@@ -77,7 +77,7 @@ describe('planSugarCrush', () => {
       grid[2][0].isCleared = true;
       // Make remaining uncleared ones non-standard
       grid[2][1].type = 'bomb';
-      grid[2][2].type = 'lightning';
+      grid[2][2].type = 'bomb';
 
       // WHEN
       const steps = planSugarCrush(grid, 3);
@@ -101,12 +101,12 @@ describe('planSugarCrush', () => {
         expect(typeof step.row).toBe('number');
         expect(typeof step.col).toBe('number');
         expect(typeof step.delayMs).toBe('number');
-        expect(['bomb', 'lightning', 'prism', 'rainbow']).toContain(step.convertTo);
+        expect(['bomb', 'gold']).toContain(step.convertTo);
         expect(['low', 'medium', 'high']).toContain(step.intensity);
       }
     });
 
-    it('should not include non-convertible types (ice, frozen, magnet etc)', () => {
+    it('never converts into standard tiles or earned diamonds', () => {
       // GIVEN
       const grid = makeStandardGrid(5);
 
@@ -115,7 +115,7 @@ describe('planSugarCrush', () => {
 
       // THEN: convertTo is only explosion/effect specials
       for (const step of steps) {
-        expect(['standard', 'ice', 'frozen', 'magnet', 'gold', 'diamond', 'gem']).not.toContain(step.convertTo);
+        expect(['standard', 'diamond']).not.toContain(step.convertTo);
       }
     });
   });
@@ -156,7 +156,7 @@ describe('planSugarCrush', () => {
       const grid = makeStandardGrid(4);
       grid[0][0].type = 'bomb'; // should be skipped (not standard)
       grid[0][1].isCleared = true; // should be skipped (already cleared)
-      grid[0][2].type = 'lightning'; // should be skipped (not standard)
+      grid[0][2].type = 'bomb'; // should be skipped (not standard)
 
       // WHEN
       const steps = planSugarCrush(grid, 4);
@@ -165,7 +165,7 @@ describe('planSugarCrush', () => {
       const skippedCoords = [
         { row: 0, col: 0 }, // bomb
         { row: 0, col: 1 }, // cleared
-        { row: 0, col: 2 }, // lightning
+        { row: 0, col: 2 }, // bomb
       ];
       for (const step of steps) {
         for (const skipped of skippedCoords) {
@@ -232,31 +232,31 @@ describe('planSugarCrush', () => {
       }
     });
 
-    it('should use lightning or prism for medium intensity tiles', () => {
+    it('should use bombs or coins for medium intensity tiles', () => {
       // GIVEN: enough tiles for medium phase
       const grid = makeStandardGrid(5);
 
       // WHEN
       const steps = planSugarCrush(grid, 5);
 
-      // THEN: medium intensity tiles convert to lightning or prism
+      // THEN: medium intensity tiles convert to bombs or coins
       const mediumSteps = steps.filter(s => s.intensity === 'medium');
       for (const step of mediumSteps) {
-        expect(['lightning', 'prism']).toContain(step.convertTo);
+        expect(['bomb', 'gold']).toContain(step.convertTo);
       }
     });
 
-    it('should use rainbow for high intensity tiles', () => {
+    it('should use coins for high intensity tiles', () => {
       // GIVEN: enough tiles for high phase (need 7+)
       const grid = makeStandardGrid(4);
 
       // WHEN
       const steps = planSugarCrush(grid, 4);
 
-      // THEN: high intensity tiles convert to rainbow
+      // THEN: high intensity tiles convert to coins
       const highSteps = steps.filter(s => s.intensity === 'high');
       for (const step of highSteps) {
-        expect(step.convertTo).toBe('rainbow');
+        expect(step.convertTo).toBe('gold');
       }
     });
   });

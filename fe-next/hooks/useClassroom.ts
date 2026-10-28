@@ -291,7 +291,9 @@ export function useClassrooms(): UseClassroomsReturn {
       lastRefetchAtRef.current = now;
       refetchInFlightRef.current = true;
       try {
-        await refresh();
+        // Quiet like the cross-list reconcile: a loading flip here re-skeletoned
+        // the teacher home on every refocus and it read as the page reloading.
+        await fetchClassrooms();
       } finally {
         refetchInFlightRef.current = false;
       }
@@ -312,7 +314,7 @@ export function useClassrooms(): UseClassroomsReturn {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('focus', handleFocus);
     };
-  }, [isAuthenticated, userId, refresh]);
+  }, [isAuthenticated, userId, fetchClassrooms]);
 
   return {
     ...state,

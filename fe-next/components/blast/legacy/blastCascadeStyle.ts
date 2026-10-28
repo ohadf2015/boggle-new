@@ -35,25 +35,19 @@ export function getPhaseStyles(phase: TilePhase, type: BlastTileType, fallOffset
       return { filter: 'brightness(1.4)', transform: 'scale(1.1)', transition: 'all 120ms ease-out' };
     case 'clearing': {
       const clearingAnim = CLEARING_ANIMS[type];
-      if (!clearingAnim && type !== 'lightning') {
+      if (!clearingAnim) {
         return {
           background: CHARGE_LIME,
           animation: 'blastTilePop 300ms cubic-bezier(0.3, 0, 0.7, 1) forwards',
           '--pop-rot': `${(clearRotate ?? 0) * 3}deg`,
         } as CSSProperties;
       }
-      const isLightning = type === 'lightning';
       return {
-        transform: clearingAnim?.transform ?? `scale(1.3) rotate(${clearRotate ?? 0}deg)`,
+        transform: clearingAnim.transform,
         opacity: 0,
-        filter: clearingAnim?.filter,
-        transition: clearingAnim?.transition ?? 'all 180ms ease-in',
+        filter: clearingAnim.filter,
+        transition: clearingAnim.transition,
         ...(clearing && { background: clearing.background, border: clearing.border }),
-        ...(isLightning && {
-          background: 'white',
-          boxShadow: '0 0 24px 8px rgba(0,255,255,0.7), 0 0 48px 16px rgba(255,255,255,0.4)',
-          animation: 'blastLightningFlash 160ms ease-in forwards',
-        }),
       };
     }
     case 'falling': {

@@ -25,6 +25,12 @@ describe('SubmitWordSchema.comboType', () => {
     expect(SubmitWordSchema.safeParse(baseValid).success).toBe(true);
   });
 
+  it('accepts a combo from a retired tile (stale client) but drops it', () => {
+    const result = SubmitWordSchema.safeParse({ ...baseValid, comboType: 'prism_prism' });
+    expect(result.success).toBe(true);
+    expect(result.success && result.data.comboType).toBeNull();
+  });
+
   it('rejects arbitrary string comboType', () => {
     expect(SubmitWordSchema.safeParse({ ...baseValid, comboType: 'fake_combo' }).success).toBe(false);
   });
@@ -40,13 +46,9 @@ describe('SubmitWordSchema.comboType', () => {
 });
 
 describe('BLAST_COMBO_TYPES canonical list', () => {
-  it('contains 27 entries matching the BlastComboType union', () => {
-    expect(BLAST_COMBO_TYPES).toHaveLength(27);
-  });
-
-  it('contains all special fallback combos', () => {
+  it('contains the bomb/coin combos', () => {
+    expect(BLAST_COMBO_TYPES).toContain('bomb_bomb');
     expect(BLAST_COMBO_TYPES).toContain('gold_special');
-    expect(BLAST_COMBO_TYPES).toContain('rainbow_special');
     expect(BLAST_COMBO_TYPES).toContain('triple_special');
   });
 

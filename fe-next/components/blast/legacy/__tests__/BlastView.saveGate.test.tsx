@@ -1,12 +1,15 @@
 /**
- * BlastView — progress-save gate.
- * On wave-loss (<90% clear) without watching the rewarded-ad continue, the run
- * MUST NOT persist score/PB/leaderboard. Save fires only when the player either
- * passed the wave (>=90% clear) or accepted the ad-continue offer.
+ * BlastView — progress-save gate, driven the way single-player really runs: every
+ * cleared wave goes through onWaveComplete, and the run ends with onGameEnd on the
+ * wave that failed. A run saves when it earned something (a cleared wave) or the
+ * player took the ad continue; a wave-1 loss with no ad saves nothing.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 
+vi.mock('@/components/blast/progress/useBlastLadder', () => ({
+  useBlastLadder: () => ({ personalBest: null, rank: null, rivals: [] }),
+}));
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }));
 
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -55,8 +58,19 @@ vi.mock('@/components/blast/legacy/BlastGame', () => ({
   },
 }));
 
+const addCoins = vi.fn();
+vi.mock('@/contexts/CoinContext', () => ({
+  useCoinContext: () => ({ addCoins, coins: 0 }),
+}));
+
 vi.mock('@/components/blast/legacy/BlastResultsSummary', () => ({
   BlastResultsSummary: () => <div data-testid="mock-blast-results" />,
+}));
+
+vi.mock('@/components/blast/progress/BlastWaveClear', () => ({
+  BlastWaveClear: ({ onContinue }: any) => (
+    <button data-testid="mock-wave-continue" onClick={onContinue} />
+  ),
 }));
 
 vi.mock('@/hooks/useHasRealAdProvider', () => ({
@@ -97,6 +111,7 @@ const endResults = (overrides: Partial<{
   clearPercentage: overrides.clearPercentage ?? 0,
   adContinueUsed: overrides.adContinueUsed ?? false,
   wavesCompleted: 0,
+  sessionCoins: 10,
   waveResults: [],
   waveScores: [],
   finalWave: 1,
@@ -108,60 +123,55 @@ describe('BlastView — save gate', () => {
   beforeEach(() => {
     blastGameProps.current = null;
     saveBlastResult.mockClear();
+    addCoins.mockClear();
   });
 
-  it('does NOT save when player loses wave without watching ad', () => {
+  function startRun() {
     render(<BlastView />);
     fireEvent.click(screen.getByTestId('play-button'));
+  }
+
+  function clearWave() {
     act(() => {
-      blastGameProps.current.onGameEnd(
-        endResults({ clearPercentage: 42, adContinueUsed: false }),
-      );
+      blastGameProps.current.onWaveComplete(300, ['CAT', 'DOG'], 100, { diamonds: 1, bombs: 0 });
     });
+    fireEvent.click(screen.getByTestId('mock-wave-continue'));
+  }
+
+  function failWave(over: Partial<{ clearPercentage: number; adContinueUsed: boolean }> = {}) {
+    act(() => {
+      blastGameProps.current.onGameEnd(endResults({ clearPercentage: 42, ...over }));
+    });
+  }
+
+  it('saves once and banks coins once when a run with cleared waves dies on a later wave', () => {
+    startRun();
+    clearWave();
+    clearWave();
+    failWave();
+    expect(saveBlastResult).toHaveBeenCalledTimes(1);
+    expect(saveBlastResult.mock.calls[0][0]).toMatchObject({ wavesCompleted: 2, finalScore: 600 + 1234 });
+    expect(addCoins).toHaveBeenCalledTimes(1);
+  });
+
+  it('does NOT save or bank when wave 1 is lost without the ad', () => {
+    startRun();
+    failWave();
     expect(saveBlastResult).not.toHaveBeenCalled();
+    expect(addCoins).not.toHaveBeenCalled();
   });
 
-  it('saves when wave is passed (>=90% clear) even without ad', () => {
-    render(<BlastView />);
-    fireEvent.click(screen.getByTestId('play-button'));
-    act(() => {
-      blastGameProps.current.onGameEnd(
-        endResults({ clearPercentage: 95, adContinueUsed: false }),
-      );
-    });
+  it('remembers the run score on the device for a guest best, even when nothing saves', () => {
+    window.localStorage.clear();
+    startRun();
+    failWave();
+    expect(window.localStorage.getItem('blast:best:v1:medium')).toBe('1234');
+  });
+
+  it('saves when the ad continue was taken even on a wave-1 loss', () => {
+    startRun();
+    failWave({ clearPercentage: 30, adContinueUsed: true });
     expect(saveBlastResult).toHaveBeenCalledTimes(1);
-  });
-
-  it('saves when ad-continue accepted even on wave-loss', () => {
-    render(<BlastView />);
-    fireEvent.click(screen.getByTestId('play-button'));
-    act(() => {
-      blastGameProps.current.onGameEnd(
-        endResults({ clearPercentage: 30, adContinueUsed: true }),
-      );
-    });
-    expect(saveBlastResult).toHaveBeenCalledTimes(1);
-  });
-
-  it('saves at the 90% boundary (passed wave)', () => {
-    render(<BlastView />);
-    fireEvent.click(screen.getByTestId('play-button'));
-    act(() => {
-      blastGameProps.current.onGameEnd(
-        endResults({ clearPercentage: 90, adContinueUsed: false }),
-      );
-    });
-    expect(saveBlastResult).toHaveBeenCalledTimes(1);
-  });
-
-  it('does NOT save at 89% with no ad', () => {
-    render(<BlastView />);
-    fireEvent.click(screen.getByTestId('play-button'));
-    act(() => {
-      blastGameProps.current.onGameEnd(
-        endResults({ clearPercentage: 89, adContinueUsed: false }),
-      );
-    });
-    expect(saveBlastResult).not.toHaveBeenCalled();
+    expect(addCoins).toHaveBeenCalledTimes(1);
   });
 });

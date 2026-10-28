@@ -4,6 +4,7 @@
 
 import type { GameModeModule } from './types';
 import { initBlastModeState, hashStringToSeed, getOrInitPlayerBoard } from '../modules/blastModeManager';
+import { blastCollectionScore } from '@/shared/utils/blastCollectionScore';
 
 export const blastMode: GameModeModule = {
   id: 'blast',
@@ -36,6 +37,11 @@ export const blastMode: GameModeModule = {
 
   resultsSummary(game) {
     const state = game.blastModeState;
-    return state ? { blastSummary: { playerMoves: state.playerMoves, playerStats: state.playerStats ?? {} } } : {};
+    if (!state) return {};
+    const playerStats = state.playerStats ?? {};
+    const collection = Object.fromEntries(
+      Object.entries(playerStats).map(([name, s]) => [name, blastCollectionScore({ coins: s.coinsCollected, diamonds: s.diamondsCollected })]),
+    );
+    return { blastSummary: { playerMoves: state.playerMoves, playerStats, collection } };
   },
 };

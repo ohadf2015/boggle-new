@@ -13,6 +13,7 @@ vi.mock('../../../backend/modules/gameStateManager', () => ({
   addPlayerWord: vi.fn(),
   playerHasWord: vi.fn(),
   updatePlayerScore: vi.fn(),
+  addPlayerEventBonus: vi.fn(),
   getLeaderboard: vi.fn(() => []),
   getLeaderboardThrottled: vi.fn(),
   markUserActivity: vi.fn(),
@@ -132,9 +133,9 @@ vi.mock('../../../backend/services/gracePeriodLock', () => ({
 // Setup blast mode manager mock with controllable tile bonus
 vi.mock('../../../backend/modules/blastModeManager', () => ({
   validateBlastWordPath: vi.fn().mockReturnValue(null),
-  getTilesOnResolvedPath: vi.fn().mockReturnValue([]),
   calculateBlastTileBonus: vi.fn().mockReturnValue(10),
-  getTilesOnPath: vi.fn().mockReturnValue(['gold', 'standard']),
+  getTilesOnBoardPath: vi.fn().mockReturnValue(['gold', 'standard']),
+  recordBlastCollection: vi.fn(() => 0),
   recordBlastMove: vi.fn().mockReturnValue({ movesUsed: 1, bonusMove: false }),
   // Per-player board model: handler now resolves a player board + cascades on it.
   getOrInitPlayerBoard: vi.fn(() => ({
@@ -156,7 +157,8 @@ vi.mock('../../../backend/modules/blastBoardRegen', () => ({
   isBlastBoardExhausted: vi.fn(() => false),
 }));
 
-import { getGame, getGameBySocketId, getUsernameBySocketId, addPlayerWord, updatePlayerScore, getFirstFinder } from '../../../backend/modules/gameStateManager';
+import { getGame, getGameBySocketId, getUsernameBySocketId, addPlayerWord, updatePlayerScore, getFirstFinder, addPlayerEventBonus } from '../../../backend/modules/gameStateManager';
+import { recordBlastCollection, safeCascadeBlastWord } from '../../../backend/modules/blastModeManager';
 import { isWordOnBoardAsync } from '../../../backend/modules/wordValidatorPool';
 import { isDictionaryWord, isValidWordCached } from '../../../backend/dictionary';
 import { isWordCommunityValid, isWordValidForScoring } from '../../../backend/modules/communityWordManager';
@@ -267,6 +269,23 @@ describe('wordHandler - Blast tile bonus in stored word details', () => {
     // Breakdown is still available for any UI that wants to itemise it — the
     // tile bonus stays reported on its own (letter value rides in the total).
     expect(payload.blast?.tileBonus).toBe(10);
+  });
+
+  it('adds the coins and diamonds this word collected to the live score as a server-side bonus', async () => {
+    (safeCascadeBlastWord as Mock).mockReturnValueOnce({
+      ok: true,
+      board: { grid: [['A', 'B'], ['C', 'D']], tileStates: [[{}, {}], [{}, {}]], overlay: [], overlayMap: new Map(), seed: 1, totalMoves: 0, refillCount: 0 },
+      clearedCount: 3, totalMoves: 1, coinsCollected: 2, diamondsCollected: 1, bombsPopped: 0,
+    });
+    (recordBlastCollection as Mock).mockReturnValueOnce(190);
+
+    await handlers['submitWord']({ word: 'test' });
+
+    expect(recordBlastCollection).toHaveBeenCalledWith(expect.anything(), 'testUser', { coins: 2, diamonds: 1, bombs: 0 });
+    expect((updatePlayerScore as Mock).mock.calls[0][2]).toBe(19 + 190);
+    expect(addPlayerEventBonus).toHaveBeenCalledWith('BLAST1', 'testUser', 190);
+    const emitCall = (mockSocket.emit as Mock).mock.calls.find((c: unknown[]) => c[0] === 'wordAccepted');
+    expect((emitCall![1] as { blast?: { collectionPoints: number } }).blast?.collectionPoints).toBe(190);
   });
 });
 

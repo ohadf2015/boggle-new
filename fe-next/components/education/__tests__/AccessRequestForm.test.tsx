@@ -156,6 +156,23 @@ describe('<AccessRequestForm>', () => {
     expect(pushMock).not.toHaveBeenCalled();
   });
 
+  it('lands a paid campaign teacher on the day-0 class screen instead of the Polar offer', async () => {
+    global.fetch = vi.fn(async () => ({
+      ok: true,
+      status: 200,
+      json: async () => ({ ok: true, success: true, paidDay0: true }),
+    } as any)) as any;
+    const user = userEvent.setup();
+    render(<AccessRequestForm />);
+
+    await user.click(screen.getByRole('radio', { name: /education\.access\.role_teacher/i }));
+    await user.type(screen.getByLabelText(/education\.access\.use_case_q/i), 'Teaching 9th grade ESL students.');
+    await user.click(screen.getByRole('button', { name: /education\.access\.submit/i }));
+
+    await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/en/teacher/class-ready'));
+    expect(screen.queryByTestId('access-success-trial')).toBeNull();
+  });
+
   it('makes Teacher Pro the main offer: first, big, with HQ as the quiet secondary', async () => {
     global.fetch = vi.fn(async () => ({
       ok: true,

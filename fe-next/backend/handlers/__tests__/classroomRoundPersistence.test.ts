@@ -70,14 +70,26 @@ function makeSupabase() {
       }
       if (table === 'classroom_memberships') {
         return {
-          select: () => ({
-            eq: () => ({
-              in: () => Promise.resolve({
-                data: [{ student_id: 'user-ana', joined_at: null }],
-                error: null,
-              }),
-            }),
-          }),
+          select: () => {
+            const filters = {};
+            const chain = {
+              eq(col, val) {
+                filters[col] = val;
+                return chain;
+              },
+              in() {
+                // Rehearsal seats are not players. This fixture has none.
+                if (filters.is_rehearsal === true) {
+                  return Promise.resolve({ data: [], error: null });
+                }
+                return Promise.resolve({
+                  data: [{ student_id: 'user-ana', joined_at: null }],
+                  error: null,
+                });
+              },
+            };
+            return chain;
+          },
         };
       }
       if (table === 'profiles') {
@@ -206,16 +218,27 @@ describe('persistClassroomGameScores — round education events', () => {
     supa.from = (table: string) => {
       if (table === 'classroom_memberships') {
         return {
-          select: () => ({
-            eq: () => ({
-              in: () => Promise.resolve({
-                // Extra minute so day_n stays 2 even when `now` was snapshotted
-                // before this mock runs (floor((2d - 1ms) / 1d) === 1).
-                data: [{ student_id: 'user-ana', joined_at: new Date(Date.now() - 2 * DAY - 60_000).toISOString() }],
-                error: null,
-              }),
-            }),
-          }),
+          select: () => {
+            const filters: Record<string, unknown> = {};
+            const chain = {
+              eq(col: string, val: unknown) {
+                filters[col] = val;
+                return chain;
+              },
+              in() {
+                if (filters.is_rehearsal === true) {
+                  return Promise.resolve({ data: [], error: null });
+                }
+                return Promise.resolve({
+                  // Extra minute so day_n stays 2 even when `now` was snapshotted
+                  // before this mock runs (floor((2d - 1ms) / 1d) === 1).
+                  data: [{ student_id: 'user-ana', joined_at: new Date(Date.now() - 2 * DAY - 60_000).toISOString() }],
+                  error: null,
+                });
+              },
+            };
+            return chain;
+          },
         };
       }
       return base(table);

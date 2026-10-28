@@ -5,7 +5,7 @@
  * Target: all modes should produce winning scores in the ~100-250 range.
  */
 
-import { BLAST_TILE_BONUSES, BLAST_RAINBOW_FLAT_BONUS } from '@/shared/constants/blastMultiplayerConstants';
+import { BLAST_TILE_BONUSES } from '@/shared/constants/blastMultiplayerConstants';
 import { HUNT_FIRST_FINDER_BONUS } from '@/shared/constants/wordHuntMultiplayerConstants';
 import { calculateBlastTileBonus } from '../modules/blastModeManager';
 import { calculateGameScores } from '../modules/scoringEngine';
@@ -49,63 +49,24 @@ describe('Scoring Normalization - Blast Tile Bonuses', () => {
     expect(BLAST_TILE_BONUSES.gold).toBe(1.5);
   });
 
-  test('diamond tile bonus should be reduced from 5 to 2.5', () => {
-    expect(BLAST_TILE_BONUSES.diamond).toBe(2.5);
-  });
-
-  test('gem tile bonus should be reduced from 2.5 to 1.5', () => {
-    expect(BLAST_TILE_BONUSES.gem).toBe(1.5);
+  test('diamond tile bonus stays plain — its reward is the collection score', () => {
+    expect(BLAST_TILE_BONUSES.diamond).toBe(1);
   });
 
   test('bomb tile bonus should be reduced from 2 to 1.25', () => {
     expect(BLAST_TILE_BONUSES.bomb).toBe(1.25);
   });
 
-  test('lightning tile bonus should be reduced from 2 to 1.25', () => {
-    expect(BLAST_TILE_BONUSES.lightning).toBe(1.25);
-  });
-
-  test('prism tile bonus should be reduced from 2 to 1.25', () => {
-    expect(BLAST_TILE_BONUSES.prism).toBe(1.25);
-  });
-
-  test('ice tile bonus should be reduced from 1.5 to 1', () => {
-    expect(BLAST_TILE_BONUSES.ice).toBe(1);
-  });
-
-  test('magnet tile bonus should be reduced from 1.5 to 1', () => {
-    expect(BLAST_TILE_BONUSES.magnet).toBe(1);
-  });
-
-  test('frozen tile bonus should be reduced from 1.5 to 1', () => {
-    expect(BLAST_TILE_BONUSES.frozen).toBe(1);
-  });
-
   test('standard tile remains at 1', () => {
     expect(BLAST_TILE_BONUSES.standard).toBe(1);
   });
 
-  test('rainbow tile remains at 1 (flat bonus separate)', () => {
-    expect(BLAST_TILE_BONUSES.rainbow).toBe(1);
+  test('typical word path tile bonus stays small', () => {
+    expect(calculateBlastTileBonus(['gold', 'bomb', 'standard'])).toBe(1.5 + 1.25 + 1);
   });
 
-  test('rainbow flat bonus should be reduced from 5 to 3', () => {
-    expect(BLAST_RAINBOW_FLAT_BONUS).toBe(3);
-  });
-
-  test('typical word path tile bonus is lower after normalization', () => {
-    // A word crossing gold + gem + standard (3 tiles)
-    const bonus = calculateBlastTileBonus(['gold', 'gem', 'standard']);
-    // Old: 3 + 2.5 + 1 = 6.5
-    // New: 1.5 + 1.5 + 1 = 4
-    expect(bonus).toBe(4);
-  });
-
-  test('best-case word path tile bonus is reasonable', () => {
-    // A word crossing diamond + gem + gold (rare best case on canonical tile set)
-    const bonus = calculateBlastTileBonus(['diamond', 'gem', 'gold']);
-    // 2.5 + 1.5 + 1.5 = 5.5
-    expect(bonus).toBe(5.5);
+  test('diamond and coin tiles add only their small per-tile bonus', () => {
+    expect(calculateBlastTileBonus(['diamond', 'gold'])).toBe(1 + 1.5);
   });
 });
 

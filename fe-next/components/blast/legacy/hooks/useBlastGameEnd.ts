@@ -25,6 +25,8 @@ interface GameEndDeps {
       wordsFound: string[];
       tilesCleared: number;
       totalTiles: number;
+      diamondsCollected?: number;
+      tileTypeClears?: Partial<Record<BlastTileType, number>>;
     };
     getResults: (maxCombo: number, wavesCompleted?: number, waveResults?: import('../types').WaveResult[], allObjectivesComplete?: boolean) => BlastResultsData;
     getLatestState: () => { tileStates: BlastTileState[][] };
@@ -39,7 +41,7 @@ interface GameEndDeps {
   onMPDeadEnd?: () => void;
   /** MP only: the shared board was fully cleared — fire a win-flavored local celebration before results. */
   onMPBoardCleared?: () => void;
-  onWaveComplete?: (score: number, words: string[], clearPct: number) => void;
+  onWaveComplete?: (score: number, words: string[], clearPct: number, collected: { diamonds: number; bombs: number }) => void;
   /** Fires when board is cleared and highlight phase should start (SP only). */
   onHighlightStart?: (finalScore: number) => void;
   /** Fires after Sugar Crush with every non-cleared tile, so the view can trigger a finale debris burst. */
@@ -60,6 +62,10 @@ interface GameEndDeps {
  * Manages game-end detection with Sugar Crush finale sequence.
  * Uses refs for callbacks to avoid stale closures without re-triggering the effect.
  */
+function waveCollected(gs: { diamondsCollected?: number; tileTypeClears?: Partial<Record<BlastTileType, number>> }) {
+  return { diamonds: gs.diamondsCollected ?? 0, bombs: gs.tileTypeClears?.bomb ?? 0 };
+}
+
 export function useBlastGameEnd(deps: GameEndDeps) {
   const {
     engine, isMultiplayer, gridSize,
@@ -100,7 +106,7 @@ export function useBlastGameEnd(deps: GameEndDeps) {
       // Full board clear always advances the wave — secondary objectives
       // (collect_type, word_length, score_target) affect stars, not progression.
       if (onWaveComplete) {
-        const timer = setTimeout(() => onWaveComplete(score, wordsFound, clearPct), 2000);
+        const timer = setTimeout(() => onWaveComplete(score, wordsFound, clearPct, waveCollected(engine.gameState)), 2000);
         return () => clearTimeout(timer);
       }
 
@@ -206,7 +212,7 @@ export function useBlastGameEnd(deps: GameEndDeps) {
         // Advance the wave if the primary board-clear objective (90%+) is met.
         // Secondary objectives affect stars but don't block progression.
         if (latestDeps.onWaveComplete && clearPct >= 90) {
-          latestDeps.onWaveComplete(score, wordsFound, clearPct);
+          latestDeps.onWaveComplete(score, wordsFound, clearPct, waveCollected(engine.gameState));
         } else {
           const results = engine.getResults(
             latestDeps.maxCombo,

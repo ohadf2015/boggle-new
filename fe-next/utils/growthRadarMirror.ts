@@ -44,6 +44,9 @@ const MIRRORED_EVENTS: ReadonlySet<string> = new Set([
   'game_completed',
   'first_game_won',
   'game_abandoned',
+  // First-game bridge tap. Consent-free so the A/B can be read without a
+  // PostHog join (growth:next_game_picked { from_mode, to_mode, first_session }).
+  'next_game_picked',
 ]);
 
 /** Keys matching this are dropped from mirrored props. `name` also covers

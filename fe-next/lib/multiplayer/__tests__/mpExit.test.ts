@@ -69,6 +69,22 @@ describe('mpExit — continue-solo', () => {
   });
 });
 
+describe('mpExit — first-game-bridge', () => {
+  it('hands an arcade player to today\'s Word Wheel, skipping the ready card', () => {
+    expect(mpExit('first-game-bridge', { ...arcade, locale: 'he' })).toEqual({
+      kind: 'navigate',
+      href: '/he/daily/word-wheel?start=1',
+    });
+  });
+
+  it('a classroom room still goes to its hub, not the consumer wheel', () => {
+    expect(mpExit('first-game-bridge', { ...arcade, isClassroomMode: true, isHost: false, locale: 'es' }))
+      .toEqual({ kind: 'navigate', href: '/es/student' });
+    expect(mpExit('first-game-bridge', { ...arcade, isClassroomMode: true, isHost: true, locale: 'he' }))
+      .toEqual({ kind: 'navigate', href: '/he/teacher' });
+  });
+});
+
 describe('mpExit — never the bare homepage from inside a room', () => {
   it('no in-room reason for any role/locale resolves to `/{locale}`', () => {
     for (const reason of MP_EXIT_REASONS) {

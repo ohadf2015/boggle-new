@@ -111,6 +111,12 @@ describe('Teacher Home', () => {
     expect(within(card).getByTestId('home-week-active')).toHaveTextContent('2');
   });
 
+  it('Given an insight, Then it lives inside the This week card: one rail card, not two', () => {
+    week = { ...week, insights: [{ id: 'momentum', value: 3 }] };
+    render(<TeacherDashboard />);
+    expect(within(screen.getByTestId('home-week')).getByTestId('home-insight')).toBeInTheDocument();
+  });
+
   it('Given the stats read failed, Then the numbers read "—", never a false zero', () => {
     week = { status: 'error', summary: null };
     render(<TeacherDashboard />);
@@ -202,6 +208,14 @@ describe('Teacher Home', () => {
     expect(card).not.toHaveTextContent(/eduShell\.onboarding\.steps\.\w+\.body/);
     expect(within(card).getAllByTestId(/^home-onboarding-step-/)).toHaveLength(3);
     expect(within(card).getByTestId('home-onboarding-cta')).toBeInTheDocument();
+  });
+
+  it('Given setup half done, Then the next step rides inside the hero, never a row of its own', () => {
+    activation = { ...activation, progress: { inviteCopied: false, liveStarted: false, roomOpened: false, dismissed: false } };
+    render(<TeacherDashboard />);
+    const card = screen.getByTestId('home-onboarding');
+    expect(card.closest('[data-testid="home-hero"]')).not.toBeNull();
+    expect(card).toHaveTextContent('eduShell.onboarding.steps.tryDemo.title');
   });
 
   it('Given ?reviewWords= from a results card, Then the lesson creator opens with those words', () => {

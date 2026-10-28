@@ -5,13 +5,9 @@ import { getTileTooltip } from '../utils/blastTileTooltips';
 import type { BlastTileType } from '@/shared/types/blast';
 
 describe('getTileTooltip', () => {
-  const allSpecialTypes: BlastTileType[] = [
-    'gold', 'bomb', 'rainbow', 'ice', 'lightning', 'magnet',
-    'prism', 'gem', 'frozen', 'diamond',
-    'countdown', 'shuffle', 'magma', 'portal', 'catalyst',
-  ];
+  const allSpecialTypes: BlastTileType[] = ['gold', 'bomb', 'diamond'];
 
-  it('defines tooltips for all 15 special tile types', () => {
+  it('defines tooltips for every special tile type', () => {
     for (const type of allSpecialTypes) {
       const tip = getTileTooltip(type);
       expect(tip).toBeDefined();
@@ -36,9 +32,8 @@ describe('getTileTooltip', () => {
     expect(tip?.desc).toContain('3×');
   });
 
-  it('returns tooltip with hits info for gem', () => {
-    const tip = getTileTooltip('gem');
-    expect(tip?.desc).toContain('3 hits');
+  it('names the coin tile', () => {
+    expect(getTileTooltip('gold')?.name).toBe('Coin');
   });
 
   it('uses i18n translations when t() provides real values', () => {

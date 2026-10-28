@@ -1,8 +1,8 @@
 /**
  * blastDeadEndGrid - Tests for grid masking used in dead-end detection
  *
- * Validates that buildDeadEndGrid correctly masks ALL unselectable tile types
- * so that hasValidWords only sees letters that can actually be played.
+ * Validates that buildDeadEndGrid masks cleared tiles so hasValidWords only
+ * sees letters still on the board.
  */
 
 import { buildDeadEndGrid } from '../blastDeadEndGrid';
@@ -11,7 +11,7 @@ import type { BlastTileState } from '../../types';
 const tile = (overrides: Partial<BlastTileState> = {}): BlastTileState => ({
   type: 'standard',
   isCleared: false,
-  isThawed: false,
+  hitsRemaining: 0,
   ...overrides,
 } as BlastTileState);
 
@@ -26,33 +26,6 @@ describe('buildDeadEndGrid', () => {
     });
   });
 
-  describe('ice and frozen tiles', () => {
-    // Ice was un-gated on 2026-06-13 (THAWABLE_TYPES = {frozen} only): it now
-    // spawns directly-selectable/meltable. So ice must NOT be masked — masking a
-    // selectable tile makes the detector fire a FALSE dead-end when only
-    // ice-routed words remain. Only unthawed `frozen` (the frost vault) is blocked.
-    it('exposes ice tiles (directly selectable since 2026-06-13)', () => {
-      const grid = [['A', 'B']];
-      const tiles = [[tile({ type: 'ice', isThawed: false }), tile()]];
-      const result = buildDeadEndGrid(grid, tiles);
-      expect(result[0][0]).toBe('A');
-    });
-
-    it('masks unthawed frozen tiles as empty string', () => {
-      const grid = [['A', 'B']];
-      const tiles = [[tile({ type: 'frozen', isThawed: false }), tile()]];
-      const result = buildDeadEndGrid(grid, tiles);
-      expect(result[0][0]).toBe('');
-    });
-
-    it('exposes thawed frozen tiles (selectable after thaw)', () => {
-      const grid = [['A', 'B']];
-      const tiles = [[tile({ type: 'frozen', isThawed: true }), tile()]];
-      const result = buildDeadEndGrid(grid, tiles);
-      expect(result[0][0]).toBe('A');
-    });
-  });
-
   describe('standard selectable tiles', () => {
     it('passes through standard tile letters unchanged', () => {
       const grid = [['X', 'Y', 'Z']];
@@ -61,12 +34,13 @@ describe('buildDeadEndGrid', () => {
       expect(result[0]).toEqual(['X', 'Y', 'Z']);
     });
 
-    it('passes through special types that are selectable (bomb, gem, etc.)', () => {
-      const grid = [['B', 'G']];
-      const tiles = [[tile({ type: 'bomb' }), tile({ type: 'gem' })]];
+    it('passes through special tiles (bomb, coin, diamond)', () => {
+      const grid = [['B', 'G', 'D']];
+      const tiles = [[tile({ type: 'bomb' }), tile({ type: 'gold' }), tile({ type: 'diamond' })]];
       const result = buildDeadEndGrid(grid, tiles);
       expect(result[0][0]).toBe('B');
       expect(result[0][1]).toBe('G');
+      expect(result[0][2]).toBe('D');
     });
   });
 

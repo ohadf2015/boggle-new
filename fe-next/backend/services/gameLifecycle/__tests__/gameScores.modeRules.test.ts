@@ -98,7 +98,7 @@ describe('calculateAndBroadcastFinalScores - mode rules and summaries', () => {
   it('blast contributes its summary block', async () => {
     mockGetGame.mockReturnValue(finishedGame({ gameMode: 'blast', blastModeState: { playerMoves: { alice: 3 }, playerStats: {} } }));
     await calculateAndBroadcastFinalScores(mockIo, 'EVT');
-    expect(payload().blastSummary).toEqual({ playerMoves: { alice: 3 }, playerStats: {} });
+    expect(payload().blastSummary).toEqual({ playerMoves: { alice: 3 }, playerStats: {}, collection: {} });
   });
 
   it('word-hunt ranks the target finder first even with a lower score, and summarizes the hunt', async () => {

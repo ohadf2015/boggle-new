@@ -1,7 +1,6 @@
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type { BlastTileState, BlastTileType } from '../types';
 import { generateBlastLetter, rollSpecialType } from './blastLetterGenerator';
-import { getInitialHitsRemaining } from './blastTileUtils';
 import { nextTileUid } from './blastTileGeneration';
 
 /** Tile with computed fall distance for animation */
@@ -128,7 +127,7 @@ export function computeGravityResult(
 
   for (let col = 0; col < gridSize; col++) {
     // Collect surviving tiles from bottom to top
-    type Survivor = { uid: string; letter: string; type: BlastTileType; originalRow: number; hitsRemaining: number } & Pick<BlastTileState, 'innerType' | 'isThawed' | 'countdown' | 'portalPairId' | 'crystalMultiplier' | 'fuseGroupId' | 'fuseTimer' | 'colorTag'>;
+    type Survivor = { uid: string; letter: string; type: BlastTileType; originalRow: number; hitsRemaining: number } & Pick<BlastTileState, 'colorTag'>;
     const survivors: Survivor[] = [];
     for (let row = gridSize - 1; row >= 0; row--) {
       const t = tileStates[row][col];
@@ -139,13 +138,6 @@ export function computeGravityResult(
           type: t.type,
           originalRow: row,
           hitsRemaining: t.hitsRemaining,
-          ...(t.innerType != null ? { innerType: t.innerType } : {}),
-          ...(t.isThawed ? { isThawed: true } : {}),
-          ...(t.countdown != null ? { countdown: t.countdown } : {}),
-          ...(t.portalPairId != null ? { portalPairId: t.portalPairId } : {}),
-          ...(t.crystalMultiplier != null ? { crystalMultiplier: t.crystalMultiplier } : {}),
-          ...(t.fuseGroupId != null ? { fuseGroupId: t.fuseGroupId } : {}),
-          ...(t.fuseTimer != null ? { fuseTimer: t.fuseTimer } : {}),
           ...(t.colorTag != null ? { colorTag: t.colorTag } : {}),
         });
       }
@@ -163,13 +155,6 @@ export function computeGravityResult(
         isCleared: false,
         activationEffect: null,
         hitsRemaining: survivor.hitsRemaining,
-        ...(survivor.innerType != null ? { innerType: survivor.innerType } : {}),
-        ...(survivor.isThawed ? { isThawed: true } : {}),
-        ...(survivor.countdown != null ? { countdown: survivor.countdown } : {}),
-        ...(survivor.portalPairId != null ? { portalPairId: survivor.portalPairId } : {}),
-        ...(survivor.crystalMultiplier != null ? { crystalMultiplier: survivor.crystalMultiplier } : {}),
-        ...(survivor.fuseGroupId != null ? { fuseGroupId: survivor.fuseGroupId } : {}),
-        ...(survivor.fuseTimer != null ? { fuseTimer: survivor.fuseTimer } : {}),
         ...(survivor.colorTag != null ? { colorTag: survivor.colorTag } : {}),
       };
 
@@ -216,7 +201,7 @@ export function computeGravityResult(
           type,
           isCleared: false,
           activationEffect: type !== 'standard' ? 'tile-earned' : null,
-          hitsRemaining: getInitialHitsRemaining(type),
+          hitsRemaining: 0,
         };
 
         newTiles.push({

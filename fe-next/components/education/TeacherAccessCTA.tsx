@@ -58,6 +58,7 @@ export function TeacherAccessCTA() {
       </p>
       <Link
         data-cta-item
+        data-lc-cta="signup"
         href={`/${language}/education/access`}
         onClick={() => trackGrowthEvent('landing_cta_clicked', { cta: 'teacher_individual' })}
         className="mt-4 inline-block rounded-neo border-neo-thick border-neo-navy bg-neo-lime px-6 py-3 font-bold text-neo-navy shadow-hard-lg transition hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-hard"
@@ -67,6 +68,7 @@ export function TeacherAccessCTA() {
       <Link
         data-cta-item
         data-testid="teacher-pro-trial-landing-cta"
+        data-lc-cta="pro_trial"
         href={`/${language}/teacher/upgrade`}
         onClick={() => trackGrowthEvent('landing_cta_clicked', { cta: 'teacher_pro_trial' })}
         className="mt-3 inline-block rounded-neo border-neo-thick border-neo-navy bg-neo-navy px-6 py-3 font-bold text-neo-cream shadow-hard-lg transition hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-hard"
@@ -76,6 +78,7 @@ export function TeacherAccessCTA() {
       <div data-cta-item className="mt-4 border-t border-neo-navy/20 pt-4">
         <p className="text-sm font-bold text-neo-navy">{t('education.landing.districtCta.title')}</p>
         <Link
+          data-lc-cta="for_schools"
           href={`/${language}/education/for-schools`}
           onClick={() => trackGrowthEvent('landing_cta_clicked', { cta: 'district_upsell' })}
           className="mt-1 inline-block text-sm font-bold text-neo-navy/70 underline underline-offset-2 transition-colors hover:text-neo-navy"

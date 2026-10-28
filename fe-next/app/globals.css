@@ -1154,34 +1154,7 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
   &[data-cascade='active'] .blast-tile-bomb {
     animation-play-state: paused;
   }
-  &[data-cascade='active'] .blast-tile-lightning {
-    animation-play-state: paused;
-  }
-  &[data-cascade='active'] .blast-tile-prism {
-    animation-play-state: paused;
-  }
-  &[data-cascade='active'] .blast-tile-gem {
-    animation-play-state: paused;
-  }
-  &[data-cascade='active'] .blast-tile-ice {
-    animation-play-state: paused;
-  }
-  &[data-cascade='active'] .blast-tile-magnet {
-    animation-play-state: paused;
-  }
-  &[data-cascade='active'] .blast-tile-frozen {
-    animation-play-state: paused;
-  }
-  &[data-cascade='active'] .blast-tile-mirror {
-    animation-play-state: paused;
-  }
-  &[data-cascade='active'] .blast-tile-silver {
-    animation-play-state: paused;
-  }
   &[data-cascade='active'] .blast-tile-diamond {
-    animation-play-state: paused;
-  }
-  &[data-cascade='active'] .blast-tile-weakened {
     animation-play-state: paused;
   }
   &[data-cascade='active'] .blast-tile-select-pop {
@@ -1319,251 +1292,6 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
   }
 }
 
-@utility blast-tile-ice {
-  /* ── Glow pseudo-element base ──
-   * Performance: static box-shadow on ::after, animate only opacity.
-   * This avoids box-shadow repaint every frame — GPU composites opacity instead.
-   */
-  overflow: visible;
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    z-index: 0;
-    will-change: opacity;
-  }
-
-  /* ── Ice ── crystalline frost breathing with subtle scale */
-  animation: blast-ice-shimmer-main 3s ease-in-out infinite;
-  &::after {
-    box-shadow:
-      inset 0 0 28px rgba(150, 220, 255, 0.55),
-      0 0 18px rgba(180, 230, 255, 0.45),
-      0 0 32px rgba(100, 200, 255, 0.25);
-    animation: blast-glow-pulse 3s ease-in-out infinite;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
-
-  .blast-game[data-cascade='active'] & {
-    animation-play-state: paused;
-  }
-}
-
-@utility blast-tile-lightning {
-  overflow: visible;
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    z-index: 0;
-    will-change: opacity;
-  }
-
-  /* ── Lightning ── electric arc flicker with jitter */
-  animation: blast-lightning-flicker-main 2s ease-in-out infinite;
-  &::after {
-    box-shadow:
-      inset 0 0 24px rgba(255, 255, 0, 0.5),
-      0 0 18px rgba(0, 191, 255, 0.4),
-      0 0 36px rgba(255, 255, 100, 0.2);
-    animation: blast-glow-flicker 2s ease-in-out infinite;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
-
-  .blast-game[data-cascade='active'] & {
-    animation-play-state: paused;
-  }
-}
-
-@utility blast-tile-magnet {
-  overflow: visible;
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    z-index: 0;
-    will-change: opacity;
-  }
-
-  /* ── Magnet ── swirling magnetic field with pull/push pulse */
-  animation: blast-magnet-rotate-main 3.5s ease-in-out infinite;
-  background-size: 200% 200% !important;
-  &::after {
-    box-shadow:
-      inset 0 0 24px rgba(139, 0, 255, 0.5),
-      0 0 20px rgba(255, 0, 64, 0.4),
-      0 0 32px rgba(180, 0, 180, 0.2);
-    animation: blast-magnet-field 3.5s ease-in-out infinite;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
-
-  .blast-game[data-cascade='active'] & {
-    animation-play-state: paused;
-  }
-}
-
-@utility blast-tile-prism {
-  overflow: visible;
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    z-index: 0;
-    will-change: opacity;
-  }
-
-  /* ── Prism ── rainbow refraction with pulsing scale */
-  animation: blast-prism-spectrum-main 4s linear infinite;
-  &::after {
-    box-shadow:
-      inset 0 0 22px rgba(255, 255, 255, 0.4),
-      0 0 18px rgba(168, 85, 247, 0.35),
-      0 0 32px rgba(255, 100, 200, 0.2);
-    animation: blast-prism-glow 4s linear infinite;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
-
-  .blast-game[data-cascade='active'] & {
-    animation-play-state: paused;
-  }
-}
-
-@utility blast-tile-gem {
-  overflow: visible;
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    z-index: 0;
-    will-change: opacity;
-  }
-
-  /* ── Gem ── emerald facet sparkle with rhythmic pulse */
-  animation: blast-gem-sparkle-main 3s ease-in-out infinite;
-  &::after {
-    box-shadow:
-      inset 0 0 26px rgba(80, 200, 120, 0.55),
-      0 0 20px rgba(0, 255, 120, 0.4),
-      0 0 32px rgba(0, 255, 100, 0.2);
-    animation: blast-glow-pulse 3s ease-in-out infinite;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
-
-  .blast-game[data-cascade='active'] & {
-    animation-play-state: paused;
-  }
-}
-
-@utility blast-tile-frozen {
-  overflow: visible;
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    z-index: 0;
-    will-change: opacity;
-  }
-
-  /* ── Frozen ── deep-freeze slow throb with icy desaturation waves */
-  animation: blast-frozen-glow-main 5s ease-in-out infinite;
-  &::after {
-    box-shadow:
-      inset 0 0 30px rgba(180, 220, 255, 0.5),
-      0 0 20px rgba(200, 230, 255, 0.4),
-      0 0 36px rgba(150, 200, 255, 0.2);
-    animation: blast-frozen-glow-after 5s ease-in-out infinite;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
-
-  .blast-game[data-cascade='active'] & {
-    animation-play-state: paused;
-  }
-}
-
-@utility blast-tile-mirror {
-  overflow: visible;
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    z-index: 0;
-    will-change: opacity;
-  }
-
-  /* ── Mirror ── reflective sweep with sharp glint flashes */
-  animation: blast-mirror-reflect-main 3.5s ease-in-out infinite;
-  background-size: 200% 200% !important;
-  &::after {
-    box-shadow:
-      inset 0 0 24px rgba(220, 220, 255, 0.5),
-      0 0 18px rgba(136, 136, 255, 0.4);
-    animation: blast-glow-pulse 3.5s ease-in-out infinite;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
-
-  .blast-game[data-cascade='active'] & {
-    animation-play-state: paused;
-  }
-}
-
-@utility blast-tile-silver {
-  overflow: visible;
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    z-index: 0;
-    will-change: opacity;
-  }
-
-  /* ── Silver ── metallic sheen sweep with glint highlights */
-  animation: blast-silver-sheen-main 3.5s ease-in-out infinite;
-  background-size: 200% 200% !important;
-  &::after {
-    box-shadow:
-      inset 0 0 22px rgba(240, 240, 240, 0.5),
-      0 0 14px rgba(200, 200, 200, 0.35);
-    animation: blast-glow-pulse 3.5s ease-in-out infinite;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
-
-  .blast-game[data-cascade='active'] & {
-    animation-play-state: paused;
-  }
-}
-
 @utility blast-tile-diamond {
   overflow: visible;
   &::after {
@@ -1594,244 +1322,6 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
   }
 }
 
-@utility blast-tile-countdown {
-  overflow: visible;
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    z-index: 0;
-    will-change: opacity;
-  }
-
-  /* ── Countdown ── urgent ticking pulse, red danger glow */
-  animation: blast-countdown-tick 1s ease-in-out infinite;
-  &::after {
-    box-shadow:
-      inset 0 0 20px rgba(255, 50, 50, 0.4),
-      0 0 14px rgba(255, 30, 30, 0.35),
-      0 0 28px rgba(200, 0, 0, 0.2);
-    animation: blast-countdown-glow 1s ease-in-out infinite;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
-}
-
-@utility blast-tile-shuffle {
-  overflow: visible;
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    z-index: 0;
-    will-change: opacity;
-  }
-
-  /* ── Shuffle ── cyan swirl with rotation hint */
-  animation: blast-shuffle-spin 2.5s ease-in-out infinite;
-  &::after {
-    box-shadow:
-      inset 0 0 18px rgba(0, 200, 255, 0.4),
-      0 0 14px rgba(0, 180, 230, 0.3),
-      0 0 28px rgba(0, 160, 210, 0.15);
-    animation: blast-glow-pulse 2.5s ease-in-out infinite;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
-}
-
-@utility blast-tile-magma {
-  overflow: visible;
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    z-index: 0;
-    will-change: opacity;
-  }
-
-  /* ── Magma ── hot orange-red pulsing glow */
-  animation: blast-magma-pulse 2s ease-in-out infinite;
-  &::after {
-    box-shadow:
-      inset 0 0 22px rgba(255, 80, 0, 0.5),
-      0 0 18px rgba(255, 120, 0, 0.4),
-      0 0 32px rgba(200, 50, 0, 0.25);
-    animation: blast-glow-pulse 2s ease-in-out infinite;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
-}
-
-@utility blast-tile-portal {
-  overflow: visible;
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    z-index: 0;
-    will-change: opacity;
-  }
-
-  /* ── Portal ── swirling vortex with hue rotation */
-  animation: blast-portal-swirl 3s linear infinite;
-  &::after {
-    box-shadow:
-      inset 0 0 24px rgba(160, 80, 255, 0.5),
-      0 0 18px rgba(130, 60, 220, 0.4),
-      0 0 32px rgba(100, 40, 200, 0.25);
-    animation: blast-portal-glow 3s ease-in-out infinite;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
-}
-
-@utility blast-tile-catalyst {
-  overflow: visible;
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    z-index: 0;
-    will-change: opacity;
-  }
-
-  /* ── Catalyst ── warm amber glow with energy radiation */
-  animation: blast-catalyst-radiate 2.8s ease-in-out infinite;
-  &::after {
-    box-shadow:
-      inset 0 0 20px rgba(255, 165, 0, 0.45),
-      0 0 16px rgba(255, 140, 0, 0.35),
-      0 0 28px rgba(255, 100, 0, 0.2);
-    animation: blast-catalyst-glow 2.8s ease-in-out infinite;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
-}
-
-@utility blast-tile-gem-glow-3 {
-  /* ── Gem glow stages — progressive amber→gold→white as hits deplete ── */
-  box-shadow:
-    0 0 8px rgba(255, 191, 0, 0.3),
-    inset 0 0 6px rgba(255, 191, 0, 0.15);
-}
-
-@utility blast-tile-gem-glow-2 {
-  box-shadow:
-    0 0 14px rgba(255, 215, 0, 0.5),
-    inset 0 0 10px rgba(255, 215, 0, 0.25);
-  animation: blast-gem-glow-pulse 1.2s ease-in-out infinite;
-
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
-}
-
-@utility blast-tile-gem-glow-1 {
-  box-shadow:
-    0 0 20px rgba(255, 255, 200, 0.7),
-    inset 0 0 14px rgba(255, 255, 255, 0.35);
-  animation: blast-gem-glow-pulse 0.7s ease-in-out infinite;
-
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
-}
-
-@utility blast-tile-gem-golden-flash {
-  /* ── Gem golden flash on final clear ── */
-  animation: blast-gem-golden-flash 350ms ease-out forwards;
-
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
-}
-
-@utility blast-tile-frozen-cracked {
-  /* ── Frozen cracked — white crack lines via pseudo-element ── */
-  position: relative;
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 3;
-    background:
-      linear-gradient(
-        135deg,
-        transparent 30%,
-        rgba(255, 255, 255, 0.6) 31%,
-        transparent 32%
-      ),
-      linear-gradient(
-        45deg,
-        transparent 55%,
-        rgba(255, 255, 255, 0.5) 56%,
-        transparent 57%
-      ),
-      linear-gradient(
-        170deg,
-        transparent 40%,
-        rgba(200, 230, 255, 0.4) 41%,
-        transparent 42%
-      );
-    pointer-events: none;
-    animation: blast-frozen-crack-appear 200ms ease-out forwards;
-  }
-}
-
-@utility blast-tile-frozen-emerge {
-  /* ── Frozen emerge — burst outward when frozen tile clears ── */
-  animation: blast-frozen-emerge 400ms ease-out forwards;
-
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
-}
-
-@utility blast-tile-ice-shimmer {
-  /* ── Ice shimmer — traveling highlight sheen ── */
-  position: relative;
-  overflow: hidden;
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    background: linear-gradient(
-      110deg,
-      transparent 25%,
-      rgba(200, 240, 255, 0.25) 37%,
-      rgba(255, 255, 255, 0.35) 50%,
-      rgba(200, 240, 255, 0.25) 63%,
-      transparent 75%
-    );
-    background-size: 250% 100%;
-    animation: blast-ice-shimmer 3s ease-in-out infinite;
-    pointer-events: none;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    &::before {
-      animation: none;
-    }
-  }
-}
-
 @utility blast-drag-selected {
   /* ── Shared glow pulse: opacity-only for GPU compositing ── */
 
@@ -1858,24 +1348,6 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
   }
 }
 
-@utility blast-tile-prism-flash {
-  /* ── Lightning flash — white burst before vertical stretch ── */
-
-  /* ── Prism rainbow flash — rapid hue cycling before cross clear ── */
-  animation: blast-prism-flash 250ms linear forwards;
-
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
-
-  /* ── Prism rainbow flash — rapid hue cycling before cross clear ── */
-  animation: blast-prism-flash 250ms linear forwards;
-
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
-}
-
 @utility blast-tile-selected {
   /* Selection glow when dragging across special tiles — single pop, not infinite pulse */
   box-shadow:
@@ -1888,31 +1360,6 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
   transition:
     transform 0.1s ease-out,
     box-shadow 0.1s ease-out;
-}
-
-@utility blast-tile-objective {
-  /* Objective tile highlight — subtle pulsing outline to guide strategy */
-  animation: blast-tile-objective-pulse 2s ease-in-out infinite;
-  outline: 2px solid rgba(255, 225, 53, 0.5);
-  outline-offset: -1px;
-}
-
-@utility blast-tile-weakened {
-  /* Score popup tier label — pops up and fades */
-
-  /* Score popup burst ring — expands and fades for exceptional words */
-
-  /* Accessibility: disable all blast tile idle animations for users who prefer reduced motion */
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
-
-  /* Weakened (cracked) tile pulse — moved from Framer Motion JS to CSS for GPU compositing */
-  animation: blast-weakened-pulse 1s ease-in-out infinite;
-
-  .blast-game[data-cascade='active'] & {
-    animation-play-state: paused;
-  }
 }
 
 @utility blast-combo-preview {
@@ -1948,149 +1395,9 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
   }
 }
 
-@utility blast-tile-frost-shatter {
-  /* ── Frost shatter reveal — ice cracks apart to show inner special ── */
-  animation: blast-frost-shatter 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)
-    forwards;
-}
-
 @utility blast-tile-earned {
   /* ── Earned tile birth — pop+shimmer when a word creates a new special ── */
   animation: blast-tile-birth 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-}
-
-@utility blast-tile-shuffle-rearrange {
-  /* ── Shuffle rearrange — cyan ripple when letters scramble ── */
-  animation: blast-shuffle-rearrange 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)
-    forwards;
-}
-
-@utility blast-lock-hint {
-  /* Locked tile adjacency hint — radiating rings */
-  animation: blast-lock-hint-pulse 2s ease-in-out infinite;
-}
-
-@utility blast-frost-shell {
-  /* Un-thawed ice/frozen shell — reads as ICE, not a padlock. Gentle frost
-     sheen + crystalline corner glints so the tile says "break me" not "locked". */
-  position: relative;
-  overflow: hidden;
-  backdrop-filter: blur(0.5px);
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    background: radial-gradient(
-      circle at 30% 25%,
-      rgba(255, 255, 255, 0.35) 0%,
-      transparent 35%
-    );
-    pointer-events: none;
-  }
-}
-
-@utility blast-frost-hint {
-  /* Frost identity pulse — gentle, never the urgent lock pulse. */
-  animation: blast-frost-hint-pulse 2.6s ease-in-out infinite;
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
-  @keyframes blast-frost-hint-pulse {
-    0%, 100% { transform: scale(1); opacity: 0.85; }
-    50% { transform: scale(1.08); opacity: 1; }
-  }
-}
-
-@utility blast-frost-melt {
-  /* Visible ONE-HIT melt — fires the first time a frozen/ice tile is struck but
-     not yet freed. Cracked-ice flash + a downward melt-drip so the player feels
-     the ice giving way. Reduced-motion keeps a static cracked frame. */
-  background:
-    linear-gradient(135deg, transparent 38%, rgba(255, 255, 255, 0.85) 40%, transparent 42%),
-    linear-gradient(48deg, transparent 58%, rgba(210, 244, 255, 0.7) 60%, transparent 62%),
-    radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 0.5) 0%, transparent 45%);
-  animation: blast-frost-melt-flash 460ms ease-out forwards;
-  &::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 42%;
-    width: 14%;
-    height: 14%;
-    border-radius: 0 50% 50% 50%;
-    transform: translate(-50%, 0) rotate(45deg);
-    background: rgba(180, 232, 255, 0.9);
-    box-shadow: 0 0 6px rgba(125, 224, 255, 0.9);
-    animation: blast-frost-drip 520ms ease-in forwards;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-    opacity: 0.9;
-    &::after { animation: none; opacity: 0; }
-  }
-  @keyframes blast-frost-melt-flash {
-    0% { opacity: 0; transform: scale(0.85); }
-    35% { opacity: 1; transform: scale(1.04); }
-    100% { opacity: 0; transform: scale(1); }
-  }
-  @keyframes blast-frost-drip {
-    0% { transform: translate(-50%, 0) rotate(45deg) scale(0.6); opacity: 0; }
-    40% { opacity: 1; }
-    100% { transform: translate(-50%, 220%) rotate(45deg) scale(1); opacity: 0; }
-  }
-}
-
-@utility blast-tile-cracked {
-  /* ── Multi-hit crack progression — visual damage states ── */
-
-  /* Cracked: tile has taken damage, shows hairline fractures + faster animation */
-  animation-duration: 1.2s !important;
-  filter: contrast(1.1) brightness(0.92);
-  &::before {
-    background:
-      linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, transparent 40%),
-      linear-gradient(
-        45deg,
-        transparent 30%,
-        rgba(0, 0, 0, 0.15) 31%,
-        transparent 32%
-      ),
-      linear-gradient(
-        -30deg,
-        transparent 55%,
-        rgba(0, 0, 0, 0.12) 56%,
-        transparent 57%
-      ) !important;
-  }
-}
-
-@utility blast-tile-critical {
-  /* Critical: one hit from breaking — intense pulsing glow + visible fracture lines */
-  animation-duration: 0.8s !important;
-  filter: contrast(1.15) brightness(0.85) saturate(1.2);
-  &::before {
-    background:
-      linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 35%),
-      linear-gradient(
-        60deg,
-        transparent 20%,
-        rgba(0, 0, 0, 0.2) 21%,
-        transparent 22%
-      ),
-      linear-gradient(
-        -45deg,
-        transparent 35%,
-        rgba(0, 0, 0, 0.18) 36%,
-        transparent 37%
-      ),
-      linear-gradient(
-        120deg,
-        transparent 60%,
-        rgba(0, 0, 0, 0.15) 61%,
-        transparent 62%
-      ) !important;
-  }
 }
 
 @utility blast-grid-frame {
@@ -3006,98 +2313,11 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
     75% { filter: hue-rotate(270deg) brightness(1.1); }
     100% { background-position: 0% 50%; filter: hue-rotate(360deg) brightness(1); }
   }
-  @keyframes blast-ice-shimmer-main {
-    0%, 100% { filter: brightness(1) saturate(1); transform: scale(1); }
-    30% { filter: brightness(1.25) saturate(1.1); }
-    50% { filter: brightness(1.15) saturate(1.2); transform: scale(1.03); }
-    70% { filter: brightness(1.3) saturate(1); }
-  }
   @keyframes blast-wildcard-pulse-main {
     0%, 100% { filter: hue-rotate(0deg) brightness(1); transform: scale(1); }
     25% { filter: hue-rotate(60deg) brightness(1.15); transform: scale(1.02); }
     50% { filter: hue-rotate(120deg) brightness(1.05); transform: scale(1); }
     75% { filter: hue-rotate(180deg) brightness(1.2); transform: scale(1.02); }
-  }
-  @keyframes blast-lightning-flicker-main {
-    0% { filter: brightness(1); transform: scale(1); }
-    8% { filter: brightness(1.8); transform: scale(1.04) rotate(0.5deg); }
-    12% { filter: brightness(0.9); transform: scale(1) rotate(-0.3deg); }
-    20% { filter: brightness(1.1); transform: scale(1); }
-    50% { filter: brightness(1); transform: scale(1); }
-    58% { filter: brightness(1.6); transform: scale(1.03) rotate(-0.5deg); }
-    62% { filter: brightness(0.85); transform: scale(1) rotate(0.2deg); }
-    70% { filter: brightness(1.15); transform: scale(1); }
-    100% { filter: brightness(1); transform: scale(1); }
-  }
-  @keyframes blast-glow-flicker {
-    0% { opacity: 0.5; }
-    8% { opacity: 1; }
-    12% { opacity: 0.2; }
-    20% { opacity: 0.6; }
-    50% { opacity: 0.5; }
-    58% { opacity: 1; }
-    62% { opacity: 0.15; }
-    70% { opacity: 0.7; }
-    100% { opacity: 0.5; }
-  }
-  @keyframes blast-magnet-rotate-main {
-    0% { background-position: 0% 0%; transform: scale(1); }
-    25% { background-position: 100% 0%; transform: scale(1.04) rotate(1deg); }
-    50% { background-position: 100% 100%; transform: scale(1); }
-    75% { background-position: 0% 100%; transform: scale(1.04) rotate(-1deg); }
-    100% { background-position: 0% 0%; transform: scale(1); }
-  }
-  @keyframes blast-magnet-field {
-    0%, 100% { opacity: 0.4; box-shadow: inset 0 0 24px rgba(139,0,255,0.5), 0 0 20px rgba(255,0,64,0.4); }
-    50% { opacity: 0.9; box-shadow: inset 0 0 28px rgba(255,0,64,0.5), 0 0 24px rgba(139,0,255,0.4); }
-  }
-  @keyframes blast-prism-spectrum-main {
-    0% { filter: hue-rotate(0deg) brightness(1); transform: scale(1); }
-    25% { filter: hue-rotate(90deg) brightness(1.15); transform: scale(1.03); }
-    50% { filter: hue-rotate(180deg) brightness(1); transform: scale(1); }
-    75% { filter: hue-rotate(270deg) brightness(1.15); transform: scale(1.03); }
-    100% { filter: hue-rotate(360deg) brightness(1); transform: scale(1); }
-  }
-  @keyframes blast-prism-glow {
-    0%, 100% { opacity: 0.4; box-shadow: inset 0 0 22px rgba(255,100,100,0.4), 0 0 18px rgba(255,50,50,0.35); }
-    25% { opacity: 0.9; box-shadow: inset 0 0 22px rgba(100,255,100,0.4), 0 0 18px rgba(50,255,50,0.35); }
-    50% { opacity: 0.5; box-shadow: inset 0 0 22px rgba(100,100,255,0.4), 0 0 18px rgba(50,50,255,0.35); }
-    75% { opacity: 0.9; box-shadow: inset 0 0 22px rgba(255,100,255,0.4), 0 0 18px rgba(255,50,255,0.35); }
-  }
-  @keyframes blast-gem-sparkle-main {
-    0%, 100% { filter: brightness(1) saturate(1); transform: scale(1); }
-    20% { filter: brightness(1.3) saturate(1.2); transform: scale(1.04); }
-    35% { filter: brightness(1) saturate(1); transform: scale(1); }
-    55% { filter: brightness(1.2) saturate(1.15); transform: scale(1.02); }
-    70% { filter: brightness(1) saturate(1); transform: scale(1); }
-  }
-  @keyframes blast-frozen-glow-main {
-    0%, 100% { filter: brightness(1) saturate(0.8); transform: scale(1); }
-    25% { filter: brightness(1.15) saturate(0.6); }
-    50% { filter: brightness(1.05) saturate(0.9); transform: scale(1.02); }
-    75% { filter: brightness(1.2) saturate(0.7); }
-  }
-  @keyframes blast-frozen-glow-after {
-    0%, 100% { opacity: 0.4; }
-    25% { opacity: 0.8; }
-    50% { opacity: 0.5; }
-    75% { opacity: 0.9; }
-  }
-  @keyframes blast-mirror-reflect-main {
-    0%, 100% { background-position: 0% 50%; filter: brightness(1); transform: scale(1); }
-    15% { filter: brightness(1.6); transform: scale(1.03); }
-    20% { filter: brightness(1); transform: scale(1); }
-    50% { background-position: 100% 50%; filter: brightness(1); }
-    65% { filter: brightness(1.5); transform: scale(1.02); }
-    70% { filter: brightness(1); transform: scale(1); }
-  }
-  @keyframes blast-silver-sheen-main {
-    0%, 100% { background-position: 0% 50%; filter: brightness(1); transform: scale(1); }
-    25% { filter: brightness(1.35); transform: scale(1.02); }
-    30% { filter: brightness(1); transform: scale(1); }
-    50% { background-position: 100% 50%; }
-    75% { filter: brightness(1.25); transform: scale(1.02); }
-    80% { filter: brightness(1); transform: scale(1); }
   }
   @keyframes blast-diamond-flash-main {
     0%, 100% { filter: brightness(1); transform: scale(1); }
@@ -3114,108 +2334,21 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
     55% { opacity: 0.95; }
     60% { opacity: 0.4; }
   }
-  @keyframes blast-countdown-tick {
-    0%, 100% { filter: brightness(1); transform: scale(1); }
-    15% { filter: brightness(1.3); transform: scale(1.06); }
-    30% { filter: brightness(1); transform: scale(0.97); }
-    50% { filter: brightness(1.15); transform: scale(1.03); }
-    70% { filter: brightness(1); transform: scale(1); }
-  }
-  @keyframes blast-countdown-glow {
-    0%, 100% { opacity: 0.35; }
-    25% { opacity: 0.9; }
-    50% { opacity: 0.4; }
-    75% { opacity: 0.85; }
-  }
-  @keyframes blast-shuffle-spin {
-    0%, 100% { filter: brightness(1) saturate(1); transform: scale(1) rotate(0deg); }
-    25% { filter: brightness(1.15) saturate(1.2); transform: scale(1.02) rotate(3deg); }
-    50% { filter: brightness(1.1) saturate(1.1); transform: scale(0.98) rotate(-3deg); }
-    75% { filter: brightness(1.2) saturate(1.15); transform: scale(1.01) rotate(1deg); }
-  }
-  @keyframes blast-magma-pulse {
-    0%, 100% { filter: brightness(1) saturate(1); transform: scale(1); }
-    30% { filter: brightness(1.3) saturate(1.4); transform: scale(1.05); }
-    60% { filter: brightness(1.1) saturate(1.2); transform: scale(0.98); }
-    80% { filter: brightness(1.35) saturate(1.3); transform: scale(1.03); }
-  }
-  @keyframes blast-portal-swirl {
-    0% { filter: hue-rotate(0deg) brightness(1); transform: scale(1); }
-    33% { filter: hue-rotate(40deg) brightness(1.15); transform: scale(1.04); }
-    66% { filter: hue-rotate(-30deg) brightness(1.1); transform: scale(0.98); }
-    100% { filter: hue-rotate(0deg) brightness(1); transform: scale(1); }
-  }
-  @keyframes blast-portal-glow {
-    0%, 100% { opacity: 0.4; }
-    50% { opacity: 0.85; }
-  }
-  @keyframes blast-catalyst-radiate {
-    0%, 100% { filter: brightness(1) saturate(1); transform: scale(1); }
-    25% { filter: brightness(1.25) saturate(1.2); transform: scale(1.05); }
-    50% { filter: brightness(1.1) saturate(1.3); transform: scale(1.02); }
-    75% { filter: brightness(1.3) saturate(1.1); transform: scale(1.04); }
-  }
-  @keyframes blast-catalyst-glow {
-    0%, 100% { opacity: 0.35; }
-    30% { opacity: 0.8; }
-    60% { opacity: 0.45; }
-    85% { opacity: 0.9; }
-  }
-  @keyframes blast-gem-glow-pulse {
-    0%, 100% { filter: brightness(1); }
-    50% { filter: brightness(1.3); }
-  }
-  @keyframes blast-gem-golden-flash {
-    0% { filter: brightness(2) saturate(1.5); box-shadow: 0 0 30px rgba(255,215,0,0.9); }
-    100% { filter: brightness(1) saturate(1); box-shadow: 0 0 0 transparent; }
-  }
-  @keyframes blast-frozen-crack-appear {
-    0% { opacity: 0; transform: scale(0.9); }
-    100% { opacity: 1; transform: scale(1); }
-  }
-  @keyframes blast-frozen-emerge {
-    0% { transform: scale(1); filter: brightness(1.8) hue-rotate(-20deg); opacity: 1; }
-    50% { transform: scale(1.3); filter: brightness(2) hue-rotate(0deg); }
-    100% { transform: scale(0.6); filter: brightness(1); opacity: 0; }
-  }
   @keyframes blast-ice-shimmer {
     0% { background-position: 200% 0; }
     100% { background-position: -50% 0; }
   }
-  @keyframes blast-glow-pulse {
-    0%, 100% { opacity: 0.45; }
-    50% { opacity: 1; }
-  }
-
   @keyframes blast-select-pop {
     0% { transform: scale(0.92); }
     60% { transform: scale(1.1); }
     100% { transform: scale(1); }
   }
-  @keyframes blastLightningFlash {
-    0% { opacity: 1; transform: scale(1.15); background: white; }
-    30% { opacity: 1; transform: scaleY(1.8) scaleX(0.5); }
-    100% { opacity: 0; transform: scaleY(2.5) scaleX(0.3); }
-  }
-
-  @keyframes blast-prism-flash {
-    0%   { filter: hue-rotate(0deg) brightness(1.4); }
-    25%  { filter: hue-rotate(90deg) brightness(1.6); }
-    50%  { filter: hue-rotate(180deg) brightness(1.8); }
-    75%  { filter: hue-rotate(270deg) brightness(1.6); }
-    100% { filter: hue-rotate(360deg) brightness(2.0); }
-  }
-
   @keyframes blast-select-pop {
     0% { transform: scale(0.92); }
     60% { transform: scale(1.1); }
     100% { transform: scale(1); }
   }
 
-  @keyframes blast-tile-objective-pulse {
-    0%, 100% { outline-color: rgba(255,225,53,0.3); }
-    50% { outline-color: rgba(255,225,53,0.7); }
-  }
   @keyframes blast-tier-label-pop {
     0% { opacity: 0; transform: translate(-50%, -80%) scale(0.5); }
     40% { opacity: 1; transform: translate(-50%, -110%) scale(1.1); }
@@ -3248,11 +2381,6 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
     65% { transform: translateY(-3px) scaleY(1.06) scaleX(0.96); }
     80% { transform: translateY(1px) scaleY(0.97) scaleX(1.02); }
     100% { opacity: 1; transform: translateY(0) scale(1); }
-  }
-
-  @keyframes blast-weakened-pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.85; }
   }
 
   @keyframes blast-combo-glow {
@@ -3288,58 +2416,16 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
     50% { text-shadow: 0 0 12px rgba(255,215,0,0.8), 0 0 24px rgba(255,200,0,0.4), 0 0 36px rgba(255,180,0,0.2); }
   }
 
-  @keyframes blast-frost-shatter {
-    0% {
-      filter: brightness(1.8) saturate(0.3);
-      box-shadow: 0 0 30px rgba(180,230,255,0.9), inset 0 0 20px rgba(200,240,255,0.6);
-      transform: scale(1.05);
-    }
-    30% {
-      filter: brightness(2.5) saturate(0);
-      box-shadow: 0 0 40px rgba(255,255,255,0.95);
-      transform: scale(1.1) rotate(3deg);
-    }
-    60% {
-      filter: brightness(1.2) saturate(1.2);
-      box-shadow: 0 0 20px rgba(191,255,0,0.6);
-      transform: scale(0.95) rotate(-2deg);
-    }
-    100% {
-      filter: brightness(1) saturate(1);
-      box-shadow: none;
-      transform: scale(1);
-    }
-  }
-
-  @keyframes blast-prism-flash {
-    0%   { filter: hue-rotate(0deg) brightness(1.4); }
-    25%  { filter: hue-rotate(90deg) brightness(1.6); }
-    50%  { filter: hue-rotate(180deg) brightness(1.8); }
-    75%  { filter: hue-rotate(270deg) brightness(1.6); }
-    100% { filter: hue-rotate(360deg) brightness(2.0); }
-  }
-
   @keyframes blast-tile-birth {
     0% { transform: scale(0.5); filter: brightness(2); box-shadow: 0 0 30px rgba(191,255,0,0.8); }
     50% { transform: scale(1.15); filter: brightness(1.5); box-shadow: 0 0 20px rgba(191,255,0,0.5); }
     100% { transform: scale(1); filter: brightness(1); box-shadow: none; }
   }
 
-  @keyframes blast-shuffle-rearrange {
-    0% { transform: scale(0.8) rotate(-10deg); filter: brightness(0.7); box-shadow: 0 0 20px rgba(0,200,255,0.7); }
-    40% { transform: scale(1.1) rotate(5deg); filter: brightness(1.4); box-shadow: 0 0 25px rgba(0,220,255,0.6), inset 0 0 8px rgba(0,180,255,0.3); }
-    100% { transform: scale(1) rotate(0deg); filter: brightness(1); box-shadow: none; }
-  }
-
   @keyframes blast-locked-frost {
     0%, 100% { opacity: 0.6; outline-color: rgba(150, 200, 255, 0.35); }
     50% { opacity: 0.45; outline-color: rgba(150, 200, 255, 0.15); }
   }
-  @keyframes blast-lock-hint-pulse {
-    0%, 100% { opacity: 0.7; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.05); }
-  }
-
   /* Animated gradient shimmer — background-position slides across oversized gradient */
   @keyframes blast-gradient-travel {
     0% { background-position: 0% 0%; }

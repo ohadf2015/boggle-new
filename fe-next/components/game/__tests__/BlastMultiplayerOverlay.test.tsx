@@ -30,7 +30,7 @@ describe('BlastMultiplayerOverlay', () => {
   it('should render a badge for each overlay tile', () => {
     const overlay: BlastTileOverlay[] = [
       { row: 0, col: 0, type: 'gold' },
-      { row: 1, col: 2, type: 'rainbow' },
+      { row: 1, col: 2, type: 'diamond' },
       { row: 2, col: 1, type: 'bomb' },
     ];
 
@@ -62,7 +62,7 @@ describe('BlastMultiplayerOverlay', () => {
     const overlay: BlastTileOverlay[] = [
       { row: 0, col: 0, type: 'gold' },
       { row: 0, col: 1, type: 'bomb' },
-      { row: 0, col: 2, type: 'ice' },
+      { row: 0, col: 2, type: 'diamond' },
     ];
 
     render(
@@ -71,66 +71,29 @@ describe('BlastMultiplayerOverlay', () => {
 
     const goldTile = screen.getByTestId('blast-tile-0-0');
     const bombTile = screen.getByTestId('blast-tile-0-1');
-    const iceTile = screen.getByTestId('blast-tile-0-2');
+    const diamondTile = screen.getByTestId('blast-tile-0-2');
 
     // The point of the overlay is that you can tell the types apart at a
     // glance, so assert the badges differ — not merely that they exist.
     // This is a decorative, pointer-events-none layer: each badge is a
     // <span> icon, never an interactive control.
     expect(goldTile.textContent).toBeTruthy();
-    expect(new Set([goldTile.textContent, bombTile.textContent, iceTile.textContent]).size).toBe(3);
+    expect(new Set([goldTile.textContent, bombTile.textContent, diamondTile.textContent]).size).toBe(3);
   });
 
-  it('should handle all tile types without errors', () => {
-    const allTypes: BlastTileOverlay[] = [
-      { row: 0, col: 0, type: 'gold' },
-      { row: 0, col: 1, type: 'rainbow' },
-      { row: 0, col: 2, type: 'bomb' },
-      { row: 1, col: 0, type: 'ice' },
-      { row: 1, col: 1, type: 'gem' },
-      { row: 1, col: 2, type: 'lightning' },
-      { row: 2, col: 0, type: 'magnet' },
-    ];
-
-    expect(() => {
-      render(
-        <BlastMultiplayerOverlay overlay={allTypes} gridSize={gridSize} />
-      );
-    }).not.toThrow();
-  });
-
-  it('should render badges for ALL 20 special tile types', () => {
-    const gridSize5 = { rows: 5, cols: 5 };
+  it('renders a badge for every special tile type', () => {
     const allSpecialTypes: BlastTileOverlay[] = [
       { row: 0, col: 0, type: 'gold' },
       { row: 0, col: 1, type: 'bomb' },
-      { row: 0, col: 2, type: 'rainbow' },
-      { row: 0, col: 3, type: 'ice' },
-      { row: 0, col: 4, type: 'lightning' },
-      { row: 1, col: 0, type: 'magnet' },
-      { row: 1, col: 1, type: 'prism' },
-      { row: 1, col: 2, type: 'gem' },
-      { row: 1, col: 3, type: 'frozen' },
-      { row: 1, col: 4, type: 'diamond' },
-      { row: 2, col: 0, type: 'countdown' },
-      { row: 2, col: 1, type: 'portal' },
-      { row: 2, col: 2, type: 'catalyst' },
-      { row: 2, col: 3, type: 'shuffle' },
-      { row: 2, col: 4, type: 'magma' },
-      { row: 3, col: 0, type: 'crystal' },
-      { row: 3, col: 1, type: 'fuse' },
-      { row: 3, col: 4, type: 'anchor' },
+      { row: 0, col: 2, type: 'diamond' },
     ];
 
     render(
-      <BlastMultiplayerOverlay overlay={allSpecialTypes} gridSize={gridSize5} />
+      <BlastMultiplayerOverlay overlay={allSpecialTypes} gridSize={gridSize} />
     );
 
-    // Every special tile type must render a badge — none should return null
     for (const tile of allSpecialTypes) {
-      const el = screen.getByTestId(`blast-tile-${tile.row}-${tile.col}`);
-      expect(el).toBeInTheDocument();
-      expect(el.textContent).toBeTruthy();
+      expect(screen.getByTestId(`blast-tile-${tile.row}-${tile.col}`).textContent).toBeTruthy();
     }
   });
 

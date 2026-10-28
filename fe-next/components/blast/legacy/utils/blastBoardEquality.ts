@@ -23,17 +23,7 @@ const COMPARED_FIELDS: ReadonlyArray<keyof BlastTileState> = [
   'isCleared',
   'activationEffect',
   'hitsRemaining',
-  'innerType',
-  'isThawed',
-  'countdown',
-  'portalPairId',
-  'crystalMultiplier',
-  'fuseGroupId',
-  'fuseTimer',
   'colorTag',
-  'jellyLayers',
-  'cakeHp',
-  'cakeAnchorUid',
 ];
 
 export function blastBoardsEqual(

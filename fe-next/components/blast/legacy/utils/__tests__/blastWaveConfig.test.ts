@@ -3,91 +3,24 @@
  */
 import {
   getWaveConfig,
-  getWaveDistribution,
   getWaveObjectives,
   seedTargetWordObjective,
   seedColorPowerObjective,
-  BLAST_RETIRED_SPECIAL_TYPES,
 } from '../blastWaveConfig';
-
-/**
- * "Locked tiles" removal (2026-06-13): only `frozen` (the inner-special vault
- * that locks until thawed) is retired. ICE is kept — it spawns and is directly
- * selectable/meltable (no lock; see THAWABLE_TYPES). The derived frost "locked"
- * overlay therefore never appears, because frozen never spawns and ice never
- * locks (SP + MP both roll on getWaveDistribution).
- */
-describe('blastWaveConfig — frozen retired, ice kept (selectable/meltable)', () => {
-  it('resolves frozen to 0 share across every wave (1-12)', () => {
-    for (let w = 1; w <= 12; w++) {
-      const dist = getWaveDistribution(getWaveConfig(w));
-      expect(dist.frozen ?? 0).toBe(0);
-    }
-  });
-
-  it('keeps ice spawning (it is no longer a locked tile)', () => {
-    expect(getWaveDistribution(getWaveConfig(1)).ice ?? 0).toBeGreaterThan(0);
-  });
-
-  it('lists frozen — but NOT ice — in the retired set', () => {
-    expect(BLAST_RETIRED_SPECIAL_TYPES.has('frozen')).toBe(true);
-    expect(BLAST_RETIRED_SPECIAL_TYPES.has('ice')).toBe(false);
-  });
-});
-
-/**
- * Sprint 1 tile retirement: 14 special types disabled across all waves so the
- * playable roster shrinks from 20 to 5 specials (bomb, rainbow, lightning,
- * prism, gold) plus base obstacles (ice, frost/frozen). Type union and effect
- * code stay intact (cleaner deletion left for a follow-up refactor); the
- * spawn flags being uniformly false means players never see them.
- */
-describe('blastWaveConfig — Sprint 1 retired tiles never spawn', () => {
-  const RETIRED_FLAGS = [
-    'vortexEnabled',
-    'magnetEnabled',
-    'gemEnabled',
-    'diamondEnabled',
-    'countdownEnabled',
-    'shuffleEnabled',
-    'magmaEnabled',
-    'portalEnabled',
-    'catalystEnabled',
-    'crystalEnabled',
-    'fuseEnabled',
-    'anchorEnabled',
-  ] as const;
-
-  // Revival sprint 2026-05-10: the retirement guard scopes to waves 1-7.
-  // Waves 8+ progressively re-enable retired tiles (see blast-tile-revival plan).
-  it.each([1, 2, 3, 4, 5, 6, 7])('wave %i (FTUE cohort) keeps all retired flags off', (wave) => {
-    const cfg = getWaveConfig(wave) as unknown as Record<string, unknown>;
-    for (const flag of RETIRED_FLAGS) {
-      expect(cfg[flag]).toBe(false);
-    }
-  });
-});
 
 describe('getWaveConfig', () => {
   it('returns WaveConfig for wave 1', () => {
     const config = getWaveConfig(1);
     expect(config.minWordLength).toBe(2);
-    expect(config.specialTileChance).toBe(0.10);
+    expect(config.specialTileChance).toBe(0.06);
     expect(config.vowelModifier).toBe(1.1);
     expect(config.maxCascadeChain).toBe(2);
-    expect(config.lightningEnabled).toBe(false);
-    expect(config.magnetEnabled).toBe(false);
   });
 
-  it('has lower special tile chance in early waves (1-2) for less visual noise', () => {
-    const w1 = getWaveConfig(1);
-    const w2 = getWaveConfig(2);
-    const w3 = getWaveConfig(3);
-    // Early waves should be calmer (fewer specials)
-    expect(w1.specialTileChance).toBeLessThanOrEqual(0.12);
-    expect(w2.specialTileChance).toBeLessThanOrEqual(0.14);
-    // Wave 3+ stays at normal levels
-    expect(w3.specialTileChance).toBeGreaterThanOrEqual(0.17);
+  it('opens with the calmest board', () => {
+    for (let wave = 2; wave <= 12; wave++) {
+      expect(getWaveConfig(wave).specialTileChance).toBeGreaterThanOrEqual(getWaveConfig(1).specialTileChance);
+    }
   });
 
   it('returns progressively harder config for higher waves', () => {
@@ -95,13 +28,8 @@ describe('getWaveConfig', () => {
     const w3 = getWaveConfig(3);
     const w5 = getWaveConfig(5);
 
-    // Ice distribution increases
-    expect(w3.iceDistribution).toBeGreaterThan(w1.iceDistribution);
-    expect(w5.iceDistribution).toBeGreaterThan(w3.iceDistribution);
-
-    // Gold distribution decreases
-    expect(w3.goldDistribution).toBeLessThan(w1.goldDistribution);
-    expect(w5.goldDistribution).toBeLessThan(w3.goldDistribution);
+    // More specials roll as waves climb
+    expect(w5.specialTileChance).toBeGreaterThan(w1.specialTileChance);
 
     // Vowel modifier decreases
     expect(w3.vowelModifier).toBeLessThan(w1.vowelModifier);
@@ -112,33 +40,6 @@ describe('getWaveConfig', () => {
     for (let wave = 1; wave <= 12; wave++) {
       expect(getWaveConfig(wave).minWordLength).toBe(2);
     }
-  });
-
-  it('enables lightning at wave 4', () => {
-    expect(getWaveConfig(3).lightningEnabled).toBe(false);
-    expect(getWaveConfig(4).lightningEnabled).toBe(true);
-  });
-
-  // Sprint 1 retirement: magnet/gems no longer spawn. Tests retained as
-  // negative assertions so a regression that re-enables them fails loudly.
-  it('keeps magnet retired across all waves', () => {
-    expect(getWaveConfig(6).magnetEnabled).toBe(false);
-    expect(getWaveConfig(7).magnetEnabled).toBe(false);
-  });
-
-  it('keeps gems retired across all waves', () => {
-    expect(getWaveConfig(1).gemEnabled).toBe(false);
-    expect(getWaveConfig(2).gemEnabled).toBe(false);
-  });
-
-  it('enables prisms at wave 3', () => {
-    expect(getWaveConfig(2).prismEnabled).toBe(false);
-    expect(getWaveConfig(3).prismEnabled).toBe(true);
-  });
-
-  it('enables frozen at wave 6', () => {
-    expect(getWaveConfig(5).frozenEnabled).toBe(false);
-    expect(getWaveConfig(6).frozenEnabled).toBe(true);
   });
 
   it('has scoreThreshold starting at wave 3', () => {
@@ -162,8 +63,6 @@ describe('getWaveConfig', () => {
     expect(w15.minWordLength).toBe(w12.minWordLength);
     expect(w15.maxCascadeChain).toBe(w12.maxCascadeChain);
     expect(w15.vowelModifier).toBe(w12.vowelModifier);
-    expect(w15.lightningEnabled).toBe(w12.lightningEnabled);
-    expect(w15.magnetEnabled).toBe(w12.magnetEnabled);
   });
 
   it('increases scoreThreshold linearly beyond wave 7', () => {
@@ -180,201 +79,12 @@ describe('getWaveConfig', () => {
   });
 });
 
-describe('getWaveDistribution', () => {
-  it('returns no lightning/magnet for wave 1', () => {
-    const dist = getWaveDistribution(getWaveConfig(1));
-    expect(dist.lightning).toBe(0);
-    expect(dist.magnet).toBe(0);
-  });
-
-  it('returns no new tiles for wave 1', () => {
-    const dist = getWaveDistribution(getWaveConfig(1));
-    expect(dist.gem).toBe(0);
-    expect(dist.prism).toBe(0);
-    expect(dist.frozen).toBe(0);
-  });
-
-  // Sprint 1 retirement: gem/diamond/magnet never spawn. Distribution checks
-  // become "zero across the board" assertions.
-  it('keeps gems out of distribution at wave 2 (retired)', () => {
-    const dist = getWaveDistribution(getWaveConfig(2));
-    expect(dist.gem).toBe(0);
-    expect(dist.prism).toBe(0);
-    expect(dist.frozen).toBe(0);
-  });
-
-  it('still unlocks prisms at wave 3 (kept)', () => {
-    const dist = getWaveDistribution(getWaveConfig(3));
-    expect(dist.gem).toBe(0);
-    expect(dist.prism).toBeGreaterThan(0);
-    expect(dist.frozen).toBe(0);
-  });
-
-  it('includes lightning at wave 4', () => {
-    const dist = getWaveDistribution(getWaveConfig(4));
-    expect(dist.lightning).toBeGreaterThan(0);
-    expect(dist.magnet).toBe(0);
-  });
-
-  it('keeps diamond retired at wave 4, features lightning only', () => {
-    const dist = getWaveDistribution(getWaveConfig(4));
-    expect(dist.lightning).toBeGreaterThan(0);
-    expect(dist.prism ?? 0).toBe(0);
-    expect(dist.diamond).toBe(0);
-    expect(dist.gem).toBe(0);
-  });
-
-  it('keeps magnet retired at wave 7, features anchor only', () => {
-    const dist = getWaveDistribution(getWaveConfig(7));
-    expect(dist.anchor ?? 0).toBeGreaterThan(0);
-    expect(dist.lightning ?? 0).toBe(0);
-    expect(dist.magnet).toBe(0);
-  });
-
-  it('distribution sums to approximately 1.0', () => {
-    for (let wave = 1; wave <= 8; wave++) {
-      const dist = getWaveDistribution(getWaveConfig(wave));
-      const sum = (Object.values(dist) as number[]).reduce((a, b) => a + b, 0);
-      expect(sum).toBeCloseTo(1.0, 1);
-    }
-  });
-
-  it('reduces gold/rainbow when new tiles are added', () => {
-    const w1Dist = getWaveDistribution(getWaveConfig(1));
-    const w6Dist = getWaveDistribution(getWaveConfig(6));
-    // Gold + rainbow should be lower in wave 6 because lightning/magnet take share
-    const w1GoldRainbow = w1Dist.gold + w1Dist.rainbow;
-    const w6GoldRainbow = w6Dist.gold + w6Dist.rainbow;
-    expect(w6GoldRainbow).toBeLessThan(w1GoldRainbow);
-  });
-
-  it('uses wave-specific ice and gold distributions', () => {
-    const dist1 = getWaveDistribution(getWaveConfig(1));
-    const dist6 = getWaveDistribution(getWaveConfig(6));
-    // Ice spawns (kept, selectable/meltable) and scales up across waves.
-    expect(dist6.ice).toBeGreaterThan(dist1.ice);
-    expect(dist1.gold).toBeGreaterThan(0);
-    expect(dist6.gold).toBeGreaterThan(0);
-  });
-});
-
-// ==================== New distribution tests (47-05) ====================
-
-describe('getWaveDistribution — new tile unlock progression', () => {
-  it('wave 1: basic tiles only, no advanced tiles', () => {
-    const dist = getWaveDistribution(getWaveConfig(1));
-    // Basic specials all present (ice kept — selectable/meltable, not locked)
-    expect(dist.bomb).toBeGreaterThan(0);
-    expect(dist.ice).toBeGreaterThan(0);
-    expect(dist.gold).toBeGreaterThan(0);
-    expect(dist.rainbow).toBeGreaterThan(0);
-    // Advanced tiles absent in wave 1
-    expect(dist.magnet ?? 0).toBe(0);
-    expect(dist.frozen ?? 0).toBe(0);
-    expect(dist.prism ?? 0).toBe(0);
-    expect(dist.lightning ?? 0).toBe(0);
-    expect(dist.gem ?? 0).toBe(0);
-    expect(dist.diamond ?? 0).toBe(0);
-    expect(dist.catalyst ?? 0).toBe(0);
-    expect(dist.crystal ?? 0).toBe(0);
-  });
-
-  // Sprint 1 retirement: gems / diamond / magnet do not appear at any wave.
-  // The progressive-unlock tests collapse to "kept tiles still unlock, retired
-  // tiles never do".
-  it('wave 2: gems retired, lightning/prism/frozen/diamond/magnet still off', () => {
-    const dist = getWaveDistribution(getWaveConfig(2));
-    expect(dist.gem ?? 0).toBe(0);
-    expect(dist.lightning ?? 0).toBe(0);
-    expect(dist.prism ?? 0).toBe(0);
-    expect(dist.frozen ?? 0).toBe(0);
-    expect(dist.magnet ?? 0).toBe(0);
-    expect(dist.diamond ?? 0).toBe(0);
-  });
-
-  it('wave 3: unlocks prism, no lightning/frozen yet', () => {
-    const dist = getWaveDistribution(getWaveConfig(3));
-    expect(dist.prism).toBeGreaterThan(0);
-    expect(dist.lightning ?? 0).toBe(0);
-    expect(dist.frozen ?? 0).toBe(0);
-  });
-
-  it('wave 4: unlocks lightning, retired diamond/magnet stay off, no prism yet', () => {
-    const dist = getWaveDistribution(getWaveConfig(4));
-    expect(dist.lightning).toBeGreaterThan(0);
-    expect(dist.prism ?? 0).toBe(0);
-    expect(dist.diamond ?? 0).toBe(0);
-    expect(dist.magnet ?? 0).toBe(0);
-    expect(dist.frozen ?? 0).toBe(0);
-  });
-
-  it('wave 5: features mystery, diamond+lightning retired', () => {
-    const dist = getWaveDistribution(getWaveConfig(5));
-    expect(dist.mystery ?? 0).toBeGreaterThan(0);
-    expect(dist.diamond ?? 0).toBe(0);
-    expect(dist.lightning ?? 0).toBe(0);
-    expect(dist.frozen ?? 0).toBe(0);
-  });
-
-  it('wave 6: frozen retired (locked-tile removal), magnet stays retired', () => {
-    const dist = getWaveDistribution(getWaveConfig(6));
-    expect(dist.frozen ?? 0).toBe(0);
-    expect(dist.magnet ?? 0).toBe(0);
-    expect(dist.diamond ?? 0).toBe(0);
-  });
-
-  it('wave 7+: magnet stays retired, features anchor', () => {
-    const dist = getWaveDistribution(getWaveConfig(7));
-    expect(dist.magnet ?? 0).toBe(0);
-    expect(dist.anchor ?? 0).toBeGreaterThan(0);
-    expect(dist.lightning ?? 0).toBe(0);
-  });
-
-  it('all distributions for waves 1-6 sum to 1.0 (within 0.01)', () => {
-    for (let wave = 1; wave <= 6; wave++) {
-      const dist = getWaveDistribution(getWaveConfig(wave));
-      const sum = (Object.values(dist) as number[]).reduce((a, b) => a + b, 0);
-      expect(sum).toBeCloseTo(1.0, 2); // within 0.01
-    }
-  });
-
-  it('WaveConfig has diamondEnabled flag', () => {
-    const config = getWaveConfig(1);
-    expect(typeof config.diamondEnabled).toBe('boolean');
-  });
-
-  it('diamondEnabled stays false through FTUE cohort (waves 1-7)', () => {
-    for (let wave = 1; wave <= 7; wave++) {
-      expect(getWaveConfig(wave).diamondEnabled).toBe(false);
-    }
-  });
-
-  it('crystalEnabled stays false through FTUE cohort (waves 1-7)', () => {
-    for (let wave = 1; wave <= 7; wave++) {
-      expect(getWaveConfig(wave).crystalEnabled).toBe(false);
-    }
-  });
-
-  it('crystal absent from distribution through FTUE cohort (waves 1-7)', () => {
-    for (let wave = 1; wave <= 7; wave++) {
-      const dist = getWaveDistribution(getWaveConfig(wave));
-      expect(dist.crystal ?? 0).toBe(0);
-    }
-  });
-
-  it('wave 12 distribution still sums to ~1.0 with crystal included', () => {
-    const dist = getWaveDistribution(getWaveConfig(12));
-    const sum = (Object.values(dist) as number[]).reduce((a, b) => a + b, 0);
-    expect(sum).toBeCloseTo(1.0, 2);
-  });
-});
-
 describe('getWaveConfig archetype', () => {
   it('wave 1 is a calm normal wave (learn-the-ropes)', () => {
     expect(getWaveConfig(1).archetype).toBe('normal');
   });
 
-  it('wave 2 is a treasureHunt wave (gem unlock)', () => {
+  it('wave 2 is a treasureHunt wave', () => {
     expect(getWaveConfig(2).archetype).toBe('treasureHunt');
   });
 
@@ -382,7 +92,7 @@ describe('getWaveConfig archetype', () => {
     expect(getWaveConfig(3).archetype).toBe('normal');
   });
 
-  it('wave 4 is a scoreRush wave (lightning unlock → big combos)', () => {
+  it('wave 4 is a scoreRush wave', () => {
     expect(getWaveConfig(4).archetype).toBe('scoreRush');
   });
 
@@ -390,19 +100,19 @@ describe('getWaveConfig archetype', () => {
     expect(getWaveConfig(5).archetype).toBe('normal');
   });
 
-  it('wave 6 is a survival wave (tight moves, frost unlock)', () => {
+  it('wave 6 is a survival wave', () => {
     expect(getWaveConfig(6).archetype).toBe('survival');
   });
 
-  it('wave 7 is a treasureHunt wave (vortex unlock → collection puzzle)', () => {
+  it('wave 7 is a treasureHunt wave', () => {
     expect(getWaveConfig(7).archetype).toBe('treasureHunt');
   });
 
-  it('wave 8 is a scoreRush wave (catalyst unlock)', () => {
+  it('wave 8 is a scoreRush wave', () => {
     expect(getWaveConfig(8).archetype).toBe('scoreRush');
   });
 
-  it('wave 9 is a survival wave (countdown unlock)', () => {
+  it('wave 9 is a survival wave', () => {
     expect(getWaveConfig(9).archetype).toBe('survival');
   });
 
@@ -410,7 +120,7 @@ describe('getWaveConfig archetype', () => {
     expect(getWaveConfig(10).archetype).toBe('normal');
   });
 
-  it('wave 11 is a scoreRush wave (magma + portal chaos)', () => {
+  it('wave 11 is a scoreRush wave', () => {
     expect(getWaveConfig(11).archetype).toBe('scoreRush');
   });
 
@@ -596,52 +306,5 @@ describe('wave completability invariants', () => {
     it('movesAllowed is at least 4 (minimum playable wave length)', () => {
       expect(getWaveConfig(wave).movesAllowed).toBeGreaterThanOrEqual(4);
     });
-  });
-});
-
-// ==================== Curated permanent roster (clarity pass) ====================
-// The wave 8-12 revival staircase used to flood the board with ~20 special
-// types. BLAST_RETIRED_SPECIAL_TYPES zeroes the redundant/confusing ones at
-// EVERY wave so the roster never grows past the clear FTUE core.
-describe('getWaveDistribution — curated permanent roster', () => {
-  // Locked-tile removal (2026-06-13) pulled only frozen from the kept core;
-  // ice stays (now selectable/meltable rather than locked).
-  const KEPT_CORE = ['bomb', 'ice', 'gold', 'rainbow', 'lightning', 'prism'] as const;
-
-  it('retires every flood tile at the highest waves (no revival)', () => {
-    for (const wave of [9, 12, 15, 20]) {
-      const dist = getWaveDistribution(getWaveConfig(wave));
-      for (const retired of BLAST_RETIRED_SPECIAL_TYPES) {
-        expect(dist[retired] ?? 0).toBe(0);
-      }
-    }
-  });
-
-  it('keeps the core + featured specials spawning at high waves', () => {
-    const dist = getWaveDistribution(getWaveConfig(12));
-    // W12 features: lightning + mystery
-    // CORE always: bomb, ice, gold, rainbow
-    expect(dist.bomb ?? 0).toBeGreaterThan(0);
-    expect(dist.ice ?? 0).toBeGreaterThan(0);
-    expect(dist.gold ?? 0).toBeGreaterThan(0);
-    expect(dist.rainbow ?? 0).toBeGreaterThan(0);
-    expect(dist.lightning ?? 0).toBeGreaterThan(0);
-    expect(dist.mystery ?? 0).toBeGreaterThan(0);
-    // W12 does NOT feature prism, so it should be zeroed
-    expect(dist.prism ?? 0).toBe(0);
-  });
-
-  it('still normalizes to ~1.0 after curation at high waves', () => {
-    for (const wave of [9, 12, 15]) {
-      const dist = getWaveDistribution(getWaveConfig(wave));
-      const sum = (Object.values(dist) as number[]).reduce((a, b) => a + b, 0);
-      expect(sum).toBeCloseTo(1.0, 1);
-    }
-  });
-
-  it('does not retire any tile the FTUE deliberately keeps', () => {
-    for (const kept of KEPT_CORE) {
-      expect(BLAST_RETIRED_SPECIAL_TYPES.has(kept as never)).toBe(false);
-    }
   });
 });

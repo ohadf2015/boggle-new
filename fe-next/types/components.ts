@@ -136,7 +136,11 @@ export interface ResultsPageProps {
   /** Word Hunt summary from server (target word, lives, eliminated) */
   wordHuntSummary?: { targetWord: string; playerLives: Record<string, number>; eliminatedPlayers: string[]; targetFoundBy: string | null; survivalTime?: number; discoveryWords?: number; playerAttempts?: Record<string, number> };
   /** Blast mode summary from server */
-  blastSummary?: { playerMoves?: Record<string, number>; playerStats?: Record<string, import('@/shared/types/game').BlastPlayerStats> };
+  blastSummary?: {
+    playerMoves?: Record<string, number>;
+    playerStats?: Record<string, import('@/shared/types/game').BlastPlayerStats>;
+    collection?: Record<string, import('@/shared/utils/blastCollectionScore').BlastCollectionScore>;
+  };
   /** Wheel Rush mode summary from server */
   wheelRushSummary?: { playerStats?: Record<string, import('@/shared/types/game').WheelRushPlayerStats> };
 }

@@ -115,6 +115,10 @@ export type GrowthEvent =
   //             variant: 'desktop' | 'mobile' | 'landscape' }.
   | 'next_step_shown'
   | 'next_step_clicked'
+  // next_game_picked: a results CTA chose the next game.
+  //   Picker props: { option, from, preset? | href? }.
+  //   First-game bridge (t_b883191f): { from_mode, to_mode, first_session: true,
+  //     experiment: 'first-game-bridge', variant: 'bridge' }.
   | 'next_game_picked'
   | 'daily_challenge_completed'
   | 'daily_puzzle_opened'

@@ -85,28 +85,6 @@ describe('useBlastMultiplayerBridge', () => {
     expect(result.current.initialTileStates).toBeNull();
   });
 
-  it('should assign innerType to frozen tiles using seeded random', () => {
-    // GIVEN: overlay with a frozen tile
-    const overlay: BlastTileOverlay[] = [
-      { row: 1, col: 2, type: 'frozen' },
-    ];
-
-    (mockBlastTileOverlay as any).length = 0;
-    mockBlastTileOverlay.push(...overlay);
-
-    // WHEN
-    const { result } = renderHook(() =>
-      useBlastMultiplayerBridge({ letterGrid: mockLetterGrid, gridSize: 4 })
-    );
-
-    const frozenTile = result.current.initialTileStates![1][2];
-
-    // THEN: frozen tile should have an innerType from the valid candidates
-    expect(frozenTile.type).toBe('frozen');
-    expect(frozenTile.innerType).toBeDefined();
-    expect(['bomb', 'lightning', 'prism', 'gem', 'rainbow']).toContain(frozenTile.innerType);
-  });
-
   it('should produce deterministic innerType for same seed', () => {
     // GIVEN: overlay with frozen tiles and seed = 42
     const overlay: BlastTileOverlay[] = [

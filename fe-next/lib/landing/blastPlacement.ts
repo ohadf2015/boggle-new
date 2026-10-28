@@ -1,16 +1,16 @@
-/**
- * Move the `blast` card so it sits immediately after the multiplayer (`arena`)
- * card in a landing order. Pure + generic so it composes with the layered
- * ordering in LandingChallengeCards regardless of popularity ranking.
- */
-export function placeBlastAfterArena<T extends string>(order: readonly T[]): T[] {
-  const out = [...order];
-  const blastIdx = out.indexOf('blast' as T);
-  const arenaIdx = out.indexOf('arena' as T);
-  if (blastIdx < 0 || arenaIdx < 0) return out;
-  if (blastIdx === arenaIdx + 1) return out; // already directly after arena
-  out.splice(blastIdx, 1);
-  const newArenaIdx = out.indexOf('arena' as T);
-  out.splice(newArenaIdx + 1, 0, 'blast' as T);
-  return out;
+import type { Locale } from '@/lib/blast/v2/types';
+
+/** The mode the homepage heroes for every player, newcomer or returning. */
+export const FEATURED_HOME_MODE = 'blast';
+
+/** Locales with a Blast letter pool; elsewhere the board would deal English letters. */
+export const BLAST_LOCALES: readonly Locale[] = ['en', 'he', 'sv', 'ja', 'es'];
+
+export function isBlastLocale(language: string): language is Locale {
+  return (BLAST_LOCALES as readonly string[]).includes(language);
+}
+
+/** Hero slot: the featured mode when it is on offer, else the live arena. */
+export function pickHomeAnchor(keys: readonly string[]): string {
+  return keys.includes(FEATURED_HOME_MODE) ? FEATURED_HOME_MODE : 'arena';
 }

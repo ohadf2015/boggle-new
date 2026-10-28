@@ -8,6 +8,7 @@ import type { ClassroomGame } from '../modules/classroomGameManager';
 import logger from '../utils/logger';
 import { REAL_CLASS_MIN_PLAYERS } from '@/lib/education/teacherUsagePrompt';
 import { planTrialClockStart, type TrialClockRow } from '@/lib/education/trialClockStart';
+import { realClassPlayerIds } from '@/lib/education/paidDay0';
 import { captureEduServerEvents, type EduServerEvent } from '../utils/educationTelemetry';
 import {
   buildLiveRoundCompletedEvent,
@@ -101,6 +102,25 @@ async function loadRealRoundHistory(
   return { firstRealRoundAt, secondDayReached: (later ?? []).length > 0 };
 }
 
+async function loadRehearsalIds(
+  supabase: NonNullable<ReturnType<typeof getSupabase>>,
+  classroomId: string,
+  playerIds: string[],
+): Promise<Set<string>> {
+  if (playerIds.length === 0) return new Set();
+  const { data, error } = await supabase
+    .from('classroom_memberships' as never)
+    .select('student_id')
+    .eq('classroom_id', classroomId)
+    .eq('is_rehearsal', true)
+    .in('student_id', playerIds);
+  if (error) {
+    logger.error('CLASSROOM_GAME', `Rehearsal lookup failed for ${classroomId}: ${error.message}`);
+    return new Set();
+  }
+  return new Set(((data ?? []) as Array<{ student_id: string }>).map((row) => row.student_id));
+}
+
 export async function recordClassroomRound(
   game: ClassroomGame,
   opts: { playerIds: string[]; durationSeconds: number | null; startedAt: Date | null }
@@ -118,6 +138,8 @@ export async function recordClassroomRound(
     if (countError) throw new Error(countError.message);
     const history = await loadRealRoundHistory(supabase, game.teacherId);
     const flagged = await loadTestAccountIds(supabase, [game.teacherId, ...opts.playerIds]);
+    const rehearsalIds = await loadRehearsalIds(supabase, game.classroomId, opts.playerIds);
+    const realIds = realClassPlayerIds(opts.playerIds, rehearsalIds);
 
     const now = new Date();
     const { error: insertError } = await supabase.from('classroom_rounds' as never).insert({
@@ -126,7 +148,7 @@ export async function recordClassroomRound(
       game_code: game.gameCode,
       game_mode: game.settings?.gameMode ?? 'classic',
       lesson_count: game.lessonIds?.length ?? 0,
-      player_count: opts.playerIds.length,
+      player_count: realIds.length,
       duration_seconds: opts.durationSeconds,
       started_at: opts.startedAt?.toISOString() ?? null,
       completed_at: now.toISOString(),
@@ -147,9 +169,10 @@ export async function recordClassroomRound(
       }));
     }
 
-    if ((count ?? 0) === 0 && opts.playerIds.length >= REAL_CLASS_MIN_PLAYERS) {
+    if ((count ?? 0) === 0 && realIds.length >= REAL_CLASS_MIN_PLAYERS) {
       // The e334c5c8 "real first class game" predicate: first completed round
-      // with 2+ real players. It starts the access-trial clock AND stamps the
+      // with 2+ real players. A paid day-0 phone test seat (is_rehearsal) is
+      // not a player. It starts the access-trial clock AND stamps the
       // checklist's live-started step — one definition of "ran a live game"
       // for both. Bots never reach playerIds (no practice session rows), so a
       // solo/bot rehearsal cannot trip this.
@@ -162,7 +185,7 @@ export async function recordClassroomRound(
     captureEduServerEvents(
       planClassroomRoundEvents({
         game,
-        playerIds: opts.playerIds,
+        playerIds: realIds,
         durationSeconds: opts.durationSeconds,
         priorRealRounds: count ?? 0,
         ...history,

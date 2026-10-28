@@ -56,12 +56,6 @@ describe('Blast Mobile Responsive', () => {
       expect(chip.querySelector('svg')).toBeTruthy();
     });
 
-    it('renders hits remaining with cqw-based clamp sizing', () => {
-      render(<BlastTile {...baseTileProps} type="ice" hitsRemaining={2} />);
-      const hitsEl = screen.getByLabelText('2 hits remaining');
-      expect(hitsEl.className).toContain('text-[clamp(0.6rem,2.2cqw,0.85rem)]');
-    });
-
     it('renders a readable multiplier badge', () => {
       render(<BlastTile {...baseTileProps} type="gold" />);
       const button = screen.getByRole('button');

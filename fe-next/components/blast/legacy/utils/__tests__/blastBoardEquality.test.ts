@@ -59,23 +59,9 @@ describe('blastBoardsEqual', () => {
     expect(blastBoardsEqual(GRID, tiles(), GRID, b)).toBe(false);
   });
 
-  it('returns false when isThawed differs (the ice-thaw divergence)', () => {
-    const a = tiles();
-    a[0][0] = { ...a[0][0], type: 'ice', isThawed: true };
-    const b = tiles();
-    b[0][0] = { ...b[0][0], type: 'ice', isThawed: false };
-    expect(blastBoardsEqual(GRID, a, GRID, b)).toBe(false);
-  });
-
   it('returns false when tile type differs', () => {
     const b = tiles();
     b[0][1] = { ...b[0][1], type: 'gem' };
-    expect(blastBoardsEqual(GRID, tiles(), GRID, b)).toBe(false);
-  });
-
-  it('returns false when a secondary field (countdown) differs', () => {
-    const b = tiles();
-    b[1][0] = { ...b[1][0], countdown: 3 };
     expect(blastBoardsEqual(GRID, tiles(), GRID, b)).toBe(false);
   });
 

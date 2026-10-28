@@ -42,8 +42,8 @@ export function useBlastMultiplayerBridge({
 
   const initialTileStates = useMemo(() => {
     if (!letterGrid) return null;
-    return overlayToTileStates(blastTileOverlay, gridSize, blastSeed);
-  }, [blastTileOverlay, gridSize, letterGrid, blastSeed]);
+    return overlayToTileStates(blastTileOverlay, gridSize);
+  }, [blastTileOverlay, gridSize, letterGrid]);
 
   return { config, initialTileStates, blastSeed, serverGrid: letterGrid };
 }

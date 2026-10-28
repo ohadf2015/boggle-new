@@ -23,6 +23,13 @@ describe('homeOnboarding', () => {
     expect(homeOnboarding({ classroomCount: 2, inviteCopied: false, liveStarted: true, dismissed: false }).current).toBe('shareCode');
   });
 
+  it('Given students already in a class, Then sharing counts as done even if the copy flag never landed', () => {
+    const o = homeOnboarding({ classroomCount: 1, studentCount: 34, inviteCopied: false, liveStarted: true, dismissed: false });
+    expect(o.steps.find((s) => s.id === 'shareCode')?.status).toBe('done');
+    expect(o.complete).toBe(true);
+    expect(o.visible).toBe(false);
+  });
+
   it('Given every step done, Then the card goes away for good', () => {
     const o = homeOnboarding({ classroomCount: 1, inviteCopied: true, liveStarted: true, dismissed: false });
     expect(o.complete).toBe(true);

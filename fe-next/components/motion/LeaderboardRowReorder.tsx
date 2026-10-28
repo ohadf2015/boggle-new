@@ -29,12 +29,16 @@ interface LeaderboardRowReorderProps<T extends { id: string }> {
   renderRow: (row: T, index: number) => React.ReactNode;
   /** Animation duration in ms (default 300) */
   duration?: number;
+  className?: string;
+  style?: React.CSSProperties;
 }
 
 export function LeaderboardRowReorder<T extends { id: string }>({
   rows,
   renderRow,
   duration = 300,
+  className = 'flex flex-col gap-0',
+  style,
 }: LeaderboardRowReorderProps<T>) {
   // Memoize the animation config to ensure stable references
   const transitionConfig = useMemo(
@@ -47,9 +51,9 @@ export function LeaderboardRowReorder<T extends { id: string }>({
 
   return (
     <ul
-      className="flex flex-col gap-0"
+      className={className}
       data-testid="leaderboard-reorder"
-      style={{ listStyle: 'none', padding: 0, margin: 0 }}
+      style={{ listStyle: 'none', padding: 0, margin: 0, ...style }}
     >
       {rows.map((row, index) => (
         <AdaptiveMotion.li

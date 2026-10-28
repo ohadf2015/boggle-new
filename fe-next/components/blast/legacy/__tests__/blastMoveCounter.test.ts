@@ -20,36 +20,17 @@ import {
 // ==================== Wave Config movesAllowed ====================
 
 describe('WaveConfig movesAllowed', () => {
-  it('wave 1 allows 12 moves (learn the ropes)', () => {
-    expect(getWaveConfig(1).movesAllowed).toBe(12);
+  it('the warm-up wave gives extra moves to learn the ropes', () => {
+    expect(getWaveConfig(1).movesAllowed).toBe(14);
   });
 
-  it('wave 2 allows 10 moves', () => {
-    expect(getWaveConfig(2).movesAllowed).toBe(10);
+  it('a boss wave cuts moves below the wave before it', () => {
+    expect(getWaveConfig(5).movesAllowed).toBeLessThan(getWaveConfig(4).movesAllowed);
+    expect(getWaveConfig(10).movesAllowed).toBeLessThan(getWaveConfig(9).movesAllowed);
   });
 
-  it('wave 3 allows 9 moves (prism unlock)', () => {
-    expect(getWaveConfig(3).movesAllowed).toBe(9);
-  });
-
-  it('wave 4 allows 8 moves', () => {
-    expect(getWaveConfig(4).movesAllowed).toBe(8);
-  });
-
-  it('wave 5 allows 7 moves', () => {
-    expect(getWaveConfig(5).movesAllowed).toBe(7);
-  });
-
-  it('wave 6 allows 7 moves', () => {
-    expect(getWaveConfig(6).movesAllowed).toBe(7);
-  });
-
-  it('wave 7 allows 6 moves', () => {
-    expect(getWaveConfig(7).movesAllowed).toBe(6);
-  });
-
-  it('late waves (10+) reduce moves for difficulty', () => {
-    expect(getWaveConfig(10).movesAllowed).toBe(5);
+  it('never drops below 4 moves', () => {
+    for (let wave = 1; wave <= 30; wave++) expect(getWaveConfig(wave).movesAllowed).toBeGreaterThanOrEqual(4);
   });
 });
 

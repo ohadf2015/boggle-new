@@ -18,6 +18,7 @@ Next.js 16 | TypeScript | Tailwind | Express | Socket.IO | Supabase | Redis | Vi
 - TDD mandatory: Test first, then implement
 - Max 500 lines per file
 - Run `npm run lint && npm run test && npm run build` after changes
+- Product/UX PR that should be graded: column-0 `GR-Intervention: surface=… kind=ux|bugfix|feature metric=… hypothesis="…"` (see `.claude/rules/10-git.md`). Not for radar/* SEO PRs, docs, or detector opt-outs.
 
 ## Environment
 - Redis: `brew install redis && redis-server`

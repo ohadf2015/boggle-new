@@ -1,92 +1,43 @@
-/**
- * Type-level verification tests for shared/types/blast.ts
- * Verifies the canonical BlastTileType union is correct and complete.
- */
-import { BLAST_TILE_TYPE_LIST, type BlastTileType } from '../blast';
+import { describe, it, expect } from 'vitest';
+import {
+  BLAST_TILE_TYPE_LIST,
+  BLAST_COMBO_TYPES,
+  normalizeBlastTileType,
+  normalizeBlastTileState,
+  type BlastTileState,
+} from '../blast';
 
-describe('BlastTileType canonical definition', () => {
-  // NOTE: intentionally no hardcoded total-count assertion. A magic number here
-  // drifts every time a tile is added (and silently blocks unrelated PRs once it
-  // lands red on master). The real invariants — required members present, retired
-  // members absent, no duplicates — are asserted below and never go stale.
-  it('is a non-empty canonical list', () => {
-    expect(BLAST_TILE_TYPE_LIST.length).toBeGreaterThan(0);
+describe('Blast tile roster', () => {
+  it('is exactly standard, coin, bomb and diamond', () => {
+    expect([...BLAST_TILE_TYPE_LIST].sort()).toEqual(['bomb', 'diamond', 'gold', 'standard']);
   });
 
-  it('should contain chocolate and cake (cc-mechanics 2026-05-10)', () => {
-    expect(BLAST_TILE_TYPE_LIST).toContain('chocolate');
-    expect(BLAST_TILE_TYPE_LIST).toContain('cake');
+  it('only has combos built from bombs and coins', () => {
+    expect([...BLAST_COMBO_TYPES].sort()).toEqual(['bomb_bomb', 'gold_special', 'triple_special']);
+  });
+});
+
+describe('normalizeBlastTileType', () => {
+  it('keeps live types', () => {
+    for (const t of BLAST_TILE_TYPE_LIST) expect(normalizeBlastTileType(t)).toBe(t);
   });
 
-  it('should contain mystery (seeded surprise-outcome tile)', () => {
-    expect(BLAST_TILE_TYPE_LIST).toContain('mystery');
-  });
-
-  it('should contain fuse (linked pair detonation tile)', () => {
-    expect(BLAST_TILE_TYPE_LIST).toContain('fuse');
-  });
-
-  it('should contain anchor (long-word length bonus)', () => {
-    expect(BLAST_TILE_TYPE_LIST).toContain('anchor');
-  });
-
-  it('should include standard (not normal)', () => {
-    expect(BLAST_TILE_TYPE_LIST).toContain('standard');
-    expect(BLAST_TILE_TYPE_LIST).not.toContain('normal');
-  });
-
-  it('should NOT contain retired tiles (mirror, silver, wildcard)', () => {
-    expect(BLAST_TILE_TYPE_LIST).not.toContain('mirror' as BlastTileType);
-    expect(BLAST_TILE_TYPE_LIST).not.toContain('silver' as BlastTileType);
-    expect(BLAST_TILE_TYPE_LIST).not.toContain('wildcard' as BlastTileType);
-  });
-
-  it('should contain diamond, countdown, shuffle, magma, portal, catalyst', () => {
-    expect(BLAST_TILE_TYPE_LIST).toContain('diamond');
-    expect(BLAST_TILE_TYPE_LIST).toContain('countdown');
-    expect(BLAST_TILE_TYPE_LIST).toContain('shuffle');
-    expect(BLAST_TILE_TYPE_LIST).toContain('magma');
-    expect(BLAST_TILE_TYPE_LIST).toContain('portal');
-    expect(BLAST_TILE_TYPE_LIST).toContain('catalyst');
-  });
-
-  // Subset guard: every documented canonical tile must be present. Adding a NEW
-  // tile to the source does NOT break this (no exact-length assertion) — it only
-  // fails if a documented tile is removed, which is the case worth catching.
-  it('should contain all expected tile types', () => {
-    const expected: BlastTileType[] = [
-      'standard',
-      'gold',
-      'bomb',
-      'rainbow',
-      'ice',
-      'lightning',
-      'magnet',
-      'prism',
-      'gem',
-      'frozen',
-      'diamond',
-      'countdown',
-      'shuffle',
-      'magma',
-      'portal',
-      'catalyst',
-      'crystal',
-      'fuse',
-      'anchor',
-      'mystery',
-      'chocolate',
-      'cake',
-      'locked',
-      'key',
-    ];
-    for (const type of expected) {
-      expect(BLAST_TILE_TYPE_LIST).toContain(type);
+  it('turns retired or garbage types into standard', () => {
+    for (const t of ['ice', 'rainbow', 'frozen', 'cake', 'locked', '', null, undefined, 3]) {
+      expect(normalizeBlastTileType(t)).toBe('standard');
     }
   });
+});
 
-  it('should have no duplicate entries', () => {
-    const unique = new Set(BLAST_TILE_TYPE_LIST);
-    expect(unique.size).toBe(BLAST_TILE_TYPE_LIST.length);
+describe('normalizeBlastTileState', () => {
+  it('drops fields from retired mechanics and resets multi-hit counters', () => {
+    const legacy = {
+      uid: 'u1', row: 1, col: 2, type: 'frozen', isCleared: false, activationEffect: null,
+      hitsRemaining: 2, innerType: 'bomb', isThawed: false, countdown: 3, jellyLayers: 2, colorTag: 'pink',
+    } as unknown as BlastTileState;
+    expect(normalizeBlastTileState(legacy)).toEqual({
+      uid: 'u1', row: 1, col: 2, type: 'standard', isCleared: false, activationEffect: null,
+      hitsRemaining: 0, colorTag: 'pink',
+    });
   });
 });

@@ -120,7 +120,6 @@ describe('DailyChallengeLanding — Hub Redesign', () => {
 
   it('should render "Today\'s quests" header at the top', () => {
     renderComponent();
-    // en.js daily.todaysPuzzles is "Today's quests" (copy moved off "Puzzles").
     expect(screen.getByText(/today['\s]s quests/i)).toBeInTheDocument();
   });
 

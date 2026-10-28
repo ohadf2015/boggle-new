@@ -1,8 +1,6 @@
 import {
   getWordLengthScaleFactor,
   scaledRadius,
-  CODEX_COMBOS,
-  CODEX_COMBO_COUNT,
 } from '../blastComboScaling';
 
 describe('getWordLengthScaleFactor', () => {
@@ -46,29 +44,5 @@ describe('scaledRadius', () => {
 
   it('returns 3 for base=2 scale=1.5 (ceil)', () => {
     expect(scaledRadius(2, 1.5)).toBe(3);
-  });
-});
-
-describe('CODEX_COMBOS', () => {
-  it('contains exactly 24 entries', () => {
-    expect(CODEX_COMBOS.length).toBe(24);
-  });
-
-  it('does NOT contain gold_special', () => {
-    expect(CODEX_COMBOS).not.toContain('gold_special');
-  });
-
-  it('does NOT contain rainbow_special', () => {
-    expect(CODEX_COMBOS).not.toContain('rainbow_special');
-  });
-
-  it('does NOT contain triple_special', () => {
-    expect(CODEX_COMBOS).not.toContain('triple_special');
-  });
-});
-
-describe('CODEX_COMBO_COUNT', () => {
-  it('equals CODEX_COMBOS.length', () => {
-    expect(CODEX_COMBO_COUNT).toBe(CODEX_COMBOS.length);
   });
 });

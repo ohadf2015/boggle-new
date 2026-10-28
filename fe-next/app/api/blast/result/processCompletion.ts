@@ -15,7 +15,13 @@
  */
 import { calculatePersonalBests, type PersonalBests } from '../utils';
 import { getPostHogServer } from '@/lib/posthog';
-import { addToWeeklyLeaderboard, getLeaderboardPercentile } from '@/lib/blastLeaderboard';
+import {
+  addToWeeklyLeaderboard,
+  getLeaderboardPercentile,
+  getWeeklyScoresAbove,
+  getWeeklyStanding,
+} from '@/lib/blastLeaderboard';
+import { nameBoardEntries, type NamedBlastScore } from '@/lib/blastLeaderboardNames';
 import { leaderboardPointsForGame } from '@/backend/modules/leaderboardScoring';
 
 // Minimal structural type for the service-role client (matches the route's use).
@@ -41,6 +47,11 @@ export interface BlastCompletionBody {
   isNewBestCombo: boolean;
   xpAwarded: number;
   percentile: number | null;
+  /** This week's board (the only Blast board). */
+  rank?: number | null;
+  previousRank?: number | null;
+  totalPlayers?: number | null;
+  rival?: NamedBlastScore | null;
   migrationPending?: boolean;
 }
 
@@ -201,8 +212,15 @@ export async function processBlastCompletion(
   }
 
   // Weekly leaderboard — both calls are internally fault-tolerant (null, never throw).
+  const before = await getWeeklyStanding(userId, data.language, data.difficulty);
   await addToWeeklyLeaderboard(userId, data.score, data.language, data.difficulty);
-  const percentile = await getLeaderboardPercentile(userId, data.language, data.difficulty);
+  const [percentile, after] = await Promise.all([
+    getLeaderboardPercentile(userId, data.language, data.difficulty),
+    getWeeklyStanding(userId, data.language, data.difficulty),
+  ]);
+  const [rival] = after && after.rank > 1
+    ? await nameBoardEntries(supabase, await getWeeklyScoresAbove(after.score, data.language, data.difficulty, 1))
+    : [];
 
   getPostHogServer()?.capture({
     distinctId: userId,
@@ -227,6 +245,10 @@ export async function processBlastCompletion(
       isNewBestCombo,
       xpAwarded,
       percentile,
+      rank: after?.rank ?? null,
+      previousRank: before?.rank ?? null,
+      totalPlayers: after?.total ?? null,
+      rival: rival ?? null,
     },
   };
 }

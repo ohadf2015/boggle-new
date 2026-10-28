@@ -19,7 +19,7 @@
  * classroom teacher projects, she does not play.
  */
 
-import { memo, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { memo, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { BoundedConfettiBurst } from '@/components/motion/BoundedConfettiBurst';
@@ -126,9 +126,7 @@ function ScorePop({ pop }: { pop: Pop }) {
       animate={{ y: 0, scale: 1.1, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 520, damping: 22 }}
       className={cn(
-        // Inside the row's box: the burst wrapper clips (overflow-hidden), so a
-        // pop above the row's top edge was cut in half on the projector.
-        'pointer-events-none absolute top-2 end-44 max-md:top-0.5 max-md:end-2 z-10 rounded-neo border-2 border-neo-black bg-neo-lime',
+        'pointer-events-none absolute top-2 end-44 max-md:hidden @[52rem]:hidden z-10 rounded-neo border-2 border-neo-black bg-neo-lime',
         'px-2 py-0.5 font-neo-display text-2xl font-black text-neo-black tabular-nums shadow-hard-sm'
       )}
     >
@@ -230,16 +228,22 @@ function ProjectorBoard({
   className?: string;
 }) {
   const reorderRows = useMemo(() => rows.map((r) => ({ ...r, id: r.username })), [rows]);
+  const leader = rows[0]?.username;
+  // Confetti marks a new leader only: a burst on every score turned a busy class into a confetti storm.
+  const [lead, setLead] = useState<{ name: string | undefined; crowned: string | null }>({ name: leader, crowned: null });
+  if (lead.name !== leader) setLead({ name: leader, crowned: lead.name === undefined ? null : (leader ?? null) });
   return (
-    <div dir={dir} className={className}>
+    <div dir={dir} className={cn('@container', className)}>
       <LeaderboardRowReorder
         rows={reorderRows}
+        className="flex flex-col gap-0 @[52rem]:grid @[52rem]:grid-flow-col @[52rem]:gap-x-4 @[52rem]:[grid-template-rows:repeat(var(--board-rows),auto)]"
+        style={{ '--board-rows': Math.ceil(rows.length / 2) } as CSSProperties}
         renderRow={(row, index) => {
           const rank = index + 1;
           const pop = pops[row.username];
           return (
             <div className="py-1.5 max-md:py-1 md:[@media(max-height:1000px)]:py-1 lg:[@media(min-height:1001px)]:py-1">
-              <BoundedConfettiBurst trigger={!!pop} size="md">
+              <BoundedConfettiBurst trigger={rank === 1 && lead.crowned === row.username} size="md">
                 <div
                   data-testid="live-board-row"
                   data-player={row.username}

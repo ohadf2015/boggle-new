@@ -60,7 +60,8 @@ interface HomeModeGridProps {
 
 export function HomeModeGrid({ models, liveCount }: HomeModeGridProps) {
   const { t } = useLanguage();
-  let index = 0;
+  const featured = models.find((m) => m.featured);
+  let index = featured ? 1 : 0;
 
   return (
     <section aria-labelledby="home-modes-title" className="flex flex-col gap-6 md:gap-9">
@@ -68,7 +69,13 @@ export function HomeModeGrid({ models, liveCount }: HomeModeGridProps) {
         {t('landing.home.gameModes')}
       </h2>
 
-      {groupModes(models).map(({ group, models: groupModels }) => {
+      {featured && (
+        <div data-testid="home-featured">
+          <ModeTile model={featured} index={0} variant="banner" />
+        </div>
+      )}
+
+      {groupModes(models.filter((m) => m !== featured)).map(({ group, models: groupModels }) => {
         const g = GROUP[group];
         const headingId = `home-group-${group}-title`;
         const first = index;

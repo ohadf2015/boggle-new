@@ -1,106 +1,81 @@
 'use client';
 
-import { m, useReducedMotion } from 'framer-motion';
-import { Bomb, Flame, Gem, LayoutGrid, Trophy } from 'lucide-react';
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
+import { Bomb } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { safeToLocaleString } from '@/utils/bcp47Locale';
-import type { BlastPlayerStats } from '@/shared/types/game';
+import { cn } from '@/lib/utils';
+import { rankBlastMpPlayers } from '@/components/blast/legacy/blastMpRanking';
+import { BlastStatChips } from '@/components/blast/results/BlastStatChips';
+import { BlastNextGoal } from '@/components/blast/results/BlastNextGoal';
+import { TIER_THEME } from '@/components/blast/results/blastResultsTheme';
+import { useBlastResultsReveal } from '@/components/blast/results/useBlastResultsReveal';
+import type { BlastCollectionScore } from '@/shared/utils/blastCollectionScore';
+import {
+  fromMpResults,
+  toBlastResultsView,
+  type BlastMpStats,
+} from '@/components/blast/results/blastResultsViewModel';
 
 interface BlastResultsSceneProps {
-  playerStats: Record<string, BlastPlayerStats>;
+  playerStats: Record<string, BlastMpStats>;
   scores: Record<string, number>;
   currentUsername?: string;
+  collection?: Record<string, BlastCollectionScore>;
 }
 
-const container = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
-};
-const row = {
-  hidden: { y: 18, scale: 0.96 },
-  show: { y: 0, scale: 1, transition: { type: 'spring' as const, stiffness: 280, damping: 22 } },
-};
-const reduced = { hidden: {}, show: { transition: { duration: 0.15 } } };
+/** The current player's Blast haul; standings and the score hero live above it. */
+export default function BlastResultsScene({ playerStats, scores, currentUsername, collection }: BlastResultsSceneProps) {
+  const { t, language, dir } = useLanguage();
+  const rootRef = useRef<HTMLDivElement>(null);
 
-function StatChip({ icon, value, label, accent }: {
-  icon: React.ReactNode; value: React.ReactNode; label: string; accent: string;
-}) {
-  return (
-    <div className="flex flex-col items-center gap-0.5">
-      <span className={`flex items-center gap-1 ${accent}`}>{icon}
-        <span className="text-base font-black tabular-nums">{value}</span>
-      </span>
-      <span className="text-[9px] uppercase tracking-wider text-neo-white">{label}</span>
-    </div>
-  );
-}
-
-export default function BlastResultsScene({ playerStats, currentUsername }: BlastResultsSceneProps) {
-  const { t, language } = useLanguage();
-  const prefersReduced = useReducedMotion();
-  const v = prefersReduced ? reduced : row;
-
-  // Current player's blast stats only. Opponent standings (rank·name·combo·
-  // score) live in BlastMpResults directly above this scene — rendering them
-  // here too was a second copy of the same list, so this scene now contributes
-  // ONLY the blast-specific stat card the standings can't carry.
-  const me = useMemo(() => {
+  const view = useMemo(() => {
     if (!currentUsername || !playerStats[currentUsername]) return null;
-    return { username: currentUsername, stats: playerStats[currentUsername] };
-  }, [playerStats, currentUsername]);
+    const ranking = rankBlastMpPlayers(
+      Object.entries(scores).map(([username, score]) => ({
+        username,
+        score,
+        wordsFoundCount: 0,
+        isCurrentPlayer: username === currentUsername,
+      })),
+    );
+    const input = fromMpResults(ranking, playerStats, collection);
+    return input ? toBlastResultsView(input) : null;
+  }, [playerStats, scores, currentUsername, collection]);
 
-  if (!me) return null;
+  useBlastResultsReveal(rootRef, { score: 0, locale: language, confetti: false });
+
+  if (!view) return null;
+  const theme = TIER_THEME[view.tier];
 
   return (
-    <m.div variants={container} initial="hidden" animate="show" className="space-y-3">
-      <m.div variants={v} className="flex items-center gap-2 px-1 animate-in fade-in-0 duration-300">
-        <Bomb className="w-5 h-5 text-neo-lime" />
-        <h3 className="text-sm font-black uppercase tracking-wider text-neo-white">
-          {t('blast.results.sceneTitle')}
-        </h3>
-      </m.div>
-
-      {/* Current user's Blast stats — the blast-specific payload the shared
-          results hero (rank + score + avatar, rendered just above) doesn't
-          carry. Deliberately omits score/rank/username to avoid stacking a
-          second "me card" on top of the hero. */}
-      {me && (
-        <m.div
-          variants={v}
-          data-testid="blast-result-me"
-          className="relative overflow-hidden p-4 rounded-neo border-3 border-neo-pink shadow-hard bg-linear-to-br from-neo-navy via-neo-navy-light to-neo-navy shadow-[0_0_18px_rgba(255,20,147,0.4)] animate-in fade-in-0 duration-300"
+    <div
+      ref={rootRef}
+      dir={dir}
+      data-testid="blast-result-me"
+      data-tier={view.tier}
+      className={cn('flex flex-col gap-3 rounded-neo border-3 bg-neo-navy p-3 shadow-hard', theme.frame)}
+    >
+      <div className="flex items-center gap-2">
+        <Bomb className={cn('h-5 w-5', theme.headline)} />
+        <h3 className="text-sm font-black uppercase tracking-wider text-neo-white">{t('blast.results.sceneTitle')}</h3>
+        <span className="ms-auto rounded-neo bg-neo-pink px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wide text-neo-black">
+          {t('results.you')}
+        </span>
+      </div>
+      <BlastStatChips view={view} t={t} locale={language} />
+      {view.collectionBonus && (
+        <div
+          data-reveal="chip"
+          data-testid="blast-results-bonus"
+          className="flex items-center justify-between gap-2 rounded-neo border-3 border-neo-black bg-neo-yellow px-3 py-1.5 text-neo-black shadow-hard"
         >
-          {!prefersReduced && (
-            <m.div
-              aria-hidden
-              className="absolute inset-0 bg-linear-to-br from-neo-pink/10 via-neo-purple/10 to-neo-cyan/10 pointer-events-none"
-              animate={{ opacity: [0.3, 0.7, 0.3] }}
-              transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
-            />
-          )}
-          <div className="relative">
-            <span className="inline-block mb-2 px-1.5 py-0.5 rounded-neo bg-neo-pink text-neo-black text-[10px] font-black uppercase tracking-wide">
-              {t('results.you')}
-            </span>
-            <div className="grid grid-cols-4 gap-1.5">
-              <StatChip icon={<Flame className="w-4 h-4" />} value={`${me.stats.maxCombo}x`} label={t('blast.results.comboChain')} accent="text-neo-orange" />
-              <StatChip icon={<Gem className="w-4 h-4" />} value={safeToLocaleString(me.stats.gemsCollected, language)} label={t('blast.results.gemsCollected')} accent="text-neo-cyan" />
-              <StatChip icon={<Bomb className="w-4 h-4" />} value={me.stats.tilesCleared} label={t('blast.results.tilesCleared')} accent="text-neo-lime" />
-              <StatChip icon={<LayoutGrid className="w-4 h-4" />} value={me.stats.boardClears} label={t('blast.results.boardClears')} accent="text-neo-purple" />
-            </div>
-            {me.stats.bestWord && (
-              <div className="mt-3 flex items-center gap-1.5 justify-center pt-2 border-t-2 border-neo-black/40">
-                <Trophy className="w-3.5 h-3.5 text-neo-yellow" />
-                <span className="text-[10px] uppercase tracking-wider text-neo-white">
-                  {t('blast.results.bestWord')}:
-                </span>
-                <span className="font-bold text-neo-white text-sm uppercase">{me.stats.bestWord}</span>
-              </div>
-            )}
-          </div>
-        </m.div>
+          <span className="text-[11px] font-black uppercase tracking-wider">{t('blast.mpResults.bonusLabel')}</span>
+          <span className="font-neo-display text-lg font-black tabular-nums" dir="ltr">
+            {t('blast.mpResults.bonus', { n: view.collectionBonus.total })}
+          </span>
+        </div>
       )}
-    </m.div>
+      <BlastNextGoal view={view} t={t} locale={language} />
+    </div>
   );
 }

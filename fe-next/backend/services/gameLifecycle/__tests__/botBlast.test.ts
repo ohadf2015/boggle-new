@@ -38,8 +38,10 @@ const mocks = vi.hoisted(() => ({
   broadcastToRoom: vi.fn(),
   volatileBroadcastToRoom: vi.fn(),
   getGameRoom: (code: string) => `room:${code}`,
-  getTilesOnPath: vi.fn(() => []),
+  getTilesOnBoardPath: vi.fn(() => []),
   calculateBlastTileBonus: vi.fn(() => 10),
+  recordBlastCollection: vi.fn(() => 0),
+  addPlayerEventBonus: vi.fn(),
   recordBlastMove: vi.fn(),
   getWordPath: vi.fn(() => []),
   processTilesForWord: vi.fn(() => ({ next: [], newlyClearedCount: 0 })),
@@ -97,7 +99,7 @@ vi.mock('../../../modules/gameStateManager', () => ({
   getLeaderboard: mocks.getLeaderboard,
   getLeaderboardThrottled: mocks.getLeaderboardThrottled,
   playerHasWord: () => false,
-  addPlayerEventBonus: vi.fn(),
+  addPlayerEventBonus: mocks.addPlayerEventBonus,
 }));
 
 vi.mock('../../../utils/socketHelpers', () => ({
@@ -116,9 +118,9 @@ vi.mock('../../../utils/playerFoundWordBatcher', () => ({
 
 vi.mock('../../../modules/blastModeManager', () => ({
   validateBlastWordPath: vi.fn().mockReturnValue(null),
-  getTilesOnResolvedPath: vi.fn().mockReturnValue([]),
-  getTilesOnPath: mocks.getTilesOnPath,
+  getTilesOnBoardPath: mocks.getTilesOnBoardPath,
   calculateBlastTileBonus: mocks.calculateBlastTileBonus,
+  recordBlastCollection: mocks.recordBlastCollection,
   recordBlastMove: mocks.recordBlastMove,
   getWordPath: mocks.getWordPath,
   isBlastBoardCleared: mocks.isBlastBoardCleared,
@@ -547,6 +549,27 @@ describe('submitBlastWord - case sensitivity fix (regression test)', () => {
       'botWordFound',
       expect.objectContaining({ username: 'BotTest', word: 'hello' })
     );
+  });
+
+  it('credits the coins and diamonds a bot collects as a bonus, like a human', () => {
+    const bot = makeBot({ isActive: true });
+    const blastState = makeBlastState();
+    const grid = [['A', 'B', 'C'], ['D', 'E', 'F'], ['G', 'H', 'I']];
+    mocks.findAllWords.mockReturnValue(['hello']);
+    mocks.getGame.mockReturnValue({
+      gameMode: 'blast', blastModeState: blastState, letterGrid: grid, letterPositions: new Map(),
+      playerCombos: {}, playerScores: {}, playerWords: {},
+    });
+    mocks.getOrInitPlayerBoard.mockReturnValue({
+      grid, tileStates: grid.map(r => r.map(() => ({ isCleared: false }))),
+      overlay: [], overlayMap: new Map(), seed: 1, totalMoves: 0, refillCount: 0,
+    });
+    mocks.recordBlastCollection.mockReturnValueOnce(170);
+
+    submitBlastWord(mockIo, gameCode, bot, blastState, 'hello', grid, 'en');
+
+    expect(mocks.updatePlayerScore).toHaveBeenCalledWith(gameCode, bot.username, 170, true);
+    expect(mocks.addPlayerEventBonus).toHaveBeenCalledWith(gameCode, bot.username, 170);
   });
 
   it('should NOT accept a word when it is not in the lowercase list from findAllWords', () => {

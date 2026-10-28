@@ -15,10 +15,22 @@ describe('applyBlastBoardUpdate', () => {
   });
 
   it('adopts a regenerated overlay and seed', () => {
-    const overlay = [{ row: 0, col: 0, type: 'jelly' }];
+    const overlay = [{ row: 0, col: 0, type: 'bomb' }];
     applyBlastBoardUpdate({ ...base, clearedBy: '__board_regenerated__', overlay, seed: 9 } as never);
     expect(useGameStore.getState().blastSeed).toBe(9);
     expect(useGameStore.getState().blastTileOverlay).toEqual(overlay);
+  });
+
+  it('loads retired tile types from an older server as plain letters', () => {
+    const tile = { uid: 'u', row: 0, col: 0, type: 'ice', isCleared: false, activationEffect: null, hitsRemaining: 2, isThawed: false };
+    applyBlastBoardUpdate({
+      ...base, tileStates: [[tile]], clearedBy: '__board_regenerated__',
+      overlay: [{ row: 0, col: 0, type: 'frozen' }], seed: 1,
+    } as never);
+    const state = useGameStore.getState();
+    expect(state.blastBoardUpdate?.tileStates[0][0]).toMatchObject({ type: 'standard', hitsRemaining: 0 });
+    expect(state.blastBoardUpdate?.tileStates[0][0]).not.toHaveProperty('isThawed');
+    expect(state.blastTileOverlay[0].type).toBe('standard');
   });
 });
 

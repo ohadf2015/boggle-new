@@ -50,6 +50,7 @@ export function EducationHero({ setupPending = false }: { setupPending?: boolean
             <Link
               href={`/${language}/education/access`}
               data-testid="education-hero-free-cta"
+              data-lc-cta="signup"
               onClick={() => trackLandingCtaClick(setupPending ? 'education_hero_finish_setup' : 'education_hero')}
               className={`group inline-flex min-h-14 items-center justify-center gap-3 whitespace-nowrap rounded-neo border-3 border-neo-black bg-neo-lime px-6 text-lg font-black uppercase tracking-wide text-neo-navy shadow-hard hover:-translate-y-0.5 ${PRESS}`}
             >
@@ -59,6 +60,7 @@ export function EducationHero({ setupPending = false }: { setupPending?: boolean
             <Link
               href={`/${language}/join`}
               data-testid="education-hero-join-cta"
+              data-lc-cta="student_join"
               onClick={() => trackLandingCtaClick('education_hero_student_join')}
               className={`inline-flex min-h-14 items-center justify-center gap-2 whitespace-nowrap rounded-neo border-3 border-neo-cream/70 px-5 font-neo-display text-base font-black text-neo-cream hover:border-neo-cyan hover:text-neo-cyan ${PRESS}`}
             >
@@ -73,6 +75,7 @@ export function EducationHero({ setupPending = false }: { setupPending?: boolean
             <Link
               href={`/${language}${TEACHER_PRO_CHECKOUT_PATH}`}
               data-testid="education-hero-pro-cta"
+              data-lc-cta="pro_upgrade"
               onClick={() => trackLandingCtaClick('education_hero_pro')}
               className="rounded-sm text-neo-yellow underline decoration-2 underline-offset-4 hover:text-neo-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
             >

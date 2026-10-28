@@ -1,25 +1,13 @@
 /**
  * blastMascot — pure mascot expression selector for Blast Mode.
  *
- * Maps run state (wave archetype, final results) to one of six mascot
- * expressions. Used by the results screen header and (Phase B) wave intro.
+ * Maps a wave archetype to one of six mascot expressions.
  * Zero React, zero state — testable in isolation.
  *
  * The image paths live here as strings (not imports) so the module stays
  * serializable for telemetry and SSR, mirroring the icon-name pattern used
  * in `blastBadges.ts`. The UI layer renders them through `next/image`.
- *
- * Priority ladder for `getMascotForResults`:
- *   1. new personal best          → celebrating
- *   2. big combo (>= 8) without PB → hyped
- *   3. decent run (>= 2 waves)    → neutral
- *   4. flameout (0-1 waves)       → sadSmile
- *
- * Future keys (`sneaky`, `sweating`) are currently reached only through the
- * archetype selector — the results ladder deliberately keeps them out so
- * the post-run emotional arc stays focused on win/loss.
  */
-import type { BlastResultsData } from '../types';
 import type { BlastWaveArchetype } from './blastWaveConfig';
 
 export type MascotKey =
@@ -59,23 +47,3 @@ export function getMascotForArchetype(archetype: BlastWaveArchetype): MascotKey 
   return ARCHETYPE_TO_MASCOT[archetype];
 }
 
-/** Big-combo threshold for the "hyped" branch of the results ladder. */
-const BIG_COMBO_THRESHOLD = 8;
-/** Minimum waves cleared to avoid the "flameout" branch. */
-const DECENT_RUN_MIN_WAVES = 2;
-
-/**
- * Pure: finished-run state → mascot expression.
- * See the priority ladder in the file-level JSDoc.
- */
-export function getMascotForResults(results: BlastResultsData): MascotKey {
-  const beatPB =
-    results.previousBest != null && results.finalScore > results.previousBest;
-  if (beatPB) return 'celebrating';
-
-  if (results.maxCombo >= BIG_COMBO_THRESHOLD) return 'hyped';
-
-  if (results.wavesCompleted >= DECENT_RUN_MIN_WAVES) return 'neutral';
-
-  return 'sadSmile';
-}

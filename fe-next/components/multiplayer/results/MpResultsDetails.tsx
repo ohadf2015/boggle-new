@@ -54,7 +54,7 @@ export default function MpResultsDetails({ open, onClose, c }: Props) {
 
 function DetailsBody({ c }: { c: MpResultsController }) {
   const { props, t, data, socketEvents, sideEffects, isGuest, resolvedGameMode, lessonGameData } = c;
-  const { username, gameCode, isHost = false, classroomSummary, wordHuntSummary } = props;
+  const { username, gameCode, isHost = false, classroomSummary, wordHuntSummary, blastSummary } = props;
   const { sortedScores, currentPlayerValidWords } = data;
   const wordHuntPlayerLives = useWordHuntPlayerLives();
   const wordHuntEliminatedPlayers = useWordHuntEliminatedPlayers();
@@ -71,7 +71,8 @@ function DetailsBody({ c }: { c: MpResultsController }) {
     boardClearedByLocal: blastBoardClearedByLocal,
     localUsername: username,
     playerStats: blastPlayerStats,
-  })), [sortedScores, resolvedGameMode, blastBoardClearedByLocal, username, blastPlayerStats]);
+    collection: blastSummary?.collection,
+  })), [sortedScores, resolvedGameMode, blastBoardClearedByLocal, username, blastPlayerStats, blastSummary?.collection]);
   const blastResultScores = useMemo(() => Object.fromEntries(sortedScores.map((p) => [p.username, p.score || 0])), [sortedScores]);
 
   const wordHuntResultsData = useMemo(() => resolvedGameMode !== 'word-hunt' ? undefined : {
@@ -225,7 +226,7 @@ function DetailsBody({ c }: { c: MpResultsController }) {
       />
       {wordHuntResultsData && <WordHuntResultsSummary {...wordHuntResultsData} />}
       {resolvedGameMode === 'blast' && Object.keys(blastPlayerStats).length > 0 && (
-        <BlastResultsScene playerStats={blastPlayerStats} scores={blastResultScores} currentUsername={username} />
+        <BlastResultsScene playerStats={blastPlayerStats} scores={blastResultScores} currentUsername={username} collection={blastSummary?.collection} />
       )}
       {c.userId && (
         <div className="flex justify-center">

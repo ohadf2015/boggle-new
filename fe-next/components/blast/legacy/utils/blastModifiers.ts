@@ -36,7 +36,7 @@ export type BlastModifierColor =
  * Typed, relative operations over WaveConfig numeric fields.
  *
  * IMPORTANT: only fields the SP engine actually READS belong here. Verified live:
- * `specialTileChance` + `goldDistribution` + `iceDistribution` (→ getWaveDistribution
+ * `specialTileChance` + `goldDistribution` (→ getWaveDistribution
  * → tile generation), `cascadeChainBonus` (→ useBlastCascade), `movesAllowed`
  * (→ BlastGame engine options). Deliberately ABSENT: `vowelModifier` (never threaded
  * into useGridInit) and `maxCascadeChain` (useBlastCascade uses momentum tiers, not
@@ -45,7 +45,6 @@ export type BlastModifierColor =
 export interface ModifierPatch {
   specialTileChanceAdd?: number;
   goldDistributionMul?: number;
-  iceDistributionMul?: number;
   cascadeChainBonusMul?: number;
   cascadeChainBonusAdd?: number;
   movesAllowedAdd?: number;
@@ -100,14 +99,13 @@ export const BLAST_MODIFIERS: Record<BlastModifierId, BlastWaveModifier> = {
     id: 'bombParty',
     color: 'orange',
     icon: 'Bomb',
-    patch: { specialTileChanceAdd: 0.1 },
+    patch: { specialTileChanceAdd: 0.1, goldDistributionMul: 0.5 },
   },
   luckyVowels: {
     id: 'luckyVowels',
     color: 'purple',
     icon: 'Sparkles',
-    // Fewer ice obstacles + a little extra gold — words come easy, luck is on your side.
-    patch: { iceDistributionMul: 0.35, goldDistributionMul: 1.25 },
+    patch: { goldDistributionMul: 1.25 },
   },
   megaCombo: {
     id: 'megaCombo',
@@ -174,9 +172,6 @@ export function applyModifierToWaveConfig(
   }
   if (p.goldDistributionMul !== undefined) {
     next.goldDistribution = clamp01(next.goldDistribution * p.goldDistributionMul);
-  }
-  if (p.iceDistributionMul !== undefined) {
-    next.iceDistribution = clamp01(next.iceDistribution * p.iceDistributionMul);
   }
   if (p.cascadeChainBonusMul !== undefined) {
     next.cascadeChainBonus = next.cascadeChainBonus * p.cascadeChainBonusMul;

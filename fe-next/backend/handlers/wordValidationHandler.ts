@@ -24,7 +24,7 @@ import logger from '../utils/logger.js';
 import { handlePeerRejection, type PeerValidationResult } from './peerRejectionHandler';
 import { hitRoomBoss } from '../services/classroomBoss/roomBoss.js';
 import { processLongWordEngagement } from './engagementHandler';
-import { getTilesOnPath, getTilesOnResolvedPath, recordBlastMove, getWordPath, getOrInitPlayerBoard, safeCascadeBlastWord, validateBlastWordPath } from '../modules/blastModeManager.js';
+import { getTilesOnBoardPath, recordBlastMove, recordBlastCollection, getWordPath, getOrInitPlayerBoard, safeCascadeBlastWord, validateBlastWordPath } from '../modules/blastModeManager.js';
 import { regenerateBlastBoardIfExhausted } from '../modules/blastBoardRegen.js';
 import { makePositionsMap } from '../modules/wordValidator.js';
 import { isLessonWord } from '../utils/lessonVocabulary.js';
@@ -91,6 +91,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
   // Blast: the special tiles on this word's path. Non-null marks a Blast word
   // (which also earns the letter-value bonus); tiles stay [] if the lookup fails.
   let blastTiles: BlastTileType[] | null = game.gameMode === 'blast' ? [] : null;
+  let blastCollectionPoints = 0;
   let blastMoveResult: { movesUsed: number; bonusMove: boolean } | null = null;
 
   if (game.gameMode === 'blast' && game.blastModeState) {
@@ -115,11 +116,8 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     //    (e.g. a corrupted overlay after a Redis restore) WITHOUT aborting — the
     //    base word still scores and, crucially, the cascade/resync below still runs.
     try {
-      const tilesOnPath = validatedClientPath
-        ? getTilesOnResolvedPath(resolvedPath, board.overlayMap)
-        : getTilesOnPath(normalizedWord, boardPositions, board.overlay, board.overlayMap);
-      const gemCount = tilesOnPath.filter(t => t === 'gem').length;
-      blastMoveResult = recordBlastMove(blastState, username, safeComboLevel, normalizedWord, tilesOnPath.length, gemCount, blastTileBonusFor(tilesOnPath));
+      const tilesOnPath = getTilesOnBoardPath(board.tileStates, resolvedPath);
+      blastMoveResult = recordBlastMove(blastState, username, safeComboLevel, normalizedWord, tilesOnPath.length, blastTileBonusFor(tilesOnPath));
       blastTiles = tilesOnPath;
     } catch (err: unknown) {
       const error = err as Error;
@@ -145,6 +143,11 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
         // Commit the successfully-cascaded board as this player's authoritative board.
         if (!blastState.playerBoards) blastState.playerBoards = {};
         blastState.playerBoards[username] = result.board;
+        blastCollectionPoints = recordBlastCollection(blastState, username, {
+          coins: result.coinsCollected,
+          diamonds: result.diamondsCollected,
+          bombs: result.bombsPopped,
+        });
       } else {
         logger.error('BLAST', 'Blast cascade failed; authoritative board kept intact for resync', {
           gameCode,
@@ -289,13 +292,13 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
   // Single atomic score update: word score + blast tile bonus + blast letter-value
   // bonus + word-hunt board bonus + bonuses
   const preScore = game.playerScores?.[username] ?? 0;
-  const totalDelta = scored.total + wordHuntBoardBonus + goldenBonus + lightningBonus + rushBonus + specialBonus + lessonBonus;
+  const totalDelta = scored.total + wordHuntBoardBonus + goldenBonus + lightningBonus + rushBonus + specialBonus + lessonBonus + blastCollectionPoints;
   updatePlayerScore(gameCode, username, totalDelta, true);
   // Mirror the bonuses that are NOT baked into the stored per-word score
   // (wordScore + blast bonuses are; golden/lightning/special/word-hunt-board are not)
   // into a per-player accumulator so the end-of-game recompute can add them back and
   // the result page matches the live leaderboard. See playerEventBonuses.
-  const eventBonusDelta = wordHuntBoardBonus + goldenBonus + lightningBonus + rushBonus + specialBonus + lessonBonus;
+  const eventBonusDelta = wordHuntBoardBonus + goldenBonus + lightningBonus + rushBonus + specialBonus + lessonBonus + blastCollectionPoints;
   if (eventBonusDelta !== 0) {
     addPlayerEventBonus(gameCode, username, eventBonusDelta);
   }
@@ -331,6 +334,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     ...(blastMoveResult ? {
       blast: {
         tileBonus: blastTileBonus,
+        collectionPoints: blastCollectionPoints,
         tilesCleared: blastTilesCleared,
         movesUsed: blastMoveResult.movesUsed,
         bonusMove: blastMoveResult.bonusMove,

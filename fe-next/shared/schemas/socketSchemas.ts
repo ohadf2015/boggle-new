@@ -11,6 +11,15 @@ import { NAME_VALID_PATTERN, NAME_UNSAFE_PATTERN, USERNAME_SOCKET_MAX } from '..
 import { customAvatarSchema } from '../types/customAvatar';
 import { BLAST_COMBO_TYPES } from '../types/blast';
 
+// A client still on an older bundle can send combos of retired tiles; drop them rather than reject the word.
+const RETIRED_BLAST_COMBO_TYPES: ReadonlySet<string> = new Set([
+  'bomb_lightning', 'bomb_prism', 'bomb_rainbow', 'bomb_magnet', 'bomb_gem', 'bomb_frozen',
+  'lightning_lightning', 'lightning_prism', 'lightning_rainbow', 'lightning_magnet', 'lightning_gem', 'lightning_frozen',
+  'prism_prism', 'prism_rainbow', 'prism_magnet', 'prism_gem', 'prism_frozen',
+  'rainbow_magnet', 'rainbow_gem', 'rainbow_frozen', 'magnet_gem', 'magnet_frozen', 'gem_frozen',
+  'rainbow_special',
+]);
+
 // ==================== Security Configuration ====================
 
 // Allowed domains for profile picture URLs (prevent SSRF attacks)
@@ -230,7 +239,10 @@ export const SubmitWordSchema = z.object({
   // comboType: server has no tile state to detect combos, so the value itself
   // is client-supplied — but the surface is enum-restricted to canonical types
   // to prevent arbitrary string injection (BLT-VAL-1, blast MP audit 2026-04-28).
-  comboType: z.enum(BLAST_COMBO_TYPES).optional().nullable(),
+  comboType: z.preprocess(
+    (v) => (typeof v === 'string' && RETIRED_BLAST_COMBO_TYPES.has(v) ? null : v),
+    z.enum(BLAST_COMBO_TYPES).optional().nullable(),
+  ),
   // inputMethod: tracks whether word was submitted via keyboard ('kb') or drag/tap ('drag')
   inputMethod: z.enum(['kb', 'drag']).optional().default('drag'),
 });

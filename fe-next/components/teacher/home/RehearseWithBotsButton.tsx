@@ -53,6 +53,7 @@ export function RehearseWithBotsButton({ classroomId, source, language, t, showN
         onClick={() => void rehearse()}
         disabled={pending}
         aria-busy={pending || undefined}
+        title={showNote ? undefined : t('education.projectorLobby.rehearsePrivate')}
         className={QUIET_LINK}
       >
         {pending ? (

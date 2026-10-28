@@ -72,7 +72,7 @@ describe('detectNearMiss', () => {
   it('should return null when path already included a combo (hadCombo = true)', () => {
     const tileStates = makeTileStates(GRID_SIZE, [
       { row: 1, col: 2, type: 'bomb' },
-      { row: 1, col: 3, type: 'lightning' },
+      { row: 1, col: 3, type: 'gold' },
     ]);
     const grid = makeGrid(GRID_SIZE);
     const path = makePath([2, 2], [2, 3]);
@@ -85,7 +85,7 @@ describe('detectNearMiss', () => {
   it('should return null when adjacent specials are already cleared', () => {
     const tileStates = makeTileStates(GRID_SIZE, [
       { row: 1, col: 2, type: 'bomb', isCleared: true },
-      { row: 1, col: 3, type: 'lightning', isCleared: true },
+      { row: 1, col: 3, type: 'gold', isCleared: true },
     ]);
     const grid = makeGrid(GRID_SIZE);
     const path = makePath([2, 2], [2, 3]);
@@ -98,7 +98,7 @@ describe('detectNearMiss', () => {
   it('should return null when adjacent specials are in the submitted path', () => {
     const tileStates = makeTileStates(GRID_SIZE, [
       { row: 2, col: 2, type: 'bomb' },
-      { row: 2, col: 3, type: 'lightning' },
+      { row: 2, col: 3, type: 'gold' },
     ]);
     const grid = makeGrid(GRID_SIZE);
     // path includes the special tiles themselves
@@ -114,7 +114,7 @@ describe('detectNearMiss', () => {
   it('should detect two adjacent special tiles above the path', () => {
     const tileStates = makeTileStates(GRID_SIZE, [
       { row: 1, col: 2, type: 'bomb' },
-      { row: 1, col: 3, type: 'lightning' },
+      { row: 1, col: 3, type: 'gold' },
     ]);
     const grid = makeGrid(GRID_SIZE);
     const path = makePath([2, 2], [2, 3]);
@@ -128,8 +128,8 @@ describe('detectNearMiss', () => {
 
   it('should detect two adjacent special tiles beside the path', () => {
     const tileStates = makeTileStates(GRID_SIZE, [
-      { row: 2, col: 1, type: 'rainbow' },
-      { row: 3, col: 1, type: 'prism' },
+      { row: 2, col: 1, type: 'gold' },
+      { row: 3, col: 1, type: 'bomb' },
     ]);
     const grid = makeGrid(GRID_SIZE);
     const path = makePath([2, 2], [3, 2]);
@@ -143,7 +143,7 @@ describe('detectNearMiss', () => {
   it('should not include path cells in the near-miss cells', () => {
     const tileStates = makeTileStates(GRID_SIZE, [
       { row: 1, col: 2, type: 'bomb' },
-      { row: 1, col: 3, type: 'lightning' },
+      { row: 1, col: 3, type: 'gold' },
     ]);
     const grid = makeGrid(GRID_SIZE);
     const path = makePath([2, 2], [2, 3]);
@@ -162,9 +162,9 @@ describe('detectNearMiss', () => {
   it('should cap returned cells at 3 even if more specials exist', () => {
     const tileStates = makeTileStates(GRID_SIZE, [
       { row: 1, col: 1, type: 'bomb' },
-      { row: 1, col: 2, type: 'lightning' },
-      { row: 1, col: 3, type: 'prism' },
-      { row: 1, col: 4, type: 'rainbow' },
+      { row: 1, col: 2, type: 'gold' },
+      { row: 1, col: 3, type: 'bomb' },
+      { row: 1, col: 4, type: 'gold' },
     ]);
     const grid = makeGrid(GRID_SIZE);
     const path = makePath([2, 2], [2, 3]);
@@ -193,7 +193,7 @@ describe('detectNearMiss', () => {
   it('should not crash on path cells at board edges', () => {
     const tileStates = makeTileStates(GRID_SIZE, [
       { row: 1, col: 0, type: 'bomb' },
-      { row: 1, col: 1, type: 'magnet' },
+      { row: 1, col: 1, type: 'bomb' },
     ]);
     const grid = makeGrid(GRID_SIZE);
     const path = makePath([0, 0], [0, 1]); // Top-left corner
@@ -206,7 +206,7 @@ describe('detectNearMiss', () => {
   it('should return NearMissResult with cells and type fields', () => {
     const tileStates = makeTileStates(GRID_SIZE, [
       { row: 1, col: 2, type: 'bomb' },
-      { row: 1, col: 3, type: 'lightning' },
+      { row: 1, col: 3, type: 'gold' },
     ]);
     const grid = makeGrid(GRID_SIZE);
     const path = makePath([2, 2], [2, 3]);
@@ -226,7 +226,7 @@ describe('detectNearMiss', () => {
   it('should detect near-miss when hadCombo is false (default)', () => {
     const tileStates = makeTileStates(GRID_SIZE, [
       { row: 1, col: 2, type: 'bomb' },
-      { row: 1, col: 3, type: 'lightning' },
+      { row: 1, col: 3, type: 'gold' },
     ]);
     const grid = makeGrid(GRID_SIZE);
     const path = makePath([2, 2], [2, 3]);

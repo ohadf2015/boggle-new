@@ -97,7 +97,7 @@ describe('usePlayerGameEvents — blastBoardUpdate handler', () => {
     );
 
     const testOverlay: BlastTileOverlay[] = [
-      { row: 0, col: 0, type: 'jelly' },
+      { row: 0, col: 0, type: 'bomb' },
     ];
     const testTileStates: BlastTileState[][] = [
       [{ isCleared: false, powerUp: null }],
