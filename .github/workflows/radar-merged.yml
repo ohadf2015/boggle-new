@@ -1,8 +1,9 @@
 name: radar-merged
 
-# Reusable: closes the Growth Radar loop for a radar/* PR. A merge completes the recommendation
+# Closes the Growth Radar loop for a radar/* PR only. A merge completes the recommendation
 # and records the intervention the 28-day scorer grades; a close without merge puts the
-# recommendation back in the backlog.
+# recommendation back in the backlog. Product/UX PRs are not this workflow — they opt in
+# with a GR-Intervention trailer, recorded by gr-intervention.yml on push to master.
 on:
   pull_request:
     types: [closed]

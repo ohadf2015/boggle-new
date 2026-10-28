@@ -131,6 +131,16 @@ mcp__github__request_reviewers(pull_number=[number], reviewers=["username"])
 mcp__github__merge_pull_request(pull_number=[number], merge_method="squash")
 ```
 
+## Growth Radar trailer
+
+If the PR changes a graded product metric, append one column-0 line per surface (not inside a fence). Omit it for SEO `radar/*` PRs, docs, refactors, and detector opt-outs.
+
+```
+GR-Intervention: surface=/en/multiplayer kind=ux metric=frustration hypothesis="why this metric should move"
+```
+
+kind is `ux`, `bugfix`, or `feature`. metric is what Growth Radar can grade (`frustration`, `errors`, `funnel_conversion`, `conversions`, ...). See `.claude/rules/10-git.md`.
+
 ## Rules
 
 1. Include meaningful description, not just "fixes bug"
@@ -138,4 +148,5 @@ mcp__github__merge_pull_request(pull_number=[number], merge_method="squash")
 3. Add test plan with specific verification steps
 4. Use conventional commit format for titles
 5. Create draft PRs for incomplete work
-6. Use `/commit-push` before creating PR to ensure all checks pass
+6. Product/UX PRs that should be graded carry a column-0 `GR-Intervention:` line
+7. Use `/commit-push` before creating PR to ensure all checks pass
