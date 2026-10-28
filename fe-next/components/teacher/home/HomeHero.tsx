@@ -40,16 +40,18 @@ export interface HomeHeroProps {
   /** The reason to play today ("19 days since the last game"), next to the button that answers it. */
   insight?: ReactNode;
   corner?: ReactNode;
+  /** False while the Get students in card owns the code, so it never shows twice. */
+  showCode?: boolean;
 }
 
 const TILE_TILT = [-2.5, 1.5, -1, 2, -1.5, 1] as const;
 
 /** The class desk: which class, its join code at a glance, and the one Start button. */
-export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, t, rehearse, nudge, meta, insight, corner }: HomeHeroProps) {
+export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, t, rehearse, nudge, meta, insight, corner, showCode = true }: HomeHeroProps) {
   const selected = classrooms.find((c) => c.id === selectedId) ?? classrooms[0];
   const [pending, setPending] = useState(false);
   const [projectorOpen, setProjectorOpen] = useState(false);
-  const code = selected?.join_code?.trim() ?? '';
+  const code = showCode ? (selected?.join_code?.trim() ?? '') : '';
 
   return (
     <section data-testid="home-hero" aria-labelledby="home-hero-title" className={cn(PANEL, 'relative overflow-hidden')}>

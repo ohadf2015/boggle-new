@@ -103,6 +103,13 @@ describe('Teacher Home', () => {
     expect(screen.getByTestId('hq-projector-qr')).toBeInTheDocument();
   });
 
+  it('Given a new class still below the student goal, Then the join code shows once: the share card owns it, not the hero', () => {
+    classroomsState = { ...classroomsState, classrooms: [{ ...CLASSES[0], member_count: 0 }] };
+    render(<TeacherDashboard />);
+    expect(screen.getByTestId('hq-join-code')).toBeInTheDocument();
+    expect(screen.queryByTestId('home-desk-code')).toBeNull();
+  });
+
   it('Given one class, Then the class list does not repeat the hero, and New class stays in reach', () => {
     classroomsState = { ...classroomsState, classrooms: [CLASSES[0]] };
     render(<TeacherDashboard />);

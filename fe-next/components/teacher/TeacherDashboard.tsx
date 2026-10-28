@@ -249,6 +249,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
                     />
                   ) : null}
                   insight={week.insights?.length ? <HomeInsightCard insights={week.insights} t={t} embedded /> : null}
+                  showCode={!shareCardShown}
                   nudge={week.status !== 'loading' && onboarding.visible && !(onboarding.current === 'shareCode' && shareCardShown) ? (
                     <HomeOnboardingCard onboarding={onboarding} hrefs={onboardingHrefs} onDismiss={activation.dismiss} variant="compact" t={t} />
                   ) : undefined}
