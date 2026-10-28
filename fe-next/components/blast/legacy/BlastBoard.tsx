@@ -39,6 +39,8 @@ export interface BlastBoardProps {
   isMultiplayer?: boolean;
   /** Verdict on the last submitted word; the shared board lifts and rewards it. */
   submitFeedback?: WordFeedback | null;
+  /** Fires with the live drag path so the FX layer can draw the connect line. */
+  onSelectionCellsChange?: (cells: Array<{ row: number; col: number }>) => void;
 }
 
 /**
@@ -62,6 +64,7 @@ export const BlastBoard = memo(function BlastBoard({
   cascadeHighlightCells = [],
   isMultiplayer = false,
   submitFeedback,
+  onSelectionCellsChange,
 }: BlastBoardProps) {
   const { t } = useLanguage();
   const equippedBoardTheme = useEquippedCosmetic('boardTheme');
@@ -97,7 +100,8 @@ export const BlastBoard = memo(function BlastBoard({
   const [selectedCells, setSelectedCells] = useState<SelectedCell[]>([]);
   const handleSelectionChange = useCallback((cells: SelectedCell[]) => {
     setSelectedCells(cells);
-  }, []);
+    onSelectionCellsChange?.(cells);
+  }, [onSelectionCellsChange]);
 
   const selectedPositions = useMemo(
     () => new Set(selectedCells.map((c) => `${c.row}-${c.col}`)),

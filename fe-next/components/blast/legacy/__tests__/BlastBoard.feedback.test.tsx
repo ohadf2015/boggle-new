@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react';
+import { act, render } from '@testing-library/react';
 import { BlastBoard } from '../BlastBoard';
 import type { LetterGrid } from '@/shared/types/game';
 import type { WordFeedback } from '@/components/game/WordFormingArea';
@@ -45,3 +45,26 @@ describe('BlastBoard word verdict', () => {
     expect(capturedProps?.submitFeedback).toBe(feedback);
   });
 });
+
+describe('BlastBoard selection hook', () => {
+  it('given a drag over cells, then onSelectionCellsChange receives the selected cells', () => {
+    const onSelectionCellsChange = vi.fn();
+    render(
+      <BlastBoard
+        grid={grid}
+        tileStates={[]}
+        gridSize={2}
+        language="en"
+        interactive
+        onWordSubmit={vi.fn()}
+        onPathSubmit={vi.fn()}
+        onWordChange={vi.fn()}
+        onSelectionCellsChange={onSelectionCellsChange}
+      />,
+    );
+    const cells = [{ row: 0, col: 0, letter: 'A' }, { row: 0, col: 1, letter: 'B' }];
+    act(() => { (capturedProps?.onSelectionChange as (c: typeof cells) => void)(cells); });
+    expect(onSelectionCellsChange).toHaveBeenCalledWith(cells);
+  });
+});
+
