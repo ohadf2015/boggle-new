@@ -10,8 +10,9 @@ export interface LobbyClassPickerProps {
   label: string;
 }
 
-/** Tap 1 of the host flow: which class is playing. One class = a confirmation chip, not a question. */
+/** Which class is playing; with one class there is no question, and the setup row already names it. */
 export function LobbyClassPicker({ classrooms, selectedId, onSelect, label }: LobbyClassPickerProps) {
+  if (classrooms.length < 2) return null;
   return (
     <div className="flex min-w-0 items-center gap-2">
       <span className="inline-flex shrink-0 items-center gap-1 font-neo-display text-xs font-black uppercase tracking-wide text-neo-cream/80 lg:text-sm">

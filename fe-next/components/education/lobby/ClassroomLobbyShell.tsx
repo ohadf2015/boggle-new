@@ -28,12 +28,14 @@ export interface ClassroomLobbyShellProps {
    * nothing to put here — one whole bar of height given back to the picker.
    */
   footer?: ReactNode;
-  /** Settings open: hide the pinned poster and give the scroller the height. */
+  /** Settings open: hide the pinned row and give the scroller the height. */
   expanded?: boolean;
+  /** The ready panel: a side column from lg, a dock under the scroller on phones. Never scrolls, never hides. */
+  aside?: ReactNode;
   className?: string;
 }
 
-export function ClassroomLobbyShell({ pinned, children, footer, expanded, className }: ClassroomLobbyShellProps) {
+export function ClassroomLobbyShell({ pinned, children, footer, expanded, aside, className }: ClassroomLobbyShellProps) {
   const { t, dir } = useLanguage();
   const scrollRef = useRef<HTMLDivElement>(null);
   // Toggling options changes the scroller's height; a stale scrollTop leaves the mode strip cropped.
@@ -48,42 +50,39 @@ export function ClassroomLobbyShell({ pinned, children, footer, expanded, classN
       // art (LaunchStageBackdrop) behind this shell.
       className={cn('relative flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden', className)}
     >
-      {/* Centred, and capped at a readable column. `justify-center` only does
-          anything because the scroller below is `shrink` rather than `flex-1`:
-          a short lobby sits in the middle of a 900px desktop instead of
-          stranding 500px of empty navy under it, and a tall one still gets its
-          own scrollbar without ever handing the scroll to the page. */}
-      <div className="mx-auto flex w-full max-w-3xl min-h-0 flex-1 flex-col justify-center-safe gap-2 px-1 py-1 lg:max-w-5xl lg:gap-3">
-        {/* The stage line is information, not an action. The title used to be
-            a yellow bordered slab that read as a second START button beside
-            GO LIVE — two CTAs for one job. It stays as the page's h1 for
-            screen readers; GO LIVE in the spotlight is the only call to action. */}
-        <header className="flex shrink-0 justify-center text-center">
+      <div className="mx-auto flex w-full max-w-[1400px] min-h-0 flex-1 flex-col gap-2 px-1 py-1 lg:gap-3 lg:px-4">
+        {/* The h1 is for screen readers; the visible line is information, so GO LIVE stays the only call to action. */}
+        <header className="flex shrink-0 justify-center text-center lg:justify-start lg:text-start">
           <h1 data-testid="lobby-stage-title" className="sr-only">
             {tr(t, 'academy.launch.title', 'Start a live game')}
           </h1>
           <p
             data-testid="lobby-stage-subtitle"
-            className="rounded-full bg-neo-navy/85 px-3 py-0.5 font-neo-body text-xs font-bold text-neo-cream lg:px-4 lg:py-1 lg:text-lg"
+            className="rounded-full bg-neo-navy/85 px-3 py-0.5 font-neo-body text-xs font-bold text-neo-cream lg:px-4 lg:py-1 lg:text-base"
           >
             {tr(t, 'academy.launch.subtitle', 'Pick a game. Your class joins with one code.')}
           </p>
         </header>
 
-        {/* Options open = the poster steps aside (hidden, still mounted so no state resets): the settings need the whole height, not the 100px under a tall poster. */}
-        <div data-testid="lobby-pinned" className={cn('shrink-0', expanded && 'hidden')}>
-          {pinned}
-        </div>
+        <div className="flex min-h-0 flex-1 flex-col gap-2 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(22rem,26rem)] lg:gap-5">
+          <div className="flex min-h-0 flex-1 flex-col gap-2 lg:gap-3">
+            <div data-testid="lobby-pinned" className={cn('shrink-0 empty:hidden', expanded && 'hidden')}>
+              {pinned}
+            </div>
+            <div
+              data-testid="lobby-scroll"
+              ref={scrollRef}
+              className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-0.5 pb-2"
+            >
+              {children}
+            </div>
+          </div>
 
-        <div
-          data-testid="lobby-scroll"
-          ref={scrollRef}
-          className={cn(
-            'min-h-0 overflow-y-auto overscroll-contain px-0.5 pb-1',
-            expanded ? 'flex-1' : 'shrink'
-          )}
-        >
-          {children}
+          {aside ? (
+            <div data-testid="lobby-aside" className="shrink-0 lg:flex lg:min-h-0 lg:flex-col">
+              {aside}
+            </div>
+          ) : null}
         </div>
       </div>
 

@@ -30,12 +30,12 @@ describe('ClassroomLobbyShell — the launch stage', () => {
     const { rerender } = render(
       <ClassroomLobbyShell pinned={<div data-testid="poster" />}>body</ClassroomLobbyShell>
     );
-    expect(screen.getByTestId('lobby-pinned').className).not.toContain('hidden');
+    expect(screen.getByTestId('lobby-pinned').className.split(' ')).not.toContain('hidden');
     rerender(
       <ClassroomLobbyShell expanded pinned={<div data-testid="poster" />}>body</ClassroomLobbyShell>
     );
     expect(screen.getByTestId('poster')).toBeInTheDocument();
-    expect(screen.getByTestId('lobby-pinned').className).toContain('hidden');
+    expect(screen.getByTestId('lobby-pinned').className.split(' ')).toContain('hidden');
     expect(screen.getByTestId('lobby-scroll').className).toContain('flex-1');
   });
 
@@ -43,5 +43,15 @@ describe('ClassroomLobbyShell — the launch stage', () => {
     render(<ClassroomLobbyShell pinned={<div />}>body</ClassroomLobbyShell>);
     expect(screen.getByTestId('classroom-lobby-shell').className).toContain('overflow-hidden');
     expect(screen.getByTestId('lobby-scroll').className).toContain('overflow-y-auto');
+  });
+
+  it('puts the ready panel beside the one scroller, outside it, and keeps it while options are open', () => {
+    const { rerender } = render(
+      <ClassroomLobbyShell pinned={<div />} aside={<div data-testid="ready" />}>body</ClassroomLobbyShell>
+    );
+    expect(screen.getByTestId('lobby-scroll')).not.toContainElement(screen.getByTestId('ready'));
+    rerender(<ClassroomLobbyShell expanded pinned={<div />} aside={<div data-testid="ready" />}>body</ClassroomLobbyShell>);
+    expect(screen.getByTestId('lobby-aside').className).not.toContain('hidden');
+    expect(screen.getByTestId('lobby-aside').className).not.toContain('overflow-y-auto');
   });
 });
