@@ -122,4 +122,41 @@ describe('teacherAccessConfirmation email', () => {
       expect(html).not.toMatch(/free trial runs until/i);
     });
   });
+
+  describe('Teacher Pro line (secondary, single-trial wording)', () => {
+    const inTrial = () => new Date(Date.now() + 14 * 24 * 3600 * 1000).toISOString();
+    const KEEP: Record<string, string> = {
+      en: 'Keep Teacher Pro after my trial',
+      he: 'להמשיך עם פרו למורים אחרי הניסיון',
+      sv: 'Behåll Teacher Pro efter min provperiod',
+      ja: 'トライアル後もTeacher Proを続ける',
+      es: 'Seguir con Teacher Pro después de mi prueba',
+      ru: 'Сохранить Teacher Pro после пробного периода',
+    };
+
+    it.each(LOCALES)('%s: in the free access trial asks to keep Pro, with the date and $9, tracked link', (locale) => {
+      const { html } = teacherAccessConfirmation({ full_name: 'Jane', locale, trialExpiresAt: inTrial() });
+      expect(html).toContain('id="teacher-pro-line"');
+      expect(html).toContain(KEEP[locale]);
+      expect(html).toContain('$9');
+      expect(html).toContain(`https://www.lexiclash.live/api/education/email-click?c=approval_email&amp;l=${locale}`.replace('&amp;', '&'));
+      expect(html).not.toMatch(/14[- ]day|14 días|14 dagars|14 дней|14日/);
+    });
+
+    it('sits under the main dashboard button, which stays the primary action', () => {
+      const { html } = teacherAccessConfirmation({ full_name: 'Jane', locale: 'en', trialExpiresAt: inTrial() });
+      const main = html.indexOf('Open Teacher Dashboard');
+      const pro = html.indexOf('id="teacher-pro-line"');
+      expect(main).toBeGreaterThan(-1);
+      expect(pro).toBeGreaterThan(main);
+      expect(html).toContain('href="https://www.lexiclash.live/en/teacher"');
+    });
+
+    it('an ended trial goes straight to $9/mo; no date falls back to the 14-day trial', () => {
+      const ended = teacherAccessConfirmation({ full_name: 'Jane', locale: 'en', trialExpiresAt: new Date(Date.now() - 86400000).toISOString() }).html;
+      expect(ended).toContain('Continue with Teacher Pro');
+      const none = teacherAccessConfirmation({ full_name: 'Jane', locale: 'en' }).html;
+      expect(none).toContain('Start your 14-day Teacher Pro trial');
+    });
+  });
 });
