@@ -46,6 +46,13 @@ class FakeObserver {
   }
 }
 
+describe('SP_WINNER_ANIMATED_SRC', () => {
+  it('points at the right-sized swap asset, not the shared 30KB winner.webp', () => {
+    expect(SP_WINNER_ANIMATED_SRC).toBe('/mascot/winner-swap.webp');
+    expect(SP_WINNER_STILL_SRC).toBe('/mascot/winner-lcp.webp');
+  });
+});
+
 describe('applySpLcpSrcSwap', () => {
   it('swaps the still src to the animated asset and drops fetchpriority first', () => {
     const img = fakeImg();
