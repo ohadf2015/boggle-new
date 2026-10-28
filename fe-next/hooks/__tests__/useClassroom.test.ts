@@ -105,6 +105,33 @@ describe('useClassrooms refetch behavior', () => {
     }, { timeout: 1000 });
   });
 
+  it('Given a loaded list, When the window regains focus, Then the refetch is quiet: isLoading never flips back on', async () => {
+    (supabaseEducation.getClassrooms as any).mockResolvedValue({
+      data: [{ id: '1', name: 'Class 1', member_count: 5 }],
+      error: null,
+    });
+    const seen: boolean[] = [];
+    const { result } = renderHook(() => {
+      const r = useClassrooms();
+      seen.push(r.isLoading);
+      return r;
+    });
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    const callCount = (supabaseEducation.getClassrooms as any).mock.calls.length;
+    (supabaseEducation.getClassrooms as any).mockImplementation(
+      () => new Promise((resolve) => setTimeout(() => resolve({ data: [{ id: '1', name: 'Class 1', member_count: 5 }], error: null }), 60))
+    );
+    seen.length = 0;
+
+    window.dispatchEvent(new Event('focus'));
+    await new Promise((r) => setTimeout(r, 120));
+
+    await waitFor(() => {
+      expect((supabaseEducation.getClassrooms as any).mock.calls.length).toBeGreaterThan(callCount);
+    }, { timeout: 1000 });
+    expect(seen).not.toContain(true);
+  });
+
   it('should refetch only ONCE when focus and visibilitychange arrive together', async () => {
     // Returning to a backgrounded tab fires BOTH events, so this is the normal case, not an
     // edge case. The debounce state must live in a ref: held in the effect body (with
