@@ -54,6 +54,7 @@ vi.mock('@/utils/dailyChallenge', () => ({
   updateDailyStreak: vi.fn(() => ({ currentStreak: 1, longestStreak: 1, lastPlayedDate: null, totalDailiesCompleted: 1 })),
   hasPlayedWordWheel: () => false,
   getWordWheelResultForDate: () => null,
+  hasEverPlayedWordWheel: () => false,
 }));
 vi.mock('@/utils/dailyChallenge/wordWheelGeneration', () => ({
   generateWordWheelPuzzle: () => ({ centerLetter: 'A', outerLetters: ['B', 'C', 'D', 'E', 'F', 'G'], validWords: [] }),
