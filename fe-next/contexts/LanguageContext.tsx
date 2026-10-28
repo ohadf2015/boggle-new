@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { locales, defaultLocale } from '../lib/i18n';
 import { matchLanguageList } from '../lib/localeResolution';
 import { loadTranslation, getCachedTranslation, seedTranslationCache, type TranslationData } from '../translations/loadTranslation';
+import { runWhenScrollSettles } from '@/lib/perf/runWhenScrollSettles';
 import { isPartialCatalogue } from '@/lib/i18n/isPartialCatalogue';
 import { isHeavyGamePath } from '@/lib/perf/heavyGamePath';
 import logger from '@/utils/logger';
@@ -175,7 +176,13 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
                     logger.warn(`Failed to load translations for ${language}:`, err);
                 });
             };
-            const onEngage = () => upgrade();
+            let cancelSettle: (() => void) | undefined;
+            // touchstart/pointerdown also start every swipe; parsing the catalogue
+            // and re-rendering every t() consumer then lands mid-scroll.
+            const onEngage = () => {
+                detach();
+                cancelSettle ??= runWhenScrollSettles(upgrade);
+            };
             const opts = { capture: true, passive: true } as const;
             const detach = () => {
                 for (const type of SUBSET_UPGRADE_EVENTS) window.removeEventListener(type, onEngage, opts);
@@ -210,6 +217,7 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
             return () => {
                 cancelled = true;
                 detach();
+                cancelSettle?.();
                 subsetUpgradeRef.current = null;
             };
         }
