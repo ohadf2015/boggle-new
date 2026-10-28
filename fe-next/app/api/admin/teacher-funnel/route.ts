@@ -19,8 +19,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { getSupabaseAdmin } from '@/lib/admin/server';
-import { buildTeacherFunnel } from '@/lib/education/teacherFunnel';
+import { buildTeacherFunnel, type CheckoutFunnelEventRow } from '@/lib/education/teacherFunnel';
 import { fetchAllRows } from '@/lib/admin/fetchAllRows';
+
+const CHECKOUT_FUNNEL_EVENT_TYPES = [
+  'checkout_started',
+  'checkout_url_reachable',
+  'checkout_url_error',
+  'checkout_return_landed',
+] as const;
 
 export async function GET(request: NextRequest) {
   const authResult = await verifyAdminAuth(request);
@@ -31,7 +38,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
   }
 
-  const [requestsRes, classroomsRes] = await Promise.all([
+  const [requestsRes, classroomsRes, checkoutEventsRes] = await Promise.all([
     // school_or_org + admin_note are here only so the panel can open the shared
     // TeacherAccessDrawer straight from a funnel row, without a second round-trip.
     fetchAllRows((from, to) =>
@@ -51,6 +58,15 @@ export async function GET(request: NextRequest) {
         .order('id')
         .range(from, to),
     ),
+    fetchAllRows<CheckoutFunnelEventRow>((from, to) =>
+      supabase
+        .from('subscription_events')
+        .select('user_id, event_type, payload, created_at')
+        .in('event_type', [...CHECKOUT_FUNNEL_EVENT_TYPES])
+        .order('created_at', { ascending: false })
+        .order('id')
+        .range(from, to),
+    ),
   ]);
 
   const firstError = requestsRes.error || classroomsRes.error;
@@ -59,7 +75,8 @@ export async function GET(request: NextRequest) {
   }
 
   const requests = requestsRes.data;
-  // Classroom owners are included alongside applicants: a classroom can be opened by
+  const checkoutEvents = checkoutEventsRes.error ? [] : checkoutEventsRes.data;
+  // Classroom owners and checkout users are included alongside applicants: a classroom can be opened by
   // someone who never filled in the access form (the 2026-01-24 one predates the form),
   // and such a row would otherwise render with a blank owner. display_name/username are
   // the only human labels on `profiles` — it has no email column.
@@ -68,6 +85,7 @@ export async function GET(request: NextRequest) {
       [
         ...requests.map((r) => r.user_id),
         ...(classroomsRes.data ?? []).map((c) => c.teacher_id),
+        ...checkoutEvents.map((e) => e.user_id),
       ].filter((id): id is string => !!id),
     ),
   ];
@@ -136,6 +154,7 @@ export async function GET(request: NextRequest) {
     classrooms,
     memberships: membershipsRes.data ?? [],
     assignments,
+    checkoutEvents,
     nowMs: Date.now(),
   });
 

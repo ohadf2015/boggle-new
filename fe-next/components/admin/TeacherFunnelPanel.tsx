@@ -239,6 +239,7 @@ export function TeacherFunnelPanel() {
   const { summary, rows } = data;
   const reasons = data.reasons ?? [];
   const classrooms = data.classrooms ?? [];
+  const checkout = data.checkout;
 
   return (
     <section className="p-4">
@@ -315,6 +316,48 @@ export function TeacherFunnelPanel() {
       {/* WHICH classrooms, before any whole-product totals: when only two exist, "2" is
           useless and their names tell you everything. */}
       <ClassroomsPanel classrooms={classrooms} t={t} />
+
+      {checkout && (
+        <section
+          data-testid="teacher-funnel-checkout-readout"
+          className="mt-4 rounded-neo border-neo border-black bg-neo-navy-light p-3"
+        >
+          <h3 className="font-neo-display text-base font-black text-neo-white">
+            {t('admin.teacherFunnel.checkout.title', 'Polar checkout telemetry')}
+          </h3>
+          <p className="mt-1 font-neo-body text-xs text-neo-white/50">
+            {t(
+              'admin.teacherFunnel.checkout.subtitle',
+              'Durable server events separating checkout URL errors from hosted-page abandonment.',
+            )}
+          </p>
+          <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <Stat
+              label={t('admin.teacherFunnel.checkout.started', 'Checkout started')}
+              value={checkout.checkoutStarted}
+            />
+            <Stat
+              label={t('admin.teacherFunnel.checkout.urlReachable', 'URL reachable')}
+              value={checkout.checkoutUrlReachable}
+              drop={checkout.checkoutStarted - checkout.checkoutUrlReachable}
+            />
+            <Stat
+              label={
+                checkout.lastErrorStatus !== null
+                  ? `${t('admin.teacherFunnel.checkout.urlError', 'URL error')} (HTTP ${checkout.lastErrorStatus})`
+                  : t('admin.teacherFunnel.checkout.urlError', 'URL error')
+              }
+              value={checkout.checkoutUrlError}
+              alert={checkout.checkoutUrlError > 0}
+            />
+            <Stat
+              label={t('admin.teacherFunnel.checkout.returnLanded', 'Return landed')}
+              value={checkout.checkoutReturnLanded}
+              drop={checkout.checkoutUrlReachable - checkout.checkoutReturnLanded}
+            />
+          </div>
+        </section>
+      )}
 
       <ReasonsPanel reasons={reasons} t={t} />
 

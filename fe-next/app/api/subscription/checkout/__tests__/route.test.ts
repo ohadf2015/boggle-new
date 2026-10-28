@@ -45,6 +45,8 @@ describe('POST /api/subscription/checkout', () => {
     getAuthedUser.mockReset()
     logSubscriptionEvent.mockReset()
     logSubscriptionEvent.mockResolvedValue(undefined)
+    probeCheckoutUrl.mockReset()
+    probeCheckoutUrl.mockResolvedValue({ ok: true, status: 200 })
     maybeSingle.mockReset()
     limitEvents.mockReset()
     maybeSingle.mockResolvedValue({ data: null, error: null })
@@ -200,7 +202,62 @@ describe('POST /api/subscription/checkout', () => {
       eventType: 'checkout_started',
       payload: { mode: 'trial', locale: 'he', client_kind: 'script' },
     })
-    expect(logSubscriptionEvent.mock.calls[0][0].payload).not.toHaveProperty('trial')
+    expect(logSubscriptionEvent).toHaveBeenCalledWith({
+      userId: 'u1',
+      eventType: 'checkout_url_reachable',
+      payload: {
+        http_status: 200,
+        status: 200,
+        mode: 'trial',
+        locale: 'he',
+        client_kind: 'script',
+        is_test_account: true,
+        test_reason: 'test_domain',
+      },
+    })
+    for (const [callArg] of logSubscriptionEvent.mock.calls) {
+      expect(callArg.payload).not.toHaveProperty('trial')
+    }
+  })
+
+  it('records checkout_url_error with HTTP status as a durable event when Polar checkout URL probe fails', async () => {
+    getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@school.org' })
+    createCheckout.mockResolvedValue('https://polar.sh/checkout/u1')
+    probeCheckoutUrl.mockResolvedValueOnce({ ok: false, status: 502 })
+
+    const res = await POST(new Request('http://localhost/api/subscription/checkout', { method: 'POST' }))
+    expect(res.status).toBe(200)
+    expect(logSubscriptionEvent).toHaveBeenCalledWith({
+      userId: 'u1',
+      eventType: 'checkout_url_error',
+      payload: {
+        http_status: 502,
+        status: 502,
+        mode: 'paid',
+        locale: 'en',
+        client_kind: 'script',
+        is_test_account: false,
+        test_reason: null,
+      },
+    })
+  })
+
+  it('records checkout_url_error with status 0 when Polar checkout URL probe times out or errors', async () => {
+    getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@school.org' })
+    createCheckout.mockResolvedValue('https://polar.sh/checkout/u1')
+    probeCheckoutUrl.mockResolvedValueOnce(null)
+
+    const res = await POST(new Request('http://localhost/api/subscription/checkout', { method: 'POST' }))
+    expect(res.status).toBe(200)
+    expect(logSubscriptionEvent).toHaveBeenCalledWith({
+      userId: 'u1',
+      eventType: 'checkout_url_error',
+      payload: expect.objectContaining({
+        http_status: 0,
+        status: 0,
+        mode: 'paid',
+      }),
+    })
   })
 
   it('still returns the checkout url when recording the start fails', async () => {
