@@ -60,6 +60,7 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
         <Link
           href={teacherHostHref(language, { classroomId: selected?.id })}
           data-testid="home-start-live"
+          data-magnet
           aria-busy={pending === 'live' || undefined}
           onClick={() => go('live')}
           className={cn(PRIMARY_BUTTON, 'w-full text-xl sm:w-auto sm:min-w-[18rem] sm:self-start')}
@@ -79,7 +80,7 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
           const mode = catalogueEntry(id);
           if (!mode) return null;
           return (
-            <li key={id} className="min-w-0">
+            <li key={id} data-tm data-tilt className="min-w-0">
               <Link
                 href={teacherHostHref(language, { classroomId: selected?.id, mode: id })}
                 data-testid={`home-mode-${id}`}

@@ -128,7 +128,7 @@ function ScorePop({ pop }: { pop: Pop }) {
       className={cn(
         // Inside the row's box: the burst wrapper clips (overflow-hidden), so a
         // pop above the row's top edge was cut in half on the projector.
-        'pointer-events-none absolute top-2 end-44 z-10 rounded-neo border-2 border-neo-black bg-neo-lime',
+        'pointer-events-none absolute top-2 end-44 max-md:top-0.5 max-md:end-2 z-10 rounded-neo border-2 border-neo-black bg-neo-lime',
         'px-2 py-0.5 font-neo-display text-2xl font-black text-neo-black tabular-nums shadow-hard-sm'
       )}
     >

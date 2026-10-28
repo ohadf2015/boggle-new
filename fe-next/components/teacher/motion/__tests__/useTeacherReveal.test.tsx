@@ -58,8 +58,10 @@ describe('useTeacherReveal', () => {
   it('hides targets only with transform+opacity', async () => {
     render(<Probe />);
     await waitFor(() => expect(gsapMock.set).toHaveBeenCalled());
-    const props = Object.keys(gsapMock.set.mock.calls[0][1]).sort();
-    expect(props).toEqual(['opacity', 'y']);
+    const props = Object.keys(gsapMock.set.mock.calls[0][1]);
+    const compositorOnly = ['opacity', 'x', 'y', 'rotate', 'scale', 'rotateX', 'transformPerspective', 'transformOrigin'];
+    expect(props.filter((p) => !compositorOnly.includes(p))).toEqual([]);
+    expect(props).toContain('opacity');
   });
 
   it('leaves content alone under reduced motion', async () => {
@@ -88,7 +90,7 @@ describe('useTeacherReveal', () => {
     render(<Probe />);
     await waitFor(() => expect(gsapMock.fromTo).toHaveBeenCalled());
     const [, from, to] = gsapMock.fromTo.mock.calls[0];
-    expect(from.clipPath).toBe('inset(0 0 100% 0)');
+    expect(from.clipPath).toMatch(/^inset\(.*(100%|50%).*\)$/);
     expect(to.clipPath).toBe('inset(0 0 0% 0)');
   });
 

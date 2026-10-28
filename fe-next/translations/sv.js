@@ -21150,6 +21150,7 @@ const sv = {
     "home": {
       "regionLabel": "Lärarens startsida",
       "railLabel": "Den här veckan och din plan",
+      "weeklyReports": "Veckorapporter",
       "greetMorning": "God morgon, {name}",
       "greetAfternoon": "God eftermiddag, {name}",
       "greetEvening": "God kväll, {name}",

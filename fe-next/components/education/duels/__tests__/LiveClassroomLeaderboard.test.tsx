@@ -75,6 +75,12 @@ describe('LiveClassroomLeaderboard — projector', () => {
     expect(playModeSound).toHaveBeenCalledWith('classic', 'start');
   });
 
+  it('given a phone-width projector, when a score pops, then the pop pins to the score corner instead of landing on the name', () => {
+    const { rerender } = render(<LiveClassroomLeaderboard variant="projector" gameMode="classic" leaderboard={board(['Ada', 30], ['Bo', 20])} />);
+    rerender(<LiveClassroomLeaderboard variant="projector" gameMode="classic" leaderboard={board(['Ada', 30], ['Bo', 28])} />);
+    expect(screen.getByTestId('live-board-pop').className).toContain('max-md:end-2');
+  });
+
   it('does not celebrate scores that were already there on first paint (refresh restore)', () => {
     render(<LiveClassroomLeaderboard variant="projector" gameMode="classic" leaderboard={board(['Ada', 30])} />);
     expect(screen.queryByTestId('live-board-pop')).toBeNull();

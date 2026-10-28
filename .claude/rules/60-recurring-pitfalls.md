@@ -83,6 +83,8 @@
 - [ ] Gating a heavy/animated effect on `isNativeApp()`? Mobile web needs the same gate — use `!isNativeApp() && !isMobileViewport()` or `prefersStaticFullscreenOverlay()`.
 - [ ] **Dark-only** surfaces (game overlays, fanfare, fullscreen results) → hardcode `bg-neo-navy`. Do NOT use `bg-neo-cream dark:bg-neo-navy` there — that pair is correct ONLY for genuinely theme-responsive surfaces (it flashes cream before the dark class resolves on lazy mounts).
 - [ ] **Bottom reservations need a real owner on screen:** `--bottom-nav-height` defaults to 64px even on pages with no nav. A body `padding-bottom` keyed on a class that outlived its banner/nav (or on the cookie sheet) shrinks an `h-dvh` shell in the flex-column body and leaves a blank band under the tab bar. Gate on the nav/banner class, and clear the class when the owner leaves.
+- [ ] **`flex-1` + `min-h-full` on a page grid inside a scrolling flex column** cancels the item's automatic content minimum, so on a phone the whole grid is squeezed to one viewport and its rows overlap. Use `flex-[1_0_auto]` (fill, never shrink below content).
+- [ ] **A closed `<details>` still mounts its children**: anything inside that fires a "viewed" event or fetches on mount now runs for content nobody opened. Mount the body on first `toggle` open.
 - [ ] Entrance opacity tweens on large/fullscreen layers on mobile: prefer a static appear (no `opacity-0` start) over a tween, or keep the tween bounded to a small element.
 
 ---

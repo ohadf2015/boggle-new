@@ -329,15 +329,16 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
       )}
 
       {/* Score Delta Badge + Score */}
-      <div className="text-end flex items-center gap-2">
+      <div className="relative text-end flex items-center gap-2">
         <AnimatePresence>
           {scoreDelta !== null && (
             <m.div
               data-testid="score-delta"
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="px-1.5 py-0.5 rounded-neo border-2 border-neo-black bg-neo-lime text-neo-black font-black text-sm 2xl:text-lg"
+              initial={{ y: 8, scale: 0.85, opacity: 0 }}
+              animate={{ y: 0, scale: 1, opacity: 1 }}
+              exit={{ y: -8, opacity: 0 }}
+              transition={{ type: 'spring', duration: 0.4, bounce: 0.35 }}
+              className="pointer-events-none absolute -top-3 end-full me-1 whitespace-nowrap max-md:hidden px-1.5 py-0.5 rounded-neo border-2 border-neo-black bg-neo-lime text-neo-black font-black text-sm 2xl:text-lg shadow-hard-sm"
             >
               +{scoreDelta}
             </m.div>

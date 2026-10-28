@@ -20188,6 +20188,7 @@ const en = {
     "home": {
       "regionLabel": "Teacher home",
       "railLabel": "This week and your plan",
+      "weeklyReports": "Weekly reports",
       "greetMorning": "Good morning, {name}",
       "greetAfternoon": "Good afternoon, {name}",
       "greetEvening": "Good evening, {name}",

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, within, cleanup } from '@testing-library/react';
+import { render, screen, within, cleanup, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -56,6 +56,14 @@ afterEach(() => {
   search = '';
   viewed.mockReset();
 });
+
+function openWeeklyReports() {
+  const fold = screen.getByTestId('home-weekly-reports') as HTMLDetailsElement;
+  act(() => {
+    fold.open = true;
+    fold.dispatchEvent(new Event('toggle'));
+  });
+}
 
 describe('Teacher Home', () => {
   it('Given classes still loading, Then it paints skeletons and no onboarding card', () => {
@@ -166,7 +174,19 @@ describe('Teacher Home', () => {
     week = { status: 'ready', summary: { gamesPlayed: 0, totalStudents: 0, activeClasses: 0, lastPlayedAt: {} } };
     render(<TeacherDashboard />);
     expect(screen.getByRole('complementary')).toBeInTheDocument();
+    openWeeklyReports();
     expect(screen.getByTestId('weekly-progress-digest')).toBeInTheDocument();
+  });
+
+  it('Given a class, Then the weekly digest and email report sit folded in one closed Weekly reports disclosure that mounts them only when opened, so no view is logged unseen', () => {
+    proState = PRO;
+    render(<TeacherDashboard />);
+    const fold = screen.getByTestId('home-weekly-reports');
+    expect(fold.tagName).toBe('DETAILS');
+    expect(fold).not.toHaveAttribute('open');
+    expect(screen.queryByTestId('weekly-progress-digest')).not.toBeInTheDocument();
+    openWeeklyReports();
+    expect(fold).toContainElement(screen.getByTestId('weekly-progress-digest'));
   });
 
   it('Given a Pro offer, Then the card is words and a button, no blurred fake chart', () => {

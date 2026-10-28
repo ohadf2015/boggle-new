@@ -12,7 +12,7 @@ import { vi } from 'vitest';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import TvBattleBar from '../TvBattleBar';
+import TvBattleBar, { TvFormatChip, TvRoundLabel } from '../TvBattleBar';
 import type { ClassroomLiveContext } from '@/shared/utils/classroomLiveContext';
 
 vi.mock('framer-motion', () => ({
@@ -148,5 +148,23 @@ describe('TvBattleBar', () => {
       />
     );
     expect(screen.getByTestId('tv-battle-team-0')).toHaveTextContent('40');
+  });
+
+  it('given the label moved into the header, when a free-for-all plays, then the bar adds no second row at all', () => {
+    const { container } = render(<TvBattleBar classroom={ffa} players={[]} t={t} labelInHeader />);
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it('given the label moved into the header, when teams play, then only the tug-of-war remains', () => {
+    render(<TvBattleBar classroom={teams} players={[]} t={t} labelInHeader />);
+    expect(screen.getByTestId('tv-battle-tug')).toBeInTheDocument();
+    expect(screen.queryByText('Round 2')).not.toBeInTheDocument();
+  });
+
+  it('given a classroom, when the header asks for the label, then it names the round, the lesson and the format', () => {
+    render(<><TvRoundLabel classroom={teams} t={t} /><TvFormatChip classroom={ffa} t={t} /></>);
+    expect(screen.getByText('Round 2')).toBeInTheDocument();
+    expect(screen.getByText('Weather Words')).toBeInTheDocument();
+    expect(screen.getByText('Everyone vs everyone')).toBeInTheDocument();
   });
 });

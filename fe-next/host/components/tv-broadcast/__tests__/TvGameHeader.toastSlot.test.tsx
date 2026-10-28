@@ -31,4 +31,12 @@ describe('TvGameHeader — toast slot beside the timer', () => {
     render(<TvGameHeader remainingTime={60} timerValue={3} gameMode="classic" t={t} />);
     expect(screen.queryByTestId('tv-header-toast-slot')).toBeNull();
   });
+
+  it('given a classroom header with its own label, when it renders, then the label replaces the LIVE and mode chips and the trailing chip sits on the end', () => {
+    render(<TvGameHeader compact remainingTime={60} timerValue={3} gameMode="classic" t={t} leading={<span data-testid="lead" />} trailing={<span data-testid="trail" />} />);
+    expect(screen.getByTestId('tv-header-start')).toContainElement(screen.getByTestId('lead'));
+    expect(screen.queryByTestId('live-badge')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('mode-badge')).not.toBeInTheDocument();
+    expect(screen.getByTestId('trail')).toBeInTheDocument();
+  });
 });

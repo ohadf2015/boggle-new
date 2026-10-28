@@ -123,6 +123,19 @@ describe('WeeklyProgressDigestCard', () => {
     expect(screen.getByTestId('weekly-progress-digest-inactive')).toHaveTextContent('Jo');
   });
 
+  it('given a whole class inactive, when the digest lists them, then it names the first eight and counts the rest', () => {
+    const many = Array.from({ length: 30 }, (_, i) => ({
+      studentId: `s${i}`, name: `Kid${i}`, thisWeekSessions: 0, lastWeekSessions: 0,
+      thisWeekAccuracyPct: null, lastWeekAccuracyPct: null, accuracyDelta: null, inactive7d: true,
+    }));
+    metricsMock.mockReturnValue({ metrics: { ...week(), inactiveCount: 30, students: many }, isLoading: false, error: null, refresh, assignmentCount: 0 });
+    render(<WeeklyProgressDigestCard classroomId="c1" classroomName="Year 7" />);
+    const line = screen.getByTestId('weekly-progress-digest-inactive');
+    expect(line).toHaveTextContent('Kid7');
+    expect(line).not.toHaveTextContent('Kid8,');
+    expect(line).toHaveTextContent('+22');
+  });
+
   it('fires teacher_digest_viewed and shows the day-7 Pro CTA', () => {
     render(
       <WeeklyProgressDigestCard

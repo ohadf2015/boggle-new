@@ -21150,6 +21150,7 @@ const ja = {
     "home": {
       "regionLabel": "先生のホーム",
       "railLabel": "今週の様子とプラン",
+      "weeklyReports": "週間レポート",
       "greetMorning": "おはようございます、{name}さん",
       "greetAfternoon": "こんにちは、{name}さん",
       "greetEvening": "こんばんは、{name}さん",

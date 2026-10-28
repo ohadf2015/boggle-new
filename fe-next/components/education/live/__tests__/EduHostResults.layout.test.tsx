@@ -31,4 +31,12 @@ describe('EduHostResults layout', () => {
     expect(scrollers[0].className).toContain('flex-1');
     expect(within(root).getByTestId('edu-host-results-scroll')).toBe(scrollers[0]);
   });
+
+  it('given a short laptop wall, when the side column overflows, then no card is squeezed shut; the one scroll region takes the overflow', () => {
+    render(<EduHostResults summary={summary} players={players} t={t} onRematch={vi.fn()} onClose={vi.fn()} onExitRoom={vi.fn()} />);
+    const scroll = screen.getByTestId('edu-host-results-scroll');
+    expect(scroll.className).not.toMatch(/lg:overflow-hidden/);
+    const side = screen.getByTestId('edu-results-actions').parentElement as HTMLElement;
+    expect(side.className).toContain('[&>*]:shrink-0');
+  });
 });

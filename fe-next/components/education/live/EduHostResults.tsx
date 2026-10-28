@@ -117,7 +117,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
         lessonNames={summary.lessonNames ?? []}
       />
 
-      <div data-testid="edu-host-results-scroll" className="-mx-3 flex min-h-0 flex-1 flex-col overflow-y-auto px-3 lg:mx-0 lg:overflow-hidden lg:px-0">
+      <div data-testid="edu-host-results-scroll" className="-mx-3 flex min-h-0 flex-1 flex-col overflow-y-auto px-3 [scrollbar-width:thin] lg:mx-0 lg:px-0">
         <div className="grid grid-cols-1 gap-3 lg:min-h-0 lg:flex-1 lg:grid-cols-5 lg:gap-5 2xl:grid-cols-3">
           {hasStage && (
             <div className="relative flex flex-col gap-3 lg:col-span-3 lg:min-h-0 lg:gap-4 2xl:col-span-2">
@@ -151,7 +151,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
             </div>
           )}
 
-          <div className={cn('flex flex-col gap-3 lg:min-h-0 lg:gap-4', hasStage ? 'lg:col-span-2 2xl:col-span-1' : 'lg:col-span-5 lg:mx-auto lg:w-full lg:max-w-4xl 2xl:col-span-3')}>
+          <div className={cn('flex flex-col gap-3 lg:min-h-0 lg:gap-4 [&>*]:shrink-0', hasStage ? 'lg:col-span-2 2xl:col-span-1' : 'lg:col-span-5 lg:mx-auto lg:w-full lg:max-w-4xl 2xl:col-span-3')}>
             {stats && (
               <div className={cn(!phone && bossOver && 'lg:[@media(max-height:900px)]:hidden')}>
                 <ClassPulse stats={stats} active={winnerBeat} size={phone ? 'card' : 'projector'} t={t} />

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { useEduReducedMotion } from '@/lib/education/motion/useEduReducedMotion';
+import { entranceOffset, pickRevealSignature } from '@/lib/education/motion/revealSignature';
 
 /**
  * Scroll-in for teacher pages: every `[data-tm]` descendant rises into place
@@ -64,16 +65,28 @@ export function useTeacherReveal<T extends HTMLElement>(rescan: string | number 
           });
         }
       }
+      const sig = pickRevealSignature();
+      const wipeFrom = ['inset(0 0 100% 0)', 'inset(0 100% 0 0)', 'inset(0 50% 0 50%)'][Math.floor(Math.random() * 3)];
       for (const el of wipes) {
         gsap.fromTo(
           el,
-          { clipPath: 'inset(0 0 100% 0)', y: 12 },
+          { clipPath: wipeFrom, y: 12 },
           { clipPath: 'inset(0 0 0% 0)', y: 0, duration: 0.6, ease: 'power4.out', clearProps: 'clipPath,transform' },
         );
       }
       if (targets.length === 0) return;
       const ctx = gsap.context(() => {
-        gsap.set(targets, { opacity: 0, y: 22 });
+        const starts = targets.map((_, i) => entranceOffset(sig, i));
+        gsap.set(targets, {
+          opacity: 0,
+          x: (i: number) => starts[i].x,
+          y: (i: number) => starts[i].y,
+          rotate: (i: number) => starts[i].rotate,
+          scale: sig.scale,
+          rotateX: sig.rotateX,
+          transformPerspective: sig.rotateX ? 900 : 0,
+          transformOrigin: sig.rotateX ? '50% 0%' : '50% 60%',
+        });
         ScrollTrigger.batch(targets, {
           scroller,
           start: 'top 92%',
@@ -83,10 +96,14 @@ export function useTeacherReveal<T extends HTMLElement>(rescan: string | number 
           onEnter: (batch) =>
             gsap.to(batch, {
               opacity: 1,
+              x: 0,
               y: 0,
-              duration: 0.55,
-              ease: 'power3.out',
-              stagger: 0.07,
+              rotate: 0,
+              scale: 1,
+              rotateX: 0,
+              duration: sig.duration,
+              ease: sig.ease,
+              stagger: { each: sig.stagger, from: sig.from },
               overwrite: true,
               clearProps: 'transform,opacity',
             }),

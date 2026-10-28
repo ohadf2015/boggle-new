@@ -20846,6 +20846,7 @@ const ru = {
     "home": {
       "regionLabel": "Главная учителя",
       "railLabel": "Эта неделя и ваш тариф",
+      "weeklyReports": "Еженедельные отчёты",
       "greetMorning": "Доброе утро, {name}",
       "greetAfternoon": "Добрый день, {name}",
       "greetEvening": "Добрый вечер, {name}",

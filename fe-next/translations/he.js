@@ -21080,6 +21080,7 @@ const he = {
     "home": {
       "regionLabel": "דף הבית של המורה",
       "railLabel": "השבוע והמסלול שלך",
+      "weeklyReports": "דוחות שבועיים",
       "greetMorning": "בוקר טוב, {name}",
       "greetAfternoon": "צהריים טובים, {name}",
       "greetEvening": "ערב טוב, {name}",

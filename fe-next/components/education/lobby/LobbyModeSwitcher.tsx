@@ -59,6 +59,8 @@ export interface LobbyModeSwitcherProps {
   onModeApplied?: (mode: ClassroomCatalogueId) => void;
   /** The room's own round settings, so each card quotes what a switch would run — the pre-live picker's answer. */
   roundSettings?: ConfiguredRoundSettings;
+  /** Off where the surrounding card already names the mode, so the chip reads only "change". */
+  showName?: boolean;
 }
 
 export function LobbyModeSwitcher({
@@ -68,6 +70,7 @@ export function LobbyModeSwitcher({
   t,
   onModeApplied,
   roundSettings,
+  showName = true,
 }: LobbyModeSwitcherProps) {
   const [open, setOpen] = useState(false);
   const { liveMode, pendingMode, switchTo } = useClassroomModeSwitch({
@@ -108,13 +111,15 @@ export function LobbyModeSwitcher({
         ) : (
           <Shuffle className="h-[1em] w-[1em] shrink-0" strokeWidth={3} aria-hidden="true" />
         )}
-        {liveName}
-        <span
-          data-testid="lobby-change-mode-tag"
-          className="rounded-md border-2 border-neo-black bg-neo-lime px-1.5 py-0.5 font-neo-display text-[11px] font-black uppercase leading-none tracking-wide text-neo-black md:px-[0.4vw] md:text-[0.72vw]"
-        >
-          {t('education.modePicker.change')}
-        </span>
+        {showName ? liveName : t('education.modePicker.change')}
+        {showName && (
+          <span
+            data-testid="lobby-change-mode-tag"
+            className="rounded-md border-2 border-neo-black bg-neo-lime px-1.5 py-0.5 font-neo-display text-[11px] font-black uppercase leading-none tracking-wide text-neo-black md:px-[0.4vw] md:text-[0.72vw]"
+          >
+            {t('education.modePicker.change')}
+          </span>
+        )}
       </button>
 
       {open && (

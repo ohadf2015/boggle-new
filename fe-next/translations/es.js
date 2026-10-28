@@ -21162,6 +21162,7 @@ const es = {
     "home": {
       "regionLabel": "Inicio del docente",
       "railLabel": "Esta semana y tu plan",
+      "weeklyReports": "Informes semanales",
       "greetMorning": "Buenos días, {name}",
       "greetAfternoon": "Buenas tardes, {name}",
       "greetEvening": "Buenas noches, {name}",

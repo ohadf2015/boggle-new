@@ -3,6 +3,7 @@
 
 import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { ChevronDown } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { EducationShell } from '@/components/education/shell/EducationShell';
@@ -183,6 +184,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
     studentCounts: classrooms.map((c) => c.member_count ?? 0),
   });
   const revealRef = useTeacherReveal<HTMLDivElement>(`${ready}-${hasClasses}-${Boolean(classroomsError)}`);
+  const [reportsOpened, setReportsOpened] = useState(false);
   const hasRail = !ready || proCard !== null || showWeek || Boolean(selectedClassroom);
 
   return (
@@ -263,7 +265,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
 
         {hasRail ? (
           <aside aria-label={t('eduShell.home.railLabel')} className="flex min-w-0 flex-col gap-6">
-            {proCard}
+            {proCard ? <div data-tm>{proCard}</div> : null}
             {!ready ? <HomeRailSkeleton /> : showWeek ? (
               <>
                 <div data-tm><HomeInsightCard insights={week.insights} t={t} /></div>
@@ -271,17 +273,25 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
               </>
             ) : null}
             {!ready || !selectedClassroom ? null : (
-              <WeeklyProgressDigestCard
-                classroomId={selectedClassroom.id}
-                classroomName={selectedClassroom.name}
-                overFreeTierCaps={overFreeTierCaps}
-              />
-            )}
-            {!ready || !selectedClassroom ? null : (
-              <WeeklyEmailReport
-                classroomId={selectedClassroom.id}
-                classroomName={selectedClassroom.name}
-              />
+              <details data-testid="home-weekly-reports" data-tm onToggle={(e) => e.currentTarget.open && setReportsOpened(true)} className="group rounded-neo-lg border-[3px] border-neo-cream/70 bg-neo-navy-light shadow-hard">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 font-neo-display text-lg font-black text-neo-cream focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan [&::-webkit-details-marker]:hidden">
+                  {t('eduShell.home.weeklyReports')}
+                  <ChevronDown className="size-5 shrink-0 transition-transform duration-200 ease-out group-open:rotate-180 motion-reduce:transition-none" aria-hidden="true" />
+                </summary>
+                {reportsOpened ? (
+                  <div className="flex flex-col gap-6 px-4 pb-4 motion-safe:group-open:animate-[edu-fold-in_260ms_cubic-bezier(0.23,1,0.32,1)]">
+                    <WeeklyProgressDigestCard
+                      classroomId={selectedClassroom.id}
+                      classroomName={selectedClassroom.name}
+                      overFreeTierCaps={overFreeTierCaps}
+                    />
+                    <WeeklyEmailReport
+                      classroomId={selectedClassroom.id}
+                      classroomName={selectedClassroom.name}
+                    />
+                  </div>
+                ) : null}
+              </details>
             )}
           </aside>
         ) : null}

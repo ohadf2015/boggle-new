@@ -11,6 +11,8 @@ interface TvBattleBarProps {
   classroom: ClassroomLiveContext | null;
   players: Array<{ username: string; score: number }>;
   t: (path: string, params?: Record<string, string | number>) => string;
+  /** The header carries the round, lesson and format; the bar keeps only the team tug-of-war. */
+  labelInHeader?: boolean;
 }
 
 /**
@@ -29,7 +31,39 @@ interface TvBattleBarProps {
  *    the loud element on this screen and the only one, because it is the one
  *    fact the old screen could not express at all.
  */
-const TvBattleBar = memo<TvBattleBarProps>(({ classroom, players, t }) => {
+type LabelProps = Pick<TvBattleBarProps, 'classroom' | 't'>;
+
+const formatLabelOf = (classroom: ClassroomLiveContext, t: LabelProps['t']) =>
+  classroom.playStyle === 'teams' && (classroom.teams?.length ?? 0) > 0
+    ? t('tvBroadcast.classroom.teamBattle')
+    : t('tvBroadcast.classroom.freeForAll');
+
+export function TvRoundLabel({ classroom, t }: LabelProps) {
+  if (!classroom) return null;
+  return (
+    <span className="flex min-w-0 items-center gap-x-4 max-md:gap-x-2">
+      <span className="px-3 py-1 rounded-neo bg-neo-lime text-neo-black font-neo-display font-bold text-sm md:text-lg uppercase tracking-wide shrink-0">
+        {t('tvBroadcast.classroom.round', { number: classroom.round })}
+      </span>
+      {classroom.lessonName && (
+        <span className="font-neo-display font-bold text-neo-cream text-base sm:text-lg md:text-3xl md:medium-short:text-2xl truncate min-w-0">
+          {classroom.lessonName}
+        </span>
+      )}
+    </span>
+  );
+}
+
+export function TvFormatChip({ classroom, t }: LabelProps) {
+  if (!classroom) return null;
+  return (
+    <span className="px-3 max-md:px-2 py-1 rounded-neo border-neo-thick border-neo-cream text-neo-cream font-neo-body font-bold text-xs max-md:text-[10px] md:text-base uppercase tracking-widest max-md:tracking-wide shrink-0">
+      {formatLabelOf(classroom, t)}
+    </span>
+  );
+}
+
+const TvBattleBar = memo<TvBattleBarProps>(({ classroom, players, t, labelInHeader = false }) => {
   const reduceMotion = useShouldReduceMotion();
 
   if (!classroom) return null;
@@ -44,34 +78,21 @@ const TvBattleBar = memo<TvBattleBarProps>(({ classroom, players, t }) => {
 
   const isTeams = classroom.playStyle === 'teams' && standings.length > 0;
   const total = standings.reduce((sum, team) => sum + team.totalScore, 0);
-  const formatLabel = isTeams
-    ? t('tvBroadcast.classroom.teamBattle')
-    : t('tvBroadcast.classroom.freeForAll');
+  const formatLabel = formatLabelOf(classroom, t);
+  if (labelInHeader && !isTeams) return null;
 
   return (
     // Dark-only surface: hardcoded navy, never `bg-neo-cream dark:bg-neo-navy`.
     // The projector mounts lazily and that pair flashes cream first.
     <div className="w-full px-4 pb-2 bg-neo-navy" data-testid="tv-battle-bar">
-      <div className="max-w-7xl mx-auto flex flex-wrap max-md:flex-nowrap items-center gap-x-4 max-md:gap-x-2 gap-y-2">
-        {/* The round marker is the one filled chip up here: a lesson IS a
-            sequence, so the number carries real information. Lime on black is
-            ~20:1 — legible from the back row. */}
-        <span className="px-3 py-1 rounded-neo bg-neo-lime text-neo-black font-neo-display font-bold text-sm md:text-lg uppercase tracking-wide shrink-0">
-          {t('tvBroadcast.classroom.round', { number: classroom.round })}
-        </span>
-        {classroom.lessonName && (
-          <span className="font-neo-display font-bold text-neo-cream text-base sm:text-lg md:text-3xl md:medium-short:text-2xl truncate min-w-0">
-            {classroom.lessonName}
+      {!labelInHeader && (
+        <div className="max-w-7xl mx-auto flex flex-wrap max-md:flex-nowrap items-center gap-x-4 max-md:gap-x-2 gap-y-2">
+          <TvRoundLabel classroom={classroom} t={t} />
+          <span className="ms-auto shrink-0">
+            <TvFormatChip classroom={classroom} t={t} />
           </span>
-        )}
-        {/* Outlined, not filled: the tug-of-war below is the loud element and
-            it should be the only one. A solid cream border on navy is 3.74:1
-            and clears the non-text contrast floor; an accent fill here would
-            fight the bar for the room's attention. */}
-        <span className="ms-auto px-3 max-md:px-2 py-1 rounded-neo border-neo-thick border-neo-cream text-neo-cream font-neo-body font-bold text-xs max-md:text-[10px] md:text-base uppercase tracking-widest max-md:tracking-wide shrink-0">
-          {formatLabel}
-        </span>
-      </div>
+        </div>
+      )}
 
       {isTeams && (
         <div

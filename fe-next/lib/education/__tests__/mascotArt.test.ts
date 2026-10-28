@@ -8,7 +8,7 @@ const pub = (p: string) => path.join(process.cwd(), 'public', p);
 describe('EDU_MASCOT', () => {
   it('given the art map, then it has exactly the agreed poses', () => {
     expect(Object.keys(EDU_MASCOT).sort()).toEqual(
-      ['attack', 'empty', 'error', 'gameStart', 'noClasses', 'podium', 'pro', 'setup', 'shield', 'success', 'tip', 'welcome'].sort()
+      ['attack', 'empty', 'error', 'gameStart', 'noClasses', 'podium', 'pro', 'setup', 'shield', 'success', 'tip', 'welcome', 'scanJoin'].sort()
     );
   });
 

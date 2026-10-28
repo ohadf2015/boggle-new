@@ -3249,3 +3249,8 @@ html.reduce-motion *::after {
   from { transform: scaleX(1); }
   to { transform: scaleX(0); }
 }
+
+@keyframes edu-fold-in {
+  from { transform: translateY(-6px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
