@@ -1,11 +1,19 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
+import Image from 'next/image';
+import { gsap } from 'gsap';
+import { isReducedMotionPreferred } from '@/utils/accessibility';
 import { cn } from '@/lib/utils';
+import { useCountUp } from '@/components/word-craft/hooks/useCountUp';
 import Avatar from '@/components/Avatar';
 import { WordCraftDuelResult } from './WordCraftDuelResult';
 import { WordCraftPlayFriendControl } from './WordCraftPlayFriendControl';
 import type { BoardDims } from '@/lib/word-craft/boardDimensions';
 import type { BotDifficulty } from '@/lib/word-craft/botDifficulty';
+import type { GameHighlights } from '@/lib/word-craft/gameHighlights';
+import type { DailyState } from '@/lib/word-craft/daily';
+import type { DailyGoalResult } from '@/lib/word-craft/dailyGoals';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 interface Props {
@@ -38,13 +46,33 @@ interface Props {
    * point of this game, so the share block gets a headline + entrance pop.
    */
   challengeIntent?: boolean;
+  /** The player's best move + longest word this game. */
+  highlights?: GameHighlights;
+  /** Set when this game was today's daily board: the streak after recording it. */
+  dailyResult?: DailyState | null;
+  /** Today's goals, shown under the streak on a daily game. */
+  dailyGoals?: DailyGoalResult[];
   /** Play-again closure loop — re-rolls a fresh solo game in place. */
   onPlayAgain?: () => void;
   /** Leave to the home/menu screen. */
   onHome?: () => void;
 }
 
-export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, botName, isNewBest, playerAvatar, opponentAvatar, duelOutcome, currentSeed, currentLocale, challengerName, challengerAvatar, currentDims, currentDifficulty, challengeIntent, onPlayAgain, onHome }: Props) {
+export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, botName, isNewBest, playerAvatar, opponentAvatar, duelOutcome, currentSeed, currentLocale, challengerName, challengerAvatar, currentDims, currentDifficulty, challengeIntent, highlights, dailyResult, dailyGoals, onPlayAgain, onHome }: Props) {
+  const heroRef = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    if (!heroRef.current || isReducedMotionPreferred()) return;
+    const tween = gsap.fromTo(
+      heroRef.current,
+      { y: -90, rotation: -14, scale: 0.4, opacity: 0 },
+      { y: 0, rotation: 0, scale: 1, opacity: 1, duration: 0.9, delay: 0.1, ease: 'elastic.out(1, 0.5)' },
+    );
+    return () => {
+      tween.kill();
+    };
+  }, []);
+  const shownPlayer = useCountUp(playerScore);
+  const shownBot = useCountUp(botScore);
   // If in a duel, show duel result instead of vs-bot result
   if (duelOutcome) {
     return (
@@ -103,12 +131,25 @@ export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, b
       role="dialog"
       aria-modal="true"
       aria-label={t('wordcraft.gameOver', 'Game over')}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 animate-neo-pop"
+      className="fixed inset-0 z-50 flex overflow-y-auto overscroll-contain p-4 bg-black/80 animate-neo-pop"
     >
-      <div className="relative w-full max-w-sm flex flex-col items-center gap-4 bg-neo-navy-light border-neo-thick border-black rounded-neo shadow-hard-lg p-6">
+      <div className="relative m-auto w-full max-w-sm flex flex-col items-center gap-3 [@media(min-height:860px)]:gap-4 bg-neo-navy-light border-neo-thick border-black rounded-neo shadow-hard-lg p-6">
         <span className="text-[11px] font-neo-display font-black uppercase tracking-[0.2em] text-neo-white/70">
           {t('wordcraft.gameOver', 'Game over')}
         </span>
+
+        {playerWon || !isTie ? (
+          <span ref={heroRef} className="block -my-1">
+            <Image
+              src={playerWon ? '/word-craft/trophy.webp' : '/word-craft/bot.webp'}
+              alt=""
+              width={512}
+              height={510}
+              priority
+              className="wc-float w-20 [@media(min-height:860px)]:w-28 h-auto drop-shadow-[0_6px_0_rgba(0,0,0,0.6)]"
+            />
+          </span>
+        ) : null}
 
         {isNewBest ? (
           <div className="animate-neo-pop px-3 py-1.5 bg-neo-lime border-neo-thick border-black text-neo-navy rounded-neo shadow-hard font-neo-display font-black uppercase tracking-wider">
@@ -136,7 +177,7 @@ export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, b
         ) : null}
 
         {/* Concrete result: how many squares each side controls at the buzzer. */}
-        <div className="flex items-stretch gap-3 w-full">
+        <div className="wc-rise flex items-stretch gap-3 w-full" style={{ '--wc-delay': '120ms' } as React.CSSProperties}>
           <div className={cn(
             'flex-1 flex flex-col items-center gap-1 py-3 rounded-neo border-neo-thick border-black',
             playerWon ? 'bg-neo-cyan text-neo-navy' : 'bg-neo-navy text-neo-cyan',
@@ -144,7 +185,7 @@ export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, b
             <span data-wc-result-avatar className="block">
               <Avatar customAvatar={playerAvatar ?? null} userId={`wc-player-${playerLabel}`} size="sm" disableEffects />
             </span>
-            <span className="text-3xl font-neo-display font-black leading-none">{playerScore}</span>
+            <span className="text-3xl font-neo-display font-black leading-none tabular-nums">{shownPlayer}</span>
             <span className="text-[10px] font-neo-body uppercase tracking-wider truncate max-w-full px-1">{playerLabel} · {squares}</span>
           </div>
           <div className={cn(
@@ -154,18 +195,59 @@ export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, b
             <span data-wc-result-avatar className="block">
               <Avatar customAvatar={opponentAvatar ?? null} userId={`wc-opponent-${botLabel}`} size="sm" disableEffects />
             </span>
-            <span className="text-3xl font-neo-display font-black leading-none">{botScore}</span>
+            <span className="text-3xl font-neo-display font-black leading-none tabular-nums">{shownBot}</span>
             <span className="text-[10px] font-neo-body uppercase tracking-wider truncate max-w-full px-1">{botLabel} · {squares}</span>
           </div>
         </div>
 
+        {dailyResult ? (
+          <div
+            data-wc-daily-result
+            className="wc-rise w-full flex items-center gap-3 px-3 py-2 rounded-neo border-neo-thick border-black bg-neo-orange text-neo-navy shadow-hard"
+            style={{ '--wc-delay': '240ms' } as React.CSSProperties}
+          >
+            <Image src="/word-craft/flame.webp" alt="" width={302} height={384} className="h-10 w-auto wc-flicker" />
+            <span className="flex flex-col min-w-0">
+              <span className="text-sm font-neo-display font-black uppercase tracking-wide leading-tight">{t('wordcraft.daily.streakNow', { n: dailyResult.streak })}</span>
+              <span className="text-[11px] font-neo-body font-bold opacity-80">{t('wordcraft.daily.tomorrow')}</span>
+            </span>
+          </div>
+        ) : null}
+
+        {dailyResult && dailyGoals ? (
+          <ul data-wc-daily-goals className="wc-rise w-full flex flex-col gap-1" style={{ '--wc-delay': '300ms' } as React.CSSProperties} aria-label={t('wordcraft.daily.goals.title')}>
+            {dailyGoals.map((g) => (
+              <li
+                key={g.id}
+                data-done={g.done ? 'true' : 'false'}
+                className={cn(
+                  'flex items-center gap-2 px-2.5 py-1 rounded-neo border-2 border-black text-xs font-neo-display font-black uppercase tracking-wide',
+                  g.done ? 'bg-neo-lime text-neo-navy' : 'bg-neo-navy text-neo-white/60',
+                )}
+              >
+                <span aria-hidden className="w-4 text-center">{g.done ? '✓' : '○'}</span>
+                {t(`wordcraft.daily.goals.${g.id}`)}
+              </li>
+            ))}
+          </ul>
+        ) : null}
+
+        {highlights?.bestMove ? (
+          <div className="w-full grid grid-cols-2 gap-2">
+            <HighlightChip delay={300} label={t('wordcraft.highlights.best')} word={highlights.bestMove.word} sub={t('wordcraft.highlights.pts', { n: highlights.bestMove.score })} />
+            {highlights.longestWord ? (
+              <HighlightChip delay={380} label={t('wordcraft.highlights.longest')} word={highlights.longestWord} sub={`${highlights.longestWord.length}`} />
+            ) : null}
+          </div>
+        ) : null}
+
         {(onPlayAgain || onHome) ? (
-          <div className="flex items-center gap-2 w-full">
+          <div className="flex items-stretch gap-2 w-full">
             {onPlayAgain ? (
               <button
                 type="button"
                 onClick={onPlayAgain}
-                className="flex-1 px-4 py-2.5 bg-neo-lime border-neo-thick border-black text-neo-navy rounded-neo shadow-hard font-neo-display font-black uppercase tracking-wider active:animate-neo-press hover:-translate-y-0.5 transition-transform"
+                className="flex-1 flex items-center justify-center text-center px-3 py-2.5 bg-neo-lime border-neo-thick border-black text-neo-navy rounded-neo shadow-hard font-neo-display font-black uppercase tracking-wider active:animate-neo-press hover:-translate-y-0.5 transition-transform"
               >
                 ↻ {t('wordcraft.playAgain')}
               </button>
@@ -174,7 +256,7 @@ export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, b
               <button
                 type="button"
                 onClick={onHome}
-                className="flex-1 px-4 py-2.5 bg-neo-cyan border-neo-thick border-black text-neo-navy rounded-neo shadow-hard font-neo-display font-black uppercase tracking-wider active:animate-neo-press hover:-translate-y-0.5 transition-transform"
+                className="flex-1 flex items-center justify-center text-center px-3 py-2.5 bg-neo-cyan border-neo-thick border-black text-neo-navy rounded-neo shadow-hard font-neo-display font-black uppercase tracking-wider active:animate-neo-press hover:-translate-y-0.5 transition-transform"
               >
                 {t('wordcraft.home')}
               </button>
@@ -206,6 +288,22 @@ export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, b
           </div>
         ) : null}
       </div>
+    </div>
+  );
+}
+
+function HighlightChip({ label, word, sub, delay }: { label: string; word: string; sub: string; delay: number }) {
+  return (
+    <div
+      className="wc-rise flex items-center gap-2 px-2 py-1.5 rounded-neo border-neo-thick border-black bg-neo-navy text-neo-white min-w-0"
+      style={{ '--wc-delay': `${delay}ms` } as React.CSSProperties}
+    >
+      <Image src="/word-craft/gem.webp" alt="" width={345} height={384} className="h-8 w-auto shrink-0" />
+      <span className="flex flex-col min-w-0">
+        <span className="text-[9px] font-neo-body uppercase tracking-wider text-neo-white/60 truncate">{label}</span>
+        <span className="text-sm font-neo-display font-black uppercase leading-tight truncate">{word}</span>
+        <span className="text-[10px] font-neo-body text-neo-cyan">{sub}</span>
+      </span>
     </div>
   );
 }

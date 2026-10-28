@@ -1,11 +1,13 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import Image from 'next/image';
 import { Bot, Play, Send, Sparkles, Users } from 'lucide-react';
 import { BOT_DIFFICULTIES } from '@/lib/word-craft/botDifficulty';
 import { WORDCRAFT_MODIFIERS, modifierLabelKey, type WordCraftModifier } from '@/lib/word-craft/modifiers';
 import type { WordCraftSetupChoice } from '@/lib/word-craft/setupPrefs';
 import { cn } from '@/lib/utils';
+import { readDaily, todayUtc, type DailyState } from '@/lib/word-craft/daily';
 
 /**
  * Handle radiogroup keyboard navigation per WAI-ARIA 1.2.
@@ -33,11 +35,13 @@ function handleRadiogroupKeyDown<T>(
   onSelect(options[nextIndex]);
 }
 
-type TFn = (path: string, fallback?: string) => string;
+type TFn = (path: string, fallbackOrParams?: string | Record<string, string | number>) => string;
 
 export interface WordCraftSetupProps {
   initial: WordCraftSetupChoice;
   onStart: (choice: WordCraftSetupChoice) => void;
+  /** One-tap start of today's shared board vs the bot. */
+  onStartDaily?: () => void;
   t: TFn;
 }
 
@@ -53,8 +57,17 @@ export interface WordCraftSetupProps {
  * Pure component: no storage or router side effects. The page persists the
  * choice and switches phase.
  */
-export function WordCraftSetup({ initial, onStart, t }: WordCraftSetupProps) {
+export function WordCraftSetup({ initial, onStart, onStartDaily, t }: WordCraftSetupProps) {
   const [choice, setChoice] = useState<WordCraftSetupChoice>(initial);
+  // localStorage resolves after mount; render nothing until then so SSR and first paint agree.
+  const [daily, setDaily] = useState<DailyState | null>(null);
+  const [playedToday, setPlayedToday] = useState(false);
+  useEffect(() => {
+    const today = todayUtc();
+    const d = readDaily(today);
+    setDaily(d);
+    setPlayedToday(d.lastDate === today);
+  }, []);
   const setOpponent = useCallback((opponent: WordCraftSetupChoice['opponent']) => {
     setChoice((c) => ({
       ...c,
@@ -88,6 +101,40 @@ export function WordCraftSetup({ initial, onStart, t }: WordCraftSetupProps) {
         <p className="text-sm [@media(min-height:700px)]:text-base text-neo-white/60 font-neo-body">
           {t('wordcraft.setup.tagline', 'Place words. Claim territory. Outsmart the bot.')}
         </p>
+      </div>
+
+      {onStartDaily && daily ? (
+        <button
+          type="button"
+          onClick={onStartDaily}
+          data-wc-daily
+          className="wc-rise shrink-0 flex items-center gap-3 px-3 py-2 rounded-neo border-neo-thick border-black bg-neo-yellow text-neo-navy shadow-hard-lg text-start active:translate-y-0.5 active:shadow-hard-pressed transition-transform"
+        >
+          <Image src="/word-craft/calendar.webp" alt="" width={338} height={384} className="h-11 w-auto" />
+          <span className="flex flex-col min-w-0 flex-1">
+            <span className="text-sm font-neo-display font-black uppercase tracking-wide leading-tight">{t('wordcraft.daily.title')}</span>
+            <span className="text-[11px] font-neo-body font-bold opacity-80 truncate">
+              {playedToday ? t('wordcraft.daily.done') : t('wordcraft.daily.play')}
+            </span>
+          </span>
+          {daily.streak > 0 ? (
+            <span className="flex items-center gap-1 shrink-0">
+              <Image src="/word-craft/flame.webp" alt="" width={302} height={384} className="h-8 w-auto wc-flicker" />
+              <span className="text-lg font-neo-display font-black leading-none" aria-label={t('wordcraft.daily.streak', { n: daily.streak })}>{daily.streak}</span>
+            </span>
+          ) : null}
+        </button>
+      ) : null}
+
+      <div className="flex-1 min-h-0 flex items-center justify-center [@media(max-height:640px)]:hidden" aria-hidden>
+        <Image
+          src="/word-craft/flag.webp"
+          alt=""
+          width={282}
+          height={512}
+          priority
+          className="wc-float h-52 w-auto object-contain drop-shadow-[0_6px_0_rgba(0,0,0,0.6)]"
+        />
       </div>
 
       {/* Opponent */}

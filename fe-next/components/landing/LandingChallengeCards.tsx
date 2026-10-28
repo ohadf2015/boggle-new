@@ -12,11 +12,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { requiresNetworkToPlay } from '@/lib/offline/landingOfflineAwareness';
 import type { LandingGameMode } from '@/lib/landing/fetchGameModeStats';
-import { placeBlastAfterArena } from '@/lib/landing/blastPlacement';
-import { orderModesForNewcomer } from '@/lib/landing/newcomerModeOrder';
+import { FEATURED_HOME_MODE, isBlastLocale, pickHomeAnchor } from '@/lib/landing/blastPlacement';
 import { HomeModeGrid } from './home/HomeModeGrid';
 import { useAdventureResume } from './useAdventureResume';
-import { MODE_META, MODE_TAGS, modeLineKey, modeRoute, isCalmMode, type ModeCubeModel } from '@/lib/landing/modeMeta';
+import { MODE_META, MODE_TAGS, modeLineKey, modeRoute, type ModeCubeModel } from '@/lib/landing/modeMeta';
 
 interface LandingChallengeCardsProps {
   language: string;
@@ -102,8 +101,8 @@ export function LandingChallengeCards({
   // Practice also disappears as soon as the player has finished any game —
   // a recorded personal best is a durable "I've played" signal that survives
   // localStorage clears for signed-in users.
-  // Word Tower, Blast Classic (V1), and Word Craft are admin-only dev previews —
-  // gated on in-work access (admin OR beta tester), no extra experiment lock.
+  // Crossword, Wordfall (Blast V2) and Quick Play are admin/beta previews, gated
+  // on in-work access. Blast V1 (/blast) is public for everyone.
   const { canSeeInWorkModes } = useAuth();
   const isVeteranRaw = useIsPracticeVeteran();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
@@ -149,15 +148,14 @@ export function LandingChallengeCards({
     // all — so the cube, and with it the "continue your run" state, would be
     // inconsistent without this append.
     if (!next.includes('adventure')) next.push('adventure');
+    // The featured hero must not depend on the popularity ranking carrying it.
+    if (!next.includes(FEATURED_HOME_MODE)) next.push(FEATURED_HOME_MODE);
     // Hide only beta-only modes (quickPlay) from non-beta users.
     const gated = (canSeeInWorkModes ? next : next.filter((m) => m !== 'quickPlay'))
-      .filter((m) => m !== 'crossword' || hasCrosswordPuzzles(language));
+      .filter((m) => m !== 'crossword' || hasCrosswordPuzzles(language))
+      .filter((m) => m !== 'blast' || isBlastLocale(language));
     return gated;
   })();
-  // Bump Blast up the hub: it sits directly after the multiplayer ('arena')
-  // card, regardless of popularity ranking. (Supersedes the old
-  // blast-before-adventure rule — arena is always above adventure.)
-  const serverOrder: LandingCardKey[] = placeBlastAfterArena(rawOrder);
   // Practice is off the hub for EVERYONE, not just veterans.
   //
   // It used to be the newcomer onramp — surfaced first, in its own featured row,
@@ -166,16 +164,8 @@ export function LandingChallengeCards({
   // cul-de-sac for half its intake, so new players now go straight to the real
   // modes and get help in-game only if they actually get stuck
   // (components/game/ftue/StuckCoachOverlay.tsx).
-  const practiceFiltered: LandingCardKey[] = serverOrder.filter((m) => m !== 'practice');
-  const orderedBeforeFeatured: LandingCardKey[] = isNewbie && !isVeteran
-    // A newcomer judges the whole game by the first mode they try, so lead with
-    // the ones they actually FINISH. orderModesForNewcomer undoes the
-    // blast-after-arena promotion above for this cohort only — blast completes
-    // at 31% for first-24h players vs 45% for classic and 56% for word-wheel.
-    ? orderModesForNewcomer(
-        ['daily', ...practiceFiltered.filter((m) => m !== 'daily')] as LandingCardKey[],
-      )
-    : practiceFiltered[0] === 'daily'
+  const practiceFiltered: LandingCardKey[] = rawOrder.filter((m) => m !== 'practice');
+  const orderedBeforeFeatured: LandingCardKey[] = practiceFiltered[0] === 'daily'
     ? practiceFiltered
     : (['daily', ...practiceFiltered.filter((m) => m !== 'daily')] as LandingCardKey[]);
   // Final step: cull to the featured allowlist so landing shows a small,
@@ -219,9 +209,10 @@ export function LandingChallengeCards({
     const meta = MODE_META[key];
     const href = modeRoute(key, language);
     if (!meta || !href) return null; // 'daily' + any unmapped key → not a cube
+    const featured = key === FEATURED_HOME_MODE;
     const onClick = () => {
       if (TRACK_SELECTED.has(key)) trackModeSelected(key as never, 'home');
-      trackLandingCtaClick('mode_card', { mode: key, variant: meta.variant });
+      trackLandingCtaClick('mode_card', { mode: key, variant: meta.variant, ...(featured && { featured: true }) });
       // Track featured mode card engagement for promoted modes.
       if (key === 'adventure' || key === 'wordTowerV2') {
         trackGrowthEvent('featured_mode_card_clicked', {
@@ -235,6 +226,7 @@ export function LandingChallengeCards({
       key, title: t(meta.titleKey), href, variant: meta.variant, Icon: meta.Icon,
       genIcon: meta.genIcon, imgScale: meta.imgScale, badge: meta.badge, category: meta.category, role, onClick,
       description: lineKey ? t(lineKey) : undefined, tag: MODE_TAGS[key],
+      ...(featured && { featured: true, badge: 'RECOMMENDED' }),
     };
     if (key === 'arena') {
       const arenaHighlight = isFirstTimer && !isNewbie && !practiceWinsHighlight;
@@ -269,30 +261,17 @@ export function LandingChallengeCards({
   };
 
   const isModel = (m: ModeCubeModel | null): m is ModeCubeModel => m !== null;
-  // Every mode renders directly in the grid — no above-fold/collapsed split.
+  // Every mode renders on the page; HomeModeGrid sorts them into intent groups.
   const visibleKeys: LandingCardKey[] = [
     ...mpCards,
     ...(featurePractice ? (['practice'] as LandingCardKey[]) : []),
     ...spCards,
   ];
+  const anchorKey = pickHomeAnchor(visibleKeys);
   const visibleModels = visibleKeys
-    .map((k) => buildCubeModel(k, k === 'arena' ? 'anchor' : 'normal'))
+    .map((k) => buildCubeModel(k, k === anchorKey ? 'anchor' : 'normal'))
     .filter(isModel);
-  // Fast modes before the calm no-timer ones (crossword, word craft, connections).
-  const fastModels = visibleModels.filter((m) => !isCalmMode(m.key));
-  const calmModels = visibleModels.filter((m) => isCalmMode(m.key));
-  // The live race anchors the home with the next four modes; the rest sit in the More sheet.
-  const leadModels = fastModels.filter((m) => m.key === 'arena');
-  const parkedModels = [
-    ...fastModels.filter((m) => m.key !== 'arena'),
-    ...calmModels,
-  ];
-  const SCREEN_TILES = 4;
   return (
-    <HomeModeGrid
-      models={[...leadModels, ...parkedModels.slice(0, SCREEN_TILES)]}
-      extras={parkedModels.slice(SCREEN_TILES)}
-      liveCount={activePlayers}
-    />
+    <HomeModeGrid models={visibleModels} liveCount={activePlayers} />
   );
 }

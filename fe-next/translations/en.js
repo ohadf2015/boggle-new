@@ -1,5 +1,28 @@
 // EN translations
 const en = {
+  // @blastProgress:start
+  "blastProgress": {
+    "wave": "Wave {wave}",
+    "tapToSkip": "Tap to skip",
+    "toPass": "{points} to pass {name}",
+    "toBest": "{points} to your best",
+    "passed": "Passed {name}!",
+    "newBest": "New best!",
+    "top": "#1 this week",
+    "weekly": "This week",
+    "cleared": "Wave {wave} cleared!",
+    "waveScore": "Wave score",
+    "coins": "Coins",
+    "diamonds": "Diamonds",
+    "nextUp": "Next up",
+    "reward": "{coins} coin prize",
+    "bigReward": "×{mult} prize",
+    "record": "New record",
+    "play": "Play wave {wave}",
+    "autoIn": "Starting in {seconds}",
+    "runLabel": "Run progress: wave {wave}"
+  },
+  // @blastProgress:end
   // @eduPickers:start
   "eduPickers": {
     "language": {
@@ -1239,7 +1262,7 @@ const en = {
         },
         "blast": {
           "title": "Blast Mode",
-          "line": "Chain words, clear the board, go boom."
+          "line": "Pop words, set off bombs, grab coins and diamonds."
         }
       }
     },
@@ -2456,8 +2479,18 @@ const en = {
     "leaveGo": "Leave",
     "dailyPlayed": "Today's tower is done. Come back tomorrow.",
     "dailyRank": "You're #{rank} today",
-    "recapAlt": "Tower recap: {floors} floors, {m} metres"
-  },
+    "recapAlt": "Tower recap: {floors} floors, {m} metres",
+"dailyResults": { "headline": "Floor {n}!",
+"floors": "Floors",
+"height": "Height",
+"bestWord": "Best word",
+"chestIncoming": "Chest incoming…"
+},
+"guide": { "spell": "Swipe these letters",
+"drop": "Tap to drop it!",
+"done": "First floor!"
+}
+},
   "wordTower": {
     "mutator": {
       "todaysTwist": "TODAY'S TWIST",
@@ -5067,6 +5100,10 @@ const en = {
       "title": "TOMORROW: new Daily Challenge",
       "countdown": "New puzzle in {time}"
     },
+    "firstGameBridge": {
+      "quickMatch": "Next: quick match vs real players",
+      "wordWheel": "Next: today's Word Wheel (2 min)"
+    },
     "saveStreak": {
       "title": "Save my streak",
       "body": "Streaks live on this device. Create a free account to keep them anywhere."
@@ -5759,8 +5796,20 @@ const en = {
         "title": "Let's hunt",
         "sameChallenge": "Same puzzle for everyone worldwide. Compare your score.",
         "start": "Start Hunt"
-      }
-    },
+      },
+"howto": { "boardTitle": "Find a word",
+"boardHint": "Drag your finger along the glowing letters:",
+"tryAgain": "Not quite. Follow the glow to spell {word}.",
+"hiddenLabel": "Hidden word",
+"feedbackTitle": "Every word gives you clues",
+"feedbackBody": "Each letter lights up to show how it fits the hidden word.",
+"next": "Next",
+"goalTitle": "Crack the hidden word",
+"goalLife": "Guess it before your life runs out.",
+"goalClues": "Words you find on the board reveal clue letters.",
+"play": "Let's play"
+}
+},
     "welcome": {
       "title": "Welcome to LexiClash!",
       "description": "Swipe letters on the grid to form words. Here are the basics."
@@ -7992,6 +8041,10 @@ const en = {
         "untimed": "No timer"
       },
       "todaysPuzzle": "Today's puzzle",
+      "groupTogether": "Play together",
+      "groupSolo": "Play solo",
+      "groupThink": "Take your time",
+      "groupPreview": "Early access",
       "wheelWord": "PUZZLE",
       "puzzleNo": "Puzzle #{n}",
       "resetsIn": "resets in {time}",
@@ -8025,7 +8078,8 @@ const en = {
     "badgeHost": "Host",
     "badge": {
       "new": "New",
-      "beta": "Beta"
+      "beta": "Beta",
+      "recommended": "Recommended"
     },
     "multiPlayer": "Multiplayer",
     "multiplayer": "Multiplayer",
@@ -8641,10 +8695,14 @@ const en = {
       "badge": "Scanned",
       "line": "You scanned in. Today’s puzzle is ready."
     },
-    "todaysPuzzles": "Today's puzzles",
+    "todaysPuzzles": "Today's quests",
     "results": {
       "fullRecap": "Full recap",
       "fullRecapSummary": "Your rank, your rarest word, your coins, and who you beat",
+      "trailCount": "{n}/{total} today",
+      "heroStreak": "{n}-day streak",
+      "heroScore": "Score",
+      "heroDaily": "Daily",
       "signup": {
         "title": "Save your streak",
         "shortPrompt": "Save your streak",
@@ -8655,7 +8713,7 @@ const en = {
     "badge": "DAILY",
     "chooseChallengeHint": "Pick your quest",
     "chooseQuest": "Choose your quest",
-    "dailyMissions": "Daily missions",
+    "dailyMissions": "Daily quests",
     "journeyProgress": "Your progress",
     "completedCount": "Completed",
     "nextQuestsIn": "Next quests in",
@@ -9008,8 +9066,9 @@ const en = {
     },
     "streak": {
       "freeze_toast_no_remaining": "Streak Freeze used. {day} saved · no freezes left"
-    }
-  },
+    },
+"practiceBoard": "Practice board"
+},
   "dailyWordWheelLanding": {
     "hero": {
       "title": "Daily Word Wheel",
@@ -9220,8 +9279,14 @@ const en = {
       "wordWheelDetails": "Spell as many words as you can in 90s. Every word must use the center letter.",
       "wordHuntQuest": "Word Hunt",
       "wordHuntDesc": "Crack the hidden word in 10 tries"
-    }
-  },
+    },
+"howTo": { "title": "Try one first",
+"prompt": "Swipe a word through the middle letter. Try {word}",
+"accepted": "{word}! That's it. Now play today's wheel",
+"notWord": "Not a word here. Try {word}",
+"check": "Check"
+}
+},
   "dailyChallenge": {
     "pointsPerWord": "Points per word"
   },
@@ -11420,6 +11485,26 @@ const en = {
       "waveFailed": "Wave Failed",
       "needClearPct": "Needed {required}% cleared. You got {got}%",
       "tilesShort": "Just {count} tiles short!",
+      "reveal": {
+        "coins": "Coins",
+        "diamonds": "Diamonds",
+        "bombs": "Bombs popped",
+        "combo": "Best combo",
+        "words": "Words",
+        "waves": "Waves",
+        "longestWord": "Longest word",
+        "goalRival": "{gap} pts to beat {name}",
+        "goalLead": "You beat {name} by {gap}",
+        "goalBest": "{gap} pts to beat your best",
+        "nearMiss": "So close!",
+        "rank": "Rank",
+        "rankUp": "Up {n}",
+        "rankDown": "Down {n}",
+        "headlineLow": "Shake it off",
+        "headlineMid": "Nice blasting",
+        "headlineHigh": "Huge run!",
+        "headlineNewBest": "Personal best!"
+      },
       "failHint": "Clear at least 90% of the board to advance",
       "tryAgain": "Try again",
       "share": "Share",
@@ -11602,92 +11687,16 @@ const en = {
     },
     "tile": {
       "gold": {
-        "name": "Gold",
-        "desc": "3× score + grants 1 bonus move."
-      },
-      "silver": {
-        "name": "Silver",
-        "desc": "1.5× score. Extends countdowns by 1 move."
+        "name": "Coin",
+        "desc": "3× word score, +1 move, and extra coins."
       },
       "diamond": {
         "name": "Diamond",
-        "desc": "5× score. Reveals hidden frost contents for 3 turns."
+        "desc": "Earned by rare words. Clear it for a big bonus."
       },
       "bomb": {
         "name": "Bomb",
         "desc": "Clears 3×3 area. Chains to nearby bombs."
-      },
-      "lightning": {
-        "name": "Lightning",
-        "desc": "Clears entire column instantly."
-      },
-      "prism": {
-        "name": "Prism",
-        "desc": "2 hits. Clears full row + column. Chains bombs and lightning."
-      },
-      "rainbow": {
-        "name": "Rainbow",
-        "desc": "Copies the best special in your word and doubles it. Solo: 2× score."
-      },
-      "ice": {
-        "name": "Ice",
-        "desc": "2 hits to break. Multi-hit defensive tile."
-      },
-      "gem": {
-        "name": "Gem",
-        "desc": "3 hits to collect. Spawns 2 new specials on completion."
-      },
-      "frozen": {
-        "name": "Frost",
-        "desc": "2 hits. Hides a special inside: could be a bomb, lightning, prism, gem, or rainbow."
-      },
-      "magnet": {
-        "name": "Vortex",
-        "desc": "Pulls nearby tiles inward, then explodes the area."
-      },
-      "mirror": {
-        "name": "Mirror",
-        "desc": "Copies the first offensive special in your word. Solo: 2× score."
-      },
-      "wildcard": {
-        "name": "Wildcard",
-        "desc": "Matches any letter. Scores Scrabble value of the letter used."
-      },
-      "countdown": {
-        "name": "Countdown",
-        "desc": "Ticks down each move. Defuse it in a word for +15 pts and 2 bonus moves. Let it expire: -50 pts and 3×3 blast."
-      },
-      "shuffle": {
-        "name": "Shuffle",
-        "desc": "Rearranges all remaining letters on the board when cleared."
-      },
-      "magma": {
-        "name": "Magma",
-        "desc": "Clears both diagonals (X-pattern) with 2× score multiplier."
-      },
-      "portal": {
-        "name": "Portal",
-        "desc": "Teleport your word path through linked pairs. Clears both. 2× score. +5 bonus."
-      },
-      "catalyst": {
-        "name": "Catalyst",
-        "desc": "+10 pts. Upgrades adjacent standard tiles into specials."
-      },
-      "crystal": {
-        "name": "Crystal",
-        "desc": "Grows +1× each unused turn (max 5×). Multiplies your word score when used."
-      },
-      "fuse": {
-        "name": "Fuse",
-        "desc": "Linked pair. Clear one to light its partner. Defuse within 3 turns for +15 pts and 2 moves, or it detonates a 3×3 blast for -50 pts."
-      },
-      "anchor": {
-        "name": "Anchor",
-        "desc": "Rewards long words. Adds +3 points per letter in the word when cleared."
-      },
-      "mystery": {
-        "name": "Mystery",
-        "desc": "The slot machine! Clear it for a random surprise: score burst, new special, mini-pop, or mega +150."
       }
     },
     "title": "Blast Mode",
@@ -11744,7 +11753,6 @@ const en = {
     "giveUp": "End game",
     "goldTile": "3x Score!",
     "bombTile": "Clears area!",
-    "rainbowTile": "Wildcard bonus!",
     "cascadeChain": "CASCADE x{level}",
     "waveBadge": "Wave {wave}",
     "stars1": "Good",
@@ -11759,33 +11767,19 @@ const en = {
     "mpResults": {
       "boardCleared": "Board Cleared!",
       "yourPosition": "Your Rank",
-      "champion": "Champion"
+      "champion": "Champion",
+      "coinKing": "Coin king",
+      "mostDiamonds": "Most diamonds",
+      "bonus": "+{n} pts",
+      "bonusLabel": "Collection bonus"
     },
     "helpGold": "3x score multiplier for the word.",
     "helpBomb": "Clears all 8 surrounding tiles.",
-    "helpRainbow": "+5 bonus points.",
     "helpGoal": "Clear as many tiles as you can for the highest score.",
     "helpGoldLabel": "Gold",
     "helpBombLabel": "Bomb",
-    "helpRainbowLabel": "Rainbow",
-    "helpPrismLabel": "Prism",
-    "helpPrism": "Use in 2 words to trigger a cross-clear (entire row + column).",
-    "helpGemLabel": "Gem",
-    "helpGem": "Use in 3 words to collect. +3 per use, +8 on collection.",
-    "helpIceLabel": "Ice",
-    "helpIce": "2 hits to break. Cracks on first use.",
-    "helpLightningLabel": "Lightning",
-    "helpLightning": "Clears the entire column when used in a word.",
-    "helpMagnetLabel": "Magnet",
-    "helpMagnet": "Pulls nearby tiles toward it when cleared.",
-    "helpMirrorLabel": "Mirror",
-    "helpMirror": "Doubles partner special tile effect, or 2x score.",
-    "helpSilverLabel": "Silver",
-    "helpSilver": "4x score multiplier for the word.",
     "helpDiamondLabel": "Diamond",
     "helpDiamond": "5x score multiplier. Highest value tile.",
-    "helpFrozenLabel": "Frozen",
-    "helpFrozen": "Takes 3 hits to break. Blocks cascade detection.",
     "foundWords": "Found Words",
     "noWordsLeft": "No words remaining",
     "moreLevelsComingSoon": "Fresh levels are on the way.",
@@ -11908,7 +11902,6 @@ const en = {
     },
     "stuck": "Stuck?",
     "hintCooldown": "Used",
-    "tileNearby": "✦ nearby ✦",
     "waveClearBanner": "Wave Clear!",
     "tapToContinue": "Tap to continue",
     "levelComplete": "Level Complete!",
@@ -11941,7 +11934,6 @@ const en = {
     "objective": {
       "scoreTarget": "Score {target} pts",
       "collectType": "Collect {target} {tileType} tiles",
-      "clearAllType": "Clear all {tileType} tiles",
       "wordLength": "{target} words of {minWordLength}+ letters",
       "clearPercent": "Clear {target}% of the board",
       "targetWord": "Find: {word}",
@@ -11951,9 +11943,6 @@ const en = {
       "colorPink": "Pink",
       "colorCyan": "Cyan",
       "colorLime": "Lime",
-      "clearJelly": "Clear all jelly",
-      "killCake": "Destroy the cake",
-      "stopChocolate": "Stop the chocolate",
       "bannerTitle": "Goals",
       "pathRoute": "Connect ◯ to ◉ in one word",
       "pathRouteSuccess": "ROUTE CONNECTED!",
@@ -11979,38 +11968,7 @@ const en = {
     },
     "combo": {
       "bomb_bomb": "MEGA BLAST!",
-      "bomb_lightning": "THUNDER BOMB!",
-      "bomb_prism": "SHATTER STORM!",
-      "bomb_rainbow": "RAINBOW DETONATOR!",
-      "bomb_mirror": "MIRROR BOMB!",
-      "bomb_magnet": "MAGNETIC EXPLOSION!",
-      "bomb_gem": "GEM SHATTER!",
-      "bomb_frozen": "THAW BLAST!",
-      "lightning_lightning": "CHAIN LIGHTNING!",
-      "lightning_prism": "CROSS THUNDER!",
-      "lightning_rainbow": "RAINBOW STORM!",
-      "lightning_mirror": "DOUBLE STRIKE!",
-      "lightning_magnet": "SURGE PULL!",
-      "lightning_gem": "SPARK CRYSTAL!",
-      "lightning_frozen": "SHOCKWAVE THAW!",
-      "prism_prism": "TOTAL DESTRUCTION!",
-      "prism_rainbow": "SPECTRAL NOVA!",
-      "prism_mirror": "INFINITE CROSS!",
-      "prism_magnet": "VORTEX CROSS!",
-      "prism_gem": "CRYSTAL PRISM!",
-      "prism_frozen": "PRISM THAW!",
-      "rainbow_mirror": "MIRROR RAINBOW!",
-      "rainbow_magnet": "RAINBOW PULL!",
-      "rainbow_gem": "RAINBOW CRYSTAL!",
-      "rainbow_frozen": "RAINBOW THAW!",
-      "mirror_magnet": "DOUBLE VORTEX!",
-      "mirror_gem": "CRYSTAL MIRROR!",
-      "mirror_frozen": "ECHO FREEZE!",
-      "magnet_gem": "CRYSTAL PULL!",
-      "magnet_frozen": "FROZEN VORTEX!",
-      "gem_frozen": "ICE CRYSTAL!",
       "gold_special": "GOLDEN POWER!",
-      "rainbow_special": "DOUBLE RAINBOW!",
       "triple_special": "TRIPLE THREAT!"
     },
     "micro": {
@@ -12024,10 +11982,6 @@ const en = {
       "specialist": "Specialist!",
       "waveClearer": "Wave Cleared!"
     },
-    "comboCodex": "COMBO CODEX",
-    "codexProgress": "{discovered}/{total} discovered",
-    "codexLocked": "???",
-    "comboDiscovered": "COMBO DISCOVERED!",
     "chainCounter": "CHAIN x{{count}}",
     "wave": "Wave",
     "words": "words",
@@ -12041,6 +11995,38 @@ const en = {
     "wordsFound": "words",
     "gameOver": "GAME OVER",
     "waves": "waves",
+    "theme": {
+      "warmUp": {
+        "name": "Warm-Up",
+        "goal": "Find 4 words of 3+ letters",
+        "flavor": "Easy board, extra moves. Find your rhythm."
+      },
+      "bombSquad": {
+        "name": "Bomb Squad",
+        "goal": "Pop the bombs",
+        "flavor": "Bombs everywhere, and chains pay double."
+      },
+      "coinRush": {
+        "name": "Coin Rush",
+        "goal": "Grab the coins",
+        "flavor": "Coins rain down and pay double."
+      },
+      "diamondHunt": {
+        "name": "Diamond Hunt",
+        "goal": "Earn a diamond",
+        "flavor": "Rare words come easier. Hunt for diamonds."
+      },
+      "boss": {
+        "name": "Boss Wave",
+        "goal": "Hit the score",
+        "flavor": "Fewer moves, bigger prize. Make every word count."
+      },
+      "cascadeCarnival": {
+        "name": "Cascade Carnival",
+        "goal": "Find long words",
+        "flavor": "Chains go deeper and pay more."
+      }
+    },
     "tileGuide": {
       "title": "Tile Guide",
       "standard": {
@@ -12048,100 +12034,16 @@ const en = {
         "desc": "Basic tile, no special effect"
       },
       "gold": {
-        "name": "Gold",
-        "desc": "×3 score + 1 bonus move"
-      },
-      "silver": {
-        "name": "Silver",
-        "desc": "×1.5 score + extends countdowns by 1"
+        "name": "Coin",
+        "desc": "×3 score, +1 move, extra coins"
       },
       "diamond": {
         "name": "Diamond",
-        "desc": "×5 score + reveals frozen contents for 3 turns"
+        "desc": "Earned by rare words — big bonus when cleared"
       },
       "bomb": {
         "name": "Bomb",
         "desc": "Clears 3×3 area. Chains to nearby bombs"
-      },
-      "lightning": {
-        "name": "Lightning",
-        "desc": "Clears entire column. Chains to other bolts"
-      },
-      "prism": {
-        "name": "Prism",
-        "desc": "2 hits. Clears row + column, spawns 2 specials"
-      },
-      "rainbow": {
-        "name": "Rainbow",
-        "desc": "Copies best special in your word, or ×2 score"
-      },
-      "ice": {
-        "name": "Ice",
-        "desc": "2 hits to break. Multi-hit defensive tile."
-      },
-      "frozen": {
-        "name": "Frozen",
-        "desc": "2 hits. Releases a hidden special inside"
-      },
-      "gem": {
-        "name": "Gem",
-        "desc": "3 hits. Spawns 2 specials + 2 bonus moves"
-      },
-      "mirror": {
-        "name": "Mirror",
-        "desc": "Copies first offensive special in your word"
-      },
-      "magnet": {
-        "name": "Magnet",
-        "desc": "Pulls nearby tiles inward, then explodes 3×3"
-      },
-      "wildcard": {
-        "name": "Wildcard",
-        "desc": "Matches any letter. Scores by letter rarity"
-      },
-      "countdown": {
-        "name": "Countdown",
-        "desc": "Defuse before 0 for +2 moves, or take a 50pt penalty"
-      },
-      "shuffle": {
-        "name": "Shuffle",
-        "desc": "Rearranges all remaining letters on the board when cleared"
-      },
-      "magma": {
-        "name": "Magma",
-        "desc": "Clears both diagonals (X-pattern) with 2× score multiplier"
-      },
-      "portal": {
-        "name": "Portal",
-        "desc": "Teleport through linked pairs. Clears both, ×2 word score"
-      },
-      "catalyst": {
-        "name": "Catalyst",
-        "desc": "Upgrades all adjacent tiles to random specials"
-      },
-      "crystal": {
-        "name": "Crystal",
-        "desc": "Grows +1× per unused turn (max 5×). Multiplies word score"
-      },
-      "fuse": {
-        "name": "Fuse",
-        "desc": "Linked pair. Clear one to light its partner, defuse in 3 turns or it blows!"
-      },
-      "anchor": {
-        "name": "Anchor",
-        "desc": "Long-word bonus: +3 pts per letter in the word when cleared"
-      },
-      "mystery": {
-        "name": "Mystery",
-        "desc": "Random surprise: score burst, spawn special, mini-pop, or mega +150"
-      },
-      "chocolate": {
-        "name": "Chocolate",
-        "desc": "Spreads to a neighboring tile every turn. Use a chocolate tile in a word to stop it"
-      },
-      "cake": {
-        "name": "Cake",
-        "desc": "Multi-tile block with shared health. Keep hitting it to destroy it"
       }
     },
     "highlight": {
@@ -13085,7 +12987,7 @@ const en = {
       "selectDate": "Select due date",
       "quickSelect": "Quick select",
       "today": "Today",
-      "tomorrow": "Tomorrow",
+      "tomorrow": "Tomorrow", "goals": {"longWord": "Play a 5-letter word", "claim": "Claim 8+ squares", "win": "Win the board", "title": "Today's goals"},
       "nextWeek": "Next week",
       "nextMonth": "Next month",
       "customDate": "Custom date",
@@ -15569,6 +15471,16 @@ const en = {
       "submitted_on": "Submitted",
       "already_approved_title": "You already have teacher access.",
       "go_to_teacher": "Open Teacher Dashboard",
+      "class_ready_cta": "Your class is ready",
+      "class_ready_title": "Your class is ready",
+      "class_ready_body": "Share this code. Students join from their phones — no accounts.",
+      "class_ready_code": "Join code",
+      "class_ready_qr": "Scan to join",
+      "class_ready_test": "Join from your phone as a test student",
+      "class_ready_test_hint": "A test join does not start your class trial.",
+      "class_ready_hq": "Teacher home",
+      "class_ready_creating": "Setting up your class…",
+      "class_ready_error": "Could not open a class. Try again, or go to teacher home.",
       "status_unknown_title": "We couldn't read your access status",
       "status_unknown_body": "Something went wrong on our side. Open your teacher dashboard, or reload this page to check again.",
       "auth_required_title": "Start with your account",
@@ -17356,8 +17268,9 @@ const en = {
         "gold": "Gold: Flawless!",
         "silver": "Silver: So close",
         "bronze": "Bronze: Solid run"
-      }
-    },
+      },
+"missesLabel": "misses"
+},
     "community": {
       "title": "Community riddles",
       "suggest": "Suggest a riddle",
@@ -17415,8 +17328,9 @@ const en = {
       "won": "Pyramid complete!",
       "lost": "Pyramid lost.",
       "reveal": "The answer was",
-      "acceptLoss": "Accept loss"
-    },
+      "acceptLoss": "Accept loss",
+"topWord": "Top word: {word}"
+},
     "difficulty": { "easy": "Easy", "medium": "Medium", "hard": "Hard" },
     "like": "Like",
     "dislike": "Dislike",
@@ -17533,8 +17447,15 @@ const en = {
       "crossPromoTitle": "Try Word Bridge",
       "crossPromoBody": "Two words. One bridge. Free.",
       "crossPromoCta": "Play"
-    }
-  },
+    },
+"tutorial": { "step1": "One hidden word links the top and the bottom.",
+"step2": "Type it in. The boxes show how many letters.",
+"step3": "Each answer builds a plank of your bridge.",
+"tryAgain": "Not quite. Try again!",
+"showMe": "Show me",
+"start": "Play today's bridge"
+}
+},
   "boosts": {
     "title": "Pick a boost",
     "cta": "BOOST",
@@ -17649,8 +17570,8 @@ const en = {
     "finalTiles": "Final tiles!",
     "difficulty": { "label": "Bot difficulty", "easy": "Easy", "medium": "Medium", "hard": "Hard" },
     "clue": { "button": "Clue", "reveal": "Try: {{word}}", "none": "No move found. Try swapping", "granted": "+1 clue!", "adFailed": "Ad unavailable. Try again" },
-    "modifier": { "bingo_bonanza": "Bingo Bonanza", "long_words": "Long Words", "rich_letters": "Rich Letters", "land_grab": "Land Grab", "quick_draw": "Quick Draw", "golden_tiles": "Golden Tiles", "none": "", "desc": { "bingo_bonanza": "Bingos score +90", "long_words": "5+ letter words +15", "rich_letters": "Rare tiles count double", "land_grab": "Captures spread to neighbors", "quick_draw": "5-tile rack, faster turns", "golden_tiles": "✦ tiles capture the cells around them" } },
-    "setup": { "title": "Set up your match", "opponent": { "label": "Opponent", "bot": "Vs. Bot", "botDesc": "Play against WordBot", "hotseat": "Pass & Play", "hotseatDesc": "Two players, one device", "friend": "Challenge a friend", "friendDesc": "Send a beat-my-score link anywhere" }, "difficulty": { "label": "Bot level" }, "twist": { "label": "Twist", "surprise": "Surprise me" }, "start": "Start game", "challengeHint": "Beat-a-friend links appear on your results screen", "sendChallengeNow": "Now send your challenge" },
+    "modifier": { "bingo_bonanza": "Bingo Bonanza", "long_words": "Long Words", "rich_letters": "Rich Letters", "land_grab": "Land Grab", "quick_draw": "Quick Draw", "golden_tiles": "Golden Tiles", "star_squares": "Star Squares", "none": "", "desc": { "bingo_bonanza": "Bingos score +90", "long_words": "5+ letter words +15", "rich_letters": "Rare tiles count double", "land_grab": "Captures spread to neighbors", "quick_draw": "5-tile rack, faster turns", "golden_tiles": "✦ tiles capture the cells around them", "star_squares": "Land on a star to capture the cells around it" } },
+    "setup": { "title": "Set up your match", "opponent": { "label": "Opponent", "bot": "Vs. Bot", "botDesc": "Play against WordBot", "hotseat": "Pass & Play", "hotseatDesc": "Two players, one device", "friend": "Challenge a friend", "friendDesc": "Send a beat-my-score link anywhere" }, "difficulty": { "label": "Bot level" }, "twist": { "label": "Twist", "surprise": "Surprise me" }, "start": "Start game", "challengeHint": "Beat-a-friend links appear on your results screen", "sendChallengeNow": "Now send your challenge" }, "daily": {"title": "Daily Board", "play": "Play today's board", "done": "Done today · play again", "streak": "{n}-day streak", "streakNow": "{n}-day streak!", "tomorrow": "Come back tomorrow to keep it going"}, "highlights": {"best": "Best move", "longest": "Longest word", "pts": "{n} pts"},
     "squares": "squares",
     "place": { "step1": "Tap a letter", "step2": "Tap a square", "step3": "Submit" },
     "newBest": "New Best!",
@@ -20142,6 +20063,7 @@ const en = {
     "home": {
       "regionLabel": "Teacher home",
       "railLabel": "This week and your plan",
+      "weeklyReports": "Weekly reports",
       "greetMorning": "Good morning, {name}",
       "greetAfternoon": "Good afternoon, {name}",
       "greetEvening": "Good evening, {name}",
@@ -20157,6 +20079,8 @@ const en = {
       "students": "{count} students",
       "notPlayedRecently": "No games in 30 days",
       "playWith": "Start a game with {name}",
+      "showCode": "Show code",
+      "showCodeFor": "Show the join code for {name}",
       "reviewTitle": "Practise the missed words"
     },
     "week": {
@@ -20211,7 +20135,8 @@ const en = {
           "body": "Run a short round. Add practice bots in the lobby if no one has joined yet.",
           "cta": "Start a 2-minute game",
           "bodyAwaitingPlayers": "Your room is ready — now get students in. Show the join code or QR on the board.",
-          "ctaAwaitingPlayers": "Show the class code"
+          "ctaAwaitingPlayers": "Show the class code",
+          "titleAwaitingPlayers": "Get your students in"
         }
       }
     },

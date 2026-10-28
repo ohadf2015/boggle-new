@@ -45,22 +45,25 @@ for (const vp of VIEWPORTS) {
         scrollWidth: document.documentElement.scrollWidth,
         innerWidth: window.innerWidth,
       }));
-      expect(size.scrollHeight).toBeLessThanOrEqual(size.innerHeight + 1);
+      // The page scrolls now (groups below the daily), but never sideways.
+      expect(size.scrollHeight).toBeGreaterThan(size.innerHeight);
       expect(size.scrollWidth).toBeLessThanOrEqual(size.innerWidth);
 
       await expect(page.getByTestId('home-streak-chip')).toBeVisible();
       await expect(page.getByTestId('mode-cube-anchor').first()).toBeInViewport();
-      await expect(page.getByTestId('landing-cubes-more')).toBeInViewport();
+      await expect(page.getByTestId('landing-cubes-more')).toHaveCount(0);
       await expect(page.locator('[data-install-pill]')).toBeHidden();
     });
 
-    test('the rest of the modes open in a sheet one tap away', async ({ page }) => {
+    test('every mode is on the page in titled groups, no sheet to open', async ({ page }) => {
       test.setTimeout(120_000);
       await openHome(page);
-      await page.getByTestId('landing-cubes-more').click();
-      const sheet = page.getByTestId('home-more-sheet');
-      await expect(sheet).toBeVisible();
-      await expect(sheet.locator('[data-cube-key]').first()).toBeVisible();
+      await expect(page.getByTestId('home-more-sheet')).toHaveCount(0);
+      for (const group of ['together', 'solo', 'think']) {
+        await expect(page.getByTestId(`home-group-${group}`)).toHaveCount(1);
+      }
+      await page.getByTestId('home-group-think').scrollIntoViewIfNeeded();
+      await expect(page.getByTestId('home-group-think').locator('[data-cube-key]').first()).toBeVisible();
     });
 
     test("tapping today's daily launches into the Word Wheel with the card's own art", async ({ page }) => {

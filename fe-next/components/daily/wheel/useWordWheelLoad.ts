@@ -19,6 +19,7 @@ import {
 } from '@/utils/dailyChallenge';
 import { getGuestFingerprint } from '@/utils/dailyChallenge/guestPlayer';
 import { prewarmDictionary } from '@/hooks/useDictionaryCache';
+import { wordWheelBridgeSkipsReady } from '@/lib/retention/firstGameBridge';
 import type { Language } from '@/types';
 
 export type WordWheelPhase = 'loading' | 'ready' | 'playing' | 'completed' | 'already-played';
@@ -56,11 +57,13 @@ interface UseWordWheelLoadOptions {
   catchupAdUnlockedRef: MutableRefObject<boolean>;
   /** Extra chunks to load while the loader is still up (e.g. the effects canvas). */
   preloadForPlay?: () => Promise<unknown>;
+  /** `?start=1` from the first-game bridge: skip the ready card and the how-to. */
+  autoStart?: boolean;
 }
 
 export function useWordWheelLoad({
   language, isPractice, catchupDate, isAuthenticated, authLoading, playerId, guestFingerprint,
-  setGameActive, catchupAdUnlockedRef, preloadForPlay,
+  setGameActive, catchupAdUnlockedRef, preloadForPlay, autoStart = false,
 }: UseWordWheelLoadOptions) {
   const isCatchup = !!catchupDate;
   const [phase, setPhase] = useState<WordWheelPhase>('loading');
@@ -90,7 +93,8 @@ export function useWordWheelLoad({
     const init = async () => {
       if (isPractice) {
         if (alreadyEntered) return;
-        const generated = generateWordWheelPuzzle(date, language);
+        // A random wheel: seeding by date would hand out today's daily untimed.
+        const generated = generateWordWheelPuzzle(`practice-${Math.random().toString(36).slice(2)}`, language);
         if (!isMounted) return;
         setPuzzle(generated);
         setPhase('ready');
@@ -159,7 +163,13 @@ export function useWordWheelLoad({
       setPuzzle(generateWordWheelPuzzle(date, language));
 
       // Returning players skip the ready card entirely; catch-up keeps it so the ad gate still applies.
-      if (!isCatchup && hasEverPlayedWordWheel(language)) {
+      // The first-game bridge (`?start=1`) skips it for a first-timer too — one tap, no how-to.
+      if (wordWheelBridgeSkipsReady({
+        startParam: autoStart,
+        hasEverPlayed: hasEverPlayedWordWheel(language),
+        isCatchup,
+        isPractice,
+      })) {
         const tasks: Promise<unknown>[] = [prewarmDictionary(language)];
         if (preloadForPlay) tasks.push(preloadForPlay());
         await settleWithin(tasks, ENTRY_WARMUP_CAP_MS);

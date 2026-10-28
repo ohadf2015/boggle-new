@@ -140,4 +140,54 @@ describe('GET /api/admin/teacher-funnel', () => {
     expect(body.summary.assigned).toBe(1);
     expect(body.rows[0].assignments).toBe(1);
   });
+
+  it('wires subscription_events checkout probe and return telemetry into the funnel readout', async () => {
+    mockVerifyAdminAuth.mockResolvedValueOnce({ success: true });
+    mockGetSupabaseAdmin.mockReturnValueOnce(
+      buildSupabaseMock({
+        teacher_access_requests: { data: [], error: null },
+        classrooms: { data: [], error: null },
+        subscription_events: {
+          data: [
+            { user_id: 'u1', event_type: 'checkout_started', payload: { client_kind: 'browser' }, created_at: '2026-10-10T10:00:00Z' },
+            { user_id: 'u1', event_type: 'checkout_url_reachable', payload: { http_status: 200, client_kind: 'browser' }, created_at: '2026-10-10T10:00:01Z' },
+            { user_id: 'u1', event_type: 'checkout_return_landed', payload: { client_kind: 'browser' }, created_at: '2026-10-10T10:01:00Z' },
+          ],
+          error: null,
+        },
+        profiles: {
+          data: [
+            { id: 'u1', user_role: 'teacher', is_test_account: false, last_seen_at: null, display_name: 'Ada', username: 'ada' },
+          ],
+          error: null,
+        },
+      }),
+    );
+
+    const response = await GET(req());
+    const body = await response.json();
+
+    expect(body.checkout).toEqual({
+      checkoutStarted: 1,
+      checkoutUrlReachable: 1,
+      checkoutUrlError: 0,
+      checkoutReturnLanded: 1,
+      lastErrorStatus: null,
+    });
+  });
+
+  it('returns 500 when subscription_events cannot be read, instead of a fake zero checkout funnel', async () => {
+    mockVerifyAdminAuth.mockResolvedValueOnce({ success: true });
+    mockGetSupabaseAdmin.mockReturnValueOnce(
+      buildSupabaseMock({
+        teacher_access_requests: { data: [], error: null },
+        classrooms: { data: [], error: null },
+        subscription_events: { data: null, error: { message: 'relation missing' } },
+      }),
+    );
+
+    const response = await GET(req());
+    expect(response.status).toBe(500);
+    expect(await response.json()).toEqual({ error: 'relation missing' });
+  });
 });

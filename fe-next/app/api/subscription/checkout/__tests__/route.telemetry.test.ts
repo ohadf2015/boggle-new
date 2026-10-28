@@ -56,15 +56,18 @@ describe('POST /api/subscription/checkout — edu_pro_checkout_started', () => {
 
     const res = await POST(req())
     expect(res.status).toBe(200)
-    expect(capture).toHaveBeenCalledTimes(2)
+    expect(capture).toHaveBeenCalledTimes(3)
     const events = capture.mock.calls.map((c) => c[0].event)
-    expect(events).toEqual(['edu_pro_checkout_started', 'checkout_started'])
+    expect(events).toEqual(['edu_pro_checkout_started', 'checkout_started', 'checkout_url_reachable'])
     const arg = capture.mock.calls[0][0]
     expect(arg.distinctId).toBe('u1')
     expect(arg.event).toBe('edu_pro_checkout_started')
     expect(arg.properties.$host).toBe(EDU_ANALYTICS_HOST)
     expect(capture.mock.calls[1][0].event).toBe('checkout_started')
     expect(capture.mock.calls[1][0].properties.$host).toBe(EDU_ANALYTICS_HOST)
+    expect(capture.mock.calls[2][0].event).toBe('checkout_url_reachable')
+    expect(capture.mock.calls[2][0].properties.http_status).toBe(200)
+    expect(capture.mock.calls[2][0].properties.$host).toBe(EDU_ANALYTICS_HOST)
   })
 
   it('Given Polar fails, When the route answers 500, Then nothing is counted as started, but edu_pro_checkout_failed fires for the user', async () => {
@@ -105,7 +108,7 @@ describe('POST /api/subscription/checkout — edu_pro_checkout_started', () => {
     expect(await res.json()).toEqual({ url: 'https://polar.sh/checkout/u1' })
   })
 
-  it('Given the Polar checkout page itself 503s, When the route answers, Then edu_pro_checkout_failed fires but the teacher still gets the url', async () => {
+  it('Given the Polar checkout page itself 503s, When the route answers, Then checkout_url_error and edu_pro_checkout_failed fire with status 503 but the teacher still gets the url', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
     createCheckout.mockResolvedValue('https://polar.sh/checkout/u1')
     probeCheckoutUrl.mockResolvedValue({ ok: false, status: 503 })
@@ -114,13 +117,22 @@ describe('POST /api/subscription/checkout — edu_pro_checkout_started', () => {
     expect(res.status).toBe(200)
     expect(await res.json()).toEqual({ url: 'https://polar.sh/checkout/u1' })
     const events = capture.mock.calls.map((c) => c[0].event)
-    expect(events).toEqual(['edu_pro_checkout_started', 'checkout_started', 'edu_pro_checkout_failed'])
-    const failedArg = capture.mock.calls[2][0]
+    expect(events).toEqual([
+      'edu_pro_checkout_started',
+      'checkout_started',
+      'checkout_url_error',
+      'edu_pro_checkout_failed',
+    ])
+    const errArg = capture.mock.calls[2][0]
+    expect(errArg.distinctId).toBe('u1')
+    expect(errArg.properties.http_status).toBe(503)
+    expect(errArg.properties.status).toBe(503)
+    const failedArg = capture.mock.calls[3][0]
     expect(failedArg.distinctId).toBe('u1')
     expect(failedArg.properties.reason).toBe('checkout_page_503')
   })
 
-  it('Given the probe cannot reach Polar at all (network error), When the route answers, Then nothing extra fires and the teacher still gets the url', async () => {
+  it('Given the probe cannot reach Polar at all (network error), When the route answers, Then checkout_url_error fires with status 0 and the teacher still gets the url', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
     createCheckout.mockResolvedValue('https://polar.sh/checkout/u1')
     probeCheckoutUrl.mockResolvedValue(null)
@@ -128,10 +140,11 @@ describe('POST /api/subscription/checkout — edu_pro_checkout_started', () => {
     const res = await POST(req())
     expect(res.status).toBe(200)
     const events = capture.mock.calls.map((c) => c[0].event)
-    expect(events).toEqual(['edu_pro_checkout_started', 'checkout_started'])
+    expect(events).toEqual(['edu_pro_checkout_started', 'checkout_started', 'checkout_url_error'])
+    expect(capture.mock.calls[2][0].properties.http_status).toBe(0)
   })
 
-  it('Given { trial: true }, When Polar creates checkout, Then it fires edu_pro_trial_started and checkout_started, not the paid event', async () => {
+  it('Given { trial: true }, When Polar creates checkout, Then it fires edu_pro_trial_started, checkout_started, and checkout_url_reachable', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
     createCheckout.mockResolvedValue('https://polar.sh/checkout/trial')
     const res = await POST(new Request('http://localhost/api/subscription/checkout', {
@@ -141,9 +154,10 @@ describe('POST /api/subscription/checkout — edu_pro_checkout_started', () => {
     }) as never)
     expect(res.status).toBe(200)
     const events = capture.mock.calls.map((c) => c[0].event)
-    expect(events).toEqual(['edu_pro_trial_started', 'checkout_started'])
+    expect(events).toEqual(['edu_pro_trial_started', 'checkout_started', 'checkout_url_reachable'])
     expect(capture.mock.calls[0][0].properties.$host).toBe(EDU_ANALYTICS_HOST)
     expect(capture.mock.calls[1][0].properties.$host).toBe(EDU_ANALYTICS_HOST)
+    expect(capture.mock.calls[2][0].properties.$host).toBe(EDU_ANALYTICS_HOST)
   })
   it('Given a scripted call from a QA alias, When a checkout is created, Then every start event is tagged as test + script + url-created', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'someone+lexitest1020@gmail.com' })

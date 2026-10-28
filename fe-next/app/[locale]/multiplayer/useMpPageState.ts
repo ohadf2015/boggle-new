@@ -252,9 +252,11 @@ export function useMpPageState() {
     const ctx = { isClassroomMode: classroomContext === 'classroom', isHost: isHost || isClassroomHost, locale: language, pathname };
     const action = mpExit(reason, { ...ctx, previousPath: readPreviousInAppPath() });
     if (reason !== 'back-from-entry') handleExitToLobby();
-    // handleExitToLobby already pushed the classroom hub; only the arcade solo handoff still needs a push.
-    const soloHandoff = reason === 'continue-solo' && !multiplayerExitDestination(ctx);
-    if (action.kind === 'navigate' && (reason === 'back-from-entry' || soloHandoff)) router.push(action.href);
+    // handleExitToLobby already pushed the classroom hub. Arcade handoffs
+    // (solo, first-game bridge) still need their own push after the leave.
+    const arcadeHandoff =
+      (reason === 'continue-solo' || reason === 'first-game-bridge') && !multiplayerExitDestination(ctx);
+    if (action.kind === 'navigate' && (reason === 'back-from-entry' || arcadeHandoff)) router.push(action.href);
   }, [classroomContext, isHost, isClassroomHost, language, handleExitToLobby, router, pathname]);
   const exitMp = useHeldMpExit(classroomContext, pathname, exitNow);
 

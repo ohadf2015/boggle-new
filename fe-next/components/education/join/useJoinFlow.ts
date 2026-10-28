@@ -311,9 +311,10 @@ export function useJoinFlow(
         // completed/failed twin fires below on the join result.
         trackStudentJoinStarted({ source });
         try {
+          const rehearsal = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('rehearsal') === '1';
           const result = await joinClassroom(
             trimmedCode,
-            isGuest ? { guestName: trimmedName } : undefined
+            { ...(isGuest ? { guestName: trimmedName } : {}), ...(rehearsal ? { rehearsal: true } : {}) }
           );
 
           if (result.success) {

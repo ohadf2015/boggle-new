@@ -1,11 +1,14 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
-import { CalendarDays, Play, Plus, Users } from 'lucide-react';
+import { CalendarDays, Play, Plus, QrCode, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import AvatarLite from '@/components/AvatarLite';
 import { teacherHostHref } from '@/lib/education/teacherHostHref';
 import { ClassStreakLine } from '@/components/teacher/hq/ClassStreakLine';
+import { HqProjectorSheet } from '@/components/teacher/hq/HqProjectorSheet';
+import type { HqClassroom } from '@/components/teacher/hq/GetStudentsInCard';
 import { PANEL, QUIET_LINK, SKELETON } from './homeStyles';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
@@ -55,7 +58,7 @@ function startOfDay(ms: number): number {
 }
 
 export interface HomeClassListProps {
-  classrooms: readonly { id: string; name: string; member_count?: number | null }[];
+  classrooms: readonly (Omit<HqClassroom, 'member_count'> & { member_count?: number | null })[];
   /** First few student ids per class; null while loading or failed. */
   studentPreview?: Record<string, string[]> | null;
   /** null while the activity read is in flight or failed. */
@@ -80,6 +83,8 @@ export function HomeClassList({
   nowMs,
   t,
 }: HomeClassListProps) {
+  const [projectorId, setProjectorId] = useState<string | null>(null);
+  const projectorClass = classrooms.find((c) => c.id === projectorId) ?? null;
   return (
     <section aria-labelledby="home-classes-title" className="flex flex-col gap-3">
       <div className="flex items-end justify-between gap-3">
@@ -100,12 +105,6 @@ export function HomeClassList({
       </div>
 
       <ul className={cn(PANEL, 'divide-y-[2px] divide-neo-cream/10 overflow-hidden p-0')}>
-        <li aria-hidden="true" className="hidden grid-cols-[minmax(0,1fr)_7rem_11rem_3rem] gap-3 px-4 py-2 font-neo-body text-[0.7rem] font-bold uppercase tracking-wide text-neo-cream/60 sm:grid">
-          <span>{t('eduShell.home.colClass')}</span>
-          <span>{t('eduShell.home.colStudents')}</span>
-          <span>{t('eduShell.home.colLastPlayed')}</span>
-          <span />
-        </li>
         {classrooms.map((c, i) => {
           const played = lastPlayedAt?.[c.id];
           const previewIds = studentPreview?.[c.id] ?? [];
@@ -114,11 +113,11 @@ export function HomeClassList({
               key={c.id}
               data-testid="home-class-row"
               data-tm
-              className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 px-3 py-2.5 sm:grid-cols-[minmax(0,1fr)_7rem_11rem_3rem] sm:px-4"
+              className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 px-3 py-3 transition-colors duration-150 hover:bg-neo-cream/[0.04] sm:px-4"
             >
               <span className="flex min-w-0 items-center gap-3">
                 {previewIds.length > 0 ? (
-                  <StudentStack ids={previewIds} total={c.member_count ?? previewIds.length} />
+                  <span className="contents max-sm:hidden"><StudentStack ids={previewIds} total={c.member_count ?? previewIds.length} /></span>
                 ) : (
                   <span
                     aria-hidden="true"
@@ -139,41 +138,59 @@ export function HomeClassList({
                   >
                     {c.name}
                   </Link>
-                  <span className="flex items-center gap-3 font-neo-body text-xs font-semibold text-neo-cream/70 sm:hidden">
+                  <span className="mt-0.5 flex items-center gap-3 font-neo-body text-xs font-semibold text-neo-cream/70 sm:text-sm">
                     <span className="inline-flex items-center gap-1">
-                      <Users className="size-3.5" aria-hidden="true" />
-                      {c.member_count ?? 0}
+                      <Users className="size-3.5 sm:size-4" aria-hidden="true" />
+                      <span className="sm:hidden">{c.member_count ?? 0}</span>
+                      <span className="hidden sm:inline">{t('eduShell.home.students', { count: c.member_count ?? 0 })}</span>
                     </span>
-                    <LastPlayed played={played} pending={lastPlayedAt === null && !activityFailed} failed={activityFailed} language={language} nowMs={nowMs} t={t} />
+                    <span className="inline-flex items-center gap-1">
+                      <CalendarDays className="size-3.5 sm:size-4" aria-hidden="true" />
+                      <LastPlayed played={played} pending={lastPlayedAt === null && !activityFailed} failed={activityFailed} language={language} nowMs={nowMs} t={t} />
+                    </span>
                   </span>
                   {(c.member_count ?? 0) > 0 ? <ClassStreakLine classroomId={c.id} className="mt-1 self-start" /> : null}
                 </span>
               </span>
-              <span className="hidden items-center gap-1.5 font-neo-body text-sm font-semibold text-neo-cream/85 sm:inline-flex">
-                <Users className="size-4" aria-hidden="true" />
-                {t('eduShell.home.students', { count: c.member_count ?? 0 })}
-              </span>
-              <span className="hidden items-center gap-1.5 font-neo-body text-sm font-semibold text-neo-cream/85 sm:inline-flex">
-                <CalendarDays className="size-4" aria-hidden="true" />
-                <LastPlayed played={played} pending={lastPlayedAt === null && !activityFailed} failed={activityFailed} language={language} nowMs={nowMs} t={t} />
-              </span>
+              <span className="flex items-center justify-self-end gap-2">
+              <button
+                type="button"
+                data-testid="home-class-code"
+                onClick={() => setProjectorId(c.id)}
+                aria-label={t('eduShell.home.showCodeFor', { name: c.name })}
+                className={cn(
+                  'inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-neo border-[2px] border-neo-cream/60 px-2.5 font-neo-body text-sm font-bold text-neo-cream',
+                  'transition-[transform,background-color,border-color] duration-150 hover:border-neo-cream hover:bg-neo-cream/10 active:scale-[0.97] motion-reduce:transition-none',
+                  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
+                )}
+              >
+                <QrCode className="size-5" aria-hidden="true" />
+                <span className="hidden xl:inline">{t('eduShell.home.showCode')}</span>
+              </button>
               <Link
                 href={teacherHostHref(language, { classroomId: c.id })}
                 data-testid="home-class-play"
                 data-magnet
                 aria-label={t('eduShell.home.playWith', { name: c.name })}
                 className={cn(
-                  'grid size-11 place-items-center justify-self-end rounded-neo border-[3px] border-neo-black bg-neo-lime text-neo-black shadow-hard-sm',
+                  'grid size-11 place-items-center rounded-neo border-[3px] border-neo-black bg-neo-lime text-neo-black shadow-hard-sm',
                   'transition-[transform,box-shadow] duration-150 hover:-translate-y-0.5 hover:shadow-hard active:scale-[0.97] motion-reduce:transition-none',
                   'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
                 )}
               >
                 <Play className="size-5 fill-current" aria-hidden="true" />
               </Link>
+              </span>
             </li>
           );
         })}
       </ul>
+      {projectorClass ? (
+        <HqProjectorSheet
+          classroom={{ ...projectorClass, member_count: projectorClass.member_count ?? undefined }}
+          onClose={() => setProjectorId(null)}
+        />
+      ) : null}
     </section>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import { Check, Loader2, UserMinus, Users, X } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
@@ -8,8 +8,9 @@ import { cn } from '@/lib/utils';
 import { chipAccent } from '@/components/education/projector/projectorLobbyModel';
 import type { ProjectorStudent } from '@/components/education/projector/ProjectorRoster';
 import type { KickStatus } from '@/hooks/useKickStudent';
+import { EDU_MASCOT } from '@/lib/education/mascotArt';
 import { lobbyRosterLayout } from './eduLobbyRosterModel';
-import { PRESS, type Translate } from './eduLiveStyles';
+import { PRESS, tiltOf, type Translate } from './eduLiveStyles';
 
 interface EduLobbyRosterProps {
   students: ProjectorStudent[];
@@ -30,12 +31,14 @@ export function EduLobbyRoster({ students, readyUsernames, t, onRemove, removeSt
   return (
     <section
       data-testid="edu-lobby-roster"
-      className="flex min-h-0 flex-1 flex-col gap-3 rounded-neo-lg border-4 border-neo-cream bg-neo-navy/95 p-3 shadow-hard-lg md:gap-[0.8vw] md:p-[1vw]"
+      className="flex min-h-0 flex-1 flex-col gap-3 max-md:flex-none rounded-neo-lg border-4 border-neo-cream bg-neo-navy/95 p-3 shadow-hard-lg md:gap-[0.8vw] md:p-[1vw]"
     >
       <header className="flex flex-wrap items-center justify-between gap-3">
         <h2 data-testid="edu-lobby-count" className="inline-flex items-center gap-2 font-neo-display text-2xl font-black text-neo-cream md:text-[2vw]">
           <Users className="size-7 text-neo-lime md:size-[2vw]" aria-hidden="true" />
-          {t('eduLiveRoom.lobby.joined', { count: students.length })}
+          <span key={students.length} className="inline-block motion-safe:animate-[edu-live-tick_260ms_cubic-bezier(0.23,1,0.32,1)]">
+            {t('eduLiveRoom.lobby.joined', { count: students.length })}
+          </span>
         </h2>
         <div className="flex items-center gap-2">
           {ready.size > 0 && (
@@ -63,8 +66,10 @@ export function EduLobbyRoster({ students, readyUsernames, t, onRemove, removeSt
       </header>
 
       {students.length === 0 ? (
-        <div data-testid="edu-lobby-empty" className="grid min-h-0 flex-1 place-items-center rounded-neo border-[3px] border-dashed border-neo-cream/40 p-6 text-center">
-          <div className="flex flex-col items-center gap-2">
+        <div data-testid="edu-lobby-empty" className="grid min-h-0 flex-1 place-items-center p-4 text-center">
+          <div className="flex flex-col items-center gap-2 md:gap-[0.6vw]">
+            {/* eslint-disable-next-line @next/next/no-img-element -- mascot art map path, decorative */}
+            <img src={EDU_MASCOT.scanJoin} alt="" aria-hidden="true" className="pointer-events-none size-32 select-none motion-safe:animate-[edu-live-bob_2.4s_ease-in-out_infinite] md:size-[min(14vw,30vh)]" />
             <p className="font-neo-display text-2xl font-black text-neo-cream md:text-[2vw]">{t('eduLiveRoom.lobby.waitingTitle')}</p>
             <p className="max-w-[34ch] font-neo-body text-base font-bold text-neo-cream/75 md:text-[1.1vw]">{t('eduLiveRoom.lobby.waitingHint')}</p>
           </div>
@@ -72,7 +77,7 @@ export function EduLobbyRoster({ students, readyUsernames, t, onRemove, removeSt
       ) : (
         <ul
           data-testid="edu-lobby-roster-list"
-          className={cn('grid min-h-0 flex-1 auto-rows-min content-start pe-1 pt-1', layout.grid, layout.scrolls ? 'overflow-y-auto' : 'max-md:overflow-y-auto md:overflow-hidden')}
+          className={cn('grid min-h-0 flex-1 auto-rows-min content-start pe-1 pt-1 max-md:flex-none', layout.grid, layout.scrolls ? 'md:overflow-y-auto' : 'md:overflow-hidden')}
         >
           {students.map((student, index) => {
             const status = removeStatusOf?.(student.username) ?? 'idle';
@@ -80,8 +85,9 @@ export function EduLobbyRoster({ students, readyUsernames, t, onRemove, removeSt
               <li
                 key={student.username}
                 data-testid="edu-lobby-student"
+                style={{ '--tilt': tiltOf(student.username) } as CSSProperties}
                 className={cn(
-                  'relative flex min-w-0 items-center gap-2 rounded-full shadow-hard-sm motion-safe:animate-[edu-live-pop_220ms_cubic-bezier(0.23,1,0.32,1)_both]',
+                  'relative flex min-w-0 items-center gap-2 rounded-full shadow-hard-sm motion-safe:animate-[edu-live-pop_260ms_cubic-bezier(0.34,1.56,0.64,1)_both]',
                   'font-neo-display font-black',
                   layout.chip,
                   chipAccent(student.username, index)

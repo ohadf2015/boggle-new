@@ -1,5 +1,28 @@
 // Sv translations
 const sv = {
+  // @blastProgress:start
+  "blastProgress": {
+    "wave": "Våg {wave}",
+    "tapToSkip": "Tryck för att hoppa över",
+    "toPass": "{points} kvar till {name}",
+    "toBest": "{points} kvar till ditt rekord",
+    "passed": "Du gick förbi {name}!",
+    "newBest": "Nytt rekord!",
+    "top": "Etta den här veckan",
+    "weekly": "Den här veckan",
+    "cleared": "Våg {wave} klar!",
+    "waveScore": "Poäng för vågen",
+    "coins": "Mynt",
+    "diamonds": "Diamanter",
+    "nextUp": "Nästa",
+    "reward": "Pris: {coins} mynt",
+    "bigReward": "×{mult} pris",
+    "record": "Nytt rekord",
+    "play": "Spela våg {wave}",
+    "autoIn": "Startar om {seconds}",
+    "runLabel": "Framsteg: våg {wave}"
+  },
+  // @blastProgress:end
   // @eduPickers:start
   "eduPickers": {
     "language": {
@@ -1239,7 +1262,7 @@ const sv = {
         },
         "blast": {
           "title": "Blast-läge",
-          "line": "Kedja ord, rensa brädet och pang!"
+          "line": "Bilda ord, spräng bomber och håva in mynt och diamanter."
         }
       }
     },
@@ -2315,8 +2338,9 @@ const sv = {
         "gold": "Guld: felfritt!",
         "silver": "Silver: så nära",
         "bronze": "Brons: bra jobbat"
-      }
-    },
+      },
+"missesLabel": "missar"
+},
     "community": {
       "title": "Community-gåtor",
       "suggest": "Föreslå en gåta",
@@ -2363,8 +2387,9 @@ const sv = {
       "won": "Pyramiden klar!",
       "lost": "Pyramiden föll.",
       "reveal": "Svaret var",
-      "acceptLoss": "Acceptera förlusten"
-    },
+      "acceptLoss": "Acceptera förlusten",
+"topWord": "Toppordet: {word}"
+},
     "difficulty": {
       "easy": "Lätt",
       "medium": "Medel",
@@ -2485,8 +2510,15 @@ const sv = {
       "crossPromoTitle": "Prova Word Bridge",
       "crossPromoBody": "Två ord. En bro. Gratis.",
       "crossPromoCta": "Spela"
-    }
-  },
+    },
+"tutorial": { "step1": "Ett dolt ord binder ihop ordet överst och ordet nederst.",
+"step2": "Skriv in det. Rutorna visar hur många bokstäver det har.",
+"step3": "Varje svar lägger en planka på din bro.",
+"tryAgain": "Nästan. Försök igen!",
+"showMe": "Visa mig",
+"start": "Spela dagens bro"
+}
+},
   "cosy": {
     "wellDone": "Bra jobbat",
     "affirmLovely": "Fint",
@@ -2862,8 +2894,18 @@ const sv = {
     "leaveGo": "Lämna",
     "dailyPlayed": "Dagens torn är klart. Kom tillbaka i morgon.",
     "dailyRank": "Du är #{rank} idag",
-    "recapAlt": "Sammanfattning: {floors} våningar, {m} meter"
-  },
+    "recapAlt": "Sammanfattning: {floors} våningar, {m} meter",
+"dailyResults": { "headline": "Våning {n}!",
+"floors": "Våningar",
+"height": "Höjd",
+"bestWord": "Bästa ordet",
+"chestIncoming": "Kistan är på väg…"
+},
+"guide": { "spell": "Dra över de här bokstäverna",
+"drop": "Tryck för att släppa!",
+"done": "Första våningen!"
+}
+},
   "wordTower": {
     "mutator": {
       "todaysTwist": "DAGENS TWIST",
@@ -5863,6 +5905,10 @@ const sv = {
       "title": "IMORGON: ny daglig utmaning",
       "countdown": "Nytt pussel om {time}"
     },
+    "firstGameBridge": {
+      "quickMatch": "Nästa: snabbmatch mot riktiga spelare",
+      "wordWheel": "Nästa: dagens ordhjul (2 min)"
+    },
     "saveStreak": {
       "title": "Spara min svit",
       "body": "Sviter sparas bara på den här enheten. Skapa ett gratiskonto så följer de med överallt."
@@ -6558,8 +6604,20 @@ const sv = {
         "title": "Dags att jaga!",
         "sameChallenge": "Samma pussel för alla i världen – jämför din poäng!",
         "start": "Kör!"
-      }
-    },
+      },
+"howto": { "boardTitle": "Hitta ett ord",
+"boardHint": "Dra fingret längs de lysande bokstäverna:",
+"tryAgain": "Nästan. Följ ljuset och stava {word}.",
+"hiddenLabel": "Dolt ord",
+"feedbackTitle": "Varje ord ger dig ledtrådar",
+"feedbackBody": "Varje bokstav lyser upp och visar hur den passar i det dolda ordet.",
+"next": "Nästa",
+"goalTitle": "Knäck det dolda ordet",
+"goalLife": "Gissa det innan livet tar slut.",
+"goalClues": "Ord du hittar på brädet avslöjar ledtrådsbokstäver.",
+"play": "Nu kör vi"
+}
+},
     "welcome": {
       "title": "Välkommen till LexiClash!",
       "description": "Svep över bokstäverna på rutnätet för att bilda ord. Vi går igenom grunderna."
@@ -8827,6 +8885,10 @@ const sv = {
         "untimed": "Ingen timer"
       },
       "todaysPuzzle": "Dagens pussel",
+      "groupTogether": "Spela tillsammans",
+      "groupSolo": "Spela själv",
+      "groupThink": "Ta det lugnt",
+      "groupPreview": "Tidig åtkomst",
       "wheelWord": "ORDHJUL",
       "puzzleNo": "Pussel #{n}",
       "resetsIn": "återställs om {time}",
@@ -8860,7 +8922,8 @@ const sv = {
     "badgeHost": "Värd",
     "badge": {
       "new": "Nytt",
-      "beta": "Beta"
+      "beta": "Beta",
+      "recommended": "Rekommenderas"
     },
     "multiPlayer": "Flerspelarläge",
     "multiplayer": "Flerspelarläge",
@@ -9547,6 +9610,10 @@ const sv = {
     "results": {
       "fullRecap": "Hela sammanfattningen",
       "fullRecapSummary": "Din placering, ditt ovanligaste ord, dina mynt och vem du slog",
+      "trailCount": "{n}/{total} idag",
+      "heroStreak": "{n} dagar i rad",
+      "heroScore": "Poäng",
+      "heroDaily": "Dagens",
       "signup": {
         "title": "Spara din svit",
         "shortPrompt": "Spara din svit",
@@ -9910,8 +9977,9 @@ const sv = {
     },
     "streak": {
       "freeze_toast_no_remaining": "Svitfrys använd. {day} räddad · inga frysar kvar"
-    }
-  },
+    },
+"practiceBoard": "Övningsbräde"
+},
   "dailyWordWheelLanding": {
     "hero": {
       "title": "Dagligt ordhjul",
@@ -10106,8 +10174,14 @@ const sv = {
       "wordWheelDetails": "Bilda så många ord du kan på 90 s. Varje ord måste innehålla mittenbokstaven.",
       "wordHuntQuest": "Ordjakt",
       "wordHuntDesc": "Knäck det dolda ordet på 10 försök"
-    }
-  },
+    },
+"howTo": { "title": "Testa först",
+"prompt": "Dra ett ord genom mittbokstaven. Testa {word}",
+"accepted": "{word}! Precis så. Spela nu dagens hjul",
+"notWord": "Inget ord här. Testa {word}",
+"check": "Kolla"
+}
+},
   "dailyChallenge": {
     "pointsPerWord": "Poäng per ord"
   },
@@ -13273,6 +13347,26 @@ const sv = {
       "waveFailed": "Våg misslyckades",
       "needClearPct": "Krävde {required}% rensat. Du fick {got}%",
       "tilesShort": "Det saknades bara {count} brickor!",
+      "reveal": {
+        "coins": "Mynt",
+        "diamonds": "Diamanter",
+        "bombs": "Sprängda bomber",
+        "combo": "Bästa kombo",
+        "words": "Ord",
+        "waves": "Vågor",
+        "longestWord": "Längsta ordet",
+        "goalRival": "{gap} p till att slå {name}",
+        "goalLead": "Du slog {name} med {gap}",
+        "goalBest": "{gap} p till ditt rekord",
+        "nearMiss": "Så nära!",
+        "rank": "Placering",
+        "rankUp": "Upp {n}",
+        "rankDown": "Ner {n}",
+        "headlineLow": "Skaka av dig",
+        "headlineMid": "Snyggt sprängt",
+        "headlineHigh": "Grym runda!",
+        "headlineNewBest": "Personbästa!"
+      },
       "failHint": "Rensa minst 90% av brädet för att gå vidare",
       "tryAgain": "Försök igen",
       "share": "Dela",
@@ -13509,92 +13603,16 @@ const sv = {
     },
     "tile": {
       "gold": {
-        "name": "Guld",
-        "desc": "3× poäng + 1 bonusdrag."
-      },
-      "silver": {
-        "name": "Silver",
-        "desc": "1,5× poäng. Förlänger nedräkningar med 1."
+        "name": "Mynt",
+        "desc": "3× ordpoäng, +1 drag och extra mynt."
       },
       "diamond": {
         "name": "Diamant",
-        "desc": "5× poäng. Avslöjar frostinnehåll i 3 turer."
+        "desc": "Fås av ovanliga ord. Rensa den för en stor bonus."
       },
       "bomb": {
         "name": "Bomb",
         "desc": "Rensar 3×3-yta. Kedjar till närliggande bomber."
-      },
-      "lightning": {
-        "name": "Blixt",
-        "desc": "Rensar hela kolumnen direkt."
-      },
-      "prism": {
-        "name": "Prisma",
-        "desc": "2 träffar. Rensar hela raden och kolumnen. Kedjar bomber och blixtar."
-      },
-      "rainbow": {
-        "name": "Regnbåge",
-        "desc": "Kopierar och fördubblar bästa specialen. Solo: 2× poäng."
-      },
-      "ice": {
-        "name": "Is",
-        "desc": "2 träffar att krossa. Defensiv bricka med flera träffar."
-      },
-      "gem": {
-        "name": "Ädelsten",
-        "desc": "3 träffar att samla. Skapar 2 nya specialer när den är klar."
-      },
-      "frozen": {
-        "name": "Frost",
-        "desc": "2 träffar. Döljer en special inuti — bomb, blixt, prisma, ädelsten eller regnbåge."
-      },
-      "magnet": {
-        "name": "Virvel",
-        "desc": "Drar närliggande brickor inåt och spränger sedan området."
-      },
-      "mirror": {
-        "name": "Spegel",
-        "desc": "Kopierar den första offensiva specialen i ditt ord. Solo: 2× poäng."
-      },
-      "wildcard": {
-        "name": "Joker",
-        "desc": "Matchar vilken bokstav som helst. Poäng baserat på Scrabble-värde."
-      },
-      "countdown": {
-        "name": "Nedräkning",
-        "desc": "Tickar ner. Desarmera i ett ord: +15 p och 2 bonusdrag. Går ut: -50 p och 3×3 explosion."
-      },
-      "shuffle": {
-        "name": "Blanda",
-        "desc": "Blandar om alla återstående bokstäver på brädet vid rensning."
-      },
-      "magma": {
-        "name": "Magma",
-        "desc": "Rensar båda diagonalerna (X-mönster) med 2× poängmultiplikator."
-      },
-      "portal": {
-        "name": "Portal",
-        "desc": "Teleportera din ordväg genom länkade par. Rensar båda. 2× poäng. +5 bonus."
-      },
-      "catalyst": {
-        "name": "Katalysator",
-        "desc": "+10 p. Uppgraderar intilliggande vanliga brickor till specialer."
-      },
-      "crystal": {
-        "name": "Kristall",
-        "desc": "Växer +1× varje oanvänd tur (max 5×). Multiplicerar din ordpoäng när den används."
-      },
-      "fuse": {
-        "name": "Stubin",
-        "desc": "Länkat par. Rensa en för att tända partnern. Desarmera inom 3 drag för +15 p och 2 drag, annars detonerar en 3×3-smäll för -50 p."
-      },
-      "anchor": {
-        "name": "Ankare",
-        "desc": "Belönar långa ord. Ger +3 poäng per bokstav i ordet när den rensas."
-      },
-      "mystery": {
-        "name": "Gåta",
-        "desc": "Överraskning! Slumpmässig effekt: poängburst, ny speciell, mini-pop eller mega +150."
       }
     },
     "title": "Blast-läge",
@@ -13667,7 +13685,6 @@ const sv = {
     "giveUp": "Avsluta spel",
     "goldTile": "3x poäng!",
     "bombTile": "Rensar området",
-    "rainbowTile": "Bonuspoäng!",
     "cascadeChain": "KASKAD x{level}",
     "waveBadge": "Våg {wave}",
     "stars1": "Bra",
@@ -13682,33 +13699,19 @@ const sv = {
     "mpResults": {
       "boardCleared": "Brädet klarat!",
       "yourPosition": "Din placering",
-      "champion": "Mästare"
+      "champion": "Mästare",
+      "coinKing": "Myntkung",
+      "mostDiamonds": "Flest diamanter",
+      "bonus": "+{n} p",
+      "bonusLabel": "Insamlingsbonus"
     },
     "helpGold": "3x poängmultiplikator för ordet.",
     "helpBomb": "Rensar alla 8 omgivande rutor.",
-    "helpRainbow": "+5 bonuspoäng.",
     "helpGoal": "Rensa så många rutor du kan för högsta poäng",
     "helpGoldLabel": "Guld",
     "helpBombLabel": "Bomb",
-    "helpRainbowLabel": "Regnbåge",
-    "helpPrismLabel": "Prisma",
-    "helpPrism": "Använd i 2 ord för att utlösa korsrensning (hel rad + kolumn).",
-    "helpGemLabel": "Ädelsten",
-    "helpGem": "Använd i 3 ord för att samla. +3 per användning, +8 vid insamling.",
-    "helpIceLabel": "Is",
-    "helpIce": "2 träffar att bryta. Spricker vid första användningen.",
-    "helpLightningLabel": "Blixt",
-    "helpLightning": "Rensar hela kolumnen när den används i ett ord.",
-    "helpMagnetLabel": "Magnet",
-    "helpMagnet": "Drar närliggande brickor mot sig när den rensas.",
-    "helpMirrorLabel": "Spegel",
-    "helpMirror": "Fördubblar partnereffekten, eller 2x poäng.",
-    "helpSilverLabel": "Silver",
-    "helpSilver": "4x poängmultiplikator för ordet.",
     "helpDiamondLabel": "Diamant",
     "helpDiamond": "5x poängmultiplikator. Brickan med högst värde.",
-    "helpFrozenLabel": "Frusen",
-    "helpFrozen": "Kräver 3 träffar att bryta. Blockerar kaskaddetektering.",
     "foundWords": "Hittade ord",
     "noWordsLeft": "Inga ord kvar",
     "moreLevelsComingSoon": "Fler nivåer är på gång.",
@@ -13815,7 +13818,6 @@ const sv = {
     },
     "stuck": "Fastnat?",
     "hintCooldown": "Använt",
-    "tileNearby": "✦ nära ✦",
     "waveClearBanner": "Vågen klar!",
     "tapToContinue": "Tryck för att fortsätta",
     "levelComplete": "Nivå klar!",
@@ -13847,7 +13849,6 @@ const sv = {
     "objective": {
       "scoreTarget": "Nå {target} poäng",
       "collectType": "Samla {target} {tileType}-brickor",
-      "clearAllType": "Rensa alla {tileType}-brickor",
       "wordLength": "{target} ord med {minWordLength}+ bokstäver",
       "clearPercent": "Rensa {target}% av brädet",
       "targetWord": "Hitta: {word}",
@@ -13857,9 +13858,6 @@ const sv = {
       "colorPink": "Rosa",
       "colorCyan": "Cyan",
       "colorLime": "Limefärg",
-      "clearJelly": "Rensa all gelé",
-      "killCake": "Förstör tårtan",
-      "stopChocolate": "Stoppa chokladen",
       "bannerTitle": "Mål",
       "pathRoute": "Koppla ◯ till ◉ i ett ord",
       "pathRouteSuccess": "RUTT KOPPLAD!",
@@ -13885,38 +13883,7 @@ const sv = {
     },
     "combo": {
       "bomb_bomb": "MEGASMÄLL!",
-      "bomb_lightning": "ÅSKBOMB!",
-      "bomb_prism": "SPLITTERSTORM!",
-      "bomb_rainbow": "REGNBÅGSDETONATOR!",
-      "bomb_mirror": "SPEGELBOMB!",
-      "bomb_magnet": "MAGNETEXPLOSION!",
-      "bomb_gem": "KRISTALLKROSS!",
-      "bomb_frozen": "TININGEXPLOSION!",
-      "lightning_lightning": "KEDJEBLIXTAR!",
-      "lightning_prism": "KORSÅSKA!",
-      "lightning_rainbow": "REGNBÅGSSTORM!",
-      "lightning_mirror": "DUBBELSTRIKE!",
-      "lightning_magnet": "STRÖMDRAG!",
-      "lightning_gem": "GNISTKRISTALL!",
-      "lightning_frozen": "CHOCKVÅGSTINING!",
-      "prism_prism": "TOTAL FÖRSTÖRELSE!",
-      "prism_rainbow": "SPEKTRALNOVA!",
-      "prism_mirror": "OÄNDLIGT KORS!",
-      "prism_magnet": "VIRVELKORS!",
-      "prism_gem": "KRISTALLPRISMA!",
-      "prism_frozen": "PRISMATINING!",
-      "rainbow_mirror": "SPEGELREGNBÅGE!",
-      "rainbow_magnet": "REGNBÅGSDRAG!",
-      "rainbow_gem": "REGNBÅGSKRISTALL!",
-      "rainbow_frozen": "REGNBÅGSTINING!",
-      "mirror_magnet": "DUBBEL VIRVEL!",
-      "mirror_gem": "KRISTALLSPEGEL!",
-      "mirror_frozen": "EKOFRYS!",
-      "magnet_gem": "KRISTALLDRAG!",
-      "magnet_frozen": "FRUSEN VIRVEL!",
-      "gem_frozen": "ISKRISTALL!",
       "gold_special": "GULDKRAFT!",
-      "rainbow_special": "DUBBEL REGNBÅGE!",
       "triple_special": "TRIPPELHOT!"
     },
     "micro": {
@@ -13930,10 +13897,6 @@ const sv = {
       "specialist": "Specialist!",
       "waveClearer": "Våg klarad!"
     },
-    "comboCodex": "KOMBOKODEX",
-    "codexProgress": "{discovered}/{total} hittade",
-    "codexLocked": "???",
-    "comboDiscovered": "KOMBINATION HITTAD!",
     "chainCounter": "KEDJA x{{count}}",
     "wave": "Våg",
     "words": "ord",
@@ -13948,6 +13911,38 @@ const sv = {
     "gameOver": "SPELET SLUT",
     "waves": "vågor",
     "bestWord": "Bäst",
+    "theme": {
+      "warmUp": {
+        "name": "Uppvärmning",
+        "goal": "Hitta 4 ord med 3+ bokstäver",
+        "flavor": "Lätt bräde och extra drag. Hitta rytmen."
+      },
+      "bombSquad": {
+        "name": "Bombgruppen",
+        "goal": "Spräng bomberna",
+        "flavor": "Bomber överallt, och kedjor ger dubbelt."
+      },
+      "coinRush": {
+        "name": "Myntregn",
+        "goal": "Samla mynten",
+        "flavor": "Mynten regnar ner och ger dubbelt."
+      },
+      "diamondHunt": {
+        "name": "Diamantjakt",
+        "goal": "Tjäna en diamant",
+        "flavor": "Ovanliga ord är lättare att få. Jaga diamanter."
+      },
+      "boss": {
+        "name": "Bossvåg",
+        "goal": "Nå poängen",
+        "flavor": "Färre drag, större pris. Varje ord räknas."
+      },
+      "cascadeCarnival": {
+        "name": "Kaskadkarneval",
+        "goal": "Hitta långa ord",
+        "flavor": "Kedjorna går djupare och ger mer."
+      }
+    },
     "tileGuide": {
       "title": "Brickguide",
       "standard": {
@@ -13955,100 +13950,16 @@ const sv = {
         "desc": "Vanlig bricka, ingen specialeffekt"
       },
       "gold": {
-        "name": "Guld",
-        "desc": "×3 poäng + 1 bonusdrag"
-      },
-      "silver": {
-        "name": "Silver",
-        "desc": "×1,5 poäng + förlänger nedräkningar med 1"
+        "name": "Mynt",
+        "desc": "×3 poäng, +1 drag, extra mynt"
       },
       "diamond": {
         "name": "Diamant",
-        "desc": "×5 poäng + avslöjar frusna i 3 turer"
+        "desc": "Fås av ovanliga ord – stor bonus när den rensas"
       },
       "bomb": {
         "name": "Bomb",
         "desc": "Rensar 3×3. Kedjar till närliggande bomber"
-      },
-      "lightning": {
-        "name": "Blixt",
-        "desc": "Rensar hela kolumnen. Kedjar till andra blixtar"
-      },
-      "prism": {
-        "name": "Prisma",
-        "desc": "2 träffar. Rensar rad + kolumn, skapar 2 special"
-      },
-      "rainbow": {
-        "name": "Regnbåge",
-        "desc": "Kopierar bästa special i ditt ord, eller ×2 poäng"
-      },
-      "ice": {
-        "name": "Is",
-        "desc": "2 träffar att krossa. Defensiv bricka med flera träffar."
-      },
-      "frozen": {
-        "name": "Frusen",
-        "desc": "2 träffar. Frigör en dold special inuti"
-      },
-      "gem": {
-        "name": "Ädelsten",
-        "desc": "3 träffar. Skapar 2 special + 2 bonusdrag"
-      },
-      "mirror": {
-        "name": "Spegel",
-        "desc": "Kopierar första offensiva special i ditt ord"
-      },
-      "magnet": {
-        "name": "Magnet",
-        "desc": "Drar brickor inåt, sedan spränger 3×3"
-      },
-      "wildcard": {
-        "name": "Joker",
-        "desc": "Matchar alla bokstäver. Poäng efter bokstavens sällsynthet"
-      },
-      "countdown": {
-        "name": "Nedräkning",
-        "desc": "Desarmera innan 0. +2 drag, annars 50p straff"
-      },
-      "shuffle": {
-        "name": "Blanda",
-        "desc": "Blandar om alla återstående bokstäver på brädet vid rensning"
-      },
-      "magma": {
-        "name": "Magma",
-        "desc": "Rensar båda diagonalerna (X-mönster) med 2× poängmultiplikator"
-      },
-      "portal": {
-        "name": "Portal",
-        "desc": "Teleportera genom par. Rensar båda, ×2 ordpoäng"
-      },
-      "catalyst": {
-        "name": "Katalysator",
-        "desc": "Uppgraderar alla intilliggande brickor till special"
-      },
-      "crystal": {
-        "name": "Kristall",
-        "desc": "Växer +1× per oanvänd tur (max 5×). Multiplicerar ordpoäng"
-      },
-      "fuse": {
-        "name": "Stubin",
-        "desc": "Länkat par. Rensa en för att tända partnern. Desarmera inom 3 drag annars smäller det"
-      },
-      "anchor": {
-        "name": "Ankare",
-        "desc": "Långordsbonus. +3 p per bokstav i ordet när den rensas"
-      },
-      "mystery": {
-        "name": "Gåta",
-        "desc": "Överraskning: poängburst, ny speciell, mini-pop eller mega +150"
-      },
-      "chocolate": {
-        "name": "Choklad",
-        "desc": "Sprider sig till en grannruta varje tur. Använd en chokladruta i ett ord för att stoppa den"
-      },
-      "cake": {
-        "name": "Tårta",
-        "desc": "Flerruteblock med delad hälsa. Träffa det om och om igen för att förstöra det"
       }
     },
     "highlight": {
@@ -15214,6 +15125,12 @@ const sv = {
       "quickSelect": "Snabbval",
       "today": "Idag",
       "tomorrow": "Imorgon",
+      "goals": {
+        "longWord": "Spela ett ord med 5 bokstäver",
+        "claim": "Ta 8+ rutor",
+        "win": "Vinn brädet",
+        "title": "Dagens mål"
+      },
       "nextWeek": "Nästa vecka",
       "nextMonth": "Nästa månad",
       "customDate": "Anpassat datum",
@@ -17508,6 +17425,16 @@ const sv = {
       "submitted_on": "Skickad",
       "already_approved_title": "Du har redan lärarbehörighet.",
       "go_to_teacher": "Till lärarpanelen",
+      "class_ready_cta": "Din klass är redo",
+      "class_ready_title": "Din klass är redo",
+      "class_ready_body": "Dela koden. Eleverna går med från mobilen — inget konto.",
+      "class_ready_code": "Klasskod",
+      "class_ready_qr": "Skanna för att gå med",
+      "class_ready_test": "Gå med från mobilen som testelev",
+      "class_ready_test_hint": "Ett testmedlemskap startar inte klassens provperiod.",
+      "class_ready_hq": "Lärarpanelen",
+      "class_ready_creating": "Förbereder din klass…",
+      "class_ready_error": "Kunde inte öppna en klass. Försök igen, eller gå till panelen.",
       "status_unknown_title": "Vi kunde inte läsa din åtkomststatus",
       "status_unknown_body": "Något gick fel hos oss. Öppna lärarpanelen eller ladda om sidan för att kolla igen.",
       "auth_required_title": "Börja med ditt konto",
@@ -19418,6 +19345,7 @@ const sv = {
       "land_grab": "Markrofferi",
       "quick_draw": "Snabbgiv",
       "golden_tiles": "Guldbrickor",
+      "star_squares": "Stjärnrutor",
       "none": "",
       "desc": {
         "bingo_bonanza": "Bingo ger +90",
@@ -19425,7 +19353,8 @@ const sv = {
         "rich_letters": "Sällsynta brickor räknas dubbelt",
         "land_grab": "Erövringar sprids till grannrutor",
         "quick_draw": "5 brickor på handen. Snabbare rundor",
-        "golden_tiles": "✦-brickor erövrar rutorna runt omkring"
+        "golden_tiles": "✦-brickor erövrar rutorna runt omkring",
+        "star_squares": "Landa på en stjärna och ta rutorna runt omkring"
       }
     },
     "setup": {
@@ -19449,6 +19378,19 @@ const sv = {
       "start": "Starta spelet",
       "challengeHint": "Utmana en vän från resultatskärmen",
       "sendChallengeNow": "Skicka din utmaning nu!"
+    },
+    "daily": {
+      "title": "Dagens bräde",
+      "play": "Spela dagens bräde",
+      "done": "Klart idag · spela igen",
+      "streak": "{n} dagars svit",
+      "streakNow": "{n} dagars svit!",
+      "tomorrow": "Kom tillbaka imorgon för att fortsätta sviten"
+    },
+    "highlights": {
+      "best": "Bästa draget",
+      "longest": "Längsta ordet",
+      "pts": "{n} p"
     },
     "squares": "rutor",
     "place": {
@@ -21083,6 +21025,7 @@ const sv = {
     "home": {
       "regionLabel": "Lärarens startsida",
       "railLabel": "Den här veckan och din plan",
+      "weeklyReports": "Veckorapporter",
       "greetMorning": "God morgon, {name}",
       "greetAfternoon": "God eftermiddag, {name}",
       "greetEvening": "God kväll, {name}",
@@ -21098,6 +21041,8 @@ const sv = {
       "students": "{count} elever",
       "notPlayedRecently": "Inga spel på 30 dagar",
       "playWith": "Starta ett spel med {name}",
+      "showCode": "Visa kod",
+      "showCodeFor": "Visa anslutningskoden för {name}",
       "reviewTitle": "Öva på de missade orden"
     },
     "week": {
@@ -21152,7 +21097,8 @@ const sv = {
           "body": "Kör en kort runda. Lägg till övningsbottar i lobbyn om ingen har anslutit än.",
           "cta": "Starta ett 2-minutersspel",
           "bodyAwaitingPlayers": "Ditt rum är klart — nu ska eleverna in. Visa anslutningskoden eller QR-koden på tavlan.",
-          "ctaAwaitingPlayers": "Visa klasskoden"
+          "ctaAwaitingPlayers": "Visa klasskoden",
+          "titleAwaitingPlayers": "Få in dina elever"
         }
       }
     },

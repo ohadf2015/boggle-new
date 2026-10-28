@@ -369,7 +369,9 @@ describe('<JoinFlow> — a student who already has an account', () => {
 
   it('joins without a guest name from the invite link, without a second tap', async () => {
     render(<JoinFlow initialCode="P45KRT" />);
-    await waitFor(() => expect(mockJoin).toHaveBeenCalledWith('P45KRT', undefined));
+    // Signed-in joins pass an options object so rehearsal can be spread in.
+    // {} is not a guest name — joinClassroom only reads guestName when logged out.
+    await waitFor(() => expect(mockJoin).toHaveBeenCalledWith('P45KRT', {}));
   });
 
   it('still shows the nickname row after the first tap mints an anon user mid-flow', async () => {

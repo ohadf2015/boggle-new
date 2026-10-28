@@ -9,7 +9,6 @@
  * every language, and a retired tile cannot leak back into the guide.
  */
 import { BLAST_TILE_TYPE_LIST, type BlastTileType } from '@/shared/types/blast';
-import { BLAST_RETIRED_SPECIAL_TYPES } from '../utils/blastWaveConfig';
 import { en } from '@/translations/en';
 import { es } from '@/translations/es';
 import { he } from '@/translations/he';
@@ -26,21 +25,11 @@ const CATALOGUES: [string, unknown][] = [
 const guideOf = (catalogue: unknown): Guide =>
   ((catalogue as { blast?: { tileGuide?: Guide } }).blast?.tileGuide ?? {}) as Guide;
 
-const shownTypes: BlastTileType[] = BLAST_TILE_TYPE_LIST.filter(
-  (type) => !BLAST_RETIRED_SPECIAL_TYPES.has(type),
-);
+const shownTypes: readonly BlastTileType[] = BLAST_TILE_TYPE_LIST;
 
 describe('blast tile guide translations', () => {
-  it('shows at least the core tile roster', () => {
-    expect(shownTypes).toContain('standard');
-    expect(shownTypes).toContain('bomb');
-    expect(shownTypes.length).toBeGreaterThan(3);
-  });
-
-  it('never advertises a retired tile', () => {
-    for (const type of shownTypes) {
-      expect(BLAST_RETIRED_SPECIAL_TYPES.has(type)).toBe(false);
-    }
+  it('shows exactly the live roster', () => {
+    expect([...shownTypes].sort()).toEqual(['bomb', 'diamond', 'gold', 'standard']);
   });
 
   it.each(CATALOGUES)('has a name and desc for every shown tile in %s', (_lang, catalogue) => {

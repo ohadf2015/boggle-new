@@ -16,6 +16,7 @@ import {
 } from '@/shared/utils/scoring';
 
 import { getGameModeRules, isDuplicateRuleDisabled } from '../modes/rules';
+import { compareBlastStandings } from '@/shared/utils/blastCollectionScore';
 
 // Re-export for backwards compatibility
 export { calculateWordScore, getComboBonus, getComboMultiplier };
@@ -238,8 +239,12 @@ export function calculateGameScores(
     });
   }
 
-  // Sort by total score descending
-  results.sort((a, b) => b.totalScore - a.totalScore);
+  // Sort by total score descending; Blast ties go to the player with more diamonds.
+  const blastStats = (game as { blastModeState?: { playerStats?: Record<string, { diamondsCollected?: number }> } }).blastModeState?.playerStats;
+  results.sort((a, b) => compareBlastStandings(
+    { score: a.totalScore, diamondsCollected: blastStats?.[a.username]?.diamondsCollected },
+    { score: b.totalScore, diamondsCollected: blastStats?.[b.username]?.diamondsCollected },
+  ));
 
   return results;
 }

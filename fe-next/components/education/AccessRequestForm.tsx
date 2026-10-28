@@ -66,6 +66,7 @@ export function AccessRequestForm({
   const inFlight = useRef(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [paidDay0, setPaidDay0] = useState(false);
   // The request row committed but instant approval is still finishing
   // server-side (202 approvalPending). Distinct from success: no /teacher
   // redirect — the account isn't promoted yet, so pushing would bounce.
@@ -81,7 +82,7 @@ export function AccessRequestForm({
   // HQ is one explicit tap; Polar 14-day trial is the other.
   const goToTeacherHq = async () => {
     try { await refreshProfile(); } catch { /* role gate re-reads on /teacher */ }
-    router.push(`/${language}/teacher`);
+    router.push(paidDay0 ? `/${language}/teacher/class-ready` : `/${language}/teacher`);
   };
 
   const firstName = (knownName ?? '').trim().split(/\s+/)[0] || '';
@@ -107,6 +108,7 @@ export function AccessRequestForm({
     inFlight.current = true;
     setError(null);
     setSubmitting(true);
+    let leaving = false;
     try {
       const res = await fetch('/api/education/access-request', {
         method: 'POST',
@@ -132,13 +134,22 @@ export function AccessRequestForm({
         setApprovalPending(true);
         return;
       }
+      // Paid campaign teachers leave inside the signup minute if the next
+      // screen is a Polar offer. Land them on the day-0 class, not the upsell.
+      if (json?.paidDay0) {
+        leaving = true;
+        setPaidDay0(true);
+        try { await refreshProfile(); } catch { /* role gate re-reads on class-ready */ }
+        router.push(`/${language}/teacher/class-ready`);
+        return;
+      }
       setSuccess(true);
       void pro.refresh().catch(() => {}).finally(() => setOfferReady(true));
     } catch {
       setError(t('education.access.submit_error'));
     } finally {
       inFlight.current = false;
-      setSubmitting(false);
+      if (!leaving) setSubmitting(false);
     }
   };
 
@@ -249,7 +260,7 @@ export function AccessRequestForm({
                 : 'w-full rounded-neo border-neo border-neo-navy bg-neo-lime px-4 py-3 font-bold text-neo-navy font-neo-display shadow-hard-sm hover:shadow-hard'
             }
           >
-            {t('education.access.go_to_teacher')}
+            {t(paidDay0 ? 'education.access.class_ready_cta' : 'education.access.go_to_teacher', paidDay0 ? 'Your class is ready' : undefined)}
           </button>
         </div>
       </m.div>

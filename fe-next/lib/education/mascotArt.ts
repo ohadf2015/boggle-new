@@ -1,6 +1,6 @@
 /** The education mascot, by role. Change art here, never at call sites. */
 
-const ROLES = ['welcome', 'gameStart', 'setup', 'empty', 'success', 'tip', 'noClasses', 'pro', 'shield', 'attack', 'error', 'podium'] as const;
+const ROLES = ['welcome', 'gameStart', 'setup', 'empty', 'success', 'tip', 'noClasses', 'pro', 'shield', 'attack', 'error', 'podium', 'scanJoin'] as const;
 export type EduMascotPose = (typeof ROLES)[number];
 
 const still = (role: EduMascotPose) => `/mascot/edu/edu-${role}-512.webp`;
@@ -22,6 +22,7 @@ export const EDU_MASCOT = {
   attack: still('attack'),
   error: still('error'),
   podium: still('podium'),
+  scanJoin: still('scanJoin'),
 } as const satisfies Record<EduMascotPose, string>;
 
 export const EDU_MASCOT_VIDEO = {

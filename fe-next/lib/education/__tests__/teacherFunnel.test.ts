@@ -414,3 +414,37 @@ describe('test accounts', () => {
     expect(out.rows[0].students).toBe(0);
   });
 });
+
+describe('checkout funnel readout', () => {
+  it('aggregates checkout_started, checkout_url_reachable, checkout_url_error, and checkout_return_landed while excluding test accounts and scripted probes', () => {
+    const out = buildTeacherFunnel(
+      input({
+        profiles: [
+          { id: 'u1', user_role: 'teacher', is_test_account: false },
+          { id: 'qa', user_role: 'teacher', is_test_account: true },
+        ],
+        checkoutEvents: [
+          { user_id: 'u1', event_type: 'checkout_started', payload: { client_kind: 'browser' }, created_at: '2026-10-01T10:00:00Z' },
+          { user_id: 'u1', event_type: 'checkout_url_reachable', payload: { http_status: 200, client_kind: 'browser' }, created_at: '2026-10-01T10:00:01Z' },
+          { user_id: 'u1', event_type: 'checkout_return_landed', payload: { client_kind: 'browser' }, created_at: '2026-10-01T10:02:00Z' },
+          { user_id: 'u2', event_type: 'checkout_started', payload: { client_kind: 'browser' }, created_at: '2026-10-02T10:00:00Z' },
+          { user_id: 'u2', event_type: 'checkout_url_error', payload: { http_status: 503, client_kind: 'browser' }, created_at: '2026-10-02T10:00:01Z' },
+          // Excluded: test account profile
+          { user_id: 'qa', event_type: 'checkout_started', payload: { client_kind: 'browser' }, created_at: '2026-10-03T10:00:00Z' },
+          // Excluded: scripted probe
+          { user_id: 'u1', event_type: 'checkout_started', payload: { client_kind: 'script' }, created_at: '2026-10-04T10:00:00Z' },
+          // Excluded: payload is_test_account flag
+          { user_id: 'u3', event_type: 'checkout_url_error', payload: { http_status: 500, is_test_account: true }, created_at: '2026-10-05T10:00:00Z' },
+        ],
+      }),
+    );
+
+    expect(out.checkout).toEqual({
+      checkoutStarted: 2,
+      checkoutUrlReachable: 1,
+      checkoutUrlError: 1,
+      checkoutReturnLanded: 1,
+      lastErrorStatus: 503,
+    });
+  });
+});

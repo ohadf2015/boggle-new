@@ -1,49 +1,42 @@
-/**
- * Tests for the redesigned Daily Challenge Word Hunt tutorial.
- *
- * The tutorial was compressed from 5 text steps to 3 image-led steps:
- *   1. Guess the word  (hero image + live colored-tile legend)
- *   2. Free bonus words (hero image + uses-a-try vs free comparison)
- *   3. Ready to hunt    (hero image + start)
- *
- * Each step leads with a brand illustration under /daily/tutorial/. The
- * colored-tile legend stays as live DOM (localized + crisp), so we assert it
- * renders rather than living inside a raster.
- */
-
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { act, render, screen, fireEvent, within } from '@testing-library/react';
+import { drag, release, stubBoardLayout } from '@/components/board/__tests__/boardTestUtils';
 
-// Pass-through framer-motion so steps render synchronously in jsdom.
-vi.mock('framer-motion', () => ({
-  m: {
-    div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
-      const { initial: _i, animate: _a, exit: _e, whileHover: _wh, whileTap: _wt, transition: _t, variants: _v, ...domProps } = props as Record<string, unknown>;
-      return <div {...domProps}>{children}</div>;
+vi.mock('framer-motion', () => {
+  const strip = (props: Record<string, unknown>) => {
+    const { initial: _i, animate: _a, exit: _e, transition: _t, variants: _v, whileTap: _wt, layout: _l, ...dom } = props;
+    return dom;
+  };
+  return {
+    m: {
+      div: ({ children, ...p }: React.PropsWithChildren<Record<string, unknown>>) => <div {...strip(p)}>{children}</div>,
+      span: ({ children, ...p }: React.PropsWithChildren<Record<string, unknown>>) => <span {...strip(p)}>{children}</span>,
     },
-  },
-  AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
-}));
+    AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
+    useReducedMotion: () => false,
+  };
+});
 
-// t() echoes the key so we can assert against stable key strings.
+const lang = vi.hoisted(() => ({ language: 'en', dir: 'ltr' }));
 vi.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({
-    t: (key: string) => key,
-    language: 'en',
-    dir: 'ltr',
-    setLanguage: vi.fn(),
-  }),
+  useLanguage: () => ({ t: (key: string) => key, language: lang.language, dir: lang.dir, setLanguage: vi.fn() }),
 }));
 
-vi.mock('@/hooks/useSwipeGesture', () => ({
-  useSwipeGesture: () => ({}),
+vi.mock('@/contexts/SoundEffectsContext', () => ({
+  useSoundEffects: () => new Proxy({}, { get: () => vi.fn() }),
 }));
 
-vi.mock('@/utils/hapticFeedback', () => ({
-  triggerHaptic: vi.fn(),
-}));
+vi.mock('@/utils/hapticFeedback', () => ({ triggerHaptic: vi.fn() }));
 
 import { DailyChallengeTutorial } from '../DailyChallengeTutorial';
+
+let restoreLayout: () => void;
+beforeEach(() => {
+  restoreLayout = stubBoardLayout();
+  lang.language = 'en';
+  lang.dir = 'ltr';
+});
+afterEach(() => restoreLayout());
 
 const setup = () => {
   const onComplete = vi.fn();
@@ -52,86 +45,93 @@ const setup = () => {
   return { onComplete, onSkip, ...utils };
 };
 
-const next = () =>
-  fireEvent.click(screen.getByRole('button', { name: /tutorial\.wordHunt/ }));
+// en demo: C(0,0) → A(0,1) → T(1,1) against hidden CRAB.
+const traceCat = (container: HTMLElement) => {
+  act(() => {
+    drag(container, [[0, 0], [0, 1], [1, 1]], 'touch');
+    release(container, 'touch');
+  });
+};
 
-describe('DailyChallengeTutorial (3-step image redesign)', () => {
-  it('opens on step 1 with the guess hero image and the goal copy', () => {
+const tiles = () => within(screen.getByTestId('howto-feedback-word')).getAllByTestId('howto-tile');
+
+describe('DailyChallengeTutorial (learn by doing)', () => {
+  it('given a first open, then step 1 shows a real board and the word to trace', () => {
     setup();
-    const hero = screen.getByRole('img', { name: 'tutorial.wordHunt.step1ImageAlt' });
-    expect(hero).toBeInTheDocument();
-    expect(hero.getAttribute('src')).toContain('step1-guess');
-    expect(screen.getByText('tutorial.wordHunt.welcome.title')).toBeInTheDocument();
-    expect(screen.getByText('tutorial.wordHunt.welcome.description')).toBeInTheDocument();
+    expect(screen.getByRole('grid')).toBeInTheDocument();
+    expect(screen.getAllByRole('gridcell')).toHaveLength(9);
+    expect(screen.getByText('tutorial.wordHunt.howto.boardTitle')).toBeInTheDocument();
+    expect(screen.getByTestId('howto-trace-word').textContent).toBe('CAT');
   });
 
-  it('keeps the colored-tile legend as live DOM on step 1 (not baked into the image)', () => {
-    setup();
-    // Legend labels share a node with their emoji (e.g. "🟩 legendGreen"), so match loosely.
-    expect(screen.getByText(/letterFeedback\.legendGreen/)).toBeInTheDocument();
-    expect(screen.getByText(/letterFeedback\.legendYellow/)).toBeInTheDocument();
-    expect(screen.getByText(/letterFeedback\.legendGray/)).toBeInTheDocument();
+  it('given step 1, when the player drags the word by touch, then the feedback step shows coloured letters', () => {
+    const { container } = setup();
+    traceCat(container);
+    expect(screen.getByText('tutorial.wordHunt.howto.feedbackTitle')).toBeInTheDocument();
+    expect(tiles().map((el) => [el.textContent, el.dataset.feedback])).toEqual([
+      ['C', 'green'],
+      ['A', 'yellow'],
+      ['T', 'gray'],
+    ]);
   });
 
-  it('advances to step 2 showing the bonus-word hero and the try-vs-free contrast', () => {
-    setup();
-    next(); // -> step 2
-    const hero = screen.getByRole('img', { name: 'tutorial.wordHunt.step2ImageAlt' });
-    expect(hero).toBeInTheDocument();
-    expect(hero.getAttribute('src')).toContain('step2-bonus');
-    expect(screen.getByText('tutorial.wordHunt.triesRule.usesAttempt')).toBeInTheDocument();
-    expect(screen.getByText('tutorial.wordHunt.triesRule.noAttempt')).toBeInTheDocument();
+  it('given the feedback step, then the hidden word reveals the green clue in place', () => {
+    const { container } = setup();
+    traceCat(container);
+    const boxes = within(screen.getByTestId('howto-hidden-word')).getAllByTestId('howto-hidden-box');
+    expect(boxes).toHaveLength(4);
+    expect(boxes.map((b) => b.textContent)).toEqual(['C', '?', '?', '?']);
   });
 
-  it('reaches the ready step after exactly two advances (3 steps total, not 5)', () => {
-    const { onComplete } = setup();
-    next(); // -> step 2
-    next(); // -> step 3 (ready)
-    const hero = screen.getByRole('img', { name: 'tutorial.wordHunt.step3ImageAlt' });
-    expect(hero).toBeInTheDocument();
-    expect(hero.getAttribute('src')).toContain('step3-ready');
-    // The final primary button completes the tutorial.
+  it('given step 1, when the player traces a different word, then it stays on the board with a nudge', () => {
+    const { container } = setup();
+    act(() => {
+      drag(container, [[1, 0], [1, 1], [1, 2]], 'touch');
+      release(container, 'touch');
+    });
+    expect(screen.getByRole('grid')).toBeInTheDocument();
+    expect(screen.getByRole('status').textContent).toContain('tutorial.wordHunt.howto.tryAgain');
+  });
+
+  it('given the feedback step, when Next then Let’s play are pressed, then the goal shows and onComplete fires', () => {
+    const { container, onComplete } = setup();
+    traceCat(container);
+    fireEvent.click(screen.getByRole('button', { name: 'tutorial.wordHunt.howto.next' }));
+    expect(screen.getByText('tutorial.wordHunt.howto.goalTitle')).toBeInTheDocument();
+    expect(screen.getByText('tutorial.wordHunt.howto.goalLife')).toBeInTheDocument();
+    expect(screen.getByText('tutorial.wordHunt.howto.goalClues')).toBeInTheDocument();
+    expect(screen.getByText('tutorial.wordHunt.triesRule.keyInsight')).toBeInTheDocument();
     expect(onComplete).not.toHaveBeenCalled();
-    // Start button name carries a trailing 🚀, so match loosely.
-    fireEvent.click(screen.getByRole('button', { name: /complete\.start/ }));
+    fireEvent.click(screen.getByRole('button', { name: 'tutorial.wordHunt.howto.play' }));
     expect(onComplete).toHaveBeenCalledTimes(1);
   });
 
-  it('calls onSkip when the close button is pressed', () => {
-    const { onSkip } = setup();
-    fireEvent.click(screen.getByRole('button', { name: 'common.close' }));
+  it.each([0, 1, 2])('given step index %i, when Skip is pressed, then onSkip fires', (stepsAhead) => {
+    const { container, onSkip } = setup();
+    if (stepsAhead >= 1) traceCat(container);
+    if (stepsAhead >= 2) fireEvent.click(screen.getByRole('button', { name: 'tutorial.wordHunt.howto.next' }));
+    fireEvent.click(screen.getByRole('button', { name: 'common.skip' }));
     expect(onSkip).toHaveBeenCalledTimes(1);
   });
 
-  /**
-   * Regression: the daily "ready" screen renders a persistent green
-   * "play today's puzzle" CTA portaled to <body> at z-[100]. Because the portal
-   * sits later in the DOM than this inline overlay, an EQUAL z-index let the
-   * sticky CTA paint over the tutorial's action buttons (the reported Swedish
-   * clipping bug). The full-screen tutorial is a modal dialog and must sit
-   * above persistent page chrome.
-   */
-  it('renders the overlay above the persistent daily play CTA (z-index > z-[100])', () => {
+  it('given Hebrew, then the feedback word reads right-to-left', () => {
+    lang.language = 'he';
+    lang.dir = 'rtl';
+    const { container } = setup();
+    act(() => {
+      drag(container, [[0, 2], [0, 1], [1, 1]], 'touch');
+      release(container, 'touch');
+    });
+    expect(screen.getByTestId('howto-feedback-word').getAttribute('dir')).toBe('rtl');
+    expect(tiles().map((el) => el.dataset.feedback)).toEqual(['green', 'yellow', 'gray']);
+  });
+
+  it('renders a dark fullscreen overlay above the ready screen’s portaled play CTA', () => {
     const { container } = setup();
     const overlay = container.firstChild as HTMLElement;
     expect(overlay.className).toContain('z-[120]');
-  });
-
-  /**
-   * Layout hardening: the step actions must live in a non-scrolling footer that
-   * is a sibling of (not inside) the scrollable body. This guarantees the
-   * primary actions are always visible and tappable on short viewports instead
-   * of being pushed below the fold or clipped.
-   */
-  it('pins the step actions in a footer outside the scrollable body', () => {
-    setup();
-    const body = screen.getByTestId('tutorial-body');
-    const footer = screen.getByTestId('tutorial-footer');
-
-    expect(body.className).toContain('overflow-y-auto');
-
-    const primary = screen.getByRole('button', { name: /welcome\.next/ });
-    expect(footer.contains(primary)).toBe(true);
-    expect(body.contains(primary)).toBe(false);
+    expect(overlay.className).toContain('bg-neo-navy');
+    expect(overlay.className).not.toContain('bg-neo-cream');
+    expect(overlay.getAttribute('role')).toBe('dialog');
   });
 });

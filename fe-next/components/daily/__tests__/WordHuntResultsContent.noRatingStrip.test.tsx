@@ -47,6 +47,10 @@ vi.mock('@/components/ui/Mascot', () => ({
 }));
 
 // Heavy siblings are stubbed.
+vi.mock('../results/WordHuntResultsHero', () => ({
+  WordHuntResultsHero: ({ children }: { children?: React.ReactNode }) => <section data-testid="daily-results-hero">{children}</section>,
+}));
+vi.mock('../results/CoinUnlockCard', () => ({ CoinUnlockCard: () => <div data-testid="coin-unlock" /> }));
 vi.mock('../results', async () => {
   return {
     ResultDisplay: () => <div data-testid="result-display" />,

@@ -1,5 +1,5 @@
 import type { BlastTileOverlay } from '@/shared/types/game';
-import type { BlastTileState } from '@/shared/types/blast';
+import { normalizeBlastTileState, normalizeBlastTileType, type BlastTileState } from '@/shared/types/blast';
 import { useGameStore } from './store';
 
 export interface BlastBoardUpdatePayload {
@@ -17,7 +17,9 @@ export interface BlastBoardUpdatePayload {
 export function applyBlastBoardUpdate(data: BlastBoardUpdatePayload): void {
   // A board regen carries a new overlay + seed; per-word updates omit both.
   if (data.overlay && typeof data.seed === 'number') {
-    useGameStore.setState({ blastTileOverlay: data.overlay, blastSeed: data.seed });
+    const overlay = data.overlay.map((o) => ({ ...o, type: normalizeBlastTileType(o.type) }));
+    useGameStore.setState({ blastTileOverlay: overlay, blastSeed: data.seed });
   }
-  useGameStore.getState().setBlastBoardUpdate(data);
+  const tileStates = data.tileStates.map((row) => row.map(normalizeBlastTileState));
+  useGameStore.getState().setBlastBoardUpdate({ ...data, tileStates });
 }

@@ -94,6 +94,10 @@ export function FreshClose({ locale, onPlay }: FreshCloseProps) {
             <DirectionalIcon icon={ArrowRight} className="h-5 w-5" />
           </FreshPlayLink>
         </div>
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 opacity-30 [background-image:radial-gradient(var(--neo-navy)_1.5px,transparent_1.5px)] [background-size:14px_14px] [mask-image:linear-gradient(to_bottom,black,transparent_70%)]"
+        />
       </section>
     </div>
   );

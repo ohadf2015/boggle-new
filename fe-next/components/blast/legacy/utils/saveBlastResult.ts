@@ -11,6 +11,11 @@ export interface SavedBlastResultPatch {
   previousBest?: number;
   /** True when this run set a new personal-best score. */
   isNewBestScore?: boolean;
+  /** This week's board standing after / before the run. */
+  rank?: number | null;
+  previousRank?: number | null;
+  totalPlayers?: number | null;
+  rival?: { name: string; score: number } | null;
 }
 
 /**
@@ -87,12 +92,20 @@ export async function saveBlastResult(
       percentile?: number | null;
       previousBest?: number | null;
       isNewBestScore?: boolean;
+      rank?: number | null;
+      previousRank?: number | null;
+      totalPlayers?: number | null;
+      rival?: { name: string; score: number } | null;
     };
 
     return {
       percentile: body.percentile ?? undefined,
       previousBest: body.previousBest ?? undefined,
       isNewBestScore: body.isNewBestScore,
+      rank: body.rank ?? null,
+      previousRank: body.previousRank ?? null,
+      totalPlayers: body.totalPlayers ?? null,
+      rival: body.rival ?? null,
     };
   } catch {
     return null;

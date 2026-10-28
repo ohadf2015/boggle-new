@@ -8,6 +8,7 @@ import { DAILY_ATTEMPTS_PER_PUZZLE } from '@/lib/connections/daily';
 import type { RankId, RankStanding } from '@/lib/connections/progress';
 import ConnectionsProgressTrack from './ConnectionsProgressTrack';
 import RankBadge from './RankBadge';
+import DailyQuestHeading from './DailyQuestHeading';
 
 interface DailyHeaderProps {
   score: number;
@@ -37,9 +38,9 @@ export default function DailyHeader({
   const reducedMotion = useReducedMotion();
   return (
     <header className="flex flex-col gap-3 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light p-3 shadow-hard-sm">
-      <div className="flex items-center justify-between">
-        <h1 className="font-neo-display text-lg font-black text-neo-white">{t('connections.daily.title')}</h1>
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between gap-2">
+        <DailyQuestHeading />
+        <div className="flex shrink-0 items-center gap-3">
           <m.span
             key={score}
             initial={reducedMotion ? undefined : { scale: 1.35 }}

@@ -7,6 +7,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 
+vi.mock('@/components/blast/progress/useBlastLadder', () => ({
+  useBlastLadder: () => ({ personalBest: null, rank: null, rivals: [] }),
+}));
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }));
 
 vi.mock('@/contexts/LanguageContext', () => ({

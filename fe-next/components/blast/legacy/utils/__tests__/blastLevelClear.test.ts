@@ -3,14 +3,8 @@
  *
  * When objectives are met (or all tiles cleared), remaining special tiles
  * fire sequentially like Candy Crush's "Sugar Crush" bonus phase:
- * - Each remaining bomb explodes (200ms stagger)
- * - Lightning tiles fire columns
- * - Prisms detonate crosses
+ * - Each remaining bomb explodes (200ms stagger), then coins, then diamonds
  * - Remaining moves convert to bonus score
- *
- * Tests the pure logic for building the trigger sequence.
- *
- * RED phase: tests written before implementation.
  */
 
 import type { BlastTileState, BlastTileType } from '../../types';
@@ -50,7 +44,7 @@ describe('buildAutoTriggerSequence', () => {
   it('returns empty array when all special tiles are already cleared', () => {
     const grid = makeGrid([
       makeTile(0, 0, 'bomb', true),
-      makeTile(1, 1, 'lightning', true),
+      makeTile(1, 1, 'gold', true),
     ]);
     const result = buildAutoTriggerSequence(grid);
     expect(result).toEqual([]);
@@ -67,33 +61,6 @@ describe('buildAutoTriggerSequence', () => {
     expect(result[0].col).toBe(3);
   });
 
-  it('includes uncleared lightning tiles in the sequence', () => {
-    const grid = makeGrid([
-      makeTile(1, 4, 'lightning', false),
-    ]);
-    const result = buildAutoTriggerSequence(grid);
-    expect(result).toHaveLength(1);
-    expect(result[0].type).toBe('lightning');
-  });
-
-  it('includes uncleared prism tiles in the sequence', () => {
-    const grid = makeGrid([
-      makeTile(3, 3, 'prism', false),
-    ]);
-    const result = buildAutoTriggerSequence(grid);
-    expect(result).toHaveLength(1);
-    expect(result[0].type).toBe('prism');
-  });
-
-  it('includes uncleared gem tiles in the sequence', () => {
-    const grid = makeGrid([
-      makeTile(0, 5, 'gem', false),
-    ]);
-    const result = buildAutoTriggerSequence(grid);
-    expect(result).toHaveLength(1);
-    expect(result[0].type).toBe('gem');
-  });
-
   it('includes uncleared gold tiles in the sequence', () => {
     const grid = makeGrid([
       makeTile(4, 2, 'gold', false),
@@ -101,27 +68,6 @@ describe('buildAutoTriggerSequence', () => {
     const result = buildAutoTriggerSequence(grid);
     expect(result).toHaveLength(1);
     expect(result[0].type).toBe('gold');
-  });
-
-  it('includes uncleared magnet tiles in the sequence', () => {
-    const grid = makeGrid([
-      makeTile(5, 0, 'magnet', false),
-    ]);
-    const result = buildAutoTriggerSequence(grid);
-    expect(result).toHaveLength(1);
-    expect(result[0].type).toBe('magnet');
-  });
-
-  it('includes uncleared ice and frozen tiles in the sequence', () => {
-    const grid = makeGrid([
-      makeTile(0, 0, 'ice', false),
-      makeTile(1, 1, 'frozen', false),
-    ]);
-    const result = buildAutoTriggerSequence(grid);
-    expect(result).toHaveLength(2);
-    const types = result.map(s => s.type);
-    expect(types).toContain('ice');
-    expect(types).toContain('frozen');
   });
 
   it('does NOT include standard tiles', () => {
@@ -134,24 +80,24 @@ describe('buildAutoTriggerSequence', () => {
     expect(result[0].type).toBe('bomb');
   });
 
-  it('orders bombs before lightning before prism (priority order)', () => {
+  it('orders bombs before coins before diamonds (priority order)', () => {
     const grid = makeGrid([
-      makeTile(0, 0, 'prism', false),
-      makeTile(1, 1, 'lightning', false),
+      makeTile(0, 0, 'diamond', false),
+      makeTile(1, 1, 'gold', false),
       makeTile(2, 2, 'bomb', false),
     ]);
     const result = buildAutoTriggerSequence(grid);
     expect(result).toHaveLength(3);
     expect(result[0].type).toBe('bomb');
-    expect(result[1].type).toBe('lightning');
-    expect(result[2].type).toBe('prism');
+    expect(result[1].type).toBe('gold');
+    expect(result[2].type).toBe('diamond');
   });
 
   it('assigns staggered delays to each step', () => {
     const grid = makeGrid([
       makeTile(0, 0, 'bomb', false),
       makeTile(1, 1, 'bomb', false),
-      makeTile(2, 2, 'lightning', false),
+      makeTile(2, 2, 'gold', false),
     ]);
     const result = buildAutoTriggerSequence(grid);
     expect(result).toHaveLength(3);
@@ -164,7 +110,7 @@ describe('buildAutoTriggerSequence', () => {
     const grid = makeGrid([
       makeTile(0, 0, 'bomb', true),   // cleared — skip
       makeTile(1, 1, 'bomb', false),  // uncleared — include
-      makeTile(2, 2, 'lightning', false), // uncleared — include
+      makeTile(2, 2, 'gold', false), // uncleared — include
     ]);
     const result = buildAutoTriggerSequence(grid);
     expect(result).toHaveLength(2);
@@ -172,7 +118,7 @@ describe('buildAutoTriggerSequence', () => {
 
   it('includes rainbow tiles', () => {
     const grid = makeGrid([
-      makeTile(0, 0, 'rainbow', false),
+      makeTile(0, 0, 'gold', false),
     ]);
     const result = buildAutoTriggerSequence(grid);
     expect(result).toHaveLength(1);

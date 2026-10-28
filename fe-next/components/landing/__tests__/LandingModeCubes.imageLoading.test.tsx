@@ -93,12 +93,13 @@ describe('ModeRow — image loading', () => {
     expect(missingFiles, `Missing files or case mismatches:\n${missingFiles.join('\n')}`).toHaveLength(0);
   });
 
-  it('adventure, word tower and blast are cards in the lead row', () => {
+  it('adventure and word tower are cards in the lead row; blast is the featured card above it', () => {
     const { container } = render(<ModeRow />);
     const lead = container.querySelector('[data-fresh-section="modes"] ul');
-    for (const mode of ['adventure', 'wordTowerV2', 'blast']) {
+    for (const mode of ['adventure', 'wordTowerV2']) {
       expect(lead?.querySelector(`a[data-mode="${mode}"]`)).toBeTruthy();
     }
+    expect(container.querySelector('a[data-featured="true"][data-mode="blast"]')).toBeTruthy();
   });
 
   it('wordCraft, connections, brainGym all render with valid genIcon paths', () => {

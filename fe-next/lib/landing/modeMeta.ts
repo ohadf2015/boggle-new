@@ -172,6 +172,8 @@ export interface ModeCubeModel {
   readonly description?: string;
   /** who you play with + pacing, painted as a small chip — see MODE_TAGS */
   readonly tag?: ModeTag;
+  /** the homepage's recommended mode — bigger badge, pitch shown at every width */
+  readonly featured?: boolean;
   /** bento role: the anchor gets the 2×2 hero slot, the rest are 1×1 cubes */
   readonly role: 'anchor' | 'normal';
   readonly onClick: () => void;
@@ -227,4 +229,33 @@ export function modeRoute(key: string, language: string): string | null {
  */
 export function isCalmMode(key: string): boolean {
   return MODE_META[key]?.category === 'calm';
+}
+
+/**
+ * Home sections by what the player wants right now, not by build era:
+ * a live race, a solo run, or an untimed puzzle. Anything unlisted (admin and
+ * beta previews) falls into `preview`, so a new mode never lands in a real
+ * section by accident.
+ */
+export const MODE_GROUPS = ['together', 'solo', 'think', 'preview'] as const;
+export type ModeGroup = (typeof MODE_GROUPS)[number];
+
+const GROUP_OF: Readonly<Record<string, ModeGroup>> = {
+  arena: 'together',
+  adventure: 'solo',
+  wordTowerV2: 'solo',
+  brainGym: 'solo',
+  blast: 'solo',
+  connections: 'think',
+  crossword: 'think',
+  wordCraft: 'think',
+};
+
+export function modeGroup(key: string): ModeGroup {
+  return GROUP_OF[key] ?? 'preview';
+}
+
+/** Non-empty groups in section order; models keep their incoming (ranked) order. */
+export function groupModes<T extends { key: string }>(models: readonly T[]): { group: ModeGroup; models: T[] }[] {
+  return MODE_GROUPS.map((group) => ({ group, models: models.filter((m) => modeGroup(m.key) === group) })).filter((g) => g.models.length > 0);
 }

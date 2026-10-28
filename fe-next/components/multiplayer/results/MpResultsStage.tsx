@@ -44,6 +44,7 @@ import { myMissedWords } from '@/components/student/live/missedWords';
 import { resultsExitCopy } from '@/lib/multiplayer/resultsExitCopy';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { usePostHogFlag } from '@/hooks/usePostHogFlag';
+import { useMpExit } from '@/hooks/useMpExit';
 import { BossOutcomeCard } from '@/components/education/boss/BossOutcomeCard';
 import { useClassroomBossStore } from '@/stores/classroomBossStore';
 
@@ -52,6 +53,7 @@ const InlineSignupCard = dynamic(() => import('@/components/auth/InlineSignupCar
 const SignupToast = dynamic(() => import('@/components/auth/SignupToast'), { ssr: false });
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
 const FloatingReaction = dynamic(() => import('@/components/game/QuickReactions').then((m) => m.FloatingReaction), { ssr: false });
+const FirstGameBridge = dynamic(() => import('@/components/results/FirstGameBridge'), { ssr: false });
 
 /** Max standings rows on one screen (8 seats; in a bigger room I stay visible). */
 const MAX_ROWS = 8;
@@ -160,6 +162,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   const tally = useMemo(() => readyTally(data.sortedScores, socketEvents.readyUsernames), [data.sortedScores, socketEvents.readyUsernames]);
   const isReady = socketEvents.isCurrentPlayerReady;
   const { isOnCrazyGamesPlatform } = useCrazyGames();
+  const mpExit = useMpExit();
   const { handleStartGame } = c.nextRound;
   const { handleMarkReady } = socketEvents;
   const auto = useAutoAdvance({
@@ -341,7 +344,17 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   );
 
   const footer = (
-    <div className="relative w-full max-w-xl lg:max-w-2xl tv:max-w-4xl lg:[--mp-u:1.15] tv:[--mp-u:1.6] mx-auto px-[calc(12px*var(--mp-u,1))] pt-2 pb-[calc(10px*var(--mp-u,1))] min-h-[calc(84px*var(--mp-u,1))] flex flex-col justify-center overflow-hidden">
+    <div className="relative w-full max-w-xl lg:max-w-2xl tv:max-w-4xl lg:[--mp-u:1.15] tv:[--mp-u:1.6] mx-auto px-[calc(12px*var(--mp-u,1))] pt-2 pb-[calc(10px*var(--mp-u,1))] min-h-[calc(84px*var(--mp-u,1))] flex flex-col justify-center overflow-hidden gap-2">
+      {/* t_b883191f: first-session classic only. Control renders nothing.
+          Tap leaves the room (useMpExit) into today's Word Wheel — not a Link. */}
+      <FirstGameBridge
+        surface="classic-mp"
+        enabled={footerShown && c.resolvedGameMode === 'classic' && !c.isClassroom}
+        onActivate={() => {
+          auto.cancel();
+          mpExit('first-game-bridge');
+        }}
+      />
       {footerShown ? (
         <div className={fx.footerUp}>
           {branch === 'final' ? (

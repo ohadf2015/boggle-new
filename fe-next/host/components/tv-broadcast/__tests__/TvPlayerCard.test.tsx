@@ -170,6 +170,12 @@ describe('TvPlayerCard score bar', () => {
     expect(delta).toHaveTextContent('+45');
   });
 
+  it('given a score jump on a narrow screen, when the delta shows, then it floats over the score and never takes width from the name', () => {
+    const { rerender } = render(<TvPlayerCard {...defaultProps} score={100} />);
+    rerender(<TvPlayerCard {...defaultProps} score={145} />);
+    expect(screen.getByTestId('score-delta').className).toMatch(/(^|\s)absolute(\s|$)/);
+  });
+
   it('no delta badge on first render', () => {
     render(<TvPlayerCard {...defaultProps} score={100} />);
     expect(screen.queryByTestId('score-delta')).toBeNull();

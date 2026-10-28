@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, within, cleanup } from '@testing-library/react';
+import { render, screen, within, cleanup, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -57,6 +57,14 @@ afterEach(() => {
   viewed.mockReset();
 });
 
+function openWeeklyReports() {
+  const fold = screen.getByTestId('home-weekly-reports') as HTMLDetailsElement;
+  act(() => {
+    fold.open = true;
+    fold.dispatchEvent(new Event('toggle'));
+  });
+}
+
 describe('Teacher Home', () => {
   it('Given classes still loading, Then it paints skeletons and no onboarding card', () => {
     classroomsState = { ...classroomsState, classrooms: [], isLoading: true };
@@ -101,6 +109,12 @@ describe('Teacher Home', () => {
     expect(within(card).getByTestId('home-week-games')).toHaveTextContent('12');
     expect(within(card).getByTestId('home-week-students')).toHaveTextContent('54');
     expect(within(card).getByTestId('home-week-active')).toHaveTextContent('2');
+  });
+
+  it('Given an insight, Then it lives inside the This week card: one rail card, not two', () => {
+    week = { ...week, insights: [{ id: 'momentum', value: 3 }] };
+    render(<TeacherDashboard />);
+    expect(within(screen.getByTestId('home-week')).getByTestId('home-insight')).toBeInTheDocument();
   });
 
   it('Given the stats read failed, Then the numbers read "—", never a false zero', () => {
@@ -166,7 +180,19 @@ describe('Teacher Home', () => {
     week = { status: 'ready', summary: { gamesPlayed: 0, totalStudents: 0, activeClasses: 0, lastPlayedAt: {} } };
     render(<TeacherDashboard />);
     expect(screen.getByRole('complementary')).toBeInTheDocument();
+    openWeeklyReports();
     expect(screen.getByTestId('weekly-progress-digest')).toBeInTheDocument();
+  });
+
+  it('Given a class, Then the weekly digest and email report sit folded in one closed Weekly reports disclosure that mounts them only when opened, so no view is logged unseen', () => {
+    proState = PRO;
+    render(<TeacherDashboard />);
+    const fold = screen.getByTestId('home-weekly-reports');
+    expect(fold.tagName).toBe('DETAILS');
+    expect(fold).not.toHaveAttribute('open');
+    expect(screen.queryByTestId('weekly-progress-digest')).not.toBeInTheDocument();
+    openWeeklyReports();
+    expect(fold).toContainElement(screen.getByTestId('weekly-progress-digest'));
   });
 
   it('Given a Pro offer, Then the card is words and a button, no blurred fake chart', () => {
@@ -176,12 +202,35 @@ describe('Teacher Home', () => {
 
   it('Given setup half done, Then the compact card is one slim row with no progress sentence or step blurbs', () => {
     activation = { ...activation, progress: { inviteCopied: false, liveStarted: false, roomOpened: false, dismissed: false } };
+    week = { status: 'ready', summary: { gamesPlayed: 0, totalStudents: 0, activeClasses: 0, lastPlayedAt: {} } };
     render(<TeacherDashboard />);
     const card = screen.getByTestId('home-onboarding');
     expect(card).not.toHaveTextContent('eduShell.onboarding.progress');
     expect(card).not.toHaveTextContent(/eduShell\.onboarding\.steps\.\w+\.body/);
     expect(within(card).getAllByTestId(/^home-onboarding-step-/)).toHaveLength(3);
     expect(within(card).getByTestId('home-onboarding-cta')).toBeInTheDocument();
+  });
+
+  it('Given setup half done, Then the next step rides inside the hero, never a row of its own', () => {
+    activation = { ...activation, progress: { inviteCopied: false, liveStarted: false, roomOpened: false, dismissed: false } };
+    week = { status: 'ready', summary: { gamesPlayed: 0, totalStudents: 0, activeClasses: 0, lastPlayedAt: {} } };
+    render(<TeacherDashboard />);
+    const card = screen.getByTestId('home-onboarding');
+    expect(card.closest('[data-testid="home-hero"]')).not.toBeNull();
+    expect(card).toHaveTextContent('eduShell.onboarding.steps.tryDemo.title');
+  });
+
+  it('Given a class that already played but the activation flag never landed, Then no setup nudge shows', () => {
+    activation = { ...activation, progress: { inviteCopied: false, liveStarted: false, roomOpened: true, dismissed: false } };
+    render(<TeacherDashboard />);
+    expect(screen.queryByTestId('home-onboarding')).toBeNull();
+  });
+
+  it('Given the activity read is still in flight, Then the setup nudge waits instead of flashing', () => {
+    activation = { ...activation, progress: { inviteCopied: false, liveStarted: false, roomOpened: false, dismissed: false } };
+    week = { status: 'loading', summary: null };
+    render(<TeacherDashboard />);
+    expect(screen.queryByTestId('home-onboarding')).toBeNull();
   });
 
   it('Given ?reviewWords= from a results card, Then the lesson creator opens with those words', () => {

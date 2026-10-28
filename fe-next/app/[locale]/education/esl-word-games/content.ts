@@ -364,18 +364,18 @@ const content: Record<EducationLocale, LocaleContent> = {
     ],
   },
   es: {
-    metaTitle: 'ESL Word Games para el aula — en vivo | LexiClash',
-    metaDescription: 'ESL word games para toda la clase: código al móvil, tablero en el proyector, sin cuentas ni descargas. Nivel por alumno y 6 idiomas.',
-    ogTitle: 'ESL Word Games para el aula',
-    ogDescription: 'ESL word games para toda la clase: código al móvil, tablero en el proyector, nivel por alumno. Gratis, sin cuentas.',
-    twitterDescription: 'ESL word games para el aula: código, proyector, nivel por alumno. Gratis.',
+    metaTitle: 'Juegos de palabras en inglés para el aula | LexiClash',
+    metaDescription: 'Juegos de vocabulario en inglés para toda la clase: los alumnos entran con un código desde el móvil, sin cuenta, y el tablero va al proyector. Gratis.',
+    ogTitle: 'Juegos de palabras en inglés para el aula',
+    ogDescription: 'Juegos de vocabulario en inglés para toda la clase: código al móvil, tablero en el proyector, nivel por alumno. Gratis.',
+    twitterDescription: 'Juegos de palabras en inglés para el aula: código, proyector, nivel por alumno. Gratis.',
     heroTag: '★ Inglés ESL/EFL ★ Gratis Siempre ★',
     heroH1: {
       highlight: 'Juegos de palabras en inglés',
       rest1: 'para el',
       rest2: 'aula.',
     },
-    heroSubtitle: 'Juegos de palabras en inglés dirigidos por la docente. Tú eliges la lista y el modo, la clase entra desde el móvil y el proyector muestra el tablero. Seis diccionarios, sin cuentas de estudiante y un nivel por estudiante para un aula de niveles mixtos.',
+    heroSubtitle: 'Juegos de palabras en inglés dirigidos por la docente. Tú eliges la lista y el modo, la clase entra desde el móvil y el proyector muestra el tablero. Seis diccionarios, sin cuentas de estudiante y un nivel por estudiante para un aula de niveles mixtos. Para empezar, pulsa «Iniciar juego de inglés» y proyecta el código: una ronda para toda la clase dura 5 minutos.',
     ctaLabel: 'Crear Aula Gratis',
     heroCtas: {
       primary: '▶ Iniciar juego de inglés',
@@ -481,7 +481,7 @@ const content: Record<EducationLocale, LocaleContent> = {
     faqs: [
       {
         q: '¿Cuáles son los mejores juegos para ESL/EFL?',
-        a: 'LexiClash ofrece juegos en vivo: Boggle rápido, Word Wheel para vocabulario, Word Hunt para búsqueda. Todos en tiempo real contra compañeros o IA — competitivo y divertido.',
+        a: 'LexiClash ofrece juegos en vivo: Boggle rápido, Word Wheel para vocabulario, Word Hunt para búsqueda. Todos en tiempo real contra compañeros o IA — competitivo y divertido. Para probarlo, abre lexiclash.live/es/education/classroom-game y proyecta el tablero.',
       },
       {
         q: '¿Necesitan cuenta?',

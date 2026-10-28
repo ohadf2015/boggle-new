@@ -6,9 +6,6 @@ import { useDictionaryCache } from '@/hooks/useDictionaryCache';
 import { generateTileStates } from '../utils/blastTileGeneration';
 import { guaranteeObjectiveTiles } from '../utils/blastObjectiveGuarantee';
 import { processTilesForWord } from '../utils/clearTilesProcessor';
-import { applyVortexLetterSwaps } from '../utils/blastLetterSwaps';
-import { applyBetweenTurnEffects } from '../utils/blastTileEffects';
-import { computeThawedCells } from './blastCellFilterLogic';
 import { computeGravityResult, type GravityResult } from '../utils/blastGravity';
 import type { SpecialCombo } from '../utils/blastCombos';
 import { hasValidWords } from '../utils/blastDeadEndDetector';
@@ -57,8 +54,8 @@ export interface WordSubmitResult {
   clearedTiles: Array<{ row: number; col: number; type: BlastTileType }>;
   explosions: Array<{ row: number; col: number; type: string }>;
   bonusMoves: number;
-  /** Countdown tiles that exploded this turn (penalty applied) */
-  countdownExplosions: Array<{ row: number; col: number }>;
+  diamondsCollected: number;
+  diamondsSpawned: Array<{ row: number; col: number }>;
 }
 
 export interface CascadeResult {
@@ -177,7 +174,7 @@ export function useBlastEngine(
   // Tile states
   const [tileStates, setTileStates] = useState<BlastTileState[][]>(() => {
     if (options?.initialTileStates) return options.initialTileStates;
-    const tiles = generateTileStates(gridSize, specialTileChance, Date.now(), customDistribution, currentWave);
+    const tiles = generateTileStates(gridSize, specialTileChance, Date.now(), customDistribution);
     return options?.waveObjectives ? guaranteeObjectiveTiles(tiles, options.waveObjectives) : tiles;
   });
 
@@ -208,7 +205,7 @@ export function useBlastEngine(
     totalMoves: movesAllowed === Infinity ? Infinity : movesAllowed,
     bonusMoveScore: 0,
     tileTypeClears: {} as Record<BlastTileType, number>,
-    diamondRevealTurns: 0,
+    diamondsCollected: 0,
   });
 
   const gameStateRef = useRef(gameState);
@@ -329,64 +326,12 @@ export function useBlastEngine(
       submitRng = createSeededRandom(blastSeedRef.current + validMovesRef.current);
     }
     const result = processTilesForWord({ prev: currentTiles, path, word, baseScore, gridSize, currentWave, rng: submitRng });
-    const { next, totalScore, newlyClearedCount, clearedTypeCounts, explosions: newExplosions, vortexLetterSwaps, detectedCombos, bonusMoveCount, diamondRevealTurns: newDiamondReveal, shuffleTriggered } = result;
+    const { next, totalScore, newlyClearedCount, clearedTypeCounts, explosions: newExplosions, detectedCombos, bonusMoveCount, diamondsCollected, diamondsSpawned } = result;
 
     if (word.length > bestWordRef.current.length) bestWordRef.current = word;
 
-    // Apply vortex letter swaps to grid (shared with the authoritative server
-    // via applyVortexLetterSwaps so both sides swap identically).
-    if (vortexLetterSwaps.length > 0) {
-      const baseGrid = effectiveGridRef.current;
-      if (baseGrid) {
-        const swappedGrid = applyVortexLetterSwaps(baseGrid, vortexLetterSwaps);
-        setCurrentGrid(swappedGrid);
-        effectiveGridRef.current = swappedGrid;
-      }
-    }
-
-    // Shuffle tile effect: Fisher-Yates rearrange all uncleared letters
-    if (shuffleTriggered) {
-      const baseGrid = effectiveGridRef.current;
-      if (baseGrid) {
-        const shuffledGrid = baseGrid.map(row => [...row]);
-        const positions: Array<{ r: number; c: number }> = [];
-        for (let r = 0; r < gridSize; r++) {
-          for (let c = 0; c < gridSize; c++) {
-            if (!next[r][c].isCleared && !path.some(p => p.row === r && p.col === c)) {
-              positions.push({ r, c });
-            }
-          }
-        }
-        const letters = positions.map(p => shuffledGrid[p.r][p.c]);
-        for (let i = letters.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [letters[i], letters[j]] = [letters[j], letters[i]];
-        }
-        for (let i = 0; i < positions.length; i++) {
-          shuffledGrid[positions[i].r][positions[i].c] = letters[i];
-        }
-        setCurrentGrid(shuffledGrid);
-        effectiveGridRef.current = shuffledGrid;
-      }
-    }
-
-    // Thaw ice/frozen tiles adjacent to the word path
-    const thawedCells = computeThawedCells(next, path);
-    const tilesAfterThaw = thawedCells.length > 0
-      ? next.map(row => row.map(tile => {
-          if (thawedCells.some(c => c.row === tile.row && c.col === tile.col)) {
-            return { ...tile, isThawed: true };
-          }
-          return tile;
-        }))
-      : next;
-
-    // Between-turn effects: countdown tick
-    const betweenTurn = applyBetweenTurnEffects(tilesAfterThaw, gridSize);
-
-    setTileStates(tilesAfterThaw);
-
-    tileStatesRef.current = tilesAfterThaw;
+    setTileStates(next);
+    tileStatesRef.current = next;
 
     // Commit the grid together with the tile states so committed React state can
     // never LAG the refs. If an earlier cascade's grid commit was skipped (e.g. a
@@ -414,16 +359,13 @@ export function useBlastEngine(
       }
       return {
         ...prev,
-        score: prev.score + totalScore - betweenTurn.penalty,
+        score: prev.score + totalScore,
         wordsFound: [...prev.wordsFound, word],
         tilesCleared: prev.tilesCleared + newlyClearedCount,
         movesRemaining: newMovesRemaining,
         movesUsed: prev.movesUsed + 1,
         tileTypeClears: mergedTypeClears,
-        diamondRevealTurns: Math.max(
-          newDiamondReveal,
-          prev.diamondRevealTurns > 0 ? prev.diamondRevealTurns - 1 : 0,
-        ),
+        diamondsCollected: prev.diamondsCollected + diamondsCollected,
         lastWordColorCounts: colorCounts,
       };
     });
@@ -434,12 +376,13 @@ export function useBlastEngine(
       .map(cell => ({ row: cell.row, col: cell.col, type: next[cell.row][cell.col].type }));
 
     return {
-      score: totalScore - betweenTurn.penalty,
+      score: totalScore,
       combos: detectedCombos,
       clearedTiles,
       explosions: newExplosions.map(e => ({ row: e.row, col: e.col, type: e.type })),
       bonusMoves: bonusMoveCount,
-      countdownExplosions: betweenTurn.countdownExplosions,
+      diamondsCollected,
+      diamondsSpawned,
     };
   }, [gridSize, currentWave, options?.isMultiplayer]);
 
@@ -551,6 +494,8 @@ export function useBlastEngine(
       stars: calculateEarnedStars(gs.tilesCleared, gs.totalTiles, allObjectivesComplete),
       wavesCompleted,
       waveResults,
+      diamondsCollected: gs.diamondsCollected,
+      bombsPopped: gs.tileTypeClears.bomb ?? 0,
     };
   }, []);
 

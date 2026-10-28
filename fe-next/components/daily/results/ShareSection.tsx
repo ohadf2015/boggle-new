@@ -6,7 +6,6 @@
 'use client';
 
 import React, { useRef, useCallback, useState, useEffect } from 'react';
-import { m } from 'framer-motion';
 import { Share2, RotateCcw, Loader2, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CoinBalanceBadge } from '@/components/ui/CoinBalanceBadge';
@@ -70,7 +69,7 @@ function WatchAdRetryButton({
     <Button
       onClick={() => void showAd()}
       disabled={disabled}
-      className="w-full py-3.5 text-lg font-black uppercase border-3 rounded-neo transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] bg-linear-to-r from-amber-400 to-orange-500 text-neo-black border-neo-black shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 disabled:opacity-50"
+      className="w-full py-3.5 text-lg font-black uppercase border-3 rounded-neo transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] bg-neo-orange text-neo-black border-neo-black shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 disabled:opacity-50"
     >
       {busy ? (
         <Loader2 className="me-2 w-5 h-5 animate-spin" />
@@ -119,15 +118,10 @@ export const ShareSection: React.FC<ShareSectionProps> = ({
   }, [canAffordRetry, isRetrying, onRetry, onSpendStart, retryCost]);
 
   return (
-    <m.div
-      initial={{ y: 20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
-      className="space-y-2"
-    >
+    <div className="space-y-2">
       {/* Screenshot share hint */}
-      <div className="text-center mb-3">
-        <span className="text-[11px] text-slate-500 font-medium">
+      <div className="text-center">
+        <span className="text-[11px] text-neo-white/60 font-medium">
           {t('wordHunt.results.screenshotHint')}
         </span>
       </div>
@@ -155,8 +149,8 @@ export const ShareSection: React.FC<ShareSectionProps> = ({
                 className={cn(
                   "w-full py-3.5 text-lg font-black uppercase border-3 rounded-neo transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity]",
                   canAffordRetry && !isRetrying
-                    ? "bg-linear-to-r from-amber-400 to-orange-500 text-neo-black border-neo-black shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5"
-                    : "bg-gray-400 text-gray-600 border-neo-black cursor-not-allowed shadow-hard"
+                    ? "bg-neo-orange text-neo-black border-neo-black shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5"
+                    : "bg-neo-navy text-neo-white/40 border-neo-black cursor-not-allowed shadow-hard"
                 )}
               >
                 {isRetrying ? (
@@ -168,7 +162,7 @@ export const ShareSection: React.FC<ShareSectionProps> = ({
                 <span className="ms-2 text-sm opacity-70">({retryCost}🪙)</span>
               </Button>
               {!canAffordRetry && (
-                <p className="text-xs text-center text-red-400 font-bold">
+                <p className="text-xs text-center text-neo-red font-bold">
                   {t('wordHunt.results.earnMoreHint')}
                 </p>
               )}
@@ -177,7 +171,7 @@ export const ShareSection: React.FC<ShareSectionProps> = ({
           <Button
             onClick={onShare}
             variant="ghost"
-            className="w-full py-2 text-sm font-medium uppercase text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 border-2 border-gray-300 dark:border-gray-600 rounded-neo"
+            className="w-full py-2 text-sm font-medium uppercase text-neo-white/70 hover:text-neo-white border-2 border-neo-white/25 rounded-neo"
           >
             <Share2 className="me-1.5 w-4 h-4" />
             {t('wordHunt.results.share')}
@@ -193,7 +187,7 @@ export const ShareSection: React.FC<ShareSectionProps> = ({
           {t('wordHunt.results.challengeFriends')}
         </Button>
       )}
-    </m.div>
+    </div>
   );
 };
 

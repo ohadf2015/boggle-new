@@ -71,6 +71,6 @@ describe('WordWheelResults — compact layout', () => {
 
   it('still shows the words-found performance stat', () => {
     renderResults();
-    expect(screen.getByTestId('word-wheel-words-stat')).toBeInTheDocument();
+    expect(screen.getAllByTestId('daily-results-stat')[0].textContent).toContain('wordWheel.results.wordsFound');
   });
 });

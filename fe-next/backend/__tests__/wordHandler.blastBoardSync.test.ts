@@ -131,7 +131,7 @@ vi.mock('../services/gracePeriodLock', () => ({
 const SENTINEL_GRID = [['Q','Z'],['X','Y']];
 
 vi.mock('@/components/blast/legacy/utils/clearTilesProcessor', () => ({
-  processTilesForWord: vi.fn(() => ({ next: [[{},{}],[{},{}]], newlyClearedCount: 1 })),
+  processTilesForWord: vi.fn(() => ({ next: [[{},{}],[{},{}]], newlyClearedCount: 1, clearedTypeCounts: {}, diamondsCollected: 0 })),
 }));
 
 vi.mock('@/components/blast/legacy/utils/blastGravity', () => ({
@@ -154,7 +154,8 @@ vi.mock('../modules/wordValidator', () => ({
 vi.mock('../modules/blastModeManager', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../modules/blastModeManager')>()),
   calculateBlastTileBonus: vi.fn().mockReturnValue(10),
-  getTilesOnPath: vi.fn().mockReturnValue(['gold', 'standard']),
+  getTilesOnBoardPath: vi.fn().mockReturnValue(['gold', 'standard']),
+  recordBlastCollection: vi.fn(() => 0),
   recordBlastMove: vi.fn().mockReturnValue({ movesUsed: 1, bonusMove: false }),
 }));
 
@@ -257,25 +258,5 @@ describe('wordHandler - Blast board sync', () => {
     // tiles only repopulate when the whole board is cleared, never per-word.
     const refillArg = (computeGravityResult as Mock).mock.calls[0][8];
     expect(refillArg).toBe(false);
-  });
-
-  it('applies vortex/magnet letter swaps to the grid BEFORE gravity so the board the next word validates against matches what the player sees', async () => {
-    const game = makeBlastGame();
-    game.blastModeState.grid = [['A', 'B'], ['C', 'D']];
-    (getGame as Mock).mockReturnValue(game);
-
-    // A vortex pull swaps A (0,0) with D (1,1).
-    (processTilesForWord as Mock).mockReturnValueOnce({
-      next: [[{}, {}], [{}, {}]],
-      newlyClearedCount: 1,
-      vortexLetterSwaps: [{ fromR: 0, fromC: 0, toR: 1, toC: 1 }],
-    });
-
-    await handlers['submitWord']({ word: 'test', comboType: null });
-
-    // Gravity must run on the SWAPPED grid (A and D exchanged), not the stale one.
-    expect(computeGravityResult as Mock).toHaveBeenCalled();
-    const gridPassedToGravity = (computeGravityResult as Mock).mock.calls[0][0];
-    expect(gridPassedToGravity).toEqual([['D', 'B'], ['C', 'A']]);
   });
 });

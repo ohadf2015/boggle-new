@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { AnimatePresence, m } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
@@ -11,6 +10,8 @@ import { buildQuitDialogConfig } from './survival/quitDialogConfig';
 import logger from '@/utils/logger';
 import WordWheelGame, { type WordWheelGameResult } from './WordWheelGame';
 import WordWheelBoardEntrance from './wheel/WordWheelBoardEntrance';
+import WheelTimeUpStamp, { shouldPlayFinishBeat } from './wheel/WheelTimeUpStamp';
+import { DailyFlowChrome } from './flow/DailyFlowChrome';
 import { useWordWheelLoad } from './wheel/useWordWheelLoad';
 import { submitWordWheelDailyResult } from './wheel/submitWordWheelDailyResult';
 import WordWheelResults from './WordWheelResults';
@@ -76,6 +77,8 @@ const WordWheelChallenge: React.FC = () => {
   const dateParam = searchParams.get('date');
   const catchupDate = dateParam && isCatchUpDate(getDailyChallengeDate(), dateParam) ? dateParam : null;
   const isCatchup = !!catchupDate;
+  // First-game bridge: one tap from MP results should land in the game, not a ready card.
+  const bridgeStart = searchParams.get('start') === '1';
 
   /**
    * Bumped once the submit POST lands, to remount the results leaderboard.
@@ -88,6 +91,7 @@ const WordWheelChallenge: React.FC = () => {
   const [canvasSize, setCanvasSize] = useState({ width: 400, height: 600 });
   const [guestFingerprint, setGuestFingerprint] = useState<string | null>(null);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
+  const [finishing, setFinishing] = useState(false);
 
   // Catch-up ad gate — mirrors DailyChallenge pattern. Per-date unlock so a
   // single ad watch covers the whole session for that date.
@@ -106,6 +110,7 @@ const WordWheelChallenge: React.FC = () => {
     setGameActive,
     catchupAdUnlockedRef,
     preloadForPlay: loadEffectsCanvas,
+    autoStart: bridgeStart,
   });
 
   // Mid-game exit. The Word Wheel had no exit affordance at all — the player
@@ -162,17 +167,8 @@ const WordWheelChallenge: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const sizeObserverRef = useRef<ResizeObserver | null>(null);
 
-  // Measure the stage for the Pixi effects canvas.
-  //
-  // This used to be a `useEffect([])` reading `containerRef.current`. That
-  // effect runs while the component is still in its `loading` early-return
-  // branch — a DIFFERENT element that never carries this ref — so the ref was
-  // null, the measurement silently no-opped, and nothing re-measured once the
-  // stage mounted. The canvas stayed at its 400×600 seed pinned to the stage's
-  // top-left, so every effect spawned at wheel coordinates fell outside it and
-  // no bubbles/particles were ever visible (measured: 1440×813 stage, 400×600
-  // canvas). A callback ref fires when the node actually mounts, and the
-  // observer keeps it correct across resize/orientation changes.
+  // Callback ref, not useEffect([]): the stage mounts after the loading branch, so a mount-time
+  // read of the ref was null and the Pixi canvas stayed at its 400x600 seed (effects off-stage).
   const attachContainer = useCallback((node: HTMLDivElement | null) => {
     containerRef.current = node;
     sizeObserverRef.current?.disconnect();
@@ -303,7 +299,9 @@ const WordWheelChallenge: React.FC = () => {
       onSettled: () => setLeaderboardKey(k => k + 1),
     });
 
-    setPhase('completed');
+    // Results wait for the buzzer beat; the run is already saved above.
+    if (shouldPlayFinishBeat(result.timeSeconds)) setFinishing(true);
+    else setPhase('completed');
   }, [language, puzzle, puzzleNumber, setGameActive, setGameResult, setPhase, isAuthenticated, profile, isPractice, catchupDate, isCatchup, guestFingerprint]);
 
   // Practice dead-end fix: results screen offers "spin another wheel" — fresh
@@ -315,6 +313,11 @@ const WordWheelChallenge: React.FC = () => {
     setGameResult(null);
     setPhase('ready');
   }, [language, setPuzzle, setGameResult, setPhase]);
+
+  const finishBeatDone = useCallback(() => {
+    setFinishing(false);
+    setPhase('completed');
+  }, [setPhase]);
 
   const handleEffect = useCallback((effect: WordWheelEffect) => {
     setEffects(prev => [...prev, effect]);
@@ -334,7 +337,12 @@ const WordWheelChallenge: React.FC = () => {
         className="flex-1 flex items-center justify-center bg-neo-navy"
         style={{ background: STAGE_AMBIENT_BG }}
       >
-        <PageLoader size="lg" text={t('wordWheel.loading')} />
+        {/* SSR renders this phase with the full catalogue, but /daily/* hydrates on
+            the slim landing subset (heavy game path). `wordWheel.*` is not in that
+            subset, so the client painted the raw key and React threw #418 whenever
+            the full-catalogue upgrade lost the race with this chunk. `daily.*` is
+            in the subset, so server and client agree. */}
+        <PageLoader size="lg" text={t('daily.loadingWordWheel')} />
       </div>
     );
   }
@@ -377,101 +385,102 @@ const WordWheelChallenge: React.FC = () => {
         />
       )}
 
-      <AnimatePresence mode="wait">
-        {/* Ready screen. Static appear: an opacity tween on this full-screen layer flashes on mobile. */}
-        {phase === 'ready' && puzzle && (
-          <m.div key="ready" className="flex-1 flex min-h-0" exit={{ opacity: 0 }}>
-            <WordWheelReadyCard
-              t={t}
-              centerLetter={puzzle.centerLetter}
-              outerLetters={puzzle.outerLetters}
-              puzzleNumber={puzzleNumber}
-              streakDays={isPractice ? 0 : getDailyStreak().currentStreak}
-              onPlay={handleStart}
-              wide={isDesktop || isTv}
-            >
-              <ReadyLeaderboardPeek t={t} defaultOpen={isDesktop || isTv}>
-                <TabbedDailyLeaderboard
-                  puzzleDate={catchupDate || getDailyChallengeDate()}
-                  language={language as Language}
-                  currentPlayerId={isAuthenticated && profile ? profile.id : null}
-                  currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
-                  scope="word-wheel"
-                  defaultTab="today"
-                  t={t}
-                  maxVisible={5}
-                  compact
-                />
-              </ReadyLeaderboardPeek>
-            </WordWheelReadyCard>
-          </m.div>
-        )}
+      {!isPractice && phase !== 'playing' && <DailyFlowChrome modeId="word-wheel" intro={false} inline />}
 
-        {/* Playing */}
-        {phase === 'playing' && isPractice && (
-          <div className="absolute top-3 right-3 z-30 pointer-events-none">
-            <PracticeBadge />
-          </div>
-        )}
-        {phase === 'playing' && puzzle && (
-          <WordWheelBoardEntrance
-            key="playing"
-            // No pb-bottom-stack: body.screen-fit-locked already reserves
-            // --bottom-stack-height for this screen, and padding is additive.
-            className="flex-1 flex flex-col items-center justify-start pt-3 sm:pt-4 shell:items-stretch shell:pt-0 shell:overflow-hidden relative z-20 overflow-y-auto overscroll-contain"
+      {/* Phases swap with no exit tween: an opacity fade on these full-screen layers flashes on mobile,
+          and the buzzer beat (WheelTimeUpStamp) already marks the play → results hand-off. */}
+      {phase === 'ready' && puzzle && (
+        <div className="flex-1 flex min-h-0">
+          <WordWheelReadyCard
+            t={t}
+            isPractice={isPractice}
+            autoShowHowTo={!isPractice && getDailyStreak().totalDailiesCompleted === 0}
+            centerLetter={puzzle.centerLetter}
+            outerLetters={puzzle.outerLetters}
+            puzzleNumber={puzzleNumber}
+            streakDays={isPractice ? 0 : getDailyStreak().currentStreak}
+            onPlay={handleStart}
+            wide={isDesktop || isTv}
           >
-            {(entranceDone) => (
-              <WordWheelGame
-                puzzle={puzzle}
-                duration={WORD_WHEEL_DURATION}
-                onComplete={handleComplete}
-                onValidateWord={handleValidateWord}
-                onQuickVerdict={handleQuickVerdict}
-                onEffect={handleEffect}
-                language={language}
-                paused={!entranceDone}
-                practice={isPractice}
+            <ReadyLeaderboardPeek t={t} defaultOpen={isDesktop || isTv}>
+              <TabbedDailyLeaderboard
                 puzzleDate={catchupDate || getDailyChallengeDate()}
+                language={language as Language}
                 currentPlayerId={isAuthenticated && profile ? profile.id : null}
                 currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
-                onExit={handleExitClick}
+                scope="word-wheel"
+                defaultTab="today"
+                t={t}
+                maxVisible={5}
+                compact
               />
-            )}
-          </WordWheelBoardEntrance>
-        )}
+            </ReadyLeaderboardPeek>
+          </WordWheelReadyCard>
+        </div>
+      )}
 
-        {/* Completed / Already Played.
-            The wrapper owns its scrollport (mirroring the ready/playing phases
-            above): the stage root is `overflow-hidden`, so without this the
-            recap had nowhere to scroll and the sticky primary CTA would have
-            had no scrollport to pin to. `justify-start`, not `justify-center`
-            — a centred flex column whose content overflows clips at BOTH ends
-            and can't be scrolled back to the top. */}
-        {(phase === 'completed' || phase === 'already-played') && gameResult && (
-          <m.div
-            key="results"
-            className="flex-1 min-h-0 flex flex-col items-center justify-start overflow-y-auto overscroll-contain pb-bottom-stack"
-            exit={{ opacity: 0 }}
-          >
-            <WordWheelResults
-              result={gameResult}
-              puzzleNumber={puzzleNumber}
+      {phase === 'playing' && isPractice && (
+        <div className="absolute top-3 right-3 z-30 pointer-events-none">
+          <PracticeBadge />
+        </div>
+      )}
+      {phase === 'playing' && puzzle && (
+        <WordWheelBoardEntrance
+          settled={finishing}
+          // No pb-bottom-stack: body.screen-fit-locked already reserves
+          // --bottom-stack-height for this screen, and padding is additive.
+          className="flex-1 flex flex-col items-center justify-start pt-3 sm:pt-4 shell:items-stretch shell:pt-0 shell:overflow-hidden relative z-20 overflow-y-auto overscroll-contain"
+        >
+          {(entranceDone) => (
+            <WordWheelGame
+              puzzle={puzzle}
+              duration={WORD_WHEEL_DURATION}
+              onComplete={handleComplete}
+              onValidateWord={handleValidateWord}
+              onQuickVerdict={handleQuickVerdict}
+              onEffect={handleEffect}
+              language={language}
+              paused={!entranceDone}
+              practice={isPractice}
               puzzleDate={catchupDate || getDailyChallengeDate()}
-              language={language as Language}
-              hasPlayedWordHunt={hasPlayedWH}
               currentPlayerId={isAuthenticated && profile ? profile.id : null}
               currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
-              isAuthenticated={isAuthenticated}
-              streakDays={getDailyStreak().currentStreak}
-              isFirstCompletion={getDailyStreak().totalDailiesCompleted <= 1}
-              alreadyPlayed={phase === 'already-played'}
-              isCatchup={isCatchup}
-              leaderboardKey={leaderboardKey}
-              onPracticeAgain={isPractice ? handlePracticeAgain : undefined}
+              onExit={handleExitClick}
             />
-          </m.div>
-        )}
-      </AnimatePresence>
+          )}
+        </WordWheelBoardEntrance>
+      )}
+      {finishing && gameResult && (
+        <WheelTimeUpStamp wordsFound={gameResult.wordsFound.length} onDone={finishBeatDone} />
+      )}
+
+      {/* Completed / Already Played.
+          The wrapper owns its scrollport (mirroring the ready/playing phases
+          above): the stage root is `overflow-hidden`, so without this the
+          recap had nowhere to scroll and the sticky primary CTA would have
+          had no scrollport to pin to. `justify-start`, not `justify-center`
+          — a centred flex column whose content overflows clips at BOTH ends
+          and can't be scrolled back to the top. */}
+      {(phase === 'completed' || phase === 'already-played') && gameResult && (
+        <div className="flex-1 min-h-0 flex flex-col items-center justify-start overflow-y-auto overscroll-contain pb-bottom-stack">
+          <WordWheelResults
+            result={gameResult}
+            puzzleNumber={puzzleNumber}
+            puzzleDate={catchupDate || getDailyChallengeDate()}
+            language={language as Language}
+            hasPlayedWordHunt={hasPlayedWH}
+            currentPlayerId={isAuthenticated && profile ? profile.id : null}
+            currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
+            isAuthenticated={isAuthenticated}
+            streakDays={getDailyStreak().currentStreak}
+            isFirstCompletion={getDailyStreak().totalDailiesCompleted <= 1}
+            alreadyPlayed={phase === 'already-played'}
+            isCatchup={isCatchup}
+            leaderboardKey={leaderboardKey}
+            onPracticeAgain={isPractice ? handlePracticeAgain : undefined}
+          />
+        </div>
+      )}
 
       {/* Mid-game exit confirmation. Rendered at the stage root (outside the
           phase branches) so it overlays the wheel; strings come from the shared

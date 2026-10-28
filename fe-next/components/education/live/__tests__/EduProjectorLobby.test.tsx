@@ -65,7 +65,7 @@ describe('EduProjectorLobby', () => {
     const start = screen.getByTestId('edu-lobby-start');
     expect(start).toBeEnabled();
     expect(start).toHaveAttribute('data-ready', 'true');
-    expect(screen.getByTestId('edu-lobby-start-count')).toHaveTextContent('1');
+    expect(screen.queryByTestId('edu-lobby-start-count')).toBeNull();
     expect(screen.queryByTestId('edu-lobby-start-reason')).toBeNull();
     fireEvent.click(start);
     expect(base.onStartGame).toHaveBeenCalledTimes(1);
@@ -84,7 +84,7 @@ describe('EduProjectorLobby', () => {
     render(<EduProjectorLobby {...base} students={[{ username: 'Noa' }]} />);
     const qr = screen.getByTestId('join-qr');
     expect(qr.parentElement?.className).toMatch(/shrink-0/);
-    expect(qr.getAttribute('class')).toMatch(/md:size-\[min\(11vw,/);
+    expect(qr.getAttribute('class')).toMatch(/md:size-\[min\(\d+vw,\d+vh\)\]/);
     expect(screen.getByTestId('edu-join-card').parentElement?.className).toMatch(/min-h-0|md:self-start/);
     const grid = screen.getByTestId('edu-join-card').parentElement?.parentElement as HTMLElement;
     expect(grid.className).toMatch(/grid-rows-\[auto_minmax\(min-content,1fr\)_auto\]/);

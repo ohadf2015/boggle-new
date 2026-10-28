@@ -198,6 +198,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/substitute-teacher-word-games",
   "/swedish-multiplayer-word-game",
   "/teacher",
+  "/teacher/class-ready",
   "/teacher/classroom",
   "/teacher/classroom/new",
   "/teacher/curriculum",

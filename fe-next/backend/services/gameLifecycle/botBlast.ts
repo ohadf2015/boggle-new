@@ -14,8 +14,9 @@ import type { Language, BlastModeState } from '@/shared/types/game';
 import type { Bot } from '../../modules/botBehavior';
 import { getGame } from '../../modules/gameStateManager';
 import {
-  getTilesOnPath,
+  getTilesOnBoardPath,
   recordBlastMove,
+  recordBlastCollection,
   getWordPath,
   getOrInitPlayerBoard,
   cascadeBlastWord,
@@ -30,6 +31,7 @@ import { ensureLanguageLoaded } from '../../dictionary';
 import logger from '../../utils/logger';
 import {
   activateBot,
+  creditBotBonus,
   playBotWord,
   runWordBot,
   type BotPlayRules,
@@ -61,15 +63,22 @@ function blastRules(state: BlastModeState): BotPlayRules {
       if (!solveBotBoard(state, bot, ctx.language).includes(word.toLowerCase())) return null;
 
       const positions = makePositionsMap(board.grid, ctx.language);
-      const tilesOnPath = getTilesOnPath(word, positions, board.overlay, board.overlayMap);
+      const path = getWordPath(word, positions);
+      const tilesOnPath = getTilesOnBoardPath(board.tileStates, path);
       const scored = scoreAcceptedWord({ word, comboLevel: bot.comboLevel || 0, blastTiles: tilesOnPath });
       return {
         wordScore: scored.total,
         commit: () => {
-          const gemCount = tilesOnPath.filter((t) => t === 'gem').length;
-          recordBlastMove(state, bot.username, bot.comboLevel || 0, word, tilesOnPath.length, gemCount, scored.blastTileBonus);
+          recordBlastMove(state, bot.username, bot.comboLevel || 0, word, tilesOnPath.length, scored.blastTileBonus);
           // Mutate the bot's OWN board. No broadcast: no client renders a bot's board.
-          const { clearedCount } = cascadeBlastWord(board, getWordPath(word, positions), word, state.wave ?? 1, ctx.language);
+          const cascade = cascadeBlastWord(board, path, word, state.wave ?? 1, ctx.language);
+          const collectionPoints = recordBlastCollection(state, bot.username, {
+            coins: cascade.coinsCollected,
+            diamonds: cascade.diamondsCollected,
+            bombs: cascade.bombsPopped,
+          });
+          creditBotBonus(ctx, bot, collectionPoints);
+          const { clearedCount } = cascade;
           const game = getGame(ctx.gameCode);
           if (game) {
             regenerateBlastBoardIfExhausted({

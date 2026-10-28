@@ -7,7 +7,6 @@
  */
 
 import type { BlastTileState, BlastObjective, BlastTileType } from '../types';
-import { getInitialHitsRemaining } from './blastTileUtils';
 
 /**
  * Minimum fraction of tiles that must remain 'standard' after objective placement.
@@ -41,13 +40,10 @@ export function guaranteeObjectiveTiles(
   const requirements = new Map<BlastTileType, number>();
 
   for (const obj of objectives) {
-    if (obj.type === 'collect_type' && obj.tileType) {
+    // Diamonds are earned by rare words, never placed on the board up front.
+    if (obj.type === 'collect_type' && obj.tileType && obj.tileType !== 'diamond') {
       const current = requirements.get(obj.tileType) || 0;
       requirements.set(obj.tileType, Math.max(current, obj.target));
-    } else if (obj.type === 'clear_all_type' && obj.tileType) {
-      // Need at least 1 tile so the objective is meaningful
-      const current = requirements.get(obj.tileType) || 0;
-      requirements.set(obj.tileType, Math.max(current, 1));
     }
   }
 
@@ -104,7 +100,7 @@ export function guaranteeObjectiveTiles(
       const pos = standardPositions[totalPlaced++];
       const tile = result[pos.row][pos.col];
       tile.type = tileType;
-      tile.hitsRemaining = getInitialHitsRemaining(tileType);
+      tile.hitsRemaining = 0;
     }
   }
 

@@ -5,11 +5,15 @@ export type HomeOnboardingStatus = 'done' | 'current' | 'todo';
 
 export interface HomeOnboardingInput {
   classroomCount: number;
+  /** Students across all classes: anyone joined means the code was shared, whatever the copy flag says. */
+  studentCount?: number;
   inviteCopied: boolean;
   /** A real 2+ player round completed (server-stamped). */
   liveStarted: boolean;
   /** The teacher opened a live room; false/undefined when unknown. */
   roomOpened?: boolean;
+  /** Live games in the recent activity window: real play history proves the demo step, whatever the flag says. */
+  gamesPlayed?: number;
   dismissed: boolean;
 }
 
@@ -29,10 +33,11 @@ export interface HomeOnboarding {
 }
 
 export function homeOnboarding(input: HomeOnboardingInput): HomeOnboarding {
+  const played = input.liveStarted || (input.gamesPlayed ?? 0) > 0;
   const done: Record<HomeOnboardingStepId, boolean> = {
     createClass: input.classroomCount > 0,
-    shareCode: input.classroomCount > 0 && input.inviteCopied,
-    tryDemo: input.classroomCount > 0 && input.liveStarted,
+    shareCode: input.classroomCount > 0 && (input.inviteCopied || (input.studentCount ?? 0) > 0),
+    tryDemo: input.classroomCount > 0 && played,
   };
   const order: HomeOnboardingStepId[] = ['createClass', 'shareCode', 'tryDemo'];
   const current = order.find((id) => !done[id]) ?? null;
@@ -50,6 +55,6 @@ export function homeOnboarding(input: HomeOnboardingInput): HomeOnboarding {
     visible: input.classroomCount === 0 || (!complete && !input.dismissed),
     dismissible,
     awaitingPlayers:
-      input.classroomCount > 0 && input.roomOpened === true && !input.liveStarted,
+      input.classroomCount > 0 && input.roomOpened === true && !played,
   };
 }

@@ -49,8 +49,8 @@ interface TvLeaderboardProps {
   t: (path: string, params?: Record<string, string | number>) => string;
 }
 
-/** Rows that fit the projector's half-panel at 1920×1080 with no scroll. */
-const CLASSROOM_TOP_N = 8;
+/** Two columns of eight on a wide wall; the row fit trims it to what the panel holds. */
+const CLASSROOM_TOP_N = 16;
 
 // Virtual item height for performance
 const ITEM_HEIGHT = 80;

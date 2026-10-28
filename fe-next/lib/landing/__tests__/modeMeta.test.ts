@@ -6,7 +6,7 @@
  * (route changed control-side, not mirrored here) forces a conscious update.
  */
 import { describe, it, expect } from 'vitest';
-import { MODE_META, modeRoute, CUBE_VARIANTS, isCalmMode } from '../modeMeta';
+import { MODE_META, modeRoute, CUBE_VARIANTS, isCalmMode, modeGroup, groupModes, MODE_GROUPS } from '../modeMeta';
 
 describe('MODE_META — parity with control renderCard', () => {
   // [key, route-suffix, variant] mirrored from LandingChallengeCards.renderCard
@@ -119,5 +119,23 @@ describe('MODE_META — parity with control renderCard', () => {
       it('false for a fast mode', () => expect(isCalmMode('arena')).toBe(false));
       it('false for an unknown key (no throw)', () => expect(isCalmMode('nope')).toBe(false));
     });
+  });
+});
+
+describe('modeGroup: home sections by player intent', () => {
+  it('puts the live race in "together"', () => expect(modeGroup('arena')).toBe('together'));
+  it.each(['adventure', 'wordTowerV2', 'brainGym', 'blast'])('%s is a solo run', (k) => expect(modeGroup(k)).toBe('solo'));
+  it.each(['connections', 'crossword', 'wordCraft'])('%s is untimed, so "think"', (k) => expect(modeGroup(k)).toBe('think'));
+  it.each(['wordfall', 'quickPlay', 'nope'])('%s lands in previews', (k) => expect(modeGroup(k)).toBe('preview'));
+
+  it('every MODE_META key resolves to a known group', () => {
+    for (const key of Object.keys(MODE_META)) expect(MODE_GROUPS).toContain(modeGroup(key));
+  });
+
+  it('groupModes keeps incoming order inside a group and drops empty groups', () => {
+    const m = (key: string) => ({ key }) as never;
+    const out = groupModes([m('crossword'), m('arena'), m('blast'), m('adventure')]);
+    expect(out.map((g) => g.group)).toEqual(['together', 'solo', 'think']);
+    expect(out[1].models.map((x: { key: string }) => x.key)).toEqual(['blast', 'adventure']);
   });
 });

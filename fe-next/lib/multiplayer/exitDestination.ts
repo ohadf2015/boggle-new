@@ -18,6 +18,7 @@
  */
 import { classroomStudentHomePath, type ClassroomContext } from '@/lib/education/classroomRoomGone';
 import { isClassroomLivePathname } from '@/lib/education/classroomLivePath';
+import { wordWheelBridgeHref } from '@/lib/retention/firstGameBridge';
 
 export interface MultiplayerExitParams {
   /** The room was opened with `?classroom=true`. */
@@ -70,6 +71,8 @@ export const MP_EXIT_REASONS = [
   'host-left',
   'error',
   'continue-solo',
+  // First-session results bridge: leave the room, then today's Word Wheel.
+  'first-game-bridge',
 ] as const;
 export type MpExitReason = (typeof MP_EXIT_REASONS)[number];
 
@@ -94,13 +97,16 @@ export function isInAppPreviousPath(path: string | null | undefined): path is st
  * Where an exit goes. Classroom rooms go to their hub (same rule as
  * `multiplayerExitDestination`). In-room reasons reset to the MP entry. Only
  * `back-from-entry` leaves the section: to the previous in-app route, else the
- * locale root. Arcade `continue-solo` hands off to singleplayer.
+ * locale root. Arcade `continue-solo` hands off to singleplayer. Arcade
+ * `first-game-bridge` hands off to today's Word Wheel (no ready card). A
+ * classroom room still goes to its hub — the check above this branch wins.
  */
 export function mpExit(reason: MpExitReason, ctx: MpExitContext): MpExitAction {
   const locale = ctx.locale || 'en';
   const classroom = multiplayerExitDestination(ctx);
   if (classroom) return { kind: 'navigate', href: classroom };
   if (reason === 'continue-solo') return { kind: 'navigate', href: `/${locale}/singleplayer?mpHandoff=1` };
+  if (reason === 'first-game-bridge') return { kind: 'navigate', href: wordWheelBridgeHref(locale) };
   if (reason === 'back-from-entry') {
     return { kind: 'navigate', href: isInAppPreviousPath(ctx.previousPath) ? ctx.previousPath : `/${locale}` };
   }

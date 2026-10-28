@@ -12,9 +12,18 @@ import { accessTrialExpiryAny } from '@/lib/education/accessTrialServer';
 import { polarTrialPlan } from '@/lib/education/pro/accessTrialCheckout';
 import { buildCheckoutTrafficTags } from '@/lib/education/checkoutTrafficTags';
 import { CHECKOUT_STARTED_EVENT, checkoutStartedPayload } from '@/lib/education/abandonedCheckout';
-import { buildProCheckoutStartedEvent, buildProTrialStartedEvent, buildCheckoutStartedEvent, buildProCheckoutFailedEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer';
+import {
+  buildProCheckoutStartedEvent,
+  buildProTrialStartedEvent,
+  buildCheckoutStartedEvent,
+  buildCheckoutUrlReachableEvent,
+  buildCheckoutUrlErrorEvent,
+  buildProCheckoutFailedEvent,
+  captureProFunnelServerEvent,
+} from '@/lib/education/proFunnelServer';
 
 const CHECKOUT_START_RECORD_TIMEOUT_MS = 1500;
+const CHECKOUT_PROBE_RECORD_TIMEOUT_MS = 400;
 const TEST_FLAG_LOOKUP_TIMEOUT_MS = 800;
 const ACCESS_TRIAL_LOOKUP_TIMEOUT_MS = 800;
 
@@ -251,8 +260,38 @@ export async function POST(request: NextRequest) {
       // succeeding doesn't mean the hosted checkout page the browser lands
       // on is actually up (sandbox/prod mismatch, Polar outage).
       const probe = await probeCheckoutUrl(checkoutUrl);
-      if (probe && !probe.ok) {
-        captureProFunnelServerEvent(buildProCheckoutFailedEvent(user.id, `checkout_page_${probe.status}`));
+      const probeStatus = probe?.status ?? 0;
+      const probeEventType = probe?.ok ? 'checkout_url_reachable' : 'checkout_url_error';
+      const probePayload: Record<string, unknown> = {
+        http_status: probeStatus,
+        status: probeStatus,
+        mode: trial ? 'trial' : 'paid',
+        locale,
+        ...(tags?.client_kind ? { client_kind: tags.client_kind } : {}),
+        ...(typeof tags?.is_test_account === 'boolean'
+          ? { is_test_account: tags.is_test_account, test_reason: tags.test_reason }
+          : {}),
+      };
+      try {
+        await withTimeout(
+          logSubscriptionEvent({
+            userId: user.id,
+            eventType: probeEventType,
+            payload: probePayload,
+          }),
+          CHECKOUT_PROBE_RECORD_TIMEOUT_MS,
+        );
+      } catch (err) {
+        logger.warn('Could not record checkout URL probe:', err);
+      }
+
+      if (probe?.ok) {
+        captureProFunnelServerEvent(buildCheckoutUrlReachableEvent(user.id, probe.status, { ...tags }));
+      } else {
+        captureProFunnelServerEvent(buildCheckoutUrlErrorEvent(user.id, probeStatus, { ...tags }));
+        if (probe && !probe.ok) {
+          captureProFunnelServerEvent(buildProCheckoutFailedEvent(user.id, `checkout_page_${probe.status}`));
+        }
       }
     } catch {
       /* the teacher's checkout url matters more than the funnel */

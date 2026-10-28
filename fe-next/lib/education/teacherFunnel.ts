@@ -94,7 +94,23 @@ export interface TeacherFunnelInput {
   }>;
   memberships: Array<{ classroom_id: string; student_id: string }>;
   assignments: Array<{ teacher_id: string | null }>;
+  checkoutEvents?: CheckoutFunnelEventRow[];
   nowMs: number;
+}
+
+export interface CheckoutFunnelEventRow {
+  user_id: string | null;
+  event_type: string;
+  payload?: Record<string, unknown> | null;
+  created_at?: string | null;
+}
+
+export interface CheckoutFunnelReadout {
+  checkoutStarted: number;
+  checkoutUrlReachable: number;
+  checkoutUrlError: number;
+  checkoutReturnLanded: number;
+  lastErrorStatus: number | null;
 }
 
 /**
@@ -199,6 +215,12 @@ export interface TeacherFunnelResult {
    * API shape, and the panel defaults it rather than white-screening the whole admin page.
    */
   classrooms?: ClassroomRow[];
+  /**
+   * Polar checkout funnel readout from durable `subscription_events`:
+   * separates "Polar checkout URL errored" (`checkoutUrlError`) from
+   * "URL was reachable (`checkoutUrlReachable`) and teacher abandoned vs returned (`checkoutReturnLanded`)".
+   */
+  checkout?: CheckoutFunnelReadout;
   /**
    * Raw row counts for the tables that hold evidence of teaching actually happening,
    * filled in by the route (buildTeacherFunnel is pure and does no IO). null for a table
@@ -377,10 +399,50 @@ export function buildTeacherFunnel(input: TeacherFunnelInput): TeacherFunnelResu
     // Newest first, with undated rows last instead of NaN-comparing into a random position.
     .sort((a, b) => (a.createdAt ? Date.parse(a.createdAt) : -Infinity) < (b.createdAt ? Date.parse(b.createdAt) : -Infinity) ? 1 : -1);
 
+  const realCheckoutEvents = (input.checkoutEvents ?? []).filter((e) => {
+    if (e.user_id && testAccountIds.has(e.user_id)) return false;
+    const p = e.payload ?? undefined;
+    if (p?.is_test_account === true) return false;
+    if (p?.client_kind === 'script') return false;
+    return true;
+  });
+
+  let checkoutStarted = 0;
+  let checkoutUrlReachable = 0;
+  let checkoutUrlError = 0;
+  let checkoutReturnLanded = 0;
+  let lastErrorStatus: number | null = null;
+  let lastErrorAt = -Infinity;
+
+  for (const e of realCheckoutEvents) {
+    if (e.event_type === 'checkout_started') checkoutStarted += 1;
+    else if (e.event_type === 'checkout_url_reachable') checkoutUrlReachable += 1;
+    else if (e.event_type === 'checkout_url_error') {
+      checkoutUrlError += 1;
+      const rawStatus = e.payload?.http_status ?? e.payload?.status;
+      const statusNum = typeof rawStatus === 'number' && Number.isFinite(rawStatus) ? rawStatus : null;
+      const ts = e.created_at ? Date.parse(e.created_at) : 0;
+      const sortKey = Number.isFinite(ts) ? ts : 0;
+      if (statusNum !== null && sortKey >= lastErrorAt) {
+        lastErrorAt = sortKey;
+        lastErrorStatus = statusNum;
+      }
+    } else if (e.event_type === 'checkout_return_landed') {
+      checkoutReturnLanded += 1;
+    }
+  }
+
   return {
     rows,
     reasons: buildReasons(rows),
     classrooms: classroomRows,
+    checkout: {
+      checkoutStarted,
+      checkoutUrlReachable,
+      checkoutUrlError,
+      checkoutReturnLanded,
+      lastErrorStatus,
+    },
     summary: {
       returnedNoClassroom: returned.length,
       returnedNoClassroomTrialActive: returned.filter((r) => r.trialState === 'active').length,

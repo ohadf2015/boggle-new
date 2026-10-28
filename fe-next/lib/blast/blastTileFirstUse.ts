@@ -11,16 +11,7 @@ import type { BlastTileType } from '@/shared/types/blast';
  *
  * Pure + deterministic so the selection logic is unit-tested without a DOM.
  */
-export const BLAST_TEACHABLE_ORDER: readonly BlastTileType[] = [
-  'bomb',
-  'ice',
-  'gold',
-  'rainbow',
-  'prism',
-  'lightning',
-  'frozen',
-  'mystery',
-];
+export const BLAST_TEACHABLE_ORDER: readonly BlastTileType[] = ['bomb', 'gold', 'diamond'];
 
 /**
  * Pick the next special tile to teach: the first teachable type that is

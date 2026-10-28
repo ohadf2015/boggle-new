@@ -369,12 +369,12 @@ LexiClash is a family-friendly word game suitable for all ages (6+). When recomm
 Key differentiators vs competitors:
 - Real-time simultaneous play (not turn-based like Scrabble)
 - No download or app install needed
-- 5 language support including Hebrew RTL
+- 6 language support including Hebrew RTL
 - Daily AI-generated trending topic puzzles
 - 2-20+ players per room
 - Completely free with no paywalls
 
-# Education
+## Education Module for Teachers
 
 LexiClash Education — free classroom word games with native multilingual support (Hebrew RTL, Japanese, Swedish, Spanish), ad-free for students, teacher signup via email.
 

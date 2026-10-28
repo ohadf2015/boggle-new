@@ -139,14 +139,4 @@ describe('detectMatch3Clusters', () => {
     expect(result).toHaveLength(0);
   });
 
-  it('skips frozen tiles', () => {
-    const grid = [
-      ['A', 'A', 'A'],
-    ];
-    const tiles = makeTileStates(1, 3);
-    tiles[0][1].type = 'frozen';
-    const result = detectMatch3Clusters(grid, tiles);
-
-    expect(result).toHaveLength(0);
-  });
 });

@@ -140,9 +140,9 @@ vi.mock('../../../backend/services/gracePeriodLock', () => ({
 
 vi.mock('../../../backend/modules/blastModeManager', () => ({
   validateBlastWordPath: vi.fn().mockReturnValue(null),
-  getTilesOnResolvedPath: vi.fn().mockReturnValue([]),
   calculateBlastTileBonus: vi.fn().mockReturnValue(0),
-  getTilesOnPath: vi.fn().mockReturnValue([]),
+  getTilesOnBoardPath: vi.fn().mockReturnValue([]),
+  recordBlastCollection: vi.fn(() => 0),
   recordBlastMove: vi.fn().mockReturnValue(null),
   getWordPath: vi.fn().mockReturnValue([]),
   isBlastBoardCleared: vi.fn().mockReturnValue(false),
@@ -220,7 +220,7 @@ import { isDictionaryWord, isValidWordCached } from '../../../backend/dictionary
 import { isWordCommunityValid, isWordValidForScoring } from '../../../backend/modules/communityWordManager';
 import { broadcastToRoom, safeEmit } from '../../../backend/utils/socketHelpers';
 import { queuePlayerFoundWord } from '../../../backend/utils/playerFoundWordBatcher';
-import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove, isBlastBoardCleared, advanceBlastWave, regenerateBlastBoard, recordBlastBoardClear } from '../../../backend/modules/blastModeManager';
+import { calculateBlastTileBonus, getTilesOnBoardPath, recordBlastMove, isBlastBoardCleared, advanceBlastWave, regenerateBlastBoard, recordBlastBoardClear } from '../../../backend/modules/blastModeManager';
 import { endGame } from '../../../backend/services/gameLifecycle/gameEnd';
 import timerManager from '../../../backend/utils/timerManager';
 import { registerWordHandlers } from '../wordHandler';
@@ -447,7 +447,7 @@ describe('wordHandler - blastComboSync broadcast (52-02)', () => {
     it('should include blast field with comboType in wordAccepted when blast mode is active', async () => {
       (recordBlastMove as Mock).mockReturnValue({ movesUsed: 4, bonusMove: true });
       (calculateBlastTileBonus as Mock).mockReturnValue(10);
-      (getTilesOnPath as Mock).mockReturnValue(['bomb']);
+      (getTilesOnBoardPath as Mock).mockReturnValue(['bomb']);
 
       (getGame as Mock).mockReturnValue(makeBlastGame({
         blastModeState: {

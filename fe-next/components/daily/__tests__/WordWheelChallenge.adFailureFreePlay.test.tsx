@@ -53,7 +53,10 @@ vi.mock('@/utils/dailyChallenge', () => ({
   getDailyStreak: () => ({ currentStreak: 0 }),
   updateDailyStreak: vi.fn(() => ({ currentStreak: 1, longestStreak: 1, lastPlayedDate: null, totalDailiesCompleted: 1 })),
   hasPlayedWordWheel: () => false,
+  // useWordWheelLoad asks this before the ready card. Catch-up still keeps the card.
+  hasEverPlayedWordWheel: () => false,
   getWordWheelResultForDate: () => null,
+  hasEverPlayedWordWheel: () => false,
 }));
 vi.mock('@/utils/dailyChallenge/wordWheelGeneration', () => ({
   generateWordWheelPuzzle: () => ({ centerLetter: 'A', outerLetters: ['B', 'C', 'D', 'E', 'F', 'G'], validWords: [] }),

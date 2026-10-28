@@ -11,7 +11,7 @@ import { PANEL, PRIMARY_BUTTON, SECONDARY_BUTTON } from './homeStyles';
 type T = (key: string, params?: Record<string, string | number>) => string;
 
 /** tryDemo with a room already open reads as "get students in", not "open another room". */
-function stepCopyKey(onboarding: HomeOnboarding, stepId: HomeOnboardingStepId, field: 'body' | 'cta'): string {
+function stepCopyKey(onboarding: HomeOnboarding, stepId: HomeOnboardingStepId, field: 'title' | 'body' | 'cta'): string {
   const suffix =
     stepId === 'tryDemo' && onboarding.awaitingPlayers && onboarding.current === 'tryDemo'
       ? `${field}AwaitingPlayers`
@@ -131,7 +131,7 @@ function CompactOnboarding({
     <section
       data-testid="home-onboarding"
       aria-labelledby="home-onboarding-title"
-      className={cn(PANEL, 'flex items-center gap-3 px-3 py-3 sm:px-4')}
+      className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2 rounded-neo border-[2px] border-neo-cream/50 bg-neo-navy/60 py-1.5 pe-1.5 ps-3"
     >
       <ol aria-label={t('eduShell.onboarding.titleCompact')} className="flex shrink-0 gap-1">
         {onboarding.steps.map((step) => (
@@ -148,15 +148,15 @@ function CompactOnboarding({
           </li>
         ))}
       </ol>
-      <h2 id="home-onboarding-title" className="sr-only">
-        {t(`eduShell.onboarding.steps.${current}.title`)}
+      <h2 id="home-onboarding-title" className="min-w-0 flex-1 truncate font-neo-body text-sm font-bold text-neo-cream">
+        {t(stepCopyKey(onboarding, current, 'title'))}
       </h2>
-      <div className="flex min-w-0 flex-1 items-center justify-end gap-2">
+      <div className="flex min-w-0 items-center justify-end gap-1 max-sm:basis-full">
         <Link
           href={hrefs[current]}
           data-testid="home-onboarding-cta"
           onClick={() => onStepStart?.(current)}
-          className={cn(SECONDARY_BUTTON, 'min-h-[44px] min-w-0 flex-1 px-3 py-2 text-base sm:flex-none sm:px-5')}
+          className={cn(SECONDARY_BUTTON, 'min-h-[44px] min-w-0 flex-1 whitespace-nowrap px-3 py-1.5 text-sm sm:flex-none sm:px-4')}
         >
           {t(stepCopyKey(onboarding, current, 'cta'))}
         </Link>

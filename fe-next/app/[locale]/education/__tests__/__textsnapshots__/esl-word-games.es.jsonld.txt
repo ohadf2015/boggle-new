@@ -2,8 +2,8 @@
   "@context": "https://schema.org",
   "@type": "WebPage",
   "@id": "https://www.lexiclash.live/es/education/esl-word-games#page",
-  "name": "ESL Word Games para el aula — en vivo | LexiClash",
-  "description": "ESL word games para toda la clase: código al móvil, tablero en el proyector, sin cuentas ni descargas. Nivel por alumno y 6 idiomas.",
+  "name": "Juegos de palabras en inglés para el aula | LexiClash",
+  "description": "Juegos de vocabulario en inglés para toda la clase: los alumnos entran con un código desde el móvil, sin cuenta, y el tablero va al proyector. Gratis.",
   "url": "https://www.lexiclash.live/es/education/esl-word-games",
   "inLanguage": "es",
   "isPartOf": {
@@ -42,8 +42,8 @@
   "@context": "https://schema.org",
   "@type": "LearningResource",
   "@id": "https://www.lexiclash.live/es/education/esl-word-games#resource",
-  "name": "ESL Word Games para el aula — en vivo | LexiClash",
-  "description": "ESL word games para toda la clase: código al móvil, tablero en el proyector, sin cuentas ni descargas. Nivel por alumno y 6 idiomas.",
+  "name": "Juegos de palabras en inglés para el aula | LexiClash",
+  "description": "Juegos de vocabulario en inglés para toda la clase: los alumnos entran con un código desde el móvil, sin cuenta, y el tablero va al proyector. Gratis.",
   "url": "https://www.lexiclash.live/es/education/esl-word-games",
   "inLanguage": "es",
   "learningResourceType": "Game",
@@ -86,7 +86,7 @@
       "name": "¿Cuáles son los mejores juegos para ESL/EFL?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "LexiClash ofrece juegos en vivo: Boggle rápido, Word Wheel para vocabulario, Word Hunt para búsqueda. Todos en tiempo real contra compañeros o IA — competitivo y divertido."
+        "text": "LexiClash ofrece juegos en vivo: Boggle rápido, Word Wheel para vocabulario, Word Hunt para búsqueda. Todos en tiempo real contra compañeros o IA — competitivo y divertido. Para probarlo, abre lexiclash.live/es/education/classroom-game y proyecta el tablero."
       }
     },
     {
@@ -176,8 +176,8 @@
   "@context": "https://schema.org",
   "@type": "Course",
   "@id": "https://www.lexiclash.live/es/education/esl-word-games#course",
-  "name": "ESL Word Games para el aula — en vivo | LexiClash",
-  "description": "ESL word games para toda la clase: código al móvil, tablero en el proyector, sin cuentas ni descargas. Nivel por alumno y 6 idiomas.",
+  "name": "Juegos de palabras en inglés para el aula | LexiClash",
+  "description": "Juegos de vocabulario en inglés para toda la clase: los alumnos entran con un código desde el móvil, sin cuenta, y el tablero va al proyector. Gratis.",
   "url": "https://www.lexiclash.live/es/education/esl-word-games",
   "provider": {
     "@type": "Organization",

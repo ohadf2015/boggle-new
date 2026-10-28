@@ -47,8 +47,8 @@ describe('useBlastTileFirstUse', () => {
     expect(result.current.teaching).toBe('bomb');
     act(() => result.current.dismiss());
     expect(result.current.teaching).toBeNull();
-    // ice now on the board → taught next.
-    rerender({ b: board('bomb', 'ice') });
-    expect(result.current.teaching).toBe('ice');
+    // a coin now on the board → taught next.
+    rerender({ b: board('bomb', 'gold') });
+    expect(result.current.teaching).toBe('gold');
   });
 });

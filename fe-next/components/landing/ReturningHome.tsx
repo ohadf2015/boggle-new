@@ -32,9 +32,10 @@ interface ReturningHomeProps {
 }
 
 /**
- * The returning-user homepage: one screen, no page scroll. Top bar (profile,
- * streak, coins), today's daily as the primary action, the live arena and four
- * modes, the rest one tap away. Every door opens through the launch curtain.
+ * The returning-user homepage. Above the fold: top bar (profile, streak, coins)
+ * and today's daily as the one primary action. Below it every mode is on the
+ * page, sorted by intent (play together, play solo, take your time) so nothing
+ * hides behind a "more" button. Every door opens through the launch curtain.
  */
 export const ReturningHome: React.FC<ReturningHomeProps> = ({ initialData }) => {
   const { t, language } = useLanguage();
@@ -101,7 +102,7 @@ export const ReturningHome: React.FC<ReturningHomeProps> = ({ initialData }) => 
         </div>
       )}
 
-      <section className="relative z-20 mx-auto flex min-h-[calc(100dvh-var(--header-height-mobile)-var(--bottom-stack-height,0px))] w-full max-w-6xl flex-col gap-3 overflow-x-clip px-3 pb-3 pt-2 sm:px-4 md:min-h-[calc(100dvh-var(--header-height-desktop))] md:justify-center md:gap-5 md:px-8 md:py-5">
+      <section className="relative z-20 mx-auto flex min-h-[calc(100dvh-var(--header-height-mobile)-var(--bottom-stack-height,0px))] w-full max-w-6xl flex-col gap-3 overflow-x-clip px-3 pb-3 pt-2 sm:px-4 md:min-h-[calc(100dvh-var(--header-height-desktop))] md:gap-8 md:px-8 md:py-5">
         <HomeTopBar
           profile={profile}
           language={language}

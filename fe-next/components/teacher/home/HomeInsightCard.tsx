@@ -49,16 +49,16 @@ function Value({ value, ink }: { value: number | string; ink: string }) {
 }
 
 /** One real fact about the classes per visit, rotating; never shown without activity behind it. */
-export function HomeInsightCard({ insights = [], t }: { insights?: readonly TeacherInsight[]; t: T }) {
+export function HomeInsightCard({ insights = [], t, embedded = false }: { insights?: readonly TeacherInsight[]; t: T; embedded?: boolean }) {
   const reduce = useReducedMotion();
   const [cursor, setCursor] = useState(nextCursor);
   if (insights.length === 0) return null;
   const insight = insights[cursor % insights.length];
 
   return (
-    <section data-testid="home-insight" aria-labelledby="home-insight-title" className={cn(PANEL, 'overflow-hidden p-4')}>
-      <div className="flex items-center justify-between gap-2">
-        <h2 id="home-insight-title" className="font-neo-display text-lg font-black text-neo-cream">
+    <section data-testid="home-insight" aria-labelledby="home-insight-title" className={cn(embedded ? 'relative' : cn(PANEL, 'overflow-hidden p-4'))}>
+      <div className={cn('flex items-center justify-between gap-2', embedded && 'absolute end-0 top-0')}>
+        <h2 id="home-insight-title" className={cn('font-neo-display text-lg font-black text-neo-cream', embedded && 'sr-only')}>
           {t('eduShell.insight.title')}
         </h2>
         {insights.length > 1 ? (
@@ -72,7 +72,7 @@ export function HomeInsightCard({ insights = [], t }: { insights?: readonly Teac
           </button>
         ) : null}
       </div>
-      <div aria-live="polite" className="mt-3 min-h-[7.5rem]">
+      <div aria-live="polite" className={embedded ? 'min-h-[5.5rem] pe-11' : 'mt-3 min-h-[7.5rem]'}>
         <AnimatePresence mode="wait" initial={false}>
           <m.div
             key={insight.id}

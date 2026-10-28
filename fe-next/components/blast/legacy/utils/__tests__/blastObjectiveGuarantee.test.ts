@@ -36,60 +36,66 @@ function countType(grid: BlastTileState[][], type: BlastTileType): number {
 }
 
 describe('guaranteeObjectiveTiles', () => {
+  it('never seeds diamonds — they are earned by rare words only', () => {
+    const grid = makeStandardGrid(6);
+    const result = guaranteeObjectiveTiles(grid, [{ type: 'collect_type', tileType: 'diamond', target: 2 }]);
+    expect(countType(result, 'diamond')).toBe(0);
+  });
+
   describe('collect_type objectives', () => {
-    it('should place missing gem tiles when board has none', () => {
+    it('should place missing coin tiles when board has none', () => {
       // GIVEN: all-standard 6x6 grid, objective needs 3 gems
       const grid = makeStandardGrid(6);
       const objectives: BlastObjective[] = [
-        { type: 'collect_type', tileType: 'gem', target: 3 },
+        { type: 'collect_type', tileType: 'gold', target: 3 },
       ];
 
       // WHEN
       const result = guaranteeObjectiveTiles(grid, objectives);
 
       // THEN: at least 3 gems exist
-      expect(countType(result, 'gem')).toBeGreaterThanOrEqual(3);
+      expect(countType(result, 'gold')).toBeGreaterThanOrEqual(3);
     });
 
     it('should not add tiles when board already has enough', () => {
       // GIVEN: grid with 4 gems already
       const grid = makeStandardGrid(6);
-      grid[0][0].type = 'gem';
-      grid[0][1].type = 'gem';
-      grid[0][2].type = 'gem';
-      grid[0][3].type = 'gem';
+      grid[0][0].type = 'gold';
+      grid[0][1].type = 'gold';
+      grid[0][2].type = 'gold';
+      grid[0][3].type = 'gold';
       const objectives: BlastObjective[] = [
-        { type: 'collect_type', tileType: 'gem', target: 3 },
+        { type: 'collect_type', tileType: 'gold', target: 3 },
       ];
 
       // WHEN
       const result = guaranteeObjectiveTiles(grid, objectives);
 
       // THEN: still exactly 4 gems (no additional ones placed)
-      expect(countType(result, 'gem')).toBe(4);
+      expect(countType(result, 'gold')).toBe(4);
     });
 
     it('should add only the deficit tiles', () => {
       // GIVEN: grid with 1 gem, objective needs 3
       const grid = makeStandardGrid(6);
-      grid[0][0].type = 'gem';
+      grid[0][0].type = 'gold';
       const objectives: BlastObjective[] = [
-        { type: 'collect_type', tileType: 'gem', target: 3 },
+        { type: 'collect_type', tileType: 'gold', target: 3 },
       ];
 
       // WHEN
       const result = guaranteeObjectiveTiles(grid, objectives);
 
       // THEN: exactly 3 gems (1 existing + 2 added)
-      expect(countType(result, 'gem')).toBe(3);
+      expect(countType(result, 'gold')).toBe(3);
     });
 
     it('should handle multiple collect_type objectives', () => {
-      // GIVEN: objectives for bombs and lightning
+      // GIVEN: objectives for bombs and coins
       const grid = makeStandardGrid(6);
       const objectives: BlastObjective[] = [
         { type: 'collect_type', tileType: 'bomb', target: 4 },
-        { type: 'collect_type', tileType: 'lightning', target: 3 },
+        { type: 'collect_type', tileType: 'gold', target: 3 },
       ];
 
       // WHEN
@@ -97,7 +103,7 @@ describe('guaranteeObjectiveTiles', () => {
 
       // THEN: both types guaranteed
       expect(countType(result, 'bomb')).toBeGreaterThanOrEqual(4);
-      expect(countType(result, 'lightning')).toBeGreaterThanOrEqual(3);
+      expect(countType(result, 'gold')).toBeGreaterThanOrEqual(3);
     });
 
     it('should only replace standard tiles, not other special tiles', () => {
@@ -105,10 +111,10 @@ describe('guaranteeObjectiveTiles', () => {
       const grid = makeStandardGrid(4); // small grid to make it tight
       grid[0][0].type = 'gold';
       grid[0][1].type = 'bomb';
-      grid[0][2].type = 'rainbow';
-      grid[0][3].type = 'ice';
+      grid[0][2].type = 'diamond';
+      grid[0][3].type = 'bomb';
       const objectives: BlastObjective[] = [
-        { type: 'collect_type', tileType: 'gem', target: 2 },
+        { type: 'collect_type', tileType: 'gold', target: 3 },
       ];
 
       // WHEN
@@ -117,43 +123,10 @@ describe('guaranteeObjectiveTiles', () => {
       // THEN: existing specials untouched
       expect(result[0][0].type).toBe('gold');
       expect(result[0][1].type).toBe('bomb');
-      expect(result[0][2].type).toBe('rainbow');
-      expect(result[0][3].type).toBe('ice');
-      // gems placed on standard tiles
-      expect(countType(result, 'gem')).toBeGreaterThanOrEqual(2);
-    });
-  });
-
-  describe('clear_all_type objectives', () => {
-    it('should ensure at least 1 tile of the type exists', () => {
-      // GIVEN: no ice tiles, objective is clear_all_type ice
-      const grid = makeStandardGrid(6);
-      const objectives: BlastObjective[] = [
-        { type: 'clear_all_type', tileType: 'ice', target: 0 },
-      ];
-
-      // WHEN
-      const result = guaranteeObjectiveTiles(grid, objectives);
-
-      // THEN: at least 1 ice tile exists (so objective is meaningful)
-      expect(countType(result, 'ice')).toBeGreaterThanOrEqual(1);
-    });
-
-    it('should not modify board when tiles of that type already exist', () => {
-      // GIVEN: 3 ice tiles already
-      const grid = makeStandardGrid(6);
-      grid[0][0].type = 'ice';
-      grid[0][1].type = 'ice';
-      grid[0][2].type = 'ice';
-      const objectives: BlastObjective[] = [
-        { type: 'clear_all_type', tileType: 'ice', target: 0 },
-      ];
-
-      // WHEN
-      const result = guaranteeObjectiveTiles(grid, objectives);
-
-      // THEN: ice count unchanged
-      expect(countType(result, 'ice')).toBe(3);
+      expect(result[0][2].type).toBe('diamond');
+      expect(result[0][3].type).toBe('bomb');
+      // coins placed on standard tiles
+      expect(countType(result, 'gold')).toBeGreaterThanOrEqual(3);
     });
   });
 
@@ -192,13 +165,13 @@ describe('guaranteeObjectiveTiles', () => {
     it('should not mutate the original grid', () => {
       const grid = makeStandardGrid(6);
       const objectives: BlastObjective[] = [
-        { type: 'collect_type', tileType: 'gem', target: 3 },
+        { type: 'collect_type', tileType: 'gold', target: 3 },
       ];
 
       guaranteeObjectiveTiles(grid, objectives);
 
       // Original grid unchanged
-      expect(countType(grid, 'gem')).toBe(0);
+      expect(countType(grid, 'gold')).toBe(0);
       expect(countType(grid, 'standard')).toBe(36);
     });
 
@@ -209,58 +182,23 @@ describe('guaranteeObjectiveTiles', () => {
       const grid = makeStandardGrid(2);
       grid[0][0].type = 'gold';
       grid[0][1].type = 'bomb';
-      grid[1][0].type = 'rainbow';
+      grid[1][0].type = 'diamond';
       // Only grid[1][1] is standard
       const objectives: BlastObjective[] = [
-        { type: 'collect_type', tileType: 'gem', target: 3 },
+        { type: 'collect_type', tileType: 'gold', target: 3 },
       ];
 
       // WHEN: should not crash and should respect the minimum ratio
       const result = guaranteeObjectiveTiles(grid, objectives);
 
-      // THEN: board is already over special budget — no gems placed (budget=0)
-      expect(countType(result, 'gem')).toBe(0);
+      // THEN: board is already over special budget — no coins placed (budget=0)
+      expect(countType(result, 'gold')).toBe(1);
       // Existing specials preserved unchanged
       expect(result[0][0].type).toBe('gold');
       expect(result[0][1].type).toBe('bomb');
-      expect(result[1][0].type).toBe('rainbow');
+      expect(result[1][0].type).toBe('diamond');
       // The one standard tile remains standard
       expect(result[1][1].type).toBe('standard');
-    });
-
-    it('should set correct hitsRemaining for placed tiles', () => {
-      const grid = makeStandardGrid(6);
-      const objectives: BlastObjective[] = [
-        { type: 'collect_type', tileType: 'ice', target: 2 },
-      ];
-
-      const result = guaranteeObjectiveTiles(grid, objectives);
-
-      // Ice tiles have hitsRemaining = 2
-      for (const row of result) {
-        for (const tile of row) {
-          if (tile.type === 'ice') {
-            expect(tile.hitsRemaining).toBe(2);
-          }
-        }
-      }
-    });
-
-    it('should set correct hitsRemaining for gem tiles', () => {
-      const grid = makeStandardGrid(6);
-      const objectives: BlastObjective[] = [
-        { type: 'collect_type', tileType: 'gem', target: 2 },
-      ];
-
-      const result = guaranteeObjectiveTiles(grid, objectives);
-
-      for (const row of result) {
-        for (const tile of row) {
-          if (tile.type === 'gem') {
-            expect(tile.hitsRemaining).toBe(3);
-          }
-        }
-      }
     });
   });
 
@@ -351,14 +289,14 @@ describe('guaranteeObjectiveTiles', () => {
       // Budget: 40% of 36 = 14 special tiles allowed → only 14 gems should be placed
       const grid = makeStandardGrid(6);
       const objectives: BlastObjective[] = [
-        { type: 'collect_type', tileType: 'gem', target: 20 },
+        { type: 'collect_type', tileType: 'gold', target: 20 },
       ];
 
       // WHEN
       const result = guaranteeObjectiveTiles(grid, objectives);
 
       // THEN: placed gems are capped by budget (max 40% of board = 14 tiles)
-      const gemCount = countType(result, 'gem');
+      const gemCount = countType(result, 'gold');
       const standardCount = countType(result, 'standard');
 
       // Standard tiles must be >= 60% of total

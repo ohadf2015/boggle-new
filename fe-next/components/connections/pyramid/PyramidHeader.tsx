@@ -6,7 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { pyramidAttemptsLeft, PYRAMID_ATTEMPTS_PER_STAGE, type PyramidState } from '@/lib/connections/pyramid/gameLogic';
 import PyramidProgress from './PyramidProgress';
-import ConnectionsMascot from '../ConnectionsMascot';
+import DailyQuestHeading from '../DailyQuestHeading';
 
 interface PyramidHeaderProps {
   state: PyramidState;
@@ -15,19 +15,22 @@ interface PyramidHeaderProps {
   testId?: string;
   /** Lifetime rank badge, shown above the tries on the standalone (non-shell) layout. */
   rankSlot?: ReactNode;
+  /** Hosted as the day's daily quest: title it the way the daily flow does. */
+  daily?: boolean;
 }
 
-export default function PyramidHeader({ state, metaAnswer, className, testId, rankSlot }: PyramidHeaderProps) {
+export default function PyramidHeader({ state, metaAnswer, className, testId, rankSlot, daily = false }: PyramidHeaderProps) {
   const { t } = useLanguage();
   const left = pyramidAttemptsLeft(state);
   return (
     <header data-testid={testId} className={cn('flex flex-col gap-2', className)}>
-      <div className="flex items-center justify-center gap-2">
-        <ConnectionsMascot status={state.status} className="h-12 w-12" />
+      {daily ? (
+        <DailyQuestHeading className="justify-center" />
+      ) : (
         <h1 className="text-center font-neo-display text-lg font-black text-neo-white">
           {t('connections.pyramid.title')}
         </h1>
-      </div>
+      )}
       <p className="text-center font-neo-body text-xs text-neo-white/60">
         {state.stage < 3 ? t('connections.pyramid.explainer') : t('connections.pyramid.finalePrompt')}
       </p>

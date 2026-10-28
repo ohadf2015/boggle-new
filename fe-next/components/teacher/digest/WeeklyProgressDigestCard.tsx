@@ -183,7 +183,7 @@ export function WeeklyProgressDigestCard({
           </div>
           <p data-testid="weekly-progress-digest-inactive" className="text-sm font-semibold text-neo-cream/80">
             {t('teacher.digest.weeklyInactiveCount', { count: inactive.length })}
-            {inactive.length > 0 ? `: ${inactive.map((s) => s.name).join(', ')}` : ''}
+            {inactive.length > 0 ? `: ${inactive.slice(0, 8).map((s) => s.name).join(', ')}${inactive.length > 8 ? ` +${inactive.length - 8}` : ''}` : ''}
           </p>
         </>
       )}

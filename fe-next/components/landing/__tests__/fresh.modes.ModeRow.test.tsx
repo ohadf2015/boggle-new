@@ -47,9 +47,58 @@ describe('ModeRow (fresh section 4)', () => {
     expect(h2s[0].textContent).toBe('homeFresh.modes.title');
   });
 
-  it('offers only public modes, newcomer-friendly first and blast last', () => {
+  it('offers only public modes in the row, with blast lifted out of it', () => {
     const { container } = render(<ModeRow />);
     expect(cards(container).map((a) => a.getAttribute('href'))).toEqual(PUBLIC_HREFS);
+    expect(FRESH_MODE_KEYS).not.toContain('blast');
+  });
+
+  describe('featured Blast card', () => {
+    const featured = (c: HTMLElement) => c.querySelector<HTMLAnchorElement>('[data-fresh-section="modes"] a[data-featured="true"]');
+
+    it('leads the section, above the row, and links to the public V1 route', () => {
+      const { container } = render(<ModeRow />);
+      const card = featured(container)!;
+      expect(card).not.toBeNull();
+      expect(card.getAttribute('href')).toBe('/en/blast');
+      expect(card.closest('ul')).toBeNull();
+      expect(card.compareDocumentPosition(cards(container)[0]) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    });
+
+    it('carries the Recommended badge, its title and the hook line', () => {
+      const { container } = render(<ModeRow />);
+      const text = featured(container)!.textContent;
+      expect(text).toContain('landing.badge.recommended');
+      expect(text).toContain('homeFresh.modes.items.blast.title');
+      expect(text).toContain('homeFresh.modes.items.blast.line');
+    });
+
+    it('localises its link', () => {
+      lang.language = 'he';
+      const { container } = render(<ModeRow />);
+      expect(featured(container)!.getAttribute('href')).toBe('/he/blast');
+    });
+
+    it('is absent where Blast has no letters (ru), and nothing else links to /blast', () => {
+      lang.language = 'ru';
+      const { container } = render(<ModeRow />);
+      expect(featured(container)).toBeNull();
+      expect(container.querySelector('a[href*="/blast"]')).toBeNull();
+    });
+
+    it('fires the same click events, flagged as featured', () => {
+      const { container } = render(<ModeRow />);
+      fireEvent.click(featured(container)!);
+      expect(trackModeSelected).toHaveBeenCalledWith('blast', 'home');
+      expect(trackLandingCtaClick).toHaveBeenCalledWith('mode_card', expect.objectContaining({ mode: 'blast', featured: true, surface: 'fresh' }));
+    });
+
+    it('only moves when motion is welcome (motion-safe idle)', () => {
+      const { container } = render(<ModeRow />);
+      const html = featured(container)!.innerHTML;
+      expect(html).not.toMatch(/(^|\s)animate-/);
+      expect(html).not.toMatch(/opacity-0/);
+    });
   });
 
   it('never links a fresh visitor to a beta-gated route', () => {
@@ -91,14 +140,28 @@ describe('ModeRow (fresh section 4)', () => {
     expect(trackModeSelected).toHaveBeenCalledWith('arena', 'home');
   });
 
-  it('is a scroll-snap row whose first card clears the gutter', () => {
+  it('is a bento wall, not a scroll row: Arena is the feature tile, the rest vary in footprint', () => {
     const { container } = render(<ModeRow />);
     const ul = container.querySelector('[data-fresh-section="modes"] ul')!;
-    expect(ul.className).toMatch(/\bsnap-x\b/);
-    expect(ul.className).toMatch(/\bsnap-mandatory\b/);
-    expect(ul.className).toMatch(/\bscroll-px-4\b/);
-    for (const li of ul.querySelectorAll('li')) expect(li.className).toMatch(/\bsnap-start\b/);
+    expect(ul.className).toMatch(/\blg:grid-cols-12\b/);
+    expect(ul.className).not.toMatch(/overflow-x-auto|snap-x/);
+    expect(container.querySelector('a[data-mode="arena"]')!.getAttribute('data-shape')).toBe('feature');
+    const shapes = new Set([...cards(container)].map((a) => a.dataset.shape));
+    expect(shapes.size).toBeGreaterThanOrEqual(3);
   });
+
+  it('has no prev/next pager (nothing is hidden off-screen)', () => {
+    const { queryByRole } = render(<ModeRow />);
+    expect(queryByRole('button')).toBeNull();
+  });
+
+  it('a card takes its colour from its mode, so neighbours are not recoloured by position', () => {
+    const { container } = render(<ModeRow />);
+    const cls = (k: string) => (container.querySelector(`a[data-mode="${k}"]`) as HTMLElement).className;
+    expect(cls('arena')).toMatch(/border-neo-pink/);
+    expect(cls('adventure')).toMatch(/border-neo-lime/);
+  });
+
 
   it('is visible at rest: nothing starts at opacity-0', () => {
     const { container } = render(<ModeRow />);
@@ -121,38 +184,6 @@ describe('ModeRow (fresh section 4)', () => {
       const src = img.getAttribute('src') || '';
       expect(src).toMatch(/modes.*cubes/);
     }
-  });
-
-  describe('prev / next buttons', () => {
-    const scrollBy = vi.fn();
-    beforeEach(() => {
-      scrollBy.mockClear();
-      Object.defineProperty(HTMLElement.prototype, 'scrollBy', { value: scrollBy, configurable: true, writable: true });
-    });
-
-    it('are labelled for screen readers', () => {
-      const { getByRole } = render(<ModeRow />);
-      expect(getByRole('button', { name: 'homeFresh.modes.next' })).toBeInTheDocument();
-      expect(getByRole('button', { name: 'homeFresh.modes.prev' })).toBeInTheDocument();
-    });
-
-    it('next scrolls forward (rightward in LTR)', () => {
-      const { getByRole } = render(<ModeRow />);
-      fireEvent.click(getByRole('button', { name: 'homeFresh.modes.next' }));
-      expect(scrollBy).toHaveBeenCalledTimes(1);
-      expect(scrollBy.mock.calls[0][0].left).toBeGreaterThan(0);
-    });
-
-    it('next scrolls forward (leftward in RTL Hebrew)', () => {
-      lang.dir = 'rtl';
-      const { getByRole } = render(<ModeRow />);
-      fireEvent.click(getByRole('button', { name: 'homeFresh.modes.next' }));
-      const left = scrollBy.mock.calls[0][0].left;
-      fireEvent.click(getByRole('button', { name: 'homeFresh.modes.prev' }));
-      const back = scrollBy.mock.calls[1][0].left;
-      expect(Math.sign(left)).toBe(-Math.sign(back));
-      expect(left).toBeLessThan(0);
-    });
   });
 
   it('Given a fresh visitor, Then every public mode is a visible card, not a link hidden in a collapsed list', () => {

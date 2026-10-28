@@ -1,25 +1,21 @@
 /**
  * useBlastObjectives - Tests for objective progress tracking hook.
- *
- * Current wave objectives (from blastWaveConfig.ts):
- * All waves include clear_percent(90) as primary objective.
- * Wave 1: clear_percent(90) + word_length(4, min=3)
- * Wave 2: clear_percent(90) + word_length(3, min=4) + score_target(60)
- * Wave 3: clear_percent(90) + collect_type(bomb, 3) + score_target(100)
- * Wave 4: clear_percent(90) + collect_type(lightning, 3) + word_length(2, min=5)
- * Wave 5: clear_percent(90) + collect_type(diamond, 2) + score_target(150)
- * Wave 6: clear_percent(90) + clear_all_type(frozen) + score_target(200)
- * Wave 7: clear_percent(90) + collect_type(prism, 3) + word_length(3, min=5)
+ * Uses fixed objective sets so the tests don't move when wave themes are retuned.
  */
 import { renderHook } from '@testing-library/react';
 import { useBlastObjectives } from '../useBlastObjectives';
-import { getWaveObjectives } from '../../utils/blastWaveConfig';
-import type { BlastGameState, BlastTileType } from '../../types';
+import type { BlastGameState, BlastObjective, BlastTileType } from '../../types';
 
-// Bridge: tests were written against a `waveNumber` API. The hook now
-// consumes pre-computed objectives. Wrap once so each test stays readable.
+const CLEAR: BlastObjective = { type: 'clear_percent', target: 90 };
+const FIXED: Record<number, BlastObjective[]> = {
+  1: [CLEAR, { type: 'word_length', target: 4, minWordLength: 3 }],
+  2: [CLEAR, { type: 'word_length', target: 3, minWordLength: 4 }, { type: 'score_target', target: 60 }],
+  3: [CLEAR, { type: 'collect_type', tileType: 'bomb', target: 3 }, { type: 'score_target', target: 100 }],
+  4: [CLEAR, { type: 'collect_type', tileType: 'gold', target: 3 }, { type: 'word_length', target: 2, minWordLength: 5 }],
+};
+
 function objsForWave(wave: number) {
-  return getWaveObjectives(wave);
+  return FIXED[wave].map(o => ({ ...o }));
 }
 
 function makeGameState(overrides: Partial<BlastGameState> = {}): BlastGameState {
@@ -99,43 +95,6 @@ describe('useBlastObjectives', () => {
 
       const collectObj = result.current.objectiveProgress.find(p => p.objective.type === 'collect_type')!;
       expect(collectObj.isComplete).toBe(true);
-    });
-  });
-
-  describe('clear_all_type objective', () => {
-    it('uses tileTypeClears for progress and total from initial tile counts', () => {
-      // Wave 6: clear_all_type frozen
-      const tileTypeClears = { frozen: 3 } as Record<BlastTileType, number>;
-      const { result } = renderHook(() =>
-        useBlastObjectives({
-          gameState: makeGameState(),
-          tileTypeClears,
-          objectives: objsForWave(6),
-          wordsFound: [],
-          initialTileTypeCounts: { frozen: 5 } as Record<BlastTileType, number>,
-        }),
-      );
-
-      const clearObj = result.current.objectiveProgress.find(p => p.objective.type === 'clear_all_type')!;
-      expect(clearObj.current).toBe(3);
-      expect(clearObj.objective.target).toBe(5);
-      expect(clearObj.isComplete).toBe(false);
-    });
-
-    it('marks complete when all tiles of type are cleared', () => {
-      const tileTypeClears = { frozen: 5 } as Record<BlastTileType, number>;
-      const { result } = renderHook(() =>
-        useBlastObjectives({
-          gameState: makeGameState(),
-          tileTypeClears,
-          objectives: objsForWave(6),
-          wordsFound: [],
-          initialTileTypeCounts: { frozen: 5 } as Record<BlastTileType, number>,
-        }),
-      );
-
-      const clearObj = result.current.objectiveProgress.find(p => p.objective.type === 'clear_all_type')!;
-      expect(clearObj.isComplete).toBe(true);
     });
   });
 

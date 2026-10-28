@@ -68,7 +68,7 @@ export function ClassroomModeCatalogueCard({
       {recommendedLabel && (
         <span
           data-testid="mode-recommended"
-          className="absolute -start-1.5 -top-2.5 z-10 inline-flex max-w-[95%] -rotate-3 items-center gap-0.5 truncate rounded-neo border-[2px] border-neo-black bg-neo-yellow px-1 py-0.5 font-neo-display text-[0.55rem] font-black uppercase leading-none text-neo-black shadow-hard-sm lg:text-[0.65rem]"
+          className="absolute start-1 top-1 z-10 inline-flex max-w-[90%] -rotate-3 items-center gap-0.5 truncate rounded-neo border-[2px] border-neo-black bg-neo-yellow px-1 py-0.5 font-neo-display text-[0.55rem] font-black uppercase leading-none text-neo-black shadow-hard-sm lg:text-[0.65rem]"
         >
           <Sparkles className="size-3 shrink-0" strokeWidth={3} aria-hidden="true" />
           {recommendedLabel}

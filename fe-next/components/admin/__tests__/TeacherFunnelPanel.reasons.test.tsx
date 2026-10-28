@@ -268,5 +268,25 @@ describe('<TeacherFunnelPanel>', () => {
       // Must not white-screen: the section renders its empty state instead.
       expect(await screen.findByText(/No classroom has ever been opened/)).toBeInTheDocument();
     });
+
+    it('renders the Polar checkout telemetry readout when checkout counts are present', async () => {
+      respondWith(
+        payload({
+          checkout: {
+            checkoutStarted: 9,
+            checkoutUrlReachable: 8,
+            checkoutUrlError: 1,
+            checkoutReturnLanded: 3,
+            lastErrorStatus: 503,
+          },
+        }),
+      );
+      render(<TeacherFunnelPanel />);
+
+      expect(await screen.findByTestId('teacher-funnel-checkout-readout')).toBeInTheDocument();
+      expect(screen.getByText('Polar checkout telemetry')).toBeInTheDocument();
+      expect(screen.getByText('URL error (HTTP 503)')).toBeInTheDocument();
+      expect(screen.getByText('Return landed')).toBeInTheDocument();
+    });
   });
 });

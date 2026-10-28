@@ -21,7 +21,7 @@ describe('Classroom host on a short projector (1366x768)', () => {
   it('Given the compact classroom header, When the screen is short, Then the timer and padding shrink so the board keeps the height', () => {
     const { container } = render(<TvGameHeader compact remainingTime={60} timerValue={3} gameMode="classic" t={t} />);
     expect((container.firstElementChild as HTMLElement).className).toContain('md:medium-short:py-1');
-    expect(screen.getByTestId('tv-timer-slot').className).toContain('md:medium-short:[zoom:0.55]');
+    expect(screen.getByTestId('tv-timer-slot').className).toContain('md:medium-short:[zoom:0.75]');
   });
 
   it('Given an arcade header, Then the short-screen squeeze does not apply', () => {

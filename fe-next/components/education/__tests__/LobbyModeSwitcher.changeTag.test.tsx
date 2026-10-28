@@ -88,4 +88,10 @@ describe('LobbyModeSwitcher — the projector says the chip is a control', () =>
     expect(screen.getByTestId('lobby-change-mode-tag')).toHaveTextContent('education.modePicker.change');
     expect(screen.getByTestId('lobby-change-mode').contains(screen.getByTestId('lobby-change-mode-tag'))).toBe(true);
   });
+
+  it('Given a surface that already names the mode, When showName is off, Then the chip reads only "change", never the mode name a second time', () => {
+    render(<LobbyModeSwitcher gameCode={CODE} currentMode={'classic' as never} socket={socket} t={t} showName={false} />);
+    expect(screen.getByTestId('lobby-change-mode')).toHaveTextContent(/^education\.modePicker\.change$/);
+    expect(screen.queryByTestId('lobby-change-mode-tag')).toBeNull();
+  });
 });

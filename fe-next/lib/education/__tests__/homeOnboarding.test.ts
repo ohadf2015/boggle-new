@@ -23,6 +23,13 @@ describe('homeOnboarding', () => {
     expect(homeOnboarding({ classroomCount: 2, inviteCopied: false, liveStarted: true, dismissed: false }).current).toBe('shareCode');
   });
 
+  it('Given students already in a class, Then sharing counts as done even if the copy flag never landed', () => {
+    const o = homeOnboarding({ classroomCount: 1, studentCount: 34, inviteCopied: false, liveStarted: true, dismissed: false });
+    expect(o.steps.find((s) => s.id === 'shareCode')?.status).toBe('done');
+    expect(o.complete).toBe(true);
+    expect(o.visible).toBe(false);
+  });
+
   it('Given every step done, Then the card goes away for good', () => {
     const o = homeOnboarding({ classroomCount: 1, inviteCopied: true, liveStarted: true, dismissed: false });
     expect(o.complete).toBe(true);
@@ -54,6 +61,12 @@ describe('homeOnboarding', () => {
   it('Given a real round already happened, Then nothing is awaiting players', () => {
     const o = homeOnboarding({ classroomCount: 1, inviteCopied: true, liveStarted: true, roomOpened: true, dismissed: false });
     expect(o.complete).toBe(true);
+    expect(o.awaitingPlayers).toBe(false);
+  });
+  it('Given a class that already played a live game, Then the first-run nudge is finished even when the server flag never landed', () => {
+    const o = homeOnboarding({ classroomCount: 1, studentCount: 34, inviteCopied: false, liveStarted: false, roomOpened: true, gamesPlayed: 1, dismissed: false });
+    expect(o.complete).toBe(true);
+    expect(o.visible).toBe(false);
     expect(o.awaitingPlayers).toBe(false);
   });
 });

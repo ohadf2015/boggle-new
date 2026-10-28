@@ -24,6 +24,13 @@ describe('planLifecycleNudges', () => {
     expect(stageOf(teacher(), facts({ classrooms: [{ id: 'c1', teacherId: 't1', createdAt: daysAgo(2) }] }))).toBe('share_code');
   });
 
+  it('Given a paid campaign teacher whose class was created today, Then the share-code nudge is due immediately', () => {
+    expect(stageOf(teacher(), facts({
+      classrooms: [{ id: 'c1', teacherId: 't1', createdAt: daysAgo(0.01) }],
+      paidDay0UserIds: new Set(['t1']),
+    }))).toBe('share_code');
+  });
+
   it('Given a class made 6 hours ago, Then it is too early for any nudge', () => {
     expect(stageOf(teacher(), facts({ classrooms: [{ id: 'c1', teacherId: 't1', createdAt: daysAgo(0.25) }] }))).toBeNull();
   });

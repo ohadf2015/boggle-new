@@ -3,13 +3,10 @@
  * server's authoritative board so applyServerBoard's equality guard no-ops
  * (no tile flicker).
  *
- * Divergence cause (flicker "with no reason" on prism clears): prism tiles
- * convert random standard tiles into specials using an `rng`. The server seeds
- * it `createSeededRandom(board.seed + totalMoves)`; the client used to call
- * processTilesForWord with NO rng (→ Math.random) and, where it did seed, used
- * the wrong move counter. This test pins the contract: client and server, given
- * the SAME seed + valid-move index, must produce identical processTilesForWord
- * output — and a WRONG move index must NOT (so the test actually catches the bug).
+ * A rare word spawns diamonds on cells picked with an `rng`. The server seeds it
+ * `createSeededRandom(board.seed + totalMoves)`; the client must use the same
+ * seed + valid-move index. A WRONG move index must diverge, so the test actually
+ * catches an off-by-one or an unseeded client.
  */
 import { describe, it, expect } from 'vitest';
 import { processTilesForWord } from '@/components/blast/legacy/utils/clearTilesProcessor';
@@ -18,17 +15,16 @@ import type { BlastTileState } from '@/shared/types/blast';
 
 const SEED = 0x1234abcd;
 const SIZE = 4;
-const WAVE = 3; // prism enabled wave 3+
+const WAVE = 1;
 
-/** 4x4 board of standard tiles with a single PRISM at (0,0). */
-function prismBoard(): BlastTileState[][] {
+function plainBoard(): BlastTileState[][] {
   return Array.from({ length: SIZE }, (_, r) =>
     Array.from({ length: SIZE }, (_, c) =>
       ({
         uid: `u-${r}-${c}`,
         row: r,
         col: c,
-        type: r === 0 && c === 0 ? 'prism' : 'standard',
+        type: 'standard',
         isCleared: false,
         activationEffect: null,
         hitsRemaining: 0,
@@ -37,22 +33,22 @@ function prismBoard(): BlastTileState[][] {
   );
 }
 
-// A word path that includes the prism cell so its conversion (rng-driven) fires.
-const PATH = [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }];
+// An epic word (two diamonds) along the top row.
+const PATH = [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }, { row: 0, col: 3 }];
 
 function runClear(rng: () => number) {
   return processTilesForWord({
-    prev: prismBoard(),
+    prev: plainBoard(),
     path: PATH,
-    word: 'ABC',
-    baseScore: 2,
+    word: 'jazz',
+    baseScore: 3,
     gridSize: SIZE,
     currentWave: WAVE,
     rng,
   });
 }
 
-/** Multiset of resulting tile types (order-independent) — what prism alters. */
+/** Multiset of resulting tile types (order-independent) — what the diamond spawn alters. */
 function typeSignature(next: BlastTileState[][]): string {
   return next
     .flat()
@@ -61,7 +57,7 @@ function typeSignature(next: BlastTileState[][]): string {
     .join('|');
 }
 
-describe('Blast MP prism RNG determinism (client/server parity)', () => {
+describe('Blast MP diamond spawn determinism (client/server parity)', () => {
   it('is deterministic for a fixed seed (same seed → identical conversion)', () => {
     const a = typeSignature(runClear(createSeededRandom(SEED + 1)).next);
     const b = typeSignature(runClear(createSeededRandom(SEED + 1)).next);

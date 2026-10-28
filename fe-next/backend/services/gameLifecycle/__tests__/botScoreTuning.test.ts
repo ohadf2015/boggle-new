@@ -40,8 +40,7 @@ vi.mock('../../../utils/logger', () => ({ default: {
 vi.mock('../botWordHunt', () => ({ startBotsForWordHunt: vi.fn() }));
 vi.mock('../../../modules/blastModeManager', () => ({
   validateBlastWordPath: vi.fn().mockReturnValue(null),
-  getTilesOnResolvedPath: vi.fn().mockReturnValue([]),
-  calculateBlastTileBonus: vi.fn(), getTilesOnPath: vi.fn(), recordBlastMove: vi.fn(),
+  calculateBlastTileBonus: vi.fn(), getTilesOnBoardPath: vi.fn(), recordBlastCollection: vi.fn(() => 0), recordBlastMove: vi.fn(),
 }));
 vi.mock('../../../modules/wordHuntManager', () => ({ restoreLife: vi.fn(), getLifeBonus: vi.fn() }));
 

@@ -47,21 +47,21 @@ const baseProps: any = {
 };
 
 describe('LandingChallengeCards - hydration safety', () => {
-  it('SSR already parks the extra modes in the same More disclosure the client renders', () => {
+  it('SSR renders every group and no More button, same as the client', () => {
     const html = renderToString(<LandingChallengeCards {...baseProps} />);
-    expect(html).toContain('landing-cubes-more');
+    expect(html).not.toContain('landing-cubes-more');
+    expect(html).toContain('home-group-together');
+    expect(html).toContain('home-group-solo');
     expect(html).toContain('data-cube-key="arena"');
     expect(html).toContain('data-cube-key="blast"');
   });
 
-  it('shows the live arena and four modes, and keeps the rest of the roster in the More sheet after mount', () => {
+  it('keeps the whole roster on the page after mount: featured blast first, the rest sorted by intent', () => {
     const { container } = render(<LandingChallengeCards {...baseProps} />);
-    const sheet = container.querySelector('[data-testid="home-more-sheet"]');
-    expect(sheet).not.toBeNull();
-    const cubes = Array.from(container.querySelectorAll('[data-cube-key]'));
-    const onHome = cubes.filter((el) => !sheet!.contains(el));
-    expect(onHome.map((el) => el.getAttribute('data-cube-key'))[0]).toBe('arena');
-    expect(onHome).toHaveLength(5);
-    expect(cubes.length).toBeGreaterThan(onHome.length);
+    expect(container.querySelector('[data-testid="home-more-sheet"]')).toBeNull();
+    expect(container.querySelector('[data-testid="home-featured"] [data-cube-key="blast"]')).toBeTruthy();
+    const groups = Array.from(container.querySelectorAll('[data-testid^="home-group-"]')).map((el) => el.getAttribute('data-testid'));
+    expect(groups.slice(0, 3)).toEqual(['home-group-together', 'home-group-solo', 'home-group-think']);
+    expect(container.querySelectorAll('[data-cube-key]').length).toBeGreaterThanOrEqual(7);
   });
 });

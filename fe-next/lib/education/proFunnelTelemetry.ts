@@ -5,13 +5,17 @@
  *   trial_cta_view                 client  — Polar 14-day trial CTA rendered
  *   trial_cta_tap                  client  — trial CTA tap (HQ banner or upgrade page)
  *   checkout_started               server  — Polar checkout session created (paid or trial)
+ *   checkout_url_reachable         server  — Polar checkout URL probed 2xx right after creation
+ *   checkout_url_error             server  — Polar checkout URL probe failed / non-2xx after creation
  *   trial_activated                server  — Polar webhook status=trialing (teacher row upgraded)
  *   edu_pro_upgrade_clicked        client  — pricing page or dashboard *paid* CTA tap
  *   edu_pro_checkout_started       server  — /api/subscription/checkout made a paid Polar checkout
+ *   checkout_return_landed         server+client — teacher landed back with ?checkout=success, REGARDLESS
+ *                                             of entitlement (not gated behind grant success)
  *   checkout_complete              server  — Polar webhook `subscription.active` not trialing
  *   edu_pro_checkout_succeeded     server  — Polar webhook `subscription.active` (authoritative)
  *   edu_pro_checkout_success_seen  client  — teacher landed back on Teacher HQ, Pro welcome shown
- *   edu_pro_checkout_return_landed client  — teacher landed back with ?checkout=success, REGARDLESS
+ *   edu_pro_checkout_return_landed server+client — teacher landed back with ?checkout=success, REGARDLESS
  *                                             of entitlement. Compares against edu_pro_checkout_succeeded
  *                                             (webhook) to tell "webhook broken" from "user abandoned".
  *
@@ -197,6 +201,20 @@ export function trackEduProCheckoutReturnLanded(now: number = Date.now()): boole
 
   captureStep('edu_pro_checkout_return_landed', {});
   safeCapture('checkout_return_landed', { product: 'teacher_pro', provider: 'polar' });
+  try {
+    if (typeof fetch === 'function') {
+      const path = typeof window !== 'undefined' ? window.location?.pathname : undefined;
+      void fetch('/api/subscription/checkout-return', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ product: 'teacher_pro', provider: 'polar', ...(path ? { path } : {}) }),
+        keepalive: true,
+        credentials: 'same-origin',
+      }).catch(() => {});
+    }
+  } catch {
+    /* analytics must never block checkout return */
+  }
   try {
     localStorage.setItem(RETURN_LANDED_STORAGE_KEY, String(now));
   } catch {

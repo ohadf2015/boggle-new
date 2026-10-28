@@ -60,6 +60,7 @@ async function openBlast(page: Page) {
   await page.getByTestId('play-button').click({ timeout: 30_000 });
   const board = page.locator('[data-board][data-ghost]');
   await expect(board).toBeAttached({ timeout: 45_000 });
+  await expect(page.getByTestId('blast-level-intro')).toHaveCount(0, { timeout: 10_000 });
   const dismiss = page.getByRole('button', { name: /^(skip|got it|next|ok|let'?s go)$/i });
   for (let i = 0; i < 8; i++) {
     const b = dismiss.first();
@@ -154,7 +155,6 @@ test.describe('shared letter board', () => {
     test.setTimeout(90_000);
     const words = await shippedWords(baseURL!);
     const board = await openBlast(page);
-    await expect(page.getByTestId('blast-wave-intro-overlay')).toHaveCount(0, { timeout: 10_000 }).catch(() => {});
     const cells = (await readGrid(page)).filter((c) => c.letter);
     const rows = [...new Set(cells.map((c) => c.row))];
     let junk: GridCellInfo[] | null = null;

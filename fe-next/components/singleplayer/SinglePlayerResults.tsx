@@ -27,6 +27,7 @@ const UGCFeaturedStrip = dynamic(() => import('@/components/ugc/UGCFeaturedStrip
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
 const UnifiedShareModal = dynamic(() => import('@/components/modals/UnifiedShareModal'), { ssr: false });
 
+import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useInterstitialAd } from '@/hooks/useInterstitialAd';
@@ -84,6 +85,7 @@ const MobileCompactLeaderboard = dynamic(() => import('@/components/results/Mobi
 // localStorage, so they stay out of SSR and reserve their own min-h (CLS=0).
 const StreakIgnitionCard = dynamic(() => import('@/components/results/StreakIgnitionCard'), { ssr: false });
 const TomorrowCard = dynamic(() => import('@/components/results/TomorrowCard'), { ssr: false });
+const FirstGameBridge = dynamic(() => import('@/components/results/FirstGameBridge'), { ssr: false });
 
 const RANK_CONFETTI_COLORS: Record<number, string[]> = {
   1: ['#ffd700', '#ffed4a', '#f59e0b', '#fbbf24'],
@@ -158,6 +160,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   }, [onBackToLobby]);
 
   const { t, language } = useLanguage();
+  const router = useRouter();
   const { user, isAuthenticated, profile, updateProfile, loading: authLoading } = useAuth();
   const isDesktop = useIsDesktop()
   const stickyCtaRef = useResultsStickyCtaHeight<HTMLDivElement>();
@@ -428,9 +431,13 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   ) : null;
 
   // Streak Ignition (t_89663cfc): the payoff directly below the celebration
-  // hero — the visible streak + the persistent tomorrow hook. Two-column on
-  // lg (TV/party screens), stacked on mobile. Practice mode has no opponent,
-  // so completing the board IS the win there.
+  // hero — the visible streak + the persistent tomorrow hook. The first-game
+  // bridge (t_b883191f) sits ABOVE TomorrowCard: one tap into a different mode.
+  // Control (flag absent or 'control') renders nothing, so this column is
+  // today's card. Two-column on lg, stacked on mobile.
+  const goQuickMatch = useCallback(() => {
+    router.push(`/${language}/multiplayer?quickPlay=true`);
+  }, [router, language]);
   const retentionBlock = (
     <div className="space-y-4 lg:grid lg:grid-cols-2 lg:gap-5 lg:space-y-0 lg:items-stretch">
       <StreakIgnitionCard
@@ -438,7 +445,10 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         currentStreak={currentStreak}
         isLoaded={isStreakLoaded}
       />
-      <TomorrowCard />
+      <div className="flex flex-col gap-4">
+        <FirstGameBridge surface="singleplayer" enabled onActivate={goQuickMatch} />
+        <TomorrowCard />
+      </div>
     </div>
   );
 

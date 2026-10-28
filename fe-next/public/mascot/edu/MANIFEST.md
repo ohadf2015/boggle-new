@@ -16,6 +16,7 @@ Current-house-art marshmallow cube, transparent webp. Source: Higgsfield gpt_ima
 | attack | edu-attack-512.webp, edu-attack-1024.webp | 512/1024 sq | Throwing letter tile: Attack action |
 | error | edu-error-512.webp, edu-error-1024.webp | 512/1024 sq | Tangled paper tape: Errors |
 | podium | edu-podium-512.webp, edu-podium-1024.webp | 512/1024 sq | #1 podium medal: Winner/podium |
+| scanJoin | edu-scanJoin-512.webp, edu-scanJoin-1024.webp | 512/1024 sq | Holding up a phone with a QR: empty live lobby, scan to join |
 | welcome loop | video/edu-welcome-loop.mp4, video/edu-welcome-loop.poster.webp | 720 sq, 4s, no audio, seamless (start=end frame) | idle loop; render poster/still under reduced motion |
 | gameStart loop | video/edu-gameStart-loop.mp4, video/edu-gameStart-loop.poster.webp | 720 sq, 4s, no audio, seamless (start=end frame) | idle loop; render poster/still under reduced motion |
 | success loop | video/edu-success-loop.mp4, video/edu-success-loop.poster.webp | 720 sq, 4s, no audio, seamless (start=end frame) | idle loop; render poster/still under reduced motion |

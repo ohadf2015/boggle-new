@@ -2,7 +2,7 @@
 describe('public subdirectory assets', () => {
   it('passes static files under public/ subdirectories (mascot loader regression)', async () => {
     const { decideNextHandle } = await import('./nextHandleGate');
-    for (const p of ['/mascot/winner.webp', '/mascots/styles/arcade.png', '/home/daily-streak.webp', '/mascot/posters/x.jpg', '/sql/sql-wasm.wasm']) {
+    for (const p of ['/mascot/winner.webp', '/mascots/styles/arcade.png', '/home/daily-streak.webp', '/mascot/posters/x.jpg', '/sql/sql-wasm.wasm', '/i18n/en.landing.32ac01bc.js']) {
       expect(decideNextHandle(p)).toEqual({ action: 'pass' });
     }
   });
@@ -17,6 +17,6 @@ describe('public subdirectory assets', () => {
     const { PUBLIC_DIRS } = await import('./nextHandleGate');
     const onDisk = fs.readdirSync(path.join(process.cwd(), 'public'), { withFileTypes: true })
       .filter((d) => d.isDirectory()).map((d) => d.name).sort();
-    expect(onDisk.filter((d) => !PUBLIC_DIRS.has(d) && d !== 'i18n')).toEqual([]);
+    expect(onDisk.filter((d) => !PUBLIC_DIRS.has(d))).toEqual([]);
   });
 });

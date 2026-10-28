@@ -110,7 +110,7 @@ export const BlastObjectiveBanner = memo(function BlastObjectiveBanner({
             {p.isComplete && !isTargetWord && (
               <Check data-testid="objective-check" className="h-3.5 w-3.5 shrink-0" strokeWidth={3} />
             )}
-            {(p.objective.type === 'collect_type' || p.objective.type === 'clear_all_type') && p.objective.tileType && (
+            {p.objective.type === 'collect_type' && p.objective.tileType && (
               <ObjectiveTilePreview tileType={p.objective.tileType} />
             )}
             <span dir="auto" className={cn('flex-1 truncate', p.isComplete && 'line-through')}>{formatObjectiveLabel(p.objective, t)}</span>

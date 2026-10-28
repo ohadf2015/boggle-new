@@ -26,15 +26,12 @@ function Spec({ testId, icon: Icon, label, value }: { testId: string; icon: type
   return (
     <div
       data-testid={testId}
-      className="flex min-w-0 flex-1 items-center gap-1.5 rounded-neo border-[2px] border-neo-cream/80 bg-neo-navy px-1.5 py-1 text-start lg:gap-3 lg:px-4 lg:py-2 lg:[@media(max-height:1099px)]:gap-2 lg:[@media(max-height:1099px)]:py-1"
+      title={label}
+      className="inline-flex min-w-0 items-center gap-1.5 rounded-full border-[2px] border-neo-cream/80 bg-neo-navy px-2 py-1 lg:gap-2 lg:px-3 lg:py-1.5 lg:[@media(max-height:1099px)]:py-1"
     >
-      <Icon className="hidden size-5 shrink-0 text-neo-cream sm:block lg:size-7" strokeWidth={2.5} aria-hidden="true" />
-      <span className="min-w-0 leading-tight">
-        <span data-spec="label" className="block truncate font-neo-display text-[0.55rem] font-black uppercase tracking-wide text-neo-cream/75 lg:text-sm">
-          {label}
-        </span>
-        <span data-spec="value" className="line-clamp-2 block font-neo-display text-[0.7rem] font-black leading-tight text-neo-cream lg:text-2xl lg:[@media(max-height:1099px)]:text-xl">{value}</span>
-      </span>
+      <Icon className="size-4 shrink-0 text-neo-cream lg:size-6" strokeWidth={2.5} aria-hidden="true" />
+      <span data-spec="label" className="sr-only">{label}</span>
+      <span data-spec="value" className="truncate font-neo-display text-xs font-black leading-tight text-neo-cream lg:text-xl lg:[@media(max-height:1099px)]:text-lg">{value}</span>
     </div>
   );
 }
@@ -49,8 +46,8 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, language, dir, bus
       aria-live="polite"
       className="rounded-neo-lg border-4 border-neo-cream bg-neo-navy-light/95 p-2.5 shadow-hard-lg lg:p-4 lg:[@media(max-height:1099px)]:p-3"
     >
-      <div className="grid grid-cols-[minmax(0,8.5rem)_minmax(0,1fr)] gap-2.5 lg:grid-cols-[minmax(0,11rem)_minmax(0,1fr)] lg:gap-5 lg:[@media(max-height:1099px)]:grid-cols-[minmax(0,8.5rem)_minmax(0,1fr)] lg:[@media(max-height:1099px)]:gap-4">
-        <div className="relative self-start">
+      <div className="grid grid-cols-[minmax(0,8.5rem)_minmax(0,1fr)] gap-2.5 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] lg:gap-6 lg:[@media(max-height:1099px)]:grid-cols-[minmax(0,13rem)_minmax(0,1fr)] lg:[@media(max-height:1099px)]:gap-5">
+        <div data-testid="spotlight-art" className="relative self-start max-lg:row-span-3 lg:self-center">
           <ClassroomModePreview
             key={mode.id}
             kind={mode.preview}
@@ -63,15 +60,14 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, language, dir, bus
             src={mode.poster}
             alt=""
             aria-hidden="true"
-            className="pointer-events-none absolute -bottom-3 -end-3 w-[42%] select-none object-contain drop-shadow-[3px_3px_0_#000] motion-safe:animate-avatar-float"
+            className="pointer-events-none absolute -bottom-3 -end-3 w-[42%] select-none object-contain drop-shadow-[3px_3px_0_rgb(var(--neo-black))] motion-safe:animate-avatar-float"
           />
           )}
         </div>
 
-        <div className="flex min-w-0 flex-col gap-1 text-start lg:gap-2">
-          {/* Category and best-for share one line on desktop — the steps strip
-              below needs the height more than these chips do. */}
-          <div className="flex flex-wrap items-center gap-1.5 lg:gap-2">
+        {/* Below lg this box dissolves into the grid: chips, title and blurb sit beside the art, the specs and GO LIVE span the card. */}
+        <div data-testid="spotlight-text" className="flex min-w-0 flex-col gap-1 text-start max-lg:contents lg:gap-2.5 lg:[@media(max-height:1099px)]:gap-1.5">
+          <div className="flex flex-wrap items-center gap-1.5 max-lg:col-start-2 lg:gap-2">
             <span
               className={cn(
                 'rounded-full border-[2px] border-neo-black px-2 py-0.5 font-neo-display text-[0.6rem] font-black uppercase leading-none text-neo-black lg:px-3 lg:py-1 lg:text-sm',
@@ -86,44 +82,46 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, language, dir, bus
                 <span
                   key={k}
                   data-testid="best-for-chip"
-                  className="rounded-full border-[2px] border-neo-black bg-neo-cream px-2 py-0.5 font-neo-display text-xs font-black text-neo-black lg:px-3 lg:py-1 lg:text-base"
+                  className="rounded-full border-[2px] border-neo-cream/45 px-2 py-0.5 font-neo-display text-xs font-bold text-neo-cream lg:px-3 lg:py-0.5 lg:text-base"
                 >
                   {t(k)}
                 </span>
               ))}
             </span>
           </div>
-          <h2 className="font-neo-display text-2xl font-black uppercase leading-[0.95] tracking-tight text-neo-cream lg:text-5xl lg:[@media(max-height:1099px)]:text-4xl">
+          <h2 className="font-neo-display max-lg:col-start-2 text-2xl font-black uppercase leading-[0.95] tracking-tight text-neo-cream lg:text-5xl lg:[@media(max-height:1099px)]:text-4xl">
             {name}
           </h2>
-          <p className="line-clamp-3 font-neo-body text-xs font-bold leading-snug text-neo-cream/90 lg:text-lg lg:[@media(max-height:1099px)]:line-clamp-2 lg:[@media(max-height:1099px)]:text-base">{t(keys.how)}</p>
+          <p className="line-clamp-3 max-lg:col-start-2 font-neo-body text-xs font-bold leading-snug text-neo-cream/90 lg:text-lg lg:[@media(max-height:1099px)]:line-clamp-2 lg:[@media(max-height:1099px)]:text-base">{t(keys.how)}</p>
+          <div className="flex min-w-0 flex-wrap gap-1.5 max-lg:col-span-2 max-lg:col-start-1 max-lg:mt-1 lg:gap-2">
+            <Spec testId="spec-duration" icon={Clock} label={t('eg2Modes.spec.duration')} value={t('education.modePicker.minutes', { count: minutes })} />
+            <Spec testId="spec-complexity" icon={Puzzle} label={t('eg2Modes.spec.complexity')} value={t(keys.complexity)} />
+            <Spec testId="spec-style" icon={Gamepad2} label={t('eg2Modes.spec.style')} value={t(keys.style)} />
+          </div>
+          <button
+            type="button"
+            data-testid="lobby-go-live"
+            onClick={onGoLive}
+            disabled={!!blockedKey || busy}
+            className={cn(
+              'flex min-h-14 w-full items-center justify-center gap-2 rounded-neo-lg border-[3px] border-black px-4 py-2 max-lg:col-span-2 max-lg:col-start-1 max-lg:mt-1 lg:mt-1 lg:min-h-16 lg:[@media(max-height:1099px)]:min-h-12 lg:[@media(max-height:1099px)]:py-1.5',
+              'bg-neo-lime font-neo-display text-xl font-black uppercase tracking-tight text-black shadow-hard-lg lg:text-3xl lg:[@media(max-height:1099px)]:text-2xl',
+              'transition-transform motion-safe:hover:-translate-y-0.5 active:translate-y-0.5',
+              'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
+              'disabled:cursor-not-allowed disabled:bg-neo-navy-light disabled:text-neo-cream/70 disabled:shadow-none disabled:hover:translate-y-0'
+            )}
+          >
+            <Radio className="size-6 shrink-0 lg:size-8" strokeWidth={3} aria-hidden="true" />
+            <span className="truncate">{t('education.modePicker.launch', { mode: name })}</span>
+          </button>
         </div>
       </div>
 
-      {/* Full card width, not squeezed into the text column: at projector
-          size three steps in a third of a column each wrapped to
-          four lines and pushed the mode row off a 960px wall. */}
-      <ol data-testid="how-it-plays-inline" aria-label={t('eg2Modes.howItPlays')} className="mt-3 hidden grid-cols-3 gap-4 text-start lg:[@media(min-height:700px)]:grid lg:[@media(max-height:1099px)]:mt-2 lg:[@media(max-height:1099px)]:gap-3">
-        {keys.steps.map((k, i) => (
-          <li key={k} className="flex items-start gap-2 font-neo-body text-sm font-bold leading-snug text-neo-cream lg:text-lg lg:[@media(max-height:1099px)]:text-sm lg:[@media(max-height:1099px)]:line-clamp-2">
-            <StepNumber n={i + 1} accent={mode.accent} />
-            {t(k)}
-          </li>
-        ))}
-      </ol>
-
-      <div className="mt-3 flex flex-col lg:[@media(max-height:1099px)]:mt-2 lg:[@media(max-height:1099px)]:flex-row lg:[@media(max-height:1099px)]:items-stretch lg:[@media(max-height:1099px)]:gap-3">
-      <div className="flex min-w-0 flex-1 gap-1.5 lg:gap-2">
-        <Spec testId="spec-duration" icon={Clock} label={t('eg2Modes.spec.duration')} value={t('education.modePicker.minutes', { count: minutes })} />
-        <Spec testId="spec-complexity" icon={Puzzle} label={t('eg2Modes.spec.complexity')} value={t(keys.complexity)} />
-        <Spec testId="spec-style" icon={Gamepad2} label={t('eg2Modes.spec.style')} value={t(keys.style)} />
-      </div>
-
-      <div className="mt-2 flex flex-wrap items-center gap-1.5 lg:hidden">
+      <div className="mt-2 flex flex-wrap items-center gap-1.5 lg:[@media(min-height:801px)]:hidden">
         {keys.bestFor.map((k) => (
           <span
             key={k}
-            className="rounded-full border-[2px] border-neo-black bg-neo-cream px-2 py-0.5 font-neo-display text-[0.65rem] font-black text-neo-black"
+            className="rounded-full border-[2px] border-neo-black bg-neo-cream px-2 py-0.5 font-neo-display text-[0.65rem] font-black text-neo-black lg:hidden"
           >
             {t(k)}
           </span>
@@ -133,7 +131,7 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, language, dir, bus
           data-testid="how-it-plays-toggle"
           aria-expanded={stepsOpen}
           onClick={() => setStepsOpen((v) => !v)}
-          className="ms-auto inline-flex items-center gap-0.5 rounded-neo px-1 font-neo-display text-[0.65rem] font-black uppercase text-neo-cream underline decoration-2 underline-offset-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream lg:hidden"
+          className="ms-auto inline-flex items-center gap-0.5 rounded-neo px-1 font-neo-display text-[0.65rem] font-black uppercase text-neo-cream underline decoration-2 underline-offset-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream lg:text-sm lg:[@media(min-height:801px)]:hidden"
         >
           {t(stepsOpen ? 'eg2Modes.hideHowItPlays' : 'eg2Modes.howItPlays')}
           {stepsOpen ? <ChevronUp className="size-3.5" strokeWidth={3} aria-hidden="true" /> : <ChevronDown className="size-3.5" strokeWidth={3} aria-hidden="true" />}
@@ -141,7 +139,7 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, language, dir, bus
       </div>
 
       {stepsOpen && (
-        <ol data-testid="how-it-plays" className="mt-2 grid gap-1.5 lg:hidden">
+        <ol data-testid="how-it-plays" className="mt-2 grid gap-1.5 lg:grid-cols-3 lg:[@media(min-height:801px)]:hidden">
           {keys.steps.map((k, i) => (
             <li
               key={k}
@@ -154,23 +152,14 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, language, dir, bus
         </ol>
       )}
 
-      <button
-        type="button"
-        data-testid="lobby-go-live"
-        onClick={onGoLive}
-        disabled={!!blockedKey || busy}
-        className={cn(
-          'mt-3 flex min-h-14 w-full items-center justify-center gap-2 rounded-neo-lg border-[3px] border-black px-4 py-2 lg:min-h-16 lg:[@media(max-height:1099px)]:mt-0 lg:[@media(max-height:1099px)]:min-h-0 lg:[@media(max-height:1099px)]:w-auto lg:[@media(max-height:1099px)]:min-w-[30%] lg:[@media(max-height:1099px)]:shrink-0',
-          'bg-neo-lime font-neo-display text-xl font-black uppercase tracking-tight text-black shadow-hard-lg lg:text-4xl lg:[@media(max-height:1099px)]:text-2xl',
-          'transition-transform motion-safe:hover:-translate-y-0.5 active:translate-y-0.5',
-          'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
-          'disabled:cursor-not-allowed disabled:bg-neo-navy-light disabled:text-neo-cream/70 disabled:shadow-none disabled:hover:translate-y-0'
-        )}
-      >
-        <Radio className="size-6 shrink-0 lg:size-8" strokeWidth={3} aria-hidden="true" />
-        <span className="truncate">{t('education.modePicker.launch', { mode: name })}</span>
-      </button>
-      </div>
+      <ol data-testid="how-it-plays-inline" aria-label={t('eg2Modes.howItPlays')} className="mt-3 hidden grid-cols-3 gap-4 text-start lg:[@media(min-height:801px)]:grid lg:[@media(max-height:1099px)]:mt-2 lg:[@media(max-height:1099px)]:gap-3">
+        {keys.steps.map((k, i) => (
+          <li key={k} className="flex items-start gap-2 font-neo-body text-sm font-bold leading-snug text-neo-cream lg:text-lg lg:[@media(max-height:1099px)]:text-sm lg:[@media(max-height:1099px)]:line-clamp-2">
+            <StepNumber n={i + 1} accent={mode.accent} />
+            {t(k)}
+          </li>
+        ))}
+      </ol>
       {blockedKey && (
         <p data-testid="go-live-blocked" role="status" className="mt-1.5 text-center font-neo-body text-xs font-bold text-neo-yellow lg:text-base">
           {t(blockedKey)}

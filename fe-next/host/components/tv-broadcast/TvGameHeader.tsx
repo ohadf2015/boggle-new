@@ -21,6 +21,9 @@ interface TvGameHeaderProps {
   /** Classroom host on a phone: a smaller timer so the leaderboard stays on screen. */
   compact?: boolean;
   toastSlot?: ReactNode;
+  /** Replaces the LIVE and mode chips, e.g. a classroom's round and lesson. */
+  leading?: ReactNode;
+  trailing?: ReactNode;
   t: (path: string, params?: Record<string, string | number>) => string;
 }
 
@@ -53,6 +56,8 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
   wordHuntAliveCount = 0,
   compact = false,
   toastSlot,
+  leading,
+  trailing,
   t,
 }) => {
   const totalTimeSeconds = timerValue * 60;
@@ -63,11 +68,13 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Left: LIVE badge + Mode badge */}
         <m.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
           data-testid="tv-header-start"
           className="flex-1 min-w-0 flex items-center gap-2"
         >
+          {leading ?? (
+            <>
           <m.div
             data-testid="live-badge"
             className="flex items-center gap-2 bg-neo-red text-neo-cream px-4 py-2 rounded-neo border-3 border-neo-black shadow-hard-sm"
@@ -90,17 +97,19 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
           {gameMode && (
             <m.div
               data-testid="mode-badge"
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
               className={`px-3 py-1 rounded-neo border-2 border-neo-black shadow-hard-sm font-bold text-sm uppercase ${MODE_COLORS[gameMode] || 'bg-neo-navy text-neo-cream'}`}
             >
               {tvModeLabel(gameMode, t)}
             </m.div>
           )}
+            </>
+          )}
         </m.div>
 
         {/* Center: Timer with heartbeat pulse */}
-        <div data-testid="tv-timer-slot" className={compact ? 'flex-1 flex justify-center max-md:[zoom:0.6] md:medium-short:[zoom:0.55] lg:[@media(min-height:851px)]:[zoom:1.2]' : 'flex-1 flex justify-center'}>
+        <div data-testid="tv-timer-slot" className={compact ? 'flex-1 flex justify-center max-md:[zoom:0.6] md:medium-short:[zoom:0.75] lg:[@media(min-height:851px)]:[zoom:1.2]' : 'flex-1 flex justify-center'}>
           {remainingTime !== null && (
             showHeartbeat ? (
               <m.div
@@ -167,12 +176,12 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
                   animation: 'fire-glow 1s ease-in-out infinite',
                 }}
               >
-                <Flame className="w-6 h-6 animate-bounce" />
+                <Flame className="w-6 h-6 motion-safe:animate-bounce" />
                 <div className="text-center">
                   <span className="font-black text-lg uppercase block">{t('tvBroadcast.fireRound')}</span>
                   <span className="text-xs font-bold">{t('tvBroadcast.twoXPoints')} • {fireRoundRemaining}s</span>
                 </div>
-                <Flame className="w-6 h-6 animate-bounce" />
+                <Flame className="w-6 h-6 motion-safe:animate-bounce" />
               </m.div>
             )}
           </AnimatePresence>
@@ -196,6 +205,7 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
             </m.div>
           )}
 
+          {trailing}
           {toastSlot && (
             <div data-testid="tv-header-toast-slot" className="min-w-0 flex justify-end">
               {toastSlot}

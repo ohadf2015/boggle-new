@@ -9,7 +9,7 @@ import { m } from 'framer-motion';
 import TvTutorialOverlay, { TvHelpButton } from './tv-broadcast/TvTutorialOverlay';
 import TvJoinBar from './tv-broadcast/TvJoinBar';
 import TvGameHeader from './tv-broadcast/TvGameHeader';
-import TvBattleBar from './tv-broadcast/TvBattleBar';
+import TvBattleBar, { TvFormatChip, TvRoundLabel } from './tv-broadcast/TvBattleBar';
 import type { ClassroomLiveContext } from '@/shared/utils/classroomLiveContext';
 import TvLeaderboard from './tv-broadcast/TvLeaderboard';
 import TvActivityPanel from './tv-broadcast/TvActivityPanel';
@@ -391,6 +391,8 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
       {/* Game Header with Timer - Always visible */}
       <TvGameHeader
         compact={isClassroom}
+        leading={isClassroom ? <TvRoundLabel classroom={classroomLive} t={t} /> : undefined}
+        trailing={isClassroom ? <span className="max-md:hidden"><TvFormatChip classroom={classroomLive} t={t} /></span> : undefined}
         toastSlot={isClassroom ? (
           <TvNotificationQueue
             notifications={notifications}
@@ -414,7 +416,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
       {/* Classroom state sentence: which lesson, which round, which format —
           and, in a team battle, the live tug-of-war. Renders nothing in a
           public room. */}
-      <TvBattleBar classroom={classroomLive} players={leaderboardData} t={t} />
+      <TvBattleBar classroom={classroomLive} players={leaderboardData} t={t} labelInHeader />
 
       {/* Momentum Ticker — auto-generated commentary */}
       <div data-testid="tv-momentum-slot" className={isClassroom ? 'hidden md:block md:medium-short:hidden lg:[@media(min-height:851px)]:hidden' : undefined}>

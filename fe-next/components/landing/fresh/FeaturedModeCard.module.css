@@ -1,0 +1,16 @@
+/* The featured mascot bobs on a slow loop; still when motion is unwelcome. */
+@media (prefers-reduced-motion: no-preference) {
+  .mascot {
+    animation: bob 2.8s ease-in-out infinite;
+  }
+}
+
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-3deg);
+  }
+  50% {
+    transform: translateY(-6%) rotate(3deg);
+  }
+}

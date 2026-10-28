@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useReducer } from 'react';
 import type { LetterGrid, Language } from '@/types';
 import type { LetterFeedback } from '@/utils/wordHuntFeedback';
-import { calculateEfficiencyScore, type ClueShopItem, type HintLevel } from '@/utils/aiHintGenerator';
+import type { ClueShopItem, HintLevel } from '@/utils/aiHintGenerator';
 import type { FeedbackType, WordDiscovery, TargetAttempt, SurvivalGameResult, AccumulatedClue, ScoreEvent, AutoClueNotificationData } from './types';
 import { useLiveScoreTracker } from './useLiveScoreTracker';
 import { clearRejectedWords } from '@/utils/invalidWordTracker';
@@ -14,12 +14,15 @@ import {
   NEW_PLAYER_LIFE_FLOOR,
   getLanguageDrainMultiplier,
   SOLVE_CELEBRATION_MS,
+  LOSS_REVEAL_MS,
 } from './constants';
+import { useFinishHold } from './useFinishHold';
+import { buildSurvivalResult, logSurvivalEnd } from './finishRun';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { useGameMusic } from '@/hooks/useGameMusic';
-import { logGameStart, logGameEnd, formatWordsForLogging } from '@/utils/gameLogger';
+import { logGameStart } from '@/utils/gameLogger';
 import { isNewDailyPlayer, incrementDailyChallengesCompleted } from '@/utils/trainingProgressStorage';
 import { useSurvivalClues } from './useSurvivalClues';
 import { useSurvivalHints } from './useSurvivalHints';
@@ -113,6 +116,8 @@ export interface SurvivalGameActions {
   showAutoClueNotification: (clueType: string) => void;
   dismissNotification: (id: string) => void;
   restoreLife: (amount: number) => void;
+  /** Ends the finish beat early (tap on the board) and opens results now. */
+  skipFinish: () => void;
   gameDir: 'ltr' | 'rtl';
   clueContainerRef: React.RefObject<HTMLDivElement | null>;
 }
@@ -134,10 +139,8 @@ export function useSurvivalGameLogic({
   // Game direction for RTL support
   const gameDir = language === 'he' ? 'rtl' : 'ltr';
 
-  // Consolidated state via reducer
   const [state, dispatch] = useReducer(survivalGameReducer, undefined, createInitialState);
 
-  // Refs
   const clueContainerRef = useRef<HTMLDivElement>(null);
   const gameOverRef = useRef(false);
   const gameStartTimeRef = useRef<number>(0);
@@ -146,9 +149,9 @@ export function useSurvivalGameLogic({
   // Timer hooks (replaces manual timer refs)
   const lifeDrainInterval = useSafeInterval();
   const feedbackTimeout = useSafeTimeout();
+  const finishHold = useFinishHold(onComplete);
   const lifeAnimationTimeout = useSafeTimeout();
 
-  // Toast helpers - dispatch-based
   const showToast = useCallback((type: FeedbackType, message: string, word?: string) => {
     dispatch({ type: 'SHOW_TOAST', payload: { type, message, word } });
   }, []);
@@ -157,7 +160,6 @@ export function useSurvivalGameLogic({
     dispatch({ type: 'CLOSE_TOAST' });
   }, []);
 
-  // Live score tracking
   const [liveScoreState] = useLiveScoreTracker({
     lifePoints: state.lifePoints,
     clueTokens: state.clueTokens,
@@ -181,13 +183,11 @@ export function useSurvivalGameLogic({
     dispatch({ type: 'DISMISS_NOTIFICATION', payload: { id } });
   }, []);
 
-  // Use extracted clue hook
   const [clueState, clueActions] = useSurvivalClues({
     targetWord,
     clueContainerRef,
   });
 
-  // Use extracted hint hook
   const [hintState, hintActions] = useSurvivalHints({
     targetWord,
     language,
@@ -301,7 +301,6 @@ export function useSurvivalGameLogic({
     handleGameOverRef,
   });
 
-  // Handle game over
   const handleGameOver = useCallback(async (won: boolean, finalAttempts?: TargetAttempt[]) => {
     if (gameOverRef.current) return;
     gameOverRef.current = true;
@@ -311,60 +310,18 @@ export function useSurvivalGameLogic({
 
     lifeDrainInterval.stop();
 
-    const attemptsToUse = finalAttempts || state.attempts;
-    // Only count target attempts (not discovery attempts) for attemptsUsed
-    // BUG FIX: Ensure at least 1 attempt for ALL game completions (win or lose)
-    // Handles scenarios where player completes without making target guesses:
-    // - Auto-win: discovers all letters through word discoveries
-    // - Loss: runs out of life before making any target guesses
-    // Without this fix, attemptsUsed=0 fails validation and blocks leaderboard submission.
-    const rawTargetAttemptsCount = attemptsToUse.filter(a => !a.isDiscovery).length;
-    const targetAttemptsCount = Math.max(1, rawTargetAttemptsCount);
-
-    const result: SurvivalGameResult = {
-      solved: won,
-      attemptsUsed: targetAttemptsCount,
+    const result = buildSurvivalResult({
+      won,
       targetWord,
-      attempts: attemptsToUse,
-      wordsDiscovered: state.discoveredWords,
-      lifeRemaining: state.lifePoints,
-      clueTokensEarned: state.clueTokens + hintState.tokensSpent,
-      clueTokensSpent: hintState.tokensSpent,
-      hintsUnlocked: hintState.currentHint?.level || 0,
-      efficiencyScore: calculateEfficiencyScore(
-        state.lifePoints,
-        state.clueTokens,
-        targetAttemptsCount,
-        state.discoveredWords.length,
-        won
-      ),
-    };
-
-    if (state.gameSessionId) {
-      const durationSeconds = Math.floor((Date.now() - gameStartTimeRef.current) / 1000);
-      const wordsFoundFormatted = formatWordsForLogging(
-        state.discoveredWords.map(w => w.word),
-        state.discoveredWords.map(w => ({
-          word: w.word,
-          points: w.lifeGained + (w.tokensGained * 10),
-          timestamp: w.timestamp,
-        }))
-      );
-
-      await logGameEnd(state.gameSessionId, {
-        score: result.efficiencyScore,
-        wordsFound: wordsFoundFormatted,
-        durationSeconds,
-        completed: true,
-        targetFound: won,
-        attemptsUsed: targetAttemptsCount,
-        lifeRemaining: state.lifePoints,
-        lifeGained: state.discoveredWords.reduce((sum, w) => sum + w.lifeGained, 0),
-        tokensEarned: state.clueTokens + hintState.tokensSpent,
-        tokensSpent: hintState.tokensSpent,
-        cluesUsed: hintState.tokensSpent > 0 ? Math.ceil(hintState.tokensSpent / 5) : 0,
-      });
-    }
+      attempts: finalAttempts || state.attempts,
+      discoveredWords: state.discoveredWords,
+      lifePoints: state.lifePoints,
+      clueTokens: state.clueTokens,
+      tokensSpent: hintState.tokensSpent,
+      hintLevel: hintState.currentHint?.level || 0,
+    });
+    const durationSeconds = Math.floor((Date.now() - gameStartTimeRef.current) / 1000);
+    if (state.gameSessionId) logSurvivalEnd(state.gameSessionId, result, durationSeconds);
 
     // Track daily challenge completion for new player detection
     incrementDailyChallengesCompleted();
@@ -374,17 +331,12 @@ export function useSurvivalGameLogic({
       result.efficiencyScore,
       state.discoveredWords.length,
       true,
-      Math.floor((Date.now() - gameStartTimeRef.current) / 1000),
-      { isWinner: won, attemptsUsed: targetAttemptsCount, lifeRemaining: state.lifePoints }
+      durationSeconds,
+      { isWinner: won, attemptsUsed: result.attemptsUsed, lifeRemaining: state.lifePoints }
     );
 
-    if (won) {
-      // Not a safe (unmount-cancelled) timeout: a win must always be reported.
-      setTimeout(() => onComplete(result), SOLVE_CELEBRATION_MS);
-    } else {
-      onComplete(result);
-    }
-  }, [state.attempts, state.discoveredWords, state.lifePoints, state.clueTokens, state.gameSessionId, hintState.tokensSpent, hintState.currentHint, targetWord, onComplete, lifeDrainInterval, fadeToTrack, TRACKS]);
+    finishHold.hold(result, won ? SOLVE_CELEBRATION_MS : LOSS_REVEAL_MS);
+  }, [state.attempts, state.discoveredWords, state.lifePoints, state.clueTokens, state.gameSessionId, hintState.tokensSpent, hintState.currentHint, targetWord, finishHold, lifeDrainInterval, fadeToTrack, TRACKS]);
 
   // Token adjustment helper for hint purchases
   const adjustTokens = useCallback((delta: number) => {
@@ -535,6 +487,7 @@ export function useSurvivalGameLogic({
     showAutoClueNotification,
     dismissNotification,
     restoreLife,
+    skipFinish: finishHold.skip,
     gameDir,
     clueContainerRef,
   };

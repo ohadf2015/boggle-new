@@ -32,21 +32,9 @@ export interface AutoTriggerStep {
 }
 
 // ─── Priority order for auto-trigger sequence ───────────────────────────────
-// Bombs first (area damage), then lightning (column), then prism (cross),
-// then the rest in decreasing visual impact order.
+// Bombs first (area damage), then coins, then diamonds.
 
-const TYPE_PRIORITY: BlastTileType[] = [
-  'bomb',
-  'lightning',
-  'prism',
-  'magnet',
-  'gold',
-  'gem',
-  'frozen',
-  'ice',
-  'rainbow',
-  'diamond',
-];
+const TYPE_PRIORITY: BlastTileType[] = ['bomb', 'gold', 'diamond'];
 
 // ─── Public API ─────────────────────────────────────────────────────────────
 

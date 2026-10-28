@@ -45,6 +45,7 @@ import type { BlastTileState, BlastGameState, BlastObjectiveProgress } from './t
 import type { SequencerState } from './hooks/useBlastSequencer';
 import type { ClearedTileEvent } from './BlastEffectsCanvas';
 import type { ComboStreakState } from './hooks/useBlastComboStreak';
+import type { BlastHudProgress } from '@/components/blast/progress/BlastHudProgress';
 
 interface BlastStageProps {
   // From engine
@@ -125,6 +126,7 @@ interface BlastStageProps {
   t: (key: string) => string | undefined;
   // Currency (SP only)
   coins?: number;
+  progress?: BlastHudProgress;
 }
 
 /**
@@ -180,6 +182,7 @@ export const BlastStage = memo(function BlastStage({
   t,
   activeModifier,
   coins = 0,
+  progress,
 }: BlastStageProps) {
   const { score, wordsFound, movesRemaining, totalMoves, tilesCleared, totalTiles, isComplete, isDeadEnd } = gameState;
   // MP Blast has timer props; SP Blast doesn't. Timer-era games hide the wave chip.
@@ -318,6 +321,8 @@ export const BlastStage = memo(function BlastStage({
         // ring and the pill disagreed by a second on screen.
         isDesktopCanvas={isDesktopCanvas}
         coins={coins}
+        progress={progress}
+        waveDiamonds={gameState.diamondsCollected ?? 0}
         t={t}
       />
       <BlastObjectiveBanner objectives={objectiveProgress} t={t} />
@@ -423,7 +428,6 @@ export const BlastStage = memo(function BlastStage({
                 sequencerState={sequencerState}
                 nearMissCells={nearMissCells}
                 cascadeHighlightCells={cascadeHighlightCells}
-                diamondRevealTurns={gameState.diamondRevealTurns}
                 isMultiplayer={isMultiplayer}
                 submitFeedback={currentFeedback}
               />

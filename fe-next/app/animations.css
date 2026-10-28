@@ -2190,18 +2190,6 @@ html.reduce-motion *::after {
   transition: none !important;
 }
 
-/* Disable heavy blast tile animations (box-shadow + filter keyframes) */
-.low-end-device .blast-tile-ice,
-.low-end-device .blast-tile-lightning,
-.low-end-device .blast-tile-magnet,
-.low-end-device .blast-tile-prism,
-.low-end-device .blast-tile-gem,
-.low-end-device .blast-tile-frozen,
-.low-end-device .blast-tile-objective {
-  animation: none !important;
-  filter: none !important;
-}
-
 /* Disable adventure tile glow/shimmer animations */
 .low-end-device .adventure-tile-gold,
 .low-end-device .adventure-tile-bomb,
@@ -3248,4 +3236,14 @@ html.reduce-motion *::after {
 @keyframes clueToastTimer {
   from { transform: scaleX(1); }
   to { transform: scaleX(0); }
+}
+
+@keyframes edu-ghost-wave {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.55; }
+  30% { transform: translateY(-14%); opacity: 1; }
+}
+
+@keyframes edu-fold-in {
+  from { transform: translateY(-6px); opacity: 0; }
+  to { transform: none; opacity: 1; }
 }

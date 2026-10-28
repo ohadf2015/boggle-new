@@ -2,6 +2,7 @@ export type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 
 export interface ToolContent {
   title: string;
+  metaTitle?: string;
   subtitle: string;
   description: string;
   metaDescription: string;
@@ -38,11 +39,12 @@ export interface ToolContent {
 const content: Record<Locale, ToolContent> = {
   en: {
     title: 'Word Solver & Anagram Finder',
+    metaTitle: 'Anagram Solver: Unscramble Letters Into Words',
     subtitle: 'Unscramble letters and find every possible word',
     description:
       'Free online anagram solver and word unscrambler. Enter your letters and instantly find all possible words. Perfect for Scrabble, Boggle, Words With Friends, and LexiClash.',
     metaDescription:
-      'Free anagram solver & word finder. Unscramble letters to find all possible words. Works for Scrabble, Boggle, Words With Friends. Try our word unscrambler now!',
+      'Enter up to 20 letters and see every word they spell, longest first. Free anagram and letter solver with a full dictionary, no signup.',
     inputPlaceholder: 'Enter your letters (e.g. AELRST)',
     inputLabel: 'Your Letters',
     languageLabel: 'Dictionary Language',

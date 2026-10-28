@@ -11,6 +11,7 @@
  *   /en/education/classroom-game?preview=waiting    — a student's waiting-for-teacher stage
  *   (&count=N sets the projector roster size, default 12)
  *   ?preview=hostresults|phone|quiz|duel|ended — the round-end surfaces, see LiveResultsPreviews
+ *   ?preview=ingame — the teacher's in-game projector mid-round
  *
  * Mounted from PageClient behind `process.env.NODE_ENV !== 'production'` on a
  * lazy `dynamic()` import, so production never ships this chunk (same pattern
@@ -38,6 +39,7 @@ import { DuelPreview, EndedPreview, HostResultsPreview, PhoneResultsPreview, Qui
 
 import type { LiveSurfacePreviewKind } from './previewKinds';
 import { StudentQuizPreview } from './StudentQuizPreview';
+import { InGamePreview } from './InGamePreview';
 
 export type { LiveSurfacePreviewKind };
 
@@ -157,5 +159,6 @@ export default function LiveSurfacePreview({ kind }: { kind: LiveSurfacePreviewK
   if (kind === 'duel') return <DuelPreview />;
   if (kind === 'ended') return <EndedPreview />;
   if (kind === 'quizphone') return <StudentQuizPreview />;
+  if (kind === 'ingame') return <InGamePreview />;
   return <ProjectorPreview />;
 }

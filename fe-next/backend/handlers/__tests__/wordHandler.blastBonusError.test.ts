@@ -132,19 +132,19 @@ vi.mock('../../../backend/services/gracePeriodLock', () => ({
   releaseGracePeriodLock: vi.fn(),
 }));
 
-// Force getTilesOnPath to throw — simulates an unexpected blast state corruption.
+// Force getTilesOnBoardPath to throw — simulates an unexpected blast state corruption.
 vi.mock('../../../backend/modules/blastModeManager', () => ({
   validateBlastWordPath: vi.fn().mockReturnValue(null),
-  getTilesOnResolvedPath: vi.fn().mockReturnValue([]),
   calculateBlastTileBonus: vi.fn().mockReturnValue(0),
-  getTilesOnPath: vi.fn(() => { throw new Error('boom: overlay corruption'); }),
+  getTilesOnBoardPath: vi.fn(() => { throw new Error('boom: overlay corruption'); }),
+  recordBlastCollection: vi.fn(() => 0),
   recordBlastMove: vi.fn().mockReturnValue({ movesUsed: 0, bonusMove: false }),
   isBlastBoardCleared: vi.fn().mockReturnValue(false),
   advanceBlastWave: vi.fn(),
   tryBeginWaveAdvance: vi.fn().mockReturnValue(false),
   endWaveAdvance: vi.fn(),
   // Per-player board model — must resolve a board before the (throwing)
-  // getTilesOnPath, so the thrown error is the intended overlay-corruption one.
+  // getTilesOnBoardPath, so the thrown error is the intended overlay-corruption one.
   getOrInitPlayerBoard: vi.fn(() => ({
     grid: [['A']], tileStates: [[{ letter: 'A', type: 'standard', isCleared: false }]],
     overlay: [], overlayMap: new Map(), seed: 1, totalMoves: 0, refillCount: 0,

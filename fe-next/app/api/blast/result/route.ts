@@ -12,6 +12,7 @@ import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { validateBlastResult, type PersonalBests } from '../utils';
 import { captureApiError } from '@/utils/sentry';
 import { processBlastCompletion } from './processCompletion';
+import { loadBlastLadder } from '@/lib/blastLeaderboardNames';
 
 /**
  * POST /api/blast/result
@@ -93,6 +94,7 @@ export async function GET(request: Request) {
     // Parse optional difficulty filter from query
     const { searchParams } = new URL(request.url);
     const difficulty = searchParams.get('difficulty');
+    const ladderLanguage = searchParams.get('ladder');
 
     // Fetch recent results (last 20)
     let resultsQuery = supabase
@@ -151,10 +153,15 @@ export async function GET(request: Request) {
       };
     }
 
+    const ladder = ladderLanguage
+      ? await loadBlastLadder(supabase, userId, ladderLanguage, difficulty ?? 'medium')
+      : undefined;
+
     return NextResponse.json({
       success: true,
       results: transformedResults,
       personalBests,
+      ...(ladder ? { ladder } : {}),
     });
   } catch (error) {
     captureApiError(error instanceof Error ? error : new Error(String(error)), '/api/blast/result', { method: 'GET' });

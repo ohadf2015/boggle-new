@@ -245,16 +245,29 @@ describe('trackEduProCheckoutReturnLanded', () => {
     localStorage.clear();
   });
 
-  it('Given a checkout return, When tracked, Then both names fire once and the webhook name does not', () => {
-    expect(trackEduProCheckoutReturnLanded(1_000)).toBe(true);
-    expect(captureMock).toHaveBeenCalledWith('edu_pro_checkout_return_landed', {});
-    expect(captureMock).toHaveBeenCalledWith('checkout_return_landed', {
-      product: 'teacher_pro',
-      provider: 'polar',
-    });
-    expect(captureMock.mock.calls.map((c) => c[0])).not.toContain('edu_pro_checkout_succeeded');
-    expect(growthMock).toHaveBeenCalledWith('edu_pro_checkout_return_landed', {});
-    expect(localStorage.getItem(RETURN_LANDED_STORAGE_KEY)).toBe('1000');
+  it('Given a checkout return, When tracked, Then both names fire once, the server return endpoint is POSTed, and the webhook name does not', () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue({ ok: true } as Response);
+    try {
+      expect(trackEduProCheckoutReturnLanded(1_000)).toBe(true);
+      expect(captureMock).toHaveBeenCalledWith('edu_pro_checkout_return_landed', {});
+      expect(captureMock).toHaveBeenCalledWith('checkout_return_landed', {
+        product: 'teacher_pro',
+        provider: 'polar',
+      });
+      expect(captureMock.mock.calls.map((c) => c[0])).not.toContain('edu_pro_checkout_succeeded');
+      expect(growthMock).toHaveBeenCalledWith('edu_pro_checkout_return_landed', {});
+      expect(fetchSpy).toHaveBeenCalledWith(
+        '/api/subscription/checkout-return',
+        expect.objectContaining({
+          method: 'POST',
+          keepalive: true,
+          credentials: 'same-origin',
+        }),
+      );
+      expect(localStorage.getItem(RETURN_LANDED_STORAGE_KEY)).toBe('1000');
+    } finally {
+      fetchSpy.mockRestore();
+    }
   });
 
   it('Given a reload that keeps ?checkout=success, When tracked again, Then it does not fire twice', () => {

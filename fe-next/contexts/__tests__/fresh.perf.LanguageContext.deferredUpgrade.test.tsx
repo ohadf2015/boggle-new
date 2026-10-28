@@ -2,14 +2,15 @@
  * Piece D (perf), SPEC section 10 item 2: a fresh visitor on the landing
  * subset must not download the full catalogue chunk (~150KB br) during first
  * load. The upgrade used to fire on idle (<=4s), i.e. always inside the first
- * load. It now fires on first engagement (pointerdown / keydown / touchstart /
- * scroll) or on the first client navigation, whichever comes first. The
+ * load. It now fires once scrolling settles after first engagement (pointerdown /
+ * keydown / touchstart / scroll), or on the first client navigation. The
  * homepage itself only uses subset namespaces (lib/i18n/landingNamespaces.ts).
  */
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import React from 'react';
 import { render, act } from '@testing-library/react';
 import { PARTIAL_FLAG } from '@/lib/i18n/pickLandingMessages';
+import { SCROLL_QUIET_MS } from '@/lib/perf/runWhenScrollSettles';
 
 let pathname = '/en';
 vi.mock('next/navigation', () => ({
@@ -81,15 +82,34 @@ describe('landing subset: full catalogue waits for first engagement', () => {
   });
 
   it.each(['pointerdown', 'keydown', 'touchstart', 'scroll'])(
-    'shouldUpgradeOnTheFirst %s',
+    'shouldUpgradeOnceScrollingSettlesAfterTheFirst %s',
     (type) => {
       renderProvider();
       act(() => {
         window.dispatchEvent(new Event(type));
       });
+      expect(loadTranslation).not.toHaveBeenCalled();
+      act(() => {
+        vi.advanceTimersByTime(SCROLL_QUIET_MS);
+      });
       expect(loadTranslation).toHaveBeenCalledTimes(1);
     },
   );
+
+  it('shouldNotUpgradeWhileTheVisitorKeepsScrolling', () => {
+    renderProvider();
+    act(() => {
+      for (let i = 0; i < 10; i += 1) {
+        window.dispatchEvent(new Event('scroll'));
+        vi.advanceTimersByTime(100);
+      }
+    });
+    expect(loadTranslation).not.toHaveBeenCalled();
+    act(() => {
+      vi.advanceTimersByTime(SCROLL_QUIET_MS);
+    });
+    expect(loadTranslation).toHaveBeenCalledTimes(1);
+  });
 
   it('shouldUpgradeOnTheFirstClientNavigation', () => {
     // GIVEN the subset booted on /en

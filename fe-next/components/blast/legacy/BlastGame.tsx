@@ -23,15 +23,14 @@ import { useBlastComboStreak, getComboWindowMs } from './hooks/useBlastComboStre
 import { useBlastSequencer } from './hooks/useBlastSequencer';
 import { useBlastColorSeeding } from './hooks/useBlastColorSeeding';
 import { BlastStage } from './BlastStage';
-import { BlastWaveIntro } from './BlastWaveIntro';
+import { BlastLevelIntro } from '@/components/blast/progress/BlastLevelIntro';
+import type { BlastHudProgress } from '@/components/blast/progress/BlastHudProgress';
 import { BlastSugarCrushFinale } from './BlastSugarCrushFinale';
 import { BlastMoveWarningMascot } from './BlastMoveWarningMascot';
 import { BlastFxBridge } from './BlastFxBridge';
 import { type BlastComboType, type SpecialCombo } from './utils/blastCombos';
-import { getWaveObjectives, type WaveConfig } from './utils/blastWaveConfig';
-import { getFeaturedSpecialsForWave } from './utils/blastWaveRoster';
+import { getWaveObjectives, getWaveTheme, type WaveConfig } from './utils/blastWaveConfig';
 import type { BlastWaveModifier } from './utils/blastModifiers';
-import { useJellyEnabled, useCakeEnabled, useChocolateEnabled } from '@/lib/blast/ccMechanicFlags';
 import { validateWaveObjectives } from './utils/blastObjectiveValidator';
 import { getComboMultiplier } from '@/shared/utils/scoring';
 import { type BlastGameConfig, type BlastResultsData, type BlastTileState, type BlastTileType } from './types';
@@ -68,7 +67,7 @@ interface BlastGameProps {
   waveNumber?: number;
   waveConfig?: WaveConfig;
   cumulativeScore?: number;
-  onWaveComplete?: (waveScore: number, waveWords: string[], clearPct: number) => void;
+  onWaveComplete?: (waveScore: number, waveWords: string[], clearPct: number, collected: { diamonds: number; bombs: number }) => void;
   onGameEnd: (results: BlastResultsData) => void;
   onMPDeadEnd?: () => void;
   /** MP only: local player cleared the shared board — parent fires the win celebration / special results. */
@@ -113,6 +112,8 @@ interface BlastGameProps {
    *  BlastStage's own desktop side-rails (rivals/word-area) so the board fills
    *  the slot and stops duplicating the shell's rails. */
   isDesktopCanvas?: boolean;
+  /** SP run context for the HUD: run totals, furthest wave and targets to beat. */
+  progress?: BlastHudProgress;
 }
 
 /**
@@ -152,6 +153,7 @@ export function BlastGame({
   onConsumeLife,
   onGridRetry,
   isDesktopCanvas = false,
+  progress,
 }: BlastGameProps) {
   const isMultiplayer = mode === 'multiplayer';
   const { t } = useLanguage();
@@ -162,17 +164,10 @@ export function BlastGame({
 
   const minWordLength = waveConfig?.minWordLength ?? 2;
 
-  // CC-mechanic flags (SP only — MP boards are server-authoritative)
-  const jellyEnabled = useJellyEnabled();
-  const cakeEnabled = useCakeEnabled();
-  const chocolateEnabled = useChocolateEnabled();
-
   // Wave objectives (SP only)
   const waveObjectives = useMemo(
-    () => (isMultiplayer ? [] : getWaveObjectives(waveNumber, config.language, {
-      jelly: jellyEnabled, cake: cakeEnabled, chocolate: chocolateEnabled,
-    })),
-    [waveNumber, isMultiplayer, config.language, jellyEnabled, cakeEnabled, chocolateEnabled],
+    () => (isMultiplayer ? [] : getWaveObjectives(waveNumber, config.language)),
+    [waveNumber, isMultiplayer, config.language],
   );
 
   // Core engine
@@ -324,6 +319,7 @@ export function BlastGame({
     config, t,
     // Compose buff (combo2x) and SP wave-modifier multipliers into one factor.
     scoreMultiplier: buffScoreMultiplier * modifierScoreMultiplier,
+    coinMultiplier: getWaveTheme(waveNumber).params.coinMultiplier,
     recorder: highlightRecorderRef.current,
     // Variable "treasure roll" reward is SOLO-only — MP scoring is server-authoritative.
     enableTreasureRoll: !isMultiplayer,
@@ -443,22 +439,6 @@ export function BlastGame({
   // "no value" and "empty string" differently.
   const tAdapter = useCallback((key: string, fallback?: string) => t(key, fallback) || undefined, [t]);
 
-  // Compute initial tile type counts once per wave (for clear_all_type objectives)
-  const initialTileTypeCounts = useMemo(() => {
-    const tiles = engine.tileStates;
-    if (!tiles.length) return undefined;
-    const counts: Record<string, number> = {};
-    for (const row of tiles) {
-      for (const tile of row) {
-        if (!tile.isCleared) {
-          counts[tile.type] = (counts[tile.type] || 0) + 1;
-        }
-      }
-    }
-    return counts as Record<import('./types').BlastTileType, number>;
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- capture once per wave
-  }, [waveNumber]);
-
   // Validate wave objectives against the freshly generated board, ONCE per
   // wave. Repairs target_word / color_power if the seeded targets are
   // unreachable on this particular grid (e.g. word can't be spelled by an
@@ -493,7 +473,6 @@ export function BlastGame({
     tileTypeClears: engine.gameState.tileTypeClears,
     objectives: validatedObjectives,
     wordsFound: engine.gameState.wordsFound,
-    initialTileTypeCounts,
   });
 
   // Hint flow — wave-6+ button, free first use, ad-gated thereafter.
@@ -672,9 +651,7 @@ export function BlastGame({
         waveClearCounter={waveClearParticle}
       />
 
-      {waveConfig?.archetype && (
-        <BlastWaveIntro waveNumber={waveNumber} archetype={waveConfig.archetype} t={tAdapter} featured={getFeaturedSpecialsForWave(waveNumber)} objectives={objectives.objectiveProgress} />
-      )}
+      {!isMultiplayer && waveConfig && <BlastLevelIntro wave={waveNumber} />}
 
       <BlastSugarCrushFinale active={sugarCrushActive} t={tAdapter} />
 
@@ -786,6 +763,7 @@ export function BlastGame({
         remainingTime={_remainingTime}
         totalTime={_totalTime}
         isDesktopCanvas={isDesktopCanvas}
+        progress={isMultiplayer ? undefined : progress}
         t={tAdapter}
       />
     </div>

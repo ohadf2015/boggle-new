@@ -2,6 +2,9 @@ import { describe, expect, it, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { WordCraftGameOverScene } from '../WordCraftGameOverScene';
 
+// Count-up jumps straight to the final number under reduced motion.
+vi.mock('@/hooks/useReducedMotion', () => ({ useReducedMotion: () => true }));
+
 const t = (k: string, vars?: Record<string, unknown>) => {
   if (k === 'wordcraft.youWon') return 'You won!';
   if (k === 'wordcraft.opponentWon') return `${String(vars?.name ?? '')} won`;
@@ -124,7 +127,7 @@ describe('WordCraftGameOverScene', () => {
     expect(overlay?.className).toContain('z-50');
   });
 
-  it('shows both final square counts so the result is concrete', () => {
+  it('shows both final square counts so the result is concrete', async () => {
     render(
       <WordCraftGameOverScene
         t={t}
@@ -133,8 +136,8 @@ describe('WordCraftGameOverScene', () => {
       />
     );
     // The headline number for each side (territory squares) must be visible.
-    expect(screen.getByText('120')).toBeTruthy();
-    expect(screen.getByText('80')).toBeTruthy();
+    expect(await screen.findByText('120')).toBeTruthy();
+    expect(await screen.findByText('80')).toBeTruthy();
   });
 
   it('shows the New Best badge only when isNewBest is set', () => {
@@ -279,5 +282,47 @@ describe('WordCraftGameOverScene', () => {
       fireEvent.click(screen.getByRole('button', { name: /home/i }));
       expect(onHome).toHaveBeenCalledTimes(1);
     });
+  });
+
+  it('shows the daily streak card and the highlights only when provided', () => {
+    const none = render(<WordCraftGameOverScene t={t} playerScore={9} botScore={4} />);
+    expect(none.container.querySelector('[data-wc-daily-result]')).toBeNull();
+    none.unmount();
+
+    const { container } = render(
+      <WordCraftGameOverScene
+        t={t}
+        playerScore={9}
+        botScore={4}
+        dailyResult={{ lastDate: '2026-10-27', streak: 3, best: 3 }}
+        highlights={{ bestMove: { word: 'quartz', score: 22 }, longestWord: 'quartz', moves: 4 }}
+      />,
+    );
+    expect(container.querySelector('[data-wc-daily-result]')?.textContent).toContain('wordcraft.daily.streakNow');
+    expect(container.textContent).toContain('quartz');
+  });
+
+  it('greets a loss with the bot art and a win with the trophy', () => {
+    const win = render(<WordCraftGameOverScene t={t} playerScore={9} botScore={4} />);
+    expect(win.container.innerHTML).toContain('trophy');
+    win.unmount();
+    const loss = render(<WordCraftGameOverScene t={t} playerScore={4} botScore={9} />);
+    expect(loss.container.innerHTML).toContain('bot.webp');
+  });
+
+  it('lists the daily goals with their done state, only on a daily result', () => {
+    const goals = [
+      { id: 'longWord' as const, done: true },
+      { id: 'claim' as const, done: false },
+      { id: 'win' as const, done: true },
+    ];
+    const without = render(<WordCraftGameOverScene t={t} playerScore={9} botScore={4} dailyGoals={goals} />);
+    expect(without.container.querySelector('[data-wc-daily-goals]')).toBeNull();
+    without.unmount();
+    const { container } = render(
+      <WordCraftGameOverScene t={t} playerScore={9} botScore={4} dailyGoals={goals} dailyResult={{ lastDate: '2026-10-27', streak: 2, best: 2 }} />,
+    );
+    const items = [...container.querySelectorAll('[data-wc-daily-goals] li')].map((li) => li.getAttribute('data-done'));
+    expect(items).toEqual(['true', 'false', 'true']);
   });
 });

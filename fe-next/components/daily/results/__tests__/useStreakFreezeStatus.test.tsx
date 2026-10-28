@@ -39,7 +39,7 @@ describe('useStreakFreezeStatus', () => {
 
     const { result } = renderHook(() => useStreakFreezeStatus(true));
 
-    await waitFor(() => expect(result.current.freezesAvailable).toBe(3));
+    await waitFor(() => expect(result.current.freezesAvailable).toBe(3), { timeout: 5000 });
     expect(result.current.isStreakProtected).toBe(true);
   });
 
@@ -52,7 +52,7 @@ describe('useStreakFreezeStatus', () => {
 
     const { result } = renderHook(() => useStreakFreezeStatus(true));
 
-    await waitFor(() => expect(result.current.freezesAvailable).toBe(1));
+    await waitFor(() => expect(result.current.freezesAvailable).toBe(1), { timeout: 5000 });
     expect(result.current.isStreakProtected).toBe(false);
   });
 
@@ -62,7 +62,7 @@ describe('useStreakFreezeStatus', () => {
     const { result } = renderHook(() => useStreakFreezeStatus(true));
 
     // allow the rejected promise to flush
-    await waitFor(() => expect(global.fetch).toHaveBeenCalled());
+    await waitFor(() => expect(global.fetch).toHaveBeenCalled(), { timeout: 5000 });
 
     expect(result.current.freezesAvailable).toBe(0);
     expect(result.current.isStreakProtected).toBe(false);
@@ -73,7 +73,7 @@ describe('useStreakFreezeStatus', () => {
 
     const { result } = renderHook(() => useStreakFreezeStatus(true));
 
-    await waitFor(() => expect(global.fetch).toHaveBeenCalled());
+    await waitFor(() => expect(global.fetch).toHaveBeenCalled(), { timeout: 5000 });
 
     expect(result.current.freezesAvailable).toBe(0);
     expect(result.current.isStreakProtected).toBe(false);

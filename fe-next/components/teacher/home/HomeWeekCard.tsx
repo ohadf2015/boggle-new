@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 import type { TeacherWeekSummary } from '@/lib/education/teacherWeekStats';
 import type { TeacherWeekStatus } from '@/hooks/useTeacherWeekStats';
@@ -14,7 +15,7 @@ const STATS = [
 ] as const;
 
 /** Three real numbers for the last 7 days; "—" when the read failed. Home hides it until a first game. */
-export function HomeWeekCard({ summary, status, t }: { summary: TeacherWeekSummary | null; status: TeacherWeekStatus; t: T }) {
+export function HomeWeekCard({ summary, status, t, children }: { summary: TeacherWeekSummary | null; status: TeacherWeekStatus; t: T; children?: ReactNode }) {
   return (
     <section data-testid="home-week" aria-labelledby="home-week-title" className={cn(PANEL, 'p-4')}>
       <h2 id="home-week-title" className="font-neo-display text-lg font-black text-neo-cream">
@@ -36,6 +37,7 @@ export function HomeWeekCard({ summary, status, t }: { summary: TeacherWeekSumma
           </div>
         ))}
       </dl>
+      {children ? <div className="mt-4 border-t-[2px] border-neo-cream/15 pt-3">{children}</div> : null}
       {status === 'error' ? (
         <p role="status" className="mt-3 font-neo-body text-xs font-semibold text-neo-cream/70">
           {t('eduShell.week.unavailable')}
