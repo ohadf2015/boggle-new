@@ -40,9 +40,9 @@ export async function runLifecycleStageNudges(
     sb, 'classrooms', 'id, teacher_id, created_at', 'teacher_id', userIds,
   ));
   const teacherOf = new Map(classrooms.map((c) => [c.id, c.teacher_id]));
-  const [members, rounds, tests, ledger] = await Promise.all([
-    fetchInChunks<{ classroom_id: string; student_id: string }>(
-      sb, 'classroom_memberships', 'id, classroom_id, student_id', 'classroom_id', classrooms.map((c) => c.id),
+  const [members, rounds, tests, ledger, paid] = await Promise.all([
+    fetchInChunks<{ classroom_id: string; student_id: string; is_rehearsal?: boolean }>(
+      sb, 'classroom_memberships', 'id, classroom_id, student_id, is_rehearsal', 'classroom_id', classrooms.map((c) => c.id),
     ),
     fetchInChunks<{ teacher_id: string; completed_at: string }>(
       sb, 'classroom_rounds', 'id, teacher_id, completed_at', 'teacher_id', userIds,
@@ -50,11 +50,15 @@ export async function runLifecycleStageNudges(
     ),
     fetchInChunks<{ id: string }>(sb, 'profiles', 'id', 'id', userIds, [{ op: 'eq', column: 'is_test_account', value: true }]),
     loadLedger(sb, userIds),
+    fetchInChunks<{ id: string }>(
+      sb, 'profiles', 'id', 'id', userIds, [{ op: 'eq', column: 'utm_medium', value: 'paid' }],
+    ),
   ]);
 
   const studentCounts = new Map<string, number>();
   for (const m of must('classroom_memberships', members)) {
     if (m.student_id === teacherOf.get(m.classroom_id)) continue;
+    if (m.is_rehearsal) continue;
     studentCounts.set(m.classroom_id, (studentCounts.get(m.classroom_id) ?? 0) + 1);
   }
 
@@ -64,6 +68,7 @@ export async function runLifecycleStageNudges(
     realRounds: must('classroom_rounds', rounds).map((r) => ({ teacherId: r.teacher_id, completedAt: r.completed_at })),
     ledger,
     testUserIds: new Set(must('profiles', tests).map((p) => p.id)),
+    paidDay0UserIds: new Set(must('profiles', paid).map((p) => p.id)),
   }, args.nowMs);
 
   const audience = await loadLifecycleAudience(sb, plan.due.map((d) => d.userId), { mint: !args.dry });

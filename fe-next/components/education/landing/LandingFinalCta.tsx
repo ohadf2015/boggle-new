@@ -24,6 +24,7 @@ export function LandingFinalCta({ setupPending = false }: { setupPending?: boole
           <Link
             href={`/${language}/education/access`}
             data-testid="landing-final-start"
+            data-lc-cta="signup"
             onClick={() => trackLandingCtaClick(setupPending ? 'education_final_finish_setup' : 'education_final')}
             className="inline-flex min-h-14 items-center justify-center rounded-neo bg-neo-navy px-6 py-3 text-center font-neo-display text-base sm:px-8 sm:text-lg font-black uppercase tracking-wide text-neo-cream shadow-hard transition-[transform,box-shadow] duration-150 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed motion-reduce:transition-none"
           >

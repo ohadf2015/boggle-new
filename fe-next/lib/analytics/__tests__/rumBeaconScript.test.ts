@@ -88,6 +88,32 @@ describe('getRumBeaconScript', () => {
     expect(sendBeacon).toHaveBeenCalledTimes(1);
   });
 
+  it('still installs the lander CTA listener when the cold start already fired today', () => {
+    const local = memStorage();
+    local.setItem('lc_rum_day', new Date().toISOString().slice(0, 10));
+    vi.stubGlobal('localStorage', local);
+    const listeners: Array<(ev: { target: unknown }) => void> = [];
+    vi.stubGlobal('window', {});
+    vi.stubGlobal('document', {
+      addEventListener: (_type: string, fn: (ev: { target: unknown }) => void) => listeners.push(fn),
+    });
+    vi.stubGlobal('location', {
+      pathname: '/he/education',
+      hostname: 'lexiclash.live',
+      href: 'https://lexiclash.live/he/education?utm_source=fb&utm_medium=paid&utm_campaign=52619629920784',
+      search: '?utm_source=fb&utm_medium=paid&utm_campaign=52619629920784',
+    });
+    runBeacon();
+    expect(sendBeacon).not.toHaveBeenCalled();
+    expect(listeners).toHaveLength(1);
+    listeners[0]({
+      target: { nodeType: 1, closest: () => ({ getAttribute: () => 'signup' }) },
+    });
+    expect(sendBeacon).toHaveBeenCalledTimes(1);
+    const blob = sendBeacon.mock.calls[0][1] as Blob;
+    expect(blob).toBeInstanceOf(Blob);
+  });
+
   it('still sends when storage is unavailable', () => {
     const blocked = {
       getItem: () => {

@@ -96,6 +96,7 @@ export function NoAccountCta({
       {compact ? null : <p className="mt-1.5 text-sm leading-relaxed text-neo-white/80">{c.body}</p>}
       <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
         <Link
+          data-lc-cta="play_now"
           href={`/${locale}${QUICK_PLAY_PATH}`}
           className={
             ctaStyle === 'link'
