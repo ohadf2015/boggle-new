@@ -175,4 +175,19 @@ describe('GET /api/admin/teacher-funnel', () => {
       lastErrorStatus: null,
     });
   });
+
+  it('returns 500 when subscription_events cannot be read, instead of a fake zero checkout funnel', async () => {
+    mockVerifyAdminAuth.mockResolvedValueOnce({ success: true });
+    mockGetSupabaseAdmin.mockReturnValueOnce(
+      buildSupabaseMock({
+        teacher_access_requests: { data: [], error: null },
+        classrooms: { data: [], error: null },
+        subscription_events: { data: null, error: { message: 'relation missing' } },
+      }),
+    );
+
+    const response = await GET(req());
+    expect(response.status).toBe(500);
+    expect(await response.json()).toEqual({ error: 'relation missing' });
+  });
 });

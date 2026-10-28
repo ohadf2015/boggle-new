@@ -69,13 +69,13 @@ export async function GET(request: NextRequest) {
     ),
   ]);
 
-  const firstError = requestsRes.error || classroomsRes.error;
+  const firstError = requestsRes.error || classroomsRes.error || checkoutEventsRes.error;
   if (firstError) {
     return NextResponse.json({ error: firstError }, { status: 500 });
   }
 
   const requests = requestsRes.data;
-  const checkoutEvents = checkoutEventsRes.error ? [] : checkoutEventsRes.data;
+  const checkoutEvents = checkoutEventsRes.data;
   // Classroom owners and checkout users are included alongside applicants: a classroom can be opened by
   // someone who never filled in the access form (the 2026-01-24 one predates the form),
   // and such a row would otherwise render with a blank owner. display_name/username are
