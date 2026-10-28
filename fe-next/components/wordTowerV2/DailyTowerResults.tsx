@@ -30,7 +30,7 @@ function GoalMeter({ t, daily, coins }: { t: Props['t']; daily: Props['daily']; 
           {daily.rank ? <span className="rounded-full border-2 border-neo-black bg-neo-purple px-1.5 text-neo-white">{`#${daily.rank}`}</span> : null}
         </span>
       </div>
-      <div className="h-2.5 overflow-hidden rounded-sm border-2 border-neo-black bg-neo-navy" role="progressbar" aria-valuemin={0} aria-valuemax={daily.targetM} aria-valuenow={Math.min(daily.growthM, daily.targetM)}>
+      <div className="h-2.5 overflow-hidden rounded-sm border-2 border-neo-cream bg-neo-navy" role="progressbar" aria-valuemin={0} aria-valuemax={daily.targetM} aria-valuenow={Math.min(daily.growthM, daily.targetM)}>
         <div className={`h-full origin-left ${hit ? 'bg-neo-lime' : 'bg-neo-yellow'}`} style={{ transform: `scaleX(${pct / 100})` }} />
       </div>
       {coins}
@@ -182,7 +182,7 @@ export function DailyTowerResults(p: Props) {
           </div>
         </div>
 
-        <div data-wt2-results-actions className="shrink-0 border-t-3 border-neo-black bg-neo-navy-light p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+        <div data-wt2-results-actions className="shrink-0 border-t-3 border-neo-cream bg-neo-navy-light p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           <div className="mx-auto flex max-w-md items-center gap-2">
             <button
               type="button"
@@ -196,7 +196,7 @@ export function DailyTowerResults(p: Props) {
               type="button"
               onClick={p.onHome}
               aria-label={t('wordTowerV2.results.home')}
-              className="flex h-14 w-14 items-center justify-center rounded-neo border-neo border-neo-black bg-neo-navy text-neo-cream shadow-hard-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+              className="flex h-14 w-14 items-center justify-center rounded-neo border-neo border-neo-cream bg-neo-navy text-neo-cream shadow-hard-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
             >
               <Home className="h-5 w-5" aria-hidden />
             </button>

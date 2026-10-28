@@ -100,7 +100,7 @@ export function GuidedWordCoach({ t, guide, swinging, selected, reducedMotion }:
         {spelling || showDrop ? (
           <m.div
             key={guide.status}
-            className="absolute inset-x-4 bottom-[calc(var(--wt2-dock,16rem)+0.75rem)] mx-auto flex max-w-sm flex-col items-center gap-2 rounded-neo border-neo-thick border-neo-black bg-neo-navy-light px-4 py-3 shadow-hard"
+            className="absolute inset-x-4 bottom-[calc(var(--wt2-dock,16rem)+0.75rem)] mx-auto flex max-w-sm flex-col items-center gap-2 rounded-neo border-neo-thick border-neo-cream bg-neo-navy-light px-4 py-3 shadow-hard"
             initial={reducedMotion ? false : { scale: 0.85, y: 12 }}
             animate={{ scale: 1, y: 0 }}
             exit={reducedMotion ? undefined : { scale: 0.9, opacity: 0 }}
