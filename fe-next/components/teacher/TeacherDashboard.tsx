@@ -143,6 +143,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
 
   const onboarding = homeOnboarding({
     classroomCount: classrooms.length,
+    studentCount: classrooms.reduce((n, c) => n + (c.member_count ?? 0), 0),
     inviteCopied: activation.progress.inviteCopied,
     liveStarted: activation.progress.liveStarted,
     roomOpened: activation.progress.roomOpened,
@@ -207,7 +208,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
             <h1 data-wipe suppressHydrationWarning className="font-neo-display text-2xl font-black text-neo-cream sm:text-3xl">
               {firstName ? t(greetingKey(hour), { name: firstName }) : t('eduShell.home.greetNoName')}
             </h1>
-            <TeacherPlanBadge quiet className="shrink-0" />
+            <TeacherPlanBadge quiet className="shrink-0 lg:hidden" />
           </header>
 
           {!ready ? (
@@ -224,16 +225,6 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
             />
           ) : (
             <>
-              {onboarding.visible && !(onboarding.current === 'shareCode' && shareCardShown) ? (
-                <HomeOnboardingCard
-                  onboarding={onboarding}
-                  hrefs={onboardingHrefs}
-                 
-                  onDismiss={activation.dismiss}
-                  variant="compact"
-                  t={t}
-                />
-              ) : null}
               {selectedClassroom ? <HomeGetStudentsIn classroom={selectedClassroom} /> : null}
               <div data-tm>
                 <HomeHero
@@ -242,7 +233,10 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
                   onSelect={setSelectedId}
                   language={language}
                   t={t}
-                  rehearse={<RehearseWithBotsButton classroomId={effectiveId || undefined} source="hq" language={language} t={t} showNote />}
+                  rehearse={<RehearseWithBotsButton classroomId={effectiveId || undefined} source="hq" language={language} t={t} />}
+                  nudge={onboarding.visible && !(onboarding.current === 'shareCode' && shareCardShown) ? (
+                    <HomeOnboardingCard onboarding={onboarding} hrefs={onboardingHrefs} onDismiss={activation.dismiss} variant="compact" t={t} />
+                  ) : undefined}
                 />
               </div>
               <div>
@@ -268,8 +262,11 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
             {proCard ? <div data-tm>{proCard}</div> : null}
             {!ready ? <HomeRailSkeleton /> : showWeek ? (
               <>
-                <div data-tm><HomeInsightCard insights={week.insights} t={t} /></div>
-                <div data-tm><HomeWeekCard summary={week.summary} status={week.status} t={t} /></div>
+                <div data-tm>
+                  <HomeWeekCard summary={week.summary} status={week.status} t={t}>
+                    {week.insights?.length ? <HomeInsightCard insights={week.insights} t={t} embedded /> : null}
+                  </HomeWeekCard>
+                </div>
               </>
             ) : null}
             {!ready || !selectedClassroom ? null : (

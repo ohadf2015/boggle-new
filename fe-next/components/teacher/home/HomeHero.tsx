@@ -34,10 +34,12 @@ export interface HomeHeroProps {
   t: T;
   /** Quiet secondary action under Start: a private practice round with bots. */
   rehearse?: ReactNode;
+  /** The next setup step, inline beside Rehearse instead of a row above the hero. */
+  nudge?: ReactNode;
 }
 
 /** "Start a game with <class>": the one primary action on Home, plus three featured modes. */
-export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, t, rehearse }: HomeHeroProps) {
+export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, t, rehearse, nudge }: HomeHeroProps) {
   const selected = classrooms.find((c) => c.id === selectedId) ?? classrooms[0];
   const [pending, setPending] = useState<string | null>(null);
   const go = (key: string) => {
@@ -57,22 +59,25 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
           <span>{t('eduShell.home.startWith')}</span>
           <ClassPicker classrooms={classrooms} selected={selected} onSelect={onSelect} t={t} />
         </h2>
-        <Link
-          href={teacherHostHref(language, { classroomId: selected?.id })}
-          data-testid="home-start-live"
-          data-magnet
-          aria-busy={pending === 'live' || undefined}
-          onClick={() => go('live')}
-          className={cn(PRIMARY_BUTTON, 'w-full text-xl sm:w-auto sm:min-w-[18rem] sm:self-start')}
-        >
-          {pending === 'live' ? (
-            <Loader2 className="size-6 animate-spin motion-reduce:animate-none" aria-hidden="true" />
-          ) : (
-            <Play className="size-6 fill-current" aria-hidden="true" />
-          )}
-          {t('eduShell.home.startLive')}
-        </Link>
-        {rehearse}
+        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-4">
+          <Link
+            href={teacherHostHref(language, { classroomId: selected?.id })}
+            data-testid="home-start-live"
+            data-magnet
+            aria-busy={pending === 'live' || undefined}
+            onClick={() => go('live')}
+            className={cn(PRIMARY_BUTTON, 'w-full text-xl sm:w-auto sm:min-w-[18rem]')}
+          >
+            {pending === 'live' ? (
+              <Loader2 className="size-6 animate-spin motion-reduce:animate-none" aria-hidden="true" />
+            ) : (
+              <Play className="size-6 fill-current" aria-hidden="true" />
+            )}
+            {t('eduShell.home.startLive')}
+          </Link>
+          {rehearse}
+        </div>
+        {nudge}
       </div>
 
       <ul className="relative mt-4 grid grid-cols-3 gap-2 sm:gap-3">

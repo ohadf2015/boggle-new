@@ -5,6 +5,8 @@ export type HomeOnboardingStatus = 'done' | 'current' | 'todo';
 
 export interface HomeOnboardingInput {
   classroomCount: number;
+  /** Students across all classes: anyone joined means the code was shared, whatever the copy flag says. */
+  studentCount?: number;
   inviteCopied: boolean;
   /** A real 2+ player round completed (server-stamped). */
   liveStarted: boolean;
@@ -31,7 +33,7 @@ export interface HomeOnboarding {
 export function homeOnboarding(input: HomeOnboardingInput): HomeOnboarding {
   const done: Record<HomeOnboardingStepId, boolean> = {
     createClass: input.classroomCount > 0,
-    shareCode: input.classroomCount > 0 && input.inviteCopied,
+    shareCode: input.classroomCount > 0 && (input.inviteCopied || (input.studentCount ?? 0) > 0),
     tryDemo: input.classroomCount > 0 && input.liveStarted,
   };
   const order: HomeOnboardingStepId[] = ['createClass', 'shareCode', 'tryDemo'];
