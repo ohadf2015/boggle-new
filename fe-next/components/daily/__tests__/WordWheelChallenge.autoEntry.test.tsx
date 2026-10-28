@@ -139,13 +139,13 @@ describe('WordWheelChallenge — returning players enter without the ready card'
     render(<WordWheelChallenge />);
 
     await waitFor(() => expect(prewarm).toHaveBeenCalledWith('en'));
-    expect(screen.getByText('wordWheel.loading')).toBeInTheDocument();
+    expect(screen.getByText('daily.loadingWordWheel')).toBeInTheDocument();
     expect(screen.queryByTestId('word-wheel-game')).not.toBeInTheDocument();
 
     await act(async () => { warm.resolve(); });
     await screen.findByTestId('word-wheel-game');
     expect(readyMounts).toBe(0);
-    expect(screen.queryByText('wordWheel.loading')).not.toBeInTheDocument();
+    expect(screen.queryByText('daily.loadingWordWheel')).not.toBeInTheDocument();
   });
 
   it('GIVEN the dictionary warm-up hangs THEN the game still starts after the 1.5s cap', async () => {
@@ -226,7 +226,7 @@ describe('WordWheelChallenge — returning players enter without the ready card'
     authState.loading = true;
     const { rerender } = render(<WordWheelChallenge />);
     await act(async () => { await new Promise((r) => setTimeout(r, 50)); });
-    expect(screen.getByText('wordWheel.loading')).toBeInTheDocument();
+    expect(screen.getByText('daily.loadingWordWheel')).toBeInTheDocument();
     expect(fetch).not.toHaveBeenCalled();
 
     authState.loading = false;
