@@ -155,10 +155,13 @@ export interface TrialChecklistState {
 export type TrialChecklist = TrialChecklistState;
 
 export function deriveTrialChecklist(input: TrialChecklistInput): TrialChecklistState {
-  const classroomCount =
-    typeof input.classroomCount === 'number'
-      ? input.classroomCount
-      : (input.classrooms?.length ?? 0);
+  // A passed classroom list is evidence of classrooms. Callers often spread a
+  // zero classroomCount default and then pass `classrooms` — an explicit 0 must
+  // not hide that list, or create_classroom stays current while students exist.
+  const listedClassroomCount = input.classrooms?.length ?? 0;
+  const explicitClassroomCount =
+    typeof input.classroomCount === 'number' ? input.classroomCount : 0;
+  const classroomCount = Math.max(explicitClassroomCount, listedClassroomCount);
 
   const anyMemberFromClassrooms =
     input.classrooms?.some((c) => (c.member_count ?? 0) > 0) ?? false;
