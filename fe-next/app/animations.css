@@ -2190,12 +2190,6 @@ html.reduce-motion *::after {
   transition: none !important;
 }
 
-/* Disable heavy blast tile animations (box-shadow + filter keyframes) */
-.low-end-device .blast-tile-objective {
-  animation: none !important;
-  filter: none !important;
-}
-
 /* Disable adventure tile glow/shimmer animations */
 .low-end-device .adventure-tile-gold,
 .low-end-device .adventure-tile-bomb,

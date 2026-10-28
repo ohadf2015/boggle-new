@@ -6,20 +6,6 @@
 import type { BlastObjective, BlastTileType } from '../types';
 
 /**
- * Extract unique tile types referenced by collect_type objectives.
- * Used to highlight objective-relevant tiles on the grid.
- */
-export function getObjectiveTileTypes(objectives: BlastObjective[]): BlastTileType[] {
-  const types = new Set<BlastTileType>();
-  for (const obj of objectives) {
-    if (obj.type === 'collect_type' && obj.tileType) {
-      types.add(obj.tileType);
-    }
-  }
-  return Array.from(types);
-}
-
-/**
  * Format a human-readable label for an objective, using translation function.
  * Supports template variables: {target}, {tileType}, {minWordLength}, {word}, {color}, {count}.
  */

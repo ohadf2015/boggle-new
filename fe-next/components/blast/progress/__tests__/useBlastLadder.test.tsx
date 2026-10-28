@@ -9,7 +9,10 @@ import { useBlastLadder } from '../useBlastLadder';
 const json = (body: unknown, status = 200) => Promise.resolve(new Response(JSON.stringify(body), { status }));
 
 describe('useBlastLadder', () => {
-  beforeEach(() => getWithAuth.mockReset());
+  beforeEach(() => {
+    getWithAuth.mockReset();
+    window.localStorage.clear();
+  });
 
   it('loads the personal best and the weekly rivals for the run language', async () => {
     getWithAuth.mockReturnValue(json({
@@ -29,6 +32,22 @@ describe('useBlastLadder', () => {
     const { result } = renderHook(() => useBlastLadder({ language: 'en', difficulty: 'medium', runId: 1 }));
     await waitFor(() => expect(getWithAuth).toHaveBeenCalled());
     expect(result.current).toEqual({ personalBest: null, rank: null, rivals: [] });
+  });
+
+  it('falls back to the on-device best for guests, with no rank', async () => {
+    window.localStorage.setItem('blast:best:v1:medium', '730');
+    getWithAuth.mockReturnValue(json({ error: 'Unauthorized' }, 401));
+    const { result } = renderHook(() => useBlastLadder({ language: 'en', difficulty: 'medium', runId: 1 }));
+    await waitFor(() => expect(result.current.personalBest).toBe(730));
+    expect(result.current.rank).toBeNull();
+  });
+
+  it('prefers the server best over the on-device one when signed in', async () => {
+    window.localStorage.setItem('blast:best:v1:medium', '5000');
+    getWithAuth.mockReturnValue(json({ personalBests: { medium: { bestScore: 900 } }, ladder: { rank: 2, total: 9, rivals: [] } }));
+    const { result } = renderHook(() => useBlastLadder({ language: 'en', difficulty: 'medium', runId: 1 }));
+    await waitFor(() => expect(result.current.rank).toBe(2));
+    expect(result.current.personalBest).toBe(900);
   });
 
   it('refetches only when a new run starts', async () => {

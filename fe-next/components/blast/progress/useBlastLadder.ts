@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { getWithAuth } from '@/utils/authFetch';
 import type { RivalScore } from './rivalTarget';
+import { readLocalBest } from './localBest';
 
 export interface BlastLadderState {
   personalBest: number | null;
@@ -22,7 +23,10 @@ export function useBlastLadder({ language, difficulty, runId }: { language: stri
     let cancelled = false;
     getWithAuth(`/api/blast/result?difficulty=${encodeURIComponent(difficulty)}&ladder=${encodeURIComponent(language)}`, { requireSession: true })
       .then(async (res) => {
-        if (!res.ok) return;
+        if (!res.ok) {
+          if (!cancelled) setState({ ...EMPTY, personalBest: readLocalBest(difficulty) });
+          return;
+        }
         const body = (await res.json()) as {
           personalBests?: Record<string, { bestScore?: number }>;
           ladder?: { rank: number | null; rivals: RivalScore[] };

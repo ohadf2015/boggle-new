@@ -161,6 +161,13 @@ describe('BlastView — save gate', () => {
     expect(addCoins).not.toHaveBeenCalled();
   });
 
+  it('remembers the run score on the device for a guest best, even when nothing saves', () => {
+    window.localStorage.clear();
+    startRun();
+    failWave();
+    expect(window.localStorage.getItem('blast:best:v1:medium')).toBe('1234');
+  });
+
   it('saves when the ad continue was taken even on a wave-1 loss', () => {
     startRun();
     failWave({ clearPercentage: 30, adContinueUsed: true });

@@ -1,49 +1,8 @@
 /**
  * blastObjectiveUtils — tests for objective helper functions.
  */
-import { getObjectiveTileTypes, formatObjectiveLabel } from '../blastObjectiveUtils';
+import { formatObjectiveLabel } from '../blastObjectiveUtils';
 import type { BlastObjective } from '../../types';
-
-describe('getObjectiveTileTypes', () => {
-  it('returns empty array for score_target objectives', () => {
-    const objectives: BlastObjective[] = [{ type: 'score_target', target: 50 }];
-    expect(getObjectiveTileTypes(objectives)).toEqual([]);
-  });
-
-  it('returns tile type for collect_type objective', () => {
-    const objectives: BlastObjective[] = [
-      { type: 'collect_type', tileType: 'bomb', target: 4 },
-    ];
-    expect(getObjectiveTileTypes(objectives)).toEqual(['bomb']);
-  });
-
-  it('returns empty array for word_length objectives', () => {
-    const objectives: BlastObjective[] = [
-      { type: 'word_length', target: 2, minWordLength: 5 },
-    ];
-    expect(getObjectiveTileTypes(objectives)).toEqual([]);
-  });
-
-  it('returns unique tile types from mixed objectives', () => {
-    const objectives: BlastObjective[] = [
-      { type: 'collect_type', tileType: 'bomb', target: 4 },
-      { type: 'score_target', target: 40 },
-      { type: 'collect_type', tileType: 'gold', target: 2 },
-    ];
-    const result = getObjectiveTileTypes(objectives);
-    expect(result).toContain('bomb');
-    expect(result).toContain('gold');
-    expect(result).toHaveLength(2);
-  });
-
-  it('deduplicates when same tile type appears in multiple objectives', () => {
-    const objectives: BlastObjective[] = [
-      { type: 'collect_type', tileType: 'gold', target: 3 },
-      { type: 'collect_type', tileType: 'gold', target: 5 },
-    ];
-    expect(getObjectiveTileTypes(objectives)).toEqual(['gold']);
-  });
-});
 
 describe('formatObjectiveLabel', () => {
   const mockT = (key: string) => {

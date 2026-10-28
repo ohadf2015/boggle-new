@@ -38,6 +38,7 @@ import { ModeCoach } from '@/components/tutorial/ModeCoach';
 import { saveBlastResult } from './utils/saveBlastResult';
 import { BlastWaveClear } from '@/components/blast/progress/BlastWaveClear';
 import { useBlastLadder } from '@/components/blast/progress/useBlastLadder';
+import { recordLocalBest } from '@/components/blast/progress/localBest';
 import { autoContinueMs } from '@/components/blast/progress/progressTiming';
 
 /**
@@ -232,6 +233,8 @@ export function BlastView() {
       emitMascotEvent({ kind: 'wave-fail' });
       playWaveFailArpeggio();
     }
+
+    recordLocalBest(config.difficulty ?? 'medium', mergedResults.finalScore);
 
     // A run only ends on a failed wave, so it saves when it earned something: a cleared wave or the ad continue.
     const passedWave = (mergedResults.clearPercentage ?? 0) >= 90;

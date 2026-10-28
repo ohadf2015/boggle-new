@@ -13,6 +13,7 @@ interface ProfileRow {
   username?: string | null;
   display_name?: string | null;
   is_test_account?: boolean | null;
+  is_admin?: boolean | null;
 }
 
 /** Resolve weekly-board user ids to display names; rows without a profile are dropped. */
@@ -24,13 +25,13 @@ export async function nameBoardEntries(
   try {
     const lookup = supabase
       .from('profiles')
-      .select('id, username, display_name, is_test_account')
+      .select('id, username, display_name, is_test_account, is_admin')
       .in('id', entries.map((e) => e.userId)) as Promise<{ data: ProfileRow[] | null }>;
     const { data } = await capped(lookup, { data: null });
     const names = new Map<string, string>();
     for (const row of data ?? []) {
       const name = row.display_name || row.username;
-      if (name && !row.is_test_account) names.set(row.id, name);
+      if (name && !row.is_test_account && !row.is_admin) names.set(row.id, name);
     }
     return entries.flatMap((e) => {
       const name = names.get(e.userId);

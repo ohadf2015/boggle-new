@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import type { Locale } from '@/lib/blast/v2/types';
+import { isBlastLocale } from '@/lib/landing/blastPlacement';
 import BlastLegacyPageClient from './legacy/PageClient';
 
 // Near-empty game shell (~38 crawlable words, measured 2026-07-02) — noindexed
@@ -9,8 +9,6 @@ import BlastLegacyPageClient from './legacy/PageClient';
 export const metadata: Metadata = {
   robots: { index: false, follow: true },
 };
-
-const VALID_LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es'];
 
 /**
  * Public Blast route — ALWAYS V1, for every player, permanently.
@@ -26,7 +24,7 @@ export default async function BlastPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale: rawLocale } = await params;
-  if (!VALID_LOCALES.includes(rawLocale as Locale)) {
+  if (!isBlastLocale(rawLocale)) {
     notFound();
   }
   return <BlastLegacyPageClient />;

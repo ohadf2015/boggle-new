@@ -183,8 +183,6 @@ export const BOMB_AREA_CLEAR_BONUS = 1;
 
 /** Maximum number of auto-cascade chain levels before stopping */
 export const MAX_CASCADE_CHAIN = 5;
-/** Maximum words/clusters cleared per cascade level */
-export const MAX_CASCADE_WORDS_PER_LEVEL = 1;
 /** Chain level at which cascade auto-clears require a "quality" match.
  * Deep chains become rare/earned — variable-ratio reward instead of routine wipes. */
 export const CASCADE_QUALITY_MIN_CHAIN = 3;
@@ -194,9 +192,6 @@ export const CASCADE_QUALITY_MIN_CLUSTER = 4;
 export const CASCADE_QUALITY_MIN_WORD_LEN = 5;
 /** Minimum word length for cascade auto-detection (shorter words ignored) */
 export const CASCADE_MIN_WORD_LENGTH = 4;
-/** Delay (ms) before scanning for cascade words after grid settles.
- * Reduced from 700ms → 400ms to eliminate the "frozen board" dead gap. */
-export const CASCADE_DETECTION_DELAY = 200;
 /** Bonus multiplier per chain level: base * chainLevel * this */
 export const CASCADE_CHAIN_BONUS_MULTIPLIER = 0.75;
 
@@ -224,24 +219,6 @@ export const CASCADE_TIER_MAX_CHAIN = [1, 2, 2, 3, 4] as const;
 export const CASCADE_HIGHLIGHT_DURATION = 600;
 /** Brief pause (ms) after banner before tiles clear */
 export const CASCADE_HIGHLIGHT_LINGER = 150;
-
-// ==================== Cascade Highlight Types ====================
-
-/** Phase of cascade word showcasing */
-export type CascadeHighlightPhase = 'idle' | 'highlighting';
-
-/** Data for a single cascade word being highlighted */
-export interface CascadeHighlightWord {
-  word: string;
-  path: Array<{ row: number; col: number }>;
-  score: number;
-  chainLevel: number;
-}
-
-/** Aggregate data for all cascade words being highlighted at once */
-export interface CascadeHighlightData {
-  words: CascadeHighlightWord[];
-}
 
 /** Default split of randomly spawned specials (diamonds are earned, never rolled). */
 export const SPECIAL_TILE_DISTRIBUTION: Record<Exclude<BlastTileType, 'standard'>, number> = {
@@ -303,13 +280,4 @@ export interface BlastScorePopup {
   timestamp: number;
   /** Tile type that triggered this popup (for color-coded display) */
   tileType?: BlastTileType;
-}
-
-// ==================== Combo Events ====================
-
-export interface BlastComboEvent {
-  comboType: import('./utils/blastCombos').BlastComboType;
-  tiles: Array<{ row: number; col: number }>;
-  label: string;
-  clearedCount: number;
 }

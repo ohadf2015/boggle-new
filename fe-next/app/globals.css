@@ -1362,13 +1362,6 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
     box-shadow 0.1s ease-out;
 }
 
-@utility blast-tile-objective {
-  /* Objective tile highlight — subtle pulsing outline to guide strategy */
-  animation: blast-tile-objective-pulse 2s ease-in-out infinite;
-  outline: 2px solid rgba(255, 225, 53, 0.5);
-  outline-offset: -1px;
-}
-
 @utility blast-combo-preview {
   /* ── Combo preview — pulsing glow when 2+ combo tiles are in the current word ── */
   animation: blast-combo-glow 0.8s ease-in-out infinite !important;
@@ -2356,10 +2349,6 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
     100% { transform: scale(1); }
   }
 
-  @keyframes blast-tile-objective-pulse {
-    0%, 100% { outline-color: rgba(255,225,53,0.3); }
-    50% { outline-color: rgba(255,225,53,0.7); }
-  }
   @keyframes blast-tier-label-pop {
     0% { opacity: 0; transform: translate(-50%, -80%) scale(0.5); }
     40% { opacity: 1; transform: translate(-50%, -110%) scale(1.1); }

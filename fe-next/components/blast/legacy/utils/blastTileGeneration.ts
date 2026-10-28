@@ -9,10 +9,6 @@ let _tileUidCounter = 0;
 export function nextTileUid(): string {
   return `t${++_tileUidCounter}`;
 }
-/** Reset counter (for testing) */
-export function resetTileUidCounter(): void {
-  _tileUidCounter = 0;
-}
 
 /** Seeded random for consistent tile placement per grid */
 export function seededRandom(seed: number): () => number {
