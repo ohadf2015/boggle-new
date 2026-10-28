@@ -39,7 +39,7 @@ export function useJoinClassroom() {
 
   const joinClassroom = useCallback(async (
     joinCode: string,
-    options?: { guestName?: string }
+    options?: { guestName?: string; rehearsal?: boolean }
   ): Promise<JoinClassroomResult> => {
     try {
       // Account-less path: a logged-out student who supplied a name joins as an
@@ -77,6 +77,7 @@ export function useJoinClassroom() {
         body: JSON.stringify({
           joinCode,
           guestName: options?.guestName,
+          ...(options?.rehearsal ? { rehearsal: true } : {}),
         }),
       });
 

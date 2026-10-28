@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import type { InsightsBundle } from '@/lib/admin/insightsTypes';
 import { peakBucketIndex, maxGames, barPct, computeDelta } from '@/lib/admin/insightsTransforms';
+import { PaidCampaignRow } from './PaidCampaignRow';
 
 const DOW_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 const MODE_LABEL: Record<string, string> = {
@@ -77,6 +78,7 @@ export function InsightsPanel() {
 
   return (
     <div className="flex flex-col gap-4">
+      <PaidCampaignRow />
       <div className="flex items-center justify-between">
         <h2 className="text-neo-white font-bold text-base uppercase tracking-wider flex items-center gap-2">
           <Rocket className="w-5 h-5 text-neo-pink" />

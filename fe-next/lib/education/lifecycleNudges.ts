@@ -3,6 +3,7 @@
 import { isMachineRequest } from './teacherFunnel';
 import type { LedgerRow } from './lifecycleLedger';
 import type { TeacherLocale } from './types';
+import { shareCodeDueAfterDays } from './paidDay0';
 
 const DAY_MS = 86_400_000;
 
@@ -10,7 +11,6 @@ export const LIFECYCLE_STAGES = ['share_code', 'start_live', 'second_game'] as c
 export type LifecycleStage = (typeof LIFECYCLE_STAGES)[number];
 
 export const NUDGE_COOLDOWN_DAYS = 3;
-const SHARE_CODE_AFTER_DAYS = 1;
 const START_LIVE_AFTER_DAYS = 2;
 const SECOND_GAME_WINDOW_DAYS = [3, 10] as const;
 
@@ -32,6 +32,8 @@ export interface StageFacts {
   realRounds: Array<{ teacherId: string; completedAt: string }>;
   ledger: readonly LedgerRow[];
   testUserIds: ReadonlySet<string>;
+  /** Paid edu_access teachers: the share-code nudge is due the day the class exists. */
+  paidDay0UserIds?: ReadonlySet<string>;
 }
 
 export interface LifecycleNudgePlan {
@@ -63,7 +65,8 @@ function pickStage(t: StageTeacher, f: StageFacts, nowMs: number): LifecycleStag
   }
 
   const oldest = Math.max(...classes.map((c) => ageDays(c.createdAt, nowMs)));
-  return oldest >= SHARE_CODE_AFTER_DAYS ? owed('share_code') : null;
+  const paidDay0 = f.paidDay0UserIds?.has(t.userId) === true;
+  return oldest >= shareCodeDueAfterDays(paidDay0) ? owed('share_code') : null;
 }
 
 export function planLifecycleNudges(

@@ -11,9 +11,11 @@ import { lookupLiveGameForClassroom } from '@/lib/education/liveGameForClassroom
 import { lookupEndedClassroomSession, recordEndedCodeTry } from './endedSessionCode';
 import { guestSignInData, joinMissBudgetSpent, joinRateLimited, recordJoinMiss, sanitizeGuestName } from './joinGuards';
 import { foldJoinCode } from '@/lib/education/joinCodeInput';
+import { honorRehearsalJoin } from '@/lib/education/paidDay0';
 
 const joinClassroomSchema = z.object({
   joinCode: z.string().min(1).max(10),
+  rehearsal: z.boolean().optional(),
 });
 
 /**
@@ -69,7 +71,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { joinCode } = parsed.data;
+    const { joinCode, rehearsal } = parsed.data;
     const normalizedCode = foldJoinCode(joinCode);
 
     // Validate code format
@@ -224,11 +226,13 @@ export async function POST(request: NextRequest) {
       logger.error('classroom join: service role key not configured');
       return NextResponse.json({ error: 'Failed to join classroom' }, { status: 500 });
     }
+    const isRehearsal = await rehearsalSeat(admin, classroom.id, rehearsal === true);
     const { error: membershipError } = await admin
       .from('classroom_memberships')
       .insert({
         classroom_id: classroom.id,
         student_id: userId,
+        ...(isRehearsal ? { is_rehearsal: true } : {}),
       });
 
     if (membershipError) {
@@ -241,7 +245,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    await captureStudentJoinEvents(createAdminClient(), { classroomId: classroom.id, studentId: userId });
+    if (!isRehearsal) {
+      await captureStudentJoinEvents(createAdminClient(), { classroomId: classroom.id, studentId: userId });
+    }
 
     return NextResponse.json(
       {
@@ -260,4 +266,19 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+async function rehearsalSeat(
+  admin: NonNullable<ReturnType<typeof createAdminClient>>,
+  classroomId: string,
+  requested: boolean,
+): Promise<boolean> {
+  if (!requested) return false;
+  const { count, error } = await admin
+    .from('classroom_memberships')
+    .select('id', { count: 'exact', head: true })
+    .eq('classroom_id', classroomId)
+    .eq('is_rehearsal', true);
+  if (error) return false;
+  return honorRehearsalJoin(true, count ?? 0);
 }

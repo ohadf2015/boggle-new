@@ -7,6 +7,7 @@ import { teacherAccessAdminNotify } from '@/lib/email/templates/teacherAccessAdm
 import { teacherAccessConfirmation } from '@/lib/email/templates/teacherAccessConfirmation';
 import { teacherTrialExpiry } from '@/lib/education/trial';
 import { isTeacherProfile } from '@/lib/education/teacherRole';
+import { isPaidMedium } from '@/lib/education/paidDay0';
 import { buildEduAccessRequestCreatedEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer';
 import type { TeacherAccessFormPayload } from '@/lib/education/types';
 
@@ -58,7 +59,7 @@ export async function POST(req: Request) {
   // inserting, updating, or emailing (idempotent success).
   const { data: profile, error: profileError } = await sb
     .from('profiles')
-    .select('display_name, username, country_code, user_role, is_admin')
+    .select('display_name, username, country_code, user_role, is_admin, utm_medium')
     .eq('id', user.id)
     .maybeSingle();
 
@@ -80,7 +81,7 @@ export async function POST(req: Request) {
   // racing to insert and then both approving the same row, and handles the case
   // where a teacher re-submits after their first request auto-approved.
   if (isTeacherProfile(profile)) {
-    return NextResponse.json({ ok: true, success: true, alreadyApproved: true });
+    return NextResponse.json({ ok: true, success: true, alreadyApproved: true, paidDay0: isPaidMedium(profile?.utm_medium) });
   }
 
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
@@ -150,7 +151,7 @@ export async function POST(req: Request) {
       console.error('[access-request] approval matched no pending row and no approved twin for', email);
       return pendingApproval();
     }
-    return NextResponse.json({ ok: true, success: true });
+    return NextResponse.json({ ok: true, success: true, paidDay0: isPaidMedium(profile?.utm_medium) });
   }
 
   const promoted = await admin.from('profiles').update({ user_role: 'teacher' }).eq('id', user.id).select('id');
@@ -188,7 +189,7 @@ export async function POST(req: Request) {
   // Both keys on purpose: this route's error path answers { ok: false, error }, so a caller that
   // checks `ok` saw undefined on success — the shapes disagreed. `success` stays for any existing
   // consumer; `ok` makes the success and failure envelopes match.
-  return NextResponse.json({ ok: true, success: true });
+  return NextResponse.json({ ok: true, success: true, paidDay0: isPaidMedium(profile?.utm_medium) });
 }
 
 export async function GET(request: NextRequest) {
