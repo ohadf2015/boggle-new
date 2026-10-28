@@ -160,7 +160,7 @@ export function fromSpResults(r: BlastResultsData & BlastResultsExtras): BlastRe
     previousRank: r.previousRank ?? null,
     totalPlayers: r.totalPlayers ?? null,
     rival: r.rival ?? null,
-    failed: r.clearPercentage < SP_ADVANCE_CLEAR_PCT,
+    failed: r.clearPercentage < (r.passPct ?? SP_ADVANCE_CLEAR_PCT),
     stars: r.stars,
   };
 }

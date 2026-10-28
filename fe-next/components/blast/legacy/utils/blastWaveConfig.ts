@@ -105,9 +105,9 @@ const MAX_SCORE_PER_MOVE = 120;
 import type { BlastObjective, WaveResult } from '../types';
 import { calculateEarnedStars } from './blastStarCalculator';
 import { getTargetWordPool, pickRandomTargetWord } from './blastTargetWordPool';
-import { getWaveTheme, type BlastWaveThemeId } from './blastWaveTheme';
+import { getWaveTheme, getWavePassPct, type BlastWaveThemeId } from './blastWaveTheme';
 
-export { getWaveTheme, BLAST_WAVE_THEME_IDS } from './blastWaveTheme';
+export { getWaveTheme, getWavePassPct, BLAST_WAVE_THEME_IDS } from './blastWaveTheme';
 export type { BlastWaveTheme, BlastWaveThemeId, BlastWaveThemeParams, BlastWaveAccentToken } from './blastWaveTheme';
 
 /**
@@ -116,8 +116,6 @@ export type { BlastWaveTheme, BlastWaveThemeId, BlastWaveThemeParams, BlastWaveA
  * Wave 1: core mechanic (find words). Wave 2: longer = better.
  * Wave 3: special tiles matter. Wave 4+: compound goals.
  */
-/** Primary objective: always clear 90%+ of the board */
-const CLEAR_BOARD: BlastObjective = { type: 'clear_percent', target: 90 };
 
 /**
  * Max objectives shown per wave (incl. the clear_percent primary). The banner
@@ -165,7 +163,10 @@ function themeGoal(id: BlastWaveThemeId, wave: number, tier: number): BlastObjec
 export function getWaveObjectives(wave: number, language?: string): BlastObjective[] {
   const clamped = Math.max(wave, 1);
   const theme = getWaveTheme(clamped);
-  const base: BlastObjective[] = [CLEAR_BOARD, themeGoal(theme.id, clamped, theme.tier)];
+  const base: BlastObjective[] = [
+    { type: 'clear_percent', target: getWavePassPct(clamped) },
+    themeGoal(theme.id, clamped, theme.tier),
+  ];
   if (clamped > 1 && theme.id !== 'boss') base.push({ type: 'score_target', target: 40 + clamped * 30 });
 
   const withTargetWord = seedTargetWordObjective(clamped, language ?? 'en', base);

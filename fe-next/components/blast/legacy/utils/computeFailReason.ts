@@ -6,28 +6,30 @@
  * card instead of the older generic "Game Over" message.
  */
 
-const ADVANCE_THRESHOLD_PCT = 90;
+const DEFAULT_ADVANCE_PCT = 90;
 
 export interface ComputeFailReasonInput {
   tilesCleared: number;
   totalTiles: number;
+  passPct?: number;
 }
 
 export type FailReasonKind = 'tiles_short' | 'met';
 
 export interface FailReason {
   kind: FailReasonKind;
-  /** Additional tiles needed to reach the 90% advance bar. */
+  /** Additional tiles needed to reach the wave's advance bar. */
   tilesShort: number;
 }
 
 export function computeFailReason({
   tilesCleared,
   totalTiles,
+  passPct = DEFAULT_ADVANCE_PCT,
 }: ComputeFailReasonInput): FailReason {
   if (totalTiles <= 0) return { kind: 'met', tilesShort: 0 };
 
-  const required = Math.ceil((totalTiles * ADVANCE_THRESHOLD_PCT) / 100);
+  const required = Math.ceil((totalTiles * passPct) / 100);
   const short = Math.max(0, required - tilesCleared);
 
   if (short === 0) return { kind: 'met', tilesShort: 0 };

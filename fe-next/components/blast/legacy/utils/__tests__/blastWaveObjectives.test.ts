@@ -5,9 +5,9 @@ import { getWaveObjectives, capWaveObjectives, MAX_WAVE_OBJECTIVES } from '../bl
 import type { BlastObjective } from '../../types';
 
 describe('getWaveObjectives', () => {
-  it('warm-up wave: clear the board and find 4 words of 3+ letters', () => {
+  it('warm-up wave: clear 75% of the board and find 4 words of 3+ letters', () => {
     expect(getWaveObjectives(1)).toEqual([
-      { type: 'clear_percent', target: 90 },
+      { type: 'clear_percent', target: 75 },
       { type: 'word_length', target: 4, minWordLength: 3 },
     ]);
   });

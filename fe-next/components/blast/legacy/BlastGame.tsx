@@ -1,5 +1,6 @@
 'use client';
 
+import { getWavePassPct } from './utils/blastWaveTheme';
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHasRealAdProvider } from '@/hooks/useHasRealAdProvider';
@@ -544,7 +545,7 @@ export function BlastGame({
   // effectively won the wave, so prompting for extra moves is noise. The
   // dead-end branch in useBlastGameEnd will simply call onWaveComplete.
   const objectiveAlreadyMet = engine.gameState.totalTiles > 0
-    && (engine.gameState.tilesCleared / engine.gameState.totalTiles) * 100 >= 90;
+    && (engine.gameState.tilesCleared / engine.gameState.totalTiles) * 100 >= getWavePassPct(waveNumber);
 
   // 3-lives model: a dead-end free-revives while lives remain, and only shows
   // the rewarded-ad continue offer once they're spent.
@@ -616,7 +617,7 @@ export function BlastGame({
   // Game end detection + Sugar Crush (extracted to useBlastGameEnd)
   const { sugarCrushActive } = useBlastGameEnd({
     engine, isMultiplayer, gridSize: config.gridSize,
-    waveConfig, objectives, onGameEnd: handleGameEnd, onMPDeadEnd, onMPBoardCleared, onWaveComplete,
+    waveConfig, waveNumber, objectives, onGameEnd: handleGameEnd, onMPDeadEnd, onMPBoardCleared, onWaveComplete,
     onHighlightStart,
     maxCombo: combo.maxCombo, sounds,
     setExplosionShake, explosionShakeTimerRef,

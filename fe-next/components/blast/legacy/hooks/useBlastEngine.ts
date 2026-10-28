@@ -9,6 +9,7 @@ import { processTilesForWord } from '../utils/clearTilesProcessor';
 import { computeGravityResult, type GravityResult } from '../utils/blastGravity';
 import type { SpecialCombo } from '../utils/blastCombos';
 import { hasValidWords } from '../utils/blastDeadEndDetector';
+import { shuffleForPlayableWord } from '../utils/blastShuffle';
 import { buildDeadEndGrid } from '../utils/blastDeadEndGrid';
 import { calculateEarnedStars } from '../utils/blastStarCalculator';
 import { blastBoardsEqual } from '../utils/blastBoardEquality';
@@ -442,18 +443,25 @@ export function useBlastEngine(
     const grid = effectiveGridRef.current;
     if (!grid) return;
 
-    const tiles = tileStatesRef.current;
-    const newGrid = grid.map((row, ri) =>
-      row.map((cell, ci) => {
-        if (tiles[ri]?.[ci]?.isCleared) return cell;
-        return generateBlastLetter(language);
-      }),
+    const newGrid = shuffleForPlayableWord(
+      grid,
+      tileStatesRef.current,
+      checkWordInDict,
+      options?.minWordLength ?? 2,
+      () => generateBlastLetter(language),
+      new Set(gameStateRef.current.wordsFound),
     );
+    // No re-roll can produce a word: end the wave rather than let the player shuffle forever.
+    if (!newGrid) {
+      setGameState(prev => (prev.isComplete || prev.isDeadEnd ? prev : { ...prev, isDeadEnd: true }));
+      return;
+    }
 
     setCurrentGrid(newGrid);
     effectiveGridRef.current = newGrid;
     setNoWordsRemaining(false);
-  }, [language]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- minWordLength is stable config
+  }, [language, checkWordInDict]);
 
   // ── endGame ──
   const endGame = useCallback(() => {

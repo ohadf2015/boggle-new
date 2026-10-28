@@ -1,5 +1,6 @@
 'use client';
 
+import { getWavePassPct } from './utils/blastWaveTheme';
 import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Gift, Shield, Bomb, Zap } from 'lucide-react';
@@ -206,6 +207,7 @@ export function BlastView() {
   const handleGameEnd = useCallback((resultsData: BlastResultsData) => {
     const mergedResults: BlastResultsData = {
       ...resultsData,
+      passPct: getWavePassPct(currentWave),
       finalScore: totalScore + resultsData.finalScore,
       diamondsCollected: runCollectedRef.current.diamonds + (resultsData.diamondsCollected ?? 0),
       bombsPopped: runCollectedRef.current.bombs + (resultsData.bombsPopped ?? 0),
@@ -227,9 +229,9 @@ export function BlastView() {
     setResults(mergedResults);
     setPhase('results');
 
-    // Empathy cue on wave-fail (clearPct < 90 = wave didn't pass): mascot pose +
+    // Empathy cue on wave-fail (below the wave's pass bar): mascot pose +
     // gentle descending arpeggio. Both decorative — never block save flow.
-    if ((resultsData.clearPercentage ?? 100) < 90) {
+    if ((resultsData.clearPercentage ?? 100) < getWavePassPct(currentWave)) {
       emitMascotEvent({ kind: 'wave-fail' });
       playWaveFailArpeggio();
     }
@@ -237,7 +239,7 @@ export function BlastView() {
     recordLocalBest(config.difficulty ?? 'medium', mergedResults.finalScore);
 
     // A run only ends on a failed wave, so it saves when it earned something: a cleared wave or the ad continue.
-    const passedWave = (mergedResults.clearPercentage ?? 0) >= 90;
+    const passedWave = (mergedResults.clearPercentage ?? 0) >= getWavePassPct(currentWave);
     const adWatched = mergedResults.adContinueUsed === true;
     if (passedWave || adWatched || mergedResults.wavesCompleted >= 1) {
       saveBlastResult(mergedResults, config.difficulty ?? 'medium', language).then(
@@ -521,13 +523,13 @@ export function BlastView() {
       )}
 
       {phase === 'results' && results && (() => {
-        // Retry-on-loss eligibility: failed (clearPct < 90), past wave 1
+        // Retry-on-loss eligibility: failed (below the wave's pass bar), past wave 1
         // (wave-1 retry has zero progress to preserve and is identical to
         // Play Again), have an ad provider, haven't already retried, and
         // player hasn't declined yet.
         const failedClearPct = results.clearPercentage ?? 0;
         const eligibleForRetry =
-          failedClearPct < 90
+          failedClearPct < getWavePassPct(currentWave)
           && currentWave > 1
           && hasRealAdProvider
           && !retryUsedRef.current

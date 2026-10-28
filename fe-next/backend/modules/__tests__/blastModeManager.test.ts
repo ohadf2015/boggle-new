@@ -434,14 +434,14 @@ describe('blastModeManager', () => {
       return counts.reduce((a, b) => a + b, 0) / counts.length;
     };
 
-    it('keeps an early board mostly letters: about one bomb and one coin', () => {
+    it('keeps a warm-up board mostly letters', () => {
       const avg = average(1);
-      expect(avg).toBeGreaterThan(1.4);
-      expect(avg).toBeLessThan(3);
+      expect(avg).toBeGreaterThan(3.5);
+      expect(avg).toBeLessThan(36 * 0.2);
     });
 
-    it('rolls more specials in later waves', () => {
-      expect(average(10)).toBeGreaterThan(average(1));
+    it('rolls the same specials as the single-player wave config', () => {
+      expect(average(2)).toBeGreaterThan(average(4));
     });
   });
 });

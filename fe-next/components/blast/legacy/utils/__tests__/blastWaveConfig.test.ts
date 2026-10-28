@@ -12,15 +12,9 @@ describe('getWaveConfig', () => {
   it('returns WaveConfig for wave 1', () => {
     const config = getWaveConfig(1);
     expect(config.minWordLength).toBe(2);
-    expect(config.specialTileChance).toBe(0.06);
+    expect(config.specialTileChance).toBeCloseTo(0.12);
     expect(config.vowelModifier).toBe(1.1);
     expect(config.maxCascadeChain).toBe(2);
-  });
-
-  it('opens with the calmest board', () => {
-    for (let wave = 2; wave <= 12; wave++) {
-      expect(getWaveConfig(wave).specialTileChance).toBeGreaterThanOrEqual(getWaveConfig(1).specialTileChance);
-    }
   });
 
   it('returns progressively harder config for higher waves', () => {
@@ -28,8 +22,8 @@ describe('getWaveConfig', () => {
     const w3 = getWaveConfig(3);
     const w5 = getWaveConfig(5);
 
-    // More specials roll as waves climb
-    expect(w5.specialTileChance).toBeGreaterThan(w1.specialTileChance);
+    // Fewer moves as waves climb
+    expect(w5.movesAllowed).toBeLessThan(w1.movesAllowed);
 
     // Vowel modifier decreases
     expect(w3.vowelModifier).toBeLessThan(w1.vowelModifier);

@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from 'react';
 import { planSugarCrush } from '../utils/blastSugarCrush';
 import type { BlastResultsData, BlastTileState, BlastTileType } from '../types';
 import type { WaveConfig } from '../utils/blastWaveConfig';
+import { getWavePassPct } from '../utils/blastWaveTheme';
 
 /** Shape we pass to the debris spawner for the dead-end finale burst. */
 export interface DeadEndFinaleTile {
@@ -35,6 +36,7 @@ interface GameEndDeps {
   isMultiplayer: boolean;
   gridSize: number;
   waveConfig?: WaveConfig;
+  waveNumber?: number;
   objectives: { allObjectivesComplete: boolean };
   onGameEnd: (results: BlastResultsData) => void;
   /** MP only: called after Sugar Crush animation — signal server to end game early on dead-end. */
@@ -209,9 +211,9 @@ export function useBlastGameEnd(deps: GameEndDeps) {
           return;
         }
 
-        // Advance the wave if the primary board-clear objective (90%+) is met.
+        // Advance the wave if the primary board-clear objective (the wave's pass bar) is met.
         // Secondary objectives affect stars but don't block progression.
-        if (latestDeps.onWaveComplete && clearPct >= 90) {
+        if (latestDeps.onWaveComplete && clearPct >= getWavePassPct(latestDeps.waveNumber ?? 1)) {
           latestDeps.onWaveComplete(score, wordsFound, clearPct, waveCollected(engine.gameState));
         } else {
           const results = engine.getResults(

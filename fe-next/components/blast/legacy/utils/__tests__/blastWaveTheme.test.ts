@@ -7,6 +7,7 @@ import {
   getWaveClearReward,
   buildWaveResult,
   totalWaveRewardCoins,
+  getWavePassPct,
   BLAST_WAVE_THEME_IDS,
 } from '../blastWaveConfig';
 import { processTilesForWord } from '../clearTilesProcessor';
@@ -131,5 +132,31 @@ describe('wave theme text', () => {
       }
     }
     expect(missing).toEqual([]);
+  });
+});
+
+describe('wave 1 is winnable for a new player', () => {
+  it('passes the warm-up at 75% cleared, ordinary early waves at 85%, bosses and later waves at 90%', () => {
+    expect(getWavePassPct(1)).toBe(75);
+    expect(getWavePassPct(2)).toBe(85);
+    expect(getWavePassPct(4)).toBe(85);
+    expect(getWavePassPct(5)).toBe(90);
+    expect(getWavePassPct(7)).toBe(90);
+  });
+
+  it('uses the wave pass bar as the clear-the-board objective', () => {
+    for (let wave = 1; wave <= 12; wave++) {
+      expect(getWaveObjectives(wave, 'en').find(o => o.type === 'clear_percent')?.target).toBe(getWavePassPct(wave));
+    }
+  });
+
+  it('seeds the warm-up with enough bombs to break up a stuck board (about 2-3 on 6x6)', () => {
+    const cfg = getWaveConfig(1);
+    const dist = getWaveDistribution(cfg);
+    expect(cfg.specialTileChance).toBeGreaterThanOrEqual(0.11);
+    expect(dist.bomb).toBeGreaterThanOrEqual(0.6);
+    const expectedBombs = 36 * cfg.specialTileChance * dist.bomb;
+    expect(expectedBombs).toBeGreaterThanOrEqual(2);
+    expect(expectedBombs).toBeLessThanOrEqual(3.5);
   });
 });

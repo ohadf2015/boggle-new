@@ -16,7 +16,7 @@ describe('blast wave roster — bomb, coin, diamond', () => {
     }
   });
 
-  it('keeps early boards mostly letters (about one bomb and one coin on 6x6)', () => {
+  it('keeps the warm-up board mostly letters with about three bombs on 6x6', () => {
     let specials = 0;
     const boards = 200;
     for (let seed = 1; seed <= boards; seed++) {
@@ -25,8 +25,8 @@ describe('blast wave roster — bomb, coin, diamond', () => {
         .flat().filter(t => t.type !== 'standard').length;
     }
     const perBoard = specials / boards;
-    expect(perBoard).toBeGreaterThan(1.4);
-    expect(perBoard).toBeLessThan(3);
+    expect(perBoard).toBeGreaterThan(3.5);
+    expect(perBoard).toBeLessThan(36 * 0.2);
   });
 
   it('spawns more specials in later waves', () => {

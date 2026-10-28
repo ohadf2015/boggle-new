@@ -34,7 +34,8 @@ export function BlastResultsSummary({ results, t, onPlayAgain, onQuit, onOpenSto
   const rootRef = useRef<HTMLDivElement>(null);
   const badges = useBlastBadgeUnlocks({ results, t });
   const view = useMemo(() => toBlastResultsView(fromSpResults(results)), [results]);
-  const didFail = results.clearPercentage < 90;
+  const passPct = results.passPct ?? 90;
+  const didFail = results.clearPercentage < passPct;
 
   useBlastResultsReveal(rootRef, { score: view.score, locale: language, confetti: view.celebrate.confetti });
 
@@ -44,7 +45,7 @@ export function BlastResultsSummary({ results, t, onPlayAgain, onQuit, onOpenSto
   }, []);
 
   const goalRows = (results.finalObjectives ?? []).filter((p) => p.objective.type !== 'clear_percent');
-  const failReason = computeFailReason({ tilesCleared: results.tilesCleared, totalTiles: results.totalTiles });
+  const failReason = computeFailReason({ tilesCleared: results.tilesCleared, totalTiles: results.totalTiles, passPct: results.passPct });
 
   return (
     <div
@@ -80,7 +81,7 @@ export function BlastResultsSummary({ results, t, onPlayAgain, onQuit, onOpenSto
               <p className="font-neo-display font-black uppercase tracking-wider text-sm" data-testid="blast-fail-reason">
                 {failReason.kind === 'tiles_short'
                   ? t('blast.results.tilesShort', { count: failReason.tilesShort })
-                  : t('blast.results.needClearPct', { required: 90, got: results.clearPercentage })}
+                  : t('blast.results.needClearPct', { required: passPct, got: results.clearPercentage })}
               </p>
               <p className="text-[11px] uppercase tracking-wider font-bold">{t('blast.results.failHint')}</p>
               {results.targetWord && !results.targetWordFound && (
@@ -188,7 +189,7 @@ function ClearMeter({ results, t }: { results: BlastResultsData; t: Translate })
       </div>
       <div className="w-full h-2 bg-neo-navy rounded-full overflow-hidden border-2 border-neo-black">
         <div
-          className={cn('h-full rounded-full', pct >= 90 ? 'bg-neo-lime' : pct >= 60 ? 'bg-neo-cyan' : 'bg-neo-pink')}
+          className={cn('h-full rounded-full', pct >= (results.passPct ?? 90) ? 'bg-neo-lime' : pct >= 60 ? 'bg-neo-cyan' : 'bg-neo-pink')}
           style={{ width: `${pct}%` }}
         />
       </div>

@@ -1,5 +1,6 @@
 'use client';
 
+import { getWavePassPct } from './utils/blastWaveTheme';
 import { useState, useEffect, useRef } from 'react';
 import { HelpCircle, Shield, Bomb, Zap, Sparkles, Clock, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -25,10 +26,6 @@ const BUFF_META: Record<ActiveBuff, { Icon: typeof Shield; bg: string; label: st
 };
 
 const NO_TEXT_SHADOW_STYLE = { textShadow: 'none' } as const;
-
-/** Wave-clear goal: ≥90% of tiles cleared. Used for the visual target marker
- *  on the HUD progress bar and the goal-met color flip. */
-export const BLAST_WAVE_GOAL_PCT = 90;
 
 /** Smoothly lerps a number for display with a CSS transition on scale */
 function useAnimatedScore(target: number) {
@@ -235,7 +232,7 @@ export function BlastHUD({
     isMultiplayer && remainingTime !== null && remainingTime !== undefined && (totalTime ?? 0) > 0;
   const clearPct = totalTiles > 0 ? Math.round((tilesCleared / totalTiles) * 100) : 0;
   const isFiniteMoves = isFinite(totalMoves);
-  const goalMet = clearPct >= BLAST_WAVE_GOAL_PCT;
+  const goalMet = clearPct >= getWavePassPct(waveNumber);
   const showProgress = !isMultiplayer && !!progress;
   // A run total keeps the score and the "X to pass" chip on the same number; wave goals show their own count.
   const { display: animatedScore, pulse: scorePulse } = useAnimatedScore(showProgress && progress ? progress.baseScore + score : score);

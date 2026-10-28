@@ -106,6 +106,8 @@ export interface WaveResult {
 
 export interface BlastResultsData {
   finalScore: number;
+  /** Clear % the finished wave had to reach; absent on records saved before per-wave bars. */
+  passPct?: number;
   tilesCleared: number;
   totalTiles: number;
   clearPercentage: number;
