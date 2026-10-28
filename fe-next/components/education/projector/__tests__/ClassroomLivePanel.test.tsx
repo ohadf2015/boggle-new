@@ -26,6 +26,7 @@ describe('ClassroomLivePanel — the host sees the round, the class is not hande
     const socket = fakeSocket();
     render(<ClassroomLivePanel socket={socket} totalWords={0} lessonWords={['House', 'water']} t={t} />);
     expect(screen.getByTestId('live-word-of-round')).toHaveAttribute('data-empty', 'true');
+    expect(screen.getAllByTestId('live-word-ghost').length).toBeGreaterThanOrEqual(4);
     expect(screen.getByTestId('live-lesson-meter')).toHaveTextContent('eduLive.live.lessonFound:{"found":0,"total":2}');
   });
 
@@ -36,6 +37,7 @@ describe('ClassroomLivePanel — the host sees the round, the class is not hande
     const card = screen.getByTestId('live-word-of-round');
     expect(card).toHaveAttribute('data-empty', 'false');
     expect(screen.getAllByTestId('live-word-tile')).toHaveLength(5);
+    expect(screen.queryByTestId('live-word-ghost')).toBeNull();
     expect(card.textContent).not.toContain('house');
     expect(card).toHaveTextContent('Maya');
     expect(screen.getByTestId('live-lesson-meter')).toHaveTextContent('"found":1');

@@ -3250,6 +3250,11 @@ html.reduce-motion *::after {
   to { transform: scaleX(0); }
 }
 
+@keyframes edu-ghost-wave {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.55; }
+  30% { transform: translateY(-14%); opacity: 1; }
+}
+
 @keyframes edu-fold-in {
   from { transform: translateY(-6px); opacity: 0; }
   to { transform: none; opacity: 1; }

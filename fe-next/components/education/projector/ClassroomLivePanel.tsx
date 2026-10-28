@@ -8,6 +8,8 @@ import { cn } from '@/lib/utils';
 import type { Language } from '@/shared/types';
 import { emptyLiveRoundWords, foldLiveWords, lessonWordSet, maskWord, type LiveWordItem } from './liveRoundWords';
 
+const GHOST_TILES = [0, 1, 2, 3];
+
 interface FeedSocket {
   on(event: string, fn: (payload: unknown) => void): void;
   off(event: string, fn: (payload: unknown) => void): void;
@@ -121,7 +123,7 @@ export const ClassroomLivePanel = memo<ClassroomLivePanelProps>(function Classro
                   key={i}
                   data-testid="live-word-tile"
                   className={cn(
-                    'grid place-items-center rounded-md border-[3px] border-neo-black font-neo-display font-black leading-none shadow-[3px_3px_0_#000]',
+                    'grid place-items-center rounded-md border-[3px] border-neo-black font-neo-display font-black leading-none shadow-[3px_3px_0_rgb(var(--neo-black))]',
                     'size-[clamp(26px,6vh,76px)] text-[clamp(16px,4vh,52px)]',
                     letter ? 'bg-neo-cream text-neo-black' : 'bg-neo-purple/80 text-neo-cream'
                   )}
@@ -135,9 +137,23 @@ export const ClassroomLivePanel = memo<ClassroomLivePanelProps>(function Classro
             </span>
           </m.div>
         ) : (
-          <p className="font-neo-body font-bold text-neo-cream/85 text-[clamp(12px,2vh,26px)]">
-            {t('eduLive.live.wordOfRoundEmpty')}
-          </p>
+          <>
+            <span aria-hidden className="flex gap-[clamp(3px,0.6vw,10px)]">
+              {GHOST_TILES.map((i) => (
+                <span
+                  key={i}
+                  data-testid="live-word-ghost"
+                  style={{ animationDelay: `${i * 140}ms` }}
+                  className="grid size-[clamp(26px,6vh,76px)] place-items-center rounded-md border-[3px] border-dashed border-neo-cream/40 bg-neo-purple/25 font-neo-display text-[clamp(16px,4vh,52px)] font-black leading-none text-neo-cream/40 motion-safe:animate-[edu-ghost-wave_2.4s_cubic-bezier(0.45,0,0.55,1)_infinite]"
+                >
+                  ?
+                </span>
+              ))}
+            </span>
+            <p className="font-neo-body font-bold text-neo-cream/85 text-[clamp(12px,2vh,26px)]">
+              {t('eduLive.live.wordOfRoundEmpty')}
+            </p>
+          </>
         )}
       </div>
     </section>

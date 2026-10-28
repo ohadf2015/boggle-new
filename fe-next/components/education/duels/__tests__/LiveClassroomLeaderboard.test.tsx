@@ -62,23 +62,38 @@ describe('LiveClassroomLeaderboard — projector', () => {
     expect(rowNames()).toEqual(['Bo', 'Ada']);
   });
 
-  it('bursts, pops "+N" and stings on the row whose score went up', () => {
+  it('pops "+N" and stings on the row whose score went up, but saves the confetti for a new leader', () => {
     const { rerender } = render(
       <LiveClassroomLeaderboard variant="projector" gameMode="classic" leaderboard={board(['Ada', 30], ['Bo', 20])} />
     );
     rerender(
       <LiveClassroomLeaderboard variant="projector" gameMode="classic" leaderboard={board(['Ada', 30], ['Bo', 28])} />
     );
-    const bo = screen.getAllByTestId('live-board-row').find((r) => r.getAttribute('data-player') === 'Bo')!;
-    expect(bo.closest('[data-testid="burst"]')!.getAttribute('data-trigger')).toBe('true');
+    const burstOf = (name: string) =>
+      screen.getAllByTestId('live-board-row').find((r) => r.getAttribute('data-player') === name)!.closest('[data-testid="burst"]')!.getAttribute('data-trigger');
+    expect(burstOf('Bo')).toBe('false');
     expect(screen.getByTestId('live-board-pop').textContent).toBe('+8');
     expect(playModeSound).toHaveBeenCalledWith('classic', 'start');
+
+    rerender(
+      <LiveClassroomLeaderboard variant="projector" gameMode="classic" leaderboard={board(['Ada', 30], ['Bo', 45])} />
+    );
+    expect(burstOf('Bo')).toBe('true');
+    expect(burstOf('Ada')).toBe('false');
   });
 
-  it('given a phone-width projector, when a score pops, then the pop pins to the score corner instead of landing on the name', () => {
+  it('given a wide projector, then the board flows into two columns so the whole class fits', () => {
+    render(<LiveClassroomLeaderboard variant="projector" leaderboard={board(['Ada', 3], ['Bo', 2], ['Cy', 1])} />);
+    const list = screen.getByTestId('leaderboard-reorder');
+    expect(list.className).toContain('@[52rem]:grid-flow-col');
+    expect(list.style.getPropertyValue('--board-rows')).toBe('2');
+  });
+
+  it('given a phone-width projector, when a score pops, then the "+N" stays off the row (it covered the score) and the score bump carries it', () => {
     const { rerender } = render(<LiveClassroomLeaderboard variant="projector" gameMode="classic" leaderboard={board(['Ada', 30], ['Bo', 20])} />);
     rerender(<LiveClassroomLeaderboard variant="projector" gameMode="classic" leaderboard={board(['Ada', 30], ['Bo', 28])} />);
-    expect(screen.getByTestId('live-board-pop').className).toContain('max-md:end-2');
+    expect(screen.getByTestId('live-board-pop').className).toContain('max-md:hidden');
+    expect(screen.getByTestId('live-board-pop').className).toContain('@[52rem]:hidden');
   });
 
   it('does not celebrate scores that were already there on first paint (refresh restore)', () => {
