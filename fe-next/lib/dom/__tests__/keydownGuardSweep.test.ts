@@ -33,8 +33,8 @@ describe('game keydown handlers guard with isTypingTarget', () => {
     expect(offenders).toEqual([]);
   });
 
-  it('Word Tower v2 keydown handler checks isTypingTarget', () => {
-    const src = readFileSync(join(ROOT, 'components/wordTowerV2/WordTowerV2.tsx'), 'utf8');
+  it('Word Tower v2 keydown handler (useWordWheel) checks isTypingTarget', () => {
+    const src = readFileSync(join(ROOT, 'components/wordTowerV2/useWordWheel.ts'), 'utf8');
     expect(src).toMatch(/isTypingTarget\(event\)/);
   });
 });
