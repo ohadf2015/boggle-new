@@ -113,10 +113,9 @@ export function getWaveTheme(wave: number): BlastWaveTheme {
   };
 }
 
-/** Percent of the board a wave must clear to pass: forgiving warm-up, 90% for bosses and later waves. */
+/** Percent of the board a wave must clear to pass: a forgiving warm-up, one step up, then 90%. */
 export function getWavePassPct(wave: number): number {
-  const theme = getWaveTheme(wave);
-  if (theme.id === 'warmUp') return 75;
-  if (theme.id === 'boss' || theme.tier > 0) return 90;
-  return 85;
+  if (wave <= 1) return 75;
+  if (wave === 2) return 85;
+  return 90;
 }

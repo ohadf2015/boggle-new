@@ -97,6 +97,7 @@ vi.mock('@/components/blast/legacy/utils/blastTelemetry', () => ({
 }));
 
 import { BlastView } from '../BlastView';
+import { overlayQuietZoneReason } from '@/lib/overlayQuietZone';
 
 const endResults = (overrides: Partial<{
   clearPercentage: number;
@@ -173,5 +174,18 @@ describe('BlastView — save gate', () => {
     failWave({ clearPercentage: 30, adContinueUsed: true });
     expect(saveBlastResult).toHaveBeenCalledTimes(1);
     expect(addCoins).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps install prompts off the results and wave-clear screens, not off play', () => {
+    startRun();
+    expect(overlayQuietZoneReason() ?? '').not.toContain('blast-results');
+    act(() => {
+      blastGameProps.current.onWaveComplete(300, ['CAT'], 100, { diamonds: 0, bombs: 0 });
+    });
+    expect(overlayQuietZoneReason()).toContain('blast-results');
+    fireEvent.click(screen.getByTestId('mock-wave-continue'));
+    expect(overlayQuietZoneReason() ?? '').not.toContain('blast-results');
+    failWave();
+    expect(overlayQuietZoneReason()).toContain('blast-results');
   });
 });

@@ -1,5 +1,6 @@
 'use client';
 
+import { useOverlayQuietZoneClaim } from '@/lib/overlayQuietZone';
 import { getWavePassPct } from './utils/blastWaveTheme';
 import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -53,6 +54,7 @@ export function BlastView() {
   const hasRealAdProvider = useHasRealAdProvider();
 
   const [phase, setPhase] = useState<BlastPhase>('ready');
+  useOverlayQuietZoneClaim(phase === 'results' || phase === 'waveTransition', 'blast-results');
   const [results, setResults] = useState<BlastResultsData | null>(null);
   const gameKeyRef = useRef(0);
 
