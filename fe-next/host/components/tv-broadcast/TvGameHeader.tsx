@@ -176,12 +176,12 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
                   animation: 'fire-glow 1s ease-in-out infinite',
                 }}
               >
-                <Flame className="w-6 h-6 animate-bounce" />
+                <Flame className="w-6 h-6 motion-safe:animate-bounce" />
                 <div className="text-center">
                   <span className="font-black text-lg uppercase block">{t('tvBroadcast.fireRound')}</span>
                   <span className="text-xs font-bold">{t('tvBroadcast.twoXPoints')} • {fireRoundRemaining}s</span>
                 </div>
-                <Flame className="w-6 h-6 animate-bounce" />
+                <Flame className="w-6 h-6 motion-safe:animate-bounce" />
               </m.div>
             )}
           </AnimatePresence>
