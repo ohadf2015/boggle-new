@@ -53,4 +53,30 @@ describe('singleplayer LCP shell (server HTML)', () => {
     expect(info.size).toBeGreaterThan(500);
     expect(info.size).toBeLessThan(25 * 1024);
   });
+
+  it('preloads the right-sized swap asset at low priority, not the shared winner.webp', async () => {
+    const tree = await SinglePlayerLayout({
+      children: <div />,
+      params: Promise.resolve({ locale: 'en' }),
+    });
+    const html = renderToStaticMarkup(tree);
+    const tags = html.match(/<link\b[^>]*>/g) || [];
+    const swap = tags.find((tag) => tag.includes('/mascot/winner-swap.webp'));
+    expect(swap).toBeTruthy();
+    expect(swap).toMatch(/rel="preload"/);
+    expect(swap).toMatch(/as="image"/);
+    expect(swap).toMatch(/fetchPriority="low"/);
+    // The shared happy mascot is 30KB. Preloading it would put those bytes
+    // back on Lantern's LCP critical path.
+    expect(html).not.toMatch(/href="\/mascot\/winner\.webp"/);
+    expect(html).toMatch(/rel="preload"[^>]*href="\/mascot\/winner-lcp\.webp"/);
+  });
+
+  it('ships the swap asset in the 4-6KB displayed-box budget', async () => {
+    const { stat } = await import('node:fs/promises');
+    const { join } = await import('node:path');
+    const info = await stat(join(__dirname, '../../../../public/mascot/winner-swap.webp'));
+    expect(info.size).toBeGreaterThan(4 * 1024);
+    expect(info.size).toBeLessThanOrEqual(6 * 1024);
+  });
 });

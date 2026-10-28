@@ -1,15 +1,19 @@
 /**
  * Upgrade the SSR /singleplayer LCP img from the preloaded still
- * (/mascot/winner-lcp.webp) to the animated winner.webp only after LCP
+ * (/mascot/winner-lcp.webp) to a right-sized animation only after LCP
  * has painted.
  *
- * A second equal-area <img> (PageLoader's happy mascot, 112x112, fetchpriority
- * high) raced the shell and became the LCP resource in half of r7 PSI runs
- * (resourceLoadDelay tracked winner.webp's rendererStartTime, 1.5–2.2s).
+ * Lantern models the post-swap src as the simulated LCP resource. The shared
+ * happy mascot (/mascot/winner.webp, 160px, 17 frames, ~30KB) took 1.8–2.4s
+ * to download on the throttled 1.6Mbps link and made simLCP unwinnable.
+ * winner-swap.webp is that same pose at the 112px display box (~6KB, 5 frames)
+ * so the modeled download stays under ~400ms. The shared file stays full-size
+ * for pages that show the happy mascot larger than this shell.
+ *
  * Changing src on the element that already painted does not add a larger
- * entry, so the preloaded shell wins deterministically. fetchpriority is
- * dropped to low BEFORE the src write so the post-paint fetch is not a
- * High-priority request Lantern can re-attribute to the LCP element.
+ * entry, so the preloaded shell wins observed LCP. fetchpriority is dropped
+ * to low BEFORE the src write so the post-paint fetch is not a High-priority
+ * request Lantern can re-attribute to the LCP element.
  *
  * Fallback when no LCP entry arrives (observer missing, or nothing painted):
  * window load + afterLoadIdle. Never swaps before one of those two signals.
@@ -18,7 +22,7 @@ import { afterLoadIdle as defaultAfterLoadIdle } from './afterLoadIdle';
 
 export const SP_LCP_PAINT_ID = 'sp-lcp-paint';
 export const SP_WINNER_STILL_SRC = '/mascot/winner-lcp.webp';
-export const SP_WINNER_ANIMATED_SRC = '/mascot/winner.webp';
+export const SP_WINNER_ANIMATED_SRC = '/mascot/winner-swap.webp';
 
 export interface SpLcpImg {
   getAttribute(name: string): string | null;
