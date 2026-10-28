@@ -1,0 +1,31 @@
+name: gr-intervention
+
+# Product/UX PRs opt in with a column-0 GR-Intervention trailer. On push to
+# master this parses the merged PR and calls Growth Radar record_intervention
+# once per line (app lexiclash, evidence = PR URL + merge sha). radar/* PRs
+# are closed by radar-merged.yml from their ```radar block — a trailer on
+# those branches is ignored here so one fix is not graded twice.
+#
+# A re-run more than 26h after merge writes nothing. The baseline is measured
+# at call time, and a late row would grade a post-fix window. A bad trailer
+# fails this check; edit the merged PR body and re-run the job inside that
+# window. Same-day retries are safe (Growth Radar returns the existing row).
+on:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Record GR-Intervention trailers
+        env:
+          GROWTH_RADAR_TOKEN: ${{ secrets.GROWTH_RADAR_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/gr-intervention-trailer.py --from-push
