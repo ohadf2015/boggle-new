@@ -4426,6 +4426,10 @@ const ja = {
     "host": "ホスト",
     "roomClosed": "ルームが閉鎖されました",
     "roomTimedOut": "ルームが時間切れになったよ。ロビーに戻ります。",
+    "roomEnded": {
+      "line": "そのルームはもう終わったよ。新しいゲームに入る？",
+      "playNow": "今すぐ遊ぶ"
+    },
     "rejoinedRoom": "復帰しました！ルーム {code} に再接続",
     "rejoinedGame": "ゲームに復帰しました！",
     "hostLeftReason": {
@@ -20242,6 +20246,7 @@ const ja = {
       "readyCount": "{ready}/{total} 準備完了",
       "waitingHost": "ホストを待っています",
       "autoIn": "{seconds}秒後に次のラウンド",
+      "autoRematchIn": "{seconds}秒後に新しいシリーズ",
       "cancelAuto": "自動開始を止める",
       "autoOff": "自動開始オフ",
       "rematch": "再戦",
@@ -20950,6 +20955,8 @@ const ja = {
       "waitingTitle": "生徒の参加を待っています",
       "waitingHint": "QRを読み取るか、上のアドレスでコードを入力",
       "startBlocked": "生徒が1人参加するとスタートできます",
+      "phoneTestCta": "まず自分のスマホで試す",
+      "phoneTestHint": "自分のスマホで読み取ると、生徒の画面を確認できます。テスト用の席なので生徒には数えられません。",
       "copyLink": "リンクをコピー",
       "minutes": "{count}分",
       "leave": "ルームを出る",
@@ -21197,7 +21204,14 @@ const ja = {
       "copyFailed": "コピーできませんでした。代わりにコードを共有してください。",
       "noAccount": "生徒はアカウントなしで参加できます",
       "showProjector": "プロジェクターに映す",
-      "backHome": "ホームに戻る"
+      "backHome": "ホームに戻る",
+      "firstRound": {
+        "title": "最初のラウンドを実施 — 2分",
+        "step1": "ボット相手に一人で練習(非公開・生徒なし)",
+        "step2": "コードかQRを黒板に映す — 生徒はスマホから参加",
+        "step3": "スタートを押す:2分のラウンド、結果はリアルタイムで表示",
+        "start": "2分のラウンドを始める"
+      }
     },
     "host": {
       "classLabel": "クラス",

@@ -85,6 +85,7 @@ interface CreateGamePayload {
   isRanked?: boolean;
   isPrivate?: boolean;
   isClassroom?: boolean;
+  isQuickPlay?: boolean;
 }
 
 interface StartGameAckPayload {
@@ -144,7 +145,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         return;
       }
 
-      const { gameCode, roomName, language, hostUsername, playerId, avatar, authUserId, guestTokenHash, guestSessionId, isRanked, isPrivate, isClassroom } = validation.data as CreateGamePayload;
+      const { gameCode, roomName, language, hostUsername, playerId, avatar, authUserId, guestTokenHash, guestSessionId, isRanked, isPrivate, isClassroom, isQuickPlay } = validation.data as CreateGamePayload;
 
       // Ranked rooms must be hosted by an authenticated user — guests can't
       // submit results that update the ranked MMR leaderboard, so allowing
@@ -199,6 +200,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         isRanked: isRanked || false,
         isPrivate: isPrivate || false,
         isClassroom: isClassroom || false,
+        isQuickPlay: isQuickPlay || false,
         allowLateJoin: isRanked ? false : true
       });
 

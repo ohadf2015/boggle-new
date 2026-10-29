@@ -4487,6 +4487,10 @@ const es = {
     "inviteFriend": "Invitar a un amigo",
     "roomClosed": "Sala cerrada",
     "roomTimedOut": "Tu sala expiró. Volviendo al lobby.",
+    "roomEnded": {
+      "line": "Esa sala ya terminó. ¿Te unes a una partida nueva?",
+      "playNow": "Jugar ya"
+    },
     "rejoinedRoom": "¡De vuelta! Reconectado a la sala {code}",
     "rejoinedGame": "¡De vuelta al juego!",
     "hostLeftReason": {
@@ -20254,6 +20258,7 @@ const es = {
       "readyCount": "{ready}/{total} listos",
       "waitingHost": "Esperando al anfitrión",
       "autoIn": "Siguiente ronda en {seconds} s",
+      "autoRematchIn": "Nueva serie en {seconds} s",
       "cancelAuto": "Parar el inicio automático",
       "autoOff": "Inicio automático apagado",
       "rematch": "Revancha",
@@ -20962,6 +20967,8 @@ const es = {
       "waitingTitle": "Esperando a los alumnos",
       "waitingHint": "Escanea el QR o escribe el código en la dirección de arriba",
       "startBlocked": "Podrás empezar en cuanto entre un alumno",
+      "phoneTestCta": "Pruébalo antes en tu móvil",
+      "phoneTestHint": "Escanéalo con tu propio móvil para ver lo que ven tus alumnos. Es un puesto de prueba y no cuenta como alumno.",
       "copyLink": "Copiar enlace",
       "minutes": "{count} min",
       "leave": "Salir de la sala",
@@ -21209,7 +21216,14 @@ const es = {
       "copyFailed": "No se pudo copiar. Comparte el código.",
       "noAccount": "Los alumnos entran sin cuenta",
       "showProjector": "Mostrar en el proyector",
-      "backHome": "Volver al inicio"
+      "backHome": "Volver al inicio",
+      "firstRound": {
+        "title": "Haz tu primera ronda — 2 minutos",
+        "step1": "Practica a solas contra bots (privado, sin alumnos)",
+        "step2": "Proyecta el código o el QR — los alumnos se unen desde el móvil",
+        "step3": "Pulsa Empezar: una ronda de 2 minutos, resultados en vivo",
+        "start": "Empezar una ronda de 2 minutos"
+      }
     },
     "host": {
       "classLabel": "Clase",

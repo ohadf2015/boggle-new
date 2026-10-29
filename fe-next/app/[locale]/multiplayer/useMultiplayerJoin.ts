@@ -106,7 +106,7 @@ type HandleJoinFn = (
   overrideGameCode?: string,
   overrideRoomName?: string,
   overrideUsername?: string,
-  options?: { isPrivate?: boolean; isClassroom?: boolean; quickPlay?: boolean },
+  options?: { isPrivate?: boolean; isClassroom?: boolean; quickPlay?: boolean; autoRetry?: boolean },
 ) => Promise<void>;
 
 export function useMultiplayerJoin({
@@ -147,7 +147,7 @@ export function useMultiplayerJoin({
       overrideGameCode?: string,
       overrideRoomName?: string,
       overrideUsername?: string,
-      options?: { isPrivate?: boolean; isClassroom?: boolean; quickPlay?: boolean },
+      options?: { isPrivate?: boolean; isClassroom?: boolean; quickPlay?: boolean; autoRetry?: boolean },
     ) => {
       if (process.env.NODE_ENV === 'development') {
         console.log(`[JOIN] handleJoin called - mode: ${isHostMode ? 'HOST' : 'PLAYER'}, socket connected: ${socket?.connected}`);
@@ -184,6 +184,8 @@ export function useMultiplayerJoin({
           quickPlay: !!options?.quickPlay,
           // Only on failures — a `reason` on a success would just be noise.
           ...(reason ? { reason } : {}),
+          // A waiting student's automatic re-ask (useClassroomRoomWait), not a tap.
+          ...(options?.autoRetry ? { autoRetry: true } : {}),
         });
       };
 
@@ -405,6 +407,8 @@ export function useMultiplayerJoin({
           // Audit T4 (2026-05-10): server-side flag protects against
           // student-promotion if teacher disconnects mid-session.
           ...(options?.isClassroom && { isClassroom: true }),
+          // The duo bot only joins rooms Quick Play made, never a friend's room.
+          ...(options?.quickPlay && { isQuickPlay: true }),
         });
 
         // Remember how to get back into this room after a socket reconnect

@@ -44,6 +44,7 @@ import { homeOnboarding, type HomeOnboardingStepId } from '@/lib/education/homeO
 import type { TrialChecklistStepId } from '@/lib/education/trialChecklistProgress';
 import { teacherHostHref } from '@/lib/education/teacherHostHref';
 import { isDigestOverFreeTierCaps } from '@/lib/education/teacherPlanGate';
+import { trackFirstRoundGuideClicked, trackFirstRoundGuideShown } from '@/lib/education/firstRoundGuideTelemetry';
 
 export interface TeacherDashboardProps {
   /** Account-state strip for a teacher already on (or just off) a Pro trial: days left / renew. */
@@ -206,6 +207,24 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
     classroomCount: classrooms.length,
     studentCounts: classrooms.map((c) => c.member_count ?? 0),
   });
+  // First-round guide funnel on Home: which onboarding step was on screen, and which was pressed.
+  const onboardingCardShown =
+    ready &&
+    !classroomsError &&
+    !trial.checklist.visible &&
+    (!hasClasses ||
+      (week.status !== 'loading' &&
+        onboarding.visible &&
+        !(onboarding.current === 'shareCode' && shareCardShown)));
+  const onboardingStep = onboarding.current ?? 'tryDemo';
+  const guideShownStep = useRef<string | null>(null);
+  useEffect(() => {
+    if (!onboardingCardShown || guideShownStep.current === onboardingStep) return;
+    guideShownStep.current = onboardingStep;
+    trackFirstRoundGuideShown({ surface: 'home', locale: language, step: onboardingStep });
+  }, [onboardingCardShown, onboardingStep, language]);
+  const onOnboardingStep = (step: HomeOnboardingStepId) =>
+    trackFirstRoundGuideClicked({ surface: 'home', locale: language, step });
   const revealRef = useTeacherReveal<HTMLDivElement>(`${ready}-${hasClasses}-${Boolean(classroomsError)}`);
   const [reportsOpened, setReportsOpened] = useState(false);
   const hasRail = !ready || proCard !== null || showWeek || Boolean(selectedClassroom);
@@ -251,6 +270,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
                   <HomeOnboardingCard
                     onboarding={onboarding}
                     hrefs={onboardingHrefs}
+                    onStepStart={onOnboardingStep}
                     variant="full"
                     t={t}
                     secondary={<RehearseWithBotsButton classroomId={undefined} source="hq" language={language} t={t} showNote />}
@@ -287,7 +307,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
                         week.status !== 'loading' &&
                         onboarding.visible &&
                         !(onboarding.current === 'shareCode' && shareCardShown) ? (
-                          <HomeOnboardingCard onboarding={onboarding} hrefs={onboardingHrefs} onDismiss={activation.dismiss} variant="compact" t={t} />
+                          <HomeOnboardingCard onboarding={onboarding} hrefs={onboardingHrefs} onStepStart={onOnboardingStep} onDismiss={activation.dismiss} variant="compact" t={t} />
                         ) : undefined
                       }
                     />

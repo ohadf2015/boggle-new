@@ -1,4 +1,4 @@
-import { vi, describe, it, expect, beforeEach, type Mock } from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach, type Mock } from 'vitest';
 
 const roundInserts: Array<Record<string, unknown>> = [];
 const captured: Array<{ distinctId: string; event: string; properties: Record<string, unknown> }> = [];
@@ -26,6 +26,18 @@ vi.mock('@/lib/posthog', () => ({
 import { getSupabase } from '../../modules/supabase/client.js';
 import { persistClassroomGameScores } from '../classroomGamePersistence';
 import { EDU_ANALYTICS_HOST } from '../../utils/educationTelemetry';
+import logger from '../../utils/logger.js';
+
+// Flake diagnosis (CI-only, never reproduced locally): recordClassroomRound runs
+// several lookups inside one try/catch that logs and swallows, so a throw there
+// skips the insert and the test only sees `roundInserts.length === 0`. The logger
+// is mocked, so the reason vanished. Surface what was swallowed.
+function swallowedErrors(): string {
+  const calls = (logger.error as unknown as Mock).mock.calls;
+  return calls.length
+    ? `logger.error calls:\n${calls.map((c) => c.map(String).join(' | ')).join('\n')}`
+    : 'no logger.error calls';
+}
 
 const LESSON_WORDS = [
   { word: 'abandon', definition: 'to leave behind' },
@@ -145,11 +157,17 @@ beforeEach(() => {
   (getSupabase as Mock).mockReturnValue(makeSupabase());
 });
 
+afterEach((ctx) => {
+  if (ctx.task.result?.state === 'fail') {
+    console.error(`[classroomRoundPersistence] ${ctx.task.name}\n${swallowedErrors()}`);
+  }
+});
+
 describe('persistClassroomGameScores — classroom_rounds row', () => {
   it('Given sessions were written, When persisted, Then one round row carries the classroom_id', async () => {
     await persistClassroomGameScores(game, scores);
 
-    expect(roundInserts).toHaveLength(1);
+    expect(roundInserts, swallowedErrors()).toHaveLength(1);
     expect(roundInserts[0]).toMatchObject({
       classroom_id: 'class-1',
       teacher_id: 'teacher-1',
@@ -183,7 +201,7 @@ describe('persistClassroomGameScores — round education events', () => {
     await persistClassroomGameScores(game, scores);
 
     const evs = eventsNamed('edu_live_round_completed');
-    expect(evs).toHaveLength(1);
+    expect(evs, swallowedErrors()).toHaveLength(1);
     expect(evs[0].distinctId).toBe('teacher-1');
     expect(evs[0].properties).toMatchObject({
       classroom_id: 'class-1',

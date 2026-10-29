@@ -199,9 +199,21 @@ export function useMpPageState() {
     setShowResults(false); setResultsData(null);
     setClassroomEnded(endedCode);
   }, [gameCode, prefilledRoomCode, searchParams, username, setIsActive, setIsHost, setIsPrivate, setGameCode, setShowResults, setResultsData]);
+  // An arcade player whose room is gone gets a one-tap Quick Play offer, shown
+  // by the entry screen (lib/multiplayer/roomEndedRecovery). Never classroom.
+  const [roomEndedOffer, setRoomEndedOffer] = useState<{ seq: number } | null>(null);
+  const roomEndedSeqRef = useRef(0);
+  const offerQuickPlayRecovery = useCallback(() => {
+    roomEndedSeqRef.current += 1;
+    setRoomEndedOffer({ seq: roomEndedSeqRef.current });
+  }, []);
+  const clearRoomEndedOffer = useCallback(() => setRoomEndedOffer(null), []);
+  useEffect(() => {
+    if (isActive) setRoomEndedOffer(null);
+  }, [isActive]);
   // Early classroom joiner: the teacher's code is up but her room is not open yet — wait, never bounce.
   const roomWait = useClassroomRoomWait({ socketRef, isActive, onGiveUp: exitClassroomStudentToHub,
-    rejoin: (code) => handleJoin(false, null, code, undefined, username) });
+    rejoin: (code) => handleJoin(false, null, code, undefined, username, { autoRetry: true }) });
 
   // Native-safe exit to the multiplayer lobby: reset MP state IN PLACE (no page
   // reload). Shared by the results "Exit" button and the host-left grace modal.
@@ -296,7 +308,7 @@ export function useMpPageState() {
     setRoomLanguage, setUsername, setGameCode, setRoomName, setActiveRooms, setIsSpectator, setSpectators,
     setPlayersInRoom, setPlayersInRoomThrottled, setPendingGameStart, setGameStartTime, setShowResults,
     setResultsData, setHostLeftState, onMatchStart: mpSounds.onMatchStart, roomWaitHold: roomWait.hold,
-    classroomContext, classroomDecisionRef, exitClassroomStudentToHub,
+    classroomContext, classroomDecisionRef, exitClassroomStudentToHub, offerQuickPlayRecovery,
   });
 
   // Sync ref bridge so hooks called before the room socket get the latest socket
@@ -366,6 +378,7 @@ export function useMpPageState() {
       prefilledRoom: prefilledRoomCode, defaultLanguage: language as Language,
       host: isClassroomHost,
       isClassroomMode, waitingForTeacher: !!roomWait.waitingCode,
+      roomEndedOffer, onRoomEndedOfferShown: clearRoomEndedOffer,
       setGameCode, setUsername, setRoomName, setHostUsername,
     },
     playersInRoom, handleShowResults, pendingGameStart, handleGameStartConsumed, lessonData,

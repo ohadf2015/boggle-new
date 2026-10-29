@@ -24,15 +24,18 @@ export interface RehearseWithBotsButtonProps {
   t: T;
   showNote?: boolean;
   className?: string;
+  /** Fired on press, before the launch (telemetry hook). */
+  onStart?: () => void;
 }
 
-export function RehearseWithBotsButton({ classroomId, source, language, t, showNote = false, className }: RehearseWithBotsButtonProps) {
+export function RehearseWithBotsButton({ classroomId, source, language, t, showNote = false, className, onStart }: RehearseWithBotsButtonProps) {
   const router = useRouter();
   const { user } = useAuth();
   const [pending, setPending] = useState(false);
 
   const rehearse = async () => {
     if (pending) return;
+    onStart?.();
     setPending(true);
     type Lessons = Awaited<ReturnType<typeof getLessons>>['data'];
     let lessons: Lessons = [];

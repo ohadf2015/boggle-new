@@ -4027,6 +4027,10 @@ const en = {
     "host": "Host",
     "roomClosed": "Room closed",
     "roomTimedOut": "Your room timed out. Back to the lobby.",
+    "roomEnded": {
+      "line": "That room has ended. Jump into a new game?",
+      "playNow": "Play now"
+    },
     "rejoinedRoom": "Back in! Rejoined room {code}",
     "rejoinedGame": "Back in the game!",
     "hostLeftModal": {
@@ -19280,6 +19284,7 @@ const en = {
       "readyCount": "{ready}/{total} ready",
       "waitingHost": "Waiting for the host",
       "autoIn": "Next round in {seconds}s",
+      "autoRematchIn": "New series in {seconds}s",
       "cancelAuto": "Stop the auto-start",
       "autoOff": "Auto-start off",
       "rematch": "Rematch",
@@ -19988,6 +19993,8 @@ const en = {
       "waitingTitle": "Waiting for students",
       "waitingHint": "Scan the QR or type the code at the address above",
       "startBlocked": "Start opens once a student joins",
+      "phoneTestCta": "Try it on your phone first",
+      "phoneTestHint": "Scan with your own phone to see what students see. It's a test seat and doesn't count as a student.",
       "copyLink": "Copy link",
       "minutes": "{count} min",
       "leave": "Leave room",
@@ -20235,7 +20242,14 @@ const en = {
       "copyFailed": "Couldn't copy. Share the code instead.",
       "noAccount": "Students join with no account",
       "showProjector": "Show on projector",
-      "backHome": "Back to Home"
+      "backHome": "Back to Home",
+      "firstRound": {
+        "title": "Run your first round — 2 minutes",
+        "step1": "Practice alone against bots (private, no students)",
+        "step2": "Put the code or QR on the board — students join from phones",
+        "step3": "Press Start: a 2-minute round, results appear live",
+        "start": "Start a 2-minute round"
+      }
     },
     "host": {
       "classLabel": "Class",

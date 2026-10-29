@@ -111,6 +111,8 @@ export interface GameState {
   isPrivate: boolean;
   /** Classroom-mode rooms skip auto-host-transfer. See audit T4 (2026-05-10). */
   isClassroom: boolean;
+  /** Quick Play made this room (the duo bot only joins these). */
+  isQuickPlay?: boolean;
   /**
    * The teacher's pressure dials, resolved once at round start from the
    * classroom record and stashed HERE so every start-shaped payload of the
@@ -194,6 +196,8 @@ export interface GameCreationData {
   isRanked?: boolean;
   isPrivate?: boolean;
   isClassroom?: boolean;
+  /** Quick Play made this room (the duo bot only joins these). */
+  isQuickPlay?: boolean;
   allowLateJoin?: boolean;
 }
 

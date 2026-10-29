@@ -226,6 +226,8 @@ export interface Game {
   isRanked: boolean;
   /** Classroom-mode rooms skip auto-host-transfer (audit T4, 2026-05-10). */
   isClassroom?: boolean;
+  /** Quick Play made this room (the duo bot only joins these). */
+  isQuickPlay?: boolean;
   allowLateJoin: boolean;
   createdAt: number;
   lastActivity: number;

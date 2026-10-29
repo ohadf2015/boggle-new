@@ -14,6 +14,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { PolarClient } from '@/lib/polar'
 import { upsertSubscription, logSubscriptionEvent, grantProFromOrder, grantProFromCheckout, type Tier, type SubscriptionStatus } from '@/lib/subscriptions'
 import { maybeSendPaymentFailedEmail } from '@/lib/education/dunning'
+import { buildPolarCheckoutStatusEvent, buildPolarOrderPaidEvent, buildPolarSubscriptionEndedEvent, polarRevenueProps, withRevenue } from '@/lib/education/polarRevenue'
 import { buildProCheckoutSucceededEvent, buildProTrialSucceededEvent, buildTrialActivatedEvent, buildTrialStartEvent, buildTeacherTrialStartedEvent, buildCheckoutCompleteEvent, buildPaidEvent, buildTeacherTrialConvertedEvent, buildTrialExpiredEvent, buildTrialStartedEvent, buildTeacherProUpgradedEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer'
 import { isPolarTrialLapse } from '@/lib/education/polarTrial'
 
@@ -212,18 +213,25 @@ export async function POST(request: NextRequest) {
       case 'subscription.canceled':
         await handleSubscriptionCanceled(payload, userId)
         trackTrialExpired(payload, userId)
+        trackSubscriptionEnded('canceled', payload, userId)
         break
       case 'subscription.revoked':
         await handleSubscriptionRevoked(payload, userId)
         trackTrialExpired(payload, userId)
+        trackSubscriptionEnded('revoked', payload, userId)
         break
       case 'order.created':
         break
       case 'order.paid':
         await handleOrderPaid(payload, userId)
+        trackOrderPaid(payload, userId)
+        break
+      case 'checkout.created':
+        trackCheckoutStatus(eventType, payload, userId)
         break
       case 'checkout.completed':
       case 'checkout.updated':
+        trackCheckoutStatus(eventType, payload, userId)
         if (isCheckoutSuccess(eventType, payload)) {
           await handleCheckoutCompleted(payload, userId)
           trackCheckoutGrant(payload, userId)
@@ -238,7 +246,7 @@ export async function POST(request: NextRequest) {
       userId,
       eventType,
       subscriptionId: String(payload?.data?.id ?? ''),
-      payload: { event_type: eventType, user_id: userId, trial: marker.trial, trial_end: marker.trial_end },
+      payload: { event_type: eventType, user_id: userId, trial: marker.trial, trial_end: marker.trial_end, ...polarRevenueProps(payload?.data) },
     })
 
     return NextResponse.json({ received: true })
@@ -260,12 +268,12 @@ function trackProConversion(payload: WebhookPayload, userId?: string) {
     if (!userId || getTierFromProductId(getProductId(payload)) !== 'pro') return
     if (mapStatus(payload?.data?.status) === 'trialing') return
     const subId = String(payload?.data?.id ?? '')
-    captureProFunnelServerEvent(buildProCheckoutSucceededEvent(userId, subId))
-    captureProFunnelServerEvent(buildCheckoutCompleteEvent(userId, subId))
-    captureProFunnelServerEvent(buildPaidEvent(userId, subId))
-    captureProFunnelServerEvent(buildTeacherProUpgradedEvent(userId, subId, getLocale(payload)))
+    captureProFunnelServerEvent(withRevenue(buildProCheckoutSucceededEvent(userId, subId), payload?.data))
+    captureProFunnelServerEvent(withRevenue(buildCheckoutCompleteEvent(userId, subId), payload?.data))
+    captureProFunnelServerEvent(withRevenue(buildPaidEvent(userId, subId), payload?.data))
+    captureProFunnelServerEvent(withRevenue(buildTeacherProUpgradedEvent(userId, subId, getLocale(payload)), payload?.data))
     if (trialMarker(payload?.data).trial) {
-      captureProFunnelServerEvent(buildTeacherTrialConvertedEvent(userId, subId))
+      captureProFunnelServerEvent(withRevenue(buildTeacherTrialConvertedEvent(userId, subId), payload?.data))
     }
   } catch (err) {
     console.error('[Polar] conversion telemetry threw:', err)
@@ -283,11 +291,11 @@ function trackProTrial(payload: WebhookPayload, userId?: string) {
     if (!userId || getTierFromProductId(getProductId(payload)) !== 'pro') return
     if (mapStatus(payload?.data?.status) !== 'trialing') return
     const subId = String(payload?.data?.id ?? '')
-    captureProFunnelServerEvent(buildProTrialSucceededEvent(userId, subId))
-    captureProFunnelServerEvent(buildTrialActivatedEvent(userId, subId))
-    captureProFunnelServerEvent(buildTrialStartEvent(userId, subId))
-    captureProFunnelServerEvent(buildTeacherTrialStartedEvent(userId, subId))
-    captureProFunnelServerEvent(buildTrialStartedEvent(userId, subId, getLocale(payload)))
+    captureProFunnelServerEvent(withRevenue(buildProTrialSucceededEvent(userId, subId), payload?.data))
+    captureProFunnelServerEvent(withRevenue(buildTrialActivatedEvent(userId, subId), payload?.data))
+    captureProFunnelServerEvent(withRevenue(buildTrialStartEvent(userId, subId), payload?.data))
+    captureProFunnelServerEvent(withRevenue(buildTeacherTrialStartedEvent(userId, subId), payload?.data))
+    captureProFunnelServerEvent(withRevenue(buildTrialStartedEvent(userId, subId, getLocale(payload)), payload?.data))
   } catch (err) {
     console.error('[Polar] trial telemetry threw:', err)
   }
@@ -311,9 +319,47 @@ function trackTrialExpired(payload: WebhookPayload, userId?: string) {
       current_period_end: periodEnd,
     })) return
     const subId = String(data?.id ?? '')
-    captureProFunnelServerEvent(buildTrialExpiredEvent(userId, subId))
+    captureProFunnelServerEvent(withRevenue(buildTrialExpiredEvent(userId, subId), data))
   } catch (err) {
     console.error('[Polar] trial_expired telemetry threw:', err)
+  }
+}
+
+/**
+ * `polar_order_paid` — every paid Pro order (first payment and renewals) with
+ * amount/currency/product and `revenue` in major units. Never throws.
+ */
+function trackOrderPaid(payload: WebhookPayload, userId?: string) {
+  try {
+    if (!userId || getTierFromProductId(getProductId(payload)) !== 'pro') return
+    captureProFunnelServerEvent(buildPolarOrderPaidEvent(userId, payload?.data))
+  } catch (err) {
+    console.error('[Polar] order telemetry threw:', err)
+  }
+}
+
+/** `polar_subscription_canceled|revoked` for any Pro cancel, trial or paid. Never throws. */
+function trackSubscriptionEnded(kind: 'canceled' | 'revoked', payload: WebhookPayload, userId?: string) {
+  try {
+    if (!userId || getTierFromProductId(getProductId(payload)) !== 'pro') return
+    const data = payload?.data ?? {}
+    captureProFunnelServerEvent(buildPolarSubscriptionEndedEvent(kind, userId, data, trialMarker(data).trial))
+  } catch (err) {
+    console.error('[Polar] cancel telemetry threw:', err)
+  }
+}
+
+/**
+ * `polar_checkout_status` — Polar-side checkout state (open/confirmed/succeeded/
+ * failed/expired), so a started checkout that never paid shows where it died.
+ * Pro product only. Never throws.
+ */
+function trackCheckoutStatus(eventType: string, payload: WebhookPayload, userId?: string) {
+  try {
+    if (getTierFromProductId(getProductId(payload)) !== 'pro') return
+    captureProFunnelServerEvent(buildPolarCheckoutStatusEvent(userId, eventType, payload?.data))
+  } catch (err) {
+    console.error('[Polar] checkout status telemetry threw:', err)
   }
 }
 

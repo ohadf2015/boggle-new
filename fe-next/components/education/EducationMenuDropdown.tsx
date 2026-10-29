@@ -6,6 +6,7 @@ import { Menu, Users, BookOpen, GraduationCap, Home, LogOut } from 'lucide-react
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { TeacherProNavLink } from '@/components/teacher/TeacherProNavLink';
+import { ForSchoolsLink } from '@/components/education/ForSchoolsLink';
 
 interface EducationMenuDropdownProps {
   isTeacher: boolean;
@@ -109,13 +110,24 @@ export const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
               )}
 
               {isTeacher && (
-                <TeacherProNavLink
-                  onNavigate={() => setIsOpen(false)}
-                  className={cn(
-                    'flex items-center gap-2 px-3 py-2 text-sm font-bold rounded-neo transition-colors',
-                    'text-neo-white hover:bg-neo-lime/30',
-                  )}
-                />
+                <>
+                  <TeacherProNavLink
+                    onNavigate={() => setIsOpen(false)}
+                    className={cn(
+                      'flex items-center gap-2 px-3 py-2 text-sm font-bold rounded-neo transition-colors',
+                      'text-neo-white hover:bg-neo-lime/30',
+                    )}
+                  />
+                  <ForSchoolsLink
+                    placement="teacher_menu"
+                    role="menuitem"
+                    onNavigate={() => setIsOpen(false)}
+                    className={cn(
+                      'flex items-center gap-2 px-3 py-2 text-sm font-bold rounded-neo transition-colors',
+                      'text-neo-white hover:bg-neo-lime/30',
+                    )}
+                  />
+                </>
               )}
 
               {isAuthenticated && (

@@ -18,7 +18,7 @@ const vars = (s: string) => (s.match(/\{\w+\}/g) ?? []).sort();
 const USED = [
   'time', 'finalTitle', 'roundDone', 'details', 'detailsTitle', 'skipHint', 'you', 'pts', 'winner', 'placeOf',
   'behind', 'ahead', 'tiedWith', 'tiedWithMore', 'bestWord', 'xp', 'coins', 'seriesTotal', 'moreHidden', 'nextUp', 'hostPicking',
-  'tapToChange', 'chooseMode', 'startNext', 'ready', 'youreReady', 'readyCount', 'waitingHost', 'autoIn',
+  'tapToChange', 'chooseMode', 'startNext', 'ready', 'youreReady', 'readyCount', 'waitingHost', 'autoIn', 'autoRematchIn',
   'cancelAuto', 'autoOff', 'rematch', 'newSeries', 'leave', 'share', 'seriesChampion', 'teacherPaced',
   'roundPoints', 'yourRank', 'lessonRecap', 'seriesPlace', 'seriesPts', 'roundGain',
   'awardsTitle', 'awardTop', 'awardLongest', 'awardMost', 'letterCount', 'roundByRound', 'roundShort', 'total', 'player',

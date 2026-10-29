@@ -4775,6 +4775,10 @@ const sv = {
     "host": "Värd",
     "roomClosed": "Rummet stängt",
     "roomTimedOut": "Ditt rum gick ut. Tillbaka till lobbyn.",
+    "roomEnded": {
+      "line": "Det rummet har avslutats. Hoppa in i ett nytt spel?",
+      "playNow": "Spela nu"
+    },
     "rejoinedRoom": "Du är tillbaka i rum {code}",
     "rejoinedGame": "Tillbaka i spelet!",
     "hostLeftReason": {
@@ -20242,6 +20246,7 @@ const sv = {
       "readyCount": "{ready}/{total} redo",
       "waitingHost": "Väntar på värden",
       "autoIn": "Nästa runda om {seconds} s",
+      "autoRematchIn": "Ny serie om {seconds} s",
       "cancelAuto": "Stoppa autostart",
       "autoOff": "Autostart av",
       "rematch": "Returmatch",
@@ -20950,6 +20955,8 @@ const sv = {
       "waitingTitle": "Väntar på elever",
       "waitingHint": "Skanna QR-koden eller skriv koden på adressen ovan",
       "startBlocked": "Start går att trycka på när en elev är med",
+      "phoneTestCta": "Testa på din mobil först",
+      "phoneTestHint": "Skanna med din egen mobil för att se vad eleverna ser. Det är en testplats och räknas inte som elev.",
       "copyLink": "Kopiera länk",
       "minutes": "{count} min",
       "leave": "Lämna rummet",
@@ -21197,7 +21204,14 @@ const sv = {
       "copyFailed": "Det gick inte att kopiera. Dela koden i stället.",
       "noAccount": "Eleverna ansluter utan konto",
       "showProjector": "Visa på projektorn",
-      "backHome": "Tillbaka till startsidan"
+      "backHome": "Tillbaka till startsidan",
+      "firstRound": {
+        "title": "Kör din första runda — 2 minuter",
+        "step1": "Öva själv mot bottar (privat, inga elever)",
+        "step2": "Visa koden eller QR-koden på tavlan — eleverna ansluter från mobilen",
+        "step3": "Tryck Starta: en runda på 2 minuter, resultaten visas live",
+        "start": "Starta en runda på 2 minuter"
+      }
     },
     "host": {
       "classLabel": "Klass",

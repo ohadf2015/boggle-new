@@ -92,6 +92,12 @@ describe('gameStateManager', () => {
       expect(game.roomName).toBe('ROOM2'); // falls back to gameCode
       expect(game.isRanked).toBe(false);
       expect(game.allowLateJoin).toBe(true);
+      expect(game.isQuickPlay).toBe(false);
+    });
+
+    it('remembers that Quick Play made the room (the duo bot only joins those)', () => {
+      const game = gsm.createGame('ROOM3', { hostSocketId: 's1', hostUsername: 'H', hostPlayerId: 'hp', isQuickPlay: true });
+      expect(game.isQuickPlay).toBe(true);
     });
   });
 

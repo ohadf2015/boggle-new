@@ -46,7 +46,7 @@ import { startVocabQuizForClassroom } from './vocabQuizHandler.js';
 import { DIFFICULTIES, DEFAULT_DIFFICULTY } from '@/shared/constants/gameConstants';
 import { beginClassroomRound } from '../modules/classroomGameManager.js';
 import { readClassroomPressure } from '@/shared/utils/classroomPressure';
-import { autoAddBotsForSoloPlayer } from '../services/gameLifecycle/autoAddBots.js';
+import { autoAddBotsForSoloPlayer, autoAddBotForDuo } from '../services/gameLifecycle/autoAddBots.js';
 import { scheduleRoundEvent } from '../modules/roundEventsManager.js';
 import { startRushTiles } from '../modules/rushTiles/rushTilesManager.js';
 import { buildLessonVocabulary } from '../utils/lessonVocabulary.js';
@@ -81,6 +81,8 @@ interface StartGamePayload {
   tvMode?: boolean;
   /** Boost token bundled with startGame — registered atomically with the transition. */
   boostToken?: string;
+  /** exp-mp-duo-bot-v1: host asks for one bot if this public room starts 1v1. */
+  duoBot?: boolean;
 }
 
 /**
@@ -313,6 +315,17 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
         initializePlayerData(gameCode);
         broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', { users: getGameUsers(gameCode) });
         logger.info('BOT', `Auto-added ${autoAddResult.botsAdded} bots for solo player in ${gameCode} (grid regenerated)`);
+      }
+
+      // exp-mp-duo-bot-v1: a public 1v1 gets a third seat (the gate — never
+      // classroom/ranked/private — lives in autoAddBotForDuo). The board is
+      // already server-dealt (2+ players), so only the roster + state change.
+      if (validatedData.duoBot && !rules.humanOnly && autoAddResult.botsAdded === 0) {
+        const duo = await autoAddBotForDuo(gameCode, game);
+        if (duo.botsAdded > 0) {
+          initializePlayerData(gameCode);
+          broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', { users: getGameUsers(gameCode) });
+        }
       }
 
       const users = getGameUsers(gameCode);
