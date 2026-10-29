@@ -9,6 +9,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { getSupabase, isSupabaseConfigured } from '../modules/supabaseServer';
 import logger from '../utils/logger';
 import { isBlocked } from '../modules/blockListManager';
+import { isAutomatedUserAgent } from '../../lib/seo/botUa';
 
 const router: Router = express.Router();
 
@@ -139,13 +140,17 @@ router.post('/track', async (req: TrackRequest, res: Response): Promise<void> =>
     // Strip any client-claimed identity from metadata, then re-stamp the trusted
     // one. The admin game log resolves the display name from the server-side
     // profiles join on player_id; it does NOT depend on a client-sent username.
-    const { userId: _spoofedUserId, username: _spoofedUsername, ...safeMetadata } =
+    const { userId: _spoofedUserId, username: _spoofedUsername, is_automated: _claimedAutomated, ...safeMetadata } =
       (metadata ?? {}) as Record<string, unknown>;
+    const userAgent = (req.headers['user-agent'] as string | undefined) || null;
     const enrichedMetadata: Record<string, unknown> = {
       ...safeMetadata,
       userId: authedUserId,
       guest_name: guest_name || null,
-      user_agent: req.headers['user-agent'] || null,
+      user_agent: userAgent,
+      // Tag, never drop: headless/audit traffic was ~40% of sessions and skewed
+      // every funnel, but synthetic monitors still want their rows.
+      ...(isAutomatedUserAgent(userAgent) ? { is_automated: true } : {}),
     };
 
     const insertData: AnalyticsEventInsert = {
