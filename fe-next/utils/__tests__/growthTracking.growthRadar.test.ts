@@ -133,6 +133,7 @@ describe('trackGrowthEvent → Growth Radar mirror', () => {
       'first_game_won',
       'game_abandoned',
       'next_game_picked',
+      'account_first_game',
     ];
     for (const event of spine) {
       trackGrowthEvent(event, {});

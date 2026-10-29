@@ -6,6 +6,7 @@ import { syncAuthAnalyticsTransition } from '@/utils/authAnalytics';
 import { consumePendingSignupCompletion, consumeSignupSource, isRecentAccount, maybeTrackSignupCompleted, setAnalyticsIdentity } from '@/utils/growthTracking';
 import { markAuthProviderMounted } from '@/lib/auth/authProviderMounted';
 import { persistProfileAttribution } from '@/utils/profileAttribution';
+import { markFreshSignup } from '@/lib/retention/signupFirstGame';
 import type { AuthContextValue } from './auth/authTypes';
 import { AuthContext } from './AuthContext';
 
@@ -158,6 +159,9 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
         // values. Fire-and-forget; must never block the auth flow.
         if (isRecentAccount(user.created_at, Date.now())) {
           void persistProfileAttribution(source);
+          // t_3b095edf: arm the post-signup first-game card and the once-per-account
+          // goal. No-op if this account already completed a game. Never blocks auth.
+          markFreshSignup(user.id, source);
         }
         // Allowlist bridge: if this email was pre-approved for teacher access, consume the entry.
         if (user?.email) {

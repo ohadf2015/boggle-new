@@ -17056,6 +17056,11 @@ const ru = {
     },
     "home": {
       "greeting": "Привет, {name}",
+      "signupFirstGame": {
+        "title": "Сыграй первую игру, {name}",
+        "titleNoName": "Сыграй первую игру",
+        "daily": "Сегодняшнее колесо слов (2 мин)"
+      },
       "levelTitle": "Уровень {level} · {title}",
       "levelOnly": "Уровень {level}",
       "titles": {
