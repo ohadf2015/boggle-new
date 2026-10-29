@@ -21,6 +21,10 @@ import { useComboStreakMilestone } from './hooks/useComboStreakMilestone';
 import { getComboAmbientTier } from './comboAmbientThreshold';
 import { useBlastGsapTimelines } from './hooks/useBlastGsapTimelines';
 import { isReducedMotionPreferred } from '@/utils/accessibility';
+import { useDevicePerformance } from '@/hooks/useDevicePerformance';
+import { useBlastSignatureFx, type SpecialTile } from './effects/useBlastSignatureFx';
+import type { CellsChannel } from './effects/blastFxEvents';
+import { startQualityFor } from './effects/blastFxGovernor';
 import {
   TILE_EXPLOSION_VARIANTS,
   BOMB_EXPLOSION_VARIANTS,
@@ -72,7 +76,15 @@ interface BlastEffectsCanvasProps {
   /** Combo streak level (0–10). Crossing 5 / 10 fires a milestone flourish. */
   comboStreakLevel?: number;
   waveCleared: boolean;
+  /** Bumps once per submitted word; the first clear after a bump is the word pop. */
+  wordSubmitCount?: number;
+  lastWordScore?: number;
+  /** Live drag path from the board (bypasses React state). */
+  selection?: CellsChannel;
+  specialTiles?: readonly SpecialTile[];
 }
+
+const NO_SPECIALS: readonly SpecialTile[] = [];
 
 // ─── Main Component ─────────────────────────────────────────────────────
 
@@ -105,12 +117,20 @@ function EffectsWorker({
   comboTier,
   comboStreakLevel = 0,
   waveCleared,
+  wordSubmitCount = 0,
+  lastWordScore = 0,
+  selection,
+  specialTiles = NO_SPECIALS,
 }: BlastEffectsCanvasProps) {
   const { app, particles, shake, physics, camera, timeDilation } = useGameEngine();
+  const { isLowEnd, isMobile } = useDevicePerformance();
   const enhancedRef = useRef<EnhancedEffectsManager | null>(null);
   const juiceRef = useRef<BlastJuiceKit | null>(null);
 
-  const prevClearedKeyRef = useRef('');
+  const prevClearedRef = useRef<ClearedTileEvent[] | null>(null);
+  const poppedSubmitRef = useRef(wordSubmitCount);
+  const wordScoreRef = useRef(lastWordScore);
+  wordScoreRef.current = lastWordScore;
   const comboStreakLevelRef = useRef(comboStreakLevel);
   const prevChainRef = useRef(0);
   const prevComboRef = useRef(0);
@@ -179,102 +199,69 @@ function EffectsWorker({
     fireShockwave, spawnStarBurst, confettiPreset: CONFETTI_BURST,
   });
 
-  // Start ambient bokeh on mount
+  const maxQuality = startQualityFor({ isLowEnd, isMobile });
+  const { govRef, playClear, resetForWave } = useBlastSignatureFx({
+    app, camera, shake, timeDilation, width, height, cellSize, chainLevel, maxQuality, selection, specialTiles,
+  });
+
+  // Ambient bokeh is pure decoration: only on full-quality devices.
   useEffect(() => {
+    if (maxQuality < 2) return;
     const emitter = particles.create(AMBIENT_BOKEH);
     emitter.emit(width / 2, height / 2);
     return () => { emitter.destroy(); };
-  }, [particles, width, height]);
+  }, [particles, width, height, maxQuality]);
 
   // Ambient effects: ghost trails (chain >= 2) + metaball goo (chain >= 3)
   const { moveGhostTo } = useBlastAmbientEffects({
     app, camera, width, height, cellSize, chainLevel,
   });
 
-  // Tile clear → per-type particle bursts + screen shake
+  // Tile clear → signature FX per special + word-size scaled bursts
   useEffect(() => {
-    if (clearedTiles.length === 0) return;
-    const key = clearedTiles.map(t => `${t.row},${t.col},${t.type}`).join(';');
-    if (key === prevClearedKeyRef.current) return;
-    prevClearedKeyRef.current = key;
+    if (clearedTiles.length === 0 || clearedTiles === prevClearedRef.current) return;
+    prevClearedRef.current = clearedTiles;
+    const isWordPop = wordSubmitCount !== poppedSubmitRef.current;
+    poppedSubmitRef.current = wordSubmitCount;
+
+    const gov = govRef.current;
+    const plan = playClear(clearedTiles, isWordPop, isWordPop ? wordScoreRef.current : 0);
+    const full = gov.quality >= 2;
+    const extra = gov.allows('extra');
+    const burstScale = plan.word?.particleScale ?? 0.8;
 
     for (const tile of clearedTiles) {
       const x = tile.col * cellSize + cellSize / 2;
       const y = tile.row * cellSize + cellSize / 2;
-
       if (tile.type === 'bomb') {
-        fireShockwave(x, y, 12);
-        particles.burst(pickRandom(BOMB_EXPLOSION_VARIANTS), x, y);
-        enhancedRef.current?.shatterTile(x, y, 'bomb');
-      }
-
-      if (tile.type === 'diamond') {
-        particles.burst(DIAMOND_SHARDS, x, y);
-        fireShockwave(x, y, 7);
-        enhancedRef.current?.shatterTile(x, y, 'diamond');
-        enhancedRef.current?.crystallizeTile(x, y, 'diamond');
+        if (full) fireShockwave(x, y, 12);
+        particles.burst(pickRandom(BOMB_EXPLOSION_VARIANTS), x, y, gov.scale(24));
+        if (extra) enhancedRef.current?.shatterTile(x, y, 'bomb');
+      } else if (tile.type === 'diamond') {
+        particles.burst(DIAMOND_SHARDS, x, y, gov.scale(20));
+        if (extra) enhancedRef.current?.crystallizeTile(x, y, 'diamond');
       } else if (tile.type === 'gold') {
-        particles.burst(GOLD_STARS, x, y);
-        spawnStarBurst(x, y, 0xffd700, 10);
-        enhancedRef.current?.meltTile(x, y, 'gold');
-      } else if (tile.type === 'standard') {
-        particles.burst(pickRandom(TILE_EXPLOSION_VARIANTS), x, y);
+        particles.burst(GOLD_STARS, x, y, gov.scale(14));
+        if (extra) enhancedRef.current?.meltTile(x, y, 'gold');
+      } else {
+        particles.burst(pickRandom(TILE_EXPLOSION_VARIANTS), x, y, gov.scale(Math.round(16 * burstScale)));
       }
+      if (extra) particles.burst(LINGER_SPARKLE, x, y, 2);
     }
 
-    // Lingering sparkle dust at each clear position — floats upward for ambient magic
-    for (const tile of clearedTiles) {
-      const x = tile.col * cellSize + cellSize / 2;
-      const y = tile.row * cellSize + cellSize / 2;
-      particles.burst(LINGER_SPARKLE, x, y, 3);
-      // Afterglow residue — warm halo that lingers where tiles were cleared
-      spawnAfterglow(x, y, tile.type === 'bomb' ? 0xff3366 : 0xbfff00);
-    }
-
-    // Move ghost sprite to centroid of cleared tiles (for chain ghost trail)
-    if (clearedTiles.length > 0) {
-      let cx = 0, cy = 0;
-      for (const t of clearedTiles) {
-        cx += t.col * cellSize + cellSize / 2;
-        cy += t.row * cellSize + cellSize / 2;
-      }
-      moveGhostTo(cx / clearedTiles.length, cy / clearedTiles.length);
-    }
-
-    // Spawn physics debris fragments
+    const { x: cx, y: cy } = plan.centroid;
+    moveGhostTo(cx, cy);
     spawnDebris(clearedTiles);
 
-    const count = clearedTiles.length;
-    if (count >= 6) shake.heavy();
-    else if (count >= 3) shake.medium();
-    else shake.light();
-
-    // J5 — long-word punch (≥6 tiles cleared). Centroid of cleared positions.
-    // Runs after standard per-tile bursts so the layered shockwave/zoom reads
-    // as "this word was special" rather than competing with tile-specific FX.
-    if (clearedTiles.length >= 6) {
-      let cx = 0, cy = 0;
-      for (const t of clearedTiles) {
-        cx += t.col * cellSize + cellSize / 2;
-        cy += t.row * cellSize + cellSize / 2;
-      }
-      runLongWordPunch(clearedTiles.length, cx / clearedTiles.length, cy / clearedTiles.length);
-    }
-
-    // D — combo-streak ambient afterglow. One Pixi Graphics per word at the
-    // centroid when the streak is hot (≥4). spawnAfterglow already self-cleans,
-    // so this stays bounded — never accrues more than the cleared-tiles cadence.
+    // One glow-filtered afterglow per clear (not per tile): each carries its own filter pass.
     const ambientTier = getComboAmbientTier(comboStreakLevelRef.current);
-    if (ambientTier !== null && clearedTiles.length > 0) {
-      let cx = 0, cy = 0;
-      for (const t of clearedTiles) {
-        cx += t.col * cellSize + cellSize / 2;
-        cy += t.row * cellSize + cellSize / 2;
-      }
-      const ambientColor = ambientTier === 3 ? 0xff1493 : ambientTier === 2 ? 0xbfff00 : 0x00ffff;
-      spawnAfterglow(cx / clearedTiles.length, cy / clearedTiles.length, ambientColor);
+    if (full) {
+      const ambientColor = ambientTier === 3 ? 0xff1493 : ambientTier === 2 ? 0xbfff00 : ambientTier === 1 ? 0x00ffff : null;
+      spawnAfterglow(cx, cy, ambientColor ?? (plan.bombPower > 0 ? 0xff3366 : 0xbfff00));
     }
-  }, [clearedTiles, particles, shake, cellSize, spawnDebris, fireShockwave, spawnStarBurst, spawnAfterglow, moveGhostTo, runLongWordPunch]);
+
+    if (isWordPop && clearedTiles.length >= 6) runLongWordPunch(clearedTiles.length, cx, cy);
+  }, [clearedTiles, wordSubmitCount, particles, cellSize, govRef, playClear, spawnDebris, fireShockwave, spawnAfterglow, moveGhostTo, runLongWordPunch]);
 
   // Chain cascade sparkle + mega celebration at chain 5
   useEffect(() => {
@@ -294,7 +281,6 @@ function EffectsWorker({
         // J1 — GSAP-driven escalation timeline for depths 1-4 (≥5 handled above).
         // Layers shake + zoom + RGB + bloom + freeze with intensity scaling per depth.
         runCascadePunch(chainLevel);
-        if (chainLevel >= 3) spawnPulseRing(width / 2, height / 2, chainLevel);
       }
     }
     prevChainRef.current = chainLevel;
@@ -372,8 +358,9 @@ function EffectsWorker({
       // J3 — staggered confetti shower over ~700ms (3 bursts + crescendo tail).
       runWaveClearShower();
     }
+    if (!waveCleared && prevWaveRef.current) resetForWave();
     prevWaveRef.current = waveCleared;
-  }, [waveCleared, particles, width, height, fireShockwave, spawnStarBurst, spawnPulseRing, spawnLightSweep, spawnWaveClearBurst, runWaveClearShower]);
+  }, [waveCleared, particles, width, height, fireShockwave, spawnStarBurst, spawnPulseRing, spawnLightSweep, spawnWaveClearBurst, runWaveClearShower, resetForWave]);
 
   return null;
 }
