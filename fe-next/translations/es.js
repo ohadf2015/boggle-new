@@ -21209,7 +21209,14 @@ const es = {
       "copyFailed": "No se pudo copiar. Comparte el código.",
       "noAccount": "Los alumnos entran sin cuenta",
       "showProjector": "Mostrar en el proyector",
-      "backHome": "Volver al inicio"
+      "backHome": "Volver al inicio",
+      "firstRound": {
+        "title": "Haz tu primera ronda — 2 minutos",
+        "step1": "Practica a solas contra bots (privado, sin alumnos)",
+        "step2": "Proyecta el código o el QR — los alumnos se unen desde el móvil",
+        "step3": "Pulsa Empezar: una ronda de 2 minutos, resultados en vivo",
+        "start": "Empezar una ronda de 2 minutos"
+      }
     },
     "host": {
       "classLabel": "Clase",
