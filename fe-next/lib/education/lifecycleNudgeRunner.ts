@@ -44,9 +44,9 @@ export async function runLifecycleStageNudges(
     fetchInChunks<{ classroom_id: string; student_id: string; is_rehearsal?: boolean }>(
       sb, 'classroom_memberships', 'id, classroom_id, student_id, is_rehearsal', 'classroom_id', classrooms.map((c) => c.id),
     ),
-    fetchInChunks<{ teacher_id: string; completed_at: string }>(
-      sb, 'classroom_rounds', 'id, teacher_id, completed_at', 'teacher_id', userIds,
-      [{ op: 'gte', column: 'player_count', value: 2 }, { op: 'notNull', column: 'completed_at' }],
+    fetchInChunks<{ teacher_id: string; completed_at: string; player_count: number | null }>(
+      sb, 'classroom_rounds', 'id, teacher_id, completed_at, player_count', 'teacher_id', userIds,
+      [{ op: 'gte', column: 'player_count', value: 1 }, { op: 'notNull', column: 'completed_at' }],
     ),
     fetchInChunks<{ id: string }>(sb, 'profiles', 'id', 'id', userIds, [{ op: 'eq', column: 'is_test_account', value: true }]),
     loadLedger(sb, userIds),
@@ -65,7 +65,9 @@ export async function runLifecycleStageNudges(
   const plan = planLifecycleNudges(teachers, {
     classrooms: classrooms.map((c) => ({ id: c.id, teacherId: c.teacher_id, createdAt: c.created_at })),
     studentCounts,
-    realRounds: must('classroom_rounds', rounds).map((r) => ({ teacherId: r.teacher_id, completedAt: r.completed_at })),
+    liveRounds: must('classroom_rounds', rounds).map((r) => ({
+      teacherId: r.teacher_id, completedAt: r.completed_at, playerCount: r.player_count ?? 0,
+    })),
     ledger,
     testUserIds: new Set(must('profiles', tests).map((p) => p.id)),
     paidDay0UserIds: new Set(must('profiles', paid).map((p) => p.id)),

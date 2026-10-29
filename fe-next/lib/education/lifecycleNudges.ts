@@ -13,6 +13,8 @@ export type LifecycleStage = (typeof LIFECYCLE_STAGES)[number];
 export const NUDGE_COOLDOWN_DAYS = 3;
 const START_LIVE_AFTER_DAYS = 2;
 const SECOND_GAME_WINDOW_DAYS = [3, 10] as const;
+/** A live round with at least one real student is a game the class played. */
+const PLAYED_ROUND_MIN_STUDENTS = 1;
 
 export const stageLedgerKind = (stage: LifecycleStage | 'reactivate') => `nudge:${stage}`;
 const isNudgeKind = (kind: string) => kind.startsWith('nudge:') || kind.startsWith('activation:');
@@ -28,8 +30,12 @@ export interface StageFacts {
   classrooms: Array<{ id: string; teacherId: string; createdAt: string }>;
   /** Students per classroom, the teacher's own preview seat excluded. */
   studentCounts: ReadonlyMap<string, number>;
-  /** Rounds with 2+ players. */
-  realRounds: Array<{ teacherId: string; completedAt: string }>;
+  /**
+   * Completed live rounds with their real-student count (rehearsal seats excluded).
+   * Any round with a real student counts as "played": the 2+ bar of a real class
+   * left one-student classes stuck on a start-live email that said they never played.
+   */
+  liveRounds: Array<{ teacherId: string; completedAt: string; playerCount: number }>;
   ledger: readonly LedgerRow[];
   testUserIds: ReadonlySet<string>;
   /** Paid edu_access teachers: the share-code nudge is due the day the class exists. */
@@ -50,7 +56,7 @@ function pickStage(t: StageTeacher, f: StageFacts, nowMs: number): LifecycleStag
   const sent = new Set(f.ledger.filter((r) => r.user_id === t.userId).map((r) => r.kind));
   const owed = (stage: LifecycleStage) => (sent.has(stageLedgerKind(stage)) ? null : stage);
 
-  const rounds = f.realRounds.filter((r) => r.teacherId === t.userId);
+  const rounds = f.liveRounds.filter((r) => r.teacherId === t.userId && r.playerCount >= PLAYED_ROUND_MIN_STUDENTS);
   if (rounds.length > 0) {
     if (new Set(rounds.map((r) => utcDay(r.completedAt))).size > 1) return null;
     const firstAge = Math.max(...rounds.map((r) => ageDays(r.completedAt, nowMs)));
