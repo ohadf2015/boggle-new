@@ -83,7 +83,8 @@ export function useWordWheelLoad({
 
   useEffect(() => {
     if (authLoading) return;
-    const alreadyEntered = enteredKeyRef.current === loadKey;
+    // Read live: the player can tap Play while this run awaits the server check.
+    const entered = () => enteredKeyRef.current === loadKey;
     let isMounted = true;
     const date = catchupDate || getDailyChallengeDate();
     const number = getPuzzleNumber(date);
@@ -92,7 +93,7 @@ export function useWordWheelLoad({
 
     const init = async () => {
       if (isPractice) {
-        if (alreadyEntered) return;
+        if (entered()) return;
         // A random wheel: seeding by date would hand out today's daily untimed.
         const generated = generateWordWheelPuzzle(`practice-${Math.random().toString(36).slice(2)}`, language);
         if (!isMounted) return;
@@ -159,7 +160,7 @@ export function useWordWheelLoad({
         // Network error / timeout: worst case is a replay, which the server dedupes (23505).
       }
 
-      if (!isMounted || alreadyEntered) return;
+      if (!isMounted || entered()) return;
       setPuzzle(generateWordWheelPuzzle(date, language));
 
       // Returning players skip the ready card entirely; catch-up keeps it so the ad gate still applies.
@@ -173,7 +174,7 @@ export function useWordWheelLoad({
         const tasks: Promise<unknown>[] = [prewarmDictionary(language)];
         if (preloadForPlay) tasks.push(preloadForPlay());
         await settleWithin(tasks, ENTRY_WARMUP_CAP_MS);
-        if (!isMounted) return;
+        if (!isMounted || entered()) return;
         enterPlaying();
         return;
       }

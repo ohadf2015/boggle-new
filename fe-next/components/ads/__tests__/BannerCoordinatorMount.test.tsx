@@ -7,7 +7,7 @@ const { showBanner, hideBanner, resumeBanner, isNative, listeners, foregroundCb 
   hideBanner: vi.fn().mockResolvedValue(undefined),
   resumeBanner: vi.fn().mockResolvedValue(undefined),
   isNative: { current: true },
-  listeners: {} as Record<string, () => void>,
+  listeners: {} as Record<string, (info?: unknown) => void>,
   foregroundCb: { current: null as null | (() => void) },
 }));
 
@@ -17,7 +17,7 @@ vi.mock('@capacitor/core', () => ({
 
 vi.mock('@capacitor-community/admob', () => ({
   AdMob: {
-    addListener: (evt: string, cb: () => void) => {
+    addListener: (evt: string, cb: (info?: unknown) => void) => {
       listeners[evt] = cb;
       return Promise.resolve({ remove: vi.fn() });
     },
@@ -56,8 +56,8 @@ vi.mock('@/lib/native/bannerController', () => ({
     setSuppressed: (v: boolean) => setSuppressed(v),
   },
   // Mirror the real pure policy so the mount's wiring is exercised end-to-end.
-  shouldSuppressBanner: (i: { drawerOpen: boolean; inGame: boolean; allowInGame: boolean; onboarding?: boolean }) =>
-    Boolean(i.onboarding) || i.drawerOpen || (i.inGame && !i.allowInGame),
+  shouldSuppressBanner: (i: { drawerOpen: boolean; inGame: boolean; allowInGame: boolean; onboarding?: boolean; adFreeRoute?: boolean }) =>
+    Boolean(i.adFreeRoute) || Boolean(i.onboarding) || i.drawerOpen || (i.inGame && !i.allowInGame),
 }));
 
 /** Flush the MutationObserver microtask queue. */
@@ -71,7 +71,7 @@ describe('BannerCoordinatorMount', () => {
     isNative.current = true;
     for (const k of Object.keys(listeners)) delete listeners[k];
     foregroundCb.current = null;
-    document.documentElement.classList.remove('mobile-drawer-open', 'banner-allow-in-game', 'onboarding-active');
+    document.documentElement.classList.remove('mobile-drawer-open', 'banner-allow-in-game', 'onboarding-active', 'ad-free-route');
     document.body.classList.remove('screen-fit-locked');
   });
 
@@ -192,6 +192,48 @@ describe('BannerCoordinatorMount', () => {
     document.body.classList.add('screen-fit-locked');
     render(<BannerCoordinatorMount />);
     expect(setSuppressed).toHaveBeenCalledWith(true);
+  });
+
+  it('suppresses the banner on an ad-free (education) route', async () => {
+    render(<BannerCoordinatorMount />);
+    setSuppressed.mockClear();
+    document.documentElement.classList.add('ad-free-route');
+    await flushObserver();
+    expect(setSuppressed).toHaveBeenCalledWith(true);
+  });
+
+  it('releases suppression when leaving the ad-free route', async () => {
+    document.documentElement.classList.add('ad-free-route');
+    render(<BannerCoordinatorMount />);
+    expect(setSuppressed).toHaveBeenCalledWith(true);
+    setSuppressed.mockClear();
+    document.documentElement.classList.remove('ad-free-route');
+    await flushObserver();
+    expect(setSuppressed).toHaveBeenCalledWith(false);
+  });
+
+  it('takes down a banner that finishes loading on an ad-free route', () => {
+    render(<BannerCoordinatorMount />);
+    document.documentElement.classList.add('ad-free-route');
+    reassert.mockClear();
+    listeners['bannerAdLoaded']?.();
+    (listeners['bannerAdSizeChanged'] as (i: { height: number }) => void)?.({ height: 60 });
+    expect(reassert).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not loop on the SizeChanged(0) that its own hide emits', () => {
+    render(<BannerCoordinatorMount />);
+    document.documentElement.classList.add('ad-free-route');
+    reassert.mockClear();
+    (listeners['bannerAdSizeChanged'] as (i: { height: number }) => void)?.({ height: 0 });
+    expect(reassert).not.toHaveBeenCalled();
+  });
+
+  it('does not reassert on load outside ad-free routes', () => {
+    render(<BannerCoordinatorMount />);
+    reassert.mockClear();
+    listeners['bannerAdLoaded']?.();
+    expect(reassert).not.toHaveBeenCalled();
   });
 
   it('suppresses the banner while the FTUE onboarding overlay is open (onboarding-active)', async () => {

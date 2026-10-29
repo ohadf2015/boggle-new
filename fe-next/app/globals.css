@@ -3102,6 +3102,11 @@ html:is(.has-global-bottom-nav, .has-admob-banner, .has-web-anchor-ad) body.edu-
   padding-bottom: min(var(--admob-banner-height, 0px), 120px);
 }
 
+/* Ad-free routes never show a banner; beats the inline var primed from a previous session's banner height. */
+html.ad-free-route {
+  --admob-banner-height: 0px !important;
+}
+
 /* ...and re-applied where it belongs: the one region that actually scrolls, so
    its last row still clears the sheet while the shell keeps its full height. */
 html.has-cookie-consent .edu-shell-scroll {

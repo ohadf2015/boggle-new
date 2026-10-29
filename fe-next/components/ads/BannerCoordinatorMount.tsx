@@ -6,6 +6,7 @@ import { AdMob, BannerAdPluginEvents, BannerAdPosition } from '@capacitor-commun
 import { useAdMob } from '@/hooks/useAdMob';
 import { useAppLifecycle } from '@/hooks/useAppLifecycle';
 import { bannerController, shouldSuppressBanner } from '@/lib/native/bannerController';
+import { AD_FREE_ROUTE_CLASS } from '@/lib/admob-routes';
 
 /**
  * Lifecycle host for the single banner coordinator. Rendered once (next to
@@ -60,13 +61,25 @@ export default function BannerCoordinatorMount() {
     });
 
     const removers: Array<() => void> = [];
-    const onLoaded = () => bannerController.notifyLoaded();
+    const takeDownOnAdFreeRoute = () => {
+      // A show dispatched before entering an ad-free route can still paint after its hide.
+      if (document.documentElement.classList.contains(AD_FREE_ROUTE_CLASS)) void bannerController.reassert();
+    };
+    const onLoaded = () => {
+      bannerController.notifyLoaded();
+      takeDownOnAdFreeRoute();
+    };
+    // hideBanner() itself emits SizeChanged(0); only a non-zero size means a banner is on screen.
+    const onSizeChanged = (info?: { height?: number }) => {
+      bannerController.notifyLoaded();
+      if ((info?.height ?? 0) > 0) takeDownOnAdFreeRoute();
+    };
     // Loaded/SizeChanged ⇒ a banner is on screen → clear any retry budget.
     // FailedToLoad ⇒ initial no-fill destroyed the AdView → bounded re-show.
     AdMob.addListener(BannerAdPluginEvents.Loaded, onLoaded)
       .then((h) => removers.push(() => h.remove()))
       .catch(() => {});
-    AdMob.addListener(BannerAdPluginEvents.SizeChanged, onLoaded)
+    AdMob.addListener(BannerAdPluginEvents.SizeChanged, onSizeChanged)
       .then((h) => removers.push(() => h.remove()))
       .catch(() => {});
     AdMob.addListener(BannerAdPluginEvents.FailedToLoad, () => bannerController.notifyFailed())
@@ -141,6 +154,7 @@ export default function BannerCoordinatorMount() {
           modalOpen:
             document.documentElement.classList.contains('modal-open') ||
             document.documentElement.classList.contains('fdw-modal-open'),
+          adFreeRoute: document.documentElement.classList.contains(AD_FREE_ROUTE_CLASS),
         }),
       );
     syncSuppress(); // reflect any drawer/game state already active at mount

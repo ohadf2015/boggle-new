@@ -17,6 +17,7 @@ const BlastEffectsCanvas = dynamic(
 import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { shouldMountBlastFxCanvas } from './utils/shouldMountBlastFxCanvas';
+import { createCellsChannel, listSpecialTiles } from './effects/blastFxEvents';
 import { useBlastTileFirstUse } from './hooks/useBlastTileFirstUse';
 import { BlastTileFirstUseCallout } from './BlastTileFirstUseCallout';
 import { BlastHUD } from './BlastHUD';
@@ -127,6 +128,8 @@ interface BlastStageProps {
   // Currency (SP only)
   coins?: number;
   progress?: BlastHudProgress;
+  /** Credited score of the last word, scales its FX. */
+  lastWordScore?: number;
 }
 
 /**
@@ -183,6 +186,7 @@ export const BlastStage = memo(function BlastStage({
   activeModifier,
   coins = 0,
   progress,
+  lastWordScore = 0,
 }: BlastStageProps) {
   const { score, wordsFound, movesRemaining, totalMoves, tilesCleared, totalTiles, isComplete, isDeadEnd } = gameState;
   // MP Blast has timer props; SP Blast doesn't. Timer-era games hide the wave chip.
@@ -235,6 +239,8 @@ export const BlastStage = memo(function BlastStage({
   }, []);
 
   const comboFlashTier = comboFlash?.tier ?? 0;
+  const fxSpecialTiles = useMemo(() => listSpecialTiles(tileStates), [tileStates]);
+  const [fxSelection] = useState(createCellsChannel);
 
   // Mid-run achievement snapshot — running maxima tracked in a ref so the
   // hook sees monotonic stats even though props only carry latest values.
@@ -391,6 +397,7 @@ export const BlastStage = memo(function BlastStage({
                 cascadeHighlightCells={cascadeHighlightCells}
                 isMultiplayer={isMultiplayer}
                 submitFeedback={currentFeedback}
+                onSelectionCellsChange={fxSelection.set}
               />
             </div>
             {/* PixiJS effects layer — overlays DOM board so particles/shockwaves/shatters are visible above tile art. pointer-events-none so taps still reach BlastBoard. */}
@@ -405,6 +412,10 @@ export const BlastStage = memo(function BlastStage({
                   comboTier={comboFlashTier}
                   comboStreakLevel={comboStreak?.level ?? 0}
                   waveCleared={waveCleared}
+                  wordSubmitCount={wordSubmitCount}
+                  lastWordScore={lastWordScore}
+                  specialTiles={fxSpecialTiles}
+                  selection={fxSelection}
                 />
               </div>
             )}
@@ -439,7 +450,7 @@ export const BlastStage = memo(function BlastStage({
         </AdaptiveAnimatePresence>
         {/* Chain escalation text — scoped within board area */}
         <BlastChainText chainLevel={sequencerState?.chainLevel ?? 0} t={t} />
-        <BlastWordPraise wordLength={lastWordLength} submitCount={wordSubmitCount} t={t} delayMs={LIFT_OK_HOLD_MS} />
+        <BlastWordPraise wordLength={lastWordLength} submitCount={wordSubmitCount} t={t} delayMs={LIFT_OK_HOLD_MS} suppressed={waveCleared} />
         <BlastWaveClearText waveCleared={waveCleared} movesRemaining={movesRemaining} t={t} />
       </div>
 

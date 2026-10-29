@@ -16,7 +16,7 @@ const DATE_PUBLISHED = '2025-12-01';
 const DATE_MODIFIED = '2026-05-19';
 
 const metaTitles: Record<string, string> = {
-  en: '6 Best Boggle Alternatives & Apps in 2026 — Tested | LexiClash',
+  en: 'Games Like Boggle 2026 — Tested, Free to Play | LexiClash',
   he: 'ניסיתי כל חלופת בוגל ב-2026 — הנה מה שבאמת שווה לשחק',
   sv: 'Jag testade alla Boggle-alternativ 2026 — Här är vad som faktiskt är värt att spela',
   ja: 'Boggle代替ゲームを全部試した（2026年）— 本当に遊ぶ価値があるのはこれだ',
