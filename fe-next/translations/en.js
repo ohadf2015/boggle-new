@@ -20235,7 +20235,14 @@ const en = {
       "copyFailed": "Couldn't copy. Share the code instead.",
       "noAccount": "Students join with no account",
       "showProjector": "Show on projector",
-      "backHome": "Back to Home"
+      "backHome": "Back to Home",
+      "firstRound": {
+        "title": "Run your first round — 2 minutes",
+        "step1": "Practice alone against bots (private, no students)",
+        "step2": "Put the code or QR on the board — students join from phones",
+        "step3": "Press Start: a 2-minute round, results appear live",
+        "start": "Start a 2-minute round"
+      }
     },
     "host": {
       "classLabel": "Class",
