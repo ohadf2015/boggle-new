@@ -8558,6 +8558,11 @@ const he = {
     },
     "home": {
       "greeting": "היי, {name}",
+      "signupFirstGame": {
+        "title": "המשחק הראשון שלך, {name}",
+        "titleNoName": "המשחק הראשון שלך",
+        "daily": "גלגל המילים של היום (2 דק')"
+      },
       "levelTitle": "רמה {level} · {title}",
       "levelOnly": "רמה {level}",
       "titles": {
