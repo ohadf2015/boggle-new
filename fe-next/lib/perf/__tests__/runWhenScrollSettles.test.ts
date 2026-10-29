@@ -43,4 +43,16 @@ describe('runWhenScrollSettles', () => {
     vi.advanceTimersByTime(SCROLL_SETTLE_MAX_MS + 1000);
     expect(fn).not.toHaveBeenCalled();
   });
+
+  it('spaces loaders released by the same pause, so their evaluations never stack', () => {
+    const a = vi.fn();
+    const b = vi.fn();
+    runWhenScrollSettles(a);
+    runWhenScrollSettles(b);
+    vi.advanceTimersByTime(SCROLL_QUIET_MS + 50);
+    expect(a.mock.calls.length + b.mock.calls.length).toBe(1);
+    vi.advanceTimersByTime(SCROLL_QUIET_MS + 50);
+    expect(a).toHaveBeenCalledTimes(1);
+    expect(b).toHaveBeenCalledTimes(1);
+  });
 });

@@ -10,6 +10,8 @@ import {
 } from 'react';
 import { usePathname } from 'next/navigation';
 import { isLandingPath } from '@/lib/i18n/isLandingPath';
+import { isNativeShell } from '@/utils/returningVisitor';
+import { hasSupabaseSession } from '@/utils/onboardingStorage';
 // Type + context object only — AuthContext.tsx does not import gotrue.
 import { AuthContext, type AuthContextValue } from '@/contexts/AuthContext';
 
@@ -73,7 +75,9 @@ export function DeferredAuthProvider({ children }: { children: ReactNode }) {
   const [Provider, setProvider] = useState<AuthProviderComponent | null>(cachedProvider);
 
   useEffect(() => {
-    if (!landing) {
+    // The PSI trace is a signed-out web visit. Anyone else would otherwise load
+    // auth (and re-render the home with their profile) mid-way through a first swipe.
+    if (!landing || isNativeShell() || hasSupabaseSession()) {
       setArmed(true);
       return;
     }
