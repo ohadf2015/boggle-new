@@ -79,7 +79,7 @@ export function AccessRequestForm({
 
   // Access is granted on POST. Do not auto-redirect: the 1.2s success beat
   // ate the Polar trial CTA (0 trial_cta_tap / 13 access requests in 14d).
-  // HQ is one explicit tap; Polar 14-day trial is the other.
+  // HQ is the main tap; the Polar trial stays as the quiet second one.
   const goToTeacherHq = async () => {
     try { await refreshProfile(); } catch { /* role gate re-reads on /teacher */ }
     router.push(paidDay0 ? `/${language}/teacher/class-ready` : `/${language}/teacher`);
@@ -220,10 +220,21 @@ export function AccessRequestForm({
         <h3 className="text-2xl font-bold font-neo-display">{t('education.access.success_title')}</h3>
         <p className="mt-2 text-neo-navy/85">{t('education.access.success_body')}</p>
         <div className="mt-4 flex flex-col gap-3">
-          {/* The main offer: Teacher Pro, in the same words as the class-ready card.
-              Waits for one fresh entitlement read; keeps its height meanwhile. */}
+          {/* The class comes first. Seconds after approval the teacher already has 14 free
+              days; a card checkout as the main button lost both real teachers who tapped it
+              (Oct 24 and 26: 0 of 2 finished Polar, neither came back). */}
+          <button
+            type="button"
+            data-testid="access-success-hq"
+            onClick={() => void goToTeacherHq()}
+            className="min-h-14 w-full rounded-neo border-neo-thick border-neo-navy bg-neo-navy px-4 py-3 font-neo-display text-base font-black text-neo-white shadow-hard-lg transition-[box-shadow,transform] duration-100 hover:-translate-y-0.5 hover:shadow-hard-xl active:translate-y-0.5 active:shadow-hard-pressed focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
+          >
+            {t(paidDay0 ? 'education.access.class_ready_cta' : 'education.access.go_to_teacher', paidDay0 ? 'Your class is ready' : undefined)}
+          </button>
+          {/* Teacher Pro stays on offer, as the quiet second option. Waits for one fresh
+              entitlement read so "keep Pro" carries the right end date; keeps its height meanwhile. */}
           {!blockedInApp && !pro.hasPro ? (
-            <div ref={offerRef} data-testid="access-success-offer" className="min-h-[5.5rem]" dir={TRIAL_COPY_RTL.has(trialCopyBase(language)) ? 'rtl' : undefined}>
+            <div ref={offerRef} data-testid="access-success-offer" className="min-h-[4.5rem]" dir={TRIAL_COPY_RTL.has(trialCopyBase(language)) ? 'rtl' : undefined}>
               {showOffer ? (
                 <>
                   <button
@@ -240,29 +251,17 @@ export function AccessRequestForm({
                       }
                       void polarTrial.start();
                     }}
-                    className="min-h-14 w-full rounded-neo border-neo-thick border-neo-navy bg-neo-navy px-4 py-3 font-neo-display text-base font-black text-neo-white shadow-hard-lg transition-[box-shadow,transform] duration-100 hover:-translate-y-0.5 hover:shadow-hard-xl active:translate-y-0.5 active:shadow-hard-pressed focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan disabled:opacity-50"
+                    className="min-h-11 w-full rounded-neo border-neo border-neo-navy/40 px-4 py-2 text-sm font-bold text-neo-navy font-neo-display hover:bg-neo-navy/10 focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan disabled:opacity-50"
                   >
                     {polarTrial.pending ? t('common.loading') : proOffer.label}
                   </button>
                   <p data-testid="access-success-offer-note" className="mt-1.5 text-center text-xs font-bold text-neo-navy/75">{proOffer.note}</p>
                 </>
               ) : (
-                <div aria-hidden="true" className="h-14 w-full animate-pulse rounded-neo bg-neo-navy/15" />
+                <div aria-hidden="true" className="h-11 w-full animate-pulse rounded-neo bg-neo-navy/15" />
               )}
             </div>
           ) : null}
-          <button
-            type="button"
-            data-testid="access-success-hq"
-            onClick={() => void goToTeacherHq()}
-            className={
-              !blockedInApp && !pro.hasPro
-                ? 'w-full rounded-neo border-neo border-neo-navy/40 px-4 py-2 text-sm font-bold text-neo-navy font-neo-display hover:bg-neo-navy/10'
-                : 'w-full rounded-neo border-neo border-neo-navy bg-neo-lime px-4 py-3 font-bold text-neo-navy font-neo-display shadow-hard-sm hover:shadow-hard'
-            }
-          >
-            {t(paidDay0 ? 'education.access.class_ready_cta' : 'education.access.go_to_teacher', paidDay0 ? 'Your class is ready' : undefined)}
-          </button>
         </div>
       </m.div>
     );
