@@ -4,6 +4,8 @@
 // EducationalOrganization signals the educational use case to AI crawlers.
 // BreadcrumbList mirrors the /guides pattern for consistent site navigation.
 
+import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
+
 const BASE_URL = 'https://www.lexiclash.live';
 const SUPPORTED = new Set(['en', 'he', 'sv', 'ja', 'es', 'ru']);
 const LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
@@ -241,12 +243,32 @@ export function buildEducationWebApplicationJsonLd(locale: string) {
     browserRequirements: 'Requires JavaScript. Works on phone, tablet, and desktop.',
     inLanguage: LOCALES,
     isAccessibleForFree: true,
-    offers: {
-      '@type': 'Offer' as const,
-      price: '0',
-      priceCurrency: 'USD',
-      availability: 'https://schema.org/InStock',
-    },
+    // Free plan first (the decisive "free" signal), then the live Teacher Pro price so AI
+    // answers to "how much is LexiClash for teachers" quote $9/month from the source, not a
+    // guess. Same price as the Product schema on /teacher/upgrade (teacherUpgradeJsonLd).
+    offers: [
+      {
+        '@type': 'Offer' as const,
+        name: 'Free',
+        price: '0',
+        priceCurrency: 'USD',
+        availability: 'https://schema.org/InStock',
+      },
+      {
+        '@type': 'Offer' as const,
+        name: 'Teacher Pro',
+        url: `${BASE_URL}/${lang}/teacher/upgrade`,
+        price: String(TEACHER_PRO_PRICE_USD),
+        priceCurrency: 'USD',
+        availability: 'https://schema.org/InStock',
+        priceSpecification: {
+          '@type': 'UnitPriceSpecification' as const,
+          price: String(TEACHER_PRO_PRICE_USD),
+          priceCurrency: 'USD',
+          unitCode: 'MON',
+        },
+      },
+    ],
     featureList: WEBAPP_FEATURES[lang] ?? WEBAPP_FEATURES.en,
     audience: {
       '@type': 'EducationalAudience',

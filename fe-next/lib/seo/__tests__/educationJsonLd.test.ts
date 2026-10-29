@@ -96,12 +96,25 @@ describe('educationJsonLd', () => {
       expect(schema.isAccessibleForFree).toBe(true);
     });
 
-    it('declares a zero-price Offer (the GEO signal for "free" / "no paywall" queries)', () => {
+    it('declares a zero-price Offer first (the GEO signal for "free" / "no paywall" queries)', () => {
       const schema = buildEducationWebApplicationJsonLd('en');
-      expect(schema.offers).toMatchObject({
+      expect(schema.offers[0]).toMatchObject({
         '@type': 'Offer',
         price: '0',
         priceCurrency: 'USD',
+      });
+    });
+
+    it.each(['en', 'he', 'sv', 'ja', 'es', 'ru'])('declares the live Teacher Pro price ($9/month, same as /teacher/upgrade) in %s', (loc) => {
+      const schema = buildEducationWebApplicationJsonLd(loc);
+      expect(schema.offers).toHaveLength(2);
+      expect(schema.offers[1]).toMatchObject({
+        '@type': 'Offer',
+        name: 'Teacher Pro',
+        url: `https://www.lexiclash.live/${loc}/teacher/upgrade`,
+        price: '9',
+        priceCurrency: 'USD',
+        priceSpecification: { '@type': 'UnitPriceSpecification', price: '9', priceCurrency: 'USD', unitCode: 'MON' },
       });
     });
 
