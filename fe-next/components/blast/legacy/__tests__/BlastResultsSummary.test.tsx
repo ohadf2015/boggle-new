@@ -21,7 +21,8 @@ vi.mock('@/utils/growthTracking', () => ({
 import { useBlastBadgeUnlocks } from '../hooks/useBlastBadgeUnlocks';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 
-const t = (key: string, vars?: Record<string, string | number>) => {
+const t = (key: string, fallbackOrVars?: string | Record<string, string | number>, extra?: Record<string, string | number>) => {
+  const vars = typeof fallbackOrVars === 'string' ? extra : fallbackOrVars;
   if (!vars) return key;
   // Substitute {name} placeholders if present, otherwise append values so
   // tests can still assert on interpolated content even though the test
@@ -73,8 +74,58 @@ describe('BlastResultsSummary', () => {
       />,
     );
     expect(screen.getByText('5,000')).toBeDefined();
-    expect(screen.getByTestId('blast-results-score-card').textContent).toContain('3');
-    expect(screen.getByTestId('blast-results-score-card').textContent).toContain('2');
+    expect(screen.getByTestId('blast-results-secondary-words').textContent).toContain('3');
+    // Waves live on the journey track, not as a loose count that disagrees with checkpoint runs.
+    expect(screen.queryByTestId('blast-results-secondary-waves')).toBeNull();
+  });
+
+  it('draws the run as a wave track with the failed wave marked and the next boss ahead', () => {
+    const waveResults = [
+      { waveNumber: 1, score: 2000, wordsFound: 1, clearPercentage: 92, reward: { stars: 3 as const, coins: 25, chestBonus: 12 } },
+      { waveNumber: 2, score: 3000, wordsFound: 2, clearPercentage: 70 },
+    ];
+    render(
+      <BlastResultsSummary results={makeResults({ wavesCompleted: 1, waveResults, clearPercentage: 70 })} t={t} onPlayAgain={noop} onQuit={noop} />,
+    );
+    const nodes = screen.getAllByTestId('blast-journey-node');
+    expect(nodes.map((n) => [n.dataset.wave, n.dataset.status])).toEqual([['1', 'cleared'], ['2', 'failed']]);
+    expect(screen.getByTestId('blast-journey-milestone').dataset.wave).toBe('5');
+  });
+
+  it('marks the wave pass bar on the clear meter from the real wave bar, not 90', () => {
+    render(<BlastResultsSummary results={makeResults()} t={t} onPlayAgain={noop} onQuit={noop} />);
+    // default fixture ended on wave 2, whose bar is 85%
+    expect(screen.getByTestId('blast-results-clear-meter').dataset.pass).toBe('85');
+    expect(screen.getByTestId('blast-results-fail-banner').textContent).toContain('blast.results.failHintPct');
+    expect(screen.getByTestId('blast-results-fail-banner').textContent).toContain('85');
+  });
+
+  it('spells the best word as letter tiles', () => {
+    render(<BlastResultsSummary results={makeResults({ bestWord: 'fish' })} t={t} onPlayAgain={noop} onQuit={noop} />);
+    const tiles = screen.getByTestId('blast-results-best-word').querySelectorAll('[data-letter]');
+    expect(Array.from(tiles).map((el) => el.textContent).join('')).toBe('FISH');
+  });
+
+  it('shows badges before the brag card', () => {
+    (useBlastBadgeUnlocks as any).mockReturnValueOnce([{ id: 'firstBlast', icon: 'Sparkles', label: 'First Blast', isNew: true }]);
+    render(<BlastResultsSummary results={makeResults({ percentile: 60 })} t={t} onPlayAgain={noop} onQuit={noop} />);
+    const badges = screen.getByTestId('blast-results-badges');
+    expect(badges.compareDocumentPosition(screen.getByTestId('blast-brag-card')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it('states the one wave goal on the clear meter', () => {
+    render(<BlastResultsSummary results={makeResults({ passPct: 85 })} t={t} onPlayAgain={noop} onQuit={noop} />);
+    expect(screen.getByTestId('blast-results-goal').textContent).toBe('blast.objective.clearPercent 85');
+    expect(screen.queryByTestId('blast-objective-summary')).toBeNull();
+  });
+
+  it('shows the new-best ribbon when the saved best arrives after first paint', () => {
+    const base = makeResults({ finalScore: 7000, clearPercentage: 70 });
+    const { rerender } = render(<BlastResultsSummary results={base} t={t} onPlayAgain={noop} onQuit={noop} />);
+    expect(screen.queryByTestId('blast-results-new-best')).toBeNull();
+    rerender(<BlastResultsSummary results={{ ...base, previousBest: 6000 }} t={t} onPlayAgain={noop} onQuit={noop} />);
+    expect(screen.getByTestId('blast-results-new-best')).toBeDefined();
+    expect(screen.getByTestId('blast-results-fail-banner')).toBeDefined();
   });
 
   it('hides the brag card until backend percentile resolves', () => {
@@ -169,6 +220,20 @@ describe('BlastResultsSummary', () => {
         onQuit={noop}
       />,
     );
+    // Failing after clearing waves reads as progress, not defeat.
+    expect((screen.getByTestId('blast-results-mascot') as HTMLImageElement).dataset.tier).toBe('mid');
+
+    rerender(
+      <BlastResultsSummary
+        results={makeResults({
+          finalScore: 200, previousBest: 6000, clearPercentage: 50, wavesCompleted: 0,
+          waveResults: [{ waveNumber: 1, score: 200, wordsFound: 2, clearPercentage: 50 }],
+        })}
+        t={t}
+        onPlayAgain={noop}
+        onQuit={noop}
+      />,
+    );
     const sad = screen.getByTestId('blast-results-mascot') as HTMLImageElement;
     expect(sad.dataset.tier).toBe('low');
     expect(sad.src).toContain('/blast/results/mascot-sad.webp');
@@ -220,6 +285,7 @@ describe('BlastResultsSummary', () => {
       <BlastResultsSummary
         // 27/36 = 75%; ceil(36*0.9)=33 → 6 tiles short
         results={makeResults({
+          passPct: 90,
           clearPercentage: 75,
           stars: 1,
           tilesCleared: 27,
@@ -237,7 +303,7 @@ describe('BlastResultsSummary', () => {
     const reason = screen.getByTestId('blast-fail-reason');
     expect(reason.textContent).toContain('blast.results.tilesShort');
     expect(reason.textContent).toContain('6');
-    expect(banner.textContent).toContain('blast.results.failHint');
+    expect(banner.textContent).toContain('blast.results.failHintPct');
     // Stars row suppressed on fail; star-label key should not render.
     expect(screen.queryByText('blast.stars1')).toBeNull();
     // Header flips to fail copy.
@@ -260,80 +326,6 @@ describe('BlastResultsSummary', () => {
 
   // Sprint 3 polish: target_word goal acknowledgement closes the loop on
   // semantic-goal feedback regardless of fail/success.
-  it('shows target-word missed line under fail banner when goal not found', () => {
-    render(
-      <BlastResultsSummary
-        results={makeResults({
-          clearPercentage: 75,
-          tilesCleared: 27,
-          totalTiles: 36,
-          targetWord: 'CRYSTAL',
-          targetWordFound: false,
-        })}
-        t={t}
-        onPlayAgain={noop}
-        onQuit={noop}
-      />,
-    );
-    const missed = screen.getByTestId('blast-target-word-missed');
-    expect(missed.textContent).toContain('blast.objective.targetWordMissed');
-    expect(missed.textContent).toContain('CRYSTAL');
-  });
-
-  it('shows target-word found celebration when goal hit on a winning wave', () => {
-    render(
-      <BlastResultsSummary
-        results={makeResults({
-          clearPercentage: 95,
-          stars: 3,
-          targetWord: 'CRYSTAL',
-          targetWordFound: true,
-        })}
-        t={t}
-        onPlayAgain={noop}
-        onQuit={noop}
-      />,
-    );
-    const celebration = screen.getByTestId('blast-target-word-found');
-    expect(celebration.textContent).toContain('blast.objective.targetWordFoundIt');
-    expect(celebration.textContent).toContain('CRYSTAL');
-  });
-
-  it('omits target-word UI entirely when no targetWord set', () => {
-    render(
-      <BlastResultsSummary
-        results={makeResults({ clearPercentage: 95, stars: 3 })}
-        t={t}
-        onPlayAgain={noop}
-        onQuit={noop}
-      />,
-    );
-    expect(screen.queryByTestId('blast-target-word-missed')).toBeNull();
-    expect(screen.queryByTestId('blast-target-word-found')).toBeNull();
-    expect(screen.queryByTestId('blast-target-word-cascade-credit')).toBeNull();
-  });
-
-  it('shows positive cascade-credit line when wave succeeded but target missed', () => {
-    render(
-      <BlastResultsSummary
-        results={makeResults({
-          clearPercentage: 95,
-          stars: 3,
-          targetWord: 'CRYSTAL',
-          targetWordFound: false,
-        })}
-        t={t}
-        onPlayAgain={noop}
-        onQuit={noop}
-      />,
-    );
-    const credit = screen.getByTestId('blast-target-word-cascade-credit');
-    expect(credit.textContent).toContain('blast.objective.targetWordMissed');
-    expect(credit.textContent).toContain('CRYSTAL');
-    // Fail banner should NOT render on a winning wave
-    expect(screen.queryByTestId('blast-results-fail-banner')).toBeNull();
-  });
-
   it('renders sticky CTA footer containing play-again + home', () => {
     render(
       <BlastResultsSummary
@@ -435,35 +427,8 @@ describe('BlastResultsSummary — neo-brutalist polish', () => {
   });
 });
 
-describe('per-objective summary', () => {
+describe('BlastResultsSummary — telemetry', () => {
   const noop = () => {};
-  const finalObjectives = [
-    { objective: { type: 'clear_percent' as const, target: 90 }, current: 95, isComplete: true },
-    { objective: { type: 'word_length' as const, target: 4, minWordLength: 3 }, current: 4, isComplete: true },
-    { objective: { type: 'score_target' as const, target: 500 }, current: 320, isComplete: false },
-  ];
-
-  it('renders a ✓/✗ row per objective, filtering clear_percent', () => {
-    render(
-      <BlastResultsSummary
-        results={makeResults({ finalObjectives })}
-        t={t}
-        onPlayAgain={noop}
-        onQuit={noop}
-      />,
-    );
-    const rows = screen.getAllByTestId('blast-objective-summary-row');
-    expect(rows).toHaveLength(2); // clear_percent excluded
-    expect(rows[0].className).toContain('text-neo-lime');
-    expect(rows[1].className).not.toContain('text-neo-lime');
-  });
-
-  it('renders nothing when finalObjectives absent', () => {
-    render(
-      <BlastResultsSummary results={makeResults()} t={t} onPlayAgain={noop} onQuit={noop} />,
-    );
-    expect(screen.queryByTestId('blast-objective-summary-row')).toBeNull();
-  });
 
   it('fires canonical results_viewed on mount', () => {
     vi.clearAllMocks();

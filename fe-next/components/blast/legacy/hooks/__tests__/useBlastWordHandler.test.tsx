@@ -31,7 +31,7 @@ import { rollTreasure } from '@/lib/blast/blastTreasureRoll';
 function findWordForTier(targetTier: 'jackpot' | 'lucky'): string {
   // We'll use word strings like 'jack0', 'jack1', etc.
   // The treasure roll happens with flyIdRef.current = 0 (before the increment at line 168)
-  for (let i = 0; i <= 50; i++) {
+  for (let i = 0; i <= 2000; i++) {
     const wordPrefix = `jack${i}`;
     // Test with flyId 0 (flyIdRef starts at 0)
     const roll = rollTreasure({
@@ -398,3 +398,44 @@ describe('useBlastWordHandler', () => {
     });
   });
 });
+
+describe('useBlastWordHandler: multiplier stamps on the score fly', () => {
+  function lastFly(effects: { setScoreFlyEvents: ReturnType<typeof vi.fn> }) {
+    const updater = effects.setScoreFlyEvents.mock.calls.at(-1)?.[0] as (prev: unknown[]) => Array<Record<string, unknown>>;
+    return updater([]).at(-1)!;
+  }
+
+  it('given a coin tile in the word, then the fly carries a x3 coin stamp', async () => {
+    const { params, engine, effects } = setup();
+    engine.tileStates[0][1] = { type: 'gold' };
+    const { result } = renderHook(() => useBlastWordHandler(params));
+    await act(async () => { await result.current.handleWordAccepted({ word: 'cat', score: 5 }); });
+    expect(lastFly(effects).stamps).toEqual([{ kind: 'coin', mult: 3, label: 'blast.stamp.coin' }]);
+  });
+
+  it('given a diamond in the word, then the fly carries a x2 gem stamp and the gem blast is announced', async () => {
+    const { params, engine, effects } = setup();
+    engine.tileStates[0][2] = { type: 'diamond' };
+    engine.submitWord.mockReturnValue({ score: 40, countdownExplosions: [], gemCrossCount: 4 } as never);
+    const { result } = renderHook(() => useBlastWordHandler(params));
+    await act(async () => { await result.current.handleWordAccepted({ word: 'cat', score: 5 }); });
+    expect(lastFly(effects).stamps).toEqual([{ kind: 'gem', mult: 2, label: 'blast.stamp.gem' }]);
+    expect(effects.setComboTypeName).toHaveBeenCalledWith('blast.stamp.gemBlast');
+  });
+
+  it('given a lucky roll, then the fly carries a x2 lucky stamp', async () => {
+    const word = findWordForTier('lucky');
+    const { params, effects } = setup({ enableTreasureRoll: true });
+    const { result } = renderHook(() => useBlastWordHandler(params));
+    await act(async () => { await result.current.handleWordAccepted({ word, score: 5 }); });
+    expect(lastFly(effects).stamps).toEqual([{ kind: 'lucky', mult: 2, label: 'blast.stamp.lucky' }]);
+  });
+
+  it('given a plain word, then the fly has no stamps', async () => {
+    const { params, effects } = setup();
+    const { result } = renderHook(() => useBlastWordHandler(params));
+    await act(async () => { await result.current.handleWordAccepted({ word: 'cat', score: 5 }); });
+    expect(lastFly(effects).stamps).toBeUndefined();
+  });
+});
+

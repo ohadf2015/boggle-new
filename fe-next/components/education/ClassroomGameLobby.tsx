@@ -35,7 +35,8 @@ import { launchOf, type ClassroomCatalogueId } from '@/lib/education/classroomCa
 import { useRotatingBoss } from './boss/useRotatingBoss';
 import { availableFocuses } from '@/lib/education/vocabFocus';
 import { ClassroomLobbyShell } from './lobby/ClassroomLobbyShell';
-import { ClassroomModeCardRow, ClassroomModeCatalogue } from './ClassroomModeCatalogue';
+import { ClassroomModeCatalogue } from './ClassroomModeCatalogue';
+import { LobbyModeGrid } from './lobby/LobbyModeGrid';
 import { LobbySetupPanel } from './lobby/LobbySetupPanel';
 import { ModeSuggestion } from './lobby/ModeSuggestion';
 import { playableLessonWords } from '@/lib/education/lessonPickerModel';
@@ -370,13 +371,14 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
   return (
     <ClassroomLobbyShell expanded={setupOpen}
       pinned={
-        <div className="flex flex-col gap-2 lg:gap-3">
         <LobbyClassPicker
           classrooms={classrooms}
           selectedId={selectedClassroomId}
           onSelect={setSelectedClassroomId}
           label={t('eduShell.host.classLabel')}
         />
+      }
+      aside={
         <ClassroomModeCatalogue
           selected={pickedId}
           recommended={recommended}
@@ -389,21 +391,8 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
           onGoLive={() => startGame(gameMode, vocabQuizVariant, classroomBossId)}
           withCardRow={false}
         />
-        </div>
       }
     >
-      {/* In the scroller, not pinned: a tall poster (Boss Battle) left the scroller 4px and options out of reach. */}
-      <ModeSuggestion selected={pickedId} isBlocked={(id) => (id === VOCAB_QUIZ_MODE && !quizPlayable) || (id === 'wordcraft' && !wordcraftOk)} onPick={pickMode} t={t as (key: string, params?: Record<string, string | number>) => string} />
-      <ClassroomModeCardRow
-        selected={pickedId}
-        recommended={recommended}
-        selectedMinutes={roundMinutes}
-        minutesFor={minutesFor}
-        busy={isStarting}
-        onPick={pickMode}
-        t={t as (key: string, params?: Record<string, string | number>) => string}
-      />
-
       {startError && (
         <div
           role="alert"
@@ -491,6 +480,19 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
         <LobbyEconomyToggles value={economy} onChange={setEconomy} />
 
       </LobbySetupDisclosure>
+
+      <div className="mt-3 flex flex-col gap-3 lg:mt-4">
+        <ModeSuggestion selected={pickedId} isBlocked={(id) => (id === VOCAB_QUIZ_MODE && !quizPlayable) || (id === 'wordcraft' && !wordcraftOk)} onPick={pickMode} t={t as (key: string, params?: Record<string, string | number>) => string} />
+        <LobbyModeGrid
+          selected={pickedId}
+          recommended={recommended}
+          selectedMinutes={roundMinutes}
+          minutesFor={minutesFor}
+          busy={isStarting}
+          onPick={pickMode}
+          t={t as (key: string, params?: Record<string, string | number>) => string}
+        />
+      </div>
     </ClassroomLobbyShell>
   );
 }

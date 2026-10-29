@@ -56,9 +56,9 @@ describe('BlastHUD — wave goal clarity (no confusing percentage)', () => {
     expect(screen.getByTestId('blast-progress-label').textContent).toContain('✓');
   });
 
-  it('still shows the concrete X/Y cleared count', () => {
+  it('counts cleared tiles toward the tiles needed to pass the wave', () => {
     render(<BlastHUD {...baseProps} tilesCleared={12} totalTiles={36} />);
-    expect(screen.getByText(/12\/36/)).toBeDefined();
+    expect(screen.getByText(/12\/27/)).toBeDefined();
   });
 
   it('pops a "+N" indicator when more tiles get cleared (satisfying progress)', () => {

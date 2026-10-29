@@ -167,8 +167,8 @@ export function BlastGame({
 
   // Wave objectives (SP only)
   const waveObjectives = useMemo(
-    () => (isMultiplayer ? [] : getWaveObjectives(waveNumber, config.language)),
-    [waveNumber, isMultiplayer, config.language],
+    () => (isMultiplayer ? [] : getWaveObjectives(waveNumber)),
+    [waveNumber, isMultiplayer],
   );
 
   // Core engine
@@ -745,6 +745,7 @@ export function BlastGame({
         explosionShake={explosionShake}
         lastWordLength={lastWordLength}
         wordSubmitCount={wordSubmitCount}
+        lastWordScore={credit?.score ?? 0}
         activeBuff={!isMultiplayer && waveNumber === 1 ? (initialBuff ?? null) : null}
         buffConsumed={initialBuff === 'shield' ? shieldConsumed : false}
         objectiveProgress={objectives.objectiveProgress}

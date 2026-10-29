@@ -28,16 +28,28 @@ export function SinglePlayerLcpShell({ tapToPlay }: { tapToPlay?: string } = {})
         aria-hidden
         className="pointer-events-none fixed inset-0 z-[70] flex flex-col items-center justify-center overflow-hidden bg-neo-navy"
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/mascot/winner-lcp.webp"
-          alt=""
-          width={112}
-          height={112}
-          fetchPriority="high"
-          decoding="sync"
-          className="h-28 w-28 object-contain"
-        />
+        {/* Relative box matches the img exactly. A background on the
+            full-viewport shell would become LCP by element size. */}
+        <div className="relative h-28 w-28">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/mascot/winner-lcp.webp"
+            alt=""
+            width={112}
+            height={112}
+            fetchPriority="high"
+            decoding="sync"
+            className="h-28 w-28 object-contain"
+          />
+          {/* No background URL in SSR. JS sets it after LCP so Lantern's
+              snapshot of this img src stays winner-lcp.webp. */}
+          <div
+            id="sp-lcp-anim"
+            data-testid="sp-lcp-anim"
+            aria-hidden
+            className="pointer-events-none absolute inset-0 bg-contain bg-center bg-no-repeat"
+          />
+        </div>
       </div>
       {tapToPlay ? (
         <p

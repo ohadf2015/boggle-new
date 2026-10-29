@@ -19,7 +19,7 @@ import { greetingName } from './home/greetingName';
 import { HomeHero } from './home/HomeHero';
 import { HomeGetStudentsIn } from './home/HomeGetStudentsIn';
 import { belowStudentGoal } from './hq/studentGoal';
-import { HomeClassList } from './home/HomeClassList';
+import { HomeClassList, HomeClassMeta, HomeNewClass } from './home/HomeClassList';
 import { HomeWeekCard } from './home/HomeWeekCard';
 import { HomeInsightCard } from './home/HomeInsightCard';
 import { WeeklyProgressDigestCard } from './digest/WeeklyProgressDigestCard';
@@ -235,24 +235,37 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
                   language={language}
                   t={t}
                   rehearse={<RehearseWithBotsButton classroomId={effectiveId || undefined} source="hq" language={language} t={t} />}
+                  corner={<HomeNewClass href={newClassHref} count={classrooms.length} limit={!proLoading && !hasPro ? FREE_TIER_LIMITS.classes : null} t={t} />}
+                  meta={selectedClassroom ? (
+                    <HomeClassMeta
+                      previewIds={studentPreview?.[selectedClassroom.id] ?? []}
+                      memberCount={selectedClassroom.member_count ?? 0}
+                      played={week.summary?.lastPlayedAt[selectedClassroom.id]}
+                      pending={week.status === 'loading'}
+                      failed={week.status === 'error'}
+                      language={language}
+                      nowMs={nowMs}
+                      t={t}
+                    />
+                  ) : null}
+                  insight={week.insights?.length ? <HomeInsightCard insights={week.insights} t={t} embedded /> : null}
+                  showCode={!shareCardShown}
                   nudge={week.status !== 'loading' && onboarding.visible && !(onboarding.current === 'shareCode' && shareCardShown) ? (
                     <HomeOnboardingCard onboarding={onboarding} hrefs={onboardingHrefs} onDismiss={activation.dismiss} variant="compact" t={t} />
                   ) : undefined}
                 />
               </div>
-              <div>
+              {classrooms.length > 1 ? (
                 <HomeClassList
                   classrooms={classrooms}
                   studentPreview={studentPreview}
                   lastPlayedAt={week.summary?.lastPlayedAt ?? null}
                   activityFailed={week.status === 'error'}
-                  newClassHref={newClassHref}
-                  classLimit={!proLoading && !hasPro ? FREE_TIER_LIMITS.classes : null}
                   language={language}
                   nowMs={nowMs}
                   t={t}
                 />
-              </div>
+              ) : null}
               {accountBanner ? <div data-testid="home-account-banner">{accountBanner}</div> : null}
             </>
           )}
@@ -263,9 +276,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
             {!ready ? <HomeRailSkeleton /> : showWeek ? (
               <>
                 <div data-tm>
-                  <HomeWeekCard summary={week.summary} status={week.status} t={t}>
-                    {week.insights?.length ? <HomeInsightCard insights={week.insights} t={t} embedded /> : null}
-                  </HomeWeekCard>
+                  <HomeWeekCard summary={week.summary} status={week.status} t={t} />
                 </div>
               </>
             ) : null}

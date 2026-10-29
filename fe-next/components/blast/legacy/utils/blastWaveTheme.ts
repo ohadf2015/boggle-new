@@ -41,7 +41,6 @@ export interface BlastWaveTheme {
   /** 0 for waves 1-5, 1 for 6-10, ... — themes escalate with it */
   tier: number;
   nameKey: string;
-  goalKey: string;
   flavorKey: string;
   accentToken: BlastWaveAccentToken;
   params: BlastWaveThemeParams;
@@ -106,7 +105,6 @@ export function getWaveTheme(wave: number): BlastWaveTheme {
     id,
     tier,
     nameKey: `blast.theme.${id}.name`,
-    goalKey: `blast.theme.${id}.goal`,
     flavorKey: `blast.theme.${id}.flavor`,
     accentToken: ACCENTS[id],
     params: paramsFor(id, tier),

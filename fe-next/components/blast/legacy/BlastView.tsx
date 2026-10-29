@@ -211,6 +211,7 @@ export function BlastView() {
     const mergedResults: BlastResultsData = {
       ...resultsData,
       passPct: getWavePassPct(currentWave),
+      previousBest: resultsData.previousBest ?? ladder.personalBest ?? undefined,
       finalScore: totalScore + resultsData.finalScore,
       diamondsCollected: runCollectedRef.current.diamonds + (resultsData.diamondsCollected ?? 0),
       bombsPopped: runCollectedRef.current.bombs + (resultsData.bombsPopped ?? 0),
@@ -277,7 +278,7 @@ export function BlastView() {
       bestWordLength: mergedResults.bestWord.length,
       difficulty: config.difficulty ?? 'medium',
     });
-  }, [totalScore, allWordsFound, waveHistory, currentWave, config.difficulty, language, addCoins]);
+  }, [totalScore, allWordsFound, waveHistory, currentWave, config.difficulty, language, addCoins, ladder.personalBest]);
 
   /** Advance to next wave */
   const handleWaveAdvance = useCallback(() => {

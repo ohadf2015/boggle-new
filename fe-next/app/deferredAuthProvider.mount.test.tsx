@@ -62,6 +62,34 @@ describe('DeferredAuthProvider mount', () => {
     expect(await screen.findByTestId('auth-provider')).toBeTruthy();
   });
 
+  it('mounts AuthProvider on landing without a gesture inside the native app', async () => {
+    (globalThis as { Capacitor?: unknown }).Capacitor = { isNativePlatform: () => true };
+    try {
+      render(
+        <DeferredAuthProvider>
+          <span>child</span>
+        </DeferredAuthProvider>,
+      );
+      expect(await screen.findByTestId('auth-provider')).toBeTruthy();
+    } finally {
+      delete (globalThis as { Capacitor?: unknown }).Capacitor;
+    }
+  });
+
+  it('mounts AuthProvider on landing without a gesture for a signed-in visitor', async () => {
+    localStorage.setItem('sb-test-auth-token', JSON.stringify({ access_token: 'x' }));
+    try {
+      render(
+        <DeferredAuthProvider>
+          <span>child</span>
+        </DeferredAuthProvider>,
+      );
+      expect(await screen.findByTestId('auth-provider')).toBeTruthy();
+    } finally {
+      localStorage.removeItem('sb-test-auth-token');
+    }
+  });
+
   it('mounts AuthProvider immediately on an auth-required route', async () => {
     pathname.current = '/en/teacher';
     (globalThis as { __lcPathname?: string }).__lcPathname = '/en/teacher';

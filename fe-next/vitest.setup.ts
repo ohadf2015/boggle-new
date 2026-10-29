@@ -181,6 +181,10 @@ if (!(global as any).performance) {
 // Per-test overrides: server.use(http.get('/api/foo', () => HttpResponse.json({...})))
 beforeAll(() => mswServer.listen({ onUnhandledRequest: 'bypass' }));
 afterEach(() => mswServer.resetHandlers());
+afterEach(async () => {
+  const mod: { resetScrollSettlesForTests?: () => void } = await import('@/lib/perf/runWhenScrollSettles');
+  mod.resetScrollSettlesForTests?.();
+});
 afterAll(() => mswServer.close());
 
 // ==========================================

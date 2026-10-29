@@ -13,6 +13,8 @@ interface BlastWordPraiseProps {
   t: (key: string) => string | undefined;
   /** Wait before stamping, so the word lifted off the board has cleared the same spot. */
   delayMs?: number;
+  /** The wave-clear headline owns the board; hide the praise so two banners never stack. */
+  suppressed?: boolean;
 }
 
 interface PraiseTier {
@@ -57,7 +59,7 @@ const SPARKS = [
  * a solid tier-colored face, thick ink border, hard shadow, per-tier icon, plus
  * burst rays + sparks for the big tiers so a long word FEELS like an event.
  */
-export default function BlastWordPraise({ wordLength, submitCount, t, delayMs = 0 }: BlastWordPraiseProps) {
+export default function BlastWordPraise({ wordLength, submitCount, t, delayMs = 0, suppressed = false }: BlastWordPraiseProps) {
   const [visible, setVisible] = useState(false);
   const [animKey, setAnimKey] = useState(0);
   const prevSubmitRef = useRef(submitCount);
@@ -94,6 +96,8 @@ export default function BlastWordPraise({ wordLength, submitCount, t, delayMs = 
   }, [submitCount, wordLength, dismiss, delayMs]);
 
   const tier = getPraiseTier(wordLength);
+
+  if (suppressed) return null;
 
   return (
     <div className="absolute inset-x-0 top-[14%] pointer-events-none z-50 flex items-start justify-center">

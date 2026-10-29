@@ -54,7 +54,7 @@ export function ClassroomModeCatalogue({
   const live = catalogueEntry(selected) ?? catalogueModes()[0];
 
   return (
-    <div data-testid="lobby-go-live-panel" className="flex flex-col gap-2.5 lg:gap-4">
+    <div data-testid="lobby-go-live-panel" className="flex flex-col gap-2.5 lg:h-full lg:gap-4">
       <ClassroomModeSpotlight
         mode={live}
         keys={catalogueKeys(live, modeStyleFor(live, playStyle))}

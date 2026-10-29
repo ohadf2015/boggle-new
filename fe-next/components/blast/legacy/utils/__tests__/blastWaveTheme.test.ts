@@ -35,7 +35,6 @@ describe('getWaveTheme', () => {
     for (let wave = 1; wave <= 12; wave++) {
       const theme = getWaveTheme(wave);
       expect(theme.nameKey).toBe(`blast.theme.${theme.id}.name`);
-      expect(theme.goalKey).toBe(`blast.theme.${theme.id}.goal`);
       expect(theme.flavorKey).toBe(`blast.theme.${theme.id}.flavor`);
       expect(ACCENTS).toContain(theme.accentToken);
     }
@@ -67,14 +66,6 @@ describe('themes change the game, not just the label', () => {
     expect(getWaveConfig(6).cascadeChainBonus).toBeGreaterThan(getWaveConfig(7).cascadeChainBonus);
   });
 
-  it('each themed wave asks for its own goal', () => {
-    const goal = (wave: number) => getWaveObjectives(wave, 'en').find(o => o.type !== 'clear_percent');
-    expect(goal(2)).toMatchObject({ type: 'collect_type', tileType: 'bomb' });
-    expect(goal(3)).toMatchObject({ type: 'collect_type', tileType: 'gold' });
-    expect(goal(4)).toMatchObject({ type: 'collect_type', tileType: 'diamond' });
-    expect(goal(5)).toMatchObject({ type: 'score_target' });
-    expect(goal(6)).toMatchObject({ type: 'word_length', minWordLength: 5 });
-  });
 
   it('diamond hunt lowers the rarity a word needs to earn a diamond', () => {
     const board = (): BlastTileState[][] => Array.from({ length: 6 }, (_, r) =>
@@ -126,7 +117,7 @@ describe('wave theme text', () => {
     for (const [lang, catalogue] of locales) {
       for (let wave = 1; wave <= 6; wave++) {
         const theme = getWaveTheme(wave);
-        for (const key of [theme.nameKey, theme.goalKey, theme.flavorKey]) {
+        for (const key of [theme.nameKey, theme.flavorKey]) {
           if (typeof get(catalogue, key) !== 'string') missing.push(`${lang}:${key}`);
         }
       }
@@ -144,7 +135,7 @@ describe('wave 1 is winnable for a new player', () => {
 
   it('uses the wave pass bar as the clear-the-board objective', () => {
     for (let wave = 1; wave <= 12; wave++) {
-      expect(getWaveObjectives(wave, 'en').find(o => o.type === 'clear_percent')?.target).toBe(getWavePassPct(wave));
+      expect(getWaveObjectives(wave).find(o => o.type === 'clear_percent')?.target).toBe(getWavePassPct(wave));
     }
   });
 

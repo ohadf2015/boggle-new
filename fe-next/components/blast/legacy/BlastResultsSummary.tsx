@@ -1,29 +1,28 @@
 'use client';
 
 import { useEffect, useMemo, useRef } from 'react';
-import { Check, X } from 'lucide-react';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { Button } from '@/components/ui/button';
 import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { BlastResultsHero } from '../results/BlastResultsHero';
-import { BlastStatChips } from '../results/BlastStatChips';
-import { BlastNextGoal } from '../results/BlastNextGoal';
 import { BlastResultsBadges } from '../results/BlastResultsBadges';
+import { BlastRunJourney } from '../results/BlastRunJourney';
+import { BlastLootRow } from '../results/BlastLootRow';
+import { BlastBestWordTiles } from '../results/BlastBestWordTiles';
 import { useBlastResultsReveal } from '../results/useBlastResultsReveal';
-import { fromSpResults, toBlastResultsView, type BlastResultsExtras } from '../results/blastResultsViewModel';
+import { buildRunJourney } from '../results/runJourneyModel';
+import { fromSpResults, resolvePassPct, toBlastResultsView, type BlastResultsExtras } from '../results/blastResultsViewModel';
+import type { BlastResultsT } from '../results/types';
 import { useBlastBadgeUnlocks } from './hooks/useBlastBadgeUnlocks';
 import { BlastBragCard } from './BlastBragCard';
 import { computeFailReason } from './utils/computeFailReason';
-import { formatObjectiveLabel } from './utils/blastObjectiveUtils';
 import type { BlastResultsData } from './types';
-
-type Translate = (key: string, vars?: Record<string, string | number> | string) => string;
 
 interface BlastResultsSummaryProps {
   results: BlastResultsData & BlastResultsExtras;
-  t: Translate;
+  t: BlastResultsT;
   onPlayAgain: () => void;
   onQuit: () => void;
   onOpenStore?: () => void;
@@ -34,8 +33,10 @@ export function BlastResultsSummary({ results, t, onPlayAgain, onQuit, onOpenSto
   const rootRef = useRef<HTMLDivElement>(null);
   const badges = useBlastBadgeUnlocks({ results, t });
   const view = useMemo(() => toBlastResultsView(fromSpResults(results)), [results]);
-  const passPct = results.passPct ?? 90;
+  const passPct = resolvePassPct(results);
   const didFail = results.clearPercentage < passPct;
+  const journey = useMemo(() => buildRunJourney(results.waveResults ?? [], passPct), [results.waveResults, passPct]);
+  const reachedWave = journey.reachedWave || results.wavesCompleted + 1;
 
   useBlastResultsReveal(rootRef, { score: view.score, locale: language, confetti: view.celebrate.confetti });
 
@@ -44,14 +45,16 @@ export function BlastResultsSummary({ results, t, onPlayAgain, onQuit, onOpenSto
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const goalRows = (results.finalObjectives ?? []).filter((p) => p.objective.type !== 'clear_percent');
-  const failReason = computeFailReason({ tilesCleared: results.tilesCleared, totalTiles: results.totalTiles, passPct: results.passPct });
+  const headline =
+    didFail && !view.isNewBest && results.wavesCompleted > 0
+      ? t('blast.results.runReached', 'Made it to wave {wave}!', { wave: reachedWave })
+      : undefined;
 
   return (
     <div
       ref={rootRef}
       dir={dir}
-      className="flex-1 flex flex-col w-full max-w-md lg:max-w-4xl mx-auto min-h-0 bg-neo-navy"
+      className="flex-1 flex flex-col w-full max-w-md lg:max-w-5xl mx-auto min-h-0 bg-neo-navy"
       data-testid="blast-results-summary"
       data-fail={didFail ? 'true' : 'false'}
     >
@@ -61,84 +64,27 @@ export function BlastResultsSummary({ results, t, onPlayAgain, onQuit, onOpenSto
             view={view}
             t={t}
             locale={language}
-            headline={didFail ? t('blast.results.waveFailed') : undefined}
+            headline={headline}
             stars={didFail ? null : { count: results.stars, label: t(`blast.stars${results.stars}`) }}
-            subline={
-              <>
-                {results.wordsFound.length} {t('blast.wordsFound')} &middot; {results.wavesCompleted} {t('blast.waves')}
-              </>
-            }
-            footer={<ClearMeter results={results} t={t} />}
+            footer={didFail ? <FailStrip results={results} passPct={passPct} t={t} /> : null}
           />
 
-          <BlastNextGoal view={view} t={t} locale={language} />
-
-          {didFail && (
-            <div
-              className="w-full flex flex-col items-center gap-1 px-4 py-3 rounded-neo border-3 border-neo-black shadow-hard bg-neo-red text-neo-white"
-              data-testid="blast-results-fail-banner"
-            >
-              <p className="font-neo-display font-black uppercase tracking-wider text-sm" data-testid="blast-fail-reason">
-                {failReason.kind === 'tiles_short'
-                  ? t('blast.results.tilesShort', { count: failReason.tilesShort })
-                  : t('blast.results.needClearPct', { required: passPct, got: results.clearPercentage })}
-              </p>
-              <p className="text-[11px] uppercase tracking-wider font-bold">{t('blast.results.failHint')}</p>
-              {results.targetWord && !results.targetWordFound && (
-                <p data-testid="blast-target-word-missed" className="mt-1 text-[11px] uppercase tracking-wider font-bold">
-                  {t('blast.objective.targetWordMissed', { word: results.targetWord })}
-                </p>
-              )}
-            </div>
-          )}
-
-          {!didFail && results.targetWord && (
-            results.targetWordFound ? (
-              <div
-                data-testid="blast-target-word-found"
-                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-neo border-3 border-neo-black shadow-hard bg-neo-lime text-neo-black font-neo-display font-black uppercase tracking-wider text-xs"
-              >
-                {t('blast.objective.targetWordFoundIt')} {results.targetWord}
-              </div>
-            ) : (
-              <div
-                data-testid="blast-target-word-cascade-credit"
-                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-neo border-2 border-neo-black bg-neo-navy-light text-neo-white font-neo-body font-bold text-xs"
-              >
-                {t('blast.objective.targetWordMissed', { word: results.targetWord })}
-              </div>
-            )
-          )}
+          <BlastRunJourney
+            journey={journey}
+            passPct={passPct}
+            tilesCleared={results.tilesCleared}
+            totalTiles={results.totalTiles}
+            clearPct={results.clearPercentage}
+            t={t}
+          />
         </div>
 
-        <div className="w-full flex flex-col items-center gap-4 lg:flex-1 lg:pt-10">
-          <BlastStatChips view={view} t={t} locale={language} />
-
-          {goalRows.length > 0 && (
-            <div
-              data-testid="blast-objective-summary"
-              className="w-full rounded-neo border-2 border-neo-black bg-neo-navy-light px-3 py-2 flex flex-col gap-1"
-            >
-              {goalRows.map((p, i) => (
-                <div
-                  key={`obj-${p.objective.type}-${i}`}
-                  data-testid="blast-objective-summary-row"
-                  dir="auto"
-                  className={cn('flex items-center gap-2 text-xs font-bold', p.isComplete ? 'text-neo-lime' : 'text-neo-white/60')}
-                >
-                  {p.isComplete
-                    ? <Check className="h-3.5 w-3.5 shrink-0" strokeWidth={3} />
-                    : <X className="h-3.5 w-3.5 shrink-0" strokeWidth={3} />}
-                  <span className={cn('flex-1 truncate text-start', p.isComplete && 'line-through')}>
-                    {formatObjectiveLabel(p.objective, t)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
+        <div className="w-full flex flex-col items-center gap-4 lg:flex-1">
+          <BlastLootRow view={view} t={t} locale={language} />
+          <BlastBestWordTiles word={view.bestWord} longestWord={view.longestWord} t={t} />
+          <BlastResultsBadges badges={badges} t={t} />
 
           <BlastBragCard results={results} t={t} />
-          <BlastResultsBadges badges={badges} t={t} />
         </div>
       </div>
 
@@ -177,22 +123,24 @@ export function BlastResultsSummary({ results, t, onPlayAgain, onQuit, onOpenSto
 
 const SECONDARY = 'font-semibold text-neo-cyan hover:text-neo-cyan hover:bg-transparent uppercase tracking-wider text-xs';
 
-function ClearMeter({ results, t }: { results: BlastResultsData; t: Translate }) {
-  const pct = results.clearPercentage;
+function FailStrip({ results, passPct, t }: { results: BlastResultsData; passPct: number; t: BlastResultsT }) {
+  const reason = computeFailReason({ tilesCleared: results.tilesCleared, totalTiles: results.totalTiles, passPct });
   return (
-    <div className="mt-3 pt-3 border-t-2 border-neo-black/60">
-      <div className="flex justify-between items-center mb-1.5">
-        <span className="text-[10px] uppercase tracking-wider font-bold text-neo-white">{t('blast.results.tilesCleared')}</span>
-        <bdi className="text-[11px] font-black text-neo-cyan tabular-nums">
-          {results.tilesCleared}/{results.totalTiles} &middot; {pct}%
-        </bdi>
-      </div>
-      <div className="w-full h-2 bg-neo-navy rounded-full overflow-hidden border-2 border-neo-black">
-        <div
-          className={cn('h-full rounded-full', pct >= (results.passPct ?? 90) ? 'bg-neo-lime' : pct >= 60 ? 'bg-neo-cyan' : 'bg-neo-pink')}
-          style={{ width: `${pct}%` }}
-        />
-      </div>
+    <div
+      data-testid="blast-results-fail-banner"
+      className="-mx-4 -mb-4 mt-4 flex flex-col items-center gap-1 rounded-b-neo border-t-3 border-neo-black bg-neo-navy px-4 py-3"
+    >
+      <span className="rounded-md border-2 border-neo-black bg-neo-pink px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-white shadow-hard-sm">
+        {t('blast.results.waveFailed')}
+      </span>
+      <p className="font-neo-display text-lg font-black uppercase leading-tight text-neo-white" data-testid="blast-fail-reason">
+        {reason.kind === 'tiles_short'
+          ? t('blast.results.tilesShort', { count: reason.tilesShort })
+          : t('blast.results.needClearPct', { required: passPct, got: results.clearPercentage })}
+      </p>
+      <p className="text-[11px] font-bold uppercase tracking-wider text-neo-white/80">
+        {t('blast.results.failHintPct', 'Clear at least {required}% of the board to advance', { required: passPct })}
+      </p>
     </div>
   );
 }
