@@ -17,6 +17,7 @@ import { modeAllowsRehearsalBots, realStudentCount } from '@/lib/education/rehea
 import { RehearsalBotsBlocked } from '@/components/education/projector/RehearsalBotsBlocked';
 import { useKickStudent } from '@/hooks/useKickStudent';
 import { EduJoinCard } from './EduJoinCard';
+import { EduPhoneTestPrompt } from './EduPhoneTestPrompt';
 import { EduLobbyRoster } from './EduLobbyRoster';
 import { useEduLobbyMode } from './useEduLobbyMode';
 import { LIVE_KEYFRAMES, PRESS, PRIMARY_BUTTON, RISE, useEnterStyle } from './eduLiveStyles';
@@ -155,6 +156,9 @@ export const EduProjectorLobby = memo<ProjectorLobbyProps>(function EduProjector
           )}
           {!canStart && onStartPracticeRound && !botsCanRehearse && !lobbyMode.quizBlocked && (
             <RehearsalBotsBlocked gameCode={gameCode} currentMode={lobbyMode.modeId} t={t} onApplied={lobbyMode.applyMode} onRehearse={onStartPracticeRound} className="md:flex-row md:items-center md:gap-[1vw]" />
+          )}
+          {realStudentCount(students) === 0 && (
+            <EduPhoneTestPrompt gameCode={gameCode} language={language} baseUrl={baseUrl} mode={launchOf(lobbyMode.modeId).gameMode} t={t} />
           )}
           {practiceRoundFailed && (
             <p role="alert" className="font-neo-body text-sm font-bold text-neo-pink md:text-[1vw]">{t('tvLobby.practiceRoundFailed')}</p>

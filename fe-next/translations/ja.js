@@ -20950,6 +20950,8 @@ const ja = {
       "waitingTitle": "生徒の参加を待っています",
       "waitingHint": "QRを読み取るか、上のアドレスでコードを入力",
       "startBlocked": "生徒が1人参加するとスタートできます",
+      "phoneTestCta": "まず自分のスマホで試す",
+      "phoneTestHint": "自分のスマホで読み取ると、生徒の画面を確認できます。テスト用の席なので生徒には数えられません。",
       "copyLink": "リンクをコピー",
       "minutes": "{count}分",
       "leave": "ルームを出る",
