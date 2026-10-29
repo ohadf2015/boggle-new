@@ -1,6 +1,6 @@
 'use client';
 import { useRef, useState } from 'react';
-import Link from 'next/link';
+import { ForSchoolsLink } from '@/components/education/ForSchoolsLink';
 import { ArrowRight, Building2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
@@ -35,14 +35,14 @@ export function LandingSchoolLead() {
               </li>
             ))}
           </ul>
-          <Link
-            href={`/${language}/education/for-schools`}
-            data-testid="landing-school-plans-link"
+          <ForSchoolsLink
+            placement="education_school_section"
+            testId="landing-school-plans-link"
             className="mt-2 inline-flex min-h-11 items-center gap-1 text-sm font-black underline decoration-2 underline-offset-4 sm:mt-5"
           >
             {t('eg2Land.school.plansLink')}
             <DirectionalIcon icon={ArrowRight} className="size-4" />
-          </Link>
+          </ForSchoolsLink>
         </div>
 
         <div className={`rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light p-3 text-neo-white shadow-hard sm:p-5 ${open ? '' : 'self-center'}`}>
