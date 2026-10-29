@@ -45,6 +45,26 @@ let alreadyEmitted = false;
 let abandonedWhileHidden = false;
 let pagehideFinalizer: (() => void) | null = null;
 /**
+ * Second destination for every abandon. PostHog is consent-gated, so without
+ * this the first-party analytics_events table saw almost no mid-game exits.
+ * growthTracking registers an unload-safe beacon here at module load.
+ */
+type AbandonPersistSink = (event: 'game_abandoned', payload: Record<string, unknown>) => void;
+let persistSink: AbandonPersistSink | null = null;
+
+export function setAbandonPersistSink(fn: AbandonPersistSink | null): void {
+  persistSink = fn;
+}
+
+function persistAbandon(payload: Record<string, unknown>): void {
+  if (!persistSink) return;
+  try {
+    persistSink('game_abandoned', payload);
+  } catch {
+    // A sink must never block the abandon path.
+  }
+}
+/**
  * Words found before `trackGameStart` (deferred afterLoadIdle + 1500ms) used
  * to vanish: `updateActiveGameExtras` no-op'd while `active` was null, and
  * the effect does not re-run if the count is unchanged after start. The
@@ -140,21 +160,23 @@ function emitAbandonIfActive(reason: 'hidden' | 'pagehide') {
 
   alreadyEmitted = true;
   abandonedWhileHidden = true;
+  const payload = {
+    mode: active.mode,
+    gameMode: active.mode,
+    durationSec: Math.round(durationMs / 1000),
+    reason,
+    ...active.extras,
+  };
   try {
     // sendBeacon transport: a hidden/pagehide handler is the last code that
     // runs before unload — the default XHR (and lazyPosthog's own rate-limit
     // deferral) routinely never leaves the device on mobile. iOS Safari in
     // particular often fires ONLY visibilitychange, never pagehide.
-    posthog.captureBeacon('growth:game_abandoned', {
-      mode: active.mode,
-      gameMode: active.mode,
-      durationSec: Math.round(durationMs / 1000),
-      reason,
-      ...active.extras,
-    });
+    posthog.captureBeacon('growth:game_abandoned', payload);
   } catch {
     // PostHog not initialized — analytics never block UX
   }
+  persistAbandon(payload);
 }
 
 export function installAbandonOnPagehide(): () => void {
@@ -194,17 +216,19 @@ export function emitAbandonOnExit(): void {
   setTimeout(() => {
     if (alreadyEmitted || active !== snapshot) return;
     alreadyEmitted = true;
+    const payload = {
+      mode: snapshot.mode,
+      gameMode: snapshot.mode,
+      durationSec: Math.round(durationMs / 1000),
+      reason: 'exit',
+      ...snapshot.extras,
+    };
     try {
-      posthog.capture('growth:game_abandoned', {
-        mode: snapshot.mode,
-        gameMode: snapshot.mode,
-        durationSec: Math.round(durationMs / 1000),
-        reason: 'exit',
-        ...snapshot.extras,
-      });
+      posthog.capture('growth:game_abandoned', payload);
     } catch {
       // PostHog not initialized — analytics never block UX
     }
+    persistAbandon(payload);
   }, 0);
 }
 
@@ -232,17 +256,19 @@ export function emitAbandonOnSpaNavigate(): void {
   setTimeout(() => {
     if (alreadyEmitted || active !== snapshot) return;
     alreadyEmitted = true;
+    const payload = {
+      mode: snapshot.mode,
+      gameMode: snapshot.mode,
+      durationSec: Math.round(durationMs / 1000),
+      reason: 'spa_navigate',
+      ...snapshot.extras,
+    };
     try {
-      posthog.capture('growth:game_abandoned', {
-        mode: snapshot.mode,
-        gameMode: snapshot.mode,
-        durationSec: Math.round(durationMs / 1000),
-        reason: 'spa_navigate',
-        ...snapshot.extras,
-      });
+      posthog.capture('growth:game_abandoned', payload);
     } catch {
       // PostHog not initialized — analytics never block UX
     }
+    persistAbandon(payload);
   }, 0);
 }
 

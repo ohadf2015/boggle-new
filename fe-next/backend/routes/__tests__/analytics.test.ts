@@ -195,3 +195,34 @@ describe('POST /api/analytics/track — admin blocklist', () => {
     expect(lastInsert!.session_id).toBe('ok-sess');
   });
 });
+
+describe('POST /api/analytics/track — automated traffic is tagged, not dropped', () => {
+  it('stamps metadata.is_automated for a HeadlessChrome user agent', async () => {
+    await callTrack({
+      body: { event_type: 'game_started', session_id: 's1', metadata: { gameMode: 'classic' } },
+      headers: { 'user-agent': 'Mozilla/5.0 (Macintosh) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/147.0.0.0 Safari/537.36' },
+    });
+
+    expect(lastInsert).not.toBeNull();
+    expect(insertedMeta().is_automated).toBe(true);
+    expect(insertedMeta().gameMode).toBe('classic');
+  });
+
+  it('leaves is_automated off for a real browser', async () => {
+    await callTrack({
+      body: { event_type: 'game_started', session_id: 's1' },
+      headers: { 'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1' },
+    });
+
+    expect(insertedMeta().is_automated).toBeUndefined();
+  });
+
+  it('ignores a client-sent is_automated flag', async () => {
+    await callTrack({
+      body: { event_type: 'game_started', session_id: 's1', metadata: { is_automated: true } },
+      headers: { 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36' },
+    });
+
+    expect(insertedMeta().is_automated).toBeUndefined();
+  });
+});

@@ -23,3 +23,22 @@ export function isBotUserAgent(userAgent: string | null | undefined): boolean {
   const ua = (userAgent || '').toLowerCase();
   return BOT_SIGNATURES.some((sig) => ua.includes(sig));
 }
+
+/**
+ * Headless browsers, audit tools and scripted clients (lowercase fragments).
+ * These run our JS and write analytics rows like a real visitor: in Oct 2026
+ * about 40% of analytics_events sessions were HeadlessChrome and the like.
+ */
+const AUTOMATION_SIGNATURES = [
+  'headlesschrome', 'chrome-lighthouse', 'lighthouse', 'page speed insights',
+  'pagespeed', 'gtmetrix', 'puppeteer', 'playwright', 'phantomjs', 'selenium',
+  'python-requests', 'python-urllib', 'aiohttp', 'curl/', 'wget/', 'go-http-client',
+  'node-fetch', 'axios/',
+] as const;
+
+/** True for crawlers plus headless/automation clients — for analytics hygiene. */
+export function isAutomatedUserAgent(userAgent: string | null | undefined): boolean {
+  if (!userAgent) return false;
+  const ua = userAgent.toLowerCase();
+  return isBotUserAgent(ua) || AUTOMATION_SIGNATURES.some((sig) => ua.includes(sig));
+}
