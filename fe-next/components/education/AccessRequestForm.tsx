@@ -10,7 +10,7 @@ import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useCheckoutBlockedInApp } from '@/hooks/useCheckoutBlockedInApp';
 import { resolveProOffer } from '@/lib/education/pro/proOfferCopy';
 import { classCreatedTrialCopy, trialCopyBase, TRIAL_COPY_RTL } from '@/lib/education/pro/trialCtaCopy';
-import { reportProCtaClick, reportProOfferImpression } from '@/lib/education/reportProCtaClick';
+import { reportProCtaClick, reportProOfferClick, reportProOfferImpression } from '@/lib/education/reportProCtaClick';
 import { useUpsellImpression } from '@/lib/education/useUpsellImpression';
 import type { TeacherAccessSubmission, TeacherAccessRole, TeacherLocale } from '@/lib/education/types';
 
@@ -234,6 +234,7 @@ export function AccessRequestForm({
                     onClick={() => {
                       try {
                         reportProCtaClick({ placement: 'access_success', locale: language, cta: proOffer.cta });
+                        reportProOfferClick({ placement: 'access_success', locale: language, cta: proOffer.cta, offer: proOffer.offer });
                       } catch {
                         /* analytics must never block */
                       }

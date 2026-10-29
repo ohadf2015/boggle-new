@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import TeacherDashboard from '@/components/teacher/TeacherDashboard';
 import { TrialEndedBannerWithRecap, TrialUrgencyBannerWithRecap } from '@/components/teacher/TrialRecapBanners';
@@ -26,6 +26,31 @@ import {
   teacherFunnelPlan,
 } from '@/lib/education/teacherOnboardingFunnel';
 import { captureTeacherActivationOnboardingOnce } from '@/lib/education/teacherActivationFunnel';
+
+const DASHBOARD_PRO_DISMISS_KEY = 'lexi:proTrialCardDismissed:dashboard';
+const DASHBOARD_PRO_DISMISS_MS = 14 * 24 * 60 * 60 * 1000;
+
+/** 14-day local "Not now" for the dashboard Teacher Pro card. Starts hidden so a dismissed card never flashes. */
+function useDashboardProCardDismiss(): { dismissed: boolean; dismiss: () => void } {
+  const [dismissed, setDismissed] = useState(true);
+  useEffect(() => {
+    try {
+      const at = Number(window.localStorage.getItem(DASHBOARD_PRO_DISMISS_KEY));
+      setDismissed(Number.isFinite(at) && at > 0 && Date.now() - at < DASHBOARD_PRO_DISMISS_MS);
+    } catch {
+      setDismissed(false);
+    }
+  }, []);
+  const dismiss = useCallback(() => {
+    try {
+      window.localStorage.setItem(DASHBOARD_PRO_DISMISS_KEY, String(Date.now()));
+    } catch {
+      /* private mode: hide for this visit only */
+    }
+    setDismissed(true);
+  }, []);
+  return { dismissed, dismiss };
+}
 
 // Access is settled by <TeacherGate> above: it owns the loading state and the
 // redirect for anyone without teacher access. This component previously
@@ -61,6 +86,7 @@ function TeacherDashboardInner() {
   } = useTeacherUsagePrompt();
   const { dismissed: trialNudgeDismissed, dismiss: dismissTrialNudge } =
     useTrialUpgradeNudge(trial);
+  const { dismissed: dashboardProDismissed, dismiss: dismissDashboardPro } = useDashboardProCardDismiss();
 
   // At most one banner above the dashboard. This page used to stack a trial
   // countdown, a district-pricing upsell and a Pro strip before the thing the
@@ -158,14 +184,35 @@ function TeacherDashboardInner() {
   const isTrialExpiring = isPolarTrialDay10Expiring(trialDaysLeft);
 
   // Free-teacher asks collapse into Home's ONE rail card; only trial account state stays a strip.
-  const proOffer =
+  // Any free teacher without a picked ask still gets the card (its wording follows
+  // resolveProOffer). It stays down for admins, while the milestone read is open, after
+  // any earlier "Not now" on a Pro ask, and beside the pending-checkout / Polar
+  // reactivation banners (those already are the ask).
+  const dismissAnd = (fn: () => void) => () => {
+    fn();
+    dismissDashboardPro();
+  };
+  const pickedProOffer =
     banner === 'offerTrial'
-      ? { kind: 'trial' as const, onDismiss: dismissTrialOffer, tracked: true }
+      ? { kind: 'trial' as const, onDismiss: dismissAnd(dismissTrialOffer), tracked: true }
       : banner === 'pro'
-        ? { kind: 'upgrade' as const, onDismiss: dismiss, tracked: true }
+        ? { kind: 'upgrade' as const, onDismiss: dismissAnd(dismiss), tracked: true }
         : banner === 'trial' && trialNudgeOpen && !trial?.isExpired
-          ? { kind: 'upgrade' as const, onDismiss: dismissTrialNudge, tracked: false }
+          ? { kind: 'upgrade' as const, onDismiss: dismissAnd(dismissTrialNudge), tracked: false }
           : null;
+  const proOffer =
+    pickedProOffer ??
+    (!hasPro &&
+    !proLoading &&
+    !isAdmin &&
+    !milestoneLoading &&
+    !dismissed &&
+    !trialOfferDismissed &&
+    !dashboardProDismissed &&
+    banner !== 'pendingCheckout' &&
+    banner !== 'reactivate'
+      ? { kind: 'upgrade' as const, onDismiss: dismissDashboardPro, tracked: false }
+      : null);
 
   return (
     <TeacherDashboard
