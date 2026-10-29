@@ -280,14 +280,22 @@ jobs:
             npm ci --prefer-offline --no-audit
           fi
 
+      # The webpack cache is versioned (v2) and keyed on the Node version. From
+      # e2a1c584 (Oct 29) every master build crashed ~2.5 min into "Creating an
+      # optimized production build" with `uncaughtException TypeError: Cannot read
+      # properties of undefined (reading 'length')`, while the same commit built
+      # clean from scratch locally (Node 20 and 22) and on Railway. A failed job
+      # never saves a new cache, so every later run restored the same (most likely
+      # stale) `.next/cache` through the prefix restore-key and crashed the same way.
+      # Bump the version to drop a poisoned cache; never delete the build step.
       - name: Cache Next.js build
         uses: actions/cache@v4
         with:
           path: |
             fe-next/.next/cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('fe-next/package-lock.json') }}-${{ hashFiles('fe-next/**/*.ts', 'fe-next/**/*.tsx') }}
+          key: ${{ runner.os }}-node${{ env.NODE_VERSION }}-nextjs-v2-${{ hashFiles('fe-next/package-lock.json') }}-${{ hashFiles('fe-next/**/*.ts', 'fe-next/**/*.tsx') }}
           restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('fe-next/package-lock.json') }}-
+            ${{ runner.os }}-node${{ env.NODE_VERSION }}-nextjs-v2-${{ hashFiles('fe-next/package-lock.json') }}-
 
       - name: Build
         working-directory: fe-next
