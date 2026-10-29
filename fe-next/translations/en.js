@@ -4027,6 +4027,10 @@ const en = {
     "host": "Host",
     "roomClosed": "Room closed",
     "roomTimedOut": "Your room timed out. Back to the lobby.",
+    "roomEnded": {
+      "line": "That room has ended. Jump into a new game?",
+      "playNow": "Play now"
+    },
     "rejoinedRoom": "Back in! Rejoined room {code}",
     "rejoinedGame": "Back in the game!",
     "hostLeftModal": {

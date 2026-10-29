@@ -4775,6 +4775,10 @@ const sv = {
     "host": "Värd",
     "roomClosed": "Rummet stängt",
     "roomTimedOut": "Ditt rum gick ut. Tillbaka till lobbyn.",
+    "roomEnded": {
+      "line": "Det rummet har avslutats. Hoppa in i ett nytt spel?",
+      "playNow": "Spela nu"
+    },
     "rejoinedRoom": "Du är tillbaka i rum {code}",
     "rejoinedGame": "Tillbaka i spelet!",
     "hostLeftReason": {

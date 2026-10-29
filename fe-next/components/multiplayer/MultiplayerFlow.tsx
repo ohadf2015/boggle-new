@@ -19,6 +19,7 @@ import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { QuickPlaySeekingOverlay } from '@/components/multiplayer/QuickPlaySeekingOverlay';
 import { MpScreen } from './shell/MpScreen';
 import { useMultiplayerFlowState } from './useMultiplayerFlowState';
+import { useRoomEndedOffer } from './useRoomEndedOffer';
 
 export interface MultiplayerFlowProps {
   // Callbacks
@@ -75,6 +76,11 @@ export interface MultiplayerFlowProps {
 
   /** The entry header (EntryScreen supplies the arcade header; classroom gets none). */
   header?: ReactNode;
+
+  /** The arcade room this player tried to join is gone: offer one-tap Quick Play. */
+  roomEndedOffer?: { seq: number } | null;
+  /** The offer toast is on screen (the page clears the offer). */
+  onRoomEndedOfferShown?: () => void;
 }
 
 const TEST_ID = 'mp-entry';
@@ -92,6 +98,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = (props) => {
   const { t } = useLanguage();
   const { isAdmin, profile } = useAuth();
   const s = useMultiplayerFlowState(props);
+  useRoomEndedOffer({ offer: props.roomEndedOffer ?? null, onShown: props.onRoomEndedOfferShown, onPlayNow: s.handleQuickPlay, t });
   const {
     refreshRooms, activeRooms, roomsLoading, isJoining, isAuthenticated, displayName, prefilledRoom,
     defaultLanguage, waitingForTeacher, profileAvatar, header,

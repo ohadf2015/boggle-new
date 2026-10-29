@@ -4487,6 +4487,10 @@ const es = {
     "inviteFriend": "Invitar a un amigo",
     "roomClosed": "Sala cerrada",
     "roomTimedOut": "Tu sala expiró. Volviendo al lobby.",
+    "roomEnded": {
+      "line": "Esa sala ya terminó. ¿Te unes a una partida nueva?",
+      "playNow": "Jugar ya"
+    },
     "rejoinedRoom": "¡De vuelta! Reconectado a la sala {code}",
     "rejoinedGame": "¡De vuelta al juego!",
     "hostLeftReason": {

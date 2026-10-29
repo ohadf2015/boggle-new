@@ -4426,6 +4426,10 @@ const ja = {
     "host": "ホスト",
     "roomClosed": "ルームが閉鎖されました",
     "roomTimedOut": "ルームが時間切れになったよ。ロビーに戻ります。",
+    "roomEnded": {
+      "line": "そのルームはもう終わったよ。新しいゲームに入る？",
+      "playNow": "今すぐ遊ぶ"
+    },
     "rejoinedRoom": "復帰しました！ルーム {code} に再接続",
     "rejoinedGame": "ゲームに復帰しました！",
     "hostLeftReason": {
