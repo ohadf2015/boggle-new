@@ -18069,6 +18069,7 @@ const ru = {
       "waveFailed": "Волна не пройдена",
       "needClearPct": "Нужно очистить {required}%, у тебя {got}%",
       "tilesShort": "Не хватило всего {count} плиток!",
+      "tilesShortOne": "Не хватило всего одной плитки!",
       "reveal": {
         "coins": "Монеты",
         "diamonds": "Алмазы",

@@ -13371,6 +13371,7 @@ const sv = {
       "waveFailed": "Våg misslyckades",
       "needClearPct": "Krävde {required}% rensat. Du fick {got}%",
       "tilesShort": "Det saknades bara {count} brickor!",
+      "tilesShortOne": "Det saknades bara 1 bricka!",
       "reveal": {
         "coins": "Mynt",
         "diamonds": "Diamanter",

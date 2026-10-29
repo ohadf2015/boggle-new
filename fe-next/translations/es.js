@@ -13026,6 +13026,7 @@ const es = {
       "waveFailed": "Oleada Fallida",
       "needClearPct": "Necesitabas {required}% despejado, lograste {got}%",
       "tilesShort": "¡Solo {count} fichas más!",
+      "tilesShortOne": "¡Solo 1 ficha más!",
       "reveal": {
         "coins": "Monedas",
         "diamonds": "Diamantes",

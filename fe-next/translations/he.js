@@ -12937,6 +12937,7 @@ const he = {
       "waveFailed": "הגל נכשל",
       "needClearPct": "נדרש ניקוי של {required}%. ניקיתם {got}%",
       "tilesShort": "חסרו רק {count} משבצות",
+      "tilesShortOne": "חסרה רק משבצת אחת",
       "reveal": {
         "coins": "מטבעות",
         "diamonds": "יהלומים",

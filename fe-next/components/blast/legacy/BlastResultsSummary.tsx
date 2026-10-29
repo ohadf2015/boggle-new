@@ -135,7 +135,7 @@ function FailStrip({ results, passPct, t }: { results: BlastResultsData; passPct
       </span>
       <p className="font-neo-display text-lg font-black uppercase leading-tight text-neo-white" data-testid="blast-fail-reason">
         {reason.kind === 'tiles_short'
-          ? t('blast.results.tilesShort', { count: reason.tilesShort })
+          ? (reason.tilesShort === 1 ? t('blast.results.tilesShortOne') : t('blast.results.tilesShort', { count: reason.tilesShort }))
           : t('blast.results.needClearPct', { required: passPct, got: results.clearPercentage })}
       </p>
       <p className="text-[11px] font-bold uppercase tracking-wider text-neo-white/80">

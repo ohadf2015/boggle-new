@@ -79,6 +79,20 @@ describe('BlastResultsSummary', () => {
     expect(screen.queryByTestId('blast-results-secondary-waves')).toBeNull();
   });
 
+  it('says "1 tile" in the singular when exactly one tile is missing', () => {
+    render(
+      <BlastResultsSummary
+        results={makeResults({ passPct: 90, clearPercentage: 88, tilesCleared: 32, totalTiles: 36 })}
+        t={t}
+        onPlayAgain={noop}
+        onQuit={noop}
+      />,
+    );
+    const reason = screen.getByTestId('blast-fail-reason');
+    expect(reason.textContent).toContain('blast.results.tilesShortOne');
+    expect(reason.textContent).not.toContain('blast.results.tilesShort ');
+  });
+
   it('keeps the play-again footer pinned to the window bottom so it never needs a scroll', () => {
     render(
       <BlastResultsSummary results={makeResults()} t={t} onPlayAgain={noop} onQuit={noop} />,

@@ -11509,6 +11509,7 @@ const en = {
       "waveFailed": "Wave Failed",
       "needClearPct": "Needed {required}% cleared. You got {got}%",
       "tilesShort": "Just {count} tiles short!",
+      "tilesShortOne": "Just 1 tile short!",
       "reveal": {
         "coins": "Coins",
         "diamonds": "Diamonds",

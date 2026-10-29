@@ -13074,6 +13074,7 @@ const ja = {
       "waveFailed": "ウェーブ失敗",
       "needClearPct": "{required}%クリアが必要。結果は{got}%",
       "tilesShort": "あと{count}タイルだった!",
+      "tilesShortOne": "あと1タイルだった!",
       "reveal": {
         "coins": "コイン",
         "diamonds": "ダイヤ",
