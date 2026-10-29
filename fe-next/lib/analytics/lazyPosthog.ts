@@ -13,9 +13,10 @@
  * async chunk that is no longer in any route's first-load set.
  *
  * Fire-and-forget calls (capture/identify/register/people.*) made before the
- * lib finishes loading are buffered and flushed — in original order, AFTER
- * `init()` — so pre-consent events still hit an `opt_out_capturing_by_default`
- * instance and are dropped exactly as before. Synchronous reads
+ * lib finishes loading are buffered and flushed — in original order, once
+ * posthog-js's own `loaded` callback has run (not merely once `init()`
+ * returns) — so the flush lands AFTER opt-in/opt-out is decided, instead of
+ * racing it. Synchronous reads
  * (getFeatureFlag) return undefined until load; callers (usePostHogFlag)
  * already treat that as "fall back to default", so flags simply resolve a beat
  * later instead of never.
@@ -156,21 +157,34 @@ export function initLazyPostHog(
   options: Record<string, unknown> = {},
 ): Promise<PostHog | null> {
   if (loadPromise) return loadPromise;
+  const userLoaded = options.loaded as ((ph: PostHog) => void) | undefined;
   loadPromise = import('posthog-js')
-    .then(({ default: ph }) => {
-      // init FIRST so buffered captures flush into a configured (and, by
-      // default, opted-out) instance — preserving the GDPR drop semantics.
-      ph.init(key, options as Parameters<PostHog['init']>[1]);
-      real = ph;
+    .then(
+      ({ default: ph }) =>
+        new Promise<PostHog | null>((resolve) => {
+          // Flush buffered captures from the `loaded` hook, not right after
+          // `init()` returns. posthog-js decides opt-in/opt-out INSIDE
+          // `loaded` (see PostHogProvider) and that decision runs async,
+          // after `init()` has already returned — flushing earlier replays
+          // the queue into the still-default opted-out instance and drops
+          // events for visitors who already consented in a prior session.
+          ph.init(key, {
+            ...(options as Parameters<PostHog['init']>[1]),
+            loaded: (loadedPh: PostHog) => {
+              userLoaded?.(loadedPh);
+              real = loadedPh;
 
-      for (const c of callQueue) applyPath(ph, c.path, c.args);
-      callQueue.length = 0;
+              for (const c of callQueue) applyPath(loadedPh, c.path, c.args);
+              callQueue.length = 0;
 
-      for (const cb of flagCallbacks) ph.onFeatureFlags(cb);
-      flagCallbacks.length = 0;
+              for (const cb of flagCallbacks) loadedPh.onFeatureFlags(cb);
+              flagCallbacks.length = 0;
 
-      return ph;
-    })
+              resolve(loadedPh);
+            },
+          } as Parameters<PostHog['init']>[1]);
+        }),
+    )
     .catch(() => null);
   return loadPromise;
 }

@@ -36,6 +36,13 @@ beforeEach(() => {
   vi.clearAllMocks();
   mockPosthog.has_opted_out_capturing.mockReturnValue(false);
   mockPosthog.getFeatureFlag.mockReturnValue('real-variant');
+  // Real posthog-js invokes the `loaded` config callback AFTER init() returns
+  // (it resolves asynchronously, not inline) — that's where opt-in/opt-out is
+  // decided (see PostHogProvider). Mirror that async gap so tests exercise the
+  // same ordering hazard as production.
+  mockPosthog.init.mockImplementation((_key: string, opts?: { loaded?: (ph: unknown) => void }) => {
+    queueMicrotask(() => opts?.loaded?.(mockPosthog));
+  });
 });
 
 describe('lazyPosthog proxy', () => {
@@ -52,7 +59,12 @@ describe('lazyPosthog proxy', () => {
 
     await initLazyPostHog('key', { opt_out_capturing_by_default: true });
 
-    expect(mockPosthog.init).toHaveBeenCalledWith('key', { opt_out_capturing_by_default: true });
+    // initLazyPostHog always injects its own `loaded` wrapper (to gate the
+    // flush on it) — assert the caller's options survive alongside it.
+    expect(mockPosthog.init).toHaveBeenCalledWith(
+      'key',
+      expect.objectContaining({ opt_out_capturing_by_default: true, loaded: expect.any(Function) }),
+    );
     expect(mockPosthog.capture).toHaveBeenNthCalledWith(1, 'e1', { a: 1 });
     expect(mockPosthog.capture).toHaveBeenNthCalledWith(2, 'e2');
   });
@@ -63,6 +75,31 @@ describe('lazyPosthog proxy', () => {
     const initOrder = mockPosthog.init.mock.invocationCallOrder[0];
     const capOrder = mockPosthog.capture.mock.invocationCallOrder[0];
     expect(initOrder).toBeLessThan(capOrder);
+  });
+
+  /**
+   * Regression: a returning user who already granted consent in a prior
+   * session hits `opt_in_capturing()` inside the caller's `loaded` callback
+   * (see PostHogProvider). If buffered captures flush BEFORE that callback
+   * runs, they're evaluated against the still-default opted-out instance and
+   * silently dropped — even though this specific visitor is consented. A
+   * checkout-return capture fired via `useLayoutEffect` (before PostHog's
+   * own `loaded` has resolved) is exactly this case.
+   */
+  it('flushes buffered captures AFTER the caller\'s loaded() callback runs, not before', async () => {
+    lazyPosthog.capture('checkout_return_landed');
+    const loadedOrder: string[] = [];
+    mockPosthog.opt_in_capturing.mockImplementation(() => loadedOrder.push('opt_in'));
+    mockPosthog.capture.mockImplementation(() => loadedOrder.push('capture'));
+
+    await initLazyPostHog('key', {
+      opt_out_capturing_by_default: true,
+      loaded: (ph: typeof mockPosthog) => {
+        ph.opt_in_capturing();
+      },
+    });
+
+    expect(loadedOrder).toEqual(['opt_in', 'capture']);
   });
 
   it('buffers register / register_once / people.set / people.set_once before load', async () => {
