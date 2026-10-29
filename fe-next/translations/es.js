@@ -21136,6 +21136,26 @@ const es = {
         }
       }
     },
+    "trialChecklist": {
+      "title": "Pon a tu clase a jugar hoy",
+      "subtitle": "Tres pasos. Tu prueba de Teacher Pro está activa.",
+      "progress": "{done} de {total}",
+      "dismiss": "Cerrar lista de pasos",
+      "steps": {
+        "create_classroom": {
+          "title": "Crear una clase",
+          "cta": "Crear clase"
+        },
+        "invite_students": {
+          "title": "Invitar a los alumnos",
+          "cta": "Invitar alumnos"
+        },
+        "first_assignment": {
+          "title": "Asignar la primera tarea",
+          "cta": "Crear tarea"
+        }
+      }
+    },
     "setup": {
       "title": "Nueva clase",
       "subtitle": "Tres elecciones rápidas. Puedes cambiarlas después.",
