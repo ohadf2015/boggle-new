@@ -114,3 +114,24 @@ describe('useAdMob showBanner → WebView repaint (black-screen-on-exit fix)', (
     expect(kickSpy).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('useAdMob showBanner on an ad-free route', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
+    Object.keys(listeners).forEach((k) => delete listeners[k]);
+  });
+
+  it('never dispatches a banner once the page is on an education route', async () => {
+    window.history.replaceState(null, '', '/en/teacher');
+    try {
+      const { result } = renderHook(() => useAdMob(), { wrapper: Wrapper });
+      await act(async () => {
+        await result.current.showBanner();
+      });
+      expect(AdMob.showBanner).not.toHaveBeenCalled();
+    } finally {
+      window.history.replaceState(null, '', '/');
+    }
+  });
+});

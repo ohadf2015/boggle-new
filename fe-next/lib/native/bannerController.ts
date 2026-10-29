@@ -70,6 +70,10 @@ export function selectActiveBannerRequest(
  * paints on top of the modal's content and action buttons (device-confirmed over
  * CreateRoomModal). Modals appear on every route — including in-game ones — so the
  * in-game opt-in does NOT rescue it: while a modal owns the screen, no banner.
+ *
+ * Ad-free routes (`html.ad-free-route`, education/teacher/student/join) are a hard
+ * suppress rather than a withdrawn request: while suppressed every reassert
+ * re-issues hide(), so a banner the native side paints late is taken down again.
  */
 export function shouldSuppressBanner(input: {
   drawerOpen: boolean;
@@ -77,8 +81,10 @@ export function shouldSuppressBanner(input: {
   allowInGame: boolean;
   onboarding?: boolean;
   modalOpen?: boolean;
+  adFreeRoute?: boolean;
 }): boolean {
   return (
+    Boolean(input.adFreeRoute) ||
     Boolean(input.onboarding) ||
     Boolean(input.modalOpen) ||
     input.drawerOpen ||

@@ -5,13 +5,19 @@ import { usePathname } from 'next/navigation';
 import { Capacitor } from '@capacitor/core';
 import { AdMob, BannerAdPluginEvents } from '@capacitor-community/admob';
 import { useSafeArea } from '@/hooks/useSafeArea';
-import { isAllowedAdBannerRoute } from '@/lib/admob-routes';
+import { AD_FREE_ROUTE_CLASS, isAdFreeRoute, isAllowedAdBannerRoute } from '@/lib/admob-routes';
 import { bannerController, BANNER_OWNER } from '@/lib/native/bannerController';
 import { computeBannerMargin } from '@/lib/native/bannerMargin';
 
 export default function AnchoredNativeBanner() {
   const pathname = usePathname();
   const safeArea = useSafeArea();
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.toggle(AD_FREE_ROUTE_CLASS, isAdFreeRoute(pathname, new URLSearchParams(window.location.search)));
+    return () => root.classList.remove(AD_FREE_ROUTE_CLASS);
+  }, [pathname]);
 
   useEffect(() => {
     // isPluginAvailable is stricter than isNativePlatform — on Android WebView
@@ -31,7 +37,8 @@ export default function AnchoredNativeBanner() {
     };
 
     AdMob.addListener(BannerAdPluginEvents.SizeChanged, (info: { height: number }) => {
-      const h = info?.height ?? 0;
+      const adFree = document.documentElement.classList.contains(AD_FREE_ROUTE_CLASS);
+      const h = adFree ? 0 : info?.height ?? 0;
       // Var = banner clearance from viewport bottom (used by in-game content that
       // hides the bottom nav). Android plugin margin adds safe-area; iOS plugin
       // adds safeAreaLayoutGuide internally. Nav-related lift is NOT in this var —
@@ -76,6 +83,14 @@ export default function AnchoredNativeBanner() {
     // so reading location.search here (vs useSearchParams) keeps this null-render
     // banner from forcing a client-side-rendering bailout on every static page.
     const search = new URLSearchParams(window.location.search);
+    if (isAdFreeRoute(pathname, search)) {
+      // The coordinator force-hides on ad-free routes, so nothing will paint into the band.
+      void bannerController.clearRequest(BANNER_OWNER.anchor.key);
+      document.documentElement.style.setProperty('--admob-banner-height', '0px');
+      document.documentElement.classList.remove('has-admob-banner');
+      try { localStorage.setItem('lc_admob_h', '0'); } catch {}
+      return () => { cancelled = true; };
+    }
     if (!isAllowedAdBannerRoute(pathname, search)) {
       // Withdraw the anchor's intent (NOT a global hide — a results page on a
       // game route may still want its InlineBannerAd 'slot' banner; the

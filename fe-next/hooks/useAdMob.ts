@@ -3,6 +3,7 @@ import { AdMob, BannerAdSize, BannerAdPosition, RewardAdPluginEvents, RewardInte
 import { useAdMobContext } from '@/contexts/AdMobContext';
 import type { RewardedSurface, BannerVariant } from '@/lib/admob-config';
 import { kickWebViewRepaint } from '@/lib/native/webviewRepaint';
+import { isAdFreeRoute } from '@/lib/admob-routes';
 import { emitRewardAdActive } from '@/hooks/useRewardAdPause';
 import { trackRewardedLifecycle, trackInterstitialLifecycle, type InterstitialLifecycleStage, type RewardedLifecycleStage } from '@/utils/growthTracking';
 import { trackAdClosed, classifyInterstitialTerminal, classifyRewardedTerminal } from '@/lib/ads/adQuality';
@@ -504,6 +505,11 @@ export function useAdMob() {
     bannerShownRef.current = true;
     try {
       await whenReady();
+      // Re-checked after the await: the route can change to an ad-free one while the plugin initializes.
+      if (isAdFreeRoute(window.location.pathname, new URLSearchParams(window.location.search))) {
+        bannerShownRef.current = false;
+        return;
+      }
       await AdMob.showBanner({
         adId,
         // Full-width anchored adaptive banner (Google-recommended). The native

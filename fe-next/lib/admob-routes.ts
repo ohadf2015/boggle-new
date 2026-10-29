@@ -84,6 +84,9 @@ export function isAllowedAdBannerRoute(
 // `/join` is the class-code join (JoinFlow) — the student's first step into a classroom.
 // `/report` is the parent-report link (Teacher Pro) — a minor's name and
 // activity, opened with no account. Never monetized.
+/** `<html>` class set while an ad-free route is on screen; read by the banner coordinator and CSS. */
+export const AD_FREE_ROUTE_CLASS = 'ad-free-route';
+
 const AD_FREE_ROUTES = ['/education', '/teacher', '/student', '/join', '/admin', '/report'];
 
 /**

@@ -86,6 +86,16 @@ describe('shouldSuppressBanner (pure)', () => {
   });
 });
 
+describe('shouldSuppressBanner — ad-free routes', () => {
+  const idle = { drawerOpen: false, inGame: false, allowInGame: false };
+  it('suppresses on an ad-free (education) route', () => {
+    expect(shouldSuppressBanner({ ...idle, adFreeRoute: true })).toBe(true);
+  });
+  it('is not overridden by the in-game opt-in', () => {
+    expect(shouldSuppressBanner({ ...idle, inGame: true, allowInGame: true, adFreeRoute: true })).toBe(true);
+  });
+});
+
 describe('BannerController', () => {
   let ops: BannerOps & { show: ReturnType<typeof vi.fn>; hide: ReturnType<typeof vi.fn> };
   let c: BannerController;
@@ -248,6 +258,19 @@ describe('BannerController', () => {
     await c.whenIdle();
     c.setRequest('slot', slot(200)); // owner appears while the drawer is still open
     await c.whenIdle();
+    expect(ops.show).not.toHaveBeenCalled();
+  });
+
+  it('re-hides on every reassert while suppressed (a banner painted after the hide is taken down again)', async () => {
+    c.setRequest('anchor', anchor(64));
+    await c.whenIdle();
+    c.setSuppressed(true);
+    await c.whenIdle();
+    ops.hide.mockClear();
+    ops.show.mockClear();
+    c.reassert();
+    await c.whenIdle();
+    expect(ops.hide).toHaveBeenCalledTimes(1);
     expect(ops.show).not.toHaveBeenCalled();
   });
 

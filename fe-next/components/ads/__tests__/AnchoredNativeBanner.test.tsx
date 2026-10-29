@@ -76,7 +76,9 @@ describe('AnchoredNativeBanner', () => {
     mockPathname.current = '/';
     mockPlatform.current = 'ios';
     mockSafeArea.current = { top: 0, bottom: 0, left: 0, right: 0 };
-    document.documentElement.classList.remove('mobile-drawer-open');
+    document.documentElement.classList.remove('mobile-drawer-open', 'ad-free-route', 'has-admob-banner');
+    document.documentElement.style.removeProperty('--admob-banner-height');
+    isVisible.mockReturnValue(false);
   });
   afterEach(() => {
     cleanup();
@@ -414,5 +416,59 @@ describe('AnchoredNativeBanner', () => {
     document.documentElement.style.setProperty('--admob-banner-height', '60px');
     (closedCall![1] as () => void)();
     expect(document.documentElement.style.getPropertyValue('--admob-banner-height')).toBe('0px');
+  });
+
+  describe('education (ad-free) routes', () => {
+    it.each(['/en/teacher', '/he/student/lessons/1', '/en/education/live', '/en/join/AB3K9Z'])(
+      'flags <html>.ad-free-route on %s so the coordinator suppresses every banner owner',
+      async (path) => {
+        mockPathname.current = path;
+        render(<AnchoredNativeBanner />);
+        await Promise.resolve();
+        expect(document.documentElement.classList.contains('ad-free-route')).toBe(true);
+      },
+    );
+
+    it('drops the flag when navigating back to a monetized route', async () => {
+      mockPathname.current = '/en/teacher';
+      const { rerender } = render(<AnchoredNativeBanner />);
+      await Promise.resolve();
+      mockPathname.current = '/en';
+      rerender(<AnchoredNativeBanner />);
+      await Promise.resolve();
+      expect(document.documentElement.classList.contains('ad-free-route')).toBe(false);
+    });
+
+    it('drops the flag on unmount', async () => {
+      mockPathname.current = '/en/teacher';
+      const { unmount } = render(<AnchoredNativeBanner />);
+      await Promise.resolve();
+      unmount();
+      expect(document.documentElement.classList.contains('ad-free-route')).toBe(false);
+    });
+
+    it('frees the reserved bottom band at once, even while a banner is still reported visible', async () => {
+      document.documentElement.style.setProperty('--admob-banner-height', '90px');
+      document.documentElement.classList.add('has-admob-banner');
+      isVisible.mockReturnValue(true);
+      clearRequest.mockReturnValueOnce(new Promise<void>(() => {}));
+      mockPathname.current = '/en/teacher';
+
+      render(<AnchoredNativeBanner />);
+      await Promise.resolve();
+
+      expect(document.documentElement.style.getPropertyValue('--admob-banner-height')).toBe('0px');
+      expect(document.documentElement.classList.contains('has-admob-banner')).toBe(false);
+    });
+
+    it('never reserves a band from a late SizeChanged on an ad-free route', async () => {
+      mockPathname.current = '/en/student';
+      render(<AnchoredNativeBanner />);
+      await Promise.resolve();
+      const sizeChanged = addListener.mock.calls.find((c) => c[0] === 'bannerAdSizeChanged');
+      (sizeChanged![1] as (i: { height: number }) => void)({ height: 60 });
+      expect(document.documentElement.style.getPropertyValue('--admob-banner-height')).toBe('0px');
+      expect(document.documentElement.classList.contains('has-admob-banner')).toBe(false);
+    });
   });
 });
