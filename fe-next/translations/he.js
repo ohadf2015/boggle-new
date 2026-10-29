@@ -4426,6 +4426,10 @@ const he = {
     "host": "מארח",
     "roomClosed": "החדר נסגר",
     "roomTimedOut": "הזמן של החדר שלך נגמר. חוזרים ללובי.",
+    "roomEnded": {
+      "line": "החדר הזה כבר נגמר. קופצים למשחק חדש?",
+      "playNow": "שחקו עכשיו"
+    },
     "rejoinedRoom": "חזרת! התחברת מחדש לחדר {code}",
     "rejoinedGame": "חזרת למשחק!",
     "hostLeftReason": {

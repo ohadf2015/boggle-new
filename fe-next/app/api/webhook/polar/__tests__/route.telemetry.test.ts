@@ -101,7 +101,8 @@ describe('polar webhook — edu_pro_checkout_succeeded', () => {
       current_period_end: '2026-10-01T00:00:00.000Z',
     })))
     expect(res.status).toBe(200)
-    expect(capture.mock.calls.map((c) => c[0].event)).toEqual(['trial_expired'])
+    expect(capture.mock.calls.map((c) => c[0].event)).toEqual(['trial_expired', 'polar_subscription_canceled'])
+    expect(capture.mock.calls[1][0].properties.was_trial).toBe(true)
     expect(capture.mock.calls[0][0].properties.subscription_id).toBe('sub_1')
     expect(capture.mock.calls[0][0].properties.$host).toBe(EDU_ANALYTICS_HOST)
   })
@@ -114,7 +115,7 @@ describe('polar webhook — edu_pro_checkout_succeeded', () => {
       current_period_end: '2026-10-01T00:00:00.000Z',
     })))
     expect(res.status).toBe(200)
-    expect(capture.mock.calls.map((c) => c[0].event)).toEqual(['trial_expired'])
+    expect(capture.mock.calls.map((c) => c[0].event)).toEqual(['trial_expired', 'polar_subscription_revoked'])
   })
 
   it('Given a paid cancel (period past trial_end), When canceled, Then it does not fire trial_expired', async () => {
@@ -124,7 +125,8 @@ describe('polar webhook — edu_pro_checkout_succeeded', () => {
       trial_end: '2026-10-01T00:00:00.000Z',
       current_period_end: '2026-11-08T00:00:00.000Z',
     })))
-    expect(capture).not.toHaveBeenCalled()
+    // Not a trial lapse — only the generic cancel event, never trial_expired.
+    expect(capture.mock.calls.map((c) => c[0].event)).toEqual(['polar_subscription_canceled'])
   })
 
   it.each(['subscription.created', 'subscription.uncanceled', 'subscription.resumed', 'subscription.updated'])(
