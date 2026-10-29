@@ -20254,6 +20254,7 @@ const es = {
       "readyCount": "{ready}/{total} listos",
       "waitingHost": "Esperando al anfitrión",
       "autoIn": "Siguiente ronda en {seconds} s",
+      "autoRematchIn": "Nueva serie en {seconds} s",
       "cancelAuto": "Parar el inicio automático",
       "autoOff": "Inicio automático apagado",
       "rematch": "Revancha",

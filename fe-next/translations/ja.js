@@ -20242,6 +20242,7 @@ const ja = {
       "readyCount": "{ready}/{total} 準備完了",
       "waitingHost": "ホストを待っています",
       "autoIn": "{seconds}秒後に次のラウンド",
+      "autoRematchIn": "{seconds}秒後に新しいシリーズ",
       "cancelAuto": "自動開始を止める",
       "autoOff": "自動開始オフ",
       "rematch": "再戦",

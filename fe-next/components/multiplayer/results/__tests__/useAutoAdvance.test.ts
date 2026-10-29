@@ -73,4 +73,29 @@ describe('useAutoAdvance', () => {
     act(() => { result.current.clearCancel(); });
     expect(sessionStorage.getItem(AUTO_ADVANCE_CANCEL_KEY)).toBeNull();
   });
+
+  describe("cancelScope 'screen' (exp-mp-auto-continue-v1)", () => {
+    it('a tap cancels this screen only: nothing is remembered for the next results', () => {
+      const onFire = vi.fn();
+      const { result } = renderHook(() => useAutoAdvance({ seconds: 10, armed: true, paused: false, enabled: true, onFire, cancelScope: 'screen' }));
+      act(() => { result.current.cancel(); });
+      act(() => { vi.advanceTimersByTime(20_000); });
+      expect(onFire).not.toHaveBeenCalled();
+      expect(result.current.active).toBe(false);
+      expect(sessionStorage.getItem(AUTO_ADVANCE_CANCEL_KEY)).toBeNull();
+      const next = renderHook(() => useAutoAdvance({ seconds: 10, armed: true, paused: false, enabled: true, onFire, cancelScope: 'screen' }));
+      expect(next.result.current.active).toBe(true);
+    });
+
+    it('still honours a host stop (flag set mid-game) on this screen, then lets the next screen re-arm', () => {
+      sessionStorage.setItem(AUTO_ADVANCE_CANCEL_KEY, '1');
+      const onFire = vi.fn();
+      const first = renderHook(() => useAutoAdvance({ seconds: 10, armed: true, paused: false, enabled: true, onFire, cancelScope: 'screen' }));
+      expect(first.result.current.active).toBe(false);
+      expect(sessionStorage.getItem(AUTO_ADVANCE_CANCEL_KEY)).toBeNull();
+      first.unmount();
+      const second = renderHook(() => useAutoAdvance({ seconds: 10, armed: true, paused: false, enabled: true, onFire, cancelScope: 'screen' }));
+      expect(second.result.current.active).toBe(true);
+    });
+  });
 });

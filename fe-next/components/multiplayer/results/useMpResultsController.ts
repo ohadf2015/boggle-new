@@ -25,6 +25,7 @@ import { SERIES_TOTAL_GAMES } from '@/hooks/useSeriesTracker';
 import type { GameModeOption } from '@/components/GameModeSelector';
 import type { ResultsPageProps } from '@/types/components';
 import { useMpNextRound } from './useMpNextRound';
+import { isDuoRoster, useDuoBotRequest } from '../duoBotRequest';
 
 export type MpResultsProps = ResultsPageProps;
 
@@ -235,7 +236,10 @@ export function useMpResultsController(props: MpResultsProps) {
     return wordMap;
   }, [deferredFinalScores]);
 
-  const nextRound = useMpNextRound({ socket, isHost, gameCode, roomLanguage, selectedGameMode });
+  const isClassroom = !!lessonGameData || !!classroomSummary;
+  const isDuo = useMemo(() => isDuoRoster(data.sortedScores), [data.sortedScores]);
+  const duoBot = useDuoBotRequest({ isClassroom, isDuo: isHost && isDuo });
+  const nextRound = useMpNextRound({ socket, isHost, gameCode, roomLanguage, selectedGameMode, duoBot });
   const isSeriesComplete = (seriesRoundNumber ?? 0) >= SERIES_TOTAL_GAMES;
   const { handleStartGame } = nextRound;
   const handleNewSeries = useCallback(() => {
@@ -244,8 +248,6 @@ export function useMpResultsController(props: MpResultsProps) {
   }, [onResetSeries, handleStartGame]);
 
   const showDailyInvite = shouldShowDailyInvite({ isGuest, gameCode, isBotsOnlyGame: data.isBotsOnlyGame, isSeriesComplete });
-  const isClassroom = !!lessonGameData || !!classroomSummary;
-
   useGameKeyboardShortcuts({
     onRematch: onReturnToRoom || undefined,
     onEscape: requestExit,
