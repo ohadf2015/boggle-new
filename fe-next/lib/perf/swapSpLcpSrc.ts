@@ -1,63 +1,60 @@
 /**
- * Upgrade the SSR /singleplayer LCP img from the preloaded still
+ * Upgrade the SSR /singleplayer LCP shell from the preloaded still
  * (/mascot/winner-lcp.webp) to a right-sized animation only after LCP
  * has painted.
  *
- * Lantern models the post-swap src as the simulated LCP resource. The shared
- * happy mascot (/mascot/winner.webp, 160px, 17 frames, ~30KB) took 1.8–2.4s
- * to download on the throttled 1.6Mbps link and made simLCP unwinnable.
- * winner-swap.webp is that same pose at the 112px display box (~6KB, 5 frames)
- * so the modeled download stays under ~400ms. The shared file stays full-size
- * for pages that show the happy mascot larger than this shell.
+ * Lantern attributes simulated LCP to the LCP element's final img src.
+ * Writing winner-swap.webp onto that img (even after the still has painted)
+ * makes the simulated resource the JS-gated swap, and byte cuts cannot
+ * move that number. The animation is therefore a CSS background on
+ * #sp-lcp-anim, an overlay the same 112px box as the still. The img src
+ * stays winner-lcp.webp for the life of the page, so it remains the only
+ * <img> LCP candidate. The overlay is not the full-viewport shell: a
+ * background-image on that box would win LCP by element size.
  *
- * Changing src on the element that already painted does not add a larger
- * entry, so the preloaded shell wins observed LCP. fetchpriority is dropped
- * to low BEFORE the src write so the post-paint fetch is not a High-priority
- * request Lantern can re-attribute to the LCP element.
+ * winner-swap.webp is the same pose at the 112px display box (~6KB, 5
+ * frames). The shared /mascot/winner.webp stays full-size for other pages.
  *
  * Fallback when no LCP entry arrives (observer missing, or nothing painted):
- * window load + afterLoadIdle. Never swaps before one of those two signals.
+ * window load + afterLoadIdle. Never applies the background before one of
+ * those two signals.
  */
 import { afterLoadIdle as defaultAfterLoadIdle } from './afterLoadIdle';
 
 export const SP_LCP_PAINT_ID = 'sp-lcp-paint';
+export const SP_LCP_ANIM_ID = 'sp-lcp-anim';
 export const SP_WINNER_STILL_SRC = '/mascot/winner-lcp.webp';
 export const SP_WINNER_ANIMATED_SRC = '/mascot/winner-swap.webp';
 
-export interface SpLcpImg {
+export interface SpLcpAnimEl {
   getAttribute(name: string): string | null;
   setAttribute(name: string, value: string): void;
-  src: string;
-  fetchPriority?: string;
+  style: { backgroundImage: string };
 }
 
 export type SpLcpIdle = (fn: () => void) => () => void;
 
 export interface ScheduleSpLcpSrcSwapOptions {
   afterLoadIdle?: SpLcpIdle;
-  getImg?: () => SpLcpImg | null;
+  getAnim?: () => SpLcpAnimEl | null;
   animatedSrc?: string;
   Observer?: typeof PerformanceObserver;
 }
 
-export function defaultSpLcpImg(): SpLcpImg | null {
+export function defaultSpLcpAnim(): SpLcpAnimEl | null {
   if (typeof document === 'undefined') return null;
-  const paint = document.getElementById(SP_LCP_PAINT_ID);
-  const img = paint?.querySelector('img');
-  return img instanceof HTMLImageElement ? img : null;
+  const el = document.getElementById(SP_LCP_ANIM_ID);
+  return el instanceof HTMLElement ? el : null;
 }
 
-/** Returns true when the src actually changed. */
+/** Returns true when the background actually changed. Never writes an img src. */
 export function applySpLcpSrcSwap(
-  img: SpLcpImg,
+  el: SpLcpAnimEl,
   animatedSrc: string = SP_WINNER_ANIMATED_SRC,
 ): boolean {
-  const current = img.getAttribute('src') || '';
-  if (current === animatedSrc || current.endsWith(animatedSrc)) return false;
-  img.setAttribute('fetchpriority', 'low');
-  if ('fetchPriority' in img) img.fetchPriority = 'low';
-  img.setAttribute('src', animatedSrc);
-  img.src = animatedSrc;
+  const current = el.style.backgroundImage || '';
+  if (current.includes(animatedSrc)) return false;
+  el.style.backgroundImage = `url("${animatedSrc}")`;
   return true;
 }
 
@@ -65,7 +62,7 @@ export function scheduleSpLcpSrcSwap(
   options: ScheduleSpLcpSrcSwapOptions = {},
 ): () => void {
   const afterIdle = options.afterLoadIdle ?? defaultAfterLoadIdle;
-  const getImg = options.getImg ?? defaultSpLcpImg;
+  const getAnim = options.getAnim ?? defaultSpLcpAnim;
   const animatedSrc = options.animatedSrc ?? SP_WINNER_ANIMATED_SRC;
   const Observer = options.Observer
     ?? (typeof PerformanceObserver !== 'undefined' ? PerformanceObserver : undefined);
@@ -83,9 +80,9 @@ export function scheduleSpLcpSrcSwap(
 
   const trySwap = (): boolean => {
     if (settled) return false;
-    const img = getImg();
-    if (!img) return false;
-    applySpLcpSrcSwap(img, animatedSrc);
+    const el = getAnim();
+    if (!el) return false;
+    applySpLcpSrcSwap(el, animatedSrc);
     settled = true;
     stop();
     return true;
