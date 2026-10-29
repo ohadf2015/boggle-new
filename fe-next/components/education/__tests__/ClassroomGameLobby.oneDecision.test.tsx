@@ -14,7 +14,7 @@
  * screen, because the round-1 regression was entirely one of addition.
  */
 
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, within, waitFor, fireEvent } from '@testing-library/react';
 import * as educationApi from '@/lib/supabase/education';
 import { io } from 'socket.io-client';
 
@@ -160,15 +160,22 @@ describe('ClassroomGameLobby — one screen, one decision', () => {
     }
   });
 
-  /** Class, words and round settings are ONE disclosure, shut on arrival. */
-  it('folds class, words and settings behind a single closed disclosure', async () => {
+  it('orders the setup list, then mode, then one closed Game options door that says what it holds', async () => {
     await renderLobby();
+    const step = screen.getByTestId('lobby-lesson-step');
+    const grid = screen.getByTestId('lobby-mode-grid');
     const summary = screen.getByTestId('lobby-setup-summary');
+    expect(step.compareDocumentPosition(grid) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(grid.compareDocumentPosition(summary) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(summary).toHaveAttribute('aria-expanded', 'false');
+    expect(summary).toHaveTextContent('eduShell.host.gameOptions');
+    expect(screen.getByTestId('lobby-setup-line').textContent).toContain('teacher.classroom.playStyle.ffa');
     expect(screen.queryByTestId('lobby-setup-body')).not.toBeInTheDocument();
 
     fireEvent.click(summary);
-    expect(screen.getByTestId('lobby-setup-body')).toBeInTheDocument();
+    const body = screen.getByTestId('lobby-setup-body');
+    expect(body).toContainElement(screen.getByTestId('pressure-dials'));
+    expect(within(body).queryByRole('radiogroup', { name: /selectClassroom/ })).toBeNull();
   });
 
   /** One primary action on the screen, and it is not inside the scroller. */

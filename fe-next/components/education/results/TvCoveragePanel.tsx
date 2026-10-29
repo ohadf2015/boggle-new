@@ -34,12 +34,12 @@ export function TvCoveragePanel({ summary, players, neverPlaced, stage, pointsWi
   return (
     <section
       data-testid="tv-coverage-panel"
-      className="flex flex-col lg:min-h-0 lg:flex-initial lg:overflow-hidden rounded-neo border-[3px] border-neo-cream bg-neo-navy-elevated px-3 pt-3 pb-0 lg:p-4 shadow-hard"
+      className="flex flex-col @5xl/results:min-h-0 @5xl/results:flex-initial @5xl/results:overflow-hidden rounded-neo border-[3px] border-neo-cream bg-neo-navy-elevated px-3 pt-3 pb-0 @5xl/results:p-4 shadow-hard"
     >
       {verdict === 'wholeLesson' && (
         <p
           data-testid="tv-reteach-whole-lesson"
-          className={phone ? 'mb-2 font-neo-display font-bold text-sm text-neo-cream' : 'mb-3 font-neo-display font-bold text-xl 2xl:text-2xl text-neo-cream'}
+          className={phone ? 'mb-2 font-neo-display font-bold text-sm text-neo-cream' : 'mb-3 font-neo-display font-bold text-xl @[96rem]/results:text-2xl text-neo-cream'}
         >
           {t('education.results.wholeLessonAgain')}
         </p>

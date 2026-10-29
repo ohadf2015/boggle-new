@@ -4,9 +4,7 @@
  * DEV-ONLY preview of the live classroom surfaces, fed with fabricated data so
  * they can be reviewed and captured without running a real round:
  *
- *   /en/education/classroom-game?preview=podium     — the projector results podium (animated reveal)
- *   /en/education/classroom-game?preview=podium&settled=1 — the same podium, reveal already finished
- *   &outcome=zero|solo|tie|nolesson — the honest round-end variants (nobody scored, one player, a shared first, points but no lesson word)
+ *   /en/education/classroom-game?preview=podium     — alias of ?preview=hostresults (emulate reduced motion for the settled podium)
  *   /en/education/classroom-game?preview=projector  — the projector lobby, students popping in
  *   /en/education/classroom-game?preview=waiting    — a student's waiting-for-teacher stage
  *   (&count=N sets the projector roster size, default 12)
@@ -24,17 +22,11 @@ import { useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useNavigation } from '@/contexts/NavigationContext';
-import { ClassroomTvResults } from '@/components/education/results/ClassroomTvResults';
-import EduProjectorLobby from '@/components/education/live/EduProjectorLobby';
+import ProjectorLobby from '@/components/education/projector/ProjectorLobby';
 import Avatar from '@/components/Avatar';
 import { ClassroomWaitingStage } from '@/components/education/lobby/ClassroomWaitingStage';
 import { EducationHeader } from '@/components/education/EducationHeader';
-import {
-  sampleClassroomSummary,
-  samplePreviewPlayers,
-  sampleProjectorStudents,
-  type PreviewOutcome,
-} from '@/components/education/results/previewFixtures';
+import { sampleProjectorStudents } from '@/components/education/results/previewFixtures';
 import { DuelPreview, EndedPreview, HostResultsPreview, PhoneResultsPreview, QuizPreview } from './LiveResultsPreviews';
 
 import type { LiveSurfacePreviewKind } from './previewKinds';
@@ -42,31 +34,6 @@ import { StudentQuizPreview } from './StudentQuizPreview';
 import { InGamePreview } from './InGamePreview';
 
 export type { LiveSurfacePreviewKind };
-
-function PodiumPreview() {
-  const { t } = useLanguage();
-  const params = useSearchParams();
-  // `&settled=1` skips the drumroll so a static capture shows the winner on #1.
-  const settled = params?.get('settled') === '1';
-  const outcomeParam = params?.get('outcome');
-  const outcome: PreviewOutcome =
-    outcomeParam === 'zero' || outcomeParam === 'solo' || outcomeParam === 'tie' || outcomeParam === 'nolesson' ? outcomeParam : 'winner';
-  const summary = useMemo(() => sampleClassroomSummary(outcome), [outcome]);
-  const players = useMemo(() => samplePreviewPlayers(outcome), [outcome]);
-  return (
-    <div data-preview="podium" className="fixed inset-0 z-[80] overflow-hidden bg-neo-navy p-3 md:p-6">
-      <ClassroomTvResults
-        summary={summary}
-        onRematch={() => toast('Preview: rematch')}
-        onChangeGame={() => toast('Preview: switch game')}
-        onBackToClass={() => toast('Preview: back to class')}
-        t={t}
-        players={players}
-        revealSettled={settled}
-      />
-    </div>
-  );
-}
 
 function ProjectorPreview() {
   const { t, language } = useLanguage();
@@ -82,7 +49,7 @@ function ProjectorPreview() {
   }, [shown, roster.length]);
 
   return (
-    <EduProjectorLobby
+    <ProjectorLobby
       gameCode="YHNCF4"
       language={language}
       students={roster.slice(0, shown)}
@@ -151,9 +118,8 @@ export default function LiveSurfacePreview({ kind }: { kind: LiveSurfacePreviewK
     return () => setIsInGame(false);
   }, [setIsInGame]);
 
-  if (kind === 'podium') return <PodiumPreview />;
   if (kind === 'waiting') return <WaitingPreview />;
-  if (kind === 'hostresults') return <HostResultsPreview />;
+  if (kind === 'hostresults' || kind === 'podium') return <HostResultsPreview />;
   if (kind === 'phone') return <PhoneResultsPreview />;
   if (kind === 'quiz') return <QuizPreview />;
   if (kind === 'duel') return <DuelPreview />;

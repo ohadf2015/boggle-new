@@ -23,7 +23,6 @@ function quoted(src: string): string[] {
 describe('education landing contrast', () => {
   const page = read('app/[locale]/education/page.tsx');
   const client = read('app/[locale]/education/PageClient.tsx');
-  const strip = read('components/education/ComparisonStrip.tsx');
   const upsell = read('components/education/DistrictUpsellStrip.tsx');
   const packages = read('components/education/EducationPackages.tsx');
   const header = read('components/education/EducationHeader.tsx');
@@ -61,15 +60,6 @@ describe('education landing contrast', () => {
 
     expect(upsell).not.toContain('text-neo-purple"');
     expect(upsell).toContain('text-neo-purple-light');
-  });
-
-  it('keeps the comparison table solid and above 4.5', () => {
-    // cream/40 lets the page navy through (navy-on-navy). lime-dark on cream
-    // is 2.40. navy/40 on cream is 2.49. navy/50 is 3.30; /80 is 8.91.
-    expect(strip).not.toContain('bg-neo-cream/40');
-    expect(strip).not.toContain('text-neo-lime-dark');
-    expect(strip).not.toContain('text-neo-navy/40');
-    expect(strip).toContain('text-neo-navy/80');
   });
 
   it('does not put black text on a pink wash over navy', () => {

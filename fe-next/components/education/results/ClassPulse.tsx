@@ -25,17 +25,17 @@ const Cell = memo(function Cell({ testId, icon: Icon, value, label, index, activ
   return (
     <m.div
       data-testid={testId}
-      className="flex min-w-0 flex-col justify-center gap-0.5 px-3 py-2 lg:px-4 lg:py-3"
+      className="flex min-w-0 flex-col justify-center gap-0.5 px-3 py-2 @5xl/results:px-4 @5xl/results:py-3"
       initial={false}
       animate={active && !reduce ? { scale: [1, 1.06, 1] } : { scale: 1 }}
       transition={{ duration: 0.45, delay: 0.16 * index, ease: 'easeOut' }}
     >
-      <span className={cn('font-neo-display font-black leading-none tabular-nums text-neo-lime', projector ? 'text-3xl 2xl:text-5xl min-[2200px]:text-7xl' : 'text-2xl')}>
+      <span className={cn('font-neo-display font-black leading-none tabular-nums text-neo-lime', projector ? 'text-3xl @[96rem]/results:text-5xl @[137.5rem]/results:text-7xl' : 'text-2xl')}>
         <span aria-hidden="true">{shown}</span>
         <span className="sr-only">{value}</span>
       </span>
-      <span className={cn('flex min-w-0 items-center gap-1.5 font-neo-body font-bold text-neo-cream/85', projector ? 'text-sm 2xl:text-base min-[2200px]:text-2xl' : 'text-xs')}>
-        <Icon className="size-4 shrink-0 text-neo-cyan 2xl:size-5" aria-hidden="true" />
+      <span className={cn('flex min-w-0 items-center gap-1.5 font-neo-body font-bold text-neo-cream/85', projector ? 'text-sm @[96rem]/results:text-base @[137.5rem]/results:text-2xl' : 'text-xs')}>
+        <Icon className="size-4 shrink-0 text-neo-cyan @[96rem]/results:size-5" aria-hidden="true" />
         <span className={projector ? 'truncate' : 'leading-tight'}>{label}</span>
       </span>
     </m.div>

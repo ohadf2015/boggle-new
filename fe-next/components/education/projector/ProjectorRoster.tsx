@@ -1,86 +1,96 @@
 'use client';
 
-import { memo, useEffect, useMemo, useRef } from 'react';
-import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Check, Users } from 'lucide-react';
+import { memo, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { Check, Loader2, Users, X } from 'lucide-react';
 import Avatar from '@/components/Avatar';
+import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { Avatar as AvatarType } from '@/shared/types/game';
+import type { KickStatus } from '@/hooks/useKickStudent';
 import { cn } from '@/lib/utils';
-import { tr } from '@/components/education/lobby/eduText';
-import { arrivalsSince, chipAccent, chipTilt, rosterDensity } from './projectorLobbyModel';
+import { EDU_MASCOT } from '@/lib/education/mascotArt';
+import { PRESS, tiltOf, type Translate } from '@/components/education/live/eduLiveStyles';
+import { arrivalsSince, chipAccent, isArrivalBurst, recordArrivals, rosterTier } from './projectorLobbyModel';
 
 export interface ProjectorStudent {
   username: string;
   isBot?: boolean;
-  /** The student's stored avatar, when the room carries it. Absent → a face seeded from the name. */
+  /** Stored avatar when the room carries it; absent = a face seeded from the name. */
   avatar?: AvatarType | null;
 }
 
 interface ProjectorRosterProps {
-  /** Already filtered — the host is the screen, never a name on the wall. */
+  /** Already filtered: the host is the screen, never a name on the wall. */
   students: ProjectorStudent[];
   readyUsernames?: string[];
-  t: (path: string, params?: Record<string, string | number>) => string;
+  t: Translate;
+  /** Host-only. Absent = read-only, no edit control. */
+  onRemove?: (username: string) => void;
+  removeStatusOf?: (username: string) => KickStatus;
 }
 
-/**
- * The half of the projector a class actually watches: their own FACES landing
- * on the arena floor, one pop at a time, with a count that bumps every time.
- *
- * Each arrival is a chunky colour-coded chip with the student's avatar, a small
- * tilt and a spring, plus the join sting — the arrival is the reward for typing
- * the code, so it should be worth looking up for. The sting fires only for a
- * name that was not there on the previous render (`arrivalsSince`), so a
- * reconnecting projector does not play thirty stings at once.
- */
-export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRoster({
-  students,
-  readyUsernames = [],
-  t,
-}) {
-  const reduceMotion = useReducedMotion();
-  const { playPlayerJoinedSound } = useSoundEffects();
-  const readySet = useMemo(() => new Set(readyUsernames), [readyUsernames]);
-  const readyCount = students.filter((s) => readySet.has(s.username)).length;
-  // Chip size is a function of how full the room is — a class of 32 has to fit
-  // on the wall, because nobody scrolls a projector. See `rosterDensity`.
-  const density = rosterDensity(students.length);
+interface ArrivalLog {
+  key: string | null;
+  names: string[] | null;
+  /** Chips that landed during a burst stay still for good, so a later render never replays their pop. */
+  still: ReadonlySet<string>;
+  arrived: number;
+}
 
-  const names = useMemo(() => students.map((s) => s.username), [students]);
-  const previousNames = useRef<string[] | null>(null);
+const RECENT_WINDOW_MS = 1000;
+
+function useArrivals(names: string[], onArrive?: () => void): ArrivalLog {
+  const log = useRef<ArrivalLog>({ key: null, names: null, still: new Set(), arrived: 0 });
+  const recent = useRef<number[]>([]);
+  const key = names.join('\u0000');
+  if (log.current.key !== key) {
+    const arrived = arrivalsSince(log.current.names, names);
+    const still = new Set([...log.current.still].filter((name) => names.includes(name)));
+    if (isArrivalBurst(recent.current.length, arrived.length)) arrived.forEach((name) => still.add(name));
+    log.current = { key, names, still, arrived: arrived.length };
+  }
+  const current = log.current;
+  const announce = useRef(onArrive);
   useEffect(() => {
-    const arrived = arrivalsSince(previousNames.current, names);
-    previousNames.current = names;
-    if (arrived.length > 0) playPlayerJoinedSound?.();
-  }, [names, playPlayerJoinedSound]);
+    announce.current = onArrive;
+  }, [onArrive]);
+
+  useEffect(() => {
+    if (current.arrived === 0) return;
+    recent.current = recordArrivals(recent.current, current.arrived, Date.now());
+    announce.current?.();
+    const expire = setTimeout(() => {
+      recent.current = recordArrivals(recent.current, 0, Date.now());
+    }, RECENT_WINDOW_MS);
+    return () => clearTimeout(expire);
+  }, [current]);
+
+  return current;
+}
+
+export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRoster({ students, readyUsernames = [], t, onRemove, removeStatusOf }) {
+  const { playPlayerJoinedSound } = useSoundEffects();
+  const ready = useMemo(() => new Set(readyUsernames), [readyUsernames]);
+  const readyCount = students.filter((s) => ready.has(s.username)).length;
+  const tier = rosterTier(students.length);
+  const names = useMemo(() => students.map((s) => s.username), [students]);
+  const arrivals = useArrivals(names, playPlayerJoinedSound);
+  const [editing, setEditing] = useState(false);
+  const [pending, setPending] = useState<string | null>(null);
+  const canEdit = !!onRemove && students.length > 0;
 
   return (
-    // md:portrait — a portrait wall (768x1024) centres the roster in the band
-    // it owns instead of top-pinning it over ~600px of empty arena.
-    <section className="flex min-h-0 flex-1 flex-col gap-[0.6vw] md:portrait:justify-center md:portrait:gap-[2vw]">
-      <header className="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-1">
-        <span className="inline-flex items-center gap-[0.6vw] rounded-neo-lg border-3 border-neo-cream bg-neo-navy/90 px-[1.2vw] py-[0.2vw] shadow-hard">
-          <Users className="h-[min(7vw,5vh)] w-[min(7vw,5vh)] shrink-0 text-neo-lime md:h-[min(3vw,5vh)] md:w-[min(3vw,5vh)]" aria-hidden="true" />
-          <m.span
-            key={students.length}
-            data-testid="projector-count"
-            initial={reduceMotion ? false : { scale: 1.6, rotate: -6 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 520, damping: 14 }}
-            className="inline-block font-neo-display text-[min(9vw,7vh)] font-black leading-none tabular-nums text-neo-lime md:text-[min(4vw,7vh)]"
-          >
-            {students.length}
-          </m.span>
-          <span
-            data-testid="projector-count-label"
-            className="font-neo-display text-[min(4.4vw,3.4vh)] font-black uppercase tracking-wide text-neo-cream md:text-[min(2vw,3.6vh)]"
-          >
-            {tr(t, 'academy.projector.joined', 'joined')}
+    <section
+      data-testid="projector-roster"
+      className="@container flex min-h-0 flex-1 flex-col gap-[clamp(0.5rem,1.2cqw,1rem)] rounded-neo-lg border-4 border-neo-cream bg-neo-navy/95 p-[clamp(0.75rem,1.4cqw,1.5rem)] shadow-hard-lg"
+    >
+      <header className="flex flex-wrap items-center gap-x-[clamp(0.5rem,1.5cqw,1.5rem)] gap-y-2">
+        <h2 data-testid="projector-count" className="inline-flex items-center gap-[0.3em] font-neo-display font-black leading-none text-neo-cream text-[clamp(1.25rem,min(3.6cqw,4cqh),3.25rem)]">
+          <Users className="size-[1em] shrink-0 text-neo-lime" aria-hidden="true" />
+          <span key={students.length} className="inline-block tabular-nums motion-safe:animate-[edu-live-tick_260ms_cubic-bezier(0.23,1,0.32,1)]">
+            {t('eduLiveRoom.lobby.joined', { count: students.length })}
           </span>
-        </span>
-        {/* Readiness sits WITH the faces it counts: "N / M ready" as a bar
-            that fills as tiles light up below it. */}
+        </h2>
         {students.length > 0 && (
           <div
             data-testid="projector-ready-count"
@@ -88,138 +98,126 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
             aria-valuenow={readyCount}
             aria-valuemin={0}
             aria-valuemax={students.length}
-            aria-label={t('education.projectorLobby.readyCount', { ready: readyCount, total: students.length })}
-            className="flex min-w-0 flex-1 items-center gap-[1vw] rounded-neo-lg border-3 border-neo-cream bg-neo-navy/90 px-[1vw] py-[0.5vw] shadow-hard md:max-w-[36vw]"
+            aria-label={t('eduLiveRoom.lobby.readyCount', { ready: readyCount, total: students.length })}
+            className="flex min-w-[min(100%,12rem)] flex-1 items-center gap-[0.6em] font-neo-body font-bold text-neo-cream/85 text-[clamp(0.875rem,min(1.8cqw,2.2cqh),1.75rem)]"
           >
-            <span className="shrink-0 font-neo-display text-[3.4vw] font-black uppercase leading-none tracking-wide text-neo-lime tabular-nums md:text-[min(1.6vw,3vh)]">
-              {t('education.projectorLobby.readyCount', { ready: readyCount, total: students.length })}
-            </span>
-            <span className="relative h-[2.2vw] min-w-0 flex-1 overflow-hidden rounded-full border-[3px] border-neo-cream bg-neo-navy md:h-[min(1.4vw,2.6vh)]">
+            <span className="shrink-0 tabular-nums">{t('eduLiveRoom.lobby.readyCount', { ready: readyCount, total: students.length })}</span>
+            <span className="relative h-[0.7em] min-w-0 flex-1 overflow-hidden rounded-full border-2 border-neo-cream/60 bg-neo-navy">
               <span
-                data-testid="projector-ready-fill"
                 className="absolute inset-y-0 start-0 rounded-full bg-neo-lime transition-[width] duration-500 ease-out motion-reduce:transition-none"
                 style={{ width: `${Math.round((readyCount / students.length) * 100)}%` }}
               />
             </span>
           </div>
         )}
+        {canEdit && (
+          <button
+            type="button"
+            data-testid="projector-edit-roster"
+            aria-pressed={editing}
+            onClick={() => setEditing((v) => !v)}
+            className={cn(
+              'ms-auto inline-flex min-h-11 items-center gap-1.5 rounded-neo border-2 px-3 font-neo-body text-sm font-bold',
+              editing ? 'border-neo-lime bg-neo-lime/10 text-neo-lime' : 'border-neo-cream/60 bg-neo-navy-light text-neo-cream',
+              PRESS
+            )}
+          >
+            {editing && <Check className="size-4" aria-hidden="true" />}
+            {t(editing ? 'eduLiveRoom.lobby.doneEditing' : 'eduLiveRoom.lobby.editRoster')}
+          </button>
+        )}
       </header>
 
       {students.length === 0 ? (
-        <div
-          data-testid="projector-roster-empty"
-          // The roster is the only flexible row in a `fixed inset-0
-          // overflow-hidden` column, so on a short laptop window it is handed
-          // whatever the join panel and footer leave. `min-h-0` lets the box
-          // shrink, `overflow-hidden` makes it clip its own content instead of
-          // spilling, and the `vh` ceilings shrink the words first.
-          className="flex min-h-0 flex-1 items-center justify-center gap-[2vw] overflow-hidden rounded-neo-lg border-4 border-dashed border-neo-cream/50 bg-neo-navy/70 px-4 py-[1vh] text-center"
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element -- decorative art / avatar data URLs: next/image adds nothing */}
-          <img
-            src="/images/education/share-code.webp"
-            alt=""
-            aria-hidden="true"
-            className="hidden h-[min(18vh,10vw)] w-auto shrink-0 select-none object-contain motion-safe:animate-avatar-float md:block"
-          />
-          <div className="flex min-w-0 flex-col gap-[0.5vh]">
-            <p
-              data-testid="projector-roster-empty-title"
-              className="font-neo-display text-[min(4.4vw,4.5vh)] font-black uppercase leading-tight text-neo-cream md:text-[min(2vw,4vh)]"
-            >
-              {t('education.projectorLobby.nobodyYet')}
-            </p>
-            <p className="font-neo-body text-[min(3vw,3vh)] leading-tight text-neo-cream/80 md:text-[min(1.1vw,2.4vh)]">
-              {t('education.projectorLobby.nobodyYetHint')}
-            </p>
-          </div>
-          <div aria-hidden="true" className="hidden shrink-0 flex-col gap-[0.6vh] md:flex">
-            {Array.from({ length: 3 }, (_, i) => (
-              <span
-                key={i}
-                data-testid="projector-roster-ghost-seat"
-                className="flex h-[min(6vw,6vh)] w-[min(18vw,18vh)] items-center gap-[0.6vw] rounded-neo border-2 border-dashed border-neo-cream/35 px-[0.8vw] motion-safe:animate-pulse"
-                style={{ animationDelay: `${i * 0.25}s` }}
-              >
-                <span className="size-[min(3.4vw,3.4vh)] rounded-full border-2 border-dashed border-neo-cream/35" />
-                <span className="h-[0.7vh] w-[40%] rounded-full bg-neo-cream/20" />
-              </span>
-            ))}
+        <div data-testid="projector-roster-empty" className="grid min-h-0 flex-1 place-items-center p-4 text-center">
+          <div className="flex flex-col items-center gap-[clamp(0.5rem,1cqh,1rem)]">
+            {/* eslint-disable-next-line @next/next/no-img-element -- mascot art map path, decorative */}
+            <img
+              src={EDU_MASCOT.scanJoin}
+              alt=""
+              aria-hidden="true"
+              className="pointer-events-none size-[clamp(6rem,min(24cqw,28cqh),22rem)] select-none motion-safe:animate-[edu-live-bob_2.4s_ease-in-out_infinite]"
+            />
+            <p className="font-neo-display font-black text-neo-cream text-[clamp(1.25rem,min(3.6cqw,4cqh),3rem)]">{t('eduLiveRoom.lobby.waitingTitle')}</p>
+            <p className="max-w-[34ch] font-neo-body font-bold text-neo-cream/75 text-[clamp(0.875rem,min(1.9cqw,2.4cqh),1.75rem)]">{t('eduLiveRoom.lobby.waitingHint')}</p>
           </div>
         </div>
       ) : (
         <ul
           data-testid="projector-roster-list"
-          className={cn(
-            // Top/end padding so a ready tile's corner check is never clipped by the list.
-            'flex min-h-0 flex-1 flex-wrap content-start overflow-y-auto pe-3 pt-3 md:justify-center md:[align-content:safe_center] md:portrait:flex-none md:portrait:overflow-visible md:portrait:pb-3',
-            density.gap
-          )}
+          data-burst={arrivals.still.size > 0 ? 'true' : 'false'}
+          className={cn('grid min-h-0 flex-1 auto-rows-min content-start pe-1 pt-1', tier.grid, tier.scrolls ? 'overflow-y-auto' : 'overflow-visible')}
         >
-          <AnimatePresence initial={false}>
-            {students.map((student, index) => {
-              const isReady = readySet.has(student.username);
-              // Once anyone is ready, the tiles still waiting step back so the
-              // room's holdouts read at a glance. Before that, nobody is dimmed:
-              // an arrival is still the reward for typing the code.
-              const dim = readyCount > 0 && !isReady;
-              return (
-                <m.li
-                  key={student.username}
-                  data-testid="projector-student"
-                  data-ready={isReady ? 'true' : 'false'}
-                  data-glow={isReady ? 'true' : 'false'}
-                  data-dim={dim ? 'true' : 'false'}
-                  initial={reduceMotion ? { scale: 1, rotate: 0, y: 0 } : { scale: 0.2, rotate: -14, y: -40 }}
-                  animate={{ scale: 1, rotate: chipTilt(student.username, index), y: 0 }}
-                  exit={reduceMotion ? undefined : { scale: 0.4 }}
-                  transition={
-                    reduceMotion
-                      ? { duration: 0 }
-                      : { type: 'spring', stiffness: 520, damping: 14, mass: 0.7 }
-                  }
-                  className={cn(
-                    'relative flex max-w-full items-center rounded-neo',
-                    'font-neo-display font-black leading-none',
-                    'transition-[filter,box-shadow] duration-300 motion-reduce:transition-none',
-                    isReady
-                      ? 'shadow-[0_0_0_3px_var(--neo-lime),0_0_1.4em_0.2em_color-mix(in_srgb,var(--neo-lime)_75%,transparent),4px_4px_0_rgb(var(--neo-black))]'
-                      : 'shadow-hard',
-                    dim && 'brightness-[0.62] saturate-[0.55]',
-                    density.chip,
-                    density.portrait,
-                    chipAccent(student.username, index)
-                  )}
-                >
-                  <span
-                    data-testid="projector-avatar"
-                    aria-hidden="true"
-                    className="relative inline-flex h-[1.5em] w-[1.5em] shrink-0 items-center justify-center overflow-hidden rounded-full border-[3px] border-neo-cream bg-neo-navy [&_svg]:h-full [&_svg]:w-full"
-                  >
-                    <Avatar
-                      userId={student.username}
-                      customAvatar={student.avatar?.customAvatar ?? undefined}
-                      size="xl"
-                      disableEffects
-                      className="!h-full !w-full"
-                    />
+          {students.map((student, index) => {
+            const status = removeStatusOf?.(student.username) ?? 'idle';
+            const isReady = ready.has(student.username);
+            return (
+              <li
+                key={student.username}
+                data-testid="projector-student"
+                data-ready={isReady ? 'true' : 'false'}
+                data-dim={readyCount > 0 && !isReady ? 'true' : 'false'}
+                style={{ '--tilt': tiltOf(student.username) } as CSSProperties}
+                className={cn(
+                  'relative flex min-w-0 items-center gap-[0.35em] rounded-full py-[0.15em] pe-[0.6em] ps-[0.15em] font-neo-display font-black leading-none',
+                  isReady ? 'shadow-[0_0_0_3px_var(--neo-lime),4px_4px_0_rgb(var(--neo-black))]' : 'shadow-hard-sm',
+                  readyCount > 0 && !isReady && 'brightness-[0.65] saturate-[0.6]',
+                  !arrivals.still.has(student.username) && 'motion-safe:animate-[edu-live-pop_260ms_cubic-bezier(0.23,1,0.32,1)_backwards]',
+                  tier.chip,
+                  chipAccent(student.username, index)
+                )}
+              >
+                <span aria-hidden="true" className="inline-flex size-[1.5em] shrink-0 overflow-hidden rounded-full border-[3px] border-neo-black bg-neo-cream">
+                  <Avatar userId={student.username} customAvatar={student.avatar?.customAvatar ?? undefined} size="xl" disableEffects className="!h-full !w-full" />
+                </span>
+                <span dir="auto" title={student.username} className="min-w-0 flex-1 truncate">
+                  {student.username}
+                </span>
+                {editing && !student.isBot && status === 'failed' && (
+                  <span data-testid="projector-remove-failed" role="status" className="shrink-0 rounded-full bg-neo-navy px-1.5 font-neo-body text-[0.6em] font-bold text-neo-pink">
+                    {t('eduLiveRoom.lobby.removeFailed')}
                   </span>
-                  <span dir="auto" className="truncate">{student.username}</span>
-                  {isReady && (
-                    <span
-                      data-testid="projector-ready-check"
-                      aria-hidden="true"
-                      className="absolute -end-[0.45em] -top-[0.45em] grid h-[0.95em] w-[0.95em] place-items-center rounded-full border-[3px] border-neo-black bg-neo-lime text-neo-black shadow-hard-sm"
-                    >
-                      <Check className="h-[0.6em] w-[0.6em]" strokeWidth={5} />
-                    </span>
-                  )}
-                  {isReady && <span className="sr-only">{tr(t, 'academy.projector.ready', 'ready')}</span>}
-                </m.li>
-              );
-            })}
-          </AnimatePresence>
+                )}
+                {editing && !student.isBot && (
+                  <button
+                    type="button"
+                    data-testid="projector-remove"
+                    disabled={status === 'removing'}
+                    aria-busy={status === 'removing'}
+                    aria-label={t('eduLiveRoom.lobby.removeStudent', { name: student.username })}
+                    title={t('eduLiveRoom.lobby.removeStudent', { name: student.username })}
+                    onClick={() => setPending(student.username)}
+                    className={cn('grid size-[1.4em] min-h-11 min-w-11 shrink-0 place-items-center rounded-full border-2 border-neo-black bg-neo-cream text-neo-black', PRESS)}
+                  >
+                    {status === 'removing' ? <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : <X className="size-4" strokeWidth={3} aria-hidden="true" />}
+                  </button>
+                )}
+                {!editing && isReady && (
+                  <span data-testid="projector-ready-check" aria-hidden="true" className="absolute -end-1 -top-1 grid size-[0.8em] min-h-4 min-w-4 place-items-center rounded-full border-2 border-neo-black bg-neo-white text-neo-black">
+                    <Check className="size-[0.55em] min-h-2.5 min-w-2.5" strokeWidth={4} />
+                  </span>
+                )}
+              </li>
+            );
+          })}
         </ul>
+      )}
+
+      {onRemove && (
+        <ConfirmationDialog
+          open={pending !== null}
+          onOpenChange={(open) => !open && setPending(null)}
+          title={pending ? t('eduLiveRoom.lobby.removeConfirmTitle', { name: pending }) : undefined}
+          description={t('eduLiveRoom.lobby.removeConfirmBody')}
+          confirmText={t('eduLiveRoom.lobby.removeConfirm')}
+          cancelText={t('common.cancel')}
+          variant="danger"
+          analyticsId="edu_lobby_remove_student"
+          onConfirm={() => {
+            if (pending) onRemove(pending);
+            setPending(null);
+          }}
+        />
       )}
     </section>
   );

@@ -37,7 +37,7 @@ export function RehearsalBotsBlocked({ gameCode, currentMode, t, onApplied, onRe
 
   return (
     <div data-testid="rehearsal-bots-blocked" className={cn('flex flex-col items-start gap-1.5', className)}>
-      <p role="status" className="font-neo-body text-sm font-bold leading-snug text-neo-cream/85 md:text-[0.95vw]">
+      <p role="status" className="font-neo-body font-bold leading-snug text-neo-cream/85 text-[clamp(0.875rem,min(1cqw,1.9cqh),1.5rem)]">
         {t('education.projectorLobby.rehearseBotsBlocked')}
       </p>
       <button
@@ -48,7 +48,7 @@ export function RehearsalBotsBlocked({ gameCode, currentMode, t, onApplied, onRe
           switchTo(REHEARSAL_FALLBACK_MODE);
         }}
         disabled={!!pendingMode}
-        className="inline-flex min-h-11 items-center gap-2 rounded-neo border-3 border-neo-black bg-neo-lime px-4 py-2 font-neo-display text-base font-black text-neo-black shadow-hard transition-transform active:translate-y-0.5 active:shadow-none focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan disabled:opacity-60 md:px-[1.2vw] md:py-[0.5vw] md:text-[1.1vw]"
+        className="inline-flex min-h-11 items-center gap-2 rounded-neo border-3 border-neo-black bg-neo-lime px-4 py-2 font-neo-display font-black text-neo-black shadow-hard transition-transform active:translate-y-0.5 active:shadow-none focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan disabled:opacity-60 text-[clamp(1rem,min(1.1cqw,2cqh),1.75rem)]"
       >
         {t('education.projectorLobby.rehearseUseClassic')}
       </button>

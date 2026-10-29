@@ -76,6 +76,29 @@ describe('EduHostResults reteach', () => {
     expect(onRematch).toHaveBeenCalledTimes(1);
   });
 
+  it('given words most of the class missed, when results show, then reteaching them is the one primary and Play again drops into a quiet row of at most three', () => {
+    const onRematch = vi.fn();
+    render(<EduHostResults summary={summary} players={players} t={t} onRematch={onRematch} onClose={vi.fn()} onExitRoom={vi.fn()} />);
+    const primary = screen.getByTestId('edu-replay-missed');
+    expect(document.querySelectorAll('[data-results-primary]')).toEqual(expect.objectContaining({ length: 1 }));
+    expect(primary).toHaveAttribute('data-results-primary');
+    expect(primary).toHaveTextContent('eduLiveRoom.hostResults.replayMissed');
+    expect(screen.getAllByRole('button').filter((b) => /bg-neo-(lime|pink)(\s|$)/.test(b.className))).toEqual([primary]);
+    const secondary = screen.getByTestId('edu-results-secondary');
+    expect(secondary.querySelectorAll('button')).toHaveLength(3);
+    expect(secondary).toContainElement(screen.getByTestId('edu-results-play-again'));
+    fireEvent.click(screen.getByTestId('edu-results-play-again'));
+    expect(onRematch).toHaveBeenCalledTimes(1);
+    expect(screen.queryByTestId('edu-reteach-panel')).toBeNull();
+  });
+
+  it('given a lesson the class nailed, when results show, then Play again is the primary', () => {
+    const nailed = { ...summary, missedWords: [], coverage: summary.coverage.map((c) => ({ ...c, foundBy: ['Noa', 'Ido', 'Lia'] })) } as ClassroomSummary;
+    render(<EduHostResults summary={nailed} players={players} t={t} onRematch={vi.fn()} onClose={vi.fn()} />);
+    expect(screen.getByTestId('edu-results-play-again')).toHaveAttribute('data-results-primary');
+    expect(screen.queryByTestId('edu-replay-missed')).toBeNull();
+  });
+
   it('given every lesson word went unfound, when results show, then no replay competes with Play again and the coverage panel stays', () => {
     const allMissed = { ...summary, classFoundCount: 0, missedWords: ['osmosis', 'enzyme', 'membrane'], coverage: summary.coverage.map((c) => ({ ...c, foundBy: [] })) } as ClassroomSummary;
     render(<EduHostResults summary={allMissed} players={players} t={t} onRematch={vi.fn()} />);

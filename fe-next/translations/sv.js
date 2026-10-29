@@ -26,7 +26,8 @@ const sv = {
   // @eduPickers:start
   "eduPickers": {
     "language": {
-      "boardHint": "Styr ordlistan och bokstäverna på brädet i klassens spel"
+      "boardHint": "Styr ordlistan och bokstäverna på brädet i klassens spel",
+      "defaultHint": "Nya listor börjar på det här språket. Lektioner kan vara på vilket språk som helst, och varje spel körs på listans språk."
     },
     "board": {
       "label": "Bräde: {language}"
@@ -40,7 +41,14 @@ const sv = {
       "searchPlaceholder": "Sök i dina listor",
       "noMatch": "Inga listor matchar \"{query}\"",
       "noLanguage": "Övrigt",
-      "selectAllIn": "Välj alla på {language}"
+      "selectAllIn": "Välj alla på {language}",
+      "filterLabel": "Visa listor på",
+      "allLanguages": "Alla",
+      "boardSwitched": "Brädet bytte till {language}. Ett spel körs på ett språk."
+    },
+    "content": {
+      "addLanguage": "Lägg till språk",
+      "languageLabel": "Språk"
     }
   },
   // @eduPickers:end
@@ -14272,7 +14280,18 @@ const sv = {
       "body": "Något gick fel hos oss. Försök igen – din klass och dina framsteg finns kvar.",
       "retry": "Försök igen"
     },
-    "notYou": "Inte du? Börja om"
+    "notYou": "Inte du? Börja om",
+    "today": {
+      "title": "Idag",
+      "warmup": "Värm upp",
+      "warmupDone": "All läxa klar",
+      "chest": "Öppna kistan",
+      "chestDone": "Kistan öppnad",
+      "streak": "Håll din {count}-dagarslåga vid liv",
+      "streakDone": "Lågan tänd idag",
+      "warmupCta": "Värm upp inför spelet",
+      "play": "Spela"
+    }
   },
   "teacher": {
     "nav": {
@@ -14851,9 +14870,18 @@ const sv = {
       "studentCountPro": "{{count}} elever",
       "presets": {
         "title": "Snabbritualer",
-        "fridayBattle": { "name": "Fredagens ordkamp", "desc": "Lag · din senaste lista · högljutt och snabbt" },
-        "sped": { "name": "Stöd (SPED)", "desc": "Färre ord · mer tid · större text" },
-        "standard": { "name": "Standard", "desc": "Klassisk 3-minuters alla-mot-alla" }
+        "fridayBattle": {
+          "name": "Fredagens ordkamp",
+          "desc": "Lag · din senaste lista · högljutt och snabbt"
+        },
+        "sped": {
+          "name": "Stöd (SPED)",
+          "desc": "Färre ord · mer tid · större text"
+        },
+        "standard": {
+          "name": "Standard",
+          "desc": "Klassisk 3-minuters alla-mot-alla"
+        }
       },
       "playStyle": {
         "title": "Spelstil",
@@ -15005,7 +15033,8 @@ const sv = {
         "shareTip": "Dela den här koden med dina elever via Google Classroom, e-post eller textmeddelande",
         "pressEscape": "Tryck ESC för att avsluta",
         "exit": "Avsluta presentation"
-      }
+      },
+      "defaultLanguage": "Standardspråk"
     },
     "classrooms": {
       "students": {
@@ -15221,7 +15250,22 @@ const sv = {
       "wordGoalMissing": "Lägg till ett ordmål eller en lista och ett datum",
       "alreadyAssignedUpdated": "Lektionen var redan tilldelad klassen. Vi uppdaterade datum och inställningar.",
       "alreadyAssigned": "Lektionen är redan tilldelad den här klassen",
-      "findNWords": "Hitta {{count}} ord"
+      "findNWords": "Hitta {{count}} ord",
+      "subjectLanguage": "Språk",
+      "templateIntl": {
+        "k2Language": "Språk F–2: Första orden",
+        "k2LanguageDesc": "Korta vardagsord för nya läsare",
+        "k2Science": "F–2 NO: Djur och natur",
+        "k2ScienceDesc": "Djur, växter och väder som barnen redan pratar om",
+        "g35Science": "Åk 3–5 NO: Levande ting",
+        "g35ScienceDesc": "Växter, djur och enkla experiment",
+        "g35Geography": "Åk 3–5 Geografi: Land och karta",
+        "g35GeographyDesc": "Berg, floder och att läsa en karta",
+        "g68Geography": "Åk 6–8 Geografi: Natur och karta",
+        "g68GeographyDesc": "Landskap, klimat och kartord",
+        "g68Science": "Åk 6–8 NO: Kropp och energi",
+        "g68ScienceDesc": "NO-begrepp för högstadiet med enkla förklaringar"
+      }
     },
     "completion": {
       "overallProgress": "Övergripande framsteg",
@@ -15604,19 +15648,19 @@ const sv = {
           "wordcraft": "Ge Word Craft som läxa. Lektionens ord finns på brädet, och en runda räknas bara när eleven verkligen spelar.",
           "leaderboard": "En live-topplista på projektorn som sorteras om när elever går om varandra, och varje elev ser var hen ligger.",
           "chests": "Skattkistor i glosquiz: ett rätt svar öppnar 1 av 3 kistor (vinst, dubbelt, stöld eller byte). På som standard – stäng av i spelinställningarna.",
-          "title": "Klassrumsspelen – ombyggda för mer glädje",
-        },
+          "title": "Klassrumsspelen – ombyggda för mer glädje"
+        }
       },
       "close": "Okej",
       "subtitle": "Varje förbättring av dina klassrumsspel, så fort den släpps.",
       "title": "Nyheter för lärare",
-      "button": "Nyheter",
+      "button": "Nyheter"
     },
     "subscription": {
-      "classLimitReached": "Du har nått gränsen för gratisklasser. Uppgradera till Pro för obegränsat antal klasser.",
+      "classLimitReached": "Du har nått gränsen för gratisklasser. Uppgradera till Pro för obegränsat antal klasser."
     },
     "lobby": {
-      "joinTitle": "Gå med i spelet",
+      "joinTitle": "Gå med i spelet"
     },
     "homework": {
       "takeHomeToggle": "Övningskort att ta hem",
@@ -15792,11 +15836,11 @@ const sv = {
         "multiple_meaning": "Ett ord, två betydelser",
         "roots_affixes": "Vad orddelarna betyder",
         "produce": {
-            "definition": "Läs betydelsen och skriv ordet",
-            "synonym": "Se ett liknande ord och skriv ordet",
-            "antonym": "Se motsatsen och skriv ordet",
-            "context": "Fyll i luckan ur minnet"
-          }
+          "definition": "Läs betydelsen och skriv ordet",
+          "synonym": "Se ett liknande ord och skriv ordet",
+          "antonym": "Se motsatsen och skriv ordet",
+          "context": "Fyll i luckan ur minnet"
+        }
       },
       "locked": {
         "word_tower": "Kräver minst 4 listord på 4–6 bokstäver",
@@ -15853,7 +15897,9 @@ const sv = {
       "teacherHint": "Solo mot en snäll bot. Eleverna spelar från klassens sida.",
       "studentPlay": "Spela WordCraft",
       "needLessonWord": "Bygg minst ett ord från lektionen för att bli klar – eller {count} valfria ord.",
-      "tryAgain": "Försök igen"
+      "tryAgain": "Försök igen",
+      "languageUnsupported": "Word Craft har inga brickor för listans språk än.",
+      "languageFallback": "Word Craft har inga brickor för listans språk än, så den här rundan använder appens språk."
     },
     "vocabFocus": {
       "title": "Ordförrådsfokus",
@@ -16211,7 +16257,6 @@ const sv = {
       "missGapGradePassbackTitle": "Miss-gap-betyg: {{lesson}}",
       "missGapGradePassbackBackHomework": "Tillbaka till miss-gap-läxan",
       "missGapGradePassbackOpen": "Öppna Google Classroom-betygskvitto",
-
       "unpluggedGradePassbackEyebrow": "Betygsåterkoppling till Google Classroom",
       "unpluggedGradePassbackHeading": "Skicka in Unplugged reteach-betyg",
       "unpluggedGradePassbackSubtitle": "Livesessionen är klar. Klassens resultat är redo för Classroom-betygsboken.",
@@ -16228,7 +16273,6 @@ const sv = {
       "unpluggedGradePassbackTitle": "Unplugged-betyg: {{lesson}}",
       "unpluggedGradePassbackBackLive": "Tillbaka till Unplugged Live",
       "unpluggedGradePassbackOpen": "Skicka betyg till Google Classroom",
-
       "missGapWhatsAppEyebrow": "Övning för föräldrar via WhatsApp",
       "missGapWhatsAppHeading": "Skicka miss-gap-övningen hem via WhatsApp",
       "missGapWhatsAppSubtitle": "Skicka övningskortet rakt in i en föräldrachatt med ett tryck. Bara klassens ord, inga elevnamn.",
@@ -16250,7 +16294,7 @@ const sv = {
       "unpluggedReteachPackQrHint": "Skanna för att öppna repetitionen på projektorn",
       "unpluggedReteachPackHowTo": "1) Skriv ut paketet 2) Ge eleverna övningssidorna 3) Skanna QR på lärarskärmen",
       "unpluggedReteachPackPracticeHeading": "Elevövningssidor",
-      "unpluggedReteachPackFooter": "LexiClash · repetitionsblad utan skärmar",
+      "unpluggedReteachPackFooter": "LexiClash · repetitionsblad utan skärmar"
     },
     "classroomAddon": {
       "eyebrow": "Google Classroom Marketplace",
@@ -16263,7 +16307,7 @@ const sv = {
       "privacyNote": "Ingen roster-import. Inga elevnamn. Publicering via Googles dialog. Vi ser aldrig vilken klass du väljer.",
       "postToStream": "Publicera Unplugged-tilldelning till Classroom Stream",
       "openUnplugged": "Öppna Unplugged Live",
-            "needMissedWords": "Lägg till minst ett missat ord för att aktivera tilldelning med ett klick.",
+      "needMissedWords": "Lägg till minst ett missat ord för att aktivera tilldelning med ett klick.",
       "planner": {
         "eyebrow": "Classroom-planerare med fri text",
         "title": "Säg vad du behöver, så fixar vi rätt Live",
@@ -16368,25 +16412,84 @@ const sv = {
       "coinReward": "+{{amount}} mynt"
     },
     "achievements": {
-      "first_lesson": { "name": "Första lektionen", "description": "Klara en lektion från din lärare" },
-      "word_master": { "name": "Ordmästare", "description": "Bemästra nya ord" },
-      "level_climber": { "name": "Nivåklättrare", "description": "Nå en ny nivå" },
-      "xp_collector": { "name": "XP-samlare", "description": "Samla XP från träning" },
-      "practice_veteran": { "name": "Träningsveteran", "description": "Klara träningsrundor" },
-      "speed_demon": { "name": "Snabbtänkare", "description": "Svara innan tiden rinner ut" },
-      "perfect_streak": { "name": "Felfri runda", "description": "Klara en runda utan misstag" },
-      "boss_slayer": { "name": "Bossdräpare", "description": "Besegra en bossrunda" },
-      "combo_master": { "name": "Combomästare", "description": "Bygg ett långt combo" },
-      "streak_starter": { "name": "Svitstartare", "description": "Träna flera dagar i rad" },
-      "early_bird": { "name": "Morgonpigg", "description": "Träna före skolan" },
-      "dedicated_learner": { "name": "Trägen elev", "description": "Träna många olika dagar" },
-      "weekly_warrior": { "name": "Veckokrigare", "description": "Träna varje dag en hel vecka" },
-      "streak_champion": { "name": "Svitmästare", "description": "Håll en lång daglig svit vid liv" },
-      "mode_explorer": { "name": "Spelutforskare", "description": "Testa olika träningsspel" },
-      "lesson_collector": { "name": "Lektionssamlare", "description": "Träna på massor av lektioner" },
-      "classroom_contributor": { "name": "Lagspelare", "description": "Ta poäng åt din klass" },
-      "word_variety": { "name": "Ordsamlare", "description": "Hitta ord av alla slag" },
-      "categories": {"consistency":"Uthållighet","exploration":"Utforskande","progress":"Framsteg","skill":"Färdighet"},
+      "first_lesson": {
+        "name": "Första lektionen",
+        "description": "Klara en lektion från din lärare"
+      },
+      "word_master": {
+        "name": "Ordmästare",
+        "description": "Bemästra nya ord"
+      },
+      "level_climber": {
+        "name": "Nivåklättrare",
+        "description": "Nå en ny nivå"
+      },
+      "xp_collector": {
+        "name": "XP-samlare",
+        "description": "Samla XP från träning"
+      },
+      "practice_veteran": {
+        "name": "Träningsveteran",
+        "description": "Klara träningsrundor"
+      },
+      "speed_demon": {
+        "name": "Snabbtänkare",
+        "description": "Svara innan tiden rinner ut"
+      },
+      "perfect_streak": {
+        "name": "Felfri runda",
+        "description": "Klara en runda utan misstag"
+      },
+      "boss_slayer": {
+        "name": "Bossdräpare",
+        "description": "Besegra en bossrunda"
+      },
+      "combo_master": {
+        "name": "Combomästare",
+        "description": "Bygg ett långt combo"
+      },
+      "streak_starter": {
+        "name": "Svitstartare",
+        "description": "Träna flera dagar i rad"
+      },
+      "early_bird": {
+        "name": "Morgonpigg",
+        "description": "Träna före skolan"
+      },
+      "dedicated_learner": {
+        "name": "Trägen elev",
+        "description": "Träna många olika dagar"
+      },
+      "weekly_warrior": {
+        "name": "Veckokrigare",
+        "description": "Träna varje dag en hel vecka"
+      },
+      "streak_champion": {
+        "name": "Svitmästare",
+        "description": "Håll en lång daglig svit vid liv"
+      },
+      "mode_explorer": {
+        "name": "Spelutforskare",
+        "description": "Testa olika träningsspel"
+      },
+      "lesson_collector": {
+        "name": "Lektionssamlare",
+        "description": "Träna på massor av lektioner"
+      },
+      "classroom_contributor": {
+        "name": "Lagspelare",
+        "description": "Ta poäng åt din klass"
+      },
+      "word_variety": {
+        "name": "Ordsamlare",
+        "description": "Hitta ord av alla slag"
+      },
+      "categories": {
+        "consistency": "Uthållighet",
+        "exploration": "Utforskande",
+        "progress": "Framsteg",
+        "skill": "Färdighet"
+      },
       "ariaDismissError": "Stäng felmeddelandet",
       "ariaOverallProgress": "Övergripande framsteg",
       "completion": "{{percent}}% klart",
@@ -16868,11 +16971,26 @@ const sv = {
       "title": "Så funkar LexiClash i ditt klassrum",
       "subtitle": "Fem snabba steg från noll till ditt första live-ordspel.",
       "steps": {
-        "create": { "title": "Skapa ditt klassrum", "text": "Ett tryck, namnge det och klart." },
-        "share": { "title": "Dela anslutningskoden", "text": "Projicera den på tavlan eller skicka länken." },
-        "join": { "title": "Eleverna ansluter", "text": "Från valfri enhet, inga konton behövs." },
-        "play": { "title": "Kör ett live-ordspel", "text": "Välj en lektion och tryck start." },
-        "results": { "title": "Se resultaten", "text": "Följ varje elevs framsteg i lärarpanelen." }
+        "create": {
+          "title": "Skapa ditt klassrum",
+          "text": "Ett tryck, namnge det och klart."
+        },
+        "share": {
+          "title": "Dela anslutningskoden",
+          "text": "Projicera den på tavlan eller skicka länken."
+        },
+        "join": {
+          "title": "Eleverna ansluter",
+          "text": "Från valfri enhet, inga konton behövs."
+        },
+        "play": {
+          "title": "Kör ett live-ordspel",
+          "text": "Välj en lektion och tryck start."
+        },
+        "results": {
+          "title": "Se resultaten",
+          "text": "Följ varje elevs framsteg i lärarpanelen."
+        }
       },
       "gotIt": "Fattat, kör igång!",
       "showTutorial": "Så funkar det"
@@ -16892,7 +17010,6 @@ const sv = {
         "cta": "Kör hela klassen gratis med tydlig gräns på 50 platser"
       }
     },
-    
     "vsWayground": {
       "starterLimit": {
         "eyebrow": "Gratisplanens bibliotek: ärlig jämförelse",
@@ -17036,7 +17153,7 @@ const sv = {
         "cta": "Kör gratis ordförråd för hela klassen med tydlig gräns på 50 platser"
       }
     },
-"vsBlooket": {
+    "vsBlooket": {
       "gapsSet": {
         "eyebrow": "Efter rapporten – ärlig jämförelse",
         "title": "Blooket: sortera Incorrect%, bygg om en 「Gaps Set」. LexiClash: miss → Live-djuplänk.",
@@ -17146,19 +17263,19 @@ const sv = {
     "starterPacks": {
       "beginnerRussian": {
         "description": "Viktiga ryska ord för nybörjare",
-        "name": "Ryska för nybörjare",
+        "name": "Ryska för nybörjare"
       },
       "beginnerJapanese": {
         "description": "Viktiga japanska ord för nybörjare",
-        "name": "Japanska för nybörjare",
+        "name": "Japanska för nybörjare"
       },
       "beginnerSwedish": {
         "description": "Viktiga svenska ord för nybörjare",
-        "name": "Svenska för nybörjare",
+        "name": "Svenska för nybörjare"
       },
       "beginnerSpanish": {
         "description": "Viktiga spanska ord för nybörjare",
-        "name": "Spanska för nybörjare",
+        "name": "Spanska för nybörjare"
       },
       "title": "Startpaket",
       "subtitle": "Färdiga ordsamlingar",
@@ -17174,6 +17291,56 @@ const sv = {
       "commonEnglish": {
         "name": "Vanlig engelska",
         "description": "Vardagliga engelska ord för alla nivåer"
+      },
+      "sessions": {
+        "title": "Färdiga lektionspass",
+        "subtitle": "Välj ett läge i lektionen. Spel, lista och timer är redan inställda.",
+        "runThis": "Kör det här",
+        "noList": "Ingen lista behövs",
+        "pickList": "Välj lista",
+        "gradeAndUp": "{{grade}} och uppåt"
+      },
+      "themed": {
+        "title": "Säsongs- och temapaket",
+        "subtitle": "Ordlistor med förklaringar, skrivna på klassens språk. Lägg till en och spela i valfritt spel.",
+        "addToLessons": "Lägg till i mina lektioner",
+        "thisSeason": "Just nu",
+        "showAll": "Visa alla {{count}} paket",
+        "showLess": "Visa färre paket"
+      },
+      "session": {
+        "warmUp": {
+          "name": "Uppvärmning på 5 minuter",
+          "when": "Lektionsstart. En snabb bricka med säsongens ord får igång alla."
+        },
+        "exitTicket": {
+          "name": "Exit ticket",
+          "when": "De sista 3 minuterna. Ett kort quiz visar vem som fått koll på dagens ord."
+        },
+        "brainBreak": {
+          "name": "Hjärnpaus",
+          "when": "När orken tryter. Tre snabba minuter Blast, ingen lista att förbereda."
+        },
+        "icebreaker": {
+          "name": "Isbrytare första dagen",
+          "when": "Första dagen eller en ny grupp. Ord om vår klass: hej, vän, dela, hjälpa."
+        },
+        "spellingBee": {
+          "name": "Fredagens stavningstävling",
+          "when": "Veckans slut. Två lagrundor där ni letar veckans ord på brickan."
+        },
+        "testReview": {
+          "name": "Repetition inför prov",
+          "when": "Dagen före provet. Två quizrundor på de viktigaste begreppen, med svaren visade."
+        },
+        "eslStarter": {
+          "name": "Engelska som andraspråk",
+          "when": "För engelskelever. Välj CEFR-nivå från A1 till B2 och öva betydelser."
+        },
+        "earlyFinishers": {
+          "name": "För den som blir klar tidigt",
+          "when": "Några är redan klara. Var och en spelar tyst på sin egen Wordcraft-bricka."
+        }
       }
     },
     "lesson": {
@@ -17200,9 +17367,8 @@ const sv = {
     "student": {
       "join": {
         "alreadyMember": "Du är redan med i den här klassen",
-        "classroomFull": "Klassen är full — be din lärare göra plats.",
-        "button": "Gå med",
         "classroomFull": "Det här klassrummet är fullt",
+        "button": "Gå med",
         "clipboardError": "Kunde inte läsa urklipp",
         "codeHint": "6 bokstäver från din lärare",
         "codeLabel": "Klasskod",
@@ -17528,7 +17694,7 @@ const sv = {
       "cta": "Skapa din första klass",
       "expired_title": "Din lärarprovperiod har tagit slut",
       "expired_kept": "Dina klasser och ordlistor förblir gratis. Rapporter, ordbehärskning och lugnt läge kräver Pro.",
-            "recap": "Under din provperiod — spel du kört: {{games}}, elever i din lista: {{students}}",
+      "recap": "Under din provperiod — spel du kört: {{games}}, elever i din lista: {{students}}",
       "recapGamesOnly": "Under din provperiod — spel du kört: {{games}}",
       "expired_body": "Din gratis provperiod är slut. Ansök igen eller kontakta oss för att behålla klassrumsläget.",
       "renew_cta": "Förnya lärarbehörighet"
@@ -17572,34 +17738,34 @@ const sv = {
       }
     },
     "packages": {
-          "title": "Utbildningspaket",
-          "subtitle": "Teacher Pro är självbetjäning. Skolor och avdelningar: $49 per lärare och år (5+ lärare), faktura eller inköpsorder — begär en offert nedan.",
-          "teacherPro": {
-                "name": "Teacher Pro",
-                "interval": "/mån",
-                "blurb": "Alla rapporter, miss-gap-läxor och omlärningsverktyg för en lärare.",
-                "cta": "Uppgradera för $9/mån"
-          },
-          "school": {
-                "name": "Skolor och avdelningar",
-                "price": "Från $49",
-                "priceFrom": "Från",
-                "interval": "per lärare / år",
-                "priceTerms": "{min}+ lärare · faktura eller inköpsorder",
-                "blurb": "Teacher Pro för varje lärare i ditt team. Faktura eller IO — ingen självbetjäning.",
-                "cta": "Begär skoloffert"
-          },
-          "feature": {
-                "reports": "Alla klassrapporter",
-                "homework": "Läxor på missade ord",
-                "reteach": "Omlärningsverktyg",
-                "wholeClass": "Hela klassen, inte bara en plats",
-                "proPlus": "Alla Teacher Pro-funktioner ingår",
-                "streaks": "Klasserier",
-                "priority": "Prioriterad support",
-                "district": "Utbyggnad för skola och avdelning",
-                "invoice": "Faktura eller inköpsorder"
-          }
+      "title": "Utbildningspaket",
+      "subtitle": "Teacher Pro är självbetjäning. Skolor och avdelningar: $49 per lärare och år (5+ lärare), faktura eller inköpsorder — begär en offert nedan.",
+      "teacherPro": {
+        "name": "Teacher Pro",
+        "interval": "/mån",
+        "blurb": "Alla rapporter, miss-gap-läxor och omlärningsverktyg för en lärare.",
+        "cta": "Uppgradera för $9/mån"
+      },
+      "school": {
+        "name": "Skolor och avdelningar",
+        "price": "Från $49",
+        "priceFrom": "Från",
+        "interval": "per lärare / år",
+        "priceTerms": "{min}+ lärare · faktura eller inköpsorder",
+        "blurb": "Teacher Pro för varje lärare i ditt team. Faktura eller IO — ingen självbetjäning.",
+        "cta": "Begär skoloffert"
+      },
+      "feature": {
+        "reports": "Alla klassrapporter",
+        "homework": "Läxor på missade ord",
+        "reteach": "Omlärningsverktyg",
+        "wholeClass": "Hela klassen, inte bara en plats",
+        "proPlus": "Alla Teacher Pro-funktioner ingår",
+        "streaks": "Klasserier",
+        "priority": "Prioriterad support",
+        "district": "Utbyggnad för skola och avdelning",
+        "invoice": "Faktura eller inköpsorder"
+      }
     }
   },
   "crazygames": {
@@ -20892,7 +21058,8 @@ const sv = {
       "title": "Hjälpcenter för lärare",
       "body": "Guider, 5-minutersintroduktioner och snabba svar.",
       "cta": "Få hjälp"
-    }
+    },
+    "fallbackNote": "Den här guiden är inte översatt till ditt språk än, så den visas på engelska."
   },
   // @eg2Help:end
   // @gameShell:start
@@ -21028,7 +21195,9 @@ const sv = {
       "noWords": "Inga ord den här gången. Nästa gång!",
       "nextRound": "Håll koll på tavlan inför nästa runda",
       "leave": "Lämna",
-      "calculating": "Räknar orden…"
+      "calculating": "Räknar orden…",
+      "classGoal": "Klassens fångst: {found}/{total} ord",
+      "waitNext": "Läraren väljer vad som händer sen. Värm upp medan du väntar."
     }
   }
   // @eduLiveRoom:end
@@ -21172,14 +21341,16 @@ const sv = {
         "g35": "Åk 3–5",
         "g68": "Åk 6–8",
         "g912": "Åk 9 och gymnasiet",
-        "adult": "Vuxna"
+        "adult": "Vuxna",
+        "esl": "Engelska som andraspråk"
       },
       "gradeName": {
         "k2": "F–2-klass",
         "g35": "Åk 3–5-klass",
         "g68": "Åk 6–8-klass",
         "g912": "Gymnasieklass",
-        "adult": "Vuxenklass"
+        "adult": "Vuxenklass",
+        "esl": "Engelskklass"
       },
       "languageLabel": "Spelspråk",
       "languageHint": "Bestämmer vilken ordlista eleverna spelar med.",
@@ -21211,7 +21382,13 @@ const sv = {
         "step2": "Visa koden eller QR-koden på tavlan — eleverna ansluter från mobilen",
         "step3": "Tryck Starta: en runda på 2 minuter, resultaten visas live",
         "start": "Starta en runda på 2 minuter"
-      }
+      },
+      "skip": "Hoppa över så länge",
+      "packLabel": "Ord till ert första spel",
+      "packWords": "{count} ord",
+      "packRecommended": "Vårt tips",
+      "startLive": "Starta livespel",
+      "createOnly": "Skapa bara klassen"
     },
     "host": {
       "classLabel": "Klass",
@@ -21219,7 +21396,21 @@ const sv = {
       "lateJoinHint": "Elever kan ansluta även efter att rundan har börjat.",
       "options": "Alternativ",
       "optionsHide": "Dölj alternativ",
-      "retry": "Försök igen"
+      "retry": "Försök igen",
+      "gameOptions": "Spelinställningar",
+      "moreOptions": "Fler val",
+      "proBadge": "Pro",
+      "lateJoinOn": "Sen anslutning på",
+      "lateJoinOff": "Sen anslutning av",
+      "changeList": "Byt",
+      "listDone": "Klar"
+    },
+    "warmup": {
+      "send": "Skicka en uppvärmning till eleverna",
+      "retry": "Gick inte att skicka. Försök igen",
+      "capped": "Gratisplanens läxgräns är nådd. Med Pro skickar du obegränsat med uppvärmningar.",
+      "status": "{done} av {total} elever har värmt upp",
+      "sent": "Uppvärmningen är skickad"
     }
   },
   // @eduShell:end

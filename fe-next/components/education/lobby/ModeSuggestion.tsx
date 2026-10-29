@@ -83,7 +83,7 @@ export function ModeSuggestion({ selected, isBlocked, onPick, t }: ModeSuggestio
         trackModeSuggestionAccepted({ suggestedMode: suggestion.id, selectedMode: selected, rehearsing: suggestion.rehearsing });
         onPick(suggestion.id);
       }}
-      className="inline-flex min-h-9 max-w-full items-center gap-1.5 rounded-full border-2 border-neo-cream/40 bg-neo-navy/80 px-3 py-1 font-neo-body text-xs font-bold text-neo-cream transition-[transform,border-color] duration-150 hover:border-neo-cream active:scale-[0.97] motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan lg:text-sm"
+      className="inline-flex min-h-11 max-w-full items-center gap-1.5 rounded-full border-2 border-neo-cream/40 bg-neo-navy/80 px-3 py-1 font-neo-body text-xs font-bold text-neo-cream transition-[transform,border-color] duration-150 hover:border-neo-cream active:scale-[0.97] motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan @4xl/lobby:text-sm"
     >
       <Sparkles className="size-4 shrink-0 text-neo-yellow" aria-hidden="true" />
       <span className="truncate">{t('eg2Modes.trySomethingNew', { mode: t(mode.nameKey) })}</span>

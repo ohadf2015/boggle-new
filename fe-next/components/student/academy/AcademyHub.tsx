@@ -44,11 +44,12 @@ import { AcademyDock } from './AcademyDock';
 import { DailyChest } from './DailyChest';
 import StudentLocker from '@/components/education/economy/StudentLocker';
 import { ClassSheet } from './ClassSheet';
-import { FirstDayCard } from './FirstDayCard';
+import { HubTopCards } from './HubTopCards';
+import { studentWarmup } from './todayItems';
+import { canOpenChest } from './dailyChestStore';
 import { buildFirstDayGoals } from './firstDayGoals';
 import { nextOpenAssignment } from '@/components/student/nextOpenAssignment';
 import { shouldOpenClassSheet } from './classSheetDeepLink';
-import { AssignmentDueCard } from './AssignmentDueCard';
 import {
   classifyAssignmentDue,
   isOverdueNudgeDue,
@@ -197,6 +198,7 @@ export function AcademyHub(props: AcademyHubProps) {
     () => nextOpenAssignment(data.lessons, language, classroomId),
     [data.lessons, language, classroomId],
   );
+  const warmup = useMemo(() => studentWarmup(data.lessons, language, classroomId), [data.lessons, language, classroomId]);
   // Due-soon card: the next open assignment lands within 24h. Overdue nudge:
   // only when its once-per-day throttle allows it; marking happens in the
   // effect below, after the card has actually mounted.
@@ -336,21 +338,15 @@ export function AcademyHub(props: AcademyHubProps) {
           <div ref={topRef} className={cn('pointer-events-auto', rail && 'min-w-0 max-w-md flex-1')}>
             {hud}
             {ready && (
-              <div className="mx-auto mt-1.5 w-full max-w-xl">
-                <FirstDayCard goals={firstDayGoals} hasClass={!!classroomId} />
-                {dueCard && nextAssignment && (
-                  <div className="mt-1.5">
-                    <AssignmentDueCard
-                      assignmentId={nextAssignment.assignmentId}
-                      classroomId={classroomId}
-                      title={nextAssignment.title}
-                      href={nextAssignment.href}
-                      dueDate={dueCard.dueDate}
-                      kind={dueCard.kind}
-                    />
-                  </div>
-                )}
-              </div>
+              <HubTopCards
+                goals={firstDayGoals}
+                classroomId={classroomId}
+                warmup={warmup}
+                due={dueCard && nextAssignment ? { ...nextAssignment, ...dueCard } : null}
+                chestOpen={canOpenChest(userId, new Date())}
+                streak={data.streak}
+                streakDoneToday={data.streakDoneToday}
+              />
             )}
           </div>
           {/* Phone: the chest is a small badge on the START side, away from the totals (end).

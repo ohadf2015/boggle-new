@@ -44,6 +44,9 @@ export interface LevelUpCelebrationProps {
 // COMPONENT
 // ==============================================
 
+/** Transform only: the overlay itself appears static (no opacity tween on a fullscreen layer). */
+const LEVEL_UP_KEYFRAMES = '@keyframes lvl-pop{0%{transform:scale(0.85) translateY(8px)}60%{transform:scale(1.04)}100%{transform:none}}';
+
 const LevelUpCelebration = memo<LevelUpCelebrationProps>(
   ({ levelUpData, onClose }) => {
     const { t } = useLanguage();
@@ -69,7 +72,7 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
 
     return (
       <>
-        {/* Overlay */}
+        <style>{LEVEL_UP_KEYFRAMES}</style>
         <div
           role="dialog"
           aria-modal="true"
@@ -77,8 +80,7 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
           className={cn(
             'fixed inset-0 z-60',
             'flex items-center justify-center',
-            'bg-neo-black/80 backdrop-blur-xs',
-            'animate-in fade-in-0 duration-300'
+            'bg-neo-black/80'
           )}
           onClick={onClose}
         >
@@ -91,15 +93,12 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
               'rounded-neo shadow-hard-lg',
               'p-6 md:p-8',
               'text-center',
-              'animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300'
+              'motion-safe:animate-[lvl-pop_320ms_cubic-bezier(0.23,1,0.32,1)_both]'
             )}
             onClick={(e: React.MouseEvent) => e.stopPropagation()}
           >
             {/* Celebration mascot */}
-            <div
-              className="mb-4 animate-in zoom-in-50 duration-300"
-              style={{ animationDelay: '0.2s' }}
-            >
+            <div className="mb-4">
               <SilentVideo
                 src="/mascot/celebration.webp"
                 width={96}
@@ -116,7 +115,6 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
               className={cn(
                 'text-3xl md:text-4xl font-black',
                 'text-neo-lime',
-                'drop-shadow-[0_0_15px_rgb(255_225_53/0.6)]',
                 'mb-4'
               )}
             >
@@ -134,15 +132,13 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
                   'w-20 h-20 md:w-24 md:h-24',
                   'bg-neo-pink/20 border-4 border-neo-pink',
                   'rounded-full',
-                  'animate-in zoom-in-50 duration-300'
+                  'motion-safe:animate-[lvl-pop_320ms_cubic-bezier(0.23,1,0.32,1)_both] motion-safe:[animation-delay:200ms]'
                 )}
-                style={{ animationDelay: '0.4s' }}
               >
                 <span
                   className={cn(
                     'text-4xl md:text-5xl font-black tabular-nums',
-                    'text-neo-pink',
-                    'drop-shadow-[0_0_10px_rgb(255_107_53/0.5)]'
+                    'text-neo-pink'
                   )}
                 >
                   {levelUpData.newLevel}
@@ -155,24 +151,17 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
               <div
                 className={cn(
                   'mb-6 p-4 rounded-neo',
-                  'bg-neo-pink/20 border-[3px] border-neo-pink',
-                  'animate-in fade-in-0 slide-in-from-bottom-2 duration-300'
+                  'bg-neo-pink/20 border-[3px] border-neo-pink'
                 )}
-                style={{ animationDelay: '0.6s' }}
               >
                 <p className="text-neo-pink font-bold text-sm uppercase tracking-wide mb-2">
                   {t('education.xp.newTitleUnlocked')}
                 </p>
                 <div className="space-y-1">
-                  {newTitles.map((title, index) => (
+                  {newTitles.map((title) => (
                     <p
                       key={title}
-                      className={cn(
-                        'text-lg md:text-xl font-black',
-                        'text-neo-white',
-                        'animate-in fade-in-0 slide-in-from-left-2 duration-300 fill-mode-both'
-                      )}
-                      style={{ animationDelay: `${0.7 + index * 0.1}s` }}
+                      className="text-lg md:text-xl font-black text-neo-white"
                     >
                       {title}
                     </p>
@@ -192,10 +181,8 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
                 'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5',
                 'active:translate-y-0.5 active:shadow-hard-pressed',
                 'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
-                'transition-all duration-200',
-                'animate-in fade-in-0 slide-in-from-bottom-2 duration-300'
+                'transition-transform duration-200'
               )}
-              style={{ animationDelay: '0.8s' }}
             >
               {t('education.xp.continue')}
             </button>

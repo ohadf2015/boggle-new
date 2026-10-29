@@ -77,7 +77,7 @@ export function ClassChest({ found, total, open, t }: ClassChestProps) {
           <span className="sr-only">{open ? found : ''}</span>
         </span>
         {open && total > 0 && (
-          <span className="hidden font-neo-body font-black leading-tight lg:block" style={{ fontSize: '1.35cqw' }}>
+          <span className="hidden font-neo-body font-black leading-tight @5xl/results:block" style={{ fontSize: '1.35cqw' }}>
             {tr(t, 'academy.results.classChestWords', 'words found of {{total}}', { total })}
           </span>
         )}

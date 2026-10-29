@@ -26,7 +26,8 @@ const es = {
   // @eduPickers:start
   "eduPickers": {
     "language": {
-      "boardHint": "Define el diccionario y las letras del tablero en los juegos de esta clase"
+      "boardHint": "Define el diccionario y las letras del tablero en los juegos de esta clase",
+      "defaultHint": "Las listas nuevas empiezan en este idioma. Las lecciones pueden estar en cualquier idioma y cada partida se juega en el de su lista."
     },
     "board": {
       "label": "Tablero: {language}"
@@ -40,7 +41,14 @@ const es = {
       "searchPlaceholder": "Busca en tus listas",
       "noMatch": "Ninguna lista coincide con \"{query}\"",
       "noLanguage": "Otro",
-      "selectAllIn": "Seleccionar todo en {language}"
+      "selectAllIn": "Seleccionar todo en {language}",
+      "filterLabel": "Mostrar listas en",
+      "allLanguages": "Todas",
+      "boardSwitched": "El tablero cambió a {language}. Cada partida se juega en un solo idioma."
+    },
+    "content": {
+      "addLanguage": "Añadir idioma",
+      "languageLabel": "Idioma"
     }
   },
   // @eduPickers:end
@@ -13923,6 +13931,17 @@ const es = {
       "recentDuels": "Duelos recientes",
       "viewDuelHistory": "Ver historial completo",
       "winRate": "Tasa de victorias"
+    },
+    "today": {
+      "title": "Hoy",
+      "warmup": "Calentar",
+      "warmupDone": "Tareas al día",
+      "chest": "Abre tu cofre",
+      "chestDone": "Cofre abierto",
+      "streak": "Mantén tu racha de {count} días",
+      "streakDone": "Racha encendida hoy",
+      "warmupCta": "Calienta para el juego",
+      "play": "Jugar"
     }
   },
   "teacher": {
@@ -14482,9 +14501,18 @@ const es = {
       "studentCountPro": "{{count}} alumnos",
       "presets": {
         "title": "Rituales rápidos",
-        "fridayBattle": { "name": "Batalla de vocabulario del viernes", "desc": "Equipos · tu última lista · rápido y ruidoso" },
-        "sped": { "name": "Apoyo (SPED)", "desc": "Menos palabras · más tiempo · letra grande" },
-        "standard": { "name": "Estándar", "desc": "Todos contra todos, 3 minutos clásicos" }
+        "fridayBattle": {
+          "name": "Batalla de vocabulario del viernes",
+          "desc": "Equipos · tu última lista · rápido y ruidoso"
+        },
+        "sped": {
+          "name": "Apoyo (SPED)",
+          "desc": "Menos palabras · más tiempo · letra grande"
+        },
+        "standard": {
+          "name": "Estándar",
+          "desc": "Todos contra todos, 3 minutos clásicos"
+        }
       },
       "playStyle": {
         "title": "Estilo de juego",
@@ -14588,7 +14616,7 @@ const es = {
         "createFailed": "No se pudo crear la clase",
         "updateFailed": "No se pudo actualizar la clase",
         "deleteFailed": "No se pudo eliminar la clase",
-            "copyFailed": "No se pudo copiar el código. Inténtalo de nuevo."
+        "copyFailed": "No se pudo copiar el código. Inténtalo de nuevo."
       },
       "dialog": {
         "createDescription": "Crea una nueva clase para tus estudiantes",
@@ -14636,7 +14664,8 @@ const es = {
           "title": "Compártelo con tus alumnos",
           "body": "Mándales el código. Sin cuentas."
         }
-      }
+      },
+      "defaultLanguage": "Idioma predeterminado"
     },
     "classrooms": {
       "students": {
@@ -15209,7 +15238,22 @@ const es = {
       "wordGoalMissing": "Añade una meta o una lista y una fecha",
       "alreadyAssignedUpdated": "Esta lección ya estaba asignada a esta clase. Actualizamos la fecha y los ajustes.",
       "alreadyAssigned": "Esta lección ya está asignada a esta clase",
-      "findNWords": "Encuentra {{count}} palabras"
+      "findNWords": "Encuentra {{count}} palabras",
+      "subjectLanguage": "Lengua",
+      "templateIntl": {
+        "k2Language": "1.º–2.º Lengua: primeras palabras",
+        "k2LanguageDesc": "Palabras cortas del día a día para quienes empiezan a leer",
+        "k2Science": "1.º–2.º Ciencias: animales y naturaleza",
+        "k2ScienceDesc": "Animales, plantas y tiempo de los que ya hablan los peques",
+        "g35Science": "3.º–5.º Ciencias: seres vivos",
+        "g35ScienceDesc": "Plantas, animales y experimentos sencillos",
+        "g35Geography": "3.º–5.º Geografía: relieve y mapa",
+        "g35GeographyDesc": "Montañas, ríos y cómo leer un mapa",
+        "g68Geography": "6.º–8.º Geografía: relieve y mapa",
+        "g68GeographyDesc": "Relieve, clima y palabras para leer mapas",
+        "g68Science": "6.º–8.º Ciencias: cuerpo y energía",
+        "g68ScienceDesc": "Términos de ciencias de secundaria con significados claros"
+      }
     },
     "completion": {
       "overallProgress": "Progreso general",
@@ -15256,19 +15300,19 @@ const es = {
           "wordcraft": "Asigna Word Craft como tarea. Las palabras de la lección aparecen en el tablero, y una ronda solo cuenta si el alumno juega de verdad.",
           "leaderboard": "Una clasificación en directo en el proyector que se reordena cuando los alumnos se adelantan, y cada alumno ve en qué puesto va.",
           "chests": "Cofres de premio en los cuestionarios de vocabulario: una respuesta correcta abre 1 de 3 cofres (ganar, doble, robar o intercambiar). Activado por defecto; puedes desactivarlo en los ajustes del juego.",
-          "title": "Los juegos de clase, rehechos para que sean más divertidos",
-        },
+          "title": "Los juegos de clase, rehechos para que sean más divertidos"
+        }
       },
       "close": "Entendido",
       "subtitle": "Cada mejora de tus juegos de clase, en cuanto sale.",
       "title": "Novedades para docentes",
-      "button": "Novedades",
+      "button": "Novedades"
     },
     "subscription": {
-      "classLimitReached": "Has alcanzado el límite de clases gratuitas. Pásate a Pro para tener clases ilimitadas.",
+      "classLimitReached": "Has alcanzado el límite de clases gratuitas. Pásate a Pro para tener clases ilimitadas."
     },
     "lobby": {
-      "joinTitle": "Únete al juego",
+      "joinTitle": "Únete al juego"
     },
     "homework": {
       "takeHomeToggle": "Tarjeta de práctica para casa",
@@ -15444,11 +15488,11 @@ const es = {
         "multiple_meaning": "Una palabra, dos significados",
         "roots_affixes": "Qué significan las partes de la palabra",
         "produce": {
-            "definition": "Lee el significado y escribe la palabra",
-            "synonym": "Ve una palabra similar y escribe la palabra",
-            "antonym": "Ve lo contrario y escribe la palabra",
-            "context": "Completa el espacio de memoria"
-          }
+          "definition": "Lee el significado y escribe la palabra",
+          "synonym": "Ve una palabra similar y escribe la palabra",
+          "antonym": "Ve lo contrario y escribe la palabra",
+          "context": "Completa el espacio de memoria"
+        }
       },
       "locked": {
         "word_tower": "Necesita 4 palabras de la lista de 4 a 6 letras",
@@ -15505,7 +15549,9 @@ const es = {
       "teacherHint": "En solitario contra un bot amistoso. Se juega desde la página de la clase.",
       "studentPlay": "Jugar WordCraft",
       "needLessonWord": "Para terminar, forma al menos una palabra de la lección, o {count} palabras cualesquiera.",
-      "tryAgain": "Otra vez"
+      "tryAgain": "Otra vez",
+      "languageUnsupported": "Word Craft aún no tiene fichas en el idioma de esta lista.",
+      "languageFallback": "Word Craft aún no tiene fichas en el idioma de la lista, así que esta ronda usa el idioma de la app."
     },
     "vocabFocus": {
       "title": "Enfoque de vocabulario",
@@ -15863,7 +15909,6 @@ const es = {
       "missGapGradePassbackTitle": "Nota miss-gap: {{lesson}}",
       "missGapGradePassbackBackHomework": "Volver a la tarea miss-gap",
       "missGapGradePassbackOpen": "Abrir recibo de nota de Google Classroom",
-
       "unpluggedGradePassbackEyebrow": "Devolución de notas a Google Classroom",
       "unpluggedGradePassbackHeading": "Entregar nota de Unplugged reteach",
       "unpluggedGradePassbackSubtitle": "Sesión en vivo lista: las palabras superadas por la clase van al libro de calificaciones de Classroom.",
@@ -15880,7 +15925,6 @@ const es = {
       "unpluggedGradePassbackTitle": "Nota Unplugged: {{lesson}}",
       "unpluggedGradePassbackBackLive": "Volver a Unplugged Live",
       "unpluggedGradePassbackOpen": "Enviar nota a Google Classroom",
-
       "missGapWhatsAppEyebrow": "Práctica para padres por WhatsApp",
       "missGapWhatsAppHeading": "Enviar la práctica miss-gap a casa por WhatsApp",
       "missGapWhatsAppSubtitle": "Envía la tarjeta de práctica al chat de las familias con un toque: solo palabras de la clase, sin nombres de estudiantes.",
@@ -15902,7 +15946,7 @@ const es = {
       "unpluggedReteachPackQrHint": "Escanea para abrir el repaso en el proyector",
       "unpluggedReteachPackHowTo": "1) Imprime este pack 2) Entrega las páginas de práctica 3) Escanea el QR en la pantalla del docente",
       "unpluggedReteachPackPracticeHeading": "Páginas de práctica del alumno",
-      "unpluggedReteachPackFooter": "LexiClash · hoja de repaso sin dispositivos",
+      "unpluggedReteachPackFooter": "LexiClash · hoja de repaso sin dispositivos"
     },
     "classroomAddon": {
       "eyebrow": "Marketplace de Google Classroom",
@@ -15915,7 +15959,7 @@ const es = {
       "privacyNote": "Sin importar listas. Sin nombres de alumnos. La publicación usa el diálogo de Google. Nunca vemos qué clase eliges.",
       "postToStream": "Publicar Unplugged en el Stream de Classroom",
       "openUnplugged": "Abrir Unplugged Live",
-            "needMissedWords": "Añade al menos una palabra fallada para activar la asignación en un clic.",
+      "needMissedWords": "Añade al menos una palabra fallada para activar la asignación en un clic.",
       "planner": {
         "eyebrow": "Planificador conversacional de Classroom",
         "title": "Di qué necesitas y te preparamos el Live",
@@ -16020,25 +16064,84 @@ const es = {
       "coinReward": "+{{amount}} monedas"
     },
     "achievements": {
-      "first_lesson": { "name": "Primera lección", "description": "Termina una lección de tu profe" },
-      "word_master": { "name": "Maestro de palabras", "description": "Domina palabras nuevas" },
-      "level_climber": { "name": "Sube de nivel", "description": "Alcanza un nivel nuevo" },
-      "xp_collector": { "name": "Coleccionista de XP", "description": "Acumula XP practicando" },
-      "practice_veteran": { "name": "Veterano del repaso", "description": "Completa rondas de práctica" },
-      "speed_demon": { "name": "Rapidísimo", "description": "Responde antes de que suene el reloj" },
-      "perfect_streak": { "name": "Ronda perfecta", "description": "Termina una ronda sin fallos" },
-      "boss_slayer": { "name": "Caza jefes", "description": "Gana una ronda contra el jefe" },
-      "combo_master": { "name": "Maestro del combo", "description": "Encadena un combo largo" },
-      "streak_starter": { "name": "Racha iniciada", "description": "Practica varios días seguidos" },
-      "early_bird": { "name": "Madrugador", "description": "Practica antes de clase" },
-      "dedicated_learner": { "name": "Constante", "description": "Practica en muchos días distintos" },
-      "weekly_warrior": { "name": "Semana completa", "description": "Practica todos los días de una semana" },
-      "streak_champion": { "name": "Campeón de rachas", "description": "Mantén viva una racha larga" },
-      "mode_explorer": { "name": "Explorador de juegos", "description": "Prueba juegos de práctica distintos" },
-      "lesson_collector": { "name": "Coleccionista de lecciones", "description": "Practica muchísimas lecciones" },
-      "classroom_contributor": { "name": "Compañero de equipo", "description": "Suma puntos para tu clase" },
-      "word_variety": { "name": "Cazador de palabras", "description": "Encuentra palabras de todo tipo" },
-      "categories": {"consistency":"Constancia","exploration":"Exploración","progress":"Progreso","skill":"Habilidad"},
+      "first_lesson": {
+        "name": "Primera lección",
+        "description": "Termina una lección de tu profe"
+      },
+      "word_master": {
+        "name": "Maestro de palabras",
+        "description": "Domina palabras nuevas"
+      },
+      "level_climber": {
+        "name": "Sube de nivel",
+        "description": "Alcanza un nivel nuevo"
+      },
+      "xp_collector": {
+        "name": "Coleccionista de XP",
+        "description": "Acumula XP practicando"
+      },
+      "practice_veteran": {
+        "name": "Veterano del repaso",
+        "description": "Completa rondas de práctica"
+      },
+      "speed_demon": {
+        "name": "Rapidísimo",
+        "description": "Responde antes de que suene el reloj"
+      },
+      "perfect_streak": {
+        "name": "Ronda perfecta",
+        "description": "Termina una ronda sin fallos"
+      },
+      "boss_slayer": {
+        "name": "Caza jefes",
+        "description": "Gana una ronda contra el jefe"
+      },
+      "combo_master": {
+        "name": "Maestro del combo",
+        "description": "Encadena un combo largo"
+      },
+      "streak_starter": {
+        "name": "Racha iniciada",
+        "description": "Practica varios días seguidos"
+      },
+      "early_bird": {
+        "name": "Madrugador",
+        "description": "Practica antes de clase"
+      },
+      "dedicated_learner": {
+        "name": "Constante",
+        "description": "Practica en muchos días distintos"
+      },
+      "weekly_warrior": {
+        "name": "Semana completa",
+        "description": "Practica todos los días de una semana"
+      },
+      "streak_champion": {
+        "name": "Campeón de rachas",
+        "description": "Mantén viva una racha larga"
+      },
+      "mode_explorer": {
+        "name": "Explorador de juegos",
+        "description": "Prueba juegos de práctica distintos"
+      },
+      "lesson_collector": {
+        "name": "Coleccionista de lecciones",
+        "description": "Practica muchísimas lecciones"
+      },
+      "classroom_contributor": {
+        "name": "Compañero de equipo",
+        "description": "Suma puntos para tu clase"
+      },
+      "word_variety": {
+        "name": "Cazador de palabras",
+        "description": "Encuentra palabras de todo tipo"
+      },
+      "categories": {
+        "consistency": "Constancia",
+        "exploration": "Exploración",
+        "progress": "Progreso",
+        "skill": "Habilidad"
+      },
       "ariaDismissError": "Descartar error",
       "ariaOverallProgress": "Progreso general",
       "completion": "{{percent}}% completado",
@@ -16520,11 +16623,26 @@ const es = {
       "title": "Cómo funciona LexiClash en tu clase",
       "subtitle": "Cinco pasos rápidos de cero a tu primer juego de palabras en vivo.",
       "steps": {
-        "create": { "title": "Crea tu clase", "text": "Un toque: ponle nombre y listo." },
-        "share": { "title": "Comparte el código", "text": "Proyéctalo en la pizarra o envía el enlace." },
-        "join": { "title": "Los alumnos se unen", "text": "Desde cualquier dispositivo, sin cuentas." },
-        "play": { "title": "Juega en vivo", "text": "Elige una lección y pulsa empezar." },
-        "results": { "title": "Mira los resultados", "text": "Sigue el progreso de cada alumno en tu panel." }
+        "create": {
+          "title": "Crea tu clase",
+          "text": "Un toque: ponle nombre y listo."
+        },
+        "share": {
+          "title": "Comparte el código",
+          "text": "Proyéctalo en la pizarra o envía el enlace."
+        },
+        "join": {
+          "title": "Los alumnos se unen",
+          "text": "Desde cualquier dispositivo, sin cuentas."
+        },
+        "play": {
+          "title": "Juega en vivo",
+          "text": "Elige una lección y pulsa empezar."
+        },
+        "results": {
+          "title": "Mira los resultados",
+          "text": "Sigue el progreso de cada alumno en tu panel."
+        }
       },
       "gotIt": "Entendido, a enseñar",
       "showTutorial": "Cómo funciona"
@@ -16544,7 +16662,6 @@ const es = {
         "cta": "Organiza toda la clase con un tope gratis claro de 50"
       }
     },
-    
     "vsWayground": {
       "starterLimit": {
         "eyebrow": "Biblioteca del plan gratis: comparación honesta",
@@ -16688,7 +16805,7 @@ const es = {
         "cta": "Organiza vocabulario gratis para toda la clase con un límite claro de 50 asientos"
       }
     },
-"vsBlooket": {
+    "vsBlooket": {
       "gapsSet": {
         "eyebrow": "Después del informe: comparación honesta",
         "title": "Blooket: ordenar Incorrect%, reconstruir un 「Gaps Set」. LexiClash: miss → deep-link a Live.",
@@ -16826,6 +16943,56 @@ const es = {
       "beginnerRussian": {
         "name": "Ruso para principiantes",
         "description": "Palabras esenciales de ruso para principiantes"
+      },
+      "sessions": {
+        "title": "Sesiones listas para usar",
+        "subtitle": "Elige un momento de la clase. El juego, la lista y el tiempo ya están puestos.",
+        "runThis": "Jugar esta",
+        "noList": "Sin lista",
+        "pickList": "Elige una lista",
+        "gradeAndUp": "{{grade}} en adelante"
+      },
+      "themed": {
+        "title": "Paquetes de temporada y temáticos",
+        "subtitle": "Listas de palabras con significado, escritas en el idioma de tu clase. Añade una y úsala en cualquier juego.",
+        "addToLessons": "Añadir a mis lecciones",
+        "thisSeason": "Esta temporada",
+        "showAll": "Ver los {{count}} paquetes",
+        "showLess": "Ver menos paquetes"
+      },
+      "session": {
+        "warmUp": {
+          "name": "Calentamiento de 5 minutos",
+          "when": "Al empezar la clase. Un tablero rápido con palabras de la temporada pone a todos a pensar."
+        },
+        "exitTicket": {
+          "name": "Ticket de salida",
+          "when": "Los últimos 3 minutos. Un quiz corto muestra quién domina las palabras de hoy."
+        },
+        "brainBreak": {
+          "name": "Pausa activa",
+          "when": "Cuando baja la energía. Tres minutos rápidos de Blast, sin preparar lista."
+        },
+        "icebreaker": {
+          "name": "Rompehielos del primer día",
+          "when": "Primer día o grupo nuevo. Palabras sobre nuestra clase: hola, grupo, ayudar, gracias."
+        },
+        "spellingBee": {
+          "name": "Concurso de ortografía del viernes",
+          "when": "Fin de semana escolar. Dos rondas por equipos buscando las palabras de la semana."
+        },
+        "testReview": {
+          "name": "Repaso antes del examen",
+          "when": "El día antes del examen. Dos rondas de quiz con los términos clave y sus respuestas."
+        },
+        "eslStarter": {
+          "name": "Inglés como segunda lengua",
+          "when": "Para alumnos de inglés. Elige un nivel MCER de A1 a B2 y practica los significados."
+        },
+        "earlyFinishers": {
+          "name": "Para los que terminan antes",
+          "when": "Algunos ya terminaron. Cada uno juega en silencio su propio tablero de Wordcraft."
+        }
       }
     },
     "lesson": {
@@ -17153,7 +17320,7 @@ const es = {
       "cta": "Crea tu primera clase",
       "expired_title": "Tu prueba de profesor ha terminado",
       "expired_kept": "Tus clases y listas de palabras siguen gratis. Los informes, el dominio de palabras y el modo calmado requieren Pro.",
-            "recap": "En tu prueba — partidas jugadas: {{games}}, estudiantes en tu lista: {{students}}",
+      "recap": "En tu prueba — partidas jugadas: {{games}}, estudiantes en tu lista: {{students}}",
       "recapGamesOnly": "En tu prueba — partidas jugadas: {{games}}",
       "expired_body": "Tu periodo de prueba gratis ha terminado. Vuelve a solicitarlo o escríbenos para conservar el modo aula.",
       "renew_cta": "Renovar acceso de profesor"
@@ -17197,34 +17364,34 @@ const es = {
       }
     },
     "packages": {
-          "title": "Paquetes educativos",
-          "subtitle": "Teacher Pro es facturación autoservicio. Escuelas y departamentos: $49 por docente al año (5+ docentes), factura o orden de compra — pide una cotización abajo.",
-          "teacherPro": {
-                "name": "Teacher Pro",
-                "interval": "/mes",
-                "blurb": "Todos los informes, deberes de palabras falladas y herramientas de reenseñanza para un docente.",
-                "cta": "Mejorar por $9/mes"
-          },
-          "school": {
-                "name": "Escuelas y departamentos",
-                "price": "Desde $49",
-                "priceFrom": "Desde",
-                "interval": "por docente / año",
-                "priceTerms": "{min}+ docentes · factura u orden de compra",
-                "blurb": "Teacher Pro para cada docente de tu equipo. Factura u OC — sin checkout autoservicio.",
-                "cta": "Pedir cotización escolar"
-          },
-          "feature": {
-                "reports": "Todos los informes de clase",
-                "homework": "Deberes de palabras falladas",
-                "reteach": "Herramientas de reenseñanza",
-                "wholeClass": "Toda la clase, no solo un asiento",
-                "proPlus": "Todas las funciones de Teacher Pro incluidas",
-                "streaks": "Rachas de clase",
-                "priority": "Soporte prioritario",
-                "district": "Despliegue escolar y de departamento",
-                "invoice": "Factura u orden de compra"
-          }
+      "title": "Paquetes educativos",
+      "subtitle": "Teacher Pro es facturación autoservicio. Escuelas y departamentos: $49 por docente al año (5+ docentes), factura o orden de compra — pide una cotización abajo.",
+      "teacherPro": {
+        "name": "Teacher Pro",
+        "interval": "/mes",
+        "blurb": "Todos los informes, deberes de palabras falladas y herramientas de reenseñanza para un docente.",
+        "cta": "Mejorar por $9/mes"
+      },
+      "school": {
+        "name": "Escuelas y departamentos",
+        "price": "Desde $49",
+        "priceFrom": "Desde",
+        "interval": "por docente / año",
+        "priceTerms": "{min}+ docentes · factura u orden de compra",
+        "blurb": "Teacher Pro para cada docente de tu equipo. Factura u OC — sin checkout autoservicio.",
+        "cta": "Pedir cotización escolar"
+      },
+      "feature": {
+        "reports": "Todos los informes de clase",
+        "homework": "Deberes de palabras falladas",
+        "reteach": "Herramientas de reenseñanza",
+        "wholeClass": "Toda la clase, no solo un asiento",
+        "proPlus": "Todas las funciones de Teacher Pro incluidas",
+        "streaks": "Rachas de clase",
+        "priority": "Soporte prioritario",
+        "district": "Despliegue escolar y de departamento",
+        "invoice": "Factura u orden de compra"
+      }
     },
     "teacher": {
       "welcome_banner_title": "¡Cuenta aprobada, bienvenido/a! 🎉",
@@ -20904,7 +21071,8 @@ const es = {
       "title": "Centro de ayuda para docentes",
       "body": "Guías paso a paso, tutoriales de 5 minutos y respuestas rápidas.",
       "cta": "Ver ayuda"
-    }
+    },
+    "fallbackNote": "Esta guía aún no está traducida a tu idioma, así que se muestra en inglés."
   },
   // @eg2Help:end
   // @gameShell:start
@@ -21040,7 +21208,9 @@ const es = {
       "noWords": "Esta vez sin palabras. ¡A la próxima!",
       "nextRound": "Atento a la pantalla para la próxima ronda",
       "leave": "Salir",
-      "calculating": "Contando las palabras…"
+      "calculating": "Contando las palabras…",
+      "classGoal": "Botín de la clase: {found}/{total} palabras",
+      "waitNext": "Tu profe decide qué sigue. Calienta mientras esperas."
     }
   }
   // @eduLiveRoom:end
@@ -21184,14 +21354,16 @@ const es = {
         "g35": "3.º–5.º",
         "g68": "6.º–2.º ESO",
         "g912": "3.º ESO–Bach.",
-        "adult": "Adultos"
+        "adult": "Adultos",
+        "esl": "Inglés como lengua extranjera"
       },
       "gradeName": {
         "k2": "Clase de Infantil–2.º",
         "g35": "Clase de 3.º–5.º",
         "g68": "Clase de 6.º–2.º ESO",
         "g912": "Clase de 3.º ESO–Bach.",
-        "adult": "Clase de adultos"
+        "adult": "Clase de adultos",
+        "esl": "Clase de inglés"
       },
       "languageLabel": "Idioma del juego",
       "languageHint": "Define el diccionario con el que juegan tus alumnos.",
@@ -21223,7 +21395,13 @@ const es = {
         "step2": "Proyecta el código o el QR — los alumnos se unen desde el móvil",
         "step3": "Pulsa Empezar: una ronda de 2 minutos, resultados en vivo",
         "start": "Empezar una ronda de 2 minutos"
-      }
+      },
+      "skip": "Ahora no",
+      "packLabel": "Palabras para tu primera partida",
+      "packWords": "{count} palabras",
+      "packRecommended": "Te lo recomendamos",
+      "startLive": "Empezar partida en vivo",
+      "createOnly": "Solo crear la clase"
     },
     "host": {
       "classLabel": "Clase",
@@ -21231,7 +21409,21 @@ const es = {
       "lateJoinHint": "Los alumnos pueden entrar aunque la ronda ya haya empezado.",
       "options": "Opciones",
       "optionsHide": "Ocultar opciones",
-      "retry": "Reintentar"
+      "retry": "Reintentar",
+      "gameOptions": "Opciones de juego",
+      "moreOptions": "Más opciones",
+      "proBadge": "Pro",
+      "lateJoinOn": "Se puede entrar tarde",
+      "lateJoinOff": "Sin entrar tarde",
+      "changeList": "Cambiar",
+      "listDone": "Listo"
+    },
+    "warmup": {
+      "send": "Enviar un calentamiento a la clase",
+      "retry": "No se pudo enviar. Reintentar",
+      "capped": "Llegaste al límite de tareas del plan gratis. Con Pro envías calentamientos sin límite.",
+      "status": "{done} de {total} estudiantes ya calentaron",
+      "sent": "Calentamiento enviado"
     }
   },
   // @eduShell:end

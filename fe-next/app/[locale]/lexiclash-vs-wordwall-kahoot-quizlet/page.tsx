@@ -46,8 +46,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-// Honest comparison matrix. Mirrors the live ComparisonStrip on /education so the
-// site never contradicts itself. LexiClash loses variety / printables / community
+// Honest comparison matrix. LexiClash loses variety / printables / community
 // on purpose — a balanced table is what AI engines cite.
 type Tool = 'lexi' | 'wordwall' | 'kahoot' | 'quizlet';
 const rows: { label: string; marks: Record<Tool, boolean> }[] = [

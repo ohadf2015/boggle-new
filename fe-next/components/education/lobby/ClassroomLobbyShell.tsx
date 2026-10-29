@@ -1,18 +1,11 @@
 /**
- * The lobby's frame: the shell locks, exactly one region scrolls.
- *
- * `<body>` carries `.screen-fit` app-wide (`overflow-y:auto`), so any screen
- * that wants to stay put has to contain itself. This is the `ProjectorLobby`
- * pattern — `overflow-hidden` outside, `min-h-0 flex-1 overflow-y-auto` inside
- * — generalised for the setup side, so a teacher on a 390×844 phone never
- * scrolls the page out from under the mode picker.
- *
- * Dark-only: `bg-neo-navy` hardcoded, never the cream/dark pair (pitfall 5).
+ * The lobby's frame: the shell locks and exactly one region scrolls (`<body>` is `.screen-fit` app-wide).
+ * Columns follow the shell's own width (`@container/lobby`), so a preview frame or the TV zoom lays out right.
  */
 
 'use client';
 
-import { useEffect, useRef, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { tr } from './eduText';
@@ -28,50 +21,42 @@ export interface ClassroomLobbyShellProps {
    * nothing to put here — one whole bar of height given back to the picker.
    */
   footer?: ReactNode;
-  /** Settings open: hide the pinned row and give the scroller the height. */
-  expanded?: boolean;
   /** The ready panel: a side column from lg, a dock under the scroller on phones. Never scrolls, never hides. */
   aside?: ReactNode;
   className?: string;
 }
 
-export function ClassroomLobbyShell({ pinned, children, footer, expanded, aside, className }: ClassroomLobbyShellProps) {
+export function ClassroomLobbyShell({ pinned, children, footer, aside, className }: ClassroomLobbyShellProps) {
   const { t, dir } = useLanguage();
-  const scrollRef = useRef<HTMLDivElement>(null);
-  // Toggling options changes the scroller's height; a stale scrollTop leaves the mode strip cropped.
-  useEffect(() => {
-    scrollRef.current?.scrollTo?.({ top: 0 });
-  }, [expanded]);
   return (
     <div
       data-testid="classroom-lobby-shell"
       dir={dir}
       // Transparent on purpose: the route paints `bg-neo-navy` and the arena
       // art (LaunchStageBackdrop) behind this shell.
-      className={cn('relative flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden', className)}
+      className={cn('@container/lobby relative flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden', className)}
     >
-      <div className="mx-auto flex w-full max-w-[1400px] min-h-0 flex-1 flex-col gap-2 px-1 py-1 lg:gap-3 lg:px-4">
+      <div className="mx-auto flex w-full max-w-[1400px] min-h-0 flex-1 flex-col gap-2 px-1 py-1 @4xl/lobby:gap-3 @4xl/lobby:px-4">
         {/* The h1 is for screen readers; the visible line is information, so GO LIVE stays the only call to action. */}
-        <header className="flex shrink-0 justify-center text-center lg:justify-start lg:text-start">
+        <header className="flex shrink-0 justify-center text-center @4xl/lobby:justify-start @4xl/lobby:text-start">
           <h1 data-testid="lobby-stage-title" className="sr-only">
             {tr(t, 'academy.launch.title', 'Start a live game')}
           </h1>
           <p
             data-testid="lobby-stage-subtitle"
-            className="rounded-full bg-neo-navy/85 px-3 py-0.5 font-neo-body text-xs font-bold text-neo-cream lg:px-4 lg:py-1 lg:text-base"
+            className="rounded-full bg-neo-navy/85 px-3 py-0.5 font-neo-body text-xs font-bold text-neo-cream @4xl/lobby:px-4 @4xl/lobby:py-1 @4xl/lobby:text-base"
           >
             {tr(t, 'academy.launch.subtitle', 'Pick a game. Your class joins with one code.')}
           </p>
         </header>
 
-        <div className="flex min-h-0 flex-1 flex-col gap-2 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(22rem,26rem)] lg:gap-5">
-          <div className="flex min-h-0 flex-1 flex-col gap-2 lg:gap-3">
-            <div data-testid="lobby-pinned" className={cn('shrink-0 empty:hidden', expanded && 'hidden')}>
+        <div data-testid="lobby-columns" className="flex min-h-0 flex-1 flex-col gap-2 @4xl/lobby:grid @4xl/lobby:grid-cols-[minmax(0,1fr)_minmax(22rem,26rem)] @4xl/lobby:gap-5">
+          <div className="flex min-h-0 flex-1 flex-col gap-2 @4xl/lobby:gap-3">
+            <div data-testid="lobby-pinned" className="shrink-0 empty:hidden">
               {pinned}
             </div>
             <div
               data-testid="lobby-scroll"
-              ref={scrollRef}
               className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-0.5 pb-2"
             >
               {children}
@@ -79,7 +64,7 @@ export function ClassroomLobbyShell({ pinned, children, footer, expanded, aside,
           </div>
 
           {aside ? (
-            <div data-testid="lobby-aside" className="shrink-0 lg:flex lg:min-h-0 lg:flex-col">
+            <div data-testid="lobby-aside" className="shrink-0 @4xl/lobby:flex @4xl/lobby:min-h-0 @4xl/lobby:flex-col">
               {aside}
             </div>
           ) : null}

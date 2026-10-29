@@ -1,29 +1,29 @@
 /**
- * The room, on the wire.
- *
- * Lifted out of `ClassroomGameLobby` unchanged in behaviour, with one addition
- * the poster picker needs: a tap can now arrive BEFORE the socket has finished
- * connecting. That used to be a silent no-op — the teacher tapped, nothing
- * happened, no message (recurring pitfall class 4). A launch asked for early is
- * held and flushed the moment the socket is up.
+ * The room, on the wire: the ONE launcher for every way into the setup lobby.
+ * A launch asked for before the socket is up is held and flushed on connect,
+ * and every dead end (refusal, rate limit, no connection, no answer) ends in a
+ * named error the lobby shows with a retry (pitfall class 4).
  */
 
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { io, type Socket } from 'socket.io-client';
 import toast from 'react-hot-toast';
 import logger from '@/utils/logger';
 import { getSocketURL } from '@/utils/SocketContext';
-import { classroomLivePath } from '@/lib/education/classroomLivePath';
 import { recordLessonPlays } from '@/lib/education/lessonPlayStat';
+import { trackEduLiveGameStarted } from '@/lib/education/telemetry';
 import type { ClassroomPressure } from '@/shared/types/classroom';
 import { splitLaunchPayload, type ClassroomLaunchPayload } from './classroomLaunchPayload';
 
 type Translate = (key: string, params?: Record<string, string | number>) => string;
 
 export type { ClassroomLaunchPayload } from './classroomLaunchPayload';
+export type LaunchSource = 'create_room' | 'hq_express';
+
+export const LAUNCH_ACK_TIMEOUT_MS = 20_000;
+const START_FAILED = 'education.classroomGame.startFailed';
 
 function randomGameCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -32,8 +32,14 @@ function randomGameCode(): string {
   return code;
 }
 
-export function useClassroomLaunchSocket(t: Translate, language: string) {
-  const router = useRouter();
+interface InFlight {
+  classroomId: string;
+  lessonIds: string[];
+  source: LaunchSource;
+  pressure: ClassroomPressure | null;
+}
+
+export function useClassroomLaunchSocket(t: Translate) {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isStarting, setIsStarting] = useState(false);
   const [startError, setStartError] = useState<string | null>(null);
@@ -42,73 +48,71 @@ export function useClassroomLaunchSocket(t: Translate, language: string) {
   // True while a pressure write awaits its ack; the caller holds navigation so a refusal is still shown.
   const [pressurePending, setPressurePending] = useState(false);
 
-  /** A launch asked for before the socket existed. Flushed on connect. */
-  const pendingRef = useRef<ClassroomLaunchPayload | null>(null);
-  /** The dials of the in-flight launch, emitted once the room exists. */
-  const pressureRef = useRef<ClassroomPressure | null>(null);
-  const launchedLessonIdsRef = useRef<string[] | null>(null);
-  /** Watchdog on the pressure write ack (see classroomGameCreated above). */
+  const pendingRef = useRef<ReturnType<typeof splitLaunchPayload>['createPayload'] | null>(null);
+  const inFlightRef = useRef<InFlight | null>(null);
+  const ackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pressureAckTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pressureAckGameCodeRef = useRef<string | null>(null);
+  const tRef = useRef(t);
+  tRef.current = t;
+
+  const clearAckTimer = () => {
+    if (ackTimerRef.current) clearTimeout(ackTimerRef.current);
+    ackTimerRef.current = null;
+  };
+
+  const fail = useCallback((key: string) => {
+    clearAckTimer();
+    inFlightRef.current = null;
+    pendingRef.current = null;
+    toast.error(tRef.current(key));
+    setStartError(key);
+    setIsStarting(false);
+  }, []);
 
   useEffect(() => {
     let socketInstance: Socket | undefined;
+    let disposed = false;
 
     async function initSocket() {
       let token: string | undefined;
       try {
         const { createClient } = await import('@/utils/supabase/client');
-        const {
-          data: { session },
-        } = await createClient().auth.getSession();
+        const { data: { session } } = await createClient().auth.getSession();
         token = session?.access_token;
       } catch {
         // proceed without a token; the server will refuse out loud
       }
+      if (disposed) return;
 
-      socketInstance = io(getSocketURL(), {
-        transports: ['websocket', 'polling'],
-        auth: token ? { token } : {},
-      });
+      socketInstance = io(getSocketURL(), { transports: ['websocket', 'polling'], auth: token ? { token } : {} });
 
-      socketInstance.on('connect', () => {
-        logger.info('Connected to Socket.IO');
-      });
-      socketInstance.on('classroomGameCreated', (data: { success: boolean; gameCode: string }) => {
-        if (data.success) {
-          const lessonIds = launchedLessonIdsRef.current;
-          if (lessonIds) {
-            launchedLessonIdsRef.current = null;
-            void recordLessonPlays(lessonIds);
-          }
-          // The dials ride a follow-up emit, never the whitelisted create
-          // payload — the room must exist before they can be written to it.
-          const pressure = pressureRef.current;
-          if (pressure) {
-            pressureRef.current = null;
-            socketInstance?.emit('updateClassroomGamePressure', {
-              gameCode: data.gameCode,
-              pressure,
-            });
+      // The server also broadcasts `{gameCode, classroomId, …}` to the class room under this
+      // event name; only the teacher's own `{success:true, gameCode}` is the confirmation.
+      socketInstance.on('classroomGameCreated', (data: { success?: boolean; gameCode?: string }) => {
+        if (data?.success !== true || !data.gameCode) return;
+        clearAckTimer();
+        const launched = inFlightRef.current;
+        inFlightRef.current = null;
+        if (launched) {
+          trackEduLiveGameStarted({ classroomId: launched.classroomId, source: launched.source, lessonCount: launched.lessonIds.length });
+          void recordLessonPlays(launched.lessonIds);
+          // The create handler whitelists its settings, so the dials follow once the room exists.
+          if (launched.pressure) {
+            socketInstance?.emit('updateClassroomGamePressure', { gameCode: data.gameCode, pressure: launched.pressure });
             setPressurePending(true);
-            // The two-step has a drop window: if the ack never lands the room
-            // runs loud while the teacher believes they launched calm. A calm
-            // setup that silently didn't apply is worse than none — scream.
             const expectedCode = data.gameCode;
+            pressureAckGameCodeRef.current = expectedCode;
             pressureAckTimerRef.current = setTimeout(() => {
-              logger.error(
-                'CLASSROOM_LAUNCH',
-                `Pressure dials write never acked for ${expectedCode} — room runs the loud default`
-              );
-              toast.error(t('education.classroomGame.pressureFailed'));
+              logger.error('CLASSROOM_LAUNCH', `Pressure dials write never acked for ${expectedCode}; room runs the loud default`);
+              toast.error(tRef.current('education.classroomGame.pressureFailed'));
               setPressurePending(false);
             }, 5_000);
-            pressureAckGameCodeRef.current = expectedCode;
           }
-          toast.success(t('education.classroomGame.gameCreated'));
-          setRoomCreatedGameCode(data.gameCode || gameCode);
-          setIsStarting(false);
         }
+        toast.success(tRef.current('education.classroomGame.gameCreated'));
+        setRoomCreatedGameCode(data.gameCode);
+        setIsStarting(false);
       });
       socketInstance.on('classroomGamePressureChanged', (data: { gameCode: string }) => {
         if (data.gameCode === pressureAckGameCodeRef.current && pressureAckTimerRef.current) {
@@ -118,40 +122,28 @@ export function useClassroomLaunchSocket(t: Translate, language: string) {
           setPressurePending(false);
         }
       });
-      // The server's error text is internal English ("Invalid payload: …").
-      // A Hebrew or Japanese teacher was shown it raw in an RTL toast. The real
-      // text is logged for us; the teacher gets a sentence in their language.
+      // The server's text is internal English; it is logged, the teacher gets their language.
       socketInstance.on('classroomGameError', (data: { error: string }) => {
         logger.error('Classroom game create rejected:', data?.error);
-        // A refused pressure WRITE is not a failed launch: the room exists and
-        // is playable, the calm setup just did not apply. Route it to its own
-        // message and disarm the watchdog — otherwise the teacher sees
-        // startFailed now and pressureFailed from the watchdog 5s later, two
-        // toasts for one refusal.
+        // A refused pressure WRITE is not a failed launch: the room exists and is playable.
         if (data?.error === 'education.classroomGame.pressureFailed') {
-          if (pressureAckTimerRef.current) {
-            clearTimeout(pressureAckTimerRef.current);
-            pressureAckTimerRef.current = null;
-            pressureAckGameCodeRef.current = null;
-          }
-          toast.error(t('education.classroomGame.pressureFailed'));
+          if (pressureAckTimerRef.current) clearTimeout(pressureAckTimerRef.current);
+          pressureAckTimerRef.current = null;
+          pressureAckGameCodeRef.current = null;
+          toast.error(tRef.current('education.classroomGame.pressureFailed'));
           setPressurePending(false);
           return;
         }
-        toast.error(t('education.classroomGame.startFailed'));
-        setStartError('education.classroomGame.startFailed');
-        setIsStarting(false);
+        fail(START_FAILED);
       });
-      // Rate limiting emits its OWN event. Without this listener a double-tapped
-      // launch stayed disabled with no message and no way out but a reload.
-      socketInstance.on('rateLimited', () => {
-        toast.error(t('education.classroomGame.tooFast'));
-        setStartError('education.classroomGame.tooFast');
-        setIsStarting(false);
+      socketInstance.on('rateLimited', () => fail('education.classroomGame.tooFast'));
+      socketInstance.on('connect_error', (err: Error) => {
+        if (!inFlightRef.current && !pendingRef.current) return;
+        logger.error('Classroom launch socket failed:', err?.message || '');
+        fail(START_FAILED);
       });
 
       setSocket(socketInstance);
-
       const queued = pendingRef.current;
       if (queued) {
         pendingRef.current = null;
@@ -161,48 +153,32 @@ export function useClassroomLaunchSocket(t: Translate, language: string) {
 
     void initSocket();
     return () => {
+      disposed = true;
+      clearAckTimer();
       if (pressureAckTimerRef.current) clearTimeout(pressureAckTimerRef.current);
       socketInstance?.disconnect();
     };
-  }, [t, language, router, gameCode]);
+  }, [fail]);
 
   const launch = useCallback(
-    (payload: ClassroomLaunchPayload) => {
+    (payload: ClassroomLaunchPayload, source: LaunchSource = 'create_room') => {
       setStartError(null);
       setIsStarting(true);
-      // The dials are peeled off HERE, not trusted to the server to strip:
-      // the create handler whitelists its settings keys, so a pressure object
-      // inside it would vanish without a trace (pitfall 4). They are emitted
-      // to the room the moment the created ack lands.
       const { createPayload, pressure } = splitLaunchPayload(payload);
-      pressureRef.current = pressure;
-      launchedLessonIdsRef.current = payload.lessonIds;
+      inFlightRef.current = { classroomId: payload.classroomId, lessonIds: payload.lessonIds, source, pressure };
+      clearAckTimer();
+      ackTimerRef.current = setTimeout(() => {
+        logger.error('CLASSROOM_LAUNCH', 'Room was never confirmed before the watchdog');
+        fail(START_FAILED);
+      }, LAUNCH_ACK_TIMEOUT_MS);
       if (socket) {
         socket.emit('createClassroomGame', createPayload);
         return;
       }
-      // Held, not dropped: the flush above sends it the instant we connect.
       pendingRef.current = createPayload;
     },
-    [socket]
+    [socket, fail]
   );
 
-  const startLiveGame = useCallback(() => {
-    if (roomCreatedGameCode) {
-      router.push(classroomLivePath(language, roomCreatedGameCode, { host: true }));
-    }
-  }, [roomCreatedGameCode, router, language]);
-
-  return {
-    gameCode,
-    isStarting,
-    setIsStarting,
-    startError,
-    setStartError,
-    launch,
-    socket,
-    roomCreatedGameCode,
-    pressurePending,
-    startLiveGame,
-  };
+  return { gameCode, isStarting, startError, setStartError, launch, socket, roomCreatedGameCode, pressurePending };
 }

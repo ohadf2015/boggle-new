@@ -35,7 +35,7 @@ export function LobbyClassPicker({ classrooms, selectedId, onSelect, label }: Lo
               aria-checked={on}
               onClick={() => !on && onSelect(c.id)}
               className={cn(
-                'min-h-[40px] max-w-[12rem] shrink-0 truncate rounded-full border-[2px] px-4 font-neo-body text-sm font-bold',
+                'min-h-11 max-w-[12rem] shrink-0 truncate rounded-full border-[2px] px-4 font-neo-body text-sm font-bold',
                 'transition-[transform,colors] duration-150 active:scale-[0.97] motion-reduce:transition-none',
                 'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
                 on ? 'border-neo-black bg-neo-lime text-neo-black shadow-hard-sm' : 'border-neo-cream/70 bg-neo-navy/85 text-neo-cream hover:bg-neo-navy-light',

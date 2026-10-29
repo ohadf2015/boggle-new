@@ -53,26 +53,6 @@ vi.mock('@/components/education/ProFramingSection', () => ({
   ProFramingSection: ({ cta }: { cta?: React.ReactNode }) => <div data-testid="pro-framing">{cta}</div>,
 }));
 
-vi.mock('@/components/education/ComparisonStrip', () => ({
-  ComparisonStrip: () => <div data-testid="comparison-strip" />,
-}));
-
-vi.mock('@/components/education/tour/TeacherTourDialog', () => ({
-  TeacherTourDialog: () => <button type="button" data-testid="teacher-tour" />,
-}));
-
-vi.mock('@/components/education/TeacherSetupSteps', () => ({
-  TeacherSetupSteps: () => (
-    <div data-testid="teacher-setup">
-      <div data-testid="onboarding-step-create" />
-      <div data-testid="onboarding-step-share" />
-      <div data-testid="onboarding-step-join" />
-      <div data-testid="onboarding-step-play" />
-      <div data-testid="onboarding-step-results" />
-    </div>
-  ),
-}));
-
 
 vi.mock('@/components/education/DistrictUpsellStrip', () => ({
   DistrictUpsellStrip: () => <div data-testid="district-upsell" />,

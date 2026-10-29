@@ -24,13 +24,13 @@ export interface LobbyModeGridProps {
 export function LobbyModeGrid({ selected, recommended = null, selectedMinutes, minutesFor, busy, onPick, t }: LobbyModeGridProps) {
   const modes = catalogueModes();
   return (
-    <div role="radiogroup" aria-label={t('eg2Modes.title')} data-testid="lobby-mode-grid" className="flex flex-col gap-4 lg:gap-5">
+    <div role="radiogroup" aria-label={t('eg2Modes.title')} data-testid="lobby-mode-grid" className="@container flex flex-col gap-4 @3xl:gap-5">
       {CATALOGUE_CATEGORIES.map((category) => (
         <section key={category} data-testid={`mode-group-${category}`} className="flex flex-col gap-2">
-          <h2 className="px-0.5 font-neo-display text-sm font-black text-neo-cream/85 lg:text-base">
+          <h2 className="px-0.5 font-neo-display text-sm font-black text-neo-cream/85 @3xl:text-base">
             {t(`eg2Modes.category.${category}`)}
           </h2>
-          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:gap-3">
+          <div className="grid grid-cols-2 gap-2.5 @md:grid-cols-3 @3xl:gap-3">
             {modes
               .filter((m) => m.category === category)
               .map((mode) => {
@@ -100,7 +100,7 @@ function ModeCard({
     >
       <span
         className={cn(
-          'relative block aspect-[16/10] w-full overflow-hidden border-b-[3px] lg:aspect-[2/1] lg:[@media(max-height:960px)]:aspect-[5/2]',
+          'relative block aspect-[16/10] w-full overflow-hidden border-b-[3px] @4xl/lobby:aspect-[2/1] @4xl/lobby:[@media(max-height:960px)]:aspect-[5/2]',
           selected ? 'border-neo-black' : 'border-neo-cream/40',
         )}
       >
@@ -117,7 +117,7 @@ function ModeCard({
         {recommendedLabel ? (
           <span
             data-testid="mode-recommended"
-            className="absolute start-1.5 top-1.5 inline-flex max-w-[85%] items-center gap-1 truncate rounded-neo border-[2px] border-neo-black bg-neo-yellow px-1.5 py-0.5 font-neo-display text-[0.65rem] font-black uppercase leading-none text-neo-black shadow-hard-sm lg:text-xs"
+            className="absolute start-1.5 top-1.5 inline-flex max-w-[85%] items-center gap-1 truncate rounded-neo border-[2px] border-neo-black bg-neo-yellow px-1.5 py-0.5 font-neo-display text-[0.65rem] font-black uppercase leading-none text-neo-black shadow-hard-sm @3xl:text-xs"
           >
             <Sparkles className="size-3 shrink-0" strokeWidth={3} aria-hidden="true" />
             {recommendedLabel}
@@ -132,12 +132,12 @@ function ModeCard({
           </span>
         ) : null}
       </span>
-      <span className="flex min-w-0 flex-1 flex-col gap-1.5 px-2.5 py-2 lg:px-3">
-        <span className="truncate font-neo-display text-sm font-black uppercase leading-tight sm:text-base">{name}</span>
+      <span className="flex min-w-0 flex-1 flex-col gap-1.5 px-2.5 py-2 @3xl:px-3">
+        <span className="truncate font-neo-display text-sm font-black uppercase leading-tight @md:text-base">{name}</span>
         <span className="flex shrink-0 flex-wrap items-center gap-1.5">
           <span
             className={cn(
-              'inline-flex items-center gap-1 whitespace-nowrap rounded-full border-[2px] px-1.5 py-0.5 font-neo-display text-[0.65rem] font-black uppercase leading-none lg:text-xs',
+              'inline-flex items-center gap-1 whitespace-nowrap rounded-full border-[2px] px-1.5 py-0.5 font-neo-display text-[0.65rem] font-black uppercase leading-none @3xl:text-xs',
               selected ? 'border-neo-black bg-neo-cream text-neo-black' : 'border-neo-cream/60 text-neo-cream',
             )}
           >

@@ -1,0 +1,1701 @@
+{
+  "language": "en",
+  "source": "en-themes",
+  "migration": "20261029120000_curriculum_v2_en_themes.sql",
+  "lists": [
+    {
+      "code": "LC-EN-PK-SCHOOL",
+      "name": "Back to school",
+      "description": "Words for the first weeks of a new school year: the supplies in your bag, the places in the building, the people you meet and the routines you learn.",
+      "language": "en",
+      "grade": "grade_3",
+      "subject": "general",
+      "words": [
+        {
+          "word": "bell",
+          "definition": "A metal thing that rings to tell everyone it is time to start or stop",
+          "example": "When the bell rings, we line up at the door.",
+          "level": "support"
+        },
+        {
+          "word": "bus",
+          "definition": "A long vehicle with many seats that carries lots of people",
+          "example": "I wave to my mom from the window of the bus.",
+          "level": "support"
+        },
+        {
+          "word": "pen",
+          "definition": "A tool filled with ink that you use to write",
+          "example": "Dad wrote my name on the tag with a blue pen.",
+          "level": "support"
+        },
+        {
+          "word": "lesson",
+          "definition": "A time when a teacher helps you learn something new",
+          "example": "Today's lesson was all about the planets.",
+          "level": "support"
+        },
+        {
+          "word": "folder",
+          "definition": "A folded cover that keeps loose papers together and flat",
+          "example": "Put your spelling sheet in the green folder.",
+          "level": "core"
+        },
+        {
+          "word": "locker",
+          "definition": "A small metal cupboard with a door where you keep your things",
+          "example": "My locker is right next to the water fountain.",
+          "level": "core"
+        },
+        {
+          "word": "hallway",
+          "definition": "A long, narrow space inside a building with doors along it",
+          "example": "We walk quietly down the hallway to music class.",
+          "level": "core"
+        },
+        {
+          "word": "playground",
+          "definition": "An outdoor area with swings and slides where children play",
+          "example": "The playground has a new climbing wall.",
+          "level": "core"
+        },
+        {
+          "word": "scissors",
+          "definition": "A tool with two sharp blades that you squeeze to cut paper",
+          "example": "Please hand me the scissors so I can cut out my star.",
+          "level": "core"
+        },
+        {
+          "word": "calendar",
+          "definition": "A chart that shows the days, weeks and months of the year",
+          "example": "We circled the field trip on the class calendar.",
+          "level": "core"
+        },
+        {
+          "word": "label",
+          "definition": "A small sticker or tag with a name or word on it",
+          "example": "Each cubby has a label with a student's name.",
+          "level": "core"
+        },
+        {
+          "word": "nurse",
+          "definition": "A person at school who helps you when you feel sick or get hurt",
+          "example": "The nurse gave me an ice pack for my bumped knee.",
+          "level": "core"
+        },
+        {
+          "word": "uniform",
+          "definition": "Special matching clothes that everyone in a group wears",
+          "example": "Our school uniform has a navy sweater.",
+          "level": "core"
+        },
+        {
+          "word": "classmate",
+          "definition": "A person who is in the same class as you",
+          "example": "My new classmate just moved here from Texas.",
+          "level": "core"
+        },
+        {
+          "word": "schedule",
+          "definition": "A plan that shows what happens at each time of the day",
+          "example": "Art is on our schedule every Tuesday after lunch.",
+          "level": "challenge"
+        },
+        {
+          "word": "routine",
+          "definition": "The usual steps you do in the same order every day",
+          "example": "Our morning routine starts with hanging up our coats.",
+          "level": "challenge"
+        },
+        {
+          "word": "principal",
+          "definition": "The person in charge of the whole school",
+          "example": "The principal visited our room to say good morning.",
+          "level": "challenge"
+        },
+        {
+          "word": "cafeteria",
+          "definition": "A big room at school where students buy and eat meals",
+          "example": "The cafeteria smells like fresh pizza on Fridays.",
+          "level": "challenge"
+        }
+      ]
+    },
+    {
+      "code": "LC-EN-PK-AUTUMN",
+      "name": "Autumn",
+      "description": "Crunchy leaves, cool mornings and busy animals. Words for the season when the trees change color and everyone gets ready for the cold.",
+      "language": "en",
+      "grade": "grade_3",
+      "subject": "general",
+      "words": [
+        {
+          "word": "leaf",
+          "definition": "A flat, thin, usually green part of a plant that grows on its stem",
+          "example": "A red leaf floated down and landed on my shoe.",
+          "level": "support"
+        },
+        {
+          "word": "rake",
+          "definition": "A garden tool with long teeth used to pull leaves into a pile",
+          "example": "Grandpa let me use the rake to clean up the yard.",
+          "level": "support"
+        },
+        {
+          "word": "pile",
+          "definition": "A lot of things lying on top of each other",
+          "example": "We jumped into a giant pile of leaves.",
+          "level": "support"
+        },
+        {
+          "word": "scarf",
+          "definition": "A long piece of cloth you wrap around your neck to stay warm",
+          "example": "My knitted scarf is orange and yellow.",
+          "level": "support"
+        },
+        {
+          "word": "acorn",
+          "definition": "The small nut of an oak tree, with a little cap on top",
+          "example": "The squirrel buried an acorn under the bench.",
+          "level": "core"
+        },
+        {
+          "word": "maple",
+          "definition": "A tree with pointed leaves that turn bright red and orange",
+          "example": "The maple in front of our school turned bright red.",
+          "level": "core"
+        },
+        {
+          "word": "pumpkin",
+          "definition": "A big, round orange vegetable that grows on a vine",
+          "example": "We picked the biggest pumpkin in the patch.",
+          "level": "core"
+        },
+        {
+          "word": "squirrel",
+          "definition": "A small animal with a bushy tail that climbs trees and gathers nuts",
+          "example": "A squirrel raced up the fence with a nut in its mouth.",
+          "level": "core"
+        },
+        {
+          "word": "sweater",
+          "definition": "A warm knitted top with long sleeves",
+          "example": "Mom said to wear a sweater because it is cool outside.",
+          "level": "core"
+        },
+        {
+          "word": "chilly",
+          "definition": "A little bit cold",
+          "example": "The air felt chilly when we waited for the bus.",
+          "level": "core"
+        },
+        {
+          "word": "crisp",
+          "definition": "Cool and fresh, or dry and easy to snap",
+          "example": "We took a walk on a crisp, sunny morning.",
+          "level": "core"
+        },
+        {
+          "word": "golden",
+          "definition": "Having a bright yellow color like gold",
+          "example": "The field looked golden in the late sunshine.",
+          "level": "core"
+        },
+        {
+          "word": "orchard",
+          "definition": "A large field of fruit trees, such as apple or pear trees",
+          "example": "Our class went to an orchard to pick apples.",
+          "level": "core"
+        },
+        {
+          "word": "mushroom",
+          "definition": "A small growing thing with a stem and a round cap, often found on damp ground",
+          "example": "Do not touch that mushroom, it might not be safe to eat.",
+          "level": "core"
+        },
+        {
+          "word": "gust",
+          "definition": "A sudden, strong rush of wind",
+          "example": "A gust of wind blew my hat across the yard.",
+          "level": "challenge"
+        },
+        {
+          "word": "chestnut",
+          "definition": "A shiny brown nut that grows inside a spiky case",
+          "example": "I found a chestnut that was smooth and shiny.",
+          "level": "challenge"
+        },
+        {
+          "word": "equinox",
+          "definition": "One of two days a year when day and night are about the same length",
+          "example": "The fall equinox comes in late September.",
+          "level": "challenge"
+        },
+        {
+          "word": "deciduous",
+          "definition": "Describes trees that lose all their leaves every year",
+          "example": "Oak trees are deciduous, so they are bare in winter.",
+          "level": "challenge"
+        }
+      ]
+    },
+    {
+      "code": "LC-EN-PK-SPOOKY",
+      "name": "Spooky night",
+      "description": "Fun-scary words for a dark, quiet night: owls and bats, fog and shadows, creaky floors and a big bright moon.",
+      "language": "en",
+      "grade": "grade_4",
+      "subject": "general",
+      "words": [
+        {
+          "word": "owl",
+          "definition": "A bird with big round eyes that hunts at night",
+          "example": "An owl sat on the branch and blinked at us.",
+          "level": "support"
+        },
+        {
+          "word": "bat",
+          "definition": "A small furry animal with wings that flies at night",
+          "example": "A bat zipped past the porch light.",
+          "level": "support"
+        },
+        {
+          "word": "moon",
+          "definition": "The big round light in the night sky that goes around Earth",
+          "example": "The moon was so bright we could see our shadows.",
+          "level": "support"
+        },
+        {
+          "word": "fog",
+          "definition": "A thick cloud close to the ground that makes it hard to see",
+          "example": "The fog hid the top of the hill.",
+          "level": "support"
+        },
+        {
+          "word": "cave",
+          "definition": "A large hole in the side of a hill or under the ground",
+          "example": "We shined our flashlight into the dark cave.",
+          "level": "core"
+        },
+        {
+          "word": "shadow",
+          "definition": "A dark shape made when something blocks the light",
+          "example": "My shadow looked like a giant on the wall.",
+          "level": "core"
+        },
+        {
+          "word": "howl",
+          "definition": "A long, loud cry, like the sound a wolf makes",
+          "example": "We heard the wind howl around the cabin.",
+          "level": "core"
+        },
+        {
+          "word": "hoot",
+          "definition": "The soft, round sound an owl makes",
+          "example": "Listen for the hoot coming from the pine trees.",
+          "level": "core"
+        },
+        {
+          "word": "whisper",
+          "definition": "To speak very softly so only someone close can hear",
+          "example": "Tom leaned over to whisper a secret.",
+          "level": "core"
+        },
+        {
+          "word": "creak",
+          "definition": "A long squeaky sound, like an old door or floor makes",
+          "example": "Every step made the old stairs creak.",
+          "level": "core"
+        },
+        {
+          "word": "lantern",
+          "definition": "A lamp with a handle and a cover around the light",
+          "example": "Grandma carried a lantern out to the garden.",
+          "level": "core"
+        },
+        {
+          "word": "midnight",
+          "definition": "Twelve o'clock at night, the middle of the night",
+          "example": "At midnight the whole house was silent.",
+          "level": "core"
+        },
+        {
+          "word": "cobweb",
+          "definition": "An old, dusty spider web",
+          "example": "A cobweb hung in the corner of the shed.",
+          "level": "core"
+        },
+        {
+          "word": "attic",
+          "definition": "A room at the very top of a house, under the roof",
+          "example": "We found a box of old toys in the attic.",
+          "level": "core"
+        },
+        {
+          "word": "rustle",
+          "definition": "A soft, dry sound like leaves or paper moving",
+          "example": "We heard a rustle in the bushes, but it was just a cat.",
+          "level": "challenge"
+        },
+        {
+          "word": "eerie",
+          "definition": "Strange in a way that gives you goose bumps",
+          "example": "The empty playground looked eerie in the moonlight.",
+          "level": "challenge"
+        },
+        {
+          "word": "nocturnal",
+          "definition": "Describes animals that sleep in the day and are awake at night",
+          "example": "Bats are nocturnal, so they hunt after sunset.",
+          "level": "challenge"
+        },
+        {
+          "word": "silhouette",
+          "definition": "A dark outline of something seen against a light background",
+          "example": "We saw the silhouette of a fox on the hill.",
+          "level": "challenge"
+        }
+      ]
+    },
+    {
+      "code": "LC-EN-PK-WINTER",
+      "name": "Winter",
+      "description": "Cold-weather words: snow and ice, warm clothes, cozy drinks and the shortest days of the year.",
+      "language": "en",
+      "grade": "grade_3",
+      "subject": "general",
+      "words": [
+        {
+          "word": "snow",
+          "definition": "Soft white flakes of frozen water that fall from the sky",
+          "example": "The snow came up to the top of my boots.",
+          "level": "support"
+        },
+        {
+          "word": "ice",
+          "definition": "Water that has frozen solid",
+          "example": "The pond was covered with a thin layer of ice.",
+          "level": "support"
+        },
+        {
+          "word": "sled",
+          "definition": "A flat board you ride on to slide down snowy hills",
+          "example": "We pulled the sled to the top of the hill.",
+          "level": "support"
+        },
+        {
+          "word": "coat",
+          "definition": "A warm piece of clothing you wear over your other clothes outside",
+          "example": "Zip up your coat before you go out.",
+          "level": "support"
+        },
+        {
+          "word": "mitten",
+          "definition": "A warm cover for your hand with one place for the thumb",
+          "example": "I lost one mitten in the snow.",
+          "level": "core"
+        },
+        {
+          "word": "frost",
+          "definition": "A thin white layer of ice that forms on cold surfaces",
+          "example": "There was frost on the car window this morning.",
+          "level": "core"
+        },
+        {
+          "word": "icicle",
+          "definition": "A pointed stick of ice that hangs down from a roof",
+          "example": "A long icicle hung from the edge of the roof.",
+          "level": "core"
+        },
+        {
+          "word": "snowflake",
+          "definition": "A single tiny piece of snow with a six-sided shape",
+          "example": "A snowflake landed on my glove and melted.",
+          "level": "core"
+        },
+        {
+          "word": "snowman",
+          "definition": "A figure people build by rolling and stacking snow",
+          "example": "Our snowman has a carrot nose and a red hat.",
+          "level": "core"
+        },
+        {
+          "word": "cocoa",
+          "definition": "A warm, sweet chocolate drink",
+          "example": "We sipped cocoa after sledding.",
+          "level": "core"
+        },
+        {
+          "word": "frozen",
+          "definition": "Turned hard because it is very cold",
+          "example": "My fingers felt frozen after the snowball fight.",
+          "level": "core"
+        },
+        {
+          "word": "blanket",
+          "definition": "A large, soft cover that keeps you warm",
+          "example": "I curled up under a fluffy blanket.",
+          "level": "core"
+        },
+        {
+          "word": "fireplace",
+          "definition": "A space in a wall where a fire burns to warm a room",
+          "example": "We read stories by the fireplace.",
+          "level": "core"
+        },
+        {
+          "word": "skate",
+          "definition": "To glide over ice wearing boots with blades",
+          "example": "My sister is learning to skate at the rink.",
+          "level": "core"
+        },
+        {
+          "word": "slippery",
+          "definition": "Smooth or wet so that it is easy to slide and fall",
+          "example": "The sidewalk was slippery, so we walked slowly.",
+          "level": "challenge"
+        },
+        {
+          "word": "sleet",
+          "definition": "Rain that is partly frozen as it falls",
+          "example": "Sleet tapped against the window all night.",
+          "level": "challenge"
+        },
+        {
+          "word": "blizzard",
+          "definition": "A big snowstorm with strong winds",
+          "example": "School was closed because of the blizzard.",
+          "level": "challenge"
+        },
+        {
+          "word": "solstice",
+          "definition": "The day with the shortest daylight of the whole year in winter",
+          "example": "The winter solstice is the darkest day of the year.",
+          "level": "challenge"
+        }
+      ]
+    },
+    {
+      "code": "LC-EN-PK-SPRING",
+      "name": "Spring",
+      "description": "Words for the season of new life: buds and blossoms, baby animals, rain showers and gardens waking up.",
+      "language": "en",
+      "grade": "grade_3",
+      "subject": "general",
+      "words": [
+        {
+          "word": "bud",
+          "definition": "A small swelling on a plant that opens into a leaf or flower",
+          "example": "A tiny green bud appeared on the rose bush.",
+          "level": "support"
+        },
+        {
+          "word": "bee",
+          "definition": "A flying insect that makes honey and visits flowers",
+          "example": "A bee buzzed from flower to flower.",
+          "level": "support"
+        },
+        {
+          "word": "lamb",
+          "definition": "A baby sheep",
+          "example": "The lamb stayed close to its mother.",
+          "level": "support"
+        },
+        {
+          "word": "chick",
+          "definition": "A baby bird, especially a baby chicken",
+          "example": "The fluffy chick peeped for food.",
+          "level": "support"
+        },
+        {
+          "word": "kite",
+          "definition": "A light frame covered in cloth or paper that flies in the wind on a string",
+          "example": "We flew a kite at the park on a windy day.",
+          "level": "core"
+        },
+        {
+          "word": "worm",
+          "definition": "A long, thin animal with no legs that lives in the soil",
+          "example": "After the rain, a worm wiggled across the path.",
+          "level": "core"
+        },
+        {
+          "word": "petal",
+          "definition": "One of the soft, colored parts of a flower",
+          "example": "Each petal of the daisy is white.",
+          "level": "core"
+        },
+        {
+          "word": "tulip",
+          "definition": "A cup-shaped flower that grows from a bulb in spring",
+          "example": "Mom planted a red tulip by the front step.",
+          "level": "core"
+        },
+        {
+          "word": "robin",
+          "definition": "A small bird with an orange-red chest",
+          "example": "A robin was pulling worms out of the lawn.",
+          "level": "core"
+        },
+        {
+          "word": "bloom",
+          "definition": "To open up into a flower",
+          "example": "The cherry trees bloom in April.",
+          "level": "core"
+        },
+        {
+          "word": "hatch",
+          "definition": "To break out of an egg",
+          "example": "We watched the ducklings hatch in our classroom.",
+          "level": "core"
+        },
+        {
+          "word": "sprout",
+          "definition": "To begin to grow, or a new young plant",
+          "example": "Our bean seeds started to sprout in three days.",
+          "level": "core"
+        },
+        {
+          "word": "garden",
+          "definition": "A piece of land where people grow flowers, fruit or vegetables",
+          "example": "We planted carrots in the school garden.",
+          "level": "core"
+        },
+        {
+          "word": "umbrella",
+          "definition": "A folding cover on a stick that keeps the rain off you",
+          "example": "I shared my umbrella with my friend.",
+          "level": "core"
+        },
+        {
+          "word": "blossom",
+          "definition": "A flower on a fruit tree or bush",
+          "example": "A pink blossom fell from the cherry tree.",
+          "level": "challenge"
+        },
+        {
+          "word": "cocoon",
+          "definition": "A silky case some insects spin to change inside",
+          "example": "The caterpillar wrapped itself in a cocoon.",
+          "level": "challenge"
+        },
+        {
+          "word": "thaw",
+          "definition": "To slowly melt and warm up after being frozen",
+          "example": "The snow began to thaw in the warm sun.",
+          "level": "challenge"
+        },
+        {
+          "word": "germinate",
+          "definition": "When a seed starts to grow a root and a shoot",
+          "example": "Seeds need water and warmth to germinate.",
+          "level": "challenge"
+        }
+      ]
+    },
+    {
+      "code": "LC-EN-PK-SUMMER",
+      "name": "Summer break",
+      "description": "Words for the last days of school and the long holiday after: saying goodbye, looking back, and heading out to the beach, the woods and the sunshine.",
+      "language": "en",
+      "grade": "grade_4",
+      "subject": "general",
+      "words": [
+        {
+          "word": "sun",
+          "definition": "The bright star in the sky that gives us light and heat",
+          "example": "The sun was hot, so we sat under a tree.",
+          "level": "support"
+        },
+        {
+          "word": "sand",
+          "definition": "Tiny grains of rock that cover beaches and deserts",
+          "example": "I got sand in my shoes at the beach.",
+          "level": "support"
+        },
+        {
+          "word": "swim",
+          "definition": "To move through water using your arms and legs",
+          "example": "We swim in the lake every afternoon.",
+          "level": "support"
+        },
+        {
+          "word": "tent",
+          "definition": "A shelter made of cloth held up by poles, used for camping",
+          "example": "We put up our tent next to the river.",
+          "level": "support"
+        },
+        {
+          "word": "beach",
+          "definition": "Land covered in sand or pebbles next to the sea",
+          "example": "We built forts all day at the beach.",
+          "level": "core"
+        },
+        {
+          "word": "shell",
+          "definition": "The hard outer cover that some sea animals live in",
+          "example": "I found a pink shell by the water.",
+          "level": "core"
+        },
+        {
+          "word": "wave",
+          "definition": "A moving ridge of water on the sea or a lake",
+          "example": "A big wave splashed over our feet.",
+          "level": "core"
+        },
+        {
+          "word": "hike",
+          "definition": "A long walk in nature, often up hills",
+          "example": "Our family went on a hike to the waterfall.",
+          "level": "core"
+        },
+        {
+          "word": "camp",
+          "definition": "To stay outdoors for a while, usually sleeping in a tent",
+          "example": "This summer we will camp by the lake.",
+          "level": "core"
+        },
+        {
+          "word": "picnic",
+          "definition": "A meal you pack and eat outside",
+          "example": "We had a picnic on a blanket in the park.",
+          "level": "core"
+        },
+        {
+          "word": "holiday",
+          "definition": "A time when you do not have school or work",
+          "example": "The summer holiday starts next Friday.",
+          "level": "core"
+        },
+        {
+          "word": "vacation",
+          "definition": "A trip or break away from school or work to rest and have fun",
+          "example": "We are going to the mountains on vacation.",
+          "level": "core"
+        },
+        {
+          "word": "lemonade",
+          "definition": "A cold drink made with lemon juice, water and sugar",
+          "example": "We sold lemonade on our street.",
+          "level": "core"
+        },
+        {
+          "word": "goodbye",
+          "definition": "What you say when you leave someone",
+          "example": "We said goodbye to our teacher on the last day.",
+          "level": "core"
+        },
+        {
+          "word": "sunscreen",
+          "definition": "A cream that protects your skin from burning in the sun",
+          "example": "Put on sunscreen before you go outside.",
+          "level": "challenge"
+        },
+        {
+          "word": "yearbook",
+          "definition": "A book with photos and memories from one school year",
+          "example": "My friends signed my yearbook.",
+          "level": "challenge"
+        },
+        {
+          "word": "graduate",
+          "definition": "To finish a school or a stage of school",
+          "example": "The fifth graders graduate this week.",
+          "level": "challenge"
+        },
+        {
+          "word": "certificate",
+          "definition": "An official paper that shows you did or earned something",
+          "example": "I got a certificate for reading fifty books.",
+          "level": "challenge"
+        }
+      ]
+    },
+    {
+      "code": "LC-EN-PK-CLASS",
+      "name": "Our class",
+      "description": "Icebreaker words for the first day together: saying hello, learning names, being kind and working as a team.",
+      "language": "en",
+      "grade": "grade_3",
+      "subject": "general",
+      "words": [
+        {
+          "word": "hello",
+          "definition": "A friendly word you say when you meet someone",
+          "example": "Say hello to the new student at your table.",
+          "level": "support"
+        },
+        {
+          "word": "name",
+          "definition": "The word that people call you",
+          "example": "Can you tell me your name?",
+          "level": "support"
+        },
+        {
+          "word": "team",
+          "definition": "A group of people who work or play together",
+          "example": "Our table is one team for the puzzle game.",
+          "level": "support"
+        },
+        {
+          "word": "help",
+          "definition": "To make something easier for someone",
+          "example": "I can help you carry those books.",
+          "level": "support"
+        },
+        {
+          "word": "smile",
+          "definition": "To turn up the corners of your mouth to show you are happy",
+          "example": "A big smile makes new friends feel welcome.",
+          "level": "support"
+        },
+        {
+          "word": "join",
+          "definition": "To become part of a group or activity",
+          "example": "Do you want to join our game?",
+          "level": "core"
+        },
+        {
+          "word": "fair",
+          "definition": "Treating everyone the same way and following the rules",
+          "example": "Taking turns is the fair way to play.",
+          "level": "core"
+        },
+        {
+          "word": "buddy",
+          "definition": "A good friend or a partner who helps you",
+          "example": "My reading buddy is in second grade.",
+          "level": "core"
+        },
+        {
+          "word": "listen",
+          "definition": "To pay attention to the sounds or words you hear",
+          "example": "We listen when someone else is talking.",
+          "level": "core"
+        },
+        {
+          "word": "polite",
+          "definition": "Having good manners, like saying please and thank you",
+          "example": "It is polite to wait for your turn.",
+          "level": "core"
+        },
+        {
+          "word": "thanks",
+          "definition": "A short way to say you are grateful",
+          "example": "Thanks for sharing your markers with me.",
+          "level": "core"
+        },
+        {
+          "word": "welcome",
+          "definition": "To greet someone in a happy, friendly way",
+          "example": "We made a sign to welcome our new classmates.",
+          "level": "core"
+        },
+        {
+          "word": "partner",
+          "definition": "A person you do an activity with",
+          "example": "Find a partner and read the story together.",
+          "level": "core"
+        },
+        {
+          "word": "together",
+          "definition": "With each other, or at the same time",
+          "example": "We sang the song together.",
+          "level": "core"
+        },
+        {
+          "word": "include",
+          "definition": "To let someone be part of a group",
+          "example": "Always include kids who are playing alone.",
+          "level": "challenge"
+        },
+        {
+          "word": "introduce",
+          "definition": "To tell people someone's name when they meet for the first time",
+          "example": "Let me introduce my friend Sam.",
+          "level": "challenge"
+        },
+        {
+          "word": "cooperate",
+          "definition": "To work together to reach the same goal",
+          "example": "We had to cooperate to build the tall tower.",
+          "level": "challenge"
+        },
+        {
+          "word": "encourage",
+          "definition": "To give someone hope and confidence to keep trying",
+          "example": "We encourage each other when a problem is hard.",
+          "level": "challenge"
+        }
+      ]
+    },
+    {
+      "code": "LC-EN-PK-K2READ",
+      "name": "First reader words",
+      "description": "The short, frequent words that 5 to 7 year olds see again and again in their first books. Great for fast reading practice.",
+      "language": "en",
+      "grade": "grade_1",
+      "subject": "english",
+      "words": [
+        {
+          "word": "the",
+          "definition": "A small word we put before a thing we are talking about",
+          "example": "Look at the dog!",
+          "level": "support"
+        },
+        {
+          "word": "and",
+          "definition": "A word that joins two things together",
+          "example": "I like cats and dogs.",
+          "level": "support"
+        },
+        {
+          "word": "see",
+          "definition": "To notice something with your eyes",
+          "example": "I can see a bird.",
+          "level": "support"
+        },
+        {
+          "word": "can",
+          "definition": "A word that means you are able to do something",
+          "example": "I can hop on one foot.",
+          "level": "support"
+        },
+        {
+          "word": "big",
+          "definition": "Large in size; not small",
+          "example": "That is a big truck.",
+          "level": "support"
+        },
+        {
+          "word": "red",
+          "definition": "The color of a ripe strawberry",
+          "example": "I have a red ball.",
+          "level": "support"
+        },
+        {
+          "word": "run",
+          "definition": "To move fast on your feet",
+          "example": "We run in the park.",
+          "level": "core"
+        },
+        {
+          "word": "you",
+          "definition": "A word for the person someone is talking to",
+          "example": "Do you want to play?",
+          "level": "core"
+        },
+        {
+          "word": "yes",
+          "definition": "A word that means you agree",
+          "example": "Yes, I want an apple.",
+          "level": "core"
+        },
+        {
+          "word": "look",
+          "definition": "To turn your eyes toward something",
+          "example": "Look up at the sky.",
+          "level": "core"
+        },
+        {
+          "word": "come",
+          "definition": "To move toward someone or a place",
+          "example": "Come here and sit with me.",
+          "level": "core"
+        },
+        {
+          "word": "here",
+          "definition": "In this place",
+          "example": "My cat is here on the bed.",
+          "level": "core"
+        },
+        {
+          "word": "down",
+          "definition": "Toward a lower place",
+          "example": "The ball rolled down the hill.",
+          "level": "core"
+        },
+        {
+          "word": "like",
+          "definition": "To enjoy something or think it is nice",
+          "example": "I like to paint.",
+          "level": "core"
+        },
+        {
+          "word": "said",
+          "definition": "Told someone something; the past of say",
+          "example": "Mom said it is time for bed.",
+          "level": "challenge"
+        },
+        {
+          "word": "they",
+          "definition": "A word for other people or things, more than one",
+          "example": "They are my friends.",
+          "level": "challenge"
+        },
+        {
+          "word": "where",
+          "definition": "A word to ask about a place",
+          "example": "Where is my hat?",
+          "level": "challenge"
+        },
+        {
+          "word": "little",
+          "definition": "Small in size",
+          "example": "The little mouse ran away.",
+          "level": "challenge"
+        }
+      ]
+    },
+    {
+      "code": "LC-EN-PK-MATH",
+      "name": "Math talk",
+      "description": "Key math words for middle school: numbers, shapes, data and equations. Know these and word problems get much easier.",
+      "language": "en",
+      "grade": "grade_6",
+      "subject": "math",
+      "words": [
+        {
+          "word": "area",
+          "definition": "The amount of flat space inside a shape, measured in squares",
+          "example": "The area of the rug is 12 square feet.",
+          "level": "support"
+        },
+        {
+          "word": "angle",
+          "definition": "The space between two lines that meet at a point",
+          "example": "A square has four right angle corners, each 90 degrees.",
+          "level": "support"
+        },
+        {
+          "word": "graph",
+          "definition": "A picture that shows numbers or data, like bars or a line",
+          "example": "Our graph shows how many pets each class has.",
+          "level": "support"
+        },
+        {
+          "word": "volume",
+          "definition": "How much space a solid shape takes up or holds",
+          "example": "We found the volume of the box in cubic inches.",
+          "level": "support"
+        },
+        {
+          "word": "mean",
+          "definition": "The total of a set of numbers divided by how many numbers there are",
+          "example": "The mean of 4, 6 and 8 is 6.",
+          "level": "core"
+        },
+        {
+          "word": "median",
+          "definition": "The middle number when a list is put in order",
+          "example": "In 2, 5, 9 the median is 5.",
+          "level": "core"
+        },
+        {
+          "word": "mode",
+          "definition": "The number that shows up most often in a set of data",
+          "example": "In 3, 3, 4, 7 the mode is 3.",
+          "level": "core"
+        },
+        {
+          "word": "ratio",
+          "definition": "A comparison of two amounts, like 2 to 3",
+          "example": "The ratio of boys to girls in our club is 3 to 4.",
+          "level": "core"
+        },
+        {
+          "word": "prime",
+          "definition": "A whole number greater than 1 that can only be divided by 1 and itself",
+          "example": "Seven is a prime number.",
+          "level": "core"
+        },
+        {
+          "word": "factor",
+          "definition": "A number that divides into another number with nothing left over",
+          "example": "Three is a factor of twelve.",
+          "level": "core"
+        },
+        {
+          "word": "decimal",
+          "definition": "A number written with a point to show parts smaller than one",
+          "example": "The decimal 0.5 is the same as one half.",
+          "level": "core"
+        },
+        {
+          "word": "percent",
+          "definition": "A part out of one hundred",
+          "example": "Fifty percent of the class chose pizza.",
+          "level": "core"
+        },
+        {
+          "word": "integer",
+          "definition": "Any whole number, its negative, or zero",
+          "example": "Negative four is an integer, but 4.5 is not.",
+          "level": "core"
+        },
+        {
+          "word": "average",
+          "definition": "A number that stands for a typical value in a set, often the mean",
+          "example": "My average score on the quizzes was 85.",
+          "level": "core"
+        },
+        {
+          "word": "equation",
+          "definition": "A math sentence that says two amounts are equal, using an = sign",
+          "example": "Solve the equation 3x = 15 to find x.",
+          "level": "challenge"
+        },
+        {
+          "word": "perimeter",
+          "definition": "The total distance around the outside of a shape",
+          "example": "The perimeter of a 5 by 3 rectangle is 16.",
+          "level": "challenge"
+        },
+        {
+          "word": "variable",
+          "definition": "A letter that stands for a number you do not know yet",
+          "example": "In 2y + 1 = 9, the variable is y.",
+          "level": "challenge"
+        },
+        {
+          "word": "exponent",
+          "definition": "A small raised number that shows how many times to multiply a number by itself",
+          "example": "In 2 to the power of 3, the exponent is 3.",
+          "level": "challenge"
+        },
+        {
+          "word": "polygon",
+          "definition": "A flat, closed shape made of straight sides",
+          "example": "A hexagon is a polygon with six sides.",
+          "level": "challenge"
+        }
+      ]
+    },
+    {
+      "code": "LC-EN-PK-PHONICS",
+      "name": "Word families",
+      "description": "Short-vowel word families for K-2 readers: change the first sound and make a new word. cat, hat, bat; pig, dig, wig; hop, top, mop.",
+      "language": "en",
+      "grade": "grade_1",
+      "subject": "english",
+      "words": [
+        {
+          "word": "hat",
+          "definition": "Something you wear on your head",
+          "example": "The hat is on the cat.",
+          "level": "support"
+        },
+        {
+          "word": "mat",
+          "definition": "A small rug you wipe your feet on or sit on",
+          "example": "Sit on the mat for story time.",
+          "level": "support"
+        },
+        {
+          "word": "sat",
+          "definition": "Rested on a seat; the past of sit",
+          "example": "The dog sat by the door.",
+          "level": "support"
+        },
+        {
+          "word": "fan",
+          "definition": "A machine that blows air to keep you cool",
+          "example": "Turn on the fan, it is hot.",
+          "level": "support"
+        },
+        {
+          "word": "pan",
+          "definition": "A flat pot for cooking",
+          "example": "Dad made eggs in a pan.",
+          "level": "core"
+        },
+        {
+          "word": "van",
+          "definition": "A big car that can carry many people or things",
+          "example": "We rode to the zoo in a van.",
+          "level": "core"
+        },
+        {
+          "word": "pig",
+          "definition": "A pink farm animal with a curly tail",
+          "example": "The pig rolled in the mud.",
+          "level": "core"
+        },
+        {
+          "word": "dig",
+          "definition": "To make a hole in the ground",
+          "example": "Let's dig in the sand.",
+          "level": "core"
+        },
+        {
+          "word": "wig",
+          "definition": "Fake hair that you put on your head",
+          "example": "The clown wore a green wig.",
+          "level": "core"
+        },
+        {
+          "word": "top",
+          "definition": "The highest part of something",
+          "example": "Climb to the top of the slide.",
+          "level": "core"
+        },
+        {
+          "word": "hop",
+          "definition": "To jump on one foot or like a bunny",
+          "example": "Can you hop like a frog?",
+          "level": "core"
+        },
+        {
+          "word": "mop",
+          "definition": "A stick with soft strings on the end for washing floors",
+          "example": "Use the mop to clean the spill.",
+          "level": "core"
+        },
+        {
+          "word": "bug",
+          "definition": "A small creature such as an ant or a beetle",
+          "example": "A bug is on the leaf.",
+          "level": "core"
+        },
+        {
+          "word": "rug",
+          "definition": "A thick cloth that covers part of a floor",
+          "example": "The rug is soft and blue.",
+          "level": "core"
+        },
+        {
+          "word": "hug",
+          "definition": "To hold someone close in your arms",
+          "example": "I hug my mom when I get home.",
+          "level": "core"
+        },
+        {
+          "word": "hen",
+          "definition": "A grown female chicken",
+          "example": "The hen sat on her eggs.",
+          "level": "core"
+        },
+        {
+          "word": "chat",
+          "definition": "To talk in a friendly, easy way",
+          "example": "We chat on the bus.",
+          "level": "challenge"
+        },
+        {
+          "word": "twig",
+          "definition": "A very small, thin stick from a tree",
+          "example": "A bird took a twig to its nest.",
+          "level": "challenge"
+        },
+        {
+          "word": "shop",
+          "definition": "A place where you buy things",
+          "example": "We went to the shop for milk.",
+          "level": "challenge"
+        },
+        {
+          "word": "plug",
+          "definition": "A thing that fills a hole or connects a cord to power",
+          "example": "Pull the plug out of the bath.",
+          "level": "challenge"
+        }
+      ]
+    },
+    {
+      "code": "LC-EN-PK-ESL-A1",
+      "name": "English A1: Everyday basics",
+      "description": "First words for English learners (CEFR A1): home, food, clothes, family and time. Simple meanings and short example sentences.",
+      "language": "en",
+      "grade": "grade_6",
+      "subject": "english",
+      "words": [
+        {
+          "word": "bread",
+          "definition": "A food made from flour and baked; you make sandwiches with it",
+          "example": "I eat bread and jam for breakfast.",
+          "level": "support"
+        },
+        {
+          "word": "milk",
+          "definition": "A white drink that comes from cows",
+          "example": "Do you want milk in your tea?",
+          "level": "support"
+        },
+        {
+          "word": "shirt",
+          "definition": "A piece of clothing for the top of your body",
+          "example": "He is wearing a blue shirt.",
+          "level": "support"
+        },
+        {
+          "word": "shoes",
+          "definition": "Things you wear on your feet when you go outside",
+          "example": "Take off your shoes, please.",
+          "level": "support"
+        },
+        {
+          "word": "week",
+          "definition": "Seven days",
+          "example": "I play football two times a week.",
+          "level": "support"
+        },
+        {
+          "word": "hot",
+          "definition": "Very warm",
+          "example": "It is very hot today.",
+          "level": "core"
+        },
+        {
+          "word": "cold",
+          "definition": "Not warm; low in temperature",
+          "example": "The water is cold.",
+          "level": "core"
+        },
+        {
+          "word": "open",
+          "definition": "To move something so people can go in or see inside",
+          "example": "Please open the window.",
+          "level": "core"
+        },
+        {
+          "word": "sleep",
+          "definition": "To rest with your eyes closed at night",
+          "example": "I sleep for eight hours.",
+          "level": "core"
+        },
+        {
+          "word": "kitchen",
+          "definition": "The room where you cook food",
+          "example": "My mother is in the kitchen.",
+          "level": "core"
+        },
+        {
+          "word": "bedroom",
+          "definition": "The room where you sleep",
+          "example": "My bedroom is small but nice.",
+          "level": "core"
+        },
+        {
+          "word": "brother",
+          "definition": "A boy who has the same parents as you",
+          "example": "My brother is ten years old.",
+          "level": "core"
+        },
+        {
+          "word": "sister",
+          "definition": "A girl who has the same parents as you",
+          "example": "My sister likes to sing.",
+          "level": "core"
+        },
+        {
+          "word": "morning",
+          "definition": "The first part of the day, before 12 o'clock",
+          "example": "I go to school in the morning.",
+          "level": "core"
+        },
+        {
+          "word": "hungry",
+          "definition": "Wanting to eat",
+          "example": "I am hungry. Can we eat now?",
+          "level": "core"
+        },
+        {
+          "word": "breakfast",
+          "definition": "The first meal of the day",
+          "example": "We have breakfast at seven o'clock.",
+          "level": "challenge"
+        },
+        {
+          "word": "tomorrow",
+          "definition": "The day after today",
+          "example": "See you tomorrow!",
+          "level": "challenge"
+        },
+        {
+          "word": "yesterday",
+          "definition": "The day before today",
+          "example": "It rained yesterday.",
+          "level": "challenge"
+        },
+        {
+          "word": "weekend",
+          "definition": "Saturday and Sunday, when many people do not work",
+          "example": "What did you do on the weekend?",
+          "level": "challenge"
+        }
+      ]
+    },
+    {
+      "code": "LC-EN-PK-ESL-A2",
+      "name": "English A2: Out and about",
+      "description": "Useful words for elementary learners (CEFR A2): travel, shopping, plans and habits. Clear meanings with real-life examples.",
+      "language": "en",
+      "grade": "grade_7",
+      "subject": "english",
+      "words": [
+        {
+          "word": "ticket",
+          "definition": "A small paper or card that lets you travel or go into a place",
+          "example": "I bought a ticket for the train.",
+          "level": "support"
+        },
+        {
+          "word": "hobby",
+          "definition": "Something you like to do in your free time",
+          "example": "My hobby is drawing.",
+          "level": "support"
+        },
+        {
+          "word": "cheap",
+          "definition": "Costing little money",
+          "example": "These shoes were very cheap.",
+          "level": "support"
+        },
+        {
+          "word": "clothes",
+          "definition": "Things you wear, like shirts and trousers",
+          "example": "I need new clothes for the trip.",
+          "level": "support"
+        },
+        {
+          "word": "arrive",
+          "definition": "To get to a place",
+          "example": "The bus will arrive at six.",
+          "level": "core"
+        },
+        {
+          "word": "invite",
+          "definition": "To ask someone to come to an event",
+          "example": "I want to invite you to my party.",
+          "level": "core"
+        },
+        {
+          "word": "prefer",
+          "definition": "To like one thing more than another",
+          "example": "I prefer tea to coffee.",
+          "level": "core"
+        },
+        {
+          "word": "forget",
+          "definition": "To not remember",
+          "example": "Don't forget your keys!",
+          "level": "core"
+        },
+        {
+          "word": "recipe",
+          "definition": "Instructions that tell you how to cook something",
+          "example": "This cake recipe is easy.",
+          "level": "core"
+        },
+        {
+          "word": "message",
+          "definition": "Words you send to someone",
+          "example": "I sent her a message on my phone.",
+          "level": "core"
+        },
+        {
+          "word": "station",
+          "definition": "A place where trains or buses stop",
+          "example": "Meet me at the station at noon.",
+          "level": "core"
+        },
+        {
+          "word": "airport",
+          "definition": "A place where planes take off and land",
+          "example": "We got to the airport early.",
+          "level": "core"
+        },
+        {
+          "word": "healthy",
+          "definition": "Good for your body, or not ill",
+          "example": "Fruit is a healthy snack.",
+          "level": "core"
+        },
+        {
+          "word": "usually",
+          "definition": "Most of the time",
+          "example": "I usually walk to school.",
+          "level": "core"
+        },
+        {
+          "word": "sometimes",
+          "definition": "On some occasions, but not always",
+          "example": "Sometimes we eat dinner outside.",
+          "level": "challenge"
+        },
+        {
+          "word": "already",
+          "definition": "Before now, or sooner than expected",
+          "example": "I have already finished my homework.",
+          "level": "challenge"
+        },
+        {
+          "word": "expensive",
+          "definition": "Costing a lot of money",
+          "example": "That phone is too expensive for me.",
+          "level": "challenge"
+        },
+        {
+          "word": "dangerous",
+          "definition": "Able to hurt you; not safe",
+          "example": "It is dangerous to cross the road here.",
+          "level": "challenge"
+        },
+        {
+          "word": "comfortable",
+          "definition": "Nice to wear or sit in; making you feel relaxed",
+          "example": "This sofa is very comfortable.",
+          "level": "challenge"
+        }
+      ]
+    },
+    {
+      "code": "LC-EN-PK-ESL-B1",
+      "name": "English B1: Ideas and opinions",
+      "description": "Intermediate words (CEFR B1) for giving advice, explaining reasons and talking about plans, work and everyday problems.",
+      "language": "en",
+      "grade": "grade_8",
+      "subject": "english",
+      "words": [
+        {
+          "word": "advice",
+          "definition": "Ideas you give someone about what they should do",
+          "example": "My teacher gave me good advice about the exam.",
+          "level": "support"
+        },
+        {
+          "word": "career",
+          "definition": "The job or series of jobs you do in your life",
+          "example": "She wants a career in medicine.",
+          "level": "support"
+        },
+        {
+          "word": "likely",
+          "definition": "Probably going to happen",
+          "example": "It is likely to rain this afternoon.",
+          "level": "support"
+        },
+        {
+          "word": "reduce",
+          "definition": "To make smaller or less",
+          "example": "We should reduce the noise in the library.",
+          "level": "support"
+        },
+        {
+          "word": "suggest",
+          "definition": "To give an idea for someone to think about",
+          "example": "I suggest we leave early to avoid traffic.",
+          "level": "core"
+        },
+        {
+          "word": "improve",
+          "definition": "To make or become better",
+          "example": "Reading every day will improve your English.",
+          "level": "core"
+        },
+        {
+          "word": "achieve",
+          "definition": "To succeed in doing something after trying hard",
+          "example": "You can achieve your goal if you practise.",
+          "level": "core"
+        },
+        {
+          "word": "benefit",
+          "definition": "Something good that helps you",
+          "example": "One benefit of cycling is that it keeps you fit.",
+          "level": "core"
+        },
+        {
+          "word": "complain",
+          "definition": "To say that you are unhappy about something",
+          "example": "He went to complain about the cold soup.",
+          "level": "core"
+        },
+        {
+          "word": "convince",
+          "definition": "To make someone believe or agree with something",
+          "example": "I tried to convince my dad to get a dog.",
+          "level": "core"
+        },
+        {
+          "word": "depend",
+          "definition": "To need someone or something; to change because of something",
+          "example": "Our plans depend on the weather.",
+          "level": "core"
+        },
+        {
+          "word": "increase",
+          "definition": "To become or make bigger in number or amount",
+          "example": "The price of bread will increase next month.",
+          "level": "core"
+        },
+        {
+          "word": "attitude",
+          "definition": "The way you think and feel about something",
+          "example": "She has a positive attitude at work.",
+          "level": "core"
+        },
+        {
+          "word": "reliable",
+          "definition": "Able to be trusted to do what is needed",
+          "example": "My old bike is still very reliable.",
+          "level": "core"
+        },
+        {
+          "word": "therefore",
+          "definition": "For that reason; so",
+          "example": "It was late, therefore we took a taxi.",
+          "level": "challenge"
+        },
+        {
+          "word": "although",
+          "definition": "Even if; despite the fact that",
+          "example": "We went out, although it was raining.",
+          "level": "challenge"
+        },
+        {
+          "word": "recommend",
+          "definition": "To say that something is good and someone should try it",
+          "example": "I recommend this book to everyone.",
+          "level": "challenge"
+        },
+        {
+          "word": "situation",
+          "definition": "What is happening at a certain time and place",
+          "example": "We need to deal with the situation calmly.",
+          "level": "challenge"
+        },
+        {
+          "word": "opportunity",
+          "definition": "A chance to do something",
+          "example": "This trip is a great opportunity to practise English.",
+          "level": "challenge"
+        }
+      ]
+    },
+    {
+      "code": "LC-EN-PK-ESL-B2",
+      "name": "English B2: Academic and debate",
+      "description": "Upper-intermediate words (CEFR B2) for essays, discussions and debates: weighing evidence, linking ideas and stating a position.",
+      "language": "en",
+      "grade": "grade_10",
+      "subject": "english",
+      "words": [
+        {
+          "word": "assume",
+          "definition": "To think something is true without being sure",
+          "example": "Don't assume the test will be easy.",
+          "level": "support"
+        },
+        {
+          "word": "approach",
+          "definition": "A way of dealing with a problem or task",
+          "example": "We need a new approach to learning vocabulary.",
+          "level": "support"
+        },
+        {
+          "word": "crucial",
+          "definition": "Extremely important",
+          "example": "Sleep is crucial before an exam.",
+          "level": "support"
+        },
+        {
+          "word": "decline",
+          "definition": "To become less, or to politely say no",
+          "example": "The number of visitors began to decline in winter.",
+          "level": "support"
+        },
+        {
+          "word": "thorough",
+          "definition": "Careful and complete, checking every detail",
+          "example": "The teacher gave my essay a thorough check.",
+          "level": "core"
+        },
+        {
+          "word": "priority",
+          "definition": "Something that is more important than other things",
+          "example": "Safety is our first priority.",
+          "level": "core"
+        },
+        {
+          "word": "perceive",
+          "definition": "To notice or understand something in a certain way",
+          "example": "Many people perceive the city as safe.",
+          "level": "core"
+        },
+        {
+          "word": "emphasize",
+          "definition": "To show that something is especially important",
+          "example": "The coach likes to emphasize teamwork.",
+          "level": "core"
+        },
+        {
+          "word": "contribute",
+          "definition": "To give something, like help or ideas, to a shared goal",
+          "example": "Everyone should contribute to the discussion.",
+          "level": "core"
+        },
+        {
+          "word": "beneficial",
+          "definition": "Having a good effect; helpful",
+          "example": "Regular exercise is beneficial for your mood.",
+          "level": "core"
+        },
+        {
+          "word": "feasible",
+          "definition": "Possible and practical to do",
+          "example": "Is it feasible to finish the project by Friday?",
+          "level": "core"
+        },
+        {
+          "word": "widespread",
+          "definition": "Found or happening in many places or among many people",
+          "example": "Smartphone use is widespread among teenagers.",
+          "level": "core"
+        },
+        {
+          "word": "sustainable",
+          "definition": "Able to continue for a long time without harming nature",
+          "example": "We need more sustainable ways to travel.",
+          "level": "core"
+        },
+        {
+          "word": "consequence",
+          "definition": "A result of an action, often a bad one",
+          "example": "Missing the bus had one consequence: I was late.",
+          "level": "challenge"
+        },
+        {
+          "word": "inevitable",
+          "definition": "Certain to happen; impossible to avoid",
+          "example": "Some mistakes are inevitable when you learn a language.",
+          "level": "challenge"
+        },
+        {
+          "word": "substantial",
+          "definition": "Large in amount or importance",
+          "example": "The library received a substantial donation.",
+          "level": "challenge"
+        },
+        {
+          "word": "nevertheless",
+          "definition": "In spite of that; however",
+          "example": "The task was hard; nevertheless, we finished it.",
+          "level": "challenge"
+        },
+        {
+          "word": "acknowledge",
+          "definition": "To accept or admit that something is true",
+          "example": "She was quick to acknowledge her mistake.",
+          "level": "challenge"
+        },
+        {
+          "word": "ambiguous",
+          "definition": "Having more than one possible meaning; unclear",
+          "example": "The question was ambiguous, so we asked the teacher.",
+          "level": "challenge"
+        }
+      ]
+    }
+  ]
+}

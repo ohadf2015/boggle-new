@@ -21,7 +21,7 @@ describe('ClassroomFormDialog (edit a class)', () => {
   it('offers every language the classroom routes accept', () => {
     render(<ClassroomFormDialog {...baseProps} />);
 
-    const group = screen.getByRole('radiogroup', { name: 'teacher.classroom.language' });
+    const group = screen.getByRole('radiogroup', { name: 'teacher.classroom.defaultLanguage' });
     const radios = within(group).getAllByRole('radio') as HTMLInputElement[];
     expect(radios.map((r) => r.value)).toEqual([...EDUCATION_LANGUAGES]);
   });

@@ -65,12 +65,18 @@ export function LobbyPressureDials({ pressure, onChange }: LobbyPressureDialsPro
         <span className="inline-flex min-w-[7.5rem] items-center gap-1.5 font-neo-display text-xs font-black uppercase text-neo-white/70">
           <Gauge className="size-4 shrink-0 text-neo-purple" strokeWidth={3} aria-hidden="true" />
           {t('teacher.classroom.pressure.title')}
+          <span
+            data-testid="pressure-pro-badge"
+            className="rounded-neo border-2 border-neo-black bg-neo-lime px-1.5 font-neo-display text-[0.65rem] font-black uppercase leading-tight text-neo-black"
+          >
+            {t('eduShell.host.proBadge')}
+          </span>
         </span>
         {!loading && !hasPro && !trialLive && (
           <Link
             href={`/${language}/teacher/upgrade`}
             data-testid="pressure-pro-lock"
-            className="inline-flex min-h-9 items-center gap-1.5 rounded-neo border-2 border-neo-lime bg-neo-navy-light px-3 py-1 font-neo-display text-xs font-black uppercase text-neo-lime shadow-hard-sm transition-shadow hover:shadow-hard"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-neo border-2 border-neo-lime bg-neo-navy-light px-3 py-1 font-neo-display text-xs font-black uppercase text-neo-lime shadow-hard-sm transition-shadow hover:shadow-hard"
           >
             <Lock className="size-3.5" strokeWidth={3} aria-hidden="true" />
             {t('teacher.proGate.pressureDials.title')}

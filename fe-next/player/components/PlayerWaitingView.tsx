@@ -8,7 +8,7 @@
  * Desktop (≥720px): seats + DJ Lexi status (rules accordion) left; invite +
  * chat right — the base suite pins chat and rules as mounted on the joiner's
  * desktop, so they stay there (the host's rail follows DESIGN §3: launcher).
- * A classroom student gets ClassroomWaitingStage instead (unchanged contract).
+ * A classroom student gets EduStudentLobby instead (unchanged contract).
  */
 import React, { memo, useState, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
@@ -44,7 +44,7 @@ import { useChatUnread } from '@/components/multiplayer/lobby/useChatUnread';
 import { LobbyExitButton, LobbyChatButton, LobbyChatPanel, HowToPlaySheet, ChatSheet } from '@/components/multiplayer/lobby/LobbyChrome';
 import type { Language, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import { VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
-import { ClassroomWaitingStage } from '@/components/education/lobby/ClassroomWaitingStage';
+import { EduStudentLobby } from '@/components/education/live/EduStudentLobby';
 import { useEduLiveSurfaces } from '@/components/education/live/eduLiveSurfaces';
 import { AvatarQuickPick } from '@/components/student/live/AvatarQuickPick';
 import { StudentExitDialog } from '@/components/student/live/StudentExitDialog';
@@ -144,7 +144,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
   const status = <LobbyAutoStartStatus readyCount={readyCount} readyTotal={readyTotal} t={t} />;
   const emote = <EmoteTray onEmote={sendEmote} t={t} disabled={cooldownActive} compact />;
 
-  const StudentStage = eduSurfaces.StudentLobby ?? ClassroomWaitingStage;
+  const StudentStage = eduSurfaces.StudentLobby ?? EduStudentLobby;
   const dialogs = (
     <>
       <AvatarBuilderModal

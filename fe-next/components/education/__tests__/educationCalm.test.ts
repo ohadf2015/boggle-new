@@ -22,7 +22,6 @@ describe('education surfaces stay calm', () => {
 
   it('shows landing sections immediately, without a scroll-in hide', () => {
     for (const rel of [
-      'components/education/ComparisonStrip.tsx',
       'components/education/TeacherAccessCTA.tsx',
     ]) {
       const src = read(rel);
@@ -33,6 +32,6 @@ describe('education surfaces stay calm', () => {
   it('keeps the lobby title level and the arena behind a heavy scrim', () => {
     expect(read('components/education/lobby/ClassroomLobbyShell.tsx')).not.toMatch(/-rotate-/);
     expect(read('components/education/lobby/LaunchStageBackdrop.tsx')).toContain('bg-neo-navy/80');
-    expect(read('components/education/ClassroomGameLobbyExpress.tsx')).not.toMatch(/animate-bounce/);
+    expect(read('components/education/lobby/QuickLaunchProvisioner.tsx')).not.toMatch(/animate-bounce/);
   });
 });

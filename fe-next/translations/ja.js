@@ -26,7 +26,8 @@ const ja = {
   // @eduPickers:start
   "eduPickers": {
     "language": {
-      "boardHint": "このクラスのゲームで使う辞書と盤面の文字が決まります"
+      "boardHint": "このクラスのゲームで使う辞書と盤面の文字が決まります",
+      "defaultHint": "新しいリストはこの言語で始まります。レッスンはどの言語でも作れて、ゲームはリストの言語で遊びます。"
     },
     "board": {
       "label": "盤面: {language}"
@@ -40,7 +41,14 @@ const ja = {
       "searchPlaceholder": "リストを検索",
       "noMatch": "「{query}」に一致するリストはありません",
       "noLanguage": "その他",
-      "selectAllIn": "{language}のリストをすべて選ぶ"
+      "selectAllIn": "{language}のリストをすべて選ぶ",
+      "filterLabel": "表示する言語",
+      "allLanguages": "すべて",
+      "boardSwitched": "ボードを{language}に切り替えました。1回のゲームは1つの言語で遊びます。"
+    },
+    "content": {
+      "addLanguage": "言語を追加",
+      "languageLabel": "言語"
     }
   },
   // @eduPickers:end
@@ -13975,7 +13983,18 @@ const ja = {
       "body": "こちらで問題が起きました。もう一度お試しください。クラスと学習の記録は残っています。",
       "retry": "もう一度試す"
     },
-    "notYou": "別の人ですか？最初から始める"
+    "notYou": "別の人ですか？最初から始める",
+    "today": {
+      "title": "今日",
+      "warmup": "ウォームアップ",
+      "warmupDone": "宿題はぜんぶ完了",
+      "chest": "宝箱を開けよう",
+      "chestDone": "宝箱オープン済み",
+      "streak": "{count}日の炎をキープ",
+      "streakDone": "今日の炎はついた",
+      "warmupCta": "ゲーム前にウォームアップ",
+      "play": "プレイ"
+    }
   },
   "teacher": {
     "nav": {
@@ -14554,9 +14573,18 @@ const ja = {
       "studentCountPro": "生徒 {{count}} 人",
       "presets": {
         "title": "定型プリセット",
-        "fridayBattle": { "name": "金曜単語バトル", "desc": "チーム戦 · 前回のリスト · 速くてにぎやか" },
-        "sped": { "name": "サポート (SPED)", "desc": "少ない単語 · 長めの時間 · 大きな文字" },
-        "standard": { "name": "標準", "desc": "定番3分間の全員対戦" }
+        "fridayBattle": {
+          "name": "金曜単語バトル",
+          "desc": "チーム戦 · 前回のリスト · 速くてにぎやか"
+        },
+        "sped": {
+          "name": "サポート (SPED)",
+          "desc": "少ない単語 · 長めの時間 · 大きな文字"
+        },
+        "standard": {
+          "name": "標準",
+          "desc": "定番3分間の全員対戦"
+        }
       },
       "playStyle": {
         "title": "プレイスタイル",
@@ -14708,7 +14736,8 @@ const ja = {
         "shareTip": "このコードをGoogle Classroom、メール、またはテキストメッセージで生徒と共有してください",
         "pressEscape": "ESCを押して終了",
         "exit": "プレゼンテーションを終了"
-      }
+      },
+      "defaultLanguage": "基本の言語"
     },
     "classrooms": {
       "students": {
@@ -14924,7 +14953,22 @@ const ja = {
       "wordGoalMissing": "単語ゴールかリストと期限を入れてください",
       "alreadyAssignedUpdated": "このレッスンはすでにこのクラスに割り当て済みです。期限と設定を更新しました。",
       "alreadyAssigned": "このレッスンはすでにこのクラスに割り当て済みです",
-      "findNWords": "{{count}}語見つけよう"
+      "findNWords": "{{count}}語見つけよう",
+      "subjectLanguage": "ことば",
+      "templateIntl": {
+        "k2Language": "小1〜2 ことば：はじめてのことば",
+        "k2LanguageDesc": "読みはじめの子のための、身近で短いことば",
+        "k2Science": "小1〜2 生活：いきものと しぜん",
+        "k2ScienceDesc": "子どもがよく話す動物・植物・天気のことば",
+        "g35Science": "小3〜5 理科：生き物と実験",
+        "g35ScienceDesc": "植物・動物とかんたんな実験のことば",
+        "g35Geography": "小3〜5 社会：国土と地図",
+        "g35GeographyDesc": "山・川と地図の読み方のことば",
+        "g68Geography": "小6〜中2 社会：地形と地図",
+        "g68GeographyDesc": "地形・気候と地図を読むことば",
+        "g68Science": "小6〜中2 理科：生き物と大地",
+        "g68ScienceDesc": "中学理科の用語を、わかりやすい説明つきで"
+      }
     },
     "completion": {
       "overallProgress": "全体的な進捗",
@@ -15307,19 +15351,19 @@ const ja = {
           "wordcraft": "Word Craftを宿題として出せるようになりました。レッスンの単語が盤面に登場し、実際にプレイしたラウンドだけが完了として記録されます。",
           "leaderboard": "プロジェクターにライブランキングを表示。追い抜きのたびに順位が入れ替わり、生徒は自分の位置を確認できます。",
           "chests": "語彙クイズに宝箱が登場:正解すると3つの宝箱から1つを開けられます(獲得・2倍・奪取・入れ替え)。初期設定でオン、ゲーム設定でオフにできます。",
-          "title": "クラスのゲームがもっと楽しく",
-        },
+          "title": "クラスのゲームがもっと楽しく"
+        }
       },
       "close": "OK",
       "subtitle": "クラスのゲームの改善点を、リリースごとにお知らせします。",
       "title": "先生向けの新機能",
-      "button": "新機能",
+      "button": "新機能"
     },
     "subscription": {
-      "classLimitReached": "無料プランのクラス上限に達しました。Proにアップグレードすると、クラスを無制限に作成できます。",
+      "classLimitReached": "無料プランのクラス上限に達しました。Proにアップグレードすると、クラスを無制限に作成できます。"
     },
     "lobby": {
-      "joinTitle": "ゲームに参加しよう",
+      "joinTitle": "ゲームに参加しよう"
     },
     "homework": {
       "takeHomeToggle": "持ち帰り練習カード",
@@ -15495,11 +15539,11 @@ const ja = {
         "multiple_meaning": "1つの単語に2つの意味",
         "roots_affixes": "語のパーツの意味",
         "produce": {
-            "definition": "意味を読んで単語を書く",
-            "synonym": "似た単語を見て単語を書く",
-            "antonym": "反対の意味を見て単語を書く",
-            "context": "空欄を記憶から埋める"
-          }
+          "definition": "意味を読んで単語を書く",
+          "synonym": "似た単語を見て単語を書く",
+          "antonym": "反対の意味を見て単語を書く",
+          "context": "空欄を記憶から埋める"
+        }
       },
       "locked": {
         "word_tower": "4〜6文字のリスト単語が4つ以上必要です",
@@ -15556,7 +15600,9 @@ const ja = {
       "teacherHint": "やさしいボットと1対1。生徒はクラスのページから遊べます。",
       "studentPlay": "ワードクラフトで遊ぶ",
       "needLessonWord": "クリアするには、レッスンの単語を1つ以上作るか、好きな単語を{count}語見つけよう。",
-      "tryAgain": "もう一度"
+      "tryAgain": "もう一度",
+      "languageUnsupported": "Word Craftにはまだこのリストの言語のタイルがありません。",
+      "languageFallback": "Word Craftにはまだこのリストの言語のタイルがないため、このラウンドはアプリの言語で遊びます。"
     },
     "vocabFocus": {
       "title": "語彙フォーカス",
@@ -15914,7 +15960,6 @@ const ja = {
       "missGapGradePassbackTitle": "ミスギャップ成績：{{lesson}}",
       "missGapGradePassbackBackHomework": "ミスギャップ宿題に戻る",
       "missGapGradePassbackOpen": "Google Classroom 成績レシートを開く",
-
       "unpluggedGradePassbackEyebrow": "Google Classroom 成績パスバック",
       "unpluggedGradePassbackHeading": "Unplugged 再指導の成績を提出",
       "unpluggedGradePassbackSubtitle": "ライブ終了。クラスの cleared/total を Classroom の成績表へ渡せます。",
@@ -15931,7 +15976,6 @@ const ja = {
       "unpluggedGradePassbackTitle": "Unplugged 成績：{{lesson}}",
       "unpluggedGradePassbackBackLive": "Unplugged Live に戻る",
       "unpluggedGradePassbackOpen": "Google Classroom に成績を提出",
-
       "missGapWhatsAppEyebrow": "保護者向けWhatsApp練習",
       "missGapWhatsAppHeading": "miss-gap練習カードをWhatsAppで家庭へ",
       "missGapWhatsAppSubtitle": "練習カードをワンタップで保護者のチャットに送れます。共有されるのはクラスの単語だけで、生徒の名前は含みません。",
@@ -15953,7 +15997,7 @@ const ja = {
       "unpluggedReteachPackQrHint": "スキャンしてプロジェクターで復習を開く",
       "unpluggedReteachPackHowTo": "1) このパックを印刷 2) 練習ページを生徒に渡す 3) 教師画面でQRをスキャン",
       "unpluggedReteachPackPracticeHeading": "生徒用練習ページ",
-      "unpluggedReteachPackFooter": "LexiClash · デバイスなしの復習シート",
+      "unpluggedReteachPackFooter": "LexiClash · デバイスなしの復習シート"
     },
     "classroomAddon": {
       "eyebrow": "Google Classroom Marketplace",
@@ -15966,7 +16010,7 @@ const ja = {
       "privacyNote": "名簿の取り込みなし。生徒名なし。投稿は Google の共有ダイアログ経由で、どのクラスかは見えません。",
       "postToStream": "Unplugged課題をClassroom Streamに投稿",
       "openUnplugged": "Unplugged Live を開く",
-            "needMissedWords": "ワンクリック課題には、見逃した単語を1つ以上入力してください。",
+      "needMissedWords": "ワンクリック課題には、見逃した単語を1つ以上入力してください。",
       "planner": {
         "eyebrow": "会話型 Classroom プランナー",
         "title": "やりたいことを書くと、Live へ案内します",
@@ -16071,25 +16115,84 @@ const ja = {
       "coinReward": "+{{amount}} コイン"
     },
     "achievements": {
-      "first_lesson": { "name": "はじめてのレッスン", "description": "先生のレッスンをクリア" },
-      "word_master": { "name": "単語マスター", "description": "たくさんの単語を覚えよう" },
-      "level_climber": { "name": "レベルアップ", "description": "新しいレベルに到達" },
-      "xp_collector": { "name": "XPコレクター", "description": "練習でXPをためよう" },
-      "practice_veteran": { "name": "練習の達人", "description": "練習ラウンドをこなそう" },
-      "speed_demon": { "name": "スピードスター", "description": "時間切れになる前に答えよう" },
-      "perfect_streak": { "name": "パーフェクト", "description": "ミスなしでラウンドをクリア" },
-      "boss_slayer": { "name": "ボスハンター", "description": "ボスラウンドに勝利" },
-      "combo_master": { "name": "コンボマスター", "description": "長いコンボをつなげよう" },
-      "streak_starter": { "name": "連続スタート", "description": "何日か続けて練習しよう" },
-      "early_bird": { "name": "早起きさん", "description": "学校の前に練習しよう" },
-      "dedicated_learner": { "name": "がんばり屋", "description": "いろいろな日に練習しよう" },
-      "weekly_warrior": { "name": "1週間かんぺき", "description": "1週間毎日練習しよう" },
-      "streak_champion": { "name": "連続チャンピオン", "description": "長い連続記録を守ろう" },
-      "mode_explorer": { "name": "モード探検家", "description": "いろいろな練習ゲームを試そう" },
-      "lesson_collector": { "name": "レッスンコレクター", "description": "たくさんのレッスンで練習しよう" },
-      "classroom_contributor": { "name": "チームプレイヤー", "description": "クラスのために得点しよう" },
-      "word_variety": { "name": "単語ハンター", "description": "いろいろな種類の単語を見つけよう" },
-      "categories": {"consistency":"継続力","exploration":"探索","progress":"進捗","skill":"スキル"},
+      "first_lesson": {
+        "name": "はじめてのレッスン",
+        "description": "先生のレッスンをクリア"
+      },
+      "word_master": {
+        "name": "単語マスター",
+        "description": "たくさんの単語を覚えよう"
+      },
+      "level_climber": {
+        "name": "レベルアップ",
+        "description": "新しいレベルに到達"
+      },
+      "xp_collector": {
+        "name": "XPコレクター",
+        "description": "練習でXPをためよう"
+      },
+      "practice_veteran": {
+        "name": "練習の達人",
+        "description": "練習ラウンドをこなそう"
+      },
+      "speed_demon": {
+        "name": "スピードスター",
+        "description": "時間切れになる前に答えよう"
+      },
+      "perfect_streak": {
+        "name": "パーフェクト",
+        "description": "ミスなしでラウンドをクリア"
+      },
+      "boss_slayer": {
+        "name": "ボスハンター",
+        "description": "ボスラウンドに勝利"
+      },
+      "combo_master": {
+        "name": "コンボマスター",
+        "description": "長いコンボをつなげよう"
+      },
+      "streak_starter": {
+        "name": "連続スタート",
+        "description": "何日か続けて練習しよう"
+      },
+      "early_bird": {
+        "name": "早起きさん",
+        "description": "学校の前に練習しよう"
+      },
+      "dedicated_learner": {
+        "name": "がんばり屋",
+        "description": "いろいろな日に練習しよう"
+      },
+      "weekly_warrior": {
+        "name": "1週間かんぺき",
+        "description": "1週間毎日練習しよう"
+      },
+      "streak_champion": {
+        "name": "連続チャンピオン",
+        "description": "長い連続記録を守ろう"
+      },
+      "mode_explorer": {
+        "name": "モード探検家",
+        "description": "いろいろな練習ゲームを試そう"
+      },
+      "lesson_collector": {
+        "name": "レッスンコレクター",
+        "description": "たくさんのレッスンで練習しよう"
+      },
+      "classroom_contributor": {
+        "name": "チームプレイヤー",
+        "description": "クラスのために得点しよう"
+      },
+      "word_variety": {
+        "name": "単語ハンター",
+        "description": "いろいろな種類の単語を見つけよう"
+      },
+      "categories": {
+        "consistency": "継続力",
+        "exploration": "探索",
+        "progress": "進捗",
+        "skill": "スキル"
+      },
       "ariaDismissError": "エラーを消す",
       "ariaOverallProgress": "全体的な進捗",
       "completion": "{{percent}}%達成",
@@ -16571,11 +16674,26 @@ const ja = {
       "title": "LexiClash の授業での使い方",
       "subtitle": "5つのステップでライブ単語ゲームをすぐ開始。",
       "steps": {
-        "create": { "title": "クラスを作成", "text": "名前をつけるだけですぐ準備完了。" },
-        "share": { "title": "参加コードを共有", "text": "黒板に映すか、リンクを送るだけ。" },
-        "join": { "title": "生徒が参加", "text": "どの端末からでもOK。アカウント不要。" },
-        "play": { "title": "ライブ単語ゲームを開始", "text": "レッスンを選んでスタート。" },
-        "results": { "title": "結果を確認", "text": "ダッシュボードで生徒の進捗を追跡。" }
+        "create": {
+          "title": "クラスを作成",
+          "text": "名前をつけるだけですぐ準備完了。"
+        },
+        "share": {
+          "title": "参加コードを共有",
+          "text": "黒板に映すか、リンクを送るだけ。"
+        },
+        "join": {
+          "title": "生徒が参加",
+          "text": "どの端末からでもOK。アカウント不要。"
+        },
+        "play": {
+          "title": "ライブ単語ゲームを開始",
+          "text": "レッスンを選んでスタート。"
+        },
+        "results": {
+          "title": "結果を確認",
+          "text": "ダッシュボードで生徒の進捗を追跡。"
+        }
       },
       "gotIt": "OK、さっそく始めよう！",
       "showTutorial": "使い方"
@@ -16595,7 +16713,6 @@ const ja = {
         "cta": "明確な無料50席でクラス全体をホスト"
       }
     },
-    
     "vsWayground": {
       "starterLimit": {
         "eyebrow": "無料プランのライブラリ：正直な比較",
@@ -16739,7 +16856,7 @@ const ja = {
         "cta": "明確な50席の無料枠でクラス全体の語彙ゲームをホスト"
       }
     },
-"vsBlooket": {
+    "vsBlooket": {
       "gapsSet": {
         "eyebrow": "レポートのあと：正直な比較",
         "title": "Blooket: Incorrect%で並べ替え、「Gaps Set」を手作業で再構築。LexiClash: miss → Liveディープリンク。",
@@ -16850,9 +16967,8 @@ const ja = {
     "student": {
       "join": {
         "alreadyMember": "すでにこのクラスのメンバーです",
-        "classroomFull": "このクラスは満員です。先生に空きを作ってもらってください。",
-        "button": "クラスに参加",
         "classroomFull": "このクラスは満員です",
+        "button": "クラスに参加",
         "clipboardError": "クリップボードを読み取れませんでした",
         "codeHint": "6文字のクラスコードを先生に聞いてね",
         "codeLabel": "クラスコード",
@@ -16970,19 +17086,19 @@ const ja = {
     "starterPacks": {
       "beginnerRussian": {
         "description": "初心者のための基本ロシア語単語",
-        "name": "初級ロシア語",
+        "name": "初級ロシア語"
       },
       "beginnerJapanese": {
         "description": "初心者のための基本日本語単語",
-        "name": "初級日本語",
+        "name": "初級日本語"
       },
       "beginnerSwedish": {
         "description": "初心者のための基本スウェーデン語単語",
-        "name": "初級スウェーデン語",
+        "name": "初級スウェーデン語"
       },
       "beginnerSpanish": {
         "description": "初心者のための基本スペイン語単語",
-        "name": "初級スペイン語",
+        "name": "初級スペイン語"
       },
       "academicVocab": {
         "name": "学術語彙",
@@ -16998,7 +17114,57 @@ const ja = {
       },
       "subtitle": "すぐに使える語彙セット",
       "title": "スターターパック",
-      "useThisPack": "このパックを使う"
+      "useThisPack": "このパックを使う",
+      "sessions": {
+        "title": "すぐ使える授業パック",
+        "subtitle": "授業の場面を選ぶだけ。ゲーム・単語リスト・タイマーはセット済みです。",
+        "runThis": "これで始める",
+        "noList": "リスト不要",
+        "pickList": "リストを選ぶ",
+        "gradeAndUp": "{{grade}}以上"
+      },
+      "themed": {
+        "title": "季節・テーマ別パック",
+        "subtitle": "クラスの言語で作った、意味つきの単語リスト。追加すればどのゲームでも遊べます。",
+        "addToLessons": "マイレッスンに追加",
+        "thisSeason": "今の季節",
+        "showAll": "{{count}}個のパックをすべて表示",
+        "showLess": "表示を減らす"
+      },
+      "session": {
+        "warmUp": {
+          "name": "5分ウォームアップ",
+          "when": "授業のはじめに。季節のことばで1ボード遊べば、みんなの頭が動き出します。"
+        },
+        "exitTicket": {
+          "name": "振り返りクイズ",
+          "when": "最後の3分で。短いクイズで、今日のことばが身についたかがわかります。"
+        },
+        "brainBreak": {
+          "name": "気分転換タイム",
+          "when": "集中が切れてきたら。Blastを3分、準備するリストはありません。"
+        },
+        "icebreaker": {
+          "name": "はじめての日のアイスブレイク",
+          "when": "新学期や新しいクラスで。あいさつ・なかよし・ありがとうなど、クラスのことば。"
+        },
+        "spellingBee": {
+          "name": "金曜日のことばバトル",
+          "when": "週の終わりに。チーム対抗2ラウンドで、今週のことばをボードから探します。"
+        },
+        "testReview": {
+          "name": "テスト前の復習",
+          "when": "テストの前日に。大事な用語のクイズを2ラウンド、答えも表示されます。"
+        },
+        "eslStarter": {
+          "name": "英語学習スターター",
+          "when": "英語を学ぶクラスに。A1〜B2のCEFRレベルを選んで、意味をクイズで確認。"
+        },
+        "earlyFinishers": {
+          "name": "早く終わった子に",
+          "when": "早く終わった子が、それぞれ自分のWordcraftボードで静かに遊べます。"
+        }
+      }
     },
     "lesson": {
       "createdClassroom": "クラスを作成しました",
@@ -17231,7 +17397,7 @@ const ja = {
       "cta": "最初のクラスを作成",
       "expired_title": "教師トライアルが終了しました",
       "expired_kept": "クラスと単語リストは引き続き無料です。レポート、単語の習熟度、落ち着きモードはProが必要です。",
-            "recap": "トライアル中 — 実施したゲーム：{{games}}、名簿の生徒：{{students}}",
+      "recap": "トライアル中 — 実施したゲーム：{{games}}、名簿の生徒：{{students}}",
       "recapGamesOnly": "トライアル中 — 実施したゲーム：{{games}}",
       "expired_body": "無料トライアル期間が終了しました。教室モードを続けるには、再申請またはお問い合わせください。",
       "renew_cta": "教師アクセスを更新"
@@ -17275,34 +17441,34 @@ const ja = {
       }
     },
     "packages": {
-          "title": "教育パッケージ",
-          "subtitle": "Teacher Proはセルフサーブ課金。学校・学科向け：$49/教員/年（5名以上）、請求書または発注書 — 下のフォームで見積もりを依頼。",
-          "teacherPro": {
-                "name": "Teacher Pro",
-                "interval": "/月",
-                "blurb": "1人の教員向けに、すべてのレポート、取りこぼし宿題、再指導ツール。",
-                "cta": "月$9でアップグレード"
-          },
-          "school": {
-                "name": "学校・学科",
-                "price": "$49から",
-                "priceFrom": "年額",
-                "interval": "/教員/年",
-                "priceTerms": "{min}名以上の教員 · 請求書または発注書",
-                "blurb": "チームの全教員にTeacher Pro。請求書または発注書 — セルフサーブ決済なし。",
-                "cta": "学校見積もりを依頼"
-          },
-          "feature": {
-                "reports": "すべてのクラスレポート",
-                "homework": "取りこぼし宿題",
-                "reteach": "再指導ツール",
-                "wholeClass": "クラス全体（1席だけではない）",
-                "proPlus": "Teacher Proの全機能を含む",
-                "streaks": "クラスの連続記録",
-                "priority": "優先サポート",
-                "district": "学校・学科への展開",
-                "invoice": "請求書または発注書"
-          }
+      "title": "教育パッケージ",
+      "subtitle": "Teacher Proはセルフサーブ課金。学校・学科向け：$49/教員/年（5名以上）、請求書または発注書 — 下のフォームで見積もりを依頼。",
+      "teacherPro": {
+        "name": "Teacher Pro",
+        "interval": "/月",
+        "blurb": "1人の教員向けに、すべてのレポート、取りこぼし宿題、再指導ツール。",
+        "cta": "月$9でアップグレード"
+      },
+      "school": {
+        "name": "学校・学科",
+        "price": "$49から",
+        "priceFrom": "年額",
+        "interval": "/教員/年",
+        "priceTerms": "{min}名以上の教員 · 請求書または発注書",
+        "blurb": "チームの全教員にTeacher Pro。請求書または発注書 — セルフサーブ決済なし。",
+        "cta": "学校見積もりを依頼"
+      },
+      "feature": {
+        "reports": "すべてのクラスレポート",
+        "homework": "取りこぼし宿題",
+        "reteach": "再指導ツール",
+        "wholeClass": "クラス全体（1席だけではない）",
+        "proPlus": "Teacher Proの全機能を含む",
+        "streaks": "クラスの連続記録",
+        "priority": "優先サポート",
+        "district": "学校・学科への展開",
+        "invoice": "請求書または発注書"
+      }
     }
   },
   "crazygames": {
@@ -20892,7 +21058,8 @@ const ja = {
       "title": "先生向けヘルプセンター",
       "body": "使い方ガイド、5分チュートリアル、すぐわかるQ&A。",
       "cta": "ヘルプを見る"
-    }
+    },
+    "fallbackNote": "このガイドはまだお使いの言語に翻訳されていないため、英語で表示しています。"
   },
   // @eg2Help:end
   // @gameShell:start
@@ -21028,7 +21195,9 @@ const ja = {
       "noWords": "今回は単語なし。次こそ！",
       "nextRound": "次のラウンドは画面に注目",
       "leave": "退出",
-      "calculating": "単語を集計中…"
+      "calculating": "単語を集計中…",
+      "classGoal": "クラスの合計：{found}/{total}語",
+      "waitNext": "次は先生が決めるよ。待つ間にウォームアップ！"
     }
   }
   // @eduLiveRoom:end
@@ -21172,14 +21341,16 @@ const ja = {
         "g35": "小3〜小5",
         "g68": "小6〜中2",
         "g912": "中3〜高3",
-        "adult": "大人"
+        "adult": "大人",
+        "esl": "英語学習（ESL）"
       },
       "gradeName": {
         "k2": "幼児〜小2クラス",
         "g35": "小3〜小5クラス",
         "g68": "小6〜中2クラス",
         "g912": "中3〜高3クラス",
-        "adult": "大人のクラス"
+        "adult": "大人のクラス",
+        "esl": "英語クラス"
       },
       "languageLabel": "ゲームの言語",
       "languageHint": "生徒が使う辞書の言語になります。",
@@ -21211,7 +21382,13 @@ const ja = {
         "step2": "コードかQRを黒板に映す — 生徒はスマホから参加",
         "step3": "スタートを押す:2分のラウンド、結果はリアルタイムで表示",
         "start": "2分のラウンドを始める"
-      }
+      },
+      "skip": "あとで設定する",
+      "packLabel": "最初のゲームで使う単語",
+      "packWords": "{count}語",
+      "packRecommended": "おすすめ",
+      "startLive": "ライブゲームを始める",
+      "createOnly": "クラスだけ作る"
     },
     "host": {
       "classLabel": "クラス",
@@ -21219,7 +21396,21 @@ const ja = {
       "lateJoinHint": "ラウンド開始後も生徒が参加できます。",
       "options": "オプション",
       "optionsHide": "オプションを隠す",
-      "retry": "もう一度試す"
+      "retry": "もう一度試す",
+      "gameOptions": "ゲーム設定",
+      "moreOptions": "その他の設定",
+      "proBadge": "Pro",
+      "lateJoinOn": "途中参加あり",
+      "lateJoinOff": "途中参加なし",
+      "changeList": "変更",
+      "listDone": "決定"
+    },
+    "warmup": {
+      "send": "生徒にウォームアップを送る",
+      "retry": "送信できませんでした。もう一度",
+      "capped": "無料プランの宿題の上限に達しました。Proならウォームアップを無制限に送れます。",
+      "status": "{total}人中{done}人がウォームアップ済み",
+      "sent": "ウォームアップを送信しました"
     }
   },
   // @eduShell:end

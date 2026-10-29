@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, within } from '@testing-library/react';
-import { ClassroomModeCatalogue } from '../ClassroomModeCatalogue';
+import { ClassroomModeCatalogue, ClassroomModeCardRow } from '../ClassroomModeCatalogue';
 import { catalogueModes } from '../ClassroomModeCatalogueData';
 
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -12,27 +12,24 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 
 type Props = React.ComponentProps<typeof ClassroomModeCatalogue>;
+type RowProps = React.ComponentProps<typeof ClassroomModeCardRow>;
+const t = (key: string, params?: unknown) => (params && typeof params === 'object' ? `${key}|${JSON.stringify(params)}` : key);
 
 function setup(overrides: Partial<Props> = {}) {
-  const onPick = vi.fn();
   const onGoLive = vi.fn();
-  const props: Props = {
-    selected: 'vocab-quiz',
-    recommended: null,
-    minutes: 4,
-    playStyle: 'ffa',
-    blockedKey: null,
-    onPick,
-    onGoLive,
-    ...overrides,
-  };
-  render(<ClassroomModeCatalogue {...props} />);
-  return { onPick, onGoLive };
+  render(<ClassroomModeCatalogue selected="vocab-quiz" minutes={4} playStyle="ffa" blockedKey={null} onGoLive={onGoLive} {...overrides} />);
+  return { onGoLive };
+}
+
+function setupRow(overrides: Partial<RowProps> = {}) {
+  const onPick = vi.fn();
+  render(<ClassroomModeCardRow selected="vocab-quiz" onPick={onPick} t={t} {...overrides} />);
+  return { onPick };
 }
 
 describe('<ClassroomModeCatalogue>', () => {
   it('shows every mode at once as a card, exactly one checked', () => {
-    setup({ selected: 'blast' });
+    setupRow({ selected: 'blast' });
     const cards = screen.getAllByRole('radio');
     expect(cards).toHaveLength(catalogueModes().length);
     const checked = cards.filter((c) => c.getAttribute('aria-checked') === 'true');
@@ -40,7 +37,7 @@ describe('<ClassroomModeCatalogue>', () => {
   });
 
   it('groups the cards under their category headings', () => {
-    setup();
+    setupRow();
     const groups = screen.getAllByTestId(/^mode-group-/);
     expect(groups.length).toBeGreaterThan(1);
     const meaning = screen.getByTestId('mode-group-meaning');
@@ -80,10 +77,15 @@ describe('<ClassroomModeCatalogue>', () => {
   });
 
   it('selects on a card tap and never launches from it', () => {
-    const { onPick, onGoLive } = setup({ selected: 'vocab-quiz' });
+    const { onPick } = setupRow({ selected: 'vocab-quiz' });
     fireEvent.click(screen.getByTestId('mode-tile-classic'));
     expect(onPick).toHaveBeenCalledWith('classic');
-    expect(onGoLive).not.toHaveBeenCalled();
+  });
+
+  it('is the ready panel only: no card row beside GO LIVE', () => {
+    setup();
+    expect(screen.queryAllByRole('radio')).toHaveLength(0);
+    expect(screen.getByTestId('lobby-go-live')).toBeInTheDocument();
   });
 
   it('launches on GO LIVE, which names the selected mode', () => {
@@ -104,13 +106,13 @@ describe('<ClassroomModeCatalogue>', () => {
   });
 
   it('quotes each card in the room\'s own settings when the lobby supplies them', () => {
-    setup({ selected: 'classic', minutes: 6, minutesFor: (id) => (id === 'vocab-quiz' ? 8 : 6) });
+    setupRow({ selected: 'classic', selectedMinutes: 6, minutesFor: (id) => (id === 'vocab-quiz' ? 8 : 6) });
     expect(screen.getByTestId('mode-tile-vocab-quiz')).toHaveTextContent('education.modePicker.minutes|{"count":8}');
     expect(screen.getByTestId('mode-tile-blast')).toHaveTextContent('education.modePicker.minutes|{"count":6}');
   });
 
   it('lets the teacher pick Boss Battle and previews the boss fight', () => {
-    const { onPick } = setup({ selected: 'vocab-quiz' });
+    const { onPick } = setupRow({ selected: 'vocab-quiz' });
     fireEvent.click(screen.getByTestId('mode-tile-boss-battle'));
     expect(onPick).toHaveBeenCalledWith('boss-battle');
   });
@@ -123,12 +125,12 @@ describe('<ClassroomModeCatalogue>', () => {
   });
 
   it('flags the recommended mode on its card', () => {
-    setup({ recommended: 'vocab-quiz' });
+    setupRow({ recommended: 'vocab-quiz' });
     expect(within(screen.getByTestId('mode-tile-vocab-quiz')).getByTestId('mode-recommended')).toBeInTheDocument();
   });
 
   it('gives each card its own mascot art, never one shared picture', () => {
-    setup();
+    setupRow();
     const srcs = screen.getAllByRole('radio').map((c) => c.querySelector('img')?.getAttribute('src'));
     expect(new Set(srcs).size).toBe(srcs.length);
   });

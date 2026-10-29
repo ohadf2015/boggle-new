@@ -32,12 +32,12 @@ describe('ProjectorLobby — a mode switched in place survives the round', () =>
   it('Given the teacher switched Classic to Wordcraft and a round ran, Then the remounted lobby still names Wordcraft', () => {
     sessionStorage.setItem('lessonGameData', JSON.stringify({ gameMode: 'wordcraft', lessonName: 'Common English' }));
     renderLobby();
-    expect(screen.getByTestId('lobby-change-mode')).toHaveTextContent('teacher.classroom.gameModes.wordcraft');
+    expect(screen.getByTestId('projector-mode')).toHaveTextContent('teacher.classroom.gameModes.wordcraft');
   });
 
   it('Given no switch was made, Then the launch mode is what the lobby names', () => {
     sessionStorage.setItem('lessonGameData', JSON.stringify({ gameMode: 'classic' }));
     renderLobby();
-    expect(screen.getByTestId('lobby-change-mode')).toHaveTextContent('teacher.classroom.gameModes.classic');
+    expect(screen.getByTestId('projector-mode')).toHaveTextContent('teacher.classroom.gameModes.classic');
   });
 });

@@ -11,9 +11,9 @@ import {
   sortLessonsForClass,
   toggleLessonInOneLanguage,
 } from '@/lib/education/lessonPickerModel';
-import { languageFlag } from '@/lib/i18n/languageLabels';
 import { LessonPickerOption, type PickerLesson } from './LessonPickerOption';
 import { nativeLanguageName } from './nativeLanguageName';
+import { LanguagePicker } from './LanguagePicker';
 
 const SEARCH_THRESHOLD = 6;
 
@@ -22,7 +22,7 @@ export interface LessonPickerProps {
   mode: 'single' | 'multi';
   selectedIds: string[];
   onChange: (ids: string[]) => void;
-  /** Lists in the class's language sort first; a board in another language gets a note. */
+  /** Lists in the class's default language sort first. */
   classLanguage?: string | null;
   /** Display labels by id (e.g. same-named lists suffixed with their class). */
   labels?: ReadonlyMap<string, string>;
@@ -49,24 +49,23 @@ export function LessonPicker({
   const headingId = `${radioName}-heading`;
   const [query, setQuery] = useState('');
   const [switchedTo, setSwitchedTo] = useState<string | null>(null);
+  const [languageFilter, setLanguageFilter] = useState<string>('all');
   const labelOf = (l: PickerLesson) => labels?.get(l.id) ?? l.name;
 
   const sorted = useMemo(() => sortLessonsForClass(lessons, classLanguage), [lessons, classLanguage]);
+  const presentLanguages = useMemo(
+    () => [...new Set(sorted.map((l) => l.language).filter((code): code is string => !!code))],
+    [sorted]
+  );
+  const filterLanguage = presentLanguages.length > 1 && presentLanguages.includes(languageFilter) ? languageFilter : null;
   const needle = query.trim().toLowerCase();
-  const visible = needle ? sorted.filter((l) => (labels?.get(l.id) ?? l.name).toLowerCase().includes(needle)) : sorted;
-  const groups = useMemo(() => {
-    const byLanguage = new Map<string, PickerLesson[]>();
-    for (const l of visible) {
-      const key = l.language ?? '';
-      byLanguage.set(key, [...(byLanguage.get(key) ?? []), l]);
-    }
-    return [...byLanguage.entries()];
-  }, [visible]);
-  const showGroupHeadings = new Set(lessons.map((l) => l.language ?? '')).size > 1;
+  const visible = sorted.filter(
+    (l) => (!filterLanguage || l.language === filterLanguage) && (!needle || labelOf(l).toLowerCase().includes(needle))
+  );
 
   const selected = lessons.filter((l) => selectedIds.includes(l.id));
   const board = boardLanguageOf(selected);
-  const activeLanguage = activeLanguageOf(sorted, selectedIds, classLanguage);
+  const activeLanguage = filterLanguage ?? activeLanguageOf(sorted, selectedIds, classLanguage);
   const pool = activeLanguage ? lessons.filter((l) => l.language === activeLanguage) : lessons;
   const allSelected = pool.length > 0 && selectedIds.length === pool.length && pool.every((l) => selectedIds.includes(l.id));
 
@@ -101,18 +100,10 @@ export function LessonPicker({
   const boardName = board.language ? nativeLanguageName(board.language) : '';
   const notice = board.mixed
     ? { id: 'lesson-mixed-warning', text: t('eduPickers.lesson.mixedWarning', 'These lists use different languages. The board will use {language} letters.', { language: boardName }) }
-    : board.language && classLanguage && board.language !== classLanguage
-      ? {
-          id: 'lesson-class-mismatch',
-          text: t('eduPickers.lesson.classMismatch', 'This class is set to {classLanguage}. The board will use {language} letters.', {
-            classLanguage: nativeLanguageName(classLanguage),
-            language: boardName,
-          }),
-        }
-      : null;
+    : null;
 
   return (
-    <div className={cn('space-y-3', className)}>
+    <div className={cn('@container space-y-3', className)}>
       {mode === 'multi' && (
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h3 id={headingId} className="font-neo-display text-lg text-neo-white">{t('education.classroomGame.selectLessons')}</h3>
@@ -131,12 +122,25 @@ export function LessonPicker({
             >
               {allSelected
                 ? t('education.classroomGame.deselectAll')
-                : showGroupHeadings && activeLanguage
+                : presentLanguages.length > 1 && activeLanguage
                   ? t('eduPickers.lesson.selectAllIn', 'Select all {language}', { language: nativeLanguageName(activeLanguage) })
                   : t('education.classroomGame.selectAllLessons')}
             </button>
           </div>
         </div>
+      )}
+
+      {presentLanguages.length > 1 && (
+        <LanguagePicker
+          testId="lesson-language-filter"
+          variant="filter"
+          hideLabel
+          label={t('eduPickers.lesson.filterLabel', 'Show lists in')}
+          allLabel={t('eduPickers.lesson.allLanguages', 'All')}
+          options={presentLanguages}
+          value={filterLanguage ?? 'all'}
+          onChange={setLanguageFilter}
+        />
       )}
 
       {lessons.length > SEARCH_THRESHOLD && (
@@ -164,7 +168,7 @@ export function LessonPicker({
       )}
       <p role="status" className={switchedTo ? 'font-neo-body text-sm text-neo-cream/85' : 'sr-only'}>
         {switchedTo
-          ? t('eduPickers.lesson.switched', 'Switched to {language}. A game uses one language, so the other lists were cleared.', {
+          ? t('eduPickers.lesson.boardSwitched', 'Board switched to {language}. One game plays in one language.', {
               language: nativeLanguageName(switchedTo),
             })
           : ''}
@@ -178,32 +182,18 @@ export function LessonPicker({
         <div
           role={mode === 'single' ? 'radiogroup' : 'group'}
           aria-labelledby={mode === 'multi' ? headingId : labelledBy}
-          className="space-y-3"
+          className="grid w-full grid-cols-1 gap-3 @md:grid-cols-2"
         >
-          {groups.map(([language, items]) => (
-            <div key={language || 'none'} data-testid="lesson-language-group" data-language={language} className="space-y-2">
-              {showGroupHeadings && (
-                <p className="flex items-center gap-1.5 font-neo-body text-xs font-bold text-neo-cream/75">
-                  <span aria-hidden="true">{language ? languageFlag(language) : '\u{1F310}'}</span>
-                  <span lang={language || undefined}>
-                    {language ? nativeLanguageName(language) : t('eduPickers.lesson.noLanguage', 'Other')}
-                  </span>
-                </p>
-              )}
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                {items.map((lesson) => (
-                  <LessonPickerOption
-                    key={lesson.id}
-                    lesson={lesson}
-                    label={labelOf(lesson)}
-                    selected={selectedIds.includes(lesson.id)}
-                    onToggle={() => toggle(lesson.id)}
-                    mode={mode}
-                    radioName={radioName}
-                  />
-                ))}
-              </div>
-            </div>
+          {visible.map((lesson) => (
+            <LessonPickerOption
+              key={lesson.id}
+              lesson={lesson}
+              label={labelOf(lesson)}
+              selected={selectedIds.includes(lesson.id)}
+              onToggle={() => toggle(lesson.id)}
+              mode={mode}
+              radioName={radioName}
+            />
           ))}
         </div>
       )}

@@ -20,15 +20,15 @@ export function NoLessonWordsPanel({ words, size, children, t }: NoLessonWordsPa
   const projector = size === 'projector';
 
   return (
-    <div data-testid="no-lesson-words-panel" className={cn('flex min-h-0 flex-col gap-2', projector && 'h-full 2xl:gap-3')}>
-      <p dir="auto" className={cn('font-neo-display font-black uppercase leading-tight text-neo-cyan', projector ? 'text-2xl 2xl:text-4xl' : 'text-lg')}>
+    <div data-testid="no-lesson-words-panel" className={cn('flex min-h-0 flex-col gap-2', projector && 'h-full @[96rem]/results:gap-3')}>
+      <p dir="auto" className={cn('font-neo-display font-black uppercase leading-tight text-neo-cyan', projector ? 'text-2xl @[96rem]/results:text-4xl' : 'text-lg')}>
         {t('eduLive.results.noLessonTitle')}
       </p>
-      <p dir="auto" className={cn('font-neo-body font-bold leading-snug text-neo-white/85', projector ? 'text-lg 2xl:text-2xl' : 'text-sm')}>
+      <p dir="auto" className={cn('font-neo-body font-bold leading-snug text-neo-white/85', projector ? 'text-lg @[96rem]/results:text-2xl' : 'text-sm')}>
         {t(words.length > 0 ? 'eduLive.results.noLessonBody' : 'eduLive.results.noLessonBodyEmpty')}
       </p>
       {words.length > 0 && (
-        <ul className={cn('flex shrink-0 flex-wrap content-start gap-2', projector && '2xl:gap-3')}>
+        <ul className={cn('flex shrink-0 flex-wrap content-start gap-2', projector && '@[96rem]/results:gap-3')}>
           {words.map((entry, i) => (
             <m.li
               key={entry.word}
@@ -39,7 +39,7 @@ export function NoLessonWordsPanel({ words, size, children, t }: NoLessonWordsPa
               transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 420, damping: 18, delay: 0.08 * i }}
               className={cn(
                 'flex items-center gap-1.5 rounded-neo border-[2px] border-neo-black bg-neo-cyan font-bold uppercase text-neo-black shadow-hard-sm',
-                projector ? 'px-3 py-1.5 text-xl 2xl:px-4 2xl:py-2 2xl:text-3xl' : 'px-3 py-1.5 text-sm'
+                projector ? 'px-3 py-1.5 text-xl @[96rem]/results:px-4 @[96rem]/results:py-2 @[96rem]/results:text-3xl' : 'px-3 py-1.5 text-sm'
               )}
             >
               <span dir="auto">{applyHebrewFinalLetters(entry.word)}</span>
@@ -50,7 +50,7 @@ export function NoLessonWordsPanel({ words, size, children, t }: NoLessonWordsPa
           ))}
         </ul>
       )}
-      <p dir="auto" className={cn('font-neo-body font-bold text-neo-white/70', projector ? 'text-base 2xl:text-xl' : 'text-xs')}>
+      <p dir="auto" className={cn('font-neo-body font-bold text-neo-white/70', projector ? 'text-base @[96rem]/results:text-xl' : 'text-xs')}>
         {t('eduLive.results.noLessonHint')}
       </p>
       {children && <div className={cn('mt-1', projector && 'min-h-0 flex-1')}>{children}</div>}

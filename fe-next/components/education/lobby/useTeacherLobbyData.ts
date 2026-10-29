@@ -31,10 +31,41 @@ export interface StarterPackInput {
   words: Parameters<typeof convertPackWordsToLessonWords>[0];
 }
 
-/** The newest list in the class's language, or none: a list in another language deals a board the class cannot read. */
-export function defaultLessonIdsFor(lessons: readonly VocabularyLesson[], classroomLanguage: string | null | undefined): string[] {
-  const match = classroomLanguage ? lessons.find((l) => l.language === classroomLanguage) : lessons[0];
-  return match ? [match.id] : [];
+export interface RecentLessonPick {
+  classroomId: string;
+  lessonIds: string[];
+  savedAt: number;
+}
+
+const RECENT_KEY = 'lexiclash_recent_game_settings';
+
+/** Read synchronously so the first paint already holds the teacher's last list (an async read would flip the picker). */
+export function readRecentLessonPicks(): RecentLessonPick[] {
+  try {
+    const parsed: unknown = JSON.parse(window.localStorage.getItem(RECENT_KEY) ?? '[]');
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .filter((e): e is RecentLessonPick => !!e && Array.isArray(e.lessonIds) && typeof e.classroomId === 'string')
+      .sort((a, b) => (b.savedAt ?? 0) - (a.savedAt ?? 0));
+  } catch {
+    return [];
+  }
+}
+
+/** This class's last-played lists (any language), else the newest list of any language; another class's history never leaks in. */
+export function defaultLessonIdsFor(
+  lessons: readonly Pick<VocabularyLesson, 'id' | 'language'>[],
+  classroomId: string | null | undefined,
+  recent: readonly RecentLessonPick[] = readRecentLessonPicks()
+): string[] {
+  const byId = new Map(lessons.map((l) => [l.id, l]));
+  for (const pick of recent.filter((r) => r.classroomId === classroomId)) {
+    const alive = pick.lessonIds.filter((id) => byId.has(id));
+    if (alive.length === 0) continue;
+    const language = byId.get(alive[0])?.language;
+    return alive.filter((id) => byId.get(id)?.language === language);
+  }
+  return lessons[0] ? [lessons[0].id] : [];
 }
 
 export function useTeacherLobbyData(
@@ -57,7 +88,6 @@ export function useTeacherLobbyData(
   const lessonPickIsAuto = useRef(!initialLessonId);
   const classroomIdRef = useRef(selectedClassroomId);
   const lessonsRef = useRef<VocabularyLesson[]>([]);
-  const classroomsRef = useRef<Classroom[]>([]);
 
   const setSelectedLessonIds = useCallback((ids: string[] | ((prev: string[]) => string[])) => {
     lessonPickIsAuto.current = false;
@@ -66,8 +96,7 @@ export function useTeacherLobbyData(
 
   const autoPickLessonFor = useCallback((classroomId: string) => {
     if (!lessonPickIsAuto.current) return;
-    const language = classroomsRef.current.find((c) => c.id === classroomId)?.language;
-    setLessonIdsState(defaultLessonIdsFor(lessonsRef.current, language));
+    setLessonIdsState(defaultLessonIdsFor(lessonsRef.current, classroomId));
   }, []);
 
   const setSelectedClassroomId = useCallback((id: string) => {
@@ -91,7 +120,6 @@ export function useTeacherLobbyData(
         setLessons(lessonsResult.data);
       }
       if (classroomsResult.data) {
-        classroomsRef.current = classroomsResult.data;
         setClassrooms(classroomsResult.data);
         const prev = classroomIdRef.current;
         if (classroomsResult.data.length > 0 && !(prev && classroomsResult.data.some((c) => c.id === prev))) {

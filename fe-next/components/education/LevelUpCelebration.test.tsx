@@ -379,4 +379,15 @@ describe('LevelUpCelebration', () => {
       expect(document.activeElement).toBe(button);
     });
   });
+
+  describe('Fullscreen layer rules', () => {
+    it('given the overlay covers the screen, then it appears static: no opacity fade, no blur, motion only on the card', () => {
+      const { container } = render(<LevelUpCelebration levelUpData={defaultLevelUpData} onClose={defaultOnClose} />);
+      const overlay = screen.getByRole('dialog');
+      expect(overlay.className).not.toMatch(/fade-in|backdrop-blur|animate-in/);
+      const all = Array.from(container.querySelectorAll('[class]')).map((el) => el.getAttribute('class') ?? '');
+      expect(all.filter((c) => /fade-in/.test(c))).toEqual([]);
+      expect(all.filter((c) => /(^|\s)animate-in/.test(c))).toEqual([]);
+    });
+  });
 });

@@ -103,7 +103,7 @@ describe('ClassroomGameLobby — launching from the catalogue', () => {
   it('hides the treasure-chest switch for Boss Battle, which never deals chests', () => {
     render(<ClassroomGameLobby onBack={vi.fn()} />);
     fireEvent.click(screen.getByTestId('mode-tile-vocab-quiz'));
-    fireEvent.click(screen.getAllByRole('button', { expanded: false }).find((b) => b.textContent?.includes('Unit 3'))!);
+    fireEvent.click(screen.getByTestId('lobby-setup-summary'));
     expect(screen.getByText('vocabQuiz.setup.treasureChests')).toBeInTheDocument();
     fireEvent.click(screen.getByTestId('mode-tile-boss-battle'));
     expect(screen.queryByText('vocabQuiz.setup.treasureChests')).not.toBeInTheDocument();

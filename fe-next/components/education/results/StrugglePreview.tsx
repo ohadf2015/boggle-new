@@ -1,11 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { BarChart3, Lock } from 'lucide-react';
+import { BarChart3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import type { ClassroomPlayerMastery } from '@/shared/types/classroom';
-import { UnlockReportUpgradeCta } from './UnlockReportUpgradeCta';
 import { trackResultsAction } from './trackResultsAction';
 
 export interface StrugglePreviewProps {
@@ -17,10 +16,7 @@ export interface StrugglePreviewProps {
   maxBars?: number;
 }
 
-/**
- * The report's shape, on the teacher's wall: one bar per student, weakest first, blurred.
- * It is read by the whole class, so it never prints a name; Pro opens the real report, free gets the gated ask.
- */
+/** A Pro teacher's door to the class report. Read by the whole class, so it never prints a name. */
 export function StrugglePreview({ masteryByPlayer, teacherName, language, t, maxBars = 5 }: StrugglePreviewProps) {
   const { hasPro, loading } = useTeacherPro();
   const host = teacherName.trim().toLowerCase();
@@ -28,14 +24,14 @@ export function StrugglePreview({ masteryByPlayer, teacherName, language, t, max
     .filter(([name, m]) => name.trim().toLowerCase() !== host && m && m.total > 0)
     .map(([, m]) => Math.round((m.found / m.total) * 100))
     .sort((a, b) => a - b);
-  if (pcts.length === 0) return null;
+  if (pcts.length === 0 || loading || !hasPro) return null;
 
   return (
     <section
       data-testid="struggle-preview"
       className="flex shrink-0 items-center gap-4 rounded-neo border-[3px] border-neo-cream bg-neo-navy-elevated px-4 py-3 shadow-hard"
     >
-      <ul aria-hidden="true" className="flex w-28 shrink-0 flex-col gap-1.5 blur-[2px] 2xl:w-36">
+      <ul aria-hidden="true" className="flex w-28 shrink-0 flex-col gap-1.5 @lg/results:w-36">
         {pcts.slice(0, maxBars).map((pct, i) => (
           <li key={i} data-testid="struggle-bar" data-pct={String(pct)} className="flex items-center gap-1.5">
             <span className="h-2.5 w-8 shrink-0 rounded-full bg-neo-cream/50" />
@@ -49,23 +45,18 @@ export function StrugglePreview({ masteryByPlayer, teacherName, language, t, max
         ))}
       </ul>
       <div className="flex min-w-0 flex-col items-start gap-2">
-        <p className="flex items-center gap-2 font-neo-display text-base font-black leading-tight text-neo-cream 2xl:text-xl">
-          <Lock className="size-4 shrink-0 text-neo-yellow 2xl:size-5" aria-hidden="true" />
+        <p className="font-neo-display text-base font-black leading-tight text-neo-cream @[96rem]/results:text-xl">
           {t('eduPlans.reports.title')}
         </p>
-        {hasPro && !loading ? (
-          <Link
-            href={`/${language}/teacher/reports`}
-            data-testid="edu-results-report"
-            onClick={() => trackResultsAction('view_report', 'projector')}
-            className="inline-flex items-center gap-1.5 rounded-neo border-[2px] border-neo-black bg-neo-cyan px-3 py-1.5 font-neo-body text-sm font-black text-neo-black shadow-hard-sm transition-transform hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none"
-          >
-            <BarChart3 className="size-4 shrink-0" aria-hidden="true" />
-            {t('education.results.fullReport')}
-          </Link>
-        ) : (
-          <UnlockReportUpgradeCta language={language} t={t} surface="projector" tone="quiet" />
-        )}
+        <Link
+          href={`/${language}/teacher/reports`}
+          data-testid="edu-results-report"
+          onClick={() => trackResultsAction('view_report', 'projector')}
+          className="inline-flex min-h-11 items-center gap-1.5 rounded-neo border-[2px] border-neo-cream/60 px-3 font-neo-display text-sm font-black uppercase text-neo-cream hover:bg-neo-navy-light"
+        >
+          <BarChart3 className="size-4 shrink-0" aria-hidden="true" />
+          {t('education.results.fullReport')}
+        </Link>
       </div>
     </section>
   );

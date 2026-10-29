@@ -11,6 +11,8 @@ import {
   type GradeBand,
   type AssignmentSubject,
 } from '@/lib/education/assignmentTemplates';
+import type { Language } from '@/lib/supabase/education/types';
+import { ContentLanguageChips } from '@/components/education/pickers/ContentLanguageChips';
 
 type GradeFilter = GradeBand | 'all';
 type SubjectFilter = AssignmentSubject | 'all';
@@ -21,8 +23,15 @@ export function AssignmentTemplateGallery({
   onAssign,
   onClose,
   onCreateOwn,
+  language,
+  languages,
+  onLanguageChange,
 }: {
   templates: AssignmentTemplate[];
+  /** With `languages` + `onLanguageChange`: which language's templates show. */
+  language?: Language;
+  languages?: readonly Language[];
+  onLanguageChange?: (code: Language) => void;
   isSubmitting: boolean;
   onAssign: (template: AssignmentTemplate) => void;
   onClose: () => void;
@@ -42,6 +51,7 @@ export function AssignmentTemplateGallery({
       }),
     [templates, gradeBand, subject],
   );
+  const subjects = useMemo(() => SUBJECTS.filter((item) => templates.some((tpl) => tpl.subject === item)), [templates]);
 
   return (
     <div data-testid="assignment-template-gallery" className="space-y-4">
@@ -51,6 +61,19 @@ export function AssignmentTemplateGallery({
       <p className="font-neo-body text-xs text-neo-white/70 text-pretty">
         {t('teacher.assignment.galleryHint')}
       </p>
+
+      {language && languages && onLanguageChange && (
+        <ContentLanguageChips
+          testId="template-filter-language"
+          label={t('eduPickers.content.languageLabel', 'Language')}
+          languages={languages}
+          value={language}
+          onChange={(code) => {
+            setSubject('all');
+            onLanguageChange(code);
+          }}
+        />
+      )}
 
       <div className="flex flex-wrap gap-2" role="group" aria-label={t('teacher.assignment.gradeBand')}>
         <FilterChip
@@ -83,7 +106,7 @@ export function AssignmentTemplateGallery({
         >
           {t('teacher.assignment.subjectAll')}
         </FilterChip>
-        {SUBJECTS.map((item) => (
+        {subjects.map((item) => (
           <FilterChip
             key={item}
             testId={`template-filter-subject-${item}`}

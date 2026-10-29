@@ -4,6 +4,8 @@ import { BookOpen, Check } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { lessonWordCount, type PickerLessonLike } from '@/lib/education/lessonPickerModel';
+import { languageFlag } from '@/lib/i18n/languageLabels';
+import { nativeLanguageName } from './nativeLanguageName';
 
 export interface PickerLesson extends PickerLessonLike {
   description?: string | null;
@@ -47,6 +49,18 @@ export function LessonPickerOption({ lesson, label, selected, onToggle, mode, ra
         <span className={cn('text-sm font-semibold', selected ? 'text-neo-black/75' : 'text-neo-white/85')}>
           {count} {count === 1 ? t('education.lesson.word') : t('education.lesson.words', { count })}
         </span>
+        {lesson.language && (
+          <span
+            data-testid="lesson-language-badge"
+            className={cn(
+              'inline-flex items-center gap-1 rounded-neo border-2 px-1.5 py-px text-xs font-bold',
+              selected ? 'border-neo-black/60 text-neo-black' : 'border-neo-cream/50 text-neo-cream'
+            )}
+          >
+            <span aria-hidden="true">{languageFlag(lesson.language)}</span>
+            <span lang={lesson.language}>{nativeLanguageName(lesson.language)}</span>
+          </span>
+        )}
       </span>
       {lesson.description && (
         <span dir="auto" className={cn('text-xs', selected ? 'text-neo-black/65' : 'text-neo-white/75')}>

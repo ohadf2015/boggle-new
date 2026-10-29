@@ -26,7 +26,6 @@ import { WeeklyProgressDigestCard } from './digest/WeeklyProgressDigestCard';
 import { WeeklyEmailReport } from './digest/WeeklyEmailReport';
 import { HomeProCard, type HomeProOfferKind } from './home/HomeProCard';
 import { HomeOnboardingCard } from './home/HomeOnboardingCard';
-import { TrialActivationChecklist } from './home/TrialActivationChecklist';
 import { RehearseWithBotsButton } from './home/RehearseWithBotsButton';
 import { HomeRailSkeleton, HomeSkeleton } from './home/HomeSkeleton';
 import { useClassrooms } from '@/hooks/useClassroom';
@@ -40,7 +39,7 @@ import { polarCheckoutWelcomeKind } from '@/lib/education/polarTrial';
 import { trackEduTeacherDashboardViewed } from '@/lib/education/telemetry';
 import { trackEduProCheckoutReturnLanded } from '@/lib/education/proFunnelTelemetry';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
-import { homeOnboarding, type HomeOnboardingStepId } from '@/lib/education/homeOnboarding';
+import { homeNextStep, homeOnboarding, type HomeOnboardingStepId } from '@/lib/education/homeOnboarding';
 import type { TrialChecklistStepId } from '@/lib/education/trialChecklistProgress';
 import { teacherHostHref } from '@/lib/education/teacherHostHref';
 import { isDigestOverFreeTierCaps } from '@/lib/education/teacherPlanGate';
@@ -208,14 +207,10 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
     studentCounts: classrooms.map((c) => c.member_count ?? 0),
   });
   // First-round guide funnel on Home: which onboarding step was on screen, and which was pressed.
-  const onboardingCardShown =
-    ready &&
-    !classroomsError &&
-    !trial.checklist.visible &&
-    (!hasClasses ||
-      (week.status !== 'loading' &&
-        onboarding.visible &&
-        !(onboarding.current === 'shareCode' && shareCardShown)));
+  const trialCard = { checklist: trial.checklist, hrefs: trialHrefs, onDismiss: trial.dismiss, onOpenAssignment: () => setShowAssignmentCreator(true) };
+  const nextStep = homeNextStep({ onboarding, trial: trial.checklist, shareCardShown });
+  const nextStepShown = ready && !classroomsError && nextStep !== null && (!hasClasses || week.status !== 'loading');
+  const onboardingCardShown = nextStepShown && nextStep?.source === 'onboarding';
   const onboardingStep = onboarding.current ?? 'tryDemo';
   const guideShownStep = useRef<string | null>(null);
   useEffect(() => {
@@ -258,24 +253,16 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
             <HqLoadError onRetry={() => void classroomsState.refresh?.()} />
           ) : (
             <>
-              <TrialActivationChecklist
-                checklist={trial.checklist}
-                hrefs={trialHrefs}
-                onDismiss={trial.dismiss}
-                onOpenAssignment={() => setShowAssignmentCreator(true)}
-                t={t}
-              />
               {!hasClasses ? (
-                !trial.checklist.visible ? (
-                  <HomeOnboardingCard
-                    onboarding={onboarding}
-                    hrefs={onboardingHrefs}
-                    onStepStart={onOnboardingStep}
-                    variant="full"
-                    t={t}
-                    secondary={<RehearseWithBotsButton classroomId={undefined} source="hq" language={language} t={t} showNote />}
-                  />
-                ) : null
+                <HomeOnboardingCard
+                  onboarding={onboarding}
+                  hrefs={onboardingHrefs}
+                  trial={trialCard}
+                  onStepStart={onOnboardingStep}
+                  variant="full"
+                  t={t}
+                  secondary={<RehearseWithBotsButton classroomId={undefined} source="hq" language={language} t={t} showNote />}
+                />
               ) : (
                 <>
                   {selectedClassroom ? <HomeGetStudentsIn classroom={selectedClassroom} /> : null}
@@ -303,11 +290,8 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
                       insight={week.insights?.length ? <HomeInsightCard insights={week.insights} t={t} embedded /> : null}
                       showCode={!shareCardShown}
                       nudge={
-                        !trial.checklist.visible &&
-                        week.status !== 'loading' &&
-                        onboarding.visible &&
-                        !(onboarding.current === 'shareCode' && shareCardShown) ? (
-                          <HomeOnboardingCard onboarding={onboarding} hrefs={onboardingHrefs} onStepStart={onOnboardingStep} onDismiss={activation.dismiss} variant="compact" t={t} />
+                        nextStepShown ? (
+                          <HomeOnboardingCard onboarding={onboarding} hrefs={onboardingHrefs} trial={trialCard} shareCardShown={shareCardShown} onStepStart={onOnboardingStep} onDismiss={activation.dismiss} variant="compact" t={t} />
                         ) : undefined
                       }
                     />

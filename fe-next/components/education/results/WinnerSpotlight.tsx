@@ -136,7 +136,7 @@ export function WinnerSpotlight({
       className={cn(
         'relative flex items-center gap-4 rounded-neo border-[2px] border-neo-cream shadow-hard',
         'bg-neo-navy-elevated text-neo-white',
-        projector ? 'px-6 py-4 gap-6 min-[2200px]:px-10 min-[2200px]:py-6' : 'px-4 py-3',
+        projector ? 'px-6 py-4 gap-6 @[137.5rem]/results:px-10 @[137.5rem]/results:py-6' : 'px-4 py-3',
         className
       )}
     >
@@ -162,7 +162,7 @@ export function WinnerSpotlight({
           // nothing about hit-testing, and a capture run lost a lobby click to
           // `covered by <video>`. Nothing here is ever the target of a tap.
           'pointer-events-none shrink-0 overflow-hidden rounded-neo border-[2px] border-neo-cream bg-neo-navy',
-          projector ? 'w-28 h-28 2xl:w-32 2xl:h-32 min-[2200px]:w-44 min-[2200px]:h-44' : 'w-16 h-16'
+          projector ? 'w-28 h-28 @[96rem]/results:w-32 @[96rem]/results:h-32 @[137.5rem]/results:w-44 @[137.5rem]/results:h-44' : 'w-16 h-16'
         )}
       >
         {active && earned && !calm && (
@@ -208,7 +208,7 @@ export function WinnerSpotlight({
             // 40% white on navy-elevated measured 3.50:1 — a smudge at the
             // back of a room, which is the only place this line is read from.
             active ? 'text-neo-yellow' : 'text-neo-white/75',
-            projector ? 'text-3xl min-[2200px]:text-5xl' : 'text-sm'
+            projector ? 'text-3xl @[137.5rem]/results:text-5xl' : 'text-sm'
           )}
         >
           {active ? t(lostBoss ? 'classroomBoss.topHitter' : BANNER[kind]) : t('education.results.moment.drumroll')}
@@ -217,7 +217,7 @@ export function WinnerSpotlight({
           <p
             className={cn(
               'mt-1 flex items-baseline gap-3 font-neo-display font-black text-neo-white truncate',
-              projector ? 'text-5xl min-[2200px]:text-8xl' : 'text-2xl'
+              projector ? 'text-5xl @[137.5rem]/results:text-8xl' : 'text-2xl'
             )}
           >
             <span data-testid="winner-names" dir="auto" className="truncate">
@@ -226,7 +226,7 @@ export function WinnerSpotlight({
             <span
               className={cn(
                 'shrink-0 tabular-nums text-neo-lime',
-                projector ? 'text-4xl min-[2200px]:text-6xl' : 'text-xl'
+                projector ? 'text-4xl @[137.5rem]/results:text-6xl' : 'text-xl'
               )}
             >
               {shownScore}
@@ -239,7 +239,7 @@ export function WinnerSpotlight({
             data-testid="winner-zero-body"
             className={cn(
               'mt-1 font-neo-body font-bold leading-snug text-neo-cream',
-              projector ? 'text-xl min-[2200px]:text-4xl' : 'text-sm'
+              projector ? 'text-xl @[137.5rem]/results:text-4xl' : 'text-sm'
             )}
           >
             {t('eduLive.results.zeroBody')}
@@ -249,7 +249,7 @@ export function WinnerSpotlight({
 
       {/* The winner's own face lands on the beat, so the moment is a person, not only a name. */}
       {projector && active && earned && !lostBoss && (
-        <span data-testid="winner-avatars" aria-hidden="true" className="pointer-events-none hidden shrink-0 items-center md:flex">
+        <span data-testid="winner-avatars" aria-hidden="true" className="pointer-events-none hidden shrink-0 items-center @3xl/results:flex">
           {names.slice(0, 2).map((name, i) => (
             <m.span
               key={name}
@@ -258,7 +258,7 @@ export function WinnerSpotlight({
               transition={calm ? { duration: 0 } : { type: 'spring', stiffness: 380, damping: 14, delay: 0.15 + i * 0.12 }}
               className={cn(
                 'grid place-items-center overflow-hidden rounded-full border-[3px] border-neo-black bg-neo-yellow shadow-hard [&_svg]:h-full [&_svg]:w-full',
-                'size-24 2xl:size-32 min-[2200px]:size-48',
+                'size-24 @[96rem]/results:size-32 @[137.5rem]/results:size-48',
                 i > 0 && '-ms-6'
               )}
             >

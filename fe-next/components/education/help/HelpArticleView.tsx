@@ -17,6 +17,7 @@ import { HelpBlocks } from './HelpBlocks';
 import { HelpRichText } from './HelpRichText';
 import { HelpNextStep } from './HelpNextStep';
 import { HelpFeedback } from './HelpFeedback';
+import { HelpFallbackNote } from './HelpFallbackNote';
 
 export function HelpArticleView({
   locale,
@@ -37,6 +38,7 @@ export function HelpArticleView({
 
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-neo-navy text-neo-white">
+      <HelpFallbackNote locale={locale} />
       <div className="mx-auto max-w-6xl px-4 pb-16 pt-8 sm:px-6 lg:px-8">
         <nav aria-label={t('eg2Help.article.breadcrumb')} className="text-sm font-bold">
           <ol className="flex flex-wrap items-center gap-2 text-neo-gray-300">

@@ -66,7 +66,7 @@ export default function WordCraftPractice({ words, language, onComplete, onBack,
   // Dealt in the lesson's language with its words seeded; ru has no Word Craft bag → UI locale, unseeded.
   const deal = useMemo(() => {
     const { locale, seeded } = wordCraftLocaleFor(language, uiLanguage ?? 'en');
-    return { locale, targets: seeded ? lessonTargetsFor(words, locale) : [] };
+    return { locale, seeded, targets: seeded ? lessonTargetsFor(words, locale) : [] };
   }, [words, language, uiLanguage]);
 
   // Latest props for the listener without re-subscribing on every render.
@@ -98,7 +98,7 @@ export default function WordCraftPractice({ words, language, onComplete, onBack,
   if (phase.name === 'playing') {
     return (
       <div className="fixed inset-0 z-50 bg-neo-navy" data-testid="wordcraft-practice-game">
-        <WordCraftGameView seed={phase.seed} duel={null} hotseat={false} difficulty="easy" modifierOverride="none" lesson={{ ...deal, onExit: onBack }} />
+        <WordCraftGameView seed={phase.seed} duel={null} hotseat={false} difficulty="easy" modifierOverride="none" lesson={{ locale: deal.locale, targets: deal.targets, onExit: onBack }} />
       </div>
     );
   }
@@ -171,6 +171,11 @@ export default function WordCraftPractice({ words, language, onComplete, onBack,
         </h1>
       </div>
       <p className="font-neo-body text-neo-white/85 mb-3 text-pretty">{t('education.wordcraftAssignment.intro')}</p>
+      {!deal.seeded && (
+        <p data-testid="wordcraft-practice-language-note" className="mb-3 rounded-neo border-2 border-neo-yellow px-3 py-2 font-neo-body text-sm font-bold text-neo-yellow text-pretty">
+          {t('education.wordcraftAssignment.languageFallback', 'Word Craft has no tiles for this list’s language yet, so this round uses your app language.')}
+        </p>
+      )}
       {targets.length > 0 && (
         <>
           <h2 className="text-xs font-neo-display uppercase tracking-wider text-neo-cream/80 mb-2">

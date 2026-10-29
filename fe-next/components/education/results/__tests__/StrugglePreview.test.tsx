@@ -18,13 +18,13 @@ const mastery = {
   'Ms Cohen': { found: 0, total: 10 },
 };
 
-describe('StrugglePreview — "See who struggled" on the wall', () => {
+describe('StrugglePreview — the Pro report door on the wall', () => {
   beforeEach(() => {
-    pro.hasPro = false;
+    pro.hasPro = true;
     pro.loading = false;
   });
 
-  it('given a round, when it renders, then it shows one blurred bar per student, weakest first, and never prints a name', () => {
+  it('given a round, when it renders, then it shows one bar per student, weakest first, and never prints a name', () => {
     render(<StrugglePreview masteryByPlayer={mastery} teacherName="Ms Cohen" language="he" t={t} />);
     const bars = screen.getAllByTestId('struggle-bar');
     expect(bars.map((b) => b.getAttribute('data-pct'))).toEqual(['10', '30', '60']);
@@ -32,14 +32,13 @@ describe('StrugglePreview — "See who struggled" on the wall', () => {
     for (const name of ['Noa', 'Ido', 'Maya', 'Ms Cohen']) expect(panel.textContent).not.toContain(name);
   });
 
-  it('given a free teacher, then the way in is the gated unlock ask, not the report', () => {
-    render(<StrugglePreview masteryByPlayer={mastery} teacherName="Ms Cohen" language="he" t={t} />);
-    expect(screen.getByTestId('unlock-report-upgrade-cta')).toBeInTheDocument();
-    expect(screen.queryByTestId('edu-results-report')).toBeNull();
+  it('given a free teacher, then it renders nothing: the wall has one Pro slot and the trial card holds it', () => {
+    pro.hasPro = false;
+    const { container } = render(<StrugglePreview masteryByPlayer={mastery} teacherName="Ms Cohen" language="he" t={t} />);
+    expect(container).toBeEmptyDOMElement();
   });
 
   it('given a Pro teacher, then it links straight to the class report', () => {
-    pro.hasPro = true;
     render(<StrugglePreview masteryByPlayer={mastery} teacherName="Ms Cohen" language="he" t={t} />);
     expect(screen.getByTestId('edu-results-report')).toHaveAttribute('href', '/he/teacher/reports');
     expect(screen.queryByTestId('unlock-report-upgrade-cta')).toBeNull();
@@ -49,7 +48,7 @@ describe('StrugglePreview — "See who struggled" on the wall', () => {
     pro.loading = true;
     render(<StrugglePreview masteryByPlayer={mastery} teacherName="Ms Cohen" language="he" t={t} />);
     expect(screen.queryByTestId('edu-results-report')).toBeNull();
-    expect(screen.queryByTestId('unlock-report-upgrade-cta')).toBeNull();
+    expect(screen.queryByTestId('struggle-preview')).toBeNull();
   });
 
   it('given no students with a tally, then it renders nothing', () => {

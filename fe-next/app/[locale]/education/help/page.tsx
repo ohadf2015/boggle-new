@@ -4,7 +4,7 @@ import { EducationHeader } from '@/components/education/EducationHeader';
 import { notFound } from 'next/navigation';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { HelpHome } from '@/components/education/help/HelpHome';
-import { isHelpLocale } from '@/components/education/help/helpTypes';
+import { servesHelp } from '@/components/education/help/helpTypes';
 import { HELP_PATH } from '@/components/education/help/helpRegistry';
 import { getHelpContent } from '@/components/education/help/content';
 import { helpT } from '@/components/education/help/helpI18n';
@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function HelpHomePage({ params }: PageProps) {
   const { locale } = await params;
-  if (!isHelpLocale(locale)) notFound();
+  if (!servesHelp(locale)) notFound();
   const t = helpT(locale);
   return (
     <>

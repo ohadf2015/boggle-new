@@ -131,11 +131,9 @@ describe('PlayerWaitingView — the classroom lobby fits a 390x844 phone', () =>
 
   it('fills the freed space with Lexi rather than a second scroll region', () => {
     render(<PlayerWaitingView {...defaultProps} isClassroomMode classroomGameMode="vocab-quiz" />);
-    const art = screen.getAllByTestId('classroom-lobby-mascot')[0];
-    // Decorative: the status line above already says what is happening, so the
-    // art carries no text to translate and no name for a screen reader to read.
+    const art = screen.getByTestId('edu-student-crowd').querySelector('img')!;
     expect(art).toHaveAttribute('alt', '');
-    expect(art.getAttribute('src')).toContain('waiting-for-teacher');
+    expect(screen.getByTestId('edu-student-lobby').querySelectorAll('[class*="overflow-y-auto"]')).toHaveLength(1);
   });
 
   it('keeps the ad slot out of a classroom lobby', () => {
@@ -147,21 +145,18 @@ describe('PlayerWaitingView — the classroom lobby fits a 390x844 phone', () =>
 });
 
 describe('PlayerWaitingView — icon-only controls still read as controls', () => {
-  it('states the Exit button text colour on the button, not only on its icon', () => {
+  it('states the Leave button text colour on the button, not only on its icon', () => {
     render(<PlayerWaitingView {...defaultProps} isClassroomMode />);
-    const exit = screen.getByLabelText('common.exit');
-    // White on --neo-red is 3.55:1; black on it is 5.92:1. An audit reads the
-    // BUTTON's colour against its own fill, so the class has to live here.
-    expect(exit.className).toContain('text-neo-black');
+    const exit = screen.getByTestId('edu-student-leave');
+    expect(exit).toHaveTextContent('eduLiveRoom.student.leave');
+    expect(exit.className).toContain('text-neo-cream');
   });
 
   it('gives the avatar button its own border width AND colour', () => {
     render(<PlayerWaitingView {...defaultProps} isClassroomMode />);
-    const avatarBtn = screen.getAllByTestId('edit-avatar-button')[0];
-    // Written as an arbitrary value on purpose: twMerge collapses `border-neo`
-    // into the border-colour group and silently drops the width.
-    expect(avatarBtn.className).toContain('border-[3px]');
-    expect(avatarBtn.className).toContain('border-neo-lime');
+    const avatarBtn = screen.getByTestId('edu-student-edit-avatar');
+    expect(avatarBtn.className).toContain('border-4');
+    expect(avatarBtn.className).toContain('border-neo-black');
   });
 
   it('gives the guest rename button a visible edge', () => {

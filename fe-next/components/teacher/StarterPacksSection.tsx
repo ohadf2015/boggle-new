@@ -1,16 +1,28 @@
 'use client';
 
-import { memo, useCallback } from 'react';
+import { memo, useCallback, useId, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { STARTER_LESSON_PACKS, type StarterLessonPack } from '@/lib/education/starterLessonPacks';
+import { isPackLanguage, type PackLessonInput } from '@/lib/education/themedPacks';
 import { BookOpen, GraduationCap, Globe, Sparkles } from 'lucide-react';
-import type { LessonWord } from '@/types/education';
+import { useThemedPacks } from './StarterPacksSection.data';
+import type { Language } from '@/lib/supabase/education/types';
+import { ContentLanguageChips, contentLanguagesFor } from '@/components/education/pickers/ContentLanguageChips';
+import { SessionTemplatesSection, type SessionRun } from './StarterPacksSection.sessions';
+import { ThemedPacksSection } from './StarterPacksSection.themed';
+
+export type { SessionRun } from './StarterPacksSection.sessions';
 
 interface StarterPacksSectionProps {
-  onSelectPack: (pack: { name: string; description: string; language: string; words: LessonWord[] }) => void;
-  /** The class's language: offer its packs first (all packs when it has none). */
+  onSelectPack: (pack: PackLessonInput) => void;
+  /** The class's default language: the chip row starts here. */
   language?: string;
+  /** Other languages the teacher teaches in (their lists' languages): one chip each. */
+  languages?: readonly (string | null | undefined)[];
+  classroomId?: string;
+  /** Inside the lobby the run is applied in place; elsewhere Run this links to the lobby. */
+  onRunSession?: (run: SessionRun) => void;
 }
 
 const categoryIcons = {
@@ -72,7 +84,7 @@ function PackCard({
         <button
           onClick={onSelect}
           className={cn(
-            'w-full flex items-center justify-center gap-2 px-4 py-3',
+            'w-full min-h-11 flex items-center justify-center gap-2 px-4 py-3',
             'bg-neo-lime text-black border-3 border-black',
             'font-black font-neo-body text-sm rounded-neo shadow-hard-sm',
             'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5',
@@ -92,8 +104,13 @@ export function packsForLanguage(language: string | undefined): readonly Starter
   return matching.length > 0 ? matching : STARTER_LESSON_PACKS;
 }
 
-export const StarterPacksSection = memo<StarterPacksSectionProps>(({ onSelectPack, language }) => {
-  const { t } = useLanguage();
+export const StarterPacksSection = memo<StarterPacksSectionProps>(({ onSelectPack, language, languages, classroomId, onRunSession }) => {
+  const { t, language: uiLanguage } = useLanguage();
+  const headingId = useId();
+  const [picked, setPicked] = useState<Language | null>(null);
+  const defaultLanguage = isPackLanguage(language) ? language : isPackLanguage(uiLanguage) ? uiLanguage : 'en';
+  const contentLanguage = picked ?? defaultLanguage;
+  const themedPacks = useThemedPacks(contentLanguage);
 
   const handleSelect = useCallback(
     (pack: StarterLessonPack) => {
@@ -108,24 +125,40 @@ export const StarterPacksSection = memo<StarterPacksSectionProps>(({ onSelectPac
   );
 
   return (
-    <div className="space-y-4">
-      <div>
-        <h3 className="text-xl font-neo-display font-black text-neo-white">
-          {t('education.starterPacks.title')}
-        </h3>
-        <p className="text-sm text-neo-white font-neo-body">
-          {t('education.starterPacks.subtitle')}
-        </p>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {packsForLanguage(language).map((pack) => (
-          <PackCard
-            key={pack.nameKey}
-            pack={pack}
-            onSelect={() => handleSelect(pack)}
-          />
-        ))}
-      </div>
+    <div className="@container space-y-8">
+      <ContentLanguageChips
+        testId="starter-packs-language"
+        label={t('eduPickers.content.languageLabel', 'Language')}
+        languages={contentLanguagesFor(defaultLanguage, languages ?? [])}
+        value={contentLanguage}
+        onChange={setPicked}
+      />
+      <SessionTemplatesSection
+        language={contentLanguage}
+        packs={themedPacks}
+        classroomId={classroomId}
+        onRunSession={onRunSession}
+      />
+      <ThemedPacksSection packs={themedPacks} onSelectPack={onSelectPack} />
+      <section aria-labelledby={headingId} className="space-y-4">
+        <div>
+          <h3 id={headingId} className="text-xl font-neo-display font-black text-neo-white">
+            {t('education.starterPacks.title')}
+          </h3>
+          <p className="text-sm text-neo-white font-neo-body">
+            {t('education.starterPacks.subtitle')}
+          </p>
+        </div>
+        <div className="grid grid-cols-1 @xl:grid-cols-2 @5xl:grid-cols-3 gap-4">
+          {packsForLanguage(contentLanguage).map((pack) => (
+            <PackCard
+              key={pack.nameKey}
+              pack={pack}
+              onSelect={() => handleSelect(pack)}
+            />
+          ))}
+        </div>
+      </section>
     </div>
   );
 });

@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
-vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ t: (k: string) => k, language: 'en' }) }));
+vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ t: (k: string, f?: unknown) => (typeof f === 'string' ? f : k), language: 'en' }) }));
 
 import { StarterPacksSection, packsForLanguage } from '../StarterPacksSection';
 import { STARTER_LESSON_PACKS } from '@/lib/education/starterLessonPacks';
@@ -21,6 +21,17 @@ describe('starter packs follow the class language', () => {
 
   it('Given the section with a language, Then it renders that language’s packs only', () => {
     render(<StarterPacksSection onSelectPack={vi.fn()} language="he" />);
-    expect(screen.getAllByRole('button')).toHaveLength(packsForLanguage('he').length);
+    const region = screen.getByRole('region', { name: 'education.starterPacks.title' });
+    expect(within(region).getAllByRole('button')).toHaveLength(packsForLanguage('he').length);
+  });
+
+  it('Given a Hebrew-default class that also teaches English, Then a chip row offers both, starting on Hebrew, and switching shows English packs', () => {
+    render(<StarterPacksSection onSelectPack={vi.fn()} language="he" languages={['en']} />);
+    const chips = within(screen.getByTestId('starter-packs-language'));
+    expect(chips.getAllByRole('radio').map((r) => (r as HTMLInputElement).value)).toEqual(['he', 'en']);
+    expect(chips.getByRole('radio', { name: /עברית/ })).toBeChecked();
+    fireEvent.click(chips.getByRole('radio', { name: /English/ }));
+    const region = screen.getByRole('region', { name: 'education.starterPacks.title' });
+    expect(within(region).getAllByRole('button')).toHaveLength(packsForLanguage('en').length);
   });
 });

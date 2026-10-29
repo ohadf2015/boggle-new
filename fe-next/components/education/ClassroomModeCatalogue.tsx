@@ -1,7 +1,5 @@
 'use client';
 
-// A card only selects; GO LIVE launches and names the mode, so the two cannot disagree (Class 3).
-
 import { useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, ChevronsRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -23,38 +21,21 @@ import { DeliveryTag } from './DeliveryTag';
 
 export interface ClassroomModeCatalogueProps {
   selected: CatalogueMode['id'];
-  recommended: CatalogueMode['id'] | null;
-  /** The configured round length for the selected mode — never a catalog guess. */
+  /** The configured round length for the selected mode, never a catalog guess. */
   minutes: number;
-  /** The same room-settings answer for any other card; falls back to the catalog estimate. */
-  minutesFor?: (id: CatalogueMode['id']) => number;
   playStyle: PlayStyle;
   busy?: boolean;
   blockedKey: string | null;
-  onPick: (id: CatalogueMode['id']) => void;
   onGoLive: () => void;
-  /** False when the host lays the card row out itself, e.g. inside its scroll region. */
-  withCardRow?: boolean;
 }
 
-export function ClassroomModeCatalogue({
-  selected,
-  recommended,
-  minutes,
-  minutesFor,
-  playStyle,
-  busy,
-  blockedKey,
-  onPick,
-  onGoLive,
-  withCardRow = true,
-}: ClassroomModeCatalogueProps) {
+/** The ready panel: the selected mode's spotlight and the one GO LIVE. */
+export function ClassroomModeCatalogue({ selected, minutes, playStyle, busy, blockedKey, onGoLive }: ClassroomModeCatalogueProps) {
   const { t, language, dir } = useLanguage();
-  const tt = t as (key: string, params?: Record<string, string | number>) => string;
   const live = catalogueEntry(selected) ?? catalogueModes()[0];
 
   return (
-    <div data-testid="lobby-go-live-panel" className="flex flex-col gap-2.5 lg:h-full lg:gap-4">
+    <div data-testid="lobby-go-live-panel" className="flex flex-col gap-2.5 @4xl/lobby:h-full @4xl/lobby:gap-4">
       <ClassroomModeSpotlight
         mode={live}
         keys={catalogueKeys(live, modeStyleFor(live, playStyle))}
@@ -64,21 +45,8 @@ export function ClassroomModeCatalogue({
         busy={busy}
         blockedKey={blockedKey}
         onGoLive={onGoLive}
-        t={tt}
+        t={t as T}
       />
-
-      {withCardRow && (
-        <ClassroomModeCardRow
-          selected={live.id}
-          recommended={recommended}
-          selectedMinutes={minutes}
-          minutesFor={minutesFor}
-          busy={busy}
-          onPick={onPick}
-          dir={dir}
-          t={tt}
-        />
-      )}
     </div>
   );
 }

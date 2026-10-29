@@ -1,0 +1,1141 @@
+{
+  "language": "sv",
+  "source": "sv-themes",
+  "migration": "20261029120200_curriculum_v2_sv_themes.sql",
+  "lists": [
+    {
+      "code": "LC-SV-PK-SCHOOL",
+      "name": "Tillbaka till skolan",
+      "description": "Ord för de första skolveckorna: saker i skolväskan, platser på skolan, rutiner och de vuxna man möter. Bra att öva på medan klassen kommer igång igen.",
+      "language": "sv",
+      "grade": "grade_3",
+      "subject": "general",
+      "words": [
+        {
+          "word": "penna",
+          "definition": "Något man skriver och ritar med, ofta av trä med grafit inuti",
+          "example": "Kan jag låna din penna en stund?",
+          "level": "support"
+        },
+        {
+          "word": "sudd",
+          "definition": "En liten mjuk bit som tar bort det man skrivit med blyerts",
+          "example": "Jag gjorde fel och använde mitt sudd.",
+          "level": "support"
+        },
+        {
+          "word": "sax",
+          "definition": "Ett verktyg med två blad som man klipper papper med",
+          "example": "Gå försiktigt när du bär en sax.",
+          "level": "support"
+        },
+        {
+          "word": "bänk",
+          "definition": "Ett bord i klassrummet där en elev sitter och arbetar",
+          "example": "Min bänk står längst fram vid fönstret.",
+          "level": "support"
+        },
+        {
+          "word": "skåp",
+          "definition": "Ett litet förvaringsutrymme med dörr där man lägger jacka och böcker",
+          "example": "Jag hänger min jacka i mitt skåp i korridoren.",
+          "level": "support"
+        },
+        {
+          "word": "ryggsäck",
+          "definition": "En väska med två remmar som man bär på ryggen",
+          "example": "Min ryggsäck är full av nya böcker.",
+          "level": "core"
+        },
+        {
+          "word": "schema",
+          "definition": "En tabell som visar vilka lektioner man har varje dag",
+          "example": "Enligt vårt schema har vi musik på tisdagar.",
+          "level": "core"
+        },
+        {
+          "word": "matsal",
+          "definition": "Det rum på skolan där alla äter lunch",
+          "example": "Vi äter lunch i skolans matsal klockan elva.",
+          "level": "core"
+        },
+        {
+          "word": "skolgård",
+          "definition": "Området utomhus vid skolan där man leker på rasterna",
+          "example": "På vår skolgård finns gungor och en klätterställning.",
+          "level": "core"
+        },
+        {
+          "word": "tavla",
+          "definition": "Den stora ytan på väggen där läraren skriver och visar saker",
+          "example": "Det hänger en stor vit tavla framme vid katedern.",
+          "level": "core"
+        },
+        {
+          "word": "häfte",
+          "definition": "Ett tunt block med sidor som man skriver i",
+          "example": "Skriv ditt namn på framsidan av ditt häfte.",
+          "level": "core"
+        },
+        {
+          "word": "fröken",
+          "definition": "Ett vanligt sätt för barn att säga lärarinna",
+          "example": "Vår fröken heter Lena och gillar att sjunga.",
+          "level": "core"
+        },
+        {
+          "word": "gympa",
+          "definition": "Lektionen där man springer, hoppar och leker i idrottshallen",
+          "example": "Glöm inte gympakläderna, vi har gympa i dag!",
+          "level": "core"
+        },
+        {
+          "word": "lektion",
+          "definition": "En bestämd tid i skolan då klassen lär sig ett ämne",
+          "example": "Varje lektion börjar med att vi säger hej.",
+          "level": "core"
+        },
+        {
+          "word": "fritids",
+          "definition": "Där yngre elever är efter skoltid tills de blir hämtade",
+          "example": "Efter skolan går jag till fritids och bygger lego.",
+          "level": "core"
+        },
+        {
+          "word": "pennvässare",
+          "definition": "En liten pryl som gör pennan spetsig igen",
+          "example": "Min pennvässare är formad som en jordglob.",
+          "level": "challenge"
+        },
+        {
+          "word": "uppgift",
+          "definition": "Något man ska göra eller lösa, till exempel i en bok",
+          "example": "Läs noga innan du börjar på en ny uppgift.",
+          "level": "challenge"
+        },
+        {
+          "word": "rutin",
+          "definition": "Något man gör på samma sätt varje gång, så att alla vet vad som händer",
+          "example": "Vår rutin är att vi hänger av oss ytterkläderna först.",
+          "level": "challenge"
+        }
+      ]
+    },
+    {
+      "code": "LC-SV-PK-AUTUMN",
+      "name": "Hösten",
+      "description": "Ord om svensk höst: färgglada löv, svampskogen, blåsiga dagar och fåglar som flyttar söderut. Passar när mörkret börjar komma tidigare.",
+      "language": "sv",
+      "grade": "grade_3",
+      "subject": "general",
+      "words": [
+        {
+          "word": "höst",
+          "definition": "Årstiden mellan sommar och vinter när löven gulnar",
+          "example": "I höst ska vi plocka svamp i skogen.",
+          "level": "support"
+        },
+        {
+          "word": "löv",
+          "definition": "Ett platt grönt blad som sitter på ett träd",
+          "example": "Ett gult löv singlade ner på marken.",
+          "level": "support"
+        },
+        {
+          "word": "svamp",
+          "definition": "Något som växer i skogen med fot och hatt, en del går att äta",
+          "example": "Vi hittade en stor svamp under granen.",
+          "level": "support"
+        },
+        {
+          "word": "pöl",
+          "definition": "Lite vatten som samlats i en grop på marken efter regnet",
+          "example": "Lillebror hoppade rakt ner i en pöl.",
+          "level": "support"
+        },
+        {
+          "word": "stövel",
+          "definition": "En hög sko av gummi som håller fötterna torra",
+          "example": "Det var ett hål i min vänstra stövel.",
+          "level": "support"
+        },
+        {
+          "word": "lingon",
+          "definition": "Ett litet rött bär som växer i skogen och är syrligt",
+          "example": "Mormor kokar sylt av varje lingon vi plockar.",
+          "level": "core"
+        },
+        {
+          "word": "paraply",
+          "definition": "Något man håller över huvudet för att inte bli blöt",
+          "example": "Ta med ett paraply, det ser ut att bli regn.",
+          "level": "core"
+        },
+        {
+          "word": "blåst",
+          "definition": "När det blåser mycket ute",
+          "example": "Det var sådan blåst att mössan flög av.",
+          "level": "core"
+        },
+        {
+          "word": "storm",
+          "definition": "Mycket hårt väder med kraftig vind",
+          "example": "Under natten drog en storm in över kusten.",
+          "level": "core"
+        },
+        {
+          "word": "kratta",
+          "definition": "Ett redskap med långt skaft och pinnar som samlar ihop löv",
+          "example": "Pappa gav mig en kratta och bad mig hjälpa till.",
+          "level": "core"
+        },
+        {
+          "word": "rönnbär",
+          "definition": "Små orangeröda bär på ett träd, som fåglarna äter",
+          "example": "En koltrast åt varje rönnbär på trädet.",
+          "level": "core"
+        },
+        {
+          "word": "ekollon",
+          "definition": "Den lilla nöten som faller ner från en ek",
+          "example": "Ekorren gömde ett ekollon i mossan.",
+          "level": "core"
+        },
+        {
+          "word": "kastanj",
+          "definition": "En blank brun nöt i ett taggigt skal som faller från trädet",
+          "example": "Jag gjorde en figur av en kastanj och tändstickor.",
+          "level": "core"
+        },
+        {
+          "word": "höstlov",
+          "definition": "En ledig vecka från skolan på hösten",
+          "example": "Vi har höstlov i vecka 44 och åker till farmor.",
+          "level": "core"
+        },
+        {
+          "word": "lönn",
+          "definition": "Ett träd vars löv blir knallröda och gula på hösten",
+          "example": "Vår lönn på gården lyser röd i oktober.",
+          "level": "core"
+        },
+        {
+          "word": "kantarell",
+          "definition": "En gul ätbar svamp som många letar efter i skogen",
+          "example": "Jag hittade en kantarell bredvid stigen!",
+          "level": "challenge"
+        },
+        {
+          "word": "skörd",
+          "definition": "När man plockar in det som har vuxit på åkern eller i landet",
+          "example": "Bonden var nöjd med årets skörd av potatis.",
+          "level": "challenge"
+        },
+        {
+          "word": "flyttfågel",
+          "definition": "En fågel som flyger till varmare länder när det blir kallt",
+          "example": "Svalan är en flyttfågel som kommer tillbaka på våren.",
+          "level": "challenge"
+        }
+      ]
+    },
+    {
+      "code": "LC-SV-PK-SPOOKY",
+      "name": "Mystisk natt",
+      "description": "Lagom läskiga ord om natten: skuggor, grottor, fladdermöss och fullmåne. Pirrigt och roligt för mellanstadiet, utan något otäckt.",
+      "language": "sv",
+      "grade": "grade_4",
+      "subject": "general",
+      "words": [
+        {
+          "word": "natt",
+          "definition": "Den mörka delen av dygnet när de flesta sover",
+          "example": "I natt lyser stjärnorna extra starkt.",
+          "level": "support"
+        },
+        {
+          "word": "eko",
+          "definition": "När ett ljud studsar tillbaka så att man hör det igen",
+          "example": "Vi ropade i dalen och hörde ett eko.",
+          "level": "support"
+        },
+        {
+          "word": "varg",
+          "definition": "Ett vilt djur som liknar en stor hund och ylar mot månen",
+          "example": "I sagan smög en varg genom skogen.",
+          "level": "support"
+        },
+        {
+          "word": "troll",
+          "definition": "Ett påhittat sagoväsen som bor i skogen eller under en bro",
+          "example": "Bakom stenen bodde ett litet troll med lång näsa.",
+          "level": "support"
+        },
+        {
+          "word": "lykta",
+          "definition": "En lampa man kan bära med sig, ofta med ljus inuti",
+          "example": "Vi tände en lykta och gick ut i mörkret.",
+          "level": "support"
+        },
+        {
+          "word": "skugga",
+          "definition": "Den mörka formen som syns när något står i vägen för ljuset",
+          "example": "Min skugga blev jättelång i månskenet.",
+          "level": "core"
+        },
+        {
+          "word": "grotta",
+          "definition": "Ett stort hål inne i ett berg",
+          "example": "Vi kröp in i en grotta med ficklampor.",
+          "level": "core"
+        },
+        {
+          "word": "viska",
+          "definition": "Att prata mycket tyst så att bara den närmaste hör",
+          "example": "Vi måste viska så att ingen vaknar.",
+          "level": "core"
+        },
+        {
+          "word": "spöke",
+          "definition": "En påhittad genomskinlig figur i sagor som svävar och säger buu",
+          "example": "Lillasyster klädde ut sig till ett spöke av ett lakan.",
+          "level": "core"
+        },
+        {
+          "word": "mörker",
+          "definition": "När det inte finns något ljus alls",
+          "example": "I källaren var det kolsvart mörker.",
+          "level": "core"
+        },
+        {
+          "word": "fullmåne",
+          "definition": "När hela månen syns som en rund lysande skiva",
+          "example": "I kväll är det fullmåne och ljust ute.",
+          "level": "core"
+        },
+        {
+          "word": "ficklampa",
+          "definition": "En liten lampa med batterier som man håller i handen",
+          "example": "Jag läste under täcket med en ficklampa.",
+          "level": "core"
+        },
+        {
+          "word": "smyga",
+          "definition": "Att gå väldigt tyst och försiktigt",
+          "example": "Katten kan smyga utan att höras.",
+          "level": "core"
+        },
+        {
+          "word": "midnatt",
+          "definition": "Klockan tolv på natten",
+          "example": "Vi försökte vara vakna till midnatt.",
+          "level": "core"
+        },
+        {
+          "word": "knarra",
+          "definition": "När golv eller dörrar gör ett gnisslande ljud",
+          "example": "Den gamla trappan brukar knarra när man går.",
+          "level": "core"
+        },
+        {
+          "word": "fladdermus",
+          "definition": "Ett litet flygande däggdjur som är vaket på natten",
+          "example": "En fladdermus fladdrade förbi lyktan.",
+          "level": "core"
+        },
+        {
+          "word": "kuslig",
+          "definition": "Lite läskig på ett konstigt och spännande sätt",
+          "example": "Det var en kuslig tystnad i den gamla ladan.",
+          "level": "challenge"
+        },
+        {
+          "word": "rysning",
+          "definition": "Ett kallt pirr som går genom kroppen",
+          "example": "En rysning gick längs ryggen när dörren gick upp.",
+          "level": "challenge"
+        },
+        {
+          "word": "skymning",
+          "definition": "Tiden på kvällen när det sakta blir mörkt",
+          "example": "På vintern kommer skymning redan vid tre.",
+          "level": "challenge"
+        },
+        {
+          "word": "mystisk",
+          "definition": "Konstig och svår att förstå, som en gåta",
+          "example": "Vi hittade en mystisk karta på vinden.",
+          "level": "challenge"
+        }
+      ]
+    },
+    {
+      "code": "LC-SV-PK-WINTER",
+      "name": "Vintern",
+      "description": "Ord om svensk vinter: kyla, pulkaåkning, istappar och norrsken. För de kalla och mörka månaderna.",
+      "language": "sv",
+      "grade": "grade_3",
+      "subject": "general",
+      "words": [
+        {
+          "word": "vinter",
+          "definition": "Årets kallaste årstid, ofta med snö och is",
+          "example": "I vinter vill jag lära mig åka skidor.",
+          "level": "support"
+        },
+        {
+          "word": "vante",
+          "definition": "Något varmt man har på handen, med en plats för tummen",
+          "example": "Jag tappade min vante i snön.",
+          "level": "support"
+        },
+        {
+          "word": "mössa",
+          "definition": "Ett varmt plagg som man har på huvudet",
+          "example": "Ta på dig mössa, det är kallt ute!",
+          "level": "support"
+        },
+        {
+          "word": "kyla",
+          "definition": "När det är mycket kallt",
+          "example": "Det var sträng kyla hela januari.",
+          "level": "support"
+        },
+        {
+          "word": "snöboll",
+          "definition": "En boll som man klämmer ihop av snö",
+          "example": "Jag kastade en snöboll på muren.",
+          "level": "support"
+        },
+        {
+          "word": "frost",
+          "definition": "Vita iskristaller som bildas på gräs och rutor när det är kallt",
+          "example": "Det låg frost på bilrutan i morse.",
+          "level": "core"
+        },
+        {
+          "word": "halsduk",
+          "definition": "Ett långt varmt tygstycke som man virar runt halsen",
+          "example": "Farmor stickade en randig halsduk till mig.",
+          "level": "core"
+        },
+        {
+          "word": "pulka",
+          "definition": "En plastkälke som man åker nerför backen i",
+          "example": "Vi åkte pulka i backen hela eftermiddagen.",
+          "level": "core"
+        },
+        {
+          "word": "skridsko",
+          "definition": "En sko med en skena under som man glider på isen med",
+          "example": "Min ena skridsko var för liten.",
+          "level": "core"
+        },
+        {
+          "word": "snöflinga",
+          "definition": "En liten iskristall som faller från himlen",
+          "example": "En snöflinga landade på min näsa.",
+          "level": "core"
+        },
+        {
+          "word": "istapp",
+          "definition": "En spetsig bit is som hänger från taket",
+          "example": "En lång istapp hängde från stupröret.",
+          "level": "core"
+        },
+        {
+          "word": "snögubbe",
+          "definition": "En figur som man bygger av stora snöbollar",
+          "example": "Vår snögubbe har en morot som näsa.",
+          "level": "core"
+        },
+        {
+          "word": "skida",
+          "definition": "Ett långt smalt bräde som man glider fram på i snön",
+          "example": "Min ena skida lossnade i backen.",
+          "level": "core"
+        },
+        {
+          "word": "halka",
+          "definition": "När vägen är så isig att man lätt ramlar",
+          "example": "Det är halka ute, gå försiktigt!",
+          "level": "core"
+        },
+        {
+          "word": "overall",
+          "definition": "Ett varmt plagg där byxor och jacka sitter ihop",
+          "example": "Jag har min overall på mig när vi leker i snön.",
+          "level": "core"
+        },
+        {
+          "word": "slask",
+          "definition": "Snö som har börjat smälta och blivit blöt och grå",
+          "example": "Det var slask överallt på trottoaren.",
+          "level": "core"
+        },
+        {
+          "word": "termometer",
+          "definition": "Ett instrument som visar hur varmt eller kallt det är",
+          "example": "Vår termometer visade tio grader kallt.",
+          "level": "challenge"
+        },
+        {
+          "word": "minusgrad",
+          "definition": "En temperatur som är under noll",
+          "example": "Termometern visade en minusgrad i morse.",
+          "level": "challenge"
+        },
+        {
+          "word": "norrsken",
+          "definition": "Gröna och lila ljus som dansar på himlen långt i norr",
+          "example": "I Kiruna såg vi norrsken över himlen.",
+          "level": "challenge"
+        }
+      ]
+    },
+    {
+      "code": "LC-SV-PK-SPRING",
+      "name": "Våren",
+      "description": "Ord om svensk vår: de första blommorna, nyfödda djur, fåglar som sjunger och värmen som kommer tillbaka.",
+      "language": "sv",
+      "grade": "grade_3",
+      "subject": "general",
+      "words": [
+        {
+          "word": "vår",
+          "definition": "Årstiden efter vintern när allt börjar växa igen",
+          "example": "Snart är det vår och snön smälter.",
+          "level": "support"
+        },
+        {
+          "word": "gräs",
+          "definition": "Smala gröna strån som täcker marken",
+          "example": "Korna betar gräs i hagen.",
+          "level": "support"
+        },
+        {
+          "word": "lamm",
+          "definition": "Ungen till ett får",
+          "example": "Ett litet lamm skuttade i hagen.",
+          "level": "support"
+        },
+        {
+          "word": "kalv",
+          "definition": "Ungen till en ko",
+          "example": "Bonden visade oss en kalv som föddes i natt.",
+          "level": "support"
+        },
+        {
+          "word": "humla",
+          "definition": "En rund och lurvig insekt som surrar mellan blommorna",
+          "example": "En humla surrade runt i rabatten.",
+          "level": "support"
+        },
+        {
+          "word": "knopp",
+          "definition": "En liten sluten bit på en växt som ska bli ett blad eller en blomma",
+          "example": "På grenen satt en knopp som snart skulle slå ut.",
+          "level": "core"
+        },
+        {
+          "word": "maskros",
+          "definition": "En gul blomma som blir en vit boll av frön",
+          "example": "Jag blåste på en maskros och fröna flög iväg.",
+          "level": "core"
+        },
+        {
+          "word": "vitsippa",
+          "definition": "En liten vit blomma som täcker skogsbacken på våren",
+          "example": "Vi plockade en vitsippa till mamma.",
+          "level": "core"
+        },
+        {
+          "word": "blåsippa",
+          "definition": "En liten blå blomma som är en av de första i skogen",
+          "example": "Titta, där växer en blåsippa bredvid stenen!",
+          "level": "core"
+        },
+        {
+          "word": "tussilago",
+          "definition": "En gul blomma som kommer redan innan löven syns",
+          "example": "Vid vägkanten lyste en tussilago.",
+          "level": "core"
+        },
+        {
+          "word": "nyckelpiga",
+          "definition": "En liten röd skalbagge med svarta prickar",
+          "example": "En nyckelpiga kröp på min hand.",
+          "level": "core"
+        },
+        {
+          "word": "plantera",
+          "definition": "Att sätta ner frön eller växter i jorden",
+          "example": "Vi ska plantera solrosor i skolans odling.",
+          "level": "core"
+        },
+        {
+          "word": "regnbåge",
+          "definition": "En båge i många färger som syns när solen lyser i regnet",
+          "example": "Efter skuren syntes en regnbåge över skogen.",
+          "level": "core"
+        },
+        {
+          "word": "fågelbo",
+          "definition": "Det hem som fåglar bygger av kvistar och strå",
+          "example": "I häcken hittade vi ett fågelbo med tre ägg.",
+          "level": "core"
+        },
+        {
+          "word": "kvittra",
+          "definition": "När små fåglar sjunger glatt",
+          "example": "Tidigt på morgonen börjar fåglarna kvittra.",
+          "level": "core"
+        },
+        {
+          "word": "värme",
+          "definition": "När det är varmt och skönt",
+          "example": "Solens värme kändes skön mot ansiktet.",
+          "level": "core"
+        },
+        {
+          "word": "pollen",
+          "definition": "Ett fint gult damm från blommor som kan ge allergi",
+          "example": "Bilen var täckt av gult pollen.",
+          "level": "challenge"
+        },
+        {
+          "word": "tjäle",
+          "definition": "När marken är frusen djupt ner efter vintern",
+          "example": "Det är tjäle i marken, så vi kan inte gräva än.",
+          "level": "challenge"
+        },
+        {
+          "word": "sådd",
+          "definition": "När man lägger frön i jorden så att de kan växa",
+          "example": "Vårens sådd gjordes i början av maj.",
+          "level": "challenge"
+        }
+      ]
+    },
+    {
+      "code": "LC-SV-PK-SUMMER",
+      "name": "Skolavslutning och sommarlov",
+      "description": "Ord för slutet av läsåret och det långa sommarlovet: bad, jordgubbar, midsommar och stugliv. Passar de sista veckorna innan lovet.",
+      "language": "sv",
+      "grade": "grade_4",
+      "subject": "general",
+      "words": [
+        {
+          "word": "sommar",
+          "definition": "Årets varmaste årstid med långa ljusa dagar",
+          "example": "I sommar ska vi bada varje dag.",
+          "level": "support"
+        },
+        {
+          "word": "glass",
+          "definition": "Något kallt och sött man äter, ofta i en strut",
+          "example": "Vi köpte varsin glass i kiosken.",
+          "level": "support"
+        },
+        {
+          "word": "båt",
+          "definition": "Något som flyter och tar en över vatten",
+          "example": "Morfar rodde ut oss i sin båt.",
+          "level": "support"
+        },
+        {
+          "word": "tält",
+          "definition": "Ett litet hus av tyg som man sover i när man campar",
+          "example": "Vi sov i tält vid sjön.",
+          "level": "support"
+        },
+        {
+          "word": "simma",
+          "definition": "Att ta sig fram i vatten med armar och ben",
+          "example": "I år lärde jag mig simma utan armpuffar.",
+          "level": "support"
+        },
+        {
+          "word": "sommarlov",
+          "definition": "Den långa ledigheten från skolan på sommaren",
+          "example": "Hela klassen längtar efter sommarlov.",
+          "level": "core"
+        },
+        {
+          "word": "strand",
+          "definition": "Platsen där land möter vatten, ofta med sand",
+          "example": "Vi badade vid en strand nära stugan.",
+          "level": "core"
+        },
+        {
+          "word": "jordgubbe",
+          "definition": "Ett rött sött bär med små frön utanpå",
+          "example": "Jag åt en jordgubbe direkt från landet.",
+          "level": "core"
+        },
+        {
+          "word": "midsommar",
+          "definition": "En svensk fest i juni med blomkransar och dans runt stången",
+          "example": "På midsommar dansar vi små grodorna.",
+          "level": "core"
+        },
+        {
+          "word": "mygga",
+          "definition": "En liten insekt som surrar och ger kliande bett",
+          "example": "En mygga stack mig på armen.",
+          "level": "core"
+        },
+        {
+          "word": "solkräm",
+          "definition": "Kräm som skyddar huden mot att bli bränd av solen",
+          "example": "Glöm inte att smörja in dig med solkräm.",
+          "level": "core"
+        },
+        {
+          "word": "hängmatta",
+          "definition": "En säng av tyg eller nät som hänger mellan två träd",
+          "example": "Pappa somnade i sin hängmatta.",
+          "level": "core"
+        },
+        {
+          "word": "stuga",
+          "definition": "Ett litet hus på landet där man ofta bor på sommaren",
+          "example": "Vi har en röd stuga i skärgården.",
+          "level": "core"
+        },
+        {
+          "word": "brygga",
+          "definition": "Ett gångbord av trä som går ut i vattnet",
+          "example": "Vi hoppade i sjön från en brygga.",
+          "level": "core"
+        },
+        {
+          "word": "flytväst",
+          "definition": "En väst som håller en flytande i vattnet",
+          "example": "Man måste ha flytväst på sig i båten.",
+          "level": "core"
+        },
+        {
+          "word": "badhandduk",
+          "definition": "En stor handduk som man torkar sig med efter badet",
+          "example": "Jag låg på min badhandduk och läste.",
+          "level": "core"
+        },
+        {
+          "word": "betyg",
+          "definition": "Ett omdöme från skolan om hur mycket man har lärt sig",
+          "example": "Storasyster fick sitt första betyg i år.",
+          "level": "challenge"
+        },
+        {
+          "word": "avsked",
+          "definition": "När man säger hej då till någon för en längre tid",
+          "example": "Det blev ett fint avsked från vår mentor.",
+          "level": "challenge"
+        },
+        {
+          "word": "ledighet",
+          "definition": "Tid när man inte behöver arbeta eller gå till skolan",
+          "example": "Efter all ledighet är det skönt att träffa klassen igen.",
+          "level": "challenge"
+        },
+        {
+          "word": "solnedgång",
+          "definition": "När solen sakta försvinner under horisonten på kvällen",
+          "example": "Vi satt på klippan och såg en solnedgång.",
+          "level": "challenge"
+        }
+      ]
+    },
+    {
+      "code": "LC-SV-PK-CLASS",
+      "name": "Vår klass",
+      "description": "Ord för de första dagarna med en ny klass: att hälsa, lära känna varandra, dela och hjälpas åt. Bra till en isbrytare eller ett klassråd.",
+      "language": "sv",
+      "grade": "grade_3",
+      "subject": "general",
+      "words": [
+        {
+          "word": "hej",
+          "definition": "Ett glatt ord man säger när man träffar någon",
+          "example": "Säg hej till vår nya klasskompis!",
+          "level": "support"
+        },
+        {
+          "word": "vän",
+          "definition": "Någon som man tycker om och gärna är med",
+          "example": "Ella blev snabbt min bästa vän.",
+          "level": "support"
+        },
+        {
+          "word": "namn",
+          "definition": "Det man heter och kallas för",
+          "example": "Skriv ditt namn på lappen.",
+          "level": "support"
+        },
+        {
+          "word": "lek",
+          "definition": "Något roligt man gör tillsammans för att ha kul",
+          "example": "Vi hittade på en ny lek på rasten.",
+          "level": "support"
+        },
+        {
+          "word": "dela",
+          "definition": "Att ge en del av det man har till någon annan",
+          "example": "Vi kan dela på kritorna.",
+          "level": "support"
+        },
+        {
+          "word": "hjälpa",
+          "definition": "Att göra något för en annan som behöver stöd",
+          "example": "Kan du hjälpa mig med knuten?",
+          "level": "core"
+        },
+        {
+          "word": "lyssna",
+          "definition": "Att höra noga på vad någon säger",
+          "example": "Det är viktigt att lyssna när någon pratar.",
+          "level": "core"
+        },
+        {
+          "word": "välkommen",
+          "definition": "Ett ord som visar att man är glad att någon kommer",
+          "example": "Varmt välkommen till klass 3B!",
+          "level": "core"
+        },
+        {
+          "word": "klasskamrat",
+          "definition": "Någon som går i samma klass som man själv",
+          "example": "Min nya klasskamrat kommer från Umeå.",
+          "level": "core"
+        },
+        {
+          "word": "vänlig",
+          "definition": "Snäll och trevlig mot andra",
+          "example": "Hon är alltid vänlig mot de nya eleverna.",
+          "level": "core"
+        },
+        {
+          "word": "ärlig",
+          "definition": "När man säger som det är och inte ljuger",
+          "example": "Det är bäst att vara ärlig, även om det är svårt.",
+          "level": "core"
+        },
+        {
+          "word": "trygg",
+          "definition": "När man känner sig lugn och inte är rädd",
+          "example": "Jag känner mig trygg i min klass.",
+          "level": "core"
+        },
+        {
+          "word": "tillsammans",
+          "definition": "När flera gör något ihop",
+          "example": "Vi löste pusslet tillsammans.",
+          "level": "core"
+        },
+        {
+          "word": "fråga",
+          "definition": "Något man säger när man vill veta något",
+          "example": "Räck upp handen om du har en fråga.",
+          "level": "core"
+        },
+        {
+          "word": "favorit",
+          "definition": "Det man tycker allra bäst om",
+          "example": "Min favorit bland djuren är pandan.",
+          "level": "core"
+        },
+        {
+          "word": "leende",
+          "definition": "När munnen blir glad och mungiporna går upp",
+          "example": "Han hälsade med ett stort leende.",
+          "level": "core"
+        },
+        {
+          "word": "gemenskap",
+          "definition": "Känslan av att höra ihop med en grupp",
+          "example": "Utflykten gav klassen en fin gemenskap.",
+          "level": "challenge"
+        },
+        {
+          "word": "inkludera",
+          "definition": "Att se till att alla får vara med",
+          "example": "Vi försöker inkludera alla i leken.",
+          "level": "challenge"
+        },
+        {
+          "word": "presentera",
+          "definition": "Att berätta vem man är eller visa någon för andra",
+          "example": "I dag ska alla presentera sig för klassen.",
+          "level": "challenge"
+        },
+        {
+          "word": "intresse",
+          "definition": "Något man tycker är roligt och gärna håller på med",
+          "example": "Mitt största intresse är att rita serier.",
+          "level": "challenge"
+        }
+      ]
+    },
+    {
+      "code": "LC-SV-PK-K2READ",
+      "name": "Första läsorden",
+      "description": "De korta och vanliga ord som barn möter först när de lär sig läsa. Bra att känna igen direkt utan att ljuda.",
+      "language": "sv",
+      "grade": "grade_1",
+      "subject": "general",
+      "words": [
+        {
+          "word": "jag",
+          "definition": "Ordet man säger om sig själv",
+          "example": "Nu är jag fem år.",
+          "level": "support"
+        },
+        {
+          "word": "och",
+          "definition": "Ett litet ord som binder ihop två saker",
+          "example": "Katten och hunden leker.",
+          "level": "support"
+        },
+        {
+          "word": "han",
+          "definition": "Ord för en pojke eller man",
+          "example": "Där är Ali, han är min kompis.",
+          "level": "support"
+        },
+        {
+          "word": "hon",
+          "definition": "Ord för en flicka eller kvinna",
+          "example": "Mia ler, hon är glad i dag.",
+          "level": "support"
+        },
+        {
+          "word": "upp",
+          "definition": "Mot himlen, åt det högre hållet",
+          "example": "Bollen flög upp i luften.",
+          "level": "support"
+        },
+        {
+          "word": "ner",
+          "definition": "Mot marken, åt det lägre hållet",
+          "example": "Katten hoppar ner från stolen.",
+          "level": "support"
+        },
+        {
+          "word": "det",
+          "definition": "Ett ord man pekar på en sak med",
+          "example": "Titta, det är en fågel!",
+          "level": "core"
+        },
+        {
+          "word": "har",
+          "definition": "Ordet man använder när något är ens eget",
+          "example": "Jag har en röd boll.",
+          "level": "core"
+        },
+        {
+          "word": "med",
+          "definition": "Ord som visar att man är tillsammans",
+          "example": "Får jag följa med dig?",
+          "level": "core"
+        },
+        {
+          "word": "här",
+          "definition": "På just denna plats, nära mig",
+          "example": "Här är min bok.",
+          "level": "core"
+        },
+        {
+          "word": "där",
+          "definition": "På en plats en bit bort",
+          "example": "Mamma står där borta.",
+          "level": "core"
+        },
+        {
+          "word": "kan",
+          "definition": "Ord som visar att man klarar något",
+          "example": "Jag kan hoppa högt.",
+          "level": "core"
+        },
+        {
+          "word": "går",
+          "definition": "Ord för att röra sig med fötterna",
+          "example": "Vi går till parken.",
+          "level": "core"
+        },
+        {
+          "word": "ser",
+          "definition": "Ord för det man gör med ögonen",
+          "example": "Jag ser en stor hund.",
+          "level": "core"
+        },
+        {
+          "word": "nej",
+          "definition": "Ordet man säger när man inte vill",
+          "example": "Jag säger nej till spenat.",
+          "level": "core"
+        },
+        {
+          "word": "till",
+          "definition": "Ord som visar vart något ska",
+          "example": "Vi åker till mormor.",
+          "level": "core"
+        },
+        {
+          "word": "vill",
+          "definition": "Ord för att man önskar något",
+          "example": "Jag vill ha en glass.",
+          "level": "core"
+        },
+        {
+          "word": "inte",
+          "definition": "Ord som gör att något blir tvärtom",
+          "example": "Hunden är inte stor.",
+          "level": "challenge"
+        },
+        {
+          "word": "liten",
+          "definition": "Motsatsen till stor",
+          "example": "Musen är liten och grå.",
+          "level": "challenge"
+        },
+        {
+          "word": "titta",
+          "definition": "Att använda ögonen för att se på något",
+          "example": "Kom och titta på min teckning!",
+          "level": "challenge"
+        }
+      ]
+    },
+    {
+      "code": "LC-SV-PK-MATH",
+      "name": "Matteord för mellan- och högstadiet",
+      "description": "Viktiga begrepp i matematik för åk 6 och uppåt: bråk, vinklar, ekvationer, statistik och sannolikhet. Bra inför prov och nationella prov.",
+      "language": "sv",
+      "grade": "grade_6",
+      "subject": "math",
+      "words": [
+        {
+          "word": "area",
+          "definition": "Hur stor yta en figur täcker, mäts till exempel i kvadratmeter",
+          "example": "Rummets area är tolv kvadratmeter.",
+          "level": "support"
+        },
+        {
+          "word": "volym",
+          "definition": "Hur mycket plats något tar eller rymmer",
+          "example": "Kartongens volym är två liter.",
+          "level": "support"
+        },
+        {
+          "word": "procent",
+          "definition": "Hundradelar, ett sätt att visa en del av något",
+          "example": "Tjugo procent av klassen cyklar till skolan.",
+          "level": "support"
+        },
+        {
+          "word": "diagram",
+          "definition": "En bild som visar siffror med staplar, linjer eller cirklar",
+          "example": "Vi ritade ett diagram över klassens favoritfrukter.",
+          "level": "support"
+        },
+        {
+          "word": "bråk",
+          "definition": "Ett tal som visar en del av en helhet, som en halv",
+          "example": "Tre fjärdedelar är ett bråk.",
+          "level": "support"
+        },
+        {
+          "word": "vinkel",
+          "definition": "Hur mycket två linjer vrider sig från varandra där de möts, mäts i grader",
+          "example": "En rät vinkel är nittio grader.",
+          "level": "core"
+        },
+        {
+          "word": "omkrets",
+          "definition": "Hur långt det är runt en figur",
+          "example": "Kvadratens omkrets är tjugo centimeter.",
+          "level": "core"
+        },
+        {
+          "word": "decimal",
+          "definition": "En siffra efter kommatecknet i ett tal",
+          "example": "I talet 3,7 är sjuan en decimal.",
+          "level": "core"
+        },
+        {
+          "word": "median",
+          "definition": "Det mittersta värdet när talen står i storleksordning",
+          "example": "Beräkna median och typvärde för talen.",
+          "level": "core"
+        },
+        {
+          "word": "nämnare",
+          "definition": "Talet under bråkstrecket som visar hur många delar helheten har",
+          "example": "Talet under bråkstrecket kallas nämnare.",
+          "level": "core"
+        },
+        {
+          "word": "kvot",
+          "definition": "Svaret man får när man dividerar",
+          "example": "Svaret på en division kallas kvot.",
+          "level": "core"
+        },
+        {
+          "word": "produkt",
+          "definition": "Svaret man får när man multiplicerar",
+          "example": "Talens produkt är trettio.",
+          "level": "core"
+        },
+        {
+          "word": "formel",
+          "definition": "En regel skriven med bokstäver och tecken som man räknar med",
+          "example": "Vi använde en formel för att räkna ut arean.",
+          "level": "core"
+        },
+        {
+          "word": "ekvation",
+          "definition": "En likhet med ett okänt tal som man ska lösa ut",
+          "example": "Lös varje ekvation på sidan tolv.",
+          "level": "core"
+        },
+        {
+          "word": "medelvärde",
+          "definition": "Summan av alla tal delad med hur många tal det är",
+          "example": "Klassens medelvärde på provet var sjutton poäng.",
+          "level": "core"
+        },
+        {
+          "word": "primtal",
+          "definition": "Ett tal som bara går att dela jämnt med ett och sig självt",
+          "example": "Sju är ett primtal.",
+          "level": "core"
+        },
+        {
+          "word": "proportion",
+          "definition": "Hur två storheter förhåller sig till varandra",
+          "example": "Bilden ritades i rätt proportion.",
+          "level": "challenge"
+        },
+        {
+          "word": "variabel",
+          "definition": "En bokstav som står för ett tal som kan ändras",
+          "example": "I uttrycket 2x är x en variabel.",
+          "level": "challenge"
+        },
+        {
+          "word": "koordinat",
+          "definition": "Ett tal som anger var en punkt ligger i ett rutnät",
+          "example": "Punktens första koordinat är tre.",
+          "level": "challenge"
+        },
+        {
+          "word": "sannolikhet",
+          "definition": "Hur troligt det är att något ska hända",
+          "example": "Det är liten sannolikhet att det snöar i juni.",
+          "level": "challenge"
+        }
+      ]
+    }
+  ]
+}

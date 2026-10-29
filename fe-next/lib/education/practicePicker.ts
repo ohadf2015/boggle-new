@@ -12,7 +12,7 @@ import type { Language } from '@/shared/types/game';
 import type { PracticeType } from '@/hooks/usePracticeSession';
 import { VOCAB_FOCUSES, focusQuestionCounts, READINESS_SEED, type VocabFocus } from './vocabFocus';
 import { PRODUCE_FOCUSES, produceFocusAvailability } from './produceQuestions';
-import { eligibleLessonWords, isLessonSeedReady } from '@/lib/wordTower/lessonSeed';
+import { eligibleLessonWords, isLessonSeedReady, lessonSeedSupportsLanguage } from '@/lib/wordTower/lessonSeed';
 
 /** Seed used for every readiness/count scan, so the badge and the drill agree. */
 export const PICKER_SEED = READINESS_SEED;
@@ -265,7 +265,25 @@ export function buildPracticeTiles(
     };
   });
 
-  return [...baseTiles, towerTile, ...focusTiles, ...produceTiles];
+  // No wheel for this language at all: hide the tile rather than lock it behind "add words".
+  const towers = lessonSeedSupportsLanguage(language) ? [towerTile] : [];
+  return [...baseTiles, ...towers, ...focusTiles, ...produceTiles];
+}
+
+const GAME_FEEL: readonly string[] = ['blitz', WORD_TOWER_TILE_ID, 'matching', 'solo_board', 'warmup', 'spelling'];
+
+/** Most game-like first; the rest keep their picker order. */
+export function byGameFeel(tiles: PracticeTile[]): PracticeTile[] {
+  const rank = (tile: PracticeTile) => {
+    const i = GAME_FEEL.indexOf(tile.id);
+    return i === -1 ? GAME_FEEL.length : i;
+  };
+  return tiles.map((tile, i) => ({ tile, i })).sort((a, b) => rank(a.tile) - rank(b.tile) || a.i - b.i).map(({ tile }) => tile);
+}
+
+/** What "Warm up for the game" opens: the most game-like playable tile. */
+export function warmupTile(tiles: PracticeTile[]): PracticeTile | null {
+  return byGameFeel(readyTiles(tiles))[0] ?? null;
 }
 
 /** The playable tiles, in picker order. */

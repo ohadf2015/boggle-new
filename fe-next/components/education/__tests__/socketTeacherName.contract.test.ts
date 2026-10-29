@@ -19,7 +19,6 @@ const read = (rel: string) =>
 
 const LOBBIES = [
   'components/education/ClassroomGameLobby.tsx',
-  'components/education/ClassroomGameLobbyExpress.tsx',
 ];
 
 describe('socket teacherName contract (#1007 class)', () => {

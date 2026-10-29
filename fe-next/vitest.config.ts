@@ -98,7 +98,6 @@ export default defineConfig({
       // fine here. Tests in a worktree belong to that worktree's own run.
       '**/.claude/worktrees/**',
       '**/LandingView.botLaunch.test.tsx',
-      '**/ClassroomGameLobby.test.tsx',
       '**/MusicContext.duplicateProvider.test.tsx',
       '**/MusicContext.ios.test.tsx',
       '**/LandingView.spacing.test.tsx',

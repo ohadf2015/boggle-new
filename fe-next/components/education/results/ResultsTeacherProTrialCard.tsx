@@ -76,9 +76,8 @@ export function ResultsTeacherProTrialCard({
   const cardRef = useRef<HTMLElement>(null);
 
   // Count an impression only once half the card is actually on screen, same as
-  // the hub (useUpsellImpression). EduHostResults hides this card with CSS on a
-  // short laptop/projector after a boss round (display:none), and on a phone it
-  // sits below the fold; firing on mount counted both as seen. `null` until the
+  // the hub (useUpsellImpression). On a phone or a short wall it sits below the
+  // fold of the results scroller; firing on mount counted that as seen. `null` until the
   // entitlement read settles, so the observer attaches once the card renders.
   const { cta, offer } = proOffer;
   // Browser PostHog only records teachers who accept cookies, so on its own the

@@ -14,6 +14,11 @@ vi.mock('@/components/student/live/StudentMissedWords', () => ({ StudentMissedWo
 vi.mock('@/components/multiplayer/results/useOpenLessonPractice', () => ({ useOpenLessonPractice: () => vi.fn() }));
 vi.mock('next/image', () => ({ default: () => <span data-testid="img" /> }));
 vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ language: 'en', t: (key: string) => key }) }));
+vi.mock('@/components/education/LevelUpCelebration', () => ({
+  default: ({ levelUpData, onClose }: { levelUpData: { newLevel: number } | null; onClose: () => void }) =>
+    levelUpData ? <button type="button" data-testid="level-up" data-level={levelUpData.newLevel} onClick={onClose} /> : null,
+}));
+vi.mock('@/components/education/lobby/WaitingWarmUp', () => ({ WaitingWarmUp: () => <div data-testid="waiting-warmup" /> }));
 vi.mock('@/components/ui/ConfirmationDialog', () => ({
   ConfirmationDialog: ({ open, onConfirm }: { open: boolean; onConfirm: () => void }) => (open ? <button type="button" data-testid="confirm-exit" onClick={onConfirm} /> : null),
 }));
@@ -124,6 +129,21 @@ describe('EduStudentResults', () => {
     expect(screen.getByTestId('boss-outcome')).toHaveAttribute('data-outcome', 'escaped');
   });
 
+  it('given a boss round that ended, when my phone shows results, then my own rank still comes first and the boss verdict follows', () => {
+    useClassroomBossStore.getState().receiveState({ bossId: 'lexiconDragon', status: 'defeated', hp: 0, maxHp: 100, pctDealt: 100, topHitters: [], staggers: 0, lastHits: [] } as unknown as ClassroomBossView);
+    render(<EduStudentResults {...(props as object)} />);
+    const hero = screen.getByTestId('edu-student-hero');
+    expect(hero.compareDocumentPosition(screen.getByTestId('boss-outcome')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(hero.compareDocumentPosition(screen.getByTestId('edu-student-next-step')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it('given a student phone, when results show, then none of the teacher-only results pieces mount', () => {
+    render(<EduStudentResults {...(props as object)} />);
+    for (const id of ['results-teacher-pro-trial-card', 'unlock-report-upgrade-cta', 'struggle-preview', 'teacher-invite', 'edu-results-actions', 'edu-missed-words']) {
+      expect(screen.queryByTestId(id)).toBeNull();
+    }
+  });
+
   it('given I won, when results show, then my card says so', () => {
     render(<EduStudentResults {...({ ...(props as object), username: 'Noa' } as never)} />);
     expect(screen.getByTestId('edu-student-headline')).toHaveTextContent('education.results.you.won');
@@ -135,6 +155,61 @@ describe('EduStudentResults', () => {
     render(<EduStudentResults {...({ ...(props as object), classroomSummary: summary } as never)} />);
     expect(screen.getByTestId('student-outcome-delta')).toHaveTextContent('education.results.moment.deltaUp:{"points":8}');
     expect(screen.getByTestId('student-outcome-round')).toHaveTextContent('"round":2');
+  });
+
+  it('given XP came in, when results show, then a level bar fills with my new total', () => {
+    controller.current = makeController({ socketEvents: { xpGainedData: { xpEarned: 45, newTotalXp: 345, newLevel: 2 } } });
+    render(<EduStudentResults {...(props as object)} />);
+    expect(screen.getByTestId('edu-student-xp-bar')).toBeInTheDocument();
+    expect(screen.getByTestId('xp-progress-wrapper')).toBeInTheDocument();
+  });
+
+  it('given a guest with no XP, when results show, then no empty level bar appears', () => {
+    render(<EduStudentResults {...(props as object)} />);
+    expect(screen.queryByTestId('edu-student-xp-bar')).toBeNull();
+  });
+
+  it('given the round levelled me up, when my card has landed, then the level-up beat plays and closing it keeps the data', async () => {
+    const setShow = vi.fn();
+    const setData = vi.fn();
+    controller.current = makeController({
+      socketEvents: { xpGainedData: { xpEarned: 45, newTotalXp: 345, newLevel: 3 }, levelUpData: { oldLevel: 2, newLevel: 3, levelsGained: 1, newTitles: [] }, showLevelUpCelebration: true, setShowLevelUpCelebration: setShow, setLevelUpData: setData },
+    });
+    render(<EduStudentResults {...(props as object)} />);
+    expect(screen.queryByTestId('level-up')).toBeNull();
+    fireEvent.click(await screen.findByTestId('level-up'));
+    expect(setShow).toHaveBeenCalledWith(false);
+    expect(setData).not.toHaveBeenCalled();
+  });
+
+  it('given the level-up beat was already closed, when results re-render, then it stays closed', () => {
+    controller.current = makeController({ socketEvents: { levelUpData: { oldLevel: 2, newLevel: 3, levelsGained: 1, newTitles: [] }, showLevelUpCelebration: false, setShowLevelUpCelebration: vi.fn() } });
+    render(<EduStudentResults {...(props as object)} />);
+    expect(screen.queryByTestId('level-up')).toBeNull();
+  });
+
+  it('given the class found words together, when results show, then a class haul chip shows found of total', () => {
+    const summary = { teacherName: 'Ms Cohen', missedWords: [], lessonIds: [], totalWords: 30, classFoundCount: 18 };
+    render(<EduStudentResults {...({ ...(props as object), classroomSummary: summary } as never)} />);
+    expect(screen.getByTestId('edu-student-class-goal')).toHaveTextContent('eduLiveRoom.studentResults.classGoal:{"found":18,"total":30}');
+  });
+
+  it('given an older summary with a board total but no class count, when results show, then no misleading 0/N chip appears', () => {
+    const summary = { teacherName: 'Ms Cohen', missedWords: [], lessonIds: [], totalWords: 30 };
+    render(<EduStudentResults {...({ ...(props as object), classroomSummary: summary } as never)} />);
+    expect(screen.queryByTestId('edu-student-class-goal')).toBeNull();
+  });
+
+  it('given no board total from the server, when results show, then no class haul chip appears', () => {
+    render(<EduStudentResults {...(props as object)} />);
+    expect(screen.queryByTestId('edu-student-class-goal')).toBeNull();
+  });
+
+  it('given results are up, then the phone says the teacher picks what is next and offers the warm-up while waiting', () => {
+    render(<EduStudentResults {...(props as object)} />);
+    const wait = screen.getByTestId('edu-student-wait-next');
+    expect(wait).toHaveTextContent('eduLiveRoom.studentResults.waitNext');
+    expect(wait.querySelector('[data-testid="waiting-warmup"]')).not.toBeNull();
   });
 
   it('given the first round of a session, when results show, then no momentum chips appear', () => {

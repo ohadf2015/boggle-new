@@ -43,7 +43,7 @@ describe('ProjectorLobby — an empty room has one clear primary', () => {
   it('Given nobody joined, Then practicing with bots is the one solid action and says it is private', () => {
     render(<ProjectorLobby {...props} />);
     const practice = screen.getByTestId('projector-practice-round');
-    expect(practice).toHaveTextContent('education.projectorLobby.practiceFirst');
+    expect(practice).toHaveTextContent('education.projectorLobby.rehearseCta');
     expect(practice.className).toMatch(/bg-neo-lime/);
     expect(practice.className).not.toContain('underline');
     expect(screen.getByText('education.projectorLobby.rehearsePrivate')).toBeInTheDocument();

@@ -1,6 +1,5 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import { LandingProofStrip } from '../LandingProofStrip';
 import { LandingHowItWorks } from '../LandingHowItWorks';
 import { LandingFinalCta } from '../LandingFinalCta';
 import { LandingFaq } from '../LandingFaq';
@@ -8,28 +7,7 @@ import { LandingFaq } from '../LandingFaq';
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
 }));
-vi.mock('@/components/education/TeacherSetupSteps', () => ({
-  TeacherSetupSteps: () => (
-    <ol>
-      {['create', 'share', 'play'].map((id) => (
-        <li key={id} data-testid={`onboarding-step-${id}`} />
-      ))}
-    </ol>
-  ),
-}));
-vi.mock('@/components/education/tour/TeacherTourDialog', () => ({
-  TeacherTourDialog: () => <button type="button" data-testid="tour" />,
-}));
 vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
-
-describe('LandingProofStrip', () => {
-  it('states only product facts, no competitor claims', () => {
-    const { container } = render(<LandingProofStrip />);
-    const items = container.querySelectorAll('li');
-    expect(items.length).toBeGreaterThanOrEqual(3);
-    expect(container.textContent).not.toMatch(/kahoot|quizlet|blooket|wordwall/i);
-  });
-});
 
 describe('LandingHowItWorks', () => {
   it('leads with the answer-first question as the section heading and keeps the three setup steps public', () => {

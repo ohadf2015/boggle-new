@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { translateKey } from '@/lib/i18n/serverTranslate';
 import { educationBreadcrumbLabels, educationProviderNode } from '@/lib/seo/educationLanding';
-import type { HelpArticleText, HelpQuickAnswer } from './helpTypes';
+import { isHelpLocale, type HelpArticleText, type HelpQuickAnswer } from './helpTypes';
 import { HELP_BASE_URL, helpAlternates, helpUrl } from './helpUrls';
 import { HELP_PATH, HELP_UPDATED } from './helpRegistry';
 import { helpShot, type HelpShotId } from './shots';
@@ -24,7 +24,9 @@ export function buildHelpMetadata(args: {
   description: string;
 }): Metadata {
   const { locale, path, title, description } = args;
-  const url = helpUrl(locale, path);
+  // An untranslated locale shows the English article: point search engines at the original.
+  const fallback = !isHelpLocale(locale);
+  const url = helpUrl(fallback ? 'en' : locale, path);
   const image = `${HELP_BASE_URL}/og-image-en.webp`;
   return {
     title,
@@ -39,7 +41,7 @@ export function buildHelpMetadata(args: {
       images: [{ url: image, width: 1200, height: 630, alt: title }],
     },
     twitter: { card: 'summary_large_image', title, description, images: [image] },
-    robots: { index: true, follow: true },
+    robots: { index: !fallback, follow: true },
   };
 }
 

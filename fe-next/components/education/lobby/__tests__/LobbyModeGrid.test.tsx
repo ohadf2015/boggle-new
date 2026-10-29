@@ -58,4 +58,13 @@ describe('<LobbyModeGrid> — the picker is the page', () => {
     renderGrid({ busy: true });
     expect(screen.getByTestId('mode-tile-blast')).toBeDisabled();
   });
+
+  it('Then its columns follow its own width, not the viewport', () => {
+    renderGrid();
+    const grid = screen.getByTestId('lobby-mode-grid');
+    expect(grid.className).toContain('@container');
+    const cards = within(screen.getByTestId('mode-group-board')).getAllByRole('radio')[0].parentElement!;
+    expect(cards.className).toContain('@md:grid-cols-3');
+    expect(grid.innerHTML).not.toMatch(/(?<![@\w-])(sm|md|lg):/);
+  });
 });

@@ -131,7 +131,7 @@ export function ClassroomTvResults({
       // A capture waits on this for the finished frame instead of calling a mid-beat podium broken.
       data-round-end-stage={stage}
       data-outcome={outcome.kind}
-      className="h-full overflow-y-auto lg:overflow-hidden flex flex-col gap-3 lg:gap-4 bg-neo-navy text-neo-white"
+      className="@container/results h-full overflow-y-auto lg:overflow-hidden flex flex-col gap-3 lg:gap-4 bg-neo-navy text-neo-white"
     >
       <TvRecapHeader
         title={

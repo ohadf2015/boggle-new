@@ -1,7 +1,8 @@
 'use client';
 
 /** Behaviour (XP, coins, game record, exit) stays in the shared results controller so it cannot drift from /multiplayer. */
-import { useMemo, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import dynamic from 'next/dynamic';
 import { useReducedMotion } from 'framer-motion';
 import { LogOut, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -24,7 +25,10 @@ import type { PlayerResult } from '@/types/components';
 import { studentGap, studentPlacing } from './eduResultsModel';
 import { EduStudentHero } from './EduStudentHero';
 import { EduStudentNextStep } from './EduStudentNextStep';
+import { EduStudentClassGoal, EduStudentWaitNext, EduStudentXpBar } from './EduStudentProgress';
 import { LIVE_KEYFRAMES, PRESS } from './eduLiveStyles';
+
+const LevelUpCelebration = dynamic(() => import('@/components/education/LevelUpCelebration'), { ssr: false });
 
 export type EduStudentResultsProps = MpResultsProps;
 
@@ -58,6 +62,19 @@ function Beat({ index, children, className }: { index: number; children: ReactNo
   );
 }
 
+/** The level-up beat waits for my own card to land first, so it reads as the payoff, not an interruption. */
+const HERO_LAND_MS = 700;
+
+function useHeroLanded(reduceMotion: boolean): boolean {
+  const [landed, setLanded] = useState(reduceMotion);
+  useEffect(() => {
+    if (landed) return;
+    const id = setTimeout(() => setLanded(true), HERO_LAND_MS);
+    return () => clearTimeout(id);
+  }, [landed]);
+  return landed;
+}
+
 function EduStudentResultsInner(props: EduStudentResultsProps) {
   const c = useMpResultsController(props);
   const { t } = c;
@@ -89,6 +106,11 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
       : false,
     ready: !!summary && !!placing,
   });
+  const xpGained = c.socketEvents?.xpGainedData ?? null;
+  const heroLanded = useHeroLanded(reduceMotion);
+  const levelUp = heroLanded && c.socketEvents?.showLevelUpCelebration ? c.socketEvents.levelUpData : null;
+  const classFound = summary?.classFoundCount;
+  const classTotal = typeof classFound === 'number' ? (summary?.totalWords ?? 0) : 0;
   let beat = 0;
 
   if (c.isExiting) return <div data-testid="results-exit-wash" className="fixed inset-0 z-[9999] bg-neo-navy" />;
@@ -112,8 +134,6 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
         <ResultsSkeleton />
       ) : (
         <main className="flex min-h-0 flex-1 flex-col items-center gap-4 overflow-y-auto px-4 pb-6 pt-3">
-          <BossOutcomeCard size="phone" className="w-full max-w-sm" />
-
           {placing && (
             <Beat index={beat++}>
               <EduStudentHero
@@ -122,15 +142,23 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
                 score={placing.score}
                 bestWord={best}
                 lesson={lesson}
-                xp={c.socketEvents?.xpGainedData?.xpEarned ?? null}
+                xp={xpGained?.xpEarned ?? null}
                 coins={c.sideEffects?.coinReward?.awarded ?? null}
                 gap={gap}
                 reduceMotion={reduceMotion}
                 t={t}
               />
               {momentum && <StudentMomentumChips momentum={momentum} t={t} className="mt-3" />}
+              {xpGained && xpGained.newTotalXp > 0 && <div className="mt-3"><EduStudentXpBar totalXp={xpGained.newTotalXp} /></div>}
+              {classTotal > 0 && (
+                <div className="mt-3 flex justify-center">
+                  <EduStudentClassGoal found={classFound ?? 0} total={classTotal} t={t} />
+                </div>
+              )}
             </Beat>
           )}
+
+          <BossOutcomeCard size="phone" className="w-full max-w-sm" />
 
           <Beat index={beat++}>
             <EduStudentNextStep
@@ -139,6 +167,10 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
               placing={placing}
               onPractice={lessonId && missed.length > 0 ? () => openLessonPractice(lessonId) : undefined}
             />
+          </Beat>
+
+          <Beat index={beat++}>
+            <EduStudentWaitNext username={props.username} t={t} />
           </Beat>
 
           {props.gameCode && (
@@ -187,6 +219,8 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
           )}
         </main>
       )}
+
+      <LevelUpCelebration levelUpData={levelUp} onClose={() => c.socketEvents?.setShowLevelUpCelebration(false)} />
 
       <ConfirmationDialog
         open={c.showExitConfirm}

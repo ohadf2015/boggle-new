@@ -114,7 +114,7 @@ export function LanguagePicker<V extends string>({
       </div>
       {showBoardHint && (
         <p id={hintId} className={cn('mt-1.5 font-neo-body text-xs', themed ? 'text-neo-black/70 dark:text-neo-cream/70' : 'text-neo-cream/70')}>
-          {t('eduPickers.language.boardHint', "Sets the dictionary and board letters for this class's games")}
+          {t('eduPickers.language.defaultHint', 'New lists start in this language. Lessons can be in any language; each game plays in its list’s language.')}
         </p>
       )}
     </fieldset>

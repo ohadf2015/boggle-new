@@ -4,7 +4,7 @@ import { EducationHeader } from '@/components/education/EducationHeader';
 import { notFound } from 'next/navigation';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { HelpArticleView } from '@/components/education/help/HelpArticleView';
-import { HELP_LOCALES, isHelpLocale } from '@/components/education/help/helpTypes';
+import { HELP_FALLBACK_LOCALES, HELP_LOCALES, servesHelp } from '@/components/education/help/helpTypes';
 import { HELP_PATH, HELP_SLUGS, getHelpArticleMeta } from '@/components/education/help/helpRegistry';
 import { getHelpContent } from '@/components/education/help/content';
 import { helpT } from '@/components/education/help/helpI18n';
@@ -25,12 +25,12 @@ interface PageProps {
 }
 
 export async function generateStaticParams() {
-  return HELP_LOCALES.flatMap((locale) => HELP_SLUGS.map((slug) => ({ locale, slug })));
+  return [...HELP_LOCALES, ...HELP_FALLBACK_LOCALES].flatMap((locale) => HELP_SLUGS.map((slug) => ({ locale, slug })));
 }
 
 function load(locale: string, slug: string) {
   const meta = getHelpArticleMeta(slug);
-  if (!meta || !isHelpLocale(locale)) return null;
+  if (!meta || !servesHelp(locale)) return null;
   return { meta, article: getHelpContent(locale).articles[slug] };
 }
 

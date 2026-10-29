@@ -12,7 +12,7 @@ import { LaunchStageBackdrop } from '@/components/education/lobby/LaunchStageBac
 import { QuickLaunchStage } from '@/components/teacher/hq/QuickLaunchStage';
 import { ClassroomGameLobby } from '@/components/education/ClassroomGameLobby';
 import { ClassroomGameLoadingShell } from './ClassroomGameLoadingShell';
-import { ClassroomGameLobbyExpress } from '@/components/education/ClassroomGameLobbyExpress';
+import { QuickLaunchProvisioner, type QuickLaunchReady } from '@/components/education/lobby/QuickLaunchProvisioner';
 import { ClassroomGuestDemo } from '@/components/education/ClassroomGuestDemo';
 import { TeacherGate } from '@/components/education/TeacherGate';
 import {
@@ -22,6 +22,8 @@ import {
 } from '@/components/teacher/dashboard/quickLaunchIntent';
 import { CEFR_LEVELS, type CefrLevel } from '@/lib/education/eslCefrDemo';
 import { parseHostMinutes, parseHostMode } from '@/lib/education/teacherHostHref';
+import { QUICK_PRESENTATION_FLOW } from '@/components/education/lobby/quickLaunchProvision';
+import { parseQuizQuestions, parseQuizSeconds, parseSessionPack, parseSessionPreset } from '@/components/education/lobby/sessionRunParams';
 import { cn } from '@/lib/utils';
 import { LIVE_SURFACE_PREVIEW_KINDS, type LiveSurfacePreviewKind } from './previewKinds';
 
@@ -73,20 +75,29 @@ function ClassroomGameInner() {
   // `?mode=` / `?minutes=` from Teacher Home and the onboarding demo; junk values are ignored.
   const initialMode = parseHostMode(searchParams?.get('mode')) ?? undefined;
   const initialMinutes = parseHostMinutes(searchParams?.get('minutes')) ?? undefined;
+  // "Run this" on a ready-to-run session; junk values are dropped.
+  const sessionPack = parseSessionPack(searchParams?.get('pack'));
+  const initialPreset = parseSessionPreset(searchParams?.get('preset'));
+  const initialQuestions = parseQuizQuestions(searchParams?.get('questions'));
+  const initialSeconds = parseQuizSeconds(searchParams?.get('seconds'));
 
-  // 'quickLaunch' — the dashboard's one-tap PLAY NOW. The intent is read ONCE,
-  // at mount, so a reload (or a second tab, or a five-minute-old intent) falls
-  // straight through to the full setup screen instead of silently re-firing a
-  // room the teacher already has open.
-  const [quickLaunchIntent] = useState(() =>
-    (searchParams?.get('flow') || '') === QUICK_LAUNCH_FLOW ? readQuickLaunchIntent() : null
-  );
-  const [expressAbandoned, setExpressAbandoned] = useState(false);
+  // One-tap launches (Teacher HQ, Rehearse, list "Play live") read their intent ONCE, at mount;
+  // provisioning then swaps the URL for `?flow=quick&…`, so a reload opens the decided lobby, never a second class or list.
+  const [quickLaunchIntent] = useState(() => (flow === QUICK_LAUNCH_FLOW ? readQuickLaunchIntent() : null));
+  const [provisionAbandoned, setProvisionAbandoned] = useState(false);
   const openFullSetup = useCallback(() => {
     clearQuickLaunchIntent();
-    setExpressAbandoned(true);
+    setProvisionAbandoned(true);
   }, []);
-  const runExpress = !!quickLaunchIntent && !expressAbandoned;
+  const provisioning = flow === QUICK_LAUNCH_FLOW && !!quickLaunchIntent && !provisionAbandoned;
+  const onQuickLaunchReady = useCallback(
+    ({ classroomId, lessonId, mode }: QuickLaunchReady) => {
+      clearQuickLaunchIntent();
+      const query = new URLSearchParams({ flow: QUICK_PRESENTATION_FLOW, classroomId, lessonId, mode });
+      router.replace(`/${language}/education/classroom-game?${query.toString()}`);
+    },
+    [router, language]
+  );
 
   useEffect(() => {
     if (authLoading) return;
@@ -147,11 +158,8 @@ function ClassroomGameInner() {
           scales up together (CSS zoom), instead of an 880px card lost in the
           arena art. Laptops are untouched — see tvStageScale. */}
       <main className={cn('relative flex min-h-0 flex-1 w-full max-w-7xl mx-auto flex-col overflow-hidden px-3 py-3 sm:px-6', TV_STAGE_ZOOM_CLASS)}>
-        {runExpress ? (
-          <ClassroomGameLobbyExpress
-            intent={quickLaunchIntent}
-            onOpenFullSetup={openFullSetup}
-          />
+        {provisioning && quickLaunchIntent ? (
+          <QuickLaunchProvisioner intent={quickLaunchIntent} onReady={onQuickLaunchReady} onOpenFullSetup={openFullSetup} />
         ) : (
           <ClassroomGameLobby
             initialLessonId={lessonId}
@@ -160,6 +168,11 @@ function ClassroomGameInner() {
             cefrLevel={cefrLevel}
             initialMode={initialMode}
             initialMinutes={initialMinutes}
+            quick={flow === QUICK_PRESENTATION_FLOW}
+            sessionPack={sessionPack}
+            initialPreset={initialPreset}
+            initialQuestions={initialQuestions}
+            initialSeconds={initialSeconds}
             onBack={handleBack}
           />
         )}

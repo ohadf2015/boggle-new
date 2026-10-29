@@ -46,7 +46,7 @@ describe('useClassroomLaunchSocket — library plays', () => {
   });
 
   it('given a launched room, when the server confirms it, then its lessons are counted as plays', async () => {
-    const { result } = renderHook(() => useClassroomLaunchSocket(t, 'en'));
+    const { result } = renderHook(() => useClassroomLaunchSocket(t));
     await waitFor(() => expect(result.current.socket).not.toBeNull());
 
     act(() => result.current.launch(payload(result.current.gameCode)));
@@ -57,7 +57,7 @@ describe('useClassroomLaunchSocket — library plays', () => {
   });
 
   it('given a rejected room, when the error arrives, then no play is counted', async () => {
-    const { result } = renderHook(() => useClassroomLaunchSocket(t, 'en'));
+    const { result } = renderHook(() => useClassroomLaunchSocket(t));
     await waitFor(() => expect(result.current.socket).not.toBeNull());
 
     act(() => result.current.launch(payload(result.current.gameCode)));

@@ -1,24 +1,11 @@
-/**
- * Everything that is NOT the mode choice, in the one region that scrolls.
- *
- * The old `ClassroomSetupStep` opened on a wizard header ("Step 1 of 1", a
- * single progress dot), then a preset block, then classroom, then lessons,
- * then teams, then timer, then board size, and only THEN the game mode — the
- * decision that actually sets the lesson was last. Here the mode is pinned
- * above and this is the fine-tuning underneath it, in that order.
- */
-
 'use client';
 
 import type React from 'react';
-import { School, BookOpen, Sparkles, type LucideIcon } from 'lucide-react';
+import { Sparkles, type LucideIcon } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { LessonPicker } from '../pickers/LessonPicker';
-import { BoardLanguageChip } from '../pickers/BoardLanguageChip';
 import { ClassroomBattleSettings } from '../ClassroomBattleSettings';
-import { SPED_VOCAB_CAP, type ClassroomPresetId } from '@/lib/education/classroomPresets';
-import type { VocabularyLesson, Classroom } from '@/lib/supabase/education';
+import type { ClassroomPresetId } from '@/lib/education/classroomPresets';
 import type { PlayStyle } from '@/shared/utils/teamBattle';
 import type { ClassroomAccessibility } from '@/shared/types/classroom';
 
@@ -50,17 +37,10 @@ function StepCard({ id, icon: Icon, tone, children }: { id: string; icon: Lucide
 }
 
 export interface LobbySetupPanelProps {
-  classrooms: Classroom[];
-  lessons: VocabularyLesson[];
-  selectedClassroomId: string;
-  selectedLessonIds: string[];
-  wordCount: number;
   activePreset: ClassroomPresetId | null;
   playStyle: PlayStyle;
   teamCount: number;
   accessibility: ClassroomAccessibility;
-  onSelectClassroom: (id: string) => void;
-  onSelectLessons: (ids: string[]) => void;
   onApplyPreset: (id: ClassroomPresetId) => void;
   onPlayStyleChange: (style: PlayStyle) => void;
   onTeamCountChange: (count: number) => void;
@@ -68,98 +48,19 @@ export interface LobbySetupPanelProps {
 }
 
 export function LobbySetupPanel({
-  classrooms,
-  lessons,
-  selectedClassroomId,
-  selectedLessonIds,
-  wordCount,
   activePreset,
   playStyle,
   teamCount,
   accessibility,
-  onSelectClassroom,
-  onSelectLessons,
   onApplyPreset,
   onPlayStyleChange,
   onTeamCountChange,
   onAccessibilityChange,
 }: LobbySetupPanelProps) {
-  const { t, language } = useLanguage();
-  const classLanguage = classrooms.find((c) => c.id === selectedClassroomId)?.language;
-  // Same rule launch uses: the first selected list (in lessons order) sets the board.
-  const boardLanguage = lessons.find((l) => selectedLessonIds.includes(l.id))?.language;
+  const { t } = useLanguage();
 
   return (
-    <div className="space-y-5">
-      {/* Which class */}
-      <StepCard id="class" icon={School} tone="bg-neo-cyan">
-        <div
-          id="lobby-classroom-label"
-          className="mb-2 flex items-center gap-1.5 font-neo-display text-xs font-black uppercase text-neo-white/70"
-        >
-          {t('education.classroomGame.selectClassroom')}
-        </div>
-        <div role="radiogroup" aria-labelledby="lobby-classroom-label" className="flex flex-wrap gap-2">
-          {classrooms.map((classroom) => {
-            const isSelected = selectedClassroomId === classroom.id;
-            return (
-              <button
-                key={classroom.id}
-                type="button"
-                role="radio"
-                aria-checked={isSelected}
-                aria-label={classroom.name}
-                onClick={() => onSelectClassroom(classroom.id)}
-                className={cn(
-                  'inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-black px-3 py-1.5 transition',
-                  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
-                  isSelected
-                    ? 'bg-neo-cyan text-black shadow-hard'
-                    : 'border-neo-cream bg-neo-navy-light text-neo-cream shadow-hard-sm hover:bg-neo-navy'
-                )}
-              >
-                <span className="font-neo-display text-sm font-black">{classroom.name}</span>
-                <span
-                  className={cn(
-                    'font-neo-body text-[0.65rem] font-bold',
-                    isSelected ? 'text-black/70' : 'text-neo-cream'
-                  )}
-                >
-                  {classroom.member_count || 0} {t('education.students')}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </StepCard>
-
-      {/* Which words */}
-      <StepCard id="words" icon={BookOpen} tone="bg-neo-lime">
-        {selectedLessonIds.length > 0 && (
-          <div className="mb-2 flex flex-wrap justify-end gap-2">
-            {boardLanguage && <BoardLanguageChip language={boardLanguage} />}
-            <span className="inline-flex items-center gap-1.5 rounded-neo border-[2px] border-neo-lime bg-neo-navy-light px-2 py-0.5 font-neo-display text-[0.65rem] font-black uppercase text-neo-lime">
-              <BookOpen className="size-3.5" strokeWidth={3} aria-hidden="true" />
-              {t('education.classroomGame.words', { count: wordCount })}
-            </span>
-          </div>
-        )}
-        <LessonPicker
-          mode="multi"
-          lessons={lessons}
-          selectedIds={selectedLessonIds}
-          onChange={onSelectLessons}
-          classLanguage={classLanguage}
-          createHref={`/${language}/teacher/curriculum${selectedClassroomId ? `?classroomId=${selectedClassroomId}` : ''}`}
-        />
-        {activePreset === 'sped' && wordCount > SPED_VOCAB_CAP && (
-          <p className="mt-2 font-neo-body text-[0.7rem] text-neo-white/60" data-testid="sped-vocab-cap-note">
-            {t('teacher.classroom.support.vocabCapNote', { count: SPED_VOCAB_CAP })}
-          </p>
-        )}
-      </StepCard>
-
-      {/* One-tap rituals */}
+    <div className="@container flex flex-col gap-5">
       <StepCard id="presets" icon={Sparkles} tone="bg-neo-purple">
         <div
           id="lobby-preset-label"
@@ -167,7 +68,7 @@ export function LobbySetupPanel({
         >
           {t('teacher.classroom.presets.title')}
         </div>
-        <div role="radiogroup" aria-labelledby="lobby-preset-label" className="grid gap-2 sm:grid-cols-3">
+        <div role="radiogroup" aria-labelledby="lobby-preset-label" className="grid gap-2 @lg:grid-cols-3">
           {PRESETS.map(({ id, key }) => {
             const isActive = activePreset === id;
             return (

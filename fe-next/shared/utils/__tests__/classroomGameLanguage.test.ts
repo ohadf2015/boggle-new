@@ -80,3 +80,18 @@ describe('embeddableLessonWords — board-safe letters', () => {
     expect(embeddableLessonWords(['ice cream', 'water'], 'en')).toEqual(['WATER']);
   });
 });
+
+describe('resolveClassroomGameLanguage — one class, lessons in many languages', () => {
+  const SAMPLES = { en: COMMON_ENGLISH, he: HEBREW, sv: SWEDISH, ja: JAPANESE, es: SPANISH, ru: RUSSIAN } as const;
+  const LANGS = Object.keys(SAMPLES) as (keyof typeof SAMPLES)[];
+
+  for (const classDefault of LANGS) {
+    for (const lessonLanguage of LANGS) {
+      it(`GIVEN a ${classDefault}-default class and a ${lessonLanguage} lesson THEN the live game plays in ${lessonLanguage}`, () => {
+        expect(
+          resolveClassroomGameLanguage({ lessonLanguage, classroomLanguage: classDefault, vocabularyWords: SAMPLES[lessonLanguage] })
+        ).toBe(lessonLanguage);
+      });
+    }
+  }
+});

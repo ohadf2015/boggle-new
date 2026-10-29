@@ -67,10 +67,27 @@ describe('help center home', () => {
 });
 
 describe('help article page', () => {
-  it('pre-renders every guide in the five locales only', async () => {
+  it('pre-renders every guide in the five translated locales plus the English fallback for ru', async () => {
     const all = await generateStaticParams();
-    expect(all).toHaveLength(5 * HELP_ARTICLES.length);
-    expect(all.some((p) => p.locale === 'ru')).toBe(false);
+    expect(all).toHaveLength(6 * HELP_ARTICLES.length);
+    expect(all.filter((p) => p.locale === 'ru')).toHaveLength(HELP_ARTICLES.length);
+  });
+
+  it('serves ru the English article with a visible note, kept out of the index with an English canonical', async () => {
+    const { container, getByTestId } = render(await HelpArticlePage(articleParams('ru', 'start-a-live-game')));
+    expect(getByTestId('help-fallback-note')).toBeTruthy();
+    expect(container.querySelector('[data-ui-label="teacher.playNow.goLive"]')).not.toBeNull();
+    const meta = await articleMetadata(articleParams('ru', 'start-a-live-game'));
+    expect(meta.alternates?.canonical).toBe('https://www.lexiclash.live/en/education/help/start-a-live-game');
+    expect(meta.robots).toEqual(expect.objectContaining({ index: false }));
+    const { container: home } = render(await HelpHomePage(params('ru')));
+    expect(home.querySelector('[data-testid="help-fallback-note"]')).not.toBeNull();
+    expect((await homeMetadata(params('ru'))).robots).toEqual(expect.objectContaining({ index: false }));
+  });
+
+  it('shows no fallback note on a translated locale', async () => {
+    const { queryByTestId } = render(await HelpArticlePage(articleParams('he', 'start-a-live-game')));
+    expect(queryByTestId('help-fallback-note')).toBeNull();
   });
 
   it('renders numbered steps, the real button labels, HowTo JSON-LD and a next step', async () => {
@@ -91,9 +108,9 @@ describe('help article page', () => {
     expect(jsonLdTypes(container)).not.toContain('HowTo');
   });
 
-  it('404s for an unknown guide or an unsupported locale', async () => {
+  it('404s for an unknown guide or a locale the app does not have', async () => {
     await expect(HelpArticlePage(articleParams('en', 'nope'))).rejects.toThrow('NEXT_NOT_FOUND');
-    await expect(HelpArticlePage(articleParams('ru', 'start-a-live-game'))).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(HelpArticlePage(articleParams('xx', 'start-a-live-game'))).rejects.toThrow('NEXT_NOT_FOUND');
     const meta = await articleMetadata(articleParams('en', 'create-a-class'));
     expect(String(meta.title)).toContain('Create a class');
   });

@@ -23,32 +23,47 @@ const lesson = (id: string, language: string | undefined, words = ['cat', 'dog']
   ({ id, name: `List ${id}`, language, description: null, words: words.map((word) => ({ word })) }) as never;
 
 describe('LessonPicker', () => {
-  it('Given mixed languages and a class language, Then class-language lists come first under a language heading', () => {
+  it('Given mixed languages and a class language, Then class-language lists come first', () => {
     render(
       <LessonPicker mode="multi" lessons={[lesson('he1', 'he'), lesson('en1', 'en')]} selectedIds={[]} onChange={vi.fn()} classLanguage="en" />
     );
-    const options = screen.getAllByRole('checkbox');
-    expect(options[0]).toHaveAccessibleName(/List en1/);
-    expect(screen.getAllByTestId('lesson-language-group').map((g) => g.getAttribute('data-language'))).toEqual(['en', 'he']);
+    expect(screen.getAllByRole('checkbox')[0]).toHaveAccessibleName(/List en1/);
   });
 
-  it('names the language once on the group, not again on every lesson, and shows the playable word count', () => {
+  it('badges every lesson with its language and shows the playable word count', () => {
     render(<LessonPicker mode="multi" lessons={[lesson('he1', 'he', ['שלום', 'שלום', 'בית']), lesson('en1', 'en')]} selectedIds={[]} onChange={vi.fn()} />);
     const card = screen.getByRole('checkbox', { name: /he1/ });
-    const he = screen.getAllByTestId('lesson-language-group').find((g) => g.getAttribute('data-language') === 'he');
-    expect(he).toHaveTextContent('עברית');
-    expect(within(card).queryByTestId('lesson-language-badge')).toBeNull();
+    expect(within(card).getByTestId('lesson-language-badge')).toHaveTextContent('עברית');
+    expect(within(screen.getByRole('checkbox', { name: /en1/ })).getByTestId('lesson-language-badge')).toHaveTextContent('English');
     expect(card).toHaveTextContent('2');
   });
 
-  it('When a list in another language is picked, Then the selection switches to it and says so', () => {
+  it('Given lists in two languages, Then a chip row filters them: All, the class default, then the other languages present', () => {
+    render(<LessonPicker mode="multi" lessons={[lesson('he1', 'he'), lesson('en1', 'en'), lesson('en2', 'en')]} selectedIds={[]} onChange={vi.fn()} classLanguage="en" />);
+    const filter = screen.getByTestId('lesson-language-filter');
+    expect(within(filter).getAllByRole('radio').map((r) => (r as HTMLInputElement).value)).toEqual(['all', 'en', 'he']);
+    fireEvent.click(within(filter).getByRole('radio', { name: /עברית/ }));
+    expect(screen.getAllByRole('checkbox').map((c) => c.textContent)).toEqual([expect.stringContaining('List he1')]);
+  });
+
+  it('Given lists in one language, Then there is no language filter', () => {
+    render(<LessonPicker mode="multi" lessons={[lesson('en1', 'en'), lesson('en2', 'en')]} selectedIds={[]} onChange={vi.fn()} />);
+    expect(screen.queryByTestId('lesson-language-filter')).toBeNull();
+  });
+
+  it('Given a Hebrew list in a class whose default is English, Then nothing warns: classes teach in many languages', () => {
+    render(<LessonPicker mode="multi" lessons={[lesson('he1', 'he'), lesson('en1', 'en')]} selectedIds={['he1']} onChange={vi.fn()} classLanguage="en" />);
+    expect(screen.queryByTestId('lesson-class-mismatch')).toBeNull();
+  });
+
+  it('When a list in another language is picked, Then the board switches to it and says so without calling it an error', () => {
     const onChange = vi.fn();
     render(
       <LessonPicker mode="multi" lessons={[lesson('en1', 'en'), lesson('en2', 'en'), lesson('he1', 'he')]} selectedIds={['en1', 'en2']} onChange={onChange} />
     );
     fireEvent.click(screen.getByRole('checkbox', { name: /List he1/ }));
     expect(onChange).toHaveBeenCalledWith(['he1']);
-    expect(screen.getByRole('status')).toHaveTextContent(/one language/i);
+    expect(screen.getByRole('status')).toHaveTextContent(/Board switched to עברית/);
   });
 
   it('Select all only selects lists in the active language', () => {

@@ -19,6 +19,7 @@ import { helpPlainText } from './helpText';
 import { HELP_ACCENT, HELP_ACCENT_INK } from './helpAccent';
 import { HelpSearch, type HelpSearchItem } from './HelpSearch';
 import { HelpRichText } from './HelpRichText';
+import { HelpFallbackNote } from './HelpFallbackNote';
 
 const TUTORIAL_ACCENTS = ['pink', 'cyan', 'lime', 'purple'] as const;
 
@@ -41,6 +42,7 @@ export function HelpHome({ locale }: { locale: string }) {
 
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-neo-navy text-neo-white">
+      <HelpFallbackNote locale={locale} />
       <section className="border-b-4 border-neo-cream/50 bg-neo-navy-light texture-halftone">
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 pb-14 pt-10 sm:px-6 lg:grid-cols-12 lg:px-8 lg:pb-20 lg:pt-14">
           <div className="lg:col-span-8">

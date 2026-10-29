@@ -39,8 +39,8 @@ vi.mock('@/components/education/ClassroomGuestDemo', () => ({
 vi.mock('@/components/education/ClassroomGameLobby', () => ({
   ClassroomGameLobby: () => <div data-testid="teacher-launcher" />,
 }));
-vi.mock('@/components/education/ClassroomGameLobbyExpress', () => ({
-  ClassroomGameLobbyExpress: () => <div data-testid="teacher-express" />,
+vi.mock('@/components/education/lobby/QuickLaunchProvisioner', () => ({
+  QuickLaunchProvisioner: () => <div data-testid="teacher-express" />,
 }));
 vi.mock('@/components/education/EducationHeader', () => ({ EducationHeader: () => null }));
 vi.mock('@/components/education/lobby/LaunchStageBackdrop', () => ({ LaunchStageBackdrop: () => null }));

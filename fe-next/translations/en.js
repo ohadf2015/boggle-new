@@ -26,7 +26,8 @@ const en = {
   // @eduPickers:start
   "eduPickers": {
     "language": {
-      "boardHint": "Sets the dictionary and board letters for this class's games"
+      "boardHint": "Sets the dictionary and board letters for this class's games",
+      "defaultHint": "New lists start in this language. Lessons can be in any language; each game plays in its list’s language."
     },
     "board": {
       "label": "Board: {language}"
@@ -40,7 +41,14 @@ const en = {
       "searchPlaceholder": "Search your lists",
       "noMatch": "No lists match \"{query}\"",
       "noLanguage": "Other",
-      "selectAllIn": "Select all {language}"
+      "selectAllIn": "Select all {language}",
+      "filterLabel": "Show lists in",
+      "allLanguages": "All",
+      "boardSwitched": "Board switched to {language}. One game plays in one language."
+    },
+    "content": {
+      "addLanguage": "Add language",
+      "languageLabel": "Language"
     }
   },
   // @eduPickers:end
@@ -12351,6 +12359,17 @@ const en = {
       "recentDuels": "Recent duels",
       "viewDuelHistory": "View full history",
       "winRate": "Win rate"
+    },
+    "today": {
+      "title": "Today",
+      "warmup": "Warm up",
+      "warmupDone": "All homework done",
+      "chest": "Open your chest",
+      "chestDone": "Chest opened",
+      "streak": "Keep your {count}-day flame",
+      "streakDone": "Flame lit today",
+      "warmupCta": "Warm up for the game",
+      "play": "Play"
     }
   },
   "teacher": {
@@ -12714,9 +12733,18 @@ const en = {
       "studentCountPro": "{{count}} students",
       "presets": {
         "title": "Ritual presets",
-        "fridayBattle": { "name": "Friday Vocab Battle", "desc": "Teams · your last list · loud and fast" },
-        "sped": { "name": "Support (SPED)", "desc": "Fewer words · more time · larger type" },
-        "standard": { "name": "Standard", "desc": "Classic 3-minute free-for-all" }
+        "fridayBattle": {
+          "name": "Friday Vocab Battle",
+          "desc": "Teams · your last list · loud and fast"
+        },
+        "sped": {
+          "name": "Support (SPED)",
+          "desc": "Fewer words · more time · larger type"
+        },
+        "standard": {
+          "name": "Standard",
+          "desc": "Classic 3-minute free-for-all"
+        }
       },
       "playStyle": {
         "title": "Play style",
@@ -12868,7 +12896,8 @@ const en = {
         "shareTip": "Share this code with your students via Google Classroom, email, or text message",
         "pressEscape": "Press ESC to exit",
         "exit": "Exit presentation"
-      }
+      },
+      "defaultLanguage": "Default language"
     },
     "classrooms": {
       "students": {
@@ -13019,7 +13048,13 @@ const en = {
       "selectDate": "Select due date",
       "quickSelect": "Quick select",
       "today": "Today",
-      "tomorrow": "Tomorrow", "goals": {"longWord": "Play a 5-letter word", "claim": "Claim 8+ squares", "win": "Win the board", "title": "Today's goals"},
+      "tomorrow": "Tomorrow",
+      "goals": {
+        "longWord": "Play a 5-letter word",
+        "claim": "Claim 8+ squares",
+        "win": "Win the board",
+        "title": "Today's goals"
+      },
       "nextWeek": "Next week",
       "nextMonth": "Next month",
       "customDate": "Custom date",
@@ -13078,7 +13113,22 @@ const en = {
       "wordGoalMissing": "Add a word goal or a word list and a due date",
       "alreadyAssignedUpdated": "This lesson was already assigned to this class. We updated its due date and settings.",
       "alreadyAssigned": "This lesson is already assigned to this class",
-      "findNWords": "Find {{count}} words"
+      "findNWords": "Find {{count}} words",
+      "subjectLanguage": "Language",
+      "templateIntl": {
+        "k2Language": "K–2 Language: First words",
+        "k2LanguageDesc": "Short everyday words for early readers",
+        "k2Science": "K–2 Science: Nature and animals",
+        "k2ScienceDesc": "Animals, plants and weather young kids already talk about",
+        "g35Science": "3–5 Science: Living things",
+        "g35ScienceDesc": "Plants, animals and simple experiments",
+        "g35Geography": "3–5 Geography: Land and map",
+        "g35GeographyDesc": "Mountains, rivers and reading a map",
+        "g68Geography": "6–8 Geography: Landscape and map",
+        "g68GeographyDesc": "Relief, climate and map-reading words",
+        "g68Science": "6–8 Science: Body and energy",
+        "g68ScienceDesc": "Middle-school science terms with plain meanings"
+      }
     },
     "completion": {
       "overallProgress": "Overall progress",
@@ -13677,19 +13727,19 @@ const en = {
           "wordcraft": "Assign Word Craft as homework. Lesson words appear on the board, and a round only counts when the student really plays.",
           "leaderboard": "A live leaderboard on the projector that re-sorts as students overtake each other, and every student sees where they stand.",
           "chests": "Chest rewards in vocab quizzes: a right answer opens 1 of 3 chests (gain, double, steal or swap). On by default; turn it off in game settings.",
-          "title": "Classroom games, rebuilt for fun",
-        },
+          "title": "Classroom games, rebuilt for fun"
+        }
       },
       "close": "Got it",
       "subtitle": "Every improvement to your classroom games, as it ships.",
       "title": "What's new for teachers",
-      "button": "What's new",
+      "button": "What's new"
     },
     "subscription": {
-      "classLimitReached": "You've reached the free class limit. Upgrade to Pro for unlimited classes.",
+      "classLimitReached": "You've reached the free class limit. Upgrade to Pro for unlimited classes."
     },
     "lobby": {
-      "joinTitle": "Join the game",
+      "joinTitle": "Join the game"
     },
     "homework": {
       "takeHomeToggle": "Take-home practice card",
@@ -13926,7 +13976,9 @@ const en = {
       "teacherHint": "Solo vs a friendly bot. Students play it from their class page.",
       "studentPlay": "Play WordCraft",
       "needLessonWord": "Build at least one lesson word to finish, or any {count} words.",
-      "tryAgain": "Try again"
+      "tryAgain": "Try again",
+      "languageUnsupported": "Word Craft has no tiles for this list’s language yet.",
+      "languageFallback": "Word Craft has no tiles for this list’s language yet, so this round uses your app language."
     },
     "vocabFocus": {
       "title": "Vocabulary focus",
@@ -14284,7 +14336,6 @@ const en = {
       "missGapGradePassbackTitle": "Miss-gap grade: {{lesson}}",
       "missGapGradePassbackBackHomework": "Back to miss-gap homework",
       "missGapGradePassbackOpen": "Open Google Classroom grade receipt",
-
       "unpluggedGradePassbackEyebrow": "Google Classroom grade passback",
       "unpluggedGradePassbackHeading": "Submit Unplugged reteach grade",
       "unpluggedGradePassbackSubtitle": "Live session done. Class cleared/total is ready for the Classroom gradebook.",
@@ -14301,7 +14352,6 @@ const en = {
       "unpluggedGradePassbackTitle": "Unplugged grade: {{lesson}}",
       "unpluggedGradePassbackBackLive": "Back to Unplugged Live",
       "unpluggedGradePassbackOpen": "Submit grade to Google Classroom",
-
       "missGapWhatsAppEyebrow": "Parent WhatsApp practice",
       "missGapWhatsAppHeading": "Send miss-gap practice home on WhatsApp",
       "missGapWhatsAppSubtitle": "Send the practice card straight into a parent chat in one tap. Class words only, no student names.",
@@ -14323,7 +14373,7 @@ const en = {
       "unpluggedReteachPackQrHint": "Scan to open Unplugged reteach Live",
       "unpluggedReteachPackHowTo": "1) Print this pack 2) Hand practice pages to students 3) Scan the QR on the teacher screen",
       "unpluggedReteachPackPracticeHeading": "Student practice pages",
-      "unpluggedReteachPackFooter": "LexiClash · unplugged reteach pack",
+      "unpluggedReteachPackFooter": "LexiClash · unplugged reteach pack"
     },
     "classroomAddon": {
       "eyebrow": "Google Classroom Marketplace",
@@ -14336,7 +14386,7 @@ const en = {
       "privacyNote": "No roster import. No student names. Stream post uses Google's share dialog, so we never see which class you pick.",
       "postToStream": "Post Unplugged assign to Classroom Stream",
       "openUnplugged": "Open Unplugged Live",
-            "needMissedWords": "Add at least one missed word to enable one-click assign.",
+      "needMissedWords": "Add at least one missed word to enable one-click assign.",
       "planner": {
         "eyebrow": "Conversational Classroom planner",
         "title": "Say what you need. We route the Live",
@@ -14432,25 +14482,84 @@ const en = {
       "coinReward": "+{{amount}} coins"
     },
     "achievements": {
-      "first_lesson": { "name": "First Lesson", "description": "Finish a lesson from your teacher" },
-      "word_master": { "name": "Word Master", "description": "Master vocabulary words" },
-      "level_climber": { "name": "Level Climber", "description": "Reach a new level" },
-      "xp_collector": { "name": "XP Collector", "description": "Bank XP from practice" },
-      "practice_veteran": { "name": "Practice Veteran", "description": "Finish practice rounds" },
-      "speed_demon": { "name": "Speed Demon", "description": "Answer before the clock does" },
-      "perfect_streak": { "name": "Perfect Run", "description": "Finish a round with no mistakes" },
-      "boss_slayer": { "name": "Boss Slayer", "description": "Beat a boss round" },
-      "combo_master": { "name": "Combo Master", "description": "Build a long combo" },
-      "streak_starter": { "name": "Streak Starter", "description": "Practise several days in a row" },
-      "early_bird": { "name": "Early Bird", "description": "Practise before school" },
-      "dedicated_learner": { "name": "Dedicated Learner", "description": "Practise on many different days" },
-      "weekly_warrior": { "name": "Weekly Warrior", "description": "Practise every day of a week" },
-      "streak_champion": { "name": "Streak Champion", "description": "Keep a long daily streak alive" },
-      "mode_explorer": { "name": "Mode Explorer", "description": "Try different practice games" },
-      "lesson_collector": { "name": "Lesson Collector", "description": "Practise lots of lessons" },
-      "classroom_contributor": { "name": "Team Player", "description": "Score points for your class" },
-      "word_variety": { "name": "Word Hoarder", "description": "Find all kinds of different words" },
-      "categories": {"consistency":"Consistency","exploration":"Exploration","progress":"Progress","skill":"Skill"},
+      "first_lesson": {
+        "name": "First Lesson",
+        "description": "Finish a lesson from your teacher"
+      },
+      "word_master": {
+        "name": "Word Master",
+        "description": "Master vocabulary words"
+      },
+      "level_climber": {
+        "name": "Level Climber",
+        "description": "Reach a new level"
+      },
+      "xp_collector": {
+        "name": "XP Collector",
+        "description": "Bank XP from practice"
+      },
+      "practice_veteran": {
+        "name": "Practice Veteran",
+        "description": "Finish practice rounds"
+      },
+      "speed_demon": {
+        "name": "Speed Demon",
+        "description": "Answer before the clock does"
+      },
+      "perfect_streak": {
+        "name": "Perfect Run",
+        "description": "Finish a round with no mistakes"
+      },
+      "boss_slayer": {
+        "name": "Boss Slayer",
+        "description": "Beat a boss round"
+      },
+      "combo_master": {
+        "name": "Combo Master",
+        "description": "Build a long combo"
+      },
+      "streak_starter": {
+        "name": "Streak Starter",
+        "description": "Practise several days in a row"
+      },
+      "early_bird": {
+        "name": "Early Bird",
+        "description": "Practise before school"
+      },
+      "dedicated_learner": {
+        "name": "Dedicated Learner",
+        "description": "Practise on many different days"
+      },
+      "weekly_warrior": {
+        "name": "Weekly Warrior",
+        "description": "Practise every day of a week"
+      },
+      "streak_champion": {
+        "name": "Streak Champion",
+        "description": "Keep a long daily streak alive"
+      },
+      "mode_explorer": {
+        "name": "Mode Explorer",
+        "description": "Try different practice games"
+      },
+      "lesson_collector": {
+        "name": "Lesson Collector",
+        "description": "Practise lots of lessons"
+      },
+      "classroom_contributor": {
+        "name": "Team Player",
+        "description": "Score points for your class"
+      },
+      "word_variety": {
+        "name": "Word Hoarder",
+        "description": "Find all kinds of different words"
+      },
+      "categories": {
+        "consistency": "Consistency",
+        "exploration": "Exploration",
+        "progress": "Progress",
+        "skill": "Skill"
+      },
       "ariaDismissError": "Dismiss error",
       "ariaOverallProgress": "Overall progress",
       "completion": "{{percent}}% complete",
@@ -14932,11 +15041,26 @@ const en = {
       "title": "How LexiClash works in your classroom",
       "subtitle": "Five quick steps from zero to your first live word game.",
       "steps": {
-        "create": { "title": "Create your classroom", "text": "One tap. Name it and you're set." },
-        "share": { "title": "Share the join code", "text": "Project it on the board or send the link." },
-        "join": { "title": "Students join", "text": "From any device. No accounts needed." },
-        "play": { "title": "Run a live word game", "text": "Pick a lesson and hit start." },
-        "results": { "title": "See results", "text": "Track every student's progress in your dashboard." }
+        "create": {
+          "title": "Create your classroom",
+          "text": "One tap. Name it and you're set."
+        },
+        "share": {
+          "title": "Share the join code",
+          "text": "Project it on the board or send the link."
+        },
+        "join": {
+          "title": "Students join",
+          "text": "From any device. No accounts needed."
+        },
+        "play": {
+          "title": "Run a live word game",
+          "text": "Pick a lesson and hit start."
+        },
+        "results": {
+          "title": "See results",
+          "text": "Track every student's progress in your dashboard."
+        }
       },
       "gotIt": "Got it, let's teach",
       "showTutorial": "How it works"
@@ -14956,7 +15080,6 @@ const en = {
         "cta": "Host a whole class with a clear 50-seat free limit"
       }
     },
-    
     "vsWayground": {
       "starterLimit": {
         "eyebrow": "Free-tier library: honesty foil",
@@ -15100,7 +15223,7 @@ const en = {
         "cta": "Host whole-class free vocab with a clear 50-seat free limit"
       }
     },
-"vsBlooket": {
+    "vsBlooket": {
       "gapsSet": {
         "eyebrow": "After the report: honesty foil",
         "title": "Blooket: sort Incorrect%, rebuild a 「Gaps Set」. LexiClash: miss → Live deep-link.",
@@ -15239,6 +15362,56 @@ const en = {
       "beginnerRussian": {
         "name": "Beginner Russian",
         "description": "Essential Russian words for beginners"
+      },
+      "sessions": {
+        "title": "Ready-to-run sessions",
+        "subtitle": "Pick a slot in your lesson. The game, list and timer are set for you.",
+        "runThis": "Run this",
+        "noList": "No list needed",
+        "pickList": "Choose a list",
+        "gradeAndUp": "{{grade}} and up"
+      },
+      "themed": {
+        "title": "Seasonal and themed packs",
+        "subtitle": "Word lists with meanings, written for your class language. Add one and play it in any game.",
+        "addToLessons": "Add to my lessons",
+        "thisSeason": "This season",
+        "showAll": "Show all {{count}} packs",
+        "showLess": "Show fewer packs"
+      },
+      "session": {
+        "warmUp": {
+          "name": "5-minute warm-up",
+          "when": "Start of class. One quick board with this season’s words gets everyone thinking."
+        },
+        "exitTicket": {
+          "name": "Exit ticket",
+          "when": "Last 3 minutes. A short quiz shows who got today’s words before they leave."
+        },
+        "brainBreak": {
+          "name": "Brain break",
+          "when": "When energy drops. Three fast minutes of Blast, no list to prepare."
+        },
+        "icebreaker": {
+          "name": "First-day icebreaker",
+          "when": "First day or a new group. Words about our class: hello, team, share, help."
+        },
+        "spellingBee": {
+          "name": "Friday spelling bee",
+          "when": "End of the week. Two team rounds hunting the week’s words on the board."
+        },
+        "testReview": {
+          "name": "Review before a test",
+          "when": "The day before a test. Two quiz rounds on the key terms, with answers shown."
+        },
+        "eslStarter": {
+          "name": "ESL starter",
+          "when": "English learners. Pick a CEFR level from A1 to B2 and quiz the meanings."
+        },
+        "earlyFinishers": {
+          "name": "Early finishers",
+          "when": "Some students are done early. Each one plays their own Wordcraft board quietly."
+        }
       }
     },
     "lesson": {
@@ -15574,7 +15747,7 @@ const en = {
       "cta": "Start your first class",
       "expired_title": "Your teacher trial has ended",
       "expired_kept": "Your classes and word lists stay free. Reports, word mastery and calm mode need Pro.",
-            "recap": "In your trial — games run: {{games}}, students on your roster: {{students}}",
+      "recap": "In your trial — games run: {{games}}, students on your roster: {{students}}",
       "recapGamesOnly": "In your trial — games run: {{games}}",
       "expired_body": "Your free trial window is over. Reapply or reach out to keep classroom mode.",
       "renew_cta": "Renew teacher access"
@@ -15618,34 +15791,34 @@ const en = {
       }
     },
     "packages": {
-          "title": "Education packages",
-          "subtitle": "Teacher Pro is self-serve billing. Schools & departments: $49 per teacher per year for 5+ teachers, paid by invoice or PO — request a quote below.",
-          "teacherPro": {
-                "name": "Teacher Pro",
-                "interval": "/mo",
-                "blurb": "All reports, miss-gap homework, and reteach tools for one teacher.",
-                "cta": "Upgrade for $9/mo"
-          },
-          "school": {
-                "name": "Schools & departments",
-                "price": "From $49",
-                "priceFrom": "From",
-                "interval": "per teacher / year",
-                "priceTerms": "{min}+ teachers · invoice or purchase order",
-                "blurb": "Teacher Pro for every teacher on your team. Invoice or PO — no self-serve checkout.",
-                "cta": "Get a school quote"
-          },
-          "feature": {
-                "reports": "All class reports",
-                "homework": "Miss-gap homework",
-                "reteach": "Reteach tools",
-                "wholeClass": "Whole class, not just one teacher seat",
-                "proPlus": "Every Teacher Pro feature included",
-                "streaks": "Class streaks",
-                "priority": "Priority support",
-                "district": "School and department rollout",
-                "invoice": "Invoice or purchase order"
-          }
+      "title": "Education packages",
+      "subtitle": "Teacher Pro is self-serve billing. Schools & departments: $49 per teacher per year for 5+ teachers, paid by invoice or PO — request a quote below.",
+      "teacherPro": {
+        "name": "Teacher Pro",
+        "interval": "/mo",
+        "blurb": "All reports, miss-gap homework, and reteach tools for one teacher.",
+        "cta": "Upgrade for $9/mo"
+      },
+      "school": {
+        "name": "Schools & departments",
+        "price": "From $49",
+        "priceFrom": "From",
+        "interval": "per teacher / year",
+        "priceTerms": "{min}+ teachers · invoice or purchase order",
+        "blurb": "Teacher Pro for every teacher on your team. Invoice or PO — no self-serve checkout.",
+        "cta": "Get a school quote"
+      },
+      "feature": {
+        "reports": "All class reports",
+        "homework": "Miss-gap homework",
+        "reteach": "Reteach tools",
+        "wholeClass": "Whole class, not just one teacher seat",
+        "proPlus": "Every Teacher Pro feature included",
+        "streaks": "Class streaks",
+        "priority": "Priority support",
+        "district": "School and department rollout",
+        "invoice": "Invoice or purchase order"
+      }
     },
     "teacher": {
       "welcome_banner_title": "You're approved. Welcome, teacher",
@@ -15666,7 +15839,8 @@ const en = {
       "studentsJoinOneByOneText": "Students join one by one",
       "studentJoinedBadge": "joined",
       "nStudentsJoinedText": "{count} of 3 students joined",
-      "roundResultsHeading": "Round 1 results"}
+      "roundResultsHeading": "Round 1 results"
+    }
   },
   "crazygames": {
     "ads": {
@@ -19930,7 +20104,8 @@ const en = {
       "title": "Teacher help center",
       "body": "How-to guides, 5-minute tutorials and quick answers.",
       "cta": "Get help"
-    }
+    },
+    "fallbackNote": "This guide is not translated into your language yet, so it is shown in English."
   },
   // @eg2Help:end
   // @gameShell:start
@@ -20066,7 +20241,9 @@ const en = {
       "noWords": "No words this round. Next time!",
       "nextRound": "Eyes on the board for the next round",
       "leave": "Leave",
-      "calculating": "Counting up the words…"
+      "calculating": "Counting up the words…",
+      "classGoal": "Class haul: {found}/{total} words",
+      "waitNext": "Your teacher picks what's next. Warm up while you wait."
     }
   }
   // @eduLiveRoom:end
@@ -20210,14 +20387,16 @@ const en = {
         "g35": "Grades 3–5",
         "g68": "Grades 6–8",
         "g912": "Grades 9–12",
-        "adult": "Adults"
+        "adult": "Adults",
+        "esl": "ESL"
       },
       "gradeName": {
         "k2": "K–2 class",
         "g35": "Grades 3–5 class",
         "g68": "Grades 6–8 class",
         "g912": "Grades 9–12 class",
-        "adult": "Adult class"
+        "adult": "Adult class",
+        "esl": "ESL class"
       },
       "languageLabel": "Game language",
       "languageHint": "Sets the dictionary your students play in.",
@@ -20249,7 +20428,13 @@ const en = {
         "step2": "Put the code or QR on the board — students join from phones",
         "step3": "Press Start: a 2-minute round, results appear live",
         "start": "Start a 2-minute round"
-      }
+      },
+      "skip": "Skip for now",
+      "packLabel": "Words for your first game",
+      "packWords": "{count} words",
+      "packRecommended": "Our pick",
+      "startLive": "Start live game",
+      "createOnly": "Just create the class"
     },
     "host": {
       "classLabel": "Class",
@@ -20257,7 +20442,21 @@ const en = {
       "lateJoinHint": "Students can still join after the round starts.",
       "options": "Options",
       "optionsHide": "Hide options",
-      "retry": "Try again"
+      "retry": "Try again",
+      "gameOptions": "Game options",
+      "moreOptions": "More options",
+      "proBadge": "Pro",
+      "lateJoinOn": "Late join on",
+      "lateJoinOff": "Late join off",
+      "changeList": "Change",
+      "listDone": "Done"
+    },
+    "warmup": {
+      "send": "Send a warm-up to students",
+      "retry": "Could not send. Try again",
+      "capped": "Free plan homework limit reached. Pro sends unlimited warm-ups.",
+      "status": "{done} of {total} students warmed up",
+      "sent": "Warm-up sent"
     }
   },
   // @eduShell:end

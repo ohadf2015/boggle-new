@@ -72,6 +72,7 @@ describe('ProjectorLobby — quiz start the lesson cannot satisfy', () => {
     sessionStorage.setItem('lessonGameData', JSON.stringify({ gameMode: 'vocab-quiz', vocabQuizVariant: 'boss', quizPlayable: false }));
     const onStart = renderLobby();
 
+    expect(screen.getByTestId('quiz-blocked-play-classic').className).toContain('min-h-11');
     fireEvent.click(screen.getByTestId('quiz-blocked-play-classic'));
 
     expect(fakeSocket.emit).toHaveBeenCalledWith('updateClassroomGameMode', { gameCode: 'BOSS01', gameMode: 'classic' });

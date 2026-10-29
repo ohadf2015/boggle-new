@@ -10,7 +10,8 @@ import { classroomJoinUrl } from '@/lib/education/classroomInvitePayload';
 import { teacherHostHref } from '@/lib/education/teacherHostHref';
 import { buildGoogleClassroomShareUrl } from '@/lib/education/googleClassroomShare';
 import { PANEL, PRIMARY_BUTTON, QUIET_LINK, SECONDARY_BUTTON } from '../home/homeStyles';
-import { FirstRoundGuide } from './FirstRoundGuide';
+import { RehearseWithBotsButton } from '../home/RehearseWithBotsButton';
+import { trackFirstRoundGuideClicked, trackFirstRoundGuideShown } from '@/lib/education/firstRoundGuideTelemetry';
 import { ResultsTeacherProTrialCard, CLASS_CREATED_TRIAL_PLACEMENT } from '@/components/education/results/ResultsTeacherProTrialCard';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
@@ -29,6 +30,8 @@ export interface ClassReadyProps {
   t: T;
 }
 
+export const FIRST_ROUND_MINUTES = 2;
+
 const SHARE_CHIP =
   'inline-flex min-h-[44px] min-w-0 items-center justify-center gap-1.5 rounded-neo border-2 border-neo-cream/40 bg-neo-navy px-2 font-neo-display text-sm font-bold text-neo-cream hover:border-neo-cream focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan';
 
@@ -44,7 +47,7 @@ function googleShareHref(joinUrl: string, name: string, t: T): string | null {
   }
 }
 
-/** Step 2: the join code at back-row size, one-tap share, a live joined count; the game CTA leads once someone is in. */
+/** The join code at back-row size with "show it on the projector" as the one hero until someone joins; then Start leads. */
 export function ClassReady({
   classroom,
   language,
@@ -64,14 +67,16 @@ export function ClassReady({
     if (shown.current) return;
     shown.current = true;
     onShown();
-  }, [onShown]);
+    trackFirstRoundGuideShown({ surface: 'class_ready', locale: language });
+  }, [onShown, language]);
 
   const joinUrl = origin ? classroomJoinUrl(origin, language, classroom.join_code) : '';
   const displayHost = origin ? `${origin.replace(/^https?:\/\//, '')}/${language}/join` : '';
   const shareText = t('teacher.classroom.shareInviteText', { name: classroom.name, code: classroom.join_code });
   const googleHref = joinUrl ? googleShareHref(joinUrl, classroom.name, t) : null;
   const studentsIn = (joined ?? 0) > 0;
-  const startHref = teacherHostHref(language, { classroomId: classroom.id });
+  const startHref = teacherHostHref(language, { classroomId: classroom.id, minutes: FIRST_ROUND_MINUTES });
+  const onStart = () => trackFirstRoundGuideClicked({ surface: 'class_ready', locale: language, step: 'start_round' });
 
   return (
     <section data-testid="setup-step-ready" aria-labelledby="setup-ready-title" className="flex flex-col items-center gap-5 text-center">
@@ -127,25 +132,38 @@ export function ClassReady({
       </p>
 
       <div className="flex w-full max-w-md flex-col gap-3">
-        {studentsIn ? (
-          <Link href={startHref} data-testid="setup-start-game" data-hero="true" className={cn(PRIMARY_BUTTON, 'w-full text-xl')}>
-            <Play className="size-6 fill-current" aria-hidden="true" />
-            {t('eduShell.setup.startQuick')}
-          </Link>
-        ) : null}
         <button
           type="button"
-          data-testid="setup-copy-link"
+          data-testid="setup-projector"
           data-hero={studentsIn ? 'false' : 'true'}
-          disabled={!joinUrl}
-          onClick={() => onCopy(joinUrl)}
-          className={cn(studentsIn ? SECONDARY_BUTTON : PRIMARY_BUTTON, 'w-full')}
+          onClick={onOpenProjector}
+          className={cn(studentsIn ? SECONDARY_BUTTON : PRIMARY_BUTTON, 'w-full', !studentsIn && 'min-h-14 text-xl')}
         >
-          <Copy className="size-5" aria-hidden="true" />
-          {t('eduShell.setup.copyLink')}
+          <MonitorPlay className={studentsIn ? 'size-5' : 'size-6'} aria-hidden="true" />
+          {t('eduShell.setup.showProjector')}
         </button>
+        <Link
+          href={startHref}
+          data-testid="setup-start-game"
+          data-hero={studentsIn ? 'true' : 'false'}
+          onClick={onStart}
+          className={cn(studentsIn ? PRIMARY_BUTTON : SECONDARY_BUTTON, 'w-full', studentsIn && 'min-h-14 text-xl')}
+        >
+          <Play className={cn(studentsIn ? 'size-6' : 'size-5', 'fill-current')} aria-hidden="true" />
+          {t(studentsIn ? 'eduShell.setup.startQuick' : 'eduShell.setup.firstRound.start')}
+        </Link>
         {joinUrl ? (
-          <div data-testid="setup-share-row" className="grid grid-cols-3 gap-2">
+          <div data-testid="setup-share-row" className="grid grid-cols-2 gap-2 min-[400px]:grid-cols-4">
+            <button
+              type="button"
+              data-testid="setup-copy-link"
+              data-hero="false"
+              onClick={() => onCopy(joinUrl)}
+              className={SHARE_CHIP}
+            >
+              <Copy className="size-4 shrink-0" aria-hidden="true" />
+              <span className="line-clamp-2">{t('eduShell.setup.copyLink')}</span>
+            </button>
             <a
               data-testid="setup-share-whatsapp"
               href={`https://wa.me/?text=${encodeURIComponent(`${shareText}\n${joinUrl}`)}`}
@@ -181,19 +199,20 @@ export function ClassReady({
         ) : null}
         <p className="font-neo-body text-sm text-neo-cream/70">{t('eduShell.setup.noAccount')}</p>
         <div className="flex flex-wrap items-center justify-center gap-2">
-          <button type="button" data-testid="setup-projector" onClick={onOpenProjector} className={QUIET_LINK}>
-            <MonitorPlay className="size-4" aria-hidden="true" />
-            {t('eduShell.setup.showProjector')}
-          </button>
+          {studentsIn ? null : (
+            <RehearseWithBotsButton
+              classroomId={classroom.id}
+              source="class"
+              language={language}
+              t={t}
+              onStart={() => trackFirstRoundGuideClicked({ surface: 'class_ready', locale: language, step: 'practice_bots' })}
+            />
+          )}
           <Link href={`/${language}/teacher`} className={QUIET_LINK}>
             {t('eduShell.setup.backHome')}
           </Link>
         </div>
       </div>
-
-      {/* Before anyone joins: the guided first round (practise with bots → code on the board →
-          2-minute round). Once a student is in, "Start a quick game" above is the one hero. */}
-      {studentsIn ? null : <FirstRoundGuide classroomId={classroom.id} language={language} t={t} />}
 
       {/* Teacher Pro trial right after the class exists. Below the join code and share
           row, so getting students in stays the one loud step. Teacher setup flow only;

@@ -6,7 +6,7 @@ const t = (k: string, p?: Record<string, unknown>) => (p ? `T(${k}:${JSON.string
 
 describe('class setup defaults', () => {
   it('Given the five grade bands, Then each has a label key', () => {
-    expect(GRADE_BANDS).toEqual(['k2', 'g35', 'g68', 'g912', 'adult']);
+    expect(GRADE_BANDS).toEqual(['k2', 'g35', 'g68', 'g912', 'esl']);
   });
 
   it('Given the teacher’s UI language, Then the class language defaults to it when supported', () => {

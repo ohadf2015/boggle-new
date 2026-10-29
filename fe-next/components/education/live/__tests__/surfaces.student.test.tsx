@@ -106,8 +106,8 @@ describe('edu live surfaces — student lobby', () => {
     expect(screen.queryByTestId('classroom-waiting-count')).not.toBeInTheDocument();
   });
 
-  it('given no provider, when a classroom student waits, then the shared waiting stage stays', () => {
+  it('given no provider, when a classroom student waits, then the same edu student lobby renders', () => {
     render(<PlayerWaitingView {...defaultProps} isClassroomMode />);
-    expect(screen.getByTestId('classroom-waiting-count')).toBeInTheDocument();
+    expect(screen.getByTestId('edu-student-count')).toBeInTheDocument();
   });
 });

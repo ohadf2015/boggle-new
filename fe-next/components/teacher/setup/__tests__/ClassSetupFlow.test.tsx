@@ -8,7 +8,11 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 let search = '';
 const routerReplace = vi.fn();
-vi.mock('next/navigation', () => ({ useSearchParams: () => new URLSearchParams(search), useRouter: () => ({ replace: routerReplace, push: vi.fn() }) }));
+const routerPush = vi.fn();
+vi.mock('next/navigation', () => ({ useSearchParams: () => new URLSearchParams(search), useRouter: () => ({ replace: routerReplace, push: routerPush }) }));
+vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'u1' } }) }));
+const guide = vi.hoisted(() => ({ trackFirstRoundGuideShown: vi.fn(), trackFirstRoundGuideClicked: vi.fn() }));
+vi.mock('@/lib/education/firstRoundGuideTelemetry', () => guide);
 const toastSuccess = vi.fn();
 const toastError = vi.fn();
 vi.mock('react-hot-toast', () => ({ default: { success: (m: string) => toastSuccess(m), error: (m: string) => toastError(m) } }));
@@ -57,6 +61,8 @@ const shareWithFallback = vi.fn();
 vi.mock('@/utils/shareWithFallback', () => ({ shareWithFallback: (...a: unknown[]) => shareWithFallback(...a) }));
 
 import { ClassSetupFlow } from '../ClassSetupFlow';
+import { QUICK_LAUNCH_KEY } from '@/components/teacher/dashboard/quickLaunchIntent';
+import { recommendedPack, packsForLanguage } from '../starterPackPick';
 
 const writeText = vi.fn().mockResolvedValue(undefined);
 
@@ -68,6 +74,7 @@ beforeEach(() => {
   createClassroom.mockReset();
   roster = { students: [], loading: false, arrivals: [] };
   rosterCalls.length = 0;
+  sessionStorage.clear();
   Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
 });
 afterEach(() => {
@@ -85,6 +92,47 @@ describe('<ClassSetupFlow>', () => {
     expect(screen.getAllByTestId(/^setup-grade-/)).toHaveLength(5);
     const language = screen.getByRole('radiogroup', { name: 'eduShell.setup.languageLabel' });
     expect(within(language).getByRole('radio', { name: /English/ })).toBeChecked();
+  });
+
+  it('Given step 1, Then a starter pack is already picked and skipping is always one tap away', () => {
+    render(<ClassSetupFlow />);
+    const packs = screen.getByRole('radiogroup', { name: 'eduShell.setup.packLabel' });
+    expect(within(packs).getAllByRole('radio').length).toBe(packsForLanguage('en').length);
+    expect(within(packs).getByRole('radio', { checked: true })).toHaveAttribute('data-pack', recommendedPack('en', null).nameKey);
+    expect(screen.getByTestId('setup-skip')).toHaveAttribute('href', '/en/teacher');
+    expect(screen.getByTestId('setup-start-live')).toHaveAttribute('data-hero', 'true');
+  });
+
+  it('Given each first-run choice, Then the mascot pose points at the next one', async () => {
+    render(<ClassSetupFlow />);
+    expect(screen.getByTestId('edu-mascot-pickGrade')).toBeInTheDocument();
+    await userEvent.click(screen.getByTestId('setup-grade-k2'));
+    expect(screen.getByTestId('edu-mascot-pickLanguage')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('radio', { name: /Español|Spanish/ }));
+    expect(screen.getByTestId('edu-mascot-firstClass')).toBeInTheDocument();
+  });
+
+  it('When Start live game is pressed, Then the class is made and the teacher lands in a live lobby with the picked pack', async () => {
+    createClassroom.mockResolvedValue({ success: true, data: NEW });
+    render(<ClassSetupFlow />);
+    await userEvent.click(screen.getByTestId('setup-grade-g912'));
+    const other = packsForLanguage('en').find((p) => p.nameKey !== recommendedPack('en', 'g912').nameKey)!;
+    await userEvent.click(screen.getByRole('radio', { name: new RegExp(other.nameKey) }));
+    await userEvent.click(screen.getByTestId('setup-start-live'));
+    await waitFor(() => expect(routerPush).toHaveBeenCalledWith('/en/education/classroom-game?flow=quickLaunch'));
+    expect(createClassroom).toHaveBeenCalledWith('eduShell.setup.gradeName.g912', 'en');
+    expect(telemetry.trackEduClassroomCreated).toHaveBeenCalledTimes(1);
+    expect(funnel).toHaveBeenCalledWith('classroom_created', expect.objectContaining({ locale: 'en' }));
+    const intent = JSON.parse(sessionStorage.getItem(QUICK_LAUNCH_KEY) ?? 'null');
+    expect(intent).toMatchObject({ source: 'pack', packKey: other.nameKey, classroomId: 'c9', language: other.language });
+  });
+
+  it('Given the free cap is hit, When Start live game is pressed, Then the upsell opens and nothing launches', async () => {
+    classrooms = ['a', 'b', 'c'].map((id) => ({ id, name: id, join_code: id.repeat(4), member_count: 0, language: 'en' }));
+    render(<ClassSetupFlow />);
+    await userEvent.click(screen.getByTestId('setup-start-live'));
+    expect(await screen.findByTestId('upsell-class_limit')).toBeInTheDocument();
+    expect(routerPush).not.toHaveBeenCalled();
   });
 
   it('Given a free teacher, Then the cap meter shows how many classes are left', () => {
@@ -129,15 +177,24 @@ describe('<ClassSetupFlow>', () => {
     expect(routerReplace).toHaveBeenCalledWith('/en/teacher/classroom/new?classroomId=c9', { scroll: false });
   });
 
-  it('Given no student yet, Then sharing is the hero and starting a game is demoted', async () => {
+  it('Given no student yet, Then putting the code on the projector is the one hero and starting a game is demoted', async () => {
     search = 'classroomId=a';
     classrooms = [{ id: 'a', name: 'A', join_code: 'ABCD', member_count: 0, language: 'en' }];
     render(<ClassSetupFlow />);
     expect(screen.getByTestId('setup-joined-count')).toHaveTextContent('eduShell.setup.joinedNone');
-    expect(screen.getByTestId('setup-copy-link')).toHaveAttribute('data-hero', 'true');
+    expect(screen.getByTestId('setup-projector')).toHaveAttribute('data-hero', 'true');
+    expect(screen.getByTestId('setup-copy-link')).toHaveAttribute('data-hero', 'false');
     expect(screen.getByTestId('setup-start-game')).toHaveAttribute('data-hero', 'false');
-    expect(screen.getByTestId('setup-start-game')).toHaveTextContent('eduShell.setup.firstRound.start');
-    expect(screen.getByTestId('first-round-guide')).toBeInTheDocument();
+    expect(screen.getAllByText('eduShell.setup.firstRound.start')).toHaveLength(1);
+    expect(screen.queryByTestId('first-round-guide')).toBeNull();
+    expect(guide.trackFirstRoundGuideShown).toHaveBeenCalledWith({ surface: 'class_ready', locale: 'en' });
+    await userEvent.click(screen.getByTestId('setup-projector'));
+    expect(screen.getByTestId('projector-sheet')).toBeInTheDocument();
+    const start = screen.getByTestId('setup-start-game');
+    start.addEventListener('click', (e) => e.preventDefault());
+    await userEvent.click(start);
+    expect(guide.trackFirstRoundGuideClicked).toHaveBeenCalledWith({ surface: 'class_ready', locale: 'en', step: 'start_round' });
+    expect(screen.getByTestId('rehearse-with-bots')).toBeInTheDocument();
   });
 
   it('Given the roster is still loading, Then the counter claims no number', () => {
@@ -170,7 +227,7 @@ describe('<ClassSetupFlow>', () => {
     const start = screen.getByTestId('setup-start-game');
     expect(start).toHaveAttribute('data-hero', 'true');
     expect(start).toHaveTextContent('eduShell.setup.startQuick');
-    expect(screen.queryByTestId('first-round-guide')).not.toBeInTheDocument();
+    expect(screen.getByTestId('setup-projector')).toHaveAttribute('data-hero', 'false');
     expect(screen.getByTestId('setup-copy-link')).toHaveAttribute('data-hero', 'false');
     roster = { students: [{ id: 's1' }, { id: 's2' }], loading: false, arrivals: ['s2'] };
     rerender(<ClassSetupFlow />);

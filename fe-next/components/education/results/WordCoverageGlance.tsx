@@ -174,7 +174,7 @@ export function WordCoverageGlance({
         <p
           data-testid="coverage-heading"
           dir="auto"
-          className={cn('shrink-0 mb-2 font-neo-display font-black uppercase tracking-wide text-neo-white/85', projector ? 'text-xl 2xl:text-2xl' : 'text-sm')}
+          className={cn('shrink-0 mb-2 font-neo-display font-black uppercase tracking-wide text-neo-white/85', projector ? 'text-xl @[96rem]/results:text-2xl' : 'text-sm')}
         >
           {heading}
         </p>
@@ -187,18 +187,18 @@ export function WordCoverageGlance({
                 // Gold is reserved for celebration, and a full sweep is the only
                 // thing on this card that earns it.
                 swept ? 'text-neo-yellow' : 'text-neo-lime',
-                projector ? 'text-6xl 2xl:text-9xl' : 'text-4xl'
+                projector ? 'text-6xl @[96rem]/results:text-9xl' : 'text-4xl'
               )}
             >
               {found}
-              <span className={cn('text-neo-white/50', projector ? 'text-3xl 2xl:text-6xl' : 'text-2xl')}>
+              <span className={cn('text-neo-white/50', projector ? 'text-3xl @[96rem]/results:text-6xl' : 'text-2xl')}>
                 /{total}
               </span>
             </span>
             <p
               className={cn(
                 'flex-1 text-neo-white font-neo-body font-bold leading-tight pb-1',
-                projector ? 'text-xl 2xl:text-4xl' : 'text-sm'
+                projector ? 'text-xl @[96rem]/results:text-4xl' : 'text-sm'
               )}
             >
               {isTeacher
@@ -251,7 +251,7 @@ export function WordCoverageGlance({
             aria-label={t('education.results.coverageMeterLabel', { percent: pct })}
             className={cn(
               'w-full shrink-0 rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated overflow-hidden mb-3',
-              projector ? 'h-6 2xl:h-10' : 'h-4'
+              projector ? 'h-6 @[96rem]/results:h-10' : 'h-4'
             )}
           >
             <div
@@ -273,7 +273,7 @@ export function WordCoverageGlance({
           // The ONE region on the projector that may overflow, and it is the
           // least important one. Everything a teacher acts on — the meter, the
           // podium, the button — is outside it and always on the wall.
-          projector && 'min-h-0 flex-1 overflow-y-auto pb-1 2xl:gap-3'
+          projector && 'min-h-0 flex-1 overflow-y-auto pb-1 @[96rem]/results:gap-3'
         )}
       >
         {shown.map((entry) => {
@@ -287,7 +287,7 @@ export function WordCoverageGlance({
               data-placed={unplaced ? 'false' : 'true'}
               className={cn(
                 'flex items-center gap-1.5 rounded-neo font-bold',
-                projector ? cn('px-3 py-1.5 text-xl', wallXL && '2xl:px-5 2xl:py-2.5 2xl:text-3xl') : 'px-3 py-1.5 text-sm',
+                projector ? cn('px-3 py-1.5 text-xl', wallXL && '@5xl/results:text-2xl @[96rem]/results:px-5 @[96rem]/results:py-2.5 @[96rem]/results:text-3xl') : 'px-3 py-1.5 text-sm',
                 hit && 'border-[2px] border-neo-black bg-neo-lime text-neo-black shadow-hard-sm',
                 !hit && !unplaced && 'border-[2px] border-neo-cream bg-neo-navy-light text-neo-white/60',
                 // A word the board never carried is still a word a teacher
@@ -298,15 +298,15 @@ export function WordCoverageGlance({
               )}
             >
               {hit ? (
-                <Check className={projector ? cn('w-6 h-6', wallXL && '2xl:w-8 2xl:h-8') : 'w-4 h-4'} aria-hidden />
+                <Check className={projector ? cn('w-6 h-6', wallXL && '@[96rem]/results:w-8 @[96rem]/results:h-8') : 'w-4 h-4'} aria-hidden />
               ) : unplaced ? (
-                <EyeOff className={projector ? cn('w-6 h-6', wallXL && '2xl:w-8 2xl:h-8') : 'w-4 h-4'} aria-hidden />
+                <EyeOff className={projector ? cn('w-6 h-6', wallXL && '@[96rem]/results:w-8 @[96rem]/results:h-8') : 'w-4 h-4'} aria-hidden />
               ) : (
-                <X className={projector ? cn('w-6 h-6', wallXL && '2xl:w-8 2xl:h-8') : 'w-4 h-4'} aria-hidden />
+                <X className={projector ? cn('w-6 h-6', wallXL && '@[96rem]/results:w-8 @[96rem]/results:h-8') : 'w-4 h-4'} aria-hidden />
               )}
               <span>{entry.word}</span>
               {isTeacher && entry.foundBy.length > 0 && (
-                <span className={cn('ms-1 opacity-70', projector ? cn('text-lg', wallXL && '2xl:text-xl') : 'text-xs')}>
+                <span className={cn('ms-1 opacity-70', projector ? cn('text-lg', wallXL && '@[96rem]/results:text-xl') : 'text-xs')}>
                   {entry.foundBy.length}
                 </span>
               )}

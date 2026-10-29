@@ -9,11 +9,19 @@
 
 'use client';
 
-import { useMemo, useReducer } from 'react';
+import { useMemo, useState } from 'react';
 import { Flame, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { useReducedEffects } from '@/hooks/useReducedEffects';
+import { pulseLive } from '@/lib/education/liveHaptics';
 import { tr, type EduT } from './eduText';
 import { initialWarmUp, warmUpLetters, warmUpReducer } from './warmUpTap';
+
+const MILESTONE = 5;
+const WARM_UP_KEYFRAMES =
+  '@keyframes lc-tile-hit{0%{transform:scale(1.35)}100%{transform:scale(1)}}' +
+  '@keyframes lc-tile-glow{0%,100%{transform:scale(1.1)}50%{transform:scale(1.18)}}';
 
 function seedFor(name: string): number {
   let h = 7;
@@ -23,14 +31,27 @@ function seedFor(name: string): number {
 
 export function WaitingWarmUp({ username, t }: { username: string; t: EduT }) {
   const letters = useMemo(() => warmUpLetters(username), [username]);
-  const [state, dispatch] = useReducer(warmUpReducer, username, (n) => initialWarmUp(seedFor(n)));
+  const [state, setState] = useState(() => initialWarmUp(seedFor(username)));
+  const sfx = useSoundEffects();
+  const [reducedEffects] = useReducedEffects();
+
+  const tap = (index: number) => {
+    const next = warmUpReducer(state, { type: 'tap', index });
+    setState(next);
+    if (!next.lastHit) return;
+    const milestone = next.combo % MILESTONE === 0;
+    if (milestone) sfx.playStreakMilestoneSound();
+    else sfx.playTileSelectSound();
+    pulseLive(milestone ? 'big' : 'valid', reducedEffects);
+  };
 
   return (
     <section
       data-testid="waiting-warmup"
       aria-label={tr(t, 'academy.live.warmUpTitle', 'Warm-up')}
-      className="w-full max-w-sm rounded-neo-lg border-[3px] border-neo-cream bg-neo-navy/90 p-2 shadow-hard [@media(max-height:620px)]:hidden"
+      className="w-full max-w-sm rounded-neo-lg border-[3px] border-neo-cream bg-neo-navy/90 p-2 shadow-hard"
     >
+      <style>{WARM_UP_KEYFRAMES}</style>
       <div className="mb-1.5 flex items-center justify-between gap-2">
         <p className="min-w-0 truncate font-neo-display text-xs font-black uppercase tracking-wide text-neo-cream lg:text-sm">
           {tr(t, 'academy.live.warmUpHint', 'Warm-up: tap the glowing letter!')}
@@ -64,9 +85,9 @@ export function WaitingWarmUp({ username, t }: { username: string; t: EduT }) {
               data-testid={`warmup-tile-${i}`}
               data-hot={hot ? 'true' : 'false'}
               aria-label={hot ? tr(t, 'academy.live.warmUpTapThis', 'Tap this one') : letter}
-              onClick={() => dispatch({ type: 'tap', index: i })}
+              onClick={() => tap(i)}
               className={cn(
-                'grid h-10 place-items-center rounded-neo lg:aspect-square lg:h-auto border-[3px] font-neo-display text-xl font-black leading-none transition-transform duration-100 motion-reduce:transition-none lg:text-2xl',
+                'grid h-11 place-items-center rounded-neo lg:aspect-square lg:h-auto border-[3px] font-neo-display text-xl font-black leading-none transition-transform duration-100 motion-reduce:transition-none lg:text-2xl',
                 'motion-safe:active:scale-90',
                 hot
                   ? 'z-10 scale-110 border-neo-black bg-neo-lime text-neo-black shadow-hard-sm motion-safe:animate-[lc-tile-glow_900ms_ease-in-out_infinite]'

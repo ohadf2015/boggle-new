@@ -1,0 +1,1153 @@
+{
+  "language": "ja",
+  "source": "ja-themes",
+  "migration": "20261029120300_curriculum_v2_ja_themes.sql",
+  "lists": [
+    {
+      "code": "LC-JA-PK-SCHOOL",
+      "name": "新学期 — 学校がはじまる",
+      "description": "新しい学年の最初の週に使う、文房具・一日の流れ・学校の人のことば。クラスのルールづくりと一緒にどうぞ。",
+      "language": "ja",
+      "grade": "grade_3",
+      "subject": "general",
+      "words": [
+        {
+          "word": "ふでばこ",
+          "definition": "えんぴつや消しゴムを入れておく入れ物",
+          "example": "新しいふでばこに、えんぴつを五本入れた。",
+          "level": "support"
+        },
+        {
+          "word": "けしごむ",
+          "definition": "書きまちがえた字をこすって消す道具",
+          "example": "まちがえた字を、けしごむでていねいに消した。",
+          "level": "support"
+        },
+        {
+          "word": "はさみ",
+          "definition": "二まいの刃で紙などを切る道具",
+          "example": "工作の時間に、はさみで色紙を切った。",
+          "level": "support"
+        },
+        {
+          "word": "じょうぎ",
+          "definition": "まっすぐな線を引いたり、長さをはかったりする道具",
+          "example": "じょうぎを当てて、ノートにまっすぐな線を引いた。",
+          "level": "support"
+        },
+        {
+          "word": "らんどせる",
+          "definition": "小学生が教科書を入れて、せなかにしょうかばん",
+          "example": "毎朝、らんどせるをしょって元気に家を出る。",
+          "level": "core"
+        },
+        {
+          "word": "こくばん",
+          "definition": "先生がチョークで字を書く、教室の前の大きな板",
+          "example": "先生がこくばんに今日のめあてを書いた。",
+          "level": "core"
+        },
+        {
+          "word": "じかんわり",
+          "definition": "何曜日の何時間目に、どの教科があるかを表にしたもの",
+          "example": "じかんわりを見て、あしたの教科書をそろえた。",
+          "level": "core"
+        },
+        {
+          "word": "うわばき",
+          "definition": "学校の中だけではく、室内用のくつ",
+          "example": "げた箱で外ぐつをぬいで、うわばきにはきかえた。",
+          "level": "core"
+        },
+        {
+          "word": "したじき",
+          "definition": "ノートの下にしいて、字を書きやすくする板",
+          "example": "したじきをしくと、字がきれいに書ける。",
+          "level": "core"
+        },
+        {
+          "word": "たんにん",
+          "definition": "そのクラスの子どもたちを受け持つ先生",
+          "example": "今年のたんにんの先生は、音楽がとくいだ。",
+          "level": "core"
+        },
+        {
+          "word": "こうちょう",
+          "definition": "学校でいちばん上の立場の先生",
+          "example": "始業式で、こうちょう先生がお話をした。",
+          "level": "core"
+        },
+        {
+          "word": "ずかん",
+          "definition": "絵や写真で、生き物や物をくわしくしょうかいする本",
+          "example": "図書室で、こん虫のずかんをかりた。",
+          "level": "core"
+        },
+        {
+          "word": "たいいくかん",
+          "definition": "雨の日でも運動ができる、屋根のある広い建物",
+          "example": "雨なので、たいいくかんでドッジボールをした。",
+          "level": "core"
+        },
+        {
+          "word": "ほけんしつ",
+          "definition": "けがをしたり、具合が悪くなったりした時に行く部屋",
+          "example": "ころんでひざをすりむき、ほけんしつに行った。",
+          "level": "core"
+        },
+        {
+          "word": "れんらくちょう",
+          "definition": "家と学校の間で、お知らせや持ち物を書いて伝えるノート",
+          "example": "あしたの持ち物を、れんらくちょうに書きうつした。",
+          "level": "challenge"
+        },
+        {
+          "word": "ちょうれい",
+          "definition": "朝、全校やクラスで集まって話を聞く時間",
+          "example": "月曜日のちょうれいで、新しい先生がしょうかいされた。",
+          "level": "challenge"
+        },
+        {
+          "word": "にっちょく",
+          "definition": "その日の号令や黒板消しなどを受け持つ係",
+          "example": "今日のにっちょくは、ぼくとさくらさんだ。",
+          "level": "challenge"
+        },
+        {
+          "word": "しゅっせき",
+          "definition": "授業や会に出ること。名前をよんでたしかめる",
+          "example": "先生が名前をよんで、しゅっせきをとった。",
+          "level": "challenge"
+        },
+        {
+          "word": "きゅうしょくとうばん",
+          "definition": "白いエプロンを着て、給食を配る係",
+          "example": "きゅうしょくとうばんの日は、手をよくあらう。",
+          "level": "challenge"
+        }
+      ]
+    },
+    {
+      "code": "LC-JA-PK-AUTUMN",
+      "name": "秋 — 実りの季節",
+      "description": "紅葉、秋の虫、秋の味覚、運動会や読書の秋。日本の秋らしいことばを集めました。",
+      "language": "ja",
+      "grade": "grade_3",
+      "subject": "general",
+      "words": [
+        {
+          "word": "さんま",
+          "definition": "秋においしくなる、細長い銀色の魚",
+          "example": "夕ごはんに、さんまの塩焼きが出た。",
+          "level": "support"
+        },
+        {
+          "word": "きのこ",
+          "definition": "山や森の木の根元などに生える、かさのある食べ物",
+          "example": "林の中で、かわいいきのこを見つけた。",
+          "level": "support"
+        },
+        {
+          "word": "ぶどう",
+          "definition": "小さな実がふさになってたくさんつく、秋のくだもの",
+          "example": "ぶどうがりで、むらさきの実をつんだ。",
+          "level": "support"
+        },
+        {
+          "word": "もみじ",
+          "definition": "秋になると葉が赤くそまる木。葉は手のひらの形",
+          "example": "公園のもみじが、まっ赤になっていた。",
+          "level": "support"
+        },
+        {
+          "word": "いちょう",
+          "definition": "秋に葉が黄色くなる木。葉はおうぎの形",
+          "example": "いちょう並木の道が、黄色いじゅうたんのようだ。",
+          "level": "core"
+        },
+        {
+          "word": "おちば",
+          "definition": "木からまい落ちて、地面にたまった葉",
+          "example": "おちばをふむと、かさかさと音がした。",
+          "level": "core"
+        },
+        {
+          "word": "すすき",
+          "definition": "秋の野原にゆれる、ふさふさした穂のある草",
+          "example": "お月見のために、すすきをかざった。",
+          "level": "core"
+        },
+        {
+          "word": "あかとんぼ",
+          "definition": "秋の空をたくさん飛ぶ、体の赤いとんぼ",
+          "example": "夕方の空に、あかとんぼがむれになって飛んでいた。",
+          "level": "core"
+        },
+        {
+          "word": "こおろぎ",
+          "definition": "秋の夜に、コロコロときれいな声で鳴く虫",
+          "example": "草むらで、こおろぎが鳴いている。",
+          "level": "core"
+        },
+        {
+          "word": "すずむし",
+          "definition": "リーンリーンと、すずのような声で鳴く秋の虫",
+          "example": "おじいちゃんの家で、すずむしをかっている。",
+          "level": "core"
+        },
+        {
+          "word": "さつまいも",
+          "definition": "土の中にできる、むらさき色の皮のあまいいも",
+          "example": "畑で、大きなさつまいもをほった。",
+          "level": "core"
+        },
+        {
+          "word": "やきいも",
+          "definition": "おいもを焼いて、ほくほくにした食べ物",
+          "example": "寒い日に、あつあつのやきいもを半分こした。",
+          "level": "core"
+        },
+        {
+          "word": "つきみ",
+          "definition": "秋の夜に、まん丸な月をながめて楽しむこと",
+          "example": "家族で、えんがわからつきみをした。",
+          "level": "core"
+        },
+        {
+          "word": "だんご",
+          "definition": "米の粉を丸めて作る、もちもちした食べ物",
+          "example": "お月見に、白いだんごを十五こならべた。",
+          "level": "core"
+        },
+        {
+          "word": "うんどうかい",
+          "definition": "全校でつな引きやリレーをして競い合う行事",
+          "example": "うんどうかいのリレーで、一等になった。",
+          "level": "core"
+        },
+        {
+          "word": "こうよう",
+          "definition": "秋に木の葉が赤や黄色に色づくこと",
+          "example": "山のこうようが、とてもきれいだった。",
+          "level": "challenge"
+        },
+        {
+          "word": "いねかり",
+          "definition": "実った稲を田んぼでかり取ること",
+          "example": "田んぼで、いねかりの体験をした。",
+          "level": "challenge"
+        },
+        {
+          "word": "しゅうかく",
+          "definition": "育てた作物を取り入れること",
+          "example": "学校の畑で、ミニトマトのしゅうかくをした。",
+          "level": "challenge"
+        },
+        {
+          "word": "どくしょ",
+          "definition": "本を読むこと",
+          "example": "秋は、どくしょにぴったりの季節だ。",
+          "level": "challenge"
+        }
+      ]
+    },
+    {
+      "code": "LC-JA-PK-SPOOKY",
+      "name": "ふしぎな夜 — ちょっぴりドキドキ",
+      "description": "夜空、こうもり、くらやみ、ささやき声。こわすぎない、わくわくする夜のことば。",
+      "language": "ja",
+      "grade": "grade_4",
+      "subject": "general",
+      "words": [
+        {
+          "word": "おばけ",
+          "definition": "お話に出てくる、ふわふわしたふしぎな者",
+          "example": "絵本のおばけは、白くてにこにこしていた。",
+          "level": "support"
+        },
+        {
+          "word": "よぞら",
+          "definition": "夜の空",
+          "example": "よぞらに、星がたくさんかがやいていた。",
+          "level": "support"
+        },
+        {
+          "word": "ひみつ",
+          "definition": "人に知られないように、かくしておくこと",
+          "example": "ぼくたちだけのひみつの合いことばを決めた。",
+          "level": "support"
+        },
+        {
+          "word": "めいろ",
+          "definition": "道が入り組んでいて、出口をさがすのがむずかしい所",
+          "example": "トウモロコシ畑のめいろで、出口をさがした。",
+          "level": "support"
+        },
+        {
+          "word": "こうもり",
+          "definition": "夜に飛び回る、つばさのあるほにゅう類",
+          "example": "夕方になると、こうもりが空を飛びはじめた。",
+          "level": "core"
+        },
+        {
+          "word": "みみずく",
+          "definition": "頭に耳のような羽がある、夜に活動する鳥",
+          "example": "森の木の上で、みみずくがホーホーと鳴いた。",
+          "level": "core"
+        },
+        {
+          "word": "まんげつ",
+          "definition": "まん丸に見える月",
+          "example": "今夜はまんげつで、外がとても明るい。",
+          "level": "core"
+        },
+        {
+          "word": "くらやみ",
+          "definition": "光がなく、何も見えないほど暗い所",
+          "example": "くらやみの中で、ねこの目が光った。",
+          "level": "core"
+        },
+        {
+          "word": "ろうそく",
+          "definition": "しんに火をつけて明かりにする、ろうの棒",
+          "example": "停電の夜、ろうそくの明かりで本を読んだ。",
+          "level": "core"
+        },
+        {
+          "word": "ほしぞら",
+          "definition": "星がいっぱいに広がった夜の空",
+          "example": "キャンプ場で、満天のほしぞらを見上げた。",
+          "level": "core"
+        },
+        {
+          "word": "どうくつ",
+          "definition": "山やがけの中にある、大きなあな",
+          "example": "たんけん隊は、ライトを持ってどうくつに入った。",
+          "level": "core"
+        },
+        {
+          "word": "あしおと",
+          "definition": "歩く時に足から出る音",
+          "example": "ろう下から、だれかのあしおとが聞こえた。",
+          "level": "core"
+        },
+        {
+          "word": "ひそひそ",
+          "definition": "人に聞こえないように、小さな声で話す様子",
+          "example": "ふとんの中で、弟とひそひそ話をした。",
+          "level": "core"
+        },
+        {
+          "word": "かくれんぼ",
+          "definition": "おにが、かくれた人をさがす遊び",
+          "example": "夕方まで、公園でかくれんぼをした。",
+          "level": "core"
+        },
+        {
+          "word": "とびら",
+          "definition": "部屋や建物の出入り口にある戸",
+          "example": "古いとびらを開けると、キーッと音がした。",
+          "level": "core"
+        },
+        {
+          "word": "ささやき",
+          "definition": "耳もとで、とても小さな声で話すこと",
+          "example": "友だちのささやきに、思わずくすっとわらった。",
+          "level": "challenge"
+        },
+        {
+          "word": "かげぼうし",
+          "definition": "光に当たって、地面にうつる人の黒いかげ",
+          "example": "夕日で、かげぼうしが長くのびていた。",
+          "level": "challenge"
+        },
+        {
+          "word": "つきあかり",
+          "definition": "月の光で、まわりがうっすら明るいこと",
+          "example": "つきあかりをたよりに、夜道を歩いた。",
+          "level": "challenge"
+        },
+        {
+          "word": "まよなか",
+          "definition": "夜のいちばんおそい時間。夜中の十二時ごろ",
+          "example": "まよなかに目がさめて、時計の音だけが聞こえた。",
+          "level": "challenge"
+        },
+        {
+          "word": "ぶきみ",
+          "definition": "なんとなく気味が悪く、落ち着かない様子",
+          "example": "風で木がゆれて、ぶきみな音がした。",
+          "level": "challenge"
+        }
+      ]
+    },
+    {
+      "code": "LC-JA-PK-WINTER",
+      "name": "冬 — 寒い日の楽しみ",
+      "description": "雪遊び、こたつ、お正月の遊び、冬の生き物。寒い季節のことばを楽しく学びます。",
+      "language": "ja",
+      "grade": "grade_3",
+      "subject": "general",
+      "words": [
+        {
+          "word": "みかん",
+          "definition": "冬においしい、オレンジ色の皮の小さなくだもの",
+          "example": "こたつに入って、みかんを食べた。",
+          "level": "support"
+        },
+        {
+          "word": "こたつ",
+          "definition": "つくえの下に暖房がついていて、ふとんをかけて温まる家具",
+          "example": "家族みんなで、こたつでトランプをした。",
+          "level": "support"
+        },
+        {
+          "word": "てぶくろ",
+          "definition": "寒い時に手にはめて温める物",
+          "example": "毛糸のてぶくろをはめて、外に出た。",
+          "level": "support"
+        },
+        {
+          "word": "こおり",
+          "definition": "水がひえてかたまったもの",
+          "example": "朝、水たまりにこおりがはっていた。",
+          "level": "support"
+        },
+        {
+          "word": "ゆきだるま",
+          "definition": "雪を丸めて重ね、顔をつけた人形",
+          "example": "大きなゆきだるまに、バケツのぼうしをかぶせた。",
+          "level": "core"
+        },
+        {
+          "word": "つらら",
+          "definition": "のき下からたれ下がる、ぼうのような氷",
+          "example": "屋根から長いつららが下がっていた。",
+          "level": "core"
+        },
+        {
+          "word": "まふらー",
+          "definition": "首に巻いて温める、長い布",
+          "example": "おばあちゃんが編んだまふらーを巻いた。",
+          "level": "core"
+        },
+        {
+          "word": "ゆきがっせん",
+          "definition": "雪玉を投げ合う遊び",
+          "example": "校庭で、クラス対抗のゆきがっせんをした。",
+          "level": "core"
+        },
+        {
+          "word": "ふゆやすみ",
+          "definition": "年末から年始にかけての、学校の休み",
+          "example": "ふゆやすみに、いとこの家へとまりに行った。",
+          "level": "core"
+        },
+        {
+          "word": "おしょうがつ",
+          "definition": "一年のはじまりをいわう、一月はじめのころ",
+          "example": "おしょうがつに、おせち料理を食べた。",
+          "level": "core"
+        },
+        {
+          "word": "かるた",
+          "definition": "読まれた札と同じ絵札を、早く取り合う遊び",
+          "example": "家族でかるたをして、ぼくが一番多く取った。",
+          "level": "core"
+        },
+        {
+          "word": "たこあげ",
+          "definition": "風にのせて、糸につないだたこを空高く上げる遊び",
+          "example": "河原でたこあげをしたら、高く上がった。",
+          "level": "core"
+        },
+        {
+          "word": "ゆたんぽ",
+          "definition": "お湯を入れて、ふとんの中を温める入れ物",
+          "example": "ゆたんぽのおかげで、足がぽかぽかだ。",
+          "level": "core"
+        },
+        {
+          "word": "はくちょう",
+          "definition": "冬に北の国からわたってくる、白くて大きな鳥",
+          "example": "湖に、はくちょうがたくさんやってきた。",
+          "level": "core"
+        },
+        {
+          "word": "とうみん",
+          "definition": "動物が冬の間、ねむるようにじっとしてすごすこと",
+          "example": "クマは、あなの中でとうみんする。",
+          "level": "challenge"
+        },
+        {
+          "word": "しもばしら",
+          "definition": "寒い朝、土の中の水がこおってできる細い氷の柱",
+          "example": "しもばしらをふむと、ザクザクと音がした。",
+          "level": "challenge"
+        },
+        {
+          "word": "ふぶき",
+          "definition": "強い風といっしょに、雪がはげしくふること",
+          "example": "ふぶきで、前がほとんど見えなかった。",
+          "level": "challenge"
+        },
+        {
+          "word": "かんぱ",
+          "definition": "とても冷たい空気がおしよせて、急に寒くなること",
+          "example": "かんぱが来て、朝の気温が氷点下になった。",
+          "level": "challenge"
+        },
+        {
+          "word": "だんぼう",
+          "definition": "部屋を温めること。また、そのための器具",
+          "example": "教室のだんぼうをつけて、温かくした。",
+          "level": "challenge"
+        }
+      ]
+    },
+    {
+      "code": "LC-JA-PK-SPRING",
+      "name": "春 — 新しいスタート",
+      "description": "桜、春の虫や鳥、入学と新学期。あたたかい季節のはじまりのことば。",
+      "language": "ja",
+      "grade": "grade_3",
+      "subject": "general",
+      "words": [
+        {
+          "word": "さくら",
+          "definition": "春に、うすいピンク色の花をいっせいにさかせる木",
+          "example": "校門の前のさくらが満開になった。",
+          "level": "support"
+        },
+        {
+          "word": "いちご",
+          "definition": "表面につぶつぶがある、赤くてあまいくだもの",
+          "example": "いちごがりで、真っ赤な実をつんだ。",
+          "level": "support"
+        },
+        {
+          "word": "つばめ",
+          "definition": "春に南の国からやってきて、のき下に巣を作る鳥",
+          "example": "駅のやねに、つばめが巣を作っていた。",
+          "level": "support"
+        },
+        {
+          "word": "つくし",
+          "definition": "春の土手に生える、筆のような形の草",
+          "example": "土手で、つくしをたくさんつんだ。",
+          "level": "support"
+        },
+        {
+          "word": "はなみ",
+          "definition": "さくらの花をながめて楽しむこと",
+          "example": "日曜日に、家族ではなみに出かけた。",
+          "level": "core"
+        },
+        {
+          "word": "ちょうちょ",
+          "definition": "花のみつをすう、羽の大きなきれいな虫",
+          "example": "菜の花畑に、ちょうちょがひらひらと飛んでいた。",
+          "level": "core"
+        },
+        {
+          "word": "なのはな",
+          "definition": "春にさく、黄色い小さな花",
+          "example": "川原いっぱいに、なのはながさいていた。",
+          "level": "core"
+        },
+        {
+          "word": "うぐいす",
+          "definition": "春に「ホーホケキョ」と鳴く小さな鳥",
+          "example": "朝、庭でうぐいすが鳴いた。",
+          "level": "core"
+        },
+        {
+          "word": "たけのこ",
+          "definition": "春に、竹の根元から出てくる若い芽",
+          "example": "うら山で、たけのこほりをした。",
+          "level": "core"
+        },
+        {
+          "word": "ひなた",
+          "definition": "日の光が当たっている、あたたかい場所",
+          "example": "ねこが、ひなたで気持ちよさそうにねている。",
+          "level": "core"
+        },
+        {
+          "word": "ぽかぽか",
+          "definition": "あたたかくて気持ちのよい様子",
+          "example": "今日は、ぽかぽか陽気でコートがいらない。",
+          "level": "core"
+        },
+        {
+          "word": "はるかぜ",
+          "definition": "春にふく、やわらかくあたたかい風",
+          "example": "はるかぜにのって、花びらがまった。",
+          "level": "core"
+        },
+        {
+          "word": "てんとうむし",
+          "definition": "赤や黄色の丸い背中に、黒い点がある小さな虫",
+          "example": "葉っぱの上を、てんとうむしが歩いていた。",
+          "level": "core"
+        },
+        {
+          "word": "はるやすみ",
+          "definition": "学年が終わって、新しい学年がはじまるまでの休み",
+          "example": "はるやすみに、新しいノートを買いそろえた。",
+          "level": "core"
+        },
+        {
+          "word": "にゅうがく",
+          "definition": "新しく学校に入ること",
+          "example": "妹が、四月に小学校ににゅうがくする。",
+          "level": "core"
+        },
+        {
+          "word": "よもぎ",
+          "definition": "春の野原に生える、いいかおりの草。草もちに使う",
+          "example": "おばあちゃんと、よもぎをつんで草もちを作った。",
+          "level": "core"
+        },
+        {
+          "word": "しんがっき",
+          "definition": "新しくはじまる学期",
+          "example": "しんがっきから、クラスがえがある。",
+          "level": "challenge"
+        },
+        {
+          "word": "めばえ",
+          "definition": "草木の芽が出ること。物事のはじまり",
+          "example": "畑の土から、小さなめばえが顔を出した。",
+          "level": "challenge"
+        },
+        {
+          "word": "しんりょく",
+          "definition": "春から夏のはじめの、若々しい木の葉の緑",
+          "example": "山がしんりょくにつつまれて、空気がおいしい。",
+          "level": "challenge"
+        }
+      ]
+    },
+    {
+      "code": "LC-JA-PK-SUMMER",
+      "name": "夏休み — 学期の終わりと夏の思い出",
+      "description": "終業式から夏休みの自由研究、花火、夏祭りまで。夏の思い出を話し合えることば。",
+      "language": "ja",
+      "grade": "grade_4",
+      "subject": "general",
+      "words": [
+        {
+          "word": "すいか",
+          "definition": "緑にしまもようの、大きくて水分の多いくだもの",
+          "example": "えんがわで、冷えたすいかを食べた。",
+          "level": "support"
+        },
+        {
+          "word": "はなび",
+          "definition": "夜空で、火薬が光ってさまざまな色にひらくもの",
+          "example": "川原で、大きなはなびが上がった。",
+          "level": "support"
+        },
+        {
+          "word": "うちわ",
+          "definition": "手であおいで風を送る、竹と紙でできた道具",
+          "example": "うちわであおぐと、少しすずしくなった。",
+          "level": "support"
+        },
+        {
+          "word": "ゆかた",
+          "definition": "夏祭りなどで着る、木綿のうすい着物",
+          "example": "ゆかたを着て、友だちとお祭りに出かけた。",
+          "level": "support"
+        },
+        {
+          "word": "なつやすみ",
+          "definition": "七月の終わりごろからの、学校の長い休み",
+          "example": "なつやすみの計画を、カレンダーに書きこんだ。",
+          "level": "core"
+        },
+        {
+          "word": "かきごおり",
+          "definition": "細かくけずった氷に、シロップをかけた食べ物",
+          "example": "いちご味のかきごおりで、したが赤くなった。",
+          "level": "core"
+        },
+        {
+          "word": "すいえい",
+          "definition": "水の中をおよぐこと",
+          "example": "夏の体育は、プールですいえいの練習をする。",
+          "level": "core"
+        },
+        {
+          "word": "かぶとむし",
+          "definition": "頭に大きな角がある、力の強いこん虫",
+          "example": "夜の林で、かぶとむしをつかまえた。",
+          "level": "core"
+        },
+        {
+          "word": "きんぎょ",
+          "definition": "赤やオレンジ色の、ひれがひらひらした小さな魚",
+          "example": "夏祭りでとったきんぎょを、水そうで育てている。",
+          "level": "core"
+        },
+        {
+          "word": "ふうりん",
+          "definition": "風がふくと、チリンときれいな音が鳴るすず",
+          "example": "まどべのふうりんが、すずしげに鳴った。",
+          "level": "core"
+        },
+        {
+          "word": "にっき",
+          "definition": "その日にあったことや思ったことを書くもの",
+          "example": "夏休みは、毎日にっきをつけることにした。",
+          "level": "core"
+        },
+        {
+          "word": "ひやけ",
+          "definition": "日の光に当たって、はだが黒くなったり赤くなったりすること",
+          "example": "海で遊んで、うでがまっ黒にひやけした。",
+          "level": "core"
+        },
+        {
+          "word": "なつまつり",
+          "definition": "夏に、おどりや屋台でにぎわう地域のお祭り",
+          "example": "なつまつりで、わたあめとヨーヨーを買った。",
+          "level": "core"
+        },
+        {
+          "word": "かいすいよく",
+          "definition": "海に入って泳いだり遊んだりすること",
+          "example": "いとこと、かいすいよくに出かけた。",
+          "level": "core"
+        },
+        {
+          "word": "むぎわら",
+          "definition": "麦のくきを編んで作った、つばの広いぼうし",
+          "example": "むぎわらぼうしをかぶって、虫とりに行った。",
+          "level": "core"
+        },
+        {
+          "word": "つうしんぼ",
+          "definition": "学期の終わりに先生からもらう、学習や生活の記録",
+          "example": "つうしんぼを家の人に見せて、ほめてもらった。",
+          "level": "core"
+        },
+        {
+          "word": "しゅうぎょうしき",
+          "definition": "学期の最後の日に、全校で集まって行う式",
+          "example": "しゅうぎょうしきが終わると、いよいよ夏休みだ。",
+          "level": "challenge"
+        },
+        {
+          "word": "じゆうけんきゅう",
+          "definition": "自分でテーマを決めて、調べたり実験したりする宿題",
+          "example": "じゆうけんきゅうで、アサガオの観察記録をまとめた。",
+          "level": "challenge"
+        },
+        {
+          "word": "しょちゅうみまい",
+          "definition": "暑い夏に、相手の体を気づかって送る手紙やはがき",
+          "example": "先生に、しょちゅうみまいのはがきを出した。",
+          "level": "challenge"
+        },
+        {
+          "word": "きせい",
+          "definition": "休みの間に、ふるさとへ帰ること",
+          "example": "お盆の前に、家族でおじいちゃんの家にきせいした。",
+          "level": "challenge"
+        }
+      ]
+    },
+    {
+      "code": "LC-JA-PK-CLASS",
+      "name": "はじめましてのクラス",
+      "description": "新しいクラスの初日に使える、あいさつ・自己しょうかい・なかよくなるためのことば。",
+      "language": "ja",
+      "grade": "grade_3",
+      "subject": "general",
+      "words": [
+        {
+          "word": "なまえ",
+          "definition": "人や物をよぶための、その人や物だけのよび方",
+          "example": "自分のなまえを、大きな字で名札に書いた。",
+          "level": "support"
+        },
+        {
+          "word": "えがお",
+          "definition": "にこにことわらっている顔",
+          "example": "となりの子のえがおを見て、ほっとした。",
+          "level": "support"
+        },
+        {
+          "word": "おはよう",
+          "definition": "朝、人に会った時のあいさつ",
+          "example": "教室に入って、元気におはようと言った。",
+          "level": "support"
+        },
+        {
+          "word": "ありがとう",
+          "definition": "何かをしてもらった時に、気持ちを伝えることば",
+          "example": "消しゴムをかしてくれた友だちに、ありがとうと言った。",
+          "level": "support"
+        },
+        {
+          "word": "なかよし",
+          "definition": "仲がよく、いつもいっしょに遊ぶこと",
+          "example": "同じはんの三人は、すぐになかよしになった。",
+          "level": "core"
+        },
+        {
+          "word": "ちーむ",
+          "definition": "同じ目当てに向かって、力を合わせる仲間の集まり",
+          "example": "四人でちーむを作って、クイズに答えた。",
+          "level": "core"
+        },
+        {
+          "word": "しんせつ",
+          "definition": "相手のことを思って、やさしくすること",
+          "example": "道がわからない一年生に、しんせつに教えてあげた。",
+          "level": "core"
+        },
+        {
+          "word": "いっしょ",
+          "definition": "同じことを、ほかの人と同時にすること",
+          "example": "休み時間に、みんなでいっしょに遊ぼう。",
+          "level": "core"
+        },
+        {
+          "word": "はくしゅ",
+          "definition": "手をたたいて、ほめたりよろこんだりすること",
+          "example": "発表が終わると、大きなはくしゅが起こった。",
+          "level": "core"
+        },
+        {
+          "word": "しゅみ",
+          "definition": "好きで、楽しみとしてすること",
+          "example": "ぼくのしゅみは、サッカーと工作です。",
+          "level": "core"
+        },
+        {
+          "word": "よろしく",
+          "definition": "これから仲よくしてほしい、という気持ちを伝えることば",
+          "example": "一年間、どうぞよろしくおねがいします。",
+          "level": "core"
+        },
+        {
+          "word": "おうえん",
+          "definition": "がんばっている人に声をかけて、元気づけること",
+          "example": "リレーに出る友だちを、大きな声でおうえんした。",
+          "level": "core"
+        },
+        {
+          "word": "てつだい",
+          "definition": "人の仕事を助けること",
+          "example": "先生のプリント配りのてつだいをした。",
+          "level": "core"
+        },
+        {
+          "word": "なかなおり",
+          "definition": "けんかをしたあとで、また仲よくなること",
+          "example": "ごめんねと言い合って、すぐになかなおりした。",
+          "level": "core"
+        },
+        {
+          "word": "はじめまして",
+          "definition": "初めて会った人にするあいさつ",
+          "example": "はじめまして、ぼくの名前は山田です。",
+          "level": "core"
+        },
+        {
+          "word": "じこしょうかい",
+          "definition": "自分の名前や好きなことを、みんなに話して知ってもらうこと",
+          "example": "新しいクラスで、一人ずつじこしょうかいをした。",
+          "level": "challenge"
+        },
+        {
+          "word": "たすけあい",
+          "definition": "おたがいに力をかし合うこと",
+          "example": "クラスのたすけあいで、そうじが早く終わった。",
+          "level": "challenge"
+        },
+        {
+          "word": "はなしあい",
+          "definition": "みんなで意見を出し合って、決めること",
+          "example": "学級会のはなしあいで、クラスの目当てを決めた。",
+          "level": "challenge"
+        },
+        {
+          "word": "ゆずりあい",
+          "definition": "おたがいに相手に先をゆずること",
+          "example": "ゆずりあいの気持ちで、ブランコを順番に使った。",
+          "level": "challenge"
+        },
+        {
+          "word": "ちょうせん",
+          "definition": "むずかしいことに、思い切ってやってみること",
+          "example": "今年は、なわとびの二重とびにちょうせんする。",
+          "level": "challenge"
+        }
+      ]
+    },
+    {
+      "code": "LC-JA-PK-K2READ",
+      "name": "はじめて よむ ことば",
+      "description": "1・2年生が さいしょに よむ、みじかくて よく つかう ことば。ひらがなの わかち書きの 例文つき。",
+      "language": "ja",
+      "grade": "grade_1",
+      "subject": "general",
+      "words": [
+        {
+          "word": "あひる",
+          "definition": "くちばしが ひらたくて、がーがー なく とり",
+          "example": "いけで あひるが およいで いる。",
+          "level": "support"
+        },
+        {
+          "word": "おうち",
+          "definition": "じぶんが すんで いる いえ",
+          "example": "がっこうが おわったら、すぐ おうちに かえる。",
+          "level": "support"
+        },
+        {
+          "word": "えほん",
+          "definition": "えが たくさん ある、こども むけの ほん",
+          "example": "ねる まえに、えほんを よんで もらった。",
+          "level": "support"
+        },
+        {
+          "word": "おやつ",
+          "definition": "ごはんと ごはんの あいだに たべる、すこしの たべもの",
+          "example": "きょうの おやつは ドーナツだ。",
+          "level": "support"
+        },
+        {
+          "word": "あかい",
+          "definition": "りんごや いちごのような いろの ようす",
+          "example": "あかい ふうせんが そらへ とんで いった。",
+          "level": "support"
+        },
+        {
+          "word": "あたま",
+          "definition": "かおや かみの けが ある、からだの いちばん うえ",
+          "example": "せんせいが あたまを なでて くれた。",
+          "level": "core"
+        },
+        {
+          "word": "からだ",
+          "definition": "あたまから あしまでの ぜんぶ",
+          "example": "まいにち うんどうして、からだを じょうぶに する。",
+          "level": "core"
+        },
+        {
+          "word": "こども",
+          "definition": "まだ おとなに なって いない ひと",
+          "example": "こうえんで こどもたちが あそんで いる。",
+          "level": "core"
+        },
+        {
+          "word": "はっぱ",
+          "definition": "きや くさに ついて いる、みどりいろの うすい もの",
+          "example": "かぜで はっぱが ひらひら おちて きた。",
+          "level": "core"
+        },
+        {
+          "word": "みんな",
+          "definition": "そこに いる ひと ぜんぶ",
+          "example": "みんなで うたを うたった。",
+          "level": "core"
+        },
+        {
+          "word": "わたし",
+          "definition": "じぶんの ことを いう ことば",
+          "example": "わたしは ねこが だいすきです。",
+          "level": "core"
+        },
+        {
+          "word": "あそぶ",
+          "definition": "すきな ことを して たのしく すごす",
+          "example": "やすみじかんに すなばで あそぶ。",
+          "level": "core"
+        },
+        {
+          "word": "たべる",
+          "definition": "くちに いれて かんで のみこむ",
+          "example": "あさごはんを しっかり たべる。",
+          "level": "core"
+        },
+        {
+          "word": "はしる",
+          "definition": "あしを はやく うごかして すすむ",
+          "example": "うんどうじょうを いっしゅう はしる。",
+          "level": "core"
+        },
+        {
+          "word": "あした",
+          "definition": "きょうの つぎの ひ",
+          "example": "あした えんそくに いく。",
+          "level": "core"
+        },
+        {
+          "word": "おにぎり",
+          "definition": "ごはんを まるや さんかくに にぎった たべもの",
+          "example": "えんそくに おにぎりを もって いった。",
+          "level": "challenge"
+        },
+        {
+          "word": "おおきい",
+          "definition": "ほかの ものより かさが ある ようす",
+          "example": "ぞうは とても おおきい どうぶつだ。",
+          "level": "challenge"
+        },
+        {
+          "word": "ちいさい",
+          "definition": "ほかの ものより かさが すくない ようす",
+          "example": "ありは ちいさいけれど ちからもちだ。",
+          "level": "challenge"
+        },
+        {
+          "word": "ことば",
+          "definition": "はなしたり かいたり して、きもちを つたえる もの",
+          "example": "あたらしい ことばを ひとつ おぼえた。",
+          "level": "challenge"
+        },
+        {
+          "word": "いもうと",
+          "definition": "じぶんより としが したの おんなの きょうだい",
+          "example": "いもうとと いっしょに おふろに はいった。",
+          "level": "challenge"
+        }
+      ]
+    },
+    {
+      "code": "LC-JA-PK-MATH",
+      "name": "中学数学のことば",
+      "description": "分数・角度・方程式・比・平均・面積など、中学数学で毎日使う用語。読み方と意味をしっかり身につけます。",
+      "language": "ja",
+      "grade": "grade_6",
+      "subject": "math",
+      "words": [
+        {
+          "word": "かくど",
+          "definition": "角の大きさ。度という単位で表す",
+          "example": "分度器を使って、三角形のかくどをはかった。",
+          "level": "support"
+        },
+        {
+          "word": "めんせき",
+          "definition": "平面の広さ。平方センチメートルなどで表す",
+          "example": "長方形のめんせきは、たて×横で求められる。",
+          "level": "support"
+        },
+        {
+          "word": "へいきん",
+          "definition": "いくつかの数を合計して、個数でわった値",
+          "example": "五回のテストのへいきんは、八十点だった。",
+          "level": "support"
+        },
+        {
+          "word": "たいせき",
+          "definition": "立体が空間をしめる大きさ。立方センチメートルなどで表す",
+          "example": "直方体のたいせきを、たて×横×高さで計算した。",
+          "level": "support"
+        },
+        {
+          "word": "ちょっかく",
+          "definition": "九十度の角",
+          "example": "正方形の四つの角は、すべてちょっかくだ。",
+          "level": "core"
+        },
+        {
+          "word": "へいこう",
+          "definition": "二本の直線をどこまでのばしても交わらないこと",
+          "example": "ノートのけい線は、おたがいにへいこうになっている。",
+          "level": "core"
+        },
+        {
+          "word": "すいちょく",
+          "definition": "二本の直線が九十度で交わること",
+          "example": "黒板のたての線は、ゆかにすいちょくだ。",
+          "level": "core"
+        },
+        {
+          "word": "ばいすう",
+          "definition": "ある整数に、整数をかけてできる数",
+          "example": "十八は、六のばいすうでもあり、九のばいすうでもある。",
+          "level": "core"
+        },
+        {
+          "word": "やくすう",
+          "definition": "ある整数を、わり切ることのできる整数",
+          "example": "十二のやくすうは、一・二・三・四・六・十二だ。",
+          "level": "core"
+        },
+        {
+          "word": "ぶんぼ",
+          "definition": "分数で、線の下に書く数",
+          "example": "四分の三のぶんぼは四だ。",
+          "level": "core"
+        },
+        {
+          "word": "ぶんし",
+          "definition": "分数で、線の上に書く数",
+          "example": "五分の二のぶんしは二だ。",
+          "level": "core"
+        },
+        {
+          "word": "はんけい",
+          "definition": "円の中心から、円のまわりまでの長さ",
+          "example": "はんけいが三センチの円をコンパスでかいた。",
+          "level": "core"
+        },
+        {
+          "word": "ひれい",
+          "definition": "一方が二倍、三倍になると、もう一方も二倍、三倍になる関係",
+          "example": "歩いた時間と道のりは、ひれいの関係にある。",
+          "level": "core"
+        },
+        {
+          "word": "わりあい",
+          "definition": "もとにする量をもとにして、くらべる量がどれだけかを表した数",
+          "example": "クラスで犬をかっている人のわりあいを求めた。",
+          "level": "core"
+        },
+        {
+          "word": "せいすう",
+          "definition": "…、−2、−1、0、1、2、…のように、小数や分数でない数",
+          "example": "答えがせいすうになるように、式を立てた。",
+          "level": "core"
+        },
+        {
+          "word": "ほうていしき",
+          "definition": "まだわからない数を文字で表し、等号で結んだ式",
+          "example": "ほうていしきを解いて、xの値を求めた。",
+          "level": "challenge"
+        },
+        {
+          "word": "えんしゅうりつ",
+          "definition": "円周が直径の何倍かを表す数。約三・一四",
+          "example": "えんしゅうりつを使って、円のまわりの長さを求めた。",
+          "level": "challenge"
+        },
+        {
+          "word": "はんぴれい",
+          "definition": "一方が二倍になると、もう一方が半分になる関係",
+          "example": "速さと時間は、はんぴれいの関係だ。",
+          "level": "challenge"
+        },
+        {
+          "word": "そすう",
+          "definition": "一とその数自身でしかわり切れない、二以上の整数",
+          "example": "七は、一と七でしかわれないのでそすうだ。",
+          "level": "challenge"
+        },
+        {
+          "word": "へんすう",
+          "definition": "いろいろな値をとる文字。xやyなど",
+          "example": "グラフでは、横じくにへんすうxをとる。",
+          "level": "challenge"
+        }
+      ]
+    }
+  ]
+}

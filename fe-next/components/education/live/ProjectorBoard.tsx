@@ -1,5 +1,6 @@
 'use client';
 
+import type { CSSProperties } from 'react';
 import type { LetterGrid } from '@/shared/types/game';
 
 /** Modes where every student plays the SAME grid, so the wall can show it. */
@@ -24,14 +25,14 @@ export default function ProjectorBoard({ grid, label }: { grid: LetterGrid; labe
       aria-label={label}
       data-testid="projector-board"
       dir="ltr"
-      className="grid size-[min(100cqw,100cqh)] gap-[0.5vw] rounded-neo-lg border-4 border-neo-cream bg-neo-navy-light p-[0.7vw] shadow-hard-lg"
-      style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
+      className="grid size-[min(100cqw,100cqh)] gap-[1.2cqmin] rounded-neo-lg border-4 border-neo-cream bg-neo-navy-light p-[1.6cqmin] shadow-hard-lg"
+      style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, '--cols': Math.max(cols, 1) } as CSSProperties}
     >
       {grid.flat().map((letter, i) => (
         <span
           key={i}
           data-testid="projector-board-tile"
-          className="grid place-items-center rounded-neo border-[3px] border-neo-black bg-neo-cream font-neo-display text-[2.2vw] font-black leading-none text-neo-black shadow-hard-sm"
+          className="grid place-items-center rounded-neo border-[3px] border-neo-black bg-neo-cream font-neo-display text-[calc(min(100cqw,100cqh)/var(--cols)*0.48)] font-black leading-none text-neo-black shadow-hard-sm"
         >
           {tileText(letter)}
         </span>

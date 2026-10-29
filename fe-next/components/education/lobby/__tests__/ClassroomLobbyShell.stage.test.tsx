@@ -26,17 +26,11 @@ describe('ClassroomLobbyShell — the launch stage', () => {
     expect(title.textContent?.length).toBeGreaterThan(3);
   });
 
-  it('hands the pinned poster\'s height to the scroller while options are open, keeping it mounted', () => {
-    const { rerender } = render(
-      <ClassroomLobbyShell pinned={<div data-testid="poster" />}>body</ClassroomLobbyShell>
-    );
-    expect(screen.getByTestId('lobby-pinned').className.split(' ')).not.toContain('hidden');
-    rerender(
-      <ClassroomLobbyShell expanded pinned={<div data-testid="poster" />}>body</ClassroomLobbyShell>
-    );
-    expect(screen.getByTestId('poster')).toBeInTheDocument();
-    expect(screen.getByTestId('lobby-pinned').className.split(' ')).toContain('hidden');
-    expect(screen.getByTestId('lobby-scroll').className).toContain('flex-1');
+  it('sizes its columns from its own width, so a preview frame or the TV zoom lays out like the page', () => {
+    render(<ClassroomLobbyShell pinned={<div />} aside={<div />}>body</ClassroomLobbyShell>);
+    expect(screen.getByTestId('classroom-lobby-shell').className).toContain('@container/lobby');
+    expect(screen.getByTestId('lobby-columns').className).toContain('@4xl/lobby:grid');
+    expect(screen.getByTestId('lobby-columns').className).not.toMatch(/(^|\s)lg:/);
   });
 
   it('still locks the shell and scrolls exactly one region', () => {
@@ -45,12 +39,9 @@ describe('ClassroomLobbyShell — the launch stage', () => {
     expect(screen.getByTestId('lobby-scroll').className).toContain('overflow-y-auto');
   });
 
-  it('puts the ready panel beside the one scroller, outside it, and keeps it while options are open', () => {
-    const { rerender } = render(
-      <ClassroomLobbyShell pinned={<div />} aside={<div data-testid="ready" />}>body</ClassroomLobbyShell>
-    );
+  it('puts the ready panel beside the one scroller, outside it, and never scrolls it', () => {
+    render(<ClassroomLobbyShell pinned={<div />} aside={<div data-testid="ready" />}>body</ClassroomLobbyShell>);
     expect(screen.getByTestId('lobby-scroll')).not.toContainElement(screen.getByTestId('ready'));
-    rerender(<ClassroomLobbyShell expanded pinned={<div />} aside={<div data-testid="ready" />}>body</ClassroomLobbyShell>);
     expect(screen.getByTestId('lobby-aside').className).not.toContain('hidden');
     expect(screen.getByTestId('lobby-aside').className).not.toContain('overflow-y-auto');
   });

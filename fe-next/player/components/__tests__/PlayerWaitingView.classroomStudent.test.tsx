@@ -104,7 +104,7 @@ describe('PlayerWaitingView - the classroom student waiting room', () => {
 
   it('Given the student is ready, Then the stage shows it on their face', () => {
     render(<PlayerWaitingView {...defaultProps} isClassroomMode isReady onToggleReady={vi.fn()} />);
-    expect(screen.getByTestId('waiting-ready-sticker')).toBeInTheDocument();
+    expect(screen.getByTestId('edu-student-ready-sticker')).toBeInTheDocument();
   });
 
   it('asks before leaving on the dark host surface, not the cream one', () => {

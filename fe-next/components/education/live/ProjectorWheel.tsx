@@ -41,12 +41,12 @@ export default function ProjectorWheel({ puzzle, label }: { puzzle: WheelPuzzle;
       aria-label={label}
       data-testid="projector-wheel"
       dir="ltr"
-      className="relative hidden aspect-square h-full max-h-full shrink-0 rounded-full border-4 border-neo-cream bg-neo-navy-light shadow-hard-lg md:block"
+      className="relative hidden aspect-square h-full max-h-full shrink-0 rounded-full [container-type:size] border-4 border-neo-cream bg-neo-navy-light shadow-hard-lg md:block"
     >
       <span aria-hidden="true" className="absolute inset-[12%] rounded-full border-2 border-dashed border-neo-cream/25" />
       <span
         data-testid="projector-wheel-center"
-        className={`${TILE} left-1/2 top-1/2 size-[30%] -translate-x-1/2 -translate-y-1/2 bg-neo-lime text-[3.4vw] text-neo-black`}
+        className={`${TILE} left-1/2 top-1/2 size-[30%] -translate-x-1/2 -translate-y-1/2 bg-neo-lime text-[13cqw] text-neo-black`}
       >
         {upper(puzzle.centerLetter)}
       </span>
@@ -56,7 +56,7 @@ export default function ProjectorWheel({ puzzle, label }: { puzzle: WheelPuzzle;
           <span
             key={`${letter}-${i}`}
             data-testid="projector-wheel-letter"
-            className={`${TILE} size-[20%] -translate-x-1/2 -translate-y-1/2 bg-neo-cream text-[2.4vw] text-neo-black`}
+            className={`${TILE} size-[20%] -translate-x-1/2 -translate-y-1/2 bg-neo-cream text-[9cqw] text-neo-black`}
             style={{ left: `${50 + 36 * Math.sin(angle)}%`, top: `${50 - 36 * Math.cos(angle)}%` }}
           >
             {upper(letter)}

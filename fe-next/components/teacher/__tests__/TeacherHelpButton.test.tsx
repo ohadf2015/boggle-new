@@ -1,81 +1,49 @@
-/**
- * TeacherHelpButton — the "?" control TeacherOnboarding's own doc comment has
- * promised since it shipped ("Reopenable from the teacher dashboard '?' button
- * (forceShow)"). The prop was implemented and tested; the trigger never was, so
- * once a teacher dismissed the walkthrough it was gone for good.
- */
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, fireEvent, cleanup } from '@testing-library/react';
+import '@testing-library/jest-dom';
 
-import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-
-const onboardingState = {
-  shouldShowOnboarding: false,
-  currentStep: 0,
-  completedSteps: [] as string[],
-  isCompleted: true,
-  isSkipped: false,
-  completeStep: vi.fn(),
-  nextStep: vi.fn(),
-  prevStep: vi.fn(),
-  setStep: vi.fn(),
-  complete: vi.fn(),
-  skip: vi.fn(),
-  reset: vi.fn(),
-};
-
-vi.mock('@/lib/education/telemetry', () => ({
-  trackEduTeacherOnboardingStep: vi.fn(),
-}));
-
-vi.mock('@/hooks/useOnboardingState', () => ({
-  useTeacherOnboardingState: () => onboardingState,
-}));
+const track = vi.hoisted(() => vi.fn());
+vi.mock('@/lib/education/telemetry', () => ({ trackEduTeacherOnboardingStep: track }));
 
 const lang = { current: 'en' };
 vi.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({
-    t: (k: string) => k,
-    language: lang.current,
-    dir: lang.current === 'he' ? 'rtl' : 'ltr',
-  }),
+  useLanguage: () => ({ t: (k: string) => k, language: lang.current, dir: lang.current === 'he' ? 'rtl' : 'ltr' }),
 }));
-
-vi.mock('@/hooks/useFocusTrap', () => ({ useFocusTrap: vi.fn() }));
 
 import { TeacherHelpButton } from '../TeacherHelpButton';
 
+beforeEach(() => {
+  lang.current = 'en';
+});
+afterEach(() => {
+  cleanup();
+  vi.clearAllMocks();
+});
+
 describe('TeacherHelpButton', () => {
-  beforeEach(() => {
-    lang.current = 'en';
-    // The state a complaining teacher is actually in: already dismissed.
-    onboardingState.shouldShowOnboarding = false;
-  });
-
-  it('renders a labelled control', () => {
+  it('renders a labelled control and shows nothing until asked', () => {
     render(<TeacherHelpButton />);
-    expect(screen.getByTestId('teacher-help-button')).toHaveAttribute(
-      'aria-label',
-      'education.onboarding.showTutorial',
-    );
+    expect(screen.getByTestId('teacher-help-button')).toHaveAttribute('aria-label', 'education.onboarding.showTutorial');
+    expect(screen.queryByTestId('how-it-works')).toBeNull();
   });
 
-  it('shows nothing until asked', () => {
-    render(<TeacherHelpButton />);
-    expect(screen.queryByTestId('onboarding-step-create')).toBeNull();
-  });
-
-  it('reopens the walkthrough even though onboarding is already dismissed', () => {
+  it('opens a compact how-it-works, not a second onboarding: four steps and the help center', () => {
+    lang.current = 'he';
     render(<TeacherHelpButton />);
     fireEvent.click(screen.getByTestId('teacher-help-button'));
-    for (const id of ['create', 'share', 'join', 'play', 'results']) {
-      expect(screen.getByTestId(`onboarding-step-${id}`)).toBeInTheDocument();
-    }
+    const sheet = screen.getByTestId('how-it-works');
+    for (const id of ['create', 'share', 'join', 'play']) expect(screen.getByTestId(`onboarding-step-${id}`)).toBeInTheDocument();
+    expect(screen.queryByTestId('onboarding-step-results')).toBeNull();
+    expect(screen.getByRole('link', { name: /eduShell.account.help/ })).toHaveAttribute('href', '/he/education/help');
+    expect(sheet).not.toHaveTextContent('education.onboarding.subtitle');
+    expect(track).toHaveBeenCalledWith({ step: 0, totalSteps: 4, action: 'view' });
   });
 
-  it('closes again on dismiss, so the button is a toggle not a trap', () => {
+  it('closes on Got it, so the button is a toggle not a trap', () => {
     render(<TeacherHelpButton />);
     fireEvent.click(screen.getByTestId('teacher-help-button'));
-    fireEvent.click(screen.getByLabelText('common.skip'));
-    expect(screen.queryByTestId('onboarding-step-create')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'education.onboarding.gotIt' }));
+    expect(screen.queryByTestId('how-it-works')).toBeNull();
+    expect(track).toHaveBeenLastCalledWith({ step: 3, totalSteps: 4, action: 'complete' });
   });
 });

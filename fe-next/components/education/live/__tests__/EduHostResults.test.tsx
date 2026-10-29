@@ -16,6 +16,8 @@ vi.mock('@/lib/education/roundEndSound', () => ({ playRoundEndCue: vi.fn(() => n
 const pro = vi.hoisted(() => ({ hasPro: false, loading: false }));
 vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => pro }));
 vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
+const proOffer = vi.hoisted(() => ({ reportProOfferImpression: vi.fn(), reportProOfferClick: vi.fn(), reportProCtaClick: vi.fn() }));
+vi.mock('@/lib/education/reportProCtaClick', () => proOffer);
 
 const t = (key: string, params?: Record<string, string | number>) => (params ? `${key}:${JSON.stringify(params)}` : key);
 const summary = {
@@ -44,6 +46,7 @@ describe('EduHostResults', () => {
     window.sessionStorage.clear();
     pro.hasPro = false;
     pro.loading = false;
+    proOffer.reportProOfferImpression.mockClear();
     vi.useFakeTimers();
   });
   afterEach(() => vi.useRealTimers());
@@ -89,19 +92,26 @@ describe('EduHostResults', () => {
     masteryByPlayer: { Noa: { found: 3, total: 10 }, Ido: { found: 1, total: 10 } },
   } as unknown as ClassroomSummary;
 
-  it('given a free teacher, when results show, then "See who struggled" opens the gated unlock ask, never a raw reports link', () => {
+  it('given a free teacher, when results show, then the Teacher Pro trial card is the one Pro slot and no second unlock ask competes', () => {
     render(<EduHostResults summary={lessonSummary} players={players} t={t} onRematch={vi.fn()} />);
     finishReveal();
-    expect(screen.queryByTestId('edu-results-report')).toBeNull();
+    expect(screen.getByTestId('results-teacher-pro-trial-card')).toBeInTheDocument();
+    expect(screen.queryByTestId('unlock-report-upgrade-cta')).toBeNull();
+    expect(screen.queryByTestId('struggle-preview')).toBeNull();
     expect(document.querySelector('a[href="/he/teacher/reports"]')).toBeNull();
-    expect(screen.getByTestId('struggle-preview')).toContainElement(screen.getByTestId('unlock-report-upgrade-cta'));
   });
 
-  it('given a Pro teacher, when results show, then the live projector links straight to the class report', () => {
+  it('given a free teacher, when the trial card mounts on the wall, then its server-side rendered impression fires', () => {
+    render(<EduHostResults summary={lessonSummary} players={players} t={t} onRematch={vi.fn()} />);
+    expect(proOffer.reportProOfferImpression).toHaveBeenCalledWith(expect.objectContaining({ placement: 'classroom_results', stage: 'rendered' }));
+  });
+
+  it('given a Pro teacher, when results show, then the live projector links straight to the class report and shows no upsell', () => {
     pro.hasPro = true;
     render(<EduHostResults summary={lessonSummary} players={players} t={t} onRematch={vi.fn()} />);
     expect(screen.getByTestId('edu-results-report')).toHaveAttribute('href', '/he/teacher/reports');
     expect(screen.queryByTestId('unlock-report-upgrade-cta')).toBeNull();
+    expect(screen.queryByTestId('results-teacher-pro-trial-card')).toBeNull();
   });
 
   it('given lesson words, when results show, then the words still to teach are on the wall', () => {
@@ -158,14 +168,31 @@ describe('EduHostResults', () => {
     expect(screen.queryByTestId('celebration-loop')).toBeNull();
     expect(screen.queryByTestId('winner-boss-escaped')).toBeNull();
   });
-  it('Given a celebrated round with three or more students, When results show, Then a quiet invite-a-colleague row sits with the teacher cards', () => {
+  it('Given a free teacher and a celebrated round with three or more students, When results show, Then the Pro slot holds the trial card and no invite row competes', () => {
+    const class3 = [...players, { username: 'Lia', score: 5, wordsFoundCount: 1 }];
+    render(<EduHostResults summary={summary} players={class3} t={t} />);
+    expect(screen.getByTestId('results-teacher-pro-trial-card')).toBeInTheDocument();
+    expect(screen.queryByTestId('teacher-invite')).toBeNull();
+  });
+
+  it('Given a Pro teacher and a celebrated round with three or more students, When results show, Then the quiet invite-a-colleague row takes the free slot', () => {
+    pro.hasPro = true;
     const class3 = [...players, { username: 'Lia', score: 5, wordsFoundCount: 1 }];
     render(<EduHostResults summary={summary} players={class3} t={t} />);
     expect(screen.getByTestId('teacher-invite')).toBeInTheDocument();
   });
 
   it('Given only two students, When results show, Then no invite appears', () => {
+    pro.hasPro = true;
     render(<EduHostResults summary={summary} players={players} t={t} />);
     expect(screen.queryByTestId('teacher-invite')).toBeNull();
+  });
+
+  it('given a finished round, when the wall renders, then it is a size container so the recap scales to its frame, not the viewport', () => {
+    render(<EduHostResults summary={summary} players={players} t={t} />);
+    const root = screen.getByTestId('edu-host-results');
+    expect(root.className).toContain('[container:results_/_size]');
+    expect(root.innerHTML).not.toMatch(/dvh|\[@media/);
+    expect(root.className).not.toMatch(/\/results:/);
   });
 });

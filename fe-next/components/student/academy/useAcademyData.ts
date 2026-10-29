@@ -32,7 +32,7 @@ export function useAcademyData(level: VocabularyLevel | null | undefined) {
   );
   const { wordsForToday } = useSpacedRepetition(words, reviewLessonId);
 
-  const { currentStreak, isStreakAtRisk } = useWinStreak();
+  const { currentStreak, isStreakAtRisk, lastWinDate } = useWinStreak();
   const stars = useMemo(() => totalStars(merged, level), [merged, level]);
 
   return {
@@ -42,6 +42,7 @@ export function useAcademyData(level: VocabularyLevel | null | undefined) {
     reviewCount: reviewLessonId ? wordsForToday.length : 0,
     streak: currentStreak,
     streakAtRisk: isStreakAtRisk,
+    streakDoneToday: !!lastWinDate && new Date(lastWinDate).toDateString() === new Date().toDateString(),
     stars,
   };
 }

@@ -1,9 +1,9 @@
-// Smart defaults for the 2-step class setup: grade band → name, UI language → class language.
+// Smart defaults for the quick class setup: grade band → name, UI language → class language.
 
 import { EDUCATION_LANGUAGES, type Language } from '@/lib/supabase/education/types';
 import { uniqueClassroomName } from '../classroom/uniqueClassName';
 
-export const GRADE_BANDS = ['k2', 'g35', 'g68', 'g912', 'adult'] as const;
+export const GRADE_BANDS = ['k2', 'g35', 'g68', 'g912', 'esl'] as const;
 export type GradeBand = (typeof GRADE_BANDS)[number];
 
 export function defaultClassLanguage(uiLanguage: string): Language {

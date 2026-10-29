@@ -10,13 +10,11 @@ import EduLiveEntry from '@/components/education/live/EduLiveEntry';
 import EduAbortedModal from '@/components/education/live/EduAbortedModal';
 import type { Translate } from '@/components/education/live/eduLiveStyles';
 
-const EduProjectorLobby = nextDynamic(() => import('@/components/education/live/EduProjectorLobby'), { ssr: false });
 const EduStudentLobby = nextDynamic(() => import('@/components/education/live/EduStudentLobby'), { ssr: false });
 const EduHostResults = nextDynamic(() => import('@/components/education/live/EduHostResults'), { ssr: false });
 const EduStudentResults = nextDynamic(() => import('@/components/education/live/EduStudentResults'), { ssr: false });
 
 const SURFACES: EduLiveSurfaces = {
-  ProjectorLobby: EduProjectorLobby,
   StudentLobby: EduStudentLobby,
   ClassroomResults: EduHostResults,
   AbortedModal: EduAbortedModal,

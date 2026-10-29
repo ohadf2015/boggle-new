@@ -107,7 +107,7 @@ describe('ProjectorLobby — the calm dial hides the round clock', () => {
   it('timer=off: no minutes row, even though the room record carries a timer', () => {
     mockLiveGame = CLASSIC_OFF;
     render(<ProjectorLobby {...baseProps} />);
-    expect(screen.queryByText('3 common.minutes')).not.toBeInTheDocument();
+    expect(screen.queryByText('eduLiveRoom.lobby.minutes:3')).not.toBeInTheDocument();
   });
 
   it('timer=off on a quiz: no per-question seconds row', () => {
@@ -134,7 +134,7 @@ describe('ProjectorLobby — the calm dial hides the round clock', () => {
       settings: { ...CLASSIC_OFF.settings, pressure: { leaderboard: 'full', timer: 'full', speedScoring: true } },
     };
     render(<ProjectorLobby {...baseProps} />);
-    expect(screen.getByText('3 common.minutes')).toBeInTheDocument();
+    expect(screen.getByText('eduLiveRoom.lobby.minutes:3')).toBeInTheDocument();
   });
 });
 
@@ -144,7 +144,7 @@ describe('ProjectorLobby — local settings beat the server record, never a defa
   it('reads the teacher\'s own template the instant the lobby mounts', () => {
     renderWithSize('large');
     // 180s → 3 minutes, from sessionStorage, with no server round-trip.
-    expect(screen.getByText('3 common.minutes')).toBeInTheDocument();
+    expect(screen.getByText('eduLiveRoom.lobby.minutes:3')).toBeInTheDocument();
   });
 
   it('falls back to the room record when there is no local copy', () => {
@@ -163,7 +163,7 @@ describe('ProjectorLobby — local settings beat the server record, never a defa
       },
     };
     render(<ProjectorLobby {...baseProps} />);
-    expect(screen.getByText('5 common.minutes')).toBeInTheDocument();
+    expect(screen.getByText('eduLiveRoom.lobby.minutes:5')).toBeInTheDocument();
     expect(screen.getByText('5×5')).toBeInTheDocument();
     expect(screen.getByText('education.projectorLobby.lateJoinOff')).toBeInTheDocument();
   });

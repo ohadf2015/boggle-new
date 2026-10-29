@@ -1,236 +1,85 @@
 'use client';
 
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
-import { useFocusTrap } from '@/hooks/useFocusTrap';
-import { X, Check, Sparkles } from 'lucide-react';
+import { useEffect } from 'react';
+import Link from 'next/link';
+import { Gamepad2, School, Share2, Smartphone, type LucideIcon } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useTeacherOnboardingState } from '@/hooks/useOnboardingState';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
 import { trackEduTeacherOnboardingStep } from '@/lib/education/telemetry';
-import { TeacherSetupSteps, TEACHER_SETUP_STEP_COUNT } from './TeacherSetupSteps';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { cn } from '@/lib/utils';
+import { PRIMARY_BUTTON, QUIET_LINK } from '@/components/teacher/home/homeStyles';
 
-const TOTAL_STEPS = TEACHER_SETUP_STEP_COUNT;
+const STEPS: { id: string; icon: LucideIcon }[] = [
+  { id: 'create', icon: School },
+  { id: 'share', icon: Share2 },
+  { id: 'join', icon: Smartphone },
+  { id: 'play', icon: Gamepad2 },
+];
 
 export interface TeacherOnboardingProps {
-  /** Callback when onboarding is completed */
-  onComplete?: () => void;
-  /** Callback when onboarding is skipped */
-  onSkip?: () => void;
-  /** Force the infographic open even if already dismissed (reopened via "?") */
-  forceShow?: boolean;
-  /** Called after any dismissal when forceShow is used */
-  onDismiss?: () => void;
-  /** 'chip': first visit shows a small trigger; the walkthrough opens only on tap, never over the page. */
-  presentation?: 'modal' | 'chip';
-  /** Chip mode: reports the walkthrough opening and closing. */
-  onOpenChange?: (open: boolean) => void;
+  open: boolean;
+  onDismiss: () => void;
 }
 
-/**
- * Teacher Onboarding — "How it works" infographic
- *
- * A single glanceable strip of 5 numbered steps:
- *   1. Create your classroom
- *   2. Share the join code/link
- *   3. Students join from any device
- *   4. Run a live word game
- *   5. See results in your dashboard
- *
- * Horizontal strip on desktop, vertical stack on mobile. Each step has a big
- * number badge, a lucide icon, one short line, and a small pure-CSS mock.
- *
- * Features:
- * - Dismissible + persisted (shows only on first visit)
- * - Reopenable from the teacher dashboard "?" button (forceShow)
- * - Fires edu_teacher_onboarding_step telemetry (per-step view / complete / skip)
- * - Neo-brutalist styling, RTL-aware
- */
-export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
-  onComplete,
-  onSkip,
-  forceShow = false,
-  onDismiss,
-  presentation = 'modal',
-  onOpenChange,
-}) => {
+/** The "?" help: how a class game runs, in four lines, with the help center one tap away. */
+export function TeacherOnboarding({ open, onDismiss }: TeacherOnboardingProps) {
   const { t, language } = useLanguage();
-  const isRTL = language === 'he';
-  const modalRef = useRef<HTMLDivElement>(null);
 
-  const {
-    shouldShowOnboarding,
-    complete,
-    skip,
-  } = useTeacherOnboardingState();
-
-  const isChip = presentation === 'chip';
-  const [chipOpen, setChipOpen] = useState(false);
-  const isVisible = forceShow || (isChip ? chipOpen : shouldShowOnboarding);
-
-  const closeChip = useCallback(() => {
-    if (!isChip) return;
-    setChipOpen(false);
-    onOpenChange?.(false);
-  }, [isChip, onOpenChange]);
-
-  // Funnel top: one view event per open; later steps report as they come on screen.
-  const seenSteps = useRef(new Set<number>());
   useEffect(() => {
-    if (isVisible) {
-      seenSteps.current = new Set();
-      trackEduTeacherOnboardingStep({ step: 0, totalSteps: TOTAL_STEPS, action: 'view' });
-    }
-  }, [isVisible]);
-  const handleStepVisible = useCallback((step: number) => {
-    if (step === 0 || seenSteps.current.has(step)) return;
-    seenSteps.current.add(step);
-    trackEduTeacherOnboardingStep({ step, totalSteps: TOTAL_STEPS, action: 'view' });
-  }, []);
+    if (open) trackEduTeacherOnboardingStep({ step: 0, totalSteps: STEPS.length, action: 'view' });
+  }, [open]);
 
-  useFocusTrap(modalRef, isVisible, isChip ? closeChip : onSkip);
+  const done = () => {
+    trackEduTeacherOnboardingStep({ step: STEPS.length - 1, totalSteps: STEPS.length, action: 'complete' });
+    onDismiss();
+  };
+  const close = (next: boolean) => {
+    if (next) return;
+    trackEduTeacherOnboardingStep({ step: 0, totalSteps: STEPS.length, action: 'skip' });
+    onDismiss();
+  };
 
-  // Dismiss via the primary CTA — marks onboarding complete (persisted)
-  const handleComplete = useCallback(() => {
-    trackEduTeacherOnboardingStep({
-      step: TOTAL_STEPS - 1,
-      totalSteps: TOTAL_STEPS,
-      action: 'complete',
-    });
-    complete();
-    closeChip();
-    onComplete?.();
-    onDismiss?.();
-  }, [complete, closeChip, onComplete, onDismiss]);
-
-  // Dismiss via the X — marks onboarding skipped (persisted)
-  const handleSkip = useCallback(() => {
-    trackEduTeacherOnboardingStep({
-      step: 0,
-      totalSteps: TOTAL_STEPS,
-      action: 'skip',
-    });
-    skip();
-    closeChip();
-    onSkip?.();
-    onDismiss?.();
-  }, [skip, closeChip, onSkip, onDismiss]);
-
-  if (isChip && !isVisible) {
-    if (!shouldShowOnboarding) return null;
-    return (
-      <button
-        type="button"
-        data-testid="teacher-onboarding-chip"
-        onClick={() => {
-          setChipOpen(true);
-          onOpenChange?.(true);
-        }}
-        className={cn(
-          'inline-flex min-h-9 max-w-full items-center gap-1.5 rounded-neo border-2 border-neo-lime bg-neo-navy px-3',
-          'font-neo-display text-xs font-black uppercase tracking-wide text-neo-lime shadow-hard-sm',
-          'motion-safe:animate-[hq-card-pop_260ms_cubic-bezier(.2,1.4,.4,1)_both]',
-          'transition duration-100 hover:-translate-y-px hover:bg-neo-lime hover:text-black hover:shadow-hard',
-          'active:translate-y-px active:shadow-none',
-          'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan',
-        )}
+  return (
+    <Dialog open={open} onOpenChange={close}>
+      <DialogContent
+        data-testid="how-it-works"
+        noDescription
+        closeButtonLabel={t('common.close')}
+        className="max-h-[90dvh] overflow-y-auto border-[3px] border-neo-cream bg-neo-navy text-neo-cream sm:max-w-md"
       >
-        <Sparkles className="size-4 shrink-0" strokeWidth={2.5} aria-hidden="true" />
-        <span className="min-w-0 truncate">{t('education.onboarding.showTutorial')}</span>
-      </button>
-    );
-  }
-
-  if (!isVisible) {
-    return null;
-  }
-
-  const modal = (
-    <div
-      // Class-5: an opacity-from-0 entrance on a FULLSCREEN layer promotes a
-      // page-sized GPU layer and flashes on the Chromium mobile renderer. The
-      // backdrop now paints at its resting value on frame one; the panel
-      // inside it keeps its (small, bounded) entrance.
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-neo-black/70 p-4"
-      dir={isRTL ? 'rtl' : 'ltr'}
-    >
-      <div
-        ref={modalRef}
-        className={cn(
-          'relative w-full max-w-4xl max-h-[90dvh] overflow-y-auto',
-          'bg-neo-navy border-neo-thick border-neo-cream',
-          'rounded-neo-lg shadow-hard-xl',
-          'animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300'
-        )}
-        role="dialog"
-        aria-modal="true"
-        aria-label={t('education.onboarding.title')}
-      >
-        {/* Skip button */}
-        <button
-          type="button"
-          onClick={handleSkip}
-          className={cn(
-            'absolute top-3 z-10 flex h-11 w-11 items-center justify-center',
-            // A bare glyph on the panel is not a control: it has no fill and no
-            // border, so the only way out of a first-run modal was a shape you
-            // had to already know was there. Cream edge, ~15:1 against navy.
-            'rounded-neo border-2 border-neo-cream bg-neo-navy text-neo-white',
-            'hover:bg-neo-pink hover:text-black transition-colors',
-            isRTL ? 'left-3' : 'right-3'
-          )}
-          aria-label={t('common.skip')}
-        >
-          <X className="w-5 h-5" />
-        </button>
-
-        {/* Header */}
-        <div className="px-6 pt-8 pb-4 text-center sm:px-10">
-          <h2 className="text-2xl sm:text-3xl font-neo-display font-black text-neo-white text-balance">
-            {t('education.onboarding.title')}
-          </h2>
-          <p className="mt-2 text-sm sm:text-base text-neo-white/80 font-neo-body text-pretty">
-            {t('education.onboarding.subtitle')}
-          </p>
-        </div>
-
-        {/* The five steps, shared with the public /education section so a
-            teacher reads one explanation of the product, not two. */}
-        <TeacherSetupSteps className="px-6 pb-4 sm:px-10" onStepVisible={handleStepVisible} />
-
-        {/* Primary CTA */}
-        <div className="flex justify-center px-6 pb-8 pt-2 sm:px-10">
-          <Button
-            onClick={handleComplete}
-            className={cn(
-              'h-12 min-w-[220px] px-8 font-neo-display font-black uppercase',
-              'bg-neo-cyan text-neo-black',
-              'border-neo border-neo-black shadow-hard',
-              'hover:-translate-y-0.5 hover:bg-neo-cyan/90 hover:shadow-hard-lg',
-              'active:translate-y-0.5 active:shadow-hard-pressed transition'
-            )}
-          >
-            <Check className="me-2 h-5 w-5" />
+        <DialogTitle className="pe-8 font-neo-display text-xl font-black leading-tight text-neo-cream">
+          {t('education.onboarding.title')}
+        </DialogTitle>
+        <ol className="flex flex-col gap-2">
+          {STEPS.map(({ id, icon: Icon }, i) => (
+            <li key={id} data-testid={`onboarding-step-${id}`} className="flex items-start gap-3 rounded-neo border-[2px] border-neo-cream/20 px-3 py-2.5">
+              <span
+                aria-hidden="true"
+                className="grid size-9 shrink-0 place-items-center rounded-full border-[2px] border-neo-black bg-neo-lime font-neo-display text-sm font-black text-neo-black"
+              >
+                {i + 1}
+              </span>
+              <span className="flex min-w-0 flex-col">
+                <span className="inline-flex items-center gap-1.5 font-neo-body text-sm font-bold">
+                  <Icon className="size-4 shrink-0 text-neo-cyan" aria-hidden="true" />
+                  {t(`education.onboarding.steps.${id}.title`)}
+                </span>
+                <span className="font-neo-body text-sm text-neo-cream/75">{t(`education.onboarding.steps.${id}.text`)}</span>
+              </span>
+            </li>
+          ))}
+        </ol>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <Link href={`/${language}/education/help`} onClick={onDismiss} className={QUIET_LINK}>
+            {t('eduShell.account.help')}
+          </Link>
+          <button type="button" onClick={done} className={cn(PRIMARY_BUTTON, 'min-h-[48px] text-base')}>
             {t('education.onboarding.gotIt')}
-          </Button>
+          </button>
         </div>
-
-        {/* Decorative sparkles */}
-        <div className="pointer-events-none absolute top-8 inset-s-6 text-neo-lime/30">
-          <Sparkles className="h-5 w-5" />
-        </div>
-        <div className="pointer-events-none absolute bottom-10 inset-e-8 text-neo-pink/30">
-          <Sparkles className="h-4 w-4" />
-        </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
-
-  // On-demand opens (chip, header "?") portal out: the header's backdrop-blur became the fixed modal's containing block and put its X off-screen.
-  return isChip || forceShow ? createPortal(modal, document.body) : modal;
-});
-
-TeacherOnboarding.displayName = 'TeacherOnboarding';
+}
 
 export default TeacherOnboarding;

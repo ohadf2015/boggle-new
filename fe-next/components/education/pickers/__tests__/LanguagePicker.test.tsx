@@ -41,9 +41,9 @@ describe('LanguagePicker', () => {
     expect(screen.getByRole('radio', { name: /עברית.*languages\.hebrew/ })).toBeInTheDocument();
   });
 
-  it('Given the dictionary hint, Then it explains what the language controls', () => {
+  it('Given the default-language hint, Then it says lists can still be in any language', () => {
     render(<LanguagePicker label="L" value="en" onChange={vi.fn()} showBoardHint />);
-    expect(screen.getByText(/dictionary and board letters/i)).toBeInTheDocument();
+    expect(screen.getByText(/any language/i)).toBeInTheDocument();
   });
 
   it('Given an "all" option, Then it comes first and can be picked', () => {

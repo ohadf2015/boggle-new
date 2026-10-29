@@ -14,11 +14,12 @@ import {
   type CreateLessonAndAssignResult,
 } from './createLessonWithAssignment';
 import { dueDateIso, FIRST_ASSIGNMENT_DUE_IN_DAYS } from './firstAssignmentTemplates';
+import { INTL_ASSIGNMENT_TEMPLATES } from './assignmentTemplatesIntl';
 
 export const GRADE_BANDS = ['k-2', '3-5', '6-8'] as const;
 export type GradeBand = (typeof GRADE_BANDS)[number];
 
-export const SUBJECTS = ['english', 'science', 'geography'] as const;
+export const SUBJECTS = ['english', 'language', 'science', 'geography'] as const;
 export type AssignmentSubject = (typeof SUBJECTS)[number];
 
 export interface AssignmentTemplate {
@@ -218,6 +219,7 @@ export const ASSIGNMENT_TEMPLATES: AssignmentTemplate[] = [
       w('border', 'A line that separates two places'),
     ],
   },
+  ...INTL_ASSIGNMENT_TEMPLATES,
 ];
 
 export function assignmentTemplatesFor(language: Language): AssignmentTemplate[] {

@@ -26,12 +26,14 @@ import {
   teacherFunnelPlan,
 } from '@/lib/education/teacherOnboardingFunnel';
 import type { Language } from '@/lib/supabase/education/types';
+import { QUICK_LAUNCH_FLOW, writeQuickLaunchIntent } from '@/components/teacher/dashboard/quickLaunchIntent';
 import { cn } from '@/lib/utils';
 import ClassLimitUpsellModal from '@/components/teacher/ClassLimitUpsellModal';
 import { HqProjectorSheet } from '@/components/teacher/hq/HqProjectorSheet';
-import { ClassSetupDetails } from './ClassSetupDetails';
+import { ClassSetupDetails, type SetupBusy } from './ClassSetupDetails';
 import { ClassReady } from './ClassReady';
 import { classCap, defaultClassLanguage, resolveClassName, type GradeBand } from './classSetupDefaults';
+import { packsForLanguage, recommendedPack } from './starterPackPick';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -43,7 +45,7 @@ interface ReadyClass {
   join_code: string;
 }
 
-/** Two steps: details → "Your class is ready". `?classroomId=` opens step 2 for an existing class. */
+/** Details → straight into a live lobby, or → "Your class is ready" to share first. `?classroomId=` opens the ready step. */
 export function ClassSetupFlow() {
   const { t: rawT, language } = useLanguage();
   const t = rawT as T;
@@ -57,7 +59,8 @@ export function ClassSetupFlow() {
   const [name, setName] = useState('');
   const [grade, setGrade] = useState<GradeBand | null>(null);
   const [classLanguage, setClassLanguage] = useState<Language>(() => defaultClassLanguage(language));
-  const [busy, setBusy] = useState(false);
+  const [packKey, setPackKey] = useState<string | null>(null);
+  const [busy, setBusy] = useState<SetupBusy>(null);
   const [errorKey, setErrorKey] = useState<string | null>(null);
   const [created, setCreated] = useState<ReadyClass | null>(null);
   const [limitHit, setLimitHit] = useState<{ currentCount: number; limit: number } | null>(null);
@@ -100,37 +103,55 @@ export function ClassSetupFlow() {
   const trialAskOpen =
     !ready && classrooms.length > 0 && !accessLoading && !proLoading && !hasPro && !!trial?.isExpired && !trialAskDismissed;
 
-  const submit = useCallback(async () => {
-    if (isFreePlanUsageBlocked(proAccess, classrooms.length, FREE_TIER_LIMITS.classes)) {
-      setLimitHit({ currentCount: classrooms.length, limit: FREE_TIER_LIMITS.classes });
-      return;
-    }
-    setBusy(true);
-    setErrorKey(null);
-    const finalName = resolveClassName(name, grade, t, classrooms.map((c) => c.name));
-    const result = await createClassroom(finalName, classLanguage);
-    setBusy(false);
-    if (result.success && result.data?.join_code) {
-      trackEduClassroomCreated({ classroomId: result.data.id, createdVia: 'dashboard', language: result.data.language ?? classLanguage });
-      // Onboarding-funnel step: card-pinned name, locale + plan only.
-      // teacherFunnelPlan, not a hasPro ternary: trialing has hasPro true
-      // (proGrant) and must stay plan=trial. A submit before the entitlement
-      // read settles is unknown, not free.
-      captureTeacherOnboardingFunnel(TEACHER_ONBOARDING_FUNNEL_EVENTS.classroomCreated, {
-        locale: language,
-        plan: teacherFunnelPlan({ hasPro, status, loading: proLoading }),
-      });
-      setCreated({ id: result.data.id, name: result.data.name, join_code: result.data.join_code });
-      router.replace(`/${language}/teacher/classroom/new?classroomId=${result.data.id}`, { scroll: false });
-      return;
-    }
-    if (result.code === 'CLASS_LIMIT_REACHED') {
-      setLimitHit({ currentCount: result.currentCount ?? classrooms.length, limit: result.limit ?? FREE_TIER_LIMITS.classes });
-      return;
-    }
-    setErrorKey('eduShell.setup.createFailed');
-    toast.error(t('eduShell.setup.createFailed'));
-  }, [name, grade, t, language, classrooms, createClassroom, classLanguage, hasPro, proAccess, status, proLoading, router]);
+  const packs = packsForLanguage(classLanguage);
+  const recommended = recommendedPack(classLanguage, grade);
+  const pack = packs.find((p) => p.nameKey === packKey) ?? recommended;
+
+  const createClass = useCallback(
+    async (mode: Exclude<SetupBusy, null>): Promise<ReadyClass | null> => {
+      if (isFreePlanUsageBlocked(proAccess, classrooms.length, FREE_TIER_LIMITS.classes)) {
+        setLimitHit({ currentCount: classrooms.length, limit: FREE_TIER_LIMITS.classes });
+        return null;
+      }
+      setBusy(mode);
+      setErrorKey(null);
+      const finalName = resolveClassName(name, grade, t, classrooms.map((c) => c.name));
+      const result = await createClassroom(finalName, classLanguage);
+      if (result.success && result.data?.join_code) {
+        trackEduClassroomCreated({ classroomId: result.data.id, createdVia: 'dashboard', language: result.data.language ?? classLanguage });
+        // teacherFunnelPlan, not a hasPro ternary: a trialing teacher must stay plan=trial.
+        captureTeacherOnboardingFunnel(TEACHER_ONBOARDING_FUNNEL_EVENTS.classroomCreated, {
+          locale: language,
+          plan: teacherFunnelPlan({ hasPro, status, loading: proLoading }),
+        });
+        return { id: result.data.id, name: result.data.name, join_code: result.data.join_code };
+      }
+      setBusy(null);
+      if (result.code === 'CLASS_LIMIT_REACHED') {
+        setLimitHit({ currentCount: result.currentCount ?? classrooms.length, limit: result.limit ?? FREE_TIER_LIMITS.classes });
+        return null;
+      }
+      setErrorKey('eduShell.setup.createFailed');
+      toast.error(t('eduShell.setup.createFailed'));
+      return null;
+    },
+    [name, grade, t, language, classrooms, createClassroom, classLanguage, hasPro, proAccess, status, proLoading],
+  );
+
+  const createOnly = useCallback(async () => {
+    const made = await createClass('create');
+    if (!made) return;
+    setBusy(null);
+    setCreated(made);
+    router.replace(`/${language}/teacher/classroom/new?classroomId=${made.id}`, { scroll: false });
+  }, [createClass, router, language]);
+
+  const startLive = useCallback(async () => {
+    const made = await createClass('live');
+    if (!made) return;
+    writeQuickLaunchIntent({ source: 'pack', packKey: pack.nameKey, title: t(pack.nameKey), language: pack.language, classroomId: made.id });
+    router.push(`/${language}/education/classroom-game?flow=${QUICK_LAUNCH_FLOW}`);
+  }, [createClass, pack, t, router, language]);
 
   const copy = useCallback(
     async (url: string) => {
@@ -187,10 +208,16 @@ export function ClassSetupFlow() {
           onGradeChange={setGrade}
           language={classLanguage}
           onLanguageChange={setClassLanguage}
+          packs={packs}
+          pack={pack}
+          recommendedKey={recommended.nameKey}
+          onPackChange={setPackKey}
           cap={cap}
           busy={busy}
           errorKey={errorKey}
-          onSubmit={() => void submit()}
+          onStartLive={() => void startLive()}
+          onCreateOnly={() => void createOnly()}
+          skipHref={`/${language}/teacher`}
           t={t}
         />
       )}

@@ -17,6 +17,12 @@ export const CURRICULUM_SUPPLEMENTS = [
   'es-upper',
   'ru-upper-a',
   'ru-upper-b',
+  'en-themes',
+  'he-themes',
+  'sv-themes',
+  'ja-themes',
+  'es-themes',
+  'ru-themes',
 ] as const;
 export type CurriculumSeedName = CurriculumLocale | (typeof CURRICULUM_SUPPLEMENTS)[number];
 export const CURRICULUM_SEEDS: readonly CurriculumSeedName[] = [...CURRICULUM_LOCALES, ...CURRICULUM_SUPPLEMENTS];

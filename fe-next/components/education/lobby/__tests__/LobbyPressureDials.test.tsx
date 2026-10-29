@@ -142,4 +142,13 @@ describe('LobbyPressureDials — monetization visibility (round 2)', () => {
     expect(section.className).toContain('bg-neo-navy-light');
     expect(section.className).toContain('border-neo-cream/40');
   });
+
+  it.each([
+    ['a Pro teacher', { hasPro: true, loading: false }],
+    ['a free teacher', { hasPro: false, loading: false }],
+  ])('labels the dials Pro for %s, so the gate is never a surprise', (_who, state) => {
+    mockProState = state;
+    setup();
+    expect(screen.getByTestId('pressure-pro-badge')).toHaveTextContent('eduShell.host.proBadge');
+  });
 });

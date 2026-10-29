@@ -90,7 +90,7 @@ export function ClassroomFormDialog({
           </div>
 
           <LanguagePicker
-            label={t('teacher.classroom.language')}
+            label={t('teacher.classroom.defaultLanguage', 'Default language')}
             value={selectedLanguage}
             onChange={setSelectedLanguage}
             tone="theme"

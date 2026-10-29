@@ -1,18 +1,11 @@
 /**
- * Pure model for the projector lobby.
+ * Pure model for the projector lobby. Every class string here is a WHOLE literal:
+ * Tailwind v4 only emits utilities it can see verbatim, so nothing is composed.
  *
- * Kept out of the components so the gating rules ("may the teacher start?",
- * "what does each chip look like?") can be tested without a DOM, and so no
- * component file drifts past 500 lines.
+ * Sizes are container units: the lobby root is a size container, so the wall
+ * renders the same inside a preview frame or a sheet as it does full-screen.
  */
 
-/**
- * Chip accents, written as WHOLE literal class strings on purpose.
- *
- * Tailwind v4 only generates a utility it can see verbatim in the source, so a
- * composed string (`bg-neo-${color}`) silently produces no colour at all. Every
- * class below is therefore complete and never interpolated.
- */
 export const CHIP_ACCENTS = [
   'bg-neo-lime text-neo-black border-neo-black',
   'bg-neo-pink text-neo-black border-neo-black',
@@ -22,125 +15,102 @@ export const CHIP_ACCENTS = [
 
 /** Deterministic per-name accent, so a student keeps their colour across renders. */
 export function chipAccent(name: string, index: number): string {
-  const seed = name
-    ? name.split('').reduce((acc, ch) => (acc * 31 + ch.charCodeAt(0)) % 9973, 7)
-    : index;
+  const seed = name ? name.split('').reduce((acc, ch) => (acc * 31 + ch.charCodeAt(0)) % 9973, 7) : index;
   return CHIP_ACCENTS[seed % CHIP_ACCENTS.length];
 }
 
-/**
- * A tiny, deterministic tilt so a wall of chips reads as a scatter rather than
- * a spreadsheet. Bounded to ±3.5° — enough for personality, never enough to
- * make a name hard to read from the back row.
- */
-export function chipTilt(name: string, index: number): number {
-  const seed = name ? name.charCodeAt(0) + name.length * 7 + index : index;
-  return ((seed % 7) - 3) * 1.15;
-}
+/** Container width (rem) from which the lobby splits into join hero | roster columns; matches `@5xl`. */
+export const WIDE_MIN_REM = 64;
 
-export interface RosterDensityTier {
-  /** Largest class size this tier still covers. */
+/** Back-row code: at least a tenth of the wall's height on every 4:3, 16:9 and 21:9 wall. */
+export const HERO_CODE_TEXT = 'text-[min(14cqw,12cqh)] @5xl:text-[min(7.6cqw,14cqh)]';
+
+export const HERO_QR_SIZE = 'size-[min(36cqw,24cqh)] @5xl:size-[min(14cqw,30cqh)]';
+
+export interface RosterTier {
   readonly upTo: number;
-  /** Whole literal chip classes: internal gap, border weight, padding, both font steps. */
+  readonly grid: string;
+  /** cqw = the roster's own width; cqh = the lobby's height, so a short wall still fits its rows. */
   readonly chip: string;
-  /** Whole literal gap class for the chip list itself. */
-  readonly gap: string;
-  /**
-   * Whole literal type step for a PORTRAIT tablet/screen at md+. A portrait
-   * screen is height-rich and width-poor, so the landscape `md:` size (tuned
-   * for a 16:9 wall) left 13px chips and a dead band at 768x1024.
-   */
-  readonly portrait: string;
+  readonly scrolls: boolean;
 }
 
-/**
- * How big a name chip is, given how many are on the wall.
- *
- * A real class is 25–35 students and NOBODY scrolls a projector. At one fixed
- * chip size the roster ran out of wall somewhere around the eighteenth arrival
- * and every student after that popped in below the fold — the spring fired, the
- * count ticked, and the person who just typed the code never saw their name. A
- * silent no-op with an animation on it (recurring pitfall class 4).
- *
- * So the chip steps DOWN as the room fills. The arithmetic the tiers are cut
- * for, on a 1920×1080 projector where the roster owns roughly 550px of height:
- *
- *   - densest tier, 0.98vw ≈ 19px type → chip ≈ 34px tall, ≈ 165px wide
- *   - usable row ≈ 1824px → ~11 chips per row → 32 students = 3 rows ≈ 120px
- *
- * i.e. a full class lands with room to spare, and a small group still gets the
- * big loud chip that makes arriving feel like something. `overflow-y-auto`
- * stays on the list as a last resort for a room far past a class, but it is no
- * longer what a normal classroom hits.
- *
- * Every class below is a WHOLE literal string. Tailwind v4 only emits a utility
- * it can see verbatim, so a composed `text-[${size}vw]` renders unstyled — the
- * same rule that shapes `CHIP_ACCENTS` above.
- */
-export const ROSTER_DENSITY_TIERS: readonly RosterDensityTier[] = [
+export const ROSTER_TIERS: readonly RosterTier[] = [
   {
-    upTo: 8,
-    chip: 'gap-[0.6vw] border-4 px-[1.3vw] py-[0.6vw] text-[4.2vw] md:text-[min(2.6vw,3.1vh)]',
-    gap: 'gap-[1.1vw]',
-    portrait: 'md:portrait:text-[5.5vw]',
+    upTo: 12,
+    grid: 'grid-cols-2 @sm:grid-cols-3 gap-[clamp(0.375rem,1.2cqw,1.25rem)]',
+    chip: 'border-[3px] text-[clamp(1rem,min(4.4cqw,4.2cqh),3.5rem)]',
+    scrolls: false,
   },
   {
-    upTo: 16,
-    chip: 'gap-[0.5vw] border-4 px-[1.1vw] py-[0.5vw] text-[3.6vw] md:text-[min(2.1vw,2.9vh)]',
-    gap: 'gap-[0.9vw]',
-    portrait: 'md:portrait:text-[4.6vw]',
+    upTo: 24,
+    grid: 'grid-cols-2 @sm:grid-cols-3 @2xl:grid-cols-4 gap-[clamp(0.25rem,0.9cqw,1rem)]',
+    chip: 'border-[3px] text-[clamp(0.875rem,min(3.2cqw,3cqh),2.75rem)]',
+    scrolls: false,
   },
   {
-    upTo: 26,
-    chip: 'gap-[0.4vw] border-[3px] px-[0.9vw] py-[0.38vw] text-[3vw] md:text-[min(1.5vw,2vh)]',
-    gap: 'gap-[0.65vw]',
-    portrait: 'md:portrait:text-[3.6vw]',
+    upTo: 40,
+    grid: 'grid-cols-2 @sm:grid-cols-4 @2xl:grid-cols-5 gap-[clamp(0.25rem,0.7cqw,0.75rem)]',
+    chip: 'border-2 text-[clamp(0.8125rem,min(2.5cqw,2.4cqh),2.25rem)]',
+    scrolls: false,
   },
   {
     upTo: Number.POSITIVE_INFINITY,
-    chip: 'gap-[0.35vw] border-[3px] px-[0.7vw] py-[0.28vw] text-[2.5vw] md:text-[0.98vw]',
-    gap: 'gap-[0.45vw]',
-    portrait: 'md:portrait:text-[2.9vw]',
+    grid: 'grid-cols-2 @sm:grid-cols-4 @2xl:grid-cols-6 gap-1',
+    chip: 'border-2 text-[clamp(0.75rem,min(1.8cqw,1.9cqh),1.75rem)]',
+    scrolls: true,
   },
-] as const;
+];
 
-/** The tier a room of `count` students gets. Monotonic: adding a student never enlarges a chip. */
-export function rosterDensity(count: number): RosterDensityTier {
-  return (
-    ROSTER_DENSITY_TIERS.find((tier) => count <= tier.upTo) ??
-    ROSTER_DENSITY_TIERS[ROSTER_DENSITY_TIERS.length - 1]
-  );
+/** Monotonic: one more arrival never makes a chip bigger. */
+export function rosterTier(count: number): RosterTier {
+  return ROSTER_TIERS.find((tier) => count <= tier.upTo) ?? ROSTER_TIERS[ROSTER_TIERS.length - 1];
 }
 
-/** First glyph of a display name, for the chip's initial tile. */
-export function chipInitial(name: string): string {
-  const trimmed = (name || '').trim();
-  return trimmed ? Array.from(trimmed)[0].toUpperCase() : '?';
-}
-
-/** One tile per character — never split a code into fewer boxes than it has letters. */
+/** One tile per character: never split a code into fewer boxes than it has letters. */
 export function codeCharacters(gameCode: string): string[] {
   return Array.from((gameCode || '').toUpperCase());
 }
 
-/**
- * The teacher may start once ONE student is in the room.
- *
- * The rule lives here rather than inline so the button's `disabled` and the
- * reason line under it can never disagree — a dead control with no stated
- * reason is the silent-failure shape this repo keeps shipping (pitfall 4).
- */
+/** One student unlocks Start; the button's `disabled` and its reason line both read this. */
 export function canStartProjectorRound(studentCount: number): boolean {
   return studentCount > 0;
 }
 
-/**
- * Names present now that were not present on the previous render. `null` for
- * the previous list means "first paint": a reconnecting projector must not
- * play a fanfare for thirty students who were already sitting there.
- */
+/** Names present now that were not before. `null` = first paint: a reconnecting wall plays no fanfare. */
 export function arrivalsSince(previous: readonly string[] | null, current: readonly string[]): string[] {
   if (previous === null) return [];
   const seen = new Set(previous);
   return current.filter((name) => !seen.has(name));
+}
+
+const BURST_WINDOW_MS = 1000;
+const BURST_MAX = 30;
+
+export function recordArrivals(times: readonly number[], count: number, now: number): number[] {
+  const recent = times.filter((at) => now - at < BURST_WINDOW_MS);
+  for (let i = 0; i < count; i++) recent.push(now);
+  return recent;
+}
+
+/** A whole class pasting the link at once: chips land still instead of 30 pops fighting for frames. */
+export function isArrivalBurst(recentArrivals: number, incoming: number): boolean {
+  return recentArrivals + incoming > BURST_MAX;
+}
+
+interface StartLabelInput {
+  starting: boolean;
+  canStart: boolean;
+  isBoss: boolean;
+  /** The teacher switched mode in this lobby, so the launch-time label is stale. */
+  switched: boolean;
+  isQuiz: boolean;
+  startLabelKey: string;
+}
+
+export function projectorStartLabel({ starting, canStart, isBoss, switched, isQuiz, startLabelKey }: StartLabelInput): string {
+  if (!canStart && !starting) return 'eduLive.lobby.waitingForStudents';
+  if (isBoss) return 'eg2Modes.boss.start';
+  if (switched) return isQuiz ? 'hostView.startQuiz' : 'hostView.startClassGame';
+  return startLabelKey;
 }

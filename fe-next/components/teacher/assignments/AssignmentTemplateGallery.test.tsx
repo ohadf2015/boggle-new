@@ -77,4 +77,28 @@ describe('AssignmentTemplateGallery', () => {
     expect(screen.getByTestId(`assignment-template-${science[0].id}`)).toBeInTheDocument();
     expect(screen.queryByTestId(`assignment-template-${other[0].id}`)).toBeNull();
   });
+
+  it('hides a subject chip that has no templates in this language', () => {
+    render(<AssignmentTemplateGallery templates={templates} isSubmitting={false} onAssign={onAssign} onClose={onClose} />);
+    expect(screen.queryByTestId('template-filter-subject-language')).toBeNull();
+  });
+
+  it('Given class languages, Then a language chip row picks which templates show', () => {
+    const onLanguageChange = vi.fn();
+    render(
+      <AssignmentTemplateGallery
+        templates={templates}
+        isSubmitting={false}
+        onAssign={onAssign}
+        onClose={onClose}
+        language="en"
+        languages={['en', 'he']}
+        onLanguageChange={onLanguageChange}
+      />,
+    );
+    const radios = screen.getAllByRole('radio') as HTMLInputElement[];
+    expect(radios.map((r) => r.value)).toEqual(['en', 'he']);
+    fireEvent.click(radios[1]);
+    expect(onLanguageChange).toHaveBeenCalledWith('he');
+  });
 });

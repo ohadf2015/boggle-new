@@ -122,6 +122,16 @@ describe('WordCraftPractice', () => {
     expect(onBack).toHaveBeenCalled();
   });
 
+  it('Given a Russian lesson, Then the intro says plainly that the round uses other letters instead of switching silently', () => {
+    render(<WordCraftPractice words={['ёлка']} language="ru" onComplete={onComplete} onBack={onBack} />);
+    expect(screen.getByTestId('wordcraft-practice-language-note')).toBeInTheDocument();
+  });
+
+  it('Given a lesson language Word Craft deals, Then there is no language note', () => {
+    renderIt();
+    expect(screen.queryByTestId('wordcraft-practice-language-note')).toBeNull();
+  });
+
   it('Given a Russian lesson (no Word Craft bag), When the game opens, Then it falls back to the UI locale and seeds nothing', async () => {
     render(<WordCraftPractice words={['ёлка']} language="ru" onComplete={onComplete} onBack={onBack} />);
     fireEvent.click(screen.getByTestId('wordcraft-practice-play'));

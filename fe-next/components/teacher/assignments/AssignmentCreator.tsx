@@ -18,7 +18,10 @@ import {
   DialogContent,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Swords, BookOpen, Grid2x2 } from 'lucide-react';
+import { Swords, BookOpen } from 'lucide-react';
+import { AssignmentWordcraftOption } from './AssignmentWordcraftOption';
+import { contentLanguagesFor } from '@/components/education/pickers/ContentLanguageChips';
+import { lessonSeedSupportsLanguage } from '@/lib/wordTower/lessonSeed';
 import { AssignmentCreatorDueDate, assignmentSubmitHintKey } from './AssignmentCreatorDueDate';
 import { AssignmentStep } from './AssignmentStep';
 import { AssignmentLessonStep } from './AssignmentLessonStep';
@@ -120,10 +123,14 @@ export default function AssignmentCreator({
 
   const classroom = classrooms.find((c) => c.id === classroomId);
   const classroomLanguage: Language = classroom?.language ?? 'en';
-  const galleryTemplates = useMemo(
-    () => assignmentTemplatesFor(classroomLanguage),
-    [classroomLanguage],
-  );
+  const [galleryLanguage, setGalleryLanguage] = useState<Language | null>(null);
+  const contentLanguage: Language = galleryLanguage ?? selectedLesson?.language ?? classroomLanguage;
+  const contentLanguages = useMemo(() => contentLanguagesFor(classroomLanguage, lessons.map((l) => l.language)), [classroomLanguage, lessons]);
+  const galleryTemplates = useMemo(() => assignmentTemplatesFor(contentLanguage), [contentLanguage]);
+  const wordcraftOk = !selectedLesson || lessonSeedSupportsLanguage(selectedLesson.language ?? 'en');
+  useEffect(() => {
+    if (!wordcraftOk) setSelectedType((type) => (type === 'wordcraft' ? 'practice' : type));
+  }, [wordcraftOk]);
   const emptyLessonList = !isLoadingLessons && lessons.length === 0;
 
   // Reset form when dialog opens. Empty classrooms land on the gallery so the
@@ -131,6 +138,7 @@ export default function AssignmentCreator({
   useEffect(() => {
     if (isOpen) {
       setSelectedType('wordcraft');
+      setGalleryLanguage(null);
       setSelectedLessonId(initialLessonId ?? '');
       setDueDate('');
       setInstructions('');
@@ -323,6 +331,9 @@ export default function AssignmentCreator({
         ) : galleryOpen ? (
           <AssignmentTemplateGallery
             templates={galleryTemplates}
+            language={contentLanguage}
+            languages={contentLanguages}
+            onLanguageChange={setGalleryLanguage}
             isSubmitting={isSubmitting}
             onAssign={(pack) => void handleAssignTemplate(pack)}
             onClose={onClose}
@@ -363,27 +374,7 @@ export default function AssignmentCreator({
             </AssignmentStep>
 
             <AssignmentStep step="mode" n={3} label={t('teacher.assignment.typeLabel')}>
-              <button
-                type="button"
-                data-testid="assignment-mode-wordcraft"
-                aria-pressed={selectedType === 'wordcraft'}
-                onClick={() => setSelectedType('wordcraft')}
-                className={cn(
-                  'w-full mb-3 px-4 py-3 rounded-neo border-neo transition flex items-center gap-3 text-start',
-                  selectedType === 'wordcraft'
-                    ? 'bg-neo-lime border-neo-lime text-neo-black shadow-hard-sm'
-                    : 'bg-neo-navy/50 border-neo-cream/40 text-neo-white hover:bg-neo-navy/80'
-                )}
-              >
-                <Grid2x2 className="w-8 h-8 shrink-0" aria-hidden="true" />
-                <span className="flex-1 min-w-0">
-                  <span className="font-bold block">{t('education.wordcraftAssignment.title')}</span>
-                  <span className="text-xs opacity-80 block">{t('education.wordcraftAssignment.teacherHint')}</span>
-                </span>
-                <span className="shrink-0 rounded-neo border-2 border-black bg-neo-yellow px-2 py-0.5 text-xs font-black uppercase text-neo-black">
-                  {t('education.wordcraftAssignment.recommended')}
-                </span>
-              </button>
+              <AssignmentWordcraftOption selected={selectedType === 'wordcraft'} disabled={!wordcraftOk} onSelect={() => setSelectedType('wordcraft')} t={t} />
               <div className="grid grid-cols-2 gap-3">
                 <button
                   type="button"

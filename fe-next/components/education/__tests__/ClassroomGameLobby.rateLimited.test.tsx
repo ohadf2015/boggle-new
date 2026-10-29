@@ -38,7 +38,7 @@ vi.mock('@/contexts/AuthContext', () => ({
   }),
 }));
 // Stable router object for the same reason as `t` — it is a socket-effect dep.
-const { stableRouter } = vi.hoisted(() => ({ stableRouter: { push: vi.fn() } }));
+const { stableRouter } = vi.hoisted(() => ({ stableRouter: { push: vi.fn(), replace: vi.fn() } }));
 vi.mock('next/navigation', () => ({ useRouter: () => stableRouter }));
 vi.mock('socket.io-client', () => ({ io: vi.fn() }));
 vi.mock('@/lib/supabase/education', () => ({
@@ -119,7 +119,7 @@ describe('ClassroomGameLobby — Start Game always recovers', () => {
     expect(mockToastError).not.toHaveBeenCalledWith('You are not the teacher of this classroom');
   });
 
-  it('fires edu_live_game_started with source create_room when CREATE ROOM is clicked', async () => {
+  it('fires edu_live_game_started with source create_room once the server confirms the room', async () => {
     await renderLobby();
     await waitFor(() => expect(startBtn()).not.toBeDisabled());
     fireEvent.click(startBtn());
@@ -130,6 +130,9 @@ describe('ClassroomGameLobby — Start Game always recovers', () => {
         expect.objectContaining({ classroomId: 'class-1' }),
       );
     });
+    expect(trackEduLiveGameStarted).not.toHaveBeenCalled();
+    const sent = mockSocket.emit.mock.calls.find(([e]) => e === 'createClassroomGame')![1] as { gameCode: string };
+    act(() => { socketHandlers['classroomGameCreated']!({ success: true, gameCode: sent.gameCode }); });
     expect(trackEduLiveGameStarted).toHaveBeenCalledWith({
       classroomId: 'class-1',
       source: 'create_room',

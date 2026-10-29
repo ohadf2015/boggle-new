@@ -7,6 +7,13 @@ export function isHelpLocale(locale: string): locale is HelpLocale {
   return (HELP_LOCALES as readonly string[]).includes(locale);
 }
 
+/** App locales with no translated help yet: they get the English article plus a note, never a 404. */
+export const HELP_FALLBACK_LOCALES = ['ru'] as const;
+
+export function servesHelp(locale: string): boolean {
+  return isHelpLocale(locale) || (HELP_FALLBACK_LOCALES as readonly string[]).includes(locale);
+}
+
 export const HELP_CATEGORY_IDS = [
   'gettingStarted',
   'liveGame',
