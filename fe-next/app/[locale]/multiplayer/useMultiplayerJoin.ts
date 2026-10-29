@@ -407,6 +407,8 @@ export function useMultiplayerJoin({
           // Audit T4 (2026-05-10): server-side flag protects against
           // student-promotion if teacher disconnects mid-session.
           ...(options?.isClassroom && { isClassroom: true }),
+          // The duo bot only joins rooms Quick Play made, never a friend's room.
+          ...(options?.quickPlay && { isQuickPlay: true }),
         });
 
         // Remember how to get back into this room after a socket reconnect

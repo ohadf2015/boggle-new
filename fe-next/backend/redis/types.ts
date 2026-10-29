@@ -31,6 +31,7 @@ export interface GameStateData {
   isRanked?: boolean;
   isPrivate?: boolean;
   isClassroom?: boolean;
+  isQuickPlay?: boolean;
   allowLateJoin?: boolean;
   chatHistory?: unknown[];
   aiApprovedWords?: unknown[];
@@ -130,6 +131,7 @@ export interface GameDataInput {
   isRanked?: boolean;
   isPrivate?: boolean;
   isClassroom?: boolean;
+  isQuickPlay?: boolean;
   allowLateJoin?: boolean;
   chatHistory?: unknown[];
   aiApprovedWords?: unknown[];

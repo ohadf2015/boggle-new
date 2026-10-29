@@ -11,7 +11,7 @@ import logger from '../../utils/logger';
 import type { GameState } from '../../modules/gameState/types';
 
 type GameLike = Pick<GameState, 'users' | 'language'> & { gameState?: string };
-type DuoGameLike = GameLike & Partial<Pick<GameState, 'isPrivate' | 'isClassroom' | 'isRanked' | 'tournamentId'>>;
+type DuoGameLike = GameLike & Partial<Pick<GameState, 'isPrivate' | 'isClassroom' | 'isRanked' | 'tournamentId' | 'isQuickPlay'>>;
 
 interface AutoAddResult {
   botsAdded: number;
@@ -120,11 +120,14 @@ export async function autoAddBotsForSoloPlayer(
  * bot gets ONE easy bot, so the round plays as three (28d: 2-player rooms
  * where the player found 0 words replayed 67% vs ~89% in rooms of 3+). The
  * bot stays seated, so later rounds of the room see it and add nothing.
- * Never a classroom, a ranked game, a private room or a tournament. The host's
+ * Only a room Quick Play made: friend rooms are public too, and two friends
+ * playing 1v1 did not ask for a third seat. Never a classroom, a ranked game,
+ * a private room or a tournament. The host's
  * client asks for it (`duoBot` on startGame); this is the authoritative gate.
  */
 export async function autoAddBotForDuo(gameCode: string, game: DuoGameLike): Promise<AutoAddResult> {
   if (!game?.users) return { botsAdded: 0 };
+  if (game.isQuickPlay !== true) return { botsAdded: 0 };
   if (game.isClassroom || game.isRanked || game.isPrivate || game.tournamentId) return { botsAdded: 0 };
   if (game.gameState !== 'in-progress') return { botsAdded: 0 };
 

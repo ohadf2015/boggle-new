@@ -84,6 +84,8 @@ export async function saveGameState(gameCode: string, gameData: GameDataInput): 
     // every teacher live control is dropped silently (teacherControlsHandler
     // requires game.isClassroom). See gameState.classroomFlag.test.ts.
     isClassroom: String(gameData.isClassroom ?? false),
+    // The duo bot only joins Quick Play rooms; a restore must keep that.
+    isQuickPlay: String(gameData.isQuickPlay ?? false),
     allowLateJoin: String(gameData.allowLateJoin ?? true),
     chatHistory: JSON.stringify(gameData.chatHistory || []),
     aiApprovedWords: JSON.stringify(gameData.aiApprovedWords || []),
@@ -181,6 +183,7 @@ export async function getGameState(gameCode: string): Promise<GameStateData | nu
       // Defaults false for legacy records written before this field existed —
       // an arcade room wrongly flagged classroom would wedge host migration.
       isClassroom: data.isClassroom === 'true',
+      isQuickPlay: data.isQuickPlay === 'true',
       allowLateJoin: data.allowLateJoin !== 'false',
       chatHistory: data.chatHistory ? safeJsonParse<unknown[]>(data.chatHistory, [], 'chatHistory', gameCode) : undefined,
       aiApprovedWords: data.aiApprovedWords ? safeJsonParse<unknown[]>(data.aiApprovedWords, [], 'aiApprovedWords', gameCode) : undefined,

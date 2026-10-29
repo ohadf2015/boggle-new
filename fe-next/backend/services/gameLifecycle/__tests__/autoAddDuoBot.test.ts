@@ -2,7 +2,8 @@
  * exp-mp-duo-bot-v1: a public 1v1 room gets ONE bot at game start, so a
  * two-human room plays as three. 28d: in 2-player rooms where the player found
  * 0 words only 67% started another game, vs ~89% in rooms of 3+.
- * Never in a classroom, a ranked game, a private room or a tournament.
+ * Only in rooms Quick Play created; never in a friend room, a classroom, a
+ * ranked game, a private room or a tournament.
  */
 import { vi } from 'vitest';
 import { autoAddBotForDuo } from '../autoAddBots';
@@ -32,6 +33,7 @@ const duo = (over: Record<string, unknown> = {}) => ({
   language: 'en',
   gameState: 'in-progress',
   isPrivate: false,
+  isQuickPlay: true,
   isClassroom: false,
   isRanked: false,
   tournamentId: null,
@@ -75,6 +77,10 @@ describe('autoAddBotForDuo', () => {
     ['a ranked game', { isRanked: true }],
     ['a private room', { isPrivate: true }],
     ['a tournament', { tournamentId: 't1' }],
+    // Friend rooms are public in code (only classrooms are private), but two
+    // friends who made a room to play each other did not ask for a third seat.
+    ['a room a player made with Create Room (not Quick Play)', { isQuickPlay: false }],
+    ['a room whose origin was lost on restore', { isQuickPlay: undefined }],
   ])('never adds a bot to %s', async (_label, over) => {
     const result = await autoAddBotForDuo('GAME1', duo(over) as never);
     expect(result.botsAdded).toBe(0);

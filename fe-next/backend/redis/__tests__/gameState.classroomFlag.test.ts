@@ -173,3 +173,26 @@ describe('isClassroom survives the Redis round-trip', () => {
     expect(restored!.isClassroom).toBe(true);
   });
 });
+
+describe('isQuickPlay survives the Redis round-trip', () => {
+  beforeEach(() => {
+    storedHash = {};
+    vi.clearAllMocks();
+  });
+
+  // A deploy mid-session must not turn a Quick Play room into one the duo bot skips.
+  it('restores a Quick Play room as a Quick Play room', async () => {
+    await saveGameState('QUICK1', classroomGameInput({ isClassroom: false, isQuickPlay: true }) as never);
+    expect(storedHash.isQuickPlay).toBe('true');
+
+    const restored = await restoreGameFromRedis('QUICK1', {} as Record<string, GameState>);
+    expect(restored!.isQuickPlay).toBe(true);
+  });
+
+  it('restores a Create Room room as not Quick Play (control)', async () => {
+    await saveGameState('FRIEND1', classroomGameInput({ isClassroom: false, isQuickPlay: false }) as never);
+
+    const restored = await restoreGameFromRedis('FRIEND1', {} as Record<string, GameState>);
+    expect(restored!.isQuickPlay).toBe(false);
+  });
+});
