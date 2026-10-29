@@ -79,6 +79,15 @@ describe('BlastResultsSummary', () => {
     expect(screen.queryByTestId('blast-results-secondary-waves')).toBeNull();
   });
 
+  it('keeps the play-again footer pinned to the window bottom so it never needs a scroll', () => {
+    render(
+      <BlastResultsSummary results={makeResults()} t={t} onPlayAgain={noop} onQuit={noop} />,
+    );
+    const footer = screen.getByTestId('blast-results-cta-footer');
+    expect(footer.className).toContain('sticky');
+    expect(footer.className).toContain('bottom-0');
+  });
+
   it('draws the run as a wave track with the failed wave marked and the next boss ahead', () => {
     const waveResults = [
       { waveNumber: 1, score: 2000, wordsFound: 1, clearPercentage: 92, reward: { stars: 3 as const, coins: 25, chestBonus: 12 } },

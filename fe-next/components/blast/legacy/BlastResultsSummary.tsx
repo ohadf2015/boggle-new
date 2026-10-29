@@ -91,7 +91,7 @@ export function BlastResultsSummary({ results, t, onPlayAgain, onQuit, onOpenSto
       <ResultsBannerSlot placement="singleplayer-complete" className="shrink-0" />
 
       <div
-        className="shrink-0 flex flex-col gap-2 w-full px-4 py-3 bg-neo-navy border-t-3 border-neo-black pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+        className="sticky bottom-0 z-20 shrink-0 flex flex-col gap-2 w-full px-4 py-3 bg-neo-navy border-t-3 border-neo-black pb-[max(0.75rem,env(safe-area-inset-bottom))]"
         data-testid="blast-results-cta-footer"
       >
         <Button
