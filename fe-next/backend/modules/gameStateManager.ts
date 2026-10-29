@@ -148,6 +148,7 @@ function createGame(gameCode: string, data: GameCreationData): GameState {
     isRanked: data.isRanked || false,
     isPrivate: data.isPrivate || false,
     isClassroom: data.isClassroom || false,
+    isQuickPlay: data.isQuickPlay || false,
     allowLateJoin: data.allowLateJoin !== false,
     aiApprovedWords: [],
     peerValidationWord: null,

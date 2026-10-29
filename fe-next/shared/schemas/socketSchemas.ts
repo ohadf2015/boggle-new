@@ -164,6 +164,10 @@ export const CreateGameSchema = z.object({
   // student/player. Goes straight to grace period so the teacher can reclaim
   // host. Set by the multiplayer client when ?classroom=true URL param is on.
   isClassroom: z.boolean().optional().default(false),
+  // Set when Quick Play created the room. Only these rooms get the 1v1 duo bot:
+  // friend rooms are public in code too, and friends playing 1v1 did not ask
+  // for a third seat.
+  isQuickPlay: z.boolean().optional().default(false),
 });
 
 /**
