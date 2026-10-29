@@ -450,7 +450,7 @@ export const BlastStage = memo(function BlastStage({
         </AdaptiveAnimatePresence>
         {/* Chain escalation text — scoped within board area */}
         <BlastChainText chainLevel={sequencerState?.chainLevel ?? 0} t={t} />
-        <BlastWordPraise wordLength={lastWordLength} submitCount={wordSubmitCount} t={t} delayMs={LIFT_OK_HOLD_MS} />
+        <BlastWordPraise wordLength={lastWordLength} submitCount={wordSubmitCount} t={t} delayMs={LIFT_OK_HOLD_MS} suppressed={waveCleared} />
         <BlastWaveClearText waveCleared={waveCleared} movesRemaining={movesRemaining} t={t} />
       </div>
 

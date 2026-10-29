@@ -101,4 +101,15 @@ describe('BlastWordPraise', () => {
       vi.useRealTimers();
     }
   });
+
+  it('stays hidden while the wave-clear text owns the headline', () => {
+    const { rerender, container } = render(
+      <BlastWordPraise wordLength={0} submitCount={0} t={mockT} suppressed />,
+    );
+    act(() => {
+      rerender(<BlastWordPraise wordLength={8} submitCount={1} t={mockT} suppressed />);
+    });
+    expect(container.textContent).toBe('');
+    expect(screen.queryByText('AMAZING!')).toBeNull();
+  });
 });
