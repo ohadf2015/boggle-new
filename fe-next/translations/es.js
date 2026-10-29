@@ -20962,6 +20962,8 @@ const es = {
       "waitingTitle": "Esperando a los alumnos",
       "waitingHint": "Escanea el QR o escribe el código en la dirección de arriba",
       "startBlocked": "Podrás empezar en cuanto entre un alumno",
+      "phoneTestCta": "Pruébalo antes en tu móvil",
+      "phoneTestHint": "Escanéalo con tu propio móvil para ver lo que ven tus alumnos. Es un puesto de prueba y no cuenta como alumno.",
       "copyLink": "Copiar enlace",
       "minutes": "{count} min",
       "leave": "Salir de la sala",

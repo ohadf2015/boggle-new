@@ -20950,6 +20950,8 @@ const sv = {
       "waitingTitle": "Väntar på elever",
       "waitingHint": "Skanna QR-koden eller skriv koden på adressen ovan",
       "startBlocked": "Start går att trycka på när en elev är med",
+      "phoneTestCta": "Testa på din mobil först",
+      "phoneTestHint": "Skanna med din egen mobil för att se vad eleverna ser. Det är en testplats och räknas inte som elev.",
       "copyLink": "Kopiera länk",
       "minutes": "{count} min",
       "leave": "Lämna rummet",

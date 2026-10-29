@@ -19988,6 +19988,8 @@ const en = {
       "waitingTitle": "Waiting for students",
       "waitingHint": "Scan the QR or type the code at the address above",
       "startBlocked": "Start opens once a student joins",
+      "phoneTestCta": "Try it on your phone first",
+      "phoneTestHint": "Scan with your own phone to see what students see. It's a test seat and doesn't count as a student.",
       "copyLink": "Copy link",
       "minutes": "{count} min",
       "leave": "Leave room",
