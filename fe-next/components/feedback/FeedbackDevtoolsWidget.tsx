@@ -37,11 +37,13 @@
 
 import { useEffect, type ReactNode } from 'react';
 import { runWhenScrollSettles } from '@/lib/perf/runWhenScrollSettles';
+import {
+    FEEDBACK_WIDGET_SRC,
+    FEEDBACK_WIDGET_TOKEN,
+    feedbackAppVersion,
+} from '@/lib/feedback/feedbackIngest';
 
-export const FEEDBACK_WIDGET_SRC =
-    'https://server-production-14a9.up.railway.app/widget.js';
-export const FEEDBACK_WIDGET_TOKEN =
-    'fdt_bd9b22165d84d2f5480f76cdf8c6cdeee434f9df94293fcd';
+export { FEEDBACK_WIDGET_SRC, FEEDBACK_WIDGET_TOKEN };
 export const FEEDBACK_WIDGET_SCRIPT_ID = 'fdw-widget';
 export const FEEDBACK_WIDGET_INTENT_EVENTS = [
     'pointerdown',
@@ -91,7 +93,7 @@ function injectFeedbackWidget(): void {
     s.setAttribute('data-side', 'left');
     s.setAttribute('data-theme', LEXICLASH_THEME);
     s.setAttribute('data-dir', 'auto');
-    s.setAttribute('data-app-version', 'web');
+    s.setAttribute('data-app-version', feedbackAppVersion());
     s.setAttribute('data-ignore-network', FEEDBACK_WIDGET_IGNORE_NETWORK);
     s.setAttribute('data-ignore-console', FEEDBACK_WIDGET_IGNORE_CONSOLE);
     document.body.appendChild(s);
