@@ -21197,7 +21197,14 @@ const sv = {
       "copyFailed": "Det gick inte att kopiera. Dela koden i stället.",
       "noAccount": "Eleverna ansluter utan konto",
       "showProjector": "Visa på projektorn",
-      "backHome": "Tillbaka till startsidan"
+      "backHome": "Tillbaka till startsidan",
+      "firstRound": {
+        "title": "Kör din första runda — 2 minuter",
+        "step1": "Öva själv mot bottar (privat, inga elever)",
+        "step2": "Visa koden eller QR-koden på tavlan — eleverna ansluter från mobilen",
+        "step3": "Tryck Starta: en runda på 2 minuter, resultaten visas live",
+        "start": "Starta en runda på 2 minuter"
+      }
     },
     "host": {
       "classLabel": "Klass",
