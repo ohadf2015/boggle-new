@@ -87,13 +87,34 @@ describe('Teacher Home', () => {
     expect(within(hero).getByTestId('home-start-live')).toHaveAttribute('href', '/en/education/classroom-game?classroomId=c5b');
   });
 
-  it('Then three featured modes carry their delivery tag and preselect the mode', () => {
+  it('Then the hero is the one way to start: no featured-mode tiles compete with Start live game', () => {
     render(<TeacherDashboard />);
-    const modes = screen.getAllByTestId(/^home-mode-/);
-    expect(modes.map((m) => m.getAttribute('data-testid'))).toEqual(['home-mode-wheel-rush', 'home-mode-word-hunt', 'home-mode-classic']);
-    expect(modes[1]).toHaveAttribute('href', '/en/education/classroom-game?classroomId=c5b&mode=word-hunt');
-    expect(within(modes[1]).getByTestId('delivery-tag-phones')).toBeInTheDocument();
-    expect(within(modes[0]).getByTestId('delivery-tag-both')).toBeInTheDocument();
+    expect(screen.queryAllByTestId(/^home-mode-/)).toHaveLength(0);
+    expect(screen.getAllByTestId('home-start-live')).toHaveLength(1);
+  });
+
+  it('Then the hero shows the class join code as letter tiles, and Open projector opens the big-screen sheet', () => {
+    render(<TeacherDashboard />);
+    const hero = screen.getByTestId('home-hero');
+    const code = within(hero).getByTestId('home-desk-code');
+    expect(code).toHaveTextContent('K7Q2');
+    expect(within(code).getAllByTestId('home-desk-code-tile')).toHaveLength(4);
+    act(() => within(hero).getByTestId('home-class-code').click());
+    expect(screen.getByTestId('hq-projector-qr')).toBeInTheDocument();
+  });
+
+  it('Given a new class still below the student goal, Then the join code shows once: the share card owns it, not the hero', () => {
+    classroomsState = { ...classroomsState, classrooms: [{ ...CLASSES[0], member_count: 0 }] };
+    render(<TeacherDashboard />);
+    expect(screen.getByTestId('hq-join-code')).toBeInTheDocument();
+    expect(screen.queryByTestId('home-desk-code')).toBeNull();
+  });
+
+  it('Given one class, Then the class list does not repeat the hero, and New class stays in reach', () => {
+    classroomsState = { ...classroomsState, classrooms: [CLASSES[0]] };
+    render(<TeacherDashboard />);
+    expect(screen.queryAllByTestId('home-class-row')).toHaveLength(0);
+    expect(screen.getByTestId('home-new-class')).toHaveAttribute('href');
   });
 
   it('Then every class row has its own play button', () => {
@@ -111,10 +132,11 @@ describe('Teacher Home', () => {
     expect(within(card).getByTestId('home-week-active')).toHaveTextContent('2');
   });
 
-  it('Given an insight, Then it lives inside the This week card: one rail card, not two', () => {
+  it('Given an insight, Then it sits in the hero beside Start, where the reason to play meets the button', () => {
     week = { ...week, insights: [{ id: 'momentum', value: 3 }] };
     render(<TeacherDashboard />);
-    expect(within(screen.getByTestId('home-week')).getByTestId('home-insight')).toBeInTheDocument();
+    expect(within(screen.getByTestId('home-hero')).getByTestId('home-insight')).toBeInTheDocument();
+    expect(within(screen.getByTestId('home-week')).queryByTestId('home-insight')).toBeNull();
   });
 
   it('Given the stats read failed, Then the numbers read "—", never a false zero', () => {

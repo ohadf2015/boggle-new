@@ -50,15 +50,15 @@ describe('BlastHUD — wave goal clarity (no confusing percentage)', () => {
   });
 
   it('shows no ready mark below the goal, and a ✓ once the goal is met', () => {
-    const { rerender } = render(<BlastHUD {...baseProps} tilesCleared={89} totalTiles={100} />);
+    const { rerender } = render(<BlastHUD {...baseProps} waveNumber={5} tilesCleared={89} totalTiles={100} />);
     expect(screen.getByTestId('blast-progress-label').textContent).not.toContain('✓');
-    rerender(<BlastHUD {...baseProps} tilesCleared={90} totalTiles={100} />);
+    rerender(<BlastHUD {...baseProps} waveNumber={5} tilesCleared={90} totalTiles={100} />);
     expect(screen.getByTestId('blast-progress-label').textContent).toContain('✓');
   });
 
-  it('still shows the concrete X/Y cleared count', () => {
+  it('counts cleared tiles toward the tiles needed to pass the wave', () => {
     render(<BlastHUD {...baseProps} tilesCleared={12} totalTiles={36} />);
-    expect(screen.getByText(/12\/36/)).toBeDefined();
+    expect(screen.getByText(/12\/27/)).toBeDefined();
   });
 
   it('pops a "+N" indicator when more tiles get cleared (satisfying progress)', () => {
@@ -69,11 +69,11 @@ describe('BlastHUD — wave goal clarity (no confusing percentage)', () => {
     expect(delta.textContent).toContain('4');
   });
 
-  it('flips to lime gradient only after the 90% goal is met', () => {
-    const { rerender } = render(<BlastHUD {...baseProps} tilesCleared={89} totalTiles={100} />);
+  it('flips to lime gradient only after the boss-wave 90% goal is met', () => {
+    const { rerender } = render(<BlastHUD {...baseProps} waveNumber={5} tilesCleared={89} totalTiles={100} />);
     expect(screen.getByTestId('blast-progress-fill').getAttribute('data-goal-met')).toBe('false');
 
-    rerender(<BlastHUD {...baseProps} tilesCleared={90} totalTiles={100} />);
+    rerender(<BlastHUD {...baseProps} waveNumber={5} tilesCleared={90} totalTiles={100} />);
     expect(screen.getByTestId('blast-progress-fill').getAttribute('data-goal-met')).toBe('true');
   });
 });
@@ -275,5 +275,12 @@ describe('BlastHUD — its own mute control', () => {
     );
     expect(screen.queryByTestId('blast-mute-btn')).toBeNull();
     expect(register).not.toHaveBeenCalled();
+  });
+
+  it('uses the easier warm-up bar on wave 1', () => {
+    const { rerender } = render(<BlastHUD {...baseProps} waveNumber={1} tilesCleared={74} totalTiles={100} />);
+    expect(screen.getByTestId('blast-progress-fill').getAttribute('data-goal-met')).toBe('false');
+    rerender(<BlastHUD {...baseProps} waveNumber={1} tilesCleared={75} totalTiles={100} />);
+    expect(screen.getByTestId('blast-progress-fill').getAttribute('data-goal-met')).toBe('true');
   });
 });

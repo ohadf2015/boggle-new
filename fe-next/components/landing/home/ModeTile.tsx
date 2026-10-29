@@ -170,7 +170,7 @@ export function ModeTile({ model, index, slot = 0, variant }: ModeTileProps) {
             </span>
             <span className="font-neo-display text-2xl font-black leading-none tracking-tight text-neo-white md:text-4xl">{model.title}</span>
             {model.description && (
-              <span className={cn('mt-1 max-w-[44ch] font-neo-body leading-snug text-neo-cream/90 md:block md:text-base', model.featured ? 'line-clamp-2 text-[0.8rem]' : 'hidden')}>{model.description}</span>
+              <span data-testid="mode-banner-hook" className={cn('mt-1 max-w-[44ch] font-neo-body leading-snug text-neo-cream/90 md:block md:text-base', model.featured ? 'line-clamp-2 text-[0.8rem]' : 'hidden')}>{model.description}</span>
             )}
             {model.livePill && (
               <span className="mt-1.5 inline-flex w-fit items-center gap-1.5 rounded-full border-2 border-black bg-neo-lime px-2 py-0.5 font-neo-display text-xs font-black text-neo-navy shadow-hard-sm md:mt-2 md:text-sm">

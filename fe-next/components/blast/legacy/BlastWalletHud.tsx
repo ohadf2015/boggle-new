@@ -108,7 +108,7 @@ export default function BlastWalletHud({ coins }: { coins: number }) {
           {formatted}
         </span>
         <span
-          className={`${styles.reels} font-neo-display text-xl font-black tabular-nums text-[#0b1530]`}
+          className={`${styles.reels} font-neo-display text-base font-black tabular-nums text-neo-black`}
           dir="ltr"
           aria-hidden="true"
         >

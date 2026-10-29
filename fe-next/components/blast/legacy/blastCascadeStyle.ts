@@ -5,11 +5,12 @@ import { CLEARING_COLORS, CLEARING_ANIMS } from './blastTileVisuals';
 
 const CHARGE_LIME = '#BFFF00';
 
-const STAGGER_MS = 18;
+const STAGGER_MS = 10;
 const STAGGER_WRAP = 5;
 
 export function getCascadeFallStyle(distPx: number, col: number): CSSProperties {
-  const fallDuration = Math.max(250, 180 + distPx * 0.8);
+  // Must finish inside the sequencer's fall phase (ANIM_TIMING.fallBase + fallPerRow * rows) or tiles snap on landing.
+  const fallDuration = Math.round(Math.max(140, 110 + distPx * 0.42));
   const colDelay = (col % STAGGER_WRAP) * STAGGER_MS;
   return {
     animation: `blastTileFall ${fallDuration}ms cubic-bezier(0.4, 0, 0.6, 1) ${colDelay}ms forwards`,
@@ -38,7 +39,7 @@ export function getPhaseStyles(phase: TilePhase, type: BlastTileType, fallOffset
       if (!clearingAnim) {
         return {
           background: CHARGE_LIME,
-          animation: 'blastTilePop 300ms cubic-bezier(0.3, 0, 0.7, 1) forwards',
+          animation: 'blastTilePop 240ms cubic-bezier(0.3, 0, 0.7, 1) forwards',
           '--pop-rot': `${(clearRotate ?? 0) * 3}deg`,
         } as CSSProperties;
       }

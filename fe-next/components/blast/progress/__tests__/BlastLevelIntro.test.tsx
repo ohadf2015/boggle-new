@@ -3,17 +3,18 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen, act, fireEvent } from '@testing-library/react';
 import { BlastLevelIntro } from '../BlastLevelIntro';
 import { getWaveTheme } from '../waveTheme';
+import { getWavePassPct } from '@/components/blast/legacy/utils/blastWaveTheme';
 
 describe('BlastLevelIntro', () => {
   afterEach(() => vi.useRealTimers());
 
-  it('names the wave theme, its goal and its accent', () => {
+  it('names the wave theme, its one board-clear goal and its accent', () => {
     const theme = getWaveTheme(5);
     render(<BlastLevelIntro wave={5} durationMs={1000} />);
     const intro = screen.getByTestId('blast-level-intro');
     expect(intro).toHaveAttribute('data-theme', theme.id);
     expect(screen.getByText(theme.nameKey)).toBeInTheDocument();
-    expect(screen.getByText(theme.goalKey)).toBeInTheDocument();
+    expect(screen.getByText(`blast.objective.clearPercent{"target":${getWavePassPct(5)}}`)).toBeInTheDocument();
     expect(screen.getByText('blastProgress.wave{"wave":5}')).toBeInTheDocument();
   });
 

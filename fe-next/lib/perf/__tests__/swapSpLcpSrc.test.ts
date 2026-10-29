@@ -4,26 +4,19 @@ import {
   scheduleSpLcpSrcSwap,
   SP_WINNER_ANIMATED_SRC,
   SP_WINNER_STILL_SRC,
-  type SpLcpImg,
+  type SpLcpAnimEl,
 } from '../swapSpLcpSrc';
 
-function fakeImg(src = SP_WINNER_STILL_SRC): SpLcpImg & { attrs: Record<string, string> } {
-  const attrs: Record<string, string> = { src, fetchpriority: 'high' };
-  const img: SpLcpImg & { attrs: Record<string, string> } = {
-    attrs,
-    getAttribute: (name) => (name in attrs ? attrs[name] : null),
-    setAttribute: (name, value) => {
-      attrs[name] = value;
+function fakeAnim(backgroundImage = ''): SpLcpAnimEl & { style: { backgroundImage: string }; srcWrites: string[] } {
+  const el = {
+    style: { backgroundImage },
+    srcWrites: [] as string[],
+    getAttribute: (name: string) => (name === 'src' ? SP_WINNER_STILL_SRC : null),
+    setAttribute: (name: string, value: string) => {
+      if (name === 'src') el.srcWrites.push(value);
     },
-    get src() {
-      return attrs.src;
-    },
-    set src(value: string) {
-      attrs.src = value;
-    },
-    fetchPriority: 'high',
   };
-  return img;
+  return el;
 }
 
 class FakeObserver {
@@ -46,83 +39,84 @@ class FakeObserver {
   }
 }
 
+describe('SP_WINNER_ANIMATED_SRC', () => {
+  it('points at the right-sized swap asset, not the shared 30KB winner.webp', () => {
+    expect(SP_WINNER_ANIMATED_SRC).toBe('/mascot/winner-swap.webp');
+    expect(SP_WINNER_STILL_SRC).toBe('/mascot/winner-lcp.webp');
+  });
+});
+
 describe('applySpLcpSrcSwap', () => {
-  it('swaps the still src to the animated asset and drops fetchpriority first', () => {
-    const img = fakeImg();
-    const order: string[] = [];
-    const origSet = img.setAttribute;
-    img.setAttribute = (name, value) => {
-      order.push(`${name}=${value}`);
-      origSet(name, value);
-    };
-    expect(applySpLcpSrcSwap(img)).toBe(true);
-    expect(img.getAttribute('src')).toBe(SP_WINNER_ANIMATED_SRC);
-    expect(img.fetchPriority).toBe('low');
-    expect(order[0]).toBe('fetchpriority=low');
-    expect(order.indexOf('fetchpriority=low')).toBeLessThan(order.indexOf(`src=${SP_WINNER_ANIMATED_SRC}`));
+  it('paints the animation as a CSS background and never writes an img src', () => {
+    const el = fakeAnim();
+    expect(applySpLcpSrcSwap(el)).toBe(true);
+    expect(el.style.backgroundImage).toBe(`url("${SP_WINNER_ANIMATED_SRC}")`);
+    expect(el.srcWrites).toEqual([]);
+    expect(el.getAttribute('src')).toBe(SP_WINNER_STILL_SRC);
   });
 
-  it('is a no-op when the animated src is already set', () => {
-    const img = fakeImg(SP_WINNER_ANIMATED_SRC);
-    expect(applySpLcpSrcSwap(img)).toBe(false);
-    expect(img.fetchPriority).toBe('high');
+  it('is a no-op when the animated background is already set', () => {
+    const el = fakeAnim(`url("${SP_WINNER_ANIMATED_SRC}")`);
+    expect(applySpLcpSrcSwap(el)).toBe(false);
+    expect(el.style.backgroundImage).toBe(`url("${SP_WINNER_ANIMATED_SRC}")`);
+    expect(el.srcWrites).toEqual([]);
   });
 });
 
 describe('scheduleSpLcpSrcSwap', () => {
-  it('does not swap before an LCP entry or the load+idle fallback', () => {
-    const img = fakeImg();
+  it('does not apply the background before an LCP entry or the load+idle fallback', () => {
+    const el = fakeAnim();
     const idle = vi.fn(() => () => {});
     scheduleSpLcpSrcSwap({
-      getImg: () => img,
+      getAnim: () => el,
       afterLoadIdle: idle,
       Observer: FakeObserver as unknown as typeof PerformanceObserver,
     });
-    expect(img.getAttribute('src')).toBe(SP_WINNER_STILL_SRC);
+    expect(el.style.backgroundImage).toBe('');
     expect(FakeObserver.last?.observed).toEqual({ type: 'largest-contentful-paint', buffered: true });
     expect(idle).toHaveBeenCalledTimes(1);
   });
 
-  it('swaps when an LCP entry arrives and cancels the idle fallback', () => {
-    const img = fakeImg();
+  it('applies the background when an LCP entry arrives and cancels the idle fallback', () => {
+    const el = fakeAnim();
     const cancelIdle = vi.fn();
     scheduleSpLcpSrcSwap({
-      getImg: () => img,
+      getAnim: () => el,
       afterLoadIdle: () => cancelIdle,
       Observer: FakeObserver as unknown as typeof PerformanceObserver,
     });
     FakeObserver.last?.emit([{ entryType: 'largest-contentful-paint', startTime: 280 }]);
-    expect(img.getAttribute('src')).toBe(SP_WINNER_ANIMATED_SRC);
-    expect(img.getAttribute('fetchpriority')).toBe('low');
+    expect(el.style.backgroundImage).toBe(`url("${SP_WINNER_ANIMATED_SRC}")`);
+    expect(el.srcWrites).toEqual([]);
     expect(cancelIdle).toHaveBeenCalledTimes(1);
     expect(FakeObserver.last?.disconnected).toBe(true);
   });
 
   it('ignores an empty observer callback', () => {
-    const img = fakeImg();
+    const el = fakeAnim();
     scheduleSpLcpSrcSwap({
-      getImg: () => img,
+      getAnim: () => el,
       afterLoadIdle: () => () => {},
       Observer: FakeObserver as unknown as typeof PerformanceObserver,
     });
     FakeObserver.last?.emit([]);
-    expect(img.getAttribute('src')).toBe(SP_WINNER_STILL_SRC);
+    expect(el.style.backgroundImage).toBe('');
   });
 
   it('falls back to load+idle when no LCP entry arrives', () => {
-    const img = fakeImg();
+    const el = fakeAnim();
     let idleFn: (() => void) | undefined;
     scheduleSpLcpSrcSwap({
-      getImg: () => img,
+      getAnim: () => el,
       afterLoadIdle: (fn) => {
         idleFn = fn;
         return () => {};
       },
       Observer: FakeObserver as unknown as typeof PerformanceObserver,
     });
-    expect(img.getAttribute('src')).toBe(SP_WINNER_STILL_SRC);
+    expect(el.style.backgroundImage).toBe('');
     idleFn?.();
-    expect(img.getAttribute('src')).toBe(SP_WINNER_ANIMATED_SRC);
+    expect(el.style.backgroundImage).toBe(`url("${SP_WINNER_ANIMATED_SRC}")`);
   });
 
   it('uses load+idle when PerformanceObserver cannot observe LCP', () => {
@@ -133,10 +127,10 @@ describe('scheduleSpLcpSrcSwap', () => {
       }
       disconnect(): void {}
     }
-    const img = fakeImg();
+    const el = fakeAnim();
     let idleFn: (() => void) | undefined;
     scheduleSpLcpSrcSwap({
-      getImg: () => img,
+      getAnim: () => el,
       afterLoadIdle: (fn) => {
         idleFn = fn;
         return () => {};
@@ -144,20 +138,25 @@ describe('scheduleSpLcpSrcSwap', () => {
       Observer: ThrowingObserver as unknown as typeof PerformanceObserver,
     });
     idleFn?.();
-    expect(img.getAttribute('src')).toBe(SP_WINNER_ANIMATED_SRC);
+    expect(el.style.backgroundImage).toBe(`url("${SP_WINNER_ANIMATED_SRC}")`);
+    expect(el.srcWrites).toEqual([]);
   });
 
-  it('does not swap twice when idle fires after LCP', () => {
-    const img = fakeImg();
+  it('does not apply the background twice when idle fires after LCP', () => {
+    const el = fakeAnim();
     let idleFn: (() => void) | undefined;
-    const swaps = vi.fn();
-    const orig = img.setAttribute;
-    img.setAttribute = (name, value) => {
-      if (name === 'src') swaps();
-      orig(name, value);
-    };
+    let writes = 0;
+    let backgroundImage = '';
+    Object.defineProperty(el.style, 'backgroundImage', {
+      configurable: true,
+      get: () => backgroundImage,
+      set: (value: string) => {
+        writes += 1;
+        backgroundImage = value;
+      },
+    });
     scheduleSpLcpSrcSwap({
-      getImg: () => img,
+      getAnim: () => el,
       afterLoadIdle: (fn) => {
         idleFn = fn;
         return () => {};
@@ -166,14 +165,16 @@ describe('scheduleSpLcpSrcSwap', () => {
     });
     FakeObserver.last?.emit([{ entryType: 'largest-contentful-paint' }]);
     idleFn?.();
-    expect(swaps).toHaveBeenCalledTimes(1);
+    expect(el.style.backgroundImage).toBe(`url("${SP_WINNER_ANIMATED_SRC}")`);
+    expect(writes).toBe(1);
+    expect(el.srcWrites).toEqual([]);
   });
 
   it('cancel blocks a late LCP entry and the idle fallback', () => {
-    const img = fakeImg();
+    const el = fakeAnim();
     let idleFn: (() => void) | undefined;
     const cancel = scheduleSpLcpSrcSwap({
-      getImg: () => img,
+      getAnim: () => el,
       afterLoadIdle: (fn) => {
         idleFn = fn;
         return () => {};
@@ -183,11 +184,11 @@ describe('scheduleSpLcpSrcSwap', () => {
     cancel();
     FakeObserver.last?.emit([{ entryType: 'largest-contentful-paint' }]);
     idleFn?.();
-    expect(img.getAttribute('src')).toBe(SP_WINNER_STILL_SRC);
+    expect(el.style.backgroundImage).toBe('');
   });
 
   it('cancels idle when a buffered LCP entry is delivered during observe()', () => {
-    const img = fakeImg();
+    const el = fakeAnim();
     const cancelIdle = vi.fn();
     class SyncObserver {
       constructor(private callback: PerformanceObserverCallback) {}
@@ -200,20 +201,20 @@ describe('scheduleSpLcpSrcSwap', () => {
       disconnect() {}
     }
     scheduleSpLcpSrcSwap({
-      getImg: () => img,
+      getAnim: () => el,
       afterLoadIdle: () => cancelIdle,
       Observer: SyncObserver as unknown as typeof PerformanceObserver,
     });
-    expect(img.getAttribute('src')).toBe(SP_WINNER_ANIMATED_SRC);
+    expect(el.style.backgroundImage).toBe(`url("${SP_WINNER_ANIMATED_SRC}")`);
     expect(cancelIdle).toHaveBeenCalledTimes(1);
   });
 
-  it('retries on idle if the shell img was missing when LCP fired', () => {
-    const img = fakeImg();
-    let current: SpLcpImg | null = null;
+  it('retries on idle if the overlay was missing when LCP fired', () => {
+    const el = fakeAnim();
+    let current: SpLcpAnimEl | null = null;
     let idleFn: (() => void) | undefined;
     scheduleSpLcpSrcSwap({
-      getImg: () => current,
+      getAnim: () => current,
       afterLoadIdle: (fn) => {
         idleFn = fn;
         return () => {};
@@ -221,9 +222,10 @@ describe('scheduleSpLcpSrcSwap', () => {
       Observer: FakeObserver as unknown as typeof PerformanceObserver,
     });
     FakeObserver.last?.emit([{ entryType: 'largest-contentful-paint' }]);
-    expect(img.getAttribute('src')).toBe(SP_WINNER_STILL_SRC);
-    current = img;
+    expect(el.style.backgroundImage).toBe('');
+    current = el;
     idleFn?.();
-    expect(img.getAttribute('src')).toBe(SP_WINNER_ANIMATED_SRC);
+    expect(el.style.backgroundImage).toBe(`url("${SP_WINNER_ANIMATED_SRC}")`);
+    expect(el.srcWrites).toEqual([]);
   });
 });

@@ -9,6 +9,8 @@ import { processTilesForWord } from '../utils/clearTilesProcessor';
 import { computeGravityResult, type GravityResult } from '../utils/blastGravity';
 import type { SpecialCombo } from '../utils/blastCombos';
 import { hasValidWords } from '../utils/blastDeadEndDetector';
+import { shuffleForPlayableWord } from '../utils/blastShuffle';
+import { recordFoundWord } from '../utils/blastFoundWords';
 import { buildDeadEndGrid } from '../utils/blastDeadEndGrid';
 import { calculateEarnedStars } from '../utils/blastStarCalculator';
 import { blastBoardsEqual } from '../utils/blastBoardEquality';
@@ -56,6 +58,8 @@ export interface WordSubmitResult {
   bonusMoves: number;
   diamondsCollected: number;
   diamondsSpawned: Array<{ row: number; col: number }>;
+  /** Tiles a played diamond's cross blast cleared */
+  gemCrossCount: number;
 }
 
 export interface CascadeResult {
@@ -70,7 +74,8 @@ export interface UseBlastEngineReturn {
   grid: LetterGrid | null;
   tileStates: BlastTileState[][];
   gameState: BlastGameState;
-  submitWord: (path: Array<{ row: number; col: number }>, word: string, baseScore: number) => WordSubmitResult;
+  /** `cascadeCluster`: a match-3 cluster clears tiles and scores but is not a word. */
+  submitWord: (path: Array<{ row: number; col: number }>, word: string, baseScore: number, opts?: { cascadeCluster?: boolean }) => WordSubmitResult;
   shuffleGrid: () => void;
   endGame: () => void;
   unlockMoves: () => void;
@@ -312,7 +317,9 @@ export function useBlastEngine(
     path: Array<{ row: number; col: number }>,
     word: string,
     baseScore: number,
+    opts?: { cascadeCluster?: boolean },
   ): WordSubmitResult => {
+    const cascadeCluster = opts?.cascadeCluster ?? false;
     ddaStateRef.current = updateDDA(ddaStateRef.current, 'success');
     setDdaBoostActive(isDDABoostActive(ddaStateRef.current));
 
@@ -326,9 +333,9 @@ export function useBlastEngine(
       submitRng = createSeededRandom(blastSeedRef.current + validMovesRef.current);
     }
     const result = processTilesForWord({ prev: currentTiles, path, word, baseScore, gridSize, currentWave, rng: submitRng });
-    const { next, totalScore, newlyClearedCount, clearedTypeCounts, explosions: newExplosions, detectedCombos, bonusMoveCount, diamondsCollected, diamondsSpawned } = result;
+    const { next, totalScore, newlyClearedCount, clearedTypeCounts, explosions: newExplosions, detectedCombos, bonusMoveCount, diamondsCollected, diamondsSpawned, gemCrossCount } = result;
 
-    if (word.length > bestWordRef.current.length) bestWordRef.current = word;
+    bestWordRef.current = recordFoundWord({ wordsFound: [], bestWord: bestWordRef.current }, word, cascadeCluster).bestWord;
 
     setTileStates(next);
     tileStatesRef.current = next;
@@ -360,7 +367,7 @@ export function useBlastEngine(
       return {
         ...prev,
         score: prev.score + totalScore,
-        wordsFound: [...prev.wordsFound, word],
+        wordsFound: recordFoundWord({ wordsFound: prev.wordsFound, bestWord: '' }, word, cascadeCluster).wordsFound,
         tilesCleared: prev.tilesCleared + newlyClearedCount,
         movesRemaining: newMovesRemaining,
         movesUsed: prev.movesUsed + 1,
@@ -383,6 +390,7 @@ export function useBlastEngine(
       bonusMoves: bonusMoveCount,
       diamondsCollected,
       diamondsSpawned,
+      gemCrossCount,
     };
   }, [gridSize, currentWave, options?.isMultiplayer]);
 
@@ -442,18 +450,25 @@ export function useBlastEngine(
     const grid = effectiveGridRef.current;
     if (!grid) return;
 
-    const tiles = tileStatesRef.current;
-    const newGrid = grid.map((row, ri) =>
-      row.map((cell, ci) => {
-        if (tiles[ri]?.[ci]?.isCleared) return cell;
-        return generateBlastLetter(language);
-      }),
+    const newGrid = shuffleForPlayableWord(
+      grid,
+      tileStatesRef.current,
+      checkWordInDict,
+      options?.minWordLength ?? 2,
+      () => generateBlastLetter(language),
+      new Set(gameStateRef.current.wordsFound),
     );
+    // No re-roll can produce a word: end the wave rather than let the player shuffle forever.
+    if (!newGrid) {
+      setGameState(prev => (prev.isComplete || prev.isDeadEnd ? prev : { ...prev, isDeadEnd: true }));
+      return;
+    }
 
     setCurrentGrid(newGrid);
     effectiveGridRef.current = newGrid;
     setNoWordsRemaining(false);
-  }, [language]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- minWordLength is stable config
+  }, [language, checkWordInDict]);
 
   // ── endGame ──
   const endGame = useCallback(() => {

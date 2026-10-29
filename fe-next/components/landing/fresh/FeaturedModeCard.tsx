@@ -31,43 +31,44 @@ export function FeaturedModeCard({ onPick }: FeaturedModeCardProps) {
         data-featured="true"
         onClick={() => onPick(key)}
         className={cn(
-          'group relative flex items-center gap-4 rounded-neo border-3 border-neo-black bg-neo-orange p-3 text-neo-black shadow-hard-xl sm:gap-6 sm:p-4 md:p-5',
+          // Phones: hook drops under mascot + title so it gets the card's full width.
+          'group relative grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-4 gap-y-2.5 rounded-neo border-3 border-neo-black bg-neo-orange p-3 text-neo-black shadow-hard-xl sm:gap-x-6 sm:gap-y-0 sm:p-4 md:p-5',
           'motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out motion-safe:hover:-translate-y-1',
           'active:translate-y-[3px] active:scale-[0.99] active:shadow-hard-pressed',
           'focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-neo-cream'
         )}
       >
-        <div className="relative grid h-28 w-28 shrink-0 place-items-center rounded-[6px] border-3 border-neo-black bg-neo-navy sm:h-36 sm:w-36 md:h-52 md:w-52">
+        <div className="relative grid h-24 w-24 shrink-0 place-items-center rounded-[6px] border-3 border-neo-black bg-neo-navy sm:row-span-3 sm:h-36 sm:w-36 md:h-52 md:w-52">
           <Image
             src={art}
             alt=""
             width={256}
             height={256}
-            sizes="(min-width: 768px) 208px, (min-width: 640px) 144px, 112px"
+            sizes="(min-width: 768px) 208px, (min-width: 640px) 144px, 96px"
             className={cn('h-[88%] w-[88%] select-none object-contain', styles.mascot)}
           />
         </div>
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 sm:self-end">
           <span className="inline-flex items-center rounded-full border-2 border-neo-black bg-neo-lime px-2.5 py-1 font-neo-display text-xs font-black uppercase leading-none tracking-wide text-neo-navy shadow-hard-sm md:text-sm">
             {t('landing.badge.recommended')}
           </span>
           <h3 className="mt-2 font-neo-display text-2xl font-black uppercase leading-none sm:text-3xl md:text-5xl">
             {t(`homeFresh.modes.items.${key}.title`)}
           </h3>
-          <p className="mt-1.5 max-w-[40ch] font-neo-body text-sm font-semibold leading-snug sm:text-base md:mt-2 md:text-xl">
-            {t(`homeFresh.modes.items.${key}.line`)}
-          </p>
-          <span
-            aria-hidden="true"
-            className="mt-4 hidden w-fit items-center gap-2 rounded-neo border-3 border-neo-black bg-neo-cream px-4 py-2 font-neo-display text-base font-black uppercase shadow-hard sm:inline-flex md:text-lg"
-          >
-            {t('homeFresh.hero.play')}
-            <DirectionalIcon
-              icon={ArrowRight}
-              className="h-5 w-5 motion-safe:transition-transform motion-safe:group-hover:translate-x-0.5 rtl:motion-safe:group-hover:-translate-x-0.5"
-            />
-          </span>
         </div>
+        <p data-testid="featured-hook" className="col-span-2 max-w-[40ch] font-neo-body text-sm font-semibold leading-snug sm:col-span-1 sm:col-start-2 sm:mt-1.5 sm:text-base md:mt-2 md:text-xl">
+          {t(`homeFresh.modes.items.${key}.line`)}
+        </p>
+        <span
+          aria-hidden="true"
+          className="mt-4 hidden w-fit items-center gap-2 self-start rounded-neo border-3 border-neo-black bg-neo-cream px-4 py-2 font-neo-display text-base font-black uppercase shadow-hard sm:col-start-2 sm:inline-flex md:text-lg"
+        >
+          {t('homeFresh.hero.play')}
+          <DirectionalIcon
+            icon={ArrowRight}
+            className="h-5 w-5 motion-safe:transition-transform motion-safe:group-hover:translate-x-0.5 rtl:motion-safe:group-hover:-translate-x-0.5"
+          />
+        </span>
       </Link>
     </div>
   );

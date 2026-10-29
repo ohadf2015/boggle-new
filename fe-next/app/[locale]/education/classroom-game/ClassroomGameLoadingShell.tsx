@@ -15,7 +15,7 @@ export function ClassroomGameLoadingShell() {
       className="relative flex h-dvh w-full shrink-0 flex-col overflow-hidden bg-neo-navy"
     >
       <div data-testid="classroom-game-header-slot" aria-hidden="true" className={CLASSROOM_GAME_HEADER_SLOT_CLASS} />
-      <div className="relative mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col overflow-hidden px-3 py-3 sm:px-6">
+      <div className="relative mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col overflow-hidden px-3 py-3 sm:px-6">
         <div
           data-testid="classroom-game-lobby-slot"
           aria-hidden="true"

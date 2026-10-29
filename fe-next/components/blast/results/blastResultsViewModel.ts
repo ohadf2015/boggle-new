@@ -2,6 +2,7 @@ import type { BlastPlayerStats } from '@/shared/types/game';
 import type { BlastCollectionScore } from '@/shared/utils/blastCollectionScore';
 import type { BlastMpRanking, BlastScoreBreakdown } from '../legacy/blastMpRanking';
 import type { BlastResultsData } from '../legacy/types';
+import { getWavePassPct } from '../legacy/utils/blastWaveTheme';
 
 export type BlastOutcomeTier = 'low' | 'mid' | 'high' | 'newBest';
 export type BlastStatId = 'coins' | 'diamonds' | 'bombs' | 'combo' | 'words' | 'waves';
@@ -25,6 +26,8 @@ export interface BlastResultsInput {
   rival?: ScoredName | null;
   runnerUp?: ScoredName | null;
   failed?: boolean;
+  /** Clear % the final wave had to reach (SP only). */
+  passPct?: number;
   stars?: 1 | 2 | 3;
   scoreBreakdown?: BlastScoreBreakdown | null;
 }
@@ -62,11 +65,16 @@ export interface BlastResultsView {
   celebrate: { coins: boolean; diamonds: boolean; confetti: boolean };
 }
 
-const SP_ADVANCE_CLEAR_PCT = 90;
+/** The finished wave's pass bar; records saved before per-wave bars fall back to the last wave played. */
+export function resolvePassPct(r: Pick<BlastResultsData, 'passPct' | 'waveResults'>): number {
+  if (r.passPct != null) return r.passPct;
+  const last = r.waveResults?.[r.waveResults.length - 1];
+  return getWavePassPct(last?.waveNumber ?? 1);
+}
 
 function pickTier(input: BlastResultsInput, isNewBest: boolean): BlastOutcomeTier {
-  if (input.failed) return 'low';
   if (isNewBest) return 'newBest';
+  if (input.failed) return (input.wavesReached ?? 0) > 0 ? 'mid' : 'low';
   const best = input.personalBest ?? 0;
   if (best > 0) {
     const ratio = input.score / best;
@@ -101,9 +109,21 @@ function longestOf(words: readonly string[]): string | null {
   return words.reduce<string | null>((a, w) => (!a || w.length > a.length ? w : a), null);
 }
 
+// Cascades log their match-3 clears as bracketed labels ("[O×3]") in the word list.
+const isClusterLabel = (w: string) => w.startsWith('[');
+
+/** Longest real word of the whole run; the engine only tracks the current wave's. */
+export function runBestWord(words: readonly string[] = [], fallback = ''): string {
+  const longest = longestOf(words.filter((w) => !isClusterLabel(w)));
+  if (longest && longest.length >= fallback.length) return longest;
+  return isClusterLabel(fallback) ? '' : fallback;
+}
+
 export function toBlastResultsView(input: BlastResultsInput): BlastResultsView {
   const best = input.personalBest ?? 0;
-  const isNewBest = best > 0 && input.score > best;
+  // A wave-1 fail is never saved, so it cannot set a record.
+  const countsForBest = !input.failed || (input.wavesReached ?? 0) > 0;
+  const isNewBest = countsForBest && best > 0 && input.score > best;
   const tier = pickTier(input, isNewBest);
   const nextGoal = pickNextGoal(input, isNewBest);
   const words = input.wordsFound ?? [];
@@ -146,21 +166,23 @@ export function toBlastResultsView(input: BlastResultsInput): BlastResultsView {
 }
 
 export function fromSpResults(r: BlastResultsData & BlastResultsExtras): BlastResultsInput {
+  const passPct = resolvePassPct(r);
   return {
     score: r.finalScore,
     coins: r.sessionCoins,
     diamonds: r.diamondsCollected,
     bombsPopped: r.bombsPopped,
     maxCombo: r.maxCombo,
-    wordsFound: r.wordsFound,
-    bestWord: r.bestWord,
+    wordsFound: r.wordsFound?.filter((w) => !isClusterLabel(w)),
+    bestWord: r.bestWord && isClusterLabel(r.bestWord) ? runBestWord(r.wordsFound) : r.bestWord,
     wavesReached: r.wavesCompleted,
     personalBest: r.previousBest ?? null,
     rank: r.rank ?? null,
     previousRank: r.previousRank ?? null,
     totalPlayers: r.totalPlayers ?? null,
     rival: r.rival ?? null,
-    failed: r.clearPercentage < SP_ADVANCE_CLEAR_PCT,
+    failed: r.clearPercentage < passPct,
+    passPct,
     stars: r.stars,
   };
 }

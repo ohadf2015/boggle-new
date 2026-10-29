@@ -90,6 +90,8 @@ interface WordFormingAreaProps {
   compact?: boolean;
   /** Word validation feedback */
   feedback?: WordFeedback | null;
+  /** Width-morph via layout projection; it re-measures on every parent render, so busy game screens turn it off. */
+  morphLayout?: boolean;
 }
 
 /**
@@ -104,6 +106,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
   className,
   compact = false,
   feedback,
+  morphLayout = true,
 }) => {
   const { t } = useLanguageSafe();
   // Cozy / Calm Mode swaps the energetic accept burst for one soft warm settle.
@@ -268,7 +271,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
           /* Main content - morphs between forming and feedback states */
           <m.div
             key="content"
-            layout
+            layout={morphLayout}
             initial={{ opacity: 0, scale: 0.85 }}
             animate={{
               opacity: 1,

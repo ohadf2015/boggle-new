@@ -319,9 +319,11 @@ export interface CoachDemoProps {
   accent: CoachAccent;
   /** Emoji for the static `icon` demo. */
   emoji?: string;
+  /** Short side-by-side frame for the bottom-anchored coach. */
+  compact?: boolean;
 }
 
-export function CoachDemo({ demo, accent, emoji }: CoachDemoProps) {
+export function CoachDemo({ demo, accent, emoji, compact = false }: CoachDemoProps) {
   const reduced = useReducedMotion() ?? false;
 
   const inner = (() => {
@@ -353,8 +355,13 @@ export function CoachDemo({ demo, accent, emoji }: CoachDemoProps) {
   })();
 
   return (
+    // Demo words are Latin (CAT, TOP); an RTL page would mirror the row into TAC.
     <div
-      className="flex h-[108px] w-full items-center justify-center rounded-neo border-neo border-black bg-neo-navy/60"
+      dir="ltr"
+      className={cn(
+        'flex items-center justify-center rounded-neo border-neo border-black bg-neo-navy/60',
+        compact ? 'h-16 w-32 shrink-0' : 'h-[108px] w-full',
+      )}
       aria-hidden="true"
     >
       {inner}

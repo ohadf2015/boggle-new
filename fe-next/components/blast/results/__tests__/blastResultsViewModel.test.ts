@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   fromMpResults,
   fromSpResults,
+  runBestWord,
   toBlastResultsView,
   type BlastResultsInput,
 } from '../blastResultsViewModel';
@@ -33,6 +34,22 @@ describe('toBlastResultsView — tiers', () => {
     expect(v.tier).toBe('newBest');
     expect(v.isNewBest).toBe(true);
     expect(v.pbDelta).toBe(200);
+  });
+
+  it('Given a failed run that cleared waves and beat the best, Then it is still a new best', () => {
+    const v = toBlastResultsView({ score: 900, personalBest: 700, failed: true, wavesReached: 2 });
+    expect(v.tier).toBe('newBest');
+    expect(v.isNewBest).toBe(true);
+  });
+
+  it('Given a wave-1 fail (not saved), Then a higher score is not claimed as a new best', () => {
+    const v = toBlastResultsView({ score: 900, personalBest: 700, failed: true, wavesReached: 0 });
+    expect(v.isNewBest).toBe(false);
+    expect(v.tier).toBe('low');
+  });
+
+  it('Given a failed run that cleared waves, Then the tier reads as progress, not defeat', () => {
+    expect(toBlastResultsView({ score: 300, failed: true, wavesReached: 2 }).tier).toBe('mid');
   });
 
   it('Given no previous best, Then it is not a new best', () => {
@@ -138,8 +155,33 @@ describe('fromSpResults', () => {
     });
   });
 
-  it('flags a run under 90% clear as failed', () => {
-    expect(fromSpResults(spResults({ clearPercentage: 89 })).failed).toBe(true);
+  it('flags a run under the wave pass bar as failed', () => {
+    expect(fromSpResults(spResults({ clearPercentage: 89, passPct: 90 })).failed).toBe(true);
+    expect(fromSpResults(spResults({ clearPercentage: 80, passPct: 75 })).failed).toBe(false);
+  });
+
+  it('Given an old record without passPct, Then the bar comes from the last wave played, not a flat 90', () => {
+    const wave1 = [{ waveNumber: 1, score: 100, wordsFound: 3, clearPercentage: 80 }];
+    const input = fromSpResults(spResults({ clearPercentage: 80, waveResults: wave1 }));
+    expect(input.passPct).toBe(75);
+    expect(input.failed).toBe(false);
+  });
+
+  it('Given cascade cluster labels in the word list, Then they are neither counted nor shown as the best word', () => {
+    const input = fromSpResults(spResults({ wordsFound: ['be', '[O×3]', 'kee', '[A×4]'], bestWord: '[O×3]' }));
+    expect(input.wordsFound).toEqual(['be', 'kee']);
+    expect(input.bestWord).toBe('kee');
+  });
+});
+
+describe('runBestWord', () => {
+  it('Given words from every wave, Then the longest real word wins over the last wave best and over cluster labels', () => {
+    expect(runBestWord(['dowel', 'at', '[O×3]', 'wemb'], 'wemb')).toBe('dowel');
+  });
+
+  it('Given no real words, Then it keeps the fallback unless that is a cluster label', () => {
+    expect(runBestWord(['[O×3]'], 'ox')).toBe('ox');
+    expect(runBestWord(['[O×3]'], '[O×3]')).toBe('');
   });
 });
 

@@ -87,11 +87,12 @@ describe('BlastMascotHud', () => {
 });
 
 describe('BLAST_MASCOT_SLOT_CLASS', () => {
-  it('drops below the HUD on phones so it never covers the coin wallet, top corner from sm up', () => {
+  it('sits in the HUD hero row beside the combo ring on phones, top corner from sm up', () => {
     const cls = BLAST_MASCOT_SLOT_CLASS.split(' ');
-    expect(cls).toContain('top-[9.25rem]');
+    expect(cls).toContain('top-[calc(env(safe-area-inset-top,0px)+2.375rem)]');
+    expect(cls).toContain('end-[4.25rem]');
     expect(cls).toContain('sm:top-3');
-    expect(cls).toContain('end-3');
+    expect(cls).toContain('sm:end-3');
     expect(cls).not.toContain('right-3');
   });
 });

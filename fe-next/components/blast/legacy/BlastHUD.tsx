@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { HelpCircle, Shield, Bomb, Zap, Sparkles, Clock, Heart } from 'lucide-react';
+import { getWavePassPct } from './utils/blastWaveTheme';
+import { HelpCircle, Shield, Bomb, Zap, Sparkles, Clock, Heart, Target, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ExitRoomButton from '@/components/ExitRoomButton';
 import { formatTimeMMSS } from '@/shared/utils/timeFormatting';
@@ -13,8 +13,14 @@ import { BlastHudMuteButton } from '../v2/BlastHudMuteButton';
 import { useRegisterHeaderAudioControl } from '@/contexts/NavigationContext';
 import { BLAST_MAX_LIVES } from './utils/blastLives';
 import type { ComboStreakState } from './hooks/useBlastComboStreak';
-import { BlastHudProgressRow, comboTier, type BlastHudProgress } from '../progress/BlastHudProgress';
+import { BlastHudDiamonds, comboTier, type BlastHudProgress } from '../progress/BlastHudProgress';
 import { accentColor, getWaveTheme } from '../progress/waveTheme';
+import type { BlastObjectiveProgress } from './types';
+import { BlastObjectiveBanner } from './BlastObjectiveBanner';
+import { useAnimatedScore } from './hud/useHudCounters';
+import { BlastHudMoves } from './hud/BlastHudMoves';
+import { BlastHudClearMeter } from './hud/BlastHudClearMeter';
+import { BlastHudGoal } from './hud/BlastHudGoal';
 
 /** Pre-game buff chip — shown in HUD top row when player claimed a rewarded-ad boost. */
 type ActiveBuff = 'shield' | 'bomb' | 'combo2x';
@@ -25,73 +31,6 @@ const BUFF_META: Record<ActiveBuff, { Icon: typeof Shield; bg: string; label: st
 };
 
 const NO_TEXT_SHADOW_STYLE = { textShadow: 'none' } as const;
-
-/** Wave-clear goal: ≥90% of tiles cleared. Used for the visual target marker
- *  on the HUD progress bar and the goal-met color flip. */
-export const BLAST_WAVE_GOAL_PCT = 90;
-
-/** Smoothly lerps a number for display with a CSS transition on scale */
-function useAnimatedScore(target: number) {
-  const [display, setDisplay] = useState(target);
-  const [pulse, setPulse] = useState(false);
-  const prevRef = useRef(target);
-  const rafRef = useRef<number>(0);
-
-  useEffect(() => {
-    if (target === prevRef.current) return;
-    const start = prevRef.current;
-    const delta = target - start;
-    const duration = Math.min(400, Math.abs(delta) * 10);
-    const startTime = performance.now();
-    prevRef.current = target;
-
-    setPulse(true);
-    const pulseTimer = setTimeout(() => setPulse(false), 200);
-
-    function tick(now: number) {
-      const elapsed = now - startTime;
-      const t = Math.min(elapsed / duration, 1);
-      const eased = 1 - (1 - t) * (1 - t); // ease-out quad
-      setDisplay(Math.round(start + delta * eased));
-      if (t < 1) rafRef.current = requestAnimationFrame(tick);
-    }
-    rafRef.current = requestAnimationFrame(tick);
-
-    return () => {
-      cancelAnimationFrame(rafRef.current);
-      clearTimeout(pulseTimer);
-    };
-  }, [target]);
-
-  return { display, pulse };
-}
-
-/**
- * Tracks tile-clear progress and fires a short "pulse" + the delta whenever the
- * cleared count jumps, so emptying the board feels rewarding (the bar glows, the
- * count pops, a "+N" floats up) instead of a silent number tick.
- */
-function useClearPulse(value: number) {
-  const [pulse, setPulse] = useState(false);
-  const [delta, setDelta] = useState(0);
-  const [burstKey, setBurstKey] = useState(0);
-  const prevRef = useRef(value);
-
-  useEffect(() => {
-    if (value > prevRef.current) {
-      setDelta(value - prevRef.current);
-      setPulse(true);
-      setBurstKey(k => k + 1);
-      prevRef.current = value;
-      const id = setTimeout(() => setPulse(false), 650);
-      return () => clearTimeout(id);
-    }
-    prevRef.current = value;
-    return undefined;
-  }, [value]);
-
-  return { pulse, delta, burstKey };
-}
 
 /**
  * Compact countdown pill for the HUD top row (multiplayer only).
@@ -193,6 +132,10 @@ interface BlastHUDProps {
   /** SP run context — ribbon, run diamonds, target to beat. */
   progress?: BlastHudProgress;
   waveDiamonds?: number;
+  /** Wave objectives; side goals render inside the goal card. */
+  objectives?: BlastObjectiveProgress[];
+  /** Active wave modifier chip; docks in the goal card's header row. */
+  modifierSlot?: React.ReactNode;
   t: (key: string, fallback?: string) => string | undefined;
 }
 
@@ -226,6 +169,8 @@ export function BlastHUD({
   coins = 0,
   progress,
   waveDiamonds = 0,
+  objectives,
+  modifierSlot,
   t,
 }: BlastHUDProps) {
   const ownMute = !isMultiplayer && !isDesktopCanvas;
@@ -233,26 +178,16 @@ export function BlastHUD({
   const showTimer =
     !isDesktopCanvas &&
     isMultiplayer && remainingTime !== null && remainingTime !== undefined && (totalTime ?? 0) > 0;
-  const clearPct = totalTiles > 0 ? Math.round((tilesCleared / totalTiles) * 100) : 0;
+  const passPct = getWavePassPct(waveNumber);
+  const goalMet = totalTiles > 0 && Math.round((tilesCleared / totalTiles) * 100) >= passPct;
   const isFiniteMoves = isFinite(totalMoves);
-  const goalMet = clearPct >= BLAST_WAVE_GOAL_PCT;
   const showProgress = !isMultiplayer && !!progress;
   // A run total keeps the score and the "X to pass" chip on the same number; wave goals show their own count.
   const { display: animatedScore, pulse: scorePulse } = useAnimatedScore(showProgress && progress ? progress.baseScore + score : score);
-  const { pulse: clearPulse, delta: clearDelta, burstKey: clearBurstKey } = useClearPulse(tilesCleared);
   const accent = showProgress ? accentColor(getWaveTheme(waveNumber)) : undefined;
+  const scoreGoal = objectives?.find((p) => p.objective.type === 'score_target');
+  const goalChips = objectives?.filter((p) => p !== scoreGoal);
   const combo = comboTier(comboStreak?.isActive ? comboStreak.level : 0);
-
-  let moveColorClass: string;
-  if (movesRemaining <= 2) {
-    moveColorClass = 'text-neo-red blast-heartbeat';
-  } else if (movesRemaining <= 3) {
-    moveColorClass = 'text-neo-red';
-  } else if (movesRemaining <= 5) {
-    moveColorClass = 'text-neo-yellow';
-  } else {
-    moveColorClass = 'text-neo-white';
-  }
 
   return (
     <div
@@ -260,15 +195,12 @@ export function BlastHUD({
       style={accent ? { borderBottomColor: accent } : undefined}
       data-testid="blast-hud"
     >
-      {/* Top row: wave + buff slot + controls. Min-h fixed so chip toggles never reflow. */}
-      <div className="flex items-center justify-between px-3 py-0.5 pt-safe min-h-[28px]">
-        <div className="flex items-center gap-2 min-w-0">
-          {/* MP countdown — docked into the top row where the wave chip would
-              sit in SP, so the board no longer shares space with a floating timer. */}
+      {/* Utility strip. The MP round frame hides this whole child, so nothing MP needs lives here. */}
+      <div className="flex items-center justify-between gap-2 px-3 py-0.5 pt-safe min-h-[32px]">
+        <div className="flex items-center gap-1.5 min-w-0">
           {showTimer && (
             <BlastHUDTimer remainingTime={remainingTime as number} totalTime={totalTime as number} t={t} />
           )}
-          {/* Wave chip — hidden in MP (timer-era, no waves); the progress ribbon replaces it in SP runs */}
           {!isMultiplayer && !showProgress && (
             <span
               className="shrink-0 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-lg border-2 border-neo-cyan text-neo-cyan tabular-nums"
@@ -278,24 +210,23 @@ export function BlastHUD({
               W{waveNumber}
             </span>
           )}
-          {/* Lives — 3-lives model. Hidden in MP (no lives) and until plumbed. */}
           {!isMultiplayer && livesRemaining !== undefined && (
             <span
               data-testid="blast-lives-chip"
-              className="shrink-0 inline-flex items-center gap-0.5 rounded-lg border-2 border-black bg-neo-navy-light px-1.5 py-0.5 shadow-hard"
+              className="shrink-0 inline-flex h-6 items-center gap-0.5 rounded-md border-2 border-neo-black bg-neo-navy-light px-1 tv:h-9"
               aria-label={t('blast.livesLabel')?.replace('{lives}', String(livesRemaining)) ?? `${livesRemaining} lives`}
             >
               {Array.from({ length: BLAST_MAX_LIVES }).map((_, i) => (
                 <Heart
                   key={`life-${i}`}
-                  className={cn('h-3.5 w-3.5', i < livesRemaining ? 'text-neo-pink' : 'text-white/20')}
+                  className={cn('h-3 w-3 tv:h-5 tv:w-5', i < livesRemaining ? 'text-neo-pink' : 'text-white/20')}
                   fill="currentColor"
                   strokeWidth={2}
                 />
               ))}
             </span>
           )}
-          {/* Lucky Boost chip — visible only when DDA assist is active. */}
+          {showProgress && progress && <BlastHudDiamonds progress={progress} waveDiamonds={waveDiamonds} />}
           {ddaBoostActive && (
             <span
               data-testid="blast-lucky-boost-chip"
@@ -308,10 +239,9 @@ export function BlastHUD({
               {t('blast.luckyBoost', 'Lucky')}
             </span>
           )}
-          {/* Reserved buff slot — keeps chrome stable whether a buff is active or not. */}
           <div
             data-testid="blast-buff-slot"
-            className="shrink-0 flex items-center min-h-[28px] min-w-[28px]"
+            className="shrink-0 flex items-center min-h-[24px] min-w-[24px]"
           >
             {activeBuff && (() => {
               const meta = BUFF_META[activeBuff];
@@ -321,13 +251,13 @@ export function BlastHUD({
                   data-testid="blast-active-buff-chip"
                   data-consumed={buffConsumed ? 'true' : 'false'}
                   className={cn(
-                    'shrink-0 inline-flex items-center gap-1.5 rounded-lg border-2 border-black px-2.5 py-1 text-xs font-black uppercase tracking-wider text-neo-navy shadow-hard transition-[background-color,color,opacity,box-shadow] animate-neo-pop',
-                    buffConsumed ? 'bg-white/20 text-white line-through opacity-60 shadow-none' : `${meta.bg} blast-heartbeat`,
+                    'shrink-0 inline-flex items-center gap-1 rounded-lg border-2 border-black px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-neo-navy shadow-hard-sm transition-[background-color,color,opacity,box-shadow] animate-neo-pop',
+                    buffConsumed ? 'bg-white/20 text-white line-through opacity-60 shadow-none' : meta.bg,
                   )}
                   style={NO_TEXT_SHADOW_STYLE}
                   aria-label={(t(meta.label) || activeBuff) + (buffConsumed ? ` (${t('common.used', 'used')})` : '')}
                 >
-                  <Icon className="h-4 w-4" strokeWidth={3} />
+                  <Icon className="h-3.5 w-3.5" strokeWidth={3} />
                   {t(meta.label) || activeBuff}
                 </span>
               );
@@ -335,14 +265,14 @@ export function BlastHUD({
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex shrink-0 items-center gap-1.5">
           {!isMultiplayer && <BlastWalletHud coins={coins} />}
           {hintSlot}
           {ownMute && <BlastHudMuteButton className="h-7 w-7" />}
           {onShowHelp && (
             <button
               onClick={onShowHelp}
-              className="text-white hover:text-white transition-colors"
+              className="grid h-7 w-7 place-items-center text-white hover:text-neo-lime transition-colors"
               aria-label={t('blast.help')}
             >
               <HelpCircle className="h-4 w-4" />
@@ -357,138 +287,108 @@ export function BlastHUD({
         </div>
       </div>
 
-      {/* Bottom row: score | moves + combo | progress.
-          Each cell uses fixed basis/min-width so digit growth or chip toggles
-          don't shove neighbours around. */}
-      <div className="flex items-stretch px-3 py-1 gap-2">
-        {/* Score — fixed minimum width room for 5 digits. Labelled so the lone
-            star + number reads unambiguously as the player's score. */}
-        <div
-          className="flex flex-col justify-center basis-1/3 min-w-0"
-          aria-label={`${t('blast.score')}: ${animatedScore}`}
-        >
-          <div data-board-score-target="" className="flex items-center gap-1.5 min-w-0">
-            <span className="text-neo-yellow text-sm shrink-0">★</span>
-            <span
-              className={cn(
-                'text-xl font-black tabular-nums truncate transition-transform duration-150 text-neo-white origin-left',
-                scorePulse && 'scale-[1.15]',
-              )}
-              style={{ minWidth: '5ch' }}
-            >
-              {animatedScore.toLocaleString()}
+      {/* Hero row: moves (the hero number), score, combo. */}
+      <div className="flex items-center gap-3 px-3 pb-2 pt-1 tv:gap-5 tv:px-4">
+        {isFiniteMoves ? (
+          <BlastHudMoves movesRemaining={movesRemaining} label={t('blast.movesLeft')} />
+        ) : (
+          <div className="flex flex-col items-center gap-0.5 w-[56px]" aria-live="polite">
+            <span className="text-xl font-black text-neo-white tabular-nums">
+              {wordsFoundCount}
+            </span>
+            <span className="text-[9px] font-bold uppercase tracking-wider text-white">
+              {t('blast.words')}
             </span>
           </div>
+        )}
+
+        <div
+          className="flex min-w-0 flex-1 flex-col justify-center"
+          aria-label={`${t('blast.score')}: ${animatedScore}`}
+        >
           <span
             data-testid="blast-score-label"
-            className="text-[9px] font-bold uppercase tracking-wider text-white leading-none mt-0.5"
+            className="text-[9px] font-black uppercase tracking-[0.14em] text-white leading-none tv:text-xs"
           >
             {t('blast.score')}
           </span>
-        </div>
-
-        {/* Moves + reserved combo slot */}
-        <div className="flex items-center gap-2 shrink-0" aria-live="polite">
-          {isFiniteMoves ? (
-            <div className="flex flex-col items-center gap-0.5 w-[56px]">
-              <div
-                className={cn(
-                  'w-11 h-11 rounded-full flex flex-col items-center justify-center border-2 transition-colors',
-                  movesRemaining <= 3 ? 'border-neo-red/80 bg-neo-red/15' : 'border-white/25 bg-white/8',
-                )}
-              >
-                <span className={cn('text-xl font-black tabular-nums leading-none', moveColorClass)}>
-                  {movesRemaining}
-                </span>
-              </div>
-              <span className={cn('text-[9px] font-bold uppercase tracking-wider leading-none', movesRemaining <= 3 ? 'text-neo-red' : 'text-white')}>
-                {t('blast.movesLeft')}
-              </span>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center gap-0.5 w-[56px]">
-              <span className="text-xl font-black text-neo-white tabular-nums">
-                {wordsFoundCount}
-              </span>
-              <span className="text-[9px] font-bold uppercase tracking-wider text-white">
-                {t('blast.words')}
-              </span>
-            </div>
-          )}
-          {/* Reserved combo badge slot — fixed footprint regardless of streak presence. */}
-          <div
-            data-testid="blast-combo-slot"
-            data-combo-tier={combo}
+          <span
+            data-board-score-target=""
             className={cn(
-              'w-[44px] h-[44px] flex items-center justify-center rounded-full transition-transform duration-200',
-              combo === 2 && 'scale-110 shadow-[0_0_0_3px_var(--neo-pink)]',
-              combo === 3 && 'scale-125 shadow-[0_0_0_3px_var(--neo-yellow),0_0_18px_var(--neo-orange)] blast-heartbeat',
+              'block w-fit font-neo-display text-[30px] font-black leading-tight tabular-nums text-neo-white transition-transform duration-150 origin-[0%_50%] rtl:origin-[100%_50%] tv:text-5xl',
+              scorePulse && 'scale-110',
             )}
           >
-            {comboStreak && comboStreakArcRef && (
-              <BlastComboStreakBadge streak={comboStreak} arcRef={comboStreakArcRef} />
-            )}
-          </div>
-        </div>
-
-        {/* Tile-clear progress. The old "X% / 90%" label + 90% marker confused
-            players, so the goal is now signalled implicitly: the bar fills, then
-            flips lime + shows a ✓ once ≥90% (goalMet) is reached. The concrete
-            X/Y cleared count stays as the only number. */}
-        <div className="relative flex flex-col items-end gap-0.5 basis-1/3 min-w-0">
-          {/* Floating "+N" that pops each time tiles clear — the satisfying beat. */}
-          {clearPulse && clearDelta > 0 && (
+            {animatedScore.toLocaleString()}
+          </span>
+          {scoreGoal && (
             <span
-              key={clearBurstKey}
-              data-testid="blast-clear-delta"
-              aria-hidden="true"
-              className="blast-clear-delta-pop pointer-events-none absolute right-1 top-0 text-sm font-black text-neo-lime drop-shadow-[0_1px_0_rgba(0,0,0,0.6)]"
+              data-testid="blast-hud-score-target"
+              dir="ltr"
+              className={cn(
+                'flex w-fit items-center gap-1 text-[11px] font-black tabular-nums leading-none tv:text-sm',
+                scoreGoal.isComplete ? 'text-neo-lime' : 'text-white/80',
+              )}
             >
-              +{clearDelta}
+              {scoreGoal.isComplete
+                ? <Check className="h-3 w-3" strokeWidth={3} aria-hidden="true" />
+                : <Target className="h-3 w-3" strokeWidth={3} aria-hidden="true" />}
+              {Math.min(scoreGoal.current, scoreGoal.objective.target).toLocaleString()} / {scoreGoal.objective.target.toLocaleString()}
             </span>
           )}
-          {/* Reserved ready-mark row — keeps height stable; shows ✓ only at goal. */}
-          <span
-            data-testid="blast-progress-label"
-            aria-hidden="true"
-            className="h-3.5 text-sm font-black leading-none text-neo-lime"
-          >
-            {goalMet ? '✓' : ' '}
-          </span>
-          <div
-            className={cn(
-              'relative w-full h-2.5 bg-white/10 rounded-full overflow-hidden border transition-all duration-200',
-              clearPulse ? 'border-neo-lime shadow-hard-sm scale-y-150' : 'border-white/10',
-            )}
-          >
-            <div
-              data-testid="blast-progress-fill"
-              data-goal-met={goalMet ? 'true' : 'false'}
-              className={cn(
-                'h-full rounded-full transition-all duration-300',
-                goalMet && 'blast-progress-shimmer',
-                clearPulse && 'brightness-150',
-              )}
-              style={{
-                width: `${clearPct}%`,
-                background: goalMet ? 'var(--neo-lime)' : (accent ?? 'var(--neo-cyan)'),
-              }}
-            />
-          </div>
-          <span
-            className={cn(
-              'text-[9px] font-bold uppercase tracking-wider tabular-nums transition-transform duration-150 origin-right',
-              goalMet ? 'text-neo-lime' : 'text-white',
-              clearPulse && 'scale-[1.35] text-neo-lime',
-            )}
-          >
-            {tilesCleared}/{totalTiles} {t('blast.cleared')}
-          </span>
         </div>
+
+        {!isMultiplayer && <div aria-hidden="true" className="h-14 w-14 shrink-0 sm:hidden" />}
+
+        <div
+          data-testid="blast-combo-slot"
+          data-combo-tier={combo}
+          dir="ltr"
+          className={cn(
+            'w-[44px] h-[44px] shrink-0 flex items-center justify-center rounded-full transition-transform duration-200',
+            combo === 2 && 'scale-110 shadow-[0_0_0_3px_var(--neo-pink)]',
+            combo === 3 && 'scale-125 shadow-[0_0_0_3px_var(--neo-yellow)]',
+          )}
+        >
+          {comboStreak?.isActive && comboStreakArcRef ? (
+            <BlastComboStreakBadge streak={comboStreak} arcRef={comboStreakArcRef} />
+          ) : (
+            <span
+              data-testid="blast-combo-idle"
+              aria-hidden="true"
+              className="grid h-10 w-10 place-items-center rounded-full border-[3px] border-white/15 font-neo-display text-xs font-black text-white/35"
+            >
+              ×1
+            </span>
+          )}
+        </div>
+
+        {isMultiplayer && (
+          <BlastHudClearMeter
+            layout="strip"
+            tilesCleared={tilesCleared}
+            totalTiles={totalTiles}
+            goalMet={goalMet}
+            clearedLabel={t('blast.cleared')}
+          />
+        )}
       </div>
-      {showProgress && progress && (
-        <BlastHudProgressRow progress={progress} wave={waveNumber} waveScore={score} waveDiamonds={waveDiamonds} />
+
+      {!isMultiplayer && (
+        <BlastHudGoal
+          waveNumber={waveNumber}
+          passPct={passPct}
+          tilesCleared={tilesCleared}
+          totalTiles={totalTiles}
+          goalMet={goalMet}
+          accent={accent}
+          showWave={showProgress}
+          objectives={goalChips}
+          modifierSlot={modifierSlot}
+          t={t}
+        />
       )}
+      {isMultiplayer && objectives && <BlastObjectiveBanner objectives={objectives} t={t} />}
     </div>
   );
 }

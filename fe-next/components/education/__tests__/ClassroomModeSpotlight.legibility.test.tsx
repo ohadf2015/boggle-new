@@ -48,10 +48,12 @@ describe('<ClassroomModeSpotlight> on a projected desktop', () => {
     }
   });
 
-  it('Given the poster layout, When rendered, Then GO LIVE sits under the title in the text column, beside a wide art column', () => {
+  it('Given the ready panel, When rendered, Then the art is desktop-only and GO LIVE is the last control, so the phone dock stays one row plus the button', () => {
     setup();
-    expect(within(screen.getByTestId('spotlight-text')).getByTestId('lobby-go-live')).toBeInTheDocument();
-    expect(screen.getByTestId('spotlight-art').parentElement?.className).toContain('lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)]');
+    expect(screen.getByTestId('spotlight-art').className).toMatch(/(^|\s)hidden(\s|$)/);
+    expect(screen.getByTestId('spotlight-art').className).toContain('lg:block');
+    const buttons = within(screen.getByTestId('mode-spotlight')).getAllByRole('button');
+    expect(buttons[buttons.length - 1]).toHaveAttribute('data-testid', 'lobby-go-live');
   });
 
   it('Given the best-for badges, When rendered, Then they read at text-base on desktop', () => {

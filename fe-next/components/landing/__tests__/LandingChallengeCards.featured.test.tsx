@@ -71,6 +71,11 @@ describe('LandingChallengeCards — Blast is the featured hero', () => {
     expect(container.querySelector('[data-cube-key="blast"]')).toBeNull();
   });
 
+  it('still shows the live "playing now" pill on the arena card when players are online', () => {
+    const { container } = render(<LandingChallengeCards {...props} activePlayers={1234} />);
+    expect(container.querySelector('[data-cube-key="arena"]')).toHaveTextContent('1,234 landing.playingNow');
+  });
+
   it('flags the featured card on the existing mode_card click event', () => {
     const { container } = render(<LandingChallengeCards {...props} />);
     fireEvent.click(container.querySelector('[data-cube-key="blast"]')!);

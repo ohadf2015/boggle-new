@@ -3247,3 +3247,13 @@ html.reduce-motion *::after {
   from { transform: translateY(-6px); opacity: 0; }
   to { transform: none; opacity: 1; }
 }
+
+@keyframes edu-tile-drop {
+  from { transform: translateY(-10px) scale(0.92); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+@keyframes edu-ready-swap {
+  from { transform: translateY(4px); opacity: 0.4; filter: blur(2px); }
+  to { transform: none; opacity: 1; filter: none; }
+}

@@ -1,5 +1,7 @@
 'use client';
 
+import { useOverlayQuietZoneClaim } from '@/lib/overlayQuietZone';
+import { getWavePassPct } from './utils/blastWaveTheme';
 import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Gift, Shield, Bomb, Zap } from 'lucide-react';
@@ -31,7 +33,8 @@ import { resolveBlastConfig, type BlastPhase, type BlastResultsData, type WaveRe
 import { useHighlightStore } from '@/stores/highlightStore';
 import { rankMoments } from '@/lib/blast/highlightScoring';
 import type { Language } from '@/shared/types/game';
-import { Button } from '@/components/ui/button';
+import { BlastStartScreen } from './BlastStartScreen';
+import { runBestWord } from '../results/blastResultsViewModel';
 import ConfirmationDialog from '@/components/ui/ConfirmationDialog';
 import { useGameExitGuard } from '@/hooks/useGameExitGuard';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
@@ -51,6 +54,7 @@ export function BlastView() {
   const hasRealAdProvider = useHasRealAdProvider();
 
   const [phase, setPhase] = useState<BlastPhase>('ready');
+  useOverlayQuietZoneClaim(phase === 'results' || phase === 'waveTransition', 'blast-results');
   const [results, setResults] = useState<BlastResultsData | null>(null);
   const gameKeyRef = useRef(0);
 
@@ -206,10 +210,13 @@ export function BlastView() {
   const handleGameEnd = useCallback((resultsData: BlastResultsData) => {
     const mergedResults: BlastResultsData = {
       ...resultsData,
+      passPct: getWavePassPct(currentWave),
+      previousBest: resultsData.previousBest ?? ladder.personalBest ?? undefined,
       finalScore: totalScore + resultsData.finalScore,
       diamondsCollected: runCollectedRef.current.diamonds + (resultsData.diamondsCollected ?? 0),
       bombsPopped: runCollectedRef.current.bombs + (resultsData.bombsPopped ?? 0),
       wordsFound: [...allWordsFound, ...resultsData.wordsFound],
+      bestWord: runBestWord([...allWordsFound, ...resultsData.wordsFound], resultsData.bestWord),
       wavesCompleted: waveHistory.length,
       waveResults: [
         ...waveHistory,
@@ -227,9 +234,9 @@ export function BlastView() {
     setResults(mergedResults);
     setPhase('results');
 
-    // Empathy cue on wave-fail (clearPct < 90 = wave didn't pass): mascot pose +
+    // Empathy cue on wave-fail (below the wave's pass bar): mascot pose +
     // gentle descending arpeggio. Both decorative — never block save flow.
-    if ((resultsData.clearPercentage ?? 100) < 90) {
+    if ((resultsData.clearPercentage ?? 100) < getWavePassPct(currentWave)) {
       emitMascotEvent({ kind: 'wave-fail' });
       playWaveFailArpeggio();
     }
@@ -237,7 +244,7 @@ export function BlastView() {
     recordLocalBest(config.difficulty ?? 'medium', mergedResults.finalScore);
 
     // A run only ends on a failed wave, so it saves when it earned something: a cleared wave or the ad continue.
-    const passedWave = (mergedResults.clearPercentage ?? 0) >= 90;
+    const passedWave = (mergedResults.clearPercentage ?? 0) >= getWavePassPct(currentWave);
     const adWatched = mergedResults.adContinueUsed === true;
     if (passedWave || adWatched || mergedResults.wavesCompleted >= 1) {
       saveBlastResult(mergedResults, config.difficulty ?? 'medium', language).then(
@@ -262,19 +269,16 @@ export function BlastView() {
     // Canonical cross-mode funnel event. Without this PostHog only sees
     // game_started for blast (server-side blast_completed isn't on the unified
     // funnel), so blast appears to abandon at ~94%.
-    const bestWord = mergedResults.wordsFound
-      .slice()
-      .sort((a, b) => b.length - a.length)[0] ?? '';
     trackBlastRunEnded({
       finalScore: mergedResults.finalScore,
       wavesCompleted: mergedResults.wavesCompleted,
       maxCombo: mergedResults.maxCombo ?? 0,
       clearPct: Math.round(mergedResults.clearPercentage ?? 0),
       wordCount: mergedResults.wordsFound.length,
-      bestWordLength: bestWord.length,
+      bestWordLength: mergedResults.bestWord.length,
       difficulty: config.difficulty ?? 'medium',
     });
-  }, [totalScore, allWordsFound, waveHistory, currentWave, config.difficulty, language, addCoins]);
+  }, [totalScore, allWordsFound, waveHistory, currentWave, config.difficulty, language, addCoins, ladder.personalBest]);
 
   /** Advance to next wave */
   const handleWaveAdvance = useCallback(() => {
@@ -371,43 +375,12 @@ export function BlastView() {
   return (
     <div className="flex flex-col flex-1 min-h-0 h-full bg-neo-navy relative">
       {phase === 'ready' && (
-        <div className="flex-1 flex flex-col items-center justify-center gap-6 px-4">
-          <h1 className="text-4xl font-black uppercase text-white font-neo-display">
-            {t('blast.ready.title')}
-          </h1>
-          <p className="text-sm text-white text-center max-w-xs">
-            {t('blast.ready.subtitle')}
-          </p>
-          {checkpoint.checkpoint && checkpoint.resumeFromWave > 1 ? (
-            <>
-              <Button
-                data-testid="resume-button"
-                size="lg"
-                onClick={handleResume}
-                className="min-h-[56px] w-full max-w-xs font-black text-xl uppercase border-3 border-neo-black shadow-hard-lg bg-neo-lime text-neo-black hover:bg-neo-lime/90"
-              >
-                {t('blast.ready.resume', { wave: checkpoint.resumeFromWave })}
-              </Button>
-              <Button
-                data-testid="play-button"
-                size="sm"
-                variant="ghost"
-                onClick={handleStart}
-                className="min-h-[40px] w-full max-w-xs font-bold text-sm uppercase text-white hover:text-white underline underline-offset-4 decoration-white/40 hover:bg-transparent"
-              >
-                {t('blast.ready.play')}
-              </Button>
-            </>
-          ) : (
-            <Button
-              data-testid="play-button"
-              size="lg"
-              onClick={handleStart}
-              className="min-h-[56px] w-full max-w-xs font-black text-xl uppercase border-3 border-neo-black shadow-hard-lg bg-neo-lime text-neo-black hover:bg-neo-lime/90"
-            >
-              {t('blast.ready.play')}
-            </Button>
-          )}
+        <BlastStartScreen
+          personalBest={ladder.personalBest}
+          resumeWave={checkpoint.checkpoint && checkpoint.resumeFromWave > 1 ? checkpoint.resumeFromWave : null}
+          onStart={handleStart}
+          onResume={handleResume}
+        >
           {pregameBuff ? (() => {
             const BuffIcon = pregameBuff === 'shield' ? Shield : pregameBuff === 'bomb' ? Bomb : Zap;
             const tone = pregameBuff === 'shield' ? 'bg-neo-cyan' : pregameBuff === 'bomb' ? 'bg-neo-pink' : 'bg-neo-lime';
@@ -435,7 +408,7 @@ export function BlastView() {
               </span>
             </button>
           ) : null}
-        </div>
+        </BlastStartScreen>
       )}
 
       <BlastPregameBuffModal
@@ -486,7 +459,7 @@ export function BlastView() {
               </AdaptiveMotion.div>
             )}
           </AdaptiveAnimatePresence>
-          <ModeCoach mode="blast" />
+          <ModeCoach mode="blast" placement="bottom" />
         </>
       )}
 
@@ -521,13 +494,13 @@ export function BlastView() {
       )}
 
       {phase === 'results' && results && (() => {
-        // Retry-on-loss eligibility: failed (clearPct < 90), past wave 1
+        // Retry-on-loss eligibility: failed (below the wave's pass bar), past wave 1
         // (wave-1 retry has zero progress to preserve and is identical to
         // Play Again), have an ad provider, haven't already retried, and
         // player hasn't declined yet.
         const failedClearPct = results.clearPercentage ?? 0;
         const eligibleForRetry =
-          failedClearPct < 90
+          failedClearPct < getWavePassPct(currentWave)
           && currentWave > 1
           && hasRealAdProvider
           && !retryUsedRef.current

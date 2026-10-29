@@ -4,6 +4,7 @@ import { useMemo, useEffect, useRef, useCallback } from 'react';
 import { Sparkles } from 'lucide-react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { getRandomScoreFlyPath, type ScoreFlyPath } from './blastEffectVariations';
+import type { ScoreStamp } from './utils/blastScoreStamps';
 
 export interface ScoreFlyEvent {
   id: string;
@@ -19,6 +20,8 @@ export interface ScoreFlyEvent {
   bonus?: number;
   /** Treasure-roll tier — colours the lucky tag (gold jackpot / cyan lucky). */
   luckyTier?: 'lucky' | 'jackpot';
+  /** Multipliers that built this score (coin, gem, lucky roll), shown as stamps */
+  stamps?: ScoreStamp[];
 }
 
 interface BlastScoreFlyProps {
@@ -158,8 +161,9 @@ function ScoreFlyItem({ fly, onComplete }: { fly: ScoreFlyEvent; onComplete: (id
           aria-hidden="true"
         />
       )}
+      {fly.stamps && <ScoreStamps stamps={fly.stamps} />}
       +{fly.score}
-      {fly.bonus != null && fly.bonus > 0 && (
+      {!fly.stamps && fly.bonus != null && fly.bonus > 0 && (
         <span
           data-testid="score-fly-bonus"
           className="ms-1 inline-flex items-center gap-0.5 align-super text-[0.6em] font-black"
@@ -176,6 +180,37 @@ function ScoreFlyItem({ fly, onComplete }: { fly: ScoreFlyEvent; onComplete: (id
         </span>
       )}
     </AdaptiveMotion.div>
+  );
+}
+
+const STAMP_FACE: Record<ScoreStamp['kind'], string> = {
+  coin: 'bg-neo-yellow text-neo-black',
+  gem: 'bg-neo-cyan text-neo-black',
+  lucky: 'bg-neo-pink text-neo-white',
+  jackpot: 'bg-neo-lime text-neo-black',
+};
+
+function ScoreStamps({ stamps }: { stamps: ScoreStamp[] }) {
+  return (
+    <span
+      data-testid="score-fly-stamps"
+      className="absolute bottom-full start-1/2 -translate-x-1/2 rtl:translate-x-1/2 mb-1 flex gap-1 whitespace-nowrap"
+      style={{ WebkitTextStroke: '0', textShadow: 'none' }}
+    >
+      {stamps.map((stamp, i) => (
+        <AdaptiveMotion.span
+          key={stamp.kind}
+          data-testid={`score-fly-stamp-${stamp.kind}`}
+          className={`inline-flex items-baseline gap-0.5 rounded-neo border-2 border-neo-black shadow-hard px-1.5 py-0.5 font-neo-display font-black uppercase leading-none text-[0.5em] ${STAMP_FACE[stamp.kind]}`}
+          initial={{ scale: 2.2, rotate: i % 2 ? 10 : -10, opacity: 0 }}
+          animate={{ scale: 1, rotate: i % 2 ? 4 : -4, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 700, damping: 18, delay: 0.06 + i * 0.12 }}
+        >
+          <span className="tabular-nums">×{stamp.mult}</span>
+          <span className="text-[0.75em]">{stamp.label}</span>
+        </AdaptiveMotion.span>
+      ))}
+    </span>
   );
 }
 

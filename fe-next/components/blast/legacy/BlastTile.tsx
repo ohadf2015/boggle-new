@@ -1,7 +1,8 @@
 'use client';
 
 import { memo, useEffect, useState } from 'react';
-import { DIAMOND_CLEAR_BONUS, type BlastTileType } from './types';
+import { DIAMOND_WORD_MULTIPLIER, GOLD_MULTIPLIER, type BlastTileType } from './types';
+import { BlastTileFaceArt } from './board/BlastTileFaceArt';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getTileTooltip } from './utils/blastTileTooltips';
@@ -62,10 +63,10 @@ export interface BlastTileProps {
   onClick?: () => void;
 }
 
-/** Value badges: coins multiply the word, diamonds pay a flat bonus */
-const VALUE_BADGES: Partial<Record<BlastTileType, string>> = {
-  gold: '×3',
-  diamond: `+${DIAMOND_CLEAR_BONUS}`,
+/** Value badges: both coins and diamonds multiply the word they are played in */
+const VALUE_BADGES: Partial<Record<BlastTileType, { label: string; tone: string }>> = {
+  gold: { label: `×${GOLD_MULTIPLIER}`, tone: 'text-neo-yellow' },
+  diamond: { label: `×${DIAMOND_WORD_MULTIPLIER}`, tone: 'text-neo-cyan' },
 };
 
 /** Letters that get a rare glow effect — high Scrabble-value letters */
@@ -191,11 +192,12 @@ export const BlastTile = memo(function BlastTile({
         data-testid="blast-tile-letter"
         // Specials: me-[18cqw] nudges the centred letter ~9cqw toward the START edge,
         // clear of the corner type chip. Logical margin, so it flips for RTL.
-        className={`relative z-10 leading-none text-[clamp(1.1rem,54cqw,3.25rem)] ${visual.indicator ? 'me-[18cqw]' : ''}`}
+        className={`relative z-10 leading-none text-[clamp(1.2rem,60cqw,3.5rem)] ${visual.indicator ? 'me-[18cqw]' : ''}`}
         style={visual.text === 'text-white' ? TILE_LETTER_LIGHT_STYLE : TILE_LETTER_DARK_STYLE}
       >
         {letter}
       </span>
+      <BlastTileFaceArt type={type} col={col ?? 0} />
       {visual.indicator && (
         /* Type icon on a solid navy chip in the corner: holds against every face
            (colour alone must not carry type identity) and no longer paints over
@@ -210,10 +212,11 @@ export const BlastTile = memo(function BlastTile({
       )}
       {VALUE_BADGES[type] && (
         <span
-          className="absolute bottom-0.5 inset-e-0.5 text-[clamp(0.6rem,22cqw,0.95rem)] font-neo-body font-black bg-neo-navy text-white rounded px-1 leading-tight tabular-nums"
+          data-testid="blast-tile-value"
+          className={`absolute bottom-[8%] inset-e-0.5 z-10 text-[clamp(0.6rem,22cqw,0.95rem)] font-neo-display font-black bg-neo-navy rounded px-1 leading-tight tabular-nums ${VALUE_BADGES[type]!.tone}`}
           aria-hidden="true"
         >
-          {VALUE_BADGES[type]}
+          {VALUE_BADGES[type]!.label}
         </span>
       )}
       {zonePreview && isSelected && (

@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react';
+import { act, render } from '@testing-library/react';
 import { BlastBoard } from '../BlastBoard';
 import type { LetterGrid } from '@/shared/types/game';
 import type { WordFeedback } from '@/components/game/WordFormingArea';
@@ -45,3 +45,49 @@ describe('BlastBoard word verdict', () => {
     expect(capturedProps?.submitFeedback).toBe(feedback);
   });
 });
+
+describe('BlastBoard sockets', () => {
+  it('given a cleared cell, then its socket still renders so cleared space reads as progress', () => {
+    const { container } = render(
+      <BlastBoard
+        grid={grid}
+        tileStates={[
+          [{ row: 0, col: 0, type: 'standard', isCleared: true }, { row: 0, col: 1, type: 'standard', isCleared: false }],
+          [{ row: 1, col: 0, type: 'standard', isCleared: false }, { row: 1, col: 1, type: 'standard', isCleared: false }],
+        ] as never}
+        gridSize={2}
+        language="en"
+        interactive
+        onWordSubmit={vi.fn()}
+        onPathSubmit={vi.fn()}
+        onWordChange={vi.fn()}
+      />,
+    );
+    const sockets = container.querySelectorAll('[data-testid="blast-socket"]');
+    expect(sockets).toHaveLength(4);
+    sockets.forEach((s) => expect(s.getAttribute('role')).toBeNull());
+  });
+});
+
+describe('BlastBoard selection hook', () => {
+  it('given a drag over cells, then onSelectionCellsChange receives the selected cells', () => {
+    const onSelectionCellsChange = vi.fn();
+    render(
+      <BlastBoard
+        grid={grid}
+        tileStates={[]}
+        gridSize={2}
+        language="en"
+        interactive
+        onWordSubmit={vi.fn()}
+        onPathSubmit={vi.fn()}
+        onWordChange={vi.fn()}
+        onSelectionCellsChange={onSelectionCellsChange}
+      />,
+    );
+    const cells = [{ row: 0, col: 0, letter: 'A' }, { row: 0, col: 1, letter: 'B' }];
+    act(() => { (capturedProps?.onSelectionChange as (c: typeof cells) => void)(cells); });
+    expect(onSelectionCellsChange).toHaveBeenCalledWith(cells);
+  });
+});
+

@@ -10,6 +10,8 @@ import type { BlastObjectiveProgress, BlastTileType } from './types';
 interface BlastObjectiveBannerProps {
   objectives: BlastObjectiveProgress[];
   t: (key: string, fallback?: string) => string | undefined;
+  /** `inline` sits inside the HUD goal card as compact chips instead of its own strip. */
+  variant?: 'banner' | 'inline';
 }
 
 /**
@@ -49,7 +51,9 @@ function ObjectiveTilePreview({ tileType }: { tileType: BlastTileType }) {
 export const BlastObjectiveBanner = memo(function BlastObjectiveBanner({
   objectives,
   t,
+  variant = 'banner',
 }: BlastObjectiveBannerProps) {
+  const inline = variant === 'inline';
   const visible = objectives.filter(p => p.objective.type !== 'clear_percent');
 
   // Track prior completion per objective so we celebrate the MOMENT a goal
@@ -75,9 +79,11 @@ export const BlastObjectiveBanner = memo(function BlastObjectiveBanner({
   return (
     <div
       data-testid="blast-objective-banner"
-      className="flex flex-col gap-1 px-3 py-1.5 bg-neo-navy-light/80 border-b-2 border-neo-black"
-      role="region"
-      aria-label={t('blast.objective.bannerTitle', 'Goals')}
+      className={inline
+        ? 'mt-1.5 flex flex-wrap gap-1.5'
+        : 'flex flex-col gap-1 px-3 py-1.5 bg-neo-navy-light/80 border-b-2 border-neo-black'}
+      role={inline ? 'list' : 'region'}
+      aria-label={inline ? undefined : t('blast.objective.bannerTitle', 'Goals')}
     >
       {visible.map((p, i) => {
         const isTargetWord = p.objective.type === 'target_word';
@@ -99,8 +105,10 @@ export const BlastObjectiveBanner = memo(function BlastObjectiveBanner({
             key={`${p.objective.type}-${p.objective.tileType ?? p.objective.targetWord ?? p.objective.colorTag ?? ''}-${i}`}
             data-testid={`blast-objective-row-${i}`}
             data-complete={p.isComplete ? 'true' : 'false'}
+            role={inline ? 'listitem' : undefined}
             className={cn(
               'flex items-center gap-2 text-xs font-bold tabular-nums transition-opacity',
+              inline && 'min-w-0 max-w-full gap-1.5 rounded-lg border-2 border-neo-black bg-neo-black/35 px-2 py-0.5 text-[11px] tv:text-sm',
               p.isComplete ? 'text-neo-lime opacity-80' : 'text-neo-white',
               justCompleted && 'animate-neo-pop',
             )}
@@ -113,7 +121,7 @@ export const BlastObjectiveBanner = memo(function BlastObjectiveBanner({
             {p.objective.type === 'collect_type' && p.objective.tileType && (
               <ObjectiveTilePreview tileType={p.objective.tileType} />
             )}
-            <span dir="auto" className={cn('flex-1 truncate', p.isComplete && 'line-through')}>{formatObjectiveLabel(p.objective, t)}</span>
+            <span dir="auto" className={cn('truncate', !inline && 'flex-1', p.isComplete && 'line-through')}>{formatObjectiveLabel(p.objective, t)}</span>
             {!isTargetWord && !isColorPower && (
               <span dir="ltr" className="shrink-0 text-white">
                 {Math.min(p.current, p.objective.target)} / {p.objective.target}

@@ -17,12 +17,14 @@ const BlastEffectsCanvas = dynamic(
 import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { shouldMountBlastFxCanvas } from './utils/shouldMountBlastFxCanvas';
+import { createCellsChannel, listSpecialTiles } from './effects/blastFxEvents';
 import { useBlastTileFirstUse } from './hooks/useBlastTileFirstUse';
 import { BlastTileFirstUseCallout } from './BlastTileFirstUseCallout';
 import { BlastHUD } from './BlastHUD';
 import { BlastMPLeaderboard } from './BlastMPLeaderboard';
 import { selectMyBlastScore } from '@/lib/blast/selectMyBlastScore';
 import { BlastBoard } from './BlastBoard';
+import { BlastBoardTray } from './board/BlastBoardTray';
 import BlastChainText from './BlastChainText';
 import BlastWaveClearText from './BlastWaveClearText';
 import BlastWordPraise from './BlastWordPraise';
@@ -38,7 +40,6 @@ import type { ScoreFlyEvent } from './BlastScoreFly';
 import { BlastBackground } from './BlastBackground';
 import { cn } from '@/lib/utils';
 import type { LetterGrid, Language, Avatar } from '@/shared/types/game';
-import { BlastObjectiveBanner } from './BlastObjectiveBanner';
 import { BlastModifierBadge } from './BlastModifierBadge';
 import type { BlastWaveModifier } from './utils/blastModifiers';
 import type { BlastTileState, BlastGameState, BlastObjectiveProgress } from './types';
@@ -127,6 +128,8 @@ interface BlastStageProps {
   // Currency (SP only)
   coins?: number;
   progress?: BlastHudProgress;
+  /** Credited score of the last word, scales its FX. */
+  lastWordScore?: number;
 }
 
 /**
@@ -183,6 +186,7 @@ export const BlastStage = memo(function BlastStage({
   activeModifier,
   coins = 0,
   progress,
+  lastWordScore = 0,
 }: BlastStageProps) {
   const { score, wordsFound, movesRemaining, totalMoves, tilesCleared, totalTiles, isComplete, isDeadEnd } = gameState;
   // MP Blast has timer props; SP Blast doesn't. Timer-era games hide the wave chip.
@@ -235,6 +239,8 @@ export const BlastStage = memo(function BlastStage({
   }, []);
 
   const comboFlashTier = comboFlash?.tier ?? 0;
+  const fxSpecialTiles = useMemo(() => listSpecialTiles(tileStates), [tileStates]);
+  const [fxSelection] = useState(createCellsChannel);
 
   // Mid-run achievement snapshot — running maxima tracked in a ref so the
   // hook sees monotonic stats even though props only carry latest values.
@@ -323,14 +329,10 @@ export const BlastStage = memo(function BlastStage({
         coins={coins}
         progress={progress}
         waveDiamonds={gameState.diamondsCollected ?? 0}
+        objectives={objectiveProgress}
+        modifierSlot={activeModifier ? <BlastModifierBadge modifier={activeModifier} variant="chip" t={t} /> : null}
         t={t}
       />
-      <BlastObjectiveBanner objectives={objectiveProgress} t={t} />
-      {activeModifier && (
-        <div className="flex justify-center pt-1.5">
-          <BlastModifierBadge modifier={activeModifier} variant="chip" t={t} />
-        </div>
-      )}
       {hintToast}
       {/* MP countdown now lives inline in the HUD top row (see BlastHUD); it no
           longer floats here above the board, which kept crowding the grid. */}
@@ -350,8 +352,8 @@ export const BlastStage = memo(function BlastStage({
           board is as big as the stage's short side allows. */}
       <div
         className={cn(
-          'flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-2 min-h-0',
-          !isDesktopCanvas && 'shell:[container-type:size] shell:px-0',
+          'flex-1 flex flex-col items-center justify-center px-2 sm:px-6 py-1 min-h-0',
+          !isDesktopCanvas && 'shell:px-0',
           explosionShake && explosionShake >= 2 ? 'animate-neo-shake' :
           explosionShake === 1 ? 'animate-neo-wobble' :
           sequencerState?.chainLevel && sequencerState.chainLevel >= 3 ? 'animate-neo-shake' :
@@ -367,52 +369,17 @@ export const BlastStage = memo(function BlastStage({
           transition: 'transform 200ms ease-out',
         }}
       >
-        {/* Desktop word bar, anchored right above the board. */}
-        <div
-          className={cn(
-            'hidden lg:flex items-center justify-center gap-2 pb-3 min-h-[56px] transition-opacity',
-            formedWord ? 'opacity-100' : 'opacity-30',
-            isDesktopCanvas && '!hidden',
-          )}
-        >
-          <WordFormingArea word={formedWord} letterCount={formedWord.length} feedback={currentFeedback} />
-          <BlastWordRewardPreview wordLength={formedWord.length} />
-        </div>
-        {/* Board frame — neo-brutalist with hard shadow + reactive glow */}
-        <div
-          className={cn(
-            'relative w-full max-w-[min(94vw,80dvh)] sm:max-w-[min(440px,75dvh)] md:max-w-[min(480px,72dvh)] lg:max-w-[min(560px,72dvh)] xl:max-w-[min(680px,80dvh)] 2xl:max-w-[min(820px,86dvh)] p-1.5 rounded-neo border-3 shadow-hard-lg transition-all duration-300',
-            // In the shell the board owns the full center column — override the
-            // phone-tuned caps so it fills instead of floating tiny.
-            isDesktopCanvas ? '!max-w-[min(680px,82dvh)]' : 'shell:!max-w-none shell:w-[min(100cqw,100cqh)]',
-            (sequencerState?.chainLevel ?? 0) >= 4
-              ? 'border-yellow-400'
-              : (sequencerState?.chainLevel ?? 0) >= 2
-              ? 'border-neo-purple'
-              : comboFlashTier >= 2
-              ? 'border-neo-pink'
-              : 'border-neo-black',
-          )}
-          style={{
-            '--frame-glow-color': (sequencerState?.chainLevel ?? 0) >= 4
-              ? 'rgba(255,200,0,0.5)'
-              : (sequencerState?.chainLevel ?? 0) >= 2
-              ? 'rgba(139,92,246,0.4)'
-              : comboFlashTier >= 2
-              ? 'rgba(255,20,147,0.4)'
-              : 'transparent',
-            // Infinite box-shadow keyframe = per-frame paint. Skip it on
-            // low-end / reduced-motion so combos don't add paint cost there.
-            ...(mountBlastFx && ((sequencerState?.chainLevel ?? 0) >= 2 || comboFlashTier >= 2)
-              ? { animation: 'blast-frame-glow 1.2s ease-in-out infinite' }
-              : {}),
-          } as React.CSSProperties}
+        <BlastBoardTray
+          chainLevel={sequencerState?.chainLevel ?? 0}
+          comboFlashTier={comboFlashTier}
+          animateGlow={mountBlastFx}
+          isDesktopCanvas={isDesktopCanvas}
         >
           {/* Inner board surface */}
           <div
             ref={boardContainerRef}
             data-blast-board="true"
-            className="relative w-full overflow-hidden rounded-[6px]"
+            className="relative w-full overflow-hidden rounded-[7px]"
           >
             {/* DOM board — renders underneath so effects overlay tile art */}
             <div className="relative z-10">
@@ -430,6 +397,7 @@ export const BlastStage = memo(function BlastStage({
                 cascadeHighlightCells={cascadeHighlightCells}
                 isMultiplayer={isMultiplayer}
                 submitFeedback={currentFeedback}
+                onSelectionCellsChange={fxSelection.set}
               />
             </div>
             {/* PixiJS effects layer — overlays DOM board so particles/shockwaves/shatters are visible above tile art. pointer-events-none so taps still reach BlastBoard. */}
@@ -444,6 +412,10 @@ export const BlastStage = memo(function BlastStage({
                   comboTier={comboFlashTier}
                   comboStreakLevel={comboStreak?.level ?? 0}
                   waveCleared={waveCleared}
+                  wordSubmitCount={wordSubmitCount}
+                  lastWordScore={lastWordScore}
+                  specialTiles={fxSpecialTiles}
+                  selection={fxSelection}
                 />
               </div>
             )}
@@ -457,7 +429,7 @@ export const BlastStage = memo(function BlastStage({
               isMultiplayer={isMultiplayer}
             />
           )}
-        </div>
+        </BlastBoardTray>
         {/* Cascade word discovery banner */}
         <AdaptiveAnimatePresence>
           {cascadeHighlightWord && (
@@ -478,7 +450,7 @@ export const BlastStage = memo(function BlastStage({
         </AdaptiveAnimatePresence>
         {/* Chain escalation text — scoped within board area */}
         <BlastChainText chainLevel={sequencerState?.chainLevel ?? 0} t={t} />
-        <BlastWordPraise wordLength={lastWordLength} submitCount={wordSubmitCount} t={t} delayMs={LIFT_OK_HOLD_MS} />
+        <BlastWordPraise wordLength={lastWordLength} submitCount={wordSubmitCount} t={t} delayMs={LIFT_OK_HOLD_MS} suppressed={waveCleared} />
         <BlastWaveClearText waveCleared={waveCleared} movesRemaining={movesRemaining} t={t} />
       </div>
 
@@ -516,7 +488,7 @@ export const BlastStage = memo(function BlastStage({
             background: liveWord ? 'rgba(255,255,255,0.05)' : 'transparent',
           }}
         >
-          <WordFormingArea word={liveWord} letterCount={liveWord.length} feedback={currentFeedback} compact />
+          <WordFormingArea word={liveWord} letterCount={liveWord.length} feedback={currentFeedback} compact morphLayout={false} />
           <BlastWordRewardPreview wordLength={liveWord.length} />
           {liveWord && (
             <span className="text-[10px] font-bold text-white tabular-nums">

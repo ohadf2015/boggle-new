@@ -13312,6 +13312,13 @@ const sv = {
     }
   },
   "blast": {
+    "stamp": {
+      "coin": "MYNT",
+      "gem": "DIAMANT",
+      "lucky": "TUR",
+      "jackpot": "JACKPOT",
+      "gemBlast": "DIAMANTSMÄLL!"
+    },
     "toCatchUp": "för att komma ikapp",
     "leadingBy": "leder med",
     "firstUse": {
@@ -13319,6 +13326,18 @@ const sv = {
     },
     "level": "Nivå {n}",
     "results": {
+      "loot": "Byte",
+      "journey": {
+        "title": "Din runda",
+        "stars": "{count} stjärnor intjänade",
+        "here": "Du",
+        "upNext": "Härnäst",
+        "wavesAway": "{count} vågor bort",
+        "passMark": "{pct}% för att klara"
+      },
+      "runReached": "Du tog dig till våg {wave}!",
+      "waveGoals": "Mål för våg {wave}",
+      "failHintPct": "Rensa minst {required}% av brädet för att gå vidare",
       "boardDomination": "Brädkontroll",
       "matchRecap": "Blast-sammanfattning",
       "totalTilesDemolished": "Rivna brickor",
@@ -13608,7 +13627,7 @@ const sv = {
       },
       "diamond": {
         "name": "Diamant",
-        "desc": "Fås av ovanliga ord. Rensa den för en stor bonus."
+        "desc": "Fås av ovanliga ord. Använd den i ett ord: ×2 och hela raden och kolumnen sprängs."
       },
       "bomb": {
         "name": "Bomb",
@@ -13781,9 +13800,12 @@ const sv = {
     "moveWarning": {
       "label": "FÅ DRAG!"
     },
+    "boardBusy": "Vänta, brickorna faller fortfarande",
     "ready": {
       "title": "Blast-läge",
-      "subtitle": "Rensa brickor genom att bilda ord. Kedjekombos ger stora poäng.",
+      "subtitle": "Svep ord och spräng brädet. Bomber rensar 3×3, mynt ger ×3 och diamanter ×2.",
+      "start": "Spela",
+      "best": "Ditt rekord: {score}",
       "play": "Börja från början",
       "resume": "Fortsätt våg {wave}",
       "step1Title": "Svep ord",
@@ -13955,7 +13977,7 @@ const sv = {
       },
       "diamond": {
         "name": "Diamant",
-        "desc": "Fås av ovanliga ord – stor bonus när den rensas"
+        "desc": "Fås av ovanliga ord: ×2 plus rad och kolumn sprängs"
       },
       "bomb": {
         "name": "Bomb",

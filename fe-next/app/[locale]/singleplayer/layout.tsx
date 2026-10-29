@@ -135,10 +135,14 @@ export default async function SinglePlayerLayout({ children, params }: SinglePla
 
   return (
     <>
-      {/* LCP on /singleplayer is a still 192px mascot (~3KiB). The animated
-          winner.webp (51 frames / 148KiB) must NOT be the LCP image — browsers
-          wait on all frames and PSI billed ~142KiB compression waste. */}
+      {/* Observed LCP is the still shell (winner-lcp.webp, preloaded high).
+          The post-paint animation is a CSS background on #sp-lcp-anim, not an
+          img src swap — Lantern scores the shell img's final src. The 112px
+          winner-swap.webp (~6KB) stays preloaded low so the animation fetch
+          is not hydration-gated for real users. Do not preload the shared
+          30KB /mascot/winner.webp — that is the happy mascot for other pages. */}
       <link rel="preload" as="image" href="/mascot/winner-lcp.webp" fetchPriority="high" />
+      <link rel="preload" as="image" href="/mascot/winner-swap.webp" fetchPriority="low" />
       <SinglePlayerLcpShell tapToPlay={tapToPlay} />
       <script
         type="application/ld+json"

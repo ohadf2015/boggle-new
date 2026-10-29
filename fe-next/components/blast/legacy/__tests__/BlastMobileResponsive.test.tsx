@@ -31,7 +31,7 @@ describe('Blast Mobile Responsive', () => {
       const button = screen.getByRole('button');
       expect(button.className).not.toContain('4.5cqw');
       const letter = screen.getByTestId('blast-tile-letter');
-      expect(letter.className).toContain('text-[clamp(1.1rem,54cqw,3.25rem)]');
+      expect(letter.className).toContain('text-[clamp(1.2rem,60cqw,3.5rem)]');
       expect(letter.textContent).toBe('M');
     });
 

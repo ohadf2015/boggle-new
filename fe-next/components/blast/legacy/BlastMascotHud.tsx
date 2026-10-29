@@ -28,8 +28,9 @@ interface BlastMascotHudProps {
   className?: string;
 }
 
-/** Positioned slot for the mascot: below the HUD on phones (the wallet lives in the top corner). */
-export const BLAST_MASCOT_SLOT_CLASS = 'absolute top-[9.25rem] sm:top-3 end-3 z-50';
+/** Phones: the HUD hero row reserves a slot beside the combo ring (BlastHUD); from sm up the top corner is free. */
+export const BLAST_MASCOT_SLOT_CLASS =
+  'absolute top-[calc(env(safe-area-inset-top,0px)+2.375rem)] end-[4.25rem] sm:top-3 sm:end-3 z-50';
 
 export function BlastMascotHud({
   state,
@@ -57,7 +58,7 @@ export function BlastMascotHud({
       data-enabled={String(enabled)}
       {...interactiveProps}
       className={[
-        'pointer-events-auto relative w-20 h-20 rounded-full overflow-hidden',
+        'pointer-events-auto relative w-14 h-14 sm:w-20 sm:h-20 rounded-full overflow-hidden',
         'border-2 border-black bg-neo-cyan',
         'shadow-hard-lg',
         'motion-safe:transition-transform motion-safe:duration-200',

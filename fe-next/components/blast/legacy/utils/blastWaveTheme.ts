@@ -41,7 +41,6 @@ export interface BlastWaveTheme {
   /** 0 for waves 1-5, 1 for 6-10, ... — themes escalate with it */
   tier: number;
   nameKey: string;
-  goalKey: string;
   flavorKey: string;
   accentToken: BlastWaveAccentToken;
   params: BlastWaveThemeParams;
@@ -70,9 +69,10 @@ const ACCENTS: Record<BlastWaveThemeId, BlastWaveAccentToken> = {
 function paramsFor(id: BlastWaveThemeId, tier: number): BlastWaveThemeParams {
   switch (id) {
     case 'warmUp':
-      return { ...NEUTRAL, movesDelta: 2 };
+      // Bomb-heavy so a new player's stuck leftovers get blasted open.
+      return { ...NEUTRAL, specialChanceMultiplier: 2, goldShare: 0.3, movesDelta: 2 };
     case 'bombSquad':
-      return { ...NEUTRAL, specialChanceMultiplier: 1.5 + 0.1 * tier, goldShare: 0.2, cascadeBonusMultiplier: 1.5 };
+      return { ...NEUTRAL, specialChanceMultiplier: 2.2 + 0.1 * tier, goldShare: 0.2, cascadeBonusMultiplier: 1.5 };
     case 'coinRush':
       return { ...NEUTRAL, specialChanceMultiplier: 1.3 + 0.1 * tier, goldShare: 0.85, coinMultiplier: 2 };
     case 'diamondHunt':
@@ -105,9 +105,15 @@ export function getWaveTheme(wave: number): BlastWaveTheme {
     id,
     tier,
     nameKey: `blast.theme.${id}.name`,
-    goalKey: `blast.theme.${id}.goal`,
     flavorKey: `blast.theme.${id}.flavor`,
     accentToken: ACCENTS[id],
     params: paramsFor(id, tier),
   };
+}
+
+/** Percent of the board a wave must clear to pass: a forgiving warm-up, one step up, then 90%. */
+export function getWavePassPct(wave: number): number {
+  if (wave <= 1) return 75;
+  if (wave === 2) return 85;
+  return 90;
 }

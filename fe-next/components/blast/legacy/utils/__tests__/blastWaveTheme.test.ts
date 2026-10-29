@@ -7,6 +7,7 @@ import {
   getWaveClearReward,
   buildWaveResult,
   totalWaveRewardCoins,
+  getWavePassPct,
   BLAST_WAVE_THEME_IDS,
 } from '../blastWaveConfig';
 import { processTilesForWord } from '../clearTilesProcessor';
@@ -34,7 +35,6 @@ describe('getWaveTheme', () => {
     for (let wave = 1; wave <= 12; wave++) {
       const theme = getWaveTheme(wave);
       expect(theme.nameKey).toBe(`blast.theme.${theme.id}.name`);
-      expect(theme.goalKey).toBe(`blast.theme.${theme.id}.goal`);
       expect(theme.flavorKey).toBe(`blast.theme.${theme.id}.flavor`);
       expect(ACCENTS).toContain(theme.accentToken);
     }
@@ -66,14 +66,6 @@ describe('themes change the game, not just the label', () => {
     expect(getWaveConfig(6).cascadeChainBonus).toBeGreaterThan(getWaveConfig(7).cascadeChainBonus);
   });
 
-  it('each themed wave asks for its own goal', () => {
-    const goal = (wave: number) => getWaveObjectives(wave, 'en').find(o => o.type !== 'clear_percent');
-    expect(goal(2)).toMatchObject({ type: 'collect_type', tileType: 'bomb' });
-    expect(goal(3)).toMatchObject({ type: 'collect_type', tileType: 'gold' });
-    expect(goal(4)).toMatchObject({ type: 'collect_type', tileType: 'diamond' });
-    expect(goal(5)).toMatchObject({ type: 'score_target' });
-    expect(goal(6)).toMatchObject({ type: 'word_length', minWordLength: 5 });
-  });
 
   it('diamond hunt lowers the rarity a word needs to earn a diamond', () => {
     const board = (): BlastTileState[][] => Array.from({ length: 6 }, (_, r) =>
@@ -125,11 +117,35 @@ describe('wave theme text', () => {
     for (const [lang, catalogue] of locales) {
       for (let wave = 1; wave <= 6; wave++) {
         const theme = getWaveTheme(wave);
-        for (const key of [theme.nameKey, theme.goalKey, theme.flavorKey]) {
+        for (const key of [theme.nameKey, theme.flavorKey]) {
           if (typeof get(catalogue, key) !== 'string') missing.push(`${lang}:${key}`);
         }
       }
     }
     expect(missing).toEqual([]);
+  });
+});
+
+describe('wave 1 is winnable for a new player', () => {
+  it('ramps the pass bar: 75% warm-up, 85% wave 2, 90% from wave 3 on (bosses included)', () => {
+    expect(getWavePassPct(1)).toBe(75);
+    expect(getWavePassPct(2)).toBe(85);
+    for (const wave of [3, 4, 5, 6, 10, 15]) expect(getWavePassPct(wave)).toBe(90);
+  });
+
+  it('uses the wave pass bar as the clear-the-board objective', () => {
+    for (let wave = 1; wave <= 12; wave++) {
+      expect(getWaveObjectives(wave).find(o => o.type === 'clear_percent')?.target).toBe(getWavePassPct(wave));
+    }
+  });
+
+  it('seeds the warm-up with enough bombs to break up a stuck board (about 2-3 on 6x6)', () => {
+    const cfg = getWaveConfig(1);
+    const dist = getWaveDistribution(cfg);
+    expect(cfg.specialTileChance).toBeGreaterThanOrEqual(0.11);
+    expect(dist.bomb).toBeGreaterThanOrEqual(0.6);
+    const expectedBombs = 36 * cfg.specialTileChance * dist.bomb;
+    expect(expectedBombs).toBeGreaterThanOrEqual(2);
+    expect(expectedBombs).toBeLessThanOrEqual(3.5);
   });
 });

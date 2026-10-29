@@ -10,6 +10,7 @@ import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { getWaveClearReward, type BlastWaveClearReward } from '@/components/blast/legacy/utils/blastWaveConfig';
 import { BlastRunRibbon } from './BlastRunRibbon';
+import { getWavePassPct } from '@/components/blast/legacy/utils/blastWaveTheme';
 import { THEME_ICON, accentColor, getWaveTheme } from './waveTheme';
 import { useCountUp } from './useCountUp';
 import styles from './progress.module.css';
@@ -231,7 +232,7 @@ export function BlastWaveClear({
             <p className="font-neo-display text-xl font-black uppercase leading-tight tv:text-4xl" style={{ color: nextAccent }}>
               {t(next.nameKey)}
             </p>
-            <p className="font-neo-body text-sm text-neo-white tv:text-xl">{t(next.goalKey)}</p>
+            <p className="font-neo-body text-sm text-neo-white tv:text-xl">{t('blast.objective.clearPercent', { target: getWavePassPct(nextWave) })}</p>
           </div>
           <span
             data-testid="blast-clear-next-reward"

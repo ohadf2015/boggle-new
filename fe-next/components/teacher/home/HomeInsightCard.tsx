@@ -72,7 +72,7 @@ export function HomeInsightCard({ insights = [], t, embedded = false }: { insigh
           </button>
         ) : null}
       </div>
-      <div aria-live="polite" className={embedded ? 'min-h-[5.5rem] pe-11' : 'mt-3 min-h-[7.5rem]'}>
+      <div aria-live="polite" className={embedded ? 'min-h-[3.5rem] pe-11' : 'mt-3 min-h-[7.5rem]'}>
         <AnimatePresence mode="wait" initial={false}>
           <m.div
             key={insight.id}
@@ -80,9 +80,10 @@ export function HomeInsightCard({ insights = [], t, embedded = false }: { insigh
             animate={{ opacity: 1, y: 0 }}
             exit={reduce ? undefined : { opacity: 0, y: -10 }}
             transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+            className={embedded ? 'flex items-center gap-4' : undefined}
           >
             <Value value={insight.value} ink={INK[insight.id]} />
-            <p className="mt-2 font-neo-body text-sm font-semibold leading-snug text-neo-cream/85">
+            <p className={cn('font-neo-body text-sm font-semibold leading-snug text-neo-cream/85', embedded ? 'min-w-0 sm:text-base' : 'mt-2')}>
               {t(`eduShell.insight.${insight.id}`, { count: Number(insight.value) || 0, day: String(insight.value), ...insight.params })}
             </p>
           </m.div>

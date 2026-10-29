@@ -57,6 +57,56 @@ function startOfDay(ms: number): number {
   return d.getTime();
 }
 
+export function HomeNewClass({ href, count, limit, t }: { href: string; count: number; limit: number | null; t: T }) {
+  return (
+    <div className="flex shrink-0 items-center gap-3">
+      {limit !== null ? (
+        <span data-testid="home-class-cap" className="hidden font-neo-body text-xs font-bold text-neo-cream/70 sm:inline">
+          {t('eduShell.setup.capMeter', { count, limit })}
+        </span>
+      ) : null}
+      <Link href={href} data-testid="home-new-class" className={cn(QUIET_LINK, 'whitespace-nowrap')}>
+        <Plus className="size-4" aria-hidden="true" />
+        {t('eduShell.home.newClass')}
+      </Link>
+    </div>
+  );
+}
+
+export function HomeClassMeta({
+  previewIds,
+  memberCount,
+  played,
+  pending,
+  failed,
+  language,
+  nowMs,
+  t,
+}: {
+  previewIds: readonly string[];
+  memberCount: number;
+  played: string | undefined;
+  pending: boolean;
+  failed: boolean;
+  language: string;
+  nowMs: number;
+  t: T;
+}) {
+  return (
+    <div data-testid="home-desk-meta" className="flex flex-wrap items-center gap-x-4 gap-y-2 font-neo-body text-sm font-semibold text-neo-cream/80 sm:text-base">
+      {previewIds.length > 0 ? <StudentStack ids={previewIds} total={memberCount} /> : null}
+      <span className="inline-flex items-center gap-1.5">
+        <Users className="size-4" aria-hidden="true" />
+        {t('eduShell.home.students', { count: memberCount })}
+      </span>
+      <span className="inline-flex items-center gap-1.5">
+        <CalendarDays className="size-4" aria-hidden="true" />
+        <LastPlayed played={played} pending={pending} failed={failed} language={language} nowMs={nowMs} t={t} />
+      </span>
+    </div>
+  );
+}
+
 export interface HomeClassListProps {
   classrooms: readonly (Omit<HqClassroom, 'member_count'> & { member_count?: number | null })[];
   /** First few student ids per class; null while loading or failed. */
@@ -64,9 +114,9 @@ export interface HomeClassListProps {
   /** null while the activity read is in flight or failed. */
   lastPlayedAt: Record<string, string> | null;
   activityFailed: boolean;
-  newClassHref: string;
+  newClassHref?: string;
   /** Free teachers see "2 of 3 classes"; Pro teachers see nothing. */
-  classLimit: number | null;
+  classLimit?: number | null;
   language: string;
   nowMs: number;
   t: T;
@@ -78,7 +128,7 @@ export function HomeClassList({
   lastPlayedAt,
   activityFailed,
   newClassHref,
-  classLimit,
+  classLimit = null,
   language,
   nowMs,
   t,
@@ -91,17 +141,7 @@ export function HomeClassList({
         <h2 id="home-classes-title" className="whitespace-nowrap font-neo-display text-xl font-black text-neo-cream sm:text-2xl">
           {t('eduShell.home.yourClasses')}
         </h2>
-        <div className="flex items-center gap-3">
-          {classLimit !== null ? (
-            <span data-testid="home-class-cap" className="hidden font-neo-body text-xs font-bold text-neo-cream/70 sm:inline">
-              {t('eduShell.setup.capMeter', { count: classrooms.length, limit: classLimit })}
-            </span>
-          ) : null}
-          <Link href={newClassHref} data-testid="home-new-class" className={cn(QUIET_LINK, 'whitespace-nowrap')}>
-            <Plus className="size-4" aria-hidden="true" />
-            {t('eduShell.home.newClass')}
-          </Link>
-        </div>
+        {newClassHref ? <HomeNewClass href={newClassHref} count={classrooms.length} limit={classLimit} t={t} /> : null}
       </div>
 
       <ul className={cn(PANEL, 'divide-y-[2px] divide-neo-cream/10 overflow-hidden p-0')}>
@@ -211,7 +251,7 @@ function LastPlayed({
   t: T;
 }) {
   if (pending) return <span aria-hidden="true" className={cn(SKELETON, 'inline-block h-3 w-16')} />;
-  if (failed) return <span>—</span>;
+  if (failed) return <span>-</span>;
   if (!played) return <span>{t('eduShell.home.notPlayedRecently')}</span>;
   return <span>{lastPlayedLabel(played, language, nowMs)}</span>;
 }

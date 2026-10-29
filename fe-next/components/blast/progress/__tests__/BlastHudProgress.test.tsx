@@ -4,18 +4,13 @@ import { render, screen } from '@testing-library/react';
 
 vi.mock('@/contexts/SoundEffectsContext', () => ({ useSoundEffects: () => ({ playAchievementSound: vi.fn() }) }));
 
-import { BlastHudProgressRow, comboTier } from '../BlastHudProgress';
+import { BlastHudDiamonds, comboTier } from '../BlastHudProgress';
 
 const progress = { baseScore: 600, baseDiamonds: 2, recordWave: 0, personalBest: null, rivals: [{ name: 'Zoe', score: 700 }] };
 
-describe('BlastHudProgressRow', () => {
-  it('chases targets with the run total, not the wave score', () => {
-    render(<BlastHudProgressRow progress={progress} wave={3} waveScore={40} waveDiamonds={1} />);
-    expect(screen.getByTestId('blast-target-chip')).toHaveTextContent('"points":"60"');
-  });
-
+describe('BlastHud progress pieces', () => {
   it('counts diamonds across the whole run', () => {
-    render(<BlastHudProgressRow progress={progress} wave={3} waveScore={0} waveDiamonds={1} />);
+    render(<BlastHudDiamonds progress={progress} waveDiamonds={1} />);
     expect(screen.getByTestId('blast-hud-diamonds')).toHaveTextContent('3');
   });
 });

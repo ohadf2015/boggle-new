@@ -106,6 +106,8 @@ export interface WaveResult {
 
 export interface BlastResultsData {
   finalScore: number;
+  /** Clear % the finished wave had to reach; absent on records saved before per-wave bars. */
+  passPct?: number;
   tilesCleared: number;
   totalTiles: number;
   clearPercentage: number;
@@ -158,6 +160,10 @@ export const GOLD_MULTIPLIER = 3;
 export const GOLD_BONUS_MOVES = 1;
 /** Flat score bonus for clearing an earned diamond */
 export const DIAMOND_CLEAR_BONUS = 30;
+/** A diamond inside the played word multiplies that word */
+export const DIAMOND_WORD_MULTIPLIER = 2;
+/** Points per tile cleared by a played diamond's row + column cross blast */
+export const DIAMOND_CROSS_POINTS = 3;
 /** Number of adjacent cells a bomb clears */
 export const BOMB_RADIUS = 1; // 3x3 area (8 adjacent cells)
 

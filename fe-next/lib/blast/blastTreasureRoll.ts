@@ -5,7 +5,7 @@
  * so two identical words don't always feel identical. Designed against the
  * council's guardrails:
  *   - Floor rule: bonus >= 0, total >= base (randomness never punishes).
- *   - Capped: bonus <= base * maxBonusRatio (anti-cheat ceiling).
+ *   - Capped: bonus <= base * maxBonusRatio (anti-cheat ceiling, default 2 = ×3).
  *   - Deterministic: seeded → same input yields same result (server-verifiable;
  *     can't be re-rolled by retrying the same word).
  *   - Skill-biased: deeper combos / cascades / special tiles raise jackpot odds,
@@ -39,12 +39,14 @@ export interface TreasureInput {
   cascadeDepth?: number;
   /** Word included a special tile (gem/gold/etc) → boost. */
   hasSpecial?: boolean;
-  /** Cap bonus at base * this ratio. Default 1.0 (bonus can't exceed base). */
+  /** Cap bonus at base * this ratio. Default 2.0 (a jackpot triples the word). */
   maxBonusRatio?: number;
 }
 
-const BASE_LUCKY = 0.22;
-const BASE_JACKPOT = 0.05;
+const BASE_LUCKY = 0.08;
+const BASE_JACKPOT = 0.02;
+const LUCKY_MULTIPLIER = 2;
+const JACKPOT_MULTIPLIER = 3;
 
 /** Stable string/number → 32-bit seed for the PRNG. */
 function hashSeed(seed: number | string): number {
@@ -58,7 +60,7 @@ function hashSeed(seed: number | string): number {
 }
 
 export function rollTreasure(input: TreasureInput): TreasureRoll {
-  const { seed, base, comboLevel = 0, cascadeDepth = 0, hasSpecial = false, maxBonusRatio = 1 } = input;
+  const { seed, base, comboLevel = 0, cascadeDepth = 0, hasSpecial = false, maxBonusRatio = 2 } = input;
 
   // Nothing to amplify — no reward, no fake "lucky" on an empty word.
   if (base <= 0) return { tier: 'common', bonus: 0, total: base, multiplier: 1 };
@@ -68,8 +70,8 @@ export function rollTreasure(input: TreasureInput): TreasureRoll {
   // Skill bias: combo + cascade + special raise the odds (capped so it stays a
   // surprise, never a guarantee).
   const skill = comboLevel * 0.012 + cascadeDepth * 0.02 + (hasSpecial ? 0.05 : 0);
-  const jackpotChance = Math.min(BASE_JACKPOT + skill, 0.3);
-  const luckyChance = Math.min(BASE_LUCKY + skill * 1.5, 0.45);
+  const jackpotChance = Math.min(BASE_JACKPOT + skill * 0.5, 0.12);
+  const luckyChance = Math.min(BASE_LUCKY + skill, 0.3);
 
   const roll = rng();
   let tier: TreasureTier;
@@ -77,14 +79,10 @@ export function rollTreasure(input: TreasureInput): TreasureRoll {
   else if (roll < jackpotChance + luckyChance) tier = 'lucky';
   else tier = 'common';
 
+  // Whole multipliers read instantly on the score fly ("×2"), unlike +17%.
   let bonus = 0;
-  if (tier === 'lucky') {
-    // 15–35% of base.
-    bonus = Math.max(1, Math.round(base * (0.15 + rng() * 0.20)));
-  } else if (tier === 'jackpot') {
-    // 50–85% of base.
-    bonus = Math.max(1, Math.round(base * (0.5 + rng() * 0.35)));
-  }
+  if (tier === 'lucky') bonus = base * (LUCKY_MULTIPLIER - 1);
+  else if (tier === 'jackpot') bonus = base * (JACKPOT_MULTIPLIER - 1);
 
   const cap = Math.floor(base * maxBonusRatio);
   bonus = Math.min(bonus, cap);

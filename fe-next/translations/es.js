@@ -12967,6 +12967,13 @@ const es = {
     }
   },
   "blast": {
+    "stamp": {
+      "coin": "MONEDA",
+      "gem": "DIAMANTE",
+      "lucky": "SUERTE",
+      "jackpot": "JACKPOT",
+      "gemBlast": "¡ESTALLIDO DE DIAMANTE!"
+    },
     "toCatchUp": "para alcanzar",
     "leadingBy": "con ventaja de",
     "firstUse": {
@@ -12974,6 +12981,18 @@ const es = {
     },
     "level": "Nivel {n}",
     "results": {
+      "loot": "Botín",
+      "journey": {
+        "title": "Tu partida",
+        "stars": "{count} estrellas ganadas",
+        "here": "Tú",
+        "upNext": "Siguiente",
+        "wavesAway": "A {count} oleadas",
+        "passMark": "{pct}% para pasar"
+      },
+      "runReached": "¡Llegaste a la oleada {wave}!",
+      "waveGoals": "Objetivos de la oleada {wave}",
+      "failHintPct": "Despeja al menos el {required}% del tablero para avanzar",
       "boardDomination": "Dominación del Tablero",
       "matchRecap": "Resumen de Blast",
       "totalTilesDemolished": "Fichas Destruidas",
@@ -13263,7 +13282,7 @@ const es = {
       },
       "diamond": {
         "name": "Diamante",
-        "desc": "Lo ganas con palabras raras. Despéjalo para un gran bono."
+        "desc": "Lo ganas con palabras raras. Úsalo en una palabra: ×2 y estalla su fila y columna."
       },
       "bomb": {
         "name": "Bomba",
@@ -13444,9 +13463,12 @@ const es = {
     "moveWarning": {
       "label": "¡POCOS MOVIMIENTOS!"
     },
+    "boardBusy": "Espera, las fichas siguen cayendo",
     "ready": {
       "title": "Modo Blast",
-      "subtitle": "Limpia fichas formando palabras. Encadena combos para sumar más puntos",
+      "subtitle": "Desliza palabras y revienta el tablero. Las bombas limpian 3×3, las monedas valen ×3 y los diamantes ×2.",
+      "start": "Jugar",
+      "best": "Tu récord: {score}",
       "play": "Empezar desde el principio",
       "resume": "Continuar ola {wave}",
       "step1Title": "Desliza palabras",
@@ -13611,7 +13633,7 @@ const es = {
       },
       "diamond": {
         "name": "Diamante",
-        "desc": "Se gana con palabras raras: gran bono al despejarlo"
+        "desc": "Sale con palabras raras: ×2 y estalla fila y columna"
       },
       "bomb": {
         "name": "Bomba",

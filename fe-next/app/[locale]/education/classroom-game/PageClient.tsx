@@ -146,7 +146,7 @@ function ClassroomGameInner() {
       {/* TV_STAGE_ZOOM_CLASS: on a 1920/2560 wall the whole launch column
           scales up together (CSS zoom), instead of an 880px card lost in the
           arena art. Laptops are untouched — see tvStageScale. */}
-      <main className={cn('relative flex min-h-0 flex-1 w-full max-w-5xl mx-auto flex-col overflow-hidden px-3 py-3 sm:px-6', TV_STAGE_ZOOM_CLASS)}>
+      <main className={cn('relative flex min-h-0 flex-1 w-full max-w-7xl mx-auto flex-col overflow-hidden px-3 py-3 sm:px-6', TV_STAGE_ZOOM_CLASS)}>
         {runExpress ? (
           <ClassroomGameLobbyExpress
             intent={quickLaunchIntent}

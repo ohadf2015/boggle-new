@@ -60,3 +60,27 @@ describe('CoachDemo stack (word tower)', () => {
     expect(screen.getAllByTestId('coach-stack-floor').length).toBeGreaterThanOrEqual(2);
   });
 });
+
+describe('CoachDemo in an RTL page (he)', () => {
+  it.each(['drag', 'chain', 'longWord'] as CoachDemoType[])(
+    'given the "%s" demo under dir=rtl, then its Latin letter row stays left-to-right (C-A-T, not T-A-C)',
+    (demo) => {
+      const { container } = render(
+        <div dir="rtl">
+          <CoachDemo demo={demo} accent="purple" />
+        </div>,
+      );
+      const root = container.querySelector('[aria-hidden="true"]') as HTMLElement;
+      expect(root.getAttribute('dir')).toBe('ltr');
+    },
+  );
+
+  it('keeps the drag demo letters in C-A-T order', () => {
+    const { container } = render(
+      <div dir="rtl">
+        <CoachDemo demo="drag" accent="purple" />
+      </div>,
+    );
+    expect(container.textContent).toBe('CAT');
+  });
+});

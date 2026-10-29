@@ -10,27 +10,32 @@ import { computeFailReason } from '../computeFailReason';
 
 describe('computeFailReason', () => {
   it('returns tiles_short with positive delta when below 90%', () => {
-    const r = computeFailReason({ tilesCleared: 30, totalTiles: 36 });
+    const r = computeFailReason({ tilesCleared: 30, totalTiles: 36, passPct: 90 });
     // 36 * 0.9 = 32.4 → ceil = 33, missed by 33 - 30 = 3
     expect(r.kind).toBe('tiles_short');
     expect(r.tilesShort).toBe(3);
   });
 
   it('returns met when clearPct >= 90%', () => {
-    const r = computeFailReason({ tilesCleared: 33, totalTiles: 36 });
+    const r = computeFailReason({ tilesCleared: 33, totalTiles: 36, passPct: 90 });
     expect(r.kind).toBe('met');
     expect(r.tilesShort).toBe(0);
   });
 
   it('handles zero tiles edge case', () => {
-    const r = computeFailReason({ tilesCleared: 0, totalTiles: 0 });
+    const r = computeFailReason({ tilesCleared: 0, totalTiles: 0, passPct: 90 });
     expect(r.kind).toBe('met');
     expect(r.tilesShort).toBe(0);
   });
 
   it('clamps negative shortfall', () => {
-    const r = computeFailReason({ tilesCleared: 100, totalTiles: 36 });
+    const r = computeFailReason({ tilesCleared: 100, totalTiles: 36, passPct: 90 });
     expect(r.kind).toBe('met');
     expect(r.tilesShort).toBe(0);
+  });
+
+  it('measures the shortfall against the wave bar, e.g. the 75% warm-up', () => {
+    // ceil(36 * 0.75) = 27
+    expect(computeFailReason({ tilesCleared: 25, totalTiles: 36, passPct: 75 })).toEqual({ kind: 'tiles_short', tilesShort: 2 });
   });
 });

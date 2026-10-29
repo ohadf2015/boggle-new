@@ -4,23 +4,15 @@
 import {
   getWaveConfig,
   getWaveObjectives,
-  seedTargetWordObjective,
-  seedColorPowerObjective,
 } from '../blastWaveConfig';
 
 describe('getWaveConfig', () => {
   it('returns WaveConfig for wave 1', () => {
     const config = getWaveConfig(1);
     expect(config.minWordLength).toBe(2);
-    expect(config.specialTileChance).toBe(0.06);
+    expect(config.specialTileChance).toBeCloseTo(0.12);
     expect(config.vowelModifier).toBe(1.1);
     expect(config.maxCascadeChain).toBe(2);
-  });
-
-  it('opens with the calmest board', () => {
-    for (let wave = 2; wave <= 12; wave++) {
-      expect(getWaveConfig(wave).specialTileChance).toBeGreaterThanOrEqual(getWaveConfig(1).specialTileChance);
-    }
   });
 
   it('returns progressively harder config for higher waves', () => {
@@ -28,8 +20,8 @@ describe('getWaveConfig', () => {
     const w3 = getWaveConfig(3);
     const w5 = getWaveConfig(5);
 
-    // More specials roll as waves climb
-    expect(w5.specialTileChance).toBeGreaterThan(w1.specialTileChance);
+    // Fewer moves as waves climb
+    expect(w5.movesAllowed).toBeLessThan(w1.movesAllowed);
 
     // Vowel modifier decreases
     expect(w3.vowelModifier).toBeLessThan(w1.vowelModifier);
@@ -141,116 +133,6 @@ describe('getWaveConfig archetype', () => {
   });
 });
 
-describe('getWaveObjectives — target_word and color_power seeding', () => {
-  describe('seedTargetWordObjective', () => {
-    it('returns objectives unchanged for wave 1-2 (wave < 3)', () => {
-      const baseObjs = [{ type: 'clear_percent' as const, target: 90 }];
-      expect(seedTargetWordObjective(1, 'en', baseObjs)).toEqual(baseObjs);
-      expect(seedTargetWordObjective(2, 'en', baseObjs)).toEqual(baseObjs);
-    });
-
-    it('may add target_word to wave 3+ based on deterministic RNG', () => {
-      const baseObjs = [{ type: 'clear_percent' as const, target: 90 }];
-      const result3 = seedTargetWordObjective(3, 'en', baseObjs);
-      const result4 = seedTargetWordObjective(4, 'en', baseObjs);
-
-      // Wave 3: (3*37) % 100 = 111 % 100 = 11, which is < 25, so should add
-      expect(result3.length).toBe(baseObjs.length + 1);
-      expect(result3[result3.length - 1].type).toBe('target_word');
-      expect(result3[result3.length - 1]).toHaveProperty('targetWord');
-
-      // Wave 4: (4*37) % 100 = 148 % 100 = 48, which is NOT < 25, so should not add
-      expect(result4).toEqual(baseObjs);
-    });
-
-    it('respects language parameter for word pool lookup', () => {
-      const baseObjs = [{ type: 'clear_percent' as const, target: 90 }];
-      // Wave 3 should add target_word for any language with a word pool
-      const resultEn = seedTargetWordObjective(3, 'en', baseObjs);
-      const resultHe = seedTargetWordObjective(3, 'he', baseObjs);
-
-      // Both should either add or not add (depends on pool availability)
-      // The key is that the language is passed through
-      expect(resultEn.length).toBeGreaterThanOrEqual(baseObjs.length);
-      expect(resultHe.length).toBeGreaterThanOrEqual(baseObjs.length);
-    });
-  });
-
-  describe('seedColorPowerObjective', () => {
-    it('returns objectives unchanged for wave 1-3 (wave < 4)', () => {
-      const baseObjs = [{ type: 'clear_percent' as const, target: 90 }];
-      expect(seedColorPowerObjective(1, baseObjs)).toEqual(baseObjs);
-      expect(seedColorPowerObjective(2, baseObjs)).toEqual(baseObjs);
-      expect(seedColorPowerObjective(3, baseObjs)).toEqual(baseObjs);
-    });
-
-    it('may add color_power to wave 4+ based on deterministic RNG', () => {
-      const baseObjs = [{ type: 'clear_percent' as const, target: 90 }];
-      const result4 = seedColorPowerObjective(4, baseObjs);
-      const result5 = seedColorPowerObjective(5, baseObjs);
-
-      // Wave 4: (4*47) % 100 = 188 % 100 = 88, which is NOT < 25, so should not add
-      expect(result4).toEqual(baseObjs);
-
-      // Wave 5: (5*47) % 100 = 235 % 100 = 35, which is NOT < 25, so should not add
-      expect(result5).toEqual(baseObjs);
-    });
-
-    it('rotates color through pink, cyan, lime', () => {
-      const baseObjs = [{ type: 'clear_percent' as const, target: 90 }];
-
-      // Find waves that should add (call at different wave numbers)
-      // The RNG formula is ((wave * 47) % 100) < 25
-      // Need to find waves where this is true
-      const addingWaves: number[] = [];
-      for (let w = 4; w <= 20; w++) {
-        if (((w * 47) % 100) < 25) {
-          addingWaves.push(w);
-        }
-      }
-
-      if (addingWaves.length > 0) {
-        const w1 = addingWaves[0];
-        const w2 = addingWaves[1] ?? w1 + 3;
-        const w3 = addingWaves[2] ?? w1 + 6;
-
-        const result1 = seedColorPowerObjective(w1, baseObjs);
-        const result2 = seedColorPowerObjective(w2, baseObjs);
-        const result3 = seedColorPowerObjective(w3, baseObjs);
-
-        if (result1.length > baseObjs.length) {
-          expect((result1[result1.length - 1] as any).colorTag).toMatch(/pink|cyan|lime/);
-        }
-      }
-    });
-
-    it('increases minColorCount at wave 8+', () => {
-      // Find a wave >= 8 that adds color_power
-      let addingWave8Plus: number | null = null;
-      for (let w = 8; w <= 20; w++) {
-        if (((w * 47) % 100) < 25) {
-          addingWave8Plus = w;
-          break;
-        }
-      }
-
-      if (addingWave8Plus !== null) {
-        const baseObjs = [{ type: 'clear_percent' as const, target: 90 }];
-        const resultEarly = seedColorPowerObjective(4, baseObjs);
-        const resultLate = seedColorPowerObjective(addingWave8Plus, baseObjs);
-
-        // Extract minColorCount from the added objectives
-        const earlyColor = resultEarly.find((o: any) => o.type === 'color_power');
-        const lateColor = resultLate.find((o: any) => o.type === 'color_power');
-
-        if (lateColor) {
-          expect((lateColor as any).minColorCount).toBeGreaterThanOrEqual(3);
-        }
-      }
-    });
-  });
-});
-
 describe('wave completability invariants', () => {
   /**
    * Max sustainable score per move, derived from blast scoring:
@@ -285,23 +167,7 @@ describe('wave completability invariants', () => {
       expect(tilesRequired).toBeLessThanOrEqual(config.movesAllowed * MAX_TILES_PER_MOVE);
     });
 
-    it('collect_type objectives do not demand more specials than movesAllowed', () => {
-      const config = getWaveConfig(wave);
-      const objectives = getWaveObjectives(wave);
-      const collects = objectives.filter((o) => o.type === 'collect_type');
-      for (const c of collects) {
-        expect(c.target).toBeLessThanOrEqual(config.movesAllowed);
-      }
-    });
 
-    it('word_length objectives do not demand more long words than movesAllowed', () => {
-      const config = getWaveConfig(wave);
-      const objectives = getWaveObjectives(wave);
-      const wordLen = objectives.filter((o) => o.type === 'word_length');
-      for (const w of wordLen) {
-        expect(w.target).toBeLessThanOrEqual(config.movesAllowed);
-      }
-    });
 
     it('movesAllowed is at least 4 (minimum playable wave length)', () => {
       expect(getWaveConfig(wave).movesAllowed).toBeGreaterThanOrEqual(4);

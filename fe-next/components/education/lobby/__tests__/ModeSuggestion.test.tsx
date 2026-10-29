@@ -34,6 +34,12 @@ describe('<ModeSuggestion>', () => {
     expect(capture).toHaveBeenCalledWith('edu_mode_suggestion_shown', expect.objectContaining({ suggested_mode: chip.getAttribute('data-mode') }));
   });
 
+  it('Given the chip, then it is a quiet hint, not a yellow CTA competing with GO LIVE', async () => {
+    render(<ModeSuggestion selected="classic" isBlocked={() => false} onPick={vi.fn()} t={t} />);
+    const chip = await screen.findByTestId('mode-suggestion');
+    expect(chip.className).not.toContain('bg-neo-yellow');
+  });
+
   it('Given the chip, when tapped, then the lobby switches to that mode, an accepted event fires and the chip goes away', async () => {
     const onPick = vi.fn();
     const { rerender } = render(<ModeSuggestion selected="classic" isBlocked={() => false} onPick={onPick} t={t} />);

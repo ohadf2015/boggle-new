@@ -37,7 +37,7 @@ export interface BragTier {
   key: 'legend' | 'elite' | 'great' | 'solid' | 'nice';
   /** Tailwind classes for the headline pill background. */
   pillClass: string;
-  /** Colored glow applied as inline boxShadow (keeps hard 3px offset). */
+  /** Hard offset shadow for the headline pill. */
   glow: string;
 }
 
@@ -50,35 +50,35 @@ export function getBragTier(percentile: number | null | undefined): BragTier {
   if (p >= 99) {
     return {
       key: 'legend',
-      pillClass: 'bg-linear-to-r from-yellow-300 via-white to-yellow-300 text-neo-black',
-      glow: '0 0 32px rgba(255,215,0,0.7), 3px 3px 0 #000',
+      pillClass: 'bg-neo-yellow text-neo-black',
+      glow: '3px 3px 0 #000',
     };
   }
   if (p >= 90) {
     return {
       key: 'elite',
-      pillClass: 'bg-linear-to-r from-neo-pink via-fuchsia-400 to-neo-pink text-white',
-      glow: '0 0 26px rgba(255,20,147,0.55), 3px 3px 0 #000',
+      pillClass: 'bg-neo-pink text-neo-white',
+      glow: '3px 3px 0 #000',
     };
   }
   if (p >= 75) {
     return {
       key: 'great',
-      pillClass: 'bg-linear-to-r from-neo-lime to-neo-cyan text-neo-black',
-      glow: '0 0 22px rgba(191,255,0,0.5), 3px 3px 0 #000',
+      pillClass: 'bg-neo-lime text-neo-black',
+      glow: '3px 3px 0 #000',
     };
   }
   if (p >= 50) {
     return {
       key: 'solid',
       pillClass: 'bg-neo-cyan text-neo-black',
-      glow: '0 0 18px rgba(0,255,255,0.45), 3px 3px 0 #000',
+      glow: '3px 3px 0 #000',
     };
   }
   return {
     key: 'nice',
     pillClass: 'bg-neo-lime-muted text-neo-black',
-    glow: '0 0 14px rgba(191,255,0,0.35), 3px 3px 0 #000',
+    glow: '3px 3px 0 #000',
   };
 }
 
@@ -145,16 +145,16 @@ export function BlastBragCard({ results, t }: BlastBragCardProps) {
       className={cn(
         'w-full relative overflow-hidden',
         'rounded-neo border-3 border-neo-black p-4 animate-in fade-in-0 duration-300',
-        'bg-linear-to-br from-neo-navy via-neo-navy-light to-neo-navy',
+        'bg-neo-navy-light shadow-hard-lg',
       )}
-      style={{ boxShadow: '6px 6px 0 #000' }}
       data-testid="blast-brag-card"
     >
       {/* Halftone accent strip */}
-      <div
-        aria-hidden
-        className="absolute inset-x-0 top-0 h-1.5 bg-linear-to-r from-neo-pink via-neo-lime to-neo-cyan"
-      />
+      <div aria-hidden className="absolute inset-x-0 top-0 flex h-1.5">
+        <span className="flex-1 bg-neo-pink" />
+        <span className="flex-1 bg-neo-lime" />
+        <span className="flex-1 bg-neo-cyan" />
+      </div>
 
       {/* Headline tier pill */}
       <div className="flex items-center justify-between gap-2 mb-3 mt-1">
