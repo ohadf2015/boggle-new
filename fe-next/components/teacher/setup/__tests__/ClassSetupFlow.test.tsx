@@ -115,7 +115,7 @@ describe('<ClassSetupFlow>', () => {
     expect(await screen.findByTestId('setup-step-ready')).toBeInTheDocument();
     expect(screen.getByTestId('setup-join-code')).toHaveTextContent('K7Q2');
     await waitFor(() => expect(screen.getByTestId('setup-qr').querySelector('svg')).not.toBeNull());
-    expect(screen.getByTestId('setup-start-game')).toHaveAttribute('href', '/en/education/classroom-game?classroomId=c9');
+    expect(screen.getByTestId('setup-start-game')).toHaveAttribute('href', '/en/education/classroom-game?classroomId=c9&minutes=2');
   });
 
   it('When a class is created, Then the join code is reported shown once with no click and the URL keeps the class', async () => {
@@ -136,7 +136,8 @@ describe('<ClassSetupFlow>', () => {
     expect(screen.getByTestId('setup-joined-count')).toHaveTextContent('eduShell.setup.joinedNone');
     expect(screen.getByTestId('setup-copy-link')).toHaveAttribute('data-hero', 'true');
     expect(screen.getByTestId('setup-start-game')).toHaveAttribute('data-hero', 'false');
-    expect(screen.getByTestId('setup-start-game')).toHaveTextContent('eduShell.setup.startNow');
+    expect(screen.getByTestId('setup-start-game')).toHaveTextContent('eduShell.setup.firstRound.start');
+    expect(screen.getByTestId('first-round-guide')).toBeInTheDocument();
   });
 
   it('Given the roster is still loading, Then the counter claims no number', () => {
@@ -169,6 +170,7 @@ describe('<ClassSetupFlow>', () => {
     const start = screen.getByTestId('setup-start-game');
     expect(start).toHaveAttribute('data-hero', 'true');
     expect(start).toHaveTextContent('eduShell.setup.startQuick');
+    expect(screen.queryByTestId('first-round-guide')).not.toBeInTheDocument();
     expect(screen.getByTestId('setup-copy-link')).toHaveAttribute('data-hero', 'false');
     roster = { students: [{ id: 's1' }, { id: 's2' }], loading: false, arrivals: ['s2'] };
     rerender(<ClassSetupFlow />);
