@@ -35,7 +35,9 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-import { ClassroomTvResults } from '../ClassroomTvResults';
+vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => ({ hasPro: true, loading: false }) }));
+vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
+import EduHostResults from '@/components/education/live/EduHostResults';
 import { ClassroomResultsCard } from '@/components/education/ClassroomResultsCard';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 
@@ -102,24 +104,24 @@ describe('the projector', () => {
   afterEach(cleanup);
 
   it('keeps the teacher off the plinths', () => {
-    render(<ClassroomTvResults summary={summary()} t={t} />);
+    render(<EduHostResults summary={summary()} t={t} />);
     expect(screen.queryByText(TEACHER)).toBeNull();
   });
 
   it('crowns the top student instead', () => {
-    render(<ClassroomTvResults summary={summary()} t={t} />);
+    render(<EduHostResults summary={summary()} t={t} />);
     const first = screen.getByTestId('podium-place-1');
     expect(first.textContent).toContain('Noa');
   });
 
   it('gives the winner spotlight the student, not the host', () => {
-    render(<ClassroomTvResults summary={summary()} t={t} />);
+    render(<EduHostResults summary={summary()} t={t} />);
     expect(screen.getByTestId('winner-spotlight').textContent).toContain('Noa');
   });
 
   it('still shows a solo teacher rather than an empty podium', () => {
     render(
-      <ClassroomTvResults
+      <EduHostResults
         summary={summary({ podium: [{ username: TEACHER, score: 0, rank: 1 }] })}
         t={t}
       />

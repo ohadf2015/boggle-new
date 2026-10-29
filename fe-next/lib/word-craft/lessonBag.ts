@@ -14,7 +14,7 @@
 
 import type { Language } from '@/shared/types/game';
 import { canonLessonWord } from '@/lib/wordTower/lessonSeed';
-import { getTileBag, RACK_SIZE, BLANK_LETTER, type SupportedLocale } from './tileBag';
+import { getTileBag, hasWordCraftBag, RACK_SIZE, BLANK_LETTER, type SupportedLocale } from './tileBag';
 import type { RackTile } from './types';
 
 const WORD_CRAFT_LOCALES: readonly SupportedLocale[] = ['en', 'sv', 'he', 'es', 'ja'];
@@ -23,8 +23,8 @@ const isWordCraftLocale = (value: string): value is SupportedLocale =>
   (WORD_CRAFT_LOCALES as readonly string[]).includes(value);
 
 /**
- * Which bag/dictionary an assignment round uses. The LESSON's language wins
- * over the UI language; a lesson language Word Craft has no bag for (ru) falls
+ * Which bag/dictionary a live classroom round uses. The LESSON's language wins
+ * over the UI language; a lesson language the server cannot deal (ru) falls
  * back to the UI locale (or en) and is explicitly unseeded.
  */
 export function wordCraftLocaleFor(
@@ -33,6 +33,20 @@ export function wordCraftLocaleFor(
 ): { locale: SupportedLocale; seeded: boolean } {
   if (isWordCraftLocale(lessonLanguage)) return { locale: lessonLanguage, seeded: true };
   return { locale: isWordCraftLocale(uiLanguage) ? uiLanguage : 'en', seeded: false };
+}
+
+/** Whether solo Word Craft homework can be dealt in this lesson language. */
+export function wordCraftHomeworkSupports(lessonLanguage: string): boolean {
+  return hasWordCraftBag(lessonLanguage);
+}
+
+/** Solo homework is dealt on the client from any bag (ru too); the live server room stays on wordCraftLocaleFor. */
+export function homeworkWordCraftLocaleFor(
+  lessonLanguage: string,
+  uiLanguage: string,
+): { locale: SupportedLocale; seeded: boolean } {
+  if (hasWordCraftBag(lessonLanguage)) return { locale: lessonLanguage, seeded: true };
+  return wordCraftLocaleFor(lessonLanguage, uiLanguage);
 }
 
 /**

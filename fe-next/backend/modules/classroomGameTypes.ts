@@ -17,6 +17,10 @@ export interface ClassroomGameSettings {
   timerMinutes?: number;
   boardSize?: 'small' | 'medium' | 'large';
   allowLateJoin?: boolean;
+  /** Teacher's padlock: no new seats while true. Never accepted at creation, so every session starts unlocked. */
+  lobbyLocked?: boolean;
+  /** `a:<authUserId>` / `g:<guestTokenHash>` of everyone seated when the lock went on. */
+  lobbyLockedSeats?: string[];
   /**
    * `vocab-quiz` is a live 4-choice question round, not a board game. It is
    * deliberately absent from the canonical `GameMode` union in

@@ -1,6 +1,6 @@
 'use client';
 
-import type { CSSProperties } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { Loader2, Play } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { BOSS_BATTLE_ID } from '@/lib/education/classroomCatalogueId';
@@ -28,6 +28,8 @@ interface ProjectorStartBarProps {
   onStartPracticeRound?: () => void;
   practiceRoundPending: boolean;
   practiceRoundFailed: boolean;
+  /** Sits beside Start in the same row. */
+  lockSlot?: ReactNode;
   className?: string;
   style?: CSSProperties;
 }
@@ -47,6 +49,7 @@ export function ProjectorStartBar({
   onStartPracticeRound,
   practiceRoundPending,
   practiceRoundFailed,
+  lockSlot,
   className,
   style,
 }: ProjectorStartBarProps) {
@@ -120,6 +123,7 @@ export function ProjectorStartBar({
             {t('education.projectorLobby.rehearseCta')}
           </button>
         )}
+        {lockSlot}
       </div>
       {!canStart && (
         <p data-testid="projector-start-reason" role="status" className="font-neo-body font-bold text-neo-cream/85 text-[clamp(0.875rem,min(1cqw,1.9cqh),1.5rem)]">

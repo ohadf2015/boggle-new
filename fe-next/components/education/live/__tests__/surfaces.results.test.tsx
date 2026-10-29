@@ -6,11 +6,9 @@ import { EduLiveSurfacesProvider } from '@/components/education/live/eduLiveSurf
 import ClassroomTvResultsScreen, { type ClassroomTvResultsScreenProps } from '@/host/components/tv-results/ClassroomTvResultsScreen';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 
-vi.mock('@/components/education/results/ClassroomTvResults', () => ({
-  default: () => <div data-testid="classroom-tv-results" />,
-}));
-vi.mock('@/host/hooks/useTvFullscreen', () => ({
-  useTvFullscreen: () => ({ isFullscreen: false, toggleFullscreen: vi.fn(), isSupported: false }),
+vi.mock('@/components/education/live/EduHostResults', () => ({
+  default: () => <div data-testid="real-edu-host-results" />,
+  EduHostResults: () => <div data-testid="real-edu-host-results" />,
 }));
 
 const summary = { podium: [] } as unknown as ClassroomSummary;
@@ -27,11 +25,11 @@ describe('edu live surfaces — host results', () => {
       </EduLiveSurfacesProvider>,
     );
     expect(screen.getByTestId('edu-host-results')).toBeInTheDocument();
-    expect(screen.queryByTestId('classroom-tv-results')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('real-edu-host-results')).not.toBeInTheDocument();
   });
 
-  it('given no provider, when a classroom round ends, then /multiplayer keeps its recap', () => {
+  it('given no provider, when a classroom round ends, then the edu host results still own the screen', () => {
     render(<ClassroomTvResultsScreen summary={summary} t={(k) => k} />);
-    expect(screen.getByTestId('classroom-tv-results')).toBeInTheDocument();
+    expect(screen.getByTestId('real-edu-host-results')).toBeInTheDocument();
   });
 });

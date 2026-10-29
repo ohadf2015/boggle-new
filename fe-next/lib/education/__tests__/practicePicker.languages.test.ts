@@ -24,14 +24,20 @@ describe('practice tiles per lesson language', () => {
     });
   }
 
-  for (const language of ['en', 'he', 'sv', 'es', 'ja']) {
+  for (const language of ['en', 'he', 'sv', 'es', 'ja', 'ru']) {
     it(`${language}: Word Tower is offered (its wheel has letters and a dictionary)`, () => {
       expect(buildPracticeTiles(lesson([...SAMPLES[language as keyof typeof SAMPLES]]), { language }).some((t) => t.id === WORD_TOWER_TILE_ID)).toBe(true);
     });
   }
 
-  it('ru: Word Tower is hidden, not shown locked with advice the teacher cannot follow', () => {
-    const tiles = buildPracticeTiles(lesson([...SAMPLES.ru]), { language: 'ru' });
+  it('ru: Word Tower is ready on a real Cyrillic list', () => {
+    const tower = buildPracticeTiles(lesson([...SAMPLES.ru]), { language: 'ru' }).find((t) => t.id === WORD_TOWER_TILE_ID);
+    expect(tower?.ready).toBe(true);
+    expect(tower?.count).toBe(SAMPLES.ru.length);
+  });
+
+  it('fr: Word Tower stays hidden, not shown locked with advice the teacher cannot follow', () => {
+    const tiles = buildPracticeTiles(lesson([...SAMPLES.en]), { language: 'fr' });
     expect(tiles.some((t) => t.id === WORD_TOWER_TILE_ID)).toBe(false);
   });
 });

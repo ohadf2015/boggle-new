@@ -61,6 +61,7 @@ import {
 } from './playerReconnectHandler';
 import { ensurePlayerState } from './playerDataInit';
 import { classroomSeatName } from './classroomSeatName';
+import { isLockedOut } from '../modules/classroomLobbyLock.js';
 
 // Types for payloads
 interface JoinGamePayload {
@@ -217,6 +218,11 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
         (seated.guestTokenHash && guestTokenHash && seated.guestTokenHash !== guestTokenHash))
     ) {
       emitError(socket, ErrorCodes.PLAYER_USERNAME_TAKEN, { message: 'That name is already taken' });
+      return;
+    }
+
+    if (isLockedOut(seat.game, { users: game.users, username, authUserId, guestTokenHash, hasSocket: !!getSocketIdByUsername(gameCode, username), inRound: isInProgress(game.gameState) })) {
+      emitError(socket, ErrorCodes.ROOM_LOCKED);
       return;
     }
 

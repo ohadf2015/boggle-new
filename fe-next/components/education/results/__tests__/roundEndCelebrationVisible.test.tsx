@@ -39,7 +39,9 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-import { ClassroomTvResults } from '../ClassroomTvResults';
+vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => ({ hasPro: true, loading: false }) }));
+vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
+import EduHostResults from '@/components/education/live/EduHostResults';
 import { WinnerSpotlight } from '../WinnerSpotlight';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 
@@ -96,12 +98,12 @@ describe('the projector is still celebrating when a late shutter opens', () => {
   });
 
   it('has no celebration layer before the winner lands', () => {
-    render(<ClassroomTvResults summary={summary()} t={t} />);
+    render(<EduHostResults summary={summary()} t={t} />);
     expect(screen.queryByTestId('celebration-loop')).toBeNull();
   });
 
   it('is still celebrating ten seconds after the reveal has finished', () => {
-    render(<ClassroomTvResults summary={summary()} t={t} />);
+    render(<EduHostResults summary={summary()} t={t} />);
 
     act(() => {
       vi.advanceTimersByTime(10_000);
@@ -114,13 +116,13 @@ describe('the projector is still celebrating when a late shutter opens', () => {
   });
 
   it('still says done at ten seconds, so the layer is what changed, not the stage', () => {
-    render(<ClassroomTvResults summary={summary()} t={t} />);
+    render(<EduHostResults summary={summary()} t={t} />);
 
     act(() => {
       vi.advanceTimersByTime(10_000);
     });
 
-    expect(screen.getByTestId('classroom-tv-results').dataset.roundEndStage).toBe('done');
+    expect(screen.getByTestId('edu-host-results').dataset.roundEndStage).toBe('done');
   });
 });
 

@@ -4,6 +4,7 @@ import * as sv from './tileBags/sv';
 import * as he from './tileBags/he';
 import * as es from './tileBags/es';
 import * as ja from './tileBags/ja';
+import * as ru from './tileBags/ru';
 import { scaleDistribution } from './tileBag.scaler';
 import { mulberry32 } from '@/lib/rng/seededRandom';
 
@@ -25,14 +26,21 @@ export const ENGLISH_TILE_DISTRIBUTION: Record<string, number> = {
   [BLANK_LETTER]: 2,
 };
 
-export type SupportedLocale = 'en' | 'sv' | 'he' | 'es' | 'ja';
+export type SupportedLocale = 'en' | 'sv' | 'he' | 'es' | 'ja' | 'ru';
 
 type BagData = { values: Record<string, number>; distribution: Record<string, number> };
-const BAGS: Record<SupportedLocale, BagData> = { en, sv, he, es, ja };
+const BAGS: Record<SupportedLocale, BagData> = { en, sv, he, es, ja, ru };
 
-/** Word Craft has no bag for other app languages (ru): they play the en bag. */
+// The ru bag is dealt only to classroom homework; the public modes keep the en bag for a ru app.
+const PUBLIC_LOCALES: readonly SupportedLocale[] = ['en', 'sv', 'he', 'es', 'ja'];
+
+/** The bag the PUBLIC game plays for an app language; anything else plays en. */
 export function toWordCraftLocale(language: string): SupportedLocale {
-  return language in BAGS ? (language as SupportedLocale) : 'en';
+  return (PUBLIC_LOCALES as readonly string[]).includes(language) ? (language as SupportedLocale) : 'en';
+}
+
+export function hasWordCraftBag(language: string): language is SupportedLocale {
+  return Object.prototype.hasOwnProperty.call(BAGS, language);
 }
 
 export function getTileBag(locale: SupportedLocale): BagData {

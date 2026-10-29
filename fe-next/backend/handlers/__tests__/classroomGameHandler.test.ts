@@ -14,6 +14,7 @@ vi.mock('../../modules/classroomGameManager');
 vi.mock('../../modules/gameStateManager', () => ({
   bindSocketToGame: vi.fn(),
   unbindSocketFromGame: vi.fn(),
+  getGameUsers: vi.fn(() => []),
 }));
 vi.mock('../../modules/supabase/classroomMembership', () => ({
   isClassroomTeacher: vi.fn(),

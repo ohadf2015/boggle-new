@@ -38,6 +38,9 @@ export interface LiveClassroomGameSettings {
   vocabQuizQuestionCount?: number;
   vocabQuizSeconds?: number;
   pressure?: import('@/shared/types/classroom').ClassroomPressure;
+  lobbyLocked?: boolean;
+  /** `a:<authUserId>` entries for everyone seated when the lock went on. */
+  lobbyLockedSeats?: string[];
 }
 
 export interface LiveClassroomGame {
@@ -52,6 +55,9 @@ export interface LiveClassroomGame {
    * without it a student's lobby renders classic defaults over a Vocab Quiz.
    */
   settings: LiveClassroomGameSettings;
+  teacherId?: string;
+  status?: string;
+  playerUserIds?: string[];
 }
 
 /**
@@ -99,8 +105,8 @@ export async function lookupLiveClassroomGame(
     if (!raw) return null;
 
     const game = JSON.parse(raw) as Partial<LiveClassroomGame> & {
-      status?: string;
       endedAt?: string;
+      players?: Array<{ userId?: string }>;
     };
     if (!game?.classroomId) return null;
     // The session rule, restated. Mirrors `isClassroomSessionEnded`.
@@ -112,6 +118,9 @@ export async function lookupLiveClassroomGame(
       teacherName: game.teacherName ?? '',
       lessonNames: game.lessonNames ?? [],
       settings: game.settings ?? {},
+      teacherId: game.teacherId,
+      status: game.status,
+      playerUserIds: game.players?.map((p) => p.userId).filter((id): id is string => !!id),
     };
   } catch (err) {
     logger.error('lookupLiveClassroomGame failed:', err);

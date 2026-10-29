@@ -49,7 +49,9 @@ vi.mock('@/hooks/useTeacherPro', () => ({
   useTeacherPro: () => ({ hasPro: false, loading: false }),
 }));
 
-import { ClassroomTvResults } from '../ClassroomTvResults';
+vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => ({ hasPro: true, loading: false }) }));
+vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
+import EduHostResults from '@/components/education/live/EduHostResults';
 import { ClassroomResultsCard } from '../../ClassroomResultsCard';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 import { roundEndTimeline } from '@/lib/education/roundEndStage';
@@ -105,21 +107,21 @@ describe('the end of a round makes exactly one sound', () => {
   });
 
   it('plays the sweep chime ALONE on the projector when the class swept', async () => {
-    render(<ClassroomTvResults summary={summary(4)} onRematch={() => {}} t={t} />);
+    render(<EduHostResults summary={summary(4)} onRematch={() => {}} t={t} />);
     await playOutTheReveal();
     expect(playRoundEndCue).toHaveBeenCalledTimes(1);
     expect(playRoundEndCue.mock.calls[0][0]).toBe('/sounds/education-class-sweep.mp3');
   });
 
   it('still plays the winner sting on the projector when the class did not sweep', async () => {
-    render(<ClassroomTvResults summary={summary(2)} onRematch={() => {}} t={t} />);
+    render(<EduHostResults summary={summary(2)} onRematch={() => {}} t={t} />);
     await playOutTheReveal();
     expect(playRoundEndCue).toHaveBeenCalledTimes(1);
     expect(playRoundEndCue.mock.calls[0][0]).toBe('/sounds/education-round-win.mp3');
   });
 
   it('never stacks two confetti bursts on one screen', async () => {
-    render(<ClassroomTvResults summary={summary(4)} onRematch={() => {}} t={t} />);
+    render(<EduHostResults summary={summary(4)} onRematch={() => {}} t={t} />);
     await playOutTheReveal();
     expect(fireRankConfetti).not.toHaveBeenCalled();
     expect(fireVictoryConfetti).toHaveBeenCalledTimes(1);

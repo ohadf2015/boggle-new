@@ -21,7 +21,7 @@ import {
 import { Swords, BookOpen } from 'lucide-react';
 import { AssignmentWordcraftOption } from './AssignmentWordcraftOption';
 import { contentLanguagesFor } from '@/components/education/pickers/ContentLanguageChips';
-import { lessonSeedSupportsLanguage } from '@/lib/wordTower/lessonSeed';
+import { wordCraftHomeworkSupports } from '@/lib/word-craft/lessonBag';
 import { AssignmentCreatorDueDate, assignmentSubmitHintKey } from './AssignmentCreatorDueDate';
 import { AssignmentStep } from './AssignmentStep';
 import { AssignmentLessonStep } from './AssignmentLessonStep';
@@ -127,7 +127,7 @@ export default function AssignmentCreator({
   const contentLanguage: Language = galleryLanguage ?? selectedLesson?.language ?? classroomLanguage;
   const contentLanguages = useMemo(() => contentLanguagesFor(classroomLanguage, lessons.map((l) => l.language)), [classroomLanguage, lessons]);
   const galleryTemplates = useMemo(() => assignmentTemplatesFor(contentLanguage), [contentLanguage]);
-  const wordcraftOk = !selectedLesson || lessonSeedSupportsLanguage(selectedLesson.language ?? 'en');
+  const wordcraftOk = !selectedLesson || wordCraftHomeworkSupports(selectedLesson.language ?? 'en');
   useEffect(() => {
     if (!wordcraftOk) setSelectedType((type) => (type === 'wordcraft' ? 'practice' : type));
   }, [wordcraftOk]);

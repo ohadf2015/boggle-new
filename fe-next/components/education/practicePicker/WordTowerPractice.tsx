@@ -31,7 +31,7 @@ import { ArrowLeft, Check, Blocks } from 'lucide-react';
 import type { Language } from '@/shared/types/game';
 import { WORD_TOWER_MIN_WORD_LEN } from '@/shared/constants/wordTowerConstants';
 import { loadWordCraftDictionary } from '@/lib/word-craft/dictionary';
-import type { SupportedLocale } from '@/lib/word-craft/tileBag';
+import { hasWordCraftBag } from '@/lib/word-craft/tileBag';
 import { useWordTower } from '@/lib/wordTower/useWordTower';
 import { initWordTowerState } from '@/lib/wordTower/wordTowerManager';
 import { WordTowerWheel } from '@/components/wordTower/WordTowerWheel';
@@ -42,9 +42,6 @@ import {
   nextLessonTarget,
   LESSON_HIT_POINTS,
 } from '@/lib/wordTower/lessonSeed';
-
-/** Locales the Word Craft dictionary ships — see `lessonSeedSupportsLanguage`. */
-const DICTIONARY_LOCALES: SupportedLocale[] = ['en', 'he', 'sv', 'es', 'ja'];
 
 /** Wheel glow colour. Cosmetic only — the wheel takes a raw hex, not a token. */
 const ACCENT_HEX = '#22D3EE';
@@ -105,10 +102,7 @@ function WordTowerRun({
   useEffect(() => {
     if (!seeded) return;
     let live = true;
-    const locale = DICTIONARY_LOCALES.includes(language as SupportedLocale)
-      ? (language as SupportedLocale)
-      : 'en';
-    loadWordCraftDictionary(locale)
+    loadWordCraftDictionary(hasWordCraftBag(language) ? language : 'en', { exact: true })
       .then((loaded) => {
         if (live) setDict(loaded);
       })

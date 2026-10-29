@@ -371,8 +371,8 @@ export function useJoinFlow(
             // A problem the student can fix in a single tap should cost them a single tap.
             setSuggestedName(result.suggestedName ?? null);
             setNameError(true);
-          } else if (failure.effect === 'full') {
-            setFormErrorKey('education.student.join.classroomFull');
+          } else if (failure.formErrorKey) {
+            setFormErrorKey(failure.formErrorKey);
           } else if (failure.effect === 'ended') {
             setEnded(true);
           } else if (failure.effect === 'invalid_code') {

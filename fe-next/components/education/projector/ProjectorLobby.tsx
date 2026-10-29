@@ -13,6 +13,7 @@ import ProjectorJoinPanel from './ProjectorJoinPanel';
 import ProjectorRoster, { type ProjectorStudent } from './ProjectorRoster';
 import { ProjectorModeCard } from './ProjectorModeCard';
 import { ProjectorStartBar } from './ProjectorStartBar';
+import { ProjectorLobbyLock } from './ProjectorLobbyLock';
 import { useProjectorLobbyMode } from './useProjectorLobbyMode';
 
 export interface ProjectorLobbyProps {
@@ -152,6 +153,7 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
             onStartPracticeRound={onStartPracticeRound}
             practiceRoundPending={practiceRoundPending}
             practiceRoundFailed={practiceRoundFailed}
+            lockSlot={<ProjectorLobbyLock gameCode={gameCode} t={t} className="@5xl:shrink-0" />}
             style={delay(4)}
             className="@5xl:row-start-3"
           />

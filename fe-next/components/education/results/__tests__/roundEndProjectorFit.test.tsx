@@ -1,25 +1,4 @@
-/**
- * The projector recap has to FIT THE WALL.
- *
- * Round 2's verdict was that nobody ever saw the celebration — the projector
- * lobby painted over it. That is fixed (`classroomResultsAboveLobby.test.ts`),
- * and the live probe now holds the screen for forty-five uninterrupted seconds.
- * Which immediately exposed the next thing: at 1280x633 the recap measured
- * `scrollHeight 1202` against `clientHeight 595`. The podium was on the wall
- * and REMATCH — the screen's one action, and the reason a class plays round
- * four — was a thousand pixels below it, behind a scroll gesture nobody makes
- * on a projector.
- *
- * A wall is not a page. Nothing on it scrolls, because nobody is holding it.
- * So the recap is a fixed two-column grid: the podium and the winner on the
- * left, the class's coverage and the one button on the right, and the ONLY
- * region allowed to overflow is the list of words to reteach.
- *
- * jsdom has no layout, so these assert the STRUCTURE that makes fitting
- * possible — the invariants a CSS change would have to break on its way to
- * putting the button off-screen again — not the pixel heights themselves. The
- * heights were measured in a real browser; see the summary.
- */
+/** Plinths, the coverage list and round-end text contrast on the projector; the wall's own layout is pinned in EduHostResults.layout. */
 
 import { readFileSync } from 'fs';
 import { join } from 'path';
@@ -46,7 +25,9 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-import { ClassroomTvResults } from '../ClassroomTvResults';
+vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => ({ hasPro: true, loading: false }) }));
+vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
+import EduHostResults from '@/components/education/live/EduHostResults';
 import { WordCoverageGlance } from '../WordCoverageGlance';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 
@@ -76,48 +57,6 @@ const bigSummary = (foundCount: number): ClassroomSummary => ({
   ],
 });
 
-describe('the projector recap fits the wall', () => {
-  beforeEach(() => window.sessionStorage.clear());
-  afterEach(cleanup);
-
-  it('locks its own root on the wall — a wall has no scrollbar and nobody to drag one', () => {
-    // Below lg the recap is one column on a teacher's phone (classroom rooms
-    // are always TV mode), so the root scrolls there; at lg it is the wall.
-    // See `classroomTvPhoneLayout.test.tsx`.
-    render(<ClassroomTvResults summary={bigSummary(0)} onRematch={() => {}} t={t} />);
-    const root = screen.getByTestId('classroom-tv-results').className.split(/\s+/);
-    expect(root).toContain('lg:overflow-hidden');
-  });
-
-  it('allows exactly one scrolling region, and it is the reteach list', () => {
-    const { container } = render(
-      <ClassroomTvResults summary={bigSummary(0)} onRematch={() => {}} t={t} />
-    );
-    // On the wall (lg+): a root that scrolls only below lg is not a scroller.
-    // Nor is the "More" popover: it lives inside a closed <details>, floats
-    // OVER the wall only when the teacher opens it, and caps its own height so
-    // it can never run off-screen — an overlay, not a region of the wall.
-    const scrollers = Array.from(container.querySelectorAll<HTMLElement>('[class]')).filter((el) => {
-      const cls = (el.getAttribute('class') ?? '').split(/\s+/);
-      if (el.closest('[data-testid="reteach-more-panel"]')) return false;
-      return cls.includes('overflow-y-auto') && !cls.includes('lg:overflow-hidden');
-    });
-    expect(scrollers).toHaveLength(1);
-    expect(scrollers[0].getAttribute('data-testid')).toBe('coverage-words');
-  });
-
-  it('keeps REMATCH out of that scroller — the one action is always on the wall', () => {
-    render(<ClassroomTvResults summary={bigSummary(0)} onRematch={() => {}} t={t} />);
-    const rematch = screen.getByTestId('classroom-tv-rematch');
-    expect(rematch.closest('[data-testid="coverage-words"]')).toBeNull();
-  });
-
-  it('splits the wall into two columns so 16:9 is used across, not down', () => {
-    render(<ClassroomTvResults summary={bigSummary(0)} onRematch={() => {}} t={t} />);
-    expect(screen.getByTestId('tv-recap-columns').className).toMatch(/grid-cols-/);
-  });
-});
-
 describe('a plinth grows for its own content rather than clipping it', () => {
   afterEach(cleanup);
 
@@ -132,7 +71,7 @@ describe('a plinth grows for its own content rather than clipping it', () => {
    */
   it('sets a minimum height, never a fixed one', () => {
     render(
-      <ClassroomTvResults
+      <EduHostResults
         summary={{
           ...bigSummary(0),
           podium: [
@@ -152,7 +91,7 @@ describe('a plinth grows for its own content rather than clipping it', () => {
 
   it('still steps the three plinths — first is tallest', () => {
     render(
-      <ClassroomTvResults
+      <EduHostResults
         summary={{
           ...bigSummary(0),
           podium: [

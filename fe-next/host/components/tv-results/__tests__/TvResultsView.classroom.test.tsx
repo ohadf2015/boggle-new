@@ -12,7 +12,7 @@
  * invisible on the only screen the room was looking at.
  */
 
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import TvResultsView from '../TvResultsView';
 import type { ClassroomSummary } from '@/shared/types/classroom';
@@ -41,10 +41,14 @@ vi.mock('lucide-react', () => ({
   ArrowUp: () => null,
 }));
 
-vi.mock('@/components/education/results/ReteachActions', () => ({
-  default: () => null,
-  ReteachActions: () => null,
-}));
+vi.mock('@/components/education/live/EduHostResults', () => {
+  const Stub = ({ summary, onRematch }: { summary: ClassroomSummary; onRematch?: () => void }) => (
+    <button type="button" data-testid="edu-host-results-stub" onClick={onRematch}>
+      {summary.lessonNames.join(',')}
+    </button>
+  );
+  return { default: Stub, EduHostResults: Stub };
+});
 
 // Every heavy child is stubbed: this file is about WHICH results surface the
 // projector picks, not what each one draws.
@@ -127,58 +131,18 @@ const baseProps = {
 };
 
 describe('TvResultsView — the classroom projector', () => {
-  it('stages the classroom podium, not the arcade one, when the round was a lesson', () => {
-    render(<TvResultsView {...baseProps} classroomSummary={summary} />);
-    expect(screen.getByTestId('classroom-tv-results')).toBeInTheDocument();
+  it('hands a lesson round to the edu host results, not the arcade podium', () => {
+    const onStartNewGame = vi.fn();
+    render(<TvResultsView {...baseProps} onStartNewGame={onStartNewGame} classroomSummary={summary} />);
+    expect(screen.getByTestId('edu-host-results-stub')).toHaveTextContent('Physics 101');
     expect(screen.queryByTestId('generic-arcade-podium')).not.toBeInTheDocument();
-  });
-
-  // The plinths are painted from the first frame; the NAMES land on the
-  // reveal's timetable (third, second, a beat, the winner). Both halves of that
-  // are asserted here, because a reveal that ever leaves the wall blank is the
-  // exact bug that froze this podium static in the first place.
-  it('has the plinths on the wall before any name is revealed', () => {
-    render(<TvResultsView {...baseProps} classroomSummary={summary} />);
-    expect(screen.getByTestId('podium-place-1')).toBeInTheDocument();
-    expect(screen.getByTestId('podium-place-2')).toBeInTheDocument();
-  });
-
-  it('names the winners on the plinths so the room reads them from the back', async () => {
-    render(<TvResultsView {...baseProps} classroomSummary={summary} />);
-    await waitFor(
-      () => expect(screen.getByTestId('podium-place-1')).toHaveTextContent('Maya'),
-      { timeout: 4000 }
-    );
-    expect(screen.getByTestId('podium-place-1')).toHaveTextContent('90');
-  });
-
-  /**
-   * The meter is the class's number and stays. The chip list no longer prints
-   * the words that went RIGHT: a wall read from the back of a room wants the
-   * short list of what to do next, not a register of thirty greens, and on a
-   * thirty-word lesson that register is what pushed REMATCH off the screen.
-   * The phone card still lists everything — see `roundEndProjectorFit`.
-   */
-  it('shows the class word coverage on the same screen', () => {
-    render(<TvResultsView {...baseProps} classroomSummary={summary} />);
-    expect(screen.getByTestId('coverage-meter')).toHaveAttribute('aria-valuenow', '2');
-    expect(screen.queryByTestId('lesson-word-photon')).not.toBeInTheDocument();
-  });
-
-  it('does not blame the class for a word the board never carried', () => {
-    render(<TvResultsView {...baseProps} classroomSummary={summary} />);
-    expect(screen.getByTestId('lesson-word-quark')).toHaveAttribute('data-placed', 'false');
-    expect(screen.getByTestId('lesson-word-neutron')).toHaveAttribute('data-placed', 'true');
-  });
-
-  it('offers the teacher one tap to run it again', () => {
-    render(<TvResultsView {...baseProps} classroomSummary={summary} />);
-    expect(screen.getByTestId('classroom-tv-rematch')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('edu-host-results-stub'));
+    expect(onStartNewGame).toHaveBeenCalledTimes(1);
   });
 
   it('leaves an ordinary arcade room exactly as it was', () => {
     render(<TvResultsView {...baseProps} />);
     expect(screen.getByTestId('generic-arcade-podium')).toBeInTheDocument();
-    expect(screen.queryByTestId('classroom-tv-results')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('edu-host-results-stub')).not.toBeInTheDocument();
   });
 });

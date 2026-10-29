@@ -20,6 +20,7 @@ import { cefrLessonPack, type CefrLevel } from '@/lib/education/eslCefrDemo';
 import { VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
 import { getPresetValues, applyVocabularyCap, type ClassroomPresetId } from '@/lib/education/classroomPresets';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
+import { launchPressure } from './lobby/pressureAccess';
 import { useRecentGameSettings } from '@/hooks/useRecentGameSettings';
 import { configuredRoundMinutes, recommendedModeBadge } from '@/lib/education/gameModes';
 import { launchOf, type ClassroomCatalogueId } from '@/lib/education/classroomCatalogueId';
@@ -106,7 +107,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
   const { runSession, pending: sessionPending } = useSessionRun({
     isLoading, lessons, setSelectedLessonIds, createLessonFromPack, opts, setPickedGameMode, sessionPack, initialPreset, initialMinutes,
   });
-  const { hasPro: hasTeacherPro } = useTeacherPro();
+  const { hasPro: hasTeacherPro, loading: proLoading, accessTrialExpires } = useTeacherPro();
   const warmup = useLobbyWarmup({ classroomId: selectedClassroomId, lessonId: selectedLessonIds[0] ?? null, teacherId: user?.id ?? null, source: 'lobby' });
   const { saveConfig } = useRecentGameSettings();
 
@@ -220,15 +221,14 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
           playStyle,
           teamCount,
           accessibility,
-          // Absent for a free teacher: the loud default is the free tier.
-          pressure: hasTeacherPro ? opts.pressure : undefined,
+          pressure: launchPressure({ hasPro: hasTeacherPro, loading: proLoading, accessTrialExpires }, opts.pressure, Date.now()),
         }),
         quick ? 'hq_express' : 'create_room'
       );
     },
     [
       user, profile, classroom, selectedClassroomId, selectedLessonIds, selectedLessons, allPlayableWords, gameCode,
-      language, t, launch, saveConfig, setStartError, opts, hasTeacherPro, quizPlayable, lessonLanguage, wordcraftOk, quick,
+      language, t, launch, saveConfig, setStartError, opts, hasTeacherPro, proLoading, accessTrialExpires, quizPlayable, lessonLanguage, wordcraftOk, quick,
     ]
   );
 

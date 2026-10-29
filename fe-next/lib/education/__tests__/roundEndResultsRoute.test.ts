@@ -166,25 +166,11 @@ describe('projectorRecapShowsTeacherFollowUp — the wall the host actually pres
   });
 });
 
-describe('the projector file mounts the shared actions, and the student card does not change', () => {
-  const wall = readFileSync(
-    join(__dirname, '../../../components/education/results/ClassroomTvResults.tsx'),
-    'utf8',
-  );
+describe('the student card does not change', () => {
   const card = readFileSync(
     join(__dirname, '../../../components/education/ClassroomResultsCard.tsx'),
     'utf8',
   );
-
-  it('reuses ReteachActions and ResultsPrimaryActions on the wall — no second copy', () => {
-    expect(wall).toContain('projectorRecapShowsTeacherFollowUp');
-    expect(wall).toContain('<ReteachActions');
-    expect(wall).toContain('<ResultsPrimaryActions');
-    expect(wall).toContain('surface="projector"');
-    expect(wall).not.toMatch(/function ReteachActions/);
-    // Rematch already has its own button on this wall.
-    expect(wall).not.toMatch(/<ResultsPrimaryActions[^>]*onRematch/);
-  });
 
   it('still gates the phone card on isTeacher, so a student phone does not grow the ask', () => {
     expect(card).toContain('{isTeacher && (\n        <ResultsPrimaryActions');

@@ -13836,7 +13836,14 @@ const en = {
       "rehearseBotsBlocked": "Bots can't play this game, so you can't rehearse it with them.",
       "rehearseUseClassic": "Rehearse with Classic instead",
       "lateJoinOn": "Late join on",
-      "lateJoinOff": "Late join off"
+      "lateJoinOff": "Late join off",
+      "lock": {
+        "cta": "Lock room",
+        "locked": "Locked",
+        "ctaHint": "Stop new players from joining",
+        "lockedHint": "No one new can join. Tap to let them in again.",
+        "failed": "Couldn't change the lock. Try again."
+      }
     },
     "errors": {
       "serverUnavailable": "We can't reach the class list right now. This is on our side, not yours. Try again in a moment."
@@ -15490,7 +15497,12 @@ const en = {
         },
         "subtitle": "Enter your teacher's code",
         "success": "You're in!",
-        "title": "Join a class"
+        "title": "Join a class",
+        "roomLocked": {
+          "title": "This room is locked",
+          "hint": "Ask your teacher to unlock it, then try again.",
+          "retry": "Try again"
+        }
       },
       "classroomRoomGone": "Your class game ended. Ask your teacher to start a new one.",
       "gameEnded": {
@@ -20166,7 +20178,7 @@ const en = {
       "joinAt": "Join at",
       "joined": "{count} joined",
       "waitingTitle": "Waiting for students",
-      "waitingHint": "Scan the QR or type the code at the address above",
+      "waitingHint": "Scan the QR or type the code to join",
       "startBlocked": "Start opens once a student joins",
       "phoneTestCta": "Try it on your phone first",
       "phoneTestHint": "Scan with your own phone to see what students see. It's a test seat and doesn't count as a student.",
@@ -20293,7 +20305,23 @@ const en = {
       "playWith": "Start a game with {name}",
       "showCode": "Show code",
       "showCodeFor": "Show the join code for {name}",
-      "reviewTitle": "Practise the missed words"
+      "reviewTitle": "Practise the missed words",
+      "rail": {
+        "run": "Run",
+        "seeAll": "See all",
+        "language": "Session language"
+      },
+      "cue": {
+        "first": "First game? A 5-minute warm-up is the easy start.",
+        "closeOut": "You played today. Close the lesson with a 3-minute exit ticket?",
+        "season": {
+          "school": "Back-to-school words are ready. Up for a 5-minute warm-up?",
+          "autumn": "Autumn words are ready. Up for a 5-minute warm-up?",
+          "winter": "Winter words are ready. Up for a 5-minute warm-up?",
+          "spring": "Spring words are ready. Up for a 5-minute warm-up?",
+          "summer": "Summer words are ready. Up for a 5-minute warm-up?"
+        }
+      }
     },
     "week": {
       "title": "This week",
@@ -20301,7 +20329,8 @@ const en = {
       "students": "Total students",
       "active": "Classes active",
       "empty": "Your numbers show up here after your first game.",
-      "unavailable": "Couldn't load this week's numbers. They'll be back on the next visit."
+      "unavailable": "Couldn't load this week's numbers. They'll be back on the next visit.",
+      "quiet": "Quiet week so far. One short round wakes it up."
     },
     "insight": {
       "title": "Insight of the visit",

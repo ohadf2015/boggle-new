@@ -6,10 +6,11 @@ import logger from '@/utils/logger';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { canAddStudent } from '@/lib/subscriptions';
 import { foldJoinCode } from '@/lib/education/joinCodeInput';
+import { ROOM_LOCKED } from '@/shared/types/classroomLobbyLock';
 
 /**
  * POST /api/education/guest-name  { name, joinCode? }
- *   → 200 { available: true }  |  409 { code: 'NAME_TAKEN', suggestedName }
+ *   → 200 { available: true }  |  409 { code: 'NAME_TAKEN', suggestedName }  |  423 { code: 'ROOM_LOCKED' }
  *
  * Answers one question: is this display name already used by someone in THIS
  * classroom?
@@ -82,6 +83,10 @@ export async function POST(request: Request) {
     } else {
       try {
         const liveGame = await lookupLiveClassroomGame(joinCode);
+        // A guest has no seat to keep, so any locked lobby refuses them before an account exists.
+        if (liveGame?.settings?.lobbyLocked && liveGame.status !== 'playing') {
+          return NextResponse.json({ code: ROOM_LOCKED }, { status: 423 });
+        }
         if (liveGame?.classroomId) {
           classroomId = liveGame.classroomId;
         }

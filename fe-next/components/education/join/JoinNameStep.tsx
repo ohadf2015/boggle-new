@@ -7,6 +7,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { pickFunName } from './funName';
 import { JoinAlert } from './JoinAlert';
+import { JoinRoomLocked } from './JoinRoomLocked';
+import { ROOM_LOCKED_KEY } from './joinFailure';
 import { JoinPrimaryButton } from './JoinPrimaryButton';
 import { useKeepInView } from './useKeepInView';
 import type { JoinFlowState } from './useJoinFlow';
@@ -157,7 +159,11 @@ export function JoinNameStep({ flow, nameRef, goRef }: JoinNameStepProps) {
           </div>
         )}
 
-        {formError && !flow.suggestedName && <JoinAlert>{t(formError)}</JoinAlert>}
+        {formError === ROOM_LOCKED_KEY ? (
+          <JoinRoomLocked onRetry={() => flow.submit()} busy={flow.isSubmitting} />
+        ) : (
+          formError && !flow.suggestedName && <JoinAlert>{t(formError)}</JoinAlert>
+        )}
 
         <JoinPrimaryButton ref={goRef} disabled={!flow.canSubmit} className="text-2xl lg:text-3xl">
           <Sparkles aria-hidden="true" className="size-6" />

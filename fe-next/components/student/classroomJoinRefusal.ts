@@ -6,6 +6,7 @@ export const CLASSROOM_JOIN_REFUSAL_KEYS = {
   busy: 'student.activeGame.joinBusy',
   full: 'student.activeGame.joinFull',
   removed: 'student.activeGame.joinRemoved',
+  locked: 'education.student.join.roomLocked.hint',
   retry: 'student.activeGame.joinRetry',
 } as const;
 
@@ -26,6 +27,7 @@ const REASON_BY_CODE: Record<string, ClassroomJoinRefusalReason> = {
   GAME_FULL: 'full',
   PLAYER_KICKED: 'removed',
   PLAYER_BLOCKED: 'removed',
+  ROOM_LOCKED: 'locked',
 };
 
 export function classifyClassroomJoinRefusal(

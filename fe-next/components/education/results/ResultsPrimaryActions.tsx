@@ -52,8 +52,6 @@ export interface ResultsPrimaryActionsProps {
   surface?: ResultsSurface;
   /** Presentation only — see `UnlockReportUpgradeCta`'s `tone`. */
   tone?: 'default' | 'quiet';
-  /** After a bot-only practice round there is no class report to sell. */
-  hideUpgrade?: boolean;
   /** Passed through to the upgrade CTA so it can name the missed words. */
   missedCount?: number;
 }
@@ -64,12 +62,11 @@ export function ResultsPrimaryActions({
   t,
   surface = 'teacher_card',
   tone = 'default',
-  hideUpgrade = false,
   missedCount = 0,
 }: ResultsPrimaryActionsProps) {
   const { hasPro, loading } = useTeacherPro();
   const canOpenReport = hasPro && !loading;
-  const showUpgrade = !loading && !hasPro && !hideUpgrade;
+  const showUpgrade = !loading && !hasPro;
 
   if (!onRematch && !canOpenReport && !showUpgrade) return null;
 

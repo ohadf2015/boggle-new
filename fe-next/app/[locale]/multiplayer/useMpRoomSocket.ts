@@ -209,6 +209,12 @@ export function useMpRoomSocket(ctx: MpRoomSocketContext) {
       const kind = classifyRoomError(data);
       // Same code derivation as the 'gone' branch below: both state values can be empty on a cold invite load.
       if (kind === 'notOpen') { setError(''); roomWait.hold(gameCode || prefilledRoomCode || (typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('room') ?? '' : '')); return; }
+      if (kind === 'locked') {
+        setError(t('education.student.join.roomLocked.title'));
+        toast.error(`${t('education.student.join.roomLocked.title')}\n${t('education.student.join.roomLocked.hint')}`, { duration: 5000, icon: '🔒', id: MP_TOAST_IDS.joinError });
+        setIsActive(false); setAttemptingReconnect(false); setShouldAutoJoin(false); clearSessionPreservingUsername();
+        return;
+      }
       if (kind === 'gone') {
         // Snapshot identity BEFORE handleRoomGone's resets clear it: the dead-
         // invite toast needs the room code, and `cameFromInvite` is derived

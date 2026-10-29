@@ -101,4 +101,10 @@ describe('classifyRoomError', () => {
       expect(classifyRoomError(null)).toBe('generic');
     });
   });
+
+  describe('teacher locked the room', () => {
+    it('classifies ROOM_LOCKED as locked, not gone or generic', () => {
+      expect(classifyRoomError({ code: 'ROOM_LOCKED', message: 'This room is locked' })).toBe('locked');
+    });
+  });
 });

@@ -42,7 +42,9 @@ import { ResultsPodium } from '../ResultsPodium';
 import { WinnerSpotlight } from '../WinnerSpotlight';
 import { WordCoverageGlance } from '../WordCoverageGlance';
 import { StudentRoundOutcome } from '../StudentRoundOutcome';
-import { ClassroomTvResults } from '../ClassroomTvResults';
+vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => ({ hasPro: true, loading: false }) }));
+vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
+import EduHostResults from '@/components/education/live/EduHostResults';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 
 const t = (key: string, params?: Record<string, string | number>) =>
@@ -134,7 +136,7 @@ describe('round-end surfaces never rely on border-neo surviving cn()', () => {
 
   it('paints an explicit border width on the projector rematch button', () => {
     const { container } = render(
-      <ClassroomTvResults summary={summary} onRematch={() => {}} t={t} />
+      <EduHostResults summary={summary} onRematch={() => {}} t={t} />
     );
     expect(borderlessControls(container)).toEqual([]);
   });

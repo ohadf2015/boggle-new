@@ -145,14 +145,14 @@ describe('Teacher Home', () => {
     expect(screen.getByTestId('home-week-games')).toHaveTextContent('—');
   });
 
-  it('Given a free teacher with a trial offer, Then exactly one Pro card sits in the rail, and the plan pill is quiet', async () => {
+  it('Given a free teacher with a trial offer, Then exactly one compact Pro strip sits in the rail, and the plan pill is quiet', async () => {
     const onDismiss = vi.fn();
     render(<TeacherDashboard proOffer={{ kind: 'trial', onDismiss, tracked: true }} />);
     const card = screen.getByTestId('home-pro-card');
     expect(screen.getAllByTestId('home-pro-card')).toHaveLength(1);
     expect(card.closest('aside')).not.toBeNull();
     expect(within(card).getByTestId('home-pro-cta')).toHaveTextContent('Start your 14-day Teacher Pro trial');
-    expect(within(card).getAllByRole('listitem')).toHaveLength(3);
+    expect(within(card).queryAllByRole('listitem')).toHaveLength(0);
     within(card).getByTestId('home-pro-dismiss').click();
     expect(onDismiss).toHaveBeenCalled();
   });

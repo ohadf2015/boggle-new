@@ -4,7 +4,7 @@
  * The /education/live projector at round end: its own screen (the rebuild gives the live route its own
  * lobby and results), built from the shared round-end pieces: the staged podium, the winner bar, the
  * class's numbers, the words still to teach, the boss verdict, the "See who struggled" Pro preview and the
- * Teacher Pro trial / school quote card.
+ * Teacher Pro trial / school quote card (never after a bots-only practice round).
  * Mounts only in the host tree, so no student sees the report or the upsell; z-[75] clears the lobby's
  * z-[65]. Dark-only and painted from frame one: the reveal only swaps what is written inside (Class 5).
  * One primary (reteach when the class missed words, else Play again), at most three quiet secondaries,
@@ -33,6 +33,8 @@ import { useRoundEndReveal } from '@/components/education/results/useRoundEndRev
 import { useIsPhoneRecap } from '@/components/education/results/useIsPhoneRecap';
 import { buildTvRecap } from '@/components/education/results/tvRecapModel';
 import { trackResultsAction } from '@/components/education/results/trackResultsAction';
+import { isPracticeRound } from '@/components/education/results/isPracticeRound';
+import { useOverlayQuietZoneClaim } from '@/lib/overlayQuietZone';
 import { isRevealed } from '@/lib/education/roundEndStage';
 import { classSwept } from '@/lib/education/roundEndSweep';
 import { useSearchParams } from 'next/navigation';
@@ -114,6 +116,7 @@ function Actions({ t, onRematch, onClose, onExitRoom, reteach }: ActionsProps) {
 
 export function EduHostResults({ summary, players, t, onRematch, onClose, onExitRoom, gameCode: roomCode, socket }: ClassroomTvResultsScreenProps) {
   const { language } = useLanguage();
+  useOverlayQuietZoneClaim(true, 'classroom-host-results');
   const phone = useIsPhoneRecap();
   const { podium, outcome, landed, stats } = buildTvRecap(summary, players, t);
   const bossStatus = useClassroomBossStore((s) => s.view?.status);
@@ -222,7 +225,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
                 <StrugglePreview masteryByPlayer={summary.masteryByPlayer ?? {}} teacherName={summary.teacherName ?? ''} language={language} t={t} />
               </div>
             )}
-            {!proLoading && !hasPro && <ResultsTeacherProTrialCard language={language} />}
+            {!proLoading && !hasPro && !isPracticeRound(players) && <ResultsTeacherProTrialCard language={language} />}
             {!proLoading && hasPro && showTeacherInvite(outcome.celebrate, students) && (
               <TeacherInviteNudge students={students} language={language} whatsapp={phone} t={t} />
             )}

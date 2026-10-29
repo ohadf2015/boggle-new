@@ -6,7 +6,8 @@ import { z } from 'zod';
 import logger from '@/utils/logger';
 import { canAddStudent } from '@/lib/subscriptions';
 import { captureStudentJoinEvents } from '@/lib/education/joinTelemetry';
-import { lookupLiveClassroomGame } from '@/lib/education/classroomGameLookup';
+import { lookupLiveClassroomGame, type LiveClassroomGame } from '@/lib/education/classroomGameLookup';
+import { ROOM_LOCKED } from '@/shared/types/classroomLobbyLock';
 import { lookupLiveGameForClassroom } from '@/lib/education/liveGameForClassroom';
 import { lookupEndedClassroomSession, recordEndedCodeTry } from './endedSessionCode';
 import { guestSignInData, joinMissBudgetSpent, joinRateLimited, recordJoinMiss, sanitizeGuestName } from './joinGuards';
@@ -27,6 +28,7 @@ const joinClassroomSchema = z.object({
  * - 400: Invalid input or classroom not found
  * - 401: Unauthorized
  * - 403: Classroom at student limit (error code: STUDENT_LIMIT_REACHED)
+ * - 423: Live game typed from the projector has a locked lobby (code: ROOM_LOCKED)
  * - 200: Already a member (idempotent — an earlier version of this comment claimed 409,
  *        which no branch below ever returns; callers treat a re-join as a success)
  * - 500: Server error
@@ -122,6 +124,9 @@ export async function POST(request: NextRequest) {
     if (!classroom) {
       try {
         const game = await lookupLiveClassroomGame(normalizedCode);
+        if (game && isLockedOut(game, userId)) {
+          return NextResponse.json({ error: 'Room locked', code: ROOM_LOCKED }, { status: 423 });
+        }
         if (game) {
           classroom = { id: game.classroomId };
           liveGameCode = normalizedCode;
@@ -167,6 +172,9 @@ export async function POST(request: NextRequest) {
     if (!liveGameCode) {
       try {
         liveGameCode = await lookupLiveGameForClassroom(classroom.id);
+        // Enrolment is not a seat: a locked lobby still takes the student onto the roster, just not into the room.
+        const live = liveGameCode ? await lookupLiveClassroomGame(liveGameCode) : null;
+        if (live && isLockedOut(live, userId)) liveGameCode = null;
       } catch (liveGameError) {
         // Enrolment is the thing that must not be lost. A student on the roster with
         // no room can be walked in by the banner; a student refused outright cannot.
@@ -266,6 +274,14 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+/** Restates backend `isRecordJoinLockedOut` (its module cannot be bundled by webpack): lobby-only, teacher and seated players exempt. */
+function isLockedOut(game: LiveClassroomGame, userId: string | undefined): boolean {
+  if (!game.settings?.lobbyLocked || game.status === 'playing') return false;
+  if (!userId) return true;
+  if (userId === game.teacherId || game.playerUserIds?.includes(userId)) return false;
+  return !(game.settings.lobbyLockedSeats ?? []).includes(`a:${userId}`);
 }
 
 async function rehearsalSeat(

@@ -4,7 +4,7 @@
  * Captured defect (r5 notes, "Other observations"): after a round ended, a
  * click aimed at the projector lobby's "Change game" / "START GAME" failed
  * with `covered by <video>` and only a reload cleared it. The video was not
- * stuck — `ClassroomTvResultsScreen` is `fixed inset-0 z-[75]` and legitimately
+ * stuck — the projector results are `fixed inset-0 z-[75]` and legitimately
  * covers the lobby (`z-[65]`), and its ONLY affordance was REMATCH, which
  * replays the same mode. A teacher who wants a different game next round had
  * no way back. `pointer-events-none` on the mascot alone would not have fixed
@@ -30,6 +30,9 @@ vi.mock('@/lib/education/roundEndSound', () => ({
   ROUND_WIN_SOUND: '/sounds/education-round-win.mp3',
   CLASS_SWEEP_SOUND: '/sounds/education-class-sweep.mp3',
 }));
+
+vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => ({ hasPro: true, loading: false }) }));
+vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
@@ -71,28 +74,29 @@ describe('ClassroomTvResultsScreen — returning to the lobby', () => {
   it('offers a dismiss control that hands the room back to the lobby', () => {
     const onClose = vi.fn();
     render(<ClassroomTvResultsScreen summary={summary} onRematch={vi.fn()} onClose={onClose} t={t} />);
-    const dismiss = screen.getByTestId('classroom-tv-dismiss');
+    const dismiss = screen.getByTestId('edu-results-next-mode');
     fireEvent.click(dismiss);
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
   it('the dismiss reads as a control: a real border, not a ghost', () => {
     render(<ClassroomTvResultsScreen summary={summary} onClose={vi.fn()} t={t} />);
-    const cls = screen.getByTestId('classroom-tv-dismiss').className;
-    // A cream edge on navy measures 16.8:1; `border-neo` does not survive a
-    // cn() merge next to a colour class, so the width is written literally.
+    const cls = screen.getByTestId('edu-results-next-mode').className;
+    // `border-neo` does not survive a cn() merge next to a colour class, so the width is written literally.
     expect(cls).toMatch(/border-\[(2|3)px\]/);
     expect(cls).toMatch(/border-neo-cream/);
   });
 
   it('does not render a dismiss when the host has nowhere to go back to', () => {
     render(<ClassroomTvResultsScreen summary={summary} t={t} />);
-    expect(screen.queryByTestId('classroom-tv-dismiss')).toBeNull();
+    expect(screen.queryByTestId('edu-results-next-mode')).toBeNull();
   });
 
   it('keeps REMATCH as the one primary action', () => {
     render(<ClassroomTvResultsScreen summary={summary} onRematch={vi.fn()} onClose={vi.fn()} t={t} />);
-    expect(screen.getByTestId('classroom-tv-rematch')).toBeInTheDocument();
+    const primaries = document.querySelectorAll('[data-results-primary]');
+    expect(primaries).toHaveLength(1);
+    expect(screen.getByTestId('edu-results-next-mode')).not.toHaveAttribute('data-results-primary');
   });
 
   it('TvResultsView threads its own onClose into the classroom branch', () => {

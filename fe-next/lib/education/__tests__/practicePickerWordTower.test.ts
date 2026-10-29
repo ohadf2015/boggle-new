@@ -49,8 +49,13 @@ describe('word tower practice tile', () => {
   });
 
   it('is hidden for a language with no Word Tower wheel', () => {
-    const tile = tileOf(['светит', 'ночной', 'зрение', 'яркий'].map(w), 'ru');
+    const tile = tileOf([w('light'), w('night'), w('sight'), w('bright')], 'fr');
     expect(tile).toBeUndefined();
+  });
+
+  it('is ready for a Russian lesson', () => {
+    const tile = tileOf(['светит', 'ночной', 'зрение', 'яркий'].map(w), 'ru');
+    expect(tile?.ready).toBe(true);
   });
 
   it('shows no play count, because solo_board sessions are not split by variant', () => {

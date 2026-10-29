@@ -15757,7 +15757,14 @@ const sv = {
       "rehearseBotsBlocked": "Bottar kan inte spela det här spelet, så du kan inte repetera det med dem.",
       "rehearseUseClassic": "Repetera med Klassiskt i stället",
       "lateJoinOn": "Sen anslutning tillåten",
-      "lateJoinOff": "Sen anslutning stängd"
+      "lateJoinOff": "Sen anslutning stängd",
+      "lock": {
+        "cta": "Lås rummet",
+        "locked": "Låst",
+        "ctaHint": "Stoppa nya spelare från att gå med",
+        "lockedHint": "Ingen ny kan gå med. Tryck för att öppna igen.",
+        "failed": "Det gick inte att ändra låset. Försök igen."
+      }
     },
     "errors": {
       "serverUnavailable": "Vi når inte klasslistan just nu. Det är vårt fel, inte ditt. Försök igen om en liten stund."
@@ -17422,7 +17429,12 @@ const sv = {
         },
         "subtitle": "Skriv in din lärares kod",
         "success": "Du är med!",
-        "title": "Gå med i klassrummet"
+        "title": "Gå med i klassrummet",
+        "roomLocked": {
+          "title": "Rummet är låst",
+          "hint": "Be din lärare låsa upp det och försök sedan igen.",
+          "retry": "Försök igen"
+        }
       },
       "classroomRoomGone": "Klassens spel är slut. Be din lärare starta ett nytt.",
       "gameEnded": {
@@ -21120,7 +21132,7 @@ const sv = {
       "joinAt": "Gå med på",
       "joined": "{count} med",
       "waitingTitle": "Väntar på elever",
-      "waitingHint": "Skanna QR-koden eller skriv koden på adressen ovan",
+      "waitingHint": "Skanna QR-koden eller skriv in koden för att gå med",
       "startBlocked": "Start går att trycka på när en elev är med",
       "phoneTestCta": "Testa på din mobil först",
       "phoneTestHint": "Skanna med din egen mobil för att se vad eleverna ser. Det är en testplats och räknas inte som elev.",
@@ -21247,7 +21259,23 @@ const sv = {
       "playWith": "Starta ett spel med {name}",
       "showCode": "Visa kod",
       "showCodeFor": "Visa anslutningskoden för {name}",
-      "reviewTitle": "Öva på de missade orden"
+      "reviewTitle": "Öva på de missade orden",
+      "rail": {
+        "run": "Kör",
+        "seeAll": "Visa alla",
+        "language": "Språk för passet"
+      },
+      "cue": {
+        "first": "Första spelet? En uppvärmning på 5 minuter är en enkel start.",
+        "closeOut": "Ni har spelat i dag. Avsluta lektionen med en exit ticket på 3 minuter?",
+        "season": {
+          "school": "Skolstartsorden är redo. Sugen på en uppvärmning på 5 minuter?",
+          "autumn": "Höstorden är redo. Sugen på en uppvärmning på 5 minuter?",
+          "winter": "Vinterorden är redo. Sugen på en uppvärmning på 5 minuter?",
+          "spring": "Vårorden är redo. Sugen på en uppvärmning på 5 minuter?",
+          "summer": "Sommarorden är redo. Sugen på en uppvärmning på 5 minuter?"
+        }
+      }
     },
     "week": {
       "title": "Den här veckan",
@@ -21255,7 +21283,8 @@ const sv = {
       "students": "Elever totalt",
       "active": "Aktiva klasser",
       "empty": "Dina siffror visas här efter ert första spel.",
-      "unavailable": "Veckans siffror gick inte att hämta. De är tillbaka nästa gång."
+      "unavailable": "Veckans siffror gick inte att hämta. De är tillbaka nästa gång.",
+      "quiet": "Lugn vecka hittills. En kort runda väcker klassen."
     },
     "insight": {
       "title": "Dagens insikt",

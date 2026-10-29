@@ -12,11 +12,6 @@
  * `{score:110,rank:1,players:2}` and rendered no chip; after REMATCH, round 2
  * rendered "110 down on last round" and "Round 2 this session". These cases
  * pin exactly that sequence.
- *
- * NOTE on the projector: it deliberately has NO per-student delta. A wall
- * showing one child's "+40" in front of thirty is the opposite of what the
- * podium is for, so ClassroomTvResults takes only `roundNumber` and
- * `sweepStreak` from the same hook, under its own `::class` key.
  */
 import { render, screen, cleanup, waitFor } from '@testing-library/react';
 import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest';
@@ -34,7 +29,6 @@ vi.mock('@/lib/education/roundEndSound', () => ({
 }));
 
 import { ClassroomResultsCard } from '../../ClassroomResultsCard';
-import ClassroomTvResults from '../ClassroomTvResults';
 import { sessionKeyFor } from '@/lib/education/roundEndHistory';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 
@@ -134,28 +128,3 @@ describe('momentum reaches the student card', () => {
   });
 });
 
-describe('momentum reaches the projector, as a round counter', () => {
-  beforeEach(() => window.sessionStorage.clear());
-  afterEach(cleanup);
-
-  it('round 2 names the round on the wall', async () => {
-    seedPreviousRound(`${sessionKeyFor(summary)}::class`, 2, 0);
-    render(<ClassroomTvResults summary={summary} onRematch={() => {}} t={t} />);
-    expect((await screen.findByTestId('classroom-tv-round')).textContent).toContain('2');
-  });
-
-  it('round 1 names nothing', () => {
-    render(<ClassroomTvResults summary={summary} onRematch={() => {}} t={t} />);
-    expect(screen.queryByTestId('classroom-tv-round')).toBeNull();
-  });
-
-  it('the wall writes its own key, never the student card\'s', async () => {
-    render(<ClassroomTvResults summary={summary} onRematch={() => {}} t={t} />);
-    await waitFor(() =>
-      expect(window.sessionStorage.getItem(`${sessionKeyFor(summary)}::class`)).not.toBeNull(),
-    );
-    // A teacher device that renders both must not have them overwrite each
-    // other (Pitfall Class 1: one value, two writers).
-    expect(window.sessionStorage.getItem(sessionKeyFor(summary))).toBeNull();
-  });
-});

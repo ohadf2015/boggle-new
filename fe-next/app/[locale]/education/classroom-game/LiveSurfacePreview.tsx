@@ -6,7 +6,7 @@
  *
  *   /en/education/classroom-game?preview=podium     — alias of ?preview=hostresults (emulate reduced motion for the settled podium)
  *   /en/education/classroom-game?preview=projector  — the projector lobby, students popping in
- *   /en/education/classroom-game?preview=waiting    — a student's waiting-for-teacher stage
+ *   /en/education/classroom-game?preview=waiting    — a student's /education/live lobby
  *   (&count=N sets the projector roster size, default 12)
  *   ?preview=hostresults|phone|quiz|duel|ended — the round-end surfaces, see LiveResultsPreviews
  *   ?preview=ingame — the teacher's in-game projector mid-round
@@ -24,8 +24,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useNavigation } from '@/contexts/NavigationContext';
 import ProjectorLobby from '@/components/education/projector/ProjectorLobby';
 import Avatar from '@/components/Avatar';
-import { ClassroomWaitingStage } from '@/components/education/lobby/ClassroomWaitingStage';
-import { EducationHeader } from '@/components/education/EducationHeader';
+import { EduStudentLobby } from '@/components/education/live/EduStudentLobby';
 import { sampleProjectorStudents } from '@/components/education/results/previewFixtures';
 import { DuelPreview, EndedPreview, HostResultsPreview, PhoneResultsPreview, QuizPreview } from './LiveResultsPreviews';
 
@@ -78,14 +77,9 @@ function WaitingPreview() {
     return () => window.clearTimeout(id);
   }, [arrived, roster.length]);
   const classmates = roster.slice(0, arrived);
-  // Mirrors the real room (/multiplayer, classroom mode): EducationHeader sits
-  // above the stage and hosts MusicControls — the student's mute. Without it
-  // this z-[80] surface buried the global mute FAB and the preview showed a
-  // waiting room with no way to mute that the real one does not have.
   return (
     <div className="fixed inset-0 z-[80] flex flex-col bg-neo-navy">
-      <EducationHeader showBackButton title={t('education.classroomGame.title')} />
-      <ClassroomWaitingStage
+      <EduStudentLobby
         username="Maya"
         avatar={<Avatar userId="Maya" size="2xl" className="!h-full !w-full" />}
         onEditAvatar={() => toast('Preview: avatar builder')}
@@ -103,6 +97,7 @@ function WaitingPreview() {
         }
         classmates={classmates}
         onExit={() => toast('Preview: exit')}
+        isReady={ready}
         t={t}
       />
     </div>

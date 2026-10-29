@@ -40,10 +40,10 @@ describe('AssignmentCreator — the selected lesson decides the language', () =>
     expect(screen.getAllByTestId(/^assignment-template-he-/).length).toBeGreaterThan(0);
   });
 
-  it('Given a Russian lesson, Then Word Craft is not offered (no Russian tiles) and practice is chosen instead', () => {
+  it('Given a Russian lesson, Then Word Craft is offered and stays the default', () => {
     renderIt();
     pickLesson('ru-1');
-    expect(screen.getByTestId('assignment-mode-wordcraft')).toBeDisabled();
-    expect(screen.getByTestId('assignment-mode-wordcraft')).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByTestId('assignment-mode-wordcraft')).not.toBeDisabled();
+    expect(screen.getByTestId('assignment-mode-wordcraft')).toHaveAttribute('aria-pressed', 'true');
   });
 });

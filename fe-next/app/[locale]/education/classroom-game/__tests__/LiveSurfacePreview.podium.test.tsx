@@ -15,9 +15,10 @@ vi.mock('../LiveResultsPreviews', () => ({
 }));
 vi.mock('../StudentQuizPreview', () => ({ StudentQuizPreview: () => null }));
 vi.mock('../InGamePreview', () => ({ InGamePreview: () => null }));
-vi.mock('@/components/education/live/EduProjectorLobby', () => ({ default: () => null }));
-vi.mock('@/components/education/lobby/ClassroomWaitingStage', () => ({ ClassroomWaitingStage: () => null }));
-vi.mock('@/components/education/EducationHeader', () => ({ EducationHeader: () => null }));
+vi.mock('@/components/education/projector/ProjectorLobby', () => ({ default: () => null }));
+vi.mock('@/components/education/live/EduStudentLobby', () => ({ default: () => <div data-testid="real-student-lobby" />, EduStudentLobby: () => <div data-testid="real-student-lobby" /> }));
+vi.mock('@/components/education/lobby/ClassroomWaitingStage', () => ({ ClassroomWaitingStage: () => <div data-testid="legacy-waiting-stage" /> }));
+vi.mock('@/components/education/EducationHeader', () => ({ EducationHeader: () => <div data-testid="legacy-education-header" /> }));
 vi.mock('@/components/Avatar', () => ({ default: () => null }));
 
 import LiveSurfacePreview from '../LiveSurfacePreview';
@@ -26,6 +27,12 @@ describe('LiveSurfacePreview podium', () => {
   it('given ?preview=podium, when it renders, then it shows the real live host results, not a parallel recap', () => {
     render(<LiveSurfacePreview kind="podium" />);
     expect(screen.getByTestId('host-results-preview')).toBeInTheDocument();
-    expect(screen.queryByTestId('classroom-tv-results')).toBeNull();
+  });
+
+  it('given ?preview=waiting, when it renders, then it shows the student lobby /education/live mounts', () => {
+    render(<LiveSurfacePreview kind="waiting" />);
+    expect(screen.getByTestId('real-student-lobby')).toBeInTheDocument();
+    expect(screen.queryByTestId('legacy-waiting-stage')).toBeNull();
+    expect(screen.queryByTestId('legacy-education-header')).toBeNull();
   });
 });

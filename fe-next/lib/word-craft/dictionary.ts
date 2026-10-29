@@ -1,4 +1,4 @@
-import { toWordCraftLocale, type SupportedLocale } from './tileBag'
+import { hasWordCraftBag, toWordCraftLocale, type SupportedLocale } from './tileBag'
 import { normalizeHebrewWord, normalizeSpanishWord } from '@/shared/utils/wordNormalization'
 
 export function isValidWord(word: string, dict: Set<string> | null): boolean {
@@ -36,6 +36,12 @@ function addDictKeys(set: Set<string>, raw: string, locale: SupportedLocale): vo
 export interface WordListDeps {
   fetchFn?: typeof fetch
   storage?: Pick<Storage, 'getItem' | 'setItem'>
+  /** Load the requested bag locale as-is (classroom homework) instead of the public mapping. */
+  exact?: boolean
+}
+
+function resolveLocale(requested: SupportedLocale, deps: WordListDeps): SupportedLocale {
+  return deps.exact && hasWordCraftBag(requested) ? requested : toWordCraftLocale(requested)
 }
 
 function wordCacheKey(locale: SupportedLocale): string {
@@ -126,7 +132,7 @@ export async function loadServerWordList(
   deps: WordListDeps = {},
 ): Promise<string[]> {
   // Callers cast the app language in; the route 400s anything but a bag locale (2A8).
-  const locale = toWordCraftLocale(requested)
+  const locale = resolveLocale(requested, deps)
   const fetchFn = deps.fetchFn ?? (typeof fetch !== 'undefined' ? fetch : undefined)
   const storage = deps.storage ?? defaultStorage()
 
@@ -178,7 +184,7 @@ export async function loadWordCraftDictionary(
   requested: SupportedLocale,
   deps: WordListDeps = {},
 ): Promise<Set<string>> {
-  const locale = toWordCraftLocale(requested)
+  const locale = resolveLocale(requested, deps)
   const out = new Set<string>()
   const words = await loadServerWordList(locale, deps)
   for (const w of words) addDictKeys(out, w, locale)

@@ -10,6 +10,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import WordTowerPractice from './WordTowerPractice';
+import { loadWordCraftDictionary } from '@/lib/word-craft/dictionary';
+import starter from '@/lib/education/curriculum/data/ru-starter.json';
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
@@ -121,5 +123,21 @@ describe('WordTowerPractice', () => {
     renderIt(['cat', 'dog']);
     expect(await screen.findByTestId('practice-insufficient-data')).toBeTruthy();
     expect(tiles()).toHaveLength(0);
+  });
+
+  it('deals a Russian lesson a Cyrillic wheel, one unclipped glyph per tile, against the Russian dictionary', async () => {
+    const words = starter.lists[0].words.map((entry) => entry.word);
+    render(<WordTowerPractice words={words} language="ru" onComplete={onComplete} onBack={onBack} />);
+    await waitFor(() => expect(tiles()).toHaveLength(7));
+    for (const tile of tiles()) {
+      const glyph = tile.textContent ?? '';
+      expect(glyph).toMatch(/^[\u0410-\u042F]$/);
+      expect(tile.getAttribute('data-wheel-letter')).toBe(glyph);
+      for (const el of [tile, ...Array.from(tile.querySelectorAll('*'))]) {
+        expect(el.className).not.toMatch(/\b(truncate|text-ellipsis|line-clamp-\d|overflow-hidden)\b/);
+      }
+    }
+    await waitFor(() => expect(loadWordCraftDictionary).toHaveBeenCalledWith('ru', { exact: true }));
+    expect(screen.queryByTestId('practice-insufficient-data')).toBeNull();
   });
 });

@@ -53,13 +53,13 @@ describe('projector results paint above the projector lobby', () => {
   });
 
   it('ships that z-index in the screen the projector actually renders', () => {
-    const screen = read('host/components/tv-results/ClassroomTvResultsScreen.tsx');
+    const screen = read('components/education/live/EduHostResults.tsx');
     expect(screen).toContain(`z-[${PROJECTOR_RESULTS_Z}]`);
     expect(topZ(screen)).toBeGreaterThan(PROJECTOR_LOBBY_Z);
   });
 
   it('paints its own opaque navy ground, so the lobby cannot show through', () => {
-    const screen = read('host/components/tv-results/ClassroomTvResultsScreen.tsx');
+    const screen = read('components/education/live/EduHostResults.tsx');
     expect(screen).toContain('bg-neo-navy');
     // Class 5: the cream/dark pair flashes cream on a lazy mount. A dark-only
     // game surface hardcodes navy.

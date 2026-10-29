@@ -15409,7 +15409,14 @@ const es = {
       "rehearseBotsBlocked": "Los bots no pueden jugar a este juego, así que no puedes ensayarlo con ellos.",
       "rehearseUseClassic": "Ensaya con Clásico",
       "lateJoinOn": "Se puede entrar tarde",
-      "lateJoinOff": "No se puede entrar tarde"
+      "lateJoinOff": "No se puede entrar tarde",
+      "lock": {
+        "cta": "Bloquear sala",
+        "locked": "Bloqueada",
+        "ctaHint": "Impedir que entren jugadores nuevos",
+        "lockedHint": "Nadie nuevo puede entrar. Toca para volver a abrirla.",
+        "failed": "No se pudo cambiar el bloqueo. Inténtalo de nuevo."
+      }
     },
     "errors": {
       "serverUnavailable": "Ahora mismo no podemos acceder a la lista de la clase. Es un problema nuestro, no tuyo: inténtalo de nuevo en un momento."
@@ -17072,7 +17079,12 @@ const es = {
         "nameLabel": "Tu nombre",
         "namePlaceholder": "p. ej. Maya",
         "nameHint": "No necesitas cuenta: solo elige un nombre",
-        "guestError": "No se pudo iniciar. Inténtalo de nuevo o pide ayuda a tu profe."
+        "guestError": "No se pudo iniciar. Inténtalo de nuevo o pide ayuda a tu profe.",
+        "roomLocked": {
+          "title": "Esta sala está bloqueada",
+          "hint": "Pide a tu profe que la desbloquee y vuelve a intentarlo.",
+          "retry": "Reintentar"
+        }
       },
       "classroomRoomGone": "El juego de tu clase terminó. Pídele a tu profe que empiece otro.",
       "gameEnded": {
@@ -21133,7 +21145,7 @@ const es = {
       "joinAt": "Únete en",
       "joined": "{count} dentro",
       "waitingTitle": "Esperando a los alumnos",
-      "waitingHint": "Escanea el QR o escribe el código en la dirección de arriba",
+      "waitingHint": "Escanea el QR o escribe el código para unirte",
       "startBlocked": "Podrás empezar en cuanto entre un alumno",
       "phoneTestCta": "Pruébalo antes en tu móvil",
       "phoneTestHint": "Escanéalo con tu propio móvil para ver lo que ven tus alumnos. Es un puesto de prueba y no cuenta como alumno.",
@@ -21260,7 +21272,23 @@ const es = {
       "playWith": "Empezar una partida con {name}",
       "showCode": "Ver código",
       "showCodeFor": "Mostrar el código de {name}",
-      "reviewTitle": "Practicar las palabras falladas"
+      "reviewTitle": "Practicar las palabras falladas",
+      "rail": {
+        "run": "Jugar",
+        "seeAll": "Ver todas",
+        "language": "Idioma de la actividad"
+      },
+      "cue": {
+        "first": "¿Primer juego? Un calentamiento de 5 minutos es el comienzo más fácil.",
+        "closeOut": "Hoy ya jugaron. ¿Cierran la clase con un ticket de salida de 3 minutos?",
+        "season": {
+          "school": "Las palabras de vuelta al cole están listas. ¿Un calentamiento de 5 minutos?",
+          "autumn": "Las palabras de otoño están listas. ¿Un calentamiento de 5 minutos?",
+          "winter": "Las palabras de invierno están listas. ¿Un calentamiento de 5 minutos?",
+          "spring": "Las palabras de primavera están listas. ¿Un calentamiento de 5 minutos?",
+          "summer": "Las palabras de verano están listas. ¿Un calentamiento de 5 minutos?"
+        }
+      }
     },
     "week": {
       "title": "Esta semana",
@@ -21268,7 +21296,8 @@ const es = {
       "students": "Alumnos en total",
       "active": "Clases activas",
       "empty": "Tus datos aparecerán aquí después de la primera partida.",
-      "unavailable": "No pudimos cargar los datos de esta semana. Volverán en tu próxima visita."
+      "unavailable": "No pudimos cargar los datos de esta semana. Volverán en tu próxima visita.",
+      "quiet": "Semana tranquila por ahora. Una ronda corta los despierta."
     },
     "insight": {
       "title": "Dato de esta visita",

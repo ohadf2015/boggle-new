@@ -73,6 +73,7 @@ export const ErrorCodes = {
   GAME_INVALID_CODE: 'GAME_INVALID_CODE',
   GAME_CLOSED: 'GAME_CLOSED',
   CLASSROOM_NOT_OPEN: 'CLASSROOM_NOT_OPEN',
+  ROOM_LOCKED: 'ROOM_LOCKED',
 
   // Player errors (2xxx)
   PLAYER_NOT_IN_GAME: 'PLAYER_NOT_IN_GAME',
@@ -177,6 +178,11 @@ export const ErrorRegistry: Record<string, ErrorRegistryEntry> = {
     message: 'Your teacher has not opened the game yet',
     severity: ErrorSeverity.LOW,
     httpStatus: 409
+  },
+  [ErrorCodes.ROOM_LOCKED]: {
+    message: 'This room is locked',
+    severity: ErrorSeverity.LOW,
+    httpStatus: 423
   },
 
   [ErrorCodes.PLAYER_NOT_IN_GAME]: {

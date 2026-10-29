@@ -12,7 +12,7 @@ import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useGemHunt } from '@/lib/word-craft/gems/useGemHunt';
 import { loadWordCraftDictionary } from '@/lib/word-craft/dictionary';
 import { DictStatusChip } from '@/components/word-craft/DictStatusChip';
-import type { SupportedLocale } from '@/lib/word-craft/tileBag';
+import { toWordCraftLocale, type SupportedLocale } from '@/lib/word-craft/tileBag';
 import { WordCraftBoard } from '@/components/word-craft/WordCraftBoard';
 import { WordCraftRack } from '@/components/word-craft/WordCraftRack';
 import { GemHuntHUD } from './GemHuntHUD';
@@ -44,7 +44,7 @@ export default function GemHuntPageClient() {
   const router = useRouter();
   const { t, language } = useLanguage();
   const isRTL = language === 'he';
-  const locale = (language ?? 'en') as SupportedLocale;
+  const locale: SupportedLocale = toWordCraftLocale(language ?? 'en');
 
   const setIsInGame = useHideNavigation();
   useEffect(() => {

@@ -122,8 +122,8 @@ describe('WordCraftPractice', () => {
     expect(onBack).toHaveBeenCalled();
   });
 
-  it('Given a Russian lesson, Then the intro says plainly that the round uses other letters instead of switching silently', () => {
-    render(<WordCraftPractice words={['ёлка']} language="ru" onComplete={onComplete} onBack={onBack} />);
+  it('Given a lesson language Word Craft has no tiles for, Then the intro says plainly that the round uses other letters instead of switching silently', () => {
+    render(<WordCraftPractice words={['maison']} language={'fr' as never} onComplete={onComplete} onBack={onBack} />);
     expect(screen.getByTestId('wordcraft-practice-language-note')).toBeInTheDocument();
   });
 
@@ -132,12 +132,13 @@ describe('WordCraftPractice', () => {
     expect(screen.queryByTestId('wordcraft-practice-language-note')).toBeNull();
   });
 
-  it('Given a Russian lesson (no Word Craft bag), When the game opens, Then it falls back to the UI locale and seeds nothing', async () => {
-    render(<WordCraftPractice words={['ёлка']} language="ru" onComplete={onComplete} onBack={onBack} />);
+  it('Given a Russian lesson, When the game opens, Then it is dealt in Russian with the lesson words seeded (ё folded to Е), not in the UI locale', async () => {
+    render(<WordCraftPractice words={['ёлка', 'кошка']} language="ru" onComplete={onComplete} onBack={onBack} />);
+    expect(screen.queryByTestId('wordcraft-practice-language-note')).toBeNull();
     fireEvent.click(screen.getByTestId('wordcraft-practice-play'));
     await screen.findByTestId('stub-game-view');
     const props = gameViewProps.mock.calls.at(-1)![0] as { lesson: { locale: string; targets: string[] } };
-    expect(props.lesson).toEqual(expect.objectContaining({ locale: 'en', targets: [] }));
+    expect(props.lesson).toEqual(expect.objectContaining({ locale: 'ru', targets: ['ЕЛКА', 'КОШКА'] }));
   });
 
   it('Given a round passed with no words, When it ends, Then it still reports (as an attempt) but nudges to build a lesson word and offers another go', async () => {

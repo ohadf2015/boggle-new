@@ -27,6 +27,8 @@ import {
 import { resolveCreatedRoomLanguage } from '../modules/classroomRoomLanguage.js';
 import { ensureJoinableClassroomGame } from './classroomGameJoinGate.js';
 import { registerClassroomRecoveryHandlers } from './classroomGameRecovery.js';
+import { registerClassroomLobbyLockHandlers } from './classroomLobbyLockHandler.js';
+import { isRecordJoinLockedOut, ROOM_LOCKED } from '../modules/classroomLobbyLock.js';
 import { registerClassroomGameEndHandlers } from './classroomGameEndHandler.js';
 import { registerClassroomGameModeHandlers } from './classroomGameModeHandler.js';
 import { registerClassroomReteachHandlers } from './classroomReteachHandler.js';
@@ -47,6 +49,7 @@ import { captureLiveRoundStarted } from '../utils/eduLiveEvents';
  */
 export function registerClassroomGameHandlers(io: Server, socket: Socket): void {
   registerClassroomRecoveryHandlers(socket);
+  registerClassroomLobbyLockHandlers(io, socket);
   /**
    * Create a new classroom game
    * Broadcasts notification to all students in the classroom
@@ -300,6 +303,11 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
     }
     if (!joinRoleResult.role) {
       refuseClassroomJoin(socket, joinPayload.gameCode, 'NOT_A_MEMBER', { error: 'You are not a member of this classroom' }, existingGame.classroomId);
+      return;
+    }
+
+    if (isRecordJoinLockedOut(existingGame, joinAuthUserId, getGameUsers(joinPayload.gameCode) ?? [])) {
+      refuseClassroomJoin(socket, joinPayload.gameCode, ROOM_LOCKED, { error: 'education.student.join.roomLocked.title' }, existingGame.classroomId);
       return;
     }
 

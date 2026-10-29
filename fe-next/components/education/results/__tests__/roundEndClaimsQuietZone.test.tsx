@@ -34,7 +34,9 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-import { ClassroomTvResults } from '../ClassroomTvResults';
+vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => ({ hasPro: true, loading: false }) }));
+vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
+import EduHostResults from '@/components/education/live/EduHostResults';
 import {
   OVERLAY_QUIET_ZONE_ATTR,
   OVERLAY_QUIET_ZONE_GRACE_MS,
@@ -77,14 +79,14 @@ describe('round-end surfaces claim the overlay quiet zone', () => {
   });
 
   it('the projector results hold the zone while mounted', () => {
-    const { unmount } = render(<ClassroomTvResults summary={summary} t={t} />);
+    const { unmount } = render(<EduHostResults summary={summary} t={t} />);
     expect(isOverlayQuietZoneActive()).toBe(true);
     expect(document.body.getAttribute(OVERLAY_QUIET_ZONE_ATTR)).toContain('classroom');
     unmount();
   });
 
   it('keeps the zone through the grace window after the recap goes away', () => {
-    const { unmount } = render(<ClassroomTvResults summary={summary} t={t} />);
+    const { unmount } = render(<EduHostResults summary={summary} t={t} />);
     unmount();
 
     expect(isOverlayQuietZoneActive()).toBe(true);

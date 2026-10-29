@@ -176,8 +176,8 @@ export function useReteachLinks(summary: ClassroomSummary, isTeacher: boolean): 
   const missGapAsyncAssignHref = hasMisses ? safely(() => buildMissGapAssignmentPath(gapArgs)) : null;
 
   /**
-   * Kahoot ChatGPT-app foil: stage missed words as a quickLaunch paste pack and
-   * open the express Live lobby inside LexiClash — no ChatGPT hop.
+   * Stage missed words as a quickLaunch paste pack and open the lobby pre-filled
+   * with them; the teacher still taps GO LIVE.
    */
   const onLaunchMissGapQuestionPack = () => {
     if (!hasMisses) return;

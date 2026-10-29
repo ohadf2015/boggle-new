@@ -3,7 +3,7 @@
  * mastery check (Quizizz's de-gameify toggles; evidence §8.8).
  *
  * Three rows, one per dial: leaderboard visibility, timer pressure, scoring
- * weight. They are PRO: a free teacher sees them frozen on the loud defaults
+ * weight. They are PRO (or a live access trial): a free teacher sees them frozen on the loud defaults
  * with a lock and an upgrade link, because a control that is invisible cannot
  * be sold — and what is shown frozen is what the game will run, never a calm
  * draft the server will ignore.
@@ -20,7 +20,7 @@ import Link from 'next/link';
 import { Gauge, Trophy, Timer, Target, Lock } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
-import { teacherTrialStatus } from '@/lib/education/trial';
+import { pressureDialsUnlocked } from './pressureAccess';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { LobbyChoiceRow } from './LobbyChoiceRow';
 import {
@@ -41,16 +41,13 @@ export function LobbyPressureDials({ pressure, onChange }: LobbyPressureDialsPro
   const { t, language } = useLanguage();
   const { hasPro, loading, accessTrialExpires } = useTeacherPro();
   const [nowMs] = useState(() => Date.now());
-  // A live access trial opens the dials (client-gated only; the server takes whatever the room saves).
-  const trial = teacherTrialStatus(accessTrialExpires, nowMs);
-  const trialLive = !!trial && !trial.isExpired;
-  const locked = loading || (!hasPro && !trialLive);
+  const locked = !pressureDialsUnlocked({ hasPro, loading, accessTrialExpires: accessTrialExpires ?? null }, nowMs);
 
   useEffect(() => {
-    if (!loading && !hasPro && !trialLive) {
+    if (!loading && locked) {
       trackGrowthEvent('iap_viewed', { source: 'pro_gate_pressureDials' });
     }
-  }, [loading, hasPro, trialLive]);
+  }, [loading, locked]);
 
   // A free teacher sees the loud defaults frozen — the game runs what the
   // rows show, so the rows show what the game runs.
@@ -72,7 +69,7 @@ export function LobbyPressureDials({ pressure, onChange }: LobbyPressureDialsPro
             {t('eduShell.host.proBadge')}
           </span>
         </span>
-        {!loading && !hasPro && !trialLive && (
+        {!loading && locked && (
           <Link
             href={`/${language}/teacher/upgrade`}
             data-testid="pressure-pro-lock"

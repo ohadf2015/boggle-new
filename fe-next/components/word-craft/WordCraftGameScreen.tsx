@@ -15,7 +15,7 @@ import { useAdMob } from '@/hooks/useAdMob';
 import { isNative } from '@/utils/platform';
 import { loadWordCraftDictionary } from '@/lib/word-craft/dictionary';
 import { DictStatusChip } from '@/components/word-craft/DictStatusChip';
-import type { SupportedLocale } from '@/lib/word-craft/tileBag';
+import { toWordCraftLocale, type SupportedLocale } from '@/lib/word-craft/tileBag';
 import { WordCraftRack } from '@/components/word-craft/WordCraftRack';
 import { WordCraftScoreboard } from '@/components/word-craft/WordCraftScoreboard';
 import { WordCraftControls } from '@/components/word-craft/WordCraftControls';
@@ -148,6 +148,8 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, daily,
     [profile, t],
   );
   const locale = lesson?.locale ?? ((language ?? 'en') as SupportedLocale);
+  // Tiles and words come from the public bag for the app language; links and telemetry keep the app locale.
+  const dealLocale: SupportedLocale = lesson?.locale ?? toWordCraftLocale(language ?? 'en');
   const exit = lesson?.onExit ?? (() => router.push(`/${language}`));
 
   // Bottom-nav hiding lives in the page-level phase switcher (PageClient) so
@@ -160,7 +162,7 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, daily,
   useEffect(() => {
     let cancelled = false;
     setDictError(false);
-    loadWordCraftDictionary(locale).then((d) => {
+    loadWordCraftDictionary(dealLocale, { exact: true }).then((d) => {
       if (!cancelled) { setDict(d); trackWordCraftGameStarted({ locale }); }
     }).catch(() => {
       // NOT setDict(new Set()): an empty dictionary rejects every real word as
@@ -168,7 +170,7 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, daily,
       if (!cancelled) setDictError(true);
     });
     return () => { cancelled = true; };
-  }, [locale]);
+  }, [locale, dealLocale]);
 
   // Record locale for linguist achievement
   useEffect(() => {
@@ -190,7 +192,7 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, daily,
   const game = useWordCraftGame({
     seed,
     dict,
-    locale,
+    locale: dealLocale,
     territoryEnabled,
     hotseat,
     difficulty: effectiveDifficulty,
@@ -359,7 +361,7 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, daily,
     () => game.state.pendingPlacements.find(isUnassignedBlank) ?? null,
     [game.state.pendingPlacements],
   );
-  const jokerAlphabet = useMemo(() => alphabetForLocale(locale), [locale]);
+  const jokerAlphabet = useMemo(() => alphabetForLocale(dealLocale), [dealLocale]);
 
   // Refill flourish: when the bag deals new tiles into the rack (after a commit
   // or swap), fly them in from the sack icon. Detect "new" by tile id vs the

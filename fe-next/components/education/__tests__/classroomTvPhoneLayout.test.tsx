@@ -9,7 +9,7 @@
  * them.
  *
  * Contract: the wall keeps its no-scroll lock at the breakpoint where the
- * layout goes wide (md for the quiz, lg for the two-column recap). Below it,
+ * layout goes wide (md for the quiz). Below it,
  * the root scrolls and the children stop shrinking to fit a height they
  * cannot fit in.
  */
@@ -53,30 +53,11 @@ vi.mock('@/lib/education/roundEndSound', () => ({
 vi.mock('../vocabQuiz/useVocabQuiz', () => ({ useVocabQuiz: () => ENDED }));
 
 const { VocabQuizHostView } = await import('../vocabQuiz/VocabQuizHostView');
-const { ClassroomTvResults } = await import('../results/ClassroomTvResults');
-const { ClassroomTvResultsScreen } = await import(
-  '@/host/components/tv-results/ClassroomTvResultsScreen'
-);
 
 const t = (key: string, params?: Record<string, string | number>) =>
   params ? `${key}:${Object.values(params).join(',')}` : key;
 
 const tokens = (el: Element) => (el.getAttribute('class') ?? '').split(/\s+/);
-
-const summary = () => ({
-  teacherName: 'T',
-  lessonNames: ['Unit 3'],
-  lessonIds: ['l1'],
-  totalWords: 2,
-  classFoundCount: 1,
-  coverage: [
-    { word: 'brave', foundBy: ['Noa'] },
-    { word: 'calm', foundBy: [] },
-  ],
-  missedWords: ['calm'],
-  masteryByPlayer: { Noa: { found: 1, total: 2 } },
-  podium: [{ username: 'Noa', score: 120, rank: 1 }],
-});
 
 afterEach(cleanup);
 
@@ -101,26 +82,5 @@ describe('classroom TV mode on a phone', () => {
     const title = tokens(screen.getByRole('heading', { level: 2 }));
     expect(title).toContain('text-3xl');
     expect(title).toContain('md:text-5xl');
-  });
-
-  it('round recap scrolls below lg, where it is one column', () => {
-    render(<ClassroomTvResults summary={summary() as never} onRematch={() => {}} t={t} />);
-    const root = tokens(screen.getByTestId('classroom-tv-results'));
-    expect(root).toContain('overflow-y-auto');
-    expect(root).toContain('lg:overflow-hidden');
-    expect(root).not.toContain('overflow-hidden');
-    const columns = tokens(screen.getByTestId('tv-recap-columns'));
-    expect(columns).not.toContain('min-h-0');
-    expect(columns).toContain('lg:min-h-0');
-    expect(columns).toContain('lg:flex-1');
-  });
-
-  it('recap screen leaves room under its corner buttons on a phone', () => {
-    render(
-      <ClassroomTvResultsScreen summary={summary() as never} onClose={() => {}} t={t} />
-    );
-    const pane = screen.getByTestId('classroom-tv-results').parentElement!;
-    expect(tokens(pane)).toContain('pt-20');
-    expect(tokens(pane)).toContain('md:pt-6');
   });
 });

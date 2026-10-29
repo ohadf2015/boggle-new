@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent, act, within } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import EduHostResults from '@/components/education/live/EduHostResults';
 import type { ClassroomSummary } from '@/shared/types/classroom';
@@ -51,14 +51,12 @@ describe('EduHostResults', () => {
   });
   afterEach(() => vi.useRealTimers());
 
-  it('given a finished round, when the projector shows results, then the live screen owns an opaque layer above the lobby without nesting the /multiplayer wall', () => {
+  it('given a finished round, when the projector shows results, then the live screen owns an opaque layer above the lobby', () => {
     render(<EduHostResults summary={summary} players={players} t={t} />);
     const root = screen.getByTestId('edu-host-results');
     expect(root.className).toContain('fixed inset-0');
     expect(root.className).toContain('z-[75]');
     expect(root.className).toContain('bg-neo-navy');
-    expect(within(root).queryByTestId('classroom-tv-results')).toBeNull();
-    expect(within(root).queryByTestId('host-next-actions')).toBeNull();
   });
 
   it('given a finished round, when the projector shows results, then a podium and class stats appear', () => {

@@ -14,7 +14,7 @@ import logger from '@/utils/logger';
  * already uses (`CLASS_LIMIT_REACHED` in `ClassroomManager`). `error` stays for logs
  * and for the generic fallback; it is not fit to render on its own.
  */
-export type JoinClassroomErrorCode = 'STUDENT_LIMIT_REACHED' | 'INVALID_CODE' | 'NAME_TAKEN' | 'SESSION_ENDED';
+export type JoinClassroomErrorCode = 'STUDENT_LIMIT_REACHED' | 'INVALID_CODE' | 'NAME_TAKEN' | 'SESSION_ENDED' | 'ROOM_LOCKED';
 
 export interface JoinClassroomResult {
   success: boolean;
@@ -95,6 +95,9 @@ export function useJoinClassroom() {
 
       if (!response.ok) {
         const data = await response.json();
+        if (data?.code === 'ROOM_LOCKED') {
+          return { success: false, code: 'ROOM_LOCKED', error: data.error };
+        }
         if (response.status === 410 || data?.code === 'SESSION_ENDED') {
           return { success: false, code: 'SESSION_ENDED', error: data?.error || 'Game ended' };
         }

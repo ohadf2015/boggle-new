@@ -12,7 +12,7 @@ import { loadWordCraftDictionary } from '@/lib/word-craft/dictionary';
 import { useWordCraftRun } from '@/lib/word-craft/run/useWordCraftRun';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { wordFeedbackTier } from '@/lib/word-craft/run/feedbackTiers';
-import type { SupportedLocale } from '@/lib/word-craft/tileBag';
+import { toWordCraftLocale, type SupportedLocale } from '@/lib/word-craft/tileBag';
 import { WordCraftBoardSection } from '@/components/word-craft/WordCraftBoardSection';
 import { WordCraftRack } from '@/components/word-craft/WordCraftRack';
 import { RunHUD } from '@/components/word-craft/run/RunHUD';
@@ -23,7 +23,7 @@ import { RunResultScene } from '@/components/word-craft/run/RunResultScene';
 
 export function RunPageClient() {
   const { t, language } = useLanguage();
-  const locale = (language ?? 'en') as SupportedLocale;
+  const locale: SupportedLocale = toWordCraftLocale(language ?? 'en');
   const params = useParams();
   const paramLocale = (params?.locale as string | undefined) ?? locale;
   useHideNavigation();

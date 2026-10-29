@@ -28,7 +28,7 @@ import { WordCraftGameView } from '@/components/word-craft/WordCraftGameScreen';
 import { onWordCraftGameEnd } from '@/components/word-craft/wordCraftTelemetry';
 import { canonLessonWord } from '@/lib/wordTower/lessonSeed';
 import { lessonWordsPlayed, wordCraftAttemptIsMeaningful, WORDCRAFT_MIN_VALID_WORDS } from '@/lib/education/wordcraftAssignment';
-import { lessonTargetsFor, wordCraftLocaleFor } from '@/lib/word-craft/lessonBag';
+import { homeworkWordCraftLocaleFor, lessonTargetsFor } from '@/lib/word-craft/lessonBag';
 import { cn } from '@/lib/utils';
 import type { Language } from '@/lib/supabase/education/types';
 
@@ -63,9 +63,8 @@ export default function WordCraftPractice({ words, language, onComplete, onBack,
     () => [...new Set(words.map((w) => canonLessonWord(w, language)).filter(Boolean))],
     [words, language],
   );
-  // Dealt in the lesson's language with its words seeded; ru has no Word Craft bag → UI locale, unseeded.
   const deal = useMemo(() => {
-    const { locale, seeded } = wordCraftLocaleFor(language, uiLanguage ?? 'en');
+    const { locale, seeded } = homeworkWordCraftLocaleFor(language, uiLanguage ?? 'en');
     return { locale, seeded, targets: seeded ? lessonTargetsFor(words, locale) : [] };
   }, [words, language, uiLanguage]);
 

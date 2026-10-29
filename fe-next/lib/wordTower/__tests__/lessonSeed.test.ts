@@ -46,18 +46,16 @@ describe('eligibleLessonWords', () => {
 
 describe('lessonSeedSupportsLanguage', () => {
   it('accepts a language with both a letter bag and a Word Craft dictionary', () => {
-    for (const lang of ['en', 'he', 'sv', 'es', 'ja'] as const) {
+    for (const lang of ['en', 'he', 'sv', 'es', 'ja', 'ru'] as const) {
       expect(lessonSeedSupportsLanguage(lang)).toBe(true);
     }
   });
 
   it('rejects a language with no letter bag or no dictionary to fall back on', () => {
     // fr/de have an EMPTY letter bag — generateWheel would hand back [] with no
-    // error at all (silent no-op). ru has a bag but no Word Craft dictionary,
-    // so only the lesson words themselves would ever be accepted.
+    // error at all (silent no-op).
     expect(lessonSeedSupportsLanguage('fr')).toBe(false);
     expect(lessonSeedSupportsLanguage('de')).toBe(false);
-    expect(lessonSeedSupportsLanguage('ru')).toBe(false);
   });
 });
 
@@ -73,7 +71,7 @@ describe('isLessonSeedReady', () => {
   });
 
   it('is not ready when the lesson language has no wheel', () => {
-    expect(isLessonSeedReady(['светит', 'ночной', 'зрение', 'яркий'], 'ru')).toBe(false);
+    expect(isLessonSeedReady(['light', 'night', 'sight', 'bright'], 'fr')).toBe(false);
   });
 });
 

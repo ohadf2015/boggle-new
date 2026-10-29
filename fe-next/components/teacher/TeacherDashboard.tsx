@@ -1,4 +1,4 @@
-/** Teacher Home: greeting, one "start a game" hero, your classes, and a rail with this week + one Pro card. */
+/** Teacher Home: greeting + coach cue, the class desk hero, ready-to-run sessions, your classes, and a rail with this week + one Pro strip. */
 'use client';
 
 import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
@@ -27,6 +27,7 @@ import { WeeklyEmailReport } from './digest/WeeklyEmailReport';
 import { HomeProCard, type HomeProOfferKind } from './home/HomeProCard';
 import { HomeOnboardingCard } from './home/HomeOnboardingCard';
 import { RehearseWithBotsButton } from './home/RehearseWithBotsButton';
+import { HomeSessionRail } from './home/HomeSessionRail';
 import { HomeRailSkeleton, HomeSkeleton } from './home/HomeSkeleton';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
@@ -34,6 +35,9 @@ import { useTeacherActivationProgress } from '@/hooks/useTeacherActivationProgre
 import { useTeacherTrialChecklist } from '@/hooks/useTeacherTrialChecklist';
 import { useTeacherWeekStats } from '@/hooks/useTeacherWeekStats';
 import { useClassStudentPreview } from '@/hooks/useClassStudentPreview';
+import { useLessons } from '@/hooks/useVocabularyLesson';
+import { classLessonProfile, homeCoachCue, homeSessionRail, railLanguages, type RailLesson } from '@/lib/education/homeSessionRail';
+import { isPackLanguage } from '@/lib/education/themedPacks';
 import { teacherAssignHref, useTeacherDashboardDeepLink } from '@/hooks/useTeacherDashboardDeepLink';
 import { polarCheckoutWelcomeKind } from '@/lib/education/polarTrial';
 import { trackEduTeacherDashboardViewed } from '@/lib/education/telemetry';
@@ -93,6 +97,14 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
   });
   const week = useTeacherWeekStats(classrooms, !classroomsLoading && !classroomsError, language);
   const studentPreview = useClassStudentPreview(classrooms, !classroomsLoading && !classroomsError);
+  const lessons = useLessons();
+  // Fail open: a slow lessons read must not hold the rail; it then ranks without the class grade.
+  const [lessonsCapped, setLessonsCapped] = useState(false);
+  useEffect(() => {
+    if (!lessons.isLoading) return;
+    const id = setTimeout(() => setLessonsCapped(true), 2500);
+    return () => clearTimeout(id);
+  }, [lessons.isLoading]);
 
   const [selectedId, setSelectedId] = useState('');
   const requestedClassroomId = searchParams?.get('classroomId') ?? null;
@@ -223,13 +235,24 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
   const revealRef = useTeacherReveal<HTMLDivElement>(`${ready}-${hasClasses}-${Boolean(classroomsError)}`);
   const [reportsOpened, setReportsOpened] = useState(false);
   const hasRail = !ready || proCard !== null || showWeek || Boolean(selectedClassroom);
+  const rawClassLanguage = selectedClassroom?.language;
+  const classLanguage = isPackLanguage(rawClassLanguage) ? rawClassLanguage : isPackLanguage(language) ? language : 'en';
+  const lessonProfile = classLessonProfile(lessons.lessons as unknown as RailLesson[], effectiveId);
+  const lastPlayedIso = selectedClassroom ? week.summary?.lastPlayedAt[selectedClassroom.id] : undefined;
+  const lastPlayedMs = lastPlayedIso ? Date.parse(lastPlayedIso) : null;
+  const railReady = (!lessons.isLoading || lessonsCapped) && week.status !== 'loading';
+  const everPlayed = activation.progress.liveStarted || (week.summary?.gamesLast30d ?? 0) > 0;
+  const cue = ready && hasClasses && week.status !== 'loading'
+    ? homeCoachCue({ nowMs, lastPlayedMs, everPlayed, rail: homeSessionRail({ language: classLanguage, gradeBand: null, nowMs, lastPlayedMs }) })
+    : null;
 
   return (
     <EducationShell
       className={cn(isRTL && 'rtl')}
       scrollRegionLabel={t('eduShell.home.regionLabel')}
-      contentClassName="relative"
+      contentClassName="relative isolate"
     >
+      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[40rem] bg-[url(/images/education/teacher-hq-bg.webp)] bg-cover bg-top opacity-[0.14] [mask-image:linear-gradient(to_bottom,black_30%,transparent)]" />
       {!proLoading && (
         <TeacherHqWelcome welcomeKind={welcomeKind} grant={pro.grant} trialExpires={pro.trialExpires ?? pro.periodEnd} />
       )}
@@ -239,12 +262,19 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
         data-testid="teacher-home"
         className={cn('mx-auto grid w-full max-w-[1280px] gap-6 px-4 py-4 sm:px-6 lg:px-8 lg:py-6', hasRail && 'lg:grid-cols-[minmax(0,1fr)_20rem]')}
       >
-        <div className="flex min-w-0 flex-col gap-6">
-          <header data-tm className="flex flex-wrap items-center justify-between gap-3">
-            <h1 data-wipe suppressHydrationWarning className="font-neo-display text-2xl font-black text-neo-cream sm:text-3xl">
-              {firstName ? t(greetingKey(hour), { name: firstName }) : t('eduShell.home.greetNoName')}
-            </h1>
-            <TeacherPlanBadge quiet className="shrink-0 lg:hidden" />
+        <div className="flex min-w-0 flex-col gap-6 lg:col-start-1 lg:row-start-1">
+          <header data-tm className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h1 data-wipe suppressHydrationWarning className="font-neo-display text-2xl font-black text-neo-cream sm:text-3xl">
+                {firstName ? t(greetingKey(hour), { name: firstName }) : t('eduShell.home.greetNoName')}
+              </h1>
+              {ready && hasClasses && !classroomsError ? (
+                <p data-testid="home-coach-cue" suppressHydrationWarning className="mt-1 min-h-12 font-neo-body text-base font-semibold text-neo-cream/85 sm:min-h-6">
+                  {cue ? t(cue.key) : null}
+                </p>
+              ) : null}
+            </div>
+            <TeacherPlanBadge quiet className="mt-1 shrink-0 lg:hidden" />
           </header>
 
           {!ready ? (
@@ -296,26 +326,45 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
                       }
                     />
                   </div>
-                  {classrooms.length > 1 ? (
-                    <HomeClassList
-                      classrooms={classrooms}
-                      studentPreview={studentPreview}
-                      lastPlayedAt={week.summary?.lastPlayedAt ?? null}
-                      activityFailed={week.status === 'error'}
-                      language={language}
-                      nowMs={nowMs}
-                      t={t}
-                    />
-                  ) : null}
-                  {accountBanner ? <div data-testid="home-account-banner">{accountBanner}</div> : null}
                 </>
               )}
             </>
           )}
         </div>
 
+        {ready && !classroomsError && hasClasses && effectiveId ? (
+          <HomeSessionRail
+            key={effectiveId}
+            className={hasRail ? 'lg:col-span-2' : undefined}
+            classroomId={effectiveId}
+            languages={railLanguages(classLanguage, lessonProfile.languages)}
+            gradeBand={lessonProfile.gradeBand}
+            nowMs={nowMs}
+            lastPlayedMs={lastPlayedMs}
+            ready={railReady}
+            locale={language}
+            t={t}
+          />
+        ) : null}
+        {ready && !classroomsError && hasClasses && (classrooms.length > 1 || accountBanner) ? (
+          <div className={cn('flex min-w-0 flex-col gap-6', hasRail && 'lg:col-span-2')}>
+            {classrooms.length > 1 ? (
+              <HomeClassList
+                classrooms={classrooms}
+                studentPreview={studentPreview}
+                lastPlayedAt={week.summary?.lastPlayedAt ?? null}
+                activityFailed={week.status === 'error'}
+                language={language}
+                nowMs={nowMs}
+                t={t}
+              />
+            ) : null}
+            {accountBanner ? <div data-testid="home-account-banner">{accountBanner}</div> : null}
+          </div>
+        ) : null}
+
         {hasRail ? (
-          <aside aria-label={t('eduShell.home.railLabel')} className="flex min-w-0 flex-col gap-6">
+          <aside aria-label={t('eduShell.home.railLabel')} className="flex min-w-0 flex-col gap-6 lg:col-start-2 lg:row-start-1">
             {!ready ? <HomeRailSkeleton /> : showWeek ? (
               <>
                 <div data-tm>

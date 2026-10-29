@@ -15,6 +15,7 @@ describe('classifyClassroomJoinRefusal', () => {
     [{ code: 'GAME_FULL' }, 'full', 'student.activeGame.joinFull'],
     [{ code: 'PLAYER_KICKED' }, 'removed', 'student.activeGame.joinRemoved'],
     [{ code: 'PLAYER_BLOCKED' }, 'removed', 'student.activeGame.joinRemoved'],
+    [{ code: 'ROOM_LOCKED' }, 'locked', 'education.student.join.roomLocked.hint'],
   ])('%j is its own reason (%s)', (payload, refusal, messageKey) => {
     expect(classifyClassroomJoinRefusal(payload)).toEqual({ refusal, messageKey });
   });

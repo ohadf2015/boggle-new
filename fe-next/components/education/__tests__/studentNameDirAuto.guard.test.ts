@@ -8,7 +8,6 @@ const FILES = [
   'components/education/results/ClassNeedsHelp.tsx',
   'components/education/results/PodiumStage.tsx',
   'components/education/TeamBattleStandings.tsx',
-  'components/education/results/ClassroomSessionStandings.tsx',
 ];
 
 /** `.username` rendered as JSX text, never as an attribute value (`key={x.username}`). */

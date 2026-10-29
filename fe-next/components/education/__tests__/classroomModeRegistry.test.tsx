@@ -170,10 +170,7 @@ describe('every classroom mode is complete on every surface', () => {
   });
 
   it.each([...CLASSROOM_GAME_MODES])('%s is offered in the teacher mode picker', (mode) => {
-    // The live picker is `ModePickerStrip`, fed by `TEACHER_GAME_MODES` — the
-    // dead `ClassroomModeSettings` wizard this assertion used to source-scan
-    // was deleted in the teacher-simplicity pass. Importing the catalog pins
-    // the same contract more strongly than a source-text match ever could.
+    // The teacher mode picker renders from this catalog.
     expect(
       TEACHER_GAME_MODES.some((m) => m.id === mode),
       `TEACHER_GAME_MODES has no entry for ${mode}`

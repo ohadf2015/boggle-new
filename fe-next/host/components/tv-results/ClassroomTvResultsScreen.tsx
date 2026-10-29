@@ -1,36 +1,6 @@
-/**
- * ClassroomTvResultsScreen — the wall, at the final whistle.
- *
- * WHY THIS FILE EXISTS AT ALL. The classroom recap used to be one branch deep
- * inside `TvResultsView`'s arcade layout, which meant it inherited everything
- * that layout wraps around its content: a slate gradient ground, a DJ mascot,
- * a gradient "RESULTS" wordmark, an install QR, a scaled-up players-ready
- * strip, a host word selector and a controls bar. Nine things competing for a
- * room that should read exactly one — and, fatally, a `z-[60]` root that the
- * projector LOBBY (`fixed inset-0 z-[65]`, opaque navy) painted straight over.
- * Both surfaces are mounted at the instant a round ends. The celebration was
- * never unmounting; it was underneath. See `lib/education/roundEndLayer`.
- *
- * So the classroom branch leaves before any of that: its own opaque navy
- * ground, its own stacking level, one piece of chrome (fullscreen), and the
- * recap. Everything the teacher needs to run it again is inside the recap,
- * where the class can see it too.
- *
- * CLASS-5 SAFE. No entrance tween on this layer — it is painted, at full
- * opacity, from its first frame; the only staged thing is the CONTENT of the
- * already-drawn podium placards inside. A screenshot at any instant shows a
- * finished-looking screen, which is the whole reason the podium was frozen
- * static before and why it no longer has to be.
- */
-
 'use client';
 
-import { Maximize, Minimize } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import ClassroomTvResults from '@/components/education/results/ClassroomTvResults';
-import { BossOutcomeCard } from '@/components/education/boss/BossOutcomeCard';
-import { PROJECTOR_RESULTS_Z } from '@/lib/education/roundEndLayer';
-import { useTvFullscreen } from '../../hooks/useTvFullscreen';
+import EduHostResults from '@/components/education/live/EduHostResults';
 import { useEduLiveSurfaces } from '@/components/education/live/eduLiveSurfaces';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 import type { PlayerResult } from '@/types/components';
@@ -38,17 +8,9 @@ import type { Socket } from 'socket.io-client';
 
 export interface ClassroomTvResultsScreenProps {
   summary: ClassroomSummary;
-  /** Same list, same code. The screen's ONE primary action, inside the recap. */
   onRematch?: () => void;
-  /**
-   * Hands the room back to the projector lobby. This layer is `inset-0` and
-   * opaque, so until it exists the lobby's "Change game" and START GAME are
-   * unreachable — a capture run had to RELOAD the page to change modes, and
-   * the click that failed reported `covered by <video>`. Quiet secondary: the
-   * recap's one primary action is still REMATCH.
-   */
+  /** Hands the room back to the projector lobby, which this opaque layer otherwise covers. */
   onClose?: () => void;
-  /** The host's confirmed exit (room closes, teacher lands on HQ). */
   onExitRoom?: () => void;
   t: (key: string, params?: Record<string, string | number>) => string;
   players?: PlayerResult[];
@@ -57,81 +19,8 @@ export interface ClassroomTvResultsScreenProps {
 }
 
 export function ClassroomTvResultsScreen(props: ClassroomTvResultsScreenProps) {
-  const EduResults = useEduLiveSurfaces().ClassroomResults;
-  return EduResults ? <EduResults {...props} /> : <SharedClassroomTvResultsScreen {...props} />;
-}
-
-function SharedClassroomTvResultsScreen({
-  summary,
-  onRematch,
-  onClose,
-  onExitRoom,
-  t,
-  players,
-  gameCode,
-  socket,
-}: ClassroomTvResultsScreenProps) {
-  const { isFullscreen, toggleFullscreen, isSupported } = useTvFullscreen({ enabled: true });
-
-  return (
-    <div
-      data-testid="classroom-tv-results-screen"
-      // z-[75]: above ProjectorLobby's z-[65] — the literal must match the
-      // constant, and a test reads both files to prove it still does.
-      // Opaque navy, hardcoded: a dark-only game surface never uses the
-      // cream/dark pair, which flashes cream on a lazy mount (Class 5).
-      className={cn(
-        'fixed inset-0 overflow-hidden bg-neo-navy text-neo-white',
-        `z-[${PROJECTOR_RESULTS_Z}]`,
-        // Tailwind generates arbitrary values only from a LITERAL class string,
-        // so the real one is written out here for the compiler to see.
-        'z-[75]'
-      )}
-    >
-      {isSupported && (
-        <button
-          type="button"
-          onClick={toggleFullscreen}
-          data-testid="classroom-tv-fullscreen"
-          title={isFullscreen ? t('tvBroadcast.exitFullscreen') : t('tvBroadcast.enterFullscreen')}
-          aria-label={
-            isFullscreen ? t('tvBroadcast.exitFullscreen') : t('tvBroadcast.enterFullscreen')
-          }
-          // A control has to read as one: solid fill plus a 3px CREAM edge
-          // (16.8:1 on navy). A black border on navy measures 1.23:1 and
-          // disappears — see the border-by-surface rule in the design cards.
-          className={cn(
-            'absolute top-3 end-3 z-10 p-2 md:top-4 md:end-4 md:p-3 rounded-neo',
-            'bg-neo-navy-elevated text-neo-cream',
-            'border-[3px] border-neo-cream shadow-hard-sm',
-            'hover:bg-neo-navy-light transition-colors'
-          )}
-        >
-          {isFullscreen ? (
-            <Minimize className="w-6 h-6" aria-hidden />
-          ) : (
-            <Maximize className="w-6 h-6" aria-hidden />
-          )}
-        </button>
-      )}
-
-      {/* The shell is locked; this is the one region allowed to scroll (it
-          rarely needs to — the recap is built to fit a 16:9 wall). */}
-      <div className="flex h-full flex-col gap-3 px-3 pt-20 pb-4 md:px-8 md:pt-6 md:pb-6 lg:gap-4">
-        <BossOutcomeCard size="tv" className="shrink-0" />
-        <ClassroomTvResults
-          summary={summary}
-          onRematch={onRematch}
-          onChangeGame={onClose}
-          onBackToClass={onExitRoom}
-          players={players}
-          gameCode={gameCode}
-          socket={socket}
-          t={t}
-        />
-      </div>
-    </div>
-  );
+  const Results = useEduLiveSurfaces().ClassroomResults ?? EduHostResults;
+  return <Results {...props} />;
 }
 
 export default ClassroomTvResultsScreen;

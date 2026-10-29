@@ -3,12 +3,10 @@
  *
  * Kahoot launched a free ChatGPT app (2026-09-03) that hops teachers out of
  * Kahoot to generate a quiz pack. LexiClash foil: from miss-gap results, one
- * tap writes a quickLaunch `paste` intent and opens the express classroom-game
- * lobby — the missed words become a Live pack without leaving LexiClash and
- * without a ChatGPT hop.
+ * tap writes a quickLaunch `paste` intent and opens the classroom-game lobby
+ * pre-filled with the missed words, one GO LIVE tap from a round.
  *
- * Reuses quickLaunchIntent (lesson/pack/paste → Live express) and the 3-minute
- * express timer. Class-level missed words only — no student names.
+ * Reuses quickLaunchIntent and its 3-minute timer. Class-level missed words only — no student names.
  */
 
 import {
@@ -19,7 +17,7 @@ import {
 } from '@/components/teacher/dashboard/quickLaunchIntent';
 import { normalizeLocale } from './classGapShare';
 
-/** Intent source — paste is the express path that mints a lesson from words. */
+/** Intent source — paste mints a lesson from the words. */
 export const MISS_GAP_QUESTION_PACK_SOURCE = 'paste' as const;
 
 export interface MissGapQuestionPackInput {
@@ -69,7 +67,7 @@ export function buildMissGapQuestionPackIntent(
   };
 }
 
-/** Relative express lobby path: `/{locale}/education/classroom-game?flow=quickLaunch`. */
+/** Relative pre-filled lobby path: `/{locale}/education/classroom-game?flow=quickLaunch`. */
 export function missGapQuestionPackLivePath(locale: string): string {
   const loc = normalizeLocale(locale);
   return `/${loc}/education/classroom-game?flow=${QUICK_LAUNCH_FLOW}`;
@@ -78,7 +76,7 @@ export function missGapQuestionPackLivePath(locale: string): string {
 /**
  * Stage the intent and return the path to navigate to.
  * Matches TeacherDashboard quickLaunch: write then navigate. If storage is
- * blocked the express lobby finds nothing and falls through to full setup.
+ * blocked the lobby finds nothing and falls through to full setup.
  */
 export function stageMissGapQuestionPackLaunch(
   input: MissGapQuestionPackInput,

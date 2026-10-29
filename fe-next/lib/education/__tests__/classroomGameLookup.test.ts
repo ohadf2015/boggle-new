@@ -24,6 +24,18 @@ beforeEach(() => {
 });
 
 describe('lookupLiveClassroomGame', () => {
+  it('surfaces what the join route needs to honour the lobby lock', async () => {
+    get.mockResolvedValue(JSON.stringify({
+      classroomId: 'c1', teacherId: 't1', status: 'waiting',
+      players: [{ userId: 's1', username: 'Ann' }],
+      settings: { lobbyLocked: true, lobbyLockedSeats: ['a:s2'] },
+    }));
+    await expect(lookupLiveClassroomGame('TZCOQ7')).resolves.toMatchObject({
+      teacherId: 't1', status: 'waiting', playerUserIds: ['s1'],
+      settings: { lobbyLocked: true, lobbyLockedSeats: ['a:s2'] },
+    });
+  });
+
   it('reads the game the socket server wrote', async () => {
     get.mockResolvedValue(JSON.stringify({
       classroomId: 'c1', lessonIds: ['l1'], teacherName: 'Ms. G',

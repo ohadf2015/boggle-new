@@ -4,8 +4,8 @@
  * DEV-ONLY previews of the round-end surfaces (see LiveSurfacePreview):
  *
  *   ?preview=hostresults — the /education/live projector (EduHostResults)
- *   ?preview=phone       — a student's phone on /education/live (`&path=legacy` = the /multiplayer card,
- *                          `&hero=1` = a signed-in student's card with XP and coins, plus the chest locker)
+ *   ?preview=phone       — a student's phone on /education/live (`&hero=1` = a signed-in student's card with
+ *                          XP and coins, plus the chest locker)
  *   ?preview=quiz        — the Vocab Quiz finale on the wall (`&own=1` = the student's phone finale,
  *                          `&qboss=defeated|escaped` = with the quiz boss verdict above it)
  *   ?preview=duel        — a duel reveal (`&duel=win|loss|draw`)
@@ -21,8 +21,6 @@ import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import EduHostResults from '@/components/education/live/EduHostResults';
 import EduStudentResults from '@/components/education/live/EduStudentResults';
-import { ClassroomResultsCard } from '@/components/education/ClassroomResultsCard';
-import { toStandings } from '@/components/education/results/resultsStandings';
 import { VocabQuizFinale } from '@/components/education/vocabQuiz/VocabQuizFinale';
 import { VocabQuizOwnFinale } from '@/components/education/vocabQuiz/VocabQuizOwnFinale';
 import { VocabQuizStandings } from '@/components/education/vocabQuiz/VocabQuizStandings';
@@ -114,19 +112,6 @@ export function PhoneResultsPreview() {
           ]}
           />
         </div>
-      </div>
-    );
-  }
-  if (params?.get('path') === 'legacy') {
-    return (
-      <div className="fixed inset-0 z-[80] overflow-y-auto bg-neo-navy p-3">
-        <ClassroomResultsCard
-          summary={summary}
-          username={me}
-          isTeacher={false}
-          standings={toStandings(players)}
-          onPractice={() => toast('Preview: practice')}
-        />
       </div>
     );
   }

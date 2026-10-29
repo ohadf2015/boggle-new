@@ -43,12 +43,10 @@ export const LESSON_HIT_POINTS = 50;
 
 /**
  * Languages the lesson seed can actually run in: a non-empty Word Tower letter
- * bag AND a Word Craft dictionary to accept ordinary words from. `fr`/`de` have
- * an empty bag (generateWheel returns [] with no error — a silent no-op), and
- * `ru` has a bag but no dictionary, which would reduce the game to spelling the
- * lesson list and nothing else.
+ * bag AND a dictionary to accept ordinary words from. `fr`/`de` have an empty
+ * bag (generateWheel returns [] with no error — a silent no-op).
  */
-const LESSON_SEED_LANGUAGES: readonly Language[] = ['en', 'he', 'sv', 'es', 'ja'];
+const LESSON_SEED_LANGUAGES: readonly Language[] = ['en', 'he', 'sv', 'es', 'ja', 'ru'];
 
 /** Sanitize, normalize per language, uppercase — the form the wheel matches on. */
 export function canonLessonWord(word: string, language: Language): string {

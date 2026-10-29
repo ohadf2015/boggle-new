@@ -29,10 +29,11 @@
  */
 
 import { resolveJoinCodeVerdict } from '@/lib/education/joinCodeVerdict';
+import { ROOM_LOCKED } from '@/shared/types/classroomLobbyLock';
 
 /** A refusal the caller can hand straight back as a `JoinClassroomResult`. */
 export interface GuestJoinRefusal {
-  code: 'INVALID_CODE' | 'NAME_TAKEN' | 'STUDENT_LIMIT_REACHED';
+  code: 'INVALID_CODE' | 'NAME_TAKEN' | 'STUDENT_LIMIT_REACHED' | typeof ROOM_LOCKED;
   /** For NAME_TAKEN: a nickname that is actually free, for one-tap acceptance. */
   suggestedName?: string;
   /** Log/fallback prose. Never rendered on its own — the caller localizes `code`. */
@@ -49,7 +50,7 @@ export interface GuestJoinRefusal {
 export async function checkGuestNameAvailable(
   name: string,
   joinCode: string
-): Promise<{ code?: 'NAME_TAKEN' | 'STUDENT_LIMIT_REACHED'; suggestedName?: string } | null> {
+): Promise<{ code?: 'NAME_TAKEN' | 'STUDENT_LIMIT_REACHED' | typeof ROOM_LOCKED; suggestedName?: string } | null> {
   try {
     const res = await fetch('/api/education/guest-name', {
       method: 'POST',
@@ -60,6 +61,7 @@ export async function checkGuestNameAvailable(
       body: JSON.stringify({ name, joinCode }),
     });
     if (res.status === 403) return { code: 'STUDENT_LIMIT_REACHED' };
+    if (res.status === 423) return { code: ROOM_LOCKED };
     if (res.status !== 409) return null;
     const data = await res.json();
     return { code: 'NAME_TAKEN', suggestedName: data?.suggestedName };
@@ -83,6 +85,9 @@ export async function runGuestJoinPreflight(
 
   if (codeVerdict === 'invalid') {
     return { code: 'INVALID_CODE', error: 'Invalid join code' };
+  }
+  if (nameCheck?.code === ROOM_LOCKED) {
+    return { code: ROOM_LOCKED, error: 'Room locked' };
   }
   if (nameCheck?.code === 'STUDENT_LIMIT_REACHED') {
     return { code: 'STUDENT_LIMIT_REACHED', error: 'STUDENT_LIMIT_REACHED' };

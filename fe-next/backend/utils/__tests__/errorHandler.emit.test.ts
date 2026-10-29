@@ -60,4 +60,14 @@ describe('emitError', () => {
 
     expect(warnMock).not.toHaveBeenCalled();
   });
+
+  it('ROOM_LOCKED is a typed LOW code: emits the code, never a LEGACY warn', async () => {
+    const { emitError, ErrorCodes } = await import('../errorHandler');
+    const socket = makeSocket();
+
+    emitError(socket, ErrorCodes.ROOM_LOCKED);
+
+    expect(warnMock).not.toHaveBeenCalled();
+    expect(socket.emit).toHaveBeenCalledWith('error', expect.objectContaining({ code: 'ROOM_LOCKED' }));
+  });
 });

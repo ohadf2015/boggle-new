@@ -34,8 +34,7 @@ describe('the registries agree with the code that enforces them', () => {
   );
 
   it.each(CLASSROOM_GAME_MODES)('%s is offered by the teacher mode picker', (mode) => {
-    // The picker's catalog, not the deleted wizard component: `ModePickerStrip`
-    // (lobby + mode sheet) renders from `TEACHER_GAME_MODES`.
+    // The teacher mode picker renders from this catalog.
     expect(TEACHER_GAME_MODES.some((m) => m.id === mode)).toBe(true);
   });
 
