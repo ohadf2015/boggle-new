@@ -1,6 +1,20 @@
 # Railway deployment configuration for LexiClash
 # Enables horizontal scaling with sticky sessions for WebSocket affinity
 
+[build]
+# A push that only touches tests or docs doesn't rebuild (a build is ~20 min).
+watchPatterns = [
+  "**",
+  "!**/__tests__/**",
+  "!**/*.test.ts",
+  "!**/*.test.tsx",
+  "!**/*.spec.ts",
+  "!**/e2e/**",
+  "!**/docs/**",
+  "!**/*.md",
+  "!**/.claude/**",
+]
+
 [deploy]
 # Health check endpoint for zero-downtime deployments
 healthcheckPath = "/health/live"

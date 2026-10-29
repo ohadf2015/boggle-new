@@ -94,7 +94,11 @@ RUN npm run build:schemas
 RUN node scripts/bundle-server.mjs
 
 # Build Next.js with standalone output → .next/standalone/
-RUN npm run build --ignore-scripts
+# .next/cache (webpack + the type-check's tsbuildinfo) persists between Railway
+# builds; without it every deploy compiled cold. Railway requires the
+# s/<service-id>- prefix on cache ids.
+RUN --mount=type=cache,id=s/cc7a91b5-cd7b-43b0-878d-cacf07b369ad-next-cache,target=/app/.next/cache \
+    npm run build --ignore-scripts
 
 # ── Stage 4: Production image (slim) ─────────────────────────────────
 FROM node:22-alpine AS runner

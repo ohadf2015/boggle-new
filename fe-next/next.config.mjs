@@ -82,33 +82,9 @@ const nextConfig = {
   // the response internally and the injector can't find <head> to inject into.
   compress: false,
 
-  // Force-include server-side packages that Next.js trace can miss
-  // (native addons, dynamic requires, data files, etc.)
-  outputFileTracingIncludes: {
-    '/**': [
-      './backend/*.txt',
-      './backend/data/dateThemedWords.js',
-      './node_modules/socket.io/**',
-      './node_modules/@socket.io/**',
-      './node_modules/ioredis/**',
-      './node_modules/express/**',
-      './node_modules/cors/**',
-      './node_modules/compression/**',
-      './node_modules/dotenv/**',
-      './node_modules/node-cron/**',
-      './node_modules/@sentry/**',
-      './node_modules/@supabase/**',
-      './node_modules/an-array-of-english-words/**',
-      './node_modules/an-array-of-spanish-words/**',
-      './node_modules/@arvidbt/**',
-      './node_modules/bad-words/**',
-      './node_modules/resend/**',
-      './node_modules/@google-cloud/**',
-      './node_modules/google-auth-library/**',
-
-      './node_modules/zod/**',
-    ],
-  },
+  // No outputFileTracingIncludes: the Dockerfile copies the full production
+  // node_modules and backend data into the image, so per-route include globs
+  // only cost the build ~3 min (Next re-globs them for every route).
 
   // Mark server-only word dictionary packages as Node.js externals so Turbopack
   // never walks their import trees into client bundles. Without this, Turbopack's
@@ -730,18 +706,10 @@ const nextConfig = {
       config.plugins.push(new ChunkLoadRetryPlugin());
     }
 
-    // Peak build-memory reduction for the webpack engine (prod builds with
-    // `next build --webpack`). Railway's build container has less RAM than a dev
-    // machine; without these, a big app can spike past the heap and OOM. Dev is
-    // untouched (full speed).
+    // Cap Terser workers so the prod build stays under the 6 GB build heap.
+    // Parallel module processing and the persistent cache stay on: with them
+    // off every Railway build compiled cold (~16 min); peak RSS measured 5.7 GB.
     if (!dev) {
-      // Process fewer modules concurrently → lower peak heap (slightly slower).
-      config.parallelism = 1;
-      // One-shot CI builds reuse nothing, so the persistent cache only costs
-      // serialization memory — drop it.
-      config.cache = false;
-      // Cap Terser minifier workers (default = CPU count; each worker holds
-      // chunks in memory and is the usual peak-RAM consumer).
       for (const m of config.optimization?.minimizer ?? []) {
         if (m && m.options && 'parallel' in m.options) {
           m.options.parallel = 2;
