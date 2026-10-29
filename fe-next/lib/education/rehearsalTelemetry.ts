@@ -18,3 +18,14 @@ export function trackEduRehearsalStarted({ source, mode, classExists }: EduRehea
     /* analytics must never block a rehearsal */
   }
 }
+
+export const EDU_PHONE_TEST_OPENED = 'edu_phone_test_opened';
+
+/** The teacher opened the "try it on your phone" QR in an empty live lobby. */
+export function trackEduPhoneTestOpened({ mode }: { mode: string }): void {
+  try {
+    (posthog.capture as unknown as Capture)(EDU_PHONE_TEST_OPENED, { mode });
+  } catch {
+    /* analytics must never block the lobby */
+  }
+}
