@@ -29,6 +29,8 @@ describe('singleplayer LCP shell (server HTML)', () => {
     expect(html).toContain('id="sp-lcp-paint"');
     expect(html).toMatch(/src="\/mascot\/winner-lcp\.webp"/);
     expect(html).toMatch(/fetchPriority="high"/);
+    expect(html).toContain('id="sp-lcp-anim"');
+    expect(html).not.toContain('winner-swap.webp');
     expect(html).not.toContain('data-nimg');
     expect(html).not.toMatch(/src="\/mascot\/winner\.webp"/);
     // Stay in the DOM; hide only after html[data-sp-ready] so results is not covered.
@@ -42,6 +44,9 @@ describe('singleplayer LCP shell (server HTML)', () => {
     });
     const html = renderToStaticMarkup(tree);
     expect(html).toContain('id="sp-lcp-paint"');
+    expect(html).toContain('id="sp-lcp-anim"');
+    expect(html).toMatch(/<img[^>]*src="\/mascot\/winner-lcp\.webp"/);
+    expect(html).not.toMatch(/<img[^>]*winner-swap\.webp/);
     expect(html).toMatch(/rel="preload"[^>]*href="\/mascot\/winner-lcp\.webp"/);
     expect(html).toContain('data-testid="sp-child"');
   });

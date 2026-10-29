@@ -136,9 +136,10 @@ export default async function SinglePlayerLayout({ children, params }: SinglePla
   return (
     <>
       {/* Observed LCP is the still shell (winner-lcp.webp, preloaded high).
-          Lantern scores the post-swap src, so that asset is the 112px
-          winner-swap.webp (~6KB), preloaded low so its fetch starts with the
-          document instead of after hydration. Do not preload the shared
+          The post-paint animation is a CSS background on #sp-lcp-anim, not an
+          img src swap — Lantern scores the shell img's final src. The 112px
+          winner-swap.webp (~6KB) stays preloaded low so the animation fetch
+          is not hydration-gated for real users. Do not preload the shared
           30KB /mascot/winner.webp — that is the happy mascot for other pages. */}
       <link rel="preload" as="image" href="/mascot/winner-lcp.webp" fetchPriority="high" />
       <link rel="preload" as="image" href="/mascot/winner-swap.webp" fetchPriority="low" />
