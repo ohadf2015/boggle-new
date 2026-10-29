@@ -2379,22 +2379,17 @@ html.reduce-motion *::after {
 }
 
 /* Border glow effect for active clue container */
-/* Single amber/gold color with subtle breathing - elegant and not distracting */
+/* Single amber/gold color with subtle breathing - elegant and not distracting.
+   The halo sits on its own layer and only its opacity breathes: a looping box-shadow repaints the whole screen every frame. */
 @keyframes clue-border-glow {
 
   0%,
   100% {
-    border-color: rgba(255, 200, 50, 0.7);
-    box-shadow: 0 0 8px rgba(255, 200, 50, 0.25),
-      0 0 16px rgba(255, 200, 50, 0.15),
-      4px 4px 0 rgb(var(--neo-black));
+    opacity: 0.55;
   }
 
   50% {
-    border-color: rgba(255, 200, 50, 0.95);
-    box-shadow: 0 0 12px rgba(255, 200, 50, 0.35),
-      0 0 24px rgba(255, 200, 50, 0.2),
-      4px 4px 0 rgb(var(--neo-black));
+    opacity: 1;
   }
 }
 
@@ -2416,7 +2411,25 @@ html.reduce-motion *::after {
 }
 
 .clue-container-glow {
+  position: relative;
+  border-color: color-mix(in srgb, var(--neo-yellow) 80%, transparent);
+  box-shadow: 4px 4px 0 rgb(var(--neo-black));
+}
+
+.clue-container-glow::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: 0 0 12px color-mix(in srgb, var(--neo-yellow) 35%, transparent), 0 0 24px color-mix(in srgb, var(--neo-yellow) 20%, transparent);
   animation: clue-border-glow 3s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .clue-container-glow::after {
+    animation: none;
+  }
 }
 
 .clue-letter-entrance {

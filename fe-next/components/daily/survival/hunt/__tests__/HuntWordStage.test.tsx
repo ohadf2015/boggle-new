@@ -1,7 +1,8 @@
 import React from 'react';
 import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { HuntWordStage } from '../HuntWordStage';
+import { createLiveWord } from '../liveWord';
 
 const t = (key: string, params?: unknown) => {
   const p = (typeof params === 'object' && params) as Record<string, unknown> | false;
@@ -60,6 +61,21 @@ describe('HuntWordStage', () => {
     const pill = screen.getByTestId('hunt-live-word').parentElement as HTMLElement;
     expect(pill.contains(reward)).toBe(false);
     expect(reward.contains(screen.getByTestId('hunt-stage-points'))).toBe(true);
+  });
+
+  it('Given a live word store, When a drag adds letters, Then the pill follows the store, not the stage word', () => {
+    const live = createLiveWord();
+    live.set('C');
+    stage({ phase: 'live', word: 'C', live });
+    act(() => live.set('CAT'));
+    expect(screen.getByTestId('hunt-live-word').textContent).toBe('CAT');
+  });
+
+  it('Given the hidden word is found, Then the stage cheers it like a good word and marks it as the target', () => {
+    stage({ phase: 'verdict', verdict: 'target', word: 'PLANE', points: 14 });
+    expect(screen.getByTestId('hunt-stage').dataset.verdict).toBe('target');
+    expect(screen.getByTestId('hunt-stage-points').textContent).toContain('+14');
+    expect(screen.getByText('wordHunt.survival.stage.praiseMid')).toBeTruthy();
   });
 
   it('keeps the released word up while the check is pending', () => {

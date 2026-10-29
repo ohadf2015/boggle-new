@@ -6,7 +6,8 @@ import type { WordDiscovery } from '../types';
 import { HuntBoard } from './HuntBoard';
 import { HuntWordStage } from './HuntWordStage';
 import stageStyles from './HuntWordStage.module.css';
-import type { HuntCell, HuntStageState } from './huntStage';
+import { isGoodVerdict, type HuntCell, type HuntStageState } from './huntStage';
+import type { LiveWordStore } from './liveWord';
 
 type TFn = (key: string, params?: Record<string, string | number> | string) => string;
 
@@ -15,8 +16,9 @@ export interface HuntPlayfieldProps {
   isGameOver: boolean;
   eliminatedLetters: Set<string>;
   onWordSubmit: (word: string) => void;
-  onWordChange: (word: string, count: number) => void;
+  onWordChange?: (word: string, count: number) => void;
   stage: HuntStageState;
+  liveWord?: LiveWordStore;
   onLive: (word: string) => void;
   onRelease: (word: string, path: HuntCell[]) => void;
   typedWord: string;
@@ -33,13 +35,14 @@ function rewardFor(word: string, discoveredWords: WordDiscovery[]): WordDiscover
   return [...discoveredWords].reverse().find((d) => d.word.toUpperCase() === upper) ?? null;
 }
 
-export function HuntPlayfield({
+function HuntPlayfieldInner({
   grid,
   isGameOver,
   eliminatedLetters,
   onWordSubmit,
   onWordChange,
   stage,
+  liveWord,
   onLive,
   onRelease,
   typedWord,
@@ -55,7 +58,7 @@ export function HuntPlayfield({
     (stage.phase === 'idle' || (stage.phase === 'pending' && typedWord.toUpperCase() !== stage.word.toUpperCase()));
   const phase = typing ? 'live' : stage.phase;
   const word = typing ? typedWord : stage.word;
-  const reward = stage.verdict === 'good' ? rewardFor(stage.word, discoveredWords) : null;
+  const reward = isGoodVerdict(stage.verdict) ? rewardFor(stage.word, discoveredWords) : null;
   const points = reward ? reward.lifeGained : null;
   const coins = reward && reward.tokensGained > 0 ? reward.tokensGained : null;
 
@@ -76,6 +79,7 @@ export function HuntPlayfield({
           message={feedbackMessage}
           calm={calm}
           size={size}
+          live={typing ? undefined : liveWord}
           t={t as (key: string, params?: Record<string, string | number>) => string}
         />
       </div>
@@ -99,5 +103,8 @@ export function HuntPlayfield({
     </div>
   );
 }
+
+/** Memoised: the life drain re-renders the game screen every second, and none of it reaches the board. */
+export const HuntPlayfield = React.memo(HuntPlayfieldInner);
 
 export default HuntPlayfield;

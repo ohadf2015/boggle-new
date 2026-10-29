@@ -344,6 +344,10 @@ export class ParticlePool {
     }
   }
 
+  get emitterCount(): number {
+    return this.emitters.length;
+  }
+
   /** Fire-and-forget burst at position */
   burst(config: ParticleConfig, x: number, y: number, count?: number): void {
     const emitter = this.create(config);

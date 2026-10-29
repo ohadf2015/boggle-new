@@ -127,15 +127,17 @@ export const SurvivalLifeBar = memo<SurvivalLifeBarProps>(({
         )}
       >
         {/* Fill bar */}
+        {/* Scaled, not resized: the drain ticks every second, and a width tween re-lays out the bar each frame. */}
         <AdaptiveMotion.div
+          data-testid="life-bar-fill"
           className={cn(
-            "h-full flex items-center relative overflow-hidden",
+            "h-full flex items-center relative overflow-hidden origin-left rtl:origin-right",
             "bg-linear-to-r",
             tier.gradient,
             isLow && !isLifeGaining && !skipAnimations && "life-bar-low-pulse"
           )}
-          style={{ width: `${Math.max(pct, 8)}%` }}
-          animate={{ width: `${Math.max(pct, 8)}%` }}
+          style={{ width: '100%', transform: `scaleX(${Math.max(pct, 8) / 100})` }}
+          animate={{ scaleX: Math.max(pct, 8) / 100 }}
           transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
         >
           {/* Shimmer sweep */}

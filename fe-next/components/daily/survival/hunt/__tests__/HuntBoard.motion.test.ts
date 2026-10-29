@@ -39,7 +39,7 @@ describe('Word Hunt board motion', () => {
   });
 
   it('Given a letter joins the selection, Then its pop never shrinks the tile below rest size', () => {
-    const selRules = rules().filter(([sel]) => /\[data-state='sel'\]/.test(sel));
+    const selRules = rules().filter(([sel]) => /\[data-sel\]/.test(sel));
     const names = selRules.flatMap(([, body]) => animationNames(body));
     expect(names.length).toBeGreaterThan(0);
     for (const name of names) {
@@ -49,27 +49,27 @@ describe('Word Hunt board motion', () => {
 
   it('Then the tile face and its letter move as one (no separate inner animations that drift apart; overlay pseudo-elements like the join ping are fine)', () => {
     for (const [sel, body] of rules()) {
-      if (/\[data-state='sel'\]\s+\.(face|ch)(?![\w:-])/.test(sel)) {
+      if (/\[data-sel\]\s+\.(face|ch)(?![\w:-])/.test(sel)) {
         expect({ sel, animation: animationNames(body) }).toEqual({ sel, animation: [] });
       }
     }
   });
 
   it('Then selected tiles lift straight — no alternating tilt that makes the row look crooked', () => {
-    const lifted = rules().filter(([sel]) => /^\.(tile|glyph)\[data-state='sel'\]$/.test(sel.split(',')[0].trim()));
+    const lifted = rules().filter(([sel]) => /^\.(tile|glyph)\[data-sel\]$/.test(sel.split(',')[0].trim()));
     expect(lifted.length).toBeGreaterThan(0);
     for (const [, body] of lifted) expect(body).not.toMatch(/rotate/);
   });
 
   it('Then the tip keeps the same size as the rest of the path, so moving on does not make tiles jump', () => {
-    const tipRules = rules().filter(([sel]) => /\.(tile|glyph)\[data-tip='true'\](,|$)/.test(sel));
+    const tipRules = rules().filter(([sel]) => /\.(tile|glyph)\[data-head\](,|$)/.test(sel));
     expect(tipRules.length).toBeGreaterThan(0);
     for (const [, body] of tipRules) expect(body).not.toMatch(/transform/);
   });
 
-  it('Then the newest trail segment draws in and the live tip breathes, so the path feels alive', () => {
-    const lead = rules().find(([sel]) => sel === '.lead');
-    expect(lead && animationNames(lead[1])).toEqual(['segDraw']);
+  it('Then the live trail is the shared painter polylines in the ribbon colour, and the live tip breathes', () => {
+    const core = rules().find(([sel]) => sel.includes("[data-trail='core']"));
+    expect(core?.[1]).toMatch(/stroke:\s*var\(--rib\)/);
     expect(() => keyframes('tipBreath')).not.toThrow();
   });
 
@@ -82,9 +82,41 @@ describe('Word Hunt board motion', () => {
     expect(css).not.toMatch(/backface-visibility/);
   });
 
-  it('Then each new segment sparks and the ribbon thickens with word length', () => {
-    const spark = rules().find(([sel]) => sel === '.spark');
-    expect(spark && animationNames(spark[1])).toEqual(['sparkFade']);
-    expect(css).toMatch(/data-tier='3'\]\s+\.ribbon\s*\{\s*stroke-width:\s*26/);
+  it('Then the live ribbon warms with word length (pink, orange at 5, yellow at 7)', () => {
+    expect(css).toMatch(/\[data-live-tier='2'\][^{]*\{\s*--rib:\s*var\(--neo-orange\)/);
+    expect(css).toMatch(/\[data-live-tier='3'\][^{]*\{\s*--rib:\s*var\(--neo-yellow\)/);
+  });
+
+  describe('when the hidden word is found', () => {
+    const targetRules = () => rules().filter(([sel]) => /data-verdict='target'/.test(sel));
+    const targetAnimations = () => targetRules().flatMap(([, body]) => animationNames(body));
+
+    it('Then the path tiles stamp gold one after another along the path', () => {
+      const staggered = targetRules().filter(([, body]) => /animation-delay:\s*calc\(var\(--i\)/.test(body));
+      expect(staggered.length).toBeGreaterThan(0);
+      expect(css).toMatch(/data-verdict='target'\][^{]*\{[^}]*--rib:\s*var\(--neo-yellow\)/);
+    });
+
+    it('Then every target keyframe moves only transform and opacity (no layout or paint-heavy properties)', () => {
+      const names = [...new Set(targetAnimations())];
+      expect(names.length).toBeGreaterThan(0);
+      for (const name of names) {
+        const props = [...keyframes(name).matchAll(/([a-z-]+)\s*:/g)].map((m) => m[1]);
+        expect({ name, props: [...new Set(props)].filter((p) => p !== 'transform' && p !== 'opacity') }).toEqual({ name, props: [] });
+      }
+    });
+
+    it('Then the whole stamp lands within 700ms for a 7-letter word', () => {
+      for (const [, body] of targetRules()) {
+        const dur = body.match(/animation:[^;]*?(\d+)ms/);
+        const step = body.match(/animation-delay:\s*calc\(var\(--i\)\s*\*\s*(\d+)ms\)/);
+        if (dur && step) expect(Number(dur[1]) + 6 * Number(step[1])).toBeLessThanOrEqual(700);
+      }
+    });
+
+    it('Then the board tray itself never moves, only its tiles', () => {
+      const tray = targetRules().filter(([sel]) => /\.tray\[data-verdict='target'\]\s*$/.test(sel));
+      for (const [, body] of tray) expect(animationNames(body)).toEqual([]);
+    });
   });
 });

@@ -1,6 +1,6 @@
 import type { FeedbackType } from '../types';
 
-export type HuntVerdict = 'good' | 'bad' | 'dupe';
+export type HuntVerdict = 'good' | 'target' | 'bad' | 'dupe';
 export type HuntPhase = 'idle' | 'live' | 'pending' | 'verdict';
 export interface HuntCell { row: number; col: number }
 
@@ -32,19 +32,24 @@ export const initialHuntStage: HuntStageState = {
   releaseSeq: 0,
 };
 
-const GOOD: ReadonlySet<FeedbackType> = new Set(['valid-word', 'target-found', 'discovery', 'short-valid', 'target-attempt']);
+const GOOD: ReadonlySet<FeedbackType> = new Set(['valid-word', 'discovery', 'short-valid', 'target-attempt']);
 const BAD: ReadonlySet<FeedbackType> = new Set(['not-on-board', 'not-in-dictionary', 'invalid-word']);
 
 export function verdictFor(type: FeedbackType | null): HuntVerdict | null {
   if (!type) return null;
+  if (type === 'target-found') return 'target';
   if (GOOD.has(type)) return 'good';
   if (BAD.has(type)) return 'bad';
   if (type === 'duplicate' || type === 'too-short' || type === 'too-long') return 'dupe';
   return null;
 }
 
+export function isGoodVerdict(verdict: HuntVerdict | null): verdict is 'good' | 'target' {
+  return verdict === 'good' || verdict === 'target';
+}
+
 export function verdictHoldMs(verdict: HuntVerdict | null): number {
-  return verdict === 'good' ? VERDICT_HOLD_MS : REJECT_HOLD_MS;
+  return isGoodVerdict(verdict) ? VERDICT_HOLD_MS : REJECT_HOLD_MS;
 }
 
 export function praiseKeyFor(length: number): string {

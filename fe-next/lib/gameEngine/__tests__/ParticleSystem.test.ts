@@ -237,6 +237,15 @@ describe('ParticlePool', () => {
     pool.destroy();
   });
 
+  it('Given a burst, Then it counts as live until its particles are gone', () => {
+    const pool = new ParticlePool(parent);
+    pool.burst(makeConfig({ lifetime: { min: 0.05, max: 0.05 } }), 100, 100, 3);
+    expect(pool.emitterCount).toBe(1);
+    pool.update(0.1);
+    expect(pool.emitterCount).toBe(0);
+    pool.destroy();
+  });
+
   it('should clear all emitters on destroy', () => {
     const pool = new ParticlePool(parent);
     pool.create(makeConfig());

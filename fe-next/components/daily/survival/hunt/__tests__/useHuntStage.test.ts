@@ -73,3 +73,52 @@ describe('useHuntStage', () => {
     expect(result.current.stage.phase).toBe('idle');
   });
 });
+
+describe('useHuntStage hidden word', () => {
+  afterEach(() => vi.useRealTimers());
+
+  it('Given the hidden word is found, Then its path stays lit until the results take over', () => {
+    vi.useFakeTimers();
+    const { result, rerender } = setup();
+    act(() => result.current.release('CAT', path));
+    rerender({ seq: 1, type: 'target-found', word: 'CAT' });
+    expect(result.current.stage).toMatchObject({ phase: 'verdict', verdict: 'target' });
+    act(() => vi.advanceTimersByTime(VERDICT_HOLD_MS * 5));
+    expect(result.current.stage).toMatchObject({ phase: 'verdict', verdict: 'target', path });
+  });
+});
+
+describe('useHuntStage live word', () => {
+  it('Given a drag in progress, When letters are added, Then the live word updates without a new stage state per letter', () => {
+    const { result } = setup();
+    act(() => result.current.live('C'));
+    const stageAtStart = result.current.stage;
+    expect(stageAtStart.phase).toBe('live');
+    act(() => result.current.live('CA'));
+    act(() => result.current.live('CAT'));
+    expect(result.current.stage).toBe(stageAtStart);
+    expect(result.current.liveWord.get()).toBe('CAT');
+  });
+
+  it('Given a live word subscriber, When the word changes and then clears, Then it hears each change and the stage returns to idle', () => {
+    const { result } = setup();
+    const seen: string[] = [];
+    const stop = result.current.liveWord.subscribe(() => seen.push(result.current.liveWord.get()));
+    act(() => result.current.live('C'));
+    act(() => result.current.live('CA'));
+    act(() => result.current.live(''));
+    stop();
+    expect(seen).toEqual(['C', 'CA', '']);
+    expect(result.current.stage.phase).toBe('idle');
+  });
+
+  it('Given a verdict still held, When a new drag starts, Then the stage goes live at once', () => {
+    vi.useFakeTimers();
+    const { result, rerender } = setup();
+    act(() => result.current.release('CAT', path));
+    rerender({ seq: 1, type: 'valid-word', word: 'CAT' });
+    expect(result.current.stage.phase).toBe('verdict');
+    act(() => result.current.live('D'));
+    expect(result.current.stage.phase).toBe('live');
+  });
+});

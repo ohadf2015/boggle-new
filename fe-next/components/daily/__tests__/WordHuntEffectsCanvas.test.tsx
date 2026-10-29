@@ -5,8 +5,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ─── Mock GameCanvas ────────────────────────────────────────────────
 // Bypass real PixiJS init — render children directly, expose spy engine.
+const ticker = { start: vi.fn(), stop: vi.fn(), add: vi.fn(), remove: vi.fn() };
 const mockEngine = {
+  app: { ticker },
   particles: {
+    emitterCount: 0,
     burst: vi.fn(),
     create: vi.fn(() => ({ emit: vi.fn(), destroy: vi.fn() })),
   },
@@ -47,11 +50,32 @@ const baseProps = {
 };
 
 beforeEach(() => {
-  Object.values(mockEngine.particles).forEach((fn) => 'mockClear' in fn && fn.mockClear());
+  Object.values(mockEngine.particles).forEach((fn) => typeof fn === 'function' && 'mockClear' in fn && fn.mockClear());
   Object.values(mockEngine.shake).forEach((fn) => fn.mockClear());
   Object.values(mockEngine.flash).forEach((fn) => fn.mockClear());
   Object.values(mockEngine.timeDilation).forEach((fn) => fn.mockClear());
   baseProps.onEffectsConsumed.mockClear();
+  Object.values(ticker).forEach((fn) => fn.mockClear());
+});
+
+describe('WordHuntEffectsCanvas idle sleep', () => {
+  it('Given an effect arrives, Then the canvas starts drawing again', () => {
+    render(<WordHuntEffectsCanvas {...baseProps} effects={[{ type: 'invalid', x: 1, y: 1 }]} />);
+    expect(ticker.start).toHaveBeenCalled();
+  });
+
+  it('Given a finish whose last burst is 1.5s out, When the frame check runs, Then it keeps drawing until that burst has played, then stops', () => {
+    const now = vi.spyOn(performance, 'now').mockReturnValue(0);
+    render(<WordHuntEffectsCanvas {...baseProps} effects={[{ type: 'gameWon', score: 10 }]} />);
+    const check = ticker.add.mock.calls.at(-1)?.[0] as () => void;
+    now.mockReturnValue(1000);
+    check();
+    expect(ticker.stop).not.toHaveBeenCalled();
+    now.mockReturnValue(5000);
+    check();
+    expect(ticker.stop).toHaveBeenCalledTimes(1);
+    now.mockRestore();
+  });
 });
 
 describe('WordHuntEffectsCanvas', () => {

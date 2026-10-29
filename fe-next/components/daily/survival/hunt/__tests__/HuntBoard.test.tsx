@@ -54,6 +54,17 @@ describe('HuntBoard', () => {
     expect(screen.getByTestId('hunt-trail')).toBeTruthy();
   });
 
+  it('Given the hidden word is found, Then its tiles are marked for the gold stamp in path order', () => {
+    const heldPath = [{ row: 3, col: 0 }, { row: 2, col: 1 }, { row: 1, col: 1 }];
+    board({ phase: 'verdict', verdict: 'target', heldPath });
+    expect(screen.getByRole('grid').dataset.verdict).toBe('target');
+    const lit = screen.getAllByRole('gridcell').filter((c) => c.dataset.state === 'held');
+    const order = lit
+      .sort((a, b) => Number(a.style.getPropertyValue('--i')) - Number(b.style.getPropertyValue('--i')))
+      .map((c) => c.dataset.letter);
+    expect(order).toEqual(['H', 'X', 'E']);
+  });
+
   it('draws no trail when nothing is selected', () => {
     board();
     expect(screen.queryByTestId('hunt-trail')).toBeNull();
@@ -102,9 +113,9 @@ describe('HuntBoard', () => {
       try {
         const { container } = board();
         act(() => { press(container, 0, 0); release(container); });
-        expect(screen.getAllByRole('gridcell').filter((c) => c.dataset.state === 'sel')).toHaveLength(1);
+        expect(screen.getAllByRole('gridcell').filter((c) => c.hasAttribute('data-sel'))).toHaveLength(1);
         act(() => { vi.advanceTimersByTime(HUNT_IDLE_SUBMIT_MS + 50); });
-        expect(screen.getAllByRole('gridcell').filter((c) => c.dataset.state)).toHaveLength(0);
+        expect(screen.getAllByRole('gridcell').filter((c) => c.dataset.state || c.hasAttribute('data-sel'))).toHaveLength(0);
       } finally {
         vi.useRealTimers();
       }
@@ -117,7 +128,7 @@ describe('HuntBoard', () => {
       expect(grid.dataset.verdict).toBeUndefined();
       const cells = screen.getAllByRole('gridcell');
       expect(cells.filter((c) => c.dataset.state === 'held')).toHaveLength(0);
-      expect(cells[15].dataset.state).toBe('sel');
+      expect(cells[15].hasAttribute('data-sel')).toBe(true);
     });
 
     it('given a drag through two tiles, then no click hint shows', () => {

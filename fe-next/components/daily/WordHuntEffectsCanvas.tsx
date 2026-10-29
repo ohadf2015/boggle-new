@@ -17,6 +17,7 @@ import {
   ELECTRIC_RINGS,
 } from '@/lib/gameEngine/presets/particles';
 import type { ParticleConfig } from '@/lib/gameEngine/types';
+import { fxCanSleep, fxHoldMs, fxResolution } from './fxSleep';
 
 // ─── Custom Presets ─────────────────────────────────────────────────
 
@@ -249,12 +250,38 @@ const WORD_VALID_COOLDOWN_MS = 80;
 const VERDICT_FLASH_MAX = 0.12;
 
 function EffectsWorker({ effects, onEffectsConsumed }: EffectsWorkerProps) {
-  const { particles, shake, flash, timeDilation, width, height } = useGameEngine();
+  const { app, particles, shake, flash, timeDilation, width, height } = useGameEngine();
   const urgencyEmitterRef = useRef<ReturnType<typeof particles.create> | null>(null);
+  const lastEffectAt = useRef(0);
+  const holdMs = useRef(0);
+
+  useEffect(() => {
+    lastEffectAt.current = performance.now();
+    const sleepWhenIdle = () => {
+      const idle = fxCanSleep({
+        emitters: particles.emitterCount,
+        shaking: shake.isShaking,
+        flashing: flash.isActive,
+        dilating: timeDilation.isActive,
+        sinceEffectMs: performance.now() - lastEffectAt.current,
+        holdMs: holdMs.current,
+      });
+      if (idle) app.ticker.stop();
+    };
+    app.ticker.add(sleepWhenIdle);
+    return () => {
+      try { app.ticker.remove(sleepWhenIdle); } catch { /* ticker already gone */ }
+    };
+  }, [app, particles, shake, flash, timeDilation]);
 
   // Process effects batch
   useEffect(() => {
     if (effects.length === 0) return;
+    const now = performance.now();
+    const pendingUntil = lastEffectAt.current + holdMs.current;
+    lastEffectAt.current = now;
+    holdMs.current = Math.max(fxHoldMs(effects), pendingUntil - now);
+    app.ticker.start();
 
     let lastWordValidTime = -Infinity;
 
@@ -444,7 +471,7 @@ function EffectsWorker({ effects, onEffectsConsumed }: EffectsWorkerProps) {
     }
 
     onEffectsConsumed();
-  }, [effects, particles, shake, flash, timeDilation, width, height, onEffectsConsumed]);
+  }, [app, effects, particles, shake, flash, timeDilation, width, height, onEffectsConsumed]);
 
   return null;
 }
@@ -471,7 +498,8 @@ export function WordHuntEffectsCanvas({
         height,
         background: 0x000000,
         backgroundAlpha: 0,
-        antialias: true,
+        antialias: false,
+        resolution: fxResolution(typeof window !== 'undefined' ? window.devicePixelRatio : 1),
       }}
       usePhysics={false}
       className="absolute inset-0 pointer-events-none z-10"

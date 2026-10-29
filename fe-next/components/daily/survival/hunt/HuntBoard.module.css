@@ -3,7 +3,6 @@
   --pad: clamp(5px, 1.5vw, 14px);
   --gap: clamp(4px, 1.1vw, 10px);
   --rib: var(--neo-pink);
-  --press-face: var(--neo-pink);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -43,11 +42,14 @@
   box-shadow: 6px 6px 0 var(--ink), 0 0 0 3px var(--neo-cyan);
 }
 
+.tray[data-live-tier='2'] { --rib: var(--neo-orange); }
+.tray[data-live-tier='3'] { --rib: var(--neo-yellow); }
 .tray[data-tier='2'] { --rib: var(--neo-orange); }
 .tray[data-tier='3'] { --rib: var(--neo-yellow); }
 .tray[data-verdict='good'] { --rib: var(--neo-lime); }
 .tray[data-verdict='bad'] { --rib: var(--neo-red); }
 .tray[data-verdict='dupe'] { --rib: var(--neo-yellow); }
+.tray[data-verdict='target'] { --rib: var(--neo-yellow); }
 
 /* The board itself never scales or dips — only tiles move. A tray-level
    scale reads as the whole board shrinking and growing under the finger. */
@@ -88,8 +90,8 @@
   pointer-events: none;
 }
 
-.tile[data-state='sel'] .face::after { animation: tilePing 360ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
-.tile[data-tip='true'] .face::after { animation: tilePing 360ms cubic-bezier(0.2, 0.8, 0.2, 1) both, tipBreath 760ms 360ms ease-in-out infinite alternate; }
+.tile[data-sel] .face::after { animation: tilePing 360ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.tile[data-head] .face::after { animation: tilePing 360ms cubic-bezier(0.2, 0.8, 0.2, 1) both, tipBreath 760ms 360ms ease-in-out infinite alternate; }
 
 .glyphs {
   position: absolute;
@@ -126,6 +128,7 @@
 
 .wrap[data-large='true'] .ch { font-size: 1.2em; }
 
+.glyph[data-sel] .ch,
 .glyph[data-state] .ch {
   display: inline-block;
   text-shadow: 0 0 2px #fffef0;
@@ -140,31 +143,26 @@
   box-shadow: 0 5px 0 var(--ink), inset 0 -4px 0 rgba(0, 0, 0, 0.2);
 }
 
-.tile[data-state='sel'],
-.glyph[data-state='sel'] {
+.tile[data-sel],
+.glyph[data-sel] {
   z-index: 2;
   transform: var(--lift);
   animation: tileJoin 200ms var(--ease) both;
 }
 
-/* Instant press light, set from pointerdown before React renders the selection. */
-.tile[data-pressed='true'] .face {
-  background: var(--press-face);
-  box-shadow: 0 2px 0 var(--ink), 0 0 0 3px var(--ink);
-  transition: none;
-}
-
-.tile[data-state='sel'] .face {
+.tile[data-sel] .face {
   background: linear-gradient(180deg, #ffe3f1 0%, #ffc2e0 100%);
   box-shadow: 0 5px 0 #b30066, 0 0 0 3px var(--ink);
 }
 
+.tray[data-live-tier='2'] .tile[data-sel] .face,
 .tray[data-tier='2'] .tile[data-state] .face { background: linear-gradient(180deg, #ffe6d6 0%, #ffc49f 100%); box-shadow: 0 5px 0 #c94a16, 0 0 0 3px var(--ink); }
+.tray[data-live-tier='3'] .tile[data-sel] .face,
 .tray[data-tier='3'] .tile[data-state] .face { background: linear-gradient(180deg, #fff8c9 0%, #ffe86b 100%); box-shadow: 0 5px 0 #b38f00, 0 0 0 3px var(--ink); }
 
-.tile[data-tip='true'],
-.glyph[data-tip='true'] { z-index: 3; }
-.tile[data-tip='true'] .face { outline: 3px solid var(--neo-yellow); outline-offset: 2px; }
+.tile[data-head],
+.glyph[data-head] { z-index: 3; }
+.tile[data-head] .face { outline: 3px solid var(--neo-yellow); outline-offset: 2px; }
 
 .tile[data-state='held'],
 .glyph[data-state='held'] { z-index: 2; transform: var(--lift); }
@@ -203,6 +201,29 @@
 .tray[data-verdict='dupe'] .tile[data-state='held'],
 .tray[data-verdict='dupe'] .glyph[data-state='held'] { animation: tileWobble 380ms ease-in-out both; }
 
+.tray[data-verdict='target'] .tile[data-state='held'],
+.tray[data-verdict='target'] .glyph[data-state='held'] {
+  animation: tileStamp 260ms var(--spring) both;
+  animation-delay: calc(var(--i) * 45ms);
+}
+.tray[data-verdict='target'] .tile[data-state='held'] .face {
+  box-shadow: 0 5px 0 var(--ink), 0 0 0 3px var(--ink);
+}
+.tray[data-verdict='target'] .tile[data-state='held'] .face::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg, var(--neo-cream) 0%, var(--neo-yellow) 100%);
+  animation: goldFlip 140ms ease-out both;
+  animation-delay: calc(var(--i) * 45ms + 60ms);
+}
+.tray[data-verdict='target'] .tile[data-state='held'] .face::after {
+  border-color: var(--neo-yellow);
+  animation: stampRing 380ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(var(--i) * 45ms + 60ms);
+}
+
 .layer {
   position: absolute;
   inset: calc(var(--pad) - var(--gap) / 2);
@@ -236,36 +257,36 @@
   stroke-dasharray: 10 12;
 }
 
-.lead { stroke-dasharray: 1 1; animation: segDraw 150ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
 
-.spark {
+
+
+/* Live path: the shared board engine writes these polylines; sized to the cell like the held ribbon. */
+.liveTrail {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 4;
+}
+.liveTrail polyline {
   fill: none;
-  stroke: #fffef0;
-  stroke-width: 9;
   stroke-linecap: round;
-  animation: sparkFade 320ms ease-out both;
+  stroke-linejoin: round;
 }
-
-.rubber {
-  stroke: var(--rib);
-  stroke-width: 16;
-  stroke-linecap: round;
-  opacity: 0;
-  transition: opacity 90ms;
-}
+.liveTrail [data-trail='ink'],
+.liveTrail [data-tail='ink'] { stroke: var(--ink); stroke-width: calc(100cqw / var(--cols) * 0.28); opacity: 0.55; }
+.liveTrail [data-trail='core'],
+.liveTrail [data-tail='core'] { stroke: var(--rib); stroke-width: calc(100cqw / var(--cols) * 0.2); opacity: 0.9; }
+.liveTrail [data-trail='shine'] { stroke: var(--neo-cream); stroke-width: 3px; opacity: 0.75; stroke-dasharray: 10 12; }
+.liveTrail [data-finger] { fill: var(--rib); stroke: var(--ink); stroke-width: 3px; }
+.liveTrail [data-finger][data-off] { display: none; }
 
 .tray[data-tier='2'] .ribbon { stroke-width: 23; }
 .tray[data-tier='3'] .ribbon { stroke-width: 26; }
 
 .cap { fill: var(--rib); stroke: var(--ink); stroke-width: 5; opacity: 0.7; }
-.tipDot {
-  fill: #fffef0;
-  opacity: 0.6;
-  stroke: var(--ink);
-  stroke-width: 4;
-  transform-box: fill-box;
-  transform-origin: center;
-}
 
 .tray[data-phase='verdict'] .trail { animation: trailOut 700ms ease-in both; }
 
@@ -303,14 +324,6 @@
   55% { transform: translateY(-8px) scale(1.08); }
   100% { transform: var(--lift); }
 }
-@keyframes sparkFade {
-  from { opacity: 0.95; }
-  to { opacity: 0; }
-}
-@keyframes segDraw {
-  from { stroke-dashoffset: 1; }
-  to { stroke-dashoffset: 0; }
-}
 @keyframes tipBreath {
   from { opacity: 0.1; transform: scale(1); }
   to { opacity: 0.5; transform: scale(1.12); }
@@ -336,10 +349,6 @@
   55% { transform: translateX(-4px); }
   75% { transform: translateX(2px); }
 }
-@keyframes tipPulse {
-  from { transform: scale(0.85); }
-  to { transform: scale(1.25); }
-}
 @keyframes trailOut {
   0%, 55% { opacity: 1; }
   100% { opacity: 0; }
@@ -348,4 +357,18 @@
   0% { transform: var(--lift); }
   45% { transform: translateY(-11px) scale(1.08); }
   100% { transform: var(--lift); }
+}
+@keyframes tileStamp {
+  0% { transform: var(--lift); }
+  45% { transform: translateY(-14px) scale(1.2) rotate(var(--tilt)); }
+  75% { transform: translateY(-2px) scale(0.97); }
+  100% { transform: var(--lift); }
+}
+@keyframes goldFlip {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes stampRing {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.6); }
 }

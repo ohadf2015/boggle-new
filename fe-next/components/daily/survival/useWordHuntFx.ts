@@ -7,8 +7,14 @@ import { useGameRewards } from '@/hooks/useGameRewards';
 import { wordHuntSolveTier } from '@/shared/utils/wordHuntScoring';
 import type { WordHuntEffect } from '../WordHuntEffectsCanvas';
 import type { SurvivalGameState } from './useSurvivalGameLogic';
+import { LIFE_DRAIN_RATE } from './constants';
 
 const LOW_LIFE = 25;
+
+/** The per-second drain is shown by the life bar; only a penalty gets the screen shock. */
+export function isPenaltyDrop(drop: number): boolean {
+  return drop > LIFE_DRAIN_RATE;
+}
 
 export function useWordHuntFx(state: SurvivalGameState, skipAnimations: boolean) {
   const { variant: clueShakeVariant, trackExposure: trackClueShakeExposure } =
@@ -92,7 +98,7 @@ export function useWordHuntFx(state: SurvivalGameState, skipAnimations: boolean)
     prevLifeRef.current = curr;
     if (skipAnimations) return;
     if (curr > prev) pushEffect({ type: 'lifeGain', amount: curr - prev });
-    else if (curr < prev) pushEffect({ type: 'lifeDrop', amount: prev - curr });
+    else if (isPenaltyDrop(prev - curr)) pushEffect({ type: 'lifeDrop', amount: prev - curr });
     if (curr > 0 && curr <= LOW_LIFE && !lowLifeFiredRef.current) {
       pushEffect({ type: 'lowLife' });
       lowLifeFiredRef.current = true;

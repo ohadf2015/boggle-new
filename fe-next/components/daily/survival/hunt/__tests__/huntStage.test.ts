@@ -1,12 +1,18 @@
 import { describe, it, expect } from 'vitest';
-import { huntStageReducer, initialHuntStage, verdictFor, praiseKeyFor, verdictHoldMs, VERDICT_HOLD_MS } from '../huntStage';
+import { huntStageReducer, initialHuntStage, verdictFor, praiseKeyFor, verdictHoldMs, isGoodVerdict, VERDICT_HOLD_MS } from '../huntStage';
 
 const path = [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 1, col: 1 }];
 
 describe('verdictFor', () => {
   it('maps accepted words to good', () => {
     expect(verdictFor('valid-word')).toBe('good');
-    expect(verdictFor('target-found')).toBe('good');
+  });
+  it('gives the hidden word its own verdict, accepted like any good word and held as briefly', () => {
+    expect(verdictFor('target-found')).toBe('target');
+    expect(isGoodVerdict('target')).toBe(true);
+    expect(isGoodVerdict('good')).toBe(true);
+    expect(isGoodVerdict('bad')).toBe(false);
+    expect(isGoodVerdict(null)).toBe(false);
   });
   it('maps penalised words to bad', () => {
     expect(verdictFor('not-on-board')).toBe('bad');

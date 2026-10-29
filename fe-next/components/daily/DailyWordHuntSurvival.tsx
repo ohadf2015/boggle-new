@@ -42,6 +42,7 @@ import { SurvivalExtraLifeModal } from './survival/SurvivalExtraLifeModal';
 import { useWordHuntFx } from './survival/useWordHuntFx';
 import { HuntPlayfield } from './survival/hunt/HuntPlayfield';
 import { useHuntStage } from './survival/hunt/useHuntStage';
+import { useLiveWord } from './survival/hunt/liveWord';
 import { HuntFinishOverlay } from './survival/hunt/HuntFinishOverlay';
 import { HuntFeedbackPill } from './survival/hunt/HuntFeedbackPill';
 import { wordHuntSolveTier } from '@/shared/utils/wordHuntScoring';
@@ -196,13 +197,15 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   });
 
   const fx = useWordHuntFx(state, skipAnimations);
-  const { stage, live: onStageLive, release: onStageRelease } = useHuntStage({
+  const { stage, live: onStageLive, release: onStageRelease, liveWord } = useHuntStage({
     feedbackSeq: state.feedbackSeq,
     feedbackType: state.feedbackType,
     feedbackWord: state.feedbackWord,
   });
 
-  const { handleWordSubmit, handleWordChange } = actions;
+  const { handleWordSubmit } = actions;
+  const targetLength = targetWord.length;
+  const swipeMatchesTarget = useLiveWord(liveWord, (w) => w.length === targetLength);
   const submitTypedWord = useCallback((word: string) => {
     onStageRelease(word, []);
     handleWordSubmit(word);
@@ -299,7 +302,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     isGameOver: state.isGameOver,
     eliminatedLetters: state.eliminatedLetters,
     onWordSubmit: handleWordSubmit,
-    onWordChange: handleWordChange,
+    liveWord,
     stage,
     onLive: onStageLive,
     onRelease: onStageRelease,
@@ -310,6 +313,11 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     t,
   };
 
+  const rewardAnchor = useMemo(
+    () => <span id={fx.rewardId} className="absolute left-1/2 top-8 pointer-events-none" />,
+    [fx.rewardId],
+  );
+
   const finishOverlay = state.isGameOver ? (
     <HuntFinishOverlay
       outcome={state.hasWon ? 'win' : 'loss'}
@@ -318,6 +326,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       tier={state.hasWon ? wordHuntSolveTier(state.attempts.filter((a) => !a.isDiscovery).length) : null}
       calm={skipAnimations}
       onSkip={actions.skipFinish}
+      sourcePath={state.hasWon ? stage.path : undefined}
       t={t}
     />
   ) : null;
@@ -433,7 +442,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           gameDir={actions.gameDir}
           matchesTargetLength={
             !state.isGameOver
-            && (keyboardInput.typedWord || state.formedWord).length === targetWord.length
+            && (keyboardInput.typedWord ? keyboardInput.typedWord.length === targetWord.length : swipeMatchesTarget)
           }
           t={t}
         />
@@ -466,7 +475,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         <HuntPlayfield
           {...playfieldProps}
           size={inShell ? 'desktop' : 'phone'}
-          stageOverlay={<span id={fx.rewardId} className="absolute left-1/2 top-8 pointer-events-none" />}
+          stageOverlay={rewardAnchor}
         />
         {finishOverlay}
       </div>

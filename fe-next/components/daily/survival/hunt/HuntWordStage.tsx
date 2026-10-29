@@ -3,7 +3,8 @@
 import React from 'react';
 import { Coins, Heart } from 'lucide-react';
 import { getLifeBonusForWord } from '../constants';
-import { praiseKeyFor, type HuntPhase, type HuntVerdict } from './huntStage';
+import { isGoodVerdict, praiseKeyFor, type HuntPhase, type HuntVerdict } from './huntStage';
+import { useLiveWord, type LiveWordStore } from './liveWord';
 import styles from './HuntWordStage.module.css';
 
 type TFn = (key: string, params?: Record<string, string | number>) => string;
@@ -17,11 +18,18 @@ export interface HuntWordStageProps {
   message: string;
   calm: boolean;
   size?: 'phone' | 'desktop';
+  /** While dragging, the pill reads the letters from here instead of `word`. */
+  live?: LiveWordStore;
   t: TFn;
 }
 
-export function HuntWordStage({ phase, word, verdict, points, coins = null, message, calm, size = 'phone', t }: HuntWordStageProps) {
-  const letters = phase === 'idle' ? [] : Array.from(word);
+const same = (w: string) => w;
+
+export function HuntWordStage({ phase, word, verdict, points, coins = null, message, calm, size = 'phone', live, t }: HuntWordStageProps) {
+  const liveWord = useLiveWord(live, same);
+  const shownWord = phase === 'live' && live && liveWord ? liveWord : word;
+  const letters = phase === 'idle' ? [] : Array.from(shownWord);
+  const good = isGoodVerdict(verdict);
   const showVerdict = phase === 'verdict' && verdict;
   const building = phase === 'live' || phase === 'pending';
   const bonus = building ? getLifeBonusForWord(letters.length) : 0;
@@ -53,14 +61,14 @@ export function HuntWordStage({ phase, word, verdict, points, coins = null, mess
             {t('wordHunt.survival.stage.longWord', { bonus })}
           </span>
         )}
-        {showVerdict && verdict === 'good' && <span className={styles.praise}>{t(praiseKeyFor(letters.length))}</span>}
+        {showVerdict && good && <span className={styles.praise}>{t(praiseKeyFor(letters.length))}</span>}
       </div>
-      {showVerdict && verdict !== 'good' && message && (
+      {showVerdict && !good && message && (
         <span className={styles.reward}>
           <span className={styles.reason}>{message}</span>
         </span>
       )}
-      {showVerdict && verdict === 'good' && points != null && (
+      {showVerdict && good && points != null && (
         <span data-testid="hunt-stage-reward" className={styles.reward}>
           <span data-testid="hunt-stage-points" className={styles.points}>
             +{points}

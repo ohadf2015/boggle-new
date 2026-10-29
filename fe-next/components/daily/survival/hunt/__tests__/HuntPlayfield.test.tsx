@@ -1,5 +1,6 @@
 import React from 'react';
-import { describe, it, expect } from 'vitest';
+import * as boardSelection from '@/components/board/useBoardSelection';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { HuntPlayfield } from '../HuntPlayfield';
 import { initialHuntStage, type HuntStageState } from '../huntStage';
@@ -30,6 +31,26 @@ function field(stage: HuntStageState, extra: Partial<React.ComponentProps<typeof
 }
 
 describe('HuntPlayfield', () => {
+  it('Given the game screen re-renders with the same board props (the once-a-second life drain), Then the board does not render again', () => {
+    const spy = vi.spyOn(boardSelection, 'useBoardSelection');
+    const props = {
+      grid, isGameOver: false, eliminatedLetters: new Set<string>(), onWordSubmit: () => {}, stage: initialHuntStage,
+      onLive: () => {}, onRelease: () => {}, typedWord: '', feedbackMessage: '', discoveredWords: [], calm: false,
+      t: (k: string) => k,
+    };
+    const Screen = ({ life }: { life: number }) => (
+      <div data-life={life}>
+        <HuntPlayfield {...props} />
+      </div>
+    );
+    const { rerender } = render(<Screen life={100} />);
+    const before = spy.mock.calls.length;
+    rerender(<Screen life={99} />);
+    rerender(<Screen life={98} />);
+    expect(spy.mock.calls.length).toBe(before);
+    spy.mockRestore();
+  });
+
   it('squares the board in the room the stage leaves, sizing both from one stage height, and centres them as a block', () => {
     field(initialHuntStage);
     const root = screen.getByTestId('hunt-playfield');
