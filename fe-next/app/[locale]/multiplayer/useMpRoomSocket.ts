@@ -18,7 +18,8 @@ import { rejoinFeedback } from '@/lib/multiplayer/rejoinFeedback';
 import { rosterSeedFromJoined } from '@/lib/multiplayer/roster';
 import { resetMpFeedback } from '@/lib/multiplayer/mpFeedback';
 import { hostTransferAction, roomGoneAction, type ClassroomContext } from '@/lib/education/classroomRoomGone';
-import { trackInviteRoomDead, trackInviteConsumed } from '@/utils/growthTracking';
+import { trackInviteRoomDead, trackInviteConsumed, trackGrowthEvent } from '@/utils/growthTracking';
+import { shouldOfferQuickPlayRecovery, consumeRoomEndedRecoveryAccepted } from '@/lib/multiplayer/roomEndedRecovery';
 import { classifyRoomError } from '@/utils/multiplayer/roomErrorClassifier';
 import { MP_TOAST_IDS } from '@/utils/multiplayer/mpToastIds';
 import type { Language, ActiveRoom, Avatar } from '@/shared/types/game';
@@ -81,6 +82,12 @@ export interface MpRoomSocketContext {
   classroomContext: ClassroomContext;
   classroomDecisionRef: MutableRefObject<{ context: ClassroomContext; isHost: boolean }>;
   exitClassroomStudentToHub: () => void;
+  /**
+   * The arcade room this player tried to join is gone: hand the entry screen a
+   * one-tap Quick Play offer (`lib/multiplayer/roomEndedRecovery`). Optional —
+   * without it the plain "room is gone" toast shows.
+   */
+  offerQuickPlayRecovery?: (goneCode: string) => void;
 }
 
 /**
@@ -106,6 +113,7 @@ export function useMpRoomSocket(ctx: MpRoomSocketContext) {
     setRoomLanguage, setUsername, setGameCode, setRoomName, setActiveRooms, setIsSpectator, setSpectators,
     setPlayersInRoom, setPlayersInRoomThrottled, setPendingGameStart, setGameStartTime, setShowResults,
     setResultsData, setHostLeftState, classroomContext, classroomDecisionRef, exitClassroomStudentToHub,
+    offerQuickPlayRecovery,
   } = ctx;
   const roomWait = { hold: ctx.roomWaitHold };
   const mpSounds = { onMatchStart: ctx.onMatchStart };
@@ -150,6 +158,11 @@ export function useMpRoomSocket(ctx: MpRoomSocketContext) {
       setShouldAutoJoin(false);
       setIsJoining(false);
       setPrefilledRoomCode('');
+      // The player tapped "Play now" on the room-ended offer: this is the
+      // recovered join (consumed once, so later joins are not counted).
+      if (consumeRoomEndedRecoveryAccepted()) {
+        trackGrowthEvent('mp_room_gone_recovery', { stage: 'joined', asHost: !!data.isHost });
+      }
       // `mp_quickplay_joined` lives in useMultiplayerJoin, which knows the join
       // was a Quick Play from `options.quickPlay` rather than a URL param.
       // Track invite consumed for returning users who arrived via ?room= invite redirect.
@@ -305,8 +318,21 @@ export function useMpRoomSocket(ctx: MpRoomSocketContext) {
     // invite to a dead room gets "that room is no longer available" instead
     // of an empty lobby — the 2026-05-25 "empty page" report). The shared
     // `roomGone` toast id collapses a run of dead-room taps into one.
-    const feedback = roomGoneFeedback({ wasActive: isActive, cameFromInvite, roomCode: goneCode });
-    toast(t(feedback.key, feedback.params), { duration: 5000, icon: feedback.icon, id: MP_TOAST_IDS.roomGone });
+    // A cold arcade join to a dead room (mostly old links: 156 people in 28
+    // days, a third never played after) gets "this room ended" with a one-tap
+    // Quick Play, shown by the entry screen, instead of only the plain toast.
+    const offerRecovery = shouldOfferQuickPlayRecovery({
+      wasActive: isActive,
+      context: classroomDecisionRef.current.context,
+      isHost: classroomDecisionRef.current.isHost,
+    });
+    if (offerRecovery && offerQuickPlayRecovery) {
+      offerQuickPlayRecovery(goneCode);
+      trackGrowthEvent('mp_room_gone_recovery', { stage: 'offered', cameFromInvite });
+    } else {
+      const feedback = roomGoneFeedback({ wasActive: isActive, cameFromInvite, roomCode: goneCode });
+      toast(t(feedback.key, feedback.params), { duration: 5000, icon: feedback.icon, id: MP_TOAST_IDS.roomGone });
+    }
     if (!isActive && cameFromInvite) {
       trackInviteRoomDead({ roomCode: goneCode || 'unknown' });
     }
@@ -320,7 +346,8 @@ export function useMpRoomSocket(ctx: MpRoomSocketContext) {
       window.history.replaceState({}, '', stripMultiplayerExitParams(window.location.href));
     }
   }, [gameCode, isActive, t, socket, classroomDecisionRef, exitClassroomStudentToHub, setActiveRooms, setError,
-      setPrefilledRoomCode, setAttemptingReconnect, setShouldAutoJoin, setGameCode, setIsActive, setIsHost, setIsPrivate]);
+      setPrefilledRoomCode, setAttemptingReconnect, setShouldAutoJoin, setGameCode, setIsActive, setIsHost, setIsPrivate,
+      offerQuickPlayRecovery]);
   handleRoomGoneRef.current = handleRoomGone;
 
   // Flush decisions parked while the classroom record was pending. A deferred
