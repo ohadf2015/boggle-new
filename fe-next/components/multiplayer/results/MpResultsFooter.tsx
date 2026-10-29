@@ -12,8 +12,12 @@ interface AutoRingProps {
   secondsLeft: number;
   total: number;
   onCancel: () => void;
+  /** What the ring starts: the next round (default) or a new series. */
+  labelKey?: string;
   t: TFn;
 }
+
+type AutoState = { active: boolean; secondsLeft: number; total: number; cancel: () => void; labelKey?: string };
 
 const R = 20;
 const C = 2 * Math.PI * R;
@@ -34,14 +38,14 @@ function MpWaitingHostChip({ t }: { t: TFn }) {
 }
 
 /** 10s auto-advance ring: tap to stop it. One stroke step per second (no rAF). */
-export function MpAutoRing({ secondsLeft, total, onCancel, t }: AutoRingProps) {
+export function MpAutoRing({ secondsLeft, total, onCancel, labelKey = 'mpUi.results.autoIn', t }: AutoRingProps) {
   const urgent = secondsLeft <= 3;
   return (
     <button
       type="button"
       onClick={onCancel}
       data-testid="mp-auto-ring"
-      aria-label={`${t('mpUi.results.autoIn', { seconds: secondsLeft })} — ${t('mpUi.results.cancelAuto')}`}
+      aria-label={`${t(labelKey, { seconds: secondsLeft })} — ${t('mpUi.results.cancelAuto')}`}
       className="group relative shrink-0 grid place-items-center rounded-full bg-neo-navy-light border-[3px] border-neo-cream/40 shadow-hard-sm w-[calc(64px*var(--mp-u,1))] h-[calc(64px*var(--mp-u,1))]"
     >
       <svg viewBox="0 0 48 48" aria-hidden="true" className="absolute inset-0 w-full h-full -rotate-90">
@@ -72,7 +76,7 @@ export interface MpIntermissionFooterProps {
   isReady: boolean;
   ready: number;
   total: number;
-  auto: { active: boolean; secondsLeft: number; total: number; cancel: () => void } | null;
+  auto: AutoState | null;
   /** Someone in the room is mid-ad: START holds so the watcher isn't torn out. */
   adHold?: boolean;
   onStart: () => void;
@@ -99,7 +103,7 @@ export function MpIntermissionFooter({ isHost, isClassroom, isReady, ready, tota
   }
   return (
     <div className="flex items-center gap-[calc(10px*var(--mp-u,1))]">
-      {auto?.active && <MpAutoRing secondsLeft={auto.secondsLeft} total={auto.total} onCancel={auto.cancel} t={t} />}
+      {auto?.active && <MpAutoRing secondsLeft={auto.secondsLeft} total={auto.total} onCancel={auto.cancel} labelKey={auto.labelKey} t={t} />}
       {isHost ? (
         <MpPrimaryCta
           tone="lime"
@@ -129,14 +133,17 @@ export interface MpFinalFooterProps {
   onShare: () => void;
   /** Exit label key; a classroom host's exit goes back to class. */
   leaveKey?: string;
+  /** exp-mp-auto-continue-v1: the series final counts down to a new series. */
+  auto?: AutoState | null;
   t: TFn;
 }
 
 /** Final results: [REMATCH] [LEAVE] [share]. One primary; the rest are quiet. */
-export function MpFinalFooter({ isHost, isReady, onRematch, onLeave, onShare, leaveKey = 'mpUi.results.leave', t }: MpFinalFooterProps) {
+export function MpFinalFooter({ isHost, isReady, onRematch, onLeave, onShare, leaveKey = 'mpUi.results.leave', auto = null, t }: MpFinalFooterProps) {
   const quiet = 'shrink-0 inline-flex flex-col items-center justify-center gap-0.5 rounded-neo border-[3px] border-neo-cream/40 bg-neo-navy-light text-neo-white shadow-hard-sm font-bold uppercase w-[calc(64px*var(--mp-u,1))] h-[calc(64px*var(--mp-u,1))] text-[calc(10px*var(--mp-u,1))] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none';
   return (
     <div className="flex items-center gap-[calc(10px*var(--mp-u,1))]">
+      {auto?.active && <MpAutoRing secondsLeft={auto.secondsLeft} total={auto.total} onCancel={auto.cancel} labelKey={auto.labelKey} t={t} />}
       {!isHost && isReady ? (
         <MpWaitingHostChip t={t} />
       ) : (

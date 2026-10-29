@@ -541,6 +541,47 @@ export const EXPERIMENTS = {
   }),
 
   /**
+   * First-visit MP early quitting (28d, humans): 1,374 started a game, 1,108
+   * reached results 1, 847 results 2, 687 results 3; first-visit players who
+   * finish 5+ games come back next day 13% vs 2-3%. Extends the results
+   * screen's existing 10s auto-advance ring (useAutoAdvance) in every
+   * non-classroom room:
+   * control = today: ring between rounds only; one tap (or a host stop)
+   *   switches it off for the whole browser session.
+   * auto-continue = the ring also runs on the series-final screen (host rolls
+   *   into a new series, joiners ready up); a tap cancels THIS screen only,
+   *   the next results re-arm it.
+   * Both arms fire growth:replay_countdown_shown / results_autoplay_cancelled.
+   * Conversion = mp_session_game per first-visit player (5+ games).
+   * Guardrail = leaving from results must not rise.
+   * Ship to PostHog: flag key = 'exp-mp-auto-continue-v1', 50/50 rollout.
+   */
+  'exp-mp-auto-continue-v1': defineExperiment({
+    variants: ['control', 'auto-continue'] as const,
+    default: 'control',
+    description:
+      'MP results auto-continue. control = 10s ring between rounds only, a cancel lasts the session. auto-continue = ring also on the series-final screen (auto new series), a cancel lasts one screen. Never in classrooms. Conversion = MP games per first visit (5+).',
+  }),
+
+  /**
+   * 1v1 public rooms feel empty: in 2-player rooms where the player found 0
+   * words only 67% started another game, vs ~89% in rooms of 3+.
+   * control = no change.
+   * bot = when a public room would start with exactly 2 humans and no bot, the
+   *   host's startGame carries `duoBot` and the server seats ONE easy bot
+   *   (autoAddBotForDuo). Never classroom, ranked, private or tournament.
+   * The HOST's arm decides for the room. Exposure counts only real 1v1 rooms.
+   * Conversion = next game started after results (2-human rooms).
+   * Ship to PostHog: flag key = 'exp-mp-duo-bot-v1', 50/50 rollout.
+   */
+  'exp-mp-duo-bot-v1': defineExperiment({
+    variants: ['control', 'bot'] as const,
+    default: 'control',
+    description:
+      'MP 1v1 third seat. control = 2 humans play alone. bot = server adds one easy bot when a public room starts with exactly 2 humans and no bot (never classroom/ranked/private). Host arm decides. Conversion = replay rate in 2-human rooms.',
+  }),
+
+  /**
    * Landing page quick-play CTA. Hypothesis: rage-clicks on /es (and other
    * locales) signal decision paralysis — the mode grid offers too many choices
    * with no clear primary action. The `quick-play` arm adds a high-contrast

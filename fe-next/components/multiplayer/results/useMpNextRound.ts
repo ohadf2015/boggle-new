@@ -24,6 +24,8 @@ interface Options {
   gameCode?: string;
   roomLanguage: Language;
   selectedGameMode: GameModeOption;
+  /** exp-mp-duo-bot-v1: ask the server for a third-seat bot if the room starts 1v1. */
+  duoBot?: boolean;
 }
 
 function buildGrid(roomLanguage: Language): Grid {
@@ -43,7 +45,7 @@ function buildGrid(roomLanguage: Language): Grid {
  * - `isStartingNextRound` holds a brand wash over the ad-teardown / socket gap,
  *   released after the interstitial's own worst case (never a second number).
  */
-export function useMpNextRound({ socket, isHost, gameCode, roomLanguage, selectedGameMode }: Options) {
+export function useMpNextRound({ socket, isHost, gameCode, roomLanguage, selectedGameMode, duoBot = false }: Options) {
   const { showInterstitial } = useInterstitialAd();
   const [isStartingNextRound, setIsStartingNextRound] = useState(false);
   const [preGeneratedGrid, setPreGeneratedGrid] = useState<Grid | null>(null);
@@ -92,6 +94,7 @@ export function useMpNextRound({ socket, isHost, gameCode, roomLanguage, selecte
       hostPlaying: true,
       boardTheme: null,
       gameMode: typeof options?.gameMode === 'string' ? options.gameMode : selectedGameMode,
+      ...(duoBot ? { duoBot: true } : {}),
     };
 
     let callbackFired = false;
@@ -112,7 +115,7 @@ export function useMpNextRound({ socket, isHost, gameCode, roomLanguage, selecte
         logger.debug('[RESULTS] Game reset failed:', response?.error);
       }
     });
-  }, [socket, isHost, roomLanguage, selectedGameMode, preGeneratedGrid, gameCode, showInterstitial]);
+  }, [socket, isHost, roomLanguage, selectedGameMode, preGeneratedGrid, gameCode, showInterstitial, duoBot]);
 
   return { handleStartGame, isStartingNextRound };
 }

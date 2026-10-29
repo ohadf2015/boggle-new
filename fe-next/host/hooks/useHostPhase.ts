@@ -33,6 +33,7 @@ import { useTimerStallWatchdog } from '@/hooks/useTimerStallWatchdog';
 import { useTeacherPaused } from '@/hooks/useTeacherPause';
 import { addGameBreadcrumb } from '@/utils/sentry';
 import { useHostRoundLifecycle } from './useHostRoundLifecycle';
+import { isDuoRoster, useDuoBotRequest } from '@/components/multiplayer/duoBotRequest';
 import type { HostViewProps } from '../hostViewTypes';
 
 export function useHostPhase({
@@ -48,6 +49,8 @@ export function useHostPhase({
   autoStart = false,
   onExitToLobby,
   classroomGameMode,
+  isClassroomMode,
+  isPrivate,
 }: HostViewProps) {
   const { t, language } = useLanguage();
   const { socket } = useSocket();
@@ -222,6 +225,12 @@ export function useHostPhase({
     },
   });
 
+  // exp-mp-duo-bot-v1: a public 1v1 lobby asks the server for a third seat on Start.
+  const duoBot = useDuoBotRequest({
+    isClassroom: !!lessonData || !!isClassroomMode || !!isPrivate,
+    isDuo: isDuoRoster(state.players.playersReady),
+  });
+
   // Game actions
   const actions = useHostGameActions({
     socket,
@@ -258,6 +267,7 @@ export function useHostPhase({
     intentionalExitRef: state.refs.intentionalExitRef,
     tournamentTimeoutRef: state.refs.tournamentTimeoutRef,
     onExitToLobby,
+    duoBot,
   });
 
   // Quick Play: auto-start solo game once room is joined and socket ready.

@@ -209,6 +209,11 @@ export const StartGameSchema = z.object({
    * with a separate `boost:apply` emit).
    */
   boostToken: z.string().min(1).max(512).optional(),
+  /**
+   * exp-mp-duo-bot-v1: the host asks for one bot when a public room would
+   * start 1v1. The server decides (autoAddBotForDuo): never classroom/ranked.
+   */
+  duoBot: z.boolean().optional(),
 });
 
 /**

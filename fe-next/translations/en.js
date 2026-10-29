@@ -19280,6 +19280,7 @@ const en = {
       "readyCount": "{ready}/{total} ready",
       "waitingHost": "Waiting for the host",
       "autoIn": "Next round in {seconds}s",
+      "autoRematchIn": "New series in {seconds}s",
       "cancelAuto": "Stop the auto-start",
       "autoOff": "Auto-start off",
       "rematch": "Rematch",
