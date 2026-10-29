@@ -19,7 +19,7 @@ import { buildMpStandings, podiumTier } from './mpStandings';
 import { nextModeForViewer, pickBestWord, pickVisibleRows, readyTally, rivalGap, seriesLadder, seriesPlacing } from './mpResultsView';
 import { buildRevealTimeline } from './revealTimeline';
 import { useRevealStage } from './useRevealStage';
-import { useAutoAdvance } from './useAutoAdvance';
+import { useMpAutoContinue } from './useMpAutoContinue';
 import { useLockedBranch, useResultBeats } from './useResultBeats';
 import { MpResultsHeader } from './MpResultsHeader';
 import { MpStandingsBoard } from './MpStandingsBoard';
@@ -57,7 +57,6 @@ const FirstGameBridge = dynamic(() => import('@/components/results/FirstGameBrid
 
 /** Max standings rows on one screen (8 seats; in a bigger room I stay visible). */
 const MAX_ROWS = 8;
-const AUTO_ADVANCE_SECONDS = 10;
 const NO_CHAMPIONS: readonly string[] = [];
 /** Signup nudge lands this long after the reveal ends (never on the verdict). */
 const NUDGE_DELAY_MS = 4000;
@@ -165,13 +164,19 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   const mpExit = useMpExit();
   const { handleStartGame } = c.nextRound;
   const { handleMarkReady } = socketEvents;
-  const auto = useAutoAdvance({
-    seconds: AUTO_ADVANCE_SECONDS,
+  const { handleNewSeries } = c;
+  // exp-mp-auto-continue-v1 extends this ring (series final, one-screen cancel).
+  const auto = useMpAutoContinue({
+    branch,
+    isClassroom: c.isClassroom,
+    isHost,
+    isReady,
     armed: footerShown,
     paused: detailsOpen || pickerOpen || nudgeSheetOpen || c.showExitConfirm || c.showShareModal || socketEvents.showWordFeedback || c.adGate.anyAdActive,
-    enabled: branch === 'intermission' && !c.isClassroom && (isHost || !isReady),
-    onFire: isHost ? handleStartGame : handleMarkReady,
     persistCancel: !isOnCrazyGamesPlatform,
+    onStartNext: handleStartGame,
+    onNewSeries: handleNewSeries,
+    onReady: handleMarkReady,
   });
   const startNext = useCallback(() => {
     auto.clearCancel();
@@ -182,9 +187,9 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
     handleMarkReady();
   }, [auto, handleMarkReady]);
   const rematch = useCallback(() => {
-    if (isHost) c.handleNewSeries();
+    if (isHost) handleNewSeries();
     else handleMarkReady();
-  }, [isHost, c, handleMarkReady]);
+  }, [isHost, handleNewSeries, handleMarkReady]);
 
   const nextMode = nextModeForViewer<GameModeOption>({ isHost, hostPick: c.selectedGameMode });
   const openLessonPractice = useOpenLessonPractice();
@@ -358,7 +363,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
       {footerShown ? (
         <div className={fx.footerUp}>
           {branch === 'final' ? (
-            <MpFinalFooter isHost={isHost} isReady={isReady} onRematch={rematch} onLeave={c.requestExit} onShare={() => setShowShareModal(true)} leaveKey={exitCopy.leaveKey} t={t} />
+            <MpFinalFooter isHost={isHost} isReady={isReady} onRematch={rematch} onLeave={c.requestExit} onShare={() => setShowShareModal(true)} leaveKey={exitCopy.leaveKey} auto={auto} t={t} />
           ) : (
             <MpIntermissionFooter
               isHost={isHost}
@@ -366,7 +371,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
               isReady={isReady}
               ready={tally.ready}
               total={tally.total}
-              auto={{ active: auto.active, secondsLeft: auto.secondsLeft, total: AUTO_ADVANCE_SECONDS, cancel: auto.cancel }}
+              auto={auto}
               adHold={c.adGate.anyAdActive}
               onStart={startNext}
               onReady={markReady}

@@ -19938,6 +19938,7 @@ const ru = {
       "readyCount": "Готовы {ready}/{total}",
       "waitingHost": "Ждём хоста",
       "autoIn": "Следующий раунд через {seconds} с",
+      "autoRematchIn": "Новая серия через {seconds} с",
       "cancelAuto": "Остановить автостарт",
       "autoOff": "Автостарт выключен",
       "rematch": "Реванш",

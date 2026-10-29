@@ -20172,6 +20172,7 @@ const he = {
       "readyCount": "{ready}/{total} מוכנים",
       "waitingHost": "מחכים למארח/ת",
       "autoIn": "הסיבוב הבא בעוד {seconds} שנ׳",
+      "autoRematchIn": "סדרה חדשה בעוד {seconds} שנ׳",
       "cancelAuto": "עצירת ההתחלה האוטומטית",
       "autoOff": "התחלה אוטומטית כבויה",
       "rematch": "משחק חוזר",
