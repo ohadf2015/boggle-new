@@ -201,7 +201,7 @@ export function useMpPageState() {
   }, [gameCode, prefilledRoomCode, searchParams, username, setIsActive, setIsHost, setIsPrivate, setGameCode, setShowResults, setResultsData]);
   // Early classroom joiner: the teacher's code is up but her room is not open yet — wait, never bounce.
   const roomWait = useClassroomRoomWait({ socketRef, isActive, onGiveUp: exitClassroomStudentToHub,
-    rejoin: (code) => handleJoin(false, null, code, undefined, username) });
+    rejoin: (code) => handleJoin(false, null, code, undefined, username, { autoRetry: true }) });
 
   // Native-safe exit to the multiplayer lobby: reset MP state IN PLACE (no page
   // reload). Shared by the results "Exit" button and the host-left grace modal.
