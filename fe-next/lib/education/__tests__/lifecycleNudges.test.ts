@@ -11,7 +11,7 @@ const teacher = (over: Partial<StageTeacher> = {}): StageTeacher => ({
 const facts = (over: Partial<StageFacts> = {}): StageFacts => ({
   classrooms: [],
   studentCounts: new Map(),
-  realRounds: [],
+  liveRounds: [],
   ledger: [],
   testUserIds: new Set(),
   ...over,
@@ -46,22 +46,40 @@ describe('planLifecycleNudges', () => {
     expect(stageOf(teacher(), facts({
       classrooms: [{ id: 'c1', teacherId: 't1', createdAt: daysAgo(10) }],
       studentCounts: new Map([['c1', 12]]),
-      realRounds: [{ teacherId: 't1', completedAt: daysAgo(4) }, { teacherId: 't1', completedAt: daysAgo(4) }],
+      liveRounds: [{ teacherId: 't1', completedAt: daysAgo(4), playerCount: 12 }, { teacherId: 't1', completedAt: daysAgo(4), playerCount: 12 }],
     }))).toBe('second_game');
+  });
+
+  it('Given a live round with one real student 4 days ago, Then the second-game nudge is due, not start-live', () => {
+    // Oct 2026: most live rounds had a single student, so these teachers were
+    // told they "haven't played a live game yet" and never got the round-two email.
+    expect(stageOf(teacher(), facts({
+      classrooms: [{ id: 'c1', teacherId: 't1', createdAt: daysAgo(10) }],
+      studentCounts: new Map([['c1', 3]]),
+      liveRounds: [{ teacherId: 't1', completedAt: daysAgo(4), playerCount: 1 }],
+    }))).toBe('second_game');
+  });
+
+  it('Given only rounds with no real student (teacher alone or a rehearsal seat), Then start-live still applies', () => {
+    expect(stageOf(teacher(), facts({
+      classrooms: [{ id: 'c1', teacherId: 't1', createdAt: daysAgo(10) }],
+      studentCounts: new Map([['c1', 3]]),
+      liveRounds: [{ teacherId: 't1', completedAt: daysAgo(4), playerCount: 0 }],
+    }))).toBe('start_live');
   });
 
   it('Given real rounds on two different UTC days, Then the north star is reached and nothing is sent', () => {
     expect(stageOf(teacher(), facts({
       classrooms: [{ id: 'c1', teacherId: 't1', createdAt: daysAgo(10) }],
       studentCounts: new Map([['c1', 12]]),
-      realRounds: [{ teacherId: 't1', completedAt: daysAgo(5) }, { teacherId: 't1', completedAt: daysAgo(1) }],
+      liveRounds: [{ teacherId: 't1', completedAt: daysAgo(5), playerCount: 12 }, { teacherId: 't1', completedAt: daysAgo(1), playerCount: 12 }],
     }))).toBeNull();
   });
 
   it('Given the first real round was 1 day or 12 days ago, Then the second-game nudge is outside its D+3..D+10 window', () => {
     const base = { classrooms: [{ id: 'c1', teacherId: 't1', createdAt: daysAgo(20) }], studentCounts: new Map([['c1', 5]]) };
-    expect(stageOf(teacher(), facts({ ...base, realRounds: [{ teacherId: 't1', completedAt: daysAgo(1) }] }))).toBeNull();
-    expect(stageOf(teacher(), facts({ ...base, realRounds: [{ teacherId: 't1', completedAt: daysAgo(12) }] }))).toBeNull();
+    expect(stageOf(teacher(), facts({ ...base, liveRounds: [{ teacherId: 't1', completedAt: daysAgo(1), playerCount: 12 }] }))).toBeNull();
+    expect(stageOf(teacher(), facts({ ...base, liveRounds: [{ teacherId: 't1', completedAt: daysAgo(12), playerCount: 12 }] }))).toBeNull();
   });
 
   it('Given the stage was already sent once, Then it is never sent again', () => {
