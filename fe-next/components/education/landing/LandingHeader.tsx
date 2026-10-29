@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { QuickLanguageSwitcher } from '@/components/QuickLanguageSwitcher';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { educationHomeFor } from '@/lib/navigation/educationBackHref';
+import { ForSchoolsLink } from '@/components/education/ForSchoolsLink';
 
 const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
 
@@ -34,6 +35,10 @@ export function LandingHeader({ showStart = true }: { showStart?: boolean }) {
 
         <div className="ms-auto flex shrink-0 items-center gap-1.5 sm:gap-3">
           <QuickLanguageSwitcher compact />
+          <ForSchoolsLink
+            placement="education_header"
+            className="hidden min-h-11 items-center gap-1.5 px-1 font-neo-display text-sm font-bold text-neo-cream underline-offset-4 hover:underline focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan md:inline-flex"
+          />
           {!isAuthenticated && (
             <button
               type="button"

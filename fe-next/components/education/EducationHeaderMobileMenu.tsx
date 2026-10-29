@@ -8,6 +8,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { QuickLanguageSwitcher } from '@/components/QuickLanguageSwitcher';
 import { TeacherProNavLink } from '@/components/teacher/TeacherProNavLink';
+import { ForSchoolsLink } from '@/components/education/ForSchoolsLink';
 
 export interface EducationHeaderMobileMenuProps {
   open: boolean;
@@ -123,13 +124,23 @@ export function EducationHeaderMobileMenu({
             )}
 
             {isTeacher && (
-              <TeacherProNavLink
-                onNavigate={onClose}
-                className={cn(
-                  'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 transition w-full',
-                  'bg-neo-navy-light hover:bg-neo-lime/20 text-neo-white border-neo-cream/40 shadow-hard-sm hover:shadow-hard',
-                )}
-              />
+              <>
+                <TeacherProNavLink
+                  onNavigate={onClose}
+                  className={cn(
+                    'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 transition w-full',
+                    'bg-neo-navy-light hover:bg-neo-lime/20 text-neo-white border-neo-cream/40 shadow-hard-sm hover:shadow-hard',
+                  )}
+                />
+                <ForSchoolsLink
+                  placement="teacher_menu_mobile"
+                  onNavigate={onClose}
+                  className={cn(
+                    'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 transition w-full',
+                    'bg-neo-navy-light hover:bg-neo-lime/20 text-neo-white border-neo-cream/40 shadow-hard-sm hover:shadow-hard',
+                  )}
+                />
+              </>
             )}
 
             {/* Student Dashboard */}

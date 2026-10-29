@@ -19,6 +19,7 @@ import SubscriptionStatusCard from '@/components/teacher/SubscriptionStatusCard'
 import { cn } from '@/lib/utils';
 import { useTeacherReveal } from '@/components/teacher/motion/useTeacherReveal';
 import { ArrowRight, GraduationCap, Users, BookOpen, Mail, ShieldCheck } from 'lucide-react';
+import { trackForSchoolsClick } from '@/components/education/ForSchoolsLink';
 
 const REPORT_CARD =
   'rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light p-5 text-neo-white shadow-hard';
@@ -200,6 +201,7 @@ function TeacherProfileInner() {
           </div>
           <Link
             href={`/${language}/education/for-schools`}
+            onClick={() => trackForSchoolsClick('teacher_profile')}
             className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-neo border-2 border-neo-black bg-neo-cyan px-4 py-2 font-neo-display text-sm font-black uppercase text-neo-black shadow-hard-sm transition hover:-translate-y-0.5 hover:shadow-hard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white"
           >
             <span>{t('teacher.profile.contactAdmin')}</span>
