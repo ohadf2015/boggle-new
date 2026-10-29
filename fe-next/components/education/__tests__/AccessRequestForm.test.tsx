@@ -173,7 +173,7 @@ describe('<AccessRequestForm>', () => {
     expect(screen.queryByTestId('access-success-trial')).toBeNull();
   });
 
-  it('makes Teacher Pro the main offer: first, big, with HQ as the quiet secondary', async () => {
+  it('puts the class first: HQ is the big main action, Teacher Pro the quiet secondary', async () => {
     global.fetch = vi.fn(async () => ({
       ok: true,
       status: 200,
@@ -188,9 +188,11 @@ describe('<AccessRequestForm>', () => {
 
     const trial = await screen.findByTestId('access-success-trial');
     const hq = screen.getByTestId('access-success-hq');
-    expect(trial.compareDocumentPosition(hq) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(trial.className).toMatch(/\bmin-h-14\b/);
-    expect(hq.className).not.toMatch(/bg-neo-lime/);
+    expect(hq.compareDocumentPosition(trial) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(hq.className).toMatch(/\bmin-h-14\b/);
+    expect(hq.className).toMatch(/(^|\s)bg-neo-navy(\s|$)/);
+    expect(trial.className).not.toMatch(/\bmin-h-14\b/);
+    expect(trial.className).not.toMatch(/(^|\s)bg-neo-navy(\s|$)/);
   });
 
   it('starts Polar trial from the success card', async () => {
