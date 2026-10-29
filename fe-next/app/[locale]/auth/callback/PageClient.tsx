@@ -19,6 +19,7 @@ import {
 import { PageLoader } from '@/components/ui/PageLoader';
 import { useLanguage } from '@/contexts/LanguageContext';
 import Cookies from 'js-cookie';
+import { markPostSignupHomeLanding } from '@/lib/retention/signupFirstGame';
 
 // Timeout constants
 const CODE_EXCHANGE_TIMEOUT = 15000; // 15 seconds timeout for code exchange
@@ -197,6 +198,9 @@ function AuthCallbackContent(): React.JSX.Element {
   // always go to home page — education dashboards are manual entry only.
   const redirectWithRole = useCallback(async (_userId: string | undefined, next: string, isDefault: boolean) => {
     if (isDefault) {
+      // No explicit next: this is the post-signup home the first-game card
+      // reads. An explicit next (deep link, in-game return) is untouched.
+      markPostSignupHomeLanding();
       safeRedirect(getDefaultRedirect(locale));
     } else {
       safeRedirect(next);

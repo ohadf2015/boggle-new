@@ -8862,6 +8862,11 @@ const sv = {
     },
     "home": {
       "greeting": "Hej, {name}",
+      "signupFirstGame": {
+        "title": "Spela ditt första spel, {name}",
+        "titleNoName": "Spela ditt första spel",
+        "daily": "Dagens ordhjul (2 min)"
+      },
       "levelTitle": "Nivå {level} · {title}",
       "levelOnly": "Nivå {level}",
       "titles": {

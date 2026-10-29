@@ -8497,6 +8497,11 @@ const es = {
     },
     "home": {
       "greeting": "Hola, {name}",
+      "signupFirstGame": {
+        "title": "Juega tu primera partida, {name}",
+        "titleNoName": "Juega tu primera partida",
+        "daily": "La rueda de hoy (2 min)"
+      },
       "levelTitle": "Nivel {level} · {title}",
       "levelOnly": "Nivel {level}",
       "titles": {

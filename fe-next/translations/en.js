@@ -8018,6 +8018,11 @@ const en = {
     },
     "home": {
       "greeting": "Hey, {name}",
+      "signupFirstGame": {
+        "title": "Play your first game, {name}",
+        "titleNoName": "Play your first game",
+        "daily": "Today's Word Wheel (2 min)"
+      },
       "levelTitle": "Level {level} · {title}",
       "levelOnly": "Level {level}",
       "titles": {

@@ -19,6 +19,7 @@ import { HomeTopBar } from './home/HomeTopBar';
 import { HomeDailyHero } from './home/HomeDailyHero';
 import { LaunchProvider } from './home/HomeLaunch';
 import { HomeEducationCardConnected } from '@/components/education/HomeEducationCardConnected';
+import { SignupFirstGameCard } from './home/SignupFirstGameCard';
 
 const EventBanner = dynamic(() => import('@/components/events/EventBanner'), { ssr: false });
 const PlayfulBackground = dynamic(
@@ -110,6 +111,7 @@ export const ReturningHome: React.FC<ReturningHomeProps> = ({ initialData }) => 
           profileLoading={dashboardProfileLoading}
         />
 
+        <SignupFirstGameCard />
         <HomeDailyHero preloadedStats={dailyChallengeStats} />
         <LandingChallengeCards
           language={language}

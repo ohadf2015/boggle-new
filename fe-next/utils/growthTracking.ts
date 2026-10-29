@@ -37,6 +37,7 @@ import {
   stashPendingActivation,
 } from '@/utils/activationGate';
 import { trackRetentionPlay } from '@/lib/retention/tracking';
+import { consumeAccountFirstGamePending } from '@/lib/retention/signupFirstGame';
 import {
   stampFirstWinClockStart,
   consumeFirstWinClockSeconds,
@@ -60,6 +61,10 @@ export type GrowthEvent =
   | 'session_start'
   | 'game_started'
   | 'game_completed'
+  // Once per account, on its first completed game after signup. Goal for the
+  // signup-first-game experiment (t_3b095edf). Both arms can reach it.
+  // Do not use game_started — control already converts ~89% on that.
+  | 'account_first_game'
   | 'game_abandoned'
   | 'game_abandon_attempted'
   | 'mode_selected'
@@ -1697,7 +1702,17 @@ export const trackGameEnd = (
     durationSec,
   });
   // results_inline signup CTA gate: only after a real game_completed.
-  if (completed) markGameCompletedSignal();
+  if (completed) {
+    markGameCompletedSignal();
+    // Once per fresh account, both experiment arms. No-op when no signup armed it.
+    const firstAccountGame = consumeAccountFirstGamePending();
+    if (firstAccountGame) {
+      trackGrowthEvent('account_first_game', {
+        mode,
+        signup_surface: firstAccountGame.surface,
+      });
+    }
+  }
 
   // Lifetime person properties — enable cohort slicing in PostHog
   // (e.g. "players with ≥10 games" × "first_mode_played = adventure").

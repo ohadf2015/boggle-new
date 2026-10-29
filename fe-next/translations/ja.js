@@ -8514,6 +8514,11 @@ const ja = {
     },
     "home": {
       "greeting": "こんにちは、{name}さん",
+      "signupFirstGame": {
+        "title": "最初のゲームをプレイ、{name}",
+        "titleNoName": "最初のゲームをプレイ",
+        "daily": "今日のワードホイール（2分）"
+      },
       "levelTitle": "レベル{level}・{title}",
       "levelOnly": "レベル{level}",
       "titles": {
