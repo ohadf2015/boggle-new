@@ -20242,6 +20242,7 @@ const sv = {
       "readyCount": "{ready}/{total} redo",
       "waitingHost": "Väntar på värden",
       "autoIn": "Nästa runda om {seconds} s",
+      "autoRematchIn": "Ny serie om {seconds} s",
       "cancelAuto": "Stoppa autostart",
       "autoOff": "Autostart av",
       "rematch": "Returmatch",

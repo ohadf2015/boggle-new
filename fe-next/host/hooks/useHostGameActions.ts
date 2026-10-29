@@ -74,6 +74,9 @@ interface UseHostGameActionsOptions {
    * hook keeps the legacy reload fallback when unwired.
    */
   onExitToLobby?: () => void;
+
+  /** exp-mp-duo-bot-v1: ask the server for a third-seat bot if the room starts 1v1. */
+  duoBot?: boolean;
 }
 
 export interface UseHostGameActionsReturn {
@@ -133,6 +136,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     intentionalExitRef,
     tournamentTimeoutRef,
     onExitToLobby,
+    duoBot = false,
   } = options;
 
   const startGameLockRef = useRef(false);
@@ -245,6 +249,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
       gameMode: hostSelectedGameMode || 'random',
       tvMode: !hostPlaying,
       ...(boostToken ? { boostToken } : {}),
+      ...(duoBot ? { duoBot: true } : {}),
     });
     // No success toast here: the MP countdown stage is the GO moment (a toast
     // reading "GO! You're in!" repeated it on top of the countdown).
@@ -273,6 +278,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     gameMode,
     hostSelectedGameMode,
     gameCode,
+    duoBot,
   ]);
 
   /** Public startGame — shows solo confirmation if host is alone */
