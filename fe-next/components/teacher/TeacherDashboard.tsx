@@ -188,14 +188,14 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
   const firstName = greetingName(profile?.display_name);
   const [nowMs] = useState(() => Date.now());
   const hour = new Date(nowMs).getHours();
-  const proHref = `/${language}/teacher/upgrade`;
 
-  // One Pro ask at most, and none before a first class: a limit-hit prompt beats the general card.
+  // One Pro ask at most: a limit-hit prompt beats the general card. Free teachers see the
+  // dashboard Teacher Pro card from day one (even before a first class); Pro teachers never do.
   const accountBanner = hasClasses ? (banner ?? null) : null;
-  const proCard = !hasClasses || proLoading || hasPro ? null : usagePrompt ? (
+  const proCard = proLoading || hasPro ? null : usagePrompt && hasClasses ? (
     <div data-testid="home-pro-slot">{usagePrompt}</div>
   ) : proOffer ? (
-    <HomeProCard kind={proOffer.kind} href={proHref} onDismiss={proOffer.onDismiss} trackImpression={!proOffer.tracked} language={language} t={t} />
+    <HomeProCard kind={proOffer.kind} onDismiss={proOffer.onDismiss} trackImpression={!proOffer.tracked} language={language} t={t} />
   ) : null;
 
   const showWeek = hasClasses && !(week.summary && Object.keys(week.summary.lastPlayedAt).length === 0);

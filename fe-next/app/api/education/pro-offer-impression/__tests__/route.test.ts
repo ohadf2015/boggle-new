@@ -83,3 +83,13 @@ describe('POST /api/education/pro-offer-impression', () => {
     })
   })
 })
+
+describe('POST /api/education/pro-offer-impression — dashboard', () => {
+  it('accepts source=dashboard', async () => {
+    getAuthedUser.mockReset()
+    capture.mockReset()
+    getAuthedUser.mockResolvedValue({ id: 't1', email: 'teacher@school.org' })
+    await POST(req({ placement: 'dashboard', stage: 'rendered', locale: 'es', cta: 'teacher_pro_trial', offer: 'trial' }))
+    expect(capture.mock.calls[0][0]).toMatchObject({ event: 'edu_pro_offer_rendered', properties: { placement: 'dashboard', source: 'dashboard' } })
+  })
+})

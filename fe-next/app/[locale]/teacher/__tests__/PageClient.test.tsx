@@ -1,6 +1,6 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: vi.fn() }));
@@ -187,15 +187,38 @@ describe('TeacherPage upgrade CTA', () => {
     );
   });
 
-  it('buries the Pro ask until a classroom hits the engagement milestone', () => {
+  it('before the engagement milestone, a free teacher with no other ask still gets the dashboard Pro card (no milestone banner impression)', () => {
     milestoneState = { ...milestoneState, hasMilestone: false };
+    trialOfferState = { dismissed: false, dismiss: vi.fn() };
+    proState = { ...proState, trialUsed: true };
+    trialEndedState = { dismissed: true, dismiss: vi.fn() };
     mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
     render(<TeacherPage />);
-    expect(screen.queryByTestId('pro-offer')).toBeNull();
+    const offer = screen.getByTestId('pro-offer');
+    expect(offer).toHaveAttribute('data-kind', 'upgrade');
+    expect(offer).toHaveAttribute('data-tracked', 'false');
     expect(mockTrackGrowthEvent).not.toHaveBeenCalledWith(
       'iap_viewed',
       expect.objectContaining({ product: 'teacher_pro', event_type: 'impression' }),
     );
+  });
+
+  it('the dashboard Pro card stays down after an earlier "Not now" on the trial offer, and its own dismiss persists', () => {
+    milestoneState = { ...milestoneState, hasMilestone: false };
+    trialOfferState = { dismissed: true, dismiss: vi.fn() };
+    mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
+    const { unmount } = render(<TeacherPage />);
+    expect(screen.queryByTestId('pro-offer')).toBeNull();
+    unmount();
+    trialOfferState = { dismissed: false, dismiss: vi.fn() };
+    proState = { ...proState, trialUsed: true };
+    trialEndedState = { dismissed: true, dismiss: vi.fn() };
+    window.localStorage.removeItem('lexi:proTrialCardDismissed:dashboard');
+    render(<TeacherPage />);
+    act(() => screen.getByTestId('pro-offer').click());
+    expect(screen.queryByTestId('pro-offer')).toBeNull();
+    expect(Number(window.localStorage.getItem('lexi:proTrialCardDismissed:dashboard'))).toBeGreaterThan(0);
+    window.localStorage.removeItem('lexi:proTrialCardDismissed:dashboard');
   });
 
   it('stays quiet after the teacher dismissed the milestone ask', () => {

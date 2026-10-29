@@ -21,7 +21,7 @@ import { cn } from '@/lib/utils';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { resolveProOffer } from '@/lib/education/pro/proOfferCopy';
 import { classCreatedTrialCopy, resultsTrialCopy, trialCopyBase, TRIAL_COPY_RTL } from '@/lib/education/pro/trialCtaCopy';
-import { reportProCtaClick, reportProOfferImpression } from '@/lib/education/reportProCtaClick';
+import { reportProCtaClick, reportProOfferClick, reportProOfferImpression } from '@/lib/education/reportProCtaClick';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { trackTeacherProUpgradeClick } from '@/lib/education/proFunnelTelemetry';
 import { useUpsellImpression } from '@/lib/education/useUpsellImpression';
@@ -160,6 +160,7 @@ export function ResultsTeacherProTrialCard({
             trackTeacherProUpgradeClick({ page: page(), locale: language, placement: placement });
             trackGrowthEvent('landing_cta_clicked', { cta, source: placement });
             reportProCtaClick({ placement, locale: language, cta });
+            reportProOfferClick({ placement, locale: language, cta, offer });
           } catch {
             /* analytics must never block */
           }

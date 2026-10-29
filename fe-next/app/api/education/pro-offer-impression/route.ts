@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { captureProFunnelServerEvent } from '@/lib/education/proFunnelServer';
 import { checkoutClientKind, testEmailReason } from '@/lib/education/checkoutTrafficTags';
+import { PRO_OFFER_PLACEMENTS } from '@/lib/education/pro/proOfferPlacements';
 
 /**
  * POST /api/education/pro-offer-impression — server twin of the Teacher Pro
@@ -16,11 +17,11 @@ import { checkoutClientKind, testEmailReason } from '@/lib/education/checkoutTra
  * - `edu_pro_offer_rendered`: the card mounted for a signed-in, non-Pro teacher.
  * - `edu_pro_offer_impression`: at least half of it was on screen.
  *
- * The tap twin is /api/education/pro-cta-click (`edu_pro_cta_clicked`).
+ * The tap twins are /api/education/pro-offer-click (`edu_pro_offer_clicked`) and
+ * /api/education/pro-cta-click (`edu_pro_cta_clicked`).
  * Anonymous callers, unknown placements and unknown stages record nothing.
  * Always 204: analytics must never affect the page.
  */
-const PLACEMENTS = new Set(['class_created', 'classroom_results', 'access_success']);
 const STAGES: Record<string, string> = {
   rendered: 'edu_pro_offer_rendered',
   viewed: 'edu_pro_offer_impression',
@@ -39,7 +40,7 @@ export async function POST(request: NextRequest) {
       body = {};
     }
     const placement = typeof body.placement === 'string' ? body.placement : '';
-    if (!PLACEMENTS.has(placement)) return new NextResponse(null, { status: 204 });
+    if (!PRO_OFFER_PLACEMENTS.has(placement)) return new NextResponse(null, { status: 204 });
     const stage = typeof body.stage === 'string' ? body.stage : '';
     const event = Object.prototype.hasOwnProperty.call(STAGES, stage) ? STAGES[stage] : null;
     if (!event) return new NextResponse(null, { status: 204 });

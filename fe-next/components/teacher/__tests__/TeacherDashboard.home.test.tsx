@@ -151,10 +151,16 @@ describe('Teacher Home', () => {
     const card = screen.getByTestId('home-pro-card');
     expect(screen.getAllByTestId('home-pro-card')).toHaveLength(1);
     expect(card.closest('aside')).not.toBeNull();
-    expect(within(card).getByTestId('home-pro-cta')).toHaveTextContent('eduShell.pro.trialCta');
+    expect(within(card).getByTestId('home-pro-cta')).toHaveTextContent('Start your 14-day Teacher Pro trial');
     expect(within(card).getAllByRole('listitem')).toHaveLength(3);
     within(card).getByTestId('home-pro-dismiss').click();
     expect(onDismiss).toHaveBeenCalled();
+  });
+
+  it('Given a free teacher with no class yet, Then the dashboard Pro card still sits in the rail', () => {
+    classroomsState = { classrooms: [], isLoading: false, error: null, refresh: vi.fn() };
+    render(<TeacherDashboard proOffer={{ kind: 'upgrade', onDismiss: vi.fn(), tracked: false }} />);
+    expect(screen.getByTestId('home-pro-card')).toBeInTheDocument();
   });
 
   it('Given no ask was picked, Then Home shows no Pro card at all', () => {

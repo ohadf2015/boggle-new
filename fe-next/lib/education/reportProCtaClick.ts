@@ -35,3 +35,21 @@ export function reportProOfferImpression(args: {
 }): void {
   post('/api/education/pro-offer-impression', args);
 }
+
+/**
+ * Tap on a Teacher Pro offer -> `edu_pro_offer_clicked` (server, cookie-free).
+ * sendBeacon first: it survives the navigation to /teacher/upgrade or Polar checkout
+ * and carries the same-origin session cookie. Falls back to keepalive fetch.
+ */
+export function reportProOfferClick(args: { placement: string; locale: string; cta: string; offer: ProOfferKind }): void {
+  const path = '/api/education/pro-offer-click';
+  try {
+    if (typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
+      const blob = new Blob([JSON.stringify(args)], { type: 'application/json' });
+      if (navigator.sendBeacon(path, blob)) return;
+    }
+  } catch {
+    /* fall through to fetch */
+  }
+  post(path, args);
+}
