@@ -30,7 +30,8 @@ import {
   trackRageQuit,
   trackSessionDepth,
 } from '@/utils/posthogEngagement';
-import { markGameActive, markGameInactive, isGameActive, consumeResumedAfterHidden } from '@/utils/abandonOnPagehide';
+import { markGameActive, markGameInactive, isGameActive, consumeResumedAfterHidden, setAbandonPersistSink } from '@/utils/abandonOnPagehide';
+import { persistEventBeacon } from '@/utils/analyticsBeacon';
 import {
   clearPendingActivation,
   isActivationCaptureArmed,
@@ -600,6 +601,10 @@ const MAX_QUEUE_SIZE = 50;
 // `growthTracking.pushPromptGamesPlayed.test.ts`), which is an undercount —
 // the failure mode worse than the double-count this guards against. The set
 // holds at most one entry per game mode, a small fixed vocabulary.
+// Mid-game exits reach analytics_events too, not only consent-gated PostHog.
+// The unload path needs the synchronous beacon; the regular persist awaits a token.
+setAbandonPersistSink((event, payload) => persistEventBeacon(event, payload));
+
 const endEmittedModes = new Set<string>();
 
 // Optional per-round dedupe for multiplayer. HostView/PlayerView and the

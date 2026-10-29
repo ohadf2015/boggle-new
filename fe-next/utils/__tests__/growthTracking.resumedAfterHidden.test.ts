@@ -31,6 +31,12 @@ vi.mock('@/utils/posthogEngagement', () => ({
 }));
 
 vi.mock('@/components/GoogleAnalytics', () => ({ trackEvent: vi.fn() }));
+
+// The hidden abandon also goes to analytics_events through the unload beacon.
+const beaconMock = vi.fn();
+vi.mock('@/utils/analyticsBeacon', () => ({
+  persistEventBeacon: (...a: unknown[]) => beaconMock(...a),
+}));
 vi.mock('@/utils/logger', () => ({
   default: { info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() },
 }));
@@ -56,6 +62,7 @@ describe('trackGameEnd — resumed_after_hidden', () => {
 
   beforeEach(() => {
     captureMock.mockClear();
+    beaconMock.mockClear();
     __resetAbandonStateForTests();
     uninstall = installAbandonOnPagehide();
   });
@@ -73,6 +80,8 @@ describe('trackGameEnd — resumed_after_hidden', () => {
 
     fireHidden(); // abandon goes out with reason: hidden
     expect(findCapture('game_abandoned')).toMatchObject({ reason: 'hidden' });
+    // …and reaches analytics_events through the unload-safe beacon.
+    expect(beaconMock).toHaveBeenCalledWith('game_abandoned', expect.objectContaining({ reason: 'hidden', mode: 'singleplayer' }));
 
     // Player foregrounds the tab and finishes the round.
     vi.setSystemTime(new Date('2026-01-01T00:01:00Z'));
