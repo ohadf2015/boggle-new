@@ -2,6 +2,59 @@
 
 Date: 2026-07-27 · Site: https://www.lexiclash.live · Publisher: `ca-pub-1896836706464880`
 
+## UPDATE 2026-10-30: second "Low value content" pass
+
+Audit method: every EN URL in the live sitemap.xml fetched with a Googlebot UA,
+visible server-rendered text counted (Next streaming `hidden` blocks included,
+nav/footer/scripts excluded), plus a mobile Playwright render of the key pages.
+
+**What a reviewer finds now**
+
+- Trust pages are fine: about (+ /about/ohad-fisher), contact, FAQ, how-to-play,
+  rules, privacy, terms, disclaimer, editorial policy. ads.txt is correct,
+  robots.txt allows Mediapartners-Google. Blog and guides are long and original.
+- **The new risk is scale.** The word-list library added since the last review
+  put **521 of 1,206 sitemap URLs (43%)** on four templates: 169 EN single-list
+  pages (535–753 words, but two lists from the same grade share ~80% of their
+  visible text), 30 grade hubs (median 198 words), 18 topic hubs (median 217),
+  and the same again in he/es/sv/ja. That is the "scaled / templated pages"
+  pattern AdSense and Google's helpful-content systems read as low value.
+  None of these pages was in the top-20 Search Console pages over 90 days.
+- Play surfaces stay thin on purpose (`/en/brain` 8 words, `/en/daily` 22,
+  `/en/multiplayer` 39; see appShellSeoContent.test). That is fine **as long as
+  no ad renders there** — AdSense only objects to ads on screens without content.
+
+**Fixed in this PR**
+
+- `lib/seo/wordLists/indexPolicy.ts`: single lists, grade hubs and topic hubs are
+  now `noindex,follow` and out of sitemap.xml (they stay live and linked for
+  teachers). The library hub and the per-language hubs stay indexed. One flag
+  per tier to undo.
+- `adSensePolicy.ts`: AdSense rejects a *site*, not the account, so the re-review
+  runs on the same pub. The pub is no longer filtered out of env. Nothing ships
+  unless env names it.
+- `app/layout.tsx`: `<meta name="google-adsense-account">` renders only when
+  `NEXT_PUBLIC_ADSENSE_CLIENT` (or `_ID`) is set. Meta only — no ad script.
+
+**Ohad's steps (in order)**
+
+1. Wait ~1–2 weeks after this deploy so Google recrawls the noindex pages and the
+   smaller sitemap (resubmit sitemap.xml in Search Console to speed it up).
+2. Railway → `lexiclash` service → Variables: `NEXT_PUBLIC_ADSENSE_CLIENT=ca-pub-1896836706464880`
+   → redeploy (build-time var). Check `view-source:https://www.lexiclash.live/en`
+   shows the `google-adsense-account` meta.
+3. AdSense → Privacy & messaging → European regulations → create and publish a
+   GDPR message for lexiclash.live. The in-house cookie banner is **not** a
+   Google-certified CMP, and EEA/UK/CH ad serving needs one.
+4. AdSense → Sites → lexiclash.live → **Request review**. Keep Auto ads **off**
+   (they follow client-side navigation into game screens).
+5. After approval: reintroduce a consent-gated loader on content routes only
+   (blog, guides, about-style pages; never the game, education or onboarding —
+   `shouldLoadAdSense` already encodes those gates), then set
+   `NEXT_PUBLIC_ADSENSE_ENABLED=true`.
+
+---
+
 ## UPDATE 2026-07-27 (evening): "Low value content" root cause found & fixed
 
 Google's rejection reason (confirmed by owner): **Low value content**.

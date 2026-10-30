@@ -1,3 +1,4 @@
+import { WORD_LIST_INDEXING } from '@/lib/seo/wordLists/indexPolicy';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { GeoFaqList } from '@/components/seo/GeoFaqList';
@@ -56,6 +57,7 @@ export function listMetadata(list: WordList, locale: string): Metadata {
     locales: list.locales,
     title: c.metaTitle,
     description: c.description,
+    index: WORD_LIST_INDEXING.lists,
   });
 }
 

@@ -26,6 +26,8 @@ export function wordListMetadata(opts: {
   description: string;
   /** Override for pages registered in EDUCATION_PAGES, whose sitemap entry uses the site-wide map. */
   languages?: Record<string, string>;
+  /** false → noindex,follow (see indexPolicy.ts). Default true. */
+  index?: boolean;
 }): Metadata {
   const url = absoluteUrl(opts.locale, opts.path);
   const title = fitTitle(titleCase(opts.locale, opts.title));
@@ -44,6 +46,6 @@ export function wordListMetadata(opts: {
       images: [{ url: ogImage, width: 1200, height: 630, alt: opts.title }],
     },
     twitter: { card: 'summary_large_image', title, description: opts.description, images: [ogImage] },
-    robots: { index: true, follow: true },
+    robots: { index: opts.index ?? true, follow: true },
   };
 }

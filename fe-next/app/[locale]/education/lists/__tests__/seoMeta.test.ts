@@ -182,6 +182,7 @@ describe('hreflang is exactly the set of locales a page renders in, and the site
   async function checkPage(label: string, path: string, meta: (locale: string) => Promise<Metadata>) {
     const live: string[] = [];
     const langsByLocale = new Map<string, Record<string, string>>();
+    const noindex = new Set<string>();
     for (const locale of ALL) {
       const m = await renders(() => meta(locale));
       if (!m) {
@@ -190,6 +191,7 @@ describe('hreflang is exactly the set of locales a page renders in, and the site
       }
       live.push(locale);
       langsByLocale.set(locale, m.alternates!.languages as Record<string, string>);
+      if ((m.robots as { index?: boolean } | undefined)?.index === false) noindex.add(locale);
     }
     expect(live.length, label).toBeGreaterThan(0);
     for (const locale of live) {
@@ -202,6 +204,11 @@ describe('hreflang is exactly the set of locales a page renders in, and the site
       expect(new Set(targets.map(([, t]) => t)), `${label} ${locale}`).toEqual(new Set(live));
       expect(langs, `${label} ${locale} head differs from the cluster of ${live[0]}`).toEqual(langsByLocale.get(live[0]));
       const smLangs = sm.get(absoluteUrl(locale, path));
+      // noindex tiers (lib/seo/wordLists/indexPolicy.ts) must stay out of the sitemap.
+      if (noindex.has(locale)) {
+        expect(smLangs, `${label} ${locale} is noindex but in the sitemap`).toBeUndefined();
+        continue;
+      }
       expect(smLangs, `${label} ${locale} sitemap`).toBeTruthy();
       expect(smLangs, `${label} ${locale} sitemap alternates`).toEqual(langs);
     }
