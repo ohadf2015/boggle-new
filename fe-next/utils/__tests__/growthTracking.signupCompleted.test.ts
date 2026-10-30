@@ -104,4 +104,16 @@ describe('maybeTrackSignupCompleted', () => {
     expect(maybeTrackSignupCompleted({ userId: 'a', createdAt: at, nowMs: NOW })).toBe(false);
     expect(signupNames()).toHaveLength(2);
   });
+
+  it('PostHog gets the bare canonical event only — the growth: copy is server-canonical (t_b6131f7d)', async () => {
+    const { maybeTrackSignupCompleted } = await import('../growthTracking');
+    maybeTrackSignupCompleted({ source: 'header_or_menu', userId: 'u1', createdAt: iso(NOW - 10_000), nowMs: NOW });
+    const names = capture.mock.calls.map((c) => c[0]);
+    // Bare keeps PostHog dashboards working…
+    expect(names).toContain('signup_completed');
+    // …but a client-side growth:signup_completed would be imported by Growth
+    // Radar's PostHog ingest as a SECOND row on top of the once-per-account
+    // server emit from /api/auth/attribution.
+    expect(names).not.toContain('growth:signup_completed');
+  });
 });

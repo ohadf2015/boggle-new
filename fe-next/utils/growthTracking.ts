@@ -708,7 +708,7 @@ export const nextSignupImpressionSeq = (): number => {
 export const trackGrowthEvent = (
   event: GrowthEvent,
   data: GrowthEventData = {},
-  opts?: { mirror?: boolean },
+  opts?: { mirror?: boolean; posthogGrowth?: boolean },
 ): void => {
   // Seeing a results screen ends the round, whoever reported it. `trackGameEnd`
   // used to be the only thing clearing the active-game flag, but it is driven by
@@ -761,9 +761,17 @@ export const trackGrowthEvent = (
     }
   }
 
-  // Send to PostHog (no-ops when opted out or not initialized)
+  // Send to PostHog (no-ops when opted out or not initialized).
+  // `posthogGrowth: false` keeps the `growth:` copy out of PostHog: Growth
+  // Radar's PostHog ingest accepts every growth:* event, so a client-side
+  // growth:signup_completed would be imported as a SECOND row on top of the
+  // server-canonical one (t_b6131f7d — GR counted 88 signups vs 49 accounts).
+  // The bare canonical dual-emit below still fires, so PostHog funnels that
+  // query the unprefixed name are unaffected.
   try {
-    posthog.capture(`growth:${event}`, enrichedData);
+    if (opts?.posthogGrowth !== false) {
+      posthog.capture(`growth:${event}`, enrichedData);
+    }
     // Dual-emit canonical name for funnel/retention dashboards that query
     // unprefixed events. Whitelisted to avoid doubling event volume.
     if (CANONICAL_DUAL_EMIT.has(event)) {
@@ -778,8 +786,9 @@ export const trackGrowthEvent = (
   // Growth Radar's product funnel (t_eb26d5c5: coverage sat at 3%).
   // Best-effort: allowlist-only, PII-stripped, queued until gr.js loads,
   // never throws, never blocks the game path.
-  // `mirror: false` is the undeduped signup funnel step — Growth Radar must
-  // count signup_completed only from maybeTrackSignupCompleted.
+  // `mirror: false` is the undeduped signup funnel step — and since
+  // t_b6131f7d, signup_completed is NEVER mirrored from the client at all:
+  // the GR copy is server-canonical (once per account, /api/auth/attribution).
   if (opts?.mirror !== false) mirrorGrowthEvent(event, enrichedData);
 
   // Send to GA4 for unified analytics
@@ -1110,8 +1119,12 @@ export const trackSignupFunnel = (
   } else if (step === 'completed') {
     // AuthProvider also calls maybeTrackSignupCompleted on the same transition.
     // That emitter is recency-gated and per-user deduped. This one is not, so
-    // mirroring both counted one signup twice. PostHog still gets this step.
-    trackGrowthEvent('signup_completed', merged, { mirror: false });
+    // mirroring both counted one signup twice. PostHog still gets this step
+    // under the bare canonical name — but NOT as growth:signup_completed:
+    // Growth Radar imports every growth:* event from PostHog, and the
+    // server-canonical growth:signup_completed (emitted once per account by
+    // /api/auth/attribution, t_b6131f7d) is the only copy that may exist.
+    trackGrowthEvent('signup_completed', merged, { mirror: false, posthogGrowth: false });
     if (isFirstWin) trackGrowthEvent('first_win_signup_completed', merged, { mirror: false });
   } else {
     // t_147a0f0c: dismissals carry the surface/source that served the prompt so
@@ -1274,9 +1287,18 @@ export const consumePendingSignupCompletion = (): void => {
  * 22 prompt_shown × 6 users → 0 completed; meanwhile 15 unique authed users
  * the same window). Fire this on every guest → authed transition with a
  * `source` prop so the funnel can attribute by signup origin.
+ *
+ * t_b6131f7d: the Growth Radar copy of signup_completed is SERVER-canonical —
+ * /api/auth/attribution emits growth:signup_completed exactly once per account
+ * (first writer of profiles.signup_surface wins). The client must feed neither
+ * GR pipe: no window.gr mirror (mirror:false — the per-device localStorage
+ * dedupe double-counts one account across two browsers) and no growth: copy in
+ * PostHog (posthogGrowth:false — GR's PostHog ingest imports every growth:*
+ * event). PostHog keeps the bare canonical `signup_completed` via the
+ * dual-emit whitelist, so PostHog dashboards are unchanged.
  */
 export const trackSignupCompleted = (source: string = 'unknown'): void => {
-  trackGrowthEvent('signup_completed', { source });
+  trackGrowthEvent('signup_completed', { source }, { mirror: false, posthogGrowth: false });
 };
 
 /** localStorage key holding the JSON array of userIds already counted as a
@@ -1318,6 +1340,10 @@ export const isRecentAccount = (
  *   1. recency — old accounts (returning users) are excluded outright;
  *   2. dedup — a per-device userId set, so reloads and multi-account devices
  *      each count a given account only once.
+ * PostHog-only since t_b6131f7d (see trackSignupCompleted): Growth Radar's
+ * copy is emitted once per account by the server. Callers must skip anonymous
+ * users entirely (is_anonymous) — an anonymous classroom session is not a
+ * signup; AuthProvider enforces this via isCountableSignupUser.
  * Returns whether the event was emitted (for callers/tests).
  */
 export const maybeTrackSignupCompleted = (args: {

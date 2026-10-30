@@ -17,6 +17,13 @@ vi.mock('@/utils/supabase/server', () => ({
   }),
 }));
 
+// The route emits the server-canonical growth:signup_completed through this
+// chokepoint (t_b6131f7d). Mocked: the real one talks to PostHog.
+const captureEduServerEvents = vi.fn();
+vi.mock('@/backend/utils/educationTelemetry', () => ({
+  captureEduServerEvents: (...a: unknown[]) => captureEduServerEvents(...a),
+}));
+
 interface ProfileRow {
   utm_source: string | null;
   utm_medium: string | null;
@@ -24,6 +31,7 @@ interface ProfileRow {
   referrer: string | null;
   landing_path: string | null;
   signup_surface: string | null;
+  is_test_account: boolean;
 }
 
 const state = {
@@ -58,6 +66,7 @@ import { sanitizeReferrerDomain, sanitizeLandingPath } from '@/lib/auth/attribut
 
 const AUTHED = { data: { user: { id: 'user-1' } }, error: null };
 const ANON = { data: { user: null }, error: new Error('no session') };
+const ANON_USER = { data: { user: { id: 'anon-1', is_anonymous: true } }, error: null };
 
 const EMPTY_PROFILE: ProfileRow = {
   utm_source: null,
@@ -66,6 +75,7 @@ const EMPTY_PROFILE: ProfileRow = {
   referrer: null,
   landing_path: null,
   signup_surface: null,
+  is_test_account: false,
 };
 
 function req(body: unknown): Request {
@@ -79,6 +89,7 @@ function req(body: unknown): Request {
 describe('POST /api/auth/attribution', () => {
   beforeEach(() => {
     getUser.mockReset();
+    captureEduServerEvents.mockReset();
     state.profile = { ...EMPTY_PROFILE };
     state.updates = [];
     state.updateError = null;
@@ -157,6 +168,72 @@ describe('POST /api/auth/attribution', () => {
     expect(res.status).toBe(200);
     expect(state.updates[0].referrer).toBe('www.google.com');
     expect(state.updates[0].landing_path).toBe('/en/play?utm_source=bing');
+  });
+});
+
+describe('POST /api/auth/attribution — server-canonical GR signup (t_b6131f7d)', () => {
+  beforeEach(() => {
+    getUser.mockReset();
+    captureEduServerEvents.mockReset();
+    state.profile = { ...EMPTY_PROFILE };
+    state.updates = [];
+    state.updateError = null;
+  });
+
+  it('emits growth:signup_completed exactly when the signup_surface write wins', async () => {
+    getUser.mockResolvedValue(AUTHED);
+    const res = await POST(req({ signup_surface: 'header_or_menu', utm_source: 'google' }));
+    expect(res.status).toBe(200);
+    expect(captureEduServerEvents).toHaveBeenCalledTimes(1);
+    const [events] = captureEduServerEvents.mock.calls[0];
+    expect(events).toEqual([{
+      distinctId: 'user-1',
+      event: 'growth:signup_completed',
+      properties: expect.objectContaining({
+        source: 'header_or_menu',
+        utm_source: 'google',
+        is_test_account: false,
+      }),
+    }]);
+  });
+
+  it('cross-device: a second browser finds signup_surface set and emits nothing', async () => {
+    getUser.mockResolvedValue(AUTHED);
+    // First device already wrote signup_surface; second device carries a new referrer.
+    state.profile = { ...EMPTY_PROFILE, signup_surface: 'header_or_menu' };
+    const res = await POST(req({ signup_surface: 'header_or_menu', referrer_domain: 'google.com' }));
+    expect(res.status).toBe(200);
+    // The new column is still persisted (first-writer-wins per column)…
+    expect(state.updates).toEqual([{ referrer: 'google.com' }]);
+    // …but it is NOT a second signup.
+    expect(captureEduServerEvents).not.toHaveBeenCalled();
+  });
+
+  it('emits nothing when there is nothing to write (reload of an attributed account)', async () => {
+    getUser.mockResolvedValue(AUTHED);
+    state.profile = { ...EMPTY_PROFILE, signup_surface: 'results_inline' };
+    const res = await POST(req({ signup_surface: 'results_inline' }));
+    expect(res.status).toBe(200);
+    expect(state.updates).toHaveLength(0);
+    expect(captureEduServerEvents).not.toHaveBeenCalled();
+  });
+
+  it('anonymous classroom-guest sessions are not signups: no write, no event', async () => {
+    getUser.mockResolvedValue(ANON_USER);
+    const res = await POST(req({ signup_surface: 'header_or_menu', utm_source: 'google' }));
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({ ok: true, applied: [] });
+    expect(state.updates).toHaveLength(0);
+    expect(captureEduServerEvents).not.toHaveBeenCalled();
+  });
+
+  it('marks QA signups on the event so funnels can exclude them', async () => {
+    getUser.mockResolvedValue(AUTHED);
+    state.profile = { ...EMPTY_PROFILE, is_test_account: true };
+    const res = await POST(req({ signup_surface: 'header_or_menu' }));
+    expect(res.status).toBe(200);
+    const [events] = captureEduServerEvents.mock.calls[0];
+    expect(events[0].properties.is_test_account).toBe(true);
   });
 });
 
