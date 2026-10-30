@@ -408,6 +408,15 @@ const nextConfig = {
   // Security headers and API caching
   async headers() {
     return [
+      // `?_lc_chunk=<ts>` is the stale-deploy recovery reload (lib/deploy/staleDeployReload.ts,
+      // utils/chunkBootGuard.ts). The page is identical and already canonicalises to the clean
+      // URL, but Bing indexed the stamped variants anyway. noindex (follow) on just those
+      // requests; the reload itself is untouched.
+      {
+        source: '/:path*',
+        has: [{ type: 'query', key: '_lc_chunk' }],
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex, follow' }],
+      },
       // Message catalogues. Filenames carry a content hash (see
       // scripts/build-i18n-assets.ts), so a stale copy is impossible and the
       // browser never needs to revalidate. This is the entire point of moving
