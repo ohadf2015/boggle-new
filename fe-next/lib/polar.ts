@@ -120,9 +120,12 @@ export class PolarClient {
 
   /**
    * Create a checkout session for a product. Returns the URL to redirect the
-   * user to. `external_customer_id` + `metadata.user_id`/`metadata.teacher_id`
-   * both carry our user id; Polar copies checkout metadata onto the resulting
-   * subscription, which is how the webhook maps events back to a teacher.
+   * user to plus Polar's checkout id. `external_customer_id` +
+   * `metadata.user_id`/`metadata.teacher_id` both carry our user id; Polar
+   * copies checkout metadata onto the resulting subscription, which is how the
+   * webhook maps events back to a teacher. `metadata.email` lets Polar-side
+   * logs and the webhook payload identify the teacher even when our own row
+   * somehow lost the user id.
    *
    * `email`/`name` prefill the hosted checkout so a signed-in teacher lands on
    * a one-screen page (card only). Both are best-effort: a Polar 422 about
@@ -132,6 +135,11 @@ export class PolarClient {
    * `allowTrial` defaults off. A paid checkout must send `allow_trial: false`
    * so it does not inherit a product-level Polar trial. The trial path sends
    * a 14-day day-interval and `metadata.trial: true`.
+   *
+   * The fallback success_url carries `checkout_id={CHECKOUT_ID}` — Polar
+   * substitutes the real id on redirect, so the return beacon can attribute
+   * the landing to one exact checkout session. A `redirectUrl` override must
+   * include the placeholder itself if it wants the same.
    */
   async createCheckout({
     userId,
@@ -157,7 +165,7 @@ export class PolarClient {
      * inside the free access window passes the days left in it (see polarTrialPlan).
      */
     trialDays?: number
-  }): Promise<string> {
+  }): Promise<{ url: string; id: string | null }> {
     const trial = allowTrial === true
     const trialLength =
       typeof trialDays === 'number' && Number.isFinite(trialDays)
@@ -167,9 +175,16 @@ export class PolarClient {
     const payload = {
       products: [productId],
       success_url:
-        redirectUrl || `${process.env.NEXT_PUBLIC_APP_URL}/${successLocale}/teacher?checkout=success`,
+        redirectUrl || `${process.env.NEXT_PUBLIC_APP_URL}/${successLocale}/teacher?checkout=success&checkout_id={CHECKOUT_ID}`,
       external_customer_id: userId,
-      metadata: { user_id: userId, teacher_id: userId, trial, locale: successLocale, ...(trial ? { trial_days: trialLength } : {}) },
+      metadata: {
+        user_id: userId,
+        teacher_id: userId,
+        trial,
+        locale: successLocale,
+        ...(email ? { email } : {}),
+        ...(trial ? { trial_days: trialLength } : {}),
+      },
       // Paid path must not inherit a trial configured on the Polar product.
       allow_trial: trial,
       ...(trial
@@ -177,7 +192,7 @@ export class PolarClient {
         : {}),
     }
     const post = (prefill?: { email?: string; name?: string }) =>
-      this.request<{ url: string }>('/v1/checkouts/', {
+      this.request<{ url: string; id?: string }>('/v1/checkouts/', {
         method: 'POST',
         body: JSON.stringify({
           ...payload,
@@ -186,7 +201,7 @@ export class PolarClient {
         }),
       })
 
-    let response: { url: string }
+    let response: { url: string; id?: string }
     try {
       response = await post({ email, name })
     } catch (err) {
@@ -201,7 +216,26 @@ export class PolarClient {
       response = await post()
     }
 
-    return response.url
+    return { url: response.url, id: typeof response.id === 'string' ? response.id : null }
+  }
+
+  /**
+   * Best-effort status of one checkout session ('open' | 'confirmed' |
+   * 'succeeded' | 'failed' | 'expired'). Used by the return beacon to tell a
+   * completed checkout whose webhook never landed apart from a stale
+   * success-URL revisit. Returns null — never throws — on any error so the
+   * beacon can record `status: 'unknown'` and move on.
+   */
+  async getCheckoutStatus(checkoutId: string): Promise<string | null> {
+    try {
+      const response = await this.request<{ status?: unknown }>(
+        `/v1/checkouts/${encodeURIComponent(checkoutId)}`,
+        { signal: AbortSignal.timeout(1_500) },
+      )
+      return typeof response.status === 'string' && response.status ? response.status : null
+    } catch {
+      return null
+    }
   }
 
   /**

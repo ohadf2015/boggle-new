@@ -107,7 +107,7 @@ describe('POST /api/subscription/checkout', () => {
     const prevPolar = process.env.POLAR_ENVIRONMENT
     process.env.POLAR_ENVIRONMENT = 'production'
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
-    createCheckout.mockResolvedValue('https://sandbox.polar.sh/checkout/u1')
+    createCheckout.mockResolvedValue({ url: 'https://sandbox.polar.sh/checkout/u1', id: '7e2f5a4b-0d6a-4f8b-2c3d-4e5f6a7b8c9d' })
     try {
       const res = await POST(new Request('http://www.lexiclash.live/api/subscription/checkout', {
         method: 'POST',
@@ -157,7 +157,7 @@ describe('POST /api/subscription/checkout', () => {
 
   it('returns 200 with checkout url when Polar is configured and user is authenticated', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
-    createCheckout.mockResolvedValue('https://polar.sh/checkout/u1')
+    createCheckout.mockResolvedValue({ url: 'https://polar.sh/checkout/u1', id: '4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a' })
 
     const res = await POST(new Request('http://localhost/api/subscription/checkout', { method: 'POST' }))
     expect(res.status).toBe(200)
@@ -173,7 +173,7 @@ describe('POST /api/subscription/checkout', () => {
 
   it('prefills the hosted checkout with the teacher display name from profiles', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
-    createCheckout.mockResolvedValue('https://polar.sh/checkout/u1')
+    createCheckout.mockResolvedValue({ url: 'https://polar.sh/checkout/u1', id: '4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a' })
     maybeSingle.mockResolvedValue({ data: { is_test_account: false, display_name: 'Ms Rivera' }, error: null })
     const res = await POST(new Request('http://localhost/api/subscription/checkout', { method: 'POST' }))
     expect(res.status).toBe(200)
@@ -182,7 +182,7 @@ describe('POST /api/subscription/checkout', () => {
 
   it('checkout still works when the profile lookup fails (no name prefill, till stays open)', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
-    createCheckout.mockResolvedValue('https://polar.sh/checkout/u1')
+    createCheckout.mockResolvedValue({ url: 'https://polar.sh/checkout/u1', id: '4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a' })
     maybeSingle.mockRejectedValue(new Error('db down'))
     const res = await POST(new Request('http://localhost/api/subscription/checkout', { method: 'POST' }))
     expect(res.status).toBe(200)
@@ -191,7 +191,7 @@ describe('POST /api/subscription/checkout', () => {
 
   it('records when a checkout started, for the abandoned-checkout email', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
-    createCheckout.mockResolvedValue('https://polar.sh/checkout/u1')
+    createCheckout.mockResolvedValue({ url: 'https://polar.sh/checkout/u1', id: '4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a' })
     await POST(new Request('http://localhost/api/subscription/checkout', {
       method: 'POST',
       body: JSON.stringify({ trial: true, locale: 'he' }),
@@ -200,7 +200,13 @@ describe('POST /api/subscription/checkout', () => {
     expect(logSubscriptionEvent).toHaveBeenCalledWith({
       userId: 'u1',
       eventType: 'checkout_started',
-      payload: { mode: 'trial', locale: 'he', client_kind: 'script' },
+      payload: {
+        mode: 'trial',
+        locale: 'he',
+        client_kind: 'script',
+        email: 'teacher@example.com',
+        checkout_id: '4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a',
+      },
     })
     expect(logSubscriptionEvent).toHaveBeenCalledWith({
       userId: 'u1',
@@ -222,7 +228,7 @@ describe('POST /api/subscription/checkout', () => {
 
   it('records checkout_url_error with HTTP status as a durable event when Polar checkout URL probe fails', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@school.org' })
-    createCheckout.mockResolvedValue('https://polar.sh/checkout/u1')
+    createCheckout.mockResolvedValue({ url: 'https://polar.sh/checkout/u1', id: '4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a' })
     probeCheckoutUrl.mockResolvedValueOnce({ ok: false, status: 502 })
 
     const res = await POST(new Request('http://localhost/api/subscription/checkout', { method: 'POST' }))
@@ -244,7 +250,7 @@ describe('POST /api/subscription/checkout', () => {
 
   it('records checkout_url_error with status 0 when Polar checkout URL probe times out or errors', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@school.org' })
-    createCheckout.mockResolvedValue('https://polar.sh/checkout/u1')
+    createCheckout.mockResolvedValue({ url: 'https://polar.sh/checkout/u1', id: '4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a' })
     probeCheckoutUrl.mockResolvedValueOnce(null)
 
     const res = await POST(new Request('http://localhost/api/subscription/checkout', { method: 'POST' }))
@@ -262,7 +268,7 @@ describe('POST /api/subscription/checkout', () => {
 
   it('still returns the checkout url when recording the start fails', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
-    createCheckout.mockResolvedValue('https://polar.sh/checkout/u1')
+    createCheckout.mockResolvedValue({ url: 'https://polar.sh/checkout/u1', id: '4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a' })
     logSubscriptionEvent.mockRejectedValue(new Error('db down'))
     const res = await POST(new Request('http://localhost/api/subscription/checkout', { method: 'POST' }))
     expect(res.status).toBe(200)
@@ -273,7 +279,7 @@ describe('POST /api/subscription/checkout', () => {
     vi.useFakeTimers()
     try {
       getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
-      createCheckout.mockResolvedValue('https://polar.sh/checkout/u1')
+      createCheckout.mockResolvedValue({ url: 'https://polar.sh/checkout/u1', id: '4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a' })
       logSubscriptionEvent.mockReturnValue(new Promise(() => {}))
       const pending = POST(new Request('http://localhost/api/subscription/checkout', { method: 'POST' }))
       await vi.advanceTimersByTimeAsync(2_000)
@@ -294,7 +300,7 @@ describe('POST /api/subscription/checkout', () => {
 
   it('uses the locale from the JSON body', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
-    createCheckout.mockResolvedValue('https://polar.sh/checkout/u1')
+    createCheckout.mockResolvedValue({ url: 'https://polar.sh/checkout/u1', id: '4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a' })
     const res = await POST(new Request('http://localhost/api/subscription/checkout', {
       method: 'POST',
       body: JSON.stringify({ trial: false, locale: 'he' }),
@@ -306,7 +312,7 @@ describe('POST /api/subscription/checkout', () => {
 
   it('rejects an unsupported body locale and falls back to the boggle_language cookie', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
-    createCheckout.mockResolvedValue('https://polar.sh/checkout/u1')
+    createCheckout.mockResolvedValue({ url: 'https://polar.sh/checkout/u1', id: '4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a' })
     // `cookie` is a forbidden header name for plain Request construction
     // (silently dropped), so seed it via NextRequest.cookies.
     const request = new NextRequest('http://localhost/api/subscription/checkout', {
@@ -322,7 +328,7 @@ describe('POST /api/subscription/checkout', () => {
 
   it('defaults to en when neither body nor cookie carries a supported locale', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
-    createCheckout.mockResolvedValue('https://polar.sh/checkout/u1')
+    createCheckout.mockResolvedValue({ url: 'https://polar.sh/checkout/u1', id: '4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a' })
     const res = await POST(new Request('http://localhost/api/subscription/checkout', {
       method: 'POST',
       body: JSON.stringify({ trial: false, locale: 'xx' }),
@@ -334,7 +340,7 @@ describe('POST /api/subscription/checkout', () => {
 
   it('an empty JSON body stays on the paid checkout', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
-    createCheckout.mockResolvedValue('https://polar.sh/checkout/u1')
+    createCheckout.mockResolvedValue({ url: 'https://polar.sh/checkout/u1', id: '4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a' })
     const res = await POST(new Request('http://localhost/api/subscription/checkout', {
       method: 'POST',
       body: '{}',
@@ -346,7 +352,7 @@ describe('POST /api/subscription/checkout', () => {
 
   it('posts allowTrial only when the body is { trial: true }', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
-    createCheckout.mockResolvedValue('https://polar.sh/checkout/trial')
+    createCheckout.mockResolvedValue({ url: 'https://polar.sh/checkout/trial', id: '5c0d3e2f-8b4e-4d6f-0a1b-2c3d4e5f6a7b' })
     const res = await POST(new Request('http://localhost/api/subscription/checkout', {
       method: 'POST',
       body: JSON.stringify({ trial: true }),
@@ -366,7 +372,7 @@ describe('POST /api/subscription/checkout', () => {
 
   it('downgrades a trial request to paid when they already have Pro or already used a trial', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
-    createCheckout.mockResolvedValue('https://polar.sh/checkout/paid')
+    createCheckout.mockResolvedValue({ url: 'https://polar.sh/checkout/paid', id: '6d1e4f3a-9c5f-4e7a-1b2c-3d4e5f6a7b8c' })
     maybeSingle.mockResolvedValue({
       data: { tier: 'pro', status: 'active', source: 'polar', current_period_end: '2026-11-01T00:00:00Z' },
       error: null,
@@ -391,7 +397,7 @@ describe('POST /api/subscription/checkout', () => {
 
   it('gives a teacher with no free access window the full 14-day trial', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
-    createCheckout.mockResolvedValue('https://polar.sh/checkout/trial')
+    createCheckout.mockResolvedValue({ url: 'https://polar.sh/checkout/trial', id: '5c0d3e2f-8b4e-4d6f-0a1b-2c3d4e5f6a7b' })
     await POST(new Request('http://localhost/api/subscription/checkout', {
       method: 'POST',
       body: JSON.stringify({ trial: true }),
@@ -402,7 +408,7 @@ describe('POST /api/subscription/checkout', () => {
 
   it('inside the free access window, the Polar trial ends when the free trial ends (no second 14 days)', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
-    createCheckout.mockResolvedValue('https://polar.sh/checkout/trial')
+    createCheckout.mockResolvedValue({ url: 'https://polar.sh/checkout/trial', id: '5c0d3e2f-8b4e-4d6f-0a1b-2c3d4e5f6a7b' })
     accessTrialExpiryAny.mockResolvedValue(new Date(Date.now() + 5.5 * 24 * 60 * 60 * 1000).toISOString())
     await POST(new Request('http://localhost/api/subscription/checkout', {
       method: 'POST',
@@ -414,7 +420,7 @@ describe('POST /api/subscription/checkout', () => {
 
   it('a paid checkout never carries trial days, access window or not', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
-    createCheckout.mockResolvedValue('https://polar.sh/checkout/paid')
+    createCheckout.mockResolvedValue({ url: 'https://polar.sh/checkout/paid', id: '6d1e4f3a-9c5f-4e7a-1b2c-3d4e5f6a7b8c' })
     accessTrialExpiryAny.mockResolvedValue(new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString())
     await POST(new Request('http://localhost/api/subscription/checkout', { method: 'POST' }))
     expect(createCheckout).toHaveBeenCalledWith(expect.objectContaining({ allowTrial: false, trialDays: undefined }))
@@ -422,7 +428,7 @@ describe('POST /api/subscription/checkout', () => {
 
   it('free access trial already ended: a straight $9/mo checkout, no Polar trial', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
-    createCheckout.mockResolvedValue('https://polar.sh/checkout/paid')
+    createCheckout.mockResolvedValue({ url: 'https://polar.sh/checkout/paid', id: '6d1e4f3a-9c5f-4e7a-1b2c-3d4e5f6a7b8c' })
     accessTrialExpiryAny.mockResolvedValue(new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString())
     const res = await POST(new Request('http://localhost/api/subscription/checkout', {
       method: 'POST',
@@ -435,7 +441,7 @@ describe('POST /api/subscription/checkout', () => {
 
   it('a slow access-window lookup falls back to the standard trial instead of failing checkout', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
-    createCheckout.mockResolvedValue('https://polar.sh/checkout/trial')
+    createCheckout.mockResolvedValue({ url: 'https://polar.sh/checkout/trial', id: '5c0d3e2f-8b4e-4d6f-0a1b-2c3d4e5f6a7b' })
     accessTrialExpiryAny.mockRejectedValue(new Error('db down'))
     const res = await POST(new Request('http://localhost/api/subscription/checkout', {
       method: 'POST',

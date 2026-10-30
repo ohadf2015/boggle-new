@@ -31,6 +31,27 @@ describe('checkoutStartedPayload', () => {
     expect(ABANDONED_CHECKOUT_EMAIL_EVENT).not.toMatch(/trial/);
     expect(checkoutStartedPayload({ trial: false, locale: 'en' })).toEqual({ mode: 'paid', locale: 'en' });
   });
+
+  it('carries email + checkout_id when given, so a NULL user_id row stays identifiable and joinable to the return beacon', () => {
+    const p = checkoutStartedPayload({
+      trial: false,
+      locale: 'en',
+      email: 'teacher@school.org',
+      checkoutId: '4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a',
+    });
+    expect(p).toEqual({
+      mode: 'paid',
+      locale: 'en',
+      email: 'teacher@school.org',
+      checkout_id: '4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a',
+    });
+  });
+
+  it('omits email + checkout_id when absent instead of writing nulls', () => {
+    const p = checkoutStartedPayload({ trial: false, locale: 'en', email: null, checkoutId: null });
+    expect(p).not.toHaveProperty('email');
+    expect(p).not.toHaveProperty('checkout_id');
+  });
 });
 
 describe('abandonedCheckoutUpgradeUrl', () => {

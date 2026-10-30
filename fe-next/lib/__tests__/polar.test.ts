@@ -144,21 +144,24 @@ describe('PolarClient.createCheckout', () => {
     vi.unstubAllGlobals()
   })
 
-  it('posts the expected payload to the sandbox API and returns the checkout url', async () => {
+  it('posts the expected payload to the sandbox API and returns the checkout url and id', async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => ({ url: 'https://sandbox.polar.sh/checkout/abc' }),
+      json: async () => ({ url: 'https://sandbox.polar.sh/checkout/abc', id: 'c58b0e2a-1c3d-4e5f-8a9b-0c1d2e3f4a5b' }),
     })
     vi.stubGlobal('fetch', fetchMock)
 
     const client = new PolarClient('token-123', 'sandbox')
-    const url = await client.createCheckout({
+    const checkout = await client.createCheckout({
       userId: 'user-1',
       productId: 'prod-1',
       email: 'teacher@example.com',
     })
 
-    expect(url).toBe('https://sandbox.polar.sh/checkout/abc')
+    expect(checkout).toEqual({
+      url: 'https://sandbox.polar.sh/checkout/abc',
+      id: 'c58b0e2a-1c3d-4e5f-8a9b-0c1d2e3f4a5b',
+    })
     expect(fetchMock).toHaveBeenCalledTimes(1)
     const [endpoint, init] = fetchMock.mock.calls[0]
     expect(endpoint).toBe('https://sandbox-api.polar.sh/v1/checkouts/')
@@ -169,10 +172,24 @@ describe('PolarClient.createCheckout', () => {
       products: ['prod-1'],
       customer_email: 'teacher@example.com',
       external_customer_id: 'user-1',
-      metadata: { user_id: 'user-1', teacher_id: 'user-1', trial: false },
+      metadata: { user_id: 'user-1', teacher_id: 'user-1', trial: false, email: 'teacher@example.com' },
       allow_trial: false,
     })
     expect(body.trial_interval).toBeUndefined()
+  })
+
+  it('omits metadata.email when no email is given and tolerates a response without an id', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ url: 'https://sandbox.polar.sh/checkout/abc' }),
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    const client = new PolarClient('token-123', 'sandbox')
+    const checkout = await client.createCheckout({ userId: 'user-1', productId: 'prod-1' })
+
+    expect(checkout).toEqual({ url: 'https://sandbox.polar.sh/checkout/abc', id: null })
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body).metadata).not.toHaveProperty('email')
   })
 
   it('prefills the customer name on the hosted checkout when given one', async () => {
@@ -248,7 +265,7 @@ describe('PolarClient.createCheckout', () => {
     expect(paid.trial_interval_count).toBeUndefined()
   })
 
-  it('builds the fallback success_url with the /en prefix by default', async () => {
+  it('builds the fallback success_url with the /en prefix by default and the checkout_id placeholder Polar substitutes', async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({ url: 'https://sandbox.polar.sh/checkout/abc' }),
@@ -260,7 +277,7 @@ describe('PolarClient.createCheckout', () => {
     await client.createCheckout({ userId: 'user-1', productId: 'prod-1' })
 
     const body = JSON.parse(fetchMock.mock.calls[0][1].body)
-    expect(body.success_url).toBe('https://www.lexiclash.live/en/teacher?checkout=success')
+    expect(body.success_url).toBe('https://www.lexiclash.live/en/teacher?checkout=success&checkout_id={CHECKOUT_ID}')
     delete process.env.NEXT_PUBLIC_APP_URL
   })
 
@@ -276,11 +293,11 @@ describe('PolarClient.createCheckout', () => {
     await client.createCheckout({ userId: 'user-1', productId: 'prod-1', locale: 'he' })
 
     const body = JSON.parse(fetchMock.mock.calls[0][1].body)
-    expect(body.success_url).toBe('https://www.lexiclash.live/he/teacher?checkout=success')
+    expect(body.success_url).toBe('https://www.lexiclash.live/he/teacher?checkout=success&checkout_id={CHECKOUT_ID}')
     delete process.env.NEXT_PUBLIC_APP_URL
   })
 
-  it('lets redirectUrl override the locale-aware success_url', async () => {
+  it('lets redirectUrl override the locale-aware success_url verbatim', async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({ url: 'https://sandbox.polar.sh/checkout/abc' }),
@@ -312,8 +329,8 @@ describe('PolarClient.createCheckout — rejected customer_email', () => {
   it('retries once without the email, so a teacher with an odd address can still subscribe', async () => {
     const fetchMock = vi.fn().mockResolvedValueOnce(rejected).mockResolvedValueOnce(created)
     vi.stubGlobal('fetch', fetchMock)
-    const url = await new PolarClient('tok', 'sandbox').createCheckout({ userId: 'u', productId: 'p', email: 'a@school.example' })
-    expect(url).toBe('https://polar.sh/checkout/ok')
+    const checkout = await new PolarClient('tok', 'sandbox').createCheckout({ userId: 'u', productId: 'p', email: 'a@school.example' })
+    expect(checkout.url).toBe('https://polar.sh/checkout/ok')
     expect(fetchMock).toHaveBeenCalledTimes(2)
     expect(JSON.parse(fetchMock.mock.calls[0][1].body).customer_email).toBe('a@school.example')
     expect(JSON.parse(fetchMock.mock.calls[1][1].body)).not.toHaveProperty('customer_email')
@@ -327,8 +344,8 @@ describe('PolarClient.createCheckout — rejected customer_email', () => {
     }
     const fetchMock = vi.fn().mockResolvedValueOnce(nameRejected).mockResolvedValueOnce(created)
     vi.stubGlobal('fetch', fetchMock)
-    const url = await new PolarClient('tok', 'sandbox').createCheckout({ userId: 'u', productId: 'p', email: 'a@b.co', name: 'Ms Rivera' })
-    expect(url).toBe('https://polar.sh/checkout/ok')
+    const checkout = await new PolarClient('tok', 'sandbox').createCheckout({ userId: 'u', productId: 'p', email: 'a@b.co', name: 'Ms Rivera' })
+    expect(checkout.url).toBe('https://polar.sh/checkout/ok')
     expect(fetchMock).toHaveBeenCalledTimes(2)
     const retry = JSON.parse(fetchMock.mock.calls[1][1].body)
     expect(retry).not.toHaveProperty('customer_name')
@@ -372,6 +389,35 @@ describe('probeCheckoutUrl', () => {
   it('returns null (never throws) when the probe request itself fails', async () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('network down')))
     await expect(probeCheckoutUrl('https://polar.sh/checkout/abc')).resolves.toBeNull()
+  })
+})
+
+describe('PolarClient.getCheckoutStatus', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  it('returns Polar’s own status for the checkout id', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ id: 'abc', status: 'succeeded' }),
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    const client = new PolarClient('token-123', 'production')
+    await expect(client.getCheckoutStatus('abc')).resolves.toBe('succeeded')
+    expect(fetchMock.mock.calls[0][0]).toBe('https://api.polar.sh/v1/checkouts/abc')
+    expect(fetchMock.mock.calls[0][1].method ?? 'GET').toBe('GET')
+  })
+
+  it('returns null on a Polar error so the beacon records status unknown', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 404, text: async () => 'not found' }))
+    await expect(new PolarClient('tok', 'sandbox').getCheckoutStatus('missing')).resolves.toBeNull()
+  })
+
+  it('returns null (never throws) when the lookup itself fails', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('network down')))
+    await expect(new PolarClient('tok', 'sandbox').getCheckoutStatus('abc')).resolves.toBeNull()
   })
 })
 

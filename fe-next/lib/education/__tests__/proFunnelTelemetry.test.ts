@@ -275,6 +275,36 @@ describe('trackEduProCheckoutReturnLanded', () => {
     expect(trackEduProCheckoutReturnLanded(2_000)).toBe(false);
     expect(captureMock).toHaveBeenCalledTimes(2);
   });
+
+  it('Given the Polar success redirect carries a checkout_id, When tracked, Then both names and the server beacon carry it', () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue({ ok: true } as Response);
+    const checkoutId = '4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a';
+    try {
+      expect(trackEduProCheckoutReturnLanded(1_000, { checkoutId, url: null })).toBe(true);
+      expect(captureMock).toHaveBeenCalledWith('edu_pro_checkout_return_landed', { checkout_id: checkoutId });
+      expect(captureMock).toHaveBeenCalledWith('checkout_return_landed', {
+        product: 'teacher_pro',
+        provider: 'polar',
+        checkout_id: checkoutId,
+      });
+      const body = JSON.parse(String(fetchSpy.mock.calls[0][1]?.body));
+      expect(body.checkout_id).toBe(checkoutId);
+    } finally {
+      fetchSpy.mockRestore();
+    }
+  });
+
+  it('Given a non-UUID checkout_id, When tracked, Then it is dropped rather than sent to Polar', () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue({ ok: true } as Response);
+    try {
+      expect(trackEduProCheckoutReturnLanded(1_000, { checkoutId: 'garbage', url: null })).toBe(true);
+      expect(captureMock).toHaveBeenCalledWith('edu_pro_checkout_return_landed', {});
+      const body = JSON.parse(String(fetchSpy.mock.calls[0][1]?.body));
+      expect(body).not.toHaveProperty('checkout_id');
+    } finally {
+      fetchSpy.mockRestore();
+    }
+  });
 });
 
 describe('trackEduProMissedHomeworkAssigned', () => {

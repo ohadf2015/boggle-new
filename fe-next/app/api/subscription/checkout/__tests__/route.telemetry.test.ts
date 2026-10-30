@@ -52,7 +52,7 @@ describe('POST /api/subscription/checkout — edu_pro_checkout_started', () => {
 
   it('Given a checkout is created, When the route answers, Then it fires once for the user with $host', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
-    createCheckout.mockResolvedValue('https://polar.sh/checkout/u1')
+    createCheckout.mockResolvedValue({ url: 'https://polar.sh/checkout/u1', id: '4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a' })
 
     const res = await POST(req())
     expect(res.status).toBe(200)
@@ -102,7 +102,7 @@ describe('POST /api/subscription/checkout — edu_pro_checkout_started', () => {
   it('Given PostHog itself throws, When a checkout is created, Then the teacher still gets the same checkout url', async () => {
     posthogThrows = true
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
-    createCheckout.mockResolvedValue('https://polar.sh/checkout/u1')
+    createCheckout.mockResolvedValue({ url: 'https://polar.sh/checkout/u1', id: '4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a' })
     const res = await POST(req())
     expect(res.status).toBe(200)
     expect(await res.json()).toEqual({ url: 'https://polar.sh/checkout/u1' })
@@ -110,7 +110,7 @@ describe('POST /api/subscription/checkout — edu_pro_checkout_started', () => {
 
   it('Given the Polar checkout page itself 503s, When the route answers, Then checkout_url_error and edu_pro_checkout_failed fire with status 503 but the teacher still gets the url', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
-    createCheckout.mockResolvedValue('https://polar.sh/checkout/u1')
+    createCheckout.mockResolvedValue({ url: 'https://polar.sh/checkout/u1', id: '4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a' })
     probeCheckoutUrl.mockResolvedValue({ ok: false, status: 503 })
 
     const res = await POST(req())
@@ -134,7 +134,7 @@ describe('POST /api/subscription/checkout — edu_pro_checkout_started', () => {
 
   it('Given the probe cannot reach Polar at all (network error), When the route answers, Then checkout_url_error fires with status 0 and the teacher still gets the url', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
-    createCheckout.mockResolvedValue('https://polar.sh/checkout/u1')
+    createCheckout.mockResolvedValue({ url: 'https://polar.sh/checkout/u1', id: '4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a' })
     probeCheckoutUrl.mockResolvedValue(null)
 
     const res = await POST(req())
@@ -146,7 +146,7 @@ describe('POST /api/subscription/checkout — edu_pro_checkout_started', () => {
 
   it('Given { trial: true }, When Polar creates checkout, Then it fires edu_pro_trial_started, checkout_started, and checkout_url_reachable', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
-    createCheckout.mockResolvedValue('https://polar.sh/checkout/trial')
+    createCheckout.mockResolvedValue({ url: 'https://polar.sh/checkout/trial', id: '5c0d3e2f-8b4e-4d6f-0a1b-2c3d4e5f6a7b' })
     const res = await POST(new Request('http://localhost/api/subscription/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -161,7 +161,7 @@ describe('POST /api/subscription/checkout — edu_pro_checkout_started', () => {
   })
   it('Given a scripted call from a QA alias, When a checkout is created, Then every start event is tagged as test + script + url-created', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'someone+lexitest1020@gmail.com' })
-    createCheckout.mockResolvedValue('https://polar.sh/checkout/u1')
+    createCheckout.mockResolvedValue({ url: 'https://polar.sh/checkout/u1', id: '4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a' })
     const res = await POST(req())
     expect(res.status).toBe(200)
     for (const [arg] of capture.mock.calls) {
@@ -180,7 +180,7 @@ describe('POST /api/subscription/checkout — edu_pro_checkout_started', () => {
 
   it('Given a real teacher in a browser, When a trial checkout is created, Then the tags say browser and not test', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@school.org' })
-    createCheckout.mockResolvedValue('https://polar.sh/checkout/trial')
+    createCheckout.mockResolvedValue({ url: 'https://polar.sh/checkout/trial', id: '5c0d3e2f-8b4e-4d6f-0a1b-2c3d4e5f6a7b' })
     // Request() strips Sec-* (forbidden header names); a browser request to the server carries them.
     const browserReq = {
       headers: new Headers({ 'content-type': 'application/json', 'sec-fetch-mode': 'cors', 'sec-fetch-site': 'same-origin' }),

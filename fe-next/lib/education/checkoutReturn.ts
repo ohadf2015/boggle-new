@@ -24,6 +24,26 @@ export function isCheckoutSuccessSearch(search: string): boolean {
   return new URLSearchParams(raw).get('checkout') === 'success';
 }
 
+/** Polar checkout ids are UUIDs; anything else is not attribution. */
+const CHECKOUT_ID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** A raw checkout id (body field, query value) — the UUID or null. */
+export function normalizeCheckoutId(raw: unknown): string | null {
+  return typeof raw === 'string' && CHECKOUT_ID_RE.test(raw) ? raw : null;
+}
+
+/**
+ * The Polar success_url carries `checkout_id={CHECKOUT_ID}`, substituted on
+ * redirect. Returns the id when present and well-formed, else null — a stale
+ * `?checkout=success` bookmark has none, which is exactly the case the return
+ * beacon must be able to tell apart from a real completed checkout.
+ */
+export function checkoutIdFromSearch(search: string): string | null {
+  const raw = search.startsWith('?') ? search.slice(1) : search;
+  if (!raw) return null;
+  return normalizeCheckoutId(new URLSearchParams(raw).get('checkout_id'));
+}
+
 export function rememberReturnIntent(storage: SetStorage, now: number = Date.now()): void {
   try {
     storage.setItem(RETURN_INTENT_KEY, String(now));
