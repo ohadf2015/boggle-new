@@ -106,11 +106,13 @@ describe('trackSignupFunnel — props merge + pending latch (t_da22db9a)', () =>
     consumePendingSignupCompletion();
     consumePendingSignupCompletion(); // second call must be a no-op
 
-    // Dual-emit: growth:signup_completed + bare signup_completed (whitelist)
+    // Bare canonical emit only: the growth:-prefixed copy is server-canonical
+    // (t_b6131f7d — /api/auth/attribution emits it once per account).
     const completed = mockCapture.mock.calls.filter(
       ([name]) => name === 'growth:signup_completed' || name === 'signup_completed'
     );
     expect(completed.length).toBeGreaterThanOrEqual(1);
+    expect(completed.every(([name]) => name === 'signup_completed')).toBe(true);
     expect(window.sessionStorage.getItem(PENDING_KEY)).toBeNull();
     expect(window.localStorage.getItem(PENDING_KEY)).toBeNull();
   });
@@ -122,10 +124,13 @@ describe('trackSignupFunnel — props merge + pending latch (t_da22db9a)', () =>
 
     consumePendingSignupCompletion();
 
+    // PostHog gets the BARE canonical event; growth:signup_completed comes
+    // from the server once per account (t_b6131f7d).
     expect(mockCapture).toHaveBeenCalledWith(
-      'growth:signup_completed',
+      'signup_completed',
       expect.objectContaining({ is_first_win: true })
     );
+    expect(mockCapture.mock.calls.map(([n]) => n)).not.toContain('growth:signup_completed');
     expect(window.localStorage.getItem(PENDING_KEY)).toBeNull();
   });
 

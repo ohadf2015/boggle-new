@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { createRequestClient } from '@/utils/supabase/server';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { sanitizeReferrerDomain, sanitizeLandingPath } from '@/lib/auth/attributionSanitize';
+import { captureEduServerEvents } from '@/backend/utils/educationTelemetry';
 
 /**
  * POST /api/auth/attribution (t_a80f937b)
@@ -18,6 +19,16 @@ import { sanitizeReferrerDomain, sanitizeLandingPath } from '@/lib/auth/attribut
  * Privacy: referrer is stored as DOMAIN only and landing_path keeps utm_*
  * params but no other query string — the client sanitizes before sending and
  * this route re-sanitizes defensively.
+ *
+ * t_b6131f7d — this route is also the SINGLE source of Growth Radar's
+ * growth:signup_completed. The client emitters (maybeTrackSignupCompleted /
+ * trackSignupFunnel) deliberately feed neither GR pipe (no window.gr mirror,
+ * no growth: copy in PostHog — GR's PostHog ingest imports every growth:*
+ * event), because per-device localStorage dedupe counted one account once per
+ * browser. The first-writer-wins signup_surface write below happens exactly
+ * once per account, so the event is emitted only from the request that
+ * applies signup_surface. Anonymous sessions (classroom guest students) are
+ * not signups: they get no write and no event.
  */
 
 const bodySchema = z.object({
@@ -34,6 +45,13 @@ export async function POST(request: Request) {
   const { data: { user }, error: authError } = await supabase.auth.getUser(token ?? undefined);
   if (authError || !user) {
     return NextResponse.json({ ok: false, error: 'unauthenticated' }, { status: 401 });
+  }
+
+  // Anonymous classroom-guest sessions are not signups (t_b6131f7d): no
+  // attribution write (the columns must stay NULL so a future anonymous →
+  // permanent upgrade can win the first-writer slot) and no GR signup event.
+  if (user.is_anonymous === true) {
+    return NextResponse.json({ ok: true, applied: [] });
   }
 
   let json: unknown;
@@ -55,7 +73,7 @@ export async function POST(request: Request) {
 
   const { data: profile, error: readError } = await admin
     .from('profiles')
-    .select('utm_source, utm_medium, utm_campaign, referrer, landing_path, signup_surface')
+    .select('utm_source, utm_medium, utm_campaign, referrer, landing_path, signup_surface, is_test_account')
     .eq('id', user.id)
     .maybeSingle();
 
@@ -99,6 +117,32 @@ export async function POST(request: Request) {
   if (updateError) {
     console.error('[attribution] profile update failed:', updateError.message);
     return NextResponse.json({ ok: false, error: 'update failed' }, { status: 500 });
+  }
+
+  // t_b6131f7d: the request that wins the signup_surface first-write is the
+  // account's ONE Growth Radar signup. Emitting here — server-side, once per
+  // account id — replaces the client mirror whose per-device dedupe counted
+  // the same account again on every new browser. Goes through
+  // captureEduServerEvents so $host is stamped (Growth Radar's PostHog ingest
+  // attributes by host) and transport failures are swallowed — analytics must
+  // never break the auth flow. A second device / a reload reads signup_surface
+  // as non-null above and never reaches this line.
+  if (update.signup_surface) {
+    captureEduServerEvents([
+      {
+        distinctId: user.id,
+        event: 'growth:signup_completed',
+        properties: {
+          source: update.signup_surface,
+          utm_source: update.utm_source,
+          utm_medium: update.utm_medium,
+          utm_campaign: update.utm_campaign,
+          referrer_domain: update.referrer,
+          is_test_account:
+            (profile as Record<string, unknown>).is_test_account === true,
+        },
+      },
+    ]);
   }
 
   return NextResponse.json({ ok: true, applied: Object.keys(update) });

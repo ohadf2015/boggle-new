@@ -7,6 +7,7 @@ import { consumePendingSignupCompletion, consumeSignupSource, isRecentAccount, m
 import { markAuthProviderMounted } from '@/lib/auth/authProviderMounted';
 import { persistProfileAttribution } from '@/utils/profileAttribution';
 import { markFreshSignup } from '@/lib/retention/signupFirstGame';
+import { isCountableSignupUser } from './auth/signupCountability';
 import type { AuthContextValue } from './auth/authTypes';
 import { AuthContext } from './AuthContext';
 
@@ -129,7 +130,14 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
       });
       // Resolve pending signup-prompt funnel only on guest → authed flips.
       // Re-identifies of an already-authed user must not re-fire completion.
-      if (wasGuest) {
+      //
+      // t_b6131f7d: anonymous Supabase sessions (classroom guest students
+      // minted by signInAnonymously) are NOT signups — they get no
+      // signup_completed, no attribution write and no fresh-signup mark
+      // (which also keeps them out of the signup-first-game experiment and
+      // its account_first_game goal). They have a profiles row and a <1h-old
+      // account, so without this guard they passed every freshness check.
+      if (wasGuest && isCountableSignupUser(user)) {
         // Unconditional canonical emit so PostHog "Signup Completed" goal
         // can attribute *any* signup source (header / menu / onboarding /
         // post-game prompt). Source disambiguator is read from the pending

@@ -195,11 +195,16 @@ describe('trackGrowthEvent → Growth Radar mirror', () => {
     };
     trackSignupFunnel('completed', false, { source: 'multi_game_prompt' });
     expect(grCapture.mock.calls.map(([event]) => event)).not.toContain('growth:signup_completed');
-    // PostHog still records the prompt-funnel step. Only the Growth Radar twin is gated.
-    expect(captureMock.mock.calls.map((c) => c[0])).toContain('growth:signup_completed');
+    // t_b6131f7d: Growth Radar's signup_completed copy is server-canonical
+    // (/api/auth/attribution, once per account). The client keeps only the
+    // BARE canonical PostHog event — a growth:signup_completed in PostHog
+    // would be imported by GR as a second row.
+    const captured = captureMock.mock.calls.map((c) => c[0]);
+    expect(captured).toContain('signup_completed');
+    expect(captured).not.toContain('growth:signup_completed');
   });
 
-  it('mirrors signup_completed from the deduped emitter', () => {
+  it('deduped emitter: PostHog bare only — GR copy is server-canonical (t_b6131f7d)', () => {
     (g.window as { location: { hostname: string; search: string } }).location = {
       hostname: 'www.lexiclash.live',
       search: '',
@@ -216,6 +221,11 @@ describe('trackGrowthEvent → Growth Radar mirror', () => {
       source: 'header_or_menu',
     });
     expect(emitted).toBe(true);
-    expect(grCapture.mock.calls.map(([event]) => event)).toContain('growth:signup_completed');
+    // Neither GR pipe is fed from the client: no window.gr mirror…
+    expect(grCapture.mock.calls.map(([event]) => event)).not.toContain('growth:signup_completed');
+    // …and no growth: copy in PostHog (GR imports every growth:* event).
+    const captured = captureMock.mock.calls.map((c) => c[0]);
+    expect(captured).toContain('signup_completed');
+    expect(captured).not.toContain('growth:signup_completed');
   });
 });
