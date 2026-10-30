@@ -16,7 +16,7 @@ import { usePostHogFlag } from '@/hooks/usePostHogFlag';
 import { getGuestStats } from '@/utils/guestManager';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { trackGrowthEvent, trackSignupFunnel } from '@/utils/growthTracking';
-import { hasPostGameCompleted, markPostGameCompleted } from '@/lib/auth/signupPromptCoordination';
+import { hasPostGameCompleted, markPostGameCompleted, hasResultsInlineShownThisSession } from '@/lib/auth/signupPromptCoordination';
 
 // Session-scoped MP game counter (separate from global guest stats)
 const MP_SESSION_GAMES_KEY = 'boggle_mp_session_games';
@@ -170,13 +170,28 @@ export function useMultiplayerSignupNudge({
     // dismissNudge) so a reload/remount before the user dismisses can't re-pop it
     // (recurring-pitfalls Class 1). dismissNudge emits signup_dismissed
     // (trigger: mp_sheet) — never a second prompt_shown.
+    // t_ac5ac2f7: never stack the sheet on a guest who already saw the
+    // results_inline card this session — 58/60 mp_sheet guests had, and the
+    // second ask earned 1 click / 0 signups in 14d (pure friction). The sheet
+    // tier is silently consumed (marked shown, no event) so the toast gate,
+    // which requires wasSheetShown(), behaves exactly as before.
     if (mpGames >= sheetThreshold && !wasSheetShown()) {
+      if (hasResultsInlineShownThisSession()) {
+        markSheetShown();
+      } else {
       const timer = setTimeout(() => {
         // t_da22db9a: parallel mounts (host/player results views) all schedule
         // this timer before any latches. Re-check INSIDE the timer so only the
         // first fire wins — PostHog 14d showed 3 prompt_shown within 1s from a
         // single device. (The solo useSignupPrompt already re-checks this way.)
         if (wasSheetShown()) return;
+        // t_ac5ac2f7: re-check the inline latch inside the timer too — the
+        // results_inline card on this same screen may have shown (and marked)
+        // after this effect scheduled.
+        if (hasResultsInlineShownThisSession()) {
+          markSheetShown();
+          return;
+        }
         markSheetShown();
         setActiveNudge('sheet');
         // Route through trackSignupFunnel so the sessionStorage pending latch
@@ -186,6 +201,7 @@ export function useMultiplayerSignupNudge({
         trackSignupFunnel('prompt_shown', false, { trigger: 'mp_sheet', mpSessionGame: mpGames });
       }, 2000); // 2s delay — let them see their results first
       return () => clearTimeout(timer);
+      }
     }
 
     // Toast: show ONCE on game 3+ (after sheet was already shown/dismissed).

@@ -24,6 +24,7 @@ import {
   isResultsInlineCapped,
   recordResultsInlineImpression,
 } from '@/utils/signupImpressionCap';
+import { markResultsInlineShown } from '@/lib/auth/signupPromptCoordination';
 
 interface InlineSignupCardProps {
   isAuthenticated: boolean;
@@ -107,6 +108,10 @@ const InlineSignupCard: React.FC<InlineSignupCardProps> = ({
       }
       shownRef.current = true;
       const capRank = recordResultsInlineImpression();
+      // t_ac5ac2f7: latch the session so the mp_sheet tier never stacks a
+      // second ask on a guest this card already asked (58/60 overlap, 0
+      // signups in 14d). Marked at SHOW time, alongside the event.
+      markResultsInlineShown();
       trackGrowthEvent('signup_prompt_shown', {
         source: analyticsSource,
         surface: analyticsSource,

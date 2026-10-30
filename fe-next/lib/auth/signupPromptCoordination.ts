@@ -70,6 +70,30 @@ export function hasPostGameCompleted(): boolean {
   }
 }
 
+/** Session latch: the results_inline card was shown this SPA session
+ *  (t_ac5ac2f7). UR 2026-10-30: 58 of 60 mp_sheet guests had also seen
+ *  results_inline; the stacked second ask earned 1 click and 0 signups in
+ *  14d, so the mp_sheet tier stays quiet once the inline card has asked. */
+export const RESULTS_INLINE_SHOWN_KEY = 'lexiclash_results_inline_shown';
+
+export function markResultsInlineShown(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    sessionStorage.setItem(RESULTS_INLINE_SHOWN_KEY, '1');
+  } catch {
+    /* ignore */
+  }
+}
+
+export function hasResultsInlineShownThisSession(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    return sessionStorage.getItem(RESULTS_INLINE_SHOWN_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
 /** True when pathname looks like a post-game results surface. */
 export function isResultsPath(pathname: string | null | undefined): boolean {
   if (!pathname) return false;
