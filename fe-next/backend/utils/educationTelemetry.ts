@@ -212,7 +212,16 @@ export function captureEduServerEvents(events: EduServerEvent[]): void {
   if (!events?.length) return;
 
   const client = getPostHogServer();
-  if (!client) return;
+  if (!client) {
+    // Silent no-op here is the exact failure this module exists to avoid
+    // (NEXT_PUBLIC_POSTHOG_KEY missing on this deploy) — warn instead of
+    // vanishing, so a dead key shows up as a Sentry issue, not a flat dashboard.
+    logger.warn(
+      'EDU_TELEMETRY',
+      `PostHog client unavailable, dropped ${events.length} event(s): ${events.map((e) => e.event).join(', ')}`
+    );
+    return;
+  }
 
   for (const ev of events) {
     const names = GROWTH_TWIN_EVENTS.has(ev.event)

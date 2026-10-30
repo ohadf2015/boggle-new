@@ -16,10 +16,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { ClassroomGame } from '../../modules/classroomGameManager';
 
 const mockCapture = vi.fn();
+const mockGetPostHogServer = vi.fn(() => ({ capture: mockCapture }));
 vi.mock('@/lib/posthog', () => ({
-  getPostHogServer: () => ({ capture: mockCapture }),
+  getPostHogServer: () => mockGetPostHogServer(),
 }));
 
+import logger from '../logger';
 import {
   buildClassroomGameStartedEvent,
   buildClassroomGameCompletedEvents,
@@ -51,6 +53,7 @@ function makeGame(over: Partial<ClassroomGame> = {}): ClassroomGame {
 
 beforeEach(() => {
   mockCapture.mockClear();
+  mockGetPostHogServer.mockReturnValue({ capture: mockCapture });
 });
 
 describe('buildClassroomGameStartedEvent', () => {
@@ -166,6 +169,21 @@ describe('captureEduServerEvents — $host', () => {
   it('Given an empty list, When captured, Then PostHog is not called at all', () => {
     captureEduServerEvents([]);
     expect(mockCapture).not.toHaveBeenCalled();
+  });
+
+  it('Given no PostHog client (missing key), When captured, Then it warns instead of silently dropping the events', () => {
+    mockGetPostHogServer.mockReturnValueOnce(null as unknown as { capture: typeof mockCapture });
+    const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
+
+    captureEduServerEvents([
+      { distinctId: 'stu-1', event: 'edu_classroom_game_started', properties: {} },
+    ]);
+
+    expect(warnSpy).toHaveBeenCalledWith(
+      'EDU_TELEMETRY',
+      expect.stringContaining('edu_classroom_game_started')
+    );
+    warnSpy.mockRestore();
   });
 });
 
