@@ -28,6 +28,7 @@ export const SPOTLIGHT_SRC = `${ART}/spotlight-burst.webp`;
 
 const CALLOUT: Record<ResultCallout['kind'], { badge?: string; icon: LucideIcon; tone: string }> = {
   photoFinish: { badge: `${ART}/badge-photo-finish.webp`, icon: Timer, tone: 'bg-neo-yellow' },
+  h2h: { icon: Swords, tone: 'bg-neo-purple' },
   comeback: { badge: `${ART}/badge-comeback.webp`, icon: TrendingUp, tone: 'bg-neo-lime' },
   beat: { badge: `${ART}/badge-rival-beat.webp`, icon: Trophy, tone: 'bg-neo-lime' },
   lost: { badge: `${ART}/badge-rival-lost.webp`, icon: Swords, tone: 'bg-neo-pink' },
@@ -39,6 +40,13 @@ function calloutText(c: ResultCallout, t: TFn): string {
   switch (c.kind) {
     case 'photoFinish':
       return t(c.won ? 'mpUi.results.calloutPhotoWon' : 'mpUi.results.calloutPhotoLost', { name: c.name, points: c.points });
+    case 'h2h': {
+      const lead = Math.max(c.mine, c.theirs);
+      const trail = Math.min(c.mine, c.theirs);
+      const record = `\u2066${lead}\u2013${trail}\u2069`;
+      const key = c.mine > c.theirs ? 'calloutH2hLead' : c.mine < c.theirs ? 'calloutH2hTrail' : 'calloutH2hEven';
+      return t(`mpUi.results.${key}`, { name: c.name, record });
+    }
     case 'comeback':
       return t('mpUi.results.calloutComeback', { places: c.places });
     case 'beat':

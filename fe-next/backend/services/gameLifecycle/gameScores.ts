@@ -38,6 +38,7 @@ import { clampTeamCount, reconcileTeams } from '@/shared/utils/teamBattle';
 import { PARTICIPATION_BONUS } from '@/shared/types/classroom';
 import type { UserData } from './types';
 import logger from '../../utils/logger';
+import { scoreRowUserId } from './fallbackResultsPayload';
 
 /**
  * Calculate and broadcast final scores
@@ -208,6 +209,7 @@ export async function calculateAndBroadcastFinalScores(
     const achievementKeys: string[] = playerResult.achievements || [];
     return {
       ...playerResult,
+      ...scoreRowUserId(game.users?.[playerResult.username], !!game.isClassroom || !!classroomGame),
       achievements: achievementKeys.map((key) => ({
         key,
         icon: ACHIEVEMENT_ICONS[key] || '🏅',

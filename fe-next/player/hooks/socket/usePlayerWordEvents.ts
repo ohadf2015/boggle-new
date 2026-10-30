@@ -21,6 +21,8 @@ import { useSafeSocketEvents } from '@/hooks/useSafeSocketEvent';
 import { useHapticFeedback, GAME_HAPTICS } from '@/hooks/useHapticFeedback';
 import logger from '@/utils/logger';
 import { recordWordAccepted, recordWordRejected } from '@/lib/multiplayer/mpFeedback';
+import { recordWordBonus } from '@/components/multiplayer/MpBonusPill';
+import { showServerRefusal } from '@/player/wordRejectFeedback';
 import type { WordAcceptedPayload } from '@/shared/types/socket';
 import type {
   SpamWarningPayload,
@@ -33,6 +35,8 @@ import type {
 import type { WordToVote } from '@/player/types';
 
 interface WordLifecyclePayload { word: string }
+interface WordRejectedPayload { word: string; reason?: string }
+type AcceptedWithBonuses = WordAcceptedPayload & { catchUp?: { bonus?: number; pct?: number }; meteorBonus?: number };
 interface WordFeedbackRequestPayload {
   word: string;
   submittedBy: string;
@@ -121,7 +125,7 @@ export function usePlayerWordEvents({
   }, [setComboLevel, setLastWordTime, comboLevelRef, lastWordTimeRef, comboTimeoutRef, getAvailableShields, comboShieldsUsedRef, t]);
 
   // Define all event handlers as stable callbacks
-  const handleWordAccepted = useCallback((data: WordAcceptedPayload) => {
+  const handleWordAccepted = useCallback((data: AcceptedWithBonuses) => {
       // Haptic feedback for accepted word
       customHaptic(GAME_HAPTICS.validWord);
 
@@ -202,6 +206,7 @@ export function usePlayerWordEvents({
 
       // One feedback channel for the HUD (score chip / floaters / callouts).
       recordWordAccepted({ word: data.word, score: data.score, comboLevel: newComboLevel });
+      recordWordBonus(data);
 
       // Handle merged blast data (Fix 2) — extract from wordAccepted instead of separate blastWordAccepted
       if (data.blast) {
@@ -282,18 +287,16 @@ export function usePlayerWordEvents({
     resetCombo();
   }, [setFoundWords, resetCombo, customHaptic]);
 
-  const handleWordRejected = useCallback((data: WordLifecyclePayload) => {
-    // Haptic feedback for rejected word
+  const handleWordRejected = useCallback((data: WordRejectedPayload) => {
     customHaptic(GAME_HAPTICS.invalidWord);
-    recordWordRejected(data.word, 'invalid');
-
     toast.dismiss(`ai-validating-${data.word.toLowerCase()}`);
-    // Note: WordFormingArea now handles rejected feedback visually
     setFoundWords(prev => prev.filter(fw =>
       fw.word.toLowerCase() !== data.word.toLowerCase()
     ));
+    if (showServerRefusal(data.reason, t)) return;
+    recordWordRejected(data.word, 'invalid');
     resetCombo();
-  }, [setFoundWords, resetCombo, customHaptic]);
+  }, [setFoundWords, resetCombo, customHaptic, t]);
 
   // Word feedback handlers
   const handleShowWordFeedback = useCallback((data: WordFeedbackRequestPayload) => {

@@ -20404,7 +20404,8 @@ const sv = {
       "chatHint": "Säg hej till gänget",
       "chatUnread": "{count} nya",
       "modeOn": "{mode} är valt — tryck Start",
-      "progressNotSaved": "Vi kunde inte spara spelet. Om servern startas om kan framstegen gå förlorade."
+      "progressNotSaved": "Vi kunde inte spara spelet. Om servern startas om kan framstegen gå förlorade.",
+      "hostPicked": "Värden valde"
     },
     "round": {
       "getReady": "Gör dig redo",
@@ -20462,7 +20463,12 @@ const sv = {
       },
       "players": "Spelare",
       "specialWord": "{name} hittade specialordet {word}!",
-      "specialWordMine": "Specialord {word}! +{bonus}"
+      "specialWordMine": "Specialord {word}! +{bonus}",
+      "bonusComeback": "Comeback +{pct}%",
+      "bonusMeteor": "Meteor +{points}",
+      "rejectFrozen": "Frusen! Vänta lite",
+      "rejectRateLimited": "Lugna ner dig, för snabbt",
+      "rejectError": "Kunde inte kontrollera ordet. Försök igen"
     },
     "results": {
       "time": "Tiden är ute!",
@@ -20507,6 +20513,9 @@ const sv = {
       "calloutPhotoLost": "Fotofinish! {name} slog dig med {points}",
       "calloutComeback": "Comeback! Upp {places} i serien",
       "calloutUnique": "Ord bara du hittade: {count}",
+      "calloutH2hLead": "Du leder mot {name}: {record} totalt",
+      "calloutH2hTrail": "{name} leder mot dig: {record} totalt",
+      "calloutH2hEven": "Jämnt mot {name}: {record} totalt",
       "detailsWords": "Dina ord",
       "detailsNoWords": "Inga ord den här rundan",
       "backToClass": "Tillbaka till klassen",

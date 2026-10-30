@@ -1,5 +1,4 @@
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readPlayerGameEventsSource } from './playerGameEventsSource';
 
 /**
  * usePlayerGameEvents — recovery emits bypass the stale-session filter
@@ -17,10 +16,7 @@ import { resolve } from 'node:path';
  * current state (they set `reconnect: true`), so they must bypass the
  * stale-session filter and re-sync the ref downward.
  */
-const source = readFileSync(
-  resolve(__dirname, '../usePlayerGameEvents.ts'),
-  'utf8',
-);
+const source = readPlayerGameEventsSource();
 
 describe('usePlayerGameEvents — recovery resync', () => {
   it('does not drop a reconnect/recovery startGame on a lower gameSessionId', () => {

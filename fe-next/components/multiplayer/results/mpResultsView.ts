@@ -170,15 +170,12 @@ export function nextModeForViewer<M extends string>({ isHost, hostPick }: { isHo
   return isHost ? hostPick : null;
 }
 
-/** `seriesEndOnly` is the ri-mp-series-end treatment arm. */
-export function showInlineSignup({ isGuest, isClassroom, footerShown, bridgeShowing, seriesEndOnly, branch }: {
+export function showInlineSignup({ isGuest, isClassroom, footerShown, bridgeShowing, branch }: {
   isGuest: boolean;
   isClassroom: boolean;
   footerShown: boolean;
   bridgeShowing: boolean;
-  seriesEndOnly: boolean;
   branch: 'intermission' | 'final' | null;
 }): boolean {
-  if (!isGuest || isClassroom || !footerShown || bridgeShowing || branch === null) return false;
-  return !seriesEndOnly || branch === 'final';
+  return isGuest && !isClassroom && footerShown && !bridgeShowing && branch === 'final';
 }

@@ -20404,7 +20404,8 @@ const ja = {
       "chatHint": "みんなにあいさつしよう",
       "chatUnread": "新着 {count}件",
       "modeOn": "{mode}を選択中 — スタートを押して",
-      "progressNotSaved": "ゲームを保存できませんでした。サーバーが再起動すると進行状況が失われる可能性があります。"
+      "progressNotSaved": "ゲームを保存できませんでした。サーバーが再起動すると進行状況が失われる可能性があります。",
+      "hostPicked": "ホストの選択"
     },
     "round": {
       "getReady": "準備して",
@@ -20462,7 +20463,12 @@ const ja = {
       },
       "players": "プレイヤー",
       "specialWord": "{name}がスペシャルワード「{word}」を発見！",
-      "specialWordMine": "スペシャルワード「{word}」！ +{bonus}"
+      "specialWordMine": "スペシャルワード「{word}」！ +{bonus}",
+      "bonusComeback": "逆転ボーナス +{pct}%",
+      "bonusMeteor": "メテオ +{points}",
+      "rejectFrozen": "凍結中！少し待ってね",
+      "rejectRateLimited": "速すぎ！ゆっくりね",
+      "rejectError": "単語を確認できませんでした。もう一度どうぞ"
     },
     "results": {
       "time": "タイムアップ！",
@@ -20507,6 +20513,9 @@ const ja = {
       "calloutPhotoLost": "写真判定！{name}に{points}点差で惜敗",
       "calloutComeback": "逆転！シリーズで{places}つ順位アップ",
       "calloutUnique": "あなただけが見つけた単語：{count}",
+      "calloutH2hLead": "{name}との通算成績：{record}でリード",
+      "calloutH2hTrail": "{name}との通算成績：{record}でリードされている",
+      "calloutH2hEven": "{name}との通算成績：{record}で互角",
       "detailsWords": "あなたの単語",
       "detailsNoWords": "このラウンドの単語はありません",
       "backToClass": "クラスに戻る",

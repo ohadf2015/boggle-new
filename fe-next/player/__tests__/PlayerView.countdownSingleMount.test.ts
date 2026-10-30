@@ -24,7 +24,7 @@ describe('PlayerView — single countdown mount', () => {
 
   it('does not render the countdown inside the !showGameView early-return branch', () => {
     const branchStart = source.indexOf('if (!showGameView');
-    const mainReturn = source.indexOf('  return (\n    <>');
+    const mainReturn = source.indexOf('  return withClock(\n    <>');
     expect(branchStart).toBeGreaterThan(0);
     expect(mainReturn).toBeGreaterThan(branchStart);
     const earlyReturnBlock = source.slice(branchStart, mainReturn);

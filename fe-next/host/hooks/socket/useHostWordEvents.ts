@@ -8,12 +8,15 @@ import { Socket } from 'socket.io-client';
 import { calculateComboChainWindow, calculateComboTimeout, resetComboState } from '@/shared/utils/comboUtils';
 import type { WordAcceptedPayload, WordsForBoardPayload, BoardTheme } from '@/shared/types/socket';
 
-type WordRejectedPayload = { word: string; reason: string };
+type WordRejectedPayload = { word: string; reason?: string };
+type AcceptedWithBonuses = WordAcceptedPayload & { catchUp?: { bonus?: number; pct?: number }; meteorBonus?: number };
 type WordTooShortPayload = { word: string; minLength: number };
 type WordAlreadyFoundPayload = { word: string };
 type WordNotOnBoardPayload = { word: string };
 import { useGameStore } from '@/hooks/gameState/store';
 import { recordWordAccepted, recordWordRejected } from '@/lib/multiplayer/mpFeedback';
+import { recordWordBonus } from '@/components/multiplayer/MpBonusPill';
+import { showServerRefusal } from '@/player/wordRejectFeedback';
 
 interface UseHostWordEventsProps {
   socket: Socket | null;
@@ -62,7 +65,7 @@ export function useHostWordEvents({
   }, [setComboLevel, setLastWordTime, comboLevelRef, lastWordTimeRef, comboTimeoutRef]);
 
   // Handle word accepted (for host playing)
-  const handleWordAccepted = useCallback((data: WordAcceptedPayload) => {
+  const handleWordAccepted = useCallback((data: AcceptedWithBonuses) => {
     if (!hostPlaying) return;
 
     const now = Date.now();
@@ -105,6 +108,7 @@ export function useHostWordEvents({
 
     // Same feedback channel as the joiner's usePlayerWordEvents.
     recordWordAccepted({ word: data.word, score: data.score, comboLevel: newComboLevel });
+    recordWordBonus(data);
 
     // Handle merged blast data (Fix 2) — extract from wordAccepted instead of separate blastWordAccepted
     if (data.blast) {
@@ -159,11 +163,12 @@ export function useHostWordEvents({
 
     const handleWordRejected = (data: WordRejectedPayload) => {
       if (hostPlaying) {
-        if (data?.word) recordWordRejected(data.word, 'invalid');
         if (data?.word) {
           const wordLower = data.word.toLowerCase();
           setHostFoundWords(prev => prev.filter(w => w.toLowerCase() !== wordLower));
         }
+        if (showServerRefusal(data?.reason, t)) return;
+        if (data?.word) recordWordRejected(data.word, 'invalid');
         resetCombo();
       }
     };

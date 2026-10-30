@@ -19,9 +19,8 @@ import { usePlayerLobby } from './usePlayerLobby';
 import { useAchievementQueue } from '@/components/achievements';
 import { usePresence } from '@/hooks/usePresence';
 import { useHints } from '@/hooks/useHints';
-import { useGameTimer } from '@/hooks/useGameTimer';
-import { useTimerZeroWatchdog } from '@/hooks/useTimerZeroWatchdog';
-import { useTimerStallWatchdog } from '@/hooks/useTimerStallWatchdog';
+import { useStore } from 'zustand';
+import { useRoundClock } from '../roundClock';
 import { useTeacherPaused } from '@/hooks/useTeacherPause';
 import { addGameBreadcrumb } from '@/utils/sentry';
 import logger from '@/utils/logger';
@@ -120,66 +119,32 @@ export function usePlayerPhase({
   // setShowModeReveal(true) and the player sees the countdown twice.
   const revealedMessageIdRef = useRef<string | null>(null);
 
-  // Multiplayer timer - uses timestamp-based countdown that syncs with server
-  // Initial time will be set when game starts via socket event
+  // The ticking clock lives in a render-null leaf (PlayerRoundClock) and a
+  // per-round store, so a 1 Hz tick never re-renders this router or the round view.
   // Teacher live controls: a paused classroom round freezes the local tick too.
   const teacherPaused = useTeacherPaused();
-  const gameTimer = useGameTimer({
-    initialTime: 180, // Default, will be updated on game start
-    isPaused: !gameActive || teacherPaused, // not active, or frozen by the teacher
-    autoStart: false, // Don't auto-start, wait for game to become active
-    onTimeUp: () => {
-      // Time up is handled by server, this is just for local display
-      logger.log('[PLAYER] Local timer reached 0');
-    },
-  });
+  const roundClock = useRoundClock(180);
+  const gameTimer = roundClock.timer;
 
-  // Destructure stable useCallback methods so effects can depend on them individually
-  // without re-firing on every render (gameTimer object is new each render).
+  // Destructure stable methods so effects can depend on them individually.
   const { reset: timerReset, setTime: timerSetTime, resume: timerResume } = gameTimer;
 
-  // Use timer's remaining time for display
-  // Note: Always use the actual timer value, not conditioned on gameActive
-  // The timer is set during pendingGameStart processing before gameActive is true
-  const remainingTime = gameTimer.remainingTime;
+  // Only the 0 ↔ positive edge matters up here (round activation, board view).
+  const hasTimeLeft = useStore(roundClock.store, (s) => (s.remainingTime ?? 0) > 0);
 
-  // Recovery watchdog: server-side game-end events (`endGame`, `timeUpdate(0)`,
-  // `validatedScores`) can be missed on flaky connections, leaving the player
-  // staring at a frozen 0:00 board. When the timer hits 0 after a previously-
-  // active game and no result transition happens, force `waitingForResults`
-  // and re-request results from the server's cached payload.
-  useTimerZeroWatchdog({
-    remainingTime,
-    gameActive,
-    waitingForResults,
-    onTrigger: () => {
-      logger.log('[PLAYER] Timer-zero watchdog: bootstrapping waiting state + requesting results');
-      setWaitingForResults(true);
-      socket?.emit('requestResults');
-    },
-  });
-
-  // Stall watchdog: catches the "timer frozen mid-game" case where the
-  // displayed value sticks (e.g. 2:00) while the server keeps ticking.
-  // Root causes are varied (gameSessionId drift, buffered transport, server
-  // clock never started) but the recovery is the same: ask the server to
-  // re-emit `startGame` with the fresh `remainingTime` via `requestGameState`.
-  useTimerStallWatchdog({
-    remainingTime,
-    // A teacher pause is a frozen clock BY DESIGN — not a stall to recover from.
-    gameActive: gameActive && !teacherPaused,
-    waitingForResults,
-    onStall: () => {
-      logger.log('[PLAYER] Timer-stall watchdog: remainingTime frozen — requesting fresh game state');
-      addGameBreadcrumb('mp_timer_stall', {
-        role: 'player',
-        gameCode,
-        remainingTime,
-        gameMode,
-      });
-      socket?.emit('requestGameState');
-    },
-  });
+  // Watchdogs run inside PlayerRoundClock (they need every tick); these are their actions.
+  // Zero: server game-end events can be missed on flaky connections, leaving a frozen 0:00.
+  const onClockZero = useCallback(() => {
+    logger.log('[PLAYER] Timer-zero watchdog: bootstrapping waiting state + requesting results');
+    setWaitingForResults(true);
+    socket?.emit('requestResults');
+  }, [setWaitingForResults, socket]);
+  // Stall: the displayed value sticks while the server keeps ticking; ask for a fresh startGame.
+  const onClockStall = useCallback((stalledAt: number | null) => {
+    logger.log('[PLAYER] Timer-stall watchdog: remainingTime frozen — requesting fresh game state');
+    addGameBreadcrumb('mp_timer_stall', { role: 'player', gameCode, remainingTime: stalledAt, gameMode });
+    socket?.emit('requestGameState');
+  }, [socket, gameCode, gameMode]);
 
   // Player roster is driven entirely by the initialPlayers prop (parent owns the
   // source of truth), so read it directly — no mirrored state/effect needed.
@@ -300,10 +265,10 @@ export function usePlayerPhase({
   // Music transitions: lobby → in-game → urgent → earthquake → results
   const { handleGameStartMusic } = usePlayerMusic({
     gameActive,
-    remainingTime,
+    clockStore: roundClock.store,
     waitingForResults,
     earthquakeState,
-    totalGameTime: totalGameTimeRef.current,
+    totalGameTimeRef,
   });
 
   // Use custom hook for socket events (now uses GameStateContext - no more prop drilling!)
@@ -354,7 +319,7 @@ export function usePlayerPhase({
   }, [showModeReveal, showStartAnimation]);
   useEffect(() => {
     if (shouldActivateRound({
-      showModeReveal, showStartAnimation, hasBoard: !!letterGrid, remainingTime, gameActive, waitingForResults,
+      showModeReveal, showStartAnimation, hasBoard: !!letterGrid, remainingTime: hasTimeLeft ? 1 : 0, gameActive, waitingForResults,
       freshStartPending, countdownSeen: countdownSeenRef.current,
     })) {
       logger.log('[PLAYER] Countdown animation complete, activating game');
@@ -365,7 +330,7 @@ export function usePlayerPhase({
       // reset() sets internalPaused=true (autoStart=false), and nothing else clears it.
       timerResume();
     }
-  }, [showModeReveal, showStartAnimation, letterGrid, remainingTime, gameActive, waitingForResults, freshStartPending, timerResume]);
+  }, [showModeReveal, showStartAnimation, letterGrid, hasTimeLeft, gameActive, waitingForResults, freshStartPending, timerResume]);
 
   // Auto-dismiss mode reveal, then trigger countdown. Kept short (1.1s) so the
   // splash → 3-2-1 handoff reads as one quick flourish rather than two separate
@@ -439,7 +404,7 @@ export function usePlayerPhase({
   }, []);
 
   return {
-    t, dir, socket, waitingForResults, letterGrid, remainingTime, gameActive, showModeReveal, showStartAnimation,
+    t, dir, socket, waitingForResults, letterGrid, hasTimeLeft, roundClock, teacherPaused, onClockZero, onClockStall, gameActive, showModeReveal, showStartAnimation,
     dispatchReveal, setShowStartAnimation, pendingMessageIdRef, isGameLoading, resolvedGameLanguage, playersReady,
     showQR, setShowQR, showExitConfirm, setShowExitConfirm, handleExitRoom, confirmExitRoom, handleNameChange,
     handleAvatarChange, readyUsernames, isReady, toggleReady, readyInFlight, leaderboard, foundWords, gameMode,

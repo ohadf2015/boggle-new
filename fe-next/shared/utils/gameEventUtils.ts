@@ -65,26 +65,6 @@ export function createRoomClosedDueToInactivityHandler(
 }
 
 /**
- * Create a room closed handler for player (host left)
- */
-export function createHostLeftRoomClosingHandler(
-  socket: Socket,
-  username: string,
-  t: (key: string) => string,
-  intentionalExitRef: React.MutableRefObject<boolean>
-): (data: RoomClosedData) => void {
-  return (data: RoomClosedData) => {
-    handleRoomClosed(
-      socket,
-      username,
-      data.message || t('playerView.roomClosed'),
-      '🚪',
-      intentionalExitRef
-    );
-  };
-}
-
-/**
  * Send start game acknowledgment if required
  */
 export function sendStartGameAck(

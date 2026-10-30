@@ -37,7 +37,7 @@ describe('applyBlastBoardUpdate', () => {
 describe('both seats apply server Blast boards through one path', () => {
   const read = (p: string) => readFileSync(resolve(__dirname, '../../..', p), 'utf8');
 
-  it.each(['player/hooks/socket/usePlayerGameEvents.ts', 'host/hooks/socket/useHostGameEvents.ts'])(
+  it.each(['player/hooks/socket/usePlayerRoundFeedEvents.ts', 'host/hooks/socket/useHostGameEvents.ts'])(
     '%s listens for blastBoardUpdate with the shared handler',
     (file) => {
       const src = read(file);

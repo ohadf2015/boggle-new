@@ -22,6 +22,7 @@ import {
   reconcileTeams,
   type ClassroomTeam,
   type PlayStyle,
+  type TeamAbilities,
 } from './teamBattle';
 
 export interface ClassroomLiveContext {
@@ -51,9 +52,11 @@ interface ClassroomGameSlice {
 export function buildClassroomLiveContext({
   game,
   humanUsernames,
+  abilities,
 }: {
   game: ClassroomGameSlice | null | undefined;
   humanUsernames: string[];
+  abilities?: TeamAbilities;
 }): ClassroomLiveContext | null {
   if (!game) return null;
 
@@ -79,7 +82,8 @@ export function buildClassroomLiveContext({
     game.teams,
     students,
     context.teamCount,
-    game.gameCode
+    game.gameCode,
+    abilities
   );
   return context;
 }

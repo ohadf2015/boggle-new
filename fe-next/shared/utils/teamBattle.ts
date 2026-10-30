@@ -5,7 +5,7 @@
  *  - the server deals teams once when it builds the classroom summary,
  *  - the client aggregates per-player scores into team totals for display.
  *
- * Assignment is a pure function of (usernames, teamCount, seed) so the host's
+ * Assignment is a pure function of (usernames, teamCount, seed, abilities) so the host's
  * projected screen and every student's phone agree on the rosters WITHOUT a
  * server round-trip — flaky school wifi is the whole reason this exists.
  */
@@ -66,18 +66,35 @@ function seededShuffle<T>(items: T[], seed: string): T[] {
   return out;
 }
 
+/** Lowercased username → ability rating (higher = stronger). */
+export type TeamAbilities = Record<string, number>;
+
+function hasAbilitySpread(names: string[], abilities: TeamAbilities | undefined): abilities is TeamAbilities {
+  if (!abilities) return false;
+  const known = names.map((n) => abilities[n.toLowerCase()]).filter((v) => typeof v === 'number');
+  return known.length > 0 && new Set(known).size > 1;
+}
+
+function abilityOf(name: string, abilities: TeamAbilities | undefined): number {
+  const value = abilities?.[name.toLowerCase()];
+  return typeof value === 'number' ? value : 0;
+}
+
 /**
  * Deal players into balanced teams.
  *
  * Usernames are sorted before shuffling so the result does not depend on
  * socket join order (which differs per client); the seed (game code) provides
- * the fairness randomness. Dealing round-robin after the shuffle keeps team
- * sizes within one player of each other.
+ * the fairness randomness. With ability data the shuffled roster is ranked
+ * strongest first and snake-drafted (A B B A A B…), so no team stacks the
+ * strong readers; without it, round-robin over the shuffle. Either way sizes
+ * stay within one player of each other.
  */
 export function assignTeams(
   usernames: string[],
   teamCount: number,
-  seed: string
+  seed: string,
+  abilities?: TeamAbilities
 ): ClassroomTeam[] {
   const count = clampTeamCount(teamCount);
   const teams: ClassroomTeam[] = Array.from({ length: count }, (_, id) => ({
@@ -96,8 +113,19 @@ export function assignTeams(
     })
     .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
   const shuffled = seededShuffle(unique, seed || 'lexiclash');
-  shuffled.forEach((name, i) => {
-    teams[i % count].memberNames.push(name);
+  if (!hasAbilitySpread(shuffled, abilities)) {
+    shuffled.forEach((name, i) => {
+      teams[i % count].memberNames.push(name);
+    });
+    return teams;
+  }
+  const ranked = shuffled
+    .map((name, order) => ({ name, order, ability: abilityOf(name, abilities) }))
+    .sort((a, b) => b.ability - a.ability || a.order - b.order);
+  ranked.forEach(({ name }, i) => {
+    const lap = Math.floor(i / count);
+    const slot = i % count;
+    teams[lap % 2 === 0 ? slot : count - 1 - slot].memberNames.push(name);
   });
   return teams;
 }
@@ -143,7 +171,8 @@ export function computeTeamStandings(
  * is additive:
  *  - a student already seated NEVER moves, whatever else changed;
  *  - a student absent this round keeps their seat (wifi drops, bathroom passes);
- *  - a newcomer joins the smallest team, ties going to the lowest team id, so
+ *  - a newcomer joins the smallest team; among equal sizes the weaker one
+ *    (lowest ability total) when ability is known, then the lowest team id, so
  *    the result is a pure function of the inputs on every client.
  *
  * The one case that re-deals is the teacher changing the team count between
@@ -154,11 +183,12 @@ export function reconcileTeams(
   existing: ClassroomTeam[] | undefined,
   usernames: string[],
   teamCount: number,
-  seed: string
+  seed: string,
+  abilities?: TeamAbilities
 ): ClassroomTeam[] {
   const count = clampTeamCount(teamCount);
   if (!existing?.length || existing.length !== count) {
-    return assignTeams(usernames, count, seed);
+    return assignTeams(usernames, count, seed, abilities);
   }
 
   const teams: ClassroomTeam[] = existing.map((team) => ({
@@ -181,11 +211,15 @@ export function reconcileTeams(
     })
     .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
 
+  const strength = (team: ClassroomTeam) =>
+    team.memberNames.reduce((sum, member) => sum + abilityOf(member, abilities), 0);
   for (const name of newcomers) {
-    const smallest = teams.reduce((best, team) =>
-      team.memberNames.length < best.memberNames.length ? team : best
-    );
-    smallest.memberNames.push(name);
+    const target = teams.reduce((best, team) => {
+      const sizeDiff = team.memberNames.length - best.memberNames.length;
+      if (sizeDiff !== 0) return sizeDiff < 0 ? team : best;
+      return strength(team) < strength(best) ? team : best;
+    });
+    target.memberNames.push(name);
   }
 
   return teams;

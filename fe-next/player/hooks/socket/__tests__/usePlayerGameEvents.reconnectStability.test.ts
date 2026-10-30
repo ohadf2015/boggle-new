@@ -12,13 +12,9 @@
  * Source-contract style mirrors usePlayerGameEvents.blastReconnect: regex
  * over source survives refactors that preserve intent.
  */
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readPlayerGameEventsSource } from './playerGameEventsSource';
 
-const source = readFileSync(
-  resolve(__dirname, '../usePlayerGameEvents.ts'),
-  'utf8',
-);
+const source = readPlayerGameEventsSource();
 
 describe('usePlayerGameEvents — MP stability fixes 2026-05-10', () => {
   describe('timeUpdate gameSessionId filter', () => {

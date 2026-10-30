@@ -52,6 +52,8 @@ import { useRoundToastLane } from '@/components/multiplayer/round/useRoundToastL
 import { PlayerRoundDialogs } from './in-game/PlayerRoundDialogs';
 import type { PlayerFoundWord, PlayerHintsState, PlayerLeaderboardEntry, PlayerTournamentData } from './in-game/types';
 import { ReconnectingOverlay } from '@/components/multiplayer/ReconnectingOverlay';
+import { MpBonusPill } from '@/components/multiplayer/MpBonusPill';
+import { RoundClock } from '../roundClock';
 import { MPGameAbortedModal } from '@/components/multiplayer/MPGameAbortedModal';
 import { useEduLiveSurfaces } from '@/components/education/live/eduLiveSurfaces';
 import { useMpExit } from '@/hooks/useMpExit';
@@ -77,7 +79,6 @@ interface PlayerInGameViewProps {
   shufflingGrid: LetterGrid | null;
   gameActive: boolean;
   showStartAnimation: boolean;
-  remainingTime: number | null;
   gameLanguage: Language | null;
   minWordLength: number;
   comboLevel: number;
@@ -143,7 +144,7 @@ interface PlayerInGameViewProps {
  */
 const PlayerInGameView = memo<PlayerInGameViewProps>(({
   username, gameCode, t, dir, socket, letterGrid, shufflingGrid, gameActive, showStartAnimation,
-  remainingTime, gameLanguage, minWordLength, comboLevel, comboLevelRef, lastWordTime, foundWords,
+  gameLanguage, minWordLength, comboLevel, comboLevelRef, lastWordTime, foundWords,
   leaderboard, rosterUsers, totalBoardWords, tournamentData, tournamentStandings, showTournamentStandings,
   setShowTournamentStandings, showExitConfirm, setShowExitConfirm, onExitRoom, onConfirmExit, onWordSubmit,
   onResetCombo, hints, earthquakeState, fireRoundActive, fireRoundRemaining, boardTheme, onShowTutorial,
@@ -232,6 +233,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
         setShowExitConfirm={setShowExitConfirm}
         onConfirmExit={onConfirmExit}
       />
+      <MpBonusPill />
 
       {isReconnecting && gameActive && (
         <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />
@@ -247,32 +249,36 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   // the exit confirm, which lives there.
   if (gameMode === 'wheel-rush') {
     const wheelCanvas = (
-      <WheelRushView
-        socket={socket}
-        username={username}
-        leaderboard={leaderboard}
-        onQuit={onExitRoom}
-        t={t}
-        remainingTime={remainingTime}
-        isDesktopCanvas={shellEnabled}
-      />
+      <RoundClock>{(remainingTime) => (
+        <WheelRushView
+          socket={socket}
+          username={username}
+          leaderboard={leaderboard}
+          onQuit={onExitRoom}
+          t={t}
+          remainingTime={remainingTime}
+          isDesktopCanvas={shellEnabled}
+        />
+      )}</RoundClock>
     );
     if (shellEnabled) {
       return (
         <>
           <div className={getMpInGameContainerClass(gameMode)}>
-            <MpDesktopShellFrame
-              gameMode={gameMode}
-              canvas={wheelCanvas}
-              leaderboard={leaderboard}
-              users={rosterUsers}
-              foundWords={foundWords}
-              socket={socket}
-              meId={username}
-              roomId={gameCode}
-              remainingTime={remainingTime}
-              totalTime={totalTime}
-            />
+            <RoundClock>{(remainingTime) => (
+              <MpDesktopShellFrame
+                gameMode={gameMode}
+                canvas={wheelCanvas}
+                leaderboard={leaderboard}
+                users={rosterUsers}
+                foundWords={foundWords}
+                socket={socket}
+                meId={username}
+                roomId={gameCode}
+                remainingTime={remainingTime}
+                totalTime={totalTime}
+              />
+            )}</RoundClock>
           </div>
           {roundDialogs}
         </>
@@ -290,7 +296,9 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   if (gameMode === 'word-tower' || gameMode === 'crossword') {
     return (
       <>
-        {gameMode === 'word-tower' ? <WordTowerVersus socket={socket} username={username} onQuit={onExitRoom} remainingTime={remainingTime} /> : <CrosswordVersus socket={socket} username={username} onQuit={onExitRoom} remainingTime={remainingTime} />}
+        <RoundClock>{(remainingTime) => (gameMode === 'word-tower'
+          ? <WordTowerVersus socket={socket} username={username} onQuit={onExitRoom} remainingTime={remainingTime} />
+          : <CrosswordVersus socket={socket} username={username} onQuit={onExitRoom} remainingTime={remainingTime} />)}</RoundClock>
         {roundDialogs}
       </>
     );
@@ -298,7 +306,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
 
   // Wordcraft — lesson-dealt solo race vs the Baron, no shared grid
   if (gameMode === 'wordcraft') {
-    return <WordcraftLiveView socket={socket} username={username} t={t} remainingTime={remainingTime} />;
+    return <RoundClock>{(remainingTime) => <WordcraftLiveView socket={socket} username={username} t={t} remainingTime={remainingTime} />}</RoundClock>;
   }
 
   // Use letterGrid or shufflingGrid
@@ -352,6 +360,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
             mpChrome
           />
       ) : (
+        <RoundClock>{(remainingTime) => (
         <InGameScreen
           // Core identity
           username={username}
@@ -410,6 +419,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
           // Tutorial callback
           onShowTutorial={onShowTutorial}
         />
+        )}</RoundClock>
       );
 
   const roundFrame = isRoundFrameMode(gameMode);
@@ -419,24 +429,26 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
       {/* Classic, word-hunt and blast: the one round frame (HUD / roster /
           board, phone and desktop). */}
       {roundFrame ? (
-        <MpRoundShell
-          desktopShell={shellEnabled}
-          roomId={gameCode}
-          meId={username}
-          gameMode={gameMode}
-          remainingTime={remainingTime}
-          totalTime={roundTotal || null}
-          leaderboard={leaderboard}
-          users={rosterUsers}
-          foundWords={foundWords}
-          comboLevel={comboLevel}
-          revealed={!showStartAnimation}
-          onExit={onExitRoom}
-          canvas={gameCanvas}
-          socket={socket}
-          bossStrip={bossActive ? <PhoneBossStrip /> : undefined}
-          dock={<ClassroomStudentDock gameCode={gameCode} />}
-        />
+        <RoundClock>{(remainingTime) => (
+          <MpRoundShell
+            desktopShell={shellEnabled}
+            roomId={gameCode}
+            meId={username}
+            gameMode={gameMode}
+            remainingTime={remainingTime}
+            totalTime={roundTotal || null}
+            leaderboard={leaderboard}
+            users={rosterUsers}
+            foundWords={foundWords}
+            comboLevel={comboLevel}
+            revealed={!showStartAnimation}
+            onExit={onExitRoom}
+            canvas={gameCanvas}
+            socket={socket}
+            bossStrip={bossActive ? <PhoneBossStrip /> : undefined}
+            dock={<ClassroomStudentDock gameCode={gameCode} />}
+          />
+        )}</RoundClock>
       ) : (
         gameCanvas
       )}

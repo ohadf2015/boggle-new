@@ -20335,7 +20335,8 @@ const he = {
       "chatHint": "תגידו היי לחבורה",
       "chatUnread": "{count} חדשות",
       "modeOn": "{mode} נבחר — לחצו התחל",
-      "progressNotSaved": "לא הצלחנו לשמור את המשחק. אם השרת יופעל מחדש, ההתקדמות עלולה ללכת לאיבוד."
+      "progressNotSaved": "לא הצלחנו לשמור את המשחק. אם השרת יופעל מחדש, ההתקדמות עלולה ללכת לאיבוד.",
+      "hostPicked": "המארח בחר"
     },
     "round": {
       "getReady": "היכונו",
@@ -20393,7 +20394,12 @@ const he = {
       },
       "players": "שחקנים",
       "specialWord": "{name} מצא את המילה המיוחדת {word}!",
-      "specialWordMine": "מילה מיוחדת: {word}! +{bonus}"
+      "specialWordMine": "מילה מיוחדת: {word}! +{bonus}",
+      "bonusComeback": "קאמבק +{pct}%",
+      "bonusMeteor": "מטאור +{points}",
+      "rejectFrozen": "קפוא! רגע אחד",
+      "rejectRateLimited": "לאט לאט, מהר מדי",
+      "rejectError": "לא הצלחנו לבדוק את המילה. נסו שוב"
     },
     "results": {
       "time": "נגמר הזמן!",
@@ -20438,6 +20444,9 @@ const he = {
       "calloutPhotoLost": "פוטו פיניש! רק {points} מאחורי {name}",
       "calloutComeback": "קאמבק! עלית {places} מקומות בסדרה",
       "calloutUnique": "מילים שרק לך: {count}",
+      "calloutH2hLead": "יתרון שלך במאזן מול {name}: {record}",
+      "calloutH2hTrail": "{name} ביתרון במאזן ביניכם: {record}",
+      "calloutH2hEven": "מאזן שוויוני מול {name}: {record}",
       "detailsWords": "המילים שלך",
       "detailsNoWords": "אין מילים בסיבוב הזה",
       "backToClass": "חזרה לכיתה",

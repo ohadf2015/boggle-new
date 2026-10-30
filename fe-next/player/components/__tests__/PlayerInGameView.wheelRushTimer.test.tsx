@@ -117,6 +117,7 @@ vi.mock('@/components/multiplayer/MPGameAbortedModal', () => ({ MPGameAbortedMod
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }), useParams: () => ({ locale: 'en' }) }));
 
 import PlayerInGameView from '../PlayerInGameView';
+import { RoundClockProvider, createRoundClockStore } from '../../roundClock';
 
 const baseProps = {
   username: 'testplayer',
@@ -128,7 +129,6 @@ const baseProps = {
   shufflingGrid: null,
   gameActive: true,
   showStartAnimation: false,
-  remainingTime: 47,
   gameLanguage: 'en' as const,
   minWordLength: 3,
   comboLevel: 0,
@@ -150,7 +150,7 @@ describe('PlayerInGameView wheel-rush timer prop', () => {
   it('passes remainingTime to WheelRushView so the in-game timer pill renders', () => {
     mockGameMode.value = 'wheel-rush';
 
-    render(<PlayerInGameView {...baseProps} />);
+    render(<RoundClockProvider value={createRoundClockStore(47)}><PlayerInGameView {...baseProps} /></RoundClockProvider>);
 
     const view = screen.getByTestId('wheel-rush-view');
     expect(view).toBeInTheDocument();
@@ -160,7 +160,7 @@ describe('PlayerInGameView wheel-rush timer prop', () => {
   it('forwards null remainingTime (still renders, value not yet known)', () => {
     mockGameMode.value = 'wheel-rush';
 
-    render(<PlayerInGameView {...baseProps} remainingTime={null} />);
+    render(<RoundClockProvider value={createRoundClockStore(null)}><PlayerInGameView {...baseProps} /></RoundClockProvider>);
 
     const view = screen.getByTestId('wheel-rush-view');
     expect(view).toHaveAttribute('data-remaining-time', 'undefined');

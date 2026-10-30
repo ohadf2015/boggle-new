@@ -20100,7 +20100,8 @@ const ru = {
       "chatHint": "Скажи привет команде",
       "chatUnread": "{count} новых",
       "modeOn": "{mode} выбран — жми Старт",
-      "progressNotSaved": "Не удалось сохранить игру. Если сервер перезапустится, прогресс может пропасть."
+      "progressNotSaved": "Не удалось сохранить игру. Если сервер перезапустится, прогресс может пропасть.",
+      "hostPicked": "Выбор хоста"
     },
     "round": {
       "getReady": "Приготовься",
@@ -20158,7 +20159,12 @@ const ru = {
       },
       "players": "Игроки",
       "specialWord": "{name} нашёл особое слово {word}!",
-      "specialWordMine": "Особое слово {word}! +{bonus}"
+      "specialWordMine": "Особое слово {word}! +{bonus}",
+      "bonusComeback": "Камбэк +{pct}%",
+      "bonusMeteor": "Метеор +{points}",
+      "rejectFrozen": "Заморожено! Секунду",
+      "rejectRateLimited": "Слишком быстро, притормози",
+      "rejectError": "Не удалось проверить слово. Попробуй ещё раз"
     },
     "results": {
       "time": "Время вышло!",
@@ -20203,6 +20209,9 @@ const ru = {
       "calloutPhotoLost": "Фотофиниш! {name} впереди всего на {points}",
       "calloutComeback": "Камбэк! +{places} в серии",
       "calloutUnique": "Слова, найденные только тобой: {count}",
+      "calloutH2hLead": "Ты ведёшь против {name}: {record} за всё время",
+      "calloutH2hTrail": "{name} ведёт против тебя: {record} за всё время",
+      "calloutH2hEven": "Ничья с {name}: {record} за всё время",
       "detailsWords": "Твои слова",
       "detailsNoWords": "В этом раунде слов нет",
       "backToClass": "Вернуться к классу",

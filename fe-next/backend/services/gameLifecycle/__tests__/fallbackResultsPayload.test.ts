@@ -22,4 +22,24 @@ describe('buildFallbackResultsPayload', () => {
     const flags = Object.fromEntries(payload.scores.map((s) => [s.username, [s.isBot, s.isHost]]));
     expect(flags).toEqual({ 'Sprout Bot': [true, false], 'Ms Cohen': [false, true], ana: [false, false] });
   });
+
+  it('carries the signed-in user id like the scored payload; guests and bots have none', () => {
+    const payload = buildFallbackResultsPayload({
+      letterGrid: [['a']],
+      users: { ana: { authUserId: 'uuid-ana' }, guest: {}, bot: { isBot: true, authUserId: 'x' } },
+    } as never);
+    const byName = Object.fromEntries(payload.scores.map((s) => [s.username, s]));
+    expect(byName.ana).toHaveProperty('userId', 'uuid-ana');
+    expect(byName.guest).not.toHaveProperty('userId');
+    expect(byName.bot).not.toHaveProperty('userId');
+  });
+
+  it('a classroom room carries no user ids', () => {
+    const payload = buildFallbackResultsPayload({
+      letterGrid: [['a']],
+      isClassroom: true,
+      users: { kid: { authUserId: 'uuid-anon-kid' } },
+    } as never);
+    expect(payload.scores[0]).not.toHaveProperty('userId');
+  });
 });

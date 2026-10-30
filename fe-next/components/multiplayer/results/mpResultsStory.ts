@@ -111,16 +111,35 @@ export function seriesGrid({ ladder, standings, rounds }: {
 
 export type ResultCallout =
   | { kind: 'photoFinish'; won: boolean; name: string; points: number }
+  | { kind: 'h2h'; name: string; mine: number; theirs: number }
   | { kind: 'comeback'; places: number }
   | { kind: 'beat' | 'lost'; name: string; points: number }
   | { kind: 'tied'; name: string; more: number }
   | { kind: 'unique'; count: number };
 
+/** All-time record against the callout rival (`getHeadToHead`). */
+export interface RivalRecord {
+  name: string;
+  myWins: number;
+  theirWins: number;
+  meetings: number;
+}
+
+const H2H_MIN_MEETINGS = 2;
+
+/** The player the callout talks about, when they have an account to look up. */
+export function calloutRival(rows: MpStandingRow[]): { username: string; userId: string } | null {
+  const gap = rivalGap(rows);
+  if (!gap) return null;
+  const rival = rows.find((r) => !r.isMe && r.username === gap.name);
+  return rival?.userId && !rival.isBot ? { username: rival.username, userId: rival.userId } : null;
+}
+
 const PHOTO_FINISH_POINTS = 10;
 const PHOTO_FINISH_SHARE = 0.05;
 
 /** One line only; a loser hears their unique finds before the gap they lost by. */
-export function resultCallout({ rows, uniqueCount }: { rows: MpStandingRow[]; uniqueCount: number }): ResultCallout | null {
+export function resultCallout({ rows, uniqueCount, h2h = null }: { rows: MpStandingRow[]; uniqueCount: number; h2h?: RivalRecord | null }): ResultCallout | null {
   const myIndex = rows.findIndex((r) => r.isMe);
   if (myIndex < 0 || rows.length < 2) return null;
   const [first, second] = rows;
@@ -128,6 +147,9 @@ export function resultCallout({ rows, uniqueCount }: { rows: MpStandingRow[]; un
   if (myIndex <= 1 && margin > 0 && (margin <= PHOTO_FINISH_POINTS || margin <= first.score * PHOTO_FINISH_SHARE)) {
     const won = myIndex === 0;
     return { kind: 'photoFinish', won, name: won ? second.username : first.username, points: margin };
+  }
+  if (h2h && h2h.meetings >= H2H_MIN_MEETINGS && h2h.name === calloutRival(rows)?.username) {
+    return { kind: 'h2h', name: h2h.name, mine: h2h.myWins, theirs: h2h.theirWins };
   }
   const places = rows[myIndex].seriesDelta;
   if (places > 0) return { kind: 'comeback', places };

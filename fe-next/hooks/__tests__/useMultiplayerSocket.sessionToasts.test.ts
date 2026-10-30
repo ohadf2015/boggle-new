@@ -1,3 +1,4 @@
+import { readPlayerGameEventsSource } from '@/player/hooks/socket/__tests__/playerGameEventsSource';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -78,7 +79,7 @@ describe('no second owner toasts the same events', () => {
 
 describe('host-left has one owner: the page banner', () => {
   const hook = readFileSync(resolve(__dirname, '../useMultiplayerSocket.ts'), 'utf8');
-  const playerGame = readFileSync(resolve(__dirname, '../../player/hooks/socket/usePlayerGameEvents.ts'), 'utf8');
+  const playerGame = readPlayerGameEventsSource();
 
   it('the page socket hook hands the message to the banner without a second toast', () => {
     const start = hook.indexOf("listen('hostLeftRoomClosing'");

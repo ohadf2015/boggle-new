@@ -23,6 +23,7 @@ const USED = [
   'roundPoints', 'yourRank', 'lessonRecap', 'seriesPlace', 'seriesPts', 'roundGain',
   'awardsTitle', 'awardTop', 'awardLongest', 'awardMost', 'letterCount', 'roundByRound', 'roundShort', 'total', 'player',
   'calloutPhotoWon', 'calloutPhotoLost', 'calloutComeback', 'calloutUnique', 'detailsWords', 'detailsNoWords',
+  'calloutH2hLead', 'calloutH2hTrail', 'calloutH2hEven',
 ];
 
 describe('mpUi.results translations', () => {

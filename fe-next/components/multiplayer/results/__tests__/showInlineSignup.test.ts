@@ -1,21 +1,19 @@
 import { describe, it, expect } from 'vitest';
 import { showInlineSignup } from '../mpResultsView';
 
-const base = { isGuest: true, isClassroom: false, footerShown: true, bridgeShowing: false, seriesEndOnly: false, branch: 'intermission' as const };
+const base = { isGuest: true, isClassroom: false, footerShown: true, bridgeShowing: false, branch: 'final' as const };
 
-describe('showInlineSignup (one growth card, below the primary)', () => {
-  it('control arm: a guest sees it on every round end once the footer is up', () => {
+describe('showInlineSignup (series-end only, below the primary)', () => {
+  it('a guest sees it on the series-end screen once the footer is up', () => {
     expect(showInlineSignup(base)).toBe(true);
-    expect(showInlineSignup({ ...base, branch: 'final' })).toBe(true);
   });
 
-  it('series-end arm: only on the final screen', () => {
-    expect(showInlineSignup({ ...base, seriesEndOnly: true })).toBe(false);
-    expect(showInlineSignup({ ...base, seriesEndOnly: true, branch: 'final' })).toBe(true);
+  it('never in the gap between rounds', () => {
+    expect(showInlineSignup({ ...base, branch: 'intermission' })).toBe(false);
   });
 
   it('never alongside the first-game bridge', () => {
-    expect(showInlineSignup({ ...base, bridgeShowing: true, branch: 'final' })).toBe(false);
+    expect(showInlineSignup({ ...base, bridgeShowing: true })).toBe(false);
   });
 
   it('never before the footer, for signed-in players, or in a classroom', () => {

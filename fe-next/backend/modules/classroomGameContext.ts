@@ -20,7 +20,7 @@ import type { Socket } from 'socket.io';
 import { safeEmit } from '../utils/socketHelpers.js';
 import logger from '../utils/logger.js';
 import { getClassroomGame, type ClassroomGame } from './classroomGameManager.js';
-import { getClassroomMembershipLevel } from './supabase/classroomMembership.js';
+import { getClassroomLevelCached } from './classroomLevelCache.js';
 
 /**
  * A classroom record a caller has ALREADY loaded.
@@ -51,7 +51,7 @@ export async function emitClassroomContext(
     const classroomGame = preloaded ? preloaded.game : await getClassroomGame(gameCode);
     if (!classroomGame) return;
     const classroomLevel = authUserId
-      ? await getClassroomMembershipLevel(authUserId, classroomGame.classroomId)
+      ? await getClassroomLevelCached(authUserId, classroomGame.classroomId)
       : 'core';
     // Prefer the words the board ACTUALLY carries. Embedding is best-effort, so
     // the full lesson list sent a support student hunting for words that are not

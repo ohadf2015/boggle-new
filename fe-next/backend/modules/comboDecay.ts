@@ -3,11 +3,15 @@ import { calculateComboChainWindow } from '@/shared/utils/comboUtils';
 /** Highest combo level that still adds score; the streak itself keeps counting (combo achievements need 25/30). */
 export const SERVER_COMBO_SCORING_CAP = 15;
 
+/** A blizzard halves how fast a streak decays, so the chain window doubles while tiles are frozen. */
+export const BLIZZARD_COMBO_DECAY_MULTIPLIER = 0.5;
+
 const lastComboWordAt = new WeakMap<object, Record<string, number>>();
 
 interface ComboGame {
   gameMode?: string | null;
   playerCombos?: Record<string, number>;
+  activeRoundEvent?: string | null;
 }
 
 /**
@@ -30,7 +34,8 @@ export function advanceServerCombo(game: ComboGame, username: string, now: numbe
     lastComboWordAt.set(game, times);
   }
   const last = times[username];
-  const lapsed = last !== undefined && now - last >= calculateComboChainWindow(stored);
+  const decay = game.activeRoundEvent === 'blizzard' ? BLIZZARD_COMBO_DECAY_MULTIPLIER : 1;
+  const lapsed = last !== undefined && now - last >= calculateComboChainWindow(stored) / decay;
   const level = lapsed ? 0 : stored;
   times[username] = now;
   game.playerCombos[username] = level + 1;

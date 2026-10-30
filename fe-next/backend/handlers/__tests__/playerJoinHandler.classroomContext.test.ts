@@ -109,6 +109,7 @@ vi.mock('../../modules/supabase/classroomMembership', () => ({
 
 import { registerPlayerJoinHandlers } from '../playerJoinHandler';
 import { handleReconnection } from '../playerReconnectHandler';
+import { clearClassroomLevelCache } from '../../modules/classroomLevelCache';
 
 function captureJoinHandler(verifiedUserId?: string) {
   const listeners: Record<string, (...args: unknown[]) => unknown> = {};
@@ -141,6 +142,7 @@ const flush = () => new Promise((r) => setTimeout(r, 0));
 describe('PlayerJoinHandler — classroomContext', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    clearClassroomLevelCache();
     mockGetGameUsers.mockReturnValue([]);
     mockGetActiveRooms.mockReturnValue([]);
     mockGetSocketIdByUsername.mockReturnValue(undefined);

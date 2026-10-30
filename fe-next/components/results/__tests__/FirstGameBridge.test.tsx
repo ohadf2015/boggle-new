@@ -81,4 +81,21 @@ describe('FirstGameBridge', () => {
     );
     expect(onHoldingChange).toHaveBeenCalledWith(true);
   });
+
+  it('is a filled primary by default', () => {
+    flag.value = 'bridge';
+    render(<FirstGameBridge surface="singleplayer" enabled onActivate={vi.fn()} />);
+    const button = screen.getByTestId('first-game-bridge');
+    expect(button).toHaveAttribute('data-emphasis', 'primary');
+    expect(button.className).toContain('bg-neo-lime');
+  });
+
+  it('secondary emphasis is an outline, never a second filled primary', () => {
+    flag.value = 'bridge';
+    render(<FirstGameBridge surface="classic-mp" enabled emphasis="secondary" onActivate={vi.fn()} />);
+    const button = screen.getByTestId('first-game-bridge');
+    expect(button).toHaveAttribute('data-emphasis', 'secondary');
+    expect(button.className).not.toMatch(/\bbg-neo-lime\b/);
+    expect(button.className).not.toMatch(/\bshadow-hard\b/);
+  });
 });

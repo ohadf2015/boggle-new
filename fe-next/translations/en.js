@@ -19450,7 +19450,8 @@ const en = {
       "chatHint": "Say hi to the squad",
       "chatUnread": "{count} new",
       "modeOn": "{mode} is on. Press Start",
-      "progressNotSaved": "Couldn't save this game. If the server restarts, progress may be lost."
+      "progressNotSaved": "Couldn't save this game. If the server restarts, progress may be lost.",
+      "hostPicked": "Host picked"
     },
     "round": {
       "getReady": "Get ready",
@@ -19508,7 +19509,12 @@ const en = {
       },
       "players": "Players",
       "specialWord": "{name} found the special word {word}!",
-      "specialWordMine": "Special word {word}! +{bonus}"
+      "specialWordMine": "Special word {word}! +{bonus}",
+      "bonusComeback": "Comeback +{pct}%",
+      "bonusMeteor": "Meteor +{points}",
+      "rejectFrozen": "Frozen! Hang on a sec",
+      "rejectRateLimited": "Whoa, too fast. Slow down",
+      "rejectError": "Couldn't check that word. Try again"
     },
     "results": {
       "time": "Time!",
@@ -19553,6 +19559,9 @@ const en = {
       "calloutPhotoLost": "Photo finish! {name} edged you by {points}",
       "calloutComeback": "Comeback! Up {places} in the series",
       "calloutUnique": "Words only you found: {count}",
+      "calloutH2hLead": "You lead {name} {record} all-time",
+      "calloutH2hTrail": "{name} leads you {record} all-time",
+      "calloutH2hEven": "You and {name} are even at {record}",
       "detailsWords": "Your words",
       "detailsNoWords": "No words this round",
       "backToClass": "Back to class",

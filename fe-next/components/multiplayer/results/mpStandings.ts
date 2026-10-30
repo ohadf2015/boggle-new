@@ -13,6 +13,8 @@ import { pickBestWord, type WordLike } from './mpResultsView';
  */
 export interface MpStandingRow {
   username: string;
+  /** Signed-in players only (server `userId`); guests and bots have none. */
+  userId?: string;
   avatar?: Avatar;
   isBot?: boolean;
   isMe: boolean;
@@ -35,6 +37,7 @@ export interface MpStandingRow {
 
 interface ScoreLike {
   username: string;
+  userId?: string;
   score: number;
   avatar?: Avatar;
   isBot?: boolean;
@@ -80,6 +83,7 @@ export function buildMpStandings({ sortedScores, username, normalizeUsername, se
     const prev = rows[i - 1];
     rows.push({
       username: p.username,
+      ...(p.userId ? { userId: p.userId } : {}),
       avatar: p.avatar,
       isBot: p.isBot,
       isMe: !!me && normalizeUsername(p.username) === me,

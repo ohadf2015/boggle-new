@@ -17,6 +17,7 @@ import { isWordShapeWeird } from '@/shared/utils/wordShapeFilter';
 import { classicMinWordLength } from '@/shared/utils/classicWordRules';
 import { isWordCommunityValid, isWordValidForScoring } from '../../modules/communityWordManager';
 import { scoreAcceptedWord } from '../../modules/wordScore';
+import { wordBlockedByBlizzardSync } from '../../modules/blizzardFreeze';
 import logger from '../../utils/logger';
 import {
   activateBot,
@@ -81,16 +82,30 @@ export async function prepareBoardWords(bot: Bot, grid: LetterGrid, ctx: BotRoun
   return true;
 }
 
-/** Personality pacing over the prepared pool. */
-export function boardWordSource(bot: Bot): BotWordSource {
+/**
+ * Personality pacing over the prepared pool. A word that is not playable right
+ * now (frozen tiles) moves to the back of the queue rather than being spent.
+ */
+export function boardWordSource(bot: Bot, isBlocked: (word: string) => boolean = () => false): BotWordSource {
   const timing = BOT_CONFIG.TIMING[bot.difficulty] || BOT_CONFIG.TIMING.medium;
   return {
     firstDelay: () => (bot.dynamicStartDelay ?? timing.startDelay) + Math.random() * 2000,
     nextDelay: () => calculateNextDelay(bot),
     pick: () => {
+      let deferrals = bot.wordsToFind.length - bot.currentWordIndex;
       while (bot.currentWordIndex < bot.wordsToFind.length) {
-        const word = bot.wordsToFind[bot.currentWordIndex++];
-        if (!bot.wordsFound.includes(word)) return word;
+        const word = bot.wordsToFind[bot.currentWordIndex];
+        if (bot.wordsFound.includes(word)) {
+          bot.currentWordIndex++;
+          continue;
+        }
+        if (!isBlocked(word)) {
+          bot.currentWordIndex++;
+          return word;
+        }
+        if (deferrals-- <= 0) return null;
+        bot.wordsToFind.splice(bot.currentWordIndex, 1);
+        bot.wordsToFind.push(word);
       }
       return undefined;
     },
@@ -114,7 +129,7 @@ export async function startBoardWordBots(
     activateBot(bot);
     if (!(await prepareBoardWords(bot, grid, ctx, durationSec))) return;
     if (!bot.isActive) return; // stopped while the pool was being built
-    runWordBot(ctx, bot, rules, boardWordSource(bot));
+    runWordBot(ctx, bot, rules, boardWordSource(bot, (word) => wordBlockedByBlizzardSync(getGame(ctx.gameCode), word)));
     logger.info('BOT', `Bot "${bot.username}" started playing (${bot.wordsToFind.length} words queued)`);
   }));
 }

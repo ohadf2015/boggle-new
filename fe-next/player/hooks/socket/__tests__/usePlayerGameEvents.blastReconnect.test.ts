@@ -14,13 +14,9 @@
  * locks the wiring at syntactic level and survives refactors that preserve
  * the contract.
  */
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readPlayerGameEventsSource } from './playerGameEventsSource';
 
-const source = readFileSync(
-  resolve(__dirname, '../usePlayerGameEvents.ts'),
-  'utf8',
-);
+const source = readPlayerGameEventsSource();
 
 describe('usePlayerGameEvents — blast reconnect / late-join state restore', () => {
   it('reads blastTileOverlay from server extData on (re)join', () => {

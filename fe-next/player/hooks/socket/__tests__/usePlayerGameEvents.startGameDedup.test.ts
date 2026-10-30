@@ -1,5 +1,4 @@
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readPlayerGameEventsSource } from './playerGameEventsSource';
 
 /**
  * usePlayerGameEvents — startGame dedup contract
@@ -9,10 +8,7 @@ import { resolve } from 'node:path';
  * effect skip its redundant store/timer/ack work, `handleStartGame` must
  * record the messageId via `markStartGameHandled('PLAYER', ...)`.
  */
-const source = readFileSync(
-  resolve(__dirname, '../usePlayerGameEvents.ts'),
-  'utf8',
-);
+const source = readPlayerGameEventsSource();
 
 describe('usePlayerGameEvents — startGame dedup', () => {
   it('imports markStartGameHandled from gameEventUtils', () => {

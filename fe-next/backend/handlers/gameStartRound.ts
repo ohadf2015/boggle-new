@@ -19,6 +19,7 @@ import { getSupabase } from '../modules/supabase/client.js';
 import { verifyBoostToken } from '../utils/boostToken.js';
 import { setClassroomGamePlacedVocabulary, saveClassroomTeams, type ClassroomGame } from '../modules/classroomGameManager.js';
 import { buildClassroomLiveContext } from '@/shared/utils/classroomLiveContext';
+import { classroomTeamAbilities } from '../modules/classroomLevelCache.js';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import { getGameModeRules } from '../modes/index.js';
 import logger from '../utils/logger.js';
@@ -167,7 +168,13 @@ export function buildClassroomStartExtras(gameCode: string, classroomGame: Class
   if (accessibility && (accessibility.largeText || accessibility.audioCues)) {
     extras.accessibility = { largeText: !!accessibility.largeText, audioCues: !!accessibility.audioCues };
   }
-  const classroomLive = buildClassroomLiveContext({ game: classroomGame, humanUsernames });
+  const users = classroomGame?.classroomId ? getGame(gameCode)?.users : undefined;
+  const abilities = users
+    ? classroomTeamAbilities(classroomGame!.classroomId, humanUsernames.map((username) => ({
+      username, authUserId: users[username]?.authUserId,
+    })))
+    : undefined;
+  const classroomLive = buildClassroomLiveContext({ game: classroomGame, humanUsernames, abilities });
   if (classroomLive) {
     extras.classroom = classroomLive;
     if (classroomLive.teams) {

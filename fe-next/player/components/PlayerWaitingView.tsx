@@ -43,6 +43,10 @@ import { ReadyMeter } from '@/components/multiplayer/lobby/ReadyMeter';
 import { useChatUnread } from '@/components/multiplayer/lobby/useChatUnread';
 import { useLobbyWide } from '@/components/multiplayer/lobby/useLobbyWide';
 import { LobbyExitButton, LobbyChatButton, LobbyChatPanel, HowToPlaySheet, ChatSheet } from '@/components/multiplayer/lobby/LobbyChrome';
+import { LobbySettingsSummary } from '@/components/multiplayer/lobby/LobbySettingsSummary';
+import { LobbyModeChip } from '@/components/multiplayer/lobby/LobbyModeChip';
+import { useLobbySettingsFor } from '@/components/multiplayer/lobby/lobbySettingsStore';
+import { useLobbySettingsSync } from '../hooks/useLobbySettingsSync';
 import type { Language, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import { VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
 import { EduStudentLobby } from '@/components/education/live/EduStudentLobby';
@@ -107,6 +111,8 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
   const socket = useSocketOptional()?.socket ?? null;
   const { emotesByUsername, sendEmote, cooldownActive } = useLobbyEmotes({ socket });
   useLobbyAdGate({ socket });
+  useLobbySettingsSync(isClassroomMode ? null : socket, gameCode);
+  const hostPick = useLobbySettingsFor(gameCode);
 
   const [sheet, setSheet] = useState<'howto' | 'chat' | null>(null);
   const closeSheet = useCallback(() => setSheet(null), []);
@@ -134,10 +140,16 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
   const { ready: readyCount, total: readyTotal } = readyTally(seats);
 
   // How-to-play follows the room: a classroom's teacher-chosen mode (a quiz
-  // has no board to teach), otherwise the store's mode with classic fallback.
+  // has no board to teach), otherwise the host's broadcast pick.
   const howToMode: GameModeOption | null = isClassroomMode
     ? (classroomGameMode && classroomGameMode !== VOCAB_QUIZ_MODE ? (classroomGameMode as GameModeOption) : null)
-    : ((gameMode || 'classic') as GameModeOption);
+    : (hostPick?.mode ?? ((gameMode || 'classic') as GameModeOption));
+  const pickRow = hostPick && (
+    <div data-testid="lobby-host-pick" className="w-full max-w-md flex flex-col items-center gap-2">
+      <LobbyModeChip mode={hostPick.mode} t={t} />
+      <LobbySettingsSummary timerValue={hostPick.timerSeconds / 60} difficulty={hostPick.difficulty} minWordLength={hostPick.minWordLength} t={t} />
+    </div>
+  );
   const lang = gameLanguage ?? 'en';
 
   const readyButton = onToggleReady ? (
@@ -226,6 +238,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
       <div className="min-w-0 max-w-md flex flex-col items-center gap-2 [&_p]:whitespace-normal [&_p]:line-clamp-3 [&_p]:text-neo-white/85 [&_p]:font-bold [&_p]:text-[length:calc(15px*var(--mp-u,1))]">
         <ReadyMeter seats={seats} meId={username} />
         {status}
+        {pickRow}
         {howTo.pill}
       </div>
       {howTo.accordion}
@@ -233,9 +246,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
   );
 
   // One how-to control per layout: the pill opens the sheet on phone; desktop
-  // has the room for the collapsed rules accordion right in the card. It stays
-  // collapsed: nothing broadcasts the host's lobby pick, so this is the room's
-  // fallback mode, not a promise.
+  // has the room for the collapsed rules accordion right in the card.
   const howToPill = howToMode && (
     <button
       type="button"

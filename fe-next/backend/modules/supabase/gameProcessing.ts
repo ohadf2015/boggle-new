@@ -17,6 +17,7 @@ import { recordGameResult } from './gameResults';
 import { updatePlayerStats, ensureProfileExists } from './playerStats';
 import { updateLeaderboardEntry, updateRankedProgress } from './leaderboard';
 import { updateGuestStats } from './guestTokens';
+import { recordHeadToHead } from './headToHead';
 import { awardsLeaderboardPoints } from '../leaderboardScoring';
 
 import logger from '../../utils/logger';
@@ -288,6 +289,8 @@ export async function processGameResults(
       lifetimeAchievements[result.username] = result.lifetimeAchievements;
     }
   }
+
+  void recordHeadToHead(gameCode, scores, userAuthMap);
 
   // Invalidate leaderboard caches only for players who participated (targeted invalidation)
   try {

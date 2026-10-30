@@ -20417,7 +20417,8 @@ const es = {
       "chatHint": "Saluda al grupo",
       "chatUnread": "{count} nuevos",
       "modeOn": "{mode} está listo — pulsa Empezar",
-      "progressNotSaved": "No pudimos guardar la partida. Si el servidor se reinicia, podrías perder el progreso."
+      "progressNotSaved": "No pudimos guardar la partida. Si el servidor se reinicia, podrías perder el progreso.",
+      "hostPicked": "El anfitrión eligió"
     },
     "round": {
       "getReady": "Prepárate",
@@ -20475,7 +20476,12 @@ const es = {
       },
       "players": "Jugadores",
       "specialWord": "¡{name} encontró la palabra especial {word}!",
-      "specialWordMine": "¡Palabra especial {word}! +{bonus}"
+      "specialWordMine": "¡Palabra especial {word}! +{bonus}",
+      "bonusComeback": "Remontada +{pct}%",
+      "bonusMeteor": "Meteoro +{points}",
+      "rejectFrozen": "¡Congelado! Espera un momento",
+      "rejectRateLimited": "Muy rápido. Más despacio",
+      "rejectError": "No pudimos comprobar esa palabra. Inténtalo de nuevo"
     },
     "results": {
       "time": "¡Tiempo!",
@@ -20520,6 +20526,9 @@ const es = {
       "calloutPhotoLost": "¡Foto finish! {name} te ganó por {points}",
       "calloutComeback": "¡Remontada! Subiste {places} en la serie",
       "calloutUnique": "Palabras que solo tú encontraste: {count}",
+      "calloutH2hLead": "Le llevas ventaja a {name}: {record} en total",
+      "calloutH2hTrail": "{name} te lleva ventaja: {record} en total",
+      "calloutH2hEven": "Empate con {name}: {record} en total",
       "detailsWords": "Tus palabras",
       "detailsNoWords": "Sin palabras esta ronda",
       "backToClass": "Volver a la clase",

@@ -22,6 +22,8 @@ import { PlayerLobbyScreen } from '@/components/multiplayer/lobby/PlayerLobbyScr
 import { MpRoundScreen } from '@/components/multiplayer/round/MpRoundScreen';
 import { MpCountdown } from '@/components/multiplayer/round/MpCountdown';
 import { usePlayerPhase } from './hooks/usePlayerPhase';
+import { PlayerRoundClock } from './components/PlayerRoundClock';
+import { RoundClockProvider } from './roundClock';
 import { roundRevealKey } from './modeRevealKey';
 import { withoutClassroomHost } from '@/components/student/live/classroomRoster';
 import type { PlayerViewProps } from './types';
@@ -29,7 +31,7 @@ import type { PlayerViewProps } from './types';
 const PlayerView: React.FC<PlayerViewProps> = memo((props) => {
   const { username, gameCode, seriesRoundNumber, isClassroomMode, classroomGameMode } = props;
   const {
-    t, dir, socket, waitingForResults, letterGrid, remainingTime, gameActive, showModeReveal, showStartAnimation,
+    t, dir, socket, waitingForResults, letterGrid, hasTimeLeft, roundClock, teacherPaused, onClockZero, onClockStall, gameActive, showModeReveal, showStartAnimation,
     dispatchReveal, setShowStartAnimation, pendingMessageIdRef, isGameLoading, resolvedGameLanguage, playersReady,
     showQR, setShowQR, showExitConfirm, setShowExitConfirm, handleExitRoom, confirmExitRoom, handleNameChange,
     handleAvatarChange, readyUsernames, isReady, toggleReady, readyInFlight, leaderboard, foundWords, gameMode,
@@ -48,8 +50,22 @@ const PlayerView: React.FC<PlayerViewProps> = memo((props) => {
   // Show game board during countdown animation when we have letterGrid
   // This allows players to see the board while countdown is active
   // Also covers the transition period between countdown ending and gameActive being set
-  const hasGameData = letterGrid && remainingTime !== null && remainingTime > 0;
+  const hasGameData = letterGrid && hasTimeLeft;
   const showGameView = gameActive || (hasGameData && !boardWaiting);
+
+  // Same tree slot in every branch below, so a phase change never remounts the clock.
+  const clock = (
+    <PlayerRoundClock
+      clock={roundClock}
+      isPaused={!gameActive || teacherPaused}
+      gameActive={gameActive}
+      stallWatchActive={gameActive && !teacherPaused}
+      waitingForResults={waitingForResults}
+      onZero={onClockZero}
+      onStall={onClockStall}
+    />
+  );
+  const withClock = (node: React.ReactNode) => <>{clock}{node}</>;
 
   // Map game mode to display label
   const modeRevealLabel = t(roundRevealKey({ bossRound, classroomGameMode: isClassroomMode ? classroomGameMode : null, gameMode }));
@@ -61,7 +77,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo((props) => {
   if (!showGameView && !boardWaiting && !showModeReveal && !showStartAnimation) {
     // Show loading indicator when server is preparing the game
     if (isGameLoading) {
-      return (
+      return withClock(
         <div className="h-full bg-neo-navy flex items-center justify-center overflow-hidden">
           <div className="flex flex-col items-center gap-4">
             <Loader2 className="h-10 w-10 text-neo-lime animate-spin" />
@@ -73,7 +89,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo((props) => {
       );
     }
 
-    return (
+    return withClock(
       <PlayerLobbyScreen>
       <PlayerWaitingView
           gameCode={gameCode}
@@ -106,7 +122,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo((props) => {
     const playerScore = playerEntry?.score ?? 0;
     const validWords = foundWords.filter(w => w.validated !== false);
 
-    return (
+    return withClock(
       <div className="flex-1 w-full bg-neo-navy flex items-center justify-center">
         <AdaptiveMotion.div
           initial={{ opacity: 0, scale: 0.9 }}
@@ -134,7 +150,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo((props) => {
     );
   }
 
-  return (
+  return withClock(
     <>
       {showModeReveal && (
         <ModeRevealOverlay
@@ -169,6 +185,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo((props) => {
       )}
 
       <MpRoundScreen>
+      <RoundClockProvider value={roundClock.store}>
       <PlayerInGameView
         username={username}
         gameCode={gameCode}
@@ -179,7 +196,6 @@ const PlayerView: React.FC<PlayerViewProps> = memo((props) => {
         shufflingGrid={shufflingGrid}
         gameActive={gameActive}
         showStartAnimation={showModeReveal || showStartAnimation}
-        remainingTime={remainingTime}
         gameLanguage={resolvedGameLanguage}
         minWordLength={minWordLength}
         comboLevel={comboLevel}
@@ -206,6 +222,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo((props) => {
         boardTheme={boardTheme}
         totalTime={totalGameTimeRef.current}
       />
+      </RoundClockProvider>
       </MpRoundScreen>
     </>
   );

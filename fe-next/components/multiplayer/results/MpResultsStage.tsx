@@ -33,7 +33,8 @@ import ChestRewardCta from '@/components/education/economy/ChestRewardCta';
 import { rewardRoundId } from '@/shared/constants/classroomEconomy';
 import RoundShop from '@/components/education/economy/RoundShop';
 import { MpRoundAwards, MpSeriesGrid } from './MpResultsAlbum';
-import { resultCallout, roundAwards, seriesGrid } from './mpResultsStory';
+import { calloutRival, resultCallout, roundAwards, seriesGrid } from './mpResultsStory';
+import { useFrozenAfter, useRivalHeadToHead } from './useRivalHeadToHead';
 import { selectUniqueWords } from '@/lib/results/selectUniqueWords';
 import type { MpResultsController } from './useMpResultsController';
 import fx from './mpResults.module.css';
@@ -44,7 +45,6 @@ import { StudentExitDialog } from '@/components/student/live/StudentExitDialog';
 import { myMissedWords } from '@/components/student/live/missedWords';
 import { resultsExitCopy } from '@/lib/multiplayer/resultsExitCopy';
 import { trackGrowthEvent } from '@/utils/growthTracking';
-import { usePostHogFlag } from '@/hooks/usePostHogFlag';
 import { useMpExit } from '@/hooks/useMpExit';
 import { BossOutcomeCard } from '@/components/education/boss/BossOutcomeCard';
 import { useClassroomBossStore } from '@/stores/classroomBossStore';
@@ -78,12 +78,6 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
     series: { roundNumber: seriesRoundNumber, standings: seriesStandings },
   }), [data.sortedScores, username, data.normalizeUsername, seriesRoundNumber, seriesStandings]);
   const { branch, lock } = useLockedBranch(seriesRoundNumber >= seriesTotalGames);
-  // t_561836a1: PostHog flag `ri-mp-series-end` (50/50). Control = today's
-  // behaviour (signup CTA on every round-end, incl. the ~10s auto-advance gap);
-  // treatment = render it only on the series-end / Leave screen. Defaults to
-  // control so a flag-less client (no consent, flags not loaded) keeps today.
-  const riMpSeriesEndFlag = usePostHogFlag<string | boolean>('ri-mp-series-end', 'control');
-  const riSeriesEndOnly = riMpSeriesEndFlag === 'series-end' || riMpSeriesEndFlag === true;
   // The teacher's hidden dial means TRUE hidden — the final screen IS the reveal.
   const pressure = useClassroomPressure();
   const hideOutcome = branch !== 'final' && pressure != null && isLeaderboardHidden(pressure);
@@ -200,7 +194,10 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   const me = data.currentPlayerData;
   const bestWord = useMemo(() => pickBestWord(me?.allWords), [me]);
   const uniqueCount = useMemo(() => (username ? selectUniqueWords(c.allPlayerWords, username).length : 0), [c.allPlayerWords, username]);
-  const callout = useMemo(() => resultCallout({ rows: boardRows, uniqueCount }), [boardRows, uniqueCount]);
+  const rival = useMemo(() => calloutRival(boardRows), [boardRows]);
+  const h2hLive = useRivalHeadToHead(rival, c.isAuthenticated && !c.isGuest);
+  const h2h = useFrozenAfter(h2hLive, seen('card'));
+  const callout = useMemo(() => resultCallout({ rows: boardRows, uniqueCount, h2h }), [boardRows, uniqueCount, h2h]);
   const champions = series?.champions ?? NO_CHAMPIONS;
   // The album (desktop/TV): the series final tells the series round by round;
   // otherwise the round is told as three awards.
@@ -208,7 +205,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   const awards = useMemo(() => (grid ? null : roundAwards(data.sortedScores)), [grid, data.sortedScores]);
 
   const [bridgeShowing, setBridgeShowing] = useState(false);
-  const signupShown = showInlineSignup({ isGuest: c.isGuest, isClassroom: c.isClassroom, footerShown, bridgeShowing, seriesEndOnly: riSeriesEndOnly, branch });
+  const signupShown = showInlineSignup({ isGuest: c.isGuest, isClassroom: c.isClassroom, footerShown, bridgeShowing, branch });
 
   const exitCopy = resultsExitCopy({ isClassroom: c.isClassroom, isHost });
   const bossOutcome = useClassroomBossStore((s) => s.view?.status === 'defeated' || s.view?.status === 'escaped');
@@ -371,6 +368,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
           Tap leaves the room (useMpExit) into today's Word Wheel — not a Link. */}
       <FirstGameBridge
         surface="classic-mp"
+        emphasis="secondary"
         enabled={footerShown && c.resolvedGameMode === 'classic' && !c.isClassroom}
         onHoldingChange={setBridgeShowing}
         onActivate={() => {
@@ -378,7 +376,6 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
           mpExit('first-game-bridge');
         }}
       />
-      {/* results_inline guest signup; under `ri-mp-series-end` treatment only on the series final. */}
       {signupShown && (
         <InlineSignupCard isAuthenticated={c.isAuthenticated} analyticsSource="results_inline" compact className={cn('shrink-0', fx.cardIn)} />
       )}

@@ -13,10 +13,9 @@
  * the countdown animation — only a genuinely fresh start shows the countdown.
  * (Matches usePlayerGameEvents.reconnectStability source-contract style.)
  */
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readPlayerGameEventsSource } from './playerGameEventsSource';
 
-const source = readFileSync(resolve(__dirname, '../usePlayerGameEvents.ts'), 'utf8');
+const source = readPlayerGameEventsSource();
 
 describe('usePlayerGameEvents — reconnect must not replay countdown', () => {
   it('resumes (no countdown) for lateJoin OR reconnect', () => {

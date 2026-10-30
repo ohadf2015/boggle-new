@@ -1,13 +1,15 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, type MutableRefObject } from 'react';
+import type { RoundClockStore } from '../roundClock';
 import { useMusic } from '@/contexts/MusicContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 
 interface UsePlayerMusicParams {
   gameActive: boolean;
-  remainingTime: number | null;
+  /** Read by subscription, so ticks never re-render the caller. */
+  clockStore: RoundClockStore;
   waitingForResults: boolean;
   earthquakeState: 'idle' | 'warning' | 'shaking' | 'fire-round';
-  totalGameTime: number;
+  totalGameTimeRef: MutableRefObject<number>;
 }
 
 /**
@@ -16,10 +18,10 @@ interface UsePlayerMusicParams {
  */
 export function usePlayerMusic({
   gameActive,
-  remainingTime,
+  clockStore,
   waitingForResults,
   earthquakeState,
-  totalGameTime,
+  totalGameTimeRef,
 }: UsePlayerMusicParams) {
   const { fadeToTrack, TRACKS } = useMusic();
   const { playCountdownBeep } = useSoundEffects();
@@ -40,25 +42,22 @@ export function usePlayerMusic({
     }
   }, [gameActive]);
 
-  // Urgent music — plays after 33% of game time elapsed (67% remaining)
+  // Urgent music after 33% of the round; countdown beeps in the last 10 seconds.
   useEffect(() => {
-    if (gameActive && remainingTime !== null && remainingTime > 0 && !hasTriggeredUrgentMusicRef.current) {
-      const triggerThreshold = totalGameTime * 0.67;
-      if (remainingTime <= triggerThreshold) {
+    if (!gameActive) return;
+    const onTick = (remainingTime: number | null) => {
+      if (remainingTime === null || remainingTime <= 0) return;
+      if (!hasTriggeredUrgentMusicRef.current && remainingTime <= totalGameTimeRef.current * 0.67) {
         hasTriggeredUrgentMusicRef.current = true;
-        if (!earthquakeMusicActiveRef.current) {
-          fadeToTrack(TRACKS.ALMOST_OUT_OF_TIME, 1000, 1000);
-        }
+        if (!earthquakeMusicActiveRef.current) fadeToTrack(TRACKS.ALMOST_OUT_OF_TIME, 1000, 1000);
       }
-    }
-  }, [remainingTime, gameActive, fadeToTrack, TRACKS, totalGameTime]);
-
-  // Countdown beeps (last 10 seconds)
-  useEffect(() => {
-    if (gameActive && remainingTime !== null && remainingTime <= 10 && remainingTime > 0) {
-      playCountdownBeep(remainingTime);
-    }
-  }, [remainingTime, gameActive, playCountdownBeep]);
+      if (remainingTime <= 10) playCountdownBeep(remainingTime);
+    };
+    onTick(clockStore.getState().remainingTime);
+    return clockStore.subscribe((state, prev) => {
+      if (state.remainingTime !== prev.remainingTime) onTick(state.remainingTime);
+    });
+  }, [gameActive, clockStore, totalGameTimeRef, fadeToTrack, TRACKS, playCountdownBeep]);
 
   // Earthquake/Fire Round music
   useEffect(() => {

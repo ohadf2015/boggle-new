@@ -12,6 +12,7 @@ import InGameScreen from '../../components/game/InGameScreen';
 import { GameLoadingFallback } from '@/components/ui/GameLoadingFallback';
 import { useReconnectFlow } from '@/lib/multiplayer/useReconnectFlow';
 import { ReconnectingOverlay } from '@/components/multiplayer/ReconnectingOverlay';
+import { MpBonusPill } from '@/components/multiplayer/MpBonusPill';
 import { MPGameAbortedModal } from '@/components/multiplayer/MPGameAbortedModal';
 import { useEduLiveSurfaces } from '@/components/education/live/eduLiveSurfaces';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -296,6 +297,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
   );
   const connectionOverlays = (
     <>
+      {hostPlaying && <MpBonusPill />}
       {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />}
       {showAbortModal && <AbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
     </>

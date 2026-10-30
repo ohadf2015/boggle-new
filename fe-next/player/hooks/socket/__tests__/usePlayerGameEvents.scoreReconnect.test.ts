@@ -14,13 +14,9 @@
  * regex-over-source test locks the wiring at syntactic level, matching the
  * established convention for this hook.
  */
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readPlayerGameEventsSource } from './playerGameEventsSource';
 
-const source = readFileSync(
-  resolve(__dirname, '../usePlayerGameEvents.ts'),
-  'utf8',
-);
+const source = readPlayerGameEventsSource();
 
 describe('usePlayerGameEvents — score (leaderboard) restore on reconnect', () => {
   it('restores the leaderboard from the reconnect startGame payload', () => {

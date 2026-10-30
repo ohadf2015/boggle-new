@@ -1,18 +1,17 @@
 /**
- * MpResultsScreen — `ri-mp-series-end` flag wiring (t_561836a1).
- * Control (flag off / unresolved): results_inline CTA on every round-end, as
- * today. Treatment ('series-end'): the CTA never renders in the auto-advance
- * gap between rounds — only on the series-end / Leave screen. Harness mirrors
- * MpResultsScreen.test.tsx; next/dynamic is mocked so the lazy
- * InlineSignupCard surfaces as a marker div (keyed on its analyticsSource).
+ * MpResultsScreen: the results_inline guest signup shows on the series-end
+ * screen only, never in the auto-advance gap between rounds, and the first-game
+ * bridge never paints a second filled primary under the footer's.
  */
 import React from 'react';
-import { render, fireEvent, screen } from '@testing-library/react';
+import { render, fireEvent, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 const h = vi.hoisted(() => ({
   reduced: false, // reduced mode makes the reveal instantly `done`, which unwires the pointerDown skip — keep the choreography and skip it
-  riFlag: undefined as undefined | string | boolean,
+  flagKeys: [] as string[],
+  guest: true,
+  getHeadToHead: vi.fn(),
   showInterstitial: vi.fn(),
   markReady: vi.fn(),
   mpExit: vi.fn(),
@@ -28,8 +27,13 @@ vi.mock('@/contexts/LanguageContext', () => ({
     dir: 'ltr',
   }),
 }));
-vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ isAuthenticated: false, user: null }) }));
-vi.mock('@/hooks/useIsGuest', () => ({ useIsGuest: () => true }));
+vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ isAuthenticated: !h.guest, user: h.guest ? null : { id: 'u-me' } }) }));
+vi.mock('@/hooks/useIsGuest', () => ({ useIsGuest: () => h.guest }));
+vi.mock('@/utils/friendsHeadToHead', async (orig) => ({
+  ...(await orig<typeof import('@/utils/friendsHeadToHead')>()),
+  getHeadToHead: h.getHeadToHead,
+  updateOnlineStatus: vi.fn(),
+}));
 vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => new Proxy({}, {
     get: (_t, k) => (k === 'playVictorySound' || k === 'playEpicVictorySound' ? h.win : k === 'playDefeatSound' ? h.lose : vi.fn()),
@@ -44,10 +48,15 @@ vi.mock('@/components/ui/AnimatedCounter', () => ({ __esModule: true, default: (
 vi.mock('next/dynamic', () => ({
   __esModule: true,
   default: () => (props: Record<string, unknown>) =>
-    props && props.analyticsSource === 'results_inline' ? <div data-testid="inline-signup-card" /> : null,
+    props && props.analyticsSource === 'results_inline' ? <div data-testid="inline-signup-card" />
+      : props && props.surface === 'classic-mp' ? <div data-testid="bridge-probe" data-emphasis={String(props.emphasis)} />
+      : null,
 }));
 vi.mock('@/hooks/usePostHogFlag', () => ({
-  usePostHogFlag: (_key: string, defaultValue: unknown) => (h.riFlag !== undefined ? h.riFlag : defaultValue),
+  usePostHogFlag: (key: string, defaultValue: unknown) => {
+    h.flagKeys.push(key);
+    return defaultValue;
+  },
 }));
 vi.mock('@/components/ads/ResultsBannerSlot', () => ({ __esModule: true, default: () => null }));
 vi.mock('@/components/results/ResultsModals', () => ({ ResultsModals: () => null }));
@@ -82,6 +91,7 @@ vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: h.trackGrowthEvent 
 
 import MpResultsScreen from '../MpResultsScreen';
 import { emitRewardAdActive } from '@/hooks/useRewardAdPause';
+import { __resetRivalHeadToHeadCache } from '../useRivalHeadToHead';
 
 type Socket = { emit: ReturnType<typeof vi.fn>; on: ReturnType<typeof vi.fn>; off: ReturnType<typeof vi.fn> };
 
@@ -112,46 +122,63 @@ function renderScreen(over: Partial<React.ComponentProps<typeof MpResultsScreen>
 
 const skipReveal = () => fireEvent.pointerDown(screen.getByTestId('mp-results-stage'));
 
-describe('MpResultsScreen ri-mp-series-end flag (t_561836a1)', () => {
+describe('MpResultsScreen results_inline signup is series-end only', () => {
   beforeEach(() => {
-    h.riFlag = undefined;
+    h.flagKeys = [];
+    h.guest = true;
+    h.getHeadToHead.mockReset();
+    __resetRivalHeadToHeadCache();
     h.trackGrowthEvent.mockClear();
     sessionStorage.clear();
     emitRewardAdActive(false);
   });
   afterEach(() => vi.useRealTimers());
 
-  it('control (flag unresolved): the CTA renders mid-series, as today', () => {
-    renderScreen({ seriesRoundNumber: 1, seriesTotalGames: 5 });
-    skipReveal();
-    expect(screen.getByTestId('inline-signup-card')).toBeTruthy();
-  });
-
-  it('control (explicit "control" variant): the CTA renders mid-series', () => {
-    h.riFlag = 'control';
-    renderScreen({ seriesRoundNumber: 1, seriesTotalGames: 5 });
-    skipReveal();
-    expect(screen.getByTestId('inline-signup-card')).toBeTruthy();
-  });
-
-  it('treatment: the CTA does NOT render between auto-advancing rounds', () => {
-    h.riFlag = 'series-end';
+  it('the CTA does NOT render between auto-advancing rounds', () => {
     renderScreen({ seriesRoundNumber: 1, seriesTotalGames: 5 });
     skipReveal();
     expect(screen.queryByTestId('inline-signup-card')).toBeNull();
   });
 
-  it('treatment: the CTA renders on the series-end / Leave screen, still capped by the card itself', () => {
-    h.riFlag = 'series-end';
+  it('the CTA renders on the series-end / Leave screen', () => {
     renderScreen({ seriesRoundNumber: 5, seriesTotalGames: 5 });
     skipReveal();
     expect(screen.getByTestId('inline-signup-card')).toBeTruthy();
   });
 
-  it('treatment as a boolean flag (true) also moves the CTA to series-end only', () => {
-    h.riFlag = true;
-    renderScreen({ seriesRoundNumber: 2, seriesTotalGames: 5 });
+  it('no longer reads the ri-mp-series-end experiment flag', () => {
+    renderScreen({ seriesRoundNumber: 5, seriesTotalGames: 5 });
     skipReveal();
-    expect(screen.queryByTestId('inline-signup-card')).toBeNull();
+    expect(h.flagKeys).not.toContain('ri-mp-series-end');
+  });
+
+  it('the first-game bridge renders as a secondary (outline) action under the footer primary', () => {
+    renderScreen({ seriesRoundNumber: 1, seriesTotalGames: 5 });
+    skipReveal();
+    expect(screen.getByTestId('bridge-probe').getAttribute('data-emphasis')).toBe('secondary');
+  });
+
+  it('a guest never looks up a head-to-head record', () => {
+    renderScreen({ finalScores: SCORES.map((p) => ({ ...p, userId: `u-${p.username}` })) as never });
+    skipReveal();
+    expect(h.getHeadToHead).not.toHaveBeenCalled();
+  });
+
+  it('a signed-in player trailing a signed-in rival with history sees the all-time record', async () => {
+    h.guest = false;
+    h.getHeadToHead.mockResolvedValue({ myWins: 2, theirWins: 4, draws: 0, totalGames: 6 });
+    renderScreen({ finalScores: [{ ...SCORES[0], score: 400, userId: 'u-maya' }, SCORES[1], SCORES[2]] as never });
+    await waitFor(() => expect(h.getHeadToHead).toHaveBeenCalledWith('u-maya'));
+    await Promise.resolve();
+    skipReveal();
+    await waitFor(() => expect(screen.getByTestId('mp-my-callout').getAttribute('data-kind')).toBe('h2h'));
+  });
+
+  it('a signed-in player whose rival is a guest gets the usual callout and no lookup', () => {
+    h.guest = false;
+    renderScreen({ finalScores: [{ ...SCORES[0], score: 400 }, SCORES[1], SCORES[2]] as never });
+    skipReveal();
+    expect(h.getHeadToHead).not.toHaveBeenCalled();
+    expect(screen.getByTestId('mp-my-callout').getAttribute('data-kind')).not.toBe('h2h');
   });
 });

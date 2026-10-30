@@ -16,6 +16,7 @@ import { executeEarthquakeSequence } from '../handlers/earthquakeHandler.js';
 import { makePositionsMap, isWordOnBoard } from './wordValidator.js';
 import { emitTotalBoardWords } from './boardWordCount.js';
 import { seededRng, pickWeightedCatalyst, isLeaderMarginLarge } from './roundEventPick.js';
+import { BLIZZARD_COMBO_DECAY_MULTIPLIER } from './comboDecay.js';
 import type { Language, LetterGrid } from '@/shared/types';
 
 // ==================== Types ====================
@@ -86,6 +87,8 @@ gameCleanupEmitter.onGameEnd(({ gameCode }) => {
 gameCleanupEmitter.onGameReset(({ gameCode }) => {
   clearRoundEventTimers(gameCode);
   clearEventTiles(gameCode);
+  // A rematch inside the 20s delay would otherwise pop last round's word vote mid-game.
+  timerManager.clearTimer(`feedback:${gameCode}`);
 });
 
 // ==================== Helpers ====================
@@ -346,7 +349,7 @@ function buildEventData(eventType: RoundEventType, game: GameState): RoundEventD
     case 'blizzard': {
       const frozenTiles = pickRandomTiles(grid, 5);
       return {
-        blizzard: { frozenTiles, comboDecayMultiplier: 0.5, durationMs: EVENT_CONFIG.blizzard.durationMs },
+        blizzard: { frozenTiles, comboDecayMultiplier: BLIZZARD_COMBO_DECAY_MULTIPLIER, durationMs: EVENT_CONFIG.blizzard.durationMs },
       };
     }
 

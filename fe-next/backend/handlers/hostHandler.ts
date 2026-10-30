@@ -16,6 +16,7 @@ import {
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { getGameRoom } from '../utils/socketHelpers.js';
 import logger from '../utils/logger.js';
+import { registerLobbySettingsHandlers } from './lobbySettingsHandler.js';
 
 const ALLOWED_LANGUAGES: readonly Language[] = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
 
@@ -85,6 +86,8 @@ function registerHostHandlers(io: Server, socket: Socket): void {
     });
     logger.info('HOST', `Room ${data.gameCode} language changed to ${newLang} by ${changedBy}`);
   });
+
+  registerLobbySettingsHandlers(io, socket);
 }
 
 export { registerHostHandlers };

@@ -33,6 +33,7 @@ import { useTimerStallWatchdog } from '@/hooks/useTimerStallWatchdog';
 import { useTeacherPaused } from '@/hooks/useTeacherPause';
 import { addGameBreadcrumb } from '@/utils/sentry';
 import { useHostRoundLifecycle } from './useHostRoundLifecycle';
+import { useBroadcastLobbySettings } from './useBroadcastLobbySettings';
 import { isDuoRoster, useDuoBotRequest } from '@/components/multiplayer/duoBotRequest';
 import type { HostViewProps } from '../hostViewTypes';
 
@@ -94,6 +95,16 @@ export function useHostPhase({
     roomLanguage: roomLanguageProp,
     defaultLanguage: language as Language,
     hasLessonData: !!lessonData,
+  });
+
+  useBroadcastLobbySettings({
+    socket,
+    gameCode,
+    enabled: !state.runtime.gameStarted && !state.runtime.waitingForResults,
+    mode: hostSelectedGameMode,
+    timerValue: state.settings.timerValue,
+    difficulty: state.settings.difficulty,
+    minWordLength: state.settings.minWordLength,
   });
 
   // Mode-specific state from Zustand store (for TV broadcast).

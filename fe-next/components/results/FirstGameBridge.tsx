@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Users, Timer } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { cn } from '@/lib/utils';
 import { useGrowthRadarFlag } from '@/hooks/useGrowthRadarFlag';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { readGamesCompletedCount } from '@/utils/gamesCompletedCount';
@@ -27,6 +28,8 @@ interface FirstGameBridgeProps {
   onActivate: () => void;
   /** Treatment is on screen — parent may hold a same-mode auto-advance. */
   onHoldingChange?: (holding: boolean) => void;
+  /** 'secondary' when the screen already has a filled primary action. */
+  emphasis?: 'primary' | 'secondary';
 }
 
 /**
@@ -38,6 +41,7 @@ export default function FirstGameBridge({
   enabled,
   onActivate,
   onHoldingChange,
+  emphasis = 'primary',
 }: FirstGameBridgeProps) {
   const { t } = useLanguage();
   const [gamesCompleted] = useState(() => readGamesCompletedCount());
@@ -66,8 +70,14 @@ export default function FirstGameBridge({
       data-testid="first-game-bridge"
       data-variant={FIRST_GAME_BRIDGE_TREATMENT}
       data-to={dest.toMode}
+      data-emphasis={emphasis}
       onClick={activate}
-      className="w-full min-h-14 rounded-neo border-3 border-neo-black bg-neo-lime text-neo-black shadow-hard font-neo-display font-black uppercase tracking-wide text-base sm:text-lg px-4 py-3 flex items-center justify-center gap-2 active:translate-x-px active:translate-y-px active:shadow-hard-pressed"
+      className={cn(
+        'w-full rounded-neo font-neo-display font-black uppercase tracking-wide flex items-center justify-center gap-2',
+        emphasis === 'primary'
+          ? 'min-h-14 border-3 border-neo-black bg-neo-lime text-neo-black shadow-hard text-base sm:text-lg px-4 py-3 active:translate-x-px active:translate-y-px active:shadow-hard-pressed'
+          : 'min-h-11 border-2 border-neo-lime bg-transparent text-neo-lime text-sm px-4 py-2 active:translate-y-px',
+      )}
     >
       <Icon className="h-5 w-5 shrink-0" aria-hidden />
       <span>{t(dest.labelKey)}</span>
