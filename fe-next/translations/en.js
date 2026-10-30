@@ -178,7 +178,7 @@ const en = {
     },
     "resources": {
       "heading": "Explore Education Modes",
-      "subhead": "Pick the right format for your classroom — quick 1v1 duels or live whole-class multiplayer.",
+      "subhead": "Pick a format: quick 1v1 duels or live whole-class multiplayer.",
       "duelsTitle": "Vocabulary Duels (1v1)",
       "duelsDesc": "Pair students for 2-3 minute head-to-head word battles.",
       "classroomTitle": "Live Classroom Game",
@@ -191,7 +191,7 @@ const en = {
     },
     "guides": {
       "heading": "Teacher Guides",
-      "subhead": "Deep-dive landing pages on specific use cases, with comparison tables, FAQs, and free word lists.",
+      "subhead": "In-depth guides for specific classroom uses, with comparison tables, FAQs and free word lists.",
       "vocabBadge": "Guide",
       "vocabTitle": "Vocabulary Games for the Classroom",
       "vocabDesc": "No signup, 6 languages, free for teachers — vs Quizlet/Kahoot/Wordwall.",
@@ -209,18 +209,18 @@ const en = {
       "sightDesc": "Flashcards, matching & spelling drills built from your own Dolch/Fry list.",
       "schoolsBadge": "For Schools",
       "schoolsTitle": "LexiClash for Schools",
-      "schoolsDesc": "Free for teachers — Schools & departments from $49 per teacher / year, no student logins.",
+      "schoolsDesc": "Free for teachers. School and department plans from $49 per teacher a year, no student logins.",
       "listsBadge": "Free",
       "listsTitle": "Word lists",
       "listsDesc": "Curriculum word lists by grade and subject, ready to play in class."
     },
     "moments": {
       "heading": "Pick your moment",
-      "subhead": "Not a feature list — the specific situations teachers actually search for, each with a plan you can run today."
+      "subhead": "The situations teachers actually search for, each with a plan you can run today."
     },
     "learner": {
       "heading": "English-learner games",
-      "subhead": "Age bands and topic drills for Spanish-English classrooms — the same teacher-led shape as the ESL page that already ranks."
+      "subhead": "Age bands and topic drills for Spanish-English classrooms, run the same teacher-led way as our ESL games."
     },
     "pro": {
       "rosterPro": "Unlimited students on your roster",
@@ -332,7 +332,7 @@ const en = {
       },
       "error": {
         "power_ups_off": "Power-ups are off for this class",
-        "between_rounds": "Double cash works during a round",
+        "between_rounds": "Double cash only works during a round",
         "insufficient_cash": "Not enough cash yet",
         "already_active": "Already active",
         "already_held": "You already hold one",
@@ -340,7 +340,7 @@ const en = {
         "not_signed_in": "Sign in to use the shop",
         "no_game": "No live round right now",
         "not_seated": "Join this class round to use the shop",
-        "unavailable": "Economy is unavailable right now",
+        "unavailable": "The shop isn't available right now",
         "no_hint": "No hint to use",
         "not_teacher": "Only the teacher can change this",
         "no_lesson_words": "No lesson words for a hint",
@@ -447,7 +447,7 @@ const en = {
     "arc": {
       "goal": "{goal}% goal",
       "word": {
-        "attempts": "Right {correct} of {count}",
+        "attempts": "{correct} of {count} right",
         "lastCorrect": "last time: right",
         "lastMissed": "last time: missed"
       },
@@ -458,7 +458,7 @@ const en = {
         "roundName": "Review for {name}: round {n} ({date})",
         "done": "Done: {count} words for {name}, in three review rounds.",
         "already": "These review rounds were already assigned today.",
-        "nothing": "No missed words left to practise for this student."
+        "nothing": "No missed words left to practice for this student."
       }
     },
     "words": {
@@ -476,7 +476,7 @@ const en = {
       "moreInReport": "+{count} more in the class report"
     },
     "pack": {
-      "noStudents": "Parent links need students. Share your class code; once students join, their links are made here."
+      "noStudents": "Parent links need students. Share your class code, and links appear here as students join."
     },
     "plans": {
       "freeNote": "No card, no time limit. Students always free.",
@@ -551,15 +551,15 @@ const en = {
       "metaTitleNoGrade": "{name}: {language} word list and class game",
       "metaTitleShort": "{grade} {name}: {language} word list",
       "metaTitleShortNoGrade": "{name}: {language} word list",
-      "metaDescription": "{count} {wordsIn} with {gloss}: {sample}… Play them as a live class game or practise solo. Free, no student accounts.",
-      "metaDescriptionPlain": "{count} {wordsIn}: {sample}… Play them as a live class game or practise solo. Free, no student accounts.",
-      "intro": "{count} {wordsIn} for {grade}, starting with {sample}. Put them on the big screen as a live class game, or practise solo right here. Every word is on this page, no sign-up needed to read it.",
-      "introNoGrade": "{count} {wordsIn}, starting with {sample}. Put them on the big screen as a live class game, or practise solo right here. Every word is on this page, no sign-up needed to read it.",
+      "metaDescription": "{count} {wordsIn} with {gloss}: {sample}… Play them as a live class game or practice solo. Free, no student accounts.",
+      "metaDescriptionPlain": "{count} {wordsIn}: {sample}… Play them as a live class game or practice solo. Free, no student accounts.",
+      "intro": "{count} {wordsIn} for {grade}, starting with {sample}. Put them on the big screen as a live class game, or practice solo right here. Every word is on this page, no sign-up needed to read it.",
+      "introNoGrade": "{count} {wordsIn}, starting with {sample}. Put them on the big screen as a live class game, or practice solo right here. Every word is on this page, no sign-up needed to read it.",
       "playClass": "Play with your class",
       "playClassSub": "Free teacher account · students join with a code",
-      "practiceSolo": "Practise solo",
+      "practiceSolo": "Practice solo",
       "practiceSoloSub": "Right here, no sign-up",
-      "modesTitle": "Three ways to practise it solo",
+      "modesTitle": "Three ways to practice it solo",
       "modes": {
         "grid": "Word grid",
         "gridSub": "Hunt the list words in a letter board",
@@ -594,12 +594,12 @@ const en = {
     },
     "practice": {
       "close": "Close",
-      "title": "Practise: {title}",
+      "title": "Practice: {title}",
       "pick": "Pick a game"
     },
     "hub": {
       "metaTitle": "Free word lists for the classroom, by grade and topic",
-      "metaDescription": "{lists} ready-to-play word lists in {languages} languages, {words} words. Pick a grade or a topic, then play any list as a live class game or practise solo.",
+      "metaDescription": "{lists} ready-to-play word lists in {languages} languages, {words} words. Pick a grade or a topic, then play any list as a live class game or practice solo.",
       "eyebrow": "Free library",
       "h1": "Word lists ready to play",
       "intro": "{lists} lists and {words} words, every one of them visible right here. Pick a grade or a topic, then put the list on the big screen as a live class game. Students join with a code, no accounts.",
@@ -615,13 +615,13 @@ const en = {
         "sv": "Swedish word lists",
         "ja": "Japanese word lists"
       },
-      "langMetaDescription": "{lists} lists of {wordsIn} sorted by grade, {words} words in all. Play any list as a live class game or practise solo. Free.",
+      "langMetaDescription": "{lists} lists of {wordsIn} sorted by grade, {words} words in all. Play any list as a live class game or practice solo. Free.",
       "langIntro": "{lists} lists of {wordsIn}, sorted by grade. Open one to see every word, then play it with your class or on your own.",
       "gradeTitle": "{grade} {language} word lists",
       "gradeMetaDescription": "{lists} {language} word lists for {grade}: {topics}. Ready to play as a class game.",
       "gradeIntro": "{lists} lists for {grade}, {words} words in all. Open a list to see every word, or start a game with it straight away.",
       "topicTitle": "Word lists: {topic}",
-      "topicMetaDescription": "{lists} word lists about {topic} across grades and languages, {words} words in all. Play any of them as a live class game or practise solo.",
+      "topicMetaDescription": "{lists} word lists about {topic} across grades and languages, {words} words in all. Play any of them as a live class game or practice solo.",
       "topicIntro": "{lists} lists about {topic}, from the youngest grades up. Open one to see every word, then play it with your class.",
       "otherGrades": "Other grades",
       "otherTopics": "Other topics",
@@ -796,7 +796,7 @@ const en = {
         "chips": "Chips",
         "details": "Details"
       },
-      "emptyWords": "Your words will pop in here.",
+      "emptyWords": "Words you add will show up here.",
       "removeWord": "Remove {word}",
       "noDefinition": "No definition yet",
       "word": "Word",
@@ -1058,7 +1058,7 @@ const en = {
         "start": "Start run",
         "score": "{correct} / {total}",
         "bestStreak": "Best streak {streak} · {points} pts",
-        "xpNotSaved": "Couldn't save XP this time. Your boxes still moved.",
+        "xpNotSaved": "Couldn't save XP this time. Your word progress still counted.",
         "streak": "Streak {count}",
         "progress": "{n} / {total}",
         "pickMeaning": "What does it mean?",
@@ -1145,7 +1145,7 @@ const en = {
       "mascotWorkshop": "Let's build some words!",
       "mascotNext": "This way to your next lesson!",
       "mascotSolo": "A quick warm-up? I'm in!",
-      "streakAtRiskAria": "Your streak is in danger — play today to save it",
+      "streakAtRiskAria": "Your streak is at risk. Play today to save it",
       "chestComeBack": "Come back tomorrow for another chest",
       "chestCollect": "Collect"
     },
@@ -1975,7 +1975,7 @@ const en = {
       "questionsAvailable": "{count} questions",
       "focusLocked": "Needs more word data",
       "noQuestions": "These words can't make a quiz yet. Add a definition to at least four of them in the word list editor, then come back.",
-      "enrichHint": "Greyed-out skills need data your word list doesn't have yet. Add synonyms, antonyms or an example sentence to your words in the word list editor to unlock them.",
+      "enrichHint": "Greyed-out skills need data your word list doesn't have yet. Add synonyms, antonyms or an example sentence to your words in the word list editor to turn them on.",
       "questionCount": "How many questions?",
       "cappedNotice": "These words can make {count} questions, so that is how long the round will be.",
       "secondsPerQuestion": "Time per question",
@@ -2274,7 +2274,7 @@ const en = {
       "ledgerShort": "{name} is still {n} up on you.",
       "ledgerBlocked": "{name}'s shield ate your payback. Debt settled.",
       "revengeBonus": "+50% payback",
-      "revengeFree": "Free — they hit you first",
+      "revengeFree": "Free: they hit you first",
       "revengePill": "Revenge ×{n}",
       "blocked": "Shield blocked!",
       "blockedBody": "{name}'s shield ate the whole swing. You still pocket the scrap.",
@@ -2291,7 +2291,7 @@ const en = {
       "raidError": "Something went sideways. Try again.",
       "revengeTitle": "Payback time",
       "revengeBody": "{name} smashed your {plot} and ran off with {coins} coins.",
-      "revengeBodyBlocked": "{name} swung at your tower — your shield held.",
+      "revengeBodyBlocked": "{name} swung at your tower. Your shield held.",
       "revenge": "Revenge",
       "dismiss": "Not now",
       "moreRaids": "+{n} more raids waiting",
@@ -2483,14 +2483,14 @@ const en = {
     "changeWord": "CHANGE WORD",
     "editHint": "Tap a letter you used to edit the word",
     "bestFlag": "BEST",
-    "leaveConfirm": "Leave this climb? You can resume this tab, but a daily run is one per day.",
+    "leaveConfirm": "Leave this climb? You can resume in this tab, but daily runs are one per day.",
     "leaveDaily": {"title": "Leave today's climb?", "desc": "Leaving ends today's climb. Your height counts on today's board. The next daily opens tomorrow."},
     "leaveFree": {"title": "Leave this climb?", "desc": "Leaving ends this run and cashes out your coins. Start a new one anytime."},
     "leaveKeep": "Keep climbing",
     "leaveGo": "Leave",
     "dailyPlayed": "Today's tower is done. Come back tomorrow.",
     "dailyRank": "You're #{rank} today",
-    "recapAlt": "Tower recap: {floors} floors, {m} metres",
+    "recapAlt": "Tower recap: {floors} floors, {m} meters",
 "dailyResults": { "headline": "Floor {n}!",
 "floors": "Floors",
 "height": "Height",
@@ -2592,8 +2592,8 @@ const en = {
     "title": "LexiClash — Free Multiplayer Word Game, 2-20 Players, 8 Modes (No Download)",
     "description": "Free multiplayer word game — 2-20 players, 8 modes, 6 languages. Real-time word battles like Boggle meets Wordle, no download, no signup. Daily Word Wheel + Word Hunt + Adventure mode. Play instantly →",
     "keywords": "free word game online, multiplayer word game, boggle online free, wordle multiplayer, scrabble alternative online, word game with friends, real-time word battle, party word game, ruzzle alternative, word hunt game, competitive word game, best word game app, online boggle with friends, word puzzle multiplayer, family word game, team building word game, kahoot alternative word game, ESL word game, vocabulary builder game, brain training word game, word race game online, free browser game no download, free boggle online no download, word game you type in words, games like boggle online free, word making games, boggle game free no download, word game like boggle free, word game no download needed, word battle game online, daily word puzzle free, word game for groups, word game for parties online, games like wordle multiplayer, word RPG game, adventure word game, word game on phone free, competitive word puzzle",
-    "ogTitle": "LexiClash - Free Multiplayer Word Game | Better Than Boggle & Wordle",
-    "ogDescription": "🎮 The best free word game for groups! Race friends in real-time word battles ⚡ Like Boggle meets Wordle - but multiplayer 🔥 No download, play instantly. Perfect for parties!",
+    "ogTitle": "LexiClash - Free Multiplayer Word Game | Boggle Meets Wordle",
+    "ogDescription": "🎮 A free word game for groups! Race friends in real-time word battles ⚡ Like Boggle meets Wordle - but multiplayer 🔥 No download, play instantly. Perfect for parties!",
     "twitterTitle": "LexiClash - Free Multiplayer Word Game | Play With Friends Online",
     "twitterDescription": "Challenge friends to real-time word battles! 🎮 Find words fast, build combos, climb leaderboards. Free to play, no download. Try now! 🔥",
     "locale": "en_US",
@@ -2616,7 +2616,7 @@ const en = {
     },
     "studentProfile": {
       "title": "Student Profile, Learning Progress & Achievements",
-      "description": "View your LexiClash student profile, XP progress, lesson completion, and educational achievements. Track your learning journey and vocabulary mastery.",
+      "description": "View your LexiClash student profile, XP progress, lesson completion, and educational achievements. Track your learning progress and vocabulary mastery.",
       "ogTitle": "Student Profile - LexiClash Education",
       "ogDescription": "Track your learning progress, achievements, and vocabulary mastery in LexiClash Education."
     },
@@ -2628,7 +2628,7 @@ const en = {
     },
     "privacy": {
       "title": "Privacy Policy - How We Protect Your Data",
-      "description": "LexiClash Privacy Policy - Learn how we collect, use, and protect your data. We prioritize your privacy and use industry-standard security measures.",
+      "description": "LexiClash Privacy Policy - Learn how we collect, use, and protect your data. We take your privacy seriously.",
       "ogTitle": "Privacy Policy - LexiClash",
       "ogDescription": "Learn how LexiClash protects your privacy and handles your data securely."
     },
@@ -2673,7 +2673,7 @@ const en = {
       "title": "Teacher Pro - Unlimited Classes & Students | LexiClash",
       "description": "Upgrade to Teacher Pro for unlimited classrooms and unlimited students per class. $9/month. Manage your entire school vocabulary program with one subscription.",
       "ogTitle": "Upgrade to Teacher Pro - Unlimited Classes",
-      "ogDescription": "Manage unlimited classrooms and students for $9/month. Scale your classroom vocabulary teaching with LexiClash Pro."
+      "ogDescription": "Manage unlimited classrooms and students for $9/month with LexiClash Teacher Pro."
     },
     "refund": {
       "title": "Refund & Cancellation Policy - LexiClash",
@@ -2708,7 +2708,7 @@ const en = {
     },
     "wordTowerV2": {
       "title": "Word Tower - Stack Words, Build a Tower | Free Game",
-      "description": "Stack words to build the tallest tower! Chain combos, earn coins, unlock upgrades, and raid rivals. Leaderboard play, free, no download required.",
+      "description": "Stack words to build the tallest tower! Chain combos, earn coins, unlock upgrades, and raid rivals. Compete on the leaderboard. Free, no download required.",
       "ogTitle": "Word Tower - Physics Word Puzzle Game",
       "ogDescription": "Stack words to build your tower! Chain combos, unlock power-ups, and compete. Free game!",
       "playLabel": "Play"
@@ -2833,8 +2833,8 @@ const en = {
       },
       "detailsOptional": "Add details (optional)",
       "submit": "Submit report",
-      "success": "Thanks — our team will review this.",
-      "error": "Couldn't submit report. Please try again."
+      "success": "Thanks. Our team will take a look.",
+      "error": "Couldn't send the report. Try again."
     },
     "friends": {
       "title": "Friends & Social - Play Word Games With Friends | LexiClash",
@@ -2850,13 +2850,13 @@ const en = {
     },
     "referrals": {
       "title": "Invite Friends & Earn Rewards | LexiClash Referrals",
-      "description": "Invite friends to LexiClash and earn XP rewards! Share your referral link, track invites, and unlock exclusive bonuses.",
+      "description": "Invite friends to LexiClash and earn XP rewards! Share your referral link, track invites, and collect bonus perks.",
       "ogTitle": "Referrals - Invite Friends, Earn Rewards",
-      "ogDescription": "Invite friends and earn XP rewards. Share your link and unlock exclusive bonuses!"
+      "ogDescription": "Invite friends and earn XP rewards. Share your link and collect bonus perks!"
     },
     "quests": {
       "title": "Daily Quests & Weekly Challenges | LexiClash",
-      "description": "Complete daily quests and weekly challenges to earn coins, XP, and exclusive rewards. New missions every day to keep you engaged!",
+      "description": "Complete daily quests and weekly challenges to earn coins, XP, and exclusive rewards. New missions every day, so there's always a next one!",
       "ogTitle": "Quests & Challenges - LexiClash",
       "ogDescription": "Complete daily quests and weekly challenges for coins, XP, and exclusive rewards!"
     },
@@ -2916,7 +2916,7 @@ const en = {
     },
     "wordForge": {
       "title": "Word Forge - Craft Words & Build Power | LexiClash",
-      "description": "Forge powerful words in this strategic word-crafting mode! Upgrade your abilities, unlock new powers, and master the art of word building.",
+      "description": "Forge powerful words in this strategy mode! Upgrade your abilities, unlock new powers, and build your own style.",
       "ogTitle": "Word Forge - Strategic Word Crafting",
       "ogDescription": "Forge words, upgrade abilities, and master strategic word building!"
     },
@@ -2999,14 +2999,14 @@ const en = {
       "ogDescription": "Fight 5 word bosses back-to-back — health carries over. Can you clear them all?"
     },
     "adventureEndless": {
-      "title": "Endless Mode — Procedural Word Floors With Escalating Difficulty",
+      "title": "Endless Mode — Word Floors That Keep Getting Harder",
       "description": "How far can you go? Endless procedurally generated word puzzles with escalating difficulty. Each floor harder than the last in LexiClash Adventure.",
       "ogTitle": "Endless Mode - LexiClash Adventure",
       "ogDescription": "Infinite procedural word floors — how deep can you go?"
     },
     "adventureSkills": {
       "title": "Skill Tree — Unlock Adventure Word Powers",
-      "description": "Unlock and upgrade skills to enhance your LexiClash Adventure gameplay. Choose your build, invest skill points, and customize your word-finding strategy.",
+      "description": "Unlock and upgrade skills in LexiClash Adventure. Pick your build, spend skill points, and play your way.",
       "ogTitle": "Skill Tree - LexiClash Adventure",
       "ogDescription": "Unlock skills and customize your adventure build!"
     },
@@ -3020,7 +3020,7 @@ const en = {
   "cookieConsent": {
     "title": "Care for a cookie? 🍪",
     "mascotAlt": "LexiClash mascot happily munching a cookie",
-    "message": "Our mascot's already munching. We use cookies for analytics and for ads worth your time. Hit Accept All and let's play, or customize below.",
+    "message": "Our mascot's already munching. We use cookies for analytics and ads. Hit Accept all and let's play, or customize below.",
     "accept": "Accept all",
     "decline": "Decline all",
     "customize": "Customize",
@@ -3032,7 +3032,7 @@ const en = {
       "essential": "Essential",
       "essentialDesc": "Required for site functionality (login, preferences, game state)",
       "analytics": "Analytics",
-      "analyticsDesc": "Help us understand how you use the site to improve your experience",
+      "analyticsDesc": "Show us how you use the site so we can make it better",
       "advertising": "Advertising",
       "advertisingDesc": "Show relevant ads via Google AdMob"
     }
@@ -3175,13 +3175,13 @@ const en = {
     "advancedSettings": "More options",
     "settings": "Settings",
     "tapToDismiss": "Tap to close",
-    "tapToClose": "Tap to continue",
+    "tapToClose": "Tap to close",
     "tapToContinue": "Tap to continue",
     "copied": "Copied",
     "copy": "Copy",
     "noData": "Nothing here yet",
     "rotateLandscape": "Flip your phone",
-    "dontShowAgain": "Got it",
+    "dontShowAgain": "Don't show again",
     "rank": "Rank",
     "menu": "Menu",
     "showPreview": "Show preview",
@@ -3349,7 +3349,7 @@ const en = {
   },
   "game": {
     "doubleClickToSubmit": "Double-click last letter to submit",
-    "boardLocked": "Wait for GO — this board isn't live yet",
+    "boardLocked": "Wait for GO. This board isn't live yet",
     "foundByOther": "Found by ${player}",
     "combo": "Combo",
     "comboHint": "Find words fast to build a combo",
@@ -3515,7 +3515,7 @@ const en = {
     "soundEffects": "Sound effects",
     "accessibility": "Accessibility",
     "cosyMode": "Calm Mode",
-    "cosyModeDescription": "Gentler visuals, no flashing timers, no confetti. Calm acknowledgements instead.",
+    "cosyModeDescription": "Gentler visuals, no flashing timers, no confetti. Calm confirmations instead.",
     "reduceMotion": "Reduce motion",
     "reduceMotionDescription": "Limit animations",
     "fireRoundLights": "Fire round lights",
@@ -3570,13 +3570,13 @@ const en = {
   "deleteAccountWeb": {
     "title": "Delete account",
     "subtitle": "Permanently remove your account and data",
-    "enterEmail": "Enter the email address associated with your LexiClash account. We'll send you a verification link.",
+    "enterEmail": "Enter the email on your LexiClash account. We'll send you a verification link.",
     "emailPlaceholder": "your@email.com",
     "sendLink": "Send verification link",
     "sending": "Sending...",
     "sendLinkError": "Couldn't send the verification link. Try again.",
     "checkEmail": "Check your email",
-    "checkEmailDescription": "Verification link sent. Click it, then return here to confirm deletion.",
+    "checkEmailDescription": "Link sent. Tap it, then come back here to confirm deletion.",
     "deleted": "Account deleted. All your data is gone.",
     "backToHome": "Back to home"
   },
@@ -3653,7 +3653,7 @@ const en = {
     "selectNone": "Clear",
     "selectedCount": "{count} of {total} selected",
     "noMatch": "No students match that search.",
-    "rosterFailed": "Couldn't load the student list. Please try again.",
+    "rosterFailed": "Couldn't load the student list. Try again.",
     "make": "Make links for {count} selected",
     "preview": "Preview",
     "previewFor": "Preview {name}'s report",
@@ -3795,21 +3795,21 @@ const en = {
     "gameNotInProgress": "Game hasn't started yet",
     "gameAlreadyStarted": "Game already in progress",
     "roomFull": "Room's full. Try another",
-    "invalidGameCode": "Invalid game code format",
+    "invalidGameCode": "That code doesn't look right",
     "gameClosed": "This room has been closed",
     "notInGame": "You're not in this game",
     "hostOnly": "Only the host can do that",
     "alreadyInGame": "You're already in a game",
     "kicked": "You were kicked from the game",
-    "invalidUsername": "Invalid username format",
+    "invalidUsername": "That name won't work. Try another.",
     "invalidWord": "Not a valid word",
     "wordTooShort": "Too short. Add more letters.",
     "wordNotOnBoard": "Can't make that word on this board",
     "wordAlreadyFound": "Already found that one",
     "submissionFailed": "Couldn't submit the word. Try again.",
     "validationFailed": "Hmm, that doesn't look right",
-    "invalidRequest": "Invalid request",
-    "missingField": "Missing required info",
+    "invalidRequest": "Hmm, that request didn't work",
+    "missingField": "Fill in everything first",
     "ipBlocked": "Too many requests. Take a breather.",
     "authRequired": "Sign in to continue",
     "invalidToken": "Session invalid. Sign in again",
@@ -3969,7 +3969,7 @@ const en = {
     "noRooms": "No rooms. Create one.",
     "roomsList": "Rooms",
     "players": "players",
-    "host": "Room",
+    "host": "Host",
     "joiningRoom": "Joining",
     "wantToHostOrJoinOther": "Join another room?",
     "clearAndRestart": "Start over",
@@ -4465,7 +4465,7 @@ const en = {
     "switchToPlayer": "Switch to player mode",
     "viewOnlyBadge": "TV Mode · Host watches",
     "tryPracticeRound": "Try a practice round (bots)",
-    "practiceRoundFailed": "Could not add practice players. Check your connection and try again."
+    "practiceRoundFailed": "Couldn't add practice players. Check your connection and try again."
   },
   "tvResults": {
     "installHeading": "TAKE IT HOME 📱",
@@ -4719,7 +4719,7 @@ const en = {
     "foundByOther": "Found by ${player}",
     "alreadyFound": "Already found",
     "wordNotOnBoard": "Not on board",
-    "wordNotInList": "Word not available",
+    "wordNotInList": "Not in the word list",
     "roomClosed": "Room closed",
     "exitConfirmation": "Exit room?",
     "exitWarning": "Bail now? You'll lose your progress in this game.",
@@ -5700,7 +5700,7 @@ const en = {
     "tips": {
       "tip1": "Start with short words to build momentum",
       "tip2": "Swipe diagonally for more letter combinations",
-      "tip4": "Long words score exponentially more points"
+      "tip4": "Long words pile on the points"
     },
     "letters": "letters",
     "pts": "pts",
@@ -5732,7 +5732,7 @@ const en = {
       "noBonus": "No bonus",
       "tryIt": "Simulate combo",
       "building": "Building combo...",
-      "tip": "Submit words within 5 seconds of each other to maintain your combo"
+      "tip": "Submit words within 5 seconds of each other to keep your combo going"
     },
     "xp": {
       "howToEarn": "How to earn XP",
@@ -6047,7 +6047,7 @@ const en = {
     },
     "FIRST_BLOOD": {
       "name": "First Blood",
-      "description": "Drew first word"
+      "description": "Found first word"
     },
     "SPEED_DEMON": {
       "name": "Speed Demon",
@@ -6251,7 +6251,7 @@ const en = {
     },
     "duelWinner": {
       "name": "Duel Winner",
-      "description": "Win duels against opponents"
+      "description": "Win duels"
     },
     "practiceMaster": {
       "name": "Practice Master",
@@ -6259,7 +6259,7 @@ const en = {
     },
     "streakLegend": {
       "name": "Streak Legend",
-      "description": "Maintain an impressive streak"
+      "description": "Keep a seriously long streak alive"
     },
     "secretWord": {
       "name": "Secret Word",
@@ -6400,7 +6400,7 @@ const en = {
     "compactLevel": "Lv",
     "canPrestige": "Prestige available!",
     "prestigeModal": {
-      "title": "Prestige system",
+      "title": "Prestige",
       "achieved": "Prestige Achieved!",
       "rewardsUnlocked": "Rewards unlocked!",
       "warning": "Warning",
@@ -6474,7 +6474,7 @@ const en = {
       "subtitleUrgency": "Don't lose this win. Sign up to keep it.",
       "subtitleValueProp": "Track your streak and unlock daily challenges.",
       "quickSave": "Takes 10 seconds. Keep this win forever.",
-      "benefitsTitle": "Unlock:",
+      "benefitsTitle": "You get:",
       "benefits": {
         "trackProgress": "Track your progress",
         "leaderboard": "Compete on leaderboards",
@@ -6523,7 +6523,7 @@ const en = {
         "protectStreak": "Protect your streak",
         "syncDevices": "Sync across devices",
         "trackStats": "Track your stats",
-        "allTimeLeaderboard": "Join all-time leaderboard"
+        "allTimeLeaderboard": "Join the all-time leaderboard"
       },
       "autoSaveNote": "Auto-saved after signup",
       "maybeLater": "Later"
@@ -6567,7 +6567,7 @@ const en = {
       "passwordPlaceholder": "Password (8+ characters)",
       "signUpButton": "Create account",
       "checkEmail": "Check your email to verify your account.",
-      "emailInUse": "This email is already registered",
+      "emailInUse": "That email already has an account",
       "emailRequired": "Email is required",
       "invalidEmail": "Enter a valid email address",
       "emailTooLong": "That email is too long",
@@ -6999,7 +6999,7 @@ const en = {
     "parentEmail": "Parent/Guardian Email",
     "parentEmailHint": "We'll send a confirmation to this email",
     "childAge": "Child's Age",
-    "childAgeHint": "Select your age",
+    "childAgeHint": "Pick the child's age",
     "agreeTerms": "I consent to data collection for educational purposes",
     "agreeTermsHint": "Required to use educational features",
     "submit": "Submit consent",
@@ -7052,8 +7052,8 @@ const en = {
         "action": "Continue"
       },
       "error": {
-        "invalidEmail": "Please enter a valid email address",
-        "selectAge": "Please select the child's age",
+        "invalidEmail": "Enter a valid email address",
+        "selectAge": "Select the child's age",
         "acceptTerms": "You must accept the terms to continue",
         "submitFailed": "Couldn't submit consent. Try again."
       }
@@ -7066,7 +7066,7 @@ const en = {
     },
     "revoke": {
       "title": "Revoke Consent",
-      "message": "Are you sure you want to revoke consent? This will disable educational features.",
+      "message": "Revoke consent? This turns off the educational features.",
       "confirm": "Yes, revoke consent",
       "cancel": "Keep consent active"
     }
@@ -7581,7 +7581,7 @@ const en = {
     "pointsToGo": "points to go",
     "beat": "Beat",
     "youAreFirst": "You're #1!",
-    "keepItUp": "Keep playing to maintain your lead",
+    "keepItUp": "Keep playing to hold your lead",
     "players": "Players",
     "nearbyPlayers": "Nearby players",
     "points": "pts",
@@ -7727,7 +7727,7 @@ const en = {
         "title": "Create Word Pack",
         "close": "Close",
         "nameLabel": "Pack Name",
-        "namePlaceholder": "Enter a name for your word pack",
+        "namePlaceholder": "Name your word pack",
         "descriptionLabel": "Description",
         "descriptionPlaceholder": "Describe your word pack",
         "languageLabel": "Language",
@@ -7738,7 +7738,7 @@ const en = {
         "addWord": "Add",
         "duplicate": "Already added",
         "wordAdded": "Word added",
-        "wordInvalid": "Invalid word",
+        "wordInvalid": "Not a valid word",
         "minimum": "minimum",
         "bulkPaste": "Bulk paste",
         "bulkPlaceholder": "Paste words, one per line",
@@ -8210,7 +8210,7 @@ const en = {
       "whatIsShort": "Free multiplayer word battles in your browser. Find words, build combos, crush your friends. No downloads, no signup.",
       "featuresTitle": "Why players love LexiClash",
       "feature1Title": "Real-time multiplayer",
-      "feature1Desc": "Compete head-to-head with 2-20 players simultaneously. Create a room, share the code, and play instantly.",
+      "feature1Desc": "Go head-to-head with 2-20 players at once. Create a room, share the code, and play instantly.",
       "feature2Title": "Daily Challenges",
       "feature2Desc": "Same puzzle for everyone worldwide, every day. Track your streak and share emoji results, just like Wordle.",
       "feature3Title": "Adventure Mode",
@@ -8248,11 +8248,11 @@ const en = {
       "faq1Q": "Is LexiClash really free?",
       "faq1A": "Yes, completely free. No hidden paywalls, no premium subscriptions. We sustain the game through non-intrusive advertising that respects your privacy.",
       "faq2Q": "Do I need to create an account?",
-      "faq2A": "No. You can play as a guest instantly. Creating an account (via Google or Discord) unlocks features like leaderboard rankings, achievement tracking, and progress saving across devices.",
+      "faq2A": "No. You can play as a guest instantly. Creating an account (Google, Discord, or email) adds leaderboard rankings, achievement tracking, and progress saving across devices.",
       "faq3Q": "What languages are supported?",
       "faq3A": "LexiClash supports English, Hebrew, Swedish, Japanese, Spanish, and Russian. Each language has its own curated dictionary, daily challenges, and leaderboards. You can switch languages anytime from the settings menu.",
       "faq4Q": "Can I play on my phone?",
-      "faq4A": "Absolutely. LexiClash is fully responsive and works on any modern mobile browser. Swipe letters to form words. The touch controls are built for mobile play.",
+      "faq4A": "Yes. LexiClash works in any modern mobile browser. Swipe letters to form words. Touch controls are built for phones.",
       "faq5Q": "Is it safe for children?",
       "faq5A": "Yes. LexiClash is designed for players ages 6 and up. We comply with COPPA regulations, serve only non-personalized ads, and do not track children's browsing behavior.",
       "faq6Q": "Can I create my own board?",
@@ -8358,7 +8358,7 @@ const en = {
     "fewWordsFoundSingular": "Found 1 word",
     "achievementsNotSaved": "Solo games don't count toward your profile.",
     "botWordsFound": "Bot words found",
-    "noWordsToShow": "Word details not available",
+    "noWordsToShow": "No word details to show",
     "wordsFound": "Words found",
     "noWordsYet": "No words yet",
     "showMore": "+{count} more",
@@ -8464,7 +8464,7 @@ const en = {
       "subtitle": "Master all 3 modes to unlock the real game",
       "progress": "{count}/{total} complete",
       "tip": {
-        "start": "Start with Word Hunt. It teaches clue reading",
+        "start": "Start with Word Hunt. It teaches you to read clues",
         "one": "Nice start! Classic next: pure speed training",
         "two": "Almost there! Survival mode is the toughest test",
         "done": "All modes mastered. Time for real competition!"
@@ -8685,13 +8685,13 @@ const en = {
     "readyToTestDesc": "Make a room. Drag your friends in. Find out who's actually good.",
     "startPlaying": "Start playing now",
     "backToHome": "Back to home",
-    "joinOrCreateDesc": "Create your own game room or join an existing one using a room code. Share the code with friends to invite them instantly.",
-    "raceAgainstTimeDesc": "When the game starts, you have a limited time (typically 90 seconds) to find as many valid words as possible from the letter grid.",
+    "joinOrCreateDesc": "Make a room or join one with a code. Share the code and your friends are in.",
+    "raceAgainstTimeDesc": "The clock starts and you get about 90 seconds to find as many valid words as you can in the grid.",
     "competeAndWinDesc": "The player with the highest score when time runs out wins! Play multiple rounds to crown the word champion.",
     "wordLength": "Word Length",
     "points": "Points",
     "example": "Example",
-    "proTip": "Pro Tip",
+    "proTip": "Power Tip",
     "proTipText": "Focus on finding 5-7 letter words for the best point-to-time ratio. 8+ letter words pay massive points, but they're rare and slow to find.",
     "scanPrefixes": "Scan for prefixes and suffixes",
     "scanPrefixesDesc": "Look for common word parts like \"UN-\", \"RE-\", \"-ING\", \"-ED\", and \"-TION\". These can help you quickly identify longer words hiding in the grid.",
@@ -8699,8 +8699,8 @@ const en = {
     "thinkWordFamiliesDesc": "When you find a word like \"PLAY\", immediately check for variations: \"PLAYS\", \"PLAYER\", \"PLAYING\", \"PLAYED\". This technique can quickly multiply your score.",
     "dontOverthink": "Don't overthink short words",
     "dontOverthinkDesc": "Submit obvious 3-4 letter words quickly without hesitation. They add up fast and give you a solid foundation while you search for longer, higher-scoring words.",
-    "soloVsBotsDesc": "Compete against AI opponents of varying difficulty levels. Good for practicing before you face real players.",
-    "practiceModeDesc": "Take your time with no timer. Good for learning new words and exploring the grid.",
+    "soloVsBotsDesc": "Take on AI rivals, easy to brutal. Great practice before you face real players.",
+    "practiceModeDesc": "No timer, no rush. Learn new words and explore the grid.",
     "challengeModeDesc": "Beat your old self. Watch the score climb."
   },
   "social": {
@@ -8745,7 +8745,7 @@ const en = {
     "journeyDone": "Done",
     "journeyStep": "Step",
     "journeyStepOf": "Step {n}/{total}",
-    "journeyAllRequiredDone": "You've cleared today's quests! Bonus rounds are optional",
+    "journeyAllRequiredDone": "Today's quests: cleared! Bonus rounds are extra",
     "backToDailyHub": "Back to daily",
     "skipOptional": "Skip",
     "bonusQuest": "Bonus",
@@ -8850,7 +8850,7 @@ const en = {
     "signUpToAppear": "Sign up to appear on the leaderboard",
     "youreOnTheBoard": "You're on the leaderboard! 🎉",
     "achievementRank1": "You're #1 today! 🏆",
-    "achievementTopTen": "You placed #{{rank}} — top 10%! 🔥",
+    "achievementTopTen": "You placed #{{rank}}, top 10%! 🔥",
     "achievementRanked": "You placed #{{rank}} today! 🎉",
     "totalAttempts": "attempts",
     "yourPosition": "Your rank",
@@ -8889,7 +8889,7 @@ const en = {
         "trackResults": "See who beats your challenge"
       },
       "ctaButton": "Sign up to start creating",
-      "socialProof": "Plenty of boards being built right now."
+      "socialProof": "Build one and see who can beat it."
     },
     "createChallengeTitle": "Create challenge",
     "chooseBoardSize": "Choose board size",
@@ -8943,9 +8943,9 @@ const en = {
       "cta": "Think you can beat this?",
       "header": "LexiClash Daily #{number}",
       "stats": "{words} words • {score} pts",
-      "streak": "🔥 {days} day streak!",
-      "streakMilestone7": "🔥 One week streak! Can you keep it going?",
-      "streakMilestone30": "🔥 30 day streak! Not bad."
+      "streak": "🔥 {days}-day streak!",
+      "streakMilestone7": "🔥 One-week streak! Can you keep it going?",
+      "streakMilestone30": "🔥 30-day streak! Not bad."
     },
     "rival": {
       "header": "Beat Me Challenge",
@@ -8954,8 +8954,8 @@ const en = {
       "youLose": "{name} wins this round",
       "tie": "It's a tie! 🤝"
     },
-    "errorWordTooShort": "Word must be at least {min} letters",
-    "errorWordTooLong": "Word must be at most {max} letters",
+    "errorWordTooShort": "Use at least {min} letters",
+    "errorWordTooLong": "Use {max} letters or fewer",
     "wordPlaceholder": "Enter a word...",
     "screenshotProtection": "Return to continue playing",
     "trainingSuggestion": {
@@ -9195,7 +9195,7 @@ const en = {
         },
         {
           "q": "Are word wheel puzzles free online here?",
-          "a": "Yes — every word wheel puzzle is 100% free. No paywall, no premium tier, no signup. Just open the page and play."
+          "a": "Yes. Every word wheel puzzle is 100% free. No paywall, no premium tier, no signup. Just open the page and play."
         }
       ]
     },
@@ -9256,17 +9256,17 @@ const en = {
     "submit": "SUBMIT",
     "alreadyFound": "Already found",
     "alreadyFoundBonus": "Found again (+{points})",
-    "notInDictionary": "Not a valid word",
-    "missingCenter": "Must include center letter ({letter})",
+    "notInDictionary": "Not a word",
+    "missingCenter": "Use the center letter ({letter})",
     "tooShort": "Too short (min {min} letters)",
-    "invalidLetters": "Can only use wheel letters",
+    "invalidLetters": "Wheel letters only",
     "allLettersUsed": "ALL LETTERS!",
     "almostAllLetters": "ALMOST ALL!",
     "streakBadge": "{count} in a row!",
     "onFireBadge": "{count} on fire!",
     "closeRace": "Close race",
     "inputPlaceholder": "Type a word...",
-    "firstHint": "Tap or swipe — every word uses {letter}",
+    "firstHint": "Tap or swipe. Every word uses {letter}",
     "tapLetters": "Tap or drag letters to build a word",
     "tapToRemove": "Tap an added letter again to remove it",
     "doubleTapToSubmit": "Double-tap a letter to submit",
@@ -9387,8 +9387,8 @@ const en = {
     "foundTarget": "found the target word",
     "submit": "Submit",
     "lifeBar": "Life bar",
-    "duplicate": "Duplicate word",
-    "invalid": "Invalid word",
+    "duplicate": "Already found",
+    "invalid": "Not a word",
     "multiplayer": {
       "targetWord": "Target Word",
       "firstFinder": "First Finder!",
@@ -9479,7 +9479,7 @@ const en = {
       "rareLetter": "A word with '{letter}'? Rare letters, rarer skill.",
       "longWord": "{length}-letter target? That's a proper challenge.",
       "tipLoss": "Next round: scout 2–3 short side-words FIRST. Free letters, free life, cheaper guesses.",
-      "tipExploration": "{words} side-words. Every extra one = +10 pts, up to 20. Easy +{gain} waiting next time.",
+      "tipExploration": "{words} side-words found. Each extra one is +10 pts, up to 20. Easy +{gain} next time.",
       "tipSpeed": "Life crashed to {life}. Longer side-words heal faster: 7+ letters = +25 life. One chunky word ≈ +100 score.",
       "tipAccuracy": "{attempts} guesses = −{lost} Accuracy pts. Never reuse a grey letter, always shuffle yellows. Solve in ≤3 to keep all {lost} next time.",
       "tipShortTarget": "{length}-letter targets bite. Open with 4-vowel words like ADIEU. Guess #1 becomes a vowel scan.",
@@ -9487,9 +9487,9 @@ const en = {
       "insightLabel": "Did you know",
       "yourJourneyLabel": "Your progress",
       "personalBest": "New personal best! {score} pts, beating your old record by {delta}.",
-      "personalMilestone": "{count} puzzles completed. Consistency is the strongest predictor of vocab growth.",
+      "personalMilestone": "{count} puzzles completed. Showing up daily is how vocab grows.",
       "personalImprovement": "You're solving ~{delta} guesses faster than two weeks ago. Spacing effect at work.",
-      "personalConsistency": "{rate}% solve rate across {total} runs. Deliberate practice beats talent.",
+      "personalConsistency": "{rate}% solve rate across {total} runs. Practice is paying off.",
       "researchProtect": "Adults who play word puzzles daily score as if ~10 years younger on verbal reasoning tests (PROTECT study, 2019).",
       "researchSpacing": "Spacing effect: one short daily session produces ~2× the retention of a long cram (Cepeda et al., 2006).",
       "researchCrossword": "Regular crossword-style play is linked to a ~2.5-year delay in accelerated memory decline (Pillai et al., 2011).",
@@ -9701,7 +9701,7 @@ const en = {
       "loading": "Preparing ad...",
       "watching": "Watching ad...",
       "almostDone": "Almost done!",
-      "error": "Ad failed",
+      "error": "Ad didn't load",
       "tryAgain": "Try again later"
     },
     "leaderboard": {
@@ -9924,7 +9924,7 @@ const en = {
     "playerLastLife": "is on their last life!",
     "yourLastLife": "FINAL LIFE!",
     "botsJoined": "No humans? {{count}} bots jumped in to keep you company!",
-    "nearRank": "So close to rank up!",
+    "nearRank": "So close to ranking up!",
     "oneMoreWin": "One more win!",
     "rankUp": "Rank Up!",
     "welcomeToTier": "Welcome to {{tier}}!",
@@ -10014,7 +10014,7 @@ const en = {
         "live": "Play live"
       },
       "async": {
-        "subcopy": "You play first. Your friend gets pushed your score to beat.",
+        "subcopy": "You play first. Your friend gets your score to beat.",
         "playInstruction": "Play your game now. We'll send the challenge after.",
         "sent": "Challenge sent to {name}"
       },
@@ -10244,7 +10244,7 @@ const en = {
     "sending": "Sending...",
     "successTitle": "Got it",
     "successMessage": "Love hearing from players. We'll be in touch.",
-    "sendAnother": "Send More",
+    "sendAnother": "Send another",
     "errorMessage": "Hmm, that didn't work. Try again?",
     "responseTime": "We usually reply in 1-2 days"
   },
@@ -10404,7 +10404,7 @@ const en = {
     "pointsToGo": "pts to go",
     "maxTierReached": "Max tier!",
     "newBadge": "NEW!",
-    "firstGameComplete": "Cognitive baseline established!",
+    "firstGameComplete": "Baseline set!",
     "baselineEstablished": "Your cognitive profile is ready. Play more games to track your improvement.",
     "overallScore": "Overall score",
     "playAgain": "Play again",
@@ -10530,7 +10530,7 @@ const en = {
       },
       "pattern-switcher": {
         "name": "Pattern Switcher",
-        "description": "Find words in required length sequences",
+        "description": "Find words of changing required lengths",
         "persona": "Shift",
         "mission": "Find a word of the required length. The target keeps changing.",
         "benefit": "Your brain gets quicker at switching rules on the fly.",
@@ -10545,7 +10545,7 @@ const en = {
         "persona": "Glimmer",
         "mission": "Hunt for longer, rarer words. Bigger words, bigger gems.",
         "benefit": "You start noticing and using fancier words in everyday life.",
-        "coachTip": "Reach for 5+ letter words — they fill your pouch way faster.",
+        "coachTip": "Reach for 5+ letter words. They fill your pouch way faster.",
         "step1": "Find words hidden on the grid.",
         "step2": "Longer words drop rarer, shinier gems.",
         "step3": "Fill your pouch before time runs out."
@@ -11609,7 +11609,7 @@ const en = {
         "solid": "Solid",
         "nice": "Nice Try",
         "beats": "You beat {pct}% of players",
-        "weeklyCohort": "This week's global cohort",
+        "weeklyCohort": "This week's players worldwide",
         "score": "Score",
         "combo": "Combo",
         "bestWord": "Best Word",
@@ -11701,11 +11701,11 @@ const en = {
         "step5": "Or tap each letter, double-tap to confirm",
         "step6": "Level 1 complete! Watch your chest bar →",
         "step6Cta": "Continue",
-        "label": "Level 1 FTUE"
+        "label": "Level 1 tutorial"
       },
       "veteran": {
         "title": "Welcome back!",
-        "body": "Blast has been redesigned. Check out the new levels.",
+        "body": "Blast got a makeover. Try the new levels.",
         "cta": "Let's go"
       },
       "unlock": {
@@ -11853,7 +11853,7 @@ const en = {
     "endGameConfirmMessage": "Your score will be saved. End this run?",
     "gridLabel": "Letter grid",
     "helpTitle": "How to Play",
-    "helpDrag": "Drag across letters to form words. Words must be at least 2 letters long.",
+    "helpDrag": "Drag across letters to spell words. Min 2 letters.",
     "mpResults": {
       "boardCleared": "Board Cleared!",
       "yourPosition": "Your Rank",
@@ -12171,7 +12171,7 @@ const en = {
       "tag": "New",
       "anyRow": {
         "title": "Words can be on any row",
-        "body": "Words aren't only on the bottom row. Scan the whole board."
+        "body": "Words aren't stuck on the bottom row. Scan the whole board."
       },
       "verticalWords": {
         "title": "Words can be vertical too",
@@ -12269,7 +12269,7 @@ const en = {
       "dueInHours": "Due in {hours}h",
       "dueInMinutes": "Due in {minutes}m",
       "overdueBy": "Overdue by {days}d",
-      "doIt": "Do it"
+      "doIt": "Start"
     },
     "classView": {
       "playAssignment": "Play {title}",
@@ -12356,7 +12356,7 @@ const en = {
       "wordsAtYourLevel": "{{mine}} at your level · {{total}} in the lesson",
       "assignment": {
         "due": "Due {{date}}",
-        "overdue": "Late. Was due {{date}}"
+        "overdue": "Overdue. Was due {{date}}"
       },
       "empty": {
         "title": "No lessons assigned yet",
@@ -12374,7 +12374,7 @@ const en = {
       "title": "Practice mode",
       "definition": "Definition",
       "yourAnswer": "Your answer",
-      "submit": "Submit",
+      "submit": "Check",
       "next": "Next word",
       "correct": "Correct!",
       "incorrect": "Try again",
@@ -12450,8 +12450,8 @@ const en = {
     "classStreak": {
       "kept": "Class streak: {count} days · played today",
       "keptOne": "Class streak: 1 day · played today",
-      "atRisk": "Class streak: {count} days — play today to keep it",
-      "atRiskOne": "Class streak: 1 day — play today to keep it"
+      "atRisk": "Class streak: {count} days. Play today to keep it",
+      "atRiskOne": "Class streak: 1 day. Play today to keep it"
     },
     "pulse": {
       "state": {
@@ -12465,7 +12465,7 @@ const en = {
       "action": {
         "invite": "Get the join code",
         "play": "Start their first game",
-        "review": "Practise the hard words",
+        "review": "Practice the hard words",
         "playAgain": "Play again",
         "retry": "Try again"
       },
@@ -12489,7 +12489,7 @@ const en = {
       "firstAssignmentCta": "Create first assignment"
     },
     "onboardingChecklist": {
-      "title": "Activate your class",
+      "title": "Get your class started",
       "progress": "{{done}} of {{total}} done",
       "createClassroom": "Create a classroom",
       "createClassroomCta": "Create classroom",
@@ -12503,7 +12503,7 @@ const en = {
       "viewReportCta": "Open report",
       "dismiss": "Dismiss",
       "completeTitle": "Your class is live",
-      "completeBody": "Try Teacher Pro free for 14 days — extra students, homework insights, class reports.",
+      "completeBody": "Try Teacher Pro free for 14 days: more students, homework insights, class reports.",
       "trialCta": "Start Teacher Pro trial"
     },
     "playNow": {
@@ -12558,7 +12558,7 @@ const en = {
       "summary": "{{count}} words · {{definitions}} with definitions · {{synonyms}} with synonyms · {{antonyms}} with antonyms · {{examples}} with examples",
       "aiFill": "Fill in missing definitions, synonyms & examples (AI, review before saving)",
       "aiFilling": "Writing suggestions…",
-      "aiFilledNote": "Highlighted fields were suggested by AI — check them before you save.",
+      "aiFilledNote": "Highlighted fields were suggested by AI. Check them before you save.",
       "aiError": "Couldn't get suggestions right now. Try again in a minute.",
       "meanings": "Other meanings",
       "meaningsPlaceholder": "Meanings, separated by ; (e.g. the land beside a river; a place for money)",
@@ -12582,7 +12582,7 @@ const en = {
       "support": "Support",
       "core": "Core",
       "challenge": "Challenge",
-      "legend": "Support: sees a word bank during live games and practises support + core words · Core: default · Challenge: practises all words incl. challenge, gets a longer-word target",
+      "legend": "Support: sees a word bank during live games and practices support + core words · Core: default · Challenge: practices all words incl. challenge, gets a longer-word target",
       "saved": "Level saved",
       "saveFailed": "Couldn't save the level. Try again."
     },
@@ -12680,16 +12680,16 @@ const en = {
         "reports": "Printable class and student reports",
         "unlimited": "Unlimited classes and students"
       },
-      "noCard": "When it ends you simply go back to the free plan. We will never charge you without you choosing to.",
+      "noCard": "When it ends you simply go back to the free plan. We'll never charge you unless you choose to subscribe.",
       "paidBody": "Your Teacher Pro subscription is active. Manage or cancel it anytime from your teacher profile.",
       "manage": "Manage subscription",
       "cta": "Let's go"
     },
     "checkoutReturn": {
       "activatingTitle": "Activating Teacher Pro",
-      "activatingBody": "Payment received. Confirming access — this usually takes a few seconds.",
+      "activatingBody": "Payment received. Confirming access. This usually takes a few seconds.",
       "successTitle": "Teacher Pro is on",
-      "successBody": "Access is active. The payment grant is already on your account.",
+      "successBody": "Your payment went through and Pro is active on your account.",
       "failureTitle": "Pro is not confirmed yet",
       "failureBody": "If you were charged, access usually arrives within a minute. Check again, or write to us if it is still missing.",
       "retry": "Check again",
@@ -12713,7 +12713,7 @@ const en = {
       "noActiveGames": "No active games"
     },
     "accessRequired": "Teacher access required",
-    "accessDenied": "You need teacher privileges to access this page.",
+    "accessDenied": "Only teacher accounts can open this page.",
     "profile": {
       "teacherBadge": "Teacher",
       "classrooms": "Classrooms",
@@ -12755,7 +12755,7 @@ const en = {
       "live": "LIVE",
       "selectClassroom": "Select classroom",
       "createClassroomFirst": "Create a classroom first to track assignments and duel activity",
-      "reviewEmptyHint": "Create your first classroom to unlock analytics, assignments and reports.",
+      "reviewEmptyHint": "Create your first classroom to see analytics, assignments and reports.",
       "analytics": "Analytics",
       "insights": "INSIGHTS",
       "viewReports": "View reports",
@@ -12768,7 +12768,7 @@ const en = {
         "prepare": "Prepare",
         "review": "Review"
       },
-      "classroomLoadError": "Could not load your classrooms",
+      "classroomLoadError": "Couldn't load your classrooms",
       "classroomLoadErrorHint": "Check your connection and try again",
       "retry": "Retry"
     },
@@ -12792,7 +12792,7 @@ const en = {
         "title": "Quick setups",
         "fridayBattle": {
           "name": "Friday Vocab Battle",
-          "desc": "Teams · your last list · loud and fast"
+          "desc": "Teams · your last list · fast-paced"
         },
         "sped": {
           "name": "Support (SPED)",
@@ -12936,9 +12936,9 @@ const en = {
         "deleted": "Classroom deleted"
       },
       "error": {
-        "createFailed": "Failed to create classroom",
-        "updateFailed": "Failed to update classroom",
-        "deleteFailed": "Failed to delete classroom",
+        "createFailed": "Couldn't create classroom",
+        "updateFailed": "Couldn't update classroom",
+        "deleteFailed": "Couldn't delete classroom",
         "copyFailed": "Couldn't copy the code. Try again."
       },
       "dialog": {
@@ -12961,7 +12961,7 @@ const en = {
         "count": "{{count}} students",
         "empty": "No students yet",
         "emptyHint": "Share join code {{code}} with your students",
-        "error": "Failed to load students",
+        "error": "Couldn't load students",
         "unknown": "Unknown student",
         "noneYet": "No students yet. Share the join code."
       },
@@ -12982,7 +12982,7 @@ const en = {
     },
     "lesson": {
       "sectionTitle": "Your lessons",
-      "sectionHint": "A lesson is a list of words. Host it live with the whole class, or share it so students practise on their own.",
+      "sectionHint": "A lesson is a list of words. Host it live with the whole class, or share it so students practice on their own.",
       "pasteWords": "Paste your word list",
       "pasteWordsPlaceholder": "One word per line, or separated by commas",
       "pasteWordsParsed": "{count} words ready",
@@ -13001,7 +13001,7 @@ const en = {
       "addWord": "Add word",
       "removeWord": "Remove",
       "wordPlaceholder": "Enter a word...",
-      "canIntegrate": "Can embed in games",
+      "canIntegrate": "Playable in games",
       "singleWordsOnly": "Only single words can be played on the board. Remove or split: {{terms}}",
       "notSingleWord": "Not one word",
       "cannotIntegrate": "Track only",
@@ -13025,8 +13025,8 @@ const en = {
         "wordsRequired": "Add at least one word"
       },
       "error": {
-        "createFailed": "Failed to create lesson",
-        "updateFailed": "Failed to update lesson"
+        "createFailed": "Couldn't create lesson",
+        "updateFailed": "Couldn't update lesson"
       },
       "dialog": {
         "createDescription": "Create a new vocabulary lesson with words and definitions",
@@ -13077,7 +13077,7 @@ const en = {
         "button": "Assign lesson",
         "assigning": "Assigning...",
         "success": "Lesson assigned",
-        "error": "Failed to assign lesson",
+        "error": "Couldn't assign lesson",
         "alreadyAssigned": "This lesson is already assigned to this classroom"
       }
     },
@@ -13093,7 +13093,7 @@ const en = {
       "create": "Create assignment",
       "creating": "Creating...",
       "created": "Assignment created",
-      "error": "Failed to create assignment",
+      "error": "Couldn't create assignment",
       "missingFields": "Select a lesson and due date",
       "typeLabel": "Assignment type",
       "practiceMode": "Practice mode",
@@ -13261,7 +13261,7 @@ const en = {
       "lessonNamePlaceholder": "Enter lesson name...",
       "noClassroom": "No classroom (personal lesson)",
       "selectWords": "Select words to create a vocabulary lesson",
-      "failedToSaveLesson": "Failed to save lesson"
+      "failedToSaveLesson": "Couldn't save lesson"
     },
     "reports": {
       "arc": {
@@ -13303,7 +13303,7 @@ const en = {
       "loading": "Loading report...",
       "loadingClassrooms": "Loading classrooms...",
       "noClassroomsFound": "No classrooms found",
-      "error": "Error loading report",
+      "error": "Couldn't load the report",
       "noData": "No data available",
       "metrics": {
         "wordsLearned": "Words learned",
@@ -13430,7 +13430,7 @@ const en = {
           "copy": "Copy parent summary",
           "copied": "Copied",
           "upgrade": "Print a parent summary with Teacher Pro {{price}}",
-          "footer": "LexiClash classroom progress — assignment completion, average score, last active."
+          "footer": "LexiClash classroom progress: assignment completion, average score, last active."
         }
       },
       "exportAllClasses": {
@@ -13510,10 +13510,10 @@ const en = {
       "import": "Import to lesson",
       "importing": "Importing...",
       "imported": "Imported",
-      "importError": "Failed to import word list",
+      "importError": "Couldn't import word list",
       "preview": "Preview words",
       "wordCount": "{{count}} words",
-      "noResults": "No curriculum lists found matching your filters",
+      "noResults": "No lists match these filters",
       "selectGrade": "Select grade level",
       "selectSubject": "Select subject",
       "allGrades": "All grades",
@@ -13563,7 +13563,7 @@ const en = {
       },
       "missedPractice": {
         "title": "Turn misses into spaced practice",
-        "body": "One click assigns your class's missed words as three short rounds — tomorrow, in 3 days and in a week. That spacing is what makes words stick."
+        "body": "One click assigns your class's missed words as three short rounds: tomorrow, in 3 days and in a week. That spacing is what makes words stick."
       },
       "analytics": {
         "title": "See how your class is really doing",
@@ -13603,10 +13603,10 @@ const en = {
       "weeklyGames": "Games completed",
       "weeklyWords": "Words found",
       "weeklyAssignments": "Assignment completion",
-      "weeklyWow": "Week-over-week",
-      "weeklyDay7Cta": "Keep Teacher Pro — {{price}}/mo",
+      "weeklyWow": "Vs last week",
+      "weeklyDay7Cta": "Keep Teacher Pro: {{price}}/mo",
       "weeklyDay7Hint": "Day 7 of your Teacher Pro trial. Keep reports and unlimited classes.",
-      "weeklyExpiryCta": "Reactivate Teacher Pro — {{price}}/mo",
+      "weeklyExpiryCta": "Reactivate Teacher Pro: {{price}}/mo",
       "weeklyExpiryHint": "Your Teacher Pro trial ended. Keep this week's reports and unlimited classes.",
       "weeklyRegionLabel": "Weekly progress for {{classroom}}",
       "weeklyLoading": "Loading this week's progress…",
@@ -13616,9 +13616,9 @@ const en = {
       "weeklyInactive": "Inactive 7 days",
       "weeklyInactiveCount": "{{count}} students inactive 7 days",
       "weeklyMovement": "Per-student movement",
-      "weeklyTrialCta": "Keep Teacher Pro — {{price}}/mo",
+      "weeklyTrialCta": "Keep Teacher Pro: {{price}}/mo",
       "weeklyTrialHint": "You're on a Teacher Pro trial. Keep reports and unlimited classes.",
-      "weeklyOverCapCta": "Upgrade to Teacher Pro — {{price}}/mo",
+      "weeklyOverCapCta": "Upgrade to Teacher Pro: {{price}}/mo",
       "weeklyOverCapHint": "You're over the free class or student cap. Teacher Pro lifts it.",
       "emailReportTitle": "Email-ready report",
       "emailReportSubtitle": "Plain text you can paste straight into an email to parents or admins.",
@@ -13650,7 +13650,7 @@ const en = {
       "scheduleReteachHint": "Rebuild the hard words and replay in about two weeks. Spaced reteach that sticks.",
       "unpluggedReteachLiveCta": "Start Unplugged reteach Live",
       "reteachLiveCta": "Start 3-min reteach Live",
-      "unpluggedReteachLiveFoil": "No student devices today? Project the misses — students answer on paper."
+      "unpluggedReteachLiveFoil": "No student devices today? Project the misses. Students answer on paper."
     },
     "windowProgress": {
       "title": "This week's class",
@@ -13678,14 +13678,14 @@ const en = {
       "studentLimitTitle": "You've reached your student limit",
       "studentLimitMessage": "This class has {{current}} of {{limit}} free students. Upgrade to Pro for unlimited students.",
       "usagePromptTitle": "Your class is ready for Teacher Pro",
-      "usagePromptStudentsBody": "You now have {{count}} students in a classroom. Teacher Pro keeps them all covered: unlimited classes and students, plus progress analytics and printable reports.",
+      "usagePromptStudentsBody": "You now have {{count}} students in a classroom. Teacher Pro lifts the cap: unlimited classes and students, plus progress analytics and printable reports.",
       "usagePromptAssignmentsBody": "You've created {{count}} assignments for a classroom. Teacher Pro lifts the cap: unlimited assignments, plus progress analytics and printable reports.",
       "assignmentLimitTitle": "Assignment limit reached",
       "assignmentLimitMessage": "You've created {{current}} of {{limit}} free assignments for this class. Upgrade to Pro for unlimited assignments.",
       "upgradeProDescription": "Pro gives you unlimited classrooms and unlimited students per class.",
       "trialExpiredTitle": "Want more than the free plan?",
       "trialExpiredMessage": "The free plan keeps working with no time limit. Pro adds unlimited classes and progress reports, and new accounts get 14 days free.",
-      "continueFree": "Continue with free tier",
+      "continueFree": "Stay on the free plan",
       "proFeatures": "Pro includes",
       "unlimitedClasses": "Unlimited classrooms",
       "unlimitedStudents": "Unlimited students on every class roster",
@@ -13708,7 +13708,7 @@ const en = {
       "trialExpiringLoss": "Without Pro, you will lose unlimited classes and printable student reports.",
       "trialLifecycleCta": "Keep Pro: $9/mo",
       "pendingCheckoutTitle": "Complete your Teacher Pro setup",
-      "pendingCheckoutBody": "You started a Teacher Pro checkout that didn't finish. Pick up where you left off to unlock unlimited classrooms and printable reports.",
+      "pendingCheckoutBody": "You started a Teacher Pro checkout that didn't finish. Pick up where you left off to get unlimited classrooms and printable reports.",
       "pendingCheckoutCta": "Resume checkout",
       "checkoutError": "Couldn't start checkout. Try again.",
       "signInRequired": "Sign in to upgrade to Teacher Pro.",
@@ -13719,7 +13719,7 @@ const en = {
       "classLimitReached": "Classroom limit reached. Upgrade to Teacher Pro for unlimited classrooms.",
       "pricePerDay": "About $0.30 a day",
       "everythingInFree": "Everything in Free, plus:",
-      "freeStartNote": "Real classes fit — up to 3 classes of 50 students each. Pro is for when you run more sections or need the reports.",
+      "freeStartNote": "Real classes fit: up to 3 classes of 50 students each. Pro is for when you run more sections or need the reports.",
       "proCtaSubtext": "Set up in 30 seconds · Cancel anytime",
       "trustCancel": "Cancel anytime, no lock-in",
       "trustDataSafe": "Your data stays safe",
@@ -13729,7 +13729,7 @@ const en = {
       "freeClasses": "Up to {count} classes",
       "freeStudents": "Up to {count} students on each class roster",
       "proPlanName": "Teacher Pro",
-      "unlimitedAccess": "Everything you need to scale",
+      "unlimitedAccess": "No caps on classes or students",
       "popular": "Most popular",
       "faqTitle": "Frequently asked questions",
       "faqCancel": "Can I cancel anytime?",
@@ -13741,7 +13741,7 @@ const en = {
       "legalNote": "By upgrading, you agree to our Terms of Service and understand our Refund Policy.",
       "refundPolicy": "Refund Policy",
       "renewsOn": "Next renewal",
-      "canceledAt": "Cancellation pending at end of current period",
+      "canceledAt": "Cancels at the end of the current period",
       "manageSubscription": "Manage subscription",
       "districtTitle": "School or district?",
       "districtSubtitle": "Managing multiple teachers or classrooms? We offer flexible pricing for schools and districts.",
@@ -13939,7 +13939,7 @@ const en = {
       "builtBy": "{name} crafted {word}",
       "errors": {
         "invalidWord": "\"{word}\" isn't a word",
-        "disconnected": "Your word has to touch one already down",
+        "disconnected": "Your word must touch one already on the board",
         "cellOccupied": "That square is taken",
         "generic": "That didn't place. Try again"
       }
@@ -14085,8 +14085,8 @@ const en = {
         "synonym": "This lesson needs synonyms on at least 4 words for this practice. Ask your teacher to add some.",
         "antonym": "This lesson needs antonyms on at least 4 words for this practice. Ask your teacher to add some.",
         "context": "This lesson needs example sentences on at least 4 words for this practice. Ask your teacher to add some.",
-        "multiple_meaning": "This lesson needs two meanings on at least a couple of words for this practice. Ask your teacher to add some.",
-        "roots_affixes": "This lesson needs word parts on at least a couple of words for this practice. Ask your teacher to add some."
+        "multiple_meaning": "This lesson needs two meanings on at least 2 words for this practice. Ask your teacher to add some.",
+        "roots_affixes": "This lesson needs word parts on at least 2 words for this practice. Ask your teacher to add some."
       },
       "progress": "{{current}} of {{total}}",
       "progressLabel": "Question progress",
@@ -14178,7 +14178,7 @@ const en = {
       "freshBoardNote": "This is a sample. The real board is generated fresh when you start the game, with a different mix of your words.",
       "skipped": {
         "title": "Words that won't be on the board",
-        "subtitle": "Students still practise these in lessons; they just can't be traced on a letter grid.",
+        "subtitle": "Students still practice these in lessons; they just can't be traced on a letter grid.",
         "none": "Every selected word can be hidden in the board.",
         "reason": {
           "empty": "Blank entry",
@@ -14199,7 +14199,7 @@ const en = {
       "allFound": "The class found every lesson word.",
       "waitingForTeacher": "Waiting for your teacher to start the next round…",
       "stayInClass": "Stay here. The next game starts on this screen.",
-      "practiceMissed": "Practise these words",
+      "practiceMissed": "Practice these words",
       "playReteachRound": "Play reteach round: missed words only",
       "backToLobby": "Back to lobby",
       "rematch": "Rematch: same list, same code",
@@ -14277,7 +14277,7 @@ const en = {
       "postReteachGoogleClassroomBody": "Open the link and start the 3-min Live on these missed words: {{missed}}. Students join from the Stream.",
       "assignPracticeGoogleClassroom": "Assign practice homework to Google Classroom",
       "assignPracticeGoogleClassroomTitle": "Practice missed words: {{lesson}}",
-      "assignPracticeGoogleClassroomBody": "Open the link and practise these missed words at home: {{missed}}. Turn in when done.",
+      "assignPracticeGoogleClassroomBody": "Open the link and practice these missed words at home: {{missed}}. Turn in when done.",
       "printPracticeSheet": "Print practice sheet",
       "printPracticeSheetTitle": "Missed-words practice: {{lesson}}",
       "printPracticeSheetSubtitle": "Device-free reteach: write each word, then use it in a sentence",
@@ -14325,7 +14325,7 @@ const en = {
       "classicUnpluggedPlayAgain": "Play again",
       "assignUnpluggedGoogleClassroom": "Assign Unplugged reteach to Google Classroom",
       "assignUnpluggedGoogleClassroomTitle": "Unplugged reteach homework: {{lesson}}",
-      "assignUnpluggedGoogleClassroomBody": "Device-free homework: open the Unplugged Live link, print the missed-words practice sheet, and practise: {{missed}}. No student devices needed. Turn in when done.",
+      "assignUnpluggedGoogleClassroomBody": "Device-free homework: open the Unplugged Live link, print the missed-words practice sheet, and practice: {{missed}}. No student devices needed. Turn in when done.",
       "assignMissGapLiveGoogleClassroom": "Assign miss-gap Live to Google Classroom",
       "assignMissGapLiveGoogleClassroomTitle": "3-min miss-gap Live: {{lesson}}",
       "assignMissGapLiveGoogleClassroomBody": "Open the link and start the 3-min Live on these missed words: {{missed}}. Students join from Classwork. Works on free Google Workspace for Education, no Education Plus required.",
@@ -14378,14 +14378,14 @@ const en = {
       "assignMissGapAsyncDueBanner": "Due {{due}}. Finish the miss-gap practice to keep the class streak",
       "assignMissGapAsyncGoogleClassroom": "Assign async miss-gap to Google Classroom",
       "assignMissGapAsyncTitle": "Async miss-gap homework: {{lesson}}",
-      "assignMissGapAsyncBody": "Async miss-gap practice (not a live game). Open the link, practise: {{missed}}. Due {{due}}. On-time completion feeds the class streak.",
+      "assignMissGapAsyncBody": "Async miss-gap practice (not a live game). Open the link, practice: {{missed}}. Due {{due}}. On-time completion feeds the class streak.",
       "assignMissGapAsyncShare": "Copy async homework link",
       "assignMissGapAsyncShareCopied": "Homework link copied. Paste it for parents or Classroom",
       "assignMissGapAsyncUntracked": "Sign in as this class's teacher so the link records who finished.",
       "assignMissGapAsyncShareText": "{{lesson}} (async miss-gap homework due {{due}}): {{missed}}",
       "assignMissGapAsyncComplete": "Mark practice complete (feeds class streak)",
       "assignMissGapAsyncCompleted": "Practice complete. Class streak updated",
-      "assignMissGapAsyncStreak": "Class streak: {{streak}} day(s)",
+      "assignMissGapAsyncStreak": "Class streak (days): {{streak}}",
       "missGapGradePassbackEyebrow": "Google Classroom grade passback",
       "missGapGradePassbackHeading": "Turn in your miss-gap grade",
       "missGapGradePassbackSubtitle": "Practice done. Your score is ready to hand in to the class gradebook.",
@@ -14403,14 +14403,14 @@ const en = {
       "missGapGradePassbackOpen": "Open Google Classroom grade receipt",
       "unpluggedGradePassbackEyebrow": "Google Classroom grade passback",
       "unpluggedGradePassbackHeading": "Submit Unplugged reteach grade",
-      "unpluggedGradePassbackSubtitle": "Live session done. Class cleared/total is ready for the Classroom gradebook.",
+      "unpluggedGradePassbackSubtitle": "Live session done. The class score is ready for the Classroom gradebook.",
       "unpluggedGradePassbackFoil": "Kahoot Classroom add-on syncs live scores to the gradebook. LexiClash passback does the same for Unplugged reteach, without roster OAuth",
       "unpluggedGradePassbackScore": "Score: {{points}} / {{max}}",
       "unpluggedGradePassbackCleared": "Class cleared {{cleared}} / {{total}} ({{accuracy}}%)",
       "unpluggedGradePassbackOnTime": "On time: full accuracy points",
       "unpluggedGradePassbackLate": "Late submit: reduced draft grade",
       "unpluggedGradePassbackDue": "Session / due {{due}}",
-      "unpluggedGradePassbackPrivacy": "No names are shared and no class list is imported. Only the class cleared/total score is handed in.",
+      "unpluggedGradePassbackPrivacy": "No names are shared and no class list is imported. Only the class score is handed in.",
       "unpluggedGradePassbackCopy": "Copy grade receipt link",
       "unpluggedGradePassbackCopied": "Grade receipt copied. Paste into Classroom",
       "unpluggedGradePassbackShareText": "{{lesson}}: Unplugged grade {{points}}/{{max}} (cleared {{cleared}}/{{total}})",
@@ -14423,11 +14423,11 @@ const en = {
       "missGapWhatsAppParentSubtitle": "Practice these missed words from {{lesson}} with your child. Print or open the practice card.",
       "missGapWhatsAppFoil": "Classroom grade sync stops at the gradebook. LexiClash sends the miss-gap practice card home on WhatsApp",
       "missGapWhatsAppDue": "Homework due {{due}}",
-      "missGapWhatsAppWordsLabel": "Class missed words to practise",
+      "missGapWhatsAppWordsLabel": "Class missed words to practice",
       "missGapWhatsAppPrivacy": "No student names. Class-level words only, safe to paste in a parent WhatsApp group.",
       "missGapWhatsAppShare": "Share practice card on WhatsApp",
       "missGapWhatsAppOpened": "WhatsApp opened. Pick a parent chat",
-      "missGapWhatsAppShareText": "{{lesson}} (due {{due}}): practise miss-gap words with your child: {{missed}}",
+      "missGapWhatsAppShareText": "{{lesson}} (due {{due}}): practice miss-gap words with your child: {{missed}}",
       "missGapWhatsAppOgTitle": "Miss-gap practice for parents: {{lesson}}",
       "missGapWhatsAppOpenPractice": "Open miss-gap practice card",
       "missGapWhatsAppOpenHomework": "Open async miss-gap homework",
@@ -14454,11 +14454,11 @@ const en = {
       "needMissedWords": "Add at least one missed word to enable one-click assign.",
       "planner": {
         "eyebrow": "Conversational Classroom planner",
-        "title": "Say what you need. We route the Live",
+        "title": "Say what you need. We set up the Live",
         "subtitle": "Type a plain-language plan. We open Classic or Team Unplugged, or a reteach Live with grade passback. Class words only, no student names.",
         "promptLabel": "What do you want to run?",
         "promptPlaceholder": "e.g. Unplugged reteach on yesterday's misses",
-        "privacyNote": "No roster import. No student names. Routes into the existing Unplugged modes, no new game logic.",
+        "privacyNote": "No roster import. No student names. Uses the existing Unplugged modes.",
         "needPrompt": "Type a plain-language prompt to plan the Live.",
         "needMissedWords": "Add missed words, or ask for a CEFR level so we can seed gap words.",
         "modeClassic": "Classic Unplugged: class/teams discuss on the projector",
@@ -14470,7 +14470,7 @@ const en = {
         "openLive": "Open planned Live",
         "openGradePassback": "Open grade passback receipt",
         "postToStream": "Post Unplugged assign to Classroom Stream",
-        "foilNote": "Foils Discovery Education Gemini conversational Classroom. LexiClash routes into real Unplugged Lives with grade passback."
+        "foilNote": "LexiClash opens real Unplugged Lives with grade passback."
       }
     },
     "nav": {
@@ -14585,19 +14585,19 @@ const en = {
       },
       "streak_starter": {
         "name": "Streak Starter",
-        "description": "Practise several days in a row"
+        "description": "Practice several days in a row"
       },
       "early_bird": {
         "name": "Early Bird",
-        "description": "Practise before school"
+        "description": "Practice before school"
       },
       "dedicated_learner": {
         "name": "Dedicated Learner",
-        "description": "Practise on many different days"
+        "description": "Practice on many different days"
       },
       "weekly_warrior": {
         "name": "Weekly Warrior",
-        "description": "Practise every day of a week"
+        "description": "Practice every day of a week"
       },
       "streak_champion": {
         "name": "Streak Champion",
@@ -14609,7 +14609,7 @@ const en = {
       },
       "lesson_collector": {
         "name": "Lesson Collector",
-        "description": "Practise lots of lessons"
+        "description": "Practice lots of lessons"
       },
       "classroom_contributor": {
         "name": "Team Player",
@@ -14745,7 +14745,7 @@ const en = {
         "reteachEmpty": "No words need reteaching right now",
         "studentsStuck": "{{stuck}}/{{total}} students",
         "emptyTitle": "Not enough data yet",
-        "emptyHint": "Play a few more lesson games for mastery trends to appear"
+        "emptyHint": "Run a few more lesson games and mastery trends will show here"
       },
       "yesterday": "Yesterday"
     },
@@ -14798,7 +14798,7 @@ const en = {
       "startGame": "Start game",
       "createRoom": "Create room",
       "startGameDescription": "Launch the classroom game",
-      "studentCount": "{{count}} students joined",
+      "studentCount": "Students joined: {{count}}",
       "studentsCanScan": "Students can scan the QR code to join",
       "title": "Classroom Game",
       "waitingForPlayers": "Setting up your classroom game...",
@@ -14868,17 +14868,17 @@ const en = {
         "studentLimitPro": "Unlimited students",
         "analytics": "Per-student progress analytics",
         "chooseNow": "Get Teacher Pro",
-        "whyNow": "Start free, really. Pro is for when {count} students in one class stops being enough."
+        "whyNow": "Start free. Pro is for when {count} students in one class isn't enough."
       },
       "duelTeaser": {
         "cta": "Challenge a friend",
         "headline": "Word Duels",
         "subtext": "Battle friends in real time"
       },
-      "freeAccess": "Free for everyone",
+      "freeAccess": "Free to start",
       "resourcesAriaLabel": "Education resources",
       "goToDashboard": "Go to dashboard",
-      "premium": "Premium",
+      "premium": "Teacher Pro",
       "roleGuest": "Guest",
       "roleStudent": "Student",
       "roleTeacher": "Teacher",
@@ -14902,7 +14902,7 @@ const en = {
       "hero": {
         "eyebrow": "For teachers in English, Hebrew, Swedish, Japanese, Spanish and Russian classrooms",
         "h1": "Vocabulary games for your classroom. No student logins.",
-        "sub": "Whole-class multiplayer word games with your own word lists. No accounts, no ads, no downloads. Play in any browser. Built natively for {count} languages. Free basic plan for teachers; Teacher Pro is $9/month for unlimited classes and students.",
+        "sub": "Whole-class multiplayer word games with your own word lists. No student accounts, no ads, no downloads. Play in any browser. Built natively for {count} languages. Free basic plan for teachers; Teacher Pro is $9/month for unlimited classes and students.",
         "cta_primary": "Request teacher access",
         "cta_secondary": "See it in action",
         "cta_note": "Free plan to start • Instant access",
@@ -14931,7 +14931,7 @@ const en = {
         "local_inventory": {
           "tag": "Local",
           "title": "Locally sourced word inventory",
-          "body": "Word lists pulled from your locale's Wikipedia + Hebrew Milog dictionary. Students see culturally relevant words from their country, not US K-12 textbook leftovers."
+          "body": "Word lists drawn from your locale's Wikipedia and the Hebrew Milog dictionary. Students see words from their own country, not generic US textbook lists."
         },
         "ad_free": {
           "tag": "Ad-free",
@@ -14940,7 +14940,7 @@ const en = {
         }
       },
       "modes": {
-        "title": "6 modes, one platform. Rotate to beat fatigue",
+        "title": "6 modes, one platform. Rotate them to keep class fresh",
         "teaches": "Teaches",
         "classroom_game": {
           "tag": "Live",
@@ -14981,7 +14981,7 @@ const en = {
       },
       "compare": {
         "title": "How LexiClash compares",
-        "subtitle": "Honest checks, only where we genuinely deliver.",
+        "subtitle": "Checks only where we deliver.",
         "col": {
           "lexiclash": "LexiClash",
           "kahoot": "Kahoot!",
@@ -15011,10 +15011,10 @@ const en = {
         },
         "q2": {
           "q": "Is there a free plan?",
-          "a": "Yes. A free basic plan for verified teachers: up to 3 classes of 50 students each, no ads on student-facing routes. Teacher Pro ($9/month) unlocks unlimited classes and students."
+          "a": "Yes. A free basic plan for verified teachers: up to 3 classes of 50 students each, no ads on student-facing routes. Teacher Pro ($9/month) gives you unlimited classes and students."
         },
         "q3": {
-          "q": "Does it work in Hebrew, Japanese, Swedish, and Spanish?",
+          "q": "Does it work in Hebrew, Japanese, Swedish, Spanish and Russian?",
           "a": "Yes. Native support including Hebrew RTL and Japanese kana/IME, not translation."
         },
         "q4": {
@@ -15132,7 +15132,7 @@ const en = {
     },
     "vsKahoot": {
       "goLimit": {
-        "eyebrow": "Free-tier seats: honesty foil",
+        "eyebrow": "Free-tier seat limits compared",
         "title": "Kahoot! Go Free: plans table says 40. Same-page FAQ says 10. LexiClash: clear 50.",
         "lede": "On kahoot.com/schools/plans the Go Free column lists Participant limit 40, while the FAQ “What are the participant limits per game?” answers Go up to 10. LexiClash publishes one free classroom cap, 50 students, so the join code matches the plan page.",
         "kahootTitle": "Kahoot! Go Free: table 40 vs FAQ 10",
@@ -15147,7 +15147,7 @@ const en = {
     },
     "vsWayground": {
       "starterLimit": {
-        "eyebrow": "Free-tier library: honesty foil",
+        "eyebrow": "Free-tier library limits compared",
         "title": "Wayground Basic: 20 max activity storage. LexiClash: free classroom vocab, no 20-resource ceiling.",
         "lede": "Wayground plans list “20 max” activity storage; Starter help (Updated 12 May 2026) says “Store up to 20 resources.” LexiClash free classroom vocab has no 20-resource library cap.",
         "waygroundTitle": "Wayground Basic: 20 max",
@@ -15163,7 +15163,7 @@ const en = {
     },
     "vsGimkit": {
       "proExclusiveModes": {
-        "eyebrow": "Free-tier Pro Exclusive: honesty foil",
+        "eyebrow": "Free-tier Pro Exclusive modes compared",
         "title": "Gimkit Basic: Pro-Exclusive modes limited to 5 players. LexiClash: whole-class free vocab.",
         "lede": "Gimkit help “Player maximums” states Pro Exclusive modes are limited to 5 players for Gimkit Basic members. LexiClash free classroom vocab covers a whole class (up to 50) without a 5-seat Pro-Exclusive mode.",
         "gimkitTitle": "Gimkit Basic: Pro Exclusive modes → 5 players",
@@ -15179,7 +15179,7 @@ const en = {
     },
     "vsMentimeter": {
       "free50": {
-        "eyebrow": "Free-tier caps: honesty foil",
+        "eyebrow": "Free-tier limits compared",
         "title": "Mentimeter Free: 50 participants/month. LexiClash: whole-class free (50) + miss→reteach Live.",
         "lede": "Mentimeter Help publishes up to 50 participants per month; the pricing table lists Participants per month: 50. The counter resets on the account-creation date, with an 8-hour grace for one over-50 presentation. Free marketing bullets say Unlimited participants once per month. The Help/table number is 50. LexiClash free covers up to 50 students per class with miss-gap → reteach Live.",
         "mentiTitle": "Mentimeter Free: published caps",
@@ -15195,13 +15195,13 @@ const en = {
     },
     "vsWooclap": {
       "starter5": {
-        "eyebrow": "Free-tier caps: honesty foil",
+        "eyebrow": "Free-tier limits compared",
         "title": "Wooclap Starter: 5 active questions / 30d. LexiClash: free classroom play without an active-question meter.",
-        "lede": "Wooclap Help (June 2, 2026) publishes Starter free up to 5 active questions; more than 5 active in 30 days prompts an upgrade. Active = 3+ responses from unique participants. The education pricing page lists 5 questions per month and Unlimited participants (up to 1000 on all plans). LexiClash free classroom vocab has no active-question meter. Question-quota honesty, not a participant-cap fight.",
+        "lede": "Wooclap Help (June 2, 2026) publishes Starter free up to 5 active questions; more than 5 active in 30 days prompts an upgrade. Active = 3+ responses from unique participants. The education pricing page lists 5 questions per month and Unlimited participants (up to 1000 on all plans). LexiClash free classroom vocab has no active-question meter.",
         "wooTitle": "Wooclap Starter: published caps",
         "wooBody": "Help: up to 5 active questions; >5 active in 30 days → upgrade. Active = 3+ unique-participant responses. Pricing: 5 questions per month; Unlimited participants; up to 1000 participants all plans.",
         "lexiTitle": "LexiClash: free classroom, no active-question meter",
-        "lexiBody": "Free classroom vocab play without a 5-active / 30-day question quota. Question-quota honesty foil. Not a participant-cap fight.",
+        "lexiBody": "Free classroom vocab play without a 5-active / 30-day question quota.",
         "citePrefix": "Wooclap:",
         "citeHelpLabel": "Help: pricing (5 active / 30d)",
         "citePlansLabel": "pricing-education (5 questions/month)",
@@ -15211,11 +15211,11 @@ const en = {
     },
     "vsSocrative": {
       "freeTier": {
-        "eyebrow": "Free-tier caps: honesty foil",
+        "eyebrow": "Free-tier limits compared",
         "title": "Socrative Free: 5 Quizzes / 1 Room / 50 students. LexiClash: whole-class free (50) + miss→reteach Live.",
-        "lede": "Socrative pricing publishes Free: 5 Quizzes, 1 Room, 50 student per activity (plus 30-day report history). Distinct from Wayground Basic 20 max activity storage. LexiClash free covers up to 50 students per class with miss-gap → reteach Live. No 5-quiz / 1-room Free library ceiling.",
+        "lede": "Socrative pricing publishes Free: 5 Quizzes, 1 Room, 50 students per activity (plus 30-day report history). LexiClash free covers up to 50 students per class with miss-gap → reteach Live. No 5-quiz / 1-room Free library ceiling.",
         "socTitle": "Socrative Free: published caps",
-        "socBody": "Pricing Free: 5 Quizzes · 1 Room · 50 student per activity · 30-day report history. Help: Free keeps the last 5 modified quizzes and one room on downgrade.",
+        "socBody": "Pricing Free: 5 Quizzes · 1 Room · 50 students per activity · 30-day report history. Help: Free keeps the last 5 modified quizzes and one room on downgrade.",
         "lexiTitle": "LexiClash: whole-class free + miss→Live",
         "lexiBody": "Free tier: up to 50 students per class for word-formation vocab games, plus miss-gap → reteach Live. No 5-quiz / 1-room Free library ceiling.",
         "citePrefix": "Socrative:",
@@ -15227,9 +15227,9 @@ const en = {
     },
     "vsClassPoint": {
       "basicFree": {
-        "eyebrow": "Free-tier caps: honesty foil",
+        "eyebrow": "Free-tier limits compared",
         "title": "ClassPoint Basic Free: Max-25-class-size / 5 Questions per PPT. LexiClash: whole-class free (50) + miss→reteach Live.",
-        "lede": "ClassPoint pricing publishes Basic Free: Max-25-class-size, 5 Questions per PPT, 5 Question types, 3 Draggable objects, 3 saved classes. Distinct from Socrative Free 5 Quizzes / 1 Room / 50. LexiClash free covers up to 50 students per class with miss-gap → reteach Live. No Max-25 / 5-question PowerPoint ceiling.",
+        "lede": "ClassPoint pricing publishes Basic Free: Max-25-class-size, 5 Questions per PPT, 5 Question types, 3 Draggable objects, 3 saved classes. LexiClash free covers up to 50 students per class with miss-gap → reteach Live. No Max-25 / 5-question PowerPoint ceiling.",
         "cpTitle": "ClassPoint Basic Free: published caps",
         "cpBody": "Pricing Basic Free: Max-25-class-size · 5 Questions per PPT · 5 Question types · 3 Draggable objects · 3 saved classes (plus 20 free AI quiz credits).",
         "lexiTitle": "LexiClash: whole-class free + miss→Live",
@@ -15243,7 +15243,7 @@ const en = {
     },
     "vsPearDeck": {
       "teacherFree": {
-        "eyebrow": "Named-response honesty: Free vs Premium",
+        "eyebrow": "Named responses: Free vs Premium",
         "title": "Pear Deck Teacher Free: anonymous projector; names via spreadsheet export. LexiClash: classroom roster + named feedback.",
         "lede": "Pear Deck Teacher Free publishes unlimited Sessions/participants and projects answers anonymously. Named responses on Free: export to spreadsheet or Flashcard Factory hover. Premium Teacher Dashboard shows names, hide/block, Drawing/Draggable, Reflect & Review, Teacher Feedback. LexiClash free covers up to 50 with classroom roster / named feedback. No Premium named-dashboard gate.",
         "pdTitle": "Pear Deck Teacher Free: named-response caps",
@@ -15259,7 +15259,7 @@ const en = {
     },
     "vsPadlet": {
       "neonFree": {
-        "eyebrow": "Neon Free honesty: 3 padlets + 20MB",
+        "eyebrow": "Neon Free limits: 3 padlets + 20MB",
         "title": "Padlet Neon Free: 3 active padlets + 20MB upload/file. LexiClash: whole-class free vocab (50). No 3-board gate.",
         "lede": "Padlet Neon Free publishes 3 fully customizable / active padlets and a 20MB upload limit per file (plus 1 user, 2-minute video / 5-minute audio recordings). Platinum unlocks unlimited padlets + 500MB uploads. LexiClash free covers up to 50 for word-formation vocab games with miss-gap → reteach Live. No 3-active-board Neon Free gate.",
         "padletTitle": "Padlet Neon Free: active-board + upload caps",
@@ -15275,7 +15275,7 @@ const en = {
     },
     "vsNearpod": {
       "silverFree": {
-        "eyebrow": "Free-tier caps: honesty foil",
+        "eyebrow": "Free-tier limits compared",
         "title": "Nearpod Silver: 40 joins/lesson + 300 MB. LexiClash: whole-class free (50) + miss→reteach Live.",
         "lede": "Nearpod pricing publishes Silver free caps of 40 joins per lesson and 300 MB storage (Gold 75 / Platinum 90 / School·District 250). LexiClash free covers up to 50 students per class with miss-gap → reteach Live. One clear free classroom seat cap.",
         "nearpodTitle": "Nearpod Silver (free): published caps",
@@ -15290,20 +15290,20 @@ const en = {
     },
     "vsBlooket": {
       "gapsSet": {
-        "eyebrow": "After the report: honesty foil",
-        "title": "Blooket: sort Incorrect%, rebuild a 「Gaps Set」. LexiClash: miss → Live deep-link.",
-        "lede": "Blooket’s Opportunities for Growth / Incorrect% workflow still ends in manual homework rebuild. LexiClash turns the same miss list into an auto reteach Live deep-link (#1124). No new set to author.",
-        "blooketTitle": "Blooket: manual 「Gaps Set」",
-        "blooketBody": "Sort the Questions report by Incorrect%, skim Opportunities for Growth (Plus), note the top misses, then open Edit / Question Bank and rebuild a 「Gaps Set」 to assign as homework or a focused review. Diagnosis is fast; the reteach set is still hand-built.",
-        "lexiTitle": "LexiClash: auto miss-gap deep-link (#1124)",
-        "lexiBody": "Last-lesson miss chips and miss-gap teacher progress already carry Unplugged / 3-min reteach Live deep-links. One click seeds the missed words into Live. No 「Gaps Set」 rebuild, no Question Bank hop.",
+        "eyebrow": "After the report: closing the gaps",
+        "title": "Blooket: sort Incorrect%, rebuild a “Gaps Set”. LexiClash: miss → Live deep-link.",
+        "lede": "Blooket’s Opportunities for Growth / Incorrect% workflow still ends in manual homework rebuild. LexiClash turns the same miss list into an auto reteach Live deep-link. No new set to author.",
+        "blooketTitle": "Blooket: manual “Gaps Set”",
+        "blooketBody": "Sort the Questions report by Incorrect%, skim Opportunities for Growth (Plus), note the top misses, then open Edit / Question Bank and rebuild a “Gaps Set” to assign as homework or a focused review. Diagnosis is fast; the reteach set is still hand-built.",
+        "lexiTitle": "LexiClash: auto miss-gap deep-link",
+        "lexiBody": "Last-lesson miss chips and miss-gap teacher progress already carry Unplugged / 3-min reteach Live deep-links. One click seeds the missed words into Live. No “Gaps Set” rebuild, no Question Bank hop.",
         "citePrefix": "Blooket teacher guide:",
         "citeLabel": "Identify knowledge gaps in Blooket reports",
-        "citeSuffix": ": Workflow 2: Build a Targeted Follow-Up Set (「Gaps Set」).",
+        "citeSuffix": ": Workflow 2: Build a Targeted Follow-Up Set (“Gaps Set”).",
         "cta": "Try miss-gap → Live without rebuilding a set"
       },
       "freeTier": {
-        "eyebrow": "Free-tier caps: honesty foil",
+        "eyebrow": "Free-tier limits compared",
         "title": "Blooket Starter: ≤60 live players + homework 14-day deadline. LexiClash: whole-class free (50) + miss→reteach Live.",
         "lede": "Blooket help and upgrade pages publish Starter free caps of up to 60 live players and homework deadlines up to 14 days (Plus raises those to 300 players / 365 days). LexiClash free covers a whole class of up to 50 with miss-gap → reteach Live. One clear free classroom seat cap.",
         "blooketTitle": "Blooket Starter (free): published caps",
@@ -15373,7 +15373,7 @@ const en = {
       "spelling": "Spelling",
       "streak": "{{count}} streak",
       "submit": "Submit",
-      "swipeExplain": "Swipe right for Got It, left for Skip",
+      "swipeExplain": "Swipe right for Got it, left for Skip",
       "swipeHint": "Swipe to answer",
       "tapCard": "Tap card to reveal",
       "tapToFlip": "Tap to flip",
@@ -15395,7 +15395,7 @@ const en = {
       "wordList": "Word list",
       "wordsFound": "Words found"
     },
-    "reviewDue": "{{count}} words due for review",
+    "reviewDue": "Words due for review: {{count}}",
     "starterPacks": {
       "title": "Starter packs",
       "subtitle": "Ready-made vocab sets",
@@ -15475,7 +15475,7 @@ const en = {
         },
         "earlyFinishers": {
           "name": "Early finishers",
-          "when": "Some students are done early. Each one plays their own Wordcraft board quietly."
+          "when": "Students who finish early each play their own Wordcraft board, quietly."
         }
       }
     },
@@ -15587,7 +15587,7 @@ const en = {
     "students": "Students",
     "template": {
       "allowLateJoin": "Allow late join",
-      "allowLateJoinDesc": "Players can join mid-game",
+      "allowLateJoinDesc": "Students can join mid-game",
       "boardPreview": "Board preview",
       "boardSize": "Board size",
       "create": "Create template",
@@ -15630,7 +15630,7 @@ const en = {
     },
     "lessonWords": {
       "title": "Lesson vocabulary",
-      "subtitle": "Your performance on lesson words",
+      "subtitle": "How you did on lesson words",
       "found": "Found",
       "total": "Total",
       "completion": "Score",
@@ -15640,7 +15640,7 @@ const en = {
     },
     "reports": {
       "title": "Progress reports",
-      "subtitle": "Generate detailed reports for students and parents",
+      "subtitle": "Create reports for students and parents",
       "classReport": "Class progress report",
       "studentReport": "Student progress report",
       "exportPDF": "Export PDF",
@@ -15712,9 +15712,9 @@ const en = {
     },
     "access": {
       "h1": "Create your free teacher account",
-      "lede": "Sign up with Google or email, confirm your address, and answer two quick questions. You're in instantly — no review queue.",
-      "redirect_title": "Teacher access unlocks that page",
-      "redirect_body": "You were heading to {{dest}}. Create your free teacher account below to open it — teachers get in instantly.",
+      "lede": "Sign up with Google or email, confirm your address, and answer two quick questions. You're in instantly, with no review queue.",
+      "redirect_title": "That page is for teachers",
+      "redirect_body": "You were heading to {{dest}}. Create a free teacher account below to open it. Teachers get in instantly.",
       "redirect_dest_fallback": "your classroom tools",
       "full_name": "Your full name",
       "email": "Email address",
@@ -15728,7 +15728,7 @@ const en = {
       "school_or_org": "School or organization (optional)",
       "country": "Country (optional)",
       "use_case": "How will you use LexiClash? (10-800 chars)",
-      "submit": "Send application",
+      "submit": "Get teacher access",
       "submitting": "Sending…",
       "submit_error": "Couldn't send your application. Try again.",
       "rate_limited": "Too many requests. Try again in 24 hours.",
@@ -15748,14 +15748,14 @@ const en = {
       "go_to_teacher": "Open Teacher Dashboard",
       "class_ready_cta": "Your class is ready",
       "class_ready_title": "Your class is ready",
-      "class_ready_body": "Share this code. Students join from their phones — no accounts.",
+      "class_ready_body": "Share this code. Students join from their phones, no accounts.",
       "class_ready_code": "Join code",
       "class_ready_qr": "Scan to join",
       "class_ready_test": "Join from your phone as a test student",
       "class_ready_test_hint": "A test join does not start your class trial.",
       "class_ready_hq": "Teacher home",
       "class_ready_creating": "Setting up your class…",
-      "class_ready_error": "Could not open a class. Try again, or go to teacher home.",
+      "class_ready_error": "Couldn't open a class. Try again, or go to teacher home.",
       "status_unknown_title": "We couldn't read your access status",
       "status_unknown_body": "Something went wrong on our side. Open your teacher dashboard, or reload this page to check again.",
       "auth_required_title": "Start with your account",
@@ -15768,7 +15768,7 @@ const en = {
       "cta_micro": "Takes 60 seconds · No credit card",
       "hero_alt": "The LexiClash mascot welcoming a classroom of letter cubes",
       "verify_email_title": "Verify your email first",
-      "verify_email_body": "We sent a confirmation link to {email}. Confirm it to unlock the teacher access request.",
+      "verify_email_body": "We sent a confirmation link to {email}. Confirm it to continue.",
       "verify_email_resend": "Resend confirmation email",
       "verify_email_sending": "Sending…",
       "verify_email_resent": "Sent. Check your inbox",
@@ -15779,14 +15779,14 @@ const en = {
       "greeting_sub": "We already have your name and email from your account. Just two quick things left.",
       "applying_as": "Applying as",
       "role_q": "First up: which one are you?",
-      "use_case_q": "Now the fun part",
+      "use_case_q": "Next: how you'll use it",
       "use_case_hint": "How will you use LexiClash with your learners? A sentence or two is perfect.",
       "use_case_placeholder": "e.g. Friday vocab battles with my 7th-grade ESL class…",
-      "use_case_spark": "Need a spark?",
+      "use_case_spark": "Need ideas?",
       "use_case_ex1": "Weekly vocabulary battles with my class",
       "use_case_ex2": "Homework practice my students actually enjoy",
       "use_case_ex3": "Live team games to review spelling",
-      "use_case_remaining": "{count} more characters to go",
+      "use_case_remaining": "{count} more characters needed",
       "use_case_ready": "Perfect, that's plenty",
       "school_q": "Where's your classroom? (optional)",
       "school_placeholder": "School, tutoring center, or homeschool",
@@ -15806,7 +15806,7 @@ const en = {
     },
     "trial": {
       "title": "Your teacher trial is live",
-      "urgent_title": "Last chance: your trial is almost over",
+      "urgent_title": "Your trial is almost over",
       "body": "Full classroom access until {date}. Set up a class and run a live game before it ends.",
       "days_left": "days left",
       "day_left": "day left",
@@ -15817,8 +15817,8 @@ const en = {
       "cta": "Start your first class",
       "expired_title": "Your teacher trial has ended",
       "expired_kept": "Your classes and word lists stay free. Reports, word mastery and calm mode need Pro.",
-      "recap": "In your trial — games run: {{games}}, students on your roster: {{students}}",
-      "recapGamesOnly": "In your trial — games run: {{games}}",
+      "recap": "In your trial: {{games}} games run, {{students}} students on your roster",
+      "recapGamesOnly": "In your trial: {{games}} games run",
       "expired_body": "Your free trial window is over. Reapply or reach out to keep classroom mode.",
       "renew_cta": "Renew teacher access"
     },
@@ -15862,7 +15862,7 @@ const en = {
     },
     "packages": {
       "title": "Education packages",
-      "subtitle": "Teacher Pro is self-serve billing. Schools & departments: $49 per teacher per year for 5+ teachers, paid by invoice or PO — request a quote below.",
+      "subtitle": "Teacher Pro is billed online. Schools & departments: $49 per teacher per year for 5+ teachers, paid by invoice or PO. Request a quote below.",
       "teacherPro": {
         "name": "Teacher Pro",
         "interval": "/mo",
@@ -15875,7 +15875,7 @@ const en = {
         "priceFrom": "From",
         "interval": "per teacher / year",
         "priceTerms": "{min}+ teachers · invoice or purchase order",
-        "blurb": "Teacher Pro for every teacher on your team. Invoice or PO — no self-serve checkout.",
+        "blurb": "Teacher Pro for every teacher on your team. Invoice or PO, no online checkout.",
         "cta": "Get a school quote"
       },
       "feature": {
@@ -15917,7 +15917,7 @@ const en = {
       "watchForReward": "Watch ad for {{reward}}",
       "adPlaying": "Ad playing...",
       "adError": "Ad unavailable",
-      "adblockDetected": "Adblock detected. Some features may be limited",
+      "adblockDetected": "Ad blocker on. Some rewards may not work.",
       "thanksForWatching": "Thanks for watching"
     },
     "cloudSave": {
@@ -16115,7 +16115,7 @@ const en = {
     "stolen": "Already claimed",
     "emptyName": "Every player needs a name",
     "minPlayers": "Need at least 2 players",
-    "maxPlayers": "Maximum 6 players",
+    "maxPlayers": "Up to 6 players",
     "nameTaken": "Names must be unique",
     "langEn": "English",
     "langHe": "Hebrew",
@@ -16184,7 +16184,7 @@ const en = {
   "noClassmatesFound": "No classmates found",
   "noOpponentsOnline": "No opponents online right now",
   "noPendingChallenges": "No pending challenges",
-  "notParticipant": "You are not a participant in this duel",
+  "notParticipant": "You're not in this duel",
   "pendingChallenges": "Pending challenges",
   "quickMatch": "Quick match",
   "selectLesson": "Select lesson",
@@ -16344,7 +16344,7 @@ const en = {
       "earning": "Watching...",
       "earned": "+{amount} gold earned!",
       "cooldown": "Available soon",
-      "blocked": "Ad blocker is preventing rewards. Disable it for lexiclash.live to earn gold."
+      "blocked": "Your ad blocker is blocking rewards. Turn it off for lexiclash.live to earn gold."
     },
     "doubleGold": {
       "cta": "Double rewards +{amount}",
@@ -16399,7 +16399,7 @@ const en = {
     "statWrongGuesses": "Wrong",
     "statSurvival": "Survived",
     "eliminatedOrder": "Out #{{order}} of {{total}}",
-    "lessonWrongGuess": "Wrong target guesses cost {{penalty}} life each. You lost {{guesses}} guesses. Build up life with board words before risking a guess.",
+    "lessonWrongGuess": "Wrong target guesses cost {{penalty}} life each. You missed {{guesses}}. Build up life with board words before risking a guess.",
     "lessonNoWords": "You only found {{count}} words. Swiping words on the board heals you. Find quick 3-letter words to stay alive.",
     "lessonShortWords": "Your average word was {{avg}} letters. Longer words heal more: 5-letter words give +8 life vs +3 for 3-letter words.",
     "lessonTooManyGuesses": "{{guesses}} wrong guesses cost you {{cost}} life total. Only guess the target when you have enough clues to be confident.",
@@ -16422,7 +16422,7 @@ const en = {
   "wordHuntNudge": {
     "lifeDrop": "Swipe words on the board to heal. Each word restores life.",
     "firstClue": "That word revealed a clue about the target. Check the boxes above.",
-    "wrongGuess": "A wrong target guess costs -15 life. Build up clues first."
+    "wrongGuess": "A wrong target guess costs 15 life. Build up clues first."
   },
   "wordHuntPromo": {
     "title": "Try Word Hunt mode",
@@ -16556,7 +16556,7 @@ const en = {
       },
       "tutorial": {
         "tip1": "Tap adjacent tiles to spell",
-        "tip2": "Longer words show off more",
+        "tip2": "Longer words score more",
         "tip3": "No timer. Just explore"
       }
     },
@@ -16565,7 +16565,7 @@ const en = {
       "description": "Clear tiles with combos and special powers.",
       "feature1": "Chain combos",
       "feature2": "Special tiles",
-      "feature3": "Cascade",
+      "feature3": "Cascades",
       "intro": {
         "greet": "Tap, swipe, breathe. No rush."
       },
@@ -16737,7 +16737,7 @@ const en = {
     "xp": "XP",
     "noLeague": "Join a league to compete",
     "positionOf": "{position} of {total}",
-    "xpToPromote": "{xp} XP to promote",
+    "xpToPromote": "{xp} XP to move up",
     "xpAboveRelegation": "{xp} XP above relegation",
     "promotionZone": "Promotion zone",
     "safeZone": "Safe zone",
@@ -16770,7 +16770,7 @@ const en = {
     "sendTo": "Send to",
     "type": {
       "hints": "Hint",
-      "streak_freeze": "Streak Shield",
+      "streak_freeze": "Streak Freeze",
       "coins": "Coins"
     },
     "coins": "coins",
@@ -16816,13 +16816,13 @@ const en = {
       "optOut": "Can I opt out of data collection?"
     },
     "a": {
-      "whatIs": "LexiClash is a multiplayer word game where you compete against friends or AI opponents to find words on a shared board. Play solo, challenge daily puzzles, or compete in real-time multiplayer matches across Hebrew, English, Swedish, and Japanese.",
+      "whatIs": "LexiClash is a multiplayer word game where you compete against friends or AI opponents to find words on a shared board. Play solo, challenge daily puzzles, or compete in real-time multiplayer matches across Hebrew, English, Swedish, Japanese, Spanish, and Russian.",
       "createAccount": "You can play as a guest or create an account using Google Sign-In. Having an account lets you save your progress, track statistics, compete on leaderboards, and play across devices.",
-      "isFree": "Yes. LexiClash is free to play. All game modes, including singleplayer, multiplayer and daily challenges, cost nothing.",
+      "isFree": "Yes. Playing LexiClash is free, including singleplayer, multiplayer and daily challenges. Teacher Pro is an optional paid plan for classrooms.",
       "scoring": "Points are awarded based on word length and letter values. Longer words score more points. Rare letters like Q, Z, and X have higher values. Bonus points are awarded for finding all words on the board.",
-      "gameModes": "LexiClash offers three main modes: (1) Singleplayer: practice against AI with various difficulty levels, (2) Multiplayer: real-time matches against other players, (3) Daily Challenge: compete on the same puzzle as players worldwide.",
+      "gameModes": "LexiClash has plenty of modes. The main three are: (1) Singleplayer: practice against AI with various difficulty levels, (2) Multiplayer: real-time matches against other players, (3) Daily Challenge: compete on the same puzzle as players worldwide.",
       "dailyChallenge": "Every day at midnight UTC, a new puzzle is generated that all players worldwide can attempt. You get one chance per day to find as many words as possible. Your score is recorded on the daily leaderboard.",
-      "multipleLanguages": "Yes. LexiClash supports Hebrew, English, Swedish, and Japanese. You can switch languages in Settings. Each language has its own word dictionary and leaderboards.",
+      "multipleLanguages": "Yes. LexiClash supports Hebrew, English, Swedish, Japanese, Spanish, and Russian. You can switch languages in Settings. Each language has its own word dictionary and leaderboards.",
       "devices": "LexiClash works on all modern devices including desktop computers, tablets, and smartphones. We support the latest versions of Chrome, Firefox, Safari, and Edge browsers.",
       "internet": "Yes, an internet connection is required for multiplayer and daily challenges. However, you can play singleplayer mode offline if you have previously loaded the game.",
       "reportBug": "If you hit a bug, contact us at lexiclash.game@gmail.com or reach out on Instagram @lexi.clash. Include what happened and which device and browser you were using.",
@@ -17019,12 +17019,12 @@ const en = {
       "notInDictionary": "Not in dictionary",
       "alreadyFound": "Already found",
       "tooShort": "Too short",
-      "invalidPath": "Invalid path",
+      "invalidPath": "Can't trace that",
       "outsideBoard": "Not on board",
       "notConnected": "Letters not connected",
       "duplicate": "Already submitted",
       "timeout": "Time's up",
-      "unknown": "Invalid word"
+      "unknown": "Not a word"
     }
   },
   "languages": {
@@ -17087,9 +17087,9 @@ const en = {
     "empty": "Play games to discover rare words"
   },
   "powerHour": {
-    "activated": "Power Hour Activated!",
+    "activated": "Power Hour is on!",
     "description": "2x XP for the next 60 minutes!",
-    "expired": "Boost Complete!",
+    "expired": "Power Hour's over",
     "badge": "{{time}}"
   },
   "vault": {
@@ -17154,9 +17154,9 @@ const en = {
       "dailyChallenges": "Complete {{target}} daily challenges",
       "longWords": "Find {{target}} words of 5+ letters",
       "mpWins": "Win {{target}} multiplayer games",
-      "combo": "Reach combo {{target}}",
+      "combo": "Reach a {{target}}x combo",
       "findWordsSession": "Find {{target}} words in a single session",
-      "dailyMissionsStreak": "Complete all daily missions {{target}} days",
+      "dailyMissionsStreak": "Finish all daily missions {{target}} days in a row",
       "highScore": "Score {{target}}+ in one game"
     }
   },
@@ -17191,7 +17191,7 @@ const en = {
   "asyncChallenge": {
     "title": "Board Challenges",
     "yourTurn": "Your turn",
-    "ariaLabel": "Async challenges from friends",
+    "ariaLabel": "Board challenges from friends",
     "playAriaLabel": "Play challenge from {{name}}",
     "playNow": "Play now",
     "challengeFriend": "Challenge a friend",
@@ -17357,7 +17357,7 @@ const en = {
     "whoIsTheShadow": "Who is the Shadow among you?",
     "theVotes": "The votes are in...",
     "isEliminated": "is eliminated!",
-    "noConsensus": "No consensus. No one eliminated.",
+    "noConsensus": "Votes split. Nobody's out.",
     "citizensWin": "Citizens Win!",
     "shadowsWin": "Shadows Win!",
     "roleShadow": "Shadow",
@@ -17498,7 +17498,7 @@ const en = {
     "rush": {
       "loading": "Loading...",
       "fogActive": "Fog of War active!",
-      "loadFailed": "Couldn't load the round. Please try again.",
+      "loadFailed": "Couldn't load the round. Try again.",
       "loadFailedQuit": "Back to lobby"
     }
   },
@@ -17571,7 +17571,7 @@ const en = {
     "title": "Word Chain",
     "subtitle": "Find the word that connects both.",
     "placeholder": "Type the bridge word...",
-    "submit": "Submit",
+    "submit": "Check",
     "backspace": "Delete letter",
     "momentum": {
       "start": "Solve {goal} in a row for a bonus",
@@ -17580,7 +17580,7 @@ const en = {
       "onFire": "🔥 {streak} in a row. Don't stop!"
     },
     "correct": "Correct!",
-    "wrong": "Wrong answer",
+    "wrong": "Not quite",
     "lives": "Lives",
     "score": "Score",
     "streak": "Streak",
@@ -17588,7 +17588,7 @@ const en = {
     "finalScore": "Final score",
     "playAgain": "Play again",
     "loading": "Loading...",
-    "noAccess": "This game mode is not available.",
+    "noAccess": "This mode isn't available.",
     "hintLabel": "Hint",
     "bonusPoints": "Streak Bonus!",
     "wordChain": "WORD1 + ? + WORD2",
@@ -17656,7 +17656,7 @@ const en = {
     "adminGiveUp": "Skip puzzle (admin)",
     "landing": {
       "metaTitle": "Word Bridge: Find the Connecting Word | LexiClash",
-      "metaDescription": "Free online word puzzle. Two words, one bridge — find the word that links them. Also known as rosh-zanav, the classic Israeli word game. No signup, no downloads.",
+      "metaDescription": "Free online word puzzle. Two words, one bridge. Find the word that links them. Also known as rosh-zanav, the classic Israeli word game. No signup, no downloads.",
       "metaKeywords": "word bridge puzzle, word association game, bridge word game, rosh zanav, word link puzzle, free word games online, brain word puzzle",
       "ogTitle": "Word Bridge: Find the Connecting Word",
       "ogDescription": "Two words, one bridge. The classic word-association puzzle, free online.",
@@ -17777,8 +17777,8 @@ const en = {
     "PLAYER_NOT_IN_GAME": "You're not in a game",
     "PLAYER_NOT_HOST": "Only the host can do that",
     "VALIDATION_FAILED": "Invalid request",
-    "VALIDATION_INVALID_PAYLOAD": "Invalid request data",
-    "VALIDATION_MISSING_FIELD": "Missing required field",
+    "VALIDATION_INVALID_PAYLOAD": "Something was off with that request",
+    "VALIDATION_MISSING_FIELD": "Fill in every field",
     "WORD_PROCESSING_ERROR": "Couldn't process your word. Try again.",
     "INTERNAL_ERROR": "Something broke. Try again.",
     "WHEEL_STATE_NOT_INITIALIZED": "The wheel isn't ready yet. Try again.",
@@ -17873,13 +17873,13 @@ const en = {
     "loadingDict": "Loading dictionary…",
     "error": {
       "dictLoading": "Dictionary still loading.",
-      "invalidWord": "{{word}} is not in the dictionary.",
+      "invalidWord": "{{word}} isn't in the dictionary.",
       "mustCoverCenter": "First word must cover the center star.",
       "tooShort": "Words need at least 2 letters.",
       "notLinear": "Place tiles in a single row or column.",
-      "notContiguous": "Tiles must be contiguous.",
-      "disconnected": "Word must connect to an existing tile.",
-      "outOfBounds": "Tile placed off the board.",
+      "notContiguous": "Tiles can't have gaps.",
+      "disconnected": "Connect your word to a placed tile.",
+      "outOfBounds": "Keep your tiles on the board.",
       "noTiles": "Place at least one tile to play.",
       "bagTooSmallToSwap": "Not enough tiles in the bag to swap.",
       "blankUnassigned": "Pick a letter for your joker first."
@@ -18114,7 +18114,7 @@ const en = {
       "shop": {
         "title": "Shop",
         "cost": "Cost",
-        "insufficient": "Need gem",
+        "insufficient": "Need gems",
         "purchased": "Bought"
       },
       "ability": {
@@ -19092,7 +19092,7 @@ const en = {
     "mode2Body": "Four cubes, one live board, zero mercy. The loudest scoreboard wins.",
     "mode3Tag": "6 languages",
     "mode3": "Play in your language",
-    "mode3Body": "Hebrew, English, Swedish, Japanese, Spanish. Your words, your turf.",
+    "mode3Body": "Hebrew, English, Swedish, Japanese, Spanish, Russian. Your words, your turf.",
     "bottomTitle": "Your move. Make it loud.",
     "bottomCta": "Play LexiClash free",
     "floatCta": "Play free",
@@ -19104,7 +19104,7 @@ const en = {
     "faqQ3": "Is it like Scrabble?",
     "faqA3": "Same love of words, much faster. Instead of placing tiles in turns, you trace words on a live grid against the clock. A quick, competitive Scrabble alternative you play online for free.",
     "faqQ4": "What languages can I play in?",
-    "faqA4": "Five, each with its own dictionary: English, Hebrew, Swedish, Japanese, and Spanish. Play a word game in your own language.",
+    "faqA4": "Six, each with its own dictionary: English, Hebrew, Swedish, Japanese, Spanish, and Russian. Play a word game in your own language.",
     "faqQ5": "Do I need to download or sign up?",
     "faqA5": "No. LexiClash runs in any modern browser on phone, tablet, or TV. No install, no account needed to start.",
     "faqQ6": "Are there competitive leaderboards?",
@@ -19183,7 +19183,7 @@ const en = {
       "loremaster": "Loremaster",
       "points": "{points} curator points",
       "toNext": "{points} points to {rank}",
-      "maxed": "Top rank reached — legend!",
+      "maxed": "Top rank reached. Legend!",
       "rankedUp": "Ranked up! You're now a {rank} 🎉"
     },
     "coins": {
@@ -19197,7 +19197,7 @@ const en = {
     },
     "levels": {
       "title": "What each access level grants",
-      "subtitle": "Three independent roles — a user can hold any combination.",
+      "subtitle": "Three independent roles. A user can hold any combination.",
       "note": "Curators never edit live content directly. Every action is a proposal an admin reviews before it takes effect.",
       "toggle": "What do these levels mean?",
       "admin": {
@@ -19215,9 +19215,9 @@ const en = {
         "scope": "Per language",
         "desc": "A trusted native speaker who reviews content quality for one or more languages. Power is set by tier; activity earns prestige."
       },
-      "capabilityHeading": "Capability tiers — what they can do",
-      "rewardsHeading": "Prestige rewards — what they earn",
-      "rewardsDesc": "Earned only when an admin ratifies a curator's proposal, so accuracy is rewarded — not volume.",
+      "capabilityHeading": "Capability tiers: what they can do",
+      "rewardsHeading": "Prestige rewards: what they earn",
+      "rewardsDesc": "Earned only when an admin ratifies a curator's proposal, so accuracy is rewarded, not volume.",
       "ranksLabel": "Ranks",
       "coinsLabel": "Coin bonuses",
       "coinMilestone": "{points} pts → {coins} coins"
@@ -19231,7 +19231,7 @@ const en = {
       "assigned": "Curator assigned",
       "revoke": "Revoke",
       "revoked": "Curator revoked",
-      "error": "Action failed — try again",
+      "error": "Didn't work. Try again.",
       "current": "Curating",
       "languageLabel": "Language",
       "tierLabel": "Tier"
@@ -19258,7 +19258,7 @@ const en = {
         "tierLabel": "Trust tier",
         "submit": "Assign",
         "success": "Curator assigned",
-        "error": "Couldn't assign — check the user ID"
+        "error": "Couldn't assign. Check the user ID."
       },
       "list": {
         "title": "Active curators",
@@ -19343,7 +19343,7 @@ const en = {
   },
   "pricing": {
     "title": "Choose your plan",
-    "subtitle": "Unlock classroom features for teachers and schools",
+    "subtitle": "Classroom tools for teachers and schools",
     "free": "Free",
     "pro": "Pro",
     "month": "month",
@@ -19449,7 +19449,7 @@ const en = {
       "editSettings": "Edit round settings",
       "chatHint": "Say hi to the squad",
       "chatUnread": "{count} new",
-      "modeOn": "{mode} is on — press Start",
+      "modeOn": "{mode} is on. Press Start",
       "progressNotSaved": "Couldn't save this game. If the server restarts, progress may be lost."
     },
     "round": {
@@ -19584,7 +19584,7 @@ const en = {
         "rule": "Spell lesson words with your tiles and drop them on the board."
       },
       "pending": "Game on!",
-      "pendingRule": "Eyes up, your teacher is starting the round."
+      "pendingRule": "Eyes up. Your teacher is starting the round."
     },
     "lobby": {
       "pickLook": "Pick a look",
@@ -19903,7 +19903,7 @@ const en = {
       "title": "One quick look before checkout",
       "includesTitle": "Teacher Pro includes",
       "paidLine": "Teacher Pro is {price}/month, starting today.",
-      "secure": "Secure checkout — we never see your card",
+      "secure": "Secure checkout. We never see your card.",
       "confirm": "Continue to secure checkout"
     },
     "faq": {
@@ -19943,7 +19943,7 @@ const en = {
     },
     "strip": {
       "title": "What Pro shows you after one game",
-      "lead": "Sample class data — your own classes fill these in."
+      "lead": "Sample class data. Your own classes fill these in."
     },
     "school": {
       "eyebrow": "Schools & departments",
@@ -19973,7 +19973,7 @@ const en = {
       "requesterBanner": "{name} asked for Teacher Pro. Send us the details and we'll quote it.",
       "errorRateLimited": "You've already sent a request today. We'll answer that one.",
       "errorInvalid": "Something in the form isn't right. Check the email and the school name.",
-      "errorGeneric": "Couldn't send that. Please try again in a minute.",
+      "errorGeneric": "Couldn't send that. Try again in a minute.",
       "roles": {
         "teacher": "Teacher",
         "head_of_department": "Head of department",
@@ -20005,7 +20005,7 @@ const en = {
       "open": "Open",
       "unnamed": "Student {n}",
       "needsPro": "Parent links are a Teacher Pro tool.",
-      "failed": "Couldn't make the links. Please try again.",
+      "failed": "Couldn't make the links. Try again.",
       "copied": "Copied {count} links",
       "fileName": "Parent links {className}",
       "colStudent": "Student",
@@ -20279,7 +20279,7 @@ const en = {
       "leave": "Leave"
     },
     "entry": {
-      "roomFullTitle": "The room is full: you are watching",
+      "roomFullTitle": "The room is full. You're watching",
       "roomFullHint": "All {max} seats are taken. Your teacher can see you are waiting.",
       "connecting": "Connecting to your class…",
       "openingRoom": "Opening your room…",
@@ -20375,7 +20375,7 @@ const en = {
         "start": "Start this lesson",
         "play": "Start the game",
         "stepsLabel": "Lesson steps",
-        "thenLive": "Press Go live when most of the class has practised.",
+        "thenLive": "Press Go live when most of the class has practiced.",
         "startShort": "Start"
       },
       "greetMorning": "Good morning, {name}",
@@ -20395,7 +20395,7 @@ const en = {
       "playWith": "Start a game with {name}",
       "showCode": "Show code",
       "showCodeFor": "Show the join code for {name}",
-      "reviewTitle": "Practise the missed words",
+      "reviewTitle": "Practice the missed words",
       "rail": {
         "run": "Use",
         "seeAll": "See all",
@@ -20465,7 +20465,7 @@ const en = {
           "title": "Try a 2-minute game",
           "body": "Run a short round. Add practice bots in the lobby if no one has joined yet.",
           "cta": "Start a 2-minute game",
-          "bodyAwaitingPlayers": "Your room is ready — now get students in. Show the join code or QR on the board.",
+          "bodyAwaitingPlayers": "Your room is ready. Now get students in: show the join code or QR on the board.",
           "ctaAwaitingPlayers": "Show the class code",
           "titleAwaitingPlayers": "Get your students in"
         }
@@ -20542,10 +20542,10 @@ const en = {
       "showProjector": "Show on projector",
       "backHome": "Back to Home",
       "firstRound": {
-        "title": "Run your first round — 2 minutes",
+        "title": "Run your first round: 2 minutes",
         "step1": "Practice alone against bots (private, no students)",
-        "step2": "Put the code or QR on the board — students join from phones",
-        "step3": "Press Start: a 2-minute round, results appear live",
+        "step2": "Put the code or QR on the board. Students join from phones",
+        "step3": "Press Start for a 2-minute round. Results appear live",
         "start": "Start a 2-minute round"
       },
       "skip": "Skip for now",
@@ -20578,9 +20578,9 @@ const en = {
     },
     "warmup": {
       "send": "Send list as homework",
-      "retry": "Could not send. Try again",
+      "retry": "Couldn't send. Try again.",
       "capped": "Free plan homework limit reached. Pro sends unlimited homework.",
-      "status": "{done} of {total} students practised",
+      "status": "{done} of {total} students practiced",
       "sent": "Sent as homework"
     }
   },
