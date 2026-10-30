@@ -173,7 +173,7 @@ export function ReportHeader({ title, subject, meta, exportState, onExport }: Re
         </div>
 
         <div className="flex shrink-0 items-center gap-3">
-          <span className="inline-flex items-center gap-1.5 rounded-neo border-2 border-black bg-neo-lime px-2.5 py-1 text-xs font-black uppercase tracking-wide text-black shadow-hard-sm">
+          <span className="inline-flex items-center gap-1.5 rounded-neo border-2 border-black bg-neo-lime px-2.5 py-1 text-xs font-black text-black shadow-hard-sm">
             <Sparkles aria-hidden="true" className="size-3.5" />
             {t('teacher.plan.pro')}
           </span>

@@ -14,6 +14,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Check, Printer, Share2 } from 'lucide-react';
+import { useFitPageSize } from '@/components/teacher/lesson-creation/library/useFitPageSize';
 import AvatarLite from '@/components/AvatarLite';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
@@ -53,9 +54,9 @@ const STATUS_LABEL_KEY: Record<RosterJoinFunnelStatus, string> = {
 };
 
 const STATUS_BADGE_CLASS: Record<RosterJoinFunnelStatus, string> = {
-  joined_idle: 'border-neo-orange bg-neo-orange/15 text-neo-orange',
-  guest: 'border-neo-cyan bg-neo-cyan/15 text-neo-cyan',
-  signed_in: 'border-neo-lime bg-neo-lime/15 text-neo-lime',
+  joined_idle: 'border-neo-cream text-neo-cream',
+  guest: 'border-neo-cream/50 text-neo-cream/85',
+  signed_in: 'border-neo-cream/35 text-neo-cream/75',
 };
 
 /**
@@ -82,15 +83,21 @@ const PRINT_CSS = `
 `;
 
 const SHARE_BTN =
-  'inline-flex min-h-11 items-center justify-center gap-1.5 rounded-neo border-2 border-black bg-neo-cyan px-4 py-2 font-bold text-neo-navy shadow-hard transition-shadow hover:shadow-hard-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white disabled:opacity-50';
+  'inline-flex min-h-10 items-center justify-center gap-1.5 rounded-neo border-2 border-neo-cream/60 bg-neo-navy px-3 py-1.5 text-sm font-bold text-neo-cream transition-colors hover:bg-neo-cream/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime disabled:opacity-50';
 
 const SHARE_BTN_QUIET =
-  'inline-flex min-h-11 items-center justify-center gap-1.5 rounded-neo border-2 border-neo-cyan bg-neo-navy px-4 py-2 font-bold text-neo-cyan transition-colors hover:bg-neo-cyan/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white disabled:opacity-50';
+  'inline-flex min-h-10 items-center justify-center gap-1.5 rounded-neo border-2 border-neo-cream/60 bg-neo-navy px-3 py-1.5 text-sm font-bold text-neo-cream transition-colors hover:bg-neo-cream/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime disabled:opacity-50';
+
+const ROW_H = 44;
+const PAGER_RESERVE = 88;
+const PAGER_BUTTON = 'min-h-10 rounded-neo border-2 border-neo-cream/60 px-3 text-sm font-bold text-neo-cream hover:border-neo-cream disabled:opacity-40';
 
 export function ClassroomRosterProgress({ classroomId, classroomName = '' }: ClassroomRosterProgressProps) {
   const { t, language } = useLanguage();
   const { hasPro, loading: proLoading } = useTeacherPro();
   const [copied, setCopied] = useState(false);
+  const [bodyRef, pageSize] = useFitPageSize(ROW_H, PAGER_RESERVE, 10);
+  const [page, setPage] = useState(0);
 
   const load = useCallback(async () => {
     const [studentRes, practiceRes, assignmentRes] = await Promise.all([
@@ -231,6 +238,9 @@ export function ClassroomRosterProgress({ classroomId, classroomName = '' }: Cla
   if (loading) return <ReportSkeleton />;
   if (failed) return <ReportError onRetry={retry} />;
   if (!data || data.rows.length === 0) return null;
+  const pageCount = Math.max(1, Math.ceil(data.rows.length / Math.max(1, pageSize)));
+  const shownPage = Math.min(page, pageCount - 1);
+  const pageRows = data.rows.slice(shownPage * pageSize, (shownPage + 1) * pageSize);
 
   return (
     <section
@@ -269,7 +279,7 @@ export function ClassroomRosterProgress({ classroomId, classroomName = '' }: Cla
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-sm">
           <thead>
-            <tr className="border-b-2 border-neo-cream/25 text-xs uppercase tracking-wide text-neo-cream/70">
+            <tr className="border-b-2 border-neo-cream/25 text-xs text-neo-cream/70">
               <th scope="col" className="p-3 text-start font-bold">
                 {t('teacher.reports.rosterProgress.columns.student')}
               </th>
@@ -287,8 +297,8 @@ export function ClassroomRosterProgress({ classroomId, classroomName = '' }: Cla
               </th>
             </tr>
           </thead>
-          <tbody>
-            {data.rows.map((row: RosterProgressRow) => (
+          <tbody ref={bodyRef}>
+            {pageRows.map((row: RosterProgressRow) => (
               <tr
                 key={row.studentId}
                 data-testid="classroom-roster-row"
@@ -313,7 +323,7 @@ export function ClassroomRosterProgress({ classroomId, classroomName = '' }: Cla
                 <td className="hidden px-3 py-2 sm:table-cell">
                   <span
                     data-testid="classroom-roster-status"
-                    className={`inline-flex items-center rounded border-2 px-1.5 py-0.5 text-xs font-bold uppercase tracking-wide ${STATUS_BADGE_CLASS[row.joinFunnelStatus]}`}
+                    className={`inline-flex items-center rounded border-2 px-1.5 py-0.5 text-xs font-bold ${STATUS_BADGE_CLASS[row.joinFunnelStatus]}`}
                   >
                     {t(STATUS_LABEL_KEY[row.joinFunnelStatus])}
                   </span>
@@ -323,6 +333,17 @@ export function ClassroomRosterProgress({ classroomId, classroomName = '' }: Cla
           </tbody>
         </table>
       </div>
+      {pageCount > 1 && (
+        <nav data-testid="classroom-roster-pager" aria-label={t('eduLibrary.pager.label')} className="flex items-center justify-center gap-3">
+          <button type="button" disabled={shownPage === 0} onClick={() => setPage(shownPage - 1)} className={PAGER_BUTTON}>
+            {t('eduLibrary.pager.prev')}
+          </button>
+          <span className="text-sm font-bold text-neo-cream/80">{t('eduLibrary.pager.status', { page: shownPage + 1, total: pageCount })}</span>
+          <button type="button" disabled={shownPage >= pageCount - 1} onClick={() => setPage(shownPage + 1)} className={PAGER_BUTTON}>
+            {t('eduLibrary.pager.next')}
+          </button>
+        </nav>
+      )}
       {proLoading || hasPro ? null : (
         <Link
           href={`/${language}/teacher/upgrade`}
@@ -338,7 +359,7 @@ export function ClassroomRosterProgress({ classroomId, classroomName = '' }: Cla
       <article
         data-print-root="parent-share"
         data-testid="classroom-roster-parent-print"
-        className="pointer-events-none absolute -left-[10000px] top-0 w-[210mm] bg-white p-6 text-black"
+        className="pointer-events-none fixed -left-[10000px] top-0 w-[210mm] bg-white p-6 text-black"
         aria-hidden="true"
       >
         <h1 className="mb-1 text-xl font-black">

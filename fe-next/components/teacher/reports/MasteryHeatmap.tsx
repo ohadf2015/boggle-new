@@ -40,7 +40,7 @@ export function MasteryHeatmap({ report, names }: { report: WordMasteryReport; n
                   <th scope="col" className="sticky start-0 top-0 z-30 w-44 min-w-[9.5rem] border-b-2 border-neo-cream/40 bg-neo-navy-light px-3 py-2 text-start align-bottom font-bold text-neo-cream/80">
                     <span className="flex items-end justify-between gap-2">
                       <span>{t('eduPro.mastery.studentColumn')}</span>
-                      <span className="text-[10px] uppercase text-neo-pink">{t('eduPro.mastery.needsHelpColumn')}</span>
+                      <span className="text-[10px] text-neo-cream/80">{t('eduPro.mastery.needsHelpColumn')}</span>
                     </span>
                   </th>
                   {view.words.map((w) => (
@@ -100,7 +100,7 @@ export function MasteryHeatmap({ report, names }: { report: WordMasteryReport; n
               </tbody>
               <tfoot>
                 <tr>
-                  <th scope="row" className="sticky bottom-0 start-0 z-30 border-t-2 border-neo-cream/40 bg-neo-navy-light px-3 py-2 text-start text-[11px] font-black uppercase text-neo-cream/80">
+                  <th scope="row" className="sticky bottom-0 start-0 z-30 border-t-2 border-neo-cream/40 bg-neo-navy-light px-3 py-2 text-start text-[11px] font-black text-neo-cream/80">
                     {t('eduPro.mastery.missedRow')}
                   </th>
                   {view.words.map((w) => (

@@ -99,15 +99,16 @@ describe('analytics page: summary first, every control does something', () => {
     expect(screen.getByTestId('analytics-live')).toBeInTheDocument();
   });
 
-  it('leads with the per-word mastery report, then a cards-only dashboard', async () => {
+  it('opens on the class pulse section under the stat row, one section at a time', async () => {
     render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
 
     const mastery = screen.getByTestId('word-mastery-report');
     const dashboard = screen.getByTestId('analytics-dashboard');
     expect(mastery).toHaveTextContent('classroom-1');
-    // The practice rounds are named after the class, so the report needs the real name.
     await waitFor(() => expect(mastery).toHaveTextContent('Room 4'));
-    expect(mastery.compareDocumentPosition(dashboard) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(dashboard.compareDocumentPosition(screen.getByRole('tablist')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.getByRole('tab', { selected: true })).toHaveTextContent('education.analytics.tabs.pulse');
+    expect(screen.queryByTestId('student-progress-table')).toBeNull();
   });
 
   it('keeps the mastery report behind the same single Pro gate for free teachers', () => {
@@ -131,7 +132,7 @@ describe('analytics page: summary first, every control does something', () => {
     const user = userEvent.setup();
     render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
 
-    await user.click(screen.getByText('education.analytics.viewLessons'));
+    await user.click(screen.getByText('education.analytics.tabs.lessons'));
     await waitFor(() => expect(screen.queryByTestId('student-progress-table')).not.toBeInTheDocument());
 
     act(() => dash.props.onViewStudents?.('struggling'));
@@ -142,17 +143,21 @@ describe('analytics page: summary first, every control does something', () => {
     const user = userEvent.setup();
     render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
 
-    await user.click(screen.getByTestId('student-progress-table'));
+    await user.click(screen.getByText('education.analytics.tabs.students'));
+    await user.click(await screen.findByTestId('student-progress-table'));
     expect(push).toHaveBeenCalledWith('/en/teacher/reports?classroomId=classroom-1&studentId=s1');
   });
 
-  it('Create review lesson jumps to the mastery report, where the missed-words practice lives', () => {
+  it('Create review lesson opens the class pulse section, where the missed-words practice lives, without scrolling', async () => {
+    const user = userEvent.setup();
     const scroll = vi.fn();
     Element.prototype.scrollIntoView = scroll;
     render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
 
+    await user.click(screen.getByText('education.analytics.tabs.students'));
+    await waitFor(() => expect(screen.queryByTestId('word-mastery-report')).not.toBeInTheDocument());
     act(() => dash.props.onCreateReviewLesson?.(['river']));
-    expect(scroll).toHaveBeenCalled();
-    expect(scroll.mock.contexts[0]).toBe(screen.getByTestId('word-mastery-report').parentElement);
+    expect(await screen.findByTestId('word-mastery-report')).toBeInTheDocument();
+    expect(scroll).not.toHaveBeenCalled();
   });
 });

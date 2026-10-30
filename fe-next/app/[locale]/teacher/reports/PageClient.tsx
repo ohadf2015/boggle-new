@@ -41,6 +41,7 @@ import { ROUND_FIXTURE } from '@/components/teacher/rounds/roundFixture';
 import { ClassroomPicker, ClassHero } from '@/components/teacher/reports/ClassroomPicker';
 import { ReportsNoClasses } from '@/components/teacher/reports/ReportsNoClasses';
 import { FullReportDisclosure, ReportDisclosure, SectionDisclosure } from '@/components/teacher/reports/FullReportDisclosure';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ParentReportPack } from '@/components/teacher/pro/ParentReportPack';
 import { StudentParentPreview } from '@/components/teacher/reports/StudentParentPreview';
 
@@ -71,6 +72,7 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
   const selectedClassroomId = pickedClassroomId ?? onlyClassroomId;
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(studentIdFromUrl);
   const [selectedStudentName, setSelectedStudentName] = useState<string | null>(null);
+  const [section, setSection] = useState<string>(() => (searchParams?.get('roundPreview') ? 'games' : 'students'));
 
   // ...but the URL stays the source of truth: browser Back/Forward change it,
   // and the view used to stay pinned on the old student.
@@ -256,44 +258,66 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
           </div>
           {hasPro ? <TeacherPlanBadge /> : null}
         </div>
-        <ClassroomRosterProgress
-          classroomId={selectedClassroomId}
-          classroomName={selectedClassroom?.name ?? ''}
-        />
-        <RoundReports
-          classroomId={selectedClassroomId}
-          classroomName={selectedClassroom?.name ?? ''}
-          onStudentClick={handleStudentClick}
-          {...roundPreviewProps(searchParams?.get('roundPreview'))}
-        />
-        <WordMasteryReport
-          classroomId={selectedClassroomId}
-          classroomName={selectedClassroom?.name ?? ''}
-          onStudentClick={handleStudentClick}
-        />
-        <ClassAssignmentGrid
-          classroomId={selectedClassroomId}
-          classroomName={selectedClassroom?.name ?? ''}
-        />
-        <div data-tm className="space-y-2.5">
-          <SectionDisclosure section="assignments">
-            <div className="space-y-4">
-              <AssignmentCompletionReport classroomId={selectedClassroomId} />
-              <AssignmentProgressReport
-                classroomId={selectedClassroomId}
-                classroomName={selectedClassroom?.name ?? ''}
-              />
-            </div>
-          </SectionDisclosure>
-          <SectionDisclosure section="arc">
-            <ClassArcPanel
+        <Tabs value={section} onValueChange={setSection} className="space-y-3">
+          <TabsList aria-label={t('teacher.reports.tabs.label')} className="grid h-auto w-full grid-cols-5 gap-1.5 rounded-neo border-2 border-neo-cream/40 bg-neo-navy p-1.5">
+            {REPORT_TABS.map((id) => (
+              <TabsTrigger key={id} value={id} className={REPORT_TAB}>
+                {t(`teacher.reports.tabs.${id}`)}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+
+          <TabsContent value="students">
+            <ClassroomRosterProgress
               classroomId={selectedClassroomId}
               classroomName={selectedClassroom?.name ?? ''}
-              classroomLanguage={selectedClassroom?.language ?? 'en'}
-              onStudentClick={handleStudentClick}
-              embedded
             />
-          </SectionDisclosure>
+          </TabsContent>
+
+          <TabsContent value="games">
+            <RoundReports
+              collapsed
+              classroomId={selectedClassroomId}
+              classroomName={selectedClassroom?.name ?? ''}
+              onStudentClick={handleStudentClick}
+              {...roundPreviewProps(searchParams?.get('roundPreview'))}
+            />
+          </TabsContent>
+
+          <TabsContent value="pulse">
+            <WordMasteryReport
+              classroomId={selectedClassroomId}
+              classroomName={selectedClassroom?.name ?? ''}
+              onStudentClick={handleStudentClick}
+            />
+          </TabsContent>
+
+          <TabsContent value="homework" className="space-y-3">
+            <ClassAssignmentGrid
+              classroomId={selectedClassroomId}
+              classroomName={selectedClassroom?.name ?? ''}
+            />
+            <SectionDisclosure section="assignments">
+              <div className="space-y-4">
+                <AssignmentCompletionReport classroomId={selectedClassroomId} />
+                <AssignmentProgressReport
+                  classroomId={selectedClassroomId}
+                  classroomName={selectedClassroom?.name ?? ''}
+                />
+              </div>
+            </SectionDisclosure>
+          </TabsContent>
+
+          <TabsContent value="more" className="space-y-2.5">
+            <SectionDisclosure section="arc">
+              <ClassArcPanel
+                classroomId={selectedClassroomId}
+                classroomName={selectedClassroom?.name ?? ''}
+                classroomLanguage={selectedClassroom?.language ?? 'en'}
+                onStudentClick={handleStudentClick}
+                embedded
+              />
+            </SectionDisclosure>
           <SectionDisclosure section="digest">
             <ProgressDigestDashboard
               classroomId={selectedClassroomId}
@@ -301,27 +325,28 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
               rosterCount={selectedClassroom?.member_count ?? 0}
             />
           </SectionDisclosure>
-          <ReportDisclosure
-            testId="parent-reports-disclosure"
-            icon={Send}
-            accent="cyan"
-            title={t('parentReportsFlow.title')}
-            hint={t('parentReportsFlow.disclosureHint')}
-          >
-            {(open) => (open ? <ParentReportPack classroomId={selectedClassroomId} /> : null)}
-          </ReportDisclosure>
-          <FullReportDisclosure>
-            {() => (
-              <div className="space-y-4">
-                <div className="flex justify-end">
-                  <ExportAllClassesButton />
+            <ReportDisclosure
+              testId="parent-reports-disclosure"
+              icon={Send}
+              accent="cyan"
+              title={t('parentReportsFlow.title')}
+              hint={t('parentReportsFlow.disclosureHint')}
+            >
+              {(open) => (open ? <ParentReportPack classroomId={selectedClassroomId} /> : null)}
+            </ReportDisclosure>
+            <FullReportDisclosure>
+              {() => (
+                <div className="space-y-4">
+                  <div className="flex justify-end">
+                    <ExportAllClassesButton />
+                  </div>
+                  <GoogleClassroomGradePassback classroomId={selectedClassroomId} enabled={gradePassbackEnabled} />
+                  <ClassProgressReport classroomId={selectedClassroomId} onStudentClick={handleStudentClick} />
                 </div>
-                <GoogleClassroomGradePassback classroomId={selectedClassroomId} enabled={gradePassbackEnabled} />
-                <ClassProgressReport classroomId={selectedClassroomId} onStudentClick={handleStudentClick} />
-              </div>
-            )}
-          </FullReportDisclosure>
-        </div>
+              )}
+            </FullReportDisclosure>
+          </TabsContent>
+        </Tabs>
       </div>
     );
   }
@@ -354,10 +379,19 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
   );
 }
 
+const REPORT_TABS = ['students', 'games', 'pulse', 'homework', 'more'] as const;
+
+// Selected = lime ring on navy-light; unselected keeps a cream edge so it reads as tappable.
+const REPORT_TAB =
+  'min-h-10 h-auto min-w-0 whitespace-normal rounded-neo border-[2px] px-1 py-1.5 font-neo-body text-xs font-bold leading-tight sm:text-sm data-[state=inactive]:border-neo-cream/40 data-[state=inactive]:text-neo-cream data-[state=active]:border-neo-lime data-[state=active]:bg-neo-navy-light data-[state=active]:text-neo-cream data-[state=active]:ring-2 data-[state=active]:ring-neo-lime';
+
 // Dev-only fixture so the round report can be judged without a played round.
 function roundPreviewProps(value: string | null | undefined) {
   if (process.env.NODE_ENV === 'production' || !value) return {};
-  return { previewGames: [ROUND_FIXTURE], previewPro: value === 'pro' };
+  const previewGames = value === 'dense'
+    ? Array.from({ length: 12 }, (_, i) => ({ ...ROUND_FIXTURE, gameCode: `FIX${String(i + 1).padStart(3, '0')}` }))
+    : [ROUND_FIXTURE];
+  return { previewGames, previewPro: value === 'pro' || value === 'dense' };
 }
 
 export default function TeacherReportsPage({ gradePassbackEnabled = false }: { gradePassbackEnabled?: boolean }) {

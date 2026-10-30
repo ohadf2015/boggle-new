@@ -117,7 +117,7 @@ describe('AnalyticsPageClient — "create assignment" opens the creator', () => 
 
   it('lands on the dashboard with this class selected and the creator open, not a bare /teacher', async () => {
     render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
-    await userEvent.click(screen.getByText('education.analytics.viewAssignments'));
+    await userEvent.click(screen.getByText('education.analytics.tabs.homework'));
     await userEvent.click(await screen.findByText('create-assignment'));
     expect(mockPush).toHaveBeenCalledWith('/en/teacher?classroomId=classroom-1&assign=1');
   });

@@ -47,7 +47,7 @@ export function MissedPracticeAction({
         href={`/${language}/teacher/upgrade`}
         onClick={() => trackGrowthEvent('landing_cta_clicked', { cta: 'pro_gate_missedPractice' })}
         className={cn(
-          'inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-neo-lime bg-neo-navy px-4 py-2 font-neo-display text-sm font-black uppercase text-neo-lime shadow-hard',
+          'inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-neo-lime bg-neo-navy px-4 py-2 font-neo-display text-sm font-black text-neo-lime shadow-hard',
           PRESS,
         )}
       >
@@ -99,7 +99,7 @@ export function MissedPracticeAction({
             transition={{ type: 'spring', stiffness: 380, damping: 16 }}
             className="relative rounded-neo border-2 border-black bg-neo-lime p-3 text-neo-black shadow-hard"
           >
-            <p className="flex items-center gap-2 font-neo-display text-xl font-black uppercase">
+            <p className="flex items-center gap-2 font-neo-display text-xl font-black">
               <CalendarCheck className="size-6" aria-hidden="true" />
               {t('eduPro.practice.assigned')}
             </p>
@@ -116,7 +116,7 @@ export function MissedPracticeAction({
                     transition={{ type: 'spring', stiffness: 500, damping: 18, delay: 0.15 + i * 0.12 }}
                     className="rounded-neo border-2 border-black bg-neo-cream px-2 py-1.5 text-center text-neo-black"
                   >
-                    <span className="block text-[11px] font-black uppercase text-neo-black/70">{t('eduPro.practice.round', { n: i + 1 })}</span>
+                    <span className="block text-[11px] font-black text-neo-black/70">{t('eduPro.practice.round', { n: i + 1 })}</span>
                     <span className="block font-neo-display text-sm font-black leading-tight">{rel}</span>
                     <span className="block text-[11px] font-bold text-neo-black/70">{when}</span>
                   </m.li>
@@ -131,7 +131,7 @@ export function MissedPracticeAction({
               onClick={assign}
               disabled={status.kind === 'saving'}
               className={cn(
-                'inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-black bg-neo-lime px-4 py-2 font-neo-display text-sm font-black uppercase text-neo-black shadow-hard',
+                'inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-black bg-neo-lime px-4 py-2 font-neo-display text-sm font-black text-neo-black shadow-hard',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white disabled:opacity-70',
                 PRESS,
               )}

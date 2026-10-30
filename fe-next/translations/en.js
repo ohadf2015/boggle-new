@@ -13302,6 +13302,14 @@ const en = {
       "selectClassroom": "Select classroom",
       "loading": "Loading report...",
       "loadingClassrooms": "Loading classrooms...",
+      "tabs": {
+        "label": "Report sections",
+        "students": "Students",
+        "games": "Games",
+        "pulse": "Class pulse",
+        "homework": "Homework",
+        "more": "More"
+      },
       "noClassroomsFound": "No classrooms found",
       "error": "Couldn't load the report",
       "noData": "No data available",
@@ -13389,6 +13397,7 @@ const en = {
         "statusCompleted": "Completed",
         "statusMissing": "Missing",
         "copySummary": "Copy weekly summary",
+        "summaryPreview": "See the summary",
         "copied": "Copied",
         "copyFailed": "Couldn't copy. Select the summary and copy it yourself.",
         "proNudge": "Pro: scheduled weekly email reports",
@@ -14731,6 +14740,14 @@ const en = {
       "today": "Today",
       "updatedAgo": "Updated {{time}} ago",
       "viewAssignments": "View assignments",
+      "tabs": {
+        "label": "Sections",
+        "pulse": "Class pulse",
+        "students": "Students",
+        "lessons": "Lessons",
+        "words": "Words",
+        "homework": "Homework"
+      },
       "viewLessons": "View lessons",
       "viewStudents": "View students",
       "viewVocabulary": "View vocabulary",

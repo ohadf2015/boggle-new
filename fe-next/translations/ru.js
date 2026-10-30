@@ -4439,6 +4439,14 @@ const ru = {
       "today": "Сегодня",
       "updatedAgo": "Обновлено {{time}} назад",
       "viewAssignments": "Посмотреть задания",
+      "tabs": {
+        "label": "Разделы",
+        "pulse": "Пульс класса",
+        "students": "Ученики",
+        "lessons": "Уроки",
+        "words": "Слова",
+        "homework": "Домашка"
+      },
       "viewLessons": "Посмотреть уроки",
       "viewStudents": "Посмотреть учеников",
       "viewVocabulary": "Посмотреть словарь",
@@ -14648,6 +14656,14 @@ const ru = {
       "selectClassroom": "Выберите класс",
       "loading": "Загрузка отчёта...",
       "loadingClassrooms": "Загрузка классов...",
+      "tabs": {
+        "label": "Разделы отчёта",
+        "students": "Ученики",
+        "games": "Игры",
+        "pulse": "Пульс класса",
+        "homework": "Домашка",
+        "more": "Ещё"
+      },
       "noClassroomsFound": "Классы не найдены",
       "error": "Не удалось загрузить отчёт",
       "noData": "Данные недоступны",
@@ -14735,6 +14751,7 @@ const ru = {
         "statusCompleted": "Выполнено",
         "statusMissing": "Не сдано",
         "copySummary": "Скопировать недельную сводку",
+        "summaryPreview": "Показать сводку",
         "copied": "Скопировано",
         "copyFailed": "Не удалось скопировать. Выделите сводку и скопируйте её сами.",
         "proNudge": "Pro: еженедельные отчёты на почту",

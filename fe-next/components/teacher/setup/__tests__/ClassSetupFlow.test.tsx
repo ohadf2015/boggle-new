@@ -117,6 +117,12 @@ describe('<ClassSetupFlow>', () => {
     expect(classes).not.toMatch(/(^|\s)uppercase(\s|$)/);
   });
 
+  it('Given step 1, Then the step dots are neutral (lime ring at most), so Create class stays the only lime fill', () => {
+    render(<ClassSetupFlow />);
+    const steps = screen.getByRole('list', { name: 'eduShell.setup.stepsLabel' });
+    expect(steps.innerHTML).not.toMatch(/\bbg-neo-(lime|yellow)\b/);
+  });
+
   it('Given a phone, Then the step dots, subtitle and board hint step aside so the form fits without scrolling', () => {
     render(<ClassSetupFlow />);
     expect(screen.getByRole('list', { name: 'eduShell.setup.stepsLabel' }).className).toMatch(/max-sm:hidden/);

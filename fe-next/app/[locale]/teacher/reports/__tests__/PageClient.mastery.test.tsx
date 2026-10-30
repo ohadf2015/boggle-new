@@ -106,6 +106,7 @@ vi.mock('@/components/teacher/reports/WordMasteryReport', () => ({
   WordMasteryReport: ({ classroomId }: { classroomId: string }) => <div data-testid="word-mastery-report">{classroomId}</div>,
 }));
 
+import userEvent from '@testing-library/user-event';
 import TeacherReportsPage from '../PageClient';
 
 describe('<TeacherReportsPage> class view — summary first, detail on demand', () => {
@@ -120,57 +121,50 @@ describe('<TeacherReportsPage> class view — summary first, detail on demand', 
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
   });
 
-  it('shows the class assignment grid on the open page, outside the folded sections', () => {
+  const openTab = async (id: string) => {
+    await userEvent.click(screen.getByRole('tab', { name: `teacher.reports.tabs.${id}` }));
+  };
+
+  it('opens on the roster, with the other sections one tab away and not mounted', () => {
     render(<TeacherReportsPage />);
-    const grid = screen.getByTestId('class-assignment-grid');
-    expect(grid.closest('details')).toBeNull();
-    const mastery = screen.getByTestId('word-mastery-report');
-    expect(mastery.compareDocumentPosition(grid) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    const tabs = screen.getAllByRole('tab').map((tab) => tab.textContent);
+    expect(tabs).toEqual(['students', 'games', 'pulse', 'homework', 'more'].map((id) => `teacher.reports.tabs.${id}`));
+    expect(screen.getByRole('tab', { selected: true })).toHaveTextContent('teacher.reports.tabs.students');
+    expect(screen.getByTestId('classroom-roster-progress')).toBeInTheDocument();
+    expect(screen.queryByTestId('word-mastery-report')).toBeNull();
+    expect(screen.queryByTestId('class-arc-panel')).toBeNull();
   });
 
-  it('leads with the word mastery report, above the arc', () => {
+  it('shows the word mastery report on the class pulse tab', async () => {
     render(<TeacherReportsPage />);
-    const mastery = screen.getByTestId('word-mastery-report');
-    const arc = screen.getByTestId('class-arc-panel');
-    expect(mastery).toHaveTextContent('c1');
-    expect(mastery.compareDocumentPosition(arc) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    await openTab('pulse');
+    expect(await screen.findByTestId('word-mastery-report')).toHaveTextContent('c1');
   });
 
-  it('gates the whole page once, and folds the printable report into a closed disclosure', () => {
+  it('shows the class assignment grid open on the homework tab, with the per-assignment reports folded under it', async () => {
+    render(<TeacherReportsPage />);
+    await openTab('homework');
+    expect((await screen.findByTestId('class-assignment-grid')).closest('details')).toBeNull();
+    const folded = screen.getByTestId('assignment-report').closest('details');
+    expect(folded).not.toBeNull();
+    expect(folded).not.toHaveAttribute('open');
+  });
+
+  it('gates the whole page once, and keeps arc, digest, parent reports and the printable report folded on the more tab', async () => {
     render(<TeacherReportsPage />);
     expect(screen.getAllByTestId('pro-gate')).toHaveLength(1);
-    const details = screen.getByTestId('class-progress-report').closest('details');
-    expect(details).not.toBeNull();
-    expect(details).not.toHaveAttribute('open');
-  });
-
-  it('offers parent reports in their own closed disclosure, mounted only once opened', () => {
-    render(<TeacherReportsPage />);
-    const details = screen.getByTestId('parent-reports-disclosure') as HTMLDetailsElement;
-    expect(details).not.toHaveAttribute('open');
-    expect(screen.getByText('parentReportsFlow.title')).toBeInTheDocument();
-    expect(screen.queryByTestId('parent-report-pack')).not.toBeInTheDocument();
-    act(() => {
-      details.open = true;
-      details.dispatchEvent(new Event('toggle'));
-    });
-    expect(screen.getByTestId('parent-report-pack')).toBeInTheDocument();
-  });
-
-  it('keeps the summary short: assignments, arc and digest fold into closed disclosures between the mastery report and the full report', () => {
-    render(<TeacherReportsPage />);
-    const mastery = screen.getByTestId('word-mastery-report');
-    const full = screen.getByTestId('full-report-disclosure');
-    for (const id of ['assignment-report', 'class-arc-panel', 'progress-digest-dashboard']) {
-      const d = screen.getByTestId(id).closest('details');
+    await openTab('more');
+    for (const id of ['class-arc-panel', 'progress-digest-dashboard', 'class-progress-report']) {
+      const d = (await screen.findByTestId(id)).closest('details');
       expect(d).not.toBeNull();
       expect(d).not.toHaveAttribute('open');
-      expect(d).not.toBe(full);
-      expect(mastery.compareDocumentPosition(d!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-      expect(d!.compareDocumentPosition(full) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     }
-    for (const key of ['assignmentsTitle', 'arcTitle', 'digestTitle']) {
-      expect(screen.getByText(`eduPro.reports.${key}`)).toBeInTheDocument();
-    }
+    const parents = screen.getByTestId('parent-reports-disclosure') as HTMLDetailsElement;
+    expect(screen.queryByTestId('parent-report-pack')).not.toBeInTheDocument();
+    act(() => {
+      parents.open = true;
+      parents.dispatchEvent(new Event('toggle'));
+    });
+    expect(screen.getByTestId('parent-report-pack')).toBeInTheDocument();
   });
 });

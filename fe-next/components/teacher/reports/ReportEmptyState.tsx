@@ -19,7 +19,7 @@ export function ReportEmptyState({ classroomId }: { classroomId: string }) {
         <Link
           href={`/${language}/teacher?classroomId=${classroomId}`}
           className={cn(
-            'inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-black bg-neo-lime px-4 font-neo-display text-sm font-black uppercase text-neo-black shadow-hard',
+            'inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-black bg-neo-lime px-4 font-neo-display text-sm font-bold text-neo-black shadow-hard',
             PRESS,
           )}
         >
@@ -29,7 +29,7 @@ export function ReportEmptyState({ classroomId }: { classroomId: string }) {
         <Link
           href={teacherAssignHref(language, classroomId)}
           className={cn(
-            'inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-neo-cyan bg-neo-navy px-4 font-neo-display text-sm font-black uppercase text-neo-cyan shadow-hard',
+            'inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-neo-cream/60 bg-neo-navy px-4 font-neo-display text-sm font-bold text-neo-cream',
             PRESS,
           )}
         >

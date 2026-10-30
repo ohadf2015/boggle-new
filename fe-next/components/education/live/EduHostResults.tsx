@@ -138,7 +138,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
   const missed = reteach.missed;
   const { hasPro, loading: proLoading } = useTeacherPro();
   const students = stats?.students ?? 0;
-  const shortWall = !phone && bossOver;
+  const shortWall = bossOver;
   const proCard = !proLoading && !hasPro && !isPracticeRound(players);
   // Laid out for the card while the entitlement resolves, so its arrival never reflows the wall.
   const roomForCard = !hasPro && !isPracticeRound(players);
@@ -164,7 +164,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
       data-outcome={outcome.kind}
       className="fixed inset-0 z-[75] flex flex-col gap-2 overflow-hidden bg-neo-navy px-3 pb-3 pt-4 text-neo-cream [container:results_/_size] lg:gap-4 lg:px-8 lg:pb-6 lg:pt-6"
     >
-      <BossOutcomeCard size="tv" className="shrink-0" />
+      <BossOutcomeCard size="tv" density="compact" className="shrink-0" />
       <TvRecapHeader
         title={
           !hasStage
@@ -189,9 +189,9 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
                   muted={!outcome.celebrate}
                   stage={stage}
                   t={t}
-                  className={cn(roomForCard && 'w-[min(100%,14rem)]', podiumWidth)}
+                  className={cn((roomForCard || phone) && 'w-[min(100%,14rem)]', podiumWidth)}
                 >
-                  {landed && <ClassChest found={summary.classFoundCount} total={summary.totalWords} open={winnerBeat} t={t} />}
+                  {landed && <ClassChest found={summary.classFoundCount} total={summary.totalWords} open={winnerBeat} tone="calm" t={t} />}
                   {!outcome.celebrate && <ZeroRoundNote t={t} />}
                 </PodiumStage>
               )}
@@ -205,7 +205,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
                   size={phone ? 'card' : 'projector'}
                   tone="calm"
                   t={t}
-                  className="z-20 shrink-0"
+                  className={cn('z-20 shrink-0', phone && bossOver && 'hidden')}
                 />
               )}
               {pulseBesideStage && pulse}
@@ -244,7 +244,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
               </div>
             )}
             {!proLoading && hasPro && showTeacherInvite(outcome.celebrate, students) && (
-              <TeacherInviteNudge students={students} language={language} whatsapp={phone} t={t} />
+              <TeacherInviteNudge students={students} language={language} whatsapp={phone} compact={phone} t={t} />
             )}
           </div>
         </div>

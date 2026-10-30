@@ -91,7 +91,7 @@ export function WordMasteryReport({ classroomId, classroomName, onStudentClick }
 
   const { report, insights } = state;
   const reteach = report.hardestWords.length > 0 && (
-    <div data-print-hide className="rounded-neo border-2 border-neo-lime/50 bg-neo-lime/5 p-3">
+    <div data-print-hide className="rounded-neo border-2 border-neo-cream/35 p-3">
       <MissedPracticeAction classroomId={classroomId} classroomName={classroomName} locked={false} />
       <p className="mt-2 text-xs font-bold text-neo-cream/60">{t('eduPro.practice.whyNote')}</p>
     </div>
@@ -204,8 +204,8 @@ function HardestBlock({ children }: { children: React.ReactNode }) {
   const { t } = useLanguage();
   return (
     <div>
-      <h3 className="mb-2 flex items-center gap-1.5 text-sm font-black uppercase text-neo-cream/80">
-        <Flame className="size-4 text-neo-pink" aria-hidden="true" />
+      <h3 className="mb-2 flex items-center gap-1.5 text-sm font-bold text-neo-cream/85">
+        <Flame className="size-4 text-neo-cream/70" aria-hidden="true" />
         {t('eduPro.mastery.hardestTitle')}
       </h3>
       {children}
@@ -228,7 +228,7 @@ function Shell({ children, pro = false, actions }: { children: React.ReactNode; 
           <h2 className="flex items-center gap-2 font-neo-display text-xl font-bold text-neo-white sm:text-2xl">
             {t('eg2Rep.report.title')}
             {pro && (
-              <span className="inline-flex shrink-0 items-center gap-1 rounded-neo border-2 border-black bg-neo-lime px-2 py-0.5 font-neo-body text-xs font-black uppercase text-neo-black shadow-hard-sm">
+              <span data-testid="mastery-pro-badge" className="inline-flex shrink-0 items-center rounded-full border-2 border-neo-yellow px-1.5 font-neo-body text-[11px] font-black leading-tight text-neo-yellow">
                 {t('eduPro.mastery.proBadge')}
               </span>
             )}

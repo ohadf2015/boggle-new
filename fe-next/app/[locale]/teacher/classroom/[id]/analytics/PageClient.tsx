@@ -13,7 +13,7 @@
 
 'use client';
 
-import { type ReactNode, useEffect, useRef, useState } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 import { useTeacherReveal } from '@/components/teacher/motion/useTeacherReveal';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
@@ -59,10 +59,8 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
   const { user, loading: authLoading } = useAuth();
   const { t } = useLanguage();
   const router = useRouter();
-  const [tab, setTab] = useState('students');
+  const [tab, setTab] = useState('pulse');
   const revealRef = useTeacherReveal<HTMLDivElement>();
-  const tabsRef = useRef<HTMLDivElement>(null);
-  const masteryRef = useRef<HTMLDivElement>(null);
   const [classroomName, setClassroomName] = useState('');
 
   useEffect(() => {
@@ -127,14 +125,9 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
     router.push(`/${locale}/teacher/classroom`);
   };
 
-  const handleViewStudents = (_filter: 'struggling') => {
-    setTab('students');
-    tabsRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
-  };
+  const handleViewStudents = (_filter: 'struggling') => setTab('students');
 
-  const handleCreateReviewLesson = (_words: string[]) => {
-    masteryRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
-  };
+  const handleCreateReviewLesson = (_words: string[]) => setTab('pulse');
 
   const handleStudentClick = (studentId: string) => {
     const params = new URLSearchParams({ classroomId, studentId });
@@ -186,92 +179,55 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
             </div>
           }
         >
-          <div ref={masteryRef} className="scroll-mt-4">
-            <WordMasteryReport classroomId={classroomId} classroomName={classroomName} />
-          </div>
-
-          <div className="bg-neo-navy/30 border-[2px] border-neo-cream/40 shadow-hard rounded-neo p-3 sm:p-6 empty:hidden">
+          <div data-testid="analytics-pro-body" className="space-y-3">
             <AnalyticsDashboard
               classroomId={classroomId}
               onViewStudents={handleViewStudents}
               onCreateReviewLesson={handleCreateReviewLesson}
               showHeader={false}
             />
+
+            <Tabs value={tab} onValueChange={setTab} className="space-y-3">
+              <TabsList aria-label={t('education.analytics.tabs.label')} className="grid h-auto w-full grid-cols-5 gap-1.5 rounded-neo border-2 border-neo-cream/40 bg-neo-navy p-1.5">
+                {ANALYTICS_TABS.map((id) => (
+                  <TabsTrigger key={id} value={id} className={cn(TAB_BASE, TAB_ACTIVE)}>
+                    {t(`education.analytics.tabs.${id}`)}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+
+              <TabsContent value="pulse">
+                <WordMasteryReport classroomId={classroomId} classroomName={classroomName} />
+              </TabsContent>
+
+              <TabsContent value="students">
+                <section aria-label={t('education.analytics.studentProgress')} className={PANEL}>
+                  <StudentProgressTable classroomId={classroomId} onStudentClick={handleStudentClick} />
+                </section>
+              </TabsContent>
+
+              <TabsContent value="lessons">
+                <div className={PANEL}>
+                  <LessonEffectivenessChart classroomId={classroomId} />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="words">
+                <section aria-label={t('education.analytics.vocabularyMastery')} className={PANEL}>
+                  <VocabularyHeatmap classroomId={classroomId} />
+                </section>
+              </TabsContent>
+
+              <TabsContent value="homework">
+                <div className={PANEL}>
+                  <AssignmentTrackingPanel
+                    classroomId={classroomId}
+                    onCreateAssignment={() => router.push(teacherAssignHref(locale, classroomId))}
+                  />
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
-
-          <Tabs ref={tabsRef} value={tab} onValueChange={setTab} className="scroll-mt-4 space-y-4">
-            <TabsList
-              className={cn(
-                'grid h-auto w-full grid-cols-2 gap-2 sm:grid-cols-4',
-                'bg-neo-navy/50 border-[2px] border-neo-cream/40 shadow-hard rounded-neo p-2'
-              )}
-            >
-              <TabsTrigger
-                value="students"
-                className={cn(TAB_BASE, TAB_ACTIVE)}
-              >
-                {t('education.analytics.viewStudents')}
-              </TabsTrigger>
-              <TabsTrigger
-                value="lessons"
-                className={cn(TAB_BASE, TAB_ACTIVE)}
-              >
-                {t('education.analytics.viewLessons')}
-              </TabsTrigger>
-              <TabsTrigger
-                value="vocabulary"
-                className={cn(TAB_BASE, TAB_ACTIVE)}
-              >
-                {t('education.analytics.viewVocabulary')}
-              </TabsTrigger>
-              <TabsTrigger
-                value="assignments"
-                className={cn(TAB_BASE, TAB_ACTIVE)}
-              >
-                {t('education.analytics.viewAssignments')}
-              </TabsTrigger>
-            </TabsList>
-
-            {/* Student Progress Tab */}
-            <TabsContent value="students" className="space-y-4">
-              <div className="bg-neo-navy/30 border-[2px] border-neo-cream/40 shadow-hard rounded-neo p-6">
-                <h2 className="text-2xl font-neo-display text-neo-white mb-4">
-                  {t('education.analytics.studentProgress')}
-                </h2>
-                <StudentProgressTable
-                  classroomId={classroomId}
-                  onStudentClick={handleStudentClick}
-                />
-              </div>
-            </TabsContent>
-
-            {/* Lesson Effectiveness Tab */}
-            <TabsContent value="lessons" className="space-y-4">
-              <div className="bg-neo-navy/30 border-[2px] border-neo-cream/40 shadow-hard rounded-neo p-6">
-                <LessonEffectivenessChart classroomId={classroomId} />
-              </div>
-            </TabsContent>
-
-            {/* Vocabulary Mastery Tab */}
-            <TabsContent value="vocabulary" className="space-y-4">
-              <div className="bg-neo-navy/30 border-[2px] border-neo-cream/40 shadow-hard rounded-neo p-6">
-                <h2 className="text-2xl font-neo-display text-neo-white mb-4">
-                  {t('education.analytics.vocabularyMastery')}
-                </h2>
-                <VocabularyHeatmap classroomId={classroomId} />
-              </div>
-            </TabsContent>
-
-            {/* Assignments Tab */}
-            <TabsContent value="assignments" className="space-y-4">
-              <div className="bg-neo-navy/30 border-[2px] border-neo-cream/40 shadow-hard rounded-neo p-6">
-                <AssignmentTrackingPanel
-                  classroomId={classroomId}
-                  onCreateAssignment={() => router.push(teacherAssignHref(locale, classroomId))}
-                />
-              </div>
-            </TabsContent>
-          </Tabs>
         </ProGate>
         </div>
 
@@ -319,12 +275,16 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
 
 import { TeacherGate } from '@/components/education/TeacherGate';
 
+const ANALYTICS_TABS = ['pulse', 'students', 'lessons', 'words', 'homework'] as const;
+
+const PANEL = 'rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light p-3 sm:p-4';
+
 // Selected = lime ring on navy; unselected keeps a cream edge so it reads as tappable.
 const TAB_ACTIVE =
   'data-[state=active]:border-neo-lime data-[state=active]:bg-neo-navy-light data-[state=active]:text-neo-cream data-[state=active]:ring-2 data-[state=active]:ring-neo-lime';
 
 const TAB_BASE =
-  'min-h-11 h-auto whitespace-normal px-2 py-2 text-sm leading-tight font-neo-body font-bold rounded-neo border-[2px] data-[state=inactive]:text-neo-white data-[state=inactive]:border-neo-cream transition-[color,background-color,border-color,transform] duration-200 active:translate-y-px motion-reduce:transition-none';
+  'min-h-10 h-auto min-w-0 whitespace-normal px-1 py-1.5 text-xs sm:text-sm leading-tight font-neo-body font-bold rounded-neo border-[2px] data-[state=inactive]:text-neo-cream data-[state=inactive]:border-neo-cream/40 transition-[color,background-color,border-color,transform] duration-200 active:translate-y-px motion-reduce:transition-none';
 
 /**
  * Shell above gate — see `components/education/shell/__tests__/gatedShellOrder.test.ts`.

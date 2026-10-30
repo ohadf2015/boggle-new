@@ -17,7 +17,7 @@ function localDay(d = new Date()) {
 }
 
 const BUTTON =
-  'inline-flex min-h-11 items-center gap-2 rounded-neo border-2 px-4 py-2 font-neo-display text-sm font-black uppercase shadow-hard transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white motion-reduce:transition-none motion-reduce:hover:translate-y-0';
+  'inline-flex min-h-11 items-center gap-2 rounded-neo border-2 px-4 py-2 font-neo-display text-sm font-black shadow-hard transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white motion-reduce:transition-none motion-reduce:hover:translate-y-0';
 
 export function StudentPracticeAction({
   classroomId,

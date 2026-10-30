@@ -138,7 +138,7 @@ export function StudentInsightList({
     <div data-testid="report-student-list" className="space-y-3">
       {below.length > 0 && (
         <section className="space-y-1.5">
-          <h4 className="text-xs font-black uppercase tracking-wide text-neo-pink">
+          <h4 className="text-xs font-bold text-neo-cream/85">
             {t('eg2Rep.report.belowGoal', { goal, count: below.length })}
           </h4>
           {group(below, 0)}
@@ -146,7 +146,7 @@ export function StudentInsightList({
       )}
       {onTrack.length > 0 && (
         <section className="space-y-1.5">
-          <h4 className="text-xs font-black uppercase tracking-wide text-neo-lime">
+          <h4 className="text-xs font-bold text-neo-cream/85">
             {t('eg2Rep.report.onTrack', { count: onTrack.length })}
           </h4>
           {group(onTrack, below.length)}

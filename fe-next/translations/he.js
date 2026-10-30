@@ -14997,6 +14997,14 @@ const he = {
       "selectClassroom": "בחרו כיתה",
       "loading": "טוענים דוח...",
       "loadingClassrooms": "טוענים כיתות...",
+      "tabs": {
+        "label": "חלקי הדוח",
+        "students": "תלמידים",
+        "games": "משחקים",
+        "pulse": "דופק הכיתה",
+        "homework": "שיעורי בית",
+        "more": "עוד"
+      },
       "noClassroomsFound": "לא נמצאו כיתות",
       "error": "לא הצלחנו לטעון את הדוח",
       "noData": "אין נתונים",
@@ -15084,6 +15092,7 @@ const he = {
         "statusCompleted": "הושלם",
         "statusMissing": "חסר",
         "copySummary": "העתקת סיכום שבועי",
+        "summaryPreview": "הצגת הסיכום",
         "copied": "הועתק",
         "copyFailed": "לא הצלחנו להעתיק. סמנו את הסיכום והעתיקו ידנית.",
         "proNudge": "פרו: דוחות שבועיים באימייל",
@@ -16219,6 +16228,14 @@ const he = {
       "today": "היום",
       "updatedAgo": "עודכן לפני {{time}}",
       "viewAssignments": "צפו במטלות",
+      "tabs": {
+        "label": "חלקי הדוח",
+        "pulse": "דופק הכיתה",
+        "students": "תלמידים",
+        "lessons": "שיעורים",
+        "words": "מילים",
+        "homework": "שיעורי בית"
+      },
       "viewLessons": "צפו בשיעורים",
       "viewStudents": "צפו בתלמידים",
       "viewVocabulary": "צפו באוצר מילים",

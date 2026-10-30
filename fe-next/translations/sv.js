@@ -15450,6 +15450,14 @@ const sv = {
       "selectClassroom": "Välj klassrum",
       "loading": "Laddar rapport...",
       "loadingClassrooms": "Laddar klassrum...",
+      "tabs": {
+        "label": "Rapportens delar",
+        "students": "Elever",
+        "games": "Spel",
+        "pulse": "Klassens puls",
+        "homework": "Läxor",
+        "more": "Mer"
+      },
       "noClassroomsFound": "Inga klassrum hittades",
       "error": "Kunde inte ladda rapporten",
       "noData": "Ingen data tillgänglig",
@@ -15537,6 +15545,7 @@ const sv = {
         "statusCompleted": "Klar",
         "statusMissing": "Saknas",
         "copySummary": "Kopiera veckosammanfattning",
+        "summaryPreview": "Visa sammanfattningen",
         "copied": "Kopierad",
         "copyFailed": "Det gick inte att kopiera. Markera sammanfattningen och kopiera den själv.",
         "proNudge": "Pro: schemalagda veckorapporter via e-post",
@@ -16672,6 +16681,14 @@ const sv = {
       "today": "Idag",
       "updatedAgo": "Uppdaterad {{time}} sedan",
       "viewAssignments": "Se uppgifter",
+      "tabs": {
+        "label": "Delar",
+        "pulse": "Klassens puls",
+        "students": "Elever",
+        "lessons": "Lektioner",
+        "words": "Ord",
+        "homework": "Läxor"
+      },
       "viewLessons": "Se lektioner",
       "viewStudents": "Se elever",
       "viewVocabulary": "Se ordförråd",

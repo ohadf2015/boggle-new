@@ -4,7 +4,6 @@ import React, { useCallback } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProClassAnalytics } from './useProClassAnalytics';
 import { MetricCard } from './MetricCard';
-import { PageLoader } from '@/components/ui/PageLoader';
 import { AlertTriangle, TrendingUp, Users, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -49,8 +48,11 @@ export function AnalyticsDashboard({
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center py-12">
-        <PageLoader size="lg" text={t('education.analytics.loading')} />
+      <div aria-busy="true" className="grid grid-cols-4 gap-1.5 sm:gap-2">
+        <span className="sr-only" role="status">{t('education.analytics.loading')}</span>
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} aria-hidden="true" className="h-16 rounded-neo bg-neo-cream/10 motion-safe:animate-pulse" />
+        ))}
       </div>
     );
   }
@@ -61,26 +63,26 @@ export function AnalyticsDashboard({
     return (
       <div
         className={cn(
-          'bg-neo-cream border-3 border-black shadow-hard rounded-neo p-6',
+          'bg-neo-navy-light border-2 border-neo-cream/40 rounded-neo p-6 text-neo-cream',
           'flex flex-col items-center gap-4 text-center'
         )}
       >
-        <div className="w-14 h-14 rounded-neo bg-neo-pink border-3 border-black flex items-center justify-center shadow-hard-sm">
-          <AlertCircle className="w-8 h-8 text-black" />
+        <div className="w-14 h-14 rounded-neo border-2 border-neo-cream/60 flex items-center justify-center">
+          <AlertCircle className="w-8 h-8 text-neo-cream" />
         </div>
         <div>
-          <h3 className="text-xl font-neo-display font-black text-black mb-2">
+          <h3 className="text-xl font-neo-display font-bold text-neo-cream mb-2">
             {t('education.analytics.error')}
           </h3>
-          <p className="text-black/60 font-bold text-sm">{error.message}</p>
+          <p className="text-neo-cream/80 font-bold text-sm">{error.message}</p>
         </div>
         <button
           type="button"
           onClick={refresh}
           className={cn(
-            'px-6 py-2 bg-neo-cyan text-black border-3 border-black',
-            'font-black font-neo-body rounded-neo shadow-hard-sm',
-            'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5',
+            'px-6 py-2 text-neo-cream border-2 border-neo-cream/60',
+            'font-bold font-neo-body rounded-neo',
+            'hover:bg-neo-cream/10 active:translate-y-0.5',
             'transition duration-100'
           )}
         >
@@ -96,18 +98,18 @@ export function AnalyticsDashboard({
     return (
       <div
         className={cn(
-          'bg-neo-cream border-3 border-black shadow-hard rounded-neo p-6',
+          'bg-neo-navy-light border-2 border-neo-cream/40 rounded-neo p-6 text-neo-cream',
           'flex flex-col items-center gap-4 text-center'
         )}
       >
-        <div className="w-14 h-14 rounded-neo bg-neo-cyan border-3 border-black flex items-center justify-center shadow-hard-sm">
-          <Users className="w-8 h-8 text-black" />
+        <div className="w-14 h-14 rounded-neo border-2 border-neo-cream/60 flex items-center justify-center">
+          <Users className="w-8 h-8 text-neo-cream" />
         </div>
         <div>
-          <h3 className="text-xl font-neo-display font-black text-black mb-2">
+          <h3 className="text-xl font-neo-display font-bold text-neo-cream mb-2">
             {t('education.analytics.noData')}
           </h3>
-          <p className="text-black/60 font-bold text-sm">{t('education.analytics.assignLessons')}</p>
+          <p className="text-neo-cream/80 font-bold text-sm">{t('education.analytics.assignLessons')}</p>
         </div>
       </div>
     );
@@ -143,7 +145,7 @@ export function AnalyticsDashboard({
   // ==================== RENDER ====================
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {showHeader && (
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-3">
@@ -161,7 +163,7 @@ export function AnalyticsDashboard({
       )}
 
       {/* Metric Cards Grid */}
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+      <div data-testid="analytics-stat-row" className="grid grid-cols-4 gap-1.5 sm:gap-2">
         {/* Metric 1: Students Needing Help (Urgent) */}
         <MetricCard
           title={t('education.analytics.studentsNeedingHelp')}
@@ -169,6 +171,7 @@ export function AnalyticsDashboard({
           icon={<AlertTriangle className="w-6 h-6" />}
           severity="urgent"
           compact
+          tone="calm"
           testId="metric-students-needing-help"
           actionable={{
             label: t('education.analytics.viewStudents'),
@@ -184,6 +187,7 @@ export function AnalyticsDashboard({
           severity="info"
           testId="metric-class-average-xp"
           compact
+          tone="calm"
         />
 
         {/* Metric 3: Active Students Today (Info) */}
@@ -196,6 +200,7 @@ export function AnalyticsDashboard({
           trend={engagementPercent >= 70 ? 'up' : engagementPercent >= 50 ? 'neutral' : 'down'}
           testId="metric-active-students"
           compact
+          tone="calm"
         />
 
         {/* Metric 4: Common Mistakes (Warning) */}
@@ -206,6 +211,7 @@ export function AnalyticsDashboard({
           severity="warning"
           testId="metric-common-mistakes"
           compact
+          tone="calm"
           actionable={
             onCreateReviewLesson && commonMistakesCount > 0
               ? {

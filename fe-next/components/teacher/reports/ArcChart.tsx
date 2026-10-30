@@ -77,7 +77,7 @@ export function ArcChart({
             className="absolute inset-x-0 border-t-2 border-dashed border-neo-lime/80"
             style={{ top: `${100 - goal}%` }}
           >
-            <span className="absolute end-1 -top-5 rounded-sm bg-neo-navy px-1 text-[11px] font-black uppercase text-neo-lime">
+            <span className="absolute end-1 -top-5 rounded-sm bg-neo-navy px-1 text-[11px] font-black text-neo-lime">
               {goalLabel}
             </span>
           </span>

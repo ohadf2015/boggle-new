@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassroomBossStore } from '@/stores/classroomBossStore';
 import { bossImage, bossNameKey } from './bossArt';
+import { CompactBossOutcome } from './CompactBossOutcome';
 
 const HITTER_DISC = ['bg-neo-yellow', 'bg-neo-cyan', 'bg-neo-pink'];
 
@@ -15,7 +16,7 @@ const HITTER_DISC = ['bg-neo-yellow', 'bg-neo-cyan', 'bg-neo-pink'];
  * projector and every phone say the same thing. Only a defeat earns a trophy. The health bar drains from
  * full to what the boss ran off with (transform only; reduced motion paints the end state).
  */
-export function BossOutcomeCard({ size, className }: { size: 'tv' | 'phone'; className?: string }) {
+export function BossOutcomeCard({ size, density, className }: { size: 'tv' | 'phone'; density?: 'compact'; className?: string }) {
   const { t } = useLanguage();
   const reduce = !!useReducedMotion();
   const view = useClassroomBossStore((s) => s.view);
@@ -25,6 +26,7 @@ export function BossOutcomeCard({ size, className }: { size: 'tv' | 'phone'; cla
   const tv = size === 'tv';
   const left = won || !view.maxHp ? 0 : Math.max(0, Math.min(1, view.hp / view.maxHp));
   const hitters = (view.topHitters ?? []).slice(0, 3);
+  if (density === 'compact') return <CompactBossOutcome view={view} name={name} left={left} hitters={hitters} reduce={reduce} className={className} />;
 
   return (
     <section

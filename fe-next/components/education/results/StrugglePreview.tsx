@@ -29,15 +29,15 @@ export function StrugglePreview({ masteryByPlayer, teacherName, language, t, max
   return (
     <section
       data-testid="struggle-preview"
-      className="flex shrink-0 items-center gap-4 rounded-neo border-[3px] border-neo-cream bg-neo-navy-elevated px-4 py-3 shadow-hard"
+      className="flex shrink-0 items-center gap-3 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-3 py-2 @lg/results:gap-4 @lg/results:px-4 @lg/results:py-3"
     >
-      <ul aria-hidden="true" className="flex w-28 shrink-0 flex-col gap-1.5 @lg/results:w-36">
+      <ul aria-hidden="true" className="flex w-24 shrink-0 flex-col gap-1 @lg/results:w-36 @lg/results:gap-1.5">
         {pcts.slice(0, maxBars).map((pct, i) => (
           <li key={i} data-testid="struggle-bar" data-pct={String(pct)} className="flex items-center gap-1.5">
-            <span className="h-2.5 w-8 shrink-0 rounded-full bg-neo-cream/50" />
-            <span className="h-2.5 flex-1 overflow-hidden rounded-full bg-neo-navy">
+            <span className="h-2 w-6 shrink-0 rounded-full bg-neo-cream/40 @lg/results:h-2.5 @lg/results:w-8" />
+            <span className="h-2 flex-1 overflow-hidden rounded-full bg-neo-navy @lg/results:h-2.5">
               <span
-                className={cn('block h-full origin-left rounded-full rtl:origin-right', pct < 40 ? 'bg-neo-pink' : pct < 70 ? 'bg-neo-yellow' : 'bg-neo-lime')}
+                className="block h-full origin-left rounded-full bg-neo-cream rtl:origin-right"
                 style={{ transform: `scaleX(${Math.max(0.06, pct / 100)})` }}
               />
             </span>
@@ -52,7 +52,7 @@ export function StrugglePreview({ masteryByPlayer, teacherName, language, t, max
           href={`/${language}/teacher/reports`}
           data-testid="edu-results-report"
           onClick={() => trackResultsAction('view_report', 'projector')}
-          className="inline-flex min-h-11 items-center gap-1.5 rounded-neo border-[2px] border-neo-cream/60 px-3 font-neo-display text-sm font-black uppercase text-neo-cream hover:bg-neo-navy-light"
+          className="inline-flex min-h-10 items-center gap-1.5 rounded-neo border-[2px] border-neo-cream/60 px-3 font-neo-display text-sm font-bold text-neo-cream hover:bg-neo-navy"
         >
           <BarChart3 className="size-4 shrink-0" aria-hidden="true" />
           {t('education.results.fullReport')}

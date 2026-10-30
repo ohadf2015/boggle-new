@@ -23,14 +23,13 @@ describe('analytics page says its title once', () => {
     expect(crumbs).toMatch(/case 'classroom':\s*\n\s*label = t\('education\.header\.breadcrumbs\.classrooms'\)/);
   });
 
-  it('fits the four view tabs at 390px: two columns on phones, labels may wrap', () => {
+  it('fits the five section tabs in one row at 390px, labels may wrap', () => {
     const page = read('app/[locale]/teacher/classroom/[id]/analytics/PageClient.tsx');
     const list = page.match(/<TabsList[\s\S]*?>/)![0];
-    expect(list).toMatch(/grid-cols-2/);
-    expect(list).toMatch(/sm:grid-cols-4/);
+    expect(list).toMatch(/grid-cols-5/);
     expect(list).toMatch(/h-auto/);
     expect(page).toMatch(/const TAB_BASE =\s[\s\S]*?whitespace-normal/);
-    expect(page.match(/className=\{cn\(TAB_BASE,/g)).toHaveLength(4);
+    expect(page.match(/className=\{cn\(TAB_BASE,/g)).toHaveLength(1);
   });
 
   it('marks the selected tab with a lime ring, never a colored fill', () => {

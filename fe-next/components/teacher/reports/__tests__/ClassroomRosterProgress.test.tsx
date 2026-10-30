@@ -382,4 +382,23 @@ describe('ClassroomRosterProgress', () => {
     }
     expect(rows).toHaveLength(2);
   });
+
+  it('Given a Pro teacher and a full class, Then the roster shows one page at a time and the share actions are outlined, not colored fills', async () => {
+    studentsState.data = Array.from({ length: 40 }, (_, i) => rosterStudent(`s${i}`, { display_name: `Kid ${i}` }, '2026-10-01T09:00:00.000Z'));
+    proState.hasPro = true;
+
+    render(<ClassroomRosterProgress classroomId="c1" classroomName="Year 5" />);
+
+    await screen.findByTestId('classroom-roster-parent-share');
+    expect(screen.getAllByTestId('classroom-roster-row').length).toBeLessThan(40);
+    expect(screen.getByTestId('classroom-roster-pager')).toBeInTheDocument();
+    const section = screen.getByTestId('classroom-roster-progress');
+    expect(section.querySelector('[data-print-root]')!.querySelectorAll('tbody tr')).toHaveLength(40);
+    for (const b of screen.getByTestId('classroom-roster-parent-share').querySelectorAll('button')) {
+      expect(b.className).not.toMatch(/\bbg-neo-(cyan|lime|pink)\b|text-neo-cyan/);
+    }
+    for (const chip of screen.getAllByTestId('classroom-roster-status')) {
+      expect(chip.className).not.toMatch(/neo-(orange|cyan|lime)/);
+    }
+  });
 });

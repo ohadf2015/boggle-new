@@ -4,6 +4,17 @@ import { useState } from 'react';
 import { useVocabularyMastery } from '@/hooks/useVocabularyMastery';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { MasteryLevel } from '@/lib/supabase/analytics';
+import { useFitPageSize } from '@/components/teacher/lesson-creation/library/useFitPageSize';
+
+const ROW_H = 40;
+const PAGER_RESERVE = 112;
+const PAGER_BUTTON = 'min-h-10 rounded-neo border-2 border-neo-cream/60 px-3 text-sm font-bold text-neo-cream hover:border-neo-cream disabled:opacity-40';
+const LEVEL_FILL: Record<string, string> = {
+  mastered: 'bg-neo-cream',
+  practicing: 'bg-neo-cream/45',
+  struggling: 'bg-neo-pink',
+  notStarted: 'bg-neo-navy/50',
+};
 
 interface VocabularyHeatmapProps {
   classroomId: string;
@@ -32,6 +43,8 @@ export function VocabularyHeatmap({
     studentId: string;
     word: string;
   } | null>(null);
+  const [rowsRef, pageSize] = useFitPageSize(ROW_H, PAGER_RESERVE, 10);
+  const [page, setPage] = useState(0);
 
   // Loading state
   if (isLoading) {
@@ -66,22 +79,12 @@ export function VocabularyHeatmap({
   }
 
   // Helper function to get cell background color based on mastery level
-  const getMasteryColor = (masteryLevel: MasteryLevel): string => {
-    switch (masteryLevel) {
-      case 'mastered':
-        return 'bg-neo-cyan';
-      case 'practicing':
-        return 'bg-neo-lime';
-      case 'struggling':
-        return 'bg-neo-orange';
-      case 'not-started':
-        return 'bg-neo-navy/50';
-      default:
-        return 'bg-neo-navy/50';
-    }
-  };
+  const getMasteryColor = (masteryLevel: MasteryLevel): string =>
+    LEVEL_FILL[masteryLevel === 'not-started' ? 'notStarted' : masteryLevel] ?? LEVEL_FILL.notStarted;
+  const pageCount = Math.max(1, Math.ceil(heatmapData.words.length / Math.max(1, pageSize)));
+  const shownPage = Math.min(page, pageCount - 1);
+  const pageWords = heatmapData.words.slice(shownPage * pageSize, (shownPage + 1) * pageSize);
 
-  // Find cell data
   const getCellData = (studentId: string, word: string) => {
     return heatmapData.cells.find(
       cell => cell.studentId === studentId && cell.word === word
@@ -96,15 +99,10 @@ export function VocabularyHeatmap({
           {t('education.analytics.masteryLevels')}:
         </span>
         <div className="flex gap-3">
-          {[
-            { key: 'mastered', color: 'bg-neo-cyan' },
-            { key: 'practicing', color: 'bg-neo-lime' },
-            { key: 'struggling', color: 'bg-neo-orange' },
-            { key: 'notStarted', color: 'bg-neo-navy/50' },
-          ].map(level => (
+          {['mastered', 'practicing', 'struggling', 'notStarted'].map((key) => ({ key, color: LEVEL_FILL[key] })).map(level => (
             <div key={level.key} className="flex items-center gap-2">
               <div
-                className={`w-4 h-4 ${level.color} border-neo border-black rounded-sm`}
+                className={`w-4 h-4 ${level.color} border-2 border-neo-cream/40 rounded-sm`}
               />
               <span className="text-neo-white text-sm">
                 {t(`education.analytics.${level.key}`)}
@@ -135,8 +133,8 @@ export function VocabularyHeatmap({
               ))}
             </div>
 
-            {/* Data Rows - One row per word */}
-            {heatmapData.words.map(word => (
+            <div ref={rowsRef}>
+            {pageWords.map(word => (
               <div key={word} className="flex">
                 {/* Word label (sticky) */}
                 <div className="w-32 shrink-0 p-2 border-neo border-neo-white/40 bg-neo-navy flex items-center">
@@ -181,9 +179,21 @@ export function VocabularyHeatmap({
                 })}
               </div>
             ))}
+            </div>
           </div>
         </div>
       </div>
+      {pageCount > 1 && (
+        <nav data-testid="heatmap-pager" aria-label={t('eduLibrary.pager.label')} className="flex items-center justify-center gap-3">
+          <button type="button" disabled={shownPage === 0} onClick={() => setPage(shownPage - 1)} className={PAGER_BUTTON}>
+            {t('eduLibrary.pager.prev')}
+          </button>
+          <span className="text-sm font-bold text-neo-cream/80">{t('eduLibrary.pager.status', { page: shownPage + 1, total: pageCount })}</span>
+          <button type="button" disabled={shownPage >= pageCount - 1} onClick={() => setPage(shownPage + 1)} className={PAGER_BUTTON}>
+            {t('eduLibrary.pager.next')}
+          </button>
+        </nav>
+      )}
     </div>
   );
 }

@@ -53,4 +53,14 @@ describe('TeacherInviteNudge', () => {
     render(<TeacherInviteNudge students={7} language="he" t={t} />);
     expect(screen.getByTestId('teacher-invite').innerHTML).not.toContain('bg-neo-lime');
   });
+
+  it('Given a phone, Then the invite is one compact row of share + WhatsApp buttons, normal case, with the same test ids', () => {
+    render(<TeacherInviteNudge students={5} language="he" whatsapp compact t={t} />);
+    const row = screen.getByTestId('teacher-invite');
+    expect(row).toHaveAttribute('data-density', 'compact');
+    expect(screen.queryByText('eduLiveRoom.hostResults.invitePrompt')).toBeNull();
+    expect(screen.getByTestId('teacher-invite-share')).toHaveTextContent('eduLiveRoom.hostResults.inviteCta');
+    expect(screen.getByTestId('teacher-invite-whatsapp')).toBeInTheDocument();
+    expect(row.innerHTML).not.toMatch(/\buppercase\b/);
+  });
 });

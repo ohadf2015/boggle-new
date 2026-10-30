@@ -82,4 +82,30 @@ describe('RoundReports', () => {
     expect(screen.getByText('teacher.lastGame.error')).toBeInTheDocument();
     expect(screen.queryByText('teacher.lastGame.emptyTitle')).not.toBeInTheDocument();
   });
+
+  describe('on the Reports games tab (collapsed, paged)', () => {
+    const dozen = Array.from({ length: 12 }, (_, i) => ({ ...ROUND_FIXTURE, gameCode: `G${String(i).padStart(2, '0')}` }));
+
+    it('given 12 games, then every game starts as a one-line row and the list pages', () => {
+      games = { games: dozen, isLoading: false, error: null };
+      render(<RoundReports classroomId="c1" classroomName="7B" collapsed pageSizeFallback={5} />);
+      expect(screen.queryByTestId('card')).toBeNull();
+      expect(screen.getAllByTestId('round-report-collapsed')).toHaveLength(5);
+      expect(screen.getByTestId('round-reports-pager')).toBeInTheDocument();
+      fireEvent.click(screen.getByTestId('round-reports-next'));
+      expect(screen.getAllByTestId('round-report-collapsed')[0].textContent).toContain('teacher.windowProgress.activeLine');
+      expect(screen.getAllByTestId('round-report-collapsed')).toHaveLength(5);
+    });
+
+    it('given a tap on a row, then that game opens alone and can be closed again', () => {
+      games = { games: dozen, isLoading: false, error: null };
+      render(<RoundReports classroomId="c1" classroomName="7B" collapsed pageSizeFallback={5} />);
+      fireEvent.click(screen.getAllByTestId('round-report-collapsed')[1]);
+      expect(screen.getAllByTestId('card').map((c) => c.textContent)).toEqual(['G01']);
+      expect(screen.queryByTestId('round-report-collapsed')).toBeNull();
+      fireEvent.click(screen.getByTestId('round-reports-back'));
+      expect(screen.queryByTestId('card')).toBeNull();
+      expect(screen.getAllByTestId('round-report-collapsed')).toHaveLength(5);
+    });
+  });
 });

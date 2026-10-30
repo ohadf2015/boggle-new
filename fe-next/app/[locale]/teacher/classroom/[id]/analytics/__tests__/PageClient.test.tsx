@@ -156,9 +156,9 @@ describe('AnalyticsPageClient', () => {
     expect(screen.getByTestId('analytics-dashboard')).toBeInTheDocument();
 
     // Tab triggers
-    expect(screen.getByText('education.analytics.viewStudents')).toBeInTheDocument();
-    expect(screen.getByText('education.analytics.viewLessons')).toBeInTheDocument();
-    expect(screen.getByText('education.analytics.viewVocabulary')).toBeInTheDocument();
+    for (const id of ['pulse', 'students', 'lessons', 'words', 'homework']) {
+      expect(screen.getByText(`education.analytics.tabs.${id}`)).toBeInTheDocument();
+    }
   });
 
   // ============================================
@@ -232,17 +232,19 @@ describe('AnalyticsPageClient', () => {
   // TAB NAVIGATION TESTS
   // ============================================
 
-  it('should render student progress table by default', () => {
+  it('should switch to the students tab when clicked', async () => {
+    const user = userEvent.setup();
     render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
 
-    expect(screen.getByTestId('student-progress-table')).toBeInTheDocument();
+    await user.click(screen.getByText('education.analytics.tabs.students'));
+    expect(await screen.findByTestId('student-progress-table')).toBeInTheDocument();
   });
 
   it('should switch to lessons tab when clicked', async () => {
     const user = userEvent.setup();
     render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
 
-    const lessonsTab = screen.getByText('education.analytics.viewLessons');
+    const lessonsTab = screen.getByText('education.analytics.tabs.lessons');
     await user.click(lessonsTab);
 
     await waitFor(() => {
@@ -254,7 +256,7 @@ describe('AnalyticsPageClient', () => {
     const user = userEvent.setup();
     render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
 
-    const vocabTab = screen.getByText('education.analytics.viewVocabulary');
+    const vocabTab = screen.getByText('education.analytics.tabs.words');
     await user.click(vocabTab);
 
     await waitFor(() => {

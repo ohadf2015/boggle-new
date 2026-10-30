@@ -47,11 +47,11 @@ describe('AnalyticsDashboard (summary cards; the page tabs carry the table, char
     expect(src).not.toMatch(/useStudentProgressMetrics|StudentProgressReport|<Dialog/);
   });
 
-  it('lays the cards out two-up on a phone instead of one tall column', () => {
+  it('lays the four numbers out in one short row on a phone, so the report sections stay in view', () => {
     render(<AnalyticsDashboard classroomId="c1" />);
     const grid = screen.getByTestId('metric-students-needing-help').parentElement!;
-    expect(grid.className).toMatch(/(^|\s)grid-cols-2(\s|$)/);
-    expect(screen.getByText('3/6').className).toMatch(/(^|\s)text-2xl(\s|$)/);
+    expect(grid.className).toMatch(/(^|\s)grid-cols-4(\s|$)/);
+    expect(screen.getByText('3/6').className).toMatch(/(^|\s)text-lg(\s|$)/);
   });
 
   it('hands View Students to the host', () => {

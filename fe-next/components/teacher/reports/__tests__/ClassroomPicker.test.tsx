@@ -23,6 +23,13 @@ describe('<ClassroomPicker>', () => {
     expect(onSelect).toHaveBeenCalledWith('a');
   });
 
+  it('Given the picker, Then the open-class arrow is outlined, not a lime fill', () => {
+    const { container } = render(<ClassroomPicker classrooms={classes} onSelect={vi.fn()} />);
+    const arrows = [...container.querySelectorAll('span.size-11')];
+    expect(arrows).toHaveLength(2);
+    for (const arrow of arrows) expect(arrow.className).not.toMatch(/(^|\s)bg-neo-lime(\s|$)/);
+  });
+
   it('Given more classes than accents, Then colors cycle', () => {
     expect(accentFor(0)).toBe(accentFor(4));
     expect(accentFor(0)).not.toBe(accentFor(1));
@@ -34,5 +41,10 @@ describe('<ClassHero>', () => {
     render(<ClassHero name="5B English" memberCount={3} />);
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('5B English');
     expect(screen.getByText('3')).toBeInTheDocument();
+  });
+
+  it('Given the report header, Then the class badge is a neutral navy tile, not a lime fill', () => {
+    const { container } = render(<ClassHero name="5B English" memberCount={3} />);
+    expect(container.innerHTML).not.toMatch(/(^|\s)bg-neo-(lime|yellow|cyan|pink)(\s|")/);
   });
 });

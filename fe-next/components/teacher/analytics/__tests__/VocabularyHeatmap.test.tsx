@@ -207,15 +207,14 @@ describe('VocabularyHeatmap', () => {
     const cells = container.querySelectorAll('[data-cell]');
     expect(cells).toHaveLength(4);
 
-    // Check for mastery level classes (mastered = cyan, practicing = yellow, struggling = orange, not-started = navy)
     const masteredCell = container.querySelector('[data-mastery="mastered"]');
     const practicingCell = container.querySelector('[data-mastery="practicing"]');
     const strugglingCell = container.querySelector('[data-mastery="struggling"]');
     const notStartedCell = container.querySelector('[data-mastery="not-started"]');
 
-    expect(masteredCell).toHaveClass('bg-neo-cyan');
-    expect(practicingCell).toHaveClass('bg-neo-lime');
-    expect(strugglingCell).toHaveClass('bg-neo-orange');
+    expect(masteredCell).toHaveClass('bg-neo-cream');
+    expect(practicingCell).toHaveClass('bg-neo-cream/45');
+    expect(strugglingCell).toHaveClass('bg-neo-pink');
     expect(notStartedCell).toHaveClass('bg-neo-navy/50');
   });
 
@@ -345,5 +344,19 @@ describe('VocabularyHeatmap', () => {
 
     // THEN
     expect(screen.getByText(/Failed to load data/)).toBeInTheDocument();
+  });
+
+  it('given more words than fit, then it shows one page of words with a pager', () => {
+    const words = Array.from({ length: 30 }, (_, i) => `word${i}`);
+    (useVocabularyMastery as Mock).mockReturnValue({
+      heatmapData: { students: [{ id: 's1', name: 'Alice' }], words, cells: [] },
+      isLoading: false,
+      error: null,
+      refresh: vi.fn(),
+    });
+    render(<VocabularyHeatmap classroomId="classroom-1" />);
+    expect(screen.getByText('word0')).toBeInTheDocument();
+    expect(screen.queryByText('word29')).toBeNull();
+    expect(screen.getByTestId('heatmap-pager')).toBeInTheDocument();
   });
 });

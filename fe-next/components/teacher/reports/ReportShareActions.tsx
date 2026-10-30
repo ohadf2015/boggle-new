@@ -41,7 +41,7 @@ export function buildReportSummary({
 }
 
 const BTN =
-  'inline-flex min-h-10 items-center gap-1.5 rounded-neo border-2 border-neo-cream/50 bg-neo-navy px-3 font-neo-display text-xs font-black uppercase text-neo-white shadow-hard-sm transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-hard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan active:translate-y-0 active:shadow-none motion-reduce:transition-none';
+  'inline-flex min-h-10 items-center gap-1.5 rounded-neo border-2 border-neo-cream/50 bg-neo-navy px-3 font-neo-display text-xs font-black text-neo-white shadow-hard-sm transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-hard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan active:translate-y-0 active:shadow-none motion-reduce:transition-none';
 
 export function ReportShareActions({ summary, className }: { summary: () => string; className?: string }) {
   const { t } = useLanguage();
@@ -72,7 +72,7 @@ export function ReportShareActions({ summary, className }: { summary: () => stri
         <Printer className="size-4" aria-hidden="true" />
         {t('eg2Rep.report.print')}
       </button>
-      <span role="status" className={cn('text-xs font-black text-neo-lime', !copied && 'sr-only')}>
+      <span role="status" className={cn('text-xs font-bold text-neo-cream/85', !copied && 'sr-only')}>
         {copied ? t('eg2Rep.report.copied') : ''}
       </span>
     </div>

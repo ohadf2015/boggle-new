@@ -106,6 +106,7 @@ vi.mock('@/components/teacher/digest/ProgressDigestDashboard', () => ({
 }));
 vi.mock('@/components/teacher/hq/tvScale', () => ({ TEACHER_TV_SCALE: '' }));
 
+import userEvent from '@testing-library/user-event';
 import TeacherReportsPage from '../PageClient';
 
 describe('<TeacherReportsPage> arc gating', () => {
@@ -113,9 +114,10 @@ describe('<TeacherReportsPage> arc gating', () => {
     search = '';
   });
 
-  it('shows the class arc panel alongside the full class report', () => {
+  it('shows the class arc panel alongside the full class report', async () => {
     search = 'classroomId=c1';
     render(<TeacherReportsPage />);
+    await userEvent.setup().click(screen.getByRole('tab', { name: 'teacher.reports.tabs.more' }));
     expect(screen.getByTestId('class-arc-panel')).toBeInTheDocument();
     expect(screen.getByTestId('class-progress-report')).toBeInTheDocument();
   });
@@ -131,6 +133,7 @@ describe('<TeacherReportsPage> arc gating', () => {
   it('hands the clicked student name through to the arc header', async () => {
     search = 'classroomId=c1';
     const { findByTestId, findAllByText } = render(<TeacherReportsPage />);
+    await userEvent.setup().click(screen.getByRole('tab', { name: 'teacher.reports.tabs.more' }));
     const panel = await findByTestId('class-arc-panel');
     panel.querySelector('button')!.click();
     expect((await findByTestId('student-arc-view')).textContent).toBe('Sam');

@@ -67,7 +67,7 @@ export function HardestWordsList({
                 {states?.[w.word] && (
                   <span
                     data-testid="report-word-state"
-                    className={cn('shrink-0 rounded-neo border px-1 text-[10px] font-black uppercase leading-4', STATE_TONE[states[w.word]])}
+                    className={cn('shrink-0 rounded-neo border px-1 text-[10px] font-black leading-4', STATE_TONE[states[w.word]])}
                   >
                     {t(`eg2Rep.report.state.${states[w.word]}`)}
                   </span>

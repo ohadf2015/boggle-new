@@ -106,6 +106,8 @@ vi.mock('@/lib/supabase/education/assignments', () => ({
 }));
 
 import { ClassAssignmentGrid } from '../ClassAssignmentGrid';
+import { getClassroomStudents } from '@/lib/supabase/education/classrooms';
+import { getClassroomAssignments } from '@/lib/supabase/education/assignments';
 
 describe('ClassAssignmentGrid', () => {
   beforeEach(() => {
@@ -167,6 +169,7 @@ describe('ClassAssignmentGrid', () => {
       ].join('\n'),
     );
     expect(summary.textContent).not.toContain('Old verbs');
+    expect(screen.getByTestId('weekly-summary-copy').className).not.toMatch(/(^|\s)bg-neo-cream(\s|$)/);
 
     await userEvent.click(screen.getByTestId('weekly-summary-copy'));
     await waitFor(() => expect(writeText).toHaveBeenCalledWith(summary.textContent));
@@ -192,5 +195,21 @@ describe('ClassAssignmentGrid', () => {
     proState.hasPro = true;
     rerender(<ClassAssignmentGrid classroomId="c1" classroomName="English 101" />);
     expect(screen.queryByTestId('class-grid-pro-nudge')).not.toBeInTheDocument();
+  });
+
+  it('given a dense class (40 students, 8 homework), then the grid shows one page of students with a pager and the summary stays one tap away', async () => {
+    vi.mocked(getClassroomStudents).mockResolvedValueOnce({
+      data: Array.from({ length: 40 }, (_, i) => ({ student_id: `s${i}`, profiles: { display_name: `Kid ${i}`, username: null } })),
+      error: null,
+    } as never);
+    vi.mocked(getClassroomAssignments).mockResolvedValueOnce({
+      data: Array.from({ length: 8 }, (_, i) => ({ id: `h${i}`, title: `Homework ${i}`, due_date: '2026-10-06', vocabulary_lessons: null })),
+      error: null,
+    } as never);
+    render(<ClassAssignmentGrid classroomId="c1" classroomName="English 101" />);
+    expect(await screen.findByTestId('class-grid-pager')).toBeInTheDocument();
+    expect(screen.getAllByRole('row').length).toBeLessThan(41);
+    expect(screen.getByTestId('weekly-summary').closest('details')).not.toBeNull();
+    expect(screen.getByTestId('weekly-summary-copy').closest('details')).toBeNull();
   });
 });

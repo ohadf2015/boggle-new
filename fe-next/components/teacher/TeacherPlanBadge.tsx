@@ -64,29 +64,29 @@ export function TeacherPlanBadge({ className, quiet = false }: { className?: str
         data-testid="teacher-plan-badge"
         data-plan="pro"
         className={cn(
-          'inline-flex items-center gap-2 rounded-neo border-2 border-black bg-neo-lime px-3 py-1.5 shadow-hard-sm',
+          'inline-flex items-center gap-2 self-start rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-3 py-1.5 text-neo-cream',
           className,
         )}
       >
-        {isGift ? <Gift className="size-4 text-black" aria-hidden="true" /> : <Sparkles className="size-4 text-black" aria-hidden="true" />}
-        <span className="font-neo-display text-sm font-black uppercase tracking-wide text-black">{t('teacher.plan.pro')}</span>
+        {isGift ? <Gift className="size-4 text-neo-cream/80" aria-hidden="true" /> : <Sparkles className="size-4 text-neo-cream/80" aria-hidden="true" />}
+        <span className="rounded-full border-2 border-neo-yellow px-1.5 font-neo-body text-[11px] font-black leading-tight text-neo-yellow">{t('teacher.plan.pro')}</span>
         {trialLabel ? (
           <>
-            <span data-testid="teacher-pro-trial-badge" className="text-xs font-bold text-black/70">
+            <span data-testid="teacher-pro-trial-badge" className="text-xs font-bold text-neo-cream/80">
               {trialLabel}
             </span>
             {polarTrialChipUpgrade(daysLeft) ? (
               <Link
                 href={`/${language}/teacher/upgrade`}
                 data-testid="teacher-pro-trial-upgrade-chip"
-                className="text-xs font-black uppercase underline underline-offset-2 text-black"
+                className="text-xs font-bold underline underline-offset-2 text-neo-cream"
               >
                 {t('teacher.plan.upgrade')}
               </Link>
             ) : null}
           </>
         ) : until ? (
-          <span className="hidden text-xs font-bold text-black/70 sm:inline">
+          <span className="hidden text-xs font-bold text-neo-cream/80 sm:inline">
             {isGift ? t('teacher.plan.giftedUntil', { date: until }) : t('teacher.plan.renewsOn', { date: until })}
           </span>
         ) : null}

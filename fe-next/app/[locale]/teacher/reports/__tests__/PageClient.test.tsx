@@ -160,15 +160,21 @@ vi.mock('@/lib/education/telemetry', () => ({
   trackEduReportsViewed: (...args: unknown[]) => trackEduReportsViewed(...args),
 }));
 
+const openSection = async (id: string) => {
+  await userEvent.setup().click(screen.getByRole('tab', { name: `teacher.reports.tabs.${id}` }));
+};
+
 describe('ReportsPageClient', () => {
   describe('A teacher with one class', () => {
     const all = [...mockClassrooms];
     beforeEach(() => mockClassrooms.splice(1));
     afterEach(() => mockClassrooms.splice(0, mockClassrooms.length, ...all));
 
-    it('Given one class, Then the report opens on it instead of asking to pick', () => {
+    it('Given one class, Then the report opens on it instead of asking to pick', async () => {
       render(<ReportsPageClient />);
       expect(screen.queryByText('Select a Classroom')).not.toBeInTheDocument();
+      expect(screen.getByTestId('classroom-roster-progress')).toHaveTextContent('classroom-1');
+      await openSection('more');
       expect(screen.getByTestId('class-progress-report')).toHaveAttribute('data-classroom-id', 'classroom-1');
     });
   });
@@ -200,8 +206,9 @@ describe('ReportsPageClient', () => {
       mockSearchParams.set('classroomId', 'classroom-1');
     });
 
-    it('displays class report when classroom is selected', () => {
+    it('displays class report when classroom is selected', async () => {
       render(<ReportsPageClient />);
+      await openSection('more');
 
       expect(screen.getByTestId('class-progress-report')).toBeInTheDocument();
       expect(screen.getByTestId('class-progress-report')).toHaveAttribute(
@@ -214,6 +221,7 @@ describe('ReportsPageClient', () => {
       const user = userEvent.setup();
 
       render(<ReportsPageClient />);
+      await openSection('more');
 
       const clickStudentButton = screen.getByRole('button', { name: /click student/i });
       await user.click(clickStudentButton);
@@ -255,7 +263,7 @@ describe('ReportsPageClient', () => {
       await user.click(backButton);
 
       await waitFor(() => {
-        expect(screen.getByTestId('class-progress-report')).toBeInTheDocument();
+        expect(screen.getByTestId('classroom-roster-progress')).toBeInTheDocument();
       });
     });
   });
@@ -334,7 +342,7 @@ describe('ReportsPageClient', () => {
       expectNoReportData();
     });
 
-    it('gives a teacher on a live access trial the full reports with one Pro strip', () => {
+    it('gives a teacher on a live access trial the full reports with one Pro strip', async () => {
       proState.hasPro = false;
       proState.accessTrialExpires = inDays(9);
       mockSearchParams.set('classroomId', 'classroom-1');
@@ -342,18 +350,21 @@ describe('ReportsPageClient', () => {
 
       expect(screen.getAllByTestId('pro-trial-preview')).toHaveLength(1);
       expect(screen.queryByTestId('teacher-plan-badge')).not.toBeInTheDocument();
-      expect(screen.getByTestId('class-progress-report')).toBeInTheDocument();
       expect(screen.getByTestId('classroom-roster-progress')).toBeInTheDocument();
+      await openSection('more');
+      expect(screen.getByTestId('class-progress-report')).toBeInTheDocument();
       expect(screen.queryByTestId('pro-gate-preview')).not.toBeInTheDocument();
     });
 
-    it('gives a paying teacher every report and no lock or strip', () => {
+    it('gives a paying teacher every report and no lock or strip', async () => {
       mockSearchParams.set('classroomId', 'classroom-1');
       render(<ReportsPageClient />);
 
-      expect(screen.getByTestId('class-progress-report')).toBeInTheDocument();
       expect(screen.getByTestId('teacher-plan-badge')).toBeInTheDocument();
+      await openSection('more');
+      expect(screen.getByTestId('class-progress-report')).toBeInTheDocument();
       expect(screen.getByTestId('progress-digest-dashboard')).toBeInTheDocument();
+      await openSection('games');
       expect(getRecentClassroomGames).toHaveBeenCalledWith('classroom-1', expect.any(Number), expect.anything());
       expect(screen.queryByTestId('pro-gate-preview')).not.toBeInTheDocument();
       expect(screen.queryByTestId('pro-trial-preview')).not.toBeInTheDocument();
@@ -421,7 +432,7 @@ describe('ReportsPageClient', () => {
       rerender(<ReportsPageClient />);
 
       // THEN the class view shows — local state must not pin the old view
-      expect(screen.getByTestId('class-progress-report')).toBeInTheDocument();
+      expect(screen.getByTestId('classroom-roster-progress')).toBeInTheDocument();
     });
   });
 });

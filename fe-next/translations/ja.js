@@ -15142,6 +15142,14 @@ const ja = {
       "selectClassroom": "クラスルームを選択",
       "loading": "レポート読み込み中...",
       "loadingClassrooms": "クラスルームを読み込み中...",
+      "tabs": {
+        "label": "レポートのセクション",
+        "students": "生徒",
+        "games": "ゲーム",
+        "pulse": "クラスの様子",
+        "homework": "宿題",
+        "more": "その他"
+      },
       "noClassroomsFound": "クラスルームが見つかりません",
       "error": "レポートの読み込みエラー",
       "noData": "データがありません",
@@ -15229,6 +15237,7 @@ const ja = {
         "statusCompleted": "完了",
         "statusMissing": "未提出",
         "copySummary": "週次まとめをコピー",
+        "summaryPreview": "まとめを見る",
         "copied": "コピーしました",
         "copyFailed": "コピーできませんでした。まとめを選択してコピーしてください。",
         "proNudge": "Pro: 毎週のメールレポート",
@@ -16364,6 +16373,14 @@ const ja = {
       "today": "今日",
       "updatedAgo": "{{time}}前に更新",
       "viewAssignments": "課題を見る",
+      "tabs": {
+        "label": "セクション",
+        "pulse": "クラスの様子",
+        "students": "生徒",
+        "lessons": "レッスン",
+        "words": "単語",
+        "homework": "宿題"
+      },
       "viewLessons": "レッスンを見る",
       "viewStudents": "生徒を見る",
       "viewVocabulary": "語彙を見る",

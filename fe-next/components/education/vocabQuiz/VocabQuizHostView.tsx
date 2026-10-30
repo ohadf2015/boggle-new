@@ -239,7 +239,7 @@ export function VocabQuizHostView({ socket, joinCode, playerCount, onPlayAgain, 
       {/* The payoff the whole round was building towards: the class's own three
           numbers, Lexi with the trophy, and the podium — not a list under a
           heading. See VocabQuizFinale. */}
-      {phase === 'ended' && <ClassroomBossOutcome boss={quiz.boss} t={t} />}
+      {phase === 'ended' && <ClassroomBossOutcome boss={quiz.boss} tone="calm" t={t} />}
       {phase === 'ended' && (
         <VocabQuizFinale
           standings={quiz.standings}

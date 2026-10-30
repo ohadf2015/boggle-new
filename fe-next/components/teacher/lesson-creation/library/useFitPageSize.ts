@@ -21,7 +21,7 @@ function measure(grid: HTMLElement, cardH: number, reserve: number, fallback: nu
   const gridStyle = getComputedStyle(grid);
   const top = grid.getBoundingClientRect().top - region.getBoundingClientRect().top + region.scrollTop;
   const availH = region.clientHeight - parseFloat(regionStyle.paddingBottom || '0') - top - reserve;
-  const cols = gridStyle.gridTemplateColumns.split(' ').filter((c) => c && c !== 'none').length;
+  const cols = Math.max(1, gridStyle.gridTemplateColumns.split(' ').filter((c) => c && c !== 'none').length);
   const gap = parseFloat(gridStyle.rowGap) || 0;
   const tallest = Math.max(0, ...Array.from(grid.children, (c) => (c as HTMLElement).offsetHeight));
   return fitPageSize({ availH, cardH: tallest || cardH, gap, cols }, fallback);
@@ -31,8 +31,8 @@ function measure(grid: HTMLElement, cardH: number, reserve: number, fallback: nu
  * Cards per page so the grid plus its pager fit the shell's scroll region without scrolling.
  * Rows are sized by the tallest rendered card (`cardH` until one renders); `reserve` is the pager's height plus its gap.
  */
-export function useFitPageSize(cardH: number, reserve: number, fallback = 12): [(el: HTMLDivElement | null) => void, number] {
-  const [grid, setGrid] = useState<HTMLDivElement | null>(null);
+export function useFitPageSize(cardH: number, reserve: number, fallback = 12): [(el: HTMLElement | null) => void, number] {
+  const [grid, setGrid] = useState<HTMLElement | null>(null);
   const [size, setSize] = useState(fallback);
 
   useEffect(() => {

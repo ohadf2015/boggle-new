@@ -220,7 +220,7 @@ export function WinnerSpotlight({
             quiet ? 'tracking-normal' : 'uppercase tracking-widest',
             // 40% white on navy-elevated measured 3.50:1 — a smudge at the
             // back of a room, which is the only place this line is read from.
-            !active ? 'text-neo-white/75' : quiet && !earned ? 'text-neo-cream' : 'text-neo-yellow',
+            !active ? 'text-neo-white/75' : quiet ? 'text-neo-cream' : 'text-neo-yellow',
             projector ? (quiet ? 'text-2xl @[96rem]/results:text-3xl @[137.5rem]/results:text-5xl' : 'text-3xl @[137.5rem]/results:text-5xl') : quiet ? 'text-base' : 'text-sm'
           )}
         >
@@ -238,7 +238,8 @@ export function WinnerSpotlight({
             </span>
             <span
               className={cn(
-                'shrink-0 tabular-nums text-neo-lime',
+                'shrink-0 tabular-nums',
+                quiet ? 'text-neo-cream/85' : 'text-neo-lime',
                 projector ? 'text-4xl @[137.5rem]/results:text-6xl' : 'text-xl'
               )}
             >

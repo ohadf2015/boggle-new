@@ -246,11 +246,11 @@ function SetupSteps({ current, t }: { current: 1 | 2; t: T }) {
         const on = n === current;
         return (
           <li key={n} className="flex items-center gap-2" aria-current={on ? 'step' : undefined}>
-            {n > 1 ? <span aria-hidden="true" className={cn('h-[3px] w-10 rounded-full', current >= n ? 'bg-neo-lime' : 'bg-neo-cream/20')} /> : null}
+            {n > 1 ? <span aria-hidden="true" className={cn('h-[3px] w-10 rounded-full', current >= n ? 'bg-neo-cream/60' : 'bg-neo-cream/20')} /> : null}
             <span
               className={cn(
                 'grid size-8 place-items-center rounded-full border-[2px] font-neo-display text-sm font-black',
-                done || on ? 'border-neo-black bg-neo-lime text-neo-black' : 'border-neo-cream/50 text-neo-cream',
+                on ? 'border-neo-lime bg-neo-navy-light text-neo-cream' : done ? 'border-neo-cream/60 bg-neo-navy-light text-neo-cream' : 'border-neo-cream/50 text-neo-cream',
               )}
             >
               {done ? <Check className="size-4" strokeWidth={3} aria-hidden="true" /> : n}

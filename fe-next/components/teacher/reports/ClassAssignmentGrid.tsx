@@ -9,6 +9,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { useFitPageSize } from '@/components/teacher/lesson-creation/library/useFitPageSize';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { getClassroomAssignments, getAssignmentCompletions } from '@/lib/supabase/education/assignments';
@@ -25,6 +26,10 @@ import { trackProgressReportViewed, trackWeeklySummaryCopied } from '@/lib/educa
 import { cn } from '@/lib/utils';
 import { ReportEmpty, ReportError, ReportSkeleton, SectionTitle, useReportData } from './ReportChrome';
 
+const ROW_H = 64;
+const PAGER_RESERVE = 168;
+const PAGER_BUTTON = 'min-h-10 rounded-neo border-2 border-neo-cream/60 px-3 text-sm font-bold text-neo-cream hover:border-neo-cream disabled:opacity-40';
+
 export interface ClassAssignmentGridProps {
   classroomId: string;
   classroomName: string;
@@ -37,6 +42,8 @@ export function ClassAssignmentGrid({ classroomId, classroomName }: ClassAssignm
   const { hasPro, loading: proLoading } = useTeacherPro();
   const [copyState, setCopyState] = useState<CopyState>('idle');
   const viewedFor = useRef<string | null>(null);
+  const [bodyRef, pageSize] = useFitPageSize(ROW_H, PAGER_RESERVE, 8);
+  const [page, setPage] = useState(0);
 
   const load = useCallback(async () => {
     const [assignmentRes, studentRes] = await Promise.all([
@@ -120,6 +127,9 @@ export function ClassAssignmentGrid({ classroomId, classroomName }: ClassAssignm
 
   const { grid, summaryText } = data;
   const hasGrid = grid.students.length > 0 && grid.assignments.length > 0;
+  const pageCount = Math.max(1, Math.ceil(grid.students.length / Math.max(1, pageSize)));
+  const shownPage = Math.min(page, pageCount - 1);
+  const first = shownPage * pageSize;
 
   return (
     <section
@@ -143,8 +153,10 @@ export function ClassAssignmentGrid({ classroomId, classroomName }: ClassAssignm
                 ))}
               </tr>
             </thead>
-            <tbody>
-              {grid.students.map((student, studentIndex) => (
+            <tbody ref={bodyRef}>
+              {grid.students.slice(first, first + pageSize).map((student, rowIndex) => {
+                const studentIndex = first + rowIndex;
+                return (
                 <tr key={student.id} className="border-t border-neo-cream/20">
                   <th scope="row" className="px-3 py-2 text-start font-bold text-neo-white">
                     {student.name}
@@ -164,7 +176,7 @@ export function ClassAssignmentGrid({ classroomId, classroomName }: ClassAssignm
                           completed ? 'bg-neo-lime/10' : 'bg-neo-pink/10',
                         )}
                       >
-                        <span className="block text-xs font-bold uppercase tracking-wide">
+                        <span className="block text-xs font-bold">
                           {completed
                             ? t('teacher.reports.classGrid.statusCompleted')
                             : t('teacher.reports.classGrid.statusMissing')}
@@ -179,33 +191,51 @@ export function ClassAssignmentGrid({ classroomId, classroomName }: ClassAssignm
                     );
                   })}
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>
-      ) : (
+      ) : null}
+      {hasGrid && pageCount > 1 ? (
+        <nav data-testid="class-grid-pager" aria-label={t('eduLibrary.pager.label')} className="flex items-center justify-center gap-3">
+          <button type="button" disabled={shownPage === 0} onClick={() => setPage(shownPage - 1)} className={PAGER_BUTTON}>
+            {t('eduLibrary.pager.prev')}
+          </button>
+          <span className="text-sm font-bold text-neo-cream/80">{t('eduLibrary.pager.status', { page: shownPage + 1, total: pageCount })}</span>
+          <button type="button" disabled={shownPage >= pageCount - 1} onClick={() => setPage(shownPage + 1)} className={PAGER_BUTTON}>
+            {t('eduLibrary.pager.next')}
+          </button>
+        </nav>
+      ) : null}
+      {hasGrid ? null : (
         <>
           <ReportEmpty />
           <p className="text-center text-sm text-neo-cream/70">{t('teacher.reports.classGrid.empty')}</p>
         </>
       )}
 
-      <div className="rounded-neo border-2 border-neo-cream/40 bg-neo-navy p-4">
-        <pre
-          data-testid="weekly-summary"
-          className="whitespace-pre-wrap break-words font-sans text-sm text-neo-white"
-        >{summaryText}</pre>
-        <div className="mt-3 flex flex-wrap items-center gap-3">
+      <div className="rounded-neo border-2 border-neo-cream/40 bg-neo-navy p-3">
+        <div className="flex flex-wrap items-start gap-3">
           <button
             type="button"
             data-testid="weekly-summary-copy"
             onClick={copySummary}
-            className="inline-flex min-h-11 items-center rounded-neo border-2 border-black bg-neo-cream px-4 py-2 font-bold text-neo-navy shadow-hard-sm transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-hard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
+            className="inline-flex min-h-10 shrink-0 items-center rounded-neo border-2 border-neo-cream/60 px-3 py-1.5 text-sm font-bold text-neo-cream transition-colors hover:bg-neo-cream/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime"
           >
             {copyState === 'copied'
               ? t('teacher.reports.classGrid.copied')
               : t('teacher.reports.classGrid.copySummary')}
           </button>
+          <details className="min-w-0 flex-1 basis-48">
+            <summary className="flex min-h-10 cursor-pointer items-center text-sm font-bold text-neo-cream/85 hover:text-neo-cream">
+              {t('teacher.reports.classGrid.summaryPreview')}
+            </summary>
+            <pre
+              data-testid="weekly-summary"
+              className="mt-2 whitespace-pre-wrap break-words font-sans text-sm text-neo-white"
+            >{summaryText}</pre>
+          </details>
           <span role="status" className={cn('text-xs font-bold text-neo-pink', copyState !== 'failed' && 'sr-only')}>
             {copyState === 'failed' ? t('teacher.reports.classGrid.copyFailed') : ''}
           </span>

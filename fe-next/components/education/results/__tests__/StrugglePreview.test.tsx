@@ -32,6 +32,11 @@ describe('StrugglePreview — the Pro report door on the wall', () => {
     for (const name of ['Noa', 'Ido', 'Maya', 'Ms Cohen']) expect(panel.textContent).not.toContain(name);
   });
 
+  it('given the teacher wall, then the preview is calm: cream bars and a normal-case link, no pink, yellow or lime', () => {
+    const { container } = render(<StrugglePreview masteryByPlayer={mastery} teacherName="Ms Cohen" language="he" t={t} />);
+    expect(container.innerHTML).not.toMatch(/bg-neo-(pink|yellow|lime)\b|\buppercase\b/);
+  });
+
   it('given a free teacher, then it renders nothing: the wall has one Pro slot and the trial card holds it', () => {
     pro.hasPro = false;
     const { container } = render(<StrugglePreview masteryByPlayer={mastery} teacherName="Ms Cohen" language="he" t={t} />);

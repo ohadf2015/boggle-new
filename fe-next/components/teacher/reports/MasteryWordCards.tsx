@@ -28,7 +28,7 @@ export function MasteryWordCards({ view, open }: { view: HeatmapView; open: bool
   return (
     <div data-testid="mastery-word-cards" className="space-y-3 sm:hidden">
       <div className="rounded-neo border-2 border-neo-pink bg-neo-pink/10 p-2.5">
-        <h4 className="mb-1.5 flex items-center gap-1.5 text-xs font-black uppercase text-neo-pink">
+        <h4 className="mb-1.5 flex items-center gap-1.5 text-xs font-bold text-neo-cream/85">
           <LifeBuoy className="size-3.5" aria-hidden="true" />
           {t('eduPro.mastery.needsHelpTitle')}
         </h4>

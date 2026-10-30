@@ -16,6 +16,7 @@
 
 import { m, useReducedMotion } from 'framer-motion';
 import { useCountUp } from '@/hooks/useCountUp';
+import { cn } from '@/lib/utils';
 import { tr, type EduT } from '@/components/education/lobby/eduText';
 
 export interface ClassChestProps {
@@ -23,10 +24,12 @@ export interface ClassChestProps {
   found: number;
   total: number;
   open: boolean;
+  /** Teacher wall: the label sits on navy-light so Play again stays the only lime on screen. */
+  tone?: 'default' | 'calm';
   t: EduT;
 }
 
-export function ClassChest({ found, total, open, t }: ClassChestProps) {
+export function ClassChest({ found, total, open, tone = 'default', t }: ClassChestProps) {
   const reduceMotion = useReducedMotion();
   const shown = useCountUp({ target: open ? found : 0, duration: 1300, startDelay: 250, immediate: !!reduceMotion });
 
@@ -34,7 +37,7 @@ export function ClassChest({ found, total, open, t }: ClassChestProps) {
     <div
       data-testid="class-chest"
       data-open={open ? 'true' : 'false'}
-      className="absolute flex flex-col items-center"
+      className="absolute flex flex-col items-start"
       style={{ left: '2.5%', bottom: '4%', width: '17%' }}
     >
       <m.div
@@ -67,9 +70,12 @@ export function ClassChest({ found, total, open, t }: ClassChestProps) {
           type that never drops below phone-legible even on a small stage. */}
       <div
         data-testid="class-chest-label"
-        className="-mt-[1cqw] flex flex-col items-center whitespace-nowrap rounded-neo border-[3px] border-neo-black bg-neo-lime px-[1.2cqw] py-[0.4cqw] text-neo-black shadow-[0.4cqw_0.4cqw_0_#000]"
+        className={cn(
+          '-mt-[1cqw] flex flex-col items-center whitespace-nowrap rounded-neo border-[3px] px-[1.2cqw] py-[0.4cqw] shadow-[0.4cqw_0.4cqw_0_#000]',
+          tone === 'calm' ? 'border-neo-cream/60 bg-neo-navy-light text-neo-cream' : 'border-neo-black bg-neo-lime text-neo-black'
+        )}
       >
-        <span className="font-neo-display font-black uppercase leading-none tracking-wide" style={{ fontSize: 'max(9px, 1.9cqw)' }}>
+        <span className={cn('font-neo-display font-black leading-none', tone !== 'calm' && 'uppercase tracking-wide')} style={{ fontSize: 'max(9px, 1.9cqw)' }}>
           {tr(t, 'academy.results.classChest', 'Class chest')}
         </span>
         <span className="font-neo-display font-black tabular-nums leading-tight" style={{ fontSize: 'max(15px, 3.8cqw)' }}>

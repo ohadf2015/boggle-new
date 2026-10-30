@@ -130,7 +130,7 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
           <span className="font-neo-body text-xs font-bold text-neo-cream/80">{t('eduShell.setup.capMeter', { count: cap.count, limit: cap.limit })}</span>
           <div className="flex gap-1 max-sm:hidden" aria-hidden="true">
             {Array.from({ length: cap.limit }, (_, i) => (
-              <span key={i} className={cn('h-2 flex-1 rounded-full', i < cap.count ? 'bg-neo-yellow' : 'bg-neo-cream/15')} />
+              <span key={i} className={cn('h-2 flex-1 rounded-full', i < cap.count ? 'bg-neo-cream/70' : 'bg-neo-cream/15')} />
             ))}
           </div>
         </div>

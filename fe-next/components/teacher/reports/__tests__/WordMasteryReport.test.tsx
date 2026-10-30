@@ -66,6 +66,14 @@ describe('WordMasteryReport — Pro', () => {
     expect(fetchMock.mock.calls[0][0]).toBe(`/api/education/classroom/${CLASSROOM}/word-mastery`);
   });
 
+  it('marks Pro with a small yellow badge and a normal-case section heading, never a lime pill', async () => {
+    renderReport();
+    const badge = await screen.findByTestId('mastery-pro-badge');
+    expect(badge.className).toMatch(/\bborder-neo-yellow\b/);
+    expect(badge.className).not.toMatch(/\bbg-neo-lime\b/);
+    expect(screen.getByTestId('word-mastery-report').innerHTML).not.toMatch(/\buppercase\b/);
+  });
+
   it('keeps the student x word heatmap behind a disclosure, inside a horizontal scroll container', async () => {
     renderReport();
     const toggle = await screen.findByText('eduPro.mastery.heatmapToggle');

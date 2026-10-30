@@ -14931,6 +14931,14 @@ const es = {
       "selectClassroom": "Elegir aula",
       "loading": "Cargando informe...",
       "loadingClassrooms": "Cargando aulas...",
+      "tabs": {
+        "label": "Secciones del informe",
+        "students": "Alumnos",
+        "games": "Partidas",
+        "pulse": "Pulso de la clase",
+        "homework": "Tareas",
+        "more": "Más"
+      },
       "noClassroomsFound": "No se encontraron aulas",
       "error": "No se pudo cargar el informe",
       "noData": "Sin datos disponibles",
@@ -15018,6 +15026,7 @@ const es = {
         "statusCompleted": "Completada",
         "statusMissing": "Falta",
         "copySummary": "Copiar resumen semanal",
+        "summaryPreview": "Ver el resumen",
         "copied": "Copiado",
         "copyFailed": "No se pudo copiar. Selecciona el resumen y cópialo tú.",
         "proNudge": "Pro: informes semanales por correo",
@@ -16313,6 +16322,14 @@ const es = {
       "today": "Hoy",
       "updatedAgo": "Actualizado hace {{time}}",
       "viewAssignments": "Tareas",
+      "tabs": {
+        "label": "Secciones",
+        "pulse": "Pulso de la clase",
+        "students": "Alumnos",
+        "lessons": "Lecciones",
+        "words": "Palabras",
+        "homework": "Tareas"
+      },
       "viewLessons": "Lecciones",
       "viewStudents": "Estudiantes",
       "viewVocabulary": "Vocabulario",

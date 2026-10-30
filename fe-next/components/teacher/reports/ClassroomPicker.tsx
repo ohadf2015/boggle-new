@@ -78,7 +78,7 @@ export function ClassroomPicker({
                   </span>
                 )}
               </span>
-              <span className="grid size-11 shrink-0 place-items-center rounded-neo border-2 border-black bg-neo-lime text-black transition-transform duration-200 group-hover:translate-x-1 rtl:group-hover:-translate-x-1">
+              <span className="grid size-11 shrink-0 place-items-center rounded-neo border-2 border-neo-cream/60 text-neo-cream transition-transform duration-200 group-hover:translate-x-1 rtl:group-hover:-translate-x-1">
                 <DirectionalIcon icon={ChevronRight} className="size-6" />
               </span>
             </m.button>
@@ -97,11 +97,11 @@ export function ClassHero({ name, memberCount }: { name: string; memberCount?: n
       initial={reduce ? false : { opacity: 0, scale: 0.97 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={SPRING}
-      className="flex items-center gap-4 rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light/95 p-4 shadow-hard"
+      className="flex items-center gap-3 rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light/95 p-3 shadow-hard sm:gap-4 sm:p-4"
     >
       <span
         aria-hidden="true"
-        className="grid size-16 shrink-0 place-items-center rounded-neo border-2 border-black bg-neo-lime font-neo-display text-2xl font-black text-black shadow-hard-sm"
+        className="grid size-12 shrink-0 place-items-center rounded-neo border-2 border-neo-cream/50 bg-neo-navy font-neo-display text-xl font-black text-neo-cream sm:size-14 sm:text-2xl"
       >
         <bdi>{classBadge(name)}</bdi>
       </span>

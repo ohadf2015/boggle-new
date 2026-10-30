@@ -43,6 +43,17 @@ describe('TeacherPlanBadge', () => {
     expect(screen.queryByTestId('teacher-pro-trial-badge')).not.toBeInTheDocument();
   });
 
+  it.each([
+    ['gifted', { source: 'admin_grant', periodEnd: '2027-09-05T12:00:00Z', grant: { id: 'g1', expires_at: '2027-09-05T12:00:00Z', days: 365, note: null, welcomed: true } }],
+    ['paying', { source: 'polar', status: 'active', periodEnd: '2026-10-05T12:00:00Z', trialExpires: null, trialUsed: true, grant: null }],
+  ])('a %s Pro teacher gets a calm navy chip with a small yellow PRO, never a lime block', (_kind, over) => {
+    mockUseTeacherPro.mockReturnValue({ hasPro: true, loading: false, grantExpired: false, ...over });
+    render(<TeacherPlanBadge />);
+    const badge = screen.getByTestId('teacher-plan-badge');
+    expect(badge.outerHTML).not.toMatch(/\bbg-neo-(lime|cyan|pink)\b|\buppercase\b/);
+    expect(screen.getByText('teacher.plan.pro').className).toMatch(/\btext-neo-yellow\b/);
+  });
+
   it('a live Polar trial shows days left, not a renewal date', () => {
     const trialExpires = new Date(Date.now() + 10 * 86400000).toISOString();
     mockUseTeacherPro.mockReturnValue({

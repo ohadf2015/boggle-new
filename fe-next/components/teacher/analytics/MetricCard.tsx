@@ -30,6 +30,8 @@ export interface MetricCardProps {
   testId?: string;
   /** Smaller icon and value on phones, for a two-up grid. */
   compact?: boolean;
+  /** Teacher class report: one navy tile, no colored fills, outlined action. */
+  tone?: 'default' | 'calm';
 }
 
 // ============================================
@@ -66,7 +68,35 @@ export function MetricCard({
   actionable,
   testId = 'metric-card',
   compact = false,
+  tone = 'default',
 }: MetricCardProps) {
+  if (tone === 'calm') {
+    return (
+      <div
+        data-testid={testId}
+        data-severity={severity ?? 'info'}
+        className="flex min-w-0 flex-col justify-between gap-1 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-2 py-1.5 text-neo-cream sm:px-3 sm:py-2"
+      >
+        <div className="flex min-w-0 items-center gap-2">
+          <span aria-hidden="true" className="shrink-0 text-neo-cream/70 max-sm:hidden [&_svg]:size-4">{icon}</span>
+          <span className="font-neo-display text-lg font-bold tabular-nums leading-none sm:text-2xl">{value}</span>
+          {trend && trendValue && <span className="text-xs font-bold text-neo-cream/70 max-sm:hidden">{trendValue}</span>}
+        </div>
+        <div className="flex min-w-0 flex-wrap items-center justify-between gap-x-2 gap-y-1">
+          <span className="font-neo-body text-[11px] font-bold leading-tight text-neo-cream/85 sm:text-sm">{title}</span>
+          {actionable && (
+            <button
+              type="button"
+              onClick={actionable.onClick}
+              className="min-h-8 rounded-neo border-2 border-neo-cream/60 px-2 font-neo-body text-xs font-bold text-neo-cream max-sm:hidden transition-colors hover:bg-neo-cream/10 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime"
+            >
+              {actionable.label}
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
   // ==================== STYLING ====================
 
   // Card bg + icon bg based on severity

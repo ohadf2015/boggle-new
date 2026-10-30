@@ -8,7 +8,8 @@ import { BOSS_ART } from './ClassroomBossBar';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
-export function ClassroomBossOutcome({ boss, compact = false, t }: { boss: VocabQuizBoss | null; compact?: boolean; t: T }) {
+export function ClassroomBossOutcome({ boss, compact = false, tone = 'default', t }: { boss: VocabQuizBoss | null; compact?: boolean; tone?: 'default' | 'calm'; t: T }) {
+  const calm = tone === 'calm';
   if (!boss) return null;
   const won = boss.defeated;
   return (
@@ -16,8 +17,8 @@ export function ClassroomBossOutcome({ boss, compact = false, t }: { boss: Vocab
       data-testid="boss-outcome"
       data-outcome={won ? 'defeated' : 'escaped'}
       className={cn(
-        'flex shrink-0 items-center gap-3 rounded-neo border-[3px] border-neo-black shadow-hard-lg',
-        won ? 'bg-neo-lime text-neo-black' : 'bg-neo-navy-light text-neo-cream',
+        'flex shrink-0 items-center gap-3 rounded-neo',
+        calm ? 'border-2 border-neo-cream/40 bg-neo-navy-light text-neo-cream' : cn('border-[3px] border-neo-black shadow-hard-lg', won ? 'bg-neo-lime text-neo-black' : 'bg-neo-navy-light text-neo-cream'),
         compact ? 'p-2' : 'p-3 md:gap-5 md:p-3 md:[@media(min-height:1000px)]:p-4'
       )}
     >
@@ -29,7 +30,7 @@ export function ClassroomBossOutcome({ boss, compact = false, t }: { boss: Vocab
         className={cn('shrink-0 select-none object-contain drop-shadow-[3px_3px_0_#000]', compact ? 'size-14' : 'size-20 md:[@media(min-height:1000px)]:size-32')}
       />
       <div className="min-w-0">
-        <h3 className={cn('font-neo-display font-black uppercase leading-none', compact ? 'text-xl' : 'text-2xl md:text-4xl md:[@media(min-height:1000px)]:text-5xl')}>
+        <h3 className={cn('font-neo-display font-black leading-none', !calm && 'uppercase', compact ? 'text-xl' : 'text-2xl md:text-4xl md:[@media(min-height:1000px)]:text-5xl')}>
           {t(won ? 'eg2Modes.boss.defeatedTitle' : 'eg2Modes.boss.escapedTitle')}
         </h3>
         <p className={cn('mt-1 font-neo-body font-bold', compact ? 'text-xs' : 'text-sm md:text-lg md:[@media(min-height:1000px)]:text-xl')}>

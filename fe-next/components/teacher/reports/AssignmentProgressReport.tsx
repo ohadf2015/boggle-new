@@ -171,7 +171,7 @@ export function AssignmentProgressReport({ classroomId, classroomName }: Assignm
                   ) : row.status === 'overdue' ? (
                     <span
                       data-testid="assignment-overdue-badge"
-                      className="inline-flex items-center gap-1 rounded border-2 border-neo-red bg-neo-red/15 px-1.5 py-0.5 text-xs font-bold uppercase tracking-wide text-neo-red"
+                      className="inline-flex items-center gap-1 rounded border-2 border-neo-red bg-neo-red/15 px-1.5 py-0.5 text-xs font-bold text-neo-red"
                     >
                       {t('teacher.reports.assignmentProgress.statusOverdue')}
                     </span>
