@@ -15,7 +15,7 @@ const SLUG = 'word-hunt-strategy';
 const DATE_PUBLISHED = '2026-03-10';
 
 const metaTitles: Record<string, string> = {
-  en: 'Word Hunt Strategy: Find Hidden Words Faster',
+  en: 'How to Get Better at Word Hunt — Strategy Guide | LexiClash',
   he: 'אסטרטגיית ציד מילים: מצאו את המילה הנסתרת בפחות ניסיונות | לקסיקלאש',
   sv: 'Word Hunt Strategi: Hitta det Dolda Ordet pa Farre Forsok | LexiClash',
   ja: 'ワードハント攻略：より少ない試行で隠された単語を見つける | LexiClash',
@@ -23,7 +23,7 @@ const metaTitles: Record<string, string> = {
 };
 
 const metaDescriptions: Record<string, string> = {
-  en: 'Word Hunt strategy that cuts guesses: eliminate letters, read clues, and deduce the hidden word. Free LexiClash guide.',
+  en: 'Learn how to get better at Word Hunt fast: eliminate letters, read clues, and deduce the hidden word in fewer guesses. Free LexiClash guide.',
   he: 'שלטו בציד מילים של לקסיקלאש עם אסטרטגיות אלימינציה, פירוש רמזים וטכניקות דדוקציה מתקדמות.',
   sv: 'Bemestra LexiClash Word Hunt med elimineringsstrategier, ledtradstolkning och avancerade deduktionstekniker.',
   ja: 'LexiClashワードハントを消去法、ヒントの解釈、高度な推論テクニックでマスター。',
