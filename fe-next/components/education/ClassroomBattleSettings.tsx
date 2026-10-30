@@ -10,9 +10,10 @@
 
 'use client';
 
-import { Users, User, Accessibility } from 'lucide-react';
+import { Users, User, Accessibility, Check } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { CALM_SELECTED, CALM_IDLE, CALM_FOCUS } from './lobby/LobbyChoiceRow';
 import { MIN_TEAMS, MAX_TEAMS, type PlayStyle } from '@/shared/utils/teamBattle';
 import type { ClassroomAccessibility } from '@/shared/types/classroom';
 
@@ -54,8 +55,8 @@ export function ClassroomBattleSettings({
     <div className="space-y-6">
       {/* Play style */}
       <div>
-        <div id="classroom-playstyle-label" className="block text-neo-white font-bold mb-3">
-          <Users className="w-5 h-5 inline me-2 text-neo-pink" />
+        <div id="classroom-playstyle-label" className="mb-3 block font-neo-display text-sm font-bold text-neo-cream">
+          <Users className="me-2 inline size-4 text-neo-cream/70" />
           {t('teacher.classroom.playStyle.title')}
         </div>
         <div
@@ -75,18 +76,17 @@ export function ClassroomBattleSettings({
                 data-testid={`playstyle-${style}`}
                 onClick={() => onPlayStyleChange(style)}
                 className={cn(
-                  'px-4 py-3 font-bold rounded-neo border-[3px] border-neo-cream transition text-start',
-                  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-pink focus-visible:ring-offset-2',
-                  isSelected
-                    ? 'bg-neo-pink text-neo-black shadow-hard'
-                    : 'bg-neo-navy/50 text-neo-white hover:bg-neo-navy shadow-hard-sm'
+                  'rounded-neo border-2 px-4 py-3 text-start transition-colors',
+                  CALM_FOCUS,
+                  isSelected ? CALM_SELECTED : CALM_IDLE
                 )}
               >
-                <Icon className="w-5 h-5 inline me-2" aria-hidden />
-                <span className="block font-neo-display font-black">
+                <span className="flex items-center gap-2 font-neo-display text-sm font-bold">
+                  <Icon className="size-4 shrink-0 text-neo-cream/70" aria-hidden />
                   {t(`teacher.classroom.playStyle.${style}`)}
+                  {isSelected && <Check className="ms-auto size-4 shrink-0" strokeWidth={3} aria-hidden="true" />}
                 </span>
-                <span className={cn('block text-xs mt-0.5', isSelected ? 'text-neo-black/70' : 'text-neo-white/70')}>
+                <span className="mt-0.5 block font-neo-body text-xs text-neo-cream/80">
                   {t(`teacher.classroom.playStyle.${style}Desc`)}
                 </span>
               </button>
@@ -96,7 +96,7 @@ export function ClassroomBattleSettings({
 
         {playStyle === 'teams' && (
           <div className="mt-3">
-            <div id="classroom-teamcount-label" className="block text-neo-white font-bold mb-2 text-sm">
+            <div id="classroom-teamcount-label" className="mb-2 block font-neo-display text-sm font-bold text-neo-cream">
               {t('teacher.classroom.playStyle.teamCount')}
             </div>
             <div
@@ -115,19 +115,18 @@ export function ClassroomBattleSettings({
                     data-testid={`teamcount-${count}`}
                     onClick={() => onTeamCountChange(count)}
                     className={cn(
-                      'px-4 py-2.5 font-bold rounded-neo border-[3px] border-neo-cream transition',
-                      'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-pink focus-visible:ring-offset-2',
-                      isSelected
-                        ? 'bg-neo-pink text-neo-black shadow-hard'
-                        : 'bg-neo-navy/50 text-neo-white hover:bg-neo-navy shadow-hard-sm'
+                      'inline-flex items-center justify-center gap-1.5 rounded-neo border-2 px-4 py-2.5 font-neo-display text-sm font-bold transition-colors',
+                      CALM_FOCUS,
+                      isSelected ? CALM_SELECTED : CALM_IDLE
                     )}
                   >
+                    {isSelected && <Check className="size-3.5 shrink-0" strokeWidth={3} aria-hidden="true" />}
                     {count}
                   </button>
                 );
               })}
             </div>
-            <p className="mt-2 text-xs text-neo-white/70 font-neo-body">
+            <p className="mt-2 font-neo-body text-xs text-neo-cream/70">
               {t('teacher.classroom.playStyle.autoAssignNote')}
             </p>
           </div>
@@ -136,8 +135,8 @@ export function ClassroomBattleSettings({
 
       {/* Support (SPED) toggles */}
       <div>
-        <div className="block text-neo-white font-bold mb-3">
-          <Accessibility className="w-5 h-5 inline me-2 text-neo-lime" />
+        <div className="mb-3 block font-neo-display text-sm font-bold text-neo-cream">
+          <Accessibility className="me-2 inline size-4 text-neo-cream/70" />
           {t('teacher.classroom.support.title')}
         </div>
         <div className="flex flex-wrap gap-2">
@@ -151,13 +150,12 @@ export function ClassroomBattleSettings({
                 data-testid={`support-${key}`}
                 onClick={() => toggle(key)}
                 className={cn(
-                  'px-4 py-2 min-h-[44px] font-bold text-sm rounded-neo border-[3px] transition',
-                  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2',
-                  isOn
-                    ? 'bg-neo-lime border-neo-black text-neo-black shadow-hard'
-                    : 'bg-neo-navy/50 border-neo-cream text-neo-white hover:bg-neo-navy shadow-hard-sm'
+                  'inline-flex min-h-[44px] items-center gap-1.5 rounded-neo border-2 px-4 py-2 font-neo-display text-sm font-bold transition-colors',
+                  CALM_FOCUS,
+                  isOn ? CALM_SELECTED : CALM_IDLE
                 )}
               >
+                {isOn && <Check className="size-3.5 shrink-0" strokeWidth={3} aria-hidden="true" />}
                 {t(labelKey)}
               </button>
             );

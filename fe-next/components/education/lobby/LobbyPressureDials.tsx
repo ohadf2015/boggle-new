@@ -56,15 +56,15 @@ export function LobbyPressureDials({ pressure, onChange }: LobbyPressureDialsPro
   return (
     <section
       data-testid="pressure-dials"
-      className="space-y-3 rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light/95 p-3 shadow-hard"
+      className="space-y-3 rounded-neo-lg border-2 border-neo-cream/35 bg-neo-navy-light p-3"
     >
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-        <span className="inline-flex min-w-[7.5rem] items-center gap-1.5 font-neo-display text-xs font-black uppercase text-neo-white/70">
-          <Gauge className="size-4 shrink-0 text-neo-purple" strokeWidth={3} aria-hidden="true" />
+        <span className="inline-flex min-w-[7.5rem] items-center gap-1.5 font-neo-display text-sm font-bold text-neo-cream">
+          <Gauge className="size-4 shrink-0 text-neo-cream/70" strokeWidth={3} aria-hidden="true" />
           {t('teacher.classroom.pressure.title')}
           <span
             data-testid="pressure-pro-badge"
-            className="rounded-neo border-2 border-neo-black bg-neo-lime px-1.5 font-neo-display text-[0.65rem] font-black uppercase leading-tight text-neo-black"
+            className="rounded-neo bg-neo-yellow px-1.5 font-neo-display text-[0.65rem] font-black leading-tight text-neo-black"
           >
             {t('eduShell.host.proBadge')}
           </span>
@@ -73,7 +73,7 @@ export function LobbyPressureDials({ pressure, onChange }: LobbyPressureDialsPro
           <Link
             href={`/${language}/teacher/upgrade`}
             data-testid="pressure-pro-lock"
-            className="inline-flex min-h-11 items-center gap-1.5 rounded-neo border-2 border-neo-lime bg-neo-navy-light px-3 py-1 font-neo-display text-xs font-black uppercase text-neo-lime shadow-hard-sm transition-shadow hover:shadow-hard"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-neo border-2 border-neo-cream/35 bg-transparent px-3 py-1 font-neo-display text-sm font-bold text-neo-cream transition-colors hover:border-neo-cream/60"
           >
             <Lock className="size-3.5" strokeWidth={3} aria-hidden="true" />
             {t('teacher.proGate.pressureDials.title')}
@@ -86,11 +86,9 @@ export function LobbyPressureDials({ pressure, onChange }: LobbyPressureDialsPro
           id="lobby-pressure-leaderboard-label"
           label={t('teacher.classroom.pressure.leaderboard.title')}
           icon={Trophy}
-          iconClassName="text-neo-yellow"
           value={shown.leaderboard}
           disabled={locked}
           onChange={(leaderboard) => onChange({ ...shown, leaderboard })}
-          selectedClassName="bg-neo-yellow border-neo-black text-black shadow-hard"
           choices={LEADERBOARD_CHOICES.map((v) => ({
             value: v,
             label: t(`teacher.classroom.pressure.leaderboard.${v}`),
@@ -103,7 +101,6 @@ export function LobbyPressureDials({ pressure, onChange }: LobbyPressureDialsPro
           id="lobby-pressure-timer-label"
           label={t('teacher.classroom.pressure.timer.title')}
           icon={Timer}
-          iconClassName="text-neo-cyan"
           value={shown.timer}
           disabled={locked}
           onChange={(timer) => onChange({ ...shown, timer })}
@@ -119,11 +116,9 @@ export function LobbyPressureDials({ pressure, onChange }: LobbyPressureDialsPro
           id="lobby-pressure-scoring-label"
           label={t('teacher.classroom.pressure.scoring.title')}
           icon={Target}
-          iconClassName="text-neo-pink"
           value={shown.speedScoring ? 'speed' : 'accuracy'}
           disabled={locked}
           onChange={(choice) => onChange({ ...shown, speedScoring: choice === 'speed' })}
-          selectedClassName="bg-neo-pink border-neo-black text-black shadow-hard"
           choices={(['speed', 'accuracy'] as const).map((v) => ({
             value: v,
             label: t(`teacher.classroom.pressure.scoring.${v}`),

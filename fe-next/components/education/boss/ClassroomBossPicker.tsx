@@ -30,12 +30,12 @@ export function ClassroomBossPicker({ value, onChange }: ClassroomBossPickerProp
   return (
     <section data-testid="boss-picker" className="space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="font-neo-display text-xs font-black uppercase text-neo-white/70">{t('classroomBoss.picker.title')}</h3>
+        <h3 className="font-neo-display text-sm font-bold text-neo-cream">{t('classroomBoss.picker.title')}</h3>
         {!loading && !hasPro && (
           <Link
             href={`/${language}/teacher/upgrade`}
             data-testid="boss-picker-pro"
-            className="inline-flex min-h-8 items-center gap-1.5 rounded-neo border-2 border-tier-gold bg-neo-navy-light px-2.5 py-0.5 font-neo-display text-[11px] font-black uppercase text-tier-gold shadow-hard-sm transition-[box-shadow,transform] duration-150 hover:shadow-hard focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-tier-gold active:scale-[0.97]"
+            className="inline-flex min-h-8 items-center gap-1.5 rounded-neo border-2 border-neo-cream/35 bg-transparent px-2.5 py-0.5 font-neo-display text-xs font-bold text-neo-cream transition-colors hover:border-neo-cream/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neo-cream"
           >
             <Lock className="size-3" strokeWidth={3} aria-hidden="true" />
             {t('classroomBoss.picker.unlock')}
@@ -59,20 +59,20 @@ export function ClassroomBossPicker({ value, onChange }: ClassroomBossPickerProp
               onClick={() => !locked && onChange(id)}
               className={cn(
                 'relative w-[76px] shrink-0 snap-start rounded-neo border-[3px] bg-neo-navy-light p-1 text-center transition-[transform,box-shadow] duration-150 ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neo-lime',
-                selected ? 'border-neo-lime shadow-hard-lg' : 'border-neo-black shadow-hard',
-                locked ? 'cursor-not-allowed' : 'hover:-translate-y-0.5 active:scale-[0.97]',
+                selected ? 'border-neo-lime' : 'border-neo-cream/35 hover:border-neo-cream/60',
+                locked ? 'cursor-not-allowed' : 'active:scale-[0.97]',
               )}
             >
               <span className="relative block aspect-square overflow-hidden rounded-[8px] bg-neo-purple-dark">
                 <Image src={bossImage(id)} alt="" fill sizes="72px" className={cn('object-cover object-top', locked && 'opacity-45 grayscale')} />
                 {locked && (
-                  <span className="absolute end-1 top-1 grid size-5 place-items-center rounded-full border-2 border-neo-black bg-tier-gold" aria-hidden="true">
-                    <Lock className="size-2.5 text-neo-black" strokeWidth={3} />
+                  <span className="absolute end-1 top-1 grid size-5 place-items-center rounded-full border-2 border-neo-cream/35 bg-neo-navy-light" aria-hidden="true">
+                    <Lock className="size-2.5 text-neo-cream" strokeWidth={3} />
                   </span>
                 )}
                 {selected && (
-                  <span className="absolute end-1 top-1 grid size-5 place-items-center rounded-full border-2 border-neo-black bg-neo-lime" aria-hidden="true">
-                    <Check className="size-3 text-neo-black" strokeWidth={4} />
+                  <span className="absolute end-1 top-1 grid size-5 place-items-center rounded-full border-2 border-neo-lime bg-neo-navy-light" aria-hidden="true">
+                    <Check className="size-3 text-neo-cream" strokeWidth={4} />
                   </span>
                 )}
               </span>

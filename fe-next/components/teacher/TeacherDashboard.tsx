@@ -3,11 +3,11 @@
 
 import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ChevronDown } from 'lucide-react';
+import { BarChart3, ChevronRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { EducationShell } from '@/components/education/shell/EducationShell';
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import { useTeacherReveal } from './motion/useTeacherReveal';
 import LessonBuilder from './LessonBuilder';
@@ -234,7 +234,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
   const onOnboardingStep = (step: HomeOnboardingStepId) =>
     trackFirstRoundGuideClicked({ surface: 'home', locale: language, step });
   const revealRef = useTeacherReveal<HTMLDivElement>(`${ready}-${hasClasses}-${Boolean(classroomsError)}`);
-  const [reportsOpened, setReportsOpened] = useState(false);
+  const [reportsOpen, setReportsOpen] = useState(false);
   const hasRail = !ready || proCard !== null || showWeek || Boolean(selectedClassroom);
   const showSessions = ready && !classroomsError && hasClasses && Boolean(effectiveId);
   const rawClassLanguage = selectedClassroom?.language;
@@ -262,7 +262,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
         ref={revealRef}
         data-testid="teacher-home"
         className={cn(
-          'mx-auto grid w-full max-w-[1280px] gap-3 px-4 py-3 sm:gap-4 sm:px-6 sm:py-4 lg:gap-5 lg:px-8 lg:py-5',
+          'mx-auto grid w-full max-w-[1280px] gap-3 px-4 py-3 sm:gap-4 sm:px-6 sm:py-4 lg:gap-5 lg:px-8 lg:py-5 lg:[@media(max-height:820px)]:gap-4 lg:[@media(max-height:820px)]:py-3',
           hasRail && 'lg:grid-cols-[minmax(0,1fr)_20rem]',
           showSessions && 'lg:min-h-full',
           showSessions && (accountBanner ? 'lg:grid-rows-[auto_1fr_auto]' : 'lg:grid-rows-[auto_1fr]'),
@@ -275,7 +275,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
                 {firstName ? t(greetingKey(hour), { name: firstName }) : t('eduShell.home.greetNoName')}
               </h1>
               {ready && hasClasses && !classroomsError ? (
-                <p data-testid="home-coach-cue" suppressHydrationWarning className="mt-0.5 min-h-5 font-neo-body text-sm font-semibold text-neo-cream/75 max-sm:hidden">
+                <p data-testid="home-coach-cue" suppressHydrationWarning className="mt-0.5 min-h-5 font-neo-body text-sm font-semibold text-neo-cream/75 max-sm:hidden [@media(max-height:760px)]:hidden">
                   {cue ? t(cue.key) : null}
                 </p>
               ) : null}
@@ -365,31 +365,46 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
               </div>
             ) : null}
             {!ready || !selectedClassroom ? null : (
-              <details data-testid="home-weekly-reports" data-tm onToggle={(e) => e.currentTarget.open && setReportsOpened(true)} className="group rounded-neo-lg border-2 border-neo-cream/35 bg-neo-navy-light max-lg:hidden">
-                <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-3 py-2 font-neo-display text-base font-bold text-neo-cream focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream [&::-webkit-details-marker]:hidden">
-                  {t('eduShell.home.weeklyReports')}
-                  <ChevronDown className="size-5 shrink-0 transition-transform duration-200 ease-out group-open:rotate-180 motion-reduce:transition-none" aria-hidden="true" />
-                </summary>
-                {reportsOpened ? (
-                  <div className="flex flex-col gap-4 px-3 pb-3 motion-safe:group-open:animate-[edu-fold-in_260ms_cubic-bezier(0.23,1,0.32,1)]">
-                    <WeeklyProgressDigestCard
-                      classroomId={selectedClassroom.id}
-                      classroomName={selectedClassroom.name}
-                      overFreeTierCaps={overFreeTierCaps}
-                    />
-                    <WeeklyEmailReport
-                      classroomId={selectedClassroom.id}
-                      classroomName={selectedClassroom.name}
-                    />
-                  </div>
-                ) : null}
-              </details>
+              <div data-testid="home-weekly-reports" data-tm className="max-lg:hidden">
+                <button
+                  type="button"
+                  aria-haspopup="dialog"
+                  onClick={() => setReportsOpen(true)}
+                  className="group flex w-full items-center gap-3 rounded-neo-lg border-2 border-neo-cream/35 bg-neo-navy-light px-3 py-2.5 text-start transition-colors hover:border-neo-cream/60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream"
+                >
+                  <BarChart3 className="size-5 shrink-0 text-neo-cream/80" strokeWidth={2.5} aria-hidden="true" />
+                  <span className="min-w-0 flex-1">
+                    <span className="block font-neo-display text-base font-bold text-neo-cream">{t('eduShell.home.weeklyReports')}</span>
+                    <span className="block font-neo-body text-xs font-semibold leading-snug text-neo-cream/70 [@media(max-height:820px)]:sr-only">{t('eduShell.home.weeklyReportsHint')}</span>
+                  </span>
+                  <ChevronRight className="size-5 shrink-0 text-neo-cream/70 transition-transform group-hover:translate-x-0.5 rtl:-scale-x-100 motion-reduce:transition-none" aria-hidden="true" />
+                </button>
+              </div>
             )}
             {proCard ? <div data-tm>{proCard}</div> : null}
           </aside>
         ) : null}
       </div>
 
+      {selectedClassroom ? (
+        <Dialog open={reportsOpen} onOpenChange={setReportsOpen}>
+          <DialogContent
+            closeButtonLabel={t('common.close')}
+            closeButtonVariant="minimal"
+            style={{ backgroundImage: 'none' }}
+            className="max-h-[90dvh] w-[calc(100%-1.5rem)] overflow-auto border-2 border-neo-cream/40 bg-neo-navy p-5 text-neo-cream dark:border-neo-cream/40 dark:bg-neo-navy sm:max-w-3xl lg:max-w-5xl"
+          >
+            <DialogTitle className="pe-12 font-neo-display text-xl font-black normal-case tracking-normal text-neo-cream">{t('eduShell.home.weeklyReports')}</DialogTitle>
+            <DialogDescription className="mb-4 font-neo-body text-sm text-neo-cream/70">
+              {selectedClassroom.name} · {t('eduShell.home.weeklyReportsHint')}
+            </DialogDescription>
+            <div data-testid="home-weekly-reports-grid" className="grid items-start gap-4 lg:grid-cols-2">
+              <WeeklyProgressDigestCard classroomId={selectedClassroom.id} classroomName={selectedClassroom.name} overFreeTierCaps={overFreeTierCaps} />
+              <WeeklyEmailReport classroomId={selectedClassroom.id} classroomName={selectedClassroom.name} />
+            </div>
+          </DialogContent>
+        </Dialog>
+      ) : null}
       <Dialog open={lessonsOpen} onOpenChange={setLessonsOpen}>
         <DialogContent className="max-h-[90dvh] overflow-auto border-[3px] border-neo-cream bg-neo-navy sm:max-w-3xl">
           <DialogTitle className="font-neo-display text-xl font-black text-neo-cream">{t('eduShell.home.reviewTitle')}</DialogTitle>

@@ -22,8 +22,8 @@ export function HomeWeekCard({ summary, status, t, children }: { summary: Teache
   return (
     <section data-testid="home-week" aria-labelledby="home-week-title" className={cn(PANEL, 'flex flex-col gap-2 p-3')}>
       <div className="flex items-center gap-3">
-        <div className="grid size-10 shrink-0 place-items-center">
-          {pose ? <EduMascot moment={pose} size={40} className="size-10" /> : null}
+        <div className="grid size-10 shrink-0 place-items-center [@media(min-height:821px)]:size-16">
+          {pose ? <EduMascot moment={pose} size={64} className="size-10 [@media(min-height:821px)]:size-16" /> : null}
         </div>
         <div className="min-w-0 flex-1">
           <h2 id="home-week-title" className="font-neo-display text-base font-black text-neo-cream">

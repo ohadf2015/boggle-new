@@ -24,7 +24,7 @@ export interface LobbyGameOptionsProps {
   lessonLanguage?: string;
 }
 
-/** Battle, Pro pressure dials, round, late join and economy: one closed door with a one-line summary. */
+/** Battle, Pro pressure dials, round, late join and economy: one modal behind a one-line summary. */
 export function LobbyGameOptions({ opts, roundMinutes, gameMode, vocabQuizVariant, classroomBossId, allPlayableWords, lessonWords, lessonLanguage }: LobbyGameOptionsProps) {
   const { t } = useLanguage();
   const [open, setOpen] = useState(false);
@@ -36,49 +36,55 @@ export function LobbyGameOptions({ opts, roundMinutes, gameMode, vocabQuizVarian
 
   return (
     <LobbySetupDisclosure label={t('eduShell.host.gameOptions')} summary={summary} open={open} onToggle={() => setOpen((v) => !v)}>
-      <LobbySetupPanel
-        activePreset={opts.activePreset}
-        playStyle={opts.playStyle}
-        teamCount={opts.teamCount}
-        accessibility={opts.accessibility}
-        onApplyPreset={opts.applyPreset}
-        onPlayStyleChange={opts.setPlayStyle}
-        onTeamCountChange={opts.setTeamCount}
-        onAccessibilityChange={opts.setAccessibility}
-      />
-      <LobbyPressureDials pressure={opts.pressure} onChange={opts.setPressure} />
-      <LobbyRoundSettings
-        gameMode={gameMode}
-        timerMinutes={opts.timerMinutes}
-        boardSize={opts.boardSize}
-        minWordLength={opts.minWordLength}
-        targetWord={opts.targetWord}
-        allPlayableWords={allPlayableWords}
-        lessonWords={lessonWords}
-        lessonLanguage={lessonLanguage}
-        vocabQuizFocus={opts.vocabQuizFocus}
-        vocabQuizQuestionCount={opts.vocabQuizQuestionCount}
-        vocabQuizSeconds={opts.vocabQuizSeconds}
-        treasureChestsEnabled={opts.treasureChestsEnabled}
-        treasureChestsAvailable={vocabQuizVariant !== 'boss'}
-        bossId={classroomBossId}
-        onBossChange={opts.setBossId}
-        onTimerChange={opts.setTimerMinutes}
-        onBoardSizeChange={opts.setBoardSize}
-        onMinWordLengthChange={opts.setMinWordLength}
-        onTargetWordChange={opts.setTargetWord}
-        onVocabQuizFocusChange={opts.setVocabQuizFocus}
-        onVocabQuizQuestionCountChange={opts.setVocabQuizQuestionCount}
-        onVocabQuizSecondsChange={opts.setVocabQuizSeconds}
-        onTreasureChestsChange={opts.setTreasureChestsEnabled}
-      />
-      <LobbyLateJoinToggle
-        checked={opts.allowLateJoin}
-        onChange={opts.setAllowLateJoin}
-        label={t('eduShell.host.lateJoin')}
-        hint={t('eduShell.host.lateJoinHint')}
-      />
-      <LobbyEconomyToggles value={opts.economy} onChange={opts.setEconomy} />
+      <div className="grid gap-6 @3xl/opts:grid-cols-2 @3xl/opts:gap-8">
+        <div className="flex flex-col gap-5">
+          <LobbySetupPanel
+            activePreset={opts.activePreset}
+            playStyle={opts.playStyle}
+            teamCount={opts.teamCount}
+            accessibility={opts.accessibility}
+            onApplyPreset={opts.applyPreset}
+            onPlayStyleChange={opts.setPlayStyle}
+            onTeamCountChange={opts.setTeamCount}
+            onAccessibilityChange={opts.setAccessibility}
+          />
+          <LobbyPressureDials pressure={opts.pressure} onChange={opts.setPressure} />
+        </div>
+        <div className="flex flex-col gap-5">
+          <LobbyRoundSettings
+            gameMode={gameMode}
+            timerMinutes={opts.timerMinutes}
+            boardSize={opts.boardSize}
+            minWordLength={opts.minWordLength}
+            targetWord={opts.targetWord}
+            allPlayableWords={allPlayableWords}
+            lessonWords={lessonWords}
+            lessonLanguage={lessonLanguage}
+            vocabQuizFocus={opts.vocabQuizFocus}
+            vocabQuizQuestionCount={opts.vocabQuizQuestionCount}
+            vocabQuizSeconds={opts.vocabQuizSeconds}
+            treasureChestsEnabled={opts.treasureChestsEnabled}
+            treasureChestsAvailable={vocabQuizVariant !== 'boss'}
+            bossId={classroomBossId}
+            onBossChange={opts.setBossId}
+            onTimerChange={opts.setTimerMinutes}
+            onBoardSizeChange={opts.setBoardSize}
+            onMinWordLengthChange={opts.setMinWordLength}
+            onTargetWordChange={opts.setTargetWord}
+            onVocabQuizFocusChange={opts.setVocabQuizFocus}
+            onVocabQuizQuestionCountChange={opts.setVocabQuizQuestionCount}
+            onVocabQuizSecondsChange={opts.setVocabQuizSeconds}
+            onTreasureChestsChange={opts.setTreasureChestsEnabled}
+          />
+          <LobbyLateJoinToggle
+            checked={opts.allowLateJoin}
+            onChange={opts.setAllowLateJoin}
+            label={t('eduShell.host.lateJoin')}
+            hint={t('eduShell.host.lateJoinHint')}
+          />
+          <LobbyEconomyToggles value={opts.economy} onChange={opts.setEconomy} />
+        </div>
+      </div>
     </LobbySetupDisclosure>
   );
 }

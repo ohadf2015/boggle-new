@@ -33,7 +33,7 @@ describe('HomeSessionRail on a tall screen', () => {
     expect(more.className).toMatch(/\[container:session-more\/size\]/);
     expect(more.className).toMatch(/(^|\s)flex-1(\s|$)/);
     expect(more.className).toMatch(/(^|\s)min-h-0(\s|$)/);
-    const row = within(more).getByRole('list');
+    const row = within(more).getAllByRole('list')[0];
     expect(row.className).toMatch(/(^|\s)hidden(\s|$)/);
     expect(row.className).toMatch(/\[@container_session-more_\(min-height:[\d.]+rem\)\]:grid/);
     const extra = within(more).getAllByTestId('home-session-card-more');

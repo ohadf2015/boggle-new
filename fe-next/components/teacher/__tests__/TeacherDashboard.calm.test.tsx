@@ -92,11 +92,15 @@ describe('Teacher Home: calm, one primary', () => {
     expect(insight.parentElement?.className ?? '').not.toContain('border');
   });
 
-  it('Then the ready-to-run sessions are one row of three cards without descriptions', () => {
+  it('Then the ready-made games are one row of three cards that each say when to use them and show their steps', () => {
     render(<TeacherDashboard />);
     const rail = screen.getByTestId('home-session-rail');
-    expect(within(rail).getAllByTestId('home-session-card')).toHaveLength(3);
-    expect(rail.textContent ?? '').not.toMatch(/\.when/);
+    const cards = within(rail).getAllByTestId('home-session-card');
+    expect(cards).toHaveLength(3);
+    for (const card of cards) {
+      expect(within(card).getByTestId('home-session-when').textContent).toMatch(/\.when/);
+      expect(within(card).getAllByTestId('home-session-step').length).toBeGreaterThan(0);
+    }
   });
 
   it('Then on desktop the sessions row takes the leftover height, so a tall screen fills it instead of leaving an empty band', () => {

@@ -83,6 +83,7 @@ describe('host flow', () => {
     render(<ClassroomGameLobby onBack={vi.fn()} initialMode="classic" />);
     await userEvent.click(screen.getByTestId('lobby-setup-summary'));
     await userEvent.click(screen.getByRole('switch', { name: 'eduShell.host.lateJoin' }));
+    await userEvent.click(screen.getByTestId('lobby-setup-done'));
     await userEvent.click(screen.getAllByTestId('lobby-go-live')[0]);
     expect(launch.mock.calls[0][0].settings.allowLateJoin).toBe(false);
   });

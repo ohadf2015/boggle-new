@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, within, cleanup, act } from '@testing-library/react';
+import { render, screen, within, cleanup, act, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -58,11 +58,7 @@ afterEach(() => {
 });
 
 function openWeeklyReports() {
-  const fold = screen.getByTestId('home-weekly-reports') as HTMLDetailsElement;
-  act(() => {
-    fold.open = true;
-    fold.dispatchEvent(new Event('toggle'));
-  });
+  fireEvent.click(within(screen.getByTestId('home-weekly-reports')).getByRole('button'));
 }
 
 describe('Teacher Home', () => {
@@ -217,12 +213,14 @@ describe('Teacher Home', () => {
   it('Given a class, Then the weekly digest and email report sit folded in one closed Weekly reports disclosure that mounts them only when opened, so no view is logged unseen', () => {
     proState = PRO;
     render(<TeacherDashboard />);
-    const fold = screen.getByTestId('home-weekly-reports');
-    expect(fold.tagName).toBe('DETAILS');
-    expect(fold).not.toHaveAttribute('open');
+    const entry = screen.getByTestId('home-weekly-reports');
+    expect(within(entry).getByRole('button')).toHaveAttribute('aria-haspopup', 'dialog');
     expect(screen.queryByTestId('weekly-progress-digest')).not.toBeInTheDocument();
     openWeeklyReports();
-    expect(fold).toContainElement(screen.getByTestId('weekly-progress-digest'));
+    const dialog = screen.getByRole('dialog', { name: 'eduShell.home.weeklyReports' });
+    expect(entry).not.toContainElement(dialog);
+    expect(dialog).toContainElement(screen.getByTestId('weekly-progress-digest'));
+    expect(dialog).toContainElement(screen.getByTestId('home-weekly-reports-grid'));
   });
 
   it('Given a Pro offer, Then the card is words and a button, no blurred fake chart', () => {

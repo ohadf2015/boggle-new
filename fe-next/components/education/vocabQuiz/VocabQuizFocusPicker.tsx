@@ -17,13 +17,13 @@
 
 import { useMemo } from 'react';
 import {
-  BookOpen, ArrowLeftRight, Split, AlignLeft, Shuffle, Timer, ListOrdered, Layers, Puzzle, HelpCircle, Gift,
+  BookOpen, ArrowLeftRight, Split, AlignLeft, Shuffle, Timer, ListOrdered, Layers, Puzzle, HelpCircle, Gift, Check,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { focusAvailability } from '@/lib/education/vocabQuizQuestions';
 import { VOCAB_FOCUSES } from '@/lib/education/vocabFocus';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
-import { NeoNote } from '@/components/ui/note';
+import { CALM_SELECTED, CALM_IDLE, CALM_FOCUS } from '../lobby/LobbyChoiceRow';
 import {
   VOCAB_QUIZ_MIN_QUESTION_COUNT,
   VOCAB_QUIZ_DEFAULT_QUESTION_COUNT,
@@ -101,26 +101,23 @@ export function VocabQuizFocusPicker({
 
   const chipClass = (selected: boolean, enabled: boolean) =>
     cn(
-      'flex flex-col items-start gap-1 px-4 py-3 rounded-neo border-[2px] transition text-start',
-      'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
-      !enabled && 'opacity-45 cursor-not-allowed',
-      selected && enabled
-        ? 'bg-neo-cyan border-neo-black text-neo-black shadow-hard'
-        : 'bg-neo-navy/50 border-neo-cream text-neo-white shadow-hard-sm',
-      enabled && !selected && 'hover:bg-neo-navy'
+      'flex min-w-0 flex-col items-start gap-1 rounded-neo border-2 px-3 py-2.5 text-start transition-colors',
+      CALM_FOCUS,
+      !enabled && 'cursor-not-allowed opacity-60',
+      selected && enabled ? CALM_SELECTED : enabled ? CALM_IDLE : 'border-neo-cream/35 bg-transparent text-neo-cream'
     );
 
   return (
     <div className="space-y-6">
       <div>
-        <div id="vocab-quiz-focus-label" className="block text-neo-white font-bold mb-1">
+        <div id="vocab-quiz-focus-label" className="mb-1 block font-neo-display text-base font-bold text-neo-cream">
           {t('vocabQuiz.setup.focusTitle')}
         </div>
-        <p className="text-sm text-neo-white/70 font-neo-body mb-3">
+        <p className="mb-3 font-neo-body text-sm text-neo-cream/70">
           {t('vocabQuiz.setup.focusDescription')}
         </p>
 
-        <div role="radiogroup" aria-labelledby="vocab-quiz-focus-label" className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+        <div role="radiogroup" aria-labelledby="vocab-quiz-focus-label" className="grid grid-cols-2 gap-2 @md:grid-cols-3 @3xl:grid-cols-4">
           <button
             type="button"
             role="radio"
@@ -129,11 +126,12 @@ export function VocabQuizFocusPicker({
             onClick={() => onFocusChange('any')}
             className={chipClass(focus === 'any', anyCount > 0)}
           >
-            <span className="flex items-center gap-2 font-bold text-sm">
-              <Shuffle className="w-5 h-5" aria-hidden />
+            <span className="flex min-w-0 items-center gap-2 break-words font-neo-display text-sm font-bold">
+              <Shuffle className="size-4 shrink-0 text-neo-cream/70" aria-hidden />
+              {focus === 'any' && anyCount > 0 && <Check className="order-last ms-auto size-3.5 shrink-0" strokeWidth={3} aria-hidden="true" />}
               {t('vocabQuiz.focus.any')}
             </span>
-            <span className="text-xs opacity-80">
+            <span className="text-xs text-neo-cream/80">
               {t('vocabQuiz.setup.questionsAvailable', { count: anyCount })}
             </span>
           </button>
@@ -151,11 +149,12 @@ export function VocabQuizFocusPicker({
                 onClick={() => onFocusChange(key)}
                 className={chipClass(focus === key, enabled)}
               >
-                <span className="flex items-center gap-2 font-bold text-sm">
-                  <Icon className="w-5 h-5" aria-hidden />
+                <span className="flex min-w-0 items-center gap-2 break-words font-neo-display text-sm font-bold">
+                  <Icon className="size-4 shrink-0 text-neo-cream/70" aria-hidden />
+                  {focus === key && enabled && <Check className="order-last ms-auto size-3.5 shrink-0" strokeWidth={3} aria-hidden="true" />}
                   {t(`vocabQuiz.focus.${key}`)}
                 </span>
-                <span className="text-xs opacity-80">
+                <span className="text-xs text-neo-cream/80">
                   {enabled
                     ? t('vocabQuiz.setup.questionsAvailable', { count })
                     : t('vocabQuiz.setup.focusLocked')}
@@ -168,21 +167,21 @@ export function VocabQuizFocusPicker({
         {/* The one message that matters most with today's lesson data: WHERE to
             add what is missing, not just that it is missing. */}
         {bestSingle === 0 ? (
-          <NeoNote tone="danger" className="mt-3 text-neo-white font-neo-body text-sm">
+          <div role="note" className="mt-3 rounded-neo border-2 border-neo-cream/35 bg-neo-navy-light p-3 font-neo-body text-sm text-neo-cream/85">
             {t('vocabQuiz.setup.noQuestions')}
-          </NeoNote>
+          </div>
         ) : (
           Object.values(availability).some((n) => n === 0) && (
-            <NeoNote tone="info" className="mt-3 text-neo-white font-neo-body text-sm">
+            <div role="note" className="mt-3 rounded-neo border-2 border-neo-cream/35 bg-neo-navy-light p-3 font-neo-body text-sm text-neo-cream/85">
               {t('vocabQuiz.setup.enrichHint')}
-            </NeoNote>
+            </div>
           )
         )}
       </div>
 
       <div>
-        <div id="vocab-quiz-count-label" className="block text-neo-white font-bold mb-3">
-          <ListOrdered className="w-5 h-5 inline me-2 text-neo-lime" />
+        <div id="vocab-quiz-count-label" className="mb-3 block font-neo-display text-base font-bold text-neo-cream">
+          <ListOrdered className="me-2 inline size-4 text-neo-cream/70" />
           {t('vocabQuiz.setup.questionCount')}
         </div>
         <div role="radiogroup" aria-labelledby="vocab-quiz-count-label" className="grid grid-cols-4 gap-3">
@@ -194,27 +193,26 @@ export function VocabQuizFocusPicker({
               aria-checked={questionCount === count}
               onClick={() => onQuestionCountChange(count)}
               className={cn(
-                'px-4 py-3 font-bold rounded-neo border-[2px] transition',
-                'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2',
-                questionCount === count
-                  ? 'bg-neo-lime border-neo-black text-neo-black shadow-hard'
-                  : 'bg-neo-navy/50 border-neo-cream text-neo-white hover:bg-neo-navy shadow-hard-sm'
+                'inline-flex items-center justify-center gap-1.5 rounded-neo border-2 px-3 py-2.5 font-neo-display text-sm font-bold transition-colors',
+                CALM_FOCUS,
+                questionCount === count ? CALM_SELECTED : CALM_IDLE
               )}
             >
+              {questionCount === count && <Check className="size-3.5 shrink-0" strokeWidth={3} aria-hidden="true" />}
               {count}
             </button>
           ))}
         </div>
         {plannedCount > 0 && plannedCount < questionCount && (
-          <p className="mt-2 text-sm text-neo-white/70 font-neo-body">
+          <p className="mt-2 font-neo-body text-sm text-neo-cream/70">
             {t('vocabQuiz.setup.cappedNotice', { count: plannedCount })}
           </p>
         )}
       </div>
 
       <div>
-        <div id="vocab-quiz-seconds-label" className="block text-neo-white font-bold mb-3">
-          <Timer className="w-5 h-5 inline me-2 text-neo-pink" />
+        <div id="vocab-quiz-seconds-label" className="mb-3 block font-neo-display text-base font-bold text-neo-cream">
+          <Timer className="me-2 inline size-4 text-neo-cream/70" />
           {t('vocabQuiz.setup.secondsPerQuestion')}
         </div>
         <div role="radiogroup" aria-labelledby="vocab-quiz-seconds-label" className="grid grid-cols-4 gap-3">
@@ -226,13 +224,12 @@ export function VocabQuizFocusPicker({
               aria-checked={secondsPerQuestion === seconds}
               onClick={() => onSecondsChange(seconds)}
               className={cn(
-                'px-4 py-3 font-bold rounded-neo border-[2px] border-neo-cream transition',
-                'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-pink focus-visible:ring-offset-2',
-                secondsPerQuestion === seconds
-                  ? 'bg-neo-pink text-black shadow-hard'
-                  : 'bg-neo-navy/50 text-neo-white hover:bg-neo-navy shadow-hard-sm'
+                'inline-flex items-center justify-center gap-1.5 rounded-neo border-2 px-3 py-2.5 font-neo-display text-sm font-bold transition-colors',
+                CALM_FOCUS,
+                secondsPerQuestion === seconds ? CALM_SELECTED : CALM_IDLE
               )}
             >
+              {secondsPerQuestion === seconds && <Check className="size-3.5 shrink-0" strokeWidth={3} aria-hidden="true" />}
               {t('vocabQuiz.setup.seconds', { seconds })}
             </button>
           ))}
@@ -248,29 +245,25 @@ export function VocabQuizFocusPicker({
             aria-checked={!!treasureChestsEnabled}
             onClick={() => onTreasureChestsChange?.(!treasureChestsEnabled)}
             className={cn(
-              'w-full flex items-center gap-3 px-4 py-3 rounded-neo border-[2px] transition',
-              'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-yellow focus-visible:ring-offset-2',
-              treasureChestsEnabled
-                ? 'bg-neo-yellow/20 border-neo-yellow text-neo-yellow shadow-hard'
-                : 'bg-neo-navy/50 border-neo-cream text-neo-white hover:bg-neo-navy shadow-hard-sm'
+              'flex w-full items-center gap-3 rounded-neo border-2 px-4 py-3 transition-colors',
+              CALM_FOCUS,
+              treasureChestsEnabled ? CALM_SELECTED : CALM_IDLE
             )}
           >
-            <Gift className="w-5 h-5 flex-shrink-0" aria-hidden />
-            <span className="flex-1 text-start font-bold">
+            <Gift className="size-4 shrink-0 text-neo-cream/70" aria-hidden />
+            <span className="flex-1 text-start font-neo-display text-sm font-bold">
               {t('vocabQuiz.setup.treasureChests')}
             </span>
             <span
               className={cn(
-                'flex-shrink-0 px-2 py-1 rounded text-xs font-bold',
-                treasureChestsEnabled
-                  ? 'bg-neo-yellow text-neo-black'
-                  : 'bg-neo-navy text-neo-white'
+                'shrink-0 rounded border-2 px-2 py-0.5 text-xs font-bold',
+                treasureChestsEnabled ? 'border-neo-lime text-neo-cream' : 'border-neo-cream/35 text-neo-cream/70'
               )}
             >
               {treasureChestsEnabled ? t('vocabQuiz.setup.on') : t('vocabQuiz.setup.off')}
             </span>
           </button>
-          <p className="mt-2 text-sm text-neo-white/70">{t('vocabQuiz.setup.treasureChestsHint')}</p>
+          <p className="mt-2 font-neo-body text-sm text-neo-cream/70">{t('vocabQuiz.setup.treasureChestsHint')}</p>
         </div>
       )}
     </div>

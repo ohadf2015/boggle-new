@@ -53,23 +53,24 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
   const code = showCode ? (selected?.join_code?.trim() ?? '') : '';
 
   return (
-    <section data-testid="home-hero" aria-labelledby="home-hero-title" className={cn(PANEL, 'relative')}>
-      <div className="flex flex-col gap-2.5 p-3 sm:gap-4 sm:p-5">
+    <section data-testid="home-hero" aria-labelledby="home-hero-title" className={cn(PANEL, 'relative @container/hero')}>
+      <div className="flex flex-col gap-2.5 p-3 sm:gap-4 sm:p-5 [@media(max-height:820px)]:gap-2.5 [@media(max-height:820px)]:p-3.5">
         <div className="flex min-w-0 flex-col gap-1 sm:gap-1.5">
           <div className="flex items-center justify-between gap-3">
             <span className="font-neo-body text-sm font-bold text-neo-cream/70">{t('eduShell.home.startWith')}</span>
             {corner}
           </div>
-          <h2 id="home-hero-title" className="min-w-0 font-neo-display text-2xl font-black leading-tight text-neo-cream sm:text-3xl">
+          <h2 id="home-hero-title" className="min-w-0 font-neo-display text-2xl font-black leading-tight text-neo-cream sm:text-3xl [@media(max-height:820px)]:text-2xl">
             <ClassPicker classrooms={classrooms} selected={selected} onSelect={onSelect} t={t} />
           </h2>
           {meta}
         </div>
 
+        <div data-testid="home-hero-actions" className="flex flex-col gap-2.5 sm:gap-4 @2xl/hero:flex-row @2xl/hero:items-center">
         {codeSlot ?? (code ? (
           <div
             data-testid="home-desk-code-panel"
-            className="flex flex-wrap items-center gap-x-2 gap-y-1.5 rounded-neo border-2 border-neo-cream/35 bg-neo-navy p-2.5 sm:gap-x-3 sm:p-3"
+            className="flex flex-wrap items-center gap-x-2 gap-y-1.5 rounded-neo border-2 border-neo-cream/35 bg-neo-navy p-2.5 sm:gap-x-3 sm:p-3 @2xl/hero:flex-1"
           >
             <span className="w-full font-neo-body text-xs font-bold text-neo-cream/70 max-sm:sr-only">{t('academy.hq.classCode')}</span>
             <p data-testid="home-desk-code" className="flex gap-1 sm:gap-1.5" dir="ltr">
@@ -79,7 +80,7 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
                   key={`${ch}-${i}`}
                   aria-hidden="true"
                   data-testid="home-desk-code-tile"
-                  className="grid size-9 place-items-center rounded-neo border-2 border-neo-black bg-neo-cream font-neo-display text-lg font-black uppercase text-neo-black sm:size-11 sm:text-2xl"
+                  className="grid size-9 place-items-center rounded-neo border-2 border-neo-black bg-neo-cream font-neo-display text-lg font-black uppercase text-neo-black sm:size-11 sm:text-2xl [@media(max-height:820px)]:size-9 [@media(max-height:820px)]:text-lg"
                 >
                   {ch}
                 </span>
@@ -99,7 +100,7 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
           </div>
         ) : null)}
 
-        <div className="flex items-center gap-x-2 gap-y-1 sm:flex-wrap sm:gap-x-4">
+        <div className="flex items-center gap-x-2 gap-y-1 sm:flex-wrap sm:gap-x-4 @2xl/hero:flex-col @2xl/hero:items-stretch @2xl/hero:gap-y-2">
           <Link
             href={teacherHostHref(language, { classroomId: selected?.id })}
             data-testid="home-start-live"
@@ -120,8 +121,9 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
           </Link>
           {rehearse}
         </div>
+        </div>
 
-        {codeSlot ? null : insight}
+        {codeSlot || !insight ? null : <div className="max-sm:hidden [@media(max-height:760px)]:hidden">{insight}</div>}
         {nudge}
       </div>
 

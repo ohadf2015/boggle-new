@@ -35,6 +35,8 @@ import { LobbyNoClassrooms, LobbyNoLessons } from './lobby/LobbyEmptyStates';
 import { LobbyClassPicker } from './lobby/LobbyClassPicker';
 import { LobbyLessonStep } from './lobby/LobbyLessonStep';
 import { useLobbyWarmup, LobbyWarmupButton, LobbyWarmupStatus } from './lobby/LobbyWarmup';
+import { LobbyFlowStrip } from './lobby/LobbyFlowStrip';
+import { catalogueEntry } from './ClassroomModeCatalogueData';
 import { LobbyGameOptions } from './lobby/LobbyGameOptions';
 import { LobbyQuickSummary } from './lobby/LobbyQuickSummary';
 import { useLobbyRoundOptions } from './lobby/useLobbyRoundOptions';
@@ -294,7 +296,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
             blockedKey={blockedKey}
             onGoLive={goLive}
           />
-          <LobbyWarmupStatus warmup={warmup} className="mt-2 justify-center" />
+          {sessionPack ? null : <LobbyWarmupStatus warmup={warmup} className="mt-2 justify-center" />}
         </>
       }
     >
@@ -323,6 +325,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
         />
       ) : (
         <div className="flex flex-col gap-2 @4xl/lobby:gap-3">
+          {sessionPack ? <LobbyFlowStrip warmup={warmup} modeName={t(catalogueEntry(pickedId)?.nameKey ?? '')} /> : null}
           <div data-testid="lobby-setup-row" className="flex flex-wrap items-start gap-2">
           <LobbyLessonStep
             className="min-w-0 flex-[1_1_18rem]"
@@ -335,7 +338,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
             boardLanguage={lessonLanguage}
             activePreset={opts.activePreset}
           />
-          <LobbyWarmupButton warmup={warmup} />
+          {sessionPack ? null : <LobbyWarmupButton warmup={warmup} />}
           </div>
           <LobbyModeGrid
             selected={pickedId}

@@ -9,8 +9,14 @@
 
 'use client';
 
-import type { LucideIcon } from 'lucide-react';
+import { Check, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+
+/** The house selection style: ring + check, never a colored fill. */
+export const CALM_SELECTED = 'border-neo-lime bg-neo-navy-light text-neo-cream';
+export const CALM_IDLE = 'border-neo-cream/35 bg-transparent text-neo-cream hover:border-neo-cream/60';
+export const CALM_FOCUS =
+  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy';
 
 export interface LobbyChoice<T extends string | number> {
   value: T;
@@ -36,18 +42,18 @@ export function LobbyChoiceRow<T extends string | number>({
   id,
   label,
   icon: Icon,
-  iconClassName = 'text-neo-cyan',
+  iconClassName = 'text-neo-cream/70',
   choices,
   value,
   onChange,
-  selectedClassName = 'bg-neo-cyan border-neo-black text-black shadow-hard',
+  selectedClassName = CALM_SELECTED,
   disabled = false,
 }: LobbyChoiceRowProps<T>) {
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
       <span
         id={id}
-        className="inline-flex min-w-[7.5rem] items-center gap-1.5 font-neo-display text-xs font-black uppercase text-neo-white/70"
+        className="inline-flex min-w-[7.5rem] items-center gap-1.5 font-neo-display text-sm font-bold text-neo-cream"
       >
         <Icon className={cn('size-4 shrink-0', iconClassName)} strokeWidth={3} aria-hidden="true" />
         {label}
@@ -65,14 +71,13 @@ export function LobbyChoiceRow<T extends string | number>({
               disabled={disabled}
               onClick={() => onChange(choice.value)}
               className={cn(
-                'min-h-9 rounded-neo border-2 px-3 py-1 font-neo-display text-xs font-black uppercase transition',
-                'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
+                'inline-flex min-h-9 items-center gap-1.5 rounded-neo border-2 px-3 py-1 font-neo-display text-sm font-bold transition-colors',
+                CALM_FOCUS,
                 disabled && 'cursor-not-allowed opacity-60',
-                isSelected
-                  ? selectedClassName
-                  : 'border-neo-cream bg-neo-navy-light text-neo-cream shadow-hard-sm hover:bg-neo-navy'
+                isSelected ? selectedClassName : CALM_IDLE
               )}
             >
+              {isSelected && <Check className="size-3.5 shrink-0" strokeWidth={3} aria-hidden="true" />}
               {choice.label}
             </button>
           );

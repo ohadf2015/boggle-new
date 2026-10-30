@@ -178,6 +178,19 @@ describe('ClassroomGameLobby — one screen, one decision', () => {
     expect(within(body).queryByRole('radiogroup', { name: /selectClassroom/ })).toBeNull();
   });
 
+  it('Given a ready-made lesson link, Then the run sheet (learn, solo, live) leads the setup and the loose warm-up button is gone', async () => {
+    render(<ClassroomGameLobby onBack={vi.fn()} sessionPack="LC-EN-PK-AUTUMN" />);
+    const flow = await screen.findByTestId('lobby-flow');
+    expect(within(flow).getAllByTestId('lobby-flow-step')).toHaveLength(3);
+    expect(flow.compareDocumentPosition(screen.getByTestId('lobby-setup-row')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(within(screen.getByTestId('lobby-setup-row')).queryByTestId('lobby-warmup-send')).toBeNull();
+  });
+
+  it('Given a plain lobby, Then no run sheet', async () => {
+    await renderLobby();
+    expect(screen.queryByTestId('lobby-flow')).toBeNull();
+  });
+
   /** One primary action on the screen, and it is not inside the scroller. */
   it('keeps GO LIVE the only launch control, pinned outside the scroll region', async () => {
     await renderLobby();

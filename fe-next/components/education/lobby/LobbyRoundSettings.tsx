@@ -10,7 +10,7 @@
 'use client';
 
 import { useEffect, useMemo } from 'react';
-import { Timer, Grid3x3, Ruler, Crosshair } from 'lucide-react';
+import { Timer, Grid3x3, Ruler, Crosshair, Check } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import {
@@ -19,7 +19,7 @@ import {
   HUNT_TARGET_MAX_LENGTH,
 } from '@/shared/utils/classroomHuntTarget';
 import { VocabQuizFocusPicker } from '../vocabQuiz/VocabQuizFocusPicker';
-import { LobbyChoiceRow } from './LobbyChoiceRow';
+import { LobbyChoiceRow, CALM_SELECTED, CALM_IDLE, CALM_FOCUS } from './LobbyChoiceRow';
 import { ClassroomBossPicker } from '../boss/ClassroomBossPicker';
 import type { ClassroomBossId } from '@/shared/types/classroomBoss';
 import { VOCAB_QUIZ_MODE, type ClassroomGameMode, type PracticeFocusSetting } from '@/shared/types/vocabQuiz';
@@ -121,7 +121,6 @@ export function LobbyRoundSettings({
         id="lobby-timer-label"
         label={t('teacher.classroom.timer.title')}
         icon={Timer}
-        iconClassName="text-neo-cyan"
         value={timerMinutes}
         onChange={onTimerChange}
         choices={TIMER_MINUTES.map((m) => ({ value: m, label: t(`teacher.classroom.timer.min${m}`) }))}
@@ -131,10 +130,8 @@ export function LobbyRoundSettings({
         id="lobby-board-label"
         label={t('teacher.classroom.board.title')}
         icon={Grid3x3}
-        iconClassName="text-neo-lime"
         value={boardSize}
         onChange={onBoardSizeChange}
-        selectedClassName="bg-neo-lime border-neo-black text-black shadow-hard"
         choices={BOARD_SIZES.map((s) => ({ value: s, label: t(`teacher.classroom.board.${s}`) }))}
       />
 
@@ -142,7 +139,6 @@ export function LobbyRoundSettings({
         id="lobby-minlen-label"
         label={t('teacher.classroom.minWordLength.title')}
         icon={Ruler}
-        iconClassName="text-neo-cyan"
         value={minWordLength}
         onChange={onMinWordLengthChange}
         choices={MIN_WORD_LENGTHS.map((len) => ({
@@ -155,13 +151,13 @@ export function LobbyRoundSettings({
         <div>
           <div
             id="lobby-hunt-label"
-            className="mb-2 flex items-center gap-1.5 font-neo-display text-xs font-black uppercase text-neo-white/70"
+            className="mb-2 flex items-center gap-1.5 font-neo-display text-sm font-bold text-neo-cream"
           >
-            <Crosshair className="size-4 text-neo-lime" strokeWidth={3} aria-hidden="true" />
+            <Crosshair className="size-4 text-neo-cream/70" strokeWidth={3} aria-hidden="true" />
             {t('teacher.classroom.huntTarget.title')}
           </div>
           {huntTargets.length === 0 ? (
-            <p className="rounded-neo border-2 border-neo-lime/40 bg-neo-lime/10 px-3 py-2 font-neo-body text-[0.7rem] font-bold text-neo-white">
+            <p className="rounded-neo border-2 border-neo-cream/35 bg-neo-navy-light px-3 py-2 font-neo-body text-xs font-bold text-neo-cream/85">
               {t('teacher.classroom.huntTarget.noneEligible', {
                 min: HUNT_TARGET_MIN_LENGTH,
                 max: HUNT_TARGET_MAX_LENGTH,
@@ -183,13 +179,12 @@ export function LobbyRoundSettings({
                       aria-label={choice.label}
                       onClick={() => onTargetWordChange(choice.value)}
                       className={cn(
-                        'min-h-9 rounded-neo border-2 border-black px-3 py-1 font-neo-display text-xs font-black uppercase transition',
-                        'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
-                        isSelected
-                          ? 'bg-neo-lime text-black shadow-hard'
-                          : 'border-neo-cream bg-neo-navy-light text-neo-cream shadow-hard-sm hover:bg-neo-navy'
+                        'inline-flex min-h-9 items-center gap-1.5 rounded-neo border-2 px-3 py-1 font-neo-display text-sm font-bold transition-colors',
+                        CALM_FOCUS,
+                        isSelected ? CALM_SELECTED : CALM_IDLE
                       )}
                     >
+                      {isSelected && <Check className="size-3.5 shrink-0" strokeWidth={3} aria-hidden="true" />}
                       {choice.label}
                     </button>
                   );

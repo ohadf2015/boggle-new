@@ -1,9 +1,10 @@
 'use client';
 
 import type React from 'react';
-import { Sparkles, type LucideIcon } from 'lucide-react';
+import { Check, Sparkles, type LucideIcon } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { CALM_SELECTED, CALM_IDLE, CALM_FOCUS } from './LobbyChoiceRow';
 import { ClassroomBattleSettings } from '../ClassroomBattleSettings';
 import type { ClassroomPresetId } from '@/lib/education/classroomPresets';
 import type { PlayStyle } from '@/shared/utils/teamBattle';
@@ -16,18 +17,15 @@ const PRESETS: { id: ClassroomPresetId; key: string }[] = [
 ];
 
 /** One icon-badged card per question, so an open panel reads as grouped decisions, not one long list. */
-function StepCard({ id, icon: Icon, tone, children }: { id: string; icon: LucideIcon; tone: string; children: React.ReactNode }) {
+function StepCard({ id, icon: Icon, children }: { id: string; icon: LucideIcon; children: React.ReactNode }) {
   return (
     <section
       data-testid={`lobby-step-${id}`}
-      className="relative rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light/60 p-4 ps-14"
+      className="relative rounded-neo-lg border-2 border-neo-cream/35 bg-neo-navy-light p-4 ps-14"
     >
       <span
         aria-hidden="true"
-        className={cn(
-          'absolute start-3 top-3 grid size-8 place-items-center rounded-full border-2 border-black font-neo-display text-sm font-black text-black shadow-hard-sm',
-          tone
-        )}
+        className="absolute start-3 top-3 grid size-8 place-items-center rounded-full border-2 border-neo-cream/35 text-neo-cream/70"
       >
         <Icon className="size-4" strokeWidth={3} />
       </span>
@@ -61,10 +59,10 @@ export function LobbySetupPanel({
 
   return (
     <div className="@container flex flex-col gap-5">
-      <StepCard id="presets" icon={Sparkles} tone="bg-neo-purple">
+      <StepCard id="presets" icon={Sparkles}>
         <div
           id="lobby-preset-label"
-          className="mb-2 flex items-center gap-1.5 font-neo-display text-xs font-black uppercase text-neo-white/70"
+          className="mb-2 flex items-center gap-1.5 font-neo-display text-sm font-bold text-neo-cream"
         >
           {t('teacher.classroom.presets.title')}
         </div>
@@ -80,22 +78,16 @@ export function LobbySetupPanel({
                 data-testid={`preset-${id}`}
                 onClick={() => onApplyPreset(id)}
                 className={cn(
-                  'rounded-neo border-2 border-black px-3 py-3 text-start transition hover:-translate-y-0.5 active:translate-y-0',
-                  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
-                  isActive
-                    ? 'bg-neo-purple text-black shadow-hard'
-                    : 'border-neo-cream bg-neo-navy-light text-neo-cream shadow-hard-sm hover:bg-neo-navy'
+                  'rounded-neo border-2 px-3 py-3 text-start transition-colors',
+                  CALM_FOCUS,
+                  isActive ? CALM_SELECTED : CALM_IDLE
                 )}
               >
-                <span className="block font-neo-display text-sm font-black uppercase">
+                <span className="flex items-center gap-1.5 font-neo-display text-sm font-bold">
+                  {isActive && <Check className="size-3.5 shrink-0" strokeWidth={3} aria-hidden="true" />}
                   {t(`teacher.classroom.presets.${key}.name`)}
                 </span>
-                <span
-                  className={cn(
-                    'block font-neo-body text-xs font-bold',
-                    isActive ? 'text-black/75' : 'text-neo-cream'
-                  )}
-                >
+                <span className="block font-neo-body text-xs text-neo-cream/80">
                   {t(`teacher.classroom.presets.${key}.desc`)}
                 </span>
               </button>

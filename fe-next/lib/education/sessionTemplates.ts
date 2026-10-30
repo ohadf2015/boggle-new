@@ -125,3 +125,10 @@ export function sessionHostHref(locale: string, session: SessionTemplate, packCo
   }
   return `${base.split('?')[0]}?${params.toString()}`;
 }
+
+export type SessionFlowStep = 'learn' | 'solo' | 'live';
+
+/** A list session runs as one lesson: the list goes out as practice (learn + solo on phones), then the class plays live. */
+export function sessionFlowSteps(session: SessionTemplate): SessionFlowStep[] {
+  return session.packs.length > 0 ? ['learn', 'solo', 'live'] : ['live'];
+}

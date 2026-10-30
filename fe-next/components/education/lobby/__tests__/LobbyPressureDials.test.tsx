@@ -140,7 +140,7 @@ describe('LobbyPressureDials — monetization visibility (round 2)', () => {
     setup();
     const section = screen.getByTestId('pressure-dials');
     expect(section.className).toContain('bg-neo-navy-light');
-    expect(section.className).toContain('border-neo-cream/40');
+    expect(section.className).toContain('border-neo-cream/35');
   });
 
   it.each([

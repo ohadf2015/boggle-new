@@ -16,10 +16,10 @@ export function LobbyLateJoinToggle({
   hint: string;
 }) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-neo border-[2px] border-neo-cream/70 bg-neo-navy/80 px-3 py-2">
+    <div className="flex items-center justify-between gap-3 rounded-neo border-2 border-neo-cream/35 bg-neo-navy-light px-3 py-2">
       <span className="flex min-w-0 flex-col">
-        <span id="lobby-late-join-label" className="inline-flex items-center gap-1.5 font-neo-display text-xs font-black uppercase text-neo-white/80">
-          <DoorOpen className="size-4 text-neo-cyan" strokeWidth={3} aria-hidden="true" />
+        <span id="lobby-late-join-label" className="inline-flex items-center gap-1.5 font-neo-display text-sm font-bold text-neo-cream">
+          <DoorOpen className="size-4 text-neo-cream/70" strokeWidth={3} aria-hidden="true" />
           {label}
         </span>
         <span className="font-neo-body text-xs text-neo-cream/70">{hint}</span>

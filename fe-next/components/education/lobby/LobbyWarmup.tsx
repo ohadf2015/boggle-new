@@ -67,6 +67,7 @@ export function useLobbyWarmup({ classroomId, lessonId, teacherId, source }: Lob
     sent: existing ? { done: existing.completion_count ?? 0, total: existing.student_count ?? 0 } : null,
     sendState,
     send,
+    refresh,
   };
 }
 
