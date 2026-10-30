@@ -9,11 +9,9 @@ import { teacherHostHref } from '@/lib/education/teacherHostHref';
 import { ClassStreakLine } from '@/components/teacher/hq/ClassStreakLine';
 import { HqProjectorSheet } from '@/components/teacher/hq/HqProjectorSheet';
 import type { HqClassroom } from '@/components/teacher/hq/GetStudentsInCard';
-import { PANEL, QUIET_LINK, SKELETON } from './homeStyles';
+import { OUTLINE_BUTTON, PANEL, QUIET_LINK, SKELETON } from './homeStyles';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
-
-const BADGE = ['bg-neo-purple', 'bg-neo-cyan', 'bg-neo-pink', 'bg-neo-lime'] as const;
 
 function StudentStack({ ids, total }: { ids: readonly string[]; total: number }) {
   const extra = total - ids.length;
@@ -145,7 +143,7 @@ export function HomeClassList({
       </div>
 
       <ul className={cn(PANEL, 'divide-y-[2px] divide-neo-cream/10 overflow-hidden p-0')}>
-        {classrooms.map((c, i) => {
+        {classrooms.map((c) => {
           const played = lastPlayedAt?.[c.id];
           const previewIds = studentPreview?.[c.id] ?? [];
           return (
@@ -162,10 +160,7 @@ export function HomeClassList({
                   <span
                     aria-hidden="true"
                     data-testid="home-class-badge"
-                    className={cn(
-                      'grid size-9 shrink-0 place-items-center rounded-neo border-[2px] border-neo-black font-neo-display text-xs font-black text-neo-black',
-                      BADGE[i % BADGE.length],
-                    )}
+                    className="grid size-9 shrink-0 place-items-center rounded-neo border-2 border-neo-cream/35 bg-neo-navy font-neo-display text-xs font-black text-neo-cream"
                   >
                     {classBadge(c.name)}
                   </span>
@@ -198,11 +193,7 @@ export function HomeClassList({
                 data-testid="home-class-code"
                 onClick={() => setProjectorId(c.id)}
                 aria-label={t('eduShell.home.showCodeFor', { name: c.name })}
-                className={cn(
-                  'inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-neo border-[2px] border-neo-cream/60 px-2.5 font-neo-body text-sm font-bold text-neo-cream',
-                  'transition-[transform,background-color,border-color] duration-150 hover:border-neo-cream hover:bg-neo-cream/10 active:scale-[0.97] motion-reduce:transition-none',
-                  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
-                )}
+                className={cn(OUTLINE_BUTTON, 'min-w-11 px-2.5')}
               >
                 <QrCode className="size-5" aria-hidden="true" />
                 <span className="hidden xl:inline">{t('eduShell.home.showCode')}</span>
@@ -212,13 +203,9 @@ export function HomeClassList({
                 data-testid="home-class-play"
                 data-magnet
                 aria-label={t('eduShell.home.playWith', { name: c.name })}
-                className={cn(
-                  'grid size-11 place-items-center rounded-neo border-[3px] border-neo-black bg-neo-lime text-neo-black shadow-hard-sm',
-                  'transition-[transform,box-shadow] duration-150 hover:-translate-y-0.5 hover:shadow-hard active:scale-[0.97] motion-reduce:transition-none',
-                  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
-                )}
+                className={cn(OUTLINE_BUTTON, 'size-11 px-0')}
               >
-                <Play className="size-5 fill-current" aria-hidden="true" />
+                <Play className="size-5" aria-hidden="true" />
               </Link>
               </span>
             </li>

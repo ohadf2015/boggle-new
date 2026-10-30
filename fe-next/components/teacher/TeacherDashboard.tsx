@@ -18,8 +18,9 @@ import { HqLoadError } from './hq/HqLoadError';
 import { greetingName } from './home/greetingName';
 import { HomeHero } from './home/HomeHero';
 import { HomeGetStudentsIn } from './home/HomeGetStudentsIn';
+import { EndedCodeTriesNotice } from './hq/EndedCodeTriesNotice';
 import { belowStudentGoal } from './hq/studentGoal';
-import { HomeClassList, HomeClassMeta, HomeNewClass } from './home/HomeClassList';
+import { HomeClassMeta, HomeNewClass } from './home/HomeClassList';
 import { HomeWeekCard } from './home/HomeWeekCard';
 import { HomeInsightCard } from './home/HomeInsightCard';
 import { WeeklyProgressDigestCard } from './digest/WeeklyProgressDigestCard';
@@ -252,7 +253,6 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
       scrollRegionLabel={t('eduShell.home.regionLabel')}
       contentClassName="relative isolate"
     >
-      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[40rem] bg-[url(/images/education/teacher-hq-bg.webp)] bg-cover bg-top opacity-[0.14] [mask-image:linear-gradient(to_bottom,black_30%,transparent)]" />
       {!proLoading && (
         <TeacherHqWelcome welcomeKind={welcomeKind} grant={pro.grant} trialExpires={pro.trialExpires ?? pro.periodEnd} />
       )}
@@ -260,16 +260,16 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
       <div
         ref={revealRef}
         data-testid="teacher-home"
-        className={cn('mx-auto grid w-full max-w-[1280px] gap-6 px-4 py-4 sm:px-6 lg:px-8 lg:py-6', hasRail && 'lg:grid-cols-[minmax(0,1fr)_20rem]')}
+        className={cn('mx-auto grid w-full max-w-[1280px] gap-3 px-4 py-3 sm:gap-4 sm:px-6 sm:py-4 lg:gap-5 lg:px-8 lg:py-5', hasRail && 'lg:grid-cols-[minmax(0,1fr)_20rem]')}
       >
-        <div className="flex min-w-0 flex-col gap-6 lg:col-start-1 lg:row-start-1">
+        <div className="flex min-w-0 flex-col gap-3 sm:gap-4 lg:col-start-1 lg:row-start-1">
           <header data-tm className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <h1 data-wipe suppressHydrationWarning className="font-neo-display text-2xl font-black text-neo-cream sm:text-3xl">
+              <h1 data-wipe suppressHydrationWarning className="font-neo-display text-2xl font-black text-neo-cream">
                 {firstName ? t(greetingKey(hour), { name: firstName }) : t('eduShell.home.greetNoName')}
               </h1>
               {ready && hasClasses && !classroomsError ? (
-                <p data-testid="home-coach-cue" suppressHydrationWarning className="mt-1 min-h-12 font-neo-body text-base font-semibold text-neo-cream/85 sm:min-h-6">
+                <p data-testid="home-coach-cue" suppressHydrationWarning className="mt-0.5 min-h-5 font-neo-body text-sm font-semibold text-neo-cream/75 max-sm:hidden">
                   {cue ? t(cue.key) : null}
                 </p>
               ) : null}
@@ -295,7 +295,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
                 />
               ) : (
                 <>
-                  {selectedClassroom ? <HomeGetStudentsIn classroom={selectedClassroom} /> : null}
+                  {selectedClassroom ? <EndedCodeTriesNotice classroomId={selectedClassroom.id} /> : null}
                   <div data-tm>
                     <HomeHero
                       classrooms={classrooms}
@@ -303,7 +303,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
                       onSelect={setSelectedId}
                       language={language}
                       t={t}
-                      rehearse={<RehearseWithBotsButton classroomId={effectiveId || undefined} source="hq" language={language} t={t} />}
+                      rehearse={<RehearseWithBotsButton classroomId={effectiveId || undefined} source="hq" language={language} t={t} compact />}
                       corner={<HomeNewClass href={newClassHref} count={classrooms.length} limit={!proLoading && !hasPro ? FREE_TIER_LIMITS.classes : null} t={t} />}
                       meta={selectedClassroom ? (
                         <HomeClassMeta
@@ -319,6 +319,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
                       ) : null}
                       insight={week.insights?.length ? <HomeInsightCard insights={week.insights} t={t} embedded /> : null}
                       showCode={!shareCardShown}
+                      codeSlot={selectedClassroom && shareCardShown ? <HomeGetStudentsIn classroom={selectedClassroom} /> : undefined}
                       nudge={
                         nextStepShown ? (
                           <HomeOnboardingCard onboarding={onboarding} hrefs={onboardingHrefs} trial={trialCard} shareCardShown={shareCardShown} onStepStart={onOnboardingStep} onDismiss={activation.dismiss} variant="compact" t={t} />
@@ -346,40 +347,25 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
             t={t}
           />
         ) : null}
-        {ready && !classroomsError && hasClasses && (classrooms.length > 1 || accountBanner) ? (
-          <div className={cn('flex min-w-0 flex-col gap-6', hasRail && 'lg:col-span-2')}>
-            {classrooms.length > 1 ? (
-              <HomeClassList
-                classrooms={classrooms}
-                studentPreview={studentPreview}
-                lastPlayedAt={week.summary?.lastPlayedAt ?? null}
-                activityFailed={week.status === 'error'}
-                language={language}
-                nowMs={nowMs}
-                t={t}
-              />
-            ) : null}
-            {accountBanner ? <div data-testid="home-account-banner">{accountBanner}</div> : null}
-          </div>
+        {ready && !classroomsError && hasClasses && accountBanner ? (
+          <div data-testid="home-account-banner" className={cn('min-w-0', hasRail && 'lg:col-span-2')}>{accountBanner}</div>
         ) : null}
 
         {hasRail ? (
-          <aside aria-label={t('eduShell.home.railLabel')} className="flex min-w-0 flex-col gap-6 lg:col-start-2 lg:row-start-1">
+          <aside aria-label={t('eduShell.home.railLabel')} className="flex min-w-0 flex-col gap-4 lg:col-start-2 lg:row-start-1">
             {!ready ? <HomeRailSkeleton /> : showWeek ? (
-              <>
-                <div data-tm>
-                  <HomeWeekCard summary={week.summary} status={week.status} t={t} />
-                </div>
-              </>
+              <div data-tm className="max-lg:hidden">
+                <HomeWeekCard summary={week.summary} status={week.status} t={t} />
+              </div>
             ) : null}
             {!ready || !selectedClassroom ? null : (
-              <details data-testid="home-weekly-reports" data-tm onToggle={(e) => e.currentTarget.open && setReportsOpened(true)} className="group rounded-neo-lg border-[3px] border-neo-cream/70 bg-neo-navy-light shadow-hard">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 font-neo-display text-lg font-black text-neo-cream focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan [&::-webkit-details-marker]:hidden">
+              <details data-testid="home-weekly-reports" data-tm onToggle={(e) => e.currentTarget.open && setReportsOpened(true)} className="group rounded-neo-lg border-2 border-neo-cream/35 bg-neo-navy-light max-lg:hidden">
+                <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-3 py-2 font-neo-display text-base font-bold text-neo-cream focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream [&::-webkit-details-marker]:hidden">
                   {t('eduShell.home.weeklyReports')}
                   <ChevronDown className="size-5 shrink-0 transition-transform duration-200 ease-out group-open:rotate-180 motion-reduce:transition-none" aria-hidden="true" />
                 </summary>
                 {reportsOpened ? (
-                  <div className="flex flex-col gap-6 px-4 pb-4 motion-safe:group-open:animate-[edu-fold-in_260ms_cubic-bezier(0.23,1,0.32,1)]">
+                  <div className="flex flex-col gap-4 px-3 pb-3 motion-safe:group-open:animate-[edu-fold-in_260ms_cubic-bezier(0.23,1,0.32,1)]">
                     <WeeklyProgressDigestCard
                       classroomId={selectedClassroom.id}
                       classroomName={selectedClassroom.name}

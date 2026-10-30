@@ -8,15 +8,20 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 
 import { ClassroomLobbyShell } from '../ClassroomLobbyShell';
-import { LaunchStageBackdrop } from '../LaunchStageBackdrop';
 
 describe('ClassroomLobbyShell — the launch stage', () => {
-  it('stands the picker on the arena art, decorative and painted from frame one', () => {
-    render(<LaunchStageBackdrop />);
-    const art = screen.getByTestId('lobby-arena-art');
-    expect(art.getAttribute('src')).toContain('/images/education/arena-lobby-bg.webp');
-    expect(art).toHaveAttribute('alt', '');
-    expect(art.className).not.toContain('opacity-0');
+  it('paints a solid navy stage with no art layer behind the lobby text', () => {
+    render(<ClassroomLobbyShell pinned={<div />} aside={<div />}>body</ClassroomLobbyShell>);
+    const shell = screen.getByTestId('classroom-lobby-shell');
+    expect(shell.className).toContain('bg-neo-navy');
+    expect(shell.querySelector('img')).toBeNull();
+    expect(screen.queryByTestId('lobby-arena-art')).toBeNull();
+  });
+
+  it('keeps the subtitle a plain line of text, not a pill', () => {
+    render(<ClassroomLobbyShell pinned={<div />}>body</ClassroomLobbyShell>);
+    const sub = screen.getByTestId('lobby-stage-subtitle');
+    expect(sub.className).not.toMatch(/rounded-full|(^|\s)bg-/);
   });
 
   it('titles the screen in words, never a raw key', () => {

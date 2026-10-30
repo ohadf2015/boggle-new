@@ -31,7 +31,6 @@ vi.mock('@/components/education/lobby/QuickLaunchProvisioner', () => ({
   },
 }));
 vi.mock('@/components/education/EducationHeader', () => ({ EducationHeader: () => null }));
-vi.mock('@/components/education/lobby/LaunchStageBackdrop', () => ({ LaunchStageBackdrop: () => null }));
 vi.mock('@/components/teacher/hq/QuickLaunchStage', () => ({ QuickLaunchStage: () => null }));
 
 import ClassroomGamePage from '../PageClient';

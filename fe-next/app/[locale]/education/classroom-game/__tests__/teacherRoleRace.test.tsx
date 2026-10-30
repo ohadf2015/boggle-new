@@ -43,7 +43,6 @@ vi.mock('@/components/education/lobby/QuickLaunchProvisioner', () => ({
   QuickLaunchProvisioner: () => <div data-testid="teacher-express" />,
 }));
 vi.mock('@/components/education/EducationHeader', () => ({ EducationHeader: () => null }));
-vi.mock('@/components/education/lobby/LaunchStageBackdrop', () => ({ LaunchStageBackdrop: () => null }));
 vi.mock('@/components/teacher/hq/QuickLaunchStage', () => ({ QuickLaunchStage: () => null }));
 vi.mock('@/components/ui/PageLoader', () => ({ PageLoader: () => <div data-testid="loader" /> }));
 
@@ -73,6 +72,8 @@ describe('classroom-game: signed-in user whose profile has not loaded yet', () =
 
     await waitFor(() => expect(screen.getByTestId('teacher-launcher')).toBeTruthy());
     expect(screen.queryByTestId('student-join')).toBeNull();
+    expect(screen.queryByTestId('lobby-arena-art')).toBeNull();
+    expect(document.querySelector('img[src*="arena-lobby-bg"]')).toBeNull();
     expect(push).not.toHaveBeenCalled();
     expect(replace).not.toHaveBeenCalled();
   });

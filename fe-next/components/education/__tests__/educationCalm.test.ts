@@ -29,9 +29,9 @@ describe('education surfaces stay calm', () => {
     }
   });
 
-  it('keeps the lobby title level and the arena behind a heavy scrim', () => {
+  it('keeps the lobby title level and no arena art behind lobby text', () => {
     expect(read('components/education/lobby/ClassroomLobbyShell.tsx')).not.toMatch(/-rotate-/);
-    expect(read('components/education/lobby/LaunchStageBackdrop.tsx')).toContain('bg-neo-navy/80');
+    expect(read('app/[locale]/education/classroom-game/PageClient.tsx')).not.toMatch(/LaunchStageBackdrop|arena-lobby-bg/);
     expect(read('components/education/lobby/QuickLaunchProvisioner.tsx')).not.toMatch(/animate-bounce/);
   });
 });

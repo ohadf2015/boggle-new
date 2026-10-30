@@ -9,7 +9,7 @@ import type { TeacherInsight, TeacherInsightId } from '@/lib/education/teacherIn
 import { PANEL } from './homeStyles';
 
 const FOCUS_RING =
-  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy';
+  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -36,13 +36,10 @@ function nextCursor(): number {
   }
 }
 
-function Value({ value, ink }: { value: number | string; ink: string }) {
+function Value({ value, className }: { value: number | string; className: string }) {
   const counted = useCountUp(typeof value === 'number' ? value : 0);
   return (
-    <span
-      data-testid="home-insight-value"
-      className={cn('block break-words font-neo-display text-5xl font-black leading-none tabular-nums', ink)}
-    >
+    <span data-testid="home-insight-value" className={cn('font-neo-display font-black tabular-nums', className)}>
       {typeof value === 'number' ? counted : value}
     </span>
   );
@@ -55,24 +52,40 @@ export function HomeInsightCard({ insights = [], t, embedded = false }: { insigh
   if (insights.length === 0) return null;
   const insight = insights[cursor % insights.length];
 
+  const text = t(`eduShell.insight.${insight.id}`, { count: Number(insight.value) || 0, day: String(insight.value), ...insight.params });
+  const next =
+    insights.length > 1 ? (
+      <button
+        type="button"
+        onClick={() => setCursor((c) => c + 1)}
+        aria-label={t('eduShell.insight.next')}
+        className={cn('grid size-9 shrink-0 place-items-center rounded-neo border-2 border-neo-cream/30 text-neo-cream/80 hover:border-neo-cream hover:text-neo-cream', FOCUS_RING)}
+      >
+        <RefreshCw className="size-4" strokeWidth={3} aria-hidden="true" />
+      </button>
+    ) : null;
+
+  if (embedded) {
+    return (
+      <section data-testid="home-insight" aria-label={t('eduShell.insight.title')} className="flex min-w-0 items-center gap-2">
+        <p aria-live="polite" className="min-w-0 flex-1 font-neo-body text-sm font-semibold leading-snug text-neo-cream/80">
+          <Value value={insight.value} className="me-1.5 text-base text-neo-cream" />
+          {text}
+        </p>
+        {next}
+      </section>
+    );
+  }
+
   return (
-    <section data-testid="home-insight" aria-labelledby="home-insight-title" className={cn(embedded ? 'relative' : cn(PANEL, 'overflow-hidden p-4'))}>
-      <div className={cn('flex items-center justify-between gap-2', embedded && 'absolute end-0 top-0')}>
-        <h2 id="home-insight-title" className={cn('font-neo-display text-lg font-black text-neo-cream', embedded && 'sr-only')}>
+    <section data-testid="home-insight" aria-labelledby="home-insight-title" className={cn(PANEL, 'overflow-hidden p-4')}>
+      <div className="flex items-center justify-between gap-2">
+        <h2 id="home-insight-title" className="font-neo-display text-lg font-black text-neo-cream">
           {t('eduShell.insight.title')}
         </h2>
-        {insights.length > 1 ? (
-          <button
-            type="button"
-            onClick={() => setCursor((c) => c + 1)}
-            aria-label={t('eduShell.insight.next')}
-            className={cn('grid size-9 place-items-center rounded-neo border-2 border-neo-cream/40 text-neo-cream hover:bg-neo-navy', FOCUS_RING)}
-          >
-            <RefreshCw className="size-4" strokeWidth={3} aria-hidden="true" />
-          </button>
-        ) : null}
+        {next}
       </div>
-      <div aria-live="polite" className={embedded ? 'min-h-[3.5rem] pe-11' : 'mt-3 min-h-[7.5rem]'}>
+      <div aria-live="polite" className="mt-3 min-h-[7.5rem]">
         <AnimatePresence mode="wait" initial={false}>
           <m.div
             key={insight.id}
@@ -80,12 +93,9 @@ export function HomeInsightCard({ insights = [], t, embedded = false }: { insigh
             animate={{ opacity: 1, y: 0 }}
             exit={reduce ? undefined : { opacity: 0, y: -10 }}
             transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-            className={embedded ? 'flex items-center gap-4' : undefined}
           >
-            <Value value={insight.value} ink={INK[insight.id]} />
-            <p className={cn('font-neo-body text-sm font-semibold leading-snug text-neo-cream/85', embedded ? 'min-w-0 sm:text-base' : 'mt-2')}>
-              {t(`eduShell.insight.${insight.id}`, { count: Number(insight.value) || 0, day: String(insight.value), ...insight.params })}
-            </p>
+            <Value value={insight.value} className={cn('block break-words text-5xl leading-none', INK[insight.id])} />
+            <p className="mt-2 font-neo-body text-sm font-semibold leading-snug text-neo-cream/85">{text}</p>
           </m.div>
         </AnimatePresence>
       </div>

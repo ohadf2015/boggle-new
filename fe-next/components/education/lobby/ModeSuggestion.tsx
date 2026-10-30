@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { Sparkles } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { hasProAccess } from '@/lib/education/teacherPlanGate';
@@ -10,15 +9,13 @@ import { fetchRecentTeacherRounds } from '@/lib/education/recentTeacherRounds';
 import { isRehearsing, PRO_ONLY_MODES, suggestNextMode, type SuggestionRound } from '@/lib/education/modeSuggestion';
 import { trackModeSuggestionAccepted, trackModeSuggestionShown } from '@/lib/education/modeSuggestionTelemetry';
 import { modeAllowsRehearsalBots, peekRehearseIntent } from '@/lib/education/rehearsal';
-import { catalogueEntry, catalogueModes } from '../ClassroomModeCatalogueData';
+import { catalogueModes } from '../ClassroomModeCatalogueData';
 
-type Translate = (key: string, params?: Record<string, string | number>) => string;
-
-export interface ModeSuggestionProps {
+export interface ModeSuggestionArgs {
   selected: ClassroomCatalogueId;
   isBlocked: (id: ClassroomCatalogueId) => boolean;
-  onPick: (id: ClassroomCatalogueId) => void;
-  t: Translate;
+  /** False while the lobby is still deciding the list and mode, so the pick is made against the settled screen. */
+  ready?: boolean;
 }
 
 interface Suggestion {
@@ -27,8 +24,8 @@ interface Suggestion {
   rehearsing: boolean;
 }
 
-/** One "try something new" tap for a teacher stuck on the same modes; it only selects, GO LIVE still launches. */
-export function ModeSuggestion({ selected, isBlocked, onPick, t }: ModeSuggestionProps) {
+/** One mode a teacher stuck on the same games has not tried; the grid tags its tile, picking it only selects. */
+export function useModeSuggestion({ selected, isBlocked, ready = true }: ModeSuggestionArgs) {
   const { user } = useAuth();
   const entitlement = useTeacherPro();
   const [rounds, setRounds] = useState<SuggestionRound[] | null>(null);
@@ -50,7 +47,7 @@ export function ModeSuggestion({ selected, isBlocked, onPick, t }: ModeSuggestio
 
   // Decided once, after rounds AND the Pro check resolve, so the chip never swaps under the teacher's finger.
   useEffect(() => {
-    if (decided.current || !rounds || entitlement.loading) return;
+    if (!ready || decided.current || !rounds || entitlement.loading) return;
     decided.current = true;
     const intent = peekRehearseIntent() !== null;
     const id = suggestNextMode({
@@ -67,28 +64,17 @@ export function ModeSuggestion({ selected, isBlocked, onPick, t }: ModeSuggestio
     const next = { id, from: selected, rehearsing: isRehearsing(rounds, intent) };
     setSuggestion(next);
     trackModeSuggestionShown({ suggestedMode: id, selectedMode: selected, rehearsing: next.rehearsing });
-  }, [rounds, entitlement, selected, isBlocked]);
+  }, [ready, rounds, entitlement, selected, isBlocked]);
 
-  if (!suggestion || accepted || suggestion.id === selected || isBlocked(suggestion.id)) return null;
-  const mode = catalogueEntry(suggestion.id);
-  if (!mode) return null;
-
-  return (
-    <button
-      type="button"
-      data-testid="mode-suggestion"
-      data-mode={suggestion.id}
-      onClick={() => {
-        setAccepted(true);
-        trackModeSuggestionAccepted({ suggestedMode: suggestion.id, selectedMode: selected, rehearsing: suggestion.rehearsing });
-        onPick(suggestion.id);
-      }}
-      className="inline-flex min-h-11 max-w-full items-center gap-1.5 rounded-full border-2 border-neo-cream/40 bg-neo-navy/80 px-3 py-1 font-neo-body text-xs font-bold text-neo-cream transition-[transform,border-color] duration-150 hover:border-neo-cream active:scale-[0.97] motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan @4xl/lobby:text-sm"
-    >
-      <Sparkles className="size-4 shrink-0 text-neo-yellow" aria-hidden="true" />
-      <span className="truncate">{t('eg2Modes.trySomethingNew', { mode: t(mode.nameKey) })}</span>
-    </button>
+  const onPicked = useCallback(
+    (id: ClassroomCatalogueId) => {
+      if (!suggestion || accepted || id !== suggestion.id) return;
+      setAccepted(true);
+      trackModeSuggestionAccepted({ suggestedMode: suggestion.id, selectedMode: selected, rehearsing: suggestion.rehearsing });
+    },
+    [suggestion, accepted, selected]
   );
-}
 
-export default ModeSuggestion;
+  const visible = !!suggestion && !accepted && suggestion.id !== selected && !isBlocked(suggestion.id);
+  return { suggested: visible ? suggestion.id : null, onPicked };
+}

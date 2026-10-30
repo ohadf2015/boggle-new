@@ -22,11 +22,13 @@ describe('<LobbyModeGrid> — the picker is the page', () => {
     expect(screen.getByTestId('mode-tile-classic')).toHaveAttribute('aria-checked', 'true');
   });
 
-  it('Then games are grouped under their category headings, in catalogue order', () => {
+  it('Then games are grouped under their category headings (read aloud, not drawn), in catalogue order', () => {
     renderGrid();
     for (const category of CATALOGUE_CATEGORIES) {
       const section = screen.getByTestId(`mode-group-${category}`);
       expect(section).toHaveTextContent(`eg2Modes.category.${category}`);
+      expect(section.className).toMatch(/(^|\s)contents(\s|$)/);
+      expect(within(section).getByRole('heading').className).toMatch(/(^|\s)sr-only(\s|$)/);
       const ids = within(section).getAllByRole('radio').map((r) => r.getAttribute('data-testid'));
       expect(ids).toEqual(catalogueModes().filter((m) => m.category === category).map((m) => `mode-tile-${m.id}`));
     }
@@ -59,12 +61,32 @@ describe('<LobbyModeGrid> — the picker is the page', () => {
     expect(screen.getByTestId('mode-tile-blast')).toBeDisabled();
   });
 
-  it('Then its columns follow its own width, not the viewport', () => {
+  it('Then all seven tiles share one grid whose columns follow its own width, not the viewport', () => {
     renderGrid();
     const grid = screen.getByTestId('lobby-mode-grid');
     expect(grid.className).toContain('@container');
-    const cards = within(screen.getByTestId('mode-group-board')).getAllByRole('radio')[0].parentElement!;
-    expect(cards.className).toContain('@md:grid-cols-3');
+    const cells = screen.getByTestId('lobby-mode-cells');
+    expect(cells.className).toMatch(/grid-cols-2/);
+    expect(cells.className).toMatch(/@2xl:grid-cols-4/);
+    expect(within(cells).getAllByRole('radio')).toHaveLength(catalogueModes().length);
     expect(grid.innerHTML).not.toMatch(/(?<![@\w-])(sm|md|lg):/);
+  });
+
+  it('Then the selected tile is outlined with a lime ring and a check, never a colored fill', () => {
+    renderGrid();
+    const on = screen.getByTestId('mode-tile-classic');
+    expect(on.className).toContain('ring-neo-lime');
+    expect(within(on).getByTestId('mode-selected-check')).toBeInTheDocument();
+    expect(screen.getByTestId('lobby-mode-grid').innerHTML).not.toMatch(/bg-neo-(lime|cyan|pink|purple|yellow|orange)(?![\w/-])/);
+  });
+
+  it('Then names may wrap and nothing is cut with an ellipsis', () => {
+    renderGrid();
+    expect(screen.getByTestId('lobby-mode-grid').innerHTML).not.toMatch(/truncate|line-clamp|uppercase/);
+  });
+
+  it('Then the recommended sticker is a neutral outline', () => {
+    renderGrid();
+    expect(screen.getByTestId('mode-recommended').className).toContain('border-neo-cream');
   });
 });

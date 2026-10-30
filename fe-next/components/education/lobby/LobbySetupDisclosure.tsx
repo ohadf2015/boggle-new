@@ -22,16 +22,16 @@ export function LobbySetupDisclosure({ label, summary, open, onToggle, children 
         aria-expanded={open}
         onClick={onToggle}
         className={cn(
-          'flex min-h-11 w-full items-center gap-2 rounded-neo border-2 border-neo-cream/45 bg-neo-navy/80 px-3 py-2 text-start',
-          'font-neo-body text-sm font-bold text-neo-cream/85 transition-colors hover:bg-neo-navy hover:text-neo-cream',
+          'flex min-h-11 w-full items-center gap-2 rounded-neo border-2 border-neo-cream/35 bg-neo-navy-light px-3 py-2 text-start',
+          'font-neo-body text-sm text-neo-cream/70 transition-colors hover:border-neo-cream/50 hover:text-neo-cream',
           'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
         )}
       >
         <SlidersHorizontal className="size-4 shrink-0" strokeWidth={3} aria-hidden="true" />
-        <span className="shrink-0 font-neo-display text-xs font-black uppercase tracking-wide text-neo-cream">{label}</span>
-        <span data-testid="lobby-setup-line" className="min-w-0 flex-1 truncate">{summary}</span>
+        <span className="shrink-0 font-bold text-neo-cream">{label}</span>
+        <span data-testid="lobby-setup-line" className="hidden min-w-0 flex-1 @lg/lobby:block">{summary}</span>
         <ChevronDown
-          className={cn('size-5 shrink-0 transition-transform duration-200 motion-reduce:transition-none', open && 'rotate-180')}
+          className={cn('ms-auto size-5 shrink-0 transition-transform duration-200 motion-reduce:transition-none', open && 'rotate-180')}
           strokeWidth={3}
           aria-hidden="true"
         />

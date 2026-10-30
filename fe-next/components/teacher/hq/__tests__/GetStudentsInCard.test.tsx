@@ -202,4 +202,22 @@ describe('<GetStudentsInCard>', () => {
     await waitFor(() => expect(trackJoined).toHaveBeenCalledWith({ classroomId: 'c1' }));
     expect(screen.queryByTestId('hq-first-student-panel')).not.toBeInTheDocument();
   });
+
+  it('Given an empty class, Then the card is calm and compact: no colored fills or ink, no helper paragraph, and a heading that wraps', () => {
+    roster.mockReturnValue({ students: [], loading: false, arrivals: [] });
+    render(<GetStudentsInCard classroom={{ ...CLASS, member_count: 0 }} onOpenProjector={vi.fn()} />);
+    const card = screen.getByTestId('hq-get-students-in');
+    const loud = Array.from(card.querySelectorAll<HTMLElement>('[class]')).filter((el) =>
+      /(^|\s)(bg|text)-neo-(lime|cyan|pink|purple|orange|yellow)(\/\d+)?(\s|$)/.test(el.getAttribute('class') ?? ''),
+    );
+    expect(loud).toEqual([]);
+    expect(card.querySelector('svg.text-neo-pink, svg.text-neo-lime')).toBeNull();
+    expect(card.textContent).not.toContain('teacher.activation.shareBody');
+    expect(card.querySelector('h2, h3')?.className).not.toMatch(/truncate|line-clamp/);
+  });
+
+  it('Given students in, Then the joined count is neutral cream, not lime', () => {
+    render(<GetStudentsInCard classroom={CLASS} onOpenProjector={vi.fn()} />);
+    expect(screen.getByTestId('hq-joined-count').innerHTML).not.toMatch(/text-neo-lime/);
+  });
 });

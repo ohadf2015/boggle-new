@@ -116,4 +116,13 @@ describe('Teacher Home: get students in', () => {
     await waitFor(() => expect(fetchWithAuth).toHaveBeenCalledWith('/api/education/classroom/c1/ended-code-tries'));
     expect(screen.queryByTestId('hq-ended-code-tries')).not.toBeInTheDocument();
   });
+
+  it('Given an empty class, Then the join card sits in the hero code slot, above one Start live, with no second stacked card', () => {
+    render(<TeacherDashboard />);
+    const hero = screen.getByTestId('home-hero');
+    const card = within(hero).getByTestId('hq-get-students-in');
+    const start = within(hero).getByTestId('home-start-live');
+    expect(card.compareDocumentPosition(start) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.getAllByTestId('hq-get-students-in')).toHaveLength(1);
+  });
 });

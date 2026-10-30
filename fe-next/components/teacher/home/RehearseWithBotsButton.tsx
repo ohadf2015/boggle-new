@@ -23,12 +23,14 @@ export interface RehearseWithBotsButtonProps {
   language: string;
   t: T;
   showNote?: boolean;
+  /** Icon-only below sm, so it can sit beside the primary button on a phone. */
+  compact?: boolean;
   className?: string;
   /** Fired on press, before the launch (telemetry hook). */
   onStart?: () => void;
 }
 
-export function RehearseWithBotsButton({ classroomId, source, language, t, showNote = false, className, onStart }: RehearseWithBotsButtonProps) {
+export function RehearseWithBotsButton({ classroomId, source, language, t, showNote = false, compact = false, className, onStart }: RehearseWithBotsButtonProps) {
   const router = useRouter();
   const { user } = useAuth();
   const [pending, setPending] = useState(false);
@@ -57,14 +59,14 @@ export function RehearseWithBotsButton({ classroomId, source, language, t, showN
         disabled={pending}
         aria-busy={pending || undefined}
         title={showNote ? undefined : t('education.projectorLobby.rehearsePrivate')}
-        className={QUIET_LINK}
+        className={cn(QUIET_LINK, compact && 'max-sm:min-w-11 max-sm:justify-center max-sm:border-2 max-sm:border-neo-cream/40 max-sm:no-underline')}
       >
         {pending ? (
           <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden="true" />
         ) : (
           <Bot className="size-4" aria-hidden="true" />
         )}
-        {t('education.projectorLobby.rehearseCta')}
+        <span className={cn(compact && 'max-sm:sr-only')}>{t('education.projectorLobby.rehearseCta')}</span>
       </button>
       {showNote ? (
         <p className="px-2 font-neo-body text-xs font-semibold text-neo-cream/60">{t('education.projectorLobby.rehearsePrivate')}</p>

@@ -1,7 +1,6 @@
 /**
- * The spotlight is read off a classroom projector, so on desktop the three
- * steps, the duration / difficulty / style values and their badges are sized
- * for the back row, and every text block is laid out for the page direction.
+ * The ready panel is calm: the mode's own cover art at a modest size, a normal-case
+ * title, neutral chips, and one lime GO LIVE whose label never wraps or clips.
  */
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
@@ -28,37 +27,43 @@ function setup(dir?: 'rtl' | 'ltr') {
   );
 }
 
-describe('<ClassroomModeSpotlight> on a projected desktop', () => {
-  it('Given the desktop steps, When rendered, Then each step reads at text-lg (up from text-sm) with a larger number badge', () => {
+describe('<ClassroomModeSpotlight> ready panel', () => {
+  it('Given the art, When rendered, Then it is the mode cover on desktop only: no fake UI preview, no floating mascot', () => {
     setup();
-    const steps = within(screen.getByTestId('how-it-plays-inline')).getAllByRole('listitem');
-    expect(steps).toHaveLength(3);
-    steps.forEach((li) => {
-      expect(li.className).toContain('@4xl/lobby:text-lg');
-      expect(li.firstElementChild?.className).toContain('@4xl/lobby:size-7');
-    });
+    const art = screen.getByTestId('spotlight-art');
+    expect(art.className).toMatch(/(^|\s)hidden(\s|$)/);
+    expect(art.className).toContain('@4xl/lobby:block');
+    expect(within(art).getByRole('presentation', { hidden: true }).getAttribute('src')).toBe(catalogueEntry('vocab-quiz')!.cover);
+    expect(screen.queryByTestId('mode-preview')).toBeNull();
+    expect(screen.getByTestId('mode-spotlight').innerHTML).not.toMatch(/animate-avatar-float/);
   });
 
-  it('Given the specs, When rendered, Then they are one row of pills in the text column, values legible at text-xl', () => {
+  it('Given the title, When rendered, Then it is normal case and not cut', () => {
+    setup();
+    const title = within(screen.getByTestId('mode-spotlight')).getByRole('heading');
+    expect(title.className).not.toMatch(/uppercase|truncate/);
+  });
+
+  it('Given the specs, best-for and steps, When rendered, Then they are neutral outlines, no accent fills', () => {
     setup();
     const text = screen.getByTestId('spotlight-text');
-    for (const id of ['spec-duration', 'spec-complexity', 'spec-style']) {
-      const pill = within(text).getByTestId(id);
-      expect(pill.querySelector('[data-spec="value"]')?.className).toContain('@4xl/lobby:text-xl');
-    }
+    for (const id of ['spec-duration', 'spec-complexity', 'spec-style']) expect(within(text).getByTestId(id)).toBeInTheDocument();
+    const html = screen.getByTestId('mode-spotlight').innerHTML;
+    expect(html.match(/(?<![\w:-])bg-neo-lime(?![\w/-])/g)).toHaveLength(1);
+    expect(html).not.toMatch(/bg-neo-(cyan|pink|purple|yellow|orange)(?![\w-])/);
   });
 
-  it('Given the ready panel, When rendered, Then the art is desktop-only and GO LIVE is the last control, so the phone dock stays one row plus the button', () => {
+  it('Given GO LIVE, When rendered, Then it is the last control and says "Go live" on one line with the mode under it', () => {
     setup();
-    expect(screen.getByTestId('spotlight-art').className).toMatch(/(^|\s)hidden(\s|$)/);
-    expect(screen.getByTestId('spotlight-art').className).toContain('@4xl/lobby:block');
     const buttons = within(screen.getByTestId('mode-spotlight')).getAllByRole('button');
-    expect(buttons[buttons.length - 1]).toHaveAttribute('data-testid', 'lobby-go-live');
-  });
-
-  it('Given the best-for badges, When rendered, Then they read at text-base on desktop', () => {
-    setup();
-    screen.getAllByTestId('best-for-chip').forEach((chip) => expect(chip.className).toContain('@4xl/lobby:text-base'));
+    const go = buttons[buttons.length - 1];
+    expect(go).toHaveAttribute('data-testid', 'lobby-go-live');
+    expect(go).toHaveAttribute('aria-label', 'education.modePicker.launch');
+    const label = within(go).getByTestId('go-live-label');
+    expect(label).toHaveTextContent('teacher.playNow.goLive');
+    expect(label.className).toContain('whitespace-nowrap');
+    expect(go.innerHTML).not.toMatch(/truncate|uppercase/);
+    expect(go).toHaveTextContent('teacher.classroom.gameModes.vocabQuiz');
   });
 
   it('Given a Hebrew page, When rendered, Then the spotlight carries dir="rtl" and start-aligned text', () => {

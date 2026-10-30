@@ -117,11 +117,13 @@ describe('Teacher Home', () => {
     expect(screen.getByTestId('home-new-class')).toHaveAttribute('href');
   });
 
-  it('Then every class row has its own play button', () => {
+  it('Given several classes, Then the hero switcher replaces a class list and a requested class retargets Start live', () => {
+    search = 'classroomId=c4a';
     render(<TeacherDashboard />);
-    const rows = screen.getAllByTestId('home-class-row');
-    expect(rows).toHaveLength(2);
-    expect(within(rows[1]).getByTestId('home-class-play')).toHaveAttribute('href', '/en/education/classroom-game?classroomId=c4a');
+    const hero = screen.getByTestId('home-hero');
+    expect(within(hero).getByRole('button', { name: 'eduShell.home.switchClass' })).toHaveTextContent('4A - Reading');
+    expect(within(hero).getByTestId('home-start-live')).toHaveAttribute('href', '/en/education/classroom-game?classroomId=c4a');
+    expect(screen.queryAllByTestId('home-class-row')).toHaveLength(0);
   });
 
   it('Then This week shows the three real numbers', () => {

@@ -29,7 +29,7 @@ import { playableLessonWords } from '@/lib/education/lessonPickerModel';
 import { ClassroomLobbyShell } from './lobby/ClassroomLobbyShell';
 import { ClassroomModeCatalogue } from './ClassroomModeCatalogue';
 import { LobbyModeGrid } from './lobby/LobbyModeGrid';
-import { ModeSuggestion } from './lobby/ModeSuggestion';
+import { useModeSuggestion } from './lobby/ModeSuggestion';
 import { wordcraftPlayable } from './lobby/wordcraftPlayable';
 import { LobbyNoClassrooms, LobbyNoLessons } from './lobby/LobbyEmptyStates';
 import { LobbyClassPicker } from './lobby/LobbyClassPicker';
@@ -151,7 +151,19 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
 
   const cannotStart = selectedLessonIds.length === 0 || !selectedClassroomId || allPlayableWords.length === 0;
   const wordcraftOk = wordcraftPlayable(allPlayableWords, { lessonLanguage, classroomLanguage: classroom?.language, preset: opts.activePreset });
-  const isBlocked = (id: ClassroomCatalogueId) => (id === VOCAB_QUIZ_MODE && !quizPlayable) || (id === 'wordcraft' && !wordcraftOk);
+  const isBlocked = useCallback(
+    (id: ClassroomCatalogueId) => (id === VOCAB_QUIZ_MODE && !quizPlayable) || (id === 'wordcraft' && !wordcraftOk),
+    [quizPlayable, wordcraftOk]
+  );
+  const settled = !isLoading && !repeatPending && !sessionPending && !(showQuick && !cannotStart);
+  const suggestion = useModeSuggestion({ selected: pickedId, isBlocked, ready: settled });
+  const pickMode = useCallback(
+    (id: ClassroomCatalogueId) => {
+      suggestion.onPicked(id);
+      setPickedGameMode(id);
+    },
+    [suggestion]
+  );
 
   const startGame = useCallback(
     (mode: ClassroomGameMode, variant?: typeof vocabQuizVariant, boss?: Parameters<typeof launchOf>[1]) => {
@@ -310,8 +322,10 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
           onMoreOptions={() => setShowQuick(false)}
         />
       ) : (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2 @4xl/lobby:gap-3">
+          <div data-testid="lobby-setup-row" className="flex flex-wrap items-start gap-2">
           <LobbyLessonStep
+            className="min-w-0 flex-[1_1_18rem]"
             lessons={lessons}
             selectedLessonIds={selectedLessonIds}
             onChange={setSelectedLessonIds}
@@ -322,14 +336,15 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
             activePreset={opts.activePreset}
           />
           <LobbyWarmupButton warmup={warmup} />
-          <ModeSuggestion selected={pickedId} isBlocked={isBlocked} onPick={setPickedGameMode} t={tt} />
+          </div>
           <LobbyModeGrid
             selected={pickedId}
             recommended={recommended}
+            suggested={suggestion.suggested}
             selectedMinutes={roundMinutes}
             minutesFor={minutesFor}
             busy={isStarting}
-            onPick={setPickedGameMode}
+            onPick={pickMode}
             t={tt}
           />
           <LobbyGameOptions

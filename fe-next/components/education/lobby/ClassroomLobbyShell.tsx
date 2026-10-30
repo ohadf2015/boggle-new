@@ -32,9 +32,7 @@ export function ClassroomLobbyShell({ pinned, children, footer, aside, className
     <div
       data-testid="classroom-lobby-shell"
       dir={dir}
-      // Transparent on purpose: the route paints `bg-neo-navy` and the arena
-      // art (LaunchStageBackdrop) behind this shell.
-      className={cn('@container/lobby relative flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden', className)}
+      className={cn('@container/lobby relative flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden bg-neo-navy', className)}
     >
       <div className="mx-auto flex w-full max-w-[1400px] min-h-0 flex-1 flex-col gap-2 px-1 py-1 @4xl/lobby:gap-3 @4xl/lobby:px-4">
         {/* The h1 is for screen readers; the visible line is information, so GO LIVE stays the only call to action. */}
@@ -44,7 +42,7 @@ export function ClassroomLobbyShell({ pinned, children, footer, aside, className
           </h1>
           <p
             data-testid="lobby-stage-subtitle"
-            className="rounded-full bg-neo-navy/85 px-3 py-0.5 font-neo-body text-xs font-bold text-neo-cream @4xl/lobby:px-4 @4xl/lobby:py-1 @4xl/lobby:text-base"
+            className="hidden font-neo-body text-xs font-bold text-neo-cream/70 @lg/lobby:block @4xl/lobby:text-sm"
           >
             {tr(t, 'academy.launch.subtitle', 'Pick a game. Your class joins with one code.')}
           </p>

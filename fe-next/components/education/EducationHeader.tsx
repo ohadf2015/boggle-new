@@ -49,6 +49,8 @@ interface EducationHeaderProps {
   backHref?: string;
   /** Replaces the navigation entirely, e.g. a live host who must confirm leaving first. */
   onBack?: () => void;
+  /** A quiet title for dense tool screens: normal case, never cut, no tagline. */
+  compact?: boolean;
 }
 
 /**
@@ -74,6 +76,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
   title,
   backHref,
   onBack,
+  compact = false,
 }) => {
   const { t, language } = useLanguage();
   const { isAuthenticated, profile } = useAuth();
@@ -163,7 +166,8 @@ export const EducationHeader = memo<EducationHeaderProps>(({
           'shadow-hard-lg',
           'rounded-neo-lg',
           'transition duration-100',
-          'min-w-0'
+          'min-w-0',
+          compact && 'gap-2'
         )}
       >
         {/* Left Section: Back button + Logo */}
@@ -214,10 +218,12 @@ export const EducationHeader = memo<EducationHeaderProps>(({
             {/* Logo text — truncate so help + hamburger never get pushed off a 320px phone. */}
             <div className="flex min-w-0 flex-col">
               <span
+                data-testid="edu-header-title"
                 className={cn(
-                  'truncate text-lg sm:text-xl lg:text-2xl font-black uppercase tracking-tight',
+                  compact
+                    ? 'font-neo-display text-base font-bold leading-[1.1] sm:text-lg lg:text-xl'
+                    : 'truncate text-lg sm:text-xl lg:text-2xl font-black uppercase tracking-tight leading-none',
                   'text-neo-white',
-                  'leading-none',
                   !title && 'hidden sm:block'
                 )}
               >
@@ -235,7 +241,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
               )}
               <span
                 className={cn(
-                  'hidden sm:block',
+                  compact ? 'hidden' : 'hidden sm:block',
                   'text-xs sm:text-sm font-bold uppercase tracking-wide',
                   'text-neo-cyan',
                   'leading-none'

@@ -8,7 +8,6 @@ import { useNavigation } from '@/contexts/NavigationContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { TV_STAGE_ZOOM_CLASS } from '@/components/education/lobby/tvStageScale';
-import { LaunchStageBackdrop } from '@/components/education/lobby/LaunchStageBackdrop';
 import { QuickLaunchStage } from '@/components/teacher/hq/QuickLaunchStage';
 import { ClassroomGameLobby } from '@/components/education/ClassroomGameLobby';
 import { ClassroomGameLoadingShell } from './ClassroomGameLoadingShell';
@@ -150,14 +149,12 @@ function ClassroomGameInner() {
        shrink:1 — so `h-dvh` alone collapsed the whole lobby to 160px and
        `overflow-hidden` clipped the mode picker to a two-pixel sliver. */
     <div className={cn('relative flex h-dvh shrink-0 flex-col overflow-hidden bg-neo-navy w-full', isRTL && 'rtl')}>
-      {/* The arena the class is about to play in — behind header and picker. */}
-      <LaunchStageBackdrop />
-      <EducationHeader showBackButton title={t('education.classroomGame.title')} />
+      <EducationHeader compact showBackButton title={t('education.classroomGame.title')} />
 
       {/* TV_STAGE_ZOOM_CLASS: on a 1920/2560 wall the whole launch column
-          scales up together (CSS zoom), instead of an 880px card lost in the
-          arena art. Laptops are untouched — see tvStageScale. */}
-      <main className={cn('relative flex min-h-0 flex-1 w-full max-w-7xl mx-auto flex-col overflow-hidden px-3 py-3 sm:px-6', TV_STAGE_ZOOM_CLASS)}>
+          scales up together (CSS zoom), instead of an 880px card lost on the
+          wall. Laptops are untouched — see tvStageScale. */}
+      <main className={cn('relative flex min-h-0 flex-1 w-full max-w-7xl mx-auto flex-col overflow-hidden px-3 py-2 sm:px-6 sm:py-3', TV_STAGE_ZOOM_CLASS)}>
         {provisioning && quickLaunchIntent ? (
           <QuickLaunchProvisioner intent={quickLaunchIntent} onReady={onQuickLaunchReady} onOpenFullSetup={openFullSetup} />
         ) : (

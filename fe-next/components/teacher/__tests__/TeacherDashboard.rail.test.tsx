@@ -45,14 +45,13 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe('Teacher Home ready-to-run rail', () => {
-  it('Given a class, Then 4-6 session cards sit right after the hero in the main column, each running for that class', () => {
+  it('Given a class, Then one row of three session cards sits right after the hero in the main column, each running for that class', () => {
     render(<TeacherDashboard />);
     const rail = screen.getByTestId('home-session-rail');
     expect(rail.closest('aside')).toBeNull();
     expect(rail.previousElementSibling?.lastElementChild).toContainElement(screen.getByTestId('home-hero'));
     const runs = within(rail).getAllByTestId('home-session-run');
-    expect(runs.length).toBeGreaterThanOrEqual(4);
-    expect(runs.length).toBeLessThanOrEqual(6);
+    expect(runs).toHaveLength(3);
     for (const run of runs) {
       const url = new URL(run.getAttribute('href') ?? '', 'https://x.test');
       expect(url.searchParams.get('classroomId')).toBe('c5b');
@@ -96,7 +95,7 @@ describe('Teacher Home ready-to-run rail', () => {
       lessonsState = { lessons: [], isLoading: true, error: null };
       render(<TeacherDashboard />);
       act(() => vi.advanceTimersByTime(2600));
-      expect(screen.getAllByTestId('home-session-card').length).toBeGreaterThanOrEqual(4);
+      expect(screen.getAllByTestId('home-session-card')).toHaveLength(3);
     } finally {
       vi.useRealTimers();
     }
@@ -110,12 +109,12 @@ describe('Teacher Home ready-to-run rail', () => {
     expect(screen.queryByTestId('home-coach-cue')).toBeNull();
   });
 
-  it('Given many classes, Then the rail follows the selected class and the class list still renders', () => {
+  it('Given many classes, Then the rail follows the selected class and the hero switcher offers the others', () => {
     classroomsState = { ...classroomsState, classrooms: [...ONE_CLASS, { id: 'c4a', name: '4A', member_count: 20, join_code: 'ZZ11', language: 'he' }] };
     render(<TeacherDashboard />);
     const [run] = screen.getAllByTestId('home-session-run');
     expect(new URL(run.getAttribute('href') ?? '', 'https://x.test').searchParams.get('classroomId')).toBe('c5b');
-    expect(screen.getAllByTestId('home-class-row')).toHaveLength(2);
+    expect(within(screen.getByTestId('home-hero')).getByRole('button', { name: 'eduShell.home.switchClass' })).toBeInTheDocument();
   });
 
   it('Then See all opens every ready-to-run session', () => {

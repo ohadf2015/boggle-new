@@ -18,10 +18,11 @@ export interface LobbyLessonStepProps {
   wordCount: number;
   boardLanguage?: string | null;
   activePreset: ClassroomPresetId | null;
+  className?: string;
 }
 
 /** The word list: one confirm-at-a-glance row, with the picker one tap away and open when nothing is chosen. */
-export function LobbyLessonStep({ lessons, selectedLessonIds, onChange, classLanguage, createHref, wordCount, boardLanguage, activePreset }: LobbyLessonStepProps) {
+export function LobbyLessonStep({ lessons, selectedLessonIds, onChange, classLanguage, createHref, wordCount, boardLanguage, activePreset, className }: LobbyLessonStepProps) {
   const { t } = useLanguage();
   const [opened, setOpened] = useState(false);
   const missing = selectedLessonIds.length === 0 || wordCount === 0;
@@ -29,7 +30,7 @@ export function LobbyLessonStep({ lessons, selectedLessonIds, onChange, classLan
   const names = lessons.filter((l) => selectedLessonIds.includes(l.id)).map((l) => l.name).join(', ');
 
   return (
-    <section data-testid="lobby-lesson-step" className="flex flex-col gap-3">
+    <section data-testid="lobby-lesson-step" className={cn('flex flex-col gap-3', className)}>
       <button
         type="button"
         data-testid="lobby-lesson-toggle"
@@ -37,39 +38,41 @@ export function LobbyLessonStep({ lessons, selectedLessonIds, onChange, classLan
         disabled={missing}
         onClick={() => setOpened((v) => !v)}
         className={cn(
-          'flex min-h-11 w-full items-center gap-2 rounded-neo border-2 px-3 py-2 text-start font-neo-body text-sm font-bold transition-colors',
+          'flex min-h-11 w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-neo border-2 px-3 py-1.5 text-start font-neo-body text-sm font-bold transition-colors',
           'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
           missing
             ? 'border-neo-pink bg-neo-navy-light text-neo-white'
-            : 'border-neo-cream/45 bg-neo-navy/80 text-neo-cream hover:bg-neo-navy'
+            : 'border-neo-cream/35 bg-neo-navy-light text-neo-cream hover:border-neo-cream/50'
         )}
       >
         {missing ? (
           <TriangleAlert className="size-4 shrink-0 text-neo-pink" strokeWidth={3} aria-hidden="true" />
         ) : (
-          <BookOpen className="size-4 shrink-0 text-neo-lime" strokeWidth={3} aria-hidden="true" />
+          <BookOpen className="size-4 shrink-0 text-neo-cream/70" strokeWidth={2.5} aria-hidden="true" />
         )}
         <span
           {...(missing ? { 'data-testid': 'mode-picker-blocked', role: 'alert' } : {})}
-          className="min-w-0 flex-1 truncate"
+          className="min-w-0 flex-[1_1_auto]"
           dir="auto"
         >
           {missing ? t('education.modePicker.needsLesson') : names}
         </span>
         {!missing && (
-          <span className="shrink-0 text-neo-cream/75">{t('education.classroomGame.words', { count: wordCount })}</span>
+          <span className="shrink-0 font-normal text-neo-cream/70">{t('education.classroomGame.words', { count: wordCount })}</span>
         )}
-        {boardLanguage && !missing && <BoardLanguageChip language={boardLanguage} />}
+        {boardLanguage && !missing && (
+          <BoardLanguageChip language={boardLanguage} className="rounded-full border border-neo-cream/35 bg-transparent font-normal text-neo-cream/80" />
+        )}
         {!missing && (
-          <span className="inline-flex shrink-0 items-center gap-1 rounded-full border-2 border-black bg-neo-cyan px-3 py-1 font-neo-display text-xs font-black uppercase text-black shadow-hard-sm">
+          <span className="inline-flex shrink-0 items-center gap-1 rounded-neo border-2 border-neo-cream/50 px-2.5 py-1 font-neo-body text-xs font-bold text-neo-cream">
             {t(open ? 'eduShell.host.listDone' : 'eduShell.host.changeList')}
-            <ChevronDown className={cn('size-4 transition-transform duration-200 motion-reduce:transition-none', open && 'rotate-180')} strokeWidth={3} aria-hidden="true" />
+            <ChevronDown className={cn('size-3.5 transition-transform duration-200 motion-reduce:transition-none', open && 'rotate-180')} strokeWidth={3} aria-hidden="true" />
           </span>
         )}
       </button>
 
       {open && (
-        <div data-testid="lobby-lesson-body" className="rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light/60 p-3">
+        <div data-testid="lobby-lesson-body" className="rounded-neo border-2 border-neo-cream/35 bg-neo-navy-light p-3">
           <LessonPicker
             mode="multi"
             lessons={lessons}

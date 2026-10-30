@@ -14,4 +14,12 @@ describe('<LobbyClassPicker>', () => {
     expect(screen.getAllByRole('radio')).toHaveLength(2);
     expect(screen.getByRole('radio', { name: '4A' })).toHaveAttribute('aria-checked', 'true');
   });
+
+  it('Given the selected class past the edge of a narrow row, Then the row scrolls it into view', () => {
+    const spy = vi.fn();
+    Element.prototype.scrollIntoView = spy;
+    render(<LobbyClassPicker classrooms={[{ id: 'a', name: '5B' }, { id: 'b', name: '4A' }, { id: 'c', name: '3C' }]} selectedId="c" onSelect={vi.fn()} label="Class" />);
+    expect(spy).toHaveBeenCalledWith({ block: 'nearest', inline: 'nearest' });
+    expect(spy.mock.contexts[0]).toBe(screen.getByRole('radio', { name: '3C' }));
+  });
 });

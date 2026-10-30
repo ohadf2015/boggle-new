@@ -30,7 +30,7 @@ export interface HomeProCardProps {
 }
 
 const CTA =
-  'inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-neo border-[2px] border-neo-yellow bg-transparent px-3 font-neo-display text-sm font-black leading-tight text-neo-yellow transition-colors duration-150 hover:bg-neo-yellow hover:text-neo-black active:scale-[0.97] disabled:opacity-60 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy';
+  'inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-neo border-2 border-neo-cream/40 bg-transparent px-2 text-center font-neo-display text-xs font-bold leading-tight text-neo-cream transition-colors duration-150 hover:border-neo-cream hover:bg-neo-cream/10 active:scale-[0.97] disabled:opacity-60 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy';
 
 /**
  * The one Pro ask on Home (free teachers only). Same single-trial rules as the
@@ -60,27 +60,27 @@ export function HomeProCard({ kind, onDismiss, trackImpression, language, t }: H
   );
 
   return (
-    <section ref={cardRef} data-testid="home-pro-card" data-kind={kind} data-offer={proOffer.offer} aria-labelledby="home-pro-title" className="relative rounded-neo-lg border-[2px] border-neo-yellow/80 bg-neo-navy p-3">
+    <section ref={cardRef} data-testid="home-pro-card" data-kind={kind} data-offer={proOffer.offer} aria-labelledby="home-pro-title" className="relative rounded-neo-lg border-2 border-neo-cream/35 bg-neo-navy-light p-2.5 sm:p-3">
       <button
         type="button"
         data-testid="home-pro-dismiss"
         onClick={onDismiss}
         aria-label={t('eduShell.pro.dismiss')}
-        className="absolute end-0.5 top-0.5 z-10 grid size-11 place-items-center rounded-neo text-neo-cream/70 transition-colors hover:bg-neo-cream/10 hover:text-neo-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
+        className="absolute end-0.5 top-0.5 z-10 grid size-11 place-items-center rounded-neo text-neo-cream/70 transition-colors hover:bg-neo-cream/10 hover:text-neo-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cream"
       >
         <X className="size-4" aria-hidden="true" />
       </button>
       <div className="flex items-center gap-2.5 pe-9">
-        <EduMascot moment="pro" size={44} className="size-11 shrink-0" />
+        <EduMascot moment="pro" size={36} className="size-9 shrink-0 max-lg:hidden" />
         <h2 id="home-pro-title" className="min-w-0 font-neo-display text-sm font-black leading-snug text-neo-cream">
-          <span className="me-1.5 inline-flex translate-y-[-1px] items-center gap-1 rounded-neo bg-neo-yellow px-1.5 py-px align-middle text-[11px] font-black uppercase text-neo-black">
+          <span data-testid="home-pro-badge" className="me-1.5 inline-flex translate-y-[-1px] items-center gap-1 rounded-neo bg-neo-yellow px-1.5 py-px align-middle text-[11px] font-black uppercase text-neo-black">
             <Crown className="size-3" aria-hidden="true" />
             {t('eduShell.nav.pro')}
           </span>
           {proOffer.title ?? t('eduShell.pro.title')}
         </h2>
       </div>
-      <div className="mt-2.5 flex flex-col gap-1">
+      <div className="mt-1.5 flex flex-col gap-1 sm:mt-2">
         <button
           type="button"
           data-testid="home-pro-cta"
@@ -100,7 +100,7 @@ export function HomeProCard({ kind, onDismiss, trackImpression, language, t }: H
           {trial.pending ? <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : null}
           {proOffer.label}
         </button>
-        <p data-testid="home-pro-note" className="text-center font-neo-body text-[11px] text-neo-cream/75">{proOffer.note}</p>
+        <p data-testid="home-pro-note" className="text-center font-neo-body text-xs text-neo-cream/70">{proOffer.note}</p>
       </div>
     </section>
   );

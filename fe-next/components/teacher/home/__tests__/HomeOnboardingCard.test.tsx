@@ -88,4 +88,11 @@ describe('<HomeOnboardingCard>', () => {
     fireEvent.click(screen.getByTestId('home-onboarding-dismiss'));
     expect(onDismiss).toHaveBeenCalledTimes(1);
   });
+
+  it('Given the compact nudge, Then its progress dots are neutral and its title wraps instead of cutting off', () => {
+    render(<HomeOnboardingCard onboarding={shared} hrefs={HREFS} variant="compact" t={t} />);
+    const card = screen.getByTestId('home-onboarding');
+    for (const dot of within(card).getAllByTestId(/^home-onboarding-step-/)) expect(dot.className).not.toMatch(/neo-lime/);
+    expect(card.querySelector('#home-onboarding-title')?.className).not.toMatch(/truncate|line-clamp/);
+  });
 });

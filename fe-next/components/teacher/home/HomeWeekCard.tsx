@@ -11,9 +11,9 @@ import { PANEL, SKELETON } from './homeStyles';
 type T = (key: string, params?: Record<string, string | number>) => string;
 
 const STATS = [
-  { id: 'games', key: 'gamesPlayed', label: 'eduShell.week.games', ink: 'text-neo-lime' },
-  { id: 'students', key: 'totalStudents', label: 'eduShell.week.students', ink: 'text-neo-cyan' },
-  { id: 'active', key: 'activeClasses', label: 'eduShell.week.active', ink: 'text-neo-pink' },
+  { id: 'games', key: 'gamesPlayed', label: 'eduShell.week.games' },
+  { id: 'students', key: 'totalStudents', label: 'eduShell.week.students' },
+  { id: 'active', key: 'activeClasses', label: 'eduShell.week.active' },
 ] as const;
 
 /** Three real numbers for the last 7 days, with the mascot reacting; "—" when the read failed. */
@@ -22,8 +22,8 @@ export function HomeWeekCard({ summary, status, t, children }: { summary: Teache
   return (
     <section data-testid="home-week" aria-labelledby="home-week-title" className={cn(PANEL, 'flex flex-col gap-2 p-3')}>
       <div className="flex items-center gap-3">
-        <div className="grid size-16 shrink-0 place-items-center">
-          {pose ? <EduMascot moment={pose} size={64} className="size-16" /> : null}
+        <div className="grid size-10 shrink-0 place-items-center">
+          {pose ? <EduMascot moment={pose} size={40} className="size-10" /> : null}
         </div>
         <div className="min-w-0 flex-1">
           <h2 id="home-week-title" className="font-neo-display text-base font-black text-neo-cream">
@@ -32,7 +32,7 @@ export function HomeWeekCard({ summary, status, t, children }: { summary: Teache
           <dl className="mt-1 grid grid-cols-3 gap-2">
             {STATS.map((s) => (
               <div key={s.id} className="flex min-w-0 flex-col">
-                <dd data-testid={`home-week-${s.id}`} className={cn('font-neo-display text-2xl font-black tabular-nums leading-none', s.ink)}>
+                <dd data-testid={`home-week-${s.id}`} className="font-neo-display text-2xl font-black tabular-nums leading-none text-neo-cream">
                   {status === 'loading' ? (
                     <span aria-hidden="true" className={cn(SKELETON, 'inline-block h-6 w-7')} />
                   ) : summary ? (
@@ -41,7 +41,7 @@ export function HomeWeekCard({ summary, status, t, children }: { summary: Teache
                     '—'
                   )}
                 </dd>
-                <dt className="mt-0.5 font-neo-body text-[11px] font-semibold leading-tight text-neo-cream/80">{t(s.label)}</dt>
+                <dt className="mt-0.5 font-neo-body text-xs font-semibold leading-tight text-neo-cream/70">{t(s.label)}</dt>
               </div>
             ))}
           </dl>

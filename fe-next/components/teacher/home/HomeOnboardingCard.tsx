@@ -115,7 +115,7 @@ export function HomeOnboardingCard(props: HomeOnboardingCardProps) {
         data-testid="home-onboarding"
         data-source={step.source}
         aria-labelledby="home-onboarding-title"
-        className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2 rounded-neo border-[2px] border-neo-cream/50 bg-neo-navy/60 py-1.5 pe-1.5 ps-3"
+        className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2 rounded-neo border-2 border-neo-cream/35 bg-neo-navy py-1.5 pe-1.5 ps-3"
       >
         <ol aria-label={`${copy.heading} · ${progress}`} className="flex shrink-0 gap-1">
           {copy.steps.map((s) => (
@@ -124,15 +124,15 @@ export function HomeOnboardingCard(props: HomeOnboardingCardProps) {
               data-testid={`home-onboarding-step-${s.id}`}
               data-status={s.done ? 'done' : s.current ? 'current' : 'todo'}
               className={cn(
-                'h-2.5 w-5 rounded-full border-[2px] border-neo-black sm:w-7',
-                s.done ? 'bg-neo-lime' : s.current ? 'bg-neo-lime/35' : 'bg-neo-cream/15',
+                'h-2 w-5 rounded-full sm:w-7',
+                s.done ? 'bg-neo-cream' : s.current ? 'bg-neo-cream/50' : 'bg-neo-cream/15',
               )}
             >
               <span className="sr-only">{s.title}</span>
             </li>
           ))}
         </ol>
-        <h2 id="home-onboarding-title" className="min-w-0 flex-1 truncate font-neo-body text-sm font-bold text-neo-cream">
+        <h2 id="home-onboarding-title" className="min-w-0 flex-1 font-neo-body text-sm font-bold leading-snug text-neo-cream">
           {copy.title}
         </h2>
         <div className="flex min-w-0 items-center justify-end gap-1 max-sm:basis-full">

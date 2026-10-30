@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import { ClassroomModeCatalogue, ClassroomModeCardRow } from '../ClassroomModeCatalogue';
-import { catalogueModes } from '../ClassroomModeCatalogueData';
+import { catalogueEntry, catalogueModes } from '../ClassroomModeCatalogueData';
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
@@ -66,9 +66,9 @@ describe('<ClassroomModeCatalogue>', () => {
     expect(inline.map((li) => li.textContent)).toEqual([1, 2, 3].map((n) => `${n}eg2Modes.steps.blast.${n}`));
   });
 
-  it('plays a preview of the selected mode and can open the three-step how-it-plays on a phone', () => {
+  it('shows the selected mode cover and can open the three-step how-it-plays on a phone', () => {
     setup({ selected: 'blast' });
-    expect(screen.getByTestId('mode-preview')).toHaveAttribute('data-preview', 'blast');
+    expect(screen.getByTestId('spotlight-art').querySelector('img')?.getAttribute('src')).toBe(catalogueEntry('blast')!.cover);
     expect(screen.queryByTestId('how-it-plays')).not.toBeInTheDocument();
     fireEvent.click(screen.getByTestId('how-it-plays-toggle'));
     const steps = within(screen.getByTestId('how-it-plays')).getAllByRole('listitem');
@@ -117,10 +117,10 @@ describe('<ClassroomModeCatalogue>', () => {
     expect(onPick).toHaveBeenCalledWith('boss-battle');
   });
 
-  it('spotlights Boss Battle with its own name and a boss preview', () => {
+  it('spotlights Boss Battle with its own name and its own cover', () => {
     setup({ selected: 'boss-battle' });
     expect(screen.getByTestId('mode-spotlight')).toHaveTextContent('eg2Modes.boss.name');
-    expect(screen.getByTestId('mode-preview')).toHaveAttribute('data-preview', 'boss');
+    expect(screen.getByTestId('spotlight-art').querySelector('img')?.getAttribute('src')).toBe(catalogueEntry('boss-battle')!.cover);
     expect(screen.getByTestId('spec-style')).toHaveTextContent('eg2Modes.style.class');
   });
 

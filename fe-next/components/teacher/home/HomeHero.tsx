@@ -10,10 +10,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { EduMascot } from '@/components/education/EduMascot';
 import { teacherHostHref } from '@/lib/education/teacherHostHref';
 import { HqProjectorSheet } from '@/components/teacher/hq/HqProjectorSheet';
-import { PANEL, PRIMARY_BUTTON } from './homeStyles';
+import { OUTLINE_BUTTON, PANEL, PRIMARY_BUTTON } from './homeStyles';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -42,51 +41,45 @@ export interface HomeHeroProps {
   corner?: ReactNode;
   /** False while the Get students in card owns the code, so it never shows twice. */
   showCode?: boolean;
+  /** Replaces the code panel: the Get students in card for a class still below its student goal. */
+  codeSlot?: ReactNode;
 }
 
-const TILE_TILT = [-2.5, 1.5, -1, 2, -1.5, 1] as const;
-
 /** The class desk: which class, its join code at a glance, and the one Start button. */
-export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, t, rehearse, nudge, meta, insight, corner, showCode = true }: HomeHeroProps) {
+export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, t, rehearse, nudge, meta, insight, corner, showCode = true, codeSlot }: HomeHeroProps) {
   const selected = classrooms.find((c) => c.id === selectedId) ?? classrooms[0];
   const [pending, setPending] = useState(false);
   const [projectorOpen, setProjectorOpen] = useState(false);
   const code = showCode ? (selected?.join_code?.trim() ?? '') : '';
 
   return (
-    <section data-testid="home-hero" aria-labelledby="home-hero-title" className={cn(PANEL, 'relative overflow-hidden')}>
-      <div className="flex flex-col gap-5 p-4 sm:p-6">
-        <div className="flex min-w-0 flex-col gap-2">
+    <section data-testid="home-hero" aria-labelledby="home-hero-title" className={cn(PANEL, 'relative')}>
+      <div className="flex flex-col gap-2.5 p-3 sm:gap-4 sm:p-5">
+        <div className="flex min-w-0 flex-col gap-1 sm:gap-1.5">
           <div className="flex items-center justify-between gap-3">
-            <span className="font-neo-body text-sm font-bold text-neo-cream/75 sm:text-base">{t('eduShell.home.startWith')}</span>
+            <span className="font-neo-body text-sm font-bold text-neo-cream/70">{t('eduShell.home.startWith')}</span>
             {corner}
           </div>
-          <h2 id="home-hero-title" className="min-w-0 font-neo-display text-3xl font-black leading-[1.05] text-neo-lime sm:text-4xl xl:text-5xl">
+          <h2 id="home-hero-title" className="min-w-0 font-neo-display text-2xl font-black leading-tight text-neo-cream sm:text-3xl">
             <ClassPicker classrooms={classrooms} selected={selected} onSelect={onSelect} t={t} />
           </h2>
           {meta}
         </div>
 
-        {code ? (
+        {codeSlot ?? (code ? (
           <div
             data-testid="home-desk-code-panel"
-            className="relative flex flex-wrap items-center gap-x-5 gap-y-3 rounded-neo-lg border-[3px] border-neo-black bg-neo-cyan p-4 text-neo-black shadow-hard 2xl:pe-28"
+            className="flex flex-wrap items-center gap-x-2 gap-y-1.5 rounded-neo border-2 border-neo-cream/35 bg-neo-navy p-2.5 sm:gap-x-3 sm:p-3"
           >
-            <EduMascot
-              moment="scanJoin"
-              size={112}
-              className="pointer-events-none absolute -bottom-2 end-1 hidden size-24 2xl:block motion-safe:animate-[edu-mascot-bob_4.5s_ease-in-out_infinite]"
-            />
-            <span className="w-full font-neo-display text-sm font-black uppercase tracking-wide xl:w-auto">{t('academy.hq.classCode')}</span>
-            <p data-testid="home-desk-code" className="flex gap-1.5 sm:gap-2" dir="ltr">
+            <span className="w-full font-neo-body text-xs font-bold text-neo-cream/70 max-sm:sr-only">{t('academy.hq.classCode')}</span>
+            <p data-testid="home-desk-code" className="flex gap-1 sm:gap-1.5" dir="ltr">
               <span className="sr-only">{code}</span>
               {Array.from(code).map((ch, i) => (
                 <span
                   key={`${ch}-${i}`}
                   aria-hidden="true"
                   data-testid="home-desk-code-tile"
-                  style={{ rotate: `${TILE_TILT[i % TILE_TILT.length]}deg`, animationDelay: `${i * 45}ms` }}
-                  className="grid size-10 place-items-center rounded-neo border-[3px] border-neo-black bg-neo-cream font-neo-display text-xl font-black uppercase text-neo-black shadow-hard-sm sm:size-14 sm:text-3xl lg:size-12 lg:text-2xl 2xl:size-14 2xl:text-3xl motion-safe:animate-[edu-tile-drop_420ms_cubic-bezier(0.23,1,0.32,1)_both]"
+                  className="grid size-9 place-items-center rounded-neo border-2 border-neo-black bg-neo-cream font-neo-display text-lg font-black uppercase text-neo-black sm:size-11 sm:text-2xl"
                 >
                   {ch}
                 </span>
@@ -97,19 +90,15 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
               data-testid="home-class-code"
               onClick={() => setProjectorOpen(true)}
               aria-label={t('eduShell.home.showCodeFor', { name: selected?.name ?? '' })}
-              className={cn(
-                'inline-flex min-h-11 items-center justify-center gap-2 rounded-neo border-[3px] border-neo-navy bg-neo-navy px-4 font-neo-display text-base font-black text-neo-cream shadow-hard-sm',
-                'transition-[transform,box-shadow] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] hover:-translate-y-0.5 hover:shadow-hard active:scale-[0.97] motion-reduce:transition-none',
-                'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-navy focus-visible:ring-offset-2 focus-visible:ring-offset-neo-cyan',
-              )}
+              className={cn(OUTLINE_BUTTON, 'max-sm:min-w-11 max-sm:px-0')}
             >
               <Projector className="size-5" aria-hidden="true" />
-              {t('academy.hq.openProjector')}
+              <span className="max-sm:hidden">{t('academy.hq.openProjector')}</span>
             </button>
           </div>
-        ) : null}
+        ) : null)}
 
-        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-4">
+        <div className="flex items-center gap-x-2 gap-y-1 sm:flex-wrap sm:gap-x-4">
           <Link
             href={teacherHostHref(language, { classroomId: selected?.id })}
             data-testid="home-start-live"
@@ -119,24 +108,20 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
               setPending(true);
               onStart?.();
             }}
-            className={cn(PRIMARY_BUTTON, 'min-h-[60px] w-full text-xl sm:w-auto sm:min-w-[18rem]')}
+            className={cn(PRIMARY_BUTTON, 'whitespace-nowrap max-sm:min-w-0 max-sm:flex-1 max-sm:px-3 sm:min-w-[16rem]')}
           >
             {pending ? (
-              <Loader2 className="size-6 animate-spin motion-reduce:animate-none" aria-hidden="true" />
+              <Loader2 className="size-5 animate-spin motion-reduce:animate-none" aria-hidden="true" />
             ) : (
-              <Play className="size-6 fill-current" aria-hidden="true" />
+              <Play className="size-5 fill-current" aria-hidden="true" />
             )}
             {t('eduShell.home.startLive')}
           </Link>
           {rehearse}
         </div>
 
-        {insight || nudge ? (
-          <div className="flex min-w-0 flex-col gap-3">
-            {insight ? <div className="rounded-neo border-[2px] border-neo-cream/50 bg-neo-navy p-3">{insight}</div> : null}
-            {nudge}
-          </div>
-        ) : null}
+        {codeSlot ? null : insight}
+        {nudge}
       </div>
 
       {projectorOpen && selected && code ? (
@@ -174,14 +159,14 @@ function ClassPicker({
         data-testid="home-class-switcher"
         aria-label={t('eduShell.home.switchClass')}
         className={cn(
-          'inline-flex min-h-[44px] min-w-0 max-w-full items-center gap-1 rounded-neo border-b-[3px] border-dashed border-neo-lime px-1 text-start',
-          'transition-colors duration-150 hover:bg-neo-lime/10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
+          'inline-flex min-h-[44px] min-w-0 max-w-full items-center gap-1 rounded-neo border-b-2 border-dashed border-neo-cream/40 px-1 text-start',
+          'transition-colors duration-150 hover:bg-neo-cream/10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream',
         )}
       >
         {label}
-        <ChevronDown className="size-7 shrink-0" aria-hidden="true" />
+        <ChevronDown className="size-6 shrink-0" aria-hidden="true" />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="max-h-72 w-64 overflow-y-auto rounded-neo border-[3px] border-neo-cream bg-neo-navy-light p-1 shadow-hard">
+      <DropdownMenuContent align="start" className="max-h-72 w-64 overflow-y-auto rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light p-1 shadow-hard">
         {classrooms.map((c) => (
           <DropdownMenuItem
             key={c.id}

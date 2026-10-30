@@ -3,7 +3,7 @@
 import { useId, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Play } from 'lucide-react';
+import { ArrowRight, Check, Play } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Language } from '@/lib/supabase/education/types';
 import type { GradeBand } from '@/lib/education/library';
@@ -11,7 +11,7 @@ import { EDU_MASCOT } from '@/lib/education/mascotArt';
 import { homeSessionRail, railRunHref, type RailSession } from '@/lib/education/homeSessionRail';
 import { gradeBandsLabel } from '@/components/teacher/StarterPacksSection.data';
 import { HomeSessionAll } from './HomeSessionAll';
-import { QUIET_LINK } from './homeStyles';
+import { CHIP, OUTLINE_BUTTON, QUIET_LINK } from './homeStyles';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -24,7 +24,7 @@ export const LANGUAGE_NAME_KEY: Record<Language, string> = {
   ru: 'languages.russian',
 };
 
-const CHIP = 'inline-flex items-center rounded-neo border-2 border-neo-black px-2 py-0.5 font-neo-body text-xs font-black uppercase text-neo-black';
+const ROW_SIZE = 3;
 
 export interface HomeSessionRailProps {
   classroomId: string;
@@ -44,33 +44,30 @@ function SessionCard({ item, language, gradeBand, href, t }: { item: RailSession
   return (
     <li
       data-testid="home-session-card"
-      className="group relative flex w-[78%] shrink-0 snap-start flex-col gap-2 rounded-neo-lg border-[3px] border-neo-cream/80 bg-neo-navy-light p-3 shadow-hard transition-[transform,box-shadow] duration-150 ease-out focus-within:-translate-y-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg motion-reduce:transition-none @lg:w-[46%] @2xl:w-auto"
+      className="group relative grid w-full shrink-0 snap-start grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-2.5 gap-y-1 rounded-neo-lg border-2 border-neo-cream/35 bg-neo-navy-light p-2.5 sm:gap-y-1.5 sm:p-3 transition-colors duration-150 focus-within:border-neo-cream/60 hover:border-neo-cream/60 motion-reduce:transition-none"
     >
-      <div className="flex items-start gap-2">
-        <div className="min-w-0 flex-1">
-          <h3 className="font-neo-display text-lg font-black leading-tight text-neo-cream">{t(session.nameKey)}</h3>
-          <p className="mt-1 line-clamp-2 font-neo-body text-xs leading-snug text-neo-cream/80">{t(session.whenKey)}</p>
-        </div>
-        {session.mascot ? (
-          <Image src={EDU_MASCOT[session.mascot]} alt="" width={512} height={512} sizes="64px" className="-mt-1 size-16 shrink-0 object-contain transition-transform duration-200 ease-out group-hover:-rotate-6 group-hover:scale-110 motion-reduce:transition-none" />
-        ) : null}
-      </div>
-      <div className="flex flex-wrap items-center gap-1.5">
-        <span data-testid="home-session-minutes" className={cn(CHIP, 'bg-neo-lime')}>{t('education.modePicker.minutes', { count: item.minutes })}</span>
-        <span data-testid="home-session-grade" className={cn(CHIP, 'bg-neo-cyan')}>
-          {gradeBand ? t(`eduLibrary.grade.${gradeBand}`) : gradeBandsLabel(session.gradeBands, t)}
-        </span>
-        <span data-testid="home-session-language" className={cn(CHIP, 'bg-neo-cream')}>{t(LANGUAGE_NAME_KEY[language])}</span>
-      </div>
+      {session.mascot ? (
+        <Image src={EDU_MASCOT[session.mascot]} alt="" width={512} height={512} sizes="40px" className="row-span-2 size-10 object-contain sm:row-span-1" />
+      ) : (
+        <span aria-hidden="true" className="row-span-2 sm:row-span-1" />
+      )}
+      <h3 className="min-w-0 font-neo-display text-base font-bold leading-tight text-neo-cream">{t(session.nameKey)}</h3>
       <Link
         href={href}
         data-testid="home-session-run"
-        className="mt-auto inline-flex min-h-11 items-center justify-center gap-1.5 rounded-neo border-[2px] border-neo-cream bg-neo-navy px-3 font-neo-display text-sm font-black text-neo-cream transition-colors duration-150 after:absolute after:inset-0 after:rounded-neo-lg group-hover:border-neo-lime group-hover:text-neo-lime focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+        className={cn(OUTLINE_BUTTON, 'row-span-2 after:absolute after:inset-0 after:rounded-neo-lg max-sm:min-w-11 max-sm:px-0 sm:row-span-1')}
       >
         <Play className="size-4" aria-hidden="true" />
-        {t('eduShell.home.rail.run')}
+        <span className="max-sm:sr-only">{t('eduShell.home.rail.run')}</span>
         <span className="sr-only">{t(session.nameKey)}</span>
       </Link>
+      <div className="col-start-2 flex flex-wrap items-center gap-1.5 sm:col-span-3 sm:col-start-1">
+        <span data-testid="home-session-minutes" className={CHIP}>{t('education.modePicker.minutes', { count: item.minutes })}</span>
+        <span data-testid="home-session-grade" className={CHIP}>
+          {gradeBand ? t(`eduLibrary.grade.${gradeBand}`) : gradeBandsLabel(session.gradeBands, t)}
+        </span>
+        <span data-testid="home-session-language" className={CHIP}>{t(LANGUAGE_NAME_KEY[language])}</span>
+      </div>
     </li>
   );
 }
@@ -80,13 +77,13 @@ export function HomeSessionRail({ classroomId, languages, gradeBand, nowMs, last
   const [picked, setPicked] = useState<Language | null>(null);
   const [allOpen, setAllOpen] = useState(false);
   const language = picked && languages.includes(picked) ? picked : languages[0];
-  const rail = language ? homeSessionRail({ language, gradeBand, nowMs, lastPlayedMs }) : [];
+  const rail = language ? homeSessionRail({ language, gradeBand, nowMs, lastPlayedMs }).slice(0, ROW_SIZE) : [];
   if (ready && rail.length === 0) return null;
 
   return (
-    <section data-testid="home-session-rail" aria-labelledby={headingId} className={cn('@container flex min-w-0 flex-col gap-3', className)}>
+    <section data-testid="home-session-rail" aria-labelledby={headingId} className={cn('@container flex min-w-0 flex-col gap-2', className)}>
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-        <h2 id={headingId} className="font-neo-display text-xl font-black text-neo-cream">
+        <h2 id={headingId} className="font-neo-display text-lg font-bold text-neo-cream">
           {t('education.starterPacks.sessions.title')}
         </h2>
         <button type="button" data-testid="home-session-see-all" onClick={() => setAllOpen(true)} className={QUIET_LINK}>
@@ -104,23 +101,24 @@ export function HomeSessionRail({ classroomId, languages, gradeBand, nowMs, last
               aria-checked={code === language}
               onClick={() => setPicked(code)}
               className={cn(
-                'min-h-11 rounded-neo border-2 px-3 font-neo-body text-sm font-black transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
-                code === language ? 'border-neo-black bg-neo-lime text-neo-black' : 'border-neo-cream/60 text-neo-cream hover:border-neo-cream',
+                'inline-flex min-h-11 items-center gap-1 rounded-neo border-2 px-3 font-neo-body text-sm font-bold text-neo-cream transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream',
+                code === language ? 'border-neo-lime' : 'border-neo-cream/30 hover:border-neo-cream',
               )}
             >
+              {code === language ? <Check className="size-4" aria-hidden="true" /> : null}
               {t(LANGUAGE_NAME_KEY[code])}
             </button>
           ))}
         </div>
       ) : null}
       {ready && language ? (
-        <ul className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-px-4 px-4 pb-2 pt-1 [scrollbar-width:thin] @2xl:mx-0 @2xl:grid @2xl:grid-cols-3 @2xl:overflow-visible @2xl:px-0 @2xl:pb-0">
+        <ul className="flex snap-x snap-mandatory gap-3 overflow-x-auto [scrollbar-width:none] @2xl:grid @2xl:grid-cols-3 @2xl:overflow-visible">
           {rail.map((item) => (
             <SessionCard key={item.session.id} item={item} language={language} gradeBand={gradeBand} href={railRunHref(locale, item, classroomId)} t={t} />
           ))}
         </ul>
       ) : (
-        <div aria-busy="true" className="min-h-[11.5rem]" />
+        <div aria-busy="true" className="min-h-[6.25rem]" />
       )}
       {allOpen && language ? <HomeSessionAll open={allOpen} onOpenChange={setAllOpen} language={language} classroomId={classroomId} t={t} /> : null}
     </section>
