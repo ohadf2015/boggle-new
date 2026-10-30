@@ -13,6 +13,7 @@ import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import { STORAGE_SHIM_SCRIPT } from '@/utils/storageShim';
 import { CHUNK_BOOT_GUARD_SCRIPT } from '@/utils/chunkBootGuard';
 import { getLocalizedSchemaStrings } from '@/utils/seoLocalizedSchema';
+import { getWebAppDescription } from '@/lib/seo/webAppDescription';
 import { ANDROID_PACKAGE } from '@/utils/androidApp';
 import type { Language } from '@/shared/types/game';
 import SrSiteNav from './SrSiteNav';
@@ -297,7 +298,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
             },
             // aggregateRating removed — hardcoded ratings risk a Google manual action.
             // TODO: Wire to real user ratings from Supabase when available.
-            description: seo.description,
+            description: getWebAppDescription(validLocale),
             url: `https://www.lexiclash.live${localePath}`,
             image: {
                 '@type': 'ImageObject',
