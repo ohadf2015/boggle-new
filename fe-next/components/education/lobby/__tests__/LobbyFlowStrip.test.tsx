@@ -47,6 +47,14 @@ describe('LobbyFlowStrip: learn, solo, then the class plays live', () => {
     expect(screen.getByTestId('lobby-flow').querySelector('[data-src]')).toBeNull();
   });
 
+  it('Given a phone, Then the run sheet is one row: the step list is read aloud and the send button carries the row', () => {
+    render(<LobbyFlowStrip warmup={warmup()} modeName="Word Hunt" />);
+    const list = screen.getAllByTestId('lobby-flow-step')[0].parentElement!;
+    expect(list.className).toMatch(/max-sm:sr-only/);
+    const row = list.parentElement!;
+    expect(row.className).toMatch(/(^|\s)flex-row(\s|$)|max-sm:flex-row/);
+  });
+
   it('Then the live step names the game the class will play', () => {
     render(<LobbyFlowStrip warmup={warmup()} modeName="Word Hunt" />);
     const live = screen.getAllByTestId('lobby-flow-step')[2];

@@ -35,7 +35,7 @@ export function LobbySetupDisclosure({ label, summary, open, onToggle, children 
       >
         <SlidersHorizontal className="size-4 shrink-0" strokeWidth={3} aria-hidden="true" />
         <span className="shrink-0 font-bold text-neo-cream">{label}</span>
-        <span data-testid="lobby-setup-line" className="hidden min-w-0 flex-1 truncate @lg/lobby:block">{summary}</span>
+        <span data-testid="lobby-setup-line" className="hidden min-w-0 flex-1 leading-snug @lg/lobby:block">{summary}</span>
         <span className="ms-auto shrink-0 rounded-neo border-2 border-neo-cream/50 px-2.5 py-0.5 font-bold text-neo-cream">
           {t('eduShell.host.gameOptionsChange')}
         </span>

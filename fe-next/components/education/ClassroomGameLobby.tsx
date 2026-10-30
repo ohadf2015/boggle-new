@@ -347,6 +347,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
             selectedMinutes={roundMinutes}
             minutesFor={minutesFor}
             busy={isStarting}
+            dense={!!sessionPack}
             onPick={pickMode}
             t={tt}
           />

@@ -107,4 +107,18 @@ describe('<LobbyModeGrid> — the picker is the page', () => {
     renderGrid();
     expect(screen.getByTestId('mode-recommended').className).toContain('border-neo-cream');
   });
+
+  it('Given a lesson run sheet sits above the grid, When the grid is dense, Then the cover art goes shorter so the page still fits', () => {
+    renderGrid({ dense: true });
+    const art = screen.getByTestId('mode-tile-classic').querySelector('[data-testid="mode-card-cover"]')!.parentElement!;
+    expect(art.className).toMatch(/aspect-\[3\/1\]/);
+    expect(art.className).toMatch(/(^|\s)size-10(\s|$)/);
+  });
+
+  it('Given no run sheet, Then the cover art keeps its normal size', () => {
+    renderGrid();
+    const art = screen.getByTestId('mode-tile-classic').querySelector('[data-testid="mode-card-cover"]')!.parentElement!;
+    expect(art.className).not.toMatch(/aspect-\[3\/1\]/);
+    expect(art.className).toMatch(/(^|\s)size-12(\s|$)/);
+  });
 });

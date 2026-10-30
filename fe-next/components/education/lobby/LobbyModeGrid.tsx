@@ -16,12 +16,14 @@ export interface LobbyModeGridProps {
   selectedMinutes?: number;
   minutesFor?: (id: CatalogueMode['id']) => number;
   busy?: boolean;
+  /** Shorter covers when the lesson run sheet takes a row above the grid. */
+  dense?: boolean;
   onPick: (id: CatalogueMode['id']) => void;
   t: T;
 }
 
 /** Every game in one compact grid; a tile only selects, GO LIVE lives in the ready panel. */
-export function LobbyModeGrid({ selected, recommended = null, suggested = null, selectedMinutes, minutesFor, busy, onPick, t }: LobbyModeGridProps) {
+export function LobbyModeGrid({ selected, recommended = null, suggested = null, selectedMinutes, minutesFor, busy, dense = false, onPick, t }: LobbyModeGridProps) {
   const modes = catalogueModes();
   return (
     <div role="radiogroup" aria-label={t('eg2Modes.title')} data-testid="lobby-mode-grid" className="@container">
@@ -46,6 +48,7 @@ export function LobbyModeGrid({ selected, recommended = null, suggested = null, 
                     newLabel={suggested === mode.id && !isOn ? t('eduShell.host.untried') : null}
                     selected={isOn}
                     busy={busy}
+                    dense={dense}
                     onPick={onPick}
                     t={t}
                   />
@@ -71,6 +74,7 @@ function ModeTile({
   newLabel,
   selected,
   busy,
+  dense,
   onPick,
   t,
 }: {
@@ -81,6 +85,7 @@ function ModeTile({
   newLabel: string | null;
   selected: boolean;
   busy?: boolean;
+  dense?: boolean;
   onPick: (id: CatalogueMode['id']) => void;
   t: T;
 }) {
@@ -106,7 +111,14 @@ function ModeTile({
           : 'border-neo-cream/35 [@media(hover:hover)]:hover:border-neo-cream/50',
       )}
     >
-      <span className="relative block size-12 shrink-0 overflow-hidden rounded-[6px] @2xl:aspect-[16/9] @2xl:[@media(max-height:800px)]:aspect-[2/1] @2xl:min-h-[min(calc(50cqh-12rem),calc(25cqw-0.75rem))] @2xl:size-auto @2xl:w-full @2xl:rounded-none">
+      <span
+        className={cn(
+          'relative block shrink-0 overflow-hidden rounded-[6px] @2xl:aspect-[16/9] @2xl:size-auto @2xl:w-full @2xl:rounded-none',
+          dense
+            ? 'size-10 @2xl:[@media(max-height:800px)]:aspect-[3/1]'
+            : 'size-12 @2xl:[@media(max-height:800px)]:aspect-[2/1] @2xl:min-h-[min(calc(50cqh-12rem),calc(25cqw-0.75rem))]',
+        )}
+      >
         {/* eslint-disable-next-line @next/next/no-img-element -- static poster cover, same file as the catalogue */}
         <img
           data-testid="mode-card-cover"

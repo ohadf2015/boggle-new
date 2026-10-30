@@ -41,6 +41,14 @@ describe('HomeSessionRail on a tall screen', () => {
     expect(extra.length).toBeLessThanOrEqual(3);
   });
 
+  it('Given the calm cards are about 9rem tall, Then the second row opens once that much height is left, not only at the old picture-card height', () => {
+    renderRail();
+    const row = within(screen.getByTestId('home-session-more')).getAllByRole('list')[0];
+    const rem = Number(/session-more_\(min-height:([\d.]+)rem\)/.exec(row.className)?.[1]);
+    expect(rem).toBeGreaterThan(8);
+    expect(rem).toBeLessThanOrEqual(10);
+  });
+
   it('Given a phone or tablet carousel, Then the second row never shows', () => {
     renderRail();
     expect(screen.getByTestId('home-session-more').className).toMatch(/(^|\s)hidden @2xl:block(\s|$)/);

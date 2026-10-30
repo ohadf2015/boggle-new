@@ -34,4 +34,10 @@ describe('LobbySetupDisclosure as a modal', () => {
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(screen.getByTestId('lobby-setup-line')).toHaveTextContent('3 min · ffa');
   });
+
+  it('Given a narrow lobby, Then the summary wraps instead of cutting off with an ellipsis', () => {
+    render(<Harness />);
+    const line = screen.getByTestId('lobby-setup-line');
+    expect(line.className).not.toMatch(/(^|\s)(truncate|line-clamp-\d)(\s|$)/);
+  });
 });
