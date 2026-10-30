@@ -288,14 +288,17 @@ jobs:
       # never saves a new cache, so every later run restored the same (most likely
       # stale) `.next/cache` through the prefix restore-key and crashed the same way.
       # Bump the version to drop a poisoned cache; never delete the build step.
+      # Oct 30: the same ~2.5 min crash came back on v2 (1e416d37, PR 1535) while
+      # those commits built clean from scratch locally and on Railway. A cache
+      # from a different commit, restored through the prefix restore-key, is the
+      # likely trigger, so restore only an exact key match (same lockfile and
+      # same .ts/.tsx). A miss costs a full build (~5 min), not a red master.
       - name: Cache Next.js build
         uses: actions/cache@v4
         with:
           path: |
             fe-next/.next/cache
-          key: ${{ runner.os }}-node${{ env.NODE_VERSION }}-nextjs-v2-${{ hashFiles('fe-next/package-lock.json') }}-${{ hashFiles('fe-next/**/*.ts', 'fe-next/**/*.tsx') }}
-          restore-keys: |
-            ${{ runner.os }}-node${{ env.NODE_VERSION }}-nextjs-v2-${{ hashFiles('fe-next/package-lock.json') }}-
+          key: ${{ runner.os }}-node${{ env.NODE_VERSION }}-nextjs-v3-${{ hashFiles('fe-next/package-lock.json') }}-${{ hashFiles('fe-next/**/*.ts', 'fe-next/**/*.tsx') }}
 
       - name: Build
         working-directory: fe-next
