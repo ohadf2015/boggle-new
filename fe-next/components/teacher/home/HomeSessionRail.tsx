@@ -84,7 +84,7 @@ export function HomeSessionRail({ classroomId, languages, gradeBand, nowMs, last
       )}
       {ready && language && more.length > 0 ? (
         <div data-testid="home-session-more" className="hidden @2xl:block min-h-0 flex-1 [container:session-more/size]">
-          <ul className="hidden grid-cols-3 gap-3 pt-1 [@container_session-more_(min-height:9.5rem)]:grid">
+          <ul className="hidden grid-cols-3 gap-3 pt-1 [@container_session-more_(min-height:12.5rem)]:grid">
             {more.map((item, i) => (
               <HomeSessionFlowCard key={item.session.id} accent={CARD_ACCENTS[(rail.length + i) % CARD_ACCENTS.length]}item={item} language={language} gradeBand={gradeBand} href={railRunHref(locale, item, classroomId)} t={t} testId="home-session-card-more" />
             ))}

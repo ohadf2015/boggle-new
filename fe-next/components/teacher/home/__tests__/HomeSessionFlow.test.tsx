@@ -52,7 +52,10 @@ describe('HomeSessionRail flow cards', () => {
     accents.slice(1).forEach((a, i) => expect(a).not.toBe(accents[i]));
     expect(accents).not.toContain('lime');
     for (const card of cards) {
-      expect(card.className).toMatch(/border-t-neo-(cyan|pink|purple|yellow|orange)/);
+      const block = card.querySelector('[data-accent-decor][aria-hidden="true"]')!;
+      expect(block.className).toMatch(/bg-neo-(cyan|pink|purple|yellow|orange)/);
+      expect(block.querySelector('[data-src]')).not.toBeNull();
+      expect(block.querySelector('a,button')).toBeNull();
       expect(within(card).getByTestId('home-session-run').className).not.toMatch(/(^|\s)bg-neo-/);
     }
   });
