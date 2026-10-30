@@ -12176,6 +12176,7 @@ const sv = {
         "errors": "Fel",
         "gameCode": "Spel-kod",
         "invitedBy": "Inbjuden av",
+        "left": "Lämnade",
         "mode": "Läge",
         "platform": "Plattform",
         "players": "Spelare",
@@ -12184,6 +12185,13 @@ const sv = {
         "result": "Resultat",
         "session": "Session",
         "winner": "Vinnare"
+      },
+      "leaveReason": {
+        "hidden": "bytte flik eller app",
+        "pagehide": "stängde eller laddade om sidan",
+        "spa_navigate": "gick till en annan vy",
+        "exit": "tryckte på avsluta",
+        "give_up": "gav upp"
       },
       "status": {
         "abandoned": "Övergiven",

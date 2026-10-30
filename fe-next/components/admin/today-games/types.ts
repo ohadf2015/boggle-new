@@ -61,8 +61,11 @@ export interface UnifiedGame {
   event_type?: string;
   // Runtime platform stamped on the event: 'web' | 'ios' | 'android' (forward-only).
   platform?: string | null;
-  // Error/abandon reason captured at game end (forward-only).
+  // Real error captured at game end via trackGameError (forward-only).
   error_reason?: string | null;
+  // How the player left an abandoned game (hidden | pagehide | spa_navigate |
+  // exit | give_up). A normal exit, not an error.
+  leave_reason?: string | null;
 }
 
 export type GameLogSource = 'analytics' | 'tables';

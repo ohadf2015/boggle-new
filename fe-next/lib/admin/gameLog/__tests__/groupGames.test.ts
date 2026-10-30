@@ -347,3 +347,37 @@ describe('groupGames — language recovery', () => {
     expect(groupGames(rows)[0].language).toBe('en');
   });
 });
+
+describe('groupGames — leaving is not an error', () => {
+  it('a player who hid the tab and left reads as abandoned with a leave reason, not errored', () => {
+    const rows = [
+      game({ id: 's', event_type: 'game_started', is_multiplayer: true, game_code: 'R2', guest_session_id: 'g1' }),
+      game({
+        id: 'a', event_type: 'game_abandoned', is_multiplayer: true, game_code: 'R2', guest_session_id: 'g1',
+        leave_reason: 'hidden', created_at: '2026-05-30T10:00:03.000Z',
+      }),
+    ];
+    const g = groupGames(rows)[0];
+    expect(g.status).toBe('abandoned');
+    expect(g.errorReasons).toEqual([]);
+    expect(g.players[0].errorReason).toBeNull();
+    expect(g.players[0].leaveReason).toBe('hidden');
+  });
+
+  it('a hidden blip followed by finishing the round reads as completed', () => {
+    const rows = [
+      game({ id: 's', event_type: 'game_started', is_multiplayer: true, game_code: 'R3', guest_session_id: 'g1' }),
+      game({
+        id: 'a', event_type: 'game_abandoned', is_multiplayer: true, game_code: 'R3', guest_session_id: 'g1',
+        leave_reason: 'hidden', created_at: '2026-05-30T10:00:59.000Z',
+      }),
+      game({
+        id: 'c', event_type: 'game_completed', is_multiplayer: true, game_code: 'R3', guest_session_id: 'g1',
+        score: 60, created_at: '2026-05-30T10:01:00.000Z',
+      }),
+    ];
+    const g = groupGames(rows)[0];
+    expect(g.status).toBe('completed');
+    expect(g.players[0].leaveReason).toBeNull();
+  });
+});

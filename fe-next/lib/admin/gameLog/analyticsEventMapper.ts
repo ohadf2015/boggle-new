@@ -117,7 +117,11 @@ export function mapAnalyticsEventToGame(
     user_agent: ua,
     guest_name: guestName,
     platform: str(meta.platform),
-    error_reason: str(meta.error_reason) ?? str(meta.reason),
+    // Only trackGameError sets error_reason. `reason` is how a player left an
+    // abandoned game (tab hidden, page closed, in-app navigation); reading it
+    // as an error flagged every normal leave as an error in the admin log.
+    error_reason: str(meta.error_reason),
+    leave_reason: row.event_type === 'game_abandoned' ? str(meta.reason) : null,
     source: 'analytics',
   };
 }

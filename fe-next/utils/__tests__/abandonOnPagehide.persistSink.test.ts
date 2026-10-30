@@ -59,6 +59,29 @@ describe('abandonOnPagehide persist sink', () => {
     expect(posthogPayload).toEqual(payload);
   });
 
+  it('stamps the MP room code on an MP leave so the admin log files it under its room', async () => {
+    markGameActive('word-hunt', { gameCode: 'SE4SFB', isMultiplayer: true });
+    vi.setSystemTime(new Date('2026-01-01T00:00:05Z'));
+
+    emitAbandonOnSpaNavigate();
+    await vi.advanceTimersByTimeAsync(5);
+
+    expect(sink).toHaveBeenCalledTimes(1);
+    expect(sink.mock.calls[0][1]).toMatchObject({ reason: 'spa_navigate', gameCode: 'SE4SFB', isMultiplayer: true });
+  });
+
+  it('leaves gameCode and isMultiplayer off a solo leave', async () => {
+    markGameActive('classic', {});
+    vi.setSystemTime(new Date('2026-01-01T00:00:05Z'));
+
+    emitAbandonOnSpaNavigate();
+    await vi.advanceTimersByTimeAsync(5);
+
+    const payload = sink.mock.calls[0][1] as Record<string, unknown>;
+    expect(payload).not.toHaveProperty('gameCode');
+    expect(payload).not.toHaveProperty('isMultiplayer');
+  });
+
   it('hands SPA-navigation and exit abandons to the sink', async () => {
     markGameActive('blast');
     vi.setSystemTime(new Date('2026-01-01T00:00:10Z'));

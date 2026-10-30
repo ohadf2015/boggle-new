@@ -26,6 +26,9 @@ export interface AbandonExtras {
   landing_path?: string;
   /** Last coach step reached. Set only for sp_mode=challenge. */
   coach_step?: string;
+  /** MP room code + flag, so the admin game log files an MP leave under its room. */
+  gameCode?: string;
+  isMultiplayer?: boolean;
 }
 
 interface ActiveGame {
@@ -109,6 +112,8 @@ export function markGameActive(mode: string, extras: AbandonExtras = {}): void {
       sp_mode: extras.sp_mode,
       landing_path: extras.landing_path ?? currentLandingPath(),
       ...(extras.coach_step ? { coach_step: extras.coach_step } : {}),
+      ...(extras.gameCode ? { gameCode: extras.gameCode } : {}),
+      ...(extras.isMultiplayer === true ? { isMultiplayer: true } : {}),
       // Queued wins over the start payload's words_found: 0.
       ...(queued ?? {}),
     },

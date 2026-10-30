@@ -12019,6 +12019,7 @@ const ja = {
         "errors": "エラー",
         "gameCode": "ゲームコード",
         "invitedBy": "招待者",
+        "left": "退出",
         "mode": "モード",
         "platform": "プラットフォーム",
         "players": "プレイヤー",
@@ -12027,6 +12028,13 @@ const ja = {
         "result": "結果",
         "session": "セッション",
         "winner": "勝者"
+      },
+      "leaveReason": {
+        "hidden": "タブやアプリを切り替えた",
+        "pagehide": "ページを閉じたか再読み込みした",
+        "spa_navigate": "別の画面に移動した",
+        "exit": "退出をタップした",
+        "give_up": "ギブアップした"
       },
       "status": {
         "abandoned": "放棄",

@@ -56,6 +56,8 @@ export interface GamePlayer {
   acquisition: AcquisitionTag;
   status: GameStatus;
   errorReason: string | null;
+  /** How the player left, set only when status is 'abandoned'. */
+  leaveReason: string | null;
   /** Number of raw analytics rows merged into this player. */
   eventCount: number;
   firstSeen: string;
@@ -157,6 +159,16 @@ function errorReasonOf(g: UnifiedGame): string | null {
   return g.error_reason ?? null;
 }
 
+/** The latest abandon's leave reason (a player can hide, return, then leave). */
+function leaveReasonOf(rows: UnifiedGame[]): string | null {
+  let latest: UnifiedGame | null = null;
+  for (const r of rows) {
+    if (r.event_type !== 'game_abandoned' || !r.leave_reason) continue;
+    if (!latest || r.created_at > latest.created_at) latest = r;
+  }
+  return latest?.leave_reason ?? null;
+}
+
 /** Rank for choosing which event's stats win: terminal > started. */
 function eventRank(eventType: string | undefined): number {
   if (eventType === 'game_completed') return 3;
@@ -222,6 +234,7 @@ function buildPlayer(acc: PlayerAccumulator): GamePlayer {
     acquisition,
     status,
     errorReason,
+    leaveReason: status === 'abandoned' ? leaveReasonOf(rows) : null,
     eventCount: rows.length,
     firstSeen: acc.firstSeen,
   };

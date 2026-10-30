@@ -58,7 +58,7 @@ describe('WordListEditor', () => {
     it('should show integration status icons', () => {
       renderEditor();
       // 3 words all canIntegrate = true → 3 integration icons
-      const integrationLabels = screen.getAllByText(/can embed/i);
+      const integrationLabels = screen.getAllByText(/playable in games/i);
       expect(integrationLabels).toHaveLength(3);
     });
 

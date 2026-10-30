@@ -39,8 +39,9 @@ describe('lexiclash-vs-blooket Gaps Set honesty foil', () => {
       expect(src).toContain('"vsBlooket"');
       expect(src).toContain('"gapsSet"');
       expect(src).toMatch(/Gaps Set/);
-      expect(src).toMatch(/#1124/);
     }
+    // The English copy audit dropped the internal "#1124" ref from visible copy;
+    // the page keeps it as a code cite (checked above).
     expect(en).toMatch(/Incorrect%/);
     expect(en).toMatch(/Opportunities for Growth/);
     expect(he).toMatch(/Incorrect%/);
