@@ -29,6 +29,7 @@ vi.mock('@/hooks/useTiltEffect', () => ({
 }));
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
+  usePathname: () => '/en',
   useParams: () => ({ locale: 'en' }),
 }));
 vi.mock('@/utils/onboardingStorage', () => ({

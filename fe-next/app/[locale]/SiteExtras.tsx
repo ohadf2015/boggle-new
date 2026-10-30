@@ -15,6 +15,7 @@ import AnimationsLoader from '@/components/AnimationsLoader';
 import { OfflineBanner } from '@/components/offline/OfflineBanner';
 import { OfflineSyncBridge } from '@/components/offline/OfflineSyncBridge';
 import { isLandingPath } from '@/lib/i18n/isLandingPath';
+import { SignupFirstGameGlobalCard } from '@/components/landing/home/SignupFirstGameCard';
 import type { Language } from '@/shared/types/game';
 
 const DeferredLayoutWidgets = nextDynamic(() => import('@/components/DeferredLayoutWidgets'), {
@@ -76,6 +77,7 @@ export default function SiteExtras({ lang }: SiteExtrasProps) {
       <NativePGSInitializer />
       <OfflineBanner />
       <OfflineSyncBridge />
+      <SignupFirstGameGlobalCard />
       <SiteFooter className="relative z-0 shrink-0" />
       <PlayerBottomNav />
       <DeferredLayoutWidgets />
