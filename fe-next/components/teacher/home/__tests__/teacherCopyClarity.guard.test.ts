@@ -29,7 +29,7 @@ const EXPECTED_EN: Record<string, string> = {
   'eduShell.host.changeList': 'Change list',
   'eduShell.warmup.send': 'Send list as homework',
   'eduShell.warmup.sent': 'Sent as homework',
-  'eduShell.warmup.status': '{done} of {total} students practised',
+  'eduShell.warmup.status': '{done} of {total} students practiced',
   'eduShell.warmup.capped': 'Free plan homework limit reached. Pro sends unlimited homework.',
   'eduShell.delivery.projector': 'Needs projector',
   'eduShell.delivery.phones': 'Phones only',
