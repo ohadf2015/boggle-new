@@ -3,6 +3,7 @@ import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { captureProFunnelServerEvent } from '@/lib/education/proFunnelServer';
 import { checkoutClientKind, testEmailReason } from '@/lib/education/checkoutTrafficTags';
 import { PRO_OFFER_PLACEMENTS } from '@/lib/education/pro/proOfferPlacements';
+import { PRO_COPY_EXPERIMENT, PRO_COPY_PLACEMENTS, proCopyVariant } from '@/lib/education/pro/proCopyExperiment';
 
 /**
  * POST /api/education/pro-offer-impression — server twin of the Teacher Pro
@@ -47,6 +48,8 @@ export async function POST(request: NextRequest) {
     const locale = typeof body.locale === 'string' && LOCALE_RE.test(body.locale) ? body.locale : null;
     const cta = body.cta === 'teacher_pro' ? 'teacher_pro' : 'teacher_pro_trial';
     const offer = typeof body.offer === 'string' && OFFERS.has(body.offer) ? body.offer : null;
+    // Only the surfaces that render the A/B copy carry a bucket (access_success does not).
+    const copyVariant = PRO_COPY_PLACEMENTS.has(placement) ? proCopyVariant(user.id) : null;
     const testReason = testEmailReason(user.email ?? null);
     captureProFunnelServerEvent({
       distinctId: user.id,
@@ -58,6 +61,10 @@ export async function POST(request: NextRequest) {
         cta,
         offer,
         locale,
+        // Copy A/B bucket, computed from the same user id the browser used to pick the copy.
+        experiment: copyVariant ? PRO_COPY_EXPERIMENT : null,
+        copy_variant: copyVariant,
+        [`$feature/${PRO_COPY_EXPERIMENT}`]: copyVariant,
         client_kind: checkoutClientKind(request.headers),
         is_test_account: testReason !== null,
         test_reason: testReason,

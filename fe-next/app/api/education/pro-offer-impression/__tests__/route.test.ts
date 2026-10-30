@@ -92,4 +92,13 @@ describe('POST /api/education/pro-offer-impression — dashboard', () => {
     await POST(req({ placement: 'dashboard', stage: 'rendered', locale: 'es', cta: 'teacher_pro_trial', offer: 'trial' }))
     expect(capture.mock.calls[0][0]).toMatchObject({ event: 'edu_pro_offer_rendered', properties: { placement: 'dashboard', source: 'dashboard' } })
   })
+  it('edu_pro_offer_rendered carries the copy A/B bucket on the results card', async () => {
+    const { proCopyVariant } = await import('@/lib/education/pro/proCopyExperiment')
+    getAuthedUser.mockResolvedValue({ id: 'teacher-uuid-2', email: 'teacher@school.org' })
+    await POST(req({ placement: 'classroom_results', stage: 'rendered', locale: 'en', cta: 'teacher_pro_trial', offer: 'trial' }))
+    expect(capture.mock.calls[0][0]).toMatchObject({
+      event: 'edu_pro_offer_rendered',
+      properties: { experiment: 'edu_pro_copy_v1', copy_variant: proCopyVariant('teacher-uuid-2') },
+    })
+  })
 })

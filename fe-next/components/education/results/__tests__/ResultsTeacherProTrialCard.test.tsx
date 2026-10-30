@@ -18,6 +18,8 @@ const growth = vi.hoisted(() => ({ trackGrowthEvent: vi.fn() }));
 vi.mock('@/utils/growthTracking', () => growth);
 const funnel = vi.hoisted(() => ({ trackTeacherProUpgradeClick: vi.fn() }));
 vi.mock('@/lib/education/proFunnelTelemetry', () => funnel);
+const auth = vi.hoisted(() => ({ user: null as { id: string } | null }));
+vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => auth }));
 
 describe('ResultsTeacherProTrialCard', () => {
   beforeEach(() => {
@@ -337,5 +339,58 @@ describe('ResultsTeacherProTrialCard server-side (cookie-independent) impression
     render(<ResultsTeacherProTrialCard language="ja" placement="class_created" />);
     act(() => observers.forEach((o) => o.cb([{ isIntersecting: false, intersectionRatio: 0 }])));
     expect(posts().map((p) => p.stage)).toEqual(['rendered']);
+  });
+});
+
+describe('ResultsTeacherProTrialCard copy A/B (edu_pro_copy_v1)', () => {
+  // Find one id per bucket so the test does not depend on the hash's exact output.
+  const idFor = async (v: 'a' | 'b') => {
+    const { proCopyVariant } = await import('@/lib/education/pro/proCopyExperiment');
+    for (let i = 0; i < 100; i++) if (proCopyVariant(`t-${i}`) === v) return `t-${i}`;
+    throw new Error('no id');
+  };
+  beforeEach(() => {
+    Object.assign(pro, { hasPro: false, loading: false, known: true, trialUsed: false, accessTrialExpires: null, accessTrialEnded: false });
+  });
+  afterEach(() => {
+    auth.user = null;
+  });
+
+  it('variant a leads with class reports, keeps the 14-day trial button for a never-trialed teacher', async () => {
+    auth.user = { id: await idFor('a') };
+    render(<ResultsTeacherProTrialCard language="en" />);
+    const card = screen.getByTestId('results-teacher-pro-trial-card');
+    expect(card).toHaveAttribute('data-variant', 'a');
+    expect(card).toHaveTextContent('Keep your class reports — $9/mo');
+    expect(card).toHaveTextContent(/CSV export/);
+    expect(screen.getByTestId('results-teacher-pro-trial-cta')).toHaveTextContent('Start your 14-day Teacher Pro trial');
+  });
+
+  it('variant b leads with the trial', async () => {
+    auth.user = { id: await idFor('b') };
+    render(<ResultsTeacherProTrialCard language="en" />);
+    const card = screen.getByTestId('results-teacher-pro-trial-card');
+    expect(card).toHaveAttribute('data-variant', 'b');
+    expect(card).toHaveTextContent('Try Teacher Pro free for 14 days');
+  });
+
+  it('variant a inside the access trial still says keep Teacher Pro after the free trial, no new trial', async () => {
+    auth.user = { id: await idFor('a') };
+    pro.accessTrialExpires = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString();
+    render(<ResultsTeacherProTrialCard language="en" />);
+    const card = screen.getByTestId('results-teacher-pro-trial-card');
+    expect(card).toHaveTextContent('keep Teacher Pro after your free trial');
+    expect(screen.getByTestId('results-teacher-pro-trial-cta')).toHaveTextContent('Keep Teacher Pro after my trial');
+    expect(card).not.toHaveTextContent(/14-day|Start your/);
+  });
+
+  it('variant a after the access trial ended: straight $9/mo, no trial', async () => {
+    auth.user = { id: await idFor('a') };
+    pro.accessTrialEnded = true;
+    render(<ResultsTeacherProTrialCard language="en" />);
+    const card = screen.getByTestId('results-teacher-pro-trial-card');
+    expect(card).toHaveTextContent('Get your class reports back — $9/mo');
+    expect(screen.getByTestId('results-teacher-pro-trial-cta')).toHaveTextContent('Continue with Teacher Pro');
+    expect(card).not.toHaveTextContent(/14-day|Start your|Try Teacher Pro free/);
   });
 });

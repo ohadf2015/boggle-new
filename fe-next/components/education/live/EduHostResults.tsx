@@ -219,13 +219,14 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
               onExitRoom={onExitRoom}
               reteach={{ count: missed.length, status: reteach.status, start: reteach.start, restoreFull: reteach.restoreFull }}
             />
+            {/* Teacher Pro right under Play again: the moment a free teacher has just seen the value. */}
+            {!proLoading && !hasPro && !isPracticeRound(players) && <ResultsTeacherProTrialCard language={language} />}
             <MissedWordsList words={missed} underHalf={studentsUnderHalf(summary)} maxChips={bossOver ? 6 : 8} t={t} />
             {!proLoading && hasPro && summary.totalWords > 0 && (
               <div className={cn(shortWall && '[@container_results_(height<56.25rem)]:hidden')}>
                 <StrugglePreview masteryByPlayer={summary.masteryByPlayer ?? {}} teacherName={summary.teacherName ?? ''} language={language} t={t} />
               </div>
             )}
-            {!proLoading && !hasPro && !isPracticeRound(players) && <ResultsTeacherProTrialCard language={language} />}
             {!proLoading && hasPro && showTeacherInvite(outcome.celebrate, students) && (
               <TeacherInviteNudge students={students} language={language} whatsapp={phone} t={t} />
             )}
