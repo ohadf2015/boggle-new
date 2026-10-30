@@ -67,7 +67,11 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
         </div>
 
         <div data-testid="home-hero-actions" className="flex flex-col gap-2.5 sm:gap-4 @2xl/hero:flex-row @2xl/hero:items-center">
-        {codeSlot ?? (code ? (
+        {codeSlot ? (
+          <div data-testid="home-hero-code-slot" className="min-w-0 @2xl/hero:flex-1">
+            {codeSlot}
+          </div>
+        ) : code ? (
           <div
             data-testid="home-desk-code-panel"
             className="flex flex-wrap items-center gap-x-2 gap-y-1.5 rounded-neo border-2 border-neo-cream/35 bg-neo-navy p-2.5 sm:gap-x-3 sm:p-3 @2xl/hero:flex-1"
@@ -98,7 +102,7 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
               <span className="max-sm:hidden">{t('academy.hq.openProjector')}</span>
             </button>
           </div>
-        ) : null)}
+        ) : null}
 
         <div className="flex items-center gap-x-2 gap-y-1 sm:flex-wrap sm:gap-x-4 @2xl/hero:flex-col @2xl/hero:items-stretch @2xl/hero:gap-y-2">
           <Link
@@ -123,7 +127,7 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
         </div>
         </div>
 
-        {codeSlot || !insight ? null : <div className="max-sm:hidden [@media(max-height:760px)]:hidden">{insight}</div>}
+        {codeSlot || !insight ? null : <div className="max-sm:hidden [@media(max-height:780px)]:hidden">{insight}</div>}
         {nudge}
       </div>
 

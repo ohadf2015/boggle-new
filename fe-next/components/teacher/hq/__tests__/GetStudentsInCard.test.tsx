@@ -67,6 +67,26 @@ describe('<GetStudentsInCard>', () => {
     expect(trackCopied).toHaveBeenCalledWith({ classroomId: 'c1' });
   });
 
+  it('Given the card is narrow beside the Start button, Then the share buttons drop their labels by the card width, not the screen width', () => {
+    render(<GetStudentsInCard classroom={CLASS} onOpenProjector={vi.fn()} />);
+    for (const id of ['hq-copy-link', 'hq-open-projector']) {
+      const label = screen.getByTestId(id).querySelector('span')!;
+      expect(label.className).toMatch(/(^|\s)hidden(\s|$)/);
+      expect(label.className).toMatch(/@\w+:inline/);
+      expect(label.className).not.toMatch(/max-sm:hidden/);
+    }
+  });
+
+  it('Given one student joined, Then the heading stays one line above the code and the goal sits with the roster in a second row', () => {
+    roster.mockReturnValue({ students: [{ id: 's1', name: 'Ava', avatar: null }], loading: false, arrivals: [] });
+    render(<GetStudentsInCard classroom={{ ...CLASS, member_count: 1 }} onOpenProjector={vi.fn()} />);
+    const heading = screen.getByRole('heading');
+    expect(heading.className).toMatch(/whitespace-nowrap/);
+    const goal = screen.getByTestId('hq-joined-goal');
+    expect(goal.parentElement).toBe(screen.getByTestId('hq-roster-row').parentElement);
+    expect(goal.parentElement).not.toBe(screen.getByTestId('hq-join-code').parentElement);
+  });
+
   it('When projector is tapped, Then the projector opens', () => {
     const onOpen = vi.fn();
     render(<GetStudentsInCard classroom={CLASS} onOpenProjector={onOpen} />);

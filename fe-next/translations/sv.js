@@ -17404,35 +17404,43 @@ const sv = {
       "session": {
         "warmUp": {
           "name": "Uppvärmning på 5 minuter",
-          "when": "Lektionsstart. En snabb bricka med säsongens ord får igång alla."
+          "when": "Lektionsstart. En snabb bricka med säsongens ord får igång alla.",
+          "whenShort": "Starta lektionen"
         },
         "exitTicket": {
           "name": "Exit ticket",
-          "when": "De sista 3 minuterna. Ett kort quiz visar vem som fått koll på dagens ord."
+          "when": "De sista 3 minuterna. Ett kort quiz visar vem som fått koll på dagens ord.",
+          "whenShort": "Innan de går"
         },
         "brainBreak": {
           "name": "Hjärnpaus",
-          "when": "När orken tryter. Tre snabba minuter Blast, ingen lista att förbereda."
+          "when": "När orken tryter. Tre snabba minuter Blast, ingen lista att förbereda.",
+          "whenShort": "När energin sjunker"
         },
         "icebreaker": {
           "name": "Isbrytare första dagen",
-          "when": "Första dagen eller en ny grupp. Ord om vår klass: hej, vän, dela, hjälpa."
+          "when": "Första dagen eller en ny grupp. Ord om vår klass: hej, vän, dela, hjälpa.",
+          "whenShort": "Första dagen, ny grupp"
         },
         "spellingBee": {
           "name": "Fredagens stavningstävling",
-          "when": "Veckans slut. Två lagrundor där ni letar veckans ord på brickan."
+          "when": "Veckans slut. Två lagrundor där ni letar veckans ord på brickan.",
+          "whenShort": "I slutet av veckan"
         },
         "testReview": {
           "name": "Repetition inför prov",
-          "when": "Dagen före provet. Två quizrundor på de viktigaste begreppen, med svaren visade."
+          "when": "Dagen före provet. Två quizrundor på de viktigaste begreppen, med svaren visade.",
+          "whenShort": "Dagen före provet"
         },
         "eslStarter": {
           "name": "Engelska som andraspråk",
-          "when": "För engelskelever. Välj CEFR-nivå från A1 till B2 och öva betydelser."
+          "when": "För engelskelever. Välj CEFR-nivå från A1 till B2 och öva betydelser.",
+          "whenShort": "För engelskelever"
         },
         "earlyFinishers": {
           "name": "För den som blir klar tidigt",
-          "when": "Några är redan klara. Var och en spelar tyst på sin egen Wordcraft-bricka."
+          "when": "Några är redan klara. Var och en spelar tyst på sin egen Wordcraft-bricka.",
+          "whenShort": "När några blir klara"
         }
       }
     },

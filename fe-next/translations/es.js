@@ -17045,35 +17045,43 @@ const es = {
       "session": {
         "warmUp": {
           "name": "Calentamiento de 5 minutos",
-          "when": "Al empezar la clase. Un tablero rápido con palabras de la temporada pone a todos a pensar."
+          "when": "Al empezar la clase. Un tablero rápido con palabras de la temporada pone a todos a pensar.",
+          "whenShort": "Para empezar la clase"
         },
         "exitTicket": {
           "name": "Ticket de salida",
-          "when": "Los últimos 3 minutos. Un quiz corto muestra quién domina las palabras de hoy."
+          "when": "Los últimos 3 minutos. Un quiz corto muestra quién domina las palabras de hoy.",
+          "whenShort": "Antes de que se vayan"
         },
         "brainBreak": {
           "name": "Pausa activa",
-          "when": "Cuando baja la energía. Tres minutos rápidos de Blast, sin preparar lista."
+          "when": "Cuando baja la energía. Tres minutos rápidos de Blast, sin preparar lista.",
+          "whenShort": "Cuando baja la energía"
         },
         "icebreaker": {
           "name": "Rompehielos del primer día",
-          "when": "Primer día o grupo nuevo. Palabras sobre nuestra clase: hola, grupo, ayudar, gracias."
+          "when": "Primer día o grupo nuevo. Palabras sobre nuestra clase: hola, grupo, ayudar, gracias.",
+          "whenShort": "Primer día, grupo nuevo"
         },
         "spellingBee": {
           "name": "Concurso de ortografía del viernes",
-          "when": "Fin de semana escolar. Dos rondas por equipos buscando las palabras de la semana."
+          "when": "Fin de semana escolar. Dos rondas por equipos buscando las palabras de la semana.",
+          "whenShort": "Al final de la semana"
         },
         "testReview": {
           "name": "Repaso antes del examen",
-          "when": "El día antes del examen. Dos rondas de quiz con los términos clave y sus respuestas."
+          "when": "El día antes del examen. Dos rondas de quiz con los términos clave y sus respuestas.",
+          "whenShort": "El día antes del examen"
         },
         "eslStarter": {
           "name": "Inglés como segunda lengua",
-          "when": "Para alumnos de inglés. Elige un nivel MCER de A1 a B2 y practica los significados."
+          "when": "Para alumnos de inglés. Elige un nivel MCER de A1 a B2 y practica los significados.",
+          "whenShort": "Para aprender inglés"
         },
         "earlyFinishers": {
           "name": "Para los que terminan antes",
-          "when": "Algunos ya terminaron. Cada uno juega en silencio su propio tablero de Wordcraft."
+          "when": "Algunos ya terminaron. Cada uno juega en silencio su propio tablero de Wordcraft.",
+          "whenShort": "Si algunos terminan antes"
         }
       }
     },

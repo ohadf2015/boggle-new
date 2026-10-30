@@ -32,22 +32,25 @@ describe('HomeSessionRail flow cards', () => {
     return render(<HomeSessionRail classroomId="c1" languages={['en']} gradeBand={null} nowMs={NOW} lastPlayedMs={null} ready locale="en" t={t} />);
   }
 
-  it('Then each card shows its steps as pictures with a numbered label, the live step naming the class game', () => {
+  it('Then a card is calm: no pictures, the steps are read to screen readers and shown on the run sheet, the live step naming the class game', () => {
     renderRail();
     const [card] = screen.getAllByTestId('home-session-card');
+    expect(card.querySelectorAll('[data-src]')).toHaveLength(1);
     const steps = within(card).getAllByTestId('home-session-step');
     expect(steps.map((s) => s.getAttribute('data-step'))).toEqual(['learn', 'solo', 'live']);
-    for (const s of steps) expect(s.querySelector('[data-src]')).not.toBeNull();
+    for (const s of steps) expect(s.querySelector('[data-src]')).toBeNull();
     expect(steps[2]).toHaveTextContent(/eduShell\.home\.flow\.live/);
-    expect(within(card).getByTestId('home-session-when')).toHaveTextContent('education.starterPacks.session.warmUp.when');
+    const line = steps[0].parentElement!;
+    expect(line.className).toBe('sr-only');
   });
 
-  it('Then the step art is big enough to tell apart, not a 40px sticker', () => {
+  it('Then the when-to-use line is the short copy on one line', () => {
     renderRail();
     const [card] = screen.getAllByTestId('home-session-card');
-    const art = within(card).getAllByTestId('home-session-step')[0].querySelector('[data-src]')!.parentElement!;
-    expect(art.className).not.toMatch(/(^|\s)size-10(\s|$)/);
-    expect(art.className).toMatch(/aspect-square/);
+    const when = within(card).getByTestId('home-session-when');
+    expect(when).toHaveTextContent('education.starterPacks.session.warmUp.whenShort');
+    expect(when.className).toMatch(/line-clamp-1/);
+    expect(when.className).not.toMatch(/line-clamp-2|max-sm:!hidden/);
   });
 
   it('Then the run button starts the whole lesson for a list session', () => {

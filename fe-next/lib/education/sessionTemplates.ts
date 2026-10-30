@@ -24,6 +24,7 @@ export interface SessionTemplate {
   id: SessionId;
   nameKey: string;
   whenKey: string;
+  whenShortKey: string;
   mode: ClassroomCatalogueId;
   timerMinutes: (typeof HOST_TIMER_MINUTES)[number];
   rounds: number;
@@ -40,6 +41,7 @@ const ALL_BANDS: readonly GradeBand[] = ['k2', 'g35', 'g68', 'g912'];
 const keys = (camel: string) => ({
   nameKey: `education.starterPacks.session.${camel}.name`,
   whenKey: `education.starterPacks.session.${camel}.when`,
+  whenShortKey: `education.starterPacks.session.${camel}.whenShort`,
 });
 
 export const SESSION_TEMPLATES: readonly SessionTemplate[] = [

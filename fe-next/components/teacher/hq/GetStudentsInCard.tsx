@@ -151,7 +151,7 @@ export function GetStudentsInCard({
       className={cn("@container flex flex-col gap-2 rounded-neo border-2 border-neo-cream/35 bg-neo-navy p-2.5", className)}
     >
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
-        <h3 id={headingId} className="w-full font-neo-body text-xs font-bold leading-snug text-neo-cream/70 max-sm:sr-only">
+        <h3 id={headingId} className="w-full whitespace-nowrap font-neo-body text-xs font-bold leading-snug text-neo-cream/70 max-sm:sr-only">
           {t("academy.hq.getStudentsIn", "Get students in")}
         </h3>
         <p data-testid="hq-join-code" dir="ltr" className="flex gap-1">
@@ -167,13 +167,13 @@ export function GetStudentsInCard({
           ))}
         </p>
         <div data-testid="hq-join-actions" className="flex gap-1.5 sm:gap-2">
-          <button type="button" data-testid="hq-copy-link" onClick={copyLink} aria-label={copyLabel} title={copyLabel} className={cn(OUTLINE_BUTTON, "max-sm:min-w-11 max-sm:px-0")}>
+          <button type="button" data-testid="hq-copy-link" onClick={copyLink} aria-label={copyLabel} title={copyLabel} className={cn(OUTLINE_BUTTON, "min-w-11 px-0 @xl:px-3")}>
             {copied ? <Check className="size-4" strokeWidth={3} aria-hidden="true" /> : <Link2 className="size-4" strokeWidth={3} aria-hidden="true" />}
-            <span className="max-sm:hidden">{copyLabel}</span>
+            <span className="hidden @xl:inline">{copyLabel}</span>
           </button>
-          <button type="button" data-testid="hq-open-projector" onClick={openProjector} aria-label={projectorLabel} title={projectorLabel} className={cn(OUTLINE_BUTTON, "max-sm:min-w-11 max-sm:px-0")}>
+          <button type="button" data-testid="hq-open-projector" onClick={openProjector} aria-label={projectorLabel} title={projectorLabel} className={cn(OUTLINE_BUTTON, "min-w-11 px-0 @xl:px-3")}>
             <MonitorUp className="size-4" strokeWidth={3} aria-hidden="true" />
-            <span className="max-sm:hidden">{projectorLabel}</span>
+            <span className="hidden @xl:inline">{projectorLabel}</span>
           </button>
         </div>
       </div>
@@ -238,7 +238,7 @@ export function GetStudentsInCard({
         <span
           data-testid="hq-join-status"
           title={t("academy.hq.codeReady", "Code ready")}
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-neo-cream/35 px-2 py-0.5 font-neo-body text-xs font-bold text-neo-cream/80 max-sm:hidden"
+          className="hidden shrink-0 items-center gap-1.5 rounded-full border border-neo-cream/35 px-2 py-0.5 font-neo-body text-xs font-bold text-neo-cream/80 @xl:inline-flex"
         >
           <span className="size-2 rounded-full bg-neo-cream/70" aria-hidden="true" />
           <span>{t("academy.hq.codeReady", "Code ready")}</span>

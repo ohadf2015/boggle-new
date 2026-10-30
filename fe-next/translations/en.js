@@ -15464,35 +15464,43 @@ const en = {
       "session": {
         "warmUp": {
           "name": "5-minute warm-up",
-          "when": "Start of class. One quick board with this season’s words gets everyone thinking."
+          "when": "Start of class. One quick board with this season’s words gets everyone thinking.",
+          "whenShort": "Kick off the lesson"
         },
         "exitTicket": {
           "name": "Exit ticket",
-          "when": "Last 3 minutes. A short quiz shows who got today’s words before they leave."
+          "when": "Last 3 minutes. A short quiz shows who got today’s words before they leave.",
+          "whenShort": "Check before they leave"
         },
         "brainBreak": {
           "name": "Brain break",
-          "when": "When energy drops. Three fast minutes of Blast, no list to prepare."
+          "when": "When energy drops. Three fast minutes of Blast, no list to prepare.",
+          "whenShort": "When energy drops"
         },
         "icebreaker": {
           "name": "First-day icebreaker",
-          "when": "First day or a new group. Words about our class: hello, team, share, help."
+          "when": "First day or a new group. Words about our class: hello, team, share, help.",
+          "whenShort": "First day, new group"
         },
         "spellingBee": {
           "name": "Friday spelling bee",
-          "when": "End of the week. Two team rounds hunting the week’s words on the board."
+          "when": "End of the week. Two team rounds hunting the week’s words on the board.",
+          "whenShort": "End of the week"
         },
         "testReview": {
           "name": "Review before a test",
-          "when": "The day before a test. Two quiz rounds on the key terms, with answers shown."
+          "when": "The day before a test. Two quiz rounds on the key terms, with answers shown.",
+          "whenShort": "The day before a test"
         },
         "eslStarter": {
           "name": "ESL starter",
-          "when": "English learners. Pick a CEFR level from A1 to B2 and quiz the meanings."
+          "when": "English learners. Pick a CEFR level from A1 to B2 and quiz the meanings.",
+          "whenShort": "For English learners"
         },
         "earlyFinishers": {
           "name": "Early finishers",
-          "when": "Students who finish early each play their own Wordcraft board, quietly."
+          "when": "Students who finish early each play their own Wordcraft board, quietly.",
+          "whenShort": "When some finish early"
         }
       }
     },

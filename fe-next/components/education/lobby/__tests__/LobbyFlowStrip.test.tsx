@@ -42,6 +42,11 @@ describe('LobbyFlowStrip: learn, solo, then the class plays live', () => {
     expect(w.refresh).toHaveBeenCalled();
   });
 
+  it('Then the run sheet is text steps, no picture strip competing with the game tiles', () => {
+    render(<LobbyFlowStrip warmup={warmup()} modeName="Word Hunt" />);
+    expect(screen.getByTestId('lobby-flow').querySelector('[data-src]')).toBeNull();
+  });
+
   it('Then the live step names the game the class will play', () => {
     render(<LobbyFlowStrip warmup={warmup()} modeName="Word Hunt" />);
     const live = screen.getAllByTestId('lobby-flow-step')[2];
