@@ -47,7 +47,8 @@ function Run({ words, hidden }: { words: readonly string[]; hidden?: boolean }) 
               {ch}
             </span>
           ))}
-          <span className="-ms-1 -mt-3 self-start rounded-neo-pill border-2 border-neo-black bg-neo-purple px-1.5 font-neo-display text-xs font-bold leading-5 text-neo-white shadow-hard-sm md:text-sm">
+          {/* Black, not white: white on neo-purple is 4.23:1, under AA for 12px text. */}
+          <span className="-ms-1 -mt-3 self-start rounded-neo-pill border-2 border-neo-black bg-neo-purple px-1.5 font-neo-display text-xs font-bold leading-5 text-neo-black shadow-hard-sm md:text-sm">
             +{points(word)}
           </span>
         </li>
