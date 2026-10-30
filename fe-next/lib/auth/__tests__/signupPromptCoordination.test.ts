@@ -2,8 +2,11 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
   SIGNUP_PROMPT_SHOWN_KEY,
   SIGNUP_PROMPT_ACTIVE_EVENT,
+  RESULTS_INLINE_SHOWN_KEY,
   emitSignupPromptActive,
   shouldSuppressOneTapForSignupFunnel,
+  markResultsInlineShown,
+  hasResultsInlineShownThisSession,
 } from '../signupPromptCoordination';
 
 describe('signupPromptCoordination (t_da22db9a)', () => {
@@ -31,5 +34,25 @@ describe('signupPromptCoordination (t_da22db9a)', () => {
     const event = handler.mock.calls[0][0] as CustomEvent;
     expect(event.detail).toEqual({ active: true });
     window.removeEventListener(SIGNUP_PROMPT_ACTIVE_EVENT, handler);
+  });
+});
+
+describe('results_inline session latch (t_ac5ac2f7)', () => {
+  beforeEach(() => {
+    sessionStorage.clear();
+  });
+
+  it('is false until the inline card is shown, true after markResultsInlineShown', () => {
+    expect(hasResultsInlineShownThisSession()).toBe(false);
+    markResultsInlineShown();
+    expect(hasResultsInlineShownThisSession()).toBe(true);
+    expect(sessionStorage.getItem(RESULTS_INLINE_SHOWN_KEY)).toBe('1');
+  });
+
+  it('is session-scoped: a fresh session (cleared storage) resets it', () => {
+    markResultsInlineShown();
+    expect(hasResultsInlineShownThisSession()).toBe(true);
+    sessionStorage.clear();
+    expect(hasResultsInlineShownThisSession()).toBe(false);
   });
 });

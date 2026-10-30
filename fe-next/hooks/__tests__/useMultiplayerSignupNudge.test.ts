@@ -59,6 +59,10 @@ vi.spyOn(Storage.prototype, 'setItem').mockImplementation((key: string, value: s
 vi.spyOn(Storage.prototype, 'clear').mockImplementation(() => { for (const key in mockSessionStore) delete mockSessionStore[key]; });
 
 import { useMultiplayerSignupNudge } from '../useMultiplayerSignupNudge';
+import {
+  RESULTS_INLINE_SHOWN_KEY,
+  markResultsInlineShown,
+} from '@/lib/auth/signupPromptCoordination';
 
 describe('useMultiplayerSignupNudge', () => {
   beforeEach(() => {
@@ -499,6 +503,117 @@ describe('useMultiplayerSignupNudge', () => {
       // The completion-attribution latch must stay unarmed: a later header
       // signup by this guest is genuinely header_or_menu, not multi_game_prompt.
       expect(window.sessionStorage.getItem(PENDING_KEY)).toBeNull();
+    });
+  });
+
+  describe('t_ac5ac2f7 — sheet tier suppressed once results_inline has asked this session', () => {
+    const sheetShownCalls = () =>
+      mockTrackGrowthEvent.mock.calls.filter(
+        ([name, props]) => name === 'signup_prompt_shown' && (props as { trigger?: string })?.trigger === 'mp_sheet',
+      );
+
+    it('does NOT show the sheet at threshold when results_inline was already shown this session', () => {
+      // UR 2026-10-30: 58/60 mp_sheet guests had also seen results_inline; the
+      // stacked second ask earned 1 click and 0 signups in 14d. The inline
+      // card (rendered on the same results screen) is the one ask.
+      markResultsInlineShown();
+      const { result } = renderHook(() =>
+        useMultiplayerSignupNudge({ isAuthenticated: false, isResultsVisible: true })
+      );
+
+      act(() => { result.current.recordMpGame(); });
+      act(() => { result.current.recordMpGame(); });
+      act(() => { vi.advanceTimersByTime(3000); });
+
+      expect(result.current.activeNudge).toBeNull();
+      expect(sheetShownCalls()).toHaveLength(0);
+    });
+
+    it('consumes the sheet tier silently: a later game does NOT re-schedule the sheet', () => {
+      mockCopyVariant = 'toast-disabled'; // isolate the sheet tier from the toast
+      markResultsInlineShown();
+      const { result } = renderHook(() =>
+        useMultiplayerSignupNudge({ isAuthenticated: false, isResultsVisible: true })
+      );
+
+      act(() => { result.current.recordMpGame(); });
+      act(() => { result.current.recordMpGame(); });
+      act(() => { vi.advanceTimersByTime(3000); });
+      // Games 3, 4: still no sheet, still no event.
+      act(() => { result.current.recordMpGame(); });
+      act(() => { vi.advanceTimersByTime(3000); });
+      act(() => { result.current.recordMpGame(); });
+      act(() => { vi.advanceTimersByTime(3000); });
+
+      expect(result.current.activeNudge).toBeNull();
+      expect(sheetShownCalls()).toHaveLength(0);
+      expect(window.sessionStorage.getItem('boggle_mp_nudge_sheet_shown')).toBe('true');
+    });
+
+    it('in-timer re-check: a latch set AFTER scheduling but BEFORE the 2s fire still suppresses the sheet', () => {
+      // The inline card on this same results screen can mark the latch while
+      // the sheet timer is pending (parallel-mount ordering).
+      const { result } = renderHook(() =>
+        useMultiplayerSignupNudge({ isAuthenticated: false, isResultsVisible: true })
+      );
+
+      act(() => { result.current.recordMpGame(); });
+      act(() => { result.current.recordMpGame(); });
+      // Card shows + marks the latch during the 2s sheet delay.
+      act(() => { markResultsInlineShown(); });
+      act(() => { vi.advanceTimersByTime(3000); });
+
+      expect(result.current.activeNudge).toBeNull();
+      expect(sheetShownCalls()).toHaveLength(0);
+    });
+
+    it('toast tier unchanged: still fires at game 3 (control variant) after the sheet was suppressed', () => {
+      mockCopyVariant = 'control';
+      markResultsInlineShown();
+      const { result } = renderHook(() =>
+        useMultiplayerSignupNudge({ isAuthenticated: false, isResultsVisible: true })
+      );
+
+      // Sheet threshold reached but suppressed (silently marked shown).
+      act(() => { result.current.recordMpGame(); });
+      act(() => { result.current.recordMpGame(); });
+      act(() => { vi.advanceTimersByTime(3000); });
+      expect(result.current.activeNudge).toBeNull();
+
+      // Game 3 → toast tier behaves exactly as if the sheet had shown.
+      act(() => { result.current.recordMpGame(); });
+      act(() => { vi.advanceTimersByTime(2000); });
+      expect(result.current.activeNudge).toBe('toast');
+    });
+
+    it('pulse tier unchanged: shouldPulseCoins still keys off game count only', () => {
+      mockCopyVariant = 'toast-disabled'; // isolate: pulse + suppressed sheet only
+      markResultsInlineShown();
+      const { result } = renderHook(() =>
+        useMultiplayerSignupNudge({ isAuthenticated: false, isResultsVisible: true })
+      );
+
+      for (let i = 0; i < 5; i++) act(() => { result.current.recordMpGame(); });
+      act(() => { vi.advanceTimersByTime(3000); });
+
+      expect(result.current.shouldPulseCoins).toBe(true);
+      expect(result.current.activeNudge).toBeNull(); // sheet still suppressed
+    });
+
+    it('sheet STILL fires at threshold when results_inline was never shown (e.g. daily-capped guest)', () => {
+      // t_561836a1 caps results_inline at 3/day: a capped-out guest has no
+      // inline ask on screen, so the sheet remains the fallback ask.
+      expect(window.sessionStorage.getItem(RESULTS_INLINE_SHOWN_KEY)).toBeNull();
+      const { result } = renderHook(() =>
+        useMultiplayerSignupNudge({ isAuthenticated: false, isResultsVisible: true })
+      );
+
+      act(() => { result.current.recordMpGame(); });
+      act(() => { result.current.recordMpGame(); });
+      act(() => { vi.advanceTimersByTime(2500); });
+
+      expect(result.current.activeNudge).toBe('sheet');
+      expect(sheetShownCalls()).toHaveLength(1);
     });
   });
 });

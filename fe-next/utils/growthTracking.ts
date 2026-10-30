@@ -1097,6 +1097,14 @@ export const trackSignupFunnel = (
     latchSignupFunnelPending(null);
   }
   if (step === 'prompt_shown') {
+    // t_ac5ac2f7: shown must carry the same `surface` as clicked/dismissed so
+    // per-surface shown→clicked→completed is one PostHog query. The mp_sheet
+    // call site passed only `trigger`; derive surface the way dismissed does.
+    if (merged.surface == null) {
+      merged.surface =
+        (props?.trigger as string | undefined) ??
+        (isFirstWin ? 'first_win_sheet' : 'soft_sheet');
+    }
     trackGrowthEvent('signup_prompt_shown', merged);
     if (isFirstWin) trackGrowthEvent('first_win_signup_shown', merged);
   } else if (step === 'completed') {
@@ -1219,7 +1227,10 @@ export const consumeSignupSource = (): string | null => {
 };
 
 export const trackSignupPromptClicked = (source: string): void => {
-  trackGrowthEvent('signup_prompt_clicked', { source });
+  // t_ac5ac2f7: carry `surface` alongside `source` (kept for back-compat) so
+  // shown→clicked→completed per surface is one PostHog query — the clicked
+  // event used to be the only funnel step without a surface.
+  trackGrowthEvent('signup_prompt_clicked', { source, surface: source });
 };
 
 /**

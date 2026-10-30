@@ -143,6 +143,44 @@ describe('trackSignupFunnel — props merge + pending latch (t_da22db9a)', () =>
     );
   });
 
+  it('trackSignupPromptClicked carries surface = source (t_ac5ac2f7: one per-surface shown→clicked→completed query)', () => {
+    trackSignupPromptClicked('mp_sheet');
+    expect(mockCapture).toHaveBeenCalledWith(
+      'growth:signup_prompt_clicked',
+      expect.objectContaining({ source: 'mp_sheet', surface: 'mp_sheet' })
+    );
+    mockCapture.mockClear();
+    trackSignupPromptClicked('results_inline');
+    expect(mockCapture).toHaveBeenCalledWith(
+      'growth:signup_prompt_clicked',
+      expect.objectContaining({ source: 'results_inline', surface: 'results_inline' })
+    );
+  });
+
+  it('prompt_shown fills surface from trigger when the call site omits it (t_ac5ac2f7: mp_sheet)', () => {
+    // The mp_sheet call site passes { trigger: 'mp_sheet' } only — shown used
+    // to be the surface-less step while clicked/dismissed carried the surface.
+    trackSignupFunnel('prompt_shown', false, { trigger: 'mp_sheet', mpSessionGame: 2 });
+    expect(mockCapture).toHaveBeenCalledWith(
+      'growth:signup_prompt_shown',
+      expect.objectContaining({ trigger: 'mp_sheet', surface: 'mp_sheet' })
+    );
+  });
+
+  it('prompt_shown keeps an explicit surface and falls back to the funnel default', () => {
+    trackSignupFunnel('prompt_shown', true, { surface: 'first_win_sheet' });
+    expect(mockCapture).toHaveBeenCalledWith(
+      'growth:signup_prompt_shown',
+      expect.objectContaining({ surface: 'first_win_sheet', is_first_win: true })
+    );
+    mockCapture.mockClear();
+    trackSignupFunnel('prompt_shown', false);
+    expect(mockCapture).toHaveBeenCalledWith(
+      'growth:signup_prompt_shown',
+      expect.objectContaining({ surface: 'soft_sheet' })
+    );
+  });
+
   it('signup_dismissed always carries source + surface (t_147a0f0c)', () => {
     trackSignupFunnel('dismissed', false, { surface: 'mp_sheet' });
     expect(mockCapture).toHaveBeenCalledWith(

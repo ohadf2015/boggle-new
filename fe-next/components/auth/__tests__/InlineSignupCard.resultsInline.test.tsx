@@ -18,6 +18,7 @@ import {
   resultsInlineCapKey,
 } from '@/utils/signupImpressionCap';
 import { markGameActive, markGameInactive } from '@/utils/abandonOnPagehide';
+import { hasResultsInlineShownThisSession } from '@/lib/auth/signupPromptCoordination';
 
 const { mockTrack, mockClicked } = vi.hoisted(() => ({ mockTrack: vi.fn(), mockClicked: vi.fn() }));
 
@@ -177,5 +178,29 @@ describe('InlineSignupCard results_inline', () => {
       ['signup_prompt_shown', { source: 'practice_results', surface: 'practice_results', trigger: 'practice_results' }],
     ]);
     expect(getResultsInlineImpressionCount()).toBe(RESULTS_INLINE_DAILY_CAP);
+  });
+
+  it('t_ac5ac2f7: showing results_inline latches the session so the mp_sheet tier stays quiet', () => {
+    expect(hasResultsInlineShownThisSession()).toBe(false);
+    markGameCompletedSignal();
+    render(<InlineSignupCard isAuthenticated={false} analyticsSource="results_inline" />);
+    expect(shownCalls()).toHaveLength(1);
+    expect(hasResultsInlineShownThisSession()).toBe(true);
+  });
+
+  it('t_ac5ac2f7: a non-results_inline surface does NOT touch the latch', () => {
+    markGameCompletedSignal();
+    render(<InlineSignupCard isAuthenticated={false} analyticsSource="practice_results" />);
+    expect(shownCalls()).toHaveLength(1);
+    expect(hasResultsInlineShownThisSession()).toBe(false);
+  });
+
+  it('t_ac5ac2f7: a capped-out render (no card, no event) leaves the latch unset — mp_sheet stays the fallback', () => {
+    localStorage.setItem(resultsInlineCapKey(), String(RESULTS_INLINE_DAILY_CAP));
+    markGameCompletedSignal();
+    const { container } = render(<InlineSignupCard isAuthenticated={false} analyticsSource="results_inline" />);
+    expect(container.firstChild).toBeNull();
+    expect(shownCalls()).toHaveLength(0);
+    expect(hasResultsInlineShownThisSession()).toBe(false);
   });
 });
