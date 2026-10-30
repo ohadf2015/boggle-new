@@ -62,8 +62,11 @@ interface Deps {
 }
 
 function skip(gameCode: string, reason: string): H2hOutcome {
-  const log = reason === 'room_unknown' ? logger.warn : logger.info;
-  log('H2H', `h2h_write game=${gameCode} outcome=skipped reason=${reason}`);
+  // Call through `logger`: a detached `logger.warn` loses `this` and throws
+  // "reading 'pino'", which turned every skip into an h2h_write error.
+  const line = `h2h_write game=${gameCode} outcome=skipped reason=${reason}`;
+  if (reason === 'room_unknown') logger.warn('H2H', line);
+  else logger.info('H2H', line);
   return 'skipped';
 }
 
