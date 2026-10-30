@@ -15,8 +15,14 @@ import AnimationsLoader from '@/components/AnimationsLoader';
 import { OfflineBanner } from '@/components/offline/OfflineBanner';
 import { OfflineSyncBridge } from '@/components/offline/OfflineSyncBridge';
 import { isLandingPath } from '@/lib/i18n/isLandingPath';
-import { SignupFirstGameGlobalCard } from '@/components/landing/home/SignupFirstGameCard';
 import type { Language } from '@/shared/types/game';
+
+// Deferred like the other heavy widgets: a static edge into the landing/home
+// chunk graph crashed the webpack production build (t_5ebe9081 CI, 2x).
+const SignupFirstGameGlobalCard = nextDynamic(
+  () => import('@/components/landing/home/SignupFirstGameCard').then((m) => m.SignupFirstGameGlobalCard),
+  { ssr: false, loading: () => null },
+);
 
 const DeferredLayoutWidgets = nextDynamic(() => import('@/components/DeferredLayoutWidgets'), {
   ssr: false,
