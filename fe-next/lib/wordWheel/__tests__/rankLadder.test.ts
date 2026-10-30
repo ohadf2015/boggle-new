@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { WHEEL_RANKS, rankThresholds, rankProgress, praiseFor } from '../rankLadder';
+import { WHEEL_RANKS, rankThresholds, rankProgress, praiseFor, wheelRankLadder } from '../rankLadder';
 
 describe('rankLadder', () => {
   it('starts at zero and climbs strictly', () => {
@@ -42,5 +42,23 @@ describe('rankLadder', () => {
     expect(praiseFor('CRATE', false)).toBe('superb');
     expect(praiseFor('CRATES', false)).toBe('brilliant');
     expect(praiseFor('CRATE', true)).toBe('fullWheel');
+  });
+
+  it('stretches the Hebrew ladder so Legend sits near the top 5% like English', () => {
+    const he = rankThresholds(120, 'he');
+    expect(he[he.length - 1]).toBe(1698);
+    expect(he[WHEEL_RANKS.indexOf('wizard')]).toBe(1200);
+    expect(he[1]).toBe(12);
+    expect(rankThresholds(120, 'en')).toEqual(rankThresholds(120));
+    for (const v of he) expect(v % 6).toBe(0);
+  });
+
+  it('composes duration, language and bonus-day scale in one ladder', () => {
+    expect(wheelRankLadder({ puzzleDate: '2026-10-30', language: 'he' })).toEqual(rankThresholds(120, 'he'));
+    const bonusHe = wheelRankLadder({ puzzleDate: '2026-11-05', language: 'he' });
+    expect(bonusHe[bonusHe.length - 1]).toBe(2292);
+    const bonusEn = wheelRankLadder({ puzzleDate: '2026-11-05', language: 'en' });
+    expect(bonusEn[bonusEn.length - 1]).toBe(1152);
+    expect(wheelRankLadder({ durationSec: 60, puzzleDate: '', language: 'en' })).toEqual(rankThresholds(60));
   });
 });

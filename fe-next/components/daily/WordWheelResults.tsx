@@ -8,7 +8,7 @@ import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { cn } from '@/lib/utils';
 import { SPRING_PRESETS } from '@/lib/animation/presets';
-import { scoreWord, scaleRankThresholds } from '@/utils/dailyChallenge/wordWheelScoring';
+import { scoreWord } from '@/utils/dailyChallenge/wordWheelScoring';
 import { selectRareFindCelebration, type RareFind } from '@/lib/wordWheel/wordRarity';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import { trackGrowthEvent } from '@/utils/growthTracking';
@@ -18,7 +18,7 @@ import DailyInsightStack from './DailyInsightStack';
 import { DailyResultsHero } from './results/DailyResultsHero';
 import WheelRankMeter from './wheel/WheelRankMeter';
 import WheelShareRow from './wheel/WheelShareRow';
-import { WHEEL_RANKS, rankProgress, rankThresholds } from '@/lib/wordWheel/rankLadder';
+import { WHEEL_RANKS, rankProgress, wheelRankLadder } from '@/lib/wordWheel/rankLadder';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import { useIsGuest } from '@/hooks/useIsGuest';
 import WordWheelSignupCta from './WordWheelSignupCta';
@@ -76,8 +76,8 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
   const { submitLeaderboardScore } = useCrazyGames();
   const { playSound } = useSoundEffects();
   const isPractice = usePracticeFlag();
-  const isExceptional = reachesWizardRank(result.score, puzzleDate);
-  const ladder = scaleRankThresholds(rankThresholds(), puzzleDate);
+  const isExceptional = reachesWizardRank(result.score, puzzleDate, gameLang);
+  const ladder = wheelRankLadder({ puzzleDate, language: gameLang });
   const celebrate = !alreadyPlayed;
   const formatWord = (w: string) => (gameLang === 'he' ? applyHebrewFinalLetters(w) : w);
   const longest = result.wordsFound.reduce((best, w) => (w.length > best.length ? w : best), '');
@@ -159,7 +159,7 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
             { value: result.wordsFound.length, label: t('wordWheel.results.wordsFound') },
             { value: longest ? formatWord(longest) : '-', label: t('wordWheel.strip.longest') },
           ]}
-          meter={<WheelRankMeter t={t} score={result.score} animate={celebrate} puzzleDate={puzzleDate} />}
+          meter={<WheelRankMeter t={t} score={result.score} animate={celebrate} puzzleDate={puzzleDate} language={gameLang} />}
           celebrate={celebrate}
           className="z-10"
         >

@@ -26,4 +26,9 @@ describe('WheelRankMeter', () => {
     const fill = screen.getByTestId('wheel-rank-fill');
     expect(fill.getAttribute('style') ?? '').not.toMatch(/width/);
   });
+
+  it('Given a Hebrew board, When a 900 score renders, Then it sits below Wizard on the stretched ladder', () => {
+    render(<WheelRankMeter t={t} score={900} puzzleDate="2026-10-30" language="he" />);
+    expect(screen.getByTestId('wheel-rank-meter').getAttribute('data-rank-index')).toBe('6');
+  });
 });

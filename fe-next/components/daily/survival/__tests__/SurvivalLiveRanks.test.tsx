@@ -125,6 +125,20 @@ describe('SurvivalLiveRanks', () => {
     });
   });
 
+  it('sends the guest fingerprint so a guest past the cut still gets their own row', async () => {
+    let requested = '';
+    server.use(
+      http.get(`*${LEADERBOARD_URL}*`, ({ request }) => {
+        requested = request.url;
+        return HttpResponse.json(mockLeaderboardResponse);
+      })
+    );
+
+    render(<SurvivalLiveRanks {...baseProps} currentGuestFingerprint="bob fp" />);
+
+    await waitFor(() => expect(new URL(requested).searchParams.get('fp')).toBe('bob fp'));
+  });
+
   it('highlights current player by guestFingerprint', async () => {
     server.use(
       http.get(`*${LEADERBOARD_URL}*`, () => HttpResponse.json(mockLeaderboardResponse))

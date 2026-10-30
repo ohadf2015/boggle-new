@@ -26,13 +26,15 @@ export interface TodayBoard {
   countries: string[];
 }
 
+const fpParam = (fp: string | null | undefined) => (fp ? `&fp=${encodeURIComponent(fp)}` : '');
+
 async function json(res: Response | null): Promise<Record<string, unknown> | null> {
   return res?.ok ? ((await res.json()) as Record<string, unknown>) : null;
 }
 
 /** The combined board is the server-merged one, so it matches the hub teaser exactly. */
 async function loadCombinedToday(date: string, lang: string, fp: string | null | undefined, signal: AbortSignal): Promise<TodayBoard> {
-  const qs = `date=${date}&lang=${lang}&limit=${FULL_BOARD}&friends=1${fp ? `&fp=${encodeURIComponent(fp)}` : ''}`;
+  const qs = `date=${date}&lang=${lang}&limit=${FULL_BOARD}&friends=1${fpParam(fp)}`;
   const body = await json(await getWithAuth(`/api/daily/leaderboard?${qs}`, { ...NO_STORE, signal }));
   if (!body) throw new Error('Failed to fetch leaderboard');
   const rows = fromMergedEntries(Array.isArray(body.data) ? body.data : []);
@@ -46,11 +48,12 @@ async function loadCombinedToday(date: string, lang: string, fp: string | null |
   };
 }
 
-async function loadScopedToday(date: string, lang: string, scope: LeaderboardScope, signal: AbortSignal): Promise<TodayBoard> {
+async function loadScopedToday(date: string, lang: string, scope: LeaderboardScope, fp: string | null | undefined, signal: AbortSignal): Promise<TodayBoard> {
   const wantHunt = scope === 'word-hunt';
+  const qs = `?limit=${FULL_BOARD}${fpParam(fp)}`;
   const [hunt, wheel] = await Promise.all([
-    wantHunt ? json(await fetch(`/api/daily-challenge/word-hunt/leaderboard/${date}/${lang}?limit=${FULL_BOARD}`, { ...NO_STORE, signal })) : null,
-    wantHunt ? null : json(await fetch(`/api/daily-challenge/word-wheel/leaderboard/${date}/${lang}?limit=${FULL_BOARD}`, { ...NO_STORE, signal })),
+    wantHunt ? json(await fetch(`/api/daily-challenge/word-hunt/leaderboard/${date}/${lang}${qs}`, { ...NO_STORE, signal })) : null,
+    wantHunt ? null : json(await fetch(`/api/daily-challenge/word-wheel/leaderboard/${date}/${lang}${qs}`, { ...NO_STORE, signal })),
   ]);
   const source = hunt ?? wheel;
   if (!source) throw new Error('Failed to fetch leaderboard');
@@ -98,7 +101,7 @@ export function useDailyBoards(opts: {
   const today = usePolledBoard<TodayBoard>(
     (signal) => scope === 'combined'
       ? loadCombinedToday(puzzleDate, fetchLanguage, guestFingerprint, signal)
-      : loadScopedToday(puzzleDate, fetchLanguage, scope, signal),
+      : loadScopedToday(puzzleDate, fetchLanguage, scope, guestFingerprint, signal),
     { enabled: !!puzzleDate && (activeTab === 'today' || activeTab === 'friends'), key: todayKey },
   );
 

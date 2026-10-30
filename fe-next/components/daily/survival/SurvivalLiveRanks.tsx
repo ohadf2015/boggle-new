@@ -48,7 +48,8 @@ export const SurvivalLiveRanks: React.FC<SurvivalLiveRanksProps> = ({
 
   const fetchLeaderboard = useCallback(async () => {
     try {
-      const url = `/api/daily-challenge/word-hunt/leaderboard/${puzzleDate}/${language}?limit=10`;
+      const fp = currentGuestFingerprint ? `&fp=${encodeURIComponent(currentGuestFingerprint)}` : '';
+      const url = `/api/daily-challenge/word-hunt/leaderboard/${puzzleDate}/${language}?limit=10${fp}`;
       const response = await fetch(url);
       if (!response.ok) {
         setHasLoaded(true);
@@ -75,7 +76,7 @@ export const SurvivalLiveRanks: React.FC<SurvivalLiveRanksProps> = ({
     } finally {
       setHasLoaded(true);
     }
-  }, [puzzleDate, language]);
+  }, [puzzleDate, language, currentGuestFingerprint]);
 
   // Initial fetch + polling
   useEffect(() => {

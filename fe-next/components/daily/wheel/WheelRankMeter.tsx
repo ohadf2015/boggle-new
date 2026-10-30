@@ -3,14 +3,15 @@
 import React, { useState } from 'react';
 import { m } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { WHEEL_RANKS, rankProgress, rankThresholds } from '@/lib/wordWheel/rankLadder';
-import { scaleRankThresholds } from '@/utils/dailyChallenge/wordWheelScoring';
+import { WHEEL_RANKS, rankProgress, wheelRankLadder } from '@/lib/wordWheel/rankLadder';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
 interface WheelRankMeterProps {
   /** Bonus-dated puzzles use the scaled ladder. */
   puzzleDate?: string;
+  /** Board language: the ladder is stretched where wheels hold more words. */
+  language?: string;
   t: T;
   score: number;
   /** Fill the track from empty (fresh finish only). */
@@ -23,9 +24,9 @@ const prefersReducedMotion = () =>
   typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
 /** The same rank ladder the play screen climbs, as the results hero's meter strip. */
-export default function WheelRankMeter({ t, score, animate = false, puzzleDate = '' }: WheelRankMeterProps) {
+export default function WheelRankMeter({ t, score, animate = false, puzzleDate = '', language }: WheelRankMeterProps) {
   const [reduced] = useState(prefersReducedMotion);
-  const thresholds = scaleRankThresholds(rankThresholds(), puzzleDate);
+  const thresholds = wheelRankLadder({ puzzleDate, language });
   const { index, position, toNext } = rankProgress(score, thresholds);
   const last = thresholds.length - 1;
   const grow = animate && !reduced;

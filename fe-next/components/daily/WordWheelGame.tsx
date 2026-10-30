@@ -5,7 +5,7 @@ import { flushSync } from 'react-dom';
 import { useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { scoreWord, wordPoints, usesGold, wheelBreakdown, goldCoinsFor, scaleRankThresholds } from '@/utils/dailyChallenge/wordWheelScoring';
+import { scoreWord, wordPoints, usesGold, wheelBreakdown, goldCoinsFor } from '@/utils/dailyChallenge/wordWheelScoring';
 import { classifyLetterCoverage } from '@/lib/wheelRush/letterCoverage';
 import { wheelWordDir } from '@/lib/wheelRush/wordDirection';
 import type { Language } from '@/types';
@@ -40,7 +40,7 @@ import WordWheelHud from './WordWheelHud';
 import WordWheelLiveRanks from './WordWheelLiveRanks';
 import { GameShell, ShellKeysCard, SHELL_MEDIA } from '@/components/game/shell';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
-import { rankThresholds } from '@/lib/wordWheel/rankLadder';
+import { wheelRankLadder } from '@/lib/wordWheel/rankLadder';
 
 export type { WordWheelGameResult } from './wheel/wordWheelGameProps';
 
@@ -321,8 +321,12 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   const equippedBoardTheme = useEquippedCosmetic('boardTheme');
   const equippedTileSkin = useEquippedCosmetic('tileSkin');
   const thresholds = useMemo(
-    () => (bonuses ? scaleRankThresholds(rankThresholds(duration), puzzle.puzzleDate) : rankThresholds(practice ? 120 : duration)),
-    [bonuses, practice, duration, puzzle.puzzleDate],
+    () => wheelRankLadder({
+      durationSec: !bonuses && practice ? 120 : duration,
+      puzzleDate: bonuses ? puzzle.puzzleDate : '',
+      language: puzzle.language,
+    }),
+    [bonuses, practice, duration, puzzle.puzzleDate, puzzle.language],
   );
 
   const hud = (

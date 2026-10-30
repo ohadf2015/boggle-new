@@ -1,7 +1,7 @@
 /**
  * API Route: /api/validate-word
  * Validates words for single-player mode
- * Supports English, Spanish, Hebrew, Swedish, and Japanese dictionaries
+ * Supports English, Spanish, Hebrew, Swedish, Japanese and Russian dictionaries
  * Also checks community-validated words (words with 6+ net votes)
  */
 
@@ -16,6 +16,7 @@ import {
   getHebrewWordSet,
   getSwedishWordSet,
 } from '@/lib/server/sharedWordSets';
+import { isRussianWord } from '@/lib/server/russianWordLookup';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -41,6 +42,15 @@ function loadJapaneseDictionary(): Set<string> {
   if (fs.existsSync(kanjiFile)) {
     const content = fs.readFileSync(kanjiFile, 'utf-8');
     content.split('\n')
+      .map(w => w.trim())
+      .filter(w => w.length > 0)
+      .forEach(w => japaneseDictionary!.add(w));
+  }
+
+  // Hiragana base: the client cache and hiragana wheels use it; kanji stays for wheels already played.
+  const baseFile = path.join(backendDir, 'japanese_words.txt');
+  if (fs.existsSync(baseFile)) {
+    fs.readFileSync(baseFile, 'utf-8').split('\n')
       .map(w => w.trim())
       .filter(w => w.length > 0)
       .forEach(w => japaneseDictionary!.add(w));
@@ -163,6 +173,9 @@ export async function POST(request: NextRequest) {
         break;
       case 'ja':
         isInDictionary = loadJapaneseDictionary().has(normalizedWord);
+        break;
+      case 'ru':
+        isInDictionary = isRussianWord(normalizedWord);
         break;
     }
 

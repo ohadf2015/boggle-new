@@ -1,3 +1,5 @@
+import { scaleRankThresholds } from '@/utils/dailyChallenge/wordWheelScoring';
+
 export const WHEEL_RANKS = [
   'warmUp',
   'spinning',
@@ -18,11 +20,23 @@ const BASE_THRESHOLDS = [0, 12, 42, 90, 160, 260, 400, 600, 850];
 const BASE_DURATION = 120;
 const FIRST_STEP = 12;
 
-export function rankThresholds(durationSec: number = BASE_DURATION): number[] {
+// Hebrew wheels hold ~3x the words of English ones; without this ~75% of Hebrew players reached Wizard.
+const LANGUAGE_RANK_SCALE: Partial<Record<string, number>> = { he: 2 };
+
+export function rankThresholds(durationSec: number = BASE_DURATION, language?: string): number[] {
   const scale = Math.min(1, Math.max(0.25, durationSec / BASE_DURATION));
+  const langScale = (language && LANGUAGE_RANK_SCALE[language]) || 1;
   return BASE_THRESHOLDS.map((v, i) =>
-    i === 0 ? 0 : Math.max(FIRST_STEP * i, Math.round((v * scale) / 6) * 6),
+    i === 0 ? 0 : Math.max(FIRST_STEP * i, Math.round((v * scale * (i <= 1 ? 1 : langScale)) / 6) * 6),
   );
+}
+
+/** The one ladder every wheel surface shows: clock length, board language and bonus-day scale composed. */
+export function wheelRankLadder({ durationSec = BASE_DURATION, puzzleDate, language }: {
+  durationSec?: number; puzzleDate: string; language?: string;
+}): number[] {
+  const base = rankThresholds(durationSec, language);
+  return puzzleDate ? scaleRankThresholds(base, puzzleDate) : base;
 }
 
 export interface RankProgress {

@@ -11,6 +11,9 @@ import { SEED_SALT } from './constants';
 import { mulberry32, hashString } from './prng';
 import { getDailyChallengeDate, getPuzzleNumber } from './dateUtils';
 import { normalizeHebrewLetter } from '@/shared/utils/wordNormalization';
+import {
+  LEGACY_WHEEL_SOURCES, WHEEL_V2_SOURCES, WHEEL_V2_START_DATE, HARD_CENTER_LETTERS,
+} from './wordWheelSources';
 
 // ==========================================
 // Word Wheel Puzzle Types
@@ -24,61 +27,6 @@ export interface WordWheelPuzzle {
   language: Language;
   puzzleNumber: number;
 }
-
-// ==========================================
-// Nine-letter source words per language
-// ==========================================
-// These words provide the 9 unique letters for each puzzle.
-// Players don't need to find the source word — it's just the seed.
-
-const NINE_LETTER_SOURCES: Record<Language, string[]> = {
-  en: [
-    'BREATHING', 'COUNTRIES', 'DANGEROUS', 'EDUCATION', 'FINGERTIP',
-    'GARDENING', 'HARMONIZE', 'IMAGINERY', 'JUMBOSIZE', 'KNOWLEDGE',
-    'LANDSCAPE', 'MACHINERY', 'NIGHTCLUB', 'OPERATING', 'PLAYSCORE',
-    'QUESTIONS', 'REACTIONS', 'SCOLARING', 'TRAMLINES', 'UPLIGHTER',
-    'VOLCANISM', 'WORSENING', 'EXPLORING', 'YEARNINGS', 'SPRINKLED',
-    'BLUNDERS', 'COMPANIES', 'DIRECTION', 'EXPORTING', 'FLOWERING',
-    'GOVERNING', 'HORSEBACK', 'INVADERS', 'LAUNCHING', 'MOLECULES',
-    'NUMBERING', 'OUTSCORED', 'PRACTICED', 'REMAINING', 'SURPRISED',
-    'THOUSANDS', 'UNMASKING', 'VICTIMLESS', 'WANDERING', 'ANCHORING',
-    'BUILDINGS', 'CERTAINLY', 'DESERVING', 'EXCLUDING', 'FURNISHED',
-    'GROUNDING', 'HERODINGS', 'ISLANDERS', 'JUXTAPOSE', 'KINGFISHER',
-    'LEVITAING', 'MISGUIDED', 'WONDERING', 'UPHOLDING', 'CARVINGS',
-    'DREAMLIKE', 'FROSTBITE', 'NIGHTWARE', 'PUBLISHED', 'RECOGNISE',
-    'SHOULDERS', 'THUMBSCRW', 'UNKINDEST', 'VOLUNTARY', 'WITHERING',
-    'CUSTOMERS', 'FRAGMENTS', 'HANDWROTE', 'MICROWAVE', 'OUTSMARTED',
-    'PLUNDERED', 'KEYSTONED', 'OBJECTING', 'RESHAPING', 'WORLDWIDE',
-    'CLUSTERING', 'DIALOGUES', 'FRANCHISE', 'HORSEMINT', 'JAVELINS',
-    'MARKETING', 'NEURALKIT', 'PROVIDING', 'SQUIRMED', 'TRANSFORM',
-    'UPBRAIDED', 'VERBOSITY', 'WHETSTONE', 'YOUNGSTER', 'BADMINTON',
-    'CLOBBERED', 'DYNAMITES', 'EXPECTING', 'FULCRTIPS', 'GEOMETRIC',
-  ],
-  he: [
-    'מחשבונים', 'התלמידים', 'הספרייה', 'משחקיהם',
-    'מתכוננים', 'השכנייה', 'הרכבתיה', 'תלבושות',
-  ],
-  sv: [
-    'BOKSTAVER', 'DATORSPEL', 'FRIHANDIG', 'GRUNDKURS',
-    'HUVUDSIDA', 'KLARGÖRAS', 'LANDSTING', 'MUSIKBAND',
-  ],
-  ja: [
-    '新しい世界', '教育機関', '自然環境', '技術革新',
-    '文化交流', '経済発展', '社会問題', '健康管理',
-  ],
-  es: [
-    'RESPALDOS', 'CAMINANDO', 'DECORATIV', 'ENCONTRAR',
-    'FABRICADO', 'GOBIERNO', 'HORMIGAS', 'INDOMABLE',
-  ],
-  fr: [],
-  de: [],
-  ru: [
-    // All exactly 9 letters and present in russian_words.txt (the wheel uses
-    // the source word's 9 letters; non-9-letter words break wheel generation).
-    'СТРОИТЕЛИ', 'ПЕРЕВОДИТ', 'ФУНДАМЕНТ', 'ОПИСЫВАЕТ', 'ИСКУССТВО',
-    'КОМПЬЮТЕР', 'ВОЛШЕБНИК', 'КАРТОФЕЛЬ', 'МУЗЫКАНТЫ', 'ПРИРОДНЫЙ',
-  ],
-};
 
 /**
  * Extract unique letters from a source word.
@@ -99,6 +47,17 @@ function getUniqueLetters(word: string, language?: Language): string[] {
   return unique;
 }
 
+/** Played dates keep the old sources and center; practice/quick seeds are not dates and get v2. */
+function isV2Puzzle(date: string): boolean {
+  return !/^\d{4}-\d{2}-\d{2}$/.test(date) || date >= WHEEL_V2_START_DATE;
+}
+
+function moveFirstPlayableCenterToFront(letters: string[], language: Language): void {
+  const hard = HARD_CENTER_LETTERS[language] ?? [];
+  const idx = letters.findIndex(l => !hard.includes(l));
+  if (idx > 0) letters.unshift(letters.splice(idx, 1)[0]);
+}
+
 /**
  * Generate a deterministic Word Wheel puzzle for a given date + language.
  * Same date + language = same puzzle worldwide.
@@ -115,8 +74,10 @@ export function generateWordWheelPuzzle(
   const seed = hashString(seedStr);
   const random = mulberry32(seed);
 
-  // Pick a source word deterministically
-  const sources = NINE_LETTER_SOURCES[language] || NINE_LETTER_SOURCES.en;
+  const v2 = isV2Puzzle(date);
+  const sources = v2
+    ? (WHEEL_V2_SOURCES[language]?.length ? WHEEL_V2_SOURCES[language] : WHEEL_V2_SOURCES.en)
+    : (LEGACY_WHEEL_SOURCES[language] || LEGACY_WHEEL_SOURCES.en);
   const sourceIndex = Math.floor(random() * sources.length);
   const sourceWord = sources[sourceIndex];
 
@@ -144,8 +105,7 @@ export function generateWordWheelPuzzle(
     [letters[i], letters[j]] = [letters[j], letters[i]];
   }
 
-  // Center letter is the most "useful" — pick one that appears most in common words
-  // For simplicity: use the first letter after shuffle (deterministic)
+  if (v2) moveFirstPlayableCenterToFront(letters, language);
   const centerLetter = letters[0];
   const outerLetters = letters.slice(1, 7);
 

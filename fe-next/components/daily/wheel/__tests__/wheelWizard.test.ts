@@ -11,4 +11,8 @@ describe('reachesWizardRank', () => {
     expect(reachesWizardRank(600, '2026-11-05')).toBe(false);
     expect(reachesWizardRank(900, '2026-11-05')).toBe(true);
   });
+  it('reads the Hebrew ladder for Hebrew boards', () => {
+    expect(reachesWizardRank(900, '2026-10-30', 'he')).toBe(false);
+    expect(reachesWizardRank(1200, '2026-10-30', 'he')).toBe(true);
+  });
 });
