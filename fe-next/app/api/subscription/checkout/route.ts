@@ -190,7 +190,7 @@ export async function POST(request: NextRequest) {
     // checkout creation so the hosted page opens with name/email filled in.
     const profile = await profileCheckoutFields(user.id);
     const client = getPolarClient();
-    const checkoutUrl = await client.createCheckout({
+    const checkout = await client.createCheckout({
       userId: user.id,
       productId: getProProductId(),
       email: user.email ?? undefined,
@@ -199,6 +199,8 @@ export async function POST(request: NextRequest) {
       trialDays: trial ? trialPlan?.days : undefined,
       locale,
     });
+    const checkoutUrl = checkout.url;
+    const checkoutId = checkout.id;
 
     // Refuse before recording checkout_started. A sandbox URL must not count
     // as a start — that is the stall this guard exists to stop.
@@ -235,7 +237,13 @@ export async function POST(request: NextRequest) {
         logSubscriptionEvent({
           userId: user.id,
           eventType: CHECKOUT_STARTED_EVENT,
-          payload: checkoutStartedPayload({ trial, locale, clientKind: tags?.client_kind }),
+          payload: checkoutStartedPayload({
+            trial,
+            locale,
+            clientKind: tags?.client_kind,
+            email: user.email ?? null,
+            checkoutId,
+          }),
         }),
         CHECKOUT_START_RECORD_TIMEOUT_MS,
       );
@@ -246,13 +254,15 @@ export async function POST(request: NextRequest) {
     // Analytics only, after the checkout exists; never able to change the answer.
     // URL creation is `checkout_started` (plus the edu_* names). `checkout_complete`
     // fires from the Polar webhook on paid `subscription.active` — not here.
+    // checkout_id is the join key to the return beacon, which echoes the same id.
     try {
+      const startTags: Record<string, unknown> = { ...tags, ...(checkoutId ? { checkout_id: checkoutId } : {}) };
       if (trial) {
-        captureProFunnelServerEvent(buildProTrialStartedEvent(user.id, { ...tags }));
-        captureProFunnelServerEvent(buildCheckoutStartedEvent(user.id, { ...tags }));
+        captureProFunnelServerEvent(buildProTrialStartedEvent(user.id, startTags));
+        captureProFunnelServerEvent(buildCheckoutStartedEvent(user.id, startTags));
       } else {
-        captureProFunnelServerEvent(buildProCheckoutStartedEvent(user.id, { ...tags }));
-        captureProFunnelServerEvent(buildCheckoutStartedEvent(user.id, { ...tags }));
+        captureProFunnelServerEvent(buildProCheckoutStartedEvent(user.id, startTags));
+        captureProFunnelServerEvent(buildCheckoutStartedEvent(user.id, startTags));
       }
 
       // Diagnostic only — never blocks the redirect. A teacher who started

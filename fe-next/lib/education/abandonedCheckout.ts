@@ -18,20 +18,31 @@ export type CheckoutMode = 'trial' | 'paid';
 /**
  * `client_kind` is 'browser' | 'script' from checkoutTrafficTags (Fetch Metadata).
  * Rows written before it existed have none and are treated as unknown, not script.
+ *
+ * `email` + `checkout_id` make the row recoverable even when user_id is NULL
+ * (the 2026-10-23 anonymous paid/en rows): the abandoned-checkout cron can
+ * match on email, and the return beacon echoes the same Polar checkout id.
+ * subscription_events is service-role-only, so the email never leaves the server.
  */
 export function checkoutStartedPayload({
   trial,
   locale,
   clientKind,
+  email,
+  checkoutId,
 }: {
   trial: boolean;
   locale: string;
   clientKind?: 'browser' | 'script';
+  email?: string | null;
+  checkoutId?: string | null;
 }) {
   return {
     mode: (trial ? 'trial' : 'paid') as CheckoutMode,
     locale,
     ...(clientKind ? { client_kind: clientKind } : {}),
+    ...(email ? { email } : {}),
+    ...(checkoutId ? { checkout_id: checkoutId } : {}),
   };
 }
 

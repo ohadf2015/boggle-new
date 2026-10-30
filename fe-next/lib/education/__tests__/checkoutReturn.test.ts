@@ -3,9 +3,11 @@ import {
   GRANT_POLL_MAX_TRIES,
   RETURN_INTENT_KEY,
   RETURN_INTENT_TTL_MS,
+  checkoutIdFromSearch,
   checkoutReturnPhase,
   clearReturnIntent,
   isCheckoutSuccessSearch,
+  normalizeCheckoutId,
   readReturnIntent,
   rememberReturnIntent,
 } from '../checkoutReturn';
@@ -33,6 +35,32 @@ describe('isCheckoutSuccessSearch', () => {
     expect(isCheckoutSuccessSearch('')).toBe(false);
     expect(isCheckoutSuccessSearch('?checkout=cancel')).toBe(false);
     expect(isCheckoutSuccessSearch('?classroomId=c1')).toBe(false);
+  });
+});
+
+describe('checkoutIdFromSearch', () => {
+  const id = '4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a';
+
+  it('reads the checkout_id Polar substitutes into the success_url', () => {
+    expect(checkoutIdFromSearch(`?checkout=success&checkout_id=${id}`)).toBe(id);
+    expect(checkoutIdFromSearch(`checkout_id=${id}&checkout=success`)).toBe(id);
+  });
+
+  it('returns null for a stale success bookmark (no id) or a malformed one', () => {
+    expect(checkoutIdFromSearch('?checkout=success')).toBe(null);
+    expect(checkoutIdFromSearch('')).toBe(null);
+    expect(checkoutIdFromSearch('?checkout=success&checkout_id=garbage')).toBe(null);
+  });
+});
+
+describe('normalizeCheckoutId', () => {
+  it('accepts only UUID-shaped ids', () => {
+    expect(normalizeCheckoutId('4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a')).toBe('4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a');
+    expect(normalizeCheckoutId('4B9C2F1E-7A3D-4C5E-9F0A-1B2C3D4E5F6A')).toBe('4B9C2F1E-7A3D-4C5E-9F0A-1B2C3D4E5F6A');
+    expect(normalizeCheckoutId('not-a-uuid')).toBe(null);
+    expect(normalizeCheckoutId(42)).toBe(null);
+    expect(normalizeCheckoutId(undefined)).toBe(null);
+    expect(normalizeCheckoutId(null)).toBe(null);
   });
 });
 

@@ -36,6 +36,7 @@
 
 import posthog from '@/lib/analytics/lazyPosthog';
 import { trackGrowthEvent, type GrowthEvent } from '@/utils/growthTracking';
+import { checkoutIdFromSearch, normalizeCheckoutId } from '@/lib/education/checkoutReturn';
 
 type Capture = (event: string, props?: Record<string, unknown>) => void;
 
@@ -189,7 +190,10 @@ export function trackEduProCheckoutSuccessSeen(now: number = Date.now()): boolea
  * grant (`edu_pro_checkout_succeeded`), so a return is not a second conversion.
  * A reload inside 24h does not count again.
  */
-export function trackEduProCheckoutReturnLanded(now: number = Date.now()): boolean {
+export function trackEduProCheckoutReturnLanded(
+  now: number = Date.now(),
+  attribution?: { checkoutId?: string | null; url?: string | null },
+): boolean {
   let last: number | null = null;
   try {
     const raw = localStorage.getItem(RETURN_LANDED_STORAGE_KEY);
@@ -199,15 +203,48 @@ export function trackEduProCheckoutReturnLanded(now: number = Date.now()): boole
   }
   if (last !== null && Number.isFinite(last) && now - last < SUCCESS_DEDUPE_MS) return false;
 
-  captureStep('edu_pro_checkout_return_landed', {});
-  safeCapture('checkout_return_landed', { product: 'teacher_pro', provider: 'polar' });
+  // Polar substitutes {CHECKOUT_ID} in the success_url, so a real return carries
+  // the exact session id; a stale bookmark has none. The server beacon resolves
+  // the id to Polar's checkout status, which is what tells "webhook lost" apart
+  // from "stale URL revisit".
+  let checkoutId = normalizeCheckoutId(attribution?.checkoutId);
+  let url = attribution?.url ?? null;
+  if (typeof window !== 'undefined') {
+    if (checkoutId === null) {
+      try {
+        checkoutId = checkoutIdFromSearch(window.location?.search ?? '');
+      } catch {
+        /* attribution is best-effort */
+      }
+    }
+    if (url === null) {
+      try {
+        const href = window.location?.href;
+        url = typeof href === 'string' && href.length <= 300 ? href : null;
+      } catch {
+        /* attribution is best-effort */
+      }
+    }
+  }
+  const attributionProps: Record<string, unknown> = {
+    ...(checkoutId ? { checkout_id: checkoutId } : {}),
+  };
+
+  captureStep('edu_pro_checkout_return_landed', attributionProps);
+  safeCapture('checkout_return_landed', { product: 'teacher_pro', provider: 'polar', ...attributionProps });
   try {
     if (typeof fetch === 'function') {
       const path = typeof window !== 'undefined' ? window.location?.pathname : undefined;
       void fetch('/api/subscription/checkout-return', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ product: 'teacher_pro', provider: 'polar', ...(path ? { path } : {}) }),
+        body: JSON.stringify({
+          product: 'teacher_pro',
+          provider: 'polar',
+          ...(path ? { path } : {}),
+          ...(checkoutId ? { checkout_id: checkoutId } : {}),
+          ...(url ? { url } : {}),
+        }),
         keepalive: true,
         credentials: 'same-origin',
       }).catch(() => {});
