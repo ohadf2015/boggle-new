@@ -19,7 +19,7 @@ import {
   getWordWheelResultKey,
 } from './constants';
 import { getDailyChallengeDate, getPreviousDate } from './dateUtils';
-import { updateDailyStreak } from './streaks';
+import { updateDailyStreak, getDailyStreak } from './streaks';
 import {
   getJsonFromLocalStorage,
   saveJsonToLocalStorage,
@@ -27,6 +27,7 @@ import {
   getFromLocalStorage,
 } from '@/utils/storageHelpers';
 import { markDailyDoneEver } from '@/lib/soloRotation';
+import { clearWordWheelRun } from './wordWheelRun';
 
 // ==========================================
 // Legacy Daily Challenge Storage
@@ -193,10 +194,9 @@ export function saveWordHuntResult(result: WordHuntResult, isAuthenticated: bool
   saveJsonToLocalStorage(key, storedResult);
   markDailyDoneEver();
 
-  // Update the daily streak only for authenticated users
-  // Anonymous users don't get streak tracking - incentive to sign up
+  // Signed-in only; and like the server, only a solved, non-catch-up day extends it.
   if (isAuthenticated) {
-    return updateDailyStreak(today);
+    return result.solved && !result.isCatchup ? updateDailyStreak(today) : getDailyStreak();
   }
 
   // Return empty streak for anonymous users
@@ -373,7 +373,7 @@ export function getTodaysWordWheelResult(language: Language): StoredWordWheelRes
 /**
  * Save Word Wheel result
  */
-export function saveWordWheelResult(result: WordWheelResult): void {
+export function saveWordWheelResult(result: WordWheelResult, opts: { submitted?: boolean } = {}): void {
   const today = result.puzzleDate || getDailyChallengeDate();
   const key = getWordWheelResultKey(result.language, today);
 
@@ -382,10 +382,11 @@ export function saveWordWheelResult(result: WordWheelResult): void {
     puzzleNumber: result.puzzleNumber,
     result,
     completedAt: new Date().toISOString(),
-    submittedToServer: false,
+    submittedToServer: opts.submitted ?? false,
   };
 
   saveJsonToLocalStorage(key, storedResult);
+  clearWordWheelRun(result.language, today);
   markDailyDoneEver();
 }
 

@@ -163,6 +163,21 @@ describe('Daily Challenge Streaks', () => {
       expect(result.totalDailiesCompleted).toBe(15); // Not incremented
     });
 
+    it('given a catch-up completion for a day before the last played day, then the streak is left untouched', () => {
+      const existingStreak = {
+        currentStreak: 5,
+        longestStreak: 10,
+        lastPlayedDate: '2026-01-31',
+        totalDailiesCompleted: 15,
+      };
+      localStorageMock.setItem(DAILY_STREAK_KEY, JSON.stringify(existingStreak));
+
+      const result = updateDailyStreak('2026-01-29');
+
+      expect(result).toEqual(existingStreak);
+      expect(JSON.parse(localStorageMock.getItem(DAILY_STREAK_KEY) as string)).toEqual(existingStreak);
+    });
+
     it('should update longest streak when current exceeds it', () => {
       // GIVEN: Current streak equals longest streak
       const existingStreak = {

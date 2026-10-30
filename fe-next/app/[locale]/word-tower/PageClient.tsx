@@ -8,9 +8,10 @@ import { useAuth } from '@/contexts/AuthContext';
  * rendered. `ssr: false` is only legal inside a Client Component, which is what
  * this wrapper exists to provide — the same shape v1 uses.
  */
-const WordTowerV2 = dynamic(() => import('@/components/wordTowerV2/WordTowerV2'), {
-  ssr: false,
-});
+const loadWordTowerV2 = () => import('@/components/wordTowerV2/WordTowerV2');
+// Fetch the game chunk while auth resolves, not after.
+if (typeof window !== 'undefined') void loadWordTowerV2().catch(() => undefined);
+const WordTowerV2 = dynamic(loadWordTowerV2, { ssr: false });
 
 /**
  * Word Tower v2 — now public (GA).

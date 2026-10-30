@@ -6,6 +6,28 @@ import type { Language } from '@/types';
 const VALID_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const MAX_DATES = 3;
+const WINDOW_PAST_DAYS = 7;
+const DAY_MS = 86_400_000;
+const PUZZLE_MEMO_MAX = 48;
+
+const puzzleMemo = new Map<string, ReturnType<typeof generateDailyPuzzle>>();
+
+function memoPuzzle(date: string, language: Language) {
+  const key = `${date}:${language}`;
+  const hit = puzzleMemo.get(key);
+  if (hit) return hit;
+  const puzzle = generateDailyPuzzle(date, language);
+  if (puzzleMemo.size >= PUZZLE_MEMO_MAX) puzzleMemo.delete(puzzleMemo.keys().next().value as string);
+  puzzleMemo.set(key, puzzle);
+  return puzzle;
+}
+
+function inWindow(date: string, today: string): boolean {
+  const ms = Date.parse(`${date}T00:00:00Z`);
+  if (Number.isNaN(ms) || new Date(ms).toISOString().slice(0, 10) !== date) return false;
+  const todayMs = Date.parse(`${today}T00:00:00Z`);
+  return ms >= todayMs - WINDOW_PAST_DAYS * DAY_MS && ms <= todayMs + DAY_MS;
+}
 
 function endOfDateUtcMs(dateStr: string): number {
   return new Date(`${dateStr}T23:59:59.999Z`).getTime();
@@ -29,14 +51,18 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'invalid date format' }, { status: 400 });
   }
 
+  const today = getDailyChallengeDate();
+  if (dates.some((d) => !inWindow(d, today))) {
+    return NextResponse.json({ error: 'date out of range' }, { status: 400 });
+  }
+
   const user = await getAuthedUser(request);
   if (!user) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
 
-  const today = getDailyChallengeDate();
   const puzzles = dates.map((date) => {
-    const puzzle = generateDailyPuzzle(date, language as Language);
+    const puzzle = memoPuzzle(date, language as Language);
     const started = date <= today;
     return {
       date,
@@ -47,5 +73,6 @@ export async function GET(request: Request) {
     };
   });
 
-  return NextResponse.json({ puzzles });
+  // private: the route is auth-gated, so a shared cache would serve today's word to signed-out requests.
+  return NextResponse.json({ puzzles }, { headers: { 'Cache-Control': 'private, max-age=300' } });
 }

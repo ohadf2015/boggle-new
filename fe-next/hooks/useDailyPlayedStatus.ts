@@ -4,20 +4,21 @@
  * Single source of truth for:
  * - Whether player has played each mode today (wordHunt, wordWheel, wordTower, connections)
  * - Current streak (server-backed for authed, localStorage for guests)
- * - All completed dates (for freeze bridge logic)
+ * - Whether the player has ever finished a daily (newcomer UI)
  *
  * Strategy:
- * 1. Authed users: skeleton until server resolves (no localStorage flip)
- * 2. Guests: localStorage immediately, never flips
- * 3. Server is authoritative across all devices
+ * 1. Auth still resolving: loading (no guest guess that flips to server state)
+ * 2. Authed: one shared /api/daily/status request for every consumer on the
+ *    page; skeleton until the first answer, then silent revalidation
+ * 3. Guests: localStorage, read before first paint
+ * 4. Played flags are per UTC day: a new day drops yesterday's answer
  */
 
-import { useState, useEffect, useLayoutEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useLayoutEffect, useCallback, useSyncExternalStore } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import type { DailyPlayedStatus } from '@/app/api/daily/status/route';
-import { getGuestFingerprint } from '@/utils/dailyChallenge/guestPlayer';
 import { getDailyStreak } from '@/utils/dailyChallenge/streaks';
-import { getDailyChallengeDate } from '@/utils/dailyChallenge/dateUtils';
+import { getDailyChallengeDate, getSecondsUntilNextDaily } from '@/utils/dailyChallenge/dateUtils';
 import { dailyBestKey, isDailyTowerPlayed } from '@/lib/wordTower/dailyBest';
 import { utcDateKey } from '@/lib/wordTower/dailySeed';
 import { hasPlayedConnectionsToday } from '@/lib/connections/dailyClient';
@@ -26,16 +27,15 @@ import { ALL_LANGUAGES } from '@/lib/languageConfig';
 
 type PlayedToday = DailyPlayedStatus['today'];
 
+const NOTHING_PLAYED: PlayedToday = { wordHunt: false, wordWheel: false, wordTower: false, connections: false };
+/** Consumers mounting within this window share the previous answer instead of refetching. */
+const FRESH_MS = 5000;
+
 /**
  * This device's "played today" flags, read from the keys the games actually
  * write: the per-language Word Hunt / Word Wheel result records (any language
  * counts — the server's answer is language-agnostic too), the Connections
  * played marker and the Word Tower daily best.
- *
- * Previously read `wh_played_<date>` / `ww_played_<date>` /
- * `connections_played_<date>`, which nothing writes, so every guest looked
- * like they had played nothing and the results handoff looped them back into
- * Word Wheel instead of reaching "all clear".
  */
 function getLocalPlayedToday(): PlayedToday {
   const today = getDailyChallengeDate();
@@ -61,139 +61,207 @@ function mergePlayedToday(a: PlayedToday, b: PlayedToday | null): PlayedToday {
   };
 }
 
-function readLocalPlayedToday(): PlayedToday | null {
-  try { return getLocalPlayedToday(); } catch { return null; /* storage disabled */ }
+const anyPlayed = (today: PlayedToday) => today.wordHunt || today.wordWheel || today.wordTower || today.connections;
+
+interface LocalSnapshot {
+  day: string;
+  today: PlayedToday;
+  streak: { current: number; longest: number };
+  totalCompleted: number;
 }
 
-/**
- * Get guest's played state from localStorage
- */
-function getGuestPlayedStatus(): DailyPlayedStatus {
-  const localStreak = getDailyStreak();
-  return {
-    today: getLocalPlayedToday(),
-    streak: {
-      current: localStreak.currentStreak,
-      longest: localStreak.longestStreak,
-    },
-    allCompletedDates: [], // Guest dates not aggregated client-side
-    freezeCount: 0,
-    loading: false,
-    fromServer: false,
-  };
+function readLocal(): LocalSnapshot | null {
+  try {
+    const streak = getDailyStreak();
+    return {
+      day: getDailyChallengeDate(),
+      today: getLocalPlayedToday(),
+      streak: { current: streak.currentStreak, longest: streak.longestStreak },
+      totalCompleted: streak.totalDailiesCompleted ?? 0,
+    };
+  } catch {
+    return null; // storage disabled
+  }
 }
 
-export function useDailyPlayedStatus(): DailyPlayedStatus & { refresh: () => Promise<void> } {
-  const { user, isAuthenticated } = useAuth();
-  const playerId = user?.id ?? null;
+// ── Shared server answer (one request per player per day, for every consumer) ──
 
-  // Authed: skeleton until the server resolves. Guest: nothing played, then the
-  // layout effect below reads this device's flags before first paint. The init
-  // must not touch localStorage — the daily hub SSRs (Sentry JAVASCRIPT-NEXTJS-29G),
-  // and reading it during hydration would mismatch the server HTML.
-  const [status, setStatus] = useState<DailyPlayedStatus>(() => ({
-    today: { wordHunt: false, wordWheel: false, wordTower: false, connections: false },
-    streak: { current: 0, longest: 0 },
-    allCompletedDates: [],
-    freezeCount: 0,
-    loading: Boolean(isAuthenticated && playerId),
-    fromServer: false,
-  }));
+interface Entry {
+  key: string;
+  data: DailyPlayedStatus | null;
+  fetchedAt: number;
+  settled: boolean;
+  inflight: Promise<void> | null;
+}
 
-  useLayoutEffect(() => {
-    if (isAuthenticated && playerId) return;
-    try { setStatus(getGuestPlayedStatus()); } catch { /* storage disabled */ }
-  }, [isAuthenticated, playerId]);
+let entry: Entry | null = null;
+let version = 0;
+const listeners = new Set<() => void>();
 
-  const isMounted = useRef(true);
-  const isFetching = useRef(false);
+function notify() {
+  version += 1;
+  listeners.forEach((listener) => listener());
+}
 
-  // Server unreachable/refused: stop the skeleton (it used to wait forever) and
-  // fall back to this device's played flags, so the CTA never points at a mode
-  // the player just finished.
-  const settleFromLocal = useCallback(() => {
-    if (!isMounted.current) return;
-    const local = readLocalPlayedToday();
-    setStatus((prev) => ({
-      ...prev,
-      today: mergePlayedToday(prev.today, local),
-      loading: false,
-    }));
-  }, []);
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+  return () => { listeners.delete(listener); };
+}
 
-  const fetchStatus = useCallback(async () => {
-    if (!playerId || isFetching.current) return;
-    isFetching.current = true;
+const getVersion = () => version;
+const getServerVersion = () => 0;
 
+const entryKey = (playerId: string, day: string) => `${playerId}:${day}`;
+
+function revalidate(playerId: string, force = false): Promise<void> {
+  const key = entryKey(playerId, getDailyChallengeDate());
+  if (!entry || entry.key !== key) {
+    entry = { key, data: null, fetchedAt: 0, settled: false, inflight: null };
+  }
+  const current = entry;
+  if (current.inflight) return current.inflight;
+  if (!force && current.data && Date.now() - current.fetchedAt < FRESH_MS) return Promise.resolve();
+
+  const request = (async () => {
     try {
-      const response = await fetch(`/api/daily/status?userId=${playerId}`, {
+      const response = await fetch(`/api/daily/status?userId=${encodeURIComponent(playerId)}`, {
         signal: AbortSignal.timeout(5000),
       });
-
-      if (!response.ok) {
+      if (response.ok) {
+        current.data = (await response.json()) as DailyPlayedStatus;
+        current.fetchedAt = Date.now();
+      } else {
         console.warn('[useDailyPlayedStatus] status', response.status);
-        settleFromLocal();
-        return;
-      }
-
-      const data = (await response.json()) as DailyPlayedStatus;
-
-      if (isMounted.current) {
-        // The server is authoritative ACROSS devices, but a score post from
-        // this device may not have landed yet — keep what this device knows.
-        setStatus({ ...data, today: mergePlayedToday(data.today, readLocalPlayedToday()) });
       }
     } catch (error) {
       console.warn('[useDailyPlayedStatus] fetch error:', error);
-      settleFromLocal();
     } finally {
-      isFetching.current = false;
+      current.settled = true;
+      current.inflight = null;
+      notify();
     }
-  }, [playerId, settleFromLocal]);
+  })();
+  current.inflight = request;
+  return request;
+}
 
-  // Initial load
+/** Test-only: drop the shared answer between tests. */
+export function __resetDailyPlayedStatusStore() {
+  entry = null;
+  version = 0;
+}
+
+export type DailyPlayedStatusResult = DailyPlayedStatus & {
+  /** Has this player ever finished a daily (any mode, any day)? */
+  hasPlayedBefore: boolean;
+  /** Silent revalidation: never flips `loading` back on once resolved. */
+  refresh: () => Promise<void>;
+};
+
+export function useDailyPlayedStatus(): DailyPlayedStatusResult {
+  const { user, isAuthenticated, loading: authLoading = false } = useAuth();
+  const playerId = isAuthenticated && user?.id ? user.id : null;
+
+  useSyncExternalStore(subscribe, getVersion, getServerVersion);
+
+  // This device's flags. Read in a layout effect, never during render: the hub
+  // SSRs, and touching localStorage there throws / mismatches hydration.
+  const [local, setLocal] = useState<LocalSnapshot | null>(null);
+  const syncLocal = useCallback(() => setLocal(readLocal()), []);
+
+  useLayoutEffect(() => {
+    syncLocal();
+  }, [syncLocal, playerId]);
+
   useEffect(() => {
-    isMounted.current = true;
+    if (authLoading || !playerId) return;
+    void revalidate(playerId);
+  }, [authLoading, playerId]);
 
-    if (isAuthenticated && playerId) {
-      fetchStatus();
-    }
-
-    return () => {
-      isMounted.current = false;
-    };
-  }, [isAuthenticated, playerId, fetchStatus]);
-
-  // Auto-refresh on visibility change
+  // Tab return / focus re-checks the day and revalidates; a timer rolls the
+  // day over at 00:00 UTC for a tab left open.
   useEffect(() => {
-    let debounceTimer: ReturnType<typeof setTimeout>;
-
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible' && isAuthenticated && playerId) {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-          if (isMounted.current) {
-            fetchStatus();
-          }
-        }, 500);
-      }
+    if (authLoading) return undefined;
+    const recheck = () => {
+      if (document.visibilityState !== 'visible') return;
+      syncLocal();
+      if (playerId) void revalidate(playerId);
     };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
+    const rollover = setTimeout(() => {
+      syncLocal();
+      if (playerId) void revalidate(playerId, true);
+    }, (getSecondsUntilNextDaily() + 1) * 1000);
+    document.addEventListener('visibilitychange', recheck);
+    window.addEventListener('focus', recheck);
     return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      clearTimeout(debounceTimer);
+      clearTimeout(rollover);
+      document.removeEventListener('visibilitychange', recheck);
+      window.removeEventListener('focus', recheck);
     };
-  }, [isAuthenticated, playerId, fetchStatus]);
+  }, [authLoading, playerId, syncLocal, local?.day]);
 
   const refresh = useCallback(async () => {
-    setStatus((prev) => ({ ...prev, loading: true }));
-    await fetchStatus();
-  }, [fetchStatus]);
+    syncLocal();
+    if (playerId) await revalidate(playerId, true);
+  }, [playerId, syncLocal]);
 
+  const day = local?.day ?? getDailyChallengeDate();
+  const localToday = local && local.day === day ? local.today : null;
+  const localEver = Boolean(local && (local.totalCompleted > 0 || local.streak.longest > 0));
+
+  if (authLoading) {
+    return {
+      today: NOTHING_PLAYED,
+      streak: { current: 0, longest: 0 },
+      allCompletedDates: [],
+      freezeCount: 0,
+      loading: true,
+      fromServer: false,
+      hasPlayedBefore: false,
+      refresh,
+    };
+  }
+
+  if (!playerId) {
+    const today = localToday ?? NOTHING_PLAYED;
+    return {
+      today,
+      streak: local?.streak ?? { current: 0, longest: 0 },
+      allCompletedDates: [],
+      freezeCount: 0,
+      loading: false,
+      fromServer: false,
+      hasPlayedBefore: localEver || anyPlayed(today),
+      refresh,
+    };
+  }
+
+  const shared = entry && entry.key === entryKey(playerId, day) ? entry : null;
+  const data = shared?.data ?? null;
+  if (data) {
+    // Server is authoritative across devices, but a score post from this
+    // device may not have landed yet — keep what this device knows.
+    const today = mergePlayedToday(data.today, localToday);
+    return {
+      ...data,
+      today,
+      loading: false,
+      hasPlayedBefore: data.allCompletedDates.length > 0 || data.streak.longest > 0 || anyPlayed(today) || localEver,
+      refresh,
+    };
+  }
+
+  // No server answer yet: skeleton until the first request settles; if it
+  // failed, fall back to this device so the CTA never points at a finished mode.
+  const today = localToday ?? NOTHING_PLAYED;
   return {
-    ...status,
+    today,
+    streak: { current: 0, longest: 0 },
+    allCompletedDates: [],
+    freezeCount: 0,
+    loading: !shared?.settled,
+    fromServer: false,
+    hasPlayedBefore: localEver || anyPlayed(today),
     refresh,
   };
 }

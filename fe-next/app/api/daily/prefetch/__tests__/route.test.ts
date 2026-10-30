@@ -3,7 +3,7 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 
 vi.mock('next/server', () => ({
   NextResponse: {
-    json: vi.fn((data, init) => ({ data, status: init?.status ?? 200 })),
+    json: vi.fn((data, init) => ({ data, status: init?.status ?? 200, headers: init?.headers })),
   },
 }));
 
@@ -121,11 +121,41 @@ describe('GET /api/daily/prefetch', () => {
 
   it('caps to 3 dates to prevent abuse', async () => {
     const res = await GET(
-      makeRequest({ language: 'en', dates: '2026-05-12,2026-05-13,2026-05-14,2026-05-15' }),
+      makeRequest({ language: 'en', dates: '2026-05-12,2026-05-11,2026-05-10,2026-05-09' }),
     );
     expect(res.status).toBe(200);
     expect(res.data.puzzles).toHaveLength(3);
-    expect(vi.mocked(generateDailyPuzzle)).toHaveBeenCalledTimes(3);
+  });
+
+  it('rejects dates beyond tomorrow (no multi-day-ahead grid leak)', async () => {
+    const res = await GET(makeRequest({ language: 'en', dates: '2026-05-14' }));
+    expect(res.status).toBe(400);
+    expect(generateDailyPuzzle).not.toHaveBeenCalled();
+  });
+
+  it('rejects dates older than the prefetch window (no archive targetWord scraping)', async () => {
+    const res = await GET(makeRequest({ language: 'en', dates: '2025-01-01' }));
+    expect(res.status).toBe(400);
+    expect(generateDailyPuzzle).not.toHaveBeenCalled();
+  });
+
+  it('rejects impossible calendar dates', async () => {
+    const res = await GET(makeRequest({ language: 'en', dates: '2026-02-30' }));
+    expect(res.status).toBe(400);
+  });
+
+  it('sends a browser-cacheable Cache-Control on success and none on errors', async () => {
+    const ok = await GET(makeRequest({ language: 'en', dates: '2026-05-12' }));
+    expect(ok.headers?.['Cache-Control']).toMatch(/max-age=300/);
+    expect(ok.headers?.['Cache-Control']).not.toMatch(/public/);
+    const bad = await GET(makeRequest({ language: 'xx', dates: '2026-05-12' }));
+    expect(bad.headers?.['Cache-Control']).toBeUndefined();
+  });
+
+  it('generates each (date, language) puzzle once across repeated calls', async () => {
+    await GET(makeRequest({ language: 'es', dates: '2026-05-08,2026-05-09' }));
+    await GET(makeRequest({ language: 'es', dates: '2026-05-08,2026-05-09' }));
+    expect(vi.mocked(generateDailyPuzzle)).toHaveBeenCalledTimes(2);
   });
 
   it('accepts all 5 supported language codes', async () => {

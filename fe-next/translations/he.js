@@ -9628,7 +9628,45 @@ const he = {
     "streak": {
       "freeze_toast_no_remaining": "הקפאת הרצף הופעלה, {day} נשמר · אין עוד הקפאות"
     },
-"practiceBoard": "לוח אימון"
+"practiceBoard": "לוח אימון",
+"hub": { "intro": "כל יום סט חדש של חידות מילים, אותו סט לכולם. מסיימים את שתי הראשונות והיום סגור.",
+"resetsAt": "חידות חדשות ב־{time} לפי השעון שלכם.",
+"newcomerTip": "חדשים כאן? התחילו עם {mode}. זה לוקח בערך 2 דקות.",
+"dismissTip": "הבנתי",
+"bonusTag": "בונוס",
+"play": "לשחק",
+"timed": "על זמן",
+"noTimer": "בלי טיימר",
+"progressLabel": "ההתקדמות של היום",
+"requiredDone": "שתי החידות של היום מאחוריכם! חידות הבונוס הן תוספת.",
+"pastPuzzles": "פספסתם יום? חידות קודמות"
+},
+"archivePage": { "backToHub": "חזרה לחידות של היום",
+"title": "חידות קודמות",
+"subtitle": "כל חידות ציד המילים היומיות עד עכשיו, ואיך הלך לשחקנים. פספסתם אחת בשלושת הימים האחרונים? אפשר עדיין לשחק בה.",
+"count": "{n} חידות",
+"view": "לצפייה",
+"backToArchive": "חידות קודמות",
+"notFound": "החידה לא נמצאה",
+"previous": "החידה הקודמת",
+"next": "החידה הבאה",
+"puzzleTitle": "חידה מס׳ {n}",
+"players": "שחקנים",
+"solveRate": "אחוז פתרון",
+"solved": "פתרו",
+"avgTries": "ממוצע ניסיונות",
+"noStats": "אין עדיין נתונים לחידה הזו.",
+"distribution": "ניסיונות עד הפתרון",
+"playToday": "לחידות של היום",
+"playThisDay": "לשחק בציד המילים של היום הזה"
+},
+"leaderboard": { "scoreExplainer": "הנקודות מכל הפאזלים של היום, מחוברות יחד.",
+"youRank": "אתם: מקום {rank} מתוך {total}",
+"topPercent": "ב־{percent}% העליונים",
+"inviteFriend": "הזמינו חבר",
+"inviteText": "חושבים שתנצחו אותי בפאזלים של היום ב־LexiClash?",
+"linkCopied": "הקישור הועתק!"
+}
 },
   "dailyWordWheelLanding": {
     "hero": {
@@ -9796,8 +9834,12 @@ const he = {
       "perfectBanner": "אלוף המילים!",
       "onlyYouFound": "רק אתם מצאתם, בינתיים!",
       "rareFind": "מציאה נדירה · רק {count} מצאו",
-      "streakChip": "רצף של {count} ימים"
-    },
+      "streakChip": "רצף של {count} ימים",
+"breakdownBase": "מילים",
+"breakdownCombo": "קומבו",
+"breakdownGold": "זהב",
+"goldCoins": "+{count} מטבעות ממילי זהב"
+},
     "signup": {
       "streakTitle": "שמרו על רצף {count} הימים שלכם",
       "boardTitle": "תפסו את המקום שלכם בטבלה",
@@ -9830,7 +9872,15 @@ const he = {
 "accepted": "{word}! בדיוק ככה. עכשיו לגלגל של היום",
 "notWord": "זו לא מילה. נסו {word}",
 "check": "בדיקה"
-}
+},
+"cantCheck": "לא הצלחנו לבדוק את המילה. נסו שוב",
+"quitKeepsWords": "המילים שמצאתם עד עכשיו ייחשבו כתוצאה של היום.",
+"goldLetterLabel": "אות זהב",
+"comboLabel": "קומבו {value}",
+"comboLost": "הקומבו נשבר",
+"longerWordsTip": "מילים ארוכות שוות הרבה יותר: 3 אותיות = {short}, 7 אותיות = {long}",
+"comboTip": "מצאו מילים ברצף כדי לבנות קומבו, עד פי 2 נקודות.",
+"goldTip": "היום יש אות זהב: מילים איתה שוות 50% יותר ומרוויחות מטבעות."
 },
   "dailyChallenge": {
     "pointsPerWord": "נקודות למילה"
@@ -17962,8 +18012,9 @@ const he = {
       "step1": "מצאו את המילה הנסתרת",
       "step2": "אייתו מילים כדי לחשוף רמזים",
       "step3": "מילים קצרות לא עולות ניסיון",
-      "scoreTip": "פצחו ראשונים = ניקוד גדול!"
-    },
+      "scoreTip": "פצחו ראשונים = ניקוד גדול!",
+"step3v2": "מילים קצרות בחינם. מילה באורך המלא עולה ניסיון."
+},
     "wheelRush": {
       "title": "סובבו ואייתו",
       "step1": "האות המרכזית חייבת בכל מילה",
@@ -19128,7 +19179,10 @@ const he = {
         "silver": "כסף: כמעט!",
         "bronze": "ארד: כל הכבוד"
       },
-"missesLabel": "פספוסים"
+"missesLabel": "פספוסים",
+"scoreNotSaved": "הניקוד לא נשמר.",
+"retrySave": "לנסות שוב",
+"skipStuck": "נתקעתם? דלגו על החידה"
 },
     "community": {
       "title": "חידות הקהילה",

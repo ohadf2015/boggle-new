@@ -49,6 +49,7 @@ const WH_MESSAGES: Record<string, { perfect: string; great: string; good: string
   sv: { perfect: 'Ordmästare!', great: 'Krossade det!', good: 'Jag överlevde!', close: 'Det var nära!', barely: 'Puh! Klarade det!', failed: 'Den fick mig...' },
   ja: { perfect: '言葉の達人!', great: '完璧!', good: '生き残った!', close: 'ギリギリ!', barely: 'ふぅ!セーフ!', failed: 'やられた...' },
   es: { perfect: 'Mago de palabras!', great: 'Lo aplasté!', good: 'Sobreviví!', close: 'Estuvo cerca!', barely: 'Uf! Lo logré!', failed: 'Esta me ganó...' },
+  ru: { perfect: 'Мастер слов!', great: 'Разнёс!', good: 'Я выжил!', close: 'Было близко!', barely: 'Фух! Успел!', failed: 'Эта меня победила...' },
 };
 
 function getWhPerformanceMessage(solved: boolean, attempts: number, locale: string): string {

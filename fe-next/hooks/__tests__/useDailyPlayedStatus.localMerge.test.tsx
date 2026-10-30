@@ -8,7 +8,7 @@ vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ user: { id: 'u1' }, isAuthenticated: true }),
 }));
 
-import { useDailyPlayedStatus } from '../useDailyPlayedStatus';
+import { useDailyPlayedStatus, __resetDailyPlayedStatusStore } from '../useDailyPlayedStatus';
 
 const serverAnswer = (today: Partial<Record<'wordHunt' | 'wordWheel' | 'wordTower' | 'connections', boolean>>) => ({
   today: { wordHunt: false, wordWheel: false, wordTower: false, connections: false, ...today },
@@ -27,7 +27,7 @@ const serverAnswer = (today: Partial<Record<'wordHunt' | 'wordWheel' | 'wordTowe
  * by the next-quest CTA and shown as unplayed on the hub.
  */
 describe('useDailyPlayedStatus — authed: server answer merged with this device', () => {
-  beforeEach(() => localStorage.clear());
+  beforeEach(() => { localStorage.clear(); __resetDailyPlayedStatusStore(); });
   afterEach(() => vi.unstubAllGlobals());
 
   it('given the server has not recorded a Word Tower climb this device made, still reports Word Tower as played', async () => {

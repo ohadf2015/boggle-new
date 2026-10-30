@@ -9,6 +9,9 @@
 import { getPuzzlesForLocale } from './puzzles';
 import { POINTS_EASY, POINTS_MEDIUM, POINTS_HARD, STREAK_BONUS_MULTIPLIER } from './gameLogic';
 import { inferTheme } from './theme';
+import { dailyConnectionsVariant } from './dailyVariant';
+import { getPyramidsForLocale } from './pyramid/puzzles';
+import { FINALE_POINTS } from './pyramid/gameLogic';
 import type { ConnectionPuzzle } from './types';
 import { mulberry32, fnv1aHash } from '@/lib/rng/seededRandom';
 
@@ -98,17 +101,35 @@ export function dailyPuzzleSet(dateISO: string, locale: string): ConnectionPuzzl
   return picked.sort((a, b) => DIFFICULTY_ORDER[a.difficulty] - DIFFICULTY_ORDER[b.difficulty]);
 }
 
+const DAILY_LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
+
+/** True when this (date, locale) runs the pyramid instead of the 5-riddle chain. */
+export function isPyramidDaily(dateISO: string, locale: string): boolean {
+  return dailyConnectionsVariant(dateISO) === 'pyramid' && getPyramidsForLocale(locale).length > 0;
+}
+
+/** Locales whose rows on this date are pyramid runs — kept off the chain's board. */
+export function pyramidLocalesOn(dateISO: string): string[] {
+  return DAILY_LOCALES.filter((l) => isPyramidDaily(dateISO, l));
+}
+
+function ceilingOf(puzzles: readonly ConnectionPuzzle[]): number {
+  return puzzles.reduce((sum, p) => sum + Math.ceil(POINTS_BY_DIFFICULTY[p.difficulty] * STREAK_BONUS_MULTIPLIER), 0);
+}
+
 /**
  * Upper bound on a legitimate daily score — used to reject cheated submissions.
  * Every puzzle could be solved on a bonus streak, so ceil(base * multiplier)
  * per puzzle gives generous headroom above the true max without admitting
- * absurd values.
+ * absurd values. `playedIds` covers a run that started before a pool update
+ * reseeded the day's set; they only ever raise the ceiling to a real 5-puzzle set.
  */
-export function maxDailyScore(dateISO: string, locale: string): number {
-  return dailyPuzzleSet(dateISO, locale).reduce(
-    (sum, p) => sum + Math.ceil(POINTS_BY_DIFFICULTY[p.difficulty] * STREAK_BONUS_MULTIPLIER),
-    0,
-  );
+export function maxDailyScore(dateISO: string, locale: string, playedIds?: readonly string[]): number {
+  if (isPyramidDaily(dateISO, locale)) return 3 * POINTS_HARD + FINALE_POINTS;
+  const base = ceilingOf(dailyPuzzleSet(dateISO, locale));
+  if (!playedIds || new Set(playedIds).size !== DAILY_PUZZLE_COUNT || playedIds.length !== DAILY_PUZZLE_COUNT) return base;
+  const played = puzzlesByIds(playedIds, locale);
+  return played ? Math.max(base, ceilingOf(played)) : base;
 }
 
 /**

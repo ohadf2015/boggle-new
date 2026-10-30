@@ -10,10 +10,11 @@ import { buildQuitDialogConfig } from './survival/quitDialogConfig';
 import logger from '@/utils/logger';
 import WordWheelGame, { type WordWheelGameResult } from './WordWheelGame';
 import WordWheelBoardEntrance from './wheel/WordWheelBoardEntrance';
-import WheelTimeUpStamp, { shouldPlayFinishBeat } from './wheel/WheelTimeUpStamp';
+import WheelTimeUpStamp from './wheel/WheelTimeUpStamp';
 import { DailyFlowChrome } from './flow/DailyFlowChrome';
 import { useWordWheelLoad } from './wheel/useWordWheelLoad';
-import { submitWordWheelDailyResult } from './wheel/submitWordWheelDailyResult';
+import { useWheelCompletion } from './wheel/useWheelCompletion';
+import { markBonusIntroSeen } from './wheel/bonusIntro';
 import WordWheelResults from './WordWheelResults';
 import ReadyLeaderboardPeek from './ReadyLeaderboardPeek';
 import WordWheelReadyCard from './WordWheelReadyCard';
@@ -23,10 +24,13 @@ const TabbedDailyLeaderboard = dynamic(() => import('./TabbedDailyLeaderboard'),
 import { generateWordWheelPuzzle } from '@/utils/dailyChallenge/wordWheelGeneration';
 import {
   getDailyChallengeDate,
-  saveWordWheelResult,
   getDailyStreak,
-  updateDailyStreak,
+  hasEverPlayedWordWheel,
 } from '@/utils/dailyChallenge';
+import {
+  startWordWheelRun, recordWordWheelRunProgress, getUnfinishedWordWheelRun,
+} from '@/utils/dailyChallenge/wordWheelRun';
+import { goldLetterFor, hasWheelBonuses } from '@/utils/dailyChallenge/wordWheelScoring';
 import { getGuestFingerprint } from '@/utils/dailyChallenge/guestPlayer';
 import { isCatchUpDate, shouldGateCatchUpBehindAd } from '@/utils/dailyChallenge/catchUp';
 import type { Language } from '@/types';
@@ -42,6 +46,8 @@ import { useRewardedAd } from '@/hooks/useRewardedAd';
 import { isNative } from '@/utils/platform';
 import PracticeBadge from '@/components/practice/PracticeBadge';
 import { useDesktopLayout } from '@/hooks/useDesktopLayout';
+import { useDevicePerformance } from '@/hooks/useDevicePerformance';
+import { useReducedEffects } from '@/hooks/useReducedEffects';
 
 // Lazy-load PixiJS effects canvas (no SSR). Preloaded while the loader is up so it mounts with the board.
 const loadEffectsCanvas = () => import('./WordWheelEffectsCanvas');
@@ -71,6 +77,10 @@ const WordWheelChallenge: React.FC = () => {
   const { profile, isAuthenticated, loading: authLoading } = useAuth();
   const setIsInGame = useHideNavigation();
   const { isDesktop, isTv } = useDesktopLayout();
+  // Same lever as Word Hunt: low-end devices and the reduced-effects setting skip the particle canvas.
+  const { isLowEnd, enableComplexAnimations } = useDevicePerformance();
+  const [effectsReduced] = useReducedEffects();
+  const skipFx = isLowEnd || !enableComplexAnimations || effectsReduced;
 
   // Catch-up: `?date=YYYY-MM-DD` launches a past daily within the 3-day window.
   const searchParams = useSearchParams();
@@ -80,22 +90,18 @@ const WordWheelChallenge: React.FC = () => {
   // First-game bridge: one tap from MP results should land in the game, not a ready card.
   const bridgeStart = searchParams.get('start') === '1';
 
-  /**
-   * Bumped once the submit POST lands, to remount the results leaderboard.
-   * The results screen shows immediately (the submit is deliberately not
-   * awaited), so its first fetch races the write and comes back without this
-   * player. Same pattern Word Hunt uses via `onSubmitSuccess`.
-   */
-  const [leaderboardKey, setLeaderboardKey] = useState(0);
   const [effects, setEffects] = useState<WordWheelEffect[]>([]);
   const [canvasSize, setCanvasSize] = useState({ width: 400, height: 600 });
   const [guestFingerprint, setGuestFingerprint] = useState<string | null>(null);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
-  const [finishing, setFinishing] = useState(false);
 
   // Catch-up ad gate — mirrors DailyChallenge pattern. Per-date unlock so a
   // single ad watch covers the whole session for that date.
   const catchupAdUnlockedRef = useRef(false);
+
+  const gameLang = language as Language;
+  // Load and completion need each other: load hands back unsent and unfinished runs, completion settles them.
+  const completionRef = useRef<ReturnType<typeof useWheelCompletion> | null>(null);
 
   const {
     phase, setPhase, puzzle, setPuzzle, gameResult, setGameResult, puzzleNumber, enterPlaying,
@@ -111,7 +117,41 @@ const WordWheelChallenge: React.FC = () => {
     catchupAdUnlockedRef,
     preloadForPlay: loadEffectsCanvas,
     autoStart: bridgeStart,
+    onUnsent: (stored) => completionRef.current?.retryUnsent(stored),
+    onUnfinishedRun: (run, meta) => completionRef.current?.settleRun(run, meta) ?? { wordsFound: run.wordsFound, score: run.score, timeSeconds: 0 },
   });
+  const completion = useWheelCompletion({
+    language: gameLang,
+    isPractice,
+    isCatchup,
+    isAuthenticated,
+    profile,
+    guestFingerprint,
+    setGameActive,
+    setGameResult,
+    setPhase,
+  });
+  completionRef.current = completion;
+  const { leaderboardKey, finishing, finishBeatDone } = completion;
+
+  // Practice puzzles are seeded by a random string, not a date, so they use today's boards.
+  const puzzleDate = (!isPractice && puzzle?.puzzleDate) || catchupDate || getDailyChallengeDate();
+  const goldLetter = useMemo(() => (puzzle && !isPractice ? goldLetterFor(puzzle) : null), [puzzle, isPractice]);
+
+  // The run counts from the moment the board opens, so leaving mid-game is never a free retry.
+  useEffect(() => {
+    if (phase !== 'playing' || !puzzle || isPractice) return;
+    if (!getUnfinishedWordWheelRun(gameLang, puzzle.puzzleDate)) startWordWheelRun(gameLang, puzzle.puzzleDate);
+  }, [phase, puzzle, isPractice, gameLang]);
+
+  useEffect(() => {
+    if (phase === 'ready' && puzzle && !isPractice && hasWheelBonuses(puzzle.puzzleDate)) markBonusIntroSeen();
+  }, [phase, puzzle, isPractice]);
+
+  const handleWordFound = useCallback((_word: string, wordsFound: string[], score?: number) => {
+    if (isPractice || !puzzle) return;
+    recordWordWheelRunProgress(gameLang, puzzle.puzzleDate, { wordsFound, score: score ?? 0 });
+  }, [isPractice, puzzle, gameLang]);
 
   // Mid-game exit. The Word Wheel had no exit affordance at all — the player
   // was trapped once the timer started (no top-nav back button, worst under
@@ -120,14 +160,19 @@ const WordWheelChallenge: React.FC = () => {
   // a bad locale bundle) with the ad-free "progress will be lost" message.
   const quitDialog = useMemo(
     () => buildQuitDialogConfig(t, {
-      descriptionKey: 'wordHunt.quitConfirmMessage',
+      descriptionKey: isPractice ? 'wordHunt.quitConfirmMessage' : 'wordWheel.quitKeepsWords',
       fallback: { description: "Your progress won't be saved." },
     }),
-    [t],
+    [t, isPractice],
   );
   const handleExitClick = useCallback(() => setShowExitConfirm(true), []);
   const handleExitConfirm = useCallback(() => {
     setShowExitConfirm(false);
+    const run = puzzle && !isPractice ? getUnfinishedWordWheelRun(gameLang, puzzle.puzzleDate) : null;
+    if (run && puzzle) {
+      setGameActive(false);
+      completionRef.current?.settleRun(run, puzzle);
+    }
     try {
       router.push(`/${language}/daily`);
     } catch (err) {
@@ -135,7 +180,7 @@ const WordWheelChallenge: React.FC = () => {
       logger.error('Word Wheel exit navigation failed; forcing hard nav', err);
       if (typeof window !== 'undefined') window.location.assign(`/${language}/daily`);
     }
-  }, [router, language]);
+  }, [router, language, puzzle, isPractice, gameLang, setGameActive]);
 
   // Cross-promo gate: has the player finished today's Word Hunt (this language)?
   // Resolved localStorage-first, then server-of-record (cross-device) — so the
@@ -252,57 +297,8 @@ const WordWheelChallenge: React.FC = () => {
   }, [isCatchup, isCatchUpAdAvailable, isCatchUpPlaceholderCooldown, showCatchUpAd, startPlaying]);
 
   const handleComplete = useCallback((result: WordWheelGameResult) => {
-    setGameActive(false);
-    setGameResult(result);
-
-    // Practice mode: skip all persistence (no streak, no leaderboard, no localStorage)
-    if (isPractice) {
-      setPhase('completed');
-      return;
-    }
-
-    const gameLang = language as Language;
-    const date = catchupDate || getDailyChallengeDate();
-    // Completing today's daily advances the streak — mirror Word Hunt, which is
-    // the only mode that used to call this. Without it a player whose daily is the
-    // Word Wheel fills the progress strip but their streak stays pinned at 0.
-    // Streak tracking is for authenticated users only; catch-up plays of past
-    // puzzles must not rewrite the live streak's last-played date.
-    const streak =
-      isAuthenticated && !isCatchup ? updateDailyStreak(date) : getDailyStreak();
-
-    saveWordWheelResult({
-      puzzleNumber,
-      puzzleDate: date,
-      language: gameLang,
-      centerLetter: puzzle?.centerLetter || '',
-      wordsFound: result.wordsFound,
-      totalPossible: 0,
-      score: result.score,
-      timeSeconds: result.timeSeconds,
-      streakDays: streak.currentStreak,
-      completedAt: new Date().toISOString(),
-    });
-
-    void submitWordWheelDailyResult({
-      result,
-      date,
-      puzzleNumber,
-      language: gameLang,
-      centerLetter: puzzle?.centerLetter,
-      isAuthenticated,
-      profile,
-      guestFingerprint,
-      isCatchup,
-      streakDays: streak.currentStreak,
-      onReconciled: setGameResult,
-      onSettled: () => setLeaderboardKey(k => k + 1),
-    });
-
-    // Results wait for the buzzer beat; the run is already saved above.
-    if (shouldPlayFinishBeat(result.timeSeconds)) setFinishing(true);
-    else setPhase('completed');
-  }, [language, puzzle, puzzleNumber, setGameActive, setGameResult, setPhase, isAuthenticated, profile, isPractice, catchupDate, isCatchup, guestFingerprint]);
+    if (puzzle) completionRef.current?.handleComplete(result, puzzle);
+  }, [puzzle]);
 
   // Practice dead-end fix: results screen offers "spin another wheel" — fresh
   // RANDOM puzzle (the mount path seeds by date, so re-entering would serve the
@@ -314,13 +310,11 @@ const WordWheelChallenge: React.FC = () => {
     setPhase('ready');
   }, [language, setPuzzle, setGameResult, setPhase]);
 
-  const finishBeatDone = useCallback(() => {
-    setFinishing(false);
-    setPhase('completed');
-  }, [setPhase]);
-
+  const skipFxRef = useRef(skipFx);
+  skipFxRef.current = skipFx;
   const handleEffect = useCallback((effect: WordWheelEffect) => {
-    setEffects(prev => [...prev, effect]);
+    // Nothing consumes the queue without a canvas.
+    if (!skipFxRef.current) setEffects(prev => [...prev, effect]);
   }, []);
 
   const handleEffectsConsumed = useCallback(() => {
@@ -337,11 +331,7 @@ const WordWheelChallenge: React.FC = () => {
         className="flex-1 flex items-center justify-center bg-neo-navy"
         style={{ background: STAGE_AMBIENT_BG }}
       >
-        {/* SSR renders this phase with the full catalogue, but /daily/* hydrates on
-            the slim landing subset (heavy game path). `wordWheel.*` is not in that
-            subset, so the client painted the raw key and React threw #418 whenever
-            the full-catalogue upgrade lost the race with this chunk. `daily.*` is
-            in the subset, so server and client agree. */}
+        {/* `daily.*` is in the slim hydration subset; a `wordWheel.*` key here caused hydration error #418. */}
         <PageLoader size="lg" text={t('daily.loadingWordWheel')} />
       </div>
     );
@@ -376,7 +366,7 @@ const WordWheelChallenge: React.FC = () => {
       />
 
       {/* PixiJS Effects Layer */}
-      {phase === 'playing' && (
+      {phase === 'playing' && !skipFx && (
         <WordWheelEffectsCanvas
           width={canvasSize.width}
           height={canvasSize.height}
@@ -394,7 +384,9 @@ const WordWheelChallenge: React.FC = () => {
           <WordWheelReadyCard
             t={t}
             isPractice={isPractice}
-            autoShowHowTo={!isPractice && getDailyStreak().totalDailiesCompleted === 0}
+            autoShowHowTo={!isPractice && !hasEverPlayedWordWheel(gameLang)}
+            goldLetter={goldLetter}
+            bonuses={!isPractice && hasWheelBonuses(puzzle.puzzleDate)}
             centerLetter={puzzle.centerLetter}
             outerLetters={puzzle.outerLetters}
             puzzleNumber={puzzleNumber}
@@ -404,7 +396,7 @@ const WordWheelChallenge: React.FC = () => {
           >
             <ReadyLeaderboardPeek t={t} defaultOpen={isDesktop || isTv}>
               <TabbedDailyLeaderboard
-                puzzleDate={catchupDate || getDailyChallengeDate()}
+                puzzleDate={puzzleDate}
                 language={language as Language}
                 currentPlayerId={isAuthenticated && profile ? profile.id : null}
                 currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
@@ -439,10 +431,13 @@ const WordWheelChallenge: React.FC = () => {
               onValidateWord={handleValidateWord}
               onQuickVerdict={handleQuickVerdict}
               onEffect={handleEffect}
+              onWordFound={handleWordFound}
+              bonuses={!isPractice && hasWheelBonuses(puzzle.puzzleDate)}
+              goldLetter={goldLetter}
               language={language}
-              paused={!entranceDone}
+              paused={!entranceDone || showExitConfirm}
               practice={isPractice}
-              puzzleDate={catchupDate || getDailyChallengeDate()}
+              puzzleDate={puzzleDate}
               currentPlayerId={isAuthenticated && profile ? profile.id : null}
               currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
               onExit={handleExitClick}
@@ -466,7 +461,7 @@ const WordWheelChallenge: React.FC = () => {
           <WordWheelResults
             result={gameResult}
             puzzleNumber={puzzleNumber}
-            puzzleDate={catchupDate || getDailyChallengeDate()}
+            puzzleDate={puzzleDate}
             language={language as Language}
             hasPlayedWordHunt={hasPlayedWH}
             currentPlayerId={isAuthenticated && profile ? profile.id : null}

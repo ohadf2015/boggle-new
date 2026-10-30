@@ -66,7 +66,8 @@ vi.mock('@/utils/dailyChallenge', () => ({
 
 const OUTER_LETTERS = ['B', 'C', 'D', 'E', 'F', 'G'];
 vi.mock('@/utils/dailyChallenge/wordWheelGeneration', () => ({
-  generateWordWheelPuzzle: () => ({
+  generateWordWheelPuzzle: (date?: string) => ({
+    puzzleDate: date, puzzleNumber: 42, language: 'en',
     centerLetter: 'A',
     outerLetters: ['B', 'C', 'D', 'E', 'F', 'G'],
     validWords: [],
@@ -99,6 +100,8 @@ vi.mock('../TabbedDailyLeaderboard', () => ({
 }));
 
 describe('WordWheelChallenge - preview wheel censoring', () => {
+  beforeEach(() => localStorage.setItem('lc:wheel-howto-seen', '1'));
+
   it('GIVEN ready state THEN renders one censored tile per outer letter', async () => {
     render(<WordWheelChallenge />);
     const tiles = await waitFor(() => {

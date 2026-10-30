@@ -74,16 +74,6 @@ export interface AccumulatedClue {
 }
 
 /**
- * Score event for tracking score changes
- */
-export interface ScoreEvent {
-  timestamp: number;
-  delta: number;
-  reason: 'word_discovered' | 'life_bonus' | 'target_attempt' | 'initial';
-  metadata?: Record<string, unknown>;
-}
-
-/**
  * Auto-clue notification data
  */
 export interface AutoClueNotificationData {
@@ -104,4 +94,5 @@ export type FeedbackType =
   | 'target-found'
   | 'clue-unlocked'
   | 'discovery'
-  | 'short-valid';
+  | 'short-valid'
+  | 'unavailable';

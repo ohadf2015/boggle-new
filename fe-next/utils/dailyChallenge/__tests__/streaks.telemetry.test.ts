@@ -10,7 +10,6 @@
 
 import { vi, describe, beforeEach, it, expect } from 'vitest';
 import { updateDailyStreak } from '../streaks';
-import { updateDailyStreakWithFreeze } from '../streakFreeze';
 import { DAILY_STREAK_KEY } from '../constants';
 
 const captureMock = vi.fn();
@@ -104,44 +103,6 @@ describe('Daily Streak Telemetry', () => {
 
       expect(eventNames()).toContain('growth:streak_continued');
       expect(eventNames()).not.toContain('growth:streak_broken');
-    });
-  });
-
-  describe('updateDailyStreakWithFreeze', () => {
-    it('emits streak_freeze_used when freeze rescues the streak', () => {
-      localStorageMock.setItem(DAILY_STREAK_KEY, JSON.stringify({
-        currentStreak: 4, longestStreak: 4,
-        lastPlayedDate: '2026-01-29', totalDailiesCompleted: 4,
-      }));
-      localStorageMock.setItem('lexiclash_streak_freezes', JSON.stringify({ count: 1 }));
-
-      updateDailyStreakWithFreeze('2026-01-31');
-
-      expect(eventNames()).toContain('growth:streak_freeze_used');
-      expect(eventNames()).toContain('growth:streak_continued');
-    });
-
-    it('emits streak_continued (not freeze_used) on normal continuation', () => {
-      localStorageMock.setItem(DAILY_STREAK_KEY, JSON.stringify({
-        currentStreak: 4, longestStreak: 4,
-        lastPlayedDate: '2026-01-30', totalDailiesCompleted: 4,
-      }));
-
-      updateDailyStreakWithFreeze('2026-01-31');
-
-      expect(eventNames()).toContain('growth:streak_continued');
-      expect(eventNames()).not.toContain('growth:streak_freeze_used');
-    });
-
-    it('emits streak_broken when no freeze available and day missed', () => {
-      localStorageMock.setItem(DAILY_STREAK_KEY, JSON.stringify({
-        currentStreak: 5, longestStreak: 10,
-        lastPlayedDate: '2026-01-29', totalDailiesCompleted: 15,
-      }));
-
-      updateDailyStreakWithFreeze('2026-01-31');
-
-      expect(eventNames()).toContain('growth:streak_broken');
     });
   });
 });

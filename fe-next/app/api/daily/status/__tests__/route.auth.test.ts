@@ -8,9 +8,11 @@ import { NextRequest } from 'next/server';
  * screen's "next quest" CTA on its skeleton forever.
  */
 
-const getUser = vi.fn();
+const getAuthedUser = vi.fn();
+vi.mock('@/lib/auth/getAuthedUser', () => ({ getAuthedUser: (...a: unknown[]) => getAuthedUser(...a) }));
+const remoteGetUser = vi.fn();
 vi.mock('@/utils/supabase/server', () => ({
-  createRequestClient: vi.fn(async () => ({ supabase: { auth: { getUser } }, token: null })),
+  createRequestClient: vi.fn(async () => ({ supabase: { auth: { getUser: remoteGetUser } }, token: null })),
 }));
 
 vi.mock('@/utils/dailyChallenge/dateUtils', () => ({
@@ -20,11 +22,14 @@ vi.mock('@/utils/dailyChallenge/dateUtils', () => ({
 // Rows per table, keyed by table name. Every builder method chains; awaiting
 // the chain (or `.single()`) resolves the table's rows.
 const tables: Record<string, unknown> = {};
+const failing = new Set<string>();
 function builder(table: string) {
-  const result = () => ({ data: tables[table] ?? null, error: null });
+  const result = () => (failing.has(table)
+    ? { data: null, error: { message: 'statement timeout' } }
+    : { data: tables[table] ?? null, error: null });
   const b: Record<string, unknown> = {};
   for (const m of ['select', 'eq']) b[m] = () => b;
-  b.single = async () => result();
+  b.maybeSingle = async () => result();
   b.then = (resolve: (v: unknown) => unknown) => Promise.resolve(result()).then(resolve);
   return b;
 }
@@ -38,11 +43,13 @@ const req = (qs: string) => new NextRequest(`http://localhost/api/daily/status?$
 describe('GET /api/daily/status — authed', () => {
   beforeEach(() => {
     for (const k of Object.keys(tables)) delete tables[k];
-    getUser.mockReset();
+    failing.clear();
+    getAuthedUser.mockReset();
+    remoteGetUser.mockReset();
   });
 
   it('given a cookie session for the requested user, returns 200 with today played per mode', async () => {
-    getUser.mockResolvedValue({ data: { user: { id: USER } }, error: null });
+    getAuthedUser.mockResolvedValue({ id: USER });
     tables.daily_word_hunt_attempts = [{ puzzle_date: '2026-09-21' }];
     tables.daily_word_wheel_attempts = [{ puzzle_date: '2026-09-20' }];
     tables.daily_word_tower_attempts = [{ puzzle_date: '2026-09-21' }];
@@ -62,7 +69,7 @@ describe('GET /api/daily/status — authed', () => {
   });
 
   it('ignores a daily_puzzle_streaks row and counts tower dates into longest', async () => {
-    getUser.mockResolvedValue({ data: { user: { id: USER } }, error: null });
+    getAuthedUser.mockResolvedValue({ id: USER });
     tables.daily_word_hunt_attempts = [{ puzzle_date: '2026-09-21' }, { puzzle_date: '2026-09-19' }];
     tables.daily_word_wheel_attempts = [];
     tables.daily_word_tower_attempts = [{ puzzle_date: '2026-09-20' }];
@@ -82,10 +89,43 @@ describe('GET /api/daily/status — authed', () => {
   });
 
   it('given a session for a DIFFERENT user, refuses with 401 and loading:false', async () => {
-    getUser.mockResolvedValue({ data: { user: { id: 'someone-else' } }, error: null });
+    getAuthedUser.mockResolvedValue({ id: 'someone-else' });
     const { GET } = await import('../route');
     const res = await GET(req(`userId=${USER}`));
     expect(res.status).toBe(401);
     expect((await res.json()).loading).toBe(false);
   });
+
+  it('verifies the session locally, without a remote auth round-trip', async () => {
+    getAuthedUser.mockResolvedValue({ id: USER });
+    tables.profiles = { streak_freeze_count: 0 };
+    const { GET } = await import('../route');
+    const res = await GET(req(`userId=${USER}`));
+    expect(res.status).toBe(200);
+    expect(getAuthedUser).toHaveBeenCalledTimes(1);
+    expect(remoteGetUser).not.toHaveBeenCalled();
+  });
+
+  it('given a player without a profile row, still answers 200 with no freezes', async () => {
+    getAuthedUser.mockResolvedValue({ id: USER });
+    tables.daily_word_hunt_attempts = [{ puzzle_date: '2026-09-21' }];
+    const { GET } = await import('../route');
+    const res = await GET(req(`userId=${USER}`));
+    expect(res.status).toBe(200);
+    expect((await res.json()).freezeCount).toBe(0);
+  });
+
+  it.each(['daily_word_hunt_attempts', 'daily_word_wheel_attempts', 'daily_word_tower_attempts', 'connections_daily_scores', 'profiles'])(
+    'given the %s read fails, answers 500 rather than a fake "nothing played, streak 0"',
+    async (table) => {
+      getAuthedUser.mockResolvedValue({ id: USER });
+      tables.daily_word_hunt_attempts = [{ puzzle_date: '2026-09-21' }];
+      tables.profiles = { streak_freeze_count: 1 };
+      failing.add(table);
+      const { GET } = await import('../route');
+      const res = await GET(req(`userId=${USER}`));
+      expect(res.status).toBe(500);
+      expect((await res.json()).fromServer).not.toBe(true);
+    },
+  );
 });

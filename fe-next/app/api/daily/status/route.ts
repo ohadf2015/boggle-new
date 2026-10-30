@@ -11,6 +11,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createRequestClient } from '@/utils/supabase/server';
 import { createAdminClient } from '@/utils/supabase/admin';
+import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { getDailyChallengeDate } from '@/utils/dailyChallenge/dateUtils';
 import { computeCurrentStreak } from '@/lib/daily/weeklyChest';
 import { freezeDateToBridge } from '@/lib/daily/chestFreezeBridge';
@@ -58,23 +59,23 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     // Authed user
     if (userId) {
-      // Request-scoped client: the browser client (`@/lib/supabase`) has no
-      // cookies on the server, so it saw every caller as anonymous and 401'd
-      // every logged-in player — the results CTA then sat on its skeleton.
-      const { supabase: requestClient, token } = await createRequestClient(request);
-      const {
-        data: { user },
-        error: authError,
-      } = await requestClient.auth.getUser(token ?? undefined);
-
-      if (authError || !user || user.id !== userId) {
+      // Local JWT verify on this read path (no Auth round-trip per hub load).
+      const user = await getAuthedUser(request);
+      if (!user || user.id !== userId) {
         return NextResponse.json({ ...DEFAULT_STATUS, loading: false }, { status: 401 });
       }
 
       // Reads go through the admin client, filtered by the VERIFIED id.
       // A user-scoped read of the attempt tables misses rows the player cannot
       // select, and longest would come back as 0.
-      const supabase = createAdminClient() ?? requestClient;
+      const supabase = createAdminClient() ?? (await createRequestClient(request)).supabase;
+
+      // A failed read must not answer "nothing played, streak 0": the client
+      // would offer a replay and drop the streak. Throw → 500 → client keeps what it has.
+      const dates = ({ data, error }: { data: { puzzle_date: string }[] | null; error: unknown }) => {
+        if (error) throw error;
+        return data?.map((r) => r.puzzle_date) ?? [];
+      };
 
       // Fetch all attempts across modes (NO is_catchup)
       const [huntRows, wheelRows, towerRows, connectionRows, freezeCount] = await Promise.all([
@@ -83,44 +84,42 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
           .select('puzzle_date')
           .eq('player_id', userId)
           .eq('is_catchup', false)
-          .then(({ data }) => data?.map((r) => r.puzzle_date) ?? []),
+          .then(dates),
         supabase
           .from('daily_word_wheel_attempts')
           .select('puzzle_date')
           .eq('player_id', userId)
           .eq('is_catchup', false)
-          .then(({ data }) => data?.map((r) => r.puzzle_date) ?? []),
+          .then(dates),
         supabase
           .from('daily_word_tower_attempts')
           .select('puzzle_date')
           .eq('player_id', userId)
-          .then(({ data }) => data?.map((r) => r.puzzle_date) ?? []),
+          .then(dates),
         supabase
           .from('connections_daily_scores')
           .select('puzzle_date')
           .eq('player_id', userId)
-          .then(({ data }) => data?.map((r) => r.puzzle_date) ?? []),
+          .then(dates),
         supabase
           .from('profiles')
           .select('streak_freeze_count')
           .eq('id', userId)
-          .single()
-          .then(({ data }) => data?.streak_freeze_count ?? 0),
+          .maybeSingle()
+          .then(({ data, error }) => {
+            if (error) throw error;
+            const count = (data as { streak_freeze_count?: unknown } | null)?.streak_freeze_count;
+            return typeof count === 'number' ? count : 0;
+          }),
       ]);
 
       const allDates = Array.from(new Set([...huntRows, ...wheelRows, ...connectionRows])).sort();
 
       // Apply freeze bridge: if today is played and yesterday is missing but day-before is played, bridge yesterday
-      const freezeBridgeDate = freezeDateToBridge(allDates, today, typeof freezeCount === 'number' ? freezeCount : 0);
+      const freezeBridgeDate = freezeDateToBridge(allDates, today, freezeCount);
       const withBridge = freezeBridgeDate
         ? Array.from(new Set([...allDates, freezeBridgeDate])).sort()
         : allDates;
-
-      // Track if freeze was just applied so we can toast it
-      let freezeApplied: { date: string; freezesRemaining: number } | undefined = undefined;
-      if (freezeBridgeDate && freezeCount > 0) {
-        freezeApplied = { date: freezeBridgeDate, freezesRemaining: freezeCount - 1 };
-      }
 
       // Longest streak comes from the attempt rows already fetched above.
       // `daily_puzzle_streaks` is not in prod (015 never landed) and its repo
@@ -146,17 +145,17 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
           longest: longestStreak,
         },
         allCompletedDates: withBridge,
-        freezeCount: typeof freezeCount === 'number' ? freezeCount : 0,
+        freezeCount,
         loading: false,
         fromServer: true,
       };
 
-      // If freeze was applied, include that info for the toast
+      // Returned on every GET while the bridge holds (nothing here consumes the
+      // freeze); the client shows the toast once per bridged date.
       if (freezeBridgeDate) {
-        const remainingFreezes = (typeof freezeCount === 'number' ? freezeCount : 0) - 1;
         response.freezeApplied = {
           date: freezeBridgeDate,
-          freezesRemaining: Math.max(0, remainingFreezes),
+          freezesRemaining: Math.max(0, freezeCount - 1),
         };
       }
 

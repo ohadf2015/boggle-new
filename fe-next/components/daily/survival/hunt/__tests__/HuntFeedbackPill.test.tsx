@@ -19,4 +19,15 @@ describe('HuntFeedbackPill', () => {
     render(<HuntFeedbackPill seq={0} type={null} message="" word={null} calm={false} />);
     expect(screen.queryByTestId('hunt-feedback-pill')).toBeNull();
   });
+
+  it('Given each outcome, When shown, Then valid, invalid, already-found and could-not-check each get their own colour', () => {
+    const toneOf = (type: 'valid-word' | 'not-in-dictionary' | 'duplicate' | 'unavailable') => {
+      const { unmount } = render(<HuntFeedbackPill seq={1} type={type} message="m" word="W" calm />);
+      const cls = screen.getByTestId('hunt-feedback-pill').className;
+      unmount();
+      return cls;
+    };
+    const tones = new Set([toneOf('valid-word'), toneOf('not-in-dictionary'), toneOf('duplicate'), toneOf('unavailable')]);
+    expect(tones.size).toBe(4);
+  });
 });

@@ -2,48 +2,39 @@
 
 import React, { memo } from 'react';
 import { m } from 'framer-motion';
-import { Crown, Eye, Target, CircleDot, CalendarDays } from 'lucide-react';
-import { getRankDisplay } from '@/utils/rankingStyles';
+import { Crown, Eye, CalendarDays } from 'lucide-react';
 import { getCountryFlag } from '@/shared/utils';
 import { LANGUAGE_CONFIG } from '@/lib/languageConfig';
+import { DAILY_MODES } from '@/lib/dailyModes';
 import type { Language } from '@/types';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import Avatar from '@/components/Avatar';
 import PlayerProfileTooltip from '@/components/ui/PlayerProfileTooltip';
 import { TierBadge } from '@/components/ui/TierBadge';
 import { getDailyLeaderboardTier } from '@/lib/ranked/leaderboardTiers';
-import { getRankColors, getRankBadgeColors } from './leaderboardUtils';
 import type { RankMovement } from './leaderboardLive';
-import type { DailyParticipant, AllTimeParticipant, SeasonParticipant } from './TabbedDailyLeaderboard';
+import { MODE_DOT } from './leaderboardRows';
+import type { DailyParticipant, AllTimeParticipant, SeasonParticipant, T } from './leaderboardTypes';
 
-/**
- * Seed for Avatar's deterministic fallback.
- *
- * The leaderboard views build `custom_avatar` from `LEFT JOIN profiles ON player_id`,
- * so a guest — who has no profile row — always comes back with it NULL. Avatar only
- * renders its seeded fallback when it is handed some identity; with neither a config
- * nor a seed it treats the row as still-loading and shows a skeleton forever. Season
- * rows carry no fingerprint, hence the display_name tail (same convention as
- * ConnectionsLeaderboard, which seeds on display_name so it leaks no identifiers).
- */
-const avatarSeed = (p: {
-  player_id: string | null;
-  guest_fingerprint: string | null;
-  display_name: string;
-}): string => p.player_id ?? p.guest_fingerprint ?? p.display_name;
+/* The board card is always navy, so rows are dark-only (no light/dark pairs that
+   could put cream text on a white row). Podium = gold / silver / bronze; the
+   viewer's row is cyan with a hard cyan shadow, on or off the podium. */
+const PODIUM: Record<number, { row: string; badge: string }> = {
+  1: { row: 'bg-neo-yellow/15 border-neo-yellow', badge: 'bg-neo-yellow text-neo-black' },
+  2: { row: 'bg-neo-white/10 border-neo-white/70', badge: 'bg-neo-white text-neo-black' },
+  3: { row: 'bg-neo-orange/15 border-neo-orange', badge: 'bg-neo-orange text-neo-black' },
+};
 
-/**
- * The app's `t`: key plus either a fallback string or interpolation params.
- * Declared through a method signature so parameters are checked bivariantly —
- * callers hand in `t`s typed `(key) => string`, `(key, params?) => string` and
- * `(key, fallback?) => string`, all of which are the same runtime function.
- */
-type T = { bivarianceHack(key: string, fallbackOrParams?: string | Record<string, string | number>): string }['bivarianceHack'];
+function rowTone(rank: number, isCurrentUser: boolean): string {
+  if (isCurrentUser) return 'bg-neo-cyan/20 border-neo-cyan shadow-hard-cyan';
+  return PODIUM[rank]?.row ?? 'bg-neo-navy border-neo-black/60';
+}
 
-// ==========================================
-// Shared bits
-// ==========================================
 
-/** Flag chip for the language a row was played in (global board only). */
+/** Avatar seed: guests have no profile, so without one Avatar shows a skeleton forever. */
+const avatarSeed = (p: { row_key?: string; player_id: string | null; guest_fingerprint: string | null; display_name: string }): string =>
+  p.row_key ?? p.player_id ?? p.guest_fingerprint ?? p.display_name;
+
 const LanguageChip: React.FC<{ language?: string | null }> = ({ language }) => {
   if (!language) return null;
   const cfg = LANGUAGE_CONFIG[language as Language];
@@ -65,10 +56,7 @@ const MovementChip: React.FC<{ movement?: RankMovement | null; t: T }> = ({ move
   if (!movement) return null;
   if (movement.isNew) {
     return (
-      <span
-        data-testid="rank-movement"
-        className="text-[9px] sm:text-[10px] font-black uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-neo-yellow text-neo-black border border-neo-black shadow-xs shrink-0"
-      >
+      <span data-testid="rank-movement" className="text-[9px] sm:text-[10px] font-black uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-neo-yellow text-neo-black border border-neo-black shrink-0">
         {t('wordHunt.leaderboard.newEntry')}
       </span>
     );
@@ -82,18 +70,130 @@ const MovementChip: React.FC<{ movement?: RankMovement | null; t: T }> = ({ move
       data-testid="rank-movement"
       aria-label={label}
       title={label}
-      className={`text-[10px] sm:text-xs font-black tabular-nums px-1.5 py-0.5 rounded-full border border-neo-black shadow-xs shrink-0 ${
-        up ? 'bg-neo-lime text-neo-black' : 'bg-neo-pink text-neo-black'
-      }`}
+      className={`text-[10px] sm:text-xs font-black tabular-nums px-1.5 py-0.5 rounded-full border border-neo-black shrink-0 ${up ? 'bg-neo-lime text-neo-black' : 'bg-neo-pink text-neo-black'}`}
     >
       {up ? '▲' : '▼'}{count}
     </span>
   );
 };
 
-// ==========================================
-// Today's Participant Row
-// ==========================================
+interface ShellPerson {
+  row_key?: string;
+  player_id: string | null;
+  guest_fingerprint: string | null;
+  display_name: string;
+  avatar_image?: string | null;
+  custom_avatar?: CustomAvatarConfig | null;
+  country_code?: string | null;
+}
+
+/**
+ * Rank badge, avatar, name (with profile tooltip) and YOU chip — the frame all
+ * three row kinds share. `badges` sit after the name; `stats` under it; `trailing` at the end.
+ */
+function RowShell({
+  person, rank, index, isCurrentUser, compact, t, showFlag = false, badges, stats, trailing, tooltip, testId,
+}: {
+  person: ShellPerson;
+  rank: number;
+  index: number;
+  isCurrentUser: boolean;
+  compact: boolean;
+  t: T;
+  showFlag?: boolean;
+  badges?: React.ReactNode;
+  stats?: React.ReactNode;
+  trailing?: React.ReactNode;
+  tooltip?: { totalGames?: number; winRate?: number };
+  testId?: string;
+}) {
+  const name = person.display_name || t('daily.aPlayer');
+  const flag = showFlag ? getCountryFlag(person.country_code) : null;
+  const podium = PODIUM[rank];
+  return (
+    <m.div
+      data-testid={testId}
+      data-viewer-row={isCurrentUser ? 'true' : undefined}
+      data-rank={rank}
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: index * 0.05, type: 'spring', stiffness: 380, damping: 26 }}
+      className={`flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 rounded-neo border-2 ${rowTone(rank, isCurrentUser)} ${compact ? 'py-2' : ''}`}
+    >
+      <div
+        className={`relative w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-neo border-2 border-neo-black flex items-center justify-center font-neo-display font-black text-sm sm:text-base tabular-nums ${
+          podium ? `${podium.badge} shadow-hard-sm` : 'bg-neo-navy-elevated text-neo-white'
+        }`}
+      >
+        {rank === 1 && <Crown aria-hidden className="absolute -top-2.5 w-4 h-4 text-neo-yellow fill-neo-yellow stroke-neo-black" />}
+        {rank}
+      </div>
+
+      <div className="relative shrink-0">
+        <div className={`w-10 h-10 sm:w-12 sm:h-12 border-2 rounded-full overflow-hidden ${isCurrentUser ? 'border-neo-cyan' : 'border-neo-black'}`}>
+          <Avatar
+            avatarImage={person.avatar_image ?? undefined}
+            customAvatar={person.custom_avatar ?? undefined}
+            userId={avatarSeed(person)}
+            size="lg"
+            className="w-full h-full"
+          />
+        </div>
+        {flag && (
+          <div className="absolute -bottom-1 -end-1 text-sm leading-none" title={person.country_code || undefined}>
+            {flag}
+          </div>
+        )}
+      </div>
+
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-1.5 min-w-0">
+          <PlayerProfileTooltip
+            player={{
+              id: person.player_id ?? undefined,
+              username: name,
+              avatarImage: person.avatar_image ?? undefined,
+              customAvatar: person.custom_avatar,
+              countryCode: person.country_code,
+              ...tooltip,
+            }}
+            isCurrentUser={isCurrentUser}
+            side="bottom"
+          >
+            <span className={`font-bold truncate text-sm sm:text-base ${isCurrentUser ? 'text-neo-cyan' : 'text-neo-white cursor-pointer hover:underline'}`}>
+              {name}
+            </span>
+          </PlayerProfileTooltip>
+          {isCurrentUser && (
+            <span className="text-[10px] sm:text-xs bg-neo-cyan text-neo-black border border-neo-black px-2 py-0.5 rounded-full font-black shrink-0">
+              {t('wordHunt.leaderboard.you')}
+            </span>
+          )}
+          {badges}
+        </div>
+        {stats && <div className="text-xs sm:text-sm flex items-center gap-2 mt-0.5 flex-wrap">{stats}</div>}
+      </div>
+
+      {trailing}
+    </m.div>
+  );
+}
+
+/** One dot + points per played mode (combined board). Tower shows its real metres. */
+function ModeBreakdown({ p, t }: { p: DailyParticipant; t: T }) {
+  const played = p.played_modes ?? [];
+  if (played.length < 2) return null;
+  return (
+    <span className="inline-flex flex-wrap items-center gap-x-2 text-[10px] sm:text-xs text-neo-white/60 font-medium tabular-nums">
+      {DAILY_MODES.filter((mode) => played.includes(mode.id)).map((mode) => (
+        <span key={mode.id} className="inline-flex items-center gap-1" title={t(mode.titleKey)}>
+          <span aria-hidden className={`w-1.5 h-1.5 rounded-full ${MODE_DOT[mode.id]}`} />
+          {mode.id === 'word-tower' && p.tower_height_m != null ? `${Math.round(p.tower_height_m)}m` : p.by_mode?.[mode.id] ?? 0}
+        </span>
+      ))}
+    </span>
+  );
+}
 
 export const TodayParticipantRow = memo<{
   participant: DailyParticipant;
@@ -103,147 +203,80 @@ export const TodayParticipantRow = memo<{
   t: T;
   onViewWheelWords?: (participant: DailyParticipant) => void;
   onViewHuntWords?: (participant: DailyParticipant) => void;
-  /** When 'word-wheel', the row exposes the view-words click for any participant
-   *  with a non-zero wheel score (not just those who also played Word Hunt). */
   scope?: 'combined' | 'word-hunt' | 'word-wheel';
   /** Show the language the row was played in (cross-language board). */
   showLanguage?: boolean;
   /** Rank change since the previous refresh, if any. */
   movement?: RankMovement | null;
-}>(({ participant, index, isCurrentUser, compact, t, onViewWheelWords, onViewHuntWords, scope = 'combined', showLanguage = false, movement }) => {
-  const rank = participant.rank_position;
-  const hasScore = participant.score != null && participant.score > 0;
-
+}>(({ participant: p, index, isCurrentUser, compact, t, onViewWheelWords, onViewHuntWords, scope = 'combined', showLanguage = false, movement }) => {
+  const hasId = !!(p.player_id || p.guest_fingerprint);
   const seeWords =
-    scope === 'word-wheel' && onViewWheelWords && (participant.player_id || participant.guest_fingerprint) && !isCurrentUser
-      ? { open: () => onViewWheelWords(participant), label: t('wordWheel.viewWordsYouMissed') || t('wordWheel.viewSubmittedWords'), tone: 'border-neo-purple/60 bg-neo-purple/15 hover:bg-neo-purple/30 text-neo-purple-light' }
-      : scope === 'word-hunt' && onViewHuntWords && (participant.player_id || participant.guest_fingerprint) && !isCurrentUser && (participant.words_discovered?.length ?? 0) > 0
-        ? { open: () => onViewHuntWords(participant), label: t('wordHunt.results.tapPlayerHint'), tone: 'border-neo-cyan/60 bg-neo-cyan/15 hover:bg-neo-cyan/30 text-neo-cyan' }
+    scope === 'word-wheel' && onViewWheelWords && hasId && !isCurrentUser
+      ? { open: () => onViewWheelWords(p), label: t('wordWheel.viewWordsYouMissed') || t('wordWheel.viewSubmittedWords'), tone: 'bg-neo-purple text-neo-white' }
+      : scope === 'word-hunt' && onViewHuntWords && hasId && !isCurrentUser && (p.words_discovered?.length ?? 0) > 0
+        ? { open: () => onViewHuntWords(p), label: t('wordHunt.results.tapPlayerHint'), tone: 'bg-neo-cyan text-neo-black' }
         : null;
+  const scoreText = (
+    <>
+      {p.score} <span className="text-xs font-bold opacity-70">{t('wordHunt.leaderboard.pts')}</span>
+    </>
+  );
 
   return (
-    <m.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: index * 0.05, type: 'spring', stiffness: 380, damping: 26 }}
-      className={`
-        flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 rounded-xl border-2 transition-colors duration-200
-        ${getRankColors(rank, isCurrentUser)}
-        ${compact ? 'py-2' : ''}
-      `}
-    >
-      <div
-        className={`
-          w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-xl flex items-center justify-center font-black text-sm sm:text-base
-          ${getRankBadgeColors(rank)}
-          border-2 shadow-xs
-        `}
-      >
-        {getRankDisplay(rank)}
-      </div>
-
-      <div className="w-10 h-10 sm:w-12 sm:h-12 shrink-0 border-2 border-neo-black/80 rounded-full overflow-hidden">
-        <Avatar
-          avatarImage={participant.avatar_image ?? undefined}
-          customAvatar={participant.custom_avatar ?? undefined}
-          userId={avatarSeed(participant)}
-          size="lg"
-          className="w-full h-full"
-        />
-      </div>
-
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5">
-          <PlayerProfileTooltip
-            player={{
-              id: participant.player_id ?? undefined,
-              username: participant.display_name || 'Player',
-
-              avatarImage: participant.avatar_image ?? undefined,
-              customAvatar: participant.custom_avatar,
-              countryCode: participant.country_code,
-            }}
-            isCurrentUser={isCurrentUser}
-            side="bottom"
-          >
-            <span className={`font-bold truncate text-sm sm:text-base ${isCurrentUser ? 'text-neo-cyan' : 'text-slate-800 dark:text-white cursor-pointer hover:underline'}`}>
-              {participant.display_name || 'Player'}
-            </span>
-          </PlayerProfileTooltip>
-          {showLanguage && <LanguageChip language={participant.language} />}
-          {isCurrentUser && (
-            <span className="text-[10px] sm:text-xs bg-neo-cyan text-neo-black px-2 py-0.5 rounded-full font-black shrink-0">
-              {t('wordHunt.leaderboard.you', 'YOU')}
-            </span>
-          )}
+    <RowShell
+      person={p}
+      rank={p.rank_position}
+      index={index}
+      isCurrentUser={isCurrentUser}
+      compact={compact}
+      t={t}
+      badges={
+        <>
+          {showLanguage && <LanguageChip language={p.language} />}
           <MovementChip movement={movement} t={t} />
-        </div>
-        <div className="text-xs sm:text-sm flex items-center gap-2 mt-0.5">
-          {participant.solved !== undefined && (
-            <span className={`font-bold ${participant.solved ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400'}`}>
-              {participant.solved
-                ? `✓ ${participant.attempts_used}/10`
-                : participant.attempts_used != null
-                  ? `✗ ${participant.attempts_used}/10`
-                  : `✗ ${t('wordHunt.leaderboard.failed', 'Failed')}`}
-            </span>
-          )}
-          {(participant.word_hunt_score ?? 0) > 0 && (participant.word_wheel_score ?? 0) > 0 && (
-            <span className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium inline-flex items-center gap-1">
-              <Target aria-hidden className="w-3 h-3" />
-              {participant.word_hunt_score}
-              <span aria-hidden>·</span>
-              {onViewWheelWords && (participant.player_id || participant.guest_fingerprint) ? (
-                <button
-                  type="button"
-                  onClick={(e) => { e.stopPropagation(); onViewWheelWords(participant); }}
-                  className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-neo border-2 border-neo-lime/50 bg-neo-lime/15 hover:bg-neo-lime/30 text-neo-cyan dark:text-neo-lime font-bold transition-colors cursor-pointer"
-                  aria-label={t('wordWheel.viewSubmittedWords')}
-                  title={t('wordWheel.viewSubmittedWords')}
-                >
-                  <CircleDot aria-hidden className="w-3 h-3" />
-                  {participant.word_wheel_score}
-                  <Eye aria-hidden className="w-3 h-3 opacity-80" />
-                </button>
-              ) : (
-                <span className="inline-flex items-center gap-1">
-                  <CircleDot aria-hidden className="w-3 h-3" />
-                  {participant.word_wheel_score}
-                </span>
-              )}
-            </span>
-          )}
-        </div>
-      </div>
-
-      {hasScore && (
-        seeWords ? (
-          <button
-            type="button"
-            onClick={(e) => { e.stopPropagation(); seeWords.open(); }}
-            className={`shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-neo border-2 font-black tabular-nums transition-colors cursor-pointer ${seeWords.tone}`}
-            aria-label={seeWords.label}
-            title={seeWords.label}
-          >
-            <span>{participant.score} {t('wordHunt.leaderboard.pts')}</span>
-            <Eye aria-hidden className="w-4 h-4" />
-            <span className="sr-only">{t('wordHunt.leaderboard.seeWords')}</span>
-          </button>
-        ) : (
-          <span className="shrink-0 font-black tabular-nums text-base sm:text-lg text-neo-cream">
-            {participant.score} <span className="text-xs font-bold text-neo-cream/70">{t('wordHunt.leaderboard.pts')}</span>
-          </span>
+        </>
+      }
+      stats={
+        (p.solved !== undefined || (p.played_modes?.length ?? 0) > 1) && (
+          <>
+            {p.solved !== undefined && (
+              <span className={`font-bold ${p.solved ? 'text-neo-lime' : 'text-neo-pink'}`}>
+                {p.solved
+                  ? `✓ ${p.attempts_used}/10`
+                  : p.attempts_used != null
+                    ? `✗ ${p.attempts_used}/10`
+                    : `✗ ${t('wordHunt.leaderboard.failed')}`}
+              </span>
+            )}
+            <ModeBreakdown p={p} t={t} />
+          </>
         )
-      )}
-    </m.div>
+      }
+      trailing={
+        p.score > 0 && (
+          seeWords ? (
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); seeWords.open(); }}
+              className={`shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-neo border-2 border-neo-black shadow-hard-sm font-black tabular-nums cursor-pointer active:translate-y-0.5 active:shadow-none transition-[transform,box-shadow] ${seeWords.tone}`}
+              aria-label={seeWords.label}
+              title={seeWords.label}
+            >
+              <span>{scoreText}</span>
+              <Eye aria-hidden className="w-4 h-4" />
+              <span className="sr-only">{t('wordHunt.leaderboard.seeWords')}</span>
+            </button>
+          ) : (
+            <span className={`shrink-0 font-neo-display font-black tabular-nums text-base sm:text-lg ${isCurrentUser ? 'text-neo-cyan' : 'text-neo-cream'}`}>
+              {scoreText}
+            </span>
+          )
+        )
+      }
+    />
   );
 });
-
 TodayParticipantRow.displayName = 'TodayParticipantRow';
-
-// ==========================================
-// All-Time Participant Row
-// ==========================================
 
 export const AllTimeParticipantRow = memo<{
   participant: AllTimeParticipant;
@@ -251,121 +284,38 @@ export const AllTimeParticipantRow = memo<{
   isCurrentUser: boolean;
   compact: boolean;
   t: T;
-}>(({ participant, index, isCurrentUser, compact, t }) => {
-  const rank = participant.rank_position;
-  const countryFlag = getCountryFlag(participant.country_code);
-
-  return (
-    <m.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: index * 0.05, type: 'spring', stiffness: 380, damping: 26 }}
-      className={`
-        flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl border-2 transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] duration-200
-        ${getRankColors(rank, isCurrentUser)}
-        ${compact ? 'py-2' : ''}
-        ${isCurrentUser ? 'scale-[1.02]' : 'hover:scale-[1.01]'}
-      `}
-    >
-      {/* Rank Badge */}
-      <div
-        className={`
-          w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center font-black text-sm sm:text-base
-          ${getRankBadgeColors(rank)}
-          border-2 shadow-xs
-        `}
-      >
-        {getRankDisplay(rank)}
+}>(({ participant: p, index, isCurrentUser, compact, t }) => (
+  <RowShell
+    person={p}
+    rank={p.rank_position}
+    index={index}
+    isCurrentUser={isCurrentUser}
+    compact={compact}
+    t={t}
+    showFlag
+    tooltip={{
+      totalGames: p.total_games,
+      winRate: p.total_games > 0 ? Math.round((p.games_won / p.total_games) * 100) : undefined,
+    }}
+    badges={p.best_efficiency != null && (
+      <TierBadge tier={getDailyLeaderboardTier(p.best_efficiency)} size="xs" animated={p.rank_position === 1} />
+    )}
+    stats={
+      <>
+        <span className="font-black text-neo-yellow tabular-nums">{p.total_efficiency_score} {t('wordHunt.leaderboard.pts')}</span>
+        <span className="text-neo-white/40" aria-hidden>•</span>
+        <span className="text-neo-white/70 font-medium">{p.games_won}/{p.total_games} {t('wordHunt.leaderboard.solved')}</span>
+      </>
+    }
+    trailing={!compact && (
+      <div className="hidden sm:flex flex-col items-end text-xs">
+        <div className="text-neo-white/60">{t('wordHunt.leaderboard.best')}</div>
+        <div className="font-bold text-neo-yellow tabular-nums">{p.best_efficiency}</div>
       </div>
-
-      {/* Avatar with Country Flag */}
-      <div className="relative">
-        <div className="w-11 h-11 sm:w-14 sm:h-14 border-3 border-neo-black/80 shadow-hard-sm rounded-full overflow-hidden">
-          <Avatar
-
-            avatarImage={participant.avatar_image ?? undefined}
-            customAvatar={participant.custom_avatar ?? undefined}
-            userId={avatarSeed(participant)}
-            size="lg"
-            className="w-full h-full"
-          />
-        </div>
-        {/* Country Flag Badge */}
-        {countryFlag && (
-          <div className="absolute -bottom-1 -inset-e-1 text-sm sm:text-base drop-shadow-xs" title={participant.country_code || undefined}>
-            {countryFlag}
-          </div>
-        )}
-      </div>
-
-      {/* Name & Stats */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <PlayerProfileTooltip
-            player={{
-              id: participant.player_id ?? undefined,
-              username: participant.display_name || 'Player',
-
-              avatarImage: participant.avatar_image ?? undefined,
-              customAvatar: participant.custom_avatar,
-              countryCode: participant.country_code,
-              totalGames: participant.total_games,
-              winRate: participant.total_games > 0
-                ? Math.round((participant.games_won / participant.total_games) * 100)
-                : undefined,
-            }}
-            isCurrentUser={isCurrentUser}
-            side="bottom"
-          >
-            <span className={`font-bold truncate text-sm sm:text-base ${isCurrentUser ? 'text-neo-cyan dark:text-neo-cyan' : 'text-slate-800 dark:text-white cursor-pointer hover:underline'}`}>
-              {participant.display_name || 'Player'}
-            </span>
-          </PlayerProfileTooltip>
-          {isCurrentUser && (
-            <span className="text-[10px] sm:text-xs bg-neo-cyan text-neo-black px-2 py-0.5 rounded-full font-black shrink-0 shadow-xs animate-pulse">
-              {t('wordHunt.leaderboard.you', 'YOU')}
-            </span>
-          )}
-          {participant.best_efficiency != null && (
-            <TierBadge
-              tier={getDailyLeaderboardTier(participant.best_efficiency)}
-              size="xs"
-              animated={rank === 1}
-            />
-          )}
-          {rank === 1 && (
-            <Crown className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 shrink-0" />
-          )}
-        </div>
-        <div className="text-xs sm:text-sm flex items-center gap-2 mt-0.5">
-          {/* Total efficiency score - primary stat */}
-          <span className="font-black text-purple-600 dark:text-purple-400">
-            {participant.total_efficiency_score} {t('wordHunt.leaderboard.pts')}
-          </span>
-          <span className="text-slate-400 dark:text-slate-500">•</span>
-          {/* Challenges solved */}
-          <span className="text-slate-600 dark:text-slate-300 font-medium">
-            {participant.games_won}/{participant.total_games} {t('wordHunt.leaderboard.solved')}
-          </span>
-        </div>
-      </div>
-
-      {/* Best Score Badge */}
-      {!compact && (
-        <div className="hidden sm:flex flex-col items-end text-xs">
-          <div className="text-slate-500 dark:text-slate-400">{t('wordHunt.leaderboard.best')}</div>
-          <div className="font-bold text-purple-600 dark:text-purple-400">{participant.best_efficiency}</div>
-        </div>
-      )}
-    </m.div>
-  );
-});
-
+    )}
+  />
+));
 AllTimeParticipantRow.displayName = 'AllTimeParticipantRow';
-
-// ==========================================
-// Season Participant Row
-// ==========================================
 
 export const SeasonParticipantRow = memo<{
   participant: SeasonParticipant;
@@ -373,137 +323,53 @@ export const SeasonParticipantRow = memo<{
   isCurrentUser: boolean;
   compact: boolean;
   t: T;
-  /** Accent color of the season being viewed — tints the rank-1 crown. */
+  /** Accent colour of the season being viewed — tints the score. */
   accentColor?: string;
-}>(({ participant, index, isCurrentUser, compact, t, accentColor }) => {
-  const rank = participant.rank_position;
-  const countryFlag = getCountryFlag(participant.country_code);
-  const days = participant.days_played;
-  const daysLabel = days === 1
+}>(({ participant: p, index, isCurrentUser, compact, t, accentColor }) => {
+  const daysLabel = p.days_played === 1
     ? t('wordHunt.leaderboard.dayPlayed')
-    : t('wordHunt.leaderboard.daysPlayed').replace('{count}', String(days));
-  const bothModes = participant.word_hunt_score > 0 && participant.word_wheel_score > 0;
-
+    : t('wordHunt.leaderboard.daysPlayed').replace('{count}', String(p.days_played));
   return (
-    <m.div
-      data-testid="season-row"
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: index * 0.05, type: 'spring', stiffness: 380, damping: 26 }}
-      className={`
-        flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl border-2 transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] duration-200
-        ${getRankColors(rank, isCurrentUser)}
-        ${compact ? 'py-2' : ''}
-        ${isCurrentUser ? 'scale-[1.02]' : 'hover:scale-[1.01]'}
-      `}
-    >
-      <div
-        className={`
-          w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center font-black text-sm sm:text-base
-          ${getRankBadgeColors(rank)}
-          border-2 shadow-xs
-        `}
-      >
-        {getRankDisplay(rank)}
-      </div>
-
-      <div className="relative">
-        <div className="w-11 h-11 sm:w-14 sm:h-14 border-3 border-neo-black/80 shadow-hard-sm rounded-full overflow-hidden">
-          <Avatar
-            avatarImage={participant.avatar_image ?? undefined}
-            customAvatar={participant.custom_avatar ?? undefined}
-            userId={avatarSeed(participant)}
-            size="lg"
-            className="w-full h-full"
-          />
-        </div>
-        {countryFlag && (
-          <div className="absolute -bottom-1 -inset-e-1 text-sm sm:text-base drop-shadow-xs" title={participant.country_code || undefined}>
-            {countryFlag}
-          </div>
-        )}
-      </div>
-
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <PlayerProfileTooltip
-            player={{
-              id: participant.player_id ?? undefined,
-              username: participant.display_name || 'Player',
-              avatarImage: participant.avatar_image ?? undefined,
-              customAvatar: participant.custom_avatar,
-              countryCode: participant.country_code,
-            }}
-            isCurrentUser={isCurrentUser}
-            side="bottom"
-          >
-            <span className={`font-bold truncate text-sm sm:text-base ${isCurrentUser ? 'text-neo-cyan dark:text-neo-cyan' : 'text-slate-800 dark:text-white cursor-pointer hover:underline'}`}>
-              {participant.display_name || 'Player'}
-            </span>
-          </PlayerProfileTooltip>
-          {participant.languages.map((lang) => (
-            <LanguageChip key={lang} language={lang} />
-          ))}
-          {isCurrentUser && (
-            <span className="text-[10px] sm:text-xs bg-neo-cyan text-neo-black px-2 py-0.5 rounded-full font-black shrink-0 shadow-xs animate-pulse">
-              {t('wordHunt.leaderboard.you', 'YOU')}
-            </span>
-          )}
-          {rank === 1 && (
-            <Crown
-              className="w-4 h-4 sm:w-5 sm:h-5 shrink-0"
-              style={accentColor ? { color: accentColor } : undefined}
-              aria-hidden
-            />
-          )}
-        </div>
-        <div className="text-xs sm:text-sm flex items-center gap-2 mt-0.5 flex-wrap">
-          <span className="font-black text-purple-600 dark:text-purple-400 tabular-nums">
-            {participant.season_score} {t('wordHunt.leaderboard.seasonPts')}
+    <RowShell
+      testId="season-row"
+      person={p}
+      rank={p.rank_position}
+      index={index}
+      isCurrentUser={isCurrentUser}
+      compact={compact}
+      t={t}
+      showFlag
+      badges={p.languages.map((lang) => <LanguageChip key={lang} language={lang} />)}
+      stats={
+        <>
+          <span className="font-black tabular-nums text-neo-yellow" style={accentColor ? { color: accentColor } : undefined}>
+            {p.season_score} {t('wordHunt.leaderboard.seasonPts')}
           </span>
-          <span className="text-slate-400 dark:text-slate-500">•</span>
-          <span className="inline-flex items-center gap-1 text-slate-600 dark:text-slate-300 font-medium">
+          <span className="text-neo-white/40" aria-hidden>•</span>
+          <span className="inline-flex items-center gap-1 text-neo-white/70 font-medium">
             <CalendarDays aria-hidden className="w-3.5 h-3.5" />
             {daysLabel}
           </span>
-          {bothModes && (
-            <span className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium inline-flex items-center gap-1">
-              <Target aria-hidden className="w-3 h-3" />
-              {participant.word_hunt_score}
-              <span aria-hidden>·</span>
-              <CircleDot aria-hidden className="w-3 h-3" />
-              {participant.word_wheel_score}
-            </span>
-          )}
-        </div>
-      </div>
-    </m.div>
+        </>
+      }
+    />
   );
 });
-
 SeasonParticipantRow.displayName = 'SeasonParticipantRow';
-
-// ==========================================
-// Skeleton Loading Row
-// ==========================================
 
 export const SkeletonRow = memo<{ index: number }>(({ index }) => (
   <m.div
     initial={{ opacity: 0 }}
     animate={{ opacity: 1 }}
     transition={{ delay: index * 0.05, type: 'spring', stiffness: 380, damping: 26 }}
-    className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-neo-navy-light/50"
+    className="flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 rounded-neo border-2 border-neo-black/60 bg-neo-navy"
   >
-    {/* Rank skeleton */}
-    <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-slate-200 dark:bg-neo-navy-elevated animate-pulse" />
-    {/* Avatar skeleton */}
-    <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-slate-200 dark:bg-neo-navy-elevated animate-pulse" />
-    {/* Name & stats skeleton */}
+    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-neo bg-neo-navy-elevated animate-pulse" />
+    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-neo-navy-elevated animate-pulse" />
     <div className="flex-1 space-y-2">
-      <div className="h-4 w-24 bg-slate-200 dark:bg-neo-navy-elevated rounded animate-pulse" />
-      <div className="h-3 w-16 bg-slate-200 dark:bg-neo-navy-elevated rounded animate-pulse" />
+      <div className="h-4 w-24 bg-neo-navy-elevated rounded animate-pulse" />
+      <div className="h-3 w-16 bg-neo-navy-elevated rounded animate-pulse" />
     </div>
   </m.div>
 ));
-
 SkeletonRow.displayName = 'SkeletonRow';

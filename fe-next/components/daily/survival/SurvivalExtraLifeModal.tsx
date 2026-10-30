@@ -15,11 +15,12 @@ interface SurvivalExtraLifeModalProps {
   coinCost?: number;
   canAffordCoinRestore?: boolean;
   onCoinRestore?: () => void;
+  coinPending?: boolean;
 }
 
 export function SurvivalExtraLifeModal({
   isOpen, restoreAmount, onRestore, onDecline, t, language,
-  coinCost, canAffordCoinRestore, onCoinRestore,
+  coinCost, canAffordCoinRestore, onCoinRestore, coinPending = false,
 }: SurvivalExtraLifeModalProps) {
   const { offer, canShowAd } = useRewardedFeatureUnlock({
     placement: 'daily_survival_extra_life',
@@ -68,7 +69,9 @@ export function SurvivalExtraLifeModal({
                 <button type="button"
                   data-testid="survival-extralife-coin-cta"
                   onClick={onCoinRestore}
-                  className="flex items-center justify-center gap-2 rounded-neo border-neo-thick border-black bg-neo-yellow px-6 py-3 font-neo-display text-lg font-black text-neo-navy shadow-hard transition-transform active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed"
+                  disabled={coinPending}
+                  aria-busy={coinPending}
+                  className="disabled:opacity-60 disabled:pointer-events-none flex items-center justify-center gap-2 rounded-neo border-neo-thick border-black bg-neo-yellow px-6 py-3 font-neo-display text-lg font-black text-neo-navy shadow-hard transition-transform active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed"
                 >
                   <Coins className="h-5 w-5" strokeWidth={3} />
                   {t('wordHunt.survival.extraLifeModal.coinCta', { cost: safeToLocaleString(coinCost, language) })}
@@ -77,7 +80,8 @@ export function SurvivalExtraLifeModal({
               <button type="button"
                 data-testid="survival-extralife-decline"
                 onClick={onDecline}
-                className="flex items-center justify-center gap-2 rounded-neo border-neo border-black bg-neo-navy px-4 py-2 font-neo-body text-sm text-neo-white hover:text-neo-white"
+                disabled={coinPending}
+                className="disabled:opacity-60 disabled:pointer-events-none flex items-center justify-center gap-2 rounded-neo border-neo border-black bg-neo-navy px-4 py-2 font-neo-body text-sm text-neo-white hover:text-neo-white"
               >
                 <X className="h-4 w-4" />
                 {t('wordHunt.survival.extraLifeModal.decline')}

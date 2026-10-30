@@ -125,7 +125,7 @@ describe('PyramidChallenge as the daily host', () => {
     const first = render(<PyramidChallenge sharePath={SHARE} />);
     winPyramid();
     const today = new Date().toISOString().slice(0, 10);
-    expect(window.localStorage.getItem(dailyResultKey(today, 'en'))).not.toBeNull();
+    expect(window.localStorage.getItem(dailyResultKey(today))).not.toBeNull();
     first.unmount();
 
     render(<PyramidChallenge sharePath={SHARE} />);

@@ -5,7 +5,7 @@
  * Contract:
  *  - If the dictionary is loaded AND the word is a hit → return true, skip fetch.
  *  - Otherwise POST /api/validate-word and return data.isValid.
- *  - On network error / non-ok response → fall back to `word.length >= 3`
+ *  - On network error / non-ok response → null (unknown), never a credit
  *    (matches existing SP permissive behavior so a hiccup doesn't brick the game).
  */
 
@@ -76,20 +76,28 @@ describe('fastValidateWord', () => {
     expect(result).toBe(false);
   });
 
-  it('falls back to length>=3 on non-ok response', async () => {
+  it('returns unknown (null) on a non-ok response such as a 429', async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: false,
+      status: 429,
       json: async () => ({}),
     }) as unknown as typeof fetch;
 
-    expect(await fastValidateWord('cat', 'en')).toBe(true);
-    expect(await fastValidateWord('no', 'en')).toBe(false);
+    expect(await fastValidateWord('cat', 'en')).toBeNull();
   });
 
-  it('falls back to length>=3 on network throw', async () => {
+  it('returns unknown (null) on a network throw', async () => {
     global.fetch = vi.fn().mockRejectedValue(new Error('offline')) as unknown as typeof fetch;
 
-    expect(await fastValidateWord('cat', 'en')).toBe(true);
-    expect(await fastValidateWord('no', 'en')).toBe(false);
+    expect(await fastValidateWord('cat', 'en')).toBeNull();
+  });
+
+  it('bounds the request with a timeout signal', async () => {
+    const spy = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ isValid: true }) });
+    global.fetch = spy as unknown as typeof fetch;
+
+    await fastValidateWord('cat', 'en');
+    const init = spy.mock.calls[0][1] as RequestInit;
+    expect(init.signal).toBeInstanceOf(AbortSignal);
   });
 });

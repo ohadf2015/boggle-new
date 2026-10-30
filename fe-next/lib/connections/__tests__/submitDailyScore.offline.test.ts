@@ -44,7 +44,7 @@ describe('submitDailyScore — offline enqueue', () => {
     const [, mode, queued] = enqueueScore.mock.calls[0];
     expect(mode).toBe('connections');
     expect(queued).toMatchObject({ puzzleDate: '2026-06-05', score: 500, language: 'en' });
-    expect(res).toMatchObject({ success: true, score: 500 });
+    expect(res).toEqual({ status: 'queued' });
   });
 
   it('does not queue when offline but unauthenticated (guest — no session)', async () => {
@@ -54,7 +54,7 @@ describe('submitDailyScore — offline enqueue', () => {
 
     const res = await submitDailyScore(payload);
     expect(enqueueScore).not.toHaveBeenCalled();
-    expect(res).toBeNull();
+    expect(res).toEqual({ status: 'failed', retryable: true });
   });
 
   it('uses the normal fetch path when online (does not enqueue)', async () => {
@@ -65,6 +65,14 @@ describe('submitDailyScore — offline enqueue', () => {
 
     const res = await submitDailyScore(payload);
     expect(enqueueScore).not.toHaveBeenCalled();
-    expect(res).toMatchObject({ currentRank: 3, totalPlayers: 9 });
+    expect(res).toMatchObject({ status: 'saved', result: { currentRank: 3, totalPlayers: 9 } });
+  });
+
+  it('a server rejection is final; a server error is worth retrying', async () => {
+    setOnline(true);
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(new Response('{}', { status: 400 }));
+    expect(await submitDailyScore(payload)).toEqual({ status: 'failed', retryable: false });
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(new Response('{}', { status: 503 }));
+    expect(await submitDailyScore(payload)).toEqual({ status: 'failed', retryable: true });
   });
 });

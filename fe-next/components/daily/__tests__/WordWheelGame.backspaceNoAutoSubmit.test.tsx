@@ -112,7 +112,8 @@ describe('WordWheelGame backspace does not race the idle auto-submit', () => {
     fireEvent.click(screen.getByLabelText('wordWheel.removeLetter'));
     tap('[data-wheel-letter="E"]');
 
-    await act(async () => { await sleep(1300); });
+    // Tap spelling waits 2.5s before an idle word submits itself.
+    await act(async () => { await sleep(2800); });
     expect(onValidateWord).toHaveBeenCalledTimes(1);
-  }, 5000);
+  }, 6000);
 });

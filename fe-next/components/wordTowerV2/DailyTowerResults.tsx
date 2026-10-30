@@ -26,7 +26,6 @@ function GoalMeter({ t, daily, coins }: { t: Props['t']; daily: Props['daily']; 
         </span>
         <span className="tabular-nums text-neo-white">{`${Math.min(daily.growthM, daily.targetM)}/${daily.targetM}${unit}`}</span>
         <span className="ms-auto flex items-center gap-2 tabular-nums">
-          <span className="text-neo-lime">{`+${daily.growthM}${unit}`}</span>
           {daily.rank ? <span className="rounded-full border-2 border-neo-black bg-neo-purple px-1.5 text-neo-white">{`#${daily.rank}`}</span> : null}
         </span>
       </div>
@@ -104,7 +103,8 @@ export function DailyTowerResults(p: Props) {
               outcome={p.isBest || hit ? 'win' : 'done'}
               headline={headline}
               eyebrow={p.dateLabel}
-              score={p.score}
+              score={daily.growthM}
+              scoreLabel={t('wordTowerV2.dailyTower.grewToday')}
               celebrate={p.celebrate}
               meter={<GoalMeter t={t} daily={daily} coins={coinsLine} />}
               stats={[

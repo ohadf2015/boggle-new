@@ -23,6 +23,8 @@ export interface WheelDiscLetterProps {
   cheerOrder?: number | null;
   tileSkin?: string | null;
   reducedMotion?: boolean;
+  /** Today's gold bonus letter. */
+  gold?: boolean;
 }
 
 const POP = { type: 'spring' as const, stiffness: 520, damping: 17 };
@@ -30,13 +32,13 @@ const POP = { type: 'spring' as const, stiffness: 520, damping: 17 };
 /** One letter on the disc: a cream keycap on the ring, or the inked hub with its lime ring. */
 const WheelDiscLetter: React.FC<WheelDiscLetterProps> = ({
   letter, index, outerCount = 6, isUsed, isPressed = false, onPress, onHoldStart, onHoldEnd, showHoldRing = false,
-  cheerOrder = null, tileSkin, reducedMotion = false,
+  cheerOrder = null, tileSkin, reducedMotion = false, gold = false,
 }) => {
   const btnRef = useRef<HTMLButtonElement>(null);
   const { t } = useLanguage();
   const isHub = index === -1;
   const size = isHub ? DISC.center : DISC.outer;
-  const skin = !isHub && !isUsed && tileSkin ? tileSkin.replace('tile-', '') : null;
+  const skin = !isHub && !isUsed && !gold && tileSkin ? tileSkin.replace('tile-', '') : null;
   const at = letterPoint(index, outerCount);
   const lit = isUsed || isPressed;
 
@@ -54,7 +56,9 @@ const WheelDiscLetter: React.FC<WheelDiscLetterProps> = ({
           ? 'bg-neo-lime text-neo-black shadow-[inset_0_-4px_0_rgba(0,0,0,0.18),4px_5px_0_#000,0_0_0_5px_rgba(191,255,0,0.3)]'
           : isHub
             ? 'bg-[#0b1530] text-neo-lime shadow-[inset_0_0_0_0.9cqw_#bfff00,4px_5px_0_#000,0_0_0_6px_rgba(191,255,0,0.16)]'
-            : 'bg-neo-cream text-neo-black shadow-[inset_0_-4px_0_rgba(0,0,0,0.14),3px_4px_0_#000] hover:bg-neo-white',
+            : gold
+              ? 'bg-neo-yellow text-neo-black shadow-[inset_0_-4px_0_rgba(0,0,0,0.18),3px_4px_0_#000,0_0_0_4px_var(--neo-orange)]'
+              : 'bg-neo-cream text-neo-black shadow-[inset_0_-4px_0_rgba(0,0,0,0.14),3px_4px_0_#000] hover:bg-neo-white',
       )}
       style={{
         width: `${size}%`,
@@ -74,13 +78,14 @@ const WheelDiscLetter: React.FC<WheelDiscLetterProps> = ({
       onPointerUp={() => onHoldEnd?.()}
       onPointerCancel={() => onHoldEnd?.()}
       onPointerLeave={() => onHoldEnd?.()}
-      aria-label={isUsed ? `${letter}. ${t('wordWheel.tapToRemove')}` : letter}
+      aria-label={isUsed ? `${letter}. ${t('wordWheel.tapToRemove')}` : gold ? `${letter}. ${t('wordWheel.goldLetterLabel')}` : letter}
       aria-pressed={isUsed}
       draggable={false}
       data-wheel-letter={letter}
       data-wheel-index={index}
       data-wheel-used={isUsed ? 'true' : 'false'}
       data-wheel-pressed={isPressed && !isUsed ? 'true' : 'false'}
+      {...(gold && { 'data-wheel-gold': 'true' })}
       {...(cheerOrder !== null && { 'data-wheel-celebrate': 'true' })}
       {...(skin && { 'data-tile-skin': skin })}
     >
@@ -100,6 +105,11 @@ const WheelDiscLetter: React.FC<WheelDiscLetterProps> = ({
           animate={{ scale: 1.75, opacity: 0 }}
           transition={{ duration: 0.42, ease: 'easeOut' }}
         />
+      )}
+      {gold && !lit && (
+        <span aria-hidden className="absolute -top-[6%] -end-[6%] w-[34%] h-[34%] grid place-items-center rounded-full border-2 border-neo-black bg-neo-orange text-neo-black text-[4cqw] font-black">
+          ★
+        </span>
       )}
       {showHoldRing && <HoldRing />}
       <span className="relative">{letter}</span>

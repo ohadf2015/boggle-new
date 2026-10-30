@@ -17,6 +17,7 @@ import { resolveDailySubmission, type DailySubmission } from '@/lib/connections/
 import { creditDailyQuests, isTodayUTC } from '@/lib/daily/questSeams';
 import { questResultForConnections } from '@/shared/dailyQuestPool';
 import { nextStreakValue, yesterdayISO } from '@/lib/connections/streak';
+import { scopeDailyBoard } from '@/lib/connections/dailyBoard';
 
 type SupabaseLike = any;
 
@@ -77,15 +78,17 @@ export async function processConnectionsCompletion(
     // Fetch existing submission for today (same player, same day).
     const { data: existing } = await admin
       .from('connections_daily_scores')
-      .select('id, score, time_taken_seconds')
+      .select('id, score, time_taken_seconds, language')
       .eq('puzzle_date', sub.puzzleDate)
       .eq(idCol, idVal)
       .maybeSingle();
 
     // Decide whether to insert, update, or keep the existing row.
     const decision = resolveDailySubmission({
-      existing: existing ? { score: existing.score, timeTakenSeconds: existing.time_taken_seconds } : null,
-      incoming: { score: sub.score, timeTakenSeconds: sub.timeTakenSeconds },
+      existing: existing
+        ? { score: existing.score, timeTakenSeconds: existing.time_taken_seconds, language: existing.language }
+        : null,
+      incoming: { score: sub.score, timeTakenSeconds: sub.timeTakenSeconds, language: sub.language },
     });
 
     // Build the row data with server-authoritative values and avatar fallbacks.
@@ -120,17 +123,19 @@ export async function processConnectionsCompletion(
     const finalTime = decision.action === 'keep' && existing ? existing.time_taken_seconds : sub.timeTakenSeconds;
 
     // Rank: count rows better than (finalScore, finalTime).
-    const { count: better } = await admin
-      .from('connections_daily_scores')
-      .select('*', { count: 'exact', head: true })
-      .eq('puzzle_date', sub.puzzleDate)
-      .or(betterFilter(finalScore, finalTime));
+    const boardLanguage = decision.action === 'keep' && existing?.language ? existing.language : sub.language;
+    const { count: better } = await scopeDailyBoard(
+      admin.from('connections_daily_scores').select('*', { count: 'exact', head: true }).eq('puzzle_date', sub.puzzleDate),
+      sub.puzzleDate,
+      boardLanguage,
+    ).or(betterFilter(finalScore, finalTime));
 
-    // Total players for this day.
-    const { count: totalPlayers } = await admin
-      .from('connections_daily_scores')
-      .select('*', { count: 'exact', head: true })
-      .eq('puzzle_date', sub.puzzleDate);
+    // Total players on this board for the day.
+    const { count: totalPlayers } = await scopeDailyBoard(
+      admin.from('connections_daily_scores').select('*', { count: 'exact', head: true }).eq('puzzle_date', sub.puzzleDate),
+      sub.puzzleDate,
+      boardLanguage,
+    );
 
     // Credit TODAY'S daily quests (authed players, today's puzzle only — a
     // replayed offline-sync submit for a past date must not credit today's set).

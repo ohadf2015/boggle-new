@@ -10,6 +10,7 @@ interface StatusResponse {
   nextClaimAt: string | null;
   unownedCount: number;
   eligible: boolean;
+  adTicket?: string;
 }
 
 export interface DailyAvatarPartState {
@@ -92,7 +93,11 @@ export function useDailyAvatarPart(): DailyAvatarPartState {
 
   const claim = useCallback(async (): Promise<string | null> => {
     try {
-      const res = await fetch(ENDPOINT, { method: 'POST' });
+      const res = await fetch(ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ adTicket: status?.adTicket }),
+      });
       if (!res.ok) {
         setModalOpen(false);
         fetchStatus();
@@ -113,7 +118,7 @@ export function useDailyAvatarPart(): DailyAvatarPartState {
       setModalOpen(false);
       return null;
     }
-  }, [fetchStatus]);
+  }, [fetchStatus, status?.adTicket]);
 
   const openModal = useCallback(() => setModalOpen(true), []);
   const closeModal = useCallback(() => setModalOpen(false), []);

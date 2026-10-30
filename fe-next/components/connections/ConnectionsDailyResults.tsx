@@ -26,6 +26,8 @@ export interface ConnectionsDailyResultsProps {
   onShareClick?: (method: 'native' | 'copy') => void;
   /** Flavor-specific note right under the hero (zero-solved encouragement, pyramid reveal). */
   body?: ReactNode;
+  /** Score-save problems, right under the hero. */
+  notice?: ReactNode;
   /** Lifetime rank + week strip. */
   progressSlot?: ReactNode;
   answerKey: { puzzles: readonly ConnectionPuzzle[]; solvedIndices: ReadonlySet<number> };
@@ -49,6 +51,7 @@ export default function ConnectionsDailyResults({
   shareText,
   onShareClick,
   body,
+  notice,
   progressSlot,
   answerKey,
   ctaSource,
@@ -72,6 +75,7 @@ export default function ConnectionsDailyResults({
         <BridgeShareRow shareText={shareText} onShareClick={onShareClick} />
       </DailyResultsHero>
 
+      {notice}
       {body}
 
       <NextQuestCta justFinished="connections" currentLanguage={language} source={ctaSource} />
@@ -96,7 +100,6 @@ export default function ConnectionsDailyResults({
             rows={leaderboard.rows}
             ownRank={leaderboard.rank}
             totalPlayers={leaderboard.totalPlayers}
-            streak={0}
             loading={leaderboard.loading}
           />
         </div>

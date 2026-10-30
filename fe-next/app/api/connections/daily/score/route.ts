@@ -32,7 +32,10 @@ export async function POST(request: NextRequest) {
     // the rest of the body against it.
     const peekDate = typeof body.puzzleDate === 'string' ? body.puzzleDate : today;
     const peekLang = typeof body.language === 'string' ? body.language : 'en';
-    const max = maxDailyScore(peekDate, peekLang);
+    const playedIds = Array.isArray(body.puzzleIds)
+      ? body.puzzleIds.filter((id: unknown): id is string => typeof id === 'string').slice(0, 10)
+      : undefined;
+    const max = maxDailyScore(peekDate, peekLang, playedIds);
     const v = validateDailySubmission(body, max, today);
     if (!v.ok) return NextResponse.json({ error: v.error }, { status: 400 });
     const sub = v.value;

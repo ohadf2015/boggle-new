@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { m } from 'framer-motion';
-import { ThumbsUp, ThumbsDown, ArrowRight, Flag, Check, Lightbulb, Eye } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, ArrowRight, Flag, Check, Lightbulb, Eye, SkipForward } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useExperiment } from '@/hooks/useExperiment';
@@ -22,6 +22,7 @@ interface ActionsProps {
   isDisabled: boolean;
   onGiveUp: () => void;
   onRevealHint: () => void;
+  skipAfterMisses?: number;
 }
 
 /**
@@ -30,7 +31,7 @@ interface ActionsProps {
  * fallback after three misses). The reveal-answer button is ad-gated for all
  * non-admins.
  */
-export function PuzzleActions({ puzzle, state, isAdmin, isDisabled, onGiveUp, onRevealHint }: ActionsProps) {
+export function PuzzleActions({ puzzle, state, isAdmin, isDisabled, onGiveUp, onRevealHint, skipAfterMisses }: ActionsProps) {
   const { t } = useLanguage();
   const { variant, trackExposure } = useExperiment('exp-connections-hint-gate-v1');
   const showFallbackHint = variant === 'after-3-wrong' && state.wrongAttempts >= 3 && !isAdmin;
@@ -109,6 +110,17 @@ export function PuzzleActions({ puzzle, state, isAdmin, isDisabled, onGiveUp, on
         >
           <Eye className="h-3.5 w-3.5" aria-hidden="true" />
           {t('connections.revealAnswerAd')}
+        </m.button>
+      ) : skipAfterMisses != null && state.wrongAttempts >= skipAfterMisses ? (
+        <m.button
+          type="button"
+          onClick={onGiveUp}
+          whileTap={{ scale: 0.96 }}
+          disabled={isDisabled}
+          className={`${QUIET_BTN} hover:text-neo-cyan`}
+        >
+          <SkipForward className="h-3.5 w-3.5" aria-hidden="true" />
+          {t('connections.daily.skipStuck')}
         </m.button>
       ) : null}
     </div>

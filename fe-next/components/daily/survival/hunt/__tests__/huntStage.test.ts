@@ -24,6 +24,9 @@ describe('verdictFor', () => {
     expect(verdictFor('too-short')).toBe('dupe');
     expect(verdictFor('too-long')).toBe('dupe');
   });
+  it('maps a word the checker could not answer to a soft, unpenalised rejection', () => {
+    expect(verdictFor('unavailable')).toBe('dupe');
+  });
   it('ignores no feedback', () => {
     expect(verdictFor(null)).toBeNull();
   });

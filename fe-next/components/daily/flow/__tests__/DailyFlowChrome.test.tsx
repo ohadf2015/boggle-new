@@ -30,6 +30,27 @@ describe('DailyFlowChrome', () => {
   });
 });
 
+describe('DailyFlowChrome intro vs an auto-shown tutorial', () => {
+  // The host decides its first-visit tutorial in its own layout effect, which
+  // runs AFTER the chrome's (child effects first). The chrome must wait for it.
+  it('given the host is still deciding, then shows nothing until told; an auto tutorial cancels the intro for good', () => {
+    sessionStorage.clear();
+    const { rerender } = render(<DailyFlowChrome modeId="connections" backLink={false} introDeferred />);
+    expect(screen.queryByTestId('daily-intro')).toBeNull();
+    rerender(<DailyFlowChrome modeId="connections" backLink={false} intro={false} />);
+    expect(screen.queryByTestId('daily-intro')).toBeNull();
+    rerender(<DailyFlowChrome modeId="connections" backLink={false} />);
+    expect(screen.queryByTestId('daily-intro')).toBeNull();
+  });
+
+  it('given the host decides there is no tutorial, then the intro plays as before', () => {
+    sessionStorage.clear();
+    const { rerender } = render(<DailyFlowChrome modeId="connections" backLink={false} introDeferred />);
+    rerender(<DailyFlowChrome modeId="connections" backLink={false} />);
+    expect(screen.getByTestId('daily-intro')).toBeTruthy();
+  });
+});
+
 describe('DailyFlowChrome skip', () => {
   // "Skip" on an optional quest used to link to the hub, which is "quit", not
   // "skip": the player had to find Word Tower again themselves.

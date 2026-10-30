@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useEffect, useRef, useState, useCallback } from 'react';
+import React, { useMemo, useEffect, useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { DiscoveredWordsList } from './DiscoveredWordsList';
 import { AnimatePresence } from 'framer-motion';
@@ -14,8 +14,6 @@ import { cn } from '@/lib/utils';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { useReducedEffects } from '@/hooks/useReducedEffects';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
-import { useHasRealAdProvider } from '@/hooks/useHasRealAdProvider';
-import { useCoinsFromContext } from '@/contexts/CoinContext';
 import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
@@ -39,6 +37,7 @@ import { HuntLeftRail, HuntRightRail } from './survival/HuntShellRails';
 import { GameShell, SHELL_MEDIA } from '@/components/game/shell';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { SurvivalExtraLifeModal } from './survival/SurvivalExtraLifeModal';
+import { useSurvivalExtraLife, EXTRA_LIFE_RESTORE_AMOUNT, EXTRA_LIFE_COIN_COST } from './survival/useSurvivalExtraLife';
 import { useWordHuntFx } from './survival/useWordHuntFx';
 import { HuntPlayfield } from './survival/hunt/HuntPlayfield';
 import { useHuntStage } from './survival/hunt/useHuntStage';
@@ -49,9 +48,6 @@ import { wordHuntSolveTier } from '@/shared/utils/wordHuntScoring';
 import { HuntHintSlots } from './survival/hunt/HuntHintSlots';
 import PracticeCoachTip from '@/components/practice/PracticeCoachTip';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
-
-const EXTRA_LIFE_RESTORE_AMOUNT = 50;
-const EXTRA_LIFE_COIN_COST = 50;
 
 export type { WordDiscovery, TargetAttempt, SurvivalGameResult } from './survival/types';
 
@@ -117,20 +113,12 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     [isLowEnd, enableComplexAnimations, effectsReduced]
   );
 
-  // Extra-life offer state (rewarded ad OR coin-spend on life=0, single-use per run)
-  const hasUsedExtraLifeRef = useRef(false);
-  const rescueMethodRef = useRef<WordHuntRescueMethod>(null);
-  const [extraLifeDeclined, setExtraLifeDeclined] = useState(false);
-  const hasRealAdProvider = useHasRealAdProvider();
-  const { canAfford, spendCoins } = useCoinsFromContext();
-  const canAffordCoinRestore = canAfford(EXTRA_LIFE_COIN_COST);
-  // Practice runs never bottom out on life, so the rescue prompt would never fire —
-  // gate it explicitly so we don't surface monetization in a tutorial flow.
-  const hasRescueAvailable = !practice && (hasRealAdProvider || canAffordCoinRestore);
+  const extraLife = useSurvivalExtraLife({ practice });
+  const { rescueMethodRef } = extraLife;
 
   const handleInnerComplete = React.useCallback(
     (result: SurvivalGameResult) => onComplete(result, rescueMethodRef.current),
-    [onComplete],
+    [onComplete, rescueMethodRef],
   );
 
   // Game logic hook
@@ -141,40 +129,12 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     targetWord,
     onComplete: handleInnerComplete,
     t,
-    deferGameOver:
-      hasRescueAvailable && !hasUsedExtraLifeRef.current && !extraLifeDeclined,
+    deferGameOver: extraLife.offerOpen,
     disableLifeDrain: practice,
   });
+  extraLife.restoreRef.current = actions.restoreLife;
 
-  const extraLifeModalOpen =
-    hasRescueAvailable
-    && !hasUsedExtraLifeRef.current
-    && !extraLifeDeclined
-    && state.lifePoints === 0
-    && !state.isGameOver;
-
-  const handleExtraLifeAccept = () => {
-    hasUsedExtraLifeRef.current = true;
-    rescueMethodRef.current = 'ad';
-    actions.restoreLife(EXTRA_LIFE_RESTORE_AMOUNT);
-  };
-
-  const handleExtraLifeDecline = () => {
-    setExtraLifeDeclined(true);
-  };
-
-  const handleExtraLifeCoinAccept = async () => {
-    const ok = await spendCoins(
-      EXTRA_LIFE_COIN_COST,
-      'Daily Survival Extra Life',
-      { placement: 'daily_survival_extra_life_coin' },
-    );
-    if (ok) {
-      hasUsedExtraLifeRef.current = true;
-      rescueMethodRef.current = 'coin';
-      actions.restoreLife(EXTRA_LIFE_RESTORE_AMOUNT);
-    }
-  };
+  const extraLifeModalOpen = extraLife.offerOpen && state.lifePoints === 0 && !state.isGameOver;
 
   // Disarm the navigation guard the instant the player confirms a quit, so its
   // beforeunload/popstate handlers don't fire during the exit nav (black-screen race).
@@ -287,11 +247,12 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     <SurvivalExtraLifeModal
       isOpen
       restoreAmount={EXTRA_LIFE_RESTORE_AMOUNT}
-      onRestore={handleExtraLifeAccept}
-      onDecline={handleExtraLifeDecline}
+      onRestore={extraLife.onAdRestore}
+      onDecline={extraLife.onDecline}
       coinCost={EXTRA_LIFE_COIN_COST}
-      canAffordCoinRestore={canAffordCoinRestore}
-      onCoinRestore={handleExtraLifeCoinAccept}
+      canAffordCoinRestore={extraLife.canAffordCoinRestore}
+      onCoinRestore={extraLife.onCoinRestore}
+      coinPending={extraLife.coinPending}
       t={t}
       language={language}
     />

@@ -43,11 +43,13 @@ interface Props {
 /** The end-of-run board, wired to the run, the empire and (on daily) the day's board. */
 export function V2RunResults({ t, language, game, estateApi, daily, dailyTower, ...p }: Props) {
   const { run } = game;
+  // `peakM` only settles when a run ends; a daily banked mid-climb reads the live height.
+  const peakM = daily ? Math.max(game.peakM, game.heightM) : game.peakM;
   return (
     <V2Results
       t={t}
-      peakM={game.peakM}
-      score={Math.round(totalScore(game.peakM, run.bonus) * estateApi.perks.scoreMult)}
+      peakM={peakM}
+      score={Math.round(totalScore(peakM, run.bonus) * estateApi.perks.scoreMult)}
       bestM={game.bestM}
       isBest={game.newBest || game.peakM >= game.bestM - 0.01}
       run={run}
@@ -69,7 +71,7 @@ export function V2RunResults({ t, language, game, estateApi, daily, dailyTower, 
         daily ? <NextQuestCta justFinished="word-tower" currentLanguage={language as Language} source="word_tower_results" /> : undefined
       }
       recapSrc={v2ShareCardPath({
-        heightM: game.peakM,
+        heightM: peakM,
         floors: run.floors,
         biome: p.biomeId,
         topWord: p.longestWord,

@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useSyncExternalStore } from 'react';
+import type { WheelClock } from './wheel/useWheelTimer';
 import { m, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Flame } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -7,9 +8,16 @@ type T = (key: string, params?: Record<string, string | number>) => string;
 
 interface WordWheelHudProps {
   t: T;
-  timeLeft: number;
+  /** Static time; ignored when `clock` is given. */
+  timeLeft?: number;
+  /** Live countdown: only the HUD re-renders each second. */
+  clock?: WheelClock;
   duration: number;
   combo: number;
+  /** Real combo multiplier on bonus days; the chip shows it instead of the chain count. */
+  multiplier?: number | null;
+  /** Bumped when a combo of 2+ breaks, to flash the drop. */
+  comboBreakId?: number;
   showCombo?: boolean;
   practice?: boolean;
   onEndPractice?: () => void;
@@ -17,9 +25,19 @@ interface WordWheelHudProps {
   className?: string;
 }
 
+const noClock = () => () => {};
+
 export default function WordWheelHud({
-  t, timeLeft, duration, combo, showCombo = false, practice = false, onEndPractice, onExit, className,
+  t, timeLeft: staticTime, clock, duration, combo, multiplier = null, comboBreakId = 0,
+  showCombo = false, practice = false, onEndPractice, onExit, className,
 }: WordWheelHudProps) {
+  const liveTime = useSyncExternalStore(
+    clock?.subscribe ?? noClock,
+    () => clock?.timeLeft() ?? staticTime ?? duration,
+    () => clock?.timeLeft() ?? staticTime ?? duration,
+  );
+  const timeLeft = liveTime;
+  const comboLabel = multiplier != null ? `×${multiplier}` : `x${combo}`;
   const urgent = timeLeft <= 10;
   const warn = timeLeft <= 30;
   const mm = Math.floor(timeLeft / 60);
@@ -71,30 +89,46 @@ export default function WordWheelHud({
             className="relative flex-1 h-2 rounded-full bg-neo-white/10 overflow-hidden"
           >
             <div
+              data-testid="wheel-time-fill"
               className={cn(
-                'absolute inset-y-0 start-0 rounded-full transition-[width] duration-1000 ease-linear',
+                // transform-origin has no logical form, so the RTL side is set explicitly.
+                'absolute inset-0 rounded-full origin-left rtl:origin-right transition-transform duration-1000 ease-linear will-change-transform',
                 urgent ? 'bg-neo-red' : warn ? 'bg-neo-orange' : 'bg-linear-to-r from-neo-cyan to-neo-lime',
               )}
-              style={{ width: `${(timeLeft / duration) * 100}%` }}
+              style={{ transform: `scaleX(${Math.max(0, Math.min(1, timeLeft / duration))})` }}
             />
           </div>
         </>
       )}
       {showCombo && (
-        <div data-testid="combo-slot" className="w-12 shrink-0 flex justify-end">
-          <AnimatePresence>
-            {combo >= 2 && (
+        <div data-testid="combo-slot" className="w-14 shrink-0 flex justify-end">
+          <AnimatePresence mode="popLayout">
+            {combo >= 2 ? (
               <m.div
+                key={`combo-${comboLabel}`}
+                data-testid="combo-chip"
+                aria-label={t('wordWheel.comboLabel', { value: comboLabel })}
                 className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full border-2 border-neo-black bg-neo-pink text-neo-white shadow-[0_0_10px_rgba(255,20,147,0.5)]"
-                initial={{ scale: 0 }}
+                initial={{ scale: 1.6 }}
                 animate={{ scale: 1 }}
                 exit={{ scale: 0 }}
-                transition={{ type: 'spring', stiffness: 500 }}
+                transition={{ type: 'spring', stiffness: 500, damping: 14 }}
               >
                 <Flame className="w-3.5 h-3.5" aria-hidden />
-                <span className="font-neo-display font-black text-xs">x{combo}</span>
+                <span className="font-neo-display font-black text-xs tabular-nums">{comboLabel}</span>
               </m.div>
-            )}
+            ) : comboBreakId > 0 ? (
+              <m.div
+                key={`break-${comboBreakId}`}
+                data-testid="combo-break"
+                className="px-1.5 py-0.5 rounded-full border-2 border-neo-black bg-neo-navy-light text-neo-white/70 font-neo-display font-black text-[10px] uppercase line-through"
+                initial={{ x: 0, opacity: 1 }}
+                animate={{ x: [0, -5, 5, -3, 0], opacity: [1, 1, 1, 1, 0] }}
+                transition={{ duration: 0.8 }}
+              >
+                {t('wordWheel.comboLost')}
+              </m.div>
+            ) : null}
           </AnimatePresence>
         </div>
       )}

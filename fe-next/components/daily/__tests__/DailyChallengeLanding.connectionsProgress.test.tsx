@@ -145,8 +145,9 @@ describe('DailyChallengeLanding — progress counts the required quests; Word To
       'compact-row-purple',
       'compact-row-cyan',
     ]);
-    expect(rows[1]).toHaveTextContent(/optional/i);
-    expect(rows[2]).toHaveTextContent(/optional/i);
+    expect(rows[0]).not.toHaveTextContent(/bonus/i);
+    expect(rows[1]).toHaveTextContent(/bonus/i);
+    expect(rows[2]).toHaveTextContent(/bonus/i);
   });
 
   it('renders primary hero card and secondary modes', async () => {

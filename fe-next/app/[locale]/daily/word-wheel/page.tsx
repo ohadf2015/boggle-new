@@ -184,8 +184,8 @@ export default async function WordWheelPage({ params }: PageParams): Promise<Rea
 
   const today = new Date();
   const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  tomorrow.setHours(0, 0, 0, 0);
+  tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+  tomorrow.setUTCHours(0, 0, 0, 0);
 
   // Static structured data — all content from hardcoded constants, safe for dangerouslySetInnerHTML
   const schemas = [

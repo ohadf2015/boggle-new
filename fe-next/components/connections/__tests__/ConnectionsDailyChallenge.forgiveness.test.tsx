@@ -43,7 +43,7 @@ vi.mock('@/lib/connections/dailyClient', async (orig) => {
     todayUTC: () => '2026-05-30',
     getGuestFingerprint: () => 'test-guest',
     advanceClientStreak: () => ({ streak: 1, lastDate: '2026-05-30' }),
-    submitDailyScore: vi.fn(async () => null),
+    submitDailyScore: vi.fn(async () => ({ status: 'failed', retryable: false })),
     fetchDailyLeaderboard: vi.fn(async () => null),
   };
 });

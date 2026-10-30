@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
+import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { Calendar, Sparkles, Info } from 'lucide-react'
 import { m, AnimatePresence } from 'framer-motion'
@@ -7,8 +8,14 @@ import { useLanguage } from '@/contexts/LanguageContext'
 import { useWeeklyChest, type PendingChest } from '@/hooks/useWeeklyChest'
 import posthog from '@/lib/analytics/lazyPosthog'
 import ChestProgressDots from './ChestProgressDots'
-import WeeklyChestInfoModal from './WeeklyChestInfoModal'
-import gsap from 'gsap'
+import { WeeklyChestPlaceholder } from './WeeklyChestPlaceholder'
+
+const WeeklyChestInfoModal = dynamic(() => import('./WeeklyChestInfoModal'), { ssr: false })
+
+type Gsap = typeof import('gsap').default
+const loadGsap = (): Promise<Gsap> => import('gsap').then((mod) => mod.default)
+const reducedMotion = () =>
+  typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
 const CHEST_IMG: Record<'bronze' | 'silver' | 'gold', string> = {
   bronze: '/daily/chests/chest-bronze.jpg',
@@ -47,80 +54,61 @@ export default function WeeklyChestCard({ onChestClaimed }: Props) {
   const remaining = Math.max(0, 7 - safeDays)
   const percent = Math.round((safeDays / 7) * 100)
 
-  // Card entrance (one-shot)
+  // Effects run once the real card is mounted (refs are null while loading).
+  // gsap is loaded on demand so guests and the hub's first load never pay for it.
+  // No opacity entrance: the placeholder → card swap is the appear (rules/60 Class 5).
   useEffect(() => {
-    if (!cardRef.current) return
-    if (
-      typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    )
-      return
-    gsap.from(cardRef.current, {
-      y: 16,
-      opacity: 0,
-      duration: 0.45,
-      ease: 'back.out(1.4)',
-    })
-  }, [])
-
-  // Animate progress bar fill on data change
-  useEffect(() => {
-    if (!barRef.current) return
-    if (
-      typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    ) {
-      barRef.current.style.width = `${percent}%`
+    const bar = barRef.current
+    if (loading || !bar) return
+    if (reducedMotion()) {
+      bar.style.width = `${percent}%`
       return
     }
-    const tween = gsap.to(barRef.current, {
-      width: `${percent}%`,
-      duration: 0.6,
-      ease: 'power2.out',
+    let tween: { kill: () => void } | undefined
+    let cancelled = false
+    void loadGsap().then((gsap) => {
+      if (!cancelled) tween = gsap.to(bar, { width: `${percent}%`, duration: 0.6, ease: 'power2.out' })
     })
-    return () => { tween.kill() }
-  }, [percent])
+    return () => { cancelled = true; tween?.kill() }
+  }, [loading, percent])
 
   // Idle float; intensifies when claimable
   useEffect(() => {
-    if (!chestRef.current) return
-    if (
-      typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    )
-      return
-    const tween = isClaimable
-      ? gsap.to(chestRef.current, {
-          scale: 1.12,
-          y: -3,
-          yoyo: true,
-          repeat: -1,
-          duration: 0.7,
-          ease: 'sine.inOut',
-        })
-      : gsap.to(chestRef.current, {
-          y: -2,
-          yoyo: true,
-          repeat: -1,
-          duration: 1.6,
-          ease: 'sine.inOut',
-        })
-    return () => {
-      tween.kill()
-    }
-  }, [isClaimable])
-
-  // Card seen (mount-time event, fire once per session)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => {
-    const projectedTierStr = projectedTier ?? 'bronze'
-    posthog.capture('growth:weekly_chest_card_seen', {
-      daysCompleted: safeDays,
-      projectedTier: projectedTierStr,
-      isClaimable,
-      weekScore,
+    const chest = chestRef.current
+    if (loading || !chest || reducedMotion()) return
+    let tween: { kill: () => void } | undefined
+    let cancelled = false
+    void loadGsap().then((gsap) => {
+      if (cancelled) return
+      tween = isClaimable
+        ? gsap.to(chest, { scale: 1.12, y: -3, yoyo: true, repeat: -1, duration: 0.7, ease: 'sine.inOut' })
+        : gsap.to(chest, { y: -2, yoyo: true, repeat: -1, duration: 1.6, ease: 'sine.inOut' })
     })
-  }, [])
+    return () => { cancelled = true; tween?.kill() }
+  }, [loading, isClaimable])
+
+  // Impression: once, when the loaded card is actually on screen.
+  const seenRef = useRef(false)
+  const impression = useRef({ safeDays, projectedTier, isClaimable, weekScore })
+  impression.current = { safeDays, projectedTier, isClaimable, weekScore }
+  useEffect(() => {
+    const card = cardRef.current
+    if (loading || !card || seenRef.current || typeof IntersectionObserver === 'undefined') return
+    const observer = new IntersectionObserver((entries) => {
+      if (seenRef.current || !entries.some((entry) => entry.isIntersecting)) return
+      seenRef.current = true
+      observer.disconnect()
+      const now = impression.current
+      posthog.capture('growth:weekly_chest_card_seen', {
+        daysCompleted: now.safeDays,
+        projectedTier: now.projectedTier ?? 'bronze',
+        isClaimable: now.isClaimable,
+        weekScore: now.weekScore,
+      })
+    })
+    observer.observe(card)
+    return () => observer.disconnect()
+  }, [loading])
 
   const handleClaim = async () => {
     if (claiming) return
@@ -128,7 +116,7 @@ export default function WeeklyChestCard({ onChestClaimed }: Props) {
     if (result) onChestClaimed(result)
   }
 
-  if (loading) return null
+  if (loading) return <WeeklyChestPlaceholder />
 
   // Pre-claim, show the *projected* tier (what they'd get right now) instead of a
   // misleading hardcoded fallback. Once claimable, the real pending tier wins.

@@ -93,12 +93,11 @@ describe('DailyChallengeLanding — no optimistic hero (rules/60 Class 1)', () =
     played.loading = false;
   });
 
-  it('given the signed-in played status is still loading, then a neutral skeleton stands in for the hero and journey', () => {
+  it('given the signed-in played status is still loading, then a neutral skeleton stands in for the hero and rows', () => {
     played.loading = true;
     renderHub();
     expect(screen.getByTestId('hub-status-skeleton')).toBeInTheDocument();
     expect(screen.queryByTestId(/^quest-card-/)).not.toBeInTheDocument();
-    expect(screen.queryByTestId('daily-journey')).not.toBeInTheDocument();
   });
 
   it('given the status resolves, then the skeleton gives way to the real hero', () => {
@@ -121,7 +120,7 @@ describe('DailyChallengeLanding — no optimistic hero (rules/60 Class 1)', () =
   it('given the played-status hook says Word Hunt was played (another device), then its step is done even before the hunt status knows', () => {
     played.today = { wordHunt: true, wordWheel: true, wordTower: false, connections: false };
     renderHub();
-    expect(screen.getByTestId('journey-step-word-hunt')).toHaveAttribute('data-state', 'done');
+    expect(document.querySelector('[data-mode="word-hunt"]')).toHaveAttribute('data-state', 'done');
     expect(screen.getByTestId('quest-card-connections')).toBeInTheDocument();
   });
 

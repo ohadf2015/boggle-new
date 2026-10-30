@@ -72,15 +72,12 @@ describe('ConnectionsDailyTab', () => {
     vi.clearAllMocks();
   });
 
-  it('fetches today\'s connections leaderboard with the guest fingerprint and renders rows', async () => {
+  it('fetches today\'s connections leaderboard (the server reads the guest cookie itself) and renders rows', async () => {
     fetchDailyLeaderboardMock.mockResolvedValue(ROWS);
     render(<ConnectionsDailyTab puzzleDate="2026-09-14" />);
 
     await screen.findByTestId('connections-daily-tab');
-    expect(fetchDailyLeaderboardMock).toHaveBeenCalledWith('2026-09-14', {
-      guestFingerprint: 'guest-fp-test',
-      limit: 100,
-    });
+    expect(fetchDailyLeaderboardMock).toHaveBeenCalledWith('2026-09-14', { limit: 100 });
     expect(screen.getByText('Speedy')).toBeInTheDocument();
     expect(screen.getByText('Me')).toBeInTheDocument();
     // Scores + formatted times

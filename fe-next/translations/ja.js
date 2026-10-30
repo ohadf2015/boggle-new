@@ -9699,7 +9699,45 @@ const ja = {
     "streak": {
       "freeze_toast_no_remaining": "ストリークフリーズ使用：{day}を保存 · 残りなし"
     },
-"practiceBoard": "練習ボード"
+"practiceBoard": "練習ボード",
+"hub": { "intro": "毎日新しいワードパズルが登場。全員が同じ問題に挑戦します。最初の2つをクリアすればその日は達成です。",
+"resetsAt": "新しいパズルはあなたの時間で{time}に登場。",
+"newcomerTip": "初めての方は{mode}から始めましょう。約2分で遊べます。",
+"dismissTip": "OK",
+"bonusTag": "ボーナス",
+"play": "プレイ",
+"timed": "制限時間あり",
+"noTimer": "時間制限なし",
+"progressLabel": "今日の進み具合",
+"requiredDone": "今日の2つをクリア！ボーナスパズルはおまけです。",
+"pastPuzzles": "遊び逃した日は？過去のパズル"
+},
+"archivePage": { "backToHub": "今日のパズルに戻る",
+"title": "過去のパズル",
+"subtitle": "これまでのデイリーワードハントと、みんなの結果。直近3日以内に遊び逃したパズルは、今からでも遊べます。",
+"count": "{n}問",
+"view": "見る",
+"backToArchive": "過去のパズル",
+"notFound": "パズルが見つかりません",
+"previous": "前のパズル",
+"next": "次のパズル",
+"puzzleTitle": "パズル #{n}",
+"players": "プレイヤー",
+"solveRate": "正解率",
+"solved": "正解者",
+"avgTries": "平均回数",
+"noStats": "このパズルの統計はまだありません。",
+"distribution": "正解までの回数",
+"playToday": "今日のパズルをプレイ",
+"playThisDay": "この日のワードハントをプレイ"
+},
+"leaderboard": { "scoreExplainer": "今日のパズル全部のポイントの合計です。",
+"youRank": "あなた：{total}人中 {rank}位",
+"topPercent": "上位{percent}%",
+"inviteFriend": "友だちを招待",
+"inviteText": "今日のLexiClashパズル、私に勝てるかな？",
+"linkCopied": "リンクをコピーしました！"
+}
 },
   "dailyWordWheelLanding": {
     "hero": {
@@ -9867,8 +9905,12 @@ const ja = {
       "perfectBanner": "言葉の達人!",
       "onlyYouFound": "今のところ、見つけたのはあなただけ！",
       "rareFind": "レアな発見 · {count}人しか見つけていません",
-      "streakChip": "{count}日連続"
-    },
+      "streakChip": "{count}日連続",
+"breakdownBase": "単語",
+"breakdownCombo": "コンボ",
+"breakdownGold": "ゴールド",
+"goldCoins": "ゴールド単語で+{count}コイン"
+},
     "signup": {
       "streakTitle": "{count}日連続記録を守ろう",
       "boardTitle": "ランキングに名前を残そう",
@@ -9901,7 +9943,15 @@ const ja = {
 "accepted": "{word}！その調子。今日のホイールに挑戦しよう",
 "notWord": "その言葉はないよ。{word}を試してみて",
 "check": "チェック"
-}
+},
+"cantCheck": "単語を確認できませんでした。もう一度どうぞ",
+"quitKeepsWords": "ここまでに見つけた単語が今日の結果になります。",
+"goldLetterLabel": "ゴールド文字",
+"comboLabel": "コンボ {value}",
+"comboLost": "コンボ終了",
+"longerWordsTip": "長い単語ほど高得点：3文字 = {short}、7文字 = {long}",
+"comboTip": "続けて単語を見つけるとコンボ。最大で得点2倍！",
+"goldTip": "今日はゴールド文字があります。使った単語は+50%、さらにコインも獲得！"
 },
   "dailyChallenge": {
     "pointsPerWord": "単語あたりのポイント"
@@ -19684,7 +19734,10 @@ const ja = {
         "silver": "銀：惜しい！",
         "bronze": "銅：よくやった"
       },
-"missesLabel": "ミス"
+"missesLabel": "ミス",
+"scoreNotSaved": "スコアを保存できませんでした。",
+"retrySave": "もう一度",
+"skipStuck": "お手上げ？この問題をスキップ"
 },
     "community": {
       "title": "コミュニティの謎",
@@ -20179,8 +20232,9 @@ const ja = {
       "step1": "隠れた単語を見つけよう",
       "step2": "言葉を作ってヒントを集めよう",
       "step3": "短い単語は無料だよ",
-      "scoreTip": "いち早く当てると大加点！"
-    },
+      "scoreTip": "いち早く当てると大加点！",
+"step3v2": "短い単語は無料。同じ長さの単語は1回分の回答になるよ。"
+},
     "wheelRush": {
       "title": "回して綴る",
       "step1": "中央の文字は必ず使う",

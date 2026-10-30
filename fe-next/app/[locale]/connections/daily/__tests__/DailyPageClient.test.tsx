@@ -7,6 +7,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, cleanup } from '@testing-library/react';
 import DailyPageClient from '../DailyPageClient';
+import { saveDailyResult } from '@/lib/connections/dailyResultStore';
+import { todayUTC } from '@/lib/connections/dailyClient';
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ language: 'en', t: (k: string) => k, dir: 'ltr' }),
@@ -66,5 +68,22 @@ describe('DailyPageClient variant host', () => {
     render(<DailyPageClient locale="ja" />);
     expect(screen.getByTestId('regular-daily')).toBeTruthy();
     expect(pyramidChallenge).not.toHaveBeenCalled();
+  });
+
+  it('given today was already played as a pyramid, then a switch to a chain locale reopens that pyramid, not a fresh chain', () => {
+    variantMock.mockReturnValue('pyramid');
+    poolMock.mockReturnValue([]);
+    saveDailyResult(todayUTC(), 'en', { kind: 'pyramid' });
+    render(<DailyPageClient locale="sv" />);
+    expect(screen.getByTestId('pyramid-daily')).toBeTruthy();
+    expect(screen.queryByTestId('regular-daily')).toBeNull();
+    localStorage.removeItem(`connections-daily-result-${todayUTC()}`);
+  });
+
+  it('passes the frozen day to the game', () => {
+    variantMock.mockReturnValue('pyramid');
+    poolMock.mockReturnValue([{ id: 'p1' }]);
+    render(<DailyPageClient locale="en" />);
+    expect(pyramidChallenge).toHaveBeenCalledWith(expect.objectContaining({ today: todayUTC() }));
   });
 });

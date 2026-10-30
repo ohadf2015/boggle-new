@@ -14,6 +14,7 @@ import { getSupabaseAdmin } from '@/lib/admin/server';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { getPremiumParts, PREMIUM_CATEGORIES } from '@/shared/types/customAvatar';
 import { captureApiError } from '@/utils/sentry';
+import { adTicketSecret, signAdTicket, verifyAdTicket } from '@/lib/ads/adTicket';
 
 const COOLDOWN_MS = 24 * 60 * 60 * 1000;
 
@@ -72,6 +73,7 @@ export async function GET(request: NextRequest) {
       nextClaimAt,
       unownedCount,
       eligible: !cooldownActive && unownedCount > 0,
+      adTicket: signAdTicket(user.id, now, adTicketSecret()),
     });
   } catch (error) {
     captureApiError(error instanceof Error ? error : new Error(String(error)), '/api/avatar/claim-daily-part', { method: 'GET' });
@@ -125,6 +127,11 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    const body = (await request.json().catch(() => ({}))) as { adTicket?: unknown };
+    if (!verifyAdTicket(body?.adTicket, { userId: user.id, lastClaimAt, now, secret: adTicketSecret() })) {
+      return NextResponse.json({ error: 'AD_NOT_WATCHED' }, { status: 400 });
+    }
+
     const ownedParts: string[] = (profile.premium_avatar_parts as string[]) ?? [];
     const ownedSet = new Set(ownedParts);
     const unowned = collectAllPremiumKeys().filter((k) => !ownedSet.has(k));
@@ -137,7 +144,8 @@ export async function POST(request: NextRequest) {
     const newParts = [...ownedParts, granted];
     const claimedAt = new Date(now).toISOString();
 
-    const { error: updateError } = await supabase
+    // Conditional on the cooldown stamp we read: two concurrent POSTs can't both win.
+    const guardedUpdate = supabase
       .from('profiles')
       .update({
         premium_avatar_parts: newParts,
@@ -145,10 +153,22 @@ export async function POST(request: NextRequest) {
         updated_at: claimedAt,
       })
       .eq('id', user.id);
+    const { data: updatedRows, error: updateError } = await (
+      lastClaimAt
+        ? guardedUpdate.eq('last_daily_part_claim_at', lastClaimAt)
+        : guardedUpdate.is('last_daily_part_claim_at', null)
+    ).select('id');
 
     if (updateError) {
       console.error('[AVATAR DAILY CLAIM] Update failed:', updateError);
       return NextResponse.json({ error: 'Failed to save claim' }, { status: 500 });
+    }
+
+    if (!updatedRows || updatedRows.length === 0) {
+      return NextResponse.json(
+        { error: 'COOLDOWN_ACTIVE', nextClaimAt: new Date(now + COOLDOWN_MS).toISOString() },
+        { status: 429 },
+      );
     }
 
     return NextResponse.json({

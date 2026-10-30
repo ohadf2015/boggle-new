@@ -9,7 +9,7 @@ import { getGuestFingerprint } from '@/utils/guestManager';
 
 interface Row {
   rank: number;
-  playerId: string | null;
+  isGuest: boolean;
   isYou: boolean;
   username: string;
   /** Metres GROWN today (the daily score), not the tower's height. */
@@ -67,7 +67,7 @@ export function DailyTowerBoard({ t, language, refreshKey = 0 }: { t: T; languag
         <ol className="mt-2 space-y-1.5">
           {shown.map((r) => (
             <li
-              key={r.playerId ?? `guest-${r.rank}`}
+              key={`${r.rank}-${r.username}`}
               className={`flex items-center gap-2 rounded-neo border-neo border-black px-2 py-1.5 font-neo-display ${
                 r.isYou ? 'bg-neo-lime text-neo-navy' : 'bg-neo-navy-light'
               }`}
@@ -75,8 +75,8 @@ export function DailyTowerBoard({ t, language, refreshKey = 0 }: { t: T; languag
               <span className="w-7 text-center text-base font-black tabular-nums">
                 {r.rank <= 3 ? <span aria-label={`#${r.rank}`}>{MEDAL[r.rank - 1]}</span> : `#${r.rank}`}
               </span>
-              {r.playerId ? (
-                <Avatar customAvatar={r.avatarConfig ?? undefined} userId={r.playerId} size="sm" disableEffects className="shrink-0 rounded-full border border-black" />
+              {!r.isGuest ? (
+                <Avatar customAvatar={r.avatarConfig ?? undefined} userId={r.username} size="sm" disableEffects className="shrink-0 rounded-full border border-black" />
               ) : (
                 <span
                   aria-hidden

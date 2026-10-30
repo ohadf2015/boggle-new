@@ -33,6 +33,8 @@ function makeBuilder() {
       return b;
     },
     eq: () => b,
+    in: () => b,
+    not: () => b,
     or: (f: string) => {
       state.or = f;
       captured.orFilters.push(f);
@@ -135,5 +137,22 @@ describe('POST /api/connections/daily/score', () => {
     rateLimit.success = false;
     const res = await POST(req({}));
     expect(res.status).toBe(429);
+  });
+});
+
+describe('POST /api/connections/daily/score — pyramid days', () => {
+  it('accepts a full pyramid score that the chain ceiling would reject', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-09-07T12:00:00Z'));
+    try {
+      maybeSingleQueue.push({ data: null }, { data: null });
+      const res = await POST(
+        req({ puzzleDate: '2026-09-07', language: 'en', displayName: 'Dana', score: 1550, timeTakenSeconds: 120, puzzlesSolved: 4 }),
+      );
+      expect(res.status).toBe(200);
+      expect(captured.inserts[0].score).toBe(1550);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

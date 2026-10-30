@@ -13,6 +13,7 @@ vi.mock('@/backend/services/economy/awardCoins', () => ({
 
 import { getAuthedUser } from '@/lib/auth/getAuthedUser'
 import { getSupabaseAdmin } from '@/lib/email'
+import { selectChestPrize } from '@/lib/daily/chestPrizePool'
 import { awardCoinsServer } from '@/backend/services/economy/awardCoins'
 import { POST } from './route'
 
@@ -39,6 +40,7 @@ interface Opts {
   chests?: Array<Record<string, unknown>>
   insertResult?: { data: unknown; error: { code?: string; message: string } | null }
   updateRows?: Array<{ id: string }>
+  engagement?: { streak_freezes_available: number } | null
 }
 
 function setup(o: Opts = {}) {
@@ -57,13 +59,18 @@ function setup(o: Opts = {}) {
     select: vi.fn(() => Promise.resolve({ data: o.updateRows ?? [{ id: 'chest-existing' }], error: null })),
   }
   const update = vi.fn(() => updateChain)
-  const engagementUpdate = vi.fn(() => ({ eq: vi.fn().mockResolvedValue({ data: null, error: null }) }))
+  const rollbackChain: any = { eq: vi.fn(() => rollbackChain), then: (ok: any) => Promise.resolve({ error: null }).then(ok) }
+  const del = vi.fn(() => rollbackChain)
+  const engagementInsert = vi.fn().mockResolvedValue({ error: null })
+  const casChain: any = { eq: vi.fn(() => casChain), select: vi.fn().mockResolvedValue({ data: [{ player_id: 'x' }], error: null }) }
+  const engagementUpdate = vi.fn(() => casChain)
   const admin = {
     from: vi.fn((table: string) => {
       if (table === 'player_engagement') {
         return {
-          select: vi.fn(() => ({ eq: vi.fn(() => ({ maybeSingle: vi.fn().mockResolvedValue({ data: { streak_freezes_available: 0 }, error: null }) })) })),
+          select: vi.fn(() => ({ eq: vi.fn(() => ({ maybeSingle: vi.fn().mockResolvedValue({ data: o.engagement === undefined ? { streak_freezes_available: 0 } : o.engagement, error: null }) })) })),
           update: engagementUpdate,
+          insert: engagementInsert,
         }
       }
       const chain: any = {
@@ -73,12 +80,13 @@ function setup(o: Opts = {}) {
         then: (ok: any) => Promise.resolve({ data: rows[table] ?? [], error: null }).then(ok),
         insert,
         update,
+        delete: del,
       }
       return chain
     }),
   }
   vi.mocked(getSupabaseAdmin).mockReturnValue(admin as never)
-  return { admin, insert, update, updateChain }
+  return { admin, insert, update, updateChain, del, rollbackChain, engagementUpdate, engagementInsert }
 }
 
 const hunt = (dates: string[], score = 900) => dates.map(d => ({ puzzle_date: d, efficiency_score: score }))
@@ -204,5 +212,44 @@ describe('POST /api/daily/weekly-chest/claim', () => {
     const res = await POST(req())
     expect(res.status).toBe(500)
     expect(awardCoinsServer).not.toHaveBeenCalled()
+  })
+
+  it('rolls back an updated chest row and returns an error when the coin award fails', async () => {
+    const { update, updateChain } = setup({
+      hunt: hunt(CYCLE),
+      chests: [{ id: 'chest-existing', cycle_start: '2026-05-06', opened_at: null, tier: 'bronze', contents: {} }],
+    })
+    vi.mocked(awardCoinsServer).mockResolvedValueOnce({ success: false, error: 'rpc down' })
+    const res = await POST(req())
+    expect(res.status).toBe(502)
+    expect(update).toHaveBeenLastCalledWith({ opened_at: null })
+    expect(updateChain.eq).toHaveBeenLastCalledWith('id', 'chest-existing')
+  })
+
+  it('deletes a freshly inserted chest and returns an error when the coin award fails, so a retry can claim', async () => {
+    const { del, rollbackChain } = setup({ hunt: hunt(CYCLE) })
+    vi.mocked(awardCoinsServer).mockResolvedValueOnce({ success: false, error: 'rpc down' })
+    const res = await POST(req())
+    expect(res.status).toBe(502)
+    expect(del).toHaveBeenCalled()
+    expect(rollbackChain.eq).toHaveBeenCalledWith('cycle_start', '2026-05-06')
+  })
+
+  it('reports freezes: 0 when the freeze grant could not be applied, and the granted count when it was', async () => {
+    let uid = ''
+    for (let n = 0; n < 500 && !uid; n++) {
+      if (selectChestPrize('gold', `u${n}::2026-05-06`).freezes > 0) uid = `u${n}`
+    }
+    expect(uid).not.toBe('')
+
+    const failing = setup({ user: { id: uid }, hunt: hunt(CYCLE, 900), engagement: null })
+    failing.engagementInsert.mockResolvedValue({ error: { message: 'fk' } })
+    const bad = await (await POST(req())).json()
+    expect(bad.freezes).toBe(0)
+
+    const ok = setup({ user: { id: uid }, hunt: hunt(CYCLE, 900), engagement: { streak_freezes_available: 1 } })
+    const good = await (await POST(req())).json()
+    expect(good.freezes).toBeGreaterThan(0)
+    expect(ok.engagementUpdate).toHaveBeenCalled()
   })
 })

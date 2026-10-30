@@ -9,30 +9,20 @@ import { questResultForWordWheel } from '../../../shared/dailyQuestPool';
 import { getSupabase, isSupabaseConfigured } from '../../modules/supabaseServer';
 import logger from '../../utils/logger';
 
-import {
-  type LeaderboardParams,
-  type LeaderboardQuery,
-} from './types';
-import {
-  isValidDateFormat,
-  isValidLanguage,
-  isLeaderboardLanguageScope,
-  withLanguageScope,
-  sanitizeGuestDisplayName,
-} from './utils';
+import { isValidDateFormat, isValidLanguage, sanitizeGuestDisplayName } from './utils';
 import { updateDailyProfileStats } from './profileStats';
-import { rerankSequential, dedupeByPlayerKeepBest, sortWordWheelRowsGlobally } from './leaderboardSort';
 import { createSeasonLeaderboardHandler } from './seasonLeaderboard';
 import { updateLeaderboardEntry } from '../../modules/supabase/leaderboard';
 import { leaderboardPointsForGame } from '../../modules/leaderboardScoring';
 import { updateQuestProgress } from '../../modules/weeklyQuestManager';
 import { shouldCreditDailyChallengeQuest } from '../../../lib/daily/questCredit';
-import { aggregateWordPlayerCounts, type RarityRow } from '../../../lib/wordWheel/wordRarity';
+import { isSubmittableDate } from '../../../utils/dailyChallenge/catchUp';
+import { goldCoinsFor } from '../../../utils/dailyChallenge/wordWheelScoring';
+import { awardCoinsServer } from '../../services/economy/awardCoins';
+import { resolveDailyPlayer } from './resolveDailyPlayer';
+import wordWheelLeaderboardRoutes from './wordWheelLeaderboardRoutes';
+import { sanitizeWheelSubmission, isWheelCatchup } from './wordWheelSubmission';
 
-// Upper bound on attempts scanned for the rarity aggregate. A daily puzzle's
-// attempts are date+language scoped (indexed), so this caps a popular day's
-// read without an unbounded table scan.
-const RARITY_ROW_CAP = 5000;
 
 const router: Router = express.Router();
 
@@ -72,20 +62,50 @@ router.post('/submit', async (req: Request<unknown, unknown, WordWheelSubmitBody
     }
 
     const {
-      puzzleDate, puzzleNumber, language, playerId, guestFingerprint,
+      puzzleDate, language, guestFingerprint,
       displayName, avatarEmoji, avatarColor, avatarImage,
-      countryCode, score, wordCount, wordsFound, longestWord, timeSeconds, centerLetter, isCatchup,
+      countryCode, score: claimedScore, wordsFound: claimedWords, timeSeconds: claimedTime, isCatchup,
     } = req.body;
 
-    if (!puzzleDate || !puzzleNumber || !language || score === undefined) {
+    if (!puzzleDate || !req.body.puzzleNumber || !language || claimedScore === undefined) {
       res.status(400).json({ error: 'Missing required fields' });
       return;
     }
 
-    if (!playerId && !guestFingerprint) {
+    if (!req.body.playerId && !guestFingerprint) {
       res.status(400).json({ error: 'Either playerId or guestFingerprint is required' });
       return;
     }
+
+    if (!isValidDateFormat(puzzleDate) || !isValidLanguage(language)) {
+      res.status(400).json({ error: 'Invalid puzzle date or language' });
+      return;
+    }
+
+    const now = new Date();
+    const serverDate = now.toISOString().split('T')[0];
+    if (!isSubmittableDate(serverDate, puzzleDate)) {
+      res.status(400).json({ error: 'Invalid puzzle date' });
+      return;
+    }
+
+    const resolved = await resolveDailyPlayer(req, req.body.playerId);
+    if (!resolved.ok) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+    const playerId = resolved.playerId;
+
+    const sanitized = sanitizeWheelSubmission({
+      puzzleDate, language, claimedScore, claimedWords, claimedTime,
+    });
+    if (!sanitized) {
+      res.status(400).json({ error: 'Invalid puzzle' });
+      return;
+    }
+    const { puzzle, wordsFound, score, timeSeconds, longestWord, goldLetter } = sanitized;
+    const wordCount = wordsFound.length;
+    const puzzleNumber = puzzle.puzzleNumber;
 
     const supabase = getSupabase();
     if (!supabase) {
@@ -98,13 +118,13 @@ router.post('/submit', async (req: Request<unknown, unknown, WordWheelSubmitBody
       puzzle_number: puzzleNumber,
       language,
       score,
-      word_count: wordCount || 0,
-      words_found: wordsFound || [],
-      longest_word: longestWord || null,
+      word_count: wordCount,
+      words_found: wordsFound,
+      longest_word: longestWord,
       longest_word_length: longestWord ? longestWord.length : null,
-      time_seconds: timeSeconds || 0,
-      center_letter: centerLetter || null,
-      completed_at: new Date().toISOString(),
+      time_seconds: timeSeconds,
+      center_letter: puzzle.centerLetter,
+      completed_at: now.toISOString(),
       display_name: sanitizeGuestDisplayName(displayName),
       avatar_emoji: avatarEmoji || '🎯',
       avatar_color: avatarColor || '#6366f1',
@@ -112,7 +132,7 @@ router.post('/submit', async (req: Request<unknown, unknown, WordWheelSubmitBody
       country_code: countryCode || null,
     };
 
-    insertData.is_catchup = Boolean(isCatchup);
+    insertData.is_catchup = isWheelCatchup(serverDate, puzzleDate, Boolean(isCatchup), now);
 
     if (playerId) {
       insertData.player_id = playerId;
@@ -216,6 +236,23 @@ router.post('/submit', async (req: Request<unknown, unknown, WordWheelSubmitBody
       });
     }
 
+    let coins = playerId ? goldCoinsFor(wordsFound, goldLetter) : 0;
+    if (playerId && coins > 0) {
+      // The gold-coin cap is per day: a second language's board that day pays nothing.
+      const { count: otherLanguages } = await supabase
+        .from('daily_word_wheel_attempts')
+        .select('id', { count: 'exact', head: true })
+        .eq('player_id', playerId)
+        .eq('puzzle_date', puzzleDate)
+        .neq('language', language);
+      if ((otherLanguages ?? 0) > 0) coins = 0;
+    }
+    if (playerId && coins > 0) {
+      // Fresh-insert path only, so the one-row-per-day unique key keeps this from paying twice.
+      const award = await awardCoinsServer(playerId, coins, 'daily_wheel_gold', { puzzleDate, language });
+      if (!award.success) logger.warn('API', `[WordWheel] gold coins not awarded to ${playerId}: ${award.error}`);
+    }
+
     res.json({ success: true, alreadySubmitted: false, data, rank });
   } catch (error) {
     const err = error as Error;
@@ -312,115 +349,7 @@ router.get('/check-played/:date/:language', async (
   }
 });
 
-// ==========================================
-// GET /api/daily-challenge/word-wheel/leaderboard/:date/:language
-// `:language` is a concrete language OR `all` for the cross-language board.
-// ==========================================
-
-router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams, unknown, unknown, LeaderboardQuery>, res: Response): Promise<void> => {
-  try {
-    if (!isSupabaseConfigured()) {
-      res.status(503).json({ error: 'Leaderboard service not available' });
-      return;
-    }
-
-    const { date, language } = req.params;
-    const limit = Math.min(parseInt(req.query.limit || '50') || 50, 100);
-
-    if (!isValidDateFormat(date)) {
-      res.status(400).json({ error: 'Invalid date format. Use YYYY-MM-DD' });
-      return;
-    }
-
-    if (!isLeaderboardLanguageScope(language)) {
-      res.status(400).json({ error: 'Invalid language code' });
-      return;
-    }
-
-    const supabase = getSupabase();
-    if (!supabase) {
-      res.status(503).json({ error: 'Database connection unavailable' });
-      return;
-    }
-
-    // Language scope: a concrete language ranks only that wheel's players; `all`
-    // ranks everyone who played today across languages (each row carries its
-    // `language` for the client). Guests are included — same contract as the
-    // Word Hunt board, which the combined view merges this into; hiding them on
-    // one side and not the other made a guest's own wheel score vanish from the
-    // very board they were shown after finishing. The view's rank_position
-    // counts guests + replays, so we re-sort and renumber below.
-    const { data, error } = await withLanguageScope(
-      supabase
-        .from('daily_word_wheel_leaderboard')
-        .select('*')
-        .eq('puzzle_date', date),
-      language,
-    )
-      .order('score', { ascending: false, nullsFirst: false })
-      .order('word_count', { ascending: false, nullsFirst: false })
-      .order('completed_at', { ascending: true, nullsFirst: false })
-      // Over-fetch: view has one row per ATTEMPT, so a player occupies many slots
-      // (same-language replays, or one per language on the global board). Pull
-      // extra so dedup-to-one-per-player still yields `limit`.
-      // ponytail: ×10 cap 500 covers current worst case; move to DISTINCT ON in the view if replays climb.
-      .limit(Math.min(limit * 10, 500));
-
-    if (error) {
-      logger.error('API', `Word Wheel leaderboard error: ${error.message}`);
-      res.status(500).json({ error: 'Failed to fetch leaderboard' });
-      return;
-    }
-
-    // Sort by scoring order, collapse each player to their single best row
-    // (view has one row per ATTEMPT), trim to limit, then renumber 1..N.
-    const rerankedData = rerankSequential(
-      dedupeByPlayerKeepBest(sortWordWheelRowsGlobally(data || [])).slice(0, limit),
-    );
-
-    const { count: totalCount } = await withLanguageScope(
-      supabase
-        .from('daily_word_wheel_attempts')
-        .select('*', { count: 'exact', head: true })
-        .eq('puzzle_date', date),
-      language,
-    );
-
-    const { count: guestCount } = await withLanguageScope(
-      supabase
-        .from('daily_word_wheel_attempts')
-        .select('*', { count: 'exact', head: true })
-        .eq('puzzle_date', date),
-      language,
-    )
-      .is('player_id', null)
-      .not('guest_fingerprint', 'is', null);
-
-    // Wheel has no `solved` boolean — anyone who submitted ≥1 word counts as solved.
-    const { count: totalSolvedCount } = await withLanguageScope(
-      supabase
-        .from('daily_word_wheel_attempts')
-        .select('*', { count: 'exact', head: true })
-        .eq('puzzle_date', date),
-      language,
-    ).gt('word_count', 0);
-
-    res.set('Cache-Control', 'public, max-age=20, s-maxage=20, stale-while-revalidate=60');
-    res.json({
-      data: rerankedData,
-      totalParticipants: rerankedData.length,
-      totalSolved: totalSolvedCount ?? 0,
-      totalAttempts: totalCount ?? 0,
-      guestPlayerCount: guestCount ?? 0,
-      date,
-      language,
-    });
-  } catch (error) {
-    const err = error as Error;
-    logger.error('API', `Word Wheel leaderboard error: ${err.message}`);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
+router.use(wordWheelLeaderboardRoutes);
 
 // ==========================================
 // GET /api/daily-challenge/word-wheel/season-leaderboard/:language?season=<id>
@@ -428,62 +357,6 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
 // ==========================================
 
 router.get('/season-leaderboard/:language', createSeasonLeaderboardHandler('daily_word_wheel_season_leaderboard'));
-
-// ==========================================
-// GET /api/daily-challenge/word-wheel/alltime-leaderboard/:language
-// ==========================================
-
-router.get('/alltime-leaderboard/:language', async (req: Request<{ language: string }, unknown, unknown, LeaderboardQuery>, res: Response): Promise<void> => {
-  try {
-    if (!isSupabaseConfigured()) {
-      res.status(503).json({ error: 'Leaderboard service not available' });
-      return;
-    }
-
-    const { language } = req.params;
-    const limit = Math.min(parseInt(req.query.limit || '50') || 50, 100);
-
-    if (!isValidLanguage(language)) {
-      res.status(400).json({ error: 'Invalid language code' });
-      return;
-    }
-
-    const supabase = getSupabase();
-    if (!supabase) {
-      res.status(503).json({ error: 'Database connection unavailable' });
-      return;
-    }
-
-    // Cross-language (global) all-time leaderboard: no `.eq('language', …)` filter.
-    // The view aggregates each player across every language and ranks globally.
-    const { data, error } = await supabase
-      .from('word_wheel_alltime_leaderboard')
-      .select('*')
-      .order('rank_position', { ascending: true })
-      .limit(limit);
-
-    if (error) {
-      logger.error('API', `Word Wheel all-time leaderboard error: ${error.message}`);
-      res.status(500).json({ error: 'Failed to fetch leaderboard' });
-      return;
-    }
-
-    const { count } = await supabase
-      .from('word_wheel_alltime_leaderboard')
-      .select('*', { count: 'exact', head: true });
-
-    res.set('Cache-Control', 'public, max-age=60, s-maxage=60, stale-while-revalidate=180');
-    res.json({
-      data: data || [],
-      totalParticipants: count || data?.length || 0,
-      language,
-    });
-  } catch (error) {
-    const err = error as Error;
-    logger.error('API', `Word Wheel all-time leaderboard error: ${err.message}`);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
 
 // ==========================================
 // GET /api/daily-challenge/word-wheel/words/:date/:language/:playerId
@@ -571,63 +444,5 @@ const handleWords = async (req: Request<WordsRouteParams>, res: Response): Promi
 
 router.get('/words/:date/:language/:playerId', handleWords);
 router.post('/words/:date/:language', handleWords);
-
-// ==========================================
-// GET /api/daily-challenge/word-wheel/word-rarity/:date/:language
-// ==========================================
-// Distinct-player count per word across the day's attempts. Powers the
-// results-screen "rarest find / only you found X (so far)" celebration.
-// NOTE: daily play is async — counts are a point-in-time snapshot, never final.
-
-router.get('/word-rarity/:date/:language', async (req: Request<{ date: string; language: string }>, res: Response): Promise<void> => {
-  try {
-    if (!isSupabaseConfigured()) {
-      res.status(503).json({ error: 'Service not available' });
-      return;
-    }
-
-    const { date, language } = req.params;
-    if (!isValidDateFormat(date)) {
-      res.status(400).json({ error: 'Invalid date format. Use YYYY-MM-DD' });
-      return;
-    }
-    if (!isValidLanguage(language)) {
-      res.status(400).json({ error: 'Invalid language code' });
-      return;
-    }
-
-    const supabase = getSupabase();
-    if (!supabase) {
-      res.status(503).json({ error: 'Database connection unavailable' });
-      return;
-    }
-
-    const { data, error } = await supabase
-      .from('daily_word_wheel_attempts')
-      .select('player_id, guest_fingerprint, words_found')
-      .eq('puzzle_date', date)
-      .eq('language', language)
-      .limit(RARITY_ROW_CAP);
-
-    if (error) {
-      logger.error('API', `Word Wheel rarity fetch error: ${error.message}`);
-      res.status(500).json({ error: 'Failed to fetch rarity' });
-      return;
-    }
-
-    const rows: RarityRow[] = (data ?? []).map((row) => ({
-      id: (row.player_id as string | null) ?? (row.guest_fingerprint as string | null) ?? null,
-      words: Array.isArray(row.words_found)
-        ? (row.words_found as unknown[]).filter((w): w is string => typeof w === 'string')
-        : [],
-    }));
-
-    res.json({ counts: aggregateWordPlayerCounts(rows) });
-  } catch (error) {
-    const err = error as Error;
-    logger.error('API', `Word Wheel rarity fetch error: ${err.message}`);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
 
 export default router;

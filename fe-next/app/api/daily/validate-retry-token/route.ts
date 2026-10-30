@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import logger from '@/utils/logger';
-import { createClient } from '@/utils/supabase/server';
+import { getAuthedUser } from '@/lib/auth/getAuthedUser';
+import { getSupabaseAdmin } from '@/lib/admin/server';
 import { captureApiError } from '@/utils/sentry';
 
 /**
@@ -33,12 +34,15 @@ export async function GET(request: Request) {
       );
     }
 
-    const supabase = await createClient();
+    const supabase = getSupabaseAdmin();
+    if (!supabase) {
+      return NextResponse.json({ valid: false, reason: 'server_error' }, { status: 503 });
+    }
 
     // Look up the token
     const { data: tokenData, error: queryError } = await supabase
       .from('daily_retry_tokens')
-      .select('*')
+      .select('id, expires_at, puzzle_date, language, use_count')
       .eq('token', token)
       .single();
 
@@ -122,12 +126,25 @@ export async function POST(request: Request) {
       );
     }
 
-    const supabase = await createClient();
+    if (playerId) {
+      const user = await getAuthedUser(request);
+      if (!user) {
+        return NextResponse.json({ success: false, error: 'unauthorized' }, { status: 401 });
+      }
+      if (user.id !== playerId) {
+        return NextResponse.json({ success: false, error: 'forbidden' }, { status: 403 });
+      }
+    }
+
+    const admin = getSupabaseAdmin();
+    if (!admin) {
+      return NextResponse.json({ success: false, error: 'server_error' }, { status: 503 });
+    }
 
     // First verify the token is valid
-    const { data: tokenData, error: queryError } = await supabase
+    const { data: tokenData, error: queryError } = await admin
       .from('daily_retry_tokens')
-      .select('*')
+      .select('id, expires_at, puzzle_date, language, use_count')
       .eq('token', token)
       .single();
 
@@ -159,14 +176,13 @@ export async function POST(request: Request) {
 
     // Increment use count using service role to bypass RLS
     // Since public users can't update the table directly
-    const { error: updateError } = await supabase.rpc('increment_retry_token_use_count', {
+    const { error: updateError } = await admin.rpc('increment_retry_token_use_count', {
       token_id: tokenData.id,
     });
 
-    // If RPC doesn't exist yet, we'll handle it gracefully
+    // A retry link is shared and has no use cap, so a counter failure must not block the player.
     if (updateError) {
-      logger.warn('Could not increment use count (RPC may not exist):', updateError.message);
-      // Continue anyway - the main functionality still works
+      logger.error('Could not increment retry token use count:', updateError.message);
     }
 
     // Reset server-side attempts for the player
@@ -175,7 +191,7 @@ export async function POST(request: Request) {
 
     if (playerId) {
       // Delete attempt for authenticated player
-      const { data: deletedData, error: deleteError } = await supabase
+      const { data: deletedData, error: deleteError } = await admin
         .from('daily_word_hunt_attempts')
         .delete()
         .eq('puzzle_date', tokenData.puzzle_date)
@@ -184,7 +200,8 @@ export async function POST(request: Request) {
         .select('id');
 
       if (deleteError) {
-        logger.warn('Could not reset player attempt:', deleteError.message);
+        logger.error('Could not reset player attempt:', deleteError.message);
+        return NextResponse.json({ success: false, error: 'reset_failed' }, { status: 500 });
       } else {
         attemptsReset = deletedData?.length || 0;
         if (attemptsReset > 0) {
@@ -193,7 +210,7 @@ export async function POST(request: Request) {
       }
     } else if (guestFingerprint) {
       // Delete attempt for guest
-      const { data: deletedData, error: deleteError } = await supabase
+      const { data: deletedData, error: deleteError } = await admin
         .from('daily_word_hunt_attempts')
         .delete()
         .eq('puzzle_date', tokenData.puzzle_date)
@@ -202,7 +219,8 @@ export async function POST(request: Request) {
         .select('id');
 
       if (deleteError) {
-        logger.warn('Could not reset guest attempt:', deleteError.message);
+        logger.error('Could not reset guest attempt:', deleteError.message);
+        return NextResponse.json({ success: false, error: 'reset_failed' }, { status: 500 });
       } else {
         attemptsReset = deletedData?.length || 0;
         if (attemptsReset > 0) {

@@ -13,6 +13,8 @@
 export interface IdentityLike {
   player_id?: string | null;
   guest_fingerprint?: string | null;
+  /** Combined board rows carry an opaque server key instead of ids. */
+  row_key?: string;
 }
 
 export interface RankedLike extends IdentityLike {
@@ -33,6 +35,7 @@ export const MOVEMENT_TTL_MS = 90_000;
 
 /** The one identity key every merge on the board agrees on. */
 export function participantKey(p: IdentityLike): string | null {
+  if (p.row_key) return `k:${p.row_key}`;
   if (p.player_id) return `u:${p.player_id}`;
   if (p.guest_fingerprint) return `g:${p.guest_fingerprint}`;
   return null;

@@ -11,6 +11,8 @@ interface UseWordWheelKeyboardParams {
   handleClear: () => void;
   setBuiltLetters: React.Dispatch<React.SetStateAction<BuiltLetter[]>>;
   gameOver: boolean;
+  /** False while a dialog or the entrance covers the board. */
+  active?: boolean;
   playTileSelectSound: () => void;
   playButtonClickSound: () => void;
 }
@@ -27,14 +29,14 @@ const normalizeKey = (key: string) => key.toUpperCase();
 export function useWordWheelKeyboard({
   centerLetter, outerLetters, usedIndices,
   handleSubmit, handleClear, setBuiltLetters,
-  gameOver, playTileSelectSound, playButtonClickSound,
+  gameOver, active = true, playTileSelectSound, playButtonClickSound,
 }: UseWordWheelKeyboardParams) {
-  const refs = useRef({ handleSubmit, handleClear, usedIndices, outerLetters, gameOver });
-  refs.current = { handleSubmit, handleClear, usedIndices, outerLetters, gameOver };
+  const refs = useRef({ handleSubmit, handleClear, usedIndices, outerLetters, gameOver, active });
+  refs.current = { handleSubmit, handleClear, usedIndices, outerLetters, gameOver, active };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (refs.current.gameOver) return;
+      if (refs.current.gameOver || !refs.current.active) return;
       if (isTypingTarget(e)) return;
       const key = e.key;
       const { handleSubmit: submit, handleClear: clear, usedIndices: used, outerLetters: outer } = refs.current;

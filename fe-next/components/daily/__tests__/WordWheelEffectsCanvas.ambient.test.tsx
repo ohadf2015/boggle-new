@@ -2,7 +2,6 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { ParticleConfig } from '@/lib/gameEngine/types';
 
 // ─── Mock GameCanvas ────────────────────────────────────────────────
 // Bypass real PixiJS init — render children directly, expose a spy engine so
@@ -19,10 +18,12 @@ const mockEngine = {
   height: 600,
 };
 
+const canvasConfigs: unknown[] = [];
 vi.mock('@/lib/gameEngine/GameCanvas', () => ({
-  GameCanvas: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="mock-game-canvas">{children}</div>
-  ),
+  GameCanvas: ({ children, config }: { children: React.ReactNode; config: unknown }) => {
+    canvasConfigs.push(config);
+    return <div data-testid="mock-game-canvas">{children}</div>;
+  },
   useGameEngine: () => mockEngine,
 }));
 
@@ -36,27 +37,18 @@ beforeEach(() => {
   baseProps.onEffectsConsumed.mockClear();
 });
 
-describe('WordWheelEffectsCanvas — ambient backdrop', () => {
-  it('creates exactly one persistent ambient emitter on mount', () => {
+describe('WordWheelEffectsCanvas — idle cost', () => {
+  it('starts no forever-running emitter on mount, so an idle canvas can sleep', () => {
     render(<WordWheelEffectsCanvas {...baseProps} effects={[]} />);
-    expect(mockEngine.particles.create).toHaveBeenCalledTimes(1);
+    expect(mockEngine.particles.create).not.toHaveBeenCalled();
   });
 
-  it('the ambient field is tuned to be VISIBLE over the dark navy backdrop', () => {
-    // Regression guard: the ambient layer previously inherited AMBIENT_BOKEH's
-    // near-invisible tuning (peak alpha 0.15, ~1px particles), so the word-wheel
-    // play area read as flat solid black. The ambient must be perceptible.
+  it('draws without antialiasing at a capped resolution', () => {
+    Object.defineProperty(window, 'devicePixelRatio', { value: 3, configurable: true });
     render(<WordWheelEffectsCanvas {...baseProps} effects={[]} />);
-    const config = mockEngine.particles.create.mock.calls[0][0] as ParticleConfig;
-
-    // Peak opacity high enough to register against bg-neo-navy (#1a1a2e).
-    expect(config.alpha.end).toBeGreaterThanOrEqual(0.2);
-    // Soft orbs large enough to be seen (not sub-pixel specks).
-    expect(config.scale.end).toBeGreaterThanOrEqual(1);
-    // A full field of particles, spawned across the whole canvas.
-    expect(config.maxParticles).toBeGreaterThanOrEqual(30);
-    expect(config.spawnConfig?.width).toBe(baseProps.width);
-    expect(config.spawnConfig?.height).toBe(baseProps.height);
+    const config = canvasConfigs.at(-1) as { antialias?: boolean; resolution?: number };
+    expect(config.antialias).toBe(false);
+    expect(config.resolution).toBeLessThanOrEqual(1.5);
   });
 
   it('renders without crashing with empty effects', () => {

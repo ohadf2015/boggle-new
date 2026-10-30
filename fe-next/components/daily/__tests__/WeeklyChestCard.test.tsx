@@ -1,5 +1,8 @@
-import { render, screen, fireEvent } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { render, screen, fireEvent, act } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+
+const capture = vi.hoisted(() => vi.fn())
+vi.mock('@/lib/analytics/lazyPosthog', () => ({ default: { capture } }))
 
 const mockUseWeeklyChest = vi.fn()
 
@@ -76,7 +79,7 @@ describe('WeeklyChestCard', () => {
     expect(screen.queryByText('daily.weeklyChest.claimButton')).toBeNull()
   })
 
-  it('renders null while loading', () => {
+  it('reserves its space with a placeholder while loading (no pop-in below)', () => {
     mockUseWeeklyChest.mockReturnValue({
       loading: true,
       daysCompleted: 0,
@@ -89,8 +92,9 @@ describe('WeeklyChestCard', () => {
       refresh: vi.fn(),
     })
 
-    const { container } = render(<WeeklyChestCard onChestClaimed={vi.fn()} />)
-    expect(container.firstChild).toBeNull()
+    render(<WeeklyChestCard onChestClaimed={vi.fn()} />)
+    expect(screen.getByTestId('weekly-chest-placeholder')).toBeTruthy()
+    expect(screen.queryByText('daily.weeklyChest.title')).toBeNull()
   })
 
   it('renders progress dots when cycleStart exists', () => {
@@ -131,11 +135,11 @@ describe('WeeklyChestCard', () => {
     expect(img.getAttribute('src') || '').toContain('chest-gold')
   })
 
-  it('opens the explainer modal when the chest is clicked', () => {
+  it('opens the explainer modal when the chest is clicked', async () => {
     render(<WeeklyChestCard onChestClaimed={vi.fn()} />)
     expect(screen.queryByText('daily.weeklyChest.info.streakReset')).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'daily.weeklyChest.info.title' }))
-    expect(screen.getByText('daily.weeklyChest.info.streakReset')).toBeTruthy()
+    expect(await screen.findByText('daily.weeklyChest.info.streakReset')).toBeTruthy()
   })
 
   it('renders a progress bar with the correct aria value', () => {
@@ -221,6 +225,38 @@ describe('WeeklyChestCard', () => {
       mockUseWeeklyChest.mockReturnValue(claimable)
       render(<WeeklyChestCard onChestClaimed={vi.fn()} />)
       expect(screen.queryByRole('alert')).toBeNull()
+    })
+  })
+
+  describe('card_seen impression', () => {
+    let observed: ((entries: { isIntersecting: boolean }[]) => void) | null = null
+    const RealIO = (globalThis as { IntersectionObserver?: unknown }).IntersectionObserver
+    beforeEach(() => {
+      capture.mockClear()
+      observed = null
+      ;(globalThis as { IntersectionObserver?: unknown }).IntersectionObserver = class {
+        constructor(cb: (entries: { isIntersecting: boolean }[]) => void) { observed = cb }
+        observe() {}
+        disconnect() {}
+      }
+    })
+    afterEach(() => {
+      ;(globalThis as { IntersectionObserver?: unknown }).IntersectionObserver = RealIO
+    })
+
+    it('fires nothing while the chest data is still loading', () => {
+      mockUseWeeklyChest.mockReturnValue({ ...defaultMockData, loading: true })
+      render(<WeeklyChestCard onChestClaimed={vi.fn()} />)
+      expect(capture).not.toHaveBeenCalled()
+    })
+
+    it('fires once, with the real progress, when the card scrolls into view', () => {
+      render(<WeeklyChestCard onChestClaimed={vi.fn()} />)
+      expect(capture).not.toHaveBeenCalled()
+      act(() => { observed?.([{ isIntersecting: true }]) })
+      act(() => { observed?.([{ isIntersecting: true }]) })
+      expect(capture).toHaveBeenCalledTimes(1)
+      expect(capture).toHaveBeenCalledWith('growth:weekly_chest_card_seen', expect.objectContaining({ daysCompleted: 4, projectedTier: 'silver' }))
     })
   })
 })

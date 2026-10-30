@@ -7,6 +7,8 @@ import { useSearchParams } from 'next/navigation';
 import { ArrowLeft, Trophy, Target, UserCircle2, Sparkles, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { LeaderboardSkeleton } from './LeaderboardStates';
 import { PracticeBoardLink } from './survival/howto/PracticeBoardLink';
 import { CreateChallengeModal } from './CreateChallengeModal';
 import { UnauthenticatedCreateChallengeSection } from './UnauthenticatedCreateChallengeSection';
@@ -71,6 +73,8 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
 }) => {
   const searchParams = useSearchParams();
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  // Starts false (SSR and first paint), so phones never mount the sidebar board.
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
   const [showCreateChallenge, setShowCreateChallenge] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [pendingCreateChallenge, setPendingCreateChallenge] = useState(false);
@@ -293,7 +297,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
             <button
               type="button"
               onClick={() => setShowLeaderboard(!showLeaderboard)}
-              className="inline-flex items-center gap-1.5 text-sm font-bold text-neo-white/60 hover:text-neo-white transition-colors"
+              className="lg:hidden inline-flex items-center gap-1.5 text-sm font-bold text-neo-white/60 hover:text-neo-white transition-colors"
             >
               <Trophy className="w-4 h-4" />
               {t('daily.todaysPlayers')}
@@ -331,7 +335,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
               <button
                 type="button"
                 onClick={() => setShowLeaderboard(!showLeaderboard)}
-                className="whitespace-nowrap text-sm font-bold text-neo-white/60 hover:text-neo-white transition-colors flex items-center gap-1"
+                className="lg:hidden whitespace-nowrap text-sm font-bold text-neo-white/60 hover:text-neo-white transition-colors flex items-center gap-1"
               >
                 <Trophy className="w-3 h-3" /> {t('daily.todaysPlayers')}
               </button>
@@ -352,13 +356,13 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
 
         {/* Collapsible Leaderboard */}
         <AnimatePresence>
-          {showLeaderboard && (
+          {showLeaderboard && !isDesktop && (
             <m.div
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="overflow-hidden"
+              className="overflow-clip"
             >
               <TabbedDailyLeaderboard
                 puzzleDate={puzzleDate}
@@ -394,7 +398,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
         transition={{ delay: 0.25, type: 'spring', stiffness: 280, damping: 26 }}
         className="hidden lg:flex lg:flex-col lg:gap-4 lg:sticky lg:top-4"
       >
-        <div className="rounded-neo border-3 border-neo-black shadow-hard overflow-hidden bg-neo-cream">
+        <div className="rounded-neo border-3 border-neo-black shadow-hard overflow-clip bg-neo-cream">
           <div className="flex items-center gap-2 px-4 py-3 bg-neo-black">
             <Trophy className="w-4 h-4 text-neo-yellow" />
             <span className="font-black text-sm text-neo-white uppercase tracking-wide">
@@ -402,7 +406,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
             </span>
           </div>
           <div className="p-3">
-            <TabbedDailyLeaderboard
+            {isDesktop ? <TabbedDailyLeaderboard
               puzzleDate={puzzleDate}
               language={language}
               currentPlayerId={currentPlayerId}
@@ -411,7 +415,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
               compact
               t={t}
               defaultTab="today"
-            />
+            /> : <LeaderboardSkeleton rows={3} />}
           </div>
         </div>
       </m.div>

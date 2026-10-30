@@ -7,7 +7,7 @@
  * Both must be clickable and have proper button states.
  */
 
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { DailyChallengeLanding } from '../DailyChallengeLanding';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { AuthProvider } from '@/contexts/AuthProvider';
@@ -154,9 +154,9 @@ describe('DailyChallengeLanding - Button Layout', () => {
     const wordHuntCard = screen.getByTestId('quest-card-word-wheel');
     expect(wordHuntCard).toBeInTheDocument();
 
-    // CTA buttons should be present (START QUEST for new cards)
-    const startButtons = screen.getAllByText(/start quest/i);
-    expect(startButtons.length).toBeGreaterThan(0);
+    // Plain "Play" CTA (the raw key until the lead merges the new strings)
+    expect(within(wordHuntCard).getByText(/^(play|daily\.hub\.play)$/i)).toBeInTheDocument();
+    expect(screen.queryByText(/start quest/i)).not.toBeInTheDocument();
   });
 
   it('should render secondary compact rows with play buttons', () => {

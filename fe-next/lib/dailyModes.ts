@@ -6,8 +6,8 @@ export interface DailyModeDef {
   id: DailyModeId;
   /** Locale-relative path (the hub prefixes `/${locale}`). Keep any query intact. */
   path: string;
-  /** Gated to admins until the mode is ready for the public daily flow. */
-  adminOnly: boolean;
+  /** Played against a clock (the hub labels it Timed vs No timer). */
+  timed: boolean;
   /** Bonus quest: shown last, never required to clear the day. */
   optional?: boolean;
   /** i18n key for the card title. */
@@ -30,7 +30,7 @@ export const DAILY_MODES: readonly DailyModeDef[] = [
   {
     id: 'word-wheel',
     path: '/daily/word-wheel',
-    adminOnly: false,
+    timed: true,
     titleKey: 'wordWheel.hub.wordWheelQuest',
     descKey: 'wordWheel.hub.wordWheelDesc',
     accent: 'yellow',
@@ -39,7 +39,7 @@ export const DAILY_MODES: readonly DailyModeDef[] = [
   {
     id: 'word-hunt',
     path: '/daily/word-hunt',
-    adminOnly: false,
+    timed: true,
     titleKey: 'daily.wordHunt.title',
     descKey: 'daily.wordHunt.desc',
     accent: 'orange',
@@ -48,7 +48,7 @@ export const DAILY_MODES: readonly DailyModeDef[] = [
   {
     id: 'connections',
     path: '/connections/daily',
-    adminOnly: false,
+    timed: false,
     optional: true,
     titleKey: 'connections.daily.questTitle',
     descKey: 'connections.daily.questDesc',
@@ -58,7 +58,7 @@ export const DAILY_MODES: readonly DailyModeDef[] = [
   {
     id: 'word-tower',
     path: '/word-tower/daily',
-    adminOnly: false,
+    timed: false,
     optional: true,
     titleKey: 'wordTower.daily.questTitle',
     descKey: 'wordTower.daily.questDesc',
@@ -69,11 +69,6 @@ export const DAILY_MODES: readonly DailyModeDef[] = [
 
 export function requiredDailyModes(modes: readonly DailyModeDef[]): DailyModeDef[] {
   return modes.filter((mode) => !mode.optional);
-}
-
-/** Modes a given viewer may see — admins see all; everyone else sees public ones. */
-export function visibleDailyModes(isAdmin: boolean): DailyModeDef[] {
-  return DAILY_MODES.filter((mode) => isAdmin || !mode.adminOnly);
 }
 
 /** Absolute locale-prefixed href for a mode, query preserved. */
@@ -92,7 +87,7 @@ export interface DailyModePlayState {
 /**
  * Determine which mode should be the primary action (most prominent on hub).
  *
- * Priority order: first unplayed mode in sequence, or word-hunt if all are played.
+ * Priority order: first unplayed mode in sequence, or word-wheel if all are played.
  * This ensures "what do I do right now" is answered by a single card.
  */
 export function pickPrimaryMode(state: DailyModePlayState): DailyModeId {
@@ -128,7 +123,7 @@ function isModePlayed(state: DailyModePlayState, id: DailyModeId): boolean {
  * the Wheel → Hunt → Connections → Tower chain (wrapping), minus the mode just
  * completed, and `null` when the whole day is cleared.
  *
- * Distinct from pickPrimaryMode on purpose: that one falls back to 'word-hunt'
+ * Distinct from pickPrimaryMode on purpose: that one falls back to 'word-wheel'
  * when everything is played, which is the right answer for a hub that must
  * always render a hero, and the WRONG answer for an end-of-game handoff, where
  * it would bounce the player back into a mode they already finished. Callers

@@ -9,6 +9,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { DailyChallengeLanding } from '../DailyChallengeLanding';
+import { getPuzzleNumber } from '@/utils/dailyChallenge/dateUtils';
 
 // --- next/navigation mocks (overridden per test) ---
 const mockUseSearchParams = vi.fn();
@@ -111,7 +112,7 @@ describe('DailyChallengeLanding - ScoreGauntletBanner integration', () => {
     beforeEach(() => {
       mockUseSearchParams.mockReturnValue(
         new URLSearchParams(
-          'whName=Ohad&whScore=847&whEmoji=%F0%9F%8E%AF'
+          `whName=Ohad&whScore=847&whEmoji=%F0%9F%8E%AF&whPuzzle=${getPuzzleNumber()}`
         )
       );
     });

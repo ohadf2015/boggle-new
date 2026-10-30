@@ -8,6 +8,8 @@ import { normalizeHebrewWord } from '../../../shared/utils/wordNormalization';
 import { isDictionaryWord } from '../../dictionary';
 import { isWordCommunityValid } from '../../modules/communityWordManager';
 import { COIN_COSTS } from '../../../utils/coinManager';
+import { getScoreBreakdown } from '../../../utils/aiHintScoring';
+import { isCatchUpDate, getCatchUpDates } from '../../../utils/dailyChallenge/catchUp';
 import { VALID_LANGUAGES, ValidLanguage, ALL_LANGUAGES_SCOPE, type LeaderboardLanguageScope } from './types';
 
 /**
@@ -147,4 +149,46 @@ export function sanitizeGuestDisplayName(raw: unknown, fallback = 'Anonymous'): 
   const stripped = withoutControlChars.trim();
   if (!stripped) return fallback;
   return stripped.slice(0, 40);
+}
+
+const WORD_HUNT_MAX_LIFE = 100;
+const MIDNIGHT_GRACE_MINUTES = 20;
+
+export interface WordHuntClaim {
+  solved: boolean;
+  attemptsUsed: number;
+  lifeRemaining: unknown;
+  wordsDiscovered: unknown;
+  efficiencyScore: unknown;
+}
+
+function finiteOr(value: unknown, fallback: number): number {
+  return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+}
+
+/** Bounds client-reported life/score to what the server can recompute; never raises an honest score. */
+export function clampWordHuntClaim(claim: WordHuntClaim): { lifeRemaining: number; efficiencyScore: number } {
+  const lifeRemaining = Math.min(WORD_HUNT_MAX_LIFE, Math.max(0, finiteOr(claim.lifeRemaining, 0)));
+  const words = Array.isArray(claim.wordsDiscovered) ? claim.wordsDiscovered : [];
+  const uniqueWords = new Set(
+    words
+      .map((w) => (typeof w === 'string' ? w : (w as { word?: unknown } | null)?.word))
+      .filter((w): w is string => typeof w === 'string' && w.length > 0)
+      .map((w) => w.toUpperCase()),
+  ).size;
+  const ceiling = getScoreBreakdown(lifeRemaining, claim.attemptsUsed, uniqueWords, claim.solved).total;
+  const reported = Math.round(finiteOr(claim.efficiencyScore, ceiling));
+  return { lifeRemaining, efficiencyScore: Math.max(0, Math.min(ceiling, reported)) };
+}
+
+/**
+ * Catch-up is decided by the server clock. Only a run that straddled UTC midnight
+ * (yesterday's puzzle, submitted in the first minutes of today) keeps the client's flag.
+ */
+export function deriveWordHuntCatchup(now: Date, puzzleDate: string, clientFlag: boolean): boolean {
+  const today = now.toISOString().split('T')[0];
+  if (!isCatchUpDate(today, puzzleDate)) return false;
+  const minutesIntoDay = now.getUTCHours() * 60 + now.getUTCMinutes();
+  if (puzzleDate === getCatchUpDates(today, 1)[0] && minutesIntoDay < MIDNIGHT_GRACE_MINUTES) return clientFlag;
+  return true;
 }

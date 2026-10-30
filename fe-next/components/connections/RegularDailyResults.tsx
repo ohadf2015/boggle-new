@@ -18,6 +18,7 @@ interface RegularDailyResultsProps {
   shareText: string;
   onShareClick?: (method: 'native' | 'copy') => void;
   progressSlot?: ReactNode;
+  notice?: ReactNode;
   board: { rows: LeaderboardRow[]; rank: number | null; totalPlayers: number; loading: boolean };
 }
 
@@ -52,6 +53,7 @@ export default function RegularDailyResults({
   shareText,
   onShareClick,
   progressSlot,
+  notice,
   board,
 }: RegularDailyResultsProps) {
   const { t, language } = useLanguage();
@@ -82,6 +84,7 @@ export default function RegularDailyResults({
         ) : undefined
       }
       progressSlot={progressSlot}
+      notice={notice}
       answerKey={{ puzzles, solvedIndices }}
       ctaSource={solvedCount === 0 ? 'connections_daily_results_blanked' : 'connections_daily_results'}
       leaderboard={board}

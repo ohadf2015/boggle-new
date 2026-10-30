@@ -16,7 +16,9 @@ export interface HuntFeedbackPillProps {
 
 function tone(type: FeedbackType): string {
   if (type === 'valid-word' || type === 'target-found') return 'bg-neo-lime/15 text-neo-lime';
-  if (type === 'duplicate' || type === 'too-short' || type === 'too-long') return 'bg-neo-orange/15 text-neo-orange';
+  if (type === 'duplicate') return 'bg-neo-cyan/15 text-neo-cyan';
+  if (type === 'unavailable') return 'bg-neo-yellow/15 text-neo-yellow';
+  if (type === 'too-short' || type === 'too-long') return 'bg-neo-orange/15 text-neo-orange';
   return 'bg-neo-red/15 text-neo-red';
 }
 

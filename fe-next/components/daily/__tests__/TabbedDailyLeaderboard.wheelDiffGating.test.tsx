@@ -12,13 +12,15 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 
-vi.mock('framer-motion', () => ({
-  m: new Proxy({}, {
-    get: () => ({ children, ...props }: React.ComponentProps<'div'>) => <div {...props}>{children}</div>,
-  }),
+vi.mock('framer-motion', () => {
+  // One stable component for every tag: a fresh function per access would remount the tree each render.
+  const MockMotion = ({ children, ...props }: React.ComponentProps<'div'>) => <div {...props}>{children}</div>;
+  return {
+  m: new Proxy({}, { get: () => MockMotion }),
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   useReducedMotion: () => false,
-}));
+  };
+});
 // eslint-disable-next-line @next/next/no-img-element
 vi.mock('next/image', () => ({ __esModule: true, default: ({ alt }: { alt: string }) => <img alt={alt} /> }));
 vi.mock('@/components/Avatar', () => ({ __esModule: true, default: () => <div data-testid="avatar" /> }));

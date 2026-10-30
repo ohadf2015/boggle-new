@@ -7,11 +7,15 @@
  */
 import { yesterdayISO } from './streak';
 import { DAILY_PUZZLE_COUNT } from './daily';
+import { POINTS_HARD, STREAK_BONUS_MULTIPLIER } from './gameLogic';
 
 const LANGUAGES = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const MAX_TIME_SECONDS = 86_400; // a day's worth — anything above is garbage
 const MAX_NAME_LEN = 50;
+/** No solve (chain riddle or pyramid finale) is worth more than a hard riddle on a bonus streak. */
+const MAX_POINTS_PER_SOLVE = Math.ceil(POINTS_HARD * STREAK_BONUS_MULTIPLIER);
+const MIN_SECONDS_PER_SOLVE = 1;
 
 export interface DailySubmission {
   puzzleDate: string;
@@ -63,6 +67,12 @@ export function validateDailySubmission(body: unknown, maxScore: number, todayIS
   if (!isInt(puzzlesSolved) || puzzlesSolved < 0 || puzzlesSolved > DAILY_PUZZLE_COUNT) {
     return { ok: false, error: 'invalid puzzlesSolved' };
   }
+  if (score > puzzlesSolved * MAX_POINTS_PER_SOLVE) {
+    return { ok: false, error: 'score exceeds solved puzzles' };
+  }
+  if (timeTakenSeconds < puzzlesSolved * MIN_SECONDS_PER_SOLVE) {
+    return { ok: false, error: 'implausible time' };
+  }
 
   return {
     ok: true,
@@ -73,9 +83,14 @@ export function validateDailySubmission(body: unknown, maxScore: number, todayIS
 export interface ScorePoint {
   score: number;
   timeTakenSeconds: number;
+  language?: string;
 }
 
-/** Best-keeps: higher score wins; on a tie, the faster time wins. */
+/**
+ * Best-keeps: higher score wins; on a tie, the faster time wins. The day's
+ * first language sticks — each language is a different puzzle set, so a
+ * replay in another one would let a player keep the best of several runs.
+ */
 export function resolveDailySubmission({
   existing,
   incoming,
@@ -84,6 +99,7 @@ export function resolveDailySubmission({
   incoming: ScorePoint;
 }): { action: 'insert' | 'update' | 'keep' } {
   if (!existing) return { action: 'insert' };
+  if (existing.language && incoming.language && existing.language !== incoming.language) return { action: 'keep' };
   if (incoming.score > existing.score) return { action: 'update' };
   if (incoming.score === existing.score && incoming.timeTakenSeconds < existing.timeTakenSeconds) {
     return { action: 'update' };

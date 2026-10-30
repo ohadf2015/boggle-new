@@ -11,7 +11,6 @@ import { GameCanvas, useGameEngine } from '@/lib/gameEngine/GameCanvas';
 import {
   CONFETTI_BURST,
   GOLD_STARS,
-  AMBIENT_BOKEH,
   TILE_EXPLOSION,
   COMBO_FLASH,
   COMBO_FLASH_RING,
@@ -21,6 +20,7 @@ import {
   LIGHTNING_SPARK,
 } from '@/lib/gameEngine/presets/particles';
 import type { ParticleConfig } from '@/lib/gameEngine/types';
+import { fxCanSleep, fxHoldMs, fxResolution } from './fxSleep';
 
 // ─── Custom Presets ─────────────────────────────────────────────────
 
@@ -164,38 +164,46 @@ interface EffectsWorkerProps {
   onEffectsConsumed: () => void;
 }
 
-function EffectsWorker({ effects, onEffectsConsumed }: EffectsWorkerProps) {
-  const { particles, shake, flash, timeDilation, width, height } = useGameEngine();
-  const ambientRef = useRef(false);
-  const urgencyEmitterRef = useRef<ReturnType<typeof particles.create> | null>(null);
+// Late bursts scheduled by setTimeout below, so the ticker stays awake for them.
+const LATE_BURST_MS: Record<string, number> = { wordValid: 150, pangram: 600, gameComplete: 1500 };
 
-  // Ambient floating particles — the calm backdrop behind the wheel.
-  // The shared AMBIENT_BOKEH preset peaks at alpha 0.15 with ~1px specks in a
-  // cool blue palette; over bg-neo-navy (#1a1a2e) that's imperceptible, so the
-  // play area read as flat solid black. Override the visibility-driving fields
-  // here (word-wheel only — the shared preset is untouched) so the layer reads
-  // as a gentle, additive lime/cyan/violet glow that gives the board depth.
+function EffectsWorker({ effects, onEffectsConsumed }: EffectsWorkerProps) {
+  const { app, particles, shake, flash, timeDilation, width, height } = useGameEngine();
+  const urgencyEmitterRef = useRef<ReturnType<typeof particles.create> | null>(null);
+  const lastEffectAt = useRef(0);
+  const holdMs = useRef(0);
+
+  // No ambient emitter: the stage gradient carries the glow, and an idle canvas stops its ticker.
   useEffect(() => {
-    if (ambientRef.current) return;
-    ambientRef.current = true;
-    const emitter = particles.create({
-      ...AMBIENT_BOKEH,
-      maxParticles: 38,
-      frequency: 0.13,
-      lifetime: { min: 4, max: 8 },
-      speed: { min: 4, max: 12 },
-      scale: { start: 0.6, end: 1.8 },
-      alpha: { start: 0, end: 0.24 },
-      colors: ['bfff00', '00ffff', '8b5cf6'],
-      blendMode: 'add',
-      spawnConfig: { width, height },
-    });
-    emitter.emit(width / 2, height / 2);
-  }, [particles, width, height]);
+    const ticker = app?.ticker;
+    if (!ticker) return;
+    lastEffectAt.current = performance.now();
+    const sleepWhenIdle = () => {
+      const idle = fxCanSleep({
+        emitters: particles.emitterCount,
+        shaking: shake.isShaking,
+        flashing: flash.isActive,
+        dilating: timeDilation.isActive,
+        sinceEffectMs: performance.now() - lastEffectAt.current,
+        holdMs: holdMs.current,
+      });
+      if (idle) ticker.stop();
+    };
+    ticker.add(sleepWhenIdle);
+    return () => {
+      try { ticker.remove(sleepWhenIdle); } catch { /* ticker already gone */ }
+    };
+  }, [app, particles, shake, flash, timeDilation]);
 
   // Process effects
   useEffect(() => {
     if (effects.length === 0) return;
+    const now = performance.now();
+    const pendingUntil = lastEffectAt.current + holdMs.current;
+    lastEffectAt.current = now;
+    const hold = Math.max(...effects.map(e => (LATE_BURST_MS[e.type] ?? 0) + 200), fxHoldMs([]));
+    holdMs.current = Math.max(hold, pendingUntil - now);
+    app?.ticker?.start();
 
     for (const effect of effects) {
       switch (effect.type) {
@@ -381,7 +389,6 @@ function EffectsWorker({ effects, onEffectsConsumed }: EffectsWorkerProps) {
             }, 1500);
           }
 
-          // Stop urgency embers
           urgencyEmitterRef.current = null;
           break;
         }
@@ -389,7 +396,7 @@ function EffectsWorker({ effects, onEffectsConsumed }: EffectsWorkerProps) {
     }
 
     onEffectsConsumed();
-  }, [effects, particles, shake, flash, timeDilation, width, height, onEffectsConsumed]);
+  }, [app, effects, particles, shake, flash, timeDilation, width, height, onEffectsConsumed]);
 
   return null;
 }
@@ -416,7 +423,8 @@ export function WordWheelEffectsCanvas({
         height,
         background: 0x000000,
         backgroundAlpha: 0,
-        antialias: true,
+        antialias: false,
+        resolution: fxResolution(typeof window !== 'undefined' ? window.devicePixelRatio : 1),
       }}
       usePhysics={false}
       className="absolute inset-0 pointer-events-none z-10"

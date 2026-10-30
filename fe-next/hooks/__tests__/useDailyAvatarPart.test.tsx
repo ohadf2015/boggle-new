@@ -96,7 +96,7 @@ describe('useDailyAvatarPart', () => {
     const fetchSpy = vi.fn()
       // initial GET
       .mockResolvedValueOnce({ ok: true, json: async () => ({
-        cooldownActive: false, nextClaimAt: null, unownedCount: 4, eligible: true,
+        cooldownActive: false, nextClaimAt: null, unownedCount: 4, eligible: true, adTicket: 'tkt',
       }) } as Response)
       // POST claim
       .mockResolvedValueOnce({ ok: true, json: async () => ({
@@ -111,7 +111,11 @@ describe('useDailyAvatarPart', () => {
     await act(async () => { granted = await result.current.claim(); });
 
     expect(granted).toBe('accessories:halo');
-    expect(fetchSpy).toHaveBeenLastCalledWith('/api/avatar/claim-daily-part', { method: 'POST' });
+    expect(fetchSpy).toHaveBeenLastCalledWith('/api/avatar/claim-daily-part', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ adTicket: 'tkt' }),
+    });
     expect(result.current.granted).toBe('accessories:halo');
     expect(result.current.eligible).toBe(false);
     expect(result.current.cooldownActive).toBe(true);

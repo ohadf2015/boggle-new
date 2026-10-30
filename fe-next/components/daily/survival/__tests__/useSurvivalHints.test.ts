@@ -67,8 +67,6 @@ describe('useSurvivalHints', () => {
     targetWord: 'APPLE',
     language: 'en' as Language,
     playWordAcceptedSound: vi.fn(),
-    showToast: vi.fn(),
-    t: (key: string) => key,
   };
 
   beforeEach(() => {

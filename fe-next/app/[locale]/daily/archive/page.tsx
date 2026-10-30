@@ -1,5 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
+import { archiveCopy } from './archiveCopy';
 import { loadTranslation } from '@/translations/loadTranslation';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { DAILY_CHALLENGE_EPOCH } from '@/utils/dailyChallenge/constants';
@@ -47,14 +50,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
 export default async function DailyArchivePage({ params }: PageParams) {
   const { locale } = await params;
   const validLocale = (locale as Locale) || 'en';
-  const t = await loadTranslation(validLocale) as Record<string, any>;
-  const archiveT = t?.daily?.archive || {
-    title: 'Daily Challenge Archive',
-    subtitle: 'Browse past puzzles and see how players performed',
-    puzzleLabel: 'Puzzle',
-    viewResults: 'View Results',
-    puzzlesTotal: 'puzzles',
-  };
+  const tx = archiveCopy(await loadTranslation(validLocale) as Record<string, unknown>);
 
   const dates = getArchiveDates();
 
@@ -91,7 +87,7 @@ export default async function DailyArchivePage({ params }: PageParams) {
     {
       '@context': 'https://schema.org',
       '@type': 'CollectionPage',
-      name: archiveT.title,
+      name: 'Daily Challenge Archive',
       description: 'Archive of all past LexiClash daily word challenges with statistics and leaderboards.',
       url: `https://www.lexiclash.live/${locale}/daily/archive`,
       isPartOf: { '@id': 'https://www.lexiclash.live/#website' },
@@ -111,18 +107,19 @@ export default async function DailyArchivePage({ params }: PageParams) {
           <div className="mb-8">
             <Link
               href={`/${locale}/daily`}
-              className="text-neo-cyan text-sm hover:underline mb-2 inline-block"
+              className="text-neo-cyan text-sm hover:underline mb-2 inline-flex items-center gap-1"
             >
-              ← {t.daily?.backToDaily || 'Back to Daily Challenge'}
+              <DirectionalIcon icon={ArrowLeft} className="w-4 h-4" />
+              {tx('backToHub')}
             </Link>
             <h1 className="text-3xl font-neo-display font-black text-neo-yellow">
-              {archiveT.title}
+              {tx('title')}
             </h1>
             <p className="text-slate-400 mt-1">
-              {archiveT.subtitle}
+              {tx('subtitle')}
             </p>
             <p className="text-slate-500 text-sm mt-1">
-              {dates.length} {archiveT.puzzlesTotal || 'puzzles'}
+              {tx('count', { n: dates.length })}
             </p>
           </div>
 
@@ -149,8 +146,9 @@ export default async function DailyArchivePage({ params }: PageParams) {
                         {formatDate(date)}
                       </span>
                     </div>
-                    <span className="text-neo-cyan text-sm font-medium">
-                      {archiveT.viewResults || 'View'} →
+                    <span className="text-neo-cyan text-sm font-medium inline-flex items-center gap-1">
+                      {tx('view')}
+                      <DirectionalIcon icon={ArrowRight} className="w-4 h-4" />
                     </span>
                   </Link>
                 ))}

@@ -1,11 +1,11 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
+import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 
 vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ user: { id: 'u1' }, isAuthenticated: true }),
 }));
 
-import { useDailyPlayedStatus } from '../useDailyPlayedStatus';
+import { useDailyPlayedStatus, __resetDailyPlayedStatusStore } from '../useDailyPlayedStatus';
 
 /*
  * An authed player starts on `loading: true` (the results CTA shows a skeleton
@@ -13,6 +13,7 @@ import { useDailyPlayedStatus } from '../useDailyPlayedStatus';
  * clearing it, so the CTA stayed a skeleton forever.
  */
 describe('useDailyPlayedStatus — failed fetch', () => {
+  beforeEach(() => __resetDailyPlayedStatusStore());
   afterEach(() => vi.unstubAllGlobals());
 
   it('given the status endpoint answers non-OK, stops loading', async () => {

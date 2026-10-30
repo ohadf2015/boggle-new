@@ -203,7 +203,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
   // flies landing coins into its exact rect), so the number never changes off-screen.
   const coinsRef = useRef<HTMLDivElement | null>(null);
 
-  const keysBlocked = smashing || rivalsOpen || raiding;
+  const keysBlocked = smashing || rivalsOpen || raiding || (forceResults && phase !== 'over');
   const ww = useWordWheel({
     daily, language, phase, run, hoist, cancelHoist, drop, setScrambles,
     dictRef, dictReady, braceApi, flashReject, playSound, recordPlay, keysBlocked,
@@ -356,7 +356,17 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
         </div>
       ) : null}
       {goalToast ? (
-        <DailyGoalCard t={t} growthM={dailyTower.growthM} onKeepClimbing={dismissGoalToast} onBank={exitFlow.goHome} />
+        <DailyGoalCard
+          t={t}
+          growthM={dailyTower.growthM}
+          onKeepClimbing={dismissGoalToast}
+          onBank={() => {
+            // Banking mid-climb shows the day's results; the tower keeps standing behind them.
+            flushDaily({ keepalive: false });
+            dismissGoalToast();
+            setForceResults(true);
+          }}
+        />
       ) : null}
       {copied ? (
         <div className="pointer-events-none absolute inset-x-0 top-1/3 z-[60] mx-auto w-fit rounded-neo border-neo-thick border-black bg-neo-lime px-4 py-2 font-neo-display text-lg font-black text-neo-navy shadow-hard animate-neo-pop">
@@ -404,7 +414,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
           language={language}
           game={game}
           estateApi={estateApi}
-          payoutStatus={rewardsFlow.payoutStatus}
+          payoutStatus={phase === 'over' ? rewardsFlow.payoutStatus : { status: 'none', coins: 0 }}
           daily={daily}
           dailyTower={dailyTower}
           dailyRank={dailyRank}
@@ -415,7 +425,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
           rivalName={rivalName}
           celebrate={overHold.celebrate && !forceResults}
           reducedMotion={reducedMotion}
-          onRestart={restartRun}
+          onRestart={phase === 'over' ? restartRun : () => setForceResults(false)}
           onHome={exitFlow.goHome}
           onClose={() => {
             setForceResults(false);

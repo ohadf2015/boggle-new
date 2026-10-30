@@ -15,7 +15,7 @@ import logger from '../../utils/logger';
 
 export const MAX_SERVER_COIN_AWARD = 2000;
 
-export type AwardCoinsReason = 'duel_win' | 'wotd_complete' | 'grand_slam' | 'blast_v2_level_clear' | 'blast_v2_chest_open' | 'daily_weekly_chest' | 'all_quests_complete' | 'bug_report' | 'curator_ratification' | 'quick_play_round'
+export type AwardCoinsReason = 'duel_win' | 'wotd_complete' | 'grand_slam' | 'blast_v2_level_clear' | 'blast_v2_chest_open' | 'daily_weekly_chest' | 'daily_wheel_gold' | 'all_quests_complete' | 'bug_report' | 'curator_ratification' | 'quick_play_round'
   // Adventure pays coins at run milestones, and when a run ends its leftover gold
   // banks at a rate (settleRunEnd / purseCoins) — spending gold in-run is a real choice.
   | 'adventure_elite' | 'adventure_boss' | 'adventure_world' | 'adventure_purse';

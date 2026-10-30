@@ -55,10 +55,9 @@ describe('fastValidateWord with offline dict', () => {
     expect(fetchSpy).toHaveBeenCalledTimes(1);
   });
 
-  it('returns permissive length-based result when offline dict misses and network fails', async () => {
+  it('returns unknown, not a credit, when offline dict misses and network fails', async () => {
     hasInMemory.mockReturnValue(null);
     vi.spyOn(globalThis, 'fetch').mockRejectedValue(new TypeError('network'));
-    expect(await fastValidateWord('zzzqx', 'en')).toBe(true);
-    expect(await fastValidateWord('zz', 'en')).toBe(false);
+    expect(await fastValidateWord('zzzqx', 'en')).toBeNull();
   });
 });

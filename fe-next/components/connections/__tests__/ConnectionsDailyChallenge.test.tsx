@@ -23,7 +23,7 @@ vi.mock('@/utils/confettiUtils', () => ({ fireVictoryConfetti: vi.fn() }));
 vi.mock('@/hooks/useRewardedFeatureUnlock', () => ({
   useRewardedFeatureUnlock: () => ({ canShowAd: false, status: 'idle', offer: vi.fn() }),
 }));
-const submitDailyScore = vi.fn(async () => null);
+const submitDailyScore = vi.fn(async (..._a: unknown[]) => ({ status: 'failed', retryable: false }) as unknown);
 const fetchDailyLeaderboard = vi.fn(async () => null);
 vi.mock('@/lib/connections/dailyClient', async (orig) => {
   const actual = (await orig()) as object;

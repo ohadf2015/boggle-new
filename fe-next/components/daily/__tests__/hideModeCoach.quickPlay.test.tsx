@@ -17,7 +17,7 @@ function src(name: string) {
 describe('WordWheelGame / DailyWordHuntSurvival hideModeCoach contract', () => {
   it('WordWheelGame declares hideModeCoach, never floats a ModeCoach over the wheel, and gates the practice tip', () => {
     const s = src('WordWheelGame.tsx');
-    expect(s).toMatch(/hideModeCoach\??\s*:/);
+    expect(src('wheel/wordWheelGameProps.ts')).toMatch(/hideModeCoach\??\s*:/);
     expect(s).not.toMatch(/<ModeCoach/);
     // Practice tip (in its fixed-height wheel slot) also suppressed under hideModeCoach
     expect(s).toMatch(/practice\s*&&\s*!hideModeCoach[\s\S]{0,80}WheelCoachSlot|!hideModeCoach\s*&&\s*practice[\s\S]{0,80}WheelCoachSlot/);

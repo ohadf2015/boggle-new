@@ -93,7 +93,7 @@ describe('daily word hunt: every verdict names its word', () => {
     global.fetch = vi.fn(async () => new Response('{}', { status: 429 })) as unknown as typeof fetch;
     const { result, showToast } = setup();
     act(() => result.current.handleWordSubmit('hous'));
-    await waitFor(() => expect(showToast).toHaveBeenCalledWith('duplicate', expect.any(String), 'HOUS'), { timeout: 3000 });
+    await waitFor(() => expect(showToast).toHaveBeenCalledWith('unavailable', expect.any(String), 'HOUS'), { timeout: 3000 });
   });
 
   it('Given the target word, When submitted, Then the solve is announced on the word before the game ends', () => {

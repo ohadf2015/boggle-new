@@ -5,14 +5,11 @@ import type { DailyModeId } from '@/lib/dailyModes';
  *
  * The four daily modes each keep their own table, keyed the same way
  * (`player_id` / `guest_fingerprint` / `puzzle_date` / `language`), but they do
- * NOT score on the same scale — see {@link MODE_POINTS}. The hub board used to
- * sum Word Hunt + Word Wheel only, which quietly excluded half the visible
- * cards; this merges all four.
+ * NOT score on the same scale — see {@link TOWER_METRES_TO_POINTS}.
  *
- * Identity is used to GROUP and is then dropped: the returned entries carry
- * display data and scores only. The per-mode routes deliberately leak no player
- * ids ("no identifiers leaked" — app/api/connections/daily/[date]/leaderboard),
- * and a combined board must not become the hole in that.
+ * Identity is used to GROUP and is then dropped: public entries carry display
+ * data, scores and at most an opaque per-day `key`, never a player id or guest
+ * fingerprint.
  */
 
 export interface ModeResultRow {
@@ -23,17 +20,22 @@ export interface ModeResultRow {
   avatar_color?: string | null;
   avatar_image?: string | null;
   custom_avatar?: unknown;
+  country_code?: string | null;
+  completed_at?: string | null;
   /** The mode's own raw metric, already selected by the caller. */
   value?: number | null;
 }
 
 export interface MergedLeaderboardEntry {
   rank: number;
+  /** Opaque per-day row key (React keys, movement chips). Never the raw id. */
+  key?: string;
   name: string;
   avatarEmoji: string | null;
   avatarColor: string | null;
   avatarImage: string | null;
   customAvatar: unknown;
+  countryCode?: string | null;
   /** Sum of every mode's POINTS contribution. */
   total: number;
   /** Points per mode — 0 for a mode the player has not played today. */
@@ -44,14 +46,16 @@ export interface MergedLeaderboardEntry {
   playedModes: DailyModeId[];
   /** The caller's own row — set only when `opts.you` matched. */
   isYou?: boolean;
+  /** One of the caller's accepted friends. */
+  isFriend?: boolean;
 }
 
-/* No `key` field on purpose. An earlier draft carried the group key (`u:<uuid>`
-   / `g:<fingerprint>`) through for React, which put the exact identifier the
-   per-mode routes withhold into the combined response — the combined board
-   must not be the hole in "no identifiers leaked". Callers key on `rank`,
-   which is stable for a board re-fetched whole. A privacy test asserts the
-   serialized entry contains neither id. */
+/** Server-only ranked row: still carries the group key, so it must never be serialized. */
+export interface RankedBoardRow extends Omit<MergedLeaderboardEntry, 'key' | 'isYou' | 'isFriend'> {
+  identity: string;
+  /** When the player's latest counted result landed — the tiebreak. */
+  reachedAt: string;
+}
 
 /**
  * How each mode's raw metric becomes comparable points.
@@ -97,16 +101,14 @@ export interface MergeInput {
   rows: ModeResultRow[];
 }
 
-/**
- * @param inputs one entry per mode; a mode with no rows may be omitted.
- * @param limit  how many entries to return, highest total first.
- */
-export function mergeDailyLeaderboard(
-  inputs: MergeInput[],
-  limit = 10,
-  opts: { you?: string | null } = {},
-): MergedLeaderboardEntry[] {
-  const byIdentity = new Map<string, Omit<MergedLeaderboardEntry, 'rank'>>();
+export interface RankOptions {
+  /** Account ids to leave off the board (test accounts). */
+  excludePlayerIds?: ReadonlySet<string>;
+}
+
+/** Every player with points today, ranked: total, then modes played, then who got there first. */
+export function rankDailyBoard(inputs: MergeInput[], opts: RankOptions = {}): RankedBoardRow[] {
+  const byIdentity = new Map<string, Omit<RankedBoardRow, 'rank'>>();
 
   for (const { mode, rows } of inputs) {
     for (const row of rows ?? []) {
@@ -114,21 +116,25 @@ export function mergeDailyLeaderboard(
       // A row with neither id cannot be attributed to a player, and merging it
       // under a shared bucket would invent a person who played four modes.
       if (!identity) continue;
+      if (row.player_id && opts.excludePlayerIds?.has(row.player_id)) continue;
 
       const points = mode === 'word-tower' ? towerPoints(row.value) : Math.max(0, Math.round(row.value ?? 0));
 
       let entry = byIdentity.get(identity);
       if (!entry) {
         entry = {
+          identity,
           name: row.display_name?.trim() || '',
           avatarEmoji: row.avatar_emoji ?? null,
           avatarColor: row.avatar_color ?? null,
           avatarImage: row.avatar_image ?? null,
           customAvatar: row.custom_avatar ?? null,
+          countryCode: row.country_code ?? null,
           total: 0,
           byMode: EMPTY_BY_MODE(),
           towerHeightM: null,
           playedModes: [],
+          reachedAt: '',
         };
         byIdentity.set(identity, entry);
       }
@@ -139,6 +145,7 @@ export function mergeDailyLeaderboard(
         entry.byMode[mode] = points;
       }
       if (!entry.playedModes.includes(mode)) entry.playedModes.push(mode);
+      if (row.completed_at && row.completed_at > entry.reachedAt) entry.reachedAt = row.completed_at;
 
       if (mode === 'word-tower' && typeof row.value === 'number') {
         entry.towerHeightM = Math.max(entry.towerHeightM ?? 0, row.value);
@@ -150,21 +157,82 @@ export function mergeDailyLeaderboard(
       entry.avatarColor ??= row.avatar_color ?? null;
       entry.avatarImage ??= row.avatar_image ?? null;
       entry.customAvatar ??= row.custom_avatar ?? null;
+      entry.countryCode ??= row.country_code ?? null;
     }
   }
 
-  const ranked = Array.from(byIdentity.entries())
-    .sort(([, a], [, b]) => b.total - a.total || b.playedModes.length - a.playedModes.length)
-    .map(([identity, entry], i) => ({
-      ...entry,
-      rank: i + 1,
-      ...(opts.you && identity === opts.you ? { isYou: true } : {}),
-    }));
+  return Array.from(byIdentity.values())
+    .filter((e) => e.total > 0)
+    .sort((a, b) =>
+      b.total - a.total
+      || b.playedModes.length - a.playedModes.length
+      || compareReachedAt(a.reachedAt, b.reachedAt)
+      || (a.identity < b.identity ? -1 : a.identity > b.identity ? 1 : 0))
+    .map((e, i) => ({ ...e, rank: i + 1 }));
+}
 
-  // A top-N board never shows a player ranked below N — so the one person
-  // looking at it could finish today and not find themselves. Their own row
-  // rides along with its TRUE rank; the identity used to find it is not echoed.
-  const top = ranked.slice(0, Math.max(0, limit));
-  const mine = ranked.find((e) => e.isYou);
-  return mine && mine.rank > top.length ? [...top, mine] : top;
+/** Earlier wins; a row with no time sorts after one that has it. */
+function compareReachedAt(a: string, b: string): number {
+  if (a === b) return 0;
+  if (!a) return 1;
+  if (!b) return -1;
+  return a < b ? -1 : 1;
+}
+
+export interface ViewOptions {
+  limit?: number;
+  you?: string | null;
+  /** Group keys (`u:<id>`) of the caller's accepted friends. */
+  friendIds?: ReadonlySet<string>;
+  /** Maps a group key to an opaque row key; omitted means no `key` field. */
+  keyOf?: (identity: string) => string;
+}
+
+export interface DailyBoardView {
+  data: MergedLeaderboardEntry[];
+  /** Ranked players on the whole board, not just the slice in `data`. */
+  total: number;
+  countries: string[];
+}
+
+/**
+ * The public slice of a ranked board: top `limit`, plus the caller and their
+ * friends at their TRUE rank when they sit below it. The group key is dropped.
+ */
+export function viewDailyBoard(ranked: RankedBoardRow[], opts: ViewOptions = {}): DailyBoardView {
+  const limit = Math.max(0, opts.limit ?? 10);
+  const data: MergedLeaderboardEntry[] = [];
+  const counts = new Map<string, number>();
+
+  for (const row of ranked) {
+    const code = (row.countryCode ?? '').trim().toUpperCase();
+    if (code.length === 2) counts.set(code, (counts.get(code) ?? 0) + 1);
+
+    const isYou = !!opts.you && row.identity === opts.you;
+    const isFriend = !isYou && !!opts.friendIds?.has(row.identity);
+    if (row.rank > limit && !isYou && !isFriend) continue;
+
+    const { identity, reachedAt: _reachedAt, ...pub } = row;
+    data.push({
+      ...pub,
+      ...(opts.keyOf ? { key: opts.keyOf(identity) } : {}),
+      ...(isYou ? { isYou: true } : {}),
+      ...(isFriend ? { isFriend: true } : {}),
+    });
+  }
+
+  const countries = Array.from(counts.entries()).sort((a, b) => b[1] - a[1]).map(([c]) => c);
+  return { data, total: ranked.length, countries };
+}
+
+/**
+ * @param inputs one entry per mode; a mode with no rows may be omitted.
+ * @param limit  how many entries to return, highest total first.
+ */
+export function mergeDailyLeaderboard(
+  inputs: MergeInput[],
+  limit = 10,
+  opts: { you?: string | null } = {},
+): MergedLeaderboardEntry[] {
+  return viewDailyBoard(rankDailyBoard(inputs), { limit, you: opts.you }).data;
 }

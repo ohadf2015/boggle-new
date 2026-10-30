@@ -16,10 +16,11 @@ interface PyramidDailyResultsProps {
   celebrate: boolean;
   shareText: string;
   progressSlot?: ReactNode;
+  notice?: ReactNode;
 }
 
 /** A pyramid day's end screen, in the same layout as the 5-riddle chain's. */
-export default function PyramidDailyResults({ pyramid, state, outcomes, celebrate, shareText, progressSlot }: PyramidDailyResultsProps) {
+export default function PyramidDailyResults({ pyramid, state, outcomes, celebrate, shareText, progressSlot, notice }: PyramidDailyResultsProps) {
   const { t } = useLanguage();
   const won = state.status === 'won';
   const solved = outcomes.filter((o) => o.solved).length;
@@ -46,6 +47,7 @@ export default function PyramidDailyResults({ pyramid, state, outcomes, celebrat
       celebrate={celebrate}
       shareText={shareText}
       progressSlot={progressSlot}
+      notice={notice}
       answerKey={{
         puzzles: pyramid.base,
         solvedIndices: new Set(pyramid.base.flatMap((_, i) => (outcomes[i]?.solved ? [i] : []))),

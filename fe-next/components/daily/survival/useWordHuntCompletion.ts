@@ -7,6 +7,10 @@ import { buildDailyWordHuntCompletePayload, type WordHuntRescueMethod } from '..
 import { levelUpFromRecordGame, publishLevelUp } from '@/lib/avatar/revealTrigger';
 import type { Language } from '@/types';
 import type { SurvivalGameResult } from './types';
+import { clearWordHuntRunStarted } from './runStartedMarker';
+
+/** The ad hooks' own watchdogs run ~45s; past this the results open (under the ad if one is still up). */
+export const INTERSTITIAL_RESULTS_CAP_MS = 3000;
 
 type TFn = (key: string, fallbackOrParams?: string | Record<string, string | number>) => string;
 
@@ -87,6 +91,7 @@ export function useWordHuntCompletion(d: WordHuntCompletionDeps) {
       completedAt,
     };
     setGameResult(result);
+    if (!isPractice) clearWordHuntRunStarted(gameLanguage);
 
     // Practice keeps nothing (no streak, leaderboard or analytics) but still shows its results.
     if (isPractice) {
@@ -119,7 +124,17 @@ export function useWordHuntCompletion(d: WordHuntCompletionDeps) {
     setStoredResult({ date: puzzleDate, puzzleNumber, result: wordHuntResult, completedAt });
     // Ad sits between the game and the results; catch-up days already paid with a rewarded ad.
     const adGate = isCatchup ? Promise.resolve() : showInterstitial(`word-hunt-complete-${extraTries}`);
-    adGate.catch(() => {}).finally(onShowResults);
+    let resultsShown = false;
+    const showResultsOnce = () => {
+      if (resultsShown) return;
+      resultsShown = true;
+      onShowResults();
+    };
+    const cap = setTimeout(showResultsOnce, INTERSTITIAL_RESULTS_CAP_MS);
+    adGate.catch(() => {}).finally(() => {
+      clearTimeout(cap);
+      showResultsOnce();
+    });
 
     if (isAuthenticated && result.solved) recordQuestProgress(result, t);
   // eslint-disable-next-line react-hooks/exhaustive-deps -- t is stable from LanguageContext

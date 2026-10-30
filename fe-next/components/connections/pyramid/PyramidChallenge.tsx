@@ -8,20 +8,13 @@ import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useHapticFeedback, GAME_HAPTICS } from '@/hooks/useHapticFeedback';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { fireVictoryConfetti } from '@/utils/confettiUtils';
-import {
-  initPyramidState,
-  pyramidGuess,
-  pyramidAdvance,
-  pyramidGiveUp,
-  pyramidRevive,
-  type PyramidState,
-} from '@/lib/connections/pyramid/gameLogic';
+import { initPyramidState, type PyramidState } from '@/lib/connections/pyramid/gameLogic';
 import { dailyPyramid } from '@/lib/connections/pyramid/daily';
 import { getPyramidsForLocale } from '@/lib/connections/pyramid/puzzles';
-import { saveDailyResult } from '@/lib/connections/dailyResultStore';
+import { patchDailyResult, saveDailyResult } from '@/lib/connections/dailyResultStore';
 import { getSolvedIds, markSolved } from '@/lib/connections/solvedStore';
 import { buildPyramidShareGrid } from '@/lib/connections/pyramid/shareGrid';
-import { todayUTC, markConnectionsPlayedToday, advanceClientStreak } from '@/lib/connections/dailyClient';
+import { todayUTC, markConnectionsPlayedToday, advanceClientStreak, type SubmitPayload } from '@/lib/connections/dailyClient';
 import { gridCallout, type BridgeOutcome } from '@/lib/connections/shareGrid';
 import { stripEmoji } from '@/lib/share/stripEmoji';
 import type { GameState } from '@/lib/connections/types';
@@ -40,32 +33,12 @@ import PyramidDailyResults from './PyramidDailyResults';
 import PyramidEndScreen from './PyramidEndScreen';
 import PyramidOutOfLives from './PyramidOutOfLives';
 import { useStoredDailyResult } from '../useStoredDailyResult';
+import { useDailyScoreSave } from '../useDailyScoreSave';
+import ScoreSaveNotice from '../ScoreSaveNotice';
+import { pyramidReducer } from './pyramidReducer';
+import { clearPyramidRun, loadPyramidRun, usePyramidRunSave, type StoredPyramidRun } from './pyramidRunStore';
 
 const UNREACHED: BridgeOutcome = { reached: false, solved: false, wrongAttempts: 0, hintUsed: false };
-
-type Action =
-  | { type: 'GUESS'; input: string }
-  | { type: 'ADVANCE' }
-  | { type: 'GIVE_UP' }
-  | { type: 'REVEAL_HINT' }
-  | { type: 'REVIVE' };
-
-function reducer(state: PyramidState, action: Action): PyramidState {
-  switch (action.type) {
-    case 'GUESS':
-      return pyramidGuess(state, action.input);
-    case 'ADVANCE':
-      return pyramidAdvance(state);
-    case 'GIVE_UP':
-      return pyramidGiveUp(state);
-    case 'REVEAL_HINT':
-      return { ...state, hintRevealed: true };
-    case 'REVIVE':
-      return pyramidRevive(state);
-    default:
-      return state;
-  }
-}
 
 /**
  * Bridge Pyramid — a three-stage tower where solving all 3 base riddles
@@ -81,36 +54,47 @@ function reducer(state: PyramidState, action: Action): PyramidState {
 export default function PyramidChallenge({
   sharePath,
   onTerminal,
+  today: hostToday,
 }: {
   sharePath?: string;
   /** Told once the run is terminal (live finish OR a restored revisit). */
   onTerminal?: () => void;
+  /** The daily host's frozen UTC day. */
+  today?: string;
 } = {}) {
   // Null-guard wrapper: the early return must happen BEFORE any of the run's
   // hooks mount (rules-of-hooks), so the actual game lives in PyramidRun.
   const { language } = useLanguage();
-  const today = useRef(todayUTC()).current;
+  const ownToday = useRef(todayUTC()).current;
+  const today = hostToday ?? ownToday;
   const isDailyHost = Boolean(sharePath);
   const [solvedPyramids] = useState<ReadonlySet<string>>(() => getSolvedIds('pyramid', language));
   const stored = useStoredDailyResult<StoredPyramidResult>(today, language, 'pyramid');
+  const [savedRun] = useState(() => (isDailyHost && typeof window !== 'undefined' ? loadPyramidRun(today) : null));
   // Daily host: render nothing until storage is read, rather than a fresh
   // pyramid that flips to the end screen a frame later.
   if (isDailyHost && !stored.checked) return null;
   const restored = isDailyHost ? stored.value : null;
   // Today's run is stored → reopen THAT pyramid. Winning marks it solved, so
   // the solved filter would otherwise serve a different one on revisit.
+  const resumable = !restored && savedRun
+    ? getPyramidsForLocale(savedRun.language).find((p) => p.id === savedRun.pyramidId)
+    : undefined;
   const pyramid = restored
-    ? (getPyramidsForLocale(language).find((p) => p.id === restored.pyramidId) ?? dailyPyramid(today, language))
-    : dailyPyramid(today, language, solvedPyramids);
+    ? (getPyramidsForLocale(restored.language).find((p) => p.id === restored.pyramidId) ?? dailyPyramid(today, restored.language))
+    : (resumable ?? dailyPyramid(today, language, solvedPyramids));
   if (!pyramid) return null;
   const restoredRun = restored && restored.pyramidId === pyramid.id ? restored : null;
+  const resumedRun = resumable && savedRun ? savedRun : null;
   return (
     <PyramidRun
-      key={restoredRun ? 'restored' : 'live'}
+      key={restoredRun ? 'restored' : resumedRun ? 'resumed' : 'live'}
       pyramid={pyramid}
       today={today}
       sharePath={sharePath}
       restored={restoredRun}
+      resumed={resumedRun}
+      runLanguage={restored?.language ?? resumedRun?.language ?? language}
       onTerminal={onTerminal}
     />
   );
@@ -123,6 +107,8 @@ interface StoredPyramidResult {
   state: Omit<PyramidState, 'pyramid'>;
   outcomes: [number, BridgeOutcome][];
   streak: number;
+  /** Set until the server has the score; absent on results stored before pyramid days were submitted. */
+  pendingSubmit?: SubmitPayload | null;
 }
 
 function PyramidRun({
@@ -130,31 +116,37 @@ function PyramidRun({
   today,
   sharePath,
   restored,
+  resumed,
+  runLanguage,
   onTerminal,
 }: {
   pyramid: NonNullable<ReturnType<typeof dailyPyramid>>;
   today: string;
   sharePath?: string;
   restored: StoredPyramidResult | null;
+  /** An unfinished daily run saved before a reload. */
+  resumed: StoredPyramidRun | null;
+  runLanguage: string;
   onTerminal?: () => void;
 }) {
   const { t, language } = useLanguage();
-  const { isAdmin } = useAuth();
+  const { isAdmin, profile } = useAuth();
   const prefersReducedMotion = useReducedMotion();
   const { haptic, customHaptic } = useHapticFeedback();
   const sfx = useSoundEffects();
   const inShell = useMediaQuery(SHELL_MEDIA);
 
-  const [pyramidState, dispatch] = useReducer(reducer, pyramid, (p) =>
-    restored ? { ...restored.state, pyramid: p } : initPyramidState(p),
-  );
+  const [pyramidState, dispatch] = useReducer(pyramidReducer, pyramid, (p) => {
+    const saved = restored?.state ?? resumed?.state;
+    return saved ? { ...saved, pyramid: p } : initPyramidState(p);
+  });
   const [input, setInput] = useState('');
   const progressApi = useBridgeProgress();
   const { onBridgeSolved, onDayPlayed } = progressApi;
 
   const startRef = useRef<number>(0);
-  const wrongByStageRef = useRef<Record<number, number>>({});
-  const outcomesRef = useRef<Map<number, BridgeOutcome>>(new Map(restored?.outcomes ?? []));
+  const wrongByStageRef = useRef<Record<number, number>>({ ...resumed?.wrongByStage });
+  const outcomesRef = useRef<Map<number, BridgeOutcome>>(new Map(restored?.outcomes ?? resumed?.outcomes ?? []));
   const prevStatusRef = useRef(pyramidState.status);
   const prevWrongRef = useRef(pyramidState.wrongAttempts);
   const [results, setResults] = useState<{ copied: boolean }>({ copied: false });
@@ -185,10 +177,12 @@ function PyramidRun({
       }
     : ({} as GameState);
 
-  // Stamp start time once mounted
+  // Stamp start time once mounted; a resumed run keeps the time it already used.
   useEffect(() => {
-    startRef.current = Date.now();
+    startRef.current = Date.now() - (resumed?.elapsedMs ?? 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
 
   // Daily-parity: finishing a pyramid (won OR lost) counts as playing the Word
   // Bridge daily quest. The 5-riddle daily writes the same markers on its own
@@ -269,21 +263,61 @@ function PyramidRun({
     prevWrongRef.current = pyramidState.wrongAttempts;
   }, [pyramidState.status, pyramidState.stage, pyramidState.hintRevealed, pyramidState.wrongAttempts, sfx, haptic, customHaptic, prefersReducedMotion, pyramid, language, onBridgeSolved, sharePath]);
 
+  // After the outcome effect, so a reload on a just-resolved riddle keeps its outcome.
+  usePyramidRunSave({
+    enabled: Boolean(sharePath),
+    today,
+    language: runLanguage,
+    state: pyramidState,
+    isTerminal,
+    snapshot: () => ({
+      outcomes: Array.from(outcomesRef.current.entries()),
+      wrongByStage: { ...wrongByStageRef.current },
+      elapsedMs: startRef.current ? Date.now() - startRef.current : 0,
+    }),
+  });
+
   // Daily host: persist the terminal run (after the outcome effect above has
-  // recorded the finale) so a same-day revisit reopens this end screen.
+  // recorded the finale) so a same-day revisit reopens this end screen, then
+  // submit it — a pyramid day counts for the server streak, quests and chest.
+  const save = useDailyScoreSave(today, (outcome) => {
+    if (outcome.status === 'saved') patchDailyResult(today, { streak: outcome.result.streak });
+  });
+  const { send } = save;
   const savedRef = useRef(Boolean(restored));
   useEffect(() => {
     if (!isTerminal || !sharePath || savedRef.current) return;
     savedRef.current = true;
     const { pyramid: _omit, ...state } = pyramidState;
-    saveDailyResult(today, language, {
+    const outcomes = Array.from(outcomesRef.current.entries());
+    const payload: SubmitPayload = {
+      puzzleDate: today,
+      language: runLanguage,
+      displayName: profile?.display_name || profile?.username || t('connections.daily.guestName'),
+      score: pyramidState.score,
+      timeTakenSeconds: startRef.current ? Math.floor((Date.now() - startRef.current) / 1000) : 0,
+      puzzlesSolved: outcomes.filter(([, o]) => o.solved).length,
+      avatarEmoji: profile?.avatar_emoji,
+      avatarColor: profile?.avatar_color,
+      avatarImage: profile?.avatar_image,
+    };
+    saveDailyResult(today, runLanguage, {
       kind: 'pyramid',
       pyramidId: pyramid.id,
       state,
-      outcomes: Array.from(outcomesRef.current.entries()),
+      outcomes,
       streak: streakRef.current,
+      pendingSubmit: payload,
     } satisfies StoredPyramidResult);
-  }, [isTerminal, sharePath, pyramidState, today, language, pyramid.id]);
+    clearPyramidRun(today);
+    void send(payload);
+  }, [isTerminal, sharePath, pyramidState, today, runLanguage, pyramid.id, profile, t, send]);
+
+  useEffect(() => {
+    if (restored?.pendingSubmit && sharePath) void send(restored.pendingSubmit);
+    // Once per mount: a score that never reached the server gets one more try.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleInput = useCallback((value: string) => setInput(value), []);
   const handleSubmit = useCallback(() => {
@@ -372,6 +406,7 @@ function PyramidRun({
         celebrate={!restored}
         shareText={shareText()}
         progressSlot={<ProgressCard api={progressApi} todayISO={today} />}
+        notice={<ScoreSaveNotice save={save} />}
       />
     );
   }

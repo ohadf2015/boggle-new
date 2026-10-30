@@ -17,6 +17,7 @@ import { getOfflineStore } from '@/lib/offline';
 import { getCachedDailyPuzzle } from '@/lib/offline/prefetchDaily';
 import type { LetterGrid, Language } from '@/types';
 import type { DailyChallengePhase } from '../DailyChallenge';
+import { consumeUnfinishedWordHuntRun } from './runStartedMarker';
 
 type SetFn<T> = Dispatch<SetStateAction<T>>;
 
@@ -68,7 +69,8 @@ export function useWordHuntPuzzleInit({
 
       // Mid-game forfeit today (no saved result) → gate re-entry behind a
       // rewarded ad on native. Skipped for practice + post-retry replays.
-      setForfeitedToday(!isPractice && !wasJustReset && hasWordHuntForfeitToday(gameLanguage));
+      const abandonedRun = !isPractice && !isCatchup && consumeUnfinishedWordHuntRun(gameLanguage, date);
+      setForfeitedToday(!isPractice && !wasJustReset && (abandonedRun || hasWordHuntForfeitToday(gameLanguage)));
 
       // Practice mode: bypass already-played gates so the player can replay safely.
       // Catch-up skips the today-only local cache (it's keyed to today) but still

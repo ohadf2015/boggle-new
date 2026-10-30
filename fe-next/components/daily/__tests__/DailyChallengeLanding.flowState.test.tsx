@@ -94,14 +94,14 @@ describe('DailyChallengeLanding — flow state', () => {
     Object.assign(huntStatus, { hasPlayed: true, hasSolved: true });
     played.today = { wordHunt: true, wordWheel: true, wordTower: false, connections: true };
     renderHub();
-    expect(screen.getByTestId('journey-step-connections')).toHaveAttribute('data-state', 'done');
+    expect(document.querySelector('[data-mode="connections"]')).toHaveAttribute('data-state', 'done');
     expect(screen.getByTestId('quest-card-word-tower')).toBeInTheDocument();
   });
 
   it('given the server says Word Tower was played today, then the Word Tower step is done', () => {
     played.today = { wordHunt: false, wordWheel: false, wordTower: true, connections: false };
     renderHub();
-    expect(screen.getByTestId('journey-step-word-tower')).toHaveAttribute('data-state', 'done');
+    expect(document.querySelector('[data-mode="word-tower"]')).toHaveAttribute('data-state', 'done');
   });
 
   describe('given every quest is played today', () => {

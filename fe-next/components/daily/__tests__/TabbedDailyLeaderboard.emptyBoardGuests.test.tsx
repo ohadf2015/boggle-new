@@ -110,7 +110,7 @@ describe('TabbedDailyLeaderboard - empty ranked board with guest solvers', () =>
   it('tells the player how many solved instead of claiming nobody has', async () => {
     mockLeaderboard({ data: [], totalParticipants: 0, totalPlayers: 6, totalSolved: 5, guestPlayerCount: 5 });
 
-    render(<TabbedDailyLeaderboard puzzleDate="2026-01-22" language="en" t={mockT} />);
+    render(<TabbedDailyLeaderboard scope="word-hunt" puzzleDate="2026-01-22" language="en" t={mockT} />);
 
     await waitFor(() => {
       expect(
@@ -123,7 +123,7 @@ describe('TabbedDailyLeaderboard - empty ranked board with guest solvers', () =>
   it('still says be-the-first when nobody has actually solved', async () => {
     mockLeaderboard({ data: [], totalParticipants: 0, totalPlayers: 0, totalSolved: 0, guestPlayerCount: 0 });
 
-    render(<TabbedDailyLeaderboard puzzleDate="2026-01-22" language="en" t={mockT} />);
+    render(<TabbedDailyLeaderboard scope="word-hunt" puzzleDate="2026-01-22" language="en" t={mockT} />);
 
     await waitFor(() => {
       expect(screen.getByText('Be the first today!')).toBeInTheDocument();

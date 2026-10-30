@@ -67,7 +67,8 @@ vi.mock('@/utils/dailyChallenge', () => ({
   updateDailyStreak: (...args: unknown[]) => updateDailyStreakMock(...args),
 }));
 vi.mock('@/utils/dailyChallenge/wordWheelGeneration', () => ({
-  generateWordWheelPuzzle: () => ({
+  generateWordWheelPuzzle: (date?: string) => ({
+    puzzleDate: date, puzzleNumber: 42, language: 'en',
     centerLetter: 'A',
     outerLetters: ['B', 'C', 'D', 'E', 'F', 'G'],
     validWords: [],

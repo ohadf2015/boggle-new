@@ -6,7 +6,7 @@ import { loadDailyResult } from '@/lib/connections/dailyResultStore';
 interface StoredState<T> {
   /** False until this device's storage has been read (pessimistic: render nothing yet). */
   checked: boolean;
-  value: T | null;
+  value: (T & { language: string }) | null;
 }
 
 /**

@@ -136,7 +136,7 @@ describe('TabbedDailyLeaderboard - Solved Count Display', () => {
     // WHEN: We render the leaderboard
     const { default: TabbedDailyLeaderboard } = await import('../TabbedDailyLeaderboard');
     render(
-      <TabbedDailyLeaderboard
+      <TabbedDailyLeaderboard scope="word-hunt"
         puzzleDate="2026-01-22"
         language="en"
         t={mockT}
@@ -180,7 +180,7 @@ describe('TabbedDailyLeaderboard - Solved Count Display', () => {
     // WHEN: We render the leaderboard
     const { default: TabbedDailyLeaderboard } = await import('../TabbedDailyLeaderboard');
     render(
-      <TabbedDailyLeaderboard
+      <TabbedDailyLeaderboard scope="word-hunt"
         puzzleDate="2026-01-22"
         language="en"
         t={mockT}
@@ -221,7 +221,7 @@ describe('TabbedDailyLeaderboard - Solved Count Display', () => {
     // WHEN: We render the leaderboard
     const { default: TabbedDailyLeaderboard } = await import('../TabbedDailyLeaderboard');
     render(
-      <TabbedDailyLeaderboard
+      <TabbedDailyLeaderboard scope="word-hunt"
         puzzleDate="2026-01-22"
         language="en"
         t={mockT}
@@ -261,7 +261,7 @@ describe('TabbedDailyLeaderboard - Solved Count Display', () => {
     // WHEN: We render the leaderboard
     const { default: TabbedDailyLeaderboard } = await import('../TabbedDailyLeaderboard');
     render(
-      <TabbedDailyLeaderboard
+      <TabbedDailyLeaderboard scope="word-hunt"
         puzzleDate="2026-01-22"
         language="en"
         t={mockT}
@@ -306,7 +306,7 @@ describe('TabbedDailyLeaderboard - Solved Count Display', () => {
     // WHEN: We render the leaderboard
     const { default: TabbedDailyLeaderboard } = await import('../TabbedDailyLeaderboard');
     render(
-      <TabbedDailyLeaderboard
+      <TabbedDailyLeaderboard scope="word-hunt"
         puzzleDate="2026-01-22"
         language="en"
         t={mockT}
@@ -356,7 +356,7 @@ describe('TabbedDailyLeaderboard - Solved Count Display', () => {
     // WHEN: We render the leaderboard
     const { default: TabbedDailyLeaderboard } = await import('../TabbedDailyLeaderboard');
     render(
-      <TabbedDailyLeaderboard
+      <TabbedDailyLeaderboard scope="word-hunt"
         puzzleDate="2026-01-22"
         language="en"
         t={mockT}
@@ -374,63 +374,28 @@ describe('TabbedDailyLeaderboard - Solved Count Display', () => {
     expect(checkMarks.length).toBeGreaterThanOrEqual(2);
   });
 
-  it('combined scope: never shows solved > played (splits per-mode when both have solvers)', async () => {
-    // GIVEN: Combined scope. Hunt 6 played / 4 solved, Wheel 6 played / 6 solved.
-    // Without the split, header sums to "10 solved" while only 6 unique players → impossible.
+  it('combined scope: shows how many played and never a summed per-mode solved count', async () => {
+    // A player who solved two modes would count twice in "N solved" — the combined board shows players only.
     (global.fetch as Mock).mockImplementation((url: string) => {
-      if (url.includes('/word-hunt/leaderboard')) {
+      if (url.includes('/api/daily/leaderboard')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({
-            data: [createMockSolvedParticipant(1)],
-            totalParticipants: 1,
-            totalPlayers: 6,
-            totalSolved: 4,
-            guestPlayerCount: 5,
+            data: [{ rank: 1, key: 'a', name: 'Ann', avatarEmoji: null, avatarColor: null, avatarImage: null, customAvatar: null, total: 900, byMode: { 'word-hunt': 500, 'word-wheel': 400, 'word-tower': 0, connections: 0 }, towerHeightM: null, playedModes: ['word-hunt', 'word-wheel'] }],
+            total: 6,
+            countries: [],
           }),
-        });
-      }
-      if (url.includes('/word-wheel/leaderboard')) {
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({
-            data: [{ ...createMockSolvedParticipant(1), score: 50 }],
-            totalParticipants: 6,
-            totalSolved: 6,
-            guestPlayerCount: 0,
-          }),
-        });
-      }
-      if (url.includes('/alltime')) {
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({ data: [], totalParticipants: 0 }),
         });
       }
       return Promise.resolve({ ok: true, json: () => Promise.resolve({}) });
     });
 
     const { default: TabbedDailyLeaderboard } = await import('../TabbedDailyLeaderboard');
-    render(
-      <TabbedDailyLeaderboard
-        puzzleDate="2026-01-22"
-        language="en"
-        scope="combined"
-        t={mockT}
-      />
-    );
+    render(<TabbedDailyLeaderboard puzzleDate="2026-01-22" language="en" scope="combined" t={mockT} />);
 
-    // THEN: Header shows split per-mode solved counts, not summed "10 solved"
     await waitFor(() => {
       expect(screen.getByText('6 played')).toBeInTheDocument();
     });
-
-    // Per-mode solved counts visible separately, so it's never solved > played
-    // (mode is now denoted by a lucide icon rather than an emoji, so match on text only)
-    expect(screen.getByText(/4.*solved/)).toBeInTheDocument();
-    expect(screen.getByText(/6.*solved/)).toBeInTheDocument();
-
-    // Confirm the bug is gone: no element renders the summed "10 solved"
-    expect(screen.queryByText('10 solved')).not.toBeInTheDocument();
+    expect(screen.queryByText(/solved/)).not.toBeInTheDocument();
   });
 });

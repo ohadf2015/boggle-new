@@ -42,9 +42,9 @@ import { questResultForWordTower } from '@/shared/dailyQuestPool';
 export const runtime = 'nodejs';
 
 const TOP_N = 50;
-/** Sanity ceiling. The tallest plausible tower is far below this; anything above
- *  is a malformed or forged payload, not a climb. */
-const MAX_HEIGHT_M = 100_000;
+/** Sanity ceiling on one day's growth: 1000 floors of 3 m, far past any real
+ *  session. Anything above is a malformed or forged payload, not a climb. */
+const MAX_HEIGHT_M = 3_000;
 
 interface SubmitBody {
   heightM?: number;
@@ -91,33 +91,34 @@ export async function POST(request: NextRequest) {
       ? { column: 'player_id' as const, value: user.id }
       : { column: 'guest_fingerprint' as const, value: guestFingerprint as string };
 
-    const { data: existing } = await supabase
-      .from('daily_word_tower_attempts')
-      .select('id, best_height_m, floors')
-      .eq(identity.column, identity.value)
-      .eq('puzzle_date', puzzleDate)
-      .eq('language', language)
-      .maybeSingle();
+    const floors = Math.floor(Number(body.floors) || 0);
+    const lookup = () =>
+      supabase
+        .from('daily_word_tower_attempts')
+        .select('id, best_height_m, floors')
+        .eq(identity.column, identity.value)
+        .eq('puzzle_date', puzzleDate)
+        .eq('language', language)
+        .maybeSingle();
 
-    if (existing) {
+    const mergeInto = async (existing: { id: string; best_height_m: number; floors: number }) => {
       // Keep the MAX, never last-write — a later, worse session must not clobber
       // a better one. `mergeDailyBest` is the same helper the client uses for the
       // localStorage best, so both sides agree on what "today's best" means.
-      const merged = mergeDailyBest(Number(existing.best_height_m) || 0, heightM);
-      if (merged <= (Number(existing.best_height_m) || 0)) {
+      const best = Number(existing.best_height_m) || 0;
+      const merged = mergeDailyBest(best, heightM);
+      if (merged <= best) {
         if (isFinal) {
-          creditDailyQuests(user?.id, questResultForWordTower({
-            heightM: Number(existing.best_height_m) || 0,
-            floors: Number(existing.floors) || 0,
-          }));
+          creditDailyQuests(user?.id, questResultForWordTower({ heightM: best, floors: Number(existing.floors) || 0 }));
         }
-        return NextResponse.json({ ok: true, bestHeightM: Number(existing.best_height_m) || 0, improved: false });
+        return NextResponse.json({ ok: true, bestHeightM: best, improved: false });
       }
+      const mergedFloors = Math.max(Number(existing.floors) || 0, floors);
       const { error } = await supabase
         .from('daily_word_tower_attempts')
         .update({
           best_height_m: merged,
-          floors: Math.max(Number(existing.floors) || 0, Math.floor(Number(body.floors) || 0)),
+          floors: mergedFloors,
           longest_word: body.longestWord ?? null,
           completed_at: new Date().toISOString(),
         })
@@ -127,14 +128,12 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'failed to save' }, { status: 500 });
       }
       // Daily quests (authed only): today's banked climb + floors. Fire-and-forget.
-      if (isFinal) {
-        creditDailyQuests(user?.id, questResultForWordTower({
-          heightM: merged,
-          floors: Math.max(Number(existing.floors) || 0, Math.floor(Number(body.floors) || 0)),
-        }));
-      }
+      if (isFinal) creditDailyQuests(user?.id, questResultForWordTower({ heightM: merged, floors: mergedFloors }));
       return NextResponse.json({ ok: true, bestHeightM: merged, improved: true });
-    }
+    };
+
+    const { data: existing } = await lookup();
+    if (existing) return mergeInto(existing);
 
     const { error } = await supabase.from('daily_word_tower_attempts').insert({
       puzzle_date: puzzleDate,
@@ -142,22 +141,22 @@ export async function POST(request: NextRequest) {
       player_id: user?.id ?? null,
       guest_fingerprint: guestFingerprint,
       best_height_m: heightM,
-      floors: Math.floor(Number(body.floors) || 0),
+      floors,
       longest_word: body.longestWord ?? null,
       completed_at: new Date().toISOString(),
     });
 
     if (error) {
+      // 23505: a concurrent tick inserted today's row first — merge into it.
+      if ((error as { code?: string }).code === '23505') {
+        const { data: raced } = await lookup();
+        if (raced) return mergeInto(raced);
+      }
       captureApiError(error as unknown as Error, 'word-tower-daily-score-insert');
       return NextResponse.json({ error: 'failed to save' }, { status: 500 });
     }
 
-    if (isFinal) {
-      creditDailyQuests(user?.id, questResultForWordTower({
-        heightM,
-        floors: Math.floor(Number(body.floors) || 0),
-      }));
-    }
+    if (isFinal) creditDailyQuests(user?.id, questResultForWordTower({ heightM, floors }));
     return NextResponse.json({ ok: true, bestHeightM: heightM, improved: true });
   } catch (err) {
     captureApiError(err as Error, 'word-tower-daily-score');
@@ -201,7 +200,7 @@ export async function GET(request: NextRequest) {
 
     const leaderboard = (rows ?? []).map((r) => ({
       rank: Number(r.rank_position) || 0,
-      playerId: r.player_id,
+      isGuest: !r.player_id,
       isYou: user
         ? r.player_id === user.id
         : Boolean(guestFingerprint) && r.guest_fingerprint === guestFingerprint,

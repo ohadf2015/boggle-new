@@ -18,6 +18,8 @@ export interface CompactModeRowProps {
   badge?: string;
   /** Visible text in the played badge, e.g. "Done". */
   doneLabel?: string;
+  /** Daily mode id, exposed as `data-mode` so the hub's per-mode state is queryable. */
+  modeId?: string;
 }
 
 /* Every class is spelled out in full: Tailwind only emits a class when the
@@ -74,6 +76,7 @@ export function CompactModeRow({
   artUrl,
   badge,
   doneLabel,
+  modeId,
 }: CompactModeRowProps) {
   const config = COLOR_CONFIGS[color] ?? COLOR_CONFIGS.cyan;
 
@@ -84,6 +87,8 @@ export function CompactModeRow({
       transition={{ delay, type: 'spring', stiffness: 300, damping: 25 }}
       className="w-full"
       data-testid={`compact-row-${color}`}
+      data-mode={modeId}
+      data-state={played ? 'done' : 'todo'}
     >
       <button
         type="button"

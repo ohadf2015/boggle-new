@@ -48,6 +48,8 @@ const PLAYED_KEY: Record<DailyModeId, 'wordWheel' | 'wordHunt' | 'connections' |
   'word-tower': 'wordTower',
 };
 
+const RESULTS_REFRESH_MS = 1500;
+
 function prefersReducedMotion(): boolean {
   return typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 }
@@ -77,6 +79,15 @@ export function DailyResultsHero({
     });
     return () => controls?.stop?.();
   }, [score, animateIn]);
+
+  // The mode's score post is fire-and-forget; re-ask once it has likely landed
+  // (silent revalidation — the trail and streak update in place, no skeleton).
+  const refreshPlayed = useRef(played.refresh);
+  refreshPlayed.current = played.refresh;
+  useEffect(() => {
+    const id = setTimeout(() => { void refreshPlayed.current(); }, RESULTS_REFRESH_MS);
+    return () => clearTimeout(id);
+  }, []);
 
   useEffect(() => {
     if (!celebrate || outcome !== 'win' || celebrated.current) return;

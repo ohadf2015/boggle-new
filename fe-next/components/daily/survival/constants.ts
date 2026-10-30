@@ -66,17 +66,6 @@ export const INVALID_WORD_PENALTY = 5;
 export const NOT_IN_DICTIONARY_PENALTY = 4;
 
 /**
- * Threshold for showing shop hint (half of initial life)
- */
-export const HALF_LIFE_THRESHOLD = 50;
-
-/**
- * Minimum tokens required to auto-unlock a clue
- * With new pricing (1-3 tokens), this triggers after finding a 4-letter word
- */
-export const MIN_TOKENS_FOR_HINT = 1;
-
-/**
  * Duration to show feedback overlay in milliseconds
  */
 export const FEEDBACK_OVERLAY_DURATION = 1200;
@@ -87,17 +76,6 @@ export const FEEDBACK_OVERLAY_DURATION = 1200;
  * then fade out to keep focus on green/yellow clue letters.
  */
 export const GRAY_LETTER_FADE_DELAY = 400;
-
-/**
- * Duration to auto-dismiss shop hint in milliseconds
- * @deprecated Shop has been removed - clues auto-unlock now
- */
-export const SHOP_HINT_DISMISS_DELAY = 5000;
-
-/**
- * Duration to show clue unlock celebration in milliseconds
- */
-export const CLUE_UNLOCK_CELEBRATION_DURATION = 1500;
 
 /**
  * Language-based life drain rate multipliers.

@@ -229,4 +229,15 @@ describe('SurvivalExtraLifeModal', () => {
     expect(screen.getByTestId('survival-extralife-cta')).toBeDefined();
     expect(screen.queryByTestId('survival-extralife-coin-cta')).toBeNull();
   });
+
+  it('given a coin spend in flight, when rendered, then the coin button is disabled', () => {
+    hookReturn.canShowAd = false;
+    render(
+      <SurvivalExtraLifeModal isOpen restoreAmount={50} onRestore={vi.fn()} onDecline={vi.fn()} t={t} language="en"
+        coinCost={50} canAffordCoinRestore onCoinRestore={vi.fn()} coinPending />,
+    );
+    expect(screen.getByTestId('survival-extralife-coin-cta')).toBeDisabled();
+    expect(screen.getByTestId('survival-extralife-decline')).toBeDisabled();
+  });
 });
+

@@ -37,7 +37,7 @@ vi.mock('@/components/ads/ResultsBannerSlot', () => ({ default: () => null }));
 vi.mock('@/components/daily/results/NextQuestCta', () => ({
   NextQuestCta: () => <div data-testid="next-quest-cta" />,
 }));
-const submitDailyScore = vi.fn(async () => null);
+const submitDailyScore = vi.fn(async (..._a: unknown[]) => ({ status: 'failed', retryable: false }) as unknown);
 const fetchDailyLeaderboard = vi.fn(async () => null);
 vi.mock('@/lib/connections/dailyClient', async (orig) => {
   const actual = (await orig()) as object;
@@ -73,7 +73,7 @@ describe('ConnectionsDailyChallenge — finished day stays finished', () => {
     const first = render(<ConnectionsDailyChallenge />);
     burnWholeRun();
     await waitFor(() => expect(screen.getByText('connections.daily.completeTough')).toBeTruthy());
-    expect(window.localStorage.getItem(dailyResultKey('2026-05-30', 'en'))).not.toBeNull();
+    expect(window.localStorage.getItem(dailyResultKey('2026-05-30'))).not.toBeNull();
     first.unmount();
     submitDailyScore.mockClear();
 
@@ -88,7 +88,7 @@ describe('ConnectionsDailyChallenge — finished day stays finished', () => {
 
   it('given a result stored for a different day, then a fresh run starts', () => {
     window.localStorage.setItem(
-      dailyResultKey('2026-05-29', 'en'),
+      dailyResultKey('2026-05-29'),
       JSON.stringify({ kind: 'regular', score: 5, solvedCount: 1, outcomes: [], streak: 1, rank: null }),
     );
     render(<ConnectionsDailyChallenge />);
