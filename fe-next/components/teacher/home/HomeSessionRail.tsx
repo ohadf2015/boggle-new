@@ -7,7 +7,7 @@ import type { Language } from '@/lib/supabase/education/types';
 import type { GradeBand } from '@/lib/education/library';
 import { homeSessionRail, railRunHref } from '@/lib/education/homeSessionRail';
 import { HomeSessionAll } from './HomeSessionAll';
-import { HomeSessionFlowCard, LANGUAGE_NAME_KEY } from './HomeSessionFlowCard';
+import { CARD_ACCENTS, HomeSessionFlowCard, LANGUAGE_NAME_KEY } from './HomeSessionFlowCard';
 import { QUIET_LINK } from './homeStyles';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
@@ -75,8 +75,8 @@ export function HomeSessionRail({ classroomId, languages, gradeBand, nowMs, last
       ) : null}
       {ready && language ? (
         <ul className="flex snap-x snap-mandatory gap-3 overflow-x-auto [scrollbar-width:none] @2xl:grid @2xl:grid-cols-3 @2xl:overflow-visible">
-          {rail.map((item) => (
-            <HomeSessionFlowCard key={item.session.id} item={item} language={language} gradeBand={gradeBand} href={railRunHref(locale, item, classroomId)} t={t} />
+          {rail.map((item, i) => (
+            <HomeSessionFlowCard key={item.session.id} accent={CARD_ACCENTS[i % CARD_ACCENTS.length]}item={item} language={language} gradeBand={gradeBand} href={railRunHref(locale, item, classroomId)} t={t} />
           ))}
         </ul>
       ) : (
@@ -85,8 +85,8 @@ export function HomeSessionRail({ classroomId, languages, gradeBand, nowMs, last
       {ready && language && more.length > 0 ? (
         <div data-testid="home-session-more" className="hidden @2xl:block min-h-0 flex-1 [container:session-more/size]">
           <ul className="hidden grid-cols-3 gap-3 pt-1 [@container_session-more_(min-height:9.5rem)]:grid">
-            {more.map((item) => (
-              <HomeSessionFlowCard key={item.session.id} item={item} language={language} gradeBand={gradeBand} href={railRunHref(locale, item, classroomId)} t={t} testId="home-session-card-more" />
+            {more.map((item, i) => (
+              <HomeSessionFlowCard key={item.session.id} accent={CARD_ACCENTS[(rail.length + i) % CARD_ACCENTS.length]}item={item} language={language} gradeBand={gradeBand} href={railRunHref(locale, item, classroomId)} t={t} testId="home-session-card-more" />
             ))}
           </ul>
         </div>

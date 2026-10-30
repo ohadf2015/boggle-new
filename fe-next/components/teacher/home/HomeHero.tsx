@@ -53,7 +53,7 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
   const code = showCode ? (selected?.join_code?.trim() ?? '') : '';
 
   return (
-    <section data-testid="home-hero" aria-labelledby="home-hero-title" className={cn(PANEL, 'relative @container/hero')}>
+    <section data-testid="home-hero" aria-labelledby="home-hero-title" className={cn(PANEL, 'relative border-s-[6px] border-s-neo-cyan @container/hero')}>
       <div className="flex flex-col gap-2.5 p-3 sm:gap-4 sm:p-5 [@media(max-height:820px)]:gap-2.5 [@media(max-height:820px)]:p-3.5">
         <div className="flex min-w-0 flex-col gap-1 sm:gap-1.5">
           <div className="flex items-center justify-between gap-3">

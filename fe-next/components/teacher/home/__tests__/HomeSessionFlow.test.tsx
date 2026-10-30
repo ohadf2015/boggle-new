@@ -44,6 +44,19 @@ describe('HomeSessionRail flow cards', () => {
     expect(line.className).toBe('sr-only');
   });
 
+  it('Then each card carries its own accent color, neighbours never match, and lime stays reserved for the one primary button', () => {
+    renderRail();
+    const cards = [...screen.getAllByTestId('home-session-card'), ...screen.queryAllByTestId('home-session-card-more')];
+    const accents = cards.map((c) => c.getAttribute('data-accent'));
+    expect(accents.every(Boolean)).toBe(true);
+    accents.slice(1).forEach((a, i) => expect(a).not.toBe(accents[i]));
+    expect(accents).not.toContain('lime');
+    for (const card of cards) {
+      expect(card.className).toMatch(/border-t-neo-(cyan|pink|purple|yellow|orange)/);
+      expect(within(card).getByTestId('home-session-run').className).not.toMatch(/(^|\s)bg-neo-/);
+    }
+  });
+
   it('Then the when-to-use line is the short copy on one line', () => {
     renderRail();
     const [card] = screen.getAllByTestId('home-session-card');

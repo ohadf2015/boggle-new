@@ -35,7 +35,7 @@ const CLASS_B = { id: 'c4a', name: '4A - Reading', member_count: 26, join_code: 
 const COLOR_FILL = /(^|\s)bg-neo-(lime|cyan|pink|purple|orange|yellow)(\/\d+)?(\s|$)/;
 
 function colorFills(root: HTMLElement): HTMLElement[] {
-  return Array.from(root.querySelectorAll<HTMLElement>('[class]')).filter((el) => COLOR_FILL.test(el.getAttribute('class') ?? ''));
+  return Array.from(root.querySelectorAll<HTMLElement>('[class]')).filter((el) => COLOR_FILL.test(el.getAttribute('class') ?? '') && !el.closest('[data-accent-decor]'));
 }
 
 beforeEach(() => {
@@ -50,6 +50,14 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe('Teacher Home: calm, one primary', () => {
+  it('Then color comes back as decoration only: accent pieces hold no buttons or links, and the week numbers each get their own accent', () => {
+    render(<TeacherDashboard proOffer={{ kind: 'trial', onDismiss: vi.fn(), tracked: true }} />);
+    const home = screen.getByTestId('teacher-home');
+    for (const decor of home.querySelectorAll('[data-accent-decor]')) expect(decor.querySelector('a,button')).toBeNull();
+    const colors = ['games', 'students', 'active'].map((id) => screen.getByTestId(`home-week-${id}`).className.match(/text-neo-(cyan|pink|purple|yellow|orange)/)?.[1]);
+    expect(new Set(colors).size).toBe(3);
+  });
+
   it('Given one class and a Pro offer, Then Start live is the only colored fill on the page apart from the small PRO badge', () => {
     render(<TeacherDashboard proOffer={{ kind: 'trial', onDismiss: vi.fn(), tracked: true }} />);
     const fills = colorFills(screen.getByTestId('teacher-home'));

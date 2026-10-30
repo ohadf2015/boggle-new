@@ -11,9 +11,9 @@ import { PANEL, SKELETON } from './homeStyles';
 type T = (key: string, params?: Record<string, string | number>) => string;
 
 const STATS = [
-  { id: 'games', key: 'gamesPlayed', label: 'eduShell.week.games' },
-  { id: 'students', key: 'totalStudents', label: 'eduShell.week.students' },
-  { id: 'active', key: 'activeClasses', label: 'eduShell.week.active' },
+  { id: 'games', key: 'gamesPlayed', label: 'eduShell.week.games', tone: 'text-neo-cyan' },
+  { id: 'students', key: 'totalStudents', label: 'eduShell.week.students', tone: 'text-neo-pink' },
+  { id: 'active', key: 'activeClasses', label: 'eduShell.week.active', tone: 'text-neo-yellow' },
 ] as const;
 
 /** Three real numbers for the last 7 days, with the mascot reacting; "—" when the read failed. */
@@ -32,7 +32,7 @@ export function HomeWeekCard({ summary, status, t, children }: { summary: Teache
           <dl className="mt-1 grid grid-cols-3 gap-2">
             {STATS.map((s) => (
               <div key={s.id} className="flex min-w-0 flex-col">
-                <dd data-testid={`home-week-${s.id}`} className="font-neo-display text-2xl font-black tabular-nums leading-none text-neo-cream">
+                <dd data-testid={`home-week-${s.id}`} className={cn('font-neo-display text-2xl font-black tabular-nums leading-none', s.tone)}>
                   {status === 'loading' ? (
                     <span aria-hidden="true" className={cn(SKELETON, 'inline-block h-6 w-7')} />
                   ) : summary ? (
