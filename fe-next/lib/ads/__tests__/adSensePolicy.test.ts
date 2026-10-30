@@ -22,7 +22,7 @@ describe('adSensePolicy — config', () => {
     expect(getAdSenseClient()).toBe('ca-pub-9999999999999999');
   });
 
-  it('is dark (not configured) unless explicitly enabled with a non-rejected client', () => {
+  it('is dark (not configured) unless explicitly enabled with a client id', () => {
     expect(isAdSenseConfigured()).toBe(false);
     process.env.NEXT_PUBLIC_ADSENSE_ENABLED = 'true';
     expect(isAdSenseConfigured()).toBe(false);
@@ -37,15 +37,20 @@ describe('adSensePolicy — account verification meta', () => {
     delete process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
   });
 
-  // Rejected publisher must not ship as a verification meta (t_02e92b5a).
-  it('returns empty meta while the publisher is rejected / unset', () => {
+  it('returns empty meta while env names no publisher', () => {
     expect(isAdSenseConfigured()).toBe(false);
     expect(getAdSenseAccountMeta()).toBe('');
   });
 
-  it('drops the rejected publisher even if env still names it', () => {
+  // AdSense rejects a site, not the account — the re-review runs on the same pub.
+  it('accepts the previously rejected publisher when env names it (never as a default)', () => {
     process.env.NEXT_PUBLIC_ADSENSE_CLIENT = 'ca-pub-1896836706464880';
-    expect(getAdSenseClient()).toBe('');
+    expect(getAdSenseClient()).toBe('ca-pub-1896836706464880');
+    expect(getAdSenseAccountMeta()).toBe('ca-pub-1896836706464880');
+  });
+
+  it('ignores a malformed publisher id', () => {
+    process.env.NEXT_PUBLIC_ADSENSE_CLIENT = 'pub-123';
     expect(getAdSenseAccountMeta()).toBe('');
   });
 

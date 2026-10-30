@@ -19,13 +19,19 @@
  * child tier (Families/COPPA) and withheld entirely until advertising consent is granted
  * (Consent Mode v2: we fully gate the script, not just personalization).
  */
-/** Rejected web AdSense publisher. Never default to this; never ship it in HTML. */
+/**
+ * The publisher whose *site review* for lexiclash.live was rejected ("Low value
+ * content"). AdSense rejects a site, not the account: the re-review runs on this
+ * same pub, so it is no longer filtered out of env (2026-10-30). It is still
+ * never a code default — nothing ships unless env names a publisher.
+ */
 export const REJECTED_ADSENSE_PUBLISHER = 'ca-pub-1896836706464880';
 
+const PUBLISHER_RE = /^ca-pub-\d{10,20}$/;
+
 function sanitizeAdSenseClient(id: string | undefined): string {
-  if (!id) return '';
-  if (id === REJECTED_ADSENSE_PUBLISHER) return '';
-  return id;
+  const v = id?.trim() ?? '';
+  return PUBLISHER_RE.test(v) ? v : '';
 }
 
 /**
@@ -74,9 +80,10 @@ export function summarizeAdSenseFill(root: {
 }
 
 /**
- * The `<meta name="google-adsense-account">` content if (and only if) env has a
- * non-rejected publisher id. Root layout must NOT call this until a new approval
- * lands — shipping the rejected pub in HTML was t_02e92b5a.
+ * The `<meta name="google-adsense-account">` content if (and only if) env names a
+ * publisher id. The root layout emits it only then: it is ~60 bytes of HTML and
+ * loads no script, and it lets AdSense confirm site ownership for a re-review.
+ * (t_02e92b5a removed a *hardcoded* meta; this one is env-only, off by default.)
  */
 export function getAdSenseAccountMeta(): string {
   return getAdSenseClient();

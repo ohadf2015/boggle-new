@@ -1,5 +1,6 @@
 import './globals.css';
 import type { Metadata } from 'next';
+import { getAdSenseAccountMeta } from '@/lib/ads/adSensePolicy';
 import type { ReactNode } from 'react';
 import Script from 'next/script';
 import { LazyMotionRoot } from './LazyMotionRoot';
@@ -103,10 +104,10 @@ export const metadata: Metadata = {
         // so it is inlined rather than env-gated. Env var stays as an override for
         // re-issue. Yandex re-checks periodically — removing this un-verifies us.
         'yandex-verification': process.env.NEXT_PUBLIC_YANDEX_VERIFICATION || 'a0492cff1a6bdd70',
-        // Do NOT ship google-adsense-account / adsbygoogle for ca-pub-1896836706464880.
-        // That publisher was REJECTED; the meta was still in prod HTML (t_02e92b5a)
-        // and Auto-Ads previously cost 162 KiB + mobile PSI 45→33. Re-add the meta
-        // only after a new approved publisher id is set in env.
+        // AdSense site-ownership meta — env-only (NEXT_PUBLIC_ADSENSE_CLIENT[_ID]), absent by
+        // default. Meta only: the AdSense script stays off the root (Auto-Ads cost 162 KiB and
+        // mobile PSI 45→33 before). See docs/ADSENSE-RESUBMISSION.md (2026-10-30).
+        ...(getAdSenseAccountMeta() ? { 'google-adsense-account': getAdSenseAccountMeta() } : {}),
         'rating': 'General',
         'msapplication-TileColor': '#1a1a2e',
         'msapplication-TileImage': '/icon-144.png',

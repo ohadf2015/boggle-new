@@ -1,3 +1,4 @@
+import { WORD_LIST_INDEXING } from '@/lib/seo/wordLists/indexPolicy';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { getCatalog, type GradeHub, type LangHub, type TopicHub } from '@/lib/seo/wordLists/catalog';
@@ -126,6 +127,7 @@ export function gradeHubMetadata(hub: GradeHub, locale: string): Metadata {
     locales: hub.locales,
     title: c.title,
     description: c.description,
+    index: WORD_LIST_INDEXING.gradeHubs,
   });
 }
 
@@ -187,6 +189,7 @@ export function topicHubMetadata(hub: TopicHub, locale: string): Metadata {
     locales: hub.locales,
     title: c.title,
     description: c.description,
+    index: WORD_LIST_INDEXING.topicHubs,
   });
 }
 

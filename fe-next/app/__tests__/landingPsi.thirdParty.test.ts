@@ -17,10 +17,10 @@ describe('landing PSI third-party first-paint guards', () => {
     expect(existsSync(join(feRoot, '..', 'components', 'ads', 'AdSenseLoader.tsx'))).toBe(false);
   });
 
-  it('does not ship the rejected AdSense publisher meta on the root layout', () => {
+  it('ships the AdSense account meta only from env, never hardcoded, and no adsbygoogle.js', () => {
     const root = readFileSync(join(feRoot, 'layout.tsx'), 'utf8');
-    expect(root).not.toContain('getAdSenseAccountMeta');
-    expect(root).not.toMatch(/['"]google-adsense-account['"]\s*:/);
+    expect(root).not.toMatch(/ca-pub-\d+/);
+    expect(root).toMatch(/getAdSenseAccountMeta\(\)\s*\?/);
     expect(root).not.toMatch(/adsbygoogle\.js/);
   });
 
