@@ -1,28 +1,36 @@
 /**
- * Post-signup first game (t_3b095edf).
+ * Post-signup first game (t_3b095edf, reach fix t_5ebe9081).
  *
  * 45% of new student accounts never play in the 24h after signup, and those
  * almost never come back. Signups that start from a game moment keep playing;
  * signups from navigation (header/menu, edu access as a student, a first-win
- * sheet with nothing to resume) land on the same home grid they just left.
+ * sheet with nothing to resume) need one visible door into a game.
+ *
+ * Eligibility comes from the fresh-signup mark AuthProvider writes on the
+ * guest → authed flip (FRESH_SIGNUP_KEY) plus the CURRENT ROUTE — not from
+ * the auth/callback redirect. Google One Tap / in-page ID-token signups (the
+ * large majority) never navigate through /auth/callback, and redirect
+ * providers always carry next=<the page they were on>, so a "landed on home
+ * by default redirect" marker can never arm for them (0 exposures in the
+ * first 16h of #1503).
  *
  * Assignment is a Growth Radar flag (`signup-first-game`). Null or `control`
- * is today's home. Only `play` renders the card. getFlag logs the exposure,
- * so callers must pass enabled=false until the visitor is actually on that
- * post-signup home. Teachers and any explicit `next` never enter the test.
+ * renders nothing. Only `play` renders the card. getFlag logs the exposure,
+ * so callers must pass enabled=false until the visitor is actually eligible.
+ * Teachers, anonymous sessions, explicit game deep links, and active game /
+ * room / daily routes never enter the test.
  *
  * The goal both arms can reach is `growth:account_first_game`, fired once
  * per account on its first completed game after signup — not `growth:game_started`
  * (control already converts ~89% on that).
  */
 
+import { stripLocalePrefix } from '@/lib/perf/heavyGamePath';
 import { quickMatchHref, wordWheelBridgeHref } from './firstGameBridge';
 
 export const SIGNUP_FIRST_GAME_KEY = 'signup-first-game';
 export const SIGNUP_FIRST_GAME_TREATMENT = 'play';
 
-/** Set by the auth callback only when the redirect is the default home. */
-export const POST_SIGNUP_HOME_KEY = 'lexiclash_post_signup_home';
 /** Set by AuthProvider for a genuinely fresh account. Session-scoped. */
 export const FRESH_SIGNUP_KEY = 'lexiclash_fresh_signup';
 /** Armed until the account's first completed game. Device-scoped, once. */
@@ -63,9 +71,10 @@ export function isTeacherRole(role: string | null | undefined): boolean {
 
 /**
  * Navigation signups that have nothing to resume. A first-win sheet only
- * qualifies when no game is waiting (room invite, pending daily result, or
- * an explicit next — the last is enforced by the home-landing marker).
- * Game-context surfaces already have a reason to play and stay out.
+ * qualifies when no game is waiting (room invite or pending daily result);
+ * an explicit game deep link is excluded by route eligibility instead
+ * (isSignupFirstGamePath). Game-context surfaces already have a reason to
+ * play and stay out.
  */
 export function isSignupFirstGameSurface(
   surface: string | null | undefined,
@@ -80,6 +89,42 @@ export function isSignupFirstGameSurface(
 
 export function signupQuickPlayHref(locale: string): string {
   return quickMatchHref(locale);
+}
+
+/**
+ * Routes where the card must never arm: an active game or room, a daily in
+ * progress, and the auth flow itself. SEO landings (`/sv/swedish-multiplayer-word-game`,
+ * `/blast`, `/word-tower`, …) stay eligible — they are content pages with game
+ * links, exactly where an in-page Google signup leaves a fresh account.
+ */
+const GAME_ROUTE_PREFIXES = [
+  '/singleplayer',
+  '/multiplayer',
+  '/player',
+  '/join',
+  '/quick-play',
+  '/daily',
+  '/challenge',
+  '/friend-challenge',
+  '/adventure',
+  '/education/live',
+  '/custom',
+  '/brain',
+  '/embed',
+  '/auth',
+] as const;
+
+export function isSignupFirstGamePath(pathname: string | null | undefined): boolean {
+  // Unknown route: no evidence of a game context — the storage guards still decide.
+  if (!pathname) return true;
+  const path = stripLocalePrefix(pathname);
+  return !GAME_ROUTE_PREFIXES.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
+}
+
+/** Home (`/` or `/{locale}`) — the inline slot there wins over the floating card. */
+export function isSignupFirstGameHomePath(pathname: string | null | undefined): boolean {
+  if (!pathname) return false;
+  return stripLocalePrefix(pathname) === '/';
 }
 
 export function signupDailyHref(locale: string): string {
@@ -120,19 +165,19 @@ function readJson(raw: string | null): FreshSignupMark | null {
   }
 }
 
-export function markPostSignupHomeLanding(): void {
-  const box = storage('sessionStorage');
-  if (!box) return;
-  try {
-    box.setItem(POST_SIGNUP_HOME_KEY, '1');
-  } catch {
-    /* storage unavailable — the card stays off, which is the control */
-  }
+export interface FreshSignupUser {
+  id: string;
+  is_anonymous?: boolean;
 }
 
-/** Idempotent. Does not re-arm the goal after this account already played. */
-export function markFreshSignup(userId: string, surface: string | null | undefined): void {
-  if (!userId) return;
+/**
+ * Idempotent. Does not re-arm the goal after this account already played.
+ * Anonymous sessions (anon classroom students) are not signups: they never
+ * arm the card or the goal (signup-event-anon-guard, t_5ebe9081).
+ */
+export function markFreshSignup(user: FreshSignupUser | null | undefined, surface: string | null | undefined): void {
+  const userId = user?.id;
+  if (!userId || user?.is_anonymous === true) return;
   const session = storage('sessionStorage');
   const local = storage('localStorage');
   if (!session || !local) return;
@@ -182,17 +227,20 @@ export function consumeAccountFirstGamePending(): FreshSignupMark | null {
 }
 
 export interface SignupFirstGameRead {
-  landedHome: boolean;
+  /** Current route is not an active game / room / daily / auth page. */
+  pathEligible: boolean;
   fresh: FreshSignupMark | null;
   pendingGame: boolean;
   role: string | null | undefined;
   userId: string | null | undefined;
+  isAnonymous?: boolean;
   stillPending: boolean;
 }
 
 export function offerFromRead(read: SignupFirstGameRead): SignupFirstGameOffer | null {
-  if (!read.landedHome || !read.fresh) return null;
+  if (!read.pathEligible || !read.fresh) return null;
   if (!read.userId || read.fresh.userId !== read.userId) return null;
+  if (read.isAnonymous === true) return null;
   if (isTeacherRole(read.role)) return null;
   if (!isSignupFirstGameSurface(read.fresh.surface, read.pendingGame)) return null;
   if (!read.stillPending) return null;

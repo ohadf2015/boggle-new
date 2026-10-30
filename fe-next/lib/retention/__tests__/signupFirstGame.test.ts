@@ -1,8 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import {
+  FRESH_SIGNUP_KEY,
   SIGNUP_FIRST_GAME_KEY,
   SIGNUP_FIRST_GAME_TREATMENT,
+  ACCOUNT_FIRST_GAME_PENDING_KEY,
   consumeAccountFirstGamePending,
+  isSignupFirstGameHomePath,
+  isSignupFirstGamePath,
   isSignupFirstGameSurface,
   isTeacherRole,
   markFreshSignup,
@@ -31,11 +35,12 @@ function installStorage() {
 
 function read(overrides: Partial<SignupFirstGameRead> = {}): SignupFirstGameRead {
   return {
-    landedHome: true,
+    pathEligible: true,
     fresh: { userId: 'u1', surface: 'header_or_menu' },
     pendingGame: false,
     role: 'student',
     userId: 'u1',
+    isAnonymous: false,
     stillPending: true,
     ...overrides,
   };
@@ -67,9 +72,10 @@ describe('signup first game', () => {
     expect(isSignupFirstGameSurface('mp_sheet', false)).toBe(false);
   });
 
-  it('exposes only a fresh student who landed on home with no game waiting', () => {
+  it('exposes only a fresh student on a non-game route with no game waiting', () => {
     expect(offerFromRead(read())?.expose).toBe(true);
-    expect(offerFromRead(read({ landedHome: false }))).toBeNull();
+    expect(offerFromRead(read({ pathEligible: false }))).toBeNull();
+    expect(offerFromRead(read({ isAnonymous: true }))).toBeNull();
     expect(offerFromRead(read({ role: 'teacher' }))).toBeNull();
     expect(offerFromRead(read({ role: 'admin' }))).toBeNull();
     expect(isTeacherRole('student')).toBe(false);
@@ -98,10 +104,48 @@ describe('signup first game', () => {
 
   it('fires the account goal once, and does not re-arm it', () => {
     installStorage();
-    markFreshSignup('u1', 'header_or_menu');
+    markFreshSignup({ id: 'u1' }, 'header_or_menu');
     expect(consumeAccountFirstGamePending()).toEqual({ userId: 'u1', surface: 'header_or_menu' });
     expect(consumeAccountFirstGamePending()).toBeNull();
-    markFreshSignup('u1', 'header_or_menu');
+    markFreshSignup({ id: 'u1' }, 'header_or_menu');
     expect(consumeAccountFirstGamePending()).toBeNull();
+  });
+
+  it('never arms anonymous sessions — anon classroom students are not signups', () => {
+    installStorage();
+    markFreshSignup({ id: 'anon1', is_anonymous: true }, 'header_or_menu');
+    expect(sessionStorage.getItem(FRESH_SIGNUP_KEY)).toBeNull();
+    expect(localStorage.getItem(ACCOUNT_FIRST_GAME_PENDING_KEY)).toBeNull();
+    expect(consumeAccountFirstGamePending()).toBeNull();
+    markFreshSignup(null, 'header_or_menu');
+    expect(sessionStorage.getItem(FRESH_SIGNUP_KEY)).toBeNull();
+  });
+
+  it('keeps SEO landings eligible and blocks active game / room / daily / auth routes', () => {
+    // Where an in-page Google signup actually leaves the fresh account:
+    expect(isSignupFirstGamePath('/sv/swedish-multiplayer-word-game')).toBe(true);
+    expect(isSignupFirstGamePath('/en/play-boggle-online-free')).toBe(true);
+    expect(isSignupFirstGamePath('/he')).toBe(true);
+    expect(isSignupFirstGamePath('/en/leaderboard')).toBe(true);
+    expect(isSignupFirstGamePath('/en/blast')).toBe(true);
+    expect(isSignupFirstGamePath(null)).toBe(true);
+    // Active game / room / daily in progress / auth flow:
+    expect(isSignupFirstGamePath('/en/multiplayer')).toBe(false);
+    expect(isSignupFirstGamePath('/he/singleplayer')).toBe(false);
+    expect(isSignupFirstGamePath('/en/join/ABC123')).toBe(false);
+    expect(isSignupFirstGamePath('/en/player/room-9')).toBe(false);
+    expect(isSignupFirstGamePath('/en/quick-play')).toBe(false);
+    expect(isSignupFirstGamePath('/en/daily/word-wheel')).toBe(false);
+    expect(isSignupFirstGamePath('/he/daily')).toBe(false);
+    expect(isSignupFirstGamePath('/en/challenge/xyz')).toBe(false);
+    expect(isSignupFirstGamePath('/en/auth/callback')).toBe(false);
+  });
+
+  it('knows home so the floating card never doubles the inline slot', () => {
+    expect(isSignupFirstGameHomePath('/')).toBe(true);
+    expect(isSignupFirstGameHomePath('/he')).toBe(true);
+    expect(isSignupFirstGameHomePath('/en')).toBe(true);
+    expect(isSignupFirstGameHomePath('/en/leaderboard')).toBe(false);
+    expect(isSignupFirstGameHomePath(null)).toBe(false);
   });
 });

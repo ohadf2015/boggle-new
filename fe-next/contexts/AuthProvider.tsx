@@ -168,8 +168,10 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
         if (isRecentAccount(user.created_at, Date.now())) {
           void persistProfileAttribution(source);
           // t_3b095edf: arm the post-signup first-game card and the once-per-account
-          // goal. No-op if this account already completed a game. Never blocks auth.
-          markFreshSignup(user.id, source);
+          // goal. No-op if this account already completed a game — or if the session
+          // is anonymous (t_5ebe9081: anon classroom students are not signups).
+          // Never blocks auth.
+          markFreshSignup(user, source);
         }
         // Allowlist bridge: if this email was pre-approved for teacher access, consume the entry.
         if (user?.email) {
