@@ -93,7 +93,7 @@ vi.mock('../RoomListView', () => ({
   ),
 }));
 
-vi.mock('../JoinRoomModal', () => ({
+vi.mock('../entry/JoinSheet', () => ({
   __esModule: true,
   default: ({
     isOpen,
@@ -118,7 +118,7 @@ vi.mock('../JoinRoomModal', () => ({
     ) : null,
 }));
 
-vi.mock('../CreateRoomModal', () => ({
+vi.mock('../entry/CreateSheet', () => ({
   __esModule: true,
   default: ({
     isOpen,

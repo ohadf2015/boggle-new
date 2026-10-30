@@ -13,7 +13,7 @@
  * on a grid, three seconds before a multiple-choice question appears, is worse
  * than teaching them nothing.
  */
-import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { vi, describe, it, expect, beforeEach, onTestFinished } from 'vitest';
 /* eslint-disable react/display-name */
 import React from 'react';
 import { render, screen } from '@testing-library/react';
@@ -85,6 +85,7 @@ vi.mock('@/hooks/useAvatarPremium', () => ({ useAvatarPremium: () => ({ isPremiu
 vi.mock('@/components/avatar/AvatarBuilderModal', () => ({ __esModule: true, default: () => null }));
 
 import PlayerWaitingView from '../PlayerWaitingView';
+import { setLobbyViewport } from '@/components/multiplayer/lobby/__tests__/lobbyViewport';
 
 const defaultProps = {
   gameCode: 'JATS5Z',
@@ -110,6 +111,8 @@ describe('PlayerWaitingView — classroom students get no host controls', () => 
   });
 
   it('keeps both for an ordinary public room', () => {
+    setLobbyViewport('desktop');
+    onTestFinished(() => setLobbyViewport('phone'));
     render(<PlayerWaitingView {...defaultProps} />);
     expect(screen.getAllByTestId('mobile-share-section').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByTestId('invite-card').length).toBeGreaterThanOrEqual(1);
@@ -145,6 +148,8 @@ describe('PlayerWaitingView — classroom students get no host controls', () => 
   });
 
   it('still falls back to the room mode outside classroom rooms', () => {
+    setLobbyViewport('desktop');
+    onTestFinished(() => setLobbyViewport('phone'));
     render(<PlayerWaitingView {...defaultProps} />);
     expect(screen.getAllByTestId('game-instructions')[0].getAttribute('data-mode')).toBe('classic');
   });

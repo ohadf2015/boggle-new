@@ -153,7 +153,7 @@ export function MpFinalFooter({ isHost, isReady, onRematch, onLeave, onShare, le
         <DirectionalIcon icon={LogOut} mirror className="w-5 h-5" />
         {t(leaveKey)}
       </button>
-      <button type="button" data-testid="mp-results-share" onClick={onShare} className={cn(quiet, 'border-neo-black bg-neo-pink text-neo-black')}>
+      <button type="button" data-testid="mp-results-share" onClick={onShare} className={quiet}>
         <Share2 aria-hidden="true" className="w-5 h-5" />
         {t('mpUi.results.share')}
       </button>

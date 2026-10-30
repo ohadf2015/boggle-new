@@ -54,8 +54,7 @@ vi.mock('@/hooks/gameState', () => ({
 vi.mock('../../hooks/useNativeShare', () => ({ useNativeShare: () => ({ canShare: false, share: vi.fn() }) }));
 vi.mock('@/components/ui/DJMascot', () => ({ DJMascotWithEntrance: () => null }));
 vi.mock('@/components/GameModeSelector', () => ({ GameModeSelector: () => null }));
-vi.mock('../components/pre-game/PresetSelector', () => ({
-  PresetSelector: () => null,
+vi.mock('@/components/multiplayer/lobby/gamePresets', () => ({
   GAME_PRESETS: {
     fast: { timer: 1, difficulty: 'EASY', nameKey: 'hostView.presetQuick' },
     challenge: { timer: 5, difficulty: 'HARD', nameKey: 'hostView.presetPro' },
@@ -73,9 +72,7 @@ vi.mock('../components/pre-game/LobbyAudioButton', () => ({ LobbyAudioButton: ()
 vi.mock('../components/pre-game/desktop', () => ({
   DesktopLobbyLayout: ({ leftContent }: { leftContent?: React.ReactNode }) =>
     React.createElement('div', null, leftContent as React.ReactNode),
-  SettingsPanel: () => null,
   InviteCard: () => null,
-  EnhancedPlayerList: () => null,
 }));
 // Avatar-part reward is the relocated lobby ad — stubbed (heavy deps) so the
 // emote-tray assertions stay focused.

@@ -51,9 +51,8 @@ vi.mock('@/utils/growthTracking', () => ({
 }));
 
 vi.mock('../RoomListView', () => ({ __esModule: true, default: () => <div data-testid="room-list-view" /> }));
-vi.mock('../JoinRoomModal', () => ({ __esModule: true, default: () => null }));
-vi.mock('../CreateRoomModal', () => ({ __esModule: true, default: () => null }));
-vi.mock('@/components/multiplayer/SeasonBanner', () => ({ SeasonBanner: () => null }));
+vi.mock('../entry/JoinSheet', () => ({ __esModule: true, default: () => null }));
+vi.mock('../entry/CreateSheet', () => ({ __esModule: true, default: () => null }));
 vi.mock('@/components/multiplayer/MatchmakingOverlay', () => ({ MatchmakingOverlay: () => null }));
 vi.mock('@/hooks/useMatchmaking', () => ({
   useMatchmaking: () => ({

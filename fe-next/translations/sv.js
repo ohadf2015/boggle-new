@@ -20403,7 +20403,8 @@ const sv = {
       "editSettings": "Ändra rundans inställningar",
       "chatHint": "Säg hej till gänget",
       "chatUnread": "{count} nya",
-      "modeOn": "{mode} är valt — tryck Start"
+      "modeOn": "{mode} är valt — tryck Start",
+      "progressNotSaved": "Vi kunde inte spara spelet. Om servern startas om kan framstegen gå förlorade."
     },
     "round": {
       "getReady": "Gör dig redo",
@@ -20502,6 +20503,12 @@ const sv = {
       "share": "Dela",
       "seriesChampion": "Seriemästare",
       "teacherPaced": "Din lärare startar nästa spel",
+      "calloutPhotoWon": "Fotofinish! Du slog {name} med {points}",
+      "calloutPhotoLost": "Fotofinish! {name} slog dig med {points}",
+      "calloutComeback": "Comeback! Upp {places} i serien",
+      "calloutUnique": "Ord bara du hittade: {count}",
+      "detailsWords": "Dina ord",
+      "detailsNoWords": "Inga ord den här rundan",
       "backToClass": "Tillbaka till klassen",
       "endClassTitle": "Avsluta klassens spel?",
       "endClassBody": "Rummet stängs för alla och du går tillbaka till din klassöversikt.",
@@ -21626,6 +21633,13 @@ const sv = {
     }
   }
   // @teacherLifecycleEmail:end
+  ,
+  // @eduPolish:start
+  "eduPolish": {
+    "seatCapReached": "{name} tittar på: klassen är full ({cap} spelare)",
+    "csvDropHint": "Släpp en CSV-fil här eller klicka för att välja"
+  }
+  // @eduPolish:end
 };
 
 export { sv };

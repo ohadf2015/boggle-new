@@ -1,7 +1,8 @@
-import { vi, describe, it, expect } from 'vitest';
+import { vi, describe, it, expect, onTestFinished } from 'vitest';
 import React from 'react';
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import PlayerWaitingView from '../PlayerWaitingView';
+import { setLobbyViewport } from '@/components/multiplayer/lobby/__tests__/lobbyViewport';
 
 const handlers = new Map<string, (d: unknown) => void>();
 const mockSocket = {
@@ -80,15 +81,22 @@ describe('PlayerWaitingView — joiner lobby on the shell', () => {
   });
 
   it('one how-to control per layout: the rules accordion on desktop, the pill → sheet on phone', () => {
-    render(<PlayerWaitingView {...props} />);
+    setLobbyViewport('desktop');
+    onTestFinished(() => setLobbyViewport('phone'));
+    const { unmount } = render(<PlayerWaitingView {...props} />);
     const desktop = within(screen.getByTestId('desktop-lobby-layout'));
     expect(desktop.getAllByTestId('game-instructions')).toHaveLength(1);
     expect(desktop.queryByText('mpUi.lobby.howToPlay')).toBeNull();
+    unmount();
+    setLobbyViewport('phone');
+    render(<PlayerWaitingView {...props} />);
     expect(phone().queryByTestId('game-instructions')).toBeNull();
     expect(phone().getByText('mpUi.lobby.howToPlay')).toBeInTheDocument();
   });
 
   it('desktop keeps the room chat in the right rail', () => {
+    setLobbyViewport('desktop');
+    onTestFinished(() => setLobbyViewport('phone'));
     render(<PlayerWaitingView {...props} />);
     expect(within(screen.getByTestId('desktop-chat-area')).getByTestId('room-chat')).toBeInTheDocument();
   });

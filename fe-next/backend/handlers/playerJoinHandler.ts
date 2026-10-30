@@ -48,6 +48,7 @@ import { answerMissingRoom } from './classroomMissingRoom.js';
 import logger from '../utils/logger.js';
 import { validatePayload, joinGameSchema } from '../utils/socketValidation.js';
 import { emitClassroomContext } from '../modules/classroomGameContext.js';
+import { broadcastRoomUsers } from './classroomUsersBroadcast.js';
 import { checkClassroomSeat } from './classroomSeatGate.js';
 import { MAX_PLAYERS_PER_ROOM } from '../utils/consts.js';
 import { seatedPlayerCount } from '../modules/roomSeats.js';
@@ -267,6 +268,10 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
         spectators: getGameSpectators(gameCode)
       });
 
+      if ((game.isClassroom || seat.game) && game.hostSocketId) {
+        io.to(game.hostSocketId).emit('classroomSeatCapReached', { gameCode, username, cap: MAX_PLAYERS_PER_ROOM });
+      }
+
       logger.info('SOCKET', `${username} joined as spectator in game ${gameCode}`);
       return;
     }
@@ -324,10 +329,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     // Handle tournament join
     handleTournamentJoin(io, socket, gameCode, username, userAvatar);
 
-    // Broadcast updates
-    broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
-      users: getGameUsers(gameCode)
-    });
+    broadcastRoomUsers(io, gameCode);
     broadcastActiveRooms(io, getActiveRooms());
 
     // A newly-joined player starts un-ready, so the lobby auto-start's

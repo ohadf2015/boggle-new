@@ -20,8 +20,6 @@ const OWNED = [
   'components/multiplayer/MultiplayerFlow.tsx',
   'components/multiplayer/useMultiplayerFlowState.ts',
   'components/multiplayer/RoomListView.tsx',
-  'components/multiplayer/CreateRoomModal.tsx',
-  'components/multiplayer/JoinRoomModal.tsx',
   'components/multiplayer/ArenaCTAStrip.tsx',
   'components/multiplayer/ArenaEmptyState.tsx',
   'components/multiplayer/AvatarStack.tsx',

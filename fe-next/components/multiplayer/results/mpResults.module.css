@@ -184,3 +184,55 @@
   -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 0%, transparent 100%);
   mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 0%, transparent 100%);
 }
+
+.medalDrop {
+  animation: medal-drop 520ms cubic-bezier(0.34, 1.56, 0.64, 1) 200ms both;
+}
+@keyframes medal-drop {
+  0% { transform: translateY(-48px) rotate(-30deg) scale(1.4); }
+  70% { transform: translateY(3px) rotate(6deg) scale(0.96); }
+  100% { transform: translateY(0) rotate(-8deg) scale(1); }
+}
+.badgeIn {
+  animation: badge-in 340ms cubic-bezier(0.34, 1.56, 0.64, 1) 650ms both;
+}
+@keyframes badge-in {
+  0% { transform: scale(0) rotate(-40deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+.rewardPop {
+  animation: reward-pop 380ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes reward-pop {
+  0% { transform: translateY(10px) scale(0); }
+  60% { transform: translateY(-3px) scale(1.18); }
+  100% { transform: translateY(0) scale(1); }
+}
+.spotlight {
+  transform-origin: 50% 0;
+  animation: spotlight-burst 900ms cubic-bezier(0.22, 1, 0.36, 1) 80ms both;
+}
+@keyframes spotlight-burst {
+  0% { transform: translateX(-50%) scale(0.2) rotate(-20deg); }
+  100% { transform: translateX(-50%) scale(1) rotate(0deg); }
+}
+.chestStagger {
+  animation: chest-stagger 460ms cubic-bezier(0.34, 1.56, 0.64, 1) 900ms both;
+}
+@keyframes chest-stagger {
+  0% { transform: translateY(24px) rotate(-6deg) scale(0.6); }
+  60% { transform: translateY(-4px) rotate(3deg) scale(1.05); }
+  100% { transform: translateY(0) rotate(0deg) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .medalDrop,
+  .badgeIn,
+  .rewardPop,
+  .chestStagger {
+    animation: none;
+  }
+  .spotlight {
+    animation: none;
+    transform: translateX(-50%);
+  }
+}

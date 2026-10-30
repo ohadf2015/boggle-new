@@ -26,6 +26,7 @@ import {
 } from '../modules/classroomGameManager.js';
 import { getGame, getUsernameBySocketId, transitionGameState } from '../modules/gameStateManager.js';
 import { persistClassroomGameScores } from '../handlers/classroomGamePersistence.js';
+import { quizEndedResultsPayload } from '../handlers/finishedResultsResend.js';
 import {
   quizStandings,
   snapshotFor,
@@ -71,11 +72,14 @@ export async function finishQuiz(io: Server, gameCode: string): Promise<void> {
   deleteQuizSession(gameCode);
 
   const standings = quizStandings(session);
-  toRoom(io, gameCode, VOCAB_QUIZ_EVENTS.ended, withBoss(session, {
+  const endedPayload = withBoss(session, {
     gameCode,
     standings,
     totalQuestions: session.questions.length,
-  }));
+  });
+  toRoom(io, gameCode, VOCAB_QUIZ_EVENTS.ended, endedPayload);
+  const room = getGame(gameCode);
+  if (room) room.cachedResultsPayload = quizEndedResultsPayload(endedPayload as unknown as Record<string, unknown>);
 
   // Retire the room in the board engine's state machine too, so its timeout
   // path can never fire a second, board-shaped end for this room.

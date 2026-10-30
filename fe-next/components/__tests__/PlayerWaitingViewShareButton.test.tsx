@@ -15,6 +15,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { setLobbyViewport } from '@/components/multiplayer/lobby/__tests__/lobbyViewport';
 
 
 const createWrapper = () => {
@@ -224,6 +225,9 @@ describe('PlayerWaitingView - Command Center Style', () => {
   });
 
   describe('Desktop Layout', () => {
+    beforeEach(() => setLobbyViewport('desktop'));
+    afterEach(() => setLobbyViewport('phone'));
+
     it('should render DesktopLobbyLayout', () => {
       render(<PlayerWaitingView {...defaultProps} />, { wrapper: createWrapper() });
       expect(screen.getByTestId('desktop-lobby-layout')).toBeInTheDocument();

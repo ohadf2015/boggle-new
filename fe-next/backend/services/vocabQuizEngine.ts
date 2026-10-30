@@ -327,10 +327,14 @@ export function submitQuizAnswer(
   return result;
 }
 
-/** True once every player in the room has answered — the cue to reveal early. */
-export function everyoneAnswered(session: VocabQuizSession): boolean {
-  if (session.players.size === 0) return false;
-  return session.answers.size >= session.players.size;
+/** True once every player still in the room has answered — the cue to reveal early. */
+export function everyoneAnswered(
+  session: VocabQuizSession,
+  isPresent: (username: string) => boolean = () => true
+): boolean {
+  const present = [...session.players.keys()].filter(isPresent);
+  if (present.length === 0) return false;
+  return present.every((username) => session.answers.has(username));
 }
 
 // ---------------------------------------------------------------------------

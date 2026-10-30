@@ -95,7 +95,7 @@ function makeSupabase() {
                   return Promise.resolve({ data: [], error: null });
                 }
                 return Promise.resolve({
-                  data: [{ student_id: 'user-ana', joined_at: null }],
+                  data: [{ student_id: 'user-ana', joined_at: null }, { student_id: 'user-bo', joined_at: null }],
                   error: null,
                 });
               },
@@ -250,7 +250,10 @@ describe('persistClassroomGameScores — round education events', () => {
                 return Promise.resolve({
                   // Extra minute so day_n stays 2 even when `now` was snapshotted
                   // before this mock runs (floor((2d - 1ms) / 1d) === 1).
-                  data: [{ student_id: 'user-ana', joined_at: new Date(Date.now() - 2 * DAY - 60_000).toISOString() }],
+                  data: [
+                    { student_id: 'user-ana', joined_at: new Date(Date.now() - 2 * DAY - 60_000).toISOString() },
+                    { student_id: 'user-bo', joined_at: null },
+                  ],
                   error: null,
                 });
               },

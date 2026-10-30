@@ -15,28 +15,24 @@ const source = readFileSync(resolve(__dirname, '../useMultiplayerSocket.ts'), 'u
 describe('useMultiplayerSocket — teacher live controls', () => {
   it('listens for gamePaused / gameResumed / timeExtended / wordHuntTargetSkipped / teacherControlRejected', () => {
     for (const ev of ['gamePaused', 'gameResumed', 'timeExtended', 'wordHuntTargetSkipped', 'teacherControlRejected']) {
-      expect(source).toMatch(new RegExp(`socketInstance\\.on\\('${ev}'`));
-      // …and cleans them up via the eventNames blanket-off (they are owned solely by this hook)
-      const start = source.indexOf('const eventNames = [');
-      const arrayLiteral = source.slice(start, source.indexOf(']', start) + 1);
-      expect(arrayLiteral).toContain(`'${ev}'`);
+      expect(source).toMatch(new RegExp(`listen\\('${ev}'`));
     }
   });
 
   it('drives the shared pause store from gamePaused / gameResumed', () => {
-    const paused = source.slice(source.indexOf("socketInstance.on('gamePaused'"));
+    const paused = source.slice(source.indexOf("listen('gamePaused'"));
     expect(paused.slice(0, 400)).toMatch(/setTeacherPaused\(true\)/);
-    const resumed = source.slice(source.indexOf("socketInstance.on('gameResumed'"));
+    const resumed = source.slice(source.indexOf("listen('gameResumed'"));
     expect(resumed.slice(0, 400)).toMatch(/setTeacherPaused\(false\)/);
   });
 
   it('derives pause state from every startGame payload (reconnect mid-pause + fresh-round reset)', () => {
-    const handler = source.slice(source.indexOf("socketInstance.on('startGame'"));
+    const handler = source.slice(source.indexOf("listen('startGame'"));
     expect(handler.slice(0, 900)).toMatch(/setTeacherPaused\(!!data\.isPaused\)/);
   });
 
   it('clears the pause on resetGame', () => {
-    const handler = source.slice(source.indexOf("socketInstance.on('resetGame'"));
+    const handler = source.slice(source.indexOf("listen('resetGame'"));
     expect(handler.slice(0, 600)).toMatch(/setTeacherPaused\(false\)/);
   });
 

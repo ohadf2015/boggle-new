@@ -27,6 +27,7 @@ import type { PlayerResult, UserData } from './types';
 import { verifyBoostToken } from '../../utils/boostToken';
 import { applyFirstWordBonus, applyScoreMultiplier } from '@/shared/utils/boostEffects';
 import { getPostHogServer } from '@/lib/posthog';
+import { claimResultsPersist } from './resultsPersistOnce';
 
 export interface PlayerBoostClaim { sessionId: string; token: string }
 
@@ -160,6 +161,10 @@ export async function recordGameResultsToSupabase(
   game: GameState,
   precomputedMmrMap?: Map<string, MmdDelta> | null
 ): Promise<void> {
+  if (!claimResultsPersist(game)) {
+    logger.warn('GAME_RESULTS', `Results for ${gameCode} already persisted this round, skipping repeat`);
+    return;
+  }
   try {
     // Filter out bot players — they have no auth identity and shouldn't be persisted
     const humanScores = scoresArray.filter(

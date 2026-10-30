@@ -278,11 +278,11 @@ describe('MobileShareSection', () => {
   });
 
   describe('accessibility', () => {
-    it('WhatsApp button has proper aria-label', async () => {
+    it('WhatsApp button has a translated aria-label', async () => {
       await renderAndOpenDialog('A11Y123');
 
       const whatsappBtn = screen.getByTestId('mobile-whatsapp-button');
-      expect(whatsappBtn).toHaveAttribute('aria-label', 'Share via WhatsApp');
+      expect(whatsappBtn).toHaveAttribute('aria-label', 'common.shareViaWhatsApp');
     });
   });
 

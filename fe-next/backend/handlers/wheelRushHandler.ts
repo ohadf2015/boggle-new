@@ -10,6 +10,7 @@ import {
   getUsernameBySocketId,
   updatePlayerScore,
   addPlayerWord,
+  addPlayerEventBonus,
 } from '../modules/gameStateManager.js';
 import {
   getLeaderboard,
@@ -69,6 +70,11 @@ export function handleSubmitWheelWord(io: Server, socket: Socket, data: SubmitWh
   const word = lang === 'he'
     ? [...rawWord].map((c) => normalizeHebrewLetter(c)).join('')
     : rawWord;
+  // Teacher pause freezes the round; the client tile clears on the same rejection shape.
+  if (game.isPaused) {
+    socket.emit('wheelWordResult', { word, accepted: false, error: 'paused' });
+    return;
+  }
   const validation = validateWheelSubmission(state, word, lang);
   if (!validation.valid) {
     socket.emit('wheelWordResult', { word, accepted: false, error: validation.error });
@@ -78,11 +84,16 @@ export function handleSubmitWheelWord(io: Server, socket: Socket, data: SubmitWh
   const outcome = applyWheelWord(state, username, word, Date.now());
 
   updatePlayerScore(gameCode, username, outcome.score, true);
-  addPlayerWord(gameCode, username, word, {
-    score: outcome.score,
-    validated: true,
-    autoValidated: true,
-  });
+  if (outcome.repeat) {
+    // addPlayerWord dedups a repeat, so its points would vanish from the results recompute.
+    addPlayerEventBonus(gameCode, username, outcome.score);
+  } else {
+    addPlayerWord(gameCode, username, word, {
+      score: outcome.score,
+      validated: true,
+      autoValidated: true,
+    });
+  }
   // `kind: 'locked'` here means "locked into your own word list" — the client's
   // accepted-word rendering keys off it. Parallel discovery: the word is NOT
   // exclusive; it stays claimable by everyone else at base score. Repeats of a

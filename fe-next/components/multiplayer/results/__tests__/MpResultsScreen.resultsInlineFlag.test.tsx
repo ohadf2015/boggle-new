@@ -50,8 +50,6 @@ vi.mock('@/hooks/usePostHogFlag', () => ({
   usePostHogFlag: (_key: string, defaultValue: unknown) => (h.riFlag !== undefined ? h.riFlag : defaultValue),
 }));
 vi.mock('@/components/ads/ResultsBannerSlot', () => ({ __esModule: true, default: () => null }));
-vi.mock('@/components/results/ResultsMainContent', () => ({ ResultsMainContent: () => null }));
-vi.mock('@/components/results/ResultsDetailsContent', () => ({ ResultsDetailsContent: () => null }));
 vi.mock('@/components/results/ResultsModals', () => ({ ResultsModals: () => null }));
 vi.mock('@/components/results/PostRoundSummary', () => ({ PostRoundSummary: () => null }));
 vi.mock('@/components/ui/ConfirmationDialog', () => ({ ConfirmationDialog: () => null }));

@@ -23,9 +23,6 @@ import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import { getGameModeRules } from '../modes/index.js';
 import logger from '../utils/logger.js';
 
-/** Board words of at least this length count toward the "N words on board" chip. */
-const MIN_DISPLAY_WORD_LENGTH = 5;
-
 /**
  * Beta (in-work) modes: the host must be an admin or beta tester, and some
  * modes only ship curated content for a few languages. Returns the refusal
@@ -109,24 +106,7 @@ export function pickGoldenLetters(letterGrid: LetterGrid): Array<{ row: number; 
   return picked;
 }
 
-/**
- * Count and broadcast the board's words (PERF-012: through the worker pool so
- * the DFS doesn't block the event loop on the start path).
- */
-export async function emitTotalBoardWords(io: Server, gameCode: string, letterGrid: LetterGrid, gameLang: Language, minWordLength: number): Promise<void> {
-  try {
-    const allWords = await findAllWordsAsync(letterGrid, gameLang, {
-      minLength: minWordLength, maxLength: 15, maxWords: 10000, trie: getCachedTrie(gameLang),
-    });
-    const totalBoardWords = allWords.filter((word: string) => word.length >= MIN_DISPLAY_WORD_LENGTH).length;
-    const currentGame = getGame(gameCode);
-    if (currentGame) currentGame.totalBoardWords = totalBoardWords;
-    broadcastToRoom(io, getGameRoom(gameCode), 'totalBoardWords', { count: totalBoardWords });
-    logger.debug('SOCKET', `Game ${gameCode} has ${totalBoardWords} possible words on board`);
-  } catch (err: unknown) {
-    logger.error('SOCKET', `Failed to calculate total board words for ${gameCode}`, err as Error);
-  }
-}
+export { emitTotalBoardWords } from '../modules/boardWordCount.js';
 
 /** Best-effort async pick of the 1-2 longest board words as hidden "special" words. */
 export function scheduleSpecialWords(gameCode: string, letterGrid: LetterGrid, gameLang: Language): void {

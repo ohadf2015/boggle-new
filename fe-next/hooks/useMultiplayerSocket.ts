@@ -27,6 +27,9 @@ import { captureSocketError, addGameBreadcrumb, isExpectedError } from '@/utils/
 import type { ActiveRoom, Language, Avatar } from '@/shared/types/game';
 import { setTeacherPaused, useTeacherPaused } from '@/hooks/useTeacherPause';
 import { useGameStore } from '@/hooks/gameState/store';
+import { MP_TOAST_IDS } from '@/utils/multiplayer/mpToastIds';
+
+type SocketListener = Parameters<Socket['on']>[1];
 
 const SOCKET_CONFIG = {
   RECONNECTION_ATTEMPTS: 10,
@@ -83,7 +86,6 @@ interface UseMultiplayerSocketOptions {
     resolvedMessage?: string;
   }) => void;
   onSessionMigrated: (data: { message?: string }) => void;
-  onWarning: (data: { type?: string; message?: string }) => void;
   onRateLimited: () => void;
   onHostTransferred: (data: { newHost: string }) => void;
   t: (key: string, fallbackOrParams?: string | Record<string, string | number>, paramsWhenFallback?: Record<string, string | number>) => string;
@@ -188,52 +190,19 @@ export function useMultiplayerSocket(
       socketInstance.emit('getActiveRooms');
     }
 
-    // Remove any existing listeners before adding new ones.
-    //
-    // IMPORTANT: this list MUST NOT include the connection-lifecycle events
-    // (connect/disconnect/connect_error/reconnect/reconnect_failed/error).
-    // We attach to the SHARED Socket.IO singleton (getSharedSocket), and
-    // SocketContext's SocketProvider also registers ITS handlers for those
-    // events on the same socket to drive the app-wide connection indicator.
-    // `socket.off(event)` with no handler removes ALL listeners — clobbering
-    // SocketProvider's and freezing the indicator app-wide after the MP page
-    // unmounts. Those 6 events are registered as named handlers below and torn
-    // down by reference. Only MP-exclusive events are safe to blanket-remove.
-    const eventNames = [
-      'joined',
-      'updateUsers',
-      'activeRooms',
-      'joinedAsSpectator',
-      'spectatorList',
-      'spectatorUpgraded',
-      'debugGameStateResponse',
-      'startGame',
-      'resetGame',
-      'hostLeftRoomClosing',
-      'sessionMigrated',
-      'warning',
-      'rateLimited',
-      'hostTransferred',
-      'kicked',
-      'playerKicked',
-      'afkWarning',
-      'pong',
-      // Classroom differentiation — owned solely by this hook.
-      'classroomContext',
-      // Teacher live controls — owned solely by this hook.
-      'gamePaused',
-      'gameResumed',
-      'timeExtended',
-      'wordHuntTargetSkipped',
-      'teacherControlRejected',
-    ];
-    eventNames.forEach((event) => socketInstance.off(event));
+    // Every handler is removed by reference: this is the SHARED singleton, and
+    // SocketProvider / PlayerView / HostView register handlers for the same events.
+    const owned: Array<[string, SocketListener]> = [];
+    const listen = (event: string, fn: SocketListener) => {
+      socketInstance.on(event, fn);
+      owned.push([event, fn]);
+    };
 
     // Connection events.
     //
     // Registered as NAMED handlers (not inline) so cleanup can remove ONLY our
     // handler via off(event, fn) without disturbing SocketProvider's handlers
-    // on the shared singleton. See the eventNames comment above.
+    // on the shared singleton.
     const onConnect = () => {
       logger.log('[SOCKET.IO] Connected:', socketInstance.id);
       setIsConnected(true);
@@ -300,7 +269,7 @@ export function useMultiplayerSocket(
     socketInstance.on('reconnect_failed', onReconnectFailed);
 
     // Game events
-    socketInstance.on('joined', (data) => {
+    listen('joined', (data) => {
       logger.log('[SOCKET.IO] ✅ Joined successfully:', data);
       // Classroom context is per-room: reset so a previous classroom room's level /
       // word bank never leaks into this one. The server re-sends `classroomContext`
@@ -350,29 +319,29 @@ export function useMultiplayerSocket(
       }
     });
 
-    socketInstance.on('updateUsers', (data) => {
+    listen('updateUsers', (data) => {
       if (data.users) {
         optionsRef.current.onUpdateUsers(data.users);
       }
     });
 
-    socketInstance.on('activeRooms', (data) => {
+    listen('activeRooms', (data) => {
       optionsRef.current.onActiveRooms(data.rooms || []);
       setRoomsLoading(false);
     });
 
-    socketInstance.on('joinedAsSpectator', (data) => {
+    listen('joinedAsSpectator', (data) => {
       logger.log('[SPECTATOR] Joined as spectator:', data);
       optionsRef.current.onJoinedAsSpectator(data);
       setAttemptingReconnect(false);
     });
 
-    socketInstance.on('spectatorList', (data) => {
+    listen('spectatorList', (data) => {
       logger.log('[SPECTATOR] Spectator list updated:', data.spectators?.length || 0);
       optionsRef.current.onSpectatorList(data.spectators || []);
     });
 
-    socketInstance.on('spectatorUpgraded', (data) => {
+    listen('spectatorUpgraded', (data) => {
       if (data.success && data.username === optionsRef.current.username) {
         logger.log('[SPECTATOR] Upgraded to player, late join:', data.lateJoin);
         optionsRef.current.onSpectatorUpgraded(data);
@@ -384,7 +353,7 @@ export function useMultiplayerSocket(
       setRoomsLoading(false);
     }, SOCKET_CONFIG.ROOMS_LOADING_TIMEOUT);
 
-    socketInstance.on('debugGameStateResponse', (data) => {
+    listen('debugGameStateResponse', (data) => {
       logger.debug('[useMultiplayerSocket] Server game state:', data);
       // Reconcile a client/server desync surfaced by a GAME_NOT_IN_PROGRESS
       // rejection. If the server reports anything other than an active round,
@@ -495,7 +464,7 @@ export function useMultiplayerSocket(
 
     socketInstance.on('error', onError);
 
-    socketInstance.on('startGame', (data) => {
+    listen('startGame', (data) => {
       logger.log('[SOCKET.IO] startGame received:', data);
       // Cancel reconnect fallback timer — we got the startGame we were waiting for
       if (reconnectFallbackTimerRef.current) {
@@ -534,15 +503,15 @@ export function useMultiplayerSocket(
       optionsRef.current.onGameStart(data);    });
 
     // ---- Teacher live controls (classroom rooms) ----
-    socketInstance.on('gamePaused', () => {
+    listen('gamePaused', () => {
       setTeacherPaused(true);
     });
 
-    socketInstance.on('gameResumed', () => {
+    listen('gameResumed', () => {
       setTeacherPaused(false);
     });
 
-    socketInstance.on('timeExtended', (data: { addedSeconds?: number }) => {
+    listen('timeExtended', (data: { addedSeconds?: number }) => {
       // The clock itself snaps via the immediate `timeUpdate` the server sends
       // alongside; this is just the "why did my timer jump" explanation.
       const seconds = data?.addedSeconds ?? 0;
@@ -551,7 +520,7 @@ export function useMultiplayerSocket(
       }
     });
 
-    socketInstance.on('wordHuntTargetSkipped', (data: { wordHuntTargetLength?: number; wordHuntTargetCategory?: string | null }) => {
+    listen('wordHuntTargetSkipped', (data: { wordHuntTargetLength?: number; wordHuntTargetCategory?: string | null }) => {
       const store = useGameStore.getState();
       if (typeof data?.wordHuntTargetLength === 'number') store.setWordHuntTargetLength(data.wordHuntTargetLength);
       store.setWordHuntTargetCategory(data?.wordHuntTargetCategory ?? null);
@@ -560,13 +529,13 @@ export function useMultiplayerSocket(
 
     // Host-only: an authorized control that could not be applied (already
     // paused, no alternative target, …). Silent no-ops are pitfall #4.
-    socketInstance.on('teacherControlRejected', () => {
+    listen('teacherControlRejected', () => {
       toast.error(optionsRef.current.t('education.liveControls.controlFailedToast'), { duration: 3000 });
     });
 
     // ---- Classroom differentiation: per-socket, emitted from the server `join`
     // path (first join, late join, reconnect) — never from the `startGame` broadcast.
-    socketInstance.on('classroomContext', (data: { classroomLevel?: unknown; classroomWordBank?: unknown }) => {
+    listen('classroomContext', (data: { classroomLevel?: unknown; classroomWordBank?: unknown }) => {
       setClassroomLevel(isVocabularyLevel(data?.classroomLevel) ? data.classroomLevel : 'core');
       setClassroomWordBank(
         Array.isArray(data?.classroomWordBank)
@@ -575,7 +544,7 @@ export function useMultiplayerSocket(
       );
     });
 
-    socketInstance.on('resetGame', () => {
+    listen('resetGame', () => {
       logger.log('[SOCKET.IO] Game reset - staying in room for new game');
       // Back to the lobby — nothing is paused between rounds.
       setTeacherPaused(false);
@@ -587,7 +556,7 @@ export function useMultiplayerSocket(
       optionsRef.current.onGameReset();
     });
 
-    socketInstance.on('hostLeftRoomClosing', (data) => {
+    listen('hostLeftRoomClosing', (data) => {
       intentionalLeaveRef.current = true;
       // Cancel reconnect fallback — the room is closing, requesting game
       // state would just emit into a dead room.
@@ -597,14 +566,7 @@ export function useMultiplayerSocket(
       }
       const opts = optionsRef.current;
       const resolvedMessage = resolveHostLeftMessage(data, opts.t, 'playerView.roomClosed');
-      // Toast is fast feedback the moment the event arrives; the modal in
-      // PageClient (HostLeftGraceModal) is the 10s soft cushion + manual exit.
-      // PageClient's onExit handler does the URL strip + state reset that the
-      // prior 2s `window.location.pathname` reload was doing.
-      toast.error(resolvedMessage, {
-        icon: '🚪',
-        duration: 5000,
-      });
+      // PageClient's HostLeftGraceModal banner shows this message and owns the exit.
       // Clear session immediately so a tab-close / navigation during the modal
       // grace doesn't leave stale rejoin state pointing at a closed room.
       // Modal onExit does its own cleanup — both paths are idempotent.
@@ -612,7 +574,7 @@ export function useMultiplayerSocket(
       opts.onHostLeftRoomClosing({ ...data, resolvedMessage });
     });
 
-    socketInstance.on('kicked', (data: { reason: 'host' | 'inactive' }) => {
+    listen('kicked', (data: { reason: 'host' | 'inactive' }) => {
       intentionalLeaveRef.current = true;
       const opts = optionsRef.current;
       const message = data.reason === 'inactive'
@@ -625,7 +587,7 @@ export function useMultiplayerSocket(
       kickedReloadTimerRef.current = setTimeout(() => { window.location.href = window.location.pathname; }, 2000);
     });
 
-    socketInstance.on('afkWarning', (data: { secondsRemaining: number }) => {
+    listen('afkWarning', (data: { secondsRemaining: number }) => {
       const opts = optionsRef.current;
       toast(opts.t('hostView.afkWarning', { seconds: data.secondsRemaining }), {
         icon: '⚠️',
@@ -634,7 +596,7 @@ export function useMultiplayerSocket(
       });
     });
 
-    socketInstance.on('playerKicked', (data: { username: string; reason: string }) => {
+    listen('playerKicked', (data: { username: string; reason: string }) => {
       const opts = optionsRef.current;
       toast(opts.t('hostView.playerKicked', { name: data.username }), {
         icon: '👋',
@@ -642,57 +604,37 @@ export function useMultiplayerSocket(
       });
     });
 
-    socketInstance.on('sessionMigrated', (data) => {
+    // Both mean "this session moved to another tab"; the old tab must stop rejoining.
+    const onSessionMoved = (data: { message?: string }) => {
       intentionalLeaveRef.current = true;
-      // Cancel reconnect fallback — this session was superseded by another tab.
       if (reconnectFallbackTimerRef.current) {
         clearTimeout(reconnectFallbackTimerRef.current);
         reconnectFallbackTimerRef.current = null;
       }
-      logger.log('[SOCKET.IO] Session migrated:', data);
-      toast(data.message || 'Your session was moved to another tab', {
-        icon: '🔄',
-        duration: 5000,
-      });
-      clearSessionPreservingUsername(optionsRef.current.username);
-      optionsRef.current.onSessionMigrated(data);
-    });
+      logger.log('[SOCKET.IO] Session moved:', data);
+      const opts = optionsRef.current;
+      toast(opts.t('playerView.sessionMovedToAnotherTab'), { icon: '🔄', duration: 5000, id: MP_TOAST_IDS.sessionMoved });
+      clearSessionPreservingUsername(opts.username);
+      opts.onSessionMigrated(data ?? {});
+    };
+    listen('sessionMigrated', onSessionMoved);
+    listen('sessionTakenOver', onSessionMoved);
 
-    socketInstance.on('warning', (data) => {
+    listen('warning', (data) => {
       logger.warn('[SOCKET.IO] Warning:', data);
-      if (data.type === 'persistence') {
-        toast.error(
-          data.message ||
-            'Game state could not be saved. Progress may be lost on server restart.',
-          {
-            icon: '⚠️',
-            duration: 6000,
-          }
-        );
-      } else {
-        toast.error(data.message || 'A warning occurred', {
-          icon: '⚠️',
-          duration: 4000,
-        });
-      }
-      optionsRef.current.onWarning(data);
+      const opts = optionsRef.current;
+      const message = data?.type === 'persistence' ? opts.t('mpUi.lobby.progressNotSaved') : opts.t('errors.generic');
+      toast.error(message, { icon: '⚠️', duration: data?.type === 'persistence' ? 6000 : 4000 });
     });
 
-    socketInstance.on('rateLimited', () => {
+    listen('rateLimited', () => {
       logger.warn('[SOCKET.IO] Rate limited by server');
       const opts = optionsRef.current;
-      toast.error(
-        opts.t('errors.rateLimited') ||
-          'Too many requests. Please wait a moment and try again.',
-        {
-          icon: '⏳',
-          duration: 4000,
-        }
-      );
+      toast.error(opts.t('errors.rateLimited'), { icon: '⏳', duration: 4000, id: MP_TOAST_IDS.rateLimited });
       opts.onRateLimited();
     });
 
-    socketInstance.on('hostTransferred', (data) => {
+    listen('hostTransferred', (data) => {
       const opts = optionsRef.current;
       if (data.newHost === opts.username) {
         saveSession({
@@ -721,7 +663,7 @@ export function useMultiplayerSocket(
       opts.onHostTransferred(data);
     });
 
-    socketInstance.on('pong', () => {
+    listen('pong', () => {
       // Heartbeat response - connection is alive
     });
 
@@ -774,7 +716,7 @@ export function useMultiplayerSocket(
         clearTimeout(kickedReloadTimerRef.current);
         kickedReloadTimerRef.current = null;
       }
-      eventNames.forEach((event) => socketInstance.off(event));
+      owned.forEach(([event, fn]) => socketInstance.off(event, fn));
       // Remove ONLY our connection-lifecycle handlers by reference so
       // SocketProvider's handlers on the shared singleton stay intact.
       socketInstance.off('connect', onConnect);

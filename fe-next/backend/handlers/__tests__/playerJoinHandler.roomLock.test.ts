@@ -250,3 +250,38 @@ describe('PlayerJoinHandler — classroom room lock', () => {
     expect(mockAddUserToGame).toHaveBeenCalled();
   });
 });
+
+describe('PlayerJoinHandler — classroom seat cap', () => {
+  const fullRoom = (extra: Record<string, unknown> = {}) =>
+    roomGame({ users: Object.fromEntries(Array.from({ length: 8 }, (_, i) => [`P${i}`, { socketId: `s${i}` }])), ...extra });
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetGameUsers.mockReturnValue([]);
+    mockGetActiveRooms.mockReturnValue([]);
+    mockGetSocketIdByUsername.mockReturnValue(undefined);
+    mockShouldSendGameState.mockReturnValue(false);
+    mockIsInProgress.mockReturnValue(false);
+  });
+
+  it('GIVEN a full classroom WHEN one more student arrives THEN the teacher is told who is watching instead of playing', async () => {
+    mockGetGame.mockReturnValue(fullRoom({ isClassroom: true, hostSocketId: 'teacher-sock' }));
+    mockCheckSeat.mockResolvedValue({ game: { teacherId: 'teacher-1', settings: {} }, refused: false });
+    const { io, join } = captureJoinHandler();
+    await join({ gameCode: 'ABC123', username: 'Late' });
+
+    expect(addSpectatorToGame).toHaveBeenCalled();
+    expect(io.to).toHaveBeenCalledWith('teacher-sock');
+    expect(io.emit).toHaveBeenCalledWith('classroomSeatCapReached', { gameCode: 'ABC123', username: 'Late', cap: 8 });
+  });
+
+  it('GIVEN a full ordinary room WHEN one more player arrives THEN no classroom notice is sent', async () => {
+    mockGetGame.mockReturnValue(fullRoom({ hostSocketId: 'host-sock' }));
+    mockCheckSeat.mockResolvedValue({ game: null, refused: false });
+    const { io, join } = captureJoinHandler();
+    await join({ gameCode: 'ABC123', username: 'Late' });
+
+    expect(addSpectatorToGame).toHaveBeenCalled();
+    expect(io.emit).not.toHaveBeenCalledWith('classroomSeatCapReached', expect.anything());
+  });
+});

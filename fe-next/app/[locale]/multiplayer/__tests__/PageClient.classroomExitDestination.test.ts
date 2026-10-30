@@ -56,16 +56,9 @@ describe('PageClient — leaving a classroom room does not drop the teacher in t
 });
 
 /**
- * There are TWO ways out of a live room and they are not the same function.
- * `handleExitToLobby` serves the results "Exit" button and the host-left modal;
- * the ConnectionBanner's inline `onLeaveGame` serves the in-lobby Back button —
- * which is the one a teacher actually taps mid-lesson, and the one that produced
- * the measured `/en/multiplayer` landing. `handleExitToLobby`'s own comment says
- * it "Mirrors the ConnectionBanner onLeaveGame path", and the two drifted:
- * fixing only the first left the real path broken.
- *
- * That is the asymmetry itself (pitfalls class 3), so it is what this block
- * pins. A third exit added later must choose a destination too.
+ * The in-lobby Back (ConnectionBanner `onLeaveGame`) is the exit a teacher taps
+ * mid-lesson. It used to repeat the reset inline and drifted from
+ * `handleExitToLobby` (pitfalls class 3); it now routes through it.
  */
 function leaveGameHandlerBody(): string {
   const start = source.indexOf('onLeaveGame={() => {');
@@ -79,19 +72,8 @@ describe('PageClient — EVERY exit from a classroom room chooses a destination'
     expect(leaveGameHandlerBody(), 'onLeaveGame handler not found').not.toBe('');
   });
 
-  it('the in-lobby Back path asks the same helper where to go', () => {
-    expect(leaveGameHandlerBody()).toMatch(/multiplayerExitDestination\(/);
-  });
-
-  it('the in-lobby Back path performs a real navigation', () => {
-    expect(leaveGameHandlerBody()).toMatch(/router\.(push|replace)\(/);
-  });
-
-  it('both exit paths consult the helper — not just one of them', () => {
-    const calls = source.match(/multiplayerExitDestination\(/g) ?? [];
-    expect(
-      calls.length,
-      'each exit path needs its own destination decision; one call means a path was missed',
-    ).toBeGreaterThanOrEqual(2);
+  it('the in-lobby Back path goes through handleExitToLobby, which chooses the destination', () => {
+    expect(leaveGameHandlerBody()).toMatch(/handleExitToLobby\(\)/);
+    expect(exitHandlerBody()).toMatch(/multiplayerExitDestination\(/);
   });
 });

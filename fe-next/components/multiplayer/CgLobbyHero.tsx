@@ -101,19 +101,19 @@ const CgLobbyHero: React.FC<CgLobbyHeroProps> = ({ variant, displayName, onPlay,
       {/* Image layer at low opacity */}
       <div
         aria-hidden
-        className={`absolute top-0 bottom-0 ${isRTL ? 'right-0' : 'left-0'} w-[52%] pointer-events-none overflow-hidden hidden sm:block opacity-[0.15]`}
+        className="absolute top-0 bottom-0 start-0 w-[52%] pointer-events-none overflow-hidden hidden sm:block opacity-[0.15]"
         style={{ backgroundImage: 'url(/cg-lobby-tiles.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}
       />
       {/* Gradient overlay at full opacity — fades image toward center */}
       <div
         aria-hidden
-        className={`absolute top-0 bottom-0 ${isRTL ? 'right-0' : 'left-0'} w-[52%] pointer-events-none hidden sm:block bg-gradient-to-${isRTL ? 'l' : 'r'} from-transparent via-neo-navy-light/55 to-neo-navy-light`}
+        className={`absolute top-0 bottom-0 start-0 w-[52%] pointer-events-none hidden sm:block ${isRTL ? 'bg-gradient-to-l' : 'bg-gradient-to-r'} from-transparent via-neo-navy-light/55 to-neo-navy-light`}
       />
 
       {/* Soft conic glow anchored to mascot side */}
       <span
         aria-hidden
-        className={`absolute top-1/2 ${isRTL ? 'left-0' : 'right-0'} -translate-y-1/2 w-[55%] h-[120%] bg-[radial-gradient(circle_at_50%_50%,rgba(0,255,255,0.10),transparent_60%)] pointer-events-none`}
+        className="absolute top-1/2 end-0 -translate-y-1/2 w-[55%] h-[120%] bg-[radial-gradient(circle_at_50%_50%,rgba(0,255,255,0.10),transparent_60%)] pointer-events-none"
       />
 
       {/* Corner staples */}
@@ -163,7 +163,7 @@ const CgLobbyHero: React.FC<CgLobbyHeroProps> = ({ variant, displayName, onPlay,
             <svg
               aria-hidden
               viewBox="0 0 24 24"
-              className={`absolute -bottom-3 ${isRTL ? 'right-6' : 'left-6'} w-6 h-6 ${isRTL ? '-scale-x-100' : ''} drop-shadow-[2px_2px_0_rgba(0,0,0,1)]`}
+              className={`absolute -bottom-3 start-6 w-6 h-6 ${isRTL ? '-scale-x-100' : ''} drop-shadow-[2px_2px_0_rgba(0,0,0,1)]`}
             >
               <path d="M0 0 L20 0 L8 18 Z" fill="#FFFEF0" stroke="#000" strokeWidth="2.5" />
             </svg>
@@ -246,7 +246,7 @@ const CgLobbyHero: React.FC<CgLobbyHeroProps> = ({ variant, displayName, onPlay,
               aria-hidden
               animate={{ rotate: [-6, -10, -6, -3, -6] }}
               transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
-              className="absolute -top-2 -right-2 z-[2] inline-block bg-black text-neo-yellow font-neo-display text-xs uppercase px-2 py-0.5 border-2 border-black shadow-hard-sm motion-reduce:!animate-none motion-reduce:!transform-none"
+              className="absolute -top-2 -end-2 z-[2] inline-block bg-black text-neo-yellow font-neo-display text-xs uppercase px-2 py-0.5 border-2 border-black shadow-hard-sm motion-reduce:!animate-none motion-reduce:!transform-none"
             >
               {t('cg.hero.playMicrocopy')}
             </m.span>
@@ -322,11 +322,11 @@ const CgLobbyHero: React.FC<CgLobbyHeroProps> = ({ variant, displayName, onPlay,
           </div>
           <div
             aria-hidden
-            className={`absolute top-1 ${isRTL ? 'left-1' : 'right-1'} w-4 h-4 rounded-full bg-neo-lime border-2 border-black shadow-hard-sm`}
+            className="absolute top-1 end-1 w-4 h-4 rounded-full bg-neo-lime border-2 border-black shadow-hard-sm"
           />
           <div
             aria-hidden
-            className={`absolute bottom-2 ${isRTL ? 'right-0' : 'left-0'} w-3 h-3 rounded-full bg-neo-pink border-2 border-black`}
+            className="absolute bottom-2 start-0 w-3 h-3 rounded-full bg-neo-pink border-2 border-black"
           />
           {SPARKLE_DOTS.map((s, i) => (
             <m.span
@@ -343,7 +343,7 @@ const CgLobbyHero: React.FC<CgLobbyHeroProps> = ({ variant, displayName, onPlay,
             viewBox="0 0 24 24"
             animate={{ rotate: [0, 18, -8, 0], scale: [1, 1.1, 1] }}
             transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
-            className={`absolute -top-3 ${isRTL ? '-left-3' : '-right-3'} w-7 h-7 motion-reduce:hidden`}
+            className="absolute -top-3 -end-3 w-7 h-7 motion-reduce:hidden"
           >
             <path
               d="M12 2 L14.5 9 L22 9.5 L16 14 L18 21 L12 17 L6 21 L8 14 L2 9.5 L9.5 9 Z"

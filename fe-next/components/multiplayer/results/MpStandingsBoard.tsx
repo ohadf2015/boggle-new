@@ -6,6 +6,7 @@ import Avatar from '@/components/Avatar';
 import { cn } from '@/lib/utils';
 import { podiumTier, type MpStandingRow } from './mpStandings';
 import fx from './mpResults.module.css';
+import { CROWN_SRC, ResultArt, SPOTLIGHT_SRC } from './MpResultArt';
 
 type TFn = (key: string, params?: Record<string, string | number>) => string;
 
@@ -52,7 +53,7 @@ function MpStandingsBoardImpl({ rows, hiddenCount, isRevealed, t, className }: M
             data-revealed={String(shown)}
             aria-hidden={shown ? undefined : true}
             className={cn(
-              'relative flex items-center min-h-0 grow shrink overflow-hidden rounded-neo border-[3px] shadow-hard-sm',
+              'relative isolate flex items-center min-h-0 grow shrink overflow-hidden rounded-neo border-[3px] shadow-hard-sm',
               'gap-[calc(10px*var(--mp-u,1))] px-[calc(10px*var(--mp-u,1))]',
               first ? 'basis-[calc(76px*var(--mp-u,1))] max-h-[calc(108px*var(--mp-u,1))] min-h-[calc(44px*var(--mp-u,1))]' : 'basis-[calc(58px*var(--mp-u,1))] max-h-[calc(84px*var(--mp-u,1))] min-h-[calc(34px*var(--mp-u,1))]',
               podium ? podium.row : 'bg-neo-navy-light border-neo-cream/40',
@@ -63,7 +64,12 @@ function MpStandingsBoardImpl({ rows, hiddenCount, isRevealed, t, className }: M
             )}
           >
             {first && shown && (
-              <span aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+              <span aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+                <ResultArt
+                  src={SPOTLIGHT_SRC}
+                  fallback={null}
+                  className={cn('absolute left-1/2 top-0 max-w-none w-[calc(360px*var(--mp-u,1))] h-[calc(180px*var(--mp-u,1))] object-contain opacity-60', fx.spotlight)}
+                />
                 <span className={cn('absolute inset-y-0 start-0 block w-1/5 bg-neo-white/45', fx.shine)} />
               </span>
             )}
@@ -87,11 +93,13 @@ function MpStandingsBoardImpl({ rows, hiddenCount, isRevealed, t, className }: M
                 <Avatar avatarImage={r.avatar?.avatarImage} customAvatar={r.avatar?.customAvatar ?? null} userId={r.username} pixelSize={36} disableEffects />
               </span>
               {first && shown && (
-                <Crown
-                  data-testid="mp-standing-crown"
-                  aria-hidden="true"
-                  className={cn('absolute -top-[calc(14px*var(--mp-u,1))] -start-[calc(6px*var(--mp-u,1))] w-[calc(22px*var(--mp-u,1))] h-[calc(22px*var(--mp-u,1))] text-neo-yellow fill-neo-yellow drop-shadow-[2px_2px_0_#000]', fx.crownDrop)}
-                />
+                <span data-testid="mp-standing-crown" aria-hidden="true" className={cn('absolute -top-[calc(16px*var(--mp-u,1))] -start-[calc(8px*var(--mp-u,1))] block w-[calc(26px*var(--mp-u,1))] h-[calc(26px*var(--mp-u,1))]', fx.crownDrop)}>
+                  <ResultArt
+                    src={CROWN_SRC}
+                    className="w-full h-full object-contain drop-shadow-[2px_2px_0_rgb(var(--neo-black))]"
+                    fallback={<Crown className="w-full h-full text-neo-yellow fill-neo-yellow drop-shadow-[2px_2px_0_rgb(var(--neo-black))]" />}
+                  />
+                </span>
               )}
               {r.isBot && (
                 <Bot aria-label={t('mpUi.shell.bot')} className="absolute -bottom-1 -end-1 w-4 h-4 rounded-full bg-neo-cyan text-neo-black p-0.5" />

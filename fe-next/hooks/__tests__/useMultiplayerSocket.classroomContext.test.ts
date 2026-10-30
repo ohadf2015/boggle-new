@@ -13,7 +13,7 @@ const source = readFileSync(resolve(__dirname, '../useMultiplayerSocket.ts'), 'u
 
 describe('useMultiplayerSocket — classroomContext', () => {
   it('listens for classroomContext and stores level + word bank', () => {
-    const start = source.indexOf("socketInstance.on('classroomContext'");
+    const start = source.indexOf("listen('classroomContext'");
     expect(start).toBeGreaterThan(-1);
     const body = source.slice(start, start + 900);
     expect(body).toMatch(/setClassroomLevel\(/);
@@ -29,20 +29,19 @@ describe('useMultiplayerSocket — classroomContext', () => {
   });
 
   it("resets to core / [] when a new room is joined (no stale value from the previous room)", () => {
-    const joinedStart = source.indexOf("socketInstance.on('joined'");
+    const joinedStart = source.indexOf("listen('joined'");
     const joinedBody = source.slice(joinedStart, joinedStart + 700);
     expect(joinedBody).toMatch(/setClassroomLevel\('core'\)/);
     expect(joinedBody).toMatch(/setClassroomWordBank\(\[\]\)/);
   });
 
-  it('is torn down with the other MP-exclusive events (no listener accumulation on re-register)', () => {
-    const listStart = source.indexOf('const eventNames = [');
-    const listBody = source.slice(listStart, source.indexOf('];', listStart));
-    expect(listBody).toMatch(/'classroomContext'/);
+  it('is registered through the by-reference listener so cleanup removes only this hook\'s handler', () => {
+    expect(source).toMatch(/listen\('classroomContext'/);
+    expect(source).toMatch(/owned\.forEach\(\(\[event, fn\]\) => socketInstance\.off\(event, fn\)\)/);
   });
 
   it("only accepts a known level; anything else degrades to 'core'", () => {
-    const start = source.indexOf("socketInstance.on('classroomContext'");
+    const start = source.indexOf("listen('classroomContext'");
     const body = source.slice(start, start + 900);
     expect(body).toMatch(/isVocabularyLevel\(/);
   });

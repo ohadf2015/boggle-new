@@ -51,16 +51,13 @@ vi.mock('../RoomListView', () => ({
   __esModule: true,
   default: () => <div data-testid="room-list-view" />,
 }));
-vi.mock('../JoinRoomModal', () => ({
+vi.mock('../entry/JoinSheet', () => ({
   __esModule: true,
   default: () => null,
 }));
-vi.mock('../CreateRoomModal', () => ({
+vi.mock('../entry/CreateSheet', () => ({
   __esModule: true,
   default: () => null,
-}));
-vi.mock('@/components/multiplayer/SeasonBanner', () => ({
-  SeasonBanner: () => null,
 }));
 vi.mock('@/components/multiplayer/MatchmakingOverlay', () => ({
   MatchmakingOverlay: () => null,

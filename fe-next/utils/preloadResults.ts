@@ -13,10 +13,7 @@ export function preloadResultsChunks(): void {
   preloaded = true;
 
   // Core results layout and content
-  void import('@/components/results/ResultsMainContent');
+  void import('@/components/multiplayer/results/MpResultsDetails');
   void import('@/components/results/ResultsModals');
-
-  // High-visibility results components
   void import('@/components/results/ResultsWinnerBanner');
-  void import('@/components/results/RewardsSummary');
 }

@@ -17,8 +17,6 @@ import { ConnectionDot, ConnectionBanner } from '@/components/ConnectionStatusIn
 import { ConnectionQualityChip } from '@/components/multiplayer/ConnectionQualityChip';
 import SpectatorBanner from '@/components/SpectatorBanner';
 import { SocketContext } from '@/utils/SocketContext';
-import { clearSessionPreservingUsername } from '@/utils/session';
-import { stripMultiplayerExitParams } from '@/lib/multiplayer/stripExitParams';
 import { multiplayerExitDestination } from '@/lib/multiplayer/exitDestination';
 import { classroomStudentHomePath, CLASSROOM_ROOM_GONE_KEY } from '@/lib/education/classroomRoomGone';
 import { useMpPageState } from './useMpPageState';
@@ -82,7 +80,7 @@ function MultiplayerPageFrame(): React.JSX.Element {
     isPaused, pauseGame, resumeGame, extendTime, endRoundNow, skipTargetWord,
     classroomAccessibility, classroomLevel, classroomWordBank, teacherStrip, quizOwnsScreen,
     socketContextValue, hostLeftState, setHostLeftState, classroomContext, classroomDecisionRef, exitClassroomStudentToHub,
-    classroomEnded, retryClassroomRoom, handleExitToLobby, exitMp, setIsActive, setIsHost, setIsPrivate, setGameCode, setShowResults, setResultsData,
+    classroomEnded, retryClassroomRoom, handleExitToLobby, exitMp,
     routerProps,
   } = useMpPageState();
   // A classroom host's header Back closes the room for every student, so it asks first.
@@ -100,45 +98,7 @@ function MultiplayerPageFrame(): React.JSX.Element {
               in-game states all use this single root — MP-root wraps all MP views. */}
           {isActive ? <ConnectionBanner showScoreSafe onLeaveGame={() => {
             signalIntentionalLeave();
-            // Tell the server we're leaving and pass username so the schema
-            // validates (server still derives identity from the socket map).
-            socket?.emit('leaveRoom', { gameCode, username });
-            setIsActive(false); setIsHost(false); setIsPrivate(false); setGameCode('');
-            // Clear results so a subsequent rejoin doesn't render the prior
-            // game's results page for a frame before the socket reconnects.
-            setShowResults(false); setResultsData(null);
-            // Preserve username so the next join modal pre-fills it; clearing
-            // the session removes the room mapping so refresh / restore won't
-            // throw the player back into this room.
-            clearSessionPreservingUsername(username);
-            // Mark intentional exit — tightens the auto-rejoin freshness guard
-            // so even a same-second F5 stays on the lobby, not back in-game.
-            try { sessionStorage.setItem('boggle_intentional_exit', '1'); } catch { /* blocked */ }
-            // Clean the exit-trap params so a back/forward nav doesn't auto-rejoin
-            // — and so a classroom host is not dropped back onto
-            // `?classroom=true&host=true`, which just makes them another room.
-            if (typeof window !== 'undefined' && window.location.search.includes('room=')) {
-              window.history.replaceState({}, '', stripMultiplayerExitParams(window.location.href));
-            }
-            // This is the in-lobby Back button — the exit a teacher actually
-            // taps mid-lesson (measured landing on the consumer arcade on
-            // 2026-09-15). Same decision as `handleExitToLobby`: stripping says
-            // what the room is NOT, this says where the user now is. Both paths
-            // have to make it — fixing only one is how they drifted apart.
-            const destination = multiplayerExitDestination({
-              // Tri-state, not the URL flag: a student who typed a classroom
-              // code into the arcade lobby has no flag. A pending record exits
-              // as arcade here — user-initiated exits cannot wait (accepted
-              // residual; the irreversible socket decisions DO defer).
-              isClassroomMode: classroomContext === 'classroom',
-              isHost: isHost || isClassroomHost,
-              locale: language,
-            });
-            if (destination) {
-              router.push(destination);
-              return;
-            }
-            toast(t('multiplayerFlow.roomList.leftGame'), { icon: '👋' });
+            if (!handleExitToLobby()) toast(t('multiplayerFlow.roomList.leftGame'), { icon: '👋' });
           }} /> : <ConnectionDot />}
           <SpectatorBanner isSpectating={isSpectator} onRequestUpgrade={handleUpgradeToPlayer} t={t} spectatorCount={spectators.length} />
           {/* RTT-tier quality signal (degraded/weak) while the socket is still up.
@@ -230,8 +190,8 @@ function MultiplayerPageFrame(): React.JSX.Element {
           )}
           <HostLeftGraceModal
             isOpen={!!hostLeftState}
-            seconds={10}
             reason={hostLeftState?.reason}
+            message={hostLeftState?.message}
             onExit={() => {
               // Same native-safe in-place reset as the results "Exit" button,
               // then clear the grace modal — except for a classroom student,

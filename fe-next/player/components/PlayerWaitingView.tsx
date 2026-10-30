@@ -41,6 +41,7 @@ import { lobbySeats, readyTally, LOBBY_SEATS } from '@/components/multiplayer/lo
 import { ReadyButton } from '@/components/multiplayer/lobby/ReadyButton';
 import { ReadyMeter } from '@/components/multiplayer/lobby/ReadyMeter';
 import { useChatUnread } from '@/components/multiplayer/lobby/useChatUnread';
+import { useLobbyWide } from '@/components/multiplayer/lobby/useLobbyWide';
 import { LobbyExitButton, LobbyChatButton, LobbyChatPanel, HowToPlaySheet, ChatSheet } from '@/components/multiplayer/lobby/LobbyChrome';
 import type { Language, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import { VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
@@ -110,6 +111,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
   const [sheet, setSheet] = useState<'howto' | 'chat' | null>(null);
   const closeSheet = useCallback(() => setSheet(null), []);
   const unread = useChatUnread({ socket, username, open: sheet === 'chat' });
+  const wide = useLobbyWide();
 
   const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
   const avatarPremium = useAvatarPremium();
@@ -267,7 +269,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
           end={
             <>
               <MobileShareSection gameCode={gameCode} t={props.t} compact />
-              <LobbyChatButton onPress={() => setSheet('chat')} unread={unread} t={t} className="min-[720px]:hidden" />
+              {!wide && <LobbyChatButton onPress={() => setSheet('chat')} unread={unread} t={t} />}
               <LobbyAudioButton />
             </>
           }
@@ -275,46 +277,48 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
       </header>
 
       <main className="flex-1 min-h-0 flex flex-col overflow-hidden">
-        <div className="hidden min-[720px]:flex min-[720px]:flex-col flex-1 min-h-0">
-          <DesktopLobbyLayout
-            leftContent={
-              <>
-                {roster}
-                {waitingCard({ accordion: howToAccordion })}
-              </>
-            }
-            rightContent={
-              <div data-testid="desktop-chat-area" className="flex-1 min-h-0 flex flex-col gap-4">
-                <InviteCard gameCode={gameCode} t={props.t} />
-                <section className={cn(CARD, 'flex-1 min-h-28 flex flex-col p-0 overflow-hidden')}>
-                  <h2 className="shrink-0 px-4 py-2 border-b-2 border-neo-black font-neo-display text-sm font-bold uppercase tracking-wider text-neo-white/80">
-                    {t('mpUi.lobby.chat')}
-                  </h2>
-                  <div className="flex-1 min-h-0 flex flex-col overflow-y-auto overscroll-contain">
-                    <LobbyChatPanel username={username} isHost={false} gameCode={gameCode} t={t} crazyGames={isOnCrazyGamesPlatform} />
-                  </div>
-                </section>
+        {wide ? (
+          <div className="flex flex-col flex-1 min-h-0">
+            <DesktopLobbyLayout
+              leftContent={
+                <>
+                  {roster}
+                  {waitingCard({ accordion: howToAccordion })}
+                </>
+              }
+              rightContent={
+                <div data-testid="desktop-chat-area" className="flex-1 min-h-0 flex flex-col gap-4">
+                  <InviteCard gameCode={gameCode} t={props.t} />
+                  <section className={cn(CARD, 'flex-1 min-h-28 flex flex-col p-0 overflow-hidden')}>
+                    <h2 className="shrink-0 px-4 py-2 border-b-2 border-neo-black font-neo-display text-sm font-bold uppercase tracking-wider text-neo-white/80">
+                      {t('mpUi.lobby.chat')}
+                    </h2>
+                    <div className="flex-1 min-h-0 flex flex-col overflow-y-auto overscroll-contain">
+                      <LobbyChatPanel username={username} isHost={false} gameCode={gameCode} t={t} crazyGames={isOnCrazyGamesPlatform} />
+                    </div>
+                  </section>
+                </div>
+              }
+            />
+            {readyButton && (
+              <div className="shrink-0 px-6 py-3 border-t-3 border-neo-black bg-neo-navy">
+                <div className="mx-auto w-full max-w-[480px] tv:max-w-[720px]">{readyButton}</div>
               </div>
-            }
-          />
-          {readyButton && (
-            <div className="shrink-0 px-6 py-3 border-t-3 border-neo-black bg-neo-navy">
-              <div className="mx-auto w-full max-w-[480px] tv:max-w-[720px]">{readyButton}</div>
-            </div>
-          )}
-        </div>
-
-        <div data-testid="lobby-phone" className="min-[720px]:hidden flex flex-col flex-1 min-h-0">
-          <div className="flex-1 min-h-0 flex flex-col gap-3 px-3 py-3 w-full max-w-[600px] mx-auto">
-            {roster}
-            {waitingCard({ pill: howToPill })}
+            )}
           </div>
-          {readyButton && (
-            <div className="shrink-0 px-3 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] border-t-3 border-neo-black bg-neo-navy">
-              <div className="max-w-[600px] mx-auto">{readyButton}</div>
+        ) : (
+          <div data-testid="lobby-phone" className="flex flex-col flex-1 min-h-0">
+            <div className="flex-1 min-h-0 flex flex-col gap-3 px-3 py-3 w-full max-w-[600px] mx-auto">
+              {roster}
+              {waitingCard({ pill: howToPill })}
             </div>
-          )}
-        </div>
+            {readyButton && (
+              <div className="shrink-0 px-3 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] border-t-3 border-neo-black bg-neo-navy">
+                <div className="max-w-[600px] mx-auto">{readyButton}</div>
+              </div>
+            )}
+          </div>
+        )}
       </main>
 
       {isOnCrazyGamesPlatform && (
@@ -324,9 +328,11 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
       )}
 
       {howToMode && <HowToPlaySheet open={sheet === 'howto'} onClose={closeSheet} mode={howToMode} lang={lang} t={t} />}
-      <ChatSheet open={sheet === 'chat'} onClose={closeSheet} t={t}>
-        <LobbyChatPanel username={username} isHost={false} gameCode={gameCode} t={t} crazyGames={isOnCrazyGamesPlatform} />
-      </ChatSheet>
+      {!wide && (
+        <ChatSheet open={sheet === 'chat'} onClose={closeSheet} t={t}>
+          <LobbyChatPanel username={username} isHost={false} gameCode={gameCode} t={t} crazyGames={isOnCrazyGamesPlatform} />
+        </ChatSheet>
+      )}
       {dialogs}
     </div>
   );

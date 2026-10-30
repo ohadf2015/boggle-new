@@ -236,6 +236,19 @@ describe('answering', () => {
     expect(session.players.get('ana')!.score).toBeGreaterThan(0);
   });
 
+  it('reveals early once every student still in the room has answered, not waiting on a dropped one', () => {
+    const room = roomState();
+    (room.users.bo as { disconnected?: boolean }).disconnected = true;
+    (gameStateManager.getGame as Mock).mockReturnValue(room);
+    const { socket, listeners } = makeSocket();
+    registerVocabQuizHandlers(makeIo().io, socket);
+
+    const session = getActiveQuiz(GAME_CODE)!;
+    listeners.get(VOCAB_QUIZ_EVENTS.answer)!({ index: 0, choiceIndex: session.questions[0].answerIndex });
+
+    expect(session.phase).toBe('reveal');
+  });
+
   it('ignores a malformed payload rather than throwing', () => {
     const { socket, listeners } = makeSocket();
     registerVocabQuizHandlers(makeIo().io, socket);

@@ -14,7 +14,7 @@ import { TeacherProUpgradeLink } from '@/components/education/TeacherProUpgradeL
 
 export const TEACHER_PRO_COMPARE_CHECKOUT_PATH = '/teacher/upgrade' as const;
 
-type Copy = { heading: string; body: string; cta: string; note: string };
+type Copy = { eyebrow: string; heading: string; body: string; cta: string; note: string };
 
 const LRI = '⁦';
 const PDI = '⁩';
@@ -23,36 +23,42 @@ const PRO_HE = 'פרו למורים';
 
 const COPY: Record<string, Copy> = {
   en: {
+    eyebrow: 'Teacher Pro',
     heading: 'Teacher Pro — {price}/mo',
     body: 'Unlimited classes, analytics, and printable reports. Free stays free: {classes} classes × {students} students.',
     cta: 'Start Teacher Pro — {price}/mo',
     note: 'Cancel anytime · Free plan stays free',
   },
   he: {
+    eyebrow: PRO_HE,
     heading: `${PRO_HE} — {price} לחודש`,
     body: 'כיתות ללא הגבלה, אנליטיקה ודוחות להדפסה. התוכנית החינמית נשארת: {classes} כיתות × {students} תלמידים.',
     cta: `התחלת ${PRO_HE} — {price} לחודש`,
     note: 'ביטול בכל עת · התוכנית החינמית נשארת חינמית',
   },
   es: {
+    eyebrow: 'Teacher Pro',
     heading: 'Teacher Pro — {price}/mes',
     body: 'Clases ilimitadas, analíticas e informes imprimibles. El plan gratis sigue: {classes} clases × {students} estudiantes.',
     cta: 'Empezar Teacher Pro — {price}/mes',
     note: 'Cancela cuando quieras · El plan gratis sigue gratis',
   },
   sv: {
+    eyebrow: 'Teacher Pro',
     heading: 'Teacher Pro — {price}/mån',
     body: 'Obegränsade klasser, analys och utskrivbara rapporter. Gratisplanen finns kvar: {classes} klasser × {students} elever.',
     cta: 'Starta Teacher Pro — {price}/mån',
     note: 'Avsluta när du vill · Gratisplanen förblir gratis',
   },
   ja: {
+    eyebrow: 'Teacher Pro',
     heading: 'Teacher Pro — 月{price}',
     body: 'クラス無制限、分析、印刷できるレポート。無料プランはそのまま：{classes}クラス × {students}人。',
     cta: 'Teacher Proを始める — 月{price}',
     note: 'いつでも解約できます · 無料プランはそのまま',
   },
   ru: {
+    eyebrow: 'Teacher Pro',
     heading: 'Teacher Pro — {price}/мес',
     body: 'Безлимитные классы, аналитика и печатные отчёты. Бесплатный план остаётся: {classes} класса × {students} учеников.',
     cta: 'Подключить Teacher Pro — {price}/мес',
@@ -76,6 +82,7 @@ export function teacherProCompareCheckoutCopy(locale: string): Copy {
     students: String(FREE_TIER_LIMITS.studentsPerClass),
   };
   return {
+    eyebrow: raw.eyebrow,
     heading: fill(raw.heading, params),
     body: fill(raw.body, params),
     cta: fill(raw.cta, params),
@@ -96,7 +103,7 @@ export function TeacherProCompareCheckoutStrip({
       data-testid="teacher-pro-compare-checkout-strip"
       className={`mb-12 rounded-neo border-3 border-neo-pink bg-neo-navy/60 p-5 shadow-hard sm:p-6 ${className}`}
     >
-      <p className="mb-2 text-xs font-bold uppercase tracking-wide text-neo-pink">Teacher Pro</p>
+      <p className="mb-2 text-xs font-bold uppercase tracking-wide text-neo-pink">{c.eyebrow}</p>
       <h2 className="mb-2 font-neo-display text-2xl font-bold text-neo-white">{c.heading}</h2>
       <p className="mb-4 text-sm leading-relaxed text-neo-gray-200 sm:text-base">{c.body}</p>
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">

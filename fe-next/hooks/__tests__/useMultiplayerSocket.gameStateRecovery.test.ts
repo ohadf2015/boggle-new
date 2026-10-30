@@ -35,7 +35,7 @@ describe('useMultiplayerSocket — game state recovery', () => {
   });
 
   it('reconciles client state inside debugGameStateResponse instead of only logging', () => {
-    const handlerStart = source.indexOf("socketInstance.on('debugGameStateResponse'");
+    const handlerStart = source.indexOf("listen('debugGameStateResponse'");
     expect(handlerStart).toBeGreaterThan(-1);
     // Grab the handler body up to the closing of the arrow callback.
     const handlerBody = source.slice(handlerStart, handlerStart + 1400);

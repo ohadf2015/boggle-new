@@ -27,7 +27,7 @@ describe('MpResultsDetails — calm dial reaches the lesson recap', () => {
     expect(source).toMatch(/<ClassroomResultsCard[\s\S]*?hideClassPlacings=/);
   });
 
-  it('suppresses the revenge card with the same gate — it names the winner and the gap', () => {
-    expect(source).toContain('suppressRevenge: hideClassPlacings');
+  it('drops the round awards with the same gate — they name who led the round', () => {
+    expect(source).toMatch(/hideClassPlacings \? null : roundAwards/);
   });
 });

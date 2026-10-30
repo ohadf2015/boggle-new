@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import type { Socket } from 'socket.io-client';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 import { recordGameCompleted } from '@/utils/multiplayerProgressStorage';
@@ -64,6 +64,8 @@ interface UseMultiplayerGameFlowReturn {
   handleUpgradeToPlayer: () => void;
 }
 
+const DEFAULT_GAME_DURATION = 180;
+
 /**
  * Manages multiplayer game flow state and transitions
  */
@@ -83,23 +85,27 @@ export function useMultiplayerGameFlow(
   const [spectators, setSpectators] = useState<Array<{ username: string; socketId: string; avatar: any }>>(
     []
   );
-  const [pendingGameStart, setPendingGameStart] = useState<GameStartData | null>(null);
+  const [pendingGameStart, setPendingGameStartState] = useState<GameStartData | null>(null);
   const [gameStartTime, setGameStartTime] = useState<number | null>(null);
+  // The game view consumes (nulls) pendingGameStart long before results arrive.
+  const roundTimerSecondsRef = useRef<number | null>(null);
+  const setPendingGameStart = useCallback((data: GameStartData | null) => {
+    if (data?.timerSeconds) roundTimerSecondsRef.current = data.timerSeconds;
+    setPendingGameStartState(data);
+  }, []);
 
-  // Calculated game duration — stored in state so it's reactive
-  const [gameDuration, setGameDuration] = useState<number>(180);
+  const [gameDuration, setGameDuration] = useState<number>(DEFAULT_GAME_DURATION);
 
-  // Calculate game duration when results are first shown
   useEffect(() => {
-    if (showResults && resultsData) {
-      if (gameStartTime && pendingGameStart?.timerSeconds) {
-        const elapsed = Math.floor((Date.now() - gameStartTime) / 1000);
-        setGameDuration(Math.min(elapsed, pendingGameStart.timerSeconds));
-      } else {
-        setGameDuration(pendingGameStart?.timerSeconds || 180);
-      }
+    if (!showResults || !resultsData) return;
+    const timerSeconds = roundTimerSecondsRef.current;
+    if (gameStartTime && timerSeconds) {
+      const elapsed = Math.floor((Date.now() - gameStartTime) / 1000);
+      setGameDuration(Math.min(elapsed, timerSeconds));
+    } else {
+      setGameDuration(timerSeconds || DEFAULT_GAME_DURATION);
     }
-  }, [showResults, resultsData, gameStartTime, pendingGameStart]);
+  }, [showResults, resultsData, gameStartTime]);
 
   const handleShowResults = useCallback(
     (data: unknown) => {
@@ -151,8 +157,9 @@ export function useMultiplayerGameFlow(
     setResultsData(null);
     setPendingGameStart(null);
     setGameStartTime(null);
-    setGameDuration(180);
-  }, [socketRef, gameCode]);
+    roundTimerSecondsRef.current = null;
+    setGameDuration(DEFAULT_GAME_DURATION);
+  }, [socketRef, gameCode, setPendingGameStart]);
 
   const handleUpgradeToPlayer = useCallback(() => {
     if (!socketRef.current || !gameCode) {

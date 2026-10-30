@@ -20416,7 +20416,8 @@ const es = {
       "editSettings": "Editar ajustes de la ronda",
       "chatHint": "Saluda al grupo",
       "chatUnread": "{count} nuevos",
-      "modeOn": "{mode} está listo — pulsa Empezar"
+      "modeOn": "{mode} está listo — pulsa Empezar",
+      "progressNotSaved": "No pudimos guardar la partida. Si el servidor se reinicia, podrías perder el progreso."
     },
     "round": {
       "getReady": "Prepárate",
@@ -20515,6 +20516,12 @@ const es = {
       "share": "Compartir",
       "seriesChampion": "Campeón de la serie",
       "teacherPaced": "Tu profe empieza la siguiente partida",
+      "calloutPhotoWon": "¡Foto finish! Le ganaste a {name} por {points}",
+      "calloutPhotoLost": "¡Foto finish! {name} te ganó por {points}",
+      "calloutComeback": "¡Remontada! Subiste {places} en la serie",
+      "calloutUnique": "Palabras que solo tú encontraste: {count}",
+      "detailsWords": "Tus palabras",
+      "detailsNoWords": "Sin palabras esta ronda",
       "backToClass": "Volver a la clase",
       "endClassTitle": "¿Terminar el juego de la clase?",
       "endClassBody": "La sala se cierra para todos y vuelves al panel de tu clase.",
@@ -21639,6 +21646,13 @@ const es = {
     }
   }
   // @teacherLifecycleEmail:end
+  ,
+  // @eduPolish:start
+  "eduPolish": {
+    "seatCapReached": "{name} está mirando: la clase está llena ({cap} jugadores)",
+    "csvDropHint": "Suelta aquí un archivo CSV o haz clic para buscarlo"
+  }
+  // @eduPolish:end
 };
 
 export { es };

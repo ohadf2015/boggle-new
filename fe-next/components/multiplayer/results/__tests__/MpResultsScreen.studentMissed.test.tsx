@@ -10,7 +10,6 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 const h = vi.hoisted(() => ({
   reduced: false,
-  mainContent: { current: null as null | Record<string, unknown> },
   banner: vi.fn(),
   showInterstitial: vi.fn(),
   markReady: vi.fn(),
@@ -48,13 +47,6 @@ vi.mock('@/components/ads/ResultsBannerSlot', () => ({
     return <div data-testid="results-banner-slot-mock" />;
   },
 }));
-vi.mock('@/components/results/ResultsMainContent', () => ({
-  ResultsMainContent: (props: Record<string, unknown>) => {
-    h.mainContent.current = props;
-    return <div data-testid="results-main-content" />;
-  },
-}));
-vi.mock('@/components/results/ResultsDetailsContent', () => ({ ResultsDetailsContent: () => null }));
 vi.mock('@/components/results/ResultsModals', () => ({ ResultsModals: () => <div data-testid="results-modals" /> }));
 vi.mock('@/components/results/PostRoundSummary', () => ({ PostRoundSummary: () => null }));
 vi.mock('@/components/ui/ConfirmationDialog', () => ({

@@ -29,7 +29,6 @@ import { ensureJoinableClassroomGame } from './classroomGameJoinGate.js';
 import { registerClassroomRecoveryHandlers } from './classroomGameRecovery.js';
 import { registerClassroomLobbyLockHandlers } from './classroomLobbyLockHandler.js';
 import { isRecordJoinLockedOut, ROOM_LOCKED } from '../modules/classroomLobbyLock.js';
-import { registerClassroomGameEndHandlers } from './classroomGameEndHandler.js';
 import { registerClassroomGameModeHandlers } from './classroomGameModeHandler.js';
 import { registerClassroomReteachHandlers } from './classroomReteachHandler.js';
 import { getAuthUserId } from './classroomSocketAuth.js';
@@ -484,12 +483,6 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
       logger.warn('CLASSROOM_GAME', `Failed to get lobby users: ${(err as Error)?.message ?? err}`);
     }
   });
-
-  // Ending the session ends the ROOM too, so that body lives in its own module
-  // (`classroomGameEndHandler`) — this file is over the 500-line limit, and the
-  // teardown belongs next to the reason for it, not bolted onto a listener list.
-  // Both historical event names are still registered there, to ONE guarded body.
-  registerClassroomGameEndHandlers(io, socket);
 
   // Changing the game WITHOUT minting a new code — the gap a blind critic
   // reproduced. Also its own module, and for the same reason.

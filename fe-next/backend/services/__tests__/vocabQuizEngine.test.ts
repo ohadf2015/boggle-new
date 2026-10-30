@@ -166,6 +166,20 @@ describe('everyoneAnswered', () => {
   it('is false for an empty room, so a teacher-only lobby waits for the clock', () => {
     expect(everyoneAnswered(makeSession())).toBe(false);
   });
+
+  it('does not wait on a player who has left or dropped', () => {
+    const session = makeSession();
+    addQuizPlayer(session, { username: 'ana', userId: 'user-ana' });
+    addQuizPlayer(session, { username: 'ghost', userId: 'user-ghost' });
+    answerCorrectly(session, 'ana', T0);
+    expect(everyoneAnswered(session, (u) => u !== 'ghost')).toBe(true);
+  });
+
+  it('is false when nobody present is left to answer', () => {
+    const session = makeSession();
+    addQuizPlayer(session, { username: 'ghost', userId: 'user-ghost' });
+    expect(everyoneAnswered(session, () => false)).toBe(false);
+  });
 });
 
 describe('pause / resume', () => {

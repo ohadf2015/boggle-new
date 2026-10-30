@@ -1,5 +1,5 @@
 import type { Avatar } from '@/shared/types/game';
-import type { WordLike } from './mpResultsView';
+import { rivalGap, type WordLike } from './mpResultsView';
 import type { MpStandingRow, SeriesStandingLike } from './mpStandings';
 
 /**
@@ -107,4 +107,34 @@ export function seriesGrid({ ladder, standings, rounds }: {
     return max > 0 ? max : null;
   });
   return { rounds, rows, top };
+}
+
+export type ResultCallout =
+  | { kind: 'photoFinish'; won: boolean; name: string; points: number }
+  | { kind: 'comeback'; places: number }
+  | { kind: 'beat' | 'lost'; name: string; points: number }
+  | { kind: 'tied'; name: string; more: number }
+  | { kind: 'unique'; count: number };
+
+const PHOTO_FINISH_POINTS = 10;
+const PHOTO_FINISH_SHARE = 0.05;
+
+/** One line only; a loser hears their unique finds before the gap they lost by. */
+export function resultCallout({ rows, uniqueCount }: { rows: MpStandingRow[]; uniqueCount: number }): ResultCallout | null {
+  const myIndex = rows.findIndex((r) => r.isMe);
+  if (myIndex < 0 || rows.length < 2) return null;
+  const [first, second] = rows;
+  const margin = first.score - second.score;
+  if (myIndex <= 1 && margin > 0 && (margin <= PHOTO_FINISH_POINTS || margin <= first.score * PHOTO_FINISH_SHARE)) {
+    const won = myIndex === 0;
+    return { kind: 'photoFinish', won, name: won ? second.username : first.username, points: margin };
+  }
+  const places = rows[myIndex].seriesDelta;
+  if (places > 0) return { kind: 'comeback', places };
+  const gap = rivalGap(rows);
+  if (!gap) return null;
+  if (gap.kind === 'ahead') return { kind: 'beat', name: gap.name, points: gap.points };
+  if (gap.kind === 'tied') return gap;
+  if (uniqueCount > 0) return { kind: 'unique', count: uniqueCount };
+  return { kind: 'lost', name: gap.name, points: gap.points };
 }

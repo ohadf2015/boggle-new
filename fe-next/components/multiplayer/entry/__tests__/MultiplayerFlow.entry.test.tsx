@@ -34,12 +34,12 @@ vi.mock('../../RoomListView', () => ({
     </div>
   ),
 }));
-vi.mock('../../JoinRoomModal', () => ({
+vi.mock('../JoinSheet', () => ({
   __esModule: true,
   default: ({ isOpen, room }: { isOpen: boolean; room: { gameCode: string } | null }) =>
     isOpen ? <div data-testid="join-room-modal">{room?.gameCode}</div> : null,
 }));
-vi.mock('../../CreateRoomModal', () => ({ __esModule: true, default: () => null }));
+vi.mock('../CreateSheet', () => ({ __esModule: true, default: () => null }));
 vi.mock('../../MatchmakingOverlay', () => ({ MatchmakingOverlay: () => null }));
 
 import MultiplayerFlow from '../../MultiplayerFlow';

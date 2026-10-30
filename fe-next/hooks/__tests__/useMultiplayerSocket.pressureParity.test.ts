@@ -13,7 +13,7 @@ const round = readFileSync(resolve(__dirname, '../../backend/modes/roundPayload.
 
 describe('classroom pressure reaches the client on EVERY start path', () => {
   it('the hook stores pressure from startGame', () => {
-    const i = hook.indexOf("socketInstance.on('startGame'");
+    const i = hook.indexOf("listen('startGame'");
     expect(i).toBeGreaterThan(-1);
     expect(hook.slice(i, i + 4000)).toMatch(/setClassroomPressure\(pressureFromStartPayload\(data\)\)/);
   });

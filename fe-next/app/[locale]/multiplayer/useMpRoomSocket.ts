@@ -239,9 +239,8 @@ export function useMpRoomSocket(ctx: MpRoomSocketContext) {
         toast.error(t('errors.tooManyAttempts'), { duration: 4000, icon: '⏳', id: MP_TOAST_IDS.rateLimited });
         setAttemptingReconnect(false);
       } else {
-        // Prefer a translated string; `data.message` is a hardcoded English
-        // sentence from the backend, so it is the last resort, not the default.
-        const errorMsg = t('errors.generic') || data.message || 'Error';
+        // `data.message` is backend English; never show it.
+        const errorMsg = t('errors.generic');
         setError(errorMsg);
         toast.error(errorMsg, { duration: 4000, icon: '❌', id: MP_TOAST_IDS.joinError });
       }
@@ -271,18 +270,15 @@ export function useMpRoomSocket(ctx: MpRoomSocketContext) {
       // before being yanked back to the lobby.
       setHostLeftState({
         reason: data.reason,
-        message: data.resolvedMessage || t('multiplayerFlow.roomClosed'),
+        message: data.resolvedMessage || data.message || t('multiplayerFlow.roomClosed'),
       });
     },
     onSessionMigrated: () => {
       clearSessionPreservingUsername(username);
       setIsActive(false); setIsHost(false); setGameCode('');
-      toast(t('multiplayerFlow.roomClosed'), { duration: 3000, icon: 'ℹ️' });
     },
-    onWarning: () => {},
     onRateLimited: () => {
       setIsJoining(false);
-      toast.error(t('multiplayerFlow.rateLimited'), { duration: 3000, icon: '⏳', id: MP_TOAST_IDS.rateLimited });
     },
     onHostTransferred: (data) => {
       if (data.newHost !== username) return;

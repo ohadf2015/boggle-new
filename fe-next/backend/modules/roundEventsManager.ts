@@ -13,6 +13,10 @@ import timerManager from '../utils/timerManager';
 import { gameCleanupEmitter } from '../events/gameCleanup';
 import logger from '../utils/logger.js';
 import { executeEarthquakeSequence } from '../handlers/earthquakeHandler.js';
+import { makePositionsMap, isWordOnBoard } from './wordValidator.js';
+import { emitTotalBoardWords } from './boardWordCount.js';
+import { seededRng, pickWeightedCatalyst, isLeaderMarginLarge } from './roundEventPick.js';
+import type { Language, LetterGrid } from '@/shared/types';
 
 // ==================== Types ====================
 
@@ -45,6 +49,27 @@ export function pickRandomCatalyst(): CatalystType {
   return CATALYST_POOL[Math.floor(Math.random() * CATALYST_POOL.length)];
 }
 
+type Tile = { row: number; col: number };
+type EventTileGame = GameState & { frozenTiles?: Tile[]; lightningTiles?: Tile[]; meteorTiles?: Tile[] };
+
+/** Rubber band: when the leader has run away at trigger time, re-roll (seeded per round) toward the board shuffle. */
+function catalystAtTrigger(game: GameState, scheduled: CatalystType): CatalystType {
+  const humanScores = Object.entries(game.users || {})
+    .filter(([, u]) => !(u as { isBot?: boolean } | undefined)?.isBot)
+    .map(([name]) => game.playerScores?.[name] ?? 0);
+  if (!isLeaderMarginLarge(humanScores)) return scheduled;
+  const round = game.modeHistory?.length ?? 0;
+  return pickWeightedCatalyst(seededRng(`${game.gameSessionId ?? 0}:${round}`), true);
+}
+
+function clearEventTiles(gameCode: string): void {
+  const game = getGame(gameCode) as EventTileGame | null | undefined;
+  if (!game) return;
+  delete game.frozenTiles;
+  delete game.lightningTiles;
+  delete game.meteorTiles;
+}
+
 const SCHEDULE_MIN_PERCENT = 0.50;
 const SCHEDULE_MAX_PERCENT = 0.75;
 
@@ -55,10 +80,12 @@ const LETTER_POOL = 'AAABBBCCDDDEEEEFFFGGHHHIIIIJJKLLLLMMNNNNOOOOPPPQRRRRSSSSTTT
 
 gameCleanupEmitter.onGameEnd(({ gameCode }) => {
   clearRoundEventTimers(gameCode);
+  clearEventTiles(gameCode);
 });
 
 gameCleanupEmitter.onGameReset(({ gameCode }) => {
   clearRoundEventTimers(gameCode);
+  clearEventTiles(gameCode);
 });
 
 // ==================== Helpers ====================
@@ -87,8 +114,11 @@ function pickRandomTiles(
   return result;
 }
 
-function pickRandomLetter(): string {
-  return LETTER_POOL[Math.floor(Math.random() * LETTER_POOL.length)];
+/** A letter already on this board, so a meteor never drops a foreign-script letter (he/ja/ru boards). */
+function pickRandomLetter(grid: Array<Array<unknown>>): string {
+  const onBoard = grid.flat().filter((ch) => typeof ch === 'string' && ch.length > 0) as string[];
+  const pool = onBoard.length > 0 ? onBoard : LETTER_POOL;
+  return pool[Math.floor(Math.random() * pool.length)];
 }
 
 // ==================== Public API ====================
@@ -130,7 +160,13 @@ export function scheduleRoundEvent(
         return;
       }
 
-      if (catalyst === 'earthquake') {
+      const firing = catalystAtTrigger(currentGame, catalyst);
+      if (firing !== catalyst) {
+        updateGame(gameCode, { roundEventSchedule: { eventType: firing, triggerAtPercent } });
+        logger.info('ROUND_EVENT', `Game ${gameCode}: leader ran away, catalyst re-rolled '${catalyst}' -> '${firing}'`);
+      }
+
+      if (firing === 'earthquake') {
         updateGame(gameCode, { earthquakeTriggered: true });
         const armedGame = getGame(gameCode);
         if (armedGame) {
@@ -139,7 +175,7 @@ export function scheduleRoundEvent(
         return;
       }
 
-      executeRoundEvent(io, gameCode, currentGame, catalyst as RoundEventType);
+      executeRoundEvent(io, gameCode, currentGame, firing as RoundEventType);
     },
     triggerDelayMs
   );
@@ -216,15 +252,8 @@ function executeRoundEvent(
         }
       }
 
-      // For meteor: apply new letters to the grid
       if (eventType === 'meteor' && eventData.meteor && currentGame.letterGrid) {
-        const newGrid = currentGame.letterGrid.map(row => [...row]) as string[][];
-        for (const tile of eventData.meteor.affectedTiles) {
-          if (newGrid[tile.row]) {
-            newGrid[tile.row][tile.col] = tile.newLetter;
-          }
-        }
-        updateGame(gameCode, { letterGrid: newGrid as typeof currentGame.letterGrid });
+        applyMeteorToBoard(io, gameCode, currentGame, eventData.meteor.affectedTiles);
       }
 
       logger.info('ROUND_EVENT', `Game ${gameCode}: '${eventType}' STARTED (${config.durationMs}ms)`);
@@ -260,6 +289,11 @@ function executeRoundEvent(
         }
       }
 
+      if (eventType === 'meteor') {
+        const mg = getGame(gameCode) as EventTileGame | null | undefined;
+        if (mg) delete mg.meteorTiles;
+      }
+
       broadcastToRoom(io, room, 'roundEventEnd', {
         eventType,
         gameSessionId: currentGame.gameSessionId,
@@ -270,6 +304,39 @@ function executeRoundEvent(
     },
     config.warningMs + config.durationMs
   );
+}
+
+/**
+ * Meteor rewrites tiles: the position index, the hidden special words and the
+ * board-word count must all follow the new grid, or validation and the HUD
+ * keep describing the old board.
+ */
+function applyMeteorToBoard(
+  io: Server,
+  gameCode: string,
+  game: GameState,
+  affectedTiles: Array<{ row: number; col: number; newLetter: string }>,
+): void {
+  const lang = (game.language || 'en') as Language;
+  const newGrid = game.letterGrid!.map(row => [...row]) as string[][];
+  for (const tile of affectedTiles) {
+    if (newGrid[tile.row]) newGrid[tile.row][tile.col] = tile.newLetter;
+  }
+  const letterGrid = newGrid as LetterGrid;
+  const letterPositions = makePositionsMap(letterGrid, lang);
+  updateGame(gameCode, { letterGrid, letterPositions } as Partial<GameState>);
+  game.letterGrid = letterGrid;
+  game.letterPositions = letterPositions;
+  (game as EventTileGame).meteorTiles = affectedTiles.map(({ row, col }) => ({ row, col }));
+
+  if (game.specialWords?.length) {
+    const kept = game.specialWords.filter((sw) => sw.foundBy || isWordOnBoard(sw.word.toLowerCase(), letterGrid, letterPositions, lang));
+    if (kept.length !== game.specialWords.length) {
+      game.specialWords = kept;
+      updateGame(gameCode, { specialWords: kept });
+    }
+  }
+  void emitTotalBoardWords(io, gameCode, letterGrid, lang, game.minWordLength || 3);
 }
 
 function buildEventData(eventType: RoundEventType, game: GameState): RoundEventData {
@@ -298,7 +365,7 @@ function buildEventData(eventType: RoundEventType, game: GameState): RoundEventD
       const affectedPositions = pickRandomTiles(grid, 4);
       const affectedTiles = affectedPositions.map(pos => ({
         ...pos,
-        newLetter: pickRandomLetter(),
+        newLetter: pickRandomLetter(grid),
       }));
       return {
         meteor: {

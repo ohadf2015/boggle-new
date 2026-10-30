@@ -144,7 +144,7 @@ function tick(io: Server, gameCode: string): void {
   if (session.paused) return;
 
   if (session.phase === 'question') {
-    if (questionExpired(session, now) || everyoneAnswered(session)) {
+    if (questionExpired(session, now) || everyoneAnswered(session, (u) => isInRoom(gameCode, u))) {
       beginReveal(io, session, now);
     }
     return;
@@ -375,7 +375,7 @@ export function registerVocabQuizHandlers(io: Server, socket: Socket): void {
     emitLockIn(io, ctx.session);
 
     // Everyone in — cut to the reveal without waiting out the clock.
-    if (everyoneAnswered(ctx.session) && ctx.session.phase === 'question') {
+    if (everyoneAnswered(ctx.session, (u) => isInRoom(ctx.gameCode, u)) && ctx.session.phase === 'question') {
       beginReveal(io, ctx.session, Date.now());
     }
   });

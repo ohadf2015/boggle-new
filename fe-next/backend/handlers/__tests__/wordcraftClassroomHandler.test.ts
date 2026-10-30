@@ -188,6 +188,18 @@ describe('wordcraft:place', () => {
     });
   });
 
+  it('scores nothing while the teacher has the round paused', () => {
+    (mockGame.current as { isPaused?: boolean }).isPaused = true;
+    const { socket, listeners } = makeSocket();
+    registerWordcraftClassroomHandlers(mockIo as never, socket as never);
+    const state = (mockGame.current as { wordcraftState: ReturnType<typeof createWordcraftLiveSession> }).wordcraftState;
+
+    listeners['wordcraft:place']({ placements: placeFromRack(state.players.Ada.rack, 'CAT') });
+
+    expect(mockUpdatePlayerScore).not.toHaveBeenCalled();
+    expect(roomEmits.some((e) => e.event === 'wordcraft:activity')).toBe(false);
+  });
+
   it('ignores a placement in a room that is not running wordcraft', () => {
     (mockGame.current as { gameMode: string }).gameMode = 'classic';
     const { socket, listeners, emitted } = makeSocket();

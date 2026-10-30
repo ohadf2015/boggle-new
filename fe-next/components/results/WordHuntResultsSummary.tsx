@@ -56,7 +56,7 @@ function formatSurvivalTime(seconds: number): string {
 }
 
 export default function WordHuntResultsSummary({
-  targetWord: _targetWord,
+  targetWord,
   foundTarget,
   isFirstFinder,
   survivalTime,
@@ -86,13 +86,16 @@ export default function WordHuntResultsSummary({
       animate="show"
       className="space-y-6"
     >
-      {/* Survival highlight — unique to WHRS, not shown elsewhere.
-          Target word, found-state, and words-found count are owned by
-          ResultsHeroSection + HighlightsBar to avoid triple display. */}
       <m.section
         variants={variant}
-        className="flex justify-center items-center py-4 px-4 sm:px-6 bg-neo-gray/20 rounded-neo-lg border border-white/5"
+        className="flex justify-center items-center gap-6 py-4 px-4 sm:px-6 bg-neo-gray/20 rounded-neo-lg border border-white/5"
       >
+        {targetWord && (
+          <div data-testid="word-hunt-target" className="text-center">
+            <p className="text-[8px] font-black text-white uppercase tracking-widest mb-1">{t('results.target')}</p>
+            <span dir="auto" className="text-sm font-neo-display font-black text-neo-lime uppercase">{targetWord}</span>
+          </div>
+        )}
         <div className="text-center">
           <p className="text-[8px] font-black text-white uppercase tracking-widest mb-1">
             {t('wordHunt.multiplayer.survivalTime', 'Survival')}
@@ -101,9 +104,6 @@ export default function WordHuntResultsSummary({
         </div>
       </m.section>
 
-      {/* Elimination History — unique data: order eliminated. Player rows
-          (avatar/score/winner) are already covered by ResultsPodium +
-          ConsolationRows above the fold; this strip adds only the order chip. */}
       {eliminated && eliminated.length > 0 && (
         <m.section variants={variant} className="space-y-2">
           <div className="flex items-center gap-2 px-2">

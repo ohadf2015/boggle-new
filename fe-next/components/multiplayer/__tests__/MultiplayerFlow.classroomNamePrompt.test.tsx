@@ -86,8 +86,8 @@ vi.mock('../RoomListView', () => ({
   __esModule: true,
   default: () => <div data-testid="room-list-view">RoomListView</div>,
 }));
-vi.mock('../JoinRoomModal', () => ({ __esModule: true, default: () => null }));
-vi.mock('../CreateRoomModal', () => ({ __esModule: true, default: () => null }));
+vi.mock('../entry/JoinSheet', () => ({ __esModule: true, default: () => null }));
+vi.mock('../entry/CreateSheet', () => ({ __esModule: true, default: () => null }));
 vi.mock('../MatchmakingOverlay', () => ({ MatchmakingOverlay: () => null }));
 
 import MultiplayerFlow from '../MultiplayerFlow';

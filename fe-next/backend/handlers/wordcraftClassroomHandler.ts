@@ -74,6 +74,7 @@ const placeSchema = z.object({
 interface WordcraftRoomGame {
   gameCode: string;
   gameState?: string;
+  isPaused?: boolean;
   gameMode?: string;
   language?: string;
   wordcraftState?: WordcraftLiveSession | null;
@@ -129,7 +130,7 @@ export function registerWordcraftClassroomHandlers(io: Server, socket: Socket): 
     if (!checkRateLimit(socket.id)) return;
     const ctx = raceForSocket(socket);
     if (!ctx) return;
-    if (ctx.game.gameState !== 'in-progress') return;
+    if (ctx.game.gameState !== 'in-progress' || ctx.game.isPaused) return;
 
     const parsed = placeSchema.safeParse(data);
     if (!parsed.success) {

@@ -3,8 +3,6 @@
 import { useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { MpSheet } from '../shell/MpSheet';
-import { ResultsMainContent } from '@/components/results/ResultsMainContent';
-import { ResultsDetailsContent } from '@/components/results/ResultsDetailsContent';
 import BlastMpResults, { buildBlastMpResults } from '@/components/blast/legacy/BlastMpResults';
 import { resolveWheelRushStats } from '@/lib/results/wheelRushStatsFallback';
 import { toStandings } from '@/components/education/results/resultsStandings';
@@ -19,13 +17,15 @@ import { SERIES_TOTAL_GAMES } from '@/hooks/useSeriesTracker';
 import type { MpResultsController } from './useMpResultsController';
 import { useOpenLessonPractice } from './useOpenLessonPractice';
 import type { GameModeOption } from '@/components/GameModeSelector';
+import { MpDetailsWords, useDetailsViewed } from './MpDetailsWords';
+import { MpRoundAwards, MpSeriesGrid } from './MpResultsAlbum';
+import { buildMpStandings } from './mpStandings';
+import { seriesLadder } from './mpResultsView';
+import { roundAwards, seriesGrid } from './mpResultsStory';
 
 const WordHuntResultsSummary = dynamic(() => import('@/components/results/WordHuntResultsSummary'), { ssr: false });
 const BlastResultsScene = dynamic(() => import('@/components/results/BlastResultsScene'), { ssr: false });
 const WheelRushResultsScene = dynamic(() => import('@/components/results/WheelRushResultsScene'), { ssr: false });
-const GlobalRankBadge = dynamic(() => import('@/components/multiplayer/GlobalRankBadge').then((m) => m.GlobalRankBadge), { ssr: false });
-const DailyChallengeInvite = dynamic(() => import('@/components/growth/DailyChallengeInvite').then((m) => m.DailyChallengeInvite), { ssr: false });
-const PostGameEngagement = dynamic(() => import('@/components/growth/PostGameEngagement'), { ssr: false });
 const PostGameWordReview = dynamic(() => import('@/components/education/PostGameWordReview'), { ssr: false });
 const ClassroomResultsCard = dynamic(() => import('@/components/education/ClassroomResultsCard').then((m) => m.ClassroomResultsCard), { ssr: false });
 const ClassroomRoundReward = dynamic(() => import('@/components/education/economy/ClassroomRoundReward'), { ssr: false });
@@ -38,9 +38,9 @@ interface Props {
 }
 
 /**
- * DETAILS — everything that is not "who won, where did I land": word lists,
- * missed words, insights, XP breakdown, mode scenes, the lesson recap. It only
- * mounts while open (the reveal screen stays one screen, nothing below the fold).
+ * DETAILS — the deep dive behind the reveal: the mode scene, the lesson recap,
+ * my words (found / only me / missed) and the round awards or series grid.
+ * Mounts only while open, so the reveal screen stays one screen.
  */
 export default function MpResultsDetails({ open, onClose, c }: Props) {
   const isDesktop = useIsDesktop();
@@ -53,9 +53,10 @@ export default function MpResultsDetails({ open, onClose, c }: Props) {
 }
 
 function DetailsBody({ c }: { c: MpResultsController }) {
-  const { props, t, data, socketEvents, sideEffects, isGuest, resolvedGameMode, lessonGameData } = c;
+  const { props, t, data, isGuest, resolvedGameMode, lessonGameData } = c;
   const { username, gameCode, isHost = false, classroomSummary, wordHuntSummary, blastSummary } = props;
   const { sortedScores, currentPlayerValidWords } = data;
+  useDetailsViewed(resolvedGameMode, data.currentPlayerData?.score ?? 0);
   const wordHuntPlayerLives = useWordHuntPlayerLives();
   const wordHuntEliminatedPlayers = useWordHuntEliminatedPlayers();
   const blastPlayerStats = useBlastPlayerStats();
@@ -149,62 +150,18 @@ function DetailsBody({ c }: { c: MpResultsController }) {
     />
   ) : null;
 
-  const detailsContentProps = {
-    allPlayerWords: c.allPlayerWords,
-    username,
-    gameCode,
-    otherPlayers: data.otherPlayers,
-    missedWords: data.missedWords,
-    isHost,
-    t,
-  };
-
-  const mainContentProps = {
+  const isFinal = isFinalRound && (props.seriesRoundNumber ?? 0) >= 2;
+  const rows = useMemo(() => buildMpStandings({
     sortedScores,
-    nearMisses: socketEvents.nearMisses,
-    isHost,
-    onStartGame: c.nextRound.handleStartGame,
-    onMarkReady: socketEvents.handleMarkReady,
-    onExit: c.requestExit,
-    winStreakData: sideEffects.winStreakData ?? null,
-    xpGainedData: socketEvents.xpGainedData,
-    levelUpData: socketEvents.levelUpData,
-    isAuthenticated: c.isAuthenticated,
-    currentPlayerData: data.currentPlayerData ?? null,
-    isCurrentUserWinner: data.isCurrentUserWinner,
-    currentPlayerValidWords,
-    currentPlayerRank: data.currentPlayerRank,
-    scoreRevealComplete: true,
-    normalizeUsername: data.normalizeUsername,
     username,
-    gameCode,
-    onReturnToRoom: props.onReturnToRoom,
-    isBotsOnlyGame: data.isBotsOnlyGame,
-    isCurrentPlayerReady: socketEvents.isCurrentPlayerReady,
-    readyUsernames: socketEvents.readyUsernames,
-    duplicateRuleDisabled: props.duplicateRuleDisabled ?? false,
-    t,
-    selectedGameMode: c.selectedGameMode,
-    onSelectGameMode: c.setSelectedGameMode,
-    seriesStandings: props.seriesStandings,
-    seriesRoundNumber: props.seriesRoundNumber,
-    seriesTotalGames: props.seriesTotalGames,
-    seriesLeader: props.seriesLeader,
-    gameMode: resolvedGameMode,
-    missedWords: data.missedWords,
-    allPlayerWords: c.allPlayerWords,
-    gameDuration: props.gameDuration,
-    wordHuntSummary,
-    onPodiumReaction: c.reactions.sendReaction,
-    coinReward: sideEffects.coinReward,
-    shareCardStats: data.shareCardStats,
-    // The reveal screen already owns the standings; the sheet is the deep dive.
-    hideStandings: true,
-    // TRUE hidden: the revenge card names the winner and the gap — a placing.
-    suppressRevenge: hideClassPlacings,
-    hideInlineCta: true,
-    hideBestWord: resolvedGameMode === 'blast' && !!blastPlayerStats[username]?.bestWord,
-  };
+    normalizeUsername: data.normalizeUsername,
+    series: { roundNumber: props.seriesRoundNumber ?? 0, standings: props.seriesStandings },
+  }), [sortedScores, username, data.normalizeUsername, props.seriesRoundNumber, props.seriesStandings]);
+  const grid = useMemo(
+    () => (isFinal ? seriesGrid({ ladder: seriesLadder(rows), standings: props.seriesStandings, rounds: props.seriesRoundNumber ?? 0 }) : null),
+    [isFinal, rows, props.seriesStandings, props.seriesRoundNumber],
+  );
+  const awards = useMemo(() => (grid || hideClassPlacings ? null : roundAwards(sortedScores)), [grid, hideClassPlacings, sortedScores]);
 
   return (
     <div data-testid="mp-results-details-body" className="flex flex-col gap-4 max-w-2xl mx-auto w-full">
@@ -215,33 +172,20 @@ function DetailsBody({ c }: { c: MpResultsController }) {
         <BlastMpResults results={blastMpResults} gameMode="blast" />
       )}
       {classroomSummary && <div>{postGameWordReviewNode}</div>}
-      <ResultsMainContent
-        {...(mainContentProps as unknown as React.ComponentProps<typeof ResultsMainContent>)}
-        detailsSlot={
-          <>
-            <ResultsDetailsContent {...(detailsContentProps as unknown as React.ComponentProps<typeof ResultsDetailsContent>)} />
-            {!classroomSummary && postGameWordReviewNode}
-          </>
-        }
+      <MpDetailsWords
+        myWords={data.currentPlayerData?.allWords}
+        allPlayerWords={c.allPlayerWords}
+        username={username ?? ''}
+        missedWords={data.missedWords ?? []}
+        language={c.language}
+        t={t}
       />
+      {!classroomSummary && postGameWordReviewNode}
+      {grid ? <MpSeriesGrid grid={grid} t={t} /> : awards && <MpRoundAwards awards={awards} t={t} />}
       {wordHuntResultsData && <WordHuntResultsSummary {...wordHuntResultsData} />}
       {resolvedGameMode === 'blast' && Object.keys(blastPlayerStats).length > 0 && (
         <BlastResultsScene playerStats={blastPlayerStats} scores={blastResultScores} currentUsername={username} collection={blastSummary?.collection} />
       )}
-      {c.userId && (
-        <div className="flex justify-center">
-          <GlobalRankBadge userId={c.userId} matchScore={data.currentPlayerData?.score ?? 0} />
-        </div>
-      )}
-      {c.showDailyInvite && (
-        <DailyChallengeInvite
-          isWinner={data.isCurrentUserWinner}
-          placement={data.currentPlayerRank}
-          totalPlayers={sortedScores.length}
-          marginToNext={c.marginToNext}
-        />
-      )}
-      <PostGameEngagement />
     </div>
   );
 }

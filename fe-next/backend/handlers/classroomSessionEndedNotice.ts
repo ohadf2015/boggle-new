@@ -1,13 +1,8 @@
 /**
  * The one payload that says "the teacher ended the class".
  *
- * A leaf, because two unrelated paths send it and neither should have to
- * import the other: `classroomGameEndHandler` broadcasts it to the room at
- * teardown, and `classroomGameRecovery` sends it to a single socket that turns
- * up afterwards asking to recover a session that is already over. Two routes
- * to the same news must not word it differently (pitfall class 3) — and the
- * recovery listener must not drag a zod schema and a Supabase persistence
- * module into its import graph to reuse four lines.
+ * A leaf: `classroomGameRecovery` sends it to a single socket that turns up
+ * asking to recover a session that is already over.
  *
  * `hostLeftRoomClosing` is the carrier because the multiplayer client already
  * answers it: a toast with this message, a ten-second grace modal, and — for a

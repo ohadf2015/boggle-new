@@ -79,6 +79,13 @@ describe('BulkImportEnhanced', () => {
     expect(screen.getByPlaceholderText('Paste words...')).toBeInTheDocument();
   });
 
+  it('labels the CSV upload area through the translation layer', () => {
+    render(<BulkImportEnhanced isOpen={true} onClose={mockOnClose} onImport={mockOnImport} language="en" />);
+
+    expect(screen.getByText('eduPolish.csvDropHint')).toBeInTheDocument();
+    expect(screen.queryByText('Drop CSV file here or click to browse')).not.toBeInTheDocument();
+  });
+
   it('should parse newline-separated words correctly', async () => {
     const user = userEvent.setup();
     render(

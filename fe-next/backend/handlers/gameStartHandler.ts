@@ -64,11 +64,8 @@ import {
   recordClassroomWordBank,
   scheduleSpecialWords,
 } from './gameStartRound.js';
+import { tryAcquireGameStart, releaseGameStart } from './gameStartMutex.js';
 
-// In-memory mutex to prevent concurrent startGame flows for the same game.
-// The state machine transition is synchronous, but async work before it
-// (dictionary load, classroom game fetch) creates a window for duplicates.
-const gamesStarting = new Set<string>();
 
 interface StartGamePayload {
   letterGrid: LetterGrid;
@@ -166,82 +163,79 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     const effectiveDifficulty = difficulty ?? game.difficulty ?? DEFAULT_DIFFICULTY;
     let effectiveMinWordLength = minWordLength ?? game.minWordLength ?? 2;
 
-    if (gamesStarting.has(gameCode)) {
+    if (!tryAcquireGameStart(gameCode)) {
       logger.debug('SOCKET', `Rejected duplicate startGame for ${gameCode} (mutex held)`);
       emitError(socket, ErrorCodes.GAME_ALREADY_STARTED, { message: 'Game is already starting' });
       return;
     }
-    gamesStarting.add(gameCode);
-    logger.info('SOCKET', `Starting game ${gameCode} - current state: ${game.gameState}`);
-
-    if (!canTransitionGameState(gameCode, 'START')) selfHealBeforeStart(io, gameCode, game);
-
-    // Random roll from the auto-rotated pool, or the host's explicit pick.
-    let resolvedMode: GameMode = !gameMode || gameMode === 'random'
-      ? selectNextGameMode(game.modeHistory || [], ALL_GAME_MODES)
-      : gameMode as GameMode;
-    if (resolvedMode === 'classic') {
-      effectiveMinWordLength = Math.max(
-        effectiveMinWordLength,
-        classicMinWordLength(language || game.language),
-      );
-    }
-    const rules = getGameModeRules(resolvedMode);
-
-    // Host timer clamped to 30..600s (mode default when none given). Event-driven
-    // modes run on a fixed backstop sized to their natural length instead.
-    const rawTimer = parseInt(String(timerSeconds), 10);
-    const validTimer = rules.fixedTimerSec
-      ?? Math.max(30, Math.min(600, rawTimer || priorTimerSeconds || rules.defaultTimerSec));
-
-    // Beta modes: enforced server-side even if a client crafts the emit.
-    const refusal = await checkInWorkModeAccess(socket, game, resolvedMode, language || game.language || 'en');
-    if (refusal) {
-      gamesStarting.delete(gameCode);
-      logger.debug('SOCKET', `Rejected in-work mode ${resolvedMode} for ${gameCode}: host lacks access or wrong language`);
-      emitError(socket, ErrorCodes.AUTH_FORBIDDEN, { message: refusal });
-      return;
-    }
-
-    // CRITICAL: Transition state FIRST to guard against concurrent startGame calls.
-    const transitionResult = transitionGameState(gameCode, 'START');
-    if (!transitionResult.success) {
-      gamesStarting.delete(gameCode);
-      logger.warn('SOCKET', `Rejected concurrent startGame for ${gameCode}: ${transitionResult.error}`);
-      emitError(socket, ErrorCodes.INTERNAL_ERROR, { message: 'Failed to start game' });
-      return;
-    }
-
-    // ---- Live Vocab Quiz ----
-    // DO NOT MOVE THIS BLOCK: it must stay AFTER the START transition (so
-    // concurrent starts still lose) and BEFORE board dealing, bot seeding and
-    // startGameTimer — any of which would run a board game underneath the quiz
-    // and fire its own endGame mid-round. Returns false for every non-quiz room.
+    let transitioned = false;
     try {
-      const quizStart = await startVocabQuizForClassroom(io, gameCode);
-      if (quizStart === 'refused') {
-        game.gameState = 'waiting';
-        gamesStarting.delete(gameCode);
-        logger.warn('SOCKET', `Game ${gameCode} quiz start refused, room left in the lobby`);
+      logger.info('SOCKET', `Starting game ${gameCode} - current state: ${game.gameState}`);
+
+      if (!canTransitionGameState(gameCode, 'START')) selfHealBeforeStart(io, gameCode, game);
+
+      // Random roll from the auto-rotated pool, or the host's explicit pick.
+      let resolvedMode: GameMode = !gameMode || gameMode === 'random'
+        ? selectNextGameMode(game.modeHistory || [], ALL_GAME_MODES)
+        : gameMode as GameMode;
+      if (resolvedMode === 'classic') {
+        effectiveMinWordLength = Math.max(
+          effectiveMinWordLength,
+          classicMinWordLength(language || game.language),
+        );
+      }
+      const rules = getGameModeRules(resolvedMode);
+
+      // Host timer clamped to 30..600s (mode default when none given). Event-driven
+      // modes run on a fixed backstop sized to their natural length instead.
+      const rawTimer = parseInt(String(timerSeconds), 10);
+      const validTimer = rules.fixedTimerSec
+        ?? Math.max(30, Math.min(600, rawTimer || priorTimerSeconds || rules.defaultTimerSec));
+
+      // Beta modes: enforced server-side even if a client crafts the emit.
+      const refusal = await checkInWorkModeAccess(socket, game, resolvedMode, language || game.language || 'en');
+      if (refusal) {
+        logger.debug('SOCKET', `Rejected in-work mode ${resolvedMode} for ${gameCode}: host lacks access or wrong language`);
+        emitError(socket, ErrorCodes.AUTH_FORBIDDEN, { message: refusal });
         return;
       }
-      if (quizStart) {
-        // The board path below arms or clears the boss; a quiz round returns first, so it clears here.
-        armRoomBoss(io, gameCode, game, { bossId: undefined, students: 0, roundSeconds: 0 });
-        gamesStarting.delete(gameCode);
-        logger.info('SOCKET', `Game ${gameCode} started as a live vocab quiz`);
+
+      // CRITICAL: Transition state FIRST to guard against concurrent startGame calls.
+      const transitionResult = transitionGameState(gameCode, 'START');
+      if (!transitionResult.success) {
+        logger.warn('SOCKET', `Rejected concurrent startGame for ${gameCode}: ${transitionResult.error}`);
+        emitError(socket, ErrorCodes.INTERNAL_ERROR, { message: 'Failed to start game' });
         return;
       }
-    } catch (err) {
-      // Never strand the room on a quiz-start failure — fall through to the board game.
-      logger.error('SOCKET', `Vocab quiz start failed for ${gameCode}, falling back to board game: ${(err as Error).message}`);
-    }
+      transitioned = true;
 
-    applyStartBoostToken(socket, game, gameCode, validatedData.boostToken);
+      // ---- Live Vocab Quiz ----
+      // DO NOT MOVE THIS BLOCK: it must stay AFTER the START transition (so
+      // concurrent starts still lose) and BEFORE board dealing, bot seeding and
+      // startGameTimer — any of which would run a board game underneath the quiz
+      // and fire its own endGame mid-round. Returns false for every non-quiz room.
+      try {
+        const quizStart = await startVocabQuizForClassroom(io, gameCode);
+        if (quizStart === 'refused') {
+          game.gameState = 'waiting';
+          logger.warn('SOCKET', `Game ${gameCode} quiz start refused, room left in the lobby`);
+          return;
+        }
+        if (quizStart) {
+          // The board path below arms or clears the boss; a quiz round returns first, so it clears here.
+          armRoomBoss(io, gameCode, game, { bossId: undefined, students: 0, roundSeconds: 0 });
+          logger.info('SOCKET', `Game ${gameCode} started as a live vocab quiz`);
+          return;
+        }
+      } catch (err) {
+        // Never strand the room on a quiz-start failure — fall through to the board game.
+        logger.error('SOCKET', `Vocab quiz start failed for ${gameCode}, falling back to board game: ${(err as Error).message}`);
+      }
 
-    // Hold the mutex through the whole async setup chain (audit SRV-H4): a
-    // duplicate arriving mid-setup would otherwise self-heal-reset this round.
-    try {
+      applyStartBoostToken(socket, game, gameCode, validatedData.boostToken);
+
+      // The mutex is held through the whole async setup chain (audit SRV-H4): a
+      // duplicate arriving mid-setup would otherwise self-heal-reset this round.
       broadcastToRoom(io, getGameRoom(gameCode), 'gameStarting', { gameMode: resolvedMode });
 
       const gameLang = language || game.language || 'en';
@@ -301,10 +295,6 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       ensureGame(gameCode);
       initializePlayerData(gameCode);
 
-      const goldenLetters = pickGoldenLetters(letterGrid);
-      game.goldenLetters = goldenLetters;
-      updateGame(gameCode, { goldenLetters });
-
       // Solo host → auto-fill bots (never for human-only invite modes: bots
       // have no move logic there). Bots make it competitive, so the client's
       // grid is dropped and a fresh 6x6 dealt (audit SRV-CRIT-4).
@@ -350,6 +340,11 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
         updateGame(gameCode, { gameMode: resolvedMode });
       }
       if (roundResult.totalBoardWords !== undefined) game.totalBoardWords = roundResult.totalBoardWords;
+
+      // Only now is the grid final (bot re-deal and mode rebuilds are done).
+      const goldenLetters = pickGoldenLetters(letterGrid);
+      game.goldenLetters = goldenLetters;
+      updateGame(gameCode, { goldenLetters });
 
       // Lesson words the FINAL board carries — only now is the grid the one the class sees.
       if (classroomGame && vocabToEmbed.length > 0) {
@@ -420,9 +415,13 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       }).catch((err: Error) => {
         logger.error('SOCKET', `Failed to notify game started for ${gameCode}: ${err.message}`);
       });
+    } catch (err) {
+      // Never strand a room mid-start: put it back in the lobby and tell the host.
+      logger.error('SOCKET', `startGame failed for ${gameCode}: ${(err as Error).message}`, { stack: (err as Error).stack });
+      if (transitioned) selfHealBeforeStart(io, gameCode, game);
+      emitError(socket, ErrorCodes.INTERNAL_ERROR, { message: 'Failed to start game' });
     } finally {
-      // Mutex released only after all setup completes (or throws). See SRV-H4 above.
-      gamesStarting.delete(gameCode);
+      releaseGameStart(gameCode);
     }
   });
 }

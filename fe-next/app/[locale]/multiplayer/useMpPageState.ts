@@ -253,6 +253,7 @@ export function useMpPageState() {
     // the in-place reset above is the whole exit (a hard nav blanks the
     // Capacitor WebView). A router push is SPA navigation, so it is safe too.
     if (destination) router.push(destination);
+    return Boolean(destination);
   }, [gameCode, username, setIsActive, setIsHost, setIsPrivate, setGameCode, setShowResults, setResultsData,
       classroomContext, isHost, isClassroomHost, language, router, pathname]);
 
@@ -392,7 +393,7 @@ export function useMpPageState() {
     isPaused, pauseGame, resumeGame, extendTime, endRoundNow, skipTargetWord,
     classroomAccessibility, classroomLevel, classroomWordBank, teacherStrip, quizOwnsScreen,
     socketContextValue, hostLeftState, setHostLeftState, classroomContext, classroomDecisionRef, exitClassroomStudentToHub,
-    classroomEnded, retryClassroomRoom, handleExitToLobby, exitMp, setIsActive, setIsHost, setIsPrivate, setGameCode, setShowResults, setResultsData,
+    classroomEnded, retryClassroomRoom, handleExitToLobby, exitMp,
     routerProps,
   };
 }

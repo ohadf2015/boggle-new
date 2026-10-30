@@ -62,6 +62,7 @@ import logger from '../utils/logger.js';
 import { startGameTimer, endGame } from './shared.js';
 import { resendFinishedResults } from './finishedResultsResend';
 import { tryReclaimClassroomHostSeat } from './classroomGameHostReclaim';
+import { decideClassroomHost } from './classroomHostGate.js';
 import { handleQuizRequestResults } from './vocabQuizHandler.js';
 import { validatePayload, createGameSchema, getWordsForBoardSchema } from '../utils/socketValidation.js';
 import { stopAllBots } from '../modules/botManager.js';
@@ -145,7 +146,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         return;
       }
 
-      const { gameCode, roomName, language, hostUsername, playerId, avatar, authUserId, guestTokenHash, guestSessionId, isRanked, isPrivate, isClassroom, isQuickPlay } = validation.data as CreateGamePayload;
+      const { gameCode, roomName, language, hostUsername, playerId, avatar, authUserId, guestTokenHash, guestSessionId, isRanked, isPrivate: requestedPrivate, isQuickPlay } = validation.data as CreateGamePayload;
 
       // Ranked rooms must be hosted by an authenticated user — guests can't
       // submit results that update the ranked MMR leaderboard, so allowing
@@ -178,10 +179,18 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       gamesBeingCreated.add(gameCode);
       try {
 
+      const classroomGate = await decideClassroomHost(socket, gameCode, requestedPrivate === true);
+      if (!classroomGate.allowed) {
+        logger.warn('SOCKET', `Refused createGame on classroom code ${gameCode}: socket is not the classroom teacher`, { socketId: socket.id });
+        emitError(socket, ErrorCodes.AUTH_FORBIDDEN, { message: 'Only the teacher can open this classroom game' });
+        return;
+      }
+      const { isClassroom, isPrivate } = classroomGate;
+
       if (authUserId) {
         await handleExistingAuthConnection(io, socket, authUserId, gameCode);
       }
-      const roomLanguage = isClassroom ? await classroomRoomLanguage(gameCode, language) : (language || 'en');
+      const roomLanguage = isClassroom ? (classroomGate.recordLanguage ?? await classroomRoomLanguage(gameCode, language)) : (language || 'en');
 
       // Re-check after async yield — another socket may have created it
       if (gameExists(gameCode)) {
@@ -198,8 +207,8 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         roomName: roomName || gameCode,
         language: roomLanguage,
         isRanked: isRanked || false,
-        isPrivate: isPrivate || false,
-        isClassroom: isClassroom || false,
+        isPrivate,
+        isClassroom,
         isQuickPlay: isQuickPlay || false,
         allowLateJoin: isRanked ? false : true
       });
@@ -233,7 +242,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         username: hostUsername || 'Host',
         roomName: roomName || gameCode,
         language: roomLanguage,
-        isPrivate: isPrivate || false,
+        isPrivate,
         users: getGameUsers(gameCode)
       });
 
@@ -373,13 +382,12 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
   });
 
   // Blast dead-end: client detected no valid moves remain, Sugar Crush played — end game now.
-  // Multiple players may emit this concurrently; endGame is idempotent.
   socket.on('blastDeadEnd', () => {
     if (!checkRateLimit(socket.id)) { socket.emit('rateLimited'); return; }
     const gameCode = getGameBySocketId(socket.id);
     if (!gameCode) return;
     const game = getGame(gameCode);
-    if (!game || game.gameMode !== 'blast') return;
+    if (!game || game.gameMode !== 'blast' || !isInProgress(game.gameState)) return;
     endGame(io, gameCode);
   });
 
@@ -615,12 +623,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
     if (!game) return;
 
     if (game.gameState === 'finished') {
-      const cached = game.cachedResultsPayload;
-      if (cached) {
-        logger.info('SOCKET', `Re-sending cached results to reconnected client in ${gameCode}`);
-        safeEmit(socket, 'validatedScores', cached);
-        safeEmit(socket, 'validationComplete', cached);
-      }
+      resendFinishedResults(socket, gameCode, game);
       return;
     }
 

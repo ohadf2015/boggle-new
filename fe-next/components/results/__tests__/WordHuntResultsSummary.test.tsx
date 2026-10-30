@@ -1,10 +1,8 @@
 /**
  * WordHuntResultsSummary Tests
  *
- * After dedup: WHRS owns ONLY survival highlight + elimination-order chips +
- * tip badges. Target word, found-state badge, words-found count, full
- * per-player Match Summary now belong to ResultsHeroSection / ResultsPodium /
- * ConsolationRows above the fold and are intentionally NOT rendered here.
+ * WHRS owns the target word + survival highlight, elimination-order chips and
+ * tip badges. Per-player standings belong to the results stage.
  */
 
 import React from 'react';
@@ -49,9 +47,16 @@ const playerResults = [
 
 describe('WordHuntResultsSummary', () => {
   describe('dedup invariants', () => {
-    it('does NOT render target-word-hero (owned by ResultsHeroSection)', () => {
+    it('shows the target word beside the survival time (the MP hero that showed it is gone)', () => {
       render(<WordHuntResultsSummary {...baseProps} />);
-      expect(screen.queryByTestId('target-word-hero')).not.toBeInTheDocument();
+      const target = screen.getByTestId('word-hunt-target');
+      expect(target).toHaveTextContent('results.target');
+      expect(target).toHaveTextContent('PUZZLE');
+    });
+
+    it('omits the target cell when the server sent no target word', () => {
+      render(<WordHuntResultsSummary {...baseProps} targetWord="" />);
+      expect(screen.queryByTestId('word-hunt-target')).not.toBeInTheDocument();
     });
 
     it('does NOT render found / first-finder / not-found badges (owned by Hero)', () => {

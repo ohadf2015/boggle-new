@@ -70,6 +70,12 @@ describe('Teacher Pro checkout strip on classroom compare pages', () => {
     expect(FREE_TIER_LIMITS.studentsPerClass).toBe(50);
   });
 
+  it('names the plan in the page language, eyebrow included', () => {
+    expect(teacherProCompareCheckoutCopy('he').eyebrow).toBe('פרו למורים');
+    expect(teacherProCompareCheckoutCopy('en').eyebrow).toBe('Teacher Pro');
+    expect(strip).not.toMatch(/>Teacher Pro</);
+  });
+
   it('mounts once on every education compare page and nowhere on word-game foils', () => {
     for (const slug of EDUCATION) {
       const page = readFileSync(join(LOCALE, slug, 'page.tsx'), 'utf8');

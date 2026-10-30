@@ -15,17 +15,15 @@
  */
 
 import React from 'react';
-import { render, fireEvent, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { NavigationProvider } from '@/contexts/NavigationContext';
 
 // Global store for captured props (accessible by hoisted mocks)
 declare global {
   var __TEST_BANNER_PROPS__: { rank?: number; winner?: { username: string; score: number } } | null;
-  var __TEST_MAIN_CONTENT_PROPS__: { currentPlayerRank?: number; username?: string } | null;
 }
 globalThis.__TEST_BANNER_PROPS__ = null;
-globalThis.__TEST_MAIN_CONTENT_PROPS__ = null;
 
 // Mock all heavy dependencies
 vi.mock('@/contexts/AuthContext', () => ({
@@ -94,170 +92,13 @@ vi.mock('next/dynamic', () => ({
   },
 }));
 
-// Mock ResultsMainContent to capture currentPlayerRank
-vi.mock('@/components/results/ResultsMainContent', () => ({
-  __esModule: true,
-  ResultsMainContent: (props: any) => {
-    globalThis.__TEST_MAIN_CONTENT_PROPS__ = {
-      currentPlayerRank: props.currentPlayerRank,
-      username: props.username,
-    };
-    const React = require('react');
-    return React.createElement('div', {
-      'data-testid': 'results-main-content',
-      'data-rank': props.currentPlayerRank,
-    });
-  },
-}));
-
-vi.mock('@/components/results/ResultsPlayerCard', () => ({
-  __esModule: true,
-  default: () => null,
-}));
-
-vi.mock('@/components/ExitRoomButton', () => ({
-  __esModule: true,
-  default: () => <button data-testid="exit-button">Exit</button>,
-}));
-
-vi.mock('@/components/ui/ConfirmationDialog', () => ({
-  ConfirmationDialog: () => null,
-}));
-
-vi.mock('@/components/auth/AuthModal', () => ({
-  __esModule: true,
-  default: () => null,
-}));
-
-vi.mock('@/components/auth/FirstWinSignupModal', () => ({
-  __esModule: true,
-  default: () => null,
-}));
-
-vi.mock('@/components/voting/WordFeedbackModal', () => ({
-  __esModule: true,
-  default: () => null,
-}));
-
-vi.mock('@/components/results/useResultsSocketEvents', () => ({
-  useResultsSocketEvents: () => ({
-    showWordFeedback: false,
-    wordToVote: null,
-    wordQueue: [],
-    xpGainedData: null,
-    levelUpData: null,
-    showLevelUpCelebration: false,
-    setShowLevelUpCelebration: vi.fn(),
-    nearMisses: [],
-    referralMilestone: null,
-    showReferralMilestone: false,
-    readyUsernames: [],
-    isCurrentPlayerReady: false,
-    handleVote: vi.fn(),
-    handleFeedbackSkip: vi.fn(),
-    handleReferralMilestoneClose: vi.fn(),
-    handleMarkReady: vi.fn(),
-  }),
-}));
-
-vi.mock('@/utils/session', () => ({
-  clearSessionPreservingUsername: vi.fn(),
-}));
-
-vi.mock('@/utils/guestManager', () => ({
-  shouldShowUpgradePrompt: vi.fn(() => false),
-  getGuestStatsSummary: vi.fn(() => ({ gamesPlayed: 5 })),
-  getGuestStats: vi.fn(() => ({ games: 5, words: 0, score: 0 })),
-  updateGuestStatsAfterGame: vi.fn(),
-  isFirstWin: vi.fn(() => false),
-}));
-
-vi.mock('@/hooks/usePostHogFlag', () => ({
-  usePostHogFlag: vi.fn(() => 'after-2nd-game'),
-}));
-
-vi.mock('@/utils/growthTracking', () => ({
-  trackGameCompletion: vi.fn(),
-  trackStreakMilestone: vi.fn(),
-  trackGrowthEvent: vi.fn(),
-  trackSignupFunnel: vi.fn(),
-}));
-
-vi.mock('@/utils/gameHistoryManager', () => ({
-  addGameToHistory: vi.fn(),
-}));
-
-vi.mock('@/utils/coinManager', () => ({
-  awardGameCoins: vi.fn(() => null),
-}));
-
-vi.mock('@/hooks/useSaveCognitiveScore', () => ({
-  useSaveCognitiveScore: () => ({
-    saveCognitiveScore: vi.fn().mockResolvedValue(null),
-    isSaving: false,
-  }),
-}));
-
-vi.mock('@/hooks/useFirstWinCelebration', () => ({
-  useFirstWinCelebration: vi.fn(),
-}));
-
-vi.mock('@/hooks/useCrazyGamesLifecycle', () => ({
-  useCrazyGamesLifecycle: vi.fn(),
-}));
-
-vi.mock('@/contexts/CoinContext', () => ({
-  useCoinContext: () => ({
-    refreshCoins: vi.fn(),
-  }),
-}));
-
-vi.mock('@/lib/supabase', () => ({
-  syncCoinsToDatabase: vi.fn().mockResolvedValue({}),
-}));
-
-vi.mock('@/utils/SocketContext', () => ({
-  useSocket: () => ({
-    socket: { emit: vi.fn(), on: vi.fn(), off: vi.fn() },
-    isConnected: true,
-  }),
-  useSocketOptional: () => null,
-}));
-
-vi.mock('@/components/RoomChat', () => ({
-  __esModule: true,
-  default: () => null,
-}));
-
-vi.mock('@/components/CrazyGamesBanner', () => ({
-  __esModule: true,
-  default: () => null,
-}));
-
-vi.mock('@/components/CrazyGamesSDK', () => ({
-  shouldHideExternalLogin: vi.fn(() => false),
-  useCrazyGames: vi.fn(() => ({
-    isAvailable: false,
-    isOnCrazyGamesPlatform: false,
-    showMidgameAd: vi.fn(),
-    showRewardedAd: vi.fn(),
-    hasAdblock: vi.fn(async () => false),
-    gameplayStart: vi.fn(),
-    gameplayStop: vi.fn(),
-    submitLeaderboardScore: vi.fn(),
-  })),
-}));
-
-// Skip the pre-result fanfare overlay: for a notable rank the real page returns
-// only <PreResultFanfare> and never mounts the results tree until onComplete
-// fires (auto-dismisses via reduced-motion in real UX, but not in jsdom). These
-// tests assert the underlying rank/banner tree, so collapse the gate to null.
 vi.mock('@/components/mascot/celebrationKind', () => ({
   pickCelebrationKind: vi.fn(() => null),
 }));
 
 vi.mock('@/utils/confettiUtils', () => ({
   fireRankConfetti: vi.fn(),
+  fireFirstWinConfetti: vi.fn(),
 }));
 
 vi.mock('@/hooks/useInterstitialAd', () => ({
@@ -302,15 +143,12 @@ const renderResultsPage = (props: {
       </LanguageProvider>
     </NavigationProvider>
   );
-  // The deep dive (ResultsMainContent) lives behind DETAILS on the rebuilt screen.
-  fireEvent.click(screen.getByTestId('mp-results-details-open'));
   return utils;
 };
 
 describe('ResultsPage Ranking', () => {
   beforeEach(() => {
     globalThis.__TEST_BANNER_PROPS__ = null;
-    globalThis.__TEST_MAIN_CONTENT_PROPS__ = null;
     vi.clearAllMocks();
   });
 
@@ -326,8 +164,6 @@ describe('ResultsPage Ranking', () => {
         username: 'PlayerOne', // Exact match
       });
 
-      // The main content should receive rank 1 for the winning player
-      expect(globalThis.__TEST_MAIN_CONTENT_PROPS__?.currentPlayerRank).toBe(1);
       expect(myCardRank()).toBe('#1');
     });
 
@@ -341,8 +177,6 @@ describe('ResultsPage Ranking', () => {
         finalScores,
         username: 'Runner',
       });
-
-      expect(globalThis.__TEST_MAIN_CONTENT_PROPS__?.currentPlayerRank).toBe(2);
 
       expect(myCardRank()).toBe('#2');
     });
@@ -372,7 +206,6 @@ describe('ResultsPage Ranking', () => {
 
       // EXPECTED: rank should be 1 (player with highest score)
       // Username normalization (trim) ensures match despite trailing space
-      expect(globalThis.__TEST_MAIN_CONTENT_PROPS__?.currentPlayerRank).toBe(1);
       expect(myCardRank()).toBe('#1');
     });
 
@@ -389,7 +222,6 @@ describe('ResultsPage Ranking', () => {
 
       // EXPECTED: rank should be 1 (player with highest score)
       // Username normalization (lowercase) ensures match despite case difference
-      expect(globalThis.__TEST_MAIN_CONTENT_PROPS__?.currentPlayerRank).toBe(1);
       expect(myCardRank()).toBe('#1');
     });
 
@@ -407,7 +239,6 @@ describe('ResultsPage Ranking', () => {
       });
 
       // ZeroScorePlayer is first in the sorted list (stable sort, both score 0)
-      expect(globalThis.__TEST_MAIN_CONTENT_PROPS__?.currentPlayerRank).toBe(1);
       expect(myCardRank()).toBe('#1');
     });
   });

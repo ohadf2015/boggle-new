@@ -28,7 +28,7 @@ const base: MpMyCardProps = {
   bestWord: { word: 'aet', score: 12 },
   xp: 15,
   coins: 10,
-  gap: { kind: 'ahead', name: 'Noa', points: 40 },
+  callout: { kind: 'beat', name: 'Noa', points: 40 },
   revealed: true,
   t,
 };

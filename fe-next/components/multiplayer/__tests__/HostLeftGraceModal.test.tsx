@@ -35,6 +35,12 @@ describe('HostLeftGraceModal (UX audit 2026-05-04 #2)', () => {
     expect(screen.getByTestId('host-left-banner').textContent).toContain('multiplayerFlow.hostLeftModal.body');
   });
 
+  it('renders the resolved server message when there is no reason (class ended, kicked)', () => {
+    render(<HostLeftGraceModal isOpen={true} onExit={vi.fn()} message="Your class game ended." />);
+    expect(screen.getByTestId('host-left-banner').textContent).toContain('Your class game ended.');
+    expect(screen.getByTestId('host-left-banner').textContent).not.toContain('multiplayerFlow.hostLeftModal.body');
+  });
+
   it('renders reason-specific body when reason="grace_expired"', () => {
     render(<HostLeftGraceModal isOpen={true} onExit={vi.fn()} seconds={10} reason="grace_expired" />);
     expect(screen.getByTestId('host-left-banner').textContent).toContain('multiplayerFlow.hostLeftReason.graceExpired');

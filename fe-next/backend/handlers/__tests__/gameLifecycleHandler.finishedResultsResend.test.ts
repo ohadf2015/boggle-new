@@ -227,3 +227,20 @@ describe('requestGameState — finished game resends the cached results payload'
     expect(mockSafeEmit.mock.calls.filter((c) => c[1] === 'validatedScores')).toHaveLength(0);
   });
 });
+
+describe('finished vocab quiz room — every door resends the quiz finale', () => {
+  const QUIZ_ENDED = { gameCode: 'QUIZ01', standings: [{ username: 'Noa', score: 900 }], totalQuestions: 8 };
+  const quizRoom = { gameState: 'finished', gameMode: 'classic', cachedResultsPayload: { vocabQuizEnded: QUIZ_ENDED } };
+
+  it.each(['requestGameState', 'requestResults'])('%s emits vocabQuiz:ended, never board-shaped scores', (event) => {
+    const socket = createSocket();
+    mockGetGameBySocketId.mockReturnValue('QUIZ01');
+    mockGetGame.mockReturnValue(quizRoom);
+
+    registerGameLifecycleHandlers(fakeIo, socket as never);
+    socket.handlers[event]();
+
+    expect(mockSafeEmit).toHaveBeenCalledWith(socket, 'vocabQuiz:ended', QUIZ_ENDED);
+    expect(mockSafeEmit.mock.calls.filter((c) => c[1] === 'validatedScores')).toHaveLength(0);
+  });
+});

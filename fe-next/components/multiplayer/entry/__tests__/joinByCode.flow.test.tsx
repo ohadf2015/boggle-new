@@ -39,7 +39,7 @@ vi.mock('../../RoomListView', () => ({
     </div>
   ),
 }));
-vi.mock('../../JoinRoomModal', () => ({
+vi.mock('../JoinSheet', () => ({
   __esModule: true,
   default: ({ isOpen, room, onJoin }: {
     isOpen: boolean;
@@ -57,7 +57,7 @@ vi.mock('../../JoinRoomModal', () => ({
       </div>
     ) : null,
 }));
-vi.mock('../../CreateRoomModal', () => ({ __esModule: true, default: () => null }));
+vi.mock('../CreateSheet', () => ({ __esModule: true, default: () => null }));
 vi.mock('../../MatchmakingOverlay', () => ({ MatchmakingOverlay: () => null }));
 
 import MultiplayerFlow from '../../MultiplayerFlow';

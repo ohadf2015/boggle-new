@@ -11,6 +11,7 @@ export const MP_TOAST_IDS = {
   usernameTaken: 'mp-username-taken',
   joinError: 'mp-join-error',
   rateLimited: 'mp-rate-limited',
+  sessionMoved: 'mp-session-moved',
   notConnected: 'mp-not-connected',
   connectionTimeout: 'mp-connection-timeout',
   loadingProfile: 'mp-loading-profile',

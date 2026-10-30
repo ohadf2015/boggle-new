@@ -20099,7 +20099,8 @@ const ru = {
       "editSettings": "Изменить настройки раунда",
       "chatHint": "Скажи привет команде",
       "chatUnread": "{count} новых",
-      "modeOn": "{mode} выбран — жми Старт"
+      "modeOn": "{mode} выбран — жми Старт",
+      "progressNotSaved": "Не удалось сохранить игру. Если сервер перезапустится, прогресс может пропасть."
     },
     "round": {
       "getReady": "Приготовься",
@@ -20198,6 +20199,12 @@ const ru = {
       "share": "Поделиться",
       "seriesChampion": "Чемпион серии",
       "teacherPaced": "Учитель запустит следующую игру",
+      "calloutPhotoWon": "Фотофиниш! Победа над {name} с разницей {points}",
+      "calloutPhotoLost": "Фотофиниш! {name} впереди всего на {points}",
+      "calloutComeback": "Камбэк! +{places} в серии",
+      "calloutUnique": "Слова, найденные только тобой: {count}",
+      "detailsWords": "Твои слова",
+      "detailsNoWords": "В этом раунде слов нет",
       "backToClass": "Вернуться к классу",
       "endClassTitle": "Завершить игру класса?",
       "endClassBody": "Комната закроется для всех, и вы вернётесь в панель класса.",
@@ -21322,6 +21329,13 @@ const ru = {
     }
   }
   // @teacherLifecycleEmail:end
+  ,
+  // @eduPolish:start
+  "eduPolish": {
+    "seatCapReached": "{name} смотрит: класс заполнен ({cap} игроков)",
+    "csvDropHint": "Перетащите CSV-файл сюда или нажмите, чтобы выбрать"
+  }
+  // @eduPolish:end
 };
 
 export { ru };

@@ -6,7 +6,7 @@
  * Reduced from 20+ state setter props to just a few local state props
  */
 import { applyBlastBoardUpdate } from '@/hooks/gameState/applyBlastBoardUpdate';
-import { useEffect, useRef, useMemo, type RefObject } from 'react';
+import { useCallback, useEffect, useRef, useMemo, type RefObject } from 'react';
 import { Socket } from 'socket.io-client';
 import { neoSuccessToast, TOAST_ICONS } from '../../../components/NeoToast';
 import { resetComboState as resetComboStateUtil } from '@/shared/utils/comboUtils';
@@ -18,7 +18,6 @@ import {
   markStartGameHandled,
   registerStartGameHandler,
   wasStartGameHandled,
-  createHostLeftRoomClosingHandler,
 } from '@/shared/utils/gameEventUtils';
 import { useLetterGrid, useGameLanguage, useShowStartAnimation, useGameActions, useGameStore } from '@/hooks/gameState';
 import type { BlastComboSyncPayload, StartGameBroadcast, PlayerResultPayload } from '@/shared/types/socket';
@@ -284,10 +283,10 @@ export function usePlayerGameEvents({
   const fireRoundIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Memoized room closed handler
-  const handleHostLeftRoomClosing = useMemo(() => {
-    if (!socket) return () => {};
-    return createHostLeftRoomClosingHandler(socket, username, t, intentionalExitRef);
-  }, [socket, username, t, intentionalExitRef]);
+  // The page-level banner owns the message and the exit; a reload here would cut its countdown short.
+  const handleHostLeftRoomClosing = useCallback(() => {
+    intentionalExitRef.current = true;
+  }, [intentionalExitRef]);
 
   // Memoized earthquake handlers using shared utility
   // Note: fireRoundIntervalRef is intentionally NOT in deps - it's a stable ref

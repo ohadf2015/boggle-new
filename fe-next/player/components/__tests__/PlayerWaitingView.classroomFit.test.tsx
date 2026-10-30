@@ -16,7 +16,7 @@
  * lobby is an age gate for a feature nobody asked for. Dropping it is what
  * makes the column fit; it is not a layout trick.
  */
-import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { vi, describe, it, expect, beforeEach, onTestFinished } from 'vitest';
 /* eslint-disable react/display-name */
 import React from 'react';
 import { render, screen } from '@testing-library/react';
@@ -85,6 +85,7 @@ vi.mock('@/hooks/useAvatarPremium', () => ({ useAvatarPremium: () => ({ isPremiu
 vi.mock('@/components/avatar/AvatarBuilderModal', () => ({ __esModule: true, default: () => null }));
 
 import PlayerWaitingView from '../PlayerWaitingView';
+import { setLobbyViewport } from '@/components/multiplayer/lobby/__tests__/lobbyViewport';
 
 const defaultProps = {
   gameCode: 'JATS5Z',
@@ -116,6 +117,8 @@ describe('PlayerWaitingView — the classroom lobby fits a 390x844 phone', () =>
   });
 
   it('keeps chat for an ordinary public room', () => {
+    setLobbyViewport('desktop');
+    onTestFinished(() => setLobbyViewport('phone'));
     render(<PlayerWaitingView {...defaultProps} />);
     expect(screen.getAllByTestId('room-chat').length).toBeGreaterThanOrEqual(1);
   });

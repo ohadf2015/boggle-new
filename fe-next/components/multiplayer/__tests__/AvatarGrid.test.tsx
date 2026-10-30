@@ -12,8 +12,8 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import JoinRoomModal from '../JoinRoomModal';
-import CreateRoomModal from '../CreateRoomModal';
+import JoinRoomModal from '../entry/JoinSheet';
+import CreateRoomModal from '../entry/CreateSheet';
 import { EntryIdentity } from '../entry/EntryIdentity';
 import { setStoredCustomAvatar } from '@/utils/profileStorage';
 import type { ActiveRoom, Language } from '@/shared/types/game';

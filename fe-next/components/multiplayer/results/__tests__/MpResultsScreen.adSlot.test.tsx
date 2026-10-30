@@ -90,15 +90,6 @@ vi.mock('next/dynamic', () => ({
   },
 }));
 
-const mainContentPropsCapture: { current: any } = { current: null };
-vi.mock('@/components/results/ResultsMainContent', () => ({
-  __esModule: true,
-  ResultsMainContent: (props: any) => {
-    mainContentPropsCapture.current = props;
-    return <div data-testid="results-main-content" />;
-  },
-}));
-
 vi.mock('@/components/results/ResultsPlayerCard', () => ({
   __esModule: true,
   default: () => null,
@@ -237,7 +228,7 @@ vi.mock('@/utils/confettiUtils', () => ({ fireRankConfetti: vi.fn() }));
 
 // Skip the pre-result fanfare overlay: for a notable rank the real page returns
 // only <PreResultFanfare> and never mounts the results tree (incl. the banner
-// slot + ResultsMainContent these tests assert) until onComplete fires.
+// slot these tests assert) until onComplete fires.
 vi.mock('@/components/mascot/celebrationKind', () => ({
   pickCelebrationKind: vi.fn(() => null),
 }));
@@ -289,7 +280,6 @@ describe('ResultsPage — AdMob banner slot', () => {
     bannerSlotMock.mockClear();
     showInterstitialMock.mockClear();
     showInterstitialMock.mockResolvedValue(undefined);
-    mainContentPropsCapture.current = null;
   });
 
   it('does not fire the AdMob interstitial on results mount', () => {
@@ -352,14 +342,9 @@ describe('ResultsPage — AdMob banner slot', () => {
       isHost: true,
     });
 
-    // The deep dive (ResultsMainContent) lives behind DETAILS on the rebuilt screen.
-    fireEvent.click(screen.getByTestId('mp-results-details-open'));
-    const onStartGame = mainContentPropsCapture.current?.onStartGame as undefined | (() => Promise<void> | void);
-    expect(typeof onStartGame).toBe('function');
-
-    // Kick off the host's "Play Again" while the interstitial promise is unresolved.
+    fireEvent.pointerDown(screen.getByTestId('mp-results-stage'));
     const startGamePromise = act(async () => {
-      void onStartGame!();
+      fireEvent.click(screen.getByTestId('mp-primary-cta'));
     });
     // Drain microtasks so the awaited interstitial call lands before assertions.
     await new Promise((r) => setTimeout(r, 0));

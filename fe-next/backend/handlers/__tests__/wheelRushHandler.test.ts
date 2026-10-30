@@ -23,6 +23,7 @@ vi.mock('../../modules/gameStateManager', () => ({
   getUsernameBySocketId: vi.fn(() => 'p1'),
   updatePlayerScore: vi.fn(),
   addPlayerWord: vi.fn(),
+  addPlayerEventBonus: vi.fn(),
 }));
 
 vi.mock('../../modules/wheelRushManager', () => ({

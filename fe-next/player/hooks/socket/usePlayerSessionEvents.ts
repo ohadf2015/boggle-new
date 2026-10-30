@@ -138,9 +138,6 @@ export function usePlayerSessionEvents({
     };
 
     const handleUpdateLeaderboard = (data: LeaderboardUpdatePayload) => {
-      if (typeof window !== 'undefined' && window.location.search.includes('lbdebug')) {
-        console.info('[lbdebug][player] updateLeaderboard received:', (data.leaderboard || []).map(e => `${e.username}=${e.score}`).join(', '));
-      }
       throttledSetLeaderboard(data.leaderboard);
     };
 
@@ -168,32 +165,15 @@ export function usePlayerSessionEvents({
       // Silent — the host crown moves on the player roster, no toast needed.
     };
 
-    const handleSessionTakenOver = (data: HostMessagePayload) => {
-      logger.log('[PLAYER] Session taken over by another tab');
+    // The page-level socket hook owns the toast for these.
+    const handleSessionMoved = () => {
       intentionalExitRef.current = true;
       clearSessionPreservingUsername(username);
-      neoInfoToast(data.message || t('playerView.sessionMovedToAnotherTab', 'Session moved to another tab'), {
-        icon: TOAST_ICONS.smartphone,
-        duration: 3000
-      });
-    };
-
-    const handleSessionMigrated = (data: HostMessagePayload) => {
-      logger.log('[PLAYER] Session migrated to different room');
-      intentionalExitRef.current = true;
-      clearSessionPreservingUsername(username);
-      neoInfoToast(data.message || t('playerView.sessionMovedToAnotherRoom', 'Session moved to another room'), {
-        duration: 3000
-      });
     };
 
     const handleError = (data: SocketErrorEventPayload) => {
       const message = socketErrorMessage(data, t);
       wordErrorToast(message, { duration: 3000 });
-    };
-
-    const handleRateLimited = () => {
-      wordErrorToast(t('playerView.tooFast', 'Slow down! Submitting too fast'), { duration: 2000 });
     };
 
     // Register listeners
@@ -213,12 +193,11 @@ export function usePlayerSessionEvents({
     socket.on('playerReconnected', handlePlayerReconnected);
     socket.on('playerConnectionStatusChanged', handlePlayerConnectionStatusChanged);
     socket.on('playerLeft', handlePlayerLeft);
-    socket.on('sessionTakenOver', handleSessionTakenOver);
-    socket.on('sessionMigrated', handleSessionMigrated);
+    socket.on('sessionTakenOver', handleSessionMoved);
+    socket.on('sessionMigrated', handleSessionMoved);
     socket.on('xpGained', handleXpGained);
     socket.on('levelUp', handleLevelUp);
     socket.on('error', handleError);
-    socket.on('rateLimited', handleRateLimited);
 
     return () => {
       throttledSetLeaderboard.cancel();
@@ -236,12 +215,11 @@ export function usePlayerSessionEvents({
       socket.off('playerReconnected', handlePlayerReconnected);
       socket.off('playerConnectionStatusChanged', handlePlayerConnectionStatusChanged);
       socket.off('playerLeft', handlePlayerLeft);
-      socket.off('sessionTakenOver', handleSessionTakenOver);
-      socket.off('sessionMigrated', handleSessionMigrated);
+      socket.off('sessionTakenOver', handleSessionMoved);
+      socket.off('sessionMigrated', handleSessionMoved);
       socket.off('xpGained', handleXpGained);
       socket.off('levelUp', handleLevelUp);
       socket.off('error', handleError);
-      socket.off('rateLimited', handleRateLimited);
     };
     // Setters are stable from context (wrapped in useCallback)
   }, [

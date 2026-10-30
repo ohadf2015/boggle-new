@@ -30,7 +30,7 @@ vi.mock('@/utils/profileStorage', () => ({
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ updateProfile, loading: false, profile: null }) }));
 vi.mock('@/components/avatar/AvatarRenderer', () => ({ __esModule: true, default: () => <div data-testid="avatar-renderer" /> }));
 
-import CreateRoomModal from '../../CreateRoomModal';
+import CreateRoomModal from '../CreateSheet';
 
 const en = bundleT('en');
 const props = {

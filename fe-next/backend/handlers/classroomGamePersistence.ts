@@ -139,6 +139,35 @@ function collectParticipants(
   return [...byUser.values()];
 }
 
+/** Fails open: a lookup error keeps every participant rather than wiping the teacher's report. */
+async function dropNonMembers(
+  supabase: NonNullable<ReturnType<typeof getSupabase>>,
+  game: ClassroomGame,
+  participants: PlayerScore[]
+): Promise<PlayerScore[]> {
+  if (participants.length === 0) return participants;
+  try {
+    const { data, error } = await supabase
+      .from('classroom_memberships')
+      .select('student_id')
+      .eq('classroom_id', game.classroomId)
+      .in('student_id', participants.map((p) => p.userId));
+    if (error) throw new Error(error.message);
+    const members = new Set(((data ?? []) as Array<{ student_id: string }>).map((row) => row.student_id));
+    const kept = participants.filter((p) => members.has(p.userId));
+    if (kept.length < participants.length) {
+      logger.warn(
+        'CLASSROOM_GAME',
+        `Game ${game.gameCode}: skipped ${participants.length - kept.length} player(s) who are not members of classroom ${game.classroomId}`
+      );
+    }
+    return kept;
+  } catch (err) {
+    logger.error('CLASSROOM_GAME', `Membership lookup failed for game ${game.gameCode}, recording every player: ${(err as Error).message}`);
+    return participants;
+  }
+}
+
 export async function persistClassroomGameScores(
   game: ClassroomGame | null | undefined,
   playerScores?: PlayerScore[],
@@ -190,7 +219,7 @@ export async function persistClassroomGameScores(
     return [];
   }
 
-  const participants = collectParticipants(game, playerScores);
+  const participants = await dropNonMembers(supabase, game, collectParticipants(game, playerScores));
   const teacherOnly = !!playerScores?.length && playerScores.every((s) => s.userId === game.teacherId);
   if (participants.length === 0 && teacherOnly) {
     logger.info('CLASSROOM_GAME', `Game ${game.gameCode}: practice round, only the teacher scored — nothing to record`);

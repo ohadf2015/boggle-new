@@ -18,6 +18,8 @@ interface HostLeftGraceModalProps {
    * generic fallback. Without it, falls through to the generic body.
    */
   reason?: 'explicit_no_successor' | 'grace_expired' | 'host_switched_room';
+  /** Already-translated server notice; shown when there is no reason (class ended, kicked). */
+  message?: string;
 }
 
 const REASON_TO_KEY: Record<NonNullable<HostLeftGraceModalProps['reason']>, string> = {
@@ -37,7 +39,7 @@ const REASON_TO_KEY: Record<NonNullable<HostLeftGraceModalProps['reason']>, stri
  * classroom hub). The server only emits the room-CLOSING case today; there is
  * no "you're the host now" event wired, so this banner has one variant.
  */
-export const HostLeftGraceModal: React.FC<HostLeftGraceModalProps> = ({ isOpen, onExit, seconds = 10, reason }) => {
+export const HostLeftGraceModal: React.FC<HostLeftGraceModalProps> = ({ isOpen, onExit, seconds = 10, reason, message }) => {
   const { t, dir } = useLanguage();
   const [remaining, setRemaining] = useState<number>(seconds);
   const firedRef = useRef<boolean>(false);
@@ -79,7 +81,9 @@ export const HostLeftGraceModal: React.FC<HostLeftGraceModalProps> = ({ isOpen, 
 
   if (!isOpen) return null;
 
-  const body = reason && REASON_TO_KEY[reason] ? t(REASON_TO_KEY[reason]) : t('multiplayerFlow.hostLeftModal.body');
+  const body = reason && REASON_TO_KEY[reason]
+    ? t(REASON_TO_KEY[reason])
+    : message || t('multiplayerFlow.hostLeftModal.body');
 
   return (
     <div

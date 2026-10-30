@@ -10,7 +10,6 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 const h = vi.hoisted(() => ({
   reduced: false,
-  mainContent: { current: null as null | Record<string, unknown> },
   banner: vi.fn(),
   showInterstitial: vi.fn(),
   markReady: vi.fn(),
@@ -48,13 +47,6 @@ vi.mock('@/components/ads/ResultsBannerSlot', () => ({
     return <div data-testid="results-banner-slot-mock" />;
   },
 }));
-vi.mock('@/components/results/ResultsMainContent', () => ({
-  ResultsMainContent: (props: Record<string, unknown>) => {
-    h.mainContent.current = props;
-    return <div data-testid="results-main-content" />;
-  },
-}));
-vi.mock('@/components/results/ResultsDetailsContent', () => ({ ResultsDetailsContent: () => null }));
 vi.mock('@/components/results/ResultsModals', () => ({ ResultsModals: () => <div data-testid="results-modals" /> }));
 vi.mock('@/components/results/PostRoundSummary', () => ({ PostRoundSummary: () => null }));
 vi.mock('@/components/ui/ConfirmationDialog', () => ({
@@ -126,7 +118,6 @@ const skip = () => fireEvent.pointerDown(screen.getByTestId('mp-results-stage'))
 describe('MpResultsScreen', () => {
   beforeEach(() => {
     h.reduced = false;
-    h.mainContent.current = null;
     h.banner.mockClear();
     h.markReady.mockClear();
     h.mpExit.mockClear();
@@ -300,13 +291,13 @@ describe('MpResultsScreen', () => {
     expect(screen.getByTestId('mp-results-header').textContent).toContain('mpUi.results.roundDone');
   });
 
-  it('DETAILS opens the deep dive with the same server rank', () => {
+  it('DETAILS opens the slim sheet: my words, no legacy deep dive', () => {
     renderScreen();
     skip();
-    expect(screen.queryByTestId('results-main-content')).toBeNull();
+    expect(screen.queryByTestId('mp-details-words')).toBeNull();
     fireEvent.click(screen.getByTestId('mp-results-details-open'));
-    expect(screen.getByTestId('results-main-content')).toBeTruthy();
-    expect(h.mainContent.current?.currentPlayerRank).toBe(2);
+    expect(screen.getByTestId('mp-details-words')).toBeTruthy();
+    expect(h.trackGrowthEvent).toHaveBeenCalledWith('results_viewed', expect.objectContaining({ score: expect.any(Number) }));
   });
 
   it('leave goes through the confirm and then useMpExit("leave-room"), clearing the lesson payload', () => {

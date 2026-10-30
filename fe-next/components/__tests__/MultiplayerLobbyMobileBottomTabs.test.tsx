@@ -1,19 +1,14 @@
 /**
  * Test: Multiplayer Lobby Mobile/Desktop Layout Split
  *
- * The lobby was redesigned from tab-based navigation to:
- * - Mobile: single-scroll vertical flow (lg:hidden)
- * - Desktop: two-column DesktopLobbyLayout (hidden lg:block)
- *
- * Requirements:
- * 1. Mobile layout is hidden on desktop (lg:hidden)
- * 2. Desktop layout is hidden on mobile (hidden lg:block)
- * 3. Both HostPreGameView and PlayerWaitingView follow this pattern
+ * Phone: single-scroll vertical flow. Desktop (>=720px): two-column
+ * DesktopLobbyLayout. Exactly one of them is mounted at a time.
  */
 
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { setLobbyViewport } from '@/components/multiplayer/lobby/__tests__/lobbyViewport';
 
 // Mock Socket context
 vi.mock('@/components/boosts/BoostButton', () => ({ BoostButton: () => null }));
@@ -111,6 +106,9 @@ const createWrapper = () => {
 };
 
 describe('Multiplayer Lobby Mobile/Desktop Layout Split', () => {
+  beforeEach(() => setLobbyViewport('desktop'));
+  afterEach(() => setLobbyViewport('phone'));
+
   describe('HostPreGameView', () => {
     const defaultHostProps = {
       gameCode: 'ABC123',
@@ -145,39 +143,20 @@ describe('Multiplayer Lobby Mobile/Desktop Layout Split', () => {
       tournamentCreating: false,
     };
 
-    it('should have mobile layout hidden on desktop (lg screens)', () => {
+    it('should not mount the phone layout on desktop', () => {
       render(<MusicProvider><HostPreGameView {...defaultHostProps} /></MusicProvider>, { wrapper: createWrapper() });
-
-      // The mobile single-scroll container has lg:hidden class
-      const desktopLayout = screen.getByTestId('desktop-lobby-layout');
-      const mobileContainer = desktopLayout.parentElement?.nextElementSibling;
-
-      // Mobile container uses lg:hidden
-      expect(mobileContainer?.className).toContain('min-[720px]:hidden');
+      expect(screen.getByTestId('desktop-lobby-layout')).toBeInTheDocument();
+      expect(screen.queryByTestId('lobby-phone')).toBeNull();
     });
 
-    it('should have start button in both desktop and mobile layouts', () => {
+    it('should have exactly one start button per viewport', () => {
+      const { unmount } = render(<MusicProvider><HostPreGameView {...defaultHostProps} /></MusicProvider>, { wrapper: createWrapper() });
+      expect(screen.getAllByRole('button', { name: /startBattle/i })).toHaveLength(1);
+      unmount();
+      setLobbyViewport('phone');
       render(<MusicProvider><HostPreGameView {...defaultHostProps} /></MusicProvider>, { wrapper: createWrapper() });
-
-      // StartButton renders t('hostView.startBattle') which returns 'hostView.startBattle' via mockT
-      const startButtons = screen.getAllByRole('button', { name: /startBattle/i });
-
-      // Two start buttons: one in desktop layout, one in mobile layout
-      expect(startButtons.length).toBe(2);
-
-      // Find the desktop start button (inside hidden min-[720px]:flex container)
-      const desktopStartButton = startButtons.find((btn) => {
-        let parent = btn.parentElement;
-        while (parent) {
-          if (parent.className?.includes('min-[720px]:flex')) {
-            return true;
-          }
-          parent = parent.parentElement;
-        }
-        return false;
-      });
-
-      expect(desktopStartButton).toBeTruthy();
+      expect(screen.getAllByRole('button', { name: /startBattle/i })).toHaveLength(1);
+      expect(screen.queryByTestId('desktop-lobby-layout')).toBeNull();
     });
 
     it('should have desktop layout with two-column grid', () => {
@@ -214,15 +193,10 @@ describe('Multiplayer Lobby Mobile/Desktop Layout Split', () => {
       onConfirmExit: vi.fn(),
     };
 
-    it('should have mobile layout hidden on desktop (lg screens)', () => {
+    it('should not mount the phone layout on desktop', () => {
       render(<MusicProvider><PlayerWaitingView {...defaultPlayerProps} /></MusicProvider>, { wrapper: createWrapper() });
-
-      // The mobile single-scroll container has lg:hidden class
-      const desktopLayout = screen.getByTestId('desktop-lobby-layout');
-      const mobileContainer = desktopLayout.parentElement?.nextElementSibling;
-
-      // Mobile container uses lg:hidden
-      expect(mobileContainer?.className).toContain('min-[720px]:hidden');
+      expect(screen.getByTestId('desktop-lobby-layout')).toBeInTheDocument();
+      expect(screen.queryByTestId('lobby-phone')).toBeNull();
     });
 
     it('should have desktop two-column layout with chat', () => {

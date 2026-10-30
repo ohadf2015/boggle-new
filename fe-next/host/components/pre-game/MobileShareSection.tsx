@@ -194,7 +194,7 @@ export const MobileShareSection = memo<MobileShareSectionProps>(function MobileS
                 data-testid="mobile-whatsapp-button"
                 onClick={handleWhatsAppShare}
                 whileTap={{ scale: 0.95 }}
-                aria-label="Share via WhatsApp"
+                aria-label={t('common.shareViaWhatsApp')}
                 className="flex-1 h-12 flex items-center justify-center gap-2 rounded-neo border-2 border-neo-black bg-brand-whatsapp shadow-hard-sm text-sm font-bold text-white active:shadow-none active:translate-y-0.5"
               >
                 <WhatsAppIcon size={18} />

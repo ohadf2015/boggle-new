@@ -6,6 +6,8 @@ import {
   updateGame,
   setTournamentIdForGame,
   getGameUsers,
+  resetGameForNewRound,
+  transitionGameState,
 } from '../../modules/gameStateManager';
 import {
   createTournament,
@@ -20,7 +22,6 @@ import { broadcastToRoom } from '../../utils/socketHelpers';
 import { generateRandomTable } from '../../utils/gameUtils';
 import { makePositionsMap } from '../../modules/wordValidator';
 import gameStartCoordinator from '../../utils/gameStartCoordinator';
-import { resetBotsForNewRound } from '../../modules/botManager';
 
 vi.mock('../../utils/logger', () => ({ default: { info: vi.fn(), debug: vi.fn(), warn: vi.fn(), error: vi.fn() } }));
 vi.mock('../../modules/gameStateManager');
@@ -88,6 +89,7 @@ function makeGame(over: Record<string, unknown> = {}) {
     timerSeconds: 120,
     minWordLength: 3,
     tournamentId: null,
+    gameState: 'waiting',
     ...over,
   };
 }
@@ -100,6 +102,7 @@ describe('tournamentHandler', () => {
     mRateLimit.mockReturnValue(true);
     mGetStandings.mockReturnValue([]);
     mGetGameUsers.mockReturnValue([]);
+    (transitionGameState as Mock).mockReturnValue({ success: true });
   });
 
   it('registers four tournament events', () => {
@@ -233,7 +236,7 @@ describe('tournamentHandler', () => {
       registerTournamentHandlers(mockIo, socket);
       handlers['startTournamentRound']();
 
-      expect(resetBotsForNewRound).toHaveBeenCalledWith('G1');
+      expect(resetGameForNewRound).toHaveBeenCalledWith('G1');
       const startCall = mBroadcast.mock.calls.find((c: unknown[]) => c[2] === 'startGame');
       expect(startCall![3]).toEqual(expect.objectContaining({
         gameMode: 'classic',

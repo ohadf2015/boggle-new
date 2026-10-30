@@ -23,11 +23,17 @@
 import type { Socket } from 'socket.io';
 
 import { safeEmit } from '../utils/socketHelpers';
+import { VOCAB_QUIZ_EVENTS } from '@/shared/types/vocabQuiz';
 import logger from '../utils/logger';
 
 /** The one field of the game record this rule reads. */
 export interface FinishedGameResultsSource {
   cachedResultsPayload?: Record<string, unknown> | null;
+}
+
+/** A quiz room's results are its finale, not board scores; the session that built it is gone. */
+export function quizEndedResultsPayload(ended: Record<string, unknown>): Record<string, unknown> {
+  return { vocabQuizEnded: ended };
 }
 
 /**
@@ -56,6 +62,13 @@ export function resendFinishedResults(
       `Finished game ${gameCode} has no cached results to resend — leaving the client's requestResults watchdog to retry`
     );
     return false;
+  }
+
+  const quizEnded = cached.vocabQuizEnded;
+  if (quizEnded && typeof quizEnded === 'object') {
+    logger.info('SOCKET', `Resending vocab quiz finale to reconnecting player in finished game ${gameCode}`);
+    safeEmit(socket, VOCAB_QUIZ_EVENTS.ended, quizEnded);
+    return true;
   }
 
   logger.info('SOCKET', `Resending results to reconnecting player in finished game ${gameCode}`);

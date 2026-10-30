@@ -14,6 +14,7 @@ import { isStudentTimerHidden } from '@/shared/utils/classroomPressure';
 import { MODE_TRANSLATION_KEY, boardSizeLabel } from './classroomModeLabels';
 import { SocketContext } from '@/utils/SocketContext';
 import { useIsVocabQuizRoom } from './vocabQuiz/useIsVocabQuizRoom';
+import { useClassroomSeatCapNotice } from './controls/useClassroomSeatCapNotice';
 import { StudentModeStrip } from './ClassroomModeBannerStudent';
 
 interface LessonData {
@@ -171,7 +172,9 @@ export function ClassroomModeBanner({
   // room has shown quiz traffic the quiz surface owns the screen; the same
   // detector the shell uses to hide this chrome during play releases on the
   // next board round (Class 3: one signal, not a second guess).
-  const quizOwnsScreen = useIsVocabQuizRoom(useContext(SocketContext)?.socket ?? null);
+  const roomSocket = useContext(SocketContext)?.socket ?? null;
+  const quizOwnsScreen = useIsVocabQuizRoom(roomSocket);
+  useClassroomSeatCapNotice(roomSocket, isHost, gameCode, t);
   const showPanel = expanded && !quizOwnsScreen && !!gameCode && (isHost || (!!liveGame && !showResults));
 
   const previewWords = useMemo(

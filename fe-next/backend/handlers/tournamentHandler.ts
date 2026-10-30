@@ -12,7 +12,9 @@ import {
   getUsernameBySocketId,
   getGameUsers,
   updateGame,
-  setTournamentIdForGame
+  setTournamentIdForGame,
+  resetGameForNewRound,
+  transitionGameState,
 } from '../modules/gameStateManager.js';
 
 import { broadcastToRoom, getGameRoom, safeEmit } from '../utils/socketHelpers.js';
@@ -32,7 +34,7 @@ import {
 } from '../modules/tournamentManager.js';
 import logger from '../utils/logger.js';
 import { startGameTimer } from './shared';
-import { resetBotsForNewRound } from '../modules/botManager.js';
+import { tryAcquireGameStart, releaseGameStart } from './gameStartMutex.js';
 import { buildRoundPayload } from '../modes/roundPayload.js';
 import type { GameState } from '../modules/gameState/types.js';
 
@@ -54,6 +56,106 @@ interface TournamentPlayer {
   socketId: string;
   username: string;
   avatar: Avatar;
+}
+
+/** A tournament round is a round boundary: the shared reset (incl. THE bot reset) runs, then START via the state machine. */
+function startNextTournamentRound(
+  io: Server,
+  socket: Socket,
+  game: GameState,
+  gameCode: string,
+  tournament: NonNullable<ReturnType<typeof getTournament>>,
+): void {
+  const tournamentId = tournament.id;
+  try {
+    startTournamentRound(tournamentId, gameCode);
+  } catch (err) {
+    emitError(socket, ErrorCodes.TOURNAMENT_INVALID_STATE, { message: (err as Error).message });
+    return;
+  }
+  const minWordLength = game.minWordLength;
+  resetGameForNewRound(gameCode);
+  const transition = transitionGameState(gameCode, 'START');
+  if (!transition?.success) {
+    emitError(socket, ErrorCodes.TOURNAMENT_INVALID_STATE, { message: 'Could not start the round' });
+    return;
+  }
+
+  // Generate new board for the round
+  const tDim = DIFFICULTIES[DEFAULT_DIFFICULTY];
+  const tLang = game.language || 'en';
+  const letterGrid: LetterGrid = generateRichBoard(
+    () => generateRandomTable(tDim.rows, tDim.cols, tLang),
+    tLang,
+    tDim.rows,
+    tDim.cols
+  ) as LetterGrid;
+  const timerSeconds = game.timerSeconds || 180;
+
+  const roundUpdates: Partial<GameState> = {
+    letterGrid,
+    timerSeconds,
+    remainingTime: timerSeconds,
+    gameDuration: timerSeconds,
+    gameState: 'in-progress',
+    gameStartedAt: Date.now(),
+    gameMode: 'classic',
+    minWordLength,
+  };
+  Object.assign(game, roundUpdates);
+  updateGame(gameCode, roundUpdates);
+
+  // Precompute positions
+  const positions = makePositionsMap(letterGrid, tLang);
+  const current = getGame(gameCode);
+  if (current) {
+    current.letterPositions = positions;
+  }
+
+  // Initialize player data for new round
+  const users = getGameUsers(gameCode);
+  const playerUsernames = users.map(u => u.username);
+  const gameForInit = getGame(gameCode);
+  if (gameForInit) {
+    if (!gameForInit.playerWordDetails) gameForInit.playerWordDetails = {};
+    if (!gameForInit.playerAchievements) gameForInit.playerAchievements = {};
+    if (!gameForInit.playerScores) gameForInit.playerScores = {};
+    if (!gameForInit.playerWords) gameForInit.playerWords = {};
+
+    playerUsernames.forEach((username: string) => {
+      gameForInit.playerWordDetails![username] = [];
+      gameForInit.playerWords[username] = [];
+      gameForInit.playerScores[username] = 0;
+      gameForInit.playerAchievements![username] = [];
+    });
+    gameForInit.firstWordFound = false;
+    gameForInit.startTime = Date.now();
+  }
+
+  // Initialize game start coordination
+  const humanUsernames = users.filter(u => !u.isBot).map(u => u.username);
+  const messageId = gameStartCoordinator.initializeSequence(gameCode, humanUsernames, timerSeconds);
+
+  // Broadcast round start
+  broadcastToRoom(io, getGameRoom(gameCode), 'tournamentRoundStarting', {
+    tournament: {
+      id: tournament.id,
+      name: tournament.name,
+      totalRounds: tournament.totalRounds,
+      currentRound: tournament.currentRound
+    },
+    standings: getTournamentStandings(tournamentId) || []
+  });
+
+  // Broadcast game start — the shared start payload (backend/modes/roundPayload).
+  broadcastToRoom(io, getGameRoom(gameCode), 'startGame', buildRoundPayload(gameCode, game, { kind: 'start', messageId }));
+
+  // Set acknowledgment timeout
+  gameStartCoordinator.setAcknowledgmentTimeout(gameCode, 2000, () => {
+    startGameTimer(io, gameCode, timerSeconds);
+  });
+
+  logger.info('TOURNAMENT', `Round ${tournament.currentRound} started for tournament ${tournamentId}`);
 }
 
 /**
@@ -157,92 +259,21 @@ function registerTournamentHandlers(io: Server, socket: Socket): void {
       return;
     }
 
-    // Start new round
-    startTournamentRound(tournamentId, gameCode);
-
-    // Generate new board for the round
-    const tDim = DIFFICULTIES[DEFAULT_DIFFICULTY];
-    const tLang = game.language || 'en';
-    const letterGrid: LetterGrid = generateRichBoard(
-      () => generateRandomTable(tDim.rows, tDim.cols, tLang),
-      tLang,
-      tDim.rows,
-      tDim.cols
-    ) as LetterGrid;
-    const timerSeconds = game.timerSeconds || 180;
-
-    // A tournament round is a round boundary like any other: the ONE per-round
-    // bot reset runs (bots are reused across rounds — pitfall class 2), and the
-    // round is plain classic, so last round's mode state must not leak in.
-    resetBotsForNewRound(gameCode);
-    const roundUpdates: Partial<GameState> = {
-      letterGrid,
-      timerSeconds,
-      remainingTime: timerSeconds,
-      gameDuration: timerSeconds,
-      gameState: 'in-progress',
-      gameStartedAt: Date.now(),
-      gameMode: 'classic',
-      goldenLetters: [],
-      blastModeState: null,
-      wordHuntState: null,
-      wheelRushState: null,
-    };
-    Object.assign(game, roundUpdates);
-    updateGame(gameCode, roundUpdates);
-
-    // Precompute positions
-    const positions = makePositionsMap(letterGrid);
-    const current = getGame(gameCode);
-    if (current) {
-      current.letterPositions = positions;
+    if (game.gameState !== 'finished' && game.gameState !== 'waiting') {
+      emitError(socket, ErrorCodes.TOURNAMENT_INVALID_STATE, { message: 'A round is already in progress' });
+      return;
     }
-
-    // Initialize player data for new round
-    const users = getGameUsers(gameCode);
-    const playerUsernames = users.map(u => u.username);
-    const gameForInit = getGame(gameCode);
-    if (gameForInit) {
-      if (!gameForInit.playerWordDetails) gameForInit.playerWordDetails = {};
-      if (!gameForInit.playerAchievements) gameForInit.playerAchievements = {};
-      if (!gameForInit.playerScores) gameForInit.playerScores = {};
-      if (!gameForInit.playerWords) gameForInit.playerWords = {};
-
-      playerUsernames.forEach((username: string) => {
-        gameForInit.playerWordDetails![username] = [];
-        gameForInit.playerWords[username] = [];
-        gameForInit.playerScores[username] = 0;
-        gameForInit.playerAchievements![username] = [];
-      });
-      gameForInit.firstWordFound = false;
-      gameForInit.startTime = Date.now();
+    if (!tryAcquireGameStart(gameCode)) {
+      emitError(socket, ErrorCodes.GAME_ALREADY_STARTED, { message: 'Game is already starting' });
+      return;
     }
-
-    // Initialize game start coordination
-    const humanUsernames = users.filter(u => !u.isBot).map(u => u.username);
-    const messageId = gameStartCoordinator.initializeSequence(gameCode, humanUsernames, timerSeconds);
-
-    // Broadcast round start
-    broadcastToRoom(io, getGameRoom(gameCode), 'tournamentRoundStarting', {
-      tournament: {
-        id: tournament.id,
-        name: tournament.name,
-        totalRounds: tournament.totalRounds,
-        currentRound: tournament.currentRound
-      },
-      standings: getTournamentStandings(tournamentId) || []
-    });
-
-    // Broadcast game start — the shared start payload (backend/modes/roundPayload).
-    broadcastToRoom(io, getGameRoom(gameCode), 'startGame', buildRoundPayload(gameCode, game, { kind: 'start', messageId }));
-
-    // Set acknowledgment timeout
-    gameStartCoordinator.setAcknowledgmentTimeout(gameCode, 2000, () => {
-      startGameTimer(io, gameCode, timerSeconds);
-    });
-
-    logger.info('TOURNAMENT', `Round ${tournament.currentRound} started for tournament ${tournamentId}`);
+    try {
+      startNextTournamentRound(io, socket, game, gameCode, tournament);
+    } finally {
+      releaseGameStart(gameCode);
+    }
   });
+
 
   // Handle get tournament standings
   socket.on('getTournamentStandings', () => {

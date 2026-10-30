@@ -2,17 +2,24 @@
 
 /**
  * DEV-ONLY visual QA harness for the multiplayer results screen.
- * Mounts ResultsMainContent with mock data so the layout/arc can be
+ * Mounts the MP results pieces (standings, my card, DETAILS words + awards) with mock data so the layout/arc can be
  * screenshotted headless without a live multiplayer game.
  * Route: /[locale]/dev/results   (e.g. /en/dev/results, /he/dev/results)
  */
 
-import React, { useState } from 'react';
-import ResultsMainContent from '@/components/results/ResultsMainContent';
+import React, { useMemo, useState } from 'react';
+import { MpStandingsBoard } from '@/components/multiplayer/results/MpStandingsBoard';
+import { MpMyCard } from '@/components/multiplayer/results/MpMyCard';
+import { MpDetailsWords } from '@/components/multiplayer/results/MpDetailsWords';
+import { MpRoundAwards } from '@/components/multiplayer/results/MpResultsAlbum';
+import { buildMpStandings, podiumTier } from '@/components/multiplayer/results/mpStandings';
+import { pickBestWord } from '@/components/multiplayer/results/mpResultsView';
+import { resultCallout, roundAwards } from '@/components/multiplayer/results/mpResultsStory';
+import { selectUniqueWords } from '@/lib/results/selectUniqueWords';
 import BlastResultsScene from '@/components/results/BlastResultsScene';
 import WheelRushResultsScene from '@/components/results/WheelRushResultsScene';
 import { useLanguage } from '@/contexts/LanguageContext';
-import type { Player } from '@/components/results/types';
+import type { Player, WordObject } from '@/components/results/types';
 
 type Scenario = 'win_1v1' | 'lose_1v1' | 'win_lobby' | 'midpack_lobby' | 'solo' | 'blast_scene' | 'wheel_scene';
 
@@ -76,47 +83,14 @@ export default function DevResultsPage() {
   const [scenario, setScenario] = useState<Scenario>('lose_1v1');
   const { t } = useLanguage();
 
+  const { scores } = useMemo(() => buildScores(scenario), [scenario]);
+  const rows = useMemo(() => buildMpStandings({ sortedScores: scores, username: 'You', normalizeUsername: (n) => n || '' }), [scores]);
   if (process.env.NODE_ENV === 'production') return null;
 
-  const { scores, rank, winner } = buildScores(scenario);
   const me = scores.find((p) => p.username === 'You') ?? null;
-  const validWords = (me?.allWords ?? []).map((w) => ({
-    word: typeof w === 'string' ? w : w.word,
-    score: typeof w === 'string' ? 0 : w.score ?? 0,
-  }));
-
-  const props = {
-    sortedScores: scores,
-    nearMisses: [],
-    isHost: true,
-    onStartGame: () => {},
-    onMarkReady: () => {},
-    onExit: () => {},
-    winStreakData: winner ? { currentStreak: 3, bestStreak: 5, isNewMilestone: false, previousStreak: 2 } : null,
-    xpGainedData: {
-      xpEarned: winner ? 120 : 45,
-      xpBreakdown: { gameCompletion: 20, scoreXp: 25, winBonus: winner ? 75 : 0, achievementXp: 0 },
-      newTotalXp: 2840,
-      newLevel: 7,
-    },
-    levelUpData: null,
-    isAuthenticated: true,
-    currentPlayerData: me,
-    isCurrentUserWinner: winner,
-    currentPlayerValidWords: validWords,
-    currentPlayerRank: rank,
-    normalizeUsername: (n: string | undefined | null) => n || '',
-    username: 'You',
-    gameCode: 'DEV01',
-    isBotsOnlyGame: false,
-    isCurrentPlayerReady: false,
-    readyUsernames: [],
-    duplicateRuleDisabled: false,
-    gameMode: 'classic',
-    coinReward: { awarded: winner ? 85 : 30, breakdown: { base: 20, scoreBonus: 10, placement: winner ? 50 : 0, streak: winner ? 5 : 0 } },
-    shareCardStats: { maxCombo: 4, longestWord: 'QUARTZ' },
-    t,
-  };
+  const myRow = rows.find((r) => r.isMe);
+  const allPlayerWords = Object.fromEntries(scores.map((p) => [p.username, (p.allWords ?? []) as WordObject[]]));
+  const callout = resultCallout({ rows, uniqueCount: selectUniqueWords(allPlayerWords, 'You').length });
 
   return (
     <div className="min-h-screen bg-neo-navy text-neo-white p-4">
@@ -157,7 +131,23 @@ export default function DevResultsPage() {
               currentUsername="You"
             />
           ) : (
-            <ResultsMainContent {...(props as any)} />
+            <div className="flex flex-col gap-3">
+              <MpStandingsBoard rows={rows} hiddenCount={0} isRevealed={() => true} t={t} />
+              <MpMyCard
+                rank={myRow?.rank ?? 1}
+                winner={myRow ? podiumTier(myRow) === 1 && rows.length > 1 : false}
+                total={rows.length}
+                score={me?.score ?? 0}
+                bestWord={pickBestWord(me?.allWords as never)}
+                xp={45}
+                coins={30}
+                callout={callout}
+                revealed
+                t={t}
+              />
+              <MpDetailsWords myWords={me?.allWords as never} allPlayerWords={allPlayerWords} username="You" missedWords={[{ word: 'owl', score: 4, foundBy: [] }]} language="en" t={t} />
+              <MpRoundAwards awards={roundAwards(scores as never)} t={t} />
+            </div>
           )}
         </div>
       </div>

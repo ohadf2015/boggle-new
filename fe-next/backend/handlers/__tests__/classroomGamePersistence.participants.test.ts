@@ -217,3 +217,42 @@ describe('never a silent no-op (Class 4)', () => {
     expect(redisCalls).toContainEqual({ op: 'del', key: 'classroom_game_persisted:GHYRVS' });
   });
 });
+
+describe('signed-in players who are not in the class', () => {
+  function withMembers(memberIds: string[] | 'error') {
+    const base = makeSupabase();
+    return {
+      ...base,
+      from(table: string) {
+        if (table !== 'classroom_memberships') return base.from(table);
+        const result = memberIds === 'error'
+          ? { data: null, error: { message: 'boom' } }
+          : { data: memberIds.map((student_id) => ({ student_id })), error: null };
+        return { select: () => ({ eq: () => ({ in: () => Promise.resolve(result) }) }) };
+      },
+    };
+  }
+
+  it('gets no practice session, progress or XP in this classroom', async () => {
+    (getSupabase as Mock).mockReturnValue(withMembers(['student-a']));
+
+    const rewards = await persistClassroomGameScores(game() as never, [
+      { userId: 'student-a', score: 300, wordsFound: ['abandon'] },
+      { userId: 'outsider-x', score: 900, wordsFound: ['brittle'] },
+    ]);
+
+    expect(studentIds()).toEqual(['student-a']);
+    expect(rewards.map((r) => r.userId)).toEqual(['student-a']);
+  });
+
+  it('keeps everyone when the membership lookup fails, rather than wiping the report', async () => {
+    (getSupabase as Mock).mockReturnValue(withMembers('error'));
+
+    await persistClassroomGameScores(game() as never, [
+      { userId: 'student-a', score: 300, wordsFound: ['abandon'] },
+      { userId: 'outsider-x', score: 900, wordsFound: ['brittle'] },
+    ]);
+
+    expect(studentIds().sort()).toEqual(['outsider-x', 'student-a']);
+  });
+});

@@ -43,6 +43,8 @@ import { isInProgress } from '../utils/gameStateMachine.js';
 import { seatLateQuizSocket } from '../services/vocabQuizShell.js';
 import { getGameModeModule } from '../modes/index.js';
 import { buildRoundPayload } from '../modes/roundPayload.js';
+import { resendFinishedResults } from './finishedResultsResend.js';
+import { broadcastRoomUsers } from './classroomUsersBroadcast.js';
 
 interface AuthConnectionResult {
   handled: boolean;
@@ -255,13 +257,10 @@ function handleReconnection(io: Server, socket: Socket, game: GameState, gameCod
     // that the mapping is rebuilt above, re-deliver the cached results here so
     // reconnect is self-contained — one rejoin restores in-progress board OR
     // finished results. Mirrors the `requestResults` finished-game path.
-    socket.emit('validatedScores', game.cachedResultsPayload);
-    socket.emit('validationComplete', game.cachedResultsPayload);
+    resendFinishedResults(socket, gameCode, game);
   }
 
-  broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
-    users: getGameUsers(gameCode)
-  });
+  broadcastRoomUsers(io, gameCode);
 }
 
 /**

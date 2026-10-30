@@ -32,9 +32,14 @@ import { computeRushBonus } from '../modules/rushTiles/rushTilesLogic.js';
 import { scoreAcceptedWord, blastTileBonusFor } from '../modules/wordScore.js';
 import { economyOnWordAccepted, economyUserIdOf, roundIdOf } from './classroomEconomyHandler.js';
 import type { BlastTileType } from '@/shared/types/blast';
-import { restoreLife, getLifeBonus, computeDiscoveryClues } from '../modules/wordHuntManager.js';
+import { tileCharBonus } from '../modules/tileCharBonus';
+import { catchUpForPlayer } from '../modules/catchUpBonus';
+import { advanceServerCombo } from '../modules/comboDecay';
+import { applyWordHuntWordEffects, bumpServerSeq } from './wordCreditEffects';
 import { BOARD_WORD_SCORE_PER_LETTER } from '@/shared/constants/wordHuntMultiplayerConstants';
 import { lessonWordBonus } from '@/shared/constants/lessonScoring';
+
+type Tile = { row: number; col: number };
 
 interface Achievement {
   key: string;
@@ -43,12 +48,8 @@ interface Achievement {
 
 function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCode: string, username: string, normalizedWord: string, isInDictionary: boolean, comboType?: string | null, inputMethod: 'kb' | 'drag' = 'drag', clientPath?: Array<{ row: number; col: number }> | null): void {
   // Derive combo and fire round from server state (never trust client)
-  const safeComboLevel = game.playerCombos?.[username] || 0;
+  const { scoringLevel: safeComboLevel } = advanceServerCombo(game, username);
   const fireRoundActive = game.fireRoundActive === true;
-
-  // Increment server-side combo on each accepted word
-  if (!game.playerCombos) game.playerCombos = {};
-  game.playerCombos[username] = safeComboLevel + 1;
 
   // Record this player as the first finder of this word
   const userData = game.users?.[username];
@@ -224,38 +225,15 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     ? normalizedWord.length * BOARD_WORD_SCORE_PER_LETTER
     : 0;
 
-  // ---- Golden Letter Bonus ----
-  // +25% rounded up if any letter of the word sits on a golden position
-  let goldenBonus = 0;
-  if (game.goldenLetters?.length && game.letterGrid) {
-    const goldenChars = game.goldenLetters.map(g => {
-      const row = game.letterGrid![g.row];
-      return row ? String(row[g.col]).toLowerCase() : '';
-    }).filter(Boolean);
-    const usesGolden = normalizedWord.toLowerCase().split('').some(ch => goldenChars.includes(ch));
-    if (usesGolden) {
-      goldenBonus = Math.ceil(wordScore * 0.25);
-    }
-  }
-
-  // ---- Lightning Round-Event Bonus ----
-  // The 'lightning' round event charges a few board tiles (game.lightningTiles)
-  // and advertises a 1.5x payout to the client (tiles glow). Char-based, exactly
-  // like the golden-letter bonus above: if the word uses any charged-tile letter
-  // while lightning is active, award +50% (ceil). Without this the broadcast
-  // bonus was never scored — the event was cosmetic only.
-  let lightningBonus = 0;
-  const lightningTiles = (game as GameState & { lightningTiles?: Array<{ row: number; col: number }> }).lightningTiles;
-  if (game.activeRoundEvent === 'lightning' && lightningTiles?.length && game.letterGrid) {
-    const chargedChars = lightningTiles.map(tile => {
-      const row = game.letterGrid![tile.row];
-      return row ? String(row[tile.col]).toLowerCase() : '';
-    }).filter(Boolean);
-    const usesCharged = normalizedWord.toLowerCase().split('').some(ch => chargedChars.includes(ch));
-    if (usesCharged) {
-      lightningBonus = Math.ceil(wordScore * 0.5);
-    }
-  }
+  // Golden letters (+25%) and the lightning / meteor round events (+50%, as advertised to the client).
+  const eventTiles = game as GameState & { lightningTiles?: Tile[]; meteorTiles?: Tile[] };
+  const goldenBonus = tileCharBonus(normalizedWord, game.goldenLetters, game.letterGrid, wordScore, 0.25);
+  const lightningBonus = game.activeRoundEvent === 'lightning'
+    ? tileCharBonus(normalizedWord, eventTiles.lightningTiles, game.letterGrid, wordScore, 0.5)
+    : 0;
+  const meteorBonus = game.activeRoundEvent === 'meteor'
+    ? tileCharBonus(normalizedWord, eventTiles.meteorTiles, game.letterGrid, wordScore, 0.5)
+    : 0;
 
   // ---- Rush-Tile Bonus ----
   // Recurring transient rush tiles (game.rushTiles) award +50% (ceil) when the
@@ -289,20 +267,21 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
   }
   const specialBonus = isSpecialWord ? specialWordBonus : 0;
 
+  const preScore = game.playerScores?.[username] ?? 0;
+  const catchUp = catchUpForPlayer(game, username, preScore, scored.total);
+  const catchUpBonus = catchUp?.bonus ?? 0;
+
   // Single atomic score update: word score + blast tile bonus + blast letter-value
   // bonus + word-hunt board bonus + bonuses
-  const preScore = game.playerScores?.[username] ?? 0;
-  const totalDelta = scored.total + wordHuntBoardBonus + goldenBonus + lightningBonus + rushBonus + specialBonus + lessonBonus + blastCollectionPoints;
+  // Every bonus NOT baked into the stored per-word score also goes into
+  // playerEventBonuses, so the end-of-game recompute matches the live leaderboard.
+  const eventBonusDelta = wordHuntBoardBonus + goldenBonus + lightningBonus + meteorBonus + rushBonus + specialBonus + lessonBonus + blastCollectionPoints + catchUpBonus;
+  const totalDelta = scored.total + eventBonusDelta;
   updatePlayerScore(gameCode, username, totalDelta, true);
-  // Mirror the bonuses that are NOT baked into the stored per-word score
-  // (wordScore + blast bonuses are; golden/lightning/special/word-hunt-board are not)
-  // into a per-player accumulator so the end-of-game recompute can add them back and
-  // the result page matches the live leaderboard. See playerEventBonuses.
-  const eventBonusDelta = wordHuntBoardBonus + goldenBonus + lightningBonus + rushBonus + specialBonus + lessonBonus + blastCollectionPoints;
   if (eventBonusDelta !== 0) {
     addPlayerEventBonus(gameCode, username, eventBonusDelta);
   }
-  game.serverSeq = (game.serverSeq ?? 0) + 1;
+  bumpServerSeq(game);
   const boss = hitRoomBoss(io, gameCode, game, { username, word: normalizedWord, score: totalDelta });
 
   inc('wordAccepted');
@@ -326,6 +305,8 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     inputMethod,
     ...(goldenBonus > 0 ? { goldenBonus } : {}),
     ...(lightningBonus > 0 ? { lightningBonus } : {}),
+    ...(meteorBonus > 0 ? { meteorBonus } : {}),
+    ...(catchUp ? { catchUp: { bonus: catchUp.bonus, pct: catchUp.pct } } : {}),
     ...(rushBonus > 0 ? { rushBonus } : {}),
     ...(lessonBonus > 0 ? { lessonBonus } : {}),
     ...(isSpecialWord ? { isSpecialWord: true } : {}),
@@ -343,50 +324,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     } : {}),
   });
 
-  // Restore life in word-hunt mode when a word is accepted
-  if (game.gameMode === 'word-hunt' && game.wordHuntState) {
-    try {
-      // wordHuntManager imported at top level
-      const huntState = game.wordHuntState;
-      const lifeBonus = getLifeBonus(normalizedWord.length);
-      restoreLife(huntState, username, lifeBonus);
-      // Broadcast updated lives immediately so clients don't wait for next timer tick
-      broadcastToRoom(io, getGameRoom(gameCode), 'wordHuntLifeUpdate', {
-        playerLives: huntState.playerLives,
-        eliminatedPlayers: huntState.eliminatedPlayers,
-      });
-      // Mark last broadcast time so gameTimer skips the redundant tick broadcast
-      huntState.lastLifeUpdateAt = Date.now();
-
-      // Compute discovery clues — sent only to the player who found the word (competitive)
-      const gameStartedAt = game.gameStartedAt || 0;
-      const elapsed = Date.now() - gameStartedAt;
-      const CLUE_DELAY = 15_000; // 15s before clues start
-      const CLUE_THROTTLE = 5_000; // 5s between clue broadcasts per player
-
-      if (elapsed >= CLUE_DELAY) {
-        const clues = computeDiscoveryClues(huntState.targetWord, normalizedWord);
-        if (clues.greenPositions.length > 0 || clues.knownLetters.length > 0) {
-          // Per-player throttle: don't flood clues
-          if (!huntState.lastClueAt) huntState.lastClueAt = {};
-          const lastClue = huntState.lastClueAt[username] || 0;
-          if (Date.now() - lastClue >= CLUE_THROTTLE) {
-            huntState.lastClueAt[username] = Date.now();
-            huntState.discoveryWordCount = (huntState.discoveryWordCount || 0) + 1;
-            // Send only to the submitting player, not the whole room
-            socket.emit('wordHuntDiscoveryClues', {
-              word: normalizedWord,
-              greenPositions: clues.greenPositions,
-              knownLetters: clues.knownLetters,
-            });
-          }
-        }
-      }
-    } catch (err: unknown) {
-      const error = err as Error;
-      logger.error('WORD_HUNT', `Life restoration error: ${error.message}`);
-    }
-  }
+  applyWordHuntWordEffects(io, socket, game, gameCode, username, normalizedWord);
 
   // Queue playerFoundWord (live feed / combo FX / TV broadcast / pending-chip
   // confirm). Coalesced into a windowed `playerFoundWordBatch` broadcast instead

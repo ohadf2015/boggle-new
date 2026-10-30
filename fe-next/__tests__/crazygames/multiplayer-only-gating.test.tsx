@@ -6,7 +6,6 @@
  *   - AuthButtonDropdownMenu (profile / leaderboard / friends / settings / admin)
  *   - HeaderMobileMenu (entire menu portal + external Ko-fi/Instagram links)
  *   - PostGameEngagement (WotdTeaser links to /daily)
- *   - ResultsCtaSection (NextStepPrompt cross-mode CTAs)
  */
 
 import { vi, type MockedFunction } from 'vitest';
@@ -15,7 +14,6 @@ import { render, screen } from '@testing-library/react';
 import { AuthButtonDropdownMenu } from '@/components/auth/AuthButtonDropdownMenu';
 import { DropdownMenu } from '@/components/ui/dropdown-menu';
 import PostGameEngagement from '@/components/growth/PostGameEngagement';
-import { ResultsCtaSection } from '@/components/results/ResultsCtaSection';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -162,43 +160,6 @@ describe('CrazyGames multiplayer-only gating', () => {
       expect(screen.getByTestId('post-game-engagement')).toBeInTheDocument();
       // WotdTeaser is loaded via next/dynamic — await the async mount.
       expect(await screen.findByTestId('wotd-teaser')).toBeInTheDocument();
-    });
-  });
-
-  describe('ResultsCtaSection (multiplayer bots-only mode)', () => {
-    const baseProps = {
-      sortedScores: [],
-      currentPlayerData: null,
-      currentPlayerRank: 1,
-      currentPlayerValidWords: [],
-      hasZeroScore: true,
-      isHost: false,
-      onStartGame: vi.fn(),
-      onMarkReady: vi.fn(),
-      onExit: vi.fn(),
-      isBotsOnlyGame: true,
-      isCurrentPlayerReady: false,
-      normalizeUsername: (n?: string | null) => n ?? '',
-      username: 'me',
-      breathingShadow: ['none'],
-      reducedMotion: true,
-      ctaDelay: 0,
-      t: (k: string) => k,
-    };
-
-    it('does not render NextStepPrompt cross-mode CTA on CG', () => {
-      mockUseCrazyGames.mockReturnValue(cgContext(true));
-      render(<ResultsCtaSection {...baseProps} />);
-      // Cross-mode CTAs use these translation keys
-      expect(screen.queryByText('nextStep.tryDailyChallenge')).not.toBeInTheDocument();
-      expect(screen.queryByText('nextStep.challengeBots')).not.toBeInTheDocument();
-    });
-
-    it('renders the NextStepPrompt off CG when bot game ends for guest', () => {
-      mockUseCrazyGames.mockReturnValue(cgContext(false));
-      render(<ResultsCtaSection {...baseProps} />);
-      // multiplayer-bots branch suggests daily challenge
-      expect(screen.getByText('nextStep.tryDailyChallenge')).toBeInTheDocument();
     });
   });
 });

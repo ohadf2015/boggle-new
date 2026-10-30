@@ -13,6 +13,7 @@ import {
   updateUserSocketId,
   updateHostSocketId,
   getLeaderboard,
+  getGame,
 } from '../../modules/gameStateManager';
 import {
   broadcastToRoom,
@@ -20,6 +21,7 @@ import {
   joinRoom,
   leaveRoom,
   LOBBY_ROOM,
+  safeEmit,
 } from '../../utils/socketHelpers';
 import timerManager from '../../utils/timerManager';
 import { isInProgress } from '../../utils/gameStateMachine';
@@ -234,8 +236,20 @@ describe('handleReconnection', () => {
 
     handleReconnection(mockIo, socket, game, 'GAME1', 'Player1');
 
-    expect(socket.emit).toHaveBeenCalledWith('validatedScores', cached);
-    expect(socket.emit).toHaveBeenCalledWith('validationComplete', cached);
+    expect(safeEmit).toHaveBeenCalledWith(socket, 'validatedScores', cached);
+    expect(safeEmit).toHaveBeenCalledWith(socket, 'validationComplete', cached);
+  });
+
+  it('re-delivers the vocab quiz finale, not board scores, when reconnecting into a finished quiz room', () => {
+    const ended = { gameCode: 'GAME1', standings: [{ username: 'Player1', score: 900 }], totalQuestions: 8 };
+    const game = makeGame({ gameState: 'finished', cachedResultsPayload: { vocabQuizEnded: ended } } as any);
+    mockIsInProgress.mockReturnValue(false);
+    const socket = createMockSocket('socket-new');
+
+    handleReconnection(mockIo, socket, game, 'GAME1', 'Player1');
+
+    expect(safeEmit).toHaveBeenCalledWith(socket, 'vocabQuiz:ended', ended);
+    expect(safeEmit).not.toHaveBeenCalledWith(socket, 'validatedScores', expect.anything());
   });
 
   // A finished game with NO cached payload must not emit empty/garbage results.
@@ -246,7 +260,7 @@ describe('handleReconnection', () => {
 
     handleReconnection(mockIo, socket, game, 'GAME1', 'Player1');
 
-    expect(socket.emit).not.toHaveBeenCalledWith('validatedScores', expect.anything());
+    expect(safeEmit).not.toHaveBeenCalledWith(socket, 'validatedScores', expect.anything());
   });
 
   // Belt: the authoritative leaderboard rides INSIDE the startGame payload too,
@@ -487,6 +501,23 @@ describe('handleReconnection', () => {
     expect(mockBroadcastToRoom).toHaveBeenCalledWith(
       mockIo, 'game:GAME1', 'updateUsers', expect.objectContaining({ users: [] })
     );
+  });
+
+  it('coalesces a reconnect wave in a classroom room into one trailing roster broadcast', () => {
+    vi.useFakeTimers();
+    try {
+      const game = makeGame({ isClassroom: true } as any);
+      (getGame as Mock).mockReturnValue(game);
+      for (const id of ['s1', 's2', 's3']) handleReconnection(mockIo, createMockSocket(id), game, 'GAME1', 'Player1');
+
+      const usersBroadcasts = () => mockBroadcastToRoom.mock.calls.filter((c) => c[2] === 'updateUsers');
+      expect(usersBroadcasts()).toHaveLength(1);
+      vi.advanceTimersByTime(300);
+      expect(usersBroadcasts()).toHaveLength(2);
+    } finally {
+      (getGame as Mock).mockReset();
+      vi.useRealTimers();
+    }
   });
 
   // 11. joined event is emitted with reconnected: true

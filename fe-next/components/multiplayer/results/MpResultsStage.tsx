@@ -16,7 +16,7 @@ import { SERIES_TOTAL_GAMES } from '@/hooks/useSeriesTracker';
 import type { GameModeOption } from '@/components/GameModeSelector';
 import { cn } from '@/lib/utils';
 import { buildMpStandings, podiumTier } from './mpStandings';
-import { nextModeForViewer, pickBestWord, pickVisibleRows, readyTally, rivalGap, seriesLadder, seriesPlacing } from './mpResultsView';
+import { nextModeForViewer, pickBestWord, pickVisibleRows, readyTally, seriesLadder, seriesPlacing, showInlineSignup } from './mpResultsView';
 import { buildRevealTimeline } from './revealTimeline';
 import { useRevealStage } from './useRevealStage';
 import { useMpAutoContinue } from './useMpAutoContinue';
@@ -33,7 +33,8 @@ import ChestRewardCta from '@/components/education/economy/ChestRewardCta';
 import { rewardRoundId } from '@/shared/constants/classroomEconomy';
 import RoundShop from '@/components/education/economy/RoundShop';
 import { MpRoundAwards, MpSeriesGrid } from './MpResultsAlbum';
-import { roundAwards, seriesGrid } from './mpResultsStory';
+import { resultCallout, roundAwards, seriesGrid } from './mpResultsStory';
+import { selectUniqueWords } from '@/lib/results/selectUniqueWords';
 import type { MpResultsController } from './useMpResultsController';
 import fx from './mpResults.module.css';
 import { useOpenLessonPractice } from './useOpenLessonPractice';
@@ -130,9 +131,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
 
-  // Canonical MP results-viewed funnel event. This stage is the always-mounted
-  // reveal screen; ResultsMainContent (where this used to fire) only mounts
-  // once DETAILS is opened, which cratered the event to near-zero.
+  // Fired here, on the always-mounted reveal; DETAILS only mounts on open.
   useEffect(() => {
     if (data.sortedScores.length > 1) {
       trackGrowthEvent('mp_results_viewed', { gameMode: c.resolvedGameMode ?? 'unknown', language: c.language });
@@ -200,13 +199,16 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   const nextModeLabel = switchedTo ? t(classroomRoundModeMeta(switchedTo).nameKey) : undefined;
   const me = data.currentPlayerData;
   const bestWord = useMemo(() => pickBestWord(me?.allWords), [me]);
-  const roundGap = useMemo(() => rivalGap(rows), [rows]);
-  const gap = series ? series.gap : roundGap;
+  const uniqueCount = useMemo(() => (username ? selectUniqueWords(c.allPlayerWords, username).length : 0), [c.allPlayerWords, username]);
+  const callout = useMemo(() => resultCallout({ rows: boardRows, uniqueCount }), [boardRows, uniqueCount]);
   const champions = series?.champions ?? NO_CHAMPIONS;
   // The album (desktop/TV): the series final tells the series round by round;
   // otherwise the round is told as three awards.
   const grid = useMemo(() => seriesGrid({ ladder, standings: seriesStandings, rounds: seriesRoundNumber }), [ladder, seriesStandings, seriesRoundNumber]);
   const awards = useMemo(() => (grid ? null : roundAwards(data.sortedScores)), [grid, data.sortedScores]);
+
+  const [bridgeShowing, setBridgeShowing] = useState(false);
+  const signupShown = showInlineSignup({ isGuest: c.isGuest, isClassroom: c.isClassroom, footerShown, bridgeShowing, seriesEndOnly: riSeriesEndOnly, branch });
 
   const exitCopy = resultsExitCopy({ isClassroom: c.isClassroom, isHost });
   const bossOutcome = useClassroomBossStore((s) => s.view?.status === 'defeated' || s.view?.status === 'escaped');
@@ -271,9 +273,9 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
           onPointerDown={(e) => e.stopPropagation()}
           onClick={() => setDetailsOpen(true)}
           className={cn(
-            'absolute z-10 -top-[calc(14px*var(--mp-u,1))] end-[calc(12px*var(--mp-u,1))] inline-flex items-center gap-1 rounded-full border-2 border-neo-black bg-neo-cyan text-neo-black shadow-hard-sm',
+            'absolute z-10 -top-[calc(14px*var(--mp-u,1))] end-[calc(12px*var(--mp-u,1))] inline-flex items-center gap-1 rounded-full border-2 border-neo-cream/50 bg-neo-navy text-neo-cream',
             'px-[calc(10px*var(--mp-u,1))] h-[calc(30px*var(--mp-u,1))] font-neo-display font-bold uppercase text-[calc(12px*var(--mp-u,1))]',
-            'active:translate-x-[1px] active:translate-y-[1px] active:shadow-none',
+            'active:translate-y-[1px]',
           )}
         >
           <ListOrdered aria-hidden="true" className="w-4 h-4" />
@@ -288,7 +290,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
           bestWord={bestWord}
           xp={socketEvents.xpGainedData?.xpEarned ?? null}
           coins={c.sideEffects.coinReward?.awarded ?? null}
-          gap={gap}
+          callout={callout}
           revealed={seen('card')}
           series={!!series}
           hideClassPosition={hideOutcome}
@@ -296,7 +298,9 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
         />
         </div>
         {classroomStudent && props.gameCode && (
-          <ChestRewardCta gameCode={props.gameCode} roundId={rewardRoundId(props.gameSessionId, props.gameCode)} />
+          <div className={cn('shrink-0 empty:hidden', seen('card') ? fx.chestStagger : 'invisible')}>
+            <ChestRewardCta gameCode={props.gameCode} roundId={rewardRoundId(props.gameSessionId, props.gameCode)} />
+          </div>
         )}
         {classroomStudent && props.gameCode && <RoundShop gameCode={props.gameCode} />}
         {classroomStudent ? (
@@ -321,18 +325,6 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
         ) : awards && !hideOutcome ? (
           <MpRoundAwards awards={awards} t={t} className="hidden lg:block" />
         ) : null)}
-        {/* results_inline: guest signup CTA on the round-end screen. The card
-            itself waits for growth:game_completed and hides mid-round. Under
-            the `ri-mp-series-end` treatment it renders only on the series-end
-            / Leave screen — never in the auto-advance gap between rounds. */}
-        {c.isGuest && !c.isClassroom && seen('card') && (!riSeriesEndOnly || branch === 'final') && (
-          <InlineSignupCard
-            isAuthenticated={c.isAuthenticated}
-            analyticsSource="results_inline"
-            compact
-            className={cn('shrink-0', fx.cardIn)}
-          />
-        )}
         {/* Native AdMob banner / CrazyGames banner. The web dev placeholder
             ([data-ad-zone], null in production) is hidden so dev matches prod. */}
         <div className="shrink-0 empty:hidden [&_[data-ad-zone]]:hidden">
@@ -350,16 +342,6 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
 
   const footer = (
     <div className="relative w-full max-w-xl lg:max-w-2xl tv:max-w-4xl lg:[--mp-u:1.15] tv:[--mp-u:1.6] mx-auto px-[calc(12px*var(--mp-u,1))] pt-2 pb-[calc(10px*var(--mp-u,1))] min-h-[calc(84px*var(--mp-u,1))] flex flex-col justify-center overflow-hidden gap-2">
-      {/* t_b883191f: first-session classic only. Control renders nothing.
-          Tap leaves the room (useMpExit) into today's Word Wheel — not a Link. */}
-      <FirstGameBridge
-        surface="classic-mp"
-        enabled={footerShown && c.resolvedGameMode === 'classic' && !c.isClassroom}
-        onActivate={() => {
-          auto.cancel();
-          mpExit('first-game-bridge');
-        }}
-      />
       {footerShown ? (
         <div className={fx.footerUp}>
           {branch === 'final' ? (
@@ -384,6 +366,21 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
         <button type="button" onClick={handleSkip} className="self-center rounded-full px-4 py-2 text-[calc(12px*var(--mp-u,1))] font-bold uppercase tracking-widest text-neo-white/60">
           {t('mpUi.results.skipHint')}
         </button>
+      )}
+      {/* t_b883191f: first-session classic only. Control renders nothing.
+          Tap leaves the room (useMpExit) into today's Word Wheel — not a Link. */}
+      <FirstGameBridge
+        surface="classic-mp"
+        enabled={footerShown && c.resolvedGameMode === 'classic' && !c.isClassroom}
+        onHoldingChange={setBridgeShowing}
+        onActivate={() => {
+          auto.cancel();
+          mpExit('first-game-bridge');
+        }}
+      />
+      {/* results_inline guest signup; under `ri-mp-series-end` treatment only on the series final. */}
+      {signupShown && (
+        <InlineSignupCard isAuthenticated={c.isAuthenticated} analyticsSource="results_inline" compact className={cn('shrink-0', fx.cardIn)} />
       )}
     </div>
   );

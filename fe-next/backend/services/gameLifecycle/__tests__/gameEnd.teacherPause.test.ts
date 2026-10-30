@@ -101,7 +101,7 @@ describe('endGame — clears teacher pause state', () => {
 
   it('resets isPaused / pausedRemainingMs / timerEndTimestamp when a paused round is ended', async () => {
     const game: any = {
-      gameCode: 'CLS1', gameMode: 'classic', gameEndedAt: null, users: {}, playerScores: {}, playerWords: {},
+      gameCode: 'CLS1', gameMode: 'classic', gameState: 'in-progress', gameEndedAt: null, users: {}, playerScores: {}, playerWords: {},
       letterGrid: [['A']], isPaused: true, pausedRemainingMs: 30_000, timerEndTimestamp: 123, timerLaunchedAt: 100,
     };
     mocks.getGame.mockReturnValue(game);

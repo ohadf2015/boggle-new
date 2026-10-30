@@ -85,16 +85,13 @@ vi.mock('../RoomListView', () => ({
   __esModule: true,
   default: () => <div data-testid="room-list-view">RoomListView</div>,
 }));
-vi.mock('../JoinRoomModal', () => ({
+vi.mock('../entry/JoinSheet', () => ({
   __esModule: true,
   default: () => null,
 }));
-vi.mock('../CreateRoomModal', () => ({
+vi.mock('../entry/CreateSheet', () => ({
   __esModule: true,
   default: () => null,
-}));
-vi.mock('../SeasonBanner', () => ({
-  SeasonBanner: () => <div data-testid="season-banner">SeasonBanner</div>,
 }));
 vi.mock('../MatchmakingOverlay', () => ({
   MatchmakingOverlay: () => null,

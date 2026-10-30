@@ -101,6 +101,7 @@ describe('endGame — pending blastEnd timer cleanup (L1)', () => {
     mocks.getGame.mockReturnValue({
       gameCode: 'BLAST1',
       gameMode: 'blast',
+      gameState: 'in-progress',
       gameEndedAt: null,
       users: { u1: { socketId: 's1' } },
       playerScores: {},

@@ -23,8 +23,7 @@
  * this in the same call, so they cannot drift.
  *
  * Its own module because `classroomGameHandler.ts` is 485 lines and the cap is
- * 500; this file registers one listener and is imported there in one line,
- * exactly as `classroomGameEndHandler` is.
+ * 500; this file registers one listener and is imported there in one line.
  */
 
 import { z } from 'zod';

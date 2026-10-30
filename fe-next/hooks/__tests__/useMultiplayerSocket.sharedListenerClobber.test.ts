@@ -17,11 +17,8 @@ import { resolve } from 'node:path';
  * connect/disconnect/reconnect handlers, so the app-wide connection indicator
  * freezes until a full page reload.
  *
- * Fix contract: the connection-lifecycle events that SocketProvider co-owns must
- * be registered as NAMED handlers and removed by reference (`off(event, fn)`),
- * never blanket-removed. They must NOT appear in the blanket `eventNames`
- * off-list. MP-exclusive game events (joined/startGame/...) may still be
- * blanket-removed — useMultiplayerSocket is their sole owner.
+ * Fix contract: every handler is removed by reference (`off(event, fn)`). Game
+ * events are shared too (PlayerView/HostView listen to startGame etc.).
  */
 const source = readFileSync(
   resolve(__dirname, '../useMultiplayerSocket.ts'),
@@ -40,16 +37,9 @@ const SHARED_LIFECYCLE_EVENTS = [
 ];
 
 describe('useMultiplayerSocket — shared listener clobber', () => {
-  it('does not blanket-off SocketProvider-owned connection events', () => {
-    // Extract the `const eventNames = [ ... ]` array literal that feeds the
-    // blanket `eventNames.forEach((e) => socket.off(e))` cleanup.
-    const start = source.indexOf('const eventNames = [');
-    expect(start).toBeGreaterThan(-1);
-    const arrayLiteral = source.slice(start, source.indexOf(']', start) + 1);
-
-    for (const event of SHARED_LIFECYCLE_EVENTS) {
-      expect(arrayLiteral).not.toContain(`'${event}'`);
-    }
+  it('never blanket-removes any event on the shared socket', () => {
+    expect(source).not.toMatch(/\.off\(\s*\w+\s*\)/);
+    expect(source).not.toMatch(/\.off\(\s*['"][\w_]+['"]\s*\)/);
   });
 
   it('removes each shared connection handler by named reference, not blanket-off', () => {

@@ -96,8 +96,7 @@ vi.mock('@/components/GameModeSelector', () => ({
   GameModeSelector: () => null,
 }));
 
-vi.mock('../components/pre-game/PresetSelector', () => ({
-  PresetSelector: () => null,
+vi.mock('@/components/multiplayer/lobby/gamePresets', () => ({
   GAME_PRESETS: {
     fast: { timer: 1, difficulty: 'EASY', nameKey: 'hostView.presetQuick' },
     party: { timer: 3, difficulty: 'EASY', nameKey: 'hostView.presetParty' },
@@ -126,9 +125,7 @@ vi.mock('../components/pre-game/LobbyAudioButton', () => ({ LobbyAudioButton: ()
 
 vi.mock('../components/pre-game/desktop', () => ({
   DesktopLobbyLayout: () => null,
-  SettingsPanel: () => null,
   InviteCard: () => null,
-  EnhancedPlayerList: () => null,
 }));
 
 // LobbyRewardCluster transitively pulls AdMobProvider (via useRewardedAd) and the

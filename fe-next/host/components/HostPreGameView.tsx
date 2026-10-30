@@ -29,6 +29,7 @@ import TvTutorialOverlay from './tv-broadcast/TvTutorialOverlay';
 import { useHostLobby, LOBBY_MAX_PLAYERS, type HostLobbyPlayer } from '@/components/multiplayer/lobby/useHostLobby';
 import { HostStatusLane } from '@/components/multiplayer/lobby/HostStatusLane';
 import { useChatUnread } from '@/components/multiplayer/lobby/useChatUnread';
+import { useLobbyWide } from '@/components/multiplayer/lobby/useLobbyWide';
 import { lobbySeats, startSublabel } from '@/components/multiplayer/lobby/lobbySeats';
 import {
   LobbyExitButton, LobbyChatButton, LobbyChatLauncher, LobbyCountPill, LobbyChatPanel, InviteSheet, HowToPlaySheet, ChatSheet,
@@ -134,6 +135,7 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const closeSheet = () => setSheet(null);
   const unread = useChatUnread({ socket: lobby.socket, username, open: sheet === 'chat' });
+  const wide = useLobbyWide();
 
   const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
   const avatarPremium = useAvatarPremium();
@@ -266,7 +268,7 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
           }
           end={
             <>
-              <LobbyChatButton onPress={() => setSheet('chat')} unread={unread} t={t} className="min-[720px]:hidden" />
+              {!wide && <LobbyChatButton onPress={() => setSheet('chat')} unread={unread} t={t} />}
               <LobbyAudioButton />
               <AdvancedSettingsModal
                 timerValue={timerValue}
@@ -296,61 +298,58 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
       <main className="flex-1 min-h-0 overflow-y-auto flex flex-col">
         <h1 className="sr-only">{t('hostView.lobbyTitle')}</h1>
 
-        {/* Desktop / tablet (≥720px): seats + mode left, invite + chat right. */}
-        <div className="hidden min-[720px]:flex min-[720px]:flex-col flex-1 min-h-0">
-          <DesktopLobbyLayout
-            leftContent={
-              <>
-                {roster(tvModeToggle)}
-                {modePicker}
-              </>
-            }
-            rightContent={
-              <div data-testid="desktop-chat-area" className="flex-1 min-h-0 flex flex-col gap-4">
-                {/* Status sits over the invite; chat is a launcher row, not a
-                    panel, so the rail never spends itself on an idle chat. */}
-                {statusLane}
-                {!isPrivate && <InviteCard gameCode={gameCode} t={props.t} showHint={lobby.humanGuestCount === 0} className="flex-1 justify-center" />}
-                {settingsSummary}
-                <LobbyChatLauncher onPress={() => setSheet('chat')} unread={unread} t={t} className={isPrivate ? 'mt-auto' : undefined} />
-              </div>
-            }
-          />
-          <div className="shrink-0 px-6 py-3 border-t-3 border-neo-black bg-neo-navy">
-            <div className="mx-auto w-full max-w-[480px] tv:max-w-[720px]">{startButton}</div>
+        {wide ? (
+          <div className="flex flex-col flex-1 min-h-0">
+            <DesktopLobbyLayout
+              leftContent={
+                <>
+                  {roster(tvModeToggle)}
+                  {modePicker}
+                </>
+              }
+              rightContent={
+                <div data-testid="desktop-chat-area" className="flex-1 min-h-0 flex flex-col gap-4">
+                  {statusLane}
+                  {!isPrivate && <InviteCard gameCode={gameCode} t={props.t} showHint={lobby.humanGuestCount === 0} className="flex-1 justify-center" />}
+                  {settingsSummary}
+                  <LobbyChatLauncher onPress={() => setSheet('chat')} unread={unread} t={t} className={isPrivate ? 'mt-auto' : undefined} />
+                </div>
+              }
+            />
+            <div className="shrink-0 px-6 py-3 border-t-3 border-neo-black bg-neo-navy">
+              <div className="mx-auto w-full max-w-[480px] tv:max-w-[720px]">{startButton}</div>
+            </div>
           </div>
-        </div>
-
-        {/* Phone (<720px): one column inside the scrolling main; the CTA
-            strip lives OUTSIDE main so it stays pinned while this scrolls. */}
-        <div data-testid="lobby-phone" className="min-[720px]:hidden flex flex-col">
-          <div className="flex-1 flex flex-col gap-2 px-3 py-2 w-full max-w-[600px] mx-auto">
-            {statusLane}
-            {roster()}
-            {modePicker}
-            {settingsSummary}
+        ) : (
+          <div data-testid="lobby-phone" className="flex flex-col">
+            <div className="flex-1 flex flex-col gap-2 px-3 py-2 w-full max-w-[600px] mx-auto">
+              {statusLane}
+              {roster()}
+              {modePicker}
+              {settingsSummary}
+            </div>
           </div>
-        </div>
+        )}
       </main>
-      {/* Phone CTA strip — pinned sibling AFTER the scroll region: tall
-          lobbies scroll inside <main>; this never moves. */}
-      <div data-testid="lobby-phone-footer" className="min-[720px]:hidden shrink-0 px-3 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] border-t-3 border-neo-black bg-neo-navy">
-        <div className="max-w-[600px] mx-auto flex items-stretch gap-2">
-          {!isPrivate && (
-            <button
-              type="button"
-              onClick={() => setSheet('invite')}
-              data-testid="lobby-invite-button"
-              // Outlined secondary: START BATTLE! beside it is the lobby's one solid CTA.
-              className="shrink-0 w-20 flex flex-col items-center justify-center gap-0.5 rounded-neo border-3 border-neo-cyan bg-neo-navy text-neo-cyan font-neo-display text-xs font-bold uppercase shadow-hard-sm hover:bg-neo-cyan/10 active:translate-y-0.5 active:shadow-none"
-            >
-              <UserPlus aria-hidden="true" className="w-6 h-6" />
-              {t('mpUi.lobby.invite')}
-            </button>
-          )}
-          <div className="flex-1 min-w-0">{startButton}</div>
+      {/* Pinned sibling after the scroll region, so the phone CTA never scrolls away. */}
+      {!wide && (
+        <div data-testid="lobby-phone-footer" className="shrink-0 px-3 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] border-t-3 border-neo-black bg-neo-navy">
+          <div className="max-w-[600px] mx-auto flex items-stretch gap-2">
+            {!isPrivate && (
+              <button
+                type="button"
+                onClick={() => setSheet('invite')}
+                data-testid="lobby-invite-button"
+                className="shrink-0 w-20 flex flex-col items-center justify-center gap-0.5 rounded-neo border-3 border-neo-cyan bg-neo-navy text-neo-cyan font-neo-display text-xs font-bold uppercase shadow-hard-sm hover:bg-neo-cyan/10 active:translate-y-0.5 active:shadow-none"
+              >
+                <UserPlus aria-hidden="true" className="w-6 h-6" />
+                {t('mpUi.lobby.invite')}
+              </button>
+            )}
+            <div className="flex-1 min-w-0">{startButton}</div>
+          </div>
         </div>
-      </div>
+      )}
 
       {!isPrivate && <InviteSheet open={sheet === 'invite'} onClose={closeSheet} gameCode={gameCode} t={t} />}
       <HowToPlaySheet open={sheet === 'howto'} onClose={closeSheet} mode={lobby.selectedGameMode} lang={roomLanguage} t={t} />

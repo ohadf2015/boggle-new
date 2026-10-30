@@ -40,8 +40,8 @@ describe('multiplayer exit paths all use the shared param strip', () => {
 
   it('imports and uses the shared helper', () => {
     expect(source).toContain('stripMultiplayerExitParams');
-    // One import + one call per exit path that clears the URL.
+    // handleExitToLobby (also behind the banner Leave) + the room-gone path.
     const uses = source.match(/stripMultiplayerExitParams\(/g) ?? [];
-    expect(uses.length).toBeGreaterThanOrEqual(3);
+    expect(uses.length).toBeGreaterThanOrEqual(2);
   });
 });

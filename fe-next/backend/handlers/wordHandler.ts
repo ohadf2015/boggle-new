@@ -16,7 +16,6 @@ import {
   getLeaderboardThrottled,
   markUserActivity,
   getFirstFinder,
-  addPlayerWord as addPlayerWordToGame,
 } from '../modules/gameStateManager.js';
 
 import { volatileBroadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
@@ -37,13 +36,13 @@ import { validatePayload, submitWordSchema } from '../utils/socketValidation.js'
 import { handleValidatedWord } from './wordValidationHandler';
 import { registerWordVoteHandlers } from './wordVoteHandlers';
 import { registerBlastBoardResyncHandler } from './blastBoardResyncHandler';
-import { hitRoomBoss, wordBlockedByFreeze } from '../services/classroomBoss/roomBoss.js';
+import { wordBlockedByFreeze } from '../services/classroomBoss/roomBoss.js';
+import { wordBlockedByBlizzard } from '../modules/blizzardFreeze.js';
+import { duplicateHalvingApplies, handleConfirmationWord } from './wordConfirmation';
 import { BOSS_FROZEN_REASON } from '@/shared/types/classroomBoss';
-import { ensurePlayerState } from './playerDataInit';
 import { spamDetector, PenaltyTier, InvalidReason, type InvalidReasonValue } from '../modules/spamDetector.js';
 import { acquireGracePeriodLock, releaseGracePeriodLock } from '../services/gracePeriodLock';
 import { WORD_SUBMIT_GRACE_PERIOD_MS } from '../utils/graceWindow.js';
-import { calculateWordScore } from '../modules/scoringEngine.js';
 import { isWordShapeWeird } from '@/shared/utils/wordShapeFilter';
 import { classicMinWordLength } from '@/shared/utils/classicWordRules';
 import type { Language } from '@/shared/types';
@@ -146,8 +145,17 @@ function registerWordHandlers(io: Server, socket: Socket): void {
   socket.on('submitWord', async (data: SubmitWordPayload) => {
     if (isSocketMigrating(socket)) return;
 
+    // Echo the word on a rate-limit bounce so an optimistic client tile resolves instead of hanging.
+    const echoRateLimited = (): void => {
+      const raw = (data as SubmitWordPayload | undefined)?.word;
+      if (typeof raw === 'string' && raw) {
+        socket.emit('wordRejected', { word: raw.toLowerCase().trim().substring(0, 50), reason: 'rate_limited' });
+      }
+    };
+
     if (!checkRateLimit(socket.id, SUBMIT_WORD_WEIGHT)) {
       socket.emit('rateLimited');
+      echoRateLimited();
       return;
     }
 
@@ -156,6 +164,7 @@ function registerWordHandlers(io: Server, socket: Socket): void {
     if (!rl.allowed) {
       logger.warn('RATE_LIMIT', 'Rate limited', { socketId: socket.id, action: 'wordSubmit' });
       socket.emit('rate-limited', { action: 'wordSubmit', retryAfterMs: rl.retryAfterMs });
+      echoRateLimited();
       return;
     }
 
@@ -342,6 +351,8 @@ function registerWordHandlers(io: Server, socket: Socket): void {
       }
       if (!validationGrid) {
         logger.warn('WORD', 'No letter grid available for word validation', { gameCode });
+        socket.emit('wordRejected', { word: normalizedWord, reason: 'error' });
+        emitError(socket, ErrorCodes.WORD_PROCESSING_ERROR, { message: 'No board for this round' });
         await releaseGraceLockIfNeeded();
         return;
       }
@@ -362,41 +373,8 @@ function registerWordHandlers(io: Server, socket: Socket): void {
         return;
       }
 
-      // Check if someone else already found this word (first-to-find scoring).
-      // SKIP for blast: boards are per-player and independent, so two players
-      // legitimately clearing the same word each deserve FULL credit (no 50%
-      // confirmation penalty).
-      const firstFinder = game.gameMode === 'blast'
-        ? null
-        : getFirstFinder(gameCode, normalizedWord, username);
-      if (firstFinder) {
-        // Catch-up mechanic: give 50% partial credit for confirmation finds
-        // This rewards word knowledge without devaluing first-find
-        const inputMethod = (validation.data as SubmitWordPayload).inputMethod ?? 'drag';
-        const baseScore = calculateWordScore(normalizedWord, 0, 1, 1, { inputMethod });
-        const confirmationScore = Math.floor(baseScore * 0.5);
-
-        if (confirmationScore > 0) {
-          updatePlayerScore(gameCode, username, confirmationScore, true);
-          addPlayerWordToGame(gameCode, username, normalizedWord, {
-            score: confirmationScore,
-            validated: true,
-            autoValidated: true,
-          });
-        }
-
-        // Boss rounds are co-op: a second finder still lands a (half-strength) hit.
-        const boss = hitRoomBoss(io, gameCode, game, { username, word: normalizedWord, score: confirmationScore });
-        socket.emit('wordAlreadyFoundByOther', {
-          word: normalizedWord,
-          foundBy: firstFinder.username,
-          foundByAvatar: firstFinder.avatar || null,
-          confirmationScore,
-          ...(boss ? { boss } : {}),
-        });
-        // Increment combo — player found a valid word, just not first
-        ensurePlayerState(game, username);
-        game.playerCombos[username] = (game.playerCombos[username] || 0) + 1;
+      if (await wordBlockedByBlizzard(game, normalizedWord)) {
+        socket.emit('wordRejected', { word: normalizedWord, reason: 'frozen' });
         await releaseGraceLockIfNeeded();
         return;
       }
@@ -419,7 +397,16 @@ function registerWordHandlers(io: Server, socket: Socket): void {
       const clientPath = (validation.data as SubmitWordPayload).path ?? null;
 
       if (shouldAutoValidate) {
-        handleValidatedWord(io, socket, game, gameCode, username, normalizedWord, isInDictionary === true, comboType, inputMethod, clientPath);
+        // No await between these checks and the credit: a twin submit (or a rival
+        // finding the same word) that raced past the early checks is settled here.
+        const firstFinder = duplicateHalvingApplies(game) ? getFirstFinder(gameCode, normalizedWord, username) : null;
+        if (playerHasWord(gameCode, username, normalizedWord)) {
+          socket.emit('wordAlreadyFound', { word: normalizedWord });
+        } else if (firstFinder) {
+          handleConfirmationWord(io, socket, game, gameCode, username, normalizedWord, firstFinder, inputMethod);
+        } else {
+          handleValidatedWord(io, socket, game, gameCode, username, normalizedWord, isInDictionary === true, comboType, inputMethod, clientPath);
+        }
       } else {
         // Word not in dictionary - reject immediately (no pending/AI validation)
         inc('wordNeedsValidation');

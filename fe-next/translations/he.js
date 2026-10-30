@@ -20334,7 +20334,8 @@ const he = {
       "editSettings": "עריכת הגדרות הסיבוב",
       "chatHint": "תגידו היי לחבורה",
       "chatUnread": "{count} חדשות",
-      "modeOn": "{mode} נבחר — לחצו התחל"
+      "modeOn": "{mode} נבחר — לחצו התחל",
+      "progressNotSaved": "לא הצלחנו לשמור את המשחק. אם השרת יופעל מחדש, ההתקדמות עלולה ללכת לאיבוד."
     },
     "round": {
       "getReady": "היכונו",
@@ -20433,6 +20434,12 @@ const he = {
       "share": "שיתוף",
       "seriesChampion": "אלוף/ת הסדרה",
       "teacherPaced": "המורה יתחיל/תתחיל את המשחק הבא",
+      "calloutPhotoWon": "פוטו פיניש! ניצחת את {name} ב-{points}",
+      "calloutPhotoLost": "פוטו פיניש! רק {points} מאחורי {name}",
+      "calloutComeback": "קאמבק! עלית {places} מקומות בסדרה",
+      "calloutUnique": "מילים שרק לך: {count}",
+      "detailsWords": "המילים שלך",
+      "detailsNoWords": "אין מילים בסיבוב הזה",
       "backToClass": "חזרה לכיתה",
       "endClassTitle": "לסיים את משחק הכיתה?",
       "endClassBody": "החדר ייסגר לכל התלמידים ותחזרו ללוח הכיתה שלכם.",
@@ -21557,6 +21564,13 @@ const he = {
     }
   }
   // @teacherLifecycleEmail:end
+  ,
+  // @eduPolish:start
+  "eduPolish": {
+    "seatCapReached": "{name} צופה: הכיתה מלאה ({cap} שחקנים)",
+    "csvDropHint": "גררו לכאן קובץ CSV או לחצו לבחירה"
+  }
+  // @eduPolish:end
 };
 
 export { he };

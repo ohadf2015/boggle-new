@@ -1,13 +1,8 @@
 /**
  * Who is on this classroom socket.
  *
- * A leaf module so `classroomGameHandler` and `classroomGameEndHandler` share
- * ONE answer. The end handler is the single most security-sensitive listener in
- * the classroom set — the game code is on the projector, in the QR and on every
- * student's screen, so "is this the teacher?" is the only thing standing
- * between a bored student and the whole class's lost session. A second copy of
- * this function drifting from the first is exactly the shape of the bug that
- * once let `classroomGameEnd` through unguarded (pitfall class 3).
+ * A leaf module so every classroom handler shares ONE answer: the game code is
+ * on the projector, so "is this the teacher?" must not drift between copies.
  *
  * Deliberately NOT `utils/socialHelpers.getAuthUserId`: that one reads
  * `socket.data.verifiedUserId` only. The classroom sockets still carry a

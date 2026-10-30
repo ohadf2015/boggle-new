@@ -20403,7 +20403,8 @@ const ja = {
       "editSettings": "ラウンド設定を変更",
       "chatHint": "みんなにあいさつしよう",
       "chatUnread": "新着 {count}件",
-      "modeOn": "{mode}を選択中 — スタートを押して"
+      "modeOn": "{mode}を選択中 — スタートを押して",
+      "progressNotSaved": "ゲームを保存できませんでした。サーバーが再起動すると進行状況が失われる可能性があります。"
     },
     "round": {
       "getReady": "準備して",
@@ -20502,6 +20503,12 @@ const ja = {
       "share": "シェア",
       "seriesChampion": "シリーズ王者",
       "teacherPaced": "先生が次のゲームを始めます",
+      "calloutPhotoWon": "写真判定！{name}に{points}点差で勝利",
+      "calloutPhotoLost": "写真判定！{name}に{points}点差で惜敗",
+      "calloutComeback": "逆転！シリーズで{places}つ順位アップ",
+      "calloutUnique": "あなただけが見つけた単語：{count}",
+      "detailsWords": "あなたの単語",
+      "detailsNoWords": "このラウンドの単語はありません",
       "backToClass": "クラスに戻る",
       "endClassTitle": "クラスのゲームを終了しますか？",
       "endClassBody": "全員のルームが閉じられ、クラスのダッシュボードに戻ります。",
@@ -21626,6 +21633,13 @@ const ja = {
     }
   }
   // @teacherLifecycleEmail:end
+  ,
+  // @eduPolish:start
+  "eduPolish": {
+    "seatCapReached": "{name}さんは観戦中です：クラスが満員です（{cap}人）",
+    "csvDropHint": "CSVファイルをここにドロップ、またはクリックして選択"
+  }
+  // @eduPolish:end
 };
 
 export { ja };

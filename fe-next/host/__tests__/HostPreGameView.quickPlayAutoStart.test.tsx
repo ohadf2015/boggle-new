@@ -48,8 +48,7 @@ vi.mock('@/hooks/gameState', () => ({
 vi.mock('../../hooks/useNativeShare', () => ({ useNativeShare: () => ({ canShare: false, share: vi.fn() }) }));
 vi.mock('@/components/ui/DJMascot', () => ({ DJMascotWithEntrance: () => null }));
 vi.mock('@/components/GameModeSelector', () => ({ GameModeSelector: () => null }));
-vi.mock('../components/pre-game/PresetSelector', () => ({
-  PresetSelector: () => null,
+vi.mock('@/components/multiplayer/lobby/gamePresets', () => ({
   GAME_PRESETS: {
     fast: { timer: 1, difficulty: 'EASY', nameKey: 'hostView.presetQuick' },
     party: { timer: 3, difficulty: 'EASY', nameKey: 'hostView.presetParty' },
@@ -62,9 +61,7 @@ vi.mock('../components/pre-game/MobileShareSection', () => ({ MobileShareSection
 vi.mock('../components/pre-game/LobbyAudioButton', () => ({ LobbyAudioButton: () => null }));
 vi.mock('../components/pre-game/desktop', () => ({
   DesktopLobbyLayout: () => null,
-  SettingsPanel: () => null,
   InviteCard: () => null,
-  EnhancedPlayerList: () => null,
 }));
 vi.mock('@/components/lobby/LobbyReactions', () => ({ LobbyReactions: () => null }));
 

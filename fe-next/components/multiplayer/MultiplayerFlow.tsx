@@ -1,12 +1,9 @@
 'use client';
 
 import React, { type ReactNode } from 'react';
-// Legacy module paths on purpose: the MultiplayerFlow.* guard tests mock
-// './RoomListView', './JoinRoomModal' and './CreateRoomModal' (they re-export
-// the entry's CreateSheet / JoinSheet).
 import RoomListView from './RoomListView';
-import JoinRoomModal from './JoinRoomModal';
-import CreateRoomModal from './CreateRoomModal';
+import JoinRoomModal from './entry/JoinSheet';
+import CreateRoomModal from './entry/CreateSheet';
 import CgLobbyHero from './CgLobbyHero';
 import ArenaCTAStrip from './ArenaCTAStrip';
 import type { Language, ActiveRoom } from '@/shared/types/game';

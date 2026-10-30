@@ -18,7 +18,7 @@ import { useGameActions, useHostSelectedGameMode } from '@/hooks/gameState';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLobbyAdGate } from '@/hooks/useLobbyAdGate';
 import { useCrazyGamesInvite } from '@/hooks/useCrazyGamesInvite';
-import { GAME_PRESETS } from '@/host/components/pre-game/PresetSelector';
+import { GAME_PRESETS } from './gamePresets';
 import { classroomHostPreset } from '@/lib/education/classroomHostPreset';
 import {
   shouldShowSoloPlayPrompt,
@@ -75,8 +75,11 @@ export interface UseHostLobbyArgs {
 export const QUICKPLAY_AUTO_FILL_SECONDS = 5;
 export const LOBBY_MAX_PLAYERS = 8;
 
+const LOBBY_GAME_STATE = 'waiting' as const;
+
 const nameOf = (p: string | HostLobbyPlayer) => (typeof p === 'string' ? p : p.username);
 const isHostRecord = (p: string | HostLobbyPlayer) => (typeof p === 'object' ? !!p.isHost : false);
+const isBotRecord = (p: string | HostLobbyPlayer) => (typeof p === 'object' ? !!p.isBot : false);
 
 export function useHostLobby({
   gameCode,
@@ -159,27 +162,26 @@ export function useHostLobby({
   }, [playersReady, hostPlaying, username]);
 
   // CrazyGames invite chip. Private rooms (Quick Play / classroom) suppress it.
-  const gameState: 'waiting' | 'playing' | 'ended' = 'waiting';
   const { showInviteButton, hideInviteButton, isInviteButtonVisible } = useCrazyGamesInvite({
     maxPlayers: LOBBY_MAX_PLAYERS,
     currentPlayers: seatedPlayers.length,
-    gameState,
+    gameState: LOBBY_GAME_STATE,
   });
   useEffect(() => {
     if (isPrivate) {
       if (isInviteButtonVisible) hideInviteButton();
       return;
     }
-    if (gameCode && gameState === 'waiting') showInviteButton(gameCode);
+    if (gameCode) showInviteButton(gameCode);
     return () => {
       if (isInviteButtonVisible) hideInviteButton();
     };
-  }, [gameCode, gameState, showInviteButton, hideInviteButton, isInviteButtonVisible, isPrivate]);
+  }, [gameCode, showInviteButton, hideInviteButton, isInviteButtonVisible, isPrivate]);
 
-  // Human opponents (excludes the host + self). This — NOT a raw player count —
-  // drives bot-fill and the alone timer: a host-inclusive count hid the case
-  // where hostPlaying is forced true, so a solo host counted as 1.
-  const humanGuestCount = playersReady.filter((p) => !isHostRecord(p) && nameOf(p) !== username).length;
+  // Bots must not count: the fill they trigger would otherwise cancel its own auto-start.
+  const humanGuestCount = playersReady.filter(
+    (p) => !isHostRecord(p) && !isBotRecord(p) && nameOf(p) !== username,
+  ).length;
 
   // Alone is never a reason to block Start (the solo dialog handles it); only a
   // missing timer, a tournament in flight, an ad, or an in-flight emit.
@@ -198,8 +200,8 @@ export function useHostLobby({
   const postFillStartRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   // The post-fill auto-start fires 20s after it is scheduled — re-read the live
   // signals at FIRE time, not schedule time.
-  const autoStartSignalsRef = useRef({ isQuickPlay, isPrivate, humanGuestCount, gameState });
-  autoStartSignalsRef.current = { isQuickPlay, isPrivate, humanGuestCount, gameState };
+  const autoStartSignalsRef = useRef({ isQuickPlay, isPrivate, humanGuestCount, gameState: LOBBY_GAME_STATE });
+  autoStartSignalsRef.current = { isQuickPlay, isPrivate, humanGuestCount, gameState: LOBBY_GAME_STATE };
 
   useEffect(() => {
     if (humanGuestCount === 0) {
@@ -233,10 +235,6 @@ export function useHostLobby({
     if (postFillStartRef.current) clearTimeout(postFillStartRef.current);
   }, []);
 
-  useEffect(() => {
-    if (gameState !== 'waiting' && startGameInFlight) setStartGameInFlight(false);
-  }, [gameState, startGameInFlight]);
-
   // Passive rescue. Public rooms only FILL (starting stays the host's call, then
   // a grace window); Quick Play fills AND starts — 31% of auto-filled quick-play
   // lobbies otherwise sat populated with nobody pressing Start.
@@ -250,7 +248,7 @@ export function useHostLobby({
       setBotCountdown(null);
       if (isQuickPlay) {
         (onAutoStartWithBotsRef.current ?? onStartGameRef.current)();
-      } else if (shouldAutoStartAfterBotFill({ isQuickPlay, isPrivate, humanGuestCount, gameState })) {
+      } else if (shouldAutoStartAfterBotFill(autoStartSignalsRef.current)) {
         postFillStartRef.current = setTimeout(() => {
           postFillStartRef.current = null;
           if (!shouldAutoStartAfterBotFill(autoStartSignalsRef.current)) return;
@@ -265,7 +263,7 @@ export function useHostLobby({
     return () => {
       if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
     };
-  }, [botCountdown, socket, gameCode, isQuickPlay, isPrivate, humanGuestCount, gameState]);
+  }, [botCountdown, socket, gameCode, isQuickPlay, isPrivate, humanGuestCount]);
 
   const handleRoomLanguageChange = useCallback((newLang: Language) => {
     socket?.emit('changeRoomLanguage', { gameCode, language: newLang });
@@ -290,7 +288,7 @@ export function useHostLobby({
   // Solo-host rescue prompt: one derived condition so render + telemetry agree.
   const showSoloPrompt = shouldShowSoloPlayPrompt({
     humanGuestCount,
-    gameState,
+    gameState: LOBBY_GAME_STATE,
     botCountdownActive: botCountdown !== null,
     isPrivate,
   });

@@ -108,3 +108,16 @@ describe('CgLobbyHero', () => {
     expect(img.getAttribute('decoding')).toBe('async');
   });
 });
+
+describe('CgLobbyHero RTL placement', () => {
+  const heroSource = require('node:fs').readFileSync(require('node:path').join(__dirname, '..', 'CgLobbyHero.tsx'), 'utf8') as string;
+
+  it('positions with logical start/end utilities instead of flipping left/right by hand', () => {
+    expect(heroSource).not.toMatch(/isRTL \? '-?(left|right)-/);
+    expect(heroSource).not.toMatch(/-right-2/);
+  });
+
+  it('never builds a Tailwind class name from a template (JIT cannot see it)', () => {
+    expect(heroSource).not.toMatch(/bg-gradient-to-\$\{/);
+  });
+});

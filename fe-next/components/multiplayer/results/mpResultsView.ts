@@ -169,3 +169,16 @@ export function readyTally(players: ReadyPlayer[], readyUsernames: string[]): { 
 export function nextModeForViewer<M extends string>({ isHost, hostPick }: { isHost: boolean; hostPick: M }): M | null {
   return isHost ? hostPick : null;
 }
+
+/** `seriesEndOnly` is the ri-mp-series-end treatment arm. */
+export function showInlineSignup({ isGuest, isClassroom, footerShown, bridgeShowing, seriesEndOnly, branch }: {
+  isGuest: boolean;
+  isClassroom: boolean;
+  footerShown: boolean;
+  bridgeShowing: boolean;
+  seriesEndOnly: boolean;
+  branch: 'intermission' | 'final' | null;
+}): boolean {
+  if (!isGuest || isClassroom || !footerShown || bridgeShowing || branch === null) return false;
+  return !seriesEndOnly || branch === 'final';
+}

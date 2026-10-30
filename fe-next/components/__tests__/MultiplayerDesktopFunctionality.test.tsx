@@ -14,6 +14,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { setLobbyViewport } from '@/components/multiplayer/lobby/__tests__/lobbyViewport';
 
 // Mock Socket context
 vi.mock('@/components/boosts/BoostButton', () => ({ BoostButton: () => null }));
@@ -111,6 +112,9 @@ const createWrapper = () => {
 };
 
 describe('Multiplayer Desktop Functionality Access', () => {
+  beforeEach(() => setLobbyViewport('desktop'));
+  afterEach(() => setLobbyViewport('phone'));
+
   describe('HostPreGameView', () => {
     const defaultHostProps = {
       gameCode: 'ABC123',

@@ -4,10 +4,11 @@
  * The rail is now invite + the round settings at a glance + a chat launcher
  * (unread count), and RoomChat mounts only inside the chat sheet.
  */
-import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import React from 'react';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import HostPreGameView from '../components/HostPreGameView';
+import { setLobbyViewport } from '@/components/multiplayer/lobby/__tests__/lobbyViewport';
 
 const mockSocket = { emit: vi.fn(), on: vi.fn(), off: vi.fn() };
 vi.mock('../../utils/SocketContext', () => ({
@@ -50,7 +51,11 @@ const props = {
 const rail = () => within(screen.getByTestId('desktop-chat-area'));
 
 describe('HostPreGameView — desktop right rail', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    setLobbyViewport('desktop');
+  });
+  afterEach(() => setLobbyViewport('phone'));
 
   it('no chat panel in the lobby body: RoomChat mounts only once the chat sheet opens', () => {
     render(<HostPreGameView {...props} />);

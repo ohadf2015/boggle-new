@@ -46,6 +46,15 @@ const FEEDBACK_TIMEOUT_SECONDS = 15;
 export async function endGame(io: Server, gameCode: string): Promise<void> {
   const game = getGame(gameCode);
   if (!game) return;
+  // The state machine allows finished->finished, so a second caller would re-score and re-persist.
+  if (game.gameState !== 'in-progress') {
+    logger.debug('GAME', `endGame skipped for ${gameCode}: state is ${game.gameState}`);
+    if (game.gameState === 'finished' && game.cachedResultsPayload) {
+      broadcastToRoom(io, getGameRoom(gameCode), 'validatedScores', game.cachedResultsPayload);
+      broadcastToRoom(io, getGameRoom(gameCode), 'validationComplete', game.cachedResultsPayload);
+    }
+    return;
+  }
 
   // Record end timestamp BEFORE state transition so the grace period
   // is active immediately when gameState becomes 'finished'

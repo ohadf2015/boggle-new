@@ -6,8 +6,13 @@ import Image from 'next/image';
 import { Coins, Sparkles, Star } from 'lucide-react';
 import AnimatedCounter from '@/components/ui/AnimatedCounter';
 import { cn } from '@/lib/utils';
-import { MASCOT_SRC, mascotFor, type RivalGap } from './mpResultsView';
+import { MASCOT_SRC, mascotFor } from './mpResultsView';
+import type { ResultCallout } from './mpResultsStory';
+import { MEDAL_SRC, MpCalloutLine, ResultArt } from './MpResultArt';
 import fx from './mpResults.module.css';
+
+const REWARD_DELAY_MS = 450;
+const REWARD_STAGGER_MS = 160;
 
 type TFn = (key: string, params?: Record<string, string | number>) => string;
 
@@ -22,7 +27,8 @@ export interface MpMyCardProps {
   bestWord: { word: string; score: number } | null;
   xp: number | null;
   coins: number | null;
-  gap: RivalGap | null;
+  /** The one rivalry line (photo finish, comeback, gap…), already prioritised. */
+  callout: ResultCallout | null;
   /** The card's beat has landed: counters roll from 0 to the server number. */
   revealed: boolean;
   /**
@@ -45,21 +51,17 @@ export interface MpMyCardProps {
  * up, the best word and what I earned. Numbers are the server's (the counter
  * only animates the display, from 0 to `score`).
  */
-function MpMyCardImpl({ rank, winner, total, score, bestWord, xp, coins, gap, revealed, series = false, hideClassPosition = false, t, className }: MpMyCardProps) {
+function MpMyCardImpl({ rank, winner, total, score, bestWord, xp, coins, callout, revealed, series = false, hideClassPosition = false, t, className }: MpMyCardProps) {
   const calm = hideClassPosition;
   // A class that lost to the boss has no winner: the top scorer keeps a rank, not a crown.
   const lostBoss = useClassroomBossStore((s) => s.view?.status === 'escaped');
   const mood = calm || (lostBoss && winner) ? 'cheer' : mascotFor(rank, total, score);
   const showWinner = !calm && winner && !lostBoss;
-  const gapLine = calm || !gap
-    ? null
-    : gap.kind === 'tied'
-      ? gap.more > 0
-        ? t('mpUi.results.tiedWithMore', { name: gap.name, more: gap.more })
-        : t('mpUi.results.tiedWith', { name: gap.name })
-      : gap.kind === 'ahead'
-        ? t('mpUi.results.ahead', { points: gap.points, name: gap.name })
-        : t('mpUi.results.behind', { points: gap.points, name: gap.name });
+  const medal = !calm && score > 0 && rank >= 1 && rank <= 3 ? (rank as 1 | 2 | 3) : null;
+  const rewards = [
+    xp != null && xp > 0 ? { id: 'xp', label: t('mpUi.results.xp', { xp }), icon: Sparkles, tone: 'bg-neo-cyan' } : null,
+    coins != null && coins > 0 ? { id: 'coins', label: t('mpUi.results.coins', { coins }), icon: Coins, tone: 'bg-neo-yellow' } : null,
+  ].filter((r) => r !== null);
 
   return (
     <section
@@ -83,21 +85,30 @@ function MpMyCardImpl({ rank, winner, total, score, bestWord, xp, coins, gap, re
           alt=""
           width={152}
           height={152}
-          className={cn('w-full h-full object-contain drop-shadow-[3px_3px_0_#000]', revealed && fx.mascotHop)}
+          className={cn('w-full h-full object-contain drop-shadow-[3px_3px_0_rgb(var(--neo-black))]', revealed && fx.mascotHop)}
         />
-        {!calm && (
+        {!calm && (medal ? (
+          <span data-testid="mp-my-rank" data-medal={medal} className={cn('absolute -bottom-2 -end-3 block w-[calc(44px*var(--mp-u,1))] h-[calc(44px*var(--mp-u,1))]', revealed && fx.medalDrop)}>
+            <span className="sr-only">#{rank}</span>
+            <ResultArt
+              src={MEDAL_SRC[medal]}
+              className="w-full h-full object-contain drop-shadow-[2px_2px_0_rgb(var(--neo-black))]"
+              fallback={<span aria-hidden="true" className={cn('grid place-items-center w-full h-full rounded-neo border-[3px] border-neo-black shadow-hard-sm font-neo-display font-bold tabular-nums text-[calc(20px*var(--mp-u,1))]', showWinner ? 'bg-neo-lime' : 'bg-neo-cyan')}>#{rank}</span>}
+            />
+          </span>
+        ) : (
           <span
             data-testid="mp-my-rank"
             className={cn(
               'absolute -bottom-1 -end-2 grid place-items-center rounded-neo border-[3px] border-neo-black shadow-hard-sm font-neo-display font-bold tabular-nums',
               'min-w-[calc(40px*var(--mp-u,1))] h-[calc(34px*var(--mp-u,1))] px-1 text-[calc(20px*var(--mp-u,1))]',
-              showWinner ? 'bg-neo-lime' : score > 0 && rank <= 3 ? 'bg-neo-cyan' : 'bg-neo-pink',
+              'bg-neo-pink',
               revealed && fx.stamp,
             )}
           >
             #{rank}
           </span>
-        )}
+        ))}
       </div>
 
       <div className="min-w-0 flex-1 flex flex-col gap-[calc(4px*var(--mp-u,1))]">
@@ -118,9 +129,7 @@ function MpMyCardImpl({ rank, winner, total, score, bestWord, xp, coins, gap, re
           </span>
           <span className="min-w-0 truncate font-neo-body font-bold text-[calc(13px*var(--mp-u,1))] opacity-70">{t(series ? 'mpUi.results.seriesPts' : 'mpUi.results.pts')}</span>
         </div>
-        {gapLine && (
-          <p dir="auto" className="font-neo-body font-semibold leading-tight text-[calc(12px*var(--mp-u,1))] truncate">{gapLine}</p>
-        )}
+        {!calm && callout && <MpCalloutLine callout={callout} revealed={revealed} t={t} />}
         <div className="flex flex-wrap items-center gap-1.5 min-w-0">
           {bestWord && (
             <span data-testid="mp-my-best-word" className={cn('inline-flex items-center gap-1 rounded-full border-2 border-neo-black bg-neo-lime px-2 py-0.5 text-[calc(12px*var(--mp-u,1))] font-bold max-w-full min-w-0', revealed && fx.chipPop)}>
@@ -132,18 +141,17 @@ function MpMyCardImpl({ rank, winner, total, score, bestWord, xp, coins, gap, re
               <span dir="ltr" className="tabular-nums opacity-70">+{bestWord.score}</span>
             </span>
           )}
-          {xp != null && xp > 0 && (
-            <span data-testid="mp-my-xp" className={cn('inline-flex items-center gap-1 rounded-full border-2 border-neo-black bg-neo-cyan px-2 py-0.5 text-[calc(12px*var(--mp-u,1))] font-bold', fx.chipPop)}>
-              <Sparkles aria-hidden="true" className="w-3.5 h-3.5" />
-              {t('mpUi.results.xp', { xp })}
+          {rewards.map((r, i) => (
+            <span
+              key={r.id}
+              data-testid={`mp-my-${r.id}`}
+              style={{ animationDelay: `${REWARD_DELAY_MS + i * REWARD_STAGGER_MS}ms` }}
+              className={cn('inline-flex items-center gap-1 rounded-full border-2 border-neo-black px-2 py-0.5 text-[calc(12px*var(--mp-u,1))] font-bold', r.tone, revealed && fx.rewardPop)}
+            >
+              <r.icon aria-hidden="true" className="w-3.5 h-3.5" />
+              {r.label}
             </span>
-          )}
-          {coins != null && coins > 0 && (
-            <span data-testid="mp-my-coins" className={cn('inline-flex items-center gap-1 rounded-full border-2 border-neo-black bg-neo-yellow px-2 py-0.5 text-[calc(12px*var(--mp-u,1))] font-bold', fx.chipPop)}>
-              <Coins aria-hidden="true" className="w-3.5 h-3.5" />
-              {t('mpUi.results.coins', { coins })}
-            </span>
-          )}
+          ))}
         </div>
       </div>
     </section>

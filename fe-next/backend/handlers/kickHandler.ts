@@ -27,6 +27,7 @@ import {
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { cleanupPlayerData } from '../utils/playerCleanup.js';
 import gameStartCoordinator from '../utils/gameStartCoordinator.js';
+import { startGameTimer } from '../services/gameLifecycle/gameTimer.js';
 import logger from '../utils/logger.js';
 
 // Auto-kick: players with AFK presence for this long in lobby get kicked
@@ -62,8 +63,11 @@ function executeKick(
     clearSocketMappingsForLeave(targetSocketId, gameCode, targetUsername);
   }
 
-  // Notify game start coordinator
-  gameStartCoordinator.handlePlayerDisconnect(gameCode, targetUsername);
+  // The coordinator has already cleared its countdown timeouts when it says startTimer, so we must start it.
+  const coordResult = gameStartCoordinator.handlePlayerDisconnect(gameCode, targetUsername);
+  if (coordResult && coordResult.startTimer) {
+    startGameTimer(io, gameCode, game.gameDuration || game.timerSeconds || 180);
+  }
 
   // Clean up player data and remove
   cleanupPlayerData(game, targetUsername);

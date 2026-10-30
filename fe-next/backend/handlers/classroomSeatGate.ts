@@ -37,7 +37,7 @@
  *     to translate. The `code: 'GAME_ENDED'` field is for our logs.
  *
  * Note this gate is the BELT, not the fix. The fix is that ending a session now
- * tears the room down (`classroomGameEndHandler`), which deletes the game's
+ * tears the room down (`gameStateManager.deleteGame`), which deletes the game's
  * Redis key and makes the ordinary GAME_NOT_FOUND branch answer. The gate
  * covers what teardown structurally cannot: `gameStateManager.deleteGame`
  * early-returns when the room is not in THIS instance's memory, so on any other

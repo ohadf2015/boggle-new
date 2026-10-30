@@ -28,7 +28,7 @@ vi.mock('@/utils/profileStorage', () => ({
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ updateProfile: vi.fn(() => Promise.resolve()), loading: false, profile: null }) }));
 vi.mock('@/components/avatar/AvatarRenderer', () => ({ __esModule: true, default: () => <div data-testid="avatar-renderer" /> }));
 
-import JoinRoomModal from '../../JoinRoomModal';
+import JoinRoomModal from '../JoinSheet';
 import { codeTicket } from '../joinTarget';
 
 const en = bundleT('en');
