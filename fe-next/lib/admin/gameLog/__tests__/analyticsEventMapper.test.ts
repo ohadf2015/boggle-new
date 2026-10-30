@@ -173,3 +173,39 @@ describe('isNudgePhantomRow', () => {
     ).toBe(false);
   });
 });
+
+describe('mapAnalyticsEventToGame — leave reason is not an error', () => {
+  it.each(['hidden', 'pagehide', 'spa_navigate', 'exit', 'give_up'])(
+    'maps an abandon with reason=%s to leave_reason, never error_reason',
+    (reason) => {
+      const g = mapAnalyticsEventToGame(
+        row({ event_type: 'game_abandoned', metadata: { mode: 'word-hunt', reason, durationSec: 3 } }),
+      );
+      expect(g.error_reason).toBeNull();
+      expect(g.leave_reason).toBe(reason);
+    },
+  );
+
+  it('keeps a real error_reason from trackGameError', () => {
+    const g = mapAnalyticsEventToGame(
+      row({ event_type: 'game_abandoned', metadata: { mode: 'classic', error_reason: 'connection_lost' } }),
+    );
+    expect(g.error_reason).toBe('connection_lost');
+  });
+
+  it('files an MP abandon under its room when gameCode and isMultiplayer are stamped', () => {
+    const g = mapAnalyticsEventToGame(
+      row({
+        event_type: 'game_abandoned',
+        metadata: { mode: 'word-hunt', reason: 'hidden', gameCode: 'SE4SFB', isMultiplayer: true },
+      }),
+    );
+    expect(g.game_code).toBe('SE4SFB');
+    expect(g.is_multiplayer).toBe(true);
+  });
+
+  it('sets no leave_reason on a completed game', () => {
+    const g = mapAnalyticsEventToGame(row({ metadata: { mode: 'classic', reason: 'whatever' } }));
+    expect(g.leave_reason).toBeNull();
+  });
+});

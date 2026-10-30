@@ -1669,6 +1669,8 @@ export const trackGameStart = (
     sp_mode: spMode,
     words_found: typeof extras.words_found === 'number' ? extras.words_found : 0,
     landing_path: typeof extras.landing_path === 'string' ? extras.landing_path : undefined,
+    gameCode: typeof extras.gameCode === 'string' && extras.gameCode ? extras.gameCode : undefined,
+    isMultiplayer: extras.isMultiplayer === true ? true : undefined,
   });
   // First-win-fast: start the clock on a brand-new player's first game so the
   // eventual `first_game_won` carries time_to_first_win_sec (target: <60s).

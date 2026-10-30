@@ -11826,6 +11826,7 @@ const es = {
         "errors": "Errores",
         "gameCode": "Código de Juego",
         "invitedBy": "Invitado por",
+        "left": "Salió",
         "mode": "Modo",
         "platform": "Plataforma",
         "players": "Jugadores",
@@ -11834,6 +11835,13 @@ const es = {
         "result": "Resultado",
         "session": "Sesión",
         "winner": "Ganador"
+      },
+      "leaveReason": {
+        "hidden": "cambió de pestaña o app",
+        "pagehide": "cerró o recargó la página",
+        "spa_navigate": "fue a otra pantalla",
+        "exit": "tocó salir",
+        "give_up": "se rindió"
       },
       "status": {
         "abandoned": "Abandonado",

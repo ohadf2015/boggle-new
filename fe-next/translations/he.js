@@ -11801,6 +11801,7 @@ const he = {
         "errors": "שגיאות",
         "gameCode": "קוד משחק",
         "invitedBy": "הוזמן על ידי",
+        "left": "יצא",
         "mode": "מצב",
         "platform": "פלטפורמה",
         "players": "שחקנים",
@@ -11809,6 +11810,13 @@ const he = {
         "result": "תוצאה",
         "session": "חיבור",
         "winner": "המנצח"
+      },
+      "leaveReason": {
+        "hidden": "עבר לטאב או אפליקציה אחרת",
+        "pagehide": "סגר או רענן את הדף",
+        "spa_navigate": "עבר למסך אחר",
+        "exit": "לחץ יציאה",
+        "give_up": "ויתר"
       },
       "refresh": "רענן",
       "retry": "נסה שוב",

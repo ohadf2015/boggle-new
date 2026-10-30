@@ -18946,6 +18946,7 @@ const en = {
         "errors": "Errors",
         "gameCode": "Game Code",
         "invitedBy": "Invited by",
+        "left": "Left",
         "mode": "Mode",
         "platform": "Platform",
         "players": "Players",
@@ -18954,6 +18955,13 @@ const en = {
         "result": "Result",
         "session": "Session",
         "winner": "Winner"
+      },
+      "leaveReason": {
+        "hidden": "switched tab or app",
+        "pagehide": "closed or reloaded the page",
+        "spa_navigate": "went to another screen",
+        "exit": "tapped exit",
+        "give_up": "gave up"
       },
       "source": {
         "analyticsAll": "All plays (incl. guests)",

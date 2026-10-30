@@ -188,6 +188,16 @@ function PlayerRow({ player, t }: { player: GamePlayer; t: (key: string, fallbac
         </div>
       )}
 
+      {/* How the player left (a normal exit, not an error) */}
+      {!player.errorReason && player.leaveReason && (
+        <div className="mb-2 text-slate-400 text-[9px]">
+          <span className="text-slate-500">{t('admin.todayGames.detail.left', 'Left')}:</span>
+          <span className="ml-1">
+            {t(`admin.todayGames.leaveReason.${player.leaveReason}`, player.leaveReason)}
+          </span>
+        </div>
+      )}
+
       {/* Links */}
       <div className="flex flex-wrap gap-2 text-[9px]">
         {phUrl && (
