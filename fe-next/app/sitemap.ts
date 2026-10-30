@@ -111,7 +111,7 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   // game shells (30-282 crawlable words, measured live 2026-07-02) — noindexed
   // at page level after the AdSense "low value content" rejection. Search
   // intent is covered by /word-craft-game, /daily-word-wheel and /guides/*.
-  addForAllLocales(routes, '/word-craft-game', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.8 });
+  addForLocaleOnly(routes, '/word-craft-game', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.8 });
   // Adventure is GA and indexed (layout.tsx robots.index=true). Guests get a
   // playable demo battle plus the SSR FAQ/feature landing; signed-in players
   // get the full world-map run. Not a teaser gate — do not noindex this URL.
