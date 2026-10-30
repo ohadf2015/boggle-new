@@ -6,6 +6,12 @@ import { CATALOGUE_CATEGORIES, catalogueModes } from '../../ClassroomModeCatalog
 
 const t = (key: string, params?: Record<string, string | number>) => (params ? `${key}|${JSON.stringify(params)}` : key);
 
+function withoutDecor(el: HTMLElement): string {
+  const copy = el.cloneNode(true) as HTMLElement;
+  copy.querySelectorAll('[data-accent-decor]').forEach((n) => n.remove());
+  return copy.innerHTML;
+}
+
 function renderGrid(overrides: Partial<Parameters<typeof LobbyModeGrid>[0]> = {}) {
   const onPick = vi.fn();
   render(<LobbyModeGrid selected="classic" recommended="vocab-quiz" selectedMinutes={5} onPick={onPick} t={t} {...overrides} />);
@@ -31,6 +37,19 @@ describe('<LobbyModeGrid> — the picker is the page', () => {
       expect(within(section).getByRole('heading').className).toMatch(/(^|\s)sr-only(\s|$)/);
       const ids = within(section).getAllByRole('radio').map((r) => r.getAttribute('data-testid'));
       expect(ids).toEqual(catalogueModes().filter((m) => m.category === category).map((m) => `mode-tile-${m.id}`));
+    }
+  });
+
+  it('Then each tile opens on its own arcade color block holding the art, neighbours never match, and lime stays for GO LIVE', () => {
+    renderGrid();
+    const tiles = within(screen.getByRole('radiogroup')).getAllByRole('radio');
+    const accents = tiles.map((tile) => tile.getAttribute('data-accent'));
+    accents.slice(1).forEach((a, i) => expect(a).not.toBe(accents[i]));
+    expect(accents).not.toContain('lime');
+    for (const tile of tiles) {
+      const block = tile.querySelector('[data-accent-decor]')!;
+      expect(block.className).toMatch(/bg-neo-(cyan|pink|purple|yellow|orange)/);
+      expect(within(block as HTMLElement).getByTestId('mode-card-cover')).toBeInTheDocument();
     }
   });
 
@@ -95,7 +114,7 @@ describe('<LobbyModeGrid> — the picker is the page', () => {
     const on = screen.getByTestId('mode-tile-classic');
     expect(on.className).toContain('ring-neo-lime');
     expect(within(on).getByTestId('mode-selected-check')).toBeInTheDocument();
-    expect(screen.getByTestId('lobby-mode-grid').innerHTML).not.toMatch(/bg-neo-(lime|cyan|pink|purple|yellow|orange)(?![\w/-])/);
+    expect(withoutDecor(screen.getByTestId('lobby-mode-grid'))).not.toMatch(/bg-neo-(lime|cyan|pink|purple|yellow|orange)(?![\w/-])/);
   });
 
   it('Then names may wrap and nothing is cut with an ellipsis', () => {
@@ -110,14 +129,14 @@ describe('<LobbyModeGrid> — the picker is the page', () => {
 
   it('Given a lesson run sheet sits above the grid, When the grid is dense, Then the cover art goes shorter so the page still fits', () => {
     renderGrid({ dense: true });
-    const art = screen.getByTestId('mode-tile-classic').querySelector('[data-testid="mode-card-cover"]')!.parentElement!;
+    const art = screen.getByTestId('mode-tile-classic').querySelector('[data-accent-decor]')!;
     expect(art.className).toMatch(/aspect-\[3\/1\]/);
     expect(art.className).toMatch(/(^|\s)size-10(\s|$)/);
   });
 
   it('Given no run sheet, Then the cover art keeps its normal size', () => {
     renderGrid();
-    const art = screen.getByTestId('mode-tile-classic').querySelector('[data-testid="mode-card-cover"]')!.parentElement!;
+    const art = screen.getByTestId('mode-tile-classic').querySelector('[data-accent-decor]')!;
     expect(art.className).not.toMatch(/aspect-\[3\/1\]/);
     expect(art.className).toMatch(/(^|\s)size-12(\s|$)/);
   });

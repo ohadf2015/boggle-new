@@ -50,7 +50,9 @@ describe('<ClassroomModeSpotlight> ready panel', () => {
     for (const id of ['spec-duration', 'spec-complexity', 'spec-style']) expect(within(text).getByTestId(id)).toBeInTheDocument();
     const html = screen.getByTestId('mode-spotlight').innerHTML;
     expect(html.match(/(?<![\w:-])bg-neo-lime(?![\w/-])/g)).toHaveLength(1);
-    expect(html).not.toMatch(/bg-neo-(cyan|pink|purple|yellow|orange)(?![\w-])/);
+    const decor = [...screen.getByTestId('mode-spotlight').querySelectorAll('[data-accent-decor]')];
+    expect(decor.map((n) => n.getAttribute('data-testid'))).toEqual(['spotlight-art']);
+    expect(html.replace(decor[0].outerHTML, '')).not.toMatch(/bg-neo-(cyan|pink|purple|yellow|orange)(?![\w-])/);
   });
 
   it('Given GO LIVE, When rendered, Then it is the last control and says "Go live" on one line with the mode under it', () => {

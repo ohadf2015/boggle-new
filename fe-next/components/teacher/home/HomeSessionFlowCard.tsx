@@ -13,6 +13,7 @@ import {
 import type { RailSession } from "@/lib/education/homeSessionRail";
 import { catalogueEntry } from "@/components/education/ClassroomModeCatalogueData";
 import { gradeBandsLabel } from "@/components/teacher/StarterPacksSection.data";
+import { ARCADE_ACCENTS, ARCADE_BLOCK, type ArcadeAccent } from "@/lib/education/arcadeAccent";
 import { OUTLINE_BUTTON } from "./homeStyles";
 
 type T = (key: string, params?: Record<string, string | number>) => string;
@@ -26,22 +27,9 @@ export const LANGUAGE_NAME_KEY: Record<Language, string> = {
   ru: "languages.russian",
 };
 
-// Rotated by position, not by mode: three of the six presets share a mode, and lime belongs to the one primary button.
-export const CARD_ACCENTS = [
-  "cyan",
-  "pink",
-  "purple",
-  "yellow",
-  "orange",
-] as const;
-export type CardAccent = (typeof CARD_ACCENTS)[number];
-const ACCENT_BLOCK: Record<CardAccent, string> = {
-  cyan: "bg-neo-cyan",
-  pink: "bg-neo-pink",
-  purple: "bg-neo-purple",
-  yellow: "bg-neo-yellow",
-  orange: "bg-neo-orange",
-};
+// Rotated by position, not by mode: three of the six presets share a mode.
+export const CARD_ACCENTS = ARCADE_ACCENTS;
+export type CardAccent = ArcadeAccent;
 
 export interface HomeSessionFlowCardProps {
   item: RailSession;
@@ -85,7 +73,7 @@ export function HomeSessionFlowCard({
         aria-hidden="true"
         className={cn(
           "grid h-16 shrink-0 place-items-center border-b-2 border-neo-black max-sm:h-12 [@media(max-height:820px)]:h-10",
-          ACCENT_BLOCK[accent],
+          ARCADE_BLOCK[accent],
         )}
       >
         {mode ? (

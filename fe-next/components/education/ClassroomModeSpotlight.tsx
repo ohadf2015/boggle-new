@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronUp, Clock, Gamepad2, Puzzle, Radio } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ARCADE_BLOCK } from '@/lib/education/arcadeAccent';
+import { modeArcadeAccent } from './lobby/LobbyModeGrid';
 import type { CatalogueMode, CatalogueModeKeys } from './ClassroomModeCatalogueData';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
@@ -50,14 +52,18 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, dir, busy, blocked
     >
       {/* In the two-column lobby the middle is a size container: art, best-for and steps step aside by the panel height, which stays true under the TV zoom. */}
       <div className="flex min-w-0 flex-col gap-2 @4xl/lobby:min-h-0 @4xl/lobby:flex-1 @4xl/lobby:gap-3 @4xl/lobby:overflow-hidden @4xl/lobby:[container-type:size]">
-        <div data-testid="spotlight-art" className="hidden @4xl/lobby:block [@container(max-height:419px)]:hidden">
+        <div
+          data-testid="spotlight-art"
+          data-accent-decor
+          className={cn('hidden rounded-neo border-2 border-neo-black p-3 @4xl/lobby:block [@container(max-height:419px)]:hidden', ARCADE_BLOCK[modeArcadeAccent(mode.id)])}
+        >
           {/* eslint-disable-next-line @next/next/no-img-element -- static poster cover */}
           <img
             key={mode.id}
             src={mode.cover}
             alt=""
             aria-hidden="true"
-            className="aspect-[16/9] w-full rounded-neo border-2 border-neo-cream/35 object-cover object-[50%_28%] [@container(max-height:519px)]:aspect-[5/2]"
+            className="aspect-[16/9] w-full -rotate-1 rounded-neo border-2 border-neo-black object-cover object-[50%_28%] shadow-hard [@container(max-height:519px)]:aspect-[5/2]"
           />
         </div>
 

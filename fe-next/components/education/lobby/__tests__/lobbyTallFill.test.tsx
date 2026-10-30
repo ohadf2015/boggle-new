@@ -16,7 +16,7 @@ describe('Pick-a-game on a tall screen: the tiles grow into the leftover height'
 
   it('Given leftover height, Then each cover grows by the space left (never taller than square, the covers are 4:5 portraits), and a short screen keeps its 16:9 / 2:1 cover', () => {
     render(<LobbyModeGrid selected="vocab-quiz" onPick={() => {}} t={(k) => k} />);
-    const cover = screen.getAllByTestId('mode-card-cover')[0].parentElement!;
+    const cover = screen.getAllByTestId('mode-card-cover')[0].closest('[data-accent-decor]')!;
     expect(cover.className).toMatch(/@2xl:min-h-\[min\(calc\(50cqh-[\d.]+rem\),calc\(25cqw-[\d.]+rem\)\)\]/);
     expect(cover.className).toContain('@2xl:aspect-[16/9]');
     expect(cover.className).toContain('@2xl:[@media(max-height:800px)]:aspect-[2/1]');

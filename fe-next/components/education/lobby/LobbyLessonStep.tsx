@@ -42,7 +42,8 @@ export function LobbyLessonStep({ lessons, selectedLessonIds, onChange, classLan
           'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
           missing
             ? 'border-neo-pink bg-neo-navy-light text-neo-white'
-            : 'border-neo-cream/35 bg-neo-navy-light text-neo-cream hover:border-neo-cream/50'
+            : 'border-neo-cream/35 bg-neo-navy-light text-neo-cream hover:border-neo-cream/50',
+          'border-s-[6px] border-s-neo-cyan hover:border-s-neo-cyan'
         )}
       >
         {missing ? (

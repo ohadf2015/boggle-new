@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { ARCADE_ACCENTS, ARCADE_BLOCK } from '@/lib/education/arcadeAccent';
 
 const ROOT = path.resolve(__dirname, '../../../..');
 const read = (rel: string) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
@@ -27,6 +28,13 @@ describe('Pick-a-game setup: one lime fill, everything else neutral', () => {
   it('the only lime fill on the screen is GO LIVE', () => {
     const fills = SETUP_SURFACES.flatMap((rel) => (read(rel).match(/(?<![\w:-])bg-neo-lime(?![\w/-])/g) ?? []).map(() => rel));
     expect(fills).toEqual(['components/education/ClassroomModeSpotlight.tsx']);
+  });
+
+  it('color comes back only as arcade blocks behind game art, from the one shared helper, never lime', () => {
+    expect(ARCADE_ACCENTS).not.toContain('lime');
+    expect(Object.values(ARCADE_BLOCK).join(' ')).not.toMatch(/lime/);
+    expect(read('components/education/lobby/LobbyModeGrid.tsx')).toMatch(/ARCADE_BLOCK/);
+    expect(read('components/education/ClassroomModeSpotlight.tsx')).toMatch(/ARCADE_BLOCK/);
   });
 
   it('the page paints no decorative art layer behind the lobby', () => {
