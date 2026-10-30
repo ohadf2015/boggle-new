@@ -8,6 +8,8 @@ import { trackTrialCtaView } from '@/lib/education/proFunnelTelemetry';
 import { useStartTeacherProTrial } from '@/hooks/useStartTeacherProTrial';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { resolveProOffer } from '@/lib/education/pro/proOfferCopy';
+import { proCopyLines, proCopyVariant } from '@/lib/education/pro/proCopyExperiment';
+import { useAuth } from '@/contexts/AuthContext';
 import { resultsTrialCopy } from '@/lib/education/pro/trialCtaCopy';
 import { reportProOfferClick, reportProOfferImpression } from '@/lib/education/reportProCtaClick';
 import { useUpsellImpression } from '@/lib/education/useUpsellImpression';
@@ -42,6 +44,10 @@ const CTA =
 export function HomeProCard({ kind, onDismiss, trackImpression, language, t }: HomeProCardProps) {
   const { known, trialUsed, accessTrialExpires, accessTrialEnded } = useTeacherPro();
   const proOffer = resolveProOffer(language, { known, trialUsed, accessTrialExpires, accessTrialEnded }, resultsTrialCopy(language));
+  // A/B (`edu_pro_copy_v1`): the heading leads with class reports (a) or the trial (b).
+  const { user } = useAuth();
+  const variant = proCopyVariant(user?.id);
+  const lines = proCopyLines(language, variant, proOffer, { accessTrialExpires, placement: DASHBOARD_PRO_PLACEMENT });
   const trial = useStartTeacherProTrial(t, language, 'dashboard_trial_offer', { trial: proOffer.checkoutTrial });
   const cardRef = useRef<HTMLElement>(null);
   const offerRef = useRef({ placement: DASHBOARD_PRO_PLACEMENT, locale: language, cta: proOffer.cta, offer: proOffer.offer });
@@ -60,7 +66,7 @@ export function HomeProCard({ kind, onDismiss, trackImpression, language, t }: H
   );
 
   return (
-    <section ref={cardRef} data-testid="home-pro-card" data-kind={kind} data-offer={proOffer.offer} aria-labelledby="home-pro-title" className="relative rounded-neo-lg border-2 border-neo-cream/35 bg-neo-navy-light p-2.5 sm:p-3">
+    <section ref={cardRef} data-testid="home-pro-card" data-kind={kind} data-offer={proOffer.offer} data-variant={variant} aria-labelledby="home-pro-title" className="relative rounded-neo-lg border-2 border-neo-cream/35 bg-neo-navy-light p-2.5 sm:p-3">
       <button
         type="button"
         data-testid="home-pro-dismiss"
@@ -77,7 +83,7 @@ export function HomeProCard({ kind, onDismiss, trackImpression, language, t }: H
             <Crown className="size-3" aria-hidden="true" />
             {t('eduShell.nav.pro')}
           </span>
-          {proOffer.title ?? t('eduShell.pro.title')}
+          {lines.title}
         </h2>
       </div>
       <div className="mt-1.5 flex flex-col gap-1 sm:mt-2">

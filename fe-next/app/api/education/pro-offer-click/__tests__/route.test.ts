@@ -54,4 +54,16 @@ describe('POST /api/education/pro-offer-click', () => {
     getAuthedUser.mockRejectedValue(new Error('down'))
     expect((await POST(req({ placement: 'dashboard' }))).status).toBe(204)
   })
+  it('tags the copy A/B bucket from the teacher id on the A/B surfaces, not on access_success', async () => {
+    const { proCopyVariant } = await import('@/lib/education/pro/proCopyExperiment')
+    getAuthedUser.mockResolvedValue({ id: 'teacher-uuid-1', email: 'teacher@school.org' })
+    await POST(req({ placement: 'classroom_results', locale: 'en', cta: 'teacher_pro_trial', offer: 'trial', variant: 'zzz' }))
+    expect(capture.mock.calls[0][0].properties).toMatchObject({
+      experiment: 'edu_pro_copy_v1',
+      copy_variant: proCopyVariant('teacher-uuid-1'),
+      '$feature/edu_pro_copy_v1': proCopyVariant('teacher-uuid-1'),
+    })
+    await POST(req({ placement: 'access_success', locale: 'en', cta: 'teacher_pro_trial', offer: 'trial' }))
+    expect(capture.mock.calls[1][0].properties).toMatchObject({ experiment: null, copy_variant: null })
+  })
 })

@@ -20,6 +20,8 @@ import { Sparkles, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { resolveProOffer } from '@/lib/education/pro/proOfferCopy';
+import { proCopyLines, proCopyVariant } from '@/lib/education/pro/proCopyExperiment';
+import { useAuth } from '@/contexts/AuthContext';
 import { classCreatedTrialCopy, resultsTrialCopy, trialCopyBase, TRIAL_COPY_RTL } from '@/lib/education/pro/trialCtaCopy';
 import { reportProCtaClick, reportProOfferClick, reportProOfferImpression } from '@/lib/education/reportProCtaClick';
 import { trackGrowthEvent } from '@/utils/growthTracking';
@@ -71,7 +73,11 @@ export function ResultsTeacherProTrialCard({
   // page and the upgrade path always say the same thing.
   const baseCopy = dismissible ? classCreatedTrialCopy(language) : { ...resultsTrialCopy(language), dismiss: '' };
   const proOffer = resolveProOffer(language, { known, trialUsed, accessTrialExpires, accessTrialEnded }, baseCopy);
-  const copy = { ...baseCopy, title: proOffer.title ?? baseCopy.title };
+  // A/B (`edu_pro_copy_v1`): heading + body only; button, note and checkout stay on resolveProOffer.
+  const { user } = useAuth();
+  const variant = proCopyVariant(user?.id);
+  const lines = proCopyLines(language, variant, proOffer, { accessTrialExpires, placement });
+  const copy = { ...baseCopy, title: lines.title, body: lines.body };
   const dir = TRIAL_COPY_RTL.has(trialCopyBase(language)) ? 'rtl' : undefined;
   const cardRef = useRef<HTMLElement>(null);
 
@@ -114,6 +120,8 @@ export function ResultsTeacherProTrialCard({
       ref={cardRef}
       data-testid="results-teacher-pro-trial-card"
       data-placement={placement}
+      data-variant={variant}
+      data-offer={proOffer.offer}
       dir={dir}
       className={cn(
         'shrink-0 rounded-neo border-2 border-s-4 border-neo-cream/40 border-s-neo-pink bg-neo-navy-light p-4 text-neo-white',
