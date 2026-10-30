@@ -24,14 +24,21 @@ export function ClassCapMeter({ count, className }: { count: number; className?:
     <div
       data-testid="class-cap-meter"
       className={cn(
-        'flex flex-col gap-2.5 rounded-neo border-2 px-3 py-2.5 sm:flex-row sm:items-center sm:gap-4',
-        full ? 'border-neo-yellow bg-neo-yellow/10' : 'border-neo-cream/30 bg-neo-navy-light',
+        'flex flex-wrap items-center gap-x-3 gap-y-1 rounded-neo border-2 bg-neo-navy-light px-3 py-1.5',
+        full ? 'border-neo-cream/60' : 'border-neo-cream/35',
         className,
       )}
     >
-      <div className="min-w-0 flex-1">
-        <p className="text-sm font-bold text-neo-cream">
-          {full ? t('eduPlans.cap.full', { limit }) : t('eduPlans.cap.used', { count, limit })}
+      <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1">
+        <p className="text-xs font-bold leading-tight text-neo-cream sm:text-sm">
+          {full ? (
+            <>
+              <span className="max-sm:hidden">{t('eduPlans.cap.full', { limit })}</span>
+              <span className="sm:hidden">{t('eduPlans.cap.used', { count, limit })}</span>
+            </>
+          ) : (
+            t('eduPlans.cap.used', { count, limit })
+          )}
         </p>
         <div
           role="progressbar"
@@ -39,10 +46,10 @@ export function ClassCapMeter({ count, className }: { count: number; className?:
           aria-valuemax={limit}
           aria-valuenow={Math.min(count, limit)}
           aria-label={t('eduPlans.cap.label')}
-          className="mt-1.5 flex gap-1"
+          className="flex w-20 shrink-0 gap-1 max-sm:hidden sm:w-28"
         >
           {Array.from({ length: limit }, (_, i) => (
-            <span key={i} className={cn('h-2 flex-1 rounded-full border border-neo-black', i < count ? (full ? 'bg-neo-yellow' : 'bg-neo-cream') : 'bg-neo-cream/15')} />
+            <span key={i} className={cn('h-1.5 flex-1 rounded-full', i < count ? 'bg-neo-cream' : 'bg-neo-cream/20')} />
           ))}
         </div>
       </div>
@@ -50,11 +57,12 @@ export function ClassCapMeter({ count, className }: { count: number; className?:
         <Link
           href={`/${language}${TEACHER_PRO_CHECKOUT_PATH}`}
           data-testid="class-cap-cta"
+          title={t('eduPlans.cap.cta')}
           onClick={() => trackGrowthEvent('landing_cta_clicked', { cta: 'class_cap_meter' })}
-          className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-neo border-2 border-neo-black bg-neo-yellow px-3 font-neo-display text-sm font-black text-neo-navy shadow-hard-sm transition-transform duration-150 hover:-translate-y-0.5 active:scale-[0.97] motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+          className="inline-flex min-h-10 shrink-0 items-center justify-center gap-1.5 rounded-neo border-2 border-neo-cream/60 px-3 max-sm:min-h-9 max-sm:min-w-9 max-sm:px-0 font-neo-display text-sm font-bold text-neo-cream transition-colors hover:bg-neo-cream/10 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime"
         >
-          <Crown className="size-4" aria-hidden="true" />
-          {t('eduPlans.cap.cta')}
+          <Crown className="size-4 text-neo-yellow" aria-hidden="true" />
+          <span className="max-sm:sr-only">{t('eduPlans.cap.cta')}</span>
         </Link>
       ) : null}
     </div>

@@ -11,7 +11,7 @@
  */
 export const CLASS_GRID_QUERIES = {
   sm: '(min-width: 640px)',
-  lg: '(min-width: 1280px)',
+  lg: '(min-width: 1280px) and (min-height: 800px)',
   /** A phone turned sideways: one wide card, laid out in two columns. */
   short: '(orientation: landscape) and (max-height: 500px)',
 } as const;

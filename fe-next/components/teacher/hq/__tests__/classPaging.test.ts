@@ -27,7 +27,7 @@ describe('CLASS_GRID_QUERIES', () => {
   // column is ~720px: three cards there were ~220px each and the class code,
   // name and Pro note crushed. Three per row only from xl (1280).
   it('Given the 3-up row, Then it starts at 1280px, not 1024px', () => {
-    expect(CLASS_GRID_QUERIES.lg).toBe('(min-width: 1280px)');
+    expect(CLASS_GRID_QUERIES.lg).toMatch(/^\(min-width: 1280px\)/);
   });
   it('Given the 2-up row, Then it starts at the sm breakpoint', () => {
     expect(CLASS_GRID_QUERIES.sm).toBe('(min-width: 640px)');
@@ -72,5 +72,11 @@ describe('classesPerView', () => {
   it('Given a phone, Then always one per page', () => {
     expect(classesPerView({ sm: false, lg: false }, 1)).toBe(1);
     expect(classesPerView({ sm: false, lg: false }, 5)).toBe(1);
+  });
+});
+
+describe('CLASS_GRID_QUERIES', () => {
+  it('keeps three cards a row for screens tall enough to hold a narrow card; a 1280x720 laptop gets two wider, shorter cards and the switcher', () => {
+    expect(CLASS_GRID_QUERIES.lg).toMatch(/min-height:\s*\d+px/);
   });
 });

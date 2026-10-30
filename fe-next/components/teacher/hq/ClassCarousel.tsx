@@ -20,11 +20,13 @@ export interface ClassCarouselProps {
   label?: string;
   /** After the cards (the "new class" seat); not a snap stop and not counted as a page. */
   trailing?: ReactNode;
+  /** Shares one row with the switcher, above the cards (the free-class meter). */
+  header?: ReactNode;
   className?: string;
 }
 
 const STEP =
-  'flex size-11 shrink-0 items-center justify-center rounded-neo border-3 border-neo-black bg-neo-lime text-black shadow-hard-sm transition hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan disabled:cursor-not-allowed disabled:bg-neo-navy-light disabled:text-neo-white/40 disabled:shadow-none disabled:hover:translate-y-0';
+  'flex size-10 shrink-0 items-center justify-center rounded-neo border-2 border-neo-cream/60 bg-neo-navy text-neo-cream transition-colors hover:bg-neo-cream/10 active:translate-y-px focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime disabled:cursor-not-allowed disabled:opacity-40';
 
 /**
  * Class cards in a native scroll-snap track: swipe, trackpad and keyboard
@@ -33,7 +35,7 @@ const STEP =
  * no scrollLeft sign maths. Arrows and the position dots appear only when
  * there is more than one screenful.
  */
-export function ClassCarousel({ slides, perView, label, trailing, className }: ClassCarouselProps) {
+export function ClassCarousel({ slides, perView, label, trailing, header, className }: ClassCarouselProps) {
   const { t } = useLanguage();
   const reduced = useEduReducedMotion();
   const trackRef = useRef<HTMLDivElement | null>(null);
@@ -78,7 +80,60 @@ export function ClassCarousel({ slides, perView, label, trailing, className }: C
   };
 
   return (
-    <div className={cn('space-y-3', className)}>
+    <div className={cn('space-y-2 sm:space-y-3', className)}>
+      <div data-testid="class-carousel-bar" className="flex items-center gap-3 [&:has(>div:empty):not(:has(>nav))]:hidden">
+        <div className="min-w-0 flex-1 empty:hidden">{header}</div>
+        {pages > 1 ? (
+          <nav
+            data-testid="class-carousel-nav"
+            aria-label={t('academy.classes.pagerLabel', 'Classes pages')}
+            className="flex shrink-0 items-center gap-2"
+          >
+            <button
+              type="button"
+              data-testid="class-carousel-prev"
+              onClick={() => goTo(current - 1)}
+              disabled={current <= 0}
+              aria-label={t('academy.classes.prevPage', 'Previous classes')}
+              title={t('academy.classes.prevPage', 'Previous classes')}
+              className={STEP}
+            >
+              <DirectionalIcon icon={ChevronLeft} className="size-5" />
+            </button>
+            <div className="flex min-w-14 flex-col items-center gap-1">
+              <span
+                data-testid="class-carousel-status"
+                aria-live="polite"
+                className="whitespace-nowrap text-center font-neo-display text-sm font-bold text-neo-cream tabular-nums"
+              >
+                {t('academy.classes.pageOf', '{{page}} of {{pages}}', { page: current + 1, pages })}
+              </span>
+              <span aria-hidden="true" className="flex items-center gap-1.5">
+                {Array.from({ length: pages }, (_, i) => (
+                  <span
+                    key={i}
+                    className={cn(
+                      'h-1.5 rounded-full transition-all motion-reduce:transition-none',
+                      i === current ? 'w-4 bg-neo-cream' : 'w-1.5 bg-neo-cream/35',
+                    )}
+                  />
+                ))}
+              </span>
+            </div>
+            <button
+              type="button"
+              data-testid="class-carousel-next"
+              onClick={() => goTo(current + 1)}
+              disabled={current >= pages - 1}
+              aria-label={t('academy.classes.nextPage', 'More classes')}
+              title={t('academy.classes.nextPage', 'More classes')}
+              className={STEP}
+            >
+              <DirectionalIcon icon={ChevronRight} className="size-5" />
+            </button>
+          </nav>
+        ) : null}
+      </div>
       <div
         ref={trackRef}
         role="region"
@@ -111,54 +166,6 @@ export function ClassCarousel({ slides, perView, label, trailing, className }: C
         {trailing}
       </div>
 
-      {pages > 1 ? (
-        <nav
-          data-testid="class-carousel-nav"
-          aria-label={t('academy.classes.pagerLabel', 'Classes pages')}
-          className="flex items-center justify-center gap-3"
-        >
-          <button
-            type="button"
-            data-testid="class-carousel-prev"
-            onClick={() => goTo(current - 1)}
-            disabled={current <= 0}
-            aria-label={t('academy.classes.prevPage', 'Previous classes')}
-            className={STEP}
-          >
-            <DirectionalIcon icon={ChevronLeft} className="size-5" />
-          </button>
-          <div className="flex min-w-20 flex-col items-center gap-1.5">
-            <span
-              data-testid="class-carousel-status"
-              aria-live="polite"
-              className="text-center font-neo-display text-sm font-black uppercase tracking-wide text-neo-white tabular-nums"
-            >
-              {t('academy.classes.pageOf', '{{page}} of {{pages}}', { page: current + 1, pages })}
-            </span>
-            <span aria-hidden="true" className="flex items-center gap-1.5">
-              {Array.from({ length: pages }, (_, i) => (
-                <span
-                  key={i}
-                  className={cn(
-                    'h-1.5 rounded-full transition-all motion-reduce:transition-none',
-                    i === current ? 'w-5 bg-neo-lime' : 'w-1.5 bg-neo-white/40',
-                  )}
-                />
-              ))}
-            </span>
-          </div>
-          <button
-            type="button"
-            data-testid="class-carousel-next"
-            onClick={() => goTo(current + 1)}
-            disabled={current >= pages - 1}
-            aria-label={t('academy.classes.nextPage', 'More classes')}
-            className={STEP}
-          >
-            <DirectionalIcon icon={ChevronRight} className="size-5" />
-          </button>
-        </nav>
-      ) : null}
     </div>
   );
 }

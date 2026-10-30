@@ -170,19 +170,22 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
   );
 
   return (
-    <div className="space-y-4 [@media(orientation:landscape)_and_(max-height:500px)]:space-y-1.5">
+    <div className="space-y-3 sm:space-y-4 [@media(orientation:landscape)_and_(max-height:500px)]:space-y-1.5">
       <div data-testid="classroom-manager-toprow" className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
         {heading}
         {topActions}
       </div>
-      <ClassCapMeter count={classrooms.length} />
 
       {classrooms.length === 0 ? (
-        <ClassroomEmptyState createHref={newClassHref} />
+        <>
+          <ClassCapMeter count={classrooms.length} />
+          <ClassroomEmptyState createHref={newClassHref} />
+        </>
       ) : (
         <m.div ref={revealRef} variants={stagger} initial="hidden" animate="visible">
           <ClassCarousel
             perView={pageSize}
+            header={<ClassCapMeter count={classrooms.length} />}
             label={t('academy.teacher.classesTitle', 'Your classes')}
             slides={classrooms.map((classroom) => ({
               key: classroom.id,
