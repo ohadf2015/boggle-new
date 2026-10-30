@@ -448,7 +448,7 @@ export default function ConnectionsGame() {
   }
 
   return (
-    <div ref={containerRef} dir={isRTL ? 'rtl' : 'ltr'} className="relative flex flex-col gap-2 w-full max-w-xl mx-auto py-3 px-4" translate="no">
+    <div ref={containerRef} dir={isRTL ? 'rtl' : 'ltr'} className="relative flex min-h-0 flex-1 flex-col gap-2 w-full max-w-xl mx-auto py-3 px-4 shell:max-w-3xl" translate="no">
       <ConnectionsEffectsCanvas width={canvasSize.width} height={canvasSize.height} />
 
       {/* Command bar: back + lives + level + score in ONE compact sticky band.

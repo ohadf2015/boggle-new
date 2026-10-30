@@ -30,7 +30,7 @@ vi.mock('@/contexts/SoundEffectsContext', () => ({
     playVictorySound: vi.fn(),
   }),
 }));
-vi.mock('@/utils/confettiUtils', () => ({ fireVictoryConfetti: vi.fn(), fireLevelUpConfetti: vi.fn() }));
+vi.mock('@/utils/confettiUtils', () => ({ fireConfetti: vi.fn(), fireVictoryConfetti: vi.fn(), fireLevelUpConfetti: vi.fn() }));
 vi.mock('@/hooks/useRewardedFeatureUnlock', () => ({
   useRewardedFeatureUnlock: () => ({ canShowAd: false, status: 'idle', offer: vi.fn() }),
 }));

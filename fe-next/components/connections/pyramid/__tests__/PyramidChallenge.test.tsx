@@ -19,7 +19,7 @@ vi.mock('@/hooks/useHapticFeedback', () => ({
 vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({ playMatchFoundSound: vi.fn(), playErrorSound: vi.fn(), playVictorySound: vi.fn() }),
 }));
-vi.mock('@/utils/confettiUtils', () => ({ fireVictoryConfetti: vi.fn() }));
+vi.mock('@/utils/confettiUtils', () => ({ fireConfetti: vi.fn(), fireVictoryConfetti: vi.fn() }));
 vi.mock('@/hooks/useRewardedFeatureUnlock', () => ({
   useRewardedFeatureUnlock: () => ({ canShowAd: false, status: 'idle', offer: vi.fn() }),
 }));

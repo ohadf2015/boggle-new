@@ -93,7 +93,7 @@ export default function AnswerSlots({ value, slotCount, state, dir, label }: Ans
                 : state === 'wrong' && filled
                 ? { y: [0, 6, 0], rotate: [0, i % 2 ? -5 : 5, 0], transition: { duration: 0.35 } }
                 : filled
-                ? { scale: [1.22, 1], transition: { duration: 0.12 } }
+                ? { y: [-12, 0], scale: [1.18, 1], transition: { duration: 0.16, ease: 'easeOut' } }
                 : { scale: 1 }
             }
             className={[

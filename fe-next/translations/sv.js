@@ -2354,7 +2354,9 @@ const sv = {
 "missesLabel": "missar",
 "scoreNotSaved": "Poängen sparades inte.",
 "retrySave": "Försök igen",
-"skipStuck": "Fast? Hoppa över den här"
+"skipStuck": "Fast? Hoppa över den här",
+"railEmptyTitle": "Dina broar hamnar här",
+"railEmptyBody": "Varje gåta du knäcker lägger till sitt broord."
 },
     "community": {
       "title": "Community-gåtor",
@@ -2426,7 +2428,7 @@ const sv = {
     "continueWithRegenLife": "Fortsätt",
     "nextLifeIn": "Nästa liv om {{time}}",
     "revealHint": "Visa ledtråd",
-    "freeHint": "Gratis ledtråd ({count} kvar)",
+    "freeHint": "Gratis ledtråd",
     "rank": {
       "plank": "Plankläggare",
       "rope": "Replagare",
@@ -2442,7 +2444,12 @@ const sv = {
     "week": {
       "title": "Den här veckan"
     },
-    "revealHintAd": "Se annons för ledtråd",
+    "revealHintAd": "Ledtråd · kort annons",
+    "hintTomorrow": "Nästa gratis ledtråd i morgon",
+    "praise1": "Snyggt!",
+    "praise2": "Grymt!",
+    "praise3": "Briljant!",
+    "praise4": "Ostoppbar!",
     "revealAnswerAd": "Se annons för att visa svar",
     "adminGiveUp": "Hoppa över (admin)",
     "landing": {

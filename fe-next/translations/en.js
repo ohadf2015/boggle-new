@@ -17549,7 +17549,9 @@ const en = {
 "missesLabel": "misses",
 "scoreNotSaved": "Your score didn't save.",
 "retrySave": "Try again",
-"skipStuck": "Stuck? Skip this one"
+"skipStuck": "Stuck? Skip this one",
+"railEmptyTitle": "Your bridges land here",
+"railEmptyBody": "Every riddle you crack adds its bridge word."
 },
     "community": {
       "title": "Community riddles",
@@ -17628,7 +17630,7 @@ const en = {
     "continueWithRegenLife": "Continue",
     "nextLifeIn": "Next life in {{time}}",
     "revealHint": "Reveal hint",
-    "freeHint": "Free hint ({count} left)",
+    "freeHint": "Free hint",
     "rank": {
       "plank": "Plank Picker",
       "rope": "Rope Tier",
@@ -17644,7 +17646,12 @@ const en = {
     "week": {
       "title": "This week"
     },
-    "revealHintAd": "Watch ad for hint",
+    "revealHintAd": "Hint · short ad",
+    "hintTomorrow": "Next free hint tomorrow",
+    "praise1": "Nice!",
+    "praise2": "Great!",
+    "praise3": "Brilliant!",
+    "praise4": "Unstoppable!",
     "revealAnswerAd": "Watch ad to reveal answer",
     "adminGiveUp": "Skip puzzle (admin)",
     "landing": {

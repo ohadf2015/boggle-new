@@ -19744,7 +19744,9 @@ const ja = {
 "missesLabel": "ミス",
 "scoreNotSaved": "スコアを保存できませんでした。",
 "retrySave": "もう一度",
-"skipStuck": "お手上げ？この問題をスキップ"
+"skipStuck": "お手上げ？この問題をスキップ",
+"railEmptyTitle": "かけた橋はここに並ぶ",
+"railEmptyBody": "謎を解くたびに橋の言葉がここに増えます。"
 },
     "community": {
       "title": "コミュニティの謎",
@@ -19827,7 +19829,7 @@ const ja = {
     "continueWithRegenLife": "続ける",
     "nextLifeIn": "次のライフまで {{time}}",
     "revealHint": "ヒントを表示",
-    "freeHint": "無料ヒント（残り{count}回）",
+    "freeHint": "無料ヒント",
     "rank": {
       "plank": "板拾い",
       "rope": "ロープ結び",
@@ -19843,7 +19845,12 @@ const ja = {
     "week": {
       "title": "今週"
     },
-    "revealHintAd": "広告を見てヒント",
+    "revealHintAd": "ヒント・短い広告",
+    "hintTomorrow": "次の無料ヒントは明日",
+    "praise1": "いいね！",
+    "praise2": "すごい！",
+    "praise3": "天才！",
+    "praise4": "止まらない！",
     "revealAnswerAd": "広告を見て答えを表示",
     "adminGiveUp": "パズルをスキップ（管理者）",
     "landing": {

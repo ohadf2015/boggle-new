@@ -1,6 +1,5 @@
 /**
- * PuzzleCard — every player gets 2 free hint reveals per day before the
- * rewarded-ad gate kicks in.
+ * PuzzleCard — every player gets 1 free hint per day, then a short rewarded ad.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
@@ -12,8 +11,9 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ language: 'en', t: (k: string) => k }),
 }));
 
+const ad = vi.hoisted(() => ({ canShowAd: true, offer: vi.fn() }));
 vi.mock('@/hooks/useRewardedFeatureUnlock', () => ({
-  useRewardedFeatureUnlock: () => ({ canShowAd: true, status: 'idle', offer: vi.fn() }),
+  useRewardedFeatureUnlock: () => ({ canShowAd: ad.canShowAd, status: 'idle', offer: ad.offer }),
 }));
 
 const puzzle: ConnectionPuzzle = {
@@ -62,7 +62,14 @@ function renderCard(onRevealHint = vi.fn()) {
 describe('PuzzleCard — free daily hints', () => {
   beforeEach(() => {
     window.localStorage.clear();
+    ad.canShowAd = true;
+    ad.offer.mockReset();
   });
+
+  const useUpFreeHint = () => {
+    const today = new Date().toISOString().slice(0, 10);
+    window.localStorage.setItem(FREE_HINTS_KEY, `${today}:1`);
+  };
 
   it('shows the free-hint button (not the ad gate) while free hints remain', () => {
     renderCard();
@@ -77,11 +84,20 @@ describe('PuzzleCard — free daily hints', () => {
     expect(window.localStorage.getItem(FREE_HINTS_KEY)).toMatch(/:1$/);
   });
 
-  it('falls back to the ad-gated button once free hints are exhausted', () => {
-    const today = new Date().toISOString().slice(0, 10);
-    window.localStorage.setItem(FREE_HINTS_KEY, `${today}:2`);
-    renderCard();
+  it('after the free hint, the hint button plays a short rewarded ad', () => {
+    useUpFreeHint();
+    const onRevealHint = renderCard();
     expect(screen.queryByText('connections.freeHint')).not.toBeInTheDocument();
-    expect(screen.getByText('connections.revealHintAd')).toBeInTheDocument();
+    fireEvent.click(screen.getByText('connections.revealHintAd'));
+    expect(ad.offer).toHaveBeenCalledTimes(1);
+    expect(onRevealHint).not.toHaveBeenCalled();
+  });
+
+  it('with no ad to show, says the next free hint comes tomorrow instead of vanishing', () => {
+    useUpFreeHint();
+    ad.canShowAd = false;
+    renderCard();
+    expect(screen.queryByText('connections.revealHintAd')).not.toBeInTheDocument();
+    expect(screen.getByText('connections.hintTomorrow')).toBeInTheDocument();
   });
 });

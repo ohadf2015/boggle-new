@@ -1,4 +1,4 @@
-export const FREE_HINTS_PER_DAY = 2;
+export const FREE_HINTS_PER_DAY = 1;
 export const FREE_HINTS_KEY = 'connections:freeHints';
 
 function isBrowser(): boolean {

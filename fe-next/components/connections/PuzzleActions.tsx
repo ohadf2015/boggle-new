@@ -1,19 +1,17 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { m } from 'framer-motion';
-import { ThumbsUp, ThumbsDown, ArrowRight, Flag, Check, Lightbulb, Eye, SkipForward } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, ArrowRight, Flag, Check, Eye, SkipForward } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
-import { useExperiment } from '@/hooks/useExperiment';
 import { useRewardedFeatureUnlock } from '@/hooks/useRewardedFeatureUnlock';
-import { freeHintsRemaining, consumeFreeHint } from '@/lib/connections/freeHints';
+import { isTypingTarget } from '@/lib/dom/isTypingTarget';
+import HintButton from './HintButton';
 import type { ConnectionPuzzle, GameState, PuzzleRating } from '@/lib/connections/types';
 
-const SECONDARY_BTN =
-  'inline-flex items-center gap-2 rounded-neo border-2 bg-transparent px-4 py-2 font-neo-body text-sm font-bold transition-colors';
 const QUIET_BTN =
-  'inline-flex items-center gap-1.5 px-2 py-1 font-neo-body text-xs text-neo-white/60 underline-offset-4 transition-colors hover:underline disabled:cursor-not-allowed disabled:opacity-60';
+  'inline-flex h-9 items-center gap-1.5 rounded-full px-2.5 font-neo-body text-xs font-bold text-neo-white/70 transition-colors hover:bg-neo-white/5 disabled:cursor-not-allowed disabled:opacity-60';
 
 interface ActionsProps {
   puzzle: ConnectionPuzzle;
@@ -26,19 +24,12 @@ interface ActionsProps {
 }
 
 /**
- * Hint + reveal row, active play only. Admins get both free; players get
- * FREE_HINTS_PER_DAY free hints, then a rewarded-ad gate (and the A/B hint-gate
- * fallback after three misses). The reveal-answer button is ad-gated for all
- * non-admins.
+ * Hint + way-out row, active play only. Hints: one free a day, then a short
+ * rewarded ad (HintButton). The way out is the ad-gated answer reveal, or the
+ * daily's free skip after enough misses when no ad is available.
  */
 export function PuzzleActions({ puzzle, state, isAdmin, isDisabled, onGiveUp, onRevealHint, skipAfterMisses }: ActionsProps) {
   const { t } = useLanguage();
-  const { variant, trackExposure } = useExperiment('exp-connections-hint-gate-v1');
-  const showFallbackHint = variant === 'after-3-wrong' && state.wrongAttempts >= 3 && !isAdmin;
-  useEffect(() => {
-    if (showFallbackHint && puzzle.hint && !state.hintRevealed) trackExposure();
-  }, [showFallbackHint, puzzle.hint, state.hintRevealed, trackExposure]);
-
   const revealAnswerAd = useRewardedFeatureUnlock({
     placement: 'connections_reveal_answer',
     surface: 'hint',
@@ -46,58 +37,15 @@ export function PuzzleActions({ puzzle, state, isAdmin, isDisabled, onGiveUp, on
     disabled: isAdmin || isDisabled,
     context: { puzzleId: puzzle.id, difficulty: puzzle.difficulty },
   });
-  const revealHintAd = useRewardedFeatureUnlock({
-    placement: 'connections_reveal_hint',
-    surface: 'hint',
-    onUnlock: onRevealHint,
-    disabled: isAdmin || state.hintRevealed || isDisabled || !puzzle.hint,
-    context: { puzzleId: puzzle.id },
-  });
-
-  const [freeHints, setFreeHints] = useState(() => freeHintsRemaining());
-  const handleFreeHint = () => {
-    setFreeHints(consumeFreeHint());
-    onRevealHint();
-  };
 
   if (state.status !== 'playing' && state.status !== 'wrong') return null;
-  const adBusy = (s: string) => s === 'loading' || s === 'showing';
+  const answerAdBusy = revealAnswerAd.status === 'loading' || revealAnswerAd.status === 'showing';
 
   return (
-    <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
-      {puzzle.hint && !state.hintRevealed && (
-        isAdmin || freeHints > 0 ? (
-          <m.button
-            type="button"
-            onClick={isAdmin ? onRevealHint : handleFreeHint}
-            whileTap={{ scale: 0.96 }}
-            className={`${SECONDARY_BTN} border-neo-yellow text-neo-yellow hover:bg-neo-yellow/10`}
-          >
-            <Lightbulb className="h-4 w-4" aria-hidden="true" />
-            {isAdmin ? t('connections.revealHint') : t('connections.freeHint', { count: freeHints })}
-          </m.button>
-        ) : revealHintAd.canShowAd || showFallbackHint ? (
-          <m.button
-            type="button"
-            onClick={revealHintAd.canShowAd ? revealHintAd.offer : onRevealHint}
-            whileTap={{ scale: 0.96 }}
-            disabled={revealHintAd.canShowAd && adBusy(revealHintAd.status)}
-            className={`${QUIET_BTN} hover:text-neo-yellow`}
-          >
-            <Lightbulb className="h-3.5 w-3.5" aria-hidden="true" />
-            {t('connections.revealHintAd')}
-          </m.button>
-        ) : null
-      )}
-
+    <div className="flex items-center justify-end gap-1">
       {isAdmin ? (
-        <m.button
-          type="button"
-          onClick={onGiveUp}
-          whileTap={{ scale: 0.96 }}
-          className={`${SECONDARY_BTN} border-neo-red text-neo-red hover:bg-neo-red/10`}
-        >
-          <Flag className="h-4 w-4" aria-hidden="true" />
+        <m.button type="button" onClick={onGiveUp} whileTap={{ scale: 0.96 }} className={`${QUIET_BTN} text-neo-red`}>
+          <Flag className="h-3.5 w-3.5" aria-hidden="true" />
           {t('connections.adminGiveUp')}
         </m.button>
       ) : revealAnswerAd.canShowAd ? (
@@ -105,24 +53,29 @@ export function PuzzleActions({ puzzle, state, isAdmin, isDisabled, onGiveUp, on
           type="button"
           onClick={revealAnswerAd.offer}
           whileTap={{ scale: 0.96 }}
-          disabled={adBusy(revealAnswerAd.status)}
-          className={`${QUIET_BTN} hover:text-neo-purple-light`}
+          disabled={answerAdBusy}
+          aria-label={t('connections.revealAnswerAd')}
+          title={t('connections.revealAnswerAd')}
+          className={QUIET_BTN}
         >
-          <Eye className="h-3.5 w-3.5" aria-hidden="true" />
-          {t('connections.revealAnswerAd')}
+          <Eye className="h-4 w-4" aria-hidden="true" />
+          <span className="hidden min-[430px]:inline">{t('connections.revealAnswerAd')}</span>
         </m.button>
       ) : skipAfterMisses != null && state.wrongAttempts >= skipAfterMisses ? (
-        <m.button
-          type="button"
-          onClick={onGiveUp}
-          whileTap={{ scale: 0.96 }}
-          disabled={isDisabled}
-          className={`${QUIET_BTN} hover:text-neo-cyan`}
-        >
+        <m.button type="button" onClick={onGiveUp} whileTap={{ scale: 0.96 }} disabled={isDisabled} className={QUIET_BTN}>
           <SkipForward className="h-3.5 w-3.5" aria-hidden="true" />
           {t('connections.daily.skipStuck')}
         </m.button>
       ) : null}
+      <HintButton
+        hasHint={!!puzzle.hint}
+        hintRevealed={state.hintRevealed}
+        isAdmin={isAdmin}
+        disabled={isDisabled}
+        wrongAttempts={state.wrongAttempts}
+        onRevealHint={onRevealHint}
+        adContext={{ puzzleId: puzzle.id }}
+      />
     </div>
   );
 }
@@ -137,18 +90,34 @@ interface ResolutionProps {
 /** After a solve / give-up: rate the riddle, then the one primary "next" action. */
 export function PuzzleResolution({ hasRated, showRating, onRate, onNext }: ResolutionProps) {
   const { t } = useLanguage();
+  // Desktop: Enter moves on, same as the key that submitted the guess.
+  const onNextRef = useRef(onNext);
+  onNextRef.current = onNext;
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Enter' || e.repeat || isTypingTarget(e)) return;
+      e.preventDefault();
+      onNextRef.current();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, []);
   return (
     <m.div
-      initial={{ y: 8 }}
+      initial={{ y: 12 }}
       animate={{ y: 0 }}
-      transition={{ delay: 0.25, type: 'spring', stiffness: 300, damping: 22 }}
-      className="mt-4 flex flex-col items-center gap-3"
+      transition={{ delay: 0.2, type: 'spring', stiffness: 320, damping: 20 }}
+      className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2"
     >
       <m.button
         onClick={onNext}
+        data-testid="puzzle-next"
+        initial={{ scale: 0.9 }}
+        animate={{ scale: 1 }}
+        transition={{ delay: 0.45, type: 'spring', stiffness: 500, damping: 12 }}
         whileHover={{ y: -1 }}
         whileTap={{ scale: 0.97 }}
-        className="inline-flex w-full max-w-xs items-center justify-center gap-2 rounded-neo border-neo-thick border-neo-black bg-neo-cyan px-6 py-3 font-neo-display text-lg font-black text-neo-navy shadow-hard active:shadow-hard-pressed"
+        className="inline-flex min-w-[10rem] flex-1 basis-[12rem] max-w-xs items-center justify-center gap-2 rounded-neo border-neo-thick border-neo-black bg-neo-cyan px-6 py-3 font-neo-display text-lg font-black text-neo-navy shadow-hard active:shadow-hard-pressed"
       >
         {t('connections.next')}
         <DirectionalIcon icon={ArrowRight} className="h-5 w-5" />
@@ -157,7 +126,7 @@ export function PuzzleResolution({ hasRated, showRating, onRate, onNext }: Resol
       {showRating &&
         (!hasRated ? (
           <div className="flex items-center gap-2">
-            <span className="font-neo-body text-[0.7rem] text-neo-white/60">{t('connections.rateThis')}</span>
+            <span className="hidden font-neo-body text-[0.7rem] text-neo-white/60 min-[480px]:inline">{t('connections.rateThis')}</span>
             <m.button
               onClick={() => onRate('like')}
               whileTap={{ scale: 0.9 }}

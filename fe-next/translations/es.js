@@ -19791,7 +19791,9 @@ const es = {
 "missesLabel": "fallos",
 "scoreNotSaved": "Tu puntuación no se guardó.",
 "retrySave": "Reintentar",
-"skipStuck": "¿Atascado? Salta esta"
+"skipStuck": "¿Atascado? Salta esta",
+"railEmptyTitle": "Tus puentes aparecen aquí",
+"railEmptyBody": "Cada acertijo que resuelvas suma su palabra puente."
 },
     "community": {
       "title": "Acertijos de la comunidad",
@@ -19874,7 +19876,7 @@ const es = {
     "continueWithRegenLife": "Continuar",
     "nextLifeIn": "Próxima vida en {{time}}",
     "revealHint": "Revelar pista",
-    "freeHint": "Pista gratis ({count} restantes)",
+    "freeHint": "Pista gratis",
     "rank": {
       "plank": "Aprendiz de tablones",
       "rope": "Atador de cuerdas",
@@ -19890,7 +19892,12 @@ const es = {
     "week": {
       "title": "Esta semana"
     },
-    "revealHintAd": "Ver anuncio por pista",
+    "revealHintAd": "Pista · anuncio corto",
+    "hintTomorrow": "Otra pista gratis mañana",
+    "praise1": "¡Bien!",
+    "praise2": "¡Genial!",
+    "praise3": "¡Brillante!",
+    "praise4": "¡Imparable!",
     "revealAnswerAd": "Ver anuncio para revelar respuesta",
     "adminGiveUp": "Saltar puzzle (admin)",
     "landing": {

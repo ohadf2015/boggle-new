@@ -19189,7 +19189,9 @@ const he = {
 "missesLabel": "פספוסים",
 "scoreNotSaved": "הניקוד לא נשמר.",
 "retrySave": "לנסות שוב",
-"skipStuck": "נתקעתם? דלגו על החידה"
+"skipStuck": "נתקעתם? דלגו על החידה",
+"railEmptyTitle": "הגשרים שלכם יופיעו כאן",
+"railEmptyBody": "כל חידה שתפצחו מוסיפה כאן את מילת הגשר."
 },
     "community": {
       "title": "חידות הקהילה",
@@ -19272,7 +19274,7 @@ const he = {
     "continueWithRegenLife": "ממשיכים",
     "nextLifeIn": "חיים נוספים בעוד {{time}}",
     "revealHint": "הצגת רמז",
-    "freeHint": "רמז חינם (נשארו {count})",
+    "freeHint": "רמז חינם",
     "rank": {
       "plank": "מתלמד",
       "rope": "קושר חבלים",
@@ -19288,7 +19290,12 @@ const he = {
     "week": {
       "title": "השבוע"
     },
-    "revealHintAd": "צפו בפרסומת לרמז",
+    "revealHintAd": "רמז · פרסומת קצרה",
+    "hintTomorrow": "הרמז החינמי הבא מחר",
+    "praise1": "יפה!",
+    "praise2": "מעולה!",
+    "praise3": "מבריק!",
+    "praise4": "אין עליכם!",
     "revealAnswerAd": "צפו בפרסומת לחשיפת התשובה",
     "adminGiveUp": "דילוג על חידה (אדמין)",
     "landing": {

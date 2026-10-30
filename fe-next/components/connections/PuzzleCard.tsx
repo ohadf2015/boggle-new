@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import { m, AnimatePresence, useAnimationControls, useReducedMotion } from 'framer-motion';
 import { Check, Lightbulb } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useHideNavigation } from '@/contexts/NavigationContext';
 import type { ConnectionPuzzle, GameState, PuzzleRating } from '@/lib/connections/types';
 import ConnectionsKeyboard from './ConnectionsKeyboard';
 import ConnectionsMascot from './ConnectionsMascot';
@@ -14,6 +15,8 @@ import { useBridgeTyping } from './useBridgeTyping';
 import { MAX_GUESS_LEN } from '@/lib/connections/keyboard';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import { BridgeSolveReveal } from './BridgeSolveReveal';
+import BridgeCelebration from './BridgeCelebration';
+import { fireConfetti } from '@/utils/confettiUtils';
 
 interface PuzzleCardProps {
   puzzle: ConnectionPuzzle;
@@ -65,7 +68,14 @@ export default function PuzzleCard({
   const isRTL = language === 'he';
   const reducedMotion = useReducedMotion();
   const shakeControls = useAnimationControls();
+  // Locks the body to the viewport (no page scroll) and hides the bottom nav while a puzzle is up.
+  const setIsInGame = useHideNavigation();
+  useEffect(() => {
+    setIsInGame(true);
+    return () => setIsInGame(false);
+  }, [setIsInGame]);
   const prevStatus = useRef(state.status);
+  const stageRef = useRef<HTMLDivElement>(null);
 
   const isCorrect = state.status === 'correct';
   const isWrong = state.status === 'wrong';
@@ -83,6 +93,18 @@ export default function PuzzleCard({
         x: [0, -14, 14, -11, 11, -7, 7, -3, 3, 0].map((v) => v * intensity),
         transition: reducedMotion ? { duration: 0 } : { duration: 0.5, ease: 'easeInOut' },
       });
+    }
+    if (state.status === 'correct' && prevStatus.current !== 'correct' && !reducedMotion) {
+      const rect = stageRef.current?.getBoundingClientRect();
+      if (rect && typeof window !== 'undefined') {
+        void fireConfetti({
+          particleCount: 46,
+          spread: 75,
+          startVelocity: 34,
+          scalar: 0.9,
+          origin: { x: (rect.left + rect.width / 2) / window.innerWidth, y: (rect.top + rect.height / 2) / window.innerHeight },
+        });
+      }
     }
     prevStatus.current = state.status;
   }, [state.status, state.wrongAttempts, shakeControls, reducedMotion]);
@@ -103,6 +125,11 @@ export default function PuzzleCard({
   const slotsValue = isResolved ? puzzle.bridge.replace(/[^\p{L}\p{N}]/gu, '') : bufferDisplay;
   const slotState = isCorrect ? 'correct' : isWrong ? 'wrong' : 'idle';
 
+  // Points this solve added, for the celebration chip.
+  const scoreAtStartRef = useRef({ id: puzzle.id, score: state.score });
+  if (scoreAtStartRef.current.id !== puzzle.id) scoreAtStartRef.current = { id: puzzle.id, score: state.score };
+  const solvePoints = Math.max(0, state.score - scoreAtStartRef.current.score);
+
   return (
     <AnimatePresence mode="wait">
       {/* Transform only — never `opacity: 0`. `m` stays frozen on `initial`
@@ -110,69 +137,87 @@ export default function PuzzleCard({
           whole puzzle blank whenever that chunk is slow or blocked. */}
       <m.div
         key={`entrance-${puzzle.id}`}
-        initial={reducedMotion ? false : { y: 32, scale: 0.96 }}
+        initial={reducedMotion ? false : { y: 24, scale: 0.97 }}
         animate={{ y: 0, scale: 1 }}
         transition={reducedMotion ? { duration: 0 } : CARD_SPRING}
+        className="flex min-h-0 flex-1 flex-col"
       >
         <m.div
           key={puzzle.id}
           data-testid="puzzle-card"
+          data-status={state.status}
           animate={shakeControls}
           exit={{ opacity: 0, y: -16, scale: 0.97, transition: { duration: 0.18 } }}
           transition={reducedMotion ? { duration: 0 } : CARD_SPRING}
           className={[
-            'relative rounded-neo border-neo-thick bg-neo-navy-light px-3 pb-4 pt-3 shadow-hard transition-colors duration-200',
+            'relative flex min-h-0 flex-1 flex-col rounded-neo border-neo-thick bg-neo-navy-light px-3 pb-3 pt-2 shadow-hard transition-colors duration-200 shell:px-6 shell:pb-5 shell:pt-4',
             STATUS_BORDER[state.status] ?? STATUS_BORDER.playing,
           ].join(' ')}
           dir={isRTL ? 'rtl' : 'ltr'}
         >
-          <div className="mb-2 flex items-center justify-between">
-            <span data-testid="puzzle-mascot" className="pointer-events-none">
-              <ConnectionsMascot status={state.status} className="h-12 w-12" />
+          <div className="flex min-h-9 items-center gap-2">
+            <span data-testid="puzzle-mascot" className="pointer-events-none shrink-0">
+              <ConnectionsMascot status={state.status} className="h-10 w-10 shell:h-14 shell:w-14" />
             </span>
             {puzzle.difficulty && (
               <span
                 className={[
-                  'rounded border-2 px-2 py-0.5 font-mono text-xs font-bold uppercase tracking-widest rtl:tracking-normal',
+                  'shrink-0 rounded border-2 px-2 py-0.5 font-mono text-xs font-bold uppercase tracking-widest rtl:tracking-normal',
                   DIFFICULTY_STYLE[puzzle.difficulty] ?? 'border-neo-cream/40 text-neo-white',
                 ].join(' ')}
               >
                 {t(`connections.difficulty.${puzzle.difficulty}`)}
               </span>
             )}
+            <div className="ms-auto min-w-0">
+              <PuzzleActions
+                puzzle={puzzle}
+                state={state}
+                isAdmin={isAdmin}
+                isDisabled={isDisabled}
+                onGiveUp={onGiveUp}
+                onRevealHint={onRevealHint}
+                skipAfterMisses={skipAfterMisses}
+              />
+            </div>
           </div>
 
-          <BridgeStage word1={puzzle.word1} word2={puzzle.word2} isCorrect={isCorrect} isGaveUp={isGaveUp}>
-            {needsIME ? (
-              <p
-                data-testid="ime-echo"
-                className="min-h-[3rem] py-1 text-center font-neo-display text-3xl font-black leading-[3rem] text-neo-cream"
-              >
-                {isResolved ? puzzle.bridge : state.input || <span className="text-neo-cream/40">?</span>}
-              </p>
-            ) : (
-              <AnswerSlots
-                value={slotsValue}
-                slotCount={slotCap}
-                state={slotState}
-                dir={isRTL ? 'rtl' : 'ltr'}
-                label={t('connections.placeholder')}
-              />
-            )}
-          </BridgeStage>
+          <div ref={stageRef} className="relative flex min-h-0 flex-1 flex-col justify-center py-2 shell:py-4" style={{ containerType: 'inline-size' }}>
+            <BridgeStage word1={puzzle.word1} word2={puzzle.word2} isCorrect={isCorrect} isGaveUp={isGaveUp} isRTL={isRTL}>
+              {needsIME ? (
+                <p
+                  data-testid="ime-echo"
+                  className="min-h-[3rem] py-1 text-center font-neo-display text-3xl font-black leading-[3rem] text-neo-cream"
+                >
+                  {isResolved ? puzzle.bridge : state.input || <span className="text-neo-cream/40">?</span>}
+                </p>
+              ) : (
+                <AnswerSlots
+                  value={slotsValue}
+                  slotCount={slotCap}
+                  state={slotState}
+                  dir={isRTL ? 'rtl' : 'ltr'}
+                  label={t('connections.placeholder')}
+                />
+              )}
+            </BridgeStage>
+            {isCorrect && <BridgeCelebration streak={state.streak} points={solvePoints} />}
+          </div>
 
-          <div className="mt-3 flex min-h-[2.25rem] flex-col items-center justify-center" aria-live="polite">
+          {/* Fixed-height feedback line: a hint or verdict appearing never shifts the keyboard. */}
+          <div className="flex h-10 shrink-0 items-center justify-center" aria-live="polite">
             <AnimatePresence mode="wait">
               {showHint && !isResolved && (
                 <m.p
                   key="hint"
-                  initial={{ y: -6 }}
-                  animate={{ y: 0 }}
+                  initial={reducedMotion ? false : { y: -8, scale: 0.9 }}
+                  animate={{ y: 0, scale: 1 }}
                   exit={{ opacity: 0 }}
-                  className="inline-flex items-center justify-center gap-2 text-center text-sm text-neo-yellow"
+                  transition={{ type: 'spring', stiffness: 420, damping: 18 }}
+                  className="inline-flex max-w-full items-center justify-center gap-2 rounded-full border-2 border-neo-yellow bg-neo-yellow/10 px-3 py-1 text-center text-sm font-bold leading-tight text-neo-yellow"
                 >
                   <Lightbulb className="h-4 w-4 shrink-0" aria-hidden="true" />
-                  {puzzle.hint}
+                  <span className="line-clamp-2">{puzzle.hint}</span>
                 </m.p>
               )}
               {isCorrect && (
@@ -206,10 +251,15 @@ export default function PuzzleCard({
             </AnimatePresence>
           </div>
 
-          {isResolved && <BridgeSolveReveal puzzle={puzzle} language={language} isCorrect={isCorrect} />}
-
-          <div className="mt-2 flex flex-col gap-3" dir={isRTL ? 'rtl' : 'ltr'}>
-            {needsIME ? (
+          {/* The dock: keyboard while playing, the payoff + Next once resolved —
+              same reserved height, so the page never grows into a scroll. */}
+          <div className="flex min-h-[var(--conn-dock)] shrink-0 flex-col justify-end [--conn-dock:9.75rem] sm:[--conn-dock:11.25rem] [@media(max-height:700px)]:[--conn-dock:9.25rem] shell:mx-auto shell:w-full shell:max-w-[40rem]">
+            {isResolved ? (
+              <div className="flex flex-col gap-2">
+                <BridgeSolveReveal puzzle={puzzle} language={language} isCorrect={isCorrect} />
+                <PuzzleResolution hasRated={hasRated} showRating={showRating} onRate={onRate} onNext={onNext} />
+              </div>
+            ) : needsIME ? (
               /* Scripts like Japanese can't fit an on-screen keyboard — use the
                  device's native IME via a real text input. */
               !isDisabled && (
@@ -265,20 +315,6 @@ export default function PuzzleCard({
               )
             )}
           </div>
-
-          <PuzzleActions
-            puzzle={puzzle}
-            state={state}
-            isAdmin={isAdmin}
-            isDisabled={isDisabled}
-            onGiveUp={onGiveUp}
-            onRevealHint={onRevealHint}
-            skipAfterMisses={skipAfterMisses}
-          />
-
-          {isResolved && (
-            <PuzzleResolution hasRated={hasRated} showRating={showRating} onRate={onRate} onNext={onNext} />
-          )}
         </m.div>
       </m.div>
     </AnimatePresence>

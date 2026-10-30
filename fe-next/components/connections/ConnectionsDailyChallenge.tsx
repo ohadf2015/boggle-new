@@ -41,6 +41,9 @@ import DailyHeader from './DailyHeader';
 import ProgressCard from './ProgressCard';
 import { useBridgeProgress } from './useBridgeProgress';
 import PuzzleCard from './PuzzleCard';
+import { DailyLeftRail, DailyRightRail } from './DailyShellRails';
+import { GameShell, SHELL_MEDIA } from '@/components/game/shell';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import RegularDailyResults, { regularTier } from './RegularDailyResults';
 import BridgeFinishBeat, { useFinishBeat } from './BridgeFinishBeat';
 
@@ -117,6 +120,7 @@ function DailyRun({ today, paused, onTerminal }: { today: string; paused: boolea
   );
   const total = state.puzzles.length;
   const progressApi = useBridgeProgress();
+  const inShell = useMediaQuery(SHELL_MEDIA);
   const { onBridgeSolved, onDayPlayed } = progressApi;
 
   const elapsedMs = useActiveTime(resumed?.run.elapsedMs ?? 0, paused);
@@ -369,31 +373,41 @@ function DailyRun({ today, paused, onTerminal }: { today: string; paused: boolea
   if (!currentPuzzle) return null;
   const remaining = attemptsLeft(state);
 
+  const headerProps = {
+    score: state.score,
+    currentIndex: state.currentIndex,
+    total,
+    attemptsLeft: remaining,
+    solvedIndices: solvedRef.current,
+    difficulties: state.puzzles.map((p) => p.difficulty),
+    standing: progressApi.standing,
+    rankUpId: progressApi.rankUpId,
+    onRankUpShown: progressApi.dismissRankUp,
+  };
+  const solvedWords = state.puzzles.filter((_, i) => solvedRef.current.has(i)).map((p) => p.bridge);
+
   return (
-    <div className="mx-auto flex w-full max-w-md flex-col gap-3 px-4 py-4">
-      <DailyHeader
-        score={state.score}
-        currentIndex={state.currentIndex}
-        total={total}
-        attemptsLeft={remaining}
-        solvedIndices={solvedRef.current}
-        difficulties={state.puzzles.map((p) => p.difficulty)}
-        standing={progressApi.standing}
-        rankUpId={progressApi.rankUpId}
-        onRankUpShown={progressApi.dismissRankUp}
-      />
-      <PuzzleCard
-        puzzle={currentPuzzle}
-        state={state}
-        isAdmin={isAdmin}
-        onInputChange={handleInput}
-        onSubmit={handleSubmit}
-        onGiveUp={handleGiveUp}
-        onRevealHint={handleRevealHint}
-        onRate={handleRate}
-        onNext={handleAdvance}
-        skipAfterMisses={2}
-      />
-    </div>
+    <GameShell
+      mode="word-bridge"
+      accent="purple"
+      left={inShell ? <DailyLeftRail t={t} header={<DailyHeader {...headerProps} variant="rail" />} /> : null}
+      right={inShell ? <DailyRightRail t={t} solvedWords={solvedWords} /> : null}
+    >
+      <div className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col gap-2 px-3 pb-3 pt-1 shell:max-w-none shell:p-0">
+        {!inShell && <DailyHeader {...headerProps} />}
+        <PuzzleCard
+          puzzle={currentPuzzle}
+          state={state}
+          isAdmin={isAdmin}
+          onInputChange={handleInput}
+          onSubmit={handleSubmit}
+          onGiveUp={handleGiveUp}
+          onRevealHint={handleRevealHint}
+          onRate={handleRate}
+          onNext={handleAdvance}
+          skipAfterMisses={2}
+        />
+      </div>
+    </GameShell>
   );
 }

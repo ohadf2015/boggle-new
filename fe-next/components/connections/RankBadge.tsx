@@ -22,13 +22,15 @@ interface RankBadgeProps {
   /** Rank just reached this session — shows the banner and fires confetti once. */
   rankUpId?: RankId | null;
   onRankUpShown?: () => void;
+  /** In-game header: smaller icon, no "N to next" line. */
+  compact?: boolean;
 }
 
 /**
  * Lifetime "Bridge Builder" rank: icon, name and a bar to the next rank. The
  * bar animates by transform, so each solved bridge visibly pushes it forward.
  */
-export default function RankBadge({ standing, rankUpId = null, onRankUpShown }: RankBadgeProps) {
+export default function RankBadge({ standing, rankUpId = null, onRankUpShown, compact = false }: RankBadgeProps) {
   const { t } = useLanguage();
   const reducedMotion = useReducedMotion();
   const Icon = RANK_ICON[standing.rank.id];
@@ -43,15 +45,15 @@ export default function RankBadge({ standing, rankUpId = null, onRankUpShown }: 
 
   return (
     <div data-testid="rank-badge" className="relative flex items-center gap-2.5">
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-purple text-neo-white shadow-hard-sm">
-        <Icon className="h-5 w-5" strokeWidth={2.5} aria-hidden="true" />
+      <span className={`flex ${compact ? 'h-7 w-7' : 'h-9 w-9'} shrink-0 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-purple text-neo-white shadow-hard-sm`}>
+        <Icon className={compact ? 'h-4 w-4' : 'h-5 w-5'} strokeWidth={2.5} aria-hidden="true" />
       </span>
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline justify-between gap-2">
           <span className="truncate font-neo-display text-sm font-black text-neo-white" title={t(`connections.rank.${standing.rank.id}`)}>
             {t(`connections.rank.${standing.rank.id}`)}
           </span>
-          <span className="shrink-0 font-neo-body text-[0.7rem] text-neo-white/70">
+          <span className={compact ? 'sr-only' : 'shrink-0 font-neo-body text-[0.7rem] text-neo-white/70'}>
             {standing.next
               ? t('connections.rank.toNext', { count: remaining, rank: t(`connections.rank.${standing.next.id}`) })
               : t('connections.rank.top')}
@@ -62,7 +64,7 @@ export default function RankBadge({ standing, rankUpId = null, onRankUpShown }: 
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={Math.round(standing.ratio * 100)}
-          className="mt-1 h-2 overflow-hidden rounded-full border border-neo-cream/40 bg-neo-navy"
+          className={`${compact ? 'mt-0.5 h-1.5' : 'mt-1 h-2'} overflow-hidden rounded-full border border-neo-cream/40 bg-neo-navy`}
         >
           <m.div
             initial={false}
