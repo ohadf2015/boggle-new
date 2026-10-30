@@ -72,7 +72,9 @@ describe('V2Results — daily tower', () => {
     const hero = screen.getByTestId('daily-results-hero');
     expect(hero.getAttribute('data-mode')).toBe('word-tower');
     expect(hero.textContent).toContain('27 Oct');
-    expect(within(hero).getByTestId('daily-results-score').textContent).toBe('2400');
+    // The day's score is growth, so the hero leads with it (not the run's points).
+    expect(within(hero).getByTestId('daily-results-score').textContent).toBe('12');
+    expect(hero.textContent).toContain('wordTowerV2.dailyTower.grewToday');
     expect(container.textContent).not.toContain('wordTowerV2.collapsed');
   });
 
@@ -106,10 +108,10 @@ describe('V2Results — daily tower', () => {
     expect(screen.getByTestId('daily-results-hero').getAttribute('data-outcome')).toBe('win');
   });
 
-  it('given a rank, then the growth, goal and rank show in the meter', () => {
+  it('given a rank, then the goal and rank show in the meter, and growth only once on the sheet', () => {
     daily();
     const meter = screen.getByTestId('wt2-daily-meter');
-    expect(meter.textContent).toContain('+12wordTowerV2.unitM');
+    expect(meter.textContent).not.toContain('+12wordTowerV2.unitM');
     expect(meter.textContent).toContain('12/15wordTowerV2.unitM');
     expect(meter.textContent).toContain('#4');
   });

@@ -126,6 +126,6 @@ describe('WordWheelGame hideCompetitive', () => {
       fireEvent.click(screen.getByTestId('inline-submit-chip'));
     });
     await waitFor(() => expect(onWordFound).toHaveBeenCalledTimes(1));
-    expect(onWordFound).toHaveBeenCalledWith('ABC', ['ABC']);
+    expect(onWordFound).toHaveBeenCalledWith('ABC', ['ABC'], expect.any(Number));
   });
 });

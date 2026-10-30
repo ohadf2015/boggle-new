@@ -15,6 +15,7 @@ import { useNetworkState } from '@/hooks/useNetworkState';
 import { useOfflineModeFlag } from '@/hooks/useOfflineModeFlag';
 import { getOfflineStore } from '@/lib/offline';
 import { enqueueScore } from '@/lib/offline/scoreQueue';
+import { createClient } from '@/utils/supabase/client';
 import type { Language } from '@/types';
 
 interface UseResultSubmissionProps {
@@ -42,6 +43,19 @@ interface UseResultSubmissionProps {
   extraTries?: number;
   /** Translation function for error messages */
   t?: (key: string) => string;
+}
+
+async function submitHeaders(isAuthenticated: boolean): Promise<Record<string, string>> {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (!isAuthenticated) return headers;
+  // Embedded iframes can block third-party cookies, so the session must travel as a bearer token.
+  try {
+    const token = (await createClient().auth.getSession()).data.session?.access_token;
+    if (token) headers.Authorization = `Bearer ${token}`;
+  } catch {
+    // No token: the server falls back to the session cookie.
+  }
+  return headers;
 }
 
 export function useResultSubmission({
@@ -221,24 +235,15 @@ export function useResultSubmission({
 
           const response = await fetch('/api/daily-challenge/word-hunt/submit', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: await submitHeaders(isAuthenticated),
             body: JSON.stringify(bodyData),
           });
 
           if (!response.ok) {
             const errorText = await response.text();
-            // Invalid words are expected user behavior, not system errors - don't log as error
-            const isInvalidWordsError = response.status === 400 && errorText.includes('Invalid words');
-            if (isInvalidWordsError) {
-              if (process.env.NODE_ENV === 'development') {
-                console.log('[WordHunt Submit] Submission rejected - contains invalid words:', errorText);
-              }
-            } else {
-              // BUG-004: Show user-facing toast for submission failures
-              const errorMessage = t?.('errors.resultSubmissionFailed') || 'Failed to save your result. Your progress is saved locally.';
-              neoErrorToast(errorMessage, { icon: '⚠️', duration: 4000 });
-              console.error('Failed to submit Word Hunt result:', errorText);
-            }
+            const errorMessage = t?.('errors.resultSubmissionFailed') || 'Failed to save your result. Your progress is saved locally.';
+            neoErrorToast(errorMessage, { icon: '⚠️', duration: 4000 });
+            console.error('Failed to submit Word Hunt result:', errorText);
             return;
           }
 

@@ -1,7 +1,20 @@
 import type { WordWheelGameResult } from '../WordWheelGame';
 import { saveWordWheelResult } from '@/utils/dailyChallenge';
+import { markWordWheelResultSubmitted } from '@/utils/dailyChallenge/wordWheelRun';
 import { getGuestFingerprint, getGuestDailyPlayer } from '@/utils/dailyChallenge/guestPlayer';
+import { createClient } from '@/utils/supabase/client';
 import type { Language } from '@/types';
+
+// Embedded hosts can block the session cookie, so signed-in submits also carry the token.
+async function authHeader(): Promise<Record<string, string>> {
+  try {
+    const { data } = await createClient().auth.getSession();
+    const token = data.session?.access_token;
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  } catch {
+    return {};
+  }
+}
 
 interface SubmitProfile {
   id: string;
@@ -58,10 +71,13 @@ export async function submitWordWheelDailyResult({
     };
     const resp = await fetch('/api/daily-challenge/word-wheel/submit', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...(isAuthenticated ? await authHeader() : {}) },
       body: JSON.stringify(submitBody),
     });
+    // A 400 (out-of-window date, bad body) will never succeed, so stop retrying it.
+    if (resp.status === 400) markWordWheelResultSubmitted(language, date);
     if (!resp.ok) return;
+    markWordWheelResultSubmitted(language, date);
     const json = (await resp.json()) as {
       alreadySubmitted?: boolean;
       result?: {
@@ -87,7 +103,7 @@ export async function submitWordWheelDailyResult({
         timeSeconds: c.timeSeconds,
         streakDays,
         completedAt: c.completedAt || new Date().toISOString(),
-      });
+      }, { submitted: true });
       onReconciled({ wordsFound: c.wordsFound, score: c.score, timeSeconds: c.timeSeconds });
     }
   } catch {

@@ -19,7 +19,6 @@ export async function GET(request: NextRequest) {
     // Local JWT verify (sub-ms) when fetchWithAuth sends a Bearer; cookie
     // fallback otherwise. Guests (null user) still get the empty list below.
     const user = await getAuthedUser(request)
-    const supabase = await createClient()
 
     const today = new Date().toISOString().split('T')[0]
     // Optional-chain nextUrl: production always passes a NextRequest, but unit
@@ -30,6 +29,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ today, missed: [] })
     }
 
+    const supabase = await createClient()
+
     // Pick table based on mode
     const table = mode === 'word-wheel' ? 'daily_word_wheel_attempts' : 'daily_word_hunt_attempts'
 
@@ -39,7 +40,11 @@ export async function GET(request: NextRequest) {
       query = query.eq('solved', true)
     }
 
-    const { data: solvedRows } = await query
+    const { data: solvedRows, error } = await query
+    if (error) {
+      logger.error('Daily missed lookup error:', error.message)
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    }
 
     const completed = (solvedRows ?? []).map((r: { puzzle_date: string }) => r.puzzle_date)
     const missed = getMissedCatchUpDates(today, completed).map(date => ({

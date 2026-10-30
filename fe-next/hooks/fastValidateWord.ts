@@ -6,8 +6,8 @@
  * cold dict), falls back to POST /api/validate-word so community-validated
  * words still resolve.
  *
- * Network failure mode intentionally permissive (length >= 3) so a hiccup
- * during single-player doesn't brick the game.
+ * Resolves `null` when the word could not be checked (offline, 429, timeout):
+ * the caller shows "try again" instead of crediting or rejecting it.
  */
 
 import type { Language } from '@/shared/types/game';
@@ -24,7 +24,15 @@ export async function tryValidateOffline(word: string, language: Language): Prom
   }
 }
 
-export async function fastValidateWord(word: string, language: Language): Promise<boolean> {
+const VALIDATE_TIMEOUT_MS = 4000;
+
+function timeoutSignal(ms: number): AbortSignal | undefined {
+  return typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function'
+    ? AbortSignal.timeout(ms)
+    : undefined;
+}
+
+export async function fastValidateWord(word: string, language: Language): Promise<boolean | null> {
   const inMemory = hasWordInMemoryCache(word, language);
   if (inMemory === true) return true;
 
@@ -37,11 +45,12 @@ export async function fastValidateWord(word: string, language: Language): Promis
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ word, language }),
+      signal: timeoutSignal(VALIDATE_TIMEOUT_MS),
     });
-    if (!res.ok) return word.length >= 3;
+    if (!res.ok) return null;
     const data = await res.json();
     return data.isValid === true;
   } catch {
-    return word.length >= 3;
+    return null;
   }
 }

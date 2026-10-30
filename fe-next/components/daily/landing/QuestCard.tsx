@@ -129,6 +129,8 @@ export function QuestCard({
       // 360px) purely from how long each tagline happened to be.
       className="relative w-full"
       data-testid={`quest-card-${challengeId}`}
+      data-mode={challengeId}
+      data-state={isCompleted ? 'done' : 'todo'}
     >
       {/* Glow ring for new challenges — breathing lives here (not on the
           clickable card) so the CSS scale transform cannot displace the CTA. */}

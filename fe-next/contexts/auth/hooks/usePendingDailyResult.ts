@@ -26,6 +26,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { trackDailySignupRank } from '@/utils/posthogEngagement';
 import logger from '@/utils/logger';
 import type { ProfileData } from '../authTypes';
+import { bearerHeader } from '@/utils/supabase/bearerHeader';
 
 interface PendingDailyResultSubmission {
   submitPendingDailyResult: (userId: string, userProfile: ProfileData) => Promise<void>;
@@ -131,7 +132,7 @@ export function usePendingDailyResult(): PendingDailyResultSubmission {
 
         const response = await fetch('/api/daily-challenge/word-hunt/submit', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', ...(await bearerHeader()) },
           body: JSON.stringify(bodyData),
         });
 

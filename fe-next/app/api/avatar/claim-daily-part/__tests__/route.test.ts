@@ -51,10 +51,13 @@ vi.mock('@/shared/types/customAvatar', () => ({
 import { NextRequest } from 'next/server';
 import { POST, GET } from '../route';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
+import { signAdTicket } from '@/lib/ads/adTicket';
 
-function makeRequest(): NextRequest {
+const validTicket = () => signAdTicket('user-1', Date.now() - 60_000, 'test-service-key');
+
+function makeRequest(body: Record<string, unknown> = { adTicket: validTicket() }): NextRequest {
   return {
-    json: () => Promise.resolve({}),
+    json: () => Promise.resolve(body),
     headers: { get: vi.fn().mockReturnValue('127.0.0.1') },
   } as unknown as NextRequest;
 }
@@ -64,10 +67,13 @@ function setupDbMocks({
   lastClaimAt = null as string | null,
   fetchError = null as { message?: string; code?: string } | null,
   updateError = null as { message?: string } | null,
+  updatedRows = [{ id: 'user-1' }] as Array<{ id: string }>,
 } = {}) {
-  const updateFn = vi.fn().mockReturnValue({
-    eq: vi.fn().mockResolvedValue({ error: updateError }),
-  });
+  const chain: Record<string, Mock> = {};
+  chain.eq = vi.fn(() => chain);
+  chain.is = vi.fn(() => chain);
+  chain.select = vi.fn().mockResolvedValue({ data: updateError ? null : updatedRows, error: updateError });
+  const updateFn = vi.fn().mockReturnValue(chain);
   mockFrom.mockImplementation((table: string) => {
     if (table === 'profiles') {
       return {
@@ -87,7 +93,7 @@ function setupDbMocks({
     }
     return {};
   });
-  return { updateFn };
+  return { updateFn, chain };
 }
 
 describe('POST /api/avatar/claim-daily-part', () => {
@@ -167,6 +173,20 @@ describe('POST /api/avatar/claim-daily-part', () => {
     expect(res.data.success).toBe(true);
   });
 
+  it('rejects a claim with no ad ticket and grants nothing', async () => {
+    const { updateFn } = setupDbMocks({ lastClaimAt: null });
+    const res = await POST(makeRequest({}));
+    expect(res.status).toBe(400);
+    expect(res.data.error).toBe('AD_NOT_WATCHED');
+    expect(updateFn).not.toHaveBeenCalled();
+  });
+
+  it('rejects a ticket claimed sooner than an ad could play', async () => {
+    setupDbMocks({ lastClaimAt: null });
+    const res = await POST(makeRequest({ adTicket: signAdTicket('user-1', Date.now() - 1000, 'test-service-key') }));
+    expect(res.data.error).toBe('AD_NOT_WATCHED');
+  });
+
   it('never grants an already-owned part', async () => {
     // Own 4 of 5 — only eyes:glow free
     const owned = ['eyes:laser', 'eyes:cyber', 'accessory:crown', 'accessory:halo'];
@@ -180,6 +200,7 @@ describe('POST /api/avatar/claim-daily-part', () => {
     it('returns eligible=true when never claimed and unowned remain', async () => {
       setupDbMocks({ premiumParts: ['eyes:laser'], lastClaimAt: null });
       const res = await GET(makeRequest());
+      expect(res.data.adTicket).toEqual(expect.any(String));
       expect(res.status).toBe(200);
       expect(res.data.cooldownActive).toBe(false);
       expect(res.data.unownedCount).toBe(4);
@@ -223,5 +244,26 @@ describe('POST /api/avatar/claim-daily-part', () => {
     });
     const res = await POST(makeRequest());
     expect(res.status).toBe(500);
+  });
+
+  it('guards the update on the cooldown value it read (first claim: IS NULL)', async () => {
+    const { chain } = setupDbMocks({ premiumParts: [], lastClaimAt: null });
+    await POST(makeRequest());
+    expect(chain.is).toHaveBeenCalledWith('last_daily_part_claim_at', null);
+  });
+
+  it('guards the update on the previous claim timestamp when one exists', async () => {
+    const last = new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString();
+    const { chain } = setupDbMocks({ premiumParts: [], lastClaimAt: last });
+    await POST(makeRequest());
+    expect(chain.eq).toHaveBeenCalledWith('last_daily_part_claim_at', last);
+  });
+
+  it('returns 429 and no grant when a concurrent claim won the update (0 rows matched)', async () => {
+    setupDbMocks({ premiumParts: [], lastClaimAt: null, updatedRows: [] });
+    const res = await POST(makeRequest());
+    expect(res.status).toBe(429);
+    expect(res.data.error).toBe('COOLDOWN_ACTIVE');
+    expect(res.data.success).toBeUndefined();
   });
 });

@@ -94,4 +94,15 @@ describe('DailyResultsHero', () => {
     vi.useRealTimers();
     expect(fireConfetti).not.toHaveBeenCalled();
   });
+
+  it('Given the score post may still be landing, When the hero has been up a moment, Then it re-asks the server once so streak and trail catch up', () => {
+    vi.useFakeTimers();
+    renderHero();
+    expect(playedStatus.refresh).not.toHaveBeenCalled();
+    vi.advanceTimersByTime(2000);
+    expect(playedStatus.refresh).toHaveBeenCalledTimes(1);
+    vi.advanceTimersByTime(10000);
+    expect(playedStatus.refresh).toHaveBeenCalledTimes(1);
+    vi.useRealTimers();
+  });
 });

@@ -110,16 +110,6 @@ export {
   CELEBRATED_STREAK_MILESTONES,
 } from './dailyChallenge/streaks';
 
-// Streak Freeze
-export {
-  updateDailyStreakWithFreeze,
-  earnStreakFreeze,
-  getFreezeCount,
-  STREAK_FREEZE_KEY,
-  MAX_FREEZES,
-} from './dailyChallenge/streakFreeze';
-export type { StreakWithFreezeResult } from './dailyChallenge/streakFreeze';
-
 // Share utilities
 export {
   generateShareableResult,

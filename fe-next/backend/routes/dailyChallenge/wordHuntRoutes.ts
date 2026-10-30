@@ -13,8 +13,6 @@ import type { Language } from '../../../types';
 import { ensureLanguageLoaded } from '../../dictionary';
 
 import {
-  type LeaderboardParams,
-  type LeaderboardQuery,
   type CachedPuzzle,
   type WordHuntSubmitRequest,
   type WordHuntStatsParams,
@@ -25,15 +23,16 @@ import {
   isWordValidForDailyChallenge,
   isValidDateFormat,
   isValidLanguage,
-  isLeaderboardLanguageScope,
-  withLanguageScope,
   computeWordHuntRetryScore,
   sanitizeGuestDisplayName,
+  clampWordHuntClaim,
+  deriveWordHuntCatchup,
 } from './utils';
+import { resolveDailyPlayer } from './resolveDailyPlayer';
 import { completeDailyQuestsForResult } from '../../modules/dailyMissionsManager';
 import { emptyQuestResult } from '../../../shared/dailyQuestPool';
-import { rerankSequential, dedupeByPlayerKeepBest, sortWordHuntRowsGlobally } from './leaderboardSort';
 import { createSeasonLeaderboardHandler } from './seasonLeaderboard';
+import { wordHuntDailyBoard, wordHuntAlltimeBoard } from './wordHuntBoards';
 import { updateDailyProfileStats } from './profileStats';
 import { updateLeaderboardEntry } from '../../modules/supabase/leaderboard';
 import { leaderboardPointsForGame } from '../../modules/leaderboardScoring';
@@ -47,10 +46,18 @@ import {
 } from '../../../lib/daily/weeklyChest';
 import { updateQuestProgress } from '../../modules/weeklyQuestManager';
 import { shouldCreditDailyChallengeQuest } from '../../../lib/daily/questCredit';
-import { isSubmittableDate, isCatchUpDate } from '../../../utils/dailyChallenge/catchUp';
+import { isSubmittableDate } from '../../../utils/dailyChallenge/catchUp';
 import { freezeDateToBridge } from '../../../lib/daily/chestFreezeBridge';
 
 const router: Router = express.Router();
+
+type HuntStatsRow = Record<string, number> & { total_players: number; solved_count: number };
+
+const HUNT_STATS_COLUMNS: string = 'total_players, solved_count, solve_rate, avg_attempts_solved, avg_life_remaining, avg_efficiency_score, max_efficiency_score, avg_words_discovered, solved_in_1, solved_in_2, solved_in_3, solved_in_4, solved_in_5, solved_in_6, solved_in_7, solved_in_8, solved_in_9, solved_in_10';
+
+function alreadySubmittedResponse(row: unknown) {
+  return { success: true, alreadySubmitted: true, isRetry: true, penaltyApplied: 0, data: row, chestReady: false, freezeBridged: false };
+}
 
 /**
  * Read a player's or guest's daily streak, on the same rules an authenticated
@@ -115,7 +122,7 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
       puzzleDate,
       puzzleNumber,
       language,
-      playerId,
+      playerId: bodyPlayerId,
       guestFingerprint,
       displayName,
       avatarEmoji,
@@ -127,11 +134,11 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
       targetWord,
       attemptWords,
       wordsDiscovered,
-      lifeRemaining,
+      lifeRemaining: rawLifeRemaining,
       clueTokensEarned,
       clueTokensSpent,
       hintsUnlocked,
-      efficiencyScore,
+      efficiencyScore: rawEfficiencyScore,
       extraTries: clientExtraTries
     } = req.body;
 
@@ -146,10 +153,27 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
       return;
     }
 
+    const resolvedPlayer = await resolveDailyPlayer(req, bodyPlayerId);
+    if (!resolvedPlayer.ok) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+    const playerId = resolvedPlayer.playerId;
+
     if (!playerId && !guestFingerprint) {
       res.status(400).json({ error: 'Either playerId or guestFingerprint is required' });
       return;
     }
+
+    const clampedClaim = clampWordHuntClaim({
+      solved: Boolean(solved),
+      attemptsUsed,
+      lifeRemaining: rawLifeRemaining,
+      wordsDiscovered,
+      efficiencyScore: rawEfficiencyScore,
+    });
+    const lifeRemaining = rawLifeRemaining === undefined ? undefined : clampedClaim.lifeRemaining;
+    const efficiencyScore = rawEfficiencyScore === undefined ? undefined : clampedClaim.efficiencyScore;
 
     logger.info('API', `[WordHunt Submit] Received: playerId=${playerId || 'null'}, guestFingerprint=${guestFingerprint ? guestFingerprint.substring(0, 8) + '...' : 'null'}, displayName=${displayName}, solved=${solved}, attempts=${attemptsUsed}`);
 
@@ -161,10 +185,7 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
       res.status(400).json({ error: 'Invalid puzzle date' });
       return;
     }
-    // A catch-up play replays a past daily within the window. Trust the client's
-    // intent flag but only ever honor it for a genuine past date (today is never
-    // catch-up; a near-midnight "yesterday" submit without the flag stays normal).
-    const isCatchupRow = Boolean(isCatchup) && isCatchUpDate(serverDate, puzzleDate);
+    const isCatchupRow = deriveWordHuntCatchup(new Date(), puzzleDate, Boolean(isCatchup));
 
     // Server-side validation
     try {
@@ -188,16 +209,12 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
         return;
       }
 
-      if (solved && attemptWords && attemptWords.length > 0) {
-        const hasMatchingAttempt = attemptWords.some((a) => {
-          const normalized = normalizeWordForComparison(a.word, language as Language);
-          return normalized === expectedTargetWord;
-        });
-        // Auto-win path: if no attempt matches the target word directly,
-        // the player may have revealed all letter positions through word discoveries.
-        // Allow solved=true in this case (wordsDiscovered serves as proof).
-        if (!hasMatchingAttempt && (!wordsDiscovered || wordsDiscovered.length === 0)) {
-          logger.info('API', `Word Hunt validation failed: solved=true but no attempt matches target "${expectedTargetWord}" and no words discovered`);
+      if (solved) {
+        const hasMatchingAttempt = Array.isArray(attemptWords) && attemptWords.some((a) =>
+          typeof a?.word === 'string' && normalizeWordForComparison(a.word, language as Language) === expectedTargetWord,
+        );
+        if (!hasMatchingAttempt) {
+          logger.info('API', `Word Hunt validation failed: solved=true but no attempt matches target "${expectedTargetWord}"`);
           res.status(400).json({ error: 'Invalid solve claim' });
           return;
         }
@@ -272,7 +289,7 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
 
     const { data: existing, error: existingError } = await supabase
       .from('daily_word_hunt_attempts')
-      .select('id, extra_tries, solved')
+      .select('id, extra_tries, solved, efficiency_score')
       .eq('puzzle_date', puzzleDate)
       .eq('language', language)
       .eq(idColumn, idValue)
@@ -281,6 +298,11 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
     if (existingError) {
       logger.error('API', `Word Hunt submit lookup error: ${existingError.message}`);
       res.status(500).json({ error: 'Failed to submit result' });
+      return;
+    }
+
+    if (existing?.solved) {
+      res.json(alreadySubmittedResponse(existing));
       return;
     }
 
@@ -301,6 +323,9 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
     }
     if (existing) {
       insertData.extra_tries = Math.max(existingExtraTries, reportedExtraTries);
+      if (insertData.efficiency_score !== undefined) {
+        insertData.efficiency_score = Math.max(Number(existing.efficiency_score) || 0, insertData.efficiency_score as number);
+      }
     }
 
     let data: Record<string, unknown> | null = null;
@@ -328,11 +353,15 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
         if ((insertError as { code?: string }).code === '23505') {
           const { data: raced } = await supabase
             .from('daily_word_hunt_attempts')
-            .select('id, extra_tries, solved')
+            .select('id, extra_tries, solved, efficiency_score')
             .eq('puzzle_date', puzzleDate)
             .eq('language', language)
             .eq(idColumn, idValue)
             .maybeSingle();
+          if (raced?.solved) {
+            res.json(alreadySubmittedResponse(raced));
+            return;
+          }
           if (raced) {
             wasAlreadySolved = !!raced.solved;
             const racePayload: Record<string, unknown> = { ...insertData };
@@ -344,7 +373,7 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
               hasExistingRow: true,
             });
             if (efficiencyScore !== undefined) {
-              racePayload.efficiency_score = racedScore.finalScore;
+              racePayload.efficiency_score = Math.max(Number(raced.efficiency_score) || 0, racedScore.finalScore);
             }
             racePayload.extra_tries = Math.max(racedExtraTries, reportedExtraTries);
             const { data: updated, error: raceUpdateError } = await supabase
@@ -534,165 +563,8 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
   }
 });
 
-/**
- * GET /api/daily-challenge/word-hunt/leaderboard/:date/:language
- *
- * `:language` is a concrete language OR `all` for the cross-language board.
- */
-router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams, unknown, unknown, LeaderboardQuery>, res: Response): Promise<void> => {
-  try {
-    if (!isSupabaseConfigured()) {
-      res.status(503).json({ error: 'Leaderboard service not available' });
-      return;
-    }
-
-    const { date, language } = req.params;
-    const limit = Math.min(parseInt(req.query.limit || '50') || 50, 100);
-
-    if (!isValidDateFormat(date)) {
-      res.status(400).json({ error: 'Invalid date format. Use YYYY-MM-DD' });
-      return;
-    }
-
-    if (!isLeaderboardLanguageScope(language)) {
-      res.status(400).json({ error: 'Invalid language code' });
-      return;
-    }
-
-    const supabase = getSupabase();
-    if (!supabase) {
-      logger.error('API', 'Word Hunt leaderboard: Supabase client is null despite isSupabaseConfigured() returning true');
-      res.status(503).json({ error: 'Database connection unavailable' });
-      return;
-    }
-
-    // Language scope: a concrete language ranks only players who played that
-    // board; `all` ranks everyone who played today, across every language (the
-    // efficiency scale is language-independent). Each row carries its `language`
-    // so the client can show a flag and gate same-language-only features (the
-    // "words you missed" diff) itself.
-    //
-    // Guests ARE included: they're recorded under guest_fingerprint (submit above)
-    // with a stable per-guest display_name/avatar assigned client-side.
-    //
-    // Unsolved attempts are included too — the view orders `solved DESC` so they
-    // trail every solver, and a player who failed today still sees where they
-    // stand instead of vanishing from a board they played on.
-    //
-    // The view's rank_position is per-language and counts replays, so we re-sort
-    // and renumber below.
-    const rowsQuery = withLanguageScope(
-      supabase
-        .from('daily_word_hunt_leaderboard')
-        .select('*')
-        .eq('puzzle_date', date),
-      language,
-    )
-      .order('solved', { ascending: false, nullsFirst: false })
-      .order('efficiency_score', { ascending: false, nullsFirst: false })
-      .order('attempts_used', { ascending: true, nullsFirst: false })
-      .order('completed_at', { ascending: true, nullsFirst: false })
-      // Over-fetch: the view has one row per ATTEMPT, so a player can occupy many
-      // slots (same-language replays, or one per language on the global board).
-      // Pull extra so that after collapsing to one row per player we still have
-      // `limit` distinct players.
-      // ponytail: ×10 cap 500 covers the current worst case (~8 attempts/player); if
-      // replay counts climb, move the dedup into the view via DISTINCT ON (player_id).
-      .limit(Math.min(limit * 10, 500));
-
-    const { data, error } = await rowsQuery;
-
-    if (error) {
-      const errorDetails = JSON.stringify({ message: error.message, code: error.code, details: error.details, hint: error.hint });
-      logger.error('API', `Word Hunt leaderboard error: ${errorDetails}`);
-
-      const isAuthError =
-        error.message?.includes('401') ||
-        error.message?.includes('JWT') ||
-        error.message?.includes('Invalid API key') ||
-        error.code === 'PGRST301' ||
-        error.code === 'PGRST302' ||
-        error.code === 'PGRST303';
-
-      if (isAuthError) {
-        logger.error('API', 'Supabase authentication failed - check SUPABASE_SERVICE_ROLE_KEY environment variable');
-        res.status(503).json({ error: 'Database authentication failed', hint: 'The service role key may be invalid or expired. Check server logs.' });
-        return;
-      }
-      res.status(500).json({ error: 'Failed to fetch leaderboard' });
-      return;
-    }
-
-    const { count: totalPlayersCount, error: totalPlayersError } = await withLanguageScope(
-      supabase
-        .from('daily_word_hunt_attempts')
-        .select('*', { count: 'exact', head: true })
-        .eq('puzzle_date', date),
-      language,
-    );
-
-    if (totalPlayersError) {
-      logger.debug('API', `Word Hunt total players count error: ${totalPlayersError.message || totalPlayersError.code || 'Unknown'}`);
-    }
-
-    const { count: totalSolvedCount, error: totalSolvedError } = await withLanguageScope(
-      supabase
-        .from('daily_word_hunt_attempts')
-        .select('*', { count: 'exact', head: true })
-        .eq('puzzle_date', date),
-      language,
-    ).eq('solved', true);
-
-    if (totalSolvedError) {
-      logger.warn('API', `Word Hunt total solved count error: ${totalSolvedError.message || totalSolvedError.code || 'Unknown'}`, { code: totalSolvedError.code, details: totalSolvedError.details });
-    }
-
-    const { count: guestSolvedCount, error: guestSolvedError } = await withLanguageScope(
-      supabase
-        .from('daily_word_hunt_attempts')
-        .select('*', { count: 'exact', head: true })
-        .eq('puzzle_date', date),
-      language,
-    )
-      .eq('solved', true)
-      .is('player_id', null)
-      .not('guest_fingerprint', 'is', null);
-
-    if (guestSolvedError) {
-      logger.warn('API', `Word Hunt guest solved count error: ${guestSolvedError.message || guestSolvedError.code || 'Unknown'}`, { code: guestSolvedError.code, details: guestSolvedError.details });
-    }
-
-    // Sort the rows by the scoring order, collapse each player to their single best
-    // row (the view emits one per ATTEMPT → dedup replays / per-language rows),
-    // trim to the requested limit, then renumber rank_position sequentially 1..N.
-    const rerankedData = rerankSequential(
-      dedupeByPlayerKeepBest(sortWordHuntRowsGlobally(data || [])).slice(0, limit),
-    );
-
-    const dataLength = rerankedData.length;
-    const totalSolved = totalSolvedCount ?? 0;
-    const totalParticipants = Math.max(totalSolved, dataLength);
-    const totalPlayers = totalPlayersCount ?? 0;
-    const guestPlayerCount = guestSolvedCount ?? 0;
-
-    logger.info('API', `[WordHunt Leaderboard] ${date}/${language}: leaderboard=${totalParticipants}, totalPlayers=${totalPlayers}, totalSolved=${totalSolved}, guests=${guestPlayerCount}`);
-
-    res.set('Cache-Control', 'public, max-age=20, s-maxage=20, stale-while-revalidate=60');
-    res.json({
-      data: rerankedData,
-      totalParticipants,
-      totalPlayers,
-      totalSolved,
-      guestPlayerCount,
-      date,
-      language
-    });
-  } catch (error) {
-    const err = error as Error;
-    logger.error('API', `Word Hunt leaderboard error: ${err.message}`);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
+/** GET /api/daily-challenge/word-hunt/leaderboard/:date/:language — see wordHuntBoards.ts. */
+router.get('/leaderboard/:date/:language', wordHuntDailyBoard);
 
 /**
  * GET /api/daily-challenge/word-hunt/stats/:date/:language
@@ -714,12 +586,14 @@ router.get('/stats/:date/:language', async (req: Request<WordHuntStatsParams>, r
       return;
     }
 
-    const { data: stats, error: statsError } = await supabase
+    const { data: statsRow, error: statsError } = await supabase
       .from('daily_word_hunt_stats')
-      .select('*')
+      .select(HUNT_STATS_COLUMNS)
       .eq('puzzle_date', date)
       .eq('language', language)
       .maybeSingle();
+
+    const stats = statsRow as unknown as HuntStatsRow | null;
 
     if (statsError) {
       logger.error('API', `Word Hunt stats error: ${statsError.message}`);
@@ -777,12 +651,24 @@ router.get('/stats/:date/:language', async (req: Request<WordHuntStatsParams>, r
           rankQuery = rankQuery.eq('guest_fingerprint', guestFingerprint);
         }
 
-        const { data: rankData } = await rankQuery.single();
+        const hasEfficiency = yourAttempt.efficiency_score !== undefined && yourAttempt.efficiency_score !== null;
+        const [{ data: rankData }, { count: worseEfficiency }] = await Promise.all([
+          rankQuery.single(),
+          hasEfficiency
+            ? supabase
+              .from('daily_word_hunt_attempts')
+              .select('id', { count: 'exact', head: true })
+              .eq('puzzle_date', date)
+              .eq('language', language)
+              .eq('solved', true)
+              .lt('efficiency_score', yourAttempt.efficiency_score)
+            : Promise.resolve({ count: null }),
+        ]);
         let rank: number | undefined;
         if (rankData && playerId) {
           const { count: authPlayersAbove } = await supabase
             .from('daily_word_hunt_leaderboard')
-            .select('*', { count: 'exact', head: true })
+            .select('player_id', { count: 'exact', head: true })
             .eq('puzzle_date', date)
             .eq('language', language)
             .not('player_id', 'is', null)
@@ -801,18 +687,8 @@ router.get('/stats/:date/:language', async (req: Request<WordHuntStatsParams>, r
 
         let efficiencyPercentile: number | undefined;
         const totalSolved = stats.solved_count;
-        if (yourAttempt.efficiency_score !== undefined && yourAttempt.efficiency_score !== null) {
-          const { count: worseEfficiency } = await supabase
-            .from('daily_word_hunt_attempts')
-            .select('*', { count: 'exact', head: true })
-            .eq('puzzle_date', date)
-            .eq('language', language)
-            .eq('solved', true)
-            .lt('efficiency_score', yourAttempt.efficiency_score);
-
-          if (worseEfficiency !== null && totalSolved > 0) {
-            efficiencyPercentile = Math.round((worseEfficiency / totalSolved) * 100);
-          }
+        if (hasEfficiency && worseEfficiency !== null && worseEfficiency !== undefined && totalSolved > 0) {
+          efficiencyPercentile = Math.round((worseEfficiency / totalSolved) * 100);
         }
 
         response.yourStats = {
@@ -990,79 +866,7 @@ router.get('/streak', async (req: Request<unknown, unknown, unknown, { playerId?
  */
 router.get('/season-leaderboard/:language', createSeasonLeaderboardHandler('daily_word_hunt_season_leaderboard'));
 
-/**
- * GET /api/daily-challenge/word-hunt/alltime-leaderboard/:language
- */
-router.get('/alltime-leaderboard/:language', async (req: Request<{ language: string }, unknown, unknown, LeaderboardQuery>, res: Response): Promise<void> => {
-  try {
-    if (!isSupabaseConfigured()) {
-      res.status(503).json({ error: 'Leaderboard service not available' });
-      return;
-    }
-
-    const { language } = req.params;
-    const limit = Math.min(parseInt(req.query.limit || '50') || 50, 100);
-
-    if (!isValidLanguage(language)) {
-      res.status(400).json({ error: 'Invalid language code' });
-      return;
-    }
-
-    const supabase = getSupabase();
-    if (!supabase) {
-      logger.error('API', 'Word Hunt all-time leaderboard: Supabase client is null despite isSupabaseConfigured() returning true');
-      res.status(503).json({ error: 'Database connection unavailable' });
-      return;
-    }
-
-    // Cross-language (global) all-time leaderboard: no `.eq('language', …)` filter.
-    // The view aggregates each player across every language and ranks globally.
-    const { data, error } = await supabase
-      .from('word_hunt_alltime_leaderboard')
-      .select('*')
-      .order('rank_position', { ascending: true })
-      .limit(limit);
-
-    if (error) {
-      const errorDetails = JSON.stringify({ message: error.message, code: error.code, details: error.details, hint: error.hint });
-      logger.error('API', `Word Hunt all-time leaderboard error: ${errorDetails}`);
-
-      const isAuthError =
-        error.message?.includes('401') ||
-        error.message?.includes('JWT') ||
-        error.message?.includes('Invalid API key') ||
-        error.code === 'PGRST301' ||
-        error.code === 'PGRST302' ||
-        error.code === 'PGRST303';
-
-      if (isAuthError) {
-        logger.error('API', 'Supabase authentication failed - check SUPABASE_SERVICE_ROLE_KEY environment variable');
-        res.status(503).json({ error: 'Database authentication failed', hint: 'The service role key may be invalid or expired. Check server logs.' });
-        return;
-      }
-      res.status(500).json({ error: 'Failed to fetch leaderboard' });
-      return;
-    }
-
-    const { count, error: countError } = await supabase
-      .from('word_hunt_alltime_leaderboard')
-      .select('*', { count: 'exact', head: true });
-
-    if (countError) {
-      logger.warn('API', `Word Hunt all-time leaderboard count error: ${countError.message}`);
-    }
-
-    res.set('Cache-Control', 'public, max-age=60, s-maxage=60, stale-while-revalidate=180');
-    res.json({
-      data: data || [],
-      totalParticipants: count || data?.length || 0,
-      language
-    });
-  } catch (error) {
-    const err = error as Error;
-    logger.error('API', `Word Hunt all-time leaderboard error: ${err.message}`);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
+/** GET /api/daily-challenge/word-hunt/alltime-leaderboard/:language — see wordHuntBoards.ts. */
+router.get('/alltime-leaderboard/:language', wordHuntAlltimeBoard);
 
 export default router;

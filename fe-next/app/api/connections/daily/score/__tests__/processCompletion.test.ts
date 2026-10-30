@@ -24,6 +24,8 @@ function makeBuilder() {
       return b;
     },
     eq: () => b,
+    in: () => b,
+    not: () => b,
     or: (f: string) => {
       state.or = f;
       return b;

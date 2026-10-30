@@ -97,7 +97,7 @@ export function aggregateSeasonRows(rows: SeasonViewRow[], language: Leaderboard
         player_id: r.player_id,
         player_identifier: r.player_id,
         guest_fingerprint: null,
-        display_name: r.username || 'Player',
+        display_name: r.username || '',
         avatar_emoji: r.avatar_emoji || '🎯',
         avatar_color: r.avatar_color || '#6366f1',
         avatar_image: null,
@@ -182,6 +182,28 @@ export async function enrichWithProfiles(
       country_code: p.country_code ?? null,
     };
   });
+}
+
+/** Drop QA accounts (`profiles.is_test_account`) and re-rank the rest 1..N. Fails open. */
+export async function withoutTestAccounts(
+  supabase: SupabaseClient,
+  ranked: SeasonBoardEntry[],
+): Promise<SeasonBoardEntry[]> {
+  if (ranked.length === 0) return ranked;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const lookup = await Promise.race([
+    Promise.resolve(supabase.from('profiles').select('id, is_test_account').in('id', ranked.map(e => e.player_id))),
+    new Promise<null>((resolve) => { timer = setTimeout(() => resolve(null), 1_000); }),
+  ]).catch(() => null).finally(() => clearTimeout(timer));
+  if (!lookup || lookup.error) return ranked;
+  const { data } = lookup;
+  const test = new Set(
+    ((data ?? []) as Array<{ id: string; is_test_account?: boolean | null }>)
+      .filter(p => p.is_test_account === true)
+      .map(p => p.id),
+  );
+  if (test.size === 0) return ranked;
+  return ranked.filter(e => !test.has(e.player_id)).map((e, i) => ({ ...e, rank_position: i + 1 }));
 }
 
 // ── Current season resolution ──────────────────────────────────────────
@@ -331,8 +353,9 @@ export function createSeasonLeaderboardHandler(view: SeasonView) {
         .eq('season_id', seasonId);
       if (language !== ALL_LANGUAGES_SCOPE) query = query.eq('language', language);
       // A season holds at most (players × languages) rows — dozens today,
-      // low thousands at scale — so folding in memory is cheap and exact.
-      const { data, error } = await query.limit(5000);
+      // low thousands at scale — so folding in memory is cheap. Ordered, so a
+      // cap ever reached drops the lowest scores rather than arbitrary rows.
+      const { data, error } = await query.order('season_score', { ascending: false }).limit(5000);
 
       if (error) {
         logger.error('API', `${label} season leaderboard error: ${error.message}`);
@@ -340,7 +363,7 @@ export function createSeasonLeaderboardHandler(view: SeasonView) {
         return;
       }
 
-      const ranked = aggregateSeasonRows((data ?? []) as SeasonViewRow[], language);
+      const ranked = await withoutTestAccounts(supabase, aggregateSeasonRows((data ?? []) as SeasonViewRow[], language));
       const page = await enrichWithProfiles(supabase, ranked.slice(0, limit));
 
       res.set('Cache-Control', 'public, max-age=60, s-maxage=60, stale-while-revalidate=180');

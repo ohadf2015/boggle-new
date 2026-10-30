@@ -55,6 +55,7 @@ export function useDailyTower({ daily, language, phase, worldRef, labelsRef, han
   const saveRef = useRef<DailyTowerSave>(emptySave(language));
   const lastKeyRef = useRef('');
   const submittedRef = useRef(0);
+  const finalSentRef = useRef(-1);
   const [restoredFloors, setRestoredFloors] = useState(0);
   const [growthM, setGrowthM] = useState(0);
   const [targetM, setTargetM] = useState(0);
@@ -94,6 +95,7 @@ export function useDailyTower({ daily, language, phase, worldRef, labelsRef, han
       const growth = growthToday(save);
       // A banking flush re-sends an unchanged best: it is the quest-credit moment.
       if (growth <= 0 || (!final && growth <= submittedRef.current)) return;
+      if (final && growth === finalSentRef.current) return;
       const words = save.words;
       const body = recordV2DailyClimb(
         {
@@ -104,6 +106,7 @@ export function useDailyTower({ daily, language, phase, worldRef, labelsRef, han
         { language, guestFingerprint: getGuestFingerprint(), storage: window.localStorage, final },
       );
       submittedRef.current = growth;
+      if (final) finalSentRef.current = growth;
       if (body) void postWithAuth('/api/word-tower/daily/score', body, keepalive ? { keepalive: true } : {}).catch(() => undefined);
     },
     [language],
@@ -112,6 +115,16 @@ export function useDailyTower({ daily, language, phase, worldRef, labelsRef, han
   const snapshot = useCallback(
     (keepalive: boolean, final = false) => {
       if (!daily || phase === 'over') return;
+      const today = utcDateKey();
+      if (saveRef.current.dayKey && saveRef.current.dayKey !== today) {
+        // The tab stayed open past midnight UTC: today's growth starts from here.
+        const rolled = rollDay(saveRef.current, today);
+        setTargetM(dailyTargetM(rolled.dayStart.totalM, rolled.dayKey));
+        persist(rolled);
+        submittedRef.current = 0;
+        finalSentRef.current = -1;
+        lastKeyRef.current = '';
+      }
       const tower = standingTower(worldRef.current, labelsRef.current, hangingIdRef.current);
       if (tower.words.length === 0) return;
       const key = tower.words.join('|');
@@ -140,6 +153,11 @@ export function useDailyTower({ daily, language, phase, worldRef, labelsRef, han
     }
     if (phase !== 'over') revertedRef.current = false;
   }, [daily, phase, persist]);
+
+  // SPA leave (back button, in-app link): bank once, like pagehide does.
+  const snapshotRef = useRef(snapshot);
+  snapshotRef.current = snapshot;
+  useEffect(() => () => snapshotRef.current(true, true), []);
 
   const flush = useCallback(
     (opts?: { keepalive?: boolean }) => snapshot(opts?.keepalive ?? false, true),

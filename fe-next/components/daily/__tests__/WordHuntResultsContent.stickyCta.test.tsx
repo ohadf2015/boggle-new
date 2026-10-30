@@ -18,6 +18,10 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => ({ user: null, isAuthenticated: false, loading: false }),
+}));
+
 const mockWheelPlayed = vi.fn<() => boolean>(() => false);
 const mockIsGuest = vi.fn<() => boolean>(() => false);
 

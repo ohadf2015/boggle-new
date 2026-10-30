@@ -9085,7 +9085,45 @@ const en = {
     "streak": {
       "freeze_toast_no_remaining": "Streak Freeze used. {day} saved · no freezes left"
     },
-"practiceBoard": "Practice board"
+"practiceBoard": "Practice board",
+"hub": { "intro": "A new set of word puzzles every day, the same for everyone. Finish the first two to clear the day.",
+"resetsAt": "New puzzles at {time} your time.",
+"newcomerTip": "New here? Start with {mode}. It takes about 2 minutes.",
+"dismissTip": "Got it",
+"bonusTag": "Bonus",
+"play": "Play",
+"timed": "Timed",
+"noTimer": "No timer",
+"progressLabel": "Today's progress",
+"requiredDone": "Today's two are done! The bonus puzzles are extra.",
+"pastPuzzles": "Missed a day? Past puzzles"
+},
+"archivePage": { "backToHub": "Back to today's quests",
+"title": "Past puzzles",
+"subtitle": "Every daily Word Hunt so far and how players did. Missed one in the last 3 days? You can still play it.",
+"count": "{n} puzzles",
+"view": "View",
+"backToArchive": "Past puzzles",
+"notFound": "Puzzle not found",
+"previous": "Previous puzzle",
+"next": "Next puzzle",
+"puzzleTitle": "Puzzle #{n}",
+"players": "Players",
+"solveRate": "Solve rate",
+"solved": "Solved",
+"avgTries": "Avg. tries",
+"noStats": "No stats for this puzzle yet.",
+"distribution": "Tries to solve",
+"playToday": "Play today's puzzles",
+"playThisDay": "Play this day's Word Hunt"
+},
+"leaderboard": { "scoreExplainer": "Points from all of today's puzzles, added up.",
+"youRank": "You: #{rank} of {total}",
+"topPercent": "Top {percent}%",
+"inviteFriend": "Invite a friend",
+"inviteText": "Think you can beat me on today's LexiClash puzzles?",
+"linkCopied": "Link copied!"
+}
 },
   "dailyWordWheelLanding": {
     "hero": {
@@ -9269,8 +9307,12 @@ const en = {
       "perfectBanner": "Word Wizard!",
       "onlyYouFound": "Only you found this. So far.",
       "rareFind": "Rare find · only {count} got this",
-      "streakChip": "{count}-day streak"
-    },
+      "streakChip": "{count}-day streak",
+"breakdownBase": "Words",
+"breakdownCombo": "Combo",
+"breakdownGold": "Gold",
+"goldCoins": "+{count} coins from gold words"
+},
     "signup": {
       "streakTitle": "Keep your {count}-day streak safe",
       "boardTitle": "Claim your spot on the board",
@@ -9303,7 +9345,15 @@ const en = {
 "accepted": "{word}! That's it. Now play today's wheel",
 "notWord": "Not a word here. Try {word}",
 "check": "Check"
-}
+},
+"cantCheck": "Couldn't check that word. Try again",
+"quitKeepsWords": "The words you've found so far will count as today's result.",
+"goldLetterLabel": "gold letter",
+"comboLabel": "Combo {value}",
+"comboLost": "Combo lost",
+"longerWordsTip": "Longer words score way more: 3 letters = {short}, 7 letters = {long}",
+"comboTip": "Find words back to back to build a combo, up to ×2 points.",
+"goldTip": "One letter is gold today: words with it score +50% and earn coins."
 },
   "dailyChallenge": {
     "pointsPerWord": "Points per word"
@@ -16211,7 +16261,7 @@ const en = {
   },
   "quests": {
     "title": "Quests",
-    "dailyTitle": "Today's Quests",
+    "dailyTitle": "Daily Missions",
     "weeklyTitle": "Weekly Quest",
     "grandSlam": "Grand Slam!",
     "grandSlamBonus": "+500 XP bonus",
@@ -16427,8 +16477,9 @@ const en = {
       "step1": "Find the hidden word",
       "step2": "Spell words to reveal clues",
       "step3": "Short words cost no try",
-      "scoreTip": "Crack it first for big points"
-    },
+      "scoreTip": "Crack it first for big points",
+"step3v2": "Shorter words are free. Full-length ones use a guess."
+},
     "wheelRush": {
       "title": "Spin & Spell",
       "step1": "Every word uses the center letter",
@@ -17488,7 +17539,10 @@ const en = {
         "silver": "Silver: So close",
         "bronze": "Bronze: Solid run"
       },
-"missesLabel": "misses"
+"missesLabel": "misses",
+"scoreNotSaved": "Your score didn't save.",
+"retrySave": "Try again",
+"skipStuck": "Stuck? Skip this one"
 },
     "community": {
       "title": "Community riddles",

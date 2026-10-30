@@ -121,6 +121,7 @@ describe('DailyChallengeLanding — Word Tower is a first-class daily quest', ()
 
   it('renders Word Tower with the shared QuestCard (or CompactModeRow), not the generic registry card', async () => {
     renderHub();
+    await screen.findByTestId('secondary-modes');
     // Word Tower now uses the shared quest-card-word-tower testid (primary)
     // or compact-row-cyan testid (secondary), not the legacy DailyModeQuestCard
     const heroCard = screen.queryByTestId('quest-card-word-tower');
@@ -133,6 +134,7 @@ describe('DailyChallengeLanding — Word Tower is a first-class daily quest', ()
   it('routes to the daily Word Tower run via the SPA router', async () => {
     const user = userEvent.setup();
     renderHub();
+    await screen.findByTestId('secondary-modes');
     // Word Tower is either a primary hero card or a secondary compact row
     const heroCard = screen.queryByTestId('quest-card-word-tower');
     const compactRow = screen.queryByTestId('compact-row-cyan');
@@ -156,6 +158,7 @@ describe('DailyChallengeLanding — Word Tower is a first-class daily quest', ()
 
   it('renders Word Tower as a public quest (reachable as primary or secondary)', async () => {
     renderHub();
+    await screen.findByTestId('secondary-modes');
     // Word Tower is reachable as a QuestCard (if primary) or CompactModeRow (if secondary).
     // The layout changed from "four equal cards" to "one hero + three compact rows",
     // so geometry assertions are no longer valid. Instead, verify Word Tower is

@@ -10,13 +10,7 @@ export interface SurvivalHeaderProps {
   liveScore: number;
   lastScoreIncrement: number | null;
   isScoreAnimating: boolean;
-  /** @deprecated Shop has been removed - clues auto-unlock now */
-  showShop?: boolean;
-  /** @deprecated Shop has been removed - clues auto-unlock now */
-  showShopHint?: boolean;
   onQuitClick: () => void;
-  /** @deprecated Shop has been removed - clues auto-unlock now */
-  onShopClick?: () => void;
   /** Quick Play mode: suppress daily-specific score tier badge */
   practice?: boolean;
   /**

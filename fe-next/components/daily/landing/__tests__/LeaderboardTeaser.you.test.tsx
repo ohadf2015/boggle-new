@@ -79,4 +79,18 @@ describe('LeaderboardTeaser — the viewer and real scores', () => {
     expect(fish.textContent).toContain('780');
     expect(fish.textContent).toContain('906');
   });
+
+  it('gives a player the same avatar whatever their rank, not one picked by rank', async () => {
+    const avatarAt = async (rank: number) => {
+      mockBoard([entry(rank, 'Ann', { key: 'ann-key' })]);
+      const view = renderBoard();
+      const row = await screen.findByTestId(`leaderboard-row-${rank}`);
+      const label = row.querySelector('svg[role="img"]')?.getAttribute('aria-label');
+      view.unmount();
+      return label;
+    };
+    const first = await avatarAt(1);
+    expect(first).toBeTruthy();
+    expect(await avatarAt(2)).toBe(first);
+  });
 });

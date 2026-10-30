@@ -48,7 +48,8 @@ vi.mock('../DailyInsightStack', () => ({
 }));
 
 const mid: WordWheelGameResult = { score: 40, wordsFound: ['ABC', 'DEFGH'], timeSeconds: 60 };
-const highScore: WordWheelGameResult = { score: 95, wordsFound: ['ABC'], timeSeconds: 60 };
+const highScore: WordWheelGameResult = { score: 600, wordsFound: ['ABC'], timeSeconds: 60 };
+const sharpOnly: WordWheelGameResult = { score: 95, wordsFound: ['ABC'], timeSeconds: 60 };
 const coverage: WordWheelGameResult = {
   score: 35,
   wordsFound: Array.from({ length: 22 }, (_, i) => `WRD${i}`),
@@ -74,13 +75,18 @@ describe('WordWheelResults — exceptional banner gating', () => {
     expect(screen.queryByTestId('word-wheel-perfect-banner')).toBeNull();
   });
 
-  it('renders the perfect banner when score ≥ 80', () => {
+  it('renders the "Word Wizard" banner only at the wizard rank of the ladder', () => {
     renderResults(highScore);
     expect(screen.getByTestId('word-wheel-perfect-banner')).toBeInTheDocument();
   });
 
-  it('renders the perfect banner when wordsFound.length ≥ 20 (coverage win)', () => {
+  it('a rank-3 score is not a wizard', () => {
+    renderResults(sharpOnly);
+    expect(screen.queryByTestId('word-wheel-perfect-banner')).toBeNull();
+  });
+
+  it('many short words alone do not make a wizard', () => {
     renderResults(coverage);
-    expect(screen.getByTestId('word-wheel-perfect-banner')).toBeInTheDocument();
+    expect(screen.queryByTestId('word-wheel-perfect-banner')).toBeNull();
   });
 });

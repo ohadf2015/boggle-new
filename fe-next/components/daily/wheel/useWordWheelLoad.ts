@@ -18,6 +18,9 @@ import {
   hasEverPlayedWordWheel,
 } from '@/utils/dailyChallenge';
 import { getGuestFingerprint } from '@/utils/dailyChallenge/guestPlayer';
+import { needsBonusIntro } from './bonusIntro';
+import { getUnfinishedWordWheelRun, type WordWheelRun } from '@/utils/dailyChallenge/wordWheelRun';
+import type { StoredWordWheelResult } from '@/utils/dailyChallenge/types';
 import { prewarmDictionary } from '@/hooks/useDictionaryCache';
 import { wordWheelBridgeSkipsReady } from '@/lib/retention/firstGameBridge';
 import type { Language } from '@/types';
@@ -59,12 +62,18 @@ interface UseWordWheelLoadOptions {
   preloadForPlay?: () => Promise<unknown>;
   /** `?start=1` from the first-game bridge: skip the ready card and the how-to. */
   autoStart?: boolean;
+  /** A stored result the server never acknowledged. */
+  onUnsent?: (stored: StoredWordWheelResult) => void;
+  /** A run started on this device and never finished: returns the result it settles to. */
+  onUnfinishedRun?: (run: WordWheelRun, meta: { puzzleDate: string; puzzleNumber: number; centerLetter: string }) => WordWheelGameResult;
 }
 
 export function useWordWheelLoad({
   language, isPractice, catchupDate, isAuthenticated, authLoading, playerId, guestFingerprint,
-  setGameActive, catchupAdUnlockedRef, preloadForPlay, autoStart = false,
+  setGameActive, catchupAdUnlockedRef, preloadForPlay, autoStart = false, onUnsent, onUnfinishedRun,
 }: UseWordWheelLoadOptions) {
+  const callbacksRef = useRef({ onUnsent, onUnfinishedRun });
+  callbacksRef.current = { onUnsent, onUnfinishedRun };
   const isCatchup = !!catchupDate;
   const [phase, setPhase] = useState<WordWheelPhase>('loading');
   const [puzzle, setPuzzle] = useState<WordWheelPuzzle | null>(null);
@@ -111,9 +120,21 @@ export function useWordWheelLoad({
           ? getWordWheelResultForDate(language, date)
           : getTodaysWordWheelResult(language);
         if (!isMounted) return;
+        if (stored && stored.submittedToServer === false) callbacksRef.current.onUnsent?.(stored);
         setGameResult(stored
           ? { wordsFound: stored.result.wordsFound, score: stored.result.score, timeSeconds: stored.result.timeSeconds }
           : { wordsFound: [], score: 0, timeSeconds: 0 });
+        setPhase('already-played');
+        return;
+      }
+
+      const run = getUnfinishedWordWheelRun(language, date);
+      const settle = callbacksRef.current.onUnfinishedRun;
+      if (run && settle && !entered()) {
+        const puzzleForDate = generateWordWheelPuzzle(date, language);
+        const settled = settle(run, { puzzleDate: date, puzzleNumber: number, centerLetter: puzzleForDate.centerLetter });
+        if (!isMounted) return;
+        setGameResult(settled);
         setPhase('already-played');
         return;
       }
@@ -148,7 +169,7 @@ export function useWordWheelLoad({
                 timeSeconds: r.timeSeconds,
                 streakDays: getDailyStreak().currentStreak,
                 completedAt: r.completedAt || new Date().toISOString(),
-              });
+              }, { submitted: true });
               if (!isMounted) return;
               setGameResult({ wordsFound: r.wordsFound, score: r.score, timeSeconds: r.timeSeconds });
               setPhase('already-played');
@@ -165,7 +186,8 @@ export function useWordWheelLoad({
 
       // Returning players skip the ready card entirely; catch-up keeps it so the ad gate still applies.
       // The first-game bridge (`?start=1`) skips it for a first-timer too — one tap, no how-to.
-      if (wordWheelBridgeSkipsReady({
+      const holdForBonusIntro = needsBonusIntro(date) && hasEverPlayedWordWheel(language) && !autoStart;
+      if (!holdForBonusIntro && wordWheelBridgeSkipsReady({
         startParam: autoStart,
         hasEverPlayed: hasEverPlayedWordWheel(language),
         isCatchup,

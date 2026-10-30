@@ -1,6 +1,10 @@
 import type { Metadata } from 'next';
 import { defaultOgImages } from '@/lib/seo/defaultOgImage';
 import Link from 'next/link';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
+import { isCatchUpDate } from '@/utils/dailyChallenge/catchUp';
+import { archiveCopy } from '../archiveCopy';
 import { loadTranslation, type TranslationData } from '@/translations/loadTranslation';
 import { DAILY_CHALLENGE_EPOCH } from '@/utils/dailyChallenge/constants';
 import { getPuzzleNumber } from '@/utils/dailyChallenge';
@@ -114,7 +118,7 @@ function StatCard({ label, value }: { label: string; value: string }) {
   return (
     <div className="bg-neo-navy border-2 border-neo-black rounded-neo p-3 text-center shadow-hard-sm">
       <div className="text-xl font-black text-neo-white">{value}</div>
-      <div className="text-xs text-slate-400 uppercase tracking-wider mt-0.5">{label}</div>
+      <div className="text-xs text-neo-white/60 uppercase tracking-wider mt-0.5">{label}</div>
     </div>
   );
 }
@@ -122,17 +126,18 @@ function StatCard({ label, value }: { label: string; value: string }) {
 export default async function DailyArchiveDatePage({ params }: PageParams) {
   const { locale, date } = await params;
   const validLocale: Locale = LOCALES.includes(locale as Locale) ? (locale as Locale) : 'en';
-  const t = await loadTranslation(validLocale) as Record<string, any>;
+  const tx = archiveCopy(await loadTranslation(validLocale) as Record<string, unknown>);
 
   if (!isValidArchiveDate(date)) {
     return (
       <div className="min-h-screen bg-neo-navy text-neo-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-neo-display font-black text-neo-yellow mb-4">
-            {'Puzzle Not Found'}
+            {tx('notFound')}
           </h1>
-          <Link href={`/${locale}/daily/archive`} className="text-neo-cyan hover:underline">
-            ← Back to Archive
+          <Link href={`/${locale}/daily/archive`} className="text-neo-cyan hover:underline inline-flex items-center gap-1">
+            <DirectionalIcon icon={ArrowLeft} className="w-4 h-4" />
+            {tx('backToArchive')}
           </Link>
         </div>
       </div>
@@ -158,6 +163,8 @@ export default async function DailyArchiveDatePage({ params }: PageParams) {
   const hasNext = nextDate <= yesterday;
   const prevDateStr = prevDate.toISOString().split('T')[0];
   const nextDateStr = nextDate.toISOString().split('T')[0];
+  // Inside the catch-up window the day is still playable, not just viewable.
+  const canCatchUp = isCatchUpDate(new Date().toISOString().slice(0, 10), date);
 
   // JSON-LD — server-generated trusted data only
   const schemaJson = JSON.stringify(jsonLdGraph([{
@@ -179,18 +186,29 @@ export default async function DailyArchiveDatePage({ params }: PageParams) {
         <div className="max-w-2xl mx-auto px-4 py-8">
           {/* Navigation */}
           <div className="flex items-center justify-between mb-6">
-            <Link href={`/${locale}/daily/archive`} className="text-neo-cyan text-sm hover:underline">
-              ← Archive
+            <Link href={`/${locale}/daily/archive`} className="text-neo-cyan text-sm hover:underline inline-flex items-center gap-1">
+              <DirectionalIcon icon={ArrowLeft} className="w-4 h-4" />
+              {tx('backToArchive')}
             </Link>
             <div className="flex gap-3 text-sm">
               {hasPrev && (
-                <Link href={`/${locale}/daily/archive/${prevDateStr}`} className="text-slate-400 hover:text-neo-cyan">
-                  ← #{puzzleNumber - 1}
+                <Link
+                  href={`/${locale}/daily/archive/${prevDateStr}`}
+                  aria-label={tx('previous')}
+                  className="text-neo-white/60 hover:text-neo-cyan inline-flex items-center gap-1"
+                >
+                  <DirectionalIcon icon={ArrowLeft} className="w-4 h-4" />
+                  <bdi>#{puzzleNumber - 1}</bdi>
                 </Link>
               )}
               {hasNext && (
-                <Link href={`/${locale}/daily/archive/${nextDateStr}`} className="text-slate-400 hover:text-neo-cyan">
-                  #{puzzleNumber + 1} →
+                <Link
+                  href={`/${locale}/daily/archive/${nextDateStr}`}
+                  aria-label={tx('next')}
+                  className="text-neo-white/60 hover:text-neo-cyan inline-flex items-center gap-1"
+                >
+                  <bdi>#{puzzleNumber + 1}</bdi>
+                  <DirectionalIcon icon={ArrowRight} className="w-4 h-4" />
                 </Link>
               )}
             </div>
@@ -199,22 +217,22 @@ export default async function DailyArchiveDatePage({ params }: PageParams) {
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-3xl font-neo-display font-black text-neo-yellow">
-              Puzzle #{puzzleNumber}
+              {tx('puzzleTitle', { n: puzzleNumber })}
             </h1>
-            <p className="text-slate-400 mt-1">{formattedDate}</p>
+            <p className="text-neo-white/60 mt-1">{formattedDate}</p>
           </div>
 
           {/* Stats */}
           {stats ? (
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
-              <StatCard label="Players" value={safeToLocaleString(stats.totalPlayers, validLocale)} />
-              <StatCard label="Solve Rate" value={`${Math.round(stats.solveRate)}%`} />
-              <StatCard label="Solved" value={safeToLocaleString(stats.solvedCount, validLocale)} />
-              <StatCard label="Avg Attempts" value={stats.avgAttemptsSolved?.toFixed(1) || '-'} />
+              <StatCard label={tx('players')} value={safeToLocaleString(stats.totalPlayers, validLocale)} />
+              <StatCard label={tx('solveRate')} value={`${Math.round(stats.solveRate)}%`} />
+              <StatCard label={tx('solved')} value={safeToLocaleString(stats.solvedCount, validLocale)} />
+              <StatCard label={tx('avgTries')} value={stats.avgAttemptsSolved?.toFixed(1) || '-'} />
             </div>
           ) : (
             <div className="bg-neo-navy border-2 border-neo-black rounded-neo p-6 mb-8 text-center">
-              <p className="text-slate-400">Stats not available for this puzzle yet.</p>
+              <p className="text-neo-white/60">{tx('noStats')}</p>
             </div>
           )}
 
@@ -222,7 +240,7 @@ export default async function DailyArchiveDatePage({ params }: PageParams) {
           {stats?.attemptDistribution && (
             <div className="bg-neo-navy border-2 border-neo-black rounded-neo p-4 mb-8">
               <h2 className="text-sm font-bold text-neo-cyan uppercase tracking-wider mb-3">
-                Attempt Distribution
+                {tx('distribution')}
               </h2>
               <div className="space-y-1.5">
                 {Array.from({ length: 10 }, (_, i) => i + 1).map(attempt => {
@@ -232,14 +250,14 @@ export default async function DailyArchiveDatePage({ params }: PageParams) {
 
                   return (
                     <div key={attempt} className="flex items-center gap-2 text-sm">
-                      <span className="w-4 text-slate-400 text-end">{attempt}</span>
+                      <span className="w-4 text-neo-white/60 text-end">{attempt}</span>
                       <div className="flex-1 h-5 bg-neo-navy-light rounded-sm overflow-hidden">
                         <div
                           className={`h-full rounded-sm ${attempt <= 2 ? 'bg-green-500' : attempt <= 4 ? 'bg-neo-cyan' : attempt <= 6 ? 'bg-neo-yellow' : 'bg-neo-orange'}`}
                           style={{ width: `${Math.max(width, count > 0 ? 2 : 0)}%` }}
                         />
                       </div>
-                      <span className="w-10 text-slate-500 text-end text-xs">{count}</span>
+                      <span className="w-10 text-neo-white/50 text-end text-xs">{count}</span>
                     </div>
                   );
                 })}
@@ -250,10 +268,13 @@ export default async function DailyArchiveDatePage({ params }: PageParams) {
           {/* CTA */}
           <div className="text-center mt-8">
             <Link
-              href={`/${locale}/daily`}
+              href={canCatchUp ? `/${locale}/daily/word-hunt?date=${date}` : `/${locale}/daily`}
               className="inline-block bg-neo-yellow text-neo-black font-neo-display font-black px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard hover:shadow-hard-pressed active:translate-y-0.5 transition-[box-shadow,translate,scale,rotate,transform]"
             >
-              {"Play Today's Puzzle"} →
+              <span className="inline-flex items-center gap-2">
+                {tx(canCatchUp ? 'playThisDay' : 'playToday')}
+                <DirectionalIcon icon={ArrowRight} className="w-5 h-5" />
+              </span>
             </Link>
           </div>
         </div>

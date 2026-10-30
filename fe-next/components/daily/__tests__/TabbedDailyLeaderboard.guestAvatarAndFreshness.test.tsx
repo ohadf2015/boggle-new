@@ -141,7 +141,7 @@ describe('TabbedDailyLeaderboard — guest avatars', () => {
         }
       : null);
 
-    render(<TabbedDailyLeaderboard puzzleDate="2026-09-08" language="he" t={t} />);
+    render(<TabbedDailyLeaderboard scope="word-hunt" puzzleDate="2026-09-08" language="he" t={t} />);
 
     expect(await screen.findByText('Guest Player')).toBeInTheDocument();
 
@@ -164,7 +164,7 @@ describe('TabbedDailyLeaderboard — guest avatars', () => {
         }
       : null);
 
-    render(<TabbedDailyLeaderboard puzzleDate="2026-09-08" language="he" t={t} />);
+    render(<TabbedDailyLeaderboard scope="word-hunt" puzzleDate="2026-09-08" language="he" t={t} />);
 
     expect(await screen.findByText('Fish')).toBeInTheDocument();
     const avatars = await screen.findAllByTestId('header-avatar');
@@ -176,7 +176,7 @@ describe('TabbedDailyLeaderboard — freshness', () => {
   it('bypasses the HTTP cache so a just-submitted row cannot be missed', async () => {
     const calls = installFetch(() => null);
 
-    render(<TabbedDailyLeaderboard puzzleDate="2026-09-08" language="he" t={t} />);
+    render(<TabbedDailyLeaderboard scope="word-hunt" puzzleDate="2026-09-08" language="he" t={t} />);
 
     await waitFor(() => {
       expect(calls.some(c => c.url.includes('/leaderboard/'))).toBe(true);

@@ -12,22 +12,31 @@ interface WordWheelFoundWordsProps {
   lastFound: string | null;
   variant?: 'strip' | 'panel';
   reducedMotion?: boolean;
+  /** An "already found" resubmit: that word pulses where it sits. */
+  pulse?: { word: string; id: number } | null;
 }
 
-function AllWords({ words, lastFound, columns, reducedMotion = false, large = false }: { words: string[]; lastFound: string | null; columns: string; reducedMotion?: boolean; large?: boolean }) {
+type Pulse = WordWheelFoundWordsProps['pulse'];
+
+function pulseKey(w: string, pulse: Pulse) {
+  return pulse && pulse.word === w ? `${w}-pulse-${pulse.id}` : w;
+}
+
+function AllWords({ words, lastFound, columns, reducedMotion = false, large = false, pulse = null }: { words: string[]; lastFound: string | null; columns: string; reducedMotion?: boolean; large?: boolean; pulse?: Pulse }) {
   const sorted = [...words].sort((a, b) => a.localeCompare(b));
   return (
     <ul data-testid="found-words-all" className={cn('grid gap-x-5 gap-y-1', columns)}>
       {sorted.map(w => (
         <m.li
-          key={w}
+          key={pulseKey(w, pulse)}
           data-testid="found-word"
+          data-pulse={pulse?.word === w ? 'true' : undefined}
           className={cn(
             'flex items-baseline justify-between gap-2 border-b border-neo-white/10 font-bold',
             large ? 'py-1.5 font-neo-display text-lg' : 'py-1 text-sm',
-            w === lastFound ? 'text-neo-lime' : 'text-neo-white',
+            pulse?.word === w ? 'text-neo-orange' : w === lastFound ? 'text-neo-lime' : 'text-neo-white',
           )}
-          initial={w === lastFound && !reducedMotion ? { scale: 1.35, x: -12 } : false}
+          initial={(w === lastFound || pulse?.word === w) && !reducedMotion ? { scale: 1.35, x: -12 } : false}
           animate={{ scale: 1, x: 0 }}
           transition={{ type: 'spring', stiffness: 420, damping: 20 }}
         >
@@ -40,7 +49,7 @@ function AllWords({ words, lastFound, columns, reducedMotion = false, large = fa
 }
 
 export default function WordWheelFoundWords({
-  t, words, lastFound, variant = 'strip', reducedMotion = false,
+  t, words, lastFound, variant = 'strip', reducedMotion = false, pulse = null,
 }: WordWheelFoundWordsProps) {
   const [open, setOpen] = useState(false);
   const newestFirst = [...words].reverse();
@@ -68,7 +77,7 @@ export default function WordWheelFoundWords({
           {words.length === 0 ? (
             <p className="text-neo-white/55 text-sm font-semibold">{t('wordWheel.strip.empty')}</p>
           ) : (
-            <AllWords words={words} lastFound={lastFound} columns="grid-cols-2" reducedMotion={reducedMotion} large />
+            <AllWords words={words} lastFound={lastFound} columns="grid-cols-2" reducedMotion={reducedMotion} large pulse={pulse} />
           )}
         </div>
         {longest && (
@@ -96,12 +105,13 @@ export default function WordWheelFoundWords({
           ) : (
             newestFirst.map(w => (
               <m.span
-                key={w}
+                key={pulseKey(w, pulse)}
                 data-testid="found-word"
                 data-fresh={w === lastFound ? 'true' : 'false'}
+                data-pulse={pulse?.word === w ? 'true' : undefined}
                 className={cn(
                   'font-bold tracking-wide text-sm shrink-0',
-                  w === lastFound ? 'text-neo-lime' : 'text-neo-white/80',
+                  pulse?.word === w ? 'text-neo-orange' : w === lastFound ? 'text-neo-lime' : 'text-neo-white/80',
                 )}
                 initial={reducedMotion ? false : { x: -24, scale: 1.3 }}
                 animate={{ x: 0, scale: 1 }}
@@ -129,7 +139,7 @@ export default function WordWheelFoundWords({
           {words.length === 0 ? (
             <p className="text-neo-white/55 text-sm font-semibold">{t('wordWheel.strip.empty')}</p>
           ) : (
-            <AllWords words={words} lastFound={lastFound} columns="grid-cols-2" reducedMotion={reducedMotion} />
+            <AllWords words={words} lastFound={lastFound} columns="grid-cols-2" reducedMotion={reducedMotion} pulse={pulse} />
           )}
         </div>
       )}

@@ -8,7 +8,7 @@ import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { cn } from '@/lib/utils';
 import { SPRING_PRESETS } from '@/lib/animation/presets';
-import { scoreWord } from '@/utils/dailyChallenge/wordWheelScoring';
+import { scoreWord, scaleRankThresholds } from '@/utils/dailyChallenge/wordWheelScoring';
 import { selectRareFindCelebration, type RareFind } from '@/lib/wordWheel/wordRarity';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import { trackGrowthEvent } from '@/utils/growthTracking';
@@ -33,13 +33,9 @@ import MpModeCrossPromo from './MpModeCrossPromo';
 import { wasSignupModalDismissedRecently } from '@/utils/dailyChallenge';
 import type { Language } from '@/types';
 import type { WordWheelGameResult } from './WordWheelGame';
+import WheelScoreBreakdown from './wheel/WheelScoreBreakdown';
+import { reachesWizardRank } from './wheel/wheelWizard';
 
-// Threshold for the "exceptional run" celebration — covers two cases:
-//   • score ≥ EXCELLENT_SCORE: graded run, almost-all-words tier
-//   • wordsFound ≥ EXCELLENT_WORD_COUNT: brute-coverage signal
-// Either trigger flips on extra confetti, layered sound, and the banner.
-const EXCELLENT_SCORE = 80;
-const EXCELLENT_WORD_COUNT = 20;
 
 interface WordWheelResultsProps {
   result: WordWheelGameResult;
@@ -80,7 +76,8 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
   const { submitLeaderboardScore } = useCrazyGames();
   const { playSound } = useSoundEffects();
   const isPractice = usePracticeFlag();
-  const isExceptional = result.score >= EXCELLENT_SCORE || result.wordsFound.length >= EXCELLENT_WORD_COUNT;
+  const isExceptional = reachesWizardRank(result.score, puzzleDate);
+  const ladder = scaleRankThresholds(rankThresholds(), puzzleDate);
   const celebrate = !alreadyPlayed;
   const formatWord = (w: string) => (gameLang === 'he' ? applyHebrewFinalLetters(w) : w);
   const longest = result.wordsFound.reduce((best, w) => (w.length > best.length ? w : best), '');
@@ -155,14 +152,14 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
         <DailyResultsHero
           mode="word-wheel"
           outcome={result.wordsFound.length > 0 ? 'win' : 'done'}
-          headline={t(`wordWheel.rank.${WHEEL_RANKS[rankProgress(result.score, rankThresholds()).index]}`)}
+          headline={t(`wordWheel.rank.${WHEEL_RANKS[rankProgress(result.score, ladder).index]}`)}
           eyebrow={`#${puzzleNumber}`}
           score={result.score}
           stats={[
             { value: result.wordsFound.length, label: t('wordWheel.results.wordsFound') },
             { value: longest ? formatWord(longest) : '-', label: t('wordWheel.strip.longest') },
           ]}
-          meter={<WheelRankMeter t={t} score={result.score} animate={celebrate} />}
+          meter={<WheelRankMeter t={t} score={result.score} animate={celebrate} puzzleDate={puzzleDate} />}
           celebrate={celebrate}
           className="z-10"
         >
@@ -182,6 +179,8 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
             />
           )}
         </DailyResultsHero>
+
+        {result.breakdown && <WheelScoreBreakdown t={t} breakdown={result.breakdown} coins={isAuthenticated ? result.coins ?? 0 : 0} />}
 
         {(isExceptional || rareFind) && (
           <div data-testid="results-highlights" className="z-10 flex flex-wrap items-center justify-center gap-2">

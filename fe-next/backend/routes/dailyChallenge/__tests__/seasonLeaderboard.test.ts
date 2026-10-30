@@ -149,6 +149,37 @@ describe('season leaderboard routes', () => {
     expect(res.body.data[0]).toMatchObject({ player_id: 'p1', display_name: 'Fish', country_code: 'IL', season_score: 50, rank_position: 1 });
   });
 
+  it('leaves test accounts off the season board and ranks the rest without a gap', async () => {
+    h.results['daily_word_hunt_season_leaderboard'] = {
+      data: [row({ player_id: 'qa', season_score: 900 }), row({ player_id: 'p2', season_score: 50 })],
+      error: null,
+    };
+    h.results['profiles'] = {
+      data: [
+        { id: 'qa', is_test_account: true, display_name: 'QA' },
+        { id: 'p2', is_test_account: false, display_name: 'Real' },
+      ],
+      error: null,
+    };
+    const res = await get('/season-leaderboard/all?season=6', wordHuntRoutes);
+    expect(res.body.totalParticipants).toBe(1);
+    expect(res.body.data.map((e: { player_id: string; rank_position: number }) => [e.player_id, e.rank_position])).toEqual([['p2', 1]]);
+  });
+
+  it('orders the season view by score before capping it, so the cap only drops the tail', async () => {
+    await get('/season-leaderboard/all?season=6', wordHuntRoutes);
+    const q = h.queries.find(q => q.table === 'daily_word_hunt_season_leaderboard')!;
+    const methods = q.calls.map(c => c.method);
+    expect(methods.indexOf('order')).toBeGreaterThan(-1);
+    expect(methods.indexOf('order')).toBeLessThan(methods.indexOf('limit'));
+    expect(q.calls.find(c => c.method === 'order')?.args[0]).toBe('season_score');
+  });
+
+  it('leaves a nameless player\'s name blank for the client to translate, never English "Player"', () => {
+    const [entry] = aggregateSeasonRows([row({ username: null as unknown as string, season_score: 5 })], 'all');
+    expect(entry.display_name).toBe('');
+  });
+
   it('Word Wheel: filters by language when the scope is concrete', async () => {
     const res = await get('/season-leaderboard/he?season=5', wordWheelRoutes);
     expect(res.status).toBe(200);

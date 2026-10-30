@@ -36,6 +36,8 @@ interface WheelDiscProps {
   onPressedChange?: (letter: string | null) => void;
   /** Desktop game shell: the disc scales with the stage. */
   large?: boolean;
+  /** Outer index of today's gold letter, if any. */
+  goldIndex?: number | null;
   children?: ReactNode;
 }
 
@@ -43,7 +45,7 @@ interface WheelDiscProps {
 const WheelDisc: React.FC<WheelDiscProps> = ({
   orbitRef, centerLetter, outerLetters, builtIndices, pointerPosRef, draggingRef,
   onPointerDown, onPointerMove, onPointerUp, onPress, onHoldStart, onHoldEnd, holdActiveIndex,
-  tileSkin, fx, release = null, checking = false, reducedMotion, onPressedChange, large = false, children,
+  tileSkin, fx, release = null, checking = false, reducedMotion, onPressedChange, large = false, goldIndex = null, children,
 }) => {
   const [settledFx, setSettledFx] = useState<number | null>(null);
   const [pressed, setPressed] = useState<number | null>(null);
@@ -175,6 +177,7 @@ const WheelDisc: React.FC<WheelDiscProps> = ({
             cheerOrder={cheerOrder(i)}
             tileSkin={tileSkin}
             reducedMotion={reducedMotion}
+            gold={goldIndex === i}
           />
         ))}
         <LetterBursts fx={fx} outerCount={outerLetters.length} />

@@ -82,3 +82,41 @@ describe('resolveDailySubmission — best-keeps upsert decision', () => {
     ).toBe('keep');
   });
 });
+
+describe('validateDailySubmission — score must match the run', () => {
+  it('rejects points with nothing solved', () => {
+    expect(validateDailySubmission(body({ score: 100, puzzlesSolved: 0 }), MAX, TODAY).ok).toBe(false);
+  });
+
+  it('rejects more points than the solved puzzles can earn', () => {
+    expect(validateDailySubmission(body({ score: 900, puzzlesSolved: 1 }), MAX, TODAY).ok).toBe(false);
+  });
+
+  it('rejects a solve faster than one second per puzzle', () => {
+    expect(validateDailySubmission(body({ timeTakenSeconds: 2, puzzlesSolved: 5 }), MAX, TODAY).ok).toBe(false);
+  });
+
+  it('accepts a zero-solve run with zero points', () => {
+    expect(validateDailySubmission(body({ score: 0, puzzlesSolved: 0, timeTakenSeconds: 0 }), MAX, TODAY).ok).toBe(true);
+  });
+});
+
+describe('resolveDailySubmission — one language per day', () => {
+  it('keeps the first row when a better score arrives in another language', () => {
+    expect(
+      resolveDailySubmission({
+        existing: { score: 100, timeTakenSeconds: 90, language: 'en' },
+        incoming: { score: 900, timeTakenSeconds: 30, language: 'he' },
+      }),
+    ).toEqual({ action: 'keep' });
+  });
+
+  it('still upgrades within the same language', () => {
+    expect(
+      resolveDailySubmission({
+        existing: { score: 100, timeTakenSeconds: 90, language: 'en' },
+        incoming: { score: 900, timeTakenSeconds: 30, language: 'en' },
+      }),
+    ).toEqual({ action: 'update' });
+  });
+});

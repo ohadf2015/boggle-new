@@ -30,7 +30,7 @@ function readCookies(header: string): Map<string, string> {
 }
 
 /** The access token from the @supabase/ssr session cookie (chunked, base64url). */
-async function cookieAccessToken(req: Request): Promise<string | null> {
+export async function cookieAccessToken(req: Pick<Request, 'headers'>): Promise<string | null> {
   const header = req.headers.get('cookie');
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   if (!header || !url) return null;

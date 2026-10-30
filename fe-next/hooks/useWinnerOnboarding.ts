@@ -15,6 +15,7 @@ import {
 } from '@/utils/dailyChallenge';
 import { updateProfile } from '@/lib/supabase';
 import { getAvatarEmojiAndColor } from '@/utils/avatarConfig';
+import { bearerHeader } from '@/utils/supabase/bearerHeader';
 
 /**
  * Hook to manage winner onboarding flow after daily challenge signup
@@ -126,7 +127,7 @@ export function useWinnerOnboarding() {
 
         const response = await fetch('/api/daily-challenge/word-hunt/submit', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', ...(await bearerHeader()) },
           body: JSON.stringify(bodyData),
         });
 

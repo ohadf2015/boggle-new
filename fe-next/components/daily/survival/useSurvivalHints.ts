@@ -2,17 +2,13 @@
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import type { Language } from '@/types';
-import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { generateProgressiveHints, generateFallbackHints, CLUE_SHOP_ITEMS, type HintLevel, type ClueShopItem } from '@/utils/aiHintGenerator';
-import type { FeedbackType } from './types';
 
 
 export interface UseSurvivalHintsProps {
   targetWord: string;
   language: Language;
   playWordAcceptedSound?: () => void;
-  showToast: (type: FeedbackType, message: string) => void;
-  t: (key: string, fallbackOrParams?: string | Record<string, string | number>, params?: Record<string, string | number>) => string;
   accumulatedClues?: Map<number, { letter: string; type: string }>;
 }
 
@@ -31,10 +27,7 @@ export interface HintState {
 }
 
 export interface HintActions {
-  buyNextHint: (clueTokens: number, setClueTokens: (fn: (prev: number) => number) => void) => void;
   getNextAffordableClue: (tokens: number) => ClueShopItem | null;
-  handlePurchase: (item: ClueShopItem, tokens: number, setTokens: (fn: (prev: number) => number) => void, setShowShop?: (show: boolean) => void) => void;
-  // Legacy actions kept for compatibility if needed, but buyNextHint is preferred
   autoRevealLetter: () => number;
   revealCategory: () => void;
   revealExample: () => void;
@@ -50,8 +43,6 @@ export function useSurvivalHints({
   targetWord,
   language,
   playWordAcceptedSound,
-  showToast,
-  t,
   accumulatedClues,
 }: UseSurvivalHintsProps): [HintState, HintActions] {
   const [currentHint, setCurrentHint] = useState<HintLevel | null>(null);
@@ -61,7 +52,7 @@ export function useSurvivalHints({
   const [eliminatedLetters] = useState<Set<string>>(new Set());
   const [showCategory, setShowCategory] = useState(false);
   const [showExample, setShowExample] = useState(false);
-  const [tokensSpent, setTokensSpent] = useState(0);
+  const tokensSpent = 0;
   
   // Stage 0: Reveal Letter, Stage 1: Reveal Category, Stage 2: Example Sentence
   const [hintStage, setHintStage] = useState(0);
@@ -149,91 +140,10 @@ export function useSurvivalHints({
     return null;
   }, [canRevealLetter, canRevealCategory, canRevealExample]);
 
-  // Handle buying next hint
-  const buyNextHint = useCallback((
-    clueTokens: number,
-    setClueTokens: (fn: (prev: number) => number) => void
-  ) => {
-    if (!nextHintItem) return;
-    
-    if (clueTokens < nextHintItem.cost) {
-      showToast('invalid-word', t('wordHunt.survival.notEnoughTokens', 'Not enough tokens!'));
-      return;
-    }
-    
-    // Apply effect
-    let success = false;
-    
-    if (nextHintItem.id === 'reveal_letter') {
-        if (unrevealedPositions.length > 0) {
-             const nextIdx = unrevealedPositions[0];
-             setRevealedLetters(prev => new Set([...prev, nextIdx]));
-             success = true;
-        } else {
-             showToast('invalid-word', t('wordHunt.survival.allLettersRevealed'));
-        }
-    } else if (nextHintItem.id === 'reveal_category') {
-        setShowCategory(true);
-        success = true;
-    } else if (nextHintItem.id === 'example_sentence') {
-        setShowExample(true);
-        success = true;
-    }
-
-    if (success) {
-        setClueTokens(prev => prev - nextHintItem.cost);
-        setTokensSpent(prev => prev + nextHintItem.cost);
-        playWordAcceptedSound?.();
-
-        const clueNameKey =
-          nextHintItem.id === 'reveal_letter'
-            ? 'wordHunt.survival.revealLetter'
-            : nextHintItem.id === 'reveal_category'
-              ? 'wordHunt.survival.revealCategory'
-              : 'wordHunt.survival.exampleSentence';
-        showToast(
-          'clue-unlocked',
-          t('wordHunt.survival.clueUnlocked', { name: t(clueNameKey), cost: safeToLocaleString(nextHintItem.cost, language) }),
-        );
-    }
-
-  }, [nextHintItem, unrevealedPositions, playWordAcceptedSound, showToast, t, language]);
-
-
-  // Auto-Unlock logic
-  // "it should auto unlocked"
-  useEffect(() => {
-    if (!nextHintItem) return;
-    
-    // We cannot access clueTokens here directly as it is passed to actions...
-    // Wait, useSurvivalHints manages internal state but clueTokens is managed by parent useSurvivalLogic?
-    // No, clueTokens is passed INTO handlePurchase.
-    
-    // We need the CURRENT clueTokens to be available here to effect an auto-purchase.
-    // However, clueTokens is state in useSurvivalGameLogic, passed down.
-    // If we want auto-unlock logic inside this hook, we need clueTokens as prop.
-    // Or, we expose a check function that useSurvivalGameLogic calls in an effect.
-  }, [nextHintItem]); // Placeholder comment logic
-  
-  // ... re-adding autoRevealLetter etc for internal use if needed
-  
   const getNextAffordableClue = useCallback((tokens: number): ClueShopItem | null => {
     if (!nextHintItem) return null;
     return tokens >= nextHintItem.cost ? nextHintItem : null;
   }, [nextHintItem]);
-
-  const handlePurchase = useCallback((
-    item: ClueShopItem,
-    tokens: number,
-    setTokens: (fn: (prev: number) => number) => void,
-    setShowShop?: (show: boolean) => void
-  ) => {
-    // If the item matches current next item, buy it
-    if (nextHintItem && item.id === nextHintItem.id) {
-        buyNextHint(tokens, setTokens);
-        if (setShowShop) setShowShop(false);
-    }
-  }, [nextHintItem, buyNextHint]);
 
   const autoRevealLetter = useCallback((): number => {
       if (unrevealedPositions.length > 0) {
@@ -277,14 +187,12 @@ export function useSurvivalHints({
   };
 
   const actions: HintActions = useMemo(() => ({
-    buyNextHint,
     getNextAffordableClue,
-    handlePurchase,
     autoRevealLetter,
     revealCategory,
     revealExample,
     autoUnlockNextHint,
-  }), [buyNextHint, getNextAffordableClue, handlePurchase, autoRevealLetter, revealCategory, revealExample, autoUnlockNextHint]);
+  }), [getNextAffordableClue, autoRevealLetter, revealCategory, revealExample, autoUnlockNextHint]);
 
   return [state, actions];
 }

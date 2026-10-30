@@ -1,28 +1,13 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-
-const SCORE_HISTORY_CAP = 20;
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { getScoreBreakdown } from '@/utils/aiHintScoring';
 import type { WordDiscovery, TargetAttempt } from './types';
-
-export interface ScoreEvent {
-  timestamp: number;
-  delta: number;
-  reason: 'word_discovered' | 'life_bonus' | 'target_attempt' | 'initial';
-  metadata?: Record<string, unknown>;
-}
 
 export interface LiveScoreState {
   currentScore: number;
   lastIncrement: number | null;
   isScoreAnimating: boolean;
-  scoreHistory: ScoreEvent[];
-}
-
-export interface LiveScoreActions {
-  triggerScoreAnimation: (delta: number, reason: ScoreEvent['reason']) => void;
-  resetScore: () => void;
 }
 
 export interface UseLiveScoreTrackerProps {
@@ -54,7 +39,7 @@ export function useLiveScoreTracker({
   attempts,
   isGameOver = false,
   hasWon = false,
-}: UseLiveScoreTrackerProps): [LiveScoreState, LiveScoreActions] {
+}: UseLiveScoreTrackerProps): LiveScoreState {
   const targetAttemptsCount = useMemo(
     () => attempts.filter(a => !a.isDiscovery).length,
     [attempts],
@@ -83,7 +68,6 @@ export function useLiveScoreTracker({
   const [currentScore, setCurrentScore] = useState(0);
   const [lastIncrement, setLastIncrement] = useState<number | null>(null);
   const [isScoreAnimating, setIsScoreAnimating] = useState(false);
-  const [scoreHistory, setScoreHistory] = useState<ScoreEvent[]>([]);
 
   const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const previousScoreRef = useRef(0);
@@ -112,18 +96,6 @@ export function useLiveScoreTracker({
       setLastIncrement(delta);
       setIsScoreAnimating(true);
 
-      const event: ScoreEvent = {
-        timestamp: Date.now(),
-        delta,
-        reason: delta > 0 ? 'word_discovered' : 'target_attempt',
-      };
-      setScoreHistory(prev => {
-        const next = prev.length >= SCORE_HISTORY_CAP
-          ? [...prev.slice(prev.length - SCORE_HISTORY_CAP + 1), event]
-          : [...prev, event];
-        return next;
-      });
-
       if (animationTimeoutRef.current) {
         clearTimeout(animationTimeoutRef.current);
       }
@@ -144,53 +116,9 @@ export function useLiveScoreTracker({
     };
   }, []);
 
-  const triggerScoreAnimation = useCallback((delta: number, reason: ScoreEvent['reason']) => {
-    if (delta === 0 || isNaN(delta)) return;
-
-    setLastIncrement(delta);
-    setIsScoreAnimating(true);
-
-    const event: ScoreEvent = {
-      timestamp: Date.now(),
-      delta,
-      reason,
-    };
-    setScoreHistory(prev => {
-      const next = prev.length >= SCORE_HISTORY_CAP
-        ? [...prev.slice(prev.length - SCORE_HISTORY_CAP + 1), event]
-        : [...prev, event];
-      return next;
-    });
-
-    if (animationTimeoutRef.current) {
-      clearTimeout(animationTimeoutRef.current);
-    }
-    animationTimeoutRef.current = setTimeout(() => {
-      setIsScoreAnimating(false);
-      setLastIncrement(null);
-    }, 600);
-  }, []);
-
-  const resetScore = useCallback(() => {
-    setCurrentScore(0);
-    setLastIncrement(null);
-    setIsScoreAnimating(false);
-    setScoreHistory([]);
-    previousScoreRef.current = 0;
-    didInitRef.current = false;
-  }, []);
-
-  const state: LiveScoreState = {
+  return {
     currentScore: Math.max(0, currentScore),
     lastIncrement,
     isScoreAnimating,
-    scoreHistory,
   };
-
-  const actions: LiveScoreActions = {
-    triggerScoreAnimation,
-    resetScore,
-  };
-
-  return [state, actions];
 }

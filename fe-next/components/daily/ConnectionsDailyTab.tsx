@@ -1,14 +1,11 @@
 'use client';
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React from 'react';
+import { usePolledBoard } from '@/hooks/usePolledBoard';
 import { Medal } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
-import {
-  fetchDailyLeaderboard,
-  getGuestFingerprint,
-  type LeaderboardRow,
-} from '@/lib/connections/dailyClient';
+import { fetchDailyLeaderboard, type LeaderboardRow } from '@/lib/connections/dailyClient';
 
 /** Podium colors for the Medal icon — gold / silver / bronze (mirrors ConnectionsLeaderboard). */
 const MEDAL_COLORS: Record<number, string> = {
@@ -29,59 +26,24 @@ interface ConnectionsDailyTabProps {
 }
 
 /**
- * Connections (Word Bridge) panel inside the shared TabbedDailyLeaderboard.
- *
- * Connections daily scores live in their own store (connections_daily_scores)
- * whose public endpoint deliberately leaks NO identifiers — so they can't be
- * merged by identity into the combined hunt+wheel board. Instead they surface
- * as their own tab on the SAME leaderboard component the other modes use
- * (Ohad directive 2026-09-13), fetched through the same dailyClient helper the
- * connections results screen uses. Self-contained fetch + 30s polling so the
- * parent doesn't need a third data source threaded through its merge logic.
+ * Connections (Word Bridge) daily board as a tab of TabbedDailyLeaderboard: its
+ * own ranking (score, then time), separate from the combined points board.
  */
 export default function ConnectionsDailyTab({ puzzleDate }: ConnectionsDailyTabProps) {
   const { t } = useLanguage();
-  const [rows, setRows] = useState<LeaderboardRow[]>([]);
-  const [totalPlayers, setTotalPlayers] = useState(0);
-  const [ownRank, setOwnRank] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-
-  const load = useCallback(async () => {
-    if (!puzzleDate) return;
-    // Authed users are identified server-side from the session cookie (it wins
-    // over the fingerprint); guests resolve their own rank via the fingerprint.
-    const res = await fetchDailyLeaderboard(puzzleDate, {
-      guestFingerprint: getGuestFingerprint(),
-      limit: 100,
-    });
-    if (!res) {
-      setError(true);
-      setLoading(false);
-      return;
-    }
-    setRows(res.leaderboard);
-    setTotalPlayers(res.totalPlayers);
-    setOwnRank(res.ownRank);
-    setError(false);
-    setLoading(false);
-  }, [puzzleDate]);
-
-  useEffect(() => {
-    setLoading(true);
-    load();
-    const interval = setInterval(() => {
-      if (!document.hidden) load();
-    }, 30000);
-    const onVis = () => {
-      if (!document.hidden) load();
-    };
-    document.addEventListener('visibilitychange', onVis);
-    return () => {
-      clearInterval(interval);
-      document.removeEventListener('visibilitychange', onVis);
-    };
-  }, [load]);
+  const board = usePolledBoard(
+    async () => {
+      // The server identifies the viewer itself (session, or the signed guest cookie).
+      const res = await fetchDailyLeaderboard(puzzleDate, { limit: 100 });
+      if (!res) throw new Error('Failed to fetch connections leaderboard');
+      return res;
+    },
+    { enabled: !!puzzleDate, key: puzzleDate },
+  );
+  const rows: LeaderboardRow[] = board.data?.leaderboard ?? [];
+  const totalPlayers = board.data?.totalPlayers ?? 0;
+  const ownRank = board.data?.ownRank ?? null;
+  const { loading, error } = board;
 
   if (loading && rows.length === 0) {
     return (
@@ -101,11 +63,7 @@ export default function ConnectionsDailyTab({ puzzleDate }: ConnectionsDailyTabP
         </p>
         <button
           type="button"
-          onClick={() => {
-            setLoading(true);
-            setError(false);
-            load();
-          }}
+          onClick={board.reload}
           className="mt-3 px-4 py-2 rounded-neo border-2 border-neo-black bg-neo-cyan text-neo-black font-neo-display font-black text-sm shadow-hard-sm active:translate-x-px active:translate-y-px"
         >
           {t('common.retry')}

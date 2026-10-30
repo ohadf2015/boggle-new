@@ -7,6 +7,7 @@ import {
   findCompletedCycles,
 } from '@/lib/daily/weeklyChest'
 import { loadChestActivity } from '@/lib/daily/weeklyChestData'
+import { grantStreakFreezes } from '@/lib/daily/chestFreezeGrant'
 import { selectChestPrize } from '@/lib/daily/chestPrizePool'
 import { awardCoinsServer } from '@/backend/services/economy/awardCoins'
 import logger from '@/utils/logger'
@@ -127,37 +128,38 @@ async function claim(request: NextRequest) {
     }
   }
 
-  await awardCoinsServer(user.id, prize.coins, 'daily_weekly_chest', {
+  const awarded = await awardCoinsServer(user.id, prize.coins, 'daily_weekly_chest', {
     tier,
     cycle_number: String(progress.cycleNumber),
     variant_id: prize.variantId,
   })
 
-  // Grant streak freezes when the prize variant includes them. Soft-fail: if
-  // the engagement row doesn't exist yet, skip silently rather than block the
-  // chest claim — the player still gets coins + badge.
-  if (prize.freezes > 0) {
-    const { data: engagement } = await supabase
-      .from('player_engagement')
-      .select('streak_freezes_available')
-      .eq('player_id', user.id)
-      .maybeSingle()
-
-    if (engagement) {
-      await supabase
-        .from('player_engagement')
-        .update({
-          streak_freezes_available:
-            (engagement.streak_freezes_available || 0) + prize.freezes,
-        })
-        .eq('player_id', user.id)
+  if (!awarded.success) {
+    // Reopen the chest so a retry can claim; otherwise the row stays opened with no coins paid.
+    const { error: rollbackErr } = existing[0]
+      ? await supabase.from('daily_weekly_chests').update({ opened_at: null }).eq('id', existing[0].id)
+      : await supabase
+          .from('daily_weekly_chests')
+          .delete()
+          .eq('player_id', user.id)
+          .eq('cycle_start', progress.cycleStart)
+    if (rollbackErr) {
+      logger.error('Weekly chest claim: rollback after failed coin award failed:', rollbackErr.message)
     }
+    return NextResponse.json({ error: 'Failed to award coins' }, { status: 502 })
+  }
+
+  let freezesGranted = 0
+  if (prize.freezes > 0) {
+    const stored = await grantStreakFreezes(supabase, user.id, prize.freezes)
+    if (stored) freezesGranted = prize.freezes
+    else logger.error('Weekly chest claim: streak freeze grant failed for', user.id)
   }
 
   return NextResponse.json({
     tier,
     coins: prize.coins,
-    freezes: prize.freezes,
+    freezes: freezesGranted,
     badgeId: prize.badgeId,
     variantId: prize.variantId,
     labelKey: prize.labelKey,

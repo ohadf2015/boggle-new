@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useReducer } from 'react';
 import type { LetterGrid, Language } from '@/types';
 import type { LetterFeedback } from '@/utils/wordHuntFeedback';
 import type { ClueShopItem, HintLevel } from '@/utils/aiHintGenerator';
-import type { FeedbackType, WordDiscovery, TargetAttempt, SurvivalGameResult, AccumulatedClue, ScoreEvent, AutoClueNotificationData } from './types';
+import type { FeedbackType, WordDiscovery, TargetAttempt, SurvivalGameResult, AccumulatedClue, AutoClueNotificationData } from './types';
 import { useLiveScoreTracker } from './useLiveScoreTracker';
 import { clearRejectedWords } from '@/utils/invalidWordTracker';
 import {
@@ -30,6 +30,8 @@ import { survivalGameReducer, createInitialState } from './survivalGameReducer';
 import { useSafeTimeout, useSafeInterval } from '@/hooks/useSafeTimeout';
 import { useSurvivalWordSubmission } from './useSurvivalWordSubmission';
 import { trackGameEnd, trackGameStart } from '@/utils/growthTracking';
+
+const MAX_DRAIN_TICK_SECONDS = 3;
 
 export interface UseSurvivalGameLogicProps {
   grid: LetterGrid;
@@ -82,7 +84,6 @@ export interface SurvivalGameState {
   liveScore: number;
   lastScoreIncrement: number | null;
   isScoreAnimating: boolean;
-  scoreHistory: ScoreEvent[];
 
   // Notifications (new)
   activeNotifications: AutoClueNotificationData[];
@@ -90,8 +91,6 @@ export interface SurvivalGameState {
   // UI state
   formedWord: string;
   letterCount: number;
-  showShop: boolean;
-  showShopHint: boolean;
   showQuitConfirm: boolean;
   isClueGaining: boolean;
 
@@ -105,12 +104,8 @@ export interface SurvivalGameState {
 export interface SurvivalGameActions {
   handleWordSubmit: (word: string) => void;
   handleWordChange: (word: string, count: number) => void;
-  handlePurchase: (item: ClueShopItem) => void;
-  buyNextHint: () => void;
   showToast: (type: FeedbackType, message: string) => void;
   closeToast: () => void;
-  setShowShop: (show: boolean) => void;
-  setShowShopHint: (show: boolean) => void;
   setShowQuitConfirm: (show: boolean) => void;
   setLifeGainAmount: (amount: number | null) => void;
   showAutoClueNotification: (clueType: string) => void;
@@ -160,7 +155,7 @@ export function useSurvivalGameLogic({
     dispatch({ type: 'CLOSE_TOAST' });
   }, []);
 
-  const [liveScoreState] = useLiveScoreTracker({
+  const liveScoreState = useLiveScoreTracker({
     lifePoints: state.lifePoints,
     clueTokens: state.clueTokens,
     discoveredWords: state.discoveredWords,
@@ -192,8 +187,6 @@ export function useSurvivalGameLogic({
     targetWord,
     language,
     playWordAcceptedSound,
-    showToast,
-    t,
     accumulatedClues: clueState.accumulatedClues,
   });
 
@@ -253,23 +246,31 @@ export function useSurvivalGameLogic({
   const baseDrainRate = isNewPlayer.current ? NEW_PLAYER_LIFE_DRAIN_RATE : LIFE_DRAIN_RATE;
   const drainRate = baseDrainRate * getLanguageDrainMultiplier(language);
 
-  // Life drain effect — suppressed in practice mode (`disableLifeDrain`) so the
-  // player can explore the board without time pressure.
+  // Drain by elapsed wall time, paused for practice, the quit dialog and a hidden tab.
+  const drainPaused = state.isGameOver || disableLifeDrain || state.showQuitConfirm;
   useEffect(() => {
-    if (state.isGameOver || disableLifeDrain) {
+    if (drainPaused) {
       lifeDrainInterval.stop();
       return;
     }
 
     const lifeFloor = isNewPlayer.current ? NEW_PLAYER_LIFE_FLOOR : 0;
+    let lastTick = Date.now();
+    const resetBaseline = () => { lastTick = Date.now(); };
+    document.addEventListener('visibilitychange', resetBaseline);
     lifeDrainInterval.start(() => {
-      dispatch({ type: 'DRAIN_LIFE', payload: { drainRate, lifeFloor } });
+      const now = Date.now();
+      const elapsedSeconds = Math.min(MAX_DRAIN_TICK_SECONDS, (now - lastTick) / 1000);
+      lastTick = now;
+      if (document.hidden || elapsedSeconds <= 0) return;
+      dispatch({ type: 'DRAIN_LIFE', payload: { drainRate: drainRate * elapsedSeconds, lifeFloor } });
     }, 1000);
 
     return () => {
+      document.removeEventListener('visibilitychange', resetBaseline);
       lifeDrainInterval.stop();
     };
-  }, [state.isGameOver, disableLifeDrain, drainRate, lifeDrainInterval]);
+  }, [drainPaused, drainRate, lifeDrainInterval]);
 
   // Check for life-based game over. While `deferGameOver` is true (e.g. a
   // rewarded-ad extra-life modal is open), suppress the finale so the reducer
@@ -338,37 +339,6 @@ export function useSurvivalGameLogic({
     finishHold.hold(result, won ? SOLVE_CELEBRATION_MS : LOSS_REVEAL_MS);
   }, [state.attempts, state.discoveredWords, state.lifePoints, state.clueTokens, state.gameSessionId, hintState.tokensSpent, hintState.currentHint, targetWord, finishHold, lifeDrainInterval, fadeToTrack, TRACKS]);
 
-  // Token adjustment helper for hint purchases
-  const adjustTokens = useCallback((delta: number) => {
-    dispatch({ type: 'ADJUST_TOKENS', payload: { delta } });
-  }, []);
-
-  // Handle purchase wrapper
-  const handlePurchase = useCallback((item: ClueShopItem) => {
-    const setClueTokens = (updater: number | ((prev: number) => number)) => {
-      if (typeof updater === 'function') {
-        // For function updates, we need the current value
-        adjustTokens(-item.cost);
-      } else {
-        dispatch({ type: 'ADJUST_TOKENS', payload: { delta: updater - state.clueTokens } });
-      }
-    };
-    const setShowShopCallback = (show: boolean) => dispatch({ type: 'SET_SHOW_SHOP', payload: show });
-    hintActions.handlePurchase(item, state.clueTokens, setClueTokens, setShowShopCallback);
-  }, [hintActions, state.clueTokens, adjustTokens]);
-
-  const buyNextHint = useCallback(() => {
-    const setClueTokens = (updater: number | ((prev: number) => number)) => {
-      if (typeof updater === 'function') {
-        const nextItem = hintState.nextHintItem;
-        if (nextItem) {
-          adjustTokens(-nextItem.cost);
-        }
-      }
-    };
-    hintActions.buyNextHint(state.clueTokens, setClueTokens);
-  }, [hintActions, state.clueTokens, hintState.nextHintItem, adjustTokens]);
-
   // Cumulative cost threshold consumed by prior auto-unlocks. Tokens are never
   // actually deducted — this ref gates the next unlock so auto-reveal still
   // follows a "save up N tokens per hint" cadence while remaining FREE.
@@ -413,14 +383,6 @@ export function useSurvivalGameLogic({
   handleGameOverRef.current = handleGameOver;
 
   // UI state setters using dispatch
-  const setShowShop = useCallback((show: boolean) => {
-    dispatch({ type: 'SET_SHOW_SHOP', payload: show });
-  }, []);
-
-  const setShowShopHint = useCallback((show: boolean) => {
-    dispatch({ type: 'SET_SHOW_SHOP_HINT', payload: show });
-  }, []);
-
   const setShowQuitConfirm = useCallback((show: boolean) => {
     dispatch({ type: 'SET_SHOW_QUIT_CONFIRM', payload: show });
   }, []);
@@ -459,12 +421,9 @@ export function useSurvivalGameLogic({
     liveScore: liveScoreState.currentScore,
     lastScoreIncrement: liveScoreState.lastIncrement,
     isScoreAnimating: liveScoreState.isScoreAnimating,
-    scoreHistory: liveScoreState.scoreHistory,
     activeNotifications: state.activeNotifications,
     formedWord: state.formedWord,
     letterCount: state.letterCount,
-    showShop: state.showShop,
-    showShopHint: state.showShopHint,
     showQuitConfirm: state.showQuitConfirm,
     isClueGaining: clueState.isClueGaining,
     feedbackType: state.feedbackType,
@@ -476,12 +435,8 @@ export function useSurvivalGameLogic({
   const actions: SurvivalGameActions = {
     handleWordSubmit: wordSubmission.handleWordSubmit,
     handleWordChange: wordSubmission.handleWordChange,
-    handlePurchase,
-    buyNextHint,
     showToast,
     closeToast,
-    setShowShop,
-    setShowShopHint,
     setShowQuitConfirm,
     setLifeGainAmount,
     showAutoClueNotification,

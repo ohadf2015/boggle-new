@@ -11,7 +11,7 @@ import { DailyTowerBoard } from '../DailyTowerBoard';
 const t = (k: string, p?: Record<string, string | number>) => (p ? `${k}:${JSON.stringify(p)}` : k);
 const row = (rank: number, name: string, m: number, isYou = false) => ({
   rank,
-  playerId: `p${rank}`,
+  isGuest: false,
   isYou,
   username: name,
   bestHeightM: m,

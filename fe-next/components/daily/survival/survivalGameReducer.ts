@@ -29,8 +29,6 @@ export interface SurvivalReducerState {
   // UI state
   formedWord: string;
   letterCount: number;
-  showShop: boolean;
-  showShopHint: boolean;
   showQuitConfirm: boolean;
 
   // Feedback/notifications
@@ -60,19 +58,15 @@ export type SurvivalAction =
   | { type: 'GAME_OVER'; payload: { won: boolean } }
 
   // Word discovery
-  | { type: 'DISCOVER_WORD'; payload: { discovery: WordDiscovery; newLife: number } }
+  | { type: 'DISCOVER_WORD'; payload: { discovery: WordDiscovery } }
 
   // Target attempts
   | { type: 'ADD_ATTEMPT'; payload: { attempt: TargetAttempt } }
   | { type: 'SET_FEEDBACK_OVERLAY'; payload: { show: boolean; feedback?: LetterFeedback[] | null } }
 
-  // Tokens
-  | { type: 'ADJUST_TOKENS'; payload: { delta: number } }
 
   // UI state
   | { type: 'SET_FORMED_WORD'; payload: { word: string; count: number } }
-  | { type: 'SET_SHOW_SHOP'; payload: boolean }
-  | { type: 'SET_SHOW_SHOP_HINT'; payload: boolean }
   | { type: 'SET_SHOW_QUIT_CONFIRM'; payload: boolean }
 
   // Toast feedback
@@ -109,8 +103,6 @@ export function createInitialState(): SurvivalReducerState {
     // UI state
     formedWord: '',
     letterCount: 0,
-    showShop: false,
-    showShopHint: false,
     showQuitConfirm: false,
 
     // Feedback/notifications
@@ -170,13 +162,16 @@ export function survivalGameReducer(
       };
 
     // Word discovery
-    case 'DISCOVER_WORD':
+    case 'DISCOVER_WORD': {
+      const { discovery } = action.payload;
+      if (state.discoveredWords.some(w => w.word === discovery.word)) return state;
       return {
         ...state,
-        discoveredWords: [...state.discoveredWords, action.payload.discovery],
-        lifePoints: action.payload.newLife,
-        clueTokens: state.clueTokens + action.payload.discovery.tokensGained,
+        discoveredWords: [...state.discoveredWords, discovery],
+        lifePoints: Math.min(INITIAL_LIFE, state.lifePoints + discovery.lifeGained),
+        clueTokens: state.clueTokens + discovery.tokensGained,
       };
+    }
 
     // Target attempts
     case 'ADD_ATTEMPT':
@@ -194,13 +189,6 @@ export function survivalGameReducer(
           : state.latestAttemptFeedback,
       };
 
-    // Tokens
-    case 'ADJUST_TOKENS':
-      return {
-        ...state,
-        clueTokens: Math.max(0, state.clueTokens + action.payload.delta),
-      };
-
     // UI state
     case 'SET_FORMED_WORD':
       return {
@@ -208,12 +196,6 @@ export function survivalGameReducer(
         formedWord: action.payload.word,
         letterCount: action.payload.count,
       };
-
-    case 'SET_SHOW_SHOP':
-      return { ...state, showShop: action.payload };
-
-    case 'SET_SHOW_SHOP_HINT':
-      return { ...state, showShopHint: action.payload };
 
     case 'SET_SHOW_QUIT_CONFIRM':
       return { ...state, showQuitConfirm: action.payload };

@@ -11,7 +11,7 @@ interface ConnectionsLeaderboardProps {
   ownRank: number | null;
   totalPlayers: number;
   /** The caller's current daily streak (for the header badge). */
-  streak: number;
+  streak?: number;
   loading: boolean;
 }
 
@@ -33,7 +33,7 @@ export default function ConnectionsLeaderboard({
   rows,
   ownRank,
   totalPlayers,
-  streak,
+  streak = 0,
   loading,
 }: ConnectionsLeaderboardProps) {
   const { t } = useLanguage();

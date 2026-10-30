@@ -105,7 +105,7 @@ describe('tutorialGate', () => {
   });
 
   it('Given a result already stored for today, Then it never auto-shows', () => {
-    window.localStorage.setItem(dailyResultKey('2026-10-27', 'en'), '{"kind":"regular"}');
+    window.localStorage.setItem(dailyResultKey('2026-10-27'), '{"kind":"regular"}');
     expect(shouldAutoShowTutorial('2026-10-27', 'en')).toBe(false);
   });
 

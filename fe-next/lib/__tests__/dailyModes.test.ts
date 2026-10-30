@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   DAILY_MODES,
-  visibleDailyModes,
+  requiredDailyModes,
   dailyModeHref,
   type DailyModeDef,
 } from '@/lib/dailyModes';
@@ -15,22 +15,17 @@ describe('dailyModes registry', () => {
     expect(ids).toContain('connections');
   });
 
-  it('ships every daily mode PUBLIC (no admin gate left in the registry)', () => {
-    for (const mode of DAILY_MODES) {
-      expect(mode.adminOnly, `${mode.id} should be public`).toBe(false);
-    }
+  it('requires Word Wheel and Word Hunt to clear the day; the rest are bonus', () => {
+    expect(requiredDailyModes(DAILY_MODES).map((m) => m.id)).toEqual(['word-wheel', 'word-hunt']);
   });
 
-  it('shows all modes to non-admins and admins alike', () => {
-    const publicIds = visibleDailyModes(false).map((m) => m.id);
-    expect(publicIds).toEqual(DAILY_MODES.map((m) => m.id));
-    expect(visibleDailyModes(true).map((m) => m.id)).toEqual(publicIds);
+  it('marks the timed modes (the hub labels them Timed / No timer)', () => {
+    expect(DAILY_MODES.filter((m) => m.timed).map((m) => m.id)).toEqual(['word-wheel', 'word-hunt']);
   });
 
   it('registers Connections as a PUBLIC daily card pointing at the variant-aware daily route', () => {
     const connections = DAILY_MODES.find((m) => m.id === 'connections')!;
     expect(connections).toBeDefined();
-    expect(connections.adminOnly).toBe(false);
     expect(connections.path).toBe('/connections/daily');
     expect(connections.accent).toBe('purple');
     expect(dailyModeHref(connections, 'he')).toBe('/he/connections/daily');

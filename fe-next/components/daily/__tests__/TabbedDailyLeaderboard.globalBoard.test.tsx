@@ -132,10 +132,9 @@ beforeEach(() => {
 describe('TabbedDailyLeaderboard — cross-language board', () => {
   it('asks the server for the all-language board by default, not the UI locale', async () => {
     const calls = installFetch(() => null);
-    render(<TabbedDailyLeaderboard puzzleDate="2026-09-07" language="en" t={t} />);
+    render(<TabbedDailyLeaderboard scope="word-hunt" puzzleDate="2026-09-07" language="en" t={t} />);
     await waitFor(() => {
       expect(calls.some(u => u.includes('/word-hunt/leaderboard/2026-09-07/all'))).toBe(true);
-      expect(calls.some(u => u.includes('/word-wheel/leaderboard/2026-09-07/all'))).toBe(true);
     });
     expect(calls.some(u => u.includes('/leaderboard/2026-09-07/en'))).toBe(false);
   });
@@ -144,7 +143,7 @@ describe('TabbedDailyLeaderboard — cross-language board', () => {
     installFetch(url => url.includes('/word-hunt/leaderboard')
       ? { data: [participant({ player_id: 'me', display_name: 'Fish', language: 'he', solved: true, attempts_used: 3, efficiency_score: 967 })], totalPlayers: 1, totalSolved: 1, guestPlayerCount: 0 }
       : null);
-    render(<TabbedDailyLeaderboard puzzleDate="2026-09-07" language="en" currentPlayerId="me" t={t} />);
+    render(<TabbedDailyLeaderboard scope="word-hunt" puzzleDate="2026-09-07" language="en" currentPlayerId="me" t={t} />);
     expect(await screen.findByText('Fish')).toBeInTheDocument();
     expect(screen.getByText('YOU')).toBeInTheDocument();
   });
@@ -152,7 +151,7 @@ describe('TabbedDailyLeaderboard — cross-language board', () => {
     installFetch(url => url.includes('/word-hunt/leaderboard')
       ? { data: [participant({ player_id: 'a', display_name: 'Aviv', language: 'he', solved: false, attempts_used: 4, efficiency_score: 0 })], totalPlayers: 1, totalSolved: 0 }
       : null);
-    render(<TabbedDailyLeaderboard puzzleDate="2026-09-07" language="en" currentPlayerId="me" t={t} />);
+    render(<TabbedDailyLeaderboard scope="word-hunt" puzzleDate="2026-09-07" language="en" currentPlayerId="me" t={t} />);
     expect(await screen.findByText('Aviv')).toBeInTheDocument();
     expect(screen.getByText(/✗ 4\/10/)).toBeInTheDocument();
     expect(screen.queryByText('X/10')).not.toBeInTheDocument();
@@ -163,7 +162,7 @@ describe('TabbedDailyLeaderboard — cross-language board', () => {
     installFetch(url => url.includes('/word-hunt/leaderboard')
       ? { data: [participant({ player_id: 'a', display_name: 'Aviv', language: 'he' }), participant({ player_id: 'b', display_name: 'Bo', language: 'sv', rank_position: 2 })], totalPlayers: 2, totalSolved: 2 }
       : null);
-    render(<TabbedDailyLeaderboard puzzleDate="2026-09-07" language="en" t={t} />);
+    render(<TabbedDailyLeaderboard scope="word-hunt" puzzleDate="2026-09-07" language="en" t={t} />);
     await screen.findByText('Aviv');
     const chips = screen.getAllByTestId('row-language');
     expect(chips.map(c => c.getAttribute('data-language'))).toEqual(['he', 'sv']);
@@ -178,7 +177,7 @@ describe('TabbedDailyLeaderboard — cross-language board', () => {
           participant({ player_id: 'd', display_name: 'D', country_code: null, rank_position: 4 }),
         ], totalPlayers: 4, totalSolved: 4 }
       : null);
-    render(<TabbedDailyLeaderboard puzzleDate="2026-09-07" language="en" t={t} />);
+    render(<TabbedDailyLeaderboard scope="word-hunt" puzzleDate="2026-09-07" language="en" t={t} />);
     expect(await screen.findByText('2 countries')).toBeInTheDocument();
     const strip = screen.getByTestId('countries-strip');
     expect(strip.textContent).toContain('flag:IL');
@@ -187,7 +186,7 @@ describe('TabbedDailyLeaderboard — cross-language board', () => {
 
   it('narrows to the player’s language on request and remembers the choice', async () => {
     const calls = installFetch(() => null);
-    render(<TabbedDailyLeaderboard puzzleDate="2026-09-07" language="he" t={t} />);
+    render(<TabbedDailyLeaderboard scope="word-hunt" puzzleDate="2026-09-07" language="he" t={t} />);
     await waitFor(() => expect(calls.some(u => u.includes('/word-hunt/leaderboard/2026-09-07/all'))).toBe(true));
 
     fireEvent.click(screen.getByRole('button', { name: /All languages/ }));
@@ -221,7 +220,7 @@ describe('TabbedDailyLeaderboard — cross-language board', () => {
         ? { data: [participant({ player_id: 'a', display_name: 'Ada', rank_position: 1 }), participant({ player_id: 'b', display_name: 'Ben', rank_position: 2, score: 90 })], totalPlayers: 2, totalSolved: 2 }
         : { data: [participant({ player_id: 'b', display_name: 'Ben', rank_position: 1, score: 150 }), participant({ player_id: 'a', display_name: 'Ada', rank_position: 2 }), participant({ player_id: 'c', display_name: 'Cy', rank_position: 3, score: 10 })], totalPlayers: 3, totalSolved: 3 };
     });
-    render(<TabbedDailyLeaderboard puzzleDate="2026-09-07" language="en" t={t} />);
+    render(<TabbedDailyLeaderboard scope="word-hunt" puzzleDate="2026-09-07" language="en" t={t} />);
     await screen.findByText('Ada');
     expect(screen.queryByLabelText('Up 1')).not.toBeInTheDocument();
 

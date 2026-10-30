@@ -22,9 +22,13 @@ interface WordWheelWordLineProps {
   /** A released word still waiting on the server; the wheel is already clear for the next swipe. */
   pendingWord?: string | null;
   shake: boolean;
-  feedback: { message: string; type: 'success' | 'error' } | null;
+  feedback: { message: string; type: 'success' | 'error' | 'warn' } | null;
   acceptedWord: string | null;
   acceptedPoints?: number | null;
+  /** Combo multiplier the accepted word scored at (shown when above 1). */
+  acceptedMultiplier?: number | null;
+  /** The accepted word used the gold letter. */
+  acceptedGold?: boolean;
   acceptedId: number;
   reducedMotion?: boolean;
   /** How-to line beside the caret; only before the player's first word. */
@@ -59,7 +63,7 @@ function PendingLetter({ letter, reducedMotion }: { letter: string; reducedMotio
 
 export default function WordWheelWordLine({
   t, letters, centerLetter, allLetters, dir, onRemove, onSubmit, isValidating, pendingWord = null, shake, feedback,
-  acceptedWord, acceptedPoints, acceptedId, reducedMotion = false, hint = false, pending = null,
+  acceptedWord, acceptedPoints, acceptedMultiplier = null, acceptedGold = false, acceptedId, reducedMotion = false, hint = false, pending = null,
   celebrating = false, banner, live = null, className,
 }: WordWheelWordLineProps) {
   const word = letters.map(l => l.letter).join('');
@@ -107,12 +111,31 @@ export default function WordWheelWordLine({
                 >
                   {t(`wordWheel.praise.${praiseFor(accepted, fullWheel)}`)}
                 </span>
-                <span className="-ms-1.5 px-2.5 py-1 rounded-full border-[3px] border-neo-black bg-neo-lime text-neo-black font-neo-display font-black text-base tabular-nums shadow-[3px_3px_0_#000]">
+                <span
+                  data-testid="accepted-points"
+                  className={cn(
+                    '-ms-1.5 px-2.5 py-1 rounded-full border-[3px] border-neo-black text-neo-black font-neo-display font-black text-base tabular-nums shadow-[3px_3px_0_#000]',
+                    acceptedGold ? 'bg-neo-yellow' : 'bg-neo-lime',
+                  )}
+                >
+                  {acceptedGold && <span aria-hidden className="me-0.5">★</span>}
                   +{acceptedPoints ?? scoreWord(accepted)}
                 </span>
+                {acceptedMultiplier != null && acceptedMultiplier > 1 && (
+                  <span
+                    data-testid="accepted-multiplier"
+                    className="-ms-1.5 px-2 py-1 rounded-full border-[3px] border-neo-black bg-neo-pink text-neo-white font-neo-display font-black text-sm tabular-nums shadow-[3px_3px_0_#000]"
+                  >
+                    ×{acceptedMultiplier}
+                  </span>
+                )}
               </>
             ) : isError ? (
               <span className="px-3.5 py-1 rounded-full border-[3px] border-neo-black bg-neo-red text-neo-white font-bold text-sm shadow-[3px_3px_0_#000]">
+                {feedback.message}
+              </span>
+            ) : feedback.type === 'warn' ? (
+              <span className="px-3.5 py-1 rounded-full border-[3px] border-neo-black bg-neo-orange text-neo-black font-bold text-sm shadow-[3px_3px_0_#000]">
                 {feedback.message}
               </span>
             ) : (

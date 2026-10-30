@@ -156,8 +156,8 @@ export default async function DailyLayout({ children, params }: DailyLayoutProps
   // This helps search engines understand the time-sensitive nature of the content
   const today = new Date();
   const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  tomorrow.setHours(0, 0, 0, 0);
+  tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+  tomorrow.setUTCHours(0, 0, 0, 0);
 
   // VideoGame + WebApplication multi-typed entity for the daily challenge.
   // Multi-typing lets Google index the same node under both spaces (game discovery + app discovery).

@@ -11,6 +11,12 @@ interface DailyFlowChromeProps {
   modeId: DailyModeId;
   /** Show the opening animation (word wheel has its own ready card, so it opts out). */
   intro?: boolean;
+  /**
+   * Host has not decided yet whether its first-visit tutorial auto-shows: hold
+   * the intro decision until this goes false. The value of `intro` at that
+   * moment is final (pass `intro={false}` when the tutorial auto-shows).
+   */
+  introDeferred?: boolean;
   /** Show the floating "back to daily" pill (modes with their own back control opt out). */
   backLink?: boolean;
   /** Render the nav in normal flow (above the game) instead of floating over it. */
@@ -30,7 +36,7 @@ const introKey = (id: DailyModeId) => `lc:daily-intro:${id}:${new Date().toISOSt
  *  - an always-available "back to daily" pill, plus "skip" for optional modes,
  *    so the player can return to the daily hub from any challenge.
  */
-export function DailyFlowChrome({ modeId, intro = true, backLink = true, inline = false, skip = true }: DailyFlowChromeProps) {
+export function DailyFlowChrome({ modeId, intro = true, introDeferred = false, backLink = true, inline = false, skip = true }: DailyFlowChromeProps) {
   const { t, language } = useLanguage();
   const index = DAILY_MODES.findIndex((md) => md.id === modeId);
   const mode = DAILY_MODES[index];
@@ -44,14 +50,15 @@ export function DailyFlowChrome({ modeId, intro = true, backLink = true, inline 
   // let the game paint first and the overlay pop over it a frame later; a
   // layout effect decides before the browser paints (client navigation).
   useLayoutEffect(() => {
-    if (!intro || !mode || decidedRef.current) return;
+    if (introDeferred || !mode || decidedRef.current) return;
     decidedRef.current = true;
+    if (!intro) return;
     let seen = false;
     try { seen = sessionStorage.getItem(introKey(modeId)) === '1'; } catch { /* storage off */ }
     if (seen) return;
     setShowIntro(true);
     try { sessionStorage.setItem(introKey(modeId), '1'); } catch { /* storage off */ }
-  }, [intro, mode, modeId]);
+  }, [intro, introDeferred, mode, modeId]);
 
   useLayoutEffect(() => {
     if (!showIntro) return;

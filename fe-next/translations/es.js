@@ -9660,7 +9660,45 @@ const es = {
     "streak": {
       "freeze_toast_no_remaining": "Congelación de racha usada: {day} guardado · sin congelaciones"
     },
-"practiceBoard": "Tablero de práctica"
+"practiceBoard": "Tablero de práctica",
+"hub": { "intro": "Cada día, un nuevo set de acertijos de palabras, el mismo para todos. Termina los dos primeros y el día queda completo.",
+"resetsAt": "Nuevos acertijos a las {time}, tu hora.",
+"newcomerTip": "¿Primera vez? Empieza con {mode}. Te lleva unos 2 minutos.",
+"dismissTip": "Entendido",
+"bonusTag": "Extra",
+"play": "Jugar",
+"timed": "Contrarreloj",
+"noTimer": "Sin reloj",
+"progressLabel": "Progreso de hoy",
+"requiredDone": "¡Listos los dos de hoy! Los acertijos extra son opcionales.",
+"pastPuzzles": "¿Te perdiste un día? Acertijos anteriores"
+},
+"archivePage": { "backToHub": "Volver a los retos de hoy",
+"title": "Acertijos anteriores",
+"subtitle": "Todas las Cazas de Palabras diarias hasta ahora y cómo les fue a los jugadores. ¿Te perdiste una en los últimos 3 días? Todavía puedes jugarla.",
+"count": "{n} acertijos",
+"view": "Ver",
+"backToArchive": "Acertijos anteriores",
+"notFound": "No encontramos este acertijo",
+"previous": "Acertijo anterior",
+"next": "Siguiente acertijo",
+"puzzleTitle": "Acertijo #{n}",
+"players": "Jugadores",
+"solveRate": "Tasa de acierto",
+"solved": "Resueltos",
+"avgTries": "Intentos (media)",
+"noStats": "Aún no hay datos de este acertijo.",
+"distribution": "Intentos hasta resolverlo",
+"playToday": "Jugar los retos de hoy",
+"playThisDay": "Jugar la Caza de Palabras de ese día"
+},
+"leaderboard": { "scoreExplainer": "Puntos de todos los puzles de hoy, sumados.",
+"youRank": "Tú: #{rank} de {total}",
+"topPercent": "Top {percent}%",
+"inviteFriend": "Invita a un amigo",
+"inviteText": "¿Crees que puedes ganarme en los puzles de hoy de LexiClash?",
+"linkCopied": "¡Enlace copiado!"
+}
 },
   "dailyWordWheelLanding": {
     "hero": {
@@ -9828,8 +9866,12 @@ const es = {
       "perfectBanner": "¡Mago de palabras!",
       "onlyYouFound": "Solo tú lo encontraste. ¡Por ahora!",
       "rareFind": "Hallazgo raro · solo {count} lo encontraron",
-      "streakChip": "Racha de {count} días"
-    },
+      "streakChip": "Racha de {count} días",
+"breakdownBase": "Palabras",
+"breakdownCombo": "Combo",
+"breakdownGold": "Oro",
+"goldCoins": "+{count} monedas por palabras doradas"
+},
     "signup": {
       "streakTitle": "Protege tu racha de {count} días",
       "boardTitle": "Reclama tu lugar en la tabla",
@@ -9862,7 +9904,15 @@ const es = {
 "accepted": "¡{word}! Eso es. Ahora juega la rueda de hoy",
 "notWord": "Esa no vale. Prueba {word}",
 "check": "Comprobar"
-}
+},
+"cantCheck": "No pudimos comprobar la palabra. Inténtalo de nuevo",
+"quitKeepsWords": "Las palabras que llevas encontradas contarán como tu resultado de hoy.",
+"goldLetterLabel": "letra dorada",
+"comboLabel": "Combo {value}",
+"comboLost": "Combo perdido",
+"longerWordsTip": "Las palabras largas valen mucho más: 3 letras = {short}, 7 letras = {long}",
+"comboTip": "Encuentra palabras seguidas para armar un combo, hasta ×2 puntos.",
+"goldTip": "Hoy hay una letra dorada: las palabras con ella valen +50 % y dan monedas."
 },
   "dailyChallenge": {
     "pointsPerWord": "Puntos por palabra"
@@ -17763,8 +17813,9 @@ const es = {
       "step1": "Encuentra la palabra oculta",
       "step2": "Forma palabras para ver pistas",
       "step3": "Las palabras cortas no gastan intentos",
-      "scoreTip": "¡Aciértala primero y gana más!"
-    },
+      "scoreTip": "¡Aciértala primero y gana más!",
+"step3v2": "Las palabras cortas son gratis. Las de largo completo gastan un intento."
+},
     "wheelRush": {
       "title": "Rueda y juega",
       "step1": "La letra del centro va en todo",
@@ -19730,7 +19781,10 @@ const es = {
         "silver": "Plata: ¡casi!",
         "bronze": "Bronce: buen intento"
       },
-"missesLabel": "fallos"
+"missesLabel": "fallos",
+"scoreNotSaved": "Tu puntuación no se guardó.",
+"retrySave": "Reintentar",
+"skipStuck": "¿Atascado? Salta esta"
 },
     "community": {
       "title": "Acertijos de la comunidad",

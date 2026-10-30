@@ -27,6 +27,8 @@ interface PuzzleCardProps {
   onNext: () => void;
   /** Pyramid stages pass false — their onRate is a no-op, so the CTAs were dead noise. */
   showRating?: boolean;
+  /** Daily only: after this many misses, a free skip when no ad reveal is available. */
+  skipAfterMisses?: number;
 }
 
 const CARD_SPRING = { type: 'spring' as const, stiffness: 320, damping: 26 };
@@ -57,6 +59,7 @@ export default function PuzzleCard({
   onRate,
   onNext,
   showRating = true,
+  skipAfterMisses,
 }: PuzzleCardProps) {
   const { t, language } = useLanguage();
   const isRTL = language === 'he';
@@ -270,6 +273,7 @@ export default function PuzzleCard({
             isDisabled={isDisabled}
             onGiveUp={onGiveUp}
             onRevealHint={onRevealHint}
+            skipAfterMisses={skipAfterMisses}
           />
 
           {isResolved && (

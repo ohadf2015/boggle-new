@@ -39,6 +39,19 @@ vi.mock('@/hooks/useDailyChallengeStatus', () => ({
 }));
 
 // Stub heavy/animated children
+const playedStatus = vi.hoisted(() => ({ hasPlayedBefore: true }));
+vi.mock('@/hooks/useDailyPlayedStatus', () => ({
+  useDailyPlayedStatus: () => ({
+    loading: false,
+    hasPlayedBefore: playedStatus.hasPlayedBefore,
+    today: { wordHunt: false, wordWheel: false, wordTower: false, connections: false },
+    streak: { current: 2, longest: 2 },
+    allCompletedDates: ['2026-10-29'],
+    freezeCount: 0,
+    fromServer: true,
+    refresh: vi.fn(),
+  }),
+}));
 vi.mock('@/components/daily/WeeklyChestCard', () => ({
   __esModule: true,
   default: () => <div data-testid="weekly-chest-card-stub" />,
@@ -78,13 +91,23 @@ const props = {
 };
 
 describe('DailyChallengeLanding weekly chest wiring', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    playedStatus.hasPlayedBefore = true;
+  });
 
-  it('renders chest slot when user is authed', () => {
+  it('renders chest slot when user is authed', async () => {
     mockUseAuth.mockReturnValue({ user: { id: 'u1' } });
     render(<DailyChallengeLanding {...props} />);
     expect(screen.getByTestId('weekly-chest-slot')).toBeTruthy();
-    expect(screen.getByTestId('weekly-chest-card-stub')).toBeTruthy();
+    expect(await screen.findByTestId('weekly-chest-card-stub')).toBeTruthy();
+  });
+
+  it('given a signed-in player who has never finished a daily, then no chest yet', () => {
+    playedStatus.hasPlayedBefore = false;
+    mockUseAuth.mockReturnValue({ user: { id: 'u1' } });
+    render(<DailyChallengeLanding {...props} />);
+    expect(screen.queryByTestId('weekly-chest-slot')).toBeNull();
   });
 
   it('does not render chest slot for guest', () => {

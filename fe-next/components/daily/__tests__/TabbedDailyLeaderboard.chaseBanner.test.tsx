@@ -71,7 +71,7 @@ const board = [
 beforeEach(() => {
   global.fetch = vi.fn().mockResolvedValue({
     ok: true,
-    json: async () => ({ data: board, totalPlayers: 6, totalSolved: 2, guestPlayerCount: 0 }),
+    json: async () => ({ data: board, totalParticipants: 6, totalSolved: 2, guestPlayerCount: 0 }),
   }) as unknown as typeof fetch;
 });
 
@@ -82,7 +82,7 @@ afterEach(() => {
 describe('TabbedDailyLeaderboard — chase banner wiring', () => {
   it('renders the chase banner for the player on the today tab', async () => {
     render(
-      <TabbedDailyLeaderboard
+      <TabbedDailyLeaderboard scope="word-wheel"
         puzzleDate="2026-08-01"
         language="en"
         currentPlayerId="me"
@@ -102,7 +102,7 @@ describe('TabbedDailyLeaderboard — chase banner wiring', () => {
 
   it('uses the fetched board total, not the number of rows returned', async () => {
     render(
-      <TabbedDailyLeaderboard
+      <TabbedDailyLeaderboard scope="word-wheel"
         puzzleDate="2026-08-01"
         language="en"
         currentPlayerId="me"
@@ -118,7 +118,7 @@ describe('TabbedDailyLeaderboard — chase banner wiring', () => {
 
   it('shows nothing for a viewer who is not on the board', async () => {
     render(
-      <TabbedDailyLeaderboard
+      <TabbedDailyLeaderboard scope="word-wheel"
         puzzleDate="2026-08-01"
         language="en"
         currentPlayerId="a-stranger"

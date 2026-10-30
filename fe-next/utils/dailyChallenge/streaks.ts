@@ -30,8 +30,8 @@ export function updateDailyStreak(completionDate?: string): DailyStreak {
   const previousDay = getPreviousDate(today);
   const current = getDailyStreak();
 
-  // Already played today - no update needed
-  if (current.lastPlayedDate === today) {
+  // Same day, or a catch-up for an older day: neither may rewind the streak.
+  if (current.lastPlayedDate && today <= current.lastPlayedDate) {
     return current;
   }
 

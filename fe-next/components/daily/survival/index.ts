@@ -23,7 +23,6 @@ export type {
   TargetAttempt,
   SurvivalGameResult,
   AccumulatedClue,
-  ScoreEvent,
   AutoClueNotificationData,
 } from './types';
 
@@ -34,10 +33,7 @@ export {
   LIFE_DRAIN_RATE,
   INVALID_WORD_PENALTY,
   NOT_IN_DICTIONARY_PENALTY,
-  HALF_LIFE_THRESHOLD,
-  MIN_TOKENS_FOR_HINT,
   FEEDBACK_OVERLAY_DURATION,
-  SHOP_HINT_DISMISS_DELAY,
 } from './constants';
 
 // Hooks
@@ -70,7 +66,7 @@ export { AutoClueNotification } from './AutoClueNotification';
 export type { AutoClueNotificationProps } from './AutoClueNotification';
 
 export { useLiveScoreTracker } from './useLiveScoreTracker';
-export type { LiveScoreState, LiveScoreActions, UseLiveScoreTrackerProps } from './useLiveScoreTracker';
+export type { LiveScoreState, UseLiveScoreTrackerProps } from './useLiveScoreTracker';
 
 export { SurvivalLiveRanks } from './SurvivalLiveRanks';
 export type { SurvivalLiveRanksProps } from './SurvivalLiveRanks';

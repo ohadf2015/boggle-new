@@ -12,7 +12,7 @@
  * drives the real HTTP route and asserts the seam was invoked.
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import express from 'express';
 import request from 'supertest';
 
@@ -65,7 +65,16 @@ vi.mock('../../../modules/supabaseServer', () => ({
   getSupabase: () => makeSupabaseStub(),
 }));
 
+vi.mock('../resolveDailyPlayer', () => ({
+  resolveDailyPlayer: async (_req: unknown, id: string | undefined) => ({ ok: true, playerId: id ?? null }),
+}));
+
 import wordWheelRoutes from '../wordWheelRoutes';
+import { generateWordWheelPuzzle } from '../../../../utils/dailyChallenge/wordWheelGeneration';
+
+const PUZZLE = generateWordWheelPuzzle('2026-05-18', 'en');
+const [C, O] = [PUZZLE.centerLetter, PUZZLE.outerLetters];
+const WORDS = [`${C}${O[0]}${O[1]}`, `${C}${O[0]}${O[1]}${O[2]}${O[3]}${O[4]}`, `${O[2]}${O[3]}${C}`];
 
 function makeApp() {
   const app = express();
@@ -84,14 +93,17 @@ const submission = {
   playerId: 'player-1',
   score: 64,
   wordCount: 3,
-  wordsFound: ['CAT', 'BRIDGE', 'TRAIN'],
-  longestWord: 'BRIDGE',
+  wordsFound: WORDS,
+  longestWord: WORDS[1],
   timeSeconds: 120,
   centerLetter: 'R',
 };
 
 describe('POST /submit — daily quest credit', () => {
+  afterEach(() => vi.useRealTimers());
   beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-05-18T12:00:00Z'));
     completeDailyQuestsForResult.mockClear();
     updateQuestProgress.mockClear();
   });
@@ -109,7 +121,7 @@ describe('POST /submit — daily quest credit', () => {
       mode: 'word-wheel',
       score: 64,
       wordsFound: 3,
-      longestWordLength: 6, // BRIDGE
+      longestWordLength: 6,
     });
   });
 

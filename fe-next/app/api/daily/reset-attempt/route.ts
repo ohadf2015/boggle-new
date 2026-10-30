@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import logger from '@/utils/logger';
-import { createClient } from '@/utils/supabase/server';
+import { getAuthedUser } from '@/lib/auth/getAuthedUser';
+import { getSupabaseAdmin } from '@/lib/admin/server';
 
 /**
  * POST /api/daily/reset-attempt
@@ -51,7 +52,22 @@ export async function POST(request: Request) {
       );
     }
 
-    const supabase = await createClient();
+    // A playerId is only honoured for the signed-in player themselves; guests are keyed by fingerprint.
+    if (playerId) {
+      const user = await getAuthedUser(request);
+      if (!user) {
+        return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+      }
+      if (user.id !== playerId) {
+        return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
+      }
+    }
+
+    // Service role: the attempts tables grant UPDATE to service_role only, so the cookie client silently matched 0 rows.
+    const supabase = getSupabaseAdmin();
+    if (!supabase) {
+      return NextResponse.json({ success: false, error: 'Service unavailable' }, { status: 503 });
+    }
 
     // Build query to increment extra_tries instead of deleting
     let query = supabase
@@ -83,16 +99,25 @@ export async function POST(request: Request) {
 
     const newExtraTries = (existing.extra_tries || 0) + 1;
 
-    const { error: updateError } = await supabase
+    const { data: updatedRows, error: updateError } = await supabase
       .from('daily_word_hunt_attempts')
       .update({ extra_tries: newExtraTries })
-      .eq('id', existing.id);
+      .eq('id', existing.id)
+      .select('id');
 
     if (updateError) {
       logger.error('Failed to increment extra_tries:', updateError.message);
       return NextResponse.json(
         { success: false, error: 'Failed to reset attempt' },
         { status: 500 }
+      );
+    }
+
+    if (!updatedRows || updatedRows.length === 0) {
+      logger.error('Reset attempt matched no row for attempt', existing.id);
+      return NextResponse.json(
+        { success: false, error: 'Attempt not updated' },
+        { status: 409 }
       );
     }
 

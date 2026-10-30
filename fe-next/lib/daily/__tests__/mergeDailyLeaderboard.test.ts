@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import {
   mergeDailyLeaderboard,
+  rankDailyBoard,
+  viewDailyBoard,
   towerPoints,
   TOWER_METRES_TO_POINTS,
   type MergeInput,
@@ -141,6 +143,71 @@ describe('mergeDailyLeaderboard', () => {
     it('still returns no identifier for the caller\'s row', () => {
       const [, , mine] = mergeDailyLeaderboard(board, 2, { you: 'u:zz-me-uuid' });
       expect(JSON.stringify(mine)).not.toContain('zz-me-uuid');
+    });
+  });
+
+  describe('deterministic ties', () => {
+    it('on equal total and modes, whoever finished first ranks higher, whatever the row order', () => {
+      const late = { player_id: 'late', display_name: 'Late', value: 500, completed_at: '2026-10-30T10:00:00Z' };
+      const early = { player_id: 'early', display_name: 'Early', value: 500, completed_at: '2026-10-30T08:00:00Z' };
+      const a = mergeDailyLeaderboard([{ mode: 'word-hunt', rows: [late, early] }]);
+      const b = mergeDailyLeaderboard([{ mode: 'word-hunt', rows: [early, late] }]);
+      expect(a.map((e) => e.name)).toEqual(['Early', 'Late']);
+      expect(b.map((e) => e.name)).toEqual(['Early', 'Late']);
+    });
+
+    it('with no completion time either, still orders the same way on every poll', () => {
+      const x = { player_id: 'x', display_name: 'X', value: 10 };
+      const y = { player_id: 'y', display_name: 'Y', value: 10 };
+      expect(mergeDailyLeaderboard([{ mode: 'word-hunt', rows: [y, x] }]).map((e) => e.name))
+        .toEqual(mergeDailyLeaderboard([{ mode: 'word-hunt', rows: [x, y] }]).map((e) => e.name));
+    });
+  });
+
+  describe('who belongs on the board', () => {
+    it('leaves out players whose total is 0', () => {
+      const rows = mergeDailyLeaderboard([{ mode: 'word-hunt', rows: [hunt('a', 0, 'Zero'), hunt('b', 5, 'Five')] }]);
+      expect(rows.map((e) => e.name)).toEqual(['Five']);
+    });
+
+    it('leaves out excluded (test) accounts and ranks the rest without a gap', () => {
+      const ranked = rankDailyBoard(
+        [{ mode: 'word-hunt', rows: [hunt('qa', 999, 'QA'), hunt('real', 10, 'Real')] }],
+        { excludePlayerIds: new Set(['qa']) },
+      );
+      expect(ranked.map((e) => [e.name, e.rank])).toEqual([['Real', 1]]);
+    });
+  });
+
+  describe('viewDailyBoard', () => {
+    const ranked = rankDailyBoard([
+      { mode: 'word-hunt', rows: [hunt('p1', 900, 'One'), hunt('p2', 800, 'Two'), hunt('p3', 700, 'Three'), hunt('fr', 100, 'Friend'), hunt('me', 50, 'Me')] },
+      { mode: 'word-wheel', rows: [{ player_id: 'p1', display_name: 'One', value: 1, country_code: 'IL' }] },
+    ]);
+
+    it('reports how many ranked players there are, beyond the slice it returns', () => {
+      expect(viewDailyBoard(ranked, { limit: 2 }).total).toBe(5);
+    });
+
+    it('marks friends and brings a friend below the cut along with their true rank', () => {
+      const { data } = viewDailyBoard(ranked, { limit: 2, you: 'u:me', friendIds: new Set(['u:fr']) });
+      expect(data.map((e) => e.rank)).toEqual([1, 2, 4, 5]);
+      expect(data.find((e) => e.rank === 4)?.isFriend).toBe(true);
+      expect(data.find((e) => e.rank === 5)?.isYou).toBe(true);
+    });
+
+    it('gives every row an opaque key that is stable and carries no identifier', () => {
+      const keyOf = (id: string) => `k${Array.from(id, (c) => c.charCodeAt(0)).join('.')}`;
+      const one = viewDailyBoard(ranked, { limit: 5, keyOf }).data;
+      const two = viewDailyBoard(ranked, { limit: 5, keyOf }).data;
+      expect(one.map((e) => e.key)).toEqual(two.map((e) => e.key));
+      expect(new Set(one.map((e) => e.key)).size).toBe(5);
+      const serialized = JSON.stringify(one);
+      for (const id of ['p1', 'p2', 'p3', 'fr', 'me']) expect(serialized).not.toContain(`u:${id}`);
+    });
+
+    it('lists the countries on the board, most represented first', () => {
+      expect(viewDailyBoard(ranked, { limit: 1 }).countries).toEqual(['IL']);
     });
   });
 });

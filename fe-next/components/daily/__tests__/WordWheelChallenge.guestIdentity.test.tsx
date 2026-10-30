@@ -82,7 +82,8 @@ vi.mock('@/utils/dailyChallenge/guestPlayer', () => ({
   getGuestDailyPlayer: () => Promise.resolve({ displayName: 'Curious Otter', avatarEmoji: '🦦', avatarColor: '#123456' }),
 }));
 vi.mock('@/utils/dailyChallenge/wordWheelGeneration', () => ({
-  generateWordWheelPuzzle: () => ({
+  generateWordWheelPuzzle: (date?: string) => ({
+    puzzleDate: date, puzzleNumber: 42, language: 'en',
     centerLetter: 'A',
     outerLetters: ['B', 'C', 'D', 'E', 'F', 'G'],
     validWords: [],

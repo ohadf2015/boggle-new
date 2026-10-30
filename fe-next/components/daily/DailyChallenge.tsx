@@ -39,6 +39,7 @@ import { neoErrorToast } from '@/components/NeoToast';
 import { trackDailyPuzzle, trackFeatureFirstUse } from '@/utils/growthTracking';
 import { useWordHuntCompletion } from './survival/useWordHuntCompletion';
 import { useWordHuntPuzzleInit } from './survival/useWordHuntPuzzleInit';
+import { markWordHuntRunStarted, clearWordHuntRunStarted } from './survival/runStartedMarker';
 import { COACH_VERSION, hasSeenCoach, markCoachSeen } from '@/lib/tutorial/modeCoachStore';
 import { useDailyChallengeUrlParams } from './useDailyChallengeUrlParams';
 import { isCatchUpDate, shouldGateCatchUpBehindAd } from '@/utils/dailyChallenge/catchUp';
@@ -341,6 +342,11 @@ const DailyChallenge: React.FC = () => {
     handleStartGame();
   }, [phase, isPractice, isCatchup, challengeData, puzzleNumber, gameLanguage, handleStartGame]);
 
+  // A reload or app kill mid-run is then treated like a confirmed quit on the next load.
+  useEffect(() => {
+    if (phase === 'playing' && !isPractice && !isCatchup && puzzleDate) markWordHuntRunStarted(gameLanguage, puzzleDate);
+  }, [phase, isPractice, isCatchup, puzzleDate, gameLanguage]);
+
   const showResults = useCallback(() => setPhase('completed'), []);
   const handleGameComplete = useWordHuntCompletion({
     isPractice, isCatchup, puzzleNumber, puzzleDate, gameLanguage, meaning, extraTries, isAuthenticated,
@@ -367,7 +373,10 @@ const DailyChallenge: React.FC = () => {
   // Mid-game exit: record a forfeit (no result saved) so re-entry is ad-gated,
   // then leave. Practice runs are exempt.
   const handleQuitMidGame = useCallback(() => {
-    if (!isPractice) markWordHuntForfeitToday(gameLanguage);
+    if (!isPractice) {
+      markWordHuntForfeitToday(gameLanguage);
+      clearWordHuntRunStarted(gameLanguage);
+    }
     router.push(`/${language}/daily`);
   }, [isPractice, gameLanguage, router, language]);
 

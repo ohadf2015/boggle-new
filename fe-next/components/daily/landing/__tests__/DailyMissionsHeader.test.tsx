@@ -40,26 +40,34 @@ describe('DailyMissionsHeader', () => {
     expect(progressBar).toHaveAttribute('aria-valuenow', '0');
   });
 
-  test('renders progress bar with 1 completed (50%)', () => {
+  test('renders progress bar with 1 completed (aria value is the count, matching valuemax)', () => {
     renderWithProviders(<DailyMissionsHeader completedCount={1} />);
 
     const progressBar = screen.getByTestId('xp-progress-bar');
-    expect(progressBar).toHaveAttribute('aria-valuenow', '50');
+    expect(progressBar).toHaveAttribute('aria-valuenow', '1');
+    expect(progressBar).toHaveAttribute('aria-valuemax', '2');
   });
 
-  test('renders progress bar with 2 completed (100%)', () => {
+  test('renders progress bar with 2 completed', () => {
     renderWithProviders(<DailyMissionsHeader completedCount={2} />);
 
     const progressBar = screen.getByTestId('xp-progress-bar');
-    expect(progressBar).toHaveAttribute('aria-valuenow', '100');
+    expect(progressBar).toHaveAttribute('aria-valuenow', '2');
+  });
+
+  test('given played-state is not ready, shows no count and no filled segment', () => {
+    renderWithProviders(<DailyMissionsHeader completedCount={2} ready={false} />);
+
+    const progressBar = screen.getByTestId('xp-progress-bar');
+    expect(progressBar).toHaveAttribute('aria-busy', 'true');
+    expect(screen.queryByText(/2\/2/)).not.toBeInTheDocument();
   });
 
   test('expands to a /3 bar for beta users (total=3)', () => {
     renderWithProviders(<DailyMissionsHeader completedCount={2} total={3} />);
 
     const progressBar = screen.getByTestId('xp-progress-bar');
-    // 2 of 3 done → 67%, valuemax reflects the 3-quest gauntlet
-    expect(progressBar).toHaveAttribute('aria-valuenow', '67');
+    expect(progressBar).toHaveAttribute('aria-valuenow', '2');
     expect(progressBar).toHaveAttribute('aria-valuemax', '3');
     expect(screen.getByText(/2\/3/)).toBeInTheDocument();
   });

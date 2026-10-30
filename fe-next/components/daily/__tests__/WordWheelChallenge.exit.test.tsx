@@ -44,6 +44,7 @@ const DICT: Record<string, string> = {
   'daily.play': 'Play',
   'daily.quitConfirmTitle': 'Leave mid-game?',
   'wordHunt.quitConfirmMessage': 'Your progress will be lost!',
+  'wordWheel.quitKeepsWords': 'Your words so far count as today.',
   'daily.imSure': 'Leave anyway',
   'common.cancel': 'Cancel',
   'common.quit': 'Quit',
@@ -68,7 +69,8 @@ vi.mock('@/utils/dailyChallenge', () => ({
   updateDailyStreak: vi.fn(() => ({ currentStreak: 1, longestStreak: 1, lastPlayedDate: null, totalDailiesCompleted: 1 })),
 }));
 vi.mock('@/utils/dailyChallenge/wordWheelGeneration', () => ({
-  generateWordWheelPuzzle: () => ({ centerLetter: 'A', outerLetters: ['B', 'C', 'D', 'E', 'F', 'G'], validWords: [] }),
+  generateWordWheelPuzzle: (date?: string) => ({
+    puzzleDate: date, puzzleNumber: 42, language: 'en', centerLetter: 'A', outerLetters: ['B', 'C', 'D', 'E', 'F', 'G'], validWords: [] }),
 }));
 vi.mock('@/utils/guestManager', () => ({ getGuestFingerprint: () => 'test-fp' }));
 vi.mock('@/hooks/useRewardedAd', () => ({
@@ -103,10 +105,9 @@ describe('WordWheelChallenge — mid-game exit', () => {
     const exit = await reachPlaying();
     fireEvent.click(exit);
 
-    // Shared defensive config: title from daily.quitConfirmTitle, description
-    // from wordHunt.quitConfirmMessage (NOT the ad-mentioning daily.quitConfirm).
+    // Leaving settles the run with what was found, so the copy says so.
     await waitFor(() => expect(screen.getByText('Leave mid-game?')).toBeInTheDocument());
-    expect(screen.getByText('Your progress will be lost!')).toBeInTheDocument();
+    expect(screen.getByText('Your words so far count as today.')).toBeInTheDocument();
     // Navigation must NOT fire until the player confirms.
     expect(pushSpy).not.toHaveBeenCalled();
   });

@@ -6,8 +6,10 @@ import { getPuzzleNumber } from '@/utils/dailyChallenge/dateUtils'
 vi.mock('@/utils/supabase/server', () => ({ createClient: vi.fn() }))
 vi.mock('@/utils/logger', () => ({ default: { error: vi.fn() } }))
 
-function makeSupabase(opts: { user?: { id: string } | null; solved?: string[] } = {}) {
-  const huntResolved = { data: (opts.solved ?? []).map(d => ({ puzzle_date: d })), error: null }
+function makeSupabase(opts: { user?: { id: string } | null; solved?: string[]; dbError?: boolean } = {}) {
+  const huntResolved = opts.dbError
+    ? { data: null, error: { message: 'canceling statement due to statement timeout' } }
+    : { data: (opts.solved ?? []).map(d => ({ puzzle_date: d })), error: null }
   const huntChain: any = {
     eq: vi.fn(() => huntChain),
     then: (f: any) => Promise.resolve(huntResolved).then(f),
@@ -62,5 +64,13 @@ describe('GET /api/daily/missed', () => {
     const res = await GET(new Request('http://localhost/api/daily/missed') as never)
     const json = await res.json()
     expect(json.missed).toEqual([])
+  })
+
+  it('given the attempts query fails, then it answers 500 instead of reporting every day as missed', async () => {
+    vi.mocked(createClient).mockResolvedValue(makeSupabase({ dbError: true }) as any)
+    const res = await GET(new Request('http://localhost/api/daily/missed') as never)
+    expect(res.status).toBe(500)
+    const json = await res.json()
+    expect(json.missed).toBeUndefined()
   })
 })

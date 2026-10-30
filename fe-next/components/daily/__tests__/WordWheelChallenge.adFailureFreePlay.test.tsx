@@ -59,7 +59,8 @@ vi.mock('@/utils/dailyChallenge', () => ({
   hasEverPlayedWordWheel: () => false,
 }));
 vi.mock('@/utils/dailyChallenge/wordWheelGeneration', () => ({
-  generateWordWheelPuzzle: () => ({ centerLetter: 'A', outerLetters: ['B', 'C', 'D', 'E', 'F', 'G'], validWords: [] }),
+  generateWordWheelPuzzle: (date?: string) => ({
+    puzzleDate: date, puzzleNumber: 42, language: 'en', centerLetter: 'A', outerLetters: ['B', 'C', 'D', 'E', 'F', 'G'], validWords: [] }),
 }));
 vi.mock('@/utils/guestManager', () => ({ getGuestFingerprint: () => null }));
 

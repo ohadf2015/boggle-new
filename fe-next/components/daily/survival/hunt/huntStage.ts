@@ -40,7 +40,7 @@ export function verdictFor(type: FeedbackType | null): HuntVerdict | null {
   if (type === 'target-found') return 'target';
   if (GOOD.has(type)) return 'good';
   if (BAD.has(type)) return 'bad';
-  if (type === 'duplicate' || type === 'too-short' || type === 'too-long') return 'dupe';
+  if (type === 'duplicate' || type === 'too-short' || type === 'too-long' || type === 'unavailable') return 'dupe';
   return null;
 }
 

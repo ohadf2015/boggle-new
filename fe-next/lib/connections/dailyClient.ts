@@ -1,26 +1,10 @@
 /**
- * Word Bridge daily-challenge client helpers — share text (pure) + thin API
- * wrappers + a stable guest fingerprint. The game logic lives in the engine;
+ * Word Bridge daily-challenge client helpers — thin API wrappers + a stable
+ * guest fingerprint. The game logic lives in the engine;
  * this is the network/localStorage edge.
  */
 import { clientStreakAfterSolve, type ClientStreak } from './streak';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
-
-export interface ShareParams {
-  title: string;
-  dateISO: string;
-  puzzlesSolved: number;
-  total: number;
-  streak: number;
-  rank: number | null;
-}
-
-/** Build a compact, shareable result line (pure). */
-export function dailyShareText({ title, dateISO, puzzlesSolved, total, streak, rank }: ShareParams): string {
-  const parts = [`🌉 ${title} ${dateISO}`, `${puzzlesSolved}/${total} ✅ · 🔥${streak}`];
-  if (rank != null) parts[1] += ` · #${rank}`;
-  return parts.join('\n');
-}
 
 /** Current UTC calendar day, 'YYYY-MM-DD'. */
 export function todayUTC(): string {
@@ -106,6 +90,8 @@ export interface SubmitPayload {
   score: number;
   timeTakenSeconds: number;
   puzzlesSolved: number;
+  /** The puzzles actually played — the server's score ceiling follows them. */
+  puzzleIds?: string[];
   guestFingerprint?: string;
   avatarEmoji?: string;
   avatarColor?: string;
@@ -120,8 +106,17 @@ export interface SubmitResult {
   totalPlayers: number;
 }
 
-/** POST a daily result. Returns null on failure (never throws into the UI). */
-export async function submitDailyScore(payload: SubmitPayload): Promise<SubmitResult | null> {
+/**
+ * `queued`: saved offline, rank and streak arrive when the queue syncs.
+ * `failed` + retryable: network or server error — offer a retry. A 4xx is final.
+ */
+export type SubmitOutcome =
+  | { status: 'saved'; result: SubmitResult }
+  | { status: 'queued' }
+  | { status: 'failed'; retryable: boolean };
+
+/** POST a daily result. Never throws into the UI. */
+export async function submitDailyScore(payload: SubmitPayload): Promise<SubmitOutcome> {
   // Offline: queue the result so it isn't lost — it syncs (and credits streak /
   // leaderboard) on reconnect via /api/scores/sync → dispatchConnections. The
   // sync route is auth-only, so this needs a cached session (getSession is local,
@@ -137,12 +132,10 @@ export async function submitDailyScore(payload: SubmitPayload): Promise<SubmitRe
         ]);
         const store = await getOfflineStore();
         await enqueueScore(store, 'connections', payload);
-        // Optimistic result so the UI proceeds; the real rank/streak arrive when
-        // the queue syncs on reconnect.
-        return { success: true, streak: 0, score: payload.score, currentRank: 0, totalPlayers: 0 };
+        return { status: 'queued' };
       }
     } catch {
-      // Fall through to the network attempt (which will likely fail → null).
+      // Fall through to the network attempt (which will likely fail).
     }
   }
 
@@ -152,10 +145,10 @@ export async function submitDailyScore(payload: SubmitPayload): Promise<SubmitRe
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
-    if (!res.ok) return null;
-    return (await res.json()) as SubmitResult;
+    if (!res.ok) return { status: 'failed', retryable: res.status >= 500 || res.status === 429 };
+    return { status: 'saved', result: (await res.json()) as SubmitResult };
   } catch {
-    return null;
+    return { status: 'failed', retryable: true };
   }
 }
 

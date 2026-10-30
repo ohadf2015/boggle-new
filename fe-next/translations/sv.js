@@ -2148,8 +2148,9 @@ const sv = {
       "step1": "Hitta det dolda ordet",
       "step2": "Stava ord för att avslöja ledtrådar",
       "step3": "Korta ord kostar inget försök",
-      "scoreTip": "Rätt först ger bonus!"
-    },
+      "scoreTip": "Rätt först ger bonus!",
+"step3v2": "Kortare ord är gratis. Ord i full längd kostar ett försök."
+},
     "wheelRush": {
       "title": "Snurra & stava",
       "step1": "Alla ord använder mittbokstaven",
@@ -2348,7 +2349,10 @@ const sv = {
         "silver": "Silver: så nära",
         "bronze": "Brons: bra jobbat"
       },
-"missesLabel": "missar"
+"missesLabel": "missar",
+"scoreNotSaved": "Poängen sparades inte.",
+"retrySave": "Försök igen",
+"skipStuck": "Fast? Hoppa över den här"
 },
     "community": {
       "title": "Community-gåtor",
@@ -9996,7 +10000,45 @@ const sv = {
     "streak": {
       "freeze_toast_no_remaining": "Svitfrys använd. {day} räddad · inga frysar kvar"
     },
-"practiceBoard": "Övningsbräde"
+"practiceBoard": "Övningsbräde",
+"hub": { "intro": "Ett nytt set ordpussel varje dag, samma för alla. Klara de två första så är dagen avklarad.",
+"resetsAt": "Nya pussel kl. {time} din tid.",
+"newcomerTip": "Ny här? Börja med {mode}. Det tar ungefär 2 minuter.",
+"dismissTip": "Uppfattat",
+"bonusTag": "Bonus",
+"play": "Spela",
+"timed": "På tid",
+"noTimer": "Ingen tidsgräns",
+"progressLabel": "Dagens framsteg",
+"requiredDone": "Dagens två är klara! Bonuspusslen är extra.",
+"pastPuzzles": "Missat en dag? Tidigare pussel"
+},
+"archivePage": { "backToHub": "Tillbaka till dagens pussel",
+"title": "Tidigare pussel",
+"subtitle": "Alla dagliga Ordjakter hittills och hur det gick för spelarna. Missat en de senaste 3 dagarna? Du kan fortfarande spela den.",
+"count": "{n} pussel",
+"view": "Visa",
+"backToArchive": "Tidigare pussel",
+"notFound": "Pusslet hittades inte",
+"previous": "Föregående pussel",
+"next": "Nästa pussel",
+"puzzleTitle": "Pussel #{n}",
+"players": "Spelare",
+"solveRate": "Lösta andel",
+"solved": "Löste",
+"avgTries": "Snitt försök",
+"noStats": "Ingen statistik för det här pusslet än.",
+"distribution": "Försök till lösning",
+"playToday": "Spela dagens pussel",
+"playThisDay": "Spela den dagens Ordjakt"
+},
+"leaderboard": { "scoreExplainer": "Poäng från alla dagens pussel, sammanlagt.",
+"youRank": "Du: #{rank} av {total}",
+"topPercent": "Topp {percent}%",
+"inviteFriend": "Bjud in en vän",
+"inviteText": "Tror du att du kan slå mig på dagens LexiClash-pussel?",
+"linkCopied": "Länken kopierad!"
+}
 },
   "dailyWordWheelLanding": {
     "hero": {
@@ -10164,8 +10206,12 @@ const sv = {
       "perfectBanner": "Ordmästare!",
       "onlyYouFound": "Bara du hittade detta – hittills!",
       "rareFind": "Sällsynt fynd · bara {count} hittade detta",
-      "streakChip": "{count} dagars svit"
-    },
+      "streakChip": "{count} dagars svit",
+"breakdownBase": "Ord",
+"breakdownCombo": "Kombo",
+"breakdownGold": "Guld",
+"goldCoins": "+{count} mynt från guldord"
+},
     "signup": {
       "streakTitle": "Behåll din svit på {count} dagar",
       "boardTitle": "Ta din plats på listan",
@@ -10198,7 +10244,15 @@ const sv = {
 "accepted": "{word}! Precis så. Spela nu dagens hjul",
 "notWord": "Inget ord här. Testa {word}",
 "check": "Kolla"
-}
+},
+"cantCheck": "Kunde inte kolla ordet. Försök igen",
+"quitKeepsWords": "Orden du har hittat hittills räknas som dagens resultat.",
+"goldLetterLabel": "guldbokstav",
+"comboLabel": "Kombo {value}",
+"comboLost": "Kombon bröts",
+"longerWordsTip": "Längre ord ger mycket mer: 3 bokstäver = {short}, 7 bokstäver = {long}",
+"comboTip": "Hitta ord i följd för att bygga en kombo, upp till ×2 poäng.",
+"goldTip": "En bokstav är guld i dag: ord med den ger +50 % och tjänar mynt."
 },
   "dailyChallenge": {
     "pointsPerWord": "Poäng per ord"

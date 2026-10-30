@@ -190,7 +190,7 @@ describe('TabbedDailyLeaderboard', () => {
       const { default: TabbedDailyLeaderboard } = await import('../TabbedDailyLeaderboard');
 
       render(
-        <TabbedDailyLeaderboard
+        <TabbedDailyLeaderboard scope="word-hunt"
           puzzleDate="2026-01-09"
           language="en"
           t={mockT}
@@ -215,7 +215,7 @@ describe('TabbedDailyLeaderboard', () => {
       const { default: TabbedDailyLeaderboard } = await import('../TabbedDailyLeaderboard');
 
       render(
-        <TabbedDailyLeaderboard
+        <TabbedDailyLeaderboard scope="word-hunt"
           puzzleDate="2026-01-09"
           language="en"
           t={mockT}
@@ -265,7 +265,7 @@ describe('TabbedDailyLeaderboard', () => {
 
       const { default: TabbedDailyLeaderboard } = await import('../TabbedDailyLeaderboard');
       render(
-        <TabbedDailyLeaderboard
+        <TabbedDailyLeaderboard scope="word-hunt"
           puzzleDate="2026-01-09"
           language="en"
           currentPlayerId="user-15"
@@ -312,7 +312,7 @@ describe('TabbedDailyLeaderboard', () => {
 
       const { default: TabbedDailyLeaderboard } = await import('../TabbedDailyLeaderboard');
       render(
-        <TabbedDailyLeaderboard
+        <TabbedDailyLeaderboard scope="word-hunt"
           puzzleDate="2026-01-09"
           language="en"
           currentPlayerId="user-15"
@@ -361,7 +361,7 @@ describe('TabbedDailyLeaderboard', () => {
 
       const { default: TabbedDailyLeaderboard } = await import('../TabbedDailyLeaderboard');
       render(
-        <TabbedDailyLeaderboard
+        <TabbedDailyLeaderboard scope="word-hunt"
           puzzleDate="2026-01-09"
           language="en"
           defaultTab="friends"
@@ -387,7 +387,7 @@ describe('TabbedDailyLeaderboard', () => {
 
       const { default: TabbedDailyLeaderboard } = await import('../TabbedDailyLeaderboard');
       render(
-        <TabbedDailyLeaderboard
+        <TabbedDailyLeaderboard scope="word-hunt"
           puzzleDate="2026-01-09"
           language="en"
           t={mockT}
@@ -411,7 +411,7 @@ describe('TabbedDailyLeaderboard', () => {
 
       const { default: TabbedDailyLeaderboard } = await import('../TabbedDailyLeaderboard');
       const { container } = render(
-        <TabbedDailyLeaderboard
+        <TabbedDailyLeaderboard scope="word-hunt"
           puzzleDate="2026-01-09"
           language="en"
           t={mockT}

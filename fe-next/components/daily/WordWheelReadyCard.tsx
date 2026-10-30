@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { DAILY_MODES } from '@/lib/dailyModes';
 import WheelHowTo from './wheel/WheelHowTo';
 import { useWheelHowTo } from './wheel/useWheelHowTo';
+import { scoreForLength } from '@/utils/dailyChallenge/wordWheelScoring';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -23,6 +24,10 @@ interface WordWheelReadyCardProps {
   isPractice?: boolean;
   /** First-time player: open the hands-on how-to once on its own. */
   autoShowHowTo?: boolean;
+  /** Bonus-dated daily: combo multiplier is live. */
+  bonuses?: boolean;
+  /** Today has a gold letter (not named here: the outer letters stay hidden until play). */
+  goldLetter?: string | null;
 }
 
 // Decoy glyphs, never the real outer letter, so the pre-game scout can't read
@@ -50,7 +55,7 @@ const STEP = DAILY_MODES.findIndex((d) => d.id === 'word-wheel') + 1;
 
 export default function WordWheelReadyCard({
   t, centerLetter, outerLetters, puzzleNumber, streakDays, onPlay, wide = false, children,
-  isPractice = false, autoShowHowTo = false,
+  isPractice = false, autoShowHowTo = false, bonuses = false, goldLetter = null,
 }: WordWheelReadyCardProps) {
   const { language } = useLanguage();
   const howTo = useWheelHowTo(autoShowHowTo);
@@ -111,6 +116,21 @@ export default function WordWheelReadyCard({
           <span aria-hidden className="mx-1.5 text-neo-lime">·</span>
           {t('wordWheel.timeLimit')}
         </p>
+
+        <p data-testid="ready-length-tip" className="mt-2 px-5 text-center text-sm font-black text-neo-lime">
+          {t('wordWheel.longerWordsTip', { short: scoreForLength(3), long: scoreForLength(7) })}
+        </p>
+        {bonuses && (
+          <p data-testid="ready-combo-tip" className="mt-1 px-5 text-center text-xs font-semibold text-neo-white/75">
+            {t('wordWheel.comboTip')}
+          </p>
+        )}
+        {goldLetter && (
+          <p data-testid="ready-gold-tip" className="mt-1 px-5 text-center text-xs font-semibold text-neo-yellow">
+            <span aria-hidden className="me-1">★</span>
+            {t('wordWheel.goldTip')}
+          </p>
+        )}
 
         {streakDays >= 1 && (
           <p data-testid="ready-streak" className="mt-3 flex items-center justify-center gap-1.5 text-neo-orange font-neo-display font-black text-sm uppercase tracking-wide">

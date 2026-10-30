@@ -9,17 +9,25 @@ import { cn } from '@/lib/utils';
 
 interface DailyMissionsHeaderProps {
   completedCount: number;
-  /** Number of quests in today's gauntlet. Defaults to 2 (the public set);
-   *  beta users who also see Word Tower pass 3 so the bar never shows a
-   *  half-state (3 cards but a /2 counter). */
+  /** Quests that clear the day. */
   total?: number;
+  /** False while played-state is still resolving: the bar stays neutral instead of painting 0/N and jumping. */
+  ready?: boolean;
+}
+
+function utcDateLabel() {
+  const now = new Date();
+  return {
+    monthAbbr: now.toLocaleString('en', { month: 'short', timeZone: 'UTC' }).toUpperCase(),
+    dayNum: now.getUTCDate() as number | null,
+  };
 }
 
 /**
  * Header section with calendar date card, segmented progress bar,
  * and countdown timer. Neo-brutalist styling with glow on completion.
  */
-export function DailyMissionsHeader({ completedCount, total = 2 }: DailyMissionsHeaderProps) {
+export function DailyMissionsHeader({ completedCount, total = 2, ready = true }: DailyMissionsHeaderProps) {
   const { t } = useLanguage();
   // Defer the countdown to the client (null on SSR): a live clock value
   // computed in render differs between server render time and client hydration
@@ -37,19 +45,21 @@ export function DailyMissionsHeader({ completedCount, total = 2 }: DailyMissions
     // Local getDate() drifted from the hub ISO / Word Hunt puzzle date for Americas
     // evenings (and Israel early morning) — the badge said "today" while the
     // puzzle page labeled the previous UTC day.
-    const now = new Date();
-    setDateLabel({
-      monthAbbr: now.toLocaleString('en', { month: 'short', timeZone: 'UTC' }).toUpperCase(),
-      dayNum: now.getUTCDate(),
-    });
-    setCountdown(getSecondsUntilNextDaily());
-    const interval = setInterval(() => {
+    const tick = () => {
       setCountdown(getSecondsUntilNextDaily());
-    }, 1000);
+      // Re-derived every tick so a tab left open past 00:00 UTC shows the new day.
+      setDateLabel((prev) => {
+        const next = utcDateLabel();
+        return prev.dayNum === next.dayNum && prev.monthAbbr === next.monthAbbr ? prev : next;
+      });
+    };
+    tick();
+    const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);
   }, []);
 
-  const allDone = completedCount >= total;
+  const shown = ready ? completedCount : 0;
+  const allDone = ready && completedCount >= total;
   const segments = Array.from({ length: total }, (_, i) => i);
   const { monthAbbr, dayNum } = dateLabel;
 
@@ -86,30 +96,30 @@ export function DailyMissionsHeader({ completedCount, total = 2 }: DailyMissions
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between mb-1.5">
           <h2 className="text-xs font-black text-neo-lime uppercase tracking-wider truncate">
-            {t('daily.dailyMissions')}
+            {t('daily.hub.progressLabel')}
           </h2>
           <span className={cn(
             'text-[10px] font-black shrink-0 ms-2',
             allDone ? 'text-neo-lime' : 'text-neo-white'
           )}>
-            {completedCount}/{total}
+            {ready ? `${completedCount}/${total}` : '\u2013'}
           </span>
         </div>
 
         {/* Segmented progress: one block per quest */}
-        <div className="flex gap-1.5" role="progressbar" aria-valuenow={Math.round((completedCount / total) * 100)} aria-valuemin={0} aria-valuemax={total} data-testid="xp-progress-bar">
+        <div className="flex gap-1.5" role="progressbar" aria-valuenow={shown} aria-valuemin={0} aria-valuemax={total} aria-busy={!ready} data-testid="xp-progress-bar">
           {segments.map((i) => (
             <m.div
               key={`segment-${i}`}
               className={cn(
                 'flex-1 h-3.5 rounded-md border-2 border-black overflow-hidden',
-                i < completedCount ? '' : 'bg-black/40'
+                i < shown ? '' : 'bg-black/40'
               )}
               initial={false}
-              animate={i < completedCount ? { scale: [1, 1.05, 1] } : {}}
+              animate={i < shown ? { scale: [1, 1.05, 1] } : {}}
               transition={{ duration: 0.3, delay: i * 0.1 }}
             >
-              {i < completedCount && (
+              {i < shown && (
                 <m.div
                   className={cn(
                     'h-full rounded-sm',
