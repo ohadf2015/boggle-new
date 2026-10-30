@@ -91,6 +91,11 @@ describe('sitemap', () => {
     }
   });
 
+  it('lists /word-craft-game for en only (non-en variants are noindex)', () => {
+    const urls = routes.map((r) => r.url).filter((u) => u.endsWith('/word-craft-game'));
+    expect(urls).toEqual([`${BASE_URL}/en/word-craft-game`]);
+  });
+
   // Teacher Pro pricing is the site's only revenue surface — it must be
   // crawlable from the sitemap. Fully SSR'd with Product+Offer JSON-LD
   // (added 2026-07-29 after finding it missing entirely).
