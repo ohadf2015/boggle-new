@@ -30,7 +30,8 @@ export function LobbySetupDisclosure({ label, summary, open, onToggle, children 
         className={cn(
           'flex min-h-11 w-full items-center gap-2 rounded-neo border-2 border-neo-cream/35 bg-neo-navy-light px-3 py-2 text-start',
           'font-neo-body text-sm text-neo-cream/70 transition-colors hover:border-neo-cream/50 hover:text-neo-cream',
-          focusRing
+          focusRing,
+          'border-s-[6px] border-s-neo-cyan hover:border-s-neo-cyan'
         )}
       >
         <SlidersHorizontal className="size-4 shrink-0" strokeWidth={3} aria-hidden="true" />

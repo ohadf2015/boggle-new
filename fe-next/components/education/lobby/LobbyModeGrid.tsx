@@ -3,6 +3,7 @@
 import { Check, Clock, MonitorPlay, MonitorSmartphone, Smartphone, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { teacherGameMode } from '@/lib/education/gameModes';
+import { ARCADE_BLOCK, arcadeAccentAt, type ArcadeAccent } from '@/lib/education/arcadeAccent';
 import { CATALOGUE_CATEGORIES, catalogueKeys, catalogueModes, deliveryKey, type CatalogueMode } from '../ClassroomModeCatalogueData';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
@@ -20,6 +21,12 @@ export interface LobbyModeGridProps {
   dense?: boolean;
   onPick: (id: CatalogueMode['id']) => void;
   t: T;
+}
+
+/** Accent by on-screen position so neighbouring tiles never share a color; the spotlight reuses it for the picked game. */
+export function modeArcadeAccent(id: CatalogueMode['id']): ArcadeAccent {
+  const order = CATALOGUE_CATEGORIES.flatMap((category) => catalogueModes().filter((m) => m.category === category));
+  return arcadeAccentAt(Math.max(0, order.findIndex((m) => m.id === id)));
 }
 
 /** Every game in one compact grid; a tile only selects, GO LIVE lives in the ready panel. */
@@ -42,6 +49,7 @@ export function LobbyModeGrid({ selected, recommended = null, suggested = null, 
                   <ModeTile
                     key={mode.id}
                     mode={mode}
+                    accent={modeArcadeAccent(mode.id)}
                     name={t(catalogueKeys(mode).name)}
                     minutesLabel={t('education.modePicker.minutes', { count: minutes })}
                     recommendedLabel={recommended === mode.id ? t('eduShell.host.bestForList') : null}
@@ -68,6 +76,7 @@ const STICKER =
 
 function ModeTile({
   mode,
+  accent,
   name,
   minutesLabel,
   recommendedLabel,
@@ -79,6 +88,7 @@ function ModeTile({
   t,
 }: {
   mode: CatalogueMode;
+  accent: ArcadeAccent;
   name: string;
   minutesLabel: string;
   recommendedLabel: string | null;
@@ -97,6 +107,7 @@ function ModeTile({
       aria-checked={selected}
       data-testid={`mode-tile-${mode.id}`}
       data-selected={selected ? 'true' : 'false'}
+      data-accent={accent}
       disabled={busy}
       onClick={() => {
         if (!selected) onPick(mode.id);
@@ -112,23 +123,27 @@ function ModeTile({
       )}
     >
       <span
+        data-accent-decor
         className={cn(
-          'relative block shrink-0 overflow-hidden rounded-[6px] @2xl:aspect-[16/9] @2xl:size-auto @2xl:w-full @2xl:rounded-none',
+          'relative grid shrink-0 place-items-center overflow-hidden rounded-[6px] p-1 @2xl:aspect-[16/9] @2xl:size-auto @2xl:w-full @2xl:rounded-none @2xl:border-b-2 @2xl:border-neo-black @2xl:p-2',
+          ARCADE_BLOCK[accent],
           dense
             ? 'size-10 @2xl:[@media(max-height:800px)]:aspect-[3/1]'
             : 'size-12 @2xl:[@media(max-height:800px)]:aspect-[2/1] @2xl:min-h-[min(calc(50cqh-12rem),calc(25cqw-0.75rem))]',
         )}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element -- static poster cover, same file as the catalogue */}
-        <img
-          data-testid="mode-card-cover"
-          src={mode.cover}
-          alt=""
-          aria-hidden="true"
-          loading="eager"
-          decoding="async"
-          className="pointer-events-none h-full w-full select-none object-cover object-[50%_28%]"
-        />
+        <span className="relative block h-full w-full -rotate-2 overflow-hidden rounded-[4px] border-2 border-neo-black shadow-hard transition-transform duration-150 group-hover:rotate-0 motion-reduce:transition-none">
+          {/* eslint-disable-next-line @next/next/no-img-element -- static poster cover, same file as the catalogue */}
+          <img
+            data-testid="mode-card-cover"
+            src={mode.cover}
+            alt=""
+            aria-hidden="true"
+            loading="eager"
+            decoding="async"
+            className="pointer-events-none h-full w-full select-none object-cover object-[50%_28%]"
+          />
+        </span>
         {selected ? (
           <span
             data-testid="mode-selected-check"
