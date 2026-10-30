@@ -124,12 +124,13 @@ export function ResultsTeacherProTrialCard({
       data-offer={proOffer.offer}
       dir={dir}
       className={cn(
-        'shrink-0 rounded-neo border-2 border-s-4 border-neo-cream/40 border-s-neo-pink bg-neo-navy-light p-4 text-neo-white',
+        'shrink-0 rounded-neo border-2 border-s-4 border-neo-cream/40 border-s-neo-pink bg-neo-navy-light text-neo-white',
+        dismissible ? 'p-4' : 'px-3 py-2.5 @[96rem]/results:px-4 @[96rem]/results:py-3.5',
         className,
       )}
     >
       <div className="flex items-start gap-2">
-        <p className="flex flex-1 items-center gap-2 font-neo-display text-base font-black leading-snug text-neo-pink-light">
+        <p className={cn('flex flex-1 items-center gap-2 font-neo-display font-black text-neo-pink-light', dismissible ? 'text-base leading-snug' : 'text-sm leading-tight @[96rem]/results:text-lg')}>
           <Sparkles className="size-4 shrink-0" aria-hidden="true" />
           {copy.title}
         </p>
@@ -158,7 +159,8 @@ export function ResultsTeacherProTrialCard({
           </button>
         ) : null}
       </div>
-      <p className="mt-1 text-sm leading-relaxed text-neo-white/80">{copy.body}</p>
+      <p className={cn('mt-1 text-neo-white/80', dismissible ? 'text-sm leading-relaxed' : 'text-xs leading-snug @[96rem]/results:text-base')}>{copy.body}</p>
+      <div className={dismissible ? undefined : 'mt-2 flex flex-wrap items-center gap-x-3 gap-y-1'}>
       <Link
         href={`/${language}/teacher/upgrade?source=${placement}`}
         data-testid="results-teacher-pro-trial-cta"
@@ -172,14 +174,18 @@ export function ResultsTeacherProTrialCard({
             /* analytics must never block */
           }
         }}
-        className="mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-neo border-2 border-neo-pink bg-transparent px-4 text-center font-neo-display text-sm font-bold text-neo-pink-light transition-colors hover:bg-neo-pink/10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan active:translate-y-px"
+        className={cn(
+          'inline-flex items-center justify-center rounded-neo border-2 border-neo-pink bg-transparent px-4 text-center font-neo-display text-sm font-bold text-neo-pink-light transition-colors hover:bg-neo-pink/10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan active:translate-y-px',
+          dismissible ? 'mt-3 min-h-11 w-full' : 'min-h-10 shrink-0 px-3 text-[0.8125rem] @[96rem]/results:min-h-12 @[96rem]/results:px-4 @[96rem]/results:text-base',
+        )}
       >
         {proOffer.label}
       </Link>
-      <p className="mt-1.5 text-center text-xs font-semibold text-neo-white/65">
+      <p className={cn('text-xs font-semibold text-neo-white/65', dismissible ? 'mt-1.5 text-center' : 'min-w-0 flex-1 basis-32 @[96rem]/results:text-sm')}>
         {proOffer.note}
       </p>
-      <div className="mt-3 border-t border-neo-cream/20 pt-3 text-center">
+      </div>
+      <div className={dismissible ? 'mt-3 border-t border-neo-cream/20 pt-3 text-center' : 'mt-2 flex flex-wrap items-baseline gap-x-2 border-t border-neo-cream/20 pt-1.5'}>
         <Link
           href={`/${language}/education/for-schools?source=${placement}`}
           data-testid="results-school-quote-link"
@@ -190,11 +196,11 @@ export function ResultsTeacherProTrialCard({
               /* analytics must never block */
             }
           }}
-          className="text-sm font-bold text-neo-cream underline underline-offset-2 hover:text-neo-white"
+          className={cn('font-bold text-neo-cream underline underline-offset-2 hover:text-neo-white', dismissible ? 'text-sm' : 'text-xs @[96rem]/results:text-sm')}
         >
           {copy.quoteCta}
         </Link>
-        <p className="mt-0.5 text-xs text-neo-white/60">{copy.quoteNote}</p>
+        <p className={cn('text-xs text-neo-white/60', dismissible ? 'mt-0.5' : '@[96rem]/results:text-sm')}>{copy.quoteNote}</p>
       </div>
     </aside>
   );

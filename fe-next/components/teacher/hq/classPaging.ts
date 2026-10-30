@@ -24,6 +24,11 @@ export function classPageSize(bp: { sm: boolean; lg: boolean; short?: boolean })
   return 1;
 }
 
+/** Cards in view for this many classes: a lone class on a desktop row gets half the row, not a narrow third. */
+export function classesPerView(bp: { sm: boolean; lg: boolean; short?: boolean }, count: number): number {
+  return Math.min(classPageSize(bp), Math.max(2, count));
+}
+
 /** How many snap stops the carousel has: one per screenful of cards. */
 export function carouselPages(count: number, perView: number): number {
   return Math.max(1, Math.ceil(count / Math.max(1, perView)));

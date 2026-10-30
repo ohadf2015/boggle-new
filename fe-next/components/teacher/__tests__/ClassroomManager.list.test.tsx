@@ -58,6 +58,10 @@ vi.mock('@/hooks/useClassroom', () => ({
   }),
 }));
 
+vi.mock('@/components/teacher/classroom/ClassAvatarStack', () => ({
+  ClassAvatarStack: () => null,
+}));
+
 import ClassroomManager from '../ClassroomManager';
 
 const NEW_CLASS_HREF = '/en/teacher/classroom/new';
@@ -96,7 +100,7 @@ describe('ClassroomManager — class list', () => {
     it('Then the top-row create control links to the setup flow', () => {
       render(<ClassroomManager heading={<h1>title</h1>} />);
       const row = screen.getByTestId('classroom-manager-toprow');
-      expect(within(row).getByRole('link', { name: /teacher\.classroom\.create/ })).toHaveAttribute('href', NEW_CLASS_HREF);
+      expect(within(row).getByRole('link', { name: /eduShell\.home\.newClass/ })).toHaveAttribute('href', NEW_CLASS_HREF);
     });
 
     it('Then each card sits in its own scroll-reveal wrapper, apart from the framer entrance', () => {
@@ -105,7 +109,7 @@ describe('ClassroomManager — class list', () => {
       expect(wrapper).toHaveAttribute('data-tm');
     });
 
-    it('Then each card carries name, roster count, big join code, and activity', () => {
+    it('Then each card carries name, roster state, big join code, and activity', () => {
       render(<ClassroomManager />);
       const card = screen.getByTestId('classroom-card');
       expect(within(card).getByText('Period 3')).toBeInTheDocument();

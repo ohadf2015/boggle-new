@@ -58,6 +58,10 @@ vi.mock('@/lib/education/telemetry', async (orig) => ({
 const shareWithFallback = vi.fn();
 vi.mock('@/utils/shareWithFallback', () => ({ shareWithFallback: (...a: unknown[]) => shareWithFallback(...a) }));
 
+vi.mock('@/components/teacher/classroom/ClassAvatarStack', () => ({
+  ClassAvatarStack: () => null,
+}));
+
 import ClassroomManager from '../ClassroomManager';
 
 const CLASSROOM = {

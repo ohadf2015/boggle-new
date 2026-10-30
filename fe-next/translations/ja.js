@@ -867,12 +867,14 @@ const ja = {
       "playsOne": "{count}回プレイ",
       "copies": "{count}回コピー",
       "copiesOne": "{count}回コピー",
-      "results": "結果"
+      "results": "結果",
+      "use": "このリストを使う"
     },
     "badge": {
       "verified": "公式",
       "teacher": "先生作成",
-      "yours": "あなたの"
+      "yours": "あなたの",
+      "byTeacher": "先生が作成"
     },
     "discover": {
       "searchLabel": "リストを検索",
@@ -935,7 +937,7 @@ const ja = {
       "label": "ページ",
       "prev": "前へ",
       "next": "次へ",
-      "status": "{page} / {total}"
+      "status": "{page} / {total} ページ"
     }
   },
   // @eduLibrary:end
@@ -14622,6 +14624,10 @@ const ja = {
     "classroom": {
       "studentCap": "生徒 {{count}} / {{limit}} 人",
       "studentCountPro": "生徒 {{count}} 人",
+      "cardSeeAllStudents": "生徒 {{count}} 人をすべて見る",
+      "cardRosterTitle": "{{name}} の生徒",
+      "cardAssignHomework": "宿題を出す",
+      "cardClassReport": "クラスのレポート",
       "presets": {
         "title": "クイック設定",
         "fridayBattle": {
@@ -15510,6 +15516,7 @@ const ja = {
       "rehearsePrivate": "これはあなただけに表示されます。生徒はルームにおらず、記録もされません。",
       "rehearseBotsBlocked": "このゲームはボットがプレイできないため、ボットでリハーサルできません。",
       "rehearseUseClassic": "代わりにクラシックでリハーサル",
+      "startWhenReady": "全員そろったらスタート",
       "lateJoinOn": "途中参加OK",
       "lateJoinOff": "途中参加なし",
       "lock": {
@@ -16313,7 +16320,7 @@ const ja = {
       "assignLessonsHint": "クラスのレッスンを選択",
       "avgAccuracy": "平均正解率",
       "avgXpGain": "平均XP獲得",
-      "backToClassroom": "クラスに戻る",
+      "backToClassroom": "クラス一覧",
       "classAverageXp": "クラス平均XP",
       "commonMistakes": "よくあるミス",
       "completionRate": "達成率",
@@ -21282,12 +21289,14 @@ const ja = {
       "homeLink": "先生向けLexiClash ホーム"
     },
     "account": {
+      "plans": "プラン",
       "menuLabel": "アカウントメニュー",
       "fallbackName": "先生",
       "profile": "プロフィール",
       "help": "ヘルプ",
       "whatsNew": "新着情報"
     },
+    "deliveryShort": { "projector": "プロジェクター", "phones": "スマホ", "both": "スマホ+TV" },
     "delivery": {
       "projector": "プロジェクター必須",
       "phones": "スマホだけ",
@@ -21316,7 +21325,7 @@ const ja = {
       "showCodeFor": "{name}の参加コードを表示",
       "reviewTitle": "間違えた単語を練習する",
       "rail": {
-        "run": "選ぶ",
+        "run": "使う",
         "seeAll": "すべて見る",
         "language": "アクティビティの言語"
       },
@@ -21545,6 +21554,7 @@ const ja = {
       "title": "毎回のゲームのあとに、つまずいた生徒がわかる",
       "body": "Proなら毎回のゲームがクラスのレポートになります。生徒ごとの正答率、もう一度教えたい単語、保護者や学年会に渡せる印刷用ページ。",
       "trialCta": "Proを{days}日間無料で試す",
+      "startTrialCta": "{days}日間の無料体験を始める",
       "buyCta": "Teacher Pro · 月{price}",
       "trialFine": "{days}日間無料、その後は月{price}。いつでも解約できます。"
     },

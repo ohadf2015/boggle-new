@@ -299,8 +299,8 @@ describe('ReportsPageClient', () => {
       Object.assign(proState, { hasPro: false, known: true, status: 'active', trialUsed: false });
       render(<ReportsPageClient />);
 
-      expect(screen.getByTestId('pro-gate-upgrade-reports')).toHaveTextContent('eduPlans.reports.trialCta');
-      const lockCard = screen.getByTestId('pro-gate-pill').closest('.rounded-neo') as HTMLElement;
+      expect(screen.getByTestId('pro-gate-upgrade-reports')).toHaveTextContent('eduPlans.reports.startTrialCta');
+      const lockCard = screen.getByTestId('pro-gate-lock');
       expect(within(lockCard).getAllByRole('button')).toHaveLength(1);
       expectNoReportData();
     });

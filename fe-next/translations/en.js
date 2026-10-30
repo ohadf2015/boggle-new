@@ -867,12 +867,14 @@ const en = {
       "playsOne": "{count} play",
       "copies": "{count} copies",
       "copiesOne": "{count} copy",
-      "results": "Results"
+      "results": "Results",
+      "use": "Use list"
     },
     "badge": {
       "verified": "Verified",
       "teacher": "Teacher made",
-      "yours": "Yours"
+      "yours": "Yours",
+      "byTeacher": "By a teacher"
     },
     "discover": {
       "searchLabel": "Search lists",
@@ -935,7 +937,7 @@ const en = {
       "label": "Pages",
       "prev": "Back",
       "next": "Next",
-      "status": "{page} / {total}"
+      "status": "Page {page} of {total}"
     }
   },
   // @eduLibrary:end
@@ -12782,6 +12784,10 @@ const en = {
     "classroom": {
       "studentCap": "{{count}} / {{limit}} students",
       "studentCountPro": "{{count}} students",
+      "cardSeeAllStudents": "See all {{count}} students",
+      "cardRosterTitle": "Students in {{name}}",
+      "cardAssignHomework": "Assign homework",
+      "cardClassReport": "Class report",
       "presets": {
         "title": "Quick setups",
         "fridayBattle": {
@@ -13886,6 +13892,7 @@ const en = {
       "rehearsePrivate": "Only you see this. Students are not in the room and it is not counted.",
       "rehearseBotsBlocked": "Bots can't play this game, so you can't rehearse it with them.",
       "rehearseUseClassic": "Rehearse with Classic instead",
+      "startWhenReady": "Start game when everyone is in",
       "lateJoinOn": "Late join on",
       "lateJoinOff": "Late join off",
       "lock": {
@@ -14680,7 +14687,7 @@ const en = {
       "assignLessonsHint": "Pick lessons for your class",
       "avgAccuracy": "Avg accuracy",
       "avgXpGain": "Avg XP gain",
-      "backToClassroom": "Back to classroom",
+      "backToClassroom": "Your classes",
       "classAverageXp": "Class avg XP",
       "commonMistakes": "Common mistakes",
       "completionRate": "Completion rate",
@@ -20328,12 +20335,14 @@ const en = {
       "homeLink": "LexiClash for Teachers, home"
     },
     "account": {
+      "plans": "Plans",
       "menuLabel": "Account menu",
       "fallbackName": "Teacher",
       "profile": "Profile",
       "help": "Help",
       "whatsNew": "What's new"
     },
+    "deliveryShort": { "projector": "Projector", "phones": "Phones", "both": "Phones + TV" },
     "delivery": {
       "projector": "Needs projector",
       "phones": "Phones only",
@@ -20362,7 +20371,7 @@ const en = {
       "showCodeFor": "Show the join code for {name}",
       "reviewTitle": "Practise the missed words",
       "rail": {
-        "run": "Pick",
+        "run": "Use",
         "seeAll": "See all",
         "language": "Session language"
       },
@@ -20591,6 +20600,7 @@ const en = {
       "title": "See who struggled, after every game",
       "body": "Pro turns each game into a class report: every student's accuracy, the words to reteach, and a printable page for parents or your department.",
       "trialCta": "Try Pro free for {days} days",
+      "startTrialCta": "Start free {days}-day trial",
       "buyCta": "Get Teacher Pro · {price}/month",
       "trialFine": "Free for {days} days, then {price}/month. Cancel anytime."
     },

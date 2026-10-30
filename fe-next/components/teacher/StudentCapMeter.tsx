@@ -51,39 +51,30 @@ export function StudentCapMeter({
   const showCta = !pro.loading && shouldShowStudentCapUpgradeCta(count, hasPro);
   const [gateOpen, setGateOpen] = useState(false);
 
+  const ctaClass = 'inline-flex min-h-10 shrink-0 items-center justify-center rounded-neo border-2 border-neo-cream/60 px-3 font-neo-display text-xs font-bold text-neo-cream transition hover:border-neo-cream hover:bg-neo-cream/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cream';
+  const ctaLabel = t('academy.classes.proCta', 'Get Pro: {{price}}/mo', { price: `$${TEACHER_PRO_PRICE_USD}` });
+
   return (
     <div
       data-testid="student-cap-meter"
       data-at-cap={atCap ? 'true' : 'false'}
-      className={cn(
-        'rounded-neo border-2 border-black bg-neo-cream px-3 py-2 text-black shadow-hard-sm',
-        className,
-      )}
+      className={cn('flex flex-col gap-1 rounded-neo border-2 border-neo-cream/35 px-3 py-1.5 text-neo-cream', className)}
     >
-      <p
-        data-testid="student-cap-count"
-        className="font-neo-display text-sm font-black uppercase tracking-wide tabular-nums"
-      >
-        {hasPro
-          ? t('teacher.classroom.studentCountPro', '{{count}} students', { count: String(count) })
-          : t('teacher.classroom.studentCap', '{{count}} / {{limit}} students', {
-              count: String(count),
-              limit: String(limit),
-            })}
-      </p>
-      {showCta ? (
-        <div className="mt-1.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 border-t-2 border-dashed border-black/20 pt-1.5">
-          <p
-            data-testid="student-cap-pro-unlocks"
-            className="min-w-0 flex-1 font-neo-body text-xs font-bold text-black/70"
-          >
-            {t('academy.classes.proUnlocks', 'Pro adds class analytics + printable reports')}
-          </p>
-          {atCap ? (
+      <div className="flex min-h-10 flex-wrap items-center justify-between gap-x-3 gap-y-1">
+        <p data-testid="student-cap-count" className="font-neo-body text-sm font-bold tabular-nums text-neo-cream/85">
+          {hasPro
+            ? t('teacher.classroom.studentCountPro', '{{count}} students', { count: String(count) })
+            : t('teacher.classroom.studentCap', '{{count}} / {{limit}} students', {
+                count: String(count),
+                limit: String(limit),
+              })}
+        </p>
+        {showCta ? (
+          atCap ? (
             <button
               type="button"
               data-testid="student-cap-upgrade-cta"
-              className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-neo border-2 border-black bg-neo-cyan px-3 py-2 font-neo-display text-xs font-black uppercase text-black shadow-hard-sm transition hover:-translate-y-0.5 hover:shadow-hard"
+              className={ctaClass}
               onClick={() => {
                 trackGrowthEvent('landing_cta_clicked', {
                   cta: 'teacher_pro',
@@ -95,13 +86,13 @@ export function StudentCapMeter({
                 setGateOpen(true);
               }}
             >
-              {t('academy.classes.proCta', 'Get Pro — {{price}}/mo', { price: `$${TEACHER_PRO_PRICE_USD}` })}
+              {ctaLabel}
             </button>
           ) : (
             <Link
               href={`/${language}/teacher/upgrade`}
               data-testid="student-cap-upgrade-cta"
-              className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-neo border-2 border-black bg-neo-cyan px-3 py-2 font-neo-display text-xs font-black uppercase text-black shadow-hard-sm transition hover:-translate-y-0.5 hover:shadow-hard"
+              className={ctaClass}
               onClick={() =>
                 trackGrowthEvent('landing_cta_clicked', {
                   cta: 'teacher_pro',
@@ -112,10 +103,21 @@ export function StudentCapMeter({
                 })
               }
             >
-              {t('academy.classes.proCta', 'Get Pro — {{price}}/mo', { price: `$${TEACHER_PRO_PRICE_USD}` })}
+              {ctaLabel}
             </Link>
-          )}
-        </div>
+          )
+        ) : null}
+      </div>
+      {showCta ? (
+        <p data-testid="student-cap-pro-unlocks" className="flex items-start gap-1.5 font-neo-body text-xs font-semibold text-neo-cream/75">
+          <span
+            data-testid="student-cap-pro-badge"
+            className="shrink-0 rounded-full border-2 border-neo-black bg-neo-yellow px-1.5 font-neo-display text-[0.65rem] font-black leading-4 text-neo-black"
+          >
+            {t('teacher.lastGame.proBadge')}
+          </span>
+          <span className="min-w-0">{t('academy.classes.proUnlocks', 'Pro adds class analytics + printable reports')}</span>
+        </p>
       ) : null}
       <ClassLimitUpsellModal
         isOpen={gateOpen}

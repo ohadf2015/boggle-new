@@ -186,7 +186,7 @@ export function ClassSetupFlow() {
   );
 
   return (
-    <div ref={rootRef} className="mx-auto flex w-full max-w-xl scroll-mt-4 flex-col gap-5 px-4 py-5 sm:py-8">
+    <div ref={rootRef} className={cn('mx-auto flex w-full max-w-xl scroll-mt-4 flex-col gap-3 px-3 py-3 sm:gap-4 sm:px-4 sm:py-5', !ready && 'lg:max-w-4xl')}>
       <SetupSteps current={ready ? 2 : 1} t={t} />
       {ready ? (
         <ClassReady
@@ -240,7 +240,7 @@ export function ClassSetupFlow() {
 
 function SetupSteps({ current, t }: { current: 1 | 2; t: T }) {
   return (
-    <ol aria-label={t('eduShell.setup.stepsLabel')} className="flex items-center justify-center gap-2">
+    <ol aria-label={t('eduShell.setup.stepsLabel')} className="flex items-center justify-center gap-2 max-sm:hidden">
       {[1, 2].map((n) => {
         const done = n < current;
         const on = n === current;

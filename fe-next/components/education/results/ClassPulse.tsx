@@ -25,17 +25,17 @@ const Cell = memo(function Cell({ testId, icon: Icon, value, label, index, activ
   return (
     <m.div
       data-testid={testId}
-      className="flex min-w-0 flex-col justify-center gap-0.5 px-3 py-2 @5xl/results:px-4 @5xl/results:py-3"
+      className={cn('flex min-w-0 justify-center', projector ? 'flex-col gap-0.5 px-3 py-2 @5xl/results:px-4 @[96rem]/results:py-3' : 'flex-row items-center gap-2 px-2.5 py-1.5')}
       initial={false}
       animate={active && !reduce ? { scale: [1, 1.06, 1] } : { scale: 1 }}
       transition={{ duration: 0.45, delay: 0.16 * index, ease: 'easeOut' }}
     >
-      <span className={cn('font-neo-display font-black leading-none tabular-nums text-neo-lime', projector ? 'text-3xl @[96rem]/results:text-5xl @[137.5rem]/results:text-7xl' : 'text-2xl')}>
+      <span className={cn('font-neo-display font-black leading-none tabular-nums text-neo-cream', projector ? 'text-3xl @[96rem]/results:text-5xl @[137.5rem]/results:text-7xl' : 'text-xl')}>
         <span aria-hidden="true">{shown}</span>
         <span className="sr-only">{value}</span>
       </span>
       <span className={cn('flex min-w-0 items-center gap-1.5 font-neo-body font-bold text-neo-cream/85', projector ? 'text-sm @[96rem]/results:text-base @[137.5rem]/results:text-2xl' : 'text-xs')}>
-        <Icon className="size-4 shrink-0 text-neo-cyan @[96rem]/results:size-5" aria-hidden="true" />
+        <Icon className="size-4 shrink-0 text-neo-cream/70 @[96rem]/results:size-5" aria-hidden="true" />
         <span className={projector ? 'truncate' : 'leading-tight'}>{label}</span>
       </span>
     </m.div>
@@ -61,7 +61,7 @@ export function ClassPulse({ stats, active, size = 'projector', t }: ClassPulseP
   return (
     <div
       data-testid="class-pulse"
-      className="grid shrink-0 grid-cols-3 divide-x-[3px] divide-neo-cream/25 rounded-neo border-[3px] border-neo-cream bg-neo-navy-elevated shadow-hard"
+      className="grid shrink-0 grid-cols-3 divide-x-2 divide-neo-cream/25 rounded-neo border-2 border-neo-cream/50 bg-neo-navy-light"
     >
       {cells.map((cell, index) => (
         <Cell key={cell.testId} {...cell} index={index} active={active} projector={projector} />

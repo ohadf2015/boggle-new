@@ -15,6 +15,7 @@ import { LessonCardSkeleton, SkeletonGrid } from '@/components/ui/EducationSkele
 import { createLessonAndAssign } from '@/lib/education/createLessonWithAssignment';
 import { publishList } from '@/lib/education/libraryClient';
 import { paginate } from '@/lib/education/library';
+import { useFitPageSize } from './lesson-creation/library/useFitPageSize';
 import type { LibraryLesson } from '@/lib/education/libraryTypes';
 import LessonBuilderDraftPrompt from './LessonBuilderDraftPrompt';
 import ListEditorSheet, { emptyListDraft, type ListDraft } from './lesson-creation/ListEditorSheet';
@@ -30,6 +31,9 @@ export interface LessonBuilderProps {
 }
 
 const PAGE_SIZE = 9;
+const LIST_CARD_H = 180;
+const PAGER_RESERVE = 60;
+const PAGER_BUTTON = 'min-h-10 rounded-neo border-2 border-neo-cream/60 px-3 font-bold text-neo-white hover:border-neo-cream disabled:opacity-40';
 
 function lessonToDraft(lesson: LibraryLesson): ListDraft {
   return {
@@ -185,27 +189,28 @@ export default function LessonBuilder({ initialReviewWords, onBrowseDiscover, hi
   );
 
   const browseDiscover = onBrowseDiscover ?? (() => router.push(`/${language}/teacher/curriculum?tab=discover`));
-  const paged = useMemo(() => paginate(lessons as LibraryLesson[], page, PAGE_SIZE), [lessons, page]);
+  const [gridRef, pageSize] = useFitPageSize(LIST_CARD_H, PAGER_RESERVE, PAGE_SIZE);
+  const paged = useMemo(() => paginate(lessons as LibraryLesson[], page, pageSize), [lessons, page, pageSize]);
 
   if (isLoading) {
     return <SkeletonGrid count={3} skeleton={LessonCardSkeleton} />;
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div className="min-w-0">
-          <h2 className="font-neo-display text-xl text-neo-white text-balance">{t('teacher.lesson.sectionTitle')}</h2>
-          <p className="max-w-prose text-sm text-neo-white/80 text-pretty">{t('teacher.lesson.sectionHint')}</p>
+    <div className="space-y-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <h2 className="sr-only">{t('teacher.lesson.sectionTitle')}</h2>
+          <p className="max-w-prose text-sm text-neo-cream/80 text-pretty max-sm:hidden">{t('teacher.lesson.sectionHint')}</p>
         </div>
         <div className="flex flex-wrap gap-2">
           {!hideDiscoverLink && <button
             type="button"
             onClick={browseDiscover}
             data-testid="lessons-browse-discover"
-            className="inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-neo-cream bg-neo-navy-light px-3 font-neo-display text-sm font-bold uppercase text-neo-white shadow-hard-sm transition hover:-translate-y-0.5 hover:shadow-hard"
+            className="inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-neo-cream/60 px-3 font-neo-display text-sm font-bold text-neo-white transition hover:border-neo-cream"
           >
-            <Compass className="size-4 text-neo-pink" aria-hidden="true" />
+            <Compass className="size-4" aria-hidden="true" />
             {t('eduLibrary.tabs.discover')}
           </button>}
           <button
@@ -213,7 +218,7 @@ export default function LessonBuilder({ initialReviewWords, onBrowseDiscover, hi
             data-testid="lessons-create"
             onClick={() => openCreate()}
             className={cn(
-              'inline-flex min-h-11 items-center gap-2 rounded-neo border-3 border-neo-black bg-neo-cyan px-4 font-neo-display text-sm font-bold uppercase text-neo-black',
+              'inline-flex min-h-11 items-center gap-2 rounded-neo border-3 border-neo-black bg-neo-lime px-4 font-neo-display text-sm font-bold text-neo-black',
               'shadow-hard transition hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none',
             )}
           >
@@ -233,7 +238,7 @@ export default function LessonBuilder({ initialReviewWords, onBrowseDiscover, hi
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div ref={gridRef} data-testid="my-lists-grid" className="grid grid-cols-1 gap-3 md:grid-cols-2 2xl:grid-cols-3">
             {paged.items.map((lesson, i) => (
               <MyListCard
                 key={lesson.id}
@@ -261,13 +266,13 @@ export default function LessonBuilder({ initialReviewWords, onBrowseDiscover, hi
           </div>
           {paged.pageCount > 1 && (
             <nav className="flex items-center justify-center gap-3" aria-label={t('eduLibrary.pager.label')}>
-              <button type="button" disabled={paged.page === 0} onClick={() => setPage(paged.page - 1)} className="min-h-10 rounded-neo border-2 border-neo-cream px-3 font-bold text-neo-white disabled:opacity-40">
+              <button type="button" disabled={paged.page === 0} onClick={() => setPage(paged.page - 1)} className={PAGER_BUTTON}>
                 {t('eduLibrary.pager.prev')}
               </button>
               <span className="text-sm font-bold tabular-nums text-neo-white">
                 {t('eduLibrary.pager.status', { page: paged.page + 1, total: paged.pageCount })}
               </span>
-              <button type="button" disabled={paged.page >= paged.pageCount - 1} onClick={() => setPage(paged.page + 1)} className="min-h-10 rounded-neo border-2 border-neo-cream px-3 font-bold text-neo-white disabled:opacity-40">
+              <button type="button" disabled={paged.page >= paged.pageCount - 1} onClick={() => setPage(paged.page + 1)} className={PAGER_BUTTON}>
                 {t('eduLibrary.pager.next')}
               </button>
             </nav>

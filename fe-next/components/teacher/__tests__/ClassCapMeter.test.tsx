@@ -52,4 +52,10 @@ describe('ClassCapMeter', () => {
     rerender(<ClassCapMeter count={LIMIT} />);
     expect(container.firstChild).toBeNull();
   });
+
+  it('keeps lime for the page primary action: used slots are cream, not lime', () => {
+    const { container } = render(<ClassCapMeter count={LIMIT - 1} />);
+    const classes = Array.from(container.querySelectorAll('*')).map((el) => (el as HTMLElement).className?.toString?.() ?? '').join(' ');
+    expect(classes).not.toMatch(/(^|\s)bg-neo-lime(\s|$)/);
+  });
 });

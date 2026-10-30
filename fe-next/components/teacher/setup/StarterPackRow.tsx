@@ -1,6 +1,6 @@
 'use client';
 
-import { BookOpen } from 'lucide-react';
+import { BookOpen, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { StarterLessonPack } from '@/lib/education/starterLessonPacks';
 
@@ -21,16 +21,16 @@ export function StarterPackRow({ packs, selectedKey, recommendedKey, onSelect, t
       <span id="setup-pack-label" className="font-neo-body text-sm font-bold text-neo-cream">
         {t('eduShell.setup.packLabel')}
       </span>
-      <div className="grid grid-cols-1 gap-2 @md:grid-cols-2">
+      <div className="grid grid-cols-2 gap-2">
         {packs.map((pack) => {
           const on = pack.nameKey === selectedKey;
           return (
             <label
               key={pack.nameKey}
               className={cn(
-                'relative flex min-h-[56px] cursor-pointer items-center gap-3 rounded-neo border-[3px] px-3 py-2 transition-[transform,colors] duration-150 active:scale-[0.98] motion-reduce:transition-none',
-                'has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-neo-cyan',
-                on ? 'border-neo-black bg-neo-lime text-neo-black shadow-hard-sm' : 'border-neo-cream/50 text-neo-cream hover:border-neo-cream',
+                'relative flex min-h-[52px] cursor-pointer items-center gap-2 rounded-neo border-2 px-2.5 py-1.5 text-neo-cream transition-[transform,colors] duration-150 active:scale-[0.98] motion-reduce:transition-none',
+                'has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-neo-cream',
+                on ? 'border-neo-lime ring-2 ring-neo-lime' : 'border-neo-cream/50 hover:border-neo-cream',
               )}
             >
               <input
@@ -42,20 +42,19 @@ export function StarterPackRow({ packs, selectedKey, recommendedKey, onSelect, t
                 onChange={() => onSelect(pack.nameKey)}
                 className="sr-only"
               />
-              <BookOpen className="size-5 shrink-0" aria-hidden="true" />
+              {on ? (
+                <Check className="size-5 shrink-0 text-neo-lime" strokeWidth={3} aria-hidden="true" />
+              ) : (
+                <BookOpen className="size-5 shrink-0" aria-hidden="true" />
+              )}
               <span className="flex min-w-0 flex-1 flex-col">
-                <span className="font-neo-display text-base font-black leading-tight">{t(pack.nameKey)}</span>
-                <span className={cn('font-neo-body text-xs font-semibold', on ? 'text-neo-black/75' : 'text-neo-cream/70')}>
+                <span className="font-neo-display text-sm font-bold leading-tight sm:text-base">{t(pack.nameKey)}</span>
+                <span className="font-neo-body text-xs font-semibold text-neo-cream/70">
                   {t('eduShell.setup.packWords', { count: pack.words.length })}
                 </span>
               </span>
               {pack.nameKey === recommendedKey ? (
-                <span
-                  className={cn(
-                    'shrink-0 rounded-full border-[2px] px-2 py-0.5 font-neo-body text-xs font-black uppercase tracking-wide',
-                    on ? 'border-neo-black bg-neo-cream text-neo-black' : 'border-neo-lime text-neo-lime',
-                  )}
-                >
+                <span className="absolute -top-2 end-2 rounded-full border border-neo-cream/50 bg-neo-navy-light px-1.5 font-neo-body text-[0.65rem] font-bold leading-4 text-neo-cream">
                   {t('eduShell.setup.packRecommended')}
                 </span>
               ) : null}

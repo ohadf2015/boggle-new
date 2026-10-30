@@ -32,4 +32,15 @@ describe('analytics page says its title once', () => {
     expect(page).toMatch(/const TAB_BASE =\s[\s\S]*?whitespace-normal/);
     expect(page.match(/className=\{cn\(TAB_BASE,/g)).toHaveLength(4);
   });
+
+  it('marks the selected tab with a lime ring, never a colored fill', () => {
+    const page = read('app/[locale]/teacher/classroom/[id]/analytics/PageClient.tsx');
+    expect(page).not.toMatch(/data-\[state=active\]:bg-neo-(cyan|pink|lime)/);
+    expect(page).toMatch(/data-\[state=active\]:ring-neo-lime|data-\[state=active\]:border-neo-lime/);
+  });
+
+  it('drops the sample preview of the locked report on phones so the page fits', () => {
+    const page = read('app/[locale]/teacher/classroom/[id]/analytics/PageClient.tsx');
+    expect(page).toMatch(/\[&_\[data-testid=pro-gate-preview\]\]:max-md:hidden/);
+  });
 });

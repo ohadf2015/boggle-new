@@ -56,6 +56,10 @@ vi.mock('@/components/teacher/hq/ClassroomCardActivity', () => ({
   ),
 }));
 
+vi.mock('@/components/teacher/classroom/ClassAvatarStack', () => ({
+  ClassAvatarStack: ({ classroomId }: { classroomId: string }) => <span data-testid="avatar-stack-for">{classroomId}</span>,
+}));
+
 import ClassroomManager from '../ClassroomManager';
 
 const scrollIntoView = vi.fn();
@@ -106,49 +110,38 @@ describe('ClassroomManager — swipe carousel instead of page scroll', () => {
     expect(screen.getByTestId('classroom-card-start-game')).toHaveAttribute('href', '/en/education/classroom-game?classroomId=cls-1');
   });
 
-  // A 375x667 phone spent ~70px on a title row AND a separate create row
-  // above the one card; the title now shares the create button's row.
-  it('Given a heading, Then it shares one row with the Create classroom button', () => {
+  it('Given a heading, Then it shares one row with the New class link', () => {
     state.classrooms = [mk(1)];
     render(<ClassroomManager heading={<h1 data-testid="classes-title">Your classes</h1>} />);
     const row = screen.getByTestId('classroom-manager-toprow');
     expect(row.contains(screen.getByTestId('classes-title'))).toBe(true);
-    expect(row.contains(screen.getByRole('link', { name: /teacher.classroom.create/ }))).toBe(true);
+    expect(row.contains(screen.getByTestId('classroom-create-link'))).toBe(true);
   });
 
-  it('Given one class on a wide Classes tab, Then the free slot is a "new class" seat, not a void', () => {
+  it.each([
+    ['phone', false],
+    ['wide screen', true],
+  ])('Given one class on a %s, Then there is exactly one "New class" entry', (_label, wide) => {
     state.classrooms = [mk(1)];
-    mq.wide = true;
-    render(<ClassroomManager />);
-    expect(screen.getByTestId('classroom-add-tile')).toHaveAttribute('href', '/en/teacher/classroom/new');
-  });
-
-  // r3 critic: beside ONE class the seat took half the desktop row — a second
-  // card-sized slab that says less than the class card next to it.
-  it('Given one class on a wide Classes tab, Then the add seat is compact — content-sized, not a card-sized slab', () => {
-    state.classrooms = [mk(1)];
-    mq.wide = true;
-    render(<ClassroomManager />);
-    const cls = screen.getByTestId('classroom-add-tile').parentElement!.className.toString();
-    expect(cls).toMatch(/(^|\s)self-start(\s|$)/);
-    expect(cls).toMatch(/(^|\s)shrink-0(\s|$)/);
-    expect(cls).not.toMatch(/self-stretch|min-h-64/);
-  });
-
-  it('Given a full page, Then there is no add seat', () => {
-    state.classrooms = [mk(1)];
+    mq.wide = wide;
     render(<ClassroomManager />);
     expect(screen.queryByTestId('classroom-add-tile')).toBeNull();
+    const links = screen.getAllByRole('link').filter((a) => a.getAttribute('href') === '/en/teacher/classroom/new');
+    expect(links).toHaveLength(1);
+    expect(links[0]).toHaveTextContent('eduShell.home.newClass');
   });
 
-  // Round 2 critic: the seat and the top-row button exposed the SAME accessible
-  // name — two "Create Classroom" controls a screen reader cannot tell apart.
-  it('Given the add seat, Then its accessible name is distinct from the header Create button', () => {
+  it('Given classes, Then "New class" is a quiet outlined control, not a second colored button', () => {
     state.classrooms = [mk(1)];
-    mq.wide = true;
     render(<ClassroomManager />);
-    expect(screen.getByTestId('classroom-add-tile')).toHaveAccessibleName(
-      'teacher.classroom.createAnother',
-    );
+    const cls = screen.getByTestId('classroom-create-link').className;
+    expect(cls).not.toMatch(/(^|\s)bg-neo-(cyan|lime|pink|yellow)(\s|$)/);
+    expect(cls).toMatch(/border-neo-cream/);
+  });
+
+  it('Given a class, Then its card shows a short student preview', () => {
+    state.classrooms = [mk(1)];
+    render(<ClassroomManager />);
+    expect(screen.getByTestId('avatar-stack-for')).toHaveTextContent('cls-1');
   });
 });

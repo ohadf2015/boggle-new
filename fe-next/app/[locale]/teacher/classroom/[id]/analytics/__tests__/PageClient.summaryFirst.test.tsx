@@ -76,6 +76,29 @@ beforeEach(() => {
 });
 
 describe('analytics page: summary first, every control does something', () => {
+  it('titles the page with the class name and says it is the class report', async () => {
+    render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
+    await waitFor(() => expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Room 4'));
+    expect(screen.getByText('teacher.classroom.cardClassReport')).toBeInTheDocument();
+  });
+
+  it('shows no "live" box while no student is playing', () => {
+    render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
+    expect(screen.queryByTestId('analytics-live')).toBeNull();
+  });
+
+  it('shows the live box once students are playing', () => {
+    (useRealtimeClassroomProgress as ReturnType<typeof vi.fn>).mockReturnValue({
+      isConnected: true,
+      activeStudentsCount: 2,
+      lastUpdate: null,
+      connectionStatus: 'connected',
+      recentActivity: [],
+    });
+    render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
+    expect(screen.getByTestId('analytics-live')).toBeInTheDocument();
+  });
+
   it('leads with the per-word mastery report, then a cards-only dashboard', async () => {
     render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
 

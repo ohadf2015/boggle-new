@@ -14,4 +14,10 @@ describe('<ClassroomModeCardRow> on a phone', () => {
     expect(hint).toHaveTextContent(`eg2Modes.swipeHint|{"count":${catalogueModes().length}}`);
     expect(hint.className).toContain('lg:hidden');
   });
+
+  it('is a quiet caption: no yellow, no shouting capitals', () => {
+    render(<ClassroomModeCardRow selected="vocab-quiz" onPick={vi.fn()} t={t} />);
+    const hint = screen.getByTestId('mode-row-swipe-hint');
+    expect(hint.className).not.toMatch(/text-neo-yellow|\buppercase\b/);
+  });
 });

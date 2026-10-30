@@ -22,6 +22,16 @@ describe('classStats', () => {
     expect(classStats(summary({ classFoundCount: 0 }), players).lesson).toBeNull();
   });
 
+  it('given bots played beside students, when summarised, then bots are not counted as students', () => {
+    const withBots: PlayerResult[] = [...players, { username: 'Sprout Bot', score: 90, wordsFoundCount: 9, isBot: true }];
+    expect(classStats(summary(), withBots)).toEqual({ students: 3, words: 12, avgScore: 20, lesson: { found: 4, total: 10 } });
+  });
+
+  it('given a bots-only practice round, when summarised, then no students are counted', () => {
+    const rehearsal: PlayerResult[] = [players[0], { username: 'Sprout Bot', score: 90, isBot: true }, { username: 'Hunter Bot', score: 40, isBot: true }];
+    expect(classStats(summary(), rehearsal).students).toBe(0);
+  });
+
   it('given an empty room, when summarised, then nothing divides by zero', () => {
     expect(classStats(summary(), [])).toEqual({ students: 0, words: 0, avgScore: 0, lesson: { found: 4, total: 10 } });
   });

@@ -80,16 +80,14 @@ export function ProjectorLobbyLock({ gameCode, t, className }: { gameCode: strin
         onClick={toggle}
         title={t(locked ? `${K}.lockedHint` : `${K}.ctaHint`)}
         className={cn(
-          'inline-flex min-h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-neo border-4 px-4 py-2 font-neo-display font-black uppercase tracking-tight text-[clamp(1rem,min(1.4cqw,2.6cqh),2rem)]',
+          'inline-flex min-h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-neo border-2 bg-neo-navy px-4 py-2 font-neo-display font-bold text-neo-cream text-[clamp(1rem,min(1.4cqw,2.6cqh),2rem)]',
           PRESS,
-          locked
-            ? 'border-neo-black bg-neo-yellow text-neo-black shadow-hard'
-            : 'border-neo-cream bg-neo-navy-light text-neo-cream shadow-hard-sm',
+          locked ? 'border-neo-lime ring-2 ring-neo-lime' : 'border-neo-cream/60',
           pending && 'opacity-70'
         )}
       >
         <Icon className="size-[1em] shrink-0" strokeWidth={2.75} aria-hidden="true" />
-        {t(locked ? `${K}.locked` : `${K}.cta`)}
+        <span className="@max-5xl:sr-only">{t(locked ? `${K}.locked` : `${K}.cta`)}</span>
       </button>
       {failed && (
         <p role="alert" className="font-neo-body text-sm font-bold text-neo-pink">

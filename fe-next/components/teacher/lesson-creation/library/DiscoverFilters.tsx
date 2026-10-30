@@ -1,17 +1,17 @@
 'use client';
 
-import { Search, SlidersHorizontal, X } from 'lucide-react';
+import { Check, Globe2, Search, SlidersHorizontal, X } from 'lucide-react';
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import type { Language } from '@/lib/supabase/education/types';
-import { LanguagePicker } from '@/components/education/pickers/LanguagePicker';
+import { EDUCATION_LANGUAGES, type Language } from '@/lib/supabase/education/types';
+import { nativeLanguageName } from '@/components/education/pickers/nativeLanguageName';
 import { GRADE_BANDS, LIBRARY_TOPICS, isGradeBand, isLibraryTopic } from '@/lib/education/library';
 import type { DiscoverFilters as Filters } from './useDiscoverLibrary';
 
-const PILL = 'inline-flex min-h-9 shrink-0 items-center gap-1 rounded-neo border-2 px-2.5 text-xs font-bold uppercase transition';
+const PILL = 'inline-flex h-10 shrink-0 items-center gap-1 rounded-neo border-2 px-2.5 text-sm font-bold transition focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cream';
 const SELECT =
-  'h-10 min-w-0 rounded-neo border-2 border-neo-cream bg-neo-navy-light px-2 text-sm font-bold text-neo-white focus:outline-hidden focus:ring-2 focus:ring-neo-cyan';
+  'h-10 min-w-0 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-2 text-sm font-bold text-neo-white focus:outline-hidden focus:ring-2 focus:ring-neo-cream';
 
 interface DiscoverFiltersProps {
   filters: Filters;
@@ -29,21 +29,22 @@ export default function DiscoverFilters({ filters, onChange, total }: DiscoverFi
       <div className="flex gap-2">
         <label className="relative min-w-0 flex-1">
           <span className="sr-only">{t('eduLibrary.discover.searchLabel')}</span>
-          <Search className="pointer-events-none absolute z-10 start-3 top-1/2 size-4 -translate-y-1/2 text-neo-black/60" aria-hidden="true" />
+          <Search className="pointer-events-none absolute z-10 start-3 top-1/2 size-4 -translate-y-1/2 text-neo-cream/60" aria-hidden="true" />
           <input
             type="search"
             data-testid="discover-search"
             value={filters.query}
             onChange={(e) => onChange({ query: e.target.value })}
             placeholder={t('eduLibrary.discover.searchPlaceholder')}
-            className="h-11 w-full min-w-0 rounded-neo border-3 border-neo-black bg-neo-cream ps-9 pe-9 font-neo-body text-base text-neo-black shadow-hard-sm placeholder:text-neo-black/50 focus:outline-hidden focus:ring-3 focus:ring-neo-cyan"
+            className="h-11 w-full min-w-0 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light ps-9 pe-9 font-neo-body text-base text-neo-white placeholder:text-neo-cream/55 focus:border-neo-cream focus:outline-hidden"
           />
           {filters.query && (
             <button
               type="button"
               onClick={() => onChange({ query: '' })}
               aria-label={t('eduLibrary.discover.clearSearch')}
-              className="absolute end-2 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded text-neo-black/70 hover:bg-neo-black/10"
+              title={t('eduLibrary.discover.clearSearch')}
+              className="absolute end-2 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded text-neo-cream/70 hover:text-neo-cream"
             >
               <X className="size-4" aria-hidden="true" />
             </button>
@@ -54,43 +55,54 @@ export default function DiscoverFilters({ filters, onChange, total }: DiscoverFi
           onClick={() => setShowMore((v) => !v)}
           aria-expanded={showMore}
           aria-controls="discover-more-filters"
-          className="relative flex h-11 shrink-0 items-center gap-1.5 rounded-neo border-3 border-neo-cream bg-neo-navy-light px-3 text-sm font-bold text-neo-white shadow-hard-sm"
+          aria-label={t('eduLibrary.discover.filters')}
+          title={t('eduLibrary.discover.filters')}
+          className="relative flex h-11 shrink-0 items-center gap-1.5 rounded-neo border-2 border-neo-cream/60 px-3 text-sm font-bold text-neo-white hover:border-neo-cream"
         >
           <SlidersHorizontal className="size-4" aria-hidden="true" />
           <span className="hidden sm:inline">{t('eduLibrary.discover.filters')}</span>
           {activeExtra > 0 && (
-            <span className="absolute -end-2 -top-2 flex size-5 items-center justify-center rounded-full border-2 border-neo-black bg-neo-pink text-[10px] font-black text-neo-black">
+            <span className="absolute -end-2 -top-2 flex size-5 items-center justify-center rounded-full border-2 border-neo-cream bg-neo-navy text-[10px] font-black text-neo-white">
               {activeExtra}
             </span>
           )}
         </button>
       </div>
 
-      <LanguagePicker
-        label={t('eduLibrary.meta.language')}
-        hideLabel
-        value={filters.language}
-        onChange={(code: Language | 'all') => onChange({ language: code })}
-        allLabel={t('eduLibrary.discover.allLanguages')}
-        variant="filter"
-      />
-
-      <div className="flex items-center gap-1.5 overflow-x-auto [scrollbar-width:none]" role="group" aria-label={t('eduLibrary.discover.sourceLabel')}>
-        {(['all', 'verified', 'teacher'] as const).map((s) => {
-          const active = filters.source === s;
-          return (
-            <button
-              key={s}
-              type="button"
-              aria-pressed={active}
-              onClick={() => onChange({ source: s })}
-              className={cn(PILL, active ? 'border-neo-black bg-neo-cyan text-neo-black shadow-hard-sm' : 'border-neo-cream/40 bg-transparent text-neo-white/85')}
-            >
-              {s === 'all' ? t('eduLibrary.discover.source.all') : t(`eduLibrary.badge.${s}`)}
-            </button>
-          );
-        })}
-        <span className="ms-auto shrink-0 text-xs font-bold tabular-nums text-neo-white/70" aria-live="polite">
+      <div className="flex flex-wrap items-center gap-1.5">
+        <label className="relative shrink-0">
+          <Globe2 className="pointer-events-none absolute start-2 top-1/2 size-4 -translate-y-1/2 text-neo-cream/70" aria-hidden="true" />
+          <select
+            aria-label={t('eduLibrary.meta.language')}
+            data-testid="discover-language"
+            value={filters.language}
+            onChange={(e) => onChange({ language: e.target.value as Language | 'all' })}
+            className={cn(SELECT, 'ps-7')}
+          >
+            <option value="all">{t('eduLibrary.discover.allLanguages')}</option>
+            {EDUCATION_LANGUAGES.map((code) => (
+              <option key={code} value={code} lang={code}>{nativeLanguageName(code)}</option>
+            ))}
+          </select>
+        </label>
+        <div className="flex items-center gap-1.5" role="group" aria-label={t('eduLibrary.discover.sourceLabel')}>
+          {(['all', 'verified', 'teacher'] as const).map((s) => {
+            const active = filters.source === s;
+            return (
+              <button
+                key={s}
+                type="button"
+                aria-pressed={active}
+                onClick={() => onChange({ source: s })}
+                className={cn(PILL, active ? 'border-neo-lime text-neo-white ring-1 ring-neo-lime' : 'border-neo-cream/40 text-neo-cream/85 hover:border-neo-cream')}
+              >
+                {active && <Check className="size-3.5 text-neo-lime" strokeWidth={3} aria-hidden="true" />}
+                {s === 'all' ? t('eduLibrary.discover.source.all') : t(`eduLibrary.badge.${s}`)}
+              </button>
+            );
+          })}
+        </div>
+        <span className="ms-auto shrink-0 text-xs font-bold tabular-nums text-neo-cream/70 max-sm:hidden" aria-live="polite">
           {t('eduLibrary.discover.count', { count: total })}
         </span>
       </div>

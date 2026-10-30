@@ -21,7 +21,7 @@ function wordsOf(p: PlayerResult): number {
 }
 
 export function classStats(summary: ClassroomSummary, players: PlayerResult[] | undefined): ClassStats {
-  const students = studentsOnly(players, summary.teacherName);
+  const students = studentsOnly(players, summary.teacherName).filter((p) => !p.isBot);
   const total = students.reduce((sum, p) => sum + (p.score ?? 0), 0);
   return {
     students: students.length,

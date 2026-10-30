@@ -16,9 +16,6 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 vi.mock('@/hooks/useClassPulse', () => ({ useClassPulse: () => pulse() }));
-vi.mock('../ClassStreakLine', () => ({
-  ClassStreakLine: ({ classroomId }: { classroomId: string }) => <p data-testid="streak-for">{classroomId}</p>,
-}));
 
 import { ClassroomCardActivity } from '../ClassroomCardActivity';
 
@@ -42,25 +39,26 @@ describe('<ClassroomCardActivity>', () => {
     pulse.mockReturnValue({ pulse: base, isLoading: false, error: null, refresh: vi.fn() });
   });
 
-  it('Given a recent game, Then it says when and how well, and what to do next', () => {
+  it('Given a recent game, Then one plain line says when and how well', () => {
     render(<ClassroomCardActivity classroomId="c1" rosterCount={3} />);
-    expect(screen.getByTestId('classroom-card-last')).toHaveTextContent('teacher.pulse.lastPlayedDays');
-    expect(screen.getByTestId('classroom-card-last')).toHaveTextContent('"days":2');
-    expect(screen.getByTestId('classroom-card-next')).toHaveTextContent('teacher.pulse.action.playAgain');
+    const last = screen.getByTestId('classroom-card-last');
+    expect(last).toHaveTextContent('teacher.playNow.shortcutLastGame');
+    expect(last).toHaveTextContent('teacher.pulse.lastPlayedDays');
+    expect(last).toHaveTextContent('"days":2');
   });
 
-  it('Given missed words, Then the next step names them', () => {
-    pulse.mockReturnValue({
-      pulse: { ...base, state: 'needsReview', nextAction: 'review', topMissedWords: ['osmosis', 'mitosis'] },
-      isLoading: false,
-      error: null,
-      refresh: vi.fn(),
-    });
-    render(<ClassroomCardActivity classroomId="c1" rosterCount={3} />);
-    expect(screen.getByTestId('classroom-card-next')).toHaveTextContent('osmosis, mitosis');
+  it('is calm: no white slab, no uppercase micro-label, no cut-off text', () => {
+    const { container } = render(<ClassroomCardActivity classroomId="c1" rosterCount={3} />);
+    const classes = Array.from(container.querySelectorAll('*')).map((el) => (el as HTMLElement).className?.toString?.() ?? '');
+    expect(classes.join(' ')).not.toMatch(/bg-neo-white|(^|\s)uppercase(\s|$)|(^|\s)truncate(\s|$)/);
   });
 
-  it('Given a class that never played, Then it shows no empty activity box (the join code is the next step)', () => {
+  it('leaves the next step to the Pick a game button: no second "next up" line', () => {
+    render(<ClassroomCardActivity classroomId="c1" rosterCount={3} />);
+    expect(screen.queryByTestId('classroom-card-next')).toBeNull();
+  });
+
+  it('Given a class that never played, Then it says so plainly', () => {
     pulse.mockReturnValue({
       pulse: { ...base, state: 'neverPlayed', nextAction: 'play', daysSinceLastGame: null, averageAccuracyPct: null },
       isLoading: false,
@@ -68,8 +66,7 @@ describe('<ClassroomCardActivity>', () => {
       refresh: vi.fn(),
     });
     render(<ClassroomCardActivity classroomId="c1" rosterCount={3} />);
-    expect(screen.queryByTestId('classroom-card-last')).toBeNull();
-    expect(screen.queryByTestId('classroom-card-next')).toBeNull();
+    expect(screen.getByTestId('classroom-card-last')).toHaveTextContent('teacher.pulse.state.neverPlayed');
   });
 
   it('Given the read is still open, Then it claims nothing yet', () => {
@@ -77,15 +74,5 @@ describe('<ClassroomCardActivity>', () => {
     render(<ClassroomCardActivity classroomId="c1" rosterCount={3} />);
     expect(screen.getByTestId('classroom-card-last')).toHaveTextContent('teacher.pulse.state.loading');
     expect(screen.getByTestId('classroom-card-last')).not.toHaveTextContent('neverPlayed');
-  });
-
-  it('Given a class with students, Then the card carries that class streak for the teacher', () => {
-    render(<ClassroomCardActivity classroomId="c9" rosterCount={3} />);
-    expect(screen.getByTestId('streak-for')).toHaveTextContent('c9');
-  });
-
-  it('Given no students yet, Then there is no streak to show', () => {
-    render(<ClassroomCardActivity classroomId="c9" rosterCount={0} />);
-    expect(screen.queryByTestId('streak-for')).toBeNull();
   });
 });

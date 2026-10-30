@@ -867,12 +867,14 @@ const he = {
       "playsOne": "הפעלה אחת",
       "copies": "{count} העתקות",
       "copiesOne": "העתקה אחת",
-      "results": "תוצאות"
+      "results": "תוצאות",
+      "use": "להשתמש ברשימה"
     },
     "badge": {
       "verified": "מאומת",
       "teacher": "של מורה",
-      "yours": "שלכם"
+      "yours": "שלכם",
+      "byTeacher": "מאת מורה"
     },
     "discover": {
       "searchLabel": "חיפוש רשימות",
@@ -935,7 +937,7 @@ const he = {
       "label": "עמודים",
       "prev": "הקודם",
       "next": "הבא",
-      "status": "{page} / {total}"
+      "status": "עמוד {page} מתוך {total}"
     }
   },
   // @eduLibrary:end
@@ -14477,6 +14479,10 @@ const he = {
     "classroom": {
       "studentCap": "{{count}} מתוך {{limit}} תלמידים",
       "studentCountPro": "{{count}} תלמידים",
+      "cardSeeAllStudents": "לכל {{count}} התלמידים",
+      "cardRosterTitle": "התלמידים של {{name}}",
+      "cardAssignHomework": "לתת שיעורי בית",
+      "cardClassReport": "דוח הכיתה",
       "presets": {
         "title": "הגדרות מהירות",
         "fridayBattle": {
@@ -15365,6 +15371,7 @@ const he = {
       "rehearsePrivate": "רק אתם רואים את זה. התלמידים לא בחדר וזה לא נספר.",
       "rehearseBotsBlocked": "בוטים לא יכולים לשחק במשחק הזה, אז אי אפשר לתרגל אותו איתם.",
       "rehearseUseClassic": "לתרגל בקלאסי במקום",
+      "startWhenReady": "מתחילים כשכולם בפנים",
       "lateJoinOn": "אפשר להצטרף באיחור",
       "lateJoinOff": "אי אפשר להצטרף באיחור",
       "lock": {
@@ -16168,7 +16175,7 @@ const he = {
       "assignLessonsHint": "בחרו שיעורים לכיתה",
       "avgAccuracy": "דיוק ממוצע",
       "avgXpGain": "ממוצע XP",
-      "backToClassroom": "חזרה לכיתה",
+      "backToClassroom": "הכיתות שלי",
       "classAverageXp": "ממוצע XP כיתתי",
       "commonMistakes": "טעויות נפוצות",
       "completionRate": "אחוז השלמה",
@@ -21213,12 +21220,14 @@ const he = {
       "homeLink": "LexiClash למורים, דף הבית"
     },
     "account": {
+      "plans": "מסלולים",
       "menuLabel": "תפריט חשבון",
       "fallbackName": "מורה",
       "profile": "פרופיל",
       "help": "עזרה",
       "whatsNew": "מה חדש"
     },
+    "deliveryShort": { "projector": "מקרן", "phones": "טלפונים", "both": "טלפון + מסך" },
     "delivery": {
       "projector": "צריך מקרן",
       "phones": "רק בטלפונים",
@@ -21247,7 +21256,7 @@ const he = {
       "showCodeFor": "הצגת קוד ההצטרפות של {name}",
       "reviewTitle": "תרגול המילים שפוספסו",
       "rail": {
-        "run": "בחירה",
+        "run": "שימוש",
         "seeAll": "לכל הפעילויות",
         "language": "שפת הפעילות"
       },
@@ -21476,6 +21485,7 @@ const he = {
       "title": "לראות מי התקשה, אחרי כל משחק",
       "body": "פרו הופך כל משחק לדוח כיתתי: הדיוק של כל תלמיד, המילים שכדאי ללמד שוב, ודף להדפסה להורים או לצוות.",
       "trialCta": "לנסות פרו {days} ימים בחינם",
+      "startTrialCta": "התחילו ניסיון חינם ל-{days} יום",
       "buyCta": "פרו למורים · {price} לחודש",
       "trialFine": "{days} ימים בחינם, ואז {price} לחודש. ביטול בכל עת."
     },

@@ -1,6 +1,7 @@
 'use client';
 
 import { useId, type ReactNode } from 'react';
+import { Check } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { EDUCATION_LANGUAGES } from '@/lib/supabase/education/types';
@@ -20,6 +21,8 @@ export interface LanguagePickerProps<V extends string> {
   variant?: 'regular' | 'compact' | 'filter';
   /** "theme" follows the light/dark class for surfaces like DialogContent that are cream in light mode. */
   tone?: 'dark' | 'theme';
+  /** "ring": selected option keeps the navy surface with a lime ring + check (calm teacher screens). */
+  selection?: 'fill' | 'ring';
   showBoardHint?: boolean;
   /** Hide the visible legend when a surrounding control already names the group. */
   hideLabel?: boolean;
@@ -41,6 +44,7 @@ export function LanguagePicker<V extends string>({
   allLabel,
   variant = 'regular',
   tone = 'dark',
+  selection = 'fill',
   showBoardHint = false,
   hideLabel = false,
   className,
@@ -52,6 +56,7 @@ export function LanguagePicker<V extends string>({
   const codes = (allLabel ? [ALL, ...options] : options) as readonly V[];
   const dense = variant !== 'regular';
   const themed = tone === 'theme';
+  const ring = selection === 'ring';
 
   return (
     <fieldset
@@ -81,7 +86,9 @@ export function LanguagePicker<V extends string>({
               className={cn(
                 OPTION_BASE,
                 variant === 'filter' ? 'min-h-9 gap-1.5 px-2 text-xs' : dense ? 'min-h-10 px-2.5 text-sm' : 'min-h-12 px-3 py-2 text-base',
-                checked
+                checked && ring
+                  ? 'border-neo-lime bg-neo-navy-light text-neo-cream ring-2 ring-neo-lime'
+                  : checked
                   ? 'border-neo-black bg-neo-lime text-neo-black shadow-hard-sm'
                   : themed
                     ? 'border-neo-black/60 bg-neo-cream text-neo-black hover:bg-neo-black/5 dark:border-neo-cream/50 dark:bg-neo-navy-light dark:text-neo-cream dark:hover:bg-neo-navy'
@@ -102,12 +109,17 @@ export function LanguagePicker<V extends string>({
               <span className="flex min-w-0 flex-col text-start leading-tight">
                 <span lang={isAll ? undefined : code} className="truncate">{native}</span>
                 {!dense && translated && translated !== native && (
-                  <span className={cn('truncate text-xs font-semibold', checked ? 'text-neo-black/70' : themed ? 'text-neo-black/65 dark:text-neo-cream/65' : 'text-neo-cream/65')}>
+                  <span className={cn('truncate text-xs font-semibold', checked && !ring ? 'text-neo-black/70' : themed ? 'text-neo-black/65 dark:text-neo-cream/65' : 'text-neo-cream/65')}>
                     {translated}
                   </span>
                 )}
               </span>
               {dense && translated && translated !== native && <span className="sr-only">{translated}</span>}
+              {checked && ring ? (
+                <span data-picker-check="" aria-hidden="true" className="absolute -end-1.5 -top-1.5 grid size-4 place-items-center rounded-full border border-neo-lime bg-neo-navy">
+                  <Check className="size-3 text-neo-lime" strokeWidth={3.5} />
+                </span>
+              ) : null}
             </label>
           );
         })}

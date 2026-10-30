@@ -80,6 +80,18 @@ describe('LanguagePicker', () => {
     expect(en.className).not.toMatch(/bg-neo-lime/);
   });
 
+  it('given selection="ring", when an option is checked, then it shows a lime ring and a check, never a lime fill', () => {
+    const { container } = render(<LanguagePicker label="L" value="he" onChange={vi.fn()} variant="compact" selection="ring" />);
+    const he = container.querySelector('[data-picker-option="he"]') as HTMLElement;
+    const en = container.querySelector('[data-picker-option="en"]') as HTMLElement;
+    expect(he.className).not.toMatch(/bg-neo-lime/);
+    expect(he.className).toMatch(/ring-neo-lime/);
+    expect(he.className).toMatch(/text-neo-cream/);
+    expect(he.querySelector('[data-picker-check]')).not.toBeNull();
+    expect(en.querySelector('[data-picker-check]')).toBeNull();
+    expect(en.className).not.toMatch(/ring-neo-lime/);
+  });
+
   it('respects reduced motion on the press feedback', () => {
     const { container } = render(<LanguagePicker label="L" value="en" onChange={vi.fn()} />);
     const option = container.querySelector('[data-picker-option="en"]') as HTMLElement;

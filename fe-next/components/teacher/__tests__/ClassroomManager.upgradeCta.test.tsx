@@ -70,6 +70,10 @@ vi.mock('@/components/teacher/hq/ClassroomCardActivity', () => ({
   ClassroomCardActivity: () => <div data-testid="card-activity" />,
 }));
 
+vi.mock('@/components/teacher/classroom/ClassAvatarStack', () => ({
+  ClassAvatarStack: () => null,
+}));
+
 import ClassroomManager from '../ClassroomManager';
 import { TEACHER_PRO_CHECKOUT_PATH } from '@/components/education/TeacherProCheckoutCta';
 

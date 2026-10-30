@@ -108,7 +108,7 @@ describe('projectorStartLabel', () => {
   const base = { starting: false, canStart: true, isBoss: false, switched: false, isQuiz: false, startLabelKey: 'hostView.startQuiz' };
 
   it('says it is waiting while nobody is in', () => {
-    expect(projectorStartLabel({ ...base, canStart: false })).toBe('eduLive.lobby.waitingForStudents');
+    expect(projectorStartLabel({ ...base, canStart: false })).toBe('education.projectorLobby.startWhenReady');
   });
 
   it('keeps the teacher label while the round is being created, so the button holds its size', () => {

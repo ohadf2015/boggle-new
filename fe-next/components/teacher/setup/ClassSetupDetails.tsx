@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Loader2, Play } from 'lucide-react';
+import { Check, Loader2, Play } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Language } from '@/lib/supabase/education/types';
 import type { StarterLessonPack } from '@/lib/education/starterLessonPacks';
@@ -53,22 +53,23 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
         e.preventDefault();
         if (!busy) props.onStartLive();
       }}
-      className={cn(PANEL, 'flex flex-col gap-5 p-5 sm:p-6')}
+      className={cn(PANEL, 'grid grid-cols-1 gap-2 p-3 sm:gap-4 sm:p-5 lg:grid-cols-2 lg:gap-x-8')}
     >
-      <div className="flex items-start gap-3">
-        <EduMascot moment={pose} size={72} className="size-16 shrink-0 sm:size-18" />
+      <div className="flex items-start gap-3 lg:col-span-2">
+        <EduMascot moment={pose} size={72} className="size-16 shrink-0 max-sm:hidden" />
         <div className="min-w-0 flex-1">
           <h1 data-wipe className="font-neo-display text-2xl font-black leading-tight text-neo-cream sm:text-3xl">{t('eduShell.setup.title')}</h1>
-          <p className="font-neo-body text-sm text-neo-cream/80">{t('eduShell.setup.subtitle')}</p>
+          <p className="font-neo-body text-sm text-neo-cream/80 max-sm:sr-only">{t('eduShell.setup.subtitle')}</p>
         </div>
         <Link href={props.skipHref} data-testid="setup-skip" className={cn(QUIET_LINK, 'shrink-0')}>
           {t('eduShell.setup.skip')}
         </Link>
       </div>
 
+      <div className="flex flex-col gap-2 sm:gap-4 max-sm:[&_p[id$='-hint']]:hidden">
       <fieldset className="flex flex-col gap-1.5">
         <legend className={cn(FIELD_LABEL, 'mb-1.5')}>{t('eduShell.setup.gradeLabel')}</legend>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5 sm:gap-2">
           {GRADE_BANDS.map((band) => {
             const on = grade === band;
             return (
@@ -79,11 +80,12 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
                 aria-pressed={on}
                 onClick={() => onGradeChange(on ? null : band)}
                 className={cn(
-                  'min-h-[44px] rounded-full border-[2px] px-4 font-neo-body text-sm font-bold transition-[transform,colors] duration-150 active:scale-[0.97] motion-reduce:transition-none',
-                  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
-                  on ? 'border-neo-black bg-neo-cyan text-neo-black' : 'border-neo-cream/70 text-neo-cream hover:bg-neo-cream/10',
+                  'inline-flex min-h-10 items-center gap-1 rounded-full border-[2px] px-3 font-neo-body text-sm font-bold text-neo-cream transition-[transform,colors] duration-150 active:scale-[0.97] motion-reduce:transition-none sm:min-h-[44px] sm:px-4',
+                  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream',
+                  on ? 'border-neo-lime ring-2 ring-neo-lime' : 'border-neo-cream/50 hover:bg-neo-cream/10',
                 )}
               >
+                {on ? <Check className="size-4 text-neo-lime" strokeWidth={3} aria-hidden="true" /> : null}
                 {t(`eduShell.setup.grade.${band}`)}
               </button>
             );
@@ -98,9 +100,13 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
           setLanguageTouched(true);
           onLanguageChange(next);
         }}
+        variant="compact"
+        selection="ring"
         showBoardHint
       />
+      </div>
 
+      <div className="flex flex-col gap-2 sm:gap-4">
       <StarterPackRow packs={props.packs} selectedKey={props.pack.nameKey} recommendedKey={props.recommendedKey} onSelect={props.onPackChange} t={t} />
 
       <div className="flex flex-col gap-1.5">
@@ -122,7 +128,7 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
       {cap ? (
         <div data-testid="setup-cap-meter" className="flex flex-col gap-1.5">
           <span className="font-neo-body text-xs font-bold text-neo-cream/80">{t('eduShell.setup.capMeter', { count: cap.count, limit: cap.limit })}</span>
-          <div className="flex gap-1" aria-hidden="true">
+          <div className="flex gap-1 max-sm:hidden" aria-hidden="true">
             {Array.from({ length: cap.limit }, (_, i) => (
               <span key={i} className={cn('h-2 flex-1 rounded-full', i < cap.count ? 'bg-neo-yellow' : 'bg-neo-cream/15')} />
             ))}
@@ -143,7 +149,7 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
           data-hero="true"
           disabled={busy !== null}
           aria-busy={busy === 'live' || undefined}
-          className={cn(PRIMARY_BUTTON, 'min-h-14 w-full text-xl')}
+          className={cn(PRIMARY_BUTTON, 'min-h-12 w-full text-xl sm:min-h-14')}
         >
           {busy === 'live' ? (
             <Loader2 className="size-6 animate-spin motion-reduce:animate-none" aria-hidden="true" />
@@ -163,6 +169,7 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
           {busy === 'create' ? <Loader2 className="size-5 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : null}
           {t(busy === 'create' ? 'eduShell.setup.creating' : 'eduShell.setup.createOnly')}
         </button>
+      </div>
       </div>
     </form>
   );

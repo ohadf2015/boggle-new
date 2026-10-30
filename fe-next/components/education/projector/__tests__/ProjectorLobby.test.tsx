@@ -62,14 +62,6 @@ describe('ProjectorLobby — the wall', () => {
     expect(container.innerHTML).not.toMatch(/(^|[\s"])(sm|md|lg|xl|max-md):/);
   });
 
-  it('paints its art behind the content without escaping the frame', () => {
-    render(<ProjectorLobby {...base} />);
-    const art = screen.getByTestId('projector-arena-art');
-    expect(art).toHaveAttribute('aria-hidden', 'true');
-    expect(art.className).toContain('absolute');
-    expect(art.className).not.toContain('fixed');
-  });
-
   it('carries its own way out, since it covers the page header', () => {
     render(<ProjectorLobby {...base} />);
     fireEvent.click(screen.getByTestId('projector-exit'));
@@ -131,7 +123,7 @@ describe('ProjectorLobby — Start', () => {
     render(<ProjectorLobby {...base} onStartPracticeRound={vi.fn()} />);
     const start = screen.getByTestId('projector-start');
     expect(start).toBeDisabled();
-    expect(start).toHaveTextContent('eduLive.lobby.waitingForStudents');
+    expect(start).toHaveTextContent('education.projectorLobby.startWhenReady');
     expect(screen.getByTestId('projector-start-reason')).toHaveTextContent('eduLiveRoom.lobby.startBlocked');
     expect(screen.queryByTestId('projector-start-count')).toBeNull();
   });
@@ -155,7 +147,7 @@ describe('ProjectorLobby — Start', () => {
     expect(start).toBeDisabled();
     expect(start).toHaveAttribute('aria-busy', 'true');
     expect(start).toHaveTextContent('hostView.startClassGame');
-    expect(start.className).toContain('w-full');
+    expect(start.className).toContain('min-h-16');
   });
 
   it('Given Boss Battle, Then Start names the fight', () => {

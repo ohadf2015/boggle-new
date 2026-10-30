@@ -19,13 +19,15 @@ export function chipAccent(name: string, index: number): string {
   return CHIP_ACCENTS[seed % CHIP_ACCENTS.length];
 }
 
+export const STUDENT_CHIP = 'bg-neo-navy text-neo-cream border-neo-cream/50';
+
 /** Container width (rem) from which the lobby splits into join hero | roster columns; matches `@5xl`. */
 export const WIDE_MIN_REM = 64;
 
 /** Back-row code: at least a tenth of the wall's height on every 4:3, 16:9 and 21:9 wall. */
 export const HERO_CODE_TEXT = 'text-[min(14cqw,12cqh)] @5xl:text-[min(7.6cqw,14cqh)]';
 
-export const HERO_QR_SIZE = 'size-[min(36cqw,24cqh)] @5xl:size-[min(14cqw,30cqh)]';
+export const HERO_QR_SIZE = 'size-[min(32cqw,19cqh)] @5xl:size-[min(14cqw,30cqh)]';
 
 export interface RosterTier {
   readonly upTo: number;
@@ -109,7 +111,7 @@ interface StartLabelInput {
 }
 
 export function projectorStartLabel({ starting, canStart, isBoss, switched, isQuiz, startLabelKey }: StartLabelInput): string {
-  if (!canStart && !starting) return 'eduLive.lobby.waitingForStudents';
+  if (!canStart && !starting) return 'education.projectorLobby.startWhenReady';
   if (isBoss) return 'eg2Modes.boss.start';
   if (switched) return isQuiz ? 'hostView.startQuiz' : 'hostView.startClassGame';
   return startLabelKey;

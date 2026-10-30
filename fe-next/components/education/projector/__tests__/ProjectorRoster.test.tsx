@@ -181,4 +181,21 @@ describe('ProjectorRoster — teacher removes a student', () => {
     fireEvent.click(screen.getByTestId('projector-edit-roster'));
     expect(screen.getAllByTestId('projector-remove')).toHaveLength(1);
   });
+
+  it('Given a full class in a phone-width roster, Then a first set of names shows and one chip counts the rest, so the page never scrolls', () => {
+    render(<ProjectorRoster students={classOf(34)} t={t} />);
+    const chips = screen.getAllByTestId('projector-student');
+    expect(chips).toHaveLength(34);
+    expect(chips.slice(0, 8).every((c) => !c.className.includes('@max-md:hidden'))).toBe(true);
+    expect(chips.slice(8).every((c) => c.className.includes('@max-md:hidden'))).toBe(true);
+    const more = screen.getByTestId('projector-more-joined');
+    expect(more).toHaveTextContent('eduLiveRoom.lobby.moreJoined:{"count":26}');
+    expect(more.className).toContain('hidden');
+    expect(more.className).toContain('@max-md:flex');
+  });
+
+  it('Given a class that fits the phone set, Then there is no more chip', () => {
+    render(<ProjectorRoster students={classOf(8)} t={t} />);
+    expect(screen.queryByTestId('projector-more-joined')).toBeNull();
+  });
 });

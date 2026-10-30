@@ -193,7 +193,7 @@ function Placing({ entry, place, stage, floor, muted }: { entry: PodiumEntry; pl
         {entry.detail && revealed && (
           <span
             data-testid={`podium-detail-${rank}`}
-            className="max-w-full truncate font-neo-body font-bold leading-tight opacity-85"
+            className="max-w-full text-balance text-center font-neo-body font-bold leading-tight opacity-85"
             style={{ fontSize: '1.4cqw' }}
           >
             {entry.detail}

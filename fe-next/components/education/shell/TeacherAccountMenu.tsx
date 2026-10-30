@@ -76,10 +76,13 @@ export function TeacherAccountMenu({ proHref, profileHref, variant = 'row' }: Te
               {t('eduShell.account.profile')}
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem asChild className={cn(ITEM, 'text-neo-yellow lg:hidden')}>
+          <DropdownMenuItem asChild className={cn(ITEM, 'lg:hidden')}>
             <Link href={proHref}>
               <Crown className="size-4" aria-hidden="true" />
-              {t('eduShell.nav.pro')}
+              {t('eduShell.account.plans')}
+              <span data-testid="teacher-account-pro-badge" className="ms-auto rounded-neo bg-neo-yellow px-1.5 py-px text-[11px] font-black text-neo-black">
+                {t('eduShell.nav.pro')}
+              </span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild className={ITEM}>

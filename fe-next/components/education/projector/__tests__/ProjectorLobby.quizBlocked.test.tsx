@@ -68,11 +68,18 @@ describe('ProjectorLobby — quiz start the lesson cannot satisfy', () => {
     expect(onStart).not.toHaveBeenCalled();
   });
 
+  it('Given the quiz cannot start, Then Play Classic instead is the one lime action on the wall', () => {
+    sessionStorage.setItem('lessonGameData', JSON.stringify({ gameMode: 'vocab-quiz', vocabQuizVariant: 'boss', quizPlayable: false }));
+    renderLobby();
+    const lime = [...document.querySelectorAll('[class]')].filter((el) => (el.getAttribute('class') ?? '').split(/\s+/).includes('bg-neo-lime'));
+    expect(lime).toEqual([screen.getByTestId('quiz-blocked-play-classic')]);
+  });
+
   it('When the teacher taps Play Classic instead, Then the room is switched through the server, not started', () => {
     sessionStorage.setItem('lessonGameData', JSON.stringify({ gameMode: 'vocab-quiz', vocabQuizVariant: 'boss', quizPlayable: false }));
     const onStart = renderLobby();
 
-    expect(screen.getByTestId('quiz-blocked-play-classic').className).toContain('min-h-11');
+    expect(screen.getByTestId('quiz-blocked-play-classic').className).toContain('min-h-12');
     fireEvent.click(screen.getByTestId('quiz-blocked-play-classic'));
 
     expect(fakeSocket.emit).toHaveBeenCalledWith('updateClassroomGameMode', { gameCode: 'BOSS01', gameMode: 'classic' });

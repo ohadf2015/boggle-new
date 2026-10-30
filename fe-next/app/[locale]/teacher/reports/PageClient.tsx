@@ -378,6 +378,7 @@ export function ReportsProGate({ children }: { children: React.ReactNode }) {
       feature="reports"
       ctaKey="teacher.proGate.reports.cta"
       polarTrialPlacement="reports_teaser"
+      tone="calm"
       whileChecking={<ReportsChecking />}
       lockedTitle={<ReportsLockedTitle />}
     >
@@ -389,7 +390,7 @@ export function ReportsProGate({ children }: { children: React.ReactNode }) {
 function ReportsLockedTitle() {
   const { t } = useLanguage();
   return (
-    <h1 className="mb-6 font-neo-display text-2xl font-bold leading-tight text-neo-white sm:text-3xl">
+    <h1 className="mb-4 font-neo-display text-2xl font-bold leading-tight text-neo-white sm:mb-6 sm:text-3xl">
       {t('teacher.reports.title')}
     </h1>
   );

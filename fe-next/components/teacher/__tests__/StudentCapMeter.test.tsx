@@ -146,6 +146,23 @@ describe('StudentCapMeter', () => {
     expect(cta.textContent).toContain('academy.classes.proCta');
   });
 
+  it('is a quiet outlined line on navy: no cream slab, no cyan button, no shouting', () => {
+    const { container } = render(<StudentCapMeter studentCount={3} />);
+    const classes = [container.firstElementChild, ...Array.from(container.querySelectorAll('*'))]
+      .map((el) => (el as HTMLElement | null)?.className?.toString?.() ?? '')
+      .join(' ');
+    expect(classes).not.toMatch(/(^|\s)bg-neo-(cream|cyan|white|lime)(\s|$)/);
+    expect(classes).not.toMatch(/(^|\s)uppercase(\s|$)/);
+    expect(screen.getByTestId('student-cap-meter').className).toMatch(/border-neo-cream/);
+  });
+
+  it('marks the ask with a small yellow PRO badge', () => {
+    render(<StudentCapMeter studentCount={3} />);
+    const badge = screen.getByTestId('student-cap-pro-badge');
+    expect(badge.className).toContain('bg-neo-yellow');
+    expect(badge).toHaveTextContent('teacher.lastGame.proBadge');
+  });
+
   it('keeps the Pro line out of the meter when there is no ask', () => {
     render(<StudentCapMeter studentCount={2} />);
     expect(screen.queryByTestId('student-cap-pro-unlocks')).toBeNull();

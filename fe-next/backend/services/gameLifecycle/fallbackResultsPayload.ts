@@ -10,8 +10,10 @@ export function buildFallbackResultsPayload(game: {
   playerScores?: Record<string, number>;
   playerWords?: Record<string, string[]>;
 }) {
-  const scores = Object.keys(game.users || {}).map((username) => ({
+  const scores = Object.entries(game.users || {}).map(([username, user]) => ({
     username,
+    isBot: !!(user as { isBot?: boolean } | undefined)?.isBot,
+    isHost: !!(user as { isHost?: boolean } | undefined)?.isHost,
     totalScore: game.playerScores?.[username] || 0,
     // Key must stay wordDetails: the Supabase mapper reads it.
     wordDetails: (game.playerWords?.[username] || []).map((word) => ({

@@ -13,7 +13,14 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 vi.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
+  useLanguage: () => ({
+    t: (k: string, p?: unknown) => (p && typeof p === 'object' ? `${k}:${JSON.stringify(p)}` : k),
+    language: 'en',
+  }),
+}));
+
+vi.mock('../GoogleClassroomRosterImport', () => ({
+  GoogleClassroomRosterImport: () => <div data-testid="google-roster-import" />,
 }));
 
 vi.mock('@/components/teacher/ClassroomStudentList', () => ({
@@ -147,12 +154,81 @@ describe('ClassCard — refined surfaces', () => {
     expect(title.className).not.toMatch(/(^|\s)truncate(\s|$)/);
   });
 
-  it('opens the roster inside the card when the students row is tapped', async () => {
+  it('asks to see the whole roster from the students row', async () => {
     const user = userEvent.setup();
     const onToggleExpanded = vi.fn();
     render(<ClassCard {...baseProps} onToggleExpanded={onToggleExpanded} />);
 
-    await user.click(screen.getByRole('button', { name: /teacher\.classrooms\.students/ }));
+    const students = screen.getByTestId('classroom-card-students');
+    expect(students).toHaveTextContent('teacher.classroom.cardSeeAllStudents:{"count":12}');
+    await user.click(students);
     expect(onToggleExpanded).toHaveBeenCalledTimes(1);
+  });
+
+  it('opens the full roster in a dialog, so the page itself never grows', () => {
+    render(<ClassCard {...baseProps} expanded />);
+    const dialog = screen.getByRole('dialog');
+    expect(dialog).toContainElement(screen.getByTestId('classroom-student-list'));
+    expect(screen.getByTestId('classroom-card')).not.toContainElement(screen.getByTestId('classroom-student-list'));
+  });
+
+  it('shows a short student preview beside the roster button', () => {
+    render(<ClassCard {...baseProps} studentPreview={<span data-testid="avatar-stack" />} />);
+    expect(screen.getByTestId('avatar-stack')).toBeInTheDocument();
+  });
+
+  it('labels the one primary action the same as Teacher home: Pick a game', () => {
+    render(<ClassCard {...baseProps} />);
+    const start = screen.getByTestId('classroom-card-start-game');
+    expect(start).toHaveTextContent('eduShell.home.startLive');
+    expect(start.className).not.toMatch(/(^|\s)uppercase(\s|$)/);
+  });
+
+  it('never shouts: no uppercase micro-labels anywhere on the card', () => {
+    render(<ClassCard {...baseProps} reportHref="/r" assignHref="/a" onOpenProjector={vi.fn()} />);
+    const card = screen.getByTestId('classroom-card');
+    const loud = [card, ...Array.from(card.querySelectorAll('*'))].filter((el) =>
+      /(^|\s)uppercase(\s|$)/.test((el as HTMLElement).className?.toString?.() ?? ''),
+    );
+    expect(loud).toHaveLength(0);
+  });
+
+  it('names the class language in words, not a two-letter code', () => {
+    render(<ClassCard {...baseProps} />);
+    expect(screen.getByTestId('classroom-card-language')).toHaveTextContent('languages.english');
+  });
+
+  it('puts only the code on the cream tile; copy, share and show-on-board are outlined buttons on navy', () => {
+    render(<ClassCard {...baseProps} onOpenProjector={vi.fn()} />);
+    const plate = screen.getByTestId('join-code-plate');
+    for (const id of ['copy-join-code', 'share-join-code', 'classroom-card-projector']) {
+      const btn = screen.getByTestId(id);
+      expect(plate).not.toContainElement(btn);
+      expect(btn.className).not.toMatch(/(^|\s)bg-neo-(cream|navy|white|black)(\s|$)/);
+      expect(btn.className).toMatch(/border-neo-cream/);
+    }
+    expect(screen.getByTestId('classroom-card-projector')).toHaveTextContent('academy.hq.openProjector');
+  });
+
+  it('never cuts a label with an ellipsis', () => {
+    render(<ClassCard {...baseProps} reportHref="/r" assignHref="/a" onOpenProjector={vi.fn()} />);
+    const card = screen.getByTestId('classroom-card');
+    const cut = Array.from(card.querySelectorAll('*')).filter((el) =>
+      /(^|\s)truncate(\s|$)/.test((el as HTMLElement).className?.toString?.() ?? ''),
+    );
+    expect(cut).toHaveLength(0);
+  });
+
+  it('labels the secondary links in teacher words', () => {
+    render(<ClassCard {...baseProps} reportHref="/r" assignHref="/a" />);
+    expect(screen.getByTestId('classroom-card-report')).toHaveTextContent('teacher.classroom.cardClassReport');
+    expect(screen.getByTestId('classroom-card-assign')).toHaveTextContent('teacher.classroom.cardAssignHomework');
+  });
+
+  it('gives the icon-only menu button a name and a tooltip', () => {
+    render(<ClassCard {...baseProps} />);
+    const menu = screen.getByTestId('classroom-card-menu');
+    expect(menu).toHaveAttribute('aria-label', 'academy.teacher.classActions');
+    expect(menu).toHaveAttribute('title', 'academy.teacher.classActions');
   });
 });

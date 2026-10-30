@@ -43,7 +43,7 @@ describe('ProjectorLobby — rehearsing before the class arrives', () => {
     expect(screen.getByTestId('projector-practice-round')).toBeEnabled();
     const start = screen.getByTestId('projector-start');
     expect(start).toBeDisabled();
-    expect(start).toHaveTextContent('eduLive.lobby.waitingForStudents');
+    expect(start).toHaveTextContent('education.projectorLobby.startWhenReady');
   });
 
   it('Given a real student joined beside the bots, Then practice is gone and Start is live', () => {

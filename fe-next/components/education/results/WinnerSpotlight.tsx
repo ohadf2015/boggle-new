@@ -62,6 +62,8 @@ export interface WinnerSpotlightProps {
   outcome?: RoundOutcomeKind;
   /** Everyone sharing first place, for a tie. */
   leaders?: string[];
+  /** Teacher wall: navy-light bar, a cream normal-case banner when nobody scored, smaller mascot. */
+  tone?: 'default' | 'calm';
   t: (key: string, params?: Record<string, string | number>) => string;
   className?: string;
 }
@@ -90,10 +92,12 @@ export function WinnerSpotlight({
   size = 'card',
   outcome = 'winner',
   leaders,
+  tone = 'default',
   t,
   className,
 }: WinnerSpotlightProps) {
   const projector = size === 'projector';
+  const quiet = tone === 'calm';
   const kind: RoundOutcomeKind = !winner || winner.score <= 0 ? 'zero' : outcome;
   const earned = kind !== 'zero' && kind !== 'empty';
   const names = kind === 'tie' && leaders && leaders.length > 1 ? leaders : winner ? [winner.username] : [];
@@ -134,9 +138,13 @@ export function WinnerSpotlight({
       data-active={String(active)}
       data-outcome={kind}
       className={cn(
-        'relative flex items-center gap-4 rounded-neo border-[2px] border-neo-cream shadow-hard',
-        'bg-neo-navy-elevated text-neo-white',
-        projector ? 'px-6 py-4 gap-6 @[137.5rem]/results:px-10 @[137.5rem]/results:py-6' : 'px-4 py-3',
+        'relative flex items-center gap-4 rounded-neo text-neo-white',
+        quiet ? 'border-2 border-neo-cream/40 bg-neo-navy-light' : 'border-[2px] border-neo-cream bg-neo-navy-elevated shadow-hard',
+        projector
+          ? quiet
+            ? 'px-4 py-3 gap-4 @[96rem]/results:px-6 @[96rem]/results:py-4 @[137.5rem]/results:px-10 @[137.5rem]/results:py-6'
+            : 'px-6 py-4 gap-6 @[137.5rem]/results:px-10 @[137.5rem]/results:py-6'
+          : quiet ? 'px-3 py-2 gap-3' : 'px-4 py-3',
         className
       )}
     >
@@ -162,7 +170,11 @@ export function WinnerSpotlight({
           // nothing about hit-testing, and a capture run lost a lobby click to
           // `covered by <video>`. Nothing here is ever the target of a tap.
           'pointer-events-none shrink-0 overflow-hidden rounded-neo border-[2px] border-neo-cream bg-neo-navy',
-          projector ? 'w-28 h-28 @[96rem]/results:w-32 @[96rem]/results:h-32 @[137.5rem]/results:w-44 @[137.5rem]/results:h-44' : 'w-16 h-16'
+          projector
+            ? quiet
+              ? 'w-20 h-20 @[96rem]/results:w-28 @[96rem]/results:h-28 @[137.5rem]/results:w-40 @[137.5rem]/results:h-40'
+              : 'w-28 h-28 @[96rem]/results:w-32 @[96rem]/results:h-32 @[137.5rem]/results:w-44 @[137.5rem]/results:h-44'
+            : quiet ? 'w-12 h-12' : 'w-16 h-16'
         )}
       >
         {active && earned && !calm && (
@@ -204,11 +216,12 @@ export function WinnerSpotlight({
       <div className="min-w-0 flex-1">
         <p
           className={cn(
-            'font-neo-display font-black uppercase tracking-widest leading-none',
+            'font-neo-display font-black leading-none',
+            quiet ? 'tracking-normal' : 'uppercase tracking-widest',
             // 40% white on navy-elevated measured 3.50:1 — a smudge at the
             // back of a room, which is the only place this line is read from.
-            active ? 'text-neo-yellow' : 'text-neo-white/75',
-            projector ? 'text-3xl @[137.5rem]/results:text-5xl' : 'text-sm'
+            !active ? 'text-neo-white/75' : quiet && !earned ? 'text-neo-cream' : 'text-neo-yellow',
+            projector ? (quiet ? 'text-2xl @[96rem]/results:text-3xl @[137.5rem]/results:text-5xl' : 'text-3xl @[137.5rem]/results:text-5xl') : quiet ? 'text-base' : 'text-sm'
           )}
         >
           {active ? t(lostBoss ? 'classroomBoss.topHitter' : BANNER[kind]) : t('education.results.moment.drumroll')}
@@ -220,7 +233,7 @@ export function WinnerSpotlight({
               projector ? 'text-5xl @[137.5rem]/results:text-8xl' : 'text-2xl'
             )}
           >
-            <span data-testid="winner-names" dir="auto" className="truncate">
+            <span data-testid="winner-names" dir="auto" className={cn('truncate', quiet && 'leading-tight')}>
               {names.join(' & ')}
             </span>
             <span
@@ -239,7 +252,7 @@ export function WinnerSpotlight({
             data-testid="winner-zero-body"
             className={cn(
               'mt-1 font-neo-body font-bold leading-snug text-neo-cream',
-              projector ? 'text-xl @[137.5rem]/results:text-4xl' : 'text-sm'
+              projector ? (quiet ? 'text-lg @[96rem]/results:text-xl @[137.5rem]/results:text-4xl' : 'text-xl @[137.5rem]/results:text-4xl') : 'text-sm'
             )}
           >
             {t('eduLive.results.zeroBody')}

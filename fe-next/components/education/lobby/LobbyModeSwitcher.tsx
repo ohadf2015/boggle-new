@@ -132,7 +132,7 @@ export function LobbyModeSwitcher({
         >
           <div className="w-full max-w-md rounded-neo border-[3px] border-neo-cream bg-neo-navy-light p-4 shadow-hard-lg md:max-w-4xl">
             <div className="mb-1 flex items-start justify-between gap-3">
-              <h2 className="font-neo-display text-base font-black uppercase leading-tight text-neo-cream">
+              <h2 className="font-neo-display text-lg font-bold leading-tight text-neo-cream">
                 {t('education.modePicker.sheetTitle')}
               </h2>
               <button

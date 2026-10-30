@@ -1,10 +1,9 @@
 'use client';
 
-import { Check, Clock, Sparkles } from 'lucide-react';
+import { Check, Clock, MonitorPlay, MonitorSmartphone, Smartphone, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { teacherGameMode } from '@/lib/education/gameModes';
-import { CATALOGUE_CATEGORIES, catalogueKeys, catalogueModes, type CatalogueMode } from '../ClassroomModeCatalogueData';
-import { DeliveryTag } from '../DeliveryTag';
+import { CATALOGUE_CATEGORIES, catalogueKeys, catalogueModes, deliveryKey, type CatalogueMode } from '../ClassroomModeCatalogueData';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -59,6 +58,8 @@ export function LobbyModeGrid({ selected, recommended = null, suggested = null, 
   );
 }
 
+const DELIVERY_ICON = { projector: MonitorPlay, phones: Smartphone, both: MonitorSmartphone } as const;
+
 const STICKER =
   'inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-neo-cream/40 bg-neo-navy px-1.5 py-0.5 font-neo-body text-[0.65rem] font-bold leading-none text-neo-cream';
 
@@ -83,6 +84,7 @@ function ModeTile({
   onPick: (id: CatalogueMode['id']) => void;
   t: T;
 }) {
+  const DeliveryIcon = DELIVERY_ICON[mode.delivery];
   return (
     <button
       type="button"
@@ -140,12 +142,15 @@ function ModeTile({
             </span>
           ) : null}
         </span>
-        <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5 font-neo-body text-xs font-bold text-neo-cream/70">
+        <span className="flex min-w-0 flex-nowrap items-center gap-x-2 whitespace-nowrap font-neo-body text-xs font-bold text-neo-cream/70">
           <span className="inline-flex items-center gap-1 whitespace-nowrap">
             <Clock className="size-3 shrink-0" strokeWidth={2.5} aria-hidden="true" />
             {minutesLabel}
           </span>
-          <DeliveryTag delivery={mode.delivery} t={t} className="hidden bg-transparent p-0 text-xs text-neo-cream/70 @2xl:inline-flex" />
+          <span data-testid={`delivery-tag-${mode.delivery}`} title={t(deliveryKey(mode.delivery))} className="hidden items-center gap-1 @2xl:inline-flex">
+            <DeliveryIcon className="size-3 shrink-0" strokeWidth={2.5} aria-hidden="true" />
+            {t(`eduShell.deliveryShort.${mode.delivery}`)}
+          </span>
         </span>
       </span>
     </button>

@@ -49,6 +49,16 @@ describe('<LobbyModeGrid> — the picker is the page', () => {
     expect(within(card).getByTestId(/^delivery-tag-/)).toBeInTheDocument();
   });
 
+  it('Then every card keeps its time and where-it-plays on one line, short copy with the full label on hover', () => {
+    renderGrid();
+    for (const mode of catalogueModes()) {
+      const tag = within(screen.getByTestId(`mode-tile-${mode.id}`)).getByTestId(`delivery-tag-${mode.delivery}`);
+      expect(tag).toHaveTextContent(`eduShell.deliveryShort.${mode.delivery}`);
+      expect(tag).toHaveAttribute('title', `eduShell.delivery.${mode.delivery}`);
+      expect((tag.parentElement as HTMLElement).className).toMatch(/(^|\s)flex-nowrap(\s|$)/);
+    }
+  });
+
   it('Then the recommended game carries one sticker, inside its own card', () => {
     renderGrid();
     const stickers = screen.getAllByTestId('mode-recommended');

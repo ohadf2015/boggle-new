@@ -20,6 +20,8 @@ export interface TvCoveragePanelProps {
   maxChips?: number;
   /** The shared reteach verdict: it decides the "all found" and "whole lesson" lines. */
   verdict?: ReteachVerdictKind;
+  /** Shares the screen with the Teacher Pro card: drop the secondary lines so Play again and the card stay on screen. */
+  compact?: boolean;
   t: (key: string, params?: Record<string, string | number>) => string;
 }
 
@@ -28,18 +30,19 @@ export interface TvCoveragePanelProps {
  * empty panel), and the one region allowed to shrink and scroll when a class
  * missed everything, so Play again below it never leaves the wall.
  */
-export function TvCoveragePanel({ summary, players, neverPlaced, stage, pointsWithoutLesson, phone, maxChips = 12, verdict, t }: TvCoveragePanelProps) {
+export function TvCoveragePanel({ summary, players, neverPlaced, stage, pointsWithoutLesson, phone, maxChips = 12, verdict, compact = false, t }: TvCoveragePanelProps) {
+  const chips = phone ? Math.min(6, maxChips) : maxChips;
   const size = phone ? 'card' : 'projector';
   const allFoundLine = verdict === undefined || verdict === 'allFound';
   return (
     <section
       data-testid="tv-coverage-panel"
-      className="flex flex-col @5xl/results:min-h-0 @5xl/results:flex-initial @5xl/results:overflow-hidden rounded-neo border-[3px] border-neo-cream bg-neo-navy-elevated px-3 pt-3 pb-0 @5xl/results:p-4 shadow-hard"
+      className="flex flex-col @5xl/results:min-h-0 @5xl/results:flex-initial @5xl/results:overflow-hidden rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-3 pt-3 pb-0 @5xl/results:p-3 @[96rem]/results:p-4"
     >
-      {verdict === 'wholeLesson' && (
+      {verdict === 'wholeLesson' && !(compact && phone) && (
         <p
           data-testid="tv-reteach-whole-lesson"
-          className={phone ? 'mb-2 font-neo-display font-bold text-sm text-neo-cream' : 'mb-3 font-neo-display font-bold text-xl @[96rem]/results:text-2xl text-neo-cream'}
+          className={phone ? 'mb-1.5 font-neo-display font-bold text-sm text-neo-cream' : 'mb-2 font-neo-display font-bold text-base @[96rem]/results:text-xl text-neo-cream'}
         >
           {t('education.results.wholeLessonAgain')}
         </p>
@@ -54,14 +57,17 @@ export function TvCoveragePanel({ summary, players, neverPlaced, stage, pointsWi
           fill={sweepReached(stage)}
           celebrate={sweepReached(stage)}
           missedOnly
-          maxChips={phone ? 6 : maxChips}
+          maxChips={chips}
           allFoundLine={allFoundLine}
+          calm
           t={t}
         />
       ) : (
         <NoLessonWordsPanel
           words={classFoundWords(players, { exclude: [summary.teacherName], limit: phone ? 6 : 8 })}
           size={size}
+          compact={compact}
+          hideWords={compact && phone}
           t={t}
         >
           <WordCoverageGlance
@@ -71,9 +77,10 @@ export function TvCoveragePanel({ summary, players, neverPlaced, stage, pointsWi
             neverPlaced={neverPlaced}
             size={size}
             missedOnly
-            maxChips={phone ? 4 : 8}
+            maxChips={compact ? Math.min(2, chips) : Math.min(phone ? 4 : 8, chips)}
             heading={t('eduLive.results.noLessonReteach')}
             allFoundLine={allFoundLine}
+            calm
             t={t}
           />
         </NoLessonWordsPanel>

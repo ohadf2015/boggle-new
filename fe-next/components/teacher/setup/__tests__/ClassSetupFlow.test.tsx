@@ -92,6 +92,37 @@ describe('<ClassSetupFlow>', () => {
     expect(screen.getAllByTestId(/^setup-grade-/)).toHaveLength(5);
     const language = screen.getByRole('radiogroup', { name: 'eduShell.setup.languageLabel' });
     expect(within(language).getByRole('radio', { name: /English/ })).toBeChecked();
+    const picked = within(language).getByRole('radio', { name: /English/ }).closest('label')!;
+    expect(picked.className).not.toMatch(/bg-neo-lime/);
+    expect(picked.className).toMatch(/ring-neo-lime/);
+  });
+
+  it('Given a picked grade, Then it shows as a lime ring with a check, never a colored fill', async () => {
+    render(<ClassSetupFlow />);
+    const band = screen.getAllByTestId(/^setup-grade-/)[1];
+    await userEvent.click(band);
+    expect(band).toHaveAttribute('aria-pressed', 'true');
+    expect(band.className).toMatch(/ring-neo-lime/);
+    expect(band.className).not.toMatch(/(^|\s)bg-neo-(cyan|lime|pink)(\s|$)/);
+    expect(band.querySelector('svg')).not.toBeNull();
+  });
+
+  it('Given the picked pack, Then it shows as a lime ring with a check and the recommendation is a quiet normal-case tag', () => {
+    render(<ClassSetupFlow />);
+    const packs = screen.getByRole('radiogroup', { name: 'eduShell.setup.packLabel' });
+    const picked = within(packs).getByRole('radio', { checked: true }).closest('label')!;
+    expect(picked.className).toMatch(/ring-neo-lime/);
+    expect(picked.className).not.toMatch(/(^|\s)bg-neo-lime(\s|$)/);
+    const classes = Array.from(packs.querySelectorAll('*')).map((el) => (el as HTMLElement).className?.toString?.() ?? '').join(' ');
+    expect(classes).not.toMatch(/(^|\s)uppercase(\s|$)/);
+  });
+
+  it('Given a phone, Then the step dots, subtitle and board hint step aside so the form fits without scrolling', () => {
+    render(<ClassSetupFlow />);
+    expect(screen.getByRole('list', { name: 'eduShell.setup.stepsLabel' }).className).toMatch(/max-sm:hidden/);
+    expect(screen.getByText('eduShell.setup.subtitle').className).toMatch(/max-sm:sr-only/);
+    const language = screen.getByRole('radiogroup', { name: 'eduShell.setup.languageLabel' });
+    expect(language.parentElement!.className).toContain("max-sm:[&_p[id$='-hint']]:hidden");
   });
 
   it('Given step 1, Then a starter pack is already picked and skipping is always one tap away', () => {

@@ -15,7 +15,7 @@ export function EmptyRoundCard({ t }: { t: (key: string) => string }) {
         className="size-20 @3xl/results:size-40 shrink-0 object-contain motion-safe:animate-neo-wobble"
       />
       <span className="flex min-w-0 flex-col gap-1 @3xl/results:gap-2 text-start">
-        <span dir="auto" className="font-neo-display font-black uppercase leading-tight text-neo-cyan text-lg @3xl/results:text-4xl">
+        <span dir="auto" className="font-neo-display font-bold leading-tight text-neo-cream text-lg @3xl/results:text-4xl">
           {t('eduLive.results.emptyHeadline')}
         </span>
         <span dir="auto" className="font-neo-body font-bold leading-snug text-neo-cream/90 text-sm @3xl/results:text-2xl">

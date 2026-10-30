@@ -80,4 +80,12 @@ describe('<TeacherAccountMenu>', () => {
     await waitFor(() => expect(push).toHaveBeenCalledWith('/he/education'));
     expect(signOut).toHaveBeenCalled();
   });
+  it('When opened, Then the Pro item is a neutral row that names plans and carries only a small PRO badge', async () => {
+    render(<TeacherAccountMenu proHref="/he/teacher/upgrade" profileHref="/he/teacher/profile" />);
+    await openMenu();
+    const item = screen.getByRole('menuitem', { name: /eduShell.account.plans/ });
+    expect(item).toHaveAttribute('href', '/he/teacher/upgrade');
+    expect(item.className).not.toContain('text-neo-yellow');
+    expect(item.querySelector('[data-testid="teacher-account-pro-badge"]')).toHaveTextContent('eduShell.nav.pro');
+  });
 });

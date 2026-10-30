@@ -147,7 +147,7 @@ describe('AnalyticsPageClient', () => {
 
     // Header
     expect(screen.getByText('education.analytics.title')).toBeInTheDocument();
-    expect(screen.getByText('education.analytics.subtitle')).toBeInTheDocument();
+    expect(screen.getByText('teacher.classroom.cardClassReport')).toBeInTheDocument();
 
     // Live indicator
     expect(screen.getByTestId('live-activity-indicator')).toBeInTheDocument();
@@ -188,6 +188,16 @@ describe('AnalyticsPageClient', () => {
       expect(screen.getByText('teacher.proGate.analytics.title')).toBeInTheDocument();
       expect(screen.getByTestId('pro-gate-upgrade-analytics')).toBeInTheDocument();
       expect(screen.queryByRole('link', { name: 'teacher.proGate.cta' })).not.toBeInTheDocument();
+    });
+
+    it('given a free teacher, when the lock shows, then it uses the calm look: one lime CTA, a small PRO badge, no lime pill', () => {
+      teacherPro.hasPro = false;
+
+      render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
+
+      expect(screen.getByTestId('pro-gate-upgrade-analytics').className).not.toMatch(/\bbg-neo-cyan\b/);
+      expect(screen.getByTestId('pro-gate-pill')).toHaveTextContent('eduShell.nav.pro');
+      expect(screen.getByTestId('pro-gate-pill').className).not.toMatch(/\bbg-neo-lime\b/);
     });
 
     it('shows neither the dashboard nor the upsell until Pro state resolves', () => {

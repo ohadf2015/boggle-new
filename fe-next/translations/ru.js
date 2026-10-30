@@ -869,12 +869,14 @@ const ru = {
       "copies": "{count} копий",
       "copiesOne": "{count} копия",
       "copiesFew": "{count} копии",
-      "results": "Итоги"
+      "results": "Итоги",
+      "use": "Использовать"
     },
     "badge": {
       "verified": "Проверено",
       "teacher": "От учителя",
-      "yours": "Ваш"
+      "yours": "Ваш",
+      "byTeacher": "От учителя"
     },
     "discover": {
       "searchLabel": "Поиск списков",
@@ -937,7 +939,7 @@ const ru = {
       "label": "Страницы",
       "prev": "Назад",
       "next": "Далее",
-      "status": "{page} / {total}"
+      "status": "Стр. {page} из {total}"
     }
   },
   // @eduLibrary:end
@@ -1155,7 +1157,7 @@ const ru = {
       "pageOf": "{{page}} из {{pages}}",
       "nextPage": "Ещё классы",
       "proUnlocks": "В Pro: аналитика класса + отчёты для печати",
-      "proCta": "Перейти на Pro — {{price}}/мес",
+      "proCta": "Перейти на Pro: {{price}}/мес",
       "nextUp": "Далее"
     },
     "launch": {
@@ -3590,6 +3592,7 @@ const ru = {
       "rehearsePrivate": "Это видите только вы. Учеников в комнате нет, и результат не засчитывается.",
       "rehearseBotsBlocked": "Боты не умеют играть в эту игру, поэтому отрепетировать её с ними нельзя.",
       "rehearseUseClassic": "Репетировать в классическом режиме",
+      "startWhenReady": "Начните, когда все войдут",
       "lateJoinOn": "Можно присоединиться позже",
       "lateJoinOff": "Позже присоединиться нельзя",
       "lock": {
@@ -4385,7 +4388,7 @@ const ru = {
       "assignLessonsHint": "Выберите уроки для класса",
       "avgAccuracy": "Средняя точность",
       "avgXpGain": "Средний прирост XP",
-      "backToClassroom": "Вернуться в класс",
+      "backToClassroom": "Мои классы",
       "classAverageXp": "Среднее XP класса",
       "commonMistakes": "Частые ошибки",
       "completionRate": "Процент завершения",
@@ -14120,6 +14123,10 @@ const ru = {
     "classroom": {
       "studentCap": "Учеников: {{count}} из {{limit}}",
       "studentCountPro": "Учеников: {{count}}",
+      "cardSeeAllStudents": "Все ученики ({{count}})",
+      "cardRosterTitle": "Ученики: {{name}}",
+      "cardAssignHomework": "Задать домашку",
+      "cardClassReport": "Отчёт по классу",
       "presets": {
         "title": "Быстрые настройки",
         "fridayBattle": {
@@ -14236,7 +14243,7 @@ const ru = {
       "createdBannerTitle": "Класс готов",
       "googleClassroom": "Опубликовать в Google Classroom",
       "googleClassroomTitle": "Присоединяйтесь к «{{name}}» в LexiClash",
-      "googleClassroomBody": "Нажмите на ссылку, чтобы войти в класс. Аккаунт не нужен — просто выберите имя.",
+      "googleClassroomBody": "Нажмите на ссылку, чтобы войти в класс. Аккаунт не нужен, просто выберите имя.",
       "createdBannerBody": "Поделитесь этим кодом с учениками.",
       "dismissBanner": "Понятно",
       "card": {
@@ -20978,12 +20985,14 @@ const ru = {
       "homeLink": "LexiClash для учителей, главная"
     },
     "account": {
+      "plans": "Тарифы",
       "menuLabel": "Меню аккаунта",
       "fallbackName": "Учитель",
       "profile": "Профиль",
       "help": "Помощь",
       "whatsNew": "Что нового"
     },
+    "deliveryShort": { "projector": "Проектор", "phones": "Телефоны", "both": "Телефон + ТВ" },
     "delivery": {
       "projector": "Нужен проектор",
       "phones": "Только телефоны",
@@ -21012,7 +21021,7 @@ const ru = {
       "showCodeFor": "Показать код для {name}",
       "reviewTitle": "Повторить пропущенные слова",
       "rail": {
-        "run": "Выбрать",
+        "run": "Взять",
         "seeAll": "Все занятия",
         "language": "Язык занятия"
       },
@@ -21241,6 +21250,7 @@ const ru = {
       "title": "Видно, кому было трудно, после каждой игры",
       "body": "Pro превращает каждую игру в отчёт по классу: точность каждого ученика, слова для повторения и страница для печати для родителей или коллег.",
       "trialCta": "Попробовать Pro бесплатно {days} дней",
+      "startTrialCta": "Начать бесплатный период на {days} дней",
       "buyCta": "Teacher Pro · {price}/мес",
       "trialFine": "{days} дней бесплатно, потом {price}/мес. Отмена в любой момент."
     },

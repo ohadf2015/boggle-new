@@ -60,6 +60,10 @@ vi.mock('@/components/teacher/hq/ClassroomCardActivity', () => ({
   ClassroomCardActivity: () => <div data-testid="card-activity" />,
 }));
 
+vi.mock('@/components/teacher/classroom/ClassAvatarStack', () => ({
+  ClassAvatarStack: () => null,
+}));
+
 import ClassroomManager from '../ClassroomManager';
 
 const CLASSROOM = {

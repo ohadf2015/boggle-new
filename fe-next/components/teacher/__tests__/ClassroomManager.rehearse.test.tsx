@@ -45,6 +45,10 @@ vi.mock('@/components/teacher/hq/ClassroomCardActivity', () => ({
   ClassroomCardActivity: () => <div data-testid="card-activity" />,
 }));
 
+vi.mock('@/components/teacher/classroom/ClassAvatarStack', () => ({
+  ClassAvatarStack: () => null,
+}));
+
 import ClassroomManager from '../ClassroomManager';
 
 describe('ClassroomManager — rehearse from the class card', () => {

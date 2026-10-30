@@ -867,12 +867,14 @@ const es = {
       "playsOne": "{count} partida",
       "copies": "{count} copias",
       "copiesOne": "{count} copia",
-      "results": "Resultados"
+      "results": "Resultados",
+      "use": "Usar lista"
     },
     "badge": {
       "verified": "Verificada",
       "teacher": "De docente",
-      "yours": "Tuya"
+      "yours": "Tuya",
+      "byTeacher": "De un docente"
     },
     "discover": {
       "searchLabel": "Buscar listas",
@@ -935,7 +937,7 @@ const es = {
       "label": "Páginas",
       "prev": "Anterior",
       "next": "Siguiente",
-      "status": "{page} / {total}"
+      "status": "Página {page} de {total}"
     }
   },
   // @eduLibrary:end
@@ -14550,6 +14552,10 @@ const es = {
     "classroom": {
       "studentCap": "{{count}} / {{limit}} alumnos",
       "studentCountPro": "{{count}} alumnos",
+      "cardSeeAllStudents": "Ver los {{count}} alumnos",
+      "cardRosterTitle": "Alumnos de {{name}}",
+      "cardAssignHomework": "Poner tarea",
+      "cardClassReport": "Informe de la clase",
       "presets": {
         "title": "Ajustes rápidos",
         "fridayBattle": {
@@ -15459,6 +15465,7 @@ const es = {
       "rehearsePrivate": "Solo tú ves esto. Los estudiantes no están en la sala y no cuenta.",
       "rehearseBotsBlocked": "Los bots no pueden jugar a este juego, así que no puedes ensayarlo con ellos.",
       "rehearseUseClassic": "Ensaya con Clásico",
+      "startWhenReady": "Empieza cuando estén todos",
       "lateJoinOn": "Se puede entrar tarde",
       "lateJoinOff": "No se puede entrar tarde",
       "lock": {
@@ -16262,7 +16269,7 @@ const es = {
       "assignLessonsHint": "Elige qué practicarán",
       "avgAccuracy": "Precisión promedio",
       "avgXpGain": "XP ganado promedio",
-      "backToClassroom": "Volver a la clase",
+      "backToClassroom": "Tus clases",
       "classAverageXp": "XP promedio",
       "commonMistakes": "Palabras problemáticas",
       "completionRate": "Tasa de completado",
@@ -21295,12 +21302,14 @@ const es = {
       "homeLink": "LexiClash para docentes, inicio"
     },
     "account": {
+      "plans": "Planes",
       "menuLabel": "Menú de la cuenta",
       "fallbackName": "Docente",
       "profile": "Perfil",
       "help": "Ayuda",
       "whatsNew": "Novedades"
     },
+    "deliveryShort": { "projector": "Proyector", "phones": "Móviles", "both": "Móvil + TV" },
     "delivery": {
       "projector": "Necesita proyector",
       "phones": "Solo teléfonos",
@@ -21329,7 +21338,7 @@ const es = {
       "showCodeFor": "Mostrar el código de {name}",
       "reviewTitle": "Practicar las palabras falladas",
       "rail": {
-        "run": "Elegir",
+        "run": "Usar",
         "seeAll": "Ver todas",
         "language": "Idioma de la actividad"
       },
@@ -21558,6 +21567,7 @@ const es = {
       "title": "Mira quién tuvo dificultades después de cada partida",
       "body": "Pro convierte cada partida en un informe de clase: la precisión de cada estudiante, las palabras que conviene repasar y una hoja imprimible para familias o tu departamento.",
       "trialCta": "Prueba Pro gratis {days} días",
+      "startTrialCta": "Empezar prueba gratis de {days} días",
       "buyCta": "Teacher Pro · {price}/mes",
       "trialFine": "Gratis {days} días y después {price}/mes. Cancela cuando quieras."
     },

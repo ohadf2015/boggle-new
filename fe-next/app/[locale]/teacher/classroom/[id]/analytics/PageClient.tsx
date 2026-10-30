@@ -40,6 +40,7 @@ import { ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
+import { OUTLINE_BUTTON } from '@/components/teacher/home/homeStyles';
 
 // ============================================
 // TYPE DEFINITIONS
@@ -143,58 +144,42 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
   // ==================== RENDER ====================
 
   return (
-    <div ref={revealRef} className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div data-tm className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-          {/* Title & Back Button */}
-          <div>
-            <button type="button"
-              onClick={handleBackToClassroom}
-              className={cn(
-                // A bare cyan word on navy is not a control. 2px cream edge +
-                // a lighter fill, same treatment as every other secondary
-                // action on these screens.
-                'inline-flex min-h-11 items-center gap-2 mb-3 rounded-neo px-3 py-2',
-                'border-[2px] border-neo-cream bg-neo-navy-light shadow-hard-sm',
-                'text-neo-white hover:-translate-y-0.5 hover:shadow-hard',
-                'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan',
-                'transition duration-200'
-              )}
-            >
-              <DirectionalIcon icon={ArrowLeft} className="w-4 h-4" />
-              <span className="text-sm font-neo-body">{t('education.analytics.backToClassroom')}</span>
-            </button>
-
-            <h1 data-wipe className="text-3xl md:text-4xl font-neo-display text-neo-white mb-2">
-              {t('education.analytics.title')}
-            </h1>
-            <p className="text-neo-white font-neo-body">
-              {t('education.analytics.subtitle')}
-            </p>
-          </div>
-
-          {/* Live Activity Indicator */}
-          <div
-            className={cn(
-              'bg-neo-navy/50 border-[2px] border-neo-cream/40 shadow-hard rounded-neo',
-              'px-4 py-3'
-            )}
+    <div ref={revealRef} className="mx-auto max-w-7xl space-y-4 md:space-y-5">
+        <div data-tm className="flex flex-wrap items-center gap-x-3 gap-y-2 sm:gap-x-4">
+          <button
+            type="button"
+            onClick={handleBackToClassroom}
+            title={t('education.analytics.backToClassroom')}
+            className={cn(OUTLINE_BUTTON, 'shrink-0 max-sm:size-11 max-sm:px-0')}
           >
-            <LiveActivityIndicator
-              isConnected={isConnected}
-              activeStudentsCount={activeStudentsCount}
-              lastUpdate={lastUpdate}
-              connectionStatus={connectionStatus}
-            />
+            <DirectionalIcon icon={ArrowLeft} className="size-4" />
+            <span className="max-sm:sr-only">{t('education.analytics.backToClassroom')}</span>
+          </button>
+          <div className="min-w-0 flex-1">
+            <p className="font-neo-body text-sm font-bold text-neo-cream/70">{t('teacher.classroom.cardClassReport', 'Class report')}</p>
+            <h1 data-wipe className="font-neo-display text-2xl font-bold leading-tight text-neo-cream md:text-3xl">
+              <bdi>{classroomName || t('education.analytics.title')}</bdi>
+            </h1>
           </div>
+          {connectionStatus === 'connected' && activeStudentsCount === 0 ? null : (
+            <div data-testid="analytics-live" className="rounded-neo border-2 border-neo-cream/35 px-3 py-2">
+              <LiveActivityIndicator
+                isConnected={isConnected}
+                activeStudentsCount={activeStudentsCount}
+                lastUpdate={lastUpdate}
+                connectionStatus={connectionStatus}
+              />
+            </div>
+          )}
         </div>
 
         {/* One gate over the dashboard AND the detail tabs — the tabs are the analytics
             being sold; gating only the summary card left them open to free teachers. */}
-        <div data-tm className="space-y-6">
+        <div data-tm className="space-y-4 md:space-y-5 [&_[data-testid=pro-gate-preview]]:max-md:hidden">
         <FreeGameHeadlineCard classroomId={classroomId} />
         <ProGate
           feature="analytics"
+          tone="calm"
           whileChecking={
             <div data-testid="analytics-pro-pending" aria-busy="true" className="flex min-h-60 items-center justify-center rounded-neo border-[2px] border-neo-cream/40 bg-neo-navy/30 shadow-hard">
               <PageLoader size="md" text={t('common.loading')} />
@@ -223,25 +208,25 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
             >
               <TabsTrigger
                 value="students"
-                className={cn(TAB_BASE, 'data-[state=active]:bg-neo-cyan data-[state=active]:text-neo-black data-[state=active]:border-neo-black')}
+                className={cn(TAB_BASE, TAB_ACTIVE)}
               >
                 {t('education.analytics.viewStudents')}
               </TabsTrigger>
               <TabsTrigger
                 value="lessons"
-                className={cn(TAB_BASE, 'data-[state=active]:bg-neo-pink data-[state=active]:text-neo-white data-[state=active]:border-neo-black')}
+                className={cn(TAB_BASE, TAB_ACTIVE)}
               >
                 {t('education.analytics.viewLessons')}
               </TabsTrigger>
               <TabsTrigger
                 value="vocabulary"
-                className={cn(TAB_BASE, 'data-[state=active]:bg-neo-lime data-[state=active]:text-neo-black data-[state=active]:border-neo-black')}
+                className={cn(TAB_BASE, TAB_ACTIVE)}
               >
                 {t('education.analytics.viewVocabulary')}
               </TabsTrigger>
               <TabsTrigger
                 value="assignments"
-                className={cn(TAB_BASE, 'data-[state=active]:bg-neo-lime data-[state=active]:text-neo-black data-[state=active]:border-neo-black')}
+                className={cn(TAB_BASE, TAB_ACTIVE)}
               >
                 {t('education.analytics.viewAssignments')}
               </TabsTrigger>
@@ -334,7 +319,10 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
 
 import { TeacherGate } from '@/components/education/TeacherGate';
 
-// Selected differs by FILL, not only text colour; unselected keeps a 2px cream edge so it reads as tappable.
+// Selected = lime ring on navy; unselected keeps a cream edge so it reads as tappable.
+const TAB_ACTIVE =
+  'data-[state=active]:border-neo-lime data-[state=active]:bg-neo-navy-light data-[state=active]:text-neo-cream data-[state=active]:ring-2 data-[state=active]:ring-neo-lime';
+
 const TAB_BASE =
   'min-h-11 h-auto whitespace-normal px-2 py-2 text-sm leading-tight font-neo-body font-bold rounded-neo border-[2px] data-[state=inactive]:text-neo-white data-[state=inactive]:border-neo-cream transition-[color,background-color,border-color,transform] duration-200 active:translate-y-px motion-reduce:transition-none';
 
@@ -358,7 +346,7 @@ function AnalyticsShell({ children }: { children: ReactNode }) {
   return (
     <EducationShell
       scrollRegionLabel={t('teacher.shell.analyticsLabel')}
-      contentClassName="p-4 md:p-8"
+      contentClassName="p-4 md:px-8 md:py-6"
     >
       {children}
     </EducationShell>

@@ -84,6 +84,8 @@ export interface WordCoverageGlanceProps {
   heading?: string;
   /** Whether the empty missed list may say "all found". The wall passes the shared reteach verdict, which counts a word found by too few as still to teach. */
   allFoundLine?: boolean;
+  /** Teacher wall: cream count and meter, smaller type, so Play again stays the one lime fill. */
+  calm?: boolean;
   t: (key: string, params?: Record<string, string | number>) => string;
 }
 
@@ -101,12 +103,18 @@ export function WordCoverageGlance({
   maxChips,
   heading,
   allFoundLine = true,
+  calm = false,
   t,
 }: WordCoverageGlanceProps) {
   const projector = size === 'projector';
   // Under a heading the list shares its panel with other content, so it skips the 2xl wall upscale.
   const wallXL = projector && heading === undefined;
   const [expanded, setExpanded] = useState(false);
+  const chipIcon = !projector
+    ? 'w-4 h-4'
+    : calm
+      ? 'w-4 h-4 @[96rem]/results:w-6 @[96rem]/results:h-6'
+      : cn('w-6 h-6', wallXL && '@[96rem]/results:w-8 @[96rem]/results:h-8');
   // A late joiner has no mastery row; treat them as having found nothing rather
   // than crashing or hiding the card.
   const mine = summary.masteryByPlayer[username] ?? { found: 0, total: summary.totalWords };
@@ -174,36 +182,36 @@ export function WordCoverageGlance({
         <p
           data-testid="coverage-heading"
           dir="auto"
-          className={cn('shrink-0 mb-2 font-neo-display font-black uppercase tracking-wide text-neo-white/85', projector ? 'text-xl @[96rem]/results:text-2xl' : 'text-sm')}
+          className={cn('shrink-0 mb-2 font-neo-display text-neo-white/85', calm ? 'font-bold' : 'font-black uppercase tracking-wide', projector ? 'text-xl @[96rem]/results:text-2xl' : 'text-sm')}
         >
           {heading}
         </p>
       ) : (
         <>
-          <div className="shrink-0 flex items-end gap-3 mb-2">
+          <div className={cn('shrink-0 flex items-end gap-3', calm ? 'mb-1.5' : 'mb-2')}>
             <span
               className={cn(
                 'font-neo-display font-black leading-none tabular-nums',
                 // Gold is reserved for celebration, and a full sweep is the only
                 // thing on this card that earns it.
-                swept ? 'text-neo-yellow' : 'text-neo-lime',
-                projector ? 'text-6xl @[96rem]/results:text-9xl' : 'text-4xl'
+                swept ? 'text-neo-yellow' : calm ? 'text-neo-cream' : 'text-neo-lime',
+                projector ? (calm ? 'text-5xl @[96rem]/results:text-7xl' : 'text-6xl @[96rem]/results:text-9xl') : calm ? 'text-3xl' : 'text-4xl'
               )}
             >
               {found}
-              <span className={cn('text-neo-white/50', projector ? 'text-3xl @[96rem]/results:text-6xl' : 'text-2xl')}>
+              <span className={cn('text-neo-white/50', projector ? (calm ? 'text-2xl @[96rem]/results:text-4xl' : 'text-3xl @[96rem]/results:text-6xl') : calm ? 'text-xl' : 'text-2xl')}>
                 /{total}
               </span>
             </span>
             <p
               className={cn(
                 'flex-1 text-neo-white font-neo-body font-bold leading-tight pb-1',
-                projector ? 'text-xl @[96rem]/results:text-4xl' : 'text-sm'
+                projector ? (calm ? 'text-lg @[96rem]/results:text-2xl' : 'text-xl @[96rem]/results:text-4xl') : 'text-sm'
               )}
             >
               {isTeacher
                 ? // The wall prints the number beside this line in 9xl; saying it again in words was noise.
-                  t(projector ? 'eduResultsV3.coverageLabel' : 'education.results.classCoverage', { found, total })
+                  t(projector || calm ? 'eduResultsV3.coverageLabel' : 'education.results.classCoverage', { found, total })
                 : t('education.results.yourMastery', { found, total })}
             </p>
 
@@ -250,15 +258,16 @@ export function WordCoverageGlance({
             aria-valuemax={total}
             aria-label={t('education.results.coverageMeterLabel', { percent: pct })}
             className={cn(
-              'w-full shrink-0 rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated overflow-hidden mb-3',
-              projector ? 'h-6 @[96rem]/results:h-10' : 'h-4'
+              'w-full shrink-0 rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated overflow-hidden',
+              calm ? 'mb-2' : 'mb-3',
+              projector ? (calm ? 'h-4 @[96rem]/results:h-6' : 'h-6 @[96rem]/results:h-10') : calm ? 'h-3' : 'h-4'
             )}
           >
             <div
               data-testid="coverage-fill"
               className={cn(
                 'h-full transition-[width] duration-700 ease-out motion-reduce:transition-none',
-                swept ? 'bg-neo-yellow' : 'bg-neo-lime'
+                swept ? 'bg-neo-yellow' : calm ? 'bg-neo-cream/80' : 'bg-neo-lime'
               )}
               style={{ width: `${fill ? pct : 0}%` }}
             />
@@ -287,7 +296,11 @@ export function WordCoverageGlance({
               data-placed={unplaced ? 'false' : 'true'}
               className={cn(
                 'flex items-center gap-1.5 rounded-neo font-bold',
-                projector ? cn('px-3 py-1.5 text-xl', wallXL && '@5xl/results:text-2xl @[96rem]/results:px-5 @[96rem]/results:py-2.5 @[96rem]/results:text-3xl') : 'px-3 py-1.5 text-sm',
+                projector
+                  ? calm
+                    ? 'px-2.5 py-1 text-base @[96rem]/results:px-3.5 @[96rem]/results:py-1.5 @[96rem]/results:text-2xl'
+                    : cn('px-3 py-1.5 text-xl', wallXL && '@5xl/results:text-2xl @[96rem]/results:px-5 @[96rem]/results:py-2.5 @[96rem]/results:text-3xl')
+                  : calm ? 'px-2.5 py-1 text-sm' : 'px-3 py-1.5 text-sm',
                 hit && 'border-[2px] border-neo-black bg-neo-lime text-neo-black shadow-hard-sm',
                 !hit && !unplaced && 'border-[2px] border-neo-cream bg-neo-navy-light text-neo-white/60',
                 // A word the board never carried is still a word a teacher
@@ -298,11 +311,11 @@ export function WordCoverageGlance({
               )}
             >
               {hit ? (
-                <Check className={projector ? cn('w-6 h-6', wallXL && '@[96rem]/results:w-8 @[96rem]/results:h-8') : 'w-4 h-4'} aria-hidden />
+                <Check className={chipIcon} aria-hidden />
               ) : unplaced ? (
-                <EyeOff className={projector ? cn('w-6 h-6', wallXL && '@[96rem]/results:w-8 @[96rem]/results:h-8') : 'w-4 h-4'} aria-hidden />
+                <EyeOff className={chipIcon} aria-hidden />
               ) : (
-                <X className={projector ? cn('w-6 h-6', wallXL && '@[96rem]/results:w-8 @[96rem]/results:h-8') : 'w-4 h-4'} aria-hidden />
+                <X className={chipIcon} aria-hidden />
               )}
               <span>{entry.word}</span>
               {isTeacher && entry.foundBy.length > 0 && (
@@ -344,13 +357,13 @@ export function WordCoverageGlance({
                 // control from six metres, not as one more grey chip.
                 'border-[2px] border-neo-cream bg-neo-navy text-neo-cream',
                 'hover:bg-neo-navy-light transition-colors',
-                projector ? 'px-4 py-2.5 text-2xl' : 'px-3 py-1.5 text-sm'
+                projector ? (calm ? 'px-2.5 py-1 text-base @[96rem]/results:text-2xl' : 'px-4 py-2.5 text-2xl') : calm ? 'px-2.5 py-1 text-sm' : 'px-3 py-1.5 text-sm'
               )}
             >
               {expanded ? (
-                <ChevronUp className={projector ? 'w-6 h-6 shrink-0' : 'w-4 h-4 shrink-0'} aria-hidden />
+                <ChevronUp className={cn(chipIcon, 'shrink-0')} aria-hidden />
               ) : (
-                <ChevronDown className={projector ? 'w-6 h-6 shrink-0' : 'w-4 h-4 shrink-0'} aria-hidden />
+                <ChevronDown className={cn(chipIcon, 'shrink-0')} aria-hidden />
               )}
               {expanded
                 ? t('education.results.fewerWords')

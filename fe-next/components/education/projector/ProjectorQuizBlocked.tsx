@@ -49,23 +49,23 @@ export function ProjectorQuizBlocked({ gameCode, currentMode, t, onApplied }: Pr
   });
 
   return (
-    <div className="flex flex-col items-start gap-1">
-      <p
-        data-testid="quiz-blocked-reason"
-        role="alert"
-        className="font-neo-body font-bold leading-tight text-neo-pink text-[clamp(0.875rem,min(1cqw,1.9cqh),1.5rem)]"
-      >
-        {t(REASON_KEY)}
-      </p>
+    <div className="flex flex-col gap-1">
       <button
         type="button"
         data-testid="quiz-blocked-play-classic"
         onClick={() => switchTo('classic')}
         disabled={!!pendingMode}
-        className="inline-flex min-h-11 items-center rounded-sm font-neo-body font-black text-neo-lime underline decoration-2 underline-offset-4 transition-colors hover:text-neo-cream focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan disabled:opacity-50 text-[clamp(0.875rem,min(1cqw,1.9cqh),1.5rem)]"
+        className="inline-flex min-h-12 items-center justify-center rounded-neo border-[3px] border-neo-black bg-neo-lime px-4 py-2 font-neo-display font-black text-neo-black shadow-hard transition-transform active:translate-y-0.5 active:shadow-none focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan disabled:opacity-60 text-[clamp(1rem,min(1.4cqw,2.6cqh),2rem)]"
       >
         {t('eg2Modes.playClassicInstead')}
       </button>
+      <p
+        data-testid="quiz-blocked-reason"
+        role="alert"
+        className="font-neo-body leading-snug text-neo-cream/85 text-[clamp(0.8125rem,min(1cqw,1.9cqh),1.375rem)]"
+      >
+        {t(REASON_KEY)}
+      </p>
     </div>
   );
 }

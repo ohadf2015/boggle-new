@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { ChevronLeft, ChevronRight, ChevronsRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronsRight, MonitorPlay, MonitorSmartphone, Smartphone } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { cn } from '@/lib/utils';
@@ -13,11 +13,12 @@ import {
   catalogueEntry,
   catalogueKeys,
   catalogueModes,
+  deliveryKey,
   modeStyleFor,
   type CatalogueMode,
+  type ModeDelivery,
 } from './ClassroomModeCatalogueData';
 import { teacherGameMode } from '@/lib/education/gameModes';
-import { DeliveryTag } from './DeliveryTag';
 
 export interface ClassroomModeCatalogueProps {
   selected: CatalogueMode['id'];
@@ -64,6 +65,22 @@ export interface ClassroomModeCardRowProps {
   /** Page direction; omitted, the row reads it from the nearest `dir` ancestor. */
   dir?: 'rtl' | 'ltr';
   t: T;
+}
+
+const DELIVERY_ICON = { projector: MonitorPlay, phones: Smartphone, both: MonitorSmartphone } as const;
+
+function DeliveryShort({ delivery, t }: { delivery: ModeDelivery; t: T }) {
+  const Icon = DELIVERY_ICON[delivery];
+  return (
+    <span
+      data-testid={`delivery-tag-${delivery}`}
+      title={t(deliveryKey(delivery))}
+      className="inline-flex items-center gap-1 whitespace-nowrap font-neo-body text-[0.65rem] font-bold leading-none text-neo-cream/75 lg:text-xs"
+    >
+      <Icon className="size-3 shrink-0" strokeWidth={2.5} aria-hidden="true" />
+      {t(`eduShell.deliveryShort.${delivery}`)}
+    </span>
+  );
 }
 
 function isRtl(el: HTMLElement): boolean {
@@ -122,7 +139,7 @@ export function ClassroomModeCardRow({ selected, recommended = null, selectedMin
     <div className="flex flex-col" dir={dir}>
     <p
       data-testid="mode-row-swipe-hint"
-      className="lg:hidden flex items-center justify-end gap-1 px-0.5 font-neo-display text-[0.7rem] font-black uppercase tracking-wide text-neo-yellow"
+      className="lg:hidden flex items-center justify-end gap-1 px-0.5 font-neo-body text-xs font-bold text-neo-cream/70"
     >
       {t('eg2Modes.swipeHint', { count: modes.length })}
       <DirectionalIcon icon={ChevronsRight} className="h-4 w-4" />
@@ -154,7 +171,7 @@ export function ClassroomModeCardRow({ selected, recommended = null, selectedMin
             // Equal card widths across groups: n sevenths of the row minus its share of the gaps.
             style={{ ['--group-basis' as string]: `calc((100% - ${(modes.length - 1) * 12}px) * ${group.length} / ${modes.length} + ${(group.length - 1) * 12}px)` }}
           >
-            <span className="flex items-center gap-1.5 px-0.5 text-start font-neo-display text-[0.65rem] font-black uppercase tracking-wide text-neo-cream lg:text-sm">
+            <span className="flex items-center gap-1.5 px-0.5 text-start font-neo-body text-xs font-bold text-neo-cream/80 lg:text-sm">
               <span aria-hidden="true" className="h-[3px] w-3 shrink-0 bg-neo-cream" />
               {t(`eg2Modes.category.${category}`)}
             </span>
@@ -170,7 +187,7 @@ export function ClassroomModeCardRow({ selected, recommended = null, selectedMin
                     name={t(catalogueKeys(mode).name)}
                     minutesLabel={t('education.modePicker.minutes', { count: cardMinutes })}
                     recommendedLabel={recommended === mode.id ? t('education.modePicker.recommended') : null}
-                    deliveryTag={<DeliveryTag delivery={mode.delivery} t={t} />}
+                    deliveryTag={<DeliveryShort delivery={mode.delivery} t={t} />}
                     selected={isLive}
                     busy={busy}
                     onPick={onPick}

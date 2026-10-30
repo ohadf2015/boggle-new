@@ -21,6 +21,16 @@ describe('ProFeaturePreview — a concrete sample of each Pro surface', () => {
     expect(root.className).not.toMatch(/blur/);
   });
 
+  it('given calm, when the analytics sample renders, then it has no colored fills or colored text', () => {
+    render(<ProFeaturePreview feature="analytics" calm />);
+    const root = screen.getByTestId('pro-preview-analytics');
+    const colored = Array.from(root.querySelectorAll<HTMLElement>('[class]')).filter((el) =>
+      /(^|\s)(bg|text|border)-neo-(lime|cyan|pink|purple|yellow)(\/\d+)?(\s|$)/.test(el.getAttribute('class') ?? ''),
+    );
+    expect(colored).toEqual([]);
+    expect(root.querySelectorAll('.uppercase')).toHaveLength(0);
+  });
+
   it('shows every sample student in the analytics preview', () => {
     render(<ProFeaturePreview feature="analytics" />);
     expect(screen.getAllByTestId('pro-preview-student-row')).toHaveLength(SAMPLE_STUDENTS.length);

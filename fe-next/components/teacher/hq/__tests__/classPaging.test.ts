@@ -3,7 +3,7 @@
  * on a phone, two on a tablet, three on a desktop row.
  */
 import { describe, it, expect } from 'vitest';
-import { CLASS_GRID_QUERIES, carouselPage, carouselPages, classPageSize } from '../classPaging';
+import { CLASS_GRID_QUERIES, carouselPage, carouselPages, classPageSize, classesPerView } from '../classPaging';
 
 describe('classPageSize', () => {
   it('Given a phone, Then one class per page', () => {
@@ -59,5 +59,18 @@ describe('carouselPage', () => {
   it('Given a mid-swipe position between cards, Then the nearest page', () => {
     expect(carouselPage({ firstIndex: 1, atEnd: false, perView: 3, count: 9 })).toBe(0);
     expect(carouselPage({ firstIndex: 2, atEnd: false, perView: 3, count: 9 })).toBe(1);
+  });
+});
+
+describe('classesPerView', () => {
+  it('Given one class on a desktop row, Then it takes half the row, not a narrow third', () => {
+    expect(classesPerView({ sm: true, lg: true }, 1)).toBe(2);
+  });
+  it('Given three classes on a desktop row, Then three per page', () => {
+    expect(classesPerView({ sm: true, lg: true }, 3)).toBe(3);
+  });
+  it('Given a phone, Then always one per page', () => {
+    expect(classesPerView({ sm: false, lg: false }, 1)).toBe(1);
+    expect(classesPerView({ sm: false, lg: false }, 5)).toBe(1);
   });
 });

@@ -29,7 +29,7 @@ export function TeacherBrand({
         <span className={cn('truncate font-neo-display font-black text-neo-cream', compact ? 'text-lg' : 'text-xl')}>
           {t('eduShell.brand.name')}
         </span>
-        <span className="truncate font-neo-display text-xs font-bold text-neo-lime">{t('eduShell.brand.tagline')}</span>
+        <span className="truncate font-neo-display text-xs font-bold text-neo-cream/70">{t('eduShell.brand.tagline')}</span>
       </span>
     </Link>
   );

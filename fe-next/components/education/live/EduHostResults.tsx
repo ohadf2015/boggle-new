@@ -45,7 +45,7 @@ import { ReteachStatusNote } from './ReteachStatusNote';
 import { reteachVerdict, studentsUnderHalf } from './eduReteachModel';
 import { useReplayMissedWords, type ReteachStatus } from './useReteachRound';
 
-const SECONDARY = cn(SECONDARY_BUTTON, PRESS, 'min-h-14 min-w-0 grow basis-40 text-center @[96rem]/results:text-base');
+const SECONDARY = cn(SECONDARY_BUTTON, PRESS, 'min-h-10 @5xl/results:min-h-11 min-w-0 grow basis-40 border-[2px] border-neo-cream/60 bg-neo-navy text-center font-bold normal-case tracking-normal @[96rem]/results:text-base');
 
 interface ActionsProps extends Pick<ClassroomTvResultsScreenProps, 'onRematch' | 'onClose' | 'onExitRoom'> {
   t: Translate;
@@ -61,7 +61,7 @@ function Actions({ t, onRematch, onClose, onExitRoom, reteach }: ActionsProps) {
         onRematch();
       }
     : undefined;
-  const primaryClass = cn(PRIMARY_BUTTON, PRESS, 'min-h-16 w-full px-6 py-3 text-2xl @5xl/results:text-3xl @[96rem]/results:min-h-20 @[96rem]/results:text-4xl');
+  const primaryClass = cn(PRIMARY_BUTTON, PRESS, 'min-h-14 w-full px-6 py-2.5 normal-case tracking-normal text-2xl @5xl/results:text-3xl @[96rem]/results:min-h-20 @[96rem]/results:text-4xl');
   const hasSecondary = (reteachFirst && !!playAgain) || !!onClose || !!onExitRoom;
 
   return (
@@ -139,13 +139,30 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
   const { hasPro, loading: proLoading } = useTeacherPro();
   const students = stats?.students ?? 0;
   const shortWall = !phone && bossOver;
+  const proCard = !proLoading && !hasPro && !isPracticeRound(players);
+  // Laid out for the card while the entitlement resolves, so its arrival never reflows the wall.
+  const roomForCard = !hasPro && !isPracticeRound(players);
+  // On the wall the class numbers stand under the winner, so the side column holds coverage, actions and the Pro card.
+  const pulseBesideStage = showPodium && !phone && !bossOver;
+  const podiumWidth = bossOver
+    ? pulseBesideStage
+      ? '@5xl/results:w-[min(100%,calc((100cqh-32rem)*1.768))] @[96rem]/results:w-[min(100%,calc((100cqh-36rem)*1.768))]'
+      : '@5xl/results:w-[min(100%,calc((100cqh-27rem)*1.768))]'
+    : pulseBesideStage
+      ? '@5xl/results:w-[min(100%,calc((100cqh-21rem)*1.768))] @[96rem]/results:w-[min(100%,calc((100cqh-25rem)*1.768))]'
+      : '@5xl/results:w-[min(100%,calc((100cqh-16rem)*1.768))]';
+  const pulse = stats ? (
+    <div className={cn(shortWall && '[@container_results_(height<56.25rem)]:hidden')}>
+      <ClassPulse stats={stats} active={winnerBeat} size={phone ? 'card' : 'projector'} t={t} />
+    </div>
+  ) : null;
 
   return (
     <div
       data-testid="edu-host-results"
       data-round-end-stage={stage}
       data-outcome={outcome.kind}
-      className="fixed inset-0 z-[75] flex flex-col gap-3 overflow-hidden bg-neo-navy px-3 pb-4 pt-16 text-neo-cream [container:results_/_size] lg:gap-4 lg:px-8 lg:pb-6 lg:pt-6"
+      className="fixed inset-0 z-[75] flex flex-col gap-2 overflow-hidden bg-neo-navy px-3 pb-3 pt-4 text-neo-cream [container:results_/_size] lg:gap-4 lg:px-8 lg:pb-6 lg:pt-6"
     >
       <BossOutcomeCard size="tv" className="shrink-0" />
       <TvRecapHeader
@@ -160,9 +177,9 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
       />
 
       <div data-testid="edu-host-results-scroll" className="-mx-3 flex min-h-0 flex-1 flex-col overflow-y-auto px-3 [scrollbar-width:thin] @5xl/results:mx-0 @5xl/results:px-0">
-        <div className="grid grid-cols-1 gap-3 @5xl/results:min-h-0 @5xl/results:flex-1 @5xl/results:grid-cols-5 @5xl/results:gap-5 @[96rem]/results:grid-cols-3">
+        <div className="grid grid-cols-1 gap-2 @5xl/results:min-h-0 @5xl/results:flex-1 @5xl/results:grid-cols-5 @5xl/results:gap-5 @[96rem]/results:grid-cols-3">
           {hasStage && (
-            <div className="relative flex flex-col gap-3 @5xl/results:col-span-3 @5xl/results:min-h-0 @5xl/results:gap-4 @[96rem]/results:col-span-2">
+            <div className="relative flex flex-col gap-2 @5xl/results:col-span-3 @5xl/results:min-h-0 @5xl/results:gap-4 @[96rem]/results:col-span-2">
               {/* The winner bar stands down to "top hitter" when the boss got away; so does the party. */}
               <CelebrationLoop active={winnerBeat && showPodium && bossStatus !== 'escaped'} className="z-10" />
               {outcome.kind === 'empty' && !bossOver && <EmptyRoundCard t={t} />}
@@ -172,7 +189,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
                   muted={!outcome.celebrate}
                   stage={stage}
                   t={t}
-                  className={bossOver ? '@5xl/results:w-[min(100%,calc((100cqh-27rem)*1.768))]' : '@5xl/results:w-[min(100%,calc((100cqh-16rem)*1.768))]'}
+                  className={cn(roomForCard && 'w-[min(100%,14rem)]', podiumWidth)}
                 >
                   {landed && <ClassChest found={summary.classFoundCount} total={summary.totalWords} open={winnerBeat} t={t} />}
                   {!outcome.celebrate && <ZeroRoundNote t={t} />}
@@ -186,19 +203,17 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
                   active={isRevealed(1, stage)}
                   cue={!swept}
                   size={phone ? 'card' : 'projector'}
+                  tone="calm"
                   t={t}
                   className="z-20 shrink-0"
                 />
               )}
+              {pulseBesideStage && pulse}
             </div>
           )}
 
-          <div className={cn('flex flex-col gap-3 @5xl/results:min-h-0 @5xl/results:gap-4 [&>*]:shrink-0', hasStage ? '@5xl/results:col-span-2 @[96rem]/results:col-span-1' : '@5xl/results:col-span-5 @5xl/results:mx-auto @5xl/results:w-full @5xl/results:max-w-4xl @[96rem]/results:col-span-3')}>
-            {stats && (
-              <div className={cn(shortWall && '[@container_results_(height<56.25rem)]:hidden')}>
-                <ClassPulse stats={stats} active={winnerBeat} size={phone ? 'card' : 'projector'} t={t} />
-              </div>
-            )}
+          <div className={cn('flex flex-col gap-2 @5xl/results:min-h-0 @5xl/results:gap-3 @[96rem]/results:gap-4 [&>*]:shrink-0', hasStage ? '@5xl/results:col-span-2 @[96rem]/results:col-span-1' : '@5xl/results:col-span-5 @5xl/results:mx-auto @5xl/results:w-full @5xl/results:max-w-4xl @[96rem]/results:col-span-3')}>
+            {!pulseBesideStage && pulse}
             {summary.totalWords > 0 && missed.length === 0 && (
               <TvCoveragePanel
                 summary={summary}
@@ -207,8 +222,9 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
                 stage={stage}
                 pointsWithoutLesson={!landed && outcome.celebrate}
                 phone={phone}
-                maxChips={bossOver ? 6 : 9}
+                maxChips={roomForCard ? (phone ? 2 : 3) : bossOver ? 6 : 9}
                 verdict={reteachVerdict(summary).kind}
+                compact={roomForCard}
                 t={t}
               />
             )}
@@ -220,7 +236,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
               reteach={{ count: missed.length, status: reteach.status, start: reteach.start, restoreFull: reteach.restoreFull }}
             />
             {/* Teacher Pro right under Play again: the moment a free teacher has just seen the value. */}
-            {!proLoading && !hasPro && !isPracticeRound(players) && <ResultsTeacherProTrialCard language={language} />}
+            {proCard && <ResultsTeacherProTrialCard language={language} />}
             <MissedWordsList words={missed} underHalf={studentsUnderHalf(summary)} maxChips={bossOver ? 6 : 8} t={t} />
             {!proLoading && hasPro && summary.totalWords > 0 && (
               <div className={cn(shortWall && '[@container_results_(height<56.25rem)]:hidden')}>

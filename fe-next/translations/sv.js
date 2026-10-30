@@ -867,12 +867,14 @@ const sv = {
       "playsOne": "Spelad {count} gång",
       "copies": "{count} kopior",
       "copiesOne": "{count} kopia",
-      "results": "Resultat"
+      "results": "Resultat",
+      "use": "Använd listan"
     },
     "badge": {
       "verified": "Verifierad",
       "teacher": "Lärargjord",
-      "yours": "Din"
+      "yours": "Din",
+      "byTeacher": "Av en lärare"
     },
     "discover": {
       "searchLabel": "Sök listor",
@@ -935,7 +937,7 @@ const sv = {
       "label": "Sidor",
       "prev": "Föregående",
       "next": "Nästa",
-      "status": "{page} / {total}"
+      "status": "Sida {page} av {total}"
     }
   },
   // @eduLibrary:end
@@ -1153,7 +1155,7 @@ const sv = {
       "pageOf": "{{page}} av {{pages}}",
       "nextPage": "Fler klasser",
       "proUnlocks": "Pro ger klassanalys och utskrivbara rapporter",
-      "proCta": "Skaffa Pro – {{price}}/mån",
+      "proCta": "Skaffa Pro: {{price}}/mån",
       "nextUp": "Nästa"
     },
     "launch": {
@@ -14923,6 +14925,10 @@ const sv = {
     "classroom": {
       "studentCap": "{{count}} / {{limit}} elever",
       "studentCountPro": "{{count}} elever",
+      "cardSeeAllStudents": "Visa alla {{count}} elever",
+      "cardRosterTitle": "Elever i {{name}}",
+      "cardAssignHomework": "Ge läxa",
+      "cardClassReport": "Klassrapport",
       "presets": {
         "title": "Snabbinställningar",
         "fridayBattle": {
@@ -15039,7 +15045,7 @@ const sv = {
       "createdBannerTitle": "Klassrummet är redo",
       "googleClassroom": "Publicera i Google Classroom",
       "googleClassroomTitle": "Gå med i {{name}} på LexiClash",
-      "googleClassroomBody": "Tryck på länken för att gå med i klassen. Inget konto behövs – välj bara ett namn.",
+      "googleClassroomBody": "Tryck på länken för att gå med i klassen. Inget konto behövs, välj bara ett namn.",
       "createdBannerBody": "Dela koden med dina elever.",
       "dismissBanner": "Okej",
       "card": {
@@ -15811,6 +15817,7 @@ const sv = {
       "rehearsePrivate": "Bara du ser det här. Eleverna är inte i rummet och det räknas inte.",
       "rehearseBotsBlocked": "Bottar kan inte spela det här spelet, så du kan inte repetera det med dem.",
       "rehearseUseClassic": "Repetera med Klassiskt i stället",
+      "startWhenReady": "Starta när alla är med",
       "lateJoinOn": "Sen anslutning tillåten",
       "lateJoinOff": "Sen anslutning stängd",
       "lock": {
@@ -16614,7 +16621,7 @@ const sv = {
       "assignLessonsHint": "Välj lektioner för klassen",
       "avgAccuracy": "Genomsnittlig träffsäkerhet",
       "avgXpGain": "Genomsnittlig XP",
-      "backToClassroom": "Tillbaka till klassen",
+      "backToClassroom": "Dina klasser",
       "classAverageXp": "Klassens snitt-XP",
       "commonMistakes": "Vanliga fel",
       "completionRate": "Andel slutförda",
@@ -21282,12 +21289,14 @@ const sv = {
       "homeLink": "LexiClash för lärare, startsida"
     },
     "account": {
+      "plans": "Abonnemang",
       "menuLabel": "Kontomeny",
       "fallbackName": "Lärare",
       "profile": "Profil",
       "help": "Hjälp",
       "whatsNew": "Nyheter"
     },
+    "deliveryShort": { "projector": "Projektor", "phones": "Mobiler", "both": "Mobil + TV" },
     "delivery": {
       "projector": "Kräver projektor",
       "phones": "Bara mobiler",
@@ -21316,7 +21325,7 @@ const sv = {
       "showCodeFor": "Visa anslutningskoden för {name}",
       "reviewTitle": "Öva på de missade orden",
       "rail": {
-        "run": "Välj",
+        "run": "Använd",
         "seeAll": "Visa alla",
         "language": "Språk för passet"
       },
@@ -21545,6 +21554,7 @@ const sv = {
       "title": "Se vem som kämpade, efter varje spel",
       "body": "Pro gör varje spel till en klassrapport: varje elevs träffsäkerhet, orden att repetera och en utskrivbar sida för föräldrar eller arbetslaget.",
       "trialCta": "Prova Pro gratis i {days} dagar",
+      "startTrialCta": "Starta gratis provperiod på {days} dagar",
       "buyCta": "Teacher Pro · {price}/mån",
       "trialFine": "Gratis i {days} dagar, sedan {price}/mån. Avsluta när du vill."
     },

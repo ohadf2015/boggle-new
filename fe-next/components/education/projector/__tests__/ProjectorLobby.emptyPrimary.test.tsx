@@ -30,7 +30,7 @@ describe('ProjectorLobby — an empty room has one clear primary', () => {
     render(<ProjectorLobby {...props} />);
     const start = screen.getByTestId('projector-start');
     expect(start).toBeDisabled();
-    expect(start).toHaveTextContent('eduLive.lobby.waitingForStudents');
+    expect(start).toHaveTextContent('education.projectorLobby.startWhenReady');
     expect(start).not.toHaveTextContent('hostView.startClassGame');
   });
 

@@ -1,17 +1,4 @@
-/**
- * Teacher Classes PageClient
- *
- * The nav shell's "Classes" tab (components/education/shell/navItems.ts)
- * links here. Before this route existed, the only place to create, rename or
- * delete a class was buried inside the dashboard's "teacher-tools" section —
- * exactly the surface the addendum's nav spec wants promoted to its own tab.
- *
- * `ClassroomManager` owns the list (rename/delete, rosters, share/invite,
- * start/assign/report); creating a class is `/teacher/classroom/new`. It
- * fetches its own data via `useClassrooms()`, so
- * this file stays a thin shell wrapper — the same shape as
- * `teacher/curriculum/PageClient.tsx` and `teacher/reports/PageClient.tsx`.
- */
+/** The Classes tab: a thin shell around ClassroomManager, which fetches and owns the class cards. */
 
 'use client';
 
@@ -46,7 +33,7 @@ export default function TeacherClassroomsPage() {
 function ClassesTitle() {
   const { t } = useLanguage();
   return (
-    <h1 data-wipe className="min-w-0 truncate font-neo-display text-lg font-bold leading-none tracking-tight text-neo-cream min-[400px]:text-xl sm:text-3xl [@media(orientation:landscape)_and_(max-height:500px)]:text-xl">
+    <h1 data-wipe className="min-w-0 whitespace-nowrap font-neo-display text-2xl font-bold leading-tight tracking-tight text-neo-cream sm:text-3xl [@media(orientation:landscape)_and_(max-height:500px)]:text-xl">
       {t('academy.teacher.classesTitle', 'Your classes')}
     </h1>
   );

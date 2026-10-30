@@ -50,25 +50,27 @@ vi.mock('@/components/teacher/hq/ClassroomCardActivity', () => ({
   ClassroomCardActivity: () => <div data-testid="card-activity" />,
 }));
 
+vi.mock('@/components/teacher/classroom/ClassAvatarStack', () => ({
+  ClassAvatarStack: () => null,
+}));
+
 import ClassroomManager from '../ClassroomManager';
 
 describe('ClassroomManager — invite actions in a narrow card', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('stacks the copy/share row at every width', () => {
-    // Measured, not assumed. Side by side, these two clipped or truncated at
-    // BOTH real widths: ~300px per card in the desktop 3-column grid (SHARE
-    // rendered as "SHAR", then "SH…"), and ~290px on a 390px phone where the
-    // card is full-bleed ("COPY …"). There is no width in this layout where
-    // both labels fit on one line, so a breakpoint — viewport or container —
-    // would only decide which of the two ways to be unreadable. Stacking is
-    // legible everywhere and the cards have the vertical room.
+  it('gives copy and share a row of their own, under the code, with wrapping labels', () => {
     render(<ClassroomManager />);
 
     const row = screen.getByTestId('copy-join-code').parentElement;
     expect(row).not.toBeNull();
-    expect(row!.className).toContain('flex-col');
-    expect(row!.className).not.toMatch(/flex-row/);
+    expect(row!.className).toMatch(/grid-cols-2/);
+    expect(row!.contains(screen.getByTestId('classroom-join-code'))).toBe(false);
+    for (const id of ['copy-join-code', 'share-join-code']) {
+      const cls = screen.getByTestId(id).className;
+      expect(cls).toContain('whitespace-normal');
+      expect(cls).not.toMatch(/(^|\s)whitespace-nowrap(\s|$)/);
+    }
   });
 
   it('lets each invite button shrink below its own label width', () => {

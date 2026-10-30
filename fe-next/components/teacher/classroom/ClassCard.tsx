@@ -8,21 +8,24 @@ import {
   Share2,
   Edit2,
   Trash2,
-  Users,
-  ChevronDown,
+  ChevronRight,
   GraduationCap,
   MoreHorizontal,
-  Rocket,
+  Play,
   MonitorPlay,
   ClipboardList,
   BarChart3,
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { LANGUAGE_LABEL_KEYS } from '@/lib/i18n/languageLabels';
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import ClassroomStudentList from '../ClassroomStudentList';
 import { GoogleClassroomRosterImport } from './GoogleClassroomRosterImport';
 import { StudentCapMeter } from '../StudentCapMeter';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
+import { OUTLINE_BUTTON, PRIMARY_BUTTON } from '../home/homeStyles';
 import { slideUp } from '../teacherDashboardTabs';
 
 export interface ClassCardData {
@@ -35,6 +38,7 @@ export interface ClassCardData {
 
 export interface ClassCardProps {
   classroom: ClassCardData;
+  /** The full roster dialog is open. */
   expanded: boolean;
   onToggleExpanded: () => void;
   onCopy: () => void;
@@ -43,38 +47,28 @@ export interface ClassCardProps {
   googleHref: string | null;
   onEdit: () => void;
   onDelete: () => void;
-  /** Recent activity + next step (the Classes tab passes it). */
+  /** The last game line. */
   activity?: ReactNode;
-  /** "Start game" → Teacher HQ with this class preselected (one more tap: GO LIVE). */
+  /** A few student faces beside the roster button. */
+  studentPreview?: ReactNode;
+  /** Opens Pick-a-game with this class preselected. */
   startGameHref?: string;
-  /** Quiet private practice with bots, under Start game. */
+  /** Quiet private practice with bots, under Pick a game. */
   rehearse?: ReactNode;
-  /** The dashboard with this class preselected and the assignment creator open. */
   assignHref?: string;
-  /** This class's report. */
   reportHref?: string;
-  /** Opens the projector view of the join code. */
   onOpenProjector?: () => void;
 }
 
-const PRESS =
-  'shadow-hard-sm transition hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed';
-
-const QUIET_ACTION =
-  'flex min-h-10 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-neo border-2 border-neo-cream/40 px-2 py-1.5 font-neo-body text-sm font-bold text-neo-cream hover:bg-neo-cream/10 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan';
+const SMALL_ACTION = cn(OUTLINE_BUTTON, 'min-h-10 min-w-0 whitespace-normal px-2 text-center leading-tight');
 
 const MENU_ITEM =
-  'flex min-h-11 w-full items-center gap-2 rounded-neo px-3 text-start font-neo-body text-sm font-black text-black hover:bg-black/10 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan';
+  'flex min-h-11 w-full items-center gap-2 rounded-neo px-3 text-start font-neo-body text-sm font-bold text-neo-cream hover:bg-neo-cream/10 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cream';
 
 /**
- * One class on the Classes tab, Kahoot-grade: the two verbs that matter get
- * the pixels — the join code (ink-on-cream plate, read aloud from the back
- * row) with copy/share beside it, and ONE saturated hero (Start a game).
- * Rename, delete and Google Classroom live behind "…". The roster opens
- * inside the card and scrolls there, never the page.
- *
- * Refined-surfaces recipe: navy-light panel, hairline cream border, quiet
- * sentence-case title — the lime hero is the only saturated fill.
+ * One class on the Classes tab. The join code is the only cream tile, Pick a
+ * game the only lime fill; the full roster opens in a dialog so the page never
+ * grows. Rename, delete and Google Classroom live behind the menu.
  */
 export function ClassCard({
   classroom,
@@ -86,6 +80,7 @@ export function ClassCard({
   onEdit,
   onDelete,
   activity,
+  studentPreview,
   startGameHref,
   rehearse,
   assignHref,
@@ -97,9 +92,8 @@ export function ClassCard({
   const count = classroom.member_count || 0;
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  // Close on any press outside the menu, or Escape. A document listener, not
-  // a `fixed inset-0` backdrop: the card animates in with a transform, which
-  // turns `fixed` into "fixed to the card".
+  // A document listener, not a `fixed inset-0` backdrop: the card animates in
+  // with a transform, which turns `fixed` into "fixed to the card".
   useEffect(() => {
     if (!menuOpen) return;
     const onDown = (e: PointerEvent) => {
@@ -119,22 +113,27 @@ export function ClassCard({
     setMenuOpen(false);
     fn();
   };
+  const languageKey = LANGUAGE_LABEL_KEYS[classroom.language as keyof typeof LANGUAGE_LABEL_KEYS];
+  const actionsLabel = t('academy.teacher.classActions', 'Class actions');
 
   return (
     <m.div
       variants={slideUp}
       data-testid="classroom-card"
-      className="@container relative rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light/95 shadow-hard transition-shadow hover:shadow-hard-lg"
+      className="@container relative flex flex-col gap-2.5 rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light p-3 shadow-hard sm:px-4"
     >
-      <div className="flex items-center gap-2 px-3 pt-2.5">
+      <div className="flex items-center gap-2">
         <h3
           title={classroom.name}
-          className="min-w-0 flex-1 line-clamp-2 font-neo-display text-lg font-bold text-neo-cream @[24rem]:text-xl"
+          className="min-w-0 flex-1 line-clamp-2 font-neo-display text-lg font-bold leading-tight text-neo-cream @[24rem]:text-xl"
         >
           <bdi>{classroom.name}</bdi>
         </h3>
-        <span className="shrink-0 rounded-neo border border-neo-cream/40 px-2 py-0.5 text-xs font-bold uppercase text-neo-cream/70">
-          {classroom.language.toUpperCase()}
+        <span
+          data-testid="classroom-card-language"
+          className="shrink-0 rounded-neo border border-neo-cream/35 px-1.5 py-px font-neo-body text-xs font-bold text-neo-cream/80"
+        >
+          {languageKey ? t(languageKey) : classroom.language}
         </span>
         <div ref={menuRef} className="relative shrink-0">
           <button
@@ -143,13 +142,11 @@ export function ClassCard({
             onClick={() => setMenuOpen((o) => !o)}
             aria-haspopup="menu"
             aria-expanded={menuOpen}
-            aria-label={t('academy.teacher.classActions', 'Class actions')}
-            className={cn(
-              'flex size-10 shrink-0 items-center justify-center rounded-neo border-2 border-neo-cream/40 text-neo-cream hover:bg-neo-cream/10',
-              PRESS,
-            )}
+            aria-label={actionsLabel}
+            title={actionsLabel}
+            className={cn(OUTLINE_BUTTON, 'size-10 min-h-10 px-0')}
           >
-            <MoreHorizontal className="size-5" strokeWidth={3} aria-hidden="true" />
+            <MoreHorizontal className="size-5" aria-hidden="true" />
           </button>
           <AnimatePresence>
             {menuOpen ? (
@@ -157,11 +154,11 @@ export function ClassCard({
                 key="menu"
                 role="menu"
                 data-testid="classroom-card-menu-panel"
-                initial={{ opacity: 0, scale: 0.9, y: -6 }}
+                initial={{ opacity: 0, scale: 0.95, y: -4 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.9, y: -6 }}
-                transition={{ type: 'spring', stiffness: 520, damping: 30 }}
-                className="absolute end-0 top-full z-30 mt-2 w-56 origin-top-right rounded-neo border-2 border-neo-black bg-neo-cream p-1 shadow-hard-lg rtl:origin-top-left"
+                exit={{ opacity: 0, scale: 0.95, y: -4 }}
+                transition={{ duration: 0.15, ease: [0.23, 1, 0.32, 1] }}
+                className="absolute end-0 top-full z-30 mt-2 w-56 origin-top-right rounded-neo border-2 border-neo-cream/40 bg-neo-navy p-1 shadow-hard-lg rtl:origin-top-left"
               >
                 <button type="button" role="menuitem" onClick={pick(onEdit)} className={MENU_ITEM}>
                   <Edit2 className="size-4 shrink-0" aria-hidden="true" />
@@ -181,12 +178,7 @@ export function ClassCard({
                     {t('teacher.classroom.googleClassroom', 'Post to Google Classroom')}
                   </a>
                 ) : null}
-                <button
-                  type="button"
-                  role="menuitem"
-                  onClick={pick(onDelete)}
-                  className={cn(MENU_ITEM, 'text-neo-red')}
-                >
+                <button type="button" role="menuitem" onClick={pick(onDelete)} className={cn(MENU_ITEM, 'text-neo-red')}>
                   <Trash2 className="size-4 shrink-0" aria-hidden="true" />
                   {t('teacher.classroom.delete')}
                 </button>
@@ -196,166 +188,123 @@ export function ClassCard({
         </div>
       </div>
 
-      {/* A phone turned sideways has width, not height: a 2x2 of invite |
-          cap meter over roster | Start (the roster list opens below). */}
-      <div className="space-y-2 p-3 [@media(orientation:landscape)_and_(max-height:500px)]:p-2 [@media(orientation:landscape)_and_(max-height:500px)]:grid [@media(orientation:landscape)_and_(max-height:500px)]:grid-cols-2 [@media(orientation:landscape)_and_(max-height:500px)]:gap-2 [@media(orientation:landscape)_and_(max-height:500px)]:space-y-0">
-        <div
-          data-testid="join-code-plate"
-          className="flex items-stretch gap-2 rounded-neo border-2 border-neo-black bg-neo-cream p-2 shadow-hard-sm [@media(orientation:landscape)_and_(max-height:500px)]:col-start-1 [@media(orientation:landscape)_and_(max-height:500px)]:row-start-1"
+      <section aria-labelledby={`class-code-${classroom.id}`} className="flex flex-col gap-1.5">
+        <p
+          id={`class-code-${classroom.id}`}
+          data-testid="invite-students-label"
+          className="font-neo-body text-xs font-bold text-neo-cream/70"
         >
-          <div className="flex min-w-0 flex-1 flex-col items-center justify-center">
-            <p
-              data-testid="invite-students-label"
-              className="font-neo-body text-[0.65rem] font-black uppercase tracking-wide text-black/70"
-            >
-              {t('teacher.classroom.inviteStudents', 'Invite students')}
-            </p>
+          {t('academy.hq.classCode', 'Class code')}
+        </p>
+        <div className="flex items-stretch gap-2">
+          <div
+            data-testid="join-code-plate"
+            className="flex min-w-0 flex-1 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-cream px-2 py-1.5"
+          >
             <code
               data-testid="classroom-join-code"
               dir="ltr"
-              className="block whitespace-nowrap text-center font-neo-display text-3xl @[19rem]:text-4xl font-black tabular-nums tracking-wider text-black"
+              className="block whitespace-nowrap text-center font-neo-display text-3xl font-black tabular-nums tracking-wider text-neo-black @[19rem]:text-4xl"
             >
               {classroom.join_code}
             </code>
-            {onOpenProjector ? (
-              <button
-                type="button"
-                data-testid="classroom-card-projector"
-                onClick={onOpenProjector}
-                className="mt-0.5 inline-flex min-h-8 items-center gap-1 rounded-neo px-1.5 font-neo-body text-xs font-black text-black/80 underline-offset-2 hover:underline focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan"
-              >
-                <MonitorPlay className="size-3.5 shrink-0" aria-hidden="true" />
-                {t('eduShell.setup.showProjector')}
-              </button>
-            ) : null}
           </div>
-          {/* Stacked, and each button may shrink: side by side, SHARE sliced
-              to "SHAR" in a ~300px card. `min-w-0` is what actually lets a
-              flex child shrink past its label. */}
-          <div className="flex w-[46%] shrink-0 flex-col gap-1.5">
+          {onOpenProjector ? (
             <button
               type="button"
-              data-testid="copy-join-code"
-              onClick={onCopy}
-              className={cn(
-                'inline-flex min-h-10 min-w-0 flex-1 items-center justify-center rounded-neo bg-neo-navy px-1.5 text-xs font-black text-neo-cream [@media(orientation:landscape)_and_(max-height:600px)]:min-h-9',
-                PRESS,
-                'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan',
-              )}
-              aria-label={t('teacher.classroom.copyCode')}
+              data-testid="classroom-card-projector"
+              onClick={onOpenProjector}
+              className={cn(SMALL_ACTION, 'w-[38%] shrink-0 flex-col gap-0.5 py-1')}
             >
-              <Copy className="me-1 h-4 w-4 shrink-0" aria-hidden="true" />
-              <span className="truncate">{t('teacher.classroom.copyCode')}</span>
+              <MonitorPlay className="size-4 shrink-0" aria-hidden="true" />
+              {t('academy.hq.openProjector', 'Show code on board')}
             </button>
-            <button
-              type="button"
-              data-testid="share-join-code"
-              onClick={onShare}
-              className={cn(
-                'inline-flex min-h-10 min-w-0 flex-1 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-cream px-1.5 text-xs font-black text-black [@media(orientation:landscape)_and_(max-height:600px)]:min-h-9',
-                PRESS,
-                'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan',
-              )}
-              aria-label={t('teacher.classroom.share')}
-            >
-              <Share2 className="me-1 h-4 w-4 shrink-0" aria-hidden="true" />
-              <span className="truncate">{t('teacher.classroom.share')}</span>
-            </button>
-          </div>
+          ) : null}
         </div>
+        <div className="grid grid-cols-2 gap-2">
+          <button type="button" data-testid="copy-join-code" onClick={onCopy} className={SMALL_ACTION}>
+            <Copy className="size-4 shrink-0" aria-hidden="true" />
+            {t('teacher.classroom.copyCode')}
+          </button>
+          <button type="button" data-testid="share-join-code" onClick={onShare} className={SMALL_ACTION}>
+            <Share2 className="size-4 shrink-0" aria-hidden="true" />
+            {t('teacher.classroom.share')}
+          </button>
+        </div>
+      </section>
 
-        {/* Short screens drop the recap: its "next up" repeats the Start
-            button below, and the card must fit without scrolling. */}
-        {activity ? (
-          <div className="max-sm:[@media(max-height:760px)]:hidden [@media(orientation:landscape)_and_(max-height:500px)]:hidden">
-            {activity}
-          </div>
-        ) : null}
+      {activity}
 
-        {hasPro || proLoading ? null : (
-          <StudentCapMeter
-            studentCount={count}
-            source="classroom_card"
-            className="py-1.5 [@media(orientation:landscape)_and_(max-height:500px)]:col-start-2 [@media(orientation:landscape)_and_(max-height:500px)]:row-start-1"
-          />
-        )}
-
+      <div className="flex min-h-11 items-center gap-2">
+        {studentPreview}
         <button
           type="button"
+          data-testid="classroom-card-students"
           onClick={onToggleExpanded}
           aria-expanded={expanded}
-          className={cn(
-            'flex min-h-10 w-full items-center justify-between rounded-neo border-2 px-3 py-1.5 text-sm font-bold transition [@media(orientation:landscape)_and_(max-height:500px)]:col-start-1 [@media(orientation:landscape)_and_(max-height:500px)]:row-start-2',
-            expanded
-              ? 'border-neo-cream/60 bg-neo-cream/10 text-neo-cream'
-              : 'border-neo-cream/40 text-neo-cream hover:bg-neo-cream/5',
-          )}
+          aria-haspopup="dialog"
+          className="inline-flex min-h-11 min-w-0 items-center gap-1 rounded-neo px-1 text-start font-neo-body text-sm font-bold text-neo-cream underline decoration-neo-cream/40 underline-offset-4 hover:decoration-neo-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cream"
         >
-          <span className="flex items-center gap-2">
-            <Users className="h-4 w-4" aria-hidden="true" />
+          <span className="min-w-0">
             {count === 0
               ? t('teacher.classrooms.students.noneYet')
-              : t('teacher.classrooms.students.count', { count })}
+              : t('teacher.classroom.cardSeeAllStudents', { count })}
           </span>
-          <ChevronDown
-            className={cn('h-4 w-4 shrink-0 transition-transform', expanded && 'rotate-180')}
-            aria-hidden="true"
-          />
+          <DirectionalIcon icon={ChevronRight} className="size-4 shrink-0" />
         </button>
+      </div>
 
-        <AnimatePresence initial={false}>
-          {expanded && (
-            <m.div
-              key="student-list"
-              className="max-h-48 overflow-y-auto overscroll-contain [@media(orientation:landscape)_and_(max-height:500px)]:col-span-2 [@media(orientation:landscape)_and_(max-height:500px)]:row-start-3"
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-            >
-              <ClassroomStudentList
-                classroomId={classroom.id}
-                joinCode={classroom.join_code}
-              />
-              <GoogleClassroomRosterImport classroomId={classroom.id} />
-            </m.div>
-          )}
-        </AnimatePresence>
+      {hasPro || proLoading ? null : <StudentCapMeter studentCount={count} source="classroom_card" />}
 
+      <div className="mt-auto flex flex-col gap-2">
         {startGameHref ? (
           <Link
             href={startGameHref}
             data-testid="classroom-card-start-game"
-            className={cn(
-              'flex min-h-12 w-full items-center justify-center gap-2 rounded-neo border-2 border-neo-black bg-neo-lime px-4 py-2 [@media(orientation:landscape)_and_(max-height:500px)]:col-start-2 [@media(orientation:landscape)_and_(max-height:500px)]:row-start-2 [@media(orientation:landscape)_and_(max-height:500px)]:min-h-10',
-              'font-neo-display text-lg font-black uppercase tracking-tight text-black',
-              PRESS,
-              'hover:shadow-hard focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
-            )}
+            className={cn(PRIMARY_BUTTON, 'w-full min-h-12')}
           >
-            <Rocket className="size-5 shrink-0" strokeWidth={3} aria-hidden="true" />
-            {t('academy.hq.startTitle', 'Start a game')}
+            <Play className="size-5 shrink-0" strokeWidth={3} aria-hidden="true" />
+            {t('eduShell.home.startLive', 'Pick a game')}
           </Link>
         ) : null}
-        {rehearse}
-
         {assignHref || reportHref ? (
-          <div className="flex gap-2 [@media(orientation:landscape)_and_(max-height:500px)]:col-span-2">
+          <div className="grid grid-cols-2 gap-2">
             {assignHref ? (
-              <Link href={assignHref} data-testid="classroom-card-assign" className={cn(QUIET_ACTION, PRESS)}>
+              <Link href={assignHref} data-testid="classroom-card-assign" className={SMALL_ACTION}>
                 <ClipboardList className="size-4 shrink-0" aria-hidden="true" />
-                <span className="line-clamp-2">{t('teacher.classroom.card.assign')}</span>
+                {t('teacher.classroom.cardAssignHomework', 'Assign homework')}
               </Link>
             ) : null}
             {reportHref ? (
-              <Link href={reportHref} data-testid="classroom-card-report" className={cn(QUIET_ACTION, PRESS)}>
+              <Link href={reportHref} data-testid="classroom-card-report" className={SMALL_ACTION}>
                 <BarChart3 className="size-4 shrink-0" aria-hidden="true" />
-                <span className="line-clamp-2">{t('teacher.classroom.card.report')}</span>
+                {t('teacher.classroom.cardClassReport', 'Class report')}
               </Link>
             ) : null}
           </div>
         ) : null}
+        {rehearse}
       </div>
+
+      <Dialog open={expanded} onOpenChange={(open) => { if (open !== expanded) onToggleExpanded(); }}>
+        <DialogContent
+          className="max-w-lg border-neo-cream/40 bg-neo-navy-light text-neo-cream"
+          closeButtonLabel={t('common.close')}
+        >
+          <div className="flex max-h-[80dvh] flex-col gap-3 p-4">
+            <DialogTitle className="font-neo-display text-xl font-bold text-neo-cream">
+              <bdi>{t('teacher.classroom.cardRosterTitle', { name: classroom.name })}</bdi>
+            </DialogTitle>
+            <DialogDescription className="sr-only">
+              {t('teacher.classroom.cardSeeAllStudents', { count })}
+            </DialogDescription>
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+              <ClassroomStudentList classroomId={classroom.id} joinCode={classroom.join_code} />
+              <GoogleClassroomRosterImport classroomId={classroom.id} />
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </m.div>
   );
 }

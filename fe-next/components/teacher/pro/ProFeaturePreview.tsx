@@ -29,7 +29,7 @@ function useSample() {
   return { t: t as T, names, words };
 }
 
-function Frame({ feature, title, children, className }: { feature: ProFeature; title: string; children: React.ReactNode; className?: string }) {
+function Frame({ feature, title, children, className, calm = false }: { feature: ProFeature; title: string; children: React.ReactNode; className?: string; calm?: boolean }) {
   const { t } = useLanguage();
   return (
     <div
@@ -38,26 +38,37 @@ function Frame({ feature, title, children, className }: { feature: ProFeature; t
     >
       <div className="mb-2 flex items-center justify-between gap-2">
         <p className="truncate font-neo-display text-sm font-black text-neo-white">{title}</p>
-        <span className="shrink-0 rounded-full border-2 border-neo-black bg-neo-yellow px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-neo-black">
-          {t('eg2Pro.sample.badge')}
-        </span>
+        {calm ? (
+          <span data-testid="pro-preview-sample-badge" className="shrink-0 rounded-full border-2 border-neo-cream/60 px-2 py-0.5 text-[10px] font-black text-neo-cream">
+            {t('eg2Pro.sample.badge')}
+          </span>
+        ) : (
+          <span data-testid="pro-preview-sample-badge" className="shrink-0 rounded-full border-2 border-neo-black bg-neo-yellow px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-neo-black">
+            {t('eg2Pro.sample.badge')}
+          </span>
+        )}
       </div>
       {children}
     </div>
   );
 }
 
-function TrendIcon({ trend }: { trend: 'up' | 'flat' | 'down' }) {
-  if (trend === 'up') return <TrendingUp className="h-3.5 w-3.5 text-neo-lime" aria-hidden />;
-  if (trend === 'down') return <TrendingDown className="h-3.5 w-3.5 text-neo-pink" aria-hidden />;
+function TrendIcon({ trend, calm = false }: { trend: 'up' | 'flat' | 'down'; calm?: boolean }) {
+  if (trend === 'up') return <TrendingUp className={cn('h-3.5 w-3.5', calm ? 'text-neo-cream' : 'text-neo-lime')} aria-hidden />;
+  if (trend === 'down') return <TrendingDown className={cn('h-3.5 w-3.5', calm ? 'text-neo-cream' : 'text-neo-pink')} aria-hidden />;
   return <Minus className="h-3.5 w-3.5 text-neo-white/60" aria-hidden />;
 }
 
-function AnalyticsPreview() {
+function accuracyFill(accuracy: number, calm: boolean): string {
+  if (calm) return 'bg-neo-cream/70';
+  return accuracy >= 80 ? 'bg-neo-lime' : accuracy >= 60 ? 'bg-neo-yellow' : 'bg-neo-pink';
+}
+
+function AnalyticsPreview({ calm = false }: { calm?: boolean }) {
   const { t, names, words } = useSample();
   const hardest = words[sampleHardestWords()[0]];
   return (
-    <Frame feature="analytics" title={t('eg2Pro.sample.analyticsTitle')}>
+    <Frame feature="analytics" calm={calm} title={t('eg2Pro.sample.analyticsTitle')}>
       <div className="space-y-1.5">
         {SAMPLE_STUDENTS.map((s, i) => (
           <div
@@ -65,22 +76,22 @@ function AnalyticsPreview() {
             data-testid="pro-preview-student-row"
             className={cn(
               'flex items-center gap-2 rounded-neo border-2 px-2 py-1',
-              s.trend === 'down' ? 'border-neo-pink bg-neo-pink/10' : 'border-neo-cream/40 bg-neo-navy-light',
+              s.trend === 'down' && !calm ? 'border-neo-pink bg-neo-pink/10' : 'border-neo-cream/40 bg-neo-navy-light',
             )}
           >
             <span className="w-14 shrink-0 truncate text-xs font-bold text-neo-white">{names[i]}</span>
             <span className="h-2 flex-1 overflow-hidden rounded-full bg-neo-white/10">
               <span
-                className={cn('block h-full rounded-full', s.accuracy >= 80 ? 'bg-neo-lime' : s.accuracy >= 60 ? 'bg-neo-yellow' : 'bg-neo-pink')}
+                className={cn('block h-full rounded-full', accuracyFill(s.accuracy, calm))}
                 style={{ width: `${s.accuracy}%` }}
               />
             </span>
             <span className="w-9 shrink-0 text-end text-xs font-black tabular-nums text-neo-white">{s.accuracy}%</span>
-            <TrendIcon trend={s.trend} />
+            <TrendIcon trend={s.trend} calm={calm} />
           </div>
         ))}
       </div>
-      <p className="mt-2 text-xs font-bold text-neo-pink">
+      <p className={cn('mt-2 text-xs font-bold', calm ? 'text-neo-cream/80' : 'text-neo-pink')}>
         {t('eg2Pro.sample.stuckOn', { name: names[2], word: hardest })}
       </p>
     </Frame>
@@ -146,14 +157,17 @@ function PracticePreview() {
   );
 }
 
-function ReportsPreview() {
+function ReportsPreview({ calm = false }: { calm?: boolean }) {
   const { t, names, words } = useSample();
   const reteach = sampleHardestWords().slice(0, 3).map((i) => words[i]).join(' · ');
   return (
-    <Frame feature="reports" title={t('eg2Pro.sample.reportTitle', { className: t('eg2Pro.sample.className') })}>
-      <div className="rounded-sm border-2 border-neo-black bg-neo-white p-2 text-neo-black">
-        <div className="flex items-end justify-between border-b-2 border-dashed border-neo-black/30 pb-1">
-          <span className="text-[11px] font-bold uppercase">{t('eg2Pro.sample.classAverage')}</span>
+    <Frame feature="reports" calm={calm} title={t('eg2Pro.sample.reportTitle', { className: t('eg2Pro.sample.className') })}>
+      <div
+        data-testid="pro-preview-report-sheet"
+        className={cn('rounded-sm border-2 p-2', calm ? 'border-neo-cream/40 bg-neo-navy-light text-neo-cream' : 'border-neo-black bg-neo-white text-neo-black')}
+      >
+        <div className={cn('flex items-end justify-between border-b-2 border-dashed pb-1', calm ? 'border-neo-cream/30' : 'border-neo-black/30')}>
+          <span className={cn('text-[11px] font-bold', !calm && 'uppercase')}>{t('eg2Pro.sample.classAverage')}</span>
           <span className="font-neo-display text-xl font-black tabular-nums">{sampleClassAverage()}%</span>
         </div>
         <ul className="mt-1 space-y-0.5">
@@ -194,7 +208,7 @@ function DialsPreview() {
   );
 }
 
-const PREVIEWS: Record<ProFeature, () => React.JSX.Element> = {
+const PREVIEWS: Record<ProFeature, (props: { calm?: boolean }) => React.JSX.Element> = {
   analytics: AnalyticsPreview,
   mastery: MasteryPreview,
   missedPractice: PracticePreview,
@@ -202,7 +216,7 @@ const PREVIEWS: Record<ProFeature, () => React.JSX.Element> = {
   pressureDials: DialsPreview,
 };
 
-export function ProFeaturePreview({ feature }: { feature: ProFeature }) {
+export function ProFeaturePreview({ feature, calm = false }: { feature: ProFeature; calm?: boolean }) {
   const Preview = PREVIEWS[feature];
-  return <Preview />;
+  return <Preview calm={calm} />;
 }

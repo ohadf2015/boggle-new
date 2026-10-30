@@ -59,4 +59,10 @@ describe('TeacherClassroomsPage', () => {
     expect(title.className).not.toMatch(/text-shadow/);
     expect(title.className).not.toMatch(/uppercase/);
   });
+
+  it('never cuts the page title: no truncate, no leading-none clipping descenders', () => {
+    render(<ClassroomsPageClient />);
+    const title = screen.getByRole('heading', { level: 1 });
+    expect(title.className).not.toMatch(/(^|\s)(truncate|leading-none)(\s|$)/);
+  });
 });

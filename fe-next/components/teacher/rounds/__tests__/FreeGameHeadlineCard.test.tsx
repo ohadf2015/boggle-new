@@ -98,4 +98,13 @@ describe('FreeGameHeadlineCard', () => {
     render(<FreeGameHeadlineCard classroomId="c1" />);
     expect(screen.queryByTestId('free-game-headline')).toBeNull();
   });
+
+  it('is calm and compact: neutral text colors, average and missed words side by side even on a phone, no shouting', () => {
+    const { container } = render(<FreeGameHeadlineCard classroomId="c1" />);
+    const classes = Array.from(container.querySelectorAll('*')).map((el) => (el as HTMLElement).className?.toString?.() ?? '').join(' ');
+    expect(classes).not.toMatch(/text-neo-(cyan|lime|pink)(\s|$)/);
+    expect(classes).not.toMatch(/(^|\s)uppercase(\s|$)/);
+    const average = screen.getByTestId('free-headline-average');
+    expect(average.parentElement!.className).toMatch(/(^|\s)grid-cols-\[auto_1fr\]/);
+  });
 });

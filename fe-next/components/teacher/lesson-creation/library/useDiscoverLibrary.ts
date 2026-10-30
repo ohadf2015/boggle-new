@@ -58,7 +58,7 @@ export function filterItems(items: LibraryItem[], f: Omit<DiscoverFilters, 'sort
   });
 }
 
-export function useDiscoverLibrary() {
+export function useDiscoverLibrary(pageSize = DISCOVER_PAGE_SIZE) {
   const { t, language: uiLanguage } = useLanguage();
   const [filters, setFilters] = useState<DiscoverFilters>(() => ({
     language: defaultLibraryLanguage(uiLanguage),
@@ -116,7 +116,7 @@ export function useDiscoverLibrary() {
 
   const all = useMemo(() => [...remote, ...packs], [remote, packs]);
   const filtered = useMemo(() => sortItems(filterItems(all, filters), filters.sort), [all, filters]);
-  const paged = useMemo(() => paginate(filtered, page, DISCOVER_PAGE_SIZE), [filtered, page]);
+  const paged = useMemo(() => paginate(filtered, page, pageSize), [filtered, page, pageSize]);
   const teacherCount = useMemo(() => all.filter((i) => i.source === 'teacher').length, [all]);
 
   const update = useCallback((patch: Partial<DiscoverFilters>) => {

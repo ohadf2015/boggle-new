@@ -1,7 +1,9 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
+import { Crown } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { cn } from '@/lib/utils';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useCheckoutBlockedInApp } from '@/hooks/useCheckoutBlockedInApp';
 import { useTeacherProCheckout } from '@/hooks/useTeacherProCheckout';
@@ -87,11 +89,14 @@ interface ProGateProps {
   ctaKey?: string;
   /** Offer a never-trialed teacher the Polar trial instead of the paid checkout. */
   polarTrialPlacement?: TrialCtaSource;
+  /** `calm`: neutral lock with one lime CTA and a small PRO badge, for pages on the calm teacher style. */
+  tone?: 'default' | 'calm';
 }
 
 const OpenGate = createContext(false);
 
-export function ProGate({ feature, children, active = true, whileChecking = null, lockedTitle = null, ctaKey = 'teacher.proGate.cta', polarTrialPlacement }: ProGateProps) {
+export function ProGate({ feature, children, active = true, whileChecking = null, lockedTitle = null, ctaKey = 'teacher.proGate.cta', polarTrialPlacement, tone = 'default' }: ProGateProps) {
+  const calm = tone === 'calm';
   const insideOpenGate = useContext(OpenGate);
   const { t, language } = useLanguage();
   const { hasPro, loading, accessTrialExpires, known, status, source, trialUsed } = useTeacherPro();
@@ -132,7 +137,10 @@ export function ProGate({ feature, children, active = true, whileChecking = null
         <div
           data-testid="pro-trial-preview"
           role="status"
-          className="mb-4 flex flex-col gap-2 rounded-neo border-neo border-neo-lime bg-neo-navy-light p-3 shadow-hard-sm sm:flex-row sm:items-center sm:justify-between"
+          className={cn(
+            'mb-4 flex flex-col gap-2 rounded-neo p-3 sm:flex-row sm:items-center sm:justify-between',
+            calm ? 'border-2 border-neo-cream/40' : 'border-neo border-neo-lime bg-neo-navy-light shadow-hard-sm',
+          )}
         >
           <div className="min-w-0">
             <p className="text-sm font-bold text-neo-white">{t('teacher.proGate.trialPreview', { days: previewDaysLeft })}</p>
@@ -146,7 +154,10 @@ export function ProGate({ feature, children, active = true, whileChecking = null
               trackProTrialPreviewUpgradeClicked({ feature, days_left: previewDaysLeft });
               void start();
             }}
-            className="shrink-0 rounded-neo border-neo bg-neo-cyan px-4 py-2 text-sm font-black text-neo-navy shadow-hard-sm disabled:opacity-60"
+            className={cn(
+              'shrink-0 rounded-neo px-4 py-2 text-sm font-black disabled:opacity-60',
+              calm ? 'border-2 border-neo-cream text-neo-cream hover:bg-neo-cream/10' : 'border-neo bg-neo-cyan text-neo-navy shadow-hard-sm',
+            )}
           >
             {t('teacher.proGate.trialPreviewCta')}
           </button>}
@@ -159,19 +170,29 @@ export function ProGate({ feature, children, active = true, whileChecking = null
   return (
     <>
     {lockedTitle}
-    <div className="rounded-neo border-neo border-neo-lime bg-neo-navy-light p-4 shadow-hard sm:p-5">
+    <div data-testid="pro-gate-lock" className={cn('rounded-neo p-4 sm:p-5', calm ? 'border-2 border-neo-cream/40 bg-neo-navy-light' : 'border-neo border-neo-lime bg-neo-navy-light shadow-hard')}>
       <div className="grid items-center gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:gap-6">
         {/* Sample data, never the teacher's own rows: a free browser must not receive what the gate sells. */}
         <div data-testid="pro-gate-preview" aria-hidden="true" className="pointer-events-none select-none">
-          <ProFeaturePreview feature={feature} />
+          <ProFeaturePreview feature={feature} calm={calm} />
         </div>
         <div className="text-center md:text-start">
-          <span
-            data-testid="pro-gate-pill"
-            className="mb-2 inline-block rounded-full border-2 border-neo-black bg-neo-lime px-2.5 py-0.5 text-xs font-black uppercase text-neo-black"
-          >
-            {t('teacher.subscription.proPlanName')}
-          </span>
+          {calm ? (
+            <span
+              data-testid="pro-gate-pill"
+              className="mb-2 inline-flex items-center gap-1 rounded-neo bg-neo-yellow px-1.5 py-px text-[11px] font-black text-neo-black"
+            >
+              <Crown className="size-3" aria-hidden="true" />
+              {t('eduShell.nav.pro')}
+            </span>
+          ) : (
+            <span
+              data-testid="pro-gate-pill"
+              className="mb-2 inline-block rounded-full border-2 border-neo-black bg-neo-lime px-2.5 py-0.5 text-xs font-black uppercase text-neo-black"
+            >
+              {t('teacher.subscription.proPlanName')}
+            </span>
+          )}
           <h3 className="mb-2 font-neo-display text-xl font-black text-neo-white">
             {t(`teacher.proGate.${feature}.title`)}
           </h3>
@@ -191,10 +212,13 @@ export function ProGate({ feature, children, active = true, whileChecking = null
               if (!offerTrial) trackProUpgradeClicked({ feature });
               void lockAction.start();
             }}
-            className="inline-block rounded-neo border-neo bg-neo-cyan px-6 py-3 font-black text-neo-navy shadow-hard transition-shadow hover:shadow-hard-lg disabled:opacity-60"
+            className={cn(
+              'inline-block rounded-neo border-neo px-6 py-3 font-black text-neo-navy shadow-hard transition-shadow hover:shadow-hard-lg disabled:opacity-60',
+              calm ? 'bg-neo-lime' : 'bg-neo-cyan',
+            )}
           >
             {offerTrial
-              ? t('eduPlans.reports.trialCta', { days: TEACHER_PRO_TRIAL_DAYS })
+              ? t(calm ? 'eduPlans.reports.startTrialCta' : 'eduPlans.reports.trialCta', { days: TEACHER_PRO_TRIAL_DAYS })
               : t(ctaKey, { price: `$${TEACHER_PRO_PRICE_USD}` })}
           </button>
           <p className="mt-2 text-xs font-bold text-neo-white/60">

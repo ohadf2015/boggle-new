@@ -8,12 +8,18 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { copyToMine } from '@/lib/education/libraryClient';
 import type { LibraryItem, LibraryLesson } from '@/lib/education/libraryTypes';
-import LibraryCard from './LibraryCard';
+import LibraryCard, { LIBRARY_CARD_H } from './LibraryCard';
 import DiscoverFilters from './DiscoverFilters';
 import ListPreviewSheet, { type PreviewBusy } from './ListPreviewSheet';
 import ReportListDialog from './ReportListDialog';
 import AssignListDialog from './AssignListDialog';
 import { useDiscoverLibrary } from './useDiscoverLibrary';
+import { useFitPageSize } from './useFitPageSize';
+
+const GRID = 'grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3 md:grid-cols-3 xl:grid-cols-4';
+const PAGER_RESERVE = 56;
+const BE_FIRST_RESERVE = 64;
+const PAGER_BUTTON = 'min-h-11 rounded-neo border-2 border-neo-cream/60 px-4 font-bold text-neo-white hover:border-neo-cream disabled:opacity-40';
 
 interface DiscoverPanelProps {
   onOpenMyLists: () => void;
@@ -25,7 +31,11 @@ export default function DiscoverPanel({ onOpenMyLists, onShareFirst, onCopied }:
   const { t, language } = useLanguage();
   const { user } = useAuth();
   const router = useRouter();
-  const lib = useDiscoverLibrary();
+  const [beFirst, setBeFirst] = useState(false);
+  const [gridRef, pageSize] = useFitPageSize(LIBRARY_CARD_H, PAGER_RESERVE + (beFirst ? BE_FIRST_RESERVE : 0));
+  const lib = useDiscoverLibrary(pageSize);
+  const showBeFirst = lib.status === 'ready' && lib.teacherCount === 0 && lib.filters.source !== 'verified';
+  if (showBeFirst !== beFirst) setBeFirst(showBeFirst);
   const [open, setOpen] = useState<LibraryItem | null>(null);
   const [busy, setBusy] = useState<PreviewBusy>(null);
   const [copiedIds, setCopiedIds] = useState<Set<string>>(new Set());
@@ -75,7 +85,7 @@ export default function DiscoverPanel({ onOpenMyLists, onShareFirst, onCopied }:
       <DiscoverFilters filters={lib.filters} onChange={lib.update} total={lib.total} />
 
       {lib.status === 'error' && (
-        <div className="flex items-center justify-between gap-3 rounded-neo border-2 border-neo-pink bg-neo-pink/10 p-3 text-sm font-bold text-neo-white">
+        <div className="flex items-center justify-between gap-3 rounded-neo border-2 border-neo-pink p-3 text-sm font-bold text-neo-white">
           {t('eduLibrary.discover.loadError')}
           <button type="button" onClick={lib.reload} className="inline-flex min-h-9 items-center gap-1 rounded-neo border-2 border-neo-cream px-2">
             <RefreshCw className="size-4" aria-hidden="true" />
@@ -85,9 +95,9 @@ export default function DiscoverPanel({ onOpenMyLists, onShareFirst, onCopied }:
       )}
 
       {lib.status === 'loading' ? (
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4" aria-busy="true">
-          {Array.from({ length: 8 }, (_, i) => (
-            <div key={i} className="h-40 animate-pulse rounded-neo border-3 border-neo-cream/50 bg-neo-navy-light" />
+        <div ref={gridRef} className={GRID} aria-busy="true">
+          {Array.from({ length: pageSize }, (_, i) => (
+            <div key={i} className="h-[78px] animate-pulse rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light sm:h-[136px]" />
           ))}
         </div>
       ) : lib.items.length === 0 ? (
@@ -100,7 +110,7 @@ export default function DiscoverPanel({ onOpenMyLists, onShareFirst, onCopied }:
                 {t('eduLibrary.discover.tryAllLanguages')}
               </button>
             )}
-            <button type="button" onClick={onShareFirst} className="inline-flex min-h-11 items-center gap-2 rounded-neo border-3 border-neo-black bg-neo-lime px-3 font-neo-display font-bold uppercase text-neo-black shadow-hard">
+            <button type="button" onClick={onShareFirst} className="inline-flex min-h-11 items-center gap-2 rounded-neo border-3 border-neo-black bg-neo-lime px-3 font-neo-display font-bold text-neo-black shadow-hard">
               <Globe2 className="size-4" aria-hidden="true" />
               {t('eduLibrary.discover.shareFirst')}
             </button>
@@ -108,30 +118,30 @@ export default function DiscoverPanel({ onOpenMyLists, onShareFirst, onCopied }:
         </div>
       ) : (
         <>
-          <div data-testid="discover-grid" className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
+          <div ref={gridRef} data-testid="discover-grid" className={GRID}>
             {lib.items.map((item, i) => (
               <LibraryCard key={item.id} item={item} index={i} onOpen={() => setOpen(item)} />
             ))}
           </div>
-          {lib.teacherCount === 0 && lib.filters.source !== 'verified' && (
+          {showBeFirst && (
             <button
               type="button"
               onClick={onShareFirst}
-              className="flex w-full items-center gap-3 rounded-neo border-2 border-dashed border-neo-lime/60 bg-neo-lime/5 p-3 text-start text-sm text-neo-white"
+              className="flex w-full items-center gap-3 rounded-neo border-2 border-dashed border-neo-cream/40 p-3 text-start text-sm text-neo-cream/85 hover:border-neo-cream"
             >
-              <Globe2 className="size-5 shrink-0 text-neo-lime" aria-hidden="true" />
-              <span><strong className="text-neo-lime">{t('eduLibrary.discover.beFirstTitle')}</strong> {t('eduLibrary.discover.beFirstHint')}</span>
+              <Globe2 className="size-5 shrink-0 text-neo-cream" aria-hidden="true" />
+              <span><strong className="text-neo-white">{t('eduLibrary.discover.beFirstTitle')}</strong> {t('eduLibrary.discover.beFirstHint')}</span>
             </button>
           )}
           {lib.pageCount > 1 && (
-            <nav data-testid="discover-pager" className="flex items-center justify-center gap-3 pb-2" aria-label={t('eduLibrary.pager.label')}>
-              <button type="button" disabled={lib.page === 0} onClick={() => lib.setPage(lib.page - 1)} className="min-h-11 rounded-neo border-2 border-neo-cream bg-neo-navy-light px-4 font-bold text-neo-white shadow-hard-sm disabled:opacity-40">
+            <nav data-testid="discover-pager" className="flex items-center justify-center gap-3" aria-label={t('eduLibrary.pager.label')}>
+              <button type="button" disabled={lib.page === 0} onClick={() => lib.setPage(lib.page - 1)} className={PAGER_BUTTON}>
                 {t('eduLibrary.pager.prev')}
               </button>
               <span className="text-sm font-bold tabular-nums text-neo-white">
                 {t('eduLibrary.pager.status', { page: lib.page + 1, total: lib.pageCount })}
               </span>
-              <button type="button" disabled={lib.page >= lib.pageCount - 1} onClick={() => lib.setPage(lib.page + 1)} className="min-h-11 rounded-neo border-2 border-neo-cream bg-neo-navy-light px-4 font-bold text-neo-white shadow-hard-sm disabled:opacity-40">
+              <button type="button" disabled={lib.page >= lib.pageCount - 1} onClick={() => lib.setPage(lib.page + 1)} className={PAGER_BUTTON}>
                 {t('eduLibrary.pager.next')}
               </button>
             </nav>

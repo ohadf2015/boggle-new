@@ -42,7 +42,7 @@ export function ClassCapMeter({ count, className }: { count: number; className?:
           className="mt-1.5 flex gap-1"
         >
           {Array.from({ length: limit }, (_, i) => (
-            <span key={i} className={cn('h-2 flex-1 rounded-full border border-neo-black', i < count ? (full ? 'bg-neo-yellow' : 'bg-neo-lime') : 'bg-neo-cream/15')} />
+            <span key={i} className={cn('h-2 flex-1 rounded-full border border-neo-black', i < count ? (full ? 'bg-neo-yellow' : 'bg-neo-cream') : 'bg-neo-cream/15')} />
           ))}
         </div>
       </div>
