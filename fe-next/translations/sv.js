@@ -30,7 +30,7 @@ const sv = {
       "defaultHint": "Nya listor börjar på det här språket. Lektioner kan vara på vilket språk som helst, och varje spel körs på listans språk."
     },
     "board": {
-      "label": "Bräde: {language}"
+      "label": "Språk: {language}"
     },
     "lesson": {
       "create": "Skapa en ordlista",
@@ -673,9 +673,9 @@ const sv = {
       "board": "Tävla på brädet"
     },
     "complexity": {
-      "simple": "Enkel",
-      "medium": "Medel",
-      "tricky": "Klurig"
+      "simple": "Enkla regler",
+      "medium": "Några regler",
+      "tricky": "Kluriga regler"
     },
     "style": {
       "ffa": "Alla mot alla",
@@ -957,7 +957,7 @@ const sv = {
       "qrLabel": "QR-kod för att gå med",
       "scanToJoin": "Skanna & gå med",
       "copyLink": "Kopiera länk",
-      "openProjector": "Öppna projektor",
+      "openProjector": "Visa koden på tavlan",
       "joinedLabel": "inne",
       "nobodyYet": "Ingen här än – dela koden",
       "firstStudentTitle": "Få in din första elev",
@@ -978,7 +978,7 @@ const sv = {
       },
       "noClassTitle": "Skapa din klass – få en kod på 5 sekunder",
       "createClassCta": "Skapa min klass",
-      "codeReady": "Koden är klar",
+      "codeReady": "Öppet att gå med",
       "firstAssignmentTitle": "Skapa deras första uppgift",
       "firstAssignmentBody": "Eleverna är inne. Skicka en uppgift så de kan spela innan nästa lektion.",
       "firstAssignmentCta": "Skapa första uppgiften",
@@ -993,7 +993,8 @@ const sv = {
       "progressSubmitted": "inlämnade",
       "progressUpgrade": "Teacher Pro",
       "endedCodeTries": "Elever som försökte med en gammal spelkod: {count}. Starta ett nytt spel så att de kan vara med.",
-      "endedCodeTriesOne": "En elev försökte med en gammal spelkod. Starta ett nytt spel så att eleven kan vara med."
+      "endedCodeTriesOne": "En elev försökte med en gammal spelkod. Starta ett nytt spel så att eleven kan vara med.",
+      "joinedGoal": "{count} inne, mål: {goal}"
     },
     "modes": {
       "workshop": {
@@ -14869,7 +14870,7 @@ const sv = {
       "studentCap": "{{count}} / {{limit}} elever",
       "studentCountPro": "{{count}} elever",
       "presets": {
-        "title": "Snabbritualer",
+        "title": "Snabbinställningar",
         "fridayBattle": {
           "name": "Fredagens ordkamp",
           "desc": "Lag · din senaste lista · högljutt och snabbt"
@@ -15752,7 +15753,7 @@ const sv = {
       "startBlocked": "Vänta tills minst en elev har anslutit innan du startar.",
       "practiceFirst": "Öva först med 3 bottar",
       "practiceFirstHint": "Se exakt vad klassen kommer att se. Bottarna går när första eleven ansluter.",
-      "rehearseCta": "Repetera med bottar",
+      "rehearseCta": "Testa med bottar",
       "rehearsePrivate": "Bara du ser det här. Eleverna är inte i rummet och det räknas inte.",
       "rehearseBotsBlocked": "Bottar kan inte spela det här spelet, så du kan inte repetera det med dem.",
       "rehearseUseClassic": "Repetera med Klassiskt i stället",
@@ -17300,7 +17301,7 @@ const sv = {
         "description": "Vardagliga engelska ord för alla nivåer"
       },
       "sessions": {
-        "title": "Färdiga lektionspass",
+        "title": "Färdiga klasspel",
         "subtitle": "Välj ett läge i lektionen. Spel, lista och timer är redan inställda.",
         "runThis": "Kör det här",
         "noList": "Ingen lista behövs",
@@ -21234,9 +21235,9 @@ const sv = {
       "whatsNew": "Nyheter"
     },
     "delivery": {
-      "projector": "Projektor",
-      "phones": "På mobilen",
-      "both": "Båda"
+      "projector": "Kräver projektor",
+      "phones": "Bara mobiler",
+      "both": "Projektor valfri"
     },
     "home": {
       "regionLabel": "Lärarens startsida",
@@ -21248,7 +21249,7 @@ const sv = {
       "greetNoName": "Välkommen tillbaka",
       "startWith": "Starta ett spel med",
       "switchClass": "Välj klass",
-      "startLive": "Starta livespel",
+      "startLive": "Välj ett spel",
       "yourClasses": "Dina klasser",
       "newClass": "Ny klass",
       "colClass": "Klass",
@@ -21261,7 +21262,7 @@ const sv = {
       "showCodeFor": "Visa anslutningskoden för {name}",
       "reviewTitle": "Öva på de missade orden",
       "rail": {
-        "run": "Kör",
+        "run": "Välj",
         "seeAll": "Visa alla",
         "language": "Språk för passet"
       },
@@ -21280,8 +21281,8 @@ const sv = {
     "week": {
       "title": "Den här veckan",
       "games": "Spelade spel",
-      "students": "Elever totalt",
-      "active": "Aktiva klasser",
+      "students": "Elever i dina klasser",
+      "active": "Klasser som spelat",
       "empty": "Dina siffror visas här efter ert första spel.",
       "unavailable": "Veckans siffror gick inte att hämta. De är tillbaka nästa gång.",
       "quiet": "Lugn vecka hittills. En kort runda väcker klassen."
@@ -21429,17 +21430,21 @@ const sv = {
       "gameOptions": "Spelinställningar",
       "moreOptions": "Fler val",
       "proBadge": "Pro",
-      "lateJoinOn": "Sen anslutning på",
-      "lateJoinOff": "Sen anslutning av",
-      "changeList": "Byt",
-      "listDone": "Klar"
+      "lateJoinOn": "Sena får gå med",
+      "lateJoinOff": "Ingen sen anslutning",
+      "changeList": "Byt lista",
+      "listDone": "Klar",
+      "bestForList": "Bäst",
+      "untried": "Ej testat",
+      "bestForListHint": "Passar bäst till den här listan",
+      "untriedHint": "Du har inte spelat det på sistone"
     },
     "warmup": {
-      "send": "Skicka en uppvärmning till eleverna",
+      "send": "Skicka listan som läxa",
       "retry": "Gick inte att skicka. Försök igen",
-      "capped": "Gratisplanens läxgräns är nådd. Med Pro skickar du obegränsat med uppvärmningar.",
-      "status": "{done} av {total} elever har värmt upp",
-      "sent": "Uppvärmningen är skickad"
+      "capped": "Gratisplanens läxgräns är nådd. Med Pro skickar du obegränsat med läxor.",
+      "status": "{done} av {total} elever har övat",
+      "sent": "Skickad som läxa"
     }
   },
   // @eduShell:end

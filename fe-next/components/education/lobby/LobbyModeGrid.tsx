@@ -43,8 +43,8 @@ export function LobbyModeGrid({ selected, recommended = null, suggested = null, 
                     mode={mode}
                     name={t(catalogueKeys(mode).name)}
                     minutesLabel={t('education.modePicker.minutes', { count: minutes })}
-                    recommendedLabel={recommended === mode.id ? t('education.modePicker.recommended') : null}
-                    newLabel={suggested === mode.id && !isOn ? t('landing.badge.new') : null}
+                    recommendedLabel={recommended === mode.id ? t('eduShell.host.bestForList') : null}
+                    newLabel={suggested === mode.id && !isOn ? t('eduShell.host.untried') : null}
                     selected={isOn}
                     busy={busy}
                     onPick={onPick}
@@ -104,7 +104,7 @@ function ModeTile({
           : 'border-neo-cream/35 [@media(hover:hover)]:hover:border-neo-cream/50',
       )}
     >
-      <span className="relative block size-12 shrink-0 overflow-hidden rounded-[6px] @2xl:aspect-[16/9] @2xl:[@media(max-height:800px)]:aspect-[2/1] @2xl:size-auto @2xl:w-full @2xl:rounded-none">
+      <span className="relative block size-12 shrink-0 overflow-hidden rounded-[6px] @2xl:aspect-[16/9] @2xl:[@media(max-height:800px)]:aspect-[2/1] @2xl:min-h-[min(calc(50cqh-12rem),calc(25cqw-0.75rem))] @2xl:size-auto @2xl:w-full @2xl:rounded-none">
         {/* eslint-disable-next-line @next/next/no-img-element -- static poster cover, same file as the catalogue */}
         <img
           data-testid="mode-card-cover"
@@ -129,13 +129,13 @@ function ModeTile({
         <span className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1">
           <span className="font-neo-display text-sm font-bold leading-tight @2xl:text-base">{name}</span>
           {newLabel ? (
-            <span data-testid="mode-suggestion" data-mode={mode.id} className={STICKER}>
+            <span data-testid="mode-suggestion" data-mode={mode.id} title={t('eduShell.host.untriedHint')} className={STICKER}>
               <Sparkles className="size-3 shrink-0" strokeWidth={2.5} aria-hidden="true" />
               {newLabel}
             </span>
           ) : null}
           {recommendedLabel ? (
-            <span data-testid="mode-recommended" className={STICKER}>
+            <span data-testid="mode-recommended" title={t('eduShell.host.bestForListHint')} className={STICKER}>
               {recommendedLabel}
             </span>
           ) : null}

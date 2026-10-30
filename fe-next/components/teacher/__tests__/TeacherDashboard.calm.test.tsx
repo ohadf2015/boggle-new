@@ -99,6 +99,14 @@ describe('Teacher Home: calm, one primary', () => {
     expect(rail.textContent ?? '').not.toMatch(/\.when/);
   });
 
+  it('Then on desktop the sessions row takes the leftover height, so a tall screen fills it instead of leaving an empty band', () => {
+    render(<TeacherDashboard />);
+    const home = screen.getByTestId('teacher-home');
+    expect(home.className).toContain('lg:min-h-full');
+    expect(home.className).toMatch(/lg:grid-rows-\[auto_1fr(_auto)?\]/);
+    expect(home.className).not.toMatch(/minmax\(0,1fr\)\]/);
+  });
+
   it('Then week stats and weekly reports stay off the phone first frame while the Pro card stays', () => {
     render(<TeacherDashboard proOffer={{ kind: 'trial', onDismiss: vi.fn(), tracked: true }} />);
     expect(screen.getByTestId('home-week').closest('.max-lg\\:hidden')).not.toBeNull();

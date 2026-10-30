@@ -30,7 +30,7 @@ const en = {
       "defaultHint": "New lists start in this language. Lessons can be in any language; each game plays in its list’s language."
     },
     "board": {
-      "label": "Board: {language}"
+      "label": "Language: {language}"
     },
     "lesson": {
       "create": "Create a word list",
@@ -673,9 +673,9 @@ const en = {
       "board": "Race the board"
     },
     "complexity": {
-      "simple": "Simple",
-      "medium": "Medium",
-      "tricky": "Tricky"
+      "simple": "Easy rules",
+      "medium": "Some rules",
+      "tricky": "Tricky rules"
     },
     "style": {
       "ffa": "Everyone vs everyone",
@@ -957,7 +957,7 @@ const en = {
       "qrLabel": "QR code to join",
       "scanToJoin": "Scan to join",
       "copyLink": "Copy link",
-      "openProjector": "Open projector",
+      "openProjector": "Show code on board",
       "joinedLabel": "joined",
       "nobodyYet": "No one yet. Share the code",
       "firstStudentTitle": "Get your first student in",
@@ -978,7 +978,7 @@ const en = {
       },
       "noClassTitle": "Create your class, get a code in 5 seconds",
       "createClassCta": "Create my class",
-      "codeReady": "Code ready",
+      "codeReady": "Open to join",
       "firstAssignmentTitle": "Assign their first game",
       "firstAssignmentBody": "Students are in. Send one assignment so they play before the next class.",
       "firstAssignmentCta": "Create assignment",
@@ -993,7 +993,8 @@ const en = {
       "progressSubmitted": "submitted",
       "progressUpgrade": "Teacher Pro",
       "endedCodeTries": "{count} students tried an old game code. Start a new game so they can play.",
-      "endedCodeTriesOne": "1 student tried an old game code. Start a new game so they can play."
+      "endedCodeTriesOne": "1 student tried an old game code. Start a new game so they can play.",
+      "joinedGoal": "{count} joined, aim for {goal}"
     },
     "modes": {
       "workshop": {
@@ -12732,7 +12733,7 @@ const en = {
       "studentCap": "{{count}} / {{limit}} students",
       "studentCountPro": "{{count}} students",
       "presets": {
-        "title": "Ritual presets",
+        "title": "Quick setups",
         "fridayBattle": {
           "name": "Friday Vocab Battle",
           "desc": "Teams · your last list · loud and fast"
@@ -12748,7 +12749,7 @@ const en = {
       },
       "playStyle": {
         "title": "Play style",
-        "ffa": "Free-for-all",
+        "ffa": "Everyone vs everyone",
         "ffaDesc": "Every student for themselves",
         "teams": "Teams",
         "teamsDesc": "Auto-split into balanced teams",
@@ -13831,7 +13832,7 @@ const en = {
       "startBlocked": "Waiting for one student to join before you can start.",
       "practiceFirst": "Practice first with 3 bots",
       "practiceFirstHint": "See what your class will see. The bots leave when your first student joins.",
-      "rehearseCta": "Rehearse with bots",
+      "rehearseCta": "Try it with bots",
       "rehearsePrivate": "Only you see this. Students are not in the room and it is not counted.",
       "rehearseBotsBlocked": "Bots can't play this game, so you can't rehearse it with them.",
       "rehearseUseClassic": "Rehearse with Classic instead",
@@ -15371,7 +15372,7 @@ const en = {
         "description": "Essential Russian words for beginners"
       },
       "sessions": {
-        "title": "Ready-to-run sessions",
+        "title": "Ready-made class games",
         "subtitle": "Pick a slot in your lesson. The game, list and timer are set for you.",
         "runThis": "Run this",
         "noList": "No list needed",
@@ -20280,9 +20281,9 @@ const en = {
       "whatsNew": "What's new"
     },
     "delivery": {
-      "projector": "Projector",
-      "phones": "On phones",
-      "both": "Both"
+      "projector": "Needs projector",
+      "phones": "Phones only",
+      "both": "Projector optional"
     },
     "home": {
       "regionLabel": "Teacher home",
@@ -20294,7 +20295,7 @@ const en = {
       "greetNoName": "Welcome back",
       "startWith": "Start a game with",
       "switchClass": "Choose a class",
-      "startLive": "Start live game",
+      "startLive": "Pick a game",
       "yourClasses": "Your classes",
       "newClass": "New class",
       "colClass": "Class",
@@ -20307,7 +20308,7 @@ const en = {
       "showCodeFor": "Show the join code for {name}",
       "reviewTitle": "Practise the missed words",
       "rail": {
-        "run": "Run",
+        "run": "Pick",
         "seeAll": "See all",
         "language": "Session language"
       },
@@ -20326,8 +20327,8 @@ const en = {
     "week": {
       "title": "This week",
       "games": "Games played",
-      "students": "Total students",
-      "active": "Classes active",
+      "students": "Students in your classes",
+      "active": "Classes that played",
       "empty": "Your numbers show up here after your first game.",
       "unavailable": "Couldn't load this week's numbers. They'll be back on the next visit.",
       "quiet": "Quiet week so far. One short round wakes it up."
@@ -20475,17 +20476,21 @@ const en = {
       "gameOptions": "Game options",
       "moreOptions": "More options",
       "proBadge": "Pro",
-      "lateJoinOn": "Late join on",
-      "lateJoinOff": "Late join off",
-      "changeList": "Change",
-      "listDone": "Done"
+      "lateJoinOn": "Latecomers can join",
+      "lateJoinOff": "No latecomers",
+      "changeList": "Change list",
+      "listDone": "Done",
+      "bestForList": "Best match",
+      "untried": "Not tried",
+      "bestForListHint": "Best match for this word list",
+      "untriedHint": "You haven't played this one lately"
     },
     "warmup": {
-      "send": "Send a warm-up to students",
+      "send": "Send list as homework",
       "retry": "Could not send. Try again",
-      "capped": "Free plan homework limit reached. Pro sends unlimited warm-ups.",
-      "status": "{done} of {total} students warmed up",
-      "sent": "Warm-up sent"
+      "capped": "Free plan homework limit reached. Pro sends unlimited homework.",
+      "status": "{done} of {total} students practised",
+      "sent": "Sent as homework"
     }
   },
   // @eduShell:end

@@ -88,6 +88,7 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, dir, busy, blocked
             data-testid="how-it-plays-toggle"
             aria-expanded={stepsOpen}
             aria-label={t(stepsOpen ? 'eg2Modes.hideHowItPlays' : 'eg2Modes.howItPlays')}
+            title={t(stepsOpen ? 'eg2Modes.hideHowItPlays' : 'eg2Modes.howItPlays')}
             onClick={() => setStepsOpen((v) => !v)}
             className="grid size-11 shrink-0 place-items-center self-center rounded-neo border-2 border-neo-cream/35 text-neo-cream transition-colors duration-150 hover:border-neo-cream/60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream @4xl/lobby:hidden"
           >

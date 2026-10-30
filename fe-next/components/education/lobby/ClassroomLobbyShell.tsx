@@ -55,7 +55,7 @@ export function ClassroomLobbyShell({ pinned, children, footer, aside, className
             </div>
             <div
               data-testid="lobby-scroll"
-              className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-0.5 pb-2"
+              className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-0.5 pb-2 [container:lobby-fill/size]"
             >
               {children}
             </div>

@@ -69,8 +69,7 @@ describe('Teacher Home: get students in', () => {
   it('Then it shows students joined against the goal', () => {
     render(<TeacherDashboard />);
     const goal = screen.getByTestId('hq-joined-goal');
-    expect(within(goal).getByTestId('hq-joined-goal-count')).toHaveTextContent('0/3');
-    expect(goal).toHaveTextContent('academy.hq.joinedLabel');
+    expect(within(goal).getByTestId('hq-joined-goal-count')).toHaveTextContent('academy.hq.joinedGoal:{"count":0,"goal":3}');
   });
 
   it('Given the share step is the next onboarding step, Then the card replaces the onboarding nudge', () => {

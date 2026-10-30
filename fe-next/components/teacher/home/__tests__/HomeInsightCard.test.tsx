@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { HomeInsightCard } from '../HomeInsightCard';
 
 const t = (k: string, p?: Record<string, string | number>) => `${k}${p?.name ? `:${p.name}` : ''}`;
@@ -34,5 +35,10 @@ describe('<HomeInsightCard>', () => {
   it('Given a single insight, Then there is nothing to cycle to', () => {
     render(<HomeInsightCard insights={[insights[0]]} t={t} />);
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
+  });
+
+  it('Given the icon-only next button, Then it explains itself on hover too', () => {
+    render(<HomeInsightCard insights={insights} t={t} embedded />);
+    expect(screen.getByRole('button', { name: 'eduShell.insight.next' })).toHaveAttribute('title', 'eduShell.insight.next');
   });
 });

@@ -21,9 +21,25 @@ vi.mock('@/lib/education/proFunnelTelemetry', () => funnel);
 const auth = vi.hoisted(() => ({ user: null as { id: string } | null }));
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => auth }));
 
+const realFetch = globalThis.fetch;
+const realBeacon = Object.getOwnPropertyDescriptor(navigator, 'sendBeacon');
+const beacon = vi.fn((_url: string, _data?: BodyInit | null) => true);
+
+beforeEach(() => {
+  beacon.mockClear();
+  Object.defineProperty(navigator, 'sendBeacon', { value: beacon, configurable: true, writable: true });
+  globalThis.fetch = vi.fn(async () => new Response(null, { status: 204 })) as unknown as typeof fetch;
+});
+
+afterEach(() => {
+  if (realBeacon) Object.defineProperty(navigator, 'sendBeacon', realBeacon);
+  else delete (navigator as { sendBeacon?: unknown }).sendBeacon;
+  globalThis.fetch = realFetch;
+});
+
 describe('ResultsTeacherProTrialCard', () => {
   beforeEach(() => {
-    Object.assign(pro, { hasPro: false, loading: false, known: true, trialUsed: false, accessTrialExpires: null, accessTrialEnded: false });
+    Object.assign(pro,{ hasPro: false, loading: false, known: true, trialUsed: false, accessTrialExpires: null, accessTrialEnded: false });
     growth.trackGrowthEvent.mockClear();
     funnel.trackTeacherProUpgradeClick.mockClear();
   });
@@ -59,6 +75,7 @@ describe('ResultsTeacherProTrialCard', () => {
     expect(funnel.trackTeacherProUpgradeClick).toHaveBeenCalledWith(
       expect.objectContaining({ locale: 'he', placement: 'classroom_results' }),
     );
+    expect(beacon).toHaveBeenCalledWith('/api/education/pro-offer-click', expect.any(Blob));
     expect(screen.getByTestId('results-teacher-pro-trial-card')).toHaveAttribute('dir', 'rtl');
   });
 

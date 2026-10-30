@@ -72,4 +72,9 @@ describe('<ClassroomModeSpotlight> ready panel', () => {
     expect(spot).toHaveAttribute('dir', 'rtl');
     expect(screen.getByTestId('how-it-plays-inline').className).toContain('text-start');
   });
+
+  it('Given the phone dock, Then the icon-only steps toggle explains itself on hover too', () => {
+    setup();
+    expect(screen.getByTestId('how-it-plays-toggle')).toHaveAttribute('title', 'eg2Modes.howItPlays');
+  });
 });

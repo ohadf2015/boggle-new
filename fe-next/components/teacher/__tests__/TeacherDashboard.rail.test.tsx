@@ -50,9 +50,9 @@ describe('Teacher Home ready-to-run rail', () => {
     const rail = screen.getByTestId('home-session-rail');
     expect(rail.closest('aside')).toBeNull();
     expect(rail.previousElementSibling?.lastElementChild).toContainElement(screen.getByTestId('home-hero'));
-    const runs = within(rail).getAllByTestId('home-session-run');
-    expect(runs).toHaveLength(3);
-    for (const run of runs) {
+    const cards = within(rail).getAllByTestId('home-session-card');
+    expect(cards).toHaveLength(3);
+    for (const run of within(rail).getAllByTestId('home-session-run')) {
       const url = new URL(run.getAttribute('href') ?? '', 'https://x.test');
       expect(url.searchParams.get('classroomId')).toBe('c5b');
       expect(url.searchParams.get('session')).toBeTruthy();

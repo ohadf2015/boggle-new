@@ -39,11 +39,11 @@ export interface HomeSessionRailProps {
   t: T;
 }
 
-function SessionCard({ item, language, gradeBand, href, t }: { item: RailSession; language: Language; gradeBand: GradeBand | null; href: string; t: T }) {
+function SessionCard({ item, language, gradeBand, href, t, testId = 'home-session-card' }: { item: RailSession; language: Language; gradeBand: GradeBand | null; href: string; t: T; testId?: string }) {
   const { session } = item;
   return (
     <li
-      data-testid="home-session-card"
+      data-testid={testId}
       className="group relative grid w-full shrink-0 snap-start grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-2.5 gap-y-1 rounded-neo-lg border-2 border-neo-cream/35 bg-neo-navy-light p-2.5 sm:gap-y-1.5 sm:p-3 transition-colors duration-150 focus-within:border-neo-cream/60 hover:border-neo-cream/60 motion-reduce:transition-none"
     >
       {session.mascot ? (
@@ -55,6 +55,7 @@ function SessionCard({ item, language, gradeBand, href, t }: { item: RailSession
       <Link
         href={href}
         data-testid="home-session-run"
+        title={t('eduShell.home.rail.run')}
         className={cn(OUTLINE_BUTTON, 'row-span-2 after:absolute after:inset-0 after:rounded-neo-lg max-sm:min-w-11 max-sm:px-0 sm:row-span-1')}
       >
         <Play className="size-4" aria-hidden="true" />
@@ -77,7 +78,9 @@ export function HomeSessionRail({ classroomId, languages, gradeBand, nowMs, last
   const [picked, setPicked] = useState<Language | null>(null);
   const [allOpen, setAllOpen] = useState(false);
   const language = picked && languages.includes(picked) ? picked : languages[0];
-  const rail = language ? homeSessionRail({ language, gradeBand, nowMs, lastPlayedMs }).slice(0, ROW_SIZE) : [];
+  const sessions = language ? homeSessionRail({ language, gradeBand, nowMs, lastPlayedMs }).slice(0, ROW_SIZE * 2) : [];
+  const rail = sessions.slice(0, ROW_SIZE);
+  const more = sessions.slice(ROW_SIZE);
   if (ready && rail.length === 0) return null;
 
   return (
@@ -120,6 +123,15 @@ export function HomeSessionRail({ classroomId, languages, gradeBand, nowMs, last
       ) : (
         <div aria-busy="true" className="min-h-[6.25rem]" />
       )}
+      {ready && language && more.length > 0 ? (
+        <div data-testid="home-session-more" className="hidden @2xl:block min-h-0 flex-1 [container:session-more/size]">
+          <ul className="hidden grid-cols-3 gap-3 pt-1 [@container_session-more_(min-height:8.5rem)]:grid">
+            {more.map((item) => (
+              <SessionCard key={item.session.id} item={item} language={language} gradeBand={gradeBand} href={railRunHref(locale, item, classroomId)} t={t} testId="home-session-card-more" />
+            ))}
+          </ul>
+        </div>
+      ) : null}
       {allOpen && language ? <HomeSessionAll open={allOpen} onOpenChange={setAllOpen} language={language} classroomId={classroomId} t={t} /> : null}
     </section>
   );

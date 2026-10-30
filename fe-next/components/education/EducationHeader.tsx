@@ -204,12 +204,14 @@ export const EducationHeader = memo<EducationHeaderProps>(({
           >
             {/* Graduation cap icon */}
             <div
+              data-testid="edu-header-icon"
               className={cn(
                 'flex items-center justify-center',
                 'w-8 h-8 sm:w-10 sm:h-10',
-                'bg-neo-cyan text-neo-black',
-                'border-neo sm:border-3 border-neo-black',
-                'rounded-neo shadow-hard-sm'
+                compact
+                  ? 'bg-neo-navy-light text-neo-cream border-2 border-neo-cream/40'
+                  : 'bg-neo-cyan text-neo-black border-neo sm:border-3 border-neo-black shadow-hard-sm',
+                'rounded-neo'
               )}
             >
               <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -257,7 +259,13 @@ export const EducationHeader = memo<EducationHeaderProps>(({
             240px sidebar already names the page, and at 1024 the crumbs'
             min-content pushed the shrink-0 controls ~13px off-screen, clipping
             the menu button. `min-w-0` lets them yield before the controls do. */}
-        <div className="hidden xl:flex min-w-0 flex-1 justify-center px-4">
+        <div
+          data-testid="edu-header-crumbs"
+          className={cn(
+            'hidden xl:flex min-w-0 flex-1 justify-center px-4',
+            compact && '[&_a]:text-neo-cream/70 [&_[aria-current=page]]:text-neo-cream'
+          )}
+        >
           <EducationBreadcrumbs />
         </div>
 
@@ -271,7 +279,11 @@ export const EducationHeader = memo<EducationHeaderProps>(({
         <div
           data-testid="edu-utility-bar"
           dir={isRTL ? 'rtl' : 'ltr'}
-          className={cn('flex shrink-0 items-center gap-0.5 rounded-neo-lg p-1 sm:gap-1', UTILITY_BAR)}
+          className={cn(
+            'flex shrink-0 items-center gap-0.5 rounded-neo-lg p-1 sm:gap-1',
+            UTILITY_BAR,
+            compact && '[&_[data-testid=whats-new-dot]]:bg-neo-cream'
+          )}
         >
           {/* ponytail: What's new + Search are desktop conveniences; at 390px they pushed the hamburger off-screen */}
           {isTeacher && (

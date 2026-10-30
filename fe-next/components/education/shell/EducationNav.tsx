@@ -64,7 +64,7 @@ function tabClasses(active: boolean) {
     'relative z-10 flex min-h-[56px] flex-col items-center justify-center gap-1 rounded-neo px-1 pb-1 pt-1.5',
     'font-neo-display text-[11px] font-bold transition-[color,transform] duration-150 ease-out active:scale-[0.97]',
     FOCUS,
-    active ? 'text-neo-lime' : 'text-neo-cream/70 [@media(hover:hover)]:hover:text-neo-cream',
+    active ? 'text-neo-cream' : 'text-neo-cream/70 [@media(hover:hover)]:hover:text-neo-cream',
   );
 }
 
@@ -91,7 +91,7 @@ function TabIndicator({ index, count }: { index: number; count: number }) {
     >
       <span
         data-testid="education-tab-indicator"
-        className="h-8 w-14 rounded-full border-[2px] border-neo-lime bg-neo-lime/15 shadow-hard-sm"
+        className="h-8 w-14 rounded-full border-[2px] border-neo-cream/40 bg-neo-navy-light"
       />
     </div>
   );
@@ -103,7 +103,7 @@ function sideClasses(active: boolean) {
     'transition-[colors,transform] duration-150 active:scale-[0.97]',
     FOCUS,
     active
-      ? 'border-[2px] border-neo-lime bg-neo-lime/15 text-neo-lime shadow-hard-sm'
+      ? 'border-[2px] border-transparent border-s-[3px] border-s-neo-lime bg-neo-navy-light text-neo-cream'
       : 'border-[2px] border-transparent text-neo-cream hover:bg-neo-navy-light',
   );
 }
@@ -173,17 +173,17 @@ export function EducationNav({ nav, t, variant, brand, account, plan, className 
               data-testid="education-side-pro"
               className={cn(
                 'group flex min-h-[44px] w-full items-center gap-2 rounded-neo px-3 py-2',
-                'font-neo-display text-[15px] font-bold text-neo-yellow transition-[colors,transform] duration-150',
-                'hover:bg-neo-yellow/10 active:scale-[0.97]',
+                'font-neo-display text-[15px] font-bold text-neo-cream transition-[colors,transform] duration-150',
+                'hover:bg-neo-navy-light active:scale-[0.97]',
                 FOCUS,
               )}
             >
-              <Crown className="h-5 w-5 shrink-0" aria-hidden />
+              <Crown data-testid="education-side-pro-crown" className="h-5 w-5 shrink-0 text-neo-yellow" aria-hidden />
               <span className="line-clamp-2 min-w-0 flex-1 leading-tight">{t(plan === 'free' ? 'teacher.plan.free' : 'eduShell.nav.pro')}</span>
               {plan === 'free' || plan === 'trial' ? (
                 <span
                   data-testid="education-side-pro-pill"
-                  className="shrink-0 rounded-neo border-[2px] border-neo-lime px-2 py-0.5 text-xs font-black text-neo-lime"
+                  className="shrink-0 rounded-neo border-[2px] border-neo-cream/40 px-2 py-0.5 text-xs font-black text-neo-cream"
                 >
                   {t(plan === 'free' ? 'teacher.plan.upgrade' : 'teacher.plan.trialActive')}
                 </span>
@@ -191,12 +191,12 @@ export function EducationNav({ nav, t, variant, brand, account, plan, className 
                 <span
                   data-testid="education-side-pro-pill"
                   aria-label={t('teacher.plan.pro')}
-                  className="grid size-5 shrink-0 place-items-center rounded-full bg-neo-lime text-neo-black"
+                  className="grid size-5 shrink-0 place-items-center rounded-full border-[2px] border-neo-cream/60 text-neo-cream"
                 >
                   <Check className="h-3.5 w-3.5" strokeWidth={3} aria-hidden />
                 </span>
               ) : null}
-              <DirectionalIcon icon={ChevronRight} className="h-4 w-4 shrink-0" />
+              {plan === 'free' || plan === 'trial' ? null : <DirectionalIcon icon={ChevronRight} className="h-4 w-4 shrink-0" />}
             </Link>
           ) : null}
           {account}

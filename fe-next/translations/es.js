@@ -30,7 +30,7 @@ const es = {
       "defaultHint": "Las listas nuevas empiezan en este idioma. Las lecciones pueden estar en cualquier idioma y cada partida se juega en el de su lista."
     },
     "board": {
-      "label": "Tablero: {language}"
+      "label": "Idioma: {language}"
     },
     "lesson": {
       "create": "Crear una lista de palabras",
@@ -673,9 +673,9 @@ const es = {
       "board": "Carrera en el tablero"
     },
     "complexity": {
-      "simple": "Fácil",
-      "medium": "Media",
-      "tricky": "Difícil"
+      "simple": "Reglas fáciles",
+      "medium": "Algunas reglas",
+      "tricky": "Reglas difíciles"
     },
     "style": {
       "ffa": "Todos contra todos",
@@ -957,7 +957,7 @@ const es = {
       "qrLabel": "Código QR para unirse",
       "scanToJoin": "Escanea y entra",
       "copyLink": "Copiar enlace",
-      "openProjector": "Abrir proyector",
+      "openProjector": "Proyectar el código",
       "joinedLabel": "dentro",
       "nobodyYet": "Nadie aún: comparte el código",
       "firstStudentTitle": "Suma a tu primer alumno",
@@ -978,7 +978,7 @@ const es = {
       },
       "noClassTitle": "Crea tu clase y ten un código en 5 segundos",
       "createClassCta": "Crear mi clase",
-      "codeReady": "Código listo",
+      "codeReady": "Abierto para unirse",
       "firstAssignmentTitle": "Crea su primera tarea",
       "firstAssignmentBody": "Ya hay estudiantes en la lista. Asigna una práctica para que la clase tenga algo que hacer cuando no estés en directo.",
       "firstAssignmentCta": "Crear primera tarea",
@@ -993,7 +993,8 @@ const es = {
       "progressSubmitted": "entregadas",
       "progressUpgrade": "Teacher Pro",
       "endedCodeTries": "Alumnos que probaron el código de un juego que ya terminó: {count}. Empieza un juego nuevo para que puedan jugar.",
-      "endedCodeTriesOne": "Un alumno probó el código de un juego que ya terminó. Empieza un juego nuevo para que pueda jugar."
+      "endedCodeTriesOne": "Un alumno probó el código de un juego que ya terminó. Empieza un juego nuevo para que pueda jugar.",
+      "joinedGoal": "{count} dentro, meta: {goal}"
     },
     "modes": {
       "workshop": {
@@ -14500,7 +14501,7 @@ const es = {
       "studentCap": "{{count}} / {{limit}} alumnos",
       "studentCountPro": "{{count}} alumnos",
       "presets": {
-        "title": "Rituales rápidos",
+        "title": "Ajustes rápidos",
         "fridayBattle": {
           "name": "Batalla de vocabulario del viernes",
           "desc": "Equipos · tu última lista · rápido y ruidoso"
@@ -15404,7 +15405,7 @@ const es = {
       "startBlocked": "Espera a que entre al menos un alumno para empezar.",
       "practiceFirst": "Practica primero con 3 bots",
       "practiceFirstHint": "Mira lo que verá tu clase. Los bots se van cuando entra tu primer alumno.",
-      "rehearseCta": "Ensaya con bots",
+      "rehearseCta": "Probar con bots",
       "rehearsePrivate": "Solo tú ves esto. Los estudiantes no están en la sala y no cuenta.",
       "rehearseBotsBlocked": "Los bots no pueden jugar a este juego, así que no puedes ensayarlo con ellos.",
       "rehearseUseClassic": "Ensaya con Clásico",
@@ -16952,7 +16953,7 @@ const es = {
         "description": "Palabras esenciales de ruso para principiantes"
       },
       "sessions": {
-        "title": "Sesiones listas para usar",
+        "title": "Juegos listos para clase",
         "subtitle": "Elige un momento de la clase. El juego, la lista y el tiempo ya están puestos.",
         "runThis": "Jugar esta",
         "noList": "Sin lista",
@@ -21247,9 +21248,9 @@ const es = {
       "whatsNew": "Novedades"
     },
     "delivery": {
-      "projector": "Proyector",
-      "phones": "En los teléfonos",
-      "both": "Ambos"
+      "projector": "Necesita proyector",
+      "phones": "Solo teléfonos",
+      "both": "Proyector opcional"
     },
     "home": {
       "regionLabel": "Inicio del docente",
@@ -21261,7 +21262,7 @@ const es = {
       "greetNoName": "Hola de nuevo",
       "startWith": "Empieza una partida con",
       "switchClass": "Elegir clase",
-      "startLive": "Empezar partida en vivo",
+      "startLive": "Elegir un juego",
       "yourClasses": "Tus clases",
       "newClass": "Nueva clase",
       "colClass": "Clase",
@@ -21274,7 +21275,7 @@ const es = {
       "showCodeFor": "Mostrar el código de {name}",
       "reviewTitle": "Practicar las palabras falladas",
       "rail": {
-        "run": "Jugar",
+        "run": "Elegir",
         "seeAll": "Ver todas",
         "language": "Idioma de la actividad"
       },
@@ -21293,8 +21294,8 @@ const es = {
     "week": {
       "title": "Esta semana",
       "games": "Partidas jugadas",
-      "students": "Alumnos en total",
-      "active": "Clases activas",
+      "students": "Alumnos en tus clases",
+      "active": "Clases que jugaron",
       "empty": "Tus datos aparecerán aquí después de la primera partida.",
       "unavailable": "No pudimos cargar los datos de esta semana. Volverán en tu próxima visita.",
       "quiet": "Semana tranquila por ahora. Una ronda corta los despierta."
@@ -21444,15 +21445,19 @@ const es = {
       "proBadge": "Pro",
       "lateJoinOn": "Se puede entrar tarde",
       "lateJoinOff": "Sin entrar tarde",
-      "changeList": "Cambiar",
-      "listDone": "Listo"
+      "changeList": "Cambiar lista",
+      "listDone": "Listo",
+      "bestForList": "Ideal",
+      "untried": "Sin probar",
+      "bestForListHint": "El que mejor va con esta lista",
+      "untriedHint": "No lo has jugado últimamente"
     },
     "warmup": {
-      "send": "Enviar un calentamiento a la clase",
+      "send": "Enviar lista como tarea",
       "retry": "No se pudo enviar. Reintentar",
-      "capped": "Llegaste al límite de tareas del plan gratis. Con Pro envías calentamientos sin límite.",
-      "status": "{done} de {total} estudiantes ya calentaron",
-      "sent": "Calentamiento enviado"
+      "capped": "Llegaste al límite de tareas del plan gratis. Con Pro envías tareas sin límite.",
+      "status": "{done} de {total} estudiantes ya practicaron",
+      "sent": "Enviada como tarea"
     }
   },
   // @eduShell:end

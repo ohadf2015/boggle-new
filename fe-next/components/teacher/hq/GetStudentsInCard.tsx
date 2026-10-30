@@ -167,11 +167,11 @@ export function GetStudentsInCard({
           ))}
         </p>
         <div data-testid="hq-join-actions" className="flex gap-1.5 sm:gap-2">
-          <button type="button" data-testid="hq-copy-link" onClick={copyLink} aria-label={copyLabel} className={cn(OUTLINE_BUTTON, "max-sm:min-w-11 max-sm:px-0")}>
+          <button type="button" data-testid="hq-copy-link" onClick={copyLink} aria-label={copyLabel} title={copyLabel} className={cn(OUTLINE_BUTTON, "max-sm:min-w-11 max-sm:px-0")}>
             {copied ? <Check className="size-4" strokeWidth={3} aria-hidden="true" /> : <Link2 className="size-4" strokeWidth={3} aria-hidden="true" />}
             <span className="max-sm:hidden">{copyLabel}</span>
           </button>
-          <button type="button" data-testid="hq-open-projector" onClick={openProjector} aria-label={projectorLabel} className={cn(OUTLINE_BUTTON, "max-sm:min-w-11 max-sm:px-0")}>
+          <button type="button" data-testid="hq-open-projector" onClick={openProjector} aria-label={projectorLabel} title={projectorLabel} className={cn(OUTLINE_BUTTON, "max-sm:min-w-11 max-sm:px-0")}>
             <MonitorUp className="size-4" strokeWidth={3} aria-hidden="true" />
             <span className="max-sm:hidden">{projectorLabel}</span>
           </button>
@@ -187,8 +187,7 @@ export function GetStudentsInCard({
               ))}
             </span>
             <span className="inline-flex items-baseline gap-1 font-neo-body text-xs font-bold text-neo-cream/80">
-              <span data-testid="hq-joined-goal-count" dir="ltr" className="tabular-nums">{count}/{STUDENT_GOAL}</span>
-              {t("academy.hq.joinedLabel")}
+              <span data-testid="hq-joined-goal-count" className="tabular-nums">{t("academy.hq.joinedGoal", { count, goal: STUDENT_GOAL })}</span>
             </span>
           </div>
         ) : null}
@@ -231,7 +230,7 @@ export function GetStudentsInCard({
                 shown={shownCount}
                 reduced={reduced}
                 label={t("academy.hq.joinedLabel", "joined")}
-                empty={t("academy.hq.nobodyYet", "No one yet — share the code")}
+                empty={t("academy.hq.nobodyYet", "No one yet. Share the code")}
               />
             </>
           )}

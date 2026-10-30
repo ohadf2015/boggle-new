@@ -236,6 +236,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
   const revealRef = useTeacherReveal<HTMLDivElement>(`${ready}-${hasClasses}-${Boolean(classroomsError)}`);
   const [reportsOpened, setReportsOpened] = useState(false);
   const hasRail = !ready || proCard !== null || showWeek || Boolean(selectedClassroom);
+  const showSessions = ready && !classroomsError && hasClasses && Boolean(effectiveId);
   const rawClassLanguage = selectedClassroom?.language;
   const classLanguage = isPackLanguage(rawClassLanguage) ? rawClassLanguage : isPackLanguage(language) ? language : 'en';
   const lessonProfile = classLessonProfile(lessons.lessons as unknown as RailLesson[], effectiveId);
@@ -260,7 +261,12 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
       <div
         ref={revealRef}
         data-testid="teacher-home"
-        className={cn('mx-auto grid w-full max-w-[1280px] gap-3 px-4 py-3 sm:gap-4 sm:px-6 sm:py-4 lg:gap-5 lg:px-8 lg:py-5', hasRail && 'lg:grid-cols-[minmax(0,1fr)_20rem]')}
+        className={cn(
+          'mx-auto grid w-full max-w-[1280px] gap-3 px-4 py-3 sm:gap-4 sm:px-6 sm:py-4 lg:gap-5 lg:px-8 lg:py-5',
+          hasRail && 'lg:grid-cols-[minmax(0,1fr)_20rem]',
+          showSessions && 'lg:min-h-full',
+          showSessions && (accountBanner ? 'lg:grid-rows-[auto_1fr_auto]' : 'lg:grid-rows-[auto_1fr]'),
+        )}
       >
         <div className="flex min-w-0 flex-col gap-3 sm:gap-4 lg:col-start-1 lg:row-start-1">
           <header data-tm className="flex items-start justify-between gap-3">
@@ -333,7 +339,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
           )}
         </div>
 
-        {ready && !classroomsError && hasClasses && effectiveId ? (
+        {showSessions ? (
           <HomeSessionRail
             key={effectiveId}
             className={hasRail ? 'lg:col-span-2' : undefined}

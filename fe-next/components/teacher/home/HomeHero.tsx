@@ -90,6 +90,7 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
               data-testid="home-class-code"
               onClick={() => setProjectorOpen(true)}
               aria-label={t('eduShell.home.showCodeFor', { name: selected?.name ?? '' })}
+              title={t('academy.hq.openProjector')}
               className={cn(OUTLINE_BUTTON, 'max-sm:min-w-11 max-sm:px-0')}
             >
               <Projector className="size-5" aria-hidden="true" />

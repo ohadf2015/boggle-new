@@ -127,19 +127,18 @@ describe('<EducationNav>', () => {
     expect(bar.className).not.toMatch(/border-neo(\s|$)/);
   });
 
-  it('marks the active tab with one lime pill behind its icon, never a solid lime slab', () => {
+  it('marks the active tab with cream text on a neutral pill, never lime', () => {
     const { getByTestId } = render(<EducationNav nav={nav} t={t} variant="tabs" />);
     const active = getByTestId('education-tab-home');
     const inactive = getByTestId('education-tab-reports');
 
     expect(active.getAttribute('aria-current')).toBe('page');
-    expect(active.className).toContain('text-neo-lime');
-    // GO LIVE owns the one solid lime slab on the deck.
-    expect(active.className).not.toMatch(/(^|\s)bg-neo-lime(\s|$)/);
+    expect(active.className).toContain('text-neo-cream');
+    expect(active.className).not.toMatch(/neo-lime/);
 
     const pill = getByTestId('education-tab-indicator');
-    expect(pill.className).toContain('border-neo-lime');
-    expect(pill.className).not.toMatch(/(^|\s)bg-neo-lime(\s|$)/);
+    expect(pill.className).toContain('bg-neo-navy-light');
+    expect(pill.className).not.toMatch(/neo-lime/);
 
     expect(inactive.getAttribute('aria-current')).toBeNull();
     // One dock, not four boxed buttons.
@@ -213,13 +212,15 @@ describe('EducationNav — the lg handover', () => {
     expect(getByTestId('education-tabbar').className).toContain('lg:hidden');
   });
 
-  it('marks the active sidebar item with the same tinted lime as the dock, never a solid lime slab', () => {
+  it('marks the active sidebar item with cream text, a neutral fill and a thin lime start bar that mirrors in RTL', () => {
     const { getByTestId } = render(<EducationNav nav={nav} t={t} variant="sidebar" />);
     const active = getByTestId('education-side-home');
     expect(active.getAttribute('aria-current')).toBe('page');
-    expect(active.className).toContain('border-neo-lime');
-    expect(active.className).toContain('text-neo-lime');
-    expect(active.className).not.toMatch(/(^|\s)bg-neo-lime(\s|$)/);
+    expect(active.className).toContain('text-neo-cream');
+    expect(active.className).toContain('bg-neo-navy-light');
+    expect(active.className).toContain('border-s-neo-lime');
+    expect(active.className).not.toMatch(/(^|\s)(text|bg)-neo-lime/);
+    expect(active.className).not.toMatch(/border-(l|r)-/);
   });
 
   it('keeps every sidebar label painted (no tablet icon-rail hide)', () => {
@@ -234,12 +235,14 @@ describe('EducationNav — the lg handover', () => {
 describe('EducationNav — teacher sidebar extras', () => {
   const t = (k: string) => k;
 
-  it('pins a gold Pro link to the bottom of the teacher sidebar', () => {
+  it('pins a neutral Pro link to the bottom of the teacher sidebar, yellow only on the small crown', () => {
     const nav = resolveEducationNav('/en/teacher/classroom')!;
     const { getByTestId } = render(<EducationNav nav={nav} t={t} variant="sidebar" />);
     const pro = getByTestId('education-side-pro');
     expect(pro.getAttribute('href')).toBe('/en/teacher/upgrade');
-    expect(pro.className).toContain('text-neo-yellow');
+    expect(pro.className).toContain('text-neo-cream');
+    expect(pro.className).not.toMatch(/neo-yellow/);
+    expect(getByTestId('education-side-pro-crown').getAttribute('class')).toContain('text-neo-yellow');
     expect(pro.textContent).toContain('eduShell.nav.pro');
   });
 
@@ -248,10 +251,24 @@ describe('EducationNav — teacher sidebar extras', () => {
     const { getByTestId } = render(<EducationNav nav={nav} t={t} variant="sidebar" plan="free" />);
     const pro = getByTestId('education-side-pro');
     expect(pro.textContent).toContain('teacher.plan.free');
-    expect(getByTestId('education-side-pro-pill').textContent).toBe('teacher.plan.upgrade');
+    const pill = getByTestId('education-side-pro-pill');
+    expect(pill.textContent).toBe('teacher.plan.upgrade');
+    expect(pill.className).toContain('border-neo-cream/40');
+    expect(pill.className).not.toMatch(/neo-(lime|yellow)/);
   });
 
-  it('shows a lime check, not an ask, once the teacher is on Pro', () => {
+  it('drops the chevron beside an Upgrade or trial pill so a long plan label (ja) is never cut', () => {
+    const nav = resolveEducationNav('/ja/teacher')!;
+    for (const plan of ['free', 'trial'] as const) {
+      const { getByTestId, unmount } = render(<EducationNav nav={nav} t={t} variant="sidebar" plan={plan} />);
+      expect(getByTestId('education-side-pro').querySelectorAll('svg')).toHaveLength(1);
+      unmount();
+    }
+    const { getByTestId } = render(<EducationNav nav={nav} t={t} variant="sidebar" />);
+    expect(getByTestId('education-side-pro').querySelectorAll('svg')).toHaveLength(2);
+  });
+
+  it('shows an outlined check, not an ask, once the teacher is on Pro', () => {
     const nav = resolveEducationNav('/en/teacher/classroom')!;
     const { getByTestId, queryByText } = render(<EducationNav nav={nav} t={t} variant="sidebar" plan="pro" />);
     expect(getByTestId('education-side-pro').textContent).toContain('eduShell.nav.pro');
@@ -286,5 +303,30 @@ describe('EducationNav — teacher sidebar extras', () => {
     const { getByTestId, queryByTestId } = render(<EducationNav nav={nav} t={t} variant="tabs" />);
     expect(getByTestId('education-tabbar').querySelectorAll('a')).toHaveLength(4);
     expect(queryByTestId('education-side-pro')).toBeNull();
+  });
+});
+
+describe('EducationNav color lock: the page primary CTA is the only lime fill on screen', () => {
+  const t = (k: string) => k;
+  const PLANS = [undefined, 'free', 'trial', 'pro'] as const;
+  const ROUTES = ['/en/teacher', '/en/teacher/classroom', '/en/teacher/curriculum', '/en/teacher/reports', '/he/teacher', '/en/student'];
+
+  it.each(ROUTES)('%s paints no lime or yellow fill or tint in the tabs or sidebar, for every plan', (route) => {
+    const nav = resolveEducationNav(route)!;
+    for (const plan of PLANS) {
+      for (const variant of ['tabs', 'sidebar'] as const) {
+        const { container, unmount } = render(<EducationNav nav={nav} t={t} variant={variant} plan={plan} />);
+        expect(container.innerHTML, `${variant} ${plan}`).not.toMatch(/bg-neo-(lime|yellow)/);
+        expect(container.innerHTML, `${variant} ${plan}`).not.toMatch(/text-neo-lime/);
+        unmount();
+      }
+    }
+  });
+
+  it('keeps lime to one thin start-side bar on the active sidebar item', () => {
+    const nav = resolveEducationNav('/en/teacher/reports')!;
+    const { container } = render(<EducationNav nav={nav} t={t} variant="sidebar" plan="free" />);
+    const lime = [...container.querySelectorAll('*')].filter((el) => /neo-lime/.test(el.getAttribute('class') ?? ''));
+    expect(lime.map((el) => el.getAttribute('data-testid'))).toEqual(['education-side-reports']);
   });
 });

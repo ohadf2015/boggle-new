@@ -87,7 +87,7 @@ describe('<GetStudentsInCard>', () => {
     expect(screen.getByTestId('hq-first-student-title')).toHaveTextContent('academy.hq.firstStudentTitle');
     expect(screen.queryByTestId('hq-joined-count')).toBeNull();
     expect(screen.queryByText(/academy\.hq\.nobodyYet/)).toBeNull();
-    expect(screen.getByTestId('hq-joined-goal-count')).toHaveTextContent('0/3');
+    expect(screen.getByTestId('hq-joined-goal-count')).toHaveTextContent('academy.hq.joinedGoal:{"count":0,"goal":3}');
     expect(screen.queryAllByTestId('hq-roster-seat')).toHaveLength(0);
   });
 
@@ -164,6 +164,12 @@ describe('<GetStudentsInCard>', () => {
     }
     expect(screen.queryByTestId('hq-open-qr')).toBeNull();
     expect(row.contains(screen.getByTestId('hq-join-code'))).toBe(false);
+  });
+
+  it('Given the phone layout hides their words, Then link and projector still name themselves on hover and to screen readers', () => {
+    render(<GetStudentsInCard classroom={CLASS} onOpenProjector={vi.fn()} />);
+    expect(screen.getByTestId('hq-copy-link')).toHaveAttribute('title', 'academy.hq.copyLink');
+    expect(screen.getByTestId('hq-open-projector')).toHaveAttribute('title', 'academy.hq.openProjector');
   });
 
   it('Given HQ shows one step at a time, Then this card carries no step number and says the code is ready', () => {

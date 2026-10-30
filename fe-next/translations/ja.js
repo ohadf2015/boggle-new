@@ -30,7 +30,7 @@ const ja = {
       "defaultHint": "新しいリストはこの言語で始まります。レッスンはどの言語でも作れて、ゲームはリストの言語で遊びます。"
     },
     "board": {
-      "label": "盤面: {language}"
+      "label": "言語: {language}"
     },
     "lesson": {
       "create": "単語リストを作る",
@@ -673,12 +673,12 @@ const ja = {
       "board": "盤面でスピード勝負"
     },
     "complexity": {
-      "simple": "かんたん",
-      "medium": "ふつう",
-      "tricky": "手ごわい"
+      "simple": "ルールがかんたん",
+      "medium": "ルールはふつう",
+      "tricky": "ルールが手ごわい"
     },
     "style": {
-      "ffa": "全員でバトル",
+      "ffa": "全員対戦",
       "teams": "チーム対抗",
       "solo": "ひとりでボットと対戦",
       "class": "クラス全員でボスに挑む"
@@ -957,7 +957,7 @@ const ja = {
       "qrLabel": "参加用QRコード",
       "scanToJoin": "スキャンして参加",
       "copyLink": "リンクをコピー",
-      "openProjector": "プロジェクター表示",
+      "openProjector": "コードを大画面に表示",
       "joinedLabel": "人参加中",
       "nobodyYet": "まだ誰もいません。コードを共有しましょう",
       "firstStudentTitle": "最初の生徒を入れましょう",
@@ -978,7 +978,7 @@ const ja = {
       },
       "noClassTitle": "クラスを作れば、5秒でコード発行",
       "createClassCta": "クラスを作成",
-      "codeReady": "コード準備OK",
+      "codeReady": "参加受付中",
       "firstAssignmentTitle": "最初の課題を作る",
       "firstAssignmentBody": "名簿に生徒がいます。ライブ中でないときも取り組める練習課題を出しましょう。",
       "firstAssignmentCta": "最初の課題を作成",
@@ -993,7 +993,8 @@ const ja = {
       "progressSubmitted": "提出済み",
       "progressUpgrade": "Teacher Pro",
       "endedCodeTries": "終了したゲームのコードを入力した生徒：{count}人。新しいゲームを始めて、参加できるようにしましょう。",
-      "endedCodeTriesOne": "終了したゲームのコードを入力した生徒：{count}人。新しいゲームを始めて、参加できるようにしましょう。"
+      "endedCodeTriesOne": "終了したゲームのコードを入力した生徒：{count}人。新しいゲームを始めて、参加できるようにしましょう。",
+      "joinedGoal": "{count}人参加・目標{goal}人"
     },
     "modes": {
       "workshop": {
@@ -14572,7 +14573,7 @@ const ja = {
       "studentCap": "生徒 {{count}} / {{limit}} 人",
       "studentCountPro": "生徒 {{count}} 人",
       "presets": {
-        "title": "定型プリセット",
+        "title": "クイック設定",
         "fridayBattle": {
           "name": "金曜単語バトル",
           "desc": "チーム戦 · 前回のリスト · 速くてにぎやか"
@@ -15455,7 +15456,7 @@ const ja = {
       "startBlocked": "生徒が1人参加したらスタートできます。",
       "practiceFirst": "まずボット3人で練習",
       "practiceFirstHint": "クラスで映る画面をそのまま確認できます。最初の生徒が入るとボットは退出します。",
-      "rehearseCta": "ボットでリハーサル",
+      "rehearseCta": "ボットで試す",
       "rehearsePrivate": "これはあなただけに表示されます。生徒はルームにおらず、記録もされません。",
       "rehearseBotsBlocked": "このゲームはボットがプレイできないため、ボットでリハーサルできません。",
       "rehearseUseClassic": "代わりにクラシックでリハーサル",
@@ -17128,7 +17129,7 @@ const ja = {
       "title": "スターターパック",
       "useThisPack": "このパックを使う",
       "sessions": {
-        "title": "すぐ使える授業パック",
+        "title": "すぐ遊べるクラスゲーム",
         "subtitle": "授業の場面を選ぶだけ。ゲーム・単語リスト・タイマーはセット済みです。",
         "runThis": "これで始める",
         "noList": "リスト不要",
@@ -21234,9 +21235,9 @@ const ja = {
       "whatsNew": "新着情報"
     },
     "delivery": {
-      "projector": "プロジェクター",
-      "phones": "スマホで",
-      "both": "どちらでも"
+      "projector": "プロジェクター必須",
+      "phones": "スマホだけ",
+      "both": "プロジェクター任意"
     },
     "home": {
       "regionLabel": "先生のホーム",
@@ -21248,7 +21249,7 @@ const ja = {
       "greetNoName": "おかえりなさい",
       "startWith": "ゲームを始めるクラス：",
       "switchClass": "クラスを選ぶ",
-      "startLive": "ライブゲームを始める",
+      "startLive": "ゲームを選ぶ",
       "yourClasses": "あなたのクラス",
       "newClass": "新しいクラス",
       "colClass": "クラス",
@@ -21261,7 +21262,7 @@ const ja = {
       "showCodeFor": "{name}の参加コードを表示",
       "reviewTitle": "間違えた単語を練習する",
       "rail": {
-        "run": "はじめる",
+        "run": "選ぶ",
         "seeAll": "すべて見る",
         "language": "アクティビティの言語"
       },
@@ -21280,8 +21281,8 @@ const ja = {
     "week": {
       "title": "今週",
       "games": "プレイしたゲーム",
-      "students": "生徒の合計",
-      "active": "活動中のクラス",
+      "students": "クラスの生徒数",
+      "active": "遊んだクラス",
       "empty": "最初のゲームのあと、ここに数字が表示されます。",
       "unavailable": "今週の数字を読み込めませんでした。次回また表示されます。",
       "quiet": "今週はまだ静かです。短いラウンドを1回やってみましょう。"
@@ -21431,15 +21432,19 @@ const ja = {
       "proBadge": "Pro",
       "lateJoinOn": "途中参加あり",
       "lateJoinOff": "途中参加なし",
-      "changeList": "変更",
-      "listDone": "決定"
+      "changeList": "リストを変更",
+      "listDone": "決定",
+      "bestForList": "おすすめ",
+      "untried": "未プレイ",
+      "bestForListHint": "このリストにいちばん合うゲーム",
+      "untriedHint": "最近まだ遊んでいないゲーム"
     },
     "warmup": {
-      "send": "生徒にウォームアップを送る",
+      "send": "リストを宿題で送る",
       "retry": "送信できませんでした。もう一度",
-      "capped": "無料プランの宿題の上限に達しました。Proならウォームアップを無制限に送れます。",
-      "status": "{total}人中{done}人がウォームアップ済み",
-      "sent": "ウォームアップを送信しました"
+      "capped": "無料プランの宿題の上限に達しました。Proなら宿題を無制限に送れます。",
+      "status": "{total}人中{done}人が練習済み",
+      "sent": "宿題として送信しました"
     }
   },
   // @eduShell:end

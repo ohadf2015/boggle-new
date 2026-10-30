@@ -54,6 +54,14 @@ describe('<LobbyModeGrid> — the picker is the page', () => {
     const stickers = screen.getAllByTestId('mode-recommended');
     expect(stickers).toHaveLength(1);
     expect(screen.getByTestId('mode-tile-vocab-quiz')).toContainElement(stickers[0]);
+    expect(stickers[0]).toHaveTextContent('eduShell.host.bestForList');
+    expect(stickers[0]).toHaveAttribute('title', 'eduShell.host.bestForListHint');
+  });
+
+  it('Given a game the teacher has not tried lately, Then its tag says so instead of calling the game new', () => {
+    renderGrid({ suggested: 'blast' });
+    expect(screen.getByTestId('mode-suggestion')).toHaveTextContent('eduShell.host.untried');
+    expect(screen.getByTestId('mode-suggestion')).toHaveAttribute('title', 'eduShell.host.untriedHint');
   });
 
   it('Given a launch in flight, Then the cards are disabled so the choice cannot change under GO LIVE', () => {

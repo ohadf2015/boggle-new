@@ -59,6 +59,7 @@ export function HomeInsightCard({ insights = [], t, embedded = false }: { insigh
         type="button"
         onClick={() => setCursor((c) => c + 1)}
         aria-label={t('eduShell.insight.next')}
+        title={t('eduShell.insight.next')}
         className={cn('grid size-9 shrink-0 place-items-center rounded-neo border-2 border-neo-cream/30 text-neo-cream/80 hover:border-neo-cream hover:text-neo-cream', FOCUS_RING)}
       >
         <RefreshCw className="size-4" strokeWidth={3} aria-hidden="true" />

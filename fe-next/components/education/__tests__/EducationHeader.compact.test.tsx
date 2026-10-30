@@ -27,9 +27,21 @@ describe('EducationHeader compact: a quiet title for the Pick-a-game setup', () 
     expect(screen.getByText('education.header.subtitle').className).not.toContain('sm:block');
   });
 
+  it('Given compact, Then the icon tile, current crumb and unread dot are neutral so GO LIVE stays the only color', () => {
+    render(<EducationHeader compact showBackButton title="Classroom Game" />);
+    const tile = screen.getByTestId('edu-header-icon');
+    expect(tile.className).not.toMatch(/bg-neo-(cyan|lime|pink|yellow|purple)/);
+    expect(tile.className).toContain('text-neo-cream');
+    expect(screen.getByTestId('edu-header-crumbs').className).toContain('[&_[aria-current=page]]:text-neo-cream');
+    expect(screen.getByTestId('edu-utility-bar').className).toContain('[&_[data-testid=whats-new-dot]]:bg-neo-cream');
+  });
+
   it('Given the default header, Then its look is unchanged', () => {
     render(<EducationHeader showBackButton title="Classroom Game" />);
     expect(screen.getByTestId('edu-header-title').className).toMatch(/truncate.*uppercase/);
     expect(screen.getByText('education.header.subtitle').className).toContain('sm:block');
+    expect(screen.getByTestId('edu-header-icon').className).toContain('bg-neo-cyan');
+    expect(screen.getByTestId('edu-header-crumbs').className).not.toContain('aria-current');
+    expect(screen.getByTestId('edu-utility-bar').className).not.toContain('whats-new-dot');
   });
 });
