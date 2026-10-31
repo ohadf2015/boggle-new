@@ -61,7 +61,7 @@ export async function persistProfileAttribution(
       body: JSON.stringify(payload),
     });
     if (!res.ok) {
-      logger.warn('[attribution] profile persist failed with status', res.status);
+      if (res.status !== 401) logger.warn('[attribution] profile persist failed with status', res.status);
       return false;
     }
     return true;

@@ -130,7 +130,7 @@ async function promoteVerified(
       // Safety gate — Wiktionary's own labels (slur/offensive/vulgar) block it.
       if (await isOffensiveWord(wordRecord.word, language)) {
         result.blocked++;
-        logger.warn('AUTO_PROMOTE', `Blocked (offensive): ${wordRecord.word} [${language}]`);
+        logger.info('AUTO_PROMOTE', `Blocked (offensive): ${wordRecord.word} [${language}]`);
         // Mark so it is removed from the verified-promotion queue permanently.
         await supabase.rpc('update_verification_result', {
           p_word_id: wordRecord.id,

@@ -237,7 +237,7 @@ export async function startBotsForWheelRush(
 
   const allCandidates = enumerateWheelWords(state.puzzle, trie, WHEEL_RUSH_MIN_WORD_LEN);
   if (allCandidates.length === 0) {
-    logger.warn('BOT_WHEEL', `No wheel candidates for ${gameCode}`);
+    logger.info('BOT_WHEEL', `No wheel candidates for ${gameCode}`);
     return;
   }
   logger.info('BOT_WHEEL', `Game ${gameCode} (${language}): ${allCandidates.length} candidate wheel words for ${bots.length} bots`);

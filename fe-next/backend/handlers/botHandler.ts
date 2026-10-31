@@ -207,7 +207,7 @@ function registerBotHandlers(io: Server, socket: Socket): void {
     // If bot not found in botManager, try to find in game.users as fallback
     // This handles edge cases where state might be out of sync
     if (!botToRemove && botUsernameToFind && game.users[botUsernameToFind]?.isBot) {
-      logger.warn('BOT', `Bot "${botUsernameToFind}" not in botManager, removing from game.users only`);
+      logger.info('BOT', `Bot "${botUsernameToFind}" not in botManager, removing from game.users only`);
       removeUserFromGame(gameCode, botUsernameToFind);
 
       // Check if room is now empty and close it immediately

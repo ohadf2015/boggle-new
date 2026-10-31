@@ -36,13 +36,21 @@ function acquireSlot(): Promise<void> {
   });
 }
 
+const QUEUE_WARN_INTERVAL_MS = 60_000;
+let lastQueueWarnAt = 0;
+
+// Every release during a spike would otherwise send its own warning.
+export function shouldWarnQueueDepth(depth: number, now: number, lastWarnAt: number): boolean {
+  return depth >= QUEUE_DEPTH_WARNING && now - lastWarnAt >= QUEUE_WARN_INTERVAL_MS;
+}
+
 function releaseSlot(): void {
   activeRequests--;
   const next = requestQueue.shift();
   if (next) next();
 
-  // Warn when queue depth indicates sustained backpressure
-  if (requestQueue.length >= QUEUE_DEPTH_WARNING) {
+  if (shouldWarnQueueDepth(requestQueue.length, Date.now(), lastQueueWarnAt)) {
+    lastQueueWarnAt = Date.now();
     logger.warn('SUPABASE', `Request queue depth: ${requestQueue.length} (threshold: ${QUEUE_DEPTH_WARNING}). Active: ${activeRequests}/${MAX_CONCURRENT_REQUESTS}`);
   }
 }
