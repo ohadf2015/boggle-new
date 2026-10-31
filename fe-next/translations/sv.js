@@ -3350,6 +3350,12 @@ const sv = {
       "ogTitle": "Uppgradera till Teacher Pro – obegränsat antal klasser",
       "ogDescription": "Hantera obegränsat antal klassrum och elever för $9/månad. Väx din ordförrådsundervisning med LexiClash Pro."
     },
+    "teacherPricing": {
+      "title": "LexiClash priser: gratisplan eller Teacher Pro för 9 $/månad",
+      "description": "Vad kostar LexiClash? Gratisplanen räcker till 3 klasser med 50 elever vardera, utan slutdatum. Teacher Pro kostar 9 $/månad efter 14 dagar gratis.",
+      "ogTitle": "LexiClash priser för lärare",
+      "ogDescription": "Gratis för upp till 3 klasser med 50 elever. Teacher Pro: 9 $/månad, 14 dagar gratis."
+    },
     "title": "LexiClash — Scrabble-Alternativ på Svenska, 2-20 Spelare, Gratis Online",
     "description": "Scrabble-alternativ på svenska: 2-20 spelare i realtid, 8 spellägen, 10 000+ svenska ord, ingen nedladdning. Skapa rum, dela länken med vänner, tävla direkt i webbläsaren. Gratis!",
     "keywords": "multiplayer ordspel, realtids ordspel, online ordstrid, festspel, tävlings ordspel, snabbt ordspel, ordpussel multiplayer, alias spel, kahoot alternativ, familjespelkväll, festspel, teambuilding, ordtävling, live ordspel, ordrace, ordförrådsspel, gratis onlinespel, alfapet online gratis, ordspel utan nedladdning, ordspel för fester, dagligt ordpussel, ordlek med vänner, ordäventyr spel",

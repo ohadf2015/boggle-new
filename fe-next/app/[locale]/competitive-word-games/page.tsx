@@ -191,6 +191,44 @@ export default async function CompetitiveWordGamesPage({ params }: PageProps) {
         </section>
 
         <section className="mb-12">
+          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">
+            Leaderboard Games Online: How Each LexiClash Board Ranks You
+          </h2>
+          <p className="mb-6 leading-relaxed text-neo-gray-200" data-speakable="true">
+            LexiClash is a free online word game with four leaderboards you can climb from a browser,
+            no download: an all-time global board, a board for each daily puzzle, a friends board, and
+            the live standings inside every multiplayer room. The daily boards are the fairest test,
+            because every player gets the identical puzzle, so a higher score means more words found,
+            not an easier board.
+          </p>
+          <div className="overflow-x-auto rounded-neo border-3 border-neo-gray-400 shadow-hard">
+            <table className="w-full min-w-[32rem] text-left text-sm">
+              <thead className="bg-neo-navy/80 text-neo-yellow">
+                <tr>
+                  <th scope="col" className="px-4 py-3 font-bold">Leaderboard</th>
+                  <th scope="col" className="px-4 py-3 font-bold">Who you are ranked against</th>
+                  <th scope="col" className="px-4 py-3 font-bold">What decides your rank</th>
+                </tr>
+              </thead>
+              <tbody className="text-neo-gray-200">
+                {[
+                  ['Global (all-time)', 'Every LexiClash player worldwide', 'Total points across your ranked games'],
+                  ['Daily Word Wheel and Daily Word Hunt', 'Everyone who plays that day’s puzzle', 'Your score on the same board everyone got'],
+                  ['Friends', 'The friends you have added', 'Who scored most on today’s puzzle'],
+                  ['Multiplayer room', 'The 2-20+ players in your room', 'Points per round; unique words score more'],
+                ].map(([board, who, rank]) => (
+                  <tr key={board} className="border-t border-neo-gray-400">
+                    <th scope="row" className="px-4 py-3 font-bold text-neo-cream">{board}</th>
+                    <td className="px-4 py-3">{who}</td>
+                    <td className="px-4 py-3">{rank}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section className="mb-12">
           <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Frequently Asked Questions</h2>
           <div className="space-y-4">
             {faqs.map((faq, idx) => (

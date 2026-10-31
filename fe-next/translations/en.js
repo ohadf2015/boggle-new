@@ -2675,6 +2675,12 @@ const en = {
       "ogTitle": "Upgrade to Teacher Pro - Unlimited Classes",
       "ogDescription": "Manage unlimited classrooms and students for $9/month with LexiClash Teacher Pro."
     },
+    "teacherPricing": {
+      "title": "LexiClash Pricing: Free Plan and Teacher Pro at $9/month",
+      "description": "LexiClash pricing for teachers: the Free plan runs up to 3 classes of 50 students with no expiry. Teacher Pro is $9/month after a 14-day free trial.",
+      "ogTitle": "LexiClash Pricing for Teachers",
+      "ogDescription": "Free for up to 3 classes of 50 students. Teacher Pro: $9/month, 14 days free."
+    },
     "refund": {
       "title": "Refund & Cancellation Policy - LexiClash",
       "description": "Learn about our refund and cancellation policy for LexiClash Pro subscriptions. Cancel anytime. Your data stays safe.",
