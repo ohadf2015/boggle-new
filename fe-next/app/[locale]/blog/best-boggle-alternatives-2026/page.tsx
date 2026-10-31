@@ -24,7 +24,7 @@ const metaTitles: Record<string, string> = {
 };
 
 const metaDescriptions: Record<string, string> = {
-  en: 'Find the best free word games like Boggle — play instantly in your browser, no signup needed. Live multiplayer, tested & ranked for 2026.',
+  en: 'Find the best free word games like Boggle — no signup needed, live multiplayer in 6 languages. Tested & ranked for 2026.',
   he: 'ביקורות כנות (ומעט מטורפות) של 6 חלופות בוגל. מי זבל של pay-to-win ומי באמת שווה? וורדל, מילים עם חברים, LexiClash ועוד — חינם וללא הורדה.',
   sv: 'Ärliga (och lite galna) recensioner av 6 Boggle-alternativ. Vilka är pay-to-win-skräp? Vilka är genuint bra? Wordle, Words With Friends, LexiClash jämförda — gratis, ingen nedladdning.',
   ja: '6つのBoggle代替ゲームを本音レビュー。課金ゲーはどれ？本当に面白いのは？Wordle、Words With Friends、LexiClashを比較 — 無料・ダウンロード不要。',

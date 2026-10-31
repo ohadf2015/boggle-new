@@ -13,8 +13,8 @@ describe('best-boggle-alternatives-2026 snippet', () => {
   const page = readFileSync(join(dir, 'page.tsx'), 'utf8');
   const [title, description] = enFields(page);
 
-  it('EN title leads with the number and Free, and fits 50-60', () => {
-    expect(title.startsWith('6 Free ')).toBe(true);
+  it('EN title leads with Best and contains Games Like Boggle, and fits 50-60', () => {
+    expect(title.startsWith('Best ')).toBe(true);
     expect(title).toContain('Games Like Boggle');
     expect(title).toContain('No Signup');
     expect(title.length).toBeGreaterThanOrEqual(50);
@@ -22,7 +22,7 @@ describe('best-boggle-alternatives-2026 snippet', () => {
   });
 
   it('EN description leads with the hook and fits 120-160', () => {
-    expect(description.startsWith('6 free games like Boggle, no signup')).toBe(true);
+    expect(description.startsWith('Find the best free word games like Boggle')).toBe(true);
     expect(description).toContain('live multiplayer');
     expect(description).toContain('6 languages');
     expect(description).not.toContain('Wordle');
