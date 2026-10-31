@@ -67,3 +67,28 @@ describe('POST /api/education/pro-offer-click', () => {
     expect(capture.mock.calls[1][0].properties).toMatchObject({ experiment: null, copy_variant: null })
   })
 })
+
+describe('POST /api/education/pro-offer-click — class report button + format', () => {
+  beforeEach(() => {
+    getAuthedUser.mockReset()
+    capture.mockReset()
+  })
+
+  it('records the class-report button tap with its copy A/B bucket and format', async () => {
+    const { proCopyVariant } = await import('@/lib/education/pro/proCopyExperiment')
+    getAuthedUser.mockResolvedValue({ id: 'teacher-uuid-2', email: 'teacher@school.org' })
+    await POST(req({ placement: 'class_report_button', locale: 'he', cta: 'teacher_pro', offer: 'paid', format: 'report_button' }))
+    expect(capture.mock.calls[0][0]).toMatchObject({
+      event: 'edu_pro_offer_clicked',
+      properties: { source: 'class_report_button', format: 'report_button', copy_variant: proCopyVariant('teacher-uuid-2'), offer: 'paid' },
+    })
+  })
+
+  it('defaults format to card and ignores unknown formats', async () => {
+    getAuthedUser.mockResolvedValue({ id: 't1', email: 'teacher@school.org' })
+    await POST(req({ placement: 'dashboard', locale: 'en', cta: 'teacher_pro', offer: 'paid' }))
+    await POST(req({ placement: 'dashboard', locale: 'en', cta: 'teacher_pro', offer: 'paid', format: 'banner' }))
+    await POST(req({ placement: 'dashboard', locale: 'en', cta: 'teacher_pro', offer: 'paid', format: 'link' }))
+    expect(capture.mock.calls.map((c) => c[0].properties.format)).toEqual(['card', 'card', 'link'])
+  })
+})

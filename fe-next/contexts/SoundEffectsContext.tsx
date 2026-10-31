@@ -274,7 +274,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     }
 
     if (!howl) {
-      logger.warn(`[SFX] Sound not found: ${soundKey}`);
+      if (soundsLoadedRef.current) logger.warn(`[SFX] Sound not found: ${soundKey}`);
       return;
     }
 

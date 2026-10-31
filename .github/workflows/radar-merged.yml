@@ -35,10 +35,10 @@ jobs:
           fi
           meta=$(printf '%s\n' "$BODY" | sed -n '/^```radar/,/^```$/p' | sed '1d;$d')
           [ -n "$meta" ] || { echo "PR body has no radar block"; exit 1; }
-          id=$(printf '%s' "$meta" | jq -r '.rec_id // empty')
+          id=$(printf '%s' "$meta" | jq -r '.recommendationId // .rec_id // empty')
           if [[ "$id" =~ ^[0-9]+$ ]]; then
             mcp update_recommendation "{\"id\":$id,\"action\":\"complete\"}"
           fi
           args=$(printf '%s' "$meta" | jq -c --arg pr "$PR_URL" \
-            '{app,surface,kind,metric,summary,hypothesis,evidence:$pr} + (if (.rec_id|type)=="number" then {recommendationId:.rec_id} else {} end)')
+            '{app,surface,kind,metric,summary,hypothesis,evidence:$pr} + ((.recommendationId // .rec_id) as $r | if ($r|type)=="number" then {recommendationId:$r} else {} end)')
           mcp record_intervention "$args"

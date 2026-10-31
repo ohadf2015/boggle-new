@@ -26,6 +26,7 @@ import { TvRecapHeader } from '@/components/education/results/TvRecapHeader';
 import { StrugglePreview } from '@/components/education/results/StrugglePreview';
 import { MissedWordsList } from '@/components/education/results/MissedWordsList';
 import { ResultsTeacherProTrialCard } from '@/components/education/results/ResultsTeacherProTrialCard';
+import { ClassReportButton } from '@/components/education/results/ClassReportButton';
 import { ZeroRoundNote } from '@/components/education/results/ZeroRoundNote';
 import { TeacherInviteNudge, showTeacherInvite } from '@/components/education/results/TeacherInviteNudge';
 import { EmptyRoundCard } from '@/components/education/results/EmptyRoundCard';
@@ -112,6 +113,15 @@ function Actions({ t, onRematch, onClose, onExitRoom, reteach }: ActionsProps) {
       )}
     </div>
   );
+}
+
+/** Each student's found % this round (no names, host excluded), lowest first: the teaser's blurred bars. */
+function reportBars(summary: ClassroomTvResultsScreenProps['summary']): number[] {
+  const host = (summary.teacherName ?? '').trim().toLowerCase();
+  return Object.entries(summary.masteryByPlayer ?? {})
+    .filter(([name, m]) => name.trim().toLowerCase() !== host && m && m.total > 0)
+    .map(([, m]) => Math.round((m.found / m.total) * 100))
+    .sort((a, b) => a - b);
 }
 
 export function EduHostResults({ summary, players, t, onRematch, onClose, onExitRoom, gameCode: roomCode, socket }: ClassroomTvResultsScreenProps) {
@@ -237,6 +247,10 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
             />
             {/* Teacher Pro right under Play again: the moment a free teacher has just seen the value. */}
             {proCard && <ResultsTeacherProTrialCard language={language} />}
+            {/* Free teachers: the class report is Teacher Pro, so this opens a teaser that leads into the offer. */}
+            {proCard && summary.totalWords > 0 && (
+              <ClassReportButton language={language} underHalf={studentsUnderHalf(summary)} bars={reportBars(summary)} />
+            )}
             <MissedWordsList words={missed} underHalf={studentsUnderHalf(summary)} maxChips={bossOver ? 6 : 8} t={t} />
             {!proLoading && hasPro && summary.totalWords > 0 && (
               <div className={cn(shortWall && '[@container_results_(height<56.25rem)]:hidden')}>

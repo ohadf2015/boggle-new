@@ -256,7 +256,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
   const leaderboardNode = (
     <>
       {isGuest && guestName && onGuestRenamed && (
-        <GuestNameEditor name={guestName} guestFingerprint={guestFingerprint} onRenamed={onGuestRenamed} t={t} />
+        <GuestNameEditor name={guestName} guestFingerprint={guestFingerprint} rank={stats?.yourStats?.rank} totalPlayers={stats?.totalPlayers} onRenamed={onGuestRenamed} t={t} />
       )}
       {(result.wordsDiscovered?.length ?? 0) > 0 && hintVariant !== 'hide-hint' && <p className="text-xs text-neo-white text-center font-medium -mb-1">{t('wordHunt.results.tapPlayerHint', 'Tap a player to see their path')}</p>}
       <div onClick={() => trackGrowthEvent('wordhunt_leaderboard_tap', { language, solved: result.solved })}>

@@ -54,9 +54,9 @@ export async function speakWord(word: string, lang: string, volume: number = 1.0
   utterance.volume = Math.max(0, Math.min(1, volume));
 
   // Return promise that resolves when speech completes
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     utterance.onend = () => resolve(true);
-    utterance.onerror = (event) => reject(new Error(`Speech error: ${event.type}`));
+    utterance.onerror = () => resolve(false);
 
     window.speechSynthesis.speak(utterance);
   });

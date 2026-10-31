@@ -27,8 +27,11 @@ import { TRIAL_COPY_RTL, trialCopyBase } from '@/lib/education/pro/trialCtaCopy'
 export const PRO_COPY_EXPERIMENT = 'edu_pro_copy_v1' as const;
 export type ProCopyVariant = 'a' | 'b';
 export const PRO_COPY_VARIANTS: readonly ProCopyVariant[] = ['a', 'b'];
-/** Offer surfaces that render the A/B copy (access_success keeps its own button copy). */
-export const PRO_COPY_PLACEMENTS: ReadonlySet<string> = new Set(['class_created', 'classroom_results', 'dashboard']);
+/**
+ * Offer surfaces whose events carry the A/B bucket (access_success keeps its own button copy).
+ * class_report_button is tagged too, so report-button clicks can be split by the copy the teacher saw.
+ */
+export const PRO_COPY_PLACEMENTS: ReadonlySet<string> = new Set(['class_created', 'classroom_results', 'dashboard', 'class_report_button']);
 
 /** FNV-1a 32-bit — tiny, dependency-free, identical in Node and the browser. */
 function fnv1a(s: string): number {

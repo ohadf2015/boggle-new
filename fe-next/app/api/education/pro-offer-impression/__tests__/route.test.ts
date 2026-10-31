@@ -102,3 +102,17 @@ describe('POST /api/education/pro-offer-impression — dashboard', () => {
     })
   })
 })
+
+describe('POST /api/education/pro-offer-impression — format + class report button', () => {
+  it('passes format through and accepts the class-report button', async () => {
+    getAuthedUser.mockReset()
+    capture.mockReset()
+    getAuthedUser.mockResolvedValue({ id: 't1', email: 'teacher@school.org' })
+    await POST(req({ placement: 'classroom_results', stage: 'rendered', locale: 'en', cta: 'teacher_pro_trial', offer: 'trial', format: 'link' }))
+    await POST(req({ placement: 'class_report_button', stage: 'rendered', locale: 'en', cta: 'teacher_pro_trial', offer: 'trial', format: 'report_teaser' }))
+    expect(capture.mock.calls.map((c) => [c[0].event, c[0].properties.source, c[0].properties.format])).toEqual([
+      ['edu_pro_offer_rendered', 'classroom_results', 'link'],
+      ['edu_pro_offer_rendered', 'class_report_button', 'report_teaser'],
+    ])
+  })
+})

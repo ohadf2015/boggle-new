@@ -27,6 +27,21 @@ const globalQueryClient = new QueryClient({
 // Reset query client between tests
 beforeEach(() => {
   globalQueryClient.clear();
+  // Teacher Pro offer session cap / impression de-dupe (lib/education/pro/proOfferSession.ts):
+  // every test starts as a fresh browser session.
+  try {
+    const s = (globalThis as { sessionStorage?: Storage }).sessionStorage;
+    if (s) {
+      const keys: string[] = [];
+      for (let i = 0; i < s.length; i++) {
+        const k = s.key(i);
+        if (k && k.startsWith('lexi:proOffer:')) keys.push(k);
+      }
+      keys.forEach((k) => s.removeItem(k));
+    }
+  } catch {
+    /* node environment */
+  }
 });
 
 // Override render/renderHook to wrap in QueryClientProvider unless a wrapper is already provided.

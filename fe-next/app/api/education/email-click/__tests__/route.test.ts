@@ -51,3 +51,14 @@ describe('GET /api/education/email-click', () => {
     expect(res.headers.get('location')).toBe('https://www.lexiclash.live/ja/teacher/upgrade?source=approval_email')
   })
 })
+
+describe('GET /api/education/email-click — class report email', () => {
+  it('tracks the personal class-report email and lands on the upgrade page in the teacher language', async () => {
+    getAuthedUser.mockReset()
+    capture.mockReset()
+    getAuthedUser.mockResolvedValue(null)
+    const res = await GET(req('c=class_report_email&l=he'))
+    expect(res.headers.get('location')).toBe('https://www.lexiclash.live/he/teacher/upgrade?source=class_report_email')
+    expect(capture.mock.calls[0][0]).toMatchObject({ event: 'edu_pro_email_clicked', properties: { source: 'class_report_email', signed_in: false } })
+  })
+})

@@ -302,6 +302,8 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
               <GuestNameEditor
                 name={guestName}
                 guestFingerprint={currentGuestFingerprint ?? null}
+                rank={currentRank}
+                totalPlayers={totalPlayers}
                 onRenamed={(name) => {
                   setGuestName(name);
                   setRenameCount(c => c + 1);

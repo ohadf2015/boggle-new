@@ -207,7 +207,7 @@ describe('textToSpeech', () => {
       await expect(resultPromise).resolves.toBe(true);
     });
 
-    it('should reject Promise on speech error', async () => {
+    it('should resolve false on speech error so fire-and-forget callers never leak a rejection', async () => {
       // GIVEN
       const word = 'hello';
       const lang = 'en-US';
@@ -226,7 +226,7 @@ describe('textToSpeech', () => {
       const resultPromise = speakWord(word, lang);
 
       // THEN
-      await expect(resultPromise).rejects.toThrow();
+      await expect(resultPromise).resolves.toBe(false);
     });
   });
 
