@@ -412,6 +412,12 @@ export type GrowthEvent =
   // wordhunt_leaderboard_tap: fires when user taps the leaderboard area;
   //   high rate = evidence the dead tap-hint is confusing players.
   | 'wordhunt_results_loaded'
+  // Daily guest name: prompt_shown once per first finish ({ is_default, rank }),
+  // saved on a real rename ({ source: prompt|nudge|edit, was_default }),
+  // kept when the keep_name arm skips ({ is_default }).
+  | 'daily_guest_name_prompt_shown'
+  | 'daily_guest_name_saved'
+  | 'daily_guest_name_kept'
   | 'wordhunt_leaderboard_tap'
   // Multiplayer results page funnel — fills mp_round blind spots.
   //   results_viewed: also fired on ResultsMainContent mount (canonical mode funnel;

@@ -70,7 +70,7 @@ export function extractOAuthDisplayName(
 // Locale-aware fallback names for when the random-name API fails.
 // Witty single-or-two-word names with no dashes/underscores. Mirrors the
 // style of BOT_CONFIG.PLAYER_NAMES so a fallback feels native, not jarring.
-const FALLBACK_NAMES_BY_LANG: Record<string, string[]> = {
+export const FALLBACK_NAMES_BY_LANG: Record<string, string[]> = {
   en: [
     'Sneaky Pickle', 'Disco Potato', 'Cosmic Banana', 'Fluffy Waffle',
     'Peppy Penguin', 'Loopy Llama', 'Bouncy Bear', 'Sassy Sloth',
