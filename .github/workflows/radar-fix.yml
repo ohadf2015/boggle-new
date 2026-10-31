@@ -9,6 +9,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: write
   contents: write
   pull-requests: write
   id-token: write
@@ -117,7 +118,7 @@ jobs:
                payments, middleware, .github/, .env*, package manifests/lockfiles, Docker/vercel/railway config,
                db/ or migrations; the workflow rejects such commits.
             5. Write ${{ env.OUT }}/result.json:
-               {"outcome":"fixed"|"none","branch":"<branch or null>","rec_id":<id or null>,
+               {"outcome":"fixed"|"none","branch":"<branch or null>","recommendationId":<id or null>,
                 "title":"<PR title, conventional commit style>",
                 "dismissed":[{"id":<id>,"title":"<row title>","evidence":"<one line>"}],
                 "intervention":{"app":"${{ env.APP }}","surface":"<path or 'sitewide'>","kind":"<kind>","metric":"<metric>",
@@ -143,7 +144,7 @@ jobs:
           [ -f "$f" ] || { echo "outcome=none" >> "$GITHUB_OUTPUT"; echo "Agent wrote no result." >> "$GITHUB_STEP_SUMMARY"; exit 0; }
           echo "outcome=$(jq -r .outcome "$f")" >> "$GITHUB_OUTPUT"
           echo "branch=$(jq -r '.branch // ""' "$f" | grep -E '^radar/(h-)?[0-9]+$' || true)" >> "$GITHUB_OUTPUT"
-          echo "id=$(jq -r '.rec_id // ""' "$f" | grep -E '^[0-9]+$' || true)" >> "$GITHUB_OUTPUT"
+          echo "id=$(jq -r '.recommendationId // .rec_id // ""' "$f" | grep -E '^[0-9]+$' || true)" >> "$GITHUB_OUTPUT"
           { echo "## $(jq -r .outcome "$f"), $(jq '.dismissed | length' "$f") dismissed"; cat "$OUT/body.md" 2>/dev/null; } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Gate the commit
@@ -178,9 +179,16 @@ jobs:
           ID: ${{ steps.result.outputs.id }}
         run: |
           git push -u origin "$BRANCH"
-          { cat "$OUT/body.md"; printf '\n\n```radar\n'; jq -c '.intervention + {rec_id}' "$OUT/result.json"; printf '```\n'; } > "$RUNNER_TEMP/pr.md"
+          { cat "$OUT/body.md"; printf '\n\n```radar\n'; jq -c '.intervention + {recommendationId: (.recommendationId // .rec_id)}' "$OUT/result.json"; printf '```\n'; } > "$RUNNER_TEMP/pr.md"
           url=$(gh pr create --base "$BASE" --head "$BRANCH" --title "$(jq -r .title "$OUT/result.json")" --body-file "$RUNNER_TEMP/pr.md")
           echo "PR: $url" >> "$GITHUB_STEP_SUMMARY"
+          # GITHUB_TOKEN pushes and PRs trigger no workflows; workflow_dispatch is the one event it may fire.
+          for wf in .github/workflows/*.y*ml; do
+            grep -qE '^\s+pull_request:|^on:.*pull_request' "$wf" && grep -qE '^\s+workflow_dispatch:' "$wf" || continue
+            gh workflow run "$(basename "$wf")" --ref "$BRANCH" \
+              && echo "CI dispatched: $(basename "$wf")" >> "$GITHUB_STEP_SUMMARY" \
+              || echo "::warning::Could not dispatch $(basename "$wf"); the caller needs permissions actions: write"
+          done
           [ -z "$ID" ] || curl -sS --fail-with-body -H "Authorization: Bearer $GROWTH_RADAR_TOKEN" -H 'content-type: application/json' "$RADAR/api/mcp" \
             -d "$(jq -n --argjson id "$ID" '{jsonrpc:"2.0",id:1,method:"tools/call",params:{name:"update_recommendation",arguments:{id:$id,action:"activate"}}}')" \
             | jq -e '.result.isError != true' > /dev/null
