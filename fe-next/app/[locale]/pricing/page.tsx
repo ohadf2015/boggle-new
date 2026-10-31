@@ -17,7 +17,7 @@ type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
-  return generatePageMetadata({ seoKey: 'teacherUpgrade', path: '/pricing', locale });
+  return generatePageMetadata({ seoKey: 'teacherPricing', path: '/pricing', locale });
 }
 
 /**

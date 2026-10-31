@@ -2991,6 +2991,12 @@ const es = {
       "ogTitle": "Mejora a Teacher Pro: clases ilimitadas",
       "ogDescription": "Gestiona aulas y estudiantes ilimitados por $9/mes. Haz crecer la enseñanza de vocabulario con LexiClash Pro."
     },
+    "teacherPricing": {
+      "title": "Precios de LexiClash: plan gratis o Teacher Pro por $9/mes",
+      "description": "¿Cuánto cuesta LexiClash? El plan gratis cubre hasta 3 clases de 50 estudiantes, sin caducidad. Teacher Pro cuesta $9/mes tras 14 días gratis.",
+      "ogTitle": "Precios de LexiClash para docentes",
+      "ogDescription": "Gratis para hasta 3 clases de 50 estudiantes. Teacher Pro: $9/mes, 14 días gratis."
+    },
     "title": "LexiClash — Scrabble en Español Online Gratis, 2-20 Jugadores, Sin Descarga",
     "description": "Alternativa a Scrabble online en español: 2-20 jugadores en tiempo real, 8 modos de juego, 10.000+ palabras. Sin turnos lentos, sin descarga, sin registro. ¡Juega gratis en el navegador ya!",
     "keywords": "juego de palabras multijugador, alternativa a scrabble en línea, alternativa multijugador a scrabble, juego como scrabble online, juego al estilo scrabble, jugar scrabble alternativa gratis, juegos de palabras online multijugador, scrabble alternativa multijugador español, alternativa gratis a scrabble go, jugar scrabble alternativa en español, juego de palabras en tiempo real, batalla de palabras online, juego de palabras para fiestas, juego de palabras competitivo, boggle online, juego de vocabulario, juego de aprendizaje de idiomas, juego online gratis, juego de letras gratis, wordle en español, boggle en español gratis, juego de palabras sin descargar, juego de palabras para grupos, juego de vocabulario online, juego de palabras con amigos, juego de palabras educativo, juego de palabras en navegador, reto de palabras diario, juego de palabras rápido, juego cerebral de palabras",
