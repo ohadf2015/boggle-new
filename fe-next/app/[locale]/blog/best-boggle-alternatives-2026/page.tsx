@@ -16,7 +16,7 @@ const DATE_PUBLISHED = '2025-12-01';
 const DATE_MODIFIED = '2026-05-19';
 
 const metaTitles: Record<string, string> = {
-  en: '6 Free Games Like Boggle — No Signup, Live | LexiClash',
+  en: 'Best Word Games Like Boggle — Free, No Signup | LexiClash',
   he: 'ניסיתי כל חלופת בוגל ב-2026 — הנה מה שבאמת שווה לשחק',
   sv: 'Jag testade alla Boggle-alternativ 2026 — Här är vad som faktiskt är värt att spela',
   ja: 'Boggle代替ゲームを全部試した（2026年）— 本当に遊ぶ価値があるのはこれだ',
@@ -24,7 +24,7 @@ const metaTitles: Record<string, string> = {
 };
 
 const metaDescriptions: Record<string, string> = {
-  en: '6 free games like Boggle, no signup, live multiplayer in 6 languages. Tested Boggle alternatives so you can skip pay-to-win apps and play in the browser.',
+  en: 'Find the best free word games like Boggle — play instantly in your browser, no signup needed. Live multiplayer, tested & ranked for 2026.',
   he: 'ביקורות כנות (ומעט מטורפות) של 6 חלופות בוגל. מי זבל של pay-to-win ומי באמת שווה? וורדל, מילים עם חברים, LexiClash ועוד — חינם וללא הורדה.',
   sv: 'Ärliga (och lite galna) recensioner av 6 Boggle-alternativ. Vilka är pay-to-win-skräp? Vilka är genuint bra? Wordle, Words With Friends, LexiClash jämförda — gratis, ingen nedladdning.',
   ja: '6つのBoggle代替ゲームを本音レビュー。課金ゲーはどれ？本当に面白いのは？Wordle、Words With Friends、LexiClashを比較 — 無料・ダウンロード不要。',
