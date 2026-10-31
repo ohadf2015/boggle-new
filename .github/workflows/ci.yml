@@ -87,7 +87,10 @@ jobs:
 
       - name: Check SEO freeze
         if: github.event_name == 'pull_request'
-        run: node fe-next/scripts/ci/check-seo-freeze.mjs HEAD^1 HEAD
+        run: |
+          # The base's last 30 days, so the check can see when a page's title last changed.
+          git fetch --no-tags --shallow-since="$(date -u -d '30 days ago' +%F)" origin "${{ github.base_ref }}"
+          node fe-next/scripts/ci/check-seo-freeze.mjs HEAD^1 HEAD
 
   type-check:
     runs-on: ubuntu-latest
