@@ -34,7 +34,7 @@ describe('proCopyVariant (edu_pro_copy_v1 bucket)', () => {
   });
 
   it('covers the results, class-ready and dashboard surfaces, not access_success', () => {
-    expect([...PRO_COPY_PLACEMENTS].sort()).toEqual(['class_created', 'classroom_results', 'dashboard']);
+    expect([...PRO_COPY_PLACEMENTS].sort()).toEqual(['class_created', 'class_report_button', 'classroom_results', 'dashboard']);
   });
 });
 

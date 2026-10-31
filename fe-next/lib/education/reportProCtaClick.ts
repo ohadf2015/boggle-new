@@ -4,6 +4,8 @@
  * Browser PostHog is consent-gated; these record for every signed-in teacher.
  * `keepalive` lets a tap finish while the link navigates away. Never throws.
  */
+import { firstProOfferReport, type ProOfferFormat } from '@/lib/education/pro/proOfferSession';
+
 function post(path: string, body: Record<string, unknown>): void {
   try {
     if (typeof fetch !== 'function') return;
@@ -26,14 +28,25 @@ export function reportProCtaClick(args: { placement: string; locale: string; cta
 export type ProOfferStage = 'rendered' | 'viewed';
 export type ProOfferKind = 'trial' | 'keep_after_trial' | 'paid';
 
-export function reportProOfferImpression(args: {
-  placement: string;
-  locale: string;
-  cta: string;
-  offer: ProOfferKind;
-  stage: ProOfferStage;
-}): void {
-  post('/api/education/pro-offer-impression', args);
+type OfferArgs = { placement: string; locale: string; cta: string; offer: ProOfferKind; format?: ProOfferFormat };
+
+/** `format` rides on the body only when it is not the default full card (older payloads stay byte-identical). */
+function body<T extends OfferArgs>(args: T): Omit<T, 'format'> & { format?: ProOfferFormat } {
+  const { format, ...rest } = args;
+  return format && format !== 'card' ? { ...rest, format } : rest;
+}
+
+/**
+ * `rendered` / `viewed` server twin. Sent at most once per placement, format and
+ * stage per browser session per teacher (`userId`), so a re-render or remount
+ * never inflates impressions (proOfferSession.ts).
+ */
+export function reportProOfferImpression(
+  args: OfferArgs & { stage: ProOfferStage },
+  opts: { userId?: string | null } = {},
+): void {
+  if (!firstProOfferReport(opts.userId, args.placement, args.format ?? 'card', args.stage)) return;
+  post('/api/education/pro-offer-impression', body(args));
 }
 
 /**
@@ -41,15 +54,16 @@ export function reportProOfferImpression(args: {
  * sendBeacon first: it survives the navigation to /teacher/upgrade or Polar checkout
  * and carries the same-origin session cookie. Falls back to keepalive fetch.
  */
-export function reportProOfferClick(args: { placement: string; locale: string; cta: string; offer: ProOfferKind }): void {
+export function reportProOfferClick(args: OfferArgs): void {
   const path = '/api/education/pro-offer-click';
+  const payload = body(args);
   try {
     if (typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
-      const blob = new Blob([JSON.stringify(args)], { type: 'application/json' });
+      const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
       if (navigator.sendBeacon(path, blob)) return;
     }
   } catch {
     /* fall through to fetch */
   }
-  post(path, args);
+  post(path, payload);
 }

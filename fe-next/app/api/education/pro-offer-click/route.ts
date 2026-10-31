@@ -17,12 +17,14 @@ import { PRO_COPY_EXPERIMENT, PRO_COPY_PLACEMENTS, proCopyVariant } from '@/lib/
  */
 const OFFERS = new Set(['trial', 'keep_after_trial', 'paid']);
 const LOCALE_RE = /^[a-z]{2}(-[A-Za-z]{2})?$/;
+/** card = full offer card (default), link = the compact line once the session cap is used, report_* = the class-report button and its teaser. */
+const FORMATS = new Set(['card', 'link', 'report_button', 'report_teaser']);
 
 export async function POST(request: NextRequest) {
   try {
     const user = await getAuthedUser(request);
     if (!user) return new NextResponse(null, { status: 204 });
-    let body: { placement?: unknown; locale?: unknown; cta?: unknown; offer?: unknown } = {};
+    let body: { placement?: unknown; locale?: unknown; cta?: unknown; offer?: unknown; format?: unknown } = {};
     try {
       body = JSON.parse((await request.text()) || '{}');
     } catch {
@@ -33,6 +35,7 @@ export async function POST(request: NextRequest) {
     const locale = typeof body.locale === 'string' && LOCALE_RE.test(body.locale) ? body.locale : null;
     const cta = body.cta === 'teacher_pro' ? 'teacher_pro' : 'teacher_pro_trial';
     const offer = typeof body.offer === 'string' && OFFERS.has(body.offer) ? body.offer : null;
+    const format = typeof body.format === 'string' && FORMATS.has(body.format) ? body.format : 'card';
     // Only the surfaces that render the A/B copy carry a bucket (access_success does not).
     const copyVariant = PRO_COPY_PLACEMENTS.has(placement) ? proCopyVariant(user.id) : null;
     const testReason = testEmailReason(user.email ?? null);
@@ -45,6 +48,7 @@ export async function POST(request: NextRequest) {
         source: placement,
         cta,
         offer,
+        format,
         locale,
         // Copy A/B bucket, computed from the same user id the browser used to pick the copy.
         experiment: copyVariant ? PRO_COPY_EXPERIMENT : null,

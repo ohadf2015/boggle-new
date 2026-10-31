@@ -32,4 +32,13 @@ describe('reportProOfferClick', () => {
     vi.stubGlobal('fetch', () => { throw new Error('y'); });
     expect(() => reportProOfferClick(args)).not.toThrow();
   });
+
+  it('sends format only when it is not the default card', () => {
+    vi.stubGlobal('navigator', { sendBeacon: vi.fn().mockReturnValue(false) });
+    const f = vi.fn().mockResolvedValue({});
+    vi.stubGlobal('fetch', f);
+    reportProOfferClick({ ...args, format: 'card' });
+    reportProOfferClick({ ...args, format: 'report_button' });
+    expect(f.mock.calls.map((c) => JSON.parse((c[1] as RequestInit).body as string))).toEqual([args, { ...args, format: 'report_button' }]);
+  });
 });

@@ -4,6 +4,7 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ResultsTeacherProTrialCard } from '@/components/education/results/ResultsTeacherProTrialCard';
 import { resultsTrialCopy } from '@/lib/education/pro/trialCtaCopy';
+import { resetProOfferSession } from '@/lib/education/pro/proOfferSession';
 
 vi.mock('next/link', () => ({
   default: ({ href, children, ...rest }: { href: string; children: React.ReactNode }) => (
@@ -66,6 +67,7 @@ describe('ResultsTeacherProTrialCard', () => {
       expect(cta.className).toMatch(/\bborder-neo-pink\b/);
       expect(screen.getByTestId('results-teacher-pro-trial-card')).toHaveTextContent('Teacher Pro');
       unmount();
+      resetProOfferSession(); // a new browser session: the full card again
     }
   });
 
@@ -106,6 +108,7 @@ describe('ResultsTeacherProTrialCard', () => {
       expect(card).toHaveTextContent('$9/mo · Cancel anytime');
       expect(card).not.toHaveTextContent(/14-day|Start your|Try Teacher Pro free/);
       unmount();
+      resetProOfferSession(); // a new browser session: the full card again
     }
   });
 

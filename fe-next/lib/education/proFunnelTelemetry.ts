@@ -287,6 +287,7 @@ export type TeacherProUpgradePlacement =
   | 'classroom_results'
   | 'analytics_free_headline'
   | 'class_created'
+  | 'class_report_button'
   | 'education_landing'
   | 'other';
 
