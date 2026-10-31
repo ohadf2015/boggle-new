@@ -140,7 +140,8 @@ describe('teacherAccessConfirmation email', () => {
       expect(html).toContain(KEEP[locale]);
       expect(html).toContain('$9');
       expect(html).toContain(`https://www.lexiclash.live/api/education/email-click?c=approval_email&amp;l=${locale}`.replace('&amp;', '&'));
-      expect(html).not.toMatch(/14[- ]day|14 días|14 dagars|14 дней|14日/);
+      // 14日間 is "14 days"; a bare 14日 is also the 14th of a month, as in a trial ending 11月14日.
+      expect(html).not.toMatch(/14[- ]day|14 días|14 dagars|14 дней|14日間/);
     });
 
     it('sits under the main dashboard button, which stays the primary action', () => {
