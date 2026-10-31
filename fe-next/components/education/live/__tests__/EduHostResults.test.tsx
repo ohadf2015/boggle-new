@@ -101,7 +101,7 @@ describe('EduHostResults', () => {
 
   it('given a free teacher, when the trial card mounts on the wall, then its server-side rendered impression fires', () => {
     render(<EduHostResults summary={lessonSummary} players={players} t={t} onRematch={vi.fn()} />);
-    expect(proOffer.reportProOfferImpression).toHaveBeenCalledWith(expect.objectContaining({ placement: 'classroom_results', stage: 'rendered' }));
+    expect(proOffer.reportProOfferImpression).toHaveBeenCalledWith(expect.objectContaining({ placement: 'classroom_results', stage: 'rendered' }), expect.anything());
   });
 
   it('given a Pro teacher, when results show, then the live projector links straight to the class report and shows no upsell', () => {
@@ -192,5 +192,25 @@ describe('EduHostResults', () => {
     expect(root.className).toContain('[container:results_/_size]');
     expect(root.innerHTML).not.toMatch(/dvh|\[@media/);
     expect(root.className).not.toMatch(/\/results:/);
+  });
+
+  it('given a free teacher, when results show, then "See this class\'s report" opens a teaser that says how many struggled, never who', () => {
+    render(<EduHostResults summary={lessonSummary} players={players} t={t} onRematch={vi.fn()} />);
+    finishReveal();
+    fireEvent.click(screen.getByTestId('class-report-button'));
+    const teaser = screen.getByTestId('class-report-teaser');
+    expect(teaser).toHaveTextContent(/2 students found under half the words|2 תלמידים/);
+    expect(teaser).not.toHaveTextContent(/Noa|Ido/);
+    expect(proOffer.reportProOfferClick).toHaveBeenCalledWith(expect.objectContaining({ placement: 'class_report_button', format: 'report_button' }));
+  });
+
+  it('given a Pro teacher or an empty round, then there is no class-report teaser button', () => {
+    pro.hasPro = true;
+    const a = render(<EduHostResults summary={lessonSummary} players={players} t={t} onRematch={vi.fn()} />);
+    expect(screen.queryByTestId('class-report-button')).toBeNull();
+    a.unmount();
+    pro.hasPro = false;
+    render(<EduHostResults summary={summary} players={players} t={t} onRematch={vi.fn()} />);
+    expect(screen.queryByTestId('class-report-button')).toBeNull();
   });
 });

@@ -27,6 +27,8 @@ import { reportProCtaClick, reportProOfferClick, reportProOfferImpression } from
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { trackTeacherProUpgradeClick } from '@/lib/education/proFunnelTelemetry';
 import { useUpsellImpression } from '@/lib/education/useUpsellImpression';
+import { useProOfferSlot } from '@/lib/education/pro/useProOfferSlot';
+import { ProOfferCompactLink } from '@/components/education/results/ProOfferCompactLink';
 
 export const RESULTS_TRIAL_PLACEMENT = 'classroom_results' as const;
 export const CLASS_CREATED_TRIAL_PLACEMENT = 'class_created' as const;
@@ -68,14 +70,20 @@ export function ResultsTeacherProTrialCard({
   useEffect(() => {
     if (dismissible) setDismissed(readDismissed(placement));
   }, [dismissible, placement]);
-  const show = !loading && !hasPro && dismissed === false;
+  const eligible = !loading && !hasPro && dismissed === false;
   // One shared decision (lib/education/pro/proOfferCopy) so this card, the access-success
   // page and the upgrade path always say the same thing.
   const baseCopy = dismissible ? classCreatedTrialCopy(language) : { ...resultsTrialCopy(language), dismiss: '' };
   const proOffer = resolveProOffer(language, { known, trialUsed, accessTrialExpires, accessTrialEnded }, baseCopy);
   // A/B (`edu_pro_copy_v1`): heading + body only; button, note and checkout stay on resolveProOffer.
   const { user } = useAuth();
+  const userId = user?.id ?? null;
   const variant = proCopyVariant(user?.id);
+  // Session cap (proOfferSession.ts): one full card per browser session across every
+  // placement; later mounts get the one-line link. `null` while the claim is read.
+  const slot = useProOfferSlot(userId, eligible);
+  const show = eligible && slot === 'full';
+  const compact = eligible && slot === 'compact';
   const lines = proCopyLines(language, variant, proOffer, { accessTrialExpires, placement });
   const copy = { ...baseCopy, title: lines.title, body: lines.body };
   const dir = TRIAL_COPY_RTL.has(trialCopyBase(language)) ? 'rtl' : undefined;
@@ -97,13 +105,13 @@ export function ResultsTeacherProTrialCard({
   useEffect(() => {
     if (!show || renderedRef.current) return;
     renderedRef.current = true;
-    reportProOfferImpression({ ...offerRef.current, stage: 'rendered' });
-  }, [show]);
+    reportProOfferImpression({ ...offerRef.current, stage: 'rendered' }, { userId });
+  }, [show, userId]);
   useUpsellImpression(
     cardRef,
     show ? { cta, placement: placement } : null,
     { locale: language },
-    () => reportProOfferImpression({ ...offerRef.current, stage: 'viewed' }),
+    () => reportProOfferImpression({ ...offerRef.current, stage: 'viewed' }, { userId }),
   );
   useUpsellImpression(
     cardRef,
@@ -111,6 +119,21 @@ export function ResultsTeacherProTrialCard({
     { locale: language },
   );
 
+  if (compact) {
+    return (
+      <ProOfferCompactLink
+        href={`/${language}/teacher/upgrade?source=${placement}`}
+        label={proOffer.label}
+        placement={placement}
+        language={language}
+        cta={cta}
+        offer={offer}
+        userId={userId}
+        variant={variant}
+        className={className}
+      />
+    );
+  }
   if (!show) return null;
 
   const page = () => (typeof window !== 'undefined' ? window.location.pathname : `/${language}/education/live`);

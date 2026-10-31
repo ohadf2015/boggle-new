@@ -13,6 +13,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { resultsTrialCopy } from '@/lib/education/pro/trialCtaCopy';
 import { reportProOfferClick, reportProOfferImpression } from '@/lib/education/reportProCtaClick';
 import { useUpsellImpression } from '@/lib/education/useUpsellImpression';
+import { useProOfferSlot } from '@/lib/education/pro/useProOfferSlot';
+import { ProOfferCompactLink } from '@/components/education/results/ProOfferCompactLink';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -46,24 +48,48 @@ export function HomeProCard({ kind, onDismiss, trackImpression, language, t }: H
   const proOffer = resolveProOffer(language, { known, trialUsed, accessTrialExpires, accessTrialEnded }, resultsTrialCopy(language));
   // A/B (`edu_pro_copy_v1`): the heading leads with class reports (a) or the trial (b).
   const { user } = useAuth();
+  const userId = user?.id ?? null;
   const variant = proCopyVariant(user?.id);
+  // Session cap (proOfferSession.ts): the full card only if no other placement showed it this session.
+  const slot = useProOfferSlot(userId, true);
+  const full = slot === 'full';
   const lines = proCopyLines(language, variant, proOffer, { accessTrialExpires, placement: DASHBOARD_PRO_PLACEMENT });
   const trial = useStartTeacherProTrial(t, language, 'dashboard_trial_offer', { trial: proOffer.checkoutTrial });
   const cardRef = useRef<HTMLElement>(null);
   const offerRef = useRef({ placement: DASHBOARD_PRO_PLACEMENT, locale: language, cta: proOffer.cta, offer: proOffer.offer });
   offerRef.current = { placement: DASHBOARD_PRO_PLACEMENT, locale: language, cta: proOffer.cta, offer: proOffer.offer };
   useEffect(() => {
-    if (!trackImpression) return;
+    if (!trackImpression || !full) return;
     trackGrowthEvent('iap_viewed', { product: 'teacher_pro', source: 'home_rail', event_type: 'impression' });
     if (kind === 'trial') trackTrialCtaView({ source: 'dashboard_trial_offer' });
-  }, [trackImpression, kind]);
-  // Cookie-free server twins (browser PostHog is consent-gated): rendered on mount, viewed at 50% on screen.
+  }, [trackImpression, kind, full]);
+  // Cookie-free server twins (browser PostHog is consent-gated): rendered once the full card
+  // shows, viewed at 50% on screen; each at most once per session (proOfferSession.ts).
   useEffect(() => {
-    reportProOfferImpression({ ...offerRef.current, stage: 'rendered' });
-  }, []);
-  useUpsellImpression(cardRef, { cta: proOffer.cta, placement: DASHBOARD_PRO_PLACEMENT }, { locale: language }, () =>
-    reportProOfferImpression({ ...offerRef.current, stage: 'viewed' }),
+    if (!full) return;
+    reportProOfferImpression({ ...offerRef.current, stage: 'rendered' }, { userId });
+  }, [full, userId]);
+  useUpsellImpression(cardRef, full ? { cta: proOffer.cta, placement: DASHBOARD_PRO_PLACEMENT } : null, { locale: language }, () =>
+    reportProOfferImpression({ ...offerRef.current, stage: 'viewed' }, { userId }),
   );
+
+  if (slot === null) return null;
+  if (!full) {
+    return (
+      <ProOfferCompactLink
+        label={proOffer.label}
+        placement={DASHBOARD_PRO_PLACEMENT}
+        language={language}
+        cta={proOffer.cta}
+        offer={proOffer.offer}
+        userId={userId}
+        variant={variant}
+        pending={trial.pending}
+        onActivate={() => void trial.start()}
+        className="text-neo-cream"
+      />
+    );
+  }
 
   return (
     <section ref={cardRef} data-testid="home-pro-card" data-kind={kind} data-offer={proOffer.offer} data-variant={variant} aria-labelledby="home-pro-title" className="relative rounded-neo-lg border-2 border-neo-cream/35 bg-neo-navy-light p-2.5 sm:p-3">

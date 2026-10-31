@@ -12,7 +12,8 @@ import { checkoutClientKind, testEmailReason } from '@/lib/education/checkoutTra
  * live entitlement. The destination is fixed (no open redirect); unknown campaigns and
  * locales fall back to safe values. Tracking never blocks the redirect.
  */
-const CAMPAIGNS = new Set(['approval_email']);
+// class_report_email: the personal "your class report" notes Ohad sends to new classroom creators.
+const CAMPAIGNS = new Set(['approval_email', 'class_report_email']);
 const LOCALES = new Set(['en', 'he', 'sv', 'ja', 'es', 'ru']);
 const SITE = 'https://www.lexiclash.live';
 
