@@ -13,12 +13,17 @@ jobs:
     if: startsWith(github.head_ref, 'radar/')
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    permissions:
+      pull-requests: write
     env:
       GROWTH_RADAR_TOKEN: ${{ secrets.GROWTH_RADAR_TOKEN }}
       BODY: ${{ github.event.pull_request.body }}
       PR_URL: ${{ github.event.pull_request.html_url }}
       REF: ${{ github.head_ref }}
       MERGED: ${{ github.event.pull_request.merged }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      REPO: ${{ github.repository }}
+      GH_TOKEN: ${{ github.token }}
     steps:
       - run: |
           mcp() {
@@ -34,7 +39,17 @@ jobs:
             exit 0
           fi
           meta=$(printf '%s\n' "$BODY" | sed -n '/^```radar/,/^```$/p' | sed '1d;$d')
-          [ -n "$meta" ] || { echo "PR body has no radar block"; exit 1; }
+          if [ -z "$meta" ]; then
+            # A radar/<id> PR opened by hand has no block: the branch still names the row, but kind/metric would be guesses.
+            id=${REF#radar/}
+            [[ "$id" =~ ^[0-9]+$ ]] || { echo "::warning::hunted fix with no radar block: nothing to complete or record"; exit 0; }
+            mcp update_recommendation "{\"id\":$id,\"action\":\"complete\"}"
+            msg="Growth Radar row $id is marked complete. This PR has no radar block, so no intervention was recorded and nothing will be graded: call record_intervention with recommendationId $id, kind and metric from the row's fix."
+            echo "::warning::$msg"
+            echo "$msg" >> "$GITHUB_STEP_SUMMARY"
+            gh pr comment "$PR_NUMBER" -R "$REPO" --body "$msg" || echo "::warning::could not comment on the PR (caller needs pull-requests: write)"
+            exit 0
+          fi
           id=$(printf '%s' "$meta" | jq -r '.recommendationId // .rec_id // empty')
           if [[ "$id" =~ ^[0-9]+$ ]]; then
             mcp update_recommendation "{\"id\":$id,\"action\":\"complete\"}"

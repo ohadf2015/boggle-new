@@ -99,8 +99,8 @@ jobs:
                and the radar's data (run_funnel, list_events, get_trends, get_paths, get_live_feed, get_web_vitals,
                get_search_performance, get_ai_visibility). A funnel drop to ~0% usually means the event is not
                fired or not wired, so check the tracking call first.
-               - DISPROVEN (code or data shows it is wrong or detector noise): update_recommendation action="dismiss",
-                 note the evidence, and continue to the next row. Dismissal is permanent; only with concrete evidence.
+               - DISPROVEN (code or data shows it is wrong or detector noise): update_recommendation action="dismiss"
+                 with reason="<the evidence>", and continue to the next row. Dismissal is permanent; only with concrete evidence.
                - REAL but not fixable in this repo (needs data, a human decision, or another repo): leave it, continue.
                - REAL, but the right fix is a product or copy choice the data cannot settle (which headline, which CTA):
                  create_experiment with recommendationId, two variants (control first) and the funnel event it should
