@@ -50,7 +50,7 @@ vi.mock('@/lib/audio/audioLoader', () => ({
 
 vi.mock('@/utils/logger', () => ({
   __esModule: true,
-  default: { log: vi.fn(), warn: vi.fn(), error: vi.fn() },
+  default: { log: vi.fn(), debug: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
 
 import { MusicProvider, useMusic } from '../MusicContext';

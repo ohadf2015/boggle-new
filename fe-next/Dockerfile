@@ -74,6 +74,11 @@ ENV NEXT_PUBLIC_SENTRY_RELEASE=$NEXT_PUBLIC_SENTRY_RELEASE
 # access; when either is absent the upload is skipped and the build is unchanged.
 ARG POSTHOG_API_KEY
 ARG POSTHOG_PROJECT_ID
+# Same for Sentry: without the token in this stage withSentryConfig skips the
+# upload and every production stack stays minified.
+ARG SENTRY_AUTH_TOKEN
+ARG SENTRY_ORG
+ARG SENTRY_PROJECT
 # CDN base for heavy static media (music/sounds/showcase3d) — offloaded to Supabase Storage.
 # When set, next build inlines CDN URLs via getAssetUrl(); when unset, assets serve from public/.
 ARG NEXT_PUBLIC_ASSET_CDN_BASE

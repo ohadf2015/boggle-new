@@ -693,7 +693,7 @@ export async function unsubscribeByToken(token: string): Promise<{ success: bool
     .select('email');
 
   if (subError || !subData || subData.length === 0) {
-    logger.error('EMAIL', 'Unsubscribe error: token not found in profiles or subscribers');
+    logger.info('EMAIL', 'Unsubscribe token not found in profiles or subscribers (stale or mistyped link)');
     return { success: false, error: 'Invalid or expired unsubscribe link' };
   }
 

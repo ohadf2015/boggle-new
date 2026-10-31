@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { WASM_STREAMING_COMPILE_FAILED, THIRD_PARTY_SCRIPT_NOISE, isStaleAssetLinkRejection } from '../benignErrorPatterns';
+import { WASM_STREAMING_COMPILE_FAILED, THIRD_PARTY_SCRIPT_NOISE, EXPECTED_CLIENT_NOISE, isStaleAssetLinkRejection } from '../benignErrorPatterns';
 
 /**
  * PixiJS lazily loads its basis-transcoder WASM. When the browser rejects
@@ -96,5 +96,22 @@ describe('THIRD_PARTY_SCRIPT_NOISE', () => {
 
   it('does not swallow first-party errors', () => {
     expect(THIRD_PARTY_SCRIPT_NOISE.some((re) => re.test('TypeError: x.foo is not a function'))).toBe(false);
+  });
+});
+
+describe('EXPECTED_CLIENT_NOISE', () => {
+  const matches = (msg: string) => EXPECTED_CLIENT_NOISE.some((re) => re.test(msg));
+
+  it.each([
+    '[rrweb] dropped 479 node(s) with unresolved parent at emit',
+    'Failed to find Server Action "7f3a". This request might be from an older or newer deployment.',
+    '[SOCKET.IO] Socket error event: {"code":"SOCIAL_RESTRICTED"}',
+    '[SOCKET.IO] Socket error event: {"code":"GAME_ALREADY_EXISTS"}',
+  ])('matches %s', (msg) => {
+    expect(matches(msg)).toBe(true);
+  });
+
+  it('does not match other socket errors', () => {
+    expect(matches('[SOCKET.IO] Socket error event: {"code":"INTERNAL"}')).toBe(false);
   });
 });

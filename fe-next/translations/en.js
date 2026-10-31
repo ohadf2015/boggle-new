@@ -18546,8 +18546,12 @@ const en = {
     "accessDenied": "Access Denied",
     "accessRequired": "Access Required",
     "acquisition": {
+      "campaigns": "Campaigns",
       "empty": "No acquisition data",
       "error": "Failed to load acquisition data",
+      "mediums": "Mediums",
+      "referrers": "Referrers",
+      "sources": "Sources",
       "title": "Acquisition"
     },
     "activity": {

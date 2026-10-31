@@ -196,7 +196,7 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
       // _ended→play→_ended to a stack overflow (Sentry 1PP/1RZ) — stop looping it.
       onload: () => {
         if (howl.duration() <= 0) {
-          logger.warn(`[Music] ${key} loaded with no duration — looping disabled`);
+          logger.debug(`[Music] ${key} loaded with no duration — looping disabled`);
           howl.loop(false);
         }
       },

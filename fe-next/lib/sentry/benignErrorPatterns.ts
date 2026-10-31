@@ -44,3 +44,14 @@ export const THIRD_PARTY_SCRIPT_NOISE: RegExp[] = [
   /Error invoking postMessage: Java object is gone/,
   /^SecurityError: The request was denied\.?$/,
 ];
+
+/**
+ * Expected, handled conditions that still reach Sentry through a warn: rrweb's
+ * replay recorder, a stale tab posting to a Server Action of an older deploy,
+ * and socket rejections the UI already shows to the player.
+ */
+export const EXPECTED_CLIENT_NOISE: RegExp[] = [
+  /^\[rrweb\] dropped \d+ node\(s\)/,
+  /Failed to find Server Action/,
+  /\[SOCKET\.IO\] Socket error event.*(SOCIAL_RESTRICTED|GAME_ALREADY_EXISTS)/,
+];
