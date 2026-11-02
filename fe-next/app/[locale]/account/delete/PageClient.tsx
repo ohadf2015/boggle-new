@@ -10,6 +10,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/utils/ThemeContext';
 import { signInWithMagicLink, signOut } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
+import { useDeleteImpact } from '@/lib/account/useDeleteImpact';
+import type { TeacherDeleteReason } from '@/lib/account/deleteAccountImpact';
+import { trackTeacherDeleteConfirmed } from '@/lib/education/teacherDeleteTelemetry';
+import TeacherDeleteInterstitial from '@/components/settings/TeacherDeleteInterstitial';
 
 type Step = 'email' | 'check-email' | 'confirm' | 'deleted';
 
@@ -24,6 +28,11 @@ export default function DeleteAccountPageClient() {
   const [confirmText, setConfirmText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Teacher retention (t_b5825a0a): classroom owners see an impact step first.
+  const [reason, setReason] = useState<TeacherDeleteReason | null>(null);
+  const [showIrreversible, setShowIrreversible] = useState(false);
+  const { impact } = useDeleteImpact(Boolean(user && step === 'confirm'));
+  const showTeacherStep = Boolean(impact?.isTeacher) && !showIrreversible;
 
   // Step 1: Send magic link to verify identity
   const handleSendLink = useCallback(async () => {
@@ -52,7 +61,14 @@ export default function DeleteAccountPageClient() {
     setError(null);
 
     try {
-      const res = await fetch('/api/account/delete', { method: 'DELETE' });
+      if (impact?.isTeacher) {
+        trackTeacherDeleteConfirmed(impact, reason, 'account_delete_page');
+      }
+      const res = await fetch('/api/account/delete', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason, surface: 'account_delete_page' }),
+      });
       const data = await res.json();
 
       if (!res.ok) {
@@ -67,7 +83,7 @@ export default function DeleteAccountPageClient() {
       setError(t('settings.deleteAccountError'));
       setIsLoading(false);
     }
-  }, [confirmText, isLoading, t]);
+  }, [confirmText, isLoading, t, impact, reason]);
 
   const cardClass = cn(
     'max-w-md mx-auto p-6 rounded-neo border-3',
@@ -156,6 +172,18 @@ export default function DeleteAccountPageClient() {
           {/* Step: Confirm deletion (user is authenticated) */}
           {step === 'confirm' && (
             <div className="space-y-4">
+              {showTeacherStep && impact ? (
+                <TeacherDeleteInterstitial
+                  impact={impact}
+                  surface="account_delete_page"
+                  isDarkMode={isDarkMode}
+                  reason={reason}
+                  onReasonChange={setReason}
+                  onKeepAccount={() => window.history.back()}
+                  onContinueToDelete={() => setShowIrreversible(true)}
+                />
+              ) : (
+              <>
               <div className="flex items-start gap-2">
                 <AlertTriangle className="w-5 h-5 text-neo-red shrink-0 mt-0.5" />
                 <p className={cn('text-sm font-medium', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
@@ -188,6 +216,8 @@ export default function DeleteAccountPageClient() {
               >
                 {isLoading ? t('settings.deleteAccountDeleting') : t('settings.deleteAccountConfirmButton')}
               </button>
+              </>
+              )}
             </div>
           )}
 
