@@ -7,6 +7,9 @@ on:
   schedule:
     - cron: "0 11 * * *"
   workflow_dispatch:
+  # An issue Growth Radar files for this repo wakes the agent now instead of at the next scheduled run.
+  issues:
+    types: [opened]
 
 permissions:
   actions: write
@@ -23,6 +26,7 @@ env:
 
 jobs:
   fix:
+    if: github.event_name != 'issues' || (contains(github.event.issue.labels.*.name, 'growth-radar') && endsWith(github.event.issue.user.login, '[bot]'))
     runs-on: ubuntu-latest
     timeout-minutes: 60
     concurrency:
