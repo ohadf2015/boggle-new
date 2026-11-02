@@ -6,4 +6,6 @@ export const PRO_OFFER_PLACEMENTS: ReadonlySet<string> = new Set([
   'dashboard',
   // "See this class's report" on the classroom round-results screen (button + its Pro teaser).
   'class_report_button',
+  // "N students tried to join after your game ended" on the teacher's HQ (EndedCodeTriesNotice).
+  'late_join_notice',
 ]);

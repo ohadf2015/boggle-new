@@ -996,8 +996,9 @@ const ru = {
       "progressAssignments": "задания",
       "progressSubmitted": "сдано",
       "progressUpgrade": "Teacher Pro",
-      "endedCodeTries": "Пытались войти по старому коду: {count}. Запустите новую игру, чтобы ученики смогли играть.",
-      "endedCodeTriesOne": "Один ученик пытался войти по старому коду. Запустите новую игру, чтобы он смог играть.",
+      "endedCodeTries": "Пытались войти после окончания игры: {count}.",
+      "endedCodeTriesOne": "Пытались войти после окончания игры: {count}.",
+      "lateJoinProLine": "С Teacher Pro можно дать им задание, которое они пройдут в удобное время.",
       "joinedGoal": "Вошли {count}, цель: {goal}"
     },
     "modes": {
@@ -5304,7 +5305,9 @@ const ru = {
         "title": "Эта игра закончилась",
         "retry": "Попробовать снова",
         "toClass": "В мой класс",
-        "newCode": "Ввести новый код"
+        "newCode": "Ввести новый код",
+        "practiceLine": "Игра учителя закончилась. Сыграй вместо неё сегодняшний тренировочный раунд.",
+        "practiceCta": "Сыграть тренировку дня"
       },
       "lessonsAssigned": "Назначенные уроки",
       "feel": {

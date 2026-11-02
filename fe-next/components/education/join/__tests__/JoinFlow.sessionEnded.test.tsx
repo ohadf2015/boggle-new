@@ -25,6 +25,8 @@ vi.mock('@/hooks/useStudentClassroom', () => ({ useStudentClassroom: mockClassro
 vi.mock('@/lib/education/telemetry', () => ({ trackEduClassroomJoin: vi.fn(), trackStudentJoinStarted: vi.fn() }));
 vi.mock('react-hot-toast', () => ({ default: { success: vi.fn(), error: vi.fn() } }));
 vi.mock('../joinTarget', () => ({ resolveJoinTarget: mockResolve }));
+const { mockReportPractice } = vi.hoisted(() => ({ mockReportPractice: vi.fn() }));
+vi.mock('@/lib/education/reportLateJoinPractice', () => ({ reportLateJoinPracticeStarted: mockReportPractice }));
 
 import JoinFlow from '../JoinFlow';
 
@@ -45,9 +47,19 @@ describe('<JoinFlow> — a code whose game has ended', () => {
 
     await waitFor(() => expect(endedPanel()).toBeInTheDocument());
     expect(screen.getByText('education.student.gameEnded.title')).toBeInTheDocument();
-    expect(screen.getByText('education.student.classroomRoomGone')).toBeInTheDocument();
+    expect(screen.getByText('education.student.gameEnded.practiceLine')).toBeInTheDocument();
     expect(codeField()).toBeNull();
     expect(screen.queryByRole('alert')).toBeNull();
+  });
+
+  it('GIVEN a late student on the ended screen WHEN they tap the practice round THEN it opens today\'s solo round and records the start', async () => {
+    mockResolve.mockResolvedValue({ verdict: 'ended' });
+    render(<JoinFlow initialCode="ABC123" />);
+
+    const practice = await screen.findByRole('link', { name: 'education.student.gameEnded.practiceCta' });
+    expect(practice).toHaveAttribute('href', '/en/daily/word-hunt?from=late_join');
+    fireEvent.click(practice);
+    expect(mockReportPractice).toHaveBeenCalledWith({ gameCode: 'ABC123', door: 'join_flow' });
   });
 
   it('GIVEN the ended state takes focus THEN its heading opts out of the global focus ring', async () => {
