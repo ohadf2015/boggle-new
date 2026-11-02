@@ -1,9 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { CheckCheck, Eye, List, RotateCcw, Lightbulb, Timer } from 'lucide-react';
+import { CheckCheck, Eye, List, RotateCcw, Lightbulb } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useCrosswordGame } from '@/hooks/useCrosswordGame';
@@ -14,12 +13,14 @@ import { ClueScramble } from './ClueScramble';
 import { CrosswordGrid } from './CrosswordGrid';
 import { CrosswordInputDock } from './CrosswordInputDock';
 import { CrosswordMasthead } from './CrosswordMasthead';
+import { CrosswordProgressRow } from './CrosswordProgressRow';
+import { CrosswordToolbar } from './CrosswordToolbar';
+import { CrosswordSolvedCard } from './CrosswordSolvedCard';
 import { ClueBar } from './ClueBar';
 import { CrosswordClueList } from './CrosswordClueList';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { CrosswordFx } from './CrosswordFx';
 import { ScreenFlashOverlay } from '@/components/game/ScreenFlashOverlay';
-import { SoloRewardCard } from '@/components/solo/SoloRewardCard';
 import {
   awardSoloDaily,
   getSoloDateISO,
@@ -28,13 +29,6 @@ import {
 } from '@/lib/solo/soloDaily';
 import { crosswordScore } from '@/lib/solo/soloReward';
 import { useCrosswordHardwareKeys } from '@/hooks/useCrosswordHardwareKeys';
-
-function formatTime(ms: number): string {
-  const total = Math.floor(ms / 1000);
-  const m = Math.floor(total / 60);
-  const s = total % 60;
-  return `${m}:${s.toString().padStart(2, '0')}`;
-}
 
 export interface CrosswordViewProps {
   puzzle: CrosswordPuzzle;
@@ -65,7 +59,6 @@ export function CrosswordView({
   onFormatChange,
 }: CrosswordViewProps) {
   const { t, language, dir } = useLanguage();
-  const reduced = useReducedMotion();
   const { playSound } = useSoundEffects();
   const [burst, setBurst] = useState(0);
   const [winFlash, setWinFlash] = useState(0);
@@ -107,7 +100,6 @@ export function CrosswordView({
   } = game;
 
   const solved = state.status === 'solved';
-  const overlayRef = useRef<HTMLDivElement>(null);
   const stats = useMemo(() => crosswordStats(state), [state]);
   const solvedIds = useMemo(() => solvedSlotIds(state), [state]);
   const hintsUsed = state.revealed.length;
@@ -166,24 +158,6 @@ export function CrosswordView({
 
   useCrosswordHardwareKeys({ backspace, moveInSlot, moveVertical, inputLetter, toggleDir, nextSlot }, puzzle.rtl);
 
-  // GSAP entrance for the solved card.
-  useEffect(() => {
-    if (!solved || reduced || !overlayRef.current) return;
-    let ctx: { revert: () => void } | null = null;
-    (async () => {
-      const gsap = (await import('gsap')).default;
-      if (!overlayRef.current) return;
-      ctx = gsap.context(() => {
-        gsap.fromTo(
-          overlayRef.current,
-          { scale: 0.8, opacity: 0, y: 24 },
-          { scale: 1, opacity: 1, y: 0, duration: 0.5, ease: 'expo.out' },
-        );
-      });
-    })();
-    return () => ctx?.revert();
-  }, [solved, reduced]);
-
   const handleReveal = useCallback(() => revealCell(), [revealCell]);
 
   // "Next" on the solve card: start a fresh generated puzzle if the host wired endless mode,
@@ -196,9 +170,19 @@ export function CrosswordView({
     }
   }, [onNewPuzzle, reset]);
 
+  const toolActions = [
+    { key: 'check', label: t('crossword.check'), icon: <CheckCheck size={18} />, onClick: checkAll },
+    { key: 'letter', label: t('crossword.revealLetter'), icon: <Lightbulb size={18} />, onClick: handleReveal },
+    { key: 'word', label: t('crossword.revealWord'), icon: <Eye size={18} />, onClick: revealWord },
+    ...(manyClues
+      ? [{ key: 'clues', label: t('crossword.allClues'), icon: <List size={18} />, onClick: () => setCluesOpen(true) }]
+      : []),
+    { key: 'restart', label: t('crossword.restart'), icon: <RotateCcw size={18} />, onClick: reset },
+  ];
+
   return (
     <div
-      className="fixed inset-x-0 top-0 z-20 flex h-[100dvh] w-full flex-col overflow-hidden bg-neo-navy texture-halftone px-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.5rem,env(safe-area-inset-bottom))] lg:static lg:z-auto lg:mx-auto lg:block lg:h-auto lg:max-w-5xl lg:overflow-visible lg:bg-transparent lg:pt-9 lg:pb-10"
+      className="fixed inset-x-0 top-0 z-20 flex h-[100dvh] w-full flex-col gap-2 overflow-hidden bg-neo-navy texture-halftone px-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.5rem,env(safe-area-inset-bottom))] lg:static lg:z-auto lg:mx-auto lg:flex lg:h-auto lg:max-w-6xl lg:gap-3 lg:overflow-visible lg:bg-transparent lg:pt-8 lg:pb-10"
       translate="no"
       dir={dir}
     >
@@ -214,126 +198,58 @@ export function CrosswordView({
         streakLabel={t('crossword.streakLabel', { count: streak })}
       />
 
-      {/* Mini ↔ Full. Each size keeps its own daily and its own saved progress, so switching is
-          a change of puzzle, never a loss of one. */}
-      {onFormatChange && (
-        <div
-          className="shrink-0 mt-2 flex items-center justify-center gap-1"
-          role="group"
-          aria-label={t('crossword.formatLabel')}
-        >
-          {(['mini', 'full'] as const).map((f) => (
-            <button
-              key={f}
-              type="button"
-              onClick={() => onFormatChange(f)}
-              aria-pressed={format === f}
-              className={`font-neo-display font-bold text-xs px-3 py-1 border-neo border-black rounded-neo shadow-hard-sm active:translate-y-[1px] active:shadow-hard-pressed ${
-                format === f ? 'bg-neo-cyan text-neo-navy' : 'bg-neo-navy-light text-neo-white'
-              }`}
-            >
-              {t(`crossword.format.${f}`)}
-            </button>
-          ))}
-        </div>
-      )}
+      {/* Mini ↔ Full, live fill bar (fills with CORRECT letters, so it only completes at a true
+          solve), words and timer — one slim row. Each size keeps its own daily and saved progress. */}
+      <CrosswordProgressRow
+        wordsSolved={stats.wordsSolved}
+        wordsTotal={stats.wordsTotal}
+        percent={stats.percent}
+        elapsedMs={elapsedMs}
+        format={format}
+        onFormatChange={onFormatChange}
+        t={t}
+      />
 
-      {/* Slim stat bar: words solved + timer + the live fill bar (fills with CORRECT letters,
-          so it only completes at a true solve). */}
-      <div className="shrink-0 mt-2 flex items-center gap-3 bg-neo-navy-light border-neo border-black rounded-neo shadow-hard px-3 py-1.5">
-        <span
-          className="font-neo-display font-bold text-sm text-neo-cyan tabular-nums shrink-0"
-          aria-label={t('crossword.wordsLabel')}
-        >
-          {stats.wordsSolved}
-          <span className="text-neo-white/55">/{stats.wordsTotal}</span>
-        </span>
+      {/* Board + clues. On phones a single fit-to-viewport column (clue, board, tools, keyboard
+          pinned); board + clue rail side by side on desktop. */}
+      <div className="flex min-h-0 flex-1 flex-col lg:grid lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-start lg:gap-8 rtl:lg:grid-cols-[24rem_minmax(0,1fr)]">
+        {/* Desktop column width = the board's width, so clue bar, board and toolbar share one edge:
+            as tall as the viewport allows (header + clue bar + toolbar reserved), capped so a 5x5
+            doesn't balloon. Literal class strings so Tailwind can see them. */}
         <div
-          className="flex-1 h-2 bg-neo-navy border-neo border-black rounded-full overflow-hidden"
-          role="progressbar"
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={stats.percent}
-          aria-label={t('crossword.progressLabel')}
+          className={`flex min-h-0 flex-1 flex-col gap-2 lg:mx-auto lg:w-full lg:gap-3 ${
+            puzzle.size <= 7
+              ? 'lg:max-w-[min(32rem,calc(100dvh-21rem))]'
+              : 'lg:max-w-[min(46rem,calc(100dvh-21rem))]'
+          }`}
         >
-          <div
-            className="h-full bg-neo-cyan transition-[width] duration-500 ease-out"
-            style={{ width: `${stats.percent}%` }}
-          />
-        </div>
-        <div
-          className="flex items-center gap-1.5 font-neo-display font-bold text-sm text-neo-white tabular-nums shrink-0"
-          aria-label={t('crossword.timer')}
-        >
-          <Timer size={15} className="text-neo-cyan" />
-          {formatTime(elapsedMs)}
-        </div>
-      </div>
+          {/* The active clue sits ABOVE the board (the NYT/Guardian convention): your eyes stay on
+              one column — read the clue, look down at the squares, type. */}
+          <div className="mx-auto w-full max-w-[28rem] shrink-0 lg:max-w-none">
+            <ClueBar
+              slot={activeSlot}
+              rtl={puzzle.rtl}
+              onPrev={() => nextSlot(-1)}
+              onNext={() => nextSlot(1)}
+              onToggleDir={toggleDir}
+              t={t}
+            />
+          </div>
 
-      {/* Board + clues. On phones a single fit-to-viewport column (grid+clues
-          scroll in the middle, keyboard pinned); grid left / clue rail right on
-          desktop. */}
-      <div className="mt-3 flex min-h-0 flex-1 flex-col lg:mt-5 lg:grid lg:grid-cols-[minmax(0,1fr)_21rem] lg:gap-6 lg:items-start rtl:lg:grid-cols-[21rem_minmax(0,1fr)]">
-        <div className="flex min-h-0 flex-1 flex-col gap-2 lg:block lg:gap-3">
-          {/* Board. On mobile this box owns whatever height is left after the pinned
-              chrome and declares itself a size-query container, so the grid's
-              `100cqmin` resolves to the real free space and can never clip. Nothing
-              here scrolls — the whole board is always on screen. */}
+          {/* Board. On mobile this box owns whatever height is left after the pinned chrome and
+              declares itself a size-query container, so the grid's `100cqmin` resolves to the
+              real free space and can never clip. Nothing here scrolls. */}
           <div className="flex min-h-0 flex-1 [container-type:size] lg:block lg:flex-none lg:[container-type:normal]">
             <CrosswordGrid state={state} onSelect={focusCell} t={t} solved={solved} />
           </div>
 
-          {/* Desktop keeps the clue under the grid. On mobile it's pinned just
-              above the keyboard instead (below), so it stays in view while you're
-              filling letters. */}
-          <div className="hidden lg:mt-3 lg:block">
-            <ClueBar
-              slot={activeSlot}
-              rtl={puzzle.rtl}
-              onPrev={() => nextSlot(-1)}
-              onNext={() => nextSlot(1)}
-              onToggleDir={toggleDir}
-              t={t}
-            />
-          </div>
-
-          {/* Toolbar — a fixed row on mobile so it can never wrap to a second band and push
-              the board off screen. The clue-list button only appears on a newspaper-size grid;
-              a mini's ten clues are covered by the clue bar's prev/next and swipe. */}
-          <div
-            className={`shrink-0 mx-auto grid w-full max-w-[28rem] gap-1.5 lg:mt-3 lg:flex lg:justify-center lg:gap-2 ${
-              manyClues ? 'grid-cols-5' : 'grid-cols-4'
-            }`}
-          >
-            <ToolButton onClick={checkAll} icon={<CheckCheck size={16} />} label={t('crossword.check')} />
-            <ToolButton onClick={handleReveal} icon={<Lightbulb size={16} />} label={t('crossword.revealLetter')} />
-            <ToolButton onClick={revealWord} icon={<Eye size={16} />} label={t('crossword.revealWord')} />
-            {manyClues && (
-              <ToolButton
-                onClick={() => setCluesOpen(true)}
-                icon={<List size={16} />}
-                label={t('crossword.allClues')}
-              />
-            )}
-            <ToolButton onClick={reset} icon={<RotateCcw size={16} />} label={t('crossword.restart')} />
-          </div>
-
-          {/* Mobile: the active clue pinned directly above the keyboard, so it
-              stays in view the whole time you're typing (newspaper habit). */}
-          <div className="shrink-0 lg:hidden">
-            <ClueBar
-              slot={activeSlot}
-              rtl={puzzle.rtl}
-              onPrev={() => nextSlot(-1)}
-              onNext={() => nextSlot(1)}
-              onToggleDir={toggleDir}
-              t={t}
-            />
+          <div className="mx-auto w-full max-w-[28rem] shrink-0 lg:max-w-none">
+            <CrosswordToolbar actions={toolActions} />
           </div>
 
           {/* Pinned to the bottom on mobile so the page never scrolls. */}
           <CrosswordInputDock
-            className="shrink-0 pt-1"
+            className="shrink-0 pt-0.5"
             locale={puzzle.locale}
             onLetter={inputLetter}
             onBackspace={backspace}
@@ -351,6 +267,7 @@ export function CrosswordView({
             onSelect={handleClueSelect}
             t={t}
             columns="stacked"
+            capturedSlotIds={solvedIds}
           />
         </aside>
       </div>
@@ -393,123 +310,21 @@ export function CrosswordView({
       )}
 
       {solved && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-neo-navy/75 p-6">
-          <div
-            ref={overlayRef}
-            className="bg-neo-cyan text-neo-navy border-neo-thick border-black rounded-neo shadow-hard-lg px-8 py-7 text-center max-w-sm w-full"
-          >
-            <div className="text-5xl mb-1" aria-hidden>
-              🎉
-            </div>
-            <div className="relative">
-              <h2 className="font-neo-display font-extrabold text-2xl mb-3">
-                {t('crossword.solvedTitle')}
-              </h2>
-              <button
-                type="button"
-                onClick={reset}
-                aria-label={t('crossword.dismiss', 'Close')}
-                className="absolute -top-2 -end-2 rounded-neo border-neo border-black bg-neo-navy-light px-2 py-1 font-neo-body text-xs font-bold text-neo-white shadow-hard active:translate-y-[1px] active:shadow-hard-pressed"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="grid grid-cols-3 gap-2 mb-4">
-              <SolvedStat value={formatTime(elapsedMs)} label={t('crossword.timer')} />
-              <SolvedStat value={`${stats.wordsTotal}`} label={t('crossword.wordsLabel')} />
-              <SolvedStat value={`${hintsUsed}`} label={t('crossword.hintsLabel')} />
-            </div>
-            {soloAward && (
-              <SoloRewardCard
-                t={t}
-                language={language}
-                awarded={soloAward.awarded}
-                bonus={soloAward.bonus}
-                modifier={dailyModifier}
-                claimed={soloAward.claimed}
-                onPlayAgain={handleNext}
-              />
-            )}
-            {onNewPuzzle ? (
-              // Endless: pick the next puzzle by difficulty (or replay the same grid).
-              <div className={soloAward ? 'mt-3' : ''}>
-                <p className="font-neo-body font-semibold text-[0.65rem] uppercase tracking-[0.12em] text-neo-navy/70 mb-2">
-                  {t('crossword.nextPuzzlePrompt')}
-                </p>
-                <div className="flex items-center justify-center gap-2">
-                  {(['easy', 'medium', 'hard'] as const).map((d) => (
-                    <button
-                      key={d}
-                      type="button"
-                      onClick={() => onNewPuzzle(d)}
-                      className={`font-neo-display font-bold text-sm border-neo border-black rounded-neo shadow-hard px-4 py-2 active:translate-y-[1px] active:shadow-hard-pressed ${
-                        d === 'easy'
-                          ? 'bg-neo-lime text-neo-navy'
-                          : d === 'hard'
-                            ? 'bg-neo-pink text-neo-white'
-                            : 'bg-neo-navy text-neo-white'
-                      }`}
-                    >
-                      {t(`crossword.difficulty.${d}`)}
-                    </button>
-                  ))}
-                </div>
-                {!soloAward && (
-                  <button
-                    type="button"
-                    onClick={reset}
-                    className="mt-3 font-neo-body font-semibold text-xs text-neo-navy/70 underline underline-offset-2"
-                  >
-                    {t('crossword.playAgain')}
-                  </button>
-                )}
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={reset}
-                className="font-neo-display font-bold bg-neo-navy text-neo-white border-neo border-black rounded-neo shadow-hard px-6 py-2.5 active:translate-y-[1px] active:shadow-hard-pressed"
-              >
-                {t('crossword.playAgain')}
-              </button>
-            )}
-          </div>
-        </div>
+        <CrosswordSolvedCard
+          t={t}
+          language={language}
+          elapsedMs={elapsedMs}
+          wordsTotal={stats.wordsTotal}
+          hintsUsed={hintsUsed}
+          soloAward={soloAward}
+          dailyModifier={dailyModifier}
+          onNewPuzzle={onNewPuzzle}
+          onReset={reset}
+          onNext={handleNext}
+        />
       )}
 
       <CrosswordFx burstKey={burst} />
     </div>
-  );
-}
-
-function SolvedStat({ value, label }: { value: string; label: string }) {
-  return (
-    <div className="bg-neo-navy text-neo-cream border-neo border-black rounded-neo px-1 py-2">
-      <div className="font-neo-display font-extrabold text-xl tabular-nums leading-none">{value}</div>
-      <div className="font-neo-body font-semibold text-[0.6rem] uppercase tracking-wide mt-1 opacity-75">
-        {label}
-      </div>
-    </div>
-  );
-}
-
-function ToolButton({
-  onClick,
-  icon,
-  label,
-}: {
-  onClick: () => void;
-  icon: React.ReactNode;
-  label: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="flex min-w-0 flex-col items-center justify-center gap-0.5 font-neo-body font-semibold text-[0.68rem] leading-tight bg-neo-navy-light text-neo-white border-neo border-black rounded-neo shadow-hard px-1.5 py-1.5 active:translate-y-[1px] active:shadow-hard-pressed lg:flex-row lg:gap-1.5 lg:px-3 lg:py-2 lg:text-sm"
-    >
-      {icon}
-      <span className="w-full truncate text-center">{label}</span>
-    </button>
   );
 }
