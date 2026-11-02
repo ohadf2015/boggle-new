@@ -193,7 +193,7 @@ describe('GuestNameEditor — first finish', () => {
     expect(hasChosenGuestName()).toBe(false);
   });
 
-  it('is a blocking dialog with no way to skip it in the control arm', () => {
+  it('is a blocking dialog with no way to skip it', () => {
     render(<GuestNameEditor name={GENERATED} guestFingerprint="fp-1" onRenamed={vi.fn()} t={t} />);
 
     expect(screen.getByRole('dialog')).toBeInTheDocument();
