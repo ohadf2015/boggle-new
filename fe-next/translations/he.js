@@ -20,6 +20,15 @@ const he = {
     "record": "שיא חדש",
     "play": "לגל {wave}",
     "autoIn": "מתחילים בעוד {seconds}",
+    "gemsFound": "אבני חן שנמצאו",
+    "gem_emerald": "אזמרגד",
+    "gem_sapphire": "ספיר",
+    "gem_amethyst": "אמטיסט",
+    "gem_ruby": "רובין",
+    "rarity_emerald": "לא נפוץ",
+    "rarity_sapphire": "נדיר",
+    "rarity_amethyst": "אפי",
+    "rarity_ruby": "אגדי",
     "runLabel": "התקדמות: גל {wave}"
   },
   // @blastProgress:end

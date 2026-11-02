@@ -22,6 +22,19 @@ const baseProps = {
 };
 
 describe('BlastTile', () => {
+  describe('gem colors', () => {
+    it.each([['emerald', '2'], ['sapphire', '2'], ['amethyst', '3'], ['ruby', '4']] as const)('%s tile shows its own art and ×%s', (gem, mult) => {
+      render(<BlastTile {...baseProps} type="diamond" gem={gem} />);
+      expect(screen.getByRole('button').querySelector(`svg[data-gem="${gem}"]`)).not.toBeNull();
+      expect(screen.getByTestId('blast-tile-value')).toHaveTextContent(`×${mult}`);
+    });
+
+    it('treats a gemless diamond as sapphire', () => {
+      render(<BlastTile {...baseProps} type="diamond" />);
+      expect(screen.getByRole('button').querySelector('svg[data-gem="sapphire"]')).not.toBeNull();
+    });
+  });
+
   describe('idle animation classes', () => {
     const tileTypes: BlastTileType[] = ['gold', 'bomb', 'diamond'];
 

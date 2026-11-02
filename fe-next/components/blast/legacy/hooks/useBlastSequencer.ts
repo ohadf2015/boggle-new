@@ -203,25 +203,8 @@ export function useBlastSequencer(): UseBlastSequencerReturn {
       // is already set, so they animate smoothly from their old visual position.
       if (commitFn) commitFn();
 
-      // Phase 0: Anticipation beat — brief dramatic pause before cascade resolves
-      if (gravity.clearedTiles.length > 0 && chainLevel >= 1) {
-        commit({ phase: 'anticipation', activeTiles: preFallTiles, isAnimating: true, chainLevel }, token);
-        await wait(ANIM_TIMING.chainPause * 2 * speed, timersRef.current);
-        if (cancelled()) return;
-      }
-
-      // Phase 1: Clear cascade-matched tiles. Chain 0's cleared tiles are the word itself, already popped by animateWordClear.
-      if (gravity.clearedTiles.length > 0 && chainLevel >= 1) {
-        const clearTiles: TileAnimState[] = gravity.clearedTiles.map((t) => ({
-          row: t.row, col: t.col, phase: 'clearing' as AnimPhase,
-        }));
-        commit({ phase: 'clearing', activeTiles: [...clearTiles, ...fallTiles, ...appearTiles], isAnimating: true, chainLevel }, token);
-        const clearDur = (ANIM_TIMING.clearing + ANIM_TIMING.clearStagger * gravity.clearedTiles.length) * speed;
-        await wait(clearDur, timersRef.current);
-        if (cancelled()) return;
-        await wait(ANIM_TIMING.pauseAfterClear * speed, timersRef.current);
-        if (cancelled()) return;
-      }
+      // Cascade finds are popped by the caller (animateWordClear) before they leave the grid,
+      // so this only resolves gravity — a clear phase here would hit cells already refilled.
 
       // Phase 2: Falling — keep appearTiles in activeTiles so new tiles stay hidden
       // until Phase 3 (prevents 1-frame flash at destination)

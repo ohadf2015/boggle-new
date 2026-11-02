@@ -32,6 +32,16 @@ describe('BlastWaveClear', () => {
     expect(screen.getByTestId('blast-clear-tally-diamonds')).toHaveTextContent('+2');
   });
 
+  it('shows the wave haul by gem color, dimming the colors not found, and the best word', () => {
+    render(<BlastWaveClear {...base} waveGems={{ emerald: 2, ruby: 1 }} bestWord="jumping" onContinue={vi.fn()} autoContinueMs={6000} />);
+    const slot = (k: string) => screen.getByTestId('blast-clear-gems').querySelector(`[data-gem-slot="${k}"]`) as HTMLElement;
+    expect(slot('emerald')).toHaveTextContent('×2');
+    expect(slot('emerald').dataset.gemFound).toBe('true');
+    expect(slot('ruby')).toHaveTextContent('×1');
+    expect(slot('sapphire').dataset.gemFound).toBe('false');
+    expect(screen.getByTestId('blast-results-best-word')).toHaveTextContent('JUMPING');
+  });
+
   it('teases the next wave with its theme and has one primary action', () => {
     render(<BlastWaveClear {...base} onContinue={vi.fn()} autoContinueMs={6000} />);
     const next = getWaveTheme(4);

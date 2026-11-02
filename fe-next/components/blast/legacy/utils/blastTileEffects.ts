@@ -8,6 +8,7 @@ import {
   type BlastTileState,
   type BlastExplosion,
 } from '../types';
+import type { BlastGemKind } from '@/shared/types/blast';
 
 export interface TileEffectContext {
   next: BlastTileState[][];
@@ -84,23 +85,24 @@ export function processBombBFS(ctx: TileEffectContext): EffectResult {
 export function spawnEarnedDiamonds(
   next: BlastTileState[][],
   pathSet: ReadonlySet<string>,
-  count: number,
+  gems: readonly BlastGemKind[],
   rng: () => number,
-): Array<{ row: number; col: number }> {
-  const spawned: Array<{ row: number; col: number }> = [];
-  if (count <= 0) return spawned;
+): Array<{ row: number; col: number; gem: BlastGemKind }> {
+  const spawned: Array<{ row: number; col: number; gem: BlastGemKind }> = [];
+  if (gems.length === 0) return spawned;
   const candidates: BlastTileState[] = [];
   for (const row of next) {
     for (const t of row) {
       if (!t.isCleared && t.type === 'standard' && !pathSet.has(`${t.row},${t.col}`)) candidates.push(t);
     }
   }
-  for (let i = 0; i < count && candidates.length > 0; i++) {
+  for (let i = 0; i < gems.length && candidates.length > 0; i++) {
     const [target] = candidates.splice(Math.floor(rng() * candidates.length), 1);
     target.type = 'diamond';
+    target.gem = gems[i];
     target.hitsRemaining = 0;
     target.activationEffect = 'diamond-spawn';
-    spawned.push({ row: target.row, col: target.col });
+    spawned.push({ row: target.row, col: target.col, gem: gems[i] });
   }
   return spawned;
 }

@@ -20,6 +20,15 @@ const ru = {
     "record": "Новый рекорд",
     "play": "Играть волну {wave}",
     "autoIn": "Старт через {seconds}",
+    "gemsFound": "Найдено самоцветов",
+    "gem_emerald": "Изумруд",
+    "gem_sapphire": "Сапфир",
+    "gem_amethyst": "Аметист",
+    "gem_ruby": "Рубин",
+    "rarity_emerald": "Необычный",
+    "rarity_sapphire": "Редкий",
+    "rarity_amethyst": "Эпический",
+    "rarity_ruby": "Легендарный",
     "runLabel": "Прогресс: волна {wave}"
   },
   // @blastProgress:end

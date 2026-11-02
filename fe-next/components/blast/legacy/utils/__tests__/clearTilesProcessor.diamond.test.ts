@@ -41,7 +41,7 @@ describe('processTilesForWord — earned diamonds', () => {
     const diamonds = diamondCells(result.next);
     expect(diamonds).toHaveLength(1);
     expect(diamonds[0].row === 0 && diamonds[0].col < 5).toBe(false);
-    expect(result.diamondsSpawned).toEqual([{ row: diamonds[0].row, col: diamonds[0].col }]);
+    expect(result.diamondsSpawned).toEqual([{ row: diamonds[0].row, col: diamonds[0].col, gem: diamonds[0].gem }]);
   });
 
   it('spawns two diamonds for an epic word', () => {

@@ -20,6 +20,15 @@ const en = {
     "record": "New record",
     "play": "Play wave {wave}",
     "autoIn": "Starting in {seconds}",
+    "gemsFound": "Gems found",
+    "gem_emerald": "Emerald",
+    "gem_sapphire": "Sapphire",
+    "gem_amethyst": "Amethyst",
+    "gem_ruby": "Ruby",
+    "rarity_emerald": "Uncommon",
+    "rarity_sapphire": "Rare",
+    "rarity_amethyst": "Epic",
+    "rarity_ruby": "Legendary",
     "runLabel": "Run progress: wave {wave}"
   },
   // @blastProgress:end

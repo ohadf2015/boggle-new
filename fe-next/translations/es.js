@@ -20,6 +20,15 @@ const es = {
     "record": "Nuevo récord",
     "play": "Jugar oleada {wave}",
     "autoIn": "Empieza en {seconds}",
+    "gemsFound": "Gemas encontradas",
+    "gem_emerald": "Esmeralda",
+    "gem_sapphire": "Zafiro",
+    "gem_amethyst": "Amatista",
+    "gem_ruby": "Rubí",
+    "rarity_emerald": "Poco común",
+    "rarity_sapphire": "Raro",
+    "rarity_amethyst": "Épico",
+    "rarity_ruby": "Legendario",
     "runLabel": "Progreso: oleada {wave}"
   },
   // @blastProgress:end

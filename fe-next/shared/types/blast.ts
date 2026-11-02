@@ -16,6 +16,14 @@ export function normalizeBlastTileType(type: unknown): BlastTileType {
   return typeof type === 'string' && BLAST_TILE_TYPE_SET.has(type) ? (type as BlastTileType) : 'standard';
 }
 
+/** Gem colors, rarest last. Every gem is a 'diamond' tile; the color sets how much it pays. */
+export const BLAST_GEM_KINDS = ['emerald', 'sapphire', 'amethyst', 'ruby'] as const;
+export type BlastGemKind = (typeof BLAST_GEM_KINDS)[number];
+
+export function isBlastGemKind(value: unknown): value is BlastGemKind {
+  return typeof value === 'string' && (BLAST_GEM_KINDS as readonly string[]).includes(value);
+}
+
 export const BLAST_COMBO_TYPES = ['bomb_bomb', 'gold_special', 'triple_special'] as const;
 
 export type BlastComboType = (typeof BLAST_COMBO_TYPES)[number];
@@ -33,6 +41,8 @@ export interface BlastTileState {
   hitsRemaining: number;
   /** Color tag for color_power objectives (pink/cyan/lime). Applies pulsing glow on board. */
   colorTag?: 'pink' | 'cyan' | 'lime';
+  /** Gem color of a 'diamond' tile. Missing means sapphire (boards saved before gem colors). */
+  gem?: BlastGemKind;
 }
 
 /** Rebuild a tile saved under an older roster: unknown types become standard, retired fields are dropped. */
@@ -48,5 +58,6 @@ export function normalizeBlastTileState(tile: BlastTileState): BlastTileState {
     hitsRemaining: 0,
   };
   if (tile.colorTag) normalized.colorTag = tile.colorTag;
+  if (type === 'diamond' && isBlastGemKind(tile.gem)) normalized.gem = tile.gem;
   return normalized;
 }

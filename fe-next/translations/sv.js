@@ -20,6 +20,15 @@ const sv = {
     "record": "Nytt rekord",
     "play": "Spela våg {wave}",
     "autoIn": "Startar om {seconds}",
+    "gemsFound": "Hittade ädelstenar",
+    "gem_emerald": "Smaragd",
+    "gem_sapphire": "Safir",
+    "gem_amethyst": "Ametist",
+    "gem_ruby": "Rubin",
+    "rarity_emerald": "Ovanlig",
+    "rarity_sapphire": "Sällsynt",
+    "rarity_amethyst": "Episk",
+    "rarity_ruby": "Legendarisk",
     "runLabel": "Framsteg: våg {wave}"
   },
   // @blastProgress:end

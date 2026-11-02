@@ -9,6 +9,7 @@ import { planSugarCrush } from '../utils/blastSugarCrush';
 import type { BlastResultsData, BlastTileState, BlastTileType } from '../types';
 import type { WaveConfig } from '../utils/blastWaveConfig';
 import { getWavePassPct } from '../utils/blastWaveTheme';
+import type { BlastGemCounts } from '../utils/blastGems';
 
 /** Shape we pass to the debris spawner for the dead-end finale burst. */
 export interface DeadEndFinaleTile {
@@ -28,6 +29,7 @@ interface GameEndDeps {
       totalTiles: number;
       diamondsCollected?: number;
       tileTypeClears?: Partial<Record<BlastTileType, number>>;
+      gemsByKind?: BlastGemCounts;
     };
     getResults: (maxCombo: number, wavesCompleted?: number, waveResults?: import('../types').WaveResult[], allObjectivesComplete?: boolean) => BlastResultsData;
     getLatestState: () => { tileStates: BlastTileState[][] };
@@ -43,7 +45,7 @@ interface GameEndDeps {
   onMPDeadEnd?: () => void;
   /** MP only: the shared board was fully cleared — fire a win-flavored local celebration before results. */
   onMPBoardCleared?: () => void;
-  onWaveComplete?: (score: number, words: string[], clearPct: number, collected: { diamonds: number; bombs: number }) => void;
+  onWaveComplete?: (score: number, words: string[], clearPct: number, collected: { diamonds: number; bombs: number; gems?: BlastGemCounts }) => void;
   /** Fires when board is cleared and highlight phase should start (SP only). */
   onHighlightStart?: (finalScore: number) => void;
   /** Fires after Sugar Crush with every non-cleared tile, so the view can trigger a finale debris burst. */
@@ -64,8 +66,8 @@ interface GameEndDeps {
  * Manages game-end detection with Sugar Crush finale sequence.
  * Uses refs for callbacks to avoid stale closures without re-triggering the effect.
  */
-function waveCollected(gs: { diamondsCollected?: number; tileTypeClears?: Partial<Record<BlastTileType, number>> }) {
-  return { diamonds: gs.diamondsCollected ?? 0, bombs: gs.tileTypeClears?.bomb ?? 0 };
+function waveCollected(gs: { diamondsCollected?: number; gemsByKind?: BlastGemCounts; tileTypeClears?: Partial<Record<BlastTileType, number>> }) {
+  return { diamonds: gs.diamondsCollected ?? 0, bombs: gs.tileTypeClears?.bomb ?? 0, gems: gs.gemsByKind ?? {} };
 }
 
 export function useBlastGameEnd(deps: GameEndDeps) {

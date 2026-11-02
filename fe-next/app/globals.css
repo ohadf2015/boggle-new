@@ -5237,12 +5237,29 @@ html.feedback-capturing [data-dialog-overlay] {
   100% { transform: scale(0) rotate(90deg); }
 }
 
+/* Amethyst and ruby: a slow light sweep so the rare gems read from across the board. */
+.blast-tile-gem-shimmer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.55) 50%, transparent 65%);
+  transform: translateX(-120%);
+  animation: blast-gem-shimmer 2.4s ease-in-out infinite;
+}
+.blast-tile-gem-shimmer[data-gem-rarity='4'] {
+  animation-duration: 1.6s;
+}
+@keyframes blast-gem-shimmer {
+  0%, 55% { transform: translateX(-120%); }
+  100% { transform: translateX(120%); }
+}
+.blast-game[data-cascade='active'] .blast-tile-gem-shimmer,
 .blast-game[data-cascade='active'] .blast-tile-shine,
 .blast-game[data-cascade='active'] .blast-tile-sparkle {
   animation-play-state: paused;
 }
 @media (prefers-reduced-motion: reduce) {
   .blast-tile-shine,
+  .blast-tile-gem-shimmer,
   .blast-tile-sparkle {
     animation: none;
     display: none;

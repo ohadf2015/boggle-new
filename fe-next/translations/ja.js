@@ -20,6 +20,15 @@ const ja = {
     "record": "新記録",
     "play": "ウェーブ{wave}へ",
     "autoIn": "あと{seconds}秒で開始",
+    "gemsFound": "見つけた宝石",
+    "gem_emerald": "エメラルド",
+    "gem_sapphire": "サファイア",
+    "gem_amethyst": "アメジスト",
+    "gem_ruby": "ルビー",
+    "rarity_emerald": "アンコモン",
+    "rarity_sapphire": "レア",
+    "rarity_amethyst": "エピック",
+    "rarity_ruby": "レジェンド",
     "runLabel": "進行状況：ウェーブ{wave}"
   },
   // @blastProgress:end
