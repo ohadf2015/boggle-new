@@ -31,6 +31,10 @@ export function useGuestNameSave(
   const save = async (draft: string, source: GuestNameSource): Promise<boolean> => {
     const trimmed = draft.trim().slice(0, MAX_GUEST_NAME_LENGTH);
     if (!trimmed) return false;
+    if (isDefaultPlayerName(trimmed)) {
+      setError(t('wordHunt.results.guestNameRejected', 'Pick a different name'));
+      return false;
+    }
     if (trimmed === name || !guestFingerprint) {
       markGuestNameChosen();
       return true;
@@ -45,7 +49,7 @@ export function useGuestNameSave(
       });
       const body = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setError(body.error === 'profane'
+        setError(body.error === 'profane' || body.error === 'default_name'
           ? t('wordHunt.results.guestNameRejected', 'Pick a different name')
           : t('wordHunt.results.guestNameFailed', "Couldn't save your name. Try again."));
         return false;

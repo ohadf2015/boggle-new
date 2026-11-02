@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 import { getSupabase, isSupabaseConfigured } from '../../modules/supabaseServer';
 import logger from '../../utils/logger';
 import { isProfane } from '../../utils/profanityFilter';
+import { isDefaultPlayerName } from '@/utils/defaultPlayerNames';
 import { sanitizeGuestDisplayName } from './utils';
 
 // ponytail: classic daily_puzzle_attempts left out — its leaderboard is Redis-cached and would need invalidation
@@ -26,6 +27,11 @@ export async function renameGuestDailyName(req: Request, res: Response): Promise
   }
   if (isProfane(name)) {
     res.status(400).json({ error: 'profane' });
+    return;
+  }
+
+  if (isDefaultPlayerName(name)) {
+    res.status(400).json({ error: 'default_name' });
     return;
   }
 

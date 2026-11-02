@@ -206,25 +206,28 @@ describe('GuestNameEditor — first finish', () => {
     expect(hasChosenGuestName()).toBe(false);
   });
 
-  it('offers "Keep this name" only to the keep_name arm, then nudges on the results screen', async () => {
-    // Given Growth Radar serves the treatment arm
+  it('never offers "Keep this name" on a generated name, even in the keep_name arm', async () => {
     const getFlag = vi.fn(() => 'keep_name');
     (window as unknown as { grq: unknown }).grq = { push: (cb: (gr: unknown) => void) => cb({ getFlag }) };
     try {
       render(<GuestNameEditor name={GENERATED} guestFingerprint="fp-1" onRenamed={vi.fn()} t={t} />);
-      // When the guest keeps the generated name
-      fireEvent.click(await screen.findByRole('button', { name: 'Keep this name' }));
-      // Then the prompt closes without a server call and does not come back
-      expect(getFlag).toHaveBeenCalledWith('daily-guest-name-skip');
-      expect(screen.queryByTestId('guest-name-prompt')).not.toBeInTheDocument();
-      expect(hasChosenGuestName()).toBe(true);
-      expect(fetchMock).not.toHaveBeenCalled();
-      expect(trackGrowthEvent).toHaveBeenCalledWith('daily_guest_name_kept', { is_default: true });
-      // And the softer in-page nudge takes its place
-      expect(screen.getByTestId('guest-name-default-nudge')).toBeInTheDocument();
+      expect(screen.getByTestId('guest-name-prompt')).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Keep this name' })).not.toBeInTheDocument();
     } finally {
       delete (window as unknown as { grq?: unknown }).grq;
     }
+  });
+
+  it('refuses to save a generated name as the chosen one', async () => {
+    render(<GuestNameEditor name={CHOSEN} guestFingerprint="fp-1" onRenamed={vi.fn()} t={t} />);
+
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'sneaky potato' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Show my name' }));
+
+    expect(await screen.findByRole('alert')).toBeInTheDocument();
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(hasChosenGuestName()).toBe(false);
+    expect(screen.getByTestId('guest-name-prompt')).toBeInTheDocument();
   });
 
   it('will not submit a blank name', () => {

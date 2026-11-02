@@ -74,6 +74,13 @@ describe('POST /guest-name', () => {
     expect(h.updates).toHaveLength(0);
   });
 
+  it('rejects a generated default name', async () => {
+    const res = await request(app).post('/guest-name').send({ guestFingerprint: 'fp-1', displayName: 'sneaky  potato 2' });
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe('default_name');
+    expect(h.updates).toHaveLength(0);
+  });
+
   it('reports a db failure instead of claiming success', async () => {
     h.state.error = { message: 'boom' };
     const res = await request(app).post('/guest-name').send({ guestFingerprint: 'fp-1', displayName: 'Zigzag' });
