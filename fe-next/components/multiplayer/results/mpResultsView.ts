@@ -170,12 +170,11 @@ export function nextModeForViewer<M extends string>({ isHost, hostPick }: { isHo
   return isHost ? hostPick : null;
 }
 
-export function showInlineSignup({ isGuest, isClassroom, footerShown, bridgeShowing, branch }: {
+export function showInlineSignup({ isGuest, isClassroom, footerShown, branch }: {
   isGuest: boolean;
   isClassroom: boolean;
   footerShown: boolean;
-  bridgeShowing: boolean;
   branch: 'intermission' | 'final' | null;
 }): boolean {
-  return isGuest && !isClassroom && footerShown && !bridgeShowing && branch === 'final';
+  return isGuest && !isClassroom && footerShown && branch === 'final';
 }

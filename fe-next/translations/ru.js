@@ -2358,7 +2358,6 @@ const ru = {
       "guestNameRejected": "Выбери другое имя",
       "guestNameFailed": "Не удалось сохранить имя. Попробуй ещё раз.",
       "guestNamePrompt": "Под каким именем сохранить результат?",
-      "guestNameKeep": "Оставить это имя",
       "guestNameProudFirst": "Сегодня ты на 1-м месте!",
       "guestNameProudRank": "Сегодня ты на {rank}-м месте из {total}!",
       "guestNameProudRankOnly": "Сегодня ты на {rank}-м месте!",
@@ -7900,10 +7899,6 @@ const ru = {
     "tomorrowCard": {
       "title": "ЗАВТРА: новый ежедневный вызов",
       "countdown": "Новый пазл через {time}"
-    },
-    "firstGameBridge": {
-      "quickMatch": "Дальше: быстрый матч с живыми игроками",
-      "wordWheel": "Дальше: сегодняшнее колесо слов (2 мин)"
     },
     "saveStreak": {
       "title": "Сохранить серию",
@@ -17402,11 +17397,6 @@ const ru = {
     },
     "home": {
       "greeting": "Привет, {name}",
-      "signupFirstGame": {
-        "title": "Сыграй первую игру, {name}",
-        "titleNoName": "Сыграй первую игру",
-        "daily": "Сегодняшнее колесо слов (2 мин)"
-      },
       "levelTitle": "Уровень {level} · {title}",
       "levelOnly": "Уровень {level}",
       "titles": {

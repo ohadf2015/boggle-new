@@ -87,7 +87,7 @@ const WordWheelChallenge: React.FC = () => {
   const dateParam = searchParams.get('date');
   const catchupDate = dateParam && isCatchUpDate(getDailyChallengeDate(), dateParam) ? dateParam : null;
   const isCatchup = !!catchupDate;
-  // First-game bridge: one tap from MP results should land in the game, not a ready card.
+  // `?start=1` lands in the game, not a ready card.
   const bridgeStart = searchParams.get('start') === '1';
 
   const [effects, setEffects] = useState<WordWheelEffect[]>([]);

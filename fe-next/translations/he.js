@@ -5661,10 +5661,6 @@ const he = {
       "title": "מחר: אתגר יומי חדש",
       "countdown": "פאזל חדש בעוד {time}"
     },
-    "firstGameBridge": {
-      "quickMatch": "הבא: משחק מהיר נגד שחקנים אמיתיים",
-      "wordWheel": "הבא: גלגל המילים של היום (2 דקות)"
-    },
     "saveStreak": {
       "title": "לשמור את הרצף",
       "body": "הרצפים נשמרים על המכשיר הזה. פתחו חשבון חינם כדי לשמור אותם בכל מקום."
@@ -8618,11 +8614,6 @@ const he = {
     },
     "home": {
       "greeting": "היי, {name}",
-      "signupFirstGame": {
-        "title": "המשחק הראשון שלך, {name}",
-        "titleNoName": "המשחק הראשון שלך",
-        "daily": "גלגל המילים של היום (2 דק')"
-      },
       "levelTitle": "רמה {level} · {title}",
       "levelOnly": "רמה {level}",
       "titles": {
@@ -10230,7 +10221,6 @@ const he = {
       "guestNameRejected": "בחרו שם אחר",
       "guestNameFailed": "לא הצלחנו לשמור את השם. נסו שוב.",
       "guestNamePrompt": "באיזה שם לשמור את התוצאה שלך?",
-      "guestNameKeep": "להשאיר את השם הזה",
       "guestNameProudFirst": "מקום ראשון היום!",
       "guestNameProudRank": "מקום {rank} מתוך {total} היום!",
       "guestNameProudRankOnly": "מקום {rank} היום!",

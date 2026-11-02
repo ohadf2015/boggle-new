@@ -22,7 +22,7 @@ import { needsBonusIntro } from './bonusIntro';
 import { getUnfinishedWordWheelRun, type WordWheelRun } from '@/utils/dailyChallenge/wordWheelRun';
 import type { StoredWordWheelResult } from '@/utils/dailyChallenge/types';
 import { prewarmDictionary } from '@/hooks/useDictionaryCache';
-import { wordWheelBridgeSkipsReady } from '@/lib/retention/firstGameBridge';
+import { wordWheelSkipsReady } from './readySkip';
 import type { Language } from '@/types';
 
 export type WordWheelPhase = 'loading' | 'ready' | 'playing' | 'completed' | 'already-played';
@@ -60,7 +60,7 @@ interface UseWordWheelLoadOptions {
   catchupAdUnlockedRef: MutableRefObject<boolean>;
   /** Extra chunks to load while the loader is still up (e.g. the effects canvas). */
   preloadForPlay?: () => Promise<unknown>;
-  /** `?start=1` from the first-game bridge: skip the ready card and the how-to. */
+  /** `?start=1`: skip the ready card and the how-to. */
   autoStart?: boolean;
   /** A stored result the server never acknowledged. */
   onUnsent?: (stored: StoredWordWheelResult) => void;
@@ -185,9 +185,9 @@ export function useWordWheelLoad({
       setPuzzle(generateWordWheelPuzzle(date, language));
 
       // Returning players skip the ready card entirely; catch-up keeps it so the ad gate still applies.
-      // The first-game bridge (`?start=1`) skips it for a first-timer too — one tap, no how-to.
+      // `?start=1` skips it for a first-timer too.
       const holdForBonusIntro = needsBonusIntro(date) && hasEverPlayedWordWheel(language) && !autoStart;
-      if (!holdForBonusIntro && wordWheelBridgeSkipsReady({
+      if (!holdForBonusIntro && wordWheelSkipsReady({
         startParam: autoStart,
         hasEverPlayed: hasEverPlayedWordWheel(language),
         isCatchup,

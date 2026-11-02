@@ -5160,10 +5160,6 @@ const en = {
       "title": "TOMORROW: new Daily Challenge",
       "countdown": "New puzzle in {time}"
     },
-    "firstGameBridge": {
-      "quickMatch": "Next: quick match vs real players",
-      "wordWheel": "Next: today's Word Wheel (2 min)"
-    },
     "saveStreak": {
       "title": "Save my streak",
       "body": "Streaks live on this device. Create a free account to keep them anywhere."
@@ -8078,11 +8074,6 @@ const en = {
     },
     "home": {
       "greeting": "Hey, {name}",
-      "signupFirstGame": {
-        "title": "Play your first game, {name}",
-        "titleNoName": "Play your first game",
-        "daily": "Today's Word Wheel (2 min)"
-      },
       "levelTitle": "Level {level} · {title}",
       "levelOnly": "Level {level}",
       "titles": {
@@ -9700,7 +9691,6 @@ const en = {
       "guestNameRejected": "Pick a different name",
       "guestNameFailed": "Couldn't save your name. Try again.",
       "guestNamePrompt": "Save your score under your name",
-      "guestNameKeep": "Keep this name",
       "guestNameProudFirst": "You're #1 today!",
       "guestNameProudRank": "You're #{rank} of {total} today!",
       "guestNameProudRankOnly": "You're #{rank} today!",
