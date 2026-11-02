@@ -8,6 +8,7 @@ import { getFromStorage, saveToStorage, removeFromStorage, getJsonFromStorage, s
 import { getOrCreateStoredUsername, getStoredUsername, setStoredUsername } from '@/utils/profileStorage';
 import { updateGuestDailyPlayer } from '@/utils/dailyChallenge/guestPlayer';
 import { markPostGameCompleted } from '@/lib/auth/signupPromptCoordination';
+import { isDefaultPlayerName } from '@/utils/defaultPlayerNames';
 
 const GUEST_SESSION_KEY = 'boggle_guest_session_id';
 const GUEST_STATS_KEY = 'boggle_guest_stats';
@@ -319,6 +320,13 @@ export function hasChosenGuestName(): boolean {
     // No storage (private mode / SSR): never nag on every finish.
     return true;
   }
+}
+
+/** The name a guest picked themselves, for daily boards; null while they're still on a generated one. */
+export function getChosenGuestName(): string | null {
+  if (!hasChosenGuestName()) return null;
+  const name = getGuestName()?.trim();
+  return name && !isDefaultPlayerName(name) ? name : null;
 }
 
 export function markGuestNameChosen(): void {

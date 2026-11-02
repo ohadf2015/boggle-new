@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { GuestNameEditor } from '../GuestNameEditor';
 import { getStoredUsername } from '@/utils/profileStorage';
-import { getGuestName, hasChosenGuestName, markGuestNameChosen } from '@/utils/guestManager';
+import { getGuestFingerprint, getGuestName, hasChosenGuestName, markGuestNameChosen } from '@/utils/guestManager';
 import { GUEST_DAILY_PLAYER_KEY } from '@/utils/dailyChallenge/constants';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 
@@ -54,7 +54,8 @@ describe('GuestNameEditor — a guest who owns their name', () => {
     const [url, init] = fetchMock.mock.calls[0];
     expect(url).toBe('/api/daily-challenge/guest-name');
     expect(init.method).toBe('POST');
-    expect(JSON.parse(init.body)).toEqual({ guestFingerprint: 'fp-1', displayName: 'Ohad' });
+    expect(JSON.parse(init.body)).toEqual({ guestFingerprint: 'fp-1', towerFingerprint: getGuestFingerprint(), displayName: 'Ohad' });
+    expect(getGuestFingerprint()).toBeTruthy();
     expect(getStoredUsername()).toBe('Ohad');
     expect(getGuestName()).toBe('Ohad');
     expect(JSON.parse(localStorage.getItem(GUEST_DAILY_PLAYER_KEY) ?? '{}').displayName).toBe('Ohad');

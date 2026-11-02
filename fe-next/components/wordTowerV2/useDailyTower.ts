@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { postWithAuth } from '@/utils/authFetch';
-import { getGuestFingerprint } from '@/utils/guestManager';
+import { getChosenGuestName, getGuestFingerprint } from '@/utils/guestManager';
 import { utcDateKey } from '@/lib/wordTower/dailySeed';
 import { recordV2DailyClimb } from '@/lib/wordTowerV2/daily';
 import {
@@ -103,7 +103,7 @@ export function useDailyTower({ daily, language, phase, worldRef, labelsRef, han
           floors: Math.max(1, Math.round(growth / 3)),
           longestWord: words.reduce((a, w) => (w.length > a.length ? w : a), ''),
         },
-        { language, guestFingerprint: getGuestFingerprint(), storage: window.localStorage, final },
+        { language, guestFingerprint: getGuestFingerprint(), displayName: getChosenGuestName(), storage: window.localStorage, final },
       );
       submittedRef.current = growth;
       if (final) finalSentRef.current = growth;

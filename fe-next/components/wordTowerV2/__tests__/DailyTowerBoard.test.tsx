@@ -51,4 +51,11 @@ describe('DailyTowerBoard', () => {
     await waitFor(() => expect(getWithAuth).toHaveBeenCalledTimes(2));
     expect(container.querySelector('[data-wt2-board]')).toBeNull();
   });
+
+  it('revalidates with the server on every load, so a rename or a new climb is never served from the browser cache', async () => {
+    respond([row(1, 'Ana', 30)]);
+    render(<DailyTowerBoard t={t} language="en" />);
+    await waitFor(() => expect(getWithAuth).toHaveBeenCalled());
+    expect(getWithAuth.mock.calls[0][1]).toMatchObject({ cache: 'no-cache' });
+  });
 });

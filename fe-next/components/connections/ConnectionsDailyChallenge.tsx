@@ -45,6 +45,8 @@ import { DailyLeftRail, DailyRightRail } from './DailyShellRails';
 import { GameShell, SHELL_MEDIA } from '@/components/game/shell';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import RegularDailyResults, { regularTier } from './RegularDailyResults';
+import { dailySubmitName } from '@/lib/connections/dailyDisplayName';
+import { getChosenGuestName } from '@/utils/guestManager';
 import BridgeFinishBeat, { useFinishBeat } from './BridgeFinishBeat';
 
 type Action =
@@ -104,7 +106,7 @@ export default function ConnectionsDailyChallenge({ onTerminal, today: hostToday
 
 function DailyRun({ today, paused, onTerminal }: { today: string; paused: boolean; onTerminal?: () => void }) {
   const { t, language } = useLanguage();
-  const { profile, isAdmin } = useAuth();
+  const { profile, isAdmin, user, loading: authLoading } = useAuth();
   const { haptic, customHaptic } = useHapticFeedback();
   const sfx = useSoundEffects();
 
@@ -271,7 +273,11 @@ function DailyRun({ today, paused, onTerminal }: { today: string; paused: boolea
     const timeTakenSeconds = Math.floor(elapsedMs() / 1000);
     const puzzlesSolved = solvedRef.current.size;
     const puzzleIds = state.puzzles.map((p) => p.id);
-    const displayName = profile?.display_name || profile?.username || t('connections.daily.guestName');
+    const displayName = dailySubmitName({
+      profile,
+      chosenGuestName: !user && !authLoading ? getChosenGuestName() : null,
+      fallback: t('connections.daily.guestName'),
+    });
     const payload = {
       puzzleDate: today,
       language: runLanguage,
@@ -307,7 +313,7 @@ function DailyRun({ today, paused, onTerminal }: { today: string; paused: boolea
     });
     setResults({ loading: true, streak: 0, rank: null, totalPlayers: 0, rows: [] });
     void send(payload);
-  }, [isTerminal, profile, today, runLanguage, state.score, state.puzzles, total, sfx, t, collectOutcomes, onDayPlayed, elapsedMs, send]);
+  }, [isTerminal, profile, user, authLoading, today, runLanguage, state.score, state.puzzles, total, sfx, t, collectOutcomes, onDayPlayed, elapsedMs, send]);
 
   const handleInput = useCallback((value: string) => dispatch({ type: 'SET_INPUT', input: value }), []);
   const handleSubmit = useCallback(() => dispatch({ type: 'SUBMIT' }), []);

@@ -3,6 +3,7 @@ import express from 'express';
 import request from 'supertest';
 
 const h = vi.hoisted(() => {
+  process.env.GUEST_COOKIE_SECRET = 'test-guest-secret';
   type Update = { table: string; values: Record<string, unknown>; eqs: Array<[string, unknown]>; isNull: string[] };
   const updates: Update[] = [];
   const state = { error: null as unknown };
@@ -31,6 +32,13 @@ vi.mock('../../../modules/supabaseServer', () => ({
 }));
 
 import { renameGuestDailyName } from '../guestNameRoutes';
+import { GUEST_COOKIE, setGuestCookie } from '@/lib/auth/guestCookie';
+
+function signedGuestCookie(uuid: string): string {
+  let token = '';
+  setGuestCookie({ cookies: { set: (_n: string, v: string) => { token = v; } } } as never, uuid);
+  return `other=1; ${GUEST_COOKIE}=${token}`;
+}
 
 const app = express();
 app.use(express.json());
@@ -85,5 +93,37 @@ describe('POST /guest-name', () => {
     h.state.error = { message: 'boom' };
     const res = await request(app).post('/guest-name').send({ guestFingerprint: 'fp-1', displayName: 'Zigzag' });
     expect(res.status).toBe(500);
+  });
+
+  it('renames the Word Tower rows keyed on the tower fingerprint when one is sent', async () => {
+    const res = await request(app).post('/guest-name').send({ guestFingerprint: 'fp-1', towerFingerprint: 'tw-1', displayName: 'Zigzag' });
+    expect(res.status).toBe(200);
+    const tower = h.updates.filter((u) => u.table === 'daily_word_tower_attempts');
+    expect(tower).toHaveLength(1);
+    expect(tower[0].values).toEqual({ display_name: 'Zigzag' });
+    expect(tower[0].eqs).toEqual([['guest_fingerprint', 'tw-1']]);
+    expect(tower[0].isNull).toEqual(['player_id']);
+  });
+
+  it('renames the Word Bridge rows keyed on the signed guest cookie, never a body value', async () => {
+    const res = await request(app)
+      .post('/guest-name')
+      .set('Cookie', signedGuestCookie('11111111-2222-3333-4444-555555555555'))
+      .send({ guestFingerprint: 'fp-1', displayName: 'Zigzag' });
+    expect(res.status).toBe(200);
+    const bridge = h.updates.filter((u) => u.table === 'connections_daily_scores');
+    expect(bridge).toHaveLength(1);
+    expect(bridge[0].values).toEqual({ display_name: 'Zigzag' });
+    expect(bridge[0].eqs).toEqual([['guest_fingerprint', '11111111-2222-3333-4444-555555555555']]);
+    expect(bridge[0].isNull).toEqual(['player_id']);
+  });
+
+  it('skips Word Bridge when the guest cookie is forged', async () => {
+    const res = await request(app)
+      .post('/guest-name')
+      .set('Cookie', `${GUEST_COOKIE}=g1.someone-else.bad-signature`)
+      .send({ guestFingerprint: 'fp-1', displayName: 'Zigzag' });
+    expect(res.status).toBe(200);
+    expect(h.updates.map((u) => u.table)).not.toContain('connections_daily_scores');
   });
 });

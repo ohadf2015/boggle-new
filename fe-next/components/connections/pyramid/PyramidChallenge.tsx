@@ -17,6 +17,8 @@ import { buildPyramidShareGrid } from '@/lib/connections/pyramid/shareGrid';
 import { todayUTC, markConnectionsPlayedToday, advanceClientStreak, type SubmitPayload } from '@/lib/connections/dailyClient';
 import { gridCallout, type BridgeOutcome } from '@/lib/connections/shareGrid';
 import { stripEmoji } from '@/lib/share/stripEmoji';
+import { dailySubmitName } from '@/lib/connections/dailyDisplayName';
+import { getChosenGuestName } from '@/utils/guestManager';
 import type { GameState } from '@/lib/connections/types';
 import PyramidProgress from './PyramidProgress';
 import PyramidHeader from './PyramidHeader';
@@ -130,7 +132,7 @@ function PyramidRun({
   onTerminal?: () => void;
 }) {
   const { t, language } = useLanguage();
-  const { isAdmin, profile } = useAuth();
+  const { isAdmin, profile, user, loading: authLoading } = useAuth();
   const prefersReducedMotion = useReducedMotion();
   const { haptic, customHaptic } = useHapticFeedback();
   const sfx = useSoundEffects();
@@ -293,7 +295,11 @@ function PyramidRun({
     const payload: SubmitPayload = {
       puzzleDate: today,
       language: runLanguage,
-      displayName: profile?.display_name || profile?.username || t('connections.daily.guestName'),
+      displayName: dailySubmitName({
+        profile,
+        chosenGuestName: !user && !authLoading ? getChosenGuestName() : null,
+        fallback: t('connections.daily.guestName'),
+      }),
       score: pyramidState.score,
       timeTakenSeconds: startRef.current ? Math.floor((Date.now() - startRef.current) / 1000) : 0,
       puzzlesSolved: outcomes.filter(([, o]) => o.solved).length,
@@ -311,7 +317,7 @@ function PyramidRun({
     } satisfies StoredPyramidResult);
     clearPyramidRun(today);
     void send(payload);
-  }, [isTerminal, sharePath, pyramidState, today, runLanguage, pyramid.id, profile, t, send]);
+  }, [isTerminal, sharePath, pyramidState, today, runLanguage, pyramid.id, profile, user, authLoading, t, send]);
 
   useEffect(() => {
     if (restored?.pendingSubmit && sharePath) void send(restored.pendingSubmit);

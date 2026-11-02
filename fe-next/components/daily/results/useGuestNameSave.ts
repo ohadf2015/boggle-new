@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { markGuestNameChosen, saveGuestNameEverywhere } from '@/utils/guestManager';
+import { getGuestFingerprint, markGuestNameChosen, saveGuestNameEverywhere } from '@/utils/guestManager';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { isDefaultPlayerName } from '@/utils/defaultPlayerNames';
 
@@ -45,7 +45,7 @@ export function useGuestNameSave(
       const res = await fetch('/api/daily-challenge/guest-name', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ guestFingerprint, displayName: trimmed }),
+        body: JSON.stringify({ guestFingerprint, towerFingerprint: getGuestFingerprint(), displayName: trimmed }),
       });
       const body = await res.json().catch(() => ({}));
       if (!res.ok) {

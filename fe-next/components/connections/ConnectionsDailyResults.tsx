@@ -1,6 +1,6 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { m } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { DailyResultsFrame } from '@/components/daily/results/DailyResultsFrame';
@@ -8,6 +8,7 @@ import { DailyRevealProvider, useDailyReveal } from '@/components/daily/results/
 import { REVEAL } from '@/components/daily/results/reveal/revealSequence';
 import { DailyResultsHero, type DailyResultsStat } from '@/components/daily/results/DailyResultsHero';
 import { NextQuestCta } from '@/components/daily/results/NextQuestCta';
+import { DailyGuestNameSlot } from '@/components/daily/results/DailyGuestNameSlot';
 import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
 import type { LeaderboardRow } from '@/lib/connections/dailyClient';
 import type { ConnectionPuzzle } from '@/lib/connections/types';
@@ -79,6 +80,12 @@ export default function ConnectionsDailyResults({
   leaderboard,
 }: ConnectionsDailyResultsProps) {
   const { t, language } = useLanguage();
+  const [renamedTo, setRenamedTo] = useState<string | null>(null);
+  // The board hides identities, so the guest's own row is found by their rank.
+  const rows =
+    leaderboard && renamedTo && leaderboard.rank != null
+      ? leaderboard.rows.map((r) => (r.rank_position === leaderboard.rank ? { ...r, display_name: renamedTo } : r))
+      : leaderboard?.rows;
 
   const aside = (
     <>
@@ -95,10 +102,11 @@ export default function ConnectionsDailyResults({
         isRTL={language === 'he'}
       />
       <ResultsBannerSlot placement="daily-complete" />
+      <DailyGuestNameSlot t={t} rank={leaderboard?.rank} totalPlayers={leaderboard?.totalPlayers} onRenamed={setRenamedTo} />
       {leaderboard && (
         <div data-testid="connections-leaderboard">
           <ConnectionsLeaderboard
-            rows={leaderboard.rows}
+            rows={rows ?? leaderboard.rows}
             ownRank={leaderboard.rank}
             totalPlayers={leaderboard.totalPlayers}
             loading={leaderboard.loading}

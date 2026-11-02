@@ -59,6 +59,7 @@ export interface DailySubmitBody extends DailyClimb {
   heightM: number;
   language: string;
   guestFingerprint: string | null;
+  displayName?: string;
   /** The climb is banked (exit / pagehide): the server may credit daily quests. */
   final?: true;
 }
@@ -72,6 +73,8 @@ export function recordV2DailyClimb(
   opts: {
     language: string;
     guestFingerprint: string | null;
+    /** A guest's own chosen name; null keeps the board's generic label. */
+    displayName?: string | null;
     storage?: { getItem(key: string): string | null; setItem(key: string, value: string): void };
     date?: Date;
     /** Banking flush: return a body even if the best did not improve, so quests get credited. */
@@ -98,6 +101,7 @@ export function recordV2DailyClimb(
     heightM: merged,
     language: opts.language,
     guestFingerprint: opts.guestFingerprint,
+    ...(opts.displayName ? { displayName: opts.displayName } : {}),
     ...(opts.final ? { final: true as const } : {}),
   };
 }

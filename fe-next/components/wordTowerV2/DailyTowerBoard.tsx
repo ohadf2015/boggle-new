@@ -38,7 +38,8 @@ export function DailyTowerBoard({ t, language, refreshKey = 0 }: { t: T; languag
     const params = new URLSearchParams({ language });
     const fp = getGuestFingerprint();
     if (fp) params.set('guestFingerprint', fp);
-    getWithAuth(`/api/word-tower/daily/score?${params.toString()}`)
+    // The GET is browser-cacheable for 30s; a board shown right after a climb or rename must be current.
+    getWithAuth(`/api/word-tower/daily/score?${params.toString()}`, { cache: 'no-cache' })
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
         if (live && d) setRows((d.leaderboard as Row[]) ?? []);

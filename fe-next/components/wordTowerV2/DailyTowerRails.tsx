@@ -31,7 +31,7 @@ export const DailyTowerLeftRail = memo(function DailyTowerLeftRail(p: LeftRailPr
   return (
     <aside
       data-wt2-rails
-      className="absolute bottom-0 start-0 top-0 z-30 flex w-[var(--wt2-rail)] flex-col gap-3 border-e-4 border-neo-cream/30 bg-neo-navy px-3 py-4"
+      className="absolute bottom-0 start-0 top-0 z-30 flex w-[var(--wt2-rail)] flex-col gap-3 border-e-4 border-neo-cream/40 bg-neo-navy px-3 py-4"
     >
       <ShellStats
         title={p.dateLabel ? t('wordTowerV2.hud.dailyBadge', { date: p.dateLabel }) : t('wordTowerV2.hud.daily')}

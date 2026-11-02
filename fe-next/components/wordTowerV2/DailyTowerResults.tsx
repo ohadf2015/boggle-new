@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { m } from 'framer-motion';
 import { Coins, Hammer, Home, Medal, Send, Target, X } from 'lucide-react';
 import { useRegisterHeaderAudioControl } from '@/contexts/NavigationContext';
 import { DailyResultsHero } from '@/components/daily/results/DailyResultsHero';
 import { DailyResultsFrame } from '@/components/daily/results/DailyResultsFrame';
+import { DailyGuestNameSlot } from '@/components/daily/results/DailyGuestNameSlot';
+import type { GuestNameT } from '@/components/daily/results/useGuestNameSave';
 import { DailyRevealProvider, useDailyReveal } from '@/components/daily/results/reveal/DailyRevealContext';
 import { REVEAL } from '@/components/daily/results/reveal/revealSequence';
 import { floorsAt } from '@/lib/wordTowerV2/biomes';
@@ -78,6 +80,9 @@ export function DailyTowerResults(p: Props) {
   useEffect(() => {
     onRaidOpen?.(target !== null);
   }, [target, onRaidOpen]);
+  const [renames, setRenames] = useState(0);
+  const guestT: GuestNameT = (key, fallbackOrParams, params) =>
+    t(key, typeof fallbackOrParams === 'object' ? fallbackOrParams : params);
   const { onClose } = p;
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -107,7 +112,13 @@ export function DailyTowerResults(p: Props) {
   const asideNode = hasAside ? (
     <>
             {p.nextSlot}
-            {p.boardSlot}
+            {p.boardSlot ? (
+              <>
+                <DailyGuestNameSlot t={guestT} rank={daily.rank} onRenamed={() => setRenames((n) => n + 1)} />
+                {/* Remount refetches the board so the new name shows. */}
+                <Fragment key={renames}>{p.boardSlot}</Fragment>
+              </>
+            ) : null}
             {p.rivals ? (
               <RivalBoard
                 t={t}

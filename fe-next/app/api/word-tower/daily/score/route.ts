@@ -38,6 +38,7 @@ import { mergeDailyBest } from '@/lib/wordTower/dailyBest';
 import { utcDateKey } from '@/lib/wordTower/dailySeed';
 import { creditDailyQuests } from '@/lib/daily/questSeams';
 import { questResultForWordTower } from '@/shared/dailyQuestPool';
+import { acceptGuestBoardName } from '@/lib/daily/guestBoardName';
 
 export const runtime = 'nodejs';
 
@@ -52,6 +53,8 @@ interface SubmitBody {
   language?: string;
   guestFingerprint?: string | null;
   longestWord?: string | null;
+  /** A guest's own chosen name; generated defaults are dropped so the board never shows them. */
+  displayName?: string | null;
   /**
    * Set only by the client's exit/pagehide flush, i.e. the climb is banked. The
    * 1.5 s ticks submit mid-climb heights for the leaderboard, but a total
@@ -85,6 +88,7 @@ export async function POST(request: NextRequest) {
     const supabase = getSupabaseAdmin();
     if (!supabase) return NextResponse.json({ error: 'db unavailable' }, { status: 503 });
 
+    const guestName = user ? null : acceptGuestBoardName(body.displayName);
     const isFinal = body.final === true;
     const puzzleDate = utcDateKey();
     const identity = user
@@ -121,6 +125,7 @@ export async function POST(request: NextRequest) {
           floors: mergedFloors,
           longest_word: body.longestWord ?? null,
           completed_at: new Date().toISOString(),
+          ...(guestName ? { display_name: guestName } : {}),
         })
         .eq('id', existing.id);
       if (error) {
@@ -140,6 +145,7 @@ export async function POST(request: NextRequest) {
       language,
       player_id: user?.id ?? null,
       guest_fingerprint: guestFingerprint,
+      display_name: guestName,
       best_height_m: heightM,
       floors,
       longest_word: body.longestWord ?? null,
