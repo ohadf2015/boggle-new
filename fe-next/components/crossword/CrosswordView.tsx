@@ -223,28 +223,32 @@ export function CrosswordView({
               : 'lg:max-w-[min(46rem,calc(100dvh-21rem))]'
           }`}
         >
-          {/* The active clue sits ABOVE the board (the NYT/Guardian convention): your eyes stay on
-              one column — read the clue, look down at the squares, type. */}
-          <div className="mx-auto w-full max-w-[28rem] shrink-0 lg:max-w-none">
-            <ClueBar
-              slot={activeSlot}
-              rtl={puzzle.rtl}
-              onPrev={() => nextSlot(-1)}
-              onNext={() => nextSlot(1)}
-              onToggleDir={toggleDir}
-              t={t}
-            />
-          </div>
+          {/* Clue + board + tools as ONE group, centered in whatever height the pinned keyboard
+              leaves, so a square board on a tall phone doesn't strand empty bands between them. */}
+          <div className="flex min-h-0 flex-1 flex-col justify-center gap-2 lg:flex-none lg:justify-start lg:gap-3">
+            {/* The active clue sits ABOVE the board (the NYT/Guardian convention): your eyes stay on
+                one column — read the clue, look down at the squares, type. */}
+            <div className="mx-auto w-full max-w-[28rem] shrink-0 lg:max-w-none">
+              <ClueBar
+                slot={activeSlot}
+                rtl={puzzle.rtl}
+                onPrev={() => nextSlot(-1)}
+                onNext={() => nextSlot(1)}
+                onToggleDir={toggleDir}
+                t={t}
+              />
+            </div>
 
-          {/* Board. On mobile this box owns whatever height is left after the pinned chrome and
-              declares itself a size-query container, so the grid's `100cqmin` resolves to the
-              real free space and can never clip. Nothing here scrolls. */}
-          <div className="flex min-h-0 flex-1 [container-type:size] lg:block lg:flex-none lg:[container-type:normal]">
-            <CrosswordGrid state={state} onSelect={focusCell} t={t} solved={solved} />
-          </div>
+            {/* Board. On mobile this box owns whatever height is left after the pinned chrome and
+                declares itself a size-query container, so the grid's `100cqmin` resolves to the
+                real free space and can never clip. Nothing here scrolls. */}
+            <div className="flex min-h-0 flex-1 max-h-[min(calc(100vw-1.5rem),28rem)] [container-type:size] lg:block lg:max-h-none lg:flex-none lg:[container-type:normal]">
+              <CrosswordGrid state={state} onSelect={focusCell} t={t} solved={solved} />
+            </div>
 
-          <div className="mx-auto w-full max-w-[28rem] shrink-0 lg:max-w-none">
-            <CrosswordToolbar actions={toolActions} />
+            <div className="mx-auto w-full max-w-[28rem] shrink-0 lg:max-w-none">
+              <CrosswordToolbar actions={toolActions} />
+            </div>
           </div>
 
           {/* Pinned to the bottom on mobile so the page never scrolls. */}
