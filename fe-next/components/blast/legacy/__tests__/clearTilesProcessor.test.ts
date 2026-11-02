@@ -67,13 +67,15 @@ describe('processTilesForWord — tile effects', () => {
   });
 
   describe('bomb tile: 3x3 clear', () => {
-    it('clears the eight neighbours and pays BOMB_AREA_CLEAR_BONUS each', () => {
+    it('clears the eight neighbours and pays a rolled bonus for each', () => {
       const grid = makeGrid(4, [{ row: 1, col: 1, tile: { type: 'bomb' } }]);
       const path = [{ row: 1, col: 0 }, { row: 1, col: 1 }, { row: 1, col: 2 }];
       const result = processTilesForWord(makeInput(grid, path, 'abc'));
       for (let r = 0; r <= 2; r++) for (let c = 0; c <= 2; c++) expect(result.next[r][c].isCleared).toBe(true);
       expect(result.next[3][3].isCleared).toBe(false);
-      expect(result.totalScore).toBe(10 + 6 * BOMB_AREA_CLEAR_BONUS);
+      const bonus = result.totalScore - 10;
+      expect(bonus).toBeGreaterThanOrEqual(6 * BOMB_AREA_CLEAR_BONUS);
+      expect(bonus).toBeLessThan(6 * 12);
     });
 
     it('chains into a bomb caught in the blast', () => {

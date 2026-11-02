@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { processTilesForWord } from '../clearTilesProcessor';
 import { createSeededRandom } from '../blastLetterGenerator';
-import { type BlastTileState, DIAMOND_CLEAR_BONUS, DIAMOND_WORD_MULTIPLIER, DIAMOND_CROSS_POINTS } from '../../types';
+import { type BlastTileState, DIAMOND_CLEAR_BONUS, DIAMOND_WORD_MULTIPLIER } from '../../types';
 
 function makeGrid(size: number): BlastTileState[][] {
   return Array.from({ length: size }, (_, r) =>
@@ -79,7 +79,9 @@ describe('processTilesForWord — earned diamonds', () => {
     const crossCells = 5 + 3; // column 1 below the diamond + the rest of row 0 off the path
     expect(result.gemCrossCount).toBe(crossCells);
     expect(result.newlyClearedCount).toBe(3 + crossCells);
-    expect(result.totalScore).toBe(10 * DIAMOND_WORD_MULTIPLIER + DIAMOND_CLEAR_BONUS + crossCells * DIAMOND_CROSS_POINTS);
+    const bonus = result.totalScore - 10 * DIAMOND_WORD_MULTIPLIER;
+    expect(bonus).toBeGreaterThan(crossCells);
+    expect(bonus).toBeLessThan(DIAMOND_CLEAR_BONUS * 2 + crossCells * 12);
     for (let r = 0; r < 6; r++) expect(result.next[r][1].isCleared).toBe(true);
     for (let c = 0; c < 6; c++) expect(result.next[0][c].isCleared).toBe(true);
   });

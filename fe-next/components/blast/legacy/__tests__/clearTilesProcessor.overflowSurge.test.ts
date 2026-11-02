@@ -36,9 +36,9 @@ describe('overflow surge', () => {
     expect(res.newlyClearedCount).toBeGreaterThan(3);
     // With bomb board, should hit detonation cap and record overflow surge
     expect(res.overflowSurge).toBeGreaterThanOrEqual(0);
-    // If surge was recorded, it must be a multiple of the per-detonation payout
+    // Each suppressed detonation pays 8-20ish points for a 3-letter word, never the old flat 10 each
     if (res.overflowSurge > 0) {
-      expect(res.overflowSurge % OVERFLOW_SURGE_POINTS_PER_DETONATION).toBe(0);
+      expect(res.overflowSurge).toBeGreaterThanOrEqual(OVERFLOW_SURGE_POINTS_PER_DETONATION * 0.5);
     }
   });
 

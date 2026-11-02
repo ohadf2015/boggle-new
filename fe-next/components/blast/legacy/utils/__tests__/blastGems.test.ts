@@ -39,7 +39,9 @@ describe('gem payoffs in processTilesForWord', () => {
     return processTilesForWord({ prev, path: row(0, 3), word: 'cat', baseScore: 10, gridSize: 6, currentWave: 1, rng: createSeededRandom(1) });
   };
   it('multiplies the word by the gem and counts it by color', () => {
-    expect(play('emerald').totalScore).toBe(10 * GEM_DEFS.emerald.wordMult + GEM_DEFS.emerald.clearBonus);
+    const bonus = play('emerald').totalScore - 10 * GEM_DEFS.emerald.wordMult;
+    expect(bonus).toBeGreaterThan(GEM_DEFS.emerald.clearBonus * 0.5);
+    expect(bonus).toBeLessThan(GEM_DEFS.emerald.clearBonus * 1.5);
     expect(play('ruby').gemsCollected).toEqual({ ruby: 1 });
   });
   it('only cross-blasts for gems that carry a cross', () => {

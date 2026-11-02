@@ -9,11 +9,9 @@ import { getWordLengthScaleFactor } from './blastComboScaling';
 import {
   GOLD_MULTIPLIER,
   GOLD_BONUS_MOVES,
-  DIAMOND_CROSS_POINTS,
   BLAST_MAX_CHAIN_DETONATIONS,
   BLAST_MAX_CHAIN_CLEAR_FRACTION,
   BLAST_MIN_CHAIN_CLEAR_CAP,
-  OVERFLOW_SURGE_POINTS_PER_DETONATION,
   type BlastTileState,
   type BlastTileType,
   type BlastExplosion,
@@ -23,6 +21,7 @@ import { type TileEffectContext, processBombBFS, spawnEarnedDiamonds } from './b
 import { calculateBonusMoves } from './blastMoveUtils';
 import { getWordRarityTier } from './blastWordRarity';
 import { GEM_DEFS, gemOfTile, rollGemsForWord } from './blastGems';
+import { gemClearPoints, crossTilePoints, surgePoints, type PayoutCtx } from './blastPayout';
 import type { BlastGemKind } from '@/shared/types/blast';
 import { getWaveTheme } from './blastWaveTheme';
 
@@ -66,6 +65,7 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
   let bonusScore = 0;
   const newExplosions: BlastExplosion[] = [];
   const now = Date.now();
+  const payout: PayoutCtx = { seed: `${word}:${currentWave}:${path.map(p => `${p.row}.${p.col}`).join('-')}`, wave: currentWave };
   const pendingPopups: BlastScorePopup[] = [];
 
   let newlyClearedCount = 0;
@@ -82,7 +82,7 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
     if (t.type === 'diamond') {
       const gem = gemOfTile(t);
       gemsCollected[gem] = (gemsCollected[gem] ?? 0) + 1;
-      bonusScore += GEM_DEFS[gem].clearBonus;
+      bonusScore += gemClearPoints(payout, t.row, t.col, gem);
       t.activationEffect = 'diamond';
       newExplosions.push({ id: `diamond-${now}-${t.row}-${t.col}`, row: t.row, col: t.col, type: 'word', intensity: 3, timestamp: now });
     }
@@ -93,6 +93,7 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
     bombQueue: [],
     processedBombs: new Set<string>(),
     markCleared,
+    payout,
     chainBudget: {
       detonations: 0,
       cleared: 0,
@@ -161,11 +162,11 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
       if (!tile.isCleared) continue;
       tile.activationEffect = tile.type !== 'standard' ? tile.type : null;
       gemCrossCount++;
+      bonusScore += crossTilePoints(payout, cell.row, cell.col, word.length, gem.gem);
       if (tile.type === 'bomb') queueBomb(cell.row, cell.col);
       newExplosions.push({ id: `gem-cross-${now}-${cell.row}-${cell.col}`, type: 'clear', row: cell.row, col: cell.col, intensity: 3, timestamp: now });
     }
   }
-  bonusScore += gemCrossCount * DIAMOND_CROSS_POINTS;
   const diamondMultiplier = diamondsOnPath.reduce((m, g) => m * GEM_DEFS[g.gem].wordMult, 1);
 
   const bombResult = processBombBFS(ctx);
@@ -209,7 +210,7 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
     }
   }
 
-  const overflowSurge = (ctx.chainBudget?.suppressed ?? 0) * OVERFLOW_SURGE_POINTS_PER_DETONATION;
+  const overflowSurge = surgePoints(payout, ctx.chainBudget?.suppressed ?? 0, word.length);
   bonusScore += overflowSurge;
   if (overflowSurge > 0 && path.length > 0) {
     pendingPopups.push({

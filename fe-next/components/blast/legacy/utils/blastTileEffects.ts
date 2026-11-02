@@ -9,6 +9,7 @@ import {
   type BlastExplosion,
 } from '../types';
 import type { BlastGemKind } from '@/shared/types/blast';
+import { bombTilePoints, type PayoutCtx } from './blastPayout';
 
 export interface TileEffectContext {
   next: BlastTileState[][];
@@ -21,6 +22,8 @@ export interface TileEffectContext {
    * Optional runaway-chain budget. When present, the bomb chain stops once
    * `maxDetonations` or `maxCleared` is reached, so one word can't wipe half the board.
    */
+  /** When set, bomb tiles pay by the payout formula instead of the flat bonus. */
+  payout?: PayoutCtx;
   chainBudget?: { detonations: number; cleared: number; suppressed: number; maxDetonations: number; maxCleared: number };
 }
 
@@ -67,7 +70,7 @@ export function processBombBFS(ctx: TileEffectContext): EffectResult {
         if (chainAtClearCap(ctx)) { recordSuppressed(ctx); break bombRadius; }
         ctx.markCleared(next[r][c]);
         if (ctx.chainBudget) ctx.chainBudget.cleared++;
-        bonusScore += BOMB_AREA_CLEAR_BONUS;
+        bonusScore += ctx.payout ? bombTilePoints(ctx.payout, r, c, bomb.depth) : BOMB_AREA_CLEAR_BONUS;
         if (next[r][c].type === 'bomb' && !processedBombs.has(`${r},${c}`)) {
           processedBombs.add(`${r},${c}`);
           bombQueue.push({ row: r, col: c, depth: bomb.depth + 1 });
