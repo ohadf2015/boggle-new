@@ -13415,8 +13415,8 @@ const es = {
         "desc": "×3 a la puntuación de la palabra, +1 movimiento y monedas extra."
       },
       "diamond": {
-        "name": "Diamante",
-        "desc": "Lo ganas con palabras raras. Úsalo en una palabra: ×2 y estalla su fila y columna."
+        "name": "Gema",
+        "desc": "Se gana con palabras poco comunes o raras, de color según su rareza. En una palabra vale ×2 (esmeralda, zafiro), ×3 (amatista) o ×4 (rubí); todas menos la esmeralda también revientan fila y columna."
       },
       "bomb": {
         "name": "Bomba",
@@ -13600,7 +13600,7 @@ const es = {
     "boardBusy": "Espera, las fichas siguen cayendo",
     "ready": {
       "title": "Modo Blast",
-      "subtitle": "Desliza palabras y revienta el tablero. Las bombas limpian 3×3, las monedas valen ×3 y los diamantes ×2.",
+      "subtitle": "Desliza palabras y revienta el tablero. Las bombas limpian 3×3, las monedas valen ×3 y las gemas de ×2 a ×4, y valen más las más raras.",
       "start": "Jugar",
       "best": "Tu récord: {score}",
       "play": "Empezar desde el principio",
@@ -13766,8 +13766,8 @@ const es = {
         "desc": "×3 puntos, +1 movimiento, monedas extra"
       },
       "diamond": {
-        "name": "Diamante",
-        "desc": "Sale con palabras raras: ×2 y estalla fila y columna"
+        "name": "Gema",
+        "desc": "Se gana con buenas palabras. De ×2 a ×4; las grandes revientan fila y columna"
       },
       "bomb": {
         "name": "Bomba",

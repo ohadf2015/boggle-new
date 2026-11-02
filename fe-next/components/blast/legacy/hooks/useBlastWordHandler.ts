@@ -145,6 +145,7 @@ export function useBlastWordHandler({
       col: p.col,
       type: engine.tileStates[p.row]?.[p.col]?.type ?? 'standard',
     }));
+    const pathGems = path.filter(p => engine.tileStates[p.row]?.[p.col]?.type === 'diamond').map(p => engine.tileStates[p.row][p.col].gem);
     const clearedTypes = new Set(clearedInfo.map(c => c.type));
     // Bomb and gem blasts clear tiles off the path. A dry run finds them up front so they
     // pop with the word instead of vanishing a beat after it. Display only: the engine decides.
@@ -236,7 +237,7 @@ export function useBlastWordHandler({
       ...(treasureBonus > 0 && treasureTier !== 'common'
         ? { bonus: treasureBonus, luckyTier: treasureTier }
         : {}),
-      stamps: buildScoreStamps(clearedInfo.map(c => c.type as BlastTileType), treasureTier, t),
+      stamps: buildScoreStamps(clearedInfo.map(c => c.type as BlastTileType), treasureTier, t, pathGems),
     }]);
 
     if ((result.gemCrossCount ?? 0) > 0) {
