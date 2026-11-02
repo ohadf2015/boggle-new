@@ -150,26 +150,28 @@ export default function PuzzleCard({
           exit={{ opacity: 0, y: -16, scale: 0.97, transition: { duration: 0.18 } }}
           transition={reducedMotion ? { duration: 0 } : CARD_SPRING}
           className={[
-            'relative flex min-h-0 flex-1 flex-col rounded-neo border-neo-thick bg-neo-navy-light px-3 pb-3 pt-2 shadow-hard transition-colors duration-200 shell:px-6 shell:pb-5 shell:pt-4',
+            'group/card relative flex min-h-0 flex-1 flex-col rounded-neo border-neo-thick bg-neo-navy-light px-2 pb-2.5 pt-1.5 shadow-hard transition-colors duration-200 sm:px-3 sm:pb-3 sm:pt-2 shell:px-6 shell:pb-5 shell:pt-4',
+            // Nav and banner already reserve the home-indicator band; only claim it when neither is up.
+            '[html:not(.has-global-bottom-nav):not(.has-admob-banner):not(.has-web-anchor-ad)_&]:mb-[env(safe-area-inset-bottom,0px)]',
             STATUS_BORDER[state.status] ?? STATUS_BORDER.playing,
           ].join(' ')}
           dir={isRTL ? 'rtl' : 'ltr'}
         >
-          <div className="flex min-h-9 items-center gap-2">
-            <span data-testid="puzzle-mascot" className="pointer-events-none shrink-0">
-              <ConnectionsMascot status={state.status} className="h-10 w-10 shell:h-14 shell:w-14" />
+          <div className="flex min-h-11 items-center gap-1.5">
+            <span data-testid="puzzle-mascot" className="pointer-events-none shrink-0 group-has-[input:focus]/card:hidden">
+              <ConnectionsMascot status={state.status} className="h-9 w-9 [@media(min-height:780px)]:h-12 [@media(min-height:780px)]:w-12 shell:h-14 shell:w-14" />
             </span>
             {puzzle.difficulty && (
               <span
                 className={[
-                  'shrink-0 rounded border-2 px-2 py-0.5 font-mono text-xs font-bold uppercase tracking-widest rtl:tracking-normal',
+                  'shrink-0 rounded border-2 px-1.5 py-0.5 font-mono text-[11px] font-bold uppercase leading-tight tracking-wider rtl:tracking-normal',
                   DIFFICULTY_STYLE[puzzle.difficulty] ?? 'border-neo-cream/40 text-neo-white',
                 ].join(' ')}
               >
                 {t(`connections.difficulty.${puzzle.difficulty}`)}
               </span>
             )}
-            <div className="ms-auto min-w-0">
+            <div className="ms-auto flex min-w-0 flex-1 justify-end">
               <PuzzleActions
                 puzzle={puzzle}
                 state={state}
@@ -182,7 +184,7 @@ export default function PuzzleCard({
             </div>
           </div>
 
-          <div ref={stageRef} className="relative flex min-h-0 flex-1 flex-col justify-center py-2 shell:py-4" style={{ containerType: 'inline-size' }}>
+          <div ref={stageRef} className="relative flex min-h-0 flex-1 flex-col justify-center py-2 group-has-[input:focus]/card:py-0 shell:py-4" style={{ containerType: 'inline-size' }}>
             <BridgeStage word1={puzzle.word1} word2={puzzle.word2} isCorrect={isCorrect} isGaveUp={isGaveUp} isRTL={isRTL}>
               {needsIME ? (
                 <p
@@ -252,8 +254,11 @@ export default function PuzzleCard({
           </div>
 
           {/* The dock: keyboard while playing, the payoff + Next once resolved —
-              same reserved height, so the page never grows into a scroll. */}
-          <div className="flex min-h-[var(--conn-dock)] shrink-0 flex-col justify-end [--conn-dock:9.75rem] sm:[--conn-dock:11.25rem] [@media(max-height:700px)]:[--conn-dock:9.25rem] shell:mx-auto shell:w-full shell:max-w-[40rem]">
+              same reserved height, so the page never grows into a scroll. The one-line
+              IME input skips the reservation so the plates get that room instead. */}
+          <div
+            className={`flex shrink-0 flex-col justify-end [--conn-dock:9.75rem] sm:[--conn-dock:11.25rem] [@media(max-height:700px)]:[--conn-dock:9.25rem] [@media(max-width:639px)_and_(min-height:780px)]:[--conn-dock:11.25rem] shell:mx-auto shell:w-full shell:max-w-[40rem] ${needsIME && !isResolved ? '' : 'min-h-[var(--conn-dock)]'}`}
+          >
             {isResolved ? (
               <div className="flex flex-col gap-2">
                 <BridgeSolveReveal puzzle={puzzle} language={language} isCorrect={isCorrect} />
@@ -263,7 +268,7 @@ export default function PuzzleCard({
               /* Scripts like Japanese can't fit an on-screen keyboard — use the
                  device's native IME via a real text input. */
               !isDisabled && (
-                <div className="flex flex-col gap-3">
+                <div className="flex items-stretch gap-2">
                   <input
                     type="text"
                     lang={language}
@@ -284,7 +289,7 @@ export default function PuzzleCard({
                     }}
                     placeholder={t('connections.placeholder')}
                     className={[
-                      'min-h-[3.25rem] w-full rounded-neo border-2 bg-neo-navy px-4 py-3 text-lg shadow-hard',
+                      'min-h-[3.25rem] min-w-0 flex-1 rounded-neo border-2 bg-neo-navy px-3 py-2.5 text-lg shadow-hard',
                       'font-neo-display font-bold text-neo-white outline-none transition-colors duration-200 placeholder:font-neo-body placeholder:font-normal placeholder:text-neo-white/40 focus:border-neo-cyan',
                       isWrong ? 'border-neo-red bg-neo-red/10' : 'border-neo-cream/40',
                     ].join(' ')}
@@ -294,7 +299,7 @@ export default function PuzzleCard({
                     onClick={onSubmit}
                     whileTap={{ scale: 0.97 }}
                     disabled={state.input.trim().length === 0}
-                    className="rounded-neo border-neo-thick border-neo-black bg-neo-cyan px-4 py-2.5 font-neo-display font-black text-neo-navy shadow-hard disabled:cursor-not-allowed disabled:opacity-40"
+                    className="shrink-0 rounded-neo border-neo-thick border-neo-black bg-neo-cyan px-4 font-neo-display font-black text-neo-navy shadow-hard active:translate-y-px active:shadow-hard-pressed disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     {t('connections.submit')}
                   </m.button>

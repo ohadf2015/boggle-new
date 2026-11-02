@@ -11,7 +11,7 @@ import HintButton from './HintButton';
 import type { ConnectionPuzzle, GameState, PuzzleRating } from '@/lib/connections/types';
 
 const QUIET_BTN =
-  'inline-flex h-9 items-center gap-1.5 rounded-full px-2.5 font-neo-body text-xs font-bold text-neo-white/70 transition-colors hover:bg-neo-white/5 disabled:cursor-not-allowed disabled:opacity-60';
+  'relative inline-flex h-9 min-w-9 shrink-0 items-center justify-center gap-1.5 rounded-full px-2 font-neo-body text-xs font-bold text-neo-white/70 transition-colors before:absolute before:-inset-1 hover:bg-neo-white/5 disabled:cursor-not-allowed disabled:opacity-60';
 
 interface ActionsProps {
   puzzle: ConnectionPuzzle;
@@ -42,7 +42,7 @@ export function PuzzleActions({ puzzle, state, isAdmin, isDisabled, onGiveUp, on
   const answerAdBusy = revealAnswerAd.status === 'loading' || revealAnswerAd.status === 'showing';
 
   return (
-    <div className="flex items-center justify-end gap-1">
+    <div className="flex min-w-0 items-center justify-end gap-1">
       {isAdmin ? (
         <m.button type="button" onClick={onGiveUp} whileTap={{ scale: 0.96 }} className={`${QUIET_BTN} text-neo-red`}>
           <Flag className="h-3.5 w-3.5" aria-hidden="true" />
@@ -62,9 +62,17 @@ export function PuzzleActions({ puzzle, state, isAdmin, isDisabled, onGiveUp, on
           <span className="hidden min-[430px]:inline">{t('connections.revealAnswerAd')}</span>
         </m.button>
       ) : skipAfterMisses != null && state.wrongAttempts >= skipAfterMisses ? (
-        <m.button type="button" onClick={onGiveUp} whileTap={{ scale: 0.96 }} disabled={isDisabled} className={QUIET_BTN}>
-          <SkipForward className="h-3.5 w-3.5" aria-hidden="true" />
-          {t('connections.daily.skipStuck')}
+        <m.button
+          type="button"
+          onClick={onGiveUp}
+          whileTap={{ scale: 0.96 }}
+          disabled={isDisabled}
+          aria-label={t('connections.daily.skipStuck')}
+          title={t('connections.daily.skipStuck')}
+          className={QUIET_BTN}
+        >
+          <SkipForward className="h-4 w-4" aria-hidden="true" />
+          <span className="hidden min-[430px]:inline">{t('connections.daily.skipStuck')}</span>
         </m.button>
       ) : null}
       <HintButton

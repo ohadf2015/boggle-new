@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Check } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -14,6 +15,8 @@ import {
   type DailyModePlayState,
 } from '@/lib/dailyModes';
 import type { Language } from '@/types';
+import { chainPips, markDailyHandoff, type ChainPip } from '@/components/daily/flow/dailyHandoff';
+import { useDailyReveal, useMountedAfterReveal } from './reveal/DailyRevealContext';
 
 export interface NextQuestCtaProps {
   /** The mode whose results screen this is — never offered as the next step. */
@@ -33,13 +36,32 @@ export interface NextQuestCtaProps {
   className?: string;
 }
 
-/* Deliberately un-animated. An entrance opacity/transform tween on a
-   full-width block is a known mobile-Chromium flash source in this codebase
-   (rules/60 Class 5), and using framer-motion here also broke every results
-   suite whose `m` mock defines only div/span. A plain Link is the lazier and
-   steadier choice; the CTA appears with the rest of the screen. */
+/* Motion only via WAAPI on the arrow chip: a full-width entrance flashes on mobile (rules/60 Class 5) and suites mock `m` as div-only. */
 
 /* Full class strings only — Tailwind emits nothing for `bg-neo-${accent}`. */
+const PIP_CLASS: Record<ChainPip, string> = {
+  done: 'w-1.5 bg-neo-lime',
+  active: 'w-4 bg-neo-cream',
+  next: 'w-1.5 bg-neo-cream/25',
+};
+
+const SEND_OFF: Keyframe[] = [
+  { transform: 'translateX(0) scale(1)' },
+  { transform: 'translateX(-3px) scale(0.92)', offset: 0.3 },
+  { transform: 'translateX(14px) scale(1.08)' },
+];
+const PULSE: Keyframe[] = [
+  { transform: 'scale(1)' },
+  { transform: 'scale(1.18) rotate(-6deg)', offset: 0.4 },
+  { transform: 'scale(1)' },
+];
+
+function playOn(el: HTMLElement | null, frames: Keyframe[], options: KeyframeAnimationOptions) {
+  if (!el || typeof el.animate !== 'function') return;
+  if (typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+  el.animate(frames, options);
+}
+
 const ACCENTS = {
   orange: { bar: 'bg-neo-orange', ring: 'focus-visible:ring-neo-orange' },
   yellow: { bar: 'bg-neo-yellow', ring: 'focus-visible:ring-neo-yellow' },
@@ -71,6 +93,14 @@ export function NextQuestCta({
 }: NextQuestCtaProps) {
   const { t } = useLanguage();
   const played = useDailyPlayedStatus();
+  const reveal = useDailyReveal();
+  const arrowRef = useRef<HTMLSpanElement>(null);
+  const late = useMountedAfterReveal();
+  const pulse = reveal.active && reveal.done && !late;
+
+  useEffect(() => {
+    if (pulse) playOn(arrowRef.current, PULSE, { duration: 650, iterations: 3, delay: 150, easing: 'ease-in-out' });
+  }, [pulse]);
 
   // Don't guess while the server answer is still in flight: rendering an
   // optimistic "play Word Wheel" that flips to "all clear" a moment later is
@@ -125,18 +155,26 @@ export function NextQuestCta({
 
   const accent = ACCENTS[mode.accent];
   const href = dailyModeHref(mode, currentLanguage);
+  const pips = chainPips(mode.id, (id) => {
+    if (id === justFinished) return true;
+    if (id === 'word-hunt') return state.wordHunt !== 'new';
+    if (id === 'word-wheel') return state.wordWheel === 'played';
+    return id === 'word-tower' ? state.wordTower : state.connections;
+  });
 
   return (
     <Link
       href={href}
-      onClick={() =>
+      onPointerDown={() => playOn(arrowRef.current, SEND_OFF, { duration: 260, easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)' })}
+      onClick={() => {
+        markDailyHandoff(mode.id);
         trackGrowthEvent('cross_promo_click', {
           target: mode.id,
           source,
           placement: 'next_quest_cta',
           language: currentLanguage,
-        })
-      }
+        });
+      }}
       data-testid="next-quest-cta"
       data-next-mode={mode.id}
       className={cn(
@@ -163,8 +201,13 @@ export function NextQuestCta({
       />
 
       <span className="relative flex-1 min-w-0">
-        <span className="block text-xs font-bold text-neo-cream/70">
+        <span className="flex items-center gap-2 text-xs font-bold text-neo-cream/70">
           {t('daily.nextUp')}
+          <span aria-hidden="true" data-testid="next-quest-pips" className="flex items-center gap-1">
+            {pips.map((pip, i) => (
+              <span key={DAILY_MODES[i].id} data-pip={pip} className={cn('block h-1.5 rounded-full', PIP_CLASS[pip])} />
+            ))}
+          </span>
         </span>
         <span className="block text-lg leading-tight font-neo-display font-black text-neo-cream line-clamp-2">
           {t(mode.titleKey)}
@@ -172,6 +215,7 @@ export function NextQuestCta({
       </span>
 
       <span
+        ref={arrowRef}
         aria-hidden="true"
         className={cn(
           'relative shrink-0 w-11 h-11 rounded-xl border-2 border-black flex items-center justify-center',

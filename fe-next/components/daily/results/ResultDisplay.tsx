@@ -18,6 +18,7 @@ import { SPRING_PRESETS } from '@/lib/animation/presets';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { cn } from '@/lib/utils';
 import { getScoreTier } from './scoreFeedbackTiers';
+import { useMountedAfterReveal } from './reveal/DailyRevealContext';
 import type { Language } from '@/types';
 
 export interface ResultDisplayProps {
@@ -32,6 +33,8 @@ export interface ResultDisplayProps {
   /** Current player's id — drives the display-only Ron bonus easter egg. */
   currentUserId?: string | null;
   meaning?: string | null;
+  /** Fresh finish only: letters flip in. A revisit renders settled. */
+  celebrate?: boolean;
   t: (key: string) => string;
 }
 
@@ -44,11 +47,18 @@ const CHIPS = [
   { id: 'exploration', cls: 'bg-neo-pink/10 border-neo-pink/30 text-neo-pink', Icon: BookOpen },
 ] as const;
 
-const enter = (delay: number) => ({
+const enterMotion = (on: boolean) => (delay: number) => (on ? {
   initial: { y: 10, scale: 0.9 },
   animate: { y: 0, scale: 1 },
   transition: { ...SPRING_PRESETS.balanced, delay },
-});
+} : {});
+
+/* Delays land the flip after the hero's stat chips. */
+const flipMotion = (on: boolean) => (i: number) => (on ? {
+  initial: { rotateX: -90, transformPerspective: 400 },
+  animate: { rotateX: 0, transformPerspective: 400 },
+  transition: { ...SPRING_PRESETS.bouncy, delay: 1.5 + i * 0.09 },
+} : {});
 
 function TomorrowLine({ streakDays, testId, countdown, t }: { streakDays: number; testId: string; countdown: string; t: ResultDisplayProps['t'] }) {
   return (
@@ -80,8 +90,13 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
   wordsDiscovered = 0,
   currentUserId,
   meaning,
+  celebrate = true,
   t,
 }) => {
+  const [reduced] = useState(() => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
+  const late = useMountedAfterReveal();
+  const enter = enterMotion(celebrate && !reduced && !late);
+  const flip = flipMotion(celebrate && !reduced && !late);
   const [wordHidden, setWordHidden] = useState(false);
   const showRonBonus = solved && isRonPrankUser(currentUserId);
 
@@ -127,7 +142,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
               <m.span
                 key={`${wordHidden ? 'blank' : 'letter'}-${i}`}
                 data-testid={wordHidden ? undefined : `letter-${letter}`}
-                {...enter(0.6 + i * 0.05)}
+                {...flip(i)}
                 className={cn(
                   'inline-flex items-center justify-center w-8 h-10 rounded-neo border-2 font-black text-lg',
                   wordHidden ? 'bg-neo-navy border-neo-white/20 text-neo-white/40' : 'bg-neo-lime/20 border-neo-lime/50 text-neo-lime',

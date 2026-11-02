@@ -31,8 +31,9 @@ interface ConnectionsKeyboardProps {
 const KEY_BASE =
   'inline-flex items-center justify-center rounded-neo border-3 border-neo-black font-neo-display font-black select-none touch-manipulation transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] duration-75 shadow-hard active:shadow-hard-pressed active:translate-x-px active:translate-y-px disabled:opacity-40 disabled:cursor-default';
 
-/** Shared key sizing — taller keys, no basis floor, so no key squashes. */
-const KEY_SIZE = 'h-11 sm:h-12 [@media(max-height:700px)]:h-10 min-w-0';
+/** Shared key sizing; PuzzleCard's --conn-dock reserves 3 rows of exactly these heights. */
+const KEY_SIZE =
+  'h-12 [@media(max-height:700px)]:h-11 [@media(max-width:639px)_and_(min-height:780px)]:h-14 sm:[@media(max-height:700px)]:h-10 min-w-0';
 
 /**
  * One letter-key width for the WHOLE keyboard. Every letter key gets this
@@ -101,7 +102,7 @@ export default function ConnectionsKeyboard({
     // layout exists to ride — so the keyboard always flows LTR regardless of locale.
     <div
       dir="ltr"
-      className="flex w-full flex-col gap-1.5 sm:gap-2 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light p-1 sm:p-2 shadow-hard"
+      className="flex w-full flex-col gap-1.5 sm:gap-2 sm:rounded-neo sm:border-2 sm:border-neo-cream/40 sm:bg-neo-navy-light sm:p-2 sm:shadow-hard"
     >
       {rows.map((row, rowIdx) => (
         <m.div

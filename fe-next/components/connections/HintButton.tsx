@@ -18,8 +18,10 @@ interface HintButtonProps {
   adContext: Record<string, unknown>;
 }
 
+// before: stretches the tap target to 44px tall while the pill itself stays h-9.
 const HINT_BTN =
-  'inline-flex h-9 items-center gap-1.5 rounded-full border-2 border-neo-black bg-neo-yellow px-3.5 font-neo-display text-sm font-black text-neo-navy shadow-hard-sm transition-[transform,box-shadow] duration-100 active:translate-y-px active:shadow-hard-pressed disabled:opacity-60';
+  'relative inline-flex h-9 min-w-0 max-w-full items-center gap-1.5 rounded-full border-2 border-neo-black bg-neo-yellow px-3 font-neo-display text-sm font-black text-neo-navy shadow-hard-sm transition-[transform,box-shadow] duration-100 before:absolute before:-inset-y-1 before:inset-x-0 active:translate-y-px active:shadow-hard-pressed disabled:opacity-60';
+const ICON = 'h-4 w-4 shrink-0';
 
 /** One free hint a day; after that a short rewarded ad (native AdMob or the web provider). */
 export default function HintButton({
@@ -61,8 +63,8 @@ export default function HintButton({
         whileTap={{ scale: 0.95 }}
         className={HINT_BTN}
       >
-        <Lightbulb className="h-4 w-4" strokeWidth={2.75} aria-hidden="true" />
-        {isAdmin ? t('connections.revealHint') : t('connections.freeHint', { count: freeHints })}
+        <Lightbulb className={ICON} strokeWidth={2.75} aria-hidden="true" />
+        <span className="truncate">{isAdmin ? t('connections.revealHint') : t('connections.freeHint', { count: freeHints })}</span>
       </m.button>
     );
   }
@@ -79,11 +81,11 @@ export default function HintButton({
         className={HINT_BTN}
       >
         {busy ? (
-          <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+          <Loader2 className={`${ICON} animate-spin`} aria-hidden="true" />
         ) : (
-          <Play className="h-4 w-4 fill-neo-navy" strokeWidth={2.75} aria-hidden="true" />
+          <Play className={`${ICON} fill-neo-navy`} strokeWidth={2.75} aria-hidden="true" />
         )}
-        {t('connections.revealHintAd')}
+        <span className="truncate">{t('connections.revealHintAd')}</span>
       </m.button>
     );
   }
@@ -91,8 +93,8 @@ export default function HintButton({
   if (showFallbackHint) {
     return (
       <m.button type="button" onClick={onRevealHint} disabled={disabled} whileTap={{ scale: 0.95 }} className={HINT_BTN}>
-        <Lightbulb className="h-4 w-4" strokeWidth={2.75} aria-hidden="true" />
-        {t('connections.revealHint')}
+        <Lightbulb className={ICON} strokeWidth={2.75} aria-hidden="true" />
+        <span className="truncate">{t('connections.revealHint')}</span>
       </m.button>
     );
   }
@@ -100,10 +102,11 @@ export default function HintButton({
   return (
     <span
       data-testid="hint-tomorrow"
-      className="inline-flex h-9 items-center gap-1.5 rounded-full border-2 border-neo-cream/40 px-3 font-neo-body text-xs font-bold text-neo-white/70"
+      title={t('connections.hintTomorrow')}
+      className="inline-flex h-9 min-w-0 max-w-full items-center gap-1.5 rounded-full border-2 border-neo-cream/40 px-2.5 font-neo-body text-xs font-bold text-neo-white/70"
     >
-      <Clock className="h-3.5 w-3.5" aria-hidden="true" />
-      {t('connections.hintTomorrow')}
+      <Clock className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+      <span className="truncate">{t('connections.hintTomorrow')}</span>
     </span>
   );
 }

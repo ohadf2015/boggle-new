@@ -9,6 +9,9 @@ import { useDailyPlayedStatus } from '@/hooks/useDailyPlayedStatus';
 import { DAILY_MODES, type DailyModeDef, type DailyModeId } from '@/lib/dailyModes';
 import { SPRING_PRESETS } from '@/lib/animation/presets';
 import { fireConfetti } from '@/utils/confettiUtils';
+import { triggerHaptic } from '@/utils/hapticFeedback';
+import { useDailyReveal, useMountedAfterReveal } from './reveal/DailyRevealContext';
+import { REVEAL, useRevealSequence, type RevealStage } from './reveal/revealSequence';
 
 export interface DailyResultsStat {
   value: React.ReactNode;
@@ -67,18 +70,24 @@ export function DailyResultsHero({
   const def = DAILY_MODES.find(d => d.id === mode) as DailyModeDef;
   const accent = ACCENT[def.accent];
   const [reduced] = useState(prefersReducedMotion);
-  const animateIn = celebrate && !reduced;
+  const shared = useDailyReveal();
+  const local = useRevealSequence(!shared.inProvider && celebrate && !reduced);
+  const seq = shared.inProvider ? shared : local;
+  const late = useMountedAfterReveal();
+  const animateIn = celebrate && !reduced && !late && (!shared.inProvider || shared.active);
   const [shown, setShown] = useState(animateIn ? 0 : score ?? 0);
   const celebrated = useRef(false);
+  const scoreGo = seq.stage >= REVEAL.score;
 
   useEffect(() => {
     if (score == null) return;
-    if (!animateIn || score === 0) { setShown(score); return; }
+    if (!animateIn || score === 0 || seq.skipped) { setShown(score); return; }
+    if (!scoreGo) return;
     const controls = fmAnimate(0, score, {
-      delay: 0.35, duration: 1.1, ease: [0.16, 1, 0.3, 1], onUpdate: v => setShown(Math.round(v)),
+      duration: 0.9, ease: [0.16, 1, 0.3, 1], onUpdate: v => setShown(Math.round(v)),
     });
     return () => controls?.stop?.();
-  }, [score, animateIn]);
+  }, [score, animateIn, scoreGo, seq.skipped]);
 
   // The mode's score post is fire-and-forget; re-ask once it has likely landed
   // (silent revalidation — the trail and streak update in place, no skeleton).
@@ -90,32 +99,51 @@ export function DailyResultsHero({
   }, []);
 
   useEffect(() => {
-    if (!celebrate || outcome !== 'win' || celebrated.current) return;
-    celebrated.current = true;
-    const id = setTimeout(() => { fireConfetti({ particleCount: 90, spread: 100, origin: { y: 0.3 } }); }, 450);
+    if (!celebrate || late || outcome !== 'win' || celebrated.current) return;
+    // Marked inside the timer: StrictMode's effect re-run clears the first one.
+    const id = setTimeout(() => {
+      celebrated.current = true;
+      if (shared.claimCelebration()) fireConfetti({ particleCount: 90, spread: 100, origin: { y: 0.3 } });
+    }, 450);
     return () => clearTimeout(id);
-  }, [celebrate, outcome]);
+  }, [celebrate, late, outcome, shared]);
 
-  const doneCount = DAILY_MODES.filter(d => played.today[PLAYED_KEY[d.id]]).length;
+  const doneCount = DAILY_MODES.filter(d => d.id === mode || played.today[PLAYED_KEY[d.id]]).length;
   const streak = played.streak?.current ?? 0;
   const pop = (delay: number) => (animateIn
     ? { initial: { scale: 0.6, y: 10 }, animate: { scale: 1, y: 0 }, transition: { ...SPRING_PRESETS.bouncy, delay } }
     : {});
+  // Stage-gated pose: held at `from` until the beat, then springs home. Space is reserved from the first frame.
+  const beat = (stage: RevealStage, from: Record<string, number>, delay = 0) => {
+    if (!animateIn) return {};
+    const home = Object.fromEntries(Object.keys(from).map(k => [k, k.startsWith('scale') ? 1 : 0]));
+    return {
+      initial: from,
+      animate: seq.stage >= stage ? home : from,
+      transition: seq.skipped ? { duration: 0 } : { ...SPRING_PRESETS.bouncy, delay },
+    };
+  };
+  const tapFeel = { whileTap: { scale: 0.88 }, onPointerDown: () => { triggerHaptic('light'); } };
+  const skipping = animateIn && !seq.done;
 
   return (
     <section
       data-testid="daily-results-hero"
       data-mode={mode}
       data-outcome={outcome}
+      data-reveal={seq.done ? 'done' : 'playing'}
+      onClick={skipping ? seq.skip : undefined}
       className={cn('relative w-full rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard-lg overflow-hidden', className)}
     >
+
       <span aria-hidden className={cn('absolute inset-x-0 top-0 h-1.5', accent.bg)} />
 
       <div className="flex items-center gap-2 px-4 pt-4" data-testid="daily-trail">
         <ol aria-label={t('daily.results.heroDaily')} className="flex items-center gap-1.5 shrink-0">
           {DAILY_MODES.map((d, i) => {
-            const isDone = played.today[PLAYED_KEY[d.id]];
             const isThis = d.id === mode;
+            // This screen IS the finish: don't wait for the score post to mark it done.
+            const isDone = isThis || played.today[PLAYED_KEY[d.id]];
             return (
               <li
                 key={d.id}
@@ -141,7 +169,7 @@ export function DailyResultsHero({
           })}
         </ol>
         <span data-testid="daily-trail-count" className="text-xs font-black text-neo-white/80 tabular-nums whitespace-nowrap min-w-0 truncate">
-          {t('daily.results.trailCount', { n: doneCount, total: DAILY_MODES.length })}
+          {skipping ? <span className="text-neo-white/50">{t('blastProgress.tapToSkip')}</span> : t('daily.results.trailCount', { n: doneCount, total: DAILY_MODES.length })}
         </span>
         {streak > 0 && (
           <span
@@ -170,13 +198,13 @@ export function DailyResultsHero({
             {t(def.titleKey)}{eyebrow != null && <span className="text-neo-white/60"> · {eyebrow}</span>}
           </span>
           <m.h2
-            className="font-neo-display font-black text-3xl sm:text-4xl text-neo-white leading-tight"
-            {...pop(0.12)}
+            className="font-neo-display font-black text-3xl sm:text-4xl text-neo-white leading-tight origin-[0%_60%] rtl:origin-[100%_60%]"
+            {...beat(REVEAL.stamp, { scale: 0, rotate: -10 })}
           >
             {headline}
           </m.h2>
           {score != null && (
-            <m.div className="flex items-baseline gap-1.5 mt-0.5" {...pop(0.3)}>
+            <m.div className="flex items-baseline gap-1.5 mt-0.5 w-fit cursor-pointer select-none" {...pop(0.3)} {...tapFeel}>
               <span data-testid="daily-results-score" className={cn('font-neo-display font-black text-4xl tabular-nums leading-none', accent.text)}>
                 {shown}
               </span>
@@ -186,7 +214,7 @@ export function DailyResultsHero({
         </div>
       </div>
 
-      {meter && <div className="px-4 pb-3">{meter}</div>}
+      {meter && <m.div className="px-4 pb-3" {...beat(REVEAL.stamp, { y: 10 }, 0.1)}>{meter}</m.div>}
 
       {stats && stats.length > 0 && (
         <div
@@ -197,8 +225,9 @@ export function DailyResultsHero({
             <m.div
               key={s.label}
               data-testid="daily-results-stat"
-              className="px-2 py-3 flex flex-col items-center gap-0.5 min-w-0"
-              {...pop(0.45 + i * 0.07)}
+              className="px-2 py-3 flex flex-col items-center gap-0.5 min-w-0 cursor-pointer select-none"
+              {...beat(REVEAL.stats, { scale: 0, y: 14 }, i * 0.08)}
+              {...tapFeel}
             >
               <span dir="auto" className="font-neo-display font-black text-2xl text-neo-white tabular-nums leading-none truncate max-w-full">
                 {s.value}
@@ -209,7 +238,11 @@ export function DailyResultsHero({
         </div>
       )}
 
-      {children && <div className="border-t-3 border-neo-black bg-neo-black/20 p-3">{children}</div>}
+      {children && (
+        <div className="border-t-3 border-neo-black bg-neo-black/20 p-3">
+          <m.div {...beat(REVEAL.details, { y: 16, scale: 0.94 })}>{children}</m.div>
+        </div>
+      )}
     </section>
   );
 }

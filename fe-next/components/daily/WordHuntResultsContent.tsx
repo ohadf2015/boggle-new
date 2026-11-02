@@ -235,6 +235,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
         wordsDiscovered={result.wordsDiscovered?.length || 0}
         currentUserId={profile?.id}
         meaning={result.meaning}
+        celebrate={!!isNewCompletion}
         t={t}
       />
       {!result.solved && (

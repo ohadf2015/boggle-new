@@ -364,7 +364,11 @@ const DailyChallenge: React.FC = () => {
     setShowTutorial(true);
   }, [phase, onboardedThisVisit, gameLanguage]);
 
-  const closeTutorial = useCallback(() => setShowTutorial(false), []);
+  // The first-visit lesson replaces the ready screen: closing it starts the run instead of revealing a second intro.
+  const closeTutorial = useCallback(() => {
+    setShowTutorial(false);
+    if (onboardedThisVisit && phase === 'ready') handleStartGame();
+  }, [onboardedThisVisit, phase, handleStartGame]);
   const handleShowTutorial = useCallback(() => setShowTutorial(true), []);
   // Client-side nav (no hard reload) — a hard nav while the game-active
   // beforeunload guard is armed can blank a Capacitor WebView (black screen).

@@ -27,6 +27,8 @@ interface Props {
   canPutBack: boolean;
   /** Merged stability + brace control, rendered in the dock row next to the wheel. */
   stabilitySlot?: ReactNode;
+  /** Wide only: the found-floors panel, filling the side panel under the wheel. */
+  feedSlot?: ReactNode;
   onScramble: () => void;
   onSelectTile: (i: number) => void;
   onDeselectTile: (i: number) => void;
@@ -80,6 +82,7 @@ export const V2Dock = memo(function V2Dock(p: Props) {
     if (p.swinging) p.onPutBack(); else p.onBackspace();
   };
   const tray = useMemo(() => p.wheel.map((l) => l.toUpperCase()), [p.wheel]);
+  const feed = p.wide ? p.feedSlot : null;
 
   return (
     <div
@@ -87,7 +90,9 @@ export const V2Dock = memo(function V2Dock(p: Props) {
       // FDT: tower tiles + backspace are tapped rapidly by design.
       data-feedback-ignore-rage=""
       className={
-        p.wide
+        p.wide && feed
+          ? 'absolute bottom-0 end-0 top-0 z-30 flex w-[22rem] flex-col justify-start gap-4 border-s-4 border-neo-cream/30 bg-neo-navy px-5 pb-4 pt-14 xl:w-[26rem]'
+          : p.wide
           ? 'absolute bottom-0 end-0 top-0 z-30 flex w-[22rem] flex-col justify-center border-s-4 border-neo-cream/30 bg-neo-navy px-6 pb-24 xl:w-[26rem]'
           : 'pointer-events-none absolute inset-x-0 bottom-0 z-30 px-4 pb-[max(2.25rem,calc(env(safe-area-inset-bottom)+1.25rem))] pt-7'
       }
@@ -171,6 +176,7 @@ export const V2Dock = memo(function V2Dock(p: Props) {
 
       {/* Wide layout: stability slot in the flex row */}
       {p.wide && p.stabilitySlot && <div className="pointer-events-auto">{p.stabilitySlot}</div>}
+      {feed ? <div className="flex min-h-0 flex-1 flex-col">{feed}</div> : null}
     </div>
   );
 });

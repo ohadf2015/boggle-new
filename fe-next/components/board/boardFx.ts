@@ -168,12 +168,16 @@ export function releaseFx(container: HTMLElement, path: CellRef[], geo: BoardGeo
 }
 
 function dropFlights(container: HTMLElement, s: FxState, kind: FeedbackKind) {
-  s.flights.forEach(({ el, anim }, i) => {
-    if (!el.isConnected) return;
+  const live = s.flights.map((f, i) => ({ ...f, i })).filter((f) => f.el.isConnected);
+  // Read every frozen transform before any write, so the drop costs one style recalc, not one per letter.
+  const frozen = kind === 'ok' ? [] : live.map(({ el, anim }) => {
+    anim?.pause();
+    return getComputedStyle(el).transform;
+  });
+  live.forEach(({ el, anim, i }, n) => {
     el.setAttribute('data-verdict', kind === 'ok' ? 'ok' : 'bad');
     if (kind === 'ok') return;
-    anim?.pause();
-    const now = getComputedStyle(el).transform;
+    const now = frozen[n];
     anim?.cancel();
     animate(container, el, [
       { transform: now && now !== 'none' ? now : 'translate(-50%, -50%)', opacity: 1 },

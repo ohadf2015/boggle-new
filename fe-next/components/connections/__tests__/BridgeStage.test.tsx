@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import BridgeStage from '../BridgeStage';
+import { plateFitEms } from '../plateFit';
 
 const stage = (o: { isCorrect?: boolean; isGaveUp?: boolean } = {}) =>
   render(
@@ -33,6 +34,20 @@ describe('BridgeStage', () => {
     stage({ isGaveUp: true });
     expect(screen.getByTestId('bridge-connector').className).toContain('bg-neo-red');
     expect(screen.queryByTestId('spark-burst')).toBeNull();
+  });
+
+  it('sizes each plate from its own longest word and never breaks inside a word', () => {
+    render(
+      <BridgeStage word1="FIREPLACE" word2="ICE" isCorrect={false} isGaveUp={false}>
+        <span />
+      </BridgeStage>,
+    );
+    const long = screen.getByText('FIREPLACE');
+    const short = screen.getByText('ICE');
+    expect(long.style.getPropertyValue('--plate-fit')).toBe(String(plateFitEms('FIREPLACE')));
+    expect(short.style.getPropertyValue('--plate-fit')).toBe(String(plateFitEms('ICE')));
+    expect(long.className).toContain('var(--plate-fit)');
+    expect(long.className).not.toContain('overflow-wrap:anywhere');
   });
 
   it('never starts a visible layer at opacity 0 (a stalled animation bundle must not blank the puzzle)', () => {

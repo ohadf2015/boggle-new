@@ -1,9 +1,10 @@
 import React from 'react';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, within, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { DailyResultsHero } from '../DailyResultsHero';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { fireConfetti } from '@/utils/confettiUtils';
+import { DailyRevealProvider } from '../reveal/DailyRevealContext';
 
 vi.mock('@/utils/confettiUtils', () => ({ fireConfetti: vi.fn() }));
 vi.mock('next/navigation', () => ({
@@ -104,5 +105,94 @@ describe('DailyResultsHero', () => {
     vi.advanceTimersByTime(10000);
     expect(playedStatus.refresh).toHaveBeenCalledTimes(1);
     vi.useRealTimers();
+  });
+
+  it('Given the score post has not landed yet, When the hero renders, Then the mode just finished already reads done', () => {
+    renderHero({ mode: 'connections' });
+    expect(screen.getByTestId('daily-trail-connections')).toHaveAttribute('data-state', 'done');
+    expect(screen.getByTestId('daily-trail-count')).toHaveTextContent('3/4');
+  });
+
+  describe('with motion allowed', () => {
+    beforeEach(() => {
+      window.matchMedia = vi.fn().mockImplementation((q: string) => ({
+        matches: false, media: q, addEventListener: vi.fn(), removeEventListener: vi.fn(),
+      })) as unknown as typeof window.matchMedia;
+    });
+
+    it('Given a fresh finish, When the player taps the hero mid-reveal, Then the sequence settles at once', () => {
+      vi.useFakeTimers();
+      renderHero({ celebrate: true });
+      const hero = screen.getByTestId('daily-results-hero');
+      expect(hero).toHaveAttribute('data-reveal', 'playing');
+      fireEvent.click(hero);
+      expect(hero).toHaveAttribute('data-reveal', 'done');
+      expect(screen.getByTestId('daily-results-score')).toHaveTextContent('420');
+      vi.useRealTimers();
+    });
+
+    it('Given a revisit, Then the hero renders settled with no skip affordance', () => {
+      renderHero({ celebrate: false });
+      expect(screen.getByTestId('daily-results-hero')).toHaveAttribute('data-reveal', 'done');
+      expect(screen.getByTestId('daily-results-score')).toHaveTextContent('420');
+    });
+
+    it('Given a screen that mounts the hero twice (mobile + desktop), Then a fresh win fires confetti once', () => {
+      vi.useFakeTimers();
+      render(
+        <LanguageProvider initialLanguage="en">
+          <DailyRevealProvider celebrate>
+            <DailyResultsHero mode="word-hunt" outcome="win" headline="Solved!" score={420} celebrate />
+            <DailyResultsHero mode="word-hunt" outcome="win" headline="Solved!" score={420} celebrate />
+          </DailyRevealProvider>
+        </LanguageProvider>,
+      );
+      act(() => { vi.advanceTimersByTime(3000); });
+      vi.useRealTimers();
+      expect(fireConfetti).toHaveBeenCalledTimes(1);
+    });
+
+    it('Given StrictMode, Then a fresh win still fires confetti', () => {
+      vi.useFakeTimers();
+      render(
+        <React.StrictMode>
+          <LanguageProvider initialLanguage="en">
+            <DailyResultsHero mode="word-hunt" outcome="win" headline="Solved!" score={420} celebrate />
+          </LanguageProvider>
+        </React.StrictMode>,
+      );
+      act(() => { vi.advanceTimersByTime(1000); });
+      vi.useRealTimers();
+      expect(fireConfetti).toHaveBeenCalledTimes(1);
+    });
+  });
+});
+
+describe('DailyResultsHero remounted after the reveal (tab switch)', () => {
+  it('Given the shared reveal already finished, When the hero remounts, Then it renders settled with no confetti', () => {
+    vi.useFakeTimers();
+    window.matchMedia = vi.fn().mockImplementation((q: string) => ({
+      matches: false, media: q, addEventListener: vi.fn(), removeEventListener: vi.fn(),
+    })) as unknown as typeof window.matchMedia;
+    function Screen({ tab }: { tab: number }) {
+      return (
+        <LanguageProvider initialLanguage="en">
+          <DailyRevealProvider celebrate>
+            {tab === 0 ? <DailyResultsHero key="a" mode="word-hunt" outcome="win" headline="Solved!" score={420} celebrate /> : <div />}
+          </DailyRevealProvider>
+        </LanguageProvider>
+      );
+    }
+    const { rerender } = render(<Screen tab={0} />);
+    act(() => { vi.advanceTimersByTime(3000); });
+    vi.mocked(fireConfetti).mockClear();
+    rerender(<Screen tab={1} />);
+    rerender(<Screen tab={0} />);
+    const hero = screen.getByTestId('daily-results-hero');
+    expect(hero).toHaveAttribute('data-reveal', 'done');
+    expect(screen.getByTestId('daily-results-score')).toHaveTextContent('420');
+    act(() => { vi.advanceTimersByTime(3000); });
+    vi.useRealTimers();
+    expect(fireConfetti).not.toHaveBeenCalled();
   });
 });

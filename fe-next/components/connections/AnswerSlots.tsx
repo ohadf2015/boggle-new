@@ -38,17 +38,18 @@ const CELL_STATE: Record<AnswerSlotsProps['state'], { filled: string; empty: str
 /**
  * Each cell takes an equal share of the row: the row (100cqi) minus its gaps
  * (0.375rem each, matching `gap-1.5`), divided by `--slots`, capped at 2.5rem so
- * a 3-letter answer doesn't render giant cells. Because the shares always sum to
- * the row width, N cells fit at any N — that is what lets the row be
- * `flex-nowrap` without ever overflowing. Font size keeps the original
- * text-2xl:w-10 ratio (1.5 / 2.5 = 0.6) as the cell shrinks.
+ * a 3-letter answer doesn't render giant cells (3rem on tall phones). Because the
+ * shares always sum to the row width, N cells fit at any N — that is what lets the row be
+ * `flex-nowrap` without ever overflowing. The letter takes `--fs` of the cell:
+ * 0.6 normally, more in the narrow cells of a long answer.
  *
  * Written out literally rather than composed from constants: Tailwind only
  * generates an arbitrary value it can see verbatim in the source.
  */
-const CELL_W = 'w-[min(2.5rem,calc((100cqi-(var(--slots)-1)*var(--gap))/var(--slots)))]';
+const CELL_W =
+  'w-[min(2.5rem,calc((100cqi-(var(--slots)-1)*var(--gap))/var(--slots)))] [@media(min-height:780px)]:w-[min(3rem,calc((100cqi-(var(--slots)-1)*var(--gap))/var(--slots)))]';
 const CELL_TEXT =
-  'text-[calc(min(2.5rem,calc((100cqi-(var(--slots)-1)*var(--gap))/var(--slots)))*0.6)]';
+  'text-[calc(min(2.5rem,calc((100cqi-(var(--slots)-1)*var(--gap))/var(--slots)))*var(--fs))] [@media(min-height:780px)]:text-[calc(min(3rem,calc((100cqi-(var(--slots)-1)*var(--gap))/var(--slots)))*var(--fs))]';
 
 /**
  * Long answers spend most of the row on gaps: at 14 cells the default 0.375rem
@@ -72,6 +73,7 @@ export default function AnswerSlots({ value, slotCount, state, dir, label }: Ans
         containerType: 'inline-size',
         ['--slots' as string]: slotCount,
         ['--gap' as string]: slotCount > TIGHT_GAP_FROM ? '0.125rem' : '0.375rem',
+        ['--fs' as string]: slotCount > TIGHT_GAP_FROM ? 0.72 : 0.6,
       }}
     >
       {Array.from({ length: slotCount }, (_, i) => {

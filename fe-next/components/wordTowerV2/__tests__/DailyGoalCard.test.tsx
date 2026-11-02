@@ -34,4 +34,18 @@ describe('DailyGoalCard', () => {
 
     expect(onKeepClimbing).toHaveBeenCalledTimes(1);
   });
+
+  it('given the desktop rail, then the card sits in the rail flow instead of floating over the tower', () => {
+    render(<DailyGoalCard t={t} growthM={12} docked onKeepClimbing={() => {}} onBank={() => {}} />);
+
+    const card = screen.getByRole('status');
+    expect(card.className).not.toContain('absolute');
+    expect(card.className).not.toContain('max-w-xs');
+  });
+
+  it('given a phone, then the card floats over the tower', () => {
+    render(<DailyGoalCard t={t} growthM={12} onKeepClimbing={() => {}} onBank={() => {}} />);
+
+    expect(screen.getByRole('status').className).toContain('absolute');
+  });
 });

@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
+import { m } from 'framer-motion';
 import { Coins, Hammer, Home, Medal, Send, Target, X } from 'lucide-react';
 import { useRegisterHeaderAudioControl } from '@/contexts/NavigationContext';
 import { DailyResultsHero } from '@/components/daily/results/DailyResultsHero';
+import { DailyResultsFrame } from '@/components/daily/results/DailyResultsFrame';
+import { DailyRevealProvider, useDailyReveal } from '@/components/daily/results/reveal/DailyRevealContext';
+import { REVEAL } from '@/components/daily/results/reveal/revealSequence';
 import { floorsAt } from '@/lib/wordTowerV2/biomes';
 import type { RevengeEntry, RivalView } from './useEstate';
 import { RaidFlow } from './rivals/RaidFlow';
@@ -13,10 +17,15 @@ import type { V2ResultsProps } from './V2Results';
 
 type Props = V2ResultsProps & { daily: NonNullable<V2ResultsProps['daily']> };
 
-function GoalMeter({ t, daily, coins }: { t: Props['t']; daily: Props['daily']; coins: React.ReactNode }) {
+const MAX_BRICKS = 12;
+
+function GoalMeter({ t, daily, coins, floors }: { t: Props['t']; daily: Props['daily']; coins: React.ReactNode; floors: number }) {
   const hit = daily.targetM > 0 && daily.growthM >= daily.targetM;
   const pct = daily.targetM > 0 ? Math.min(100, (daily.growthM / daily.targetM) * 100) : 0;
   const unit = t('wordTowerV2.unitM');
+  const reveal = useDailyReveal();
+  const built = !reveal.active || reveal.stage >= REVEAL.stamp;
+  const snap = reveal.skipped ? { duration: 0 } : undefined;
   return (
     <div data-testid="wt2-daily-meter" className="flex flex-col gap-1.5">
       <div className="flex items-center gap-2 font-neo-display text-xs font-black uppercase tracking-wide text-neo-white/80">
@@ -30,7 +39,25 @@ function GoalMeter({ t, daily, coins }: { t: Props['t']; daily: Props['daily']; 
         </span>
       </div>
       <div className="h-2.5 overflow-hidden rounded-sm border-2 border-neo-cream bg-neo-navy" role="progressbar" aria-valuemin={0} aria-valuemax={daily.targetM} aria-valuenow={Math.min(daily.growthM, daily.targetM)}>
-        <div className={`h-full origin-left ${hit ? 'bg-neo-lime' : 'bg-neo-yellow'}`} style={{ transform: `scaleX(${pct / 100})` }} />
+        <m.div
+          className={`h-full origin-left ${hit ? 'bg-neo-lime' : 'bg-neo-yellow'}`}
+          initial={reveal.active ? { scaleX: 0 } : false}
+          animate={{ scaleX: built ? pct / 100 : 0 }}
+          transition={snap ?? { type: 'spring', stiffness: 120, damping: 20 }}
+        />
+      </div>
+      {/* Today's floors, laid one on another on the stamp beat. */}
+      <div aria-hidden data-testid="wt2-daily-bricks" className="flex flex-wrap items-end gap-0.5">
+        {Array.from({ length: Math.min(floors, MAX_BRICKS) }, (_, i) => (
+          <m.span
+            key={i}
+            className={`block h-2.5 w-4 rounded-[2px] border border-neo-black ${i % 2 ? 'bg-neo-cyan' : 'bg-neo-cream'}`}
+            initial={reveal.active ? { y: -16, scale: 0.4 } : false}
+            animate={built ? { y: 0, scale: 1 } : { y: -16, scale: 0.4 }}
+            transition={snap ?? { type: 'spring', stiffness: 520, damping: 18, delay: i * 0.05 }}
+          />
+        ))}
+        {floors > MAX_BRICKS && <span className="ms-1 font-neo-display text-[10px] font-black text-neo-white/70 tabular-nums">{`+${floors - MAX_BRICKS}`}</span>}
       </div>
       {coins}
     </div>
@@ -76,83 +103,9 @@ export function DailyTowerResults(p: Props) {
       </div>
     ) : null;
 
-  return (
+  const hasAside = !!(p.nextSlot || p.boardSlot || p.rivals || p.extra || (p.onSmash && p.smashLabel));
+  const asideNode = hasAside ? (
     <>
-      <div
-        data-testid="wt2-daily-results"
-        data-wt2-results-backdrop
-        className="absolute inset-0 z-40 flex flex-col bg-neo-navy"
-        role="dialog"
-        aria-modal="true"
-      >
-        <div className="relative h-14 shrink-0 pt-[env(safe-area-inset-top)]">
-          <ResultsMute />
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label={t('wordTowerV2.results.close')}
-            className="absolute end-3 top-[max(0.75rem,env(safe-area-inset-top))] flex h-8 w-8 items-center justify-center rounded-neo border-neo border-neo-black bg-neo-cream text-neo-navy shadow-hard-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
-          >
-            <X className="h-4 w-4" aria-hidden />
-          </button>
-        </div>
-        <div data-wt2-results-scroll className="min-h-0 flex-1 overflow-y-auto px-4 pb-4">
-          <div className="mx-auto flex w-full max-w-md flex-col gap-4 md:max-w-xl">
-            <DailyResultsHero
-              mode="word-tower"
-              outcome={p.isBest || hit ? 'win' : 'done'}
-              headline={headline}
-              eyebrow={p.dateLabel}
-              score={daily.growthM}
-              scoreLabel={t('wordTowerV2.dailyTower.grewToday')}
-              celebrate={p.celebrate}
-              meter={<GoalMeter t={t} daily={daily} coins={coinsLine} />}
-              stats={[
-                { value: floors, label: t('wordTowerV2.dailyResults.floors') },
-                { value: `${p.peakM.toFixed(1)}${t('wordTowerV2.unitM')}`, label: t('wordTowerV2.dailyResults.height') },
-                { value: p.bestWord ? p.bestWord.toUpperCase() : '—', label: t('wordTowerV2.dailyResults.bestWord') },
-              ]}
-            >
-              {p.recapSrc || p.onShare ? (
-                <div className="flex items-center gap-3">
-                  {p.recapSrc ? (
-                    // Runtime-generated recap PNG: next/image cannot optimize it.
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={p.recapSrc}
-                      alt={t('wordTowerV2.recapAlt', { floors, m: p.peakM.toFixed(1) })}
-                      className="w-28 shrink-0 rounded-md border-2 border-neo-black"
-                      width={1200}
-                      height={630}
-                    />
-                  ) : null}
-                  {p.onShare ? (
-                    <button
-                      type="button"
-                      onClick={p.onShare}
-                      aria-label={t('wordTowerV2.wreck.share')}
-                      className="flex min-w-0 flex-1 items-center justify-center gap-2 rounded-neo border-neo-thick border-neo-black bg-neo-cyan px-3 py-2.5 font-neo-display text-base font-black uppercase text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
-                    >
-                      <Send className="h-5 w-5 shrink-0" aria-hidden />
-                      <span className="truncate">{t('wordTowerV2.wreck.share')}</span>
-                    </button>
-                  ) : null}
-                </div>
-              ) : null}
-            </DailyResultsHero>
-
-            {p.badges.length > 0 ? (
-              <ul className="flex flex-wrap justify-center gap-1.5" aria-label={t('wordTowerV2.results.badges')}>
-                {p.badges.map((id) => (
-                  <li key={id} className="flex items-center gap-1 rounded-neo border-neo border-neo-black bg-neo-purple px-2 py-0.5 font-neo-display text-xs font-bold text-neo-white shadow-hard-sm">
-                    <Medal className="h-3.5 w-3.5" aria-hidden />
-                    {t(`wordTowerV2.ach.${id}.name`)}
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-
-            <DailyChestRow t={t} payoutStatus={p.payoutStatus} reducedMotion={reducedMotion} />
             {p.nextSlot}
             {p.boardSlot}
             {p.rivals ? (
@@ -179,7 +132,88 @@ export function DailyTowerResults(p: Props) {
                 ) : null}
               </div>
             ) : null}
-          </div>
+    </>
+  ) : undefined;
+
+  return (
+    <DailyRevealProvider celebrate={!!p.celebrate}>
+      <div
+        data-testid="wt2-daily-results"
+        data-wt2-results-backdrop
+        className="absolute inset-0 z-40 flex flex-col bg-neo-navy"
+        role="dialog"
+        aria-modal="true"
+      >
+        <div className="relative h-14 shrink-0 pt-[env(safe-area-inset-top)]">
+          <ResultsMute />
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label={t('wordTowerV2.results.close')}
+            className="absolute end-3 top-[max(0.75rem,env(safe-area-inset-top))] flex h-8 w-8 items-center justify-center rounded-neo border-neo border-neo-black bg-neo-cream text-neo-navy shadow-hard-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+          >
+            <X className="h-4 w-4" aria-hidden />
+          </button>
+        </div>
+        <div data-wt2-results-scroll className="min-h-0 flex-1 overflow-y-auto pb-4">
+          <DailyResultsFrame testId="wt2-daily-results-frame" maxWidth="lg:max-w-4xl" aside={asideNode}>
+            <DailyResultsHero
+              mode="word-tower"
+              outcome={p.isBest || hit ? 'win' : 'done'}
+              headline={headline}
+              eyebrow={p.dateLabel}
+              score={daily.growthM}
+              scoreLabel={t('wordTowerV2.dailyTower.grewToday')}
+              celebrate={p.celebrate}
+              meter={<GoalMeter t={t} daily={daily} coins={coinsLine} floors={floors} />}
+              stats={[
+                { value: floors, label: t('wordTowerV2.dailyResults.floors') },
+                { value: `${p.peakM.toFixed(1)}${t('wordTowerV2.unitM')}`, label: t('wordTowerV2.dailyResults.height') },
+                { value: p.bestWord ? p.bestWord.toUpperCase() : '—', label: t('wordTowerV2.dailyResults.bestWord') },
+              ]}
+            >
+              {p.recapSrc || p.onShare ? (
+                <div className="flex items-center gap-3">
+                  {p.recapSrc ? (
+                    // Runtime-generated recap PNG: next/image cannot optimize it.
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={p.recapSrc}
+                      alt={t('wordTowerV2.recapAlt', { floors, m: p.peakM.toFixed(1) })}
+                      className="w-28 shrink-0 rounded-md border-2 border-neo-black"
+                      width={1200}
+                      height={630}
+                    />
+                  ) : null}
+                  {p.onShare ? (
+                    <m.button
+                      type="button"
+                      whileTap={{ scale: 0.92, rotate: -2 }}
+                      onClick={p.onShare}
+                      aria-label={t('wordTowerV2.wreck.share')}
+                      className="flex min-w-0 flex-1 items-center justify-center gap-2 rounded-neo border-neo-thick border-neo-black bg-neo-cyan px-3 py-2.5 font-neo-display text-base font-black uppercase text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
+                    >
+                      <Send className="h-5 w-5 shrink-0" aria-hidden />
+                      <span className="truncate">{t('wordTowerV2.wreck.share')}</span>
+                    </m.button>
+                  ) : null}
+                </div>
+              ) : null}
+            </DailyResultsHero>
+
+            {p.badges.length > 0 ? (
+              <ul className="flex flex-wrap justify-center gap-1.5" aria-label={t('wordTowerV2.results.badges')}>
+                {p.badges.map((id) => (
+                  <li key={id} className="flex items-center gap-1 rounded-neo border-neo border-neo-black bg-neo-purple px-2 py-0.5 font-neo-display text-xs font-bold text-neo-white shadow-hard-sm">
+                    <Medal className="h-3.5 w-3.5" aria-hidden />
+                    {t(`wordTowerV2.ach.${id}.name`)}
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+
+            <DailyChestRow t={t} payoutStatus={p.payoutStatus} reducedMotion={reducedMotion} />
+          </DailyResultsFrame>
         </div>
 
         <div data-wt2-results-actions className="shrink-0 border-t-3 border-neo-cream bg-neo-navy-light p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
@@ -215,6 +249,6 @@ export function DailyTowerResults(p: Props) {
           onClose={() => setTarget(null)}
         />
       ) : null}
-    </>
+    </DailyRevealProvider>
   );
 }

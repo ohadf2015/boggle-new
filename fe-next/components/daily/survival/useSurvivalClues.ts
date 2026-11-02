@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo, useRef } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import type { LetterFeedback } from '@/utils/wordHuntFeedback';
 import type { AccumulatedClue } from './types';
 import { fireConfetti } from '@/utils/confettiUtils';
@@ -37,6 +37,8 @@ export function useSurvivalClues({
   const [accumulatedClues, setAccumulatedClues] = useState<Map<number, AccumulatedClue>>(new Map());
   const [knownLetters, setKnownLetters] = useState<Set<string>>(new Set());
   const [isClueGaining, setIsClueGaining] = useState(false);
+  const glowTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  useEffect(() => () => clearTimeout(glowTimer.current), []);
 
   const normalizedTarget = targetWord.toUpperCase();
 
@@ -330,7 +332,8 @@ export function useSurvivalClues({
     if (cluesRevealed <= 0) return;
 
     setIsClueGaining(true);
-    setTimeout(() => setIsClueGaining(false), 800);
+    clearTimeout(glowTimer.current);
+    glowTimer.current = setTimeout(() => setIsClueGaining(false), 800);
 
     hapticClueRevealed(cluesRevealed);
 
