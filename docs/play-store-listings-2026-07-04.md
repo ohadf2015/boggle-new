@@ -1,5 +1,6 @@
 # Play Store Listings — LIVE COPY (source of truth)
 
+> 2026-11-02: en-GB full description keyword pass (word search / anagram / online; Adventure line dropped to match live); ja-JP short+full re-synced (live short had 完全無料 + 世界ランキング, both Google price/rank-word triggers). Committed via androidpublisher edit 11053173529164930069.
 > Updated 2026-07-04 via androidpublisher API (edit committed; managed publishing OFF — changes auto-publish once Google review approves, verified in Console same day).
 > Changes: NEW ru-RU listing · 5→6 languages everywhere · Word Tower added to mode lists · removed Jackbox/Boggle trademark line (Play metadata policy risk).
 > Supersedes: docs/google-play-store-listing.md, docs/store-listing-hebrew.md, docs/store-listing-swedish.md, docs/store-listing-japanese.md (copy sections only — those files keep tags/rating-questionnaire notes).
@@ -16,20 +17,19 @@
 **Full description**:
 
 ```
-Real-time multiplayer word games. Build words, battle friends live, and climb global leaderboards — no waiting for turns.
+Real-time multiplayer word game: a fast word search you play live with friends. Swipe letters, build words, battle online and climb the leaderboards — no waiting for turns.
 
-You know that feeling when you spot a word nobody else saw? That rush is what LexiClash is built on. Swipe letters, build words, outscore everyone — all happening live. Real opponents, real pressure, real satisfaction when you drop a 7-letter bomb while everyone else is stuck on CAT.
+You know that feeling when you spot a word nobody else saw? That rush is what LexiClash is built on. Swipe letters through the grid, find every hidden word, outscore everyone — all happening live. Real opponents, real pressure, real satisfaction when you drop a 7-letter bomb while everyone else is stuck on CAT.
 
 WHY IT'S DIFFERENT
-Most word games are slow — play a word, put the phone down, wait for grandma to respond next Tuesday. LexiClash runs in real time. Everyone plays the same board, same clock, same panic. A live word hunt where the fastest mind wins.
+Most word games are slow — play a word, put the phone down, wait for grandma to respond next Tuesday. LexiClash runs in real time. Everyone plays the same board, same clock, same panic. Part word search, part anagram sprint, a live word hunt where the fastest mind wins.
 
 6 LANGUAGES, REAL DICTIONARIES
 Play in English, Spanish, Russian, Hebrew, Swedish, or Japanese — not just translated menus, but full word dictionaries for each language. Switch mid-session whenever you want.
 
 GAME MODES
 • Word Arena — live multiplayer word battles. Quick Start finds an opponent in seconds, or make a private room for people you know.
-• Daily Challenge — a fresh daily word challenge. Same puzzle for everyone; compare your score against the whole player base.
-• Adventure — 100+ levels across themed worlds with new rules each world: gravity, locked tiles, and other curveballs.
+• Daily Challenge — a fresh daily word puzzle. Same puzzle for everyone; compare your score against the whole player base.
 • Blast — fast tile-clearing combo chains. Chain words, trigger cascades, beat the board.
 • Word Tower — turn words into floors and stack the tallest tower you can.
 • Word Bridge — chain-building logic puzzles that connect words into a path.

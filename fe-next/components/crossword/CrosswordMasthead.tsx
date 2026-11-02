@@ -50,7 +50,7 @@ export function CrosswordMasthead({
 
         {streak > 0 ? (
           <span
-            className="flex items-center gap-1 font-neo-display font-extrabold text-sm text-neo-navy tabular-nums"
+            className="me-10 flex items-center gap-1 font-neo-display font-extrabold text-sm text-neo-navy tabular-nums lg:me-0"
             aria-label={streakLabel}
             title={streakLabel}
           >

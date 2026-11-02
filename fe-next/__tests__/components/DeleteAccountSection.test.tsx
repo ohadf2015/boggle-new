@@ -24,6 +24,20 @@ vi.mock('framer-motion', () => {
 vi.mock('@/contexts/AuthContext');
 vi.mock('@/contexts/LanguageContext');
 vi.mock('@/lib/supabase', () => ({ signOut: vi.fn() }));
+vi.mock('@/utils/authFetch', () => ({ fetchWithAuth: vi.fn() }));
+vi.mock('@/lib/education/teacherDeleteTelemetry', () => ({
+  trackTeacherDeleteViewed: vi.fn(),
+  trackTeacherDeleteReasonSelected: vi.fn(),
+  trackTeacherDeleteAlternativeChosen: vi.fn(),
+  trackTeacherDeleteConfirmed: vi.fn(),
+}));
+
+const impactState = {
+  impact: null as import('@/lib/account/deleteAccountImpact').DeleteImpactSummary | null,
+};
+vi.mock('@/lib/account/useDeleteImpact', () => ({
+  useDeleteImpact: () => ({ impact: impactState.impact, isLoading: false, reload: vi.fn() }),
+}));
 
 const mockPush = vi.fn();
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: mockPush }) }));
@@ -32,6 +46,7 @@ const mockT = (key: string) => key;
 
 beforeEach(() => {
   vi.clearAllMocks();
+  impactState.impact = null;
   (useLanguage as Mock).mockReturnValue({ t: mockT, language: 'en' });
   (useAuth as Mock).mockReturnValue({ user: { id: 'user-123' } });
   global.fetch = vi.fn();
@@ -81,7 +96,10 @@ describe('DeleteAccountSection', () => {
     fireEvent.click(screen.getByText('settings.deleteAccountConfirmButton'));
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith('/api/account/delete', { method: 'DELETE' });
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/account/delete',
+        expect.objectContaining({ method: 'DELETE' })
+      );
     });
     await waitFor(() => {
       expect(signOut).toHaveBeenCalled();
@@ -137,5 +155,69 @@ describe('DeleteAccountSection', () => {
     // Surface migrated from raw bg-slate-800 to the neo token (cosy-themable).
     const card = screen.getByText('settings.deleteAccount').closest('[class*="border-neo-red"]');
     expect(card?.className).toContain('bg-neo-navy-light');
+  });
+
+  describe('teacher-aware flow (t_b5825a0a)', () => {
+    const TEACHER_IMPACT = {
+      isTeacher: true,
+      classrooms: [{ id: 'c1', name: 'Period 3', studentCount: 19 }],
+      totalStudents: 19,
+      roundsPlayed: 15,
+      emailSubscribed: true,
+    };
+
+    beforeEach(() => {
+      impactState.impact = TEACHER_IMPACT;
+    });
+
+    it('a classroom teacher sees the impact step instead of the bare DELETE form', () => {
+      render(<DeleteAccountSection isDarkMode={false} />);
+      fireEvent.click(screen.getByText('settings.deleteAccountButton'));
+      expect(screen.getByTestId('teacher-delete-interstitial')).toBeInTheDocument();
+      expect(screen.queryByPlaceholderText('DELETE')).not.toBeInTheDocument();
+    });
+
+    it('continue reveals the irreversible DELETE form', () => {
+      render(<DeleteAccountSection isDarkMode={false} />);
+      fireEvent.click(screen.getByText('settings.deleteAccountButton'));
+      fireEvent.click(screen.getByText('settings.teacherDeleteContinue'));
+      expect(screen.getByPlaceholderText('DELETE')).toBeInTheDocument();
+    });
+
+    it('"keep free account" closes the panel without any DELETE call', () => {
+      render(<DeleteAccountSection isDarkMode={false} />);
+      fireEvent.click(screen.getByText('settings.deleteAccountButton'));
+      fireEvent.click(screen.getByText('settings.teacherDeleteKeepFree'));
+      expect(screen.queryByTestId('teacher-delete-interstitial')).not.toBeInTheDocument();
+      expect(global.fetch).not.toHaveBeenCalledWith(
+        '/api/account/delete',
+        expect.objectContaining({ method: 'DELETE' })
+      );
+    });
+
+    it('the DELETE body carries the picked reason and settings surface', async () => {
+      (global.fetch as Mock).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ success: true }),
+      });
+      (signOut as Mock).mockResolvedValue(undefined);
+
+      render(<DeleteAccountSection isDarkMode={false} />);
+      fireEvent.click(screen.getByText('settings.deleteAccountButton'));
+      fireEvent.click(screen.getByText('settings.teacherDeleteReason.too_many_emails'));
+      fireEvent.click(screen.getByText('settings.teacherDeleteContinue'));
+      fireEvent.change(screen.getByPlaceholderText('DELETE'), { target: { value: 'DELETE' } });
+      fireEvent.click(screen.getByText('settings.deleteAccountConfirmButton'));
+
+      await waitFor(() => {
+        expect(global.fetch).toHaveBeenCalledWith(
+          '/api/account/delete',
+          expect.objectContaining({
+            method: 'DELETE',
+            body: JSON.stringify({ reason: 'too_many_emails', surface: 'settings' }),
+          })
+        );
+      });
+    });
   });
 });

@@ -26,8 +26,17 @@ export const MAX_SCALE = 3;
  * target — so it opens showing roughly VISIBLE_COLS columns and is panned like a paper.
  */
 const VISIBLE_COLS = 7;
-export function initialScale(size: number): number {
+/** Smallest comfortable cell (CSS px): the touch-target size, and the point past which zoom is pointless. */
+const COMFY_CELL = 44;
+const FITS_CELL = 40;
+export function initialScale(size: number, vw?: number): number {
   if (size <= VISIBLE_COLS) return 1;
+  if (vw && vw > 0) {
+    // Measured: a desktop board already gives roomy cells, so open fitted; a phone zooms only as
+    // far as a touch-size cell needs, never the blind size/7 guess.
+    if (vw / size >= FITS_CELL) return 1;
+    return Math.min(MAX_SCALE, COMFY_CELL / (vw / size));
+  }
   return Math.min(MAX_SCALE, size / VISIBLE_COLS);
 }
 

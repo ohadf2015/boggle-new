@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import type { Slot } from '@/lib/crossword/types';
 
 export interface CrosswordClueListProps {
@@ -80,6 +80,13 @@ function Section({
   capturedSlotIds?: string[];
   t: (key: string, fallbackOrParams?: string | Record<string, string | number>) => string;
 }) {
+  // Keep the active clue in view as the cursor moves along a long rail. `nearest` so a clue that
+  // is already visible never makes the rail jump.
+  const activeRef = useRef<HTMLButtonElement | null>(null);
+  useEffect(() => {
+    activeRef.current?.scrollIntoView?.({ block: 'nearest' });
+  }, [activeSlotId]);
+
   return (
     <div
       data-dir={dir}
@@ -98,6 +105,7 @@ function Section({
                 type="button"
                 data-slot-number={slot.number}
                 data-captured={captured ? 'true' : undefined}
+                ref={active ? activeRef : undefined}
                 aria-current={active ? 'true' : undefined}
                 onClick={() => onSelect(slot)}
                 className={`flex w-full items-baseline gap-2 text-start rounded-none px-2 py-1 leading-snug transition-colors ${

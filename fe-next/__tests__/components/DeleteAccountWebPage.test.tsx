@@ -119,7 +119,10 @@ describe('DeleteAccountPageClient', () => {
       fireEvent.click(screen.getByText('settings.deleteAccountConfirmButton'));
 
       await waitFor(() => {
-        expect(global.fetch).toHaveBeenCalledWith('/api/account/delete', { method: 'DELETE' });
+        expect(global.fetch).toHaveBeenCalledWith(
+          '/api/account/delete',
+          expect.objectContaining({ method: 'DELETE' })
+        );
       });
       await waitFor(() => {
         expect(screen.getByText('deleteAccountWeb.deleted')).toBeInTheDocument();

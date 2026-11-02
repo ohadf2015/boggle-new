@@ -6,7 +6,7 @@ import { Delete } from 'lucide-react';
 const KEY_BASE =
   'border-neo border-black rounded-neo shadow-hard active:translate-y-[1px] active:shadow-hard-pressed disabled:opacity-40';
 
-export function LetterKey({ ch, onPress, disabled, className = 'h-11' }: { ch: string; onPress: (ch: string) => void; disabled?: boolean; className?: string }) {
+export function LetterKey({ ch, onPress, disabled, className = 'h-11 [@media(min-height:800px)]:h-[3.25rem]' }: { ch: string; onPress: (ch: string) => void; disabled?: boolean; className?: string }) {
   return (
     <button
       type="button"
@@ -20,7 +20,7 @@ export function LetterKey({ ch, onPress, disabled, className = 'h-11' }: { ch: s
 }
 
 export function ActionKey({
-  label, onPress, disabled, pressed, children, className = 'h-11 px-3 min-w-[2.75rem]',
+  label, onPress, disabled, pressed, children, className = 'h-11 px-3 min-w-[2.75rem] [@media(min-height:800px)]:h-[3.25rem]',
 }: { label: string; onPress: () => void; disabled?: boolean; pressed?: boolean; children: ReactNode; className?: string }) {
   return (
     <button

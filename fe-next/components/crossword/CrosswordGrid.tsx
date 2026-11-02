@@ -1,12 +1,11 @@
 'use client';
 
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, type CSSProperties } from 'react';
 import { currentSlot, type GameState } from '@/lib/crossword/gameState';
 import { solvedSlotIds } from '@/lib/crossword/stats';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { CrosswordCell } from './CrosswordCell';
 import { useBoardPanZoom, ZOOM_STEP } from './useBoardPanZoom';
-import { initialScale } from '@/lib/crossword/viewport';
 
 export interface CrosswordGridProps {
   state: GameState;
@@ -29,9 +28,10 @@ export function CrosswordGrid({ state, onSelect, t, solved = false }: CrosswordG
       puzzle.difficulty
     ] ?? 'shadow-hard-lg';
 
-  // A mini always fits its box, so it gets neither pan nor zoom chrome.
-  const zoomable = initialScale(size) > 1;
   const pan = useBoardPanZoom({ size, rtl: puzzle.rtl, active });
+  // Only a board whose cells fall under touch size gets zoom chrome — a mini, or a full grid on a
+  // roomy desktop board, always fits.
+  const zoomable = pan.zoomable;
 
   const slot = currentSlot(state);
   const activeSlotCells = useMemo(
@@ -122,7 +122,7 @@ export function CrosswordGrid({ state, onSelect, t, solved = false }: CrosswordG
     <div
       ref={pan.viewportRef}
       data-crossword-board
-      className={`relative m-auto aspect-square w-[min(100cqmin,28rem)] lg:w-full lg:max-w-[28rem] overflow-hidden touch-none select-none bg-black ${diffShadow} border-[3px] border-black`}
+      className={`relative m-auto aspect-square w-[min(100cqmin,28rem)] lg:w-full overflow-hidden touch-none select-none bg-black ${diffShadow} border-[3px] border-black`}
       onPointerDown={pan.onPointerDown}
       onPointerMove={pan.onPointerMove}
       onPointerUp={pan.onPointerUp}
@@ -134,7 +134,7 @@ export function CrosswordGrid({ state, onSelect, t, solved = false }: CrosswordG
       <div
         ref={pan.contentRef}
         className="absolute inset-0 will-change-transform"
-        style={{ transformOrigin: '0 0' }}
+        style={{ transformOrigin: '0 0', containerType: 'inline-size' }}
       >
         <div
           ref={gridRef}
@@ -142,13 +142,16 @@ export function CrosswordGrid({ state, onSelect, t, solved = false }: CrosswordG
           aria-label={t('crossword.gridLabel')}
           dir={puzzle.rtl ? 'rtl' : 'ltr'}
           className="grid gap-px h-full w-full bg-black p-px"
-          style={{
-            gridTemplateColumns: `repeat(${size}, 1fr)`,
-            gridTemplateRows: `repeat(${size}, 1fr)`,
-          }}
+          style={
+            {
+              gridTemplateColumns: `repeat(${size}, minmax(0, 1fr))`,
+              gridTemplateRows: `repeat(${size}, minmax(0, 1fr))`,
+              '--cw-n': size,
+            } as CSSProperties
+          }
         >
           {puzzle.cells.map((cell) => {
-        const key = `${cell.row},${cell.col}`;
+            const key = `${cell.row},${cell.col}`;
             return (
               <CrosswordCell
                 key={key}
