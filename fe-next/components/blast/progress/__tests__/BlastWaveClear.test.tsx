@@ -42,6 +42,14 @@ describe('BlastWaveClear', () => {
     expect(screen.getByTestId('blast-results-best-word')).toHaveTextContent('JUMPING');
   });
 
+  it('frames the chase: who this wave passed, the weekly standing and the next rival', () => {
+    const ladder = { rank: 10, total: 50, personalBest: 100, rivals: [{ name: 'Ann', score: 420 }, { name: 'Bo', score: 900 }] };
+    render(<BlastWaveClear {...base} ladder={ladder} onContinue={vi.fn()} autoContinueMs={6000} />);
+    expect(screen.getByTestId('blast-clear-passed')).toHaveTextContent('blastProgress.passedOne{"name":"Ann"}');
+    expect(screen.getByTestId('blast-clear-standing')).toHaveTextContent('"rank":9');
+    expect(screen.getByTestId('blast-clear-target')).toHaveAttribute('data-kind', 'rival');
+  });
+
   it('teases the next wave with its theme and has one primary action', () => {
     render(<BlastWaveClear {...base} onContinue={vi.fn()} autoContinueMs={6000} />);
     const next = getWaveTheme(4);

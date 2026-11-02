@@ -29,6 +29,12 @@ const ja = {
     "rarity_sapphire": "レア",
     "rarity_amethyst": "エピック",
     "rarity_ruby": "レジェンド",
+    "goalRival": "{name}を抜くまであと{gap}",
+    "goalBest": "自己ベストまであと{gap}",
+    "goalTop": "今週のランキング1位です",
+    "passedOne": "{name}を抜きました！",
+    "passedMany": "{name}を含む{n}人を抜きました！",
+    "standing": "今週{total}人中{rank}位 · {ahead}人の上",
     "runLabel": "進行状況：ウェーブ{wave}"
   },
   // @blastProgress:end

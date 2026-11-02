@@ -29,6 +29,12 @@ const sv = {
     "rarity_sapphire": "Sällsynt",
     "rarity_amethyst": "Episk",
     "rarity_ruby": "Legendarisk",
+    "goalRival": "{gap} för att passera {name}",
+    "goalBest": "{gap} för att slå ditt rekord",
+    "goalTop": "Du leder tabellen den här veckan",
+    "passedOne": "Du gick förbi {name}!",
+    "passedMany": "Du gick förbi {n} spelare, bland andra {name}!",
+    "standing": "Plats {rank} av {total} den här veckan · före {ahead}",
     "runLabel": "Framsteg: våg {wave}"
   },
   // @blastProgress:end

@@ -31,7 +31,7 @@ describe('useBlastLadder', () => {
     getWithAuth.mockReturnValue(json({ error: 'Unauthorized' }, 401));
     const { result } = renderHook(() => useBlastLadder({ language: 'en', difficulty: 'medium', runId: 1 }));
     await waitFor(() => expect(getWithAuth).toHaveBeenCalled());
-    expect(result.current).toEqual({ personalBest: null, rank: null, rivals: [] });
+    expect(result.current).toEqual({ personalBest: null, rank: null, total: null, rivals: [] });
   });
 
   it('falls back to the on-device best for guests, with no rank', async () => {

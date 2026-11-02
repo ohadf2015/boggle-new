@@ -29,6 +29,12 @@ const en = {
     "rarity_sapphire": "Rare",
     "rarity_amethyst": "Epic",
     "rarity_ruby": "Legendary",
+    "goalRival": "{gap} to pass {name}",
+    "goalBest": "{gap} to beat your best",
+    "goalTop": "You lead the board this week",
+    "passedOne": "You passed {name}!",
+    "passedMany": "You passed {n} players, {name} included!",
+    "standing": "#{rank} of {total} this week · ahead of {ahead}",
     "runLabel": "Run progress: wave {wave}"
   },
   // @blastProgress:end

@@ -10,6 +10,8 @@ import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { getWaveClearReward, type BlastWaveClearReward } from '@/components/blast/legacy/utils/blastWaveConfig';
 import { BlastRunRibbon } from './BlastRunRibbon';
+import { BlastWaveGoal } from './BlastWaveGoal';
+import type { RivalScore } from './rivalTarget';
 import { BlastGemArt } from '@/components/blast/legacy/BlastGemArt';
 import { GEM_PALETTE, GEM_RARITY } from '@/components/blast/legacy/blastGemVisuals';
 import { BlastBestWordTiles } from '@/components/blast/results/BlastBestWordTiles';
@@ -37,6 +39,8 @@ interface BlastWaveClearProps {
   waveGems?: BlastGemCounts;
   /** Longest word of the wave, spelled in tiles */
   bestWord?: string;
+  /** Weekly ladder (empty for guests) — drives the chase panel. */
+  ladder?: { rank: number | null; total: number | null; rivals: RivalScore[]; personalBest: number | null };
   /** Furthest wave cleared on any earlier run (0 = none). */
   recordWave: number;
   autoContinueMs: number;
@@ -50,7 +54,7 @@ type CounterKey = 'score' | 'coins' | 'diamonds';
 /** Between-wave beat: stars slam, the haul flies into the run totals, the next theme is teased. */
 export function BlastWaveClear({
   wave, waveScore, words, clearPct, reward, runScoreBefore, runCoinsBefore, runDiamondsBefore,
-  waveDiamonds, waveGems = {}, bestWord = '', recordWave, autoContinueMs, onContinue, nextExtra,
+  waveDiamonds, waveGems = {}, bestWord = '', ladder, recordWave, autoContinueMs, onContinue, nextExtra,
 }: BlastWaveClearProps) {
   const { t } = useLanguage();
   const { playAchievementSound } = useSoundEffects();
@@ -138,6 +142,7 @@ export function BlastWaveClear({
         })
         .to('[data-clear="stars"]', { y: 4, duration: 0.05, yoyo: true, repeat: 3 }, '-=0.1')
         .from('[data-clear="card"]', { y: 30, scale: 0.92, autoAlpha: 0, duration: 0.3, ease: 'back.out(1.6)' })
+        .from('[data-clear="goal"]', { x: -40, autoAlpha: 0, duration: 0.3, ease: 'back.out(1.5)' })
         .from('[data-gem-slot]', { scale: 0, rotate: -40, autoAlpha: 0, duration: 0.32, stagger: 0.12, ease: 'back.out(2.6)' })
         .to('[data-gem-found="true"]', { scale: 1.25, duration: 0.12, yoyo: true, repeat: 1, stagger: 0.12, ease: 'power1.inOut' }, '<0.3')
         .from('[data-reveal="tile"]', { y: 18, scale: 0.4, autoAlpha: 0, duration: 0.2, stagger: 0.05, ease: 'back.out(2)' })
@@ -286,6 +291,15 @@ export function BlastWaveClear({
         </ul>
         {gemTotal === 0 && waveDiamonds === 0 && <span className="sr-only">0</span>}
       </div>
+
+      <BlastWaveGoal
+        runScoreBefore={runScoreBefore}
+        waveScore={waveScore}
+        personalBest={ladder?.personalBest ?? null}
+        rank={ladder?.rank ?? null}
+        total={ladder?.total ?? null}
+        rivals={ladder?.rivals ?? []}
+      />
 
       {bestWord && (
         <div className="w-full max-w-sm tv:max-w-2xl">

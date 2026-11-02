@@ -480,6 +480,7 @@ export function BlastView() {
             waveDiamonds={lastWaveStats.diamonds}
             waveGems={lastWaveStats.gems}
             bestWord={lastWaveStats.bestWord}
+            ladder={{ rank: ladder.rank, total: ladder.total, rivals: ladder.rivals, personalBest: ladder.personalBest }}
             recordWave={recordAtStart}
             autoContinueMs={autoContinueMs()}
             onContinue={handleWaveAdvance}

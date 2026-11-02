@@ -29,6 +29,12 @@ const ru = {
     "rarity_sapphire": "Редкий",
     "rarity_amethyst": "Эпический",
     "rarity_ruby": "Легендарный",
+    "goalRival": "{gap}, чтобы обойти {name}",
+    "goalBest": "{gap}, чтобы побить ваш рекорд",
+    "goalTop": "Вы лидируете на этой неделе",
+    "passedOne": "Вы обошли {name}!",
+    "passedMany": "Вы обошли {n} игроков, включая {name}!",
+    "standing": "{rank}-е место из {total} на этой неделе · впереди {ahead}",
     "runLabel": "Прогресс: волна {wave}"
   },
   // @blastProgress:end

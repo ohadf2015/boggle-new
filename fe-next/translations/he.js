@@ -29,6 +29,12 @@ const he = {
     "rarity_sapphire": "נדיר",
     "rarity_amethyst": "אפי",
     "rarity_ruby": "אגדי",
+    "goalRival": "{gap} כדי לעקוף את {name}",
+    "goalBest": "{gap} כדי לשבור את השיא שלך",
+    "goalTop": "מובילים בטבלה השבוע",
+    "passedOne": "עקפת את {name}!",
+    "passedMany": "עקפת {n} שחקנים, כולל {name}!",
+    "standing": "מקום {rank} מתוך {total} השבוע · לפני {ahead}",
     "runLabel": "התקדמות: גל {wave}"
   },
   // @blastProgress:end

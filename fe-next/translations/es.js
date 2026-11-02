@@ -29,6 +29,12 @@ const es = {
     "rarity_sapphire": "Raro",
     "rarity_amethyst": "Épico",
     "rarity_ruby": "Legendario",
+    "goalRival": "{gap} para superar a {name}",
+    "goalBest": "{gap} para batir tu récord",
+    "goalTop": "Lideras el ranking esta semana",
+    "passedOne": "¡Superaste a {name}!",
+    "passedMany": "¡Superaste a {n} jugadores, incluido {name}!",
+    "standing": "Nº {rank} de {total} esta semana · por delante de {ahead}",
     "runLabel": "Progreso: oleada {wave}"
   },
   // @blastProgress:end
