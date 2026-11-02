@@ -18,9 +18,9 @@ interface HintButtonProps {
   adContext: Record<string, unknown>;
 }
 
-// before: stretches the tap target to 44px tall while the pill itself stays h-9.
+// before: a 44px-tall tap target centred on the h-9 pill (sized, not inset, so the border cannot shrink it).
 const HINT_BTN =
-  'relative inline-flex h-9 min-w-0 max-w-full items-center gap-1.5 rounded-full border-2 border-neo-black bg-neo-yellow px-3 font-neo-display text-sm font-black text-neo-navy shadow-hard-sm transition-[transform,box-shadow] duration-100 before:absolute before:-inset-y-1 before:inset-x-0 active:translate-y-px active:shadow-hard-pressed disabled:opacity-60';
+  'relative inline-flex h-9 min-w-0 max-w-full items-center gap-1.5 rounded-full border-2 border-neo-black bg-neo-yellow px-3 font-neo-display text-sm font-black text-neo-navy shadow-hard-sm transition-[transform,box-shadow] duration-100 before:absolute before:inset-x-0 before:top-1/2 before:h-11 before:-translate-y-1/2 active:translate-y-px active:shadow-hard-pressed disabled:opacity-60';
 const ICON = 'h-4 w-4 shrink-0';
 
 /** One free hint a day; after that a short rewarded ad (native AdMob or the web provider). */

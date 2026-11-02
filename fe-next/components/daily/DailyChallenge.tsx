@@ -394,7 +394,8 @@ const DailyChallenge: React.FC = () => {
     >
       {/* Collapse the in-game header spacer so the focused Word Hunt screen has no
           empty band at the top (the header is hidden during play anyway). */}
-      <AutoHideHeader collapseSpacerWhenHidden />
+      {/* Results own their back control (like Word Wheel); loading stays bare so a returning player never sees the header flash in and out. */}
+      {(phase === 'ready' || phase === 'playing' || phase === 'offline-miss') && <AutoHideHeader collapseSpacerWhenHidden />}
       <SessionRevealHost />
 
       {phase === 'playing' && isPractice && (

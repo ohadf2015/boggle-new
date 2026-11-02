@@ -151,6 +151,8 @@ const InGameAudioButton: React.FC = memo(() => {
           ? 'left-[max(0.5rem,env(safe-area-inset-left))]'
           : 'right-[max(0.5rem,env(safe-area-inset-right))]',
         'flex items-center justify-center w-10 h-10 min-w-[40px] min-h-[40px]',
+        // Tap target reaches 44px without growing the 40px disc.
+        'before:absolute before:left-1/2 before:top-1/2 before:size-11 before:-translate-1/2 before:rounded-full',
         // Solid cream edge, not `/20`: at 20% over navy the ring measured
         // 1.7:1 against the surface, under the 3:1 control rule, and this FAB
         // is the only mute control on every game screen it appears on.

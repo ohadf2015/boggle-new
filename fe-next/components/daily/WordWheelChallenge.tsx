@@ -455,9 +455,10 @@ const WordWheelChallenge: React.FC = () => {
           recap had nowhere to scroll and the sticky primary CTA would have
           had no scrollport to pin to. `justify-start`, not `justify-center`
           — a centred flex column whose content overflows clips at BOTH ends
-          and can't be scrolled back to the top. */}
+          and can't be scrolled back to the top. Navy so the bottom-stack padding
+          reads as part of the results ground, not a band of stage gradient. */}
       {(phase === 'completed' || phase === 'already-played') && gameResult && (
-        <div className="flex-1 min-h-0 flex flex-col items-center justify-start overflow-y-auto overscroll-contain pb-bottom-stack">
+        <div className="flex-1 min-h-0 flex flex-col items-center justify-start overflow-y-auto overscroll-contain pb-bottom-stack bg-neo-navy">
           <WordWheelResults
             result={gameResult}
             puzzleNumber={puzzleNumber}

@@ -114,7 +114,7 @@ describe('PuzzleCard — free daily hints', () => {
   it('gives every top-row action a 44px tap area without growing the row', () => {
     renderCard();
     const hint = screen.getByTestId('hint-free');
-    expect(hint.className).toMatch(/before:-inset-y-1/);
+    expect(hint.className).toMatch(/before:h-11/);
     expect(hint.className).toContain('relative');
   });
 });

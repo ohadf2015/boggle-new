@@ -38,7 +38,7 @@ export function PlayHud({ isRTL, lives, level, totalLevels, streak, score, onBac
         type="button"
         onClick={onBack}
         aria-label={t('common.back')}
-        className="relative inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-neo border-neo border-black bg-neo-navy-light text-neo-white shadow-hard-sm transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] duration-100 before:absolute before:-inset-1 hover:shadow-hard active:translate-y-[1px] active:shadow-hard-pressed"
+        className="relative inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-neo border-neo border-black bg-neo-navy-light text-neo-white shadow-hard-sm transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] duration-100 before:absolute before:left-1/2 before:top-1/2 before:size-11 before:-translate-1/2 hover:shadow-hard active:translate-y-[1px] active:shadow-hard-pressed"
       >
         <ArrowLeft className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
       </button>

@@ -148,7 +148,7 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
      scrollport for `position: sticky` and would silently pin the CTA to nothing. */
   return (
     <DailyRevealProvider celebrate={celebrate}>
-    <DailyResultsFrame className="relative py-5" gap="gap-3" aside={aside()}>
+    <DailyResultsFrame className="relative flex-[1_0_auto] py-5" gap="gap-3" aside={aside()}>
         <DailyResultsHero
           mode="word-wheel"
           outcome={result.wordsFound.length > 0 ? 'win' : 'done'}
