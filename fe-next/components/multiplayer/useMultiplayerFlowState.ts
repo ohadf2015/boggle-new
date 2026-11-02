@@ -26,7 +26,7 @@ import type { MultiplayerFlowProps } from './MultiplayerFlow';
 
 export function useMultiplayerFlowState({
   handleJoin, activeRooms, roomsLoading, isJoining, isAuthenticated, displayName, prefilledRoom,
-  autoCreate, quickPlay, defaultLanguage, host, isClassroomMode,
+  autoCreate, quickPlay, defaultLanguage, host, isClassroomMode, joinRoomGone,
   setGameCode, setUsername, setRoomName, setHostUsername,
 }: MultiplayerFlowProps) {
   const { isOnCrazyGamesPlatform, cgUser } = useCrazyGames();
@@ -48,6 +48,22 @@ export function useMultiplayerFlowState({
     autoCreate ? { view: 'create-modal' as const, selectedRoom: null } : INITIAL_ENTRY_FLOW,
   );
   const selectedRoom = flow.selectedRoom;
+
+  // GR #14164: the server confirmed the room an OPEN join sheet targets is
+  // gone (handleRoomGone). Leaving the sheet up offers a "Join battle" CTA
+  // into a dead room — every re-tap re-fires the join while the id-collapsed
+  // roomGone toast stays silent, and the button feels dead (rage clicks). Close
+  // the sheet; the room-ended toast / Quick Play offer owns the recovery. The
+  // seq guard consumes each report once, so a stale report never slams a sheet
+  // the player opened AFTER it (a fresh try deserves the server's own answer).
+  const handledRoomGoneSeqRef = useRef(0);
+  useEffect(() => {
+    if (!joinRoomGone || joinRoomGone.seq === handledRoomGoneSeqRef.current) return;
+    handledRoomGoneSeqRef.current = joinRoomGone.seq;
+    if (flow.view !== 'join-modal' || !flow.selectedRoom) return;
+    if (flow.selectedRoom.gameCode.trim().toUpperCase() !== joinRoomGone.code.trim().toUpperCase()) return;
+    dispatchFlow({ type: 'CLOSE' });
+  }, [joinRoomGone, flow]);
 
   // Classroom mode has no room list and no dismissible modal layer, so "this
   // student still owes us a name" is its own state rather than a flow view.

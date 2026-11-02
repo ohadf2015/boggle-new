@@ -88,6 +88,13 @@ export interface MpRoomSocketContext {
    * without it the plain "room is gone" toast shows.
    */
   offerQuickPlayRecovery?: (goneCode: string) => void;
+  /**
+   * EVERY server-confirmed dead room (arcade paths of handleRoomGone, after the
+   * classroom defer). The entry flow closes a join sheet still open for that
+   * code — without it the sheet's CTA keeps firing joins into a dead room and
+   * the id-collapsed roomGone toast makes the button feel dead (GR #14164).
+   */
+  onRoomGone?: (goneCode: string) => void;
 }
 
 /**
@@ -113,7 +120,7 @@ export function useMpRoomSocket(ctx: MpRoomSocketContext) {
     setRoomLanguage, setUsername, setGameCode, setRoomName, setActiveRooms, setIsSpectator, setSpectators,
     setPlayersInRoom, setPlayersInRoomThrottled, setPendingGameStart, setGameStartTime, setShowResults,
     setResultsData, setHostLeftState, classroomContext, classroomDecisionRef, exitClassroomStudentToHub,
-    offerQuickPlayRecovery,
+    offerQuickPlayRecovery, onRoomGone,
   } = ctx;
   const roomWait = { hold: ctx.roomWaitHold };
   const mpSounds = { onMatchStart: ctx.onMatchStart };
@@ -307,6 +314,10 @@ export function useMpRoomSocket(ctx: MpRoomSocketContext) {
     if (gameCode) setActiveRooms((rooms) => rooms.filter((r) => r.gameCode !== gameCode));
     const action = roomGoneAction(classroomDecisionRef.current);
     if (action === 'defer') { deferredRoomGoneRef.current = { goneCode, cameFromInvite }; return; }
+    // Every arcade confirmation a room is dead — the entry flow closes a join
+    // sheet still open for this code (GR #14164). Deferred reports reach here
+    // through the classroom flush re-calling handleRoomGone.
+    onRoomGone?.(goneCode);
     // A classroom student gets the classroom sentence and their own hub — the
     // arcade "no battles in progress" lobby means nothing to them and reads
     // as the app having simply lost their class.
@@ -349,7 +360,7 @@ export function useMpRoomSocket(ctx: MpRoomSocketContext) {
     }
   }, [gameCode, isActive, t, socket, classroomDecisionRef, exitClassroomStudentToHub, setActiveRooms, setError,
       setPrefilledRoomCode, setAttemptingReconnect, setShouldAutoJoin, setGameCode, setIsActive, setIsHost, setIsPrivate,
-      offerQuickPlayRecovery]);
+      offerQuickPlayRecovery, onRoomGone]);
   handleRoomGoneRef.current = handleRoomGone;
 
   // Flush decisions parked while the classroom record was pending. A deferred
