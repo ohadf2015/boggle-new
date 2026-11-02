@@ -14460,6 +14460,7 @@ const he = {
         "notIncluded": "לא כלול",
         "classes": "כיתות",
         "studentsPerClass": "תלמידים ברשימת כל כיתה",
+        "assignmentsPerClass": "מטלות בכל כיתה",
         "customLists": "רשימות מילים משלכם",
         "duels": "דו-קרב בין תלמידים",
         "noAds": "בלי פרסומות לתלמידים",

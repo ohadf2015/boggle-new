@@ -30,7 +30,7 @@ export interface PlanMatrixRow {
 }
 
 /**
- * Order matters: the two caps lead because they are the only rows where Free and Pro differ
+ * Order matters: the three caps lead because they are the only rows where Free and Pro differ
  * by a number, and they are the reason a growing teacher upgrades. The three shared ticks sit
  * in the middle — they are load-bearing, not filler, because a column of crosses reads as a
  * crippled free tier and ours genuinely is not. Analytics lands last, alone, as the one thing
@@ -42,6 +42,7 @@ export interface PlanMatrixRow {
 export const PLAN_MATRIX_ROWS: readonly PlanMatrixRow[] = [
   { key: 'classes', free: FREE_TIER_LIMITS.classes, pro: null },
   { key: 'studentsPerClass', free: FREE_TIER_LIMITS.studentsPerClass, pro: null },
+  { key: 'assignmentsPerClass', free: FREE_TIER_LIMITS.assignmentsPerClass, pro: null },
   { key: 'customLists', free: true, pro: true },
   { key: 'noAds', free: true, pro: true },
   { key: 'analytics', free: false, pro: true },

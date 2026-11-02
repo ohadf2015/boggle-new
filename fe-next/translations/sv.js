@@ -14913,6 +14913,7 @@ const sv = {
         "notIncluded": "Ingår inte",
         "classes": "Klasser",
         "studentsPerClass": "Elever per klasslista",
+        "assignmentsPerClass": "Uppgifter per klass",
         "customLists": "Egna ordlistor",
         "duels": "Dueller mot varandra",
         "noAds": "Reklamfritt för eleverna",

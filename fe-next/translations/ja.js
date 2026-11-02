@@ -14605,6 +14605,7 @@ const ja = {
         "notIncluded": "含まない",
         "classes": "クラス数",
         "studentsPerClass": "クラス名簿の人数",
+        "assignmentsPerClass": "クラスごとの課題数",
         "customLists": "オリジナル単語リスト",
         "duels": "対戦デュエル",
         "noAds": "生徒には広告なし",

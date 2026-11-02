@@ -14554,6 +14554,7 @@ const es = {
         "notIncluded": "No incluido",
         "classes": "Clases",
         "studentsPerClass": "Estudiantes por lista de clase",
+        "assignmentsPerClass": "Tareas por clase",
         "customLists": "Tus propias listas de palabras",
         "duels": "Duelos cara a cara",
         "noAds": "Sin anuncios para el alumnado",

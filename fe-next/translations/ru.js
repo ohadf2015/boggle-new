@@ -14111,6 +14111,7 @@ const ru = {
         "notIncluded": "Не включено",
         "classes": "Классы",
         "studentsPerClass": "Учеников в списке класса",
+        "assignmentsPerClass": "Заданий на класс",
         "customLists": "Свои списки слов",
         "duels": "Дуэли один на один",
         "noAds": "Без рекламы для учеников",

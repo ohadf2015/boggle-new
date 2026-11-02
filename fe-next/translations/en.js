@@ -13830,6 +13830,7 @@ const en = {
         "notIncluded": "Not included",
         "classes": "Classrooms",
         "studentsPerClass": "Students on each class roster",
+        "assignmentsPerClass": "Assignments on each class",
         "customLists": "Your own word lists",
         "duels": "Head-to-head duels",
         "noAds": "Ad-free for students",
