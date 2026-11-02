@@ -254,6 +254,7 @@ export const BlastBoard = memo(function BlastBoard({
                 key={key}
                 letter={letter}
                 type={tile.type}
+                gem={tile.gem}
                 phase={tilePhase}
                 isSelected={isSelected}
                 isCleared={tile.isCleared}

@@ -20,6 +20,21 @@ const en = {
     "record": "New record",
     "play": "Play wave {wave}",
     "autoIn": "Starting in {seconds}",
+    "gemsFound": "Gems found",
+    "gem_emerald": "Emerald",
+    "gem_sapphire": "Sapphire",
+    "gem_amethyst": "Amethyst",
+    "gem_ruby": "Ruby",
+    "rarity_emerald": "Uncommon",
+    "rarity_sapphire": "Rare",
+    "rarity_amethyst": "Epic",
+    "rarity_ruby": "Legendary",
+    "goalRival": "{gap} to pass {name}",
+    "goalBest": "{gap} to beat your best",
+    "goalTop": "You lead the board this week",
+    "passedOne": "You passed {name}!",
+    "passedMany": "You passed {n} players, {name} included!",
+    "standing": "#{rank} of {total} this week · ahead of {ahead}",
     "runLabel": "Run progress: wave {wave}"
   },
   // @blastProgress:end
@@ -2119,6 +2134,7 @@ const en = {
     "revealLetter": "Letter",
     "revealWord": "Word",
     "restart": "Restart",
+    "restartConfirm": "Sure?",
     "backspace": "Delete",
     "kanaVoiced": "Voiced kana (゛゜)",
     "kanaBasic": "Basic kana",
@@ -11820,8 +11836,8 @@ const en = {
         "desc": "3× word score, +1 move, and extra coins."
       },
       "diamond": {
-        "name": "Diamond",
-        "desc": "Rare words earn it. Use it in a word for ×2 and a row + column blast."
+        "name": "Gem",
+        "desc": "Uncommon and rare words earn it, colored by rarity. In a word it pays ×2 (emerald, sapphire), ×3 (amethyst) or ×4 (ruby); all but emerald also blast a row + column."
       },
       "bomb": {
         "name": "Bomb",
@@ -11981,7 +11997,7 @@ const en = {
     "boardBusy": "Hold on, tiles are still falling",
     "ready": {
       "title": "Blast Mode",
-      "subtitle": "Swipe words to blast the board. Bombs clear 3×3, coins pay ×3, diamonds pay ×2.",
+      "subtitle": "Swipe words to blast the board. Bombs clear 3×3, coins pay ×3, gems pay ×2 to ×4, rarer colors pay more.",
       "start": "Play",
       "best": "Best: {score}",
       "play": "Start from beginning",
@@ -12170,8 +12186,8 @@ const en = {
         "desc": "×3 score, +1 move, extra coins"
       },
       "diamond": {
-        "name": "Diamond",
-        "desc": "Rare words earn it. ×2 word plus a row + column blast"
+        "name": "Gem",
+        "desc": "Earned by good words. ×2 to ×4 word, bigger gems also blast a row + column"
       },
       "bomb": {
         "name": "Bomb",
@@ -13814,6 +13830,7 @@ const en = {
         "notIncluded": "Not included",
         "classes": "Classrooms",
         "studentsPerClass": "Students on each class roster",
+        "assignmentsPerClass": "Assignments on each class",
         "customLists": "Your own word lists",
         "duels": "Head-to-head duels",
         "noAds": "Ad-free for students",

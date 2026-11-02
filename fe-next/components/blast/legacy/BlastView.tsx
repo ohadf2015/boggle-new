@@ -1,5 +1,6 @@
 'use client';
 
+import type { BlastGemCounts } from './utils/blastGems';
 import { useOverlayQuietZoneClaim } from '@/lib/overlayQuietZone';
 import { getWavePassPct } from './utils/blastWaveTheme';
 import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
@@ -88,7 +89,7 @@ export function BlastView() {
   const [totalScore, setTotalScore] = useState(0);
   const [allWordsFound, setAllWordsFound] = useState<string[]>([]);
   const [waveHistory, setWaveHistory] = useState<WaveResult[]>([]);
-  const [lastWaveStats, setLastWaveStats] = useState({ score: 0, words: 0, clearPct: 0, diamonds: 0 });
+  const [lastWaveStats, setLastWaveStats] = useState<{ score: number; words: number; clearPct: number; diamonds: number; gems: BlastGemCounts; bestWord: string }>({ score: 0, words: 0, clearPct: 0, diamonds: 0, gems: {}, bestWord: '' });
   const [runDiamonds, setRunDiamonds] = useState(0);
   // Furthest wave before this run started, so the ladder can flag a new record.
   const [recordAtStart, setRecordAtStart] = useState(0);
@@ -183,7 +184,7 @@ export function BlastView() {
 
   /** Wave completed — transition to next wave */
   const runCollectedRef = useRef({ diamonds: 0, bombs: 0 });
-  const handleWaveComplete = useCallback((waveScore: number, waveWords: string[], clearPct: number, collected?: { diamonds: number; bombs: number }) => {
+  const handleWaveComplete = useCallback((waveScore: number, waveWords: string[], clearPct: number, collected?: { diamonds: number; bombs: number; gems?: BlastGemCounts }) => {
     runCollectedRef.current = {
       diamonds: runCollectedRef.current.diamonds + (collected?.diamonds ?? 0),
       bombs: runCollectedRef.current.bombs + (collected?.bombs ?? 0),
@@ -192,7 +193,7 @@ export function BlastView() {
     setTotalScore(prev => prev + waveScore);
     setAllWordsFound(prev => [...prev, ...waveWords]);
     setWaveHistory(prev => [...prev, waveResult]);
-    setLastWaveStats({ score: waveScore, words: waveWords.length, clearPct, diamonds: collected?.diamonds ?? 0 });
+    setLastWaveStats({ score: waveScore, words: waveWords.length, clearPct, diamonds: collected?.diamonds ?? 0, gems: collected?.gems ?? {}, bestWord: runBestWord(waveWords, '') });
     setRunDiamonds(runCollectedRef.current.diamonds);
     checkpoint.recordWaveReached(currentWave);
     emitMascotEvent({ kind: 'wave-clear' });
@@ -477,6 +478,9 @@ export function BlastView() {
             runCoinsBefore={totalWaveRewardCoins(waveHistory.slice(0, -1))}
             runDiamondsBefore={runDiamonds - lastWaveStats.diamonds}
             waveDiamonds={lastWaveStats.diamonds}
+            waveGems={lastWaveStats.gems}
+            bestWord={lastWaveStats.bestWord}
+            ladder={{ rank: ladder.rank, total: ladder.total, rivals: ladder.rivals, personalBest: ladder.personalBest }}
             recordWave={recordAtStart}
             autoContinueMs={autoContinueMs()}
             onContinue={handleWaveAdvance}

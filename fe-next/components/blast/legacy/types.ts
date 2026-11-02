@@ -3,7 +3,7 @@ import type { Language } from '@/shared/types/game';
 // ==================== Tile Types (canonical source: @/shared/types/blast) ====================
 
 // Import for local use + re-export so all blast component imports can use '../types' without change
-import type { BlastTileType, BlastTileState } from '@/shared/types/blast';
+import type { BlastTileType, BlastTileState, BlastGemKind } from '@/shared/types/blast';
 export type { BlastTileType, BlastTileState };
 
 // ==================== Difficulty ====================
@@ -88,6 +88,8 @@ export interface BlastGameState {
   tileTypeClears: Record<BlastTileType, number>;
   /** Diamonds collected this run (earned by rare words) */
   diamondsCollected: number;
+  /** Gems cleared this wave, by color */
+  gemsByKind?: Partial<Record<BlastGemKind, number>>;
   /** Color counts in the last submitted word: { pink, cyan, lime } (for color_power tracking) */
   lastWordColorCounts?: { pink: number; cyan: number; lime: number };
 }

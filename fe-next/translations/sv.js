@@ -20,6 +20,21 @@ const sv = {
     "record": "Nytt rekord",
     "play": "Spela våg {wave}",
     "autoIn": "Startar om {seconds}",
+    "gemsFound": "Hittade ädelstenar",
+    "gem_emerald": "Smaragd",
+    "gem_sapphire": "Safir",
+    "gem_amethyst": "Ametist",
+    "gem_ruby": "Rubin",
+    "rarity_emerald": "Ovanlig",
+    "rarity_sapphire": "Sällsynt",
+    "rarity_amethyst": "Episk",
+    "rarity_ruby": "Legendarisk",
+    "goalRival": "{gap} för att passera {name}",
+    "goalBest": "{gap} för att slå ditt rekord",
+    "goalTop": "Du leder tabellen den här veckan",
+    "passedOne": "Du gick förbi {name}!",
+    "passedMany": "Du gick förbi {n} spelare, bland andra {name}!",
+    "standing": "Plats {rank} av {total} den här veckan · före {ahead}",
     "runLabel": "Framsteg: våg {wave}"
   },
   // @blastProgress:end
@@ -2258,6 +2273,7 @@ const sv = {
     "revealLetter": "Bokstav",
     "revealWord": "Ord",
     "restart": "Börja om",
+    "restartConfirm": "Säker?",
     "backspace": "Radera",
     "kanaVoiced": "Tonande kana (゛゜)",
     "kanaBasic": "Grundkana",
@@ -13755,8 +13771,8 @@ const sv = {
         "desc": "3× ordpoäng, +1 drag och extra mynt."
       },
       "diamond": {
-        "name": "Diamant",
-        "desc": "Fås av ovanliga ord. Använd den i ett ord: ×2 och hela raden och kolumnen sprängs."
+        "name": "Ädelsten",
+        "desc": "Fås av ovanliga och sällsynta ord, färgen visar hur ovanlig. I ett ord ger den ×2 (smaragd, safir), ×3 (ametist) eller ×4 (rubin); alla utom smaragden sprängs också rad och kolumn."
       },
       "bomb": {
         "name": "Bomb",
@@ -13932,7 +13948,7 @@ const sv = {
     "boardBusy": "Vänta, brickorna faller fortfarande",
     "ready": {
       "title": "Blast-läge",
-      "subtitle": "Svep ord och spräng brädet. Bomber rensar 3×3, mynt ger ×3 och diamanter ×2.",
+      "subtitle": "Svep ord och spräng brädet. Bomber rensar 3×3, mynt ger ×3 och ädelstenar ×2 till ×4, ju ovanligare färg desto mer.",
       "start": "Spela",
       "best": "Ditt rekord: {score}",
       "play": "Börja från början",
@@ -14105,8 +14121,8 @@ const sv = {
         "desc": "×3 poäng, +1 drag, extra mynt"
       },
       "diamond": {
-        "name": "Diamant",
-        "desc": "Fås av ovanliga ord: ×2 plus rad och kolumn sprängs"
+        "name": "Ädelsten",
+        "desc": "Fås av bra ord: ×2 till ×4, de stora sprängs rad och kolumn"
       },
       "bomb": {
         "name": "Bomb",
@@ -14897,6 +14913,7 @@ const sv = {
         "notIncluded": "Ingår inte",
         "classes": "Klasser",
         "studentsPerClass": "Elever per klasslista",
+        "assignmentsPerClass": "Uppgifter per klass",
         "customLists": "Egna ordlistor",
         "duels": "Dueller mot varandra",
         "noAds": "Reklamfritt för eleverna",

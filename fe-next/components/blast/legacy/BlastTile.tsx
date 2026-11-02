@@ -1,7 +1,11 @@
 'use client';
 
 import { memo, useEffect, useState } from 'react';
-import { DIAMOND_WORD_MULTIPLIER, GOLD_MULTIPLIER, type BlastTileType } from './types';
+import { GOLD_MULTIPLIER, type BlastTileType } from './types';
+import type { BlastGemKind } from '@/shared/types/blast';
+import { GEM_DEFS, DEFAULT_GEM } from './utils/blastGems';
+import { gemTileStyle, GEM_PALETTE } from './blastGemVisuals';
+import { BlastGemArt } from './BlastGemArt';
 import { BlastTileFaceArt } from './board/BlastTileFaceArt';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -26,6 +30,8 @@ export type TilePhase = 'idle' | 'selected' | 'anticipation' | 'clearing' | 'fal
 export interface BlastTileProps {
   letter: string;
   type: BlastTileType;
+  /** Gem color when type is 'diamond' (sapphire if missing) */
+  gem?: BlastGemKind;
   phase: TilePhase;
   isSelected: boolean;
   isCleared: boolean;
@@ -63,10 +69,9 @@ export interface BlastTileProps {
   onClick?: () => void;
 }
 
-/** Value badges: both coins and diamonds multiply the word they are played in */
+/** Value badges: coins and gems multiply the word they are played in */
 const VALUE_BADGES: Partial<Record<BlastTileType, { label: string; tone: string }>> = {
   gold: { label: `×${GOLD_MULTIPLIER}`, tone: 'text-neo-yellow' },
-  diamond: { label: `×${DIAMOND_WORD_MULTIPLIER}`, tone: 'text-neo-cyan' },
 };
 
 /** Letters that get a rare glow effect — high Scrabble-value letters */
@@ -96,7 +101,7 @@ function getColorTagGlow(colorTag?: 'pink' | 'cyan' | 'lime'): string {
 }
 
 export const BlastTile = memo(function BlastTile({
-  letter, type, phase, isSelected, isCleared,
+  letter, type, gem, phase, isSelected, isCleared,
   fallOffset, clearRotate, spawnOffset, isNearMiss, activationEffect, isComboPreview,
   selectionIndex, selectionTotal, zonePreview,
   isCascadeHighlight, colorTag, hideTooltip, onClick, col,
@@ -125,6 +130,8 @@ export const BlastTile = memo(function BlastTile({
   }
 
   const visual = TILE_VISUALS[type] ?? TILE_VISUALS.standard;
+  const gemKind = type === 'diamond' ? (gem ?? DEFAULT_GEM) : undefined;
+  const valueBadge = gemKind ? { label: `×${GEM_DEFS[gemKind].wordMult}`, tone: 'text-neo-white' } : VALUE_BADGES[type];
   // Skip tooltip lookup entirely for standard tiles (the vast majority) — keeps
   // render fast — and in multiplayer where the explanations are suppressed.
   const tooltip = type !== 'standard' && !hideTooltip ? getTileTooltip(type, t) : null;
@@ -175,8 +182,9 @@ export const BlastTile = memo(function BlastTile({
         getPhaseClasses(effectivePhase, isSelected),
       ].filter(Boolean).join(' ')}
       style={{
-        ...(visual.style ?? {}),
+        ...(gemKind ? gemTileStyle(gemKind) : (visual.style ?? {})),
         ...phaseStyle,
+        ...(gemKind && effectivePhase === 'clearing' ? { background: `radial-gradient(circle, ${GEM_PALETTE[gemKind].light} 0%, ${GEM_PALETTE[gemKind].dark} 100%)` } : {}),
         ...selectionStyle,
         ...(willChangeValue && { willChange: willChangeValue }),
         containerType: 'inline-size',
@@ -192,13 +200,22 @@ export const BlastTile = memo(function BlastTile({
         data-testid="blast-tile-letter"
         // Specials: me-[18cqw] nudges the centred letter ~9cqw toward the START edge,
         // clear of the corner type chip. Logical margin, so it flips for RTL.
-        className={`relative z-10 leading-none text-[clamp(1.2rem,60cqw,3.5rem)] ${visual.indicator ? 'me-[18cqw]' : ''}`}
+        className={`relative z-10 leading-none text-[clamp(1.2rem,60cqw,3.5rem)] ${visual.indicator || gemKind ? 'me-[18cqw]' : ''}`}
         style={visual.text === 'text-white' ? TILE_LETTER_LIGHT_STYLE : TILE_LETTER_DARK_STYLE}
       >
         {letter}
       </span>
-      <BlastTileFaceArt type={type} col={col ?? 0} />
-      {visual.indicator && (
+      <BlastTileFaceArt type={type} col={col ?? 0} gem={gemKind} />
+      {gemKind && (
+        <span
+          data-testid="blast-tile-type-chip"
+          className="absolute top-0.5 inset-e-0.5 z-5 grid place-items-center pointer-events-none w-[clamp(17px,34cqw,30px)] h-[clamp(17px,34cqw,30px)] drop-shadow-[0_1px_0_rgba(11,21,48,0.9)]"
+          aria-hidden="true"
+        >
+          <BlastGemArt gem={gemKind} className="h-full w-full" />
+        </span>
+      )}
+      {!gemKind && visual.indicator && (
         /* Type icon on a solid navy chip in the corner: holds against every face
            (colour alone must not carry type identity) and no longer paints over
            the letter now that the letter fills the tile. */
@@ -210,13 +227,13 @@ export const BlastTile = memo(function BlastTile({
           <visual.indicator className="w-[62%] h-[62%]" strokeWidth={2.75} />
         </span>
       )}
-      {VALUE_BADGES[type] && (
+      {valueBadge && (
         <span
           data-testid="blast-tile-value"
-          className={`absolute bottom-[8%] inset-e-0.5 z-10 text-[clamp(0.6rem,22cqw,0.95rem)] font-neo-display font-black bg-neo-navy rounded px-1 leading-tight tabular-nums ${VALUE_BADGES[type]!.tone}`}
+          className={`absolute bottom-[8%] inset-e-0.5 z-10 text-[clamp(0.6rem,22cqw,0.95rem)] font-neo-display font-black bg-neo-navy rounded px-1 leading-tight tabular-nums ${valueBadge.tone}`}
           aria-hidden="true"
         >
-          {VALUE_BADGES[type]!.label}
+          {valueBadge.label}
         </span>
       )}
       {zonePreview && isSelected && (
@@ -231,6 +248,7 @@ export const BlastTile = memo(function BlastTile({
 }, (prev, next) =>
   prev.letter === next.letter &&
   prev.type === next.type &&
+  prev.gem === next.gem &&
   prev.phase === next.phase &&
   prev.isSelected === next.isSelected &&
   prev.isCleared === next.isCleared &&

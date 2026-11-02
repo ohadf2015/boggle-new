@@ -127,7 +127,7 @@ export function computeGravityResult(
 
   for (let col = 0; col < gridSize; col++) {
     // Collect surviving tiles from bottom to top
-    type Survivor = { uid: string; letter: string; type: BlastTileType; originalRow: number; hitsRemaining: number } & Pick<BlastTileState, 'colorTag'>;
+    type Survivor = { uid: string; letter: string; type: BlastTileType; originalRow: number; hitsRemaining: number } & Pick<BlastTileState, 'colorTag' | 'gem'>;
     const survivors: Survivor[] = [];
     for (let row = gridSize - 1; row >= 0; row--) {
       const t = tileStates[row][col];
@@ -139,6 +139,7 @@ export function computeGravityResult(
           originalRow: row,
           hitsRemaining: t.hitsRemaining,
           ...(t.colorTag != null ? { colorTag: t.colorTag } : {}),
+          ...(t.gem != null ? { gem: t.gem } : {}),
         });
       }
     }
@@ -156,6 +157,7 @@ export function computeGravityResult(
         activationEffect: null,
         hitsRemaining: survivor.hitsRemaining,
         ...(survivor.colorTag != null ? { colorTag: survivor.colorTag } : {}),
+        ...(survivor.gem != null ? { gem: survivor.gem } : {}),
       };
 
       const fallDist = bottomRow - survivor.originalRow;

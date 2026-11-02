@@ -105,7 +105,7 @@ describe('useBlastGameEnd — dead-end finale callback', () => {
 
     await act(async () => { await vi.runAllTimersAsync(); });
 
-    expect(deps.onWaveComplete).toHaveBeenCalledWith(500, ['HELLO'], 100, { diamonds: 2, bombs: 3 });
+    expect(deps.onWaveComplete).toHaveBeenCalledWith(500, ['HELLO'], 100, { diamonds: 2, bombs: 3, gems: {} });
   });
 
   it('ends the game after the finale burst has time to play', async () => {

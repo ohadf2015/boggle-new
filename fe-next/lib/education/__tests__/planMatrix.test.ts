@@ -79,9 +79,13 @@ describe('plan comparison matrix', () => {
     expect(byKey.studentsPerClass.free).toBe(free.students_limit_per_class);
     expect(byKey.studentsPerClass.pro).toBe(pro.students_limit_per_class);
 
-    // Every count row must be one of the two the config knows about. A third count row
-    // would be a number with no enforcement behind it.
-    expect(countRows().map((r) => r.key).sort()).toEqual(['classes', 'studentsPerClass']);
+    expect(byKey.assignmentsPerClass, 'matrix has no "assignmentsPerClass" row').toBeTruthy();
+    expect(byKey.assignmentsPerClass.free).toBe(FREE_TIER_LIMITS.assignmentsPerClass);
+    expect(byKey.assignmentsPerClass.pro).toBeNull();
+
+    // One count row per cap in FREE_TIER_LIMITS: a cap the server enforces but the pricing
+    // page omits is a surprise paywall, and a count row with no cap behind it is a lie.
+    expect(countRows().map((r) => r.key).sort()).toEqual(Object.keys(FREE_TIER_LIMITS).sort());
   });
 
   it('never ticks Free for something the product gates', () => {

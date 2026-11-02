@@ -11,6 +11,7 @@
 import { useCallback, useRef, type Dispatch, type SetStateAction, type MutableRefObject } from 'react';
 import { detectSpecialCombos, type SpecialCombo } from '../utils/blastCombos';
 import { diffClearedTiles } from '../utils/diffClearedTiles';
+import { predictBlastClears } from '../utils/blastPredictClears';
 import { detectNearMiss } from '../utils/blastNearMiss';
 import { vibrateBlastBomb, vibrateBlastPrism } from '@/components/grid/hapticFeedback';
 import { blastCoinDelta } from '../utils/blastCoinCurrency';
@@ -144,12 +145,18 @@ export function useBlastWordHandler({
       col: p.col,
       type: engine.tileStates[p.row]?.[p.col]?.type ?? 'standard',
     }));
+    const pathGems = path.filter(p => engine.tileStates[p.row]?.[p.col]?.type === 'diamond').map(p => engine.tileStates[p.row][p.col].gem);
     const clearedTypes = new Set(clearedInfo.map(c => c.type));
+    // Bomb and gem blasts clear tiles off the path. A dry run finds them up front so they
+    // pop with the word instead of vanishing a beat after it. Display only: the engine decides.
+    const pathKeys = new Set(path.map(p => `${p.row},${p.col}`));
+    const blastInfo = predictBlastClears(engine.tileStates, path, data.word, config.gridSize).filter(c => !pathKeys.has(`${c.row},${c.col}`));
+    const animInfo = [...clearedInfo, ...blastInfo];
     let popped = false;
     const pop = () => {
       if (popped) return;
       popped = true;
-      effects.setClearedTilesForEffects(clearedInfo.map(c => ({ row: c.row, col: c.col, type: c.type as BlastTileType })));
+      effects.setClearedTilesForEffects(animInfo.map(c => ({ row: c.row, col: c.col, type: c.type as BlastTileType })));
       if (clearedTypes.has('bomb')) vibrateBlastBomb();
       for (const type of clearedTypes) {
         if (type !== 'standard') sounds.playSpecialTileSound(type);
@@ -182,7 +189,7 @@ export function useBlastWordHandler({
 
     effects.onCreditedScore?.({ word: data.word, score: multipliedScore + treasureBonus });
 
-    await sequencer.animateWordClear(clearedInfo, pop);
+    await sequencer.animateWordClear(animInfo, pop);
     pop();
 
     // 2. Submit to engine
@@ -191,9 +198,9 @@ export function useBlastWordHandler({
     // 2a. Capture post-grid snapshot after engine processing
     const postGrid = structuredClone(engine.tileStates);
 
-    // 2b. The path already burst at pop(); only bomb/lightning/prism chain neighbours are new here.
-    const pathKeys = new Set(path.map(p => `${p.row},${p.col}`));
-    const chainCleared = diffClearedTiles(preGrid, postGrid).filter(c => !pathKeys.has(`${c.row},${c.col}`));
+    // 2b. The path and predicted blasts already burst at pop(); only blasts the dry run missed are new here.
+    const animKeys = new Set(animInfo.map(p => `${p.row},${p.col}`));
+    const chainCleared = diffClearedTiles(preGrid, postGrid).filter(c => !animKeys.has(`${c.row},${c.col}`));
     if (chainCleared.length > 0) {
       effects.setClearedTilesForEffects(chainCleared.map(c => ({ row: c.row, col: c.col, type: c.type })));
     }
@@ -230,7 +237,7 @@ export function useBlastWordHandler({
       ...(treasureBonus > 0 && treasureTier !== 'common'
         ? { bonus: treasureBonus, luckyTier: treasureTier }
         : {}),
-      stamps: buildScoreStamps(clearedInfo.map(c => c.type as BlastTileType), treasureTier, t),
+      stamps: buildScoreStamps(clearedInfo.map(c => c.type as BlastTileType), treasureTier, t, pathGems),
     }]);
 
     if ((result.gemCrossCount ?? 0) > 0) {

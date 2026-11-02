@@ -3,7 +3,9 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useGridInit } from '@/components/singleplayer/game/hooks/useGridInit';
 import { useDictionaryCache } from '@/hooks/useDictionaryCache';
-import { generateTileStates } from '../utils/blastTileGeneration';
+import { generateTileStates, seededRandom } from '../utils/blastTileGeneration';
+import { seedWaveGems, mergeGemCounts } from '../utils/blastGems';
+import type { BlastGemKind } from '@/shared/types/blast';
 import { guaranteeObjectiveTiles } from '../utils/blastObjectiveGuarantee';
 import { processTilesForWord } from '../utils/clearTilesProcessor';
 import { computeGravityResult, type GravityResult } from '../utils/blastGravity';
@@ -57,7 +59,7 @@ export interface WordSubmitResult {
   explosions: Array<{ row: number; col: number; type: string }>;
   bonusMoves: number;
   diamondsCollected: number;
-  diamondsSpawned: Array<{ row: number; col: number }>;
+  diamondsSpawned: Array<{ row: number; col: number; gem?: BlastGemKind }>;
   /** Tiles a played diamond's cross blast cleared */
   gemCrossCount: number;
 }
@@ -179,7 +181,9 @@ export function useBlastEngine(
   // Tile states
   const [tileStates, setTileStates] = useState<BlastTileState[][]>(() => {
     if (options?.initialTileStates) return options.initialTileStates;
-    const tiles = generateTileStates(gridSize, specialTileChance, Date.now(), customDistribution);
+    const seed = Date.now();
+    const tiles = generateTileStates(gridSize, specialTileChance, seed, customDistribution);
+    if (!options?.isMultiplayer) seedWaveGems(tiles, currentWave, seededRandom(seed + 7));
     return options?.waveObjectives ? guaranteeObjectiveTiles(tiles, options.waveObjectives) : tiles;
   });
 
@@ -211,6 +215,7 @@ export function useBlastEngine(
     bonusMoveScore: 0,
     tileTypeClears: {} as Record<BlastTileType, number>,
     diamondsCollected: 0,
+    gemsByKind: {},
   });
 
   const gameStateRef = useRef(gameState);
@@ -333,7 +338,7 @@ export function useBlastEngine(
       submitRng = createSeededRandom(blastSeedRef.current + validMovesRef.current);
     }
     const result = processTilesForWord({ prev: currentTiles, path, word, baseScore, gridSize, currentWave, rng: submitRng });
-    const { next, totalScore, newlyClearedCount, clearedTypeCounts, explosions: newExplosions, detectedCombos, bonusMoveCount, diamondsCollected, diamondsSpawned, gemCrossCount } = result;
+    const { next, totalScore, newlyClearedCount, clearedTypeCounts, explosions: newExplosions, detectedCombos, bonusMoveCount, diamondsCollected, diamondsSpawned, gemCrossCount, gemsCollected } = result;
 
     bestWordRef.current = recordFoundWord({ wordsFound: [], bestWord: bestWordRef.current }, word, cascadeCluster).bestWord;
 
@@ -373,6 +378,7 @@ export function useBlastEngine(
         movesUsed: prev.movesUsed + 1,
         tileTypeClears: mergedTypeClears,
         diamondsCollected: prev.diamondsCollected + diamondsCollected,
+        gemsByKind: mergeGemCounts(prev.gemsByKind, gemsCollected),
         lastWordColorCounts: colorCounts,
       };
     });

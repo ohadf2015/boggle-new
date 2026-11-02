@@ -156,9 +156,22 @@ export function useBlastCascade(deps: CascadeDeps) {
         await new Promise<void>(r => setTimeout(r, CASCADE_HIGHLIGHT_LINGER));
         setCascadeHighlightCells([]);
 
-        // Submit all finds. Snapshot tiles before/after so the cascade's cleared
-        // cells reach the FX layer — without this, cascade-cleared tiles vanished
-        // with only the highlight + gravity (Bug: "tiles disappear without effect").
+        // Pop the found cells with the same clear animation as a played word, and fire
+        // the FX/sound on its first frame, so shatter, sound and tile pop land together.
+        const findCells = cascadeFinds.flatMap(f => f.cells);
+        const findTiles = engine.getLatestState().tileStates;
+        const findInfo = findCells.map(c => ({ row: c.row, col: c.col, type: findTiles[c.row]?.[c.col]?.type ?? 'standard' }));
+        let popped = false;
+        const pop = () => {
+          if (popped) return;
+          popped = true;
+          setClearedTilesForEffects(findInfo.map(c => ({ row: c.row, col: c.col, type: c.type })));
+          sounds.playCascadeChain(chainLevel);
+        };
+        await sequencer.animateWordClear(findInfo, pop);
+        pop();
+
+        // Bomb/gem neighbours caught by these finds were not popped above; they burst now.
         const preCascade = structuredClone(engine.getLatestState().tileStates);
         let creditedBonus = 0;
         for (const find of cascadeFinds) {
@@ -168,13 +181,14 @@ export function useBlastCascade(deps: CascadeDeps) {
           else engine.submitWord(find.cells, find.label, bonus);
           foundWordsSet.add(find.label);
         }
-        const cascadeCleared = diffClearedTiles(preCascade, engine.getLatestState().tileStates);
-        if (cascadeCleared.length > 0) {
-          setClearedTilesForEffects(cascadeCleared.map(c => ({ row: c.row, col: c.col, type: c.type })));
+        const findKeys = new Set(findCells.map(c => `${c.row},${c.col}`));
+        const extraCleared = diffClearedTiles(preCascade, engine.getLatestState().tileStates)
+          .filter(c => !findKeys.has(`${c.row},${c.col}`));
+        if (extraCleared.length > 0) {
+          setClearedTilesForEffects(extraCleared.map(c => ({ row: c.row, col: c.col, type: c.type })));
         }
 
         // Cascade chain sound + score fly
-        sounds.playCascadeChain(chainLevel);
         const chainFlyId = `chain-${++flyIdRef.current}`;
         const chainTier: 1 | 2 | 3 = chainLevel >= 3 ? 3 : chainLevel >= 2 ? 2 : 1;
         // Fly the bonus the engine ACTUALLY credited — the old `chainLevel * 5`

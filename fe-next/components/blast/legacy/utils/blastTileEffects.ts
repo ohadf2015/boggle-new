@@ -8,6 +8,8 @@ import {
   type BlastTileState,
   type BlastExplosion,
 } from '../types';
+import type { BlastGemKind } from '@/shared/types/blast';
+import { bombTilePoints, type PayoutCtx } from './blastPayout';
 
 export interface TileEffectContext {
   next: BlastTileState[][];
@@ -20,6 +22,8 @@ export interface TileEffectContext {
    * Optional runaway-chain budget. When present, the bomb chain stops once
    * `maxDetonations` or `maxCleared` is reached, so one word can't wipe half the board.
    */
+  /** When set, bomb tiles pay by the payout formula instead of the flat bonus. */
+  payout?: PayoutCtx;
   chainBudget?: { detonations: number; cleared: number; suppressed: number; maxDetonations: number; maxCleared: number };
 }
 
@@ -66,7 +70,7 @@ export function processBombBFS(ctx: TileEffectContext): EffectResult {
         if (chainAtClearCap(ctx)) { recordSuppressed(ctx); break bombRadius; }
         ctx.markCleared(next[r][c]);
         if (ctx.chainBudget) ctx.chainBudget.cleared++;
-        bonusScore += BOMB_AREA_CLEAR_BONUS;
+        bonusScore += ctx.payout ? bombTilePoints(ctx.payout, r, c, bomb.depth) : BOMB_AREA_CLEAR_BONUS;
         if (next[r][c].type === 'bomb' && !processedBombs.has(`${r},${c}`)) {
           processedBombs.add(`${r},${c}`);
           bombQueue.push({ row: r, col: c, depth: bomb.depth + 1 });
@@ -84,23 +88,24 @@ export function processBombBFS(ctx: TileEffectContext): EffectResult {
 export function spawnEarnedDiamonds(
   next: BlastTileState[][],
   pathSet: ReadonlySet<string>,
-  count: number,
+  gems: readonly BlastGemKind[],
   rng: () => number,
-): Array<{ row: number; col: number }> {
-  const spawned: Array<{ row: number; col: number }> = [];
-  if (count <= 0) return spawned;
+): Array<{ row: number; col: number; gem: BlastGemKind }> {
+  const spawned: Array<{ row: number; col: number; gem: BlastGemKind }> = [];
+  if (gems.length === 0) return spawned;
   const candidates: BlastTileState[] = [];
   for (const row of next) {
     for (const t of row) {
       if (!t.isCleared && t.type === 'standard' && !pathSet.has(`${t.row},${t.col}`)) candidates.push(t);
     }
   }
-  for (let i = 0; i < count && candidates.length > 0; i++) {
+  for (let i = 0; i < gems.length && candidates.length > 0; i++) {
     const [target] = candidates.splice(Math.floor(rng() * candidates.length), 1);
     target.type = 'diamond';
+    target.gem = gems[i];
     target.hitsRemaining = 0;
     target.activationEffect = 'diamond-spawn';
-    spawned.push({ row: target.row, col: target.col });
+    spawned.push({ row: target.row, col: target.col, gem: gems[i] });
   }
   return spawned;
 }

@@ -10,6 +10,14 @@ import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { getWaveClearReward, type BlastWaveClearReward } from '@/components/blast/legacy/utils/blastWaveConfig';
 import { BlastRunRibbon } from './BlastRunRibbon';
+import { BlastWaveGoal } from './BlastWaveGoal';
+import type { RivalScore } from './rivalTarget';
+import { BlastGemArt } from '@/components/blast/legacy/BlastGemArt';
+import { GEM_PALETTE, GEM_RARITY } from '@/components/blast/legacy/blastGemVisuals';
+import { BlastBestWordTiles } from '@/components/blast/results/BlastBestWordTiles';
+import { BLAST_RESULT_ASSETS } from '@/components/blast/results/blastResultsTheme';
+import { BLAST_GEM_KINDS } from '@/shared/types/blast';
+import type { BlastGemCounts } from '@/components/blast/legacy/utils/blastGems';
 import { getWavePassPct } from '@/components/blast/legacy/utils/blastWaveTheme';
 import { THEME_ICON, accentColor, getWaveTheme } from './waveTheme';
 import { useCountUp } from './useCountUp';
@@ -27,6 +35,12 @@ interface BlastWaveClearProps {
   runCoinsBefore: number;
   runDiamondsBefore: number;
   waveDiamonds: number;
+  /** Gems cleared this wave, by color */
+  waveGems?: BlastGemCounts;
+  /** Longest word of the wave, spelled in tiles */
+  bestWord?: string;
+  /** Weekly ladder (empty for guests) — drives the chase panel. */
+  ladder?: { rank: number | null; total: number | null; rivals: RivalScore[]; personalBest: number | null };
   /** Furthest wave cleared on any earlier run (0 = none). */
   recordWave: number;
   autoContinueMs: number;
@@ -40,7 +54,7 @@ type CounterKey = 'score' | 'coins' | 'diamonds';
 /** Between-wave beat: stars slam, the haul flies into the run totals, the next theme is teased. */
 export function BlastWaveClear({
   wave, waveScore, words, clearPct, reward, runScoreBefore, runCoinsBefore, runDiamondsBefore,
-  waveDiamonds, recordWave, autoContinueMs, onContinue, nextExtra,
+  waveDiamonds, waveGems = {}, bestWord = '', ladder, recordWave, autoContinueMs, onContinue, nextExtra,
 }: BlastWaveClearProps) {
   const { t } = useLanguage();
   const { playAchievementSound } = useSoundEffects();
@@ -64,6 +78,9 @@ export function BlastWaveClear({
   const score = useCountUp(runScoreBefore + (landed.score ? waveScore : 0), 500, reducedMotion);
   const coins = useCountUp(runCoinsBefore + (landed.coins ? prizeCoins : 0), 500, reducedMotion);
   const diamonds = useCountUp(runDiamondsBefore + (landed.diamonds ? waveDiamonds : 0), 400, reducedMotion);
+
+  const cardScore = useCountUp(waveScore, 900, reducedMotion);
+  const gemTotal = BLAST_GEM_KINDS.reduce((n, k) => n + (waveGems[k] ?? 0), 0);
 
   const go = useCallback(() => {
     if (continuedRef.current) return;
@@ -116,12 +133,19 @@ export function BlastWaveClear({
       };
       gsap
         .timeline({ delay: 0.1 })
-        .from('[data-clear="title"]', { scale: 1.8, autoAlpha: 0, duration: 0.25, ease: 'back.out(1.8)' })
+        .from('[data-clear="mascot"]', { y: 30, scale: 0.4, rotate: -12, autoAlpha: 0, duration: 0.45, ease: 'back.out(2.2)' })
+        .from('[data-clear="confetti"]', { y: -30, autoAlpha: 0, duration: 0.5, ease: 'power2.out' }, '<')
+        .from('[data-clear="title"]', { scale: 1.8, autoAlpha: 0, duration: 0.25, ease: 'back.out(1.8)' }, '-=0.15')
         .from('[data-testid="blast-clear-star"]', {
           scale: 3, rotate: -50, autoAlpha: 0, duration: 0.28, ease: 'back.out(2.5)', stagger: 0.16,
           onStart: playAchievementSound,
         })
         .to('[data-clear="stars"]', { y: 4, duration: 0.05, yoyo: true, repeat: 3 }, '-=0.1')
+        .from('[data-clear="card"]', { y: 30, scale: 0.92, autoAlpha: 0, duration: 0.3, ease: 'back.out(1.6)' })
+        .from('[data-clear="goal"]', { x: -40, autoAlpha: 0, duration: 0.3, ease: 'back.out(1.5)' })
+        .from('[data-gem-slot]', { scale: 0, rotate: -40, autoAlpha: 0, duration: 0.32, stagger: 0.12, ease: 'back.out(2.6)' })
+        .to('[data-gem-found="true"]', { scale: 1.25, duration: 0.12, yoyo: true, repeat: 1, stagger: 0.12, ease: 'power1.inOut' }, '<0.3')
+        .from('[data-reveal="tile"]', { y: 18, scale: 0.4, autoAlpha: 0, duration: 0.2, stagger: 0.05, ease: 'back.out(2)' })
         .from('[data-tally]', { y: 24, autoAlpha: 0, duration: 0.22, stagger: 0.08, ease: 'power2.out' })
         .add(flyTo('score'), '+=0.35')
         .add(flyTo('coins'), '+=0.12')
@@ -166,6 +190,30 @@ export function BlastWaveClear({
         ))}
       </div>
 
+      <div className="relative flex w-full max-w-sm flex-col items-center tv:max-w-2xl">
+        {stars === 3 && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={BLAST_RESULT_ASSETS.confetti}
+            alt=""
+            aria-hidden="true"
+            data-clear="confetti"
+            className="pointer-events-none absolute -top-2 inset-x-0 mx-auto h-28 w-56 max-w-none object-contain opacity-45"
+          />
+        )}
+        <div data-clear="mascot" className="relative h-24 w-24 tv:h-40 tv:w-40">
+          <div aria-hidden="true" className="absolute inset-2 rounded-full opacity-25" style={{ backgroundColor: accentColor(theme) }} />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={stars >= 2 ? '/blast/results/mascot-celebrate.webp' : '/blast/results/mascot-neutral.webp'}
+            alt=""
+            aria-hidden="true"
+            data-testid="blast-clear-mascot"
+            className="relative h-full w-full object-contain drop-shadow-[3px_3px_0_var(--neo-black)]"
+          />
+        </div>
+      </div>
+
       <h2
         data-clear="title"
         className="text-center font-neo-display text-3xl font-black uppercase leading-none [text-shadow:3px_3px_0_var(--neo-black)] tv:text-6xl"
@@ -199,9 +247,65 @@ export function BlastWaveClear({
           </span>
         ))}
       </div>
-      <p className="-mt-2 font-neo-body text-xs text-neo-white/80 tv:text-lg">
-        {words} {t('blast.wordsFound')} · {Math.round(clearPct)}% {t('blast.cleared')}
-      </p>
+      <div
+        data-clear="card"
+        data-testid="blast-clear-score-card"
+        className="w-full max-w-sm rounded-neo border-3 bg-neo-navy-light px-4 py-3 text-center shadow-hard-lg tv:max-w-2xl tv:py-6"
+        style={{ borderColor: accentColor(theme) }}
+      >
+        <p
+          className="font-neo-display text-5xl font-black tabular-nums text-neo-white [text-shadow:3px_3px_0_var(--neo-black)] tv:text-8xl"
+          dir="ltr"
+        >
+          {cardScore.toLocaleString()}
+        </p>
+        <p className="mt-1 font-neo-body text-xs font-bold uppercase tracking-widest text-neo-white/80 tv:text-lg">
+          {words} {t('blast.wordsFound')} · {Math.round(clearPct)}% {t('blast.cleared')}
+        </p>
+        <h3 className="mt-3 font-neo-display text-[11px] font-black uppercase tracking-[0.2em] text-neo-white/70 tv:text-base">
+          {t('blastProgress.gemsFound')}
+        </h3>
+        <ul className="mt-1.5 grid grid-cols-[repeat(4,minmax(0,1fr))] gap-1.5" data-testid="blast-clear-gems">
+          {BLAST_GEM_KINDS.map((kind) => {
+            const n = waveGems[kind] ?? 0;
+            return (
+              <li
+                key={kind}
+                data-gem-slot={kind}
+                data-gem-found={n > 0 ? 'true' : 'false'}
+                title={`${t(`blastProgress.gem_${kind}`)} · ${t(`blastProgress.rarity_${kind}`)}`}
+                className={cn(
+                  'flex min-w-0 flex-col items-center gap-0.5 rounded-neo border-2 border-neo-black bg-neo-navy px-0.5 py-1.5',
+                  n === 0 && 'opacity-40 grayscale',
+                )}
+                style={n > 0 ? { boxShadow: `0 0 ${GEM_RARITY[kind] * 5}px ${GEM_PALETTE[kind].glow}` } : undefined}
+              >
+                <BlastGemArt gem={kind} className="h-9 w-9 tv:h-14 tv:w-14" />
+                <span className="font-neo-display text-base font-black leading-none tabular-nums text-neo-white tv:text-3xl" dir="ltr">×{n}</span>
+                <span className="max-w-full truncate text-[8.5px] font-bold uppercase leading-tight tracking-normal text-neo-white/70 tv:text-sm">
+                  {t(`blastProgress.rarity_${kind}`)}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+        {gemTotal === 0 && waveDiamonds === 0 && <span className="sr-only">0</span>}
+      </div>
+
+      <BlastWaveGoal
+        runScoreBefore={runScoreBefore}
+        waveScore={waveScore}
+        personalBest={ladder?.personalBest ?? null}
+        rank={ladder?.rank ?? null}
+        total={ladder?.total ?? null}
+        rivals={ladder?.rivals ?? []}
+      />
+
+      {bestWord && (
+        <div className="w-full max-w-sm tv:max-w-2xl">
+          <BlastBestWordTiles word={bestWord.toUpperCase()} longestWord={null} t={t} />
+        </div>
+      )}
 
       <section
         data-clear="next"
