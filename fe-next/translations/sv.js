@@ -2258,6 +2258,7 @@ const sv = {
     "revealLetter": "Bokstav",
     "revealWord": "Ord",
     "restart": "Börja om",
+    "restartConfirm": "Säker?",
     "backspace": "Radera",
     "kanaVoiced": "Tonande kana (゛゜)",
     "kanaBasic": "Grundkana",

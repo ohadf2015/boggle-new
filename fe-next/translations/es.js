@@ -2145,6 +2145,7 @@ const es = {
     "revealLetter": "Letra",
     "revealWord": "Palabra",
     "restart": "Reiniciar",
+    "restartConfirm": "¿Seguro?",
     "backspace": "Borrar",
     "kanaVoiced": "Kana sonoras (゛゜)",
     "kanaBasic": "Kana básicas",

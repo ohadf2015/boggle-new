@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
-import { describe, it, expect, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { describe, it, expect, vi, afterEach } from 'vitest';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { CrosswordToolbar } from '../CrosswordToolbar';
 import { CrosswordProgressRow } from '../CrosswordProgressRow';
 import { ClueBar } from '../ClueBar';
@@ -27,6 +27,39 @@ describe('CrosswordToolbar', () => {
   it('never truncates a label (the verb must stay readable)', () => {
     render(<CrosswordToolbar actions={[{ key: 'a', label: 'Reveal word', icon: <i />, onClick: vi.fn() }]} />);
     expect(screen.getByText('Reveal word').className).not.toMatch(/truncate/);
+  });
+});
+
+describe('CrosswordToolbar confirm', () => {
+  afterEach(() => vi.useRealTimers());
+
+  const setup = () => {
+    const onRestart = vi.fn();
+    render(
+      <CrosswordToolbar
+        actions={[{ key: 'restart', label: 'Restart', confirmLabel: 'Sure?', icon: <i />, onClick: onRestart }]}
+      />,
+    );
+    return onRestart;
+  };
+
+  it('needs a second tap before a destructive action runs', () => {
+    const onRestart = setup();
+    fireEvent.click(screen.getByRole('button', { name: 'Restart' }));
+    expect(onRestart).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: 'Sure?' }));
+    expect(onRestart).toHaveBeenCalledTimes(1);
+  });
+
+  it('disarms after a few seconds so a stray later tap cannot wipe the board', () => {
+    vi.useFakeTimers();
+    const onRestart = setup();
+    fireEvent.click(screen.getByRole('button', { name: 'Restart' }));
+    act(() => {
+      vi.advanceTimersByTime(3500);
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Restart' }));
+    expect(onRestart).not.toHaveBeenCalled();
   });
 });
 

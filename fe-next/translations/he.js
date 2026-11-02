@@ -2145,6 +2145,7 @@ const he = {
     "revealLetter": "אות",
     "revealWord": "מילה",
     "restart": "התחלה מחדש",
+    "restartConfirm": "בטוחים?",
     "backspace": "מחיקה",
     "kanaVoiced": "קאנה קולית (゛゜)",
     "kanaBasic": "קאנה בסיסית",

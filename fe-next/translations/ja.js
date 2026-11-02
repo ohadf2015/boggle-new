@@ -2145,6 +2145,7 @@ const ja = {
     "revealLetter": "文字",
     "revealWord": "単語",
     "restart": "リスタート",
+    "restartConfirm": "本当に？",
     "backspace": "削除",
     "kanaVoiced": "濁音・半濁音",
     "kanaBasic": "清音",

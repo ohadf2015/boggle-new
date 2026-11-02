@@ -177,7 +177,7 @@ export function CrosswordView({
     ...(manyClues
       ? [{ key: 'clues', label: t('crossword.allClues'), icon: <List size={18} />, onClick: () => setCluesOpen(true) }]
       : []),
-    { key: 'restart', label: t('crossword.restart'), icon: <RotateCcw size={18} />, onClick: reset },
+    { key: 'restart', label: t('crossword.restart'), confirmLabel: t('crossword.restartConfirm'), icon: <RotateCcw size={18} />, onClick: reset },
   ];
 
   return (

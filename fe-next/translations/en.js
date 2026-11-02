@@ -2119,6 +2119,7 @@ const en = {
     "revealLetter": "Letter",
     "revealWord": "Word",
     "restart": "Restart",
+    "restartConfirm": "Sure?",
     "backspace": "Delete",
     "kanaVoiced": "Voiced kana (゛゜)",
     "kanaBasic": "Basic kana",

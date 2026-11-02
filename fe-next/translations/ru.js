@@ -7546,6 +7546,7 @@ const ru = {
     "revealLetter": "Буква",
     "revealWord": "Слово",
     "restart": "Начать заново",
+    "restartConfirm": "Точно?",
     "backspace": "Стереть",
     "kanaVoiced": "Звонкие кана (゛゜)",
     "kanaBasic": "Основные кана",
