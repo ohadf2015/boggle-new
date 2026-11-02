@@ -78,6 +78,12 @@ export interface MultiplayerFlowProps {
   roomEndedOffer?: { seq: number } | null;
   /** The offer toast is on screen (the page clears the offer). */
   onRoomEndedOfferShown?: () => void;
+  /**
+   * Server-confirmed dead room, seq-bumped per report (useMpRoomSocket's
+   * handleRoomGone). The flow closes a join sheet still open for that code —
+   * its CTA into a dead room is what GR #14164 recorded rage clicks on.
+   */
+  joinRoomGone?: { code: string; seq: number } | null;
 }
 
 const TEST_ID = 'mp-entry';

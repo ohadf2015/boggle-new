@@ -208,6 +208,17 @@ export function useMpPageState() {
     setRoomEndedOffer({ seq: roomEndedSeqRef.current });
   }, []);
   const clearRoomEndedOffer = useCallback(() => setRoomEndedOffer(null), []);
+  // EVERY server-confirmed dead room, seq-bumped (handleRoomGone's arcade
+  // paths). The entry flow watches this to close a join sheet still open for
+  // the dead code — its CTA would otherwise keep firing joins into a room the
+  // server already refused (GR #14164 rage clicks on "Join battle").
+  const [joinRoomGone, setJoinRoomGone] = useState<{ code: string; seq: number } | null>(null);
+  const joinRoomGoneSeqRef = useRef(0);
+  const noteRoomGone = useCallback((goneCode: string) => {
+    if (!goneCode) return;
+    joinRoomGoneSeqRef.current += 1;
+    setJoinRoomGone({ code: goneCode, seq: joinRoomGoneSeqRef.current });
+  }, []);
   useEffect(() => {
     if (isActive) setRoomEndedOffer(null);
   }, [isActive]);
@@ -309,7 +320,7 @@ export function useMpPageState() {
     setRoomLanguage, setUsername, setGameCode, setRoomName, setActiveRooms, setIsSpectator, setSpectators,
     setPlayersInRoom, setPlayersInRoomThrottled, setPendingGameStart, setGameStartTime, setShowResults,
     setResultsData, setHostLeftState, onMatchStart: mpSounds.onMatchStart, roomWaitHold: roomWait.hold,
-    classroomContext, classroomDecisionRef, exitClassroomStudentToHub, offerQuickPlayRecovery,
+    classroomContext, classroomDecisionRef, exitClassroomStudentToHub, offerQuickPlayRecovery, onRoomGone: noteRoomGone,
   });
 
   // Sync ref bridge so hooks called before the room socket get the latest socket
@@ -379,7 +390,7 @@ export function useMpPageState() {
       prefilledRoom: prefilledRoomCode, defaultLanguage: language as Language,
       host: isClassroomHost,
       isClassroomMode, waitingForTeacher: !!roomWait.waitingCode,
-      roomEndedOffer, onRoomEndedOfferShown: clearRoomEndedOffer,
+      roomEndedOffer, onRoomEndedOfferShown: clearRoomEndedOffer, joinRoomGone,
       setGameCode, setUsername, setRoomName, setHostUsername,
     },
     playersInRoom, handleShowResults, pendingGameStart, handleGameStartConsumed, lessonData,
