@@ -7,7 +7,7 @@
  * DIFFERENT name from the server's authoritative `edu_pro_checkout_succeeded`
  * so the two never double-count one conversion.
  */
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 const captureMock = vi.fn();
 vi.mock('@/lib/analytics/lazyPosthog', () => ({
@@ -21,6 +21,15 @@ vi.mock('@/lib/analytics/lazyPosthog', () => ({
 const growthMock = vi.fn();
 vi.mock('@/utils/growthTracking', () => ({
   trackGrowthEvent: (...args: unknown[]) => growthMock(...args),
+}));
+
+const beaconMock = vi.fn();
+const reportMissingKeyMock = vi.fn();
+const keyState = vi.hoisted(() => ({ present: true }));
+vi.mock('@/lib/education/proFunnelBeacon', () => ({
+  hasClientPostHogKey: () => keyState.present,
+  beaconProFunnelEvent: (...args: unknown[]) => beaconMock(...args),
+  reportMissingClientKey: (...args: unknown[]) => reportMissingKeyMock(...args),
 }));
 
 import {
@@ -350,6 +359,65 @@ describe('trial CTA funnel events', () => {
       throw new Error('posthog down');
     });
     expect(() => trackTrialCtaTap({ source: 'dashboard_trial_offer' })).not.toThrow();
+  });
+});
+
+describe('durable server fallback when the client PostHog key is absent', () => {
+  beforeEach(() => {
+    captureMock.mockReset();
+    beaconMock.mockReset();
+    reportMissingKeyMock.mockReset();
+    growthMock.mockReset();
+    localStorage.clear();
+    keyState.present = false;
+  });
+  afterEach(() => {
+    keyState.present = true;
+  });
+
+  it('Given no client key, When a funnel step is tracked, Then it is beaconed to the server instead of queued-and-dropped, and the gap is reported loudly', () => {
+    trackTrialCtaView({ source: 'upgrade_page' });
+    expect(captureMock).not.toHaveBeenCalled();
+    expect(beaconMock).toHaveBeenCalledWith('trial_cta_view', {
+      source: 'upgrade_page',
+      product: 'teacher_pro',
+    });
+    expect(reportMissingKeyMock).toHaveBeenCalledWith('proFunnelTelemetry');
+    // The Growth Radar mirror does not depend on the PostHog key — unaffected.
+    expect(growthMock).toHaveBeenCalledWith('trial_cta_view', {
+      source: 'upgrade_page',
+      product: 'teacher_pro',
+    });
+  });
+
+  it('Given no client key, When the return step is tracked, Then BOTH names beacon AND the durable checkout-return POST still fires', () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue({ ok: true } as Response);
+    try {
+      expect(trackEduProCheckoutReturnLanded(1_000)).toBe(true);
+      expect(captureMock).not.toHaveBeenCalled();
+      expect(beaconMock).toHaveBeenCalledWith('edu_pro_checkout_return_landed', {});
+      expect(beaconMock).toHaveBeenCalledWith('checkout_return_landed', {
+        product: 'teacher_pro',
+        provider: 'polar',
+      });
+      expect(fetchSpy).toHaveBeenCalledWith(
+        '/api/subscription/checkout-return',
+        expect.objectContaining({ method: 'POST', keepalive: true }),
+      );
+    } finally {
+      fetchSpy.mockRestore();
+    }
+  });
+
+  it('Given the key is present, When a step is tracked, Then the beacon stays silent and the client path is unchanged', () => {
+    keyState.present = true;
+    trackTrialCtaView({ source: 'upgrade_page' });
+    expect(captureMock).toHaveBeenCalledWith('trial_cta_view', {
+      source: 'upgrade_page',
+      product: 'teacher_pro',
+    });
+    expect(beaconMock).not.toHaveBeenCalled();
+    expect(reportMissingKeyMock).not.toHaveBeenCalled();
   });
 });
 

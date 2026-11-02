@@ -37,10 +37,24 @@
 import posthog from '@/lib/analytics/lazyPosthog';
 import { trackGrowthEvent, type GrowthEvent } from '@/utils/growthTracking';
 import { checkoutIdFromSearch, normalizeCheckoutId } from '@/lib/education/checkoutReturn';
+import {
+  beaconProFunnelEvent,
+  hasClientPostHogKey,
+  reportMissingClientKey,
+} from '@/lib/education/proFunnelBeacon';
 
 type Capture = (event: string, props?: Record<string, unknown>) => void;
 
 function safeCapture(event: string, props: Record<string, unknown>): void {
+  // No client key baked into the bundle: PostHogProvider's init guard skips
+  // init(), so a capture here would sit in lazyPosthog's queue until it is
+  // silently dropped at MAX_QUEUE. Say so once, loudly, and take the durable
+  // server path instead of the doomed queue (brain P0 38ac1a51).
+  if (!hasClientPostHogKey()) {
+    reportMissingClientKey('proFunnelTelemetry');
+    beaconProFunnelEvent(event, props);
+    return;
+  }
   try {
     (posthog.capture as unknown as Capture)(event, props);
   } catch {

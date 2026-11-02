@@ -63,7 +63,18 @@ export function _resetPostHogInit() {
 function initPostHog() {
   const key = process.env.NEXT_PUBLIC_POSTHOG_KEY;
   if (!key || posthogInitialized) {
-    if (!key) armActivationCapture({ force: true });
+    if (!key) {
+      // Loud, not silent: with no key the lazy proxy queues captures until they
+      // are dropped at MAX_QUEUE, and the only trace used to be nothing at all
+      // (that is how checkout_return_landed went dark — brain P0 38ac1a51).
+       
+      console.error(
+        '[PostHogProvider] NEXT_PUBLIC_POSTHOG_KEY missing from the client bundle — ' +
+          'posthog.init() skipped; queued captures will be dropped. ' +
+          'Teacher Pro funnel events fall back to the server beacon.',
+      );
+      armActivationCapture({ force: true });
+    }
     return;
   }
 
