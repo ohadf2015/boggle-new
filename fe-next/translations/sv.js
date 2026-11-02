@@ -994,8 +994,9 @@ const sv = {
       "progressAssignments": "uppgifter",
       "progressSubmitted": "inlämnade",
       "progressUpgrade": "Teacher Pro",
-      "endedCodeTries": "Elever som försökte med en gammal spelkod: {count}. Starta ett nytt spel så att de kan vara med.",
-      "endedCodeTriesOne": "En elev försökte med en gammal spelkod. Starta ett nytt spel så att eleven kan vara med.",
+      "endedCodeTries": "Elever som försökte gå med efter att ditt spel tog slut: {count}.",
+      "endedCodeTriesOne": "En elev försökte gå med efter att ditt spel tog slut.",
+      "lateJoinProLine": "Med Teacher Pro kan du ge dem en uppgift som de spelar när det passar dem.",
       "joinedGoal": "{count} inne, mål: {goal}"
     },
     "modes": {
@@ -17559,7 +17560,9 @@ const sv = {
         "title": "Det här spelet är slut",
         "retry": "Försök igen",
         "toClass": "Till min klass",
-        "newCode": "Skriv en ny kod"
+        "newCode": "Skriv en ny kod",
+        "practiceLine": "Din lärares spel är slut. Spela dagens övningsrunda i stället.",
+        "practiceCta": "Spela dagens övningsrunda"
       },
       "lessonsAssigned": "Tilldelade lektioner",
       "feel": {

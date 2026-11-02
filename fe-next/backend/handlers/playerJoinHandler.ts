@@ -150,7 +150,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     // included, since the client re-emits `join` to rebuild the socket map).
     // No-op for ordinary multiplayer rooms; hands back the classroom record so
     // `emitClassroomContext` below reads Redis once, not twice.
-    const seat = await checkClassroomSeat(socket, gameCode, 'multiplayer');
+    const seat = await checkClassroomSeat(socket, gameCode, 'multiplayer', typeof username === 'string' ? username : null);
     if (seat.refused) return;
 
     // Handle multi-tab detection and existing auth connection

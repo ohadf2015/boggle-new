@@ -17,6 +17,8 @@ export const EDU_EVENTS = {
   classroomGameStarted: 'edu_classroom_game_started',
   classroomGameCompleted: 'edu_classroom_game_completed',
   classroomJoinRefused: 'edu_classroom_join_refused',
+  // A student who reached an ended classroom game started today's practice round instead.
+  latePracticeStarted: 'edu_late_join_practice_started',
 } as const;
 
 export type EduEventName = (typeof EDU_EVENTS)[keyof typeof EDU_EVENTS];

@@ -994,8 +994,9 @@ const en = {
       "progressAssignments": "assigned",
       "progressSubmitted": "submitted",
       "progressUpgrade": "Teacher Pro",
-      "endedCodeTries": "{count} students tried an old game code. Start a new game so they can play.",
-      "endedCodeTriesOne": "1 student tried an old game code. Start a new game so they can play.",
+      "endedCodeTries": "{count} students tried to join after your game ended.",
+      "endedCodeTriesOne": "1 student tried to join after your game ended.",
+      "lateJoinProLine": "With Teacher Pro, give them an assignment they can play on their own time.",
       "joinedGoal": "{count} joined, aim for {goal}"
     },
     "modes": {
@@ -15608,7 +15609,9 @@ const en = {
         "title": "This game has ended",
         "retry": "Try again",
         "toClass": "Go to my class",
-        "newCode": "Enter a new code"
+        "newCode": "Enter a new code",
+        "practiceLine": "Your teacher's game ended. Play today's class practice round instead.",
+        "practiceCta": "Play today's practice round"
       },
       "lessonsAssigned": "Lessons assigned",
       "feel": {

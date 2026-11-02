@@ -994,8 +994,9 @@ const es = {
       "progressAssignments": "tareas",
       "progressSubmitted": "entregadas",
       "progressUpgrade": "Teacher Pro",
-      "endedCodeTries": "Alumnos que probaron el código de un juego que ya terminó: {count}. Empieza un juego nuevo para que puedan jugar.",
-      "endedCodeTriesOne": "Un alumno probó el código de un juego que ya terminó. Empieza un juego nuevo para que pueda jugar.",
+      "endedCodeTries": "Alumnos que intentaron unirse después de que terminara tu juego: {count}.",
+      "endedCodeTriesOne": "Un alumno intentó unirse después de que terminara tu juego.",
+      "lateJoinProLine": "Con Teacher Pro, dales una tarea que puedan jugar a su ritmo.",
       "joinedGoal": "{count} dentro, meta: {goal}"
     },
     "modes": {
@@ -17198,7 +17199,9 @@ const es = {
         "title": "Este juego terminó",
         "retry": "Reintentar",
         "toClass": "Ir a mi clase",
-        "newCode": "Poner otro código"
+        "newCode": "Poner otro código",
+        "practiceLine": "El juego de tu profe terminó. Juega la ronda de práctica de hoy.",
+        "practiceCta": "Jugar la práctica de hoy"
       },
       "lessonsAssigned": "Lecciones asignadas",
       "feel": {

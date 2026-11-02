@@ -994,8 +994,9 @@ const ja = {
       "progressAssignments": "課題",
       "progressSubmitted": "提出済み",
       "progressUpgrade": "Teacher Pro",
-      "endedCodeTries": "終了したゲームのコードを入力した生徒：{count}人。新しいゲームを始めて、参加できるようにしましょう。",
-      "endedCodeTriesOne": "終了したゲームのコードを入力した生徒：{count}人。新しいゲームを始めて、参加できるようにしましょう。",
+      "endedCodeTries": "ゲーム終了後に参加しようとした生徒：{count}人。",
+      "endedCodeTriesOne": "ゲーム終了後に参加しようとした生徒：{count}人。",
+      "lateJoinProLine": "Teacher Proなら、生徒が自分のペースで取り組める課題を出せます。",
       "joinedGoal": "{count}人参加・目標{goal}人"
     },
     "modes": {
@@ -17140,7 +17141,9 @@ const ja = {
         "title": "このゲームは終了しました",
         "retry": "もう一度試す",
         "toClass": "自分のクラスへ",
-        "newCode": "新しいコードを入力"
+        "newCode": "新しいコードを入力",
+        "practiceLine": "先生のゲームは終了しました。代わりに今日の練習ラウンドをプレイしよう。",
+        "practiceCta": "今日の練習ラウンドをプレイ"
       },
       "lessonsAssigned": "割り当てられたレッスン",
       "feel": {

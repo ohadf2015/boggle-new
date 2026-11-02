@@ -28,6 +28,11 @@ vi.mock('../../modules/supabase/client', () => ({
   }),
 }));
 
+const tally = vi.hoisted(() => ({ calls: [] as Array<[string, string]> }));
+vi.mock('@/lib/education/endedCodeTries', () => ({
+  recordEndedCodeTry: vi.fn(async (classroomId: string, key: string) => { tally.calls.push([classroomId, key]); }),
+}));
+
 import { captureLiveGameEnded, captureJoinRefusal } from '../eduLiveEvents';
 
 const game = { gameCode: 'G1', classroomId: 'c1', teacherId: 't1', players: [], lessonIds: [], settings: {}, startedAt: '2026-10-01T10:00:00Z' } as unknown as ClassroomGame;
@@ -65,5 +70,22 @@ describe('captureJoinRefusal', () => {
   it('Given an unknown code (no classroom), Then the refusal still fires with an explicit false', async () => {
     await captureJoinRefusal({ gameCode: 'ZZZ', classroomId: null, reason: 'CODE_UNKNOWN', door: 'join', actorId: null });
     expect(captured[0].properties.is_test_account).toBe(false);
+  });
+
+  it('Given a student refused because the game ended, Then the class late-join tally counts them for the teacher', async () => {
+    tally.calls.length = 0;
+    await captureJoinRefusal(
+      { gameCode: 'G1', classroomId: 'c1', reason: 'SESSION_ENDED', door: 'join', actorId: null },
+      { studentKey: 'guest:G1:maya' },
+    );
+    expect(tally.calls).toEqual([['c1', 'guest:G1:maya']]);
+    expect(captured[0]).toMatchObject({ event: 'edu_classroom_join_refused', properties: { reason: 'SESSION_ENDED' } });
+  });
+
+  it('Given a refusal for any other reason or without a class, Then nothing is tallied', async () => {
+    tally.calls.length = 0;
+    await captureJoinRefusal({ gameCode: 'G1', classroomId: 'c1', reason: 'ROOM_GONE', door: 'join', actorId: 's1' });
+    await captureJoinRefusal({ gameCode: 'G1', classroomId: null, reason: 'SESSION_ENDED', door: 'join', actorId: 's1' });
+    expect(tally.calls).toEqual([]);
   });
 });

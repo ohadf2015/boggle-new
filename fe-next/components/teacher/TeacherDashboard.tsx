@@ -301,7 +301,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
                 />
               ) : (
                 <>
-                  {selectedClassroom ? <EndedCodeTriesNotice classroomId={selectedClassroom.id} /> : null}
+                  {selectedClassroom ? <EndedCodeTriesNotice classroomId={selectedClassroom.id} pro={pro} /> : null}
                   <div data-tm>
                     <HomeHero
                       classrooms={classrooms}

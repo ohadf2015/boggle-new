@@ -994,8 +994,9 @@ const he = {
       "progressAssignments": "מטלות",
       "progressSubmitted": "הוגשו",
       "progressUpgrade": "פרו למורים",
-      "endedCodeTries": "תלמידים שניסו קוד של משחק שהסתיים: {count}. התחילו משחק חדש כדי שיוכלו לשחק.",
-      "endedCodeTriesOne": "תלמיד אחד ניסה קוד של משחק שהסתיים. התחילו משחק חדש כדי שיוכל לשחק.",
+      "endedCodeTries": "תלמידים שניסו להצטרף אחרי שהמשחק הסתיים: {count}.",
+      "endedCodeTriesOne": "תלמיד אחד ניסה להצטרף אחרי שהמשחק הסתיים.",
+      "lateJoinProLine": "עם פרו למורים אפשר לתת להם משימה שישחקו בזמן שלהם.",
       "joinedGoal": "{count} הצטרפו, היעד: {goal}"
     },
     "modes": {
@@ -17103,7 +17104,9 @@ const he = {
         "title": "המשחק הזה נגמר",
         "retry": "נסו שוב",
         "toClass": "חזרה לכיתה שלי",
-        "newCode": "הזינו קוד חדש"
+        "newCode": "הזינו קוד חדש",
+        "practiceLine": "המשחק של המורה הסתיים. אפשר לשחק במקום זה בסבב התרגול של היום.",
+        "practiceCta": "לשחק בסבב התרגול של היום"
       },
       "lessonsAssigned": "שיעורים שהוקצו",
       "feel": {
