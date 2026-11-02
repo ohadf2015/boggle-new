@@ -37,7 +37,13 @@ describe('ProWelcomeCelebration — paid checkout', () => {
 
   it('does not write the gift seen-marker for a paid celebration', () => {
     render(<ProWelcomeCelebration grant={null} paid />);
-    expect(global.fetch).not.toHaveBeenCalled();
+    // The marker write is POST /api/subscription/pro-welcome-seen. A paid
+    // celebration still fires TELEMETRY fetches (the pro-funnel beacon when
+    // the test env has no client PostHog key) — those are not the marker.
+    const markerCalls = (global.fetch as ReturnType<typeof vi.fn>).mock.calls.filter(
+      (c) => String(c[0]).includes('/api/subscription/pro-welcome-seen'),
+    );
+    expect(markerCalls).toHaveLength(0);
   });
 
   it('strips ?checkout=success on close so a reload does not re-celebrate', () => {
