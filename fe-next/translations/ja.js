@@ -16386,6 +16386,34 @@ const ja = {
       "notStarted": "未着手",
       "student": "生徒",
       "studentDetail": "生徒の詳細",
+      "overview": {
+        "statusTitle": "みんなの今の状況",
+        "status": {
+          "needsHelp": "サポートが必要",
+          "inactive": "最近やっていない",
+          "notStarted": "未開始",
+          "steady": "順調",
+          "thriving": "絶好調"
+        },
+        "attentionTitle": "まず声をかけたい生徒",
+        "attentionEmpty": "今、気にかけるべき生徒はいません。",
+        "activityTitle": "今週の練習",
+        "activityHint": "最後に練習した日ごとの生徒数",
+        "starsTitle": "伸びている生徒",
+        "starsEmpty": "3日練習して正答率80%以上になると表示されます。",
+        "hardWordsTitle": "つまずきやすい単語",
+        "hardWordsEmpty": "クラスが苦戦している単語はありません。",
+        "hardWordsMeta": "{{count}}人・誤答{{pct}}%",
+        "rosterTitle": "全員",
+        "reason": {
+          "needsHelp": "今週の正答率 {{pct}}%",
+          "notStarted": "まだ始めていません"
+        },
+        "today": "今日",
+        "openReport": "{{name}}さんのレポートを開く",
+        "unnamed": "生徒",
+        "drillDescription": "この生徒の詳しい進捗レポート"
+      },
       "studentProgress": "生徒の進捗",
       "students": "生徒",
       "studentsNeedingHelp": "サポートが必要な生徒",

@@ -4440,6 +4440,34 @@ const ru = {
       "notStarted": "Не начато",
       "student": "Ученик",
       "studentDetail": "Детали ученика",
+      "overview": {
+        "statusTitle": "Как дела у каждого",
+        "status": {
+          "needsHelp": "Нужна помощь",
+          "inactive": "Пропали",
+          "notStarted": "Не начали",
+          "steady": "В ритме",
+          "thriving": "Блистают"
+        },
+        "attentionTitle": "Кому помочь в первую очередь",
+        "attentionEmpty": "Сейчас никто не нуждается в вас.",
+        "activityTitle": "Практика за неделю",
+        "activityHint": "Ученики по дню последней практики",
+        "starsTitle": "Растущие звёзды",
+        "starsEmpty": "Появятся после 3 дней практики с точностью от 80%.",
+        "hardWordsTitle": "Самые трудные слова",
+        "hardWordsEmpty": "Ни одно слово не тормозит класс.",
+        "hardWordsMeta": "{{count}} уч. · {{pct}}% ошибок",
+        "rosterTitle": "Все ученики",
+        "reason": {
+          "needsHelp": "{{pct}}% верно за неделю",
+          "notStarted": "Ещё не начал"
+        },
+        "today": "Сегодня",
+        "openReport": "Открыть отчёт: {{name}}",
+        "unnamed": "Ученик",
+        "drillDescription": "Подробный отчёт о прогрессе ученика"
+      },
       "studentProgress": "Прогресс ученика",
       "students": "Ученики",
       "studentsNeedingHelp": "Ученики, которым нужна помощь",

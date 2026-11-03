@@ -16241,6 +16241,34 @@ const he = {
       "notStarted": "טרם התחיל/ה",
       "student": "תלמיד/ה",
       "studentDetail": "פרטי תלמיד",
+      "overview": {
+        "statusTitle": "איפה כל אחד עומד",
+        "status": {
+          "needsHelp": "צריכים עזרה",
+          "inactive": "נעלמו",
+          "notStarted": "לא התחילו",
+          "steady": "בקצב טוב",
+          "thriving": "מצטיינים"
+        },
+        "attentionTitle": "מי צריך אתכם קודם",
+        "attentionEmpty": "אף אחד לא צריך אתכם כרגע.",
+        "activityTitle": "תרגול השבוע",
+        "activityHint": "תלמידים לפי היום האחרון שתרגלו",
+        "starsTitle": "כוכבים עולים",
+        "starsEmpty": "כוכבים יופיעו אחרי 3 ימי תרגול עם דיוק של 80% ומעלה.",
+        "hardWordsTitle": "המילים הקשות ביותר",
+        "hardWordsEmpty": "אין מילה שמכשילה את הכיתה.",
+        "hardWordsMeta": "{{count}} תלמידים · {{pct}}% טעויות",
+        "rosterTitle": "כולם",
+        "reason": {
+          "needsHelp": "{{pct}}% נכון השבוע",
+          "notStarted": "עוד לא התחיל"
+        },
+        "today": "היום",
+        "openReport": "פתחו את הדוח של {{name}}",
+        "unnamed": "תלמיד",
+        "drillDescription": "דוח התקדמות מפורט לתלמיד"
+      },
       "studentProgress": "התקדמות תלמידים",
       "students": "תלמידים",
       "studentsNeedingHelp": "תלמידים שצריכים עזרה",

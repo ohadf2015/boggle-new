@@ -16335,6 +16335,34 @@ const es = {
       "notStarted": "Sin empezar",
       "student": "Estudiante",
       "studentDetail": "Detalles del estudiante",
+      "overview": {
+        "statusTitle": "Cómo va cada uno",
+        "status": {
+          "needsHelp": "Necesitan ayuda",
+          "inactive": "Desaparecidos",
+          "notStarted": "Sin empezar",
+          "steady": "Buen ritmo",
+          "thriving": "Brillando"
+        },
+        "attentionTitle": "A quién atender primero",
+        "attentionEmpty": "Nadie te necesita ahora mismo.",
+        "activityTitle": "Práctica de la semana",
+        "activityHint": "Alumnos según su último día de práctica",
+        "starsTitle": "Estrellas en ascenso",
+        "starsEmpty": "Aparecen tras 3 días de práctica con un 80 % o más de aciertos.",
+        "hardWordsTitle": "Palabras más difíciles",
+        "hardWordsEmpty": "Ninguna palabra frena a la clase.",
+        "hardWordsMeta": "{{count}} alumnos · {{pct}} % de fallos",
+        "rosterTitle": "Toda la clase",
+        "reason": {
+          "needsHelp": "{{pct}} % de aciertos esta semana",
+          "notStarted": "Aún no empieza"
+        },
+        "today": "Hoy",
+        "openReport": "Abrir el informe de {{name}}",
+        "unnamed": "Alumno",
+        "drillDescription": "Informe de progreso detallado de este alumno"
+      },
       "studentProgress": "Progreso",
       "students": "Estudiantes",
       "studentsNeedingHelp": "Estudiantes con dificultad",

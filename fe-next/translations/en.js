@@ -14745,6 +14745,34 @@ const en = {
       "notStarted": "Not started",
       "student": "Student",
       "studentDetail": "Student details",
+      "overview": {
+        "statusTitle": "Where everyone stands",
+        "status": {
+          "needsHelp": "Needs help",
+          "inactive": "Gone quiet",
+          "notStarted": "Not started",
+          "steady": "On track",
+          "thriving": "Thriving"
+        },
+        "attentionTitle": "Who needs you first",
+        "attentionEmpty": "Nobody needs you right now.",
+        "activityTitle": "Practice this week",
+        "activityHint": "Students by day they last practiced",
+        "starsTitle": "Rising stars",
+        "starsEmpty": "Stars show up once students practice 3 days with 80%+ accuracy.",
+        "hardWordsTitle": "Hardest words",
+        "hardWordsEmpty": "No word is tripping up the class.",
+        "hardWordsMeta": "{{count}} students · {{pct}}% wrong",
+        "rosterTitle": "Everyone",
+        "reason": {
+          "needsHelp": "{{pct}}% correct this week",
+          "notStarted": "Hasn't started"
+        },
+        "today": "Today",
+        "openReport": "Open {{name}}'s report",
+        "unnamed": "Student",
+        "drillDescription": "Detailed progress report for this student"
+      },
       "studentProgress": "Student progress",
       "students": "Students",
       "studentsNeedingHelp": "Students needing help",
