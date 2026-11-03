@@ -14897,7 +14897,8 @@ const he = {
       "allPlayed": "כולם שיחקו.",
       "noMisses": "בלי טעויות",
       "loadFailed": "לא הצלחנו לטעון מי שיחק.",
-      "eachStudent": "כל תלמיד ({count})"
+      "eachStudent": "כל תלמיד ({count})",
+      "noScores": "אין עדיין ציונים: המשחקים האלה לא שמרו תוצאות למילים."
     },
     "tracking": {
       "all": "הכל",

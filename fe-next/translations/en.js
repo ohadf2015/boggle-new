@@ -13207,7 +13207,8 @@ const en = {
       "allPlayed": "Everyone has played.",
       "noMisses": "No misses",
       "loadFailed": "Couldn't load who played.",
-      "eachStudent": "Each student ({count})"
+      "eachStudent": "Each student ({count})",
+      "noScores": "No scores yet: these plays saved no word results."
     },
     "tracking": {
       "all": "All",

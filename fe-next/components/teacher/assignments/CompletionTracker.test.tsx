@@ -120,6 +120,8 @@ describe('CompletionTracker', () => {
     expect(within(row).getByText('teacher.completion.noMisses')).toBeInTheDocument();
     expect(screen.queryByText('%')).not.toBeInTheDocument();
     expect(screen.queryByText(/NaN/)).not.toBeInTheDocument();
+    expect(screen.queryByText('teacher.completion.onTrack')).not.toBeInTheDocument();
+    expect(within(screen.getByTestId('results-need-help')).getByText('teacher.completion.noScores')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /eduPro.practice.cta/ })).not.toBeInTheDocument();
   });
 

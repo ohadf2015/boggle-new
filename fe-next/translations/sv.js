@@ -15350,7 +15350,8 @@ const sv = {
       "allPlayed": "Alla har spelat.",
       "noMisses": "Inga missar",
       "loadFailed": "Kunde inte ladda vem som spelat.",
-      "eachStudent": "Varje elev ({count})"
+      "eachStudent": "Varje elev ({count})",
+      "noScores": "Inga resultat än: de här spelen sparade inga ordresultat."
     },
     "tracking": {
       "all": "Alla",

@@ -15360,7 +15360,8 @@ const es = {
       "allPlayed": "Todos han jugado.",
       "noMisses": "Sin fallos",
       "loadFailed": "No se pudo cargar quién jugó.",
-      "eachStudent": "Cada alumno ({count})"
+      "eachStudent": "Cada alumno ({count})",
+      "noScores": "Aún no hay puntuaciones: estas partidas no guardaron resultados por palabra."
     },
     "tracking": {
       "all": "Todas",

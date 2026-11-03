@@ -78,7 +78,9 @@ export function AssignmentResultsView({
               tone="border-neo-pink/70"
             >
               {needHelp.length === 0 ? (
-                <p className="text-sm text-neo-cream/80">{t('teacher.completion.onTrack')}</p>
+                <p className="text-sm text-neo-cream/80">
+                  {t(played.some((s) => s.accuracy !== null) ? 'teacher.completion.onTrack' : 'teacher.completion.noScores')}
+                </p>
               ) : (
                 <ul className="flex flex-wrap gap-1.5">
                   {needHelp.map((s, i) => (

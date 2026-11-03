@@ -15042,7 +15042,8 @@ const ja = {
       "allPlayed": "全員がプレイしました。",
       "noMisses": "ミスなし",
       "loadFailed": "プレイした生徒を読み込めませんでした。",
-      "eachStudent": "生徒ごと（{count}人）"
+      "eachStudent": "生徒ごと（{count}人）",
+      "noScores": "まだスコアがありません。このプレイでは単語の結果が保存されていません。"
     },
     "tracking": {
       "all": "すべて",
