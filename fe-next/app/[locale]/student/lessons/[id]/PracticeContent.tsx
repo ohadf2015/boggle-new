@@ -87,6 +87,8 @@ export interface PracticeContentProps {
   initialFocus: VocabFocus | null;
   /** solo_board only: 'wordcraft' when a Word Craft assignment deep-links here. */
   initialVariant?: PracticeVariant | null;
+  /** Signed-in student id: Word Craft queues missed lesson words for their review. */
+  reviewStudentId?: string;
   /** Records a finished round on the device when there is no account. */
   onGuestResult: (result: { cardsReviewed?: number; cardsCorrect?: number; vocabularyWordsFound?: string[] }) => void;
 }
@@ -102,6 +104,7 @@ export default function PracticeContent({
   initialMode,
   initialFocus,
   initialVariant = null,
+  reviewStudentId,
   onGuestResult,
 }: PracticeContentProps) {
   const { t } = useLanguage();
@@ -339,6 +342,7 @@ export default function PracticeContent({
             xpSessionData={xpSessionData}
             onNext={nextTile ? handleNextTile : undefined}
             nextLabel={nextTile ? t(nextTile.titleKey) : undefined}
+            wordCraftReview={reviewStudentId ? { studentId: reviewStudentId, lessonId: lesson.id } : undefined}
           />
         </EducationShell>
 

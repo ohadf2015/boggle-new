@@ -77,6 +77,8 @@ export interface PracticeModeStageProps {
   /** Straight into the next ready mode, when the lesson has one left. */
   onNext?: () => void;
   nextLabel?: string;
+  /** Word Craft only: where the round's missed lesson words are queued for review. */
+  wordCraftReview?: { studentId: string; lessonId: string };
 }
 
 export default function PracticeModeStage({
@@ -91,6 +93,7 @@ export default function PracticeModeStage({
   xpSessionData,
   onNext,
   nextLabel,
+  wordCraftReview,
 }: PracticeModeStageProps) {
   if (words.length === 0) return null;
 
@@ -123,6 +126,7 @@ export default function PracticeModeStage({
               await onFinish('solo_board', { vocabularyWordsFound: results.vocabularyWordsFound, wordsFound: results.wordsFound, newWordsFound: [] });
             }}
             onBack={onBack}
+            review={wordCraftReview}
             {...forward}
           />
         );

@@ -21704,6 +21704,11 @@ const sv = {
   }
   // @teacherLifecycleEmail:end
   ,
+  // @wordcraftReview:start
+  "wordcraftReview": {
+    "cta": "Repetera missade ord ({count})",
+  },
+  // @wordcraftReview:end
   // @eduPolish:start
   "eduPolish": {
     "seatCapReached": "{name} tittar på: klassen är full ({cap} spelare)",

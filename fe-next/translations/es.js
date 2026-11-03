@@ -21717,6 +21717,11 @@ const es = {
   }
   // @teacherLifecycleEmail:end
   ,
+  // @wordcraftReview:start
+  "wordcraftReview": {
+    "cta": "Repasar palabras que faltaron ({count})",
+  },
+  // @wordcraftReview:end
   // @eduPolish:start
   "eduPolish": {
     "seatCapReached": "{name} está mirando: la clase está llena ({cap} jugadores)",

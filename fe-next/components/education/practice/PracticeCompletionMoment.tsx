@@ -21,7 +21,7 @@
  * reduced motion is a motion preference, not a silence preference.
  */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { AdaptiveMotion, useSkipAnimations } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -55,6 +55,8 @@ export interface PracticeCompletionMomentProps {
   nextLabel?: string;
   /** Back to the picker. */
   onBack: () => void;
+  /** A quieter follow-up under the actions (e.g. the words to review). */
+  footer?: ReactNode;
   className?: string;
 }
 
@@ -73,6 +75,7 @@ export default function PracticeCompletionMoment({
   onNext,
   nextLabel,
   onBack,
+  footer,
   className,
 }: PracticeCompletionMomentProps) {
   const { t, dir } = useLanguage();
@@ -288,6 +291,7 @@ export default function PracticeCompletionMoment({
               {t('student.practiceFun.again')}
             </button>
           )}
+          {footer}
         </div>
       </div>
 

@@ -23,11 +23,13 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import PracticeCompletionMoment from '@/components/education/practice/PracticeCompletionMoment';
+import WordCraftMissedReview from '@/components/education/practice/WordCraftMissedReview';
 import { DRILL_ROOT_CLASS } from '@/components/practice/drillLayout';
 import { WordCraftGameView } from '@/components/word-craft/WordCraftGameScreen';
 import { onWordCraftGameEnd } from '@/components/word-craft/wordCraftTelemetry';
 import { canonLessonWord } from '@/lib/wordTower/lessonSeed';
 import { lessonWordsPlayed, wordCraftAttemptIsMeaningful, WORDCRAFT_MIN_VALID_WORDS } from '@/lib/education/wordcraftAssignment';
+import { saveWordCraftMisses, wordCraftMissedLessonWords } from '@/lib/education/wordcraftMissedWords';
 import { homeworkWordCraftLocaleFor, lessonTargetsFor } from '@/lib/word-craft/lessonBag';
 import { cn } from '@/lib/utils';
 import type { Language } from '@/lib/supabase/education/types';
@@ -50,13 +52,18 @@ export interface WordCraftPracticeProps {
   onBack: () => void;
   onNext?: () => void;
   nextLabel?: string;
+  /** Signed-in student: unbuilt lesson words are queued for Missed Words Review. */
+  review?: { studentId: string; lessonId: string };
 }
 
-type Phase = { name: 'intro' } | { name: 'playing'; seed: number } | { name: 'done'; results: WordCraftPracticeResults };
+type Phase =
+  | { name: 'intro' }
+  | { name: 'playing'; seed: number }
+  | { name: 'done'; results: WordCraftPracticeResults; missed: string[] };
 
 const newSeed = () => Math.floor(Math.random() * 1_000_000);
 
-export default function WordCraftPractice({ words, language, onComplete, onBack, onNext, nextLabel }: WordCraftPracticeProps) {
+export default function WordCraftPractice({ words, language, onComplete, onBack, onNext, nextLabel, review }: WordCraftPracticeProps) {
   const { t, language: uiLanguage } = useLanguage();
   const [phase, setPhase] = useState<Phase>({ name: 'intro' });
   const targets = useMemo(
@@ -69,9 +76,9 @@ export default function WordCraftPractice({ words, language, onComplete, onBack,
   }, [words, language, uiLanguage]);
 
   // Latest props for the listener without re-subscribing on every render.
-  const latest = useRef({ words, language, onComplete });
+  const latest = useRef({ words, language, onComplete, review, dealt: deal.targets });
   useEffect(() => {
-    latest.current = { words, language, onComplete };
+    latest.current = { words, language, onComplete, review, dealt: deal.targets };
   });
 
   const playing = phase.name === 'playing';
@@ -81,7 +88,7 @@ export default function WordCraftPractice({ words, language, onComplete, onBack,
     return onWordCraftGameEnd((state, { hotseat }) => {
       if (reported || hotseat) return;
       reported = true;
-      const { words: lessonWords, language: lang, onComplete: report } = latest.current;
+      const { words: lessonWords, language: lang, onComplete: report, review: reviewTo, dealt } = latest.current;
       const results: WordCraftPracticeResults = {
         vocabularyWordsFound: lessonWordsPlayed(state.history, lessonWords, lang),
         wordsFound: [...new Set(state.history.filter((m) => m.who === 'player').flatMap((m) => m.words))],
@@ -89,7 +96,11 @@ export default function WordCraftPractice({ words, language, onComplete, onBack,
         botScore: state.bot.score,
         won: state.player.score > state.bot.score,
       };
-      setPhase({ name: 'done', results });
+      const missed = reviewTo
+        ? wordCraftMissedLessonWords({ lessonWords, dealt, built: results.vocabularyWordsFound, language: lang })
+        : [];
+      if (reviewTo) saveWordCraftMisses(reviewTo.studentId, reviewTo.lessonId, missed);
+      setPhase({ name: 'done', results, missed });
       void report(results);
     });
   }, [playing]);
@@ -103,7 +114,8 @@ export default function WordCraftPractice({ words, language, onComplete, onBack,
   }
 
   if (phase.name === 'done') {
-    const { results } = phase;
+    const { results, missed } = phase;
+    const missedReview = review && missed.length > 0 ? <WordCraftMissedReview lessonId={review.lessonId} missed={missed} /> : null;
     if (!wordCraftAttemptIsMeaningful({ lessonWordsFound: results.vocabularyWordsFound, validWordsFound: results.wordsFound })) {
       return (
         <div className={cn(DRILL_ROOT_CLASS, 'w-full rounded-neo border-[3px] border-neo-black p-4 text-center')} data-testid="wordcraft-practice-nudge">
@@ -123,6 +135,7 @@ export default function WordCraftPractice({ words, language, onComplete, onBack,
           <Button variant="ghost" onClick={onBack} className="w-full text-neo-white hover:text-neo-white hover:bg-neo-white/10">
             {t('common.back')}
           </Button>
+          {missedReview && <div className="mt-2">{missedReview}</div>}
         </div>
       );
     }
@@ -147,6 +160,7 @@ export default function WordCraftPractice({ words, language, onComplete, onBack,
           onBack={onBack}
           onNext={onNext}
           nextLabel={nextLabel}
+          footer={missedReview}
         />
       </div>
     );

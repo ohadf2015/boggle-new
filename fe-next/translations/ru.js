@@ -21404,6 +21404,11 @@ const ru = {
   }
   // @teacherLifecycleEmail:end
   ,
+  // @wordcraftReview:start
+  "wordcraftReview": {
+    "cta": "Повторить пропущенные слова ({count})",
+  },
+  // @wordcraftReview:end
   // @eduPolish:start
   "eduPolish": {
     "seatCapReached": "{name} смотрит: класс заполнен ({cap} игроков)",
