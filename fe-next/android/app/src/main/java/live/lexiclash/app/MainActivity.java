@@ -31,6 +31,7 @@ public class MainActivity extends BridgeActivity implements ModifiedMainActivity
     protected void onCreate(Bundle savedInstanceState) {
         // Crash logger installed in LexiClashApplication.attachBaseContext —
         // earlier than this hook so ContentProvider init failures get captured too.
+        registerPlugin(AppUpdatePlugin.class);
         super.onCreate(savedInstanceState);
 
         // Edge-to-edge (Android 15+): WebView draws behind transparent system bars;

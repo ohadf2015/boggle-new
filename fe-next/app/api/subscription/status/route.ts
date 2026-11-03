@@ -8,6 +8,7 @@ import { accessTrialExpiryAny } from '@/lib/education/accessTrialServer';
 import { hasPendingCheckout, type PendingCheckoutEventRow } from '@/lib/education/pendingCheckout';
 import { withTimeout } from '@/lib/server/routeTimeout';
 import logger from '@/utils/logger';
+import { isNativeAppUserAgent } from '@/lib/native/nativeHandoff';
 
 const PENDING_CHECKOUT_LOOKUP_TIMEOUT_MS = 800;
 
@@ -150,7 +151,7 @@ export async function GET(request: NextRequest) {
       status: subscription.status,
       source: subscription.source,
       grant_expired: subscription.grant_expired,
-      portal_url: portalUrl,
+      portal_url: isNativeAppUserAgent(request.headers.get('user-agent')) ? null : portalUrl,
       current_period_end: subscription.current_period_end,
       cancel_at_period_end: subscription.cancel_at_period_end,
       trial_expires: trialExpires,

@@ -6,6 +6,7 @@ import { isHiddenQaRoute } from './lib/qaRoutes';
 import { decideNextHandle } from './lib/seo/nextHandleGate';
 // Shared with the [locale] layout (RUM beacon suppression for crawlers).
 import { isBotUserAgent } from './lib/seo/botUa';
+import { isNativeAppUserAgent, nativeHandoffRoute } from './lib/native/nativeHandoff';
 
 const VALID_LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
 const DEFAULT_LOCALE = 'en';
@@ -47,6 +48,11 @@ export async function proxy(request: NextRequest) {
   if (isHiddenQaRoute(pathname)) {
     const locale = pathname.split('/')[1];
     return NextResponse.rewrite(new URL(`/${locale}/__qa-route-disabled`, request.url));
+  }
+
+  if (isNativeAppUserAgent(request.headers.get('user-agent'))) {
+    const handoff = nativeHandoffRoute(pathname, getLocaleFromRequest(request) ?? 'en');
+    if (handoff) return NextResponse.rewrite(new URL(handoff, request.url));
   }
 
   const pathnameHasLocale = VALID_LOCALES.some(

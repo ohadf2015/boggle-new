@@ -3454,7 +3454,14 @@ const es = {
       "reconnect": "Intentar de nuevo"
     }
   },
+  "webHandoff": {
+    "title": "Los planes están en la web",
+    "body": "Los planes y la facturación para docentes se gestionan en lexiclash.live, no en la app.",
+    "open": "Abrir lexiclash.live"
+  },
   "common": {
+    "updateReady": "Actualización lista",
+    "updateRestart": "Reiniciar",
     "pressBackAgainToExit": "Pulsa atrás otra vez para salir",
     "used": "Usado",
     "free": "Gratis",

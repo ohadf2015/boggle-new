@@ -3071,7 +3071,14 @@ const en = {
       "reconnect": "Try again"
     }
   },
+  "webHandoff": {
+    "title": "Plans are on the website",
+    "body": "Teacher plans and billing are managed on lexiclash.live, not in the app.",
+    "open": "Open lexiclash.live"
+  },
   "common": {
+    "updateReady": "Update ready",
+    "updateRestart": "Restart",
     "pressBackAgainToExit": "Press back again to exit",
     "used": "Used",
     "email": "Email",
