@@ -10087,7 +10087,7 @@ const sv = {
     "hero": {
       "title": "Dagligt ordhjul",
       "subtitle": "Gratis dagligt ordpussel",
-      "description": "Ett nytt ordhjulspussel varje dag. Hitta ord från ett hjul av bokstäver, tävla om världsrekordet och följ din dagliga svit. Gratis, ingen nedladdning.",
+      "description": "Ordhjulet är ett dagligt ordpussel: sju bokstäver i ett hjul, med en bokstav i mitten. Bilda så många svenska ord du kan. Varje ord måste innehålla mittenbokstaven och ha minst tre bokstäver. Ju längre ord, desto fler poäng: tre bokstäver ger 12 poäng, fyra ger 30, fem ger 60, sex ger 96 och sju ger 144. Alla spelar samma hjul, som byts vid midnatt UTC, så du kan jämföra dig med dagens världsrekord. Gratis i webbläsaren, utan konto.",
       "cta": "Spela dagens ordhjul",
       "leaderboard": "Visa världsrekordet"
     },
