@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const post = vi.fn((..._a: unknown[]) => Promise.resolve({ ok: true }));
 vi.mock('@/utils/authFetch', () => ({ postWithAuth: (...a: unknown[]) => post(...a) }));
-vi.mock('@/utils/guestManager', () => ({ getGuestFingerprint: () => 'g1' }));
+vi.mock('@/utils/guestManager', () => ({ getGuestFingerprint: () => 'g1', getChosenGuestName: () => null }));
 
 const tower = { words: ['cat'], standingM: 3 };
 vi.mock('../runHelpers', () => ({ standingTower: () => ({ ...tower, words: [...tower.words] }) }));

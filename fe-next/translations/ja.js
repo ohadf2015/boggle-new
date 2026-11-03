@@ -20,6 +20,21 @@ const ja = {
     "record": "新記録",
     "play": "ウェーブ{wave}へ",
     "autoIn": "あと{seconds}秒で開始",
+    "gemsFound": "見つけた宝石",
+    "gem_emerald": "エメラルド",
+    "gem_sapphire": "サファイア",
+    "gem_amethyst": "アメジスト",
+    "gem_ruby": "ルビー",
+    "rarity_emerald": "アンコモン",
+    "rarity_sapphire": "レア",
+    "rarity_amethyst": "エピック",
+    "rarity_ruby": "レジェンド",
+    "goalRival": "{name}を抜くまであと{gap}",
+    "goalBest": "自己ベストまであと{gap}",
+    "goalTop": "今週のランキング1位です",
+    "passedOne": "{name}を抜きました！",
+    "passedMany": "{name}を含む{n}人を抜きました！",
+    "standing": "今週{total}人中{rank}位 · {ahead}人の上",
     "runLabel": "進行状況：ウェーブ{wave}"
   },
   // @blastProgress:end
@@ -2128,6 +2143,7 @@ const ja = {
     "revealLetter": "文字",
     "revealWord": "単語",
     "restart": "リスタート",
+    "restartConfirm": "本当に？",
     "backspace": "削除",
     "kanaVoiced": "濁音・半濁音",
     "kanaBasic": "清音",
@@ -3941,6 +3957,28 @@ const ja = {
     "deleteAccountConfirmButton": "アカウントを完全に削除",
     "deleteAccountDeleting": "削除中...",
     "deleteAccountError": "アカウントの削除に失敗しました。もう一度お試しください。",
+    "teacherDeleteImpactTitle": "このアカウントを削除するとクラスも失われます",
+    "teacherDeleteImpactSummary": "{classes}クラスの{students}人の生徒と{rounds}回のゲーム記録が、クラスの進捗へのアクセスを失います。",
+    "teacherDeleteUnnamedClass": "無名のクラス",
+    "teacherDeleteRosterCount": "{count}人の生徒",
+    "teacherDeleteAlternativesTitle": "削除する前に — もっと手軽な選択肢",
+    "teacherDeleteStopEmails": "メールだけ停止する",
+    "teacherDeleteStopEmailsHint": "教師向けメールを解除し、他はすべてそのまま",
+    "teacherDeleteStopEmailsWorking": "メールを停止中...",
+    "teacherDeleteStopEmailsDone": "メールを停止しました — アカウントは保持されます",
+    "teacherDeleteStopEmailsError": "メール設定を更新できませんでした。もう一度お試しください。",
+    "teacherDeleteKeepFree": "無料アカウントを残す",
+    "teacherDeleteKeepFreeHint": "無料のまま — クラスとゲームはそのまま残ります",
+    "teacherDeleteReasonTitle": "主な退会理由を教えてください",
+    "teacherDeleteReason": {
+      "too_many_emails": "メールが多すぎる",
+      "not_using_it": "もう使っていない",
+      "privacy_concerns": "プライバシーの懸念",
+      "missing_features": "機能が足りない",
+      "found_alternative": "他のサービスに移行",
+      "other": "その他"
+    },
+    "teacherDeleteContinue": "それでもアカウントを削除する",
     "changeLanguage": "言語を変更",
     "firstGamePlayingIn": "{language}でプレイ中",
     "firstGameDismiss": "OK",
@@ -13408,8 +13446,8 @@ const ja = {
         "desc": "単語スコア3倍、手数+1、コインも獲得。"
       },
       "diamond": {
-        "name": "ダイヤモンド",
-        "desc": "レアな単語で出現。単語に使うと得点2倍、縦と横の列をまとめて一掃。"
+        "name": "宝石",
+        "desc": "ややレア〜レアな単語で出現し、色はレア度で決まる。単語に使うとエメラルドとサファイアは2倍、アメジストは3倍、ルビーは4倍。エメラルド以外は縦と横の列も一掃。"
       },
       "bomb": {
         "name": "ボム",
@@ -13585,7 +13623,7 @@ const ja = {
     "boardBusy": "タイル落下中…ちょっと待ってね",
     "ready": {
       "title": "ブラストモード",
-      "subtitle": "単語をなぞってボードを爆破！爆弾は3×3を一掃、コインは3倍、ダイヤは2倍。",
+      "subtitle": "単語をなぞってボードを爆破！爆弾は3×3を一掃、コインは3倍、宝石は2〜4倍、レアな色ほど高得点。",
       "start": "プレイ",
       "best": "ベスト：{score}",
       "play": "最初から始める",
@@ -13758,8 +13796,8 @@ const ja = {
         "desc": "スコア×3・手数+1・コイン獲得"
       },
       "diamond": {
-        "name": "ダイヤモンド",
-        "desc": "レアな単語で出現・2倍＋縦横一掃"
+        "name": "宝石",
+        "desc": "良い単語で出現・2〜4倍、大きい宝石は縦横一掃"
       },
       "bomb": {
         "name": "ボム",
@@ -14518,6 +14556,7 @@ const ja = {
         "notIncluded": "含まない",
         "classes": "クラス数",
         "studentsPerClass": "クラス名簿の人数",
+        "assignmentsPerClass": "クラスごとの課題数",
         "customLists": "オリジナル単語リスト",
         "duels": "対戦デュエル",
         "noAds": "生徒には広告なし",

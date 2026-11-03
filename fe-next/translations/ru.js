@@ -20,6 +20,21 @@ const ru = {
     "record": "Новый рекорд",
     "play": "Играть волну {wave}",
     "autoIn": "Старт через {seconds}",
+    "gemsFound": "Найдено самоцветов",
+    "gem_emerald": "Изумруд",
+    "gem_sapphire": "Сапфир",
+    "gem_amethyst": "Аметист",
+    "gem_ruby": "Рубин",
+    "rarity_emerald": "Необычный",
+    "rarity_sapphire": "Редкий",
+    "rarity_amethyst": "Эпический",
+    "rarity_ruby": "Легендарный",
+    "goalRival": "{gap}, чтобы обойти {name}",
+    "goalBest": "{gap}, чтобы побить ваш рекорд",
+    "goalTop": "Вы лидируете на этой неделе",
+    "passedOne": "Вы обошли {name}!",
+    "passedMany": "Вы обошли {n} игроков, включая {name}!",
+    "standing": "{rank}-е место из {total} на этой неделе · впереди {ahead}",
     "runLabel": "Прогресс: волна {wave}"
   },
   // @blastProgress:end
@@ -7529,6 +7544,7 @@ const ru = {
     "revealLetter": "Буква",
     "revealWord": "Слово",
     "restart": "Начать заново",
+    "restartConfirm": "Точно?",
     "backspace": "Стереть",
     "kanaVoiced": "Звонкие кана (゛゜)",
     "kanaBasic": "Основные кана",
@@ -14046,6 +14062,7 @@ const ru = {
         "notIncluded": "Не включено",
         "classes": "Классы",
         "studentsPerClass": "Учеников в списке класса",
+        "assignmentsPerClass": "Заданий на класс",
         "customLists": "Свои списки слов",
         "duels": "Дуэли один на один",
         "noAds": "Без рекламы для учеников",
@@ -15366,6 +15383,28 @@ const ru = {
     "deleteAccountConfirmButton": "Навсегда удалить аккаунт",
     "deleteAccountDeleting": "Удаление...",
     "deleteAccountError": "Не удалось удалить аккаунт. Попробуйте ещё раз.",
+    "teacherDeleteImpactTitle": "Ваш класс удалится вместе с аккаунтом",
+    "teacherDeleteImpactSummary": "{students} учеников в {classes} классах и {rounds} сыгранных игр потеряют доступ к прогрессу класса.",
+    "teacherDeleteUnnamedClass": "Класс без названия",
+    "teacherDeleteRosterCount": "{count} учеников",
+    "teacherDeleteAlternativesTitle": "Прежде чем уйти — более лёгкие варианты",
+    "teacherDeleteStopEmails": "Просто отключить письма",
+    "teacherDeleteStopEmailsHint": "Отписаться от писем для учителей, всё остальное сохранится",
+    "teacherDeleteStopEmailsWorking": "Отключаем письма...",
+    "teacherDeleteStopEmailsDone": "Письма отключены — аккаунт сохранён",
+    "teacherDeleteStopEmailsError": "Не удалось обновить настройки почты. Попробуйте ещё раз.",
+    "teacherDeleteKeepFree": "Оставить бесплатный аккаунт",
+    "teacherDeleteKeepFreeHint": "Бесплатное остаётся бесплатным — класс и игры подождут вас",
+    "teacherDeleteReasonTitle": "Какова главная причина ухода?",
+    "teacherDeleteReason": {
+      "too_many_emails": "Слишком много писем",
+      "not_using_it": "Больше не пользуюсь",
+      "privacy_concerns": "Вопросы приватности",
+      "missing_features": "Не хватает функций",
+      "found_alternative": "Нашёл альтернативу",
+      "other": "Другое"
+    },
+    "teacherDeleteContinue": "Я всё равно хочу удалить аккаунт",
     "changeLanguage": "Изменить язык",
     "firstGamePlayingIn": "Вы играете на {language}",
     "firstGameDismiss": "Понял",
@@ -18597,8 +18636,8 @@ const ru = {
         "desc": "×3 к очкам за слово, +1 ход и бонусные монеты."
       },
       "diamond": {
-        "name": "Алмаз",
-        "desc": "Появляется за редкие слова. Используй его в слове: ×2 и взрыв всей строки и столбца."
+        "name": "Самоцвет",
+        "desc": "Появляется за необычные и редкие слова, цвет зависит от редкости. В слове даёт ×2 (изумруд, сапфир), ×3 (аметист) или ×4 (рубин); все, кроме изумруда, ещё взрывают строку и столбец."
       },
       "bomb": {
         "name": "Бомба",
@@ -18758,7 +18797,7 @@ const ru = {
     "boardBusy": "Секунду, плитки ещё падают",
     "ready": {
       "title": "Режим Blast",
-      "subtitle": "Собирай слова и взрывай поле. Бомба сносит 3×3, монета даёт ×3, алмаз даёт ×2.",
+      "subtitle": "Собирай слова и взрывай поле. Бомба сносит 3×3, монета даёт ×3, самоцвет даёт от ×2 до ×4, чем реже цвет, тем больше.",
       "start": "Играть",
       "best": "Рекорд: {score}",
       "play": "Начать с начала",
@@ -18947,8 +18986,8 @@ const ru = {
         "desc": "×3 очков, +1 ход, бонусные монеты"
       },
       "diamond": {
-        "name": "Алмаз",
-        "desc": "За редкие слова: ×2 и взрыв строки и столбца"
+        "name": "Самоцвет",
+        "desc": "За хорошие слова: от ×2 до ×4, крупные взрывают строку и столбец"
       },
       "bomb": {
         "name": "Бомба",

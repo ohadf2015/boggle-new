@@ -62,7 +62,7 @@ describe('useBlastSequencer — input lock after a word', () => {
     expect(phases).not.toContain('clearing');
   });
 
-  it('still plays the clear for tiles a chained cascade found', async () => {
+  it('never plays a clear phase inside a cascade: finds are popped before gravity, not after', async () => {
     const { result } = renderHook(() => useBlastSequencer());
     act(() => { void result.current.animateCascade(gravity(), 1, () => {}); });
     const phases: AnimPhase[] = [];
@@ -70,7 +70,7 @@ describe('useBlastSequencer — input lock after a word', () => {
       phases.push(result.current.state.phase);
       await act(async () => { await vi.advanceTimersByTimeAsync(20); });
     }
-    expect(phases).toContain('clearing');
+    expect(phases).not.toContain('clearing');
   });
 
   it('lets new tiles finish appearing without holding input, then goes idle', async () => {

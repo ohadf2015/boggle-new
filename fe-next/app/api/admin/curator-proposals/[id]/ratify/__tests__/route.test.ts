@@ -98,20 +98,20 @@ describe('POST /api/admin/curator-proposals/[id]/ratify', () => {
 
   it('404 when the proposal does not exist', async () => {
     state.proposal = null;
-    const res = await POST(req(), ctx());
+    const res = await POST(req({ decision: 'ratify' }), ctx());
     expect(res.status).toBe(404);
   });
 
   it('is idempotent: an already-ratified proposal applies no effect', async () => {
     state.proposal = proposal({ status: 'ratified' });
-    const res = await POST(req(), ctx());
+    const res = await POST(req({ decision: 'ratify' }), ctx());
     expect(res.status).toBe(200);
     expect(promote).not.toHaveBeenCalled();
     expect(cap.updates).toHaveLength(0);
   });
 
   it('ratifies a word_approve: promotes the word, bumps points, marks ratified', async () => {
-    const res = await POST(req(), ctx());
+    const res = await POST(req({ decision: 'ratify' }), ctx());
     expect(res.status).toBe(200);
     // effect
     expect(promote).toHaveBeenCalledWith(expect.anything(), 'שלום', 'he', {
@@ -132,6 +132,40 @@ describe('POST /api/admin/curator-proposals/[id]/ratify', () => {
     expect(json.points).toBe(10);
   });
 
+  it('400 on malformed JSON body (no effect)', async () => {
+    const badReq = new Request('http://localhost/api/admin/curator-proposals/p1/ratify', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: '{not json',
+    });
+    const res = await POST(badReq, ctx());
+    expect(res.status).toBe(400);
+    expect(promote).not.toHaveBeenCalled();
+    expect(awardCoins).not.toHaveBeenCalled();
+    expect(cap.updates).toHaveLength(0);
+  });
+
+  it('400 on an empty body (no effect)', async () => {
+    const res = await POST(req({}), ctx());
+    expect(res.status).toBe(400);
+    expect(promote).not.toHaveBeenCalled();
+    expect(cap.updates).toHaveLength(0);
+  });
+
+  it("400 on a miscased decision like 'Reject' (no effect)", async () => {
+    const res = await POST(req({ decision: 'Reject' }), ctx());
+    expect(res.status).toBe(400);
+    expect(promote).not.toHaveBeenCalled();
+    expect(cap.updates).toHaveLength(0);
+  });
+
+  it("400 on an unknown decision like 'defer' (no effect)", async () => {
+    const res = await POST(req({ decision: 'defer' }), ctx());
+    expect(res.status).toBe(400);
+    expect(promote).not.toHaveBeenCalled();
+    expect(cap.updates).toHaveLength(0);
+  });
+
   it('rejects a proposal when decision=reject (no effect, status rejected)', async () => {
     const res = await POST(req({ decision: 'reject' }), ctx());
     expect(res.status).toBe(200);
@@ -142,7 +176,7 @@ describe('POST /api/admin/curator-proposals/[id]/ratify', () => {
 
   it('still succeeds (200) when the best-effort coin grant throws', async () => {
     awardCoins.mockRejectedValueOnce(new Error('economy down'));
-    const res = await POST(req(), ctx());
+    const res = await POST(req({ decision: 'ratify' }), ctx());
     expect(res.status).toBe(200);
     // points + ratification still applied
     const propUpdate = cap.updates.find((u) => u.table === 'curator_proposals');
@@ -151,7 +185,7 @@ describe('POST /api/admin/curator-proposals/[id]/ratify', () => {
 
   it('writes a connections review for a ratified puzzle_verdict', async () => {
     state.proposal = proposal({ kind: 'puzzle_verdict', target_ref: 'he-o-006', payload: { verdict: 'bad', note: 'off' } });
-    const res = await POST(req(), ctx());
+    const res = await POST(req({ decision: 'ratify' }), ctx());
     expect(res.status).toBe(200);
     const review = cap.upserts.find((u) => u.table === 'connections_puzzle_reviews');
     expect(review).toBeTruthy();

@@ -14,6 +14,8 @@ import { utcDateKey } from '@/lib/wordTower/dailySeed';
 import TowerCanvas, { type FrameStats } from './TowerCanvas';
 import { V2Celebrations } from './V2Celebrations';
 import { DailyGoalCard } from './DailyGoalCard';
+import { DailyTowerFeed, DailyTowerLeftRail } from './DailyTowerRails';
+import { dailyStandingRows, placedWords, standingFloors } from './dailyRails';
 import { V2Hud } from './V2Hud';
 import { V2Dock } from './V2Dock';
 import { V2RunResults } from './V2RunResults';
@@ -60,7 +62,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
   const { t, language, dir } = useLanguage();
   const { playSound } = useSoundEffects();
   const reducedMotion = usePrefersReducedMotion();
-  const { recordPlay } = useDailyStreak();
+  const { recordPlay, streak } = useDailyStreak();
 
   const dailyDateFormatted = useMemo(() => (daily ? dailyDateLabel(language) : undefined), [daily, language]);
   const game = useTowerRun({
@@ -103,8 +105,8 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
   /** Floors standing right now: this run's plus the ones restored from earlier days. */
   const towerFloors = run.floors + (daily ? dailyTower.restoredFloors : 0);
 
-  const layout = useV2Layout();
-  const { wide, canvasClass } = layout;
+  const layout = useV2Layout({ withRails: daily });
+  const { wide, rails, canvasClass } = layout;
 
   // Perks reach the run through a ref, so they can never re-render mid-drop.
   const setRunPerks = game.setPerks;
@@ -143,12 +145,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
     if (estateApi.status === 'ready') adoptBest(estateApi.estate.bestM);
   }, [estateApi.status, estateApi.estate.bestM, adoptBest]);
 
-  /**
-   * Leaving with a tower still standing BANKS it (coins, floors, best height,
-   * the rival copy). Before, only a collapse reported the run, so walking away
-   * mid-run — the exit, a closed tab, the back button — threw it all away.
-   * Once per run (useRunPayout), keepalive so the POST outlives the page.
-   */
+  // Leaving with a tower standing banks it (once per run, keepalive so the POST outlives the page).
   const bankRun = rewardsFlow.bank;
   const flushDaily = dailyTower.flush;
   useEffect(() => {
@@ -162,12 +159,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
       void bankRun(true);
     };
   }, [bankRun, flushDaily]);
-  /**
-   * A tower still standing is never "game over" any more — only a total
-   * collapse is. So the exit is the CASH OUT: it ends the run on purpose and
-   * the chest + results follow (they carry the way home). With nothing built
-   * it just leaves.
-   */
+  // Only a total collapse is game over, so the exit is the cash-out: it ends the run on purpose.
   const { finish } = game;
 
   const getScreen = useCallback(() => {
@@ -217,11 +209,12 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
   const overHold = useOverHold(phase, daily);
   const { showOver, resultsDismissed } = overHold;
 
-  const myWords = Array.from(game.labelsRef.current.values()).slice(0, 30);
+  const builtWords = placedWords(game.labelsRef.current, game.hangingRef.current?.id ?? null);
+  const myWords = builtWords.slice(0, 30);
   const longestWord = myWords.reduce((a, w) => (w.length > a.length ? w : a), '');
   // Landmark perk: the district multiplies what the run is worth.
   const score = Math.round(totalScore(heightM, run.bonus) * estateApi.perks.scoreMult);
-  const { dailyRank, refreshRank } = useV2Ready({
+  const { dailyRank, dailyBoard, refreshRank } = useV2Ready({
     daily,
     isAdmin: !!isAdmin,
     canSeeInWorkModes: !!canSeeInWorkModes,
@@ -244,10 +237,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
     [showBrace, t, game.risk, braceApi, reducedMotion],
   );
 
-  /**
-   * New run. The daily tower comes back as the day's checkpoint (a collapse
-   * only costs today's growth); the free tower starts from an empty lot.
-   */
+  // The daily tower comes back as the day's checkpoint (a collapse only costs today's growth).
   const restartRun = useCallback(() => {
     restart();
     resetForRun();
@@ -268,11 +258,26 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
       text: t('wordTowerV2.wreck.shareText', { m: game.peakM.toFixed(1) }),
     });
 
+  const goalCard = goalToast ? (
+    <DailyGoalCard
+      t={t}
+      growthM={dailyTower.growthM}
+      docked={rails}
+      onKeepClimbing={dismissGoalToast}
+      onBank={() => {
+        // Banking mid-climb shows the day's results; the tower keeps standing behind them.
+        flushDaily({ keepalive: false });
+        dismissGoalToast();
+        setForceResults(true);
+      }}
+    />
+  ) : null;
+
   const biomeNow = biomeAt(floorsAt(heightM));
   const accentHex = `#${biomeNow.accent.toString(16).padStart(6, '0')}`;
 
   return (
-    <div ref={layout.rootRef} className="relative h-dvh w-full shrink-0 overflow-hidden bg-neo-navy" dir={dir}>
+    <div ref={layout.rootRef} className={`relative h-dvh w-full shrink-0 overflow-hidden bg-neo-navy ${layout.railVarsClass}`} dir={dir}>
       {/* The smash round covers everything: don't run a second Pixi loop under it. */}
       {!smashing && !raiding ? (
         <TowerCanvas
@@ -355,17 +360,18 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
           {t('wordTowerV2.wreck.challenge', { name: rivalName })}
         </div>
       ) : null}
-      {goalToast ? (
-        <DailyGoalCard
+      {!rails ? goalCard : null}
+      {rails && phase !== 'over' && !smashing && !district ? (
+        <DailyTowerLeftRail
           t={t}
+          dateLabel={dailyDateFormatted}
           growthM={dailyTower.growthM}
-          onKeepClimbing={dismissGoalToast}
-          onBank={() => {
-            // Banking mid-climb shows the day's results; the tower keeps standing behind them.
-            flushDaily({ keepalive: false });
-            dismissGoalToast();
-            setForceResults(true);
-          }}
+          targetM={dailyTower.targetM}
+          heightM={heightM}
+          floors={standingFloors(heightM)}
+          streak={streak}
+          standings={dailyStandingRows(dailyBoard, dailyTower.growthM, t('gameShell.you'))}
+          goalCard={goalCard}
         />
       ) : null}
       {copied ? (
@@ -406,6 +412,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
         onPutBack={ww.putBack}
         onBackspace={ww.backspace}
         onClearWord={ww.clearWord}
+        feedSlot={rails ? <DailyTowerFeed t={t} words={builtWords} /> : undefined}
       />
 
       {((showOver && resultsReady) || forceResults) && !resultsDismissed ? (
@@ -438,8 +445,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
         />
       ) : null}
 
-      {/* Closing the results card shows the fallen tower — but it must never be
-          a dead end, so the three ways on stay pinned above the dock. */}
+      {/* Closing the results shows the fallen tower; the ways on stay pinned so it is never a dead end. */}
       {resultsDismissed && phase === 'over' && !smashing && !district ? (
         <V2OverBar
           t={t}
@@ -471,10 +477,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
       {/* Someone raided you while you were away: their tower, the grievance and
           a free REVENGE — before any run, not after one. */}
       {phase !== 'over' && !smashing && !district && !showOver && !forceResults && towerFloors === 0 ? (
-        /* Only with nothing standing. `raiding` unmounts TowerCanvas, so opening
-           a raid ON TOP of a live run would tear down the Pixi loop mid-tower —
-           an entry point this flow has never had. Surfacing the pill mid-run is
-           worth doing, but not on an unverified suspend. */
+        /* Only with nothing standing: `raiding` unmounts TowerCanvas, which would tear down a live run's Pixi loop. */
         <RevengeHome t={t} estate={estateApi} balls={run.balls} reducedMotion={reducedMotion} onRaidOpen={setRaiding} />
       ) : null}
 

@@ -104,19 +104,22 @@ function CrosswordCellBase({
       aria-selected={isActive}
       onClick={() => onSelect(cell.row, cell.col)}
       onPointerDown={() => onSelect(cell.row, cell.col)}
-      className={`relative flex min-h-[44px] min-w-[44px] items-center justify-center font-neo-body font-bold uppercase select-none touch-manipulation transition-colors duration-75 ${bg} ${text} ${
+      className={`relative flex min-h-0 min-w-0 items-center justify-center font-neo-body font-bold uppercase select-none touch-manipulation transition-colors duration-75 ${bg} ${text} ${
         isActive ? 'z-10 ring-2 ring-inset ring-neo-navy' : ''
       } ${enter ? 'cw-cell-enter' : ''}`}
       style={{
         gridColumn,
         gridRow,
-        fontSize: 'min(6.6vw, 1.8rem)',
+        // Sized from the GRID (cqw of the board layer ÷ cells per row), not the viewport, so a
+        // 5x5 and a 15x15 both get letters in proportion to their cells on any screen.
+        fontSize: 'calc(56cqw / var(--cw-n, 5))',
         animationDelay: enter ? `${enterDelay}s` : undefined,
       }}
     >
       {cell.number != null && (
         <span
-          className="absolute top-[2px] start-[3px] text-[0.6rem] leading-none font-serif font-semibold text-neo-navy/70"
+          className="absolute top-[2px] start-[3px] leading-none font-serif font-semibold text-neo-navy/70"
+          style={{ fontSize: 'clamp(0.4rem, calc(15cqw / var(--cw-n, 5)), 0.8rem)' }}
           aria-hidden
         >
           {cell.number}

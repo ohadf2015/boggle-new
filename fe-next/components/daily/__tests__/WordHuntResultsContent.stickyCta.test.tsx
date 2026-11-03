@@ -202,4 +202,17 @@ describe('WordHuntResultsContent — sticky primary CTA', () => {
     const cta = screen.getByTestId('next-quest-cta');
     expect(cta.className).not.toContain('sticky');
   });
+
+  it.each([
+    ['signed-in', false, true],
+    ['guest', true, false],
+  ])('puts the next-step CTA right under the hero, before the answer block (%s)', (_label, guest, authed) => {
+    mockIsGuest.mockReturnValue(guest);
+    render(<WordHuntResultsContent {...baseProps} isAuthenticated={authed} />);
+    const cta = screen.getByTestId('next-quest-cta');
+    const hero = screen.getByTestId('daily-results-hero');
+    const answer = screen.getByTestId('result-display');
+    expect(hero.compareDocumentPosition(cta) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(cta.compareDocumentPosition(answer) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
 });

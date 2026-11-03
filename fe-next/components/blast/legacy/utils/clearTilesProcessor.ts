@@ -9,13 +9,9 @@ import { getWordLengthScaleFactor } from './blastComboScaling';
 import {
   GOLD_MULTIPLIER,
   GOLD_BONUS_MOVES,
-  DIAMOND_CLEAR_BONUS,
-  DIAMOND_WORD_MULTIPLIER,
-  DIAMOND_CROSS_POINTS,
   BLAST_MAX_CHAIN_DETONATIONS,
   BLAST_MAX_CHAIN_CLEAR_FRACTION,
   BLAST_MIN_CHAIN_CLEAR_CAP,
-  OVERFLOW_SURGE_POINTS_PER_DETONATION,
   type BlastTileState,
   type BlastTileType,
   type BlastExplosion,
@@ -23,7 +19,10 @@ import {
 } from '../types';
 import { type TileEffectContext, processBombBFS, spawnEarnedDiamonds } from './blastTileEffects';
 import { calculateBonusMoves } from './blastMoveUtils';
-import { diamondsForWord } from './blastWordRarity';
+import { getWordRarityTier } from './blastWordRarity';
+import { GEM_DEFS, gemOfTile, rollGemsForWord } from './blastGems';
+import { gemClearPoints, crossTilePoints, surgePoints, type PayoutCtx } from './blastPayout';
+import type { BlastGemKind } from '@/shared/types/blast';
 import { getWaveTheme } from './blastWaveTheme';
 
 export interface TileProcessingInput {
@@ -51,7 +50,9 @@ export interface TileProcessingResult {
   overflowSurge: number;
   diamondsCollected: number;
   /** Cells turned into diamonds because the word was rare */
-  diamondsSpawned: Array<{ row: number; col: number }>;
+  diamondsSpawned: Array<{ row: number; col: number; gem: BlastGemKind }>;
+  /** Gems cleared by this word, by color */
+  gemsCollected: Partial<Record<BlastGemKind, number>>;
   /** Tiles cleared by played diamonds' row + column cross blasts */
   gemCrossCount: number;
 }
@@ -64,10 +65,12 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
   let bonusScore = 0;
   const newExplosions: BlastExplosion[] = [];
   const now = Date.now();
+  const payout: PayoutCtx = { seed: `${word}:${currentWave}:${path.map(p => `${p.row}.${p.col}`).join('-')}`, wave: currentWave };
   const pendingPopups: BlastScorePopup[] = [];
 
   let newlyClearedCount = 0;
   const clearedTypeCounts: Partial<Record<BlastTileType, number>> = {};
+  const gemsCollected: Partial<Record<BlastGemKind, number>> = {};
   let goldMultiplier = 1;
   let tileBonusMoves = 0;
 
@@ -77,7 +80,9 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
     newlyClearedCount++;
     clearedTypeCounts[t.type] = (clearedTypeCounts[t.type] || 0) + 1;
     if (t.type === 'diamond') {
-      bonusScore += DIAMOND_CLEAR_BONUS;
+      const gem = gemOfTile(t);
+      gemsCollected[gem] = (gemsCollected[gem] ?? 0) + 1;
+      bonusScore += gemClearPoints(payout, t.row, t.col, gem);
       t.activationEffect = 'diamond';
       newExplosions.push({ id: `diamond-${now}-${t.row}-${t.col}`, row: t.row, col: t.col, type: 'word', intensity: 3, timestamp: now });
     }
@@ -88,6 +93,7 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
     bombQueue: [],
     processedBombs: new Set<string>(),
     markCleared,
+    payout,
     chainBudget: {
       detonations: 0,
       cleared: 0,
@@ -119,7 +125,7 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
   }
 
   const goldOnPath: Array<{ row: number; col: number }> = [];
-  const diamondsOnPath: Array<{ row: number; col: number }> = [];
+  const diamondsOnPath: Array<{ row: number; col: number; gem: BlastGemKind }> = [];
   const queueBomb = (row: number, col: number) => {
     const key = `${row},${col}`;
     if (ctx.processedBombs.has(key)) return;
@@ -133,7 +139,7 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
     tile.activationEffect = tile.type !== 'standard' ? tile.type : null;
     markCleared(tile);
     if (tile.type === 'bomb') queueBomb(cell.row, cell.col);
-    if (tile.type === 'diamond') diamondsOnPath.push(cell);
+    if (tile.type === 'diamond') diamondsOnPath.push({ ...cell, gem: gemOfTile(tile) });
     if (tile.type === 'gold') {
       goldOnPath.push(cell);
       goldMultiplier *= GOLD_MULTIPLIER;
@@ -144,6 +150,7 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
 
   let gemCrossCount = 0;
   for (const gem of diamondsOnPath) {
+    if (!GEM_DEFS[gem.gem].cross) continue;
     const cross = [
       ...Array.from({ length: gridSize }, (_, c) => ({ row: gem.row, col: c })),
       ...Array.from({ length: gridSize }, (_, r) => ({ row: r, col: gem.col })),
@@ -155,12 +162,12 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
       if (!tile.isCleared) continue;
       tile.activationEffect = tile.type !== 'standard' ? tile.type : null;
       gemCrossCount++;
+      bonusScore += crossTilePoints(payout, cell.row, cell.col, word.length, gem.gem);
       if (tile.type === 'bomb') queueBomb(cell.row, cell.col);
       newExplosions.push({ id: `gem-cross-${now}-${cell.row}-${cell.col}`, type: 'clear', row: cell.row, col: cell.col, intensity: 3, timestamp: now });
     }
   }
-  bonusScore += gemCrossCount * DIAMOND_CROSS_POINTS;
-  const diamondMultiplier = DIAMOND_WORD_MULTIPLIER ** diamondsOnPath.length;
+  const diamondMultiplier = diamondsOnPath.reduce((m, g) => m * GEM_DEFS[g.gem].wordMult, 1);
 
   const bombResult = processBombBFS(ctx);
   bonusScore += bombResult.bonusScore;
@@ -192,7 +199,8 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
 
   // Spawned last so no blast from this same word can collect the diamond it just earned.
   const rarityBoost = getWaveTheme(currentWave).params.rarityBoost;
-  const diamondsSpawned = spawnEarnedDiamonds(next, pathSet, diamondsForWord(word.toLowerCase(), rarityBoost), rng);
+  const earnedGems = rollGemsForWord(getWordRarityTier(word.toLowerCase(), rarityBoost), rng);
+  const diamondsSpawned = spawnEarnedDiamonds(next, pathSet, earnedGems, rng);
 
   const goldBonusScore = baseScore * goldMultiplier - baseScore;
   if (goldMultiplier > 1) {
@@ -202,7 +210,7 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
     }
   }
 
-  const overflowSurge = (ctx.chainBudget?.suppressed ?? 0) * OVERFLOW_SURGE_POINTS_PER_DETONATION;
+  const overflowSurge = surgePoints(payout, ctx.chainBudget?.suppressed ?? 0, word.length);
   bonusScore += overflowSurge;
   if (overflowSurge > 0 && path.length > 0) {
     pendingPopups.push({
@@ -229,6 +237,7 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
     overflowSurge,
     diamondsCollected: clearedTypeCounts.diamond ?? 0,
     diamondsSpawned,
+    gemsCollected,
     gemCrossCount,
   };
 }

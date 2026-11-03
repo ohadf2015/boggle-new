@@ -9,11 +9,13 @@ export interface BlastLadderState {
   personalBest: number | null;
   /** Weekly board rank before this run. */
   rank: number | null;
+  /** Players on this week's board. */
+  total: number | null;
   /** Nearest weekly scores above the player, closest first. */
   rivals: RivalScore[];
 }
 
-const EMPTY: BlastLadderState = { personalBest: null, rank: null, rivals: [] };
+const EMPTY: BlastLadderState = { personalBest: null, rank: null, total: null, rivals: [] };
 
 /** Targets to chase this run, fetched once per run (guests get none). */
 export function useBlastLadder({ language, difficulty, runId }: { language: string; difficulty: string; runId: number }): BlastLadderState {
@@ -29,12 +31,13 @@ export function useBlastLadder({ language, difficulty, runId }: { language: stri
         }
         const body = (await res.json()) as {
           personalBests?: Record<string, { bestScore?: number }>;
-          ladder?: { rank: number | null; rivals: RivalScore[] };
+          ladder?: { rank: number | null; total?: number | null; rivals: RivalScore[] };
         };
         if (cancelled) return;
         setState({
           personalBest: body.personalBests?.[difficulty]?.bestScore ?? null,
           rank: body.ladder?.rank ?? null,
+          total: body.ladder?.total ?? null,
           rivals: body.ladder?.rivals ?? [],
         });
       })

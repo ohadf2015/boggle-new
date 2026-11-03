@@ -31,6 +31,38 @@ function makeTiles(): Tile[][] {
 }
 
 describe('useBlastCascade — cascade FX feed', () => {
+  it('pops the found cells (clear animation + FX) before the engine removes them', async () => {
+    const tiles = makeTiles();
+    const grid = tiles.map(row => row.map(() => 'A'));
+    const cells = [{ row: 0, col: 0 }, { row: 1, col: 0 }, { row: 2, col: 0 }];
+    detectMatch3Clusters.mockReturnValueOnce([{ letter: 'A', cells }]).mockReturnValue([]);
+    const order: string[] = [];
+    const engine = {
+      startCascade: vi.fn(() => ({ gravity: { newGrid: grid, newTileStates: tiles, clearedTiles: [], fallingTiles: [], newTiles: [] }, commit: undefined })),
+      stopCascade: vi.fn(),
+      submitWord: vi.fn((c: Array<{ row: number; col: number }>) => { order.push('submit'); for (const x of c) tiles[x.row][x.col].isCleared = true; return { score: 0 }; }),
+      getLatestState: () => ({ grid, tileStates: tiles }),
+      gameState: { wordsFound: [] },
+    };
+    const deps = {
+      engine: engine as never,
+      sequencer: { animateCascade: vi.fn().mockResolvedValue(undefined), animateWordClear: vi.fn(async (_c: unknown, pop?: () => void) => { order.push('clear'); pop?.(); }) } as never,
+      sounds: { playCascadeChain: vi.fn(() => order.push('sound')) },
+      comboStreak: { pauseTimer: vi.fn(), resumeTimer: vi.fn(), onWordSubmitted: vi.fn() } as never,
+      checkWord: vi.fn(() => true),
+      waveConfig: undefined,
+      setCascadeHighlightCells: vi.fn(),
+      setCascadeHighlightWord: vi.fn(),
+      setScoreFlyEvents: vi.fn(),
+      setComboFlash: vi.fn(),
+      flyIdRef: { current: 0 },
+      setClearedTilesForEffects: vi.fn(() => order.push('fx')),
+    };
+    const { result } = renderHook(() => useBlastCascade(deps as never));
+    await result.current.runCascade(5);
+    expect(order.slice(0, 4)).toEqual(['clear', 'fx', 'sound', 'submit']);
+  });
+
   beforeEach(() => { vi.clearAllMocks(); });
 
   it('feeds cascade-cleared tiles to setClearedTilesForEffects', async () => {
@@ -58,7 +90,7 @@ describe('useBlastCascade — cascade FX feed', () => {
 
     const deps = {
       engine: engine as never,
-      sequencer: { animateCascade: vi.fn().mockResolvedValue(undefined) } as never,
+      sequencer: { animateCascade: vi.fn().mockResolvedValue(undefined), animateWordClear: vi.fn(async (_c: unknown, pop?: () => void) => { pop?.(); }) } as never,
       sounds: { playCascadeChain: vi.fn() },
       comboStreak: { pauseTimer: vi.fn(), resumeTimer: vi.fn(), onWordSubmitted: vi.fn() } as never,
       checkWord: vi.fn(() => true),
@@ -103,7 +135,7 @@ describe('useBlastCascade — cascade FX feed', () => {
     };
     const deps = {
       engine: engine as never,
-      sequencer: { animateCascade: vi.fn().mockResolvedValue(undefined) } as never,
+      sequencer: { animateCascade: vi.fn().mockResolvedValue(undefined), animateWordClear: vi.fn(async (_c: unknown, pop?: () => void) => { pop?.(); }) } as never,
       sounds: { playCascadeChain: vi.fn() },
       comboStreak: { pauseTimer: vi.fn(), resumeTimer: vi.fn(), onWordSubmitted: vi.fn() } as never,
       checkWord: vi.fn(() => true),
@@ -143,7 +175,7 @@ describe('useBlastCascade — cascade FX feed', () => {
     const setScoreFlyEvents = vi.fn();
     const deps = {
       engine: engine as never,
-      sequencer: { animateCascade: vi.fn().mockResolvedValue(undefined) } as never,
+      sequencer: { animateCascade: vi.fn().mockResolvedValue(undefined), animateWordClear: vi.fn(async (_c: unknown, pop?: () => void) => { pop?.(); }) } as never,
       sounds: { playCascadeChain: vi.fn() },
       comboStreak: { pauseTimer: vi.fn(), resumeTimer: vi.fn(), onWordSubmitted: vi.fn() } as never,
       checkWord: vi.fn(() => true),

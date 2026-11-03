@@ -100,4 +100,21 @@ describe('PuzzleCard — free daily hints', () => {
     expect(screen.queryByText('connections.revealHintAd')).not.toBeInTheDocument();
     expect(screen.getByText('connections.hintTomorrow')).toBeInTheDocument();
   });
+
+  it('keeps the top row on one line at phone width: actions shrink and long labels truncate', () => {
+    useUpFreeHint();
+    ad.canShowAd = true;
+    renderCard();
+    const hint = screen.getByTestId('hint-ad');
+    expect(hint.className).toContain('min-w-0');
+    expect(hint).toHaveAccessibleName('connections.revealHintAd');
+    expect(screen.getByText('connections.revealHintAd').className).toContain('truncate');
+  });
+
+  it('gives every top-row action a 44px tap area without growing the row', () => {
+    renderCard();
+    const hint = screen.getByTestId('hint-free');
+    expect(hint.className).toMatch(/before:h-11/);
+    expect(hint.className).toContain('relative');
+  });
 });

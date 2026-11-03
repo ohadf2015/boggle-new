@@ -166,11 +166,6 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
     };
   }, []);
 
-  // NOTE: the `wordhunt-crosspromo-position` A/B (wheel CTA above vs below the
-  // leaderboard) is concluded — the primary CTA is now pinned to the bottom of
-  // the scrollport in both cases, so the two arms would render identically and
-  // collect null data. Removed rather than left tracking exposure for nothing.
-
   // A/B: hide the dead "Tap a player to see their path" hint that causes rage clicks.
   const { variant: hintVariant, trackExposure: trackHintExposure } =
     useExperiment('exp-wordhunt-hint-v1');
@@ -220,10 +215,12 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
   /* Shared hero (score, outcome, streak, quest trail) with the one share surface as its footer,
      then the Word Hunt body: the answer, how the score was earned, and, after a loss, the reveal. */
   const heroNode = (
+    <WordHuntResultsHero result={result} puzzleNumber={puzzleNumber} celebrate={!!isNewCompletion} t={t}>
+      {shareNode}
+    </WordHuntResultsHero>
+  );
+  const answerNode = (
     <>
-      <WordHuntResultsHero result={result} puzzleNumber={puzzleNumber} celebrate={!!isNewCompletion} t={t}>
-        {shareNode}
-      </WordHuntResultsHero>
       <ResultDisplay
         solved={result.solved}
         attemptsUsed={result.attemptsUsed}
@@ -235,6 +232,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
         wordsDiscovered={result.wordsDiscovered?.length || 0}
         currentUserId={profile?.id}
         meaning={result.meaning}
+        celebrate={!!isNewCompletion}
         t={t}
       />
       {!result.solved && (
@@ -314,7 +312,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
         {heroNode}
 
         <NextQuestCta justFinished="word-hunt" currentLanguage={language} source="word_hunt_results_guest" />
-
+        {answerNode}
         {leaderboardNode}
         {signupLineNode}
         {signupModalNode}
@@ -333,7 +331,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       source="word_hunt_results"
       className={STICKY_CTA_WORD_HUNT}
     />
-
+    {answerNode}
     {/* Leaderboard — who else played, and how you stack up. */}
     {leaderboardNode}
 

@@ -6,6 +6,7 @@
 'use client';
 
 import React, { useRef, useCallback, useState, useEffect } from 'react';
+import { m } from 'framer-motion';
 import { Share2, RotateCcw, Loader2, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CoinBalanceBadge } from '@/components/ui/CoinBalanceBadge';
@@ -179,6 +180,7 @@ export const ShareSection: React.FC<ShareSectionProps> = ({
         </div>
       ) : (
         /* Winners: Challenge Friends CTA (falls back to native share) */
+        <m.div className="w-full" whileTap={{ scale: 0.94, rotate: -1 }} transition={{ type: 'spring', stiffness: 500, damping: 18 }}>
         <Button
           onClick={onChallengeShare ?? onShare}
           className="w-full sm:max-w-btn sm:mx-auto py-3.5 text-lg font-black uppercase bg-linear-to-r from-neo-lime via-neo-lime to-neo-pink text-neo-black border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity]"
@@ -186,6 +188,7 @@ export const ShareSection: React.FC<ShareSectionProps> = ({
           <Share2 className="me-2 w-5 h-5" />
           {t('wordHunt.results.challengeFriends')}
         </Button>
+        </m.div>
       )}
     </div>
   );

@@ -7,7 +7,7 @@
  * Results tab shows core metrics, Stats tab shows in-depth data.
  */
 
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import GameFeedback from '@/components/feedback/GameFeedback';
 import dynamic from 'next/dynamic';
@@ -37,6 +37,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { WordHuntResultsContent } from './WordHuntResultsContent';
 import { usePracticeFlag } from '@/hooks/usePracticeFlag';
 import PracticeChainCta from '@/components/practice/PracticeChainCta';
+import { DailyRevealProvider } from './results/reveal/DailyRevealContext';
 
 // Import from results module
 import {
@@ -97,6 +98,8 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   const [showCreatePuzzle, setShowCreatePuzzle] = useState(false);
   const spendAnimation = useSpendAnimation();
   const { freezesAvailable, isStreakProtected } = useStreakFreezeStatus(isAuthenticated);
+  const streakSavedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => { if (streakSavedTimer.current) clearTimeout(streakSavedTimer.current); }, []);
 
   // Derived values
   // Tracked at every milestone (analytics), celebrated on screen at only the rare
@@ -178,7 +181,8 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     onFreezeBridged: ({ freezesRemaining }) => {
       setStreakSavedFreezesLeft(freezesRemaining);
       // Let the hero's entrance settle, then reveal the save.
-      setTimeout(() => setShowStreakSaved(true), 1800);
+      if (streakSavedTimer.current) clearTimeout(streakSavedTimer.current);
+      streakSavedTimer.current = setTimeout(() => setShowStreakSaved(true), 1800);
     },
     extraTries: result.extraTries,
     t,
@@ -273,6 +277,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   // ============================================================================
 
   return (
+    <DailyRevealProvider celebrate={!!isNewCompletion}>
     <div key="word-hunt-results" className="flex-1 flex flex-col min-h-0 overflow-hidden bg-neo-navy">
       <div className="shrink-0 px-3 py-2 border-b-2 border-neo-black bg-neo-navy">
         <div className="max-w-md mx-auto lg:max-w-5xl xl:max-w-6xl">
@@ -415,6 +420,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         document.body
       )}
     </div>
+    </DailyRevealProvider>
   );
 };
 

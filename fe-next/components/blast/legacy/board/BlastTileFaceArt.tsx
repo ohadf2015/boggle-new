@@ -1,11 +1,13 @@
 import { Bomb } from 'lucide-react';
 import type { BlastTileType } from '../types';
+import type { BlastGemKind } from '@/shared/types/blast';
+import { GEM_RARITY } from '../blastGemVisuals';
 
 /* Per-column stagger so a row of specials never shines in lockstep. */
 const delay = (col: number, step: number) => ({ animationDelay: `${(col * step) % 3}s` });
 
 /** Face art that carries a special tile's identity beyond its colour. Sits under the letter. */
-export function BlastTileFaceArt({ type, col }: { type: BlastTileType; col: number }) {
+export function BlastTileFaceArt({ type, col, gem }: { type: BlastTileType; col: number; gem?: BlastGemKind }) {
   if (type === 'bomb') {
     return (
       <span data-testid="blast-tile-watermark" className="blast-tile-watermark" aria-hidden="true">
@@ -31,6 +33,7 @@ export function BlastTileFaceArt({ type, col }: { type: BlastTileType; col: numb
           <polyline points="0,62 50,38 100,62" fill="none" stroke="rgba(11,21,48,0.22)" strokeWidth="2" />
         </svg>
         <span className="blast-tile-sparkle" style={delay(col, 1.1)} />
+        {gem && GEM_RARITY[gem] >= 3 && <span className="blast-tile-gem-shimmer" data-gem-rarity={GEM_RARITY[gem]} />}
       </span>
     );
   }

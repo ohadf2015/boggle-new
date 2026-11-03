@@ -1,7 +1,14 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { captureApiError } from '@/utils/sentry';
+import { captureEduServerEvents, type EduServerEvent } from '@/backend/utils/educationTelemetry';
+import {
+  deleteUserWithRetry,
+  loadDeleteImpact,
+  normalizeDeleteReason,
+  type DeleteImpactSummary,
+} from '@/lib/account/deleteAccountImpact';
 
 /**
  * DELETE /api/account/delete
@@ -14,8 +21,57 @@ import { captureApiError } from '@/utils/sentry';
  * `teacher_access_requests` afterwards. Anything holding the address as text
  * has to be cleared explicitly, here, before the auth row (and with it the
  * only copy of the email) goes away.
+ *
+ * Teacher retention (t_b5825a0a): the only activated classroom teacher deleted
+ * her account 6 minutes after the day-2 value email with no class-impact
+ * warning, no lighter alternative, and a deleteUser that timed out (504)
+ * without retry. Now: GET reports classroom impact for the interstitial, the
+ * delete carries an optional { reason, surface } body onto teacher_delete_*
+ * telemetry, and deleteUser retries a timeout/5xx once — treating
+ * user-not-found as the success a completed-then-retried delete returns.
  */
-export async function DELETE() {
+
+function impactEventProps(impact: DeleteImpactSummary): Record<string, unknown> {
+  return {
+    classroom_count: impact.classrooms.length,
+    student_count: impact.totalStudents,
+    rounds_played: impact.roundsPlayed,
+    email_subscribed: impact.emailSubscribed,
+  };
+}
+
+/**
+ * GET /api/account/delete
+ * Impact summary for the signed-in user — drives the teacher-aware confirm
+ * step (roster warning, alternatives). Non-teachers get isTeacher: false.
+ */
+export async function GET() {
+  try {
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const admin = createAdminClient();
+    if (!admin) {
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+    }
+
+    const impact = await loadDeleteImpact(admin, user.id);
+    return NextResponse.json(impact);
+  } catch (err) {
+    captureApiError(
+      err instanceof Error ? err : new Error('Delete impact lookup error'),
+      '/api/account/delete',
+      { method: 'GET', statusCode: 500 }
+    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: NextRequest) {
   try {
     // 1. Verify the user is authenticated via session
     const supabase = await createClient();
@@ -23,6 +79,18 @@ export async function DELETE() {
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Optional body: { reason, surface } from the teacher interstitial. A bare
+    // DELETE with no body (older clients, scripts) is still fully valid.
+    let reason: string | null = null;
+    let surface: string | null = null;
+    try {
+      const body = await request.json();
+      reason = normalizeDeleteReason(body?.reason);
+      surface = typeof body?.surface === 'string' ? body.surface.slice(0, 40) : null;
+    } catch {
+      // No/invalid JSON body — proceed without it.
     }
 
     // 2. Get admin client (service role — bypasses RLS)
@@ -39,14 +107,18 @@ export async function DELETE() {
       );
     }
 
-    // 3. Clean up push tokens explicitly (may not have CASCADE FK)
+    // 3. Impact snapshot BEFORE anything is deleted — the telemetry below is
+    //    the only record of what this account's classrooms looked like.
+    const impact = await loadDeleteImpact(admin, user.id);
+
+    // 4. Clean up push tokens explicitly (may not have CASCADE FK)
     await admin
       .from('user_push_tokens')
       .delete()
       .eq('user_id', user.id)
       .then(() => {});
 
-    // 4. Clear rows keyed by the email STRING — no FK, so no cascade. Must run
+    // 5. Clear rows keyed by the email STRING — no FK, so no cascade. Must run
     //    BEFORE deleteUser, which is what destroys our copy of the address.
     //    Signup lowercases the address while the request row keeps whatever the
     //    teacher typed, so match lowercased on both sides.
@@ -66,12 +138,32 @@ export async function DELETE() {
       }
     }
 
-    // 5. Delete the auth user — cascades to profiles and all FK'd tables
-    const { error: deleteError } = await admin.auth.admin.deleteUser(user.id);
+    // 6. Delete the auth user — cascades to profiles and all FK'd tables.
+    //    Retried once on timeout/5xx; user-not-found means a previous attempt
+    //    already completed and is treated as success.
+    const outcome = await deleteUserWithRetry(admin, user.id);
 
-    if (deleteError) {
+    const telemetry: EduServerEvent[] = [];
+    if (impact.isTeacher) {
+      telemetry.push({
+        distinctId: user.id,
+        event: outcome.ok ? 'teacher_delete_completed' : 'teacher_delete_failed',
+        properties: {
+          teacher_id: user.id,
+          ...impactEventProps(impact),
+          ...(reason ? { reason } : {}),
+          ...(surface ? { surface } : {}),
+          attempts: outcome.attempts,
+          ...(outcome.alreadyDeleted ? { already_deleted: true } : {}),
+          ...(!outcome.ok ? { error: outcome.error?.message ?? 'unknown' } : {}),
+        },
+      });
+    }
+
+    if (!outcome.ok) {
+      captureEduServerEvents(telemetry);
       captureApiError(
-        new Error(deleteError.message),
+        new Error(outcome.error?.message ?? 'deleteUser failed'),
         '/api/account/delete',
         { method: 'DELETE', userId: user.id, statusCode: 500 }
       );
@@ -81,7 +173,8 @@ export async function DELETE() {
       );
     }
 
-    return NextResponse.json({ success: true });
+    captureEduServerEvents(telemetry);
+    return NextResponse.json({ success: true, alreadyDeleted: outcome.alreadyDeleted });
   } catch (err) {
     captureApiError(
       err instanceof Error ? err : new Error('Account deletion error'),

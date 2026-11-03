@@ -60,7 +60,11 @@ vi.mock('@/contexts/AuthContext', () => ({
 }));
 
 vi.mock('@/contexts/NavigationContext', () => ({ useHideNavigation: () => vi.fn() }));
-vi.mock('@/components/AutoHideHeader', () => ({ __esModule: true, default: () => null }));
+const headerMounts = vi.fn();
+vi.mock('@/components/AutoHideHeader', () => ({
+  __esModule: true,
+  default: () => { headerMounts(); return <div data-testid="site-header" />; },
+}));
 vi.mock('@/components/MusicControls', () => ({ __esModule: true, default: () => null }));
 vi.mock('@/components/ui/PullToRefreshIndicator', () => ({ PullToRefreshIndicator: () => null }));
 vi.mock('@/components/ui/PageLoader', () => ({ PageLoader: () => <div data-testid="loading">Loading...</div> }));
@@ -73,6 +77,8 @@ vi.mock('next/navigation', () => ({
 }));
 
 const mockHasEverPlayedWordHunt = vi.fn(() => false);
+const mockHasPlayedToday = vi.fn(() => false);
+const mockTodaysResult = vi.fn((): unknown => null);
 
 vi.mock('@/utils/dailyChallenge', () => ({
   generateDailyPuzzle: vi.fn(() => ({
@@ -86,8 +92,8 @@ vi.mock('@/utils/dailyChallenge', () => ({
   getPuzzleNumber: vi.fn(() => 1),
   getSecondsUntilNextDaily: vi.fn(() => 3600),
   formatCountdown: vi.fn(() => '1:00:00'),
-  hasPlayedWordHuntToday: vi.fn(() => false),
-  getTodaysWordHuntResult: vi.fn(() => null),
+  hasPlayedWordHuntToday: (...args: unknown[]) => mockHasPlayedToday(...args),
+  getTodaysWordHuntResult: (...args: unknown[]) => mockTodaysResult(...args),
   saveWordHuntResult: vi.fn(),
   getDailyStreak: vi.fn(() => 0),
   parseChallengeParam: vi.fn(() => null),
@@ -138,6 +144,8 @@ describe('DailyChallenge — returning player skips the ready screen', () => {
     Storage.prototype.getItem = vi.fn(() => null);
     Storage.prototype.setItem = vi.fn();
     mockHasEverPlayedWordHunt.mockReturnValue(false);
+    mockHasPlayedToday.mockReturnValue(false);
+    mockTodaysResult.mockReturnValue(null);
   });
 
   it('GIVEN a first-time player THEN the ready screen is shown', async () => {
@@ -158,5 +166,17 @@ describe('DailyChallenge — returning player skips the ready screen', () => {
       expect(screen.getByTestId('survival-game')).toBeInTheDocument();
     });
     expect(screen.queryByTestId('ready-screen')).not.toBeInTheDocument();
+  });
+
+  it('GIVEN a player who already finished today THEN results show and the site header never mounts', async () => {
+    mockHasEverPlayedWordHunt.mockReturnValue(true);
+    mockHasPlayedToday.mockReturnValue(true);
+    mockTodaysResult.mockReturnValue({ date: '2024-01-01', puzzleNumber: 1, result: { solved: true, attemptsUsed: 2 } });
+    render(<DailyChallenge />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('results-screen')).toBeInTheDocument();
+    });
+    expect(headerMounts).not.toHaveBeenCalled();
   });
 });

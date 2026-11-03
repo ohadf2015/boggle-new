@@ -28,6 +28,8 @@ export interface BoardPanZoom {
   onClickCapture: (e: { stopPropagation: () => void }) => void;
   zoomBy: (delta: number) => void;
   scale: number;
+  /** The board is too small for touch at fit — show the zoom buttons. */
+  zoomable: boolean;
   pannable: boolean;
   canZoomIn: boolean;
   canZoomOut: boolean;
@@ -48,6 +50,8 @@ export function useBoardPanZoom(args: {
 }): BoardPanZoom {
   const { size, rtl, active } = args;
 
+  const sizeRef = useRef(size);
+  sizeRef.current = size;
   const viewRef = useRef<BoardView>({ x: 0, y: 0, scale: initialScale(size) });
   const viewportEl = useRef<HTMLDivElement | null>(null);
   const contentEl = useRef<HTMLDivElement | null>(null);
@@ -59,6 +63,7 @@ export function useBoardPanZoom(args: {
   const dragged = useRef(false);
 
   const [scale, setScale] = useState(viewRef.current.scale);
+  const [zoomable, setZoomable] = useState(() => initialScale(size) > 1);
 
   const paint = useCallback(() => {
     const el = contentEl.current;
@@ -85,7 +90,16 @@ export function useBoardPanZoom(args: {
       viewportEl.current = node;
       if (!node) return;
       const measure = () => {
-        vwRef.current = node.clientWidth;
+        const w = node.clientWidth;
+        const first = vwRef.current === 0 && w > 0;
+        vwRef.current = w;
+        // First real measurement: re-seed the opening zoom from the actual board width, so a
+        // desktop board isn't zoomed by a phone-sized guess.
+        if (first) {
+          viewRef.current = { x: 0, y: 0, scale: initialScale(sizeRef.current, w) };
+          setScale(viewRef.current.scale);
+          setZoomable(initialScale(sizeRef.current, w) > 1);
+        }
         commit(viewRef.current);
       };
       measure();
@@ -106,8 +120,10 @@ export function useBoardPanZoom(args: {
 
   // A grid swapped for a differently-sized one re-opens at that size's natural zoom.
   useEffect(() => {
-    commit({ x: 0, y: 0, scale: initialScale(size) });
+    const vw = vwRef.current || undefined;
+    commit({ x: 0, y: 0, scale: initialScale(size, vw) });
     setScale(viewRef.current.scale);
+    if (vw) setZoomable(initialScale(size, vw) > 1);
   }, [size, commit]);
 
   // Any focus change — arrows, Tab, a clue tap, auto-advance — must drag the board along, or
@@ -200,6 +216,7 @@ export function useBoardPanZoom(args: {
     onClickCapture,
     zoomBy,
     scale,
+    zoomable,
     pannable: scale > MIN_SCALE + 0.0001,
     canZoomIn: scale < MAX_SCALE - 0.0001,
     canZoomOut: scale > MIN_SCALE + 0.0001,

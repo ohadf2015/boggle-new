@@ -49,45 +49,37 @@ export function ClueBar({ slot, rtl, onPrev, onNext, onToggleDir, t }: ClueBarPr
   };
 
   return (
-    <div className="flex items-stretch gap-2 w-full max-w-[28rem] mx-auto">
+    <div className="flex w-full items-stretch overflow-hidden rounded-neo border-neo border-black bg-[#ffe9a8] text-neo-navy shadow-hard">
       <button
         type="button"
         aria-label={t('crossword.prevClue')}
         onClick={onPrev}
-        className="flex items-center justify-center w-11 bg-neo-cream text-neo-navy border-2 border-black rounded-none shadow-hard active:translate-y-[1px] active:shadow-hard-pressed"
+        className="grid w-10 shrink-0 place-items-center border-e-2 border-black/70 active:bg-black/10"
       >
         <PrevIcon size={20} />
       </button>
 
-      {/* Explicit, discoverable horizontal↔vertical toggle. */}
-      <button
-        type="button"
-        aria-label={t('crossword.switchDir')}
-        aria-pressed={!isAcross}
-        title={t('crossword.switchDir')}
-        onClick={onToggleDir}
-        className="shrink-0 flex flex-col items-center justify-center gap-0.5 w-14 bg-neo-cyan text-neo-navy border-2 border-black rounded-none shadow-hard active:translate-y-[1px] active:shadow-hard-pressed"
-      >
-        <AxisIcon size={20} strokeWidth={2.5} aria-hidden />
-        <span className="font-neo-display font-extrabold text-[0.6rem] uppercase leading-none">
-          {dirLabel}
-        </span>
-      </button>
-
-      {/* Clue display — read-only. Use the AxisIcon button (left) to toggle direction. */}
+      {/* Number + direction in ONE chip: it is the clue's label AND the across/down switch. */}
       <div
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
-        className="flex-1 flex items-center gap-2.5 px-3 py-2.5 bg-[#ffe9a8] text-neo-navy border-2 border-black rounded-none shadow-hard touch-pan-y"
+        className="flex min-h-[3.25rem] min-w-0 flex-1 items-center gap-2.5 px-2.5 py-1.5 touch-pan-y"
       >
-        {slot && (
-          <span className="shrink-0 inline-flex items-center font-neo-display font-extrabold text-xs uppercase tracking-wide bg-neo-navy text-neo-cream rounded-none px-2 py-1">
-            {slot.number}
-          </span>
-        )}
+        <button
+          type="button"
+          aria-label={t('crossword.switchDir')}
+          aria-pressed={!isAcross}
+          title={t('crossword.switchDir')}
+          onClick={onToggleDir}
+          className="flex shrink-0 items-center gap-1 rounded-full bg-neo-navy px-2.5 py-1.5 font-neo-display text-xs font-extrabold uppercase leading-none text-neo-cyan active:translate-y-[1px]"
+        >
+          <AxisIcon size={14} strokeWidth={2.75} aria-hidden />
+          {slot && <span className="tabular-nums">{slot.number}</span>}
+          <span className="text-neo-cream">{dirLabel}</span>
+        </button>
         {/* Clamped: an unbounded clue grew this bar to 3+ lines on narrow phones and
             stole that height straight off the board. */}
-        <span className="font-neo-body font-semibold text-[0.95rem] leading-snug line-clamp-2">
+        <span className="font-neo-body text-[0.95rem] font-semibold leading-snug line-clamp-2 lg:text-base">
           {slot?.clue || t('crossword.noClue')}
         </span>
       </div>
@@ -96,7 +88,7 @@ export function ClueBar({ slot, rtl, onPrev, onNext, onToggleDir, t }: ClueBarPr
         type="button"
         aria-label={t('crossword.nextClue')}
         onClick={onNext}
-        className="flex items-center justify-center w-11 bg-neo-cream text-neo-navy border-2 border-black rounded-none shadow-hard active:translate-y-[1px] active:shadow-hard-pressed"
+        className="grid w-10 shrink-0 place-items-center border-s-2 border-black/70 active:bg-black/10"
       >
         <NextIcon size={20} />
       </button>

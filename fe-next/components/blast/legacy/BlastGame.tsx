@@ -1,5 +1,6 @@
 'use client';
 
+import type { BlastGemCounts } from './utils/blastGems';
 import { getWavePassPct } from './utils/blastWaveTheme';
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -68,7 +69,7 @@ interface BlastGameProps {
   waveNumber?: number;
   waveConfig?: WaveConfig;
   cumulativeScore?: number;
-  onWaveComplete?: (waveScore: number, waveWords: string[], clearPct: number, collected: { diamonds: number; bombs: number }) => void;
+  onWaveComplete?: (waveScore: number, waveWords: string[], clearPct: number, collected: { diamonds: number; bombs: number; gems?: BlastGemCounts }) => void;
   onGameEnd: (results: BlastResultsData) => void;
   onMPDeadEnd?: () => void;
   /** MP only: local player cleared the shared board — parent fires the win celebration / special results. */

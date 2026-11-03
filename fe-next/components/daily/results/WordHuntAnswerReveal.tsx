@@ -1,6 +1,7 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
+import { m } from 'framer-motion';
 import { Eye, BookOpen } from 'lucide-react';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import { CoinUnlockCard } from './CoinUnlockCard';
@@ -22,6 +23,9 @@ export interface WordHuntAnswerRevealProps {
 export function WordHuntAnswerReveal({
   targetWord, meaning, language, revealed, revealCost, currentCoins, onReveal, onSpendStart, t,
 }: WordHuntAnswerRevealProps) {
+  // Only a reveal paid for in this view flips in; an answer bought earlier renders settled.
+  const [flipIn] = useState(() => !revealed
+    && !(typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches));
   if (!revealed) {
     return (
       <div className="max-w-btn space-y-2">
@@ -43,8 +47,20 @@ export function WordHuntAnswerReveal({
   return (
     <div className="py-3 px-4 bg-neo-navy-light rounded-neo border-3 border-neo-black text-center space-y-2">
       <div className="text-xs text-neo-white/60">{t('wordHunt.results.theTargetWordWas')}</div>
-      <div className="text-2xl font-black text-neo-lime tracking-wider">
-        {language === 'he' ? applyHebrewFinalLetters(targetWord) : targetWord.toUpperCase()}
+      <div data-testid="answer-reveal-word" dir="auto" className="flex justify-center gap-1 text-2xl font-black text-neo-lime">
+        {Array.from(language === 'he' ? applyHebrewFinalLetters(targetWord) : targetWord.toUpperCase()).map((letter, i) => (
+          <m.div
+            key={i}
+            className="w-8 h-10 grid place-items-center rounded-neo border-2 border-neo-lime/50 bg-neo-lime/20"
+            {...(flipIn ? {
+              initial: { rotateX: -90, transformPerspective: 400 },
+              animate: { rotateX: 0, transformPerspective: 400 },
+              transition: { type: 'spring', stiffness: 400, damping: 20, delay: i * 0.09 },
+            } : {})}
+          >
+            {letter}
+          </m.div>
+        ))}
       </div>
       {meaning && (
         <div className="mt-2 flex items-start gap-2.5 rounded-neo border-3 border-neo-black bg-neo-cyan/15 px-3 py-2.5 shadow-hard text-start">

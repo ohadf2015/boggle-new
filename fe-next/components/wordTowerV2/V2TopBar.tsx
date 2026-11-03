@@ -3,7 +3,7 @@
 import { memo, type RefObject } from 'react';
 import { ArrowLeft, Flag, Menu, Target, Trophy } from 'lucide-react';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
-import { floorsAt } from '@/lib/wordTowerV2/biomes';
+import { standingFloors } from './dailyRails';
 import type { RunState } from '@/lib/wordTowerV2/run';
 import { ITEM } from './estate/estateArt';
 import { useFloorPop } from './useFloorPop';
@@ -74,7 +74,7 @@ export const V2TopBar = memo(function V2TopBar({
   dailyTarget,
   hasTower,
 }: Props) {
-  const floors = Math.floor(floorsAt(heightM) + 0.05);
+  const floors = standingFloors(heightM);
 
   const floorPop = useFloorPop(heightM, reducedMotion);
 
@@ -85,13 +85,13 @@ export const V2TopBar = memo(function V2TopBar({
     <div
       ref={barRef}
       data-wt2-topbar
-      className="pointer-events-none absolute inset-x-3 top-[max(0.5rem,env(safe-area-inset-top))] z-40 flex flex-col gap-1.5"
+      className="pointer-events-none absolute start-[calc(var(--wt2-rail,0px)+0.75rem)] end-[calc(var(--wt2-side,0px)+0.75rem)] top-[max(0.5rem,env(safe-area-inset-top))] z-40 flex flex-col gap-1.5"
       aria-live="polite"
     >
       {/* Row 1 — where am I. ONE row, 4 items (5 on daily): exit, height+score, coins, [daily], menu.
           `pe-12` reserves the corner for the global mute FAB.
           NO flex-wrap: width is constrained and items are compact. */}
-      <div data-wt2-topbar-row className="flex items-center gap-2 pe-12">
+      <div data-wt2-topbar-row className="flex items-center gap-2 pe-[var(--wt2-fab-gap,3rem)]">
         {/* The exit leads the row: an icon AND a word, so it reads as "leave" at a glance.
             Daily: it goes back to the daily hub and the tower is already saved.
             Free tower with floors: it is the cash-out (the run ends, the chest follows). */}

@@ -1,11 +1,13 @@
 'use client';
 
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { m } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { DAILY_MODES, dailyModeHref, type DailyModeId } from '@/lib/dailyModes';
 import { cn } from '@/lib/utils';
+import { consumeDailyHandoff, markDailyHandoff } from './dailyHandoff';
+import { DailyStepBanner } from './DailyStepBanner';
 
 interface DailyFlowChromeProps {
   modeId: DailyModeId;
@@ -33,6 +35,7 @@ const introKey = (id: DailyModeId) => `lc:daily-intro:${id}:${new Date().toISOSt
  *  - an opening animation in the Word Wheel ready-card style (step N of 4,
  *    mode art + title springing in, letter tiles orbiting), auto-dismissed and
  *    tap-to-skip, shown once per mode per day;
+ *  - arriving from the previous quest shows a small non-blocking step banner instead;
  *  - an always-available "back to daily" pill, plus "skip" for optional modes,
  *    so the player can return to the daily hub from any challenge.
  */
@@ -41,6 +44,8 @@ export function DailyFlowChrome({ modeId, intro = true, introDeferred = false, b
   const index = DAILY_MODES.findIndex((md) => md.id === modeId);
   const mode = DAILY_MODES[index];
   const [showIntro, setShowIntro] = useState(false);
+  const [showBanner, setShowBanner] = useState(false);
+  const hideBanner = useCallback(() => setShowBanner(false), []);
   // Decided once per mount. The marker is written at show-time, so an effect
   // re-run (StrictMode) must not re-read it and bail with the timer cleared.
   const decidedRef = useRef(false);
@@ -52,6 +57,11 @@ export function DailyFlowChrome({ modeId, intro = true, introDeferred = false, b
   useLayoutEffect(() => {
     if (introDeferred || !mode || decidedRef.current) return;
     decidedRef.current = true;
+    if (consumeDailyHandoff(modeId)) {
+      setShowBanner(true);
+      try { sessionStorage.setItem(introKey(modeId), '1'); } catch { /* storage off */ }
+      return;
+    }
     if (!intro) return;
     let seen = false;
     try { seen = sessionStorage.getItem(introKey(modeId)) === '1'; } catch { /* storage off */ }
@@ -87,6 +97,7 @@ export function DailyFlowChrome({ modeId, intro = true, introDeferred = false, b
           {mode.optional && skip && (
             <Link
               href={skipHref}
+              onClick={() => { if (nextMode) markDailyHandoff(nextMode.id); }}
               data-testid="skip-optional"
               className="flex items-center gap-1 h-9 px-3 rounded-full border-2 border-neo-black bg-white/10 text-neo-cream text-xs font-black backdrop-blur"
             >
@@ -96,6 +107,8 @@ export function DailyFlowChrome({ modeId, intro = true, introDeferred = false, b
           )}
         </div>
       )}
+
+      {showBanner && <DailyStepBanner modeId={modeId} t={t} onDone={hideBanner} />}
 
       {/* Static disappear: an exit scale/blur tween on a fullscreen layer is a
           mobile-Chromium flash source (rules/60 Class 5). */}

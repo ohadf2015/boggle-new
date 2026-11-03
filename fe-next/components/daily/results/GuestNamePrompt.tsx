@@ -31,7 +31,7 @@ export function GuestNamePrompt({ name, guestFingerprint, rank, totalPlayers, on
   // A generated name is not offered back; a name the guest typed elsewhere is.
   const [draft, setDraft] = useState(isDefault ? '' : name);
   const { save, saving, error } = useGuestNameSave(name, guestFingerprint, onRenamed, t);
-  const canKeepName = useGrowthRadarFlag(SKIP_EXPERIMENT_KEY, true) === 'keep_name';
+  const canKeepName = useGrowthRadarFlag(SKIP_EXPERIMENT_KEY, true) === 'keep_name' && !isDefault;
   const shownRef = useRef(false);
 
   useEffect(() => {

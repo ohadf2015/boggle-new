@@ -18,6 +18,9 @@ import { creditDailyQuests, isTodayUTC } from '@/lib/daily/questSeams';
 import { questResultForConnections } from '@/shared/dailyQuestPool';
 import { nextStreakValue, yesterdayISO } from '@/lib/connections/streak';
 import { scopeDailyBoard } from '@/lib/connections/dailyBoard';
+import { acceptGuestBoardName } from '@/lib/daily/guestBoardName';
+
+const GUEST_FALLBACK_NAME = 'Player';
 
 type SupabaseLike = any;
 
@@ -96,7 +99,7 @@ export async function processConnectionsCompletion(
       puzzle_date: sub.puzzleDate,
       player_id: userIdForRow,
       guest_fingerprint: guestIdForRow,
-      display_name: sub.displayName,
+      display_name: userIdForRow ? sub.displayName : (acceptGuestBoardName(sub.displayName) ?? GUEST_FALLBACK_NAME),
       avatar_emoji: avatarOverrides.avatarEmoji || profile?.avatar_emoji || '🎯',
       avatar_color: avatarOverrides.avatarColor || profile?.avatar_color || '#6366f1',
       avatar_image: avatarOverrides.avatarImage ?? profile?.avatar_image ?? null,

@@ -20,6 +20,21 @@ const he = {
     "record": "שיא חדש",
     "play": "לגל {wave}",
     "autoIn": "מתחילים בעוד {seconds}",
+    "gemsFound": "אבני חן שנמצאו",
+    "gem_emerald": "אזמרגד",
+    "gem_sapphire": "ספיר",
+    "gem_amethyst": "אמטיסט",
+    "gem_ruby": "רובין",
+    "rarity_emerald": "לא נפוץ",
+    "rarity_sapphire": "נדיר",
+    "rarity_amethyst": "אפי",
+    "rarity_ruby": "אגדי",
+    "goalRival": "{gap} כדי לעקוף את {name}",
+    "goalBest": "{gap} כדי לשבור את השיא שלך",
+    "goalTop": "מובילים בטבלה השבוע",
+    "passedOne": "עקפת את {name}!",
+    "passedMany": "עקפת {n} שחקנים, כולל {name}!",
+    "standing": "מקום {rank} מתוך {total} השבוע · לפני {ahead}",
     "runLabel": "התקדמות: גל {wave}"
   },
   // @blastProgress:end
@@ -2128,6 +2143,7 @@ const he = {
     "revealLetter": "אות",
     "revealWord": "מילה",
     "restart": "התחלה מחדש",
+    "restartConfirm": "בטוחים?",
     "backspace": "מחיקה",
     "kanaVoiced": "קאנה קולית (゛゜)",
     "kanaBasic": "קאנה בסיסית",
@@ -3947,6 +3963,28 @@ const he = {
     "deleteAccountConfirmButton": "מחיקת חשבון לצמיתות",
     "deleteAccountDeleting": "מוחק...",
     "deleteAccountError": "מחיקת החשבון נכשלה. נסו שוב.",
+    "teacherDeleteImpactTitle": "הכיתה שלך נמחקת יחד עם החשבון",
+    "teacherDeleteImpactSummary": "{students} תלמידים ב-{classes} כיתות ו-{rounds} משחקים ששוחקו יאבדו את הגישה להתקדמות הכיתה.",
+    "teacherDeleteUnnamedClass": "כיתה ללא שם",
+    "teacherDeleteRosterCount": "{count} תלמידים",
+    "teacherDeleteAlternativesTitle": "לפני שהולכים — אפשרויות קלות יותר",
+    "teacherDeleteStopEmails": "רק להפסיק את המיילים",
+    "teacherDeleteStopEmailsHint": "הסרה ממיילי הערך למורים, כל השאר נשאר",
+    "teacherDeleteStopEmailsWorking": "מפסיקים את המיילים...",
+    "teacherDeleteStopEmailsDone": "המיילים הופסקו — החשבון נשמר",
+    "teacherDeleteStopEmailsError": "עדכון הגדרות הדוא\"ל נכשל. נסו שוב.",
+    "teacherDeleteKeepFree": "להשאיר את החשבון החינמי",
+    "teacherDeleteKeepFreeHint": "חינם נשאר חינם — הכיתה והמשחקים מחכים לך",
+    "teacherDeleteReasonTitle": "מה הסיבה העיקרית לעזיבה?",
+    "teacherDeleteReason": {
+      "too_many_emails": "יותר מדי מיילים",
+      "not_using_it": "כבר לא משתמשים בזה",
+      "privacy_concerns": "חששות פרטיות",
+      "missing_features": "חסרות תכונות",
+      "found_alternative": "מצאתי חלופה",
+      "other": "אחר"
+    },
+    "teacherDeleteContinue": "אני עדיין רוצה למחוק את החשבון",
     "changeLanguage": "החלפת שפה",
     "firstGamePlayingIn": "אתם משחקים ב{language}",
     "firstGameDismiss": "הבנתי",
@@ -13268,8 +13306,8 @@ const he = {
         "desc": "פי 3 לניקוד המילה, מהלך נוסף ומטבעות בונוס."
       },
       "diamond": {
-        "name": "יהלום",
-        "desc": "מגיע ממילים נדירות. שלבו אותו במילה: ×2 ופיצוץ של כל השורה והעמודה."
+        "name": "אבן חן",
+        "desc": "מגיעה ממילים לא נפוצות או נדירות, בצבע לפי נדירות. במילה היא שווה ×2 (אזמרגד, ספיר), ×3 (אמטיסט) או ×4 (רובין); כולן חוץ מהאזמרגד גם מפוצצות שורה ועמודה."
       },
       "bomb": {
         "name": "פצצה",
@@ -13429,7 +13467,7 @@ const he = {
     "boardBusy": "רגע, האריחים עוד נופלים",
     "ready": {
       "title": "מצב פיצוץ",
-      "subtitle": "גוררים מילים ומפוצצים את הלוח. פצצה מנקה 3×3, מטבע שווה ×3, יהלום שווה ×2.",
+      "subtitle": "גוררים מילים ומפוצצים את הלוח. פצצה מנקה 3×3, מטבע שווה ×3, אבן חן שווה ×2 עד ×4, ככל שהצבע נדיר יותר.",
       "start": "שחקו",
       "best": "השיא שלך: {score}",
       "play": "התחילו מההתחלה",
@@ -13618,8 +13656,8 @@ const he = {
         "desc": "ניקוד ×3, מהלך נוסף, מטבעות בונוס"
       },
       "diamond": {
-        "name": "יהלום",
-        "desc": "מגיע ממילים נדירות: ×2 ופיצוץ שורה ועמודה"
+        "name": "אבן חן",
+        "desc": "מגיעה ממילים טובות. ×2 עד ×4, הגדולות מפוצצות שורה ועמודה"
       },
       "bomb": {
         "name": "פצצה",
@@ -14373,6 +14411,7 @@ const he = {
         "notIncluded": "לא כלול",
         "classes": "כיתות",
         "studentsPerClass": "תלמידים ברשימת כל כיתה",
+        "assignmentsPerClass": "מטלות בכל כיתה",
         "customLists": "רשימות מילים משלכם",
         "duels": "דו-קרב בין תלמידים",
         "noAds": "בלי פרסומות לתלמידים",

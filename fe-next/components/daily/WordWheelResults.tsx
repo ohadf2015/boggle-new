@@ -35,6 +35,8 @@ import type { Language } from '@/types';
 import type { WordWheelGameResult } from './WordWheelGame';
 import WheelScoreBreakdown from './wheel/WheelScoreBreakdown';
 import { reachesWizardRank } from './wheel/wheelWizard';
+import { DailyResultsFrame } from './results/DailyResultsFrame';
+import { DailyRevealProvider } from './results/reveal/DailyRevealContext';
 
 
 interface WordWheelResultsProps {
@@ -142,13 +144,11 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, [isExceptional, isPractice, playSound]);
 
+  /* No `overflow-hidden` on any wrapper: an overflow-hidden ancestor becomes the
+     scrollport for `position: sticky` and would silently pin the CTA to nothing. */
   return (
-    <m.div
-      /* No `overflow-hidden` here: an overflow-hidden ancestor becomes the
-         scrollport for `position: sticky` and would silently pin the CTA to nothing. */
-      className="relative flex flex-col items-center gap-3 w-full max-w-md mx-auto px-4 py-5 lg:max-w-5xl lg:flex-row lg:items-start lg:gap-8"
-    >
-      <div className="w-full flex flex-col items-center gap-3">
+    <DailyRevealProvider celebrate={celebrate}>
+    <DailyResultsFrame className="relative flex-[1_0_auto] py-5" gap="gap-3" aside={aside()}>
         <DailyResultsHero
           mode="word-wheel"
           outcome={result.wordsFound.length > 0 ? 'win' : 'done'}
@@ -188,7 +188,7 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
               <m.span
                 data-testid="word-wheel-perfect-banner"
                 className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border-2 border-neo-black bg-neo-lime text-neo-black font-neo-display font-black text-xs uppercase tracking-wider shadow-hard-sm"
-                initial={{ scale: 0 }}
+                initial={celebrate ? { scale: 0 } : false}
                 animate={{ scale: 1 }}
                 transition={{ ...SPRING_PRESETS.bouncy, delay: 1.0 }}
               >
@@ -239,12 +239,7 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
         {/* Practice mode: replace cross-promos + leaderboard with chain CTA so the
             player flows from one practice mode to the next without dead-ends. */}
         {isPractice && (
-          <m.div
-            className="w-full z-10"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, type: 'spring', stiffness: 300, damping: 26 }}
-          >
+          <div className="w-full z-10">
             {/* Primary next action: another wheel, right now. Without this the
                 chain CTA (wheelRush = last mode → hub link) is a dead-end for a
                 player who wants to keep spinning. */}
@@ -259,7 +254,7 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
               </button>
             )}
             <PracticeChainCta currentMode="wheelRush" />
-          </m.div>
+          </div>
         )}
 
         {/* ONE next step for the whole daily, for every mode.
@@ -286,18 +281,16 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
             className={isGuest ? 'w-full' : STICKY_CTA_WORD_WHEEL}
           />
         )}
+    </DailyResultsFrame>
+    </DailyRevealProvider>
+  );
 
-      </div>
-
-      <div className="w-full flex flex-col items-center gap-3">
+  function aside() {
+    return (
+      <>
         {/* Leaderboard — hidden in practice (no score persisted, would only confuse). */}
         {!isPractice && (
-          <m.div
-            className="w-full z-10"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-          >
+          <div className="w-full z-10">
             {isGuest && guestName && (
               <GuestNameEditor
                 name={guestName}
@@ -331,7 +324,7 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
                 {t('wordWheel.results.tapPlayerHint', 'Tap a player to see what you missed')}
               </p>
             )}
-          </m.div>
+          </div>
         )}
 
         {/* Everything past the verdict, the next-step CTA and the leaderboard is
@@ -389,9 +382,9 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
           </CollapsibleSection>
         )}
 
-      </div>
-    </m.div>
-  );
+      </>
+    );
+  }
 };
 
 export default WordWheelResults;

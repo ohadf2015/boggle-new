@@ -26,6 +26,17 @@ describe('initialScale', () => {
   it('never exceeds the zoom ceiling', () => {
     expect(initialScale(45)).toBe(MAX_SCALE);
   });
+
+  it('opens fitted when the measured board already gives comfortable cells (desktop)', () => {
+    expect(initialScale(15, 640)).toBe(1);
+    expect(initialScale(11, 560)).toBe(1);
+  });
+
+  it('zooms only as far as a touch-size cell needs when the board is measured (phone)', () => {
+    const scale = initialScale(15, 350);
+    expect(scale).toBeGreaterThan(1);
+    expect((350 * scale) / 15).toBeCloseTo(44, 0);
+  });
 });
 
 describe('clampView', () => {

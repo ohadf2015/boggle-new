@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Trophy, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -46,44 +46,51 @@ export const SurvivalLiveRanks: React.FC<SurvivalLiveRanksProps> = ({
   const [totalPlayers, setTotalPlayers] = useState(0);
   const [hasLoaded, setHasLoaded] = useState(false);
 
-  const fetchLeaderboard = useCallback(async () => {
-    try {
-      const fp = currentGuestFingerprint ? `&fp=${encodeURIComponent(currentGuestFingerprint)}` : '';
-      const url = `/api/daily-challenge/word-hunt/leaderboard/${puzzleDate}/${language}?limit=10${fp}`;
-      const response = await fetch(url);
-      if (!response.ok) {
-        setHasLoaded(true);
-        return;
-      }
-
-      const data = await response.json();
-      // API returns snake_case from Supabase view — map to camelCase
-      const mapped: LeaderboardEntry[] = (data.data || []).map((row: Record<string, unknown>, idx: number) => ({
-        rank: (row.rank_position as number) ?? idx + 1,
-        displayName: (row.display_name as string) || 'Anonymous',
-        score: (row.efficiency_score as number) ?? 0,
-        solved: (row.solved as boolean) ?? false,
-        playerId: row.player_id as string | undefined,
-        guestFingerprint: row.guest_fingerprint as string | undefined,
-
-        avatar_image: row.avatar_image as string | null,
-        custom_avatar: (row.custom_avatar as import('@/shared/types/customAvatar').CustomAvatarConfig | null) ?? null,
-      }));
-      setEntries(mapped);
-      setTotalPlayers(data.totalPlayers || data.totalParticipants || 0);
-    } catch {
-      // Silently fail - leaderboard is non-critical during gameplay
-    } finally {
-      setHasLoaded(true);
-    }
-  }, [puzzleDate, language, currentGuestFingerprint]);
-
-  // Initial fetch + polling
   useEffect(() => {
-    fetchLeaderboard();
-    const interval = setInterval(fetchLeaderboard, POLL_INTERVAL);
-    return () => clearInterval(interval);
-  }, [fetchLeaderboard]);
+    let live = true;
+    const fetchLeaderboard = async () => {
+      try {
+        const fp = currentGuestFingerprint ? `&fp=${encodeURIComponent(currentGuestFingerprint)}` : '';
+        const url = `/api/daily-challenge/word-hunt/leaderboard/${puzzleDate}/${language}?limit=10${fp}`;
+        const response = await fetch(url);
+        if (!response.ok) return;
+
+        const data = await response.json();
+        // A response for a previous puzzle/language must not overwrite the current board.
+        if (!live) return;
+        // API returns snake_case from Supabase view — map to camelCase
+        const mapped: LeaderboardEntry[] = (data.data || []).map((row: Record<string, unknown>, idx: number) => ({
+          rank: (row.rank_position as number) ?? idx + 1,
+          displayName: (row.display_name as string) || 'Anonymous',
+          score: (row.efficiency_score as number) ?? 0,
+          solved: (row.solved as boolean) ?? false,
+          playerId: row.player_id as string | undefined,
+          guestFingerprint: row.guest_fingerprint as string | undefined,
+
+          avatar_image: row.avatar_image as string | null,
+          custom_avatar: (row.custom_avatar as import('@/shared/types/customAvatar').CustomAvatarConfig | null) ?? null,
+        }));
+        setEntries(mapped);
+        setTotalPlayers(data.totalPlayers || data.totalParticipants || 0);
+      } catch {
+        // Silently fail - leaderboard is non-critical during gameplay
+      } finally {
+        if (live) setHasLoaded(true);
+      }
+    };
+    const fetchIfVisible = () => {
+      if (!document.hidden) void fetchLeaderboard();
+    };
+
+    void fetchLeaderboard();
+    const interval = setInterval(fetchIfVisible, POLL_INTERVAL);
+    document.addEventListener('visibilitychange', fetchIfVisible);
+    return () => {
+      live = false;
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', fetchIfVisible);
+    };
+  }, [puzzleDate, language, currentGuestFingerprint]);
 
   const isCurrentPlayer = (entry: LeaderboardEntry) => {
     if (currentPlayerId && entry.playerId === currentPlayerId) return true;

@@ -24,6 +24,7 @@ const COMPARED_FIELDS: ReadonlyArray<keyof BlastTileState> = [
   'activationEffect',
   'hitsRemaining',
   'colorTag',
+  'gem',
 ];
 
 export function blastBoardsEqual(

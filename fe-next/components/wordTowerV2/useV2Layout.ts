@@ -7,7 +7,10 @@ import { useHideNavigation } from '@/contexts/NavigationContext';
  * The play screen's measured frame: wide (side-panel) mode, the HUD's real
  * bottom edge and the dock's real top edge, all read by the camera.
  */
-export function useV2Layout() {
+/** SHELL_MEDIA plus the wide aspect gate: tablet portrait matches SHELL_MEDIA but keeps the phone framing on purpose. */
+const RAILS_MEDIA = '(min-width: 1024px) and (min-aspect-ratio: 6/5) and (min-height: 600px)';
+
+export function useV2Layout({ withRails = false }: { withRails?: boolean } = {}) {
   /*
    * Desktop/TV: the wheel moves to a SIDE panel and the canvas becomes the play
    * column, so the camera can spend the height on floors instead of sky (see
@@ -26,6 +29,17 @@ export function useV2Layout() {
     mq.addEventListener('change', apply);
     return () => mq.removeEventListener('change', apply);
   }, []);
+
+  // Desktop daily: stats/standings rail at the start, built words under the wheel.
+  const [railsFit, setRailsFit] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia(RAILS_MEDIA);
+    const apply = () => setRailsFit(mq.matches);
+    apply();
+    mq.addEventListener('change', apply);
+    return () => mq.removeEventListener('change', apply);
+  }, []);
+  const rails = withRails && wide && railsFit;
 
   const dockRef = useRef<HTMLDivElement | null>(null);
   const dockPxRef = useRef(260);
@@ -85,7 +99,15 @@ export function useV2Layout() {
   // ONE source for the play column's box: the reward layer's impact FX is
   // positioned in canvas px, so its container must share this exact rect (on
   // RTL desktop the two differ by the whole side panel).
-  const canvasClass = wide ? 'absolute bottom-0 start-0 top-0 end-[22rem] xl:end-[26rem]' : 'absolute inset-0';
+  const canvasClass = rails
+    ? 'absolute bottom-0 top-0 start-[var(--wt2-rail)] end-[var(--wt2-side)]'
+    : wide
+      ? 'absolute bottom-0 start-0 top-0 end-[22rem] xl:end-[26rem]'
+      : 'absolute inset-0';
+  // The top bar reads these too, so it stays over the play column instead of the rails.
+  const railVarsClass = rails
+    ? '[--wt2-fab-gap:0px] [--wt2-rail:15rem] [--wt2-side:22rem] xl:[--wt2-rail:18rem] xl:[--wt2-side:26rem] 2xl:[--wt2-rail:24rem]'
+    : '';
 
-  return { wide, rootRef, setBarEl, getHudPx, dockRef, getDockPx, debug, canvasClass };
+  return { wide, rails, rootRef, setBarEl, getHudPx, dockRef, getDockPx, debug, canvasClass, railVarsClass };
 }

@@ -125,7 +125,6 @@ export function HuntBoard({
   const holding = (phase === 'pending' || phase === 'verdict') && !hasLive;
   const shown: HuntCell[] = useMemo(() => (holding ? heldPath : []), [holding, heldPath]);
 
-  const order = useMemo(() => new Map(shown.map((c, i) => [key(c), i])), [shown]);
   const cols = grid[0]?.length ?? 0;
   const rows = grid.length;
 
@@ -133,6 +132,57 @@ export function HuntBoard({
   // Labels follow the board, not the selection; t() is stable for the round.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const cellLabels = useMemo(() => grid.map((row, r) => row.map((letter, c) => t('game.grid.cellLabel', { row: r + 1, col: c + 1, letter: String(letter) }))), [boardSeed]);
+
+  // Value keys, not identities: a drag start/end or an equal new Set must not rebuild every tile.
+  const heldKey = shown.map(key).join(' ');
+  const eliminatedKey = [...eliminatedLetters].sort().join('\n');
+  const { tiles, glyphs } = useMemo(() => {
+    const order = new Map(heldKey.split(' ').filter(Boolean).map((k, i) => [k, i]));
+    const gone = new Set(eliminatedKey.split('\n'));
+    const isGone = (letter: string) => gone.has(String(letter).toUpperCase());
+    return {
+      tiles: grid.map((row, r) =>
+        row.map((letter, c) => {
+          const idx = order.get(`${r},${c}`);
+          return (
+            <div
+              key={`${r},${c}`}
+              role="gridcell"
+              aria-label={cellLabels[r]?.[c] ?? String(letter)}
+              data-tile=""
+              data-key={keyOf(r, c)}
+              data-row={r}
+              data-col={c}
+              data-letter={letter}
+              data-state={idx !== undefined ? 'held' : undefined}
+              data-eliminated={isGone(letter) ? 'true' : undefined}
+              className={styles.tile}
+              style={cellStyle(idx, r, c)}
+            >
+              <span className={styles.face} />
+            </div>
+          );
+        }),
+      ),
+      glyphs: grid.map((row, r) =>
+        row.map((letter, c) => {
+          const idx = order.get(`${r},${c}`);
+          return (
+            <span
+              key={`${r},${c}`}
+              data-gk={keyOf(r, c)}
+              className={styles.glyph}
+              data-state={idx !== undefined ? 'held' : undefined}
+              data-eliminated={isGone(letter) ? 'true' : undefined}
+              style={cellStyle(idx, r, c)}
+            >
+              <span className={styles.ch}>{letter}</span>
+            </span>
+          );
+        }),
+      ),
+    };
+  }, [grid, cellLabels, heldKey, eliminatedKey]);
 
   return (
     <div ref={wrapRef} className={styles.wrap} data-size={size} data-calm={calm ? 'true' : 'false'} data-large={largeLetters ? 'true' : undefined}>
@@ -149,30 +199,7 @@ export function HuntBoard({
         className={styles.tray}
         style={{ '--cols': cols, '--rows': rows } as React.CSSProperties}
       >
-        {grid.map((row, r) =>
-          row.map((letter, c) => {
-            const idx = order.get(`${r},${c}`);
-            const eliminated = eliminatedLetters.has(String(letter).toUpperCase());
-            return (
-              <div
-                key={`${r},${c}`}
-                role="gridcell"
-                aria-label={cellLabels[r]?.[c] ?? String(letter)}
-                data-tile=""
-                data-key={keyOf(r, c)}
-                data-row={r}
-                data-col={c}
-                data-letter={letter}
-                data-state={idx !== undefined ? 'held' : undefined}
-                data-eliminated={eliminated ? 'true' : undefined}
-                className={styles.tile}
-                style={cellStyle(idx, r, c)}
-              >
-                <span className={styles.face} />
-              </div>
-            );
-          }),
-        )}
+        {tiles}
         <svg data-board-trail="" className={styles.liveTrail} aria-hidden="true">
           <polyline data-trail="ink" />
           <polyline data-tail="ink" />
@@ -198,23 +225,7 @@ export function HuntBoard({
           )}
         </div>
         <div className={styles.glyphs} aria-hidden="true">
-          {grid.map((row, r) =>
-            row.map((letter, c) => {
-              const idx = order.get(`${r},${c}`);
-              return (
-                <span
-                  key={`${r},${c}`}
-                  data-gk={keyOf(r, c)}
-                  className={styles.glyph}
-                  data-state={idx !== undefined ? 'held' : undefined}
-                  data-eliminated={eliminatedLetters.has(String(letter).toUpperCase()) ? 'true' : undefined}
-                  style={cellStyle(idx, r, c)}
-                >
-                  <span className={styles.ch}>{letter}</span>
-                </span>
-              );
-            }),
-          )}
+          {glyphs}
         </div>
       </div>
       {interactive && canHover && clickHint && (

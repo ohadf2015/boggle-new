@@ -118,10 +118,10 @@ function RowShell({
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.05, type: 'spring', stiffness: 380, damping: 26 }}
-      className={`flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 rounded-neo border-2 ${rowTone(rank, isCurrentUser)} ${compact ? 'py-2' : ''}`}
+      className={`flex items-center gap-2.5 p-2.5 rounded-neo border-2 ${rowTone(rank, isCurrentUser)} ${compact ? 'py-2' : 'sm:gap-3 sm:p-3'}`}
     >
       <div
-        className={`relative w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-neo border-2 border-neo-black flex items-center justify-center font-neo-display font-black text-sm sm:text-base tabular-nums ${
+        className={`relative w-9 h-9 ${compact ? '' : 'sm:w-10 sm:h-10'} shrink-0 rounded-neo border-2 border-neo-black flex items-center justify-center font-neo-display font-black text-sm sm:text-base tabular-nums ${
           podium ? `${podium.badge} shadow-hard-sm` : 'bg-neo-navy-elevated text-neo-white'
         }`}
       >
@@ -130,7 +130,7 @@ function RowShell({
       </div>
 
       <div className="relative shrink-0">
-        <div className={`w-10 h-10 sm:w-12 sm:h-12 border-2 rounded-full overflow-hidden ${isCurrentUser ? 'border-neo-cyan' : 'border-neo-black'}`}>
+        <div className={`w-10 h-10 ${compact ? '' : 'sm:w-12 sm:h-12'} border-2 rounded-full overflow-hidden ${isCurrentUser ? 'border-neo-cyan' : 'border-neo-black'}`}>
           <Avatar
             avatarImage={person.avatar_image ?? undefined}
             customAvatar={person.custom_avatar ?? undefined}
@@ -160,7 +160,7 @@ function RowShell({
             isCurrentUser={isCurrentUser}
             side="bottom"
           >
-            <span className={`font-bold truncate text-sm sm:text-base ${isCurrentUser ? 'text-neo-cyan' : 'text-neo-white cursor-pointer hover:underline'}`}>
+            <span dir="auto" className={`min-w-0 font-bold truncate text-sm sm:text-base ${isCurrentUser ? 'text-neo-cyan' : 'text-neo-white cursor-pointer hover:underline'}`}>
               {name}
             </span>
           </PlayerProfileTooltip>
@@ -258,7 +258,7 @@ export const TodayParticipantRow = memo<{
             <button
               type="button"
               onClick={(e) => { e.stopPropagation(); seeWords.open(); }}
-              className={`shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-neo border-2 border-neo-black shadow-hard-sm font-black tabular-nums cursor-pointer active:translate-y-0.5 active:shadow-none transition-[transform,box-shadow] ${seeWords.tone}`}
+              className={`shrink-0 inline-flex items-center gap-1 px-2 py-1.5 rounded-neo border-2 border-neo-black shadow-hard-sm font-black tabular-nums cursor-pointer active:translate-y-0.5 active:shadow-none transition-[transform,box-shadow] ${seeWords.tone}`}
               aria-label={seeWords.label}
               title={seeWords.label}
             >

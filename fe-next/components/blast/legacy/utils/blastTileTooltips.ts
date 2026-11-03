@@ -21,7 +21,7 @@ const TILE_I18N_KEYS: Partial<Record<BlastTileType, { name: string; desc: string
 /** English fallbacks */
 const ENGLISH_FALLBACK: Partial<Record<BlastTileType, TileTooltip>> = {
   gold:      { name: 'Coin',    desc: '3\u00d7 word score, +1 move, and extra coins.',          icon: '🪙' },
-  diamond:   { name: 'Diamond', desc: 'Rare words earn it. Use it in a word for \u00d72 and a row + column blast.', icon: '💠' },
+  diamond:   { name: 'Gem', desc: 'Good words earn it, colored by rarity. In a word it pays \u00d72 to \u00d74; all but emerald also blast a row + column.', icon: '💠' },
   bomb:      { name: 'Bomb',    desc: 'Clears 3\u00d73 area. Chains to nearby bombs.',          icon: '💣' },
 };
 

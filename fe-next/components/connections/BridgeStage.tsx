@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react';
 import { m, useReducedMotion } from 'framer-motion';
 import SparkBurst from './SparkBurst';
+import { plateFitEms } from './plateFit';
 
 interface BridgeStageProps {
   word1: string;
@@ -24,7 +25,7 @@ interface BridgeStageProps {
  * animation bundle that never loads must still leave a readable puzzle.
  */
 const PLATE =
-  'relative z-10 flex w-full items-center justify-center rounded-neo border-neo-thick border-neo-black bg-neo-cream px-3 py-[clamp(0.375rem,2.2cqi,0.75rem)] text-center font-neo-display font-black uppercase leading-none tracking-wide text-neo-navy shadow-hard [overflow-wrap:anywhere] text-[clamp(1.25rem,8.5cqi,2.25rem)] @min-[36rem]:min-h-[7rem] @min-[36rem]:text-[clamp(1.5rem,4.2cqi,2.75rem)]';
+  'relative z-10 flex w-full items-center justify-center rounded-neo border-neo-thick border-neo-black bg-neo-cream px-3 py-[clamp(0.375rem,2.2cqi,0.75rem)] text-center font-neo-display font-black uppercase leading-[1.05] tracking-wide text-neo-navy shadow-hard [overflow-wrap:break-word] text-balance text-[clamp(1rem,min(8.5cqi,calc((100cqi-2.25rem)/var(--plate-fit))),2.25rem)] @max-[36rem]:[@media(min-height:780px)]:min-h-[4.75rem] @max-[36rem]:[@media(min-height:780px)]:text-[clamp(1rem,min(10cqi,calc((100cqi-2.25rem)/var(--plate-fit))),2.75rem)] @min-[36rem]:min-h-[7rem] @min-[36rem]:text-[clamp(1rem,min(4.2cqi,calc((30cqi-2.25rem)/var(--plate-fit))),2.75rem)]';
 
 const SLIDE = { type: 'spring' as const, stiffness: 260, damping: 22 };
 
@@ -50,7 +51,7 @@ export default function BridgeStage({ word1, word2, isCorrect, isGaveUp, isRTL =
         <Plate word={word1} bob={!resolved && !reducedMotion} phase={0} />
       </m.div>
 
-      <div className="relative -my-1 w-full py-[clamp(0.75rem,5cqi,1.75rem)] @min-[36rem]:-mx-1 @min-[36rem]:my-0 @min-[36rem]:flex @min-[36rem]:flex-1 @min-[36rem]:items-center @min-[36rem]:px-5 @min-[36rem]:py-0">
+      <div className="relative -my-1 w-full py-[clamp(0.75rem,5cqi,1.75rem)] @max-[36rem]:[@media(min-height:780px)]:py-[clamp(1rem,8cqi,2.25rem)] @min-[36rem]:-mx-1 @min-[36rem]:my-0 @min-[36rem]:flex @min-[36rem]:flex-1 @min-[36rem]:items-center @min-[36rem]:px-5 @min-[36rem]:py-0">
         {/* Two ropes tie the plates together; they pull lime on a solve. */}
         {(['start-[14%] inset-y-0 w-1 @min-[36rem]:inset-x-0 @min-[36rem]:start-0 @min-[36rem]:top-[18%] @min-[36rem]:bottom-auto @min-[36rem]:h-1 @min-[36rem]:w-auto',
           'end-[14%] inset-y-0 w-1 @min-[36rem]:inset-x-0 @min-[36rem]:end-0 @min-[36rem]:top-auto @min-[36rem]:bottom-[18%] @min-[36rem]:h-1 @min-[36rem]:w-auto'] as const).map((pos, i) => (
@@ -73,7 +74,7 @@ export default function BridgeStage({ word1, word2, isCorrect, isGaveUp, isRTL =
           animate={isCorrect && !reducedMotion ? { scale: [1, 1.04, 1] } : { scale: 1 }}
           transition={isCorrect ? { duration: 0.35, delay: 0.3 } : { ...SLIDE, delay: 0.12 }}
           className={[
-            'relative z-10 mx-auto w-full max-w-[22rem] rounded-neo border-2 bg-neo-navy px-3 py-[clamp(0.375rem,2.5cqi,0.75rem)] shadow-hard-sm transition-colors duration-300 @min-[36rem]:max-w-none',
+            'relative z-10 mx-auto w-full max-w-[24rem] rounded-neo border-2 bg-neo-navy px-2 py-[clamp(0.375rem,2.5cqi,0.75rem)] shadow-hard-sm transition-colors duration-300 @min-[36rem]:max-w-none',
             isCorrect ? 'border-neo-lime' : 'border-neo-cream/40',
           ].join(' ')}
         >
@@ -98,7 +99,9 @@ function Plate({ word, bob, phase }: { word: string; bob: boolean; phase: number
       transition={bob ? { duration: 3.2, repeat: Infinity, ease: 'easeInOut', delay: phase } : { duration: 0.2 }}
       className="flex w-full"
     >
-      <div className={PLATE}>{word}</div>
+      <div className={PLATE} style={{ ['--plate-fit' as string]: plateFitEms(word) }}>
+        {word}
+      </div>
     </m.div>
   );
 }

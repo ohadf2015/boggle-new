@@ -2,16 +2,14 @@
 
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import { AnimatePresence, m } from 'framer-motion';
-import { ArrowLeft, Heart, Flame, Trophy, Users, Pyramid } from 'lucide-react';
+import { m } from 'framer-motion';
+import { Trophy } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useGameExitGuard } from '@/hooks/useGameExitGuard';
 import { getPuzzleForLevel, getTotalLevels } from '@/lib/connections/puzzles';
-import { getPyramidsForLocale } from '@/lib/connections/pyramid/puzzles';
 import { getPlayerSeed } from '@/lib/connections/playerSeed';
 import {
   initGameState,
@@ -36,7 +34,7 @@ import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { fireStreakConfetti, fireLevelUpConfetti } from '@/utils/confettiUtils';
 import { momentumState, isStreakMilestone } from '@/lib/connections/momentum';
 import PuzzleCard from './PuzzleCard';
-import ConnectionsMomentumChip from './ConnectionsMomentumChip';
+import { PlayHud, PlayModeRow } from './ConnectionsPlayChrome';
 import OutOfLivesModal from './OutOfLivesModal';
 import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
 import ConfirmationDialog from '@/components/ui/ConfirmationDialog';
@@ -448,161 +446,22 @@ export default function ConnectionsGame() {
   }
 
   return (
-    <div ref={containerRef} dir={isRTL ? 'rtl' : 'ltr'} className="relative flex min-h-0 flex-1 flex-col gap-2 w-full max-w-xl mx-auto py-3 px-4 shell:max-w-3xl" translate="no">
+    <div ref={containerRef} dir={isRTL ? 'rtl' : 'ltr'} className="relative mx-auto flex min-h-0 w-full max-w-xl flex-1 flex-col gap-2 px-3 py-2 sm:px-4 sm:py-3 [@media(max-height:700px)]:py-1.5 shell:max-w-3xl" translate="no">
       <ConnectionsEffectsCanvas width={canvasSize.width} height={canvasSize.height} />
 
-      {/* Command bar: back + lives + level + score in ONE compact sticky band.
-          Consolidating these (was 2 separate rows of 3 shouty stat boxes) lifts
-          the puzzle higher and cuts the visual noise above the playfield. */}
-      <m.div
-        initial={{ opacity: 0, y: -12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ type: 'spring' as const, stiffness: 280, damping: 24, delay: 0.1 }}
-        className="sticky top-0 z-30 -mx-4 px-4 py-2 bg-neo-navy/90 backdrop-blur-sm border-b-2 border-neo-purple/40 flex items-center gap-2.5"
-        dir={isRTL ? 'rtl' : 'ltr'}
-      >
-        {/* Back — icon-only to keep the bar light */}
-        <button
-          type="button"
-          onClick={exitGuard.requestExit}
-          aria-label={t('common.back')}
-          className="shrink-0 inline-flex items-center justify-center w-9 h-9 rounded-neo border-neo border-black bg-neo-navy-light text-neo-white shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed active:translate-y-[1px] transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] duration-100"
-        >
-          <ArrowLeft className="w-4 h-4 rtl:rotate-180" aria-hidden="true" />
-        </button>
+      <PlayHud
+        isRTL={isRTL}
+        lives={state.lives}
+        level={level}
+        totalLevels={totalLevels}
+        streak={state.streak}
+        score={sessionScore + state.score}
+        onBack={exitGuard.requestExit}
+        heartsRef={heartsRef}
+        levelBadgeRef={levelBadgeRef}
+      />
 
-        {/* LIVES — compact hearts row */}
-        <div
-          ref={heartsRef}
-          className="flex items-center gap-1 shrink-0"
-          aria-label={`${t('connections.lives')}: ${state.lives} / ${MAX_LIVES}`}
-        >
-          <span className="sr-only">{t('connections.lives')}</span>
-          {Array.from({ length: MAX_LIVES }).map((_, i) => {
-            const alive = i < state.lives;
-            return (
-              <m.span
-                key={`life-${i}`}
-                animate={
-                  alive
-                    ? { scale: 1, opacity: 1, filter: 'drop-shadow(0 0 4px rgba(255,20,147,0.6))' }
-                    : { scale: 0.55, opacity: 0.25, filter: 'none' }
-                }
-                transition={{ type: 'spring' as const, stiffness: 420, damping: 16 }}
-                className="select-none leading-none"
-              >
-                <Heart
-                  className={alive ? 'h-5 w-5 fill-neo-pink text-neo-pink' : 'h-5 w-5 fill-neo-white/15 text-neo-white/25'}
-                  strokeWidth={2}
-                  aria-hidden="true"
-                />
-              </m.span>
-            );
-          })}
-        </div>
-
-        {/* LEVEL + SCORE pushed to the trailing edge */}
-        <div className="ms-auto flex items-center gap-3">
-          {/* LEVEL — cyan badge with inline label */}
-          <m.div
-            ref={levelBadgeRef}
-            key={`level-${level}`}
-            initial={{ scale: 0.85, rotate: -2 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ type: 'spring' as const, stiffness: 400, damping: 14 }}
-            className="flex items-center gap-1.5 px-2.5 py-1 bg-neo-cyan border-neo border-black rounded-neo shadow-hard-sm"
-          >
-            <span className="text-neo-navy/60 text-[9px] uppercase tracking-widest font-neo-display font-bold leading-none">
-              {t('connections.level')}
-            </span>
-            <span className="font-neo-display text-lg text-neo-navy font-black leading-none tabular-nums">
-              {level}
-              <span className="text-neo-navy/50 text-[10px] font-mono font-bold"> / {totalLevels}</span>
-            </span>
-          </m.div>
-
-          {/* SCORE — streak flame + animated total */}
-          <div className="flex items-center gap-1.5 font-neo-body">
-            <span className="sr-only">{t('connections.score')}</span>
-            <AnimatePresence>
-              {state.streak >= 2 && (
-                <m.span
-                  key={`streak-${state.streak}`}
-                  initial={{ scale: 0.5, opacity: 0, y: -8 }}
-                  animate={{ scale: 1, opacity: 1, y: 0 }}
-                  exit={{ scale: 0.5, opacity: 0 }}
-                  transition={{ type: 'spring' as const, stiffness: 400, damping: 16 }}
-                  className="inline-flex items-center gap-0.5 text-neo-orange text-sm font-bold leading-none"
-                >
-                  <Flame className="h-4 w-4 fill-neo-orange/30" strokeWidth={2.5} aria-hidden="true" />
-                  {state.streak}
-                </m.span>
-              )}
-            </AnimatePresence>
-            <AnimatePresence mode="popLayout">
-              <m.span
-                key={sessionScore + state.score}
-                initial={{ y: -14, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: 14, opacity: 0 }}
-                transition={{ type: 'spring' as const, stiffness: 380, damping: 22 }}
-                className="text-neo-cyan text-lg font-bold leading-none tabular-nums inline-block"
-              >
-                {(sessionScore + state.score).toLocaleString()}
-              </m.span>
-            </AnimatePresence>
-          </div>
-        </div>
-      </m.div>
-
-      {/* Pyramid (flagship) + Daily + Community — lightweight secondary links */}
-      <div className="flex justify-center gap-2">
-        {getPyramidsForLocale(language).length > 0 && (
-          <Link
-            href={`/${language}/connections/pyramid`}
-            className="inline-flex items-center gap-1.5 rounded-neo border-neo border-black bg-neo-purple/25 px-3 py-1 font-neo-body text-xs font-bold text-neo-purple shadow-hard-sm transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] duration-100 hover:bg-neo-purple/40 hover:shadow-hard active:translate-y-[1px] active:shadow-hard-pressed"
-          >
-            <Pyramid className="h-3.5 w-3.5" strokeWidth={2.5} aria-hidden="true" />
-            <span>{t('connections.pyramid.cta')}</span>
-          </Link>
-        )}
-        <Link
-          href={`/${language}/connections/daily`}
-          className="inline-flex items-center gap-1.5 rounded-neo border-neo border-black bg-neo-yellow/15 px-3 py-1 font-neo-body text-xs font-bold text-neo-yellow shadow-hard-sm transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] duration-100 hover:bg-neo-yellow/25 hover:shadow-hard active:translate-y-[1px] active:shadow-hard-pressed"
-        >
-          <Trophy className="h-3.5 w-3.5" strokeWidth={2.5} aria-hidden="true" />
-          <span>{t('connections.daily.cta')}</span>
-        </Link>
-        <Link
-          href={`/${language}/connections/community`}
-          className="inline-flex items-center gap-1.5 rounded-neo border-neo border-black bg-neo-pink/15 px-3 py-1 font-neo-body text-xs font-bold text-neo-pink shadow-hard-sm transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] duration-100 hover:bg-neo-pink/25 hover:shadow-hard active:translate-y-[1px] active:shadow-hard-pressed"
-        >
-          <Users className="h-3.5 w-3.5" strokeWidth={2.5} aria-hidden="true" />
-          <span>{t('connections.community.cta')}</span>
-        </Link>
-      </div>
-
-      {/* Momentum: dangle the next reward / hype the streak — pulls into the next
-          puzzle. XP earned this session rides here too (was a separate line). */}
-      <div className="flex items-center gap-2">
-        <div className="min-w-0 flex-1">
-          <ConnectionsMomentumChip state={momentumState({ solvedThisSession, streak: state.streak })} />
-        </div>
-        <AnimatePresence>
-          {xpEarned > 0 && (
-            <m.span
-              key={xpEarned}
-              initial={{ scale: 0.7, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ type: 'spring' as const, stiffness: 360, damping: 18 }}
-              className="shrink-0 rounded-full border border-neo-lime/40 bg-neo-lime/10 px-2.5 py-1 font-neo-body text-xs font-bold text-neo-lime tabular-nums"
-            >
-              +{xpEarned} {t('connections.xpEarned')}
-            </m.span>
-          )}
-        </AnimatePresence>
-      </div>
+      <PlayModeRow language={language} momentum={momentumState({ solvedThisSession, streak: state.streak })} xpEarned={xpEarned} />
 
       <PuzzleCard
         puzzle={currentPuzzle}

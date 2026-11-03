@@ -9,6 +9,7 @@ import { canUseV2ReviewHooks, v2ReviewHooksFromSearch } from '@/lib/wordTowerV2/
 import { rankFromDailyBoard } from '@/lib/wordTowerV2/daily';
 import { shouldConfirmLeave } from '@/lib/wordTowerV2/runPersist';
 import { useDailyTowerLifecycle } from './useDailyTowerLifecycle';
+import type { DailyBoardRow } from './dailyRails';
 
 interface Args {
   daily: boolean;
@@ -49,8 +50,9 @@ export function useV2Ready({
   seedDemo,
   setForceResults,
   setSmashing,
-}: Args): { dailyRank: number | null; refreshRank: () => void } {
+}: Args): { dailyRank: number | null; dailyBoard: DailyBoardRow[] | null; refreshRank: () => void } {
   const [dailyRank, setDailyRank] = useState<number | null>(null);
+  const [dailyBoard, setDailyBoard] = useState<DailyBoardRow[] | null>(null);
 
   useEffect(() => {
     const hooks = v2ReviewHooksFromSearch(
@@ -70,6 +72,7 @@ export function useV2Ready({
       .then((d) => {
         if (cancelled || !d) return;
         setDailyRank(rankFromDailyBoard(d.leaderboard ?? []));
+        setDailyBoard(d.leaderboard ?? []);
       })
       .catch(() => undefined);
     return () => {
@@ -103,5 +106,5 @@ export function useV2Ready({
     return () => window.removeEventListener('beforeunload', onLeave);
   }, [daily, phase, floors]);
 
-  return { dailyRank, refreshRank: () => setRankTick((n) => n + 1) };
+  return { dailyRank, dailyBoard, refreshRank: () => setRankTick((n) => n + 1) };
 }

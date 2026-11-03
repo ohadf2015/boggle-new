@@ -1,12 +1,13 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { render, screen, act, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'he', dir: 'rtl' }),
 }));
 
 import { DailyFlowChrome } from '../DailyFlowChrome';
+import { markDailyHandoff, consumeDailyHandoff } from '../dailyHandoff';
 
 describe('DailyFlowChrome', () => {
   it('always links back to the daily hub', () => {
@@ -70,5 +71,61 @@ describe('DailyFlowChrome placement', () => {
     const fs = await import('node:fs');
     const src = fs.readFileSync('app/[locale]/word-tower/daily/page.tsx', 'utf8');
     expect(src).toMatch(/modeId="word-tower" backLink=\{false\}/);
+  });
+});
+
+describe('DailyFlowChrome chain handoff', () => {
+  beforeEach(() => {
+    sessionStorage.clear();
+    vi.useFakeTimers();
+  });
+  afterEach(() => vi.useRealTimers());
+
+  it('given the player came from the previous quest, then a compact step banner shows instead of the fullscreen intro', () => {
+    markDailyHandoff('connections');
+    const { unmount } = render(<DailyFlowChrome modeId="connections" backLink={false} />);
+    expect(screen.queryByTestId('daily-intro')).toBeNull();
+    const banner = screen.getByTestId('daily-step-banner');
+    expect(banner.className).toMatch(/pointer-events-none/);
+    expect(banner.textContent).toContain('connections.daily.questTitle');
+    unmount();
+    render(<DailyFlowChrome modeId="connections" backLink={false} />);
+    expect(screen.queryByTestId('daily-intro')).toBeNull();
+  });
+
+  it('given a handoff, when the host shows its own tutorial (intro off), then the banner still shows; it is non-blocking', () => {
+    markDailyHandoff('word-hunt');
+    render(<DailyFlowChrome modeId="word-hunt" backLink={false} intro={false} />);
+    expect(screen.getByTestId('daily-step-banner')).toBeTruthy();
+  });
+
+  it('given the host is still deciding, then the banner waits for it', () => {
+    markDailyHandoff('connections');
+    const { rerender } = render(<DailyFlowChrome modeId="connections" backLink={false} introDeferred />);
+    expect(screen.queryByTestId('daily-step-banner')).toBeNull();
+    rerender(<DailyFlowChrome modeId="connections" backLink={false} intro={false} />);
+    expect(screen.getByTestId('daily-step-banner')).toBeTruthy();
+  });
+
+  it('given StrictMode, then the banner hides itself', () => {
+    markDailyHandoff('word-tower');
+    render(<React.StrictMode><DailyFlowChrome modeId="word-tower" backLink={false} intro={false} /></React.StrictMode>);
+    expect(screen.getByTestId('daily-step-banner')).toBeTruthy();
+    act(() => { vi.advanceTimersByTime(5000); });
+    expect(screen.queryByTestId('daily-step-banner')).toBeNull();
+  });
+
+  it('given a handoff meant for another quest, then this quest arrives normally', () => {
+    markDailyHandoff('word-tower');
+    render(<DailyFlowChrome modeId="connections" backLink={false} />);
+    expect(screen.queryByTestId('daily-step-banner')).toBeNull();
+    expect(screen.getByTestId('daily-intro')).toBeTruthy();
+  });
+
+  it('skip marks a handoff to the next quest', () => {
+    vi.useRealTimers();
+    render(<DailyFlowChrome modeId="connections" intro={false} />);
+    fireEvent.click(screen.getByTestId('skip-optional'));
+    expect(consumeDailyHandoff('word-tower')).toBe(true);
   });
 });

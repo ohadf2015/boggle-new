@@ -65,6 +65,20 @@ describe('AnswerSlots — one row, always', () => {
     expect(screen.getByRole('group').style.getPropertyValue('--gap')).toBe('0.125rem');
   });
 
+  it('fills more of each tight cell with the letter so long answers stay legible', () => {
+    const { unmount } = render(<AnswerSlots {...base} slotCount={12} />);
+    expect(screen.getByRole('group').style.getPropertyValue('--fs')).toBe('0.72');
+    unmount();
+    render(<AnswerSlots {...base} slotCount={5} />);
+    expect(screen.getByRole('group').style.getPropertyValue('--fs')).toBe('0.6');
+    expect(screen.getAllByTestId('answer-slot')[0].className).toContain('*var(--fs)');
+  });
+
+  it('lets cells grow on tall phones where the row has room', () => {
+    render(<AnswerSlots {...base} slotCount={5} />);
+    expect(screen.getAllByTestId('answer-slot')[0].className).toContain('[@media(min-height:780px)]:w-[min(3rem,');
+  });
+
   it('keeps the roomier gutter for short answers, which have space to spare', () => {
     render(<AnswerSlots {...base} slotCount={4} />);
     expect(screen.getByRole('group').style.getPropertyValue('--gap')).toBe('0.375rem');

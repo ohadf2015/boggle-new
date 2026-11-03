@@ -43,21 +43,21 @@ export default function ConnectionsMomentumChip({ state }: ConnectionsMomentumCh
   }
 
   return (
-    <div className="flex flex-col gap-1.5 rounded-neo border-neo border-neo-white/15 bg-neo-navy-light px-3 py-2 shadow-hard-sm">
-      <div className="flex items-center gap-2">
+    <div className="flex flex-col gap-1.5 rounded-neo border-neo border-neo-white/15 bg-neo-navy-light px-3 py-2 shadow-hard-sm [@media(max-height:700px)]:gap-1 [@media(max-height:700px)]:px-2 [@media(max-height:700px)]:py-1.5">
+      <div className="flex min-w-0 items-center gap-2 [@media(max-height:700px)]:gap-1">
         <m.span
           key={message.kind + (message.kind === 'rewardEarned' ? message.rewardNumber : '')}
           initial={{ scale: 0.7, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: 'spring', stiffness: 360, damping: 18 }}
           className={[
-            'inline-flex items-center justify-center rounded-full p-1',
+            'inline-flex shrink-0 items-center justify-center rounded-full p-1 [@media(max-height:700px)]:p-0',
             streakTier >= 3 ? 'text-neo-orange' : streakTier >= 2 ? 'text-neo-cyan' : 'text-neo-lime',
           ].join(' ')}
         >
           <Icon className="h-4 w-4" strokeWidth={2.5} aria-hidden="true" />
         </m.span>
-        <span className="font-neo-body text-sm font-bold text-neo-white">{label}</span>
+        <span className="min-w-0 font-neo-body text-sm font-bold text-neo-white [@media(max-height:700px)]:truncate [@media(max-height:700px)]:text-xs">{label}</span>
       </div>
       <div
         role="progressbar"

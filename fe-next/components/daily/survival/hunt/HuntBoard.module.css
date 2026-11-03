@@ -77,7 +77,6 @@
   background: linear-gradient(180deg, #fffef0 0%, #f6efd6 100%);
   box-shadow: 0 5px 0 var(--ink), inset 0 -4px 0 rgba(214, 196, 150, 0.55);
   pointer-events: none;
-  transition: box-shadow 160ms ease-out;
 }
 
 .face::after {

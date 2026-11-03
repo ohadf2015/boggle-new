@@ -20,6 +20,8 @@ export function useWordHuntFx(state: SurvivalGameState, skipAnimations: boolean)
   const { variant: clueShakeVariant, trackExposure: trackClueShakeExposure } =
     useExperiment('exp-wordhunt-clue-shake-v1');
   const [shakingClues, setShakingClues] = useState(false);
+  const shakeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  useEffect(() => () => clearTimeout(shakeTimer.current), []);
   const { rewardId, triggerReward } = useGameRewards();
   const [flashTrigger, setFlashTrigger] = useState(0);
   const [flashColor, setFlashColor] = useState('bg-neo-lime/15');
@@ -73,7 +75,8 @@ export function useWordHuntFx(state: SurvivalGameState, skipAnimations: boolean)
       trackClueShakeExposure();
       if (clueShakeVariant === 'clue-shake') {
         setShakingClues(true);
-        setTimeout(() => setShakingClues(false), 500);
+        clearTimeout(shakeTimer.current);
+        shakeTimer.current = setTimeout(() => setShakingClues(false), 500);
       }
     }
   }, [

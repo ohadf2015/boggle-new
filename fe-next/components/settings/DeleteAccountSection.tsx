@@ -8,6 +8,10 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { signOut } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
+import { useDeleteImpact } from '@/lib/account/useDeleteImpact';
+import type { TeacherDeleteReason } from '@/lib/account/deleteAccountImpact';
+import { trackTeacherDeleteConfirmed } from '@/lib/education/teacherDeleteTelemetry';
+import TeacherDeleteInterstitial from './TeacherDeleteInterstitial';
 
 interface DeleteAccountSectionProps {
   isDarkMode: boolean;
@@ -21,6 +25,11 @@ export default function DeleteAccountSection({ isDarkMode }: DeleteAccountSectio
   const [confirmText, setConfirmText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Teacher retention (t_b5825a0a): classroom owners see an impact step first.
+  const [reason, setReason] = useState<TeacherDeleteReason | null>(null);
+  const [showIrreversible, setShowIrreversible] = useState(false);
+  const { impact } = useDeleteImpact(Boolean(user && showConfirm));
+  const showTeacherStep = Boolean(impact?.isTeacher) && !showIrreversible;
 
   const handleDelete = useCallback(async () => {
     if (confirmText !== 'DELETE' || isDeleting) return;
@@ -29,7 +38,14 @@ export default function DeleteAccountSection({ isDarkMode }: DeleteAccountSectio
     setError(null);
 
     try {
-      const res = await fetch('/api/account/delete', { method: 'DELETE' });
+      if (impact?.isTeacher) {
+        trackTeacherDeleteConfirmed(impact, reason, 'settings');
+      }
+      const res = await fetch('/api/account/delete', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason, surface: 'settings' }),
+      });
       const data = await res.json();
 
       if (!res.ok) {
@@ -45,7 +61,7 @@ export default function DeleteAccountSection({ isDarkMode }: DeleteAccountSectio
       setError(t('settings.deleteAccountError'));
       setIsDeleting(false);
     }
-  }, [confirmText, isDeleting, t, language, router]);
+  }, [confirmText, isDeleting, t, language, router, impact, reason]);
 
   if (!user) return null;
 
@@ -83,7 +99,7 @@ export default function DeleteAccountSection({ isDarkMode }: DeleteAccountSectio
           </div>
           <button
             type="button"
-            onClick={() => { setShowConfirm(true); setError(null); setConfirmText(''); }}
+            onClick={() => { setShowConfirm(true); setError(null); setConfirmText(''); setReason(null); setShowIrreversible(false); }}
             className={cn(
               'px-4 py-2 rounded-neo border-3 border-neo-red font-bold text-sm',
               'bg-neo-red/10 text-neo-red hover:bg-neo-red hover:text-white transition-colors',
@@ -107,6 +123,18 @@ export default function DeleteAccountSection({ isDarkMode }: DeleteAccountSectio
                 'mt-4 pt-4 border-t',
                 isDarkMode ? 'border-slate-700' : 'border-gray-200'
               )}>
+                {showTeacherStep && impact ? (
+                  <TeacherDeleteInterstitial
+                    impact={impact}
+                    surface="settings"
+                    isDarkMode={isDarkMode}
+                    reason={reason}
+                    onReasonChange={setReason}
+                    onKeepAccount={() => setShowConfirm(false)}
+                    onContinueToDelete={() => setShowIrreversible(true)}
+                  />
+                ) : (
+                <>
                 <div className="flex items-start gap-2 mb-3">
                   <AlertTriangle className="w-5 h-5 text-neo-red shrink-0 mt-0.5" />
                   <p className={cn('text-sm font-medium', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
@@ -165,6 +193,8 @@ export default function DeleteAccountSection({ isDarkMode }: DeleteAccountSectio
                     <X className="w-4 h-4" />
                   </button>
                 </div>
+                </>
+                )}
               </div>
             </m.div>
           )}

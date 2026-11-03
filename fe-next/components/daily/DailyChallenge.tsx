@@ -364,7 +364,11 @@ const DailyChallenge: React.FC = () => {
     setShowTutorial(true);
   }, [phase, onboardedThisVisit, gameLanguage]);
 
-  const closeTutorial = useCallback(() => setShowTutorial(false), []);
+  // The first-visit lesson replaces the ready screen: closing it starts the run instead of revealing a second intro.
+  const closeTutorial = useCallback(() => {
+    setShowTutorial(false);
+    if (onboardedThisVisit && phase === 'ready') handleStartGame();
+  }, [onboardedThisVisit, phase, handleStartGame]);
   const handleShowTutorial = useCallback(() => setShowTutorial(true), []);
   // Client-side nav (no hard reload) — a hard nav while the game-active
   // beforeunload guard is armed can blank a Capacitor WebView (black screen).
@@ -390,7 +394,8 @@ const DailyChallenge: React.FC = () => {
     >
       {/* Collapse the in-game header spacer so the focused Word Hunt screen has no
           empty band at the top (the header is hidden during play anyway). */}
-      <AutoHideHeader collapseSpacerWhenHidden />
+      {/* Results own their back control (like Word Wheel); loading stays bare so a returning player never sees the header flash in and out. */}
+      {(phase === 'ready' || phase === 'playing' || phase === 'offline-miss') && <AutoHideHeader collapseSpacerWhenHidden />}
       <SessionRevealHost />
 
       {phase === 'playing' && isPractice && (

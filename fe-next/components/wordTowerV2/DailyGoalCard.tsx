@@ -10,15 +10,19 @@ interface Props {
   onKeepClimbing: () => void;
   /** The tower is already saved; this leaves for the daily hub. */
   onBank: () => void;
+  /** Desktop rail: part of the rail stack, not an overlay on the tower. */
+  docked?: boolean;
 }
 
 /** The daily finish line: the goal toast it replaces vanished in 3s and offered no way to stop on a high. */
-export function DailyGoalCard({ t, growthM, onKeepClimbing, onBank }: Props) {
+export function DailyGoalCard({ t, growthM, onKeepClimbing, onBank, docked = false }: Props) {
   return (
     <div
       role="status"
       data-wt2-goal-toast
-      className="pointer-events-auto absolute inset-x-4 top-1/4 z-[60] mx-auto flex max-w-xs flex-col items-center gap-3 rounded-neo border-neo-thick border-black bg-neo-yellow px-4 py-4 text-center shadow-hard-lg animate-neo-pop"
+      className={`pointer-events-auto flex shrink-0 flex-col items-center gap-3 rounded-neo border-neo-thick border-black bg-neo-yellow px-4 py-4 text-center shadow-hard-lg animate-neo-pop ${
+        docked ? '' : 'absolute inset-x-4 top-1/4 z-[60] mx-auto max-w-xs'
+      }`}
     >
       <span className="font-neo-display text-xl font-black text-neo-navy">{t('wordTowerV2.dailyTower.goalToast', { m: growthM })}</span>
       <div className="flex w-full gap-2">
