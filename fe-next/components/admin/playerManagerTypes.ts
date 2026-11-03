@@ -19,6 +19,7 @@ export interface Player {
   is_beta_tester?: boolean;
   user_role?: string;
   is_admin?: boolean;
+  is_test_account?: boolean;
   /** Music/theme personalization the player picked; `null` = never chose. */
   player_style?: string | null;
 }

@@ -75,13 +75,21 @@ router.get('/activity/daily', async (req: AdminRequest, res: Response): Promise<
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
+    const { data: testRows, error: testError } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('is_test_account', true);
+    if (testError) throw testError;
+    const testIds = new Set((testRows ?? []).map((r: { id: string }) => r.id));
+
     // Get authenticated user games from game_results
-    const { data: gamesData, error: gamesError } = await supabase
+    const { data: allGamesData, error: gamesError } = await supabase
       .from('game_results')
       .select('created_at, player_id')
       .gte('created_at', startDate.toISOString());
 
     if (gamesError) throw gamesError;
+    const gamesData = (allGamesData ?? []).filter((g: { player_id: string }) => !testIds.has(g.player_id));
 
     // Get guest games from game_sessions
     let guestGamesData: { started_at: string; guest_session_id: string }[] = [];
@@ -100,20 +108,13 @@ router.get('/activity/daily', async (req: AdminRequest, res: Response): Promise<
       logger.debug('ADMIN_API', 'Guest game sessions unavailable for daily activity');
     }
 
-    const { data: signupsData, error: signupsError } = await supabase
-      .from('profiles')
-      .select('created_at')
-      .gte('created_at', startDate.toISOString());
-
-    if (signupsError) throw signupsError;
-
     // Aggregate by day
     const dailyData: Record<string, DailyDataEntry> = {};
     for (let i = 0; i < days; i++) {
       const date = new Date();
       date.setDate(date.getDate() - i);
       const dateStr = date.toISOString().split('T')[0];
-      dailyData[dateStr] = { games: 0, guestGames: 0, uniquePlayers: new Set(), uniqueGuests: new Set(), signups: 0 };
+      dailyData[dateStr] = { games: 0, guestGames: 0, uniquePlayers: new Set(), uniqueGuests: new Set() };
     }
 
     // Add authenticated games
@@ -134,13 +135,6 @@ router.get('/activity/daily', async (req: AdminRequest, res: Response): Promise<
       }
     });
 
-    signupsData?.forEach((profile: { created_at: string }) => {
-      const dateStr = profile.created_at.split('T')[0];
-      if (dailyData[dateStr]) {
-        dailyData[dateStr].signups++;
-      }
-    });
-
     const result = Object.entries(dailyData)
       .map(([date, data]) => ({
         date,
@@ -150,7 +144,6 @@ router.get('/activity/daily', async (req: AdminRequest, res: Response): Promise<
         uniquePlayers: data.uniquePlayers.size,
         uniqueGuests: data.uniqueGuests.size,
         totalUniquePlayers: data.uniquePlayers.size + data.uniqueGuests.size,
-        signups: data.signups,
       }))
       .sort((a, b) => a.date.localeCompare(b.date));
 

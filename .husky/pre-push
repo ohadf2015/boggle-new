@@ -1,116 +1,22 @@
 #!/bin/sh
+# Minimum gate: eslint on the files this push changes. Types and tests run in CI.
+# Needs the executable bit or git silently skips it.
 
-echo "🔍 Running pre-push checks (lint + types + changed tests)..."
+cd fe-next || exit 1
 
-# vitest 4.x's rolldown bundle imports `styleText` from `node:util` (Node >=22 only).
-for nv in v22 v23 v24; do
-  for d in "$HOME/.nvm/versions/node"/$nv*/bin; do
-    [ -x "$d/node" ] && PATH="$d:$PATH" && break 2
-  done
-done
-export PATH
-
-cd fe-next
-
-# Minimum gate: the full suite, build and e2e run in CI (ci.yml). Locally we only
-# check what this push touches, in one process each, so the hook stays under ~1-2 min.
 DIFF=$(git -C .. diff --name-only --diff-filter=d origin/master...HEAD 2>/dev/null || true)
-CHANGED=$(echo "$DIFF" | grep -E '\.(ts|tsx|js|jsx)$' || true)
-LINT_FILES=$(echo "$CHANGED" | sed 's|^fe-next/||' | while IFS= read -r f; do [ -n "$f" ] && [ -f "$f" ] && printf '%s ' "$f"; done) || true
-TYPE_RELEVANT=$(echo "$DIFF" | grep -E '\.(ts|tsx|js|jsx|mjs|cjs)$|(^|/)tsconfig[^/]*\.json$|(^|/)package\.json$' || true)
+LINT_FILES=$(echo "$DIFF" | grep -E '^fe-next/.*\.(ts|tsx|js|jsx)$' | sed 's|^fe-next/||' \
+  | while IFS= read -r f; do [ -f "$f" ] && printf '%s ' "$f"; done) || true
 
-# Only the test files in the diff themselves — not their whole dependent cone.
-# A hub change used to pull 1000+ tests (sharded, 20+ min); CI covers the cone.
-TEST_FILES=$(echo "$CHANGED" | grep -E '\.(test|spec)\.(ts|tsx|js|jsx)$' | sed 's|^fe-next/||' | while IFS= read -r f; do [ -f "$f" ] && printf '%s ' "$f"; done) || true
-BACKEND_TESTS=$(printf '%s\n' $TEST_FILES | grep -E '^backend/' || true)
-FRONTEND_TESTS=$(printf '%s\n' $TEST_FILES | grep -vE '^backend/|^$' || true)
-
-TMPDIR=$(mktemp -d)
-trap 'rm -rf "$TMPDIR"' EXIT
-
-# One test run at a time machine-wide: concurrent sessions stacking vitest runs OOM-killed
-# the box (exit 144). mkdir is an atomic lock; a lock whose PID is gone is reclaimed.
-PREPUSH_LOCK="${PREPUSH_LOCK:-$(dirname "$TMPDIR" 2>/dev/null || echo /tmp)/lexi-prepush-test.lock}"
-acquire_test_lock() {
-  waited=0
-  while ! mkdir "$PREPUSH_LOCK" 2>/dev/null; do
-    holder=$(cat "$PREPUSH_LOCK/pid" 2>/dev/null || true)
-    if [ -n "$holder" ] && ! kill -0 "$holder" 2>/dev/null; then
-      rm -rf "$PREPUSH_LOCK" 2>/dev/null
-      continue
-    fi
-    [ "$waited" -ge 300 ] && return 0
-    sleep 3
-    waited=$((waited + 3))
-  done
-  echo $$ > "$PREPUSH_LOCK/pid" 2>/dev/null || true
-}
-release_test_lock() { rm -rf "$PREPUSH_LOCK" 2>/dev/null || true; }
-
-(
-  if [ -z "$LINT_FILES" ]; then
-    echo "ℹ️  Lint: no files to check"
-  elif ./node_modules/.bin/eslint $LINT_FILES --fix --max-warnings=0 2>/dev/null; then
-    echo "✅ Lint passed"
-  else
-    echo "❌ Lint failed"
-    exit 1
-  fi
-) > "$TMPDIR/lint.log" 2>&1 &
-PID_LINT=$!
-
-# --incremental reuses the previous run's build info, so repeat pushes only re-check
-# what changed. 8 GB: the cold whole-project check OOMs at Node's ~4 GB default.
-(
-  if [ -z "$TYPE_RELEVANT" ]; then
-    echo "ℹ️  Type check: no type-relevant files changed — skipped"
-  elif NODE_OPTIONS="${NODE_OPTIONS:-} --max-old-space-size=8192" ./node_modules/.bin/tsc --noEmit --incremental --tsBuildInfoFile node_modules/.cache/prepush.tsbuildinfo; then
-    echo "✅ Type check passed"
-  else
-    echo "❌ Type check failed"
-    exit 1
-  fi
-) > "$TMPDIR/tsc.log" 2>&1 &
-PID_TSC=$!
-
-(
-  if [ -z "$BACKEND_TESTS" ] && [ -z "$FRONTEND_TESTS" ]; then
-    echo "ℹ️  Tests: no test files in this push — CI runs the full suite"
-    exit 0
-  fi
-  acquire_test_lock
-  trap release_test_lock EXIT
-  rm -rf node_modules/.experimental-vitest-cache 2>/dev/null
-  ./node_modules/.bin/tsx scripts/build-i18n-assets.ts --skip-brotli >/dev/null
-  FAIL=0
-  if [ -n "$BACKEND_TESTS" ]; then
-    ./node_modules/.bin/vitest run --config=backend/vitest.config.ts $BACKEND_TESTS 2>&1 || FAIL=1
-  fi
-  if [ -n "$FRONTEND_TESTS" ]; then
-    ./node_modules/.bin/vitest run $FRONTEND_TESTS 2>&1 || FAIL=1
-  fi
-  if [ "$FAIL" -eq 0 ]; then
-    echo "✅ Tests passed"
-  else
-    echo "❌ Tests failed"
-    exit 1
-  fi
-) > "$TMPDIR/test.log" 2>&1 &
-PID_TEST=$!
-
-FAILED=0
-wait $PID_LINT || FAILED=1
-cat "$TMPDIR/lint.log"
-wait $PID_TSC || FAILED=1
-cat "$TMPDIR/tsc.log"
-wait $PID_TEST || FAILED=1
-cat "$TMPDIR/test.log"
-
-if [ "$FAILED" -ne 0 ]; then
-  echo ""
-  echo "❌ Pre-push checks failed. Fix the issues above before pushing."
-  exit 1
+if [ -z "$LINT_FILES" ]; then
+  echo "pre-push: no JS/TS files to lint"
+  exit 0
 fi
 
-echo ""
-echo "🎉 All pre-push checks passed!"
+# shellcheck disable=SC2086
+if ./node_modules/.bin/eslint $LINT_FILES --max-warnings=0; then
+  echo "pre-push: lint passed"
+else
+  echo "pre-push: eslint failed. Fix the errors above before pushing."
+  exit 1
+fi

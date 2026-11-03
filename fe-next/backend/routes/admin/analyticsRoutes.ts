@@ -24,6 +24,12 @@ interface CohortRow {
   retention_pct: number;
 }
 
+interface SignupGrowthRow {
+  week: string;
+  signups: number;
+  total: number;
+}
+
 interface FunnelData {
   registered: number;
   playedFirstGame: number;
@@ -37,8 +43,10 @@ interface SupabaseClient {
     select: (...args: unknown[]) => {
       lt: (...args: unknown[]) => {
         not: (...args: unknown[]) => {
+          not: (...args: unknown[]) => {
           order: (...args: unknown[]) => {
             range: (...args: unknown[]) => Promise<{ data: unknown[] | null; count: number | null; error: { message: string } | null }>;
+          };
           };
         };
       };
@@ -69,6 +77,7 @@ export async function fetchChurnRisk(
     .select('id, username, display_name, country_code, total_games, total_xp, last_game_at, created_at', { count: 'exact' } as never)
     .lt('last_game_at', cutoff)
     .not('last_game_at', 'is', null as never)
+    .not('is_test_account', 'is', true as never)
     .order('last_game_at', { ascending: false } as never)
     .range(offset, offset + limit - 1);
 
@@ -89,7 +98,72 @@ export async function fetchEngagementFunnel(supabase: SupabaseClient): Promise<F
   return data as FunnelData;
 }
 
+export async function fetchSignupGrowth(supabase: SupabaseClient, weeks: number): Promise<SignupGrowthRow[]> {
+  const { data, error } = await supabase.rpc('admin_signup_growth', { weeks });
+  if (error || !data) return [];
+  return data as SignupGrowthRow[];
+}
+
+export async function fetchRevenueSummary(supabase: SupabaseClient): Promise<Record<string, number>> {
+  const { data, error } = await supabase.rpc('admin_revenue_summary');
+  if (error || !data) return {};
+  return data as Record<string, number>;
+}
+
+const DRILL_KINDS = ['signups', 'payers', 'checkouts'] as const;
+
+export async function fetchDrilldown(supabase: SupabaseClient, kind: string, week: string | null): Promise<unknown[]> {
+  const { data, error } = await supabase.rpc('admin_drilldown', { kind, week });
+  if (error || !data) return [];
+  return data as unknown[];
+}
+
 // ==================== Routes ====================
+
+/** GET /api/admin/analytics/revenue: customers + conversion (test accounts excluded) */
+router.get('/analytics/revenue', async (_req: AdminRequest, res: Response): Promise<void> => {
+  try {
+    const revenue = await withCache('admin:revenue', 300, () => fetchRevenueSummary(getSupabase()));
+    res.json(successResponse({ revenue }));
+  } catch (err) {
+    logger.error('ADMIN_ANALYTICS', `Revenue error: ${(err as Error).message}`);
+    res.status(500).json(errorResponse('REVENUE_QUERY_FAILED', (err as Error).message));
+  }
+});
+
+/** GET /api/admin/analytics/drilldown?kind=signups|payers|checkouts[&week=YYYY-MM-DD] */
+router.get('/analytics/drilldown', async (req: AdminRequest, res: Response): Promise<void> => {
+  const kind = String(req.query.kind ?? '');
+  const week = req.query.week ? String(req.query.week) : null;
+  if (!(DRILL_KINDS as readonly string[]).includes(kind) || (week !== null && !/^\d{4}-\d{2}-\d{2}$/.test(week))) {
+    res.status(400).json(errorResponse('INVALID_DRILLDOWN', 'kind or week is invalid'));
+    return;
+  }
+  try {
+    const rows = await fetchDrilldown(getSupabase(), kind, week);
+    res.json(successResponse({ rows }));
+  } catch (err) {
+    logger.error('ADMIN_ANALYTICS', `Drilldown error: ${(err as Error).message}`);
+    res.status(500).json(errorResponse('DRILLDOWN_QUERY_FAILED', (err as Error).message));
+  }
+});
+
+/**
+ * GET /api/admin/analytics/signup-growth
+ * Weekly new registered users + running total (guests and test accounts excluded)
+ */
+router.get('/analytics/signup-growth', async (req: AdminRequest, res: Response): Promise<void> => {
+  try {
+    const weeks = Math.min(Math.max(Number(req.query.weeks) || 26, 4), 104);
+    const growth = await withCache(`admin:signup-growth:${weeks}`, 300, () =>
+      fetchSignupGrowth(getSupabase(), weeks)
+    );
+    res.json(successResponse({ growth }));
+  } catch (err) {
+    logger.error('ADMIN_ANALYTICS', `Signup growth error: ${(err as Error).message}`);
+    res.status(500).json(errorResponse('SIGNUP_GROWTH_QUERY_FAILED', (err as Error).message));
+  }
+});
 
 /**
  * GET /api/admin/analytics/cohorts

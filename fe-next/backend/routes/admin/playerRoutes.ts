@@ -25,7 +25,8 @@ router.get('/players/countries', async (_req: AdminRequest, res: Response): Prom
     const { data: profileData, error: profileError } = await supabase
       .from('profiles')
       .select('country_code')
-      .not('country_code', 'is', null);
+      .not('country_code', 'is', null)
+      .not('is_test_account', 'is', true);
 
     if (profileError) throw profileError;
 
@@ -121,7 +122,8 @@ router.get('/players/sources', async (_req: AdminRequest, res: Response): Promis
     // Get registered user data from profiles
     const { data: profileData, error: profileError } = await supabase
       .from('profiles')
-      .select('utm_source, utm_medium, utm_campaign, referrer');
+      .select('utm_source, utm_medium, utm_campaign, referrer')
+      .not('is_test_account', 'is', true);
 
     if (profileError) throw profileError;
 
@@ -238,7 +240,7 @@ router.get('/players/top', async (req: AdminRequest, res: Response): Promise<voi
     const { data, error } = await supabase
       .from('profiles')
       .select(`
-        id, username, display_name, avatar_emoji, avatar_color, avatar_image, avatar_config,
+        id, username, display_name, avatar_emoji, avatar_color, avatar_image, avatar_config, is_test_account,
         total_score, total_games, total_words, total_time_played, total_xp, current_level,
         casual_games, ranked_games, casual_wins, ranked_wins,
         ranked_mmr, peak_mmr, longest_word, longest_word_length,

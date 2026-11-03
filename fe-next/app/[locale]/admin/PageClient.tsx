@@ -27,11 +27,12 @@ import { TeacherHealthCard } from '@/components/admin/overview/TeacherHealthCard
 import { SystemHealth } from '@/components/admin/overview/SystemHealth';
 import { GameModePopularity } from '@/components/admin/overview/GameModePopularity';
 import { MpModeBreakdown } from '@/components/admin/overview/MpModeBreakdown';
-import { InsightsPanel } from '@/components/admin/overview/InsightsPanel';
 const DailyActivityChart = dynamic(
   () => import('@/components/admin/overview/DailyActivityChart').then((m) => m.DailyActivityChart),
   { ssr: false }
 );
+import { RevenuePanel } from '@/components/admin/overview/RevenuePanel';
+import { SignupGrowthChart } from '@/components/admin/overview/SignupGrowthChart';
 import { DeploymentInfoPanel } from '@/components/admin/overview/DeploymentInfoPanel';
 
 export default function AdminPageClient() {
@@ -143,14 +144,11 @@ export default function AdminPageClient() {
           {/* MP Mode Breakdown */}
           <MpModeBreakdown />
 
-          {/* Insights — activity heatmaps, cross-play, records, word-quality */}
-          <div className="mt-4">
-            <InsightsPanel />
-          </div>
-
           {/* Dashboard content */}
           {authToken ? (
             <>
+              <SignupGrowthChart authToken={authToken} />
+              <RevenuePanel authToken={authToken} />
               <DailyActivityChart authToken={authToken} />
               <LiveMonitor authToken={authToken} onTokenExpired={refreshToken} />
               <TodayGamesHistory authToken={authToken} />
