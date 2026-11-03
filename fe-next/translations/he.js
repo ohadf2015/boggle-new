@@ -3455,7 +3455,14 @@ const he = {
       "reconnect": "נסו שוב"
     }
   },
+  "webHandoff": {
+    "title": "התוכניות באתר",
+    "body": "תוכניות ותשלומים למורים מנוהלים באתר lexiclash.live ולא באפליקציה.",
+    "open": "פתחו את lexiclash.live"
+  },
   "common": {
+    "updateReady": "העדכון מוכן",
+    "updateRestart": "הפעלה מחדש",
     "pressBackAgainToExit": "לחצו שוב על חזרה כדי לצאת",
     "used": "בשימוש",
     "email": "אימייל",

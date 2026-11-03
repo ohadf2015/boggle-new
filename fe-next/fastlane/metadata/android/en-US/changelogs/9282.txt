@@ -1,0 +1,6 @@
+- feat(mobile): deeplink coverage, push-prompt timing, exit hint, Play release hygiene (#1591)
+- feat(quests): pay for clearing the daily modes, show today's goal before a round, celebrate the weekly quest once across devices (#1590)
+- chore(ci): lean PR CI, changed tests only, 7 jobs down to 2 (#1588)
+- feat(es-mp): explain a two-player game on the Spanish scrabble landing (#1580)
+- fix(mp): Quick Start waits for a cold socket and ends a rate-limited create at once (#1589)
+-

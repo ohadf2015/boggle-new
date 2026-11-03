@@ -3813,7 +3813,14 @@ const sv = {
       "reconnect": "Försök igen"
     }
   },
+  "webHandoff": {
+    "title": "Planerna finns på webben",
+    "body": "Lärarplaner och betalning hanteras på lexiclash.live, inte i appen.",
+    "open": "Öppna lexiclash.live"
+  },
   "common": {
+    "updateReady": "Uppdateringen är klar",
+    "updateRestart": "Starta om",
     "pressBackAgainToExit": "Tryck bakåt igen för att avsluta",
     "used": "Används",
     "email": "E-post",

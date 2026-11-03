@@ -58,7 +58,7 @@ export function JoinCodeStep({ flow, pasteNoteKey, onPaste }: JoinCodeStepProps)
 
         <div id="join-code-note" className="min-h-11">
           {refused ? (
-            <JoinAlert>{t(flow.codeErrorKey ?? `${K}.invalidCode`)}</JoinAlert>
+            <JoinAlert key={flow.refusalTick}>{t(flow.codeErrorKey ?? `${K}.invalidCode`)}</JoinAlert>
           ) : (
             <p
               role="status"

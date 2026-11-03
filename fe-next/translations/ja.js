@@ -3455,7 +3455,14 @@ const ja = {
       "reconnect": "再試行"
     }
   },
+  "webHandoff": {
+    "title": "プランはウェブで",
+    "body": "教師向けプランとお支払いはアプリではなく lexiclash.live で管理します。",
+    "open": "lexiclash.live を開く"
+  },
   "common": {
+    "updateReady": "アップデートの準備ができました",
+    "updateRestart": "再起動",
     "pressBackAgainToExit": "もう一度戻るで終了",
     "used": "使用済み",
     "email": "メール",

@@ -22,6 +22,8 @@ import logger from '@/utils/logger';
 
 const DeepLinkHandler = dynamic(() => import('@/components/DeepLinkHandler'), { ssr: false });
 const ExitHintToast = dynamic(() => import('./ExitHintToast'), { ssr: false });
+const NativeUpdateSnackbar = dynamic(() => import('./NativeUpdateSnackbar'), { ssr: false });
+const NativeHandoffRedirect = dynamic(() => import('./NativeHandoffRedirect'), { ssr: false });
 const NativeColdStartGuard = dynamic(() => import('./NativeColdStartGuard'), { ssr: false });
 
 interface NativeAppProviderProps {
@@ -100,6 +102,8 @@ export function NativeAppProvider({ children }: NativeAppProviderProps): React.R
       <NativeColdStartGuard />
       <DeepLinkHandler />
       <ExitHintToast />
+      <NativeUpdateSnackbar />
+      <NativeHandoffRedirect />
       {children}
     </>
   );
