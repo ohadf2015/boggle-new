@@ -6,6 +6,11 @@
 import logger from './logger';
 import { gameCleanupEmitter } from '../events/gameCleanup';
 
+/** Big rooms stop waiting on the slowest phone: once this share has finished the countdown, the rest get a short grace. */
+const QUORUM_MIN_PLAYERS = 6;
+const QUORUM_RATIO = 0.85;
+const QUORUM_GRACE_MS = 1500;
+
 // ==========================================
 // Type Definitions
 // ==========================================
@@ -22,6 +27,9 @@ interface GameStartSequence {
   retryTimeouts: ReturnType<typeof setTimeout>[];
   ackTimeout: ReturnType<typeof setTimeout> | null;
   countdownTimeout: ReturnType<typeof setTimeout> | null;
+  onCountdownTimeout: TimeoutCallback | null;
+  countdownDeadline: number;
+  quorumArmed: boolean;
   timerStarted: boolean;
   timerStartedAt: number | null;
   cancelled: boolean;
@@ -99,6 +107,9 @@ class GameStartCoordinator {
       retryTimeouts: [],
       ackTimeout: null,
       countdownTimeout: null,
+      onCountdownTimeout: null,
+      countdownDeadline: 0,
+      quorumArmed: false,
       timerStarted: false,
       timerStartedAt: null,
       cancelled: false,
@@ -336,6 +347,18 @@ class GameStartCoordinator {
     const expectedCount = sequence.expectedPlayers.size;
     const allReady = completedCount === expectedCount;
 
+    if (
+      !allReady &&
+      !sequence.quorumArmed &&
+      sequence.onCountdownTimeout &&
+      expectedCount >= QUORUM_MIN_PLAYERS &&
+      completedCount >= Math.ceil(expectedCount * QUORUM_RATIO)
+    ) {
+      sequence.quorumArmed = true;
+      const remaining = sequence.countdownDeadline - Date.now();
+      if (remaining > QUORUM_GRACE_MS) this.armCountdownTimeout(gameCode, QUORUM_GRACE_MS);
+    }
+
     if (allReady && !sequence.timerStarted) {
       sequence.timerStarted = true;
       sequence.timerStartedAt = Date.now();
@@ -362,6 +385,17 @@ class GameStartCoordinator {
     const sequence = this.activeSequences.get(gameCode);
     if (!sequence || sequence.cancelled) return;
 
+    sequence.onCountdownTimeout = onTimeout;
+    sequence.countdownDeadline = Date.now() + timeoutMs;
+    this.armCountdownTimeout(gameCode, timeoutMs);
+  }
+
+  private armCountdownTimeout(gameCode: string, delayMs: number): void {
+    const sequence = this.activeSequences.get(gameCode);
+    if (!sequence || sequence.cancelled || !sequence.onCountdownTimeout) return;
+    if (sequence.countdownTimeout) clearTimeout(sequence.countdownTimeout);
+    const onTimeout = sequence.onCountdownTimeout;
+
     sequence.countdownTimeout = setTimeout(() => {
       const current = this.activeSequences.get(gameCode);
       if (!current || current.cancelled || current.timerStarted || !current.countdownTimeout) return;
@@ -381,7 +415,7 @@ class GameStartCoordinator {
       };
       logger.info('GAME_START', `Countdown timeout. Starting with ${stats.acknowledged}/${stats.expected} ready. Missing: ${missing.join(', ')}`);
       onTimeout(stats);
-    }, timeoutMs);
+    }, delayMs);
   }
 
   /**

@@ -129,4 +129,54 @@ describe('GameStartCoordinator — countdownComplete', () => {
     vi.advanceTimersByTime(10000);
     expect(onTimeout).not.toHaveBeenCalled();
   });
+  describe('quorum start in big rooms', () => {
+    const names = (n: number) => Array.from({ length: n }, (_, i) => `p${i}`);
+
+    it('GIVEN 11 of 12 finished the countdown WHEN the grace passes THEN the round starts without waiting the full 8s', () => {
+      const players = names(12);
+      const messageId = coordinator.initializeSequence('BIG1', players, 60);
+      const onTimeout = vi.fn();
+      coordinator.setCountdownCompleteTimeout('BIG1', 8000, onTimeout);
+      players.slice(0, 11).forEach((p) => coordinator.recordCountdownComplete('BIG1', p, messageId));
+      vi.advanceTimersByTime(1400);
+      expect(onTimeout).not.toHaveBeenCalled();
+      vi.advanceTimersByTime(200);
+      expect(onTimeout).toHaveBeenCalledTimes(1);
+      expect(onTimeout.mock.calls[0][0]).toMatchObject({ acknowledged: 11, expected: 12, missing: ['p11'] });
+    });
+
+    it('GIVEN only 10 of 12 are ready THEN there is no quorum and the full fallback still applies', () => {
+      const players = names(12);
+      const messageId = coordinator.initializeSequence('BIG2', players, 60);
+      const onTimeout = vi.fn();
+      coordinator.setCountdownCompleteTimeout('BIG2', 8000, onTimeout);
+      players.slice(0, 10).forEach((p) => coordinator.recordCountdownComplete('BIG2', p, messageId));
+      vi.advanceTimersByTime(7900);
+      expect(onTimeout).not.toHaveBeenCalled();
+      vi.advanceTimersByTime(200);
+      expect(onTimeout).toHaveBeenCalledTimes(1);
+    });
+
+    it('GIVEN a small room of 4 with 3 ready THEN it keeps waiting for the fourth', () => {
+      const players = names(4);
+      const messageId = coordinator.initializeSequence('SMALL', players, 60);
+      const onTimeout = vi.fn();
+      coordinator.setCountdownCompleteTimeout('SMALL', 8000, onTimeout);
+      players.slice(0, 3).forEach((p) => coordinator.recordCountdownComplete('SMALL', p, messageId));
+      vi.advanceTimersByTime(7900);
+      expect(onTimeout).not.toHaveBeenCalled();
+    });
+
+    it('GIVEN the last straggler reports inside the grace THEN the normal all-ready path wins and the callback never fires', () => {
+      const players = names(12);
+      const messageId = coordinator.initializeSequence('BIG3', players, 60);
+      const onTimeout = vi.fn();
+      coordinator.setCountdownCompleteTimeout('BIG3', 8000, onTimeout);
+      players.slice(0, 11).forEach((p) => coordinator.recordCountdownComplete('BIG3', p, messageId));
+      vi.advanceTimersByTime(500);
+      expect(coordinator.recordCountdownComplete('BIG3', 'p11', messageId).allReady).toBe(true);
+      vi.advanceTimersByTime(9000);
+      expect(onTimeout).not.toHaveBeenCalled();
+    });
+  });
 });

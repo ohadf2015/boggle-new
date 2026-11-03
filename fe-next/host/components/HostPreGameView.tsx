@@ -30,7 +30,7 @@ import { useHostLobby, LOBBY_MAX_PLAYERS, type HostLobbyPlayer } from '@/compone
 import { HostStatusLane } from '@/components/multiplayer/lobby/HostStatusLane';
 import { useChatUnread } from '@/components/multiplayer/lobby/useChatUnread';
 import { useLobbyWide } from '@/components/multiplayer/lobby/useLobbyWide';
-import { lobbySeats, startSublabel } from '@/components/multiplayer/lobby/lobbySeats';
+import { lobbySeats, lobbyMax, startSublabel } from '@/components/multiplayer/lobby/lobbySeats';
 import {
   LobbyExitButton, LobbyChatButton, LobbyChatLauncher, LobbyCountPill, LobbyChatPanel, InviteSheet, HowToPlaySheet, ChatSheet,
 } from '@/components/multiplayer/lobby/LobbyChrome';
@@ -238,7 +238,7 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
       disabled={lobby.isStartDisabled}
       tournamentCreating={tournamentCreating}
       playerCount={seats.length}
-      maxPlayers={LOBBY_MAX_PLAYERS}
+      maxPlayers={lobbyMax(seats.length)}
       t={t}
       labelKey={isClassroomRoom ? 'hostView.startClassGame' : undefined}
       sublabel={sublabel}
@@ -263,7 +263,7 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
           start={<LobbyExitButton onPress={onExitRoom} t={t} />}
           center={
             isPrivate
-              ? <LobbyCountPill count={seats.length} max={LOBBY_MAX_PLAYERS} />
+              ? <LobbyCountPill count={seats.length} max={lobbyMax(seats.length)} />
               : <MpRoomCode code={gameCode} size="chip" onCopy={() => setSheet('invite')} className="px-2 text-[24px] tracking-[0.1em] [&>svg]:hidden min-[720px]:text-[length:calc(28px*var(--mp-u,1))] min-[720px]:tracking-[0.2em] min-[720px]:[&>svg]:inline" />
           }
           end={

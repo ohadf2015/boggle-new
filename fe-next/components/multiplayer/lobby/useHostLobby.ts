@@ -29,6 +29,7 @@ import { trackSoloPlayPrompt } from '@/utils/posthogEngagement';
 import { isTvTutorialComplete } from '@/host/components/tv-broadcast/TvTutorialOverlay';
 import type { GameModeOption } from '@/components/GameModeSelector';
 import type { Avatar as AvatarType, DifficultyLevel, Language, PresenceStatus } from '@/shared/types/game';
+import { MAX_PLAYERS_PER_ROOM } from '@/shared/constants/gameConstants';
 
 export interface HostLobbyPlayer {
   username: string;
@@ -73,7 +74,7 @@ export interface UseHostLobbyArgs {
  * trigger bot fill after this many seconds instead of requiring a click.
  */
 export const QUICKPLAY_AUTO_FILL_SECONDS = 5;
-export const LOBBY_MAX_PLAYERS = 8;
+export const LOBBY_MAX_PLAYERS = MAX_PLAYERS_PER_ROOM;
 
 const LOBBY_GAME_STATE = 'waiting' as const;
 
