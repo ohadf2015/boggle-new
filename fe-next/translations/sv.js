@@ -4550,6 +4550,7 @@ const sv = {
     "gameCodeNotExist": "Koden hittades inte. Kontrollera och försök igen.",
     "usernameTaken": "Namnet är upptaget. Prova ett annat",
     "tooManyAttempts": "För snabbt. Vänta en sekund och försök igen",
+    "roomCreateTooSoon": "Du öppnade precis ett rum. Försök igen om några sekunder",
     "gameCodeExists": "Den koden är upptagen. Välj en ny.",
     "somethingWentWrong": "Snabb paus",
     "unexpectedError": "Ett litet fel, men ditt spel är säkert",

@@ -4191,6 +4191,7 @@ const ja = {
     "gameCodeNotExist": "コードが見つからないよ。確認してね",
     "usernameTaken": "先に使われてたよ。別の名前にしてね",
     "tooManyAttempts": "連打しすぎ。少し待ってからもう一度どうぞ",
+    "roomCreateTooSoon": "ルームを作ったばかりです。数秒後にもう一度どうぞ",
     "gameCodeExists": "そのコードは使用中。新しいのを選んでね",
     "somethingWentWrong": "ちょっと休憩！",
     "unexpectedError": "ちょっとしたトラブル。でもゲームは無事だよ",

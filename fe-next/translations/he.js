@@ -4191,6 +4191,7 @@ const he = {
     "roomClosed": "החדר נסגר. אפשר לפתוח חדר חדש",
     "usernameTaken": "השם כבר תפוס. נסו שם אחר",
     "tooManyAttempts": "לאט לאט. חכו שנייה ונסו שוב",
+    "roomCreateTooSoon": "הרגע פתחתם חדר. נסו שוב בעוד כמה שניות",
     "gameCodeExists": "הקוד תפוס. בחרו קוד אחר",
     "somethingWentWrong": "פסק זמן קצר",
     "unexpectedError": "תקלה קטנה, אבל המשחק שלך בטוח",
