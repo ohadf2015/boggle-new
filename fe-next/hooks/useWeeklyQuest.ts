@@ -9,7 +9,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
-import { supabase } from '@/lib/supabase';
 import {
   getAvailableQuests, getWeekStart, getWeekNumber, pickAvatarReward,
   getDifficultyFromType, getDisplayTargetForType,
@@ -66,7 +65,17 @@ export function useWeeklyQuest(): UseWeeklyQuestReturn {
   const available = getAvailableQuests();
 
   const fetchQuest = useCallback(async () => {
-    if (!user?.id || !supabase) {
+    if (!user?.id) {
+      setLoading(false);
+      return;
+    }
+    // Dynamic: this hook runs in the global nav, and a static import would put
+    // @supabase/gotrue back into the landing chunk (landing-gotrue-defer test).
+    const { supabase } = await import(
+      /* webpackPrefetch: false, webpackPreload: false */
+      '@/lib/supabase'
+    );
+    if (!supabase) {
       setLoading(false);
       return;
     }
