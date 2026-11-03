@@ -56,3 +56,12 @@ describe('own profile — no fake-identity flash', () => {
     expect(trackProfileViewed).toHaveBeenCalledWith('direct', true);
   });
 });
+
+describe('own profile — signed-out guest', () => {
+  it('Given a guest on the sign-in wall, Then the tile-skin collection is still there to browse and equip', () => {
+    auth.value = { user: null, profile: null, isAuthenticated: false, loading: false, updateProfile: vi.fn(), refreshProfile: vi.fn() };
+    render(<NuqsTestingAdapter><ProfilePageClient /></NuqsTestingAdapter>);
+    expect(screen.getByText('auth.signIn')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'cosmetics.collection' })).toBeInTheDocument();
+  });
+});

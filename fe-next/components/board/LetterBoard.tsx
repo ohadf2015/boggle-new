@@ -52,6 +52,7 @@ export interface LetterBoardProps {
   eliminatedLetters?: ReadonlySet<string>;
   /** Cells lit as a hint or by typing, with their 1-based order. */
   hintPath?: ReadonlyArray<{ row: number; col: number }>;
+  /** null = the hint has finished fading, so its cells rest as plain tiles; omit to keep them lit. */
   hintPhase?: 'blink' | 'fadeout' | null;
   feedback?: BoardFeedback | null;
   cellLabel?: (row: number, col: number, letter: string) => string;
@@ -107,7 +108,7 @@ export default function LetterBoard({
   marks,
   eliminatedLetters,
   hintPath,
-  hintPhase = null,
+  hintPhase,
   feedback,
   cellLabel,
   gridLabel,
@@ -163,7 +164,7 @@ export default function LetterBoard({
   const rows = grid.length;
   const cols = grid[0]?.length ?? 0;
   const hintOrder = new Map<string, number>();
-  hintPath?.forEach((c, i) => hintOrder.set(keyOf(c.row, c.col), i + 1));
+  if (hintPhase !== null) hintPath?.forEach((c, i) => hintOrder.set(keyOf(c.row, c.col), i + 1));
   const template: CSSProperties = {
     gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
     gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`,
@@ -267,6 +268,8 @@ export default function LetterBoard({
                   key={key}
                   data-gk={key}
                   data-eliminated={eliminatedLetters?.has(letter.toUpperCase()) ? '' : undefined}
+                  data-hint={hintOrder.has(key) ? '' : undefined}
+                  data-marked={isMarked(key, marks) ? '' : undefined}
                   className={styles.glyph}
                   style={{ ['--enter-i' as string]: r * cols + c }}
                 >

@@ -208,6 +208,9 @@ export default function ProfilePageClient(): React.JSX.Element {
               </Button>
             </div>
           </m.div>
+          <div className="mt-6">
+            <CosmeticCollection rankTier={cosmeticRankTier} streakDays={0} coins={0} />
+          </div>
         </div>
         {!isOnCrazyGamesPlatform && showAuthModal && (
           <AuthModal isOpen onClose={() => setShowAuthModal(false)} showGuestStats={true} />
