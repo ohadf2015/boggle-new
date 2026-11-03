@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/nextjs";
-import { WASM_STREAMING_COMPILE_FAILED, THIRD_PARTY_SCRIPT_NOISE, EXPECTED_CLIENT_NOISE, isStaleAssetLinkRejection } from "@/lib/sentry/benignErrorPatterns";
+import { WASM_STREAMING_COMPILE_FAILED, THIRD_PARTY_SCRIPT_NOISE, THIRD_PARTY_SCRIPT_URLS, EXPECTED_CLIENT_NOISE, isStaleAssetLinkRejection } from "@/lib/sentry/benignErrorPatterns";
 
 const SENTRY_DSN = process.env.NEXT_PUBLIC_SENTRY_DSN;
 
@@ -406,6 +406,7 @@ Sentry.init({
     /^safari-extension:\/\//i,
     /webkit-masked-url/i,
     /^resource:\/\//i,
+    ...THIRD_PARTY_SCRIPT_URLS,
   ],
 
   initialScope: {

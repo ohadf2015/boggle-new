@@ -19,6 +19,7 @@ import {
 import { PageLoader } from '@/components/ui/PageLoader';
 import { useLanguage } from '@/contexts/LanguageContext';
 import Cookies from 'js-cookie';
+import { isBareCallbackVisit } from './noSessionReport';
 
 // Timeout constants
 const CODE_EXCHANGE_TIMEOUT = 15000; // 15 seconds timeout for code exchange
@@ -486,11 +487,16 @@ function AuthCallbackContent(): React.JSX.Element {
 
         // Fallback: redirect to home with error
         // Log diagnostic info - use variables already declared above (code, accessToken)
-        logger.warn('Auth callback: No session found, redirecting with error', {
+        const noSessionDiag = {
           hadCode: !!code,
           hadHashTokens: !!accessToken,
           url: window.location.href.replace(/code=[^&]+/, 'code=REDACTED')
-        });
+        };
+        if (isBareCallbackVisit({ search: window.location.search, hash: window.location.hash })) {
+          logger.log('Auth callback: opened without an OAuth result, redirecting home', noSessionDiag);
+        } else {
+          logger.warn('Auth callback: No session found, redirecting with error', noSessionDiag);
+        }
         broadcastAuthFailed('No session found');
         safeRedirect(`/${locale}?auth_error=true&reason=no_session`);
       } catch (err) {

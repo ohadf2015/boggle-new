@@ -246,6 +246,11 @@ function isJwtExpiredError(message?: string): boolean {
   return lower.includes('jwt expired') || lower.includes('token expired') || lower.includes('invalid jwt');
 }
 
+// A request that lost its access token runs as anon, which cannot read the threads view.
+function isAnonPermissionError(error: { code?: string; message?: string }): boolean {
+  return error.code === '42501' || /permission denied/i.test(error.message ?? '');
+}
+
 /**
  * Get all message threads with friends
  */
@@ -265,15 +270,16 @@ export async function getThreads(userId?: string): Promise<MessageThread[]> {
 
     // If the access token expired, refresh the session and retry once instead
     // of surfacing a JWT error to Sentry every polling cycle.
-    if (error && isJwtExpiredError(error.message)) {
-      logger.debug('FRIEND_MESSAGES', 'JWT expired while getting threads; attempting refresh');
+    if (error && (isJwtExpiredError(error.message) || isAnonPermissionError(error))) {
+      logger.debug('FRIEND_MESSAGES', 'Session missing or expired while getting threads; attempting refresh');
       const { error: refreshError } = await supabase.auth.refreshSession();
       if (!refreshError) {
         const retry = await supabase.rpc('get_friend_threads', { p_user_id: uid });
         rows = retry.data;
         error = retry.error;
       } else {
-        logger.debug('FRIEND_MESSAGES', `Token refresh failed: ${refreshError.message}`);
+        logger.warn('FRIEND_MESSAGES', `Threads skipped, no session to refresh: ${refreshError.message}`);
+        return [];
       }
     }
 
