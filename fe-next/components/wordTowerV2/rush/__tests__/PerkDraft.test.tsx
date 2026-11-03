@@ -54,6 +54,13 @@ describe("PerkDraft", () => {
     expect(screen.getByText("wordTowerV2.rush.draft.subtitle:10")).toBeTruthy();
   });
 
+  it("given a landscape phone, when cards render, then their glyphs opt out of the global 18px button-svg clamp", () => {
+    renderDraft();
+    for (const card of screen.getAllByRole("button")) {
+      expect(card.classList.contains("svg-free")).toBe(true);
+    }
+  });
+
   it("given the draft opens, when mounted, then the first card has focus", () => {
     renderDraft();
     expect(document.activeElement).toBe(screen.getAllByRole("button")[0]);
