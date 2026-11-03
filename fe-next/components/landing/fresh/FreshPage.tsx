@@ -21,6 +21,7 @@ import { FreshAdSlot } from './FreshAdSlot';
 import { FreshMarquee } from './FreshMarquee';
 import { FreshClassrooms } from './FreshClassrooms';
 import { FreshEduStrip } from './FreshEduStrip';
+import { FreshFloatingPlay } from './FreshFloatingPlay';
 
 export interface FreshPageProps {
   /**
@@ -49,6 +50,7 @@ export function FreshPage({ onPlay }: FreshPageProps) {
       <div className="mx-auto w-full max-w-6xl px-4 pb-4 pt-6 sm:px-6 md:pt-4 lg:px-8">
         <FreshClassrooms />
       </div>
+      <FreshFloatingPlay onPlay={onPlay} />
     </div>
   );
 }

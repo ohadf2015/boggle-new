@@ -1,0 +1,9 @@
+/* Pinned above the viewport's bottom chrome: the app tab bar / AdMob banner
+   (--bottom-stack-height, memory: admob-banner-clearance-4019) and the
+   cookie-consent sheet (--cookie-consent-height), mirroring the body
+   reservations in globals.css so nothing viewport-pinned covers the pill. */
+.floatingPlay {
+  padding-bottom: calc(
+    var(--bottom-stack-height, 0px) + var(--cookie-consent-height, 0px) + 12px
+  );
+}
