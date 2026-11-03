@@ -21590,7 +21590,9 @@ const es = {
       "packWords": "{count} palabras",
       "packRecommended": "Te lo recomendamos",
       "startLive": "Empezar en vivo",
-      "createOnly": "Solo crear la clase"
+      "createOnly": "Solo crear la clase",
+      "packHint": "Tus alumnos también reciben estas palabras como tarea al unirse.",
+      "assignFailed": "Tu clase está lista, pero las palabras no se asignaron. Asígnalas desde la página de la clase."
     },
     "host": {
       "classLabel": "Clase",

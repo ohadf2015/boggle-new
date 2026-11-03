@@ -21577,7 +21577,9 @@ const sv = {
       "packWords": "{count} ord",
       "packRecommended": "Vårt tips",
       "startLive": "Starta live",
-      "createOnly": "Skapa bara klassen"
+      "createOnly": "Skapa bara klassen",
+      "packHint": "Eleverna får också orden som läxa när de går med.",
+      "assignFailed": "Klassen är klar, men orden tilldelades inte. Tilldela dem från klassens sida."
     },
     "host": {
       "classLabel": "Klass",
