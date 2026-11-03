@@ -48,6 +48,7 @@ const cap = {
   deletedUserIds: [] as string[],
   /** Queue of deleteUser results; each call shifts one. Last one repeats. */
   deleteUserResults: [] as Array<{ error: { message: string; status?: number; code?: string } | null }>,
+  getUserByIdResult: null as { data: { user: unknown } | null; error: { message?: string; status?: number; code?: string } | null } | null,
 };
 
 function runDeleteUser(id: string) {
@@ -82,6 +83,10 @@ vi.mock('@/utils/supabase/admin', () => ({
     auth: {
       admin: {
         deleteUser: (id: string) => runDeleteUser(id),
+        getUserById: (id: string) => {
+          if (cap.getUserByIdResult !== null) return Promise.resolve(cap.getUserByIdResult);
+          return Promise.resolve({ data: { user: { id } }, error: null });
+        },
       },
     },
   }),
@@ -100,6 +105,7 @@ beforeEach(() => {
   cap.deletes = [];
   cap.deletedUserIds = [];
   cap.deleteUserResults = [{ error: null }];
+  cap.getUserByIdResult = null;
   telemetry.events = [];
   db.classrooms = [];
   db.memberships = [];
@@ -217,6 +223,86 @@ describe('DELETE /api/account/delete', () => {
     const ev = telemetry.events.find((e) => e.event === 'teacher_delete_completed');
     expect(ev).toBeTruthy();
     expect(ev!.properties.reason).toBeUndefined();
+  });
+
+  it('emits growth:account_deleted with teacher metadata, reason, and account_age_days', async () => {
+    authUser.v = { id: 'user-1', email: 'teacher@school.org', created_at: '2026-10-01T00:00:00.000Z' } as any;
+    db.classrooms = [{ id: 'c1', name: 'Period 3' }];
+    db.memberships = [
+      { classroom_id: 'c1', student_id: 's1', is_rehearsal: false },
+      { classroom_id: 'c1', student_id: 's2', is_rehearsal: false },
+    ];
+    const res = await DELETE(req({ reason: 'too_many_emails', surface: 'account_delete_page' }));
+    expect(res.status).toBe(200);
+    const growth = telemetry.events.find((e) => e.event === 'growth:account_deleted');
+    expect(growth).toBeTruthy();
+    expect(growth!.distinctId).toBe('user-1');
+    expect(growth!.properties).toMatchObject({
+      is_teacher: true,
+      class_count: 1,
+      student_count: 2,
+      deletion_reason: 'too_many_emails',
+    });
+    expect(typeof growth!.properties.account_age_days).toBe('number');
+    expect(growth!.properties.account_age_days).toBeGreaterThan(0);
+  });
+
+  it('emits growth:account_deleted for non-teacher with is_teacher:false', async () => {
+    authUser.v = { id: 'user-2', email: 'player@example.com', created_at: '2026-10-15T00:00:00.000Z' } as any;
+    const res = await DELETE(req());
+    expect(res.status).toBe(200);
+    const growth = telemetry.events.find((e) => e.event === 'growth:account_deleted');
+    expect(growth).toBeTruthy();
+    expect(growth!.distinctId).toBe('user-2');
+    expect(growth!.properties).toMatchObject({
+      is_teacher: false,
+      class_count: 0,
+      student_count: 0,
+      deletion_reason: null,
+    });
+  });
+
+  it('deleteUser timeout-then-already-deleted resolves as success (idempotent recovery)', async () => {
+    cap.deleteUserResults = [
+      { error: { message: 'Gateway Timeout', status: 504 } },
+    ];
+    // Lookup confirms user is already gone
+    cap.getUserByIdResult = { data: { user: null }, error: { status: 404, message: 'User not found' } };
+    const res = await DELETE(req());
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.success).toBe(true);
+    expect(body.alreadyDeleted).toBe(true);
+  });
+
+  it('deleteUser hard failure (user still exists) returns 500 and does NOT claim success', async () => {
+    cap.deleteUserResults = [
+      { error: { message: 'Gateway Timeout', status: 504 } },
+      { error: { message: 'Gateway Timeout', status: 504 } },
+    ];
+    // User still exists on lookup
+    cap.getUserByIdResult = { data: { user: { id: 'user-1' } }, error: null };
+    const res = await DELETE(req());
+    expect(res.status).toBe(500);
+    const body = await res.json();
+    expect(body.error).toBe('Failed to delete account');
+    expect(body.success).toBeUndefined();
+  });
+
+  it('telemetry failure does not fail the deletion', async () => {
+    const eduTelemetry = await import('@/backend/utils/educationTelemetry');
+    const originalCapture = eduTelemetry.captureEduServerEvents;
+    try {
+      (eduTelemetry as any).captureEduServerEvents = () => {
+        throw new Error('PostHog capture failure');
+      };
+      const res = await DELETE(req());
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.success).toBe(true);
+    } finally {
+      (eduTelemetry as any).captureEduServerEvents = originalCapture;
+    }
   });
 });
 

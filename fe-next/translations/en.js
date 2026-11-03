@@ -3581,9 +3581,11 @@ const en = {
     "teacherDeleteReasonTitle": "What's the main reason for leaving?",
     "teacherDeleteReason": {
       "too_many_emails": "Too many emails",
-      "not_using_it": "Not using it anymore",
-      "privacy_concerns": "Privacy concerns",
       "missing_features": "Missing features",
+      "too_expensive": "Too expensive",
+      "privacy": "Privacy concerns",
+      "privacy_concerns": "Privacy concerns",
+      "not_using_it": "Not using it anymore",
       "found_alternative": "Found an alternative",
       "other": "Other"
     },

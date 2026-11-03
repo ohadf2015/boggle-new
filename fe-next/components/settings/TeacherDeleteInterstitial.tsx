@@ -230,11 +230,16 @@ export default function TeacherDeleteInterstitial({
       <button
         type="button"
         onClick={onContinueToDelete}
+        disabled={!reason}
         className={cn(
           'flex items-center justify-center gap-1 w-full px-4 py-2 rounded-neo border-3 font-bold text-sm min-h-[44px] transition-colors',
-          isDarkMode
-            ? 'border-slate-600 text-gray-300 hover:border-neo-red hover:text-neo-red'
-            : 'border-gray-300 text-gray-600 hover:border-neo-red hover:text-neo-red'
+          !reason
+            ? isDarkMode
+              ? 'border-slate-700 bg-neo-navy-elevated/50 text-slate-500 cursor-not-allowed opacity-60'
+              : 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed opacity-60'
+            : isDarkMode
+              ? 'border-slate-600 text-gray-300 hover:border-neo-red hover:text-neo-red'
+              : 'border-gray-300 text-gray-600 hover:border-neo-red hover:text-neo-red'
         )}
       >
         {t('settings.teacherDeleteContinue')}

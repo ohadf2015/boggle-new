@@ -118,27 +118,33 @@ export async function loadDeleteImpact(db: Db, userId: string): Promise<DeleteIm
 /** Reasons the delete confirm can report; rides teacher_delete_* telemetry. */
 export const TEACHER_DELETE_REASONS = [
   'too_many_emails',
-  'not_using_it',
-  'privacy_concerns',
   'missing_features',
-  'found_alternative',
+  'too_expensive',
+  'privacy',
   'other',
 ] as const;
 
 export type TeacherDeleteReason = (typeof TEACHER_DELETE_REASONS)[number];
 
 export function normalizeDeleteReason(raw: unknown): TeacherDeleteReason | null {
-  return typeof raw === 'string' && (TEACHER_DELETE_REASONS as readonly string[]).includes(raw)
+  if (typeof raw !== 'string') return null;
+  if (raw === 'privacy_concerns') return 'privacy';
+  return (TEACHER_DELETE_REASONS as readonly string[]).includes(raw)
     ? (raw as TeacherDeleteReason)
     : null;
 }
 
-interface AdminDeleteResult {
+export interface AdminDeleteResult {
   error: { message?: string; status?: number; code?: string } | null;
 }
 
-type AdminAuth = {
-  auth: { admin: { deleteUser: (id: string) => Promise<AdminDeleteResult> } };
+export type AdminAuth = {
+  auth: {
+    admin: {
+      deleteUser: (id: string) => Promise<AdminDeleteResult>;
+      getUserById?: (id: string) => Promise<{ data: { user: unknown } | null; error: AdminDeleteResult['error'] }>;
+    };
+  };
 };
 
 /** GoTrue says the user is gone — a previous attempt actually deleted them. */
@@ -159,7 +165,13 @@ export function isRetryableDeleteError(error: AdminDeleteResult['error']): boole
   const status = typeof error.status === 'number' ? error.status : 0;
   if (status >= 500) return true;
   const msg = (error.message ?? '').toLowerCase();
-  return msg.includes('timeout') || msg.includes('timed out') || msg.includes('fetch failed');
+  return (
+    error.code === 'timeout' ||
+    msg.includes('timeout') ||
+    msg.includes('timed out') ||
+    msg.includes('fetch failed') ||
+    msg.includes('aborterror')
+  );
 }
 
 export interface DeleteUserOutcome {
@@ -173,25 +185,83 @@ export interface DeleteUserOutcome {
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
- * deleteUser with one bounded retry on timeout/5xx and idempotency on
- * user-not-found. The 2026-11 UR audit delete died on a 504 that may well
- * have completed server-side; a blind retry would 404, and that 404 IS the
- * success signal.
+ * Checks if the user is actually gone in auth.users via getUserById.
+ */
+export async function checkUserActuallyGone(admin: AdminAuth, userId: string): Promise<boolean> {
+  if (typeof admin.auth.admin.getUserById !== 'function') return false;
+  try {
+    const lookup = await admin.auth.admin.getUserById(userId);
+    if (lookup?.error && isUserNotFoundError(lookup.error)) {
+      return true;
+    }
+    if (!lookup?.data?.user && !lookup?.error) {
+      return true;
+    }
+    return false;
+  } catch (err) {
+    if (err instanceof Error && isUserNotFoundError({ message: err.message })) {
+      return true;
+    }
+    return false;
+  }
+}
+
+/**
+ * Invokes admin.deleteUser bounded by an AbortController timeout (default 10s).
+ */
+export async function deleteUserWithTimeout(
+  admin: AdminAuth,
+  userId: string,
+  timeoutMs: number = 10000,
+): Promise<AdminDeleteResult> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const deletePromise = admin.auth.admin.deleteUser(userId);
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      controller.signal.addEventListener('abort', () => {
+        const err = new Error(`deleteUser timed out after ${timeoutMs / 1000}s`);
+        err.name = 'AbortError';
+        reject(err);
+      });
+    });
+
+    return await Promise.race([deletePromise, timeoutPromise]);
+  } catch (err) {
+    const isTimeout =
+      err instanceof Error &&
+      (err.name === 'AbortError' || err.message.toLowerCase().includes('timed out'));
+    return {
+      error: {
+        message: err instanceof Error ? err.message : String(err),
+        status: isTimeout ? 504 : 500,
+        code: isTimeout ? 'timeout' : undefined,
+      },
+    };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/**
+ * deleteUser with timeout-safety (10s AbortController), bounded retry on timeout/5xx,
+ * and idempotency on user-not-found / getUserById verification.
+ * If the deleteUser call times out or returns 5xx, we inspect whether the user is
+ * actually gone before declaring failure.
  */
 export async function deleteUserWithRetry(
   admin: AdminAuth,
   userId: string,
-  { maxAttempts = 2, retryDelayMs = 750 }: { maxAttempts?: number; retryDelayMs?: number } = {},
+  {
+    maxAttempts = 2,
+    retryDelayMs = 750,
+    timeoutMs = 10000,
+  }: { maxAttempts?: number; retryDelayMs?: number; timeoutMs?: number } = {},
 ): Promise<DeleteUserOutcome> {
   let lastError: AdminDeleteResult['error'] = null;
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    let result: AdminDeleteResult;
-    try {
-      result = await admin.auth.admin.deleteUser(userId);
-    } catch (err) {
-      // supabase-js throws on network failure instead of returning { error }.
-      result = { error: { message: err instanceof Error ? err.message : String(err) } };
-    }
+    const result = await deleteUserWithTimeout(admin, userId, timeoutMs);
 
     if (!result.error) return { ok: true, alreadyDeleted: false, attempts: attempt, error: null };
 
@@ -201,8 +271,26 @@ export async function deleteUserWithRetry(
       // completed the delete. That IS the success signal.
       return { ok: true, alreadyDeleted: true, attempts: attempt, error: null };
     }
+
+    // On timeout or 5xx, check if user was actually deleted despite the error
+    if (isRetryableDeleteError(result.error)) {
+      const gone = await checkUserActuallyGone(admin, userId);
+      if (gone) {
+        return { ok: true, alreadyDeleted: true, attempts: attempt, error: null };
+      }
+    }
+
     if (!isRetryableDeleteError(result.error) || attempt === maxAttempts) break;
     await sleep(retryDelayMs);
   }
+
+  // Final check before reporting failure: if error was retryable, check if user is gone
+  if (isRetryableDeleteError(lastError)) {
+    const gone = await checkUserActuallyGone(admin, userId);
+    if (gone) {
+      return { ok: true, alreadyDeleted: true, attempts: maxAttempts, error: null };
+    }
+  }
+
   return { ok: false, alreadyDeleted: false, attempts: maxAttempts, error: lastError };
 }
