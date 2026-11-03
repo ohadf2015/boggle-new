@@ -15,6 +15,7 @@ import {
   type DailyModeId,
 } from '@/lib/dailyModes';
 import type { Language } from '@/types';
+import { saveFlySource } from '@/components/daily/flow/dailyFly';
 import { chainPips, markDailyHandoff, type ChainPip } from '@/components/daily/flow/dailyHandoff';
 import { useDailyReveal, useMountedAfterReveal } from './reveal/DailyRevealContext';
 
@@ -95,6 +96,7 @@ export function NextQuestCta({
   const played = useDailyPlayedStatus();
   const reveal = useDailyReveal();
   const arrowRef = useRef<HTMLSpanElement>(null);
+  const artRef = useRef<HTMLSpanElement>(null);
   const late = useMountedAfterReveal();
   const pulse = reveal.active && reveal.done && !late;
 
@@ -163,6 +165,7 @@ export function NextQuestCta({
       onPointerDown={() => playOn(arrowRef.current, SEND_OFF, { duration: 260, easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)' })}
       onClick={() => {
         markDailyHandoff(mode.id);
+        if (artRef.current) saveFlySource(artRef.current.getBoundingClientRect());
         trackGrowthEvent('cross_promo_click', {
           target: mode.id,
           source,
@@ -188,6 +191,7 @@ export function NextQuestCta({
       {/* Decorative mascot, as a CSS background for the same reasons as the
           hub's compact rows — the label beside it names the mode. */}
       <span
+        ref={artRef}
         aria-hidden="true"
         role="presentation"
         data-art-url={mode.art}
