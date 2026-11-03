@@ -19636,6 +19636,7 @@ const sv = {
     "yourTurn": "Din tur",
     "botTurn": "WordBot tänker…",
     "player1": "Spelare 1",
+    "botPassed": "WordBot hoppade över sin tur",
     "player2": "Spelare 2",
     "player1Turn": "Spelare 1:s tur",
     "player2Turn": "Spelare 2:s tur",
