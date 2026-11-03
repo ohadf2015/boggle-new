@@ -17869,6 +17869,7 @@ const en = {
     "belowYourNorm": "{{delta}}% below your average"
   },
   "wordcraft": {
+    "botPassed": "WordBot skipped its turn",
     "domination": "Domination!",
     "combo": "COMBO",
     "title": "WordCraft",

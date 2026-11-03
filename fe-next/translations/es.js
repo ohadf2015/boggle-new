@@ -19394,6 +19394,7 @@ const es = {
     "belowYourNorm": "{{delta}}% bajo tu promedio"
   },
   "wordcraft": {
+    "botPassed": "WordBot pasó su turno",
     "domination": "¡Dominación!",
     "combo": "COMBO",
     "title": "WordCraft",

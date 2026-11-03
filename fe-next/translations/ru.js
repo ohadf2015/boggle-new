@@ -16960,6 +16960,7 @@ const ru = {
   "forfeitDescription": "Ты проиграешь эту дуэль, а соперник победит. Отменить это нельзя.",
   "realtimeDuel": "Дуэль в реальном времени",
   "wordcraft": {
+    "botPassed": "WordBot пропустил ход",
     "domination": "Доминирование!",
     "combo": "КОМБО",
     "title": "WordCraft",
