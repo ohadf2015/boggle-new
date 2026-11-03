@@ -15732,7 +15732,9 @@ const es = {
     "wordBank": {
       "title": "Banco de palabras ({{count}})",
       "hint": "Estas palabras están escondidas en el tablero. Toca para cerrar.",
-      "challengeBadge": "Reto: busca palabras de {{min}}+ letras"
+      "challengeBadge": "Reto: busca palabras de {{min}}+ letras",
+      "huntTitle": "Palabras de la lección {{found}}/{{total}}",
+      "huntHidden": "Palabra de la lección oculta, {{length}} letras"
     },
     "studentPreview": {
       "button": "Ver lo que verán los alumnos",

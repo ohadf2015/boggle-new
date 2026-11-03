@@ -348,7 +348,7 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
 
       // Lesson words the FINAL board carries — only now is the grid the one the class sees.
       if (classroomGame && vocabToEmbed.length > 0) {
-        recordClassroomWordBank(io, gameCode, game, letterGrid, gameLang, vocabToEmbed);
+        recordClassroomWordBank(io, gameCode, game, letterGrid, gameLang, vocabToEmbed, classroomGame.teacherId);
       }
 
       const bossId = resolvedMode === 'classic' ? classroomGame?.settings?.classroomBossId : undefined;

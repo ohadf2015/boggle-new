@@ -15638,7 +15638,9 @@ const he = {
     "wordBank": {
       "title": "בנק מילים ({{count}})",
       "hint": "המילים האלה מסתתרות בלוח. הקישו כדי לסגור.",
-      "challengeBadge": "אתגר: חפשו מילים של {{min}}+ אותיות"
+      "challengeBadge": "אתגר: חפשו מילים של {{min}}+ אותיות",
+      "huntTitle": "מילות השיעור {{found}}/{{total}}",
+      "huntHidden": "מילת שיעור נסתרת, {{length}} אותיות"
     },
     "studentPreview": {
       "button": "תצוגה מקדימה של מסך התלמידים",

@@ -14151,7 +14151,9 @@ const en = {
     "wordBank": {
       "title": "Word bank ({{count}})",
       "hint": "These words are hidden in the board. Tap to close.",
-      "challengeBadge": "Challenge: aim for {{min}}+ letter words"
+      "challengeBadge": "Challenge: aim for {{min}}+ letter words",
+      "huntTitle": "Lesson words {{found}}/{{total}}",
+      "huntHidden": "Hidden lesson word, {{length}} letters"
     },
     "studentPreview": {
       "button": "Preview what students will see",

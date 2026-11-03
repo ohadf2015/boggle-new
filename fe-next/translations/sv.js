@@ -16091,7 +16091,9 @@ const sv = {
     "wordBank": {
       "title": "Ordbank ({{count}})",
       "hint": "De här orden gömmer sig i brädet. Tryck för att stänga.",
-      "challengeBadge": "Utmaning: sikta på ord med {{min}}+ bokstäver"
+      "challengeBadge": "Utmaning: sikta på ord med {{min}}+ bokstäver",
+      "huntTitle": "Lektionsord {{found}}/{{total}}",
+      "huntHidden": "Dolt lektionsord, {{length}} bokstäver"
     },
     "studentPreview": {
       "button": "Förhandsgranska vad eleverna ser",

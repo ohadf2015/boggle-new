@@ -15783,7 +15783,9 @@ const ja = {
     "wordBank": {
       "title": "単語バンク（{{count}}）",
       "hint": "これらの単語はボードに隠れています。タップで閉じる。",
-      "challengeBadge": "チャレンジ：{{min}}文字以上の単語をねらおう"
+      "challengeBadge": "チャレンジ：{{min}}文字以上の単語をねらおう",
+      "huntTitle": "レッスンの単語 {{found}}/{{total}}",
+      "huntHidden": "かくれたレッスンの単語（{{length}}文字）"
     },
     "studentPreview": {
       "button": "生徒に見える画面をプレビュー",
