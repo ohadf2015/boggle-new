@@ -87,7 +87,8 @@ export default function DailyPageClient({ locale }: Props): React.JSX.Element {
             className="absolute end-3 top-2 z-10 flex h-9 items-center gap-1 rounded-full border-2 border-neo-black bg-neo-navy/90 px-3 text-xs font-black text-neo-white shadow-hard-sm"
           >
             <CircleHelp className="h-4 w-4" strokeWidth={2.75} aria-hidden="true" />
-            {t('daily.howToPlay')}
+            {/* Icon-only under 360px: the labelled pill collides with Back + Skip on 320px phones. */}
+            <span className="max-[359px]:sr-only">{t('daily.howToPlay')}</span>
           </button>
         )}
       </div>

@@ -71,4 +71,12 @@ describe('DailyPageClient — first-run tutorial', () => {
     expect(screen.getByTestId('regular-daily')).toBeTruthy();
     expect(mounts.game).toBe(1);
   });
+  it('Given a 320px phone, Then the "How to play" label collapses to icon-only but keeps its accessible name', () => {
+    localStorage.setItem(SEEN, '1');
+    render(<DailyPageClient locale="en" />);
+    const btn = screen.getByTestId('connections-how-to-play');
+    const label = btn.querySelector('span');
+    expect(label?.className).toContain('max-[359px]:sr-only');
+    expect(btn.textContent?.trim().length).toBeGreaterThan(0);
+  });
 });
