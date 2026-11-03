@@ -339,4 +339,21 @@ describe('processBrainDrillCompletion', () => {
     );
     expect(result.ok && result.body.newLevel).toBe(2);
   });
+  describe('drill_progress.avg_score is a generated column', () => {
+    it('first play inserts progress without writing avg_score', async () => {
+      const supabase = makeMockSupabase();
+      await processBrainDrillCompletion(validBody, 'user-1', 'sub-gen-1', { supabase, source: 'live' });
+      expect(supabase.spies.progressInsert).toHaveBeenCalledTimes(1);
+      expect(supabase.spies.progressInsert.mock.calls[0][0]).not.toHaveProperty('avg_score');
+    });
+
+    it('repeat play updates progress without writing avg_score', async () => {
+      const supabase = makeMockSupabase({
+        existingProgress: { id: 'prog-1', level: 2, high_score: 400, total_plays: 3, total_score: 900, avg_score: 300 },
+      });
+      await processBrainDrillCompletion(validBody, 'user-1', 'sub-gen-2', { supabase, source: 'live' });
+      expect(supabase.spies.progressUpdate).toHaveBeenCalledTimes(1);
+      expect(supabase.spies.progressUpdate.mock.calls[0][0]).not.toHaveProperty('avg_score');
+    });
+  });
 });

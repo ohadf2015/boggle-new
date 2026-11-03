@@ -5,7 +5,7 @@ const captured: Array<{ distinctId: string; event: string; properties: Record<st
 vi.mock('@/lib/posthog', () => ({ getPostHogServer: () => ({ capture: (a: (typeof captured)[number]) => captured.push(a) }) }));
 vi.mock('../logger', () => ({ default: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() } }));
 
-const db = vi.hoisted(() => ({ rounds: [] as Array<{ teacher_id: string; game_code: string }>, flagged: [] as string[], roundsError: null as null | { message: string } }));
+const db = vi.hoisted(() => ({ rounds: [] as Array<{ teacher_id: string; game_code: string; player_count?: number }>, flagged: [] as string[], roundsError: null as null | { message: string } }));
 vi.mock('../../modules/supabase/client', () => ({
   getSupabase: () => ({
     from: (table: string) => {
@@ -14,9 +14,12 @@ vi.mock('../../modules/supabase/client', () => ({
         const q: Record<string, unknown> = {
           select: () => q,
           eq: (c: string, v: unknown) => { f.push([c, v]); return q; },
-          then: (ok: (v: unknown) => unknown) => Promise.resolve(db.roundsError
-            ? { count: null, error: db.roundsError }
-            : { count: db.rounds.filter((r) => f.every(([c, v]) => (r as Record<string, unknown>)[c] === v)).length, error: null }).then(ok),
+          then: (ok: (v: unknown) => unknown) => {
+            const rows = db.rounds.filter((r) => f.every(([c, v]) => (r as Record<string, unknown>)[c] === v));
+            return Promise.resolve(db.roundsError
+              ? { data: null, count: null, error: db.roundsError }
+              : { data: rows, count: rows.length, error: null }).then(ok);
+          },
         };
         return q;
       }
@@ -44,6 +47,12 @@ describe('captureLiveGameEnded', () => {
     db.rounds = [{ teacher_id: 't1', game_code: 'G1' }, { teacher_id: 't1', game_code: 'G1' }, { teacher_id: 't1', game_code: 'OTHER' }];
     await captureLiveGameEnded(game);
     expect(captured[0].properties).toMatchObject({ rounds_recorded: 2, roster_count: 0 });
+  });
+
+  it('Given an empty roster but rounds that saw 9 and 16 players, Then roster_count is the peak 16', async () => {
+    db.rounds = [{ teacher_id: 't1', game_code: 'G1', player_count: 9 }, { teacher_id: 't1', game_code: 'G1', player_count: 16 }];
+    await captureLiveGameEnded(game);
+    expect(captured[0].properties).toMatchObject({ rounds_recorded: 2, roster_count: 16 });
   });
 
   it('Given a game that ended with no recorded round, Then rounds_recorded is 0', async () => {

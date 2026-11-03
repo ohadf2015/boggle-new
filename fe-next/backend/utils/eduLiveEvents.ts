@@ -23,24 +23,31 @@ export async function captureLiveRoundStarted(game: ClassroomGame): Promise<void
   }
 }
 
-async function countRecordedRounds(game: ClassroomGame): Promise<number | null> {
+async function readRecordedRounds(game: ClassroomGame): Promise<{ count: number; peakPlayers: number } | null> {
   const sb = getSupabase();
   if (!sb) return null;
-  const { count, error } = await sb
+  const { data, count, error } = await sb
     .from('classroom_rounds' as never)
-    .select('id', { count: 'exact', head: true })
+    .select('player_count', { count: 'exact' })
     .eq('teacher_id', game.teacherId)
     .eq('game_code', game.gameCode);
-  return error ? null : (count ?? 0);
+  if (error) return null;
+  const rows = (data ?? []) as Array<{ player_count: number | null }>;
+  return { count: count ?? rows.length, peakPlayers: Math.max(0, ...rows.map((r) => r.player_count ?? 0)) };
 }
 
 export async function captureLiveGameEnded(game: ClassroomGame): Promise<void> {
   try {
-    const [isTestAccount, roundsRecorded] = await Promise.all([
+    const [isTestAccount, recorded] = await Promise.all([
       isAnyTestAccount(getSupabase(), [game.teacherId]),
-      countRecordedRounds(game),
+      readRecordedRounds(game),
     ]);
-    const ev = buildLiveGameEndedEvent(game, { isTestAccount, now: new Date(), roundsRecorded });
+    const ev = buildLiveGameEndedEvent(game, {
+      isTestAccount,
+      now: new Date(),
+      roundsRecorded: recorded?.count ?? null,
+      peakPlayers: recorded?.peakPlayers,
+    });
     if (ev) captureEduServerEvents([ev]);
   } catch (err) {
     logger.error('EDU_TELEMETRY', `live game ended event failed for ${game?.gameCode}: ${(err as Error).message}`);

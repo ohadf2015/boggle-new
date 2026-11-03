@@ -5,8 +5,15 @@
  */
 import { toMpRoster, type MpRosterPlayer, type MpRosterUserLike } from '@/lib/multiplayer/roster';
 import type { Avatar } from '@/shared/types/game';
+import { MAX_PLAYERS_PER_ROOM } from '@/shared/constants/gameConstants';
 
+/** Chairs drawn even when empty; a bigger room grows past this, it never truncates. */
 export const LOBBY_SEATS = 8;
+
+/** The "x/max" cap shown to players: the familiar 8 until the room outgrows it, then the real server cap. */
+export function lobbyMax(seated: number): number {
+  return seated > LOBBY_SEATS ? MAX_PLAYERS_PER_ROOM : LOBBY_SEATS;
+}
 
 /** A `playersReady` entry as the server sends it: a bare name or a record. */
 export type LobbyPlayerInput =
@@ -46,7 +53,7 @@ export function lobbySeats(
   for (const seat of roster) {
     if (seat.isHost || seat.isBot) seat.isReady = false;
   }
-  return roster.slice(0, LOBBY_SEATS);
+  return roster;
 }
 
 export function readyTally(seats: readonly LobbySeat[]): { ready: number; total: number; allReady: boolean } {
@@ -59,6 +66,6 @@ type T = (key: string, params?: Record<string, string | number>) => string;
 
 /** START's second line: who you are about to play. */
 export function startSublabel({ seated, humanGuests, t }: { seated: number; humanGuests: number; t: T }): string {
-  const params = { count: seated, max: LOBBY_SEATS };
+  const params = { count: seated, max: lobbyMax(seated) };
   return humanGuests === 0 ? t('mpUi.lobby.startVsBots', params) : t('mpUi.lobby.seatsTaken', params);
 }

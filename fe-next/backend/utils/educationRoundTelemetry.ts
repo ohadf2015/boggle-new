@@ -126,7 +126,7 @@ export function buildLiveRoundCompletedEvent(args: {
 /** Independent of practice writes, so a started game whose class bounced is still visible. */
 export function buildLiveGameEndedEvent(
   game: ClassroomGame,
-  ctx: { isTestAccount: boolean; now: Date; roundsRecorded: number | null }
+  ctx: { isTestAccount: boolean; now: Date; roundsRecorded: number | null; peakPlayers?: number }
 ): EduServerEvent | null {
   if (!game?.classroomId) return null;
   const startedMs = game.startedAt ? new Date(game.startedAt).getTime() : NaN;
@@ -135,8 +135,8 @@ export function buildLiveGameEndedEvent(
     event: EDU_EVENTS.liveGameEnded,
     properties: {
       ...roundProps(game),
-      // The socket roster only; students who joined by code are counted in rounds_recorded.
-      roster_count: game.players?.length ?? 0,
+      // The Redis copy of a finished game has no live roster, so the recorded rounds' peak backs it up.
+      roster_count: Math.max(game.players?.length ?? 0, ctx.peakPlayers ?? 0),
       rounds_recorded: ctx.roundsRecorded,
       had_started: Number.isFinite(startedMs),
       duration_seconds: Number.isFinite(startedMs)

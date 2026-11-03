@@ -213,6 +213,16 @@ describe('server-side join and end events', () => {
     });
   });
 
+  it('Given an empty socket roster but recorded rounds, When built, Then roster_count uses the peak recorded players', () => {
+    const ev = buildLiveGameEndedEvent(makeGame({ players: [] }), { isTestAccount: false, now: NOW, roundsRecorded: 2, peakPlayers: 16 });
+    expect(ev!.properties).toMatchObject({ roster_count: 16 });
+  });
+
+  it('Given a live roster larger than the recorded peak, When built, Then the larger one wins', () => {
+    const ev = buildLiveGameEndedEvent(makeGame(), { isTestAccount: false, now: NOW, roundsRecorded: 1, peakPlayers: 1 });
+    expect(ev!.properties).toMatchObject({ roster_count: 2 });
+  });
+
   it('Given a lobby closed before start, When built, Then had_started is false and duration null', () => {
     const ev = buildLiveGameEndedEvent(makeGame({ startedAt: undefined }), { isTestAccount: false, now: NOW, roundsRecorded: null });
     expect(ev!.properties).toMatchObject({ had_started: false, duration_seconds: null, rounds_recorded: null });
