@@ -294,7 +294,7 @@ describe('sitemap', () => {
   // locales. Catches an over-eager refactor that narrows a localized route.
   it('keeps the noindexed game shells out of the sitemap', () => {
     const urls = sitemap().map((e) => e.url);
-    expect(urls.filter((u) => /\/(multiplayer|singleplayer|brain)$/.test(u))).toEqual([]);
+    expect(urls.filter((u) => /\/(multiplayer|singleplayer|brain)$/.test(u))).toEqual(['https://www.lexiclash.live/es/multiplayer']);
   });
 
   it('still lists genuinely-localized routes for all five locales', () => {

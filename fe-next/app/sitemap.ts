@@ -103,8 +103,8 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   });
 
   // ─── Core game mode pages ───
-  // /multiplayer and /singleplayer are noindexed game shells with no visible copy (the lobby must fill the screen);
-  // multiplayer search intent lands on /free-multiplayer-word-game and its locale siblings.
+  // /multiplayer (except the Spanish lobby) and /singleplayer are noindexed game shells with no visible copy.
+  addForLocaleOnly(routes, '/multiplayer', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.9 }, 'es');
   addForAllLocales(routes, '/daily', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.9 });
   // /blast, /word-craft, /daily/word-hunt, /daily/word-wheel are near-empty
   // game shells (30-282 crawlable words, measured live 2026-07-02) — noindexed

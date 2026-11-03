@@ -2,6 +2,7 @@ import { loadTranslation } from '@/translations/loadTranslation';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { jsonLdGraph } from '@/lib/seo/jsonLdGraph';
+import { INDEXED_LOBBY_LOCALE } from './indexedLobby';
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 
@@ -82,7 +83,7 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
       },
     },
     robots: {
-      index: false,
+      index: locale === INDEXED_LOBBY_LOCALE,
       follow: true,
     },
   };
