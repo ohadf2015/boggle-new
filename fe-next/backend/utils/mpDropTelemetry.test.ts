@@ -242,4 +242,29 @@ describe('buildHostLeftDropEvents', () => {
     });
     expect(buildHostLeftDropEvents(game, 1000)).toEqual([]);
   });
+
+  it('marks who was still connected when the room closed, so a solo or already-empty room is not read as players cut off', () => {
+    const game = makeGame({
+      gameStartedAt: 100_000,
+      users: {
+        host: makeUser({ username: 'host', isHost: true, disconnected: true, disconnectedAt: 130_000 }),
+        // Left the results screen before the host did.
+        bob: makeUser({ username: 'bob', disconnected: true, disconnectedAt: 120_000 }),
+        // Still in the room when it closed: the only real victim.
+        carol: makeUser({ username: 'carol' }),
+      },
+    });
+
+    const evs = buildHostLeftDropEvents(game, 430_000);
+    const byName = Object.fromEntries(evs.map((e) => [e.distinctId, e.properties.connectedAtClose]));
+
+    expect(byName).toEqual({ host: false, bob: false, carol: true });
+  });
+});
+
+describe('connectedAtClose on grace-expiry drops', () => {
+  it('is false, because the player had already disconnected', () => {
+    const game = makeGame({ users: { alice: makeUser({ username: 'alice', disconnected: true }) } });
+    expect(buildMpDropEvent(game, 'alice', 'ping timeout', 1000).properties.connectedAtClose).toBe(false);
+  });
 });

@@ -38,6 +38,10 @@ export interface MpDropEvent {
     isMultiplayer: boolean;
     wasHost: boolean;
     source: MpDropSource;
+    /** host_left only: the player was still in the room when it closed. False for the
+     *  host and for anyone who had already gone, so a solo or already-empty room is not
+     *  read as players being cut off. Always false for grace_expiry drops. */
+    connectedAtClose: boolean;
   };
 }
 
@@ -48,6 +52,7 @@ function buildDrop(
   now: number,
   source: MpDropSource,
   humanPlayers: number,
+  connectedAtClose = false,
 ): MpDropEvent {
   const durationSec =
     typeof game.gameStartedAt === 'number'
@@ -71,6 +76,7 @@ function buildDrop(
       isMultiplayer: humanPlayers >= 2,
       wasHost: game.users[username]?.isHost ?? false,
       source,
+      connectedAtClose,
     },
   };
 }
@@ -118,6 +124,7 @@ export function buildHostLeftDropEvents(game: Game, now: number): MpDropEvent[] 
       // played until `now`. Without this the host's durationSec is inflated by
       // the full host grace.
       const droppedAt = u?.disconnectedAt ?? now;
-      return buildDrop(game, username, 'host_left', droppedAt, 'host_left', humanPlayers);
+      const connectedAtClose = !u?.isHost && !u?.disconnected;
+      return buildDrop(game, username, 'host_left', droppedAt, 'host_left', humanPlayers, connectedAtClose);
     });
 }
