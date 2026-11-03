@@ -5,7 +5,7 @@
  * Returns quest state, available quests, and selection function.
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -64,7 +64,6 @@ export function useWeeklyQuest(): UseWeeklyQuestReturn {
   const [loading, setLoading] = useState(true);
   const [selectingQuestId, setSelectingQuestId] = useState<string | null>(null);
   const available = getAvailableQuests();
-  const prevQuestStateRef = useRef<{ id: string; completed: boolean } | null>(null);
 
   const fetchQuest = useCallback(async () => {
     if (!user?.id || !supabase) {
@@ -108,23 +107,26 @@ export function useWeeklyQuest(): UseWeeklyQuestReturn {
     return () => document.removeEventListener('visibilitychange', handleVisibility);
   }, [fetchQuest]);
 
-  // Celebrate weekly quest completion on false → true transition.
+  // Celebrate once per quest id. The marker is written at show time so a reload
+  // can't replay it, and it also covers a quest finished while the app was closed.
   useEffect(() => {
-    if (loading || !activeQuest) return;
-    const prev = prevQuestStateRef.current;
-    const isTransition = prev && prev.id === activeQuest.id && !prev.completed && activeQuest.completed;
-    if (isTransition) {
-      import('@/components/quests/QuestCompletionToast').then(({ showQuestCompletionToast }) => {
-        showQuestCompletionToast({
-          questName: activeQuest.title ? t(activeQuest.title) : t('weeklyQuest.title'),
-          xpReward: activeQuest.xpReward,
-          dedupKey: `weekly:${activeQuest.questType}`,
-          t,
-          onComplete: playQuestCompleteSound,
-        });
-      });
+    if (loading || !activeQuest?.completed) return;
+    const key = `lc:weekly-quest-celebrated:${activeQuest.id}`;
+    try {
+      if (localStorage.getItem(key)) return;
+      localStorage.setItem(key, '1');
+    } catch {
+      // storage blocked: the toast's own dedup window still bounds repeats
     }
-    prevQuestStateRef.current = { id: activeQuest.id, completed: activeQuest.completed };
+    import('@/components/quests/QuestCompletionToast').then(({ showQuestCompletionToast }) => {
+      showQuestCompletionToast({
+        questName: activeQuest.title ? t(activeQuest.title) : t('weeklyQuest.title'),
+        xpReward: activeQuest.xpReward,
+        dedupKey: `weekly:${activeQuest.questType}`,
+        t,
+        onComplete: playQuestCompleteSound,
+      });
+    });
   }, [activeQuest, loading, t, playQuestCompleteSound]);
 
   const handleSelectQuest = useCallback(async (questId: string) => {
