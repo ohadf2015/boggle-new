@@ -23,10 +23,22 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
+      # The checks only read code, so skip the ~900 MB of audio, images and content (a full checkout took 2m17s).
+      # Blobless + sparse: git fetches only the files that are checked out.
       - uses: actions/checkout@v4
         with:
           # HEAD^1 is the PR base (or the previous master commit on a push).
           fetch-depth: 2
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/daily-content/
+            !/docs/
+            !/wk/
+            !/stickers/
+            !/fe-next/public/
+            !/fe-next/raw/
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
