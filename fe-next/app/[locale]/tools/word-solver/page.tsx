@@ -157,6 +157,12 @@ export default async function WordSolverPage({ params }: PageParams) {
         faq={content.faqs}
       />
       <div className="mx-auto max-w-4xl px-4">
+        {locale === 'en' && (
+          <p className="text-neo-white text-sm mb-4">
+            Need letters in fixed positions, a pattern like c_a_e, or blank tiles? Use the{' '}
+            <Link href="/en/word-finder" className="text-neo-cyan underline">Word Finder</Link>.
+          </p>
+        )}
         <GuidesCalloutLink locale={locale} />
       </div>
       <section className="mx-auto max-w-4xl px-4 pb-12">

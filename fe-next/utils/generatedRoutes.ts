@@ -213,6 +213,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/word-craft",
   "/word-craft-game",
   "/word-craft-landing",
+  "/word-finder",
   "/word-games-for-the-classroom",
   "/word-games-online-free",
   "/word-of-the-day",

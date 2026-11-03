@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit, rateLimitResponse } from '@/lib/apiRateLimit';
 import { normalizeHebrewWord, applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
+import { BLANK_CHARS, MAX_BLANKS, buildMatcher, parsePattern } from './matcher';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -17,6 +18,11 @@ type SolverLanguage = (typeof VALID_LANGUAGES)[number];
 interface WordSolverRequest {
   letters: string;
   language?: string;
+  pattern?: string;
+  startsWith?: string;
+  endsWith?: string;
+  contains?: string;
+  length?: number;
 }
 
 // Rate limit: 20 requests per minute per IP
@@ -37,22 +43,6 @@ async function getDictionary(language: SolverLanguage): Promise<Set<string>> {
   const wordSet = new Set(words);
   dictionaryCache[language] = wordSet;
   return wordSet;
-}
-
-function getLetterCounts(str: string): Record<string, number> {
-  const counts: Record<string, number> = {};
-  for (const ch of str) {
-    counts[ch] = (counts[ch] || 0) + 1;
-  }
-  return counts;
-}
-
-function canFormWord(word: string, available: Record<string, number>): boolean {
-  const needed = getLetterCounts(word);
-  for (const [letter, count] of Object.entries(needed)) {
-    if ((available[letter] || 0) < count) return false;
-  }
-  return true;
 }
 
 function normalizeInput(letters: string, language: SolverLanguage): string {
@@ -106,33 +96,58 @@ export async function POST(request: NextRequest) {
   }
   const body = parsed as Partial<WordSolverRequest>;
 
-  const { letters, language: rawLang = 'en' } = body;
+  const { letters: rawLetters, language: rawLang = 'en', pattern: rawPattern } = body;
   const language = (VALID_LANGUAGES.includes(rawLang as SolverLanguage) ? rawLang : 'en') as SolverLanguage;
+  const letters = typeof rawLetters === 'string' ? rawLetters : '';
+  const patternText = typeof rawPattern === 'string' ? rawPattern.trim() : '';
 
-  if (!letters || typeof letters !== 'string' || letters.trim().length < 2) {
+  if (letters.trim().length < 2 && patternText.length < 2) {
     return NextResponse.json({ error: 'At least 2 letters required' }, { status: 400 });
   }
 
-  if (letters.length > 20) {
+  if (letters.length > 20 || patternText.length > 20) {
     return NextResponse.json({ error: 'Maximum 20 characters' }, { status: 400 });
   }
 
+  const blanks = (letters.match(BLANK_CHARS) || []).length;
+  if (blanks > MAX_BLANKS) {
+    return NextResponse.json({ error: `Maximum ${MAX_BLANKS} blank tiles` }, { status: 400 });
+  }
+
+  const pattern = patternText ? parsePattern(patternText, (ch) => normalizeInput(ch, language)) : null;
+  if (patternText && !pattern) {
+    return NextResponse.json({ error: 'Pattern can only contain letters and _ for unknown spots' }, { status: 400 });
+  }
+
+  const filterText = (value: unknown) =>
+    typeof value === 'string' ? normalizeInput(value.slice(0, 20), language) : '';
+  const lengthFilter =
+    typeof body.length === 'number' && Number.isInteger(body.length) && body.length >= 2 && body.length <= 20
+      ? body.length
+      : null;
+
   try {
     const dictionary = await getDictionary(language);
-    const normalizedInput = normalizeInput(letters, language);
-    if (normalizedInput.length < 2) {
+    const normalizedInput = normalizeInput(letters.replace(BLANK_CHARS, ''), language);
+    if (!pattern && normalizedInput.length + blanks < 2) {
       return NextResponse.json({ words: [], total: 0 });
     }
 
-    const inputCounts = getLetterCounts(normalizedInput);
+    const matches = buildMatcher({
+      rack: normalizedInput,
+      blanks,
+      pattern,
+      startsWith: filterText(body.startsWith),
+      endsWith: filterText(body.endsWith),
+      contains: filterText(body.contains),
+      length: lengthFilter,
+    });
     // Set: the Hebrew dictionary stores sofit-folded forms, so restoring the
     // final letter can collapse two entries into one display word.
     const found = new Set<string>();
 
     for (const word of dictionary) {
-      if (word.length < 2 || word.length > normalizedInput.length) continue;
-      const normalized = normalizeWord(word, language);
-      if (canFormWord(normalized, inputCounts)) {
+      if (matches(normalizeWord(word, language))) {
         // he: dictionary words end in the regular form (שלומ); show the real
         // spelling with a final letter (שלום).
         found.add(language === 'he' ? applyHebrewFinalLetters(word) : word);
