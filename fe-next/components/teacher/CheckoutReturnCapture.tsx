@@ -12,8 +12,12 @@ import {
   isCheckoutSuccessSearch,
   readReturnIntent,
   rememberReturnIntent,
+  takeCheckoutOrigin,
 } from '@/lib/education/checkoutReturn';
 import { trackEduProCheckoutReturnLanded } from '@/lib/education/proFunnelTelemetry';
+import { ProWelcomeCelebration } from '@/components/teacher/ProWelcomeCelebration';
+
+const TEACHER_HOME = /^\/[a-z]{2}\/teacher\/?$/;
 
 /**
  * Records a Polar return before TeacherGate can redirect, then shows whether
@@ -24,16 +28,24 @@ import { trackEduProCheckoutReturnLanded } from '@/lib/education/proFunnelTeleme
  */
 export function CheckoutReturnCapture() {
   const [active, setActive] = useState(false);
+  const { language } = useLanguage();
+  const router = useRouter();
 
   useLayoutEffect(() => {
     const search = window.location.search;
     if (isCheckoutSuccessSearch(search)) {
       rememberReturnIntent(window.sessionStorage);
       trackEduProCheckoutReturnLanded();
+      const origin = takeCheckoutOrigin(window.sessionStorage, {
+        locale: language,
+        currentPath: `${window.location.pathname}${search}`,
+      });
+      if (origin) router.replace(origin, { scroll: false });
       setActive(true);
       return;
     }
     if (readReturnIntent(window.sessionStorage)) setActive(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- the landing is read once per mount
   }, []);
 
   if (!active) return null;
@@ -68,6 +80,8 @@ function CheckoutReturnBanner() {
     attempts,
   });
   if (phase === 'idle') return null;
+  // Off the home page nobody else celebrates the upgrade, so the unlocked page does.
+  if (phase === 'success' && pathname && !TEACHER_HOME.test(pathname)) return <PaidOnThisPage />;
 
   const copy = {
     activating: ['teacher.checkoutReturn.activatingTitle', 'teacher.checkoutReturn.activatingBody'],
@@ -127,4 +141,11 @@ function CheckoutReturnBanner() {
       </div>
     </div>
   );
+}
+
+function PaidOnThisPage() {
+  useEffect(() => {
+    clearReturnIntent(window.sessionStorage);
+  }, []);
+  return <ProWelcomeCelebration grant={null} paid />;
 }

@@ -3845,7 +3845,9 @@ const ru = {
     "wordBank": {
       "title": "Банк слов ({{count}})",
       "hint": "Эти слова спрятаны на доске. Нажмите, чтобы закрыть.",
-      "challengeBadge": "Вызов: ищите слова из {{min}}+ букв"
+      "challengeBadge": "Вызов: ищите слова из {{min}}+ букв",
+      "huntTitle": "Слова урока {{found}}/{{total}}",
+      "huntHidden": "Скрытое слово урока, букв: {{length}}"
     },
     "studentPreview": {
       "button": "Посмотреть глазами учеников",
@@ -12442,6 +12444,7 @@ const ru = {
     }
   },
   "common": {
+    "stop": "Стоп",
     "used": "Использован",
     "email": "Электронная почта",
     "free": "Бесплатно",
@@ -13886,6 +13889,8 @@ const ru = {
       },
       "trialPreview": "Предпросмотр Pro: эта страница открыта ещё {{days}} дн. После этого нужен Pro.",
       "trialPreviewCta": "Оставить с Pro",
+      "trialEnded": "Предпросмотр Pro закончился. Ваши классы и история игр сохранены. С Pro эта страница снова откроется.",
+      "freeKeeps": "Бесплатно остаются все режимы игры в классе ({{modes}}), ваши списки слов и никакой рекламы для учеников.",
       "cta": "Открыть с Pro — {{price}}/месяц"
     },
     "digest": {
@@ -17019,6 +17024,9 @@ const ru = {
       }
     },
     "setup": {
+      "tagline": "Ставь слова, захватывай поле, перехитри бота.",
+      "showAdvanced": "Дополнительные настройки",
+      "hideAdvanced": "Скрыть дополнительные настройки",
       "title": "Настрой матч",
       "opponent": {
         "label": "Соперник",
@@ -17041,6 +17049,7 @@ const ru = {
       "sendChallengeNow": "Теперь отправь вызов!"
     },
     "daily": {
+      "goals": { "title": "Цели на сегодня" },
       "title": "Доска дня",
       "play": "Играть доску дня",
       "done": "Сегодня пройдено · ещё раз",
@@ -21406,6 +21415,11 @@ const ru = {
   }
   // @teacherLifecycleEmail:end
   ,
+  // @wordcraftReview:start
+  "wordcraftReview": {
+    "cta": "Повторить пропущенные слова ({count})",
+  },
+  // @wordcraftReview:end
   // @eduPolish:start
   "eduPolish": {
     "seatCapReached": "{name} смотрит: класс заполнен ({cap} игроков)",

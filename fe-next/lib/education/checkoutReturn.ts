@@ -98,6 +98,48 @@ export function buildCheckoutSuccessUrl(args: { appUrl: string | undefined; loca
   return `${args.appUrl ?? ''}${path}${sep}checkout=success&checkout_id={CHECKOUT_ID}`;
 }
 
+export const CHECKOUT_ORIGIN_KEY = 'lexi_edu_checkout_origin';
+export const CHECKOUT_ORIGIN_TTL_MS = 30 * 60 * 1000;
+
+/**
+ * The page a teacher started checkout from, kept in the tab. Polar's success_url can
+ * only point at /teacher until the checkout route forwards the start page, and the
+ * tab survives the Polar round trip, so the landing can still send the teacher back.
+ */
+export function rememberCheckoutOrigin(storage: SetStorage, path: string, now: number = Date.now()): void {
+  try {
+    storage.setItem(CHECKOUT_ORIGIN_KEY, JSON.stringify({ path, at: now }));
+  } catch {
+    /* private mode: the teacher lands on /teacher, as before */
+  }
+}
+
+/** The safe start page to return to, or null when there is none or it is this page. Consumes it. */
+export function takeCheckoutOrigin(
+  storage: GetStorage & ClearStorage,
+  { locale, currentPath, now = Date.now() }: { locale: string; currentPath: string; now?: number },
+): string | null {
+  let raw: string | null = null;
+  try {
+    raw = storage.getItem(CHECKOUT_ORIGIN_KEY);
+    storage.removeItem(CHECKOUT_ORIGIN_KEY);
+  } catch {
+    return null;
+  }
+  if (!raw) return null;
+  let stored: { path?: unknown; at?: unknown };
+  try {
+    stored = JSON.parse(raw) as { path?: unknown; at?: unknown };
+  } catch {
+    return null;
+  }
+  const at = typeof stored.at === 'number' ? stored.at : NaN;
+  if (!Number.isFinite(at) || now < at || now - at > CHECKOUT_ORIGIN_TTL_MS) return null;
+  const path = safeTeacherReturnPath(stored.path, locale);
+  if (!path || path === safeTeacherReturnPath(currentPath, locale)) return null;
+  return path;
+}
+
 export function rememberReturnIntent(storage: SetStorage, now: number = Date.now()): void {
   try {
     storage.setItem(RETURN_INTENT_KEY, String(now));

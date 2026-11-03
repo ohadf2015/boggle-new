@@ -3455,6 +3455,7 @@ const es = {
     }
   },
   "common": {
+    "stop": "Detener",
     "used": "Usado",
     "free": "Gratis",
     "loading": "Mezclando letras...",
@@ -14324,6 +14325,8 @@ const es = {
       },
       "trialPreview": "Vista previa de Pro: esta página está abierta {{days}} días más. Después requiere Pro.",
       "trialPreviewCta": "Quedarme con Pro",
+      "trialEnded": "Tu vista previa de Pro terminó. Tus clases y el historial de partidas siguen guardados. Con Pro, esta página se vuelve a abrir.",
+      "freeKeeps": "Gratis sigues teniendo los {{modes}} modos de juego en clase, tus propias listas de palabras y cero anuncios para tus alumnos.",
       "cta": "Desbloquéalo con Pro: {{price}}/mes"
     },
     "digest": {
@@ -15732,7 +15735,9 @@ const es = {
     "wordBank": {
       "title": "Banco de palabras ({{count}})",
       "hint": "Estas palabras están escondidas en el tablero. Toca para cerrar.",
-      "challengeBadge": "Reto: busca palabras de {{min}}+ letras"
+      "challengeBadge": "Reto: busca palabras de {{min}}+ letras",
+      "huntTitle": "Palabras de la lección {{found}}/{{total}}",
+      "huntHidden": "Palabra de la lección oculta, {{length}} letras"
     },
     "studentPreview": {
       "button": "Ver lo que verán los alumnos",
@@ -19453,6 +19458,9 @@ const es = {
       }
     },
     "setup": {
+      "tagline": "Coloca palabras. Conquista territorio. Gánale al bot.",
+      "showAdvanced": "Opciones avanzadas",
+      "hideAdvanced": "Ocultar opciones avanzadas",
       "title": "Prepara tu partida",
       "opponent": {
         "label": "Rival",
@@ -19475,6 +19483,7 @@ const es = {
       "sendChallengeNow": "Ahora envía tu reto"
     },
     "daily": {
+      "goals": { "title": "Metas de hoy" },
       "title": "Tablero diario",
       "play": "Juega el tablero de hoy",
       "done": "Hecho hoy · jugar otra vez",
@@ -21719,6 +21728,11 @@ const es = {
   }
   // @teacherLifecycleEmail:end
   ,
+  // @wordcraftReview:start
+  "wordcraftReview": {
+    "cta": "Repasar palabras que faltaron ({count})",
+  },
+  // @wordcraftReview:end
   // @eduPolish:start
   "eduPolish": {
     "seatCapReached": "{name} está mirando: la clase está llena ({cap} jugadores)",

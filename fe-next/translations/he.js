@@ -3456,6 +3456,7 @@ const he = {
     }
   },
   "common": {
+    "stop": "עצירה",
     "used": "בשימוש",
     "email": "אימייל",
     "free": "חינם",
@@ -14171,7 +14172,7 @@ const he = {
       }
     },
     "proWelcome": {
-      "title": "את/ה בפרו למורים",
+      "title": "יש לכם פרו למורים",
       "until": "שלכם עד {date}. אין מה לממש, בלי כרטיס.",
       "perk": {
         "analytics": "לראות אילו מילים היו קשות לכיתה, אחרי כל משחק",
@@ -14230,6 +14231,8 @@ const he = {
       },
       "trialPreview": "תצוגת פרו: העמוד הזה פתוח עוד {{days}} ימים. אחר כך הוא דורש פרו.",
       "trialPreviewCta": "להישאר עם פרו",
+      "trialEnded": "תצוגת פרו הסתיימה. הכיתות והיסטוריית המשחקים שלכם שמורות. עם פרו העמוד הזה ייפתח שוב.",
+      "freeKeeps": "בחינם נשארים לכם כל {{modes}} מצבי המשחק בכיתה, רשימות המילים שלכם, ובלי פרסומות לתלמידים.",
       "cta": "פתחו עם פרו: {{price}} לחודש"
     },
     "digest": {
@@ -15638,7 +15641,9 @@ const he = {
     "wordBank": {
       "title": "בנק מילים ({{count}})",
       "hint": "המילים האלה מסתתרות בלוח. הקישו כדי לסגור.",
-      "challengeBadge": "אתגר: חפשו מילים של {{min}}+ אותיות"
+      "challengeBadge": "אתגר: חפשו מילים של {{min}}+ אותיות",
+      "huntTitle": "מילות השיעור {{found}}/{{total}}",
+      "huntHidden": "מילת שיעור נסתרת, {{length}} אותיות"
     },
     "studentPreview": {
       "button": "תצוגה מקדימה של מסך התלמידים",
@@ -19588,6 +19593,9 @@ const he = {
       }
     },
     "setup": {
+      "tagline": "מניחים מילים, כובשים שטח ומערימים על הבוט.",
+      "showAdvanced": "אפשרויות מתקדמות",
+      "hideAdvanced": "הסתרת האפשרויות המתקדמות",
       "title": "מכינים את המשחק",
       "opponent": {
         "label": "יריב",
@@ -19610,6 +19618,7 @@ const he = {
       "sendChallengeNow": "עכשיו שולחים את האתגר!"
     },
     "daily": {
+      "goals": { "title": "המטרות של היום" },
       "title": "הלוח היומי",
       "play": "משחקים את הלוח של היום",
       "done": "הושלם היום · עוד סיבוב",
@@ -21637,6 +21646,11 @@ const he = {
   }
   // @teacherLifecycleEmail:end
   ,
+  // @wordcraftReview:start
+  "wordcraftReview": {
+    "cta": "חזרה על מילים שפספסת ({count})",
+  },
+  // @wordcraftReview:end
   // @eduPolish:start
   "eduPolish": {
     "seatCapReached": "{name} צופה: הכיתה מלאה ({cap} שחקנים)",
