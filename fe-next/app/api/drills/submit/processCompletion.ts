@@ -235,7 +235,6 @@ export async function processBrainDrillCompletion(
         high_score: nextProgress.highScore,
         total_plays: nextProgress.totalPlays,
         total_score: nextProgress.totalScore,
-        avg_score: nextProgress.avgScore,
         last_played_at: nowIso,
         updated_at: nowIso,
       })
@@ -254,7 +253,6 @@ export async function processBrainDrillCompletion(
         high_score: nextProgress.highScore,
         total_plays: nextProgress.totalPlays,
         total_score: nextProgress.totalScore,
-        avg_score: nextProgress.avgScore,
         last_played_at: nowIso,
       });
 
