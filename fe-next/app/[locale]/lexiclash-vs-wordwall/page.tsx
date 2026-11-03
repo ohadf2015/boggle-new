@@ -63,11 +63,20 @@ const compareRows: ReadonlyArray<readonly [string, string, string]> = [
   ['Word-game depth (Boggle/Wheel/Anagram)', '✓ Native mechanics', 'Anagram template only'],
   ['Live whole-class multiplayer', '✓ Free', '✓ Pro tier'],
   ['1v1 student duels', '✓ Built-in', '✗'],
-  ['6 native-dictionary languages', '✓ EN/HE/SV/JA/ES', 'Activity text any language; no dictionaries'],
+  ['6 native-dictionary languages', '✓ EN/HE/SV/JA/ES/RU', 'Activity text any language; no dictionaries'],
   ['Custom curriculum word lists', '✓', '✓'],
   ['Class analytics', 'Teacher Pro ($9/mo)', 'Limited free; Pro for full'],
   ['Activity templates variety', '3 word-game modes', '50+ templates (varied formats)'],
   ['Setup time', 'Under 60 seconds', '2-5 minutes per activity'],
+];
+
+const wordwallAlternatives = [
+  { name: 'Kahoot', href: '/lexiclash-vs-kahoot', desc: 'Live multiple-choice quiz on the board, students answer from their devices. Best for a fast check of what the class remembers.' },
+  { name: 'Quizlet', href: '/lexiclash-vs-quizlet', desc: 'Flashcard sets with study and test modes. Best for memorizing definitions one term at a time.' },
+  { name: 'Blooket', href: '/lexiclash-vs-blooket', desc: 'Your quiz questions played inside arcade-style game modes. Best when you already have a question bank.' },
+  { name: 'Gimkit', href: '/lexiclash-vs-gimkit', desc: 'Quiz questions where right answers earn in-game cash for upgrades. Best for longer review sessions.' },
+  { name: 'Wayground (formerly Quizizz)', href: '/lexiclash-vs-wayground', desc: 'Quizzes and lessons played live or at each student\'s own pace. Best for homework-style practice.' },
+  { name: 'LexiClash', href: '/education/classroom-game', desc: 'Students find words on a letter grid, live against the class or in 1v1 duels. Best for spelling and vocabulary building.' },
 ];
 
 export default async function Page({ params }: PageProps) {
@@ -176,6 +185,23 @@ export default async function Page({ params }: PageProps) {
             need a Swiss-army knife of activity formats, Wordwall is the better pick. Many teachers use both: Wordwall
             for varied activity formats, LexiClash for vocabulary and word-game review.
           </p>
+        </section>
+
+        <section className="mb-12">
+          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">Other Wordwall alternatives, by what you need</h2>
+          <p className="mb-6 text-neo-gray-200">
+            Most Wordwall alternatives are quiz platforms: you bring the questions and the tool turns them into an
+            activity, the way Wordwall does with its templates. LexiClash is the odd one out, since students make the
+            words themselves instead of answering questions. Pick by what you want the lesson to do.
+          </p>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {wordwallAlternatives.map((alt) => (
+              <Link key={alt.href} href={`/${locale}${alt.href}`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
+                <h3 className="font-bold text-neo-cyan">{alt.name}</h3>
+                <p className="mt-1 text-sm text-neo-gray-200">{alt.desc}</p>
+              </Link>
+            ))}
+          </div>
         </section>
 
         <section className="mb-12">
