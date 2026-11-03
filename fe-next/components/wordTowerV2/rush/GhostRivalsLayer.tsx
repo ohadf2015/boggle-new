@@ -117,7 +117,7 @@ export function GhostRivalsLayer({
             ) : null}
             <div
               data-rival-tag
-              className="absolute end-2 flex max-w-[60%] items-center gap-1 rounded-neo-sm border-2 border-black bg-neo-navy/80 px-1.5 font-neo-display text-[11px] font-bold leading-[20px] text-neo-cream shadow-hard-sm"
+              className="absolute end-2 flex max-w-[60%] items-center gap-1 rounded-neo-sm border-2 border-neo-cream bg-neo-navy/80 px-1.5 font-neo-display text-[11px] font-bold leading-[20px] text-neo-cream shadow-hard-sm"
               style={{ top: tagY, height: LABEL_H - 4 }}
             >
               <span className="min-w-0 truncate">{rival.name}</span>
