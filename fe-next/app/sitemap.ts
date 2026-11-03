@@ -627,6 +627,13 @@ function getAllRoutes(): MetadataRoute.Sitemap {
     priority: 0.7,
   }, 'sv');
 
+  // Word finder (Growth Radar rec 15849): English-only body, other locales noindex.
+  addForLocaleOnly(routes, '/word-finder', {
+    lastModified: LAST_DEPLOYED,
+    changeFrequency: 'monthly',
+    priority: 0.8,
+  });
+
   // ─── Anagram solver: programmatic /anagram/[letters] RETIRED from sitemap 2026-06-08 ───
   // The 150 seed pages earned 0 clicks / 0% CTR over 28d and are now noindexed
   // (app/[locale]/anagram/[letters]/page.tsx robots:{index:false}). Keeping them
