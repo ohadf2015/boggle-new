@@ -47,6 +47,7 @@ import {
 
 // Growth event types for tracking viral loops and engagement
 export type GrowthEvent =
+  | 'quest_completed'
   // Acquisition
   | 'page_view'
   | 'landing_view'

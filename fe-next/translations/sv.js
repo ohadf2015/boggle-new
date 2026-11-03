@@ -18364,7 +18364,8 @@ const sv = {
       "grandSlam": "Grand Slam!",
       "grandSlamDesc": "Alla dagliga uppdrag avklarade!",
       "xpReward": "+{{xp}} XP",
-      "goldReward": "+{{gold}} Guld"
+      "goldReward": "+{{gold}} Guld",
+      "progress": "{{done}} av {{total}} dagliga uppdrag klara"
     }
   },
   "ads": {

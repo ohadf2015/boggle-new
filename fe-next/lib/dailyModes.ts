@@ -24,6 +24,8 @@ export interface DailyModeDef {
    * mascot for Connections.
    */
   art: string;
+  /** The game opens on its own step/title card, so shared arrival surfaces stay bare. */
+  ownsIntro?: boolean;
 }
 
 export const DAILY_MODES: readonly DailyModeDef[] = [
@@ -35,6 +37,7 @@ export const DAILY_MODES: readonly DailyModeDef[] = [
     descKey: 'wordWheel.hub.wordWheelDesc',
     accent: 'yellow',
     art: '/daily/modes/word-wheel.webp',
+    ownsIntro: true,
   },
   {
     id: 'word-hunt',

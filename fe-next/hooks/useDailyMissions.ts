@@ -260,6 +260,7 @@ export function useDailyMissions(): UseDailyMissionsReturn {
             questName: t(mission.titleKey),
             xpReward: PER_QUEST_XP,
             isPvpWin: isPvp,
+            progress: { done: missions.filter((m) => m.completed).length, total: missions.length },
             dedupKey: `mission:${celebrationKey}`,
             t,
             onComplete: playQuestCompleteSound,

@@ -16,6 +16,7 @@ import toast from 'react-hot-toast';
 import { Trophy, Star, Sparkles, Crown, Coins, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { fireVictoryConfetti, fireFireworks } from '@/utils/confettiUtils';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 
 interface QuestCompletionOptions {
   questName: string;
@@ -25,6 +26,8 @@ interface QuestCompletionOptions {
   isAllComplete?: boolean;
   /** PvP quest (beat a human) — the brag-worthy one, gets louder confetti. */
   isPvpWin?: boolean;
+  /** Daily-mission progress after this completion; shown so the next reward feels close. */
+  progress?: { done: number; total: number };
   /**
    * Stable, translation-independent key for in-memory dedup within a short
    * window (defends against double-invocation from the same tab). Cross-device
@@ -56,6 +59,7 @@ export function showQuestCompletionToast({
   isGrandSlam = false,
   isAllComplete = false,
   isPvpWin = false,
+  progress,
   dedupKey,
   t = (k) => k,
   onComplete,
@@ -75,6 +79,13 @@ export function showQuestCompletionToast({
   }
 
   onComplete?.();
+
+  trackGrowthEvent('quest_completed', {
+    tier: isAllComplete ? 'all_complete' : isGrandSlam ? 'grand_slam' : isPvpWin ? 'pvp' : 'quest',
+    xp: xpReward,
+    gold: goldReward ?? 0,
+    ...(progress ? { done: progress.done, total: progress.total } : {}),
+  });
 
   // Fire confetti based on achievement tier
   if (isAllComplete) {
@@ -226,6 +237,11 @@ export function showQuestCompletionToast({
               </div>
             )}
           </div>
+          {progress && (
+            <p data-testid="quest-toast-progress" className="font-neo-body text-xs font-bold text-neo-cream">
+              {t('quests.completion.progress', { done: progress.done, total: progress.total })}
+            </p>
+          )}
         </div>
       </div>
     ),

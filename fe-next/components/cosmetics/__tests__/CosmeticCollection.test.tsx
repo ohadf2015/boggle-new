@@ -50,6 +50,15 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 
 describe('CosmeticCollection', () => {
+  it('given a narrow host column (signed-out profile wall), then the card grid sizes by its own width, not the viewport', () => {
+    const { container } = render(<CosmeticCollection rankTier="Unranked" streakDays={0} coins={0} />);
+    const root = container.firstElementChild as HTMLElement;
+    expect(root).toHaveClass('@container');
+    const grid = container.querySelector('.grid') as HTMLElement;
+    expect(grid).toHaveClass('grid-cols-2', '@md:grid-cols-3', '@xl:grid-cols-4');
+    expect(grid.className).not.toMatch(/(^|\s)(sm|md):grid-cols-/);
+  });
+
   it('renders category tabs', () => {
     render(<CosmeticCollection rankTier="Unranked" streakDays={0} coins={0} />);
     expect(screen.getByText('cosmetics.tileSkins')).toBeDefined();

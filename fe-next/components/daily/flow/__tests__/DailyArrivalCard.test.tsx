@@ -29,6 +29,15 @@ describe('DailyArrivalCard', () => {
     expect(container.innerHTML).not.toMatch(/animate-spin|opacity-0/);
   });
 
+  it('word wheel arrival leaves the step, title and art to its ready card', () => {
+    const { container } = render(<DailyArrivalCard modeId="word-wheel" />);
+    expect(screen.queryByText(/daily\.journeyStepOf/)).toBeNull();
+    expect(screen.queryByRole('heading')).toBeNull();
+    expect(container.querySelector('img')).toBeNull();
+    expect(screen.queryByTestId('daily-arrival-pips')).toBeNull();
+    expect(screen.getByRole('status')).toHaveAttribute('aria-label', 'wordWheel.hub.wordWheelQuest');
+  });
+
   it('is a polite status region', () => {
     render(<DailyArrivalCard modeId="word-wheel" />);
     expect(screen.getByRole('status')).toBeInTheDocument();

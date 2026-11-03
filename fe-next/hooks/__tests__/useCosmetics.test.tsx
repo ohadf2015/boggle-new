@@ -46,6 +46,20 @@ describe('useCosmetics', () => {
     expect(storage['lexiclash_cosmetics_equipped']).toBeDefined();
   });
 
+  it('given a board already mounted in this tab, when a skin is equipped, then it is told to repaint', () => {
+    const seen: Array<string | null> = [];
+    const onStorage = (e: StorageEvent) => seen.push(e.key);
+    window.addEventListener('storage', onStorage);
+    const { result } = renderHook(() =>
+      useCosmetics({ rankTier: 'Gold', streakDays: 0, coins: 0 })
+    );
+    act(() => {
+      result.current.equipCosmetic('tile-neon');
+    });
+    window.removeEventListener('storage', onStorage);
+    expect(seen).toContain('lexiclash_cosmetics_equipped');
+  });
+
   it('getCosmeticsByCategory returns filtered list with unlock status', () => {
     const { result } = renderHook(() =>
       useCosmetics({ rankTier: 'Unranked', streakDays: 0, coins: 0 })

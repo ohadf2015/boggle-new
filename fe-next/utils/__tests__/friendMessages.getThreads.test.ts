@@ -3,10 +3,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 // Mock the Supabase browser client — getThreads now calls a single rpc()
 const mockGetUser = vi.fn();
 const mockRpc = vi.fn();
+const mockRefreshSession = vi.fn();
 
 vi.mock('@/utils/supabase/client', () => ({
   createClient: () => ({
-    auth: { getUser: mockGetUser },
+    auth: { getUser: mockGetUser, refreshSession: mockRefreshSession },
     rpc: mockRpc,
   }),
 }));
@@ -98,6 +99,25 @@ describe('getThreads — single-RPC mapping', () => {
     mockRpc.mockResolvedValue({ data: null, error: { message: 'boom' } });
     const result = await getThreads('me-123');
     expect(result).toEqual([]);
+  });
+
+  it('refreshes the session and retries when the rpc runs as anon (permission denied)', async () => {
+    mockRefreshSession.mockResolvedValue({ error: null });
+    mockRpc
+      .mockResolvedValueOnce({ data: null, error: { code: '42501', message: 'permission denied for view public_profiles' } })
+      .mockResolvedValueOnce({ data: [], error: null });
+    expect(await getThreads('me-123')).toEqual([]);
+    expect(mockRefreshSession).toHaveBeenCalledTimes(1);
+    expect(mockRpc).toHaveBeenCalledTimes(2);
+    expect(logger.error).not.toHaveBeenCalled();
+  });
+
+  it('warns, not errors, when the session is gone and cannot be refreshed', async () => {
+    mockRefreshSession.mockResolvedValue({ error: { message: 'Auth session missing!' } });
+    mockRpc.mockResolvedValue({ data: null, error: { code: '42501', message: 'permission denied for view public_profiles' } });
+    expect(await getThreads('me-123')).toEqual([]);
+    expect(logger.error).not.toHaveBeenCalled();
+    expect(logger.warn).toHaveBeenCalledWith('FRIEND_MESSAGES', expect.stringContaining('no session'));
   });
 
   it('treats a browser "request was denied" SecurityError as benign, not an error log', async () => {

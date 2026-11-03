@@ -282,6 +282,13 @@
   transition: transform 160ms cubic-bezier(0.3, 1.5, 0.5, 1);
 }
 
+/* A skin's --tile-ink is for its own face only; state fills are light, so they take the board ink. */
+.glyph[data-hint],
+.glyph[data-marked],
+.glyph[data-fx] {
+  color: var(--ink);
+}
+
 .glyph[data-sel] {
   color: #fff;
   -webkit-text-stroke: 0.08em var(--ink);

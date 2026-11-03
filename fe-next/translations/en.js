@@ -16365,7 +16365,8 @@ const en = {
       "grandSlam": "GRAND SLAM!",
       "grandSlamDesc": "All daily missions crushed!",
       "xpReward": "+{{xp}} XP",
-      "goldReward": "+{{gold}} Gold"
+      "goldReward": "+{{gold}} Gold",
+      "progress": "{{done}} of {{total}} daily quests done"
     }
   },
   "ads": {

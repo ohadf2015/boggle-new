@@ -72,7 +72,8 @@ export function DeferredAuthProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const landing = isLandingPath(pathname ?? '');
   const [armed, setArmed] = useState(!landing || cachedProvider !== null);
-  const [Provider, setProvider] = useState<AuthProviderComponent | null>(cachedProvider);
+  // Lazy initializer: a bare component would be called by useState with no props.
+  const [Provider, setProvider] = useState<AuthProviderComponent | null>(() => cachedProvider);
 
   useEffect(() => {
     // The PSI trace is a signed-out web visit. Anyone else would otherwise load

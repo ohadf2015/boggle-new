@@ -12,8 +12,9 @@ describe('DailyLoadingFallback', () => {
     expect(screen.getByText('daily.wordHunt.title')).toBeInTheDocument();
   });
 
-  it('renders the Word Wheel arrival card', () => {
+  it('keeps the Word Wheel arrival bare so its ready card is the only intro', () => {
     render(<DailyLoadingFallback mode="wordWheel" />);
-    expect(screen.getByText('wordWheel.hub.wordWheelQuest')).toBeInTheDocument();
+    expect(screen.queryByText('wordWheel.hub.wordWheelQuest')).toBeNull();
+    expect(screen.getByRole('status')).toHaveAttribute('aria-label', 'wordWheel.hub.wordWheelQuest');
   });
 });

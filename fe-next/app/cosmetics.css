@@ -40,7 +40,7 @@
 }
 
 .tile-skin-fire {
-  background: linear-gradient(135deg, #cc4400 0%, #ff5500 35%, #ff2200 70%, #dd1100 100%);
+  background: linear-gradient(135deg, #c23a00 0%, #b83000 35%, #a82000 70%, #8a1000 100%);
   border: 2px solid #660000;
   box-shadow: inset 0 0 10px rgba(255, 100, 0, 0.5), inset 0 0 6px rgba(255, 200, 0, 0.2);
 }
@@ -213,7 +213,7 @@
 }
 
 [data-tile-skin='fire'] .letter-tile-gradient:not([data-sel]):not([data-fx]) {
-  background: linear-gradient(135deg, #cc4400 0%, #ff5500 35%, #ff2200 70%, #dd1100 100%) !important;
+  background: linear-gradient(135deg, #c23a00 0%, #b83000 35%, #a82000 70%, #8a1000 100%) !important;
   border-color: #660000 !important;
   box-shadow: inset 0 0 10px rgba(255, 100, 0, 0.5), inset 0 0 6px rgba(255, 200, 0, 0.2) !important;
   color: #ffe8cc !important;
@@ -292,7 +292,7 @@
   color: #002855 !important;
 }
 .wheel-letter-skinnable[data-tile-skin='fire'] {
-  background: linear-gradient(135deg, #cc4400 0%, #ff5500 35%, #ff2200 70%, #dd1100 100%) !important;
+  background: linear-gradient(135deg, #c23a00 0%, #b83000 35%, #a82000 70%, #8a1000 100%) !important;
   border-color: #660000 !important;
   color: #ffe8cc !important;
   text-shadow: 0 0 6px rgba(255, 200, 0, 0.7);
@@ -342,7 +342,7 @@
 [data-tile-skin='world-5'] .letter-tile-gradient:not([data-sel]):not([data-fx]) {
   background:
     repeating-linear-gradient(180deg, rgba(0, 0, 0, 0) 0 7px, rgba(60, 10, 0, 0.28) 7px 9px),
-    linear-gradient(180deg, #ff7a45 0%, #d93a1a 60%, #8c1c07 100%) !important;
+    linear-gradient(180deg, #e0582c 0%, #b8300f 60%, #7a1805 100%) !important;
   border-color: #2b0500 !important;
   box-shadow: inset 0 3px 0 rgba(255, 200, 150, 0.35) !important;
   color: #fff3e6 !important;
