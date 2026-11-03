@@ -681,6 +681,7 @@ function getAllRoutes(): MetadataRoute.Sitemap {
     [
       ['en', 'best-online-word-games'],
       ['en', 'boggle-word-shake-free'],
+      ['en', 'play-boggle-5x5-online'],
       ['es', 'lexiclash-contra-wordle'],
       ['he', 'lexiclash-neged-wordle'],
     ] as const

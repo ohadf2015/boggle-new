@@ -398,6 +398,13 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
               QR, 20 people on phones, one TV in the middle — chaos in six languages. Real-time scoring, combo
               streaks, the works.
             </p>
+            <p className="mt-3 text-neo-white">
+              Want the bigger board?{' '}
+              <Link href={`/${locale}/play-boggle-5x5-online`} className="text-neo-lime underline">
+                Play Boggle 5x5 online
+              </Link>{' '}
+              with 25 letters per round.
+            </p>
             <Link
               href={`/${locale}/multiplayer`}
               className="mt-6 inline-block rounded-neo border-4 border-neo-black bg-neo-navy px-7 py-3 font-neo-display text-base font-black uppercase tracking-wider text-neo-lime shadow-hard transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"

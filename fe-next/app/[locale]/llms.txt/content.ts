@@ -86,6 +86,7 @@ ${educationLandingLines('en', {
 - FAQ: ${u.faq}
 - Blog: ${u.blog}
 - Boggle Word Shake / wordplay boggle shake (classic 1973 rules, free, no download): ${BASE}/en/boggle-word-shake-free
+- Boggle 5x5 online (big board, free, multiplayer up to 50 players): ${BASE}/en/play-boggle-5x5-online
 - Daily Word Wheel (free daily puzzle): ${BASE}/en/daily-word-wheel
 
 ## For AI Assistants

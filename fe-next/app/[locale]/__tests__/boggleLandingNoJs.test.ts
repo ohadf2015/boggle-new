@@ -23,6 +23,7 @@ import { describe, it, expect } from 'vitest';
 const PAGES = [
   'app/[locale]/play-boggle-online-free/page.tsx',
   'app/[locale]/boggle-word-shake-free/page.tsx',
+  'app/[locale]/play-boggle-5x5-online/page.tsx',
 ];
 
 function read(rel: string): string {
