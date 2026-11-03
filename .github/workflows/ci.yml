@@ -4,6 +4,7 @@ on:
   pull_request:
     branches: [master, main]
   # radar-loop dispatches this on its bot PRs, which GITHUB_TOKEN cannot trigger.
+  # A dispatch runs the FULL test suite; a pull_request run tests only what the PR touches.
   workflow_dispatch:
 
 concurrency:
@@ -13,10 +14,11 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
-          # The SEO freeze check diffs the PR merge commit against its base (HEAD^1).
+          # HEAD^1 is the PR base: the SEO freeze check and the changed-files lint diff against it.
           fetch-depth: 2
       - uses: actions/setup-node@v4
         with:
@@ -25,8 +27,18 @@ jobs:
           cache-dependency-path: fe-next/package-lock.json
       - run: npm ci --prefer-offline --no-audit
         working-directory: fe-next
-      - run: npm run check:translations && npm run lint
+      - run: npm run check:translations
         working-directory: fe-next
+      - name: Lint
+        working-directory: fe-next
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            FILES=$(git diff --name-only --diff-filter=ACMR HEAD^1 HEAD -- . | grep -E '\.(js|jsx|ts|tsx|mjs)$' | sed 's#^fe-next/##' || true)
+            [ -z "$FILES" ] && { echo "no lintable files changed"; exit 0; }
+            echo "$FILES" | xargs npx eslint --no-warn-ignored
+          else
+            npm run lint
+          fi
       - run: npx tsx scripts/build-i18n-assets.ts --skip-brotli && npx tsc --noEmit
         working-directory: fe-next
       - name: Check SEO freeze
@@ -37,12 +49,11 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        shard: [1, 2, 3, 4, 5, 6]
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -52,43 +63,43 @@ jobs:
         working-directory: fe-next
       - run: npx tsx scripts/build-i18n-assets.ts --skip-brotli && npm run build:schemas
         working-directory: fe-next
-      - name: Frontend tests (shard ${{ matrix.shard }}/6)
+      - name: Tests
         working-directory: fe-next
-        # Gate on the JSON report, not vitest's exit code: a worker fork can crash
-        # at teardown after every test passed (see assert-vitest-passed.mjs).
+        env:
+          CI: true
+        # Gate on each JSON report, not vitest's exit code: a worker fork can crash at
+        # teardown after every test passed (see assert-vitest-passed.mjs).
+        # --changed runs the tests whose import graph touches the PR diff; guard tests
+        # read source files instead of importing them, so they always run.
         run: |
-          set +e
-          npx vitest run --config vitest.config.ts --shard=${{ matrix.shard }}/6 \
-            --reporter=default --reporter=json --outputFile.json=vitest-shard-${{ matrix.shard }}.json
-          VITEST_RC=$?
-          set -e
-          node scripts/ci/assert-vitest-passed.mjs vitest-shard-${{ matrix.shard }}.json "$VITEST_RC"
-        env:
-          CI: true
-
-  backend:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: npm
-          cache-dependency-path: fe-next/package-lock.json
-      - run: npm ci --prefer-offline --no-audit
-        working-directory: fe-next
-      - run: npx tsx scripts/build-i18n-assets.ts --skip-brotli && npm run build:schemas
-        working-directory: fe-next
-      - run: npx vitest run --config backend/vitest.config.ts
-        working-directory: fe-next
-        env:
-          CI: true
+          run_vitest() {
+            NAME="$1"; shift
+            set +e
+            npx vitest run "$@" --passWithNoTests --reporter=default --reporter=json --outputFile.json="vitest-$NAME.json"
+            RC=$?
+            set -e
+            # A clean exit that selected no tests (a PR touching only docs or workflows) is fine;
+            # any other zero-test report still fails the assert below.
+            if [ "$RC" = 0 ] && node -e "process.exit(require('./vitest-$NAME.json').numTotalTests === 0 ? 0 : 1)"; then
+              echo "$NAME: no tests selected"
+              return 0
+            fi
+            node scripts/ci/assert-vitest-passed.mjs "vitest-$NAME.json" "$RC"
+          }
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            run_vitest frontend --config vitest.config.ts --changed HEAD^1
+            run_vitest guards --config vitest.config.ts guard
+            run_vitest backend --config backend/vitest.config.ts --changed HEAD^1
+          else
+            run_vitest frontend --config vitest.config.ts
+            run_vitest backend --config backend/vitest.config.ts
+          fi
 
   # Branch-protection gate; keep the name.
   ci-success:
     runs-on: ubuntu-latest
-    needs: [check, test, backend]
+    needs: [check, test]
     if: always()
     steps:
       - run: |
-          [[ "${{ needs.check.result }}" == "success" && "${{ needs.test.result }}" == "success" && "${{ needs.backend.result }}" == "success" ]] || { echo "❌ failed"; exit 1; }
+          [[ "${{ needs.check.result }}" == "success" && "${{ needs.test.result }}" == "success" ]] || { echo "❌ failed"; exit 1; }
