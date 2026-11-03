@@ -9729,7 +9729,9 @@ const sv = {
     "allClear": {
       "title": "Allt klart!",
       "body": "Du har klarat alla dagens uppdrag.",
-      "streak": "{n} dagar i rad. Kom tillbaka i morgon så håller sviten."
+      "streak": "{n} dagar i rad. Kom tillbaka i morgon så håller sviten.",
+      "reward": "Dagens belöning: +{coins} mynt, +{xp} XP",
+      "guestNudge": "Logga in för att få {coins} mynt för att klara dagen."
     },
     "adminBeta": "Beta",
     "replay": "Spela igen",

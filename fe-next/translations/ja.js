@@ -9392,7 +9392,9 @@ const ja = {
     "allClear": {
       "title": "オールクリア！",
       "body": "今日のクエストはすべてクリアしました。",
-      "streak": "{n}日連続！明日も来て記録をつなごう。"
+      "streak": "{n}日連続！明日も来て記録をつなごう。",
+      "reward": "今日のごほうび: +{coins}コイン、+{xp} XP",
+      "guestNudge": "ログインすると、全クリアで{coins}コインがもらえます。"
     },
     "adminBeta": "ベータ",
     "replay": "もう一度",

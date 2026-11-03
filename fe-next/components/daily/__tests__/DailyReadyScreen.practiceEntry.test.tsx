@@ -4,6 +4,7 @@ import DailyReadyScreen from '../DailyReadyScreen';
 
 const params = vi.hoisted(() => ({ practice: null as string | null }));
 
+vi.mock('@/components/quests/QuestGoalChip', () => ({ QuestGoalChip: () => null }));
 vi.mock('@/contexts/MusicContext', () => ({
   useMusic: () => ({
     preloadMusicTrack: vi.fn(),

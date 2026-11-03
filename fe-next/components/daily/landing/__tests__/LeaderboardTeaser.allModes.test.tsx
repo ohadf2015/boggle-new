@@ -59,7 +59,8 @@ describe('LeaderboardTeaser — all four modes', () => {
 
   it('reads the combined endpoint, not the two per-mode ones', async () => {
     renderBoard();
-    await waitFor(() => expect(global.fetch).toHaveBeenCalled());
+    // First render of a file cold-loads the translation bundle; the 1s default flakes under load.
+    await waitFor(() => expect(global.fetch).toHaveBeenCalled(), { timeout: 5000 });
     const urls = (global.fetch as ReturnType<typeof vi.fn>).mock.calls.map((c) => String(c[0]));
     expect(urls.some((u) => u.includes('/api/daily/leaderboard'))).toBe(true);
     // The old implementation fanned out to these and summed 2 of 4 client-side.

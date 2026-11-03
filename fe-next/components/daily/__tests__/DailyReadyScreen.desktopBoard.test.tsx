@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 import DailyReadyScreen from '../DailyReadyScreen';
 
+vi.mock('@/components/quests/QuestGoalChip', () => ({ QuestGoalChip: () => null }));
 vi.mock('../TabbedDailyLeaderboard', () => ({ __esModule: true, default: () => <div data-testid="daily-board" /> }));
 
 

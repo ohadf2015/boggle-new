@@ -10,6 +10,7 @@
  * desktop, so they stay there (the host's rail follows DESIGN §3: launcher).
  * A classroom student gets EduStudentLobby instead (unchanged contract).
  */
+import { QuestGoalChip } from '@/components/quests/QuestGoalChip';
 import React, { memo, useState, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { Check, HelpCircle, Pencil, X } from 'lucide-react';
@@ -148,6 +149,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
     <div data-testid="lobby-host-pick" className="w-full max-w-md flex flex-col items-center gap-2">
       <LobbyModeChip mode={hostPick.mode} t={t} />
       <LobbySettingsSummary timerValue={hostPick.timerSeconds / 60} difficulty={hostPick.difficulty} minWordLength={hostPick.minWordLength} t={t} />
+      {!isClassroomMode && <QuestGoalChip screen="multiplayer" />}
     </div>
   );
   const lang = gameLanguage ?? 'en';

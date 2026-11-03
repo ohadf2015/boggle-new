@@ -9535,7 +9535,9 @@ const es = {
     "allClear": {
       "title": "¡Todo listo!",
       "body": "Completaste todas las misiones de hoy.",
-      "streak": "Racha de {n} días. Vuelve mañana para mantenerla."
+      "streak": "Racha de {n} días. Vuelve mañana para mantenerla.",
+      "reward": "Premio del día: +{coins} monedas, +{xp} XP",
+      "guestNudge": "Inicia sesión para ganar {coins} monedas por completar el día."
     },
     "adminBeta": "Beta",
     "replay": "Repetir",

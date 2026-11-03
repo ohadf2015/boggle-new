@@ -10,6 +10,7 @@ import { MusicProvider } from '../../contexts/MusicContext';
 
 // Mock next/navigation
 
+vi.mock('@/components/quests/QuestGoalChip', () => ({ QuestGoalChip: () => null }));
 vi.mock('next/navigation', () => ({
   useRouter: vi.fn(() => ({
     push: vi.fn(),

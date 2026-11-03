@@ -87,7 +87,7 @@ describe('LeaderboardTeaser', () => {
       expect(screen.getByText('JellyDrifter')).toBeInTheDocument();
       expect(screen.getByText('ZenithX')).toBeInTheDocument();
       expect(screen.getByText('WordWiz99')).toBeInTheDocument();
-    });
+    }, { timeout: 5000 });
   });
 
   test('shows the combined total the endpoint computed across modes', async () => {

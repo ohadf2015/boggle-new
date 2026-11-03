@@ -8780,7 +8780,9 @@ const en = {
     "allClear": {
       "title": "All clear!",
       "body": "You finished every quest today.",
-      "streak": "{n}-day streak. Come back tomorrow to keep it alive."
+      "streak": "{n}-day streak. Come back tomorrow to keep it alive.",
+      "reward": "Day reward: +{coins} coins, +{xp} XP",
+      "guestNudge": "Sign in to earn {coins} coins for clearing the day."
     },
     "adminBeta": "Beta",
     "replay": "Replay",
