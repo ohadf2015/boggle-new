@@ -52,4 +52,18 @@ export const GAME_ROUTE_ALIASES = [
     destination: '/en/multiplayer',
     permanent: false,
   },
+  // /room/CODE is the shareable invite shape the apps open (DeepLinkHandler maps
+  // it to /join/CODE, and the AASA/assetlinks claim it). A recipient without the
+  // app lands on the web, where only /[locale]/join/[code] exists, so mirror the
+  // app's mapping instead of 404ing the invite.
+  {
+    source: `/${LOCALE}/room/:code`,
+    destination: '/:locale/join/:code',
+    permanent: false,
+  },
+  {
+    source: '/room/:code',
+    destination: '/en/join/:code',
+    permanent: false,
+  },
 ];

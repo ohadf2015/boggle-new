@@ -41,6 +41,13 @@ describe('game route aliases', () => {
     expect(rules.find((r) => r.source === '/room')?.destination).toBe('/en/multiplayer');
   });
 
+  it('sends shared /room/CODE invites to the join page, like the apps do', () => {
+    expect(rules.find((r) => r.source.endsWith('/room/:code') && r.source.includes(':locale'))?.destination).toBe(
+      '/:locale/join/:code',
+    );
+    expect(rules.find((r) => r.source === '/room/:code')?.destination).toBe('/en/join/:code');
+  });
+
   it('lists every supported locale in the alternation', () => {
     for (const rule of rules.filter((r) => r.source.includes(':locale'))) {
       const group = rule.source.match(/:locale\(([^)]+)\)/)?.[1]?.split('|');
@@ -56,7 +63,7 @@ describe('game route aliases', () => {
     // A `:rest*` or prefix shape here would eat `/en/connections/play` and
     // `/en/play-boggle-online-free`, both real pages.
     for (const rule of rules) {
-      expect(rule.source).toMatch(/^(\/:locale\(.+\))?\/(play|room)$/);
+      expect(rule.source).toMatch(/^(\/:locale\(.+\))?\/(play|room|room\/:code)$/);
     }
   });
 });
