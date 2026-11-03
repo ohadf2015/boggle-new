@@ -11,8 +11,8 @@ import {
   DAILY_MODES,
   dailyModeHref,
   pickNextUnplayedMode,
+  playStateFromToday,
   type DailyModeId,
-  type DailyModePlayState,
 } from '@/lib/dailyModes';
 import type { Language } from '@/types';
 import { chainPips, markDailyHandoff, type ChainPip } from '@/components/daily/flow/dailyHandoff';
@@ -120,12 +120,7 @@ export function NextQuestCta({
     );
   }
 
-  const state: DailyModePlayState = {
-    wordHunt: played.today.wordHunt ? 'won' : 'new',
-    wordWheel: played.today.wordWheel ? 'played' : 'new',
-    wordTower: played.today.wordTower,
-    connections: played.today.connections,
-  };
+  const state = playStateFromToday(played.today);
 
   const nextId = pickNextUnplayedMode(state, justFinished);
 

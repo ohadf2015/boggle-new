@@ -6,6 +6,11 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'he', dir: 'rtl' }),
 }));
 
+const playedMock = vi.hoisted(() => ({
+  value: { loading: false, today: { wordHunt: false, wordWheel: false, wordTower: false, connections: false } },
+}));
+vi.mock('@/hooks/useDailyPlayedStatus', () => ({ useDailyPlayedStatus: () => playedMock.value }));
+
 import { DailyFlowChrome } from '../DailyFlowChrome';
 import { markDailyHandoff, consumeDailyHandoff } from '../dailyHandoff';
 
@@ -58,6 +63,44 @@ describe('DailyFlowChrome skip', () => {
   it('given an optional quest with a quest after it, skip goes straight to the next quest', () => {
     render(<DailyFlowChrome modeId="connections" intro={false} />);
     expect(screen.getByTestId('skip-optional').getAttribute('href')).toBe('/he/word-tower/daily');
+  });
+});
+
+describe('DailyFlowChrome smart skip', () => {
+  const setPlayed = (today: Partial<typeof playedMock.value.today>, loading = false) => {
+    playedMock.value = { loading, today: { wordHunt: false, wordWheel: false, wordTower: false, connections: false, ...today } };
+  };
+  afterEach(() => setPlayed({}));
+
+  it('given the next quest is already done, skip goes to the next one still open, never the done one', () => {
+    setPlayed({ wordWheel: true, wordHunt: true, wordTower: true });
+    render(<DailyFlowChrome modeId="connections" intro={false} />);
+    expect(screen.getByTestId('skip-optional').getAttribute('href')).toBe('/he/daily');
+  });
+
+  it('given the last quest and an unplayed required quest, skip wraps to it', () => {
+    setPlayed({ wordWheel: true });
+    render(<DailyFlowChrome modeId="word-tower" intro={false} />);
+    expect(screen.getByTestId('skip-optional').getAttribute('href')).toBe('/he/daily/word-hunt');
+  });
+
+  it('given the whole day is done, skip goes to the hub', () => {
+    setPlayed({ wordWheel: true, wordHunt: true, connections: true, wordTower: true });
+    render(<DailyFlowChrome modeId="word-tower" intro={false} />);
+    expect(screen.getByTestId('skip-optional').getAttribute('href')).toBe('/he/daily');
+  });
+
+  it('given play state is still loading, no skip is offered yet', () => {
+    setPlayed({}, true);
+    render(<DailyFlowChrome modeId="connections" intro={false} />);
+    expect(screen.queryByTestId('skip-optional')).toBeNull();
+  });
+
+  it('skip marks the handoff for the quest it actually links to', () => {
+    setPlayed({ wordWheel: true });
+    render(<DailyFlowChrome modeId="word-tower" intro={false} />);
+    fireEvent.click(screen.getByTestId('skip-optional'));
+    expect(consumeDailyHandoff('word-hunt')).toBe(true);
   });
 });
 
