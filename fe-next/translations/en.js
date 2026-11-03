@@ -20627,7 +20627,9 @@ const en = {
       "packWords": "{count} words",
       "packRecommended": "Our pick",
       "startLive": "Start live",
-      "createOnly": "Just create the class"
+      "createOnly": "Just create the class",
+      "packHint": "Students also get these words as homework when they join.",
+      "assignFailed": "Your class is ready, but the words weren't assigned. Assign them from the class page."
     },
     "host": {
       "classLabel": "Class",

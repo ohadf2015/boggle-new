@@ -67,7 +67,7 @@ export function safeTeacherReturnPath(raw: unknown, locale: string): string | nu
   const segments = path.split('/').slice(1);
   if (segments.some((s) => s === '..' || s === '.')) return null;
   if (shippedLocale(segments[0] ?? '')) segments.shift();
-  if (segments[0] !== 'teacher') return null;
+  if (segments[0] !== 'teacher' || segments[1] === 'upgrade') return null;
   const kept = query
     .split('&')
     .filter((pair) => pair && !CHECKOUT_MARKERS.has(pair.split('=')[0]));

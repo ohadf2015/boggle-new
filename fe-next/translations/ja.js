@@ -21577,7 +21577,9 @@ const ja = {
       "packWords": "{count}語",
       "packRecommended": "おすすめ",
       "startLive": "ライブ開始",
-      "createOnly": "クラスだけ作る"
+      "createOnly": "クラスだけ作る",
+      "packHint": "参加した生徒には、これらの単語が宿題としても届きます。",
+      "assignFailed": "クラスはできましたが、単語の割り当てに失敗しました。クラスのページから割り当ててください。"
     },
     "host": {
       "classLabel": "クラス",

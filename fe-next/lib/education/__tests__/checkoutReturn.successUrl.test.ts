@@ -41,6 +41,7 @@ describe('safeTeacherReturnPath', () => {
     ['encoded slash', '/en/teacher/%2F%2Fevil.example'],
     ['encoded dots', '/en/teacher/%2e%2e/admin'],
     ['not a teacher page', '/en/student/lessons'],
+    ['plans page, so a teacher who just paid is not sent back to the pitch', '/en/teacher/upgrade?from=reports'],
     ['consumer home', '/en'],
     ['teacher prefix trick', '/en/teachers-lounge'],
     ['control character', '/en/teacher/reports\nSet-Cookie: x'],
