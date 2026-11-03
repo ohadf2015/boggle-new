@@ -20544,6 +20544,7 @@ const sv = {
       "coins": "+{coins}",
       "seriesTotal": "Totalt {total}",
       "moreHidden": "+{count} till",
+      "allStandings": "Alla {count} spelare",
       "nextUp": "Näst på tur",
       "hostPicking": "Värden väljer…",
       "tapToChange": "Tryck för att byta",

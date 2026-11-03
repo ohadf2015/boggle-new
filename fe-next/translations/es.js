@@ -20557,6 +20557,7 @@ const es = {
       "coins": "+{coins}",
       "seriesTotal": "Total {total}",
       "moreHidden": "+{count} más",
+      "allStandings": "Los {count} jugadores",
       "nextUp": "Siguiente",
       "hostPicking": "El anfitrión está eligiendo…",
       "tapToChange": "Toca para cambiar",

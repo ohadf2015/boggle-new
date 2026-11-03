@@ -20475,6 +20475,7 @@ const he = {
       "coins": "+{coins}",
       "seriesTotal": "סה״כ {total}",
       "moreHidden": "+{count} נוספים",
+      "allStandings": "כל {count} השחקנים",
       "nextUp": "הבא בתור",
       "hostPicking": "המארח/ת בוחר/ת…",
       "tapToChange": "הקישו לשינוי",

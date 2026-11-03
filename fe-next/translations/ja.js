@@ -20544,6 +20544,7 @@ const ja = {
       "coins": "+{coins}",
       "seriesTotal": "合計 {total}",
       "moreHidden": "ほか{count}人",
+      "allStandings": "全{count}人の順位",
       "nextUp": "次のモード",
       "hostPicking": "ホストが選択中…",
       "tapToChange": "タップで変更",

@@ -20244,6 +20244,7 @@ const ru = {
       "coins": "+{coins}",
       "seriesTotal": "Всего {total}",
       "moreHidden": "ещё {count}",
+      "allStandings": "Все игроки: {count}",
       "nextUp": "Дальше",
       "hostPicking": "Хост выбирает…",
       "tapToChange": "Нажми, чтобы сменить",

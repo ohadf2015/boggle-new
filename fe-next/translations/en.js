@@ -19594,6 +19594,7 @@ const en = {
       "coins": "+{coins}",
       "seriesTotal": "Total {total}",
       "moreHidden": "+{count} more",
+      "allStandings": "All {count} players",
       "nextUp": "Next up",
       "hostPicking": "Host is picking…",
       "tapToChange": "Tap to change",
