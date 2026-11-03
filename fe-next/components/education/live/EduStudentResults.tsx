@@ -89,7 +89,8 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
     () => [...(c.data.currentPlayerValidWords ?? [])].sort((a, b) => (b.score ?? 0) - (a.score ?? 0) || b.word.length - a.word.length),
     [c.data.currentPlayerValidWords],
   );
-  const best = words[0] ? { word: words[0].word, score: words[0].score ?? 0 } : null;
+  // A quiz round's words carry no per-word points; a "+0" best word would read as a mistake.
+  const best = words[0] && (words[0].score ?? 0) > 0 ? { word: words[0].word, score: words[0].score ?? 0 } : null;
   const mastery = summary?.masteryByPlayer?.[props.username];
   const lesson = typeof mastery?.found === 'number' && typeof mastery?.total === 'number' ? { found: mastery.found, total: mastery.total } : null;
   const missed = useMemo(() => myMissedWords(summary, props.username), [summary, props.username]);

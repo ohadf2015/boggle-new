@@ -197,3 +197,26 @@ export function useBoardWaitingScreen(
 ): boolean {
   return showBoardWaitingScreen({ isQuizRoom: useIsVocabQuizRoom(socket), waitingForResults });
 }
+
+/**
+ * True from the moment the classroom recap lands until the next `startGame`.
+ *
+ * Play again and Next mode clear the host's `finalScores` before the server
+ * starts the next round, while the quiz latch is still set; without this the
+ * quiz's own finale would reappear on the wall in that gap.
+ */
+export function useRecapShownLatch(socket: Socket | null, hasRecap: boolean): boolean {
+  const [shown, setShown] = useState(false);
+  if (hasRecap && !shown) setShown(true);
+
+  useEffect(() => {
+    if (!socket) return;
+    const release = () => setShown(false);
+    socket.on('startGame', release);
+    return () => {
+      socket.off('startGame', release);
+    };
+  }, [socket]);
+
+  return hasRecap || shown;
+}
