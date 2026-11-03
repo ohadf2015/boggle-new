@@ -274,6 +274,8 @@ export function isExpectedSocketErrorCode(code: unknown): boolean {
 export function isExpectedError(error: Error | unknown, code?: unknown): boolean {
   if (!error) return true;
   if (isExpectedSocketErrorCode(code)) return true;
+  // Node's http server raises this when the client hangs up before the body arrives.
+  if (error instanceof Error && error.message === "aborted" && (error as { code?: unknown }).code === "ECONNRESET") return true;
 
   const errorMessage =
     error instanceof Error

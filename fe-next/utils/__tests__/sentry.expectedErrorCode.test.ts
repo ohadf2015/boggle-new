@@ -56,3 +56,19 @@ describe('isExpectedError — code beats localized message', () => {
     expect(isExpectedError(new Error('Game is not in progress'))).toBe(true);
   });
 });
+
+describe('isExpectedError — client hung up mid-request', () => {
+  it('treats Node\'s "aborted" ECONNRESET from an incoming request as expected', () => {
+    const err = Object.assign(new Error('aborted'), { code: 'ECONNRESET' });
+    expect(isExpectedError(err)).toBe(true);
+  });
+
+  it('still reports an outbound ECONNRESET with another message', () => {
+    const err = Object.assign(new Error('read ECONNRESET'), { code: 'ECONNRESET' });
+    expect(isExpectedError(err)).toBe(false);
+  });
+
+  it('still reports a plain "aborted" error without the reset code', () => {
+    expect(isExpectedError(new Error('aborted'))).toBe(false);
+  });
+});
