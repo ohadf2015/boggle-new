@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { useAuth } from '@/contexts/AuthContext';
+import { useModeBed } from '@/hooks/useModeBed';
 
 /**
  * Pixi touches `window` at import time, so the game must never be server
@@ -18,6 +19,7 @@ const WordTowerV2 = dynamic(loadWordTowerV2, { ssr: false });
  * The physics rebuild is now the default Word Tower for all players.
  */
 export function WordTowerV2PageClient({ daily = false }: { daily?: boolean } = {}) {
+  useModeBed('WORD_TOWER');
   const { loading, user, profile } = useAuth();
 
   // No gate — Word Tower v2 is now public for all players.

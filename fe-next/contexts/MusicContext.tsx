@@ -15,7 +15,7 @@ import { restartStalledHowl } from '@/lib/audio/howlStall';
 import { usePlayerStyle } from '@/contexts/PlayerStyleContext';
 import { resolveStyleTrack } from '@/lib/playerStyle/styles';
 
-type TrackKey = 'lobby' | 'beforeGame' | 'inGame' | 'almostOutOfTime' | 'bossaArcade' | 'bossa' | 'blast' | 'daily' | 'boss' | 'results';
+type TrackKey = 'lobby' | 'beforeGame' | 'inGame' | 'almostOutOfTime' | 'bossaArcade' | 'bossa' | 'blast' | 'daily' | 'boss' | 'results' | 'wordTower' | 'connections' | 'crossword' | 'adventure';
 
 interface MusicContextType {
   currentTrack: TrackKey | null;
@@ -41,6 +41,10 @@ interface MusicContextType {
     DAILY: 'daily';
     BOSS: 'boss';
     RESULTS: 'results';
+    WORD_TOWER: 'wordTower';
+    CONNECTIONS: 'connections';
+    CROSSWORD: 'crossword';
+    ADVENTURE: 'adventure';
   };
 }
 
@@ -68,6 +72,10 @@ const TRACKS: Record<TrackKey, string> = {
   daily: '/music/daily-bed.mp3',
   boss: '/music/boss-focus.mp3',
   results: '/music/results-groove.mp3',
+  wordTower: '/music/word-tower-bed.mp3',
+  connections: '/music/connections-bed.mp3',
+  crossword: '/music/crossword-bed.mp3',
+  adventure: '/music/adventure-bed.mp3',
 };
 
 /**
@@ -589,6 +597,10 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
     DAILY: 'daily' as const,
     BOSS: 'boss' as const,
     RESULTS: 'results' as const,
+    WORD_TOWER: 'wordTower' as const,
+    CONNECTIONS: 'connections' as const,
+    CROSSWORD: 'crossword' as const,
+    ADVENTURE: 'adventure' as const,
   }), []);
 
   const value = useMemo<MusicContextType>(() => ({
@@ -625,6 +637,10 @@ const STUB_TRACKS = {
   DAILY: 'daily' as const,
   BOSS: 'boss' as const,
   RESULTS: 'results' as const,
+  WORD_TOWER: 'wordTower' as const,
+  CONNECTIONS: 'connections' as const,
+  CROSSWORD: 'crossword' as const,
+  ADVENTURE: 'adventure' as const,
 };
 const stubValue: MusicContextType = {
   currentTrack: null,

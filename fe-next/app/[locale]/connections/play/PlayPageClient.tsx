@@ -5,6 +5,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { PageLoader } from '@/components/ui/PageLoader';
 import ConnectionsGame from '@/components/connections/ConnectionsGame';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
+import { useModeBed } from '@/hooks/useModeBed';
 
 interface Props {
   locale: string;
@@ -20,6 +21,7 @@ function LoadingFallback(): React.JSX.Element {
 }
 
 export default function PlayPageClient(_props: Props): React.JSX.Element {
+  useModeBed('CONNECTIONS');
   return (
     <div data-testid="connections-play-root" className="flex-1 flex flex-col min-h-0">
       <Suspense fallback={<LoadingFallback />}>

@@ -21,3 +21,15 @@ describe('results bed', () => {
     expect(isSameResolvedTrack('bossa', 'results', 'default')).toBe(false);
   });
 });
+
+describe('mode beds', () => {
+  it.each([
+    ['wordTower', '/music/word-tower-bed.mp3'],
+    ['connections', '/music/connections-bed.mp3'],
+    ['crossword', '/music/crossword-bed.mp3'],
+    ['adventure', '/music/adventure-bed.mp3'],
+  ] as const)('%s has its own file and ignores the chosen style', (key, file) => {
+    expect(resolveTrackSrc(key, 'default')).toBe(file);
+    expect(resolveTrackSrc(key, 'rock')).toBe(file);
+  });
+});
