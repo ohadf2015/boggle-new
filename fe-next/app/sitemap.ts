@@ -281,6 +281,21 @@ function getAllRoutes(): MetadataRoute.Sitemap {
     images: [`${BASE_URL}/og-image-he.webp`],
   });
 
+  routes.push({
+    url: `${BASE_URL}/he/mischaqey-safa-imun-kogniti`,
+    lastModified: LAST_DEPLOYED,
+    changeFrequency: 'monthly',
+    priority: 0.7,
+    alternates: {
+      languages: {
+        'x-default': `${BASE_URL}/en/brain-training-word-games`,
+        he: `${BASE_URL}/he/mischaqey-safa-imun-kogniti`,
+        'he-IL': `${BASE_URL}/he/mischaqey-safa-imun-kogniti`,
+      },
+    },
+    images: [`${BASE_URL}/og-image-he.webp`],
+  });
+
   // ─── Spanish dedicated education landing ───
   routes.push({
     url: `${BASE_URL}/es/juegos-vocabulario-aula`,

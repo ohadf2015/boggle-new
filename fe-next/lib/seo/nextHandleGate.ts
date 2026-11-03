@@ -101,6 +101,7 @@ export const KNOWN_APP_ROOT_SEGMENTS: ReadonlySet<string> = new Set([
   'lexiclash-vs-wordwall',
   'lexiclash-vs-wordwall-kahoot-quizlet',
   'llms.txt',
+  'mischaqey-safa-imun-kogniti',
   'multiplayer',
   'multiplayer-word-game-online',
   'online-word-games-with-friends',
