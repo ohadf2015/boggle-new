@@ -1,10 +1,14 @@
 default_platform(:android)
 
 platform :android do
-  desc "Build AAB and upload to Play internal testing track (fast propagation, ≤100 testers)"
+  desc "Upload the pre-built AAB (AAB_PATH, VERSION_CODE required) to the Play internal track with release notes"
   lane :internal do
     aab = ENV["AAB_PATH"] || "android/app/build/outputs/bundle/release/app-release.aab"
-    changelog = ENV["RELEASE_NOTES"] || `git log -1 --pretty=%B`.strip
+    version_code = ENV["VERSION_CODE"] or UI.user_error!("VERSION_CODE env var is required (must match the AAB)")
+    changelog = (ENV["RELEASE_NOTES"] || `git log -1 --pretty=%s`.strip)[0, 480]
+    notes_dir = File.join(Dir.pwd, "metadata", "android", "en-US", "changelogs")
+    FileUtils.mkdir_p(notes_dir)
+    File.write(File.join(notes_dir, "#{version_code}.txt"), changelog)
     supply(
       track: "internal",
       aab: aab,
@@ -13,9 +17,9 @@ platform :android do
       skip_upload_metadata: true,
       skip_upload_images: true,
       skip_upload_screenshots: true,
-      skip_upload_changelogs: true
+      skip_upload_changelogs: false
     )
-    UI.success("Uploaded #{aab} to alpha. Changelog: #{changelog}")
+    UI.success("Uploaded #{aab} to internal. Changelog: #{changelog}")
   end
 
   desc "Promote latest internal build to production"

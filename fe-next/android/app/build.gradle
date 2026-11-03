@@ -8,6 +8,11 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         def vc = System.getenv("VERSION_CODE")
+        // A release upload with the fallback code collides with an already-published build, so refuse it.
+        def isReleaseBuild = gradle.startParameter.taskNames.any { it.toLowerCase().contains('release') || it.toLowerCase().contains('bundle') }
+        if (vc == null && isReleaseBuild) {
+            throw new GradleException("VERSION_CODE env var is required for release builds (Play rejects a reused versionCode)")
+        }
         versionCode vc != null ? vc.toInteger() : 3
         versionName System.getenv("VERSION_NAME") ?: "0.3.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

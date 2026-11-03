@@ -3072,6 +3072,7 @@ const en = {
     }
   },
   "common": {
+    "pressBackAgainToExit": "Press back again to exit",
     "used": "Used",
     "email": "Email",
     "free": "Free",

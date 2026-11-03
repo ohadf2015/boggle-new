@@ -3456,6 +3456,7 @@ const ja = {
     }
   },
   "common": {
+    "pressBackAgainToExit": "もう一度戻るで終了",
     "used": "使用済み",
     "email": "メール",
     "free": "無料",
