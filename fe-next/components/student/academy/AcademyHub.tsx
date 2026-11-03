@@ -146,6 +146,9 @@ export function AcademyHub(props: AcademyHubProps) {
     if (shouldOpenClassSheet(searchParams, classroomId)) setClassOpen(true);
   }, [searchParams, classroomId]);
   const [grantedXp, setGrantedXp] = useState<number | null>(null);
+  // The map keeps animating under the 95% chest overlay; hiding it there halves the frame cost of the reveal.
+  const hubRef = useRef<HTMLDivElement>(null);
+  const onChestCover = useCallback((covering: boolean) => { hubRef.current?.toggleAttribute('data-covered', covering); }, []);
   const [live, setLive] = useState<LiveState>(NO_LIVE);
   const [note, setNote] = useState<Note>(null);
   const liveGame = classroomId ? live.activeGame : null;
@@ -264,6 +267,7 @@ export function AcademyHub(props: AcademyHubProps) {
         reducedMotion={reducedMotion}
         size={wide ? 'md' : 'sm'}
         onGranted={(xp) => xp != null && setGrantedXp(xp)}
+        onRevealChange={onChestCover}
       />
       <StudentLocker />
     </div>
@@ -302,7 +306,8 @@ export function AcademyHub(props: AcademyHubProps) {
       data-testid="academy-hub"
       data-chrome={hub.chrome}
       data-scale={hub.scale}
-      className="fixed inset-x-0 top-0 bottom-[var(--cookie-consent-height,0px)] overflow-hidden bg-neo-navy text-neo-white"
+      ref={hubRef}
+      className="fixed inset-x-0 top-0 bottom-[var(--cookie-consent-height,0px)] overflow-hidden bg-neo-navy text-neo-white [&[data-covered]>*]:invisible"
     >
       {classroomId && <LiveGameBridge classroomId={classroomId} onChange={setLive} />}
 
@@ -438,7 +443,9 @@ export function AcademyHub(props: AcademyHubProps) {
           {wide && !hub.sideCard && <div className="shrink-0 pb-3">{chest}</div>}
           <div className={cn('flex flex-col gap-1', wide && 'w-full', wide && !hub.sideCard && 'min-w-0 max-w-[40rem] flex-1', rail && 'min-w-0 flex-1')}>
             {/* Lexi sits out the phone-on-its-side row: one short row has no room for a bubble. */}
-            {ready && !rail && <AcademyMascot mood={mascotMood} reducedMotion={reducedMotion} />}
+            {!rail && (ready
+              ? <AcademyMascot mood={mascotMood} reducedMotion={reducedMotion} />
+              : <div aria-hidden="true" data-testid="academy-mascot-slot" className="h-16" />)}
             {ready ? (
               <AcademyCta
                 kind={action.kind}

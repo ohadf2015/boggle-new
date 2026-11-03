@@ -54,3 +54,17 @@ describe('<DailyChest> key moment', () => {
     expect(Number(box.dataset.duration ?? 0)).toBe(0);
   });
 });
+
+describe('<DailyChest> reveal lifetime', () => {
+  it('tells the hub when the reveal covers it, and again when it is collected', async () => {
+    window.localStorage.clear();
+    global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ newTotalXp: 300 }) }) as never;
+    const onReveal = vi.fn();
+    render(<DailyChest userId="c" reducedMotion onGranted={vi.fn()} onRevealChange={onReveal} />);
+    expect(onReveal).not.toHaveBeenCalledWith(true);
+    fireEvent.click(screen.getByTestId('academy-daily-chest'));
+    expect(onReveal).toHaveBeenLastCalledWith(true);
+    fireEvent.click(await screen.findByText('academy.student.chestCollect'));
+    expect(onReveal).toHaveBeenLastCalledWith(false);
+  });
+});

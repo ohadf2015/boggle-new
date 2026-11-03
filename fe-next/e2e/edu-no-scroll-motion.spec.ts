@@ -36,23 +36,30 @@ for (const rate of [1, 4]) {
     await expect(page.getByTestId('academy-cta')).toBeVisible({ timeout: 30_000 });
     await page.waitForTimeout(1500);
     const entry = await stopFrameRecording(page);
-    const entryShift = await readLayoutShift(page);
+    // Load-time shift is data arriving (and the cookie banner); only shift from here on is motion.
+    const loadShift = await readLayoutShift(page);
+    await page.waitForTimeout(1500);
 
     const chest = page.getByTestId('academy-daily-chest');
     await expect(chest).toBeEnabled();
     await startFrameRecording(page);
     await chest.click();
     await expect(page.getByTestId('academy-chest-reveal')).toBeVisible();
+    await expect(page.locator('[data-testid="academy-hub"] > main')).toBeHidden();
     await page.waitForTimeout(1500);
     const celebration = await stopFrameRecording(page);
+    await page.getByRole('button', { name: /collect/i }).click();
+    await expect(page.locator('[data-testid="academy-hub"] > main')).toBeVisible();
+    const motionShift = (await readLayoutShift(page)) - loadShift;
 
-    const report = { rate, entry, celebration, cls: Math.round(entryShift * 1000) / 1000 };
+    const round = (n: number) => Math.round(n * 1000) / 1000;
+    const report = { rate, entry, celebration, loadCls: round(loadShift), motionCls: round(motionShift) };
     await info.attach('pacing', { body: JSON.stringify(report), contentType: 'application/json' });
     if (RESULTS) console.log(`PACING ${JSON.stringify(report)}`);
 
     expect(entry.max, JSON.stringify(report)).toBeLessThanOrEqual(MAX_FRAME_MS);
     expect(celebration.max, JSON.stringify(report)).toBeLessThanOrEqual(MAX_FRAME_MS);
-    expect(entryShift, JSON.stringify(report)).toBeLessThan(0.01);
+    expect(motionShift, JSON.stringify(report)).toBeLessThan(0.001);
   });
 }
 

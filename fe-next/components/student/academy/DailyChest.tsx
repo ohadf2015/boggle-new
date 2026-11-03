@@ -31,17 +31,20 @@ interface Props {
   onGranted: (newTotalXp: number | null) => void;
   /** Badge size: small on a phone (a badge, not a billboard), a touch larger on desktop. */
   size?: 'sm' | 'md';
+  /** The full-screen reveal is up (true) or gone (false). */
+  onRevealChange?: (covering: boolean) => void;
 }
 
 type Phase = 'idle' | 'rattle' | 'open';
 
+const LAYER_GAP_MS = 32;
 const RATTLE_MS = Math.round(KEY_MOMENTS.chest.transition.duration * 1000);
 const OPEN_BURST = {
   animate: { scale: [0.9, 1.25, 1.1], y: [0, -18, 0] },
   transition: { duration: 0.4, ease: EDU_EASE.outQuint },
 };
 
-export function DailyChest({ userId, reducedMotion, onGranted, size = 'sm' }: Props) {
+export function DailyChest({ userId, reducedMotion, onGranted, size = 'sm', onRevealChange }: Props) {
   const { t, dir } = useLanguage();
   const sfx = useSoundEffects();
   const [available, setAvailable] = useState(() => canOpenChest(userId, new Date()));
@@ -64,6 +67,20 @@ export function DailyChest({ userId, reducedMotion, onGranted, size = 'sm' }: Pr
       }
     });
   };
+
+  // One layer per couple of frames: mounting rays, coins and confetti in the same task as the burst cost a 4x-throttled frame 60-80ms.
+  const [layers, setLayers] = useState(0);
+  useEffect(() => {
+    if (phase !== 'open') { setLayers(0); return; }
+    const timers = [1, 2].map((n) => setTimeout(() => setLayers(n), n * LAYER_GAP_MS));
+    return () => timers.forEach(clearTimeout);
+  }, [phase]);
+
+  const covering = phase !== 'idle';
+  useEffect(() => {
+    onRevealChange?.(covering);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [covering]);
 
   useEffect(() => {
     if (phase !== 'rattle') return;
@@ -130,9 +147,9 @@ export function DailyChest({ userId, reducedMotion, onGranted, size = 'sm' }: Pr
             dir={dir}
             className="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden bg-neo-navy/95 px-6"
           >
-            {phase === 'open' && <GodRays rays={12} hex={NEO_HEX.yellow} strength={0.75} reducedMotion={reducedMotion} />}
-            {phase === 'open' && <CoinFountain count={14} spread={1} reducedMotion={reducedMotion} />}
-            <BoundedConfettiBurst trigger={phase === 'open' && !reducedMotion} size="lg">
+            {phase === 'open' && layers >= 1 && <GodRays rays={12} hex={NEO_HEX.yellow} strength={0.75} reducedMotion={reducedMotion} />}
+            {phase === 'open' && layers >= 2 && <CoinFountain count={14} spread={1} reducedMotion={reducedMotion} />}
+            <BoundedConfettiBurst trigger={phase === 'open' && layers >= 2 && !reducedMotion} size="lg">
               <m.div
                 data-testid="academy-chest-art"
                 className="relative h-48 w-48 sm:h-64 sm:w-64"
