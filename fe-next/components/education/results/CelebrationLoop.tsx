@@ -51,7 +51,7 @@ export const CELEBRATION_PIECES = 18;
  * accents" rule is deliberately lifted (see the design addendum), so the full
  * celebratory set is correct here and nowhere else.
  */
-const PIECE_COLOURS = ['#bfff00', '#00ffff', '#ff1493', '#ffe135', '#fffef0'];
+const PIECE_COLOURS = ['var(--neo-lime)', 'var(--neo-cyan)', 'var(--neo-pink)', 'var(--neo-yellow)', 'var(--neo-cream)'];
 
 /**
  * Fall time per piece. Spread across a few values so the layer never pulses in

@@ -29,7 +29,7 @@ export interface ProOfferCompactLinkProps {
 }
 
 const CLASS =
-  'inline-flex min-h-10 items-center gap-1.5 self-start rounded-neo px-1 text-start font-neo-display text-sm font-bold text-neo-pink-light underline underline-offset-2 hover:text-neo-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan disabled:opacity-60';
+  'inline-flex min-h-11 items-center gap-1.5 self-start rounded-neo px-1 text-start font-neo-display text-sm font-bold text-neo-pink-light underline underline-offset-2 hover:text-neo-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan disabled:opacity-60';
 
 export function ProOfferCompactLink({ label, placement, language, cta, offer, userId, variant, href, onActivate, pending, className }: ProOfferCompactLinkProps) {
   const argsRef = useRef({ placement, locale: language, cta, offer, format: 'link' as const });

@@ -39,7 +39,7 @@ export default function LockerGrid({ items }: { items: ClassroomLockerEntry[] })
               <PartThumb category={unlock.category} id={unlock.partId} config={wearing} size={44} />
             )}
             <span className="block font-bold text-white">{name}</span>
-            <span className={`font-neo-display text-[0.65rem] font-black uppercase ${RARITY_TEXT[item.rarity]}`}>
+            <span className={`font-neo-display text-xs font-black uppercase ${RARITY_TEXT[item.rarity]}`}>
               {t(`economy.chest.rarity.${item.rarity}`)}
             </span>
           </li>

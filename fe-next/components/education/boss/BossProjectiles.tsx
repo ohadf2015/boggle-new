@@ -49,7 +49,7 @@ export const BossProjectiles = memo(function BossProjectiles({ hits }: { hits: C
           <div key={f.id} className="absolute left-1/2 top-[38%]">
             <span
               className={cn(
-                'absolute -translate-x-1/2 whitespace-nowrap font-neo-display font-black uppercase tracking-wide [text-shadow:0.15cqw_0.15cqw_0_#000]',
+                'absolute -translate-x-1/2 whitespace-nowrap font-neo-display font-black uppercase tracking-wide [text-shadow:0.15cqw_0.15cqw_0_rgb(var(--neo-black))]',
                 f.crit ? 'text-[3cqw] text-neo-pink' : cn('text-[2.8cqw]', COLORS[f.id % COLORS.length]),
                 styles.projectile,
               )}
@@ -59,7 +59,7 @@ export const BossProjectiles = memo(function BossProjectiles({ hits }: { hits: C
             </span>
             <span
               className={cn(
-                'absolute -translate-x-1/2 whitespace-nowrap text-center font-neo-display font-black leading-none [text-shadow:0.18cqw_0.18cqw_0_#000]',
+                'absolute -translate-x-1/2 whitespace-nowrap text-center font-neo-display font-black leading-none [text-shadow:0.18cqw_0.18cqw_0_rgb(var(--neo-black))]',
                 f.crit ? 'text-[3.4cqw] text-neo-pink' : 'text-[2.6cqw] text-neo-white',
                 styles.pop,
               )}

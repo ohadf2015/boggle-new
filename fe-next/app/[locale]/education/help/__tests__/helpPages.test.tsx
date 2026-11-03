@@ -93,14 +93,14 @@ describe('help article page', () => {
   it('renders numbered steps, the real button labels, HowTo JSON-LD and a next step', async () => {
     const { container } = render(await HelpArticlePage(articleParams('en', 'start-a-live-game')));
     expect(container.querySelectorAll('ol li[id^="step-"]').length).toBeGreaterThan(2);
-    expect(container.querySelector('[data-ui-label="teacher.playNow.goLive"]')?.textContent).toBe('Go live');
+    expect(container.querySelector('[data-ui-label="teacher.playNow.goLive"]')?.textContent).toBe('Start live');
     expect(jsonLdTypes(container)).toEqual(expect.arrayContaining(['HowTo', 'TechArticle', 'BreadcrumbList']));
     expect(container.querySelector('[data-help-next] a[href="/en/education/classroom-game"]')).not.toBeNull();
   });
 
   it('shows the Japanese label for the same button on the Japanese page', async () => {
     const { container } = render(await HelpArticlePage(articleParams('ja', 'start-a-live-game')));
-    expect(container.querySelector('[data-ui-label="teacher.playNow.goLive"]')?.textContent).toBe('スタート');
+    expect(container.querySelector('[data-ui-label="teacher.playNow.goLive"]')?.textContent).toBe('ライブ開始');
   });
 
   it('skips HowTo on guides that are not a procedure', async () => {

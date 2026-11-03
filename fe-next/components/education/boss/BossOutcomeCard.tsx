@@ -96,13 +96,13 @@ export function BossOutcomeCard({ size, density, className }: { size: 'tv' | 'ph
 
       {hitters.length > 0 && (
         <div className={cn('min-w-0', tv ? 'w-[min(34%,30rem)] shrink-0 border-s-[3px] border-neo-black/30 ps-6' : 'border-t-2 border-neo-black/20 pt-2')}>
-          <p className={cn('font-neo-display font-black uppercase tracking-widest', tv ? 'mb-2 text-base 2xl:text-lg' : 'mb-1 text-[11px]', won ? 'text-neo-black/75' : 'text-neo-cream/80')}>
+          <p className={cn('font-neo-display font-black uppercase tracking-widest', tv ? 'mb-2 text-base 2xl:text-lg' : 'mb-1 text-xs', won ? 'text-neo-black/75' : 'text-neo-cream/80')}>
             {t('classroomBoss.topHitters')}
           </p>
           <ol className={cn('flex', tv ? 'flex-col gap-1.5' : 'flex-wrap gap-x-3 gap-y-1')}>
             {hitters.map((h, i) => (
               <li key={h.username} data-testid="boss-top-hitter" data-username={h.username} className="flex min-w-0 items-center gap-2">
-                <span className={cn('grid shrink-0 place-items-center rounded-full border-[2px] border-neo-black font-neo-display font-black text-neo-black', HITTER_DISC[i], tv ? 'size-8 text-base' : 'size-5 text-[11px]')}>
+                <span className={cn('grid shrink-0 place-items-center rounded-full border-[2px] border-neo-black font-neo-display font-black text-neo-black', HITTER_DISC[i], tv ? 'size-8 text-base' : 'size-5 text-xs')}>
                   {i + 1}
                 </span>
                 <span dir="auto" className={cn('min-w-0 truncate font-neo-display font-black', tv ? 'text-xl 2xl:text-2xl' : 'text-sm')}>{h.username}</span>

@@ -44,7 +44,7 @@ import {
 } from '@/lib/wordTower/lessonSeed';
 
 /** Wheel glow colour. Cosmetic only — the wheel takes a raw hex, not a token. */
-const ACCENT_HEX = '#22D3EE';
+const ACCENT_HEX = 'color-mix(in srgb, var(--neo-cyan) 80%, var(--neo-purple-dark))';
 
 export interface WordTowerPracticeResults {
   /** Lesson words the student actually built, canonical. */
@@ -213,7 +213,7 @@ function WordTowerRun({
   const canBuild = tower.word.length >= WORD_TOWER_MIN_WORD_LEN;
 
   return (
-    <div className={cn(DRILL_ROOT_CLASS, 'w-full rounded-neo border-[3px] border-black p-4')}>
+    <div className={cn(DRILL_ROOT_CLASS, 'w-full rounded-neo border-[3px] border-neo-black p-4')}>
       <div className="flex items-center gap-2 mb-3 shrink-0">
         <Button
           variant="ghost"
@@ -231,7 +231,7 @@ function WordTowerRun({
           type="button"
           data-testid="word-tower-practice-done"
           onClick={handleDone}
-          className="shrink-0 rounded-neo border-[2px] border-black bg-neo-lime px-3 py-1.5 font-neo-display text-sm font-black uppercase text-black shadow-hard active:translate-y-0.5"
+          className="shrink-0 rounded-neo border-[2px] border-neo-black bg-neo-lime px-3 py-1.5 font-neo-display text-sm font-black uppercase text-neo-black shadow-hard active:translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
         >
           {t('education.wordTowerPractice.done')}
         </button>
@@ -257,11 +257,11 @@ function WordTowerRun({
               data-testid={`word-tower-practice-target-${target}`}
               data-hit={isHit ? 'true' : 'false'}
               className={cn(
-                'flex items-center gap-1 rounded-neo border-[2px] border-black px-2 py-1 font-neo-display text-sm font-black uppercase',
+                'flex items-center gap-1 rounded-neo border-[2px] border-neo-black px-2 py-1 font-neo-display text-sm font-black uppercase',
                 isHit
-                  ? 'bg-neo-lime text-black'
+                  ? 'bg-neo-lime text-neo-black'
                   : target === next
-                    ? 'bg-neo-yellow text-black'
+                    ? 'bg-neo-yellow text-neo-black'
                     : 'bg-neo-white/15 text-neo-white/80'
               )}
             >
@@ -289,7 +289,7 @@ function WordTowerRun({
       {lastHit && (
         <p
           role="status"
-          className="mb-3 rounded-neo border-[2px] border-black bg-neo-lime px-3 py-1.5 font-neo-display text-sm font-black uppercase text-black"
+          className="mb-3 rounded-neo border-[2px] border-neo-black bg-neo-lime px-3 py-1.5 font-neo-display text-sm font-black uppercase text-neo-black"
         >
           {t('education.wordTowerPractice.hit', { word: lastHit })}
         </p>

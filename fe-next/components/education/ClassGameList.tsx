@@ -85,7 +85,7 @@ export function ClassGameList({ section }: { section: ClassGameSection }): React
               </div>
             </dl>
 
-            <ul className="mt-4 flex flex-wrap gap-2 text-[11px] font-bold uppercase tracking-widest">
+            <ul className="mt-4 flex flex-wrap gap-2 text-xs font-bold uppercase tracking-widest">
               <li className="rounded border-2 border-neo-cream/40 bg-neo-navy px-2 py-1 text-neo-gray-200">
                 {labels.time}: {g.time}
               </li>

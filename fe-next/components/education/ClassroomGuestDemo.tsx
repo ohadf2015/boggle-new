@@ -63,7 +63,7 @@ export function ClassroomGuestDemo() {
               autoComplete="off"
               autoCapitalize="characters"
               dir="ltr"
-              className="w-full rounded-neo border-neo-thick border-black bg-neo-cream px-4 py-3 text-center font-neo-display text-2xl font-black uppercase tracking-[0.2em] text-neo-navy placeholder:tracking-normal placeholder:text-neo-navy/40"
+              className="w-full rounded-neo border-neo-thick border-neo-black bg-neo-cream px-4 py-3 text-center font-neo-display text-2xl font-black uppercase tracking-[0.2em] text-neo-navy placeholder:tracking-normal placeholder:text-neo-navy/40"
             />
             {errorKey && (
               <p role="alert" className="text-sm font-bold text-neo-red">
@@ -72,7 +72,7 @@ export function ClassroomGuestDemo() {
             )}
             <button
               type="submit"
-              className="rounded-neo border-neo-thick border-black bg-neo-lime px-6 py-3 font-neo-display text-lg font-black uppercase tracking-wider text-neo-navy shadow-hard transition hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0 active:shadow-hard-pressed"
+              className="rounded-neo border-neo-thick border-neo-black bg-neo-lime px-6 py-3 font-neo-display text-lg font-black uppercase tracking-wider text-neo-navy shadow-hard transition hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0 active:shadow-hard-pressed focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
             >
               {t('joinByCode.submit')}
             </button>

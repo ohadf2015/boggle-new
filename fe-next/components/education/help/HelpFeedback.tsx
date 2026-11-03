@@ -35,7 +35,7 @@ export function HelpFeedback({
           <button
             type="button"
             onClick={() => vote('yes')}
-            className="inline-flex items-center gap-2 rounded-neo border-3 border-neo-black bg-neo-cream px-4 py-2 font-bold text-neo-navy shadow-hard hover:-translate-y-0.5"
+            className="inline-flex items-center gap-2 rounded-neo border-3 border-neo-black bg-neo-cream px-4 py-2 font-bold text-neo-navy shadow-hard hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           >
             <ThumbsUp aria-hidden="true" className="size-4" />
             {yes}
@@ -43,7 +43,7 @@ export function HelpFeedback({
           <button
             type="button"
             onClick={() => vote('no')}
-            className="inline-flex items-center gap-2 rounded-neo border-3 border-neo-cream/50 bg-neo-navy-light px-4 py-2 font-bold text-neo-white shadow-hard hover:-translate-y-0.5"
+            className="inline-flex items-center gap-2 rounded-neo border-3 border-neo-cream/50 bg-neo-navy-light px-4 py-2 font-bold text-neo-white shadow-hard hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           >
             <ThumbsDown aria-hidden="true" className="size-4" />
             {no}

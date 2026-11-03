@@ -79,7 +79,7 @@ export default function RewardChest({ reveal, wearing, onClose }: RewardChestPro
     >
       <div className="mx-auto flex min-h-full w-full max-w-md flex-col items-center gap-3 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))]">
         {!revealed && (
-          <h2 className="pt-2 text-center font-neo-display text-3xl font-black uppercase tracking-wide" style={{ textShadow: '3px 3px 0 #000' }}>
+          <h2 className="pt-2 text-center font-neo-display text-3xl font-black uppercase tracking-wide" style={{ textShadow: '3px 3px 0 rgb(var(--neo-black))' }}>
             {t('economy.chest.title')}
           </h2>
         )}
@@ -87,7 +87,7 @@ export default function RewardChest({ reveal, wearing, onClose }: RewardChestPro
         <ChestStage ref={chestRef} phase={phase} rarity={reveal.rarity} onTap={tap} openLabel={t('economy.chest.open')} />
 
         {phase === 'sealed' && (
-          <p className="rounded-full border-[3px] border-black bg-neo-lime px-5 py-1.5 font-neo-display text-lg font-black uppercase text-neo-navy shadow-hard-lg">
+          <p className="rounded-full border-[3px] border-neo-black bg-neo-lime px-5 py-1.5 font-neo-display text-lg font-black uppercase text-neo-navy shadow-hard-lg">
             {t('economy.chest.tapToOpen')}
           </p>
         )}
@@ -99,13 +99,13 @@ export default function RewardChest({ reveal, wearing, onClose }: RewardChestPro
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.3, ease: EASE_OUT }}
               className="text-balance text-center font-neo-display text-[clamp(2.5rem,13vw,4rem)] font-black uppercase leading-[0.95]"
-              style={{ color: rays.hex, textShadow: '4px 4px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000' }}
+              style={{ color: rays.hex, textShadow: '4px 4px 0 rgb(var(--neo-black)), -2px -2px 0 rgb(var(--neo-black)), 2px -2px 0 rgb(var(--neo-black)), -2px 2px 0 rgb(var(--neo-black))' }}
             >
               {t(chestHeadlineKey(reveal.rarity))}
             </m.h2>
             <RewardChipRow label={t('economy.chest.chip.label')} chips={chips} reduced={reduced} delay={0.1} />
             {reveal.rank !== null && (
-              <p className="inline-flex items-center gap-2 rounded-full border-2 border-white/25 bg-white/10 px-4 py-1.5 text-base font-bold">
+              <p className="inline-flex items-center gap-2 rounded-full border-2 border-neo-white/40 bg-neo-white/10 px-4 py-1.5 text-base font-bold">
                 <Trophy aria-hidden="true" className="h-5 w-5 text-neo-yellow" />
                 {t('economy.reward.rank', { rank: reveal.rank, size: reveal.size })}
               </p>
@@ -118,7 +118,7 @@ export default function RewardChest({ reveal, wearing, onClose }: RewardChestPro
                 e.stopPropagation();
                 onClose();
               }}
-              className="min-h-14 w-full rounded-2xl border-[3px] border-black bg-neo-lime px-8 font-neo-display text-2xl font-black text-neo-navy shadow-hard-lg transition-transform duration-150 ease-out hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white active:scale-[0.97]"
+              className="min-h-14 w-full rounded-2xl border-[3px] border-neo-black bg-neo-lime px-8 font-neo-display text-2xl font-black text-neo-navy shadow-hard-lg transition-transform duration-150 ease-out hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white active:scale-[0.97]"
             >
               {t('economy.chest.continue')}
             </button>

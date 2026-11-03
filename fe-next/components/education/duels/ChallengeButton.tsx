@@ -101,7 +101,7 @@ export function ChallengeButton({
       <>
         <button type="button"
           onClick={handleClick}
-          className={cn(
+          className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
             'p-2 rounded-neo transition',
             'text-neo-pink hover:text-neo-lime',
             'hover:bg-neo-navy/30',
@@ -131,7 +131,7 @@ export function ChallengeButton({
       <button type="button"
         onClick={handleClick}
         disabled={showSuccess}
-        className={cn(
+        className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
           'px-4 py-2 font-neo-body font-bold rounded-neo',
           'bg-neo-pink text-neo-black',
           'border-[3px] border-neo-black shadow-hard-sm',

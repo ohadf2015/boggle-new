@@ -48,12 +48,13 @@ export interface CatalogueMode {
 
 type Row = Omit<CatalogueMode, 'suffix' | 'poster' | 'cover' | 'accent' | 'launch' | 'nameKey' | 'howKey'>;
 
+// Most-played first inside each group (finished classroom rounds, 30 days to 2026-11-02): quiz 18, classic 16, blast 6, hunt 4, wheel 2, craft 1.
 const ROWS: readonly Row[] = [
   { id: 'vocab-quiz', category: 'meaning', complexity: 'simple', style: 'ffa', teamsCapable: false, bestFor: ['meanings', 'testPrep'], preview: 'quiz', delivery: 'projector' },
-  { id: BOSS_BATTLE_ID, category: 'board', complexity: 'simple', style: 'class', teamsCapable: false, bestFor: ['teamwork', 'review'], preview: 'boss', delivery: 'projector' },
-  { id: 'wordcraft', category: 'meaning', complexity: 'medium', style: 'solo', teamsCapable: false, bestFor: ['lessonWords', 'independent'], preview: 'craft', delivery: 'phones' },
+  { id: 'wordcraft', category: 'meaning', complexity: 'medium', style: 'solo', teamsCapable: false, bestFor: ['lessonWords', 'independent'], preview: 'craft', delivery: 'both' },
   { id: 'classic', category: 'board', complexity: 'medium', style: 'ffa', teamsCapable: true, bestFor: ['spelling', 'mixedLevels'], preview: 'board', delivery: 'both' },
   { id: 'blast', category: 'board', complexity: 'simple', style: 'ffa', teamsCapable: true, bestFor: ['energy', 'warmup'], preview: 'blast', delivery: 'phones' },
+  { id: BOSS_BATTLE_ID, category: 'board', complexity: 'simple', style: 'class', teamsCapable: false, bestFor: ['teamwork', 'review'], preview: 'boss', delivery: 'projector' },
   { id: 'word-hunt', category: 'board', complexity: 'medium', style: 'ffa', teamsCapable: true, bestFor: ['focus', 'spelling'], preview: 'hunt', delivery: 'phones' },
   { id: 'wheel-rush', category: 'board', complexity: 'simple', style: 'ffa', teamsCapable: true, bestFor: ['warmup', 'review'], preview: 'wheel', delivery: 'both' },
 ];
@@ -72,8 +73,15 @@ const MODES: readonly CatalogueMode[] = ROWS.flatMap((row): CatalogueMode[] => {
   return [{ ...row, launch, suffix: base.nameKeySuffix, nameKey: base.nameKey, howKey: base.howKey, poster: base.poster, cover, accent: base.accent }];
 });
 
-/** Teacher Home's three featured modes, in display order. */
-export const FEATURED_HOME_MODES: readonly ClassroomCatalogueId[] = ['wheel-rush', 'word-hunt', 'classic'];
+/** The three modes classes play most; they get a "Most popular" tag and lead the landing. */
+export const CLASS_FAVORITE_MODES: readonly ClassroomCatalogueId[] = ['vocab-quiz', 'classic', 'blast'];
+
+export function isClassFavorite(id: string | null | undefined): boolean {
+  return CLASS_FAVORITE_MODES.some((m) => m === id);
+}
+
+/** The landing's three featured modes, in display order. */
+export const FEATURED_HOME_MODES: readonly ClassroomCatalogueId[] = CLASS_FAVORITE_MODES;
 
 export function deliveryKey(delivery: ModeDelivery): string {
   return `eduShell.delivery.${delivery}`;

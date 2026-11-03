@@ -18,11 +18,21 @@ vi.mock('@/utils/growthTracking', () => ({
 
 // Stub the heavy form + modal so the gate is tested in isolation.
 vi.mock('../AccessRequestForm', () => ({
-  AccessRequestForm: ({ knownName, knownEmail }: { knownName?: string; knownEmail?: string }) => (
-    <div data-testid="access-form">form:{knownEmail}:{knownName}</div>
+  AccessRequestForm: ({ knownName, knownEmail, onApproved }: { knownName?: string; knownEmail?: string; onApproved?: (a: unknown) => void }) => (
+    <div data-testid="access-form">
+      form:{knownEmail}:{knownName}
+      <button type="button" onClick={() => onApproved?.({ paidDay0: false, alreadyApproved: false })}>approve</button>
+    </div>
   ),
 }));
 vi.mock('@/components/auth/AuthModal', () => ({ default: () => <div data-testid="auth-modal" /> }));
+vi.mock('../AccessRequestGoogleButton', () => ({
+  AccessRequestGoogleButton: ({ onTap }: { onTap: () => void }) => (
+    <button type="button" onClick={onTap}>
+      google
+    </button>
+  ),
+}));
 
 import { AccessRequestGate } from '../AccessRequestGate';
 
@@ -59,6 +69,14 @@ describe('<AccessRequestGate>', () => {
     expect(screen.getByText('education.access.auth_required_title')).toBeInTheDocument();
     expect(screen.queryByTestId('access-form')).not.toBeInTheDocument();
     expect(mockTrackGrowthEvent).toHaveBeenCalledWith('edu_access_gate_viewed', { state: 'auth_required' });
+  });
+
+  it('puts Google first for a signed-out visitor and reports the tap', async () => {
+    render(<AccessRequestGate />);
+    const buttons = screen.getAllByRole('button');
+    expect(buttons[0]).toHaveTextContent('google');
+    await userEvent.click(buttons[0]);
+    expect(mockTrackGrowthEvent).toHaveBeenCalledWith('edu_access_signup_tapped', { mode: 'google' });
   });
 
   it('opens the auth modal when the sign-up CTA is clicked', async () => {
@@ -115,6 +133,14 @@ describe('<AccessRequestGate>', () => {
     render(<AccessRequestGate />);
     expect(screen.getByTestId('access-form')).toHaveTextContent('form:jane@school.edu:Jane');
     expect(mockTrackGrowthEvent).toHaveBeenCalledWith('edu_access_gate_viewed', { state: 'form' });
+  });
+
+  it('hands the approval up to the page that owns the navigation', async () => {
+    mockAuth = { user: { email: 'jane@school.edu', email_confirmed_at: '2026-01-01T00:00:00Z' }, loading: false };
+    const onApproved = vi.fn();
+    render(<AccessRequestGate onApproved={onApproved} />);
+    await userEvent.click(screen.getByRole('button', { name: 'approve' }));
+    expect(onApproved).toHaveBeenCalledWith({ paidDay0: false, alreadyApproved: false });
   });
 
   it('does not throw or break interactions if trackGrowthEvent throws', async () => {

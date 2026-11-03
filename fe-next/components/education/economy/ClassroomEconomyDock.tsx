@@ -79,7 +79,7 @@ export default function ClassroomEconomyDock({ gameCode }: ClassroomEconomyDockP
         <div className="fixed inset-x-0 bottom-0 z-50 max-h-[70vh] overflow-y-auto rounded-t-neo border-t-3 border-neo-cream bg-neo-navy p-4 pb-6 text-white">
           <div className="mb-3 flex items-center justify-between">
             <span className="text-sm font-bold text-white">{sheet === 'shop' ? t('economy.shop.title') : t('economy.board.title')}</span>
-            <button type="button" onClick={() => setSheet(null)} className="min-h-11 px-3 text-sm font-bold text-white">
+            <button type="button" onClick={() => setSheet(null)} className="min-h-11 px-3 text-sm font-bold text-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black">
               {t('economy.sheet.close')}
             </button>
           </div>
@@ -90,7 +90,7 @@ export default function ClassroomEconomyDock({ gameCode }: ClassroomEconomyDockP
                 <button
                   type="button"
                   onClick={econ.useHint}
-                  className="mt-3 min-h-11 w-full rounded-neo border-3 border-neo-black bg-neo-yellow font-neo-display font-black uppercase text-neo-navy shadow-hard-sm"
+                  className="mt-3 min-h-11 w-full rounded-neo border-3 border-neo-black bg-neo-yellow font-neo-display font-black uppercase text-neo-navy shadow-hard-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
                 >
                   {t('economy.hint.use', { count: econ.snapshot.hintsHeld })}
                 </button>

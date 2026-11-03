@@ -8,6 +8,7 @@ import { teacherAccessConfirmation } from '@/lib/email/templates/teacherAccessCo
 import { teacherTrialExpiry } from '@/lib/education/trial';
 import { isTeacherProfile } from '@/lib/education/teacherRole';
 import { isPaidMedium } from '@/lib/education/paidDay0';
+import { testEmailReason } from '@/lib/education/checkoutTrafficTags';
 import { buildEduAccessRequestCreatedEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer';
 import type { TeacherAccessFormPayload } from '@/lib/education/types';
 
@@ -32,11 +33,15 @@ export async function POST(req: Request) {
   let body: any;
   try { body = await req.json(); } catch { return bad('invalid json'); }
 
-  const { role, locale, use_case, school_or_org } = body || {};
+  const { locale, school_or_org } = body || {};
+  // Access is granted on submit, so the form asks for nothing: role is an optional tap.
+  const rolePicked = body?.role !== undefined && body?.role !== null;
+  const role = rolePicked ? body.role : 'teacher';
+  const use_case = body?.use_case ?? '';
 
   if (!ROLES.includes(role)) return bad('invalid role');
   if (!LOCALES.includes(locale)) return bad('invalid locale');
-  if (typeof use_case !== 'string' || use_case.length < 10 || use_case.length > 800) return bad('use_case must be 10-800 chars');
+  if (typeof use_case !== 'string' || use_case.length > 800) return bad('use_case must be at most 800 chars');
   if (school_or_org && (typeof school_or_org !== 'string' || school_or_org.length > 200)) return bad('invalid school_or_org');
 
   const sb = await createClient();
@@ -101,7 +106,7 @@ export async function POST(req: Request) {
   // Growth Radar server step: record request creation once durably inserted.
   try {
     captureProFunnelServerEvent(
-      buildEduAccessRequestCreatedEvent(user.id, { role, locale })
+      buildEduAccessRequestCreatedEvent(user.id, { role, locale, role_picked: rolePicked })
     );
   } catch {
     /* telemetry failure must never break access request */
@@ -186,10 +191,28 @@ export async function POST(req: Request) {
     console.error('[access-request] confirmation email threw', e);
   }
 
+  const paidDay0 = isPaidMedium(profile?.utm_medium);
+  try {
+    captureProFunnelServerEvent({
+      distinctId: user.id,
+      event: 'edu_access_completed_to_class',
+      properties: {
+        product: 'teacher_pro',
+        locale,
+        role,
+        role_picked: rolePicked,
+        destination: paidDay0 ? 'paid_class' : 'class_setup',
+        is_test_account: testEmailReason(email) !== null,
+      },
+    });
+  } catch {
+    /* telemetry failure must never break access request */
+  }
+
   // Both keys on purpose: this route's error path answers { ok: false, error }, so a caller that
   // checks `ok` saw undefined on success — the shapes disagreed. `success` stays for any existing
   // consumer; `ok` makes the success and failure envelopes match.
-  return NextResponse.json({ ok: true, success: true, paidDay0: isPaidMedium(profile?.utm_medium) });
+  return NextResponse.json({ ok: true, success: true, paidDay0 });
 }
 
 export async function GET(request: NextRequest) {

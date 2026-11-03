@@ -55,7 +55,7 @@ export function ForSchoolsLink({ placement, className, children, onNavigate, tes
         trackForSchoolsClick(placement);
         onNavigate?.();
       }}
-      className={className}
+      className={`${className ?? ''} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}
     >
       {children ?? (
         <>

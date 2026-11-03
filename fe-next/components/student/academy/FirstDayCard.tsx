@@ -39,7 +39,7 @@ export function FirstDayCard({ goals, hasClass }: Props) {
               key={g.id}
               data-testid={`academy-first-day-${g.id}`}
               data-done={g.done ? 'true' : 'false'}
-              className={`flex min-w-0 flex-col gap-0.5 rounded-lg border-2 border-neo-black px-1.5 py-1 font-neo-body text-[11px] font-bold leading-tight ${
+              className={`flex min-w-0 flex-col gap-0.5 rounded-lg border-2 border-neo-black px-1.5 py-1 font-neo-body text-xs font-bold leading-tight ${
                 g.done ? 'bg-neo-lime text-neo-black' : 'bg-neo-white/10 text-neo-white'
               }`}
             >
@@ -52,7 +52,7 @@ export function FirstDayCard({ goals, hasClass }: Props) {
           ))}
         </ul>
       </div>
-      <p className="font-neo-body text-[10px] font-bold uppercase tracking-wide text-neo-yellow">
+      <p className="font-neo-body text-xs font-bold uppercase tracking-wide text-neo-yellow">
         {hasClass
           ? t('student.firstDay.classStreakHint', "Today's class game starts your class streak")
           : t('student.firstDay.chestHint', 'Win chests in class games')}

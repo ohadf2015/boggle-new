@@ -147,13 +147,21 @@ describe('<PageClient> (access page state machine)', () => {
     expect(screen.queryByTestId('access-request-gate')).not.toBeInTheDocument();
   });
 
-  it('shows the approved card with trial banner when hasAccess and trial info present', () => {
+  it('shows the approved card with the trial line when hasAccess and trial info present', () => {
     mockTeacherAccessState.hasAccess = true;
     mockTeacherAccessState.status = 'approved';
-    mockTeacherAccessState.trial = { daysRemaining: 7, endsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() };
+    mockTeacherAccessState.trial = { isExpired: false, daysLeft: 7, expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() };
     render(<PageClient />);
     expect(screen.getByText('education.access.already_approved_title')).toBeInTheDocument();
-    expect(screen.getByTestId('trial-urgency')).toBeInTheDocument();
+    expect(screen.getByTestId('access-trial-note')).toBeInTheDocument();
+  });
+
+  it('shows no trial line for a malformed trial instead of "Invalid Date"', () => {
+    mockTeacherAccessState.hasAccess = true;
+    mockTeacherAccessState.status = 'approved';
+    mockTeacherAccessState.trial = { daysRemaining: 7 };
+    render(<PageClient />);
+    expect(screen.queryByTestId('access-trial-note')).toBeNull();
   });
 
   describe('issue 2: unrecognized status values do not render blank page', () => {
@@ -177,7 +185,6 @@ describe('<PageClient> (access page state machine)', () => {
     // A teacher who is already approved / pending / declined must never be sold
     // teacher access again — the pitch belongs to the pre-application state only.
     const pitchKeys = [
-      'education.access.trust_instant',
       'education.access.trust_free',
       'education.access.trust_nologins',
     ];
@@ -222,7 +229,6 @@ describe('<PageClient> (access page state machine)', () => {
       expect(skeleton).toBeInTheDocument();
       // CRITICAL: step cards should STILL be rendered, not dropped by early return
       expect(screen.getByText('education.access.next.step1_title')).toBeInTheDocument();
-      expect(screen.getByText('education.access.next.step2_title')).toBeInTheDocument();
       expect(screen.getByText('education.access.next.step3_title')).toBeInTheDocument();
       // The consumer try-a-game block is gone from the teacher signup page.
       expect(screen.queryByText('education.access.regular_game_title')).not.toBeInTheDocument();

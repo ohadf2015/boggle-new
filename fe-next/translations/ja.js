@@ -945,7 +945,7 @@ const ja = {
   "academy": {
     "teacher": {
       "classesTitle": "クラス一覧",
-      "hqTitle": "先生HQ",
+      "hqTitle": "先生ホーム",
       "classActions": "クラスの操作",
       "orTypeCode": "またはリンクを開いてコードを入力"
     },
@@ -986,14 +986,9 @@ const ja = {
       "firstAssignmentCta": "最初の課題を作成",
       "startLiveTitle": "ライブ授業を始める",
       "startLiveBody": "課題は出しています。ライブゲームを始めてクラスで一緒に遊びましょう。",
-      "startLiveCta": "ライブ授業ゲームを開始",
+      "startLiveCta": "ライブ開始",
       "copyJoinCode": "参加リンクをコピー",
       "joinCodeCopied": "参加リンクをコピーしました",
-      "progressTitle": "クラスの進捗",
-      "progressStudents": "生徒",
-      "progressAssignments": "課題",
-      "progressSubmitted": "提出済み",
-      "progressUpgrade": "Teacher Pro",
       "endedCodeTries": "ゲーム終了後に参加しようとした生徒：{count}人。",
       "endedCodeTriesOne": "ゲーム終了後に参加しようとした生徒：{count}人。",
       "lateJoinProLine": "Teacher Proなら、生徒が自分のペースで取り組める課題を出せます。",
@@ -1088,7 +1083,6 @@ const ja = {
       "savingXp": "XPを保存中…",
       "xpEarned": "+{xp} XP",
       "tapToOpen": "タップで開ける",
-      "errorTitle": "おっと、エラーが起きたよ。もう一回やる？",
       "tryAgain": "もう一度",
       "playAgain": "もう一回",
       "xpNotSaved": "今回はXPを保存できなかった。もう一回遊んで再チャレンジしてね。",
@@ -1190,17 +1184,6 @@ const ja = {
       "classmateHere": "人のクラスメイトが来てるよ",
       "classmatesHere": "人のクラスメイトが来てるよ",
       "firstIn": "一番乗り！クラスメイトはここに現れるよ。"
-    },
-    "homework": {
-      "noGame": "ライブゲームをすると、生徒ごとのミスした単語がここに届きます。",
-      "noMisses": "前回のゲームはミスした単語ゼロ。出す宿題はありません。",
-      "summary": "生徒{students}人・ミスした単語{words}語。各自が自分の単語だけを練習します。",
-      "more": "ほか{count}人",
-      "assigned": "出題しました。「ミスした単語」の島で待っています。",
-      "assign": "生徒ごとに出題",
-      "due": "期限：{date}",
-      "failed": "出題できませんでした。もう一度お試しください。",
-      "title": "ミスした単語の宿題"
     },
     "pages": {
       "backToMap": "アカデミーに戻る",
@@ -4595,7 +4578,7 @@ const ja = {
     "crazyGamesFriends": "CrazyGamesで友達と遊ぶ"
   },
   "hostView": {
-    "demoBotsFailed": "練習ラウンドは大画面で行います。プレイヤーモードを終了するとボットでリハーサルできます。",
+    "demoBotsFailed": "練習ラウンドは大画面で行います。プレイヤーモードを終了するとボットで練習できます。",
     "lobby": "ロビー",
     "lobbyTitle": "マルチプレイヤーロビー",
     "waitingForPlayers": "戦士集合中...",
@@ -14147,7 +14130,7 @@ const ja = {
       "shareJoin": "参加リンクを共有",
       "shareJoinCta": "参加リンクをコピー",
       "startLive": "ライブ授業を始める",
-      "startLiveCta": "ライブ授業を開始",
+      "startLiveCta": "ライブ開始",
       "viewReport": "最初の進捗レポートを見る",
       "viewReportCta": "レポートを開く",
       "dismiss": "閉じる",
@@ -14168,7 +14151,7 @@ const ja = {
       "pasteTooFew": "単語を{{min}}個以上入れてください",
       "pasteReady": "{{count}}語、準備完了",
       "pastedRoundName": "きょうの単語",
-      "goLive": "スタート",
+      "goLive": "ライブ開始",
       "armedWith": "{{title}} · {{count}}語",
       "pickSomething": "単語リストを選べばすぐ始まります",
       "noSetupNeeded": "クラス作成も名簿入力も不要。生徒はコードで参加します。",
@@ -14272,36 +14255,18 @@ const ja = {
     },
     "classReport": {
       "title": "単語 × 生徒",
-      "hint": "レッスンの全単語と全生徒の対応表です。上にあるほど難しかった単語で、そのまま復習リストになります。",
       "word": "単語",
       "classMiss": "クラスの不正解率",
       "accuracy": "正答率",
       "didNotPlay": "不参加",
       "quizCaveat": "クイズはレッスンの一部の単語しか出題しないため、出題されなかった単語もここでは「できなかった」として数えられます。復習の前にリストを確認してください。",
-      "empty": "このゲームには誰も参加していません",
-      "emptyHint": "生徒がクラスゲームに参加すると、単語ごとの結果がここに表示されます。",
-      "copy": "メモ用にコピー",
-      "copied": "コピーしました",
-      "copyFallback": "このテキストをコピーしてください:",
       "print": "印刷",
-      "trendTitle": "最近のゲームの推移",
-      "trendEmpty": "このレッスンをもう一度プレイすると、クラスの伸びが見えるようになります。",
-      "trendBarsLabel": "{word}: 最初のゲームでは{first}%、最新のゲームでは{last}%が不正解でした。",
       "state": {
         "found": "見つけた",
         "missed": "見つけられなかった",
         "absent": "不参加",
         "quizFound": "正解",
         "quizMissed": "不正解"
-      },
-      "drilldown": {
-        "title": "生徒の詳細",
-        "missedCount": "{count}語ができませんでした",
-        "noneMissed": "レッスンの単語をすべて見つけました。",
-        "absentHint": "この生徒にはこのゲームの記録がありません。次回までにフォローしてください。",
-        "suggested": "次の一手:",
-        "assign": "この単語を練習",
-        "close": "閉じる"
       },
       "practice": {
         "flashcard": "まず意味から。フラッシュカードのあとにクイズ",
@@ -14454,21 +14419,7 @@ const ja = {
       "unpluggedReteachLiveFoil": "今日は生徒の端末が使えませんか？ ミスした語を映して、紙で答えてもらいましょう。"
     },
     "windowProgress": {
-      "title": "今週のクラス",
-      "windowLabel": "期間",
-      "days7": "7日間",
-      "days30": "30日間",
-      "completion": "完了率",
-      "accuracy": "正答率",
       "activeLine": "{{roster}}人中{{active}}人がプレイ",
-      "studentStat": "{{sessions}}回 · {{accuracy}}",
-      "noPlay": "まだプレイなし",
-      "loading": "クラスの進捗を読み込み中…",
-      "loadError": "クラスの進捗を読み込めませんでした。",
-      "retry": "再試行",
-      "emptyNoRoster": "先に生徒を招待してください。そうすると7日・30日の進捗が表示されます。",
-      "proCtaHint": "Teacher Proで印刷できる履歴と全クラスを解放。",
-      "regionLabel": "{{classroom}}の7日・30日進捗"
     },
     "subscription": {
       "giftedNoCard": "カード登録も自動更新もありません。期限が来たら無料プランに戻るだけです。",
@@ -14903,17 +14854,8 @@ const ja = {
       "editLesson": "単語と定義を編集",
       "moreWords": "+{{count}}個の単語",
       "bulkImport": "一括インポート",
-      "bulkImportTitle": "複数の単語をインポート",
-      "bulkImportDescription": "改行、カンマ、またはスペースで区切った単語のリストを貼り付けてください。「単語 - 定義」の形式で定義も含められます。",
-      "bulkImportLabel": "ここに単語を貼り付け",
-      "bulkImportPlaceholder": "単語を貼り付け（1行に1つ）。「単語 - 定義」で定義も追加可能。",
-      "bulkImportDetected": "{{count}}個の単語を検出",
-      "bulkImportUnreadable": "{{count}}行（{{rows}}行目）を読み取れませんでした。単語が見つからないため取り込みから除外しました。余分な | や単語の書き忘れがないか確認してください。",
-      "bulkImportOneWordPerLine": "{{rows}}行目に複数の単語が入っているようです。1行に1語ずつ書いて、もう一度取り込んでください。",
       "savedAndAssigned": "レッスンを保存し、{{classroom}}に割り当てました。生徒はすぐに見られます。",
       "savedNotAssigned": "レッスンは保存しましたが、{{classroom}}に割り当てられませんでした。レッスンの「クラスに割り当て」ボタンからもう一度お試しください。",
-      "bulkImportButton": "インポート",
-      "templates": "レッスンテンプレート",
       "category": {
         "all": "すべて",
         "grade-1": "1年生",
@@ -15129,6 +15071,30 @@ const ja = {
       "failedToSaveLesson": "レッスンの保存に失敗しました"
     },
     "reports": {
+      "valueLine": "毎回のゲームのあとに、各クラスが見逃した単語、手助けが必要な生徒、次に練習することがわかります。",
+      "lockedValue": "クラスが見逃した単語は、毎回のゲーム結果画面で無料で見られます。レポートでは、すべてのゲームを通して、手助けが必要な生徒を一人ずつ確認できます。",
+      "emptyClass": {
+        "title": "このクラスはまだゲームをしていません",
+        "body": "このクラスで1回ゲームをすると、レポートにクラスが見逃した単語と手助けが必要な生徒が表示されます。",
+        "cta": "このクラスでゲームを始める"
+      },
+      "reteach": {
+        "title": "復習すること",
+        "exampleBadge": "例",
+        "exampleBody": "最初のゲームのあと、ここにクラスが見逃した単語と手助けが必要な生徒が表示されます。下はサンプルデータです。",
+        "fromClass": "{name}がこれまでのゲームで最も見逃した単語です。",
+        "accuracy": "クラスの正答率 {pct}%",
+        "missRate": "{pct}%が不正解",
+        "studentsMissed": "{asked}人中{missing}人が見逃しました",
+        "needsHelp": "手助けが必要:",
+        "needsHelpPro": "生徒ごとの詳細は Teacher Pro で見られます。",
+        "needsHelpNone": "全員がクラスの目標に届いています。",
+        "moreStudents": "ほか{count}人",
+        "openClass": "クラスのレポートを開く",
+        "startFirstGame": "最初のゲームを始める",
+        "exampleWords": "かみなり,そよかぜ,しも,くも",
+        "exampleNames": "ゆい,はると"
+      },
       "arc": {
         "title": "学習の軌跡",
         "subtitle": "生徒ごと・全セッションの記録",
@@ -15546,10 +15512,10 @@ const ja = {
       "startBlocked": "生徒が1人参加したらスタートできます。",
       "practiceFirst": "まずボット3人で練習",
       "practiceFirstHint": "クラスで映る画面をそのまま確認できます。最初の生徒が入るとボットは退出します。",
-      "rehearseCta": "ボットで試す",
+      "rehearseCta": "ボットで練習",
       "rehearsePrivate": "これはあなただけに表示されます。生徒はルームにおらず、記録もされません。",
-      "rehearseBotsBlocked": "このゲームはボットがプレイできないため、ボットでリハーサルできません。",
-      "rehearseUseClassic": "代わりにクラシックでリハーサル",
+      "rehearseBotsBlocked": "このゲームはボットがプレイできないため、ボットで練習できません。",
+      "rehearseUseClassic": "代わりにクラシックでボットと練習",
       "startWhenReady": "全員そろったらスタート",
       "lateJoinOn": "途中参加OK",
       "lateJoinOff": "途中参加なし",
@@ -20709,8 +20675,6 @@ const ja = {
       "haveAccount": "アカウントをお持ちですか？ログイン"
     },
     "hq": {
-      "assigned": "宿題 {{count}}件",
-      "assignedAria": "宿題：{{count}}件を配布中。宿題を開く",
       "assignNudge": "宿題を出す"
     },
     "modeTags": {
@@ -20726,7 +20690,7 @@ const ja = {
   "eduLive": {
     "exit": {
       "title": "クラスのゲームを終了しますか？",
-      "body": "生徒全員のルームが閉じて、クラスのホームに戻ります。",
+      "body": "生徒全員のルームが閉じて、ホームに戻ります。",
       "stay": "続ける",
       "confirm": "ゲームを終了"
     },
@@ -20775,6 +20739,13 @@ const ja = {
   },
   // @eduLive:end
   "eduPro": {
+    "table": {
+      "modes": "ライブゲームのモード",
+      "assignments": "クラスごとの課題数"
+    },
+    "trialLine": "Teacher Pro は最初の{days}日間無料です（先生1人につき1回）。いつでも解約できます。",
+    "modesSub": "プロジェクターで遊ぶモードも、生徒のスマホで遊ぶモードもあります。どのモードも無料で遊べます。不安な生徒のための落ち着いたモードは Pro で使えます。",
+    "pill": "プロ",
     "mastery": {
       "title": "単語の定着度",
       "subtitle": "クラスが何度もつまずく単語を、すべてのゲームから。",
@@ -21122,8 +21093,8 @@ const ja = {
       "articlesCount": "{count}件のガイド",
       "faqTitle": "すぐわかるQ&A",
       "ctaTitle": "クラスはワンタップで始められます",
-      "ctaBody": "先生は無料、生徒のアカウントもカードも不要。先生HQを開いて「スタート」を押すだけ。",
-      "ctaPrimary": "先生HQを開く（無料）",
+      "ctaBody": "先生は無料、生徒のアカウントもカードも不要。先生ホームを開いて「ライブ開始」を押すだけ。",
+      "ctaPrimary": "先生ホームを開く（無料）",
       "ctaSecondary": "まずライブゲームを見る",
       "stuckTitle": "それでも解決しない場合は",
       "stuckBody": "何をしようとしていたか教えてください。チームのスタッフが直接お返事します。",
@@ -21132,11 +21103,11 @@ const ja = {
     "categories": {
       "gettingStarted": {
         "title": "はじめに",
-        "blurb": "アカウント、先生HQ、最初のクラス。"
+        "blurb": "アカウント、ホーム、最初のクラス。"
       },
       "liveGame": {
         "title": "ライブゲームの進め方",
-        "blurb": "スタート、生徒の参加、モード選び、ゲームの進行。"
+        "blurb": "ライブ開始、生徒の参加、モード選び、ゲームの進行。"
       },
       "assign": {
         "title": "宿題・練習の配信",
@@ -21183,8 +21154,8 @@ const ja = {
       "eyebrow": "次のステップ",
       "startClass": {
         "title": "今日のクラスで試してみましょう",
-        "body": "先生HQは無料です。「スタート」を押せば、数秒で参加コードが黒板に。",
-        "cta": "先生HQを開く"
+        "body": "先生ホームは無料です。「ライブ開始」を押せば、数秒で参加コードが黒板に。",
+        "cta": "先生ホームを開く"
       },
       "liveGame": {
         "title": "今すぐライブゲームを",
@@ -21307,6 +21278,10 @@ const ja = {
       "toTeacher": "先生ホームに戻る"
     },
     "hostResults": {
+      "missedTitle": "クラスが見逃した単語",
+      "practiceWords": "この単語を練習する（{count}）",
+      "shareParents": "保護者に共有",
+      "proPill": "Pro",
       "invitePrompt": "気に入りそうな先生はいますか？",
       "inviteCta": "同僚を招待",
       "inviteText": "うちのクラスでLexiClashのことばゲームをやりました。先生は無料で使えます。よかったら見てみてください：",
@@ -21353,6 +21328,11 @@ const ja = {
   ,
   // @eduShell:start
   "eduShell": {
+    "error": {
+      "title": "この画面で問題が起きました",
+      "body": "もう一度お試しください。何度も起きる場合は、クラスに戻ってそこからやり直してください。",
+      "backToClass": "クラスに戻る"
+    },
     "nav": {
       "home": "ホーム",
       "library": "ライブラリ",
@@ -21509,7 +21489,6 @@ const ja = {
     "setup": {
       "title": "新しいクラス",
       "subtitle": "選ぶのは3つだけ。あとから変更できます。",
-      "stepsLabel": "クラス作成の進み具合",
       "step1": "クラスの情報",
       "step2": "コードを共有",
       "nameLabel": "クラス名",
@@ -21567,7 +21546,7 @@ const ja = {
       "packLabel": "最初のゲームで使う単語",
       "packWords": "{count}語",
       "packRecommended": "おすすめ",
-      "startLive": "ライブゲームを始める",
+      "startLive": "ライブ開始",
       "createOnly": "クラスだけ作る"
     },
     "host": {
@@ -21698,7 +21677,6 @@ const ja = {
   // @eduPolish:start
   "eduPolish": {
     "seatCapReached": "{name}さんは観戦中です：クラスが満員です（{cap}人）",
-    "csvDropHint": "CSVファイルをここにドロップ、またはクリックして選択"
   }
   // @eduPolish:end
 };

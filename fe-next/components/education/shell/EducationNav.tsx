@@ -62,7 +62,7 @@ const FOCUS =
 function tabClasses(active: boolean) {
   return cn(
     'relative z-10 flex min-h-[56px] flex-col items-center justify-center gap-1 rounded-neo px-1 pb-1 pt-1.5',
-    'font-neo-display text-[11px] font-bold transition-[color,transform] duration-150 ease-out active:scale-[0.97]',
+    'font-neo-display text-xs font-bold transition-[color,transform] duration-150 ease-out active:scale-[0.97]',
     FOCUS,
     active ? 'text-neo-cream' : 'text-neo-cream/70 [@media(hover:hover)]:hover:text-neo-cream',
   );
@@ -125,7 +125,7 @@ function NavLink({
       href={item.href}
       data-testid={`education-${variant === 'tabs' ? 'tab' : 'side'}-${item.key}`}
       aria-current={active ? 'page' : undefined}
-      className={variant === 'tabs' ? tabClasses(active) : sideClasses(active)}
+      className={`${variant === 'tabs' ? tabClasses(active) : sideClasses(active)} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}
     >
       <Icon
         className={cn(

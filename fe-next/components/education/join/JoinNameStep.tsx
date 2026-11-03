@@ -152,7 +152,7 @@ export function JoinNameStep({ flow, nameRef, goRef }: JoinNameStepProps) {
             <button
               type="button"
               onClick={() => flow.submit(flow.suggestedName ?? undefined)}
-              className="min-h-11 rounded-neo border-3 border-neo-cream bg-neo-navy px-3 py-2 font-neo-display text-sm font-black uppercase text-neo-lime shadow-hard-sm"
+              className="min-h-11 rounded-neo border-3 border-neo-cream bg-neo-navy px-3 py-2 font-neo-display text-sm font-black uppercase text-neo-lime shadow-hard-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
             >
               {t(`${K}.useSuggestedName`, { suggestedName: flow.suggestedName })}
             </button>

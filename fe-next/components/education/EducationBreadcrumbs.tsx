@@ -192,7 +192,7 @@ export const EducationBreadcrumbs = memo<EducationBreadcrumbsProps>(({
               ) : (
                 <Link
                   href={item.href}
-                  className={cn(
+                  className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
                     'text-neo-white hover:text-neo-white',
                     'transition-colors duration-100',
                     'truncate max-w-[100px] sm:max-w-none',

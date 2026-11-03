@@ -9,7 +9,7 @@
       "name": "¿Es LexiClash gratis para maestros?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Sí. Cada maestro obtiene una prueba gratuita de 14 días de Teacher Pro: juego en clase, duelos 1v1, los seis idiomas, sin anuncios, sin inicios de sesión de estudiantes, sin tarjeta de crédito. Después de la prueba, el juego de aula sigue siendo gratis para maestros individuales — hasta 3 clases de 50 estudiantes cada una. Teacher Pro cuesta $9/mes y agrega análisis por clase, informes de progreso en PDF/CSV y clases ilimitadas."
+        "text": "Sí. Cada maestro obtiene una prueba gratuita de 14 días de Teacher Pro: juego en clase, los 7 modos de juego, los seis idiomas, sin anuncios, sin inicios de sesión de estudiantes, sin tarjeta de crédito. Después de la prueba, el juego de aula sigue siendo gratis para maestros individuales — hasta 3 clases de 50 estudiantes cada una. Teacher Pro cuesta $9/mes y agrega análisis por clase, informes de progreso en PDF/CSV y clases ilimitadas."
       }
     },
     {
@@ -49,7 +49,7 @@
       "name": "¿En qué se diferencia de Kahoot, Gimkit o Quizlet?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Esas son herramientas de cuestionarios/tarjetas que priorizan el inglés. LexiClash es un juego de construcción de palabras (no opción múltiple), admite seis idiomas incluido hebreo RTL, permite que una clase completa de hasta 50 estudiantes juegue gratis, y ofrece verdaderos duelos 1v1."
+        "text": "Esas son herramientas de cuestionarios/tarjetas que priorizan el inglés. LexiClash es un juego de construcción de palabras (no opción múltiple), admite seis idiomas incluido hebreo RTL, permite que una clase completa de hasta 50 estudiantes juegue gratis, con 7 modos en vivo."
       }
     },
     {

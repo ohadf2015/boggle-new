@@ -38,11 +38,11 @@ export default function RewardChipRow({ label, chips, reduced, delay = 0 }: Prop
           initial={reduced ? false : { opacity: 0, y: 18, scale: 0.92 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.25, ease: EASE_OUT, delay: delay + i * 0.08 }}
-          className="relative flex min-h-[8.5rem] flex-col items-center justify-center gap-1 rounded-2xl border-[3px] border-black bg-white px-1.5 pb-2.5 pt-3 text-center text-neo-navy shadow-[4px_4px_0_0_#000]"
+          className="relative flex min-h-[8.5rem] flex-col items-center justify-center gap-1 rounded-2xl border-[3px] border-neo-black bg-neo-white px-1.5 pb-2.5 pt-3 text-center text-neo-navy shadow-[4px_4px_0_0_rgb(var(--neo-black))]"
         >
           {chip.badge && (
             <span
-              className={cn('absolute -top-3 max-w-[90%] truncate rounded-full border-2 border-black px-2 text-[11px] font-black uppercase leading-5 tracking-wide text-black shadow-[2px_2px_0_0_#000]', !chip.badgeHex && 'bg-neo-yellow')}
+              className={cn('absolute -top-3 max-w-[90%] truncate rounded-full border-2 border-neo-black px-2 text-xs font-black uppercase leading-5 tracking-wide text-neo-black shadow-[2px_2px_0_0_rgb(var(--neo-black))]', !chip.badgeHex && 'bg-neo-yellow')}
               style={chip.badgeHex ? { background: chip.badgeHex } : undefined}
             >
               {chip.badge}
@@ -60,8 +60,8 @@ export default function RewardChipRow({ label, chips, reduced, delay = 0 }: Prop
 /** The XP mark on a reward card. */
 export function XpIcon() {
   return (
-    <span className="grid h-12 w-12 place-items-center rounded-full border-[3px] border-black bg-neo-lime shadow-[2px_2px_0_0_#000]">
-      <Zap className="h-6 w-6 fill-black text-black" />
+    <span className="grid h-12 w-12 place-items-center rounded-full border-[3px] border-neo-black bg-neo-lime shadow-[2px_2px_0_0_rgb(var(--neo-black))]">
+      <Zap className="h-6 w-6 fill-black text-neo-black" />
     </span>
   );
 }

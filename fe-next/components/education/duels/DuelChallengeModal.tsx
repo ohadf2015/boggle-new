@@ -134,7 +134,7 @@ export default function DuelChallengeModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-neo border-[2px] border-neo-cream p-1 text-neo-cream transition-colors hover:bg-neo-cream hover:text-neo-navy"
+            className="rounded-neo border-[2px] border-neo-cream p-1 text-neo-cream transition-colors hover:bg-neo-cream hover:text-neo-navy focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
             aria-label={t('common.close')}
           >
             <X className="w-6 h-6" />
@@ -172,7 +172,7 @@ export default function DuelChallengeModal({
               data-testid="duel-challenge-change"
               aria-expanded={showSetup}
               onClick={() => setShowSetup((open) => !open)}
-              className="inline-flex shrink-0 items-center gap-1 rounded-neo border-[2px] border-neo-cream bg-neo-navy px-2.5 py-1 font-neo-body text-xs font-black uppercase tracking-widest text-neo-cream transition-colors hover:bg-neo-cream hover:text-neo-navy"
+              className="inline-flex shrink-0 items-center gap-1 rounded-neo border-[2px] border-neo-cream bg-neo-navy px-2.5 py-1 font-neo-body text-xs font-black uppercase tracking-widest text-neo-cream transition-colors hover:bg-neo-cream hover:text-neo-navy focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
             >
               {t('education.duels.changeSetup')}
               <ChevronDown
@@ -195,7 +195,7 @@ export default function DuelChallengeModal({
                     data-testid="duel-type-async"
                     aria-pressed={duelType === 'async'}
                     onClick={() => setDuelType('async')}
-                    className={cn(
+                    className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
                       'rounded-neo p-3 text-start shadow-hard-sm transition',
                       // Selected differs by FILL, not by a tint; the unselected
                       // tile keeps a cream edge because black on navy is 1.23:1.
@@ -220,7 +220,7 @@ export default function DuelChallengeModal({
                     data-testid="duel-type-realtime"
                     aria-pressed={duelType === 'realtime'}
                     onClick={() => setDuelType('realtime')}
-                    className={cn(
+                    className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
                       'rounded-neo p-3 text-start shadow-hard-sm transition',
                       duelType === 'realtime'
                         ? 'border-[3px] border-neo-black bg-neo-lime text-neo-black shadow-hard'
@@ -229,7 +229,7 @@ export default function DuelChallengeModal({
                   >
                     <div className="mb-1 flex items-center gap-1.5">
                       <span className="text-base font-black">{t('realTime')}</span>
-                      <span className="rounded-neo border-[2px] border-neo-black bg-neo-cyan px-1.5 py-0.5 font-neo-body text-[9px] font-black uppercase tracking-widest text-neo-black">
+                      <span className="rounded-neo border-[2px] border-neo-black bg-neo-cyan px-1.5 py-0.5 font-neo-body text-xs font-black uppercase tracking-widest text-neo-black">
                         {t('education.duels.recommended')}
                       </span>
                     </div>
@@ -282,7 +282,7 @@ export default function DuelChallengeModal({
           <button
             type="button"
             onClick={onClose}
-            className={cn(
+            className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
               'flex-1 px-6 py-3 font-bold rounded-neo',
               'bg-neo-navy text-neo-cream',
               'border-[3px] border-neo-cream shadow-hard-sm',
@@ -297,7 +297,7 @@ export default function DuelChallengeModal({
             data-testid="duel-challenge-send"
             onClick={handleSendChallenge}
             disabled={!selectedLessonId || isCreating}
-            className={cn(
+            className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
               'flex-1 px-6 py-3 font-bold rounded-neo',
               'bg-neo-lime text-neo-black',
               'border-[3px] border-neo-black shadow-hard',

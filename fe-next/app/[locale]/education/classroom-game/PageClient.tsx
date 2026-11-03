@@ -51,6 +51,7 @@ function previewKind(value: string | null | undefined): LiveSurfacePreviewKind |
  *
  * lessonId is optional — when omitted, the lobby lets the teacher pick lessons.
  */
+// Query contract (the only params this lobby reads): classroomId+lessonId preselect, mode+minutes+questions+seconds shape the round, pack+preset run a session, cefr picks an ESL list, flow=quickLaunch|quick|repeatLast; junk values are dropped.
 function ClassroomGameInner() {
   const { user, loading: authLoading } = useAuth();
   const { t, language } = useLanguage();

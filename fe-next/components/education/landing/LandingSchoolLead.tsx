@@ -59,7 +59,7 @@ export function LandingSchoolLead() {
                   trackGrowthEvent('landing_cta_clicked', { cta: 'education_school_quote' });
                   setOpen(true);
                 }}
-                className="min-h-12 w-full rounded-neo border-3 border-neo-black bg-neo-lime px-5 font-neo-display text-base font-black uppercase text-neo-navy shadow-hard transition-transform duration-100 hover:-translate-y-0.5 active:translate-y-0.5 motion-reduce:transition-none"
+                className="min-h-12 w-full rounded-neo border-3 border-neo-black bg-neo-lime px-5 font-neo-display text-base font-black uppercase text-neo-navy shadow-hard transition-transform duration-100 hover:-translate-y-0.5 active:translate-y-0.5 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
               >
                 {t('eg2Land.school.cta')}
               </button>

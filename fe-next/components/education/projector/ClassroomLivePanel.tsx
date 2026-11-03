@@ -88,7 +88,7 @@ export const ClassroomLivePanel = memo<ClassroomLivePanelProps>(function Classro
               <BookOpen className="size-[1.1em] shrink-0 text-neo-cyan" aria-hidden />
               {t('eduLive.live.lessonFound', { found: lessonFound, total: lessonTotal })}
             </span>
-            <span className="relative h-[clamp(10px,1.6cqh,20px)] overflow-hidden rounded-full border-[3px] border-neo-cream bg-neo-navy">
+            <span aria-hidden="true" className="relative h-[clamp(10px,1.6cqh,20px)] overflow-hidden rounded-full border-[3px] border-neo-cream bg-neo-navy">
               <span
                 className="absolute inset-y-0 start-0 rounded-full bg-neo-cyan transition-[width] duration-500 ease-out motion-reduce:transition-none"
                 style={{ width: `${lessonPct}%` }}

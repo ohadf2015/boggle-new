@@ -30,7 +30,7 @@ export default function RoundShop({ gameCode, compact = false }: { gameCode: str
             data-testid="round-shop-open"
             onClick={() => setOpen(true)}
             disabled={!canBuy}
-            className="flex min-h-11 w-full items-center justify-between gap-2 rounded-neo border-[3px] border-neo-cream/60 bg-neo-navy-elevated px-3 font-neo-display text-sm font-black text-neo-cream shadow-hard-sm disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex min-h-11 w-full items-center justify-between gap-2 rounded-neo border-[3px] border-neo-cream/60 bg-neo-navy-elevated px-3 font-neo-display text-sm font-black text-neo-cream shadow-hard-sm disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
           >
             <span className="min-w-0 truncate text-start">{t('economy.shop.title')}</span>
             <span className="shrink-0 tabular-nums text-neo-lime">{t('economy.shop.open', { cash: shop.cash })}</span>
@@ -54,8 +54,8 @@ export default function RoundShop({ gameCode, compact = false }: { gameCode: str
             className={cn(
               'min-h-14 w-full rounded-xl border-4 px-3 text-lg font-black transition-transform duration-150 ease-out',
               canBuy
-                ? 'border-black bg-neo-lime text-neo-navy shadow-hard-lg hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan active:scale-[0.97]'
-                : 'cursor-not-allowed border-white/20 bg-white/5 text-white/50'
+                ? 'border-neo-black bg-neo-lime text-neo-navy shadow-hard-lg hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan active:scale-[0.97]'
+                : 'cursor-not-allowed border-neo-white/20 bg-neo-white/5 text-neo-white/50'
             )}
           >
             {t('economy.shop.open', { cash: shop.cash })}
@@ -82,7 +82,7 @@ export default function RoundShop({ gameCode, compact = false }: { gameCode: str
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="min-h-11 rounded-lg border-2 border-black bg-neo-cream px-3 font-bold text-neo-navy"
+              className="min-h-11 rounded-lg border-2 border-neo-black bg-neo-cream px-3 font-bold text-neo-navy focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
             >
               {t('economy.shop.close')}
             </button>

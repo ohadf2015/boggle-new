@@ -48,7 +48,7 @@ export function BoardPreview({ list, title, hiddenLabel }: { list: WordList; tit
               >
                 {ch}
                 {step !== undefined && (
-                  <span className="absolute end-0.5 top-0 text-[9px] font-black text-neo-navy/60">{step + 1}</span>
+                  <span className="absolute end-0.5 top-0 text-xs leading-none font-black text-neo-navy/60">{step + 1}</span>
                 )}
               </span>
             );

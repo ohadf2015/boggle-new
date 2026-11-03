@@ -201,10 +201,10 @@ export function JoinFlow({
           )}
         </main>
         <nav className="relative z-10 flex justify-center gap-4 px-4 pb-3 text-xs text-neo-white/60">
-          <Link prefetch={false} href={`/${language}/legal/privacy`} className="underline-offset-2 hover:text-neo-white hover:underline">
+          <Link prefetch={false} href={`/${language}/legal/privacy`} className="underline-offset-2 hover:text-neo-white hover:underline focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black">
             {t('legal.privacyPolicy')}
           </Link>
-          <Link prefetch={false} href={`/${language}/legal/terms`} className="underline-offset-2 hover:text-neo-white hover:underline">
+          <Link prefetch={false} href={`/${language}/legal/terms`} className="underline-offset-2 hover:text-neo-white hover:underline focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black">
             {t('legal.termsOfService')}
           </Link>
         </nav>

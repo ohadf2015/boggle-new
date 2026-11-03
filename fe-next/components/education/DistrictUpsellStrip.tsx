@@ -75,7 +75,7 @@ export function DistrictUpsellStrip({ hideTeacherCta = false }: { hideTeacherCta
               onClick={() =>
                 trackGrowthEvent('landing_cta_clicked', { cta: 'teacher_individual' })
               }
-              className="shrink-0 rounded-neo border-neo border-neo-lime bg-neo-lime/20 px-5 py-2.5 font-bold text-neo-white shadow-hard-sm transition hover:bg-neo-lime/30 hover:shadow-hard"
+              className="shrink-0 rounded-neo border-neo border-neo-lime bg-neo-lime/20 px-5 py-2.5 font-bold text-neo-white shadow-hard-sm transition hover:bg-neo-lime/30 hover:shadow-hard focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
             >
               {t('education.landing.teacherLeadCta.button')}
             </Link>
@@ -99,7 +99,7 @@ export function DistrictUpsellStrip({ hideTeacherCta = false }: { hideTeacherCta
             onClick={() =>
               trackGrowthEvent('landing_cta_clicked', { cta: 'district_upsell' })
             }
-            className="shrink-0 rounded-neo border-neo border-neo-purple bg-neo-purple/20 px-5 py-2.5 font-bold text-neo-white shadow-hard-sm transition hover:bg-neo-purple/30 hover:shadow-hard"
+            className="shrink-0 rounded-neo border-neo border-neo-purple bg-neo-purple/20 px-5 py-2.5 font-bold text-neo-white shadow-hard-sm transition hover:bg-neo-purple/30 hover:shadow-hard focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           >
             {t('education.landing.districtCta.button')}
           </Link>

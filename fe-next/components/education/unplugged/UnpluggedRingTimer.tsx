@@ -38,10 +38,10 @@ export function UnpluggedRingTimer({
 }: UnpluggedRingTimerProps) {
   const clamped = Math.max(0, Math.min(1, progress));
   const stroke = spent
-    ? 'var(--color-neo-white, #fff)'
+    ? 'rgb(var(--neo-white))'
     : urgent
-      ? 'var(--color-neo-orange, #FF6B35)'
-      : 'var(--color-neo-cyan, #00FFFF)';
+      ? 'var(--neo-orange)'
+      : 'var(--neo-cyan)';
 
   return (
     <div
@@ -51,7 +51,7 @@ export function UnpluggedRingTimer({
       className={cn('relative shrink-0 aspect-square', className)}
     >
       <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90" aria-hidden>
-        <circle cx="50" cy="50" r={RADIUS} fill="none" stroke="#000" strokeWidth="11" />
+        <circle cx="50" cy="50" r={RADIUS} fill="none" stroke="rgb(var(--neo-black))" strokeWidth="11" />
         <circle
           cx="50"
           cy="50"

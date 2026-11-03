@@ -86,7 +86,7 @@ export function SocrativeFreeTierHonestyStrip({
           href={PRICING_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="underline decoration-neo-cyan/60 underline-offset-2 hover:text-neo-cyan"
+          className="underline decoration-neo-cyan/60 underline-offset-2 hover:text-neo-cyan focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           data-testid="socrative-free-pricing-link"
         >
           {t('education.vsSocrative.freeTier.citePlansLabel')}
@@ -96,7 +96,7 @@ export function SocrativeFreeTierHonestyStrip({
           href={HELP_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="underline decoration-neo-cyan/60 underline-offset-2 hover:text-neo-cyan"
+          className="underline decoration-neo-cyan/60 underline-offset-2 hover:text-neo-cyan focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           data-testid="socrative-free-help-link"
         >
           {t('education.vsSocrative.freeTier.citeHelpLabel')}
@@ -107,7 +107,7 @@ export function SocrativeFreeTierHonestyStrip({
       <div className="mt-5">
         <Link
           href={`/${loc}/education/classroom-game`}
-          className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition hover:shadow-hard-lg"
+          className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition hover:shadow-hard-lg focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           data-testid="socrative-free-tier-cta"
         >
           {t('education.vsSocrative.freeTier.cta')}

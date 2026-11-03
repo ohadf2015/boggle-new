@@ -44,6 +44,9 @@ import { FullReportDisclosure, ReportDisclosure, SectionDisclosure } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ParentReportPack } from '@/components/teacher/pro/ParentReportPack';
 import { StudentParentPreview } from '@/components/teacher/reports/StudentParentPreview';
+import { ReportsClassEmpty } from './ReportsClassEmpty';
+import { ReportsReteachPanel } from './ReportsReteachPanel';
+import { ReportsLockedTitle } from './ReportsLockedTitle';
 
 /** Slide distance for the drill-down; the direction follows depth and locale. */
 const SLIDE_PX = 56;
@@ -185,8 +188,8 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
 
   const offset = SLIDE_PX * (dir === 'rtl' ? -1 : 1);
   const variants = {
-    enter: (d: number) => ({ opacity: 0, x: reduceMotion ? 0 : d * offset, scale: reduceMotion ? 1 : 0.97 }),
-    center: { opacity: 1, x: 0, scale: 1 },
+    enter: (d: number) => ({ x: reduceMotion ? 0 : d * offset, scale: reduceMotion ? 1 : 0.97 }),
+    center: { x: 0, scale: 1 },
     exit: (d: number) => ({
       opacity: 0,
       x: reduceMotion ? 0 : -d * offset * 0.5,
@@ -204,8 +207,15 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
           </h1>
           {hasPro ? <TeacherPlanBadge /> : null}
         </div>
+        <p data-testid="reports-value-line" dir="auto" className="-mt-3 mb-6 max-w-prose text-sm leading-snug text-neo-cream sm:text-base">
+          {t('teacher.reports.valueLine', 'After every game, see which words each class missed, who needs help, and what to practice next.')}
+        </p>
 
-        <h2 className="mb-3 text-base font-bold text-neo-cream/80">{t('teacher.reports.selectClassroom')}</h2>
+        {classrooms && classrooms.length > 0 ? (
+          <ReportsReteachPanel classrooms={classrooms} onOpenClass={handleClassroomSelect} />
+        ) : null}
+
+        <h2 className="mb-3 text-base font-bold text-neo-cream">{t('teacher.reports.selectClassroom')}</h2>
 
         {classroomsLoading ? (
           <div aria-busy="true" className="grid gap-3 sm:grid-cols-2">
@@ -250,6 +260,8 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
     );
   } else {
     const selectedClassroom = classrooms?.find((c) => c.id === selectedClassroomId);
+    // No one has joined, so no game has been played: tabs of empty panels would only say "nothing" five ways.
+    const classIsEmpty = selectedClassroom?.member_count === 0;
     view = (
       <div className="space-y-4 sm:space-y-5">
         <div className="flex flex-wrap items-stretch gap-3">
@@ -258,6 +270,13 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
           </div>
           {hasPro ? <TeacherPlanBadge /> : null}
         </div>
+        {classIsEmpty ? (
+          <ReportsClassEmpty classroomId={selectedClassroomId} />
+        ) : (
+        <>
+        {classrooms ? (
+          <ReportsReteachPanel classrooms={classrooms} onOpenClass={handleClassroomSelect} focusClassroomId={selectedClassroomId} />
+        ) : null}
         <Tabs value={section} onValueChange={setSection} className="space-y-3">
           <TabsList aria-label={t('teacher.reports.tabs.label')} className="grid h-auto w-full grid-cols-5 gap-1.5 rounded-neo border-2 border-neo-cream/40 bg-neo-navy p-1.5">
             {REPORT_TABS.map((id) => (
@@ -347,12 +366,14 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
             </FullReportDisclosure>
           </TabsContent>
         </Tabs>
+        </>
+        )}
       </div>
     );
   }
 
   return (
-    <div ref={viewRef} className="mx-auto max-w-5xl scroll-mt-4">
+    <div ref={viewRef} className="mx-auto w-full max-w-5xl scroll-mt-4">
       {/* The shell's scroll region is overflow-y:auto, which makes x auto too:
           the slide would flash a horizontal scrollbar. Clip x, padded so the
           hard offset shadows stay inside the clip. */}
@@ -368,7 +389,7 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
             transition={
               reduceMotion
                 ? { duration: 0.12 }
-                : { x: { type: 'spring', stiffness: 320, damping: 30 }, scale: { type: 'spring', stiffness: 320, damping: 30 }, opacity: { duration: 0.2, ease: EASE_OUT_EXPO } }
+                : { x: { type: 'spring', stiffness: 320, damping: 30 }, scale: { type: 'spring', stiffness: 320, damping: 30 }, opacity: { duration: 0.16, ease: EASE_OUT_EXPO } }
             }
           >
             {view}
@@ -383,7 +404,7 @@ const REPORT_TABS = ['students', 'games', 'pulse', 'homework', 'more'] as const;
 
 // Selected = lime ring on navy-light; unselected keeps a cream edge so it reads as tappable.
 const REPORT_TAB =
-  'min-h-10 h-auto min-w-0 whitespace-normal rounded-neo border-[2px] px-1 py-1.5 font-neo-body text-xs font-bold leading-tight sm:text-sm data-[state=inactive]:border-neo-cream/40 data-[state=inactive]:text-neo-cream data-[state=active]:border-neo-lime data-[state=active]:bg-neo-navy-light data-[state=active]:text-neo-cream data-[state=active]:ring-2 data-[state=active]:ring-neo-lime';
+  'min-h-11 h-auto min-w-0 whitespace-normal rounded-neo border-[2px] px-1 py-1.5 font-neo-body text-xs font-bold leading-tight sm:text-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan data-[state=inactive]:border-neo-cream/40 data-[state=inactive]:text-neo-cream data-[state=active]:border-neo-lime data-[state=active]:bg-neo-navy-light data-[state=active]:text-neo-cream data-[state=active]:ring-2 data-[state=active]:ring-neo-lime';
 
 // Dev-only fixture so the round report can be judged without a played round.
 function roundPreviewProps(value: string | null | undefined) {
@@ -421,15 +442,6 @@ export function ReportsProGate({ children }: { children: React.ReactNode }) {
   );
 }
 
-function ReportsLockedTitle() {
-  const { t } = useLanguage();
-  return (
-    <h1 className="mb-4 font-neo-display text-2xl font-bold leading-tight text-neo-white sm:mb-6 sm:text-3xl">
-      {t('teacher.reports.title')}
-    </h1>
-  );
-}
-
 function ReportsChecking() {
   const { t } = useLanguage();
   return (
@@ -462,7 +474,10 @@ function ReportsShell({ children }: { children: React.ReactNode }) {
     >
       {/* Calm canvas (Teacher HQ recipe): flat navy, no full-bleed illustration
           behind a working deck. Dark-only surface (pitfall 5). */}
-      <div className="relative">{children}</div>
+      {/* On a phone the trial strip's full-width button would be the first tap and push the reteach action below the fold. */}
+      <div className="relative max-sm:flex max-sm:flex-col [&>[data-testid=pro-trial-preview]]:mx-auto [&>[data-testid=pro-trial-preview]]:max-w-5xl max-sm:[&>[data-testid=pro-trial-preview]]:order-last max-sm:[&>[data-testid=pro-trial-preview]]:mb-0 max-sm:[&>[data-testid=pro-trial-preview]]:mt-4">
+        {children}
+      </div>
     </EducationShell>
   );
 }

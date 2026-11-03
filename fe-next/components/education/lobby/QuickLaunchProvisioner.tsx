@@ -129,7 +129,7 @@ export function QuickLaunchProvisioner({ intent, onReady, onOpenFullSetup }: Qui
             setFailure(null);
             setAttempt((n) => n + 1);
           }}
-          className="inline-flex min-h-11 items-center rounded-neo border-3 border-neo-black bg-neo-lime px-6 py-2.5 font-neo-display font-black uppercase text-neo-black shadow-hard transition-transform active:translate-y-0.5"
+          className="inline-flex min-h-11 items-center rounded-neo border-3 border-neo-black bg-neo-lime px-6 py-2.5 font-neo-display font-black uppercase text-neo-black shadow-hard transition-transform active:translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
         >
           {t('teacher.playNow.retry')}
         </button>
@@ -137,7 +137,7 @@ export function QuickLaunchProvisioner({ intent, onReady, onOpenFullSetup }: Qui
           type="button"
           data-testid="quick-launch-open-full-setup"
           onClick={onOpenFullSetup}
-          className="inline-flex min-h-11 items-center rounded-neo border-3 border-neo-black bg-neo-cyan px-6 py-2.5 font-neo-display font-black uppercase text-neo-black shadow-hard-sm transition-transform active:translate-y-0.5"
+          className="inline-flex min-h-11 items-center rounded-neo border-3 border-neo-black bg-neo-cyan px-6 py-2.5 font-neo-display font-black uppercase text-neo-black shadow-hard-sm transition-transform active:translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
         >
           {t('teacher.playNow.openFullSetup')}
         </button>

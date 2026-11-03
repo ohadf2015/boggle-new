@@ -138,7 +138,7 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
         className="mb-5 flex flex-wrap items-center gap-x-5 gap-y-2 rounded-neo border-[3px] border-neo-black bg-neo-cream px-4 py-3 shadow-hard"
       >
         <div>
-          <p className="font-neo-body text-[10px] font-black uppercase tracking-widest text-neo-black/70">
+          <p className="font-neo-body text-xs font-black uppercase tracking-widest text-neo-black/70">
             {t('duels.wins')}
           </p>
           <p className="font-neo-display text-2xl font-black tabular-nums leading-none text-neo-black">
@@ -146,7 +146,7 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
           </p>
         </div>
         <div>
-          <p className="font-neo-body text-[10px] font-black uppercase tracking-widest text-neo-black/70">
+          <p className="font-neo-body text-xs font-black uppercase tracking-widest text-neo-black/70">
             {t('duels.losses')}
           </p>
           <p className="font-neo-display text-2xl font-black tabular-nums leading-none text-neo-black">
@@ -154,7 +154,7 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
           </p>
         </div>
         <div>
-          <p className="font-neo-body text-[10px] font-black uppercase tracking-widest text-neo-black/70">
+          <p className="font-neo-body text-xs font-black uppercase tracking-widest text-neo-black/70">
             {t('duels.winRate')}
           </p>
           <p className="font-neo-display text-2xl font-black tabular-nums leading-none text-neo-black">
@@ -171,7 +171,7 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
             <span className="font-neo-display text-lg font-black tabular-nums leading-none text-neo-black">
               {stats.winStreak}
             </span>
-            <span className="font-neo-body text-[10px] font-black uppercase tracking-widest text-neo-black">
+            <span className="font-neo-body text-xs font-black uppercase tracking-widest text-neo-black">
               {t('duels.winStreak')}
             </span>
           </span>

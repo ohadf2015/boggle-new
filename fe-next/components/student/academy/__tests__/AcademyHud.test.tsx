@@ -42,6 +42,6 @@ describe('<AcademyHud> streak flame', () => {
 
   it('says so out loud — a visual-only warning is no warning', () => {
     render(<AcademyHud {...base} streak={4} streakAtRisk />);
-    expect(screen.getByTestId('academy-streak-flame')).toHaveAttribute('aria-label', 'academy.student.streakAtRiskAria');
+    expect(screen.getByText('academy.student.streakAtRiskAria')).toHaveClass('sr-only');
   });
 });

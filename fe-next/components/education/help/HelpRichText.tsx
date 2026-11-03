@@ -30,7 +30,7 @@ export function HelpRichText({ text, locale }: { text: string; locale: string })
             <Link
               key={i}
               href={linkHref(locale, seg.target)}
-              className="font-bold text-neo-cyan underline decoration-2 underline-offset-4 hover:text-neo-lime"
+              className="font-bold text-neo-cyan underline decoration-2 underline-offset-4 hover:text-neo-lime focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
             >
               {seg.value}
             </Link>

@@ -94,13 +94,13 @@ export function EducationLandingProjector({ youScore, children }: { youScore: nu
               style={{ transitionDelay: popped ? `${rank * POP_STEP_MS}ms` : '0ms' }}
             >
               <div className="flex items-center gap-1.5">
-                <span className={cn('grid size-5 shrink-0 place-items-center rounded-full border-2 border-neo-black text-[10px] font-black', CHIP_TONE[p])}>
+                <span className={cn('grid size-5 shrink-0 place-items-center rounded-full border-2 border-neo-black text-xs font-black', CHIP_TONE[p])}>
                   {t(NAME_KEYS[p]).charAt(0)}
                 </span>
                 <span className="min-w-0 flex-1 truncate text-xs font-bold text-neo-cream">{t(NAME_KEYS[p])}</span>
                 <span className="font-neo-display text-sm font-black tabular-nums text-neo-cream">{scores[p]}</span>
               </div>
-              <span className="mt-1 block h-1.5 overflow-hidden rounded-full bg-neo-cream/15">
+              <span aria-hidden="true" className="mt-1 block h-1.5 overflow-hidden rounded-full bg-neo-cream/15">
                 <span
                   className={cn(
                     'block h-full rounded-full transition-[width] duration-300 motion-reduce:transition-none',

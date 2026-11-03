@@ -49,6 +49,9 @@ vi.mock('@/utils/accessibility', () => ({
   isReducedMotionPreferred: () => false,
 }));
 
+const classes = vi.hoisted(() => ({ value: { classrooms: [] as unknown[], isLoading: false, error: null as string | null } }));
+vi.mock('@/hooks/useClassroom', () => ({ useClassrooms: () => classes.value }));
+
 let mockTeacherAccessState: any = {
   hasAccess: false,
   status: 'none',
@@ -63,20 +66,45 @@ vi.mock('@/lib/education/useTeacherAccess', () => ({
 
 import { PageClient } from '../PageClient';
 
-describe('<PageClient> — a returning teacher with access is one tap from HQ', () => {
+describe('<PageClient> — an approved teacher is one tap from the right next step', () => {
   beforeEach(() => {
     mockTeacherAccessState = { hasAccess: true, status: 'approved', latestRequest: null, trial: null, isLoading: false };
+    classes.value = { classrooms: [], isLoading: false, error: null };
   });
 
-  it('Given access, Then the HQ link is the first link on the page and the apply pitch is gone', () => {
+  it('Given no class yet, Then "Start your first class" is the first link and the dashboard comes second', () => {
     render(<PageClient />);
-    const main = screen.getByRole('main');
-    const firstLink = main.querySelector('a');
-    expect(firstLink).toHaveTextContent('education.access.go_to_teacher');
-    expect(firstLink).toHaveAttribute('href', '/en/teacher');
+    const links = Array.from(screen.getByRole('main').querySelectorAll('a'));
+    expect(links[0]).toHaveTextContent('education.trial.cta');
+    expect(links[0]).toHaveAttribute('href', '/en/teacher/classroom/new');
+    expect(links[1]).toHaveTextContent('education.access.go_to_teacher');
+    expect(links[1]).toHaveAttribute('href', '/en/teacher');
     expect(screen.queryByText('education.access.h1')).toBeNull();
     expect(screen.queryByText('education.access.next.step1_title')).toBeNull();
     expect(screen.queryByTestId('district-upsell')).toBeNull();
+  });
+
+  it('Given a class already exists, Then the dashboard is the only action', () => {
+    classes.value = { classrooms: [{ id: 'c1' }], isLoading: false, error: null };
+    render(<PageClient />);
+    const links = Array.from(screen.getByRole('main').querySelectorAll('a'));
+    expect(links[0]).toHaveTextContent('education.access.go_to_teacher');
+    expect(screen.queryByText('education.trial.cta')).toBeNull();
+  });
+
+  it('Given the class list is still loading, Then no action is offered that could flip a moment later', () => {
+    classes.value = { classrooms: [], isLoading: true, error: null };
+    render(<PageClient />);
+    expect(screen.getByRole('main').querySelectorAll('a')).toHaveLength(0);
+    expect(screen.getByTestId('approved-actions-loading')).toBeInTheDocument();
+  });
+
+  it('Given the class list failed to load, Then only the dashboard is offered, never "first class"', () => {
+    classes.value = { classrooms: [], isLoading: false, error: 'Failed to load classrooms' };
+    render(<PageClient />);
+    const links = Array.from(screen.getByRole('main').querySelectorAll('a'));
+    expect(links).toHaveLength(1);
+    expect(links[0]).toHaveTextContent('education.access.go_to_teacher');
   });
 
   it('Given access, Then the approved title is the page heading', () => {

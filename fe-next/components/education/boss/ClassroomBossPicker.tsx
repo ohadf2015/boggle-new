@@ -35,7 +35,7 @@ export function ClassroomBossPicker({ value, onChange }: ClassroomBossPickerProp
           <Link
             href={`/${language}/teacher/upgrade`}
             data-testid="boss-picker-pro"
-            className="inline-flex min-h-8 items-center gap-1.5 rounded-neo border-2 border-neo-cream/35 bg-transparent px-2.5 py-0.5 font-neo-display text-xs font-bold text-neo-cream transition-colors hover:border-neo-cream/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neo-cream"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-neo border-2 border-neo-cream/35 bg-transparent px-2.5 py-0.5 font-neo-display text-xs font-bold text-neo-cream transition-colors hover:border-neo-cream/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neo-cream"
           >
             <Lock className="size-3" strokeWidth={3} aria-hidden="true" />
             {t('classroomBoss.picker.unlock')}
@@ -76,7 +76,7 @@ export function ClassroomBossPicker({ value, onChange }: ClassroomBossPickerProp
                   </span>
                 )}
               </span>
-              <span dir="auto" className={cn('mt-1 block truncate text-[10px] font-bold leading-tight', locked ? 'text-neo-white/50' : 'text-neo-white')}>
+              <span dir="auto" className={cn('mt-1 block truncate text-xs font-bold leading-tight', locked ? 'text-neo-white/50' : 'text-neo-white')}>
                 {name}
               </span>
             </button>

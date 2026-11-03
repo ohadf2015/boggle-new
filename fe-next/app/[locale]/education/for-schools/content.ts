@@ -2,22 +2,11 @@
 // SEO + GEO page. Localized natively per locale (all six EDUCATION_LOCALES are indexed;
 // see page.tsx robots). The conversion form itself is localized separately via t().
 //
-// Pricing/feature ground truth (keep this in sync with page.tsx orgJsonLd,
-// lib/education/educationPackages.ts and components/education/EducationPackages.tsx):
-//   - Free tier: lib/education/freeTierLimits.ts -- 3 classes of up to 50 students each,
-//     no ads, custom word lists, live whole-class play, 1v1 duels. Not framed as "forever"
-//     (see educationClaims.test.ts) -- it is simply the free tier, with no expiry.
-//   - Teacher Pro: $9/mo (TEACHER_PRO_PRICE_USD) -- unlimited classes, per-class analytics,
-//     PDF/CSV progress reports (components/teacher/reports/ProgressReportPDF.tsx,
-//     lib/education/assignmentProgressReport.ts). 14-day trial (TEACHER_TRIAL_DAYS).
-//   - Schools & departments: $49 per teacher / year for 5+ teachers, invoice or PO via
-//     "Get a school quote" (SCHOOL_PLAN_PRICE_USD / SCHOOL_PRICING). Same offer as
-//     /teacher/upgrade. Admin dashboards, cross-class/district analytics, curriculum
-//     libraries and SSO (Clever/ClassLink/Google) are NOT shipped -- they are roadmap asks
-//     surfaced through the same lead form (schoolLead.ts), never advertised as included.
-//   - Google Classroom: a Stream-share add-on exists today (googleClassroomAddon.ts) --
-//     say "share/post to your Classroom Stream", not "attach" (attachment-API creation is
-//     deferred).
+// Prices, caps, trial length and mode count come from lib/education/proFeatures.ts (P).
+// Admin dashboards, district analytics, curriculum libraries and SSO are roadmap asks,
+// never advertised as included. Google Classroom: say "share to your Classroom Stream".
+
+import { PRO_COPY_PARAMS as P } from '@/lib/education/proFeatures';
 
 export const EDUCATION_LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
 export type EducationLocale = (typeof EDUCATION_LOCALES)[number];
@@ -77,10 +66,10 @@ const EN: ForSchoolsContent = {
   heroH1: 'Vocabulary games your whole school can',
   heroHighlight: 'actually use',
   heroSubtitle:
-    'Try Teacher Pro free for 14 days -- no student logins, no credit card. No ads anywhere in the classroom, ever. 6 languages including Hebrew RTL, live whole-class play for up to 50 students, and 1v1 word duels. After your trial, the classroom game stays free for individual teachers -- Teacher Pro and Schools & departments scale up from there.',
+    `Try Teacher Pro free for ${P.days} days -- no student logins, no credit card. No ads anywhere in the classroom, ever. ${P.languages} languages including Hebrew RTL, live whole-class play for up to ${P.students} students, and ${P.modes} live game modes. After your trial, the classroom game stays free for individual teachers -- Teacher Pro and Schools & departments scale up from there.`,
   freeForeverTitle: 'Start free -- Teacher Pro $9/mo, Schools & departments from $49 per teacher / year',
   freeForeverBody:
-    'Every teacher gets a 14-day free trial of Teacher Pro. After the trial, the classroom game -- live whole-class play, 1v1 duels, custom word lists, no ads -- stays free for individual teachers, for up to 3 classes of 50 students each. Teacher Pro ($9/mo) adds per-class analytics, PDF/CSV progress reports and unlimited classes. Schools & departments are $49 per teacher per year for 5+ teachers, paid by invoice or purchase order — request a quote below. Admin dashboards, cross-class analytics, curriculum libraries and SSO are on our roadmap -- tell us what you need below.',
+    `Every teacher gets a ${P.days}-day free trial of Teacher Pro. After the trial, the classroom game -- live whole-class play, all ${P.modes} game modes, custom word lists, no ads -- stays free for individual teachers, for up to ${P.classes} classes of ${P.students} students each. Teacher Pro (${P.price}/mo) adds per-class analytics, PDF/CSV progress reports and unlimited classes. Schools & departments are ${P.schoolPrice} per teacher per year for ${P.schoolMin}+ teachers, paid by invoice or purchase order — request a quote below. Admin dashboards, cross-class analytics, curriculum libraries and SSO are on our roadmap -- tell us what you need below.`,
   whyTitle: 'Why schools choose LexiClash',
   why: [
     { title: 'No student logins', body: 'Students join a class game with a code -- no accounts to provision, no rostering before you can play, no student data to manage.' },
@@ -93,10 +82,10 @@ const EN: ForSchoolsContent = {
   compareIntro:
     'Free classroom tools vary a lot in what they actually let a real class do before charging per teacher or per student. Here is the honest comparison.',
   compareRows: [
-    { competitor: 'Kahoot', freeTierLimit: 'Free tier allows 10-40 live players depending on account type -- tight for a full class.', lexiclash: 'Every class fits free, up to 50 students. Teacher Pro $9/mo adds analytics and reports.' },
-    { competitor: 'Gimkit', freeTierLimit: 'Free tier allows unlimited players on featured modes, but reports and pro modes are paid.', lexiclash: 'Also free for the whole class (up to 50), plus real 1v1 duels and 6 languages including Hebrew RTL.' },
-    { competitor: 'Vocabulary.com', freeTierLimit: 'No meaningful free tier for real classroom use -- paid plans required to get started.', lexiclash: 'Free for the whole class, no card required. Teacher Pro $9/mo adds analytics and reports.' },
-    { competitor: 'Wordwall', freeTierLimit: 'Free tier limited to a small number of activity types.', lexiclash: 'Every activity, free for the whole class, up to 50 students. Teacher Pro $9/mo unlocks unlimited classes.' },
+    { competitor: 'Kahoot', freeTierLimit: 'Free tier allows 10-40 live players depending on account type -- tight for a full class.', lexiclash: `Every class fits free, up to ${P.students} students. Teacher Pro ${P.price}/mo adds analytics and reports.` },
+    { competitor: 'Gimkit', freeTierLimit: 'Free tier allows unlimited players on featured modes, but reports and pro modes are paid.', lexiclash: `Also free for the whole class (up to ${P.students}), plus ${P.languages} languages including Hebrew RTL.` },
+    { competitor: 'Vocabulary.com', freeTierLimit: 'No meaningful free tier for real classroom use -- paid plans required to get started.', lexiclash: `Free for the whole class, no card required. Teacher Pro ${P.price}/mo adds analytics and reports.` },
+    { competitor: 'Wordwall', freeTierLimit: 'Free tier limited to a small number of activity types.', lexiclash: `Every activity, free for the whole class, up to ${P.students} students. Teacher Pro ${P.price}/mo unlocks unlimited classes.` },
   ],
   compareBreakdownPrompt: 'Want the full breakdown?',
   compareBreakdownCta: 'LexiClash vs Kahoot — feature-by-feature comparison',
@@ -111,15 +100,15 @@ const EN: ForSchoolsContent = {
   ],
   leadTitle: 'Get a school quote',
   leadIntro:
-    "Using LexiClash with your class, or rolling it out to a whole school or department? Tell us what you need -- we'll follow up with a school quote ($49 per teacher / year for 5+ teachers, invoice or PO), or early access to the roadmap features above.",
+    `Using LexiClash with your class, or rolling it out to a whole school or department? Tell us what you need -- we'll follow up with a school quote (${P.schoolPrice} per teacher / year for ${P.schoolMin}+ teachers, invoice or PO), or early access to the roadmap features above.`,
   faqTitle: 'Schools & districts -- frequently asked',
   faqs: [
-    { q: 'Is LexiClash free for teachers?', a: 'Yes. Every teacher gets a 14-day free trial of Teacher Pro: whole-class play, 1v1 duels, all six languages, no ads, no student logins, no credit card. After the trial, the classroom game stays free for individual teachers -- up to 3 classes of 50 students each. Teacher Pro is $9/month and adds per-class analytics, PDF/CSV progress reports and unlimited classes.' },
-    { q: 'What does a school or district plan include?', a: 'Schools & departments are $49 per teacher per year for 5+ teachers, paid by invoice or purchase order via the form on this page — every teacher gets Teacher Pro (analytics, reports, homework tools). Admin dashboards, cross-class analytics, curriculum libraries and SSO for school or district rollout are on our roadmap, not shipped yet -- tell us what you need and we will follow up.' },
+    { q: 'Is LexiClash free for teachers?', a: `Yes. Every teacher gets a ${P.days}-day free trial of Teacher Pro: whole-class play, all ${P.modes} game modes, all six languages, no ads, no student logins, no credit card. After the trial, the classroom game stays free for individual teachers -- up to ${P.classes} classes of ${P.students} students each. Teacher Pro is ${P.price}/month and adds per-class analytics, PDF/CSV progress reports and unlimited classes.` },
+    { q: 'What does a school or district plan include?', a: `Schools & departments are ${P.schoolPrice} per teacher per year for ${P.schoolMin}+ teachers, paid by invoice or purchase order via the form on this page — every teacher gets Teacher Pro (analytics, reports, homework tools). Admin dashboards, cross-class analytics, curriculum libraries and SSO for school or district rollout are on our roadmap, not shipped yet -- tell us what you need and we will follow up.` },
     { q: 'Do students need accounts or logins?', a: 'No. Students join a class game with a code -- nothing to provision, no student data to manage. That makes a school-wide rollout far simpler than tools that require rostering or SSO before play.' },
     { q: 'Which languages are supported?', a: 'English, Hebrew (full right-to-left support), Spanish, Swedish, Japanese and Russian, each with a native dictionary -- built for ESL, bilingual and immersion classrooms.' },
-    { q: 'How do we start our trial or get a school plan?', a: "Sign up as a teacher to start your own 14-day Teacher Pro trial. Rolling out to a school or department instead? Fill in the form on this page with your role, school and how many teachers need Pro, and we'll follow up with a school quote ($49 per teacher / year, 5+ teachers, invoice/PO)." },
-    { q: 'How is this different from Kahoot, Gimkit or Quizlet?', a: 'Those are quiz/flashcard tools that are English-first. LexiClash is a word-building game (not multiple-choice), supports six languages including Hebrew RTL, fits a whole class of up to 50 students for free, and offers true 1v1 duels.' },
+    { q: 'How do we start our trial or get a school plan?', a: `Sign up as a teacher to start your own ${P.days}-day Teacher Pro trial. Rolling out to a school or department instead? Fill in the form on this page with your role, school and how many teachers need Pro, and we'll follow up with a school quote (${P.schoolPrice} per teacher / year, ${P.schoolMin}+ teachers, invoice/PO).` },
+    { q: 'How is this different from Kahoot, Gimkit or Quizlet?', a: `Those are quiz/flashcard tools that are English-first. LexiClash is a word-building game (not multiple-choice), supports six languages including Hebrew RTL, fits a whole class of up to ${P.students} students for free, with ${P.modes} live game modes.` },
     { q: 'Can I use LexiClash for ESL or English language learner (ELL) students?', a: 'Yes — LexiClash was built with language learners in mind. It supports English, Hebrew (RTL), Spanish, Swedish, Japanese and Russian with native dictionaries. Students can compete in their own language or practice the language they are learning, making it a natural fit for ESL, bilingual and immersion classrooms. Word-building gameplay reinforces vocabulary and spelling organically, without passive multiple-choice.' },
     { q: 'Can students use LexiClash as a spelling practice game?', a: 'Yes. LexiClash\'s word-building format — where students find, spell and submit real words against a live opponent or the whole class — makes spelling practice competitive and engaging rather than passive. Teachers use it for spelling warm-ups, end-of-unit vocabulary reviews and in-class tournaments.' },
     { q: 'Does LexiClash work on Chromebooks and school devices?', a: 'Yes. LexiClash runs entirely in the browser — no app to install, no student accounts to provision. It works on Chromebooks, iPads, desktops and phones. Students join with a game code, and teachers can share assignments straight to Google Classroom. District SSO (Clever, ClassLink) is on our roadmap.' },
@@ -141,10 +130,10 @@ const RU: ForSchoolsContent = {
   heroH1: 'Словесные игры, которые ваша школа действительно может',
   heroHighlight: 'использовать',
   heroSubtitle:
-    'Попробуйте Teacher Pro бесплатно 14 дней — без входа для учеников, без кредитной карты. Без рекламы на уроках, никогда. 6 языков, включая иврит с поддержкой RTL, командные игры в реальном времени для всего класса (до 50 учеников) и поединки 1 на 1. После пробного периода командная игра остаётся бесплатной для отдельных учителей — Teacher Pro и план для класса расширяют возможности дальше.',
+    `Попробуйте Teacher Pro бесплатно ${P.days} дней — без входа для учеников, без кредитной карты. Без рекламы на уроках, никогда. ${P.languages} языков, включая иврит с поддержкой RTL, командные игры в реальном времени для всего класса (до ${P.students} учеников) и ${P.modes} живых режимов. После пробного периода командная игра остаётся бесплатной для отдельных учителей — Teacher Pro и план для класса расширяют возможности дальше.`,
   freeForeverTitle: 'Начните бесплатно — Teacher Pro за $9/мес, для школ и кафедр от $49 за учителя в год',
   freeForeverBody:
-    'Каждый учитель получает бесплатный 14-дневный пробный период Teacher Pro. После пробного периода командная игра — живая игра для всего класса, поединки 1 на 1, собственные списки слов, без рекламы — остаётся бесплатной для отдельных учителей, до 3 классов по 50 учеников в каждом. Teacher Pro (за $9/мес) добавляет аналитику по классу, отчёты о прогрессе в PDF/CSV и неограниченное количество классов. Разворачиваете на весь класс или школу? План для школ и кафедр ($49 за учителя в год) охватывает целый класс со всеми функциями Teacher Pro, плюс серии побед класса и приоритетную поддержку. Панель администратора, аналитика между классами, библиотеки учебных материалов и SSO — в нашей дорожной карте. Расскажите нам, что вам нужно, в форме ниже.',
+    `Каждый учитель получает бесплатный ${P.days}-дневный пробный период Teacher Pro. После пробного периода командная игра — живая игра для всего класса, все ${P.modes} игровых режимов, собственные списки слов, без рекламы — остаётся бесплатной для отдельных учителей, до ${P.classes} классов по ${P.students} учеников в каждом. Teacher Pro (за ${P.price}/мес) добавляет аналитику по классу, отчёты о прогрессе в PDF/CSV и неограниченное количество классов. Разворачиваете на весь класс или школу? План для школ и кафедр (${P.schoolPrice} за учителя в год) охватывает целый класс со всеми функциями Teacher Pro, плюс серии побед класса и приоритетную поддержку. Панель администратора, аналитика между классами, библиотеки учебных материалов и SSO — в нашей дорожной карте. Расскажите нам, что вам нужно, в форме ниже.`,
   whyTitle: 'Почему школы выбирают LexiClash',
   why: [
     { title: 'Без входа для учеников', body: 'Ученики присоединяются к командной игре по коду — не нужно создавать аккаунты, не нужна регистрация класса перед началом игры, не нужно управлять данными учеников.' },
@@ -157,10 +146,10 @@ const RU: ForSchoolsContent = {
   compareIntro:
     'Бесплатные инструменты для уроков сильно различаются в том, что они реально позволяют делать настоящему классу, прежде чем начать брать плату за учителя или ученика. Вот честное сравнение.',
   compareRows: [
-    { competitor: 'Kahoot', freeTierLimit: 'Бесплатная версия допускает 10–40 живых игроков в зависимости от типа аккаунта — тесно для полного класса.', lexiclash: 'Любой класс помещается бесплатно, до 50 учеников. Teacher Pro за $9/мес добавляет аналитику и отчёты.' },
-    { competitor: 'Gimkit', freeTierLimit: 'Бесплатная версия допускает неограниченное число игроков в основных режимах, но отчёты и pro-режимы платные.', lexiclash: 'Тоже бесплатно для всего класса (до 50), плюс настоящие поединки 1 на 1 и 6 языков, включая иврит с RTL.' },
-    { competitor: 'Vocabulary.com', freeTierLimit: 'Нет полноценной бесплатной версии для реального использования в классе — для начала нужен платный план.', lexiclash: 'Бесплатно для всего класса, без карты. Teacher Pro за $9/мес добавляет аналитику и отчёты.' },
-    { competitor: 'Wordwall', freeTierLimit: 'Бесплатная версия ограничена небольшим числом типов активностей.', lexiclash: 'Любая активность, бесплатно для всего класса, до 50 учеников. Teacher Pro за $9/мес снимает ограничение на число классов.' },
+    { competitor: 'Kahoot', freeTierLimit: 'Бесплатная версия допускает 10–40 живых игроков в зависимости от типа аккаунта — тесно для полного класса.', lexiclash: `Любой класс помещается бесплатно, до ${P.students} учеников. Teacher Pro за ${P.price}/мес добавляет аналитику и отчёты.` },
+    { competitor: 'Gimkit', freeTierLimit: 'Бесплатная версия допускает неограниченное число игроков в основных режимах, но отчёты и pro-режимы платные.', lexiclash: `Тоже бесплатно для всего класса (до ${P.students}), плюс ${P.languages} языков, включая иврит с RTL.` },
+    { competitor: 'Vocabulary.com', freeTierLimit: 'Нет полноценной бесплатной версии для реального использования в классе — для начала нужен платный план.', lexiclash: `Бесплатно для всего класса, без карты. Teacher Pro за ${P.price}/мес добавляет аналитику и отчёты.` },
+    { competitor: 'Wordwall', freeTierLimit: 'Бесплатная версия ограничена небольшим числом типов активностей.', lexiclash: `Любая активность, бесплатно для всего класса, до ${P.students} учеников. Teacher Pro за ${P.price}/мес снимает ограничение на число классов.` },
   ],
   compareBreakdownPrompt: 'Хотите полное сравнение?',
   compareBreakdownCta: 'LexiClash против Kahoot — сравнение функций',
@@ -175,15 +164,15 @@ const RU: ForSchoolsContent = {
   ],
   leadTitle: 'Расскажите нам о своей школе',
   leadIntro:
-    'Уже используете LexiClash в классе или разворачиваете его на всю школу или район? Расскажите нам, что вам нужно — мы свяжемся с вами по поводу школьного расчёта ($49 за учителя в год), расчёта стоимости для школы или района, или раннего доступа к функциям из дорожной карты выше.',
+    `Уже используете LexiClash в классе или разворачиваете его на всю школу или район? Расскажите нам, что вам нужно — мы свяжемся с вами по поводу школьного расчёта (${P.schoolPrice} за учителя в год), расчёта стоимости для школы или района, или раннего доступа к функциям из дорожной карты выше.`,
   faqTitle: 'Часто задаваемые вопросы школ и районов',
   faqs: [
-    { q: 'LexiClash бесплатен для учителей?', a: 'Да. Каждый учитель получает бесплатный 14-дневный пробный период Teacher Pro: командные игры, поединки 1 на 1, все шесть языков, без рекламы, без входа для учеников, без кредитной карты. После пробного периода командная игра остаётся бесплатной для отдельных учителей — до 3 классов по 50 учеников в каждом. Teacher Pro стоит $9 в месяц и добавляет аналитику по классу, отчёты о прогрессе в PDF/CSV и неограниченное количество классов.' },
-    { q: 'Что включает школьный или районный план?', a: 'План для школ и кафедр ($49 за учителя в год, через форму на этой странице) охватывает целый класс со всеми функциями Teacher Pro — аналитикой, отчётами, инструментами для домашних заданий — плюс серии побед класса и приоритетную поддержку. Панель администратора, аналитика между классами, библиотеки учебных материалов и SSO для развёртывания на уровне школы или района — в нашей дорожной карте и пока не реализованы. Расскажите нам, что вам нужно, и мы свяжемся с вами; цена — по запросу.' },
+    { q: 'LexiClash бесплатен для учителей?', a: `Да. Каждый учитель получает бесплатный ${P.days}-дневный пробный период Teacher Pro: командные игры, все ${P.modes} игровых режимов, все шесть языков, без рекламы, без входа для учеников, без кредитной карты. После пробного периода командная игра остаётся бесплатной для отдельных учителей — до ${P.classes} классов по ${P.students} учеников в каждом. Teacher Pro стоит ${P.price} в месяц и добавляет аналитику по классу, отчёты о прогрессе в PDF/CSV и неограниченное количество классов.` },
+    { q: 'Что включает школьный или районный план?', a: `План для школ и кафедр (${P.schoolPrice} за учителя в год, через форму на этой странице) охватывает целый класс со всеми функциями Teacher Pro — аналитикой, отчётами, инструментами для домашних заданий — плюс серии побед класса и приоритетную поддержку. Панель администратора, аналитика между классами, библиотеки учебных материалов и SSO для развёртывания на уровне школы или района — в нашей дорожной карте и пока не реализованы. Расскажите нам, что вам нужно, и мы свяжемся с вами; цена — по запросу.` },
     { q: 'Нужны ли учащимся аккаунты или вход?', a: 'Нет. Ученики присоединяются к командной игре по коду — не нужно ничего настраивать, не нужно управлять данными учеников. Это делает развертывание по всей школе намного проще, чем инструменты, которые требуют регистрации или SSO перед игрой.' },
     { q: 'Какие языки поддерживаются?', a: 'Английский, иврит (с полной поддержкой справа налево), испанский, шведский, японский и русский, каждый со встроенным словарем — разработано для ESL, двуязычных и погруженных в языковую среду классов.' },
-    { q: 'Как начать пробный период или получить школьный план?', a: 'Зарегистрируйтесь как учитель, чтобы начать собственный 14-дневный пробный период Teacher Pro. Разворачиваете на весь класс или школу? Заполните форму на этой странице, указав свою роль, школу и примерное количество учеников — мы свяжемся с вами по поводу плана для класса или расчёта стоимости для школы или района.' },
-    { q: 'Чем это отличается от Kahoot, Gimkit или Quizlet?', a: 'Это инструменты викторин/карточек, ориентированные на английский язык. LexiClash — это игра в составление слов (не множественный выбор), поддерживает шесть языков, включая иврит с RTL, бесплатно вмещает весь класс до 50 учеников и предлагает настоящие поединки 1 на 1.' },
+    { q: 'Как начать пробный период или получить школьный план?', a: `Зарегистрируйтесь как учитель, чтобы начать собственный ${P.days}-дневный пробный период Teacher Pro. Разворачиваете на весь класс или школу? Заполните форму на этой странице, указав свою роль, школу и примерное количество учеников — мы свяжемся с вами по поводу плана для класса или расчёта стоимости для школы или района.` },
+    { q: 'Чем это отличается от Kahoot, Gimkit или Quizlet?', a: `Это инструменты викторин/карточек, ориентированные на английский язык. LexiClash — это игра в составление слов (не множественный выбор), поддерживает шесть языков, включая иврит с RTL, бесплатно вмещает весь класс до ${P.students} учеников и предлагает ${P.modes} живых режимов.` },
     { q: 'Можно ли использовать LexiClash для ESL или учеников, изучающих английский язык?', a: 'Да — LexiClash разработан с учетом изучающих языки. Поддерживает английский, иврит (RTL), испанский, шведский, японский и русский со встроенными словарями. Ученики могут соревноваться на своем языке или тренировать изучаемый язык, что делает его естественным выбором для ESL, двуязычных и погруженных в языковую среду классов. Игра в составление слов — где ученики находят, пишут и вводят настоящие слова против живого противника или класса — укрепляет словарный запас и орфографию органически, без пассивного множественного выбора.' },
     { q: 'Могут ли ученики использовать LexiClash как игру для тренировки орфографии?', a: 'Да. Формат LexiClash, где ученики находят, пишут и вводят настоящие слова против живого противника или класса, делает тренировку орфографии конкурентной и увлекательной, а не пассивной. Учители используют ее для словарных разминок, финальных обзоров и школьных турниров.' },
     { q: 'Работает ли LexiClash на Chromebook и школьных устройствах?', a: 'Да. LexiClash работает полностью в браузере — не нужно устанавливать приложение, не нужно создавать аккаунты для учеников. Это работает на Chromebook, iPad, ПК и телефонах. Ученики присоединяются по коду игры, а учителя могут делиться заданиями прямо в Google Classroom. SSO на уровне района (Clever, ClassLink) — в нашей дорожной карте.' },
@@ -205,10 +194,10 @@ const HE: ForSchoolsContent = {
   heroH1: 'משחקי אוצר מילים שכל בית הספר שלכם',
   heroHighlight: 'באמת ישתמש בהם',
   heroSubtitle:
-    'נסו את Teacher Pro חינם ל-14 יום — בלי חשבונות תלמידים, בלי כרטיס אשראי. בלי פרסומות בכיתה, אף פעם. 6 שפות כולל עברית מימין לשמאל, משחק כיתתי חי לכל הכיתה (עד 50 תלמידים) ודו-קרבות מילים 1 על 1. בתום הניסיון, המשחק הכיתתי נשאר חינם למורים בודדים — Teacher Pro ותוכנית הכיתה מתרחבות משם.',
+    `נסו את Teacher Pro חינם ל-${P.days} יום — בלי חשבונות תלמידים, בלי כרטיס אשראי. בלי פרסומות בכיתה, אף פעם. ${P.languages} שפות כולל עברית מימין לשמאל, משחק כיתתי חי לכל הכיתה (עד ${P.students} תלמידים) ו-${P.modes} מצבי משחק חיים. בתום הניסיון, המשחק הכיתתי נשאר חינם למורים בודדים — Teacher Pro ותוכנית הכיתה מתרחבות משם.`,
   freeForeverTitle: 'מתחילים חינם — Teacher Pro ב-$9 לחודש, בתי ספר ומחלקות החל מ-$49 למורה לשנה',
   freeForeverBody:
-    'כל מורה מקבל ניסיון חינם של 14 יום ל-Teacher Pro. בתום הניסיון, המשחק הכיתתי — משחק חי לכל הכיתה, דו-קרבות 1 על 1, רשימות מילים משלכם, בלי פרסומות — נשאר חינם למורים בודדים, עד 3 כיתות של 50 תלמידים כל אחת. Teacher Pro (ב-$9 לחודש) מוסיף ניתוח נתונים לכל כיתה, דוחות התקדמות ל-PDF/CSV וכיתות ללא הגבלה. מרחיבים לכיתה שלמה או לבית ספר? בתי ספר ומחלקות ($49 למורה לשנה) כוללת כיתה שלמה עם כל יכולות Teacher Pro, בתוספת רצף ניצחונות לכיתה ותמיכה בעדיפות. לוח ניהול, ניתוח נתונים בין כיתות, ספריות תוכן לימודי ו-SSO נמצאים במפת הדרכים שלנו — ספרו לנו מה אתם צריכים למטה.',
+    `כל מורה מקבל ניסיון חינם של ${P.days} יום ל-Teacher Pro. בתום הניסיון, המשחק הכיתתי — משחק חי לכל הכיתה, כל ${P.modes} מצבי המשחק, רשימות מילים משלכם, בלי פרסומות — נשאר חינם למורים בודדים, עד ${P.classes} כיתות של ${P.students} תלמידים כל אחת. Teacher Pro (ב-${P.price} לחודש) מוסיף ניתוח נתונים לכל כיתה, דוחות התקדמות ל-PDF/CSV וכיתות ללא הגבלה. מרחיבים לכיתה שלמה או לבית ספר? בתי ספר ומחלקות (${P.schoolPrice} למורה לשנה) כוללת כיתה שלמה עם כל יכולות Teacher Pro, בתוספת רצף ניצחונות לכיתה ותמיכה בעדיפות. לוח ניהול, ניתוח נתונים בין כיתות, ספריות תוכן לימודי ו-SSO נמצאים במפת הדרכים שלנו — ספרו לנו מה אתם צריכים למטה.`,
   whyTitle: 'למה בתי ספר בוחרים ב-LexiClash',
   why: [
     { title: 'בלי חשבונות תלמידים', body: 'התלמידים מצטרפים למשחק כיתתי עם קוד — אין חשבונות להקים, אין רישום כיתה לפני שמתחילים לשחק, אין נתוני תלמידים לנהל.' },
@@ -221,10 +210,10 @@ const HE: ForSchoolsContent = {
   compareIntro:
     'כלים חינמיים לכיתה נבדלים מאוד במה שהם באמת מאפשרים לכיתה אמיתית לפני שגובים תשלום למורה או לתלמיד. הנה ההשוואה הכנה.',
   compareRows: [
-    { competitor: 'Kahoot', freeTierLimit: 'המסלול החינמי מאפשר 10–40 שחקנים חיים בהתאם לסוג החשבון — צפוף לכיתה מלאה.', lexiclash: 'כל כיתה מתאימה בחינם, עד 50 תלמידים. Teacher Pro ב-$9 לחודש מוסיף ניתוח נתונים ודוחות.' },
-    { competitor: 'Gimkit', freeTierLimit: 'המסלול החינמי מאפשר מספר בלתי מוגבל של שחקנים במצבים נבחרים, אך דוחות ומצבים מתקדמים בתשלום.', lexiclash: 'גם חינם לכל הכיתה (עד 50), בתוספת דו-קרבות 1 על 1 אמיתיים ו-6 שפות כולל עברית מימין לשמאל.' },
-    { competitor: 'Vocabulary.com', freeTierLimit: 'אין מסלול חינמי משמעותי לשימוש כיתתי אמיתי — נדרשת תוכנית בתשלום כדי להתחיל.', lexiclash: 'חינם לכל הכיתה, בלי כרטיס אשראי. Teacher Pro ב-$9 לחודש מוסיף ניתוח נתונים ודוחות.' },
-    { competitor: 'Wordwall', freeTierLimit: 'המסלול החינמי מוגבל למספר קטן של סוגי פעילויות.', lexiclash: 'כל פעילות, חינם לכל הכיתה, עד 50 תלמידים. Teacher Pro ב-$9 לחודש מסיר את הגבלת הכיתות.' },
+    { competitor: 'Kahoot', freeTierLimit: 'המסלול החינמי מאפשר 10–40 שחקנים חיים בהתאם לסוג החשבון — צפוף לכיתה מלאה.', lexiclash: `כל כיתה מתאימה בחינם, עד ${P.students} תלמידים. Teacher Pro ב-${P.price} לחודש מוסיף ניתוח נתונים ודוחות.` },
+    { competitor: 'Gimkit', freeTierLimit: 'המסלול החינמי מאפשר מספר בלתי מוגבל של שחקנים במצבים נבחרים, אך דוחות ומצבים מתקדמים בתשלום.', lexiclash: `גם חינם לכל הכיתה (עד ${P.students}), בתוספת ${P.languages} שפות כולל עברית מימין לשמאל.` },
+    { competitor: 'Vocabulary.com', freeTierLimit: 'אין מסלול חינמי משמעותי לשימוש כיתתי אמיתי — נדרשת תוכנית בתשלום כדי להתחיל.', lexiclash: `חינם לכל הכיתה, בלי כרטיס אשראי. Teacher Pro ב-${P.price} לחודש מוסיף ניתוח נתונים ודוחות.` },
+    { competitor: 'Wordwall', freeTierLimit: 'המסלול החינמי מוגבל למספר קטן של סוגי פעילויות.', lexiclash: `כל פעילות, חינם לכל הכיתה, עד ${P.students} תלמידים. Teacher Pro ב-${P.price} לחודש מסיר את הגבלת הכיתות.` },
   ],
   compareBreakdownPrompt: 'רוצים את הפירוט המלא?',
   compareBreakdownCta: 'LexiClash מול Kahoot — השוואת יכולות מלאה',
@@ -239,15 +228,15 @@ const HE: ForSchoolsContent = {
   ],
   leadTitle: 'ספרו לנו על בית הספר שלכם',
   leadIntro:
-    'כבר משתמשים ב-LexiClash בכיתה, או מרחיבים לבית ספר או רשות שלמים? ספרו לנו מה אתם צריכים — נחזור אליכם בנוגע לבתי ספר ומחלקות ($49 למורה לשנה), הצעת מחיר לבית ספר או רשות, או גישה מוקדמת ליכולות שבמפת הדרכים למעלה.',
+    `כבר משתמשים ב-LexiClash בכיתה, או מרחיבים לבית ספר או רשות שלמים? ספרו לנו מה אתם צריכים — נחזור אליכם בנוגע לבתי ספר ומחלקות (${P.schoolPrice} למורה לשנה), הצעת מחיר לבית ספר או רשות, או גישה מוקדמת ליכולות שבמפת הדרכים למעלה.`,
   faqTitle: 'בתי ספר ורשויות — שאלות נפוצות',
   faqs: [
-    { q: 'האם LexiClash חינם למורים?', a: 'כן. כל מורה מקבל ניסיון חינם של 14 יום ל-Teacher Pro: משחק כיתתי, דו-קרבות 1 על 1, כל שש השפות, בלי פרסומות, בלי חשבונות תלמידים, בלי כרטיס אשראי. בתום הניסיון, המשחק הכיתתי נשאר חינם למורים בודדים — עד 3 כיתות של 50 תלמידים כל אחת. Teacher Pro עולה $9 לחודש ומוסיף ניתוח נתונים לכל כיתה, דוחות התקדמות ל-PDF/CSV וכיתות ללא הגבלה.' },
-    { q: 'מה כוללת תוכנית בית ספר או רשות?', a: 'בתי ספר ומחלקות ($49 למורה לשנה, דרך הטופס בעמוד הזה) כוללת כיתה שלמה עם כל יכולות Teacher Pro — ניתוח נתונים, דוחות, כלי שיעורי בית — בתוספת רצף ניצחונות לכיתה ותמיכה בעדיפות. לוח ניהול, ניתוח נתונים בין כיתות, ספריות תוכן לימודי ו-SSO להטמעה ברמת בית ספר או רשות נמצאים במפת הדרכים שלנו ועדיין לא הושקו — ספרו לנו מה אתם צריכים ונחזור אליכם, עם הצעת מחיר לפי בקשה.' },
+    { q: 'האם LexiClash חינם למורים?', a: `כן. כל מורה מקבל ניסיון חינם של ${P.days} יום ל-Teacher Pro: משחק כיתתי, כל ${P.modes} מצבי המשחק, כל שש השפות, בלי פרסומות, בלי חשבונות תלמידים, בלי כרטיס אשראי. בתום הניסיון, המשחק הכיתתי נשאר חינם למורים בודדים — עד ${P.classes} כיתות של ${P.students} תלמידים כל אחת. Teacher Pro עולה ${P.price} לחודש ומוסיף ניתוח נתונים לכל כיתה, דוחות התקדמות ל-PDF/CSV וכיתות ללא הגבלה.` },
+    { q: 'מה כוללת תוכנית בית ספר או רשות?', a: `בתי ספר ומחלקות (${P.schoolPrice} למורה לשנה, דרך הטופס בעמוד הזה) כוללת כיתה שלמה עם כל יכולות Teacher Pro — ניתוח נתונים, דוחות, כלי שיעורי בית — בתוספת רצף ניצחונות לכיתה ותמיכה בעדיפות. לוח ניהול, ניתוח נתונים בין כיתות, ספריות תוכן לימודי ו-SSO להטמעה ברמת בית ספר או רשות נמצאים במפת הדרכים שלנו ועדיין לא הושקו — ספרו לנו מה אתם צריכים ונחזור אליכם, עם הצעת מחיר לפי בקשה.` },
     { q: 'האם תלמידים צריכים חשבונות או התחברות?', a: 'לא. התלמידים מצטרפים למשחק כיתתי עם קוד — אין מה להקים, אין נתוני תלמידים לנהל. זה הופך הטמעה בכל בית הספר להרבה יותר פשוטה מכלים שדורשים רישום או SSO לפני שמשחקים.' },
     { q: 'אילו שפות נתמכות?', a: 'אנגלית, עברית (תמיכה מלאה מימין לשמאל), ספרדית, שוודית, יפנית ורוסית, כל אחת עם מילון מובנה — בנוי לכיתות ESL, דו-לשוניות וטבילה לשונית.' },
-    { q: 'איך מתחילים את הניסיון או מקבלים תוכנית בית ספר?', a: 'הירשמו כמורה כדי להתחיל ניסיון Teacher Pro של 14 יום משלכם. מרחיבים לכיתה שלמה או לבית ספר? מלאו את הטופס בעמוד הזה עם התפקיד שלכם, בית הספר ומספר תלמידים משוער, ונחזור אליכם בנוגע לתוכנית הכיתה או להצעת מחיר לבית ספר או רשות.' },
-    { q: 'במה זה שונה מ-Kahoot, Gimkit או Quizlet?', a: 'אלה כלי חידונים/כרטיסיות שמתמקדים באנגלית. LexiClash הוא משחק בניית מילים (לא שאלות סגורות), תומך בשש שפות כולל עברית מימין לשמאל, מתאים לכיתה שלמה של עד 50 תלמידים בחינם, ומציע דו-קרבות אמיתיים 1 על 1.' },
+    { q: 'איך מתחילים את הניסיון או מקבלים תוכנית בית ספר?', a: `הירשמו כמורה כדי להתחיל ניסיון Teacher Pro של ${P.days} יום משלכם. מרחיבים לכיתה שלמה או לבית ספר? מלאו את הטופס בעמוד הזה עם התפקיד שלכם, בית הספר ומספר תלמידים משוער, ונחזור אליכם בנוגע לתוכנית הכיתה או להצעת מחיר לבית ספר או רשות.` },
+    { q: 'במה זה שונה מ-Kahoot, Gimkit או Quizlet?', a: `אלה כלי חידונים/כרטיסיות שמתמקדים באנגלית. LexiClash הוא משחק בניית מילים (לא שאלות סגורות), תומך בשש שפות כולל עברית מימין לשמאל, מתאים לכיתה שלמה של עד ${P.students} תלמידים בחינם, עם ${P.modes} מצבי משחק חיים.` },
     { q: 'אפשר להשתמש ב-LexiClash לתלמידי ESL או לומדי אנגלית (ELL)?', a: 'כן — LexiClash נבנה עם לומדי שפות במחשבה. הוא תומך באנגלית, עברית (מימין לשמאל), ספרדית, שוודית, יפנית ורוסית עם מילונים מובנים. תלמידים יכולים להתחרות בשפה שלהם או לתרגל את השפה שהם לומדים, מה שהופך אותו למתאים באופן טבעי לכיתות ESL, דו-לשוניות וטבילה לשונית. משחק בניית המילים — שבו תלמידים מוצאים, מאייתים ומגישים מילים אמיתיות מול יריב חי או מול כל הכיתה — מחזק אוצר מילים ואיות באופן טבעי, בלי שאלות סגורות פסיביות.' },
     { q: 'אפשר להשתמש ב-LexiClash כמשחק לתרגול איות?', a: 'כן. פורמט בניית המילים של LexiClash — שבו תלמידים מוצאים, מאייתים ומגישים מילים אמיתיות מול יריב חי או מול כל הכיתה — הופך את תרגול האיות לתחרותי ומרתק במקום פסיבי. מורים משתמשים בו לחימום אוצר מילים, לחזרות בסוף יחידה ולטורנירים כיתתיים.' },
     { q: 'האם LexiClash עובד על Chromebook ומכשירי בית ספר?', a: 'כן. LexiClash רץ לגמרי בדפדפן — בלי אפליקציה להתקין, בלי חשבונות תלמידים להקים. הוא עובד על Chromebook, iPad, מחשבים שולחניים וטלפונים. התלמידים מצטרפים עם קוד משחק, והמורים יכולים לשתף מטלות ישירות ל-Google Classroom. SSO ברמת הרשות (Clever, ClassLink) נמצא במפת הדרכים שלנו.' },
@@ -269,10 +258,10 @@ const SV: ForSchoolsContent = {
   heroH1: 'Ordspel som din skola faktiskt kan',
   heroHighlight: 'använda',
   heroSubtitle:
-    'Prova Teacher Pro gratis i 14 dagar — ingen inloggning för elever, inget kreditkort. Inga annonser i klassrummet, någonsin. 6 språk inklusive hebreiska RTL, direktsänt klassomfattande spel för upp till 50 elever och 1v1-orddueller. Efter provperioden förblir klassrumsspelet gratis för enskilda lärare — Teacher Pro och Klassplanen skalar därifrån.',
+    `Prova Teacher Pro gratis i ${P.days} dagar — ingen inloggning för elever, inget kreditkort. Inga annonser i klassrummet, någonsin. ${P.languages} språk inklusive hebreiska RTL, direktsänt klassomfattande spel för upp till ${P.students} elever och ${P.modes} livelägen. Efter provperioden förblir klassrumsspelet gratis för enskilda lärare — Teacher Pro och Klassplanen skalar därifrån.`,
   freeForeverTitle: 'Börja gratis — Teacher Pro $9/mån, Skolor och avdelningar från $49 per lärare / år',
   freeForeverBody:
-    'Varje lärare får en 14-dagars gratis provperiod av Teacher Pro. Efter provperioden förblir klassrumsspelet — direktsänt klassomfattande spel, 1v1-dueller, egna ordlistor, inga annonser — gratis för enskilda lärare, för upp till 3 klasser med 50 elever vardera. Teacher Pro ($9/mån) lägger till statistik per klass, PDF/CSV-rapporter och obegränsat antal klasser. Ska ni rulla ut till en hel klass eller skola? Skolor och avdelningar ($49 per lärare / år) täcker en hel klass med alla Teacher Pro-funktioner, plus klasstreaks och prioriterad support. Administratörsöversikter, distriktsövergripande statistik, läroplansbibliotek och SSO finns på vår färdplan — berätta vad ni behöver nedan.',
+    `Varje lärare får en ${P.days}-dagars gratis provperiod av Teacher Pro. Efter provperioden förblir klassrumsspelet — direktsänt klassomfattande spel, alla ${P.modes} spellägen, egna ordlistor, inga annonser — gratis för enskilda lärare, för upp till ${P.classes} klasser med ${P.students} elever vardera. Teacher Pro (${P.price}/mån) lägger till statistik per klass, PDF/CSV-rapporter och obegränsat antal klasser. Ska ni rulla ut till en hel klass eller skola? Skolor och avdelningar (${P.schoolPrice} per lärare / år) täcker en hel klass med alla Teacher Pro-funktioner, plus klasstreaks och prioriterad support. Administratörsöversikter, distriktsövergripande statistik, läroplansbibliotek och SSO finns på vår färdplan — berätta vad ni behöver nedan.`,
   whyTitle: 'Varför skolor väljer LexiClash',
   why: [
     { title: 'Ingen inloggning för elever', body: 'Eleverna ansluter till ett klassrumsspel med en kod — inga konton att skapa, ingen klasslista innan ni kan spela, inga elevdata att hantera.' },
@@ -285,10 +274,10 @@ const SV: ForSchoolsContent = {
   compareIntro:
     'Gratis klassrumsverktyg skiljer sig mycket åt i vad de faktiskt låter en verklig klass göra innan de tar betalt per lärare eller elev. Här är den ärliga jämförelsen.',
   compareRows: [
-    { competitor: 'Kahoot', freeTierLimit: 'Gratisversionen tillåter 10–40 livespelare beroende på kontotyp — trångt för en hel klass.', lexiclash: 'Varje klass får plats gratis, upp till 50 elever. Teacher Pro $9/mån lägger till statistik och rapporter.' },
-    { competitor: 'Gimkit', freeTierLimit: 'Gratisversionen tillåter obegränsat antal spelare i utvalda lägen, men rapporter och proläge kostar.', lexiclash: 'Också gratis för hela klassen (upp till 50), plus riktiga 1v1-dueller och 6 språk inklusive hebreiska RTL.' },
-    { competitor: 'Vocabulary.com', freeTierLimit: 'Ingen meningsfull gratisversion för verklig klassrumsanvändning — betalplan krävs för att komma igång.', lexiclash: 'Gratis för hela klassen, inget kort krävs. Teacher Pro $9/mån lägger till statistik och rapporter.' },
-    { competitor: 'Wordwall', freeTierLimit: 'Gratisversionen begränsad till ett fåtal aktivitetstyper.', lexiclash: 'Alla aktiviteter, gratis för hela klassen, upp till 50 elever. Teacher Pro $9/mån låser upp obegränsat antal klasser.' },
+    { competitor: 'Kahoot', freeTierLimit: 'Gratisversionen tillåter 10–40 livespelare beroende på kontotyp — trångt för en hel klass.', lexiclash: `Varje klass får plats gratis, upp till ${P.students} elever. Teacher Pro ${P.price}/mån lägger till statistik och rapporter.` },
+    { competitor: 'Gimkit', freeTierLimit: 'Gratisversionen tillåter obegränsat antal spelare i utvalda lägen, men rapporter och proläge kostar.', lexiclash: `Också gratis för hela klassen (upp till ${P.students}), plus ${P.languages} språk inklusive hebreiska RTL.` },
+    { competitor: 'Vocabulary.com', freeTierLimit: 'Ingen meningsfull gratisversion för verklig klassrumsanvändning — betalplan krävs för att komma igång.', lexiclash: `Gratis för hela klassen, inget kort krävs. Teacher Pro ${P.price}/mån lägger till statistik och rapporter.` },
+    { competitor: 'Wordwall', freeTierLimit: 'Gratisversionen begränsad till ett fåtal aktivitetstyper.', lexiclash: `Alla aktiviteter, gratis för hela klassen, upp till ${P.students} elever. Teacher Pro ${P.price}/mån låser upp obegränsat antal klasser.` },
   ],
   compareBreakdownPrompt: 'Vill du se hela jämförelsen?',
   compareBreakdownCta: 'LexiClash vs Kahoot — jämförelse funktion för funktion',
@@ -303,15 +292,15 @@ const SV: ForSchoolsContent = {
   ],
   leadTitle: 'Berätta om din skola',
   leadIntro:
-    'Använder du LexiClash med din klass, eller rullar ni ut till en hel skola eller ett distrikt? Berätta vad ni behöver — vi hör av oss om Skolor och avdelningar ($49 per lärare / år), en offert för skola eller distrikt, eller tidig åtkomst till färdplansfunktionerna ovan.',
+    `Använder du LexiClash med din klass, eller rullar ni ut till en hel skola eller ett distrikt? Berätta vad ni behöver — vi hör av oss om Skolor och avdelningar (${P.schoolPrice} per lärare / år), en offert för skola eller distrikt, eller tidig åtkomst till färdplansfunktionerna ovan.`,
   faqTitle: 'Skolor och distrikt — vanliga frågor',
   faqs: [
-    { q: 'Är LexiClash gratis för lärare?', a: 'Ja. Varje lärare får en 14-dagars gratis provperiod av Teacher Pro: klassomfattande spel, 1v1-dueller, alla sex språken, inga annonser, ingen inloggning för elever, inget kreditkort. Efter provperioden förblir klassrumsspelet gratis för enskilda lärare — upp till 3 klasser med 50 elever vardera. Teacher Pro kostar $9/månad och lägger till statistik per klass, PDF/CSV-rapporter och obegränsat antal klasser.' },
-    { q: 'Vad ingår i en skol- eller distriktsplan?', a: 'Skolor och avdelningar ($49 per lärare / år, via formuläret på den här sidan) täcker en hel klass med alla Teacher Pro-funktioner — statistik, rapporter, läxverktyg — plus klasstreaks och prioriterad support. Administratörsöversikter, distriktsövergripande statistik, läroplansbibliotek och SSO för skol- eller distriktsutrullning finns på vår färdplan och är inte lanserade än — berätta vad ni behöver så hör vi av oss, med pris på begäran.' },
+    { q: 'Är LexiClash gratis för lärare?', a: `Ja. Varje lärare får en ${P.days}-dagars gratis provperiod av Teacher Pro: klassomfattande spel, alla ${P.modes} spellägen, alla sex språken, inga annonser, ingen inloggning för elever, inget kreditkort. Efter provperioden förblir klassrumsspelet gratis för enskilda lärare — upp till ${P.classes} klasser med ${P.students} elever vardera. Teacher Pro kostar ${P.price}/månad och lägger till statistik per klass, PDF/CSV-rapporter och obegränsat antal klasser.` },
+    { q: 'Vad ingår i en skol- eller distriktsplan?', a: `Skolor och avdelningar (${P.schoolPrice} per lärare / år, via formuläret på den här sidan) täcker en hel klass med alla Teacher Pro-funktioner — statistik, rapporter, läxverktyg — plus klasstreaks och prioriterad support. Administratörsöversikter, distriktsövergripande statistik, läroplansbibliotek och SSO för skol- eller distriktsutrullning finns på vår färdplan och är inte lanserade än — berätta vad ni behöver så hör vi av oss, med pris på begäran.` },
     { q: 'Behöver eleverna konton eller inloggning?', a: 'Nej. Eleverna ansluter till ett klassrumsspel med en kod — inget att skapa, inga elevdata att hantera. Det gör en skolövergripande lansering mycket enklare än verktyg som kräver klasslistor eller SSO innan man kan spela.' },
     { q: 'Vilka språk stöds?', a: 'Engelska, hebreiska (fullt höger-till-vänster-stöd), spanska, svenska, japanska och ryska, var och en med en inbyggd ordbok — byggd för ESL, tvåspråkiga och immersionsklassrum.' },
-    { q: 'Hur börjar vi vår provperiod eller får en skolplan?', a: 'Registrera dig som lärare för att starta din egen 14-dagars Teacher Pro-provperiod. Ska ni istället rulla ut till en hel klass eller skola? Fyll i formuläret på den här sidan med din roll, skola och ungefärligt antal elever, så hör vi av oss om Klassplanen eller en offert för skola/distrikt.' },
-    { q: 'Hur skiljer sig detta från Kahoot, Gimkit eller Quizlet?', a: 'Det är quiz-/flashcardverktyg som är engelskfokuserade. LexiClash är ett ordbyggande spel (inte flervalsfrågor), stöder sex språk inklusive hebreiska RTL, får plats för en hel klass på upp till 50 elever gratis, och erbjuder riktiga 1v1-dueller.' },
+    { q: 'Hur börjar vi vår provperiod eller får en skolplan?', a: `Registrera dig som lärare för att starta din egen ${P.days}-dagars Teacher Pro-provperiod. Ska ni istället rulla ut till en hel klass eller skola? Fyll i formuläret på den här sidan med din roll, skola och ungefärligt antal elever, så hör vi av oss om Klassplanen eller en offert för skola/distrikt.` },
+    { q: 'Hur skiljer sig detta från Kahoot, Gimkit eller Quizlet?', a: `Det är quiz-/flashcardverktyg som är engelskfokuserade. LexiClash är ett ordbyggande spel (inte flervalsfrågor), stöder sex språk inklusive hebreiska RTL, får plats för en hel klass på upp till ${P.students} elever gratis, med ${P.modes} livelägen.` },
     { q: 'Kan jag använda LexiClash för ESL eller elever med engelska som andraspråk (ELL)?', a: 'Ja — LexiClash byggdes med språkinlärare i åtanke. Det stöder engelska, hebreiska (RTL), spanska, svenska, japanska och ryska med inbyggda ordböcker. Eleverna kan tävla på sitt eget språk eller öva det språk de lär sig, vilket gör det naturligt för ESL, tvåspråkiga och immersionsklassrum. Ordbyggande spel — där elever hittar, stavar och skickar in riktiga ord mot en levande motståndare eller hela klassen — stärker ordförråd och stavning organiskt, utan passiva flervalsfrågor.' },
     { q: 'Kan eleverna använda LexiClash som ett stavningsövningsspel?', a: 'Ja. LexiClashs ordbyggande format — där elever hittar, stavar och skickar in riktiga ord mot en levande motståndare eller hela klassen — gör stavningsövning konkurrenskraftig och engagerande i stället för passiv. Lärare använder det för stavningsuppvärmningar, repetitioner i slutet av ett avsnitt och klassrumsturneringar.' },
     { q: 'Fungerar LexiClash på Chromebooks och skolenheter?', a: 'Ja. LexiClash körs helt i webbläsaren — ingen app att installera, inga elevkonton att skapa. Det fungerar på Chromebooks, iPads, stationära datorer och telefoner. Eleverna ansluter med en spelkod, och lärare kan dela uppgifter direkt till Google Classroom. Distrikts-SSO (Clever, ClassLink) finns på vår färdplan.' },
@@ -333,10 +322,10 @@ const JA: ForSchoolsContent = {
   heroH1: 'あなたの学校が実際に',
   heroHighlight: '使える語彙ゲーム',
   heroSubtitle:
-    'Teacher Proを14日間無料でお試しください — 学生ログイン不要、クレジットカード不要。授業内の広告は一切なし。ヘブライ語RTL対応を含む6言語、最大50人のクラス全体でのライブプレイ、1v1単語決闘に対応しています。トライアル後も、クラスルームゲームは個人の教師向けに無料のまま — Teacher Proとクラスプランはそこから拡張できます。',
+    `Teacher Proを${P.days}日間無料でお試しください — 学生ログイン不要、クレジットカード不要。授業内の広告は一切なし。ヘブライ語RTL対応を含む${P.languages}言語、最大${P.students}人のクラス全体でのライブプレイ、${P.modes}つのライブモードに対応しています。トライアル後も、クラスルームゲームは個人の教師向けに無料のまま — Teacher Proとクラスプランはそこから拡張できます。`,
   freeForeverTitle: '無料でスタート — Teacher Pro 月額$9、学校・学科は教員1人あたり年$49から',
   freeForeverBody:
-    'すべての教師がTeacher Proの14日間無料トライアルを利用できます。トライアル後も、クラスルームゲーム — ライブのクラス全体プレイ、1v1決闘、独自の単語リスト、広告なし — は個人の教師向けに無料のまま、最大3クラス（各50人）まで利用できます。Teacher Pro（月額$9）はクラスごとの分析、PDF/CSVの進捗レポート、クラス数無制限を追加します。クラス全体や学校全体への導入をお考えですか？学校・学科プラン（教員1人あたり年$49）はすべてのTeacher Pro機能に加え、クラスの連続記録と優先サポートを含みます。管理者ダッシュボード、クラス間分析、カリキュラムライブラリ、SSOは今後の開発計画にあります — 下のフォームで必要な機能をお知らせください。',
+    `すべての教師がTeacher Proの${P.days}日間無料トライアルを利用できます。トライアル後も、クラスルームゲーム — ライブのクラス全体プレイ、${P.modes}つのゲームモードすべて、独自の単語リスト、広告なし — は個人の教師向けに無料のまま、最大${P.classes}クラス（各${P.students}人）まで利用できます。Teacher Pro（月額${P.price}）はクラスごとの分析、PDF/CSVの進捗レポート、クラス数無制限を追加します。クラス全体や学校全体への導入をお考えですか？学校・学科プラン（教員1人あたり年${P.schoolPrice}）はすべてのTeacher Pro機能に加え、クラスの連続記録と優先サポートを含みます。管理者ダッシュボード、クラス間分析、カリキュラムライブラリ、SSOは今後の開発計画にあります — 下のフォームで必要な機能をお知らせください。`,
   whyTitle: 'なぜ学校がLexiClashを選ぶのか',
   why: [
     { title: '学生ログイン不要', body: '学生はコードでクラスゲームに参加 — アカウント作成不要、プレイ前の名簿登録不要、学生データの管理も不要です。' },
@@ -349,10 +338,10 @@ const JA: ForSchoolsContent = {
   compareIntro:
     '無料のクラスルームゲームツールは、教師や学生ごとに課金される前に実際のクラスで何ができるかが大きく異なります。以下が正直な比較です。',
   compareRows: [
-    { competitor: 'Kahoot', freeTierLimit: '無料プランはアカウントの種類によりライブプレイヤー数が10〜40人に制限され、クラス全体には手狭です。', lexiclash: 'どのクラスも無料で収まります（最大50人）。Teacher Pro（月額$9）が分析とレポートを追加します。' },
-    { competitor: 'Gimkit', freeTierLimit: '無料プランは主要モードでは人数無制限ですが、レポートとプロモードは有料です。', lexiclash: 'こちらも最大50人までのクラス全体が無料。さらに本物の1v1決闘と、ヘブライ語RTLを含む6言語に対応。' },
-    { competitor: 'Vocabulary.com', freeTierLimit: '実際のクラス運用に使える無料プランは実質なく、始めるには有料プランが必要です。', lexiclash: 'クラス全体が無料、カード登録不要。Teacher Pro（月額$9）が分析とレポートを追加します。' },
-    { competitor: 'Wordwall', freeTierLimit: '無料プランは少数のアクティビティ種類に制限されています。', lexiclash: 'すべてのアクティビティが、最大50人のクラス全体で無料。Teacher Pro（月額$9）でクラス数無制限に。' },
+    { competitor: 'Kahoot', freeTierLimit: '無料プランはアカウントの種類によりライブプレイヤー数が10〜40人に制限され、クラス全体には手狭です。', lexiclash: `どのクラスも無料で収まります（最大${P.students}人）。Teacher Pro（月額${P.price}）が分析とレポートを追加します。` },
+    { competitor: 'Gimkit', freeTierLimit: '無料プランは主要モードでは人数無制限ですが、レポートとプロモードは有料です。', lexiclash: `こちらも最大${P.students}人までのクラス全体が無料。さらにヘブライ語RTLを含む${P.languages}言語に対応。` },
+    { competitor: 'Vocabulary.com', freeTierLimit: '実際のクラス運用に使える無料プランは実質なく、始めるには有料プランが必要です。', lexiclash: `クラス全体が無料、カード登録不要。Teacher Pro（月額${P.price}）が分析とレポートを追加します。` },
+    { competitor: 'Wordwall', freeTierLimit: '無料プランは少数のアクティビティ種類に制限されています。', lexiclash: `すべてのアクティビティが、最大${P.students}人のクラス全体で無料。Teacher Pro（月額${P.price}）でクラス数無制限に。` },
   ],
   compareBreakdownPrompt: '詳しい比較をご覧になりますか？',
   compareBreakdownCta: 'LexiClash vs Kahoot — 機能ごとの徹底比較',
@@ -367,15 +356,15 @@ const JA: ForSchoolsContent = {
   ],
   leadTitle: 'あなたの学校について教えてください',
   leadIntro:
-    'すでにクラスでLexiClashを使っていますか、それとも学校や学区全体への導入をお考えですか？必要なことを教えてください — 学校・学科プラン（教員1人あたり年$49）、学校・学区向けの見積もり、または上記の開発計画中の機能への早期アクセスについてご連絡します。',
+    `すでにクラスでLexiClashを使っていますか、それとも学校や学区全体への導入をお考えですか？必要なことを教えてください — 学校・学科プラン（教員1人あたり年${P.schoolPrice}）、学校・学区向けの見積もり、または上記の開発計画中の機能への早期アクセスについてご連絡します。`,
   faqTitle: '学校・学区 — よくある質問',
   faqs: [
-    { q: 'LexiClashは教師にとって無料ですか？', a: 'はい。すべての教師がTeacher Proの14日間無料トライアルを利用できます：クラス全体プレイ、1v1決闘、6言語すべて、広告なし、学生ログイン不要、クレジットカード不要。トライアル後も、クラスルームゲームは個人の教師向けに無料のまま — 最大3クラス（各50人）まで。Teacher Proは月額$9で、クラスごとの分析、PDF/CSVの進捗レポート、クラス数無制限を追加します。' },
-    { q: '学校または学区プランには何が含まれますか？', a: '学校・学科プラン（教員1人あたり年$49、このページのフォームから）は、クラス全体にすべてのTeacher Pro機能 — 分析、レポート、宿題ツール — に加え、クラスの連続記録と優先サポートを提供します。学校・学区への導入向けの管理者ダッシュボード、クラス間分析、カリキュラムライブラリ、SSOは今後の開発計画にあり、まだ提供されていません — 必要なことを教えていただければご連絡します。価格はご相談に応じます。' },
+    { q: 'LexiClashは教師にとって無料ですか？', a: `はい。すべての教師がTeacher Proの${P.days}日間無料トライアルを利用できます：クラス全体プレイ、${P.modes}つのゲームモードすべて、${P.languages}言語すべて、広告なし、学生ログイン不要、クレジットカード不要。トライアル後も、クラスルームゲームは個人の教師向けに無料のまま — 最大${P.classes}クラス（各${P.students}人）まで。Teacher Proは月額${P.price}で、クラスごとの分析、PDF/CSVの進捗レポート、クラス数無制限を追加します。` },
+    { q: '学校または学区プランには何が含まれますか？', a: `学校・学科プラン（教員1人あたり年${P.schoolPrice}、このページのフォームから）は、クラス全体にすべてのTeacher Pro機能 — 分析、レポート、宿題ツール — に加え、クラスの連続記録と優先サポートを提供します。学校・学区への導入向けの管理者ダッシュボード、クラス間分析、カリキュラムライブラリ、SSOは今後の開発計画にあり、まだ提供されていません — 必要なことを教えていただければご連絡します。価格はご相談に応じます。` },
     { q: '学生にアカウントやログインは必要ですか？', a: 'いいえ。学生はコードでクラスゲームに参加します — 何も用意する必要がなく、学生データを管理する必要もありません。これにより、名簿登録やプレイ前のSSOを必要とするツールよりも、学校全体への展開がはるかに簡単になります。' },
     { q: 'どの言語に対応していますか？', a: '英語、ヘブライ語（完全なRTLサポート）、スペイン語、スウェーデン語、日本語、ロシア語 — それぞれネイティブ辞書を完備し、ESL、バイリンガル、イマージョンのクラスルーム向けです。' },
-    { q: 'トライアルを始める、または学校プランを取得するにはどうすればよいですか？', a: '教師として登録すると、ご自身の14日間Teacher Pro無料トライアルを開始できます。クラス全体や学校全体への導入をお考えの場合は、このページのフォームに役割、学校、およびおおよその学生数を入力してください。クラスプランまたは学校・学区向けの見積もりについてご連絡します。' },
-    { q: 'Kahoot、Gimkit、Quizletとどう違いますか？', a: 'それらは英語優先のクイズ／フラッシュカードツールです。LexiClashは単語構築ゲーム（選択式ではありません）で、ヘブライ語RTLを含む6言語に対応し、最大50人のクラス全体が無料で利用でき、本物の1v1決闘を提供します。' },
+    { q: 'トライアルを始める、または学校プランを取得するにはどうすればよいですか？', a: `教師として登録すると、ご自身の${P.days}日間Teacher Pro無料トライアルを開始できます。クラス全体や学校全体への導入をお考えの場合は、このページのフォームに役割、学校、およびおおよその学生数を入力してください。クラスプランまたは学校・学区向けの見積もりについてご連絡します。` },
+    { q: 'Kahoot、Gimkit、Quizletとどう違いますか？', a: `それらは英語優先のクイズ／フラッシュカードツールです。LexiClashは単語構築ゲーム（選択式ではありません）で、ヘブライ語RTLを含む${P.languages}言語に対応し、最大${P.students}人のクラス全体が無料で利用でき、${P.modes}つのライブモードを提供します。` },
     { q: 'ESLや英語学習者（ELL）の学生にLexiClashを使えますか？', a: 'はい — LexiClashは言語学習者を念頭に作られました。英語、ヘブライ語（RTL）、スペイン語、スウェーデン語、日本語、ロシア語にネイティブ辞書で対応しています。学生は自分の言語で競い合ったり、学んでいる言語を練習したりできるため、ESL、バイリンガル、イマージョンのクラスルームに自然にフィットします。単語構築ゲーム — 学生がライブの対戦相手やクラス全体を相手に本物の単語を見つけ、つづり、送信する — は、受動的な選択式なしで語彙とつづりを自然に強化します。' },
     { q: '学生はLexiClashをスペリング練習ゲームとして使えますか？', a: 'はい。LexiClashの単語構築フォーマット — 学生がライブの対戦相手やクラス全体を相手に本物の単語を見つけ、つづり、送信する — は、スペリング練習を受動的ではなく競争的で魅力的なものにします。教師は語彙のウォーミングアップ、単元末のレビュー、クラス内トーナメントに活用しています。' },
     { q: 'LexiClashはChromebookや学校の端末で動作しますか？', a: 'はい。LexiClashはブラウザで完全に動作します — アプリのインストール不要、学生アカウントの用意も不要です。Chromebook、iPad、デスクトップ、スマートフォンで動作します。学生はゲームコードで参加し、教師は課題をGoogle Classroomに直接共有できます。学区向けのSSO（Clever、ClassLink）は今後の開発計画にあります。' },
@@ -397,10 +386,10 @@ const ES: ForSchoolsContent = {
   heroH1: 'Juegos de vocabulario que toda tu escuela puede',
   heroHighlight: 'usar de verdad',
   heroSubtitle:
-    'Prueba Teacher Pro gratis por 14 días — sin inicios de sesión de estudiantes, sin tarjeta de crédito. Sin anuncios en clase, nunca. 6 idiomas incluido hebreo RTL, juego en vivo con toda la clase para hasta 50 estudiantes y duelos de palabras 1v1. Después de la prueba, el juego de aula sigue siendo gratis para maestros individuales — Teacher Pro y el plan de clase escalan desde ahí.',
+    `Prueba Teacher Pro gratis por ${P.days} días — sin inicios de sesión de estudiantes, sin tarjeta de crédito. Sin anuncios en clase, nunca. ${P.languages} idiomas incluido hebreo RTL, juego en vivo con toda la clase para hasta ${P.students} estudiantes y ${P.modes} modos en vivo. Después de la prueba, el juego de aula sigue siendo gratis para maestros individuales — Teacher Pro y el plan de clase escalan desde ahí.`,
   freeForeverTitle: 'Empieza gratis — Teacher Pro $9/mes, escuelas y departamentos desde $49 por docente / año',
   freeForeverBody:
-    'Cada maestro obtiene una prueba gratuita de 14 días de Teacher Pro. Después de la prueba, el juego de aula — juego en vivo con toda la clase, duelos 1v1, tus propias listas de palabras, sin anuncios — sigue siendo gratis para maestros individuales, hasta 3 clases de 50 estudiantes cada una. Teacher Pro ($9/mes) agrega análisis por clase, informes de progreso en PDF/CSV y clases ilimitadas. ¿Vas a implementarlo en toda una clase o escuela? El escuelas y departamentos ($49 por docente / año) cubre una clase completa con todas las funciones de Teacher Pro, más rachas de clase y soporte prioritario. Los paneles de administración, el análisis entre clases, las bibliotecas de currículo y el SSO están en nuestra hoja de ruta — cuéntanos qué necesitas más abajo.',
+    `Cada maestro obtiene una prueba gratuita de ${P.days} días de Teacher Pro. Después de la prueba, el juego de aula — juego en vivo con toda la clase, los ${P.modes} modos de juego, tus propias listas de palabras, sin anuncios — sigue siendo gratis para maestros individuales, hasta ${P.classes} clases de ${P.students} estudiantes cada una. Teacher Pro (${P.price}/mes) agrega análisis por clase, informes de progreso en PDF/CSV y clases ilimitadas. ¿Vas a implementarlo en toda una clase o escuela? El escuelas y departamentos (${P.schoolPrice} por docente / año) cubre una clase completa con todas las funciones de Teacher Pro, más rachas de clase y soporte prioritario. Los paneles de administración, el análisis entre clases, las bibliotecas de currículo y el SSO están en nuestra hoja de ruta — cuéntanos qué necesitas más abajo.`,
   whyTitle: 'Por qué las escuelas eligen LexiClash',
   why: [
     { title: 'Sin inicios de sesión de estudiantes', body: 'Los estudiantes se unen a un juego de clase con un código — sin cuentas que crear, sin registro de clase antes de jugar, sin datos de estudiantes que gestionar.' },
@@ -413,10 +402,10 @@ const ES: ForSchoolsContent = {
   compareIntro:
     'Las herramientas gratuitas para el aula varían mucho en lo que realmente permiten hacer a una clase real antes de cobrar por maestro o por estudiante. Aquí está la comparación honesta.',
   compareRows: [
-    { competitor: 'Kahoot', freeTierLimit: 'El nivel gratuito permite entre 10 y 40 jugadores en vivo según el tipo de cuenta — ajustado para una clase completa.', lexiclash: 'Cada clase cabe gratis, hasta 50 estudiantes. Teacher Pro $9/mes agrega análisis e informes.' },
-    { competitor: 'Gimkit', freeTierLimit: 'El nivel gratuito permite jugadores ilimitados en los modos destacados, pero los informes y modos pro son de pago.', lexiclash: 'También gratis para toda la clase (hasta 50), además de duelos 1v1 reales y 6 idiomas incluido hebreo RTL.' },
-    { competitor: 'Vocabulary.com', freeTierLimit: 'Sin un nivel gratuito real para uso real en el aula — se requiere un plan de pago para empezar.', lexiclash: 'Gratis para toda la clase, sin tarjeta. Teacher Pro $9/mes agrega análisis e informes.' },
-    { competitor: 'Wordwall', freeTierLimit: 'El nivel gratuito se limita a un pequeño número de tipos de actividad.', lexiclash: 'Cada actividad, gratis para toda la clase, hasta 50 estudiantes. Teacher Pro $9/mes desbloquea clases ilimitadas.' },
+    { competitor: 'Kahoot', freeTierLimit: 'El nivel gratuito permite entre 10 y 40 jugadores en vivo según el tipo de cuenta — ajustado para una clase completa.', lexiclash: `Cada clase cabe gratis, hasta ${P.students} estudiantes. Teacher Pro ${P.price}/mes agrega análisis e informes.` },
+    { competitor: 'Gimkit', freeTierLimit: 'El nivel gratuito permite jugadores ilimitados en los modos destacados, pero los informes y modos pro son de pago.', lexiclash: `También gratis para toda la clase (hasta ${P.students}), además de ${P.languages} idiomas incluido hebreo RTL.` },
+    { competitor: 'Vocabulary.com', freeTierLimit: 'Sin un nivel gratuito real para uso real en el aula — se requiere un plan de pago para empezar.', lexiclash: `Gratis para toda la clase, sin tarjeta. Teacher Pro ${P.price}/mes agrega análisis e informes.` },
+    { competitor: 'Wordwall', freeTierLimit: 'El nivel gratuito se limita a un pequeño número de tipos de actividad.', lexiclash: `Cada actividad, gratis para toda la clase, hasta ${P.students} estudiantes. Teacher Pro ${P.price}/mes desbloquea clases ilimitadas.` },
   ],
   compareBreakdownPrompt: '¿Quieres ver el desglose completo?',
   compareBreakdownCta: 'LexiClash vs Kahoot — comparación función por función',
@@ -431,15 +420,15 @@ const ES: ForSchoolsContent = {
   ],
   leadTitle: 'Cuéntanos sobre tu escuela',
   leadIntro:
-    '¿Ya usas LexiClash con tu clase, o estás implementándolo en toda una escuela o distrito? Cuéntanos qué necesitas — te contactaremos sobre el escuelas y departamentos ($49 por docente / año), una cotización para tu escuela o distrito, o acceso anticipado a las funciones de la hoja de ruta de arriba.',
+    `¿Ya usas LexiClash con tu clase, o estás implementándolo en toda una escuela o distrito? Cuéntanos qué necesitas — te contactaremos sobre el escuelas y departamentos (${P.schoolPrice} por docente / año), una cotización para tu escuela o distrito, o acceso anticipado a las funciones de la hoja de ruta de arriba.`,
   faqTitle: 'Escuelas y distritos — preguntas frecuentes',
   faqs: [
-    { q: '¿Es LexiClash gratis para maestros?', a: 'Sí. Cada maestro obtiene una prueba gratuita de 14 días de Teacher Pro: juego en clase, duelos 1v1, los seis idiomas, sin anuncios, sin inicios de sesión de estudiantes, sin tarjeta de crédito. Después de la prueba, el juego de aula sigue siendo gratis para maestros individuales — hasta 3 clases de 50 estudiantes cada una. Teacher Pro cuesta $9/mes y agrega análisis por clase, informes de progreso en PDF/CSV y clases ilimitadas.' },
-    { q: '¿Qué incluyen los planes escolares o de distrito?', a: 'Escuelas y departamentos ($49 por docente / año, a través del formulario de esta página) cubre una clase completa con todas las funciones de Teacher Pro — análisis, informes, herramientas de tareas — más rachas de clase y soporte prioritario. Los paneles de administración, el análisis entre clases, las bibliotecas de currículo y el SSO para implementación escolar o de distrito están en nuestra hoja de ruta y aún no están disponibles — cuéntanos qué necesitas y te contactaremos, con precio a solicitud.' },
+    { q: '¿Es LexiClash gratis para maestros?', a: `Sí. Cada maestro obtiene una prueba gratuita de ${P.days} días de Teacher Pro: juego en clase, los ${P.modes} modos de juego, los seis idiomas, sin anuncios, sin inicios de sesión de estudiantes, sin tarjeta de crédito. Después de la prueba, el juego de aula sigue siendo gratis para maestros individuales — hasta ${P.classes} clases de ${P.students} estudiantes cada una. Teacher Pro cuesta ${P.price}/mes y agrega análisis por clase, informes de progreso en PDF/CSV y clases ilimitadas.` },
+    { q: '¿Qué incluyen los planes escolares o de distrito?', a: `Escuelas y departamentos (${P.schoolPrice} por docente / año, a través del formulario de esta página) cubre una clase completa con todas las funciones de Teacher Pro — análisis, informes, herramientas de tareas — más rachas de clase y soporte prioritario. Los paneles de administración, el análisis entre clases, las bibliotecas de currículo y el SSO para implementación escolar o de distrito están en nuestra hoja de ruta y aún no están disponibles — cuéntanos qué necesitas y te contactaremos, con precio a solicitud.` },
     { q: '¿Los estudiantes necesitan cuentas o inicios de sesión?', a: 'No. Los estudiantes se unen a un juego de clase con un código — nada que crear, sin datos de estudiantes que gestionar. Eso hace que una implementación en toda la escuela sea mucho más simple que las herramientas que requieren registro o SSO antes de jugar.' },
     { q: '¿Qué idiomas son compatibles?', a: 'Inglés, hebreo (compatibilidad completa de derecha a izquierda), español, sueco, japonés y ruso, cada uno con un diccionario nativo — diseñado para aulas ESL, bilingües e inmersión de idiomas.' },
-    { q: '¿Cómo iniciamos nuestra prueba u obtenemos un plan escolar?', a: 'Regístrate como maestro para iniciar tu propia prueba gratuita de Teacher Pro de 14 días. ¿Vas a implementarlo en toda una clase o escuela? Completa el formulario en esta página con tu rol, escuela y número aproximado de estudiantes, y te contactaremos sobre el plan de clase o una cotización para tu escuela o distrito.' },
-    { q: '¿En qué se diferencia de Kahoot, Gimkit o Quizlet?', a: 'Esas son herramientas de cuestionarios/tarjetas que priorizan el inglés. LexiClash es un juego de construcción de palabras (no opción múltiple), admite seis idiomas incluido hebreo RTL, permite que una clase completa de hasta 50 estudiantes juegue gratis, y ofrece verdaderos duelos 1v1.' },
+    { q: '¿Cómo iniciamos nuestra prueba u obtenemos un plan escolar?', a: `Regístrate como maestro para iniciar tu propia prueba gratuita de Teacher Pro de ${P.days} días. ¿Vas a implementarlo en toda una clase o escuela? Completa el formulario en esta página con tu rol, escuela y número aproximado de estudiantes, y te contactaremos sobre el plan de clase o una cotización para tu escuela o distrito.` },
+    { q: '¿En qué se diferencia de Kahoot, Gimkit o Quizlet?', a: `Esas son herramientas de cuestionarios/tarjetas que priorizan el inglés. LexiClash es un juego de construcción de palabras (no opción múltiple), admite seis idiomas incluido hebreo RTL, permite que una clase completa de hasta ${P.students} estudiantes juegue gratis, con ${P.modes} modos en vivo.` },
     { q: '¿Puedo usar LexiClash para estudiantes de ESL o aprendices de inglés (ELL)?', a: 'Sí — LexiClash fue diseñado pensando en los aprendices de idiomas. Admite inglés, hebreo (RTL), español, sueco, japonés y ruso con diccionarios nativos. Los estudiantes pueden competir en su propio idioma o practicar el idioma que están aprendiendo, lo que lo hace naturalmente adecuado para aulas ESL, bilingües e inmersión de idiomas. La mecánica de construcción de palabras — donde los estudiantes encuentran, deletrean y envían palabras reales contra un oponente en vivo o toda la clase — refuerza el vocabulario y la ortografía de forma orgánica, sin opción múltiple pasiva.' },
     { q: '¿Pueden los estudiantes usar LexiClash como un juego de práctica de ortografía?', a: 'Sí. El formato de construcción de palabras de LexiClash — donde los estudiantes encuentran, deletrean y envían palabras reales contra un oponente en vivo o toda la clase — hace que la práctica de ortografía sea competitiva y atractiva en lugar de pasiva. Los maestros lo usan para calentamientos de vocabulario, repasos de fin de unidad y torneos en clase.' },
     { q: '¿Funciona LexiClash en Chromebooks y dispositivos escolares?', a: 'Sí. LexiClash se ejecuta completamente en el navegador — sin aplicación que instalar, sin cuentas de estudiante que crear. Funciona en Chromebooks, iPads, computadoras de escritorio y teléfonos. Los estudiantes se unen con un código de juego, y los maestros pueden compartir tareas directamente en Google Classroom. El SSO de distrito (Clever, ClassLink) está en nuestra hoja de ruta.' },

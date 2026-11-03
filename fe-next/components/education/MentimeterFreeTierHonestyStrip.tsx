@@ -88,7 +88,7 @@ export function MentimeterFreeTierHonestyStrip({
           href={HELP_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="underline decoration-neo-cyan/60 underline-offset-2 hover:text-neo-cyan"
+          className="underline decoration-neo-cyan/60 underline-offset-2 hover:text-neo-cyan focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           data-testid="mentimeter-free-help-link"
         >
           {t('education.vsMentimeter.free50.citeHelpLabel')}
@@ -98,7 +98,7 @@ export function MentimeterFreeTierHonestyStrip({
           href={PLANS_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="underline decoration-neo-cyan/60 underline-offset-2 hover:text-neo-cyan"
+          className="underline decoration-neo-cyan/60 underline-offset-2 hover:text-neo-cyan focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           data-testid="mentimeter-free-plans-link"
         >
           {t('education.vsMentimeter.free50.citePlansLabel')}
@@ -109,7 +109,7 @@ export function MentimeterFreeTierHonestyStrip({
       <div className="mt-5">
         <Link
           href={`/${loc}/education/classroom-game`}
-          className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition hover:shadow-hard-lg"
+          className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition hover:shadow-hard-lg focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           data-testid="mentimeter-free-tier-cta"
         >
           {t('education.vsMentimeter.free50.cta')}

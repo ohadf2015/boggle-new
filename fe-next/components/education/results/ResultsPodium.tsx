@@ -230,7 +230,7 @@ export function ResultsPodium({ entries, size = 'card', stage = FINAL_STAGE, lay
               {entry.detail && revealed && (
                 <span
                   data-testid={`podium-detail-${rank}`}
-                  className={cn('font-neo-body font-bold opacity-80', projector ? 'text-lg [@media(min-height:1000px)]:text-xl' : row ? 'text-[11px] leading-tight' : 'text-xs')}
+                  className={cn('font-neo-body font-bold opacity-80', projector ? 'text-lg [@media(min-height:1000px)]:text-xl' : row ? 'text-xs leading-tight' : 'text-xs')}
                 >
                   {entry.detail}
                 </span>

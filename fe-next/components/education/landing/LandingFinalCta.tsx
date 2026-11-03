@@ -1,6 +1,7 @@
 'use client';
 import Image from 'next/image';
 import Link from 'next/link';
+import { PRO_COPY_PARAMS } from '@/lib/education/proFeatures';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackLandingCtaClick } from '@/utils/growthTracking';
 import m from './landingMotion.module.css';
@@ -19,20 +20,20 @@ export function LandingFinalCta({ setupPending = false }: { setupPending?: boole
           className={`pointer-events-none absolute -top-14 start-1/2 h-auto w-20 -translate-x-1/2 select-none rtl:translate-x-1/2 sm:-top-16 sm:start-auto sm:end-10 sm:w-24 sm:translate-x-0 sm:rtl:translate-x-0 ${m.peek}`}
         />
         <h2 className="text-balance font-neo-poster text-2xl font-extrabold leading-tight tracking-[-0.01em] [overflow-wrap:anywhere] sm:text-4xl">{t('eg2Land.final.title')}</h2>
-        <p className="mx-auto mt-3 max-w-[52ch] text-base font-semibold text-neo-navy/80">{t('eg2Land.final.body')}</p>
+        <p className="mx-auto mt-3 max-w-[52ch] text-base font-semibold text-neo-navy/80">{t('eg2Land.final.body', { classes: PRO_COPY_PARAMS.classes, students: PRO_COPY_PARAMS.students })}</p>
         <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <Link
             href={`/${language}/education/access`}
             data-testid="landing-final-start"
             data-lc-cta="signup"
             onClick={() => trackLandingCtaClick(setupPending ? 'education_final_finish_setup' : 'education_final')}
-            className="inline-flex min-h-14 items-center justify-center rounded-neo bg-neo-navy px-6 py-3 text-center font-neo-display text-base sm:px-8 sm:text-lg font-black uppercase tracking-wide text-neo-cream shadow-hard transition-[transform,box-shadow] duration-150 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed motion-reduce:transition-none"
+            className="inline-flex min-h-14 items-center justify-center rounded-neo bg-neo-navy px-6 py-3 text-center font-neo-display text-base sm:px-8 sm:text-lg font-black uppercase tracking-wide text-neo-cream shadow-hard transition-[transform,box-shadow] duration-150 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-navy focus-visible:ring-offset-2 focus-visible:ring-offset-neo-lime"
           >
             {t(setupPending ? 'eg2Land.hero.ctaFinishSetup' : 'eg2Land.hero.ctaPrimary')}
           </Link>
           <a
             href="#school-quote"
-            className="inline-flex min-h-11 items-center font-neo-display text-base font-black underline decoration-2 underline-offset-4"
+            className="inline-flex min-h-11 items-center font-neo-display text-base font-black underline decoration-2 underline-offset-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-navy"
           >
             {t('eg2Land.final.schoolLink')}
           </a>

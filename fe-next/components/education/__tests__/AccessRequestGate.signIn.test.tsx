@@ -12,6 +12,8 @@ vi.mock('@/components/auth/AuthModal', () => ({
   default: ({ initialMode }: { initialMode: string }) => <div data-testid="auth-modal">{initialMode}</div>,
 }));
 
+vi.mock('../AccessRequestGoogleButton', () => ({ AccessRequestGoogleButton: () => <button type="button">google</button> }));
+
 import { AccessRequestGate } from '../AccessRequestGate';
 
 describe('<AccessRequestGate> signed-out teacher', () => {
@@ -21,7 +23,7 @@ describe('<AccessRequestGate> signed-out teacher', () => {
     expect(await screen.findByTestId('auth-modal')).toHaveTextContent('signin');
   });
 
-  it('keeps sign-up as the primary CTA', async () => {
+  it('keeps email sign-up one tap away', async () => {
     render(<AccessRequestGate />);
     await userEvent.click(screen.getByRole('button', { name: /auth_required_cta/ }));
     expect(await screen.findByTestId('auth-modal')).toHaveTextContent('signup');

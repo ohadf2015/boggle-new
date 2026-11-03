@@ -76,7 +76,7 @@ export function LangHubView({ hub, locale }: { hub: LangHub; locale: string }) {
               {gh && (
                 <Link
                   href={`/${pickLocale(gh.locales, locale)}${gradeHubPath(hub.lang, gh.grade)}`}
-                  className="rounded-neo border-3 border-neo-black bg-neo-white px-4 py-2 text-sm font-black text-neo-navy shadow-hard"
+                  className="rounded-neo border-3 border-neo-black bg-neo-white px-4 py-2 text-sm font-black text-neo-navy shadow-hard focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
                 >
                   {tr(locale, 'hub.viewAll', { count: gh.lists.length })}
                 </Link>

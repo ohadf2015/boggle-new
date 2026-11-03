@@ -140,7 +140,7 @@ export default function PracticePicker({
               data-testid="practice-picker-more"
               aria-expanded={showAll}
               onClick={() => setShowAll((open) => !open)}
-              className="flex min-h-[46px] w-full shrink-0 items-center justify-center gap-2 rounded-neo border-[3px] border-neo-cream bg-neo-navy px-4 font-neo-display text-sm font-black uppercase text-neo-cream transition-colors hover:bg-neo-navy-light"
+              className="flex min-h-[46px] w-full shrink-0 items-center justify-center gap-2 rounded-neo border-[3px] border-neo-cream bg-neo-navy px-4 font-neo-display text-sm font-black uppercase text-neo-cream transition-colors hover:bg-neo-navy-light focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
             >
               {showAll
                 ? t('student.practiceFun.fewerGames')

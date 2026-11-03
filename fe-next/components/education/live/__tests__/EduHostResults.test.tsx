@@ -90,18 +90,19 @@ describe('EduHostResults', () => {
     masteryByPlayer: { Noa: { found: 3, total: 10 }, Ido: { found: 1, total: 10 } },
   } as unknown as ClassroomSummary;
 
-  it('given a free teacher, when results show, then the Teacher Pro trial card is the one Pro slot and no second unlock ask competes', () => {
+  it('given a free teacher, when results show, then the labelled Pro preview is the one Pro slot and no trial card or second unlock ask competes', () => {
     render(<EduHostResults summary={lessonSummary} players={players} t={t} onRematch={vi.fn()} />);
     finishReveal();
-    expect(screen.getByTestId('results-teacher-pro-trial-card')).toBeInTheDocument();
+    expect(screen.getByTestId('class-report-teaser')).toBeInTheDocument();
+    expect(screen.queryByTestId('results-teacher-pro-trial-card')).toBeNull();
     expect(screen.queryByTestId('unlock-report-upgrade-cta')).toBeNull();
     expect(screen.queryByTestId('struggle-preview')).toBeNull();
     expect(document.querySelector('a[href="/he/teacher/reports"]')).toBeNull();
   });
 
-  it('given a free teacher, when the trial card mounts on the wall, then its server-side rendered impression fires', () => {
+  it('given a free teacher, when the Pro preview mounts on the wall, then its server-side rendered impression fires', () => {
     render(<EduHostResults summary={lessonSummary} players={players} t={t} onRematch={vi.fn()} />);
-    expect(proOffer.reportProOfferImpression).toHaveBeenCalledWith(expect.objectContaining({ placement: 'classroom_results', stage: 'rendered' }), expect.anything());
+    expect(proOffer.reportProOfferImpression).toHaveBeenCalledWith(expect.objectContaining({ placement: 'class_report_button', format: 'report_teaser', stage: 'rendered' }), expect.anything());
   });
 
   it('given a Pro teacher, when results show, then the live projector links straight to the class report and shows no upsell', () => {
@@ -114,8 +115,7 @@ describe('EduHostResults', () => {
 
   it('given lesson words, when results show, then the words still to teach are on the wall', () => {
     render(<EduHostResults summary={lessonSummary} players={players} t={t} />);
-    expect(screen.getByTestId('lesson-word-dog')).toHaveAttribute('data-found', 'false');
-    expect(screen.queryByTestId('lesson-word-cat')).toBeNull();
+    expect(screen.getAllByTestId('edu-most-missed-word').map((el) => el.textContent)).toEqual(['dog0/2']);
   });
 
   it('given nobody scored, when results show, then the wall says so honestly with the stats and Play again', () => {
@@ -166,10 +166,10 @@ describe('EduHostResults', () => {
     expect(screen.queryByTestId('celebration-loop')).toBeNull();
     expect(screen.queryByTestId('winner-boss-escaped')).toBeNull();
   });
-  it('Given a free teacher and a celebrated round with three or more students, When results show, Then the Pro slot holds the trial card and no invite row competes', () => {
+  it('Given a free teacher and a celebrated round with three or more students, When results show, Then no invite row competes', () => {
     const class3 = [...players, { username: 'Lia', score: 5, wordsFoundCount: 1 }];
     render(<EduHostResults summary={summary} players={class3} t={t} />);
-    expect(screen.getByTestId('results-teacher-pro-trial-card')).toBeInTheDocument();
+    expect(screen.queryByTestId('results-teacher-pro-trial-card')).toBeNull();
     expect(screen.queryByTestId('teacher-invite')).toBeNull();
   });
 
@@ -194,23 +194,21 @@ describe('EduHostResults', () => {
     expect(root.className).not.toMatch(/\/results:/);
   });
 
-  it('given a free teacher, when results show, then "See this class\'s report" opens a teaser that says how many struggled, never who', () => {
+  it('given a free teacher, when results show, then the Pro preview says how many struggled, never who, with no tap needed', () => {
     render(<EduHostResults summary={lessonSummary} players={players} t={t} onRematch={vi.fn()} />);
     finishReveal();
-    fireEvent.click(screen.getByTestId('class-report-button'));
     const teaser = screen.getByTestId('class-report-teaser');
     expect(teaser).toHaveTextContent(/2 students found under half the words|2 תלמידים/);
     expect(teaser).not.toHaveTextContent(/Noa|Ido/);
-    expect(proOffer.reportProOfferClick).toHaveBeenCalledWith(expect.objectContaining({ placement: 'class_report_button', format: 'report_button' }));
   });
 
-  it('given a Pro teacher or an empty round, then there is no class-report teaser button', () => {
+  it('given a Pro teacher or an empty round, then there is no Pro preview', () => {
     pro.hasPro = true;
     const a = render(<EduHostResults summary={lessonSummary} players={players} t={t} onRematch={vi.fn()} />);
-    expect(screen.queryByTestId('class-report-button')).toBeNull();
+    expect(screen.queryByTestId('class-report-teaser')).toBeNull();
     a.unmount();
     pro.hasPro = false;
     render(<EduHostResults summary={summary} players={players} t={t} onRematch={vi.fn()} />);
-    expect(screen.queryByTestId('class-report-button')).toBeNull();
+    expect(screen.queryByTestId('class-report-teaser')).toBeNull();
   });
 });

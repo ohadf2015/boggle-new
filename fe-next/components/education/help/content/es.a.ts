@@ -41,8 +41,8 @@ export const esA: HelpLocaleContent = {
   },
   'start-a-live-game': {
     title: 'Lanza un juego en directo con un toque',
-    summary: 'Elige un juego, elige las palabras y pulsa ¡En directo! El código está en la pizarra antes de que la clase termine de sentarse.',
-    keywords: 'en directo, juego en vivo, lanzar, proyector, juego de clase, empezar, jugar ahora',
+    summary: 'Elige un juego, elige las palabras y pulsa Empezar en vivo. El código está en la pizarra antes de que la clase termine de sentarse.',
+    keywords: 'empezar en vivo, en directo, juego en vivo, lanzar, proyector, juego de clase, empezar, jugar ahora',
     blocks: [
       { t: 'p', text: 'En un juego en directo toda la clase juega a la vez desde sus dispositivos mientras la pizarra muestra el código, el tiempo y la clasificación. Todo empieza en [[teacher.nav.play]] dentro de la Central del profe.' },
       {
@@ -50,7 +50,7 @@ export const esA: HelpLocaleContent = {
         items: [
           { title: 'Elige el juego', body: 'En [[academy.hq.startTitle]], toca un póster. ¿Dudas? [[academy.hq.modes.classic]] funciona con cualquier lista; [[academy.hq.modes.vocabQuiz]] necesita palabras con definición.', shot: 'hq-start-game' },
           { title: 'Elige las palabras', body: 'Toca una de tus listas bajo los pósteres, o pulsa [[teacher.playNow.changeWords]] para ver [[teacher.playNow.sourcePacks]] o [[teacher.playNow.sourcePaste]].' },
-          { title: 'Pulsa ¡En directo!', body: 'Pulsa [[teacher.playNow.goLive]]. LexiClash prepara la clase, carga las palabras y abre la sala. La sala de espera llena la pantalla con el código, el enlace y un código QR.', shot: 'lobby' },
+          { title: 'Pulsa Empezar en vivo', body: 'Pulsa [[teacher.playNow.goLive]]. LexiClash prepara la clase, carga las palabras y abre la sala. La sala de espera llena la pantalla con el código, el enlace y un código QR.', shot: 'lobby' },
           { title: 'Empieza cuando estén dentro', body: 'Los nombres aparecen en la sala de espera según se unen. [[hostView.startClassGame]] se activa en cuanto hay al menos un alumno. Púlsalo y la ronda empieza a la vez en todos los dispositivos.' },
         ],
       },

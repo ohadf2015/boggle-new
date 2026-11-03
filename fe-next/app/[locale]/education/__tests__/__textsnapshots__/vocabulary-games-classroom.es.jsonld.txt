@@ -85,7 +85,7 @@
       "name": "¿Necesitan registrarse los estudiantes?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Sí, pero es gratis y toma 30 segundos. Correo o cuenta Google. Sin tarjeta de crédito, sin sorpresas."
+        "text": "No. Entran con un código de 6 caracteres y juegan en cualquier navegador: sin registro ni correo. Solo el docente tiene cuenta."
       }
     },
     {

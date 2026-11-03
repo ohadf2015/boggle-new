@@ -12,7 +12,7 @@ export const svT: HelpLocaleContent = {
         items: [
           { time: '0:00', title: 'Öppna Lärarbasen', body: 'Logga in i [Lärarbasen](app:/teacher). Du hamnar på [[teacher.nav.play]].' },
           { time: '0:30', title: 'Välj spel och ord', body: 'Tryck på [[academy.hq.modes.classic]] och en av startlistorna under affischerna. De är redo att spelas.', shot: 'hq-start-game' },
-          { time: '1:00', title: 'Kör igång och visa på tavlan', body: 'Tryck på [[teacher.playNow.goLive]] och visa din skärm på tavlan. Lobbyn visar en stor kod, länken och en QR-kod.', shot: 'lobby' },
+          { time: '1:00', title: 'Starta live och visa på tavlan', body: 'Tryck på [[teacher.playNow.goLive]] och visa din skärm på tavlan. Lobbyn visar en stor kod, länken och en QR-kod.', shot: 'lobby' },
           { time: '1:30', title: 'Eleverna går med', body: 'De skannar QR-koden eller skriver koden på lexiclash.live/join och väljer ett namn. Se namnen flyga in.' },
           { time: '2:00', title: 'Spela en runda', body: 'Tryck på [[hostView.startClassGame]]. En runda [[academy.hq.modes.classic]] tar tre minuter. Din skärm visar klockan och topplistan live.', shot: 'live-host' },
           { time: '5:00', title: 'Fira, och kör igen', body: 'Prispallen visas. Tryck på [[education.results.playAgain]] för en runda till med samma kod, eller på [[eduLive.results.backToClass]] för att avsluta.' },

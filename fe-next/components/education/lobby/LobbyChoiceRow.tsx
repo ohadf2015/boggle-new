@@ -71,7 +71,7 @@ export function LobbyChoiceRow<T extends string | number>({
               disabled={disabled}
               onClick={() => onChange(choice.value)}
               className={cn(
-                'inline-flex min-h-9 items-center gap-1.5 rounded-neo border-2 px-3 py-1 font-neo-display text-sm font-bold transition-colors',
+                'inline-flex min-h-11 items-center gap-1.5 rounded-neo border-2 px-3 py-1 font-neo-display text-sm font-bold transition-colors',
                 CALM_FOCUS,
                 disabled && 'cursor-not-allowed opacity-60',
                 isSelected ? selectedClassName : CALM_IDLE

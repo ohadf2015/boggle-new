@@ -137,7 +137,7 @@ export default function DuelNotification({ classroomId }: DuelNotificationProps)
               type="button"
               data-testid="duel-rematch-offer-accept"
               onClick={requestRematch}
-              className={cn(
+              className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
                 'inline-flex flex-1 items-center justify-center gap-2 rounded-neo border-[3px] border-neo-black bg-neo-lime px-4 py-2.5',
                 'font-neo-display text-sm font-black uppercase italic tracking-tight text-neo-black shadow-hard',
                 'transition hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed'
@@ -155,7 +155,7 @@ export default function DuelNotification({ classroomId }: DuelNotificationProps)
               type="button"
               data-testid="duel-rematch-offer-dismiss"
               onClick={() => setRematchOffer(null)}
-              className="shrink-0 rounded-neo border-[2px] border-neo-cream bg-neo-navy p-2 text-neo-cream transition-colors hover:bg-neo-cream hover:text-neo-navy"
+              className="shrink-0 rounded-neo border-[2px] border-neo-cream bg-neo-navy p-2 text-neo-cream transition-colors hover:bg-neo-cream hover:text-neo-navy focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
               aria-label={t('common.dismiss')}
             >
               <X className="h-5 w-5" />
@@ -203,7 +203,7 @@ export default function DuelNotification({ classroomId }: DuelNotificationProps)
             <button
               type="button"
               onClick={handleDismiss}
-              className="shrink-0 rounded-neo border-[2px] border-neo-cream bg-neo-navy p-1.5 text-neo-cream transition-colors hover:bg-neo-cream hover:text-neo-navy"
+              className="shrink-0 rounded-neo border-[2px] border-neo-cream bg-neo-navy p-1.5 text-neo-cream transition-colors hover:bg-neo-cream hover:text-neo-navy focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
               aria-label={t('common.dismiss')}
             >
               <X className="w-5 h-5" />

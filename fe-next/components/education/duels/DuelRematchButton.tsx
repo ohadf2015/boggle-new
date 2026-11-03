@@ -94,7 +94,7 @@ export function DuelRematchButton({
       {state === 'offered' && (
         <p
           data-testid="duel-rematch-note"
-          className="truncate text-center font-neo-body text-[11px] font-black uppercase tracking-widest text-neo-lime"
+          className="truncate text-center font-neo-body text-xs font-black uppercase tracking-widest text-neo-lime"
         >
           {t('education.duels.rematchWants', undefined, { name })}
         </p>
@@ -106,7 +106,7 @@ export function DuelRematchButton({
         data-state={state}
         aria-live={state === 'offered' ? 'polite' : undefined}
         onClick={state === 'pending' ? onCancel : state === 'invited' ? undefined : onRematch}
-        className={cn(
+        className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
           'inline-flex w-full items-center justify-center gap-2 rounded-neo border-[3px] border-neo-black px-4 py-3',
           'font-neo-display text-base font-black uppercase italic tracking-tight shadow-hard transition',
           'hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed',
@@ -121,7 +121,7 @@ export function DuelRematchButton({
       </button>
 
       {state === 'pending' && (
-        <p className="text-center font-neo-body text-[10px] font-black uppercase tracking-widest text-neo-cream/80">
+        <p className="text-center font-neo-body text-xs font-black uppercase tracking-widest text-neo-cream/80">
           {t('education.duels.rematchTapCancel')}
         </p>
       )}

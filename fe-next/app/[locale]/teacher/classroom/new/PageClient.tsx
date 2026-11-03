@@ -1,10 +1,12 @@
 'use client';
 
+import { useSearchParams } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { TeacherGate } from '@/components/education/TeacherGate';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import { useTeacherReveal } from '@/components/teacher/motion/useTeacherReveal';
-import { ClassSetupFlow } from '@/components/teacher/setup/ClassSetupFlow';
+import { ClassSetupInvite } from '@/components/education/ClassSetupInvite';
+import { ClassSetupStart } from '@/components/education/ClassSetupStart';
 
 /** The shell wraps the gate so the gate's loading/denial states keep the body lock too. */
 export default function NewClassPageClient() {
@@ -20,9 +22,11 @@ export default function NewClassPageClient() {
 
 function SetupMain() {
   const revealRef = useTeacherReveal<HTMLElement>();
+  const searchParams = useSearchParams();
+  const classroomId = searchParams?.get('classroomId');
   return (
     <main ref={revealRef}>
-      <ClassSetupFlow />
+      {classroomId ? <ClassSetupInvite classroomId={classroomId} packKey={searchParams?.get('pack')} /> : <ClassSetupStart />}
     </main>
   );
 }

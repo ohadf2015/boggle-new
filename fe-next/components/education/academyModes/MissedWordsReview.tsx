@@ -119,14 +119,14 @@ export default function MissedWordsReview({ cards, lessonName, onBack, onFinish,
       <AcademyModeFrame title={title} onBack={onBack} accent="cyan" theme="vault" testId="review-screen" right={playerChip}>
         <div data-testid="review-empty" className="flex w-full max-w-md flex-col items-center gap-3 text-center lg:max-w-3xl">
           {/* eslint-disable-next-line @next/next/no-img-element -- static art */}
-          <img src={REVIEW_MASCOT_ART.cheer} alt="" className="h-40 w-40 object-contain drop-shadow-[5px_5px_0_#000] lg:h-72 lg:w-72" />
-          <h2 className="font-neo-display text-3xl font-black uppercase text-neo-white lg:text-7xl" style={{ textShadow: '3px 3px 0 #000' }}>
+          <img src={REVIEW_MASCOT_ART.cheer} alt="" className="h-40 w-40 object-contain drop-shadow-[5px_5px_0_rgb(var(--neo-black))] lg:h-72 lg:w-72" />
+          <h2 className="font-neo-display text-3xl font-black uppercase text-neo-white lg:text-7xl" style={{ textShadow: '3px 3px 0 rgb(var(--neo-black))' }}>
             {t('academy.modes.review.emptyTitle', 'Nothing to review!')}
           </h2>
           <p className="font-neo-body text-base text-neo-cream lg:text-2xl">
             {t('academy.modes.review.emptyBody', 'Play a class game or a lesson, and the words you miss will show up here for a rematch.')}
           </p>
-          <button type="button" data-testid="review-back" onClick={onBack} className={cn(primaryButtonClass, 'w-full lg:max-w-xl')}>
+          <button type="button" data-testid="review-back" onClick={onBack} className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black', primaryButtonClass, 'w-full lg:max-w-xl')}>
             {t('academy.modes.backToAcademy', 'Back to Academy')}
           </button>
         </div>
@@ -163,7 +163,7 @@ export default function MissedWordsReview({ cards, lessonName, onBack, onFinish,
               <img
                 src={perfect || s.bestStreak >= 3 ? REVIEW_MASCOT_ART.fire : REVIEW_MASCOT_ART.cheer}
                 alt=""
-                className="absolute bottom-[6%] end-0 h-20 w-20 object-contain drop-shadow-[4px_4px_0_#000] sm:h-28 sm:w-28 lg:h-56 lg:w-56"
+                className="absolute bottom-[6%] end-0 h-20 w-20 object-contain drop-shadow-[4px_4px_0_rgb(var(--neo-black))] sm:h-28 sm:w-28 lg:h-56 lg:w-56"
               />
             }
             note={
@@ -179,12 +179,12 @@ export default function MissedWordsReview({ cards, lessonName, onBack, onFinish,
             actions={
               <>
                 {onPlayAgain && (
-                  <button type="button" data-testid="review-again" onClick={onPlayAgain} className={cn(primaryButtonClass, 'flex-1 whitespace-nowrap px-3 text-base sm:text-xl')}>
+                  <button type="button" data-testid="review-again" onClick={onPlayAgain} className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black', primaryButtonClass, 'flex-1 whitespace-nowrap px-3 text-base sm:text-xl')}>
                     <RotateCcw className="h-5 w-5 lg:h-8 lg:w-8" aria-hidden />
                     {t('academy.modes.playAgain', 'Play again')}
                   </button>
                 )}
-                <button type="button" data-testid="review-back" onClick={onBack} className={cn(secondaryButtonClass, 'flex-1 px-3 text-sm sm:text-base')}>
+                <button type="button" data-testid="review-back" onClick={onBack} className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black', secondaryButtonClass, 'flex-1 px-3 text-sm sm:text-base')}>
                   {t('academy.modes.backToAcademy', 'Back to Academy')}
                 </button>
               </>
@@ -217,9 +217,9 @@ export default function MissedWordsReview({ cards, lessonName, onBack, onFinish,
           transition={{ type: 'spring', stiffness: 500, damping: 12 }}
           className={cn(
             'flex items-center gap-1 rounded-neo border-[3px] px-2.5 py-1 font-neo-display text-lg font-black shadow-hard lg:px-4 lg:text-3xl min-[2200px]:px-6 min-[2200px]:text-5xl',
-            streak >= 3 ? 'border-black bg-neo-orange text-black' : streak > 0 ? 'border-black bg-neo-yellow text-black' : 'border-neo-cream bg-neo-navy-elevated text-neo-cream',
+            streak >= 3 ? 'border-neo-black bg-neo-orange text-neo-black' : streak > 0 ? 'border-neo-black bg-neo-yellow text-neo-black' : 'border-neo-cream bg-neo-navy-elevated text-neo-cream',
           )}
-          style={streak >= 3 ? { boxShadow: '3px 3px 0 #000, 0 0 22px rgba(255,107,53,0.8)' } : undefined}
+          style={streak >= 3 ? { boxShadow: '3px 3px 0 rgb(var(--neo-black)), 0 0 22px rgba(255,107,53,0.8)' } : undefined}
           aria-label={t('academy.modes.review.streak', 'Streak {count}', { count: streak })}
         >
           <Flame className="h-5 w-5 lg:h-8 lg:w-8" aria-hidden />
@@ -267,8 +267,8 @@ export default function MissedWordsReview({ cards, lessonName, onBack, onFinish,
                 animate={{ y: -8, scale: 1 }}
                 exit={{ opacity: 0 }}
                 className={cn(
-                  'pointer-events-none absolute -top-5 z-10 flex items-center gap-1 rounded-neo border-[3px] border-black px-3 py-1 font-neo-display text-xl font-black shadow-hard lg:text-4xl',
-                  lastPoints > 0 ? 'bg-neo-lime text-black' : 'bg-neo-pink text-black',
+                  'pointer-events-none absolute -top-5 z-10 flex items-center gap-1 rounded-neo border-[3px] border-neo-black px-3 py-1 font-neo-display text-xl font-black shadow-hard lg:text-4xl',
+                  lastPoints > 0 ? 'bg-neo-lime text-neo-black' : 'bg-neo-pink text-neo-black',
                 )}
               >
                 {lastPoints > 0 ? <Check className="h-5 w-5" aria-hidden /> : <X className="h-5 w-5" aria-hidden />}

@@ -155,10 +155,52 @@ describe('Teacher Home', () => {
     expect(onDismiss).toHaveBeenCalled();
   });
 
-  it('Given a free teacher with no class yet, Then the dashboard Pro card still sits in the rail', () => {
+  it('Given a free teacher with no class yet, Then the onboarding guide is the one ask and no Pro card shows', () => {
     classroomsState = { classrooms: [], isLoading: false, error: null, refresh: vi.fn() };
-    render(<TeacherDashboard proOffer={{ kind: 'upgrade', onDismiss: vi.fn(), tracked: false }} />);
-    expect(screen.getByTestId('home-pro-card')).toBeInTheDocument();
+    render(<TeacherDashboard proOffer={{ kind: 'trial', onDismiss: vi.fn(), tracked: true }} />);
+    expect(screen.getByTestId('home-onboarding')).toBeInTheDocument();
+    expect(screen.queryByTestId('home-pro-card')).not.toBeInTheDocument();
+  });
+
+  it('Given the setup nudge is showing, Then no Pro card or usage card stacks beside it', () => {
+    activation = { ...activation, progress: { inviteCopied: true, liveStarted: false, roomOpened: false, dismissed: false } };
+    week = { status: 'ready', summary: { gamesPlayed: 0, totalStudents: 0, activeClasses: 0, lastPlayedAt: {} } };
+    render(<TeacherDashboard proOffer={{ kind: 'upgrade', onDismiss: vi.fn(), tracked: true }} usagePrompt={<div data-testid="usage-card" />} />);
+    expect(screen.getByTestId('home-onboarding')).toBeInTheDocument();
+    expect(screen.queryByTestId('home-pro-card')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('usage-card')).not.toBeInTheDocument();
+  });
+
+  it('Given a picked Pro offer, Then its impression fires only when Home actually renders the card', () => {
+    const shown = vi.fn();
+    const offer = { kind: 'upgrade' as const, onDismiss: vi.fn(), tracked: true, onShown: shown };
+    const { unmount } = render(<TeacherDashboard proOffer={offer} />);
+    expect(shown).toHaveBeenCalledTimes(1);
+    unmount();
+
+    shown.mockClear();
+    classroomsState = { classrooms: [], isLoading: false, error: null, refresh: vi.fn() };
+    render(<TeacherDashboard proOffer={offer} />);
+    expect(shown).not.toHaveBeenCalled();
+  });
+
+  it('Given the week read is still loading, Then the rail Pro card waits instead of flashing', () => {
+    week = { status: 'loading', summary: null };
+    render(<TeacherDashboard proOffer={{ kind: 'upgrade', onDismiss: vi.fn(), tracked: true }} />);
+    expect(screen.queryByTestId('home-pro-card')).not.toBeInTheDocument();
+  });
+
+  it('Given an account banner, Then no Pro card or usage card stacks under it', () => {
+    render(
+      <TeacherDashboard
+        banner={<div data-testid="trial-banner" />}
+        proOffer={{ kind: 'upgrade', onDismiss: vi.fn(), tracked: true }}
+        usagePrompt={<div data-testid="usage-card" />}
+      />,
+    );
+    expect(screen.getByTestId('trial-banner')).toBeInTheDocument();
+    expect(screen.queryByTestId('home-pro-card')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('usage-card')).not.toBeInTheDocument();
   });
 
   it('Given no ask was picked, Then Home shows no Pro card at all', () => {

@@ -14,6 +14,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useCountUp } from '@/hooks/useCountUp';
 import { GodRays } from '@/components/wordTowerV2/rewards/GodRays';
+import { NEO_HEX } from '@/components/education/economy/neoHex';
 import { CoinFountain } from '@/components/wordTowerV2/rewards/CoinFountain';
 import { BoundedConfettiBurst } from '@/components/motion/BoundedConfettiBurst';
 import { cn } from '@/lib/utils';
@@ -102,7 +103,7 @@ export function DailyChest({ userId, reducedMotion, onGranted, size = 'sm' }: Pr
         <span
           dir="auto"
           className={cn(
-            'absolute -bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border-2 px-1.5 font-neo-display text-[9px] font-black uppercase leading-[14px] tracking-wider',
+            'absolute -bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border-2 px-1.5 font-neo-display text-xs font-black uppercase leading-[14px] tracking-wider',
             available ? 'border-neo-black bg-neo-yellow text-neo-black' : 'border-neo-cream bg-neo-navy text-neo-white/80',
           )}
           style={available ? toneStyle('gold', { shadow: 2, trim: 1 }) : undefined}
@@ -121,7 +122,7 @@ export function DailyChest({ userId, reducedMotion, onGranted, size = 'sm' }: Pr
             dir={dir}
             className="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden bg-neo-navy/95 px-6"
           >
-            {phase === 'open' && <GodRays rays={12} hex="#ffe135" strength={0.75} reducedMotion={reducedMotion} />}
+            {phase === 'open' && <GodRays rays={12} hex={NEO_HEX.yellow} strength={0.75} reducedMotion={reducedMotion} />}
             {phase === 'open' && <CoinFountain count={14} spread={1} reducedMotion={reducedMotion} />}
             <BoundedConfettiBurst trigger={phase === 'open' && !reducedMotion} size="lg">
               <m.div
@@ -160,7 +161,7 @@ export function DailyChest({ userId, reducedMotion, onGranted, size = 'sm' }: Pr
                 <button
                   type="button"
                   onClick={() => setPhase('idle')}
-                  className="min-h-[48px] rounded-neo border-3 border-neo-black bg-neo-yellow px-8 font-neo-display text-lg font-black uppercase text-neo-black shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm"
+                  className="min-h-[48px] rounded-neo border-3 border-neo-black bg-neo-yellow px-8 font-neo-display text-lg font-black uppercase text-neo-black shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
                 >
                   {t('academy.student.chestCollect', 'Collect')}
                 </button>

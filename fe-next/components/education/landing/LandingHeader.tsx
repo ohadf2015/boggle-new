@@ -28,7 +28,7 @@ export function LandingHeader({ showStart = true }: { showStart?: boolean }) {
           <span className="truncate font-neo-display text-base font-black uppercase tracking-tight text-neo-cream min-[400px]:text-lg sm:text-xl">
             LexiClash
           </span>
-          <span className="hidden shrink-0 -rotate-2 rounded-neo-sm border-2 border-neo-black bg-neo-lime px-1.5 py-0.5 font-neo-display text-[11px] font-black uppercase leading-none text-neo-navy shadow-hard-sm min-[400px]:inline-block">
+          <span className="hidden shrink-0 -rotate-2 rounded-neo-sm border-2 border-neo-black bg-neo-lime px-1.5 py-0.5 font-neo-display text-xs font-black uppercase leading-none text-neo-navy shadow-hard-sm min-[400px]:inline-block">
             {t('eg2Land.header.tag')}
           </span>
         </Link>
@@ -57,7 +57,7 @@ export function LandingHeader({ showStart = true }: { showStart?: boolean }) {
               href={`/${language}/education/access`}
               data-testid="landing-header-start"
               onClick={() => trackGrowthEvent('landing_cta_clicked', { cta: 'education_header_start' })}
-              className="inline-flex min-h-10 items-center whitespace-nowrap rounded-neo border-2 border-neo-cream bg-transparent px-2.5 font-neo-display text-sm font-bold text-neo-cream transition-colors duration-150 hover:bg-neo-cream/10 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan motion-reduce:transition-none sm:px-4"
+              className="inline-flex min-h-11 items-center whitespace-nowrap rounded-neo border-2 border-neo-cream bg-transparent px-2.5 font-neo-display text-sm font-bold text-neo-cream transition-colors duration-150 hover:bg-neo-cream/10 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan motion-reduce:transition-none sm:px-4"
             >
               {t('eg2Land.header.start')}
             </Link>

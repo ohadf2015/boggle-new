@@ -102,7 +102,7 @@ export function MissGapTeacherCompose({
         data-testid="share-miss-gap-async-homework"
         onClick={handleShare}
         disabled={!payload.dueDate || tokenPending}
-        className={cn(
+        className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
           'w-full flex items-center justify-center gap-2 px-4 py-4',
           'font-neo-display font-bold text-lg',
           'bg-neo-lime text-neo-black border-[3px] border-neo-black rounded-neo',
@@ -135,7 +135,7 @@ export function MissGapTeacherCompose({
           target="_blank"
           rel="noopener noreferrer"
           data-testid="assign-miss-gap-async-google-classroom"
-          className={cn(
+          className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
             'w-full flex items-center justify-center gap-2 px-4 py-3 font-bold',
             'bg-neo-cream text-neo-black border-[3px] border-neo-black rounded-neo',
             'shadow-hard-sm hover:shadow-hard transition',

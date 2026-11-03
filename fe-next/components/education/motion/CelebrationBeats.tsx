@@ -82,7 +82,7 @@ export function CelebrationBeats({ hero, headline, subtitle, chips, cta, skipLab
         <button
           type="button"
           onClick={skip}
-          className="absolute end-4 top-4 rounded-neo border-2 border-neo-cream px-3 py-1 font-neo-display text-xs font-black uppercase tracking-wide text-neo-cream"
+          className="absolute end-4 top-4 rounded-neo border-2 border-neo-cream px-3 py-1 font-neo-display text-xs font-black uppercase tracking-wide text-neo-cream focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
         >
           {skipLabel}
         </button>

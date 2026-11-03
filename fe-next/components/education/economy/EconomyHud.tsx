@@ -62,7 +62,7 @@ export default function EconomyHud({ snapshot }: EconomyHudProps) {
       {snapshot.streak >= 1 && (
         <m.span
           key={`streak-${snapshot.multiplier}`}
-          className={hot ? 'inline-flex items-center gap-1 rounded-full border-2 border-black bg-neo-orange px-2 py-0.5 text-neo-navy' : 'inline-flex items-center gap-1 rounded-full border-2 border-white/40 px-2 py-0.5 text-white'}
+          className={hot ? 'inline-flex items-center gap-1 rounded-full border-2 border-neo-black bg-neo-orange px-2 py-0.5 text-neo-navy' : 'inline-flex items-center gap-1 rounded-full border-2 border-white/40 px-2 py-0.5 text-white'}
           data-testid="hud-streak"
           initial={reduced ? false : { scale: 1.25 }}
           animate={{ scale: 1 }}

@@ -41,8 +41,8 @@ export const svA: HelpLocaleContent = {
   },
   'start-a-live-game': {
     title: 'Starta ett livespel med ett tryck',
-    summary: 'Välj spel, välj ord, tryck Kör igång. Koden står på tavlan innan klassen har hunnit sätta sig.',
-    keywords: 'kör igång, livespel, starta spel, projektor, klasspel, spela nu',
+    summary: 'Välj spel, välj ord, tryck Starta live. Koden står på tavlan innan klassen har hunnit sätta sig.',
+    keywords: 'starta live, kör igång, livespel, starta spel, projektor, klasspel, spela nu',
     blocks: [
       { t: 'p', text: 'I ett livespel spelar hela klassen samtidigt från sina egna enheter medan tavlan visar koden, klockan och topplistan. Allt börjar på [[teacher.nav.play]] i Lärarbasen.' },
       {
@@ -50,7 +50,7 @@ export const svA: HelpLocaleContent = {
         items: [
           { title: 'Välj spel', body: 'Under [[academy.hq.startTitle]] trycker du på en affisch. Osäker? [[academy.hq.modes.classic]] fungerar med alla ordlistor; [[academy.hq.modes.vocabQuiz]] kräver ord med förklaringar.', shot: 'hq-start-game' },
           { title: 'Välj ord', body: 'Tryck på en av dina listor under affischerna, eller på [[teacher.playNow.changeWords]] för [[teacher.playNow.sourcePacks]] eller [[teacher.playNow.sourcePaste]].' },
-          { title: 'Tryck Kör igång', body: 'Tryck på [[teacher.playNow.goLive]]. LexiClash förbereder klassen, laddar orden och öppnar rummet. Lobbyn fyller skärmen med koden, länken och en QR-kod.', shot: 'lobby' },
+          { title: 'Tryck Starta live', body: 'Tryck på [[teacher.playNow.goLive]]. LexiClash förbereder klassen, laddar orden och öppnar rummet. Lobbyn fyller skärmen med koden, länken och en QR-kod.', shot: 'lobby' },
           { title: 'Starta när de är inne', body: 'Namnen dyker upp i lobbyn när eleverna går med. [[hostView.startClassGame]] låses upp så fort minst en elev är inne. Tryck, så börjar rundan på alla enheter samtidigt.' },
         ],
       },

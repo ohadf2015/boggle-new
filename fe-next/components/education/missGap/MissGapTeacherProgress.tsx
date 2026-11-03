@@ -48,7 +48,7 @@ export function MissGapTeacherProgress({ data, failed, payload }: MissGapTeacher
             <Users className="w-5 h-5 text-neo-cyan" aria-hidden />
             <span data-testid="miss-gap-teacher-players">{data?.players ?? 0}</span>
           </span>
-          <span className="block font-neo-body text-[11px] uppercase tracking-wider text-neo-cream">
+          <span className="block font-neo-body text-xs uppercase tracking-wider text-neo-cream">
             {t('education.homework.teacherPlayed')}
           </span>
         </p>
@@ -56,7 +56,7 @@ export function MissGapTeacherProgress({ data, failed, payload }: MissGapTeacher
           <span className="block font-neo-display font-bold text-2xl text-neo-lime">
             {data?.averageAccuracy ?? 0}%
           </span>
-          <span className="block font-neo-body text-[11px] uppercase tracking-wider text-neo-cream">
+          <span className="block font-neo-body text-xs uppercase tracking-wider text-neo-cream">
             {t('education.homework.teacherAverage')}
           </span>
         </p>
@@ -107,7 +107,7 @@ export function MissGapTeacherProgress({ data, failed, payload }: MissGapTeacher
               </span>
               <span
                 className={cn(
-                  'px-1.5 py-0.5 rounded border-[2px] border-neo-black text-[10px] font-bold uppercase',
+                  'px-1.5 py-0.5 rounded border-[2px] border-neo-black text-xs font-bold uppercase',
                   run.onTime ? 'bg-neo-lime text-neo-black' : 'bg-neo-orange text-neo-black',
                 )}
               >

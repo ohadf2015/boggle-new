@@ -25,12 +25,14 @@ export interface TvStageZoomTier {
   className: string;
 }
 
+/** The one edu TV size: the `tv:` variant in app/globals.css (the tailwind.config `tv` screen is shadowed by it). */
+export const TV_VIEWPORT = { minWidth: 1800, minHeight: 1000 } as const;
+
 export const TV_STAGE_ZOOM_TIERS: readonly TvStageZoomTier[] = [
   {
-    minWidth: 1700,
-    minHeight: 950,
+    ...TV_VIEWPORT,
     zoom: 1.3,
-    className: '[@media(min-width:1700px)_and_(min-height:950px)]:[zoom:1.3]',
+    className: '[@media(min-width:1800px)_and_(min-height:1000px)]:[zoom:1.3]',
   },
   {
     minWidth: 2200,

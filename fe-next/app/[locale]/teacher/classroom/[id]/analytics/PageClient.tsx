@@ -143,7 +143,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
             type="button"
             onClick={handleBackToClassroom}
             title={t('education.analytics.backToClassroom')}
-            className={cn(OUTLINE_BUTTON, 'shrink-0 max-sm:size-11 max-sm:px-0')}
+            className={cn(OUTLINE_BUTTON, 'shrink-0 max-sm:size-11 max-sm:px-0 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan')}
           >
             <DirectionalIcon icon={ArrowLeft} className="size-4" />
             <span className="max-sm:sr-only">{t('education.analytics.backToClassroom')}</span>

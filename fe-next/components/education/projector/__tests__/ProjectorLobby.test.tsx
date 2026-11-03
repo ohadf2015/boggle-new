@@ -105,10 +105,21 @@ describe('ProjectorLobby — the session it is projecting', () => {
     expect(screen.getByTestId('projector-session')).toHaveTextContent('education.classroomGame.classroomSession');
   });
 
-  it('names the mode with the round length the clock will run and offers the switch', () => {
+  it('names the mode with the round length the clock will run, echoing the lobby pick before the first round', () => {
+    sessionStorage.clear();
     mockLiveGame = { gameMode: 'wheel-rush', settings: { timerMinutes: 3 } };
     render(<ProjectorLobby {...base} classroomGameMode="wheel-rush" students={[{ username: 'Noa' }]} />);
     expect(screen.getByTestId('projector-mode')).toHaveTextContent('eduLiveRoom.lobby.minutes:{"count":1}');
+    expect(screen.queryByTestId('mode-switcher')).toBeNull();
+  });
+
+  it('offers the switch once a round has been played in this room ("Next game")', () => {
+    sessionStorage.clear();
+    mockLiveGame = { gameMode: 'wheel-rush', settings: { timerMinutes: 3 } };
+    const view = render(<ProjectorLobby {...base} classroomGameMode="wheel-rush" students={[{ username: 'Noa' }]} />);
+    fireEvent.click(screen.getByTestId('projector-start'));
+    // The lobby stays mounted under the results layer, so the next render (not a remount) must offer the switch.
+    view.rerender(<ProjectorLobby {...base} classroomGameMode="wheel-rush" starting students={[{ username: 'Noa' }]} />);
     expect(screen.getByTestId('mode-switcher')).toBeInTheDocument();
   });
 });

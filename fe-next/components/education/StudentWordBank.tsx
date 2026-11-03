@@ -48,7 +48,7 @@ export function StudentWordBank({
       <div
         dir={isRTL ? 'rtl' : 'ltr'}
         className={cn(
-          'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-neo border-2 border-black bg-neo-orange text-black',
+          'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-neo border-2 border-neo-black bg-neo-orange text-neo-black',
           'text-xs font-neo-display font-black uppercase tracking-wide shadow-hard-sm',
           className
         )}
@@ -97,13 +97,13 @@ export function StudentWordBank({
       </button>
 
       {open && (
-        <div id={panelId} className="border-t-3 border-black px-4 pt-3 pb-4 max-h-[40vh] overflow-y-auto">
+        <div id={panelId} className="border-t-3 border-neo-black px-4 pt-3 pb-4 max-h-[40vh] overflow-y-auto">
           <p className="text-xs font-bold text-white/70 mb-2">{t('education.wordBank.hint')}</p>
           <ul className="grid grid-cols-2 gap-2">
             {words.map((word) => (
               <li
                 key={word}
-                className="text-xl font-neo-display font-black tracking-wide uppercase px-3 py-2 rounded-neo border-2 border-black bg-neo-cream text-black shadow-hard-sm break-words"
+                className="text-xl font-neo-display font-black tracking-wide uppercase px-3 py-2 rounded-neo border-2 border-neo-black bg-neo-cream text-neo-black shadow-hard-sm break-words"
               >
                 {word}
               </li>

@@ -37,12 +37,12 @@ export function MissGapExitLink({ locale }: MissGapExitLinkProps) {
     <Link
       href={`/${locale}/teacher`}
       data-testid="miss-gap-exit-link"
-      className={[
+      className={`${[
         'inline-flex items-center gap-2 self-start shrink-0',
         'px-3 py-2 rounded-neo font-neo-display font-bold text-sm',
         'bg-neo-cream text-neo-black border-[3px] border-neo-black shadow-hard-sm',
         'transition-transform active:translate-x-[2px] active:translate-y-[2px]',
-      ].join(' ')}
+      ].join(' ')} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}
     >
       <DirectionalIcon icon={ArrowLeft} className="w-4 h-4" />
       {t('education.homework.backToDashboard')}

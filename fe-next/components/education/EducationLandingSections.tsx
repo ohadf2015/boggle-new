@@ -136,7 +136,7 @@ export function EducationSectionRenderer({
             const body = (
               <>
                 {u.tag && (
-                  <span className={`absolute -top-3 start-4 border-2 border-neo-black ${a.fill} ${a.ink} px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest`}>
+                  <span className={`absolute -top-3 start-4 border-2 border-neo-black ${a.fill} ${a.ink} px-2 py-0.5 font-neo-display text-xs font-black uppercase tracking-widest`}>
                     {u.tag}
                   </span>
                 )}
@@ -153,7 +153,7 @@ export function EducationSectionRenderer({
             // A card with somewhere to go is a link, not a div with a label that
             // looks clickable.
             return u.href ? (
-              <Link key={u.title} href={`/${locale}${u.href}`} className={`group ${shell}`}>
+              <Link key={u.title} href={`/${locale}${u.href}`} className={`group ${shell} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}>
                 {body}
               </Link>
             ) : (
@@ -240,7 +240,7 @@ export function EducationSectionRenderer({
         <p className="mt-3 max-w-[68ch] text-sm leading-relaxed text-neo-white/75 sm:text-base">{section.body}</p>
         <a
           href={section.href}
-          className="mt-4 inline-block font-neo-display text-sm font-black uppercase tracking-widest text-neo-cyan underline underline-offset-4"
+          className="mt-4 inline-block font-neo-display text-sm font-black uppercase tracking-widest text-neo-cyan underline underline-offset-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
         >
           {section.cta} ↗
         </a>

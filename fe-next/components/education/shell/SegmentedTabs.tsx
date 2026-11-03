@@ -66,7 +66,7 @@ export function SegmentedTabs<K extends string>({ items, value, onChange, ariaLa
             tabIndex={active ? 0 : -1}
             onClick={() => onChange(key)}
             className={cn(
-              'relative z-10 inline-flex min-h-10 min-w-0 items-center justify-center gap-1.5 rounded-neo px-3',
+              'relative z-10 inline-flex min-h-11 min-w-0 items-center justify-center gap-1.5 rounded-neo px-3',
               'font-neo-display text-sm font-bold transition-[color,transform] duration-150 ease-out active:scale-[0.97]',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan',
               active ? 'text-neo-black' : 'text-neo-cream/75 [@media(hover:hover)]:hover:text-neo-cream',

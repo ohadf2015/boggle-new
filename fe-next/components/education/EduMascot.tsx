@@ -27,7 +27,7 @@ export function EduMascot({
 
   if (animate && video && !reduced) {
     return (
-      <span className={cn('block overflow-hidden rounded-full bg-[#0d122b]', className)}>
+      <span className={cn('block overflow-hidden rounded-full bg-[color-mix(in_srgb,_var(--neo-purple)_15%,_rgb(var(--neo-black)))]', className)}>
       <video
         data-testid={`edu-mascot-${moment}`}
         src={video}

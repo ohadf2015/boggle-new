@@ -356,7 +356,7 @@ export function WordCoverageGlance({
                 // Cream edge on navy measures 16.8:1 — this has to read as a
                 // control from six metres, not as one more grey chip.
                 'border-[2px] border-neo-cream bg-neo-navy text-neo-cream',
-                'hover:bg-neo-navy-light transition-colors',
+                'min-h-11 hover:bg-neo-navy-light transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
                 projector ? (calm ? 'px-2.5 py-1 text-base @[96rem]/results:text-2xl' : 'px-4 py-2.5 text-2xl') : calm ? 'px-2.5 py-1 text-sm' : 'px-3 py-1.5 text-sm'
               )}
             >

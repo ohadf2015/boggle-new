@@ -122,7 +122,7 @@ describe('teacher onboarding funnel — call sites stay wired', () => {
   });
 
   it('classroom/new submit success fires classroom_created', () => {
-    const src = readSrc('components/teacher/setup/ClassSetupFlow.tsx');
+    const src = readSrc('components/education/ClassSetupStart.tsx');
     expect(src).toContain('TEACHER_ONBOARDING_FUNNEL_EVENTS.classroomCreated');
   });
 
@@ -153,7 +153,7 @@ const PLAN_TERNARY = /plan:\s*(?:proLoading\s*\?\s*'unknown'\s*:\s*)?hasPro\s*\?
 
 describe('teacher onboarding funnel — plan slice cannot regress to a hasPro ternary', () => {
   const clientSteps = [
-    'components/teacher/setup/ClassSetupFlow.tsx',
+    'components/education/ClassSetupStart.tsx',
     'components/teacher/assignments/AssignmentCreator.tsx',
     'components/teacher/hq/GetStudentsInCard.tsx',
   ];

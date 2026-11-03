@@ -20,7 +20,7 @@ const EXPECTED_EN: Record<string, string> = {
   'eduShell.home.rail.run': 'Use',
   'eduShell.home.startLive': 'Pick a game',
   'academy.hq.openProjector': 'Show code on board',
-  'education.projectorLobby.rehearseCta': 'Try it with bots',
+  'education.projectorLobby.rehearseCta': 'Practice with bots',
   'academy.hq.codeReady': 'Open to join',
   'academy.hq.joinedGoal': '{count} joined, aim for {goal}',
   'eduShell.week.students': 'Students in your classes',

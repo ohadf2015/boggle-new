@@ -171,7 +171,7 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, dir, busy, blocked
 
 function StepNumber({ n }: { n: number }) {
   return (
-    <span className="grid size-5 shrink-0 place-items-center rounded-full border border-neo-cream/40 font-neo-body text-[0.7rem] font-bold text-neo-cream @4xl/lobby:size-6 @4xl/lobby:text-xs">
+    <span className="grid size-5 shrink-0 place-items-center rounded-full border border-neo-cream/40 font-neo-body text-xs font-bold text-neo-cream @4xl/lobby:size-6 @4xl/lobby:text-xs">
       {n}
     </span>
   );

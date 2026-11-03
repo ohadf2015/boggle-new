@@ -9,7 +9,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 
-vi.mock('next/navigation', () => ({ useParams: () => ({ locale: 'he' }) }));
+const push = vi.fn();
+vi.mock('next/navigation', () => ({ useParams: () => ({ locale: 'he' }), useRouter: () => ({ push }) }));
 const captureError = vi.fn();
 vi.mock('@/utils/sentry', () => ({ captureError: (...args: unknown[]) => captureError(...args) }));
 vi.mock('@/components/ui/Mascot', () => ({
@@ -46,6 +47,14 @@ describe('LessonPracticeError', () => {
     render(<LessonPracticeError error={new Error('boom')} reset={vi.fn()} />);
     expect(screen.getByTestId('practice-error-retry')).toHaveTextContent('נסו שוב');
     expect(screen.getByTestId('practice-error-exit')).toHaveTextContent('השיעורים שלי');
+  });
+
+  it('leaves for the student hub in place, on a full-size target', () => {
+    render(<LessonPracticeError error={new Error('boom')} reset={vi.fn()} />);
+    const exit = screen.getByTestId('practice-error-exit');
+    expect(exit.className).toMatch(/min-h-\[48px\]/);
+    fireEvent.click(exit);
+    expect(push).toHaveBeenCalledWith('/he/student');
   });
 
   it('reports the failure so a broken lesson link is never silent', () => {

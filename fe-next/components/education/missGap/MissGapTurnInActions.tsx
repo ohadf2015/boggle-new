@@ -57,7 +57,7 @@ export function MissGapTurnInActions({
           <Link
             href={gradePassbackHref}
             data-testid="miss-gap-async-open-grade-passback"
-            className={cn(
+            className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
               'w-full flex items-center justify-center gap-2 px-4 py-4',
               'font-neo-display font-bold text-lg',
               'bg-neo-lime text-neo-black border-[3px] border-neo-black rounded-neo',
@@ -82,7 +82,7 @@ export function MissGapTurnInActions({
           target="_blank"
           rel="noopener noreferrer"
           data-testid="miss-gap-async-whatsapp-share"
-          className={cn(
+          className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
             'w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold',
             // Secondary, deliberately: turning the work in is the action, and
             // two full-width green slabs made the finish screen ask the student

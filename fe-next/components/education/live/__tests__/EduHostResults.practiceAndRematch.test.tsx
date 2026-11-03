@@ -63,20 +63,21 @@ describe('EduHostResults practice rounds, rematch and lesson honesty', () => {
 
   it('given a free teacher after a bots-only practice round, when results show, then no Teacher Pro ask appears', () => {
     render(<EduHostResults summary={summary()} players={bots} t={t} onRematch={vi.fn()} />);
-    expect(screen.queryByTestId('results-teacher-pro-trial-card')).toBeNull();
+    expect(screen.queryByTestId('class-report-teaser')).toBeNull();
+    expect(screen.queryByTestId('edu-results-parent-share')).toBeNull();
   });
 
   it('given a bots-only round whose scores also carry the host row, as the server sends it, when results show, then no Pro ask, no student count, and the bots podium stays', () => {
     const live = [...bots, { username: TEACHER, score: 0, isHost: true, isBot: false }] as unknown as PlayerResult[];
     render(<EduHostResults summary={summary({ podium: [], masteryByPlayer: { [TEACHER]: { found: 0, total: 4 } } })} players={live} t={t} onRematch={vi.fn()} />);
-    expect(screen.queryByTestId('results-teacher-pro-trial-card')).toBeNull();
+    expect(screen.queryByTestId('class-report-teaser')).toBeNull();
     expect(screen.queryByTestId('edu-stat-students')).toBeNull();
     expect(screen.getByTestId('podium-stage')).toBeInTheDocument();
   });
 
-  it('given a free teacher after a real class round, when results show, then the Teacher Pro card still shows', () => {
+  it('given a free teacher after a real class round, when results show, then the labelled Pro preview still shows', () => {
     render(<EduHostResults summary={summary()} players={students} t={t} onRematch={vi.fn()} />);
-    expect(screen.getByTestId('results-teacher-pro-trial-card')).toBeInTheDocument();
+    expect(screen.getByTestId('class-report-teaser')).toBeInTheDocument();
   });
 
   it('given a nailed lesson, when the teacher taps Play again, then the room restarts and it counts as a projector rematch', () => {

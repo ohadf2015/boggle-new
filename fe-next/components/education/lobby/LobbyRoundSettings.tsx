@@ -179,7 +179,7 @@ export function LobbyRoundSettings({
                       aria-label={choice.label}
                       onClick={() => onTargetWordChange(choice.value)}
                       className={cn(
-                        'inline-flex min-h-9 items-center gap-1.5 rounded-neo border-2 px-3 py-1 font-neo-display text-sm font-bold transition-colors',
+                        'inline-flex min-h-11 items-center gap-1.5 rounded-neo border-2 px-3 py-1 font-neo-display text-sm font-bold transition-colors',
                         CALM_FOCUS,
                         isSelected ? CALM_SELECTED : CALM_IDLE
                       )}

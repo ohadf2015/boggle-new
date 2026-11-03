@@ -24,7 +24,6 @@ vi.mock('@/utils/confettiUtils', () => ({ fireConfetti: vi.fn() }));
 let proState: Record<string, unknown>;
 vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => proState }));
 
-vi.mock('@/components/teacher/analytics/LastGameInsights', () => ({ LastGameInsights: () => <div data-testid="last-game-insights" /> }));
 import TeacherDashboard from '../TeacherDashboard';
 
 // The PLAY NOW panel has its own suite (dashboard/__tests__/PlayNowLauncher);

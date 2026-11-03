@@ -49,7 +49,7 @@ function readDismissed(placement: string): boolean {
 
 /**
  * `placement="class_created"` is the same card on the class-ready screen
- * (ClassReady, teacher setup flow), right after a teacher makes a class: its own
+ * (ClassSetupInvite, teacher setup flow), right after a teacher makes a class: its own
  * title, its own impression/click placement, and a "Not now" that hides it for
  * 14 days on this device. The results screen keeps no dismiss.
  */
@@ -176,7 +176,7 @@ export function ResultsTeacherProTrialCard({
               }
               setDismissed(true);
             }}
-            className="-me-1 -mt-1 inline-flex size-9 shrink-0 items-center justify-center rounded-neo text-neo-white/70 hover:text-neo-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+            className="-me-1 -mt-1 inline-flex size-11 shrink-0 items-center justify-center rounded-neo text-neo-white/70 hover:text-neo-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
           >
             <X className="size-4" aria-hidden="true" />
           </button>
@@ -219,7 +219,7 @@ export function ResultsTeacherProTrialCard({
               /* analytics must never block */
             }
           }}
-          className={cn('font-bold text-neo-cream underline underline-offset-2 hover:text-neo-white', dismissible ? 'text-sm' : 'text-xs @[96rem]/results:text-sm')}
+          className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black', 'font-bold text-neo-cream underline underline-offset-2 hover:text-neo-white', dismissible ? 'text-sm' : 'text-xs @[96rem]/results:text-sm')}
         >
           {copy.quoteCta}
         </Link>

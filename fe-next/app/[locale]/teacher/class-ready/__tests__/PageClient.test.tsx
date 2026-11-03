@@ -24,6 +24,13 @@ describe('class-ready (paid day 0)', () => {
     expect(global.fetch).toHaveBeenCalledWith('/api/education/classroom/paid-ready', expect.objectContaining({ method: 'POST' }));
   });
 
+  it('Given provisioning is in flight, Then it shows the same loader the class setup page opens with, so the hop is one screen', () => {
+    global.fetch = vi.fn(() => new Promise(() => {})) as unknown as typeof fetch;
+    render(<ClassReadyPageClient />);
+    expect(screen.getByText('common.loading')).toBeInTheDocument();
+    expect(screen.queryByText('education.access.class_ready_creating')).toBeNull();
+  });
+
   it('Given provisioning fails, Then the error offers the way home and nothing redirects', async () => {
     global.fetch = vi.fn().mockResolvedValue({ ok: false, json: async () => ({ error: 'not_paid_teacher' }) }) as unknown as typeof fetch;
     render(<ClassReadyPageClient />);

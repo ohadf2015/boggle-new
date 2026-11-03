@@ -67,10 +67,10 @@ describe('access PageClient — eg2 teacher-only page', () => {
     for (const consumer of ['/en/multiplayer', '/en/blast', '/en/daily']) expect(hrefs).not.toContain(consumer);
   });
 
-  it('describes the steps in the order they really happen: account, confirm + 2 questions, class', () => {
+  it('describes the steps in the order they really happen: account, then class', () => {
     render(<PageClient />);
-    for (const k of ['step1', 'step2', 'step3']) {
-      expect(screen.getByText(`education.access.next.${k}_title`)).toBeInTheDocument();
-    }
+    const titles = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    expect(titles).toEqual(expect.arrayContaining(['education.access.next.step1_title', 'education.access.next.step3_title']));
+    expect(screen.queryByText(/education\.access\.next\.step2/)).toBeNull();
   });
 });

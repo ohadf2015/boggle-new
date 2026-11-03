@@ -1,3 +1,4 @@
+import { PRO_COPY_PARAMS as P } from '@/lib/education/proFeatures';
 import { dictionaryFloor } from '@/lib/seo/dictionaryStats';
 import type { DepthSection } from '@/components/education/EducationDepthSections';
 export type { DepthSection };
@@ -114,11 +115,11 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       line1: 'Free',
       highlight: 'Vocabulary',
       line2: 'Games. Real Classrooms.',
-      line3: 'Free accounts.',
+      line3: 'No student sign-up.',
     },
     heroSubtitle:
-      'The classroom vocabulary game teachers actually use. Live multiplayer, 1v1 duels, your word lists, six languages — student accounts are always free.',
-    ctaSubLabel: 'Free · Student accounts free',
+      'The classroom vocabulary game teachers actually use. Live multiplayer, your word lists, six languages — students join with a code, no sign-up.',
+    ctaSubLabel: 'Free · No student sign-up',
     duelCta: { label: '⚔ Run a 1v1 Duel', note: 'Pair students head-to-head' },
     related: {
       label: 'Related education resources',
@@ -128,10 +129,10 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     },
     whyTitle: 'Why teachers pick LexiClash',
     whyPoints: [
-      'Free student accounts. Quick signup, then tracks XP and progress forever.',
+      'No student sign-up. Students join with a 6-character code, no email needed.',
       'Word-formation, not flashcards. Beats Quizlet for spelling + recall.',
       'Six languages with full dictionaries. ESL, Hebrew immersion, Spanish bilingual — all native.',
-      'Free: 3 classes of up to 50 students. No ads in the classroom.',
+      `Free: ${P.classes} classes of up to ${P.students} students. No ads in the classroom.`,
     ],
     depth: [
       {
@@ -150,8 +151,8 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
         answer:
           'One word list drives both halves of the lesson. The class plays a shared live board together, then each student drills the same words alone across seven practice modes. Three tiers — support, core, and challenge — decide which words each child sees in that solo practice.',
         points: [
-          'The free tier covers 3 classes of 50 students each, and Teacher Pro at $9/month adds unlimited classes and the progress reports.',
-          '50 students is the technical ceiling for one live room, so the free cap and the engine agree rather than the paywall arriving first.',
+          `The free tier covers ${P.classes} classes of ${P.students} students each, and Teacher Pro at ${P.price}/month adds unlimited classes and the progress reports.`,
+          `${P.students} students is the technical ceiling for one live room, so the free cap and the engine agree rather than the paywall arriving first.`,
           'Live controls during a round: pause and resume, plus thirty seconds, skip a word, and end the round.',
           'After the round the results screen shows the words the class missed, and the shareable summary stays class-level.',
         ],
@@ -168,7 +169,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     faqs: [
       {
         q: 'Do students need to sign up?',
-        a: "Yes, but it's free and takes 30 seconds. One email or Google account, that's it. No credit card, no upsell.",
+        a: 'No. Students join with a 6-character code and play in any browser: no sign-up, no email. Only the teacher has an account.',
       },
       {
         q: 'Can we use our own word lists?',
@@ -192,21 +193,18 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       },
     ],
     features: [
-      { icon: '⚡', text: 'Free student accounts — quick signup, tracks XP and progress across sessions' },
+      { icon: '⚡', text: 'No student sign-up — a 6-character code in any browser' },
       { icon: '🎯', text: 'Three game modes: Boggle grid, Word Hunt, Word Wheel' },
       { icon: '👥', text: 'Live multiplayer a whole class per session' },
-      { icon: '⚔️', text: '1v1 vocabulary duels for paired practice or sub-team rounds' },
       { icon: '📚', text: 'Upload your own curriculum word lists — any unit, any subject' },
       { icon: '🌍', text: 'Six languages: English, Hebrew (RTL), Spanish, Swedish, Japanese, Russian' },
       { icon: '📊', text: 'Teacher dashboard: per-student accuracy + missed-word patterns' },
-      { icon: '💸', text: 'Free: 3 classes of up to 50 students — Pro ($9/mo) adds printable reports' },
+      { icon: '💸', text: `Free: ${P.classes} classes of up to ${P.students} students — Pro (${P.price}/mo) adds printable reports` },
     ],
     compareRows: [
       ['Free tier (full features)', '✓', 'Limited', '✓ basic', 'Limited'],
-      ['Free student accounts', '✓ always free', '✗ paid tiers', '✗ paid tiers', '✗ paid tiers'],
       ['Word-formation gameplay', '✓ Boggle/Wheel/Anagram', '✗ flashcards', '✗ templates', '✗ quizzes'],
       ['Live whole-class multiplayer', '✓', '✓ paid', '✗', '✓'],
-      ['1v1 vocabulary duels', '✓', '✓ paid', '✗', '✗'],
       ['6 languages incl. RTL', '✓', '✗', '✗', '✗'],
       ['Custom word lists', '✓', '✓', '✓', '✓'],
       ['Class analytics dashboard', 'Teacher Pro', '✓ paid', 'Basic', '✓ paid'],
@@ -222,9 +220,9 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     ctaPrimaryButtonLabel: '▶ Start Classroom Game',
     ctaSecondaryButtonLabel: 'See Education Hub',
     metadataLabels: {
-      languages: '6 languages',
+      languages: `${P.languages} languages`,
       gradeLevel: 'K-12 + adult ESL',
-      accounts: 'free student accounts',
+      accounts: 'no student sign-up',
       duration: '5-min sessions',
     },
     sections: {
@@ -288,11 +286,11 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       line1: 'חינם',
       highlight: 'אוצר מילים',
       line2: 'משחקים. כיתות אמיתיות.',
-      line3: 'חשבונות חינמיים.',
+      line3: 'בלי הרשמה לתלמידים.',
     },
     heroSubtitle:
-      'משחק אוצר המילים שמורים באמת משתמשים בו. ריבוי משתתפים חי, דו־קרבות, הרשימות שלכם, 6 שפות — חשבונות תלמידים חינמיים תמיד.',
-    ctaSubLabel: 'חינם · חשבונות תלמידים חינמיים',
+      `משחק אוצר המילים שמורים באמת משתמשים בו. משחק חי לכל הכיתה, הרשימות שלכם, ${P.languages} שפות — התלמידים נכנסים עם קוד, בלי הרשמה.`,
+    ctaSubLabel: 'חינם · בלי הרשמה לתלמידים',
     duelCta: { label: '⚔ הפעילו דו-קרב 1 על 1', note: 'שבצו תלמידים זה מול זה' },
     related: {
       label: 'משאבי הוראה נוספים',
@@ -302,10 +300,10 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     },
     whyTitle: 'למה מורים בוחרים ב־LexiClash',
     whyPoints: [
-      'חשבונות תלמידים חינמיים. הרשמה של 30 שניות, ואז מעקב אחר ההתקדמות לתמיד.',
+      'בלי הרשמה לתלמידים. נכנסים עם קוד בן 6 תווים, בלי מייל.',
       'משחקי בניית מילים, לא כרטיסיות. עדיף מ־Quizlet לאיות ולזיכרון.',
-      '6 שפות עם מילונים מלאים. ESL, הטמעת עברית, ספרדית דו־לשונית — הכל בשפת אם.',
-      'כל הכיתה בחינם: 3 כיתות של עד 50 תלמידים. Teacher Pro ($9/חודש) מוסיף כיתות ללא הגבלה ודוחות.',
+      `${P.languages} שפות עם מילונים מלאים. ESL, הטמעת עברית, ספרדית דו־לשונית — הכל בשפת אם.`,
+      `כל הכיתה בחינם: ${P.classes} כיתות של עד ${P.students} תלמידים. Teacher Pro (${P.price}/חודש) מוסיף כיתות ללא הגבלה ודוחות.`,
     ],
     depth: [
       {
@@ -324,8 +322,8 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
         answer:
           'רשימת מילים אחת מזינה את שני חלקי השיעור. הכיתה משחקת יחד על לוח חי משותף, ואז כל תלמיד מתרגל את אותן מילים לבד בשבעה מצבי תרגול. שלוש רמות — תמיכה, ליבה ואתגר — קובעות אילו מילים כל ילד רואה בתרגול העצמאי.',
         points: [
-          'המסלול החינמי כולל 3 כיתות עם 50 תלמידים בכל אחת, ו-Teacher Pro ב-$9 לחודש מוסיף כיתות ללא הגבלה ואת דוחות ההתקדמות.',
-          '50 תלמידים הם התקרה הטכנית של חדר חי אחד, כך שהמגבלה החינמית והמנוע מסכימים.',
+          `המסלול החינמי כולל ${P.classes} כיתות עם ${P.students} תלמידים בכל אחת, ו-Teacher Pro ב-${P.price} לחודש מוסיף כיתות ללא הגבלה ואת דוחות ההתקדמות.`,
+          `${P.students} תלמידים הם התקרה הטכנית של חדר חי אחד, כך שהמגבלה החינמית והמנוע מסכימים.`,
           'שליטה חיה במהלך סיבוב: השהיה והמשך, תוספת שלושים שניות, דילוג על מילה וסיום הסיבוב.',
           'בתום הסיבוב מסך התוצאות מציג את המילים שהכיתה פספסה, והסיכום לשיתוף נשאר ברמת הכיתה.',
         ],
@@ -342,7 +340,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     faqs: [
       {
         q: 'האם תלמידים צריכים להירשם?',
-        a: 'כן, אבל זה חינם ולוקח 30 שניות. דוא״ל אחד או חשבון Google — וזהו. בלי כרטיס אשראי ובלי הפתעות.',
+        a: 'לא. התלמידים נכנסים עם קוד בן 6 תווים ומשחקים מכל דפדפן: בלי הרשמה ובלי מייל. רק למורה יש חשבון.',
       },
       {
         q: 'אפשר להשתמש ברשימות המילים שלנו?',
@@ -366,21 +364,18 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       },
     ],
     features: [
-      { icon: '⚡', text: 'חשבונות חינמיים — הרשמה של 30 שניות, ומעקב מלא אחר ההתקדמות בכל משחק' },
+      { icon: '⚡', text: 'בלי הרשמה לתלמידים — קוד בן 6 תווים בכל דפדפן' },
       { icon: '🎯', text: '3 משחקים: Boggle, Word Hunt, Word Wheel' },
       { icon: '👥', text: 'ריבוי משתתפים חי — כל הכיתה במשחק אחד' },
-      { icon: '⚔️', text: 'דו־קרבות 1v1 לתרגול בזוגות או בסבבי קבוצות' },
       { icon: '📚', text: 'העלו את רשימות המילים שלכם — כל יחידה, כל מקצוע' },
-      { icon: '🌍', text: '6 שפות: אנגלית, עברית (RTL), ספרדית, שוודית, יפנית, רוסית' },
+      { icon: '🌍', text: `${P.languages} שפות: אנגלית, עברית (RTL), ספרדית, שוודית, יפנית, רוסית` },
       { icon: '📊', text: 'לוח מורה: דיוק לכל תלמיד + אנליטיקה של מילים קשות' },
-      { icon: '💸', text: 'חינם: 3 כיתות של עד 50 תלמידים. Teacher Pro ($9/חודש) מוסיף דוחות' },
+      { icon: '💸', text: `חינם: ${P.classes} כיתות של עד ${P.students} תלמידים. Teacher Pro (${P.price}/חודש) מוסיף דוחות` },
     ],
     compareRows: [
       ['כל התכונות בחינם', '✓', 'מוגבל', '✓ בסיסי', 'מוגבל'],
-      ['חשבונות תלמידים חינמיים', '✓ תמיד', '✗ בתשלום', '✗ בתשלום', '✗ בתשלום'],
       ['משחקי יצירת מילים', '✓ Boggle/Wheel/Anagram', '✗ כרטיסיות', '✗ תבניות', '✗ חידונים'],
       ['ריבוי משתתפים חי', '✓', '✓ בתשלום', '✗', '✓'],
-      ['דו־קרבות 1v1', '✓', '✓ בתשלום', '✗', '✗'],
       ['6 שפות + RTL', '✓', '✗', '✗', '✗'],
       ['רשימות מילים משלכם', '✓', '✓', '✓', '✓'],
       ['לוח אנליטיקה למורה', 'פרו למורים', '✓ בתשלום', 'בסיסי', '✓ בתשלום'],
@@ -396,9 +391,9 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     ctaPrimaryButtonLabel: '▶ התחילו משחק כיתה',
     ctaSecondaryButtonLabel: 'למרכז החינוך',
     metadataLabels: {
-      languages: '6 שפות',
+      languages: `${P.languages} שפות`,
       gradeLevel: 'כל הגילאים',
-      accounts: 'חשבונות תלמידים חינמיים',
+      accounts: 'בלי הרשמה לתלמידים',
       duration: 'סשנים של 5 דקות',
     },
     sections: {
@@ -462,11 +457,11 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       line1: 'Gratis',
       highlight: 'Vocabulario',
       line2: 'Juegos. Aulas Reales.',
-      line3: 'Cuentas gratis.',
+      line3: 'Sin registro de estudiantes.',
     },
     heroSubtitle:
-      'El juego de vocabulario que los maestros usan. Multijugador en vivo, duelos, tus listas, 6 idiomas — cuentas de estudiantes gratis para empezar.',
-    ctaSubLabel: 'Gratis · Cuentas de estudiantes gratis',
+      `El juego de vocabulario que los maestros usan. Multijugador en vivo, tus listas, ${P.languages} idiomas — el alumnado entra con un código, sin registro.`,
+    ctaSubLabel: 'Gratis · Sin registro de estudiantes',
     duelCta: { label: '⚔ Iniciar un duelo 1 vs 1', note: 'Enfrenta a los estudiantes de a dos' },
     related: {
       label: 'Recursos educativos relacionados',
@@ -476,10 +471,10 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     },
     whyTitle: 'Por qué los maestros eligen LexiClash',
     whyPoints: [
-      'Cuentas gratis. Registro en 30 segundos, luego sigue el progreso para siempre.',
+      'Sin registro de estudiantes. Entran con un código de 6 caracteres, sin correo.',
       'Formar palabras, no tarjetas. Mejor que Quizlet para ortografía y memoria.',
-      '6 idiomas con diccionarios completos. ESL, inmersión hebraica, bilingüe español — todo nativo.',
-      'Toda tu clase gratis: 3 clases de hasta 50. Pro ($9/mes) añade informes.',
+      `${P.languages} idiomas con diccionarios completos. ESL, inmersión hebraica, bilingüe español — todo nativo.`,
+      `Toda tu clase gratis: ${P.classes} clases de hasta ${P.students}. Pro (${P.price}/mes) añade informes.`,
     ],
     depth: [
       {
@@ -498,8 +493,8 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
         answer:
           'Una sola lista alimenta las dos mitades de la clase. El grupo juega junto en un tablero en vivo y después cada estudiante practica esas mismas palabras a solas en siete modos. Tres niveles — apoyo, base y desafío — deciden qué palabras ve cada niño en esa práctica individual.',
         points: [
-          'El plan gratuito cubre 3 clases de 50 estudiantes cada una, y Teacher Pro por $9/mes añade clases ilimitadas y los informes de progreso.',
-          '50 estudiantes es el techo técnico de una sala en vivo, así que el límite gratuito y el motor coinciden.',
+          `El plan gratuito cubre ${P.classes} clases de ${P.students} estudiantes cada una, y Teacher Pro por ${P.price}/mes añade clases ilimitadas y los informes de progreso.`,
+          `${P.students} estudiantes es el techo técnico de una sala en vivo, así que el límite gratuito y el motor coinciden.`,
           'Controles en vivo durante la ronda: pausar y reanudar, treinta segundos más, saltar una palabra y terminar la ronda.',
           'Al terminar, la pantalla de resultados muestra las palabras que la clase falló, y el resumen para compartir se queda a nivel de clase.',
         ],
@@ -516,7 +511,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     faqs: [
       {
         q: '¿Necesitan registrarse los estudiantes?',
-        a: 'Sí, pero es gratis y toma 30 segundos. Correo o cuenta Google. Sin tarjeta de crédito, sin sorpresas.',
+        a: 'No. Entran con un código de 6 caracteres y juegan en cualquier navegador: sin registro ni correo. Solo el docente tiene cuenta.',
       },
       {
         q: '¿Usamos nuestras propias listas de palabras?',
@@ -540,21 +535,18 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       },
     ],
     features: [
-      { icon: '⚡', text: 'Cuentas gratis — registro rápido, sigue el progreso en todas las sesiones' },
+      { icon: '⚡', text: 'Sin registro de estudiantes — un código de 6 caracteres en cualquier navegador' },
       { icon: '🎯', text: '3 juegos: Boggle, Word Hunt, Word Wheel' },
       { icon: '👥', text: 'Multijugador en vivo — toda la clase por sesión' },
-      { icon: '⚔️', text: 'Duelos 1v1 para parejas o equipos' },
       { icon: '📚', text: 'Carga tus listas — cualquier unidad, cualquier materia' },
-      { icon: '🌍', text: '6 idiomas: inglés, hebreo (RTL), español, sueco, japonés, ruso' },
+      { icon: '🌍', text: `${P.languages} idiomas: inglés, hebreo (RTL), español, sueco, japonés, ruso` },
       { icon: '📊', text: 'Panel de maestro: precisión por alumno + palabras difíciles' },
-      { icon: '💸', text: 'Gratis: 3 clases de hasta 50 alumnos. Pro ($9/mes) añade informes' },
+      { icon: '💸', text: `Gratis: ${P.classes} clases de hasta ${P.students} alumnos. Pro (${P.price}/mes) añade informes` },
     ],
     compareRows: [
       ['Todo gratis', '✓', 'Limitado', '✓ básico', 'Limitado'],
-      ['Cuentas gratis', '✓ siempre', '✗ pago', '✗ pago', '✗ pago'],
       ['Juegos de palabras', '✓ Boggle/Wheel/Anagrama', '✗ tarjetas', '✗ plantillas', '✗ cuestionarios'],
       ['Multijugador', '✓', '✓ pago', '✗', '✓'],
-      ['Duelos 1v1', '✓', '✓ pago', '✗', '✗'],
       ['6 idiomas + RTL', '✓', '✗', '✗', '✗'],
       ['Tus listas', '✓', '✓', '✓', '✓'],
       ['Panel analítico', 'Teacher Pro', '✓ pago', 'Básico', '✓ pago'],
@@ -570,9 +562,9 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     ctaPrimaryButtonLabel: '▶ Iniciar juego de clase',
     ctaSecondaryButtonLabel: 'Ver Hub educativo',
     metadataLabels: {
-      languages: '6 idiomas',
+      languages: `${P.languages} idiomas`,
       gradeLevel: 'Grados 4-12 + ESL adultos',
-      accounts: 'cuentas de estudiantes gratis',
+      accounts: 'sin registro de estudiantes',
       duration: 'sesiones de 5 minutos',
     },
     sections: {
@@ -636,11 +628,11 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       line1: 'Gratis',
       highlight: 'Ordförråds',
       line2: 'Spel. Verkliga Klassrum.',
-      line3: 'Gratis konton.',
+      line3: 'Ingen elevregistrering.',
     },
     heroSubtitle:
-      'Ordförråds spelet som lärare använder. Live multiplayer, dueller, dina ordlistor, 6 språk — studentkonton gratis alltid.',
-    ctaSubLabel: 'Gratis · Studentkonton gratis',
+      `Ordförrådsspelet som lärare använder. Live multiplayer, dina ordlistor, ${P.languages} språk — eleverna ansluter med en kod, utan registrering.`,
+    ctaSubLabel: 'Gratis · Ingen elevregistrering',
     duelCta: { label: '⚔ Kör en 1-mot-1-duell', note: 'Ställ elever mot varandra' },
     related: {
       label: 'Relaterade lärarresurser',
@@ -650,10 +642,10 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     },
     whyTitle: 'Varför lärare väljer LexiClash',
     whyPoints: [
-      'Gratis studentkonton. Registrering på 30 sekunder, sedan framstegen sparas.',
+      'Ingen elevregistrering. Eleverna ansluter med en kod på 6 tecken, utan mejl.',
       'Ordbildning, inte flashkort. Bättre än Quizlet för stavning och minne.',
-      '6 språk med kompletta ordböcker. ESL, hebreisk nedsänkning, spansk tvåspråkig — allt modersmål.',
-      'Hela klassen gratis: 3 klasser med upp till 50 elever. Teacher Pro ($9/månad) lägger till obegränsade klasser och rapporter.',
+      `${P.languages} språk med kompletta ordböcker. ESL, hebreisk nedsänkning, spansk tvåspråkig — allt modersmål.`,
+      `Hela klassen gratis: ${P.classes} klasser med upp till ${P.students} elever. Teacher Pro (${P.price}/månad) lägger till obegränsade klasser och rapporter.`,
     ],
     depth: [
       {
@@ -672,8 +664,8 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
         answer:
           'En enda ordlista driver lektionens båda halvor. Klassen spelar tillsammans på ett delat direktbräde, och sedan övar varje elev samma ord på egen hand i sju övningslägen. Tre nivåer — stöd, bas och utmaning — avgör vilka ord varje barn möter i den egna övningen.',
         points: [
-          'Gratisplanen täcker 3 klasser med 50 elever vardera, och Teacher Pro för $9/månad lägger till obegränsade klasser och rapporterna.',
-          '50 elever är det tekniska taket för ett direktrum, så gratisgränsen och motorn är överens.',
+          `Gratisplanen täcker ${P.classes} klasser med ${P.students} elever vardera, och Teacher Pro för ${P.price}/månad lägger till obegränsade klasser och rapporterna.`,
+          `${P.students} elever är det tekniska taket för ett direktrum, så gratisgränsen och motorn är överens.`,
           'Direktkontroller under rundan: pausa och återuppta, trettio sekunder till, hoppa över ett ord och avsluta rundan.',
           'Efter rundan visar resultatskärmen orden klassen missade, och sammanfattningen som delas stannar på klassnivå.',
         ],
@@ -690,7 +682,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     faqs: [
       {
         q: 'Måste studenter registrera sig?',
-        a: 'Ja, men det är gratis och tar 30 sekunder. Mail eller Google-konto. Inget kreditkort, inga överraskningar.',
+        a: 'Nej. Eleverna ansluter med en kod på 6 tecken och spelar i valfri webbläsare: ingen registrering, ingen mejl. Bara läraren har ett konto.',
       },
       {
         q: 'Kan vi använda våra egna ordlistor?',
@@ -714,21 +706,18 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       },
     ],
     features: [
-      { icon: '⚡', text: 'Gratis konton — registrering på 30 sekunder, spårar framsteg alltid' },
+      { icon: '⚡', text: 'Ingen elevregistrering — en kod på 6 tecken i valfri webbläsare' },
       { icon: '🎯', text: '3 spel: Boggle, Word Hunt, Word Wheel' },
       { icon: '👥', text: 'Live multiplayer — hela klassen per spel' },
-      { icon: '⚔️', text: '1v1 dueller för par eller lag' },
       { icon: '📚', text: 'Dina ordlistor — vilken enhet, vilket ämne som helst' },
-      { icon: '🌍', text: '6 språk: engelska, hebreiska (RTL), spanska, svenska, japanska, ryska' },
+      { icon: '🌍', text: `${P.languages} språk: engelska, hebreiska (RTL), spanska, svenska, japanska, ryska` },
       { icon: '📊', text: 'Lärarpanel: precision per elev + vilka ord som är svåra' },
-      { icon: '💸', text: 'Gratis: 3 klasser med upp till 50 elever — Pro ($9/mån) ger utskrivbara rapporter' },
+      { icon: '💸', text: `Gratis: ${P.classes} klasser med upp till ${P.students} elever — Pro (${P.price}/mån) ger utskrivbara rapporter` },
     ],
     compareRows: [
       ['Gratisplan (fulla funktioner)', '✓', 'Begränsad', '✓ grund', 'Begränsad'],
-      ['Gratis konton', '✓ alltid', '✗ betald', '✗ betald', '✗ betald'],
       ['Ordbildningsspel', '✓ Boggle/Wheel/Anagram', '✗ kort', '✗ mallar', '✗ quiz'],
       ['Live multiplayer', '✓', '✓ betald', '✗', '✓'],
-      ['1v1 dueller', '✓', '✓ betald', '✗', '✗'],
       ['6 språk + RTL', '✓', '✗', '✗', '✗'],
       ['Dina ordlistor', '✓', '✓', '✓', '✓'],
       ['Analyspanel', 'Teacher Pro', '✓ betald', 'Grund', '✓ betald'],
@@ -744,9 +733,9 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     ctaPrimaryButtonLabel: '▶ Starta klassrumsspel',
     ctaSecondaryButtonLabel: 'Se utbildningshub',
     metadataLabels: {
-      languages: '6 språk',
+      languages: `${P.languages} språk`,
       gradeLevel: 'Årskurs 4-12 + vuxen ESL',
-      accounts: 'gratis studentkonton',
+      accounts: 'ingen elevregistrering',
       duration: '5-minuterssessioner',
     },
     sections: {
@@ -810,11 +799,11 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       line1: '無料の',
       highlight: '語彙',
       line2: 'ゲーム。本物の教室。',
-      line3: '無料アカウント。',
+      line3: '生徒の登録は不要。',
     },
     heroSubtitle:
-      '先生が実際に使う語彙ゲーム。ライブマルチプレイヤー、デュエル、あなたのリスト、6言語 — 学生アカウントはいつも無料。',
-    ctaSubLabel: '無料 · 学生アカウント無料',
+      `先生が実際に使う語彙ゲーム。ライブマルチプレイヤー、あなたのリスト、${P.languages}言語 — 生徒はコードで参加、登録不要。`,
+    ctaSubLabel: '無料 · 生徒の登録不要',
     duelCta: { label: '⚔ 1対1のデュエルを開始', note: '生徒どうしを対戦させる' },
     related: {
       label: '関連する教育リソース',
@@ -824,10 +813,10 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     },
     whyTitle: 'LexiClashが選ばれる理由',
     whyPoints: [
-      '無料。30秒で登録して、あとはずっと成績が記録される。',
+      '生徒の登録は不要。6文字のコードで参加でき、メールもいりません。',
       '単語を作るゲーム。フラッシュカードじゃない。スペリングと記憶で Quizlet より優れている。',
-      '6言語、完全な辞書付き。ESL、ヘブライ語コース、スペイン語バイリンガル — すべてネイティブ。',
-      '無料プランは3クラス・各50人まで。クラス全員が参加できます。授業中に広告は出ません。',
+      `${P.languages}言語、完全な辞書付き。ESL、ヘブライ語コース、スペイン語バイリンガル — すべてネイティブ。`,
+      `無料プランは${P.classes}クラス・各${P.students}人まで。クラス全員が参加できます。授業中に広告は出ません。`,
     ],
     depth: [
       {
@@ -838,7 +827,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
           '辞書は言語ごとに独立した語彙集合で、翻訳した一つのリストではありません。ヘブライ語のラウンドはヘブライ語で判定され、右から左に表示されます。',
           '日本語の盤はかなです。漢字熟語のリストは盤の生成にのみ使われ、提出された単語の判定には使われません。',
           '先生自身の単語リストが練習モードを直接動かすので、クラスはその週の単語をそのまま練習できます。',
-          '6言語がそれぞれの辞書を備えています：英語、ヘブライ語、スウェーデン語、日本語、スペイン語、ロシア語。',
+          `${P.languages}言語がそれぞれの辞書を備えています：英語、ヘブライ語、スウェーデン語、日本語、スペイン語、ロシア語。`,
         ],
       },
       {
@@ -846,8 +835,8 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
         answer:
           '1つの単語リストが授業の両方の場面を動かします。クラスは共有のライブ盤で一緒に遊び、そのあと各生徒が同じ単語を7つの練習モードで一人で練習します。サポート・コア・チャレンジの3段階が、その生徒が個人練習で出会う単語を決めます。',
         points: [
-          '無料プランは3クラス・各クラス50人まで。Teacher Pro（月$9）でクラス数が無制限になり、進捗レポートが加わります。',
-          '1つのライブルームの技術的な上限が50人で、無料プランの上限はそれに合わせてあります。',
+          `無料プランは${P.classes}クラス・各クラス${P.students}人まで。Teacher Pro（月${P.price}）でクラス数が無制限になり、進捗レポートが加わります。`,
+          `1つのライブルームの技術的な上限が${P.students}人で、無料プランの上限はそれに合わせてあります。`,
           'ラウンド中の操作は4つ：一時停止と再開、30秒追加、単語をスキップ、ラウンド終了。',
           'ラウンド後、結果画面にクラスが取りこぼした単語が表示されます。共有用のまとめはクラス単位で、生徒名は含みません。',
         ],
@@ -864,7 +853,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     faqs: [
       {
         q: '生徒は登録が必要ですか？',
-        a: 'はい。でも無料で30秒だけです。メールアドレスか Google アカウント。クレジットカード不要、追加料金なし。',
+        a: 'いいえ。生徒は6文字のコードで参加し、どのブラウザでも遊べます。登録もメールも不要です。アカウントが必要なのは先生だけです。',
       },
       {
         q: '自分の単語リストが使えますか？',
@@ -888,22 +877,19 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       },
     ],
     features: [
-      { icon: '⚡', text: '無料。30秒登録で、全セッション成績記録。' },
+      { icon: '⚡', text: '生徒の登録不要 — どのブラウザでも6文字のコードで参加' },
       { icon: '🎯', text: '3つのゲーム：Boggle、Word Hunt、Word Wheel' },
       { icon: '👥', text: 'ライブマルチプレイヤー — 1セッション最大30人' },
-      { icon: '⚔️', text: '1v1 デュエル — ペアや小グループ練習向け' },
       { icon: '📚', text: 'あなたの単語リスト — どの単元、どの科目でも' },
-      { icon: '🌍', text: '6言語：英語、ヘブライ語（RTL）、スペイン語、スウェーデン語、日本語、ロシア語' },
+      { icon: '🌍', text: `${P.languages}言語：英語、ヘブライ語（RTL）、スペイン語、スウェーデン語、日本語、ロシア語` },
       { icon: '📊', text: '先生用ダッシュボード：生徒ごとの成績 + 苦手な単語がわかる' },
-      { icon: '💸', text: '無料プランは3クラス・各50人 — Teacher Pro（月$9）でレポート追加' },
+      { icon: '💸', text: `無料プランは${P.classes}クラス・各${P.students}人 — Teacher Pro（月${P.price}）でレポート追加` },
     ],
     compareRows: [
       ['無料プランあり', '✓', '限定的', '✓ 基本', '限定的'],
-      ['無料アカウント', '✓ いつも', '✗ 有料', '✗ 有料', '✗ 有料'],
       ['単語ゲーム', '✓ Boggle/Wheel/Anagram', '✗ カード', '✗ テンプレート', '✗ クイズ'],
       ['ライブマルチプレイヤー', '✓', '✓ 有料', '✗', '✓'],
-      ['1v1デュエル', '✓', '✓ 有料', '✗', '✗'],
-      ['6言語 + RTL', '✓', '✗', '✗', '✗'],
+      [`${P.languages}言語 + RTL`, '✓', '✗', '✗', '✗'],
       ['自分のリスト', '✓', '✓', '✓', '✓'],
       ['ダッシュボード', 'Teacher Pro', '✓ 有料', '基本', '✓ 有料'],
     ],
@@ -918,9 +904,9 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     ctaPrimaryButtonLabel: '▶ クラスルームゲームを開始',
     ctaSecondaryButtonLabel: '教育ハブを見る',
     metadataLabels: {
-      languages: '6言語',
+      languages: `${P.languages}言語`,
       gradeLevel: '4-12年生 + 成人ESL',
-      accounts: '無料の生徒アカウント',
+      accounts: '生徒の登録不要',
       duration: '5分間のセッション',
     },
     sections: {
@@ -949,7 +935,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
         {
           title: 'コード1つで、教室中のスマホが参加',
           body:
-            '同じロビーからルームを作り、6文字のコードを読み上げます。生徒はどのブラウザからでもマルチプレイヤーのページを開き、コードと名前を入力すれば参加完了です。1つのルームに50人まで入るので、1クラスなら余裕があります。',
+            `同じロビーからルームを作り、6文字のコードを読み上げます。生徒はどのブラウザからでもマルチプレイヤーのページを開き、コードと名前を入力すれば参加完了です。1つのルームに${P.students}人まで入るので、1クラスなら余裕があります。`,
         },
         {
           title: '教えている言語でラウンドを回す',
@@ -984,11 +970,11 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       line1: 'Бесплатные',
       highlight: 'словарные',
       line2: 'игры. Реальные классы.',
-      line3: 'Бесплатные аккаунты.',
+      line3: 'Ученикам не нужна регистрация.',
     },
     heroSubtitle:
-      'Словарная игра, которую действительно используют учителя. Живой мультиплеер, дуэли, ваши списки, 6 языков — ученические аккаунты бесплатны.',
-    ctaSubLabel: 'Бесплатно · Ученические аккаунты бесплатны',
+      `Словарная игра, которую действительно используют учителя. Живой мультиплеер, ваши списки, ${P.languages} языков — ученики входят по коду, без регистрации.`,
+    ctaSubLabel: 'Бесплатно · Без регистрации учеников',
     duelCta: { label: '⚔ Запустить дуэль 1 на 1', note: 'Ставьте учеников друг против друга' },
     related: {
       label: 'Похожие материалы для учителей',
@@ -998,10 +984,10 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     },
     whyTitle: 'Почему учителя выбирают LexiClash',
     whyPoints: [
-      'Бесплатные ученические аккаунты. Регистрация за 30 секунд, потом отслеживание прогресса навсегда.',
+      'Без регистрации учеников. Вход по коду из 6 символов, без почты.',
       'Словообразование, не карточки. Лучше Quizlet для орфографии и запоминания.',
-      '6 языков со скомплектованными словарями. ESL, иврит погружение, испанский билингвизм — всё на родном языке.',
-      'Бесплатно: 3 класса по 50 учеников. Без рекламы на уроке.',
+      `${P.languages} языков со скомплектованными словарями. ESL, иврит погружение, испанский билингвизм — всё на родном языке.`,
+      `Бесплатно: ${P.classes} класса по ${P.students} учеников. Без рекламы на уроке.`,
     ],
     depth: [
       {
@@ -1020,8 +1006,8 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
         answer:
           'Один список слов питает обе половины урока. Класс играет вместе на общей живой доске, а затем каждый ученик отрабатывает те же слова один в семи режимах практики. Три уровня — поддержка, база и вызов — решают, какие слова видит каждый ребёнок в этой практике.',
         points: [
-          'Бесплатный план — 3 класса по 50 учеников в каждом, а Teacher Pro за $9 в месяц добавляет неограниченные классы и отчёты о прогрессе.',
-          '50 учеников — технический потолок одной живой комнаты, поэтому бесплатный лимит и движок совпадают.',
+          `Бесплатный план — ${P.classes} класса по ${P.students} учеников в каждом, а Teacher Pro за ${P.price} в месяц добавляет неограниченные классы и отчёты о прогрессе.`,
+          `${P.students} учеников — технический потолок одной живой комнаты, поэтому бесплатный лимит и движок совпадают.`,
           'Управление во время раунда: пауза и продолжение, плюс тридцать секунд, пропуск слова и завершение раунда.',
           'После раунда экран результатов показывает слова, которые класс не нашёл, а сводка для обмена остаётся на уровне класса.',
         ],
@@ -1038,7 +1024,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     faqs: [
       {
         q: 'Нужна ли регистрация ученикам?',
-        a: 'Да, но это бесплатно и занимает 30 секунд. Электронная почта или аккаунт Google. Без кредитной карты, без сюрпризов.',
+        a: 'Нет. Ученики входят по коду из 6 символов и играют в любом браузере: без регистрации и почты. Аккаунт нужен только учителю.',
       },
       {
         q: 'Можем ли мы использовать собственные списки слов?',
@@ -1062,21 +1048,18 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       },
     ],
     features: [
-      { icon: '⚡', text: 'Бесплатные аккаунты — регистрация за 30 секунд, отслеживание прогресса всегда' },
+      { icon: '⚡', text: 'Без регистрации учеников — код из 6 символов в любом браузере' },
       { icon: '🎯', text: '3 игры: Boggle, Word Hunt, Word Wheel' },
       { icon: '👥', text: 'Живой мультиплеер — весь класс за сеанс' },
-      { icon: '⚔️', text: 'Дуэли 1v1 для парной практики или командных раундов' },
       { icon: '📚', text: 'Загружайте свои списки — любая тема, любой предмет' },
-      { icon: '🌍', text: '6 языков: английский, иврит (RTL), испанский, шведский, японский, русский' },
+      { icon: '🌍', text: `${P.languages} языков: английский, иврит (RTL), испанский, шведский, японский, русский` },
       { icon: '📊', text: 'Панель учителя: точность каждого ученика + анализ пропущенных слов' },
-      { icon: '💸', text: 'Бесплатно: 3 класса до 50 учеников — Pro ($9/мес) добавляет печатные отчёты' },
+      { icon: '💸', text: `Бесплатно: ${P.classes} класса до ${P.students} учеников — Pro (${P.price}/мес) добавляет печатные отчёты` },
     ],
     compareRows: [
       ['Бесплатный план (полные функции)', '✓', 'Ограничено', '✓ базовое', 'Ограничено'],
-      ['Бесплатные аккаунты', '✓ всегда', '✗ платно', '✗ платно', '✗ платно'],
       ['Словообразующие игры', '✓ Boggle/Wheel/Anagram', '✗ карточки', '✗ шаблоны', '✗ викторины'],
       ['Живой мультиплеер', '✓', '✓ платно', '✗', '✓'],
-      ['Дуэли 1v1', '✓', '✓ платно', '✗', '✗'],
       ['6 языков + RTL', '✓', '✗', '✗', '✗'],
       ['Собственные списки', '✓', '✓', '✓', '✓'],
       ['Аналитическая панель', 'Teacher Pro', '✓ платно', 'Базовое', '✓ платно'],
@@ -1092,9 +1075,9 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     ctaPrimaryButtonLabel: '▶ Начать классовую игру',
     ctaSecondaryButtonLabel: 'Образовательный центр',
     metadataLabels: {
-      languages: '6 языков',
+      languages: `${P.languages} языков`,
       gradeLevel: '4–12 классы + взрослый ESL',
-      accounts: 'бесплатные ученические аккаунты',
+      accounts: 'без регистрации учеников',
       duration: '5-минутные сеансы',
     },
     sections: {

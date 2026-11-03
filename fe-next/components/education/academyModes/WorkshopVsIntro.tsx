@@ -36,7 +36,7 @@ function PlayerMedallion({ player, fallbackName }: { player?: AcademyPlayer; fal
     <div className="flex flex-col items-center">
       <div
         className="relative grid h-[min(40cqw,34cqh)] w-[min(40cqw,34cqh)] place-items-center overflow-hidden rounded-full border-[clamp(3px,1cqmin,6px)] border-neo-cyan bg-neo-navy-elevated"
-        style={{ boxShadow: '6px 6px 0 #000, 0 0 36px rgba(0,255,255,0.55)' }}
+        style={{ boxShadow: '6px 6px 0 rgb(var(--neo-black)), 0 0 36px rgba(0,255,255,0.55)' }}
       >
         <span aria-hidden className="absolute font-neo-display text-[min(24cqw,20cqh)] font-black uppercase leading-none text-neo-cyan/50">
           {name.slice(0, 1)}
@@ -45,7 +45,7 @@ function PlayerMedallion({ player, fallbackName }: { player?: AcademyPlayer; fal
       </div>
       <span
         data-testid="academy-player"
-        className="z-10 -mt-[3cqmin] max-w-[40cqw] truncate rounded-neo border-[3px] border-black bg-neo-cyan px-[1.6cqmin] py-0.5 font-neo-display text-[clamp(0.75rem,4cqmin,1.75rem)] font-black uppercase text-black shadow-hard"
+        className="z-10 -mt-[3cqmin] max-w-[40cqw] truncate rounded-neo border-[3px] border-neo-black bg-neo-cyan px-[1.6cqmin] py-0.5 font-neo-display text-[clamp(0.75rem,4cqmin,1.75rem)] font-black uppercase text-neo-black shadow-hard"
       >
         {name}
       </span>
@@ -84,10 +84,10 @@ export function WorkshopVsIntro({
   return (
     <div className={INTRO_LAYOUT}>
       {/* The arena: student top-start, Baron bottom-end, split by a lightning seam. */}
-      <div data-testid="workshop-hero" className={cn(INTRO_HERO, 'overflow-hidden rounded-[22px] border-[3px] border-neo-yellow lg:max-h-[80rem]')} style={{ boxShadow: '6px 6px 0 #000' }}>
+      <div data-testid="workshop-hero" className={cn(INTRO_HERO, 'overflow-hidden rounded-[22px] border-[3px] border-neo-yellow lg:max-h-[80rem]')} style={{ boxShadow: '6px 6px 0 rgb(var(--neo-black))' }}>
         {/* Backdrop mirrors in RTL so the student's (start) corner always gets the deep half. */}
         <div aria-hidden className="absolute inset-0 rtl:-scale-x-100">
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(160deg, #0b5a6e 0%, #103a5c 45%, #3a1040 55%, #6b1238 100%)' }} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(160deg, color-mix(in srgb, color-mix(in srgb, var(--neo-cyan-dark) 80%, var(--neo-purple-dark)) 60%, rgb(var(--neo-black))) 0%, color-mix(in srgb, color-mix(in srgb, var(--neo-cyan-dark) 60%, var(--neo-purple-dark)) 50%, rgb(var(--neo-black))) 45%, color-mix(in srgb, color-mix(in srgb, var(--neo-pink-dark) 40%, var(--neo-purple-muted)) 40%, rgb(var(--neo-black))) 55%, color-mix(in srgb, var(--neo-pink) 40%, rgb(var(--neo-black))) 100%)' }} />
         <div
           aria-hidden
           className="absolute inset-0"
@@ -102,16 +102,16 @@ export function WorkshopVsIntro({
         <div
           aria-hidden
           className="absolute -start-[20%] -top-[20%] h-[80%] w-[90%]"
-          style={{ background: 'repeating-conic-gradient(from 0deg, rgba(0,255,255,0.22) 0 7deg, transparent 7deg 18deg)', maskImage: 'radial-gradient(circle, #000 20%, transparent 68%)', WebkitMaskImage: 'radial-gradient(circle, #000 20%, transparent 68%)' }}
+          style={{ background: 'repeating-conic-gradient(from 0deg, rgba(0,255,255,0.22) 0 7deg, transparent 7deg 18deg)', maskImage: 'radial-gradient(circle, rgb(var(--neo-black)) 20%, transparent 68%)', WebkitMaskImage: 'radial-gradient(circle, rgb(var(--neo-black)) 20%, transparent 68%)' }}
         />
         <div
           aria-hidden
           className="absolute -bottom-[20%] -end-[20%] h-[80%] w-[90%]"
-          style={{ background: 'repeating-conic-gradient(from 5deg, rgba(255,20,147,0.26) 0 7deg, transparent 7deg 18deg)', maskImage: 'radial-gradient(circle, #000 20%, transparent 68%)', WebkitMaskImage: 'radial-gradient(circle, #000 20%, transparent 68%)' }}
+          style={{ background: 'repeating-conic-gradient(from 5deg, rgba(255,20,147,0.26) 0 7deg, transparent 7deg 18deg)', maskImage: 'radial-gradient(circle, rgb(var(--neo-black)) 20%, transparent 68%)', WebkitMaskImage: 'radial-gradient(circle, rgb(var(--neo-black)) 20%, transparent 68%)' }}
         />
         <svg aria-hidden viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
-          <polyline points="-2,61 22,55 30,60 50,50 70,44 78,48 102,39" fill="none" stroke="#000" vectorEffect="non-scaling-stroke" style={{ strokeWidth: 12 }} />
-          <polyline points="-2,61 22,55 30,60 50,50 70,44 78,48 102,39" fill="none" stroke="#ffe135" vectorEffect="non-scaling-stroke" style={{ strokeWidth: 6 }} />
+          <polyline points="-2,61 22,55 30,60 50,50 70,44 78,48 102,39" fill="none" stroke="rgb(var(--neo-black))" vectorEffect="non-scaling-stroke" style={{ strokeWidth: 12 }} />
+          <polyline points="-2,61 22,55 30,60 50,50 70,44 78,48 102,39" fill="none" stroke="var(--neo-yellow)" vectorEffect="non-scaling-stroke" style={{ strokeWidth: 6 }} />
         </svg>
         </div>
 
@@ -136,14 +136,14 @@ export function WorkshopVsIntro({
         {/* The Baron's taunt, pointing at him across the pink half. */}
         <m.p
           data-testid="workshop-rival-taunt"
-          className="absolute bottom-[8cqh] start-[4cqw] max-w-[42cqw] rounded-2xl border-[3px] border-black bg-neo-cream px-[2.4cqmin] py-[1.6cqmin] font-neo-display text-[clamp(0.75rem,4.4cqmin,2.25rem)] font-black leading-tight text-black"
-          style={{ boxShadow: '4px 4px 0 #000' }}
+          className="absolute bottom-[8cqh] start-[4cqw] max-w-[42cqw] rounded-2xl border-[3px] border-neo-black bg-neo-cream px-[2.4cqmin] py-[1.6cqmin] font-neo-display text-[clamp(0.75rem,4.4cqmin,2.25rem)] font-black leading-tight text-neo-black"
+          style={{ boxShadow: '4px 4px 0 rgb(var(--neo-black))' }}
           initial={still ? false : { scale: 0.6, rotate: -12 }}
           animate={{ scale: 1, rotate: -3 }}
           transition={{ type: 'spring', stiffness: 520, damping: 22, delay: reduce ? 0 : 0.3 }}
         >
           {t(INTRO_TAUNT.key, INTRO_TAUNT.en)}
-          <span aria-hidden className="absolute -end-3 bottom-3 h-5 w-5 rotate-45 border-e-[3px] border-t-[3px] border-black bg-neo-cream" />
+          <span aria-hidden className="absolute -end-3 bottom-3 h-5 w-5 rotate-45 border-e-[3px] border-t-[3px] border-neo-black bg-neo-cream" />
         </m.p>
 
         {/* VS badge on the seam */}
@@ -163,7 +163,7 @@ export function WorkshopVsIntro({
           />
           <span
             className="absolute font-neo-display text-[11cqmin] font-black italic leading-none text-neo-yellow"
-            style={{ WebkitTextStroke: '3px #000', textShadow: '4px 4px 0 #000' }}
+            style={{ WebkitTextStroke: '3px rgb(var(--neo-black))', textShadow: '4px 4px 0 rgb(var(--neo-black))' }}
           >
             {t('academy.modes.workshop.vs', 'VS')}
           </span>
@@ -178,12 +178,12 @@ export function WorkshopVsIntro({
         className={INTRO_COPY}
       >
         <p className={cn(INTRO_KICKER, 'text-neo-yellow')}>{lessonName}</p>
-        <h2 className={cn(INTRO_TITLE, 'lg:text-[clamp(2.5rem,min(5vw,8.5vh),8rem)]')} style={{ textShadow: '3px 3px 0 #000' }}>
+        <h2 className={cn(INTRO_TITLE, 'lg:text-[clamp(2.5rem,min(5vw,8.5vh),8rem)]')} style={{ textShadow: '3px 3px 0 rgb(var(--neo-black))' }}>
           {t('academy.modes.workshop.introTitleBaron', 'Out-build the Baron')}
         </h2>
         {chips.length > 0 && (
           <div className="mb-3 flex w-full flex-col items-center gap-1.5 [--chip-fs:0.875rem] [--chip-gap:6px] [@media(orientation:landscape)_and_(max-height:520px)]:mb-2 [@media(orientation:landscape)_and_(max-height:520px)]:items-start [@media(orientation:landscape)_and_(max-height:520px)]:[--chip-fs:0.8rem] lg:mb-[clamp(0.75rem,3vh,2rem)] lg:items-start lg:gap-[clamp(0.4rem,1.2vh,0.75rem)] lg:[--chip-fs:clamp(0.95rem,min(1.6vw,2.6vh),2.4rem)] lg:[--chip-gap:clamp(8px,1.2vh,12px)]">
-            <span className="flex shrink-0 items-center gap-1 rounded-full border-[3px] border-black bg-neo-yellow px-2 py-0.5 font-neo-display text-xs font-black uppercase text-black shadow-hard lg:px-[0.8em] lg:text-[clamp(0.85rem,min(1.4vw,2.3vh),2rem)]">
+            <span className="flex shrink-0 items-center gap-1 rounded-full border-[3px] border-neo-black bg-neo-yellow px-2 py-0.5 font-neo-display text-xs font-black uppercase text-neo-black shadow-hard lg:px-[0.8em] lg:text-[clamp(0.85rem,min(1.4vw,2.3vh),2rem)]">
               <Coins className="h-[1.25em] w-[1.25em]" aria-hidden />
               {t('academy.modes.workshop.stakes', 'Lesson words = gold')}
             </span>
@@ -193,8 +193,8 @@ export function WorkshopVsIntro({
                 <li
                   key={w}
                   data-testid="workshop-lesson-word"
-                  className="flex h-[calc(var(--chip-fs)*1.25+10px)] items-center gap-[0.3em] rounded-md border-[3px] border-black pe-[0.55em] ps-[0.3em] font-neo-display text-[length:var(--chip-fs)] font-black leading-[1.25] text-black"
-                  style={{ background: 'linear-gradient(180deg, #fff6c4 0%, #ffd23a 60%, #d9a400 100%)', boxShadow: 'inset 0 2px 0 #fff, inset 0 -3px 0 #a87b00, 2px 3px 0 #000' }}
+                  className="flex h-[calc(var(--chip-fs)*1.25+10px)] items-center gap-[0.3em] rounded-md border-[3px] border-neo-black pe-[0.55em] ps-[0.3em] font-neo-display text-[length:var(--chip-fs)] font-black leading-[1.25] text-neo-black"
+                  style={{ background: 'linear-gradient(180deg, color-mix(in srgb, var(--neo-yellow) 30%, rgb(var(--neo-white))) 0%, color-mix(in srgb, var(--neo-red) 10%, var(--neo-yellow)) 60%, color-mix(in srgb, var(--neo-lime) 50%, var(--neo-orange-hover)) 100%)', boxShadow: 'inset 0 2px 0 rgb(var(--neo-white)), inset 0 -3px 0 color-mix(in srgb, var(--neo-lime-dark) 40%, var(--neo-cozy-dark)), 2px 3px 0 rgb(var(--neo-black))' }}
                 >
                   {/* Each word is literally a gold coin: the stakes read on the pill itself, not only in the label. */}
                   <Coins aria-hidden className="h-[1.1em] w-[1.1em] shrink-0" strokeWidth={2.75} />
@@ -218,9 +218,9 @@ export function WorkshopVsIntro({
               ? undefined
               : {
                   boxShadow: [
-                    '6px 6px 0 #000, 0 0 18px rgba(255,20,147,0.45)',
-                    '6px 6px 0 #000, 0 0 46px rgba(255,20,147,0.95)',
-                    '6px 6px 0 #000, 0 0 18px rgba(255,20,147,0.45)',
+                    '6px 6px 0 rgb(var(--neo-black)), 0 0 18px rgba(255,20,147,0.45)',
+                    '6px 6px 0 rgb(var(--neo-black)), 0 0 46px rgba(255,20,147,0.95)',
+                    '6px 6px 0 rgb(var(--neo-black)), 0 0 18px rgba(255,20,147,0.45)',
                   ],
                 }
           }
@@ -230,11 +230,11 @@ export function WorkshopVsIntro({
             'text-3xl [@media(orientation:landscape)_and_(max-height:520px)]:text-2xl! lg:text-[clamp(1.75rem,min(3.4vw,5.5vh),4.5rem)]',
           )}
           style={{
-            background: 'linear-gradient(180deg, #fff27a 0%, #ffc21a 45%, #ff8a00 100%)',
-            boxShadow: '6px 6px 0 #000, 0 0 30px rgba(255,20,147,0.7)',
+            background: 'linear-gradient(180deg, color-mix(in srgb, var(--neo-yellow) 70%, rgb(var(--neo-white))) 0%, color-mix(in srgb, var(--neo-cozy) 30%, var(--neo-yellow-hover)) 45%, color-mix(in srgb, var(--neo-yellow-hover) 40%, var(--neo-orange-hover)) 100%)',
+            boxShadow: '6px 6px 0 rgb(var(--neo-black)), 0 0 30px rgba(255,20,147,0.7)',
           }}
         >
-          <span aria-hidden className="pointer-events-none absolute inset-x-2 top-1 h-2 rounded-full bg-white/60" />
+          <span aria-hidden className="pointer-events-none absolute inset-x-2 top-1 h-2 rounded-full bg-neo-white/60" />
           <Swords className="relative h-[1.1em] w-[1.1em] shrink-0" aria-hidden />
           <span className="relative">{loading ? t('common.loading', 'Loading…') : t('academy.modes.workshop.battle', 'Battle!')}</span>
         </m.button>

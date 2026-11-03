@@ -27,13 +27,8 @@ type Dict = Record<string, unknown>;
 
 const LOCALES: Record<string, Dict> = { en, he, sv, ja, es, ru };
 
-const COMPONENT_DIR = join(process.cwd(), 'components/teacher/report');
-const SOURCES = [
-  'ClassReportSection.tsx',
-  'WordStudentGrid.tsx',
-  'WordTrendStrip.tsx',
-  'StudentDrillDownPanel.tsx',
-];
+const COMPONENT_DIR = join(process.cwd(), 'components/teacher');
+const SOURCES = ['report/WordStudentGrid.tsx', 'rounds/RoundReportCard.tsx'];
 
 /** Literal `t('...')` keys under teacher.classReport, from the source itself. */
 function literalKeys(): string[] {
@@ -55,7 +50,7 @@ function resolve(dict: Dict, path: string): unknown {
 }
 
 /**
- * Keys built by template — `practice.<key>` in the drill-down panel and every
+ * Keys built by template — `practice.<key>` and every
  * cell state's label. Templated keys are invisible to the literal scan, so
  * they are enumerated from the union types that produce them.
  */

@@ -78,7 +78,7 @@ function XpCounter({ xp, reduce }: { xp: number; reduce: boolean }) {
       initial={reduce ? false : { scale: 0.5, rotate: -8 }}
       animate={{ scale: 1, rotate: -2 }}
       transition={{ type: 'spring', stiffness: 420, damping: 13 }}
-      className="relative inline-flex items-center gap-2 rounded-neo border-[3px] border-black bg-neo-lime px-4 py-1 font-neo-display font-black text-black shadow-hard-lg"
+      className="relative inline-flex items-center gap-2 rounded-neo border-[3px] border-neo-black bg-neo-lime px-4 py-1 font-neo-display font-black text-neo-black shadow-hard-lg"
     >
       <Sparkles className="h-7 w-7 lg:h-10 lg:w-10" aria-hidden />
       <span className="sr-only">{t('academy.modes.xpEarned', '+{xp} XP', { xp })}</span>
@@ -150,7 +150,7 @@ export function AcademyReward({
           animate={{ y: 0, scale: 1 }}
           transition={{ type: 'spring', stiffness: 380, damping: 16 }}
           className="relative z-10 shrink-0 text-center font-neo-display text-3xl font-black uppercase leading-none text-neo-white sm:text-5xl lg:hidden"
-          style={{ textShadow: '3px 3px 0 #000, 0 0 24px rgba(0,0,0,0.6)' }}
+          style={{ textShadow: '3px 3px 0 rgb(var(--neo-black)), 0 0 24px rgba(0,0,0,0.6)' }}
         >
           {headline}
         </m.h2>
@@ -165,7 +165,7 @@ export function AcademyReward({
               disabled={open}
               onClick={onOpen}
               aria-label={open ? chestLabel : t('academy.modes.tapToOpen', 'Tap to open')}
-              className="relative grid place-items-center disabled:cursor-default"
+              className="relative grid place-items-center disabled:cursor-default focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
               style={{
                 width: open ? CHEST_OPEN : CHEST_CLOSED,
                 height: open ? CHEST_OPEN : CHEST_CLOSED,
@@ -187,7 +187,7 @@ export function AcademyReward({
                 alt=""
                 draggable={false}
                 className="relative h-full w-full object-contain"
-                style={{ filter: `drop-shadow(6px 6px 0 #000) drop-shadow(0 0 ${open ? 22 : 12}px ${fx.hex})` }}
+                style={{ filter: `drop-shadow(6px 6px 0 rgb(var(--neo-black))) drop-shadow(0 0 ${open ? 22 : 12}px ${fx.hex})` }}
                 animate={reduce ? undefined : open ? { scale: [0.8, 1.2, 1], y: [10, -16, 0] } : { rotate: [0, -6, 6, -4, 4, 0], y: [0, -6, 0] }}
                 transition={reduce ? undefined : open ? { duration: 0.55 } : { duration: 0.9, repeat: Infinity, repeatDelay: 0.7 }}
               />
@@ -211,7 +211,7 @@ export function AcademyReward({
                 </span>
               )}
               {!open && (
-                <span className={cn('absolute -bottom-2 rounded-full border-[3px] border-black bg-neo-lime px-4 py-1 font-neo-display text-base font-black uppercase text-black shadow-hard lg:text-2xl', !reduce && 'motion-safe:animate-bounce')}>
+                <span className={cn('absolute -bottom-2 rounded-full border-[3px] border-neo-black bg-neo-lime px-4 py-1 font-neo-display text-base font-black uppercase text-neo-black shadow-hard lg:text-2xl', !reduce && 'motion-safe:animate-bounce')}>
                   {t('academy.modes.tapToOpen', 'Tap to open')}
                 </span>
               )}
@@ -219,7 +219,7 @@ export function AcademyReward({
           </div>
         </BoundedConfettiBurst>
         <span
-          className="relative z-10 mt-1 shrink-0 -rotate-2 rounded-neo border-[3px] border-black px-3 py-0.5 font-neo-display text-sm font-black uppercase text-black shadow-hard lg:text-2xl"
+          className="relative z-10 mt-1 shrink-0 -rotate-2 rounded-neo border-[3px] border-neo-black px-3 py-0.5 font-neo-display text-sm font-black uppercase text-neo-black shadow-hard lg:text-2xl"
           style={{ background: fx.hex }}
         >
           {chestLabel}
@@ -231,7 +231,7 @@ export function AcademyReward({
       <div className={cn('flex w-full flex-col items-center gap-2 sm:gap-3 lg:max-w-[40rem] lg:flex-none lg:basis-1/2 lg:items-start lg:justify-center lg:gap-6', open ? 'shrink-0 gap-4' : 'shrink-0')}>
         <h2
           className="hidden font-neo-display text-7xl font-black uppercase leading-none text-neo-white lg:block"
-          style={{ textShadow: '4px 4px 0 #000' }}
+          style={{ textShadow: '4px 4px 0 rgb(var(--neo-black))' }}
         >
           {headline}
         </h2>
@@ -262,15 +262,15 @@ export function AcademyReward({
                 open ? 'min-h-[10rem] justify-center pb-3 pt-6 lg:min-h-0' : 'py-2',
                 i === 0 && 'border-neo-lime',
               )}
-              style={open ? { boxShadow: `4px 4px 0 #000, 0 0 26px ${i === 0 ? 'rgba(191,255,0,0.35)' : 'rgba(255,225,53,0.3)'}` } : undefined}
+              style={open ? { boxShadow: `4px 4px 0 rgb(var(--neo-black)), 0 0 26px ${i === 0 ? 'rgba(191,255,0,0.35)' : 'rgba(255,225,53,0.3)'}` } : undefined}
             >
               {/* Trophy medallion riding the tile's top edge once the payout is the hero. */}
               <span
                 className={cn(
-                  'grid place-items-center text-black [&>svg]:h-5 [&>svg]:w-5 lg:[&>svg]:h-9 lg:[&>svg]:w-9',
-                  open ? 'absolute -top-5 h-10 w-10 rounded-full border-[3px] border-black lg:static lg:h-auto lg:w-auto lg:border-0 lg:!bg-transparent lg:text-neo-yellow' : 'text-neo-yellow',
+                  'grid place-items-center text-neo-black [&>svg]:h-5 [&>svg]:w-5 lg:[&>svg]:h-9 lg:[&>svg]:w-9',
+                  open ? 'absolute -top-5 h-10 w-10 rounded-full border-[3px] border-neo-black lg:static lg:h-auto lg:w-auto lg:border-0 lg:!bg-transparent lg:text-neo-yellow' : 'text-neo-yellow',
                 )}
-                style={open ? { background: i === 0 ? '#bfff00' : '#ffe135', boxShadow: '2px 2px 0 #000' } : undefined}
+                style={open ? { background: i === 0 ? 'var(--neo-lime)' : 'var(--neo-yellow)', boxShadow: '2px 2px 0 rgb(var(--neo-black))' } : undefined}
                 aria-hidden
               >
                 {s.icon}
@@ -282,12 +282,12 @@ export function AcademyReward({
                   !open && (s.value.length > 5 ? 'text-2xl sm:text-3xl lg:text-5xl' : 'text-3xl sm:text-4xl lg:text-6xl'),
                   open && 'lg:text-6xl',
                 )}
-                style={open ? { textShadow: '3px 3px 0 #000', fontSize: trophySize } : undefined}
+                style={open ? { textShadow: '3px 3px 0 rgb(var(--neo-black))', fontSize: trophySize } : undefined}
               >
                 {s.value}
                 {s.suffix && <span className="ms-0.5 align-baseline text-[0.42em] text-neo-cream">{s.suffix}</span>}
               </span>
-              <span className="mt-1 line-clamp-1 font-neo-display text-[11px] font-bold uppercase tracking-wide text-neo-cream sm:text-xs lg:text-lg">{s.label}</span>
+              <span className="mt-1 line-clamp-1 font-neo-display text-xs font-bold uppercase tracking-wide text-neo-cream sm:text-xs lg:text-lg">{s.label}</span>
             </m.li>
           ))}
         </ul>

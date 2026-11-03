@@ -6,7 +6,8 @@ import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackLandingCtaClick } from '@/utils/growthTracking';
 import { locales } from '@/lib/i18n';
-import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
+import { PRO_COPY_PARAMS } from '@/lib/education/proFeatures';
+import { LandingProPill } from './LandingProPill';
 import { TEACHER_PRO_CHECKOUT_PATH } from './TeacherProCheckoutCta';
 
 // Derived from the shipped locales so the "built for N languages" line can't go stale.
@@ -69,25 +70,27 @@ export function EducationHero({ setupPending = false }: { setupPending?: boolean
             </Link>
           </div>
 
-          <p className="mt-4 text-sm font-bold text-neo-cream/70">
-            {t('eg2Land.hero.note')}
-            {' · '}
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm font-bold text-neo-cream/70 lg:justify-start">
+            <span>{t('eg2Land.hero.note')}</span>
             <Link
               href={`/${language}${TEACHER_PRO_CHECKOUT_PATH}`}
               data-testid="education-hero-pro-cta"
               data-lc-cta="pro_upgrade"
               onClick={() => trackLandingCtaClick('education_hero_pro')}
-              className="rounded-sm text-neo-yellow underline decoration-2 underline-offset-4 hover:text-neo-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
+              className="inline-flex min-h-11 items-center gap-2 rounded-neo-sm px-1 text-neo-cream hover:text-neo-yellow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
             >
-              {t('eduPlans.hero.proLink', { price: `$${TEACHER_PRO_PRICE_USD}` })}
+              <LandingProPill label={t('eduPro.pill', 'Pro')} />
+              <span className="underline decoration-2 underline-offset-4">
+                {t('eduPlans.hero.proLink', { price: PRO_COPY_PARAMS.price })}
+              </span>
             </Link>
-          </p>
+          </div>
 
           <ul aria-label={t('eg2Land.proof.label')} className="mx-auto mt-6 hidden max-w-md flex-col gap-2 text-start sm:flex lg:mx-0">
             {PROOF.map(({ key, Icon }) => (
               <li key={key} className="flex items-center gap-2.5 text-sm font-bold text-neo-cream/85">
                 <Icon className="size-4 shrink-0 text-neo-lime" strokeWidth={2.5} aria-hidden="true" />
-                {t(`eg2Land.proof.${key}`)}
+                {t(`eg2Land.proof.${key}`, { count: LANGUAGE_COUNT })}
               </li>
             ))}
           </ul>

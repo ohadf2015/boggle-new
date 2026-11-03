@@ -338,7 +338,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
   }
 
   if (gameMode === 'wordcraft') {
-    return <TvWordcraftBroadcast joinBar={joinBar} socket={socket} leaderboard={leaderboardData} remainingTime={remainingTime} t={t} />;
+    return <TvWordcraftBroadcast joinBar={joinBar} socket={socket} players={leaderboardData} teams={classroomLive?.teams} hostUsername={username} language={roomLanguage} remainingTime={remainingTime} t={t} />;
   }
 
   return (

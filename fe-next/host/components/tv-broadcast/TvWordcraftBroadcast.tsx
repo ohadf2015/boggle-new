@@ -1,20 +1,25 @@
 'use client';
 
-import type { ReactNode } from 'react';
-import { WordcraftProjectorView } from '@/components/multiplayer/wordcraft/WordcraftProjectorView';
+import type { ComponentProps, ReactNode } from 'react';
+import { ProjectorWordcraftStage } from '@/components/education/live/ProjectorWordcraftStage';
 import type { WordcraftLiveSocket } from '@/components/multiplayer/wordcraft/useWordcraftLive';
 import { TEACHER_CONTROLS_INSET } from '@/components/education/controls/teacherBarInset';
+
+type StageProps = ComponentProps<typeof ProjectorWordcraftStage>;
 
 interface TvWordcraftBroadcastProps {
   joinBar: ReactNode;
   socket: WordcraftLiveSocket | null;
-  leaderboard: { username: string; score: number }[];
+  players: StageProps['players'];
+  teams?: StageProps['teams'];
+  hostUsername?: string;
+  language: string;
   remainingTime: number | null;
-  t: (key: string, params?: Record<string, string | number>) => string;
+  t: StageProps['t'];
 }
 
 /** The teacher's Wordcraft screen: join bar for late joiners over the live race; the control strip owns End round. */
-export default function TvWordcraftBroadcast({ joinBar, socket, leaderboard, remainingTime, t }: TvWordcraftBroadcastProps) {
+export default function TvWordcraftBroadcast({ joinBar, socket, players, teams, hostUsername, language, remainingTime, t }: TvWordcraftBroadcastProps) {
   return (
     <div
       data-testid="tv-wordcraft-broadcast"
@@ -22,7 +27,15 @@ export default function TvWordcraftBroadcast({ joinBar, socket, leaderboard, rem
       style={TEACHER_CONTROLS_INSET}
     >
       {joinBar}
-      <WordcraftProjectorView socket={socket} leaderboard={leaderboard} remainingTime={remainingTime} t={t} embedded />
+      <ProjectorWordcraftStage
+        socket={socket}
+        players={players}
+        teams={teams}
+        hostUsername={hostUsername}
+        language={language}
+        remainingTime={remainingTime}
+        t={t}
+      />
     </div>
   );
 }

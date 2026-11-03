@@ -88,7 +88,7 @@ const FALLS: Record<MapLayout, { x: number; y: number; h: number; w: number }[]>
 function Sparkle({ size }: { size: number }) {
   return (
     <svg viewBox="0 0 12 12" width={size} height={size} aria-hidden="true">
-      <path d="M6 0 L7.2 4.8 L12 6 L7.2 7.2 L6 12 L4.8 7.2 L0 6 L4.8 4.8 Z" fill="#fff6c2" />
+      <path d="M6 0 L7.2 4.8 L12 6 L7.2 7.2 L6 12 L4.8 7.2 L0 6 L4.8 4.8 Z" fill="color-mix(in srgb, var(--neo-yellow) 30%, rgb(var(--neo-white)))" />
     </svg>
   );
 }
@@ -110,8 +110,8 @@ export function AcademyAmbient({ layout, reducedMotion }: { layout: MapLayout; r
               top: `${fall.y}%`,
               width: `${fall.w}%`,
               height: `${fall.h}%`,
-              WebkitMaskImage: 'linear-gradient(180deg, transparent 0%, #000 18%, #000 78%, transparent 100%)',
-              maskImage: 'linear-gradient(180deg, transparent 0%, #000 18%, #000 78%, transparent 100%)',
+              WebkitMaskImage: 'linear-gradient(180deg, transparent 0%, rgb(var(--neo-black)) 18%, rgb(var(--neo-black)) 78%, transparent 100%)',
+              maskImage: 'linear-gradient(180deg, transparent 0%, rgb(var(--neo-black)) 18%, rgb(var(--neo-black)) 78%, transparent 100%)',
               animation: `academy-fall-glint ${2.4 + (i % 3) * 0.7}s ease-in-out ${(i * 0.37) % 2}s infinite`,
             }}
           >
@@ -162,7 +162,7 @@ export function AcademyAmbient({ layout, reducedMotion }: { layout: MapLayout; r
               top: `${mote.y}%`,
               width: mote.size,
               height: mote.size,
-              background: 'radial-gradient(circle, #fff7c8 0%, #ffd23a 45%, rgba(255,210,58,0) 72%)',
+              background: 'radial-gradient(circle, color-mix(in srgb, var(--neo-yellow) 20%, var(--neo-cream)) 0%, color-mix(in srgb, var(--neo-red) 10%, var(--neo-yellow)) 45%, rgba(255,210,58,0) 72%)',
             }}
             initial={{ opacity: 0, y: 0 }}
             animate={{ opacity: [0, 0.9, 0], y: [0, -60], x: [0, i % 2 ? 10 : -10] }}

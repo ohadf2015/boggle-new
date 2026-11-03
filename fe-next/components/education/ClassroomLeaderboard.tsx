@@ -262,7 +262,7 @@ const ClassroomLeaderboard = memo<ClassroomLeaderboardProps>(
           type="button"
           data-testid="leaderboard-error"
           onClick={() => void refresh()}
-          className={cn(
+          className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
             'w-full rounded-neo border-neo border-neo-cream/40 bg-neo-navy px-4 py-3 text-start font-neo-body text-sm font-bold text-neo-white',
             className
           )}

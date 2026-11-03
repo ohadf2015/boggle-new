@@ -202,7 +202,7 @@ export function MissGapRoundView({
                   data-testid="miss-gap-letter-tile"
                   disabled={locked || typed.includes(index)}
                   onClick={() => pickTile(index)}
-                  className={cn(
+                  className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
                     'w-14 h-14 rounded-neo border-[3px] shadow-hard-sm',
                     'font-neo-display font-bold text-2xl transition-transform',
                     'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
@@ -238,7 +238,7 @@ export function MissGapRoundView({
                       onTapFeedback();
                       onAnswer(choice.correct, choice.label);
                     }}
-                    className={cn(
+                    className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
                       'w-full h-full flex items-center text-start px-4 py-3 rounded-neo border-[3px]',
                       'font-neo-display font-bold text-base leading-snug shadow-hard-sm',
                       'transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',

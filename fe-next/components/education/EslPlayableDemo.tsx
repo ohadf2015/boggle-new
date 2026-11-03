@@ -108,7 +108,7 @@ export function EslPlayableDemo({ locale }: { locale: string }) {
             onClick={() => pickLevel(lv)}
             className={`rounded-neo border-2 border-neo-black px-3 py-1.5 font-neo-display text-sm font-black ${
               level === lv ? 'bg-neo-cyan text-neo-navy shadow-hard-sm' : 'bg-neo-navy text-neo-white'
-            }`}
+            } focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}
           >
             {lv}
           </button>
@@ -134,7 +134,7 @@ export function EslPlayableDemo({ locale }: { locale: string }) {
         <button
           type="button"
           onClick={start}
-          className="mt-5 rounded-neo border-3 border-neo-black bg-neo-lime px-5 py-3 font-neo-display text-sm font-black uppercase tracking-wider text-neo-navy shadow-hard"
+          className="mt-5 rounded-neo border-3 border-neo-black bg-neo-lime px-5 py-3 font-neo-display text-sm font-black uppercase tracking-wider text-neo-navy shadow-hard focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
         >
           {copy.start}
         </button>
@@ -148,7 +148,7 @@ export function EslPlayableDemo({ locale }: { locale: string }) {
           <button
             type="button"
             onClick={start}
-            className="mt-3 rounded-neo border-3 border-neo-black bg-neo-lime px-5 py-3 font-neo-display text-sm font-black uppercase tracking-wider text-neo-navy shadow-hard"
+            className="mt-3 rounded-neo border-3 border-neo-black bg-neo-lime px-5 py-3 font-neo-display text-sm font-black uppercase tracking-wider text-neo-navy shadow-hard focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           >
             {copy.playAgain}
           </button>
@@ -175,7 +175,7 @@ export function EslPlayableDemo({ locale }: { locale: string }) {
                   onClick={() => onTile(i)}
                   className={`grid aspect-square place-items-center rounded-neo border-3 border-neo-black font-neo-display text-lg font-black ${
                     on ? 'bg-neo-lime text-neo-navy shadow-hard-sm' : 'bg-neo-navy text-neo-white'
-                  }`}
+                  } focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}
                 >
                   {letter}
                 </button>
@@ -189,14 +189,14 @@ export function EslPlayableDemo({ locale }: { locale: string }) {
             <button
               type="button"
               onClick={submit}
-              className="rounded-neo border-2 border-neo-black bg-neo-cyan px-4 py-2 font-neo-display text-xs font-black uppercase text-neo-navy"
+              className="rounded-neo border-2 border-neo-black bg-neo-cyan px-4 py-2 font-neo-display text-xs font-black uppercase text-neo-navy focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
             >
               {copy.submit}
             </button>
             <button
               type="button"
               onClick={() => setPath([])}
-              className="rounded-neo border-2 border-neo-cream/40 bg-neo-navy px-4 py-2 font-neo-display text-xs font-black uppercase text-neo-white"
+              className="rounded-neo border-2 border-neo-cream/40 bg-neo-navy px-4 py-2 font-neo-display text-xs font-black uppercase text-neo-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
             >
               {copy.clear}
             </button>
@@ -216,7 +216,7 @@ export function EslPlayableDemo({ locale }: { locale: string }) {
 
       <Link
         href={practiceHref(level, locale)}
-        className="mt-5 inline-block font-neo-display text-sm font-black uppercase tracking-widest text-neo-cyan underline underline-offset-4"
+        className="mt-5 inline-block font-neo-display text-sm font-black uppercase tracking-widest text-neo-cyan underline underline-offset-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
       >
         {copy.practice}
       </Link>

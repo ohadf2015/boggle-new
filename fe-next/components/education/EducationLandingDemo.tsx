@@ -162,7 +162,7 @@ export function EducationLandingDemo() {
         <button
           type="button"
           onClick={replay}
-          className="min-h-9 rounded-neo border-2 border-neo-black bg-neo-cyan px-3 font-neo-display text-xs font-black uppercase text-neo-navy shadow-hard-sm transition-transform duration-150 hover:-translate-y-0.5 active:scale-[0.97] motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime"
+          className="min-h-11 rounded-neo border-2 border-neo-black bg-neo-cyan px-3 font-neo-display text-xs font-black uppercase text-neo-navy shadow-hard-sm transition-transform duration-150 hover:-translate-y-0.5 active:scale-[0.97] motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime"
         >
           {t('eg6Land.demo.replay')}
         </button>

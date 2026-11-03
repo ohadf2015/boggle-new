@@ -55,7 +55,7 @@ export function AccessRedirectNotice({ from }: { from?: string | null }) {
   return (
     <div
       role="status"
-      className="mb-5 flex items-start gap-3 rounded-neo border-neo-thick border-black bg-neo-cyan p-4 text-neo-navy shadow-hard"
+      className="mb-5 flex items-start gap-3 rounded-neo border-neo-thick border-neo-black bg-neo-cyan p-4 text-neo-navy shadow-hard"
     >
       <Info aria-hidden="true" className="mt-0.5 h-5 w-5 shrink-0" />
       <div>

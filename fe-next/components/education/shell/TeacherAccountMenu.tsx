@@ -3,7 +3,7 @@
 import { useCallback, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ChevronsUpDown, Crown, DoorOpen, HelpCircle, LogOut, Sparkles, UserRound } from 'lucide-react';
+import { ChevronsUpDown, Crown, HelpCircle, LogOut, Sparkles, UserRound } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { signOut } from '@/lib/supabase';
@@ -80,7 +80,7 @@ export function TeacherAccountMenu({ proHref, profileHref, variant = 'row' }: Te
             <Link href={proHref}>
               <Crown className="size-4" aria-hidden="true" />
               {t('eduShell.account.plans')}
-              <span data-testid="teacher-account-pro-badge" className="ms-auto rounded-neo bg-neo-yellow px-1.5 py-px text-[11px] font-black text-neo-black">
+              <span data-testid="teacher-account-pro-badge" className="ms-auto rounded-neo bg-neo-yellow px-1.5 py-px text-xs font-black text-neo-black">
                 {t('eduShell.nav.pro')}
               </span>
             </Link>
@@ -99,12 +99,6 @@ export function TeacherAccountMenu({ proHref, profileHref, variant = 'row' }: Te
           <DropdownMenuItem className={ITEM} onSelect={() => void handleSignOut()}>
             <LogOut className="size-4" aria-hidden="true" />
             {t('auth.signOut')}
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild className={cn(ITEM, 'text-neo-cream/75')}>
-            <Link href={`/${language}`}>
-              <DoorOpen className="size-4" aria-hidden="true" />
-              {t('education.header.exitEducation')}
-            </Link>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

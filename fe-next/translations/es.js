@@ -945,7 +945,7 @@ const es = {
   "academy": {
     "teacher": {
       "classesTitle": "Tus clases",
-      "hqTitle": "Central del profe",
+      "hqTitle": "Inicio del profe",
       "classActions": "Acciones de la clase",
       "orTypeCode": "o abre el enlace y escribe el código"
     },
@@ -986,14 +986,9 @@ const es = {
       "firstAssignmentCta": "Crear primera tarea",
       "startLiveTitle": "Juega una clase en vivo",
       "startLiveBody": "La tarea ya está. Empieza un juego en vivo para que la clase juegue junta.",
-      "startLiveCta": "Empezar juego en vivo",
+      "startLiveCta": "Empezar en vivo",
       "copyJoinCode": "Copiar enlace",
       "joinCodeCopied": "Enlace copiado",
-      "progressTitle": "Progreso de la clase",
-      "progressStudents": "estudiantes",
-      "progressAssignments": "tareas",
-      "progressSubmitted": "entregadas",
-      "progressUpgrade": "Teacher Pro",
       "endedCodeTries": "Alumnos que intentaron unirse después de que terminara tu juego: {count}.",
       "endedCodeTriesOne": "Un alumno intentó unirse después de que terminara tu juego.",
       "lateJoinProLine": "Con Teacher Pro, dales una tarea que puedan jugar a su ritmo.",
@@ -1088,7 +1083,6 @@ const es = {
       "savingXp": "Guardando XP…",
       "xpEarned": "+{xp} XP",
       "tapToOpen": "Toca para abrir",
-      "errorTitle": "Algo salió mal. Inténtalo de nuevo.",
       "tryAgain": "Reintentar",
       "playAgain": "Jugar otra vez",
       "xpNotSaved": "Esta vez no pudimos guardar tu XP. Juega otra vez para intentarlo de nuevo.",
@@ -1190,17 +1184,6 @@ const es = {
       "classmateHere": "de tu clase ya está aquí",
       "classmatesHere": "de tu clase ya están aquí",
       "firstIn": "¡Llegaste antes que nadie! Tus compañeros aparecerán aquí."
-    },
-    "homework": {
-      "noGame": "Juega una partida en vivo: aquí llegarán las palabras falladas de cada alumno.",
-      "noMisses": "Nadie falló ni una palabra en la última partida. Nada que asignar.",
-      "summary": "Alumnos: {students} · palabras falladas: {words}. Cada uno practica solo las suyas.",
-      "more": "+{count} más",
-      "assigned": "Asignado. Les espera en su isla de Palabras falladas.",
-      "assign": "Asignar a cada alumno",
-      "due": "Entrega: {date}",
-      "failed": "No se pudo asignar. Inténtalo de nuevo.",
-      "title": "Tarea: palabras falladas"
     },
     "pages": {
       "backToMap": "Volver a la Academia",
@@ -4654,7 +4637,7 @@ const es = {
     }
   },
   "hostView": {
-    "demoBotsFailed": "Las rondas de práctica se juegan en la pantalla grande. Sal del modo jugador para ensayar con bots.",
+    "demoBotsFailed": "Las rondas de práctica se juegan en la pantalla grande. Sal del modo jugador para practicar con bots.",
     "lobby": "Cuartel",
     "lobbyTitle": "Sala multijugador",
     "waitingForPlayers": "Esperando que llegue la banda...",
@@ -14095,7 +14078,7 @@ const es = {
       "shareJoin": "Comparte el enlace de acceso",
       "shareJoinCta": "Copiar enlace de unión",
       "startLive": "Empezar una clase en vivo",
-      "startLiveCta": "Empezar clase en vivo",
+      "startLiveCta": "Empezar en vivo",
       "viewReport": "Ver el primer informe de progreso",
       "viewReportCta": "Abrir informe",
       "dismiss": "Cerrar",
@@ -14116,7 +14099,7 @@ const es = {
       "pasteTooFew": "Añade al menos {{min}} palabras",
       "pasteReady": "{{count}} palabras, listas para jugar",
       "pastedRoundName": "Palabras de hoy",
-      "goLive": "En directo",
+      "goLive": "Empezar en vivo",
       "armedWith": "{{title}} · {{count}} palabras",
       "pickSomething": "Elige una lista y arrancamos",
       "noSetupNeeded": "Sin crear clase ni escribir la lista: el alumnado entra con el código.",
@@ -14220,36 +14203,18 @@ const es = {
     },
     "classReport": {
       "title": "Palabra por estudiante",
-      "hint": "Cada palabra de la lección frente a cada estudiante. Las más difíciles arriba: esa es tu lista de repaso.",
       "word": "Palabra",
       "classMiss": "La clase falló",
       "accuracy": "Acierto",
       "didNotPlay": "No jugó",
       "quizCaveat": "Un concurso solo pregunta algunas palabras de la lección, y las que no preguntó cuentan aquí como falladas. Revisa la lista antes de repasar.",
-      "empty": "Nadie jugó esta partida",
-      "emptyHint": "Cuando tus estudiantes entren a una partida de clase, sus palabras aparecerán aquí una a una.",
-      "copy": "Copiar para mis notas",
-      "copied": "Copiado",
-      "copyFallback": "Copia este texto:",
       "print": "Imprimir",
-      "trendTitle": "En tus últimas partidas",
-      "trendEmpty": "Vuelve a jugar esta lección para ver si la clase mejora en estas palabras.",
-      "trendBarsLabel": "{word}: fallada por el {first}% en la primera partida y el {last}% en la última.",
       "state": {
         "found": "La encontró",
         "missed": "La falló",
         "absent": "No jugó",
         "quizFound": "Respondió bien",
         "quizMissed": "No respondió bien"
-      },
-      "drilldown": {
-        "title": "Detalle del estudiante",
-        "missedCount": "{count} palabras falladas",
-        "noneMissed": "Encontró todas las palabras de la lección.",
-        "absentHint": "Este estudiante no tiene resultado en esta partida. Ponlo al día antes de la próxima.",
-        "suggested": "Siguiente paso:",
-        "assign": "Practicar estas palabras",
-        "close": "Cerrar"
       },
       "practice": {
         "flashcard": "Primero el significado: tarjetas y luego un test",
@@ -14403,21 +14368,7 @@ const es = {
       "unpluggedReteachLiveFoil": "¿Hoy sin dispositivos para el alumnado? Proyecta los fallos y que respondan en papel."
     },
     "windowProgress": {
-      "title": "La clase esta semana",
-      "windowLabel": "Periodo",
-      "days7": "7 días",
-      "days30": "30 días",
-      "completion": "Finalización",
-      "accuracy": "Precisión",
       "activeLine": "{{active}} de {{roster}} estudiantes jugaron",
-      "studentStat": "{{sessions}} partidas · {{accuracy}}",
-      "noPlay": "Aún no hay partidas",
-      "loading": "Cargando el progreso de la clase…",
-      "loadError": "No se pudo cargar el progreso de la clase.",
-      "retry": "Reintentar",
-      "emptyNoRoster": "Invita primero a tus estudiantes: así el progreso de 7 y 30 días tiene a quién informar.",
-      "proCtaHint": "Desbloquea el historial imprimible y cada aula con Teacher Pro.",
-      "regionLabel": "Progreso de 7 y 30 días de {{classroom}}"
     },
     "subscription": {
       "giftedNoCard": "Sin tarjeta ni renovación: simplemente termina y vuelves al plan gratuito.",
@@ -14831,17 +14782,8 @@ const es = {
       "editLesson": "Editar palabras y definiciones",
       "moreWords": "+{{count}} palabras más",
       "bulkImport": "Importar en lote",
-      "bulkImportTitle": "Importar varias palabras",
-      "bulkImportDescription": "Pega una lista de palabras separadas por líneas, comas o espacios. Puedes incluir definiciones con el formato 'palabra - definición'.",
-      "bulkImportLabel": "Pega las palabras aquí",
-      "bulkImportPlaceholder": "Pega palabras, una por línea. Usa 'palabra - definición' para definiciones.",
-      "bulkImportDetected": "{{count}} palabras detectadas",
-      "bulkImportUnreadable": "No se pudieron leer {{count}} fila(s) (fila {{rows}}): no tienen palabra, así que se dejaron fuera. Revisa si sobra un | o falta la palabra.",
-      "bulkImportOneWordPerLine": "La fila {{rows}} parece tener varias palabras en una sola línea. Escribe una palabra por línea e importa de nuevo.",
       "savedAndAssigned": "Lección guardada y asignada a {{classroom}}: tus estudiantes ya la ven.",
       "savedNotAssigned": "La lección se guardó, pero no pudimos asignarla a {{classroom}}. Inténtalo con el botón Asignar a clase de la lección.",
-      "bulkImportButton": "Importar",
-      "templates": "Plantillas de lecciones",
       "category": {
         "all": "Todo",
         "grade-1": "Grado 1",
@@ -14918,6 +14860,30 @@ const es = {
       "failedToSaveLesson": "No se pudo guardar la lección"
     },
     "reports": {
+      "valueLine": "Después de cada partida, ves qué palabras falló cada clase, quién necesita ayuda y qué practicar a continuación.",
+      "lockedValue": "Las palabras que falló tu clase aparecen gratis en la pantalla de resultados de cada partida. Los informes añaden quién necesita ayuda, alumno por alumno, en todas tus partidas.",
+      "emptyClass": {
+        "title": "Esta clase aún no ha jugado",
+        "body": "Juega una partida con esta clase. Después, su informe muestra qué palabras falló la clase y quién necesita ayuda.",
+        "cta": "Empezar una partida con esta clase"
+      },
+      "reteach": {
+        "title": "Qué volver a enseñar",
+        "exampleBadge": "Ejemplo",
+        "exampleBody": "Después de tu primera partida, aquí verás las palabras que falló tu clase y quién necesita ayuda. Abajo hay datos de ejemplo.",
+        "fromClass": "Las palabras que más falló {name} en sus partidas hasta ahora.",
+        "accuracy": "Precisión de la clase: {pct} %",
+        "missRate": "{pct} % la falló",
+        "studentsMissed": "{missing} de {asked} alumnos la fallaron",
+        "needsHelp": "Necesitan ayuda:",
+        "needsHelpPro": "El detalle alumno por alumno viene con Teacher Pro.",
+        "needsHelpNone": "Todos alcanzan la meta de la clase.",
+        "moreStudents": "+{count} más",
+        "openClass": "Abrir el informe de la clase",
+        "startFirstGame": "Empieza tu primera partida",
+        "exampleWords": "trueno,brisa,escarcha,nube",
+        "exampleNames": "Lucía,Mateo"
+      },
       "arc": {
         "title": "Arco de aprendizaje",
         "subtitle": "Cada estudiante, a lo largo de todas las sesiones",
@@ -15465,7 +15431,7 @@ const es = {
       "settings": "Ajuste fino",
       "settingsHide": "Ocultar ajuste fino",
       "needsLesson": "Elige primero una lista de palabras",
-      "launch": "EN VIVO: {{mode}}",
+      "launch": "Empezar en vivo: {{mode}}",
       "tapAgain": "Toca otra vez para empezar",
       "moreModes": "Más juegos ({{count}})",
       "fewerModes": "Menos juegos",
@@ -15495,10 +15461,10 @@ const es = {
       "startBlocked": "Espera a que entre al menos un alumno para empezar.",
       "practiceFirst": "Practica primero con 3 bots",
       "practiceFirstHint": "Mira lo que verá tu clase. Los bots se van cuando entra tu primer alumno.",
-      "rehearseCta": "Probar con bots",
+      "rehearseCta": "Practicar con bots",
       "rehearsePrivate": "Solo tú ves esto. Los estudiantes no están en la sala y no cuenta.",
-      "rehearseBotsBlocked": "Los bots no pueden jugar a este juego, así que no puedes ensayarlo con ellos.",
-      "rehearseUseClassic": "Ensaya con Clásico",
+      "rehearseBotsBlocked": "Los bots no pueden jugar a este juego, así que no puedes practicarlo con ellos.",
+      "rehearseUseClassic": "Practica con bots en Clásico",
       "startWhenReady": "Empieza cuando estén todos",
       "lateJoinOn": "Se puede entrar tarde",
       "lateJoinOff": "No se puede entrar tarde",
@@ -20722,8 +20688,6 @@ const es = {
       "haveAccount": "¿Ya tienes cuenta? Inicia sesión"
     },
     "hq": {
-      "assigned": "{{count}} asignadas",
-      "assignedAria": "Tareas: {{count}} asignadas. Abrir tareas",
       "assignNudge": "Asignar tarea"
     },
     "modeTags": {
@@ -20739,7 +20703,7 @@ const es = {
   "eduLive": {
     "exit": {
       "title": "¿Terminar el juego de la clase?",
-      "body": "La sala se cierra para todo el alumnado y vuelves al panel de tu clase.",
+      "body": "La sala se cierra para todo el alumnado y vuelves a Inicio.",
       "stay": "Seguir jugando",
       "confirm": "Terminar juego"
     },
@@ -20788,6 +20752,13 @@ const es = {
   },
   // @eduLive:end
   "eduPro": {
+    "table": {
+      "modes": "Modos de juego en vivo",
+      "assignments": "Tareas por clase"
+    },
+    "trialLine": "Los primeros {days} días de Teacher Pro son gratis, una vez por docente. Cancela cuando quieras.",
+    "modesSub": "Unos van en el proyector y otros en los móviles de tus estudiantes. Todos los modos son gratis; el modo tranquilo para alumnos con ansiedad viene con Pro.",
+    "pill": "Pro",
     "mastery": {
       "title": "Dominio de palabras",
       "subtitle": "Qué palabras falla tu clase una y otra vez, en todos los juegos.",
@@ -21135,8 +21106,8 @@ const es = {
       "articlesCount": "{count} guías",
       "faqTitle": "Respuestas rápidas",
       "ctaTitle": "Tu clase está a un toque",
-      "ctaBody": "Gratis para docentes, sin cuentas para el alumnado y sin tarjeta. Abre la Central del profe y pulsa ¡En directo!",
-      "ctaPrimary": "Abrir la Central del profe, gratis",
+      "ctaBody": "Gratis para docentes, sin cuentas para el alumnado y sin tarjeta. Abre tu Inicio del profe y pulsa Empezar en vivo.",
+      "ctaPrimary": "Abrir Inicio del profe, gratis",
       "ctaSecondary": "Ver antes un juego en directo",
       "stuckTitle": "¿Sigues atascado?",
       "stuckBody": "Cuéntanos qué intentabas hacer. Te responde una persona real del equipo.",
@@ -21145,11 +21116,11 @@ const es = {
     "categories": {
       "gettingStarted": {
         "title": "Primeros pasos",
-        "blurb": "Tu cuenta, la Central del profe y tu primera clase."
+        "blurb": "Tu cuenta, Inicio y tu primera clase."
       },
       "liveGame": {
         "title": "Juegos en directo",
-        "blurb": "Lanzar el juego, sumar alumnos, elegir modo y llevar la sala."
+        "blurb": "Empezar en vivo, sumar alumnos, elegir modo y llevar la sala."
       },
       "assign": {
         "title": "Deberes y práctica",
@@ -21196,8 +21167,8 @@ const es = {
       "eyebrow": "Tu siguiente paso",
       "startClass": {
         "title": "Pruébalo hoy con tu clase",
-        "body": "La Central del profe es gratis. Pulsa ¡En directo! y el código aparece en la pizarra en segundos.",
-        "cta": "Abrir la Central del profe"
+        "body": "Inicio del profe es gratis. Pulsa Empezar en vivo y el código aparece en la pizarra en segundos.",
+        "cta": "Abrir Inicio del profe"
       },
       "liveGame": {
         "title": "Lanza un juego en directo ya",
@@ -21320,6 +21291,10 @@ const es = {
       "toTeacher": "Volver al inicio de profe"
     },
     "hostResults": {
+      "missedTitle": "Palabras que tu clase falló",
+      "practiceWords": "Practicar estas palabras ({count})",
+      "shareParents": "Compartir con las familias",
+      "proPill": "Pro",
       "invitePrompt": "¿Conoces a un docente a quien le gustaría?",
       "inviteCta": "Invitar a un colega",
       "inviteText": "Mi clase acaba de jugar a un juego de palabras en LexiClash. Es gratis para docentes, échale un vistazo:",
@@ -21366,6 +21341,11 @@ const es = {
   ,
   // @eduShell:start
   "eduShell": {
+    "error": {
+      "title": "Esta pantalla se ha atascado",
+      "body": "Inténtalo de nuevo. Si vuelve a pasar, vuelve a tu clase y empieza desde ahí.",
+      "backToClass": "Volver a la clase"
+    },
     "nav": {
       "home": "Inicio",
       "library": "Biblioteca",
@@ -21522,7 +21502,6 @@ const es = {
     "setup": {
       "title": "Nueva clase",
       "subtitle": "Tres elecciones rápidas. Puedes cambiarlas después.",
-      "stepsLabel": "Progreso de la creación de la clase",
       "step1": "Datos de la clase",
       "step2": "Compartir el código",
       "nameLabel": "Nombre de la clase",
@@ -21580,7 +21559,7 @@ const es = {
       "packLabel": "Palabras para tu primera partida",
       "packWords": "{count} palabras",
       "packRecommended": "Te lo recomendamos",
-      "startLive": "Empezar partida en vivo",
+      "startLive": "Empezar en vivo",
       "createOnly": "Solo crear la clase"
     },
     "host": {
@@ -21711,7 +21690,6 @@ const es = {
   // @eduPolish:start
   "eduPolish": {
     "seatCapReached": "{name} está mirando: la clase está llena ({cap} jugadores)",
-    "csvDropHint": "Suelta aquí un archivo CSV o haz clic para buscarlo"
   }
   // @eduPolish:end
 };

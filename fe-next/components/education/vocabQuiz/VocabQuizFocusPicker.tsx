@@ -124,7 +124,7 @@ export function VocabQuizFocusPicker({
             aria-checked={focus === 'any'}
             disabled={anyCount === 0}
             onClick={() => onFocusChange('any')}
-            className={chipClass(focus === 'any', anyCount > 0)}
+            className={`${chipClass(focus === 'any', anyCount > 0)} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}
           >
             <span className="flex min-w-0 items-center gap-2 break-words font-neo-display text-sm font-bold">
               <Shuffle className="size-4 shrink-0 text-neo-cream/70" aria-hidden />
@@ -147,7 +147,7 @@ export function VocabQuizFocusPicker({
                 aria-checked={focus === key}
                 disabled={!enabled}
                 onClick={() => onFocusChange(key)}
-                className={chipClass(focus === key, enabled)}
+                className={`${chipClass(focus === key, enabled)} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}
               >
                 <span className="flex min-w-0 items-center gap-2 break-words font-neo-display text-sm font-bold">
                   <Icon className="size-4 shrink-0 text-neo-cream/70" aria-hidden />

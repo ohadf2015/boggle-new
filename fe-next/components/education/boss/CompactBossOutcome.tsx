@@ -91,7 +91,7 @@ export function CompactBossOutcome({ view, name, left, hitters, reduce, classNam
           <ol className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-0.5 @5xl/results:flex-nowrap">
             {hitters.map((h, i) => (
               <li key={h.username} data-testid="boss-top-hitter" data-username={h.username} className="flex min-w-0 items-center gap-1.5">
-                <span className="grid size-5 shrink-0 place-items-center rounded-full border-2 border-neo-cream/60 font-neo-display text-[11px] font-black @[96rem]/results:size-6 @[96rem]/results:text-sm">
+                <span className="grid size-5 shrink-0 place-items-center rounded-full border-2 border-neo-cream/60 font-neo-display text-xs font-black @[96rem]/results:size-6 @[96rem]/results:text-sm">
                   {i + 1}
                 </span>
                 <span dir="auto" className="min-w-0 font-neo-display text-sm font-black @[96rem]/results:text-lg">

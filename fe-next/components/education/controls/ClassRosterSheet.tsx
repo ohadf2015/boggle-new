@@ -124,7 +124,7 @@ export function ClassRosterSheet({ rows, statusOf, onRemove, t }: ClassRosterShe
                     <button
                       type="button"
                       onClick={() => setArmed(null)}
-                      className="min-h-[56px] rounded-neo border-3 border-neo-black bg-neo-white px-3 font-neo-display text-sm lg:text-lg xl:text-xl tv:text-2xl font-black uppercase text-neo-black shadow-hard"
+                      className="min-h-[56px] rounded-neo border-3 border-neo-black bg-neo-white px-3 font-neo-display text-sm lg:text-lg xl:text-xl tv:text-2xl font-black uppercase text-neo-black shadow-hard focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
                     >
                       {t('education.liveControls.removeCancel')}
                     </button>
@@ -132,7 +132,7 @@ export function ClassRosterSheet({ rows, statusOf, onRemove, t }: ClassRosterShe
                       type="button"
                       data-testid={`teacher-remove-confirm-${row.username}`}
                       onClick={() => confirm(row.username)}
-                      className="min-h-[56px] rounded-neo border-3 border-neo-black bg-neo-red px-3 font-neo-display text-sm lg:text-lg xl:text-xl tv:text-2xl font-black uppercase text-neo-white shadow-hard animate-pulse"
+                      className="min-h-[56px] rounded-neo border-3 border-neo-black bg-neo-red px-3 font-neo-display text-sm lg:text-lg xl:text-xl tv:text-2xl font-black uppercase text-neo-white shadow-hard animate-pulse focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
                     >
                       {t('education.liveControls.removeConfirm', { name: row.username })}
                     </button>
@@ -144,7 +144,7 @@ export function ClassRosterSheet({ rows, statusOf, onRemove, t }: ClassRosterShe
                     onClick={() => (status === 'removing' ? undefined : arm(row.username))}
                     disabled={status === 'removing'}
                     aria-label={t('education.liveControls.removeAria', { name: row.username })}
-                    className={cn(
+                    className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
                       'inline-flex min-h-[56px] items-center gap-2 rounded-neo border-3 border-neo-black px-3 tv:px-5',
                       'font-neo-display text-sm lg:text-lg xl:text-xl tv:text-2xl font-black uppercase shadow-hard',
                       status === 'failed' ? 'bg-neo-red text-neo-white' : 'bg-neo-cream text-neo-black',

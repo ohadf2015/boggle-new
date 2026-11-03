@@ -19,6 +19,7 @@ const reports = vi.hoisted(() => ({ reportProOfferImpression: vi.fn(), reportPro
 vi.mock('@/lib/education/reportProCtaClick', () => reports);
 
 import { ClassReportButton } from '../ClassReportButton';
+import { classReportTeaserCopy } from '@/lib/education/pro/classReportTeaserCopy';
 
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -29,36 +30,35 @@ describe('ClassReportButton (round results, free teacher)', () => {
     reports.reportProOfferClick.mockClear();
   });
 
-  it.each([
-    ['en', "See this class's report"],
-    ['he', 'לדוח של הכיתה הזו'],
-    ['es', 'Ver el informe de esta clase'],
-    ['sv', 'Se klassens rapport'],
-    ['ja', 'このクラスのレポートを見る'],
-    ['ru', 'Отчёт по этому классу'],
-  ])('shows the button in %s', (language, label) => {
-    render(<ClassReportButton language={language} underHalf={2} bars={[10, 40]} />);
-    expect(screen.getByTestId('class-report-button')).toHaveTextContent(label);
+  it.each(['en', 'he', 'es', 'sv', 'ja', 'ru'])('shows the labelled Pro preview heading in %s without a tap', (language) => {
+    render(<ClassReportButton language={language} underHalf={2} bars={[10, 40]} proLabel="Pro" />);
+    expect(screen.getByTestId('class-report-teaser')).toHaveTextContent(classReportTeaserCopy(language).title);
   });
 
-  it('a tap is recorded as edu_pro_offer_clicked from class_report_button and opens the teaser', () => {
-    render(<ClassReportButton language="en" underHalf={2} bars={[10, 40, 90]} />);
-    expect(reports.reportProOfferImpression).toHaveBeenCalledWith(
-      expect.objectContaining({ placement: 'class_report_button', format: 'report_button', stage: 'rendered' }),
-      { userId: 'teacher-1' },
-    );
-    expect(screen.queryByTestId('class-report-teaser')).toBeNull();
-    fireEvent.click(screen.getByTestId('class-report-button'));
-    expect(reports.reportProOfferClick).toHaveBeenCalledWith({ placement: 'class_report_button', locale: 'en', cta: 'teacher_pro_trial', offer: 'trial', format: 'report_button' });
+  it('the preview is open from the start, wears the crown Pro pill, never blurs, never names, and records its impression', () => {
+    render(<ClassReportButton language="en" underHalf={2} bars={[10, 40, 90]} proLabel="Pro" />);
     const teaser = screen.getByTestId('class-report-teaser');
+    expect(screen.queryByTestId('class-report-button')).toBeNull();
+    expect(teaser.querySelector('[data-testid="pro-pill"]')).toHaveTextContent('Pro');
+    expect(teaser.innerHTML).not.toMatch(/blur-/);
     expect(teaser).toHaveTextContent('2 students found under half the words this round');
     expect(teaser).not.toHaveTextContent(/Noa|Ido/);
-    expect(reports.reportProOfferImpression).toHaveBeenCalledWith(expect.objectContaining({ format: 'report_teaser', stage: 'rendered' }), { userId: 'teacher-1' });
+    expect(reports.reportProOfferImpression).toHaveBeenCalledWith(
+      expect.objectContaining({ placement: 'class_report_button', format: 'report_teaser', stage: 'rendered' }),
+      { userId: 'teacher-1' },
+    );
+  });
+
+  it('the upgrade link opens in a new tab so the live room stays up, and is 44px tall', () => {
+    render(<ClassReportButton language="en" underHalf={0} bars={[]} proLabel="Pro" />);
+    const cta = screen.getByTestId('class-report-teaser-cta');
+    expect(cta).toHaveAttribute('target', '_blank');
+    expect(cta.className).toMatch(/min-h-11/);
+    expect(cta.className).toMatch(/focus-visible:ring/);
   });
 
   it('never trialed: the 14-day trial, straight into /teacher/upgrade', () => {
     render(<ClassReportButton language="en" underHalf={0} bars={[]} />);
-    fireEvent.click(screen.getByTestId('class-report-button'));
     const cta = screen.getByTestId('class-report-teaser-cta');
     expect(cta).toHaveTextContent('Start your 14-day Teacher Pro trial');
     expect(cta).toHaveAttribute('href', '/en/teacher/upgrade?source=class_report_button');
@@ -70,7 +70,6 @@ describe('ClassReportButton (round results, free teacher)', () => {
   it('inside the free access trial: keep Teacher Pro after the free trial, no new trial', () => {
     pro.accessTrialExpires = new Date(Date.now() + 5 * DAY).toISOString();
     render(<ClassReportButton language="en" underHalf={1} bars={[20]} />);
-    fireEvent.click(screen.getByTestId('class-report-button'));
     const teaser = screen.getByTestId('class-report-teaser');
     expect(teaser).toHaveAttribute('data-offer', 'keep_after_trial');
     expect(teaser).toHaveTextContent(/Keep Teacher Pro after your free trial/i);
@@ -78,12 +77,13 @@ describe('ClassReportButton (round results, free teacher)', () => {
     // The access trial opens the report right now, so the teaser links to it instead of calling it locked.
     expect(teaser).toHaveTextContent('Your class report is open during your free trial');
     expect(screen.getByTestId('class-report-teaser-open')).toHaveAttribute('href', '/en/teacher/reports');
+    // One action per Pro slot: while the report is open, no second upgrade link competes with it.
+    expect(screen.queryByTestId('class-report-teaser-cta')).toBeNull();
   });
 
   it('access trial ended: straight $9/mo, no trial wording', () => {
     pro.accessTrialEnded = true;
     render(<ClassReportButton language="en" underHalf={1} bars={[20]} />);
-    fireEvent.click(screen.getByTestId('class-report-button'));
     const teaser = screen.getByTestId('class-report-teaser');
     expect(teaser).toHaveAttribute('data-offer', 'paid');
     expect(screen.getByTestId('class-report-teaser-cta')).toHaveTextContent('Continue with Teacher Pro');
@@ -95,7 +95,6 @@ describe('ClassReportButton (round results, free teacher)', () => {
   it('Hebrew teaser is RTL and keeps the single-trial ask', () => {
     pro.accessTrialEnded = true;
     const { container } = render(<ClassReportButton language="he" underHalf={3} bars={[20]} />);
-    fireEvent.click(screen.getByTestId('class-report-button'));
     expect(container.firstElementChild).toHaveAttribute('dir', 'rtl');
     expect(screen.getByTestId('class-report-teaser-cta')).toHaveTextContent('להמשיך עם פרו למורים');
   });
@@ -103,11 +102,11 @@ describe('ClassReportButton (round results, free teacher)', () => {
   it('hidden for Pro teachers and while the entitlement loads', () => {
     pro.hasPro = true;
     const { rerender } = render(<ClassReportButton language="en" underHalf={1} bars={[]} />);
-    expect(screen.queryByTestId('class-report-button')).toBeNull();
+    expect(screen.queryByTestId('class-report-teaser')).toBeNull();
     pro.hasPro = false;
     pro.loading = true;
     rerender(<ClassReportButton language="en" underHalf={1} bars={[]} />);
-    expect(screen.queryByTestId('class-report-button')).toBeNull();
+    expect(screen.queryByTestId('class-report-teaser')).toBeNull();
     expect(reports.reportProOfferImpression).not.toHaveBeenCalled();
   });
 });

@@ -3,7 +3,7 @@
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { GraduationCap, BookOpen, Copy, Check, LayoutGrid, Search, Zap, RotateCw, Grid3x3, UserPlus, X, Clock, Building2, Grid2x2, Brain } from 'lucide-react';
-import { QRCodeCanvas } from 'qrcode.react';
+import { QRCodeSVG } from 'qrcode.react';
 import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -300,7 +300,7 @@ export function ClassroomModeBanner({
                 <button
                   type="button"
                   onClick={handleCopy}
-                  className={cn(
+                  className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
                     'p-3 rounded-neo border-neo border-neo-black bg-neo-cream text-neo-black',
                     'shadow-hard hover:shadow-hard-lg transition',
                     copied && 'bg-neo-lime'
@@ -317,7 +317,7 @@ export function ClassroomModeBanner({
                     {t('education.classroomGame.scanToJoin')}
                   </p>
                   <div className="p-2 bg-neo-cream rounded-neo border-neo border-neo-black shadow-hard-sm">
-                    <QRCodeCanvas value={joinUrl} size={150} bgColor="#ffffff" fgColor="#000000" level="M" />
+                    <QRCodeSVG value={joinUrl} size={150} bgColor="rgb(var(--neo-white))" fgColor="rgb(var(--neo-black))" level="M" />
                   </div>
                   {/* A QR alone strands every student who cannot scan it — no phone,
                       a Chromebook, or just too far from the projector. They need an
@@ -443,7 +443,7 @@ function SummaryTile({
 }) {
   return (
     <div data-testid={testId} className="p-3 rounded-neo border border-neo-cream/40 bg-neo-navy-light/80">
-      <div className="flex items-center gap-1.5 text-neo-white text-[10px] uppercase tracking-wide mb-1">
+      <div className="flex items-center gap-1.5 text-neo-white text-xs uppercase tracking-wide mb-1">
         {icon}
         <span>{label}</span>
       </div>

@@ -17,7 +17,7 @@ const OPTION_SURFACES = [
   'components/education/boss/ClassroomBossPicker.tsx',
 ];
 
-const PRO_BADGE_MARKER = 'text-[0.65rem]';
+const PRO_BADGE_TESTID = /data-testid="[\w-]*pro-badge"/;
 
 describe('Game options modal: calm controls', () => {
   it.each(OPTION_SURFACES)('%s has no colored fills, accent text or shouting labels', (rel) => {
@@ -28,7 +28,11 @@ describe('Game options modal: calm controls', () => {
   });
 
   it.each(OPTION_SURFACES)('%s uses yellow only on the small PRO badge', (rel) => {
-    const lines = read(rel).split('\n').filter((l) => /bg-neo-yellow|text-neo-yellow/.test(l));
-    for (const line of lines) expect(line).toContain(PRO_BADGE_MARKER);
+    const lines = read(rel).split('\n');
+    lines.forEach((line, i) => {
+      if (!/bg-neo-yellow|text-neo-yellow/.test(line)) return;
+      expect(line).toMatch(/\btext-xs\b/);
+      expect(lines.slice(Math.max(0, i - 2), i + 1).join('\n')).toMatch(PRO_BADGE_TESTID);
+    });
   });
 });

@@ -97,7 +97,7 @@ export function AsyncDuelTurnCard({
           {isLive && (
             <span
               data-testid="duel-turn-live-badge"
-              className="mb-1 inline-flex items-center gap-1 rounded-neo border-[2px] border-neo-black bg-neo-orange px-2 py-0.5 font-neo-body text-[10px] font-black uppercase tracking-widest text-neo-black"
+              className="mb-1 inline-flex items-center gap-1 rounded-neo border-[2px] border-neo-black bg-neo-orange px-2 py-0.5 font-neo-body text-xs font-black uppercase tracking-widest text-neo-black"
             >
               <Zap className="h-3 w-3" aria-hidden="true" />
               {t('education.duels.turnLiveBadge')}
@@ -125,7 +125,7 @@ export function AsyncDuelTurnCard({
               <Target className="h-4 w-4" aria-hidden="true" />
               {opponentScore}
             </span>
-            <span className="font-neo-body text-[9px] font-black uppercase tracking-widest text-neo-black/70">
+            <span className="font-neo-body text-xs font-black uppercase tracking-widest text-neo-black/70">
               {t('education.duels.turnToBeat')}
             </span>
           </div>
@@ -144,7 +144,7 @@ export function AsyncDuelTurnCard({
           type="button"
           data-testid="duel-turn-play"
           onClick={() => onAccept(duelId)}
-          className="inline-flex flex-1 items-center justify-center gap-2 rounded-neo border-[2px] border-neo-black bg-neo-lime px-4 py-2.5 font-neo-display text-sm font-black uppercase italic tracking-tight text-neo-black shadow-hard transition duration-100 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed"
+          className="inline-flex flex-1 items-center justify-center gap-2 rounded-neo border-[2px] border-neo-black bg-neo-lime px-4 py-2.5 font-neo-display text-sm font-black uppercase italic tracking-tight text-neo-black shadow-hard transition duration-100 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
         >
           <Swords className="h-4 w-4" aria-hidden="true" />
           {isLive
@@ -157,7 +157,7 @@ export function AsyncDuelTurnCard({
           type="button"
           data-testid="duel-turn-decline"
           onClick={() => onDecline(duelId)}
-          className="rounded-neo border-[3px] border-neo-cream bg-neo-navy px-3 py-2.5 font-neo-body text-sm font-black text-neo-cream shadow-hard-sm transition duration-100 hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed"
+          className="rounded-neo border-[3px] border-neo-cream bg-neo-navy px-3 py-2.5 font-neo-body text-sm font-black text-neo-cream shadow-hard-sm transition duration-100 hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
         >
           {t('education.duels.turnDecline')}
         </button>

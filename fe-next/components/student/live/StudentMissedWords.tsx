@@ -45,7 +45,7 @@ export function StudentMissedWords({ words, language, t, onPractice, className }
             type="button"
             onPointerDown={(e) => e.stopPropagation()}
             onClick={onPractice}
-            className="inline-flex shrink-0 items-center gap-1 rounded-full border-2 border-neo-black bg-neo-cyan px-2.5 py-1 font-neo-display text-xs font-black uppercase text-neo-black shadow-hard-sm active:translate-y-0.5 active:shadow-none"
+            className="inline-flex shrink-0 items-center gap-1 rounded-full border-2 border-neo-black bg-neo-cyan px-2.5 py-1 font-neo-display text-xs font-black uppercase text-neo-black shadow-hard-sm active:translate-y-0.5 active:shadow-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           >
             <BookOpenCheck aria-hidden="true" className="size-3.5" />
             {t('eduStudent.results.practiceThese')}
@@ -63,7 +63,7 @@ export function StudentMissedWords({ words, language, t, onPractice, className }
                 setSpeaking(word);
                 void speakWord(word, language).finally(() => setSpeaking((w) => (w === word ? null : w)));
               }}
-              className={cn(
+              className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
                 'inline-flex items-center gap-1.5 rounded-neo border-2 border-neo-black bg-neo-cream px-2.5 py-1 font-neo-display text-base font-black text-neo-black shadow-hard-sm transition-transform active:scale-95 active:shadow-none',
                 speaking === word && 'bg-neo-yellow motion-safe:animate-pulse'
               )}

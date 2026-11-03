@@ -55,6 +55,6 @@ describe('<DailyChest>', () => {
     const list = await screen.findByRole('list', { name: 'academy.student.chestTitle' });
     const card = list.querySelector('li');
     expect(card?.textContent).toContain('economy.chest.chip.xp');
-    expect(card?.className).toContain('shadow-[4px_4px_0_0_#000]');
+    expect(card?.className).toContain('shadow-[4px_4px_0_0_rgb(var(--neo-black))]');
   });
 });

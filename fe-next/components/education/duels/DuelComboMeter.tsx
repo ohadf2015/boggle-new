@@ -74,7 +74,7 @@ export function DuelComboMeter({ streak, bonus, className }: DuelComboMeterProps
           </span>
           <span
             className={cn(
-              'truncate font-neo-body text-[10px] font-black uppercase tracking-widest',
+              'truncate font-neo-body text-xs font-black uppercase tracking-widest',
               isHot ? 'text-neo-white' : 'text-neo-cream/80'
             )}
           >
@@ -83,7 +83,7 @@ export function DuelComboMeter({ streak, bonus, className }: DuelComboMeterProps
         </div>
 
         {/* Meter track */}
-        <div className="mt-1 h-2 w-full overflow-hidden rounded-full border-2 border-neo-cream/40 bg-neo-black/60">
+        <div aria-hidden="true" className="mt-1 h-2 w-full overflow-hidden rounded-full border-2 border-neo-cream/40 bg-neo-black/60">
           <m.div
             data-testid="duel-combo-fill"
             className={cn('h-full', tier.fillClass)}

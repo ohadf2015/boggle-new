@@ -36,8 +36,8 @@ export function StudentNextActions({ onPlayAgain, onPractice, t }: StudentNextAc
           type="button"
           data-testid="play-again-button"
           data-results-primary=""
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ y: 8 }}
+          animate={{ y: 0 }}
           transition={{ delay: 0.2 }}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
@@ -48,7 +48,8 @@ export function StudentNextActions({ onPlayAgain, onPractice, t }: StudentNextAc
           className={cn(
             'w-full flex items-center justify-center gap-2 px-4 py-3.5 font-neo-display font-bold',
             'bg-neo-lime text-neo-black border-[3px] border-neo-black rounded-neo',
-            'shadow-hard hover:shadow-hard-lg transition hover:-translate-y-0.5'
+            'min-h-11 shadow-hard hover:shadow-hard-lg transition hover:-translate-y-0.5',
+            'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
           )}
         >
           <RotateCcw className="w-5 h-5 shrink-0" aria-hidden />
@@ -91,8 +92,8 @@ export function StudentNextActions({ onPlayAgain, onPractice, t }: StudentNextAc
         <m.button
           type="button"
           data-testid="practice-missed-button"
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ y: 8 }}
+          animate={{ y: 0 }}
           transition={{ delay: 0.4 }}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
@@ -104,7 +105,8 @@ export function StudentNextActions({ onPlayAgain, onPractice, t }: StudentNextAc
             'w-full flex items-center justify-center gap-2 px-4 py-3 font-bold',
             'bg-neo-cyan/20 text-neo-cyan border-[2px] border-neo-cyan rounded-neo',
             'shadow-hard hover:shadow-hard-lg transition',
-            'hover:bg-neo-cyan/30'
+            'min-h-11 hover:bg-neo-cyan/30',
+            'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
           )}
         >
           <BookOpen className="w-5 h-5 shrink-0" aria-hidden />

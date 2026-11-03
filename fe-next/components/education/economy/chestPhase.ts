@@ -1,4 +1,5 @@
 import { CHEST_ODDS, type ChestRarity } from '@/shared/constants/classroomEconomy';
+import { NEO_HEX } from './neoHex';
 
 export type ChestPhase = 'sealed' | 'shaking' | 'bursting' | 'revealed';
 
@@ -25,7 +26,7 @@ export function chestSrcForPhase(phase: ChestPhase, rarity: ChestRarity): string
 export function rarityTone(rarity: ChestRarity): { glow: string; text: string; ring: string } {
   if (rarity === 'epic') return { glow: 'bg-neo-pink/60', text: 'text-neo-pink', ring: 'border-neo-pink' };
   if (rarity === 'rare') return { glow: 'bg-neo-cyan/50', text: 'text-neo-cyan', ring: 'border-neo-cyan' };
-  return { glow: 'bg-white/25', text: 'text-white', ring: 'border-white' };
+  return { glow: 'bg-neo-white/25', text: 'text-neo-white', ring: 'border-neo-white' };
 }
 
 /** Tap anywhere on the chest screen: a sealed chest starts opening, a moving one skips to the reveal. */
@@ -34,9 +35,9 @@ export function tapChestPhase(phase: ChestPhase, reducedMotion: boolean): ChestP
 }
 
 const RAYS: Record<ChestRarity, { rays: number; hex: string; strength: number }> = {
-  common: { rays: 8, hex: '#ffe135', strength: 0.45 },
-  rare: { rays: 12, hex: '#38e1ff', strength: 0.65 },
-  epic: { rays: 16, hex: '#ff5fa2', strength: 0.8 },
+  common: { rays: 8, hex: NEO_HEX.yellow, strength: 0.45 },
+  rare: { rays: 12, hex: NEO_HEX.cyan, strength: 0.65 },
+  epic: { rays: 16, hex: NEO_HEX.pink, strength: 0.8 },
 };
 
 export function chestRays(rarity: ChestRarity) {

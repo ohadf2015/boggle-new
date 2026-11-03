@@ -102,7 +102,7 @@ export default async function WordListsHubPage({ params }: PageProps) {
                 key={h.lang}
                 className="flex flex-col rounded-neo border-4 border-neo-cream/40 bg-neo-navy-light p-5 shadow-hard-lg"
               >
-                <Link href={`/${pickLocale(h.locales, locale)}${langHubPath(h.lang)}`} className="group">
+                <Link href={`/${pickLocale(h.locales, locale)}${langHubPath(h.lang)}`} className="group focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan">
                   <span
                     className={`inline-block rounded-neo border-3 border-neo-black ${accent.fill} px-3 py-1 font-neo-display text-2xl font-black text-neo-navy shadow-hard group-hover:-translate-y-0.5`}
                   >
@@ -130,7 +130,7 @@ export default async function WordListsHubPage({ params }: PageProps) {
                     <Link
                       key={pill.key}
                       href={pill.href}
-                      className="inline-flex min-h-[40px] items-center rounded-md border-2 border-neo-black bg-neo-white px-3 text-sm font-black text-neo-navy shadow-hard-sm hover:-translate-y-0.5"
+                      className="inline-flex min-h-11 items-center rounded-md border-2 border-neo-black bg-neo-white px-3 text-sm font-black text-neo-navy shadow-hard-sm hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
                     >
                       {gradeLabel(locale, pill.grade)}
                     </Link>

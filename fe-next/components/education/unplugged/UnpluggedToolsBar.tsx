@@ -44,7 +44,7 @@ export function UnpluggedToolsBar({
         data-testid="print-missed-words-practice-sheet"
         onClick={onPrintSheet}
         aria-label={printSheetLabel}
-        className={cn(TOOL, 'bg-neo-cream text-neo-black')}
+        className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black', TOOL, 'bg-neo-cream text-neo-black')}
       >
         <Printer className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" aria-hidden />
         <span className="truncate hidden sm:inline">{printSheetLabel}</span>
@@ -54,7 +54,7 @@ export function UnpluggedToolsBar({
         data-testid="print-unplugged-reteach-pack"
         onClick={onPrintPack}
         aria-label={printPackLabel}
-        className={cn(TOOL, 'bg-neo-cyan text-neo-black')}
+        className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black', TOOL, 'bg-neo-cyan text-neo-black')}
       >
         <QrCode className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" aria-hidden />
         <span className="truncate hidden sm:inline">{printPackLabel}</span>
@@ -64,7 +64,7 @@ export function UnpluggedToolsBar({
         data-testid="share-miss-gap-practice"
         onClick={onShare}
         aria-label={shared ? shareCopiedLabel : shareLabel}
-        className={cn(TOOL, 'bg-neo-white text-neo-black')}
+        className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black', TOOL, 'bg-neo-white text-neo-black')}
       >
         {shared ? (
           <Check className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" aria-hidden />

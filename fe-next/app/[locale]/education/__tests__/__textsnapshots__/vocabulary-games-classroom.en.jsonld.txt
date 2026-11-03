@@ -85,7 +85,7 @@
       "name": "Do students need to sign up?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes, but it's free and takes 30 seconds. One email or Google account, that's it. No credit card, no upsell."
+        "text": "No. Students join with a 6-character code and play in any browser: no sign-up, no email. Only the teacher has an account."
       }
     },
     {

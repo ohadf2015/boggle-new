@@ -41,8 +41,8 @@ export const jaA: HelpLocaleContent = {
   },
   'start-a-live-game': {
     title: 'ワンタップでライブゲームを始める',
-    summary: 'ゲームを選び、単語を選び、「スタート」を押すだけ。生徒が席に着く前に、参加コードが黒板に映ります。',
-    keywords: 'スタート, ライブ, ゲーム開始, プロジェクター, 授業でゲーム, クラスゲーム, 今すぐプレイ',
+    summary: 'ゲームを選び、単語を選び、「ライブ開始」を押すだけ。生徒が席に着く前に、参加コードが黒板に映ります。',
+    keywords: 'ライブ開始, スタート, ライブ, ゲーム開始, プロジェクター, 授業でゲーム, クラスゲーム, 今すぐプレイ',
     blocks: [
       { t: 'p', text: 'ライブゲームでは、クラス全員がそれぞれの端末から同時にプレイし、黒板にはコード・タイマー・ランキングが映ります。すべて先生HQの[[teacher.nav.play]]から始まります。' },
       {
@@ -50,7 +50,7 @@ export const jaA: HelpLocaleContent = {
         items: [
           { title: 'ゲームを選ぶ', body: '[[academy.hq.startTitle]]の下にあるポスターをタップします。迷ったら、[[academy.hq.modes.classic]]はどの単語リストでも遊べます。[[academy.hq.modes.vocabQuiz]]には意味つきの単語が必要です。', shot: 'hq-start-game' },
           { title: '単語を選ぶ', body: 'ポスターの下にあるリストをタップするか、[[teacher.playNow.changeWords]]を押して[[teacher.playNow.sourcePacks]]や[[teacher.playNow.sourcePaste]]を選びます。' },
-          { title: '「スタート」を押す', body: '[[teacher.playNow.goLive]]を押すと、LexiClashがクラスを準備し、単語を読み込み、ルームを開きます。ロビーにはコード、参加リンク、QRコードが大きく表示されます。', shot: 'lobby' },
+          { title: '「ライブ開始」を押す', body: '[[teacher.playNow.goLive]]を押すと、LexiClashがクラスを準備し、単語を読み込み、ルームを開きます。ロビーにはコード、参加リンク、QRコードが大きく表示されます。', shot: 'lobby' },
           { title: 'そろったら開始', body: '生徒が参加すると、ロビーに名前が次々と表示されます。生徒が1人以上入ると[[hostView.startClassGame]]が押せるようになります。押すと、全員の端末で同時にラウンドが始まります。' },
         ],
       },

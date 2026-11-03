@@ -21,7 +21,7 @@ export default function ShopGoalLine({ cash }: { cash: number }) {
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={pct}
-        className="h-3 w-full overflow-hidden rounded-full border-2 border-neo-cream/40 bg-white/10"
+        className="h-3 w-full overflow-hidden rounded-full border-2 border-neo-cream/40 bg-neo-white/10"
       >
         <div className="h-full bg-neo-lime transition-[width] duration-500" style={{ width: `${pct}%` }} />
       </div>

@@ -37,7 +37,7 @@ import { ReteachStatusNote } from '@/components/education/live/ReteachStatusNote
 const ACTION =
   'flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm text-center ' +
   'text-neo-black border-[3px] border-neo-black rounded-neo shadow-hard-sm ' +
-  'hover:shadow-hard hover:-translate-y-0.5 transition';
+  'min-h-11 hover:shadow-hard hover:-translate-y-0.5 transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan';
 
 export interface ReteachActionsProps {
   links: ReteachLinks;
@@ -79,7 +79,7 @@ export function ReteachActions({ links, onReteach, reteachStatus = 'idle', onRes
             'flex cursor-pointer list-none items-center gap-2 rounded-neo px-4 py-2 [&::-webkit-details-marker]:hidden',
             'border-[3px] border-neo-cream bg-neo-navy-elevated text-neo-cream shadow-hard-sm',
             'font-neo-display text-base font-black uppercase tracking-wide lg:text-xl min-[2200px]:px-6 min-[2200px]:py-3 min-[2200px]:text-3xl',
-            'hover:bg-neo-purple/30 transition-colors'
+            'min-h-11 hover:bg-neo-purple/30 transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan'
           )}
         >
           <MoreHorizontal className="size-5 shrink-0 lg:size-6 min-[2200px]:size-9" aria-hidden />
@@ -109,7 +109,7 @@ export function ReteachActions({ links, onReteach, reteachStatus = 'idle', onRes
                     className={cn(
                       'w-full flex items-center justify-center gap-2 px-4 py-3 font-neo-display font-bold text-base',
                       'bg-neo-pink text-neo-black border-[3px] border-neo-black rounded-neo',
-                      'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition'
+                      'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan'
                     )}
                   >
                     <Play className="w-5 h-5" aria-hidden />
@@ -137,7 +137,7 @@ export function ReteachActions({ links, onReteach, reteachStatus = 'idle', onRes
           className={cn(
             'w-full flex items-center justify-center gap-2 px-4 py-3.5 font-neo-display font-bold text-base',
             'bg-neo-pink text-neo-black border-[3px] border-neo-black rounded-neo',
-            'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition'
+            'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan'
           )}
         >
           <Play className="w-5 h-5" aria-hidden />
@@ -157,7 +157,7 @@ export function ReteachActions({ links, onReteach, reteachStatus = 'idle', onRes
             // fill OR border must clear 3:1 against what surrounds it).
             'font-neo-display font-bold text-sm text-neo-white bg-neo-navy-elevated',
             'border-2 border-neo-cream',
-            'hover:bg-neo-purple/30 transition-colors'
+            'min-h-11 hover:bg-neo-purple/30 transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan'
           )}
         >
           {t('education.results.moreWaysToReteach')}
@@ -173,7 +173,7 @@ export function ReteachActions({ links, onReteach, reteachStatus = 'idle', onRes
 
 const ROW =
   'flex w-full items-center gap-2.5 rounded-neo border-[2px] border-neo-cream/70 bg-neo-navy-elevated px-3 py-2 ' +
-  'text-start font-neo-body text-sm font-bold text-neo-cream transition-colors hover:border-neo-cream hover:bg-neo-navy-light';
+  'min-h-11 text-start font-neo-body text-sm font-bold text-neo-cream transition-colors hover:border-neo-cream hover:bg-neo-navy-light focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan';
 
 const ICON = 'grid size-7 shrink-0 place-items-center rounded-md border-2 border-neo-black text-neo-black [&>svg]:size-4';
 

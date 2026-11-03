@@ -49,7 +49,7 @@ export function AcademySidePanel({ title, streak, boss, chest }: Props) {
                   <span
                     key={i}
                     className="h-3 w-5 rounded-full border-2 border-neo-black"
-                    style={{ background: i < lit ? 'linear-gradient(180deg,#ffd23a,#ff6b35)' : '#2a2160' }}
+                    style={{ background: i < lit ? 'linear-gradient(180deg,color-mix(in srgb, var(--neo-red) 10%, var(--neo-yellow)),var(--neo-orange))' : 'color-mix(in srgb, var(--neo-purple) 40%, rgb(var(--neo-black)))' }}
                   />
                 ))}
               </div>
@@ -66,7 +66,7 @@ export function AcademySidePanel({ title, streak, boss, chest }: Props) {
                   fill
                   unoptimized
                   sizes="38px"
-                  className={`object-contain drop-shadow-[1px_2px_0_#000] ${boss.state === 'locked' ? 'brightness-75 grayscale-[.6]' : ''}`}
+                  className={`object-contain drop-shadow-[1px_2px_0_rgb(var(--neo-black))] ${boss.state === 'locked' ? 'brightness-75 grayscale-[.6]' : ''}`}
                 />
               </span>
               <div className="min-w-0 flex-1">
@@ -76,12 +76,13 @@ export function AcademySidePanel({ title, streak, boss, chest }: Props) {
                     : t('academy.student.bossReady', 'Unlocked')}
                 </p>
                 <div
+                  aria-hidden="true"
                   className="relative mt-1 h-3 overflow-hidden rounded-full border-2 border-neo-black"
-                  style={{ background: '#120d33', boxShadow: 'inset 0 0 0 1px #f5c542' }}
+                  style={{ background: 'color-mix(in srgb, var(--neo-purple-dark) 25%, rgb(var(--neo-black)))', boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--neo-cozy) 40%, var(--neo-yellow))' }}
                 >
                   <span
                     className="absolute inset-y-0 start-0 rounded-full"
-                    style={{ width: `${pct}%`, backgroundImage: 'linear-gradient(180deg,#fff27a,#f39a1c)' }}
+                    style={{ width: `${pct}%`, backgroundImage: 'linear-gradient(180deg,color-mix(in srgb, var(--neo-yellow) 70%, rgb(var(--neo-white))),color-mix(in srgb, var(--neo-red) 30%, var(--neo-yellow-hover)))' }}
                   />
                 </div>
               </div>

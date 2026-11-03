@@ -52,7 +52,7 @@ export default function PracticePickerTile({ tile, onSelect }: PracticePickerTil
       // Inline, for the same reason as the hero: at `auto` the tile collapses
       // to its name band and the art never shows.
       style={{ minHeight: 128 }}
-      className={cn(
+      className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
         // The ACCENT is the button's own fill, not a child's. A tappable thing
         // has to differ from the surface around it by fill or border; a navy
         // button on a navy grid measures 1.2:1 however loud its contents are.
@@ -114,14 +114,14 @@ export default function PracticePickerTile({ tile, onSelect }: PracticePickerTil
         </span>
         <span
           data-tile-line=""
-          className="mt-0.5 flex flex-wrap items-center gap-1 font-neo-body text-[10px] font-bold leading-none text-neo-cream"
+          className="mt-0.5 flex flex-wrap items-center gap-1 font-neo-body text-xs font-bold leading-none text-neo-cream"
         >
           {tile.ready ? (
             <>
               {xp > 0 && (
                 <span
                   data-testid={`practice-tile-xp-${tile.id}`}
-                  className="inline-flex items-center gap-0.5 rounded-[4px] border-[2px] border-black bg-neo-yellow px-1 py-0.5 tabular-nums text-black"
+                  className="inline-flex items-center gap-0.5 rounded-[4px] border-[2px] border-neo-black bg-neo-yellow px-1 py-0.5 tabular-nums text-neo-black"
                 >
                   <Zap className="h-2.5 w-2.5 fill-black" aria-hidden="true" />
                   {t('student.practiceFun.xpRate', { xp })}

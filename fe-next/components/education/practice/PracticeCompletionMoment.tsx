@@ -151,7 +151,7 @@ export default function PracticeCompletionMoment({
         data-testid="practice-completion-exit"
         onClick={onBack}
         aria-label={t('student.practiceFun.allGames')}
-        className="absolute end-2 top-4 flex h-9 w-9 items-center justify-center rounded-neo border-[2px] border-neo-cream bg-neo-navy text-neo-cream transition-colors hover:bg-neo-navy-light"
+        className="absolute end-2 top-3 flex h-11 w-11 items-center justify-center rounded-neo border-[2px] border-neo-cream bg-neo-navy text-neo-cream transition-colors hover:bg-neo-navy-light focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
       >
         <X className="h-4 w-4" aria-hidden="true" />
       </button>
@@ -175,12 +175,12 @@ export default function PracticeCompletionMoment({
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ delay: 0.12 * slot, type: 'spring', stiffness: 380, damping: 13 }}
                 className={cn(
-                  'flex h-11 w-11 items-center justify-center rounded-neo border-[3px] border-black',
-                  filled ? 'bg-neo-yellow shadow-hard-sm' : 'bg-neo-navy/60 border-black/40'
+                  'flex h-11 w-11 items-center justify-center rounded-neo border-[3px] border-neo-black',
+                  filled ? 'bg-neo-yellow shadow-hard-sm' : 'bg-neo-navy/60 border-neo-black/40'
                 )}
               >
                 <Star
-                  className={cn('h-6 w-6', filled ? 'fill-black text-black' : 'text-neo-white/25')}
+                  className={cn('h-6 w-6', filled ? 'fill-neo-black text-neo-black' : 'text-neo-white/50')}
                   aria-hidden="true"
                 />
               </AdaptiveMotion.div>
@@ -206,10 +206,10 @@ export default function PracticeCompletionMoment({
             initial={{ scale: 0.6 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.42, type: 'spring', stiffness: 420, damping: 14 }}
-            className="inline-flex items-center gap-1.5 rounded-neo border-[3px] border-black bg-neo-yellow px-3 py-1.5 shadow-hard-sm"
+            className="inline-flex items-center gap-1.5 rounded-neo border-[3px] border-neo-black bg-neo-yellow px-3 py-1.5 shadow-hard-sm"
           >
-            <Zap className="h-4 w-4 fill-black text-black" aria-hidden="true" />
-            <span className="font-neo-display text-base font-black tabular-nums text-black">
+            <Zap className="h-4 w-4 fill-neo-black text-neo-black" aria-hidden="true" />
+            <span className="font-neo-display text-base font-black tabular-nums text-neo-black">
               {t('student.practiceFun.xpGain', { xp: xpEarned })}
             </span>
           </AdaptiveMotion.div>
@@ -221,10 +221,10 @@ export default function PracticeCompletionMoment({
             initial={{ scale: 0.7 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.5, type: 'spring', stiffness: 400, damping: 13 }}
-            className="flex w-full items-center justify-center gap-2 rounded-neo border-[3px] border-black bg-neo-yellow px-3 py-2 shadow-hard-sm"
+            className="flex w-full items-center justify-center gap-2 rounded-neo border-[3px] border-neo-black bg-neo-yellow px-3 py-2 shadow-hard-sm"
           >
-            <Star className="h-4 w-4 fill-black text-black" aria-hidden="true" />
-            <span className="font-neo-display text-base font-black uppercase text-black">
+            <Star className="h-4 w-4 fill-neo-black text-neo-black" aria-hidden="true" />
+            <span className="font-neo-display text-base font-black uppercase text-neo-black">
               {t('student.practiceFun.levelUp', { level: claimedLevel })}
             </span>
           </AdaptiveMotion.div>
@@ -236,12 +236,12 @@ export default function PracticeCompletionMoment({
               <div
                 key={stat.key}
                 data-testid={`practice-completion-stat-${stat.key}`}
-                className="rounded-neo border-[2px] border-black/50 bg-black/25 px-2 py-1.5"
+                className="rounded-neo border-[2px] border-neo-cream/40 bg-neo-black/25 px-2 py-1.5"
               >
                 <p className="font-neo-display text-lg font-black tabular-nums leading-none text-neo-cyan">
                   {stat.value}
                 </p>
-                <p className="mt-0.5 font-neo-body text-[11px] font-bold leading-tight text-neo-cream">
+                <p className="mt-0.5 font-neo-body text-xs font-bold leading-tight text-neo-cream">
                   {stat.label}
                 </p>
               </div>
@@ -260,7 +260,7 @@ export default function PracticeCompletionMoment({
             data-primary="true"
             data-testid={onNext ? 'practice-completion-next' : 'practice-completion-again'}
             onClick={onNext ?? onAgain}
-            className="flex min-h-[58px] w-full items-center justify-center gap-2 rounded-neo border-[3px] border-black bg-neo-lime px-4 font-neo-display text-xl font-black uppercase text-black shadow-hard transition hover:shadow-hard-lg active:translate-y-[2px] active:shadow-hard-pressed"
+            className="flex min-h-[58px] w-full items-center justify-center gap-2 rounded-neo border-[3px] border-neo-black bg-neo-lime px-4 font-neo-display text-xl font-black uppercase text-neo-black shadow-hard transition hover:shadow-hard-lg active:translate-y-[2px] active:shadow-hard-pressed focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
           >
             {onNext ? (
               <>
@@ -282,7 +282,7 @@ export default function PracticeCompletionMoment({
               type="button"
               data-testid="practice-completion-again"
               onClick={onAgain}
-              className="flex min-h-[40px] w-3/5 items-center justify-center gap-1.5 rounded-neo border-[2px] border-neo-cream bg-neo-navy px-3 font-neo-body text-xs font-bold uppercase text-neo-cream transition-colors hover:bg-neo-navy-light"
+              className="flex min-h-11 w-3/5 items-center justify-center gap-1.5 rounded-neo border-[2px] border-neo-cream bg-neo-navy px-3 font-neo-body text-sm font-bold uppercase text-neo-cream transition-colors hover:bg-neo-navy-light focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
             >
               <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
               {t('student.practiceFun.again')}

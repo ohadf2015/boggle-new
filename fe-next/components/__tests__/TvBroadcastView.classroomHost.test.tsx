@@ -102,7 +102,8 @@ describe('TvBroadcastView — the classroom host screen', () => {
     gameModeRef.current = 'wordcraft';
     render(<TvBroadcastView {...props()} />);
     expect(screen.getByTestId('tv-wordcraft-broadcast')).toBeInTheDocument();
-    expect(screen.getByTestId('wordcraft-projector')).toBeInTheDocument();
+    expect(screen.getByTestId('projector-wordcraft-stage')).toBeInTheDocument();
+    expect(screen.queryByTestId('wordcraft-projector')).toBeNull();
     expect(screen.queryByTestId('tv-activity-panel')).toBeNull();
     expect(screen.queryByText('common.stop')).toBeNull();
   });

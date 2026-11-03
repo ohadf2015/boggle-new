@@ -34,7 +34,7 @@ export const TimeScopeTabs = memo<TimeScopeTabsProps>(({ timeScope, onScopeChang
           type="button"
           key={tab.key}
           onClick={() => onScopeChange(tab.key)}
-          className={cn(
+          className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
             'px-4 py-2 rounded-neo border-neo font-neo-body font-bold text-sm transition',
             timeScope === tab.key
               ? 'bg-neo-lime text-neo-black border-neo-black shadow-hard-sm'

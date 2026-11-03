@@ -64,15 +64,21 @@ export type Medal = 'gold' | 'silver' | 'bronze';
 
 export const MEDAL: Record<1 | 2 | 3, Medal> = { 1: 'gold', 2: 'silver', 3: 'bronze' };
 
+export const MEDAL_FILL: Record<Medal, string> = {
+  gold: 'bg-neo-yellow',
+  silver: 'bg-[#dfe5ee]',
+  bronze: 'bg-[#e8894b]',
+};
+
 const PLATE: Record<1 | 2 | 3, string> = {
-  1: 'bg-neo-yellow text-neo-black',
-  2: 'bg-[#dfe5ee] text-neo-black',
-  3: 'bg-[#e8894b] text-neo-black',
+  1: `${MEDAL_FILL.gold} text-neo-black`,
+  2: `${MEDAL_FILL.silver} text-neo-black`,
+  3: `${MEDAL_FILL.bronze} text-neo-black`,
 };
 
 const SHEEN: Record<1 | 2 | 3, string> = {
-  1: 'linear-gradient(160deg, #fff6b0 0%, #ffe135 38%, #f2b90c 72%, #c98a00 100%)',
-  2: 'linear-gradient(160deg, #ffffff 0%, #e4e9f0 40%, #b9c2cf 75%, #8e99a8 100%)',
+  1: 'linear-gradient(160deg, #fff6b0 0%, var(--neo-yellow) 38%, #f2b90c 72%, #c98a00 100%)',
+  2: 'linear-gradient(160deg, rgb(var(--neo-white)) 0%, #e4e9f0 40%, #b9c2cf 75%, #8e99a8 100%)',
   3: 'linear-gradient(160deg, #ffd0a3 0%, #e8894b 42%, #b85a24 78%, #8a3d12 100%)',
 };
 
@@ -81,9 +87,9 @@ const MUTED_PLATE = 'bg-neo-navy-light text-neo-cream';
 
 /** The medal disc's face — same metal, deeper, with a darker rim. */
 const DISC: Record<1 | 2 | 3, { face: string; rim: string; ribbon: string }> = {
-  1: { face: 'radial-gradient(circle at 35% 30%, #fffbd1 0%, #ffd400 45%, #d19a00 100%)', rim: '#8a6200', ribbon: '#ff1493' },
-  2: { face: 'radial-gradient(circle at 35% 30%, #ffffff 0%, #cfd6e0 50%, #8b96a6 100%)', rim: '#5b6574', ribbon: '#00b3ff' },
-  3: { face: 'radial-gradient(circle at 35% 30%, #ffe0c2 0%, #d9793c 50%, #8a3d12 100%)', rim: '#5e2708', ribbon: '#8b5cf6' },
+  1: { face: 'radial-gradient(circle at 35% 30%, #fffbd1 0%, #ffd400 45%, #d19a00 100%)', rim: '#8a6200', ribbon: 'var(--neo-pink)' },
+  2: { face: 'radial-gradient(circle at 35% 30%, rgb(var(--neo-white)) 0%, #cfd6e0 50%, #8b96a6 100%)', rim: '#5b6574', ribbon: 'color-mix(in srgb, var(--neo-cyan) 50%, var(--neo-purple))' },
+  3: { face: 'radial-gradient(circle at 35% 30%, #ffe0c2 0%, #d9793c 50%, #8a3d12 100%)', rim: '#5e2708', ribbon: 'var(--neo-purple)' },
 };
 
 export interface PodiumStageProps {
@@ -115,13 +121,13 @@ function MedalDisc({ position, rank }: { position: 1 | 2 | 3; rank: 1 | 2 | 3 })
         <span className="block rotate-12 border-[2px] border-neo-black" style={{ width: '1.3cqw', height: '2cqw', background: disc.ribbon }} />
       </span>
       <span
-        className="grid place-items-center rounded-full font-neo-display font-black leading-none text-neo-black shadow-[0.25cqw_0.25cqw_0_#000]"
+        className="grid place-items-center rounded-full font-neo-display font-black leading-none text-neo-black shadow-[0.25cqw_0.25cqw_0_rgb(var(--neo-black))]"
         style={{
           width: rank === 1 ? '4.4cqw' : '3.6cqw',
           height: rank === 1 ? '4.4cqw' : '3.6cqw',
           background: disc.face,
           border: `0.35cqw solid ${disc.rim}`,
-          outline: '0.18cqw solid #000',
+          outline: '0.18cqw solid rgb(var(--neo-black))',
           fontSize: rank === 1 ? '2.3cqw' : '1.9cqw',
         }}
       >
@@ -167,7 +173,7 @@ function Placing({ entry, place, stage, floor, muted }: { entry: PodiumEntry; pl
       <div
         data-testid={`podium-plate-${rank}`}
         className={cn(
-          'absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-neo border-[3px] border-neo-black px-[1cqw] pt-[1.6cqw] shadow-[0.35cqw_0.35cqw_0_#000]',
+          'absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-neo border-[3px] border-neo-black px-[1cqw] pt-[1.6cqw] shadow-[0.35cqw_0.35cqw_0_rgb(var(--neo-black))]',
           muted ? MUTED_PLATE : PLATE[place]
         )}
         style={{
@@ -178,7 +184,7 @@ function Placing({ entry, place, stage, floor, muted }: { entry: PodiumEntry; pl
           minHeight: `${spot.plinth * 0.6}cqw`,
           backgroundImage: muted ? undefined : SHEEN[place],
           // An inner trim line in the metal's own dark tone: a plate, not a sticker.
-          boxShadow: `inset 0 0 0 0.3cqw rgba(255,255,255,0.55), inset 0 -0.6cqw 0 rgba(0,0,0,0.18), 0.35cqw 0.35cqw 0 #000`,
+          boxShadow: `inset 0 0 0 0.3cqw rgba(255,255,255,0.55), inset 0 -0.6cqw 0 rgba(0,0,0,0.18), 0.35cqw 0.35cqw 0 rgb(var(--neo-black))`,
         }}
       >
         {!muted && <MedalDisc position={rank} rank={place} />}
@@ -212,7 +218,7 @@ function Placing({ entry, place, stage, floor, muted }: { entry: PodiumEntry; pl
         {winner && revealed && !muted && (
           <Crown
             data-testid="podium-crown"
-            className="mb-[-0.6cqw] text-neo-yellow drop-shadow-[0.25cqw_0.25cqw_0_#000] motion-safe:animate-neo-wobble"
+            className="mb-[-0.6cqw] text-neo-yellow drop-shadow-[0.25cqw_0.25cqw_0_rgb(var(--neo-black))] motion-safe:animate-neo-wobble"
             style={{ width: '5cqw', height: '5cqw' }}
             aria-hidden
           />
@@ -221,7 +227,7 @@ function Placing({ entry, place, stage, floor, muted }: { entry: PodiumEntry; pl
           data-testid={revealed ? 'podium-avatar' : undefined}
           aria-hidden="true"
           className={cn(
-            'relative grid place-items-center overflow-hidden rounded-full border-[3px] border-neo-cream bg-neo-navy shadow-[0.4cqw_0.4cqw_0_#000] [&_svg]:h-full [&_svg]:w-full',
+            'relative grid place-items-center overflow-hidden rounded-full border-[3px] border-neo-cream bg-neo-navy shadow-[0.4cqw_0.4cqw_0_rgb(var(--neo-black))] [&_svg]:h-full [&_svg]:w-full',
             winner && !muted ? 'ring-[0.4cqw] ring-neo-yellow' : ''
           )}
           style={{ width: winner ? '10cqw' : '8cqw', height: winner ? '10cqw' : '8cqw' }}
@@ -234,7 +240,7 @@ function Placing({ entry, place, stage, floor, muted }: { entry: PodiumEntry; pl
         </span>
         <p
           dir="auto"
-          className="mt-[0.6cqw] max-w-full truncate rounded-neo border-[2px] border-neo-cream bg-neo-navy px-[1cqw] py-[0.3cqw] text-center font-neo-display font-black leading-tight text-neo-white shadow-[0.3cqw_0.3cqw_0_#000]"
+          className="mt-[0.6cqw] max-w-full truncate rounded-neo border-[2px] border-neo-cream bg-neo-navy px-[1cqw] py-[0.3cqw] text-center font-neo-display font-black leading-tight text-neo-white shadow-[0.3cqw_0.3cqw_0_rgb(var(--neo-black))]"
           style={{ fontSize: winner ? '2.6cqw' : '2.1cqw' }}
         >
           {revealed ? entry.username : '—'}
@@ -293,7 +299,7 @@ export function PodiumStage({ entries, stage = FINAL_STAGE, t, children, classNa
             marginTop: '-45cqw',
             opacity: 0.35,
             background:
-              'conic-gradient(from 0deg, #FFE135 0deg 10deg, transparent 10deg 30deg, #FFE135 30deg 40deg, transparent 40deg 60deg, #FFE135 60deg 70deg, transparent 70deg 90deg, #FFE135 90deg 100deg, transparent 100deg 120deg, #FFE135 120deg 130deg, transparent 130deg 150deg, #FFE135 150deg 160deg, transparent 160deg 180deg, #FFE135 180deg 190deg, transparent 190deg 210deg, #FFE135 210deg 220deg, transparent 220deg 240deg, #FFE135 240deg 250deg, transparent 250deg 270deg, #FFE135 270deg 280deg, transparent 280deg 300deg, #FFE135 300deg 310deg, transparent 310deg 330deg, #FFE135 330deg 340deg, transparent 340deg 360deg)',
+              'conic-gradient(from 0deg, var(--neo-yellow) 0deg 10deg, transparent 10deg 30deg, var(--neo-yellow) 30deg 40deg, transparent 40deg 60deg, var(--neo-yellow) 60deg 70deg, transparent 70deg 90deg, var(--neo-yellow) 90deg 100deg, transparent 100deg 120deg, var(--neo-yellow) 120deg 130deg, transparent 130deg 150deg, var(--neo-yellow) 150deg 160deg, transparent 160deg 180deg, var(--neo-yellow) 180deg 190deg, transparent 190deg 210deg, var(--neo-yellow) 210deg 220deg, transparent 220deg 240deg, var(--neo-yellow) 240deg 250deg, transparent 250deg 270deg, var(--neo-yellow) 270deg 280deg, transparent 280deg 300deg, var(--neo-yellow) 300deg 310deg, transparent 310deg 330deg, var(--neo-yellow) 330deg 340deg, transparent 340deg 360deg)',
             WebkitMaskImage: 'radial-gradient(circle, transparent 4%, black 18%, transparent 60%)',
             maskImage: 'radial-gradient(circle, transparent 4%, black 18%, transparent 60%)',
             willChange: 'transform',

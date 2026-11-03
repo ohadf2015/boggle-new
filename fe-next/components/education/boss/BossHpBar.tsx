@@ -46,7 +46,7 @@ export const BossHpBar = memo(function BossHpBar({ hp, maxHp, phase, size, label
         dir="ltr"
         className={cn(
           'absolute inset-y-0 end-[1%] flex items-center font-neo-display font-black leading-none text-neo-white tabular-nums',
-          stage ? 'text-[2.2cqw] [text-shadow:0.15cqw_0.15cqw_0_#000]' : 'text-[10px] [text-shadow:1px_1px_0_#000]',
+          stage ? 'text-[2.2cqw] [text-shadow:0.15cqw_0.15cqw_0_rgb(var(--neo-black))]' : 'text-xs [text-shadow:1px_1px_0_rgb(var(--neo-black))]',
         )}
       >
         {pct}%

@@ -100,7 +100,7 @@ export function LobbyModeSwitcher({
           // target and 15px body text; `vw` returns only from `md` up, where
           // the wall is the audience again.
           'px-3 py-2 font-neo-body text-[15px] font-bold text-neo-cream',
-          'md:min-h-0 md:px-[1vw] md:py-[0.4vw] md:text-[1vw]',
+          'md:min-h-0 md:px-[1vw] md:py-[0.4vw] md:text-[clamp(0.75rem,1vw,4rem)]',
           'transition-colors hover:bg-neo-navy',
           'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
           'disabled:cursor-wait disabled:opacity-70'
@@ -115,7 +115,7 @@ export function LobbyModeSwitcher({
         {showName && (
           <span
             data-testid="lobby-change-mode-tag"
-            className="rounded-md border-2 border-neo-black bg-neo-lime px-1.5 py-0.5 font-neo-display text-[11px] font-black uppercase leading-none tracking-wide text-neo-black md:px-[0.4vw] md:text-[0.72vw]"
+            className="rounded-md border-2 border-neo-black bg-neo-lime px-1.5 py-0.5 font-neo-display text-xs font-black uppercase leading-none tracking-wide text-neo-black md:px-[0.4vw] md:text-[clamp(0.75rem,0.72vw,4rem)]"
           >
             {t('education.modePicker.change')}
           </span>

@@ -35,7 +35,7 @@ export function TodayCard({ items, warmup }: { items: TodayItem[]; warmup: Stude
               data-testid={`academy-today-${item.id}`}
               data-done={item.done ? 'true' : 'false'}
               className={cn(
-                'flex min-w-0 items-center gap-1 rounded-lg border-2 border-neo-black px-1.5 py-1 font-neo-body text-[11px] font-bold leading-tight',
+                'flex min-w-0 items-center gap-1 rounded-lg border-2 border-neo-black px-1.5 py-1 font-neo-body text-xs font-bold leading-tight',
                 item.done ? 'bg-neo-lime text-neo-black' : 'bg-neo-white/10 text-neo-white'
               )}
             >
@@ -65,13 +65,13 @@ export function WarmupCta({ warmup }: { warmup: StudentWarmup }) {
         </span>
         <span className="flex flex-wrap gap-1 pt-0.5" translate="no">
           {warmup.words.map((word) => (
-            <span key={word} dir="auto" className="rounded-md border border-neo-black/50 bg-neo-cream px-1.5 font-neo-body text-[11px] font-bold">
+            <span key={word} dir="auto" className="rounded-md border border-neo-black/50 bg-neo-cream px-1.5 font-neo-body text-xs font-bold">
               {word}
             </span>
           ))}
         </span>
       </span>
-      <span className="shrink-0 rounded-lg border-2 border-neo-black bg-neo-white px-2 py-1 font-neo-body text-[11px] font-black uppercase">
+      <span className="shrink-0 rounded-lg border-2 border-neo-black bg-neo-white px-2 py-1 font-neo-body text-xs font-black uppercase">
         {t('student.today.play', 'Play')}
       </span>
     </Link>
