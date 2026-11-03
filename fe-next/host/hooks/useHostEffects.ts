@@ -17,6 +17,7 @@ import logger from '@/utils/logger';
 import type { Language, LetterGrid, DifficultyLevel } from '@/types';
 import type { Player } from '@/hooks/useGameState';
 import { useGameMode } from '@/hooks/gameState';
+import { useBossBed } from '@/hooks/useBossBed';
 
 interface UseHostEffectsOptions {
   socket: Socket | null;
@@ -46,7 +47,7 @@ interface UseHostEffectsOptions {
   fadeToTrack: (track: any, fadeOut?: number, fadeIn?: number) => void;
   stopMusic: (fadeOut: number) => void;
   playCountdownBeep: (time: number) => void;
-  TRACKS: { IN_GAME: any; ALMOST_OUT_OF_TIME: any; BOSSA_ARCADE: any; BOSSA: any };
+  TRACKS: { IN_GAME: any; ALMOST_OUT_OF_TIME: any; BOSSA_ARCADE: any; BOSSA: any; RESULTS: any };
 
   // Earthquake state for music transitions
   earthquakeState: 'idle' | 'warning' | 'shaking' | 'fire-round';
@@ -86,6 +87,7 @@ export function useHostEffects(options: UseHostEffectsOptions): void {
     intentionalExitRef,
     initialPlayers,
   } = options;
+  useBossBed(gameStarted);
 
   // Client-side countdown timer
   useEffect(() => {
@@ -154,7 +156,7 @@ export function useHostEffects(options: UseHostEffectsOptions): void {
   useEffect(() => {
     if (waitingForResults) {
       // Transition to bossa for results validation and results page
-      fadeToTrack(TRACKS.BOSSA, 1500, 1500);
+      fadeToTrack(TRACKS.RESULTS, 1500, 1500);
     }
   }, [waitingForResults, fadeToTrack, TRACKS]);
 

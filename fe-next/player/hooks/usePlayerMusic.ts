@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback, type MutableRefObject } from 'react';
 import type { RoundClockStore } from '../roundClock';
 import { useMusic } from '@/contexts/MusicContext';
+import { useBossBed } from '@/hooks/useBossBed';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 
 interface UsePlayerMusicParams {
@@ -25,6 +26,7 @@ export function usePlayerMusic({
 }: UsePlayerMusicParams) {
   const { fadeToTrack, TRACKS } = useMusic();
   const { playCountdownBeep } = useSoundEffects();
+  useBossBed(gameActive);
 
   const hasTriggeredUrgentMusicRef = useRef(false);
   const earthquakeMusicActiveRef = useRef(false);
@@ -76,7 +78,7 @@ export function usePlayerMusic({
   // Results validation music
   useEffect(() => {
     if (waitingForResults) {
-      fadeToTrack(TRACKS.BOSSA, 1500, 1500);
+      fadeToTrack(TRACKS.RESULTS, 1500, 1500);
     }
   }, [waitingForResults, fadeToTrack, TRACKS]);
 

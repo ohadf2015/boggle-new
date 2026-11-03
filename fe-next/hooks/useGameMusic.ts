@@ -24,6 +24,8 @@ interface UseGameMusicOptions {
    * "almost out of time" ramp. Reward-neutral — music doesn't gate word-count.
    */
   suppressUrgentMusic?: boolean;
+  /** Bed for a fire round that is already running on mount; defaults to bossa-arcade. */
+  fireRoundBed?: 'daily';
 }
 
 /**
@@ -47,6 +49,7 @@ export function useGameMusic({
   enabled = true,
   earthquakeState = 'idle',
   suppressUrgentMusic = false,
+  fireRoundBed,
 }: UseGameMusicOptions) {
   const { fadeToTrack, playTrack, TRACKS } = useMusic();
 
@@ -89,7 +92,7 @@ export function useGameMusic({
           } else {
             // Fire-round/earthquake active (e.g., Word Hunt): play bossa-arcade immediately
             // This handles initial mount case where we start directly in fire-round
-            fadeToTrack(TRACKS.BOSSA_ARCADE, 800, 800);
+            fadeToTrack(fireRoundBed === 'daily' ? TRACKS.DAILY : TRACKS.BOSSA_ARCADE, 800, 800);
             hasTriggeredUrgentMusicRef.current = false;
             earthquakeMusicActiveRef.current = true;
           }
@@ -98,7 +101,7 @@ export function useGameMusic({
 
       case 'results':
         // Transition to bossa for results validation and results page
-        fadeToTrack(TRACKS.BOSSA, 1500, 1500);
+        fadeToTrack(TRACKS.RESULTS, 1500, 1500);
         hasTriggeredUrgentMusicRef.current = false;
         earthquakeMusicActiveRef.current = false;
         break;
@@ -107,7 +110,7 @@ export function useGameMusic({
         // No music change for waiting state
         break;
     }
-  }, [phase, enabled, earthquakeState, isPaused, fadeToTrack, playTrack, TRACKS]);
+  }, [phase, enabled, earthquakeState, isPaused, fireRoundBed, fadeToTrack, playTrack, TRACKS]);
 
   // Handle urgent music after 33% of game time has elapsed
   useEffect(() => {

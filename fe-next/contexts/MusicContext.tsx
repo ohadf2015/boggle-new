@@ -15,7 +15,7 @@ import { restartStalledHowl } from '@/lib/audio/howlStall';
 import { usePlayerStyle } from '@/contexts/PlayerStyleContext';
 import { resolveStyleTrack } from '@/lib/playerStyle/styles';
 
-type TrackKey = 'lobby' | 'beforeGame' | 'inGame' | 'almostOutOfTime' | 'bossaArcade' | 'bossa' | 'blast';
+type TrackKey = 'lobby' | 'beforeGame' | 'inGame' | 'almostOutOfTime' | 'bossaArcade' | 'bossa' | 'blast' | 'daily' | 'boss' | 'results';
 
 interface MusicContextType {
   currentTrack: TrackKey | null;
@@ -38,6 +38,9 @@ interface MusicContextType {
     BOSSA_ARCADE: 'bossaArcade';
     BOSSA: 'bossa';
     BLAST: 'blast';
+    DAILY: 'daily';
+    BOSS: 'boss';
+    RESULTS: 'results';
   };
 }
 
@@ -62,6 +65,9 @@ const TRACKS: Record<TrackKey, string> = {
   bossaArcade: '/music/bossa-arcade.mp3',
   bossa: '/music/bossa.mp3',
   blast: '/music/blast_mode.mp3',
+  daily: '/music/daily-bed.mp3',
+  boss: '/music/boss-focus.mp3',
+  results: '/music/results-groove.mp3',
 };
 
 /**
@@ -73,6 +79,7 @@ const TRACKS: Record<TrackKey, string> = {
  */
 const STYLE_SWAPPABLE_TRACKS: ReadonlySet<TrackKey> = new Set<TrackKey>([
   'bossa',
+  'results',
 ]);
 
 export function resolveTrackSrc(key: TrackKey, styleKey: string): string {
@@ -579,6 +586,9 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
     BOSSA_ARCADE: 'bossaArcade' as const,
     BOSSA: 'bossa' as const,
     BLAST: 'blast' as const,
+    DAILY: 'daily' as const,
+    BOSS: 'boss' as const,
+    RESULTS: 'results' as const,
   }), []);
 
   const value = useMemo<MusicContextType>(() => ({
@@ -612,6 +622,9 @@ const STUB_TRACKS = {
   BOSSA_ARCADE: 'bossaArcade' as const,
   BOSSA: 'bossa' as const,
   BLAST: 'blast' as const,
+  DAILY: 'daily' as const,
+  BOSS: 'boss' as const,
+  RESULTS: 'results' as const,
 };
 const stubValue: MusicContextType = {
   currentTrack: null,
