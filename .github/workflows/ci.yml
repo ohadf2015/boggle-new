@@ -49,7 +49,11 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # workflow_dispatch runs the full frontend+backend suite in this one job.
+    # A 30-minute cap cancelled a green run (3848 files, 0 failures, run 41713883182).
+    # Observed rate projects ~45 min; the old 6-shard sum is a ~57 min upper bound.
+    # 90 is a ceiling, not a target. pull_request still runs --changed and finishes fast.
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
         with:
