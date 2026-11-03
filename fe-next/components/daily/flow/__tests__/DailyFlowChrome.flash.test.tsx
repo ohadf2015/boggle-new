@@ -21,6 +21,10 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
+vi.mock('@/hooks/useDailyPlayedStatus', () => ({
+  useDailyPlayedStatus: () => ({ loading: false, today: { wordHunt: false, wordWheel: false, wordTower: false, connections: false } }),
+}));
+
 import { DailyFlowChrome } from '../DailyFlowChrome';
 
 const src = readFileSync(resolve(__dirname, '../DailyFlowChrome.tsx'), 'utf8');

@@ -94,7 +94,12 @@ const PERK_ART: Record<PerkId, ReactNode> = {
 };
 
 const TRAIT_ART: Record<BlockTrait, ReactNode> = {
-  plain: <rect x="5" y="5" width="14" height="14" rx="2" />,
+  plain: (
+    <path
+      fillRule="evenodd"
+      d="M4 21V8l8-5 8 5v13zM8 10h3v3H8zm5 0h3v3h-3zM8 15h3v3H8zm5 0h3v3h-3z"
+    />
+  ),
   gold: (
     <>
       <path d="M12 2 21 12 12 22 3 12z" />
@@ -135,7 +140,7 @@ export function TraitGlyph({
 }
 
 export const TRAIT_FILL: Record<BlockTrait, string> = {
-  plain: "bg-neo-cream text-neo-gray-500",
+  plain: "bg-neo-cream text-neo-navy",
   gold: "bg-neo-yellow text-neo-orange",
   feather: "bg-neo-cyan text-neo-white",
   anvil: "bg-neo-gray-400 text-neo-navy",

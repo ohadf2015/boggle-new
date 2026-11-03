@@ -8,6 +8,13 @@ type T = (key: string, params?: Record<string, string | number>) => string;
 
 export const OVERTAKE_MS = 1800;
 
+const NAME_MAX = 16;
+
+function shortName(name: string): string {
+  const chars = Array.from(name);
+  return chars.length > NAME_MAX ? `${chars.slice(0, NAME_MAX - 1).join("")}…` : name;
+}
+
 interface Props {
   t: T;
   name: string;
@@ -80,7 +87,7 @@ export function OvertakeToast({
           </svg>
         </span>
         <span className="min-w-0 break-words font-neo-display text-lg font-black uppercase leading-tight sm:text-xl">
-          {t("wordTowerV2.rush.overtake.passed", { name })}
+          {t("wordTowerV2.rush.overtake.passed", { name: shortName(name) })}
         </span>
       </m.div>
     </div>,

@@ -20,6 +20,20 @@ describe("OvertakeToast", () => {
     );
   });
 
+  it("given a very long rival name, when shown, then the name is cut to 16 characters with an ellipsis", () => {
+    render(
+      <OvertakeToast t={t} name="Supercalifragilistic_Builder" onDone={() => {}} reducedMotion />,
+    );
+    expect(screen.getByRole("status").textContent).toContain(
+      "wordTowerV2.rush.overtake.passed:Supercalifragil…",
+    );
+  });
+
+  it("given a name made of emoji, when cut, then no surrogate pair is split", () => {
+    render(<OvertakeToast t={t} name={"🦄".repeat(20)} onDone={() => {}} reducedMotion />);
+    expect(screen.getByRole("status").textContent).toContain(`:${"🦄".repeat(15)}…`);
+  });
+
   it("given an overtake, when ~1.8s pass, then it asks to be cleared exactly once", () => {
     vi.useFakeTimers();
     const onDone = vi.fn();

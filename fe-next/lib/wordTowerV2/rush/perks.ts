@@ -69,17 +69,23 @@ export function rollDraft(seed: number, floorIndex: number, owned: PerkId[]): Pe
   const picks: Perk[] = [];
 
   while (picks.length < 3 && pool.length > 0) {
-    const total = pool.reduce((sum, p) => sum + RARITY_WEIGHT[p.rarity], 0);
+    const tiers = (Object.keys(RARITY_WEIGHT) as PerkRarity[]).filter((r) =>
+      pool.some((p) => p.rarity === r),
+    );
+    const total = tiers.reduce((sum, r) => sum + RARITY_WEIGHT[r], 0);
     let roll = rng() * total;
-    let index = pool.length - 1;
-    for (let i = 0; i < pool.length; i++) {
-      roll -= RARITY_WEIGHT[pool[i].rarity];
+    let tier = tiers[tiers.length - 1];
+    for (const r of tiers) {
+      roll -= RARITY_WEIGHT[r];
       if (roll < 0) {
-        index = i;
+        tier = r;
         break;
       }
     }
-    picks.push(pool.splice(index, 1)[0]);
+    const inTier = pool.filter((p) => p.rarity === tier);
+    const chosen = inTier[Math.floor(rng() * inTier.length)];
+    picks.push(chosen);
+    pool.splice(pool.indexOf(chosen), 1);
   }
   return picks;
 }
