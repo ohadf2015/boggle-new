@@ -17,15 +17,32 @@ interface BridgeStageProps {
 }
 
 /**
- * The riddle as a place: two stone plates (the given words) with a river gap
- * between them that the player bridges, letter by letter. Narrow cards stack the
- * plates; a wide card (desktop, tablet) lays the bridge out in a row. On a solve the
- * ropes pull taut in lime, the plates slam inward and a spark burst fires; on
- * a give-up the ropes cut to red. Nothing starts at `opacity: 0` — an
- * animation bundle that never loads must still leave a readable puzzle.
+ * The riddle as a place: two stone plates (the given words) and, between them, a
+ * plank bridge over a river. The player's letter tiles sit on the deck; an arch
+ * and two piers hold the deck up out of the water, two ropes tie it to the top
+ * plate and the piers stand on the bottom plate. Narrow cards stack the parts; a
+ * wide card (desktop, tablet) lays them out in a row.
+ *
+ * Layout is plain flex flow, no absolute positioning or negative margins, so
+ * nothing can paint over the hint row above or the feedback line below. Every
+ * vertical size is also capped by the stage height (`cqh` of the nearest
+ * `container-type: size` ancestor, PuzzleCard's stage), so on a short screen with
+ * the keyboard up the plates, tiles and river shrink instead of overflowing.
+ * Outside a size container `cqh` falls back to `svh`, which only ever loosens it.
+ *
+ * On a solve the ropes pull taut in lime, the plates slam inward and a spark
+ * burst fires; on a give-up the ropes cut to red. Nothing starts at `opacity: 0`:
+ * an animation bundle that never loads must still leave a readable puzzle.
  */
 const PLATE =
-  'relative z-10 flex w-full items-center justify-center rounded-neo border-neo-thick border-neo-black bg-neo-cream px-3 py-[clamp(0.375rem,2.2cqi,0.75rem)] text-center font-neo-display font-black uppercase leading-[1.05] tracking-wide text-neo-navy shadow-hard [overflow-wrap:break-word] text-balance text-[clamp(1rem,min(8.5cqi,calc((100cqi-2.25rem)/var(--plate-fit))),2.25rem)] @max-[36rem]:[@media(min-height:780px)]:min-h-[4.75rem] @max-[36rem]:[@media(min-height:780px)]:text-[clamp(1rem,min(10cqi,calc((100cqi-2.25rem)/var(--plate-fit))),2.75rem)] @min-[36rem]:min-h-[7rem] @min-[36rem]:text-[clamp(1rem,min(4.2cqi,calc((30cqi-2.25rem)/var(--plate-fit))),2.75rem)]';
+  'relative flex w-full items-center justify-center rounded-neo border-neo-thick border-neo-black bg-neo-cream px-3 py-[clamp(0.25rem,min(2.2cqi,2cqh),0.75rem)] text-center font-neo-display font-black uppercase leading-[1.05] tracking-wide text-neo-navy shadow-hard [overflow-wrap:break-word] text-balance text-[clamp(0.95rem,min(8.5cqi,13cqh,calc((100cqi-2.25rem)/var(--plate-fit))),2.25rem)] @max-[36rem]:[@media(min-height:780px)]:min-h-[min(4.75rem,19cqh)] @max-[36rem]:[@media(min-height:780px)]:text-[clamp(0.95rem,min(10cqi,13cqh,calc((100cqi-2.25rem)/var(--plate-fit))),2.75rem)] @min-[36rem]:min-h-[7rem] @min-[36rem]:text-[clamp(1rem,min(4.2cqi,calc((30cqi-2.25rem)/var(--plate-fit))),2.75rem)]';
+
+/** Twisted-rope texture: diagonal strands in two warm tones, outlined in ink. */
+const ROPE =
+  'w-[9px] rounded-full border-x-2 border-neo-black bg-[repeating-linear-gradient(-50deg,var(--neo-cozy)_0_3px,var(--neo-cozy-dark)_3px_6px)]';
+/** Stone pier texture: a solid post with mortar courses. */
+const PIER =
+  'w-[clamp(0.625rem,3.2cqi,0.875rem)] border-x-2 border-neo-black bg-[repeating-linear-gradient(180deg,var(--neo-cream)_0_7px,var(--neo-gray)_7px_8px)]';
 
 const SLIDE = { type: 'spring' as const, stiffness: 260, damping: 22 };
 
@@ -44,47 +61,75 @@ export default function BridgeStage({ word1, word2, isCorrect, isGaveUp, isRTL =
 
   return (
     <div
-      className="relative mx-auto flex w-full flex-col items-center @min-[36rem]:flex-row @min-[36rem]:items-stretch"
+      data-testid="bridge-stage"
+      className="relative mx-auto flex w-full flex-col items-center @min-[36rem]:flex-row @min-[36rem]:items-center"
       style={{ containerType: 'inline-size' }}
     >
-      <m.div {...plate(1, 0)} className="w-full @min-[36rem]:flex @min-[36rem]:w-[30%] @min-[36rem]:shrink-0">
+      <m.div {...plate(1, 0)} className="relative z-[1] w-full @min-[36rem]:flex @min-[36rem]:w-[30%] @min-[36rem]:shrink-0">
         <Plate word={word1} bob={!resolved && !reducedMotion} phase={0} />
       </m.div>
 
-      <div className="relative -my-1 w-full py-[clamp(0.75rem,5cqi,1.75rem)] @max-[36rem]:[@media(min-height:780px)]:py-[clamp(1rem,8cqi,2.25rem)] @min-[36rem]:-mx-1 @min-[36rem]:my-0 @min-[36rem]:flex @min-[36rem]:flex-1 @min-[36rem]:items-center @min-[36rem]:px-5 @min-[36rem]:py-0">
-        {/* Two ropes tie the plates together; they pull lime on a solve. */}
-        {(['start-[14%] inset-y-0 w-1 @min-[36rem]:inset-x-0 @min-[36rem]:start-0 @min-[36rem]:top-[18%] @min-[36rem]:bottom-auto @min-[36rem]:h-1 @min-[36rem]:w-auto',
-          'end-[14%] inset-y-0 w-1 @min-[36rem]:inset-x-0 @min-[36rem]:end-0 @min-[36rem]:top-auto @min-[36rem]:bottom-[18%] @min-[36rem]:h-1 @min-[36rem]:w-auto'] as const).map((pos, i) => (
-          <span key={i} aria-hidden="true" className={`absolute ${pos}`}>
-            <span className="absolute inset-0 border-s-4 border-dashed border-neo-cream/50 @min-[36rem]:border-s-0 @min-[36rem]:border-t-4" />
-            {resolved && (
-              <m.span
-                data-testid={i === 0 ? 'bridge-connector' : undefined}
-                initial={reducedMotion ? { scale: 1 } : { scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={reducedMotion ? { duration: 0 } : { duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                className={`absolute inset-0 origin-top @min-[36rem]:origin-[0%_50%] rtl:@min-[36rem]:origin-[100%_50%] ${isCorrect ? 'bg-neo-lime' : 'bg-neo-red'}`}
-              />
-            )}
-          </span>
-        ))}
+      <div
+        data-testid="bridge-span"
+        className="flex w-full max-w-[24rem] flex-col items-stretch @min-[36rem]:min-w-0 @min-[36rem]:max-w-none @min-[36rem]:flex-1 @min-[36rem]:px-3"
+      >
+        {/* Two ropes tie the deck to the top plate; they pull lime on a solve. */}
+        <div
+          aria-hidden="true"
+          className="flex h-[clamp(0.5rem,min(7cqi,7cqh),2rem)] justify-between px-[7%] @max-[36rem]:[@media(min-height:780px)]:h-[clamp(0.5rem,min(9cqi,8cqh),2.5rem)] @min-[36rem]:hidden"
+        >
+          {[0, 1].map((i) => (
+            <span key={i} data-testid="bridge-rope" className={`relative h-full ${ROPE}`}>
+              {resolved && (
+                <m.span
+                  data-testid={i === 0 ? 'bridge-connector' : undefined}
+                  initial={reducedMotion ? { scaleY: 1 } : { scaleY: 0 }}
+                  animate={{ scaleY: 1 }}
+                  transition={reducedMotion ? { duration: 0 } : { duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                  className={`absolute inset-0 origin-top ${isCorrect ? 'bg-neo-lime' : 'bg-neo-red'}`}
+                />
+              )}
+            </span>
+          ))}
+        </div>
 
+        {/* The deck: wooden planks the letter tiles sit on. */}
         <m.div
+          data-testid="bridge-deck"
           initial={reducedMotion ? false : { scale: 0.92 }}
           animate={isCorrect && !reducedMotion ? { scale: [1, 1.04, 1] } : { scale: 1 }}
           transition={isCorrect ? { duration: 0.35, delay: 0.3 } : { ...SLIDE, delay: 0.12 }}
           className={[
-            'relative z-10 mx-auto w-full max-w-[24rem] rounded-neo border-2 bg-neo-navy px-2 py-[clamp(0.375rem,2.5cqi,0.75rem)] shadow-hard-sm transition-colors duration-300 @min-[36rem]:max-w-none',
-            isCorrect ? 'border-neo-lime' : 'border-neo-cream/40',
+            'relative z-[1] rounded-[6px] border-neo-thick px-1.5 py-[clamp(0.125rem,1.2cqh,0.375rem)] shadow-hard transition-colors duration-300',
+            'bg-[repeating-linear-gradient(90deg,var(--neo-cozy-muted)_0_22px,var(--neo-cozy-dark)_22px_24px)]',
+            isCorrect ? 'border-neo-lime' : isGaveUp ? 'border-neo-red' : 'border-neo-black',
           ].join(' ')}
+          style={{
+            // Tiles never grow taller than the stage allows (AnswerSlots reads these caps).
+            ['--cell-cap' as string]: 'min(2.5rem, 14cqh)',
+            ['--cell-cap-tall' as string]: 'min(3rem, 14cqh)',
+          }}
         >
-          <RiverWaves flowing={!reducedMotion} />
+          {/* Handrail: a thin cream rail along the deck's top edge. */}
+          <span aria-hidden="true" className="pointer-events-none absolute inset-x-1 top-0.5 h-[3px] rounded-full bg-neo-cream/45" />
           <div className="relative">{children}</div>
           {isCorrect && <SparkBurst distance={140} />}
         </m.div>
+
+        {/* Under the deck: arch + piers, standing in the river. */}
+        <div
+          aria-hidden="true"
+          data-testid="bridge-river"
+          className="relative flex h-[clamp(1.75rem,min(18cqi,17cqh),4.5rem)] justify-between overflow-hidden px-[7%] @max-[36rem]:[@media(min-height:780px)]:h-[clamp(1.75rem,min(20cqi,18cqh),5rem)]"
+        >
+          <BridgeArch />
+          <span className={`relative h-full ${PIER}`} />
+          <span className={`relative h-full ${PIER}`} />
+          <RiverWaves flowing={!reducedMotion} />
+        </div>
       </div>
 
-      <m.div {...plate(-1, 0.06)} className="w-full @min-[36rem]:flex @min-[36rem]:w-[30%] @min-[36rem]:shrink-0">
+      <m.div {...plate(-1, 0.06)} className="relative z-[1] w-full @min-[36rem]:flex @min-[36rem]:w-[30%] @min-[36rem]:shrink-0">
         <Plate word={word2} bob={!resolved && !reducedMotion} phase={1.3} />
       </m.div>
     </div>
@@ -99,30 +144,71 @@ function Plate({ word, bob, phase }: { word: string; bob: boolean; phase: number
       transition={bob ? { duration: 3.2, repeat: Infinity, ease: 'easeInOut', delay: phase } : { duration: 0.2 }}
       className="flex w-full"
     >
-      <div className={PLATE} style={{ ['--plate-fit' as string]: plateFitEms(word) }}>
+      <div data-testid="bridge-plate" className={PLATE} style={{ ['--plate-fit' as string]: plateFitEms(word) }}>
         {word}
       </div>
     </m.div>
   );
 }
 
-const WAVE = 'M0 8 Q10 0 20 8 T40 8 T60 8 T80 8 T100 8 T120 8 M0 18 Q10 10 20 18 T40 18 T60 18 T80 18 T100 18 T120 18';
+/**
+ * The arch: a cream stone curve outlined in ink, from the water line up to the
+ * deck, with spandrel posts carrying the deck. Pure decoration in its own box.
+ */
+const ARCH_POSTS = [0.22, 0.36, 0.5, 0.64, 0.78].map((t) => {
+  const x = 10 + t * 180;
+  // Quadratic arch from (10,40) through control (100,-16) to (190,40).
+  const s = (x - 10) / 180;
+  const y = (1 - s) * (1 - s) * 40 + 2 * (1 - s) * s * -16 + s * s * 40;
+  return { x, y };
+});
 
-/** The river the bridge crosses: two wave periods side by side, sliding one period on a loop. */
+function BridgeArch() {
+  return (
+    <svg
+      viewBox="0 0 200 40"
+      preserveAspectRatio="none"
+      className="pointer-events-none absolute inset-x-[7%] top-0 h-full w-[86%] text-neo-black"
+    >
+      {ARCH_POSTS.map((p) => (
+        <line key={p.x} x1={p.x} x2={p.x} y1={0} y2={p.y} stroke="currentColor" strokeWidth="3" vectorEffect="non-scaling-stroke" />
+      ))}
+      <path d="M10 40 Q100 -16 190 40" fill="none" stroke="currentColor" strokeWidth="10" vectorEffect="non-scaling-stroke" strokeLinecap="round" />
+      <path d="M10 40 Q100 -16 190 40" fill="none" stroke="var(--neo-cream)" strokeWidth="4.5" vectorEffect="non-scaling-stroke" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+const WAVE_BACK = 'M0 7 Q15 1 30 7 T60 7 T90 7 T120 7 V20 H0 Z';
+const WAVE_FRONT = 'M0 9 Q10 4 20 9 T40 9 T60 9 T80 9 T100 9 T120 9 V20 H0 Z';
+
+/**
+ * The river: two filled wave layers drifting at different speeds (transform
+ * only, two periods side by side sliding one period on a loop). Still under
+ * prefers-reduced-motion.
+ */
 function RiverWaves({ flowing }: { flowing: boolean }) {
   return (
-    <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-5 overflow-hidden rounded-b-neo">
-      <m.span
-        animate={flowing ? { x: ['0%', '-50%'] } : undefined}
-        transition={flowing ? { duration: 7, repeat: Infinity, ease: 'linear' } : undefined}
-        className="flex h-full w-[200%]"
-      >
-        {[0, 1].map((i) => (
-          <svg key={i} viewBox="0 0 120 24" preserveAspectRatio="none" className="h-full w-1/2 max-w-none shrink-0 text-neo-cyan/35">
-            <path d={WAVE} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-          </svg>
-        ))}
-      </m.span>
+    <span className="pointer-events-none absolute inset-x-0 bottom-0 h-[58%] overflow-hidden rounded-b-[6px]">
+      {(
+        [
+          { d: WAVE_BACK, cls: 'text-neo-cyan-dark/70', dur: 9, dir: ['-50%', '0%'] },
+          { d: WAVE_FRONT, cls: 'text-neo-cyan/50', dur: 6, dir: ['0%', '-50%'] },
+        ] as const
+      ).map((layer, li) => (
+        <m.span
+          key={li}
+          animate={flowing ? { x: [...layer.dir] } : undefined}
+          transition={flowing ? { duration: layer.dur, repeat: Infinity, ease: 'linear' } : undefined}
+          className={`absolute bottom-0 left-0 flex w-[200%] ${li ? 'top-[30%]' : 'top-0'}`}
+        >
+          {[0, 1].map((i) => (
+            <svg key={i} viewBox="0 0 120 20" preserveAspectRatio="none" className={`h-full w-[calc(50%+1px)] max-w-none shrink-0 ${layer.cls}`}>
+              <path d={layer.d} fill="currentColor" />
+            </svg>
+          ))}
+        </m.span>
+      ))}
     </span>
   );
 }

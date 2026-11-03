@@ -54,4 +54,42 @@ describe('BridgeStage', () => {
     const { container } = stage();
     expect(container.querySelector('[style*="opacity: 0"]')).toBeNull();
   });
+
+  it('draws a bridge over water: two ropes, a plank deck holding the tiles, an arch and a river', () => {
+    const { container } = stage();
+    expect(screen.getAllByTestId('bridge-rope')).toHaveLength(2);
+    const deck = screen.getByTestId('bridge-deck');
+    expect(deck.contains(screen.getByTestId('planks'))).toBe(true);
+    expect(deck.className).toContain('repeating-linear-gradient');
+    const river = screen.getByTestId('bridge-river');
+    expect(river.querySelector('svg path')).toBeTruthy();
+    // Rope + deck + river stack in that order between the two plates.
+    const span = screen.getByTestId('bridge-span');
+    const kids = [...span.children];
+    expect(kids.indexOf(deck)).toBeLessThan(kids.indexOf(river));
+    expect(container.textContent?.indexOf('PINE')).toBeLessThan(container.textContent?.indexOf('planks') ?? 0);
+  });
+
+  it('lays the plates and the bridge out in normal flow, never absolute or with negative margins', () => {
+    stage();
+    const flow = [
+      screen.getByTestId('bridge-stage'),
+      screen.getByTestId('bridge-span'),
+      screen.getByTestId('bridge-deck'),
+      ...screen.getAllByTestId('bridge-plate'),
+    ];
+    for (const el of flow) {
+      expect(el.className).not.toMatch(/(^|\s)absolute(\s|$)/);
+      expect(el.className).not.toMatch(/(^|\s)-m[xy]?-/);
+    }
+  });
+
+  it('caps plate text and tile size by the stage height so a short screen shrinks instead of overlapping', () => {
+    stage();
+    const plate = screen.getAllByTestId('bridge-plate')[0];
+    expect(plate.className).toMatch(/cqh/);
+    const deck = screen.getByTestId('bridge-deck');
+    expect(deck.style.getPropertyValue('--cell-cap')).toContain('cqh');
+  });
 });
+
