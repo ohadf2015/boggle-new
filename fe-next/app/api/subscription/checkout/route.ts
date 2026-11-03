@@ -5,6 +5,7 @@ import { getPolarClient, getProProductId, probeCheckoutUrl } from '@/lib/polar';
 import { productionRefusesSandbox } from '@/lib/polarBillingRuntime';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { locales, defaultLocale } from '@/i18n/config';
+import { returnPathFromReferer } from '@/lib/education/checkoutReturn';
 import logger from '@/utils/logger';
 import { logSubscriptionEvent } from '@/lib/subscriptions';
 import { withTimeout } from '@/lib/server/routeTimeout';
@@ -90,21 +91,23 @@ async function polarTrialBlocked(userId: string): Promise<boolean> {
 /**
  * `{ trial: true }` starts the 14-day Teacher Pro trial. Empty body, malformed
  * JSON, and any other value stay on the paid checkout — older clients post
- * with no body at all. The same parse also carries the caller's `locale`.
+ * with no body at all. The same parse also carries the caller's `locale` and an
+ * optional `returnTo` page (validated later by the success_url builder).
  */
 async function parseCheckoutBody(
   request: NextRequest,
-): Promise<{ trial: boolean; locale: string }> {
+): Promise<{ trial: boolean; locale: string; returnTo: string }> {
   const raw = await request.text();
-  if (!raw.trim()) return { trial: false, locale: '' };
+  if (!raw.trim()) return { trial: false, locale: '', returnTo: '' };
   try {
-    const parsed = JSON.parse(raw) as { trial?: unknown; locale?: unknown };
+    const parsed = JSON.parse(raw) as { trial?: unknown; locale?: unknown; returnTo?: unknown };
     return {
       trial: parsed?.trial === true,
       locale: typeof parsed?.locale === 'string' ? parsed.locale : '',
+      returnTo: typeof parsed?.returnTo === 'string' ? parsed.returnTo : '',
     };
   } catch {
-    return { trial: false, locale: '' };
+    return { trial: false, locale: '', returnTo: '' };
   }
 }
 
@@ -198,6 +201,16 @@ export async function POST(request: NextRequest) {
       allowTrial: trial,
       trialDays: trial ? trialPlan?.days : undefined,
       locale,
+      // Same-origin fetch sends the full Referer, so a checkout from a class report
+      // returns there; the success_url builder only keeps /teacher paths.
+      returnPath:
+        body.returnTo ||
+        returnPathFromReferer(
+          request.headers.get('referer'),
+          process.env.NEXT_PUBLIC_APP_URL,
+          request.headers.get('x-forwarded-host') ?? request.headers.get('host'),
+        ) ||
+        undefined,
     });
     const checkoutUrl = checkout.url;
     const checkoutId = checkout.id;

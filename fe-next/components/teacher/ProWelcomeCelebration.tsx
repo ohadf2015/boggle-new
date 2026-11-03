@@ -111,9 +111,9 @@ export function ProWelcomeCelebration({ grant, paid = false, onReturnPage = fals
           type="button"
           onClick={close}
           aria-label={t('common.close')}
-          className="absolute top-3 end-3 flex h-9 w-9 items-center justify-center rounded-full border-2 border-black bg-neo-white shadow-hard-sm hover:-translate-y-0.5 transition-transform"
+          className="absolute top-3 end-3 flex h-9 w-9 items-center justify-center rounded-full border-2 border-black bg-neo-white text-black shadow-hard-sm hover:-translate-y-0.5 transition-transform"
         >
-          <X className="size-4" />
+          <X className="size-4" aria-hidden="true" />
         </button>
 
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-neo border-3 border-black bg-neo-lime shadow-hard">

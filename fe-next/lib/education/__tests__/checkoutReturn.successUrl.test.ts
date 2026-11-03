@@ -108,4 +108,10 @@ describe('returnPathFromReferer', () => {
     expect(returnPathFromReferer('not a url', APP)).toBeNull();
     expect(returnPathFromReferer(`${APP}${REPORT}`, undefined)).toBeNull();
   });
+
+  it('also accepts the host the request came in on', () => {
+    expect(returnPathFromReferer(`https://preview.example${REPORT}`, APP, 'preview.example')).toBe(REPORT);
+    expect(returnPathFromReferer(`https://preview.example${REPORT}`, undefined, 'preview.example')).toBe(REPORT);
+    expect(returnPathFromReferer(`https://evil.example${REPORT}`, APP, 'preview.example')).toBeNull();
+  });
 });

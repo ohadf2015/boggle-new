@@ -76,11 +76,17 @@ export function safeTeacherReturnPath(raw: unknown, locale: string): string | nu
 }
 
 /** Path and query of a same-origin referer; the caller still validates it. */
-export function returnPathFromReferer(referer: string | null | undefined, appUrl: string | undefined): string | null {
-  if (!referer || !appUrl) return null;
+export function returnPathFromReferer(
+  referer: string | null | undefined,
+  appUrl: string | undefined,
+  requestHost?: string | null,
+): string | null {
+  if (!referer) return null;
   try {
     const from = new URL(referer);
-    return from.origin === new URL(appUrl).origin ? `${from.pathname}${from.search}` : null;
+    const sameApp = appUrl ? from.origin === new URL(appUrl).origin : false;
+    const sameHost = !!requestHost && from.host === requestHost;
+    return sameApp || sameHost ? `${from.pathname}${from.search}` : null;
   } catch {
     return null;
   }
