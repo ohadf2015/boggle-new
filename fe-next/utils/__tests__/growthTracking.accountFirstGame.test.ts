@@ -32,7 +32,7 @@ vi.mock('@/utils/logger', () => ({
 }));
 
 import { trackGameEnd, trackGameStart } from '../growthTracking';
-import { ACCOUNT_FIRST_GAME_DONE_KEY, ACCOUNT_FIRST_GAME_PENDING_KEY } from '@/lib/retention/signupFirstGame';
+import { ACCOUNT_FIRST_GAME_DONE_KEY, ACCOUNT_FIRST_GAME_PENDING_KEY } from '@/lib/retention/accountFirstGame';
 
 function installStorage() {
   const local = new Map<string, string>();

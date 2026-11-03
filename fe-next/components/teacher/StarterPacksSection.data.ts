@@ -41,6 +41,12 @@ export const chipClass =
 export const actionClass =
   'inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-neo border-3 border-neo-black px-4 py-2.5 font-neo-body text-sm font-black text-neo-black shadow-hard-sm transition duration-100 hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan motion-reduce:transition-none motion-reduce:hover:translate-y-0 disabled:opacity-60';
 
+export function starterGridClass(count: number): string {
+  if (count <= 1) return 'grid grid-cols-1 gap-3';
+  if (count === 2) return 'grid grid-cols-1 gap-3 @xl:grid-cols-2';
+  return 'grid grid-cols-1 gap-3 @xl:grid-cols-2 @5xl:grid-cols-3';
+}
+
 export function CardArt({ pose }: { pose: EduMascotPose | undefined }) {
   if (!pose) return null;
   return createElement(Image, {

@@ -129,7 +129,7 @@ describe('EduHostResults: the words to reteach lead the wall', () => {
     expect(preview).not.toHaveTextContent(/Noa|Ido|Lia/);
   });
 
-  it('given a Pro teacher, then the wall keeps the same shape: one primary, Share with parents, and the report card as the one Pro slot with its one link', () => {
+  it('given a Pro teacher, then the wall keeps the same shape: one primary, Share with parents, Export class report (PDF), and the report card as the one Pro slot with its one link', () => {
     pro.hasPro = true;
     renderWall();
     expect(document.querySelectorAll('[data-results-primary]')).toHaveLength(1);
@@ -137,7 +137,7 @@ describe('EduHostResults: the words to reteach lead the wall', () => {
     const tertiary = screen.getByTestId('edu-results-tertiary');
     const invite = screen.queryByTestId('teacher-invite');
     const outside = Array.from(document.querySelectorAll('a, button')).filter((el) => !tertiary.contains(el) && !invite?.contains(el));
-    expect(outside.map((el) => el.getAttribute('data-testid'))).toEqual(['edu-replay-missed', 'edu-results-parent-share', 'edu-results-report']);
+    expect(outside.map((el) => el.getAttribute('data-testid'))).toEqual(['edu-replay-missed', 'edu-results-parent-share', 'report-pdf-export', 'edu-results-report']);
     expect(screen.getByTestId('edu-results-report')).toHaveAttribute('target', '_blank');
   });
 

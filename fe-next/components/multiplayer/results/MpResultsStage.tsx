@@ -54,7 +54,6 @@ const InlineSignupCard = dynamic(() => import('@/components/auth/InlineSignupCar
 const SignupToast = dynamic(() => import('@/components/auth/SignupToast'), { ssr: false });
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
 const FloatingReaction = dynamic(() => import('@/components/game/QuickReactions').then((m) => m.FloatingReaction), { ssr: false });
-const FirstGameBridge = dynamic(() => import('@/components/results/FirstGameBridge'), { ssr: false });
 
 /** Max standings rows on one screen (8 seats; in a bigger room I stay visible). */
 const MAX_ROWS = 8;
@@ -204,8 +203,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   const grid = useMemo(() => seriesGrid({ ladder, standings: seriesStandings, rounds: seriesRoundNumber }), [ladder, seriesStandings, seriesRoundNumber]);
   const awards = useMemo(() => (grid ? null : roundAwards(data.sortedScores)), [grid, data.sortedScores]);
 
-  const [bridgeShowing, setBridgeShowing] = useState(false);
-  const signupShown = showInlineSignup({ isGuest: c.isGuest, isClassroom: c.isClassroom, footerShown, bridgeShowing, branch });
+  const signupShown = showInlineSignup({ isGuest: c.isGuest, isClassroom: c.isClassroom, footerShown, branch });
 
   const exitCopy = resultsExitCopy({ isClassroom: c.isClassroom, isHost });
   const bossOutcome = useClassroomBossStore((s) => s.view?.status === 'defeated' || s.view?.status === 'escaped');
@@ -364,18 +362,6 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
           {t('mpUi.results.skipHint')}
         </button>
       )}
-      {/* t_b883191f: first-session classic only. Control renders nothing.
-          Tap leaves the room (useMpExit) into today's Word Wheel — not a Link. */}
-      <FirstGameBridge
-        surface="classic-mp"
-        emphasis="secondary"
-        enabled={footerShown && c.resolvedGameMode === 'classic' && !c.isClassroom}
-        onHoldingChange={setBridgeShowing}
-        onActivate={() => {
-          auto.cancel();
-          mpExit('first-game-bridge');
-        }}
-      />
       {signupShown && (
         <InlineSignupCard isAuthenticated={c.isAuthenticated} analyticsSource="results_inline" compact className={cn('shrink-0', fx.cardIn)} />
       )}

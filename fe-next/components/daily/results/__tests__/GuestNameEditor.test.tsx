@@ -194,7 +194,7 @@ describe('GuestNameEditor — first finish', () => {
     expect(hasChosenGuestName()).toBe(false);
   });
 
-  it('is a blocking dialog with no way to skip it in the control arm', () => {
+  it('is a blocking dialog with no way to skip it', () => {
     render(<GuestNameEditor name={GENERATED} guestFingerprint="fp-1" onRenamed={vi.fn()} t={t} />);
 
     expect(screen.getByRole('dialog')).toBeInTheDocument();
@@ -205,18 +205,6 @@ describe('GuestNameEditor — first finish', () => {
 
     expect(screen.getByTestId('guest-name-prompt')).toBeInTheDocument();
     expect(hasChosenGuestName()).toBe(false);
-  });
-
-  it('never offers "Keep this name" on a generated name, even in the keep_name arm', async () => {
-    const getFlag = vi.fn(() => 'keep_name');
-    (window as unknown as { grq: unknown }).grq = { push: (cb: (gr: unknown) => void) => cb({ getFlag }) };
-    try {
-      render(<GuestNameEditor name={GENERATED} guestFingerprint="fp-1" onRenamed={vi.fn()} t={t} />);
-      expect(screen.getByTestId('guest-name-prompt')).toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: 'Keep this name' })).not.toBeInTheDocument();
-    } finally {
-      delete (window as unknown as { grq?: unknown }).grq;
-    }
   });
 
   it('refuses to save a generated name as the chosen one', async () => {

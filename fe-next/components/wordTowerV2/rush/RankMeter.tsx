@@ -53,7 +53,7 @@ export function RankMeter({ t, rank, reducedMotion = false }: Props) {
     <m.div
       key={pulseKey}
       data-rank-pulse={pulsing ? "true" : undefined}
-      className={`pointer-events-none flex min-w-[7.5rem] max-w-[11rem] flex-col gap-1 rounded-neo border-neo-thick border-black bg-neo-navy px-2 py-1 shadow-hard ${pulsing ? "ring-4 ring-neo-yellow" : ""}`}
+      className={`pointer-events-none flex min-w-[7.5rem] max-w-[11rem] flex-col gap-1 rounded-neo border-neo-thick border-neo-cream bg-neo-navy px-2 py-1 shadow-hard ${pulsing ? "ring-4 ring-neo-yellow" : ""}`}
       initial={pulsing && !reducedMotion ? { scale: 1 } : false}
       animate={
         pulsing && !reducedMotion
@@ -84,7 +84,7 @@ export function RankMeter({ t, rank, reducedMotion = false }: Props) {
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={pct}
-        className="h-1.5 w-full overflow-hidden rounded-neo-pill border border-black bg-neo-navy-light"
+        className="h-1.5 w-full overflow-hidden rounded-neo-pill border border-neo-cream bg-neo-navy-light"
       >
         <m.div
           className={`h-full origin-[left] rtl:origin-[right] ${fill}`}

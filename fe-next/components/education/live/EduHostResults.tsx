@@ -29,6 +29,7 @@ import { MissedWordsList } from '@/components/education/results/MissedWordsList'
 import { ParentShareLink } from '@/components/education/results/ParentShareLink';
 import { reteachPanelWords } from '@/components/education/results/reteachPanelModel';
 import { ClassReportButton } from '@/components/education/results/ClassReportButton';
+import { ReportPdfExportButton } from '@/components/education/results/ReportPdfExportButton';
 import { ZeroRoundNote } from '@/components/education/results/ZeroRoundNote';
 import { TeacherInviteNudge, showTeacherInvite } from '@/components/education/results/TeacherInviteNudge';
 import { EmptyRoundCard } from '@/components/education/results/EmptyRoundCard';
@@ -290,6 +291,15 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
                   ) : null
                 }
               />
+              {/* Export class report (PDF): the real export for Pro, locked and straight to checkout for a free teacher. */}
+              {!proLoading && summary.totalWords > 0 && students > 0 && !isPracticeRound(players) && (
+                <ReportPdfExportButton
+                  language={language}
+                  summary={summary}
+                  players={players}
+                  proLabel={tf('eduLiveRoom.hostResults.proPill', 'Pro')}
+                />
+              )}
             </div>
             {/* One Pro slot for a free teacher: a labelled preview of the per-student report, never a wall over the free insight. */}
             {proCard && summary.totalWords > 0 && (
