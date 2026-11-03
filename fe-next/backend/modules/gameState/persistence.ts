@@ -190,6 +190,44 @@ export async function restoreGameFromRedis(
   }
 }
 
+const refreshClaimed = new Set<string>();
+const refreshInFlight = new Map<string, Promise<GameState | null>>();
+
+function hasLiveSocket(game: GameState): boolean {
+  if (game.hostSocketId) return true;
+  if (Object.values(game.users || {}).some((u) => u?.socketId)) return true;
+  return Object.values(game.spectators || {}).some((s) => (s as { socketId?: string | null })?.socketId);
+}
+
+/**
+ * Boot restore runs while the outgoing instance still serves the room, so the
+ * copy read at boot misses whatever happened before its final shutdown persist.
+ * Re-read Redis once, on the first join, while nobody is seated here yet.
+ */
+export function refreshRestoredGameFromRedis(
+  gameCode: string,
+  games: Record<string, GameState>
+): Promise<GameState | null> {
+  const current = games[gameCode];
+  if (!current) return Promise.resolve(null);
+  const inFlight = refreshInFlight.get(gameCode);
+  if (inFlight) return inFlight;
+  if (!current.restoredFromRedis || refreshClaimed.has(gameCode)) return Promise.resolve(current);
+  refreshClaimed.add(gameCode);
+  if (hasLiveSocket(current)) return Promise.resolve(current);
+
+  const promise = (async () => {
+    const fresh = await restoreGameFromRedis(gameCode, {});
+    if (fresh && games[gameCode] === current && !hasLiveSocket(current)) {
+      games[gameCode] = fresh;
+      logger.info('PERSIST', `Refreshed ${gameCode} from Redis on first rejoin after boot restore`);
+    }
+    return games[gameCode] ?? null;
+  })().finally(() => refreshInFlight.delete(gameCode));
+  refreshInFlight.set(gameCode, promise);
+  return promise;
+}
+
 export async function getAllGameCodesFromRedis(): Promise<string[]> {
   try {
     const redis = getRedisClient();

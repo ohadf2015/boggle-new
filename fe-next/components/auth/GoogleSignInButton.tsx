@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Script from 'next/script';
 import { isNative, isEdgeBrowser } from '@/utils/platform';
 import { supabase, signInWithGoogle } from '@/lib/supabase';
@@ -45,7 +45,10 @@ interface GoogleSignInButtonProps {
  */
 export default function GoogleSignInButton({ className, width, analyticsSource }: GoogleSignInButtonProps) {
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID;
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
+  // Inert look-alike shown until GSI paints its own button, so the iframe swap
+  // doesn't jump. Removed once rendered: GSI ignores clicks on obscured buttons.
+  const [gsiRendered, setGsiRendered] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const renderedRef = useRef(false);
@@ -102,6 +105,7 @@ export default function GoogleSignInButton({ className, width, analyticsSource }
       click_listener: handlePromptClickIntent,
       ...(fitWidth != null ? { width: Math.min(fitWidth, GSI_MAX_WIDTH) } : {}),
     });
+    setGsiRendered(true);
   }, [clientId, width, language, handlePromptClickIntent]);
 
   // GIS may already be loaded (the global One Tap initializer pulls it in) — render
@@ -170,6 +174,16 @@ export default function GoogleSignInButton({ className, width, analyticsSource }
         onPointerDown={handlePromptClickIntent}
         className="flex w-full min-h-[48px] items-center justify-center overflow-visible rounded-xl border-3 border-neo-black bg-white shadow-hard"
       >
+        {!gsiRendered && (
+          <div
+            data-testid="gsi-placeholder"
+            aria-hidden="true"
+            className="pointer-events-none flex items-center justify-center gap-2 text-sm font-medium text-neo-black"
+          >
+            <GoogleIcon className="w-[18px] h-[18px]" />
+            <span>{t('auth.continueWithGoogle', 'Continue with Google')}</span>
+          </div>
+        )}
         <div ref={containerRef} data-testid="gsi-button-container" />
       </div>
     </div>

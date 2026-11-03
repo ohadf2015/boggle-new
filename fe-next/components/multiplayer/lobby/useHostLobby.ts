@@ -276,15 +276,28 @@ export function useHostLobby({
     setBotCountdown(null);
   }, []);
 
-  // Host pressed Start. Never silently fill bots here: alone → onStartGame opens
-  // the solo confirm dialog, which hands the decision to the host.
+  // Alone in a room the host created, START itself reads "Start vs bots", so the
+  // tap is the consent. Classroom and Quick Play keep their own flows.
+  const startsVsBots = humanGuestCount === 0 && !isPrivate && !isQuickPlay && !lessonData;
+
   const handleStartClick = useCallback(() => {
     if (anyAdActive) return;
     // Visible in-flight state immediately (rage-click); 3s failsafe release.
     setStartGameInFlight(true);
     setTimeout(() => setStartGameInFlight(false), 3000);
-    onStartGame();
-  }, [anyAdActive, onStartGame]);
+    if (!startsVsBots) {
+      onStartGame();
+      return;
+    }
+    // A countdown reaching 0 mid-start would fill bots and queue a second start.
+    cancelBotCountdown();
+    if (postFillStartRef.current) {
+      clearTimeout(postFillStartRef.current);
+      postFillStartRef.current = null;
+    }
+    trackSoloPlayPrompt({ event: 'clicked', surface: 'start_button' });
+    (onAutoStartWithBots ?? onStartGame)();
+  }, [anyAdActive, startsVsBots, cancelBotCountdown, onAutoStartWithBots, onStartGame]);
 
   // Solo-host rescue prompt: one derived condition so render + telemetry agree.
   const showSoloPrompt = shouldShowSoloPlayPrompt({
@@ -305,7 +318,7 @@ export function useHostLobby({
   // path — no redundant confirm dialog, no client setAutoFill.
   const handleSoloPlayVsBots = useCallback(() => {
     if (anyAdActive) return;
-    trackSoloPlayPrompt({ event: 'clicked' });
+    trackSoloPlayPrompt({ event: 'clicked', surface: 'status_lane' });
     (onAutoStartWithBots ?? onStartGame)();
   }, [anyAdActive, onAutoStartWithBots, onStartGame]);
 
@@ -324,6 +337,7 @@ export function useHostLobby({
     botCountdown,
     cancelBotCountdown,
     handleStartClick,
+    startsVsBots,
     showSoloPrompt,
     handleSoloPlayVsBots,
     handleRoomLanguageChange,

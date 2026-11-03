@@ -18,6 +18,7 @@ import { navTierForPath, tierDotClass } from '@/lib/seasons/scoreTier';
 import { useSafeArea } from '../hooks/useSafeArea';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useDailyMissions } from '../hooks/useDailyMissions';
+import { useWeeklyQuest } from '@/hooks/useWeeklyQuest';
 import { useFriends } from '../hooks/useFriends';
 import { useFriendMessages } from '../hooks/useFriendMessages';
 import { neoInfoToast } from './NeoToast';
@@ -174,6 +175,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
     const { user, profile } = useAuth();
     const [showAuthModal, setShowAuthModal] = useState(false);
     const { missions } = useDailyMissions();
+    useWeeklyQuest();
     const { pendingRequests, pendingChallenges, friends } = useFriends();
 
     // Refs with fresh values so onMessage callback can decide whether to toast

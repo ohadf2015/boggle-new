@@ -21,6 +21,7 @@ import {
   upgradeSpectatorToPlayer,
   clearSocketMappingsForLeave,
   restoreGameFromRedis,
+  refreshRestoredGameFromRedis,
   getNextEligibleHost,
   transferHost
 } from '../modules/gameStateManager.js';
@@ -130,6 +131,8 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
         game = opened === 'opened' ? getGame(gameCode) ?? null : null;
         if (!game) return;
       }
+    } else if (game.restoredFromRedis) {
+      game = (await refreshRestoredGameFromRedis(gameCode)) ?? game;
     }
 
     // A server restart/redeploy wipes the in-memory setInterval game clock

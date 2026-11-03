@@ -22,7 +22,7 @@ import { useRevealStage } from './useRevealStage';
 import { useMpAutoContinue } from './useMpAutoContinue';
 import { useLockedBranch, useResultBeats } from './useResultBeats';
 import { MpResultsHeader } from './MpResultsHeader';
-import { MpStandingsBoard } from './MpStandingsBoard';
+import { MpStandingsSection } from './MpFullStandings';
 import { MpMyCard } from './MpMyCard';
 import { useClassroomPressure } from '@/hooks/gameState/classroomPressureStore';
 import { isLeaderboardHidden } from '@/shared/utils/classroomPressure';
@@ -123,6 +123,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
 
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [standingsOpen, setStandingsOpen] = useState(false);
 
   // Fired here, on the always-mounted reveal; DETAILS only mounts on open.
   useEffect(() => {
@@ -164,7 +165,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
     isHost,
     isReady,
     armed: footerShown,
-    paused: detailsOpen || pickerOpen || nudgeSheetOpen || c.showExitConfirm || c.showShareModal || socketEvents.showWordFeedback || c.adGate.anyAdActive,
+    paused: detailsOpen || pickerOpen || standingsOpen || nudgeSheetOpen || c.showExitConfirm || c.showShareModal || socketEvents.showWordFeedback || c.adGate.anyAdActive,
     persistCancel: !isOnCrazyGamesPlatform,
     onStartNext: handleStartGame,
     onNewSeries: handleNewSeries,
@@ -251,10 +252,12 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
             {t('education.classroomGame.pressure.revealAtEnd')}
           </p>
         ) : (
-          <MpStandingsBoard
+          <MpStandingsSection
+            allRows={boardRows}
             rows={visible.rows}
             hiddenCount={visible.hiddenCount}
             isRevealed={(pos) => seen(`row-${pos}`)}
+            onOpenChange={setStandingsOpen}
             t={t}
             className="min-h-0 flex-1 lg:max-h-[calc(560px*var(--mp-u,1))]"
           />

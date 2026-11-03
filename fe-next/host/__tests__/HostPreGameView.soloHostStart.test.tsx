@@ -8,9 +8,9 @@ const mockSocket = { emit: emitMock, on: vi.fn(), off: vi.fn() } as unknown as {
 
 // Capture the props the StartButton is rendered with so we can assert its
 // disabled state AND invoke its onStartGame exactly as a real click would.
-let capturedStartProps: { disabled: boolean; onStartGame: () => void } | null = null;
+let capturedStartProps: { disabled: boolean; onStartGame: () => void; labelKey?: string; sublabel?: string } | null = null;
 vi.mock('../components/pre-game/StartButton', () => ({
-  StartButton: (props: { disabled: boolean; onStartGame: () => void }) => {
+  StartButton: (props: { disabled: boolean; onStartGame: () => void; labelKey?: string; sublabel?: string }) => {
     capturedStartProps = props;
     return React.createElement('button', { disabled: props.disabled, onClick: props.onStartGame }, 'start');
   },
@@ -132,36 +132,41 @@ describe('HostPreGameView solo-host start (alone in lobby)', () => {
     expect(capturedStartProps!.disabled).toBe(false);
   });
 
-  it('does NOT silently fill bots when an alone host presses Start (decision deferred to dialog)', () => {
-    // Pressing Start while alone must hand the decision to the host (the
-    // SoloStartConfirmDialog, opened by onStartGame→startGame→setShowSoloConfirm)
-    // — NOT pre-emptively add bots before they can choose.
-    render(<HostPreGameView {...baseProps} />);
+  it('alone in a created room, START reads "Start vs bots" without repeating it in the sublabel', () => {
+    render(<HostPreGameView {...baseProps} hostPlaying={true} playersReady={[{ username: 'Host', isHost: true }]} />);
 
-    act(() => { capturedStartProps!.onStartGame(); });
-
-    const setAutoFill = emitMock.mock.calls.find(([evt]) => evt === 'setAutoFill');
-    expect(setAutoFill).toBeUndefined();
-    expect(baseProps.onStartGame).toHaveBeenCalled();
+    expect(capturedStartProps!.labelKey).toBe('hostView.startVsBots');
+    expect(capturedStartProps!.sublabel).toBe('mpUi.lobby.seatsTaken');
   });
 
-  it('defers to the dialog for a PLAYING host alone (hostPlaying=true, host in roster)', () => {
-    // Dominant mobile path: hostPlaying is forced true and the host IS in
-    // playersReady, so actualPlayerCount===1 — yet there are no human opponents.
-    // Still no silent fill: onStartGame routes to the confirm dialog.
-    render(
-      <HostPreGameView
-        {...baseProps}
-        hostPlaying={true}
-        playersReady={[{ username: 'Host', isHost: true }]}
-      />,
-    );
+  it('alone in a created room, one START tap begins the bot game (no dialog, no client bot fill)', () => {
+    render(<HostPreGameView {...baseProps} hostPlaying={true} playersReady={[{ username: 'Host', isHost: true }]} />);
 
     act(() => { capturedStartProps!.onStartGame(); });
 
-    const setAutoFill = emitMock.mock.calls.find(([evt]) => evt === 'setAutoFill');
-    expect(setAutoFill).toBeUndefined();
+    expect(emitMock.mock.calls.find(([evt]) => evt === 'setAutoFill')).toBeUndefined();
+    expect(baseProps.onAutoStartWithBots).toHaveBeenCalledTimes(1);
+    expect(baseProps.onStartGame).not.toHaveBeenCalled();
+  });
+
+  it('alone in a classroom (private) room, START still hands the choice to the dialog', () => {
+    render(<HostPreGameView {...baseProps} isPrivate={true} hostPlaying={true} playersReady={[{ username: 'Host', isHost: true }]} />);
+
+    act(() => { capturedStartProps!.onStartGame(); });
+
+    expect(capturedStartProps!.labelKey).not.toBe('hostView.startVsBots');
     expect(baseProps.onStartGame).toHaveBeenCalled();
+    expect(baseProps.onAutoStartWithBots).not.toHaveBeenCalled();
+  });
+
+  it('alone with a lesson loaded, START still hands the choice to the dialog', () => {
+    const lessonData = { lessonId: 'l1', lessonName: 'Animals', vocabularyWords: ['cat'], language: 'en' as const };
+    render(<HostPreGameView {...baseProps} lessonData={lessonData} hostPlaying={true} playersReady={[{ username: 'Host', isHost: true }]} />);
+
+    act(() => { capturedStartProps!.onStartGame(); });
+
+    expect(baseProps.onStartGame).toHaveBeenCalled();
+    expect(baseProps.onAutoStartWithBots).not.toHaveBeenCalled();
   });
 
   it('does NOT force bot-fill when a human guest is already present', () => {
@@ -177,6 +182,8 @@ describe('HostPreGameView solo-host start (alone in lobby)', () => {
     const setAutoFill = emitMock.mock.calls.find(([evt]) => evt === 'setAutoFill');
     expect(setAutoFill).toBeUndefined();
     expect(baseProps.onStartGame).toHaveBeenCalled();
+    expect(baseProps.onAutoStartWithBots).not.toHaveBeenCalled();
+    expect(capturedStartProps!.labelKey).toBeUndefined();
   });
 });
 
