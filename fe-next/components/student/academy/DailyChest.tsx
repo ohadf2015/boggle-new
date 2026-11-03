@@ -19,6 +19,8 @@ import { CoinFountain } from '@/components/wordTowerV2/rewards/CoinFountain';
 import { BoundedConfettiBurst } from '@/components/motion/BoundedConfettiBurst';
 import { cn } from '@/lib/utils';
 import RewardChipRow, { XpIcon } from '@/components/education/rewards/RewardChipRow';
+import { EDU_EASE } from '@/lib/education/motion/tokens';
+import { KEY_MOMENTS } from '@/lib/education/motion/keyMoments';
 import { toneStyle } from './chrome';
 import { canOpenChest, markChestOpened, clearChestOpened, claimDailyChestXp, DAILY_CHEST_XP } from './dailyChestStore';
 
@@ -32,6 +34,12 @@ interface Props {
 }
 
 type Phase = 'idle' | 'rattle' | 'open';
+
+const RATTLE_MS = Math.round(KEY_MOMENTS.chest.transition.duration * 1000);
+const OPEN_BURST = {
+  animate: { scale: [0.9, 1.25, 1.1], y: [0, -18, 0] },
+  transition: { duration: 0.4, ease: EDU_EASE.outQuint },
+};
 
 export function DailyChest({ userId, reducedMotion, onGranted, size = 'sm' }: Props) {
   const { t, dir } = useLanguage();
@@ -59,7 +67,7 @@ export function DailyChest({ userId, reducedMotion, onGranted, size = 'sm' }: Pr
 
   useEffect(() => {
     if (phase !== 'rattle') return;
-    const timer = setTimeout(() => setPhase('open'), 650);
+    const timer = setTimeout(() => setPhase('open'), RATTLE_MS);
     return () => clearTimeout(timer);
   }, [phase]);
 
@@ -126,14 +134,11 @@ export function DailyChest({ userId, reducedMotion, onGranted, size = 'sm' }: Pr
             {phase === 'open' && <CoinFountain count={14} spread={1} reducedMotion={reducedMotion} />}
             <BoundedConfettiBurst trigger={phase === 'open' && !reducedMotion} size="lg">
               <m.div
+                data-testid="academy-chest-art"
                 className="relative h-48 w-48 sm:h-64 sm:w-64"
-                animate={
-                  phase === 'rattle'
-                    ? { rotate: [0, -10, 10, -12, 12, -6, 0], scale: [1, 1.05, 1] }
-                    : { scale: [0.9, 1.25, 1.1], y: [0, -18, 0] }
-                }
+                animate={reducedMotion ? { scale: 1.1, y: 0 } : phase === 'rattle' ? KEY_MOMENTS.chest.animate : OPEN_BURST.animate}
                 // Keyframes run as a tween: framer springs only take 2 keyframes.
-                transition={phase === 'rattle' ? { duration: 0.6 } : { duration: 0.55, ease: 'easeOut' }}
+                transition={reducedMotion ? { duration: 0 } : phase === 'rattle' ? KEY_MOMENTS.chest.transition : OPEN_BURST.transition}
               >
                 <Image src="/images/education/chest-books.webp" alt="" aria-hidden="true" fill unoptimized sizes="256px" className="object-contain drop-shadow-[6px_6px_0_#000]" priority />
               </m.div>

@@ -10,7 +10,8 @@
  */
 
 import Image from 'next/image';
-import { m, useReducedMotion } from 'framer-motion';
+import { m } from 'framer-motion';
+import { useEduReducedMotion } from '@/lib/education/motion/useEduReducedMotion';
 import { Loader2, Play, Sparkles, UserPlus } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -71,7 +72,7 @@ export function AcademyCta({ kind, activeGame, target, targetLabel, isJoining, j
   const compact = size === 'compact';
   const { t } = useLanguage();
   const sfx = useSoundEffects();
-  const osReduced = useReducedMotion();
+  const osReduced = useEduReducedMotion();
   const still = reducedMotion || !!osReduced;
   const overline = useCtaOverline(kind);
 

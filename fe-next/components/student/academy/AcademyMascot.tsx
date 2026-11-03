@@ -8,7 +8,8 @@
  * eats a tap meant for an island.
  */
 
-import { m, useReducedMotion } from 'framer-motion';
+import { m } from 'framer-motion';
+import { useEduReducedMotion } from '@/lib/education/motion/useEduReducedMotion';
 import { Mascot } from '@/components/ui/Mascot';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { AcademyMascotMood } from './academyMascotMood';
@@ -20,7 +21,7 @@ interface Props {
 
 export function AcademyMascot({ mood, reducedMotion }: Props) {
   const { t } = useLanguage();
-  const osReduced = useReducedMotion();
+  const osReduced = useEduReducedMotion();
   const still = reducedMotion || !!osReduced;
   const line = t(mood.lineKey, mood.lineKey, mood.params);
 

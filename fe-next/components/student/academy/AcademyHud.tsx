@@ -7,7 +7,8 @@
  */
 
 import Image from 'next/image';
-import { m, useReducedMotion } from 'framer-motion';
+import { m } from 'framer-motion';
+import { useEduReducedMotion } from '@/lib/education/motion/useEduReducedMotion';
 import { UserX } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -45,7 +46,7 @@ export function AcademyHud({ userId, name, avatarConfig, totalXp, streak, streak
   const wide = size === 'wide';
   const compact = size === 'compact';
   const { t } = useLanguage();
-  const osReduced = useReducedMotion();
+  const osReduced = useEduReducedMotion();
   const still = reducedMotion || !!osReduced;
   const xp = getXpProgress(totalXp);
   const shownXp = useCountUp({ target: xp.xpInCurrentLevel, duration: 1100, startDelay: 250, immediate: still });

@@ -11,7 +11,8 @@
 
 import Image from 'next/image';
 import { useState } from 'react';
-import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
+import { useEduReducedMotion } from '@/lib/education/motion/useEduReducedMotion';
 import { Flag, Lock, Moon, Star } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -131,7 +132,7 @@ function BossRing({ have, need, size }: { have: number; need: number; size: numb
 export function AcademyNodeButton({ node, at, index, big, recommended, tag: tagWord, tone = 'gold', onOpen, reducedMotion, compact = 0, scale = 1 }: Props) {
   const { t } = useLanguage();
   const sfx = useSoundEffects();
-  const osReduced = useReducedMotion();
+  const osReduced = useEduReducedMotion();
   const still = reducedMotion || !!osReduced;
   const [burst, setBurst] = useState(0);
   const label = useNodeLabel(node);

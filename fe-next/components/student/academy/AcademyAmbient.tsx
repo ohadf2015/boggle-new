@@ -14,7 +14,8 @@
  */
 
 import Image from 'next/image';
-import { m, useReducedMotion } from 'framer-motion';
+import { m } from 'framer-motion';
+import { useEduReducedMotion } from '@/lib/education/motion/useEduReducedMotion';
 import type { MapLayout } from './AcademyMap';
 
 const RUNES: Record<MapLayout, { x: number; y: number; r: number }[]> = {
@@ -94,7 +95,7 @@ function Sparkle({ size }: { size: number }) {
 }
 
 export function AcademyAmbient({ layout, reducedMotion }: { layout: MapLayout; reducedMotion: boolean }) {
-  const osReduced = useReducedMotion();
+  const osReduced = useEduReducedMotion();
   const still = reducedMotion || !!osReduced;
 
   return (

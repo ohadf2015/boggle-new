@@ -19,11 +19,11 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, typ
 import type { Socket } from 'socket.io-client';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 import posthog from '@/lib/analytics/lazyPosthog';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useReducedEffects } from '@/hooks/useReducedEffects';
+import { useEduReducedMotion } from '@/lib/education/motion/useEduReducedMotion';
 import { useActiveClassroomGame, type ActiveGame } from '@/hooks/useActiveClassroomGame';
 import { useClassroomRewardListener } from '@/hooks/useClassroomRewardListener';
 import type { VocabularyLevel } from '@/lib/supabase/education/types';
@@ -129,9 +129,7 @@ export function AcademyHub(props: AcademyHubProps) {
   const { userId, studentName, classroomId, classroomName, level, avatarConfig, profileXp, isGuest, onSignOut, classroomLoading } = props;
   const { t, language, dir } = useLanguage();
   const router = useRouter();
-  const [reducedEffects] = useReducedEffects();
-  const prefersReduced = useReducedMotion();
-  const reducedMotion = reducedEffects || !!prefersReduced;
+  const reducedMotion = useEduReducedMotion();
   const hub = useHubLayout();
   const layout = hub.art;
   const wide = hub.chrome === 'wide';

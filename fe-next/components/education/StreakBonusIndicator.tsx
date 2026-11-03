@@ -13,7 +13,8 @@
  */
 
 import { memo, useMemo } from 'react';
-import { m, useReducedMotion } from 'framer-motion';
+import { m } from 'framer-motion';
+import { useEduReducedMotion } from '@/lib/education/motion/useEduReducedMotion';
 import { Flame } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -89,7 +90,7 @@ const StreakBonusIndicator = memo<StreakBonusIndicatorProps>(({
   className,
 }) => {
   const { t } = useLanguage();
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = useEduReducedMotion();
   const sizeConfig = SIZE_CONFIG[size];
   const bonus = useMemo(() => getStreakBonus(currentStreak), [currentStreak]);
 
