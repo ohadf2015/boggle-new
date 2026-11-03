@@ -18005,7 +18005,8 @@ const ja = {
       "grandSlam": "グランドスラム！",
       "grandSlamDesc": "デイリーミッション全制覇！",
       "xpReward": "+{{xp}} XP",
-      "goldReward": "+{{gold}} ゴールド"
+      "goldReward": "+{{gold}} ゴールド",
+      "progress": "デイリークエスト {{done}}/{{total}} 達成"
     }
   },
   "ads": {

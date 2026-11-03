@@ -18288,7 +18288,8 @@ const es = {
       "grandSlam": "¡Grand Slam!",
       "grandSlamDesc": "¡Todas las misiones diarias completadas!",
       "xpReward": "+{{xp}} XP",
-      "goldReward": "+{{gold}} Oro"
+      "goldReward": "+{{gold}} Oro",
+      "progress": "{{done}} de {{total}} misiones diarias completadas"
     }
   },
   "brag": {

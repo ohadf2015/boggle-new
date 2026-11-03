@@ -1,6 +1,9 @@
 'use client';
 
+import { useEffect } from 'react';
 import { CheckCheck, Flame } from 'lucide-react';
+import { fireVictoryConfetti } from '@/utils/confettiUtils';
+import { triggerHaptic } from '@/utils/hapticFeedback';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface DailyAllClearCardProps {
@@ -13,11 +16,29 @@ interface DailyAllClearCardProps {
  * where the hub used to fall back to a desaturated Word Wheel card still
  * labelled START QUEST — an invitation into a game the player had finished.
  *
- * Static on purpose (no entrance tween): a full-width opacity tween is a known
- * mobile-Chromium flash source (rules/60 Class 5).
+ * The card has no entrance tween (a full-width opacity tween is a known
+ * mobile-Chromium flash source, rules/60 Class 5); the first show each day
+ * fires a canvas confetti burst + haptic instead.
  */
+function celebrateOncePerDay(): boolean {
+  const key = `lc:daily-all-clear:${new Date().toISOString().slice(0, 10)}`;
+  try {
+    if (localStorage.getItem(key)) return false;
+    localStorage.setItem(key, '1');
+  } catch {
+    // storage blocked: celebrate anyway, a repeat beats a silent finish
+  }
+  return true;
+}
+
 export function DailyAllClearCard({ streak }: DailyAllClearCardProps) {
   const { t } = useLanguage();
+
+  useEffect(() => {
+    if (!celebrateOncePerDay()) return;
+    fireVictoryConfetti();
+    triggerHaptic('success');
+  }, []);
 
   return (
     <section
