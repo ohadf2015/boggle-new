@@ -16,6 +16,7 @@ import { startBotsForGame, restoreBotsForGame } from './botGame';
 import { endGame } from './gameEnd';
 import { startRoomBossClock, tickRoomBoss, pauseRoomBoss, resumeRoomBoss } from '../classroomBoss/roomBoss';
 import { ensureLanguageLoaded } from '../../dictionary';
+import gameStartCoordinator from '../../utils/gameStartCoordinator';
 import logger from '../../utils/logger';
 
 /**
@@ -38,7 +39,8 @@ const WORD_HUNT_NULL_STATE_RECOVERY_TICKS = 3;
 export function startGameTimer(
   io: Server,
   gameCode: string,
-  timerSeconds: number
+  timerSeconds: number,
+  remainingSeconds: number = timerSeconds,
 ): void {
   const game = getGame(gameCode);
   if (!game) return;
@@ -56,19 +58,20 @@ export function startGameTimer(
     timerElapsedOffsetMs: 0,
   });
 
+  const elapsedMs = (timerSeconds - remainingSeconds) * 1000;
   // The versus match is created at setup, before every player's 3-2-1.
   if (game.wordTowerVersusState) {
     const now = Date.now();
     updateGame(gameCode, {
-      wordTowerVersusState: { ...game.wordTowerVersusState, startedAtMs: now, endsAtMs: now + timerSeconds * 1000 },
+      wordTowerVersusState: { ...game.wordTowerVersusState, startedAtMs: now - elapsedMs, endsAtMs: now + remainingSeconds * 1000 },
     });
   }
 
   startRoomBossClock(game);
-  launchGameInterval(io, gameCode, timerSeconds * 1000, 0);
+  launchGameInterval(io, gameCode, remainingSeconds * 1000, elapsedMs);
 
   // Start bots if any are in the game
-  startBotsForGame(io, gameCode, game.letterGrid, game.language, timerSeconds);
+  startBotsForGame(io, gameCode, game.letterGrid, game.language, remainingSeconds);
 
   // NOTE: We do NOT broadcast 'startGame' here anymore.
   // The game start has already been broadcast from gameLifecycleHandler with all necessary data.
@@ -383,6 +386,9 @@ export async function resumeGameTimerIfMissing(io: Server, gameCode: string): Pr
   if (hasGameTimer(gameCode)) return false;
   // A teacher-paused round has no interval BY DESIGN — it is not orphaned.
   if (game.isPaused) return false;
+  // The 3-2-1 countdown starts the clock itself (countdownComplete or its 8s fallback).
+  const sequence = gameStartCoordinator.getSequenceStats(gameCode);
+  if (sequence && !sequence.timerStarted) return false;
 
   // Re-register bot AI instances lost on restart. The Bot objects are in-memory
   // only; their identity survived on game.users. Reconstruct them (preserving
@@ -410,12 +416,23 @@ export async function resumeGameTimerIfMissing(io: Server, gameCode: string): Pr
   }
 
   const duration = game.gameDuration || game.timerSeconds || 180;
+  const remaining = resolveResumeSeconds(game.remainingTime, duration);
   logger.info(
     'TIMER',
-    `Resuming timer for rehydrated in-progress game ${gameCode} (mode=${game.gameMode ?? 'classic'}, ${restoredBots} bots restored) — server-restart recovery`,
+    `Resuming timer for rehydrated in-progress game ${gameCode} at ${remaining}/${duration}s (mode=${game.gameMode ?? 'classic'}, ${restoredBots} bots restored) — server-restart recovery`,
   );
-  startGameTimer(io, gameCode, duration);
+  startGameTimer(io, gameCode, duration, remaining);
   return true;
+}
+
+/**
+ * Seconds left for a resumed round: the last persisted `remainingTime`, clamped
+ * to [1, duration]. Downtime between persist and restore is not deducted —
+ * nobody could play while the server was down, so it counts like a pause.
+ */
+function resolveResumeSeconds(saved: unknown, duration: number): number {
+  if (typeof saved !== 'number' || !Number.isFinite(saved) || saved <= 0) return duration;
+  return Math.min(duration, Math.max(1, Math.ceil(saved)));
 }
 
 /**

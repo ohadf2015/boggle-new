@@ -119,7 +119,7 @@ vi.mock('../../../backend/modules/lobbyAutoStart', () => ({
   shouldTriggerAutoStart: vi.fn(), cancelAutoStartCountdown: vi.fn(), clearAutoStartState: vi.fn(),
 }));
 vi.mock('../../../backend/utils/gameStartCoordinator', () => ({
-  default: { recordAcknowledgment: vi.fn(), recordCountdownComplete: vi.fn() },
+  default: { recordAcknowledgment: vi.fn(), recordCountdownComplete: vi.fn(), getSequenceStats: vi.fn(() => null) },
 }));
 
 import { registerGameLifecycleHandlers } from '../gameLifecycleHandler';
