@@ -78,6 +78,8 @@ export interface JoinFlowState {
   /** True once we are SURE the code is wrong. `unverified` never sets this. */
   codeRejected: boolean;
   codeErrorKey: string | null;
+  /** Bumps on every refused tap, so the same refusal shown twice still replays its alert. */
+  refusalTick: number;
   formErrorKey: string | null;
   nameError: boolean;
   suggestedName: string | null;
@@ -135,6 +137,7 @@ export function useJoinFlow(
   }, [initialCode]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [codeErrorKey, setCodeErrorKey] = useState<string | null>(seedTooLong ? CODE_TOO_LONG : null);
+  const [refusalTick, setRefusalTick] = useState(0);
   const [formErrorKey, setFormErrorKey] = useState<string | null>(null);
   const [nameError, setNameError] = useState(false);
   const [suggestedName, setSuggestedName] = useState<string | null>(null);
@@ -208,6 +211,7 @@ export function useJoinFlow(
       const effective = sanitizeJoinCode(codeArg ?? code);
       if (effective.length !== JOIN_CODE_LENGTH) {
         setCodeErrorKey('education.student.join.flow.codeTooShort');
+        setRefusalTick((n) => n + 1);
         return;
       }
       // Rule 1 above says nothing WAITS on the lookup. It does not say we throw
@@ -226,6 +230,7 @@ export function useJoinFlow(
       // therefore still advances, exactly as before.
       if (effective === code && target?.verdict === 'invalid') {
         setCodeErrorKey('education.student.join.invalidCode');
+        setRefusalTick((n) => n + 1);
         return;
       }
       setCodeErrorKey(null);
@@ -476,6 +481,7 @@ export function useJoinFlow(
     showNameField,
     codeRejected: target?.verdict === 'invalid',
     codeErrorKey,
+    refusalTick,
     formErrorKey,
     nameError,
     suggestedName,
