@@ -272,7 +272,7 @@ const HostView: React.FC<HostViewProps> = memo((props) => {
         />
         </MpRoundScreen>
       )}
-      {projectorShowsQuiz({ gameStarted: !!runtime.gameStarted, hasActiveGameData: !!hasActiveGameData, waitingForResults: !!runtime.waitingForResults, hostPlaying: !!settings.hostPlaying, hasBoard: !!runtime.tableData, isQuizRoom: isVocabQuizRoom }) && (
+      {projectorShowsQuiz({ gameStarted: !!runtime.gameStarted, hasActiveGameData: !!hasActiveGameData, waitingForResults: !!runtime.waitingForResults, hostPlaying: !!settings.hostPlaying, hasBoard: !!runtime.tableData, isQuizRoom: isVocabQuizRoom, hasRecap: !!tournament.finalScores?.classroomSummary }) && (
         <TvBroadcastView
           gameCode={gameCode}
           username={username}

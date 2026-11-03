@@ -89,4 +89,18 @@ describe('projectorShowsQuiz', () => {
       })
     ).toBe(true);
   });
+
+  it('hands the wall to the shared projector recap once the classroom results land', () => {
+    expect(
+      projectorShowsQuiz({
+        gameStarted: false,
+        hasActiveGameData: false,
+        waitingForResults: false,
+        hostPlaying: false,
+        hasBoard: false,
+        isQuizRoom: true,
+        hasRecap: true,
+      })
+    ).toBe(false);
+  });
 });

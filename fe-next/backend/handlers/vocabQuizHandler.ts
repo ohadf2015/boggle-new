@@ -296,10 +296,11 @@ export async function startVocabQuizForClassroom(io: Server, gameCode: string): 
   // The shell fields come from `vocabQuizShell` — the same builder late join,
   // reconnect and `requestGameState` use, so a student arriving mid-quiz gets
   // this exact start rather than the room's (null) grid.
+  session.shellSessionId = `${gameCode}:${now}`;
   broadcastToRoom(io, getGameRoom(gameCode), 'startGame', {
     ...buildQuizShellStart(session),
     messageId: `vocab-quiz-${gameCode}-${now}`,
-    gameSessionId: `${gameCode}:${now}`,
+    gameSessionId: session.shellSessionId,
   });
 
   // The question broadcast is itself the "a quiz is live" signal. A room-wide

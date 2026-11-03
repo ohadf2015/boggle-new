@@ -27,14 +27,11 @@ import { broadcastToRoom, getGameRoom } from '../../utils/socketHelpers';
 import { isSupabaseConfigured } from '../../modules/supabaseServer';
 import { recordGameResultsToSupabase, applyBoostsToScores } from './gameResults';
 import { updateRankedMmr, fetchRankedBaselines, type RankedParticipant, type MmdDelta } from '../../modules/supabase/rankedMmr';
-import { getClassroomGame, updateClassroomGameStatus, saveClassroomSessionScores, type ClassroomGame } from '../../modules/classroomGameManager';
+import { getClassroomGame, updateClassroomGameStatus } from '../../modules/classroomGameManager';
 import { hasQuizSession } from '../../modules/vocabQuizStore.js';
-import { buildClassroomSummary } from '../../modules/classroomSummary';
-import { buildClassroomPodium, splitNeverPlacedWords } from '../../modules/classroomResultsExtras';
-import { accumulateSessionScores, toSessionStandings } from '../../modules/classroomSessionScores';
+import { buildClassroomRoundSummary } from '../../modules/classroomRoundSummary';
 import { persistClassroomGameScores, playerScoresFromGameResults, roundHasStudents } from '../../handlers/classroomGamePersistence';
 import { DEFAULT_RATING, DEFAULT_RD } from '@/shared/utils/eloRating';
-import { clampTeamCount, reconcileTeams } from '@/shared/utils/teamBattle';
 import { PARTICIPATION_BONUS } from '@/shared/types/classroom';
 import type { UserData } from './types';
 import logger from '../../utils/logger';
@@ -224,138 +221,23 @@ export async function calculateAndBroadcastFinalScores(
     (playerResult as Record<string, unknown>).titles = titles[playerResult.username] || [];
   }
 
-  // Build the classroom summary if a teacher launched this room. Derived here,
-  // not on the client: `lessonGameData` only exists in the TEACHER's
-  // sessionStorage, so a client-side version is empty for every student.
-  // `classroomGame` was already fetched above (it drives the SPED participation
-  // bonus) — reuse it, never fetch twice.
+  // Built server-side: `lessonGameData` lives only in the TEACHER's
+  // sessionStorage, so a client-side recap is empty for every student.
   let classroomSummary;
   try {
     if (classroomGame) {
-      classroomSummary = buildClassroomSummary({
+      classroomSummary = await buildClassroomRoundSummary({
+        gameCode,
         language,
-        teacherName: classroomGame.teacherName,
-        lessonNames: classroomGame.lessonNames,
-        lessonIds: classroomGame.lessonIds,
-        vocabularyWords: classroomGame.vocabularyWords,
+        classroomGame,
+        participationBonus,
         players: resultsWithIconAchievements.map((p) => ({
           username: p.username,
-          // Bots are in finalScores; a bot finding a lesson word must not take
-          // it off the teacher's reteach list.
+          totalScore: p.totalScore,
           isBot: !!game.users?.[p.username]?.isBot,
-          wordDetails: (p.wordDetails || []) as Array<{
-            word: string; validated: boolean; isDuplicate?: boolean;
-          }>,
+          wordDetails: (p.wordDetails || []) as Array<{ word: string; validated: boolean; isDuplicate?: boolean }>,
         })),
-      }) ?? undefined;
-
-      if (classroomSummary) {
-        // Team battle: deal teams deterministically from the human roster so
-        // every client renders identical standings with no extra round-trip.
-        if (classroomSettings?.playStyle === 'teams') {
-          const humanNames = resultsWithIconAchievements
-            .filter((p) => !game.users?.[p.username]?.isBot)
-            .map((p) => p.username);
-          // Prefer the deal the round STARTED with — the one the projector has
-          // been painting for the last three minutes. Re-dealing here used to be
-          // harmless because teams were invisible until this screen; it is not
-          // harmless now, and `assignTeams` re-shuffles everybody whenever the
-          // roster changes, so a student who dropped mid-round would have flipped
-          // the whole class's colours between the board and the podium.
-          // `reconcileTeams` seats anyone the stored deal has not met yet.
-          if (!classroomGame?.teams?.length) {
-            // The projector painted a deal for this whole round. Losing it here
-            // means the podium re-deals from the roster that FINISHED, so a
-            // student who dropped mid-round silently recolours the class. Never
-            // silent (class 4) — a mismatch between the bar and the podium is
-            // exactly the kind of thing a room notices and we do not.
-            logger.warn(
-              'CLASSROOM_GAME',
-              `No stored team deal for ${gameCode} at results — re-dealing from the finishing roster`
-            );
-          }
-          classroomSummary.teamBattle = {
-            teamCount: clampTeamCount(classroomSettings.teamCount),
-            teams: reconcileTeams(
-              classroomGame?.teams,
-              humanNames,
-              classroomSettings.teamCount ?? 2,
-              gameCode
-            ),
-          };
-        }
-        if (participationBonus > 0) {
-          classroomSummary.participationBonus = participationBonus;
-        }
-        // The podium and the never-placed split: presentation facts the room
-        // sees before the coverage table. Server-built so the projector and
-        // every phone celebrate the same names.
-        classroomSummary.podium = buildClassroomPodium({
-          players: resultsWithIconAchievements.map((p) => ({
-            username: p.username,
-            totalScore: p.totalScore,
-            isBot: !!game.users?.[p.username]?.isBot,
-          })),
-          masteryByPlayer: classroomSummary.masteryByPlayer,
-          // The teacher holds a socket but never plays (classroom rooms force
-          // broadcast), so their zero was sorting onto the top plinth.
-          exclude: [classroomGame.teacherName],
-        });
-        // The LESSON total, not the round total. `resetGameForNewRound` zeroes
-        // the room's scores on every rematch, so without this fold each round's
-        // podium is a separate reset-to-zero contest and no screen can say who
-        // won the period. Folded here — the one place a round's final scores and
-        // the session-long Redis record are both in scope.
-        const sessionScores = accumulateSessionScores(
-          classroomGame.sessionScores,
-          resultsWithIconAchievements.map((p) => ({
-            username: p.username,
-            totalScore: p.totalScore,
-            isBot: !!game.users?.[p.username]?.isBot,
-          })),
-          [classroomGame.teacherName]
-        );
-        const roundsPlayed = (classroomGame.roundsPlayed ?? 0) + 1;
-        classroomSummary.roundsPlayed = roundsPlayed;
-        // Round one's podium already IS the session answer — a second list
-        // saying the same thing is noise on a projector.
-        if (roundsPlayed > 1) {
-          classroomSummary.sessionStandings = toSessionStandings(sessionScores);
-        }
-        // The team panel sums whole students, so it needs the whole class. On
-        // round one this is just round one's scores, which is what it should be.
-        if (classroomSummary.teamBattle) {
-          classroomSummary.teamBattle.scores = toSessionStandings(sessionScores).map((row) => ({
-            username: row.username,
-            score: row.totalScore,
-          }));
-        }
-        // AWAITED, deliberately. `roundsPlayed` for the NEXT round is read back
-        // off this same Redis record, and the record is rewritten whole
-        // (get → mutate → setex) by `beginClassroomRound` and
-        // `setClassroomGamePlacedVocabulary` at the start of round two. Fired
-        // and forgotten, this write races both: it can land after they have
-        // already read, and their `setex` then drops `sessionScores` — so
-        // round two reads `roundsPlayed` as undefined, computes 1 again, and
-        // the session leaderboard never appears at all. That is the bug this
-        // whole feature exists to fix, silently restored. The cost of awaiting
-        // is one Redis round-trip before a results payload that is already
-        // waiting on several; errors are swallowed inside.
-        await saveClassroomSessionScores(gameCode, sessionScores, roundsPlayed);
-
-        const neverPlaced = splitNeverPlacedWords({
-          missedWords: classroomSummary.missedWords,
-          placedWords: classroomGame.placedVocabulary,
-          language,
-        });
-        if (neverPlaced.length > 0) classroomSummary.neverPlacedWords = neverPlaced;
-        if (classroomSettings?.accessibility?.largeText || classroomSettings?.accessibility?.audioCues) {
-          classroomSummary.accessibility = {
-            largeText: !!classroomSettings.accessibility.largeText,
-            audioCues: !!classroomSettings.accessibility.audioCues,
-          };
-        }
-      }
+      });
     }
   } catch (err) {
     // Never let a Redis hiccup swallow the results broadcast — but say so, so
