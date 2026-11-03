@@ -5,7 +5,8 @@ import { Bot } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 
 interface SoloPlayPromptProps {
-  onPlayVsBots: () => void;
+  /** Omitted when START itself already starts vs bots: one action, not two. */
+  onPlayVsBots?: () => void;
   t: (path: string, params?: Record<string, string | number>) => string;
   className?: string;
 }
@@ -28,6 +29,7 @@ export const SoloPlayPrompt = memo<SoloPlayPromptProps>(function SoloPlayPrompt(
           {t('hostView.soloPrompt.subtitle')}
         </p>
       </div>
+      {onPlayVsBots && (
       <button
         type="button"
         onClick={onPlayVsBots}
@@ -40,6 +42,7 @@ export const SoloPlayPrompt = memo<SoloPlayPromptProps>(function SoloPlayPrompt(
         <Bot className="w-4 h-4" aria-hidden="true" />
         <span>{t('hostView.soloPrompt.cta')}</span>
       </button>
+      )}
     </div>
   );
 });

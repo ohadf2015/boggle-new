@@ -63,12 +63,12 @@ describe('PlayerRoster — phone one-row crew strip', () => {
         selfActions={<span data-testid="my-actions" />}
       />,
     );
-    const actions = screen.getByTestId('my-actions');
     const mine = screen.getAllByTestId('lobby-seat').find((el) => el.getAttribute('data-me') === 'true')!;
-    expect(mine.contains(actions)).toBe(true);
-    // The header row (the h2's flex row) no longer hosts the emote trigger.
-    const headerRow = screen.getByRole('heading', { level: 2 }).parentElement!;
-    expect(headerRow.contains(actions)).toBe(false);
+    const copies = screen.getAllByTestId('my-actions');
+    expect(copies.filter((el) => mine.contains(el))).toHaveLength(1);
+    // The other copy is the ≥720px header placement; on a phone it is hidden.
+    expect(screen.getByTestId('self-header-actions').contains(copies.find((el) => !mine.contains(el))!)).toBe(true);
+    expect(screen.getByTestId('self-header-actions').className).toMatch(/max-\[719px\]:hidden/);
   });
 
   it('the emote trigger carries its label so it reads as "emotes" at a glance', () => {

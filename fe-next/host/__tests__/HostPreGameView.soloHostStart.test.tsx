@@ -249,9 +249,11 @@ describe('HostPreGameView solo "play vs bots" prompt visibility', () => {
 
   const cta = 'hostView.soloPrompt.cta'; // mockT echoes the key
 
-  it('renders the play-vs-bots card for a PUBLIC host alone in the lobby', () => {
+  it('tells a PUBLIC host alone in the lobby, with START as the one vs-bots action (no second button)', () => {
     render(<HostPreGameView {...baseProps} isPrivate={false} />);
-    expect(screen.getByText(cta)).toBeInTheDocument();
+    expect(screen.getByTestId('solo-play-prompt')).toHaveTextContent('hostView.soloPrompt.title');
+    expect(screen.queryByText(cta)).not.toBeInTheDocument();
+    expect(capturedStartProps!.labelKey).toBe('hostView.startVsBots');
   });
 
   it('renders the card for a PLAYING host alone (hostPlaying=true, host in roster)', () => {
@@ -262,7 +264,7 @@ describe('HostPreGameView solo "play vs bots" prompt visibility', () => {
         playersReady={[{ username: 'Host', isHost: true }]}
       />,
     );
-    expect(screen.getByText(cta)).toBeInTheDocument();
+    expect(screen.getByTestId('solo-play-prompt')).toBeInTheDocument();
   });
 
   it('does NOT render the card once a human guest is present', () => {
@@ -272,21 +274,17 @@ describe('HostPreGameView solo "play vs bots" prompt visibility', () => {
         playersReady={[{ username: 'Guest', isHost: false }]}
       />,
     );
-    expect(screen.queryByText(cta)).not.toBeInTheDocument();
+    expect(screen.queryByTestId('solo-play-prompt')).not.toBeInTheDocument();
   });
 
   it('does NOT render the card for a PRIVATE/classroom host (they wait on specific humans)', () => {
     render(<HostPreGameView {...baseProps} isPrivate={true} />);
-    expect(screen.queryByText(cta)).not.toBeInTheDocument();
+    expect(screen.queryByTestId('solo-play-prompt')).not.toBeInTheDocument();
   });
 
-  it('pressing the card CTA starts directly with bots (explicit consent → no redundant dialog)', () => {
-    // The "Play vs Bots" card IS the consent, so it starts straight away via the
-    // bots path (onAutoStartWithBots → confirmSoloStart) — it must NOT re-open the
-    // confirm dialog (onStartGame), and the server fills the bots, so no client
-    // setAutoFill is emitted (parity with the dialog's "Skip & Play with bots").
+  it('pressing START vs bots starts directly with bots (explicit consent → no redundant dialog)', () => {
     render(<HostPreGameView {...baseProps} isPrivate={false} />);
-    act(() => { screen.getByText(cta).click(); });
+    act(() => { capturedStartProps!.onStartGame(); });
 
     const setAutoFill = emitMock.mock.calls.find(([evt]) => evt === 'setAutoFill');
     expect(setAutoFill).toBeUndefined();

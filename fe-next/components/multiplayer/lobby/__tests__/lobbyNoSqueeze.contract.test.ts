@@ -46,7 +46,7 @@ describe('host lobby no-squeeze contract', () => {
   });
 
   it('mode picker card keeps its automatic minimum so the grid can never be squashed', () => {
-    expect(hostView).toContain("cn(CARD, 'flex-1 flex flex-col')");
+    expect(hostView).toContain("cn(CARD, 'flex-[1_0_auto] flex flex-col')");
   });
 
   it('mode grid rows may stretch into free height but never compress below tile content', () => {

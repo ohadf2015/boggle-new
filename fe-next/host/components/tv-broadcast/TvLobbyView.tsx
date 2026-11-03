@@ -280,8 +280,10 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
               {t('tvLobby.viewOnlyBadge')}
             </span>
           </div>
-          <div className="shrink-0 rounded-neo-lg border-3 border-neo-black bg-neo-navy-light/70 shadow-hard p-4 tv:p-5">
+          {/* On a short projector the roster gives up height, never the mode tiles. */}
+          <div className="min-h-0 flex flex-col overflow-hidden rounded-neo-lg border-3 border-neo-black bg-neo-navy-light/70 shadow-hard p-4 tv:p-5">
             <PlayerRoster
+              className="min-h-0 flex-1"
               players={filteredPlayers}
               username={username}
               gameCode={gameCode}
@@ -291,7 +293,7 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
               variant="tv"
             />
           </div>
-          <div className="flex-1 min-h-0 flex flex-col rounded-neo-lg border-3 border-neo-black bg-neo-navy-light/70 shadow-hard p-4 tv:p-5">
+          <div className="flex-[1_0_auto] flex flex-col rounded-neo-lg border-3 border-neo-black bg-neo-navy-light/70 shadow-hard p-4 tv:p-5">
             <BattleModeCard
               fill
               selectedGameMode={selectedGameMode}

@@ -256,6 +256,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
             allRows={boardRows}
             rows={visible.rows}
             hiddenCount={visible.hiddenCount}
+            gapBeforeLast={visible.gapBeforeLast}
             isRevealed={(pos) => seen(`row-${pos}`)}
             onOpenChange={setStandingsOpen}
             t={t}

@@ -9,7 +9,7 @@ const row = (username: string, rank: number, score: number, isMe = false): MpSta
 describe('pickVisibleRows', () => {
   it('shows everyone when the room fits', () => {
     const rows = [row('a', 1, 9), row('b', 2, 8), row('c', 3, 7)];
-    expect(pickVisibleRows(rows, 8)).toEqual({ rows, hiddenCount: 0 });
+    expect(pickVisibleRows(rows, 8)).toEqual({ rows, hiddenCount: 0, gapBeforeLast: false });
   });
 
   it('keeps me visible in a big room: top (max-1) plus my row, counting the hidden', () => {
@@ -17,6 +17,7 @@ describe('pickVisibleRows', () => {
     const out = pickVisibleRows(rows, 8);
     expect(out.rows.map((r) => r.rank)).toEqual([1, 2, 3, 4, 5, 6, 7, 11]);
     expect(out.hiddenCount).toBe(4);
+    expect(out.gapBeforeLast).toBe(true);
   });
 
   it('when I am in the top slice, it is just the top slice', () => {
@@ -24,7 +25,14 @@ describe('pickVisibleRows', () => {
     const out = pickVisibleRows(rows, 8);
     expect(out.rows.map((r) => r.rank)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
     expect(out.hiddenCount).toBe(2);
+    expect(out.gapBeforeLast).toBe(false);
   });
+});
+
+it('pickVisibleRows: a tie that skips rank numbers is not a gap, only hidden positions are', () => {
+  const rows = [row('a', 1, 9), row('b', 2, 8), row('c', 2, 8), row('d', 4, 7), row('e', 5, 6, true)];
+  expect(pickVisibleRows(rows, 5).gapBeforeLast).toBe(false);
+  expect(pickVisibleRows([...rows.slice(0, 4), row('x', 5, 6), row('e', 6, 5, true)], 5).gapBeforeLast).toBe(true);
 });
 
 describe('mascotFor', () => {
