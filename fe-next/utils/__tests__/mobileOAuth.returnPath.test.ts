@@ -32,3 +32,19 @@ describe('native sign-in keeps the classroom return path', () => {
     expect(redirectTo).toBe(expected);
   });
 });
+
+describe('the native callback hop keeps next', () => {
+  it.each([
+    ['ios', 'ru', '/ru/student/join'],
+    ['android', 'en', '/en/education/access?from=teacher'],
+  ])('%s: Supabase adds the code, DeepLinkHandler routes it, the callback resolves back to %s', async (platform, locale, origin) => {
+    const { buildDeepLinkRoute } = await import('@/components/DeepLinkHandler');
+    const { nativeOAuthRedirectUrl, resolveAuthNext } = await import('@/lib/navigation/authReturnPath');
+    const returned = `${nativeOAuthRedirectUrl(platform, locale, origin)}&code=abc`;
+    const route = buildDeepLinkRoute(returned, 'en')!.route;
+    const params = new URL(route, 'https://x').searchParams;
+    expect(new URL(route, 'https://x').pathname).toBe(`/${locale}/auth/callback`);
+    expect(params.get('code')).toBe('abc');
+    expect(resolveAuthNext(params.get('next'), locale).url).toBe(origin);
+  });
+});

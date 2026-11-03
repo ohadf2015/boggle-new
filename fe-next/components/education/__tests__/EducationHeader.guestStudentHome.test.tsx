@@ -38,8 +38,10 @@ function linkHrefs(): (string | null)[] {
 
 function openMenus(): void {
   fireEvent.click(screen.getByLabelText('common.openMenu'));
-  const kebab = screen.queryByLabelText('education.header.menu');
-  if (kebab) fireEvent.click(kebab);
+  const kebab = screen.getByLabelText('common.menu');
+  fireEvent.click(kebab);
+  expect(kebab).toHaveAttribute('aria-expanded', 'true');
+  expect(screen.getAllByRole('menuitem').length).toBeGreaterThan(0);
 }
 
 describe.each(['en', 'he'])('EducationHeader home for every viewer, language=%s', (lang) => {
@@ -53,7 +55,9 @@ describe.each(['en', 'he'])('EducationHeader home for every viewer, language=%s'
     render(<EducationHeader />);
     openMenus();
     expect(linkHrefs()).not.toContain(`/${lang}`);
-    expect(screen.queryByText('education.header.exitEducation')).toBeNull();
+    for (const exit of screen.queryAllByText('education.header.exitEducation')) {
+      expect(exit.closest('a')).toHaveAttribute('href', `/${lang}/student`);
+    }
     expect(screen.getByLabelText('education.header.homeLink')).toHaveAttribute('href', `/${lang}/student`);
   });
 
@@ -68,7 +72,9 @@ describe.each(['en', 'he'])('EducationHeader home for every viewer, language=%s'
     authState = VIEWERS.public;
     render(<EducationHeader />);
     openMenus();
-    expect(screen.getByText('education.header.exitEducation').closest('a')).toHaveAttribute('href', `/${lang}`);
-    expect(screen.getByText('education.header.educationHome').closest('a')).toHaveAttribute('href', `/${lang}/education`);
+    const exits = screen.getAllByText('education.header.exitEducation');
+    expect(exits.length).toBe(2);
+    for (const exit of exits) expect(exit.closest('a')).toHaveAttribute('href', `/${lang}`);
+    expect(screen.getByLabelText('education.header.homeLink')).toHaveAttribute('href', `/${lang}/education`);
   });
 });
