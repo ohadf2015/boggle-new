@@ -47,6 +47,13 @@ describe('AnswerSlots — one row, always', () => {
     expect(cell.className).toContain('min(2.5rem,');
   });
 
+  it('lets a host cap the cell size (BridgeStage fits the tiles into a short stage)', () => {
+    render(<AnswerSlots {...base} slotCount={3} />);
+    const cell = screen.getAllByTestId('answer-slot')[0];
+    expect(cell.className).toContain('var(--cell-cap,2.5rem)');
+    expect(cell.className).toContain('var(--cell-cap-tall,3rem)');
+  });
+
   it('scales the letter with the cell instead of a fixed text size', () => {
     render(<AnswerSlots {...base} slotCount={14} />);
     const cell = screen.getAllByTestId('answer-slot')[0];

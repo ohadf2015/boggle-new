@@ -184,7 +184,17 @@ export default function PuzzleCard({
             </div>
           </div>
 
-          <div ref={stageRef} className="relative flex min-h-0 flex-1 flex-col justify-center py-2 group-has-[input:focus]/card:py-0 shell:py-4" style={{ containerType: 'inline-size' }}>
+          {/* Size container: BridgeStage caps its plates, tiles and river by this box's
+              height (cqh), so they shrink to fit instead of spilling over the action row
+              above or the feedback line below. `safe` centering never pushes content
+              past the top edge; the floor keeps a readable stage if a host ever
+              leaves this box without a flex height. */}
+          <div
+            ref={stageRef}
+            data-testid="puzzle-stage"
+            className="relative flex min-h-[11rem] flex-1 flex-col justify-center-safe py-2 group-has-[input:focus]/card:py-0 shell:py-4"
+            style={{ containerType: 'size' }}
+          >
             <BridgeStage word1={puzzle.word1} word2={puzzle.word2} isCorrect={isCorrect} isGaveUp={isGaveUp} isRTL={isRTL}>
               {needsIME ? (
                 <p
