@@ -119,6 +119,26 @@ describe('DeferredAuthProvider mount', () => {
     expect(await screen.findByTestId('auth-provider')).toBeTruthy();
   });
 
+  it('remounts with the cached AuthProvider without calling it as a state initializer', async () => {
+    pathname.current = '/en/teacher';
+    (globalThis as { __lcPathname?: string }).__lcPathname = '/en/teacher';
+    const first = render(
+      <DeferredAuthProvider>
+        <span>first</span>
+      </DeferredAuthProvider>,
+    );
+    await screen.findByTestId('auth-provider');
+    first.unmount();
+
+    render(
+      <DeferredAuthProvider>
+        <span>second</span>
+      </DeferredAuthProvider>,
+    );
+    expect(screen.getByTestId('auth-provider')).toBeTruthy();
+    expect(screen.getByText('second')).toBeTruthy();
+  });
+
   it('keeps the app subtree mounted when AuthProvider arrives on first tap', async () => {
     render(
       <DeferredAuthProvider>
