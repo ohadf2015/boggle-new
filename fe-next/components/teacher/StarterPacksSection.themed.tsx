@@ -71,7 +71,7 @@ export function ThemedPacksSection({ packs, onSelectPack }: ThemedProps) {
         <button
           type="button"
           onClick={() => setShowAll((v) => !v)}
-          className="min-h-11 rounded-neo border-2 border-neo-cream px-4 font-neo-body text-sm font-black text-neo-white hover:bg-neo-cream/10 focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
+          className="mx-auto flex min-h-11 w-full items-center justify-center rounded-neo border-2 border-dashed border-neo-cream/60 px-5 font-neo-body text-sm font-black text-neo-white transition-colors hover:border-solid hover:border-neo-cream hover:bg-neo-cream/10 focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan active:scale-[0.98] motion-reduce:transition-none @xl:w-auto"
         >
           {showAll
             ? t('education.starterPacks.themed.showLess')

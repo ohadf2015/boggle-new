@@ -122,7 +122,7 @@ export function SessionTemplatesSection(props: SessionsProps) {
         </h3>
         <p className="font-neo-body text-sm text-neo-white">{t('education.starterPacks.sessions.subtitle')}</p>
       </div>
-      <div className="grid grid-cols-1 gap-3 @xl:grid-cols-2 @5xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 @xl:grid-cols-2 @xl:[&>:last-child:nth-child(odd)]:col-span-2 @5xl:grid-cols-4 @5xl:[&>:last-child:nth-child(odd)]:col-span-1">
         {sessionsFor(props.language).map((session) => (
           <SessionCard key={session.id} session={session} {...props} />
         ))}

@@ -5,8 +5,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { STARTER_LESSON_PACKS, type StarterLessonPack } from '@/lib/education/starterLessonPacks';
 import { isPackLanguage, type PackLessonInput } from '@/lib/education/themedPacks';
-import { BookOpen, GraduationCap, Globe, Sparkles } from 'lucide-react';
-import { useThemedPacks } from './StarterPacksSection.data';
+import { BookOpen, GraduationCap, Globe, Plus } from 'lucide-react';
+import { actionClass, chipClass, starterGridClass, useThemedPacks } from './StarterPacksSection.data';
 import type { Language } from '@/lib/supabase/education/types';
 import { ContentLanguageChips, contentLanguagesFor } from '@/components/education/pickers/ContentLanguageChips';
 import { SessionTemplatesSection, type SessionRun } from './StarterPacksSection.sessions';
@@ -31,10 +31,10 @@ const categoryIcons = {
   language: Globe,
 };
 
-const categoryColors = {
-  general: { bg: 'bg-neo-cyan', border: 'border-s-neo-cyan' },
-  academic: { bg: 'bg-neo-pink', border: 'border-s-neo-pink' },
-  language: { bg: 'bg-neo-lime', border: 'border-s-neo-lime' },
+const categoryTile = {
+  general: 'bg-neo-cyan',
+  academic: 'bg-neo-pink',
+  language: 'bg-neo-lime',
 };
 
 function PackCard({
@@ -46,56 +46,36 @@ function PackCard({
 }) {
   const { t } = useLanguage();
   const Icon = categoryIcons[pack.category];
-  const colors = categoryColors[pack.category];
 
   return (
-    <div
-      className={cn(
-        'rounded-neo border-3 border-neo-cream shadow-hard bg-neo-navy/80',
-        'border-s-8',
-        colors.border,
-        'flex flex-col'
-      )}
-    >
-      <div className="p-5 flex-1">
-        <div className="flex items-center gap-3 mb-3">
-          <div
-            className={cn(
-              'w-10 h-10 rounded-neo border-3 border-black flex items-center justify-center shadow-hard-sm',
-              colors.bg
-            )}
-          >
-            <Icon className="w-5 h-5 text-black" />
+    <article data-testid="starter-pack-card" className="@container rounded-neo border-3 border-neo-cream bg-neo-navy/80 p-4 shadow-hard">
+      <div className="flex h-full flex-col gap-3 @2xl:flex-row @2xl:items-center @2xl:gap-5">
+        <div className="flex min-w-0 flex-1 flex-col gap-3">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className={cn(chipClass, 'bg-neo-cream')}>{t('teacher.lesson.words', { count: pack.words.length })}</span>
           </div>
-          <div>
-            <h4 className="text-lg font-neo-display font-black text-neo-white">
-              {t(pack.nameKey)}
-            </h4>
-            <span className="text-xs text-neo-white font-neo-body font-bold uppercase">
-              {t('teacher.lesson.words', { count: pack.words.length })}
+          <div className="flex items-start gap-3">
+            <div className="min-w-0 flex-1">
+              <h4 className="font-neo-display text-lg font-black text-neo-white">{t(pack.nameKey)}</h4>
+              <p className="mt-1 line-clamp-2 font-neo-body text-sm leading-relaxed text-neo-white">{t(pack.descriptionKey)}</p>
+            </div>
+            <span
+              aria-hidden="true"
+              className={cn(
+                'grid size-14 shrink-0 -rotate-3 place-items-center rounded-neo border-3 border-neo-black shadow-hard-sm @2xl:order-first',
+                categoryTile[pack.category],
+              )}
+            >
+              <Icon className="size-7 text-neo-black" />
             </span>
           </div>
         </div>
-        <p className="text-sm text-neo-white font-neo-body leading-relaxed">
-          {t(pack.descriptionKey)}
-        </p>
-      </div>
-      <div className="px-5 pb-5">
-        <button
-          onClick={onSelect}
-          className={cn(
-            'w-full min-h-11 flex items-center justify-center gap-2 px-4 py-3',
-            'bg-neo-lime text-black border-3 border-black',
-            'font-black font-neo-body text-sm rounded-neo shadow-hard-sm',
-            'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5',
-            'transition duration-100'
-          )}
-        >
-          <Sparkles className="w-4 h-4" />
+        <button type="button" onClick={onSelect} className={cn(actionClass, 'mt-auto bg-neo-cream @2xl:mt-0 @2xl:w-auto @2xl:shrink-0')}>
+          <Plus className="size-4" aria-hidden />
           {t('education.starterPacks.useThisPack')}
         </button>
       </div>
-    </div>
+    </article>
   );
 }
 
@@ -111,6 +91,7 @@ export const StarterPacksSection = memo<StarterPacksSectionProps>(({ onSelectPac
   const defaultLanguage = isPackLanguage(language) ? language : isPackLanguage(uiLanguage) ? uiLanguage : 'en';
   const contentLanguage = picked ?? defaultLanguage;
   const themedPacks = useThemedPacks(contentLanguage);
+  const starterPacks = packsForLanguage(contentLanguage);
 
   const handleSelect = useCallback(
     (pack: StarterLessonPack) => {
@@ -140,7 +121,7 @@ export const StarterPacksSection = memo<StarterPacksSectionProps>(({ onSelectPac
         onRunSession={onRunSession}
       />
       <ThemedPacksSection packs={themedPacks} onSelectPack={onSelectPack} />
-      <section aria-labelledby={headingId} className="space-y-4">
+      <section aria-labelledby={headingId} className="space-y-3">
         <div>
           <h3 id={headingId} className="text-xl font-neo-display font-black text-neo-white">
             {t('education.starterPacks.title')}
@@ -149,8 +130,8 @@ export const StarterPacksSection = memo<StarterPacksSectionProps>(({ onSelectPac
             {t('education.starterPacks.subtitle')}
           </p>
         </div>
-        <div className="grid grid-cols-1 @xl:grid-cols-2 @5xl:grid-cols-3 gap-4">
-          {packsForLanguage(contentLanguage).map((pack) => (
+        <div className={starterGridClass(starterPacks.length)}>
+          {starterPacks.map((pack) => (
             <PackCard
               key={pack.nameKey}
               pack={pack}
