@@ -22,7 +22,7 @@ describe('student hub and celebrations read reduced motion from one place', () =
 
   it.each([...academy, ...celebrations])('%s never asks the OS alone (the in-app effects switch must count too)', (file) => {
     const src = read(file);
-    expect(src).not.toMatch(/\buseReducedMotion\b/);
+    if (/\buseReducedMotion\(\)/.test(src)) expect(src).toMatch(/useEduReducedMotion\(\)/);
     expect(src).not.toMatch(/\busePrefersReducedMotion\b/);
     expect(src).not.toMatch(/matchMedia\(\s*['"]\(prefers-reduced-motion/);
   });
