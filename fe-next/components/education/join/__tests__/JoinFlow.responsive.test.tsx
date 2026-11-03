@@ -201,3 +201,22 @@ describe('<JoinFlow> before the catalogue loads', () => {
     expect(nameField().value).not.toContain('funNames');
   });
 });
+
+describe('<JoinFlow> repeated refusals', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockUseAuth.mockReturnValue({ user: null, loading: false });
+  });
+
+  it('Given a short code, When Next is tapped again, Then the alert is shown afresh instead of sitting still', () => {
+    render(<JoinFlow />);
+    fireEvent.change(screen.getByTestId('join-code-input'), { target: { value: 'P45' } });
+    const next = screen.getByRole('button', { name: `${K}.flow.next` });
+    fireEvent.click(next);
+    const first = screen.getByRole('alert');
+    fireEvent.click(next);
+    const second = screen.getByRole('alert');
+    expect(second).toHaveTextContent(`${K}.flow.codeTooShort`);
+    expect(second).not.toBe(first);
+  });
+});
