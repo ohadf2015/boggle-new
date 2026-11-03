@@ -4336,9 +4336,11 @@ const sv = {
     "teacherDeleteReasonTitle": "Vad är huvudorsaken till att du lämnar?",
     "teacherDeleteReason": {
       "too_many_emails": "För många mejl",
-      "not_using_it": "Använder det inte längre",
-      "privacy_concerns": "Integritetsskäl",
       "missing_features": "Funktioner saknas",
+      "too_expensive": "För dyrt",
+      "privacy": "Integritetsskäl",
+      "privacy_concerns": "Integritetsskäl",
+      "not_using_it": "Använder det inte längre",
       "found_alternative": "Hittat ett alternativ",
       "other": "Annat"
     },

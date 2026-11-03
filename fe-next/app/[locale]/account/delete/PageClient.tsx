@@ -206,10 +206,10 @@ export default function DeleteAccountPageClient() {
               <button
                 type="button"
                 onClick={handleDelete}
-                disabled={confirmText !== 'DELETE' || isLoading}
+                disabled={confirmText !== 'DELETE' || isLoading || (Boolean(impact?.isTeacher) && !reason)}
                 className={cn(
                   'w-full px-4 py-3 rounded-neo border-3 border-neo-red font-bold text-sm min-h-[44px] transition-colors',
-                  confirmText === 'DELETE' && !isLoading
+                  confirmText === 'DELETE' && !isLoading && (!impact?.isTeacher || Boolean(reason))
                     ? 'bg-neo-red text-white hover:bg-red-600'
                     : 'bg-gray-300 text-gray-500 border-gray-400 cursor-not-allowed'
                 )}
@@ -235,7 +235,7 @@ export default function DeleteAccountPageClient() {
                   isDarkMode ? 'bg-neo-navy-elevated text-white' : 'bg-white text-neo-black'
                 )}
               >
-                <ArrowLeft className="w-4 h-4 inline me-2" />
+                <ArrowLeft className="w-4 h-4 inline me-2 rtl:rotate-180" />
                 {t('deleteAccountWeb.backToHome')}
               </Link>
             </div>

@@ -3959,9 +3959,11 @@ const es = {
     "teacherDeleteReasonTitle": "¿Cuál es el motivo principal para irte?",
     "teacherDeleteReason": {
       "too_many_emails": "Demasiados correos",
-      "not_using_it": "Ya no lo uso",
-      "privacy_concerns": "Motivos de privacidad",
       "missing_features": "Faltan funciones",
+      "too_expensive": "Demasiado caro",
+      "privacy": "Motivos de privacidad",
+      "privacy_concerns": "Motivos de privacidad",
+      "not_using_it": "Ya no lo uso",
       "found_alternative": "Encontré una alternativa",
       "other": "Otro"
     },
