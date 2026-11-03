@@ -38,7 +38,7 @@ import {
   stashPendingActivation,
 } from '@/utils/activationGate';
 import { trackRetentionPlay } from '@/lib/retention/tracking';
-import { consumeAccountFirstGamePending } from '@/lib/retention/signupFirstGame';
+import { consumeAccountFirstGamePending } from '@/lib/retention/accountFirstGame';
 import {
   stampFirstWinClockStart,
   consumeFirstWinClockSeconds,
@@ -62,9 +62,7 @@ export type GrowthEvent =
   | 'session_start'
   | 'game_started'
   | 'game_completed'
-  // Once per account, on its first completed game after signup. Goal for the
-  // signup-first-game experiment (t_3b095edf). Both arms can reach it.
-  // Do not use game_started — control already converts ~89% on that.
+  // Once per account, on its first completed game after signup.
   | 'account_first_game'
   | 'game_abandoned'
   | 'game_abandon_attempted'
@@ -123,8 +121,6 @@ export type GrowthEvent =
   | 'next_step_clicked'
   // next_game_picked: a results CTA chose the next game.
   //   Picker props: { option, from, preset? | href? }.
-  //   First-game bridge (t_b883191f): { from_mode, to_mode, first_session: true,
-  //     experiment: 'first-game-bridge', variant: 'bridge' }.
   | 'next_game_picked'
   | 'daily_challenge_completed'
   | 'daily_puzzle_opened'
@@ -1766,7 +1762,7 @@ export const trackGameEnd = (
   // results_inline signup CTA gate: only after a real game_completed.
   if (completed) {
     markGameCompletedSignal();
-    // Once per fresh account, both experiment arms. No-op when no signup armed it.
+    // Once per fresh account. No-op when no signup armed it.
     const firstAccountGame = consumeAccountFirstGamePending();
     if (firstAccountGame) {
       trackGrowthEvent('account_first_game', {

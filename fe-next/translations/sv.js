@@ -5960,10 +5960,6 @@ const sv = {
       "title": "IMORGON: ny daglig utmaning",
       "countdown": "Nytt pussel om {time}"
     },
-    "firstGameBridge": {
-      "quickMatch": "Nästa: snabbmatch mot riktiga spelare",
-      "wordWheel": "Nästa: dagens ordhjul (2 min)"
-    },
     "saveStreak": {
       "title": "Spara min svit",
       "body": "Sviter sparas bara på den här enheten. Skapa ett gratiskonto så följer de med överallt."
@@ -8917,11 +8913,6 @@ const sv = {
     },
     "home": {
       "greeting": "Hej, {name}",
-      "signupFirstGame": {
-        "title": "Spela ditt första spel, {name}",
-        "titleNoName": "Spela ditt första spel",
-        "daily": "Dagens ordhjul (2 min)"
-      },
       "levelTitle": "Nivå {level} · {title}",
       "levelOnly": "Nivå {level}",
       "titles": {
@@ -10597,7 +10588,6 @@ const sv = {
       "guestNameRejected": "Välj ett annat namn",
       "guestNameFailed": "Kunde inte spara ditt namn. Försök igen.",
       "guestNamePrompt": "Vilket namn ska poängen sparas under?",
-      "guestNameKeep": "Behåll det här namnet",
       "guestNameProudFirst": "Du är #1 idag!",
       "guestNameProudRank": "Du är #{rank} av {total} idag!",
       "guestNameProudRankOnly": "Du är #{rank} idag!",

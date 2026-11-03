@@ -18,22 +18,22 @@ describe('useGrowthRadarFlag', () => {
     const getFlag = vi.fn(() => 'keep_name');
     installGr(getFlag);
     // When the hook is enabled
-    const { result } = renderHook(() => useGrowthRadarFlag('daily-guest-name-skip'));
+    const { result } = renderHook(() => useGrowthRadarFlag('example-flag'));
     // Then it resolves to the served variant
     await waitFor(() => expect(result.current).toBe('keep_name'));
-    expect(getFlag).toHaveBeenCalledWith('daily-guest-name-skip');
+    expect(getFlag).toHaveBeenCalledWith('example-flag');
   });
 
   it('does not read the flag (no exposure) while disabled', () => {
     const getFlag = vi.fn(() => 'keep_name');
     installGr(getFlag);
-    const { result } = renderHook(() => useGrowthRadarFlag('daily-guest-name-skip', false));
+    const { result } = renderHook(() => useGrowthRadarFlag('example-flag', false));
     expect(result.current).toBeNull();
     expect(getFlag).not.toHaveBeenCalled();
   });
 
   it('queues on window.grq and stays null until gr.js loads', () => {
-    const { result } = renderHook(() => useGrowthRadarFlag('daily-guest-name-skip'));
+    const { result } = renderHook(() => useGrowthRadarFlag('example-flag'));
     expect(result.current).toBeNull();
     expect(Array.isArray((window as unknown as { grq?: unknown[] }).grq)).toBe(true);
     expect((window as unknown as { grq: unknown[] }).grq).toHaveLength(1);

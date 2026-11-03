@@ -195,8 +195,6 @@ function AuthCallbackContent(): React.JSX.Element {
 
   // Helper to redirect after auth. When no explicit destination was requested,
   // always go to home page — education dashboards are manual entry only.
-  // (The signup-first-game card no longer keys off this redirect: it arms from
-  // AuthProvider's fresh-signup mark + the route the user lands on, t_5ebe9081.)
   const redirectWithRole = useCallback(async (_userId: string | undefined, next: string, isDefault: boolean) => {
     if (isDefault) {
       safeRedirect(getDefaultRedirect(locale));

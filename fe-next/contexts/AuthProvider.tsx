@@ -6,7 +6,7 @@ import { syncAuthAnalyticsTransition } from '@/utils/authAnalytics';
 import { consumePendingSignupCompletion, consumeSignupSource, isRecentAccount, maybeTrackSignupCompleted, setAnalyticsIdentity } from '@/utils/growthTracking';
 import { markAuthProviderMounted } from '@/lib/auth/authProviderMounted';
 import { persistProfileAttribution } from '@/utils/profileAttribution';
-import { markFreshSignup } from '@/lib/retention/signupFirstGame';
+import { markFreshSignup } from '@/lib/retention/accountFirstGame';
 import { isCountableSignupUser } from './auth/signupCountability';
 import type { AuthContextValue } from './auth/authTypes';
 import { AuthContext } from './AuthContext';
@@ -133,9 +133,8 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
       //
       // t_b6131f7d: anonymous Supabase sessions (classroom guest students
       // minted by signInAnonymously) are NOT signups — they get no
-      // signup_completed, no attribution write and no fresh-signup mark
-      // (which also keeps them out of the signup-first-game experiment and
-      // its account_first_game goal). They have a profiles row and a <1h-old
+      // signup_completed, no attribution write and no account_first_game
+      // goal. They have a profiles row and a <1h-old
       // account, so without this guard they passed every freshness check.
       if (wasGuest && isCountableSignupUser(user)) {
         // Unconditional canonical emit so PostHog "Signup Completed" goal
@@ -167,10 +166,7 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
         // values. Fire-and-forget; must never block the auth flow.
         if (isRecentAccount(user.created_at, Date.now())) {
           void persistProfileAttribution(source);
-          // t_3b095edf: arm the post-signup first-game card and the once-per-account
-          // goal. No-op if this account already completed a game — or if the session
-          // is anonymous (t_5ebe9081: anon classroom students are not signups).
-          // Never blocks auth.
+          // Arm the once-per-account first-game goal. Never blocks auth.
           markFreshSignup(user, source);
         }
         // Allowlist bridge: if this email was pre-approved for teacher access, consume the entry.

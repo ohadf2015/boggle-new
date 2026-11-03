@@ -2,15 +2,10 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import { markGuestNameChosen } from '@/utils/guestManager';
 import { isDefaultPlayerName } from '@/utils/defaultPlayerNames';
 import { trackGrowthEvent } from '@/utils/growthTracking';
-import { useGrowthRadarFlag } from '@/hooks/useGrowthRadarFlag';
 import { proudHeadline } from './guestNameCopy';
 import { MAX_GUEST_NAME_LENGTH, useGuestNameSave, type GuestNameT } from './useGuestNameSave';
-
-// Growth Radar A/B (rec 11904): control = forced prompt, keep_name = skippable.
-const SKIP_EXPERIMENT_KEY = 'daily-guest-name-skip';
 
 interface GuestNamePromptProps {
   name: string;
@@ -31,7 +26,6 @@ export function GuestNamePrompt({ name, guestFingerprint, rank, totalPlayers, on
   // A generated name is not offered back; a name the guest typed elsewhere is.
   const [draft, setDraft] = useState(isDefault ? '' : name);
   const { save, saving, error } = useGuestNameSave(name, guestFingerprint, onRenamed, t);
-  const canKeepName = useGrowthRadarFlag(SKIP_EXPERIMENT_KEY, true) === 'keep_name' && !isDefault;
   const shownRef = useRef(false);
 
   useEffect(() => {
@@ -39,12 +33,6 @@ export function GuestNamePrompt({ name, guestFingerprint, rank, totalPlayers, on
     shownRef.current = true;
     trackGrowthEvent('daily_guest_name_prompt_shown', { is_default: isDefault, rank: rank ?? null });
   }, [isDefault, rank]);
-
-  const keepName = () => {
-    markGuestNameChosen();
-    trackGrowthEvent('daily_guest_name_kept', { is_default: isDefault });
-    onDone();
-  };
 
   const placeholder = t('wordHunt.results.guestNamePlaceholder', 'Your name');
   const preview = draft.trim() || (isDefault ? placeholder : name);
@@ -116,15 +104,6 @@ export function GuestNamePrompt({ name, guestFingerprint, rank, totalPlayers, on
             </button>
           </div>
           {error && <p role="alert" className="text-xs text-neo-red font-bold">{error}</p>}
-          {canKeepName && (
-            <button
-              type="button"
-              onClick={keepName}
-              className="self-start text-xs font-bold opacity-70 underline underline-offset-2"
-            >
-              {t('wordHunt.results.guestNameKeep', 'Keep this name')}
-            </button>
-          )}
         </form>
       </DialogContent>
     </Dialog>

@@ -7,7 +7,7 @@
  * auth.users row AND a profiles row, so they pass every gate the signup
  * trackers use (user && profile, account < 1h old). Before this guard, an
  * anonymous classroom join fired signup_completed, persisted first-touch
- * attribution and armed the signup-first-game experiment exactly like a real
+ * attribution and armed the account-first-game goal exactly like a real
  * registration — Growth Radar counted 88 signups vs 49 real accounts in a
  * week, with the excess sitting on classroom days.
  *
