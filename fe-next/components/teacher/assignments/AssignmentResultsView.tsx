@@ -159,7 +159,7 @@ export function AssignmentResultsView({
               <li
                 key={s.studentId}
                 data-testid={`played-${s.studentId}`}
-                className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-neo border border-neo-cream/30 bg-neo-black/20 px-3 py-2"
+                className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-neo border border-neo-cream/40 bg-neo-black/20 px-3 py-2"
               >
                 <CheckCircle2 className="size-4 shrink-0 text-neo-lime" aria-hidden="true" />
                 <bdi className="min-w-0 flex-1 truncate font-bold">{s.name}</bdi>
