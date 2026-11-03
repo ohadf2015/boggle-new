@@ -15,7 +15,6 @@ import {
   type DailyModeId,
 } from '@/lib/dailyModes';
 import type { Language } from '@/types';
-import { saveFlySource } from '@/components/daily/flow/dailyFly';
 import { chainPips, markDailyHandoff, type ChainPip } from '@/components/daily/flow/dailyHandoff';
 import { useDailyReveal, useMountedAfterReveal } from './reveal/DailyRevealContext';
 
@@ -41,9 +40,9 @@ export interface NextQuestCtaProps {
 
 /* Full class strings only — Tailwind emits nothing for `bg-neo-${accent}`. */
 const PIP_CLASS: Record<ChainPip, string> = {
-  done: 'w-1.5 bg-neo-lime',
-  active: 'w-4 bg-neo-cream',
-  next: 'w-1.5 bg-neo-cream/25',
+  done: 'w-1.5 bg-neo-black',
+  active: 'w-5 bg-neo-black',
+  next: 'w-1.5 bg-neo-black/30',
 };
 
 const SEND_OFF: Keyframe[] = [
@@ -64,11 +63,13 @@ function playOn(el: HTMLElement | null, frames: Keyframe[], options: KeyframeAni
 }
 
 const ACCENTS = {
-  orange: { bar: 'bg-neo-orange', ring: 'focus-visible:ring-neo-orange' },
-  yellow: { bar: 'bg-neo-yellow', ring: 'focus-visible:ring-neo-yellow' },
-  cyan: { bar: 'bg-neo-cyan', ring: 'focus-visible:ring-neo-cyan' },
-  purple: { bar: 'bg-neo-purple', ring: 'focus-visible:ring-neo-purple' },
+  orange: { fill: 'bg-neo-orange', chip: 'text-neo-orange' },
+  yellow: { fill: 'bg-neo-yellow', chip: 'text-neo-yellow' },
+  cyan: { fill: 'bg-neo-cyan', chip: 'text-neo-cyan' },
+  purple: { fill: 'bg-neo-purple', chip: 'text-neo-purple' },
 } as const;
+
+const SLAB_HEIGHT = 'min-h-[120px] md:min-h-[148px]';
 
 /**
  * "What now?" for the end of a daily game.
@@ -96,7 +97,6 @@ export function NextQuestCta({
   const played = useDailyPlayedStatus();
   const reveal = useDailyReveal();
   const arrowRef = useRef<HTMLSpanElement>(null);
-  const artRef = useRef<HTMLSpanElement>(null);
   const late = useMountedAfterReveal();
   const pulse = reveal.active && reveal.done && !late;
 
@@ -115,7 +115,7 @@ export function NextQuestCta({
   if (played.loading) {
     return (
       <div
-        className={cn('w-full h-[84px] rounded-xl skeleton', className)}
+        className={cn('w-full h-[120px] md:h-[148px] rounded-xl skeleton', className)}
         aria-hidden="true"
         data-testid="next-quest-loading"
       />
@@ -165,7 +165,6 @@ export function NextQuestCta({
       onPointerDown={() => playOn(arrowRef.current, SEND_OFF, { duration: 260, easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)' })}
       onClick={() => {
         markDailyHandoff(mode.id);
-        if (artRef.current) saveFlySource(artRef.current.getBoundingClientRect());
         trackGrowthEvent('cross_promo_click', {
           target: mode.id,
           source,
@@ -176,31 +175,28 @@ export function NextQuestCta({
       data-testid="next-quest-cta"
       data-next-mode={mode.id}
       className={cn(
-        'group relative w-full overflow-hidden ps-6 pe-3 py-3 rounded-xl',
-        'border-2 border-neo-cream/40 shadow-hard bg-neo-navy-light/95',
-        'flex items-center gap-3 text-start cursor-pointer',
-        'focus-visible:outline-hidden focus-visible:ring-4',
-        accent.ring,
-        'active:translate-y-0.5 active:shadow-none transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity]',
+        'group relative w-full overflow-hidden px-4 py-4 md:px-6 md:py-5 rounded-xl',
+        SLAB_HEIGHT,
+        'border-3 border-neo-black shadow-hard-lg',
+        accent.fill,
+        'flex items-center gap-4 md:gap-6 text-start cursor-pointer',
+        'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cream',
+        'hover:brightness-110 active:translate-y-0.5 active:shadow-none transition-[transform,translate,scale,rotate,box-shadow,filter]',
         className,
       )}
     >
-      {/* Accent edge — start-anchored so it flips in Hebrew. */}
-      <span aria-hidden="true" className={cn('absolute start-0 top-0 bottom-0 w-2', accent.bar)} />
-
       {/* Decorative mascot, as a CSS background for the same reasons as the
           hub's compact rows — the label beside it names the mode. */}
       <span
-        ref={artRef}
         aria-hidden="true"
         role="presentation"
         data-art-url={mode.art}
         style={{ backgroundImage: `url(${mode.art})` }}
-        className="relative shrink-0 w-14 h-14 rounded-lg bg-cover bg-center border-2 border-neo-cream/40"
+        className="relative shrink-0 w-20 h-20 md:w-28 md:h-28 rounded-xl bg-cover bg-center border-3 border-neo-black"
       />
 
       <span className="relative flex-1 min-w-0">
-        <span className="flex items-center gap-2 text-xs font-bold text-neo-cream/70">
+        <span className="flex items-center gap-2 text-xs md:text-sm font-black uppercase tracking-wide text-neo-black/80">
           {t('daily.nextUp')}
           <span aria-hidden="true" data-testid="next-quest-pips" className="flex items-center gap-1">
             {pips.map((pip, i) => (
@@ -208,7 +204,7 @@ export function NextQuestCta({
             ))}
           </span>
         </span>
-        <span className="block text-lg leading-tight font-neo-display font-black text-neo-cream line-clamp-2">
+        <span className="block mt-1 text-2xl md:text-4xl leading-none font-neo-display font-black uppercase text-neo-black line-clamp-2">
           {t(mode.titleKey)}
         </span>
       </span>
@@ -217,12 +213,12 @@ export function NextQuestCta({
         ref={arrowRef}
         aria-hidden="true"
         className={cn(
-          'relative shrink-0 w-11 h-11 rounded-xl border-2 border-black flex items-center justify-center',
-          'text-neo-black shadow-hard-sm transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5',
-          accent.bar,
+          'relative shrink-0 w-14 h-14 md:w-20 md:h-20 rounded-full border-3 border-neo-black bg-neo-black flex items-center justify-center',
+          'shadow-hard-sm transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5',
+          accent.chip,
         )}
       >
-        <ArrowRight className="w-5 h-5 rtl:rotate-180" />
+        <ArrowRight className="w-7 h-7 md:w-10 md:h-10 rtl:rotate-180" strokeWidth={3.5} />
       </span>
     </Link>
   );
