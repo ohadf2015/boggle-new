@@ -1,9 +1,11 @@
 'use client';
 
+import { useLayoutEffect, useRef } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { DAILY_MODES, type DailyModeId } from '@/lib/dailyModes';
 import { cn } from '@/lib/utils';
 import { chainPips } from './dailyHandoff';
+import { flyKeyframes, takeFlySource } from './dailyFly';
 
 const PIP_CLASS = {
   done: 'w-2 bg-neo-lime',
@@ -18,8 +20,17 @@ const PIP_CLASS = {
  */
 export function DailyArrivalCard({ modeId }: { modeId: DailyModeId }) {
   const { t } = useLanguage();
+  const artRef = useRef<HTMLDivElement>(null);
   const index = DAILY_MODES.findIndex((md) => md.id === modeId);
   const mode = DAILY_MODES[index];
+  useLayoutEffect(() => {
+    const el = artRef.current;
+    const from = takeFlySource();
+    if (!el || !from || typeof el.animate !== 'function') return;
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    el.animate(flyKeyframes(from, el.getBoundingClientRect()), { duration: 460, easing: 'cubic-bezier(0.34, 1.4, 0.64, 1)' });
+  }, []);
+
   if (!mode) return null;
   const pips = chainPips(modeId);
 
@@ -32,7 +43,7 @@ export function DailyArrivalCard({ modeId }: { modeId: DailyModeId }) {
       <span className="text-[11px] font-black uppercase tracking-[0.2em] text-neo-lime/80">
         {t('daily.journeyStepOf', { n: index + 1, total: DAILY_MODES.length })}
       </span>
-      <div className="w-28 h-28 rounded-full border-3 border-neo-black overflow-hidden shadow-[4px_4px_0_black,0_0_24px_rgba(191,255,0,0.45)] motion-safe:animate-neo-pop">
+      <div ref={artRef} className="w-28 h-28 rounded-full border-3 border-neo-black overflow-hidden shadow-[4px_4px_0_black,0_0_24px_rgba(191,255,0,0.45)] motion-safe:animate-neo-pop">
         {/* eslint-disable-next-line @next/next/no-img-element -- loading-boundary art */}
         <img src={mode.art} alt="" className="w-full h-full object-cover" draggable={false} />
       </div>
