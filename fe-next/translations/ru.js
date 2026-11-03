@@ -15462,6 +15462,8 @@ const ru = {
       "not_using_it": "Больше не пользуюсь",
       "privacy_concerns": "Вопросы приватности",
       "missing_features": "Не хватает функций",
+      "too_expensive": "Слишком дорого",
+      "privacy": "Вопросы приватности",
       "found_alternative": "Нашёл альтернативу",
       "other": "Другое"
     },
