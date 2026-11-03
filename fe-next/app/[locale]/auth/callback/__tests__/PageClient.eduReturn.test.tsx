@@ -51,7 +51,8 @@ describe('auth callback keeps a classroom sign-in in the classroom', () => {
     query = 'next=%2Fru%2Fteacher';
     getSession.mockResolvedValue({ data: { session: { user: { id: 'u1' } } } });
     render(<AuthCallbackPageClient />);
-    await waitFor(() => expect(replace).toHaveBeenCalledWith('/en/teacher'));
+    await waitFor(() => expect(replace).toHaveBeenCalledWith('/ru/teacher'));
+    expect(replace).not.toHaveBeenCalledWith('/en/ru/teacher');
   });
 
   it('Try again on a stuck edu sign-in returns to the edu entry', async () => {

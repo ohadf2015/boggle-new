@@ -18,7 +18,7 @@ describe('server auth callback', () => {
   });
 
   it('a code-less hit from edu returns to the edu entry, keeping its query', async () => {
-    expect(await hit('next=%2Fru%2Feducation%2Faccess%3Ffrom%3Dteacher')).toBe('/en/education/access?from=teacher');
+    expect(await hit('next=%2Fru%2Feducation%2Faccess%3Ffrom%3Dteacher')).toBe('/ru/education/access?from=teacher');
   });
 
   it('a code-less hit with no next goes home', async () => {

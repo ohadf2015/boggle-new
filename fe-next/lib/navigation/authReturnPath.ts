@@ -33,13 +33,17 @@ function isSafeInternalPath(next: string): boolean {
   return next.startsWith('/') && !next.startsWith('//') && !next.startsWith('/\\');
 }
 
-/** `isDefault` means no real destination was asked for, so the caller applies the homepage policy. */
+/**
+ * Keeps next's own locale (the language the sign-in started in). `isDefault` means no real
+ * destination was asked for, so the caller applies the homepage policy.
+ */
 export function resolveAuthNext(nextParam: string | null | undefined, locale: string): { url: string; isDefault: boolean } {
   const home = `/${locale}`;
   if (!nextParam || !isSafeInternalPath(nextParam)) return { url: home, isDefault: true };
+  const ownLocale = LOCALE_PREFIX.exec(nextParam)?.[1];
   const rest = nextParam.replace(LOCALE_PREFIX, '');
-  if (rest === '' || rest === '/') return { url: home, isDefault: true };
-  return { url: `${home}${rest.startsWith('/') ? '' : '/'}${rest}`, isDefault: false };
+  if (rest === '' || rest === '/' || rest.startsWith('?') || rest.startsWith('#')) return { url: home, isDefault: true };
+  return { url: `/${ownLocale ?? locale}${rest}`, isDefault: false };
 }
 
 /** A failed or abandoned sign-in from edu goes back to its edu entry, not to the arcade. */

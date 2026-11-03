@@ -77,17 +77,21 @@ describe('resolveAuthNext', () => {
 
   for (const from of locales) {
     for (const cb of locales) {
-      it(`next=/${from}/teacher on a /${cb} callback never doubles the locale`, () => {
+      it(`next=/${from}/teacher on a /${cb} callback keeps the sign-in page's language and never doubles the locale`, () => {
         const { url, isDefault } = resolveAuthNext(`/${from}/teacher?from=x`, cb);
-        expect(url).toBe(`/${cb}/teacher?from=x`);
+        expect(url).toBe(`/${from}/teacher?from=x`);
         expect(isDefault).toBe(false);
       });
     }
   }
 
+  it('prefixes the callback locale when next has none', () => {
+    expect(resolveAuthNext('/teacher', 'ja')).toEqual({ url: '/ja/teacher', isDefault: false });
+  });
+
   it('does not mistake a path that begins with a locale code for a locale', () => {
-    expect(resolveAuthNext('/en/esl-word-games', 'es').url).toBe('/es/esl-word-games');
-    expect(resolveAuthNext('/es', 'en').url).toBe('/en');
+    expect(resolveAuthNext('/esl-word-games', 'en').url).toBe('/en/esl-word-games');
+    expect(resolveAuthNext('/es', 'en')).toEqual({ url: '/en', isDefault: true });
     expect(resolveAuthNext('/russian', 'en').url).toBe('/en/russian');
   });
 
@@ -103,7 +107,7 @@ describe('authFailureHref', () => {
       '/en/education/access?from=teacher&auth_error=true&reason=timeout',
     );
     expect(authFailureHref('en', '/ru/student/join', 'access_denied')).toBe(
-      '/en/student/join?auth_error=true&reason=access_denied',
+      '/ru/student/join?auth_error=true&reason=access_denied',
     );
   });
 
