@@ -48,7 +48,7 @@ export const THIRD_PARTY_SCRIPT_NOISE: RegExp[] = [
 ];
 
 /** Frame URLs of scripts we embed but don't ship, for Sentry `denyUrls`. */
-export const THIRD_PARTY_SCRIPT_URLS: RegExp[] = [/^https:\/\/accounts\.google\.com\/gsi\//];
+export const THIRD_PARTY_SCRIPT_URLS: RegExp[] = [/^https:\/\/accounts\.google\.com\/gsi\//, /^app:\/\/\/gsi\//];
 
 /**
  * Expected, handled conditions that still reach Sentry through a warn: rrweb's

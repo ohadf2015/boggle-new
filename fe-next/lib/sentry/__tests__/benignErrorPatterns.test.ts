@@ -108,6 +108,10 @@ describe('THIRD_PARTY_SCRIPT_URLS', () => {
     expect(denied('https://accounts.google.com/gsi/client')).toBe(true);
   });
 
+  it('denies the same frames after RewriteFrames renamed them', () => {
+    expect(denied('app:///gsi/client')).toBe(true);
+  });
+
   it('keeps our own chunks', () => {
     expect(denied('app:///_next/static/chunks/23388.98f755de3d41c170.js')).toBe(false);
     expect(denied('https://www.lexiclash.live/_next/static/chunks/gsi-button.js')).toBe(false);
