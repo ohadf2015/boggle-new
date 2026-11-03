@@ -88,9 +88,9 @@ function WaitingPreview() {
           <button
             type="button"
             onClick={() => setReady((v) => !v)}
-            className={ready
+            className={`focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan ${ready
               ? 'w-full rounded-neo border-3 border-neo-black bg-neo-lime py-3 font-black uppercase text-neo-black shadow-hard'
-              : 'w-full rounded-neo border-3 border-neo-lime bg-neo-navy py-3 font-black uppercase text-neo-lime shadow-hard'}
+              : 'w-full rounded-neo border-3 border-neo-lime bg-neo-navy py-3 font-black uppercase text-neo-lime shadow-hard'}`}
           >
             {ready ? t('playerView.readyConfirmed') : t('playerView.readyUp')}
           </button>

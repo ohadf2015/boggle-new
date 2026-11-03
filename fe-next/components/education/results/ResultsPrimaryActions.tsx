@@ -34,9 +34,9 @@ import { UnlockReportUpgradeCta } from './UnlockReportUpgradeCta';
  * original cyan chip with a black edge.
  */
 const QUIET_LINK =
-  'self-center flex items-center justify-center gap-1.5 px-2.5 py-1 font-neo-body font-bold text-xs text-neo-cream/85 rounded-neo border-[2px] border-neo-cream/50 hover:text-neo-cream hover:border-neo-cream transition-colors';
+  'self-center flex min-h-11 items-center justify-center gap-1.5 px-3 py-1 font-neo-body font-bold text-sm text-neo-cream rounded-neo border-[2px] border-neo-cream/60 hover:border-neo-cream transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan';
 const LOUD_LINK =
-  'self-center flex items-center justify-center gap-2 px-3 py-2 font-neo-body font-bold text-sm bg-neo-cyan text-neo-black border-[2px] border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard transition';
+  'self-center flex min-h-11 items-center justify-center gap-2 px-3 py-2 font-neo-body font-bold text-sm bg-neo-cyan text-neo-black border-[2px] border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan';
 
 export interface ResultsPrimaryActionsProps {
   /** Locale segment for the report href. */
@@ -86,7 +86,8 @@ export function ResultsPrimaryActions({
           className={cn(
             'flex items-center justify-center gap-2 px-4 py-4 font-neo-display font-bold text-lg',
             'bg-neo-yellow text-neo-black border-[3px] border-neo-black rounded-neo',
-            'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition'
+            'min-h-11 shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition',
+            'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
           )}
         >
           <RotateCcw className="w-6 h-6 shrink-0" aria-hidden />

@@ -45,8 +45,8 @@ export function AvatarQuickPick({ seed, onPick, onOpenBuilder, t, className }: A
             setPicked(s);
             onPick(getSeededAvatarConfig(s));
           }}
-          className={cn(
-            'size-11 shrink-0 overflow-hidden rounded-full border-[3px] [@media(max-height:700px)]:size-9 bg-neo-navy shadow-hard-sm transition-transform duration-150 active:scale-90 [&_svg]:h-full [&_svg]:w-full',
+          className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
+            'size-11 shrink-0 overflow-hidden rounded-full border-[3px] bg-neo-navy shadow-hard-sm transition-transform duration-150 active:scale-90 [&_svg]:h-full [&_svg]:w-full',
             'motion-safe:animate-[lc-pick-in_380ms_cubic-bezier(.34,1.56,.64,1)_both]',
             picked === s ? 'border-neo-lime ring-2 ring-neo-lime motion-safe:animate-[lc-pick-pop_420ms_cubic-bezier(.34,1.56,.64,1)]' : 'border-neo-cream'
           )}
@@ -64,7 +64,7 @@ export function AvatarQuickPick({ seed, onPick, onOpenBuilder, t, className }: A
           setPicked(null);
           setSpin((n) => n + 1);
         }}
-        className="flex size-11 shrink-0 items-center justify-center rounded-neo border-[3px] border-neo-black bg-neo-yellow [@media(max-height:700px)]:size-9 text-neo-black shadow-hard-sm transition-transform active:translate-y-0.5 active:shadow-none"
+        className="flex size-11 shrink-0 items-center justify-center rounded-neo border-[3px] border-neo-black bg-neo-yellow text-neo-black shadow-hard-sm transition-transform active:translate-y-0.5 active:shadow-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
       >
         <Dices
           key={spin}
@@ -79,7 +79,7 @@ export function AvatarQuickPick({ seed, onPick, onOpenBuilder, t, className }: A
         aria-label={t('eduStudent.lobby.buildLook')}
         title={t('eduStudent.lobby.buildLook')}
         onClick={onOpenBuilder}
-        className="flex size-11 shrink-0 items-center justify-center rounded-neo border-[3px] border-neo-black bg-neo-cyan [@media(max-height:700px)]:size-9 text-neo-black shadow-hard-sm transition-transform active:translate-y-0.5 active:shadow-none"
+        className="flex size-11 shrink-0 items-center justify-center rounded-neo border-[3px] border-neo-black bg-neo-cyan text-neo-black shadow-hard-sm transition-transform active:translate-y-0.5 active:shadow-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
       >
         <Pencil aria-hidden="true" className="size-5" strokeWidth={2.5} />
       </button>

@@ -85,7 +85,7 @@
       "name": "Måste studenter registrera sig?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Ja, men det är gratis och tar 30 sekunder. Mail eller Google-konto. Inget kreditkort, inga överraskningar."
+        "text": "Nej. Eleverna ansluter med en kod på 6 tecken och spelar i valfri webbläsare: ingen registrering, ingen mejl. Bara läraren har ett konto."
       }
     },
     {

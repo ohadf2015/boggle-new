@@ -86,7 +86,7 @@ export function WaitingWarmUp({ username, t }: { username: string; t: EduT }) {
               data-hot={hot ? 'true' : 'false'}
               aria-label={hot ? tr(t, 'academy.live.warmUpTapThis', 'Tap this one') : letter}
               onClick={() => tap(i)}
-              className={cn(
+              className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
                 'grid h-11 place-items-center rounded-neo lg:aspect-square lg:h-auto border-[3px] font-neo-display text-xl font-black leading-none transition-transform duration-100 motion-reduce:transition-none lg:text-2xl',
                 'motion-safe:active:scale-90',
                 hot

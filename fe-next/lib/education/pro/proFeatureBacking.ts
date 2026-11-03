@@ -11,7 +11,7 @@ export const PRO_FEATURE_BACKING: Record<string, ProFeatureBacking> = {
   classes: {
     route: 'app/api/education/classroom/create/route.ts',
     guard: 'canCreateClass(',
-    ui: 'components/teacher/setup/ClassSetupFlow.tsx',
+    ui: 'components/education/ClassSetupStart.tsx',
     tapsFromHq: 1,
     refusal: {
       file: 'app/api/education/classroom/create/__tests__/route.classLimit.test.ts',
@@ -140,5 +140,13 @@ export const PRO_FEATURES_GATED_ON_SOCKET: Record<string, { handler: string; gua
     handler: 'backend/handlers/classroomPressureHandler.ts',
     guard: 'teacherHasProAccess',
     test: 'backend/handlers/__tests__/classroomPressureHandler.test.ts',
+  },
+};
+
+export const PRO_FEATURES_GATED_IN_DATABASE: Record<string, { migration: string; guard: string; test: string }> = {
+  assignmentsPerClass: {
+    migration: 'supabase/migrations/20261026170100_enforce_free_assignment_cap.sql',
+    guard: 'ASSIGNMENT_LIMIT_REACHED',
+    test: 'lib/supabase/education/__tests__/assignments.capLimit.test.ts',
   },
 };

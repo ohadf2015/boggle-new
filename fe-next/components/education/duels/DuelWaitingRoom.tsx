@@ -88,7 +88,7 @@ export function DuelWaitingRoom({
               type="button"
               data-testid="duel-waiting-retry"
               onClick={onRetry}
-              className={cn(
+              className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
                 'inline-flex w-full items-center justify-center gap-2 rounded-neo border-[3px] border-neo-black bg-neo-lime px-4 py-3',
                 'font-neo-display text-base font-black uppercase italic tracking-tight text-neo-black shadow-hard',
                 'transition hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed'
@@ -102,7 +102,7 @@ export function DuelWaitingRoom({
               type="button"
               data-testid="duel-waiting-exit"
               onClick={onBackToLobby}
-              className={cn(
+              className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
                 'inline-flex w-full items-center justify-center gap-2 rounded-neo border-[3px] border-neo-cream bg-neo-navy px-4 py-2.5',
                 'font-neo-body text-sm font-black text-neo-cream shadow-hard-sm',
                 'transition hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed'

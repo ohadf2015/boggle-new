@@ -57,6 +57,10 @@ export function samplePreviewRound(variant: PreviewOutcome, { count = 0, longNam
       allWords: wordPlayers.get(p.username)?.allWords ?? wordsFor(p.score, i),
     }));
   const total = summary.totalWords;
+  // A student who scored nothing still played: without a row the wall counts fewer students than its own word chips.
+  for (const name of Object.keys(summary.masteryByPlayer)) {
+    if (name !== teacher && !players.some((p) => p.username === name)) players.push({ username: name, score: 0, wordsFoundCount: 0, allWords: [] });
+  }
   const seeded = players.length;
   for (let i = seeded; i < count; i++) {
     const n = i - seeded;

@@ -1,3 +1,4 @@
+import { PRO_COPY_PARAMS as P } from '@/lib/education/proFeatures';
 import { dictionaryFloor } from '@/lib/seo/dictionaryStats';
 import type { DepthSection } from '@/components/education/EducationDepthSections';
 export type { DepthSection };
@@ -126,7 +127,7 @@ const content: Record<EducationLocale, LocaleContent> = {
           'Nothing is machine-translated at play time: the board, the dictionary, and the interface language are three separate things.',
           'Hebrew is genuinely right-to-left, down to the direction the hard shadows fall and the way back arrows flip.',
           'Students join with a six-character code and no account, which matters most where school email addresses do not exist.',
-          'The free tier covers 3 classes of 50 students each; Teacher Pro is $9/month and adds unlimited classes and reports.',
+          `The free tier covers ${P.classes} classes of ${P.students} students each; Teacher Pro is ${P.price}/month and adds unlimited classes and reports.`,
         ],
       },
       {
@@ -173,13 +174,13 @@ const content: Record<EducationLocale, LocaleContent> = {
     faqTitle: 'Frequently Asked Questions',
     features: [
       { icon: '🌍', text: 'Six built-in dictionaries: English, Spanish, Hebrew (RTL), Swedish, Japanese, Russian' },
-      { icon: '⚡', text: 'Free student accounts — quick one-time setup, then tracks progress forever' },
-      { icon: '👥', text: 'Live multiplayer a whole class; pair-up duels for 2-by-2 practice' },
+      { icon: '⚡', text: 'No student sign-up — a 6-character code in any browser' },
+      { icon: '👥', text: `Live multiplayer for the whole class, up to ${P.students} students` },
       { icon: '📈', text: 'Per-student accuracy + class-wide missed-word patterns' },
-      { icon: '🎯', text: 'Five live class modes: Classic, Word Hunt, Blast, Wheel Rush, Vocab Quiz' },
+      { icon: '🎯', text: `${P.modes} live class modes, from Vocab Quiz and Boss Battle to Word Hunt and Wheel Rush` },
       { icon: '📱', text: 'Works on any phone, tablet, Chromebook, or laptop browser' },
       { icon: '⏱️', text: '5-minute warm-up format fits any lesson plan' },
-      { icon: '💸', text: 'Free to start — no student logins; free tier covers 3 classes of 50' },
+      { icon: '💸', text: `Free to start — no student logins; free tier covers ${P.classes} classes of ${P.students}` },
     ],
     proficiencyLevels: [
       { tag: 'Support', title: 'Beginner', desc: '3-4 letter words, longer timer, sight-word focus. Use the Word Wheel mode for guided practice.' },
@@ -201,7 +202,7 @@ const content: Record<EducationLocale, LocaleContent> = {
       },
       {
         q: 'Do students need an account to play?',
-        a: 'Yes, student accounts are required but always free. Teachers set up a classroom, and students join with a simple code. No payment needed, ever.',
+        a: 'No. Students join with a 6-character code and play in any browser: no sign-up, no email. Only the teacher has an account.',
       },
       {
         q: 'How do word games help English language learners?',
@@ -268,7 +269,7 @@ const content: Record<EducationLocale, LocaleContent> = {
           'שום דבר לא מתורגם אוטומטית בזמן המשחק: הלוח, המילון ושפת הממשק הם שלושה דברים נפרדים.',
           'העברית היא באמת מימין לשמאל, עד לכיוון שבו נופלות הצללים החדים ולאופן שבו חיצי החזרה מתהפכים.',
           'תלמידים מצטרפים עם קוד בן שישה תווים ובלי חשבון — קריטי במקומות שבהם אין כתובות מייל בית-ספריות.',
-          'המסלול החינמי כולל 3 כיתות עם 50 תלמידים בכל אחת; Teacher Pro עולה $9 לחודש ומוסיף כיתות ללא הגבלה ודוחות.',
+          `המסלול החינמי כולל ${P.classes} כיתות עם ${P.students} תלמידים בכל אחת; Teacher Pro עולה ${P.price} לחודש ומוסיף כיתות ללא הגבלה ודוחות.`,
         ],
       },
       {
@@ -315,10 +316,10 @@ const content: Record<EducationLocale, LocaleContent> = {
     faqTitle: 'שאלות נפוצות',
     features: [
       { icon: '🌍', text: '6 מילונים: אנגלית, ספרדית, עברית (RTL), שוודית, יפנית, רוסית' },
-      { icon: '⚡', text: 'חשבונות חינמיים — הגדרה מהירה, ואז מעקב התקדמות' },
-      { icon: '👥', text: 'ריבוי משתתפים חי — כל הכיתה; דו־קרבות בזוגות' },
+      { icon: '⚡', text: 'בלי הרשמה לתלמידים — קוד בן 6 תווים בכל דפדפן' },
+      { icon: '👥', text: `משחק חי לכל הכיתה, עד ${P.students} תלמידים` },
       { icon: '📈', text: 'דיוק לכל תלמיד + מילים קשות לכל הכיתה' },
-      { icon: '🎯', text: '3 משחקים: Boggle, Word Hunt, Word Wheel' },
+      { icon: '🎯', text: `${P.modes} מצבי משחק חיים לכיתה, מחידון אוצר מילים וקרב בוס ועד Word Hunt ו-Wheel Rush` },
       { icon: '📱', text: 'טלפון, טאבלט, Chromebook, כל דפדפן' },
       { icon: '⏱️', text: 'חימום של 5 דקות — לכל תוכנית שיעור' },
       { icon: '💸', text: 'חינם לשחק — בלי עלות לכל תלמיד, בלי חשבונות' },
@@ -343,7 +344,7 @@ const content: Record<EducationLocale, LocaleContent> = {
       },
       {
         q: 'האם תלמידים צריכים חשבון?',
-        a: 'כן, צריך חשבון — אבל הוא תמיד חינמי. המורה פותח כיתה, התלמידים נכנסים עם קוד. אפס עלות.',
+        a: 'לא. התלמידים נכנסים עם קוד בן 6 תווים ומשחקים מכל דפדפן: בלי הרשמה ובלי מייל. רק למורה יש חשבון.',
       },
       {
         q: 'איך משחקי מילים עוזרים בלימוד?',
@@ -410,7 +411,7 @@ const content: Record<EducationLocale, LocaleContent> = {
           'Nada se traduce automáticamente durante la partida: el tablero, el diccionario y el idioma de la interfaz son tres cosas distintas.',
           'El hebreo es de derecha a izquierda de verdad, hasta la dirección de las sombras duras y el giro de las flechas de volver.',
           'Los estudiantes entran con un código de seis caracteres y sin cuenta, lo que importa más donde no hay correos escolares.',
-          'El plan gratuito cubre 3 clases de 50 estudiantes cada una; Teacher Pro cuesta $9/mes y añade clases ilimitadas e informes.',
+          `El plan gratuito cubre ${P.classes} clases de ${P.students} estudiantes cada una; Teacher Pro cuesta ${P.price}/mes y añade clases ilimitadas e informes.`,
         ],
       },
       {
@@ -457,13 +458,13 @@ const content: Record<EducationLocale, LocaleContent> = {
     faqTitle: 'Preguntas Frecuentes',
     features: [
       { icon: '🌍', text: '6 diccionarios: inglés, español, hebreo (RTL), sueco, japonés, ruso' },
-      { icon: '⚡', text: 'Cuentas gratis — solo una vez, luego sigue el progreso' },
-      { icon: '👥', text: 'Multijugador — toda la clase; duelos de parejas' },
+      { icon: '⚡', text: 'Sin registro de estudiantes — un código de 6 caracteres en cualquier navegador' },
+      { icon: '👥', text: `Multijugador en vivo para toda la clase, hasta ${P.students} estudiantes` },
       { icon: '📈', text: 'Precisión por alumno + palabras difíciles de la clase' },
-      { icon: '🎯', text: '3 juegos: Boggle, Word Hunt, Word Wheel' },
+      { icon: '🎯', text: `${P.modes} modos en vivo para la clase, del quiz de vocabulario y la batalla contra el jefe a Word Hunt y Wheel Rush` },
       { icon: '📱', text: 'Teléfono, tableta, Chromebook, cualquier navegador' },
       { icon: '⏱️', text: 'Calentamiento de 5 minutos — cualquier plan' },
-      { icon: '💸', text: 'Sin cuentas de alumnado; 3 clases de hasta 50 alumnos en el plan gratuito' },
+      { icon: '💸', text: `Sin cuentas de alumnado; ${P.classes} clases de hasta ${P.students} alumnos en el plan gratuito` },
     ],
     proficiencyLevels: [
       { tag: 'Apoyo', title: 'Principiante', desc: 'Palabras cortas, tiempo largo, palabras de vista. Word Wheel para práctica guiada.' },
@@ -485,7 +486,7 @@ const content: Record<EducationLocale, LocaleContent> = {
       },
       {
         q: '¿Necesitan cuenta?',
-        a: 'Sí, pero es gratis. Los maestros crean el aula, estudiantes entran con código. Sin pago.',
+        a: 'No. Entran con un código de 6 caracteres y juegan en cualquier navegador: sin registro ni correo. Solo el docente tiene cuenta.',
       },
       {
         q: '¿Cómo ayudan los juegos?',
@@ -511,7 +512,7 @@ const content: Record<EducationLocale, LocaleContent> = {
         // GSC 28d (2026-09-13): "juegos para aprender inglés gratis",
         // "juego de inglés gratis" — ~40 impr at pos 8-21, near-zero CTR.
         q: '¿Son gratis estos juegos de palabras en inglés?',
-        a: 'Sí. La cuenta de docente, hasta 3 clases y las rondas con tus propias listas son gratis, sin tarjeta y sin anuncios para los estudiantes. Teacher Pro (9 $/mes) solo añade clases ilimitadas e informes imprimibles — una clase completa cabe en el nivel gratuito.',
+        a: `Sí. La cuenta de docente, hasta ${P.classes} clases y las rondas con tus propias listas son gratis, sin tarjeta y sin anuncios para los estudiantes. Teacher Pro (${P.price}/mes) solo añade clases ilimitadas e informes imprimibles — una clase completa cabe en el nivel gratuito.`,
       },
       {
         // GSC: "juegos para aprender vocabulario en ingles" pos 20.9,
@@ -579,7 +580,7 @@ const content: Record<EducationLocale, LocaleContent> = {
           'Inget maskinöversätts under spelets gång: brädet, ordlistan och gränssnittsspråket är tre skilda saker.',
           'Hebreiskan är på riktigt från höger till vänster, ända ner till åt vilket håll de hårda skuggorna faller.',
           'Elever ansluter med en kod på sex tecken och utan konto, vilket betyder mest där skolmejladresser inte finns.',
-          'Gratisplanen täcker 3 klasser med 50 elever vardera; Teacher Pro kostar $9/månad och lägger till obegränsade klasser och rapporter.',
+          `Gratisplanen täcker ${P.classes} klasser med ${P.students} elever vardera; Teacher Pro kostar ${P.price}/månad och lägger till obegränsade klasser och rapporter.`,
         ],
       },
       {
@@ -626,13 +627,13 @@ const content: Record<EducationLocale, LocaleContent> = {
     faqTitle: 'Vanliga Frågor',
     features: [
       { icon: '🌍', text: '6 ordböcker: engelska, spanska, hebreiska (RTL), svenska, japanska, ryska' },
-      { icon: '⚡', text: 'Gratis konton — snabb setup, sedan sparas framstegen' },
-      { icon: '👥', text: 'Flerspelar — hela klassen; pardueller' },
+      { icon: '⚡', text: 'Ingen elevregistrering — en kod på 6 tecken i valfri webbläsare' },
+      { icon: '👥', text: `Live multiplayer för hela klassen, upp till ${P.students} elever` },
       { icon: '📈', text: 'Noggrannhet per elev + klassens svåra ord' },
-      { icon: '🎯', text: '3 spel: Boggle, Word Hunt, Word Wheel' },
+      { icon: '🎯', text: `${P.modes} livelägen för klassen, från ordförrådsquiz och bosstrid till Word Hunt och Wheel Rush` },
       { icon: '📱', text: 'Telefon, surfplatta, Chromebook, vilken webbläsare som helst' },
       { icon: '⏱️', text: 'Uppvärmning på 5 minuter — vilken lektion som helst' },
-      { icon: '💸', text: 'Inga elevkonton; 3 klasser med upp till 50 elever i gratisnivån' },
+      { icon: '💸', text: `Inga elevkonton; ${P.classes} klasser med upp till ${P.students} elever i gratisnivån` },
     ],
     proficiencyLevels: [
       { tag: 'Stöd', title: 'Nybörjare', desc: 'Korta ord, längre timer, sight-ord. Word Wheel för guidad övning.' },
@@ -654,7 +655,7 @@ const content: Record<EducationLocale, LocaleContent> = {
       },
       {
         q: 'Måste elever ha konto?',
-        a: 'Ja, men det är gratis. Lärare gör klassrummet, elever ansluter med kod. Ingen betalning.',
+        a: 'Nej. Eleverna ansluter med en kod på 6 tecken och spelar i valfri webbläsare: ingen registrering, ingen mejl. Bara läraren har ett konto.',
       },
       {
         q: 'Hur hjälper ordspel?',
@@ -704,12 +705,12 @@ const content: Record<EducationLocale, LocaleContent> = {
       {
         heading: '英語の答えはどの辞書で判定されるか',
         answer:
-          `英語の答えは授業用の短いリストではなく、${dictionaryFloor('en', 'ja')}語以上の辞書で判定されます。ほかの6言語もそれぞれ独自の辞書を持ちます：スペイン語${dictionaryFloor('es', 'ja')}語以上、スウェーデン語${dictionaryFloor('sv', 'ja')}語以上、ヘブライ語${dictionaryFloor('he', 'ja')}語以上、ロシア語${dictionaryFloor('ru', 'ja')}語以上、日本語は${dictionaryFloor('ja', 'ja')}語以上のひらがな語。`,
+          `英語の答えは授業用の短いリストではなく、${dictionaryFloor('en', 'ja')}語以上の辞書で判定されます。ほかの${P.languages}言語もそれぞれ独自の辞書を持ちます：スペイン語${dictionaryFloor('es', 'ja')}語以上、スウェーデン語${dictionaryFloor('sv', 'ja')}語以上、ヘブライ語${dictionaryFloor('he', 'ja')}語以上、ロシア語${dictionaryFloor('ru', 'ja')}語以上、日本語は${dictionaryFloor('ja', 'ja')}語以上のひらがな語。`,
         points: [
           '本物の単語を見つければ、レッスンのリストになくても得点になります。辞書はワークシートではなく言語そのものです。',
           '先生のカスタムリストは練習ドリルを動かし続けるので、その週の目標語彙が繰り返されます。',
           'どの辞書もその言語のために作られた別々の語彙集合で、英語の規則で判定されるものはありません。',
-          '6言語がそれぞれの辞書を備えています：英語、ヘブライ語、スウェーデン語、日本語、スペイン語、ロシア語。',
+          `${P.languages}言語がそれぞれの辞書を備えています：英語、ヘブライ語、スウェーデン語、日本語、スペイン語、ロシア語。`,
         ],
       },
       {
@@ -721,7 +722,7 @@ const content: Record<EducationLocale, LocaleContent> = {
           'プレイ中に機械翻訳されるものはありません。盤、辞書、インターフェースの言語は別々のものです。',
           'ヘブライ語は本当に右から左で、影の落ちる向きや戻る矢印の反転まで含みます。',
           '生徒は6文字のコードで、アカウントなしで参加できます。学校のメールアドレスがない場所ほど効きます。',
-          '無料プランは3クラス・各クラス50人まで。Teacher Pro は月$9で、クラス数無制限とレポートが加わります。',
+          `無料プランは${P.classes}クラス・各クラス${P.students}人まで。Teacher Pro は月${P.price}で、クラス数無制限とレポートが加わります。`,
         ],
       },
       {
@@ -768,10 +769,10 @@ const content: Record<EducationLocale, LocaleContent> = {
     faqTitle: 'よくある質問',
     features: [
       { icon: '🌍', text: '6つの辞書：英語、スペイン語、ヘブライ語（RTL）、スウェーデン語、日本語、ロシア語' },
-      { icon: '⚡', text: '無料。快速セットアップで、あとはずっと成績記録。' },
-      { icon: '👥', text: 'マルチプレイヤー — 最大30人; ペアデュエル' },
+      { icon: '⚡', text: '生徒の登録不要 — どのブラウザでも6文字のコードで参加' },
+      { icon: '👥', text: `クラス全員でライブ対戦、最大${P.students}人` },
       { icon: '📈', text: '生徒ごとの正確さ + クラスの苦手単語' },
-      { icon: '🎯', text: '3つのゲーム：Boggle、Word Hunt、Word Wheel' },
+      { icon: '🎯', text: `クラス向けライブモード${P.modes}種類：語彙クイズやボスバトルからWord Hunt、Wheel Rushまで` },
       { icon: '📱', text: 'スマホ、タブレット、Chromebook、どのブラウザでも' },
       { icon: '⏱️', text: '5分ウォームアップ — どの授業でも合う' },
       { icon: '💸', text: '無料でプレイ — 生徒ごとの料金なし、アカウント不要' },
@@ -796,7 +797,7 @@ const content: Record<EducationLocale, LocaleContent> = {
       },
       {
         q: 'アカウントが必要？',
-        a: 'はい、でも無料。先生がクラスを作成、生徒はコードで参加。支払いなし。',
+        a: 'いいえ。生徒は6文字のコードで参加し、どのブラウザでも遊べます。登録もメールも不要です。アカウントが必要なのは先生だけです。',
       },
       {
         q: 'どう役立つ？',
@@ -863,7 +864,7 @@ const content: Record<EducationLocale, LocaleContent> = {
           'Во время игры ничего не переводится машинно: доска, словарь и язык интерфейса — три разные вещи.',
           'Иврит по-настоящему справа налево — вплоть до того, куда падают жёсткие тени и как разворачиваются стрелки назад.',
           'Ученики входят по коду из шести символов и без аккаунта — это важнее всего там, где школьной почты не существует.',
-          'Бесплатный план — 3 класса по 50 учеников; Teacher Pro стоит $9 в месяц и добавляет неограниченные классы и отчёты.',
+          `Бесплатный план — ${P.classes} класса по ${P.students} учеников; Teacher Pro стоит ${P.price} в месяц и добавляет неограниченные классы и отчёты.`,
         ],
       },
       {
@@ -910,13 +911,13 @@ const content: Record<EducationLocale, LocaleContent> = {
     faqTitle: 'Часто задаваемые вопросы',
     features: [
       { icon: '🌍', text: 'Шесть встроенных словарей: Английский, Испанский, Иврит (RTL), Шведский, Японский, Русский' },
-      { icon: '⚡', text: 'Бесплатные учетные записи ученика — быстрая настройка, затем отслеживание прогресса всегда' },
+      { icon: '⚡', text: 'Без регистрации учеников — код из 6 символов в любом браузере' },
       { icon: '👥', text: 'Живой многопользовательский режим до 30 учащихся; парные поединки 1на1' },
       { icon: '📈', text: 'Точность по каждому ученику + трудные слова для всего класса' },
-      { icon: '🎯', text: 'Три игровых режима: Boggle, Word Hunt, Word Wheel' },
+      { icon: '🎯', text: `${P.modes} живых режимов для класса: от словарной викторины и битвы с боссом до Word Hunt и Wheel Rush` },
       { icon: '📱', text: 'Работает на любом телефоне, планшете, Chromebook или веб-браузере' },
       { icon: '⏱️', text: 'Формат 5 минут подходит для любого плана урока' },
-      { icon: '💸', text: 'Без аккаунтов учеников; 3 класса по 50 учеников в бесплатном тарифе' },
+      { icon: '💸', text: `Без аккаунтов учеников; ${P.classes} класса по ${P.students} учеников в бесплатном тарифе` },
     ],
     proficiencyLevels: [
       { tag: 'Поддержка', title: 'Начинающий', desc: 'Слова из 3–4 букв, более длительный таймер, обычные слова. Word Wheel для направленной практики.' },
@@ -938,7 +939,7 @@ const content: Record<EducationLocale, LocaleContent> = {
       },
       {
         q: 'Нужна ли учащимся учетная запись?',
-        a: 'Да, учетные записи необходимы, но бесплатны. Учитель создает класс, а ученики присоединяются с простым кодом. Никаких платежей, никогда.',
+        a: 'Нет. Ученики входят по коду из 6 символов и играют в любом браузере: без регистрации и почты. Аккаунт нужен только учителю.',
       },
       {
         q: 'Как словесные игры помогают учащимся?',

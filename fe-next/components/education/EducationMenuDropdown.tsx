@@ -60,9 +60,9 @@ export const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={cn(
+        className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
           'flex items-center justify-center',
-          'w-10 h-10 sm:w-11 sm:h-11',
+          'w-11 h-11',
           'bg-neo-navy text-neo-white',
           'border-3 border-neo-cream/40',
           'rounded-neo shadow-hard-sm',
@@ -97,7 +97,7 @@ export const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
                   href={`/${language}/teacher`}
                   role="menuitem"
                   onClick={() => setIsOpen(false)}
-                  className={cn(
+                  className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
                     'flex items-center gap-2 px-3 py-2 text-sm font-bold rounded-neo transition-colors',
                     isOnTeacherSection
                       ? 'bg-neo-cyan text-neo-black'
@@ -135,7 +135,7 @@ export const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
                   href={`/${language}/student`}
                   role="menuitem"
                   onClick={() => setIsOpen(false)}
-                  className={cn(
+                  className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
                     'flex items-center gap-2 px-3 py-2 text-sm font-bold rounded-neo transition-colors',
                     isOnStudentSection
                       ? 'bg-neo-cyan text-neo-black'
@@ -151,7 +151,7 @@ export const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
                 href={`/${language}/education`}
                 role="menuitem"
                 onClick={() => setIsOpen(false)}
-                className={cn(
+                className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
                   'flex items-center gap-2 px-3 py-2 text-sm font-bold rounded-neo transition-colors',
                   'text-neo-white hover:bg-neo-lime/30'
                 )}
@@ -172,7 +172,7 @@ export const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
                       setIsOpen(false);
                       onSignOut();
                     }}
-                    className={cn(
+                    className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
                       'flex items-center gap-2 px-3 py-2 text-sm font-bold rounded-neo transition-colors w-full',
                       'text-neo-white hover:bg-neo-pink/30'
                     )}
@@ -192,7 +192,7 @@ export const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
                 href={exitHref ?? `/${language}`}
                 role="menuitem"
                 onClick={() => setIsOpen(false)}
-                className={cn(
+                className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
                   'flex items-center gap-2 px-3 py-2 text-sm font-bold rounded-neo transition-colors w-full',
                   'text-neo-white hover:bg-neo-pink/30'
                 )}

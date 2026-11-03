@@ -23,7 +23,7 @@ export function HelpNextStep({ locale, next }: { locale: string; next: HelpNextS
             <Link
               href={helpNextStepHref(locale, next)}
               data-ph-capture-attribute-cta={`help_next_${next}`}
-              className="inline-flex items-center justify-center gap-2 rounded-neo border-4 border-neo-cream/50 bg-neo-navy px-6 py-3 font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard-lg transition-transform hover:-translate-y-1"
+              className="inline-flex items-center justify-center gap-2 rounded-neo border-4 border-neo-cream/50 bg-neo-navy px-6 py-3 font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard-lg transition-transform hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
             >
               {t(`eg2Help.next.${next}.cta`)}
               <DirectionalIcon icon={ArrowRight} className="size-5" />
@@ -32,7 +32,7 @@ export function HelpNextStep({ locale, next }: { locale: string; next: HelpNextS
               <Link
                 href={helpNextStepHref(locale, 'liveGame')}
                 data-ph-capture-attribute-cta="help_next_secondary_live"
-                className="text-center font-bold underline decoration-2 underline-offset-4 hover:no-underline"
+                className="text-center font-bold underline decoration-2 underline-offset-4 hover:no-underline focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
               >
                 {t('eg2Help.next.secondary')}
               </Link>

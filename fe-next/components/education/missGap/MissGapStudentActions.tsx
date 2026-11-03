@@ -56,7 +56,7 @@ export function MissGapStudentActions({
         type="button"
         data-testid="miss-gap-async-complete"
         onClick={onPlay}
-        className={cn(
+        className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
           'w-full flex items-center justify-center gap-2 px-4',
           'font-neo-display font-bold border-[3px] rounded-neo transition',
           completed

@@ -52,7 +52,7 @@ describe('<TeacherAccountMenu>', () => {
     expect(trigger).toHaveAccessibleName('eduShell.account.menuLabel');
   });
 
-  it('When opened, Then it lists Profile, Help, What’s new, Pro, Sign out and Exit education in the locale', async () => {
+  it('When opened, Then it lists Profile, Help, What’s new, Pro and Sign out, and no link leaves the teacher app', async () => {
     render(<TeacherAccountMenu proHref="/he/teacher/upgrade" profileHref="/he/teacher/profile" />);
     await openMenu();
     expect(screen.getByRole('menuitem', { name: /eduShell.account.profile/ })).toHaveAttribute('href', '/he/teacher/profile');
@@ -60,10 +60,9 @@ describe('<TeacherAccountMenu>', () => {
     expect(screen.getByRole('menuitem', { name: /eduShell.account.whatsNew/ })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: /eduShell.nav.pro/ })).toHaveAttribute('href', '/he/teacher/upgrade');
     expect(screen.getByRole('menuitem', { name: /auth.signOut/ })).toBeInTheDocument();
-    expect(screen.getByRole('menuitem', { name: /education.header.exitEducation/ })).toHaveAttribute('href', '/he');
+    expect(screen.queryByRole('menuitem', { name: /education.header.exitEducation/ })).toBeNull();
     const hrefs = Array.from(document.querySelectorAll('a[href]')).map((a) => a.getAttribute('href'));
-    expect(hrefs.filter((h) => h === '/he')).toHaveLength(1);
-    for (const h of hrefs) expect(h).toMatch(/^\/he(\/|$)/);
+    for (const h of hrefs) expect(h).toMatch(/^\/he\/(teacher|education)(\/|$)/);
   });
 
   it('When What’s new is chosen, Then the changelog dialog opens', async () => {

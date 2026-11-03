@@ -41,7 +41,7 @@ export function HelpHome({ locale }: { locale: string }) {
   });
 
   return (
-    <main className="relative min-h-screen overflow-x-hidden bg-neo-navy text-neo-white">
+    <main className="relative min-h-dvh overflow-x-hidden bg-neo-navy text-neo-white">
       <HelpFallbackNote locale={locale} />
       <section className="border-b-4 border-neo-cream/50 bg-neo-navy-light texture-halftone">
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 pb-14 pt-10 sm:px-6 lg:grid-cols-12 lg:px-8 lg:pb-20 lg:pt-14">
@@ -72,7 +72,7 @@ export function HelpHome({ locale }: { locale: string }) {
                   <li key={slug}>
                     <Link
                       href={helpArticleHref(locale, slug)}
-                      className="inline-block rounded-full border-3 border-neo-cream/50 bg-neo-navy px-4 py-2 text-sm font-bold text-neo-white shadow-hard transition-transform hover:-translate-y-0.5 hover:bg-neo-cyan hover:text-neo-navy"
+                      className="inline-block rounded-full border-3 border-neo-cream/50 bg-neo-navy px-4 py-2 text-sm font-bold text-neo-white shadow-hard transition-transform hover:-translate-y-0.5 hover:bg-neo-cyan hover:text-neo-navy focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
                     >
                       {content.articles[slug].title}
                     </Link>
@@ -109,7 +109,7 @@ export function HelpHome({ locale }: { locale: string }) {
                 <li key={m.slug}>
                   <Link
                     href={helpArticleHref(locale, m.slug)}
-                    className={`group flex h-full flex-col rounded-neo border-4 border-neo-black p-5 shadow-hard-lg transition-transform hover:-translate-y-1 ${HELP_ACCENT[accent].bg} ${HELP_ACCENT_INK[accent]}`}
+                    className={`group flex h-full flex-col rounded-neo border-4 border-neo-black p-5 shadow-hard-lg transition-transform hover:-translate-y-1 ${HELP_ACCENT[accent].bg} ${HELP_ACCENT_INK[accent]} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}
                   >
                     <span className="flex items-center justify-between">
                       <span className="font-neo-display text-4xl font-black leading-none">{i + 1}</span>
@@ -157,7 +157,7 @@ export function HelpHome({ locale }: { locale: string }) {
                       <li key={m.slug}>
                         <Link
                           href={helpArticleHref(locale, m.slug)}
-                          className="group flex items-center gap-2 rounded-[6px] px-2 py-2 font-semibold text-neo-gray-100 hover:bg-neo-navy hover:text-neo-lime"
+                          className="group flex items-center gap-2 rounded-[6px] px-2 py-2 font-semibold text-neo-gray-100 hover:bg-neo-navy hover:text-neo-lime focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
                         >
                           <DirectionalIcon icon={ArrowRight} className={`size-4 shrink-0 ${HELP_ACCENT[style.accent].text}`} />
                           <span>{content.articles[m.slug].title}</span>
@@ -181,7 +181,7 @@ export function HelpHome({ locale }: { locale: string }) {
                 <h3 className="font-neo-display text-lg font-black text-neo-white">{q.q}</h3>
                 <p className="mt-2 text-neo-gray-200">
                   <HelpRichText text={q.a} locale={locale} />{' '}
-                  <Link href={helpArticleHref(locale, q.slug)} className="inline-flex items-center gap-1 font-bold text-neo-cyan hover:text-neo-lime">
+                  <Link href={helpArticleHref(locale, q.slug)} className="inline-flex items-center gap-1 font-bold text-neo-cyan hover:text-neo-lime focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black">
                     <span className="sr-only">{content.articles[q.slug].title}</span>
                     <DirectionalIcon icon={ArrowRight} className="size-4" />
                   </Link>
@@ -200,14 +200,14 @@ export function HelpHome({ locale }: { locale: string }) {
             <Link
               href={helpNextStepHref(locale, 'startClass')}
               data-ph-capture-attribute-cta="help_home_start_class"
-              className="rounded-neo border-4 border-neo-black bg-neo-lime px-6 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition-transform hover:-translate-y-1"
+              className="rounded-neo border-4 border-neo-black bg-neo-lime px-6 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition-transform hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
             >
               {t('eg2Help.home.ctaPrimary')}
             </Link>
             <Link
               href={helpNextStepHref(locale, 'liveGame')}
               data-ph-capture-attribute-cta="help_home_live_game"
-              className="rounded-neo border-4 border-neo-cream/50 bg-neo-navy px-6 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard transition-transform hover:-translate-y-1"
+              className="rounded-neo border-4 border-neo-cream/50 bg-neo-navy px-6 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard transition-transform hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
             >
               {t('eg2Help.home.ctaSecondary')}
             </Link>
@@ -220,7 +220,7 @@ export function HelpHome({ locale }: { locale: string }) {
             <p className="font-neo-display text-lg font-black">{t('eg2Help.home.stuckTitle')}</p>
             <p className="text-neo-gray-300">{t('eg2Help.home.stuckBody')}</p>
           </div>
-          <Link href={`/${locale}/contact`} className="rounded-neo border-3 border-neo-black bg-neo-cream px-4 py-2 font-bold text-neo-navy shadow-hard">
+          <Link href={`/${locale}/contact`} className="rounded-neo border-3 border-neo-black bg-neo-cream px-4 py-2 font-bold text-neo-navy shadow-hard focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black">
             {t('eg2Help.home.stuckCta')}
           </Link>
         </aside>

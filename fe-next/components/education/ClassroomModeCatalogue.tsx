@@ -14,11 +14,13 @@ import {
   catalogueKeys,
   catalogueModes,
   deliveryKey,
+  isClassFavorite,
   modeStyleFor,
   type CatalogueMode,
   type ModeDelivery,
 } from './ClassroomModeCatalogueData';
 import { teacherGameMode } from '@/lib/education/gameModes';
+import { tr } from '@/components/education/lobby/eduText';
 
 export interface ClassroomModeCatalogueProps {
   selected: CatalogueMode['id'];
@@ -75,7 +77,7 @@ function DeliveryShort({ delivery, t }: { delivery: ModeDelivery; t: T }) {
     <span
       data-testid={`delivery-tag-${delivery}`}
       title={t(deliveryKey(delivery))}
-      className="inline-flex items-center gap-1 whitespace-nowrap font-neo-body text-[0.65rem] font-bold leading-none text-neo-cream/75 lg:text-xs"
+      className="inline-flex items-center gap-1 whitespace-nowrap font-neo-body text-xs font-bold leading-none text-neo-cream/80"
     >
       <Icon className="size-3 shrink-0" strokeWidth={2.5} aria-hidden="true" />
       {t(`eduShell.deliveryShort.${delivery}`)}
@@ -105,6 +107,7 @@ function prefersReducedMotion(): boolean {
  */
 export function ClassroomModeCardRow({ selected, recommended = null, selectedMinutes, minutesFor, busy, onPick, dir, t }: ClassroomModeCardRowProps) {
   const modes = catalogueModes();
+  const favoriteLabel = tr(t, 'teacher.subscription.popular', 'Most popular');
   const scrollerRef = useRef<HTMLDivElement>(null);
   const centredOnce = useRef(false);
 
@@ -187,6 +190,7 @@ export function ClassroomModeCardRow({ selected, recommended = null, selectedMin
                     name={t(catalogueKeys(mode).name)}
                     minutesLabel={t('education.modePicker.minutes', { count: cardMinutes })}
                     recommendedLabel={recommended === mode.id ? t('education.modePicker.recommended') : null}
+                    favoriteLabel={isClassFavorite(mode.id) ? favoriteLabel : null}
                     deliveryTag={<DeliveryShort delivery={mode.delivery} t={t} />}
                     selected={isLive}
                     busy={busy}

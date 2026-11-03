@@ -223,7 +223,7 @@ export default function EducationBadgeGrid({
               onClick={() => toggleCategory(category)}
               aria-expanded={!isCollapsed}
               aria-controls={`category-${category}`}
-              className="w-full flex items-center justify-between text-start group p-3 -m-3 rounded-neo hover:bg-neo-white/5 transition-colors"
+              className="w-full flex items-center justify-between text-start group p-3 -m-3 rounded-neo hover:bg-neo-white/5 transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
             >
               <h3 className="font-neo-display text-xl font-bold text-neo-white group-hover:text-neo-cyan transition-colors">
                 {t(`education.achievements.categories.${category}`)}
@@ -301,7 +301,7 @@ export default function EducationBadgeGrid({
             <button
               type="button"
               onClick={clearError}
-              className="font-bold hover:underline"
+              className="font-bold hover:underline focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
               aria-label={t('education.achievements.ariaDismissError')}
             >
               ×

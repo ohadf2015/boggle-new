@@ -135,7 +135,7 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
         <Link
           key={page}
           href={`/${language}/legal/${page}`}
-          className="text-neo-cyan hover:text-neo-lime font-bold text-xs underline transition-colors"
+          className="text-neo-cyan hover:text-neo-lime font-bold text-xs underline transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
         >
           {t(page === 'terms' ? 'legal.termsOfService' : page === 'refund' ? 'legal.refundPolicy' : 'legal.privacyPolicy')}
         </Link>
@@ -260,7 +260,7 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
                           setAskOpen(true);
                           trackGrowthEvent('landing_cta_clicked', { cta: 'ask_school_open', source: 'teacher_upgrade' });
                         }}
-                        className="inline-flex items-center justify-center gap-1 text-sm font-black text-neo-black underline decoration-2 underline-offset-2"
+                        className="inline-flex items-center justify-center gap-1 text-sm font-black text-neo-black underline decoration-2 underline-offset-2 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
                       >
                         {t('eg2Pro.plans.askSchool')} <DirectionalIcon icon={ArrowRight} className="h-3.5 w-3.5" />
                       </button>

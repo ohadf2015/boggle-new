@@ -41,7 +41,7 @@ export function MissGapTakeHomeDisclosure({ payload }: MissGapTakeHomeDisclosure
         data-testid="miss-gap-takehome-toggle"
         aria-expanded={showTakeHome}
         onClick={() => setShowTakeHome((open) => !open)}
-        className={cn(
+        className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
           'w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold',
           'bg-neo-navy text-neo-cream border-[3px] border-neo-cream rounded-neo',
           'transition-transform active:translate-x-[2px] active:translate-y-[2px]',

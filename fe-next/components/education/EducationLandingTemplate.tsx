@@ -56,7 +56,7 @@ export function EducationLandingTemplate({ locale, path, content }: Props) {
             href={`/${locale}${cta.href}`}
             className={`rounded-neo border-4 border-neo-black px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider sm:text-lg ${
               i === 0 ? `bg-neo-navy ${a.text} shadow-hard-lg` : 'bg-neo-cyan text-neo-navy shadow-hard'
-            }`}
+            } focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}
           >
             {cta.label}
           </Link>
@@ -66,7 +66,7 @@ export function EducationLandingTemplate({ locale, path, content }: Props) {
   ) : null;
 
   return (
-    <main className="relative min-h-screen overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
+    <main className="relative min-h-dvh overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
       {jsonLd.map((node) => (
         <JsonLd key={node['@id']} data={node} />
       ))}
@@ -114,7 +114,7 @@ export function EducationLandingTemplate({ locale, path, content }: Props) {
             >
               <span className="block text-base sm:text-lg">{hero.primaryCta.label}</span>
               {hero.primaryCta.sublabel && (
-                <span className="block text-[10px] font-bold uppercase tracking-widest opacity-70">
+                <span className="block text-xs font-bold uppercase tracking-widest opacity-70">
                   {hero.primaryCta.sublabel}
                 </span>
               )}
@@ -127,7 +127,7 @@ export function EducationLandingTemplate({ locale, path, content }: Props) {
               >
                 <span className="block text-base sm:text-lg">{hero.secondaryCta.label}</span>
                 {hero.secondaryCta.sublabel && (
-                  <span className="block text-[10px] font-bold uppercase tracking-widest opacity-70">
+                  <span className="block text-xs font-bold uppercase tracking-widest opacity-70">
                     {hero.secondaryCta.sublabel}
                   </span>
                 )}

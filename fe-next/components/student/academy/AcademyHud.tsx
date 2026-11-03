@@ -8,13 +8,14 @@
 
 import Image from 'next/image';
 import { m, useReducedMotion } from 'framer-motion';
-import { Flame, UserX } from 'lucide-react';
+import { UserX } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCountUp } from '@/hooks/useCountUp';
 import { getXpProgress } from '@/backend/modules/xpManager';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { InkPanel, Medallion, INK_TEXT, toneStyle } from './chrome';
+import { StreakMark } from './StreakMark';
 
 interface Props {
   userId: string;
@@ -36,8 +37,8 @@ interface Props {
 
 /** Recessed "coin tray" the totals sit in — one object, not two floating pills. */
 const TRAY_STYLE = {
-  background: 'linear-gradient(180deg,#120d33 0%,#1d1650 100%)',
-  boxShadow: 'inset 0 0 0 1.5px #f5c542, inset 0 3px 5px rgba(0,0,0,0.6)',
+  background: 'linear-gradient(180deg,var(--neo-abyss-light) 0%,color-mix(in srgb,var(--neo-purple-dark) 25%,var(--neo-abyss-light)) 100%)',
+  boxShadow: 'inset 0 0 0 1.5px color-mix(in srgb,var(--neo-yellow) 80%,var(--neo-orange)), inset 0 3px 5px rgba(0,0,0,0.6)',
 } as const;
 
 export function AcademyHud({ userId, name, avatarConfig, totalXp, streak, streakAtRisk = false, stars, isGuest, onSignOut, reducedMotion, title, size = 'normal' }: Props) {
@@ -77,7 +78,7 @@ export function AcademyHud({ userId, name, avatarConfig, totalXp, streak, streak
           className="absolute -bottom-1.5 -end-2"
         >
           <Medallion tone="lime" size={compact ? 20 : 24} shadow={1}>
-            <span className="font-neo-display text-[11px] font-black leading-none text-neo-black">{xp.currentLevel}</span>
+            <span className="font-neo-display text-xs font-black leading-none text-neo-black">{xp.currentLevel}</span>
           </Medallion>
         </span>
       </div>
@@ -91,7 +92,7 @@ export function AcademyHud({ userId, name, avatarConfig, totalXp, streak, streak
             <span
               dir="auto"
               data-testid="academy-class-tag"
-              className={`min-w-0 max-w-full truncate rounded-full border-2 border-neo-black px-2 font-neo-display font-black uppercase leading-[18px] tracking-wide text-neo-white ${wide ? 'text-xs leading-[22px]' : 'text-[10px]'} ${INK_TEXT}`}
+              className={`min-w-0 max-w-full truncate rounded-full border-2 border-neo-black px-2 font-neo-display font-black uppercase leading-[18px] tracking-wide text-neo-white ${wide ? 'text-xs leading-[22px]' : 'text-xs'} ${INK_TEXT}`}
               style={toneStyle('pink', { shadow: 0, trim: 1 })}
             >
               {title}
@@ -105,28 +106,28 @@ export function AcademyHud({ userId, name, avatarConfig, totalXp, streak, streak
           aria-valuemax={100}
           aria-valuenow={xp.progressPercent}
           className={`relative mt-1 w-full overflow-hidden rounded-full border-2 border-neo-black ${wide ? 'h-5' : compact ? 'h-3' : 'h-4'}`}
-          style={{ background: 'linear-gradient(180deg,#120d33,#261d63)', boxShadow: 'inset 0 0 0 1.5px #f5c542, inset 0 3px 4px rgba(0,0,0,0.55)' }}
+          style={{ background: 'linear-gradient(180deg,var(--neo-abyss-light),color-mix(in srgb,var(--neo-purple-dark) 35%,var(--neo-abyss-light)))', boxShadow: 'inset 0 0 0 1.5px color-mix(in srgb,var(--neo-yellow) 80%,var(--neo-orange)), inset 0 3px 4px rgba(0,0,0,0.55)' }}
         >
           <div
             className="absolute inset-y-[2px] start-[2px] rounded-full"
             style={{
               width: `calc(${pct}% - 4px)`,
               minWidth: pct > 0 ? 8 : 0,
-              backgroundImage: 'linear-gradient(180deg,#f4ff9a 0%,#bfff00 45%,#5fae00 100%)',
-              boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.55), 1px 0 0 #000',
+              backgroundImage: 'linear-gradient(180deg,color-mix(in srgb,var(--neo-lime) 40%,var(--neo-cream)) 0%,var(--neo-lime) 45%,var(--neo-lime-dark) 100%)',
+              boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.55), 1px 0 0 rgb(var(--neo-black))',
             }}
           >
             {!still && (
               <m.span
                 aria-hidden="true"
-                className="absolute inset-y-0 left-0 w-6 -skew-x-12 bg-white/60"
+                className="absolute inset-y-0 left-0 w-6 -skew-x-12 bg-neo-white/60"
                 animate={{ x: ['-100%', '400%'] }}
                 transition={{ duration: 1.3, repeat: Infinity, repeatDelay: 2.6, ease: 'easeInOut', delay: 1.4 }}
               />
             )}
           </div>
         </div>
-        <p dir="ltr" className={`mt-0.5 text-start ${compact ? 'sr-only' : ''} font-neo-display ${wide ? 'text-xs' : 'text-[10px]'} font-black uppercase tracking-wider text-neo-yellow tabular-nums rtl:text-end`}>
+        <p dir="ltr" className={`mt-0.5 text-start ${compact ? 'sr-only' : ''} font-neo-display text-xs font-black uppercase tracking-wider text-neo-yellow tabular-nums rtl:text-end`}>
           {t('academy.student.xpLine', '{xp} / {need} XP', { xp: shownXp, need: xp.xpNeededForNextLevel })}
         </p>
       </div>
@@ -137,32 +138,7 @@ export function AcademyHud({ userId, name, avatarConfig, totalXp, streak, streak
         style={TRAY_STYLE}
       >
       <span className="flex items-center gap-1" title={t('education.xp.streak', 'Day Streak')}>
-        <span
-          data-testid="academy-streak-flame"
-          data-state={streak <= 0 ? 'none' : streakAtRisk ? 'at-risk' : 'calm'}
-          aria-label={streak > 0 && streakAtRisk ? t('academy.student.streakAtRiskAria', 'Your streak is in danger — play today to save it') : undefined}
-          className="relative inline-flex"
-        >
-          <span
-            aria-hidden="true"
-            className="inline-flex"
-            style={
-              !still && streak > 0
-                ? { animation: streakAtRisk ? 'academy-flame-risk 0.9s ease-in-out infinite' : 'academy-flame-calm 2.6s ease-in-out infinite' }
-                : undefined
-            }
-          >
-            <Medallion tone="ember" size={wide ? 36 : compact ? 22 : 28} shadow={1}>
-              <Flame className="h-4 w-4 fill-neo-yellow text-neo-black" strokeWidth={2.5} />
-            </Medallion>
-          </span>
-          {streak > 0 && streakAtRisk && (
-            <span
-              aria-hidden="true"
-              className="absolute -top-1 -end-1 h-2.5 w-2.5 rounded-full border border-neo-black bg-neo-red"
-            />
-          )}
-        </span>
+        <StreakMark streak={streak} atRisk={streakAtRisk} still={still} size={wide ? 36 : compact ? 22 : 28} t={t} />
         <span className="sr-only">{t('education.xp.streak', 'Day Streak')}</span>
         <span className={`min-w-[1ch] font-neo-display ${compact ? 'text-base' : 'text-lg'} font-black tabular-nums text-neo-white ${INK_TEXT}`}>{streak}</span>
       </span>
@@ -180,7 +156,7 @@ export function AcademyHud({ userId, name, avatarConfig, totalXp, streak, streak
         <button
           type="button"
           onClick={onSignOut}
-          className="icon-only flex h-8 shrink-0 items-center gap-1 rounded-full border-2 border-neo-cream px-2 font-neo-body text-xs font-bold text-neo-white hover:border-neo-pink"
+          className="icon-only flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-1 rounded-full border-2 border-neo-cream px-2 font-neo-body text-xs font-bold text-neo-white hover:border-neo-pink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
         >
           <UserX className="h-4 w-4" aria-hidden="true" />
           <span className="sr-only sm:not-sr-only">{t('student.notYou', 'Not you?')}</span>

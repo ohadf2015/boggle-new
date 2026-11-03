@@ -106,7 +106,7 @@ export default function WordCraftPractice({ words, language, onComplete, onBack,
     const { results } = phase;
     if (!wordCraftAttemptIsMeaningful({ lessonWordsFound: results.vocabularyWordsFound, validWordsFound: results.wordsFound })) {
       return (
-        <div className={cn(DRILL_ROOT_CLASS, 'w-full rounded-neo border-[3px] border-black p-4 text-center')} data-testid="wordcraft-practice-nudge">
+        <div className={cn(DRILL_ROOT_CLASS, 'w-full rounded-neo border-[3px] border-neo-black p-4 text-center')} data-testid="wordcraft-practice-nudge">
           <Grid2x2 className="w-10 h-10 mx-auto mb-2 text-neo-cyan" aria-hidden="true" />
           <p className="font-neo-display text-lg text-neo-white mb-4 text-balance">
             {t('education.wordcraftAssignment.needLessonWord', { count: WORDCRAFT_MIN_VALID_WORDS })}
@@ -115,7 +115,7 @@ export default function WordCraftPractice({ words, language, onComplete, onBack,
             type="button"
             data-testid="wordcraft-practice-retry"
             onClick={() => setPhase({ name: 'playing', seed: newSeed() })}
-            className="w-full min-h-14 mb-2 flex items-center justify-center gap-2 rounded-neo border-[3px] border-black bg-neo-lime font-neo-display text-xl font-black uppercase text-black shadow-hard active:translate-y-0.5 active:shadow-none"
+            className="w-full min-h-14 mb-2 flex items-center justify-center gap-2 rounded-neo border-[3px] border-neo-black bg-neo-lime font-neo-display text-xl font-black uppercase text-neo-black shadow-hard active:translate-y-0.5 active:shadow-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           >
             <RotateCcw className="w-6 h-6" aria-hidden="true" />
             {t('education.wordcraftAssignment.tryAgain')}
@@ -153,7 +153,7 @@ export default function WordCraftPractice({ words, language, onComplete, onBack,
   }
 
   return (
-    <div className={cn(DRILL_ROOT_CLASS, 'w-full rounded-neo border-[3px] border-black p-4')} data-testid="wordcraft-practice-intro">
+    <div className={cn(DRILL_ROOT_CLASS, 'w-full rounded-neo border-[3px] border-neo-black p-4')} data-testid="wordcraft-practice-intro">
       <div className="flex items-center gap-2 mb-3">
         <Button
           variant="ghost"
@@ -184,7 +184,7 @@ export default function WordCraftPractice({ words, language, onComplete, onBack,
             {targets.slice(0, 24).map((word) => (
               <li
                 key={word}
-                className="rounded-neo border-2 border-black bg-neo-cream px-2 py-1 font-neo-display text-sm font-bold text-neo-black"
+                className="rounded-neo border-2 border-neo-black bg-neo-cream px-2 py-1 font-neo-display text-sm font-bold text-neo-black"
               >
                 {word}
               </li>
@@ -196,7 +196,7 @@ export default function WordCraftPractice({ words, language, onComplete, onBack,
         type="button"
         data-testid="wordcraft-practice-play"
         onClick={() => setPhase({ name: 'playing', seed: newSeed() })}
-        className="w-full min-h-14 flex items-center justify-center gap-2 rounded-neo border-[3px] border-black bg-neo-lime font-neo-display text-xl font-black uppercase text-black shadow-hard active:translate-y-0.5 active:shadow-none"
+        className="w-full min-h-14 flex items-center justify-center gap-2 rounded-neo border-[3px] border-neo-black bg-neo-lime font-neo-display text-xl font-black uppercase text-neo-black shadow-hard active:translate-y-0.5 active:shadow-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
       >
         <Play className="w-6 h-6" aria-hidden="true" />
         {t('education.wordcraftAssignment.play')}

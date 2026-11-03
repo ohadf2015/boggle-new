@@ -30,19 +30,20 @@ describe('teacher first-run funnel event names (dashboards query these strings)'
   });
 
   it('still fires them from the one first-run path', () => {
-    const flow = src('components/teacher/setup/ClassSetupFlow.tsx');
+    const start = src('components/education/ClassSetupStart.tsx');
+    for (const call of ['trackEduClassroomCreated(', 'TEACHER_ONBOARDING_FUNNEL_EVENTS.classroomCreated']) {
+      expect(start).toContain(call);
+    }
+    const ready = src('components/education/ClassSetupInvite.tsx');
     for (const call of [
-      'trackEduClassroomCreated(',
-      'TEACHER_ONBOARDING_FUNNEL_EVENTS.classroomCreated',
       'TEACHER_ONBOARDING_FUNNEL_EVENTS.studentJoined',
       'trackEduFirstStudentJoined(',
       'trackEduJoinCodeShown(',
       'trackEduJoinCodeCopied(',
       'trackEduJoinCodeShared(',
     ]) {
-      expect(flow).toContain(call);
+      expect(ready).toContain(call);
     }
-    const ready = src('components/teacher/setup/ClassReady.tsx');
     expect(ready).toContain('trackFirstRoundGuideShown(');
     expect(ready).toContain("step: 'start_round'");
     expect(ready).toContain("step: 'practice_bots'");

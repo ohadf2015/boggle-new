@@ -205,7 +205,7 @@ function PhoneStrip({
               {row.score}
             </AdaptiveMotion.span>
             {isMe && (
-              <span className="relative text-[9px] font-bold uppercase tracking-wide opacity-80">{pointsLabel}</span>
+              <span className="relative text-xs font-bold uppercase tracking-wide opacity-80">{pointsLabel}</span>
             )}
           </AdaptiveMotion.div>
         );

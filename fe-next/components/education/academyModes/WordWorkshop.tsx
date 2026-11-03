@@ -256,14 +256,14 @@ export default function WordWorkshop({ lessonName, lessonWords, lessonLanguage, 
       <AcademyModeFrame title={title} onBack={onBack} accent="yellow" theme="workshop" testId="workshop-screen">
         <div data-testid="workshop-unsupported" className="flex w-full max-w-md flex-col items-center rounded-neo border-[3px] border-neo-cream bg-neo-navy-elevated p-6 text-center shadow-hard-lg">
           {/* eslint-disable-next-line @next/next/no-img-element -- static art */}
-          <img src={ACADEMY_ART.wordcraft} alt="" className="mb-3 h-28 w-28 object-contain opacity-80 drop-shadow-[4px_4px_0_#000]" />
+          <img src={ACADEMY_ART.wordcraft} alt="" className="mb-3 h-28 w-28 object-contain opacity-80 drop-shadow-[4px_4px_0_rgb(var(--neo-black))]" />
           <h2 className="mb-2 font-neo-display text-2xl font-black text-neo-white">
             {t('academy.modes.workshop.unsupportedTitle', 'The workshop is still learning this language')}
           </h2>
           <p className="mb-5 font-neo-body text-neo-cream/85">
             {t('academy.modes.workshop.unsupportedBody', "Word Workshop doesn't have letter tiles for this lesson's language yet. Try the lesson's other games!")}
           </p>
-          <button type="button" data-testid="workshop-back" onClick={onBack} className={cn(primaryButtonClass, 'w-full')}>
+          <button type="button" data-testid="workshop-back" onClick={onBack} className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black', primaryButtonClass, 'w-full')}>
             {t('academy.modes.backToAcademy', 'Back to Academy')}
           </button>
         </div>
@@ -325,8 +325,8 @@ export default function WordWorkshop({ lessonName, lessonWords, lessonLanguage, 
                 animate={{ y: 0, scale: 1, rotate: -2 }}
                 exit={reduce ? undefined : { y: -20, scale: 0.8, opacity: 0 }}
                 transition={{ type: 'spring', stiffness: 520, damping: 16 }}
-                className="flex items-center gap-2 rounded-neo border-[3px] border-black bg-neo-yellow px-4 py-2 font-neo-display text-black lg:px-6 lg:py-3"
-                style={{ boxShadow: '5px 5px 0 #000, 0 0 32px rgba(255,214,0,0.75)' }}
+                className="flex items-center gap-2 rounded-neo border-[3px] border-neo-black bg-neo-yellow px-4 py-2 font-neo-display text-neo-black lg:px-6 lg:py-3"
+                style={{ boxShadow: '5px 5px 0 rgb(var(--neo-black)), 0 0 32px rgba(255,214,0,0.75)' }}
               >
                 <Star className="h-7 w-7 fill-current lg:h-10 lg:w-10" aria-hidden />
                 <span className="flex flex-col leading-tight">
@@ -337,7 +337,7 @@ export default function WordWorkshop({ lessonName, lessonWords, lessonLanguage, 
                   </span>
                   <span translate="no" className="text-2xl font-black lg:text-4xl">{callout.hit.lessonWord}</span>
                 </span>
-                <span className="ms-1 rounded-full border-2 border-black bg-black px-2 py-0.5 text-sm font-black text-neo-yellow lg:text-xl">
+                <span className="ms-1 rounded-full border-2 border-neo-black bg-black px-2 py-0.5 text-sm font-black text-neo-yellow lg:text-xl">
                   {t('academy.modes.workshop.stars', '★ {count}', { count: callout.total })}
                 </span>
               </m.div>
@@ -357,11 +357,11 @@ export default function WordWorkshop({ lessonName, lessonWords, lessonLanguage, 
         : t('academy.modes.workshop.lostBaron', 'The Baron won this one');
     const actions = (
       <>
-        <button type="button" data-testid="workshop-again" onClick={() => void play()} className={cn(primaryButtonClass, 'flex-1 whitespace-nowrap px-3 text-base sm:text-xl')}>
+        <button type="button" data-testid="workshop-again" onClick={() => void play()} className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black', primaryButtonClass, 'flex-1 whitespace-nowrap px-3 text-base sm:text-xl')}>
           <RotateCcw className="h-5 w-5 lg:h-8 lg:w-8" aria-hidden />
           {t('academy.modes.playAgain', 'Play again')}
         </button>
-        <button type="button" data-testid="workshop-back" onClick={onBack} className={cn(secondaryButtonClass, 'flex-1 px-3 text-sm sm:text-base')}>
+        <button type="button" data-testid="workshop-back" onClick={onBack} className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black', secondaryButtonClass, 'flex-1 px-3 text-sm sm:text-base')}>
           {t('academy.modes.backToAcademy', 'Back to Academy')}
         </button>
       </>
@@ -410,7 +410,7 @@ export default function WordWorkshop({ lessonName, lessonWords, lessonLanguage, 
           ) : (
             <div className="relative flex h-full w-full max-w-md flex-col items-center justify-center gap-4 text-center lg:max-w-3xl">
               <WorkshopRival mood={rival.mood} taunt={{ key: 'academy.modes.workshop.rival.gloat', en: 'My workshop, my rules!' }} bubbleSide="below" />
-              <h2 className="font-neo-display text-3xl font-black uppercase text-neo-white lg:text-7xl" style={{ textShadow: '3px 3px 0 #000' }}>{verdict}</h2>
+              <h2 className="font-neo-display text-3xl font-black uppercase text-neo-white lg:text-7xl" style={{ textShadow: '3px 3px 0 rgb(var(--neo-black))' }}>{verdict}</h2>
               <p data-testid="workshop-nudge" className="font-neo-body text-base text-neo-cream lg:text-2xl">
                 {t('academy.modes.workshop.nudge', 'Build at least one lesson word (or 3 words) to earn the chest. You got this!')}
               </p>

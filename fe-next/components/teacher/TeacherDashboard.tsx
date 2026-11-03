@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
+import { pickHomeAsk } from '@/lib/education/teacherBannerPriority';
 import { useTeacherReveal } from './motion/useTeacherReveal';
 import LessonBuilder from './LessonBuilder';
 import { AssignmentCreator } from './assignments';
@@ -54,7 +55,7 @@ export interface TeacherDashboardProps {
   /** Account-state strip for a teacher already on (or just off) a Pro trial: days left / renew. */
   banner?: ReactNode;
   /** The one free-teacher Pro ask, picked by the route client. Rendered as the rail card. */
-  proOffer?: { kind: HomeProOfferKind; onDismiss: () => void; tracked: boolean } | null;
+  proOffer?: { kind: HomeProOfferKind; onDismiss: () => void; tracked: boolean; onShown?: () => void } | null;
   /** Kept for the route client's contract: a pinned banner also lives in the Pro slot. */
   pinBanner?: boolean;
   /** The usage-triggered Pro card (10+ students / 3+ assignments). Same slot. */
@@ -202,14 +203,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
   const [nowMs] = useState(() => Date.now());
   const hour = new Date(nowMs).getHours();
 
-  // One Pro ask at most: a limit-hit prompt beats the general card. Free teachers see the
-  // dashboard Teacher Pro card from day one (even before a first class); Pro teachers never do.
   const accountBanner = hasClasses ? (banner ?? null) : null;
-  const proCard = proLoading || hasPro ? null : usagePrompt && hasClasses ? (
-    <div data-testid="home-pro-slot">{usagePrompt}</div>
-  ) : proOffer ? (
-    <HomeProCard kind={proOffer.kind} onDismiss={proOffer.onDismiss} trackImpression={!proOffer.tracked} language={language} t={t} />
-  ) : null;
 
   const showWeek = hasClasses && !(week.summary && Object.keys(week.summary.lastPlayedAt).length === 0);
   const selectedClassroom = classrooms.find((c) => c.id === effectiveId) ?? null;
@@ -224,6 +218,25 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
   const nextStep = homeNextStep({ onboarding, trial: trial.checklist, shareCardShown });
   const nextStepShown = ready && !classroomsError && nextStep !== null && (!hasClasses || week.status !== 'loading');
   const onboardingCardShown = nextStepShown && nextStep?.source === 'onboarding';
+  // One ask per screen: the rail Pro card waits until onboarding is known, and yields to it and to account state.
+  const askSettled = ready && !classroomsError && (!hasClasses || week.status !== 'loading');
+  const railAsk = pickHomeAsk({
+    account: Boolean(accountBanner),
+    onboarding: !hasClasses || nextStepShown,
+    trial: false,
+    usage: Boolean(usagePrompt) && hasClasses,
+    pro: Boolean(proOffer),
+  });
+  const proCard = proLoading || hasPro || !askSettled ? null : railAsk === 'usage' ? (
+    <div data-testid="home-pro-slot">{usagePrompt}</div>
+  ) : railAsk === 'pro' && proOffer ? (
+    <HomeProCard kind={proOffer.kind} onDismiss={proOffer.onDismiss} trackImpression={!proOffer.tracked} language={language} t={t} />
+  ) : null;
+  const proOfferShown = proCard !== null && railAsk === 'pro';
+  const onProOfferShown = proOffer?.onShown;
+  useEffect(() => {
+    if (proOfferShown) onProOfferShown?.();
+  }, [proOfferShown, onProOfferShown]);
   const onboardingStep = onboarding.current ?? 'tryDemo';
   const guideShownStep = useRef<string | null>(null);
   useEffect(() => {

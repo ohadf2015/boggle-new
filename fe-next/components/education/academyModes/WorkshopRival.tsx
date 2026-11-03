@@ -62,7 +62,7 @@ export function WorkshopRival({
             src={RIVAL_ART[mood]}
             alt=""
             draggable={false}
-            className="h-full w-full object-contain drop-shadow-[6px_6px_0_#000]"
+            className="h-full w-full object-contain drop-shadow-[6px_6px_0_rgb(var(--neo-black))]"
             initial={reduce ? false : { scale: 0.85 }}
             animate={reduce ? { scale: 1 } : { scale: 1, ...MOOD_MOTION[mood] }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
@@ -78,7 +78,7 @@ export function WorkshopRival({
         </div>
         <span
           className={cn(
-            'z-10 -rotate-2 whitespace-nowrap rounded-neo border-[3px] border-black bg-neo-pink px-2 py-0.5 font-neo-display font-black uppercase text-black shadow-hard',
+            'z-10 -rotate-2 whitespace-nowrap rounded-neo border-[3px] border-neo-black bg-neo-pink px-2 py-0.5 font-neo-display font-black uppercase text-neo-black shadow-hard',
             size === 'game'
               ? 'sr-only 2xl:not-sr-only 2xl:-mt-4 2xl:text-xl'
               : size === 'arena'
@@ -100,7 +100,7 @@ export function WorkshopRival({
             exit={reduce ? undefined : { scale: 0.7 }}
             transition={{ type: 'spring', stiffness: 520, damping: 18 }}
             className={cn(
-              'relative max-w-[13rem] rounded-2xl border-[3px] border-black bg-neo-cream px-3 py-1.5 font-neo-display font-black leading-tight text-black shadow-hard',
+              'relative max-w-[13rem] rounded-2xl border-[3px] border-neo-black bg-neo-cream px-3 py-1.5 font-neo-display font-black leading-tight text-neo-black shadow-hard',
               size === 'game' ? 'text-sm 2xl:text-lg' : 'text-base lg:text-lg',
             )}
           >

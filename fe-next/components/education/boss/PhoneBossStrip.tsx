@@ -54,7 +54,7 @@ export function PhoneBossStrip() {
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-1.5">
             <p dir="auto" className="truncate font-neo-display text-sm font-black leading-tight text-neo-white">{name}</p>
-            <span className={cn('shrink-0 rounded-full border-2 border-neo-black px-1.5 text-[10px] font-black uppercase leading-4', view.phase === 3 ? 'bg-neo-red text-neo-white' : 'bg-neo-navy text-neo-white/90')}>
+            <span className={cn('shrink-0 rounded-full border-2 border-neo-black px-1.5 text-xs font-black uppercase leading-4', view.phase === 3 ? 'bg-neo-red text-neo-white' : 'bg-neo-navy text-neo-white/90')}>
               {t('classroomBoss.phaseShort', { n: view.phase })}
             </span>
           </div>

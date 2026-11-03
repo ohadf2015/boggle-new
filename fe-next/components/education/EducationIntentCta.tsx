@@ -26,7 +26,7 @@ export function EducationIntentCta({ locale, variant }: { locale: string; varian
         </p>
         <Link
           href={esl}
-          className="mt-4 inline-block font-bold text-neo-yellow underline underline-offset-2 hover:text-neo-white"
+          className="mt-4 inline-block font-bold text-neo-yellow underline underline-offset-2 hover:text-neo-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
         >
           {t('education.intentCta.eslLink')}
         </Link>
@@ -43,12 +43,12 @@ export function EducationIntentCta({ locale, variant }: { locale: string; varian
         {t('education.intentCta.teachersBody')}
       </p>
       <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:gap-4">
-        <Link href={hub} className="font-bold text-neo-cyan underline underline-offset-2 hover:text-neo-white">
+        <Link href={hub} className="font-bold text-neo-cyan underline underline-offset-2 hover:text-neo-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black">
           {t('education.intentCta.hubLink')}
         </Link>
         <Link
           href={elementary}
-          className="font-bold text-neo-lime underline underline-offset-2 hover:text-neo-white"
+          className="font-bold text-neo-lime underline underline-offset-2 hover:text-neo-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
         >
           {t('education.intentCta.elementaryLink')}
         </Link>

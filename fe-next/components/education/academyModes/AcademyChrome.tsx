@@ -61,7 +61,7 @@ export function AcademyPlayerChip({ player, className }: { player: AcademyPlayer
         className,
       )}
     >
-      <span className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-full border-[3px] border-black bg-neo-orange lg:h-14 lg:w-14 min-[2200px]:h-20 min-[2200px]:w-20">
+      <span className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-full border-[3px] border-neo-black bg-neo-orange lg:h-14 lg:w-14 min-[2200px]:h-20 min-[2200px]:w-20">
         <Avatar customAvatar={player.avatarConfig ?? null} userId={player.userId ?? player.name} pixelSize={80} disableEffects className="!h-full !w-full" />
       </span>
       <span className="truncate font-neo-display text-base font-black text-neo-white lg:text-2xl min-[2200px]:text-4xl">{player.name}</span>
@@ -97,7 +97,7 @@ export function AcademyModeFrame({
             onClick={onBack}
             data-testid="academy-back"
             aria-label={t('academy.modes.backToAcademy', 'Back to Academy')}
-            className="grid h-11 w-11 shrink-0 place-items-center rounded-neo border-[3px] border-black bg-neo-cream text-black shadow-hard active:translate-y-0.5 active:shadow-none lg:h-14 lg:w-14 min-[2200px]:h-20 min-[2200px]:w-20"
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-neo border-[3px] border-neo-black bg-neo-cream text-neo-black shadow-hard active:translate-y-0.5 active:shadow-none lg:h-14 lg:w-14 min-[2200px]:h-20 min-[2200px]:w-20 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           >
             <DirectionalIcon icon={ArrowLeft} className="h-5 w-5 lg:h-7 lg:w-7 min-[2200px]:h-10 min-[2200px]:w-10" />
           </button>
@@ -106,7 +106,7 @@ export function AcademyModeFrame({
             <h1
               className={cn(
                 // Never an ellipsis: long locale titles wrap to two tight lines on phones (e.g. "Repaso de palabras falladas").
-                'line-clamp-2 min-w-0 -rotate-1 break-words rounded-neo border-[3px] border-black px-2 py-0.5 font-neo-display text-[14px] font-black uppercase leading-[1.1] text-black shadow-hard [overflow-wrap:anywhere] sm:px-3 sm:py-1 sm:text-2xl sm:leading-tight sm:tracking-wide lg:px-5 lg:text-3xl min-[2200px]:px-7 min-[2200px]:py-2 min-[2200px]:text-5xl',
+                'line-clamp-2 min-w-0 -rotate-1 break-words rounded-neo border-[3px] border-neo-black px-2 py-0.5 font-neo-display text-[14px] font-black uppercase leading-[1.1] text-neo-black shadow-hard [overflow-wrap:anywhere] sm:px-3 sm:py-1 sm:text-2xl sm:leading-tight sm:tracking-wide lg:px-5 lg:text-3xl min-[2200px]:px-7 min-[2200px]:py-2 min-[2200px]:text-5xl',
                 ribbon,
               )}
             >
@@ -139,7 +139,7 @@ export function XpChip({ xp, className }: { xp: number | null; className?: strin
       initial={{ scale: 0.6, rotate: -6 }}
       animate={{ scale: 1, rotate: -2 }}
       transition={{ type: 'spring', stiffness: 420, damping: 14 }}
-      className={cn('inline-flex items-center gap-1 rounded-neo border-[3px] border-black bg-neo-lime px-3 py-1 font-neo-display text-lg font-black text-black shadow-hard lg:px-4 lg:text-3xl', className)}
+      className={cn('inline-flex items-center gap-1 rounded-neo border-[3px] border-neo-black bg-neo-lime px-3 py-1 font-neo-display text-lg font-black text-neo-black shadow-hard lg:px-4 lg:text-3xl', className)}
     >
       <Sparkles className="h-4 w-4" aria-hidden />
       {t('academy.modes.xpEarned', '+{xp} XP', { xp })}
@@ -148,6 +148,6 @@ export function XpChip({ xp, className }: { xp: number | null; className?: strin
 }
 
 export const primaryButtonClass =
-  'flex min-h-14 items-center justify-center gap-2 rounded-neo border-[3px] border-black bg-neo-lime px-6 font-neo-display text-xl font-black uppercase text-black shadow-hard transition-transform active:translate-y-0.5 active:shadow-none lg:min-h-20 lg:text-3xl';
+  'flex min-h-14 items-center justify-center gap-2 rounded-neo border-[3px] border-neo-black bg-neo-lime px-6 font-neo-display text-xl font-black uppercase text-neo-black shadow-hard transition-transform active:translate-y-0.5 active:shadow-none lg:min-h-20 lg:text-3xl';
 export const secondaryButtonClass =
-  'flex min-h-12 items-center justify-center gap-2 rounded-neo border-[3px] border-black bg-neo-cream px-5 font-neo-display text-base font-black uppercase text-black shadow-hard active:translate-y-0.5 active:shadow-none lg:min-h-20 lg:text-2xl';
+  'flex min-h-12 items-center justify-center gap-2 rounded-neo border-[3px] border-neo-black bg-neo-cream px-5 font-neo-display text-base font-black uppercase text-neo-black shadow-hard active:translate-y-0.5 active:shadow-none lg:min-h-20 lg:text-2xl';

@@ -84,7 +84,7 @@ export function MissGapPracticeCard({ payload }: MissGapPracticeCardProps) {
         <p className="text-neo-white font-neo-body mb-4">{t(classGapCardKind(payload) === 'sweep' ? 'education.results.allFound' : 'eg2Fix.gap.empty')}</p>
         <Link
           href={`/${locale}/education`}
-          className="inline-flex items-center justify-center px-4 py-3 font-bold bg-neo-lime text-neo-black border-[3px] border-neo-black rounded-neo shadow-hard"
+          className="inline-flex items-center justify-center px-4 py-3 font-bold bg-neo-lime text-neo-black border-[3px] border-neo-black rounded-neo shadow-hard focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
         >
           {t('education.results.shareGapCta')}
         </Link>
@@ -131,7 +131,7 @@ export function MissGapPracticeCard({ payload }: MissGapPracticeCardProps) {
         type="button"
         data-testid="miss-gap-practice-print-pdf"
         onClick={handlePrintPdf}
-        className={cn(
+        className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
           'mt-5 w-full flex items-center justify-center gap-2 px-4 py-3 font-bold',
           'bg-neo-cream text-neo-black border-[3px] border-neo-black rounded-neo',
           'shadow-hard hover:shadow-hard-lg transition',
@@ -145,7 +145,7 @@ export function MissGapPracticeCard({ payload }: MissGapPracticeCardProps) {
         type="button"
         data-testid="miss-gap-practice-share"
         onClick={handleShare}
-        className={cn(
+        className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
           'mt-2 w-full flex items-center justify-center gap-2 px-4 py-3 font-bold',
           'bg-neo-lime text-neo-black border-[3px] border-neo-black rounded-neo',
           'shadow-hard-sm hover:shadow-hard transition',
@@ -168,7 +168,7 @@ export function MissGapPracticeCard({ payload }: MissGapPracticeCardProps) {
         <Link
           href={unpluggedHref}
           data-testid="miss-gap-practice-open-unplugged"
-          className={cn(
+          className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
             'mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
             'bg-neo-cyan text-neo-black border-[3px] border-neo-black rounded-neo',
             'shadow-hard-sm hover:shadow-hard transition',

@@ -91,7 +91,7 @@ export function WooclapStarterHonestyStrip({
           href={HELP_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="underline decoration-neo-cyan/60 underline-offset-2 hover:text-neo-cyan"
+          className="underline decoration-neo-cyan/60 underline-offset-2 hover:text-neo-cyan focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           data-testid="wooclap-starter-help-link"
         >
           {t('education.vsWooclap.starter5.citeHelpLabel')}
@@ -101,7 +101,7 @@ export function WooclapStarterHonestyStrip({
           href={PLANS_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="underline decoration-neo-cyan/60 underline-offset-2 hover:text-neo-cyan"
+          className="underline decoration-neo-cyan/60 underline-offset-2 hover:text-neo-cyan focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           data-testid="wooclap-starter-plans-link"
         >
           {t('education.vsWooclap.starter5.citePlansLabel')}
@@ -112,7 +112,7 @@ export function WooclapStarterHonestyStrip({
       <div className="mt-5">
         <Link
           href={`/${loc}/education/classroom-game`}
-          className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition hover:shadow-hard-lg"
+          className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition hover:shadow-hard-lg focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           data-testid="wooclap-starter-cta"
         >
           {t('education.vsWooclap.starter5.cta')}

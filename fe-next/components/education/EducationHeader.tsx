@@ -127,8 +127,8 @@ export const EducationHeader = memo<EducationHeaderProps>(({
   const isOnStudentSection = pathname?.includes('/student');
 
   const eduRole = isTeacher ? 'teacher' : profile?.user_role === 'student' ? 'student' : null;
-  // Back, error and 404 paths stay in education; this is the one deliberate way out.
-  const exitHref = `/${language}`;
+  // Only a signed-out visitor on a public page may leave for the game home; a teacher or student stays in their hub.
+  const exitHref = eduRole ? undefined : `/${language}`;
 
   const handleBackClick = useCallback(() => {
     if (onBack) return onBack();
@@ -178,7 +178,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
               onClick={handleBackClick}
               className={cn(
                 'flex items-center justify-center',
-                'w-10 h-10 min-w-[40px] min-h-[40px]',
+                'size-11 min-w-11 min-h-11',
                 'bg-neo-navy text-neo-white',
                 'border-3 border-neo-cream',
                 'rounded-neo shadow-hard-sm',
@@ -236,7 +236,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                   <span className="truncate text-lg font-black uppercase tracking-tight text-neo-white">
                     {t('eg2Polish.header.brand')}
                   </span>
-                  <span className="truncate text-[0.65rem] font-black uppercase tracking-wide text-neo-cyan">
+                  <span className="truncate text-xs font-black uppercase tracking-wide text-neo-cyan">
                     {t('eg2Polish.header.section')}
                   </span>
                 </span>
@@ -316,7 +316,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
           <span className="hidden sm:flex">
             <EducationMenuDropdown
               isTeacher={isTeacher}
-              exitHref={exitHref}
+              exitHref={exitHref ?? educationHomeFor(language, eduRole)}
               isOnTeacherSection={isOnTeacherSection}
               isOnStudentSection={isOnStudentSection}
               onSignOut={handleSignOut}
@@ -328,7 +328,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
           <div className="flex sm:hidden" ref={mobileMenuRef}>
             <button
               onClick={() => setShowMobileMenu(!showMobileMenu)}
-              className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center"
+              className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
               aria-label={showMobileMenu ? t('common.closeMenu') : t('common.openMenu')}
               aria-expanded={showMobileMenu}
             >

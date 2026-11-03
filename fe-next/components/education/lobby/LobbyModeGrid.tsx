@@ -72,7 +72,7 @@ export function LobbyModeGrid({ selected, recommended = null, suggested = null, 
 const DELIVERY_ICON = { projector: MonitorPlay, phones: Smartphone, both: MonitorSmartphone } as const;
 
 const STICKER =
-  'inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-neo-cream/40 bg-neo-navy px-1.5 py-0.5 font-neo-body text-[0.65rem] font-bold leading-none text-neo-cream';
+  'inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-neo-cream/40 bg-neo-navy px-1.5 py-0.5 font-neo-body text-xs font-bold leading-none text-neo-cream';
 
 function ModeTile({
   mode,

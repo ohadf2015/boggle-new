@@ -310,7 +310,7 @@ export function MissGapGame({
           data-testid="miss-gap-game-exit"
           onClick={onClose}
           aria-label={t('education.homework.exit')}
-          className="w-9 h-9 grid place-items-center rounded-neo border-[3px] border-neo-black bg-neo-cream text-neo-black"
+          className="w-11 h-11 grid place-items-center rounded-neo border-[3px] border-neo-black bg-neo-cream text-neo-black focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
         >
           <X className="w-5 h-5" aria-hidden />
         </button>
@@ -365,7 +365,7 @@ export function MissGapGame({
               type="button"
               data-testid="miss-gap-start"
               onClick={start}
-              className={cn(
+              className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
                 'shrink-0 w-full px-4 py-4 font-neo-display font-bold text-lg',
                 'bg-neo-lime text-neo-black border-[3px] border-neo-black rounded-neo shadow-hard',
                 'transition-transform active:translate-x-[3px] active:translate-y-[3px] active:shadow-none',

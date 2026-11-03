@@ -43,7 +43,7 @@ export function ReteachStatusNote({ status, onRestoreFull, t }: ReteachStatusNot
           disabled={status === 'restoring'}
           aria-busy={status === 'restoring'}
           onClick={onRestoreFull}
-          className={cn(
+          className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
             'inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-neo-cream bg-neo-navy-elevated px-3 py-1.5',
             'font-neo-body text-sm font-bold text-neo-cream hover:bg-neo-navy-light transition-colors disabled:opacity-60'
           )}

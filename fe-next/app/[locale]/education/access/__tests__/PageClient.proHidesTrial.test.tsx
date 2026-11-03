@@ -33,9 +33,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 vi.mock('@/lib/animation/useGsapReveal', () => ({ useGsapReveal: () => ({ current: null }) }));
 vi.mock('@/components/education/AccessRequestGate', () => ({ AccessRequestGate: () => null }));
 vi.mock('@/components/education/DistrictUpsellStrip', () => ({ DistrictUpsellStrip: () => null }));
-vi.mock('@/components/education/TrialUrgencyBanner', () => ({
-  TrialUrgencyBanner: () => <div data-testid="trial-banner" />,
-}));
+vi.mock('@/hooks/useClassroom', () => ({ useClassrooms: () => ({ classrooms: [], isLoading: false }) }));
 vi.mock('next/image', () => ({
   // eslint-disable-next-line @next/next/no-img-element -- test stub for next/image, never shipped
   default: (p: Record<string, unknown>) => <img alt={String(p.alt ?? '')} />,
@@ -46,35 +44,46 @@ vi.mock('next/link', () => ({
 
 import { PageClient } from '../PageClient';
 
-const APPROVED_WITH_TRIAL = {
+const ENDED = { expiresAt: '2026-09-23T00:00:00Z', isExpired: true, daysLeft: 0 };
+const LIVE = { expiresAt: '2026-12-02T00:00:00Z', isExpired: false, daysLeft: 14 };
+const approvedWith = (trial: unknown) => ({
   status: 'approved',
   hasAccess: true,
   isLoading: false,
   latestRequest: { trial_expires_at: '2026-09-23T00:00:00Z' },
-  trial: { state: 'expired', daysLeft: 0 },
-};
+  trial,
+});
 
-describe('access PageClient — Pro hides the trial banner', () => {
+describe('access PageClient — the trial line on the approved card', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockUseTeacherAccess.mockReturnValue(APPROVED_WITH_TRIAL);
+    mockUseTeacherAccess.mockReturnValue(approvedWith(ENDED));
   });
 
-  it('shows the trial banner for an approved free teacher', () => {
+  it('Given a live trial, Then it says Pro features are open until the date, with no countdown card or second CTA', () => {
+    proState = { hasPro: false, loading: false };
+    mockUseTeacherAccess.mockReturnValue(approvedWith(LIVE));
+    render(<PageClient />);
+    expect(screen.getByTestId('access-trial-note')).toHaveTextContent('education.trial.body');
+    expect(screen.queryByTestId('trial-urgency-banner')).toBeNull();
+    expect(screen.getAllByText('education.trial.cta')).toHaveLength(1);
+  });
+
+  it('Given an ended trial, Then it says what stays free instead of a date', () => {
     proState = { hasPro: false, loading: false };
     render(<PageClient />);
-    expect(screen.getByTestId('trial-banner')).toBeInTheDocument();
+    expect(screen.getByTestId('access-trial-note')).toHaveTextContent('education.trial.expired_kept');
   });
 
   it('hides it for a Pro teacher', () => {
     proState = { hasPro: true, loading: false };
     render(<PageClient />);
-    expect(screen.queryByTestId('trial-banner')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('access-trial-note')).not.toBeInTheDocument();
   });
 
   it('hides it while the entitlement is still loading', () => {
     proState = { hasPro: false, loading: true };
     render(<PageClient />);
-    expect(screen.queryByTestId('trial-banner')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('access-trial-note')).not.toBeInTheDocument();
   });
 });

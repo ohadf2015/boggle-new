@@ -133,7 +133,7 @@ export function AcademyCta({ kind, activeGame, target, targetLabel, isJoining, j
         {!still && (
           <m.span
             aria-hidden="true"
-            className="pointer-events-none absolute inset-y-0 left-0 w-1/4 -skew-x-12 bg-white/45"
+            className="pointer-events-none absolute inset-y-0 left-0 w-1/4 -skew-x-12 bg-neo-white/45"
             animate={{ x: ['-100%', '400%'] }}
             transition={{ duration: 1.4, repeat: Infinity, repeatDelay: kind === 'live' ? 0.5 : 2.2, ease: 'easeInOut' }}
           />
@@ -167,7 +167,7 @@ export function AcademyCta({ kind, activeGame, target, targetLabel, isJoining, j
           <span
             dir="auto"
             className={cn(
-              'mb-0.5 inline-flex items-center gap-1 rounded-full border-2 border-neo-black px-2 font-neo-display text-[10px] font-black uppercase leading-4 tracking-widest',
+              'mb-0.5 inline-flex items-center gap-1 rounded-full border-2 border-neo-black px-2 font-neo-display text-xs font-black uppercase leading-4 tracking-widest',
               kind === 'live' ? 'bg-neo-black text-neo-lime' : 'bg-neo-black text-neo-yellow',
             )}
           >

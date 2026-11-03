@@ -28,7 +28,7 @@ const SCREENS: readonly [string, string][] = [
   ['/teacher (onboarding)', 'components/teacher/home/HomeOnboardingCard.tsx'],
   ['/teacher (classes)', 'components/teacher/home/HomeClassList.tsx'],
   ['/teacher/classroom/new', 'components/teacher/setup/ClassSetupDetails.tsx'],
-  ['/teacher/classroom/new (ready)', 'components/teacher/setup/ClassReady.tsx'],
+  ['/teacher/classroom/new (ready)', 'components/education/ClassSetupInvite.tsx'],
   ['/teacher/curriculum', 'app/[locale]/teacher/curriculum/PageClient.tsx'],
   ['/teacher/reports', 'app/[locale]/teacher/reports/PageClient.tsx'],
   ['/teacher/classroom/[id]/analytics', 'app/[locale]/teacher/classroom/[id]/analytics/PageClient.tsx'],

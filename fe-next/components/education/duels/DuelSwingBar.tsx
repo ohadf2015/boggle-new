@@ -74,6 +74,7 @@ export function DuelSwingBar({
             {myName}
           </span>
           {myStreak >= 2 && (
+            // eslint-disable-next-line @next/next/no-img-element -- tiny decorative mascot sprite
             <img
               src="/mascot/streak-spark-nobg.webp"
               alt=""
@@ -91,7 +92,7 @@ export function DuelSwingBar({
           </span>
         </div>
 
-        <span className="shrink-0 rounded-neo border-2 border-neo-black bg-neo-yellow px-1.5 font-neo-display text-[10px] font-black uppercase text-neo-black">
+        <span className="shrink-0 rounded-neo border-2 border-neo-black bg-neo-yellow px-1.5 font-neo-display text-xs font-black uppercase text-neo-black">
           {t('education.duels.vs')}
         </span>
 
@@ -103,6 +104,7 @@ export function DuelSwingBar({
             {opponentScore}
           </span>
           {opponentStreak >= 2 && (
+            // eslint-disable-next-line @next/next/no-img-element -- tiny decorative mascot sprite
             <img
               data-testid="duel-swing-opponent-fire"
               src="/mascot/streak-inferno-nobg.webp"
@@ -120,7 +122,7 @@ export function DuelSwingBar({
       </div>
 
       {/* The swing itself */}
-      <div className="flex h-4 overflow-hidden rounded-neo border-2 border-neo-black bg-neo-black">
+      <div aria-hidden="true" className="flex h-4 overflow-hidden rounded-neo border-2 border-neo-black bg-neo-black">
         <m.div
           data-testid="duel-swing-mine"
           className="h-full bg-neo-cyan"

@@ -11,9 +11,10 @@ import { GodRays } from '@/components/wordTowerV2/rewards/GodRays';
 import { CoinArt } from '@/components/ui/CoinArt';
 import type { ChestRarity } from '@/shared/constants/classroomEconomy';
 import { chestArtSrc, chestRays, chestSrcForPhase, type ChestPhase } from './chestPhase';
+import { NEO_HEX } from './neoHex';
 
 const PIECES = Array.from({ length: 16 }, (_, i) => i);
-const CONFETTI = ['#c6f432', '#ff5fa2', '#38e1ff', '#ffd23f', '#ffffff'];
+const CONFETTI = [NEO_HEX.lime, NEO_HEX.pink, NEO_HEX.cyan, NEO_HEX.yellow, NEO_HEX.white];
 const EASE_OUT = [0.23, 1, 0.32, 1] as const;
 
 function piece(i: number) {
@@ -79,7 +80,7 @@ const ChestStage = forwardRef<HTMLDivElement, Props>(function ChestStage({ phase
           className="h-full w-full cursor-pointer rounded-3xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime"
         >
           {/* eslint-disable-next-line @next/next/no-img-element -- pre-sized chest art; the optimizer would re-encode it */}
-          <img src={chestSrcForPhase(phase, rarity)} alt="" draggable={false} className="h-full w-full select-none object-contain drop-shadow-[6px_6px_0_#000]" />
+          <img src={chestSrcForPhase(phase, rarity)} alt="" draggable={false} className="h-full w-full select-none object-contain drop-shadow-[6px_6px_0_rgb(var(--neo-black))]" />
           {/* eslint-disable-next-line @next/next/no-img-element -- warms the open art so the burst frame never shows the shut chest */}
           {!lit && <img src={chestArtSrc(rarity, true)} alt="" aria-hidden="true" className="hidden" />}
         </button>
@@ -101,7 +102,7 @@ const ChestStage = forwardRef<HTMLDivElement, Props>(function ChestStage({ phase
                 {coin ? (
                   <CoinArt size={26} />
                 ) : (
-                  <span className="block h-3.5 w-2.5 rounded-[2px] border border-black/40" style={{ background: CONFETTI[i % CONFETTI.length] }} />
+                  <span className="block h-3.5 w-2.5 rounded-[2px] border border-neo-black/40" style={{ background: CONFETTI[i % CONFETTI.length] }} />
                 )}
               </m.span>
             );

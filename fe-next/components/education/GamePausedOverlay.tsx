@@ -35,10 +35,10 @@ export function GamePausedOverlay({ isHost = false }: GamePausedOverlayProps) {
     >
       <div
         className={cn(
-          'w-full max-w-sm rounded-neo border-3 border-black bg-neo-cream p-6 text-center text-black shadow-hard-lg',
+          'w-full max-w-sm rounded-neo border-3 border-neo-black bg-neo-cream p-6 text-center text-neo-black shadow-hard-lg',
         )}
       >
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full border-3 border-black bg-neo-cyan shadow-hard">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full border-3 border-neo-black bg-neo-cyan shadow-hard">
           <Pause className="h-8 w-8" aria-hidden="true" />
         </div>
         <h2 className="font-neo-display text-2xl font-bold">{t('education.liveControls.pausedTitle')}</h2>

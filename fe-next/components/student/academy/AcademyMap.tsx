@@ -108,8 +108,8 @@ function Spotlight({ at, still, tone }: { at: IslandPoint; still: boolean; tone:
           clipPath: 'polygon(40% 0, 60% 0, 100% 100%, 0 100%)',
           background:
             `linear-gradient(90deg, rgba(${rgb},0) 0%, rgba(${rgb},0.1) 22%, rgba(${rgb},0.75) 50%, rgba(${rgb},0.1) 78%, rgba(${rgb},0) 100%)`,
-          WebkitMaskImage: 'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.5) 35%, #000 72%, transparent 100%)',
-          maskImage: 'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.5) 35%, #000 72%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.5) 35%, rgb(var(--neo-black)) 72%, transparent 100%)',
+          maskImage: 'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.5) 35%, rgb(var(--neo-black)) 72%, transparent 100%)',
           animation: still ? undefined : 'academy-beam 3.2s ease-in-out infinite',
         }}
       />
@@ -180,8 +180,8 @@ export function AcademyMap({ layout, islands, boss, recommendedKey, spotlightTag
   const gapX = fit.left > 0.5 || fit.left + fit.width < view.width - 0.5;
   const gapY = fit.top > 0.5 || fit.top + fit.height < view.height - 0.5;
   const feather = [
-    gapX ? 'linear-gradient(90deg, transparent 0%, #000 6%, #000 94%, transparent 100%)' : '',
-    gapY ? 'linear-gradient(180deg, transparent 0%, #000 6%, #000 94%, transparent 100%)' : '',
+    gapX ? 'linear-gradient(90deg, transparent 0%, rgb(var(--neo-black)) 6%, rgb(var(--neo-black)) 94%, transparent 100%)' : '',
+    gapY ? 'linear-gradient(180deg, transparent 0%, rgb(var(--neo-black)) 6%, rgb(var(--neo-black)) 94%, transparent 100%)' : '',
   ].filter(Boolean);
   const mask: CSSProperties = feather.length
     ? { WebkitMaskImage: feather.join(','), maskImage: feather.join(','), WebkitMaskComposite: 'source-in', maskComposite: 'intersect' }

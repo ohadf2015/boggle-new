@@ -33,8 +33,8 @@ ${S} [data-wc-board] {
   padding: 10px; gap: 3px; border: 0; border-radius: 16px;
   background:
     radial-gradient(ellipse at 50% 40%, rgba(255,190,110,0.18), transparent 70%),
-    repeating-linear-gradient(90deg, #6e421f 0 9px, #7a4a23 9px 15px, #663d1d 15px 22px);
-  box-shadow: 0 0 0 3px #000, 0 0 0 8px #a86b32, 0 0 0 11px #000, 9px 11px 0 11px #000, 0 0 70px 14px rgba(255,160,60,0.35);
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--neo-cozy-muted) 50%, rgb(var(--neo-black))) 0 9px, color-mix(in srgb, var(--neo-cozy-muted) 55%, rgb(var(--neo-black))) 9px 15px, color-mix(in srgb, var(--neo-cozy-muted) 45%, rgb(var(--neo-black))) 15px 22px);
+  box-shadow: 0 0 0 3px rgb(var(--neo-black)), 0 0 0 8px color-mix(in srgb, var(--neo-lime-muted) 50%, var(--neo-pink-dark)), 0 0 0 11px rgb(var(--neo-black)), 9px 11px 0 11px rgb(var(--neo-black)), 0 0 70px 14px rgba(255,160,60,0.35);
 }
 ${CELL} { border-radius: 6px; font-family: var(--font-fredoka, inherit); }
 /* Empty squares = carved sockets in a wooden workbench: grain, a worn centre, a bevelled lip. */
@@ -42,7 +42,7 @@ ${CELL}[data-tile-state="empty"] {
   background:
     radial-gradient(ellipse at 50% 30%, rgba(255,205,140,0.16), transparent 62%),
     repeating-linear-gradient(97deg, transparent 0 4px, rgba(0,0,0,0.16) 4px 5px, rgba(255,214,160,0.06) 5px 8px, transparent 8px 11px),
-    linear-gradient(180deg, #5b3a1d 0%, #3d2611 100%);
+    linear-gradient(180deg, color-mix(in srgb, var(--neo-cozy-muted) 40%, rgb(var(--neo-black))) 0%, color-mix(in srgb, var(--neo-cozy-muted) 30%, rgb(var(--neo-black))) 100%);
   box-shadow: inset 0 3px 5px rgba(0,0,0,0.72), inset 0 -2px 0 rgba(255,214,160,0.2), inset 0 0 0 1px rgba(0,0,0,0.4);
 }
 ${CELL}[data-tile-state="empty"]::before {
@@ -55,7 +55,7 @@ ${CELL}[data-tile-state="empty"][data-wk-near] {
   background:
     radial-gradient(circle at 50% 50%, rgba(255,214,120,0.34), rgba(255,170,60,0.1) 58%, transparent 78%),
     repeating-linear-gradient(97deg, transparent 0 4px, rgba(0,0,0,0.14) 4px 5px, rgba(255,214,160,0.07) 5px 8px, transparent 8px 11px),
-    linear-gradient(180deg, #6d4622 0%, #472b12 100%);
+    linear-gradient(180deg, color-mix(in srgb, var(--neo-cozy-muted) 50%, rgb(var(--neo-black))) 0%, color-mix(in srgb, var(--neo-cozy-muted) 35%, rgb(var(--neo-black))) 100%);
   box-shadow: inset 0 0 0 2px rgba(255,205,110,0.6), inset 0 3px 5px rgba(0,0,0,0.5);
 }
 ${CELL}[data-tile-state="empty"][data-wk-near]::before { width: 22%; height: 22%; background: rgba(255,226,160,0.8); box-shadow: 0 0 8px rgba(255,200,90,0.9); }
@@ -69,31 +69,31 @@ ${CELL}[data-wk-near="2"]::after { animation-delay: -1.1s; }
 ${CELL}[data-wk-near="3"]::after { animation-delay: -1.65s; }
 ${CELL}[data-wk-near="4"]::after { animation-delay: -2.2s; }
 ${CELL}[data-tile-state="empty"][data-cell-invite="true"] {
-  background: radial-gradient(circle at 50% 40%, #4d5a1a, #2c3310);
+  background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--neo-lime-light) 40%, rgb(var(--neo-black))), color-mix(in srgb, var(--neo-lime-light) 20%, rgb(var(--neo-black))));
   box-shadow: inset 0 0 0 2px rgba(191,255,0,0.55), inset 0 3px 5px rgba(0,0,0,0.6);
 }
-${CELL}[data-tile-state="empty"][data-drag-target="true"] { background: #1f5e66; box-shadow: inset 0 0 0 3px #00ffff; }
+${CELL}[data-tile-state="empty"][data-drag-target="true"] { background: color-mix(in srgb, var(--neo-cyan-muted) 45%, rgb(var(--neo-black))); box-shadow: inset 0 0 0 3px var(--neo-cyan); }
 ${CELL}[data-tile-state="placed"], ${CELL}[data-tile-state="pending"] {
-  color: #17110a;
-  background: linear-gradient(180deg, #fffcf2 0%, #f3e4c4 100%);
-  box-shadow: inset 0 0 0 2px #000, inset 0 -4px 0 rgba(120,76,28,0.35), 0 2px 0 #000;
+  color: color-mix(in srgb, var(--neo-cozy) 10%, rgb(var(--neo-black)));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--neo-yellow-hover) 5%, rgb(var(--neo-white))) 0%, color-mix(in srgb, var(--neo-cozy-light) 40%, var(--neo-cream)) 100%);
+  box-shadow: inset 0 0 0 2px rgb(var(--neo-black)), inset 0 -4px 0 rgba(120,76,28,0.35), 0 2px 0 rgb(var(--neo-black));
 }
-${CELL}[data-claim="player"] { background: linear-gradient(180deg, #effeff 0%, #b9f4fb 100%); }
-${CELL}[data-claim="bot"] { background: linear-gradient(180deg, #fff0f7 0%, #ffc4de 100%); }
+${CELL}[data-claim="player"] { background: linear-gradient(180deg, color-mix(in srgb, var(--neo-cyan-light) 10%, rgb(var(--neo-white))) 0%, color-mix(in srgb, var(--neo-cyan-muted) 40%, rgb(var(--neo-white))) 100%); }
+${CELL}[data-claim="bot"] { background: linear-gradient(180deg, color-mix(in srgb, var(--neo-pink-light) 10%, rgb(var(--neo-white))) 0%, color-mix(in srgb, var(--neo-pink-light) 40%, var(--neo-cream)) 100%); }
 ${CELL}[data-claim]::after {
   content: ''; position: absolute; left: 2px; right: 2px; bottom: 2px; height: 22%;
-  border-top: 2px solid #000; border-radius: 0 0 4px 4px; pointer-events: none;
+  border-top: 2px solid rgb(var(--neo-black)); border-radius: 0 0 4px 4px; pointer-events: none;
 }
-${CELL}[data-claim="player"]::after { background: #00ffff; }
-${CELL}[data-claim="bot"]::after { background: #ff1493; }
+${CELL}[data-claim="player"]::after { background: var(--neo-cyan); }
+${CELL}[data-claim="bot"]::after { background: var(--neo-pink); }
 ${CELL}[data-tile-state="pending"] {
-  background: linear-gradient(180deg, #fbffe6 0%, #e4ff8c 100%);
-  box-shadow: inset 0 0 0 2px #000, 0 0 0 2px #bfff00, 0 0 14px 2px rgba(191,255,0,0.7), 0 3px 0 #000;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--neo-lime) 10%, rgb(var(--neo-white))) 0%, color-mix(in srgb, var(--neo-lime) 45%, rgb(var(--neo-white))) 100%);
+  box-shadow: inset 0 0 0 2px rgb(var(--neo-black)), 0 0 0 2px var(--neo-lime), 0 0 14px 2px rgba(191,255,0,0.7), 0 3px 0 rgb(var(--neo-black));
   ${reduce ? '' : 'animation: wk-pop 280ms cubic-bezier(.3,1.6,.5,1) both;'}
 }
 ${CELL}[data-wk-gold] {
-  background: linear-gradient(180deg, #fff6c4 0%, #ffd23a 100%);
-  box-shadow: inset 0 0 0 2px #000, 0 0 0 2px #ffe135, 0 0 16px 4px rgba(255,214,0,0.85);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--neo-yellow) 30%, rgb(var(--neo-white))) 0%, color-mix(in srgb, var(--neo-red) 10%, var(--neo-yellow)) 100%);
+  box-shadow: inset 0 0 0 2px rgb(var(--neo-black)), 0 0 0 2px var(--neo-yellow), 0 0 16px 4px rgba(255,214,0,0.85);
   z-index: 5;
   ${reduce ? '' : 'animation: wk-gold 1.8s ease-in-out infinite;'}
 }
@@ -101,29 +101,29 @@ ${CELL} .wc-tile-glyph { font-weight: 900; text-shadow: 0 1px 0 rgba(255,255,255
 /* Scoreboard, icon-first: two portraits, two big numbers, one tug-of-war rope. */
 ${S} div:has(> [data-score-value="bot"]) > :first-child {
   width: 52px !important; height: 52px !important; flex-shrink: 0; border-radius: 9999px; overflow: hidden;
-  background: #2a2a4e url(${RIVAL_ART.idle}) 50% 8% / 150% no-repeat;
-  border: 3px solid #ff1493; opacity: 1; filter: none; box-shadow: 3px 3px 0 #000;
+  background: color-mix(in srgb, var(--neo-purple-light) 30%, rgb(var(--neo-black))) url(${RIVAL_ART.idle}) 50% 8% / 150% no-repeat;
+  border: 3px solid var(--neo-pink); opacity: 1; filter: none; box-shadow: 3px 3px 0 rgb(var(--neo-black));
 }
 ${S} div:has(> [data-score-value="bot"]) > :first-child > * { visibility: hidden; }
 ${S} div:has(> [data-score-value="player"]) > :first-child {
   width: 52px !important; height: 52px !important; flex-shrink: 0; border-radius: 9999px;
-  box-shadow: 0 0 0 3px #ffe135, 3px 3px 0 3px #000;
+  box-shadow: 0 0 0 3px var(--neo-yellow), 3px 3px 0 3px rgb(var(--neo-black));
 }
 ${S} div:has(> [data-score-value]) > span:last-child { display: none; }
 ${S} div:has(> div > [data-score-value="player"]) > div:nth-child(2) { display: none; }
-${S} [data-score-value] { font-size: 46px; text-shadow: 3px 3px 0 #000; }
+${S} [data-score-value] { font-size: 46px; text-shadow: 3px 3px 0 rgb(var(--neo-black)); }
 ${S} [role="img"]:has(> .wc-bar-fill) {
-  height: 20px; overflow: visible; border: 3px solid #000; border-radius: 9999px;
-  background: linear-gradient(180deg, #ff5ab0, #ff1493 60%, #c20f72); box-shadow: 0 4px 0 #000;
+  height: 20px; overflow: visible; border: 3px solid rgb(var(--neo-black)); border-radius: 9999px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--neo-pink) 20%, var(--neo-pink-light)), var(--neo-pink) 60%, color-mix(in srgb, var(--neo-pink) 75%, rgb(var(--neo-black)))); box-shadow: 0 4px 0 rgb(var(--neo-black));
 }
 ${S} .wc-bar-fill {
   border-radius: 0; border-start-start-radius: 9999px; border-end-start-radius: 9999px; border-inline-end: 0 !important;
-  background: linear-gradient(180deg, #8affff, #00ffff 60%, #00b8c9);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--neo-cyan) 45%, rgb(var(--neo-white))), var(--neo-cyan) 60%, color-mix(in srgb, var(--neo-cyan-dark) 90%, var(--neo-purple-light)));
 }
 ${S} .wc-bar-fill::after {
   content: ''; position: absolute; inset-inline-end: -13px; top: 50%; width: 26px; height: 26px; margin-top: -13px;
-  border-radius: 9999px; border: 3px solid #000; box-shadow: 2px 2px 0 #000;
-  background: radial-gradient(circle at 35% 30%, #fff6c4, #ffd23a 55%, #c98a00);
+  border-radius: 9999px; border: 3px solid rgb(var(--neo-black)); box-shadow: 2px 2px 0 rgb(var(--neo-black));
+  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--neo-yellow) 30%, rgb(var(--neo-white))), color-mix(in srgb, var(--neo-red) 10%, var(--neo-yellow)) 55%, color-mix(in srgb, var(--neo-lime-dark) 50%, var(--neo-orange-hover)));
 }
 ${S} [role="img"]:has(> .wc-bar-fill) > span[aria-hidden] { display: none; }
 ${S} span:has(> svg.lucide-crown) { display: none; }
@@ -132,22 +132,22 @@ ${S} [data-scoreboard-card] { font-size: 12px; }
 
 /* Rack: seven thumb-size ivory tiles on a wooden tray — all visible at 390px, real bevel + drop. */
 ${S} [role="toolbar"]:has([data-rack-tile-id]) {
-  min-height: 0 !important; overflow: visible; border: 3px solid #000; border-radius: 16px;
+  min-height: 0 !important; overflow: visible; border: 3px solid rgb(var(--neo-black)); border-radius: 16px;
   background:
     linear-gradient(180deg, rgba(255,210,150,0.25), transparent 30%),
-    repeating-linear-gradient(90deg, #7a4a23 0 11px, #6e421f 11px 19px, #845027 19px 27px);
-  box-shadow: inset 0 -6px 0 rgba(0,0,0,0.35), 0 5px 0 #000;
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--neo-cozy-muted) 55%, rgb(var(--neo-black))) 0 11px, color-mix(in srgb, var(--neo-cozy-muted) 50%, rgb(var(--neo-black))) 11px 19px, color-mix(in srgb, var(--neo-cozy-muted) 60%, rgb(var(--neo-black))) 19px 27px);
+  box-shadow: inset 0 -6px 0 rgba(0,0,0,0.35), 0 5px 0 rgb(var(--neo-black));
 }
 ${S} [role="toolbar"] > div:has(> [data-rack-tile-id]) { gap: 5px; padding: 10px 8px 14px; width: 100%; justify-content: center; }
 ${S} [data-rack-tile-id] {
   width: min(calc((min(100vw, 820px) - 76px) / 7), 68px); height: auto; aspect-ratio: 5 / 6;
-  border: 2.5px solid #000; border-radius: 11px; color: #17110a;
-  background: linear-gradient(180deg, #fffdf4 0%, #f6e8c8 55%, #ead3a2 100%);
-  box-shadow: inset 0 2px 0 #fff, inset 0 -6px 0 #c79a5a, 0 4px 0 #000, 0 8px 12px rgba(0,0,0,0.45);
+  border: 2.5px solid rgb(var(--neo-black)); border-radius: 11px; color: color-mix(in srgb, var(--neo-cozy) 10%, rgb(var(--neo-black)));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--neo-cream) 65%, rgb(var(--neo-white))) 0%, color-mix(in srgb, var(--neo-cozy-light) 40%, var(--neo-cream)) 55%, color-mix(in srgb, var(--neo-cyan) 10%, var(--neo-cozy-light)) 100%);
+  box-shadow: inset 0 2px 0 rgb(var(--neo-white)), inset 0 -6px 0 color-mix(in srgb, var(--neo-purple) 40%, var(--neo-yellow-hover)), 0 4px 0 rgb(var(--neo-black)), 0 8px 12px rgba(0,0,0,0.45);
 }
 ${S} [data-rack-tile-id][aria-pressed="true"] {
-  background: linear-gradient(180deg, #f4ffc9 0%, #d8ff5c 60%, #a6d900 100%);
-  box-shadow: inset 0 2px 0 #fff, inset 0 -6px 0 #7fa300, 0 6px 0 #000, 0 0 18px rgba(191,255,0,0.8);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--neo-lime-light) 35%, rgb(var(--neo-white))) 0%, color-mix(in srgb, var(--neo-lime) 10%, var(--neo-lime-light)) 60%, var(--neo-lime-muted) 100%);
+  box-shadow: inset 0 2px 0 rgb(var(--neo-white)), inset 0 -6px 0 color-mix(in srgb, var(--neo-lime-muted) 75%, rgb(var(--neo-black))), 0 6px 0 rgb(var(--neo-black)), 0 0 18px rgba(191,255,0,0.8);
 }
 ${S} [data-rack-tile-id] .wc-tile-glyph { font-size: clamp(1.6rem, 7.4vw, 2.6rem); line-height: 1; margin-top: -4px; }
 ${S} [data-rack-tile-id] > span.absolute.bottom-1 { top: 4px; bottom: auto; inset-inline-end: 5px; font-size: 10px; line-height: 1; opacity: 0.7; }

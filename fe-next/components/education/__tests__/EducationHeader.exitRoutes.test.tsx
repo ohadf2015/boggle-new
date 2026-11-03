@@ -42,8 +42,7 @@ const ROLES = {
 } as const;
 
 type Role = keyof typeof ROLES;
-// "Exit Education" is the deliberate way out, so it always leaves for the app home.
-const exitHref = (lang: string) => `/${lang}`;
+const HUB: Record<Role, string> = { teacher: 'teacher', student: 'student', guest: 'education' };
 
 describe.each(['en', 'he', 'sv', 'ja', 'es', 'ru'])('EducationHeader exit links, language=%s', (lang) => {
   beforeEach(() => {
@@ -51,13 +50,22 @@ describe.each(['en', 'he', 'sv', 'ja', 'es', 'ru'])('EducationHeader exit links,
     pathname = `/${lang}/education`;
   });
 
-  it.each(Object.keys(ROLES) as Role[])('mobile "Exit Education" for %s', (role) => {
+  it.each(['teacher', 'student'] as const)('mobile menu offers a signed-in %s no way to the game home', (role) => {
     authState = ROLES[role];
     render(<EducationHeader />);
     fireEvent.click(screen.getByLabelText('common.openMenu'));
 
-    const exit = screen.getByText('education.header.exitEducation').closest('a');
-    expect(exit).toHaveAttribute('href', exitHref(lang));
+    expect(screen.queryByText('education.header.exitEducation')).toBeNull();
+    const hrefs = Array.from(document.querySelectorAll('a[href]')).map((a) => a.getAttribute('href'));
+    expect(hrefs).not.toContain(`/${lang}`);
+  });
+
+  it('mobile "Exit Education" stays for a signed-out visitor on a public page', () => {
+    authState = ROLES.guest;
+    render(<EducationHeader />);
+    fireEvent.click(screen.getByLabelText('common.openMenu'));
+
+    expect(screen.getByText('education.header.exitEducation').closest('a')).toHaveAttribute('href', `/${lang}`);
   });
 
   it.each([
@@ -70,13 +78,13 @@ describe.each(['en', 'he', 'sv', 'ja', 'es', 'ru'])('EducationHeader exit links,
     expect(screen.getByLabelText('education.header.homeLink')).toHaveAttribute('href', `/${lang}/${hub}`);
   });
 
-  it.each(Object.keys(ROLES) as Role[])('desktop menu "Exit Education" for %s', (role) => {
+  it.each(Object.keys(ROLES) as Role[])('desktop menu exit for a %s lands in their edu hub or, signed out, the public home', (role) => {
     authState = ROLES[role];
     render(<EducationHeader />);
     fireEvent.click(screen.getByLabelText('common.menu'));
 
     const menu = screen.getByText('education.header.exitEducation').closest('a');
-    expect(menu).toHaveAttribute('href', exitHref(lang));
+    expect(menu).toHaveAttribute('href', role === 'guest' ? `/${lang}` : `/${lang}/${HUB[role]}`);
   });
 
 });

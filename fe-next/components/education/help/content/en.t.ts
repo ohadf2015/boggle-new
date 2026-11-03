@@ -12,7 +12,7 @@ export const enT: HelpLocaleContent = {
         items: [
           { time: '0:00', title: 'Open Teacher HQ', body: 'Sign in at [Teacher HQ](app:/teacher). You land on [[teacher.nav.play]].' },
           { time: '0:30', title: 'Pick a game and words', body: 'Tap [[academy.hq.modes.classic]] and one of the starter lists under the posters. They are ready to play.', shot: 'hq-start-game' },
-          { time: '1:00', title: 'Go live and project it', body: 'Press [[teacher.playNow.goLive]] and put your screen on the board. The lobby shows a big code, the link and a QR code.', shot: 'lobby' },
+          { time: '1:00', title: 'Start live and project it', body: 'Press [[teacher.playNow.goLive]] and put your screen on the board. The lobby shows a big code, the link and a QR code.', shot: 'lobby' },
           { time: '1:30', title: 'Students join', body: 'They scan the QR or type the code at lexiclash.live/join, then pick a name. Watch the names fly in.' },
           { time: '2:00', title: 'Play one round', body: 'Press [[hostView.startClassGame]]. A [[academy.hq.modes.classic]] round lasts three minutes. Your screen shows the clock and the live leaderboard.', shot: 'live-host' },
           { time: '5:00', title: 'Celebrate, then go again', body: 'The podium appears. Press [[education.results.playAgain]] for a second round with the same code, or [[eduLive.results.backToClass]] to finish.' },

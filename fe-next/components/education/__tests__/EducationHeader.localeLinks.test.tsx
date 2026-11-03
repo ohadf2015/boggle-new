@@ -51,32 +51,26 @@ describe('EducationHeader links under he', () => {
   it.each([
     ['teacher', TEACHER],
     ['student', STUDENT],
-    ['guest', GUEST],
-  ] as const)('the desktop account menu holds the only way out for a %s', (_, auth) => {
+  ] as const)('neither menu sends a signed-in %s to the game home', (_, auth) => {
     authState = auth;
     render(<EducationHeader />);
     fireEvent.click(screen.getByLabelText('common.menu'));
-    const menu = screen.getByRole('menu');
-    const links = anchors(menu);
-    for (const a of links) expect(a.getAttribute('href')).toMatch(/^\/he(\/|$)/);
-    const exits = links.filter((a) => a.getAttribute('href') === '/he');
-    expect(exits).toHaveLength(1);
-    expect(exits[0]).toHaveTextContent('education.header.exitEducation');
-    expect(hrefs().filter((h) => h === '/he')).toHaveLength(1);
-  });
-
-  it.each([
-    ['teacher', TEACHER],
-    ['student', STUDENT],
-    ['guest', GUEST],
-  ] as const)('the phone menu holds the only way out for a %s', (_, auth) => {
-    authState = auth;
-    render(<EducationHeader />);
     fireEvent.click(screen.getByLabelText('common.openMenu'));
     const all = hrefs();
-    for (const h of all) expect(h).toMatch(/^\/he(\/|$)/);
+    expect(all.length).toBeGreaterThan(0);
+    for (const h of all) expect(h).toMatch(/^\/he\/(education|teacher|student|join)/);
+  });
+
+  it('a signed-out visitor keeps exactly one way out in each menu', () => {
+    authState = GUEST;
+    render(<EducationHeader />);
+    fireEvent.click(screen.getByLabelText('common.menu'));
+    const menuExits = anchors(screen.getByRole('menu')).filter((a) => a.getAttribute('href') === '/he');
+    expect(menuExits).toHaveLength(1);
+    expect(menuExits[0]).toHaveTextContent('education.header.exitEducation');
+    fireEvent.click(screen.getByLabelText('common.openMenu'));
     const exits = anchors().filter((a) => a.getAttribute('href') === '/he');
-    expect(exits).toHaveLength(1);
-    expect(exits[0]).toHaveTextContent('education.header.exitEducation');
+    expect(exits).toHaveLength(2);
+    for (const a of exits) expect(a).toHaveTextContent('education.header.exitEducation');
   });
 });

@@ -1,38 +1,36 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
-import { Mail, MailCheck, ArrowRight } from 'lucide-react';
+import { Mail, MailCheck } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { resendEmailVerification } from '@/lib/supabase';
-import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { latchSignupSource, trackGrowthEvent } from '@/utils/growthTracking';
 import { AccessRequestForm } from './AccessRequestForm';
+import { AccessRequestGoogleButton } from './AccessRequestGoogleButton';
+import type { AccessApproval } from './AccessRequestHandoff';
 
 const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
 
 const CTA_CLASS =
-  'inline-flex items-center gap-2 rounded-neo border-neo-thick border-black bg-neo-lime px-4 py-3 ' +
+  'inline-flex items-center gap-2 rounded-neo border-neo-thick border-neo-black bg-neo-lime px-4 py-3 ' +
   'font-bold text-neo-navy font-neo-display shadow-hard hover:shadow-hard-sm ' +
   'active:shadow-hard-pressed disabled:opacity-50 disabled:cursor-not-allowed transition';
 
-/** The one action this page exists for — sized and weighted accordingly. */
-const PRIMARY_CTA_CLASS =
-  'group flex w-full items-center justify-center gap-3 rounded-neo border-neo-thick border-black ' +
-  // text-base on phones: the longer locales (es/ru/sv) wrap badly at 18px in a
-  // ~290px content box. text-balance keeps the wrap even when it does happen.
-  'bg-neo-lime px-5 py-4 font-neo-display text-base font-black tracking-[-0.01em] text-neo-navy ' +
-  'text-balance shadow-hard-lg transition hover:-translate-y-0.5 hover:shadow-hard-xl ' +
-  'active:translate-y-0 active:shadow-hard-pressed sm:px-6 sm:text-xl';
+const EMAIL_CTA_CLASS =
+  'flex min-h-12 w-full items-center justify-center gap-2 rounded-neo border-neo-thick border-neo-cream/60 bg-neo-navy ' +
+  'px-4 py-3 font-neo-display text-base font-black text-neo-white text-balance shadow-hard transition-[box-shadow,transform] ' +
+  'duration-100 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0 active:shadow-hard-pressed ' +
+  'focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan';
 
 /**
  * Auth + email-verification gate in front of the teacher-access request form.
  *
  * Teacher access is bound to a verified account (the API enforces the same in
  * `POST /api/education/access-request`). This surface makes the prerequisite
- * legible: sign up / sign in, then confirm your email, then request access.
+ * legible: sign up / sign in, confirm your email, then one tap into class setup.
  */
-export function AccessRequestGate() {
+export function AccessRequestGate({ onApproved }: { onApproved?: (approval: AccessApproval) => void } = {}) {
   const { t } = useLanguage();
   const { user, profile, loading } = useAuth();
   const [authMode, setAuthMode] = useState<'signup' | 'signin' | null>(null);
@@ -80,49 +78,55 @@ export function AccessRequestGate() {
 
   // Not signed up / signed in yet. An anonymous arcade session has no email to verify.
   if (!user || user.is_anonymous || !user.email) {
+    const tapped = (mode: 'google' | 'signup' | 'signin') => {
+      try {
+        trackGrowthEvent('edu_access_signup_tapped', { mode });
+        // Own attribution: signups from the edu gate are not header_or_menu.
+        latchSignupSource('edu_access');
+      } catch {
+        /* telemetry must never break access request */
+      }
+    };
     return (
       <div className="text-neo-white">
         <h2 className="font-neo-display text-2xl font-black tracking-[-0.02em]">
           {t('education.access.auth_required_title')}
         </h2>
         <p className="mt-2 text-neo-white/80">{t('education.access.auth_required_body')}</p>
+        <div className="mt-5">
+          <AccessRequestGoogleButton onTap={() => tapped('google')} />
+        </div>
+        <div className="my-4 flex items-center gap-3" aria-hidden="true">
+          <span className="h-0.5 flex-1 bg-neo-cream/25" />
+          <span className="text-xs font-bold uppercase tracking-wider text-neo-white/60">
+            {t('auth.magicLink.divider')}
+          </span>
+          <span className="h-0.5 flex-1 bg-neo-cream/25" />
+        </div>
         <button
           type="button"
           onClick={() => {
-            try {
-              trackGrowthEvent('edu_access_signup_tapped', { mode: 'signup' });
-              // Own attribution: signups from the edu gate are not header_or_menu.
-              latchSignupSource('edu_access');
-            } catch {
-              /* telemetry must never break access request */
-            }
+            tapped('signup');
             setAuthMode('signup');
           }}
-          className={`mt-5 ${PRIMARY_CTA_CLASS}`}
+          className={EMAIL_CTA_CLASS}
         >
-          {t('education.access.auth_required_cta')}
-          <DirectionalIcon
-            icon={ArrowRight}
-            className="h-5 w-5 transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1"
-          />
+          <span className="text-balance">
+            <Mail className="me-2 inline size-5 align-[-0.2em]" aria-hidden="true" />
+            {t('education.access.auth_required_cta')}
+          </span>
         </button>
         <button
           type="button"
           onClick={() => {
-            try {
-              trackGrowthEvent('edu_access_signup_tapped', { mode: 'signin' });
-              // Own attribution: signups from the edu gate are not header_or_menu.
-              latchSignupSource('edu_access');
-            } catch {
-              /* telemetry must never break access request */
-            }
+            tapped('signin');
             setAuthMode('signin');
           }}
-          className="mt-3 flex min-h-11 w-full items-center justify-center rounded-neo border-2 border-neo-cream/60 bg-neo-navy px-4 font-neo-display text-sm font-black text-neo-white shadow-hard-sm transition-[box-shadow] hover:shadow-hard focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
+          className="mt-2 flex min-h-11 w-full items-center justify-center rounded-neo px-4 font-neo-display text-sm font-bold text-neo-white/85 underline decoration-neo-cream/40 underline-offset-4 hover:text-neo-white focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
         >
           {t('education.access.auth_signin_cta')}
         </button>
-        <p className="mt-3 text-center text-sm font-semibold text-neo-white/60">
+        <p className="mt-2 text-center text-sm font-semibold text-neo-white/60">
           {t('education.access.cta_micro')}
         </p>
         {authMode && <AuthModal isOpen onClose={() => setAuthMode(null)} initialMode={authMode} audience="teacher" />}
@@ -172,7 +176,7 @@ export function AccessRequestGate() {
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="inline-flex items-center gap-2 rounded-neo border-neo border-neo-cream/40 bg-neo-navy px-4 py-3 font-bold text-neo-white shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition"
+            className="inline-flex items-center gap-2 rounded-neo border-neo border-neo-cream/40 bg-neo-navy px-4 py-3 font-bold text-neo-white shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
           >
             {t('education.access.verify_email_refresh')}
           </button>
@@ -186,9 +190,6 @@ export function AccessRequestGate() {
     );
   }
 
-  // Signed in and verified — we already have name + email from signup, so the
-  // form asks only for role and use case. Pass the known details for a friendly
-  // greeting; the server derives them authoritatively from the account.
   const knownName = profile?.display_name || profile?.username || undefined;
-  return <AccessRequestForm knownName={knownName} knownEmail={user.email ?? undefined} />;
+  return <AccessRequestForm knownName={knownName} knownEmail={user.email ?? undefined} onApproved={onApproved} />;
 }

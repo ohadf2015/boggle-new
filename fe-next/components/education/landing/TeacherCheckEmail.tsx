@@ -68,7 +68,7 @@ export function TeacherCheckEmail({
           data-testid="teacher-check-email-resend"
           onClick={onResend}
           disabled={resend === 'sending' || resend === 'sent'}
-          className="min-h-11 text-neo-cyan underline decoration-2 underline-offset-4 disabled:no-underline disabled:opacity-80"
+          className="min-h-11 text-neo-cyan underline decoration-2 underline-offset-4 disabled:no-underline disabled:opacity-80 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
         >
           {resend === 'sent'
             ? t('eg2Land.checkEmail.resent')
@@ -80,7 +80,7 @@ export function TeacherCheckEmail({
           type="button"
           data-testid="teacher-check-email-change"
           onClick={onChangeEmail}
-          className="min-h-11 text-neo-white/80 underline decoration-2 underline-offset-4 hover:text-neo-white"
+          className="min-h-11 text-neo-white/80 underline decoration-2 underline-offset-4 hover:text-neo-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
         >
           {t('eg2Land.checkEmail.change')}
         </button>

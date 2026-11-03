@@ -16,14 +16,10 @@
 import { Flame } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ResultsPodium } from '../results/ResultsPodium';
+import { MEDAL_FILL } from '../results/PodiumStage';
 import type { VocabQuizStanding, TranslateFn } from '@/shared/types/vocabQuiz';
 
-/** Same metals as the board podium's plates, so a medal reads the same in every mode. */
-const MEDALS = [
-  { name: 'gold', fill: 'bg-neo-yellow' },
-  { name: 'silver', fill: 'bg-[#dfe5ee]' },
-  { name: 'bronze', fill: 'bg-[#e8894b]' },
-] as const;
+const MEDALS = (['gold', 'silver', 'bronze'] as const).map((name) => ({ name, fill: MEDAL_FILL[name] }));
 
 export interface VocabQuizStandingsProps {
   standings: VocabQuizStanding[];

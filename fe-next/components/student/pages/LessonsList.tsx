@@ -78,7 +78,7 @@ export function LessonCard({ entry, level, locale }: { entry: StudentLesson; lev
       style={toneStyle(done ? 'plum' : 'night', { shadow: 3, trim: 2 })}
     >
       <span className="relative h-14 w-14 shrink-0" aria-hidden="true">
-        <Image src={NODE_ART[type] ?? NODE_ART.lesson!} alt="" fill unoptimized sizes="56px" className="object-contain drop-shadow-[2px_2px_0_#000]" />
+        <Image src={NODE_ART[type] ?? NODE_ART.lesson!} alt="" fill unoptimized sizes="56px" className="object-contain drop-shadow-[2px_2px_0_rgb(var(--neo-black))]" />
       </span>
       <span className="flex min-w-0 flex-1 flex-col gap-1">
         <span dir="auto" className={cn('line-clamp-2 font-neo-display text-lg font-black leading-tight text-neo-white', INK_TEXT)}>
@@ -109,7 +109,7 @@ export function LessonsEmpty({ locale }: { locale: string }) {
   return (
     <div className="flex h-full min-h-[12rem] flex-col items-center justify-center gap-3 px-4 text-center">
       <span className="relative h-24 w-24 sm:h-32 sm:w-32" aria-hidden="true">
-        <Image src="/images/education/chest-books.webp" alt="" fill unoptimized sizes="128px" className="object-contain drop-shadow-[3px_3px_0_#000]" />
+        <Image src="/images/education/chest-books.webp" alt="" fill unoptimized sizes="128px" className="object-contain drop-shadow-[3px_3px_0_rgb(var(--neo-black))]" />
       </span>
       <p dir="auto" className={cn('font-neo-display text-xl font-black text-neo-white', INK_TEXT)}>
         {t('academy.pages.noLessonsTitle', 'No lessons yet')}

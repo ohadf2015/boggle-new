@@ -117,7 +117,7 @@ export function ClassroomAddonPlanner({
             type="button"
             data-testid={`classroom-addon-planner-example-${example.slice(0, 12).replace(/\s+/g, '-')}`}
             onClick={() => setPrompt(example)}
-            className="px-2.5 py-1 text-xs font-bold rounded-neo border-neo border-neo-cream/40 bg-neo-navy text-neo-cream/90 hover:border-neo-lime hover:text-neo-lime transition-colors"
+            className="px-2.5 py-1 text-xs font-bold rounded-neo border-neo border-neo-cream/40 bg-neo-navy text-neo-cream/90 hover:border-neo-lime hover:text-neo-lime transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           >
             {example}
           </button>
@@ -184,7 +184,7 @@ export function ClassroomAddonPlanner({
             target="_blank"
             rel="noopener noreferrer"
             data-testid="classroom-addon-planner-open-live"
-            className={cn(
+            className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
               'mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 font-bold text-sm',
               'bg-neo-lime text-neo-black border-neo border-neo-black rounded-neo',
               'shadow-hard hover:shadow-hard-lg transition',
@@ -199,7 +199,7 @@ export function ClassroomAddonPlanner({
             target="_blank"
             rel="noopener noreferrer"
             data-testid="classroom-addon-planner-grade-passback"
-            className={cn(
+            className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
               'mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
               'bg-neo-cyan text-neo-black border-neo border-neo-black rounded-neo',
               'shadow-hard-sm hover:shadow-hard transition',
@@ -215,7 +215,7 @@ export function ClassroomAddonPlanner({
               target="_blank"
               rel="noopener noreferrer"
               data-testid="classroom-addon-planner-post-stream"
-              className={cn(
+              className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
                 'mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
                 'bg-neo-cream text-neo-black border-neo border-neo-black rounded-neo',
                 'shadow-hard-sm hover:shadow-hard transition',

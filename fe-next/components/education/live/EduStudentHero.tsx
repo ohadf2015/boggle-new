@@ -114,7 +114,7 @@ function EduStudentHeroImpl({ rank, total, score, bestWord, lesson, xp, coins, g
           alt=""
           width={192}
           height={192}
-          className="size-24 shrink-0 select-none object-contain drop-shadow-[3px_3px_0_#000] motion-safe:animate-[edu-live-bob_2.4s_ease-in-out_infinite]"
+          className="size-24 shrink-0 select-none object-contain drop-shadow-[3px_3px_0_rgb(var(--neo-black))] motion-safe:animate-[edu-live-bob_2.4s_ease-in-out_infinite]"
         />
       </div>
 

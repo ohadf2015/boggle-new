@@ -1,4 +1,4 @@
-import { vi, type Mock, } from 'vitest';
+import { vi, type Mock, afterEach, beforeEach } from 'vitest';
 /**
  * Teacher Reports PageClient Tests
  *
@@ -356,6 +356,19 @@ describe('ReportsPageClient', () => {
       expect(screen.queryByTestId('pro-gate-preview')).not.toBeInTheDocument();
     });
 
+    it('on a phone, orders the trial strip after the report so the reteach action is the first tap', () => {
+      proState.hasPro = false;
+      proState.accessTrialExpires = inDays(9);
+      render(<ReportsPageClient />);
+
+      const strip = screen.getByTestId('pro-trial-preview');
+      const frame = strip.parentElement!;
+      expect(frame.className).toMatch(/max-sm:flex-col/);
+      expect(frame.className).toContain('max-sm:[&>[data-testid=pro-trial-preview]]:order-last');
+      expect(strip.nextElementSibling).toContainElement(screen.getByTestId('reports-value-line'));
+      expect(strip.nextElementSibling!.className).toMatch(/\bw-full\b/);
+    });
+
     it('gives a paying teacher every report and no lock or strip', async () => {
       mockSearchParams.set('classroomId', 'classroom-1');
       render(<ReportsPageClient />);
@@ -416,6 +429,46 @@ describe('ReportsPageClient', () => {
 
       const classroomButtons = screen.getAllByRole('button');
       expect(classroomButtons.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe('Plain-words value and the empty class', () => {
+    const saved = { ...proState };
+    beforeEach(() => Object.assign(proState, { hasPro: true, loading: false, accessTrialExpires: null }));
+    afterEach(() => {
+      Object.assign(proState, saved);
+      delete (mockClassrooms[0] as { member_count?: number }).member_count;
+    });
+
+    it('Given the class list, Then one line says what a report is for, in plain words', () => {
+      render(<ReportsPageClient />);
+      expect(screen.getByTestId('reports-value-line')).toHaveTextContent('teacher.reports.valueLine');
+    });
+
+    it('Given a class nobody has played in yet, Then an empty state says why and offers one action: start a game for that class', () => {
+      (mockClassrooms[0] as { member_count?: number }).member_count = 0;
+      mockSearchParams.set('classroomId', 'classroom-1');
+      render(<ReportsPageClient />);
+      const empty = screen.getByTestId('reports-class-empty');
+      expect(empty).toHaveTextContent('teacher.reports.emptyClass.title');
+      const links = within(empty).getAllByRole('link');
+      expect(links).toHaveLength(1);
+      expect(links[0]).toHaveAttribute('href', '/en/education/classroom-game?classroomId=classroom-1');
+      expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
+    });
+
+    it('Given a class with students, Then the report tabs show and no empty state', () => {
+      (mockClassrooms[0] as { member_count?: number }).member_count = 12;
+      mockSearchParams.set('classroomId', 'classroom-1');
+      render(<ReportsPageClient />);
+      expect(screen.queryByTestId('reports-class-empty')).not.toBeInTheDocument();
+      expect(screen.getByRole('tablist')).toBeInTheDocument();
+    });
+
+    it('Given a free teacher at the lock, Then the page says the missed words stay free on every game\'s results', () => {
+      Object.assign(proState, { hasPro: false, known: true, status: 'canceled', trialUsed: true });
+      render(<ReportsPageClient />);
+      expect(screen.getByTestId('reports-locked-value')).toHaveTextContent('teacher.reports.lockedValue');
     });
   });
 

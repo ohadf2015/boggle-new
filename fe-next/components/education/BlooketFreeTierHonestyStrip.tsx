@@ -88,7 +88,7 @@ export function BlooketFreeTierHonestyStrip({
           href={IS_FREE_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="underline decoration-neo-cyan/60 underline-offset-2 hover:text-neo-cyan"
+          className="underline decoration-neo-cyan/60 underline-offset-2 hover:text-neo-cyan focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           data-testid="blooket-free-tier-is-free-link"
         >
           {t('education.vsBlooket.freeTier.citeIsFreeLabel')}
@@ -98,7 +98,7 @@ export function BlooketFreeTierHonestyStrip({
           href={PLUS_FEATURES_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="underline decoration-neo-cyan/60 underline-offset-2 hover:text-neo-cyan"
+          className="underline decoration-neo-cyan/60 underline-offset-2 hover:text-neo-cyan focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           data-testid="blooket-free-tier-plus-link"
         >
           {t('education.vsBlooket.freeTier.citePlusLabel')}
@@ -108,7 +108,7 @@ export function BlooketFreeTierHonestyStrip({
           href={UPGRADE_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="underline decoration-neo-cyan/60 underline-offset-2 hover:text-neo-cyan"
+          className="underline decoration-neo-cyan/60 underline-offset-2 hover:text-neo-cyan focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           data-testid="blooket-free-tier-upgrade-link"
         >
           {t('education.vsBlooket.freeTier.citeUpgradeLabel')}
@@ -119,7 +119,7 @@ export function BlooketFreeTierHonestyStrip({
       <div className="mt-5">
         <Link
           href={`/${loc}/education/classroom-game`}
-          className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition hover:shadow-hard-lg"
+          className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition hover:shadow-hard-lg focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           data-testid="blooket-free-tier-cta"
         >
           {t('education.vsBlooket.freeTier.cta')}

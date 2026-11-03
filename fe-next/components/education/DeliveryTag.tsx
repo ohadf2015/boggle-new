@@ -22,7 +22,7 @@ export function DeliveryTag({
       data-testid={`delivery-tag-${delivery}`}
       className={cn(
         'inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-neo-black/85 px-2 py-0.5',
-        'font-neo-body text-[0.68rem] font-bold leading-none text-neo-cream',
+        'font-neo-body text-xs font-bold leading-none text-neo-cream',
         className,
       )}
     >

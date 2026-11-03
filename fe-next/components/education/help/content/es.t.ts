@@ -12,7 +12,7 @@ export const esT: HelpLocaleContent = {
         items: [
           { time: '0:00', title: 'Abre la Central del profe', body: 'Inicia sesión en la [Central del profe](app:/teacher). Aterrizas en [[teacher.nav.play]].' },
           { time: '0:30', title: 'Elige juego y palabras', body: 'Toca [[academy.hq.modes.classic]] y una de las listas iniciales bajo los pósteres. Están listas para jugar.', shot: 'hq-start-game' },
-          { time: '1:00', title: 'En directo y a la pizarra', body: 'Pulsa [[teacher.playNow.goLive]] y proyecta tu pantalla. La sala de espera muestra un código grande, el enlace y un código QR.', shot: 'lobby' },
+          { time: '1:00', title: 'Empieza en vivo y a la pizarra', body: 'Pulsa [[teacher.playNow.goLive]] y proyecta tu pantalla. La sala de espera muestra un código grande, el enlace y un código QR.', shot: 'lobby' },
           { time: '1:30', title: 'El alumnado se une', body: 'Escanean el QR o escriben el código en lexiclash.live/join y eligen un nombre. Verás los nombres entrar volando.' },
           { time: '2:00', title: 'Juega una ronda', body: 'Pulsa [[hostView.startClassGame]]. Una ronda de [[academy.hq.modes.classic]] dura tres minutos. Tu pantalla muestra el reloj y la clasificación en directo.', shot: 'live-host' },
           { time: '5:00', title: 'Celebrad y otra vez', body: 'Aparece el podio. Pulsa [[education.results.playAgain]] para una segunda ronda con el mismo código, o [[eduLive.results.backToClass]] para terminar.' },

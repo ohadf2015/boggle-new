@@ -166,14 +166,14 @@ export function StudentRankRail({
       >
         {myScore}
       </AdaptiveMotion.span>
-      <span className="text-[10px] font-bold uppercase tracking-wide opacity-70">
+      <span className="text-xs font-bold uppercase tracking-wide opacity-70">
         {t('education.student.feel.points')}
       </span>
       <span className="opacity-40" aria-hidden="true">
         ·
       </span>
       <span className="text-sm font-black tabular-nums leading-none">{wordsFound}</span>
-      <span className="text-[10px] font-bold uppercase tracking-wide opacity-70">
+      <span className="text-xs font-bold uppercase tracking-wide opacity-70">
         {t('education.student.feel.words')}
       </span>
       {scorePop && scorePop.points > 0 && (
@@ -186,7 +186,7 @@ export function StudentRankRail({
           transition={{ type: 'spring', stiffness: 520, damping: 20 }}
           className={cn(
             'pointer-events-none absolute -top-2 start-1 z-10 rounded-neo border-2 border-neo-black',
-            'bg-neo-lime px-1 text-[11px] font-black leading-tight text-neo-black tabular-nums',
+            'bg-neo-lime px-1 text-xs font-black leading-tight text-neo-black tabular-nums',
           )}
         >
           {`+${scorePop.points}`}
@@ -243,7 +243,7 @@ export function StudentRankRail({
             className={cn(
               'absolute left-1/2 top-full z-30 mt-1 -translate-x-1/2 whitespace-nowrap',
               'flex items-center gap-1 rounded-neo border-neo px-2.5 py-1',
-              'font-neo-display text-[11px] font-black',
+              'font-neo-display text-xs font-black',
               MESSAGE_TONE[cue.tone],
             )}
             role="status"

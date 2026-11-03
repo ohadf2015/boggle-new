@@ -14,7 +14,7 @@ export const BossShieldMeter = memo(function BossShieldMeter({ shield, max }: { 
       data-testid="boss-shield"
       className="relative rounded-[0.8cqw] border-[0.25cqw] border-neo-black bg-neo-navy-light/95 p-[1cqw] shadow-hard-xl"
     >
-      <Image src={EDU_MASCOT.shield} alt="" width={96} height={96} className="absolute -top-[2.2cqw] -end-[1cqw] size-[4.2cqw] drop-shadow-[2px_2px_0_#000]" />
+      <Image src={EDU_MASCOT.shield} alt="" width={96} height={96} className="absolute -top-[2.2cqw] -end-[1cqw] size-[4.2cqw] drop-shadow-[2px_2px_0_rgb(var(--neo-black))]" />
       <h3 className="flex items-center gap-[0.5cqw] font-neo-display text-[1.8cqw] font-black uppercase leading-none tracking-wide text-neo-white">
         <Shield className="size-[2.2cqw] text-neo-cyan" strokeWidth={3} aria-hidden="true" />
         {t('classroomBoss.shield')}

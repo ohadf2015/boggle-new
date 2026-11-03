@@ -197,7 +197,7 @@ export function TeacherProCheckoutCta({
           href={`/${locale}${TEACHER_PRO_CHECKOUT_PATH}`}
           onClick={onClick}
           data-testid="teacher-pro-checkout-link"
-          className="inline-flex min-h-11 items-center rounded-neo border-2 border-neo-black bg-neo-pink px-5 font-neo-display text-sm font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform active:translate-y-px active:shadow-hard-pressed"
+          className="inline-flex min-h-11 items-center rounded-neo border-2 border-neo-black bg-neo-pink px-5 font-neo-display text-sm font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform active:translate-y-px active:shadow-hard-pressed focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
         >
           {c.cta}
         </Link>

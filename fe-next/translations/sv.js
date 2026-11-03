@@ -960,7 +960,7 @@ const sv = {
   "academy": {
     "teacher": {
       "classesTitle": "Dina klasser",
-      "hqTitle": "Lärarbasen",
+      "hqTitle": "Lärarens startsida",
       "classActions": "Klassåtgärder",
       "orTypeCode": "eller öppna länken och skriv koden"
     },
@@ -1001,14 +1001,9 @@ const sv = {
       "firstAssignmentCta": "Skapa första uppgiften",
       "startLiveTitle": "Spela en livelektion",
       "startLiveBody": "Uppgiften är ute. Starta ett livespel så klassen spelar tillsammans.",
-      "startLiveCta": "Starta liveklasspel",
+      "startLiveCta": "Starta live",
       "copyJoinCode": "Kopiera länk",
       "joinCodeCopied": "Länken kopierades",
-      "progressTitle": "Klassens framsteg",
-      "progressStudents": "elever",
-      "progressAssignments": "uppgifter",
-      "progressSubmitted": "inlämnade",
-      "progressUpgrade": "Teacher Pro",
       "endedCodeTries": "Elever som försökte gå med efter att ditt spel tog slut: {count}.",
       "endedCodeTriesOne": "En elev försökte gå med efter att ditt spel tog slut.",
       "lateJoinProLine": "Med Teacher Pro kan du ge dem en uppgift som de spelar när det passar dem.",
@@ -1103,7 +1098,6 @@ const sv = {
       "savingXp": "Sparar XP…",
       "xpEarned": "+{xp} XP",
       "tapToOpen": "Tryck för att öppna",
-      "errorTitle": "Något gick fel. Försök igen.",
       "tryAgain": "Försök igen",
       "playAgain": "Spela igen",
       "xpNotSaved": "Kunde inte spara XP den här gången. Spela igen för att försöka en gång till.",
@@ -1205,17 +1199,6 @@ const sv = {
       "classmateHere": "klasskompis är här",
       "classmatesHere": "klasskompisar är här",
       "firstIn": "Du är först här! Klasskompisarna dyker upp här."
-    },
-    "homework": {
-      "noGame": "Kör ett livespel – varje elevs missade ord hamnar här.",
-      "noMisses": "Ingen missade ett enda ord förra spelet. Inget att dela ut.",
-      "summary": "Elever: {students} · missade ord: {words}. Var och en övar bara på sina egna.",
-      "more": "+{count} till",
-      "assigned": "Utdelat. Det väntar på deras ö Missade ord.",
-      "assign": "Dela ut till varje elev",
-      "due": "Senast {date}",
-      "failed": "Kunde inte dela ut. Försök igen.",
-      "title": "Läxa: missade ord"
     },
     "pages": {
       "backToMap": "Tillbaka till Akademin",
@@ -4991,7 +4974,7 @@ const sv = {
     }
   },
   "hostView": {
-    "demoBotsFailed": "Övningsrundor körs på storskärmen. Lämna spelarläget för att repetera med bottar.",
+    "demoBotsFailed": "Övningsrundor körs på storskärmen. Lämna spelarläget för att öva med bottar.",
     "lobby": "Krigsrummet",
     "lobbyTitle": "Flerspelarlobby",
     "waitingForPlayers": "Samlar krigare...",
@@ -14493,7 +14476,7 @@ const sv = {
       "shareJoin": "Dela inbjudningslänken",
       "shareJoinCta": "Kopiera inbjudningslänk",
       "startLive": "Starta en livelektion",
-      "startLiveCta": "Starta livelektion",
+      "startLiveCta": "Starta live",
       "viewReport": "Visa första progressrapporten",
       "viewReportCta": "Öppna rapport",
       "dismiss": "Stäng",
@@ -14514,7 +14497,7 @@ const sv = {
       "pasteTooFew": "Lägg till minst {{min}} ord",
       "pasteReady": "{{count}} ord, klara att köra",
       "pastedRoundName": "Dagens ord",
-      "goLive": "Kör igång",
+      "goLive": "Starta live",
       "armedWith": "{{title}} · {{count}} ord",
       "pickSomething": "Välj en ordlista så är du igång",
       "noSetupNeeded": "Ingen klass att skapa, ingen lista att skriva. Eleverna går in med koden.",
@@ -14618,36 +14601,18 @@ const sv = {
     },
     "classReport": {
       "title": "Ord per elev",
-      "hint": "Varje ord i lektionen mot varje elev. De svåraste överst. Det är din repetitionslista.",
       "word": "Ord",
       "classMiss": "Klassen missade",
       "accuracy": "Träffsäkerhet",
       "didNotPlay": "Spelade inte",
       "quizCaveat": "Ett quiz frågar bara efter en del av lektionens ord, och de som aldrig frågades räknas här som missade. Kolla listan innan du repeterar.",
-      "empty": "Ingen spelade den här omgången",
-      "emptyHint": "När eleverna går med i ett klassspel dyker deras ord upp här, ord för ord.",
-      "copy": "Kopiera till mina anteckningar",
-      "copied": "Kopierat",
-      "copyFallback": "Kopiera den här texten:",
       "print": "Skriv ut",
-      "trendTitle": "Över dina senaste omgångar",
-      "trendEmpty": "Spela lektionen igen för att se om klassen förbättras på de här orden.",
-      "trendBarsLabel": "{word}: missat av {first} % i första omgången och {last} % i den sista.",
       "state": {
         "found": "Hittade det",
         "missed": "Missade det",
         "absent": "Spelade inte",
         "quizFound": "Svarade rätt",
         "quizMissed": "Svarade inte rätt"
-      },
-      "drilldown": {
-        "title": "Elevdetaljer",
-        "missedCount": "{count} ord missade",
-        "noneMissed": "Hittade alla ord i lektionen.",
-        "absentHint": "Eleven har inget resultat i den här omgången. Ta igen det före nästa.",
-        "suggested": "Nästa steg:",
-        "assign": "Öva de här orden",
-        "close": "Stäng"
       },
       "practice": {
         "flashcard": "Betydelsen först: flashkort och sedan ett quiz",
@@ -14800,21 +14765,7 @@ const sv = {
       "unpluggedReteachLiveFoil": "Inga elevenheter i dag? Projicera missarna – eleverna svarar på papper."
     },
     "windowProgress": {
-      "title": "Klassen den här veckan",
-      "windowLabel": "Tidsfönster",
-      "days7": "7 dagar",
-      "days30": "30 dagar",
-      "completion": "Slutförande",
-      "accuracy": "Träffsäkerhet",
       "activeLine": "{{active}} av {{roster}} elever spelade",
-      "studentStat": "{{sessions}} spel · {{accuracy}}",
-      "noPlay": "Inga spel än",
-      "loading": "Laddar klassens framsteg…",
-      "loadError": "Kunde inte ladda klassens framsteg.",
-      "retry": "Försök igen",
-      "emptyNoRoster": "Bjud in elever först, så har 7- och 30-dagarsrapporten någon att visa.",
-      "proCtaHint": "Lås upp utskrivbar historik och varje klassrum med Teacher Pro.",
-      "regionLabel": "7- och 30-dagarsframsteg för {{classroom}}"
     },
     "subscription": {
       "giftedNoCard": "Inget kort registrerat, ingen förnyelse – det tar bara slut och du går tillbaka till gratis.",
@@ -15250,17 +15201,8 @@ const sv = {
       "editLesson": "Redigera ord & definitioner",
       "moreWords": "+{{count}} fler ord",
       "bulkImport": "Massimport",
-      "bulkImportTitle": "Importera flera ord",
-      "bulkImportDescription": "Klistra in en lista med ord separerade med radbrytningar, kommatecken eller mellanslag. Du kan inkludera definitioner med 'ord - definition'.",
-      "bulkImportLabel": "Klistra in ord här",
-      "bulkImportPlaceholder": "Klistra in ord, ett per rad. Använd 'ord - definition' för definitioner.",
-      "bulkImportDetected": "{{count}} ord upptäckta",
-      "bulkImportUnreadable": "Kunde inte läsa {{count}} rad(er) (rad {{rows}}). Inget ord hittades, så de utelämnades. Kolla om ett | blivit över eller om ordet saknas.",
-      "bulkImportOneWordPerLine": "Rad {{rows}} ser ut att innehålla flera ord på samma rad. Skriv ett ord per rad och importera igen.",
       "savedAndAssigned": "Lektionen sparades och tilldelades {{classroom}}. Dina elever ser den nu.",
       "savedNotAssigned": "Lektionen sparades, men vi kunde inte tilldela den till {{classroom}}. Försök igen med lektionens knapp Tilldela klass.",
-      "bulkImportButton": "Importera",
-      "templates": "Lektionsmallar",
       "category": {
         "all": "Alla",
         "grade-1": "Åk 1",
@@ -15476,6 +15418,30 @@ const sv = {
       "failedToSaveLesson": "Kunde inte spara lektionen"
     },
     "reports": {
+      "valueLine": "Efter varje spel ser du vilka ord varje klass missade, vem som behöver hjälp och vad ni ska öva på härnäst.",
+      "lockedValue": "Orden som klassen missade visas gratis på resultatskärmen efter varje spel. Rapporterna visar dessutom vem som behöver hjälp, elev för elev, i alla dina spel.",
+      "emptyClass": {
+        "title": "Inga spel i den här klassen än",
+        "body": "Spela ett spel med klassen. Sedan visar rapporten vilka ord klassen missade och vem som behöver hjälp.",
+        "cta": "Starta ett spel med klassen"
+      },
+      "reteach": {
+        "title": "Vad ni ska repetera",
+        "exampleBadge": "Exempel",
+        "exampleBody": "Efter ditt första spel visar rutan vilka ord klassen missade och vem som behöver hjälp. Nedan är exempeldata.",
+        "fromClass": "Orden som {name} missade mest i sina spel hittills.",
+        "accuracy": "Klassens träffsäkerhet {pct} %",
+        "missRate": "{pct} % missade",
+        "studentsMissed": "{missing} av {asked} elever missade ordet",
+        "needsHelp": "Behöver hjälp:",
+        "needsHelpPro": "Detaljer elev för elev ingår i Teacher Pro.",
+        "needsHelpNone": "Alla har nått klassens mål.",
+        "moreStudents": "+{count} till",
+        "openClass": "Öppna klassrapporten",
+        "startFirstGame": "Starta ditt första spel",
+        "exampleWords": "åska,bris,frost,moln",
+        "exampleNames": "Maja,Leo"
+      },
       "arc": {
         "title": "Inlärningsbåge",
         "subtitle": "Varje elev, över alla sessioner",
@@ -15863,7 +15829,7 @@ const sv = {
       "settings": "Finjustera",
       "settingsHide": "Dölj finjustering",
       "needsLesson": "Välj en ordlista först",
-      "launch": "KÖR IGÅNG: {{mode}}",
+      "launch": "Starta live: {{mode}}",
       "tapAgain": "Tryck igen för att starta",
       "moreModes": "Fler spel ({{count}})",
       "fewerModes": "Färre spel",
@@ -15893,10 +15859,10 @@ const sv = {
       "startBlocked": "Vänta tills minst en elev har anslutit innan du startar.",
       "practiceFirst": "Öva först med 3 bottar",
       "practiceFirstHint": "Se exakt vad klassen kommer att se. Bottarna går när första eleven ansluter.",
-      "rehearseCta": "Testa med bottar",
+      "rehearseCta": "Öva med bottar",
       "rehearsePrivate": "Bara du ser det här. Eleverna är inte i rummet och det räknas inte.",
-      "rehearseBotsBlocked": "Bottar kan inte spela det här spelet, så du kan inte repetera det med dem.",
-      "rehearseUseClassic": "Repetera med Klassiskt i stället",
+      "rehearseBotsBlocked": "Bottar kan inte spela det här spelet, så du kan inte öva på det med dem.",
+      "rehearseUseClassic": "Öva med bottar i Klassiskt i stället",
       "startWhenReady": "Starta när alla är med",
       "lateJoinOn": "Sen anslutning tillåten",
       "lateJoinOff": "Sen anslutning stängd",
@@ -17840,11 +17806,11 @@ const sv = {
       "school_q": "Var finns ditt klassrum? (valfritt)",
       "school_placeholder": "Skola, läxhjälp eller hemundervisning",
       "next": {
-        "step1_title": "Steg 1: Skapa konto",
+        "step1_title": "Skapa konto",
         "step1_body": "Med Google eller e-post. Inget kort behövs.",
         "step2_title": "Steg 2: Bekräfta + 2 frågor",
         "step2_body": "Klicka på länken vi mejlar och berätta vilken roll du har och hur du ska använda LexiClash. Åtkomsten ges direkt.",
-        "step3_title": "Steg 3: Skapa en klass, dela koden",
+        "step3_title": "Skapa en klass, dela koden",
         "step3_body": "Lägg till en ordlista, starta ett spel, och eleverna går med från valfri webbläsare."
       },
       "regular_game_title": "Inte lärare?",
@@ -20748,8 +20714,6 @@ const sv = {
       "haveAccount": "Har du redan ett konto? Logga in"
     },
     "hq": {
-      "assigned": "{{count}} tilldelade",
-      "assignedAria": "Läxor: {{count}} tilldelade. Öppna läxor",
       "assignNudge": "Ge läxa"
     },
     "modeTags": {
@@ -20765,7 +20729,7 @@ const sv = {
   "eduLive": {
     "exit": {
       "title": "Avsluta klassens spel?",
-      "body": "Rummet stängs för alla elever och du kommer tillbaka till klassens startsida.",
+      "body": "Rummet stängs för alla elever och du kommer tillbaka till Hem.",
       "stay": "Fortsätt spela",
       "confirm": "Avsluta spelet"
     },
@@ -20808,12 +20772,19 @@ const sv = {
       "waitingForStudents": "Väntar på elever"
     },
     "wordcraft": {
-      "bingo": "BINGO!",
+      "bingo": "BINGO – alla brickor!",
       "waiting": "Väntar på första ordet…"
     }
   },
   // @eduLive:end
   "eduPro": {
+    "table": {
+      "modes": "Livespellägen",
+      "assignments": "Uppgifter per klass"
+    },
+    "trialLine": "De första {days} dagarna med Teacher Pro är gratis, en gång per lärare. Avsluta när du vill.",
+    "modesSub": "Vissa lägen körs på projektorn, andra på elevernas mobiler. Alla lägen är gratis att spela, och lugnt läge för ängsliga elever ingår i Pro.",
+    "pill": "Pro",
     "mastery": {
       "title": "Ordbehärskning",
       "subtitle": "Vilka ord klassen missar gång på gång – i alla spel.",
@@ -21161,8 +21132,8 @@ const sv = {
       "articlesCount": "{count} guider",
       "faqTitle": "Snabba svar",
       "ctaTitle": "Din klass är ett tryck bort",
-      "ctaBody": "Gratis för lärare, inga elevkonton, inget kort. Öppna Lärarbasen och tryck Kör igång.",
-      "ctaPrimary": "Öppna Lärarbasen, gratis",
+      "ctaBody": "Gratis för lärare, inga elevkonton, inget kort. Öppna lärarens startsida och tryck Starta live.",
+      "ctaPrimary": "Öppna lärarens startsida, gratis",
       "ctaSecondary": "Se ett livespel först",
       "stuckTitle": "Fastnat ändå?",
       "stuckBody": "Berätta vad du försökte göra. En riktig person i teamet svarar.",
@@ -21171,11 +21142,11 @@ const sv = {
     "categories": {
       "gettingStarted": {
         "title": "Kom igång",
-        "blurb": "Ditt konto, Lärarbasen och din första klass."
+        "blurb": "Ditt konto, startsidan och din första klass."
       },
       "liveGame": {
         "title": "Spela live",
-        "blurb": "Kör igång, få in eleverna, välj spel och styr rummet."
+        "blurb": "Starta live, få in eleverna, välj spel och styr rummet."
       },
       "assign": {
         "title": "Läxor och övning",
@@ -21222,8 +21193,8 @@ const sv = {
       "eyebrow": "Nästa steg",
       "startClass": {
         "title": "Testa med klassen i dag",
-        "body": "Lärarbasen är gratis. Tryck Kör igång så står koden på tavlan på några sekunder.",
-        "cta": "Öppna Lärarbasen"
+        "body": "Lärarens startsida är gratis. Tryck Starta live så står koden på tavlan på några sekunder.",
+        "cta": "Öppna lärarens startsida"
       },
       "liveGame": {
         "title": "Kör ett livespel nu",
@@ -21346,6 +21317,10 @@ const sv = {
       "toTeacher": "Tillbaka till lärarstarten"
     },
     "hostResults": {
+      "missedTitle": "Ord som klassen missade",
+      "practiceWords": "Öva på de här orden ({count})",
+      "shareParents": "Dela med föräldrar",
+      "proPill": "Pro",
       "invitePrompt": "Känner du en lärare som skulle gilla det här?",
       "inviteCta": "Bjud in en kollega",
       "inviteText": "Min klass spelade just ett ordspel på LexiClash. Det är gratis för lärare, ta en titt:",
@@ -21392,6 +21367,11 @@ const sv = {
   ,
   // @eduShell:start
   "eduShell": {
+    "error": {
+      "title": "Den här skärmen hakade upp sig",
+      "body": "Försök igen. Om det fortsätter, gå tillbaka till klassen och börja därifrån.",
+      "backToClass": "Tillbaka till klassen"
+    },
     "nav": {
       "home": "Hem",
       "library": "Bibliotek",
@@ -21548,7 +21528,6 @@ const sv = {
     "setup": {
       "title": "Ny klass",
       "subtitle": "Tre snabba val. Du kan ändra dem senare.",
-      "stepsLabel": "Framsteg för klassen",
       "step1": "Klassuppgifter",
       "step2": "Dela koden",
       "nameLabel": "Klassens namn",
@@ -21606,7 +21585,7 @@ const sv = {
       "packLabel": "Ord till ert första spel",
       "packWords": "{count} ord",
       "packRecommended": "Vårt tips",
-      "startLive": "Starta livespel",
+      "startLive": "Starta live",
       "createOnly": "Skapa bara klassen"
     },
     "host": {
@@ -21737,7 +21716,6 @@ const sv = {
   // @eduPolish:start
   "eduPolish": {
     "seatCapReached": "{name} tittar på: klassen är full ({cap} spelare)",
-    "csvDropHint": "Släpp en CSV-fil här eller klicka för att välja"
   }
   // @eduPolish:end
 };

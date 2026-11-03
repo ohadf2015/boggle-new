@@ -48,11 +48,19 @@ function openMobileMenu() {
 }
 
 describe('EducationHeader mobile menu — exit-education placement & styling', () => {
-  it('renders the exit-education link for an authenticated user, below a divider from Education Home', () => {
+  it('never offers a signed-in student a way out to the game home', () => {
     authState = {
       isAuthenticated: true,
       profile: { user_role: 'student', is_admin: false, display_name: 'Sam' },
     };
+    openMobileMenu();
+
+    expect(screen.queryByText('education.header.exitEducation')).toBeNull();
+    expect(screen.getByText('education.header.studentDashboard').closest('a')).toHaveAttribute('href', '/en/student');
+  });
+
+  it('renders the exit-education link for a signed-out visitor, below a divider from Education Home', () => {
+    authState = { isAuthenticated: false, profile: null };
     openMobileMenu();
 
     const eduHome = screen.getByText('education.header.educationHome').closest('a');
@@ -81,10 +89,7 @@ describe('EducationHeader mobile menu — exit-education placement & styling', (
   });
 
   it('styles exit-education as visually SECONDARY vs. the primary Education Home link', () => {
-    authState = {
-      isAuthenticated: true,
-      profile: { user_role: 'student', is_admin: false, display_name: 'Sam' },
-    };
+    authState = { isAuthenticated: false, profile: null };
     openMobileMenu();
 
     const eduHome = screen.getByText('education.header.educationHome').closest('a')!;

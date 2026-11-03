@@ -26,23 +26,29 @@ vi.mock('@/components/ui/PageLoader', () => ({ PageLoader: () => <div /> }));
 // `h-dvh` root it made the page taller than the viewport. The mock has to render
 // what it is handed, or these assertions would pass on a dropped banner.
 vi.mock('@/components/teacher/TeacherDashboard', () => ({
-  default: ({
+  default: function MockTeacherDashboard({
     banner,
     usagePrompt,
     proOffer,
   }: {
     banner?: React.ReactNode;
     usagePrompt?: React.ReactNode;
-    proOffer?: { kind: string; tracked: boolean; onDismiss: () => void } | null;
-  }) => (
-    <div data-testid="teacher-dashboard">
-      {banner}
-      {usagePrompt}
-      {proOffer ? (
-        <button data-testid="pro-offer" data-kind={proOffer.kind} data-tracked={String(proOffer.tracked)} onClick={proOffer.onDismiss} />
-      ) : null}
-    </div>
-  ),
+    proOffer?: { kind: string; tracked: boolean; onDismiss: () => void; onShown?: () => void } | null;
+  }) {
+    const onShown = proOffer?.onShown;
+    React.useEffect(() => {
+      onShown?.();
+    }, [onShown]);
+    return (
+      <div data-testid="teacher-dashboard">
+        {banner}
+        {usagePrompt}
+        {proOffer ? (
+          <button data-testid="pro-offer" data-kind={proOffer.kind} data-tracked={String(proOffer.tracked)} onClick={proOffer.onDismiss} />
+        ) : null}
+      </div>
+    );
+  },
 }));
 vi.mock('@/components/education/TrialUrgencyBanner', () => ({
   TrialUrgencyBanner: ({
@@ -187,38 +193,18 @@ describe('TeacherPage upgrade CTA', () => {
     );
   });
 
-  it('before the engagement milestone, a free teacher with no other ask still gets the dashboard Pro card (no milestone banner impression)', () => {
+  it('before the engagement milestone, a free teacher with no other ask gets no Pro card and no impression', () => {
     milestoneState = { ...milestoneState, hasMilestone: false };
     trialOfferState = { dismissed: false, dismiss: vi.fn() };
     proState = { ...proState, trialUsed: true };
     trialEndedState = { dismissed: true, dismiss: vi.fn() };
     mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
     render(<TeacherPage />);
-    const offer = screen.getByTestId('pro-offer');
-    expect(offer).toHaveAttribute('data-kind', 'upgrade');
-    expect(offer).toHaveAttribute('data-tracked', 'false');
+    expect(screen.queryByTestId('pro-offer')).toBeNull();
     expect(mockTrackGrowthEvent).not.toHaveBeenCalledWith(
       'iap_viewed',
       expect.objectContaining({ product: 'teacher_pro', event_type: 'impression' }),
     );
-  });
-
-  it('the dashboard Pro card stays down after an earlier "Not now" on the trial offer, and its own dismiss persists', () => {
-    milestoneState = { ...milestoneState, hasMilestone: false };
-    trialOfferState = { dismissed: true, dismiss: vi.fn() };
-    mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
-    const { unmount } = render(<TeacherPage />);
-    expect(screen.queryByTestId('pro-offer')).toBeNull();
-    unmount();
-    trialOfferState = { dismissed: false, dismiss: vi.fn() };
-    proState = { ...proState, trialUsed: true };
-    trialEndedState = { dismissed: true, dismiss: vi.fn() };
-    window.localStorage.removeItem('lexi:proTrialCardDismissed:dashboard');
-    render(<TeacherPage />);
-    act(() => screen.getByTestId('pro-offer').click());
-    expect(screen.queryByTestId('pro-offer')).toBeNull();
-    expect(Number(window.localStorage.getItem('lexi:proTrialCardDismissed:dashboard'))).toBeGreaterThan(0);
-    window.localStorage.removeItem('lexi:proTrialCardDismissed:dashboard');
   });
 
   it('stays quiet after the teacher dismissed the milestone ask', () => {
@@ -247,12 +233,13 @@ describe('TeacherPage upgrade CTA', () => {
     );
   });
 
-  it('does not stack the usage card on top of the milestone Pro banner', () => {
+  it('a real usage-limit hit outranks the milestone Pro card, and they never stack', () => {
     usageState = { reason: 'assignments', count: 3, loading: false, dismissed: false, dismiss: vi.fn() };
     mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
     render(<TeacherPage />);
-    expect(screen.getByTestId('pro-offer')).toBeInTheDocument();
-    expect(screen.queryByTestId('teacher-pro-usage-prompt')).toBeNull();
+    expect(screen.getByTestId('teacher-pro-usage-prompt')).toBeInTheDocument();
+    expect(screen.queryByTestId('pro-offer')).toBeNull();
+    expect(mockTrackGrowthEvent).not.toHaveBeenCalledWith('iap_viewed', expect.objectContaining({ source: 'dashboard_banner' }));
   });
 
   it('a live Polar trial shows the days-remaining lifecycle banner, not the access banner or a Pro ask', () => {
@@ -362,6 +349,7 @@ describe('TeacherPage 7-day trial upgrade nudge', () => {
     milestoneState = { hasMilestone: true, loading: false, dismissed: false, dismiss: vi.fn() };
     trialOfferState = { dismissed: true, dismiss: vi.fn() };
     trialEndedState = { dismissed: false, dismiss: vi.fn() };
+    usageState = { reason: null, count: 0, loading: false, dismissed: false, dismiss: vi.fn() };
     mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
   });
 
@@ -403,6 +391,23 @@ describe('TeacherPage 7-day trial upgrade nudge', () => {
     const banner = screen.getByTestId('trial-urgency-banner');
     expect(banner).toHaveAttribute('data-href', '/en/teacher/upgrade');
     expect(banner).toHaveAttribute('data-dismissible', '0');
+  });
+
+  it('the expired renewal card is the one ask: no usage card stacks with it', () => {
+    accessState = { trial: mkTrial({ isExpired: true, daysLeft: 0, hoursLeft: 0, msLeft: 0 }) };
+    usageState = { reason: 'students', count: 12, loading: false, dismissed: false, dismiss: vi.fn() };
+    render(<TeacherPage />);
+    expect(screen.getByTestId('trial-urgency-banner')).toBeInTheDocument();
+    expect(screen.queryByTestId('teacher-pro-usage-prompt')).toBeNull();
+    expect(screen.queryByTestId('pro-offer')).toBeNull();
+  });
+
+  it('the 7-day trial nudge outranks a usage-limit card', () => {
+    accessState = { trial: mkTrial({ daysLeft: 5 }) };
+    usageState = { reason: 'students', count: 12, loading: false, dismissed: false, dismiss: vi.fn() };
+    render(<TeacherPage />);
+    expect(screen.getByTestId('pro-offer')).toBeInTheDocument();
+    expect(screen.queryByTestId('teacher-pro-usage-prompt')).toBeNull();
   });
 });
 

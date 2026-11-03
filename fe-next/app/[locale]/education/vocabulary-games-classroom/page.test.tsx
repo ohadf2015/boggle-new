@@ -12,10 +12,8 @@ describe('vocabulary-games-classroom page', () => {
       const text = container.textContent || '';
 
       // Assert Hebrew content is rendered
-      // Updated to match actual polished content: features now say "דו־קרבות 1v1"
-      expect(text).toContain('דו־קרבות 1v1');
+      expect(text).toContain('בלי הרשמה לתלמידים');
       expect(text).toContain('6 שפות'); // Six languages from metadataLabels
-      expect(text).toContain('דו־קרבות'); // 1v1 duels
 
       // Assert English hardcoded strings are NOT present (these would indicate hardcoding)
       // Only check representative ones that should be translated
@@ -31,11 +29,9 @@ describe('vocabulary-games-classroom page', () => {
       const text = container.textContent || '';
 
       // Assert Spanish content is rendered
-      expect(text).toContain('Cuentas de estudiantes gratis');
+      expect(text).toContain('Sin registro de estudiantes');
       // Updated to match polished content: "6 idiomas" not "Cinco idiomas"
       expect(text).toContain('6 idiomas');
-      // Updated to match actual feature text: "Duelos 1v1"
-      expect(text).toContain('Duelos 1v1');
     });
   });
 

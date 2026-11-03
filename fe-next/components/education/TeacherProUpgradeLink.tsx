@@ -23,7 +23,7 @@ export function TeacherProUpgradeLink({
     <Link
       href={href}
       data-testid={testId}
-      className={className}
+      className={`${className ?? ''} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}
       onClick={() => {
         try {
           trackTeacherProUpgradeClick({

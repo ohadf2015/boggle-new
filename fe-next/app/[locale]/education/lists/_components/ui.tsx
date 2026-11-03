@@ -25,7 +25,7 @@ export function ListsFrame({
   children: ReactNode;
 }) {
   return (
-    <main className="relative min-h-screen overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
+    <main className="relative min-h-dvh overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(graph) }} />
       <div className="mx-auto max-w-6xl px-4 pb-20 pt-6 sm:px-6 sm:pt-10 lg:px-8">
         <Breadcrumbs locale={locale} crumbs={crumbs} />
@@ -52,7 +52,7 @@ function Breadcrumbs({ locale, crumbs }: { locale: string; crumbs: Crumb[] }) {
                 </span>
               ) : (
                 <>
-                  <Link href={`/${locale}${c.path}`} className="underline-offset-4 hover:text-neo-white hover:underline">
+                  <Link href={`/${locale}${c.path}`} className="underline-offset-4 hover:text-neo-white hover:underline focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan">
                     {c.name}
                   </Link>
                   <span aria-hidden className="text-neo-white/30">
@@ -83,7 +83,7 @@ export function ChipLink({ href, children, active = false }: { href: string; chi
       aria-current={active ? 'page' : undefined}
       className={`inline-flex min-h-[44px] items-center gap-2 rounded-neo border-3 px-4 py-2 text-sm font-black shadow-hard transition-transform duration-150 hover:-translate-y-0.5 ${
         active ? 'border-neo-black bg-neo-white text-neo-navy' : 'border-neo-cream/40 bg-neo-navy-light text-neo-white'
-      }`}
+      } focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan`}
     >
       {children}
     </Link>
@@ -129,7 +129,7 @@ export function ListCard({ list, locale }: { list: WordList; locale: string }) {
           .map((w) => w.word)
           .join(' · ')}
       </p>
-      <div className="mt-auto flex flex-wrap items-center gap-2 pt-4 text-[11px] font-black uppercase tracking-widest">
+      <div className="mt-auto flex flex-wrap items-center gap-2 pt-4 text-xs font-black uppercase tracking-widest">
         <span className={`rounded border-2 border-neo-black px-2 py-0.5 ${accent.fill} text-neo-navy`}>
           {tr(locale, `lang.${list.lang}`)}
         </span>

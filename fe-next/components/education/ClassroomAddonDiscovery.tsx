@@ -158,7 +158,7 @@ export function ClassroomAddonDiscovery({
       <a
         href={`/${locale}/education/classroom-addon/planner`}
         data-testid="classroom-addon-open-planner"
-        className="mt-3 inline-flex text-neo-lime font-bold text-xs underline-offset-2 hover:underline"
+        className="mt-3 inline-flex text-neo-lime font-bold text-xs underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
       >
         {t('education.classroomAddon.planner.title')}
       </a>
@@ -169,7 +169,7 @@ export function ClassroomAddonDiscovery({
           target="_blank"
           rel="noopener noreferrer"
           data-testid="classroom-addon-assign-live"
-          className={cn(
+          className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
             'mt-5 w-full flex items-center justify-center gap-2 px-4 py-3 font-bold text-sm',
             'bg-neo-lime text-neo-black border-neo border-neo-black rounded-neo',
             'shadow-hard hover:shadow-hard-lg transition',
@@ -203,7 +203,7 @@ export function ClassroomAddonDiscovery({
           target="_blank"
           rel="noopener noreferrer"
           data-testid="classroom-addon-post-stream"
-          className={cn(
+          className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
             'mt-3 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
             'bg-neo-pink text-neo-black border-neo border-neo-black rounded-neo',
             'shadow-hard-sm hover:shadow-hard transition',
@@ -220,7 +220,7 @@ export function ClassroomAddonDiscovery({
           target="_blank"
           rel="noopener noreferrer"
           data-testid="classroom-addon-open-unplugged"
-          className={cn(
+          className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
             'mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
             'bg-neo-cyan text-neo-black border-neo border-neo-black rounded-neo',
             'shadow-hard-sm hover:shadow-hard transition',
@@ -235,7 +235,7 @@ export function ClassroomAddonDiscovery({
           type="button"
           data-testid="classroom-addon-print-sheet"
           onClick={handlePrint}
-          className={cn(
+          className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
             'mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
             'bg-neo-white text-neo-black border-neo border-neo-black rounded-neo',
             'shadow-hard-sm hover:shadow-hard transition',
@@ -251,7 +251,7 @@ export function ClassroomAddonDiscovery({
           type="button"
           data-testid="classroom-addon-share-miss-gap"
           onClick={handleShareMissGapPractice}
-          className={cn(
+          className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
             'mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
             'bg-neo-cream text-neo-black border-neo border-neo-black rounded-neo',
             'shadow-hard-sm hover:shadow-hard transition',

@@ -135,7 +135,7 @@ export function StudentModeStrip({
           </>
         )}
         {lessonName && (
-          <li className="inline-flex min-w-0 max-w-full items-center gap-1 rounded-full border-2 border-neo-pink bg-neo-navy px-1.5 py-px font-neo-body text-[11px] font-bold text-neo-pink">
+          <li className="inline-flex min-w-0 max-w-full items-center gap-1 rounded-full border-2 border-neo-pink bg-neo-navy px-1.5 py-px font-neo-body text-xs font-bold text-neo-pink">
             <BookOpen aria-hidden="true" className="size-3.5 shrink-0" />
             <span className="truncate">{lessonName}</span>
           </li>
@@ -153,7 +153,7 @@ function Chip({ icon: Icon, label, value, testId }: { icon: LucideIcon; label: s
     <li
       data-testid={testId}
       title={label}
-      className="inline-flex items-center gap-1 rounded-full border-2 border-neo-cream/60 bg-neo-navy px-1.5 py-px font-neo-body text-[11px] font-bold text-neo-cream"
+      className="inline-flex items-center gap-1 rounded-full border-2 border-neo-cream/60 bg-neo-navy px-1.5 py-px font-neo-body text-xs font-bold text-neo-cream"
     >
       <Icon aria-hidden="true" className="size-3.5 text-neo-cyan" />
       <span className="sr-only">{label}</span>

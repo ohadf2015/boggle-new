@@ -49,7 +49,7 @@ export function PageClient({ geo, faq }: { geo?: GeoAnswer; faq?: ReactNode }) {
           <Link
             href={`/${language}/student`}
             data-testid="landing-student-classes-link"
-            className="font-bold text-neo-cream underline underline-offset-2 hover:text-neo-white"
+            className="font-bold text-neo-cream underline underline-offset-2 hover:text-neo-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
           >
             {t('eg2Land.studentLink')}
           </Link>

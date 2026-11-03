@@ -52,7 +52,7 @@ export function EduStudentLobby({
       {/* my-auto, not justify-*: when a short phone overflows, auto margins collapse and nothing clips above the scroll start. */}
       <main className="relative flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-2 [container-type:size]">
         <div className="my-auto flex w-full flex-col items-center gap-3">
-          <h1 className="-rotate-2 font-neo-display text-[clamp(1.75rem,8cqh,3rem)] font-black leading-none text-neo-lime [-webkit-text-stroke:2px_rgb(var(--neo-black))] [paint-order:stroke_fill] drop-shadow-[3px_3px_0_rgb(var(--neo-black))] motion-safe:animate-[edu-live-pop_220ms_cubic-bezier(0.23,1,0.32,1)_both] [@container(max-height:460px)]:hidden">
+          <h1 className="-rotate-2 font-neo-display text-[clamp(1.75rem,8cqh,3rem)] font-black leading-none text-neo-lime [-webkit-text-stroke:2px_rgb(var(--neo-black))] [paint-order:stroke_fill] drop-shadow-[3px_3px_0_rgb(var(--neo-black))] motion-safe:animate-[edu-live-pop_220ms_cubic-bezier(0.23,1,0.32,1)_both] [@container(max-height:460px)]:sr-only">
             {t('eduLiveRoom.student.youreIn')}
           </h1>
 

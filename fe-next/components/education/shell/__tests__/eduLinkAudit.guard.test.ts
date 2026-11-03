@@ -37,7 +37,6 @@ const LOCALE_ROOT_ALLOWED: Record<string, number> = {
   'components/education/EducationBreadcrumbs.tsx': 2,
   'components/education/EducationHeader.tsx': 1,
   'components/education/EducationMenuDropdown.tsx': 1,
-  'components/education/shell/TeacherAccountMenu.tsx': 1,
   'app/[locale]/student/profile/layout.tsx': 2,
 };
 

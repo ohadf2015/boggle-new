@@ -9,11 +9,11 @@
  * - Link to /teacher/upgrade (Polar checkout) is present
  */
 import { describe, it, expect, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { ProFramingSection } from '@/components/education/ProFramingSection';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { en } from '@/translations/en';
-import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
+import { FREE_TIER_LIMITS, TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
 
 describe('ProFramingSection', () => {
   // `initialTranslations` is the dictionary for `initialLanguage` — it is handed straight to
@@ -35,41 +35,43 @@ describe('ProFramingSection', () => {
 
   it('displays the correct Pro price sourced from constants', () => {
     renderComponent();
-    // The price should be rendered somewhere in the component
-    const priceText = screen.getByText(/\$9/);
-    expect(priceText).toBeInTheDocument();
+    expect(screen.getAllByText(`$${TEACHER_PRO_PRICE_USD}`).length).toBeGreaterThan(0);
   });
 
-  it('shows free tier limits sourced from FREE_TIER_LIMITS', () => {
+  it('names the free limits in the Free column, from FREE_TIER_LIMITS', () => {
     renderComponent();
-    // Built from the constants, not typed here: if the caps move and the copy stops
-    // interpolating, this fails instead of quietly advertising the old numbers.
-    // `getAllBy` because the student cap is named twice on purpose — once in the tier card
-    // and again in the "why now" line, which is the whole loss-framing argument.
-    const classMatches = screen.getAllByText(
-      new RegExp(`${FREE_TIER_LIMITS.classes}\\s+class`, 'i'),
-    );
-    expect(classMatches.length).toBeGreaterThan(0);
-
-    const studentMatches = screen.getAllByText(
-      new RegExp(`${FREE_TIER_LIMITS.studentsPerClass}\\s+students`, 'i'),
-    );
-    expect(studentMatches.length).toBeGreaterThan(0);
+    // Built from the constants, not typed here: if the caps move and the table stops
+    // reading them, this fails instead of quietly advertising the old numbers.
+    const free = (id: string) => within(screen.getByTestId(`plan-row-${id}`)).getAllByRole('cell')[0];
+    expect(free('classes').textContent).toBe(String(FREE_TIER_LIMITS.classes));
+    expect(free('students').textContent).toBe(String(FREE_TIER_LIMITS.studentsPerClass));
+    expect(free('assignments').textContent).toBe(String(FREE_TIER_LIMITS.assignmentsPerClass));
   });
 
-  it('does not print the same benefit on both cards', () => {
-    // `education.landing.pro.analytics` was rendered on the FREE card and the Pro card, so the
-    // comparison table's job — showing what $9 buys — was answered "the same thing, twice".
+  it('never sells unlimited students: Pro keeps the same per-class number', () => {
+    renderComponent();
+    const [, pro] = within(screen.getByTestId('plan-row-students')).getAllByRole('cell');
+    expect(pro.textContent).toBe(String(FREE_TIER_LIMITS.studentsPerClass));
+    expect(screen.queryByText(en.eg6Land.pro.rosterPro)).toBeNull();
+  });
+
+  it('does not print the same benefit twice', () => {
     renderComponent();
     const analytics = screen.getAllByText(en.education.landing.pro.analytics);
     expect(analytics).toHaveLength(1);
   });
 
-  it('lists analytics on the Pro side of the table, not the free side', () => {
+  it('marks analytics as Pro-only: a dash for Free, a check for Pro', () => {
     renderComponent();
-    const analytics = screen.getByText(en.education.landing.pro.analytics);
-    const card = analytics.closest('div.rounded-neo');
-    expect(card?.textContent).toContain(en.education.landing.pro.proTier);
+    const [free, pro] = within(screen.getByTestId('plan-row-analytics')).getAllByRole('cell');
+    expect(free.textContent).toContain(en.teacher.subscription.matrix.notIncluded);
+    expect(pro.textContent).toContain(en.teacher.subscription.matrix.included);
+  });
+
+  it('shows every row on a phone (no Pro row hidden below sm)', () => {
+    const { container } = renderComponent();
+    expect(container.querySelector('[data-testid="plan-table"] .hidden')).toBeNull();
+    expect(screen.getByTestId('plan-row-missedPractice')).toBeInTheDocument();
   });
 
   it('links to /teacher/upgrade for checkout', () => {

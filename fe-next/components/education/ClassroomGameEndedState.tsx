@@ -15,7 +15,7 @@ interface ClassroomGameEndedStateProps {
 }
 
 const PRIMARY =
-  'flex min-h-12 w-full items-center justify-center rounded-neo border-3 border-black bg-neo-black px-6 py-3 font-neo-display font-black text-neo-lime shadow-hard-sm transition hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px]';
+  'flex min-h-12 w-full items-center justify-center rounded-neo border-3 border-neo-black bg-neo-black px-6 py-3 font-neo-display font-black text-neo-lime shadow-hard-sm transition hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px]';
 
 /** Shown to a classroom student whose room is gone: what happened, a way on, and a quiet retry. */
 export function ClassroomGameEndedState({ roomCode, message, hubHref, onRetry }: ClassroomGameEndedStateProps) {
@@ -28,13 +28,13 @@ export function ClassroomGameEndedState({ roomCode, message, hubHref, onRetry }:
       aria-labelledby="classroom-game-ended-title"
       className="fixed inset-0 z-[90] flex items-center justify-center bg-neo-navy px-4"
     >
-      <div className="relative w-full max-w-sm rounded-neo-lg border-3 border-black bg-neo-lime px-6 pb-6 pt-16 text-neo-black shadow-hard-lg">
+      <div className="relative w-full max-w-sm rounded-neo-lg border-3 border-neo-black bg-neo-lime px-6 pb-6 pt-16 text-neo-black shadow-hard-lg">
         {/* eslint-disable-next-line @next/next/no-img-element -- mascot art map path, decorative */}
         <img
           src={EDU_MASCOT.empty}
           alt=""
           aria-hidden="true"
-          className="pointer-events-none absolute -top-14 start-1/2 size-28 -translate-x-1/2 select-none drop-shadow-[3px_3px_0_#000] rtl:translate-x-1/2"
+          className="pointer-events-none absolute -top-14 start-1/2 size-28 -translate-x-1/2 select-none drop-shadow-[3px_3px_0_rgb(var(--neo-black))] rtl:translate-x-1/2"
         />
         <h1 id="classroom-game-ended-title" className="mb-2 font-neo-display text-2xl font-black">
           {t('education.student.gameEnded.title')}
@@ -42,12 +42,12 @@ export function ClassroomGameEndedState({ roomCode, message, hubHref, onRetry }:
         <p className="mb-5 font-neo-body text-neo-black/80">{message}</p>
         <div className="flex flex-col gap-3">
           {!isLoading && classroomId && (
-            <Link data-testid="ended-primary" href={hubHref} className={PRIMARY}>
+            <Link data-testid="ended-primary" href={hubHref} className={`${PRIMARY} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}>
               {t('education.student.gameEnded.toClass')}
             </Link>
           )}
           {!isLoading && !classroomId && (
-            <Link data-testid="ended-primary" href={`/${language}/join`} className={PRIMARY}>
+            <Link data-testid="ended-primary" href={`/${language}/join`} className={`${PRIMARY} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}>
               {t('education.student.gameEnded.newCode')}
             </Link>
           )}

@@ -17,7 +17,7 @@
  */
 
 import { useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { captureError } from '@/utils/sentry';
 import { Mascot } from '@/components/ui/Mascot';
 import { getCachedTranslation } from '@/translations/loadTranslation';
@@ -31,19 +31,18 @@ export default function LessonPracticeError({
   reset: () => void;
 }) {
   const params = useParams();
+  const router = useRouter();
   const locale = (params?.locale as string) || 'en';
 
-  const t = (path: string): string => {
+  const t = (path: string, fallback: string): string => {
     try {
-      const keys = path.split('.');
       let current: unknown = getCachedTranslation(locale as Language) || getCachedTranslation('en');
-      for (const key of keys) {
-        current = (current as Record<string, unknown>)[key];
-        if (current === undefined) return path;
+      for (const key of path.split('.')) {
+        current = (current as Record<string, unknown> | undefined)?.[key];
       }
-      return typeof current === 'string' ? current : path;
+      return typeof current === 'string' && current ? current : fallback;
     } catch {
-      return path;
+      return fallback;
     }
   };
 
@@ -58,29 +57,31 @@ export default function LessonPracticeError({
       <div className="w-full max-w-sm rounded-neo border-[3px] border-neo-cream/40 bg-neo-navy-light p-5 text-center shadow-hard-lg">
         <Mascot variant="oops" size="sm" animated={false} className="mx-auto mb-3" />
         <h1 className="mb-2 font-neo-display text-xl font-black uppercase text-neo-white">
-          {t('education.practice.lessonUnavailable')}
+          {t('education.practice.lessonUnavailable', "Can't open this lesson")}
         </h1>
         <p className="mb-5 font-neo-body text-sm font-bold text-neo-cream">
-          {t('education.practice.lessonUnavailableBody')}
+          {t('education.practice.lessonUnavailableBody', 'The link may be out of date, or the lesson was removed. Ask your teacher for a new one.')}
         </p>
         <button
           type="button"
           data-primary="true"
           data-testid="practice-error-retry"
           onClick={reset}
-          className="flex min-h-[56px] w-full items-center justify-center rounded-neo border-[3px] border-black bg-neo-lime px-4 font-neo-display text-lg font-black uppercase text-black shadow-hard active:translate-y-[2px] active:shadow-hard-pressed"
+          className="flex min-h-[56px] w-full items-center justify-center rounded-neo border-[3px] border-neo-black bg-neo-lime px-4 font-neo-display text-lg font-black uppercase text-neo-black shadow-hard active:translate-y-[2px] active:shadow-hard-pressed focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy-light"
         >
-          {t('student.practiceFun.tryAgain')}
+          {t('student.practiceFun.tryAgain', 'Try again')}
         </button>
         <button
           type="button"
           data-testid="practice-error-exit"
           onClick={() => {
-            window.location.href = `/${locale}/student`;
+            const target = `/${locale}/student`;
+            if (error.name === 'ChunkLoadError') window.location.assign(target);
+            else router.push(target);
           }}
-          className="mx-auto mt-2 block min-h-[40px] w-3/5 rounded-neo border-[2px] border-neo-cream bg-neo-navy px-4 font-neo-body text-xs font-bold uppercase text-neo-cream"
+          className="mt-3 flex min-h-[48px] w-full items-center justify-center rounded-neo border-[3px] border-neo-cream bg-neo-navy px-4 font-neo-display text-base font-bold text-neo-cream focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy-light"
         >
-          {t('student.practiceFun.myLessons')}
+          {t('student.practiceFun.myLessons', 'My lessons')}
         </button>
       </div>
     </div>

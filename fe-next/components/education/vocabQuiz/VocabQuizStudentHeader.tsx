@@ -68,7 +68,7 @@ export function VocabQuizStudentHeader({
         sizeClassName="w-11 h-11"
         clipShape="circle"
         clipBorder="cyan"
-        clipBg="var(--neo-navy-elevated, #1b2340)"
+        clipBg="var(--neo-navy-elevated)"
         animated
         // A reaction, not a control: a tappable thing sitting inches from four
         // answer tiles is a mis-tap waiting to happen on a phone, and its hover
@@ -93,11 +93,11 @@ export function VocabQuizStudentHeader({
             around you; between questions it is where you stand. Both matter,
             neither is worth a second row on a 390px phone. */}
         {lockedIn && lockedIn.total > 0 ? (
-          <span className="font-neo-body text-[11px] leading-tight text-neo-cyan tabular-nums">
+          <span className="font-neo-body text-xs leading-tight text-neo-cyan tabular-nums">
             {t('vocabQuiz.lockedInCount', { locked: lockedIn.locked, total: lockedIn.total })}
           </span>
         ) : rank ? (
-          <span className="font-neo-body text-[11px] leading-tight text-neo-yellow tabular-nums">
+          <span className="font-neo-body text-xs leading-tight text-neo-yellow tabular-nums">
             {t('vocabQuiz.rank', { position: rank.position, total: rank.total })}
           </span>
         ) : null}

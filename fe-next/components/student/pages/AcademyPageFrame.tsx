@@ -128,7 +128,7 @@ export function AcademyPageFrame({ title, art, badge, toolbar, regionLabel, pend
               </Medallion>
             </Link>
             <span className="relative h-10 w-10 shrink-0 sm:h-12 sm:w-12" aria-hidden="true">
-              <Image src={art} alt="" fill unoptimized sizes="48px" className="object-contain drop-shadow-[2px_2px_0_#000]" />
+              <Image src={art} alt="" fill unoptimized sizes="48px" className="object-contain drop-shadow-[2px_2px_0_rgb(var(--neo-black))]" />
             </span>
             <h1 dir="auto" title={title} aria-label={title} className={cn('min-w-0 flex-1 truncate font-neo-display font-black leading-tight text-neo-white', rail ? 'text-xl' : 'text-2xl sm:text-3xl', INK_TEXT)}>
               {title}
@@ -168,7 +168,7 @@ export function FrameSkeleton({ rows = 4, grid = false }: { rows?: number; grid?
       {Array.from({ length: rows }, (_, i) => (
         <div
           key={i}
-          className={cn('rounded-[16px] bg-white/10 motion-safe:animate-pulse', grid ? 'h-36' : 'h-20')}
+          className={cn('rounded-[16px] bg-neo-white/10 motion-safe:animate-pulse', grid ? 'h-36' : 'h-20')}
         />
       ))}
     </div>

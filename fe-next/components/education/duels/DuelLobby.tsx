@@ -408,7 +408,7 @@ export default function DuelLobby({
                 </div>
 
                 {/* Name */}
-                <span className="text-black font-neo-body font-bold text-sm text-center">
+                <span className="text-neo-black font-neo-body font-bold text-sm text-center">
                   {opponent.displayName ?? '?'}
                 </span>
               </button>

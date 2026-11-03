@@ -77,7 +77,7 @@ export function DuelPlayPanel({
       {/* Timer + live scores */}
       <div className="flex shrink-0 items-center justify-between gap-2 rounded-neo border-[3px] border-neo-cream/70 bg-neo-navy px-3 py-2 shadow-hard">
         <div className="text-neo-white">
-          <p className="font-neo-body text-[10px] font-black uppercase tracking-widest text-neo-cream/80">
+          <p className="font-neo-body text-xs font-black uppercase tracking-widest text-neo-cream/80">
             {t('duels.you')}
           </p>
           <p className="font-neo-display text-xl font-black tabular-nums" data-testid="my-score">
@@ -98,7 +98,7 @@ export function DuelPlayPanel({
         </div>
 
         <div className="text-end text-neo-white">
-          <p className="truncate font-neo-body text-[10px] font-black uppercase tracking-widest text-neo-cream/80">
+          <p className="truncate font-neo-body text-xs font-black uppercase tracking-widest text-neo-cream/80">
             {opponentName}
           </p>
           <p
@@ -151,7 +151,7 @@ export function DuelPlayPanel({
           onClick={onSubmitWord}
           aria-disabled={currentWordEmpty}
           data-testid="submit-word-btn"
-          className={cn(
+          className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
             'shrink-0 rounded-neo border-[2px] border-neo-black bg-neo-lime px-4 py-2.5 font-neo-display text-sm font-black uppercase text-neo-black shadow-hard transition hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px]',
             currentWordEmpty && 'cursor-not-allowed opacity-50'
           )}
@@ -192,7 +192,7 @@ export function DuelPlayPanel({
         type="button"
         onClick={onForfeit}
         data-testid="forfeit-btn"
-        className="mx-auto shrink-0 rounded-neo border-[3px] border-neo-cream bg-transparent px-4 py-1.5 font-neo-body text-xs font-black uppercase tracking-wide text-neo-cream transition hover:bg-neo-cream hover:text-neo-navy active:translate-y-0.5"
+        className="mx-auto shrink-0 rounded-neo border-[3px] border-neo-cream bg-transparent px-4 py-1.5 font-neo-body text-xs font-black uppercase tracking-wide text-neo-cream transition hover:bg-neo-cream hover:text-neo-navy active:translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
       >
         {t('duels.forfeitConfirm')}
       </button>

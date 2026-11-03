@@ -72,7 +72,7 @@ export function TeamTilesBoard({
             onClick={() => {
               if (clickable) onFlip(tile.id);
             }}
-            className={cn(
+            className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
               'aspect-square min-h-0 rounded-neo border-[3px] border-neo-black shadow-hard',
               'flex flex-col items-center justify-center gap-1 p-1 sm:p-2',
               'font-neo-display font-bold uppercase',

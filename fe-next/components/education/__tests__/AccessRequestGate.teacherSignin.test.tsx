@@ -12,6 +12,8 @@ vi.mock('@/components/auth/AuthModal', () => ({
   ),
 }));
 
+vi.mock('../AccessRequestGoogleButton', () => ({ AccessRequestGoogleButton: () => <button type="button">google</button> }));
+
 import { AccessRequestGate } from '../AccessRequestGate';
 
 describe('<AccessRequestGate> — a returning teacher signs in in one tap', () => {

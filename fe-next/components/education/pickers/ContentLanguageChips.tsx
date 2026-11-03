@@ -41,7 +41,7 @@ export function ContentLanguageChips({ label, languages, value, onChange, testId
         <button
           type="button"
           onClick={() => setShowAll(true)}
-          className="inline-flex min-h-10 items-center gap-1 rounded-neo border-2 border-dashed border-neo-cream/60 px-2.5 font-neo-body text-sm font-bold text-neo-cream transition-colors hover:border-neo-cream hover:bg-neo-navy focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+          className="inline-flex min-h-11 items-center gap-1 rounded-neo border-2 border-dashed border-neo-cream/60 px-2.5 font-neo-body text-sm font-bold text-neo-cream transition-colors hover:border-neo-cream hover:bg-neo-navy focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
         >
           <Plus className="size-4" strokeWidth={3} aria-hidden="true" />
           {t('eduPickers.content.addLanguage', 'Add language')}

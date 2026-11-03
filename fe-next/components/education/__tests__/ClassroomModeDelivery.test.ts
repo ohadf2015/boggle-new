@@ -9,7 +9,7 @@ describe('mode delivery (SPEC modes table)', () => {
       'word-hunt': 'phones',
       blast: 'phones',
       'vocab-quiz': 'projector',
-      wordcraft: 'phones',
+      wordcraft: 'both',
       'boss-battle': 'projector',
     };
     for (const mode of catalogueModes()) expect([mode.id, mode.delivery]).toEqual([mode.id, table[mode.id]]);
@@ -22,8 +22,8 @@ describe('mode delivery (SPEC modes table)', () => {
     expect(deliveryKey('both')).toBe('eduShell.delivery.both');
   });
 
-  it('Given Teacher Home, Then it features Word Wheel, Word Hunt and Classic from the same table', () => {
-    expect(FEATURED_HOME_MODES).toEqual(['wheel-rush', 'word-hunt', 'classic']);
+  it('Given the landing, Then it features the three most-played modes from the same table', () => {
+    expect(FEATURED_HOME_MODES).toEqual(['vocab-quiz', 'classic', 'blast']);
     for (const id of FEATURED_HOME_MODES) expect(catalogueEntry(id)).toBeDefined();
   });
 });

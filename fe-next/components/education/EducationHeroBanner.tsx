@@ -72,7 +72,7 @@ export function EducationHeroBanner({ title, subtitle, cta }: Props) {
           <div className="mt-6">
             <a
               href={cta.href}
-              className="inline-flex items-center gap-2 px-5 py-3 bg-neo-lime text-neo-navy font-bold rounded-neo shadow-hard hover:shadow-hard-lg transition hover:translate-x-[2px] hover:translate-y-[2px]"
+              className="inline-flex items-center gap-2 px-5 py-3 bg-neo-lime text-neo-navy font-bold rounded-neo shadow-hard hover:shadow-hard-lg transition hover:translate-x-[2px] hover:translate-y-[2px] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
             >
               {cta.label}
               <span aria-hidden>→</span>

@@ -86,7 +86,7 @@ export function EducationRelatedLinks({
               <Link
                 key={r.href}
                 href={r.href}
-                className="rounded-neo border-2 border-neo-black bg-neo-cream px-4 py-2 text-neo-navy shadow-hard-sm transition-transform hover:-translate-y-0.5"
+                className="rounded-neo border-2 border-neo-black bg-neo-cream px-4 py-2 text-neo-navy shadow-hard-sm transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
               >
                 {r.label}
               </Link>
@@ -104,7 +104,7 @@ export function EducationRelatedLinks({
               <Link
                 key={r.href}
                 href={`/${locale}${r.href}`}
-                className={`rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-4 py-2 ${ACCENT_TEXT[r.accent]} transition-colors hover:bg-neo-navy`}
+                className={`rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-4 py-2 ${ACCENT_TEXT[r.accent]} transition-colors hover:bg-neo-navy focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}
               >
                 {r.label}
               </Link>

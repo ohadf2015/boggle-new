@@ -55,7 +55,7 @@ export function ChatGptReteachAutostart({
 
   if (payload.missedWords.length === 0) {
     return (
-      <a href={educationHref} className={primaryClass}>
+      <a href={educationHref} className={`${primaryClass} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}>
         {educationLabel}
       </a>
     );
@@ -67,11 +67,11 @@ export function ChatGptReteachAutostart({
         type="button"
         data-testid="chatgpt-start-reteach-live"
         onClick={startLive}
-        className={primaryClass}
+        className={`${primaryClass} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}
       >
         {reteachLabel}
       </button>
-      <a href={educationHref} className={secondaryClass}>
+      <a href={educationHref} className={`${secondaryClass} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}>
         {educationLabel}
       </a>
     </>

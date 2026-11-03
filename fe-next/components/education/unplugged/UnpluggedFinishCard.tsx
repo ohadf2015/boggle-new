@@ -126,7 +126,7 @@ export function UnpluggedFinishCard({
         <Link
           href={gradePassbackHref}
           data-testid="unplugged-grade-passback-open"
-          className={cn(
+          className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
             'w-full max-w-md flex items-center justify-center gap-2 px-4 py-3 sm:py-4',
             'font-neo-display font-bold uppercase text-[clamp(0.85rem,1.6vw,1.25rem)]',
             'bg-neo-lime text-neo-black border-[3px] border-neo-black rounded-neo',
@@ -142,7 +142,7 @@ export function UnpluggedFinishCard({
         type="button"
         data-testid="unplugged-play-again"
         onClick={onReplay}
-        className="w-full max-w-md flex items-center justify-center gap-2 py-3 sm:py-4 font-neo-display font-bold uppercase text-[clamp(1rem,2vw,1.6rem)] bg-neo-pink text-neo-black border-neo border-neo-black rounded-neo shadow-hard active:shadow-hard-pressed active:translate-y-[1px]"
+        className="w-full max-w-md flex items-center justify-center gap-2 py-3 sm:py-4 font-neo-display font-bold uppercase text-[clamp(1rem,2vw,1.6rem)] bg-neo-pink text-neo-black border-neo border-neo-black rounded-neo shadow-hard active:shadow-hard-pressed active:translate-y-[1px] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
       >
         <RotateCcw className="w-5 h-5 sm:w-7 sm:h-7" aria-hidden />
         {labels.playAgain}

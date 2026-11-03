@@ -94,7 +94,7 @@
       "name": "Måste elever ha konto?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Ja, men det är gratis. Lärare gör klassrummet, elever ansluter med kod. Ingen betalning."
+        "text": "Nej. Eleverna ansluter med en kod på 6 tecken och spelar i valfri webbläsare: ingen registrering, ingen mejl. Bara läraren har ett konto."
       }
     },
     {

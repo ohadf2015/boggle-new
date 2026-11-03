@@ -19,7 +19,7 @@ import { ACADEMY_ART } from './AcademyChrome';
 import { INTRO_COPY, INTRO_CTA, INTRO_HERO, INTRO_KICKER, INTRO_LAYOUT, INTRO_TITLE } from './introLayout';
 import { useIsHydrating } from './useIsHydrating';
 
-const GEMS = ['#00ffff', '#c084fc', '#ff4fb0', '#bfff00', '#ffe135'] as const;
+const GEMS = ['var(--neo-cyan)', 'color-mix(in srgb, var(--neo-pink) 10%, var(--neo-purple-light))', 'color-mix(in srgb, var(--neo-pink) 75%, rgb(var(--neo-white)))', 'var(--neo-lime)', 'var(--neo-yellow)'] as const;
 const GEM_SHAPE = 'polygon(50% 0, 100% 32%, 82% 100%, 18% 100%, 0 32%)';
 
 function useReduce(): boolean {
@@ -36,13 +36,13 @@ function Gem({ word, color }: { word: string; color: string }) {
         className="block h-[min(1.75rem+2cqmin,4.5rem)] w-[min(2rem+2.4cqmin,5.25rem)]"
         style={{
           clipPath: GEM_SHAPE,
-          background: `linear-gradient(135deg, #fff 0%, ${color} 35%, ${color} 60%, rgba(0,0,0,0.55) 100%)`,
+          background: `linear-gradient(135deg, rgb(var(--neo-white)) 0%, ${color} 35%, ${color} 60%, rgba(0,0,0,0.55) 100%)`,
           filter: `drop-shadow(0 0 10px ${color})`,
         }}
       />
       <span
-        className="whitespace-nowrap rounded-full border-2 border-black px-[0.6em] font-neo-display text-[clamp(0.7rem,3.2cqmin,2.1rem)] font-black text-black"
-        style={{ background: color, boxShadow: '2px 2px 0 #000' }}
+        className="whitespace-nowrap rounded-full border-2 border-neo-black px-[0.6em] font-neo-display text-[clamp(0.7rem,3.2cqmin,2.1rem)] font-black text-neo-black"
+        style={{ background: color, boxShadow: '2px 2px 0 rgb(var(--neo-black))' }}
       >
         {word}
       </span>
@@ -84,8 +84,8 @@ export function ReviewVaultIntro({
             aria-hidden
             className="absolute inset-0 rounded-full border-[4px] border-neo-cyan"
             style={{
-              background: 'radial-gradient(circle at 38% 30%, #9fb0cc 0%, #5b6b86 38%, #2c3650 72%, #161d30 100%)',
-              boxShadow: '8px 8px 0 #000, 0 0 50px rgba(0,255,255,0.45), inset 0 0 0 10px rgba(0,0,0,0.25)',
+              background: 'radial-gradient(circle at 38% 30%, color-mix(in srgb, var(--neo-pink-light) 40%, var(--neo-cyan-muted)) 0%, color-mix(in srgb, color-mix(in srgb, var(--neo-pink-dark) 40%, var(--neo-cyan-light)) 70%, rgb(var(--neo-black))) 38%, color-mix(in srgb, color-mix(in srgb, var(--neo-cyan) 20%, var(--neo-purple-light)) 30%, rgb(var(--neo-black))) 72%, color-mix(in srgb, var(--neo-purple-light) 20%, rgb(var(--neo-black))) 100%)',
+              boxShadow: '8px 8px 0 rgb(var(--neo-black)), 0 0 50px rgba(0,255,255,0.45), inset 0 0 0 10px rgba(0,0,0,0.25)',
             }}
             initial={still ? false : { rotate: -90, scale: 0.7 }}
             animate={{ rotate: 0, scale: 1 }}
@@ -98,19 +98,19 @@ export function ReviewVaultIntro({
                 style={{
                   left: `${50 + Math.cos(a) * 43 - 3}%`,
                   top: `${50 + Math.sin(a) * 43 - 3}%`,
-                  background: 'radial-gradient(circle at 35% 30%, #e6edf7, #7d8aa3 60%, #3a4560)',
-                  boxShadow: '1px 2px 0 #000',
+                  background: 'radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--neo-purple-light) 10%, rgb(var(--neo-white))), color-mix(in srgb, color-mix(in srgb, var(--neo-pink-light) 40%, var(--neo-cyan-muted)) 80%, rgb(var(--neo-black))) 60%, color-mix(in srgb, color-mix(in srgb, var(--neo-cyan-muted) 40%, var(--neo-purple-light)) 40%, rgb(var(--neo-black))))',
+                  boxShadow: '1px 2px 0 rgb(var(--neo-black))',
                 }}
               />
             ))}
-            <span className="absolute inset-[16%] rounded-full" style={{ background: 'radial-gradient(circle at 50% 40%, #1f2a44, #0b1020 80%)', boxShadow: 'inset 0 6px 14px rgba(0,0,0,0.8), 0 0 0 4px #000' }} />
+            <span className="absolute inset-[16%] rounded-full" style={{ background: 'radial-gradient(circle at 50% 40%, color-mix(in srgb, color-mix(in srgb, var(--neo-cyan-muted) 40%, var(--neo-purple)) 30%, rgb(var(--neo-black))), color-mix(in srgb, var(--neo-purple) 10%, rgb(var(--neo-black))) 80%)', boxShadow: 'inset 0 6px 14px rgba(0,0,0,0.8), 0 0 0 4px rgb(var(--neo-black))' }} />
           </m.div>
           <m.img
             src={ACADEMY_ART.chest}
             alt=""
             draggable={false}
             className="absolute left-1/2 top-1/2 h-[58%] w-[58%] -translate-x-1/2 -translate-y-1/2 object-contain"
-            style={{ filter: 'drop-shadow(5px 5px 0 #000) drop-shadow(0 0 22px rgba(191,255,0,0.55))' }}
+            style={{ filter: 'drop-shadow(5px 5px 0 rgb(var(--neo-black))) drop-shadow(0 0 22px rgba(191,255,0,0.55))' }}
             initial={still ? false : { scale: 0 }}
             animate={reduce ? { scale: 1 } : { scale: 1, y: [0, -6, 0] }}
             transition={reduce ? undefined : { scale: { type: 'spring', stiffness: 260, damping: 14, delay: 0.3 }, y: { duration: 2.2, repeat: Infinity, ease: 'easeInOut' } }}
@@ -139,7 +139,7 @@ export function ReviewVaultIntro({
                     {w ? (
                       <Gem word={w} color={GEMS[i % GEMS.length]} />
                     ) : (
-                      <span aria-hidden className="block h-[min(1.75rem+2cqmin,4.5rem)] w-[min(2rem+2.4cqmin,5.25rem)] opacity-50" style={{ clipPath: GEM_SHAPE, background: 'linear-gradient(135deg, #9fb0cc, #2c3650)' }} />
+                      <span aria-hidden className="block h-[min(1.75rem+2cqmin,4.5rem)] w-[min(2rem+2.4cqmin,5.25rem)] opacity-50" style={{ clipPath: GEM_SHAPE, background: 'linear-gradient(135deg, color-mix(in srgb, var(--neo-pink-light) 40%, var(--neo-cyan-muted)), color-mix(in srgb, color-mix(in srgb, var(--neo-cyan) 20%, var(--neo-purple-light)) 30%, rgb(var(--neo-black))))' }} />
                     )}
                   </m.span>
                 </li>
@@ -152,7 +152,7 @@ export function ReviewVaultIntro({
           src={REVIEW_MASCOT_ART.hello}
           alt=""
           draggable={false}
-          className="absolute bottom-0 start-0 object-contain drop-shadow-[4px_4px_0_#000]"
+          className="absolute bottom-0 start-0 object-contain drop-shadow-[4px_4px_0_rgb(var(--neo-black))]"
           style={{ width: 'min(20cqw, 24cqh, 14rem)', height: 'min(20cqw, 24cqh, 14rem)' }}
         />
       </div>
@@ -164,7 +164,7 @@ export function ReviewVaultIntro({
         className={INTRO_COPY}
       >
         <p className={cn(INTRO_KICKER, 'text-neo-cyan')}>{lessonName}</p>
-        <h2 className={cn(INTRO_TITLE, 'mb-1 lg:text-[clamp(2.25rem,min(4.4vw,7.5vh),7rem)]')} style={{ textShadow: '3px 3px 0 #000' }}>
+        <h2 className={cn(INTRO_TITLE, 'mb-1 lg:text-[clamp(2.25rem,min(4.4vw,7.5vh),7rem)]')} style={{ textShadow: '3px 3px 0 rgb(var(--neo-black))' }}>
           {loading ? t('common.loading', 'Loading…') : t('academy.modes.review.vaultTitle', '{count} words locked in the vault', { count: words.length })}
         </h2>
         <p className="mb-3 font-neo-body text-sm text-neo-cream sm:text-base [@media(orientation:landscape)_and_(max-height:520px)]:mb-2! [@media(orientation:landscape)_and_(max-height:520px)]:text-sm! lg:mb-[clamp(1rem,3.5vh,2rem)] lg:text-[clamp(1rem,min(1.6vw,2.6vh),1.75rem)]">
@@ -181,9 +181,9 @@ export function ReviewVaultIntro({
               ? undefined
               : {
                   boxShadow: [
-                    '6px 6px 0 #000, 0 0 16px rgba(0,255,255,0.4)',
-                    '6px 6px 0 #000, 0 0 44px rgba(0,255,255,0.95)',
-                    '6px 6px 0 #000, 0 0 16px rgba(0,255,255,0.4)',
+                    '6px 6px 0 rgb(var(--neo-black)), 0 0 16px rgba(0,255,255,0.4)',
+                    '6px 6px 0 rgb(var(--neo-black)), 0 0 44px rgba(0,255,255,0.95)',
+                    '6px 6px 0 rgb(var(--neo-black)), 0 0 16px rgba(0,255,255,0.4)',
                   ],
                 }
           }
@@ -192,9 +192,9 @@ export function ReviewVaultIntro({
             INTRO_CTA,
             'text-2xl [@media(orientation:landscape)_and_(max-height:520px)]:text-xl! lg:text-[clamp(1.5rem,min(3vw,5vh),4.25rem)]',
           )}
-          style={{ background: 'linear-gradient(180deg, #b8ffff 0%, #00e5ff 45%, #8b5cf6 120%)', boxShadow: '6px 6px 0 #000, 0 0 28px rgba(0,255,255,0.7)' }}
+          style={{ background: 'linear-gradient(180deg, color-mix(in srgb, var(--neo-cyan-light) 45%, rgb(var(--neo-white))) 0%, color-mix(in srgb, var(--neo-cyan) 80%, var(--neo-purple-light)) 45%, var(--neo-purple) 120%)', boxShadow: '6px 6px 0 rgb(var(--neo-black)), 0 0 28px rgba(0,255,255,0.7)' }}
         >
-          <span aria-hidden className="pointer-events-none absolute inset-x-2 top-1 h-2 rounded-full bg-white/60" />
+          <span aria-hidden className="pointer-events-none absolute inset-x-2 top-1 h-2 rounded-full bg-neo-white/60" />
           <KeyRound className="relative h-[1.2em] w-[1.2em] shrink-0" aria-hidden />
           <span className="relative">{loading ? t('common.loading', 'Loading…') : t('academy.modes.review.crack', 'Crack the vault')}</span>
         </m.button>

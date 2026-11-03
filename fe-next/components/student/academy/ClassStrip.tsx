@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Flame } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { ClassHubState } from '@/lib/education/classroomHub';
+import { StreakMark } from './StreakMark';
 
 interface Props {
   classroomId: string;
@@ -61,12 +61,7 @@ export function ClassStrip({ classroomId, reducedMotion }: Props) {
   return (
     <section className="mb-3 flex flex-col gap-2 rounded-neo border-3 border-neo-black bg-neo-white p-3 text-neo-black shadow-hard-sm">
       <div className="flex items-center gap-3">
-        <Flame
-          aria-hidden="true"
-          className={`h-7 w-7 shrink-0 ${hub.streak > 0 ? 'text-neo-pink' : 'text-neo-black/30'} ${
-            hub.streak > 0 && !reducedMotion ? 'motion-safe:animate-pulse' : ''
-          }`}
-        />
+        <StreakMark streak={hub.streak} still={!!reducedMotion} size={36} t={t} />
         <div className="min-w-0">
           <p className="font-neo-display text-sm font-black uppercase">{t('student.classStrip.title')}</p>
           <p className="font-neo-body text-sm font-bold">
@@ -87,7 +82,7 @@ export function ClassStrip({ classroomId, reducedMotion }: Props) {
           type="button"
           onClick={ask}
           disabled={asking}
-          className="min-h-[44px] rounded-neo border-3 border-black bg-neo-lime px-4 py-2 font-neo-display text-sm font-black text-neo-black shadow-hard-sm transition hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-60"
+          className="min-h-[44px] rounded-neo border-3 border-neo-black bg-neo-lime px-4 py-2 font-neo-display text-sm font-black text-neo-black shadow-hard-sm transition hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan disabled:opacity-60"
         >
           {t('student.classStrip.askRematch')}
         </button>

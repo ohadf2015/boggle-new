@@ -1,3 +1,4 @@
+import { PRO_COPY_PARAMS as P } from '@/lib/education/proFeatures';
 import type { EducationLandingContent } from '@/lib/seo/educationLanding';
 
 /**
@@ -131,7 +132,7 @@ const EN: EducationLandingContent = {
         {
           tag: 'Vocabulary',
           title: 'Classroom vocabulary games',
-          desc: 'Seven formats for turning this week’s word list into live practice, from duels to whole-class boards.',
+          desc: `${P.modes} live modes for turning this week’s word list into practice, from a class quiz to whole-class boards.`,
           href: '/education/vocabulary-games-classroom',
           cta: 'See the formats',
         },
@@ -305,7 +306,7 @@ const HE: EducationLandingContent = {
         {
           tag: 'אוצר מילים',
           title: 'משחקי אוצר מילים לכיתה',
-          desc: 'שבעה פורמטים להפיכת רשימת המילים השבועית לתרגול חי, מדו-קרבות ועד לוחות לכל הכיתה.',
+          desc: `${P.modes} מצבים חיים להפיכת רשימת המילים השבועית לתרגול, מחידון כיתתי ועד לוחות לכל הכיתה.`,
           href: '/education/vocabulary-games-classroom',
           cta: 'לראות את הפורמטים',
         },
@@ -478,7 +479,7 @@ const ES: EducationLandingContent = {
         {
           tag: 'Vocabulario',
           title: 'Juegos de vocabulario para el aula',
-          desc: 'Siete formatos para convertir la lista de palabras de la semana en práctica en vivo, de duelos a tableros para toda la clase.',
+          desc: `${P.modes} modos en vivo para convertir la lista de la semana en práctica, de un quiz de clase a tableros para toda la clase.`,
           href: '/education/vocabulary-games-classroom',
           cta: 'Ver los formatos',
         },
@@ -651,7 +652,7 @@ const SV: EducationLandingContent = {
         {
           tag: 'Ordförråd',
           title: 'Ordförrådsspel för klassrummet',
-          desc: 'Sju format för att förvandla veckans ordlista till liveträning, från dueller till tavlor för hela klassen.',
+          desc: `${P.modes} livelägen för att förvandla veckans ordlista till träning, från klassquiz till tavlor för hela klassen.`,
           href: '/education/vocabulary-games-classroom',
           cta: 'Se formaten',
         },
@@ -824,7 +825,7 @@ const JA: EducationLandingContent = {
         {
           tag: '語彙',
           title: '教室向け語彙ゲーム',
-          desc: '今週の単語リストをライブ練習に変える7つのフォーマット。デュエルからクラス全員のボードまで。',
+          desc: `今週の単語リストを練習に変える${P.modes}つのライブモード。クラスクイズからクラス全員のボードまで。`,
           href: '/education/vocabulary-games-classroom',
           cta: 'フォーマットを見る',
         },
@@ -997,7 +998,7 @@ const RU: EducationLandingContent = {
         {
           tag: 'Словарный запас',
           title: 'Словесные игры для класса',
-          desc: 'Семь форматов, превращающих список недели в живую практику — от дуэлей до поля на весь класс.',
+          desc: `${P.modes} живых режимов, превращающих список недели в практику — от классной викторины до поля на весь класс.`,
           href: '/education/vocabulary-games-classroom',
           cta: 'Смотреть форматы',
         },

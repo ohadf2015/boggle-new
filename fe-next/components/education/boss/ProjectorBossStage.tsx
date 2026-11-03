@@ -55,7 +55,7 @@ export function ProjectorBossStage({ remainingTime, trailing, style }: Projector
         <div ref={shakeRef} className="relative h-full w-full">
           <header className="absolute inset-x-[22%] top-[1.6cqw] z-20">
             <div className="mb-[0.6cqw] flex items-end justify-between gap-[1cqw]">
-              <h1 dir="auto" className="truncate font-neo-display text-[3cqw] font-black uppercase leading-none tracking-wide text-neo-cream [text-shadow:0.22cqw_0.22cqw_0_#000]">
+              <h1 dir="auto" className="truncate font-neo-display text-[3cqw] font-black uppercase leading-none tracking-wide text-neo-cream [text-shadow:0.22cqw_0.22cqw_0_rgb(var(--neo-black))]">
                 {bossName}
               </h1>
               <PhasePips phase={view.phase} label={t('classroomBoss.phase', { n: view.phase })} />

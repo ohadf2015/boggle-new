@@ -45,6 +45,7 @@ import { useClassroomLaunchSocket } from './lobby/useClassroomLaunchSocket';
 import { buildClassroomLaunchPayload } from './lobby/classroomLaunchPayload';
 import { useRepeatLastSetup } from './lobby/useRepeatLastSetup';
 import { useSessionRun } from './lobby/useSessionRun';
+import { libraryHref } from './lobby/inviteLinks';
 
 type Translate = (key: string, params?: Record<string, string | number>) => string;
 
@@ -271,8 +272,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
       <LobbyNoLessons
         starterPacks={<StarterPacksSection onSelectPack={createLessonFromPack} language={classroom?.language} classroomId={selectedClassroomId} onRunSession={runSession} />}
         isCreating={isCreatingFromPack}
-        onBack={onBack}
-        onCreateLesson={() => router.push(`/${language}/teacher`)}
+        onCreateLesson={() => router.push(libraryHref(language, selectedClassroomId))}
       />
     );
   }
@@ -308,7 +308,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
             data-testid="create-room-retry"
             disabled={isStarting}
             onClick={goLive}
-            className="mt-2 inline-flex min-h-11 items-center rounded-neo border-[3px] border-neo-black bg-neo-cream px-4 font-neo-display text-sm font-black text-neo-black shadow-hard-sm transition-transform active:scale-[0.97] disabled:opacity-60"
+            className="mt-2 inline-flex min-h-11 items-center rounded-neo border-[3px] border-neo-black bg-neo-cream px-4 font-neo-display text-sm font-black text-neo-black shadow-hard-sm transition-transform active:scale-[0.97] disabled:opacity-60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
           >
             {t('eduShell.host.retry')}
           </button>
@@ -333,7 +333,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
             selectedLessonIds={selectedLessonIds}
             onChange={setSelectedLessonIds}
             classLanguage={classroom?.language}
-            createHref={`/${language}/teacher/curriculum${selectedClassroomId ? `?classroomId=${selectedClassroomId}` : ''}`}
+            createHref={libraryHref(language, selectedClassroomId)}
             wordCount={allPlayableWords.length}
             boardLanguage={lessonLanguage}
             activePreset={opts.activePreset}

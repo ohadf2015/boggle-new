@@ -27,7 +27,7 @@ export function LobbySetupDisclosure({ label, summary, open, onToggle, children 
         aria-haspopup="dialog"
         aria-expanded={open}
         onClick={onToggle}
-        className={cn(
+        className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
           'flex min-h-11 w-full items-center gap-2 rounded-neo border-2 border-neo-cream/35 bg-neo-navy-light px-3 py-2 text-start',
           'font-neo-body text-sm text-neo-cream/70 transition-colors hover:border-neo-cream/50 hover:text-neo-cream',
           focusRing,

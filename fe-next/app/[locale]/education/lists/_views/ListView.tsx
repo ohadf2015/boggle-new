@@ -178,11 +178,11 @@ export function ListView({ list, locale }: { list: WordList; locale: string }) {
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
           <Link
             href={accessHref}
-            className="rounded-neo border-4 border-neo-cream/40 bg-neo-navy px-6 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-lime shadow-hard-lg"
+            className="rounded-neo border-4 border-neo-cream/40 bg-neo-navy px-6 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-lime shadow-hard-lg focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
           >
             {tr(locale, 'detail.leadCta')}
           </Link>
-          <Link href={`/${locale}/teacher/upgrade`} className="text-center font-bold underline underline-offset-4">
+          <Link href={`/${locale}/teacher/upgrade`} className="text-center font-bold underline underline-offset-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan">
             {tr(locale, 'detail.leadPro')}
           </Link>
         </div>

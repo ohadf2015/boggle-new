@@ -81,7 +81,7 @@ export function ListActions({ locale, path, title, lang, words, playable, labels
           className="rounded-neo border-4 border-neo-black bg-neo-lime px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition-transform duration-150 hover:-translate-y-1 focus-visible:-translate-y-1 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-white"
         >
           <span className="block text-base sm:text-lg">{labels.playClass}</span>
-          <span className="block text-[10px] font-bold tracking-widest opacity-70">{labels.playClassSub}</span>
+          <span className="block text-xs font-bold tracking-widest opacity-70">{labels.playClassSub}</span>
         </a>
         <button
           type="button"
@@ -90,7 +90,7 @@ export function ListActions({ locale, path, title, lang, words, playable, labels
           className="rounded-neo border-4 border-neo-black bg-neo-cyan px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard transition-transform duration-150 hover:-translate-y-1 focus-visible:-translate-y-1 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-white"
         >
           <span className="block text-base sm:text-lg">{labels.practiceSolo}</span>
-          <span className="block text-[10px] font-bold tracking-widest opacity-70">{labels.practiceSoloSub}</span>
+          <span className="block text-xs font-bold tracking-widest opacity-70">{labels.practiceSoloSub}</span>
         </button>
       </div>
 

@@ -3,7 +3,7 @@ import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { PLAN_MATRIX_ROWS } from '@/lib/education/planMatrix';
 import { PRO_FEATURES } from '@/components/teacher/ProGate';
-import { PRO_FEATURE_BACKING, PRO_FEATURES_WITHOUT_SERVER_GATE, PRO_FEATURES_GATED_ON_SOCKET } from '../proFeatureBacking';
+import { PRO_FEATURE_BACKING, PRO_FEATURES_WITHOUT_SERVER_GATE, PRO_FEATURES_GATED_ON_SOCKET, PRO_FEATURES_GATED_IN_DATABASE } from '../proFeatureBacking';
 
 const ROOT = join(__dirname, '../../../..');
 const read = (path: string) => readFileSync(join(ROOT, path), 'utf8');
@@ -12,7 +12,7 @@ const sold = [...new Set([...matrixProRows, ...PRO_FEATURES])];
 
 describe('every Pro feature we sell is refused to a free teacher on the server', () => {
   it('covers every matrix Pro row and every ProGate lock, with no silent gaps', () => {
-    const accounted = [...Object.keys(PRO_FEATURE_BACKING), ...Object.keys(PRO_FEATURES_WITHOUT_SERVER_GATE), ...Object.keys(PRO_FEATURES_GATED_ON_SOCKET)];
+    const accounted = [...Object.keys(PRO_FEATURE_BACKING), ...Object.keys(PRO_FEATURES_WITHOUT_SERVER_GATE), ...Object.keys(PRO_FEATURES_GATED_ON_SOCKET), ...Object.keys(PRO_FEATURES_GATED_IN_DATABASE)];
     expect(accounted).toEqual(expect.arrayContaining(sold));
   });
 
@@ -35,6 +35,11 @@ describe('every Pro feature we sell is refused to a free teacher on the server',
   it.each(Object.entries(PRO_FEATURES_GATED_ON_SOCKET))('%s: its socket handler checks Pro and a test refuses a free teacher', (_key, b) => {
     expect(read(b.handler)).toContain(b.guard);
     expect(read(b.test)).toContain('refuses a free teacher');
+  });
+
+  it.each(Object.entries(PRO_FEATURES_GATED_IN_DATABASE))('%s: its database trigger refuses a free teacher and a test covers the refusal', (_key, b) => {
+    expect(read(b.migration)).toContain(b.guard);
+    expect(read(b.test)).toContain(b.guard);
   });
 
   it.each(Object.entries(PRO_FEATURE_BACKING))('%s: its route exists and calls the plan guard', (_key, backing) => {

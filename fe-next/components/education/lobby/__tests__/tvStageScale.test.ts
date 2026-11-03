@@ -12,7 +12,9 @@
  *    (Tailwind v4 only emits what it sees verbatim).
  */
 import { describe, it, expect } from 'vitest';
-import { TV_STAGE_ZOOM_TIERS, TV_STAGE_ZOOM_CLASS, tvStageZoom } from '../tvStageScale';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { TV_STAGE_ZOOM_TIERS, TV_STAGE_ZOOM_CLASS, TV_VIEWPORT, tvStageZoom } from '../tvStageScale';
 
 describe('tvStageZoom', () => {
   it('leaves phones, tablets and laptops alone', () => {
@@ -30,6 +32,15 @@ describe('tvStageZoom', () => {
 
   it('never scales a wide-but-short window', () => {
     expect(tvStageZoom(2560, 800)).toBe(1);
+  });
+
+  it('starts at the same TV size as the `tv:` variant in globals.css', () => {
+    const css = readFileSync(join(__dirname, '../../../../app/globals.css'), 'utf8');
+    const variant = css.match(/@custom-variant tv \(@media \(min-width: (\d+)px\) and \(min-height: (\d+)px\)\)/);
+    expect(variant).not.toBeNull();
+    expect(TV_VIEWPORT).toEqual({ minWidth: Number(variant![1]), minHeight: Number(variant![2]) });
+    expect(TV_STAGE_ZOOM_TIERS[0]).toMatchObject(TV_VIEWPORT);
+    expect(tvStageZoom(1750, 980)).toBe(1);
   });
 
   it('keeps every tier class a literal that matches its numbers', () => {

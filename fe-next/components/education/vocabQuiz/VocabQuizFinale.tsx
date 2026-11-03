@@ -149,7 +149,7 @@ export function VocabQuizFinale({ standings, totalQuestions, onPlayAgain, onBack
             sizeClassName="w-16 h-16 md:w-20 md:h-20 md:[@media(min-height:1000px)]:w-28 md:[@media(min-height:1000px)]:h-28"
             clipShape="rounded-square"
             clipBorder="lime"
-            clipBg="var(--neo-navy, #141a33)"
+            clipBg="var(--neo-navy)"
             animated
             enableHover={false}
             enableClick={false}
@@ -223,7 +223,7 @@ export function VocabQuizFinale({ standings, totalQuestions, onPlayAgain, onBack
               trackResultsAction('rematch', 'projector');
               onPlayAgain();
             }}
-            className={cn(
+            className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
               'w-full lg:flex-1 flex items-center justify-center gap-3 px-6 py-3 md:py-4',
               'font-neo-display font-black uppercase text-2xl md:text-4xl',
               'bg-neo-yellow text-neo-black border-4 border-neo-black rounded-neo-lg',
@@ -239,7 +239,7 @@ export function VocabQuizFinale({ standings, totalQuestions, onPlayAgain, onBack
             type="button"
             data-testid="quiz-finale-back-to-class"
             onClick={onBackToClass}
-            className="shrink-0 self-center lg:self-stretch flex items-center gap-2 px-4 py-2 rounded-neo border-[3px] border-neo-cream bg-neo-navy-elevated text-neo-cream font-neo-display font-black uppercase shadow-hard-sm transition-transform hover:-translate-y-0.5 active:translate-y-0.5"
+            className="shrink-0 self-center lg:self-stretch flex items-center gap-2 px-4 py-2 rounded-neo border-[3px] border-neo-cream bg-neo-navy-elevated text-neo-cream font-neo-display font-black uppercase shadow-hard-sm transition-transform hover:-translate-y-0.5 active:translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           >
             <SchoolGlyph className="size-5 shrink-0" />
             {t('eduLive.results.backToClass')}

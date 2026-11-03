@@ -20,7 +20,8 @@ export interface EducationHeaderMobileMenuProps {
   isAuthenticated: boolean;
   isOnTeacherSection: boolean;
   isOnStudentSection: boolean;
-  exitHref: string;
+  /** Absent for a signed-in teacher or student: nothing here leaves their hub. */
+  exitHref?: string;
   onClose: () => void;
   onSignOut: () => void;
 }
@@ -70,7 +71,7 @@ export function EducationHeaderMobileMenu({
           <button
             onClick={() => onClose()}
             className={cn(
-              'flex items-center justify-center',
+              'flex items-center justify-center focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
               'min-w-[48px] min-h-[48px] w-12 h-12',
               'bg-neo-navy text-neo-white',
               'border-3 border-neo-cream/40',
@@ -110,7 +111,7 @@ export function EducationHeaderMobileMenu({
                 href={`/${language}/teacher`}
                 onClick={() => onClose()}
                 className={cn(
-                  'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 transition w-full',
+                  'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 transition w-full focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
                   isOnTeacherSection
                     ? 'bg-neo-cyan text-neo-black border-neo-black shadow-hard'
                     : 'bg-neo-navy-light hover:bg-neo-cyan/20 text-neo-white border-neo-cream/40 shadow-hard-sm hover:shadow-hard'
@@ -149,7 +150,7 @@ export function EducationHeaderMobileMenu({
                 href={`/${language}/student`}
                 onClick={() => onClose()}
                 className={cn(
-                  'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 transition w-full',
+                  'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 transition w-full focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
                   isOnStudentSection
                     ? 'bg-neo-cyan text-neo-black border-neo-black shadow-hard'
                     : 'bg-neo-navy-light hover:bg-neo-cyan/20 text-neo-white border-neo-cream/40 shadow-hard-sm hover:shadow-hard'
@@ -167,7 +168,7 @@ export function EducationHeaderMobileMenu({
               href={`/${language}/education`}
               onClick={() => onClose()}
               className={cn(
-                'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-cream/40 transition w-full',
+                'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-cream/40 transition w-full focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
                 'bg-neo-navy-light hover:bg-neo-lime/20 text-neo-white',
                 'shadow-hard-sm hover:shadow-hard'
               )}
@@ -193,7 +194,7 @@ export function EducationHeaderMobileMenu({
                 <button
                   onClick={onSignOut}
                   className={cn(
-                    'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-cream/40 transition w-full',
+                    'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-cream/40 transition w-full focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
                     'bg-neo-navy-light hover:bg-neo-pink/20 text-neo-white',
                     'shadow-hard-sm hover:shadow-hard'
                   )}
@@ -207,34 +208,32 @@ export function EducationHeaderMobileMenu({
             </>
           )}
 
-          <div className="h-0.5 bg-neo-cream/20 rounded-full" />
+          {exitHref ? (
+            <>
+              <div className="h-0.5 bg-neo-cream/20 rounded-full" />
 
-          {/* Leave Education Section — rendered for EVERY user, including
-              unauthenticated guest students, who have no other escape
-              hatch from the education mobile menu. Kept below its own
-              divider and styled as visually secondary (thinner border,
-              no shadow-hard, transparent fill) so it never reads as the
-              primary action next to "Education Home". */}
-          <div className="flex flex-col gap-2">
-            <span className="text-xs font-bold text-neo-white/80 uppercase tracking-wide">
-              {t('common.leave')}
-            </span>
+              {/* Secondary on purpose (thin border, no shadow) so it never reads as the primary action. */}
+              <div className="flex flex-col gap-2">
+                <span className="text-xs font-bold text-neo-white/80 uppercase tracking-wide">
+                  {t('common.leave')}
+                </span>
 
-            {/* Exit Education */}
-            <Link
-              href={exitHref}
-              onClick={() => onClose()}
-              className={cn(
-                'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-2 border-neo-cream/40 transition w-full',
-                'bg-transparent hover:bg-neo-cream/10 text-neo-white'
-              )}
-            >
-              <span className="flex items-center justify-center w-6 h-6 text-neo-cream/60">
-                <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-              </span>
-              <span>{t('education.header.exitEducation')}</span>
-            </Link>
-          </div>
+                <Link
+                  href={exitHref}
+                  onClick={() => onClose()}
+                  className={cn(
+                    'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-2 border-neo-cream/40 transition w-full focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
+                    'bg-transparent hover:bg-neo-cream/10 text-neo-white'
+                  )}
+                >
+                  <span className="flex items-center justify-center w-6 h-6 text-neo-cream/60">
+                    <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+                  </span>
+                  <span>{t('education.header.exitEducation')}</span>
+                </Link>
+              </div>
+            </>
+          ) : null}
         </div>
       </div>
     </>,

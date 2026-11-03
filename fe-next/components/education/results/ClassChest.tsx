@@ -63,7 +63,7 @@ export function ClassChest({ found, total, open, tone = 'default', t }: ClassChe
           src="/images/education/chest-books.webp"
           alt=""
           aria-hidden="true"
-          className="w-full select-none drop-shadow-[0.4cqw_0.4cqw_0_#000]"
+          className="w-full select-none drop-shadow-[0.4cqw_0.4cqw_0_rgb(var(--neo-black))]"
         />
       </m.div>
       {/* Read from the back row: black on lime (16:1), a thick edge, and
@@ -71,7 +71,7 @@ export function ClassChest({ found, total, open, tone = 'default', t }: ClassChe
       <div
         data-testid="class-chest-label"
         className={cn(
-          '-mt-[1cqw] flex flex-col items-center whitespace-nowrap rounded-neo border-[3px] px-[1.2cqw] py-[0.4cqw] shadow-[0.4cqw_0.4cqw_0_#000]',
+          '-mt-[1cqw] flex flex-col items-center whitespace-nowrap rounded-neo border-[3px] px-[1.2cqw] py-[0.4cqw] shadow-[0.4cqw_0.4cqw_0_rgb(var(--neo-black))]',
           tone === 'calm' ? 'border-neo-cream/60 bg-neo-navy-light text-neo-cream' : 'border-neo-black bg-neo-lime text-neo-black'
         )}
       >

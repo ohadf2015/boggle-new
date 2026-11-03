@@ -103,7 +103,7 @@ export function MissGapCompletion({
             <span className="block font-neo-display font-bold text-2xl text-neo-cyan">
               {score.correct}/{score.total}
             </span>
-            <span className="block font-neo-body text-[11px] uppercase tracking-wider text-neo-cream">
+            <span className="block font-neo-body text-xs uppercase tracking-wider text-neo-cream">
               {t('education.homework.wordsRight')}
             </span>
           </p>
@@ -111,7 +111,7 @@ export function MissGapCompletion({
             <span className="block font-neo-display font-bold text-2xl text-neo-lime">
               {score.bestStreak}
             </span>
-            <span className="block font-neo-body text-[11px] uppercase tracking-wider text-neo-cream">
+            <span className="block font-neo-body text-xs uppercase tracking-wider text-neo-cream">
               {t('education.homework.bestRun')}
             </span>
           </p>
@@ -164,7 +164,7 @@ export function MissGapCompletion({
           type="button"
           data-testid="miss-gap-replay"
           onClick={onReplay}
-          className={cn(
+          className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
             'w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold',
             'bg-neo-navy text-neo-cream border-[3px] border-neo-cream rounded-neo',
             'transition-transform active:translate-x-[2px] active:translate-y-[2px]',

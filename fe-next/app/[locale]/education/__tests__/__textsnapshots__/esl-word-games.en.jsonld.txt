@@ -94,7 +94,7 @@
       "name": "Do students need an account to play?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes, student accounts are required but always free. Teachers set up a classroom, and students join with a simple code. No payment needed, ever."
+        "text": "No. Students join with a 6-character code and play in any browser: no sign-up, no email. Only the teacher has an account."
       }
     },
     {

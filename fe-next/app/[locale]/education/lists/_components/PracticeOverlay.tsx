@@ -69,7 +69,7 @@ export default function PracticeOverlay({ title, lang, words, playable, initialM
           type="button"
           onClick={onClose}
           aria-label={labels.close}
-          className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-neo border-3 border-neo-black bg-neo-white text-neo-navy shadow-hard"
+          className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-neo border-3 border-neo-black bg-neo-white text-neo-navy shadow-hard focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
         >
           <X className="h-5 w-5" aria-hidden />
         </button>
@@ -85,7 +85,7 @@ export default function PracticeOverlay({ title, lang, words, playable, initialM
                   key={m}
                   type="button"
                   onClick={() => setMode(m)}
-                  className="rounded-neo border-3 border-neo-black bg-neo-cream p-4 text-start text-neo-navy shadow-hard-lg transition-transform duration-150 hover:-translate-y-0.5"
+                  className="rounded-neo border-3 border-neo-black bg-neo-cream p-4 text-start text-neo-navy shadow-hard-lg transition-transform duration-150 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
                 >
                   <span className="block font-neo-display text-lg font-black">{labels.modes[m].title}</span>
                   <span className="block text-sm text-neo-navy/70">{labels.modes[m].sub}</span>

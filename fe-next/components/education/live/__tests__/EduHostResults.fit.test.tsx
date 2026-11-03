@@ -53,10 +53,10 @@ describe('EduHostResults: fits the wall with the Teacher Pro card', () => {
     pro.loading = false;
   });
 
-  it('given a free teacher, when results show, then the Pro card sits right under the actions', () => {
+  it('given a free teacher, when results show, then the one Pro preview sits right under the actions, never above them', () => {
     renderZeroRound();
-    const card = screen.getByTestId('results-teacher-pro-trial-card');
-    expect(card.previousElementSibling).toBe(screen.getByTestId('edu-results-actions'));
+    const card = screen.getByTestId('class-report-teaser').parentElement!;
+    expect(card.previousElementSibling).toContainElement(screen.getByTestId('edu-results-actions'));
   });
 
   it('given the Pro card shows, when the class missed many words, then the wall prints a short chip list and counts the rest', () => {
@@ -111,7 +111,7 @@ describe('EduHostResults: fits the wall with the Teacher Pro card', () => {
   it('given the Pro state is still loading, when results show, then the wall is already in its compact form so the card never reflows it', () => {
     pro.loading = true;
     renderZeroRound();
-    expect(screen.queryByTestId('results-teacher-pro-trial-card')).toBeNull();
+    expect(screen.queryByTestId('class-report-teaser')).toBeNull();
     expect(screen.getByTestId('coverage-words').querySelectorAll('[data-testid^="lesson-word-"]').length).toBeLessThanOrEqual(4);
   });
 

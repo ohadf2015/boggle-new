@@ -90,7 +90,7 @@ export default function StreakFlame({ streak, className }: StreakFlameProps) {
       animate={{ scale: 1 }}
       transition={{ type: 'spring', stiffness: 480, damping: 12 }}
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-neo border-[3px] border-black px-2.5 py-1',
+        'inline-flex items-center gap-1.5 rounded-neo border-[3px] border-neo-black px-2.5 py-1',
         PILL_BY_STAGE[flame.stage],
         className
       )}
@@ -106,7 +106,7 @@ export default function StreakFlame({ streak, className }: StreakFlameProps) {
         style={{ width: size, height: size }}
         className={cn('shrink-0', !skipAnimations && flame.stage >= 3 && 'animate-pulse')}
       />
-      <span className="font-neo-display text-lg font-black tabular-nums leading-none text-black">
+      <span className="font-neo-display text-lg font-black tabular-nums leading-none text-neo-black">
         {streak}
       </span>
     </AdaptiveMotion.div>

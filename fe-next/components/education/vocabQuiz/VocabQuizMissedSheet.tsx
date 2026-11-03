@@ -43,7 +43,7 @@ export function VocabQuizMissedSheet({ missed, onClose, t }: VocabQuizMissedShee
           type="button"
           onClick={onClose}
           aria-label={t('vocabQuiz.practice.close')}
-          className="shrink-0 w-11 h-11 flex items-center justify-center rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated shadow-hard"
+          className="shrink-0 w-11 h-11 flex items-center justify-center rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated shadow-hard focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
         >
           <X className="w-5 h-5" aria-hidden />
         </button>
@@ -77,7 +77,7 @@ export function VocabQuizMissedSheet({ missed, onClose, t }: VocabQuizMissedShee
       <button
         type="button"
         onClick={onClose}
-        className="shrink-0 w-full px-4 py-3.5 font-neo-display font-bold rounded-neo border-[3px] border-neo-black bg-neo-cyan text-neo-black shadow-hard"
+        className="shrink-0 w-full px-4 py-3.5 font-neo-display font-bold rounded-neo border-[3px] border-neo-black bg-neo-cyan text-neo-black shadow-hard focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
       >
         {t('vocabQuiz.practice.close')}
       </button>

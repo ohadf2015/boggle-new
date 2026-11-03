@@ -144,7 +144,7 @@ function PackageCard({
               /* analytics must never block */
             }
           }}
-          className="mt-6 rounded-neo border-4 border-neo-black bg-neo-yellow px-4 py-3 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard transition hover:-translate-y-0.5"
+          className="mt-6 rounded-neo border-4 border-neo-black bg-neo-yellow px-4 py-3 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
         >
           {t('education.packages.teacherPro.cta')}
         </Link>
@@ -152,11 +152,9 @@ function PackageCard({
         <button
           type="button"
           onClick={() => pkg.leadPlan && onLead(pkg.leadPlan)}
-          className={
-            highlighted
+          className={`${highlighted
               ? 'mt-6 rounded-neo border-4 border-neo-cream bg-neo-navy px-4 py-3 font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard'
-              : 'mt-6 rounded-neo border-4 border-neo-black bg-neo-pink px-4 py-3 font-neo-display font-black uppercase tracking-wider text-neo-black shadow-hard'
-          }
+              : 'mt-6 rounded-neo border-4 border-neo-black bg-neo-pink px-4 py-3 font-neo-display font-black uppercase tracking-wider text-neo-black shadow-hard'} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}
         >
           {t(`education.packages.${ns}.cta`)}
         </button>

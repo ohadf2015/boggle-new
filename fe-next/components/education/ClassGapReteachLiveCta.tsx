@@ -62,7 +62,7 @@ export function ClassGapReteachLiveCta({
 
   if (payload.missedWords.length === 0) {
     return (
-      <Link href={educationHref} className={primaryClass}>
+      <Link href={educationHref} className={`${primaryClass} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}>
         {educationLabel}
       </Link>
     );
@@ -78,7 +78,7 @@ export function ClassGapReteachLiveCta({
         type="button"
         data-testid="start-reteach-live"
         onClick={handleStart}
-        className={primaryClass}
+        className={`${primaryClass} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}
       >
         <Play className="w-5 h-5" aria-hidden />
         {reteachLabel}
@@ -86,25 +86,25 @@ export function ClassGapReteachLiveCta({
       <Link
         href={unpluggedHref}
         data-testid="start-unplugged-reteach-live"
-        className={secondaryClass}
+        className={`${secondaryClass} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}
       >
         {unpluggedLabel}
       </Link>
       <Link
         href={classicUnpluggedHref}
         data-testid="start-classic-unplugged"
-        className={secondaryClass}
+        className={`${secondaryClass} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}
       >
         {classicUnpluggedLabel}
       </Link>
       <Link
         href={teamTilesHref}
         data-testid="start-team-tiles-unplugged"
-        className={secondaryClass}
+        className={`${secondaryClass} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}
       >
         {teamTilesLabel}
       </Link>
-      <Link href={educationHref} className={secondaryClass}>
+      <Link href={educationHref} className={`${secondaryClass} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}>
         {educationLabel}
       </Link>
     </>

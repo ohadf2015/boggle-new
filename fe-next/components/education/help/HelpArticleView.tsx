@@ -37,20 +37,20 @@ export function HelpArticleView({
     .filter((m): m is HelpArticleMeta => Boolean(m));
 
   return (
-    <main className="relative min-h-screen overflow-x-hidden bg-neo-navy text-neo-white">
+    <main className="relative min-h-dvh overflow-x-hidden bg-neo-navy text-neo-white">
       <HelpFallbackNote locale={locale} />
       <div className="mx-auto max-w-6xl px-4 pb-16 pt-8 sm:px-6 lg:px-8">
         <nav aria-label={t('eg2Help.article.breadcrumb')} className="text-sm font-bold">
           <ol className="flex flex-wrap items-center gap-2 text-neo-gray-300">
             <li>
-              <Link href={`/${locale}${HELP_PATH}`} className="inline-flex items-center gap-1 text-neo-cyan hover:text-neo-lime">
+              <Link href={`/${locale}${HELP_PATH}`} className="inline-flex items-center gap-1 text-neo-cyan hover:text-neo-lime focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black">
                 <DirectionalIcon icon={ArrowLeft} className="size-4" />
                 {t('eg2Help.article.breadcrumb')}
               </Link>
             </li>
             <li aria-hidden="true">/</li>
             <li>
-              <Link href={`/${locale}${HELP_PATH}#${meta.category}`} className="hover:text-neo-lime">
+              <Link href={`/${locale}${HELP_PATH}#${meta.category}`} className="hover:text-neo-lime focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black">
                 {t(`eg2Help.categories.${meta.category}.title`)}
               </Link>
             </li>
@@ -108,7 +108,7 @@ export function HelpArticleView({
                   <ol className="mt-3 space-y-2">
                     {steps.map((s, i) => (
                       <li key={i}>
-                        <a href={`#step-${i + 1}`} className="flex gap-2 text-sm font-semibold text-neo-gray-100 hover:text-neo-lime">
+                        <a href={`#step-${i + 1}`} className="flex gap-2 text-sm font-semibold text-neo-gray-100 hover:text-neo-lime focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black">
                           <span className="font-neo-display font-black text-neo-cyan">{i + 1}</span>
                           <span>{s.title}</span>
                         </a>
@@ -130,7 +130,7 @@ export function HelpArticleView({
                     <li key={m.slug}>
                       <Link
                         href={helpArticleHref(locale, m.slug)}
-                        className="group flex items-start gap-2 rounded-[6px] px-2 py-2 font-semibold text-neo-gray-100 hover:bg-neo-navy hover:text-neo-lime"
+                        className="group flex items-start gap-2 rounded-[6px] px-2 py-2 font-semibold text-neo-gray-100 hover:bg-neo-navy hover:text-neo-lime focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
                       >
                         <DirectionalIcon icon={ArrowRight} className="mt-1 size-4 shrink-0 text-neo-cyan" />
                         <span>{content.articles[m.slug].title}</span>
@@ -138,7 +138,7 @@ export function HelpArticleView({
                     </li>
                   ))}
                 </ul>
-                <Link href={`/${locale}${HELP_PATH}`} className="mt-3 inline-block px-2 text-sm font-bold text-neo-cyan hover:text-neo-lime">
+                <Link href={`/${locale}${HELP_PATH}`} className="mt-3 inline-block px-2 text-sm font-bold text-neo-cyan hover:text-neo-lime focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black">
                   {t('eg2Help.article.back')}
                 </Link>
               </nav>

@@ -171,11 +171,11 @@ export default function AchievementProgressCard({
                 aria-label={isPinned ? t('education.achievements.unpin') : t('education.achievements.pin')}
                 title={!isPinned && !canPin ? t('education.achievements.maxPinsReached') : ''}
                 className={`
-                  w-8 h-8 rounded flex items-center justify-center
+                  w-11 h-11 rounded flex items-center justify-center
                   border-neo transition
                   ${isPinned ? 'bg-neo-lime text-neo-black border-neo-black shadow-hard-sm' : 'bg-neo-navy-light text-neo-white border-neo-cream/40'}
                   ${!isPinned && !canPin ? 'opacity-40 cursor-not-allowed' : 'hover:scale-110 active:scale-95'}
-                `}
+                 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}
               >
                 {isPinned ? <Star className="w-4 h-4 fill-current" /> : <Star className="w-4 h-4" />}
               </button>

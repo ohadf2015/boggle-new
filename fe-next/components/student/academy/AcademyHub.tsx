@@ -376,7 +376,7 @@ export function AcademyHub(props: AcademyHubProps) {
               <InkPanel tone="lime" className="flex items-center justify-center gap-2 px-4 py-2 font-neo-display font-black text-neo-black">
                 <Sparkles className="h-5 w-5" aria-hidden="true" />
                 <span className="text-lg uppercase">{t('academy.student.rewardXp', '+{xp} XP', { xp: reward.xpEarned })}</span>
-                <button onClick={clearReward} className="ms-1 text-xs underline" aria-label={t('common.dismiss', 'Dismiss')}>×</button>
+                <button onClick={clearReward} className="ms-1 text-xs underline focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black" aria-label={t('common.dismiss', 'Dismiss')}>×</button>
               </InkPanel>
             ) : (
               <InkPanel tone="night" className="flex items-center gap-3 p-2 pe-3">

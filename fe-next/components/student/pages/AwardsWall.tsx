@@ -46,7 +46,7 @@ export function AwardsFilterBar({ active, onChange, compact }: { active: AwardsF
             aria-selected={on}
             onClick={() => onChange(key)}
             className={cn(
-              'shrink-0 whitespace-nowrap rounded-full border-2 border-neo-black font-neo-display font-black outline-none transition-transform active:translate-y-[2px] focus-visible:ring-2 focus-visible:ring-neo-yellow',
+              "relative shrink-0 whitespace-nowrap rounded-full border-2 border-neo-black font-neo-display font-black outline-none transition-transform after:absolute after:inset-x-0 after:-inset-y-1.5 after:content-[''] active:translate-y-[2px] focus-visible:ring-2 focus-visible:ring-neo-yellow",
               compact ? 'h-8 px-2.5 text-xs' : 'h-9 px-2.5 text-xs sm:h-10 sm:px-3 sm:text-sm',
               on ? 'text-neo-black' : 'text-neo-white',
             )}
@@ -81,18 +81,18 @@ function AwardCard({ id, a, t }: { id: string; a: Achievement; t: T }) {
         {name}
       </span>
       {tier.isMaxTier ? (
-        <span className="rounded-full border-2 border-neo-black px-2 py-0.5 font-neo-display text-[11px] font-black text-neo-black" style={toneStyle('gold', { shadow: 0, trim: 1 })}>
+        <span className="rounded-full border-2 border-neo-black px-2 py-0.5 font-neo-display text-xs font-black text-neo-black" style={toneStyle('gold', { shadow: 0, trim: 1 })}>
           {t('academy.pages.maxTier', 'MAX')}
         </span>
       ) : tier.currentTier ? (
         <span
-          className="rounded-full border-2 border-neo-black px-2 py-0.5 font-neo-display text-[11px] font-black"
+          className="rounded-full border-2 border-neo-black px-2 py-0.5 font-neo-display text-xs font-black"
           style={{ backgroundColor: display?.colors.bg, color: display?.colors.text }}
         >
           {display?.icon} {tier.currentTier}
         </span>
       ) : (
-        <span className="inline-flex items-center gap-1 font-neo-display text-[11px] font-black text-neo-white/80">
+        <span className="inline-flex items-center gap-1 font-neo-display text-xs font-black text-neo-white/80">
           <Lock className="h-3 w-3" aria-hidden="true" />
           {t('education.achievements.locked')}
         </span>
@@ -102,10 +102,10 @@ function AwardCard({ id, a, t }: { id: string; a: Achievement; t: T }) {
           <span className="h-2.5 flex-1 overflow-hidden rounded-full border-2 border-neo-black bg-black/40">
             <span
               className="block h-full w-full origin-left rtl:origin-right rounded-full motion-safe:transition-transform motion-safe:duration-700"
-              style={{ transform: `scaleX(${Math.max(0, Math.min(100, tier.progress)) / 100})`, backgroundImage: 'linear-gradient(90deg,#fff27a,#ffcf3a)' }}
+              style={{ transform: `scaleX(${Math.max(0, Math.min(100, tier.progress)) / 100})`, backgroundImage: 'linear-gradient(90deg,color-mix(in srgb,var(--neo-yellow) 55%,var(--neo-cream)),color-mix(in srgb,var(--neo-yellow) 85%,var(--neo-orange)))' }}
             />
           </span>
-          <span className="shrink-0 font-neo-body text-[11px] font-bold text-neo-white/85">
+          <span className="shrink-0 font-neo-body text-xs font-bold text-neo-white/85">
             {a.count}/{tier.nextThreshold}
           </span>
         </span>

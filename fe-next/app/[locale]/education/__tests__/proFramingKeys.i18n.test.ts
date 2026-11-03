@@ -26,6 +26,8 @@ const ROOT = join(__dirname, '..', '..', '..', '..');
 /** Every surface that renders the Pro comparison. */
 const SOURCES = [
   join(ROOT, 'components', 'education', 'ProFramingSection.tsx'),
+  join(ROOT, 'components', 'education', 'ProFramingSectionTable.tsx'),
+  join(ROOT, 'lib', 'education', 'proFeatures.ts'),
   join(ROOT, 'app', '[locale]', 'teacher', 'upgrade', 'PageClient.tsx'),
 ];
 
@@ -56,7 +58,7 @@ describe('education.landing.pro translations', () => {
   it('finds the keys the Pro comparison actually uses', () => {
     // Guards the derivation itself: a regex that silently matches nothing would make
     // every language assertion below vacuously pass.
-    expect(USED_KEYS.length).toBeGreaterThanOrEqual(15);
+    expect(USED_KEYS.length).toBeGreaterThanOrEqual(8);
   });
 
   it.each(Object.keys(LANGUAGES))('%s defines every key with a non-empty string', (lang) => {

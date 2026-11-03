@@ -19,12 +19,14 @@ interface ProjectorModeCardProps {
   gameCode: string;
   lobby: ReturnType<typeof useProjectorLobbyMode>;
   t: Translate;
+  /** Off until a round has been played: the lobby already picked the game, so the wall only echoes it. */
+  canChange: boolean;
   className?: string;
   style?: CSSProperties;
 }
 
 /** The game the class is about to play, its settings, and the one control that changes it without a new code. */
-export function ProjectorModeCard({ gameCode, lobby, t, className, style }: ProjectorModeCardProps) {
+export function ProjectorModeCard({ gameCode, lobby, t, canChange, className, style }: ProjectorModeCardProps) {
   const entry = catalogueEntry(lobby.modeId);
   return (
     <div
@@ -53,7 +55,7 @@ export function ProjectorModeCard({ gameCode, lobby, t, className, style }: Proj
           })}
         </ul>
       </div>
-      <LobbyModeSwitcher gameCode={gameCode} currentMode={lobby.modeId} socket={getSharedSocketIfExists()} t={t} onModeApplied={lobby.applyMode} roundSettings={lobby.roundSettings} showName={false} />
+      {canChange && <LobbyModeSwitcher gameCode={gameCode} currentMode={lobby.modeId} socket={getSharedSocketIfExists()} t={t} onModeApplied={lobby.applyMode} roundSettings={lobby.roundSettings} showName={false} />}
     </div>
   );
 }

@@ -1,4 +1,6 @@
-export const BURST_COLORS = ['#c6f432', '#ff5fa2', '#38e1ff', '#ffd23f'] as const;
+import { NEO_HEX } from './neoHex';
+
+export const BURST_COLORS = [NEO_HEX.lime, NEO_HEX.pink, NEO_HEX.cyan, NEO_HEX.yellow] as const;
 
 export interface CashBurstPiece {
   x: number;

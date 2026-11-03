@@ -28,7 +28,7 @@ export function ClassSheet({ classroomId, userId, className, onClose, reducedMot
   const { t } = useLanguage();
   return (
     <div className="fixed inset-0 z-40 flex items-end justify-center sm:items-center" role="dialog" aria-modal="true" aria-label={t('student.dashboard.leaderboard', 'Leaderboard')}>
-      <button type="button" aria-label={t('common.close', 'Close')} onClick={onClose} className="absolute inset-0 bg-neo-black/70" />
+      <button type="button" aria-label={t('common.close', 'Close')} onClick={onClose} className="absolute inset-0 bg-neo-black/70 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black" />
       <m.div
         initial={reducedMotion ? false : { y: 40, scale: 0.97 }}
         animate={{ y: 0, scale: 1 }}
@@ -46,7 +46,7 @@ export function ClassSheet({ classroomId, userId, className, onClose, reducedMot
             type="button"
             onClick={onClose}
             aria-label={t('common.close', 'Close')}
-            className="rounded-neo border-2 border-neo-black bg-neo-white p-1.5 text-neo-black shadow-hard-sm"
+            className="rounded-neo border-2 border-neo-black bg-neo-white p-1.5 text-neo-black shadow-hard-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           >
             <X className="h-4 w-4" aria-hidden="true" />
           </button>

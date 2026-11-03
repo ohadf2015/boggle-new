@@ -1,9 +1,6 @@
 /**
- * Turning pasted text into rows, on its own so both surfaces share one parser:
- * the paste box in the create dialog and the bulk importer behind it.
- *
- * It used to live inside BulkImportEnhanced, which a dialog cannot import
- * without dragging in the whole importer (and its dictionary lookups) with it.
+ * Turning pasted text into rows, kept apart so a dialog can import the parser
+ * without the dictionary lookups that ride along with the editors.
  */
 
 // Delimiter pattern: requires spaces around - – — or : to avoid splitting hyphenated words

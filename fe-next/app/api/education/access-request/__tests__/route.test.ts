@@ -126,8 +126,7 @@ describe('POST /api/education/access-request', () => {
     const json = await res.json();
     expect(json.ok).toBe(true);
 
-    expect(captureMock).toHaveBeenCalledTimes(1);
-    const ev = captureMock.mock.calls[0][0];
+    const ev = captureMock.mock.calls.map((c: any[]) => c[0]).find((e: any) => e.event === 'edu_access_request_created');
     expect(ev.distinctId).toBe('user-1');
     expect(ev.event).toBe('edu_access_request_created');
     expect(ev.properties.$host).toBe(EDU_ANALYTICS_HOST);
@@ -189,6 +188,74 @@ describe('POST /api/education/access-request', () => {
   it('400 if use_case > 800 chars', async () => {
     const res = await POST(mkReq({ ...validPayload, use_case: 'x'.repeat(801) }));
     expect(res.status).toBe(400);
+  });
+
+  describe('nothing to type: role and use case are optional', () => {
+    it('files the request with role teacher and an empty use case when neither is sent', async () => {
+      const res = await POST(mkReq({ locale: 'he' }));
+      expect(res.status).toBe(200);
+      const row = insertMock.mock.calls[0][0] as any;
+      expect(row.role).toBe('teacher');
+      expect(row.use_case).toBe('');
+      expect(approveMock).toHaveBeenCalledTimes(1);
+      expect(approveMock.mock.calls[0][0].values.trial_expires_at).toBeTruthy();
+    });
+
+    it('records whether the teacher picked a role, so the default does not read as a choice', async () => {
+      await POST(mkReq({ locale: 'en' }));
+      const created = captureMock.mock.calls.map((c: any[]) => c[0]).find((e: any) => e.event === 'edu_access_request_created');
+      expect(created.properties.role_picked).toBe(false);
+      captureMock.mockClear();
+      await POST(mkReq({ locale: 'en', role: 'tutor' }));
+      const again = captureMock.mock.calls.map((c: any[]) => c[0]).find((e: any) => e.event === 'edu_access_request_created');
+      expect(again.properties.role).toBe('tutor');
+      expect(again.properties.role_picked).toBe(true);
+    });
+
+    it('still accepts a short use case (no 10-character minimum)', async () => {
+      const res = await POST(mkReq({ ...validPayload, use_case: 'vocab' }));
+      expect(res.status).toBe(200);
+    });
+  });
+
+  describe('edu_access_completed_to_class (graded, cookie-free)', () => {
+    const completed = () => captureMock.mock.calls.map((c: any[]) => c[0]).filter((e: any) => e.event === 'edu_access_completed_to_class');
+
+    it('fires once on a fresh approval, server-side, with where the teacher goes next', async () => {
+      await POST(mkReq({ locale: 'en' }));
+      expect(completed()).toHaveLength(1);
+      expect(completed()[0].distinctId).toBe('user-1');
+      expect(completed()[0].properties).toMatchObject({ destination: 'class_setup', locale: 'en', $host: EDU_ANALYTICS_HOST });
+    });
+
+    it('tags QA accounts so rigs never count as graded completions', async () => {
+      mockUser = { ...verifiedUser(), email: 'rig1@lexiclash.test' };
+      await POST(mkReq({ locale: 'en' }));
+      expect(completed()[0].properties.is_test_account).toBe(true);
+      captureMock.mockClear();
+      mockUser = verifiedUser();
+      await POST(mkReq({ locale: 'en' }));
+      expect(completed()[0].properties.is_test_account).toBe(false);
+    });
+
+    it('a paid campaign teacher goes to the day-0 class', async () => {
+      mockProfile = { ...mockProfile, utm_medium: 'paid' } as any;
+      const res = await POST(mkReq({ locale: 'en' }));
+      expect((await res.json()).paidDay0).toBe(true);
+      expect(completed()[0].properties.destination).toBe('paid_class');
+    });
+
+    it('does not fire for an account that already had access', async () => {
+      mockProfile = { display_name: 'Jane', user_role: 'teacher' };
+      await POST(mkReq({ locale: 'en' }));
+      expect(completed()).toHaveLength(0);
+    });
+
+    it('does not fire when approval is still pending (202)', async () => {
+      adminAvailable = false;
+      await POST(mkReq({ locale: 'en' }));
+      expect(completed()).toHaveLength(0);
+    });
   });
 
   it('400 if role unknown', async () => {

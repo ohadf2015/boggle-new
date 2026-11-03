@@ -2,14 +2,13 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
-import { Zap, Gift, ShieldCheck, ArrowRight } from 'lucide-react';
-import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
+import { useEffect, useRef, useState } from 'react';
+import { Gift, ShieldCheck } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AccessRedirectNotice } from '@/components/education/AccessRedirectNotice';
 import { AccessRequestGate } from '@/components/education/AccessRequestGate';
 import { DistrictUpsellStrip } from '@/components/education/DistrictUpsellStrip';
-import { TrialUrgencyBanner } from '@/components/education/TrialUrgencyBanner';
+import { AccessApprovedCard } from './AccessApprovedCard';
 import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useGsapReveal } from '@/lib/animation/useGsapReveal';
@@ -17,11 +16,17 @@ import { trackGrowthEvent } from '@/utils/growthTracking';
 import { accessReturnPath } from '@/lib/education/accessReturnPath';
 import { LandingHeader } from '@/components/education/landing/LandingHeader';
 import { EducationShell } from '@/components/education/shell/EducationShell';
+import { PageLoader } from '@/components/ui/PageLoader';
+import { accessHandoffHref, type AccessApproval } from '@/components/education/AccessRequestHandoff';
 
 const TRUST = [
-  { key: 'trust_instant', Icon: Zap, chip: 'bg-neo-lime' },
-  { key: 'trust_free', Icon: Gift, chip: 'bg-neo-cyan' },
-  { key: 'trust_nologins', Icon: ShieldCheck, chip: 'bg-neo-pink' },
+  { key: 'education.access.trust_free', Icon: Gift, chip: 'bg-neo-cyan' },
+  { key: 'education.access.trust_nologins', Icon: ShieldCheck, chip: 'bg-neo-pink' },
+] as const;
+
+const STEPS = [
+  { title: 'education.access.next.step1_title', body: 'education.access.next.step1_body' },
+  { title: 'education.access.next.step3_title', body: 'education.access.next.step3_body' },
 ] as const;
 
 export function PageClient() {
@@ -40,9 +45,19 @@ export function PageClient() {
   // auth was settling, or who signed in here, returns to where they were headed.
   // Direct visits from marketing CTAs keep the approved card.
   const returnTo = accessReturnPath(redirectedFrom);
+  // A teacher approved on this visit: this page alone navigates, once the profile re-read lands,
+  // and the "already approved" card never gets a frame in between.
+  const [approval, setApproval] = useState<AccessApproval | null>(null);
+  const handedOff = useRef(false);
   useEffect(() => {
-    if (returnTo && !isLoading && hasAccess) router.replace(returnTo);
-  }, [returnTo, isLoading, hasAccess, router]);
+    if (!approval || handedOff.current) return;
+    handedOff.current = true;
+    const href = accessHandoffHref(language, approval, returnTo);
+    void approval.ready.then(() => router.replace(href));
+  }, [approval, language, returnTo, router]);
+  useEffect(() => {
+    if (returnTo && !approval && !isLoading && hasAccess) router.replace(returnTo);
+  }, [returnTo, approval, isLoading, hasAccess, router]);
 
   // Guardrail for exp-teacher-gate-redirect-clarity-v1: confirms the
   // TeacherGate → /education/access redirect actually lands, regardless of
@@ -65,8 +80,9 @@ export function PageClient() {
   // Keep pitch chrome up while auth/access is still loading (`status` stays
   // `'none'`). Field CLS 0.30 on this route was the short loading column
   // swapping into the wide hero+gate layout. The gate itself still waits.
-  const showPitch = status === 'none' && !hasAccess;
-  const approved = !isLoading && (hasAccess || status === 'approved');
+  const handingOff = approval !== null;
+  const showPitch = handingOff || (status === 'none' && !hasAccess);
+  const approved = !handingOff && !isLoading && (hasAccess || status === 'approved');
 
   // Steps + escape hatch reveal on scroll. The hero itself is NOT animated:
   // an opacity-0 start on the h1 flashes on mobile Chromium above the fold.
@@ -78,7 +94,14 @@ export function PageClient() {
     ease: 'power3.out',
   });
 
-  const statusCard = (
+  const statusCard = handingOff ? (
+    <div
+      role="status"
+      className="flex min-h-[220px] items-center justify-center rounded-neo border-neo-thick border-neo-cream/40 bg-neo-navy p-6 shadow-hard-lg sm:min-h-[260px]"
+    >
+      <PageLoader size="md" text={t('education.access.class_ready_creating')} />
+    </div>
+  ) : (
     <>
       {isLoading && (
         <div
@@ -89,7 +112,7 @@ export function PageClient() {
       )}
 
       {!isLoading && status === 'pending' && (
-        <div className="rounded-neo border-neo-thick border-black bg-neo-cyan p-6 text-neo-navy shadow-hard-lg">
+        <div className="rounded-neo border-neo-thick border-neo-black bg-neo-cyan p-6 text-neo-navy shadow-hard-lg">
           <h2 className="font-neo-display text-2xl font-black tracking-[-0.02em]">
             {t('education.access.pending_title')}
           </h2>
@@ -104,12 +127,12 @@ export function PageClient() {
       )}
 
       {!isLoading && status === 'declined' && (
-        <div className="rounded-neo border-neo-thick border-black bg-neo-pink p-6 text-neo-white shadow-hard-lg">
+        <div className="rounded-neo border-neo-thick border-neo-black bg-neo-pink p-6 text-neo-white shadow-hard-lg">
           <h2 className="font-neo-display text-2xl font-black tracking-[-0.02em]">
             {t('education.access.declined_title')}
           </h2>
           {latestRequest?.admin_note && (
-            <p className="mt-3 rounded-neo border border-black/30 bg-neo-navy/50 p-3 text-sm">
+            <p className="mt-3 rounded-neo border border-neo-cream/60 bg-neo-navy/50 p-3 text-sm">
               {latestRequest.admin_note}
             </p>
           )}
@@ -119,7 +142,7 @@ export function PageClient() {
 
       {!isLoading && showPitch && (
         <div className="rounded-neo border-neo-thick border-neo-cream/40 bg-neo-navy-light p-6 shadow-hard-lg sm:p-7">
-          <AccessRequestGate />
+          <AccessRequestGate onApproved={setApproval} />
         </div>
       )}
 
@@ -128,14 +151,14 @@ export function PageClient() {
         status !== 'declined' &&
         status !== 'approved' &&
         status !== 'none' && (
-          <div className="rounded-neo border-neo-thick border-black bg-neo-purple p-6 text-neo-white shadow-hard-lg">
+          <div className="rounded-neo border-neo-thick border-neo-black bg-neo-purple p-6 text-neo-white shadow-hard-lg">
             <h2 className="font-neo-display text-2xl font-black tracking-[-0.02em]">
               {t('education.access.status_unknown_title')}
             </h2>
             <p className="mt-2">{t('education.access.status_unknown_body')}</p>
             <Link
               href={`/${language}/teacher`}
-              className="mt-4 inline-block rounded-neo border-neo border-neo-cream/40 bg-neo-navy px-5 py-3 font-neo-display font-bold text-neo-white shadow-hard transition hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0 active:shadow-hard-pressed"
+              className="mt-4 inline-block rounded-neo border-neo border-neo-cream/40 bg-neo-navy px-5 py-3 font-neo-display font-bold text-neo-white shadow-hard transition hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0 active:shadow-hard-pressed focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
             >
               {t('education.access.go_to_teacher')}
             </Link>
@@ -144,32 +167,13 @@ export function PageClient() {
     </>
   );
 
-  // A returning teacher came here for one thing: their HQ. No re-pitch, no steps, no upsell strip.
+  // An approved teacher gets her next step only: no re-pitch, no steps, no upsell strip.
   if (approved) {
     return (
       <EducationShell header={<LandingHeader showStart={false} />} contentClassName="flex flex-col">
         <main className="flex flex-1 flex-col text-neo-white">
           <section className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-center px-4 pb-10 pt-16">
-            <div className="relative rounded-neo-xl border-neo-thick border-black bg-neo-lime p-6 pt-14 text-neo-navy shadow-hard-xl sm:p-8 sm:pt-16">
-              <span className="absolute -top-12 start-1/2 flex size-24 shrink-0 -translate-x-1/2 items-center justify-center overflow-hidden rounded-full border-neo-thick border-black bg-neo-cyan shadow-hard rtl:translate-x-1/2 [contain:layout]">
-                <Image src="/mascot/teacher/teacher-hero.webp" alt="" aria-hidden="true" width={96} height={96} priority className="size-full object-contain" />
-              </span>
-              <h1 className="text-center font-neo-display text-[clamp(1.75rem,6vw,2.5rem)] font-black leading-tight tracking-[-0.02em] text-balance [min-height:2.5em]">
-                {t('education.access.already_approved_title')}
-              </h1>
-              <Link
-                href={`/${language}/teacher`}
-                className="group mt-6 flex min-h-14 w-full items-center justify-center gap-3 rounded-neo border-neo-thick border-neo-cream bg-neo-navy px-5 py-3 font-neo-display text-lg font-black uppercase tracking-wide text-neo-white shadow-hard-lg transition-[box-shadow,transform] duration-100 hover:-translate-y-0.5 hover:shadow-hard-xl active:translate-y-0.5 active:shadow-hard-pressed focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
-              >
-                {t('education.access.go_to_teacher')}
-                <DirectionalIcon icon={ArrowRight} className="size-5 transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1" />
-              </Link>
-              {trial && !hasPro && !proLoading && (
-                <div className="mt-5">
-                  <TrialUrgencyBanner trial={trial} href={`/${language}/teacher`} />
-                </div>
-              )}
-            </div>
+            <AccessApprovedCard trial={trial} showTrial={!hasPro && !proLoading} />
           </section>
         </main>
       </EducationShell>
@@ -194,7 +198,7 @@ export function PageClient() {
                 {t('education.access.h1')}
               </h1>
               <p className="mt-4 max-w-[62ch] text-lg leading-relaxed text-neo-white/85">
-                {t('education.access.lede')}
+                {t('teacher.classroom.wizard.subtitle')}
               </p>
 
               {/* The action (sign up, or sign in in one tap) sits right under the lede — on a phone the trust list used to push it below the fold. */}
@@ -202,7 +206,7 @@ export function PageClient() {
 
               {/* Only for someone who still has to apply — an approved teacher who
                   happens to carry a `from` needs their status, not this. */}
-              {showPitch && (
+              {showPitch && !handingOff && (
                 <div className="mt-6 max-w-[62ch]">
                   <AccessRedirectNotice from={redirectedFrom} />
                 </div>
@@ -213,12 +217,12 @@ export function PageClient() {
                   {TRUST.map(({ key, Icon, chip }) => (
                     <li key={key} className="flex items-center gap-3">
                       <span
-                        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-neo border-neo border-black ${chip} text-neo-navy shadow-hard-sm`}
+                        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-neo border-neo border-neo-black ${chip} text-neo-navy shadow-hard-sm`}
                       >
                         <Icon className="h-[18px] w-[18px]" strokeWidth={2.5} aria-hidden="true" />
                       </span>
                       <span className="font-semibold text-neo-white">
-                        {t(`education.access.${key}`)}
+                        {t(key)}
                       </span>
                     </li>
                   ))}
@@ -239,7 +243,7 @@ export function PageClient() {
                   width={918}
                   height={880}
                   sizes="(min-width: 1024px) 34rem, (min-width: 640px) 24rem, 100vw"
-                  className="w-full rounded-neo-xl border-neo-thick border-black shadow-hard-lg"
+                  className="w-full rounded-neo-xl border-neo-thick border-neo-black shadow-hard-lg"
                 />
               </div>
             )}
@@ -250,18 +254,18 @@ export function PageClient() {
           <div ref={belowRef} className="mt-16">
             <ol
               data-access-reveal
-              className="grid divide-y-2 divide-neo-cream/30 overflow-hidden rounded-neo border-neo-thick border-neo-cream/40 bg-neo-navy-light sm:grid-cols-3 sm:divide-x-2 sm:rtl:divide-x-reverse sm:divide-y-0"
+              className="grid divide-y-2 divide-neo-cream/30 overflow-hidden rounded-neo border-neo-thick border-neo-cream/40 bg-neo-navy-light sm:grid-cols-2 sm:divide-x-2 sm:rtl:divide-x-reverse sm:divide-y-0"
             >
-              {(['step1', 'step2', 'step3'] as const).map((k, i) => (
-                <li key={k} className="p-5">
+              {STEPS.map(({ title, body }, i) => (
+                <li key={title} className="p-5">
                   <span className="font-neo-display text-sm font-black text-neo-lime">
                     {i + 1}
                   </span>
                   <h2 className="mt-1 font-neo-display text-base font-bold text-neo-white">
-                    {t(`education.access.next.${k}_title`)}
+                    {t(title)}
                   </h2>
                   <p className="mt-1 text-sm leading-relaxed text-neo-white/70">
-                    {t(`education.access.next.${k}_body`)}
+                    {t(body)}
                   </p>
                 </li>
               ))}

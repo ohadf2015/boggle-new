@@ -64,7 +64,7 @@ export function LobbyPressureDials({ pressure, onChange }: LobbyPressureDialsPro
           {t('teacher.classroom.pressure.title')}
           <span
             data-testid="pressure-pro-badge"
-            className="rounded-neo bg-neo-yellow px-1.5 font-neo-display text-[0.65rem] font-black leading-tight text-neo-black"
+            className="rounded-neo bg-neo-yellow px-1.5 font-neo-display text-xs font-black leading-tight text-neo-black"
           >
             {t('eduShell.host.proBadge')}
           </span>
@@ -73,7 +73,7 @@ export function LobbyPressureDials({ pressure, onChange }: LobbyPressureDialsPro
           <Link
             href={`/${language}/teacher/upgrade`}
             data-testid="pressure-pro-lock"
-            className="inline-flex min-h-11 items-center gap-1.5 rounded-neo border-2 border-neo-cream/35 bg-transparent px-3 py-1 font-neo-display text-sm font-bold text-neo-cream transition-colors hover:border-neo-cream/60"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-neo border-2 border-neo-cream/35 bg-transparent px-3 py-1 font-neo-display text-sm font-bold text-neo-cream transition-colors hover:border-neo-cream/60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           >
             <Lock className="size-3.5" strokeWidth={3} aria-hidden="true" />
             {t('teacher.proGate.pressureDials.title')}

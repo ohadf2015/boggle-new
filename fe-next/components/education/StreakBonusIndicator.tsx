@@ -155,7 +155,7 @@ const StreakBonusIndicator = memo<StreakBonusIndicatorProps>(({
         {showBonus && bonus !== null && (
           <div className={cn(
             'font-neo-body font-black text-neo-black',
-            size === 'sm' ? 'text-[10px]' : 'text-xs',
+            size === 'sm' ? 'text-xs' : 'text-xs',
             'mt-0.5'
           )}>
             +{bonus}% XP

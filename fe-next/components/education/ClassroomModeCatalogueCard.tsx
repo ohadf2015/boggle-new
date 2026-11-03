@@ -1,7 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { Check, Clock, Sparkles } from 'lucide-react';
+import { Check, Clock, Flame, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { CatalogueMode } from './ClassroomModeCatalogueData';
 
@@ -10,6 +10,8 @@ export interface ClassroomModeCatalogueCardProps {
   name: string;
   minutesLabel: string;
   recommendedLabel: string | null;
+  /** "Most popular" on the modes classes play most; hidden when the card already says Best fit. */
+  favoriteLabel?: string | null;
   /** Where the mode is played (Projector / On phones / Both). */
   deliveryTag?: ReactNode;
   selected: boolean;
@@ -17,11 +19,15 @@ export interface ClassroomModeCatalogueCardProps {
   onPick: (id: CatalogueMode['id']) => void;
 }
 
+const TAG =
+  'absolute start-1 top-1 z-10 inline-flex max-w-[90%] items-center gap-0.5 truncate rounded-full border border-neo-cream/40 bg-neo-navy px-1.5 py-0.5 font-neo-body text-xs font-bold leading-none text-neo-cream';
+
 export function ClassroomModeCatalogueCard({
   mode,
   name,
   minutesLabel,
   recommendedLabel,
+  favoriteLabel = null,
   deliveryTag,
   selected,
   busy,
@@ -48,15 +54,17 @@ export function ClassroomModeCatalogueCard({
           : 'border-neo-cream/35 [@media(hover:hover)]:hover:border-neo-cream/60'
       )}
     >
-      {recommendedLabel && (
-        <span
-          data-testid="mode-recommended"
-          className="absolute start-1 top-1 z-10 inline-flex max-w-[90%] items-center gap-0.5 truncate rounded-full border border-neo-cream/40 bg-neo-navy px-1.5 py-0.5 font-neo-body text-[0.6rem] font-bold leading-none text-neo-cream lg:text-[0.65rem]"
-        >
+      {recommendedLabel ? (
+        <span data-testid="mode-recommended" className={TAG}>
           <Sparkles className="size-3 shrink-0" strokeWidth={2.5} aria-hidden="true" />
           {recommendedLabel}
         </span>
-      )}
+      ) : favoriteLabel ? (
+        <span data-testid="mode-favorite" className={cn(TAG, 'border-neo-black bg-neo-orange text-neo-black')}>
+          <Flame className="size-3 shrink-0" strokeWidth={2.5} aria-hidden="true" />
+          {favoriteLabel}
+        </span>
+      ) : null}
       <span className="relative block aspect-square w-full overflow-hidden rounded-neo bg-neo-navy lg:aspect-[5/4] lg:[@media(max-height:1099px)]:aspect-[2/1]">
         {/* eslint-disable-next-line @next/next/no-img-element -- static poster cover, same file as the catalog */}
         <img
@@ -83,7 +91,7 @@ export function ClassroomModeCatalogueCard({
       <span className="line-clamp-3 min-h-[2.2em] font-neo-display text-[0.8rem] font-bold leading-[1.1] lg:text-sm">
         {name}
       </span>
-      <span className="mx-auto inline-flex items-center gap-1 whitespace-nowrap font-neo-body text-[0.65rem] font-bold leading-none text-neo-cream/75 lg:text-xs">
+      <span className="mx-auto inline-flex items-center gap-1 whitespace-nowrap font-neo-body text-xs font-bold leading-none text-neo-cream/80">
         <Clock className="size-3 shrink-0" strokeWidth={2.5} aria-hidden="true" />
         {minutesLabel}
       </span>

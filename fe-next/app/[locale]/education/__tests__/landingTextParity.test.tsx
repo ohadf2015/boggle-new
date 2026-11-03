@@ -43,8 +43,10 @@ import Icebreakers, { generateMetadata as metaIcebreakers } from '../first-day-o
  * `vocabulary-games-classroom` the class-analytics cell is Teacher Pro
  * (Hebrew: פרו למורים) instead of a free claim. Since #1351 the shared
  * `TeacherAccessCTA` aside also carries the Teacher Pro trial link (Start 14-day
- * free trial, `/{locale}/teacher/upgrade`) on every template landing. JSON-LD and metadata snapshots
- * are unchanged, and `for-schools` does not use the template.
+ * free trial, `/{locale}/teacher/upgrade`) on every template landing. The strip also carries a
+ * Free-vs-Pro table, and the plan copy (no student sign-up, no duels, prices from
+ * lib/education/proFeatures) changed the esl, vocabulary and for-schools text and JSON-LD.
+ * Metadata snapshots are unchanged, and `for-schools` does not use the template.
  *
  * Regenerate them only when the copy itself is meant to change:
  *

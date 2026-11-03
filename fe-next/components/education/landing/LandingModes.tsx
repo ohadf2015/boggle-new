@@ -30,7 +30,9 @@ export function LandingModes() {
       <h2 className="text-balance font-neo-poster text-2xl font-extrabold leading-tight tracking-[-0.01em] text-neo-white [overflow-wrap:anywhere] sm:text-3xl">
         {t('eduPlans.modes.title', { count: modes.length })}
       </h2>
-      <p className="mt-2 max-w-[60ch] text-base text-neo-white/75">{t('eduPlans.modes.sub')}</p>
+      <p className="mt-2 max-w-[60ch] text-base text-neo-white/75">
+        {t('eduPro.modesSub', t('eduPlans.modes.sub'))}
+      </p>
 
       <ul className="mt-6 grid gap-3 md:grid-cols-[1.4fr_1fr_1fr] md:gap-5">
         {featured.map((mode, i) => (

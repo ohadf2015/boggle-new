@@ -63,7 +63,7 @@ export function TrialUrgencyBanner({ trial, href, onDismiss, ctaLabel, recap }: 
             money. Both strings already exist in every locale. */}
         <Link
           href={checkoutHref}
-          className="mt-3 inline-block rounded-neo bg-neo-navy px-4 py-2 font-bold text-neo-white border-neo border-neo-cream/40 shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition"
+          className="mt-3 inline-block rounded-neo bg-neo-navy px-4 py-2 font-bold text-neo-white border-neo border-neo-cream/40 shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
         >
           {t('teacher.subscription.upgradeNow')}
         </Link>
@@ -91,7 +91,7 @@ export function TrialUrgencyBanner({ trial, href, onDismiss, ctaLabel, recap }: 
             <div data-testid="trial-count" className="text-2xl font-black font-neo-display leading-none">
               {count}
             </div>
-            <div data-testid="trial-unit" className="mt-0.5 text-[10px] font-bold uppercase tracking-wide">
+            <div data-testid="trial-unit" className="mt-0.5 text-xs font-bold uppercase tracking-wide">
               {t(unitKey)}
             </div>
           </div>
@@ -110,7 +110,7 @@ export function TrialUrgencyBanner({ trial, href, onDismiss, ctaLabel, recap }: 
             data-testid="trial-urgency-banner-dismiss"
             onClick={onDismiss}
             aria-label={t('common.close')}
-            className="inline-flex size-10 shrink-0 items-center justify-center rounded-neo border-2 border-black bg-neo-lime text-neo-navy hover:bg-neo-navy hover:text-neo-lime focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-navy"
+            className="inline-flex size-11 shrink-0 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-lime text-neo-navy hover:bg-neo-navy hover:text-neo-lime focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-navy"
           >
             <X className="size-5" aria-hidden="true" />
           </button>
@@ -119,7 +119,7 @@ export function TrialUrgencyBanner({ trial, href, onDismiss, ctaLabel, recap }: 
       <Link
         href={ctaHref}
         data-testid="trial-urgency-banner-cta"
-        className="mt-3 inline-block rounded-neo bg-neo-navy px-4 py-2 font-bold text-neo-white border-neo border-neo-cream/40 shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition"
+        className="mt-3 inline-block rounded-neo bg-neo-navy px-4 py-2 font-bold text-neo-white border-neo border-neo-cream/40 shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
       >
         {ctaText}
       </Link>

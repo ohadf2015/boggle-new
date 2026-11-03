@@ -27,7 +27,7 @@ export function ClassroomBossOutcome({ boss, compact = false, tone = 'default', 
         src={won ? BOSS_ART.defeated : BOSS_ART.idle}
         alt=""
         aria-hidden="true"
-        className={cn('shrink-0 select-none object-contain drop-shadow-[3px_3px_0_#000]', compact ? 'size-14' : 'size-20 md:[@media(min-height:1000px)]:size-32')}
+        className={cn('shrink-0 select-none object-contain drop-shadow-[3px_3px_0_rgb(var(--neo-black))]', compact ? 'size-14' : 'size-20 md:[@media(min-height:1000px)]:size-32')}
       />
       <div className="min-w-0">
         <h3 className={cn('font-neo-display font-black leading-none', !calm && 'uppercase', compact ? 'text-xl' : 'text-2xl md:text-4xl md:[@media(min-height:1000px)]:text-5xl')}>

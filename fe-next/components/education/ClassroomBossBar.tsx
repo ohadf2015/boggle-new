@@ -48,7 +48,7 @@ export function ClassroomBossBar({ boss, phase, surface, myHit = null, t }: Clas
           alt=""
           aria-hidden="true"
           className={cn(
-            'size-full select-none object-contain drop-shadow-[3px_3px_0_#000]',
+            'size-full select-none object-contain drop-shadow-[3px_3px_0_rgb(var(--neo-black))]',
             hitNow && 'motion-safe:animate-[combo-shake_0.5s_ease-in-out]'
           )}
         />
@@ -73,7 +73,7 @@ export function ClassroomBossBar({ boss, phase, surface, myHit = null, t }: Clas
             <Swords className={host ? 'size-4 md:size-6' : 'size-3.5'} strokeWidth={3} aria-hidden="true" />
             {t('eg2Modes.boss.dragon')}
           </span>
-          <span data-testid="boss-hp-text" className={cn('shrink-0 font-neo-display font-black tabular-nums text-neo-cream', host ? 'text-sm md:text-xl' : 'text-[0.7rem]')}>
+          <span data-testid="boss-hp-text" className={cn('shrink-0 font-neo-display font-black tabular-nums text-neo-cream', host ? 'text-sm md:text-xl' : 'text-xs')}>
             {t('eg2Modes.boss.hp', { hp: boss.hp, max: boss.maxHp })}
           </span>
         </div>

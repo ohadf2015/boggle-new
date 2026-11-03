@@ -94,7 +94,7 @@
       "name": "¿Necesitan cuenta?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Sí, pero es gratis. Los maestros crean el aula, estudiantes entran con código. Sin pago."
+        "text": "No. Entran con un código de 6 caracteres y juegan en cualquier navegador: sin registro ni correo. Solo el docente tiene cuenta."
       }
     },
     {
@@ -142,7 +142,7 @@
       "name": "¿Son gratis estos juegos de palabras en inglés?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Sí. La cuenta de docente, hasta 3 clases y las rondas con tus propias listas son gratis, sin tarjeta y sin anuncios para los estudiantes. Teacher Pro (9 $/mes) solo añade clases ilimitadas e informes imprimibles — una clase completa cabe en el nivel gratuito."
+        "text": "Sí. La cuenta de docente, hasta 3 clases y las rondas con tus propias listas son gratis, sin tarjeta y sin anuncios para los estudiantes. Teacher Pro ($9/mes) solo añade clases ilimitadas e informes imprimibles — una clase completa cabe en el nivel gratuito."
       }
     },
     {

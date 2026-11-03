@@ -103,7 +103,7 @@ export function UnpluggedHud({
         aria-label={muteLabel}
         title={muteLabel}
         data-testid="unplugged-mute"
-        className="shrink-0 grid place-items-center w-9 h-9 sm:w-11 sm:h-11 rounded-neo border-[3px] border-neo-cream bg-neo-navy text-neo-cream shadow-hard-sm"
+        className="shrink-0 grid place-items-center w-11 h-11 rounded-neo border-[3px] border-neo-cream bg-neo-navy text-neo-cream shadow-hard-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
       >
         {muted ? (
           <VolumeX className="w-4 h-4 sm:w-5 sm:h-5" aria-hidden />

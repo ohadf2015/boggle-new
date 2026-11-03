@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { pickTeacherBanner } from './teacherBannerPriority';
+import { pickHomeAsk, pickTeacherBanner } from './teacherBannerPriority';
 
 /**
  * The teacher dashboard stacked three monetization banners at once.
@@ -218,5 +218,22 @@ describe('pickTeacherBanner pendingCheckout', () => {
         pendingCheckout: true,
       }),
     ).toBe('pendingCheckout');
+  });
+});
+
+describe('pickHomeAsk', () => {
+  const none = { account: false, onboarding: false, trial: false, usage: false, pro: false };
+
+  it('shows nothing when no ask is live', () => {
+    expect(pickHomeAsk(none)).toBe('none');
+  });
+
+  it('ranks account blockers, onboarding, trial lifecycle, usage limit, then the milestone Pro card', () => {
+    const all = { account: true, onboarding: true, trial: true, usage: true, pro: true };
+    expect(pickHomeAsk(all)).toBe('account');
+    expect(pickHomeAsk({ ...all, account: false })).toBe('onboarding');
+    expect(pickHomeAsk({ ...all, account: false, onboarding: false })).toBe('trial');
+    expect(pickHomeAsk({ ...none, usage: true, pro: true })).toBe('usage');
+    expect(pickHomeAsk({ ...none, pro: true })).toBe('pro');
   });
 });

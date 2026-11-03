@@ -57,7 +57,7 @@ export function BossAttackClock({ view }: { view: ClassroomBossView }) {
           </span>
         </div>
         {tg && (
-          <Image src={EDU_MASCOT.attack} alt="" width={96} height={96} className="absolute -end-[2.4cqw] -bottom-[0.6cqw] size-[4.4cqw] drop-shadow-[2px_2px_0_#000]" />
+          <Image src={EDU_MASCOT.attack} alt="" width={96} height={96} className="absolute -end-[2.4cqw] -bottom-[0.6cqw] size-[4.4cqw] drop-shadow-[2px_2px_0_rgb(var(--neo-black))]" />
         )}
       </div>
       {tg && (

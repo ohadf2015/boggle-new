@@ -76,17 +76,17 @@ describe('EduHostResults reteach', () => {
     expect(onRematch).toHaveBeenCalledTimes(1);
   });
 
-  it('given words most of the class missed, when results show, then reteaching them is the one primary and Play again drops into a quiet row of at most three', () => {
+  it('given words most of the class missed, when results show, then practicing them is the one primary and Play again drops into a quiet row of at most three', () => {
     const onRematch = vi.fn();
     render(<EduHostResults summary={summary} players={players} t={t} onRematch={onRematch} onClose={vi.fn()} onExitRoom={vi.fn()} />);
     const primary = screen.getByTestId('edu-replay-missed');
     expect(document.querySelectorAll('[data-results-primary]')).toEqual(expect.objectContaining({ length: 1 }));
     expect(primary).toHaveAttribute('data-results-primary');
-    expect(primary).toHaveTextContent('eduLiveRoom.hostResults.replayMissed');
+    expect(primary).toHaveTextContent('eduLiveRoom.hostResults.practiceWords');
     expect(screen.getAllByRole('button').filter((b) => /bg-neo-(lime|pink)(\s|$)/.test(b.className))).toEqual([primary]);
-    const secondary = screen.getByTestId('edu-results-secondary');
-    expect(secondary.querySelectorAll('button')).toHaveLength(3);
-    expect(secondary).toContainElement(screen.getByTestId('edu-results-play-again'));
+    const quiet = screen.getByTestId('edu-results-tertiary');
+    expect(quiet.querySelectorAll('button')).toHaveLength(3);
+    expect(quiet).toContainElement(screen.getByTestId('edu-results-play-again'));
     fireEvent.click(screen.getByTestId('edu-results-play-again'));
     expect(onRematch).toHaveBeenCalledTimes(1);
     expect(screen.queryByTestId('edu-reteach-panel')).toBeNull();
@@ -107,10 +107,10 @@ describe('EduHostResults reteach', () => {
     expect(screen.getByTestId('tv-reteach-whole-lesson')).toHaveTextContent('education.results.wholeLessonAgain');
   });
 
-  it('given no rematch handler and a word too few found, when results show, then the wall never claims all found', () => {
+  it('given no rematch handler and a word too few found, when results show, then the wall lists it and never claims all found', () => {
     const fewFound = { ...summary, missedWords: [], coverage: summary.coverage.map((c) => ({ ...c, foundBy: c.foundBy.length ? c.foundBy : ['Lia'] })) } as ClassroomSummary;
     render(<EduHostResults summary={fewFound} players={players} t={t} />);
-    expect(screen.getByTestId('tv-coverage-panel')).toBeInTheDocument();
+    expect(screen.getByTestId('edu-reteach-words')).toBeInTheDocument();
     expect(screen.queryByText('education.results.allFound')).not.toBeInTheDocument();
   });
 

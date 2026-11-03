@@ -67,7 +67,8 @@ describe('EduHostResults: boss round on the teacher wall', () => {
   it.each(['defeated', 'escaped'] as const)('given the boss %s, then the only lime fill on the wall is the primary action', (status) => {
     const { container } = renderBossWall(status);
     const lime = [...container.querySelectorAll('[class]')].filter((el) => tokens(el).includes('bg-neo-lime'));
-    expect(lime.map((el) => el.getAttribute('data-testid'))).toEqual(['edu-results-play-again']);
+    expect(lime).toHaveLength(1);
+    expect(lime[0]).toHaveAttribute('data-results-primary');
     expect(container.innerHTML).not.toMatch(/\btext-neo-lime\b/);
   });
 

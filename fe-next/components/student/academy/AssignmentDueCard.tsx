@@ -90,18 +90,18 @@ export function AssignmentDueCard({
       href={href}
       data-testid="assignment-due-card"
       data-kind={kind}
-      className={`pointer-events-auto flex items-center gap-2 rounded-[14px] border-2 p-1.5 text-neo-white shadow-hard-sm ${tone}`}
+      className={`pointer-events-auto flex items-center gap-2 rounded-[14px] border-2 p-1.5 text-neo-white shadow-hard-sm ${tone} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan`}
     >
       <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border-2 border-neo-black ${kind === 'overdue' ? 'bg-neo-red text-neo-white' : 'bg-neo-yellow text-neo-black'}`}>
         <Icon className="h-5 w-5" aria-hidden="true" />
       </span>
       <span className="min-w-0 flex-1">
         <span className="block truncate font-neo-body text-xs font-bold leading-tight">{title}</span>
-        <span className={`block font-neo-body text-[11px] font-bold uppercase tracking-wide ${kind === 'overdue' ? 'text-neo-red' : 'text-neo-yellow'}`}>
+        <span className={`block font-neo-body text-xs font-bold uppercase tracking-wide ${kind === 'overdue' ? 'text-neo-red' : 'text-neo-yellow'}`}>
           {t(time.key, time.fallback, time.params)}
         </span>
       </span>
-      <span className="shrink-0 rounded-lg border-2 border-neo-black bg-neo-white px-2 py-1 font-neo-body text-[11px] font-black uppercase text-neo-black">
+      <span className="shrink-0 rounded-lg border-2 border-neo-black bg-neo-white px-2 py-1 font-neo-body text-xs font-black uppercase text-neo-black">
         {t('student.assignments.doIt', 'Do it')}
       </span>
     </Link>

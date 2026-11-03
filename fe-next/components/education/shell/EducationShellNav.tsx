@@ -1,11 +1,40 @@
 'use client';
 
+import Link from 'next/link';
+import { Crown } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { EducationNav } from './EducationNav';
 import { TeacherAccountMenu } from './TeacherAccountMenu';
 import { TeacherBrand } from './TeacherBrand';
+import { cn } from '@/lib/utils';
 import type { ResolvedEducationNav } from './navItems';
+
+type Plan = 'free' | 'trial' | 'pro';
+
+const PLAN_LABEL: Record<Plan, string> = {
+  free: 'teacher.plan.free',
+  trial: 'teacher.plan.trialActive',
+  pro: 'teacher.plan.pro',
+};
+
+/** Phone/tablet plan status; the desktop sidebar states it beside the Pro link instead. */
+function TeacherPlanChip({ plan, href, t }: { plan: Plan; href: string; t: (key: string) => string }) {
+  return (
+    <Link
+      href={href}
+      data-testid="teacher-plan-chip"
+      className={cn(
+        'flex min-h-[44px] min-w-0 items-center gap-1.5 rounded-neo px-2 font-neo-display text-sm font-bold text-neo-cream',
+        'transition-[colors,transform] duration-150 hover:bg-neo-navy-light active:scale-[0.97]',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
+      )}
+    >
+      <Crown className="size-4 shrink-0 text-neo-yellow" aria-hidden="true" />
+      <span className="truncate">{t(PLAN_LABEL[plan])}</span>
+    </Link>
+  );
+}
 
 /**
  * The one place the nav touches React context, so `EducationShell` stays
@@ -22,7 +51,7 @@ export function EducationShellNav({
   const { t } = useLanguage();
   const { hasPro, loading, known, status } = useTeacherPro();
   // Nothing is claimed until the entitlement read lands: no false "Free plan" for a paying teacher.
-  const plan = nav.kind !== 'teacher' || loading || !known ? undefined : !hasPro ? 'free' : status === 'trialing' ? 'trial' : 'pro';
+  const plan: Plan | undefined = nav.kind !== 'teacher' || loading || !known ? undefined : !hasPro ? 'free' : status === 'trialing' ? 'trial' : 'pro';
   const teacher = nav.kind === 'teacher' && nav.proHref && nav.profileHref;
   const home = `/${nav.locale}/${nav.kind}`;
 
@@ -34,7 +63,10 @@ export function EducationShellNav({
         className="flex shrink-0 items-center justify-between gap-3 border-b-[3px] border-neo-cream bg-neo-navy px-4 pb-2 pt-[max(0.5rem,env(safe-area-inset-top))] lg:hidden"
       >
         <TeacherBrand href={home} t={t} compact />
-        <TeacherAccountMenu proHref={nav.proHref!} profileHref={nav.profileHref!} variant="icon" />
+        <div className="flex min-w-0 items-center gap-1">
+          {plan ? <TeacherPlanChip plan={plan} href={nav.proHref!} t={t} /> : null}
+          <TeacherAccountMenu proHref={nav.proHref!} profileHref={nav.profileHref!} variant="icon" />
+        </div>
       </div>
     );
   }

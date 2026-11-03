@@ -12,7 +12,7 @@ export const jaT: HelpLocaleContent = {
         items: [
           { time: '0:00', title: '先生HQを開く', body: '[先生HQ](app:/teacher)にログインすると、[[teacher.nav.play]]画面が開きます。' },
           { time: '0:30', title: 'ゲームと単語を選ぶ', body: '[[academy.hq.modes.classic]]と、ポスターの下にあるスターターリストを1つタップします。すぐにプレイできます。', shot: 'hq-start-game' },
-          { time: '1:00', title: 'スタートして画面を映す', body: '[[teacher.playNow.goLive]]を押して、画面を黒板に映します。ロビーには大きなコード、リンク、QRコードが表示されます。', shot: 'lobby' },
+          { time: '1:00', title: 'ライブを開始して画面を映す', body: '[[teacher.playNow.goLive]]を押して、画面を黒板に映します。ロビーには大きなコード、リンク、QRコードが表示されます。', shot: 'lobby' },
           { time: '1:30', title: '生徒が参加', body: '生徒はQRを読み取るか、lexiclash.live/join でコードを入力して名前を決めます。名前が次々と表示されます。' },
           { time: '2:00', title: '1ラウンド遊ぶ', body: '[[hostView.startClassGame]]を押します。[[academy.hq.modes.classic]]は1ラウンド3分。先生の画面にはタイマーとライブランキングが表示されます。', shot: 'live-host' },
           { time: '5:00', title: '盛り上がったら、もう一回', body: '表彰台が表示されます。[[education.results.playAgain]]で同じコードのまま2ラウンド目へ、[[eduLive.results.backToClass]]で終了です。' },

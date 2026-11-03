@@ -41,8 +41,8 @@ export const enA: HelpLocaleContent = {
   },
   'start-a-live-game': {
     title: 'Start a live game in one tap',
-    summary: 'Pick a game, pick the words, press Go live. The join code is on your board before the class has finished sitting down.',
-    keywords: 'go live, host, start game, projector, live class, classroom game, launch, play now',
+    summary: 'Pick a game, pick the words, press Start live. The join code is on your board before the class has finished sitting down.',
+    keywords: 'start live, go live, host, start game, projector, live class, classroom game, launch, play now',
     blocks: [
       { t: 'p', text: 'A live game is the whole class playing at once from their own devices while the board shows the code, the timer and the leaderboard. Everything starts from [[teacher.nav.play]] in Teacher HQ.' },
       {
@@ -50,7 +50,7 @@ export const enA: HelpLocaleContent = {
         items: [
           { title: 'Choose the game', body: 'Under [[academy.hq.startTitle]], tap a poster. Not sure? [[academy.hq.modes.classic]] works with any word list; [[academy.hq.modes.vocabQuiz]] needs words with definitions.', shot: 'hq-start-game' },
           { title: 'Choose the words', body: 'Tap one of your lists under the posters, or press [[teacher.playNow.changeWords]] for [[teacher.playNow.sourcePacks]] or [[teacher.playNow.sourcePaste]].' },
-          { title: 'Press Go live', body: 'Press [[teacher.playNow.goLive]]. LexiClash sets up the class, loads the words and opens the room. The lobby fills your screen with the code, the join link and a QR code.', shot: 'lobby' },
+          { title: 'Press Start live', body: 'Press [[teacher.playNow.goLive]]. LexiClash sets up the class, loads the words and opens the room. The lobby fills your screen with the code, the join link and a QR code.', shot: 'lobby' },
           { title: 'Start when they are in', body: 'Names pop into the lobby as students join. [[hostView.startClassGame]] unlocks once at least one student is in. Press it and the round begins on every device at the same time.' },
         ],
       },

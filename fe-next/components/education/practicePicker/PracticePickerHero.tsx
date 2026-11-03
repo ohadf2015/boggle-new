@@ -59,10 +59,10 @@ export default function PracticePickerHero({ tile, onSelect }: PracticePickerHer
       // height of its own name band and the art disappears — so it does not
       // depend on a stylesheet being in step with the markup.
       style={{ minHeight: 248 }}
-      className={cn(
-        'group relative flex w-full flex-col overflow-hidden rounded-neo border-[3px] border-black text-start shadow-hard-lg transition',
+      className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
+        'group relative flex w-full flex-col overflow-hidden rounded-neo border-[3px] border-neo-black text-start shadow-hard-lg transition',
         accent,
-        'text-black hover:-translate-y-0.5 active:translate-y-[2px] active:shadow-hard'
+        'text-neo-black hover:-translate-y-0.5 active:translate-y-[2px] active:shadow-hard'
       )}
     >
       {/* The mascot floats on the accent. Transparent art only: it cannot crop
@@ -91,7 +91,7 @@ export default function PracticePickerHero({ tile, onSelect }: PracticePickerHer
           audit (cream on lime measures 1.2:1, black on lime 14+). */}
       <span
         data-testid="practice-picker-hero-badge"
-        className="relative m-2.5 inline-flex w-fit items-center gap-1 rounded-[4px] border-[2px] border-black bg-neo-cream px-2 py-1 font-neo-display text-[11px] font-black uppercase leading-none tracking-wide text-black"
+        className="relative m-2.5 inline-flex w-fit items-center gap-1 rounded-[4px] border-[2px] border-neo-black bg-neo-cream px-2 py-1 font-neo-display text-xs font-black uppercase leading-none tracking-wide text-neo-black"
       >
         {t('student.practiceFun.recommended')}
       </span>
@@ -102,11 +102,11 @@ export default function PracticePickerHero({ tile, onSelect }: PracticePickerHer
         <span className="block font-neo-display text-xl font-black uppercase leading-none text-neo-white text-balance">
           {t(tile.titleKey)}
         </span>
-        <span className="mt-1.5 flex flex-wrap items-center gap-1.5 font-neo-body text-[11px] font-bold leading-none text-neo-cream">
+        <span className="mt-1.5 flex flex-wrap items-center gap-1.5 font-neo-body text-xs font-bold leading-none text-neo-cream">
           {xp > 0 && (
             <span
               data-testid={`practice-hero-xp-${tile.id}`}
-              className="inline-flex items-center gap-0.5 rounded-[4px] border-[2px] border-black bg-neo-yellow px-1.5 py-0.5 tabular-nums text-black"
+              className="inline-flex items-center gap-0.5 rounded-[4px] border-[2px] border-neo-black bg-neo-yellow px-1.5 py-0.5 tabular-nums text-neo-black"
             >
               <Zap className="h-3 w-3 fill-black" aria-hidden="true" />
               {t('student.practiceFun.xpRate', { xp })}
@@ -118,7 +118,7 @@ export default function PracticePickerHero({ tile, onSelect }: PracticePickerHer
         <span
           data-testid="practice-picker-hero-play"
           role="presentation"
-          className="mt-2.5 flex min-h-[52px] w-full items-center justify-center gap-2 rounded-neo border-[3px] border-black bg-neo-lime px-4 font-neo-display text-lg font-black uppercase text-black shadow-hard group-active:translate-y-[2px] group-active:shadow-hard-pressed"
+          className="mt-2.5 flex min-h-[52px] w-full items-center justify-center gap-2 rounded-neo border-[3px] border-neo-black bg-neo-lime px-4 font-neo-display text-lg font-black uppercase text-neo-black shadow-hard group-active:translate-y-[2px] group-active:shadow-hard-pressed"
         >
           <Play className="h-5 w-5 fill-black" aria-hidden="true" />
           {t('student.practiceFun.playNow')}

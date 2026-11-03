@@ -50,9 +50,11 @@ export function StrugglePreview({ masteryByPlayer, teacherName, language, t, max
         </p>
         <Link
           href={`/${language}/teacher/reports`}
+          target="_blank"
+          rel="noopener noreferrer"
           data-testid="edu-results-report"
           onClick={() => trackResultsAction('view_report', 'projector')}
-          className="inline-flex min-h-10 items-center gap-1.5 rounded-neo border-[2px] border-neo-cream/60 px-3 font-neo-display text-sm font-bold text-neo-cream hover:bg-neo-navy"
+          className="inline-flex min-h-11 items-center gap-1.5 rounded-neo border-[2px] border-neo-cream/60 px-3 font-neo-display text-sm font-bold text-neo-cream hover:bg-neo-navy focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan @[96rem]/results:min-h-14 @[96rem]/results:text-lg"
         >
           <BarChart3 className="size-4 shrink-0" aria-hidden="true" />
           {t('education.results.fullReport')}

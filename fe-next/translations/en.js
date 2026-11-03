@@ -960,7 +960,7 @@ const en = {
   "academy": {
     "teacher": {
       "classesTitle": "Your classes",
-      "hqTitle": "Teacher HQ",
+      "hqTitle": "Teacher home",
       "classActions": "Class actions",
       "orTypeCode": "or open the link and type the code"
     },
@@ -1001,14 +1001,9 @@ const en = {
       "firstAssignmentCta": "Create assignment",
       "startLiveTitle": "Play a live class",
       "startLiveBody": "The assignment is out. Start a live game so the class plays together.",
-      "startLiveCta": "Start live classroom game",
+      "startLiveCta": "Start live",
       "copyJoinCode": "Copy join link",
       "joinCodeCopied": "Join link copied",
-      "progressTitle": "Class progress",
-      "progressStudents": "students",
-      "progressAssignments": "assigned",
-      "progressSubmitted": "submitted",
-      "progressUpgrade": "Teacher Pro",
       "endedCodeTries": "{count} students tried to join after your game ended.",
       "endedCodeTriesOne": "1 student tried to join after your game ended.",
       "lateJoinProLine": "With Teacher Pro, give them an assignment they can play on their own time.",
@@ -1103,7 +1098,6 @@ const en = {
       "savingXp": "Saving XP…",
       "xpEarned": "+{xp} XP",
       "tapToOpen": "Tap to open",
-      "errorTitle": "Oops, that broke. Try again?",
       "tryAgain": "Try again",
       "playAgain": "Play again",
       "xpNotSaved": "Couldn't save XP this time. Play again to try once more.",
@@ -1205,17 +1199,6 @@ const en = {
       "classmateHere": "classmate is here",
       "classmatesHere": "classmates are here",
       "firstIn": "You're first in. Classmates will pop in here."
-    },
-    "homework": {
-      "noGame": "Play a live game and each student’s missed words land here.",
-      "noMisses": "Nobody missed a word last game. Nothing to assign!",
-      "summary": "Students: {students} · Missed words: {words}. Each one practices only their own.",
-      "more": "+{count} more students",
-      "assigned": "Assigned. It’s waiting on their Missed Words island.",
-      "assign": "Assign to each student",
-      "due": "Due {date}",
-      "failed": "Couldn’t assign it. Try again.",
-      "title": "Missed-words homework"
     },
     "pages": {
       "backToMap": "Back to the Academy",
@@ -4234,7 +4217,7 @@ const en = {
     }
   },
   "hostView": {
-    "demoBotsFailed": "Practice rounds run on the big screen. Leave player mode to rehearse with bots.",
+    "demoBotsFailed": "Practice rounds run on the big screen. Leave player mode to practice with bots.",
     "lobby": "War Room",
     "lobbyTitle": "Multiplayer lobby",
     "waitingForPlayers": "Gathering warriors...",
@@ -12553,7 +12536,7 @@ const en = {
       "shareJoin": "Share the join link",
       "shareJoinCta": "Copy join link",
       "startLive": "Start a live class",
-      "startLiveCta": "Start live class",
+      "startLiveCta": "Start live",
       "viewReport": "View first progress report",
       "viewReportCta": "Open report",
       "dismiss": "Dismiss",
@@ -12574,7 +12557,7 @@ const en = {
       "pasteTooFew": "Add at least {{min}} words",
       "pasteReady": "{{count}} words, ready to go",
       "pastedRoundName": "Today's words",
-      "goLive": "Go live",
+      "goLive": "Start live",
       "armedWith": "{{title}} · {{count}} words",
       "pickSomething": "Pick a word list and you're off",
       "noSetupNeeded": "No class to make, no roster to type. Students join with the code.",
@@ -12678,36 +12661,18 @@ const en = {
     },
     "classReport": {
       "title": "Word by student",
-      "hint": "Every lesson word against every student. Hardest words first. That's your reteach list.",
       "word": "Word",
       "classMiss": "Class missed",
       "accuracy": "Accuracy",
       "didNotPlay": "Did not play",
       "quizCaveat": "A quiz asks only some of the lesson words, and the ones it never asked are counted as missed here. Check the list before you reteach.",
-      "empty": "Nobody played this one",
-      "emptyHint": "Once students join a class game, their words show up here word by word.",
-      "copy": "Copy for my notes",
-      "copied": "Copied",
-      "copyFallback": "Copy this text:",
       "print": "Print",
-      "trendTitle": "Across your recent games",
-      "trendEmpty": "Play this lesson again to see whether the class is improving on these words.",
-      "trendBarsLabel": "{word}: missed by {first}% in the first game, {last}% in the last.",
       "state": {
         "found": "Found it",
         "missed": "Missed it",
         "absent": "Did not play",
         "quizFound": "Answered correctly",
         "quizMissed": "Not answered correctly"
-      },
-      "drilldown": {
-        "title": "Student detail",
-        "missedCount": "{count} words missed",
-        "noneMissed": "Found every lesson word.",
-        "absentHint": "This student has no result for this game. Catch them up before the next one.",
-        "suggested": "Try next:",
-        "assign": "Practice these words",
-        "close": "Close"
       },
       "practice": {
         "flashcard": "Meaning first: flashcards, then a quiz",
@@ -13093,17 +13058,8 @@ const en = {
       "editLesson": "Edit words & definitions",
       "moreWords": "+{{count}} more words",
       "bulkImport": "Bulk import",
-      "bulkImportTitle": "Import multiple words",
-      "bulkImportDescription": "Paste a list of words separated by newlines, commas, or spaces. You can include definitions with 'word - definition' format.",
-      "bulkImportLabel": "Paste words here",
-      "bulkImportPlaceholder": "Paste words, one per line or comma-separated. Use 'word - definition' for definitions.",
-      "bulkImportDetected": "{{count}} words detected",
-      "bulkImportUnreadable": "Couldn't read {{count}} row(s) (row {{rows}}): no word found, so they were left out. Check for a stray | or a missing word.",
-      "bulkImportOneWordPerLine": "Row {{rows}} looks like several words on one line. Put one word per line and import again.",
       "savedAndAssigned": "Lesson saved and assigned to {{classroom}}. Your students can see it now.",
       "savedNotAssigned": "Lesson saved, but we couldn't assign it to {{classroom}}. Use the lesson's Assign to classroom button to try again.",
-      "bulkImportButton": "Import",
-      "templates": "Lesson templates",
       "category": {
         "all": "All",
         "grade-1": "Grade 1",
@@ -13319,6 +13275,30 @@ const en = {
       "failedToSaveLesson": "Couldn't save lesson"
     },
     "reports": {
+      "valueLine": "After every game, see which words each class missed, who needs help, and what to practice next.",
+      "lockedValue": "The words your class missed are free on every game's results screen. Reports add who needs help, student by student, across all your games.",
+      "emptyClass": {
+        "title": "No games in this class yet",
+        "body": "Play one game with this class. Its report then shows which words the class missed and who needs help.",
+        "cta": "Start a game with this class"
+      },
+      "reteach": {
+        "title": "What to reteach",
+        "exampleBadge": "Example",
+        "exampleBody": "After your first game, this shows the words your class missed and who needs help. Sample data below.",
+        "fromClass": "Words {name} missed most in its games so far.",
+        "accuracy": "Class accuracy {pct}%",
+        "missRate": "{pct}% missed",
+        "studentsMissed": "{missing} of {asked} students missed it",
+        "needsHelp": "Needs help:",
+        "needsHelpPro": "Student-by-student detail comes with Teacher Pro.",
+        "needsHelpNone": "Everyone is at the class goal.",
+        "moreStudents": "+{count} more",
+        "openClass": "Open class report",
+        "startFirstGame": "Start your first game",
+        "exampleWords": "thunder,breeze,frost,cloud",
+        "exampleNames": "Maya,Leo"
+      },
       "arc": {
         "title": "Learning arc",
         "subtitle": "Each student, across every session",
@@ -13717,21 +13697,7 @@ const en = {
       "unpluggedReteachLiveFoil": "No student devices today? Project the misses. Students answer on paper."
     },
     "windowProgress": {
-      "title": "This week's class",
-      "windowLabel": "Time window",
-      "days7": "7 days",
-      "days30": "30 days",
-      "completion": "Completion",
-      "accuracy": "Accuracy",
       "activeLine": "{{active}} of {{roster}} students played",
-      "studentStat": "{{sessions}} games · {{accuracy}}",
-      "noPlay": "No games yet",
-      "loading": "Loading class progress…",
-      "loadError": "Couldn't load class progress.",
-      "retry": "Try again",
-      "emptyNoRoster": "Invite students first. Then 7- and 30-day progress has someone to report on.",
-      "proCtaHint": "Unlock printable history and every classroom on Teacher Pro.",
-      "regionLabel": "7- and 30-day progress for {{classroom}}"
     },
     "subscription": {
       "giftedNoCard": "No card on file, no renewal. It just ends, and you go back to Free.",
@@ -13923,7 +13889,7 @@ const en = {
       "settings": "Fine-tune",
       "settingsHide": "Hide fine-tuning",
       "needsLesson": "Pick a word list first",
-      "launch": "GO LIVE: {{mode}}",
+      "launch": "Start live: {{mode}}",
       "tapAgain": "Tap again to start",
       "moreModes": "More games ({{count}})",
       "fewerModes": "Fewer games",
@@ -13953,10 +13919,10 @@ const en = {
       "startBlocked": "Waiting for one student to join before you can start.",
       "practiceFirst": "Practice first with 3 bots",
       "practiceFirstHint": "See what your class will see. The bots leave when your first student joins.",
-      "rehearseCta": "Try it with bots",
+      "rehearseCta": "Practice with bots",
       "rehearsePrivate": "Only you see this. Students are not in the room and it is not counted.",
-      "rehearseBotsBlocked": "Bots can't play this game, so you can't rehearse it with them.",
-      "rehearseUseClassic": "Rehearse with Classic instead",
+      "rehearseBotsBlocked": "Bots can't play this game, so you can't practice it with them.",
+      "rehearseUseClassic": "Practice with bots in Classic instead",
       "startWhenReady": "Start game when everyone is in",
       "lateJoinOn": "Late join on",
       "lateJoinOff": "Late join off",
@@ -19798,8 +19764,6 @@ const en = {
       "haveAccount": "Already have an account? Sign in"
     },
     "hq": {
-      "assigned": "{{count}} assigned",
-      "assignedAria": "Homework: {{count}} assigned. Open homework",
       "assignNudge": "Assign homework"
     },
     "modeTags": {
@@ -19815,7 +19779,7 @@ const en = {
   "eduLive": {
     "exit": {
       "title": "End the class game?",
-      "body": "The room closes for every student and you'll be back in your class HQ.",
+      "body": "The room closes for every student and you'll be back on your Home screen.",
       "stay": "Keep playing",
       "confirm": "End game"
     },
@@ -19864,6 +19828,13 @@ const en = {
   },
   // @eduLive:end
   "eduPro": {
+    "table": {
+      "modes": "Live game modes",
+      "assignments": "Assignments per class"
+    },
+    "trialLine": "The first {days} days of Teacher Pro are free, once per teacher. Cancel anytime.",
+    "modesSub": "Some run on the projector, some on students' phones. Every mode is free to play; calm mode for anxious students comes with Pro.",
+    "pill": "Pro",
     "mastery": {
       "title": "Word mastery",
       "subtitle": "Which words your class keeps missing, across every game.",
@@ -20211,8 +20182,8 @@ const en = {
       "articlesCount": "{count} guides",
       "faqTitle": "Quick answers",
       "ctaTitle": "Your class is one tap away",
-      "ctaBody": "Free for teachers, no student accounts, no card. Open Teacher HQ and press Go live.",
-      "ctaPrimary": "Open Teacher HQ, free",
+      "ctaBody": "Free for teachers, no student accounts, no card. Open your teacher Home and press Start live.",
+      "ctaPrimary": "Open teacher Home, free",
       "ctaSecondary": "See a live game first",
       "stuckTitle": "Still stuck?",
       "stuckBody": "Tell us what you were trying to do. A real person from the team answers.",
@@ -20221,11 +20192,11 @@ const en = {
     "categories": {
       "gettingStarted": {
         "title": "Getting started",
-        "blurb": "Your account, Teacher HQ and your first class."
+        "blurb": "Your account, Home and your first class."
       },
       "liveGame": {
         "title": "Running a live game",
-        "blurb": "Go live, get students in, pick a mode, run the room."
+        "blurb": "Start live, get students in, pick a mode, run the room."
       },
       "assign": {
         "title": "Assigning practice",
@@ -20272,8 +20243,8 @@ const en = {
       "eyebrow": "Your next step",
       "startClass": {
         "title": "Try it with your class today",
-        "body": "Teacher HQ is free. Press Go live and your join code is on the board in seconds.",
-        "cta": "Open Teacher HQ"
+        "body": "Teacher Home is free. Press Start live and your join code is on the board in seconds.",
+        "cta": "Open teacher Home"
       },
       "liveGame": {
         "title": "Run a live game now",
@@ -20396,6 +20367,10 @@ const en = {
       "toTeacher": "Back to teacher home"
     },
     "hostResults": {
+      "missedTitle": "Words your class missed",
+      "practiceWords": "Practice these words ({count})",
+      "shareParents": "Share with parents",
+      "proPill": "Pro",
       "invitePrompt": "Know a teacher who'd like this?",
       "inviteCta": "Invite a colleague",
       "inviteText": "My class just played a word game on LexiClash. It's free for teachers, have a look:",
@@ -20442,6 +20417,11 @@ const en = {
   ,
   // @eduShell:start
   "eduShell": {
+    "error": {
+      "title": "This screen hit a snag",
+      "body": "Try again. If it keeps happening, head back to your class and start from there.",
+      "backToClass": "Back to class"
+    },
     "nav": {
       "home": "Home",
       "library": "Library",
@@ -20598,7 +20578,6 @@ const en = {
     "setup": {
       "title": "New class",
       "subtitle": "Three quick choices. You can change them later.",
-      "stepsLabel": "Class setup progress",
       "step1": "Class details",
       "step2": "Share the code",
       "nameLabel": "Class name",
@@ -20656,7 +20635,7 @@ const en = {
       "packLabel": "Words for your first game",
       "packWords": "{count} words",
       "packRecommended": "Our pick",
-      "startLive": "Start live game",
+      "startLive": "Start live",
       "createOnly": "Just create the class"
     },
     "host": {
@@ -20787,7 +20766,6 @@ const en = {
   // @eduPolish:start
   "eduPolish": {
     "seatCapReached": "{name} is watching: the class is full ({cap} players)",
-    "csvDropHint": "Drop CSV file here or click to browse"
   }
   // @eduPolish:end
 };

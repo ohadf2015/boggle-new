@@ -1,348 +1,170 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import '@testing-library/jest-dom';
 
-const pushMock = vi.hoisted(() => vi.fn());
+const nav = vi.hoisted(() => ({ push: vi.fn(), replace: vi.fn() }));
+const refreshProfile = vi.hoisted(() => vi.fn(async () => {}));
+const track = vi.hoisted(() => vi.fn());
 
 vi.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
+  useLanguage: () => ({ t: (k: string, fb?: unknown) => (typeof fb === 'string' ? `${k}|${fb}` : k), language: 'en' }),
 }));
-
-vi.mock('@/contexts/AuthContext', () => ({
-  useAuth: () => ({ refreshProfile: vi.fn(async () => {}) }),
-}));
-
-vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: pushMock }),
-}));
-
-const mockTrackGrowthEvent = vi.fn();
-vi.mock('@/utils/growthTracking', () => ({
-  trackGrowthEvent: (...args: unknown[]) => mockTrackGrowthEvent(...args),
-}));
-
-const startPolarTrialMock = vi.fn();
-vi.mock('@/hooks/useStartTeacherProTrial', () => ({
-  useStartTeacherProTrial: () => ({ start: startPolarTrialMock, pending: false }),
-}));
-
-
-const proState = vi.hoisted(() => ({
-  hasPro: false, loading: false, known: true, trialUsed: false, accessTrialExpires: null as string | null, accessTrialEnded: false,
-  refresh: vi.fn(async () => {}),
-}));
-vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => proState }));
-const offerReports = vi.hoisted(() => ({ click: vi.fn(), impression: vi.fn() }));
-vi.mock('@/lib/education/reportProCtaClick', () => ({
-  reportProCtaClick: (...a: unknown[]) => offerReports.click(...a),
-  reportProOfferImpression: (...a: unknown[]) => offerReports.impression(...a),
-}));
+vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ refreshProfile }) }));
+vi.mock('next/navigation', () => ({ useRouter: () => nav }));
+vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: (...a: unknown[]) => track(...a) }));
 
 import { AccessRequestForm } from '../AccessRequestForm';
 
-describe('<AccessRequestForm>', () => {
+const ok = (json: Record<string, unknown> = { ok: true }, status = 200) =>
+  vi.fn(async () => ({ ok: status < 400, status, json: async () => json }) as unknown as Response);
+
+const submitButton = () => screen.getByRole('button', { name: /education\.(trial\.cta|access\.class_ready_creating)/ });
+const sentBody = (f: ReturnType<typeof ok>) => JSON.parse((f.mock.calls[0] as unknown as [string, RequestInit])[1].body as string);
+
+describe('<AccessRequestForm> — one tap to the first class', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockTrackGrowthEvent.mockClear();
-    startPolarTrialMock.mockClear();
   });
 
-  it('disables submit until required fields filled', () => {
+  it('Given the form, Then nothing has to be typed: no use-case box, no school box, and the main button is live', () => {
     render(<AccessRequestForm />);
-    const submit = screen.getByRole('button', { name: /education\.access\.submit/i });
-    expect(submit).toBeDisabled();
+    expect(screen.queryByRole('textbox')).toBeNull();
+    expect(screen.queryByTestId('access-form-progress')).toBeNull();
+    expect(screen.queryByTestId('applying-as')).toBeNull();
+    expect(submitButton()).toBeEnabled();
   });
 
-  // The form only asks for what signup doesn't already capture: role + use case.
-  // Name/email/country are derived server-side from the signed-in account (#722),
-  // so they are NOT fields here — required = a role pick plus a ≥10-char use case.
-  it('enables submit when required fields filled', async () => {
-    render(<AccessRequestForm />);
+  it('Given no role tapped, When submitted, Then the request is filed without a role or use case', async () => {
+    const f = ok();
+    global.fetch = f as unknown as typeof fetch;
+    render(<AccessRequestForm onApproved={vi.fn()} />);
+    await userEvent.setup().click(submitButton());
+    await waitFor(() => expect(f).toHaveBeenCalled());
+    expect((f.mock.calls[0] as unknown as [string])[0]).toBe('/api/education/access-request');
+    const body = sentBody(f);
+    expect(body.role).toBeUndefined();
+    expect(body.use_case).toBeUndefined();
+    expect(body.locale).toBe('en');
+  });
+
+  it('Given a role chip tapped, Then it is sent, and tapping it again clears it', async () => {
+    const f = ok();
+    global.fetch = f as unknown as typeof fetch;
     const user = userEvent.setup();
-    const submit = screen.getByRole('button', { name: /education\.access\.submit/i });
-    expect(submit).toBeDisabled();
-
-    await user.click(screen.getByRole('radio', { name: /education\.access\.role_teacher/i }));
-    await user.type(screen.getByLabelText(/education\.access\.use_case_q/i), 'Teaching 9th grade ESL students.');
-
-    await waitFor(() => expect(submit).not.toBeDisabled());
+    render(<AccessRequestForm onApproved={vi.fn()} />);
+    const tutor = screen.getByRole('radio', { name: /education\.access\.role_tutor/ });
+    await user.click(tutor);
+    expect(tutor).toHaveAttribute('aria-checked', 'true');
+    await user.click(tutor);
+    expect(tutor).toHaveAttribute('aria-checked', 'false');
+    await user.click(screen.getByRole('radio', { name: /education\.access\.role_teacher/ }));
+    await user.click(submitButton());
+    await waitFor(() => expect(f).toHaveBeenCalled());
+    expect(sentBody(f).role).toBe('teacher');
   });
 
-  it('posts to /api/education/access-request on submit', async () => {
-    const fetchMock = vi.fn(async () => ({ ok: true, json: async () => ({ ok: true }) } as any));
-    global.fetch = fetchMock as any;
-    const user = userEvent.setup();
-    render(<AccessRequestForm />);
-
-    await user.click(screen.getByRole('radio', { name: /education\.access\.role_teacher/i }));
-    await user.type(screen.getByLabelText(/education\.access\.use_case_q/i), 'Teaching 9th grade ESL students.');
-    await user.click(screen.getByRole('button', { name: /education\.access\.submit/i }));
-
-    await waitFor(() => expect(fetchMock).toHaveBeenCalled());
-    expect(fetchMock.mock.calls[0][0]).toBe('/api/education/access-request');
-    const body = JSON.parse(fetchMock.mock.calls[0][1].body);
-    expect(body.role).toBe('teacher');
-    expect(body.use_case).toContain('Teaching');
-  });
-
-  // 202 approvalPending: the request row committed but instant approval is
-  // still finishing server-side. The form must tell THAT truth — not the
-  // "You're in!" success card followed by a /teacher push that bounces the
-  // still-student user straight back here.
-  it('shows the pending state and does NOT redirect when the server answers approvalPending', async () => {
-    const fetchMock = vi.fn(async () => ({
-      ok: true,
-      status: 202,
-      json: async () => ({ ok: true, success: true, approvalPending: true }),
-    } as any));
-    global.fetch = fetchMock as any;
-    const user = userEvent.setup();
-    render(<AccessRequestForm />);
-
-    await user.click(screen.getByRole('radio', { name: /education\.access\.role_teacher/i }));
-    await user.type(screen.getByLabelText(/education\.access\.use_case_q/i), 'Teaching 9th grade ESL students.');
-    await user.click(screen.getByRole('button', { name: /education\.access\.submit/i }));
-
-    await screen.findByText('education.access.approval_pending_title');
+  it('Given approval, Then the page is told where to go, with the profile refresh, and no success card or Pro offer shows', async () => {
+    global.fetch = ok({ ok: true, paidDay0: false }) as unknown as typeof fetch;
+    const onApproved = vi.fn();
+    render(<AccessRequestForm onApproved={onApproved} />);
+    await userEvent.setup().click(submitButton());
+    await waitFor(() => expect(onApproved).toHaveBeenCalledTimes(1));
+    const approval = onApproved.mock.calls[0][0];
+    expect(approval).toMatchObject({ paidDay0: false, alreadyApproved: false });
+    await approval.ready;
+    expect(refreshProfile).toHaveBeenCalled();
     expect(screen.queryByText('education.access.success_title')).toBeNull();
-    expect(screen.queryByRole('alert')).toBeNull();
-    expect(pushMock).not.toHaveBeenCalled();
-  });
-
-  // The pending copy offers "submit again to retry" — so the UI must make
-  // that possible without a page reload: a back button returns to the form
-  // with everything the teacher already typed still in place.
-  it('back button on the pending card returns to the form with entered values intact', async () => {
-    const fetchMock = vi.fn(async () => ({
-      ok: true,
-      status: 202,
-      json: async () => ({ ok: true, success: true, approvalPending: true }),
-    } as any));
-    global.fetch = fetchMock as any;
-    const user = userEvent.setup();
-    render(<AccessRequestForm />);
-
-    await user.click(screen.getByRole('radio', { name: /education\.access\.role_teacher/i }));
-    await user.type(screen.getByLabelText(/education\.access\.use_case_q/i), 'Teaching 9th grade ESL students.');
-    await user.click(screen.getByRole('button', { name: /education\.access\.submit/i }));
-    await screen.findByText('education.access.approval_pending_title');
-
-    await user.click(screen.getByRole('button', { name: /education\.access\.approval_pending_back/i }));
-
-    expect(screen.queryByText('education.access.approval_pending_title')).toBeNull();
-    expect(screen.getByLabelText(/education\.access\.use_case_q/i)).toHaveValue('Teaching 9th grade ESL students.');
-    expect(screen.getByRole('radio', { name: /education\.access\.role_teacher/i })).toHaveAttribute('aria-checked', 'true');
-    expect(screen.getByRole('button', { name: /education\.access\.submit/i })).toBeEnabled();
-  });
-
-  it('shows the success card with Polar trial + HQ CTAs and does not auto-redirect', async () => {
-    const fetchMock = vi.fn(async () => ({
-      ok: true,
-      status: 200,
-      json: async () => ({ ok: true, success: true }),
-    } as any));
-    global.fetch = fetchMock as any;
-    const user = userEvent.setup();
-    render(<AccessRequestForm />);
-
-    await user.click(screen.getByRole('radio', { name: /education\.access\.role_teacher/i }));
-    await user.type(screen.getByLabelText(/education\.access\.use_case_q/i), 'Teaching 9th grade ESL students.');
-    await user.click(screen.getByRole('button', { name: /education\.access\.submit/i }));
-
-    await screen.findByText('education.access.success_title');
-    expect(mockTrackGrowthEvent).toHaveBeenCalledWith('edu_access_request_submitted', { ok: true, status: 200 });
-    expect(await screen.findByTestId('access-success-trial')).toHaveTextContent('Start your 14-day Teacher Pro trial');
-    expect(screen.getByTestId('access-success-hq')).toHaveTextContent('education.access.go_to_teacher');
-    expect(pushMock).not.toHaveBeenCalled();
-  });
-
-  it('lands a paid campaign teacher on the day-0 class screen instead of the Polar offer', async () => {
-    global.fetch = vi.fn(async () => ({
-      ok: true,
-      status: 200,
-      json: async () => ({ ok: true, success: true, paidDay0: true }),
-    } as any)) as any;
-    const user = userEvent.setup();
-    render(<AccessRequestForm />);
-
-    await user.click(screen.getByRole('radio', { name: /education\.access\.role_teacher/i }));
-    await user.type(screen.getByLabelText(/education\.access\.use_case_q/i), 'Teaching 9th grade ESL students.');
-    await user.click(screen.getByRole('button', { name: /education\.access\.submit/i }));
-
-    await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/en/teacher/class-ready'));
     expect(screen.queryByTestId('access-success-trial')).toBeNull();
+    expect(screen.queryByTestId('access-success-offer')).toBeNull();
+    expect(nav.push).not.toHaveBeenCalled();
+    expect(submitButton()).toBeDisabled();
   });
 
-  it('puts the class first: HQ is the big main action, Teacher Pro the quiet secondary', async () => {
-    global.fetch = vi.fn(async () => ({
-      ok: true,
-      status: 200,
-      json: async () => ({ ok: true, success: true }),
-    } as any)) as any;
-    const user = userEvent.setup();
+  it('Given a paid campaign teacher or an already-approved account, Then the page hears it', async () => {
+    global.fetch = ok({ ok: true, paidDay0: true, alreadyApproved: true }) as unknown as typeof fetch;
+    const onApproved = vi.fn();
+    render(<AccessRequestForm onApproved={onApproved} />);
+    await userEvent.setup().click(submitButton());
+    await waitFor(() => expect(onApproved).toHaveBeenCalled());
+    expect(onApproved.mock.calls[0][0]).toMatchObject({ paidDay0: true, alreadyApproved: true });
+  });
+
+  it('Given no page owner, When approved, Then the form itself refreshes and goes to class setup', async () => {
+    global.fetch = ok() as unknown as typeof fetch;
     render(<AccessRequestForm />);
-
-    await user.click(screen.getByRole('radio', { name: /education\.access\.role_teacher/i }));
-    await user.type(screen.getByLabelText(/education\.access\.use_case_q/i), 'Teaching 9th grade ESL students.');
-    await user.click(screen.getByRole('button', { name: /education\.access\.submit/i }));
-
-    const trial = await screen.findByTestId('access-success-trial');
-    const hq = screen.getByTestId('access-success-hq');
-    expect(hq.compareDocumentPosition(trial) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(hq.className).toMatch(/\bmin-h-14\b/);
-    expect(hq.className).toMatch(/(^|\s)bg-neo-navy(\s|$)/);
-    expect(trial.className).not.toMatch(/\bmin-h-14\b/);
-    expect(trial.className).not.toMatch(/(^|\s)bg-neo-navy(\s|$)/);
+    await userEvent.setup().click(submitButton());
+    await waitFor(() => expect(nav.replace).toHaveBeenCalledWith('/en/teacher/classroom/new'));
+    expect(refreshProfile).toHaveBeenCalled();
   });
 
-  it('starts Polar trial from the success card', async () => {
-    const fetchMock = vi.fn(async () => ({
-      ok: true,
-      status: 200,
-      json: async () => ({ ok: true, success: true }),
-    } as any));
-    global.fetch = fetchMock as any;
-    const user = userEvent.setup();
-    render(<AccessRequestForm />);
-
-    await user.click(screen.getByRole('radio', { name: /education\.access\.role_teacher/i }));
-    await user.type(screen.getByLabelText(/education\.access\.use_case_q/i), 'Teaching 9th grade ESL students.');
-    await user.click(screen.getByRole('button', { name: /education\.access\.submit/i }));
-    await screen.findByTestId('access-success-trial');
-    await user.click(screen.getByTestId('access-success-trial'));
-    expect(startPolarTrialMock).toHaveBeenCalledTimes(1);
-  });
-
-  it('opens Teacher HQ from the success card after refreshing the profile', async () => {
-    const fetchMock = vi.fn(async () => ({
-      ok: true,
-      status: 200,
-      json: async () => ({ ok: true, success: true }),
-    } as any));
-    global.fetch = fetchMock as any;
-    const user = userEvent.setup();
-    render(<AccessRequestForm />);
-
-    await user.click(screen.getByRole('radio', { name: /education\.access\.role_teacher/i }));
-    await user.type(screen.getByLabelText(/education\.access\.use_case_q/i), 'Teaching 9th grade ESL students.');
-    await user.click(screen.getByRole('button', { name: /education\.access\.submit/i }));
-    await user.click(await screen.findByTestId('access-success-hq'));
-    await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/en/teacher'));
-  });
-
-  it('tracks edu_access_request_submitted on 202 approvalPending response', async () => {
-    const fetchMock = vi.fn(async () => ({
-      ok: true,
-      status: 202,
-      json: async () => ({ ok: true, success: true, approvalPending: true }),
-    } as any));
-    global.fetch = fetchMock as any;
-    const user = userEvent.setup();
-    render(<AccessRequestForm />);
-
-    await user.click(screen.getByRole('radio', { name: /education\.access\.role_teacher/i }));
-    await user.type(screen.getByLabelText(/education\.access\.use_case_q/i), 'Teaching 9th grade ESL students.');
-    await user.click(screen.getByRole('button', { name: /education\.access\.submit/i }));
-
-    await screen.findByText('education.access.approval_pending_title');
-    expect(mockTrackGrowthEvent).toHaveBeenCalledWith('edu_access_request_submitted', { ok: true, status: 202 });
-  });
-
-  it('tracks edu_access_request_submitted on error response (e.g. 429)', async () => {
-    const fetchMock = vi.fn(async () => ({
-      ok: false,
-      status: 429,
-      json: async () => ({ ok: false, error: 'rate limited' }),
-    } as any));
-    global.fetch = fetchMock as any;
-    const user = userEvent.setup();
-    render(<AccessRequestForm />);
-
-    await user.click(screen.getByRole('radio', { name: /education\.access\.role_teacher/i }));
-    await user.type(screen.getByLabelText(/education\.access\.use_case_q/i), 'Teaching 9th grade ESL students.');
-    await user.click(screen.getByRole('button', { name: /education\.access\.submit/i }));
-
-    await screen.findByRole('alert');
-    expect(mockTrackGrowthEvent).toHaveBeenCalledWith('edu_access_request_submitted', { ok: false, status: 429 });
-  });
-
-  it('a throwing tracker does not break form submit', async () => {
-    mockTrackGrowthEvent.mockImplementation(() => {
-      throw new Error('Analytics failed');
-    });
-    const fetchMock = vi.fn(async () => ({
-      ok: true,
-      status: 200,
-      json: async () => ({ ok: true, success: true }),
-    } as any));
-    global.fetch = fetchMock as any;
-    const user = userEvent.setup();
-    render(<AccessRequestForm />);
-
-    await user.click(screen.getByRole('radio', { name: /education\.access\.role_teacher/i }));
-    await user.type(screen.getByLabelText(/education\.access\.use_case_q/i), 'Teaching 9th grade ESL students.');
-    await user.click(screen.getByRole('button', { name: /education\.access\.submit/i }));
-
-    await screen.findByText('education.access.success_title');
-    expect(pushMock).not.toHaveBeenCalled();
-  });
-
-  describe('Teacher Pro offer wording matches the class-ready card', () => {
-    const submit = async () => {
-      global.fetch = vi.fn(async () => ({ ok: true, status: 200, json: async () => ({ ok: true, success: true }) } as any)) as any;
-      const user = userEvent.setup();
+  it('Given a profile refresh that never answers, Then the teacher still reaches class setup after a few seconds', async () => {
+    vi.useFakeTimers();
+    try {
+      refreshProfile.mockImplementationOnce(() => new Promise(() => {}));
+      global.fetch = ok() as unknown as typeof fetch;
       render(<AccessRequestForm />);
-      await user.click(screen.getByRole('radio', { name: /education\.access\.role_teacher/i }));
-      await user.type(screen.getByLabelText(/education\.access\.use_case_q/i), 'Teaching 9th grade ESL students.');
-      await user.click(screen.getByRole('button', { name: /education\.access\.submit/i }));
-      return user;
-    };
-    beforeEach(() => {
-      Object.assign(proState, { hasPro: false, loading: false, known: true, trialUsed: false, accessTrialExpires: null, accessTrialEnded: false });
-      proState.refresh.mockClear();
-      offerReports.click.mockClear();
-      offerReports.impression.mockClear();
-    });
+      fireEvent.click(submitButton());
+      await act(async () => { await vi.advanceTimersByTimeAsync(3000); });
+      expect(nav.replace).not.toHaveBeenCalled();
+      await act(async () => { await vi.advanceTimersByTimeAsync(2000); });
+      expect(nav.replace).toHaveBeenCalledWith('/en/teacher/classroom/new');
+      expect(nav.replace).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 
-    it('re-reads the entitlement after approval and reports rendered (source access_success)', async () => {
-      await submit();
-      await screen.findByTestId('access-success-trial');
-      expect(proState.refresh).toHaveBeenCalledTimes(1);
-      expect(offerReports.impression).toHaveBeenCalledWith({
-        placement: 'access_success', stage: 'rendered', locale: 'en', cta: 'teacher_pro_trial', offer: 'trial',
-      });
-    });
+  it('Given 202 approvalPending, Then the pending card shows and nothing navigates', async () => {
+    global.fetch = ok({ ok: true, approvalPending: true }, 202) as unknown as typeof fetch;
+    const onApproved = vi.fn();
+    const user = userEvent.setup();
+    render(<AccessRequestForm onApproved={onApproved} />);
+    await user.click(submitButton());
+    await screen.findByText('education.access.approval_pending_title');
+    expect(onApproved).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('button', { name: 'education.access.approval_pending_back' }));
+    expect(submitButton()).toBeEnabled();
+  });
 
-    it('inside the free access trial asks to keep Pro, with the end date, as a trial checkout', async () => {
-      proState.accessTrialExpires = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
-      await submit();
-      const btn = await screen.findByTestId('access-success-trial');
-      expect(btn).toHaveTextContent('Keep Teacher Pro after my trial');
-      expect(btn).toHaveAttribute('data-offer', 'keep_after_trial');
-      expect(screen.getByTestId('access-success-offer-note')).toHaveTextContent(/starts when your trial ends/);
-    });
+  it('Given a 429, Then the rate-limit message is announced and the button comes back', async () => {
+    global.fetch = ok({ ok: false }, 429) as unknown as typeof fetch;
+    render(<AccessRequestForm onApproved={vi.fn()} />);
+    await userEvent.setup().click(submitButton());
+    expect(await screen.findByRole('alert')).toHaveTextContent('education.access.rate_limited');
+    expect(submitButton()).toBeEnabled();
+    expect(track).toHaveBeenCalledWith('edu_access_request_submitted', { ok: false, status: 429 });
+  });
 
-    it('an ended access trial goes straight to $9/mo with no trial wording', async () => {
-      proState.accessTrialEnded = true;
-      await submit();
-      const btn = await screen.findByTestId('access-success-trial');
-      expect(btn).toHaveTextContent('Continue with Teacher Pro');
-      expect(btn).not.toHaveTextContent(/14|trial/i);
-    });
+  it('Given a double tap, Then only one request is filed', async () => {
+    let resolve: (v: unknown) => void = () => {};
+    const f = vi.fn(() => new Promise((r) => { resolve = r; }));
+    global.fetch = f as unknown as typeof fetch;
+    render(<AccessRequestForm onApproved={vi.fn()} />);
+    const btn = submitButton();
+    btn.click();
+    btn.click();
+    resolve({ ok: true, status: 200, json: async () => ({ ok: true }) });
+    await waitFor(() => expect(f).toHaveBeenCalledTimes(1));
+  });
 
-    it('reports the tap server-side and starts checkout', async () => {
-      const user = await submit();
-      await user.click(await screen.findByTestId('access-success-trial'));
-      expect(offerReports.click).toHaveBeenCalledWith({ placement: 'access_success', locale: 'en', cta: 'teacher_pro_trial' });
-      expect(startPolarTrialMock).toHaveBeenCalledTimes(1);
-    });
+  it('Given a throwing tracker, Then the request still goes through', async () => {
+    track.mockImplementation(() => { throw new Error('boom'); });
+    global.fetch = ok() as unknown as typeof fetch;
+    const onApproved = vi.fn();
+    render(<AccessRequestForm onApproved={onApproved} />);
+    await userEvent.setup().click(submitButton());
+    await waitFor(() => expect(onApproved).toHaveBeenCalled());
+  });
 
-    it('shows no Pro offer to a teacher who already has Pro; HQ stays the one button', async () => {
-      proState.hasPro = true;
-      await submit();
-      await screen.findByTestId('access-success-hq');
-      expect(screen.queryByTestId('access-success-trial')).toBeNull();
-      expect(offerReports.impression).not.toHaveBeenCalled();
-    });
+  it('Given any locale, Then every line comes from the catalogue, never from an English fallback', () => {
+    const { container } = render(<AccessRequestForm />);
+    expect(container.textContent).not.toContain('|');
+    expect(screen.getByRole('radiogroup').getAttribute('aria-label')).not.toContain('|');
+  });
+
+  it('greets by first name when known', () => {
+    render(<AccessRequestForm knownName="Dana Levi" />);
+    expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('education.access.greeting');
   });
 });

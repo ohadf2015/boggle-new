@@ -1,6 +1,6 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, useCallback } from 'react';
 import { ArrowLeft, BookOpen, GraduationCap } from 'lucide-react';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { cn } from '@/lib/utils';
@@ -15,6 +15,7 @@ import { ProjectorModeCard } from './ProjectorModeCard';
 import { ProjectorStartBar } from './ProjectorStartBar';
 import { ProjectorLobbyLock } from './ProjectorLobbyLock';
 import { useProjectorLobbyMode } from './useProjectorLobbyMode';
+import { markRoomPlayed, roomPlayed } from './roomPlayed';
 import { EduPhoneTestPrompt } from '@/components/education/live/EduPhoneTestPrompt';
 
 export interface ProjectorLobbyProps {
@@ -82,6 +83,16 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
   const studentCount = realStudentCount(students);
   const delay = useEnterStyle();
   const lesson = lessonName || lobby.lessonNames.join(' · ');
+  // Read every render, not once: the lobby may stay mounted under the results layer between rounds.
+  const canChangeMode = roomPlayed(gameCode);
+  const startGame = useCallback(() => {
+    markRoomPlayed(gameCode);
+    onStartGame();
+  }, [gameCode, onStartGame]);
+  const startPractice = useCallback(() => {
+    markRoomPlayed(gameCode);
+    onStartPracticeRound?.();
+  }, [gameCode, onStartPracticeRound]);
 
   return (
     <div data-testid="projector-lobby" className="fixed inset-0 z-[65] overflow-hidden bg-neo-navy [container-type:size]">
@@ -140,7 +151,7 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
             />
           </div>
 
-          <ProjectorModeCard gameCode={gameCode} lobby={lobby} t={t} style={delay(3)} className="@5xl:row-start-3" />
+          <ProjectorModeCard gameCode={gameCode} lobby={lobby} t={t} canChange={canChangeMode} style={delay(3)} className="@5xl:row-start-3" />
 
           <ProjectorStartBar
             gameCode={gameCode}
@@ -149,10 +160,10 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
             studentCount={studentCount}
             startLabelKey={startLabelKey}
             starting={starting}
-            onStartGame={onStartGame}
+            onStartGame={startGame}
             autoStartSecondsLeft={autoStartSecondsLeft}
             onCancelAutoStart={onCancelAutoStart}
-            onStartPracticeRound={onStartPracticeRound}
+            onStartPracticeRound={onStartPracticeRound ? startPractice : undefined}
             practiceRoundPending={practiceRoundPending}
             practiceRoundFailed={practiceRoundFailed}
             lockSlot={<ProjectorLobbyLock gameCode={gameCode} t={t} className="shrink-0" />}

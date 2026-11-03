@@ -30,7 +30,7 @@ const ART: Record<NodeType, string> = {
   locked: '/images/education/node-locked.webp',
 };
 
-const POINTER_FILL: Partial<Record<Tone, string>> = { gold: '#ffd23a', pink: '#ff3d9a', teal: '#1fc9c0' };
+const POINTER_FILL: Partial<Record<Tone, string>> = { gold: 'fill-neo-yellow', pink: 'fill-neo-pink', teal: 'fill-neo-cyan-muted' };
 
 const SPARKS = [0, 45, 90, 135, 180, 225, 270, 315];
 
@@ -66,9 +66,9 @@ function Chains() {
     <svg aria-hidden="true" viewBox="0 0 100 100" className="pointer-events-none absolute inset-[6%] h-[88%] w-[88%]">
       {['M14 14 L86 86', 'M86 14 L14 86'].map((d) => (
         <g key={d}>
-          <path d={d} stroke="#000" strokeWidth={11} strokeLinecap="round" />
-          <path d={d} stroke="#b8bdd6" strokeWidth={6.5} strokeLinecap="round" strokeDasharray="9 5" />
-          <path d={d} stroke="#eef0ff" strokeWidth={2} strokeLinecap="round" strokeDasharray="4 10" opacity={0.8} />
+          <path d={d} className="stroke-neo-black" strokeWidth={11} strokeLinecap="round" />
+          <path d={d} className="stroke-neo-gray-300" strokeWidth={6.5} strokeLinecap="round" strokeDasharray="9 5" />
+          <path d={d} className="stroke-neo-gray-100" strokeWidth={2} strokeLinecap="round" strokeDasharray="4 10" opacity={0.8} />
         </g>
       ))}
     </svg>
@@ -112,14 +112,14 @@ function BossRing({ have, need, size }: { have: number; need: number; size: numb
   const frac = need > 0 ? Math.min(1, have / need) : 0;
   return (
     <svg aria-hidden="true" width={size} height={size} className="absolute inset-0 -rotate-90">
-      <circle cx={size / 2} cy={size / 2} r={r} fill="rgba(90,70,190,0.55)" stroke="#000" strokeWidth={9} />
-      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#3a2d80" strokeWidth={5} />
+      <circle cx={size / 2} cy={size / 2} r={r} fill="rgba(90,70,190,0.55)" className="stroke-neo-black" strokeWidth={9} />
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" style={{ stroke: 'color-mix(in srgb, var(--neo-purple-dark) 55%, var(--neo-abyss-light))' }} strokeWidth={5} />
       <circle
         cx={size / 2}
         cy={size / 2}
         r={r}
         fill="none"
-        stroke="#ffd23a"
+        className="stroke-neo-yellow"
         strokeWidth={5}
         strokeLinecap="round"
         strokeDasharray={`${c * frac} ${c}`}
@@ -165,8 +165,8 @@ export function AcademyNodeButton({ node, at, index, big, recommended, tag: tagW
 
   const plaqueTone: Tone = recommended ? tone : node.state === 'live' ? 'pink' : node.state === 'done' ? 'teal' : 'night';
   const plaqueSize = isBoss
-    ? big ? 'text-sm' : 'text-[11px]'
-    : recommended ? (big ? 'max-w-[20rem] text-lg' : 'max-w-[12rem] text-[13px]') : big ? 'max-w-[16rem] text-sm' : 'max-w-[10rem] text-[11px]';
+    ? big ? 'text-sm' : 'text-xs'
+    : recommended ? (big ? 'max-w-[20rem] text-lg' : 'max-w-[12rem] text-[13px]') : big ? 'max-w-[16rem] text-sm' : 'max-w-[10rem] text-xs';
   const dark = plaqueTone === 'night';
 
   return (
@@ -216,8 +216,8 @@ export function AcademyNodeButton({ node, at, index, big, recommended, tag: tagW
             </span>
           )}
           <svg width="34" height="30" viewBox="0 0 34 30" className="drop-shadow-[2px_3px_0_#000]">
-            <path d="M3 3 H31 L17 27 Z" fill={POINTER_FILL[tone] ?? '#ffd23a'} stroke="#000" strokeWidth="3.5" strokeLinejoin="round" />
-            <path d="M9 7 H22 L16 17 Z" fill="#fff6b8" opacity="0.8" />
+            <path d="M3 3 H31 L17 27 Z" className={cn(POINTER_FILL[tone] ?? 'fill-neo-yellow', 'stroke-neo-black')} strokeWidth="3.5" strokeLinejoin="round" />
+            <path d="M9 7 H22 L16 17 Z" style={{ fill: 'color-mix(in srgb, var(--neo-yellow) 35%, var(--neo-cream))' }} opacity="0.8" />
           </svg>
         </m.span>
       )}
@@ -231,7 +231,7 @@ export function AcademyNodeButton({ node, at, index, big, recommended, tag: tagW
               className={cn(
                 big ? 'h-6 w-6' : 'h-[18px] w-[18px]',
                 'drop-shadow-[1px_2px_0_#000]',
-                i < node.stars ? 'fill-neo-yellow text-neo-black' : 'fill-[#2a2160] text-neo-black',
+                i < node.stars ? 'fill-neo-yellow text-neo-black' : 'fill-neo-navy-elevated text-neo-black',
                 i === 1 && '-translate-y-1',
               )}
             />
@@ -271,7 +271,7 @@ export function AcademyNodeButton({ node, at, index, big, recommended, tag: tagW
                 style={{ left: `${tw.x}%`, top: `${tw.y}%`, width: tw.s * (big ? 1.5 : 1), height: tw.s * (big ? 1.5 : 1), animation: `academy-twinkle 1.8s ease-in-out ${tw.d}s infinite` }}
               >
                 <svg viewBox="0 0 12 12" className="h-full w-full drop-shadow-[0_0_4px_rgba(255,230,120,0.95)]">
-                  <path d="M6 0 L7.2 4.8 L12 6 L7.2 7.2 L6 12 L4.8 7.2 L0 6 L4.8 4.8 Z" fill="#fff6c2" />
+                  <path d="M6 0 L7.2 4.8 L12 6 L7.2 7.2 L6 12 L4.8 7.2 L0 6 L4.8 4.8 Z" style={{ fill: 'color-mix(in srgb, var(--neo-yellow) 30%, var(--neo-cream))' }} />
                 </svg>
               </span>
             ))}
@@ -347,7 +347,7 @@ export function AcademyNodeButton({ node, at, index, big, recommended, tag: tagW
         )}
         {node.state === 'live' && (
           <span
-            className="absolute -top-2 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-full border-2 border-neo-black px-2 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-white"
+            className="absolute -top-2 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-full border-2 border-neo-black px-2 font-neo-display text-xs font-black uppercase tracking-widest text-neo-white"
             style={toneStyle('pink', { shadow: 2, trim: 1 })}
           >
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-neo-white" aria-hidden="true" />
@@ -374,7 +374,7 @@ export function AcademyNodeButton({ node, at, index, big, recommended, tag: tagW
                 transition={{ duration: 0.55, ease: 'easeOut' }}
               >
                 <svg viewBox="0 0 12 12" className="h-full w-full">
-                  <path d="M6 0 L7.4 4.6 L12 6 L7.4 7.4 L6 12 L4.6 7.4 L0 6 L4.6 4.6 Z" fill="#fff3a0" stroke="#000" strokeWidth="1" />
+                  <path d="M6 0 L7.4 4.6 L12 6 L7.4 7.4 L6 12 L4.6 7.4 L0 6 L4.6 4.6 Z" className="stroke-neo-black" style={{ fill: 'color-mix(in srgb, var(--neo-yellow) 50%, var(--neo-cream))' }} strokeWidth="1" />
                 </svg>
               </m.span>
             ))}

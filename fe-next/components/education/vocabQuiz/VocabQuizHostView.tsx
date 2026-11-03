@@ -117,7 +117,7 @@ export function VocabQuizHostView({ socket, joinCode, playerCount, onPlayAgain, 
           sizeClassName="w-10 h-10 md:w-16 md:h-16"
           clipShape="rounded-square"
           clipBorder="cyan"
-          clipBg="var(--neo-navy-elevated, #1b2340)"
+          clipBg="var(--neo-navy-elevated)"
           animated
           enableHover={false}
           enableClick={false}

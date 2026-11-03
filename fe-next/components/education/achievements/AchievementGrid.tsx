@@ -74,7 +74,7 @@ export const AchievementGrid = memo<AchievementGridProps>(
             <button
               key={key}
               onClick={() => setActiveCategory(key)}
-              className={cn(
+              className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
                 // `border-neo` (the WIDTH) and `border-neo-black` (the COLOUR)
                 // are one tailwind-merge group, so cn() kept only the colour and
                 // preflight rendered these chips with NO border — on a navy fill
