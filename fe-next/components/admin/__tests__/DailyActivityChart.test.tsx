@@ -44,7 +44,6 @@ const buildResponse = (days: number) => ({
       uniquePlayers: i,
       uniqueGuests: Math.floor(i / 3),
       totalUniquePlayers: i + Math.floor(i / 3),
-      signups: i % 5,
     };
   }),
 });

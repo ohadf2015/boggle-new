@@ -2,10 +2,10 @@
 
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { Users, Gamepad2, UserPlus, TrendingUp, BookOpen } from 'lucide-react';
+import { Users, Gamepad2, UserPlus, TrendingUp, Trophy } from 'lucide-react';
 
 interface StatsData {
-  overview: { totalPlayers: number; totalGames: number; totalWords: number; totalGameTimeHours: number };
+  overview: { totalPlayers: number; totalGames: number; totalWords: number; totalGameTimeHours: number; totalGuests?: number; testAccounts?: number };
   activity: { gamesToday: number; uniquePlayersToday: number; uniquePlayersWeek: number; uniquePlayersMonth: number; signupsToday: number; signupsWeek: number };
   languages: Record<string, number>;
 }
@@ -78,15 +78,19 @@ export function KPICards({ stats }: KPICardsProps) {
       subtitle: 'DAU/MAU',
     },
     {
-      labelKey: 'admin.kpi.totalPlayers',
+      labelKey: 'admin.kpi.registered',
       value: formatNumber(stats.overview.totalPlayers),
       icon: Users,
-      color: 'text-blue-400',
+      color: 'text-neo-lime',
+      subtitle: [
+        stats.overview.totalGuests != null && `${formatNumber(stats.overview.totalGuests)} ${t('admin.kpi.guests')}`,
+        stats.overview.testAccounts != null && `${stats.overview.testAccounts} ${t('admin.kpi.testExcluded')}`,
+      ].filter(Boolean).join(' · ') || undefined,
     },
     {
-      labelKey: 'admin.kpi.totalWords',
-      value: formatNumber(stats.overview.totalWords),
-      icon: BookOpen,
+      labelKey: 'admin.kpi.totalGames',
+      value: formatNumber(stats.overview.totalGames),
+      icon: Trophy,
       color: 'text-emerald-400',
     },
   ];

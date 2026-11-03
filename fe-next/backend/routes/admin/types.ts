@@ -48,6 +48,8 @@ export interface GameInfo {
 export interface StatsResponse {
   overview: {
     totalPlayers: number;
+    totalGuests?: number;
+    testAccounts?: number;
     totalGames: number;
     totalGameTimeHours: number;
     totalWords: number;
@@ -200,7 +202,6 @@ export interface DailyDataEntry {
   guestGames: number;
   uniquePlayers: Set<string>;
   uniqueGuests: Set<string>;
-  signups: number;
 }
 
 export interface InvalidWordStatsRow {

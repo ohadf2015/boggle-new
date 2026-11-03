@@ -99,7 +99,10 @@ router.get('/analytics/auth-games', async (req: AdminRequest, res: Response): Pr
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
-    const { data, error } = await supabase
+    const { data: testRows } = await supabase.from('profiles').select('id').eq('is_test_account', true);
+    const testIds = new Set((testRows ?? []).map((r: { id: string }) => r.id));
+
+    const { data: rawData, error } = await supabase
       .from('game_sessions')
       .select('user_id, mode, language, score, duration_seconds, completed')
       .not('user_id', 'is', null)
@@ -116,7 +119,8 @@ router.get('/analytics/auth-games', async (req: AdminRequest, res: Response): Pr
       throw error;
     }
 
-    const stats = aggregateAuthSessions((data ?? []) as AuthSession[]);
+    const data = (rawData ?? []).filter((s: { user_id: string }) => !testIds.has(s.user_id));
+    const stats = aggregateAuthSessions(data as AuthSession[]);
 
     res.json({ stats, sampledFromLast: limit, days });
   } catch (err) {
