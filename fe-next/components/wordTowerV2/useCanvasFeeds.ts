@@ -36,7 +36,7 @@ export function useCanvasFeeds({ game, estateApi, word, valid, playSound }: Args
   const sceneMRef = useRef(heightM);
   sceneMRef.current = heightM;
   const getSceneM = useCallback(() => sceneMRef.current, []);
-  const getPerfectWindowMult = useCallback(() => game.perksRef.current.perfectWindowMult, [game.perksRef]);
+  const { getPerfectWindowMult } = game;
   // The workshop's upgrades, painted on the tower. A ref so the canvas loop reads the latest.
   const gearRef = useRef<TowerGear | null>(null);
   gearRef.current = estateApi.status === 'loading' ? null : gearFromEstate(estateApi.estate);

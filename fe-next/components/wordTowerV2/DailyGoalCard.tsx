@@ -21,7 +21,7 @@ export function DailyGoalCard({ t, growthM, onKeepClimbing, onBank, docked = fal
       role="status"
       data-wt2-goal-toast
       className={`pointer-events-auto flex shrink-0 flex-col items-center gap-3 rounded-neo border-neo-thick border-black bg-neo-yellow px-4 py-4 text-center shadow-hard-lg animate-neo-pop ${
-        docked ? '' : 'absolute inset-x-4 top-1/4 z-[60] mx-auto max-w-xs'
+        docked ? '' : 'absolute inset-x-4 top-[max(25%,calc(var(--wt2-hud,6rem)+0.5rem))] z-[60] mx-auto max-w-xs'
       }`}
     >
       <span className="font-neo-display text-xl font-black text-neo-navy">{t('wordTowerV2.dailyTower.goalToast', { m: growthM })}</span>

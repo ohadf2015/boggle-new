@@ -2,6 +2,8 @@ import { Container, Graphics, Text, TextStyle } from 'pixi.js';
 import { apartmentLayout, litWindows, type Rect } from '@/lib/wordTowerV2/apartment';
 import { blockLabel, labelTracking } from '@/lib/wordTowerV2/label';
 import { squashScale } from '@/lib/wordTowerV2/juice';
+import { traitTint } from '@/lib/wordTowerV2/rush/landingFeel';
+import type { BlockTrait } from '@/lib/wordTowerV2/rush/types';
 
 /**
  * A Word Tower v2 block, drawn as an apartment floor: facade with brick coursing,
@@ -123,6 +125,15 @@ export function setBlockGold(view: BlockView): void {
   view.gold = true;
   view.colour = [GOLD, GOLD_SIDE];
   view.builtScale = 0;
+}
+
+export function setBlockTrait(view: BlockView, trait: BlockTrait | undefined): void {
+  const tint = traitTint(trait);
+  if (tint === 'gold') setBlockGold(view);
+  else if (tint) {
+    view.colour = tint;
+    view.builtScale = 0;
+  }
 }
 
 function paintWindow(g: Graphics, r: Rect, lit: boolean, px: (n: number) => number): void {

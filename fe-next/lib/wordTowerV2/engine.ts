@@ -12,6 +12,7 @@
 import { Bodies, Body, Composite, Engine, Events } from 'matter-js';
 import { standingChain } from './stability';
 import { removeBlockBody, cleanupDebris } from './debris';
+import type { BlockTrait } from './rush/types';
 
 /**
  * Physics runs at a fixed 120Hz regardless of display refresh. 240Hz was tried
@@ -97,6 +98,14 @@ export interface SpawnSpec {
    * the player aims with is the exact thing that gets simulated.
    */
   attached?: boolean;
+  density?: number;
+}
+
+const DEFAULT_DENSITY = 0.0016;
+const TRAIT_DENSITY: Partial<Record<BlockTrait, number>> = { feather: 0.001, anvil: 0.0026 };
+
+export function densityForTrait(trait: BlockTrait): number | undefined {
+  return TRAIT_DENSITY[trait];
 }
 
 export interface BlockSnapshot {
@@ -213,7 +222,7 @@ export function spawnBlock(world: TowerWorld, spec: SpawnSpec): Body {
     friction: 0.7,
     frictionStatic: 1.1,
     restitution: 0.16,
-    density: 0.0016,
+    density: spec.density ?? DEFAULT_DENSITY,
     slop: 0.02,
     label: `block:${spec.id}`,
   });

@@ -16,7 +16,9 @@ import { ParticlePool } from '@/lib/gameEngine/ParticleSystem';
 import { ScreenShake } from '@/lib/gameEngine/ScreenShake';
 import { COMBO_FLASH, CONFETTI_BURST, GOLD_STARS, RUBBLE_BURST, TOWER_DUST } from '@/lib/gameEngine/presets/particles';
 import { createBestLabel, paintBestLine, paintGround, paintLandingMark, paintRuler, paintThrowArc, paintTowerShaft, skirtsKey } from './towerArt';
-import { type BlockView, addTenant, createBlockView, createGhost, paintBlock, paintGhost, setBlockGold, setBlockRebar, tickBlock } from './apartmentArt';
+import { type BlockView, addTenant, createBlockView, createGhost, paintBlock, paintGhost, setBlockGold, setBlockRebar, setBlockTrait, tickBlock } from './apartmentArt';
+import { perfectLandingFeel } from '@/lib/wordTowerV2/rush/landingFeel';
+import type { BlockTrait } from '@/lib/wordTowerV2/rush/types';
 import { createCity, paintCity, placeCity } from './skylineArt';
 import { paintCraneFrame, paintCraneHook } from './craneArt';
 import { SkyLayer } from './skyArt';
@@ -37,7 +39,7 @@ import { TenantCrowd } from './tenantArt';
  */
 
 export type TowerFx =
-  | { kind: 'land'; id: string; quality: LandingQuality }
+  | { kind: 'land'; id: string; quality: LandingQuality; combo?: number }
   | { kind: 'gold'; id: string }
   | { kind: 'tenants'; id: string; count: number }
   /** Rebar crate: these floors were welded in place. */
@@ -108,6 +110,9 @@ interface Props {
   reducedMotion?: boolean;
   /** Workshop upgrades to paint on the tower (plinth, braces, cornices, rooftop, crane paint). */
   getGear?: () => TowerGear | null;
+  /** Receives a live metres -> canvas-Y projector (same camera maths as the scene). */
+  registerProjector?: (fn: (hM: number) => number) => void;
+  getTrait?: (id: string) => BlockTrait | undefined;
   className?: string;
 }
 
@@ -211,6 +216,8 @@ export default function TowerCanvas(props: Props) {
     let craneKey = '';
     let flashAlpha = 0;
     let flashColour = 0xffffff;
+    let hitstopUntil = 0;
+    let punchY = 0;
 
     void (async () => {
       const created = new Application();
@@ -238,6 +245,7 @@ export default function TowerCanvas(props: Props) {
       resizeObserver.observe(host);
 
       const scene = new Container();
+      const project = (hM: number) => scene.y - hM * PX_PER_M * scene.scale.y;
       const flash = new Graphics();
       const sky = new SkyLayer(skyProps(11));
       const farCity = createCity();
@@ -283,7 +291,7 @@ export default function TowerCanvas(props: Props) {
         frameTimes.push(frameMs);
 
         p.onBeforeStep?.(ts);
-        stepWorld(world, Math.min(frameMs, 100));
+        if (ts >= hitstopUntil) stepWorld(world, Math.min(frameMs, 100));
         const snap = snapshotWorld(world);
         const byId = new Map(snap.blocks.map((b) => [b.id, b]));
 
@@ -352,12 +360,16 @@ export default function TowerCanvas(props: Props) {
             quality: fx.quality,
           });
           if (fx.quality === 'perfect') {
+            const feel = perfectLandingFeel(fx.combo ?? 1, !!p.reducedMotion);
+            hitstopUntil = ts + feel.hitstopMs;
+            punchY = Math.max(punchY, feel.punchPx);
+            if (view) view.squash = Math.max(view.squash, feel.squash);
             if (view) view.flash = 1;
             particles.burst(COMBO_FLASH, block.x, block.y, 14);
             particles.burst(CONFETTI_BURST, block.x, block.y - block.heightPx, 18);
             // Camera kick + a dust ring along the seam: a perfect floor should
             // LAND, not merely appear. Tower Bloxx sells the snap this way.
-            shake.shake({ intensity: 9, duration: 0.22, decay: 'exponential' });
+            shake.shake({ intensity: Math.max(9, feel.shake), duration: 0.22, decay: 'exponential' });
             particles.burst(TOWER_DUST, block.x - block.widthPx / 2, block.y + block.heightPx / 2, 6);
             particles.burst(TOWER_DUST, block.x + block.widthPx / 2, block.y + block.heightPx / 2, 6);
           }
@@ -431,7 +443,9 @@ export default function TowerCanvas(props: Props) {
 
         scene.scale.set(scale);
         scene.x = w / 2 - camX * scale + lookX + shake.offset.x;
-        scene.y = frame.groundScreenY + cameraY + lookY + shake.offset.y;
+        punchY *= Math.exp(-dt * 16);
+        scene.y = frame.groundScreenY + cameraY + lookY + shake.offset.y + punchY;
+        p.registerProjector?.(project);
 
         const halfW = w / 2 / scale;
         // World x under the middle of the screen. Screen-edge furniture (street,
@@ -536,6 +550,7 @@ export default function TowerCanvas(props: Props) {
             // Floor number from the id (`r0-b7` -> 7): colour cycle + lobby on floor 0.
             const floor = floorNo(block.id);
             view = createBlockView(floor < 0 ? views.size : floor, block.widthPx, block.heightPx, p.labels.get(block.id) ?? '', scale);
+            setBlockTrait(view, p.getTrait?.(block.id));
             blocks.addChild(view.container);
             views.set(block.id, view);
           }

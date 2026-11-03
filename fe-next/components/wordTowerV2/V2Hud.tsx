@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState, type RefObject } from 'react';
+import { useCallback, useState, type ReactNode, type RefObject } from 'react';
 import type { Estate } from '@/lib/wordTowerV2/estate';
 import type { RunState } from '@/lib/wordTowerV2/run';
 import { V2TopBar } from './V2TopBar';
@@ -43,6 +43,8 @@ interface Props {
   dailyDateFormatted?: string;
   dailyTarget?: { growthM: number; targetM: number };
   hasTower?: boolean;
+  /** Rush widgets; see V2TopBar: `null` reserves the row, `undefined` omits it. */
+  rushSlot?: ReactNode;
 }
 
 /**
@@ -71,6 +73,7 @@ export function V2Hud({
   dailyDateFormatted,
   dailyTarget,
   hasTower,
+  rushSlot,
 }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
   const coins = estate.coins + runCoins;
@@ -103,6 +106,7 @@ export function V2Hud({
         dailyDateFormatted={dailyDateFormatted}
         dailyTarget={dailyTarget}
         hasTower={hasTower}
+        rushSlot={rushSlot}
       />
       <V2HudMenu
         t={t}

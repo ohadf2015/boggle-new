@@ -199,7 +199,7 @@ export function useWordWheel({
 
   const scramble = useCallback(() => {
     const next = spendScramble(run);
-    if (!next || phase === 'over') return;
+    if (!next || phase === 'over' || phase === 'draft') return;
     setScrambles(next);
     deal(drawRef.current + 1);
     playSound('boardShuffle');

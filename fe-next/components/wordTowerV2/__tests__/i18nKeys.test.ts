@@ -11,6 +11,12 @@ import { CALLOUT_VARIANTS } from '@/lib/wordTowerV2/celebrations';
 import { REWARDS } from '@/lib/wordTowerV2/rewards';
 import { DISTRICTS, MAX_DISTRICT, PLOT_SLOTS } from '@/lib/wordTowerV2/estateCatalog';
 import { buildingNameKey } from '../estate/estateArt';
+import { PERKS } from '@/lib/wordTowerV2/rush/perks';
+import { RANK_TIERS } from '@/lib/wordTowerV2/rush/rankLadder';
+import type { BlockTrait, PerkRarity } from '@/lib/wordTowerV2/rush/types';
+
+const RUSH_TRAITS: BlockTrait[] = ['plain', 'gold', 'feather', 'anvil', 'magnet', 'lucky'];
+const RUSH_RARITIES: PerkRarity[] = ['common', 'rare', 'epic'];
 
 /**
  * Word Tower v2 builds most of its keys dynamically (`call.perfect.${i}`,
@@ -121,6 +127,12 @@ const keys: string[] = [
     'built', 'repaired', 'guest', 'perksTitle', 'perksNone', 'newsRaids', 'newsAffordable', 'newsDamaged',
     'completeTitle', 'completeSub', 'completeNext', 'completeCta', 'reward',
   ].map((k) => `wordTowerV2.estate.${k}`),
+  ...PERKS.flatMap((p) => [`wordTowerV2.rush.perk.${p.id}.name`, `wordTowerV2.rush.perk.${p.id}.desc`]),
+  ...RANK_TIERS.map((r) => `wordTowerV2.rush.rank.${r.id}`),
+  ...RUSH_TRAITS.map((k) => `wordTowerV2.rush.trait.${k}`),
+  ...RUSH_RARITIES.map((k) => `wordTowerV2.rush.rarity.${k}`),
+  ...['draft.title', 'draft.subtitle', 'nextUp.title', 'nextUp.label', 'nextUp.sealed', 'rank.max', 'rank.progress',
+    'rankUp.title', 'overtake.passed', 'rival.height', 'safetyNetSaved'].map((k) => `wordTowerV2.rush.${k}`),
 ];
 
 describe('Word Tower v2 i18n', () => {

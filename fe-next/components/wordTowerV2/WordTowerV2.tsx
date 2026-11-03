@@ -48,6 +48,8 @@ import { dailyDateLabel } from './dailyDateLabel';
 import { GuidedWordCoach } from './guide/GuidedWordCoach';
 import { useGuidedFirstWord } from './guide/useGuidedFirstWord';
 import { resolveWt2Screen } from '@/lib/wordTowerV2/exitTracking';
+import { useRush } from './rush/useRush';
+import { useRushUi } from './rush/useRushUi';
 
 /**
  * Word Tower v2.
@@ -65,10 +67,8 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
   const { recordPlay, streak } = useDailyStreak();
 
   const dailyDateFormatted = useMemo(() => (daily ? dailyDateLabel(language) : undefined), [daily, language]);
-  const game = useTowerRun({
-    seed: daily ? v2DailyNumericSeed(undefined, language) : undefined,
-    scriptedSwing: daily,
-  });
+  const rush = useRush({ daily });
+  const game = useTowerRun({ seed: daily ? v2DailyNumericSeed(undefined, language) : undefined, scriptedSwing: daily, rush });
   const { profile, canSeeInWorkModes, isAdmin } = useAuth();
   const router = useRouter();
   const { rival, share, copied } = useRivalTower(language);
@@ -163,18 +163,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
   const { finish } = game;
 
   const getScreen = useCallback(() => {
-    return resolveWt2Screen({
-      dictError,
-      dictReady,
-      phase,
-      showOver: phase === 'over',
-      resultsReady,
-      forceResults,
-      district,
-      raiding,
-      smashing,
-      floors: towerFloors,
-    });
+    return resolveWt2Screen({ dictError, dictReady, phase, showOver: phase === 'over', resultsReady, forceResults, district, raiding, smashing, floors: towerFloors });
   }, [dictError, dictReady, phase, resultsReady, forceResults, district, raiding, smashing, towerFloors]);
 
   const exitFlow = useV2Exit({
@@ -195,7 +184,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
   // flies landing coins into its exact rect), so the number never changes off-screen.
   const coinsRef = useRef<HTMLDivElement | null>(null);
 
-  const keysBlocked = smashing || rivalsOpen || raiding || (forceResults && phase !== 'over');
+  const keysBlocked = smashing || rivalsOpen || raiding || phase === 'draft' || (forceResults && phase !== 'over');
   const ww = useWordWheel({
     daily, language, phase, run, hoist, cancelHoist, drop, setScrambles,
     dictRef, dictReady, braceApi, flashReject, playSound, recordPlay, keysBlocked,
@@ -230,7 +219,9 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
     setSmashing,
   });
 
-  const showBrace = phase !== 'over' && !smashing && !district;
+  const inRun = phase !== 'over' && !smashing && !district;
+  const rushUi = useRushUi({ t, rush, game, daily, language, dailyBoard, dailyBaseM: dailyTower.totalM - dailyTower.growthM, reducedMotion, canvasClass, getHudPx: layout.getHudPx, inRun });
+  const showBrace = inRun && phase !== 'draft';
   const stabilitySlot = useMemo(
     () =>
       showBrace ? <StabilityBrace t={t} risk={game.risk} api={braceApi} reducedMotion={reducedMotion} /> : undefined,
@@ -303,12 +294,14 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
           homeKey={feeds.homeKey}
           reducedMotion={reducedMotion}
           getGear={feeds.getGear}
+          {...rushUi.canvasProps}
           dockSide={wide ? 'inline' : 'bottom'}
           className={canvasClass}
         />
       ) : null}
+      {rushUi.overlays}
 
-      {phase !== 'over' && !smashing && !district && !raiding && guide.status === 'off' && !guide.path ? <ModeCoach mode="wordTower" /> : null}
+      {showBrace && !raiding && guide.status === 'off' && !guide.path ? <ModeCoach mode="wordTower" /> : null}
       <GuidedWordCoach t={t} guide={guide} swinging={phase === 'swinging'} selected={selected} reducedMotion={reducedMotion} />
       {phase !== 'over' && !smashing && !district ? (
         <V2Hud
@@ -333,6 +326,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
           dailyDateFormatted={dailyDateFormatted}
           dailyTarget={daily ? { growthM: dailyTower.growthM, targetM: dailyTower.targetM } : undefined}
           hasTower={towerFloors > 0}
+          rushSlot={rushUi.hudSlot}
         />
       ) : null}
       <RunRewards
@@ -346,7 +340,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
         wide={wide}
         reducedMotion={reducedMotion}
       />
-      {phase !== 'over' && !smashing && !district ? <BraceControl t={t} api={braceApi} reducedMotion={reducedMotion} /> : null}
+      {showBrace ? <BraceControl t={t} api={braceApi} reducedMotion={reducedMotion} /> : null}
       <V2Celebrations
         t={t}
         callout={game.callout}

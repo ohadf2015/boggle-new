@@ -118,7 +118,7 @@ export function V2Celebrations({ t, callout, banners, onBannerDone, swinging = f
           <div
             key={shown.key}
             data-wt2-callout={QUIET_TONE[shown.tone] ? 'quiet' : 'loud'}
-            className={`flex items-baseline gap-2 rounded-neo border-neo-thick border-black font-neo-display font-black uppercase animate-neo-pop ${
+            className={`flex max-w-full items-baseline justify-center gap-2 break-words rounded-neo border-neo-thick border-black text-center font-neo-display font-black uppercase leading-tight animate-neo-pop ${
               QUIET_TONE[shown.tone]
                 ? 'px-3 py-0.5 text-sm shadow-hard-sm lg:text-lg'
                 : 'px-4 py-1 text-3xl shadow-hard-lg lg:text-5xl'
@@ -168,7 +168,7 @@ function BannerCard({ t, banner, onDismiss }: { t: T; banner: Banner; onDismiss:
         type="button"
         onClick={handleDismiss}
         data-testid="banner-card"
-        className="pointer-events-auto flex max-w-sm items-center gap-3 rounded-neo border-neo-thick border-black bg-neo-yellow px-4 py-2 text-neo-navy shadow-hard-lg animate-neo-pop active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
+        className="pointer-events-auto flex max-w-full items-center gap-3 rounded-neo border-neo-thick border-black bg-neo-yellow sm:max-w-sm px-4 py-2 text-neo-navy shadow-hard-lg animate-neo-pop active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
       >
         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-cream">
           <Icon className="h-5 w-5" aria-hidden />
@@ -188,7 +188,7 @@ function BannerCard({ t, banner, onDismiss }: { t: T; banner: Banner; onDismiss:
         type="button"
         onClick={handleDismiss}
         data-testid="banner-card"
-        className="pointer-events-auto flex max-w-sm items-center gap-3 rounded-neo border-neo-thick border-black bg-neo-purple px-4 py-2 text-neo-navy shadow-hard-lg animate-neo-pop active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
+        className="pointer-events-auto flex max-w-full items-center gap-3 rounded-neo border-neo-thick border-black bg-neo-purple sm:max-w-sm px-4 py-2 text-neo-navy shadow-hard-lg animate-neo-pop active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
       >
         <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-neo-thick border-black ${TIER_CLASS[tier]}`}>
           <Medal className="h-5 w-5" aria-hidden />
@@ -207,7 +207,7 @@ function BannerCard({ t, banner, onDismiss }: { t: T; banner: Banner; onDismiss:
         type="button"
         onClick={handleDismiss}
         data-testid="banner-card"
-        className="pointer-events-auto flex items-center gap-2 rounded-neo border-neo-thick border-black bg-neo-yellow px-5 py-1.5 font-neo-display text-2xl font-black uppercase text-neo-navy shadow-hard-lg animate-neo-pop active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
+        className="pointer-events-auto flex max-w-full items-center gap-2 break-words rounded-neo border-neo-thick border-black bg-neo-yellow px-5 py-1.5 text-center font-neo-display text-2xl font-black uppercase text-neo-navy shadow-hard-lg animate-neo-pop active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
       >
         <Trophy className="h-6 w-6" aria-hidden />
         {t('wordTowerV2.newBest')}
@@ -219,7 +219,7 @@ function BannerCard({ t, banner, onDismiss }: { t: T; banner: Banner; onDismiss:
       type="button"
       onClick={handleDismiss}
       data-testid="banner-card"
-      className="pointer-events-auto flex flex-col items-center rounded-neo border-neo-thick border-black bg-neo-cyan px-5 py-1.5 text-neo-navy shadow-hard-lg animate-neo-pop active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
+      className="pointer-events-auto flex max-w-full flex-col items-center break-words rounded-neo border-neo-thick border-black bg-neo-cyan px-5 py-1.5 text-center text-neo-navy shadow-hard-lg animate-neo-pop active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
     >
       <span className="flex items-center gap-1 font-neo-display text-[10px] font-black uppercase tracking-widest">
         <Sparkles className="h-3 w-3" aria-hidden />

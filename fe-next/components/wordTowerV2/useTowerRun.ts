@@ -3,16 +3,17 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { SOUND_EFFECTS } from '@/lib/audio/soundEffectsConfig';
-import { type RunStats, emptyStats, loadUnlocked, newlyUnlocked, saveUnlocked } from '@/lib/wordTowerV2/achievements';
+import { type RunStats, emptyStats, loadUnlocked } from '@/lib/wordTowerV2/achievements';
 import { publishHeightM } from '@/lib/wordTowerV2/altitude';
 import { biomeAt, floorsAt } from '@/lib/wordTowerV2/biomes';
-import { BANNER_PRIORITY, type Banner, type BannerKind, type CalloutCopy, landingCallout, pushBanner, wordCallout } from '@/lib/wordTowerV2/celebrations';
+import { type CalloutCopy, landingCallout, wordCallout } from '@/lib/wordTowerV2/celebrations';
 import { CRANE_CLEARANCE_PX, SWING, releaseKinematics } from '@/lib/wordTowerV2/crane';
 import {
   PX_PER_M,
   type TowerWorld,
   braceTower,
   createTowerWorld,
+  densityForTrait,
   despawnBlock,
   getTowerHeightM,
   moveAttachedBlock,
@@ -32,13 +33,13 @@ import { isCounterweight, standingChain, towerLean, towerRisk } from '@/lib/word
 import { endV2Run, startV2Run } from '@/lib/wordTowerV2/telemetry';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import type { TowerFx } from './TowerCanvas';
+import { MAGNET_VX_MUL, landingModsFor } from './rush/rushHelpers';
+import type { RushApi } from './rush/useRush';
+import { useRushBridge } from './rush/useRushBridge';
+import { useRunBanners } from './useRunBanners';
 import { type Hanging, LANDING_SOUND, type PendingLanding, REWARD_SOUND, dampSway, recordLanding, readBest, seedDemoTower, standing, supportTop, writeBest } from './runHelpers';
 
-/**
- * Word Tower v2 run loop: spawns/releases floors, judges the SETTLED sim, opens
- * crates, awards badges. A crash that leaves floors standing clears the rubble
- * and the run goes on; it ends when nothing stands or the player cashes out.
- */
+/** Word Tower v2 run loop: judges the SETTLED sim; a crash that leaves floors standing clears the rubble and the run goes on. */
 
 const POLL_MS = 100;
 /** Stop waiting for a floor to settle after this long and judge it anyway. */
@@ -46,7 +47,7 @@ const SETTLE_TIMEOUT_MS = 2600;
 /** Floors the rebar crate leaves live at the top. */
 const REBAR_KEEP_TOP = 2;
 
-export type Phase = 'composing' | 'swinging' | 'over';
+export type Phase = 'composing' | 'swinging' | 'draft' | 'over';
 
 export interface CalloutEvent extends CalloutCopy {
   key: number;
@@ -55,9 +56,10 @@ export interface CalloutEvent extends CalloutCopy {
 
 export type SurpriseEvent = SurprisePayout & { key: number };
 
-export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean }) {
+export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean; rush?: RushApi }) {
   const dailySeed = opts?.seed;
   const scriptedSwing = !!opts?.scriptedSwing;
+  const baseIdRef = useRef<string | null>(null);
   const { playSound, playComboSound, playWordLengthSound, setGameActive } = useSoundEffects();
 
   const worldRef = useRef<TowerWorld>(createTowerWorld({ seed: 1 }));
@@ -75,7 +77,6 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean }) {
   const statsRef = useRef<RunStats>(emptyStats());
   const unlockedRef = useRef<Set<string>>(new Set());
   const seenBiomesRef = useRef(new Set<string>(['downtown']));
-  const bannerKeyRef = useRef(0);
   const startedAtRef = useRef<number | null>(null);
   /** Emergency braces this run: `paid` ones are charged at the bank (RunSummary.braces). */
   const bracesRef = useRef({ used: 0, paid: 0 });
@@ -83,11 +84,7 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean }) {
   const leanRef = useRef<number | null>(null);
   /** Guard: endRun already fired the event for this run. */
   const endedRef = useRef(false);
-  /**
-   * Empire perks, fed in by the estate (NEUTRAL until it has loaded, so a run
-   * that starts before auth settles simply plays unperked rather than flipping
-   * mid-run). Every use multiplies through, so at level 0 this is identity.
-   */
+  /** Estate perks: NEUTRAL until loaded, so a run started before auth plays unperked instead of flipping mid-run. */
   const perksRef = useRef<Perks>(NEUTRAL_PERKS);
   const setPerks = useCallback((next: Perks) => {
     perksRef.current = next;
@@ -101,45 +98,26 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean }) {
   const [run, setRun] = useState<RunState>(runRef.current);
   const [bestM, setBestM] = useState(0);
   const [callout, setCallout] = useState<CalloutEvent | null>(null);
-  const [banners, setBanners] = useState<Banner[]>([]);
   const [newBest, setNewBest] = useState(false);
-  const [runBadges, setRunBadges] = useState<string[]>([]);
+  const { banners, setBanners, runBadges, setRunBadges, banner, shiftBanner, checkBadges } = useRunBanners(statsRef, unlockedRef, playSound);
+  const { rushRef, traitRef, draftingRef, rushMods, maybeOpenDraft, windowMultFor, takeTrait, returnTrait, resetRush, pickPerk, getPerfectWindowMult, getTrait } =
+    useRushBridge({ rush: opts?.rush, hangingRef, perksRef, setPhase });
 
   useEffect(() => {
     bestRef.current = readBest();
     setBestM(bestRef.current);
     unlockedRef.current = loadUnlocked();
     runRef.current = createRun(dailySeed ?? Date.now());
+    rushRef.current?.reset(runRef.current.seed);
     if (dailySeed) worldRef.current = createTowerWorld({ seed: dailySeed });
     setRun(runRef.current);
-  }, [dailySeed]);
+  }, [dailySeed, rushRef]);
 
   // Without this every playSound() silently no-ops: the context gates on it.
   useEffect(() => {
     setGameActive(true);
     return () => setGameActive(false);
   }, [setGameActive]);
-
-  const banner = useCallback((kind: BannerKind, id: string) => {
-    bannerKeyRef.current += 1;
-    const key = bannerKeyRef.current;
-    setBanners((q) => pushBanner(q, { key, kind, id, priority: BANNER_PRIORITY[kind] }));
-  }, []);
-
-  /** The banner on screen is done: show the next one. */
-  const shiftBanner = useCallback(() => setBanners((q) => q.slice(1)), []);
-
-  const checkBadges = useCallback(() => {
-    const fresh = newlyUnlocked(statsRef.current, unlockedRef.current);
-    if (fresh.length === 0) return;
-    for (const id of fresh) {
-      unlockedRef.current.add(id);
-      banner('achievement', id);
-    }
-    saveUnlocked(unlockedRef.current);
-    setRunBadges((b) => [...b, ...fresh]);
-    playSound('achievement');
-  }, [banner, playSound]);
 
   const openCrate = useCallback(
     (reward: SurprisePayout, blockId: string) => {
@@ -163,24 +141,23 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean }) {
     if (!block) return;
 
     const landed = { x: block.x, bottomY: block.y + block.heightPx / 2, angleRad: block.angleRad };
-    const quality: LandingQuality = classifyLanding(landed, pending.support, perksRef.current.perfectWindowMult);
-    const out = applyLanding(runRef.current, { quality, wordLen: pending.wordLen });
+    const trait = traitRef.current.get(pending.id);
+    const quality: LandingQuality = classifyLanding(landed, pending.support, windowMultFor(trait));
+    const out = applyLanding(runRef.current, { quality, wordLen: pending.wordLen }, landingModsFor(rushMods(), trait));
+    rushRef.current?.onLanding(quality);
     runRef.current = out.run;
     setRun(out.run);
-    fxRef.current.push({ kind: 'land', id: pending.id, quality });
+    fxRef.current.push({ kind: 'land', id: pending.id, quality, combo: out.run.combo });
     if (out.tenants > 0) fxRef.current.push({ kind: 'tenants', id: pending.id, count: out.tenants });
     // Crane Yard: name the upgrade when its wider band is what made this perfect.
     const copy = perkMadePerfect(landed, pending.support, perksRef.current.perfectWindowMult)
       ? { textKey: 'wordTowerV2.rescue.craneSaved', tone: 'cyan' as const } : landingCallout(quality, out.run.combo, Math.random());
     setCallout({ ...copy, key: performance.now(), points: out.points });
 
-    // Counterweight: this floor landed on the far side of a lean and pulled
-    // the load back over the base. Physics already moved the centre of mass;
-    // the reward is that the crew locks the steadier tower in (all but the
-    // top two floors are welded, like the rebar crate).
+    // Counterweight: a floor that pulled a lean back over the base welds all but the top two floors.
     const leanBefore = leanRef.current;
     leanRef.current = null;
-    const base = snapshotWorld(worldRef.current).blocks.find((b) => b.id === `r${runNoRef.current}-b0`);
+    const base = snapshotWorld(worldRef.current).blocks.find((b) => b.id === baseIdRef.current);
     if (leanBefore !== null && base && quality !== 'miss') {
       const after = towerLean(standing(worldRef.current, null));
       if (isCounterweight(leanBefore, after, block.x - base.x, base.widthPx / 2)) {
@@ -198,11 +175,10 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean }) {
 
     recordLanding(statsRef.current, out.run, quality);
     checkBadges();
-  }, [playComboSound, playSound, openCrate, checkBadges]);
+  }, [playComboSound, playSound, openCrate, checkBadges, windowMultFor, rushMods, rushRef, traitRef]);
 
   /** `cashedOut`: the player ended a standing run — a win, not a fall. */
   const endRun = useCallback((cashedOut = false) => {
-    // Guard: already ended, don't fire event twice
     if (endedRef.current) return;
 
     resolveLanding();
@@ -225,9 +201,7 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean }) {
       heightM: peak,
       daily: !!dailySeed,
     });
-    // Mark run as ended to prevent double-firing the event
     endedRef.current = true;
-    // Track engagement: run ended with cause (crash or cashout)
     trackGrowthEvent('wt2_run_ended', {
       daily: !!dailySeed,
       heightM: peak,
@@ -236,33 +210,33 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean }) {
     });
   }, [playSound, resolveLanding, dailySeed]);
 
-  /**
-   * The tower came down — but if floors are still standing on the base, the
-   * run is NOT over: the rubble is cleared, the streak breaks, and you build on
-   * from what is left. Returns false when nothing stands (the run ends).
-   */
+  /** Floors still standing on the base keep the run alive: rubble clears, the streak breaks. False when nothing stands. */
   const recover = useCallback((): boolean => {
     const world = worldRef.current;
     const hangId = hangingRef.current?.id ?? null;
-    const keep = standingChain(standing(world, hangId), `r${runNoRef.current}-b0`);
-    if (keep.length === 0) return false;
+    const keep = standingChain(standing(world, hangId), baseIdRef.current ?? 'none');
+    // Safety Net perk: a fall that would end the run clears it all instead, streak kept; the next floor is the new base.
+    const netted = keep.length === 0 && !!rushRef.current?.consumeFreeRecovery();
+    if (keep.length === 0 && !netted) return false;
     // The slab on the hook and anything still in the air are not rubble.
     for (const b of snapshotWorld(world).blocks) if (b.id === hangId || !world.landed.has(b.id)) keep.push(b.id);
+    if (netted) baseIdRef.current = keep[0] ?? null;
     const rubble = reviveWorld(world, new Set(keep));
     for (const r of rubble) labelsRef.current.delete(r.id);
-    runRef.current = { ...runRef.current, combo: 0 };
-    setRun(runRef.current);
+    if (!netted) {
+      runRef.current = { ...runRef.current, combo: 0 };
+      setRun(runRef.current);
+    }
     fxRef.current.push({ kind: 'crumble', points: rubble });
-    setCallout({ textKey: 'wordTowerV2.rescue.crumbled', tone: 'red', params: { n: rubble.length }, key: performance.now(), points: 0 });
-    playSound('comboBreak');
+    const copy = netted
+      ? { textKey: 'wordTowerV2.rush.safetyNetSaved', tone: 'cyan' as const }
+      : { textKey: 'wordTowerV2.rescue.crumbled', tone: 'red' as const, params: { n: rubble.length } };
+    setCallout({ ...copy, key: performance.now(), points: 0 });
+    playSound(netted ? 'powerUp' : 'comboBreak');
     return true;
-  }, [playSound]);
+  }, [playSound, rushRef]);
 
-  /**
-   * Emergency brace: steel every floor but the top one in place, right now.
-   * Paying for it (coins off the run, or a free brace from the upgrades, or a
-   * rescue word) is decided by the caller; `paid` ones reach the bank.
-   */
+  /** Emergency brace: steel every floor but the top one. The caller decides payment; `paid` ones reach the bank. */
   const brace = useCallback(
     (paid: boolean): boolean => {
       if (phase === 'over') return false;
@@ -303,6 +277,7 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean }) {
         if (!recover()) endRun();
         return;
       }
+      rushRef.current?.onPeak(world.runPeakPx / PX_PER_M);
 
       const floors = floorsAt(h);
       if (floors > statsRef.current.peakFloors) {
@@ -329,9 +304,11 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean }) {
         const timedOut = performance.now() - pending.releasedAt > SETTLE_TIMEOUT_MS;
         if (!snap || (snap.resting && world.landed.has(pending.id)) || timedOut) resolveLanding();
       }
+      if (!pendingRef.current && !hangingRef.current) maybeOpenDraft();
     }, POLL_MS);
     return () => window.clearInterval(id);
-  }, [phase, endRun, recover, resolveLanding, playSound, banner, checkBadges]);
+  }, [phase, endRun, recover, resolveLanding, playSound, banner, checkBadges, maybeOpenDraft, rushRef]);
+
 
   /** Drives the crane: the hanging floor follows the swing until released. */
   const onBeforeStep = useCallback((nowMs: number) => {
@@ -353,20 +330,17 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean }) {
   /** Crane pivot while a floor hangs; null between hoists (the canvas uses the top floor). */
   const getCraneX = useCallback(() => hangingRef.current?.pivotX ?? null, []);
 
-  /**
-   * Width the next floor would get for `word`: the banked wide-load crate AND
-   * the Foundation perk. The ghost slab and `hoist` must read the SAME numbers
-   * or the block that lands is not the one the player aimed with.
-   */
-  const previewWidth = useCallback(
-    (word: string) =>
-      Math.round(blockWidthForWord(word) * runRef.current.nextWidthMult * (dropCountRef.current === 0 ? perksRef.current.baseWidthMult : 1)),
-    [],
+  /** The ghost slab and `hoist` must read the SAME width, or the block that lands is not the one aimed with. */
+  const floorWidth = useCallback(
+    (word: string, crateMult: number) =>
+      Math.round(blockWidthForWord(word) * crateMult * (dropCountRef.current === 0 ? perksRef.current.baseWidthMult : 1) * rushMods().widthMul),
+    [rushMods],
   );
+  const previewWidth = useCallback((word: string) => floorWidth(word, runRef.current.nextWidthMult), [floorWidth]);
 
   const hoist = useCallback(
     (word: string) => {
-      if (phase !== 'composing') return;
+      if (phase !== 'composing' || draftingRef.current) return;
       startV2Run(startedAtRef);
       const world = worldRef.current;
       preHoistRef.current = { run: runRef.current, longestWord: statsRef.current.longestWord };
@@ -375,26 +349,26 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean }) {
       setRun(spent.run);
 
       const id = `r${runNoRef.current}-b${dropCountRef.current}`;
-      // Foundation perk: the GROUND floor is wider, so the whole tower starts
-      // on a bigger footing. Later floors are untouched. Same predicate as
-      // previewWidth, read BEFORE the counter moves.
-      const perkWidth = dropCountRef.current === 0 ? perksRef.current.baseWidthMult : 1;
+      // Read BEFORE the counter moves: the Foundation perk widens only the ground floor.
+      const widthPx = floorWidth(word, spent.widthMult);
+      const trait = takeTrait(id);
+      baseIdRef.current ??= id;
       const dropIndex = dropCountRef.current;
       dropCountRef.current += 1;
-      // The crane swings over the tower as it stands NOW. Latched for the whole
-      // swing: a pivot that tracked a still-rocking top would wander mid-aim.
+      // Latched for the whole swing: a pivot tracking a still-rocking top would wander mid-aim.
       const pivotX = supportTop(world, null)?.x ?? 0;
       labelsRef.current.set(id, word);
       spawnBlock(world, {
         id,
         x: pivotX,
         y: -(getTowerHeightM(world) * PX_PER_M + CRANE_CLEARANCE_PX),
-        widthPx: Math.round(blockWidthForWord(word) * spent.widthMult * perkWidth),
+        widthPx,
         heightPx: BLOCK_HEIGHT_PX,
         vx: 0,
         attached: true,
+        density: densityForTrait(trait),
       });
-      const perkSwing = { ...SWING, periodMs: SWING.periodMs * perksRef.current.swingPeriodMult };
+      const perkSwing = { ...SWING, periodMs: (SWING.periodMs * perksRef.current.swingPeriodMult) / rushMods().swingSpeedMul };
       const scripted = scriptedSwing && dailySeed ? v2DailySwing(dailySeed, dropIndex) : perkSwing;
       hangingRef.current = {
         id,
@@ -412,24 +386,18 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean }) {
       } else playWordLengthSound(word.length);
       setPhase('swinging');
     },
-    [phase, playWordLengthSound, playSound, dailySeed, scriptedSwing],
+    [phase, playWordLengthSound, playSound, dailySeed, scriptedSwing, floorWidth, draftingRef, takeTrait, rushMods],
   );
 
-  /**
-   * Put the hanging word back on the wheel.
-   *
-   * Only legal while the slab still hangs: once it is released, physics owns it.
-   * The block leaves the world entirely (engine `despawnBlock` — no orphan body
-   * keeps colliding), the banked crate effects the hoist spent come back, and
-   * the label is dropped so a cancelled word never reaches the share list.
-   * Returns false when there is nothing to take back.
-   */
+  /** Put the hanging word back on the wheel for free: only while it still hangs; everything the hoist spent comes back. */
   const cancelHoist = useCallback(() => {
     const hanging = hangingRef.current;
     if (!hanging || phase !== 'swinging') return false;
     despawnBlock(worldRef.current, hanging.id);
     labelsRef.current.delete(hanging.id);
     hangingRef.current = null;
+    returnTrait(hanging.id);
+    if (baseIdRef.current === hanging.id) baseIdRef.current = null;
     const before = preHoistRef.current;
     if (before) {
       runRef.current = before.run;
@@ -441,7 +409,7 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean }) {
     playSound('buttonClick', { volume: 0.5 });
     setPhase('composing');
     return true;
-  }, [phase, playSound]);
+  }, [phase, playSound, returnTrait]);
 
   const drop = useCallback(() => {
     const hanging = hangingRef.current;
@@ -453,12 +421,13 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean }) {
     leanRef.current = towerLean(standing(world, hanging.id));
     const k = releaseKinematics(performance.now() - hanging.startedAt, hanging.swing, hanging.pivotX);
     // Foundation perk: less spin off the hook is a floor that lands flatter.
-    releaseBlock(world, hanging.id, hanging.plumb ? 0 : k.vx, hanging.plumb ? 0 : k.spin * perksRef.current.swayMult);
+    const vxMul = traitRef.current.get(hanging.id) === 'magnet' ? MAGNET_VX_MUL : 1;
+    releaseBlock(world, hanging.id, hanging.plumb ? 0 : k.vx * vxMul, hanging.plumb ? 0 : k.spin * perksRef.current.swayMult);
     pendingRef.current = { id: hanging.id, wordLen: hanging.wordLen, support, releasedAt: performance.now() };
     hangingRef.current = null;
     playSound('swipeTransition', { volume: 0.4 });
     setPhase('composing');
-  }, [playSound, resolveLanding]);
+  }, [playSound, resolveLanding, traitRef]);
 
   const restart = useCallback(() => {
     startedAtRef.current = null;
@@ -475,6 +444,8 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean }) {
     statsRef.current = emptyStats();
     seenBiomesRef.current = new Set(['downtown']);
     runRef.current = createRun(dailySeed ?? Date.now());
+    resetRush(runRef.current.seed);
+    baseIdRef.current = null;
     setRun(runRef.current);
     setHeightM(0);
     setRisk(0);
@@ -483,13 +454,9 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean }) {
     setBanners([]);
     setRunBadges([]);
     setPhase('composing');
-  }, [dailySeed]);
+  }, [dailySeed, resetRush, setBanners, setRunBadges]);
 
-  /**
-   * The server's best (word_tower_estates.best_m) wins when it is higher: the
-   * device copy is lost with a cleared cache or a new phone, and the HUD then
-   * said 0 with no "new best" banner for a player whose record was 70m.
-   */
+  /** The server's best wins when higher: the device copy is lost with a cleared cache or a new phone. */
   const adoptBest = useCallback((m: number) => {
     if (!(m > bestRef.current)) return;
     bestRef.current = m;
@@ -502,27 +469,31 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean }) {
     setRun(next);
   }, []);
 
+  /** A seeded tower is not climbed this run: no drafts or overtakes for floors already there. */
+  const adoptSeededTower = useCallback(() => {
+    baseIdRef.current = 'r0-b0';
+    rushRef.current?.baseline(Math.max(worldRef.current.runPeakPx / PX_PER_M, getTowerHeightM(worldRef.current)));
+  }, [rushRef]);
+
   /** Review hook (`?demo=1`, optionally `&words=a,b,c` to see another script). */
   const seedDemo = useCallback((words?: string[]) => {
     if (dropCountRef.current > 0) return; // StrictMode double-invoke guard
     dropCountRef.current = seedDemoTower(worldRef.current, labelsRef.current, words);
-  }, []);
+    adoptSeededTower();
+  }, [adoptSeededTower]);
 
-  /**
-   * Rebuild the persisted daily tower floor by floor (short settle per floor:
-   * up to 100 of them). Returns how many floors stand. Same guard as the demo
-   * seed: a second call (StrictMode) on a built world is a no-op.
-   */
+  /** Rebuild the persisted daily tower (short settle per floor); a second call on a built world is a no-op. */
   const restoreTower = useCallback((words: string[]): number => {
     if (dropCountRef.current > 0 || words.length === 0) return 0;
     dropCountRef.current = seedDemoTower(worldRef.current, labelsRef.current, words, 250);
+    adoptSeededTower();
     return dropCountRef.current;
-  }, []);
+  }, [adoptSeededTower]);
 
   return {
     worldRef, labelsRef, fxRef, hangingRef,
     phase, heightM, risk, peakM, bestM, run, callout, banners, shiftBanner, newBest, runBadges, unlockedRef, statsRef,
     onBeforeStep, getHangVx, getCraneX, previewWidth, hoist, cancelHoist, drop, restart, setScrambles, seedDemo, restoreTower, setPerks, perksRef, adoptBest,
-    brace, finish, bracesRef,
+    brace, finish, bracesRef, pickPerk, getPerfectWindowMult, getTrait, traitRef,
   };
 }

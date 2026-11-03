@@ -11,7 +11,7 @@ export type Wt2Screen = 'home' | 'run' | 'results' | 'estate' | 'raid' | 'wreck'
 interface Wt2State {
   dictError: boolean;
   dictReady: boolean;
-  phase: 'composing' | 'swinging' | 'over';
+  phase: 'composing' | 'swinging' | 'draft' | 'over';
   showOver: boolean;
   resultsReady: boolean;
   forceResults: boolean;

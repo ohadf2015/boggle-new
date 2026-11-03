@@ -3,6 +3,13 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { createRun } from '@/lib/wordTowerV2/run';
 import { V2TopBar } from '../V2TopBar';
 
+vi.mock('@/components/ui/AnimatedCounter', () => ({
+  default: ({ value, formatValue }: { value: number; formatValue?: (v: number) => string }) => (
+    <span>{formatValue ? formatValue(value) : value}</span>
+  ),
+}));
+
+
 afterEach(cleanup);
 
 // Echo the key (plus params) so assertions read which copy was chosen.

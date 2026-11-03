@@ -3,6 +3,13 @@ import { cleanup, render, screen } from '@testing-library/react';
 import { createRun } from '@/lib/wordTowerV2/run';
 import { V2TopBar } from '../V2TopBar';
 
+vi.mock('@/components/ui/AnimatedCounter', () => ({
+  default: ({ value, formatValue }: { value: number; formatValue?: (v: number) => string }) => (
+    <span>{formatValue ? formatValue(value) : value}</span>
+  ),
+}));
+
+
 afterEach(cleanup);
 
 const t = (key: string, params?: Record<string, string | number>) => {

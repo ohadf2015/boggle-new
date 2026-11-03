@@ -7,6 +7,7 @@
  */
 import { WORD_TOWER_SCRAMBLES_START } from '@/shared/constants/wordTowerConstants';
 import type { LandingQuality } from './landing';
+import type { BlockTrait } from './rush/types';
 import { type RewardPayout, payoutFor, rollReward } from './rewards';
 import { scoreFromHeightM } from './scoring';
 
@@ -19,6 +20,17 @@ const MAX_BANKED_DROPS = 6;
 /** Wrecking balls: two to start, one per 3-perfect streak step, capped. */
 export const MAX_BALLS = 5;
 const BALL_EVERY_COMBO = 3;
+/** One floor's height points (3m at 100/m): a gold floor pays its height twice. */
+export const GOLD_BONUS = 300;
+const ANVIL_COMBO_MUL = 1.5;
+
+export interface LandingMods {
+  perfectBonusMul?: number;
+  comboGainMul?: number;
+  wordLenBonusPerLetter?: number;
+  chanceMul?: number;
+  trait?: BlockTrait;
+}
 
 export interface RunState {
   seed: number;
@@ -100,15 +112,15 @@ export function consumeDrop(run: RunState): { run: RunState; widthMult: number; 
 export function applyLanding(
   prev: RunState,
   landing: { quality: LandingQuality; wordLen: number },
+  mods: LandingMods = {},
 ): { run: RunState; points: number; reward: RewardPayout | null; tenants: number } {
   const perfect = landing.quality === 'perfect';
   const tenants = tenantsFor(landing.quality, landing.wordLen);
   const combo = perfect ? prev.combo + 1 : 0;
-  const points = perfect
-    ? PERFECT_BONUS * Math.min(combo, COMBO_CAP)
-    : landing.quality === 'good'
-      ? GOOD_BONUS
-      : 0;
+  const comboGain = (mods.comboGainMul ?? 1) * (mods.trait === 'anvil' ? ANVIL_COMBO_MUL : 1);
+  const perfectPoints = PERFECT_BONUS * (mods.perfectBonusMul ?? 1) * (1 + (Math.min(combo, COMBO_CAP) - 1) * comboGain);
+  const gold = mods.trait === 'gold' && landing.quality !== 'miss' ? GOLD_BONUS : 0;
+  const points = Math.round(perfect ? perfectPoints : landing.quality === 'good' ? GOOD_BONUS : 0) + gold;
 
   let seed = prev.seed;
   const rng = () => {
@@ -116,7 +128,16 @@ export function applyLanding(
     return seed / 4294967296;
   };
   const floors = prev.floors + 1;
-  const id = rollReward(rng, { quality: landing.quality, combo, sinceLast: prev.wordsSinceSurprise, floors, wordLen: landing.wordLen });
+  const id = rollReward(rng, {
+    quality: landing.quality,
+    combo,
+    sinceLast: prev.wordsSinceSurprise,
+    floors,
+    wordLen: landing.wordLen,
+    chanceMul: mods.chanceMul,
+    bonusPerLetter: mods.wordLenBonusPerLetter,
+    guaranteed: mods.trait === 'lucky',
+  });
   const reward = id ? payoutFor(id, floors) : null;
 
   const run: RunState = {

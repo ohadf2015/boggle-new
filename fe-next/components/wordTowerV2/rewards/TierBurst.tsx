@@ -1,12 +1,14 @@
-'use client';
+"use client";
 
-import { m } from 'framer-motion';
-import type { ChestTier } from '@/lib/wordTowerV2/estate';
-import { tierFx } from '@/lib/wordTowerV2/rewards';
-import { CoinFountain } from './CoinFountain';
-import { GodRays } from './GodRays';
+import { useState } from "react";
+import { m } from "framer-motion";
+import { prefersStaticFullscreenOverlay } from "@/lib/native/webViewLayerFlash";
+import type { ChestTier } from "@/lib/wordTowerV2/estate";
+import { tierFx } from "@/lib/wordTowerV2/rewards";
+import { CoinFountain } from "./CoinFountain";
+import { GodRays } from "./GodRays";
 
-const STAR_ART = '/images/word-tower-v2/empire/fx-star.webp';
+const STAR_ART = "/images/word-tower-v2/empire/fx-star.webp";
 
 /**
  * The rarity colour, as a raw value — these draw gradients and glows, not
@@ -14,9 +16,9 @@ const STAR_ART = '/images/word-tower-v2/empire/fx-star.webp';
  * surface only, so the dark-theme values are the only ones that ever show.
  */
 export const TIER_HEX: Record<ChestTier, string> = {
-  common: '#fffef0', // neo-cream
-  rare: '#00ffff', // neo-cyan
-  epic: '#ff1493', // neo-pink
+  common: "#fffef0", // neo-cream
+  rare: "#00ffff", // neo-cyan
+  epic: "#ff1493", // neo-pink
 };
 
 /** Deterministic spark geometry — no RNG, so the server and client agree. */
@@ -50,18 +52,35 @@ interface Props {
 export function TierBurst({ tier, rattling, popped, reducedMotion }: Props) {
   const fx = tierFx(tier);
   const hex = TIER_HEX[tier];
+  // Mobile renderers flash white when a full-screen layer tweens in (Class 5): the flood and ring appear still there.
+  const [staticFlood] = useState(prefersStaticFullscreenOverlay);
+  const alpha = (a: number) =>
+    Math.round(Math.min(1, Math.max(0, a)) * 255)
+      .toString(16)
+      .padStart(2, "0");
 
   if (reducedMotion) {
     // Still, but not plain: the flood and the ray fan are LIGHT, not motion, so
     // the rarity is every bit as legible with the animation turned off.
     return (
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-        {popped ? <GodRays rays={fx.rays} hex={hex} strength={fx.flood} reducedMotion /> : null}
+      <div
+        className="pointer-events-none absolute inset-0 overflow-hidden"
+        aria-hidden
+      >
+        {popped ? (
+          <GodRays rays={fx.rays} hex={hex} strength={fx.flood} reducedMotion />
+        ) : null}
         <div
+          data-wt2-tier-flood
+          data-static="true"
           className="absolute inset-0"
           style={{
             background: popped
-              ? `radial-gradient(circle at 50% 42%, ${hex}${Math.round(fx.flood * 90).toString(16).padStart(2, '0')} 0%, transparent 62%)`
+              ? `radial-gradient(circle at 50% 42%, ${hex}${Math.round(
+                  fx.flood * 90,
+                )
+                  .toString(16)
+                  .padStart(2, "0")} 0%, transparent 62%)`
               : undefined,
           }}
         />
@@ -70,34 +89,80 @@ export function TierBurst({ tier, rattling, popped, reducedMotion }: Props) {
   }
 
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+    <div
+      className="pointer-events-none absolute inset-0 overflow-hidden"
+      aria-hidden
+    >
       {/* Behind everything: the light fan that says "treasure" from across the
           room. Rare and up only — `tierFx().rays` is 0 for a common. */}
-      {popped ? <GodRays rays={fx.rays} hex={hex} strength={fx.flood} /> : null}
-
-      {/* Light seeping out of the seam, then the flood when it blows. */}
-      <m.div
-        className="absolute inset-0"
-        style={{ background: `radial-gradient(circle at 50% 42%, ${hex} 0%, transparent 60%)` }}
-        initial={{ opacity: 0 }}
-        animate={
-          popped
-            ? { opacity: [fx.flood * 1.5, fx.flood * 0.45], scale: [0.9, 1.06] }
-            : rattling
-              ? { opacity: [0, fx.flood * 0.55, fx.flood * 0.2, fx.flood * 0.6] }
-              : { opacity: 0 }
-        }
-        transition={popped ? { duration: 0.5 } : { duration: fx.anticipationMs / 1000, times: [0, 0.4, 0.7, 1] }}
-      />
-
-      {/* The shockwave: one hard ring, as wide as the tier is loud. */}
       {popped ? (
+        <GodRays
+          rays={fx.rays}
+          hex={hex}
+          strength={fx.flood}
+          reducedMotion={staticFlood}
+        />
+      ) : null}
+
+      {staticFlood ? (
+        <div
+          data-wt2-tier-flood
+          data-static="true"
+          className="absolute inset-0"
+          style={{
+            background:
+              popped || rattling
+                ? `radial-gradient(circle at 50% 42%, ${hex}${alpha(fx.flood * (popped ? 0.6 : 0.3))} 0%, transparent 60%)`
+                : undefined,
+          }}
+        />
+      ) : (
+        <m.div
+          data-wt2-tier-flood
+          data-static="false"
+          className="absolute inset-0"
+          style={{
+            background: `radial-gradient(circle at 50% 42%, ${hex} 0%, transparent 60%)`,
+          }}
+          initial={{ opacity: 0 }}
+          animate={
+            popped
+              ? {
+                  opacity: [fx.flood * 1.5, fx.flood * 0.45],
+                  scale: [0.9, 1.06],
+                }
+              : rattling
+                ? {
+                    opacity: [
+                      0,
+                      fx.flood * 0.55,
+                      fx.flood * 0.2,
+                      fx.flood * 0.6,
+                    ],
+                  }
+                : { opacity: 0 }
+          }
+          transition={
+            popped
+              ? { duration: 0.5 }
+              : { duration: fx.anticipationMs / 1000, times: [0, 0.4, 0.7, 1] }
+          }
+        />
+      )}
+
+      {popped && !staticFlood ? (
         <m.div
           className="absolute left-1/2 top-[42%] rounded-full border-[6px]"
-          style={{ borderColor: hex, width: '14vmin', height: '14vmin', marginLeft: '-7vmin', marginTop: '-7vmin' }}
+          style={{
+            borderColor: hex,
+            width: "14vmin",
+            height: "14vmin",
+            marginLeft: "-7vmin",
+            marginTop: "-7vmin",
+          }}
           initial={{ scale: 0.2, opacity: 0.95 }}
           animate={{ scale: fx.spread * 9, opacity: 0 }}
-          transition={{ duration: 0.55, ease: 'easeOut' }}
+          transition={{ duration: 0.55, ease: "easeOut" }}
         />
       ) : null}
 
@@ -114,10 +179,25 @@ export function TierBurst({ tier, rattling, popped, reducedMotion }: Props) {
                 src={STAR_ART}
                 alt=""
                 className="absolute left-1/2 top-[42%]"
-                style={{ width: s.size, height: s.size, marginLeft: -s.size / 2, marginTop: -s.size / 2 }}
+                style={{
+                  width: s.size,
+                  height: s.size,
+                  marginLeft: -s.size / 2,
+                  marginTop: -s.size / 2,
+                }}
                 initial={{ x: 0, y: 0, scale: 0.3, opacity: 0 }}
-                animate={{ x: s.x, y: s.y, scale: [0.3, 1.15, 0.5], rotate: s.spin, opacity: [0, 1, 0] }}
-                transition={{ duration: 0.85 + fx.spread * 0.3, delay: s.delay, ease: 'easeOut' }}
+                animate={{
+                  x: s.x,
+                  y: s.y,
+                  scale: [0.3, 1.15, 0.5],
+                  rotate: s.spin,
+                  opacity: [0, 1, 0],
+                }}
+                transition={{
+                  duration: 0.85 + fx.spread * 0.3,
+                  delay: s.delay,
+                  ease: "easeOut",
+                }}
               />
             );
           })

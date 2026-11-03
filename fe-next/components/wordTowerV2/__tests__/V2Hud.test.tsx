@@ -6,6 +6,13 @@ import type { RunState } from '@/lib/wordTowerV2/run';
 import type { Estate } from '@/lib/wordTowerV2/estate';
 import { createRef } from 'react';
 
+vi.mock('@/components/ui/AnimatedCounter', () => ({
+  default: ({ value, formatValue }: { value: number; formatValue?: (v: number) => string }) => (
+    <span>{formatValue ? formatValue(value) : value}</span>
+  ),
+}));
+
+
 const mockT = (key: string, params?: Record<string, string | number>) => {
   // Simple mock that returns the key for now
   if (params) {
@@ -329,5 +336,25 @@ describe('V2Hud', () => {
     expect(
       screen.getByLabelText('wordTowerV2.hud.effect {"name":"wordTowerV2.reward.steady.name","n":2}'),
     ).toBeInTheDocument();
+  });
+
+  it('forwards the rush slot to the top bar so rush widgets sit in the HUD', () => {
+    const { container } = render(
+      <V2Hud
+        t={mockT}
+        heightM={0}
+        score={0}
+        bestM={0}
+        run={mockRun}
+        tenants={0}
+        estate={mockEstate}
+        runCoins={0}
+        raids={0}
+        coinsRef={createRef<HTMLDivElement>()}
+        onOpenEstate={vi.fn()}
+        rushSlot={<span>RUSH</span>}
+      />,
+    );
+    expect(container.querySelector('[data-wt2-rush-slot]')?.textContent).toBe('RUSH');
   });
 });
