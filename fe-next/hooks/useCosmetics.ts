@@ -31,6 +31,11 @@ interface CosmeticWithStatus extends Cosmetic {
   isEquipped: boolean;
 }
 
+/** useEquippedCosmetic listens for 'storage', which never fires in the tab that wrote it. */
+export function announceEquipped(): void {
+  window.dispatchEvent(new StorageEvent('storage', { key: EQUIPPED_KEY }));
+}
+
 export function syncCosmeticsToSupabase(
   userId: string,
   equipped: Partial<Record<CosmeticCategory, string>>,
@@ -75,6 +80,7 @@ export function useCosmetics(input: UseCosmeticsInput) {
           const eq = data.equipped_cosmetics as Partial<Record<CosmeticCategory, string>>;
           setEquippedIds(eq);
           saveJsonToLocalStorage(EQUIPPED_KEY, eq);
+          announceEquipped();
         }
         if (data.purchased_cosmetics) {
           const pc = data.purchased_cosmetics as string[];
@@ -115,6 +121,7 @@ export function useCosmetics(input: UseCosmeticsInput) {
       const next = { ...equippedIds, [cosmetic.category]: cosmeticId };
       setEquippedIds(next);
       saveJsonToLocalStorage(EQUIPPED_KEY, next);
+      announceEquipped();
       if (isAuthenticated && user?.id) syncCosmeticsToSupabase(user.id, next, purchasedIds);
     },
     [equippedIds, playerState, isAuthenticated, user, purchasedIds]
