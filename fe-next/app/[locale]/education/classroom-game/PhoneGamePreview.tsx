@@ -50,7 +50,7 @@ export function PhoneGamePreview() {
         minWordLength={3}
         comboLevel={0}
         foundWords={foundWords as never}
-        leaderboard={[{ username: 'Maya', score: 40 }, { username: 'Leo', score: 55 }, { username: 'Noa', score: 20 }] as never}
+        leaderboard={[{ username: 'Leo', score: 55 }, { username: 'Maya', score: 40 }, { username: 'Noa', score: 20 }] as never}
         totalBoardWords={null}
         gameMode="classic"
         onExitRoom={() => undefined}
