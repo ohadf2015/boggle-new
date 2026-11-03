@@ -159,7 +159,9 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
   // "Everyone's in" is the server's call (playersReadyUpdate totals), not a
   // client recount — one source of truth (pitfall class 3).
   const allReady = readyTotal > 0 && readyUsernames.length >= readyTotal;
-  const sublabel = startSublabel({ seated: seats.length, humanGuests: lobby.humanGuestCount, t });
+  const sublabel = lobby.startsVsBots
+    ? t('mpUi.lobby.seatsTaken', { count: seats.length, max: lobbyMax(seats.length) })
+    : startSublabel({ seated: seats.length, humanGuests: lobby.humanGuestCount, t });
 
   // TV/projector toggle. useHostViewState pins phone/tablet (<1024px, read at
   // mount) to player mode, so the toggle only exists where it can take effect.
@@ -240,7 +242,7 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
       playerCount={seats.length}
       maxPlayers={lobbyMax(seats.length)}
       t={t}
-      labelKey={isClassroomRoom ? 'hostView.startClassGame' : undefined}
+      labelKey={isClassroomRoom ? 'hostView.startClassGame' : lobby.startsVsBots ? 'hostView.startVsBots' : undefined}
       sublabel={sublabel}
       celebrate={allReady}
     />

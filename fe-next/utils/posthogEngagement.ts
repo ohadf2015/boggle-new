@@ -243,6 +243,8 @@ export function trackSoloPlayPrompt(args: {
   event: 'shown' | 'clicked';
   lobbyWaitSec?: number;
   auto_filled?: boolean;
+  /** Which button took the bot-start: the lobby START or the status-lane chip. */
+  surface?: 'start_button' | 'status_lane';
 }): void {
   safe(() =>
     (posthog.capture as PHFn)(
@@ -251,6 +253,7 @@ export function trackSoloPlayPrompt(args: {
         mode: 'classic',
         lobby_wait_sec: args.lobbyWaitSec,
         auto_filled: args.auto_filled,
+        surface: args.surface,
       }
     )
   );

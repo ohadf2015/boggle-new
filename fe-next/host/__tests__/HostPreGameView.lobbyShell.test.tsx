@@ -121,7 +121,7 @@ describe('HostPreGameView — lobby on the shell', () => {
     render(<HostPreGameView {...baseProps} hostPlaying playersReady={[{ username: 'Host', isHost: true }]} />);
     // Round 3 (2026-09-27): the CTA strip moved OUT of lobby-phone — it is a
     // pinned sibling so it never scrolls. Scope footer assertions to it.
-    expect(within(within(screen.getByTestId('lobby-phone-footer')).getByTestId('lobby-start')).getByText('mpUi.lobby.startVsBots')).toBeInTheDocument();
+    expect(within(within(screen.getByTestId('lobby-phone-footer')).getByTestId('lobby-start')).getByText('hostView.startVsBots')).toBeInTheDocument();
   });
 
   it('START shows the seat count once a human joined', () => {
