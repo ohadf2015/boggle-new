@@ -92,7 +92,7 @@ interface UpgradeToPlayerPayload {
 function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
 
   // Handle player joining
-  socket.on('join', async (data: JoinGamePayload) => {
+  const handlePlayerJoin = async (data: JoinGamePayload): Promise<void> => {
     if (!checkRateLimit(socket.id)) {
       socket.emit('rateLimited');
       return;
@@ -353,7 +353,12 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
       username,
       isAuthenticated: !!authUserId
     }).catch(() => {}); // Swallow errors - never block game flow
-  });
+  };
+  // A throw used to leave the client waiting out its 10s join timeout with no answer.
+  socket.on('join', (data: JoinGamePayload) => handlePlayerJoin(data).catch((error: unknown) => {
+    logger.error('SOCKET', `Unhandled error in join handler: ${(error as Error)?.message ?? error}`, { socketId: socket.id });
+    emitError(socket, ErrorCodes.INTERNAL_ERROR, { message: 'Failed to join game' });
+  }));
 
   // Handle leave room
   // Derive username from server-side mapping to prevent impersonation
