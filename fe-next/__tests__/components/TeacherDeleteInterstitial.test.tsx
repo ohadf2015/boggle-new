@@ -118,9 +118,19 @@ describe('TeacherDeleteInterstitial', () => {
     expect(screen.getByText('settings.teacherDeleteStopEmailsDone')).toBeInTheDocument();
   });
 
-  it('continue reveals the irreversible step via callback', () => {
-    const props = renderInterstitial();
-    fireEvent.click(screen.getByText('settings.teacherDeleteContinue'));
+  it('disables continue button until a reason is selected', () => {
+    const props = renderInterstitial({ reason: null });
+    const continueBtn = screen.getByText('settings.teacherDeleteContinue').closest('button');
+    expect(continueBtn).toBeDisabled();
+    fireEvent.click(continueBtn!);
+    expect(props.onContinueToDelete).not.toHaveBeenCalled();
+  });
+
+  it('enables continue button and calls onContinueToDelete when reason is selected', () => {
+    const props = renderInterstitial({ reason: 'too_many_emails' });
+    const continueBtn = screen.getByText('settings.teacherDeleteContinue').closest('button');
+    expect(continueBtn).not.toBeDisabled();
+    fireEvent.click(continueBtn!);
     expect(props.onContinueToDelete).toHaveBeenCalled();
   });
 });

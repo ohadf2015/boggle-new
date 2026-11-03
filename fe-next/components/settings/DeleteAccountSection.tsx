@@ -171,10 +171,10 @@ export default function DeleteAccountSection({ isDarkMode }: DeleteAccountSectio
                   <button
                     type="button"
                     onClick={handleDelete}
-                    disabled={confirmText !== 'DELETE' || isDeleting}
+                    disabled={confirmText !== 'DELETE' || isDeleting || (Boolean(impact?.isTeacher) && !reason)}
                     className={cn(
                       'flex-1 px-4 py-2 rounded-neo border-3 border-neo-red font-bold text-sm min-h-[44px] transition-colors',
-                      confirmText === 'DELETE' && !isDeleting
+                      confirmText === 'DELETE' && !isDeleting && (!impact?.isTeacher || Boolean(reason))
                         ? 'bg-neo-red text-white hover:bg-red-600'
                         : 'bg-gray-300 text-gray-500 border-gray-400 cursor-not-allowed'
                     )}

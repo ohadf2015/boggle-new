@@ -139,29 +139,35 @@ export async function DELETE(request: NextRequest) {
     }
 
     // 6. Delete the auth user — cascades to profiles and all FK'd tables.
-    //    Retried once on timeout/5xx; user-not-found means a previous attempt
-    //    already completed and is treated as success.
+    //    Retried once on timeout/5xx; user-not-found or confirmed gone means
+    //    a previous attempt already completed and is treated as success.
     const outcome = await deleteUserWithRetry(admin, user.id);
 
-    const telemetry: EduServerEvent[] = [];
-    if (impact.isTeacher) {
-      telemetry.push({
-        distinctId: user.id,
-        event: outcome.ok ? 'teacher_delete_completed' : 'teacher_delete_failed',
-        properties: {
-          teacher_id: user.id,
-          ...impactEventProps(impact),
-          ...(reason ? { reason } : {}),
-          ...(surface ? { surface } : {}),
-          attempts: outcome.attempts,
-          ...(outcome.alreadyDeleted ? { already_deleted: true } : {}),
-          ...(!outcome.ok ? { error: outcome.error?.message ?? 'unknown' } : {}),
-        },
-      });
-    }
+    const accountAgeDays = user.created_at
+      ? Math.max(0, Math.floor((Date.now() - new Date(user.created_at).getTime()) / (1000 * 60 * 60 * 24)))
+      : 0;
 
     if (!outcome.ok) {
-      captureEduServerEvents(telemetry);
+      if (impact.isTeacher) {
+        try {
+          captureEduServerEvents([
+            {
+              distinctId: user.id,
+              event: 'teacher_delete_failed',
+              properties: {
+                teacher_id: user.id,
+                ...impactEventProps(impact),
+                ...(reason ? { reason } : {}),
+                ...(surface ? { surface } : {}),
+                attempts: outcome.attempts,
+                error: outcome.error?.message ?? 'unknown',
+              },
+            },
+          ]);
+        } catch {
+          // Fire-and-forget — telemetry failure must never block or fail response
+        }
+      }
       captureApiError(
         new Error(outcome.error?.message ?? 'deleteUser failed'),
         '/api/account/delete',
@@ -173,7 +179,42 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    captureEduServerEvents(telemetry);
+    // Telemetry on successful deletion
+    const telemetry: EduServerEvent[] = [
+      {
+        distinctId: user.id,
+        event: 'growth:account_deleted',
+        properties: {
+          is_teacher: impact.isTeacher,
+          class_count: impact.classrooms.length,
+          student_count: impact.totalStudents,
+          deletion_reason: reason,
+          account_age_days: accountAgeDays,
+        },
+      },
+    ];
+
+    if (impact.isTeacher) {
+      telemetry.push({
+        distinctId: user.id,
+        event: 'teacher_delete_completed',
+        properties: {
+          teacher_id: user.id,
+          ...impactEventProps(impact),
+          ...(reason ? { reason } : {}),
+          ...(surface ? { surface } : {}),
+          attempts: outcome.attempts,
+          ...(outcome.alreadyDeleted ? { already_deleted: true } : {}),
+        },
+      });
+    }
+
+    try {
+      captureEduServerEvents(telemetry);
+    } catch {
+      // Fire-and-forget — telemetry failure must never block or fail the deletion.
+    }
+
     return NextResponse.json({ success: true, alreadyDeleted: outcome.alreadyDeleted });
   } catch (err) {
     captureApiError(

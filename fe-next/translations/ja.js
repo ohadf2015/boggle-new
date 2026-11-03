@@ -3981,9 +3981,11 @@ const ja = {
     "teacherDeleteReasonTitle": "主な退会理由を教えてください",
     "teacherDeleteReason": {
       "too_many_emails": "メールが多すぎる",
-      "not_using_it": "もう使っていない",
-      "privacy_concerns": "プライバシーの懸念",
       "missing_features": "機能が足りない",
+      "too_expensive": "料金が高すぎる",
+      "privacy": "プライバシーの懸念",
+      "privacy_concerns": "プライバシーの懸念",
+      "not_using_it": "もう使っていない",
       "found_alternative": "他のサービスに移行",
       "other": "その他"
     },

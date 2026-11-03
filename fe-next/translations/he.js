@@ -3987,9 +3987,11 @@ const he = {
     "teacherDeleteReasonTitle": "מה הסיבה העיקרית לעזיבה?",
     "teacherDeleteReason": {
       "too_many_emails": "יותר מדי מיילים",
-      "not_using_it": "כבר לא משתמשים בזה",
-      "privacy_concerns": "חששות פרטיות",
       "missing_features": "חסרות תכונות",
+      "too_expensive": "יקר מדי",
+      "privacy": "חששות פרטיות",
+      "privacy_concerns": "חששות פרטיות",
+      "not_using_it": "כבר לא משתמשים בזה",
       "found_alternative": "מצאתי חלופה",
       "other": "אחר"
     },
