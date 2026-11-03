@@ -44,4 +44,20 @@ describe('registerPushToken', () => {
     expect(push.register).toHaveBeenCalledTimes(1);
     expect(remove).toHaveBeenCalledTimes(2);
   });
+
+  it('a registration timeout resolves false without raising a console error', async () => {
+    vi.useFakeTimers();
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    push.checkPermissions.mockResolvedValue({ receive: 'granted' });
+    push.addListener.mockImplementation(async () => ({ remove }));
+    const pending = registerPushToken({ silent: true });
+    await vi.advanceTimersByTimeAsync(10001);
+    expect(await pending).toBe(false);
+    expect(err).not.toHaveBeenCalled();
+    expect(warn).toHaveBeenCalled();
+    err.mockRestore();
+    warn.mockRestore();
+    vi.useRealTimers();
+  });
 });

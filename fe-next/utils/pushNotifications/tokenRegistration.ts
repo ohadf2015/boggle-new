@@ -204,7 +204,7 @@ async function doRegisterPushToken(silent: boolean): Promise<boolean> {
       });
 
       const timer = setTimeout(() => {
-        console.error('Push registration timeout');
+        console.warn('Push registration timeout');
         finish(false);
       }, 10000);
     });
