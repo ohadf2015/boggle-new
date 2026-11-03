@@ -132,6 +132,7 @@ vi.mock('../../../backend/utils/errorHandler', async () => {
 
 import { registerGameLifecycleHandlers } from '../gameLifecycleHandler';
 import { getLeaderboard } from '../../../backend/modules/gameStateManager';
+import gameStartCoordinator from '../../../backend/utils/gameStartCoordinator';
 
 interface SocketHandlerMap { [event: string]: (...args: unknown[]) => void }
 
@@ -209,6 +210,32 @@ describe('requestGameState — orphan timer recovery', () => {
       'startGame',
       expect.objectContaining({ timerSeconds: 47, reconnect: true })
     );
+  });
+
+  it('does NOT start the clock during the 3-2-1 countdown (start sequence active, timer not started)', () => {
+    const socket = createSocket();
+    mockGetGameBySocketId.mockReturnValue('ABC');
+    mockGetGame.mockReturnValue({
+      gameState: 'in-progress',
+      remainingTime: 120,
+      timerSeconds: 120,
+      letterGrid: [[]],
+      language: 'en',
+      gameMode: 'classic',
+      gameSessionId: 1,
+    });
+    mockHasGameTimer.mockReturnValue(false);
+    gameStartCoordinator.initializeSequence('ABC', ['alice'], 120);
+
+    try {
+      registerGameLifecycleHandlers(fakeIo, socket as never);
+      socket.handlers['requestGameState']();
+    } finally {
+      gameStartCoordinator.cleanupSequence('ABC');
+    }
+
+    expect(mockStartGameTimer).not.toHaveBeenCalled();
+    expect(mockSafeEmit).toHaveBeenCalledWith(socket, 'startGame', expect.anything());
   });
 
   it('falls back to timerSeconds when remainingTime is missing', () => {

@@ -463,7 +463,10 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       // and never restarts the clock. Defense-in-depth: idempotent, safe to
       // call when timer is already running (`startGameTimer` clears first).
       // A teacher-paused round has no interval BY DESIGN — never "recover" it.
-      if (!hasGameTimer(gameCode) && !game.isPaused && !quizShell) {
+      // During the 3-2-1 the start sequence owns the clock; starting it here steals seconds.
+      const startSequence = gameStartCoordinator.getSequenceStats(gameCode);
+      const countdownOwnsClock = !!startSequence && !startSequence.timerStarted;
+      if (!hasGameTimer(gameCode) && !game.isPaused && !quizShell && !countdownOwnsClock) {
         const recoverySeconds = game.remainingTime ?? game.timerSeconds;
         if (recoverySeconds && recoverySeconds > 0) {
           logger.info('SOCKET', `Orphan timer recovery: restarting interval for ${gameCode} at ${recoverySeconds}s`);
