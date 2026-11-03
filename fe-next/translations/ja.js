@@ -21707,6 +21707,8 @@ const ja = {
   // @wordcraftReview:start
   "wordcraftReview": {
     "cta": "逃した単語を復習 ({count})",
+    "homeworkDone": "宿題クリア",
+    "next": "逃した単語 ({count})",
   },
   // @wordcraftReview:end
   // @eduPolish:start

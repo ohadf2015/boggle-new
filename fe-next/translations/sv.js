@@ -21707,6 +21707,8 @@ const sv = {
   // @wordcraftReview:start
   "wordcraftReview": {
     "cta": "Repetera missade ord ({count})",
+    "homeworkDone": "Läxan är klar",
+    "next": "Missade ord ({count})",
   },
   // @wordcraftReview:end
   // @eduPolish:start

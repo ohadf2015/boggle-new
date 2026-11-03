@@ -242,4 +242,26 @@ describe('PATCH /api/education/practice — Word Craft completion', () => {
     }));
     expect(mockStamp).not.toHaveBeenCalled();
   });
+
+  const finish = (body: Record<string, unknown>) =>
+    PATCH(new NextRequest('http://localhost/api/education/practice', {
+      method: 'PATCH',
+      body: JSON.stringify({ sessionId: SESSION, completed: true, ...body }),
+    })).then((res) => res.json());
+
+  it('Given the assignment stamp lands, When a Word Craft round completes, Then the response says the homework is done', async () => {
+    const data = await finish({ wordsFound: ['SUN', 'RUN', 'FUN'] });
+    expect(data.assignmentCompleted).toBe(true);
+  });
+
+  it('Given the stamp write fails, When a Word Craft round completes, Then the response does not claim the homework is done', async () => {
+    mockStamp.mockResolvedValueOnce(false);
+    const data = await finish({ wordsFound: ['SUN', 'RUN', 'FUN'] });
+    expect(data.assignmentCompleted).toBe(false);
+  });
+
+  it('Given a round below the bar, When completed:true is sent, Then the homework is not done', async () => {
+    const data = await finish({ wordsFound: ['SUN'] });
+    expect(data.assignmentCompleted).toBe(false);
+  });
 });

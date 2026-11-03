@@ -21638,6 +21638,8 @@ const he = {
   // @wordcraftReview:start
   "wordcraftReview": {
     "cta": "חזרה על מילים שפספסת ({count})",
+    "homeworkDone": "שיעורי הבית הושלמו",
+    "next": "מילים שפספסת ({count})",
   },
   // @wordcraftReview:end
   // @eduPolish:start

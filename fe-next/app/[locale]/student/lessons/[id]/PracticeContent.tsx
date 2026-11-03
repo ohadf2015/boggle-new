@@ -89,6 +89,8 @@ export interface PracticeContentProps {
   initialVariant?: PracticeVariant | null;
   /** Signed-in student id: Word Craft queues missed lesson words for their review. */
   reviewStudentId?: string;
+  /** Signed-in or guest id: a Word Craft round in progress is kept on the device under it. */
+  runOwnerId?: string;
   /** Records a finished round on the device when there is no account. */
   onGuestResult: (result: { cardsReviewed?: number; cardsCorrect?: number; vocabularyWordsFound?: string[] }) => void;
 }
@@ -105,6 +107,7 @@ export default function PracticeContent({
   initialFocus,
   initialVariant = null,
   reviewStudentId,
+  runOwnerId,
   onGuestResult,
 }: PracticeContentProps) {
   const { t } = useLanguage();
@@ -247,8 +250,8 @@ export default function PracticeContent({
     });
     // ponytail: warmup / word_list are not persistable session types (the API union
     // has no row for them) — the guard also narrows `type` for the call below.
-    if (type === 'warmup' || type === 'word_list') return;
-    await completePracticeSession({ type, sessionId: currentSessionIdRef.current, ...payload });
+    if (type === 'warmup' || type === 'word_list') return null;
+    return completePracticeSession({ type, sessionId: currentSessionIdRef.current, ...payload });
   }, [completePracticeSession, onGuestResult]);
 
   // XP session data for practice components
@@ -343,6 +346,7 @@ export default function PracticeContent({
             onNext={nextTile ? handleNextTile : undefined}
             nextLabel={nextTile ? t(nextTile.titleKey) : undefined}
             wordCraftReview={reviewStudentId ? { studentId: reviewStudentId, lessonId: lesson.id } : undefined}
+            wordCraftRunKey={runOwnerId ? `${runOwnerId}:${lesson.id}` : undefined}
           />
         </EducationShell>
 

@@ -20757,6 +20757,8 @@ const en = {
   // @wordcraftReview:start
   "wordcraftReview": {
     "cta": "Review missed words ({count})",
+    "homeworkDone": "Homework done",
+    "next": "Missed words ({count})",
   },
   // @wordcraftReview:end
   // @eduPolish:start

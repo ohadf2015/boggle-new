@@ -152,6 +152,7 @@ export default function LessonPracticePageClient() {
         initialFocus={initialFocus}
         initialVariant={initialVariant}
         reviewStudentId={user?.id}
+        runOwnerId={studentId}
         onGuestResult={handleGuestResult}
       />
     </PracticeSessionProvider>

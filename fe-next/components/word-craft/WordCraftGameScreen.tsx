@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { PageLoader } from '@/components/ui/PageLoader';
-import { useWordCraftGame } from '@/lib/word-craft/useWordCraftGame';
+import { useWordCraftGame, type WordCraftState } from '@/lib/word-craft/useWordCraftGame';
 import { useAdMob } from '@/hooks/useAdMob';
 import { isNative } from '@/utils/platform';
 import { loadWordCraftDictionary } from '@/lib/word-craft/dictionary';
@@ -132,6 +132,9 @@ interface GameViewProps {
     guide?: boolean;
     /** false = no achievement toasts (academy lessons do not award public-game achievements). */
     achievements?: boolean;
+    /** A round saved on the device, resumed after a reload. */
+    resume?: WordCraftState | null;
+    onState?: (state: WordCraftState) => void;
   };
 }
 
@@ -202,7 +205,10 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, daily,
     forcedDims,
     lessonTargets: lesson?.targets,
     initialTiles: lesson?.initialTiles,
+    restoredState: lesson?.resume,
   });
+  const onLessonState = lesson?.onState;
+  useEffect(() => { onLessonState?.(game.state); }, [game.state, onLessonState]);
   const { cosyMode } = useAccessibility();
   const prefersReducedMotion = useReducedMotion();
 
@@ -1066,7 +1072,8 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, daily,
         />
       ) : null}
 
-      <ModeCoach mode="wordCraft" />
+      {/* Lessons open on the tutor card; a second first-run coach stacked on top of it. */}
+      {!lesson && <ModeCoach mode="wordCraft" />}
     </div>
   );
 }

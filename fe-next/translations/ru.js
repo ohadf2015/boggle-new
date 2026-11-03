@@ -21407,6 +21407,8 @@ const ru = {
   // @wordcraftReview:start
   "wordcraftReview": {
     "cta": "Повторить пропущенные слова ({count})",
+    "homeworkDone": "Домашка готова",
+    "next": "Пропущенные слова ({count})",
   },
   // @wordcraftReview:end
   // @eduPolish:start

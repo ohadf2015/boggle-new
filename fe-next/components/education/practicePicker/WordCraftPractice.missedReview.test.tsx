@@ -9,6 +9,8 @@ vi.mock('@/contexts/LanguageContext', () => ({
     dir: 'ltr',
   }),
 }));
+const push = vi.fn();
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push }) }));
 vi.mock('@/utils/growthTracking', () => ({ trackGameEnd: vi.fn(), trackGameStart: vi.fn() }));
 vi.mock('@/lib/analytics/lazyPosthog', () => ({ default: { capture: vi.fn() } }));
 vi.mock('@/components/word-craft/WordCraftGameScreen', () => ({
@@ -49,12 +51,13 @@ describe('WordCraftPractice → Missed Words Review', () => {
     expect(state[reviewKey('L1', 'dog')].box).toBe(1);
   });
 
-  it('Given missed words, Then the result card links to the review of this lesson', async () => {
+  it('Given missed words on a finished round, Then reviewing them is the big next step', async () => {
     await play({ studentId: 'stu-1', lessonId: 'L1' });
     finish([{ who: 'player', words: ['CAT', 'SUN'] }]);
-    const link = await screen.findByTestId('wordcraft-missed-review');
-    expect(link.getAttribute('href')).toBe('/en/student/review?lesson=L1');
-    expect(link.textContent).toContain('wordcraftReview.cta(2)');
+    const next = await screen.findByTestId('practice-completion-next');
+    expect(next.textContent).toContain('wordcraftReview.next(2)');
+    fireEvent.click(next);
+    expect(push).toHaveBeenCalledWith('/en/student/review?lesson=L1');
   });
 
   it('Given a round below the homework bar, Then the nudge still offers the missed words', async () => {
