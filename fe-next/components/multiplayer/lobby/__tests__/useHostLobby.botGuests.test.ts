@@ -17,6 +17,7 @@ vi.mock('@/host/components/tv-broadcast/TvTutorialOverlay', () => ({ isTvTutoria
 
 import { useHostLobby, type HostLobbyPlayer } from '../useHostLobby';
 import { PUBLIC_ROOM_BOT_START_GRACE_SECONDS } from '@/lib/multiplayer/soloHostPrompt';
+import { trackSoloPlayPrompt } from '@/utils/posthogEngagement';
 
 const host: HostLobbyPlayer = { username: 'Host', isHost: true };
 const bot: HostLobbyPlayer = { username: 'Bot Ava', isBot: true };
@@ -64,6 +65,26 @@ describe('useHostLobby with bots in the roster', () => {
     act(() => { vi.advanceTimersByTime(PUBLIC_ROOM_BOT_START_GRACE_SECONDS * 1000); });
 
     expect(onAutoStartWithBots).toHaveBeenCalledTimes(1);
+  });
+
+  it('given the bot countdown is running, when the alone host taps Start vs bots, then the countdown cannot fill or start a second time', () => {
+    const { result, onAutoStartWithBots } = setup();
+    act(() => { vi.advanceTimersByTime(15_000); });
+    expect(result.current.botCountdown).toBe(20);
+
+    act(() => { result.current.handleStartClick(); });
+    for (let i = 0; i < 20; i += 1) act(() => { vi.advanceTimersByTime(1000); });
+    act(() => { vi.advanceTimersByTime(PUBLIC_ROOM_BOT_START_GRACE_SECONDS * 1000); });
+
+    expect(result.current.botCountdown).toBeNull();
+    expect(emitMock).not.toHaveBeenCalledWith('setAutoFill', expect.anything());
+    expect(onAutoStartWithBots).toHaveBeenCalledTimes(1);
+  });
+
+  it('tags the Start-button bot start so it can be told apart from the lane chip', () => {
+    const { result } = setup();
+    act(() => { result.current.handleStartClick(); });
+    expect(trackSoloPlayPrompt).toHaveBeenCalledWith({ event: 'clicked', surface: 'start_button' });
   });
 
   it('in TV mode the host is the screen, not a seat', () => {

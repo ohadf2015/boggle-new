@@ -4631,6 +4631,7 @@ const ja = {
     "noOneYet": "まだ誰もいない？",
     "startingWithBots": "ボットで開始まで",
     "addingBots": "ボット追加まで",
+    "startVsBots": "ボットと対戦",
     "soloPrompt": {
       "title": "まだ誰もいない？",
       "subtitle": "今すぐボットと対戦するか、コードを共有して友達を待とう。",

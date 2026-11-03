@@ -4989,6 +4989,7 @@ const sv = {
     "noOneYet": "Ingen ännu?",
     "startingWithBots": "Startar med bottar om",
     "addingBots": "Lägger till bottar om",
+    "startVsBots": "Starta mot bottar",
     "soloPrompt": {
       "title": "Ingen här än?",
       "subtitle": "Kör mot bottar direkt, eller dela din kod och vänta på vänner.",

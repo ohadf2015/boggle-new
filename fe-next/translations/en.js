@@ -4232,6 +4232,7 @@ const en = {
     "noOneYet": "No one yet?",
     "startingWithBots": "Starting with bots in",
     "addingBots": "Adding bots in",
+    "startVsBots": "Start vs bots",
     "soloPrompt": {
       "title": "No one here yet?",
       "subtitle": "Jump in against bots now, or share your code and wait for friends to join.",
