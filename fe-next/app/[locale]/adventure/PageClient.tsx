@@ -5,6 +5,7 @@ import nextDynamic from 'next/dynamic';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { PlayfulBackground } from '@/components/ui/PlayfulBackground';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
+import { useModeBed } from '@/hooks/useModeBed';
 
 // Loading fallback component with playful design
 function LoadingFallback(): React.JSX.Element {
@@ -34,6 +35,7 @@ const AdventureView = nextDynamic(
  * auth split: guests get a playable demo battle, signed-in players the full map.
  */
 export default function AdventurePageClient(): React.JSX.Element {
+  useModeBed('ADVENTURE');
   return (
     <Suspense fallback={<LoadingFallback />}>
       <AdventureView />

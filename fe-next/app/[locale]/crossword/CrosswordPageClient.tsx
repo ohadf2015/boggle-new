@@ -17,6 +17,7 @@ import { hasCrosswordPuzzles } from '@/lib/crossword/locales';
 import type { CrosswordPuzzle, Difficulty, PuzzleLocale } from '@/lib/crossword/types';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
 import { CrosswordLoader } from '@/components/crossword/CrosswordLoader';
+import { useModeBed } from '@/hooks/useModeBed';
 
 // Client-only: the view pulls in pixi.js + gsap on demand.
 const CrosswordView = dynamic(
@@ -82,6 +83,7 @@ interface Edition {
 }
 
 export function CrosswordPageClient({ locale }: { locale: PuzzleLocale }) {
+  useModeBed('CROSSWORD');
   const { t, language } = useLanguage();
   const today = useMemo(() => todayISO(), []);
 

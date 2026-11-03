@@ -13,6 +13,7 @@ import { loadDailyResult } from '@/lib/connections/dailyResultStore';
 import { DailyFlowChrome } from '@/components/daily/flow/DailyFlowChrome';
 import BridgeTutorial from '@/components/connections/tutorial/BridgeTutorial';
 import { shouldAutoShowTutorial, markTutorialSeen } from '@/components/connections/tutorial/tutorialGate';
+import { useModeBed } from '@/hooks/useModeBed';
 
 interface Props {
   locale: string;
@@ -38,6 +39,7 @@ function LoadingFallback(): React.JSX.Element {
 type TutorialState = 'undecided' | 'auto' | 'manual' | 'off';
 
 export default function DailyPageClient({ locale }: Props): React.JSX.Element {
+  useModeBed('CONNECTIONS');
   const { t } = useLanguage();
   // Frozen for the visit: a run finished after midnight UTC stays on the day (and variant) it started.
   const [today] = useState(todayUTC);
