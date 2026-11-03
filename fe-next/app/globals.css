@@ -48,6 +48,13 @@
   then re-enable it for real text inputs and anything opting in via
   `data-selectable` (e.g. room/game codes users want to copy).
 */
+/* Paid-plan entry points never show in the app; plans are handled on the website (see /web-handoff). */
+html.lexi-native a[href*="/teacher/upgrade"],
+html.lexi-native a[href*="/pricing"],
+html.lexi-native a[href*="polar.sh"] {
+  display: none !important;
+}
+
 html.lexi-native,
 html.lexi-native * {
   -webkit-user-select: none;

@@ -6,6 +6,7 @@ import { productionRefusesSandbox } from '@/lib/polarBillingRuntime';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { locales, defaultLocale } from '@/i18n/config';
 import logger from '@/utils/logger';
+import { isNativeAppUserAgent } from '@/lib/native/nativeHandoff';
 import { logSubscriptionEvent } from '@/lib/subscriptions';
 import { withTimeout } from '@/lib/server/routeTimeout';
 import { accessTrialExpiryAny } from '@/lib/education/accessTrialServer';
@@ -140,6 +141,9 @@ function resolveCheckoutLocale(bodyLocale: string, cookieHeader: string | null):
  * - 500: Server error
  */
 export async function POST(request: NextRequest) {
+  if (isNativeAppUserAgent(request.headers.get('user-agent'))) {
+    return NextResponse.json({ error: 'not_in_app' }, { status: 403 });
+  }
   let user: Awaited<ReturnType<typeof getAuthedUser>> = null;
   try {
     // Checkout gate: keep the till shut while Polar wiring is missing.

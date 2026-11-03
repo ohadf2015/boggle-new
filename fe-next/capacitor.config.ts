@@ -88,6 +88,7 @@ const config: CapacitorConfig = {
   },
 
   ios: {
+    appendUserAgent: 'LexiClashApp/1',
     contentInset: 'automatic',
     preferredContentMode: 'mobile',
     scheme: 'lexiclash', // Custom URL scheme for deep links
@@ -96,6 +97,8 @@ const config: CapacitorConfig = {
   },
 
   android: {
+    // Server-side marker: the site keeps paid-plan pages and checkout out of the app (lib/native/nativeHandoff.ts).
+    appendUserAgent: 'LexiClashApp/1',
     allowMixedContent: false, // Don't allow HTTP in production WebView
     captureInput: true,
     webContentsDebuggingEnabled: isDev,

@@ -108,6 +108,7 @@ export const KNOWN_APP_ROOT_SEGMENTS: ReadonlySet<string> = new Set([
   'play-boggle-online-free',
   'player',
   'pricing',
+  'web-handoff',
   'profile',
   'quests',
   'quick-play',
