@@ -88,6 +88,16 @@ export function PlayerCard({
                     {styleBadge.label}
                   </span>
                 )}
+                {player.is_test_account && (
+                  <span
+                    data-testid="player-test-badge"
+                    title="Test account: excluded from dashboard stats"
+                    className="inline-flex items-center gap-1 rounded-full border border-neo-purple bg-neo-purple/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-neo-purple"
+                  >
+                    <FlaskConical className="w-3 h-3" />
+                    Test
+                  </span>
+                )}
                 {player.is_admin && (
                   <span
                     data-testid="player-admin-badge"

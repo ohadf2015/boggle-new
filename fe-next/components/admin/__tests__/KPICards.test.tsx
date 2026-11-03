@@ -29,6 +29,12 @@ describe('KPICards', () => {
     expect(screen.getByText('5')).toBeInTheDocument();
   });
 
+  it('should show guests and excluded test accounts under registered users', () => {
+    render(<KPICards stats={{ ...mockStats, overview: { ...mockStats.overview, totalGuests: 192, testAccounts: 72 } }} />);
+
+    expect(screen.getByText('192 admin.kpi.guests · 72 admin.kpi.testExcluded')).toBeInTheDocument();
+  });
+
   it('should render stickiness ratio', () => {
     render(<KPICards stats={mockStats} />);
 

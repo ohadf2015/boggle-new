@@ -23,7 +23,6 @@ interface DailyPoint {
   uniquePlayers: number;
   uniqueGuests: number;
   totalUniquePlayers: number;
-  signups: number;
 }
 
 const RANGES = [7, 30, 90] as const;
@@ -145,14 +144,6 @@ export function DailyActivityChart({ authToken }: DailyActivityChartProps) {
                 dataKey="totalUniquePlayers"
                 name={t('admin.activity.uniquePlayers')}
                 stroke="#00FFFF"
-                strokeWidth={2}
-                dot={false}
-              />
-              <Line
-                type="monotone"
-                dataKey="signups"
-                name={t('admin.activity.signups')}
-                stroke="#FF1493"
                 strokeWidth={2}
                 dot={false}
               />

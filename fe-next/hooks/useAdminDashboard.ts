@@ -13,7 +13,7 @@ const ADMIN_API_BASE = '/api/admin';
 const REFRESH_INTERVAL = 30_000;
 
 interface StatsData {
-  overview: { totalPlayers: number; totalGames: number; totalWords: number; totalGameTimeHours: number };
+  overview: { totalPlayers: number; totalGames: number; totalWords: number; totalGameTimeHours: number; totalGuests?: number; testAccounts?: number };
   activity: { gamesToday: number; uniquePlayersToday: number; uniquePlayersWeek: number; uniquePlayersMonth: number; signupsToday: number; signupsWeek: number };
   languages: Record<string, number>;
 }

@@ -39,6 +39,9 @@ import {
   fetchCohortRetention,
   fetchChurnRisk,
   fetchEngagementFunnel,
+  fetchSignupGrowth,
+  fetchRevenueSummary,
+  fetchDrilldown,
 } from '../analyticsRoutes';
 
 describe('analyticsRoutes', () => {
@@ -105,6 +108,46 @@ describe('analyticsRoutes', () => {
 
       const result = await fetchEngagementFunnel(mockSupabase as never);
       expect(result.registered).toBe(0);
+    });
+  });
+
+  describe('fetchSignupGrowth', () => {
+    it('calls admin_signup_growth with the week window', async () => {
+      mockRpc.mockResolvedValue({ data: [{ week: '2026-11-02', signups: 15, total: 905 }], error: null });
+      const result = await fetchSignupGrowth(mockSupabase as never, 26);
+      expect(mockRpc).toHaveBeenCalledWith('admin_signup_growth', { weeks: 26 });
+      expect(result[0].total).toBe(905);
+    });
+
+    it('returns an empty list on error', async () => {
+      mockRpc.mockResolvedValue({ data: null, error: { message: 'fail' } });
+      expect(await fetchSignupGrowth(mockSupabase as never, 26)).toEqual([]);
+    });
+  });
+
+  describe('fetchRevenueSummary', () => {
+    it('calls admin_revenue_summary', async () => {
+      mockRpc.mockResolvedValue({ data: { paying: 1 }, error: null });
+      expect(await fetchRevenueSummary(mockSupabase as never)).toEqual({ paying: 1 });
+      expect(mockRpc).toHaveBeenCalledWith('admin_revenue_summary');
+    });
+
+    it('returns an empty object on error', async () => {
+      mockRpc.mockResolvedValue({ data: null, error: { message: 'fail' } });
+      expect(await fetchRevenueSummary(mockSupabase as never)).toEqual({});
+    });
+  });
+
+  describe('fetchDrilldown', () => {
+    it('passes kind and week to admin_drilldown', async () => {
+      mockRpc.mockResolvedValue({ data: [{ id: 'u1' }], error: null });
+      expect(await fetchDrilldown(mockSupabase as never, 'signups', '2026-11-02')).toEqual([{ id: 'u1' }]);
+      expect(mockRpc).toHaveBeenCalledWith('admin_drilldown', { kind: 'signups', week: '2026-11-02' });
+    });
+
+    it('returns an empty list on error', async () => {
+      mockRpc.mockResolvedValue({ data: null, error: { message: 'fail' } });
+      expect(await fetchDrilldown(mockSupabase as never, 'payers', null)).toEqual([]);
     });
   });
 });
