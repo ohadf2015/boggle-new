@@ -3,22 +3,72 @@ name: CI
 on:
   pull_request:
     branches: [master, main]
+  # Every merge re-runs the whole suite on master; a failure opens an issue (ci-failure-assistant.yml).
+  push:
+    branches: [master, main]
   # radar-loop dispatches this on its bot PRs, which GITHUB_TOKEN cannot trigger.
-  # A dispatch runs the FULL test suite; a pull_request run tests only what the PR touches.
   workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  # A master push is never cancelled by the next one: every merged commit gets its full run.
+  cancel-in-progress: ${{ github.event_name != 'push' }}
 
+# Two gates:
+#   ci-success  REQUIRED for merge. Needs only `quick`, which installs nothing heavy and ends in about a minute.
+#   ci-full     NOT required. Waits for lint, tsc, the sharded tests, guards and backend, and fails the run when
+#               any of them fails, so a PR shows red within minutes and a bad merge to master opens an issue.
 jobs:
-  check:
+  quick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # HEAD^1 is the PR base (or the previous master commit on a push).
+          fetch-depth: 2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Quick checks (run together)
+        run: |
+          set +e
+          # typescript alone, outside the repo, so `npm ci` (2 GB) is not needed for the translations scan.
+          ( mkdir -p /tmp/ts && cd /tmp/ts && npm init -y >/dev/null && npm i typescript@5.9.3 --ignore-scripts --no-audit --no-fund >/dev/null 2>&1 ) &
+          TS_PID=$!
+
+          ( # Conflict markers in what this change touched (a scripted resolve once committed them to master).
+            FILES=$(git diff --name-only --diff-filter=ACMR HEAD^1 HEAD -- . ':!*.lock' ':!*package-lock.json')
+            [ -z "$FILES" ] && exit 0
+            if echo "$FILES" | xargs git grep -nE '^(<<<<<<<|>>>>>>>) ' HEAD -- 2>/dev/null | grep -q .; then
+              echo "::error::conflict markers committed"; echo "$FILES" | xargs git grep -nE '^(<<<<<<<|>>>>>>>) ' HEAD -- | head; exit 1
+            fi
+          ) > /tmp/markers.log 2>&1 &
+          M_PID=$!
+
+          ( if [ "${{ github.event_name }}" = "pull_request" ]; then
+              git fetch --no-tags --shallow-since="$(date -u -d '30 days ago' +%F)" origin "${{ github.base_ref }}" &&
+              node fe-next/scripts/ci/check-seo-freeze.mjs HEAD^1 HEAD
+            fi
+          ) > /tmp/seo.log 2>&1 &
+          S_PID=$!
+
+          wait $TS_PID
+          ( cd fe-next && NODE_PATH=/tmp/ts/node_modules node scripts/find-missing-translations.js ) > /tmp/translations.log 2>&1
+          T_RC=$?
+          wait $M_PID; M_RC=$?
+          wait $S_PID; S_RC=$?
+
+          for n in markers seo translations; do echo "::group::$n"; tail -25 /tmp/$n.log; echo "::endgroup::"; done
+          echo "rc: markers=$M_RC seo=$S_RC translations=$T_RC"
+          [ $M_RC -eq 0 ] && [ $S_RC -eq 0 ] && [ $T_RC -eq 0 ]
+
+  lint:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
-          # HEAD^1 is the PR base: the SEO freeze check and the changed-files lint diff against it.
           fetch-depth: 2
       - uses: actions/setup-node@v4
         with:
@@ -26,8 +76,6 @@ jobs:
           cache: npm
           cache-dependency-path: fe-next/package-lock.json
       - run: npm ci --prefer-offline --no-audit
-        working-directory: fe-next
-      - run: npm run check:translations
         working-directory: fe-next
       - name: Lint
         working-directory: fe-next
@@ -39,11 +87,6 @@ jobs:
           else
             npm run lint
           fi
-      - name: Check SEO freeze
-        if: github.event_name == 'pull_request'
-        run: |
-          git fetch --no-tags --shallow-since="$(date -u -d '30 days ago' +%F)" origin "${{ github.base_ref }}"
-          node fe-next/scripts/ci/check-seo-freeze.mjs HEAD^1 HEAD
 
   types:
     runs-on: ubuntu-latest
@@ -61,8 +104,8 @@ jobs:
         working-directory: fe-next
 
   # Frontend tests, sharded. On a PR, --changed picks the tests whose import graph touches the diff;
-  # a shared file (translations, a context) selects a large slice, so the slice is split across shards
-  # instead of running serially. workflow_dispatch runs the full suite over the same shards.
+  # a shared file (translations, a context) selects a large slice, so the slice is split across shards.
+  # workflow_dispatch and master pushes run the full suite over the same shards.
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -97,7 +140,7 @@ jobs:
             npx vitest run "$@" --passWithNoTests --reporter=default --reporter=json --outputFile.json="$OUT"
             RC=$?
             set -e
-            # A clean exit that selected no tests (a shard or PR that touches nothing relevant) is fine;
+            # A clean exit that selected no tests (a shard that touches nothing relevant) is fine;
             # any other zero-test report still fails the assert below.
             if [ "$RC" = 0 ] && node -e "process.exit(require('$OUT').numTotalTests === 0 ? 0 : 1)"; then
               echo "$NAME: no tests selected"
@@ -112,11 +155,11 @@ jobs:
             run_vitest frontend --config vitest.config.ts "$SHARD"
           fi
 
-  # Guard tests read source files instead of importing them, so --changed cannot see them: they always run,
-  # in parallel with the shards rather than after them.
+  # Guard tests read source files instead of importing them, so --changed cannot see them: they always run on a PR.
   guards:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -134,29 +177,13 @@ jobs:
         working-directory: fe-next
         env:
           CI: true
-        # Gate on each JSON report, not vitest's exit code: a worker fork can crash at
-        # teardown after every test passed (see assert-vitest-passed.mjs).
         run: |
-          run_vitest() {
-            NAME="$1"; shift
-            OUT="$PWD/vitest-$NAME.json"
-            set +e
-            npx vitest run "$@" --passWithNoTests --reporter=default --reporter=json --outputFile.json="$OUT"
-            RC=$?
-            set -e
-            # A clean exit that selected no tests (a shard or PR that touches nothing relevant) is fine;
-            # any other zero-test report still fails the assert below.
-            if [ "$RC" = 0 ] && node -e "process.exit(require('$OUT').numTotalTests === 0 ? 0 : 1)"; then
-              echo "$NAME: no tests selected"
-              return 0
-            fi
-            node scripts/ci/assert-vitest-passed.mjs "$OUT" "$RC"
-          }
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            run_vitest guards --config vitest.config.ts guard
-          else
-            echo "guards run inside the full shards on dispatch"
-          fi
+          set +e
+          OUT="$PWD/vitest-guards.json"
+          npx vitest run --config vitest.config.ts guard --passWithNoTests --reporter=default --reporter=json --outputFile.json="$OUT"
+          RC=$?
+          set -e
+          node scripts/ci/assert-vitest-passed.mjs "$OUT" "$RC"
 
   backend:
     runs-on: ubuntu-latest
@@ -178,35 +205,39 @@ jobs:
         working-directory: fe-next
         env:
           CI: true
-        # Gate on each JSON report, not vitest's exit code: a worker fork can crash at
-        # teardown after every test passed (see assert-vitest-passed.mjs).
         run: |
-          run_vitest() {
-            NAME="$1"; shift
-            OUT="$PWD/vitest-$NAME.json"
-            set +e
-            npx vitest run "$@" --passWithNoTests --reporter=default --reporter=json --outputFile.json="$OUT"
-            RC=$?
-            set -e
-            # A clean exit that selected no tests (a shard or PR that touches nothing relevant) is fine;
-            # any other zero-test report still fails the assert below.
-            if [ "$RC" = 0 ] && node -e "process.exit(require('$OUT').numTotalTests === 0 ? 0 : 1)"; then
-              echo "$NAME: no tests selected"
-              return 0
-            fi
-            node scripts/ci/assert-vitest-passed.mjs "$OUT" "$RC"
-          }
+          set +e
+          OUT="$PWD/vitest-backend.json"
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            run_vitest backend --config backend/vitest.config.ts --changed HEAD^1
+            npx vitest run --config backend/vitest.config.ts --changed HEAD^1 --passWithNoTests --reporter=default --reporter=json --outputFile.json="$OUT"
           else
-            run_vitest backend --config backend/vitest.config.ts
+            npx vitest run --config backend/vitest.config.ts --reporter=default --reporter=json --outputFile.json="$OUT"
           fi
+          RC=$?
+          set -e
+          if [ "$RC" = 0 ] && node -e "process.exit(require('$OUT').numTotalTests === 0 ? 0 : 1)"; then
+            echo "backend: no tests selected"; exit 0
+          fi
+          node scripts/ci/assert-vitest-passed.mjs "$OUT" "$RC"
 
-  # Branch-protection gate; keep the name.
+  # REQUIRED branch-protection gate; keep the name. Only the quick job: ends in about a minute.
   ci-success:
     runs-on: ubuntu-latest
-    needs: [check, types, test, guards, backend]
+    needs: [quick]
     if: always()
     steps:
       - run: |
-          for r in "${{ needs.check.result }}" "${{ needs.types.result }}" "${{ needs.test.result }}" "${{ needs.guards.result }}" "${{ needs.backend.result }}"; do [[ "$r" == "success" ]] || { echo "❌ failed"; exit 1; }; done
+          [[ "${{ needs.quick.result }}" == "success" ]] || { echo "❌ quick checks failed"; exit 1; }
+
+  # NOT required. Fails the run if any heavy job failed, so the PR shows red and master opens an issue.
+  ci-full:
+    runs-on: ubuntu-latest
+    needs: [quick, lint, types, test, guards, backend]
+    if: always()
+    steps:
+      - run: |
+          for r in "${{ needs.quick.result }}" "${{ needs.lint.result }}" "${{ needs.types.result }}" "${{ needs.test.result }}" "${{ needs.backend.result }}"; do
+            [[ "$r" == "success" ]] || { echo "❌ a full-suite job did not succeed"; exit 1; }
+          done
+          G="${{ needs.guards.result }}"
+          [[ "$G" == "success" || "$G" == "skipped" ]] || { echo "❌ guards failed"; exit 1; }
