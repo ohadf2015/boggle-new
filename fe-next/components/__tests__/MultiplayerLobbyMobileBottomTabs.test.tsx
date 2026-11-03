@@ -151,11 +151,11 @@ describe('Multiplayer Lobby Mobile/Desktop Layout Split', () => {
 
     it('should have exactly one start button per viewport', () => {
       const { unmount } = render(<MusicProvider><HostPreGameView {...defaultHostProps} /></MusicProvider>, { wrapper: createWrapper() });
-      expect(screen.getAllByRole('button', { name: /startBattle/i })).toHaveLength(1);
+      expect(screen.getAllByRole('button', { name: /startBattle|startVsBots/i })).toHaveLength(1);
       unmount();
       setLobbyViewport('phone');
       render(<MusicProvider><HostPreGameView {...defaultHostProps} /></MusicProvider>, { wrapper: createWrapper() });
-      expect(screen.getAllByRole('button', { name: /startBattle/i })).toHaveLength(1);
+      expect(screen.getAllByRole('button', { name: /startBattle|startVsBots/i })).toHaveLength(1);
       expect(screen.queryByTestId('desktop-lobby-layout')).toBeNull();
     });
 

@@ -160,9 +160,8 @@ describe('Multiplayer Desktop Functionality Access', () => {
     it('should have a visible start game button on desktop', () => {
       render(<MusicProvider><HostPreGameView {...defaultHostProps} /></MusicProvider>, { wrapper: createWrapper() });
 
-      // StartButton renders with text from t('hostView.startBattle')
-      // mockT returns the key itself, so button text is 'hostView.startBattle'
-      const startButtons = screen.getAllByRole('button', { name: /startBattle/i });
+      // mockT returns the key, so a lone host sees 'hostView.startVsBots', anyone else 'hostView.startBattle'
+      const startButtons = screen.getAllByRole('button', { name: /startBattle|startVsBots/i });
 
       // Verify at least one start button exists
       expect(startButtons.length).toBeGreaterThanOrEqual(1);
