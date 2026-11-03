@@ -48,8 +48,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       canonical: CANONICAL,
       languages: {
         'x-default': `${BASE_URL}/en/brain-training-word-games`,
-        he: CANONICAL,
-        'he-IL': CANONICAL,
+        he: `${BASE_URL}/he/mischaqey-safa-imun-kogniti`,
+        'he-IL': `${BASE_URL}/he/mischaqey-safa-imun-kogniti`,
       },
     },
     robots: { index: locale === 'he', follow: true },
