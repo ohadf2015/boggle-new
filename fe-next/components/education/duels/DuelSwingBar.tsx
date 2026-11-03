@@ -74,6 +74,7 @@ export function DuelSwingBar({
             {myName}
           </span>
           {myStreak >= 2 && (
+            // eslint-disable-next-line @next/next/no-img-element -- tiny decorative mascot sprite
             <img
               src="/mascot/streak-spark-nobg.webp"
               alt=""
@@ -103,6 +104,7 @@ export function DuelSwingBar({
             {opponentScore}
           </span>
           {opponentStreak >= 2 && (
+            // eslint-disable-next-line @next/next/no-img-element -- tiny decorative mascot sprite
             <img
               data-testid="duel-swing-opponent-fire"
               src="/mascot/streak-inferno-nobg.webp"

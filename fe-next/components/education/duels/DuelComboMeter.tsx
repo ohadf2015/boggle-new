@@ -49,6 +49,7 @@ export function DuelComboMeter({ streak, bonus, className }: DuelComboMeterProps
       )}
     >
       {/* Tier mascot — the art escalates as the chain grows */}
+      {/* eslint-disable-next-line @next/next/no-img-element -- tiny decorative mascot sprite */}
       <img
         src={tier.mascotSrc}
         alt=""
