@@ -28,7 +28,7 @@ const guidesContent: Record<string, {
     guides: [
       { slug: 'classic-strategy', title: 'Classic Mode Strategy', description: 'Learn scanning patterns, time management, and scoring strategies to find more words and score higher.', icon: 'classic' },
       { slug: 'blast-strategy', title: 'Blast Mode Mastery', description: 'Unlock the combo system, master tile effects, and chain your way to massive scores.', icon: 'blast' },
-      { slug: 'word-hunt-strategy', title: 'Word Hunt Strategy', description: 'Master elimination strategy, vowel placement, and clue interpretation to solve puzzles faster.', icon: 'wordHunt' },
+      { slug: 'word-hunt-strategy', title: 'Word Hunt Strategy', description: 'Scan the grid on a route, turn one word into a family, and use board words to crack the hidden target.', icon: 'wordHunt' },
     ],
     faqHeading: 'Common Questions',
     faq: [

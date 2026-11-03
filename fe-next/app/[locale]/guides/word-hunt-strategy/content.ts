@@ -15,123 +15,101 @@ export type GuideContent = {
 
 export const contentByLocale: Record<string, GuideContent> = {
   en: {
-    title: 'Word Hunt Strategy: How I Went From 5 Guesses to Solving in 3',
-    subtitle: 'Real tactics from hundreds of rounds. Opener picks, clue reading tricks, and the traps I kept falling into.',
+    title: 'How to Get Better at Word Hunt: Grid Tips That Actually Help',
+    subtitle: 'How to scan a letter grid, spot word families and keep long words coming, plus what is different in LexiClash Word Hunt.',
     category: 'Strategy',
-    readTime: '8 min read',
+    readTime: '7 min read',
     authorName: 'Ohad Fisher',
-    authorBio: 'I track my stats obsessively. 95% solve rate, 3.2 average attempts. Yes, I have a spreadsheet.',
+    authorBio: 'I build LexiClash and play its grid modes every day.',
     quickTips: [
-      'STARE or CRANE as openers. I flip between them depending on my mood. Both cover the letters that matter.',
-      'Reusing a gray letter is the #1 beginner mistake. I still catch myself doing it when I rush.',
-      'Green = right letter, right spot. Yellow = right letter, wrong spot. Tattoo this on your brain.',
-      'Got a yellow? Dont just move it randomly. Try it in every position you havent tested yet.',
-      'Two good openers with no overlapping letters = 10 letters tested. Thats 40% of the alphabet in 2 guesses.',
-      'Learn the -IGHT, -OUND, -ATCH clusters. Once you spot one, the answer is usually hiding in there.',
-      'Down to 2-3 options? Go with the more common word. The answer is almost never the obscure one.',
+      'Hunt endings first. -ING, -ED, -ER, -EST and a final S turn one word into three.',
+      'Every tile touches up to 8 neighbors, diagonals included. Read the grid in all directions, not just left to right.',
+      'Found a word? Try it with a letter added at the front or the back before you move on.',
+      'Short words are fast points and keep your rhythm. Long words are where the big scores are.',
+      'Rare letters like Q, J, X and Z have few partners. Check them once, then ignore them.',
+      'Trace cleanly. A wrong swipe costs more time than a one-second look before you drag.',
+      'In LexiClash Word Hunt, the hidden target is always on the board, and board words keep you alive while you look for it.',
     ],
     sections: [
       {
-        title: 'So What Actually Is Word Hunt?',
-        content: `If youve played Wordle, you already get it. Word Hunt is LexiClashs take on the formula: guess the hidden word, get color-coded feedback, repeat until you nail it or run out of attempts.
+        title: 'Two games called Word Hunt',
+        content: `Most people searching for Word Hunt tips mean the timed letter-grid game from the GamePigeon pack in iMessage: a small grid of letters, a short clock, and you swipe through touching letters to make as many words as you can. Longer words score more.
 
-Green tile means right letter, right spot. Yellow means the letter is in the word but youve got it in the wrong place. Gray means that letter isnt in the word at all. Simple enough on paper, but the deductive puzzle it creates is genuinely addictive.
+LexiClash has its own Word Hunt mode on the same kind of grid, with a twist. A secret target word is hidden on the board. Your life bar drains every second, and every word you find on the board heals you and lights up clue letters about the target. Trace the target before your life runs out and you win the round.
 
-What makes it different from Classic or Blast mode (where the letters are right there on the board) is that youre working blind. Its pure deduction and vocabulary. I find it way more satisfying when I crack one in 2 tries than anything else in the game, honestly.
-
-Theres a fresh puzzle every day in the Daily Challenge, plus unlimited practice rounds if youre like me and cant stop after just one. Fewer guesses = more points and coins, which is the carrot that turned me from a casual player into someone who genuinely thinks about letter frequency at breakfast.`,
+The grid skills below work for both games. The last two sections are about the LexiClash version.`,
       },
       {
-        title: 'Your Opener Matters More Than You Think',
-        content: `Heres a mistake I made for my first 50+ rounds: I tried to guess the actual word on attempt one. Dont do this. Your first guess isnt about being right. Its about learning as much as possible.
+        title: 'Scan the grid with a system',
+        content: `The most common mistake is staring at one corner. Your eyes lock onto a word you almost see, the clock runs, and the rest of the grid goes unread.
 
-I rotate between STARE and CRANE. Both hit common vowels (A, E) and high-frequency consonants (S, T, R, N) with zero repeated letters. SLATE and ROAST work great too. The point is youre testing the letters that show up in the most English words.
+Give yourself a route. Start at one corner tile and ask what it connects to: up, down, sideways and the four diagonals. Then move to the next tile. You will not check every tile every round, but a route stops you from rereading the same patch.
 
-Think about it: E, T, A, O, I, N, S, R appear in something like 80% of common words. If your opener checks 5 of those, youve immediately got a massive head start.
+Look for common pairs and triples before full words. TH, ST, CH, SH, ER, RE, IN and AN show up everywhere in English. When you see one, try to grow it in both directions: ST can become STAR, REST, STARE or TASTE, depending on what sits around it.
 
-What NOT to open with: TEETH (only tests 3 unique letters, total waste), JAZZY (cool word, terrible opener), or anything with Q, X, or Z. Those letters almost never show up in the answer.
-
-My favorite trick: pair two complementary openers. STARE then COIL gives you 9 unique letters across two guesses and covers all 5 vowels. After those two, I usually know enough to start zeroing in.`,
+Vowels are your anchors. A tile with a vowel in the middle of the grid has the most neighbors and usually sits inside the most words. Start there when you are stuck.`,
       },
       {
-        title: 'Reading the Clues Without Losing Your Mind',
-        content: `OK so youve made your first guess and the colors come back. Heres where most people (including past me) go wrong.
+        title: 'Turn one word into a family',
+        content: `This is the habit that adds the most words per round. When you find a word, do not move on yet. Check for:
 
-Green letters are easy. Lock them in. If S lights up green in position 1, every guess from now on starts with S. No exceptions, no cleverness. Just lock it.
+Plurals and verb endings. If there is an S next to the last letter, you probably have a second word. Same for -ED, -ER and -ING when those letters touch the end of the word.
 
-Yellow letters are where it gets tricky, and where I wasted the most guesses early on. A yellow A in position 2 means two things: A IS in the word, and A is NOT in position 2. The trap is moving it to some random spot. Instead, be methodical. Try position 1, then 3, then 4. Check them off as you go.
+Letters in front. RATE can become CRATE, GRATE or IRATE if the right letter touches the R. LATE can become PLATE or SLATE.
 
-Gray letters are gone. Dead to you. Forget they exist. I cannot tell you how many times Ive caught myself trying an R that I already knew was gray because I wasnt paying attention. If you remember one thing from this guide, its this: never reuse gray letters.
+Words inside the word. If you traced STARE, you also passed through STAR, TAR, ARE and TARE. Each one usually counts on its own.
 
-The real magic happens when you combine everything. Say you know A is yellow from position 2 and R is green in position 4. Now youre looking for _ _ _ R _ with an A somewhere thats not position 2. That constraint alone usually cuts your options down to a handful.`,
+Swaps around a shared core. Once you see -ATE in a corner, every consonant touching the A is a candidate: DATE, GATE, HATE, LATE, MATE.
+
+In a timed round, one find can turn into four or five words this way, and you already know where they are.`,
       },
       {
-        title: 'Narrowing It Down (The Fun Part)',
-        content: `After 2 good guesses, you should have tested around 10 letters. Thats nearly 40% of the alphabet eliminated or confirmed. If you dont feel like the field has narrowed dramatically, your guesses probably had too much overlap.
+        title: 'Short words, long words and the clock',
+        content: `In a timed grid game you are balancing two things: how many words you find and how long they are.
 
-Green letters are the best. Two greens after two guesses means roughly 95% of possibilities for those positions are gone. Its a beautiful feeling.
+Short words (three and four letters) are quick. They keep you moving and stop you freezing at the start of a round. Long words take longer to spot but score far more, so a single six- or seven-letter word can beat a handful of short ones.
 
-This is where I start scribbling (mentally or literally). I take the pattern I know and just list words that fit. Position 1 is S, position 4 is R, A goes somewhere thats not position 2? OK: SHARP, SNARE, SUGAR, SOLAR... then I cross-reference against my gray letters and the list shrinks fast.
+A rhythm that works for a lot of players: clear the obvious short words in the first part of the round to get going, then spend the rest looking for long words built on the endings and families you have already spotted. If you notice yourself hunting for long words with nothing to show for it, drop back to short ones for a few seconds to reset.
 
-Heres a principle that changed my game: every guess should roughly halve your remaining options. If a guess only eliminates one or two words, it wasnt a good guess. You want maximum carnage with each attempt.
-
-When Im down to 2-3 candidates, I go with gut frequency. SHARE before SNARE. SNARE before SCARE. The more common the word feels, the more likely it is to be the answer. The puzzle designers arent trying to stump you with obscure vocab.`,
+Trace accurately. A rejected swipe costs you the time it took, plus the time to find your place again. If you are not sure the letters touch, look for one second before you drag.`,
       },
       {
-        title: 'Getting More Out of Hints and Patterns',
-        content: `Theres a hint system in Word Hunt that reveals an extra letter position, and I have opinions about when to use it.
+        title: 'LexiClash Word Hunt: finding the hidden word',
+        content: `In LexiClash Word Hunt you are looking for one specific word, and the game tells you how long it is. The target is always somewhere on the board, so you are hunting, not guessing blind.
 
-Dont use a hint when you still have 5+ possible words. Another guess will give you way more information than a single letter reveal. Save hints for when youre staring at 2-3 equally plausible candidates and you genuinely cant tell which one it is. Thats when a hint pays for itself.
+Clues come from the words you find. Board words that share letters with the target light up the clue boxes at the top: green means the letter is in that spot, yellow means it is in the word but somewhere else, gray means it is not in the word. The more words you find, the more of the target you can see.
 
-Even without hints, letter frequency is your secret weapon. After the big ones (E, T, A, O, I, N, S, R), the next tier is H, L, D, C, U, M, F, P. If your first two guesses havent touched any of those, make sure guess 3 does.
+Tracing a word that is the same length as the target counts as a guess at it. Shorter words do not use a guess, so they are a free way to collect clues and life.
 
-I keep mental "clusters" of word endings, and this has probably saved me more guesses than anything else. Once I see _IGHT forming, I know Im looking at light/right/sight/might/night/fight/tight and I can usually nail it in one more guess. Same with -OUND (bound/found/hound/mound/pound/round/sound/wound). Build these clusters in your head and you start recognizing patterns almost instantly.
-
-Oh, and double letters. They get me every time. SLEEP, TEETH, LLAMA. If all your guesses come back clean with no doubles, thats actually a signal that the answer might HAVE doubles. Try words with LL, SS, EE, TT. I once spent 4 guesses not considering doubles and felt extremely foolish.`,
+A wrong guess at the target costs you life, so build up a few clues first. Once you have two or three green letters, look at the board for a path that spells a word of the right length with those letters in those spots. The target has to be traceable, which rules out most of the words that fit the clues on paper.`,
       },
       {
-        title: 'Traps I Keep Falling Into (And You Will Too)',
-        content: `I want to be honest: I still fall into some of these. Knowing about them helps, but in the moment, your brain just does what it wants.
+        title: 'LexiClash Word Hunt: staying alive',
+        content: `Your life bar starts full and drains every second, and it drains faster the longer the round goes on. Finding a word on the board heals you, and longer words heal more than short ones.
 
-Tunnel vision. This is the big one. You convince yourself its CRANE, so you try CRANE, CRONE, CRAZE... meanwhile the answer is PLUMB and shares zero letters. If your guess comes back all gray, that means the answer has NOTHING in common with what you tried. Force yourself to think in a completely different direction.
+That changes how you play compared with a plain timed grid. Early in the round, a quick stream of short words keeps your bar safe while the clue boxes fill in. Later, when the drain speeds up, one long word is worth several short ones for the life it gives back.
 
-Rare word syndrome. Ive done it. "Maybe its KNOLL? FJORD?" No. Its almost certainly a word you use in everyday conversation. If you wouldnt say it to a friend, its probably not the answer.
+If your bar gets low, stop hunting for the target and find any words you can until you are safe again. Running out of life ends your round, while the target will still be on the board in ten seconds.
 
-Position fixation. You get a yellow T, try it in position 3, still yellow, try position 3 again because you forgot. Keep a mental (or physical) checklist of where youve tested each yellow letter. I actually mouth the positions to myself: "T not 1, not 3, try 4."
-
-The panic guess. Two guesses left, brain goes blank, you slam in whatever word pops into your head. Stop. Take 10 seconds. Re-read every clue. List every constraint. The answer has to satisfy ALL of them. That moment of calm has saved my solve streak more than once.
-
-Double letter blindness. If E came back yellow once, remember: the word might have TWO Es. I lost a really obvious GEESE once because I assumed one E was enough. Embarrassing, but educational.`,
-      },
-      {
-        title: 'The Tricks That Got Me to a 2-3 Average',
-        content: `This is the stuff that separated "pretty good" from "annoying my friends with my solve rate."
-
-Before I submit a guess, I play out every scenario in my head. If A comes back green, Ill try THIS. Yellow, Ill try THAT. Gray, something else entirely. It sounds slow but it actually speeds you up because youre not sitting there re-analyzing after every result.
-
-I play hard mode even when the game doesnt force it. That means every guess uses all confirmed green and yellow letters. It feels restrictive at first, but it forces you into efficient play. You cant waste a guess on a throwaway word that ignores what you already know.
-
-Frequency-weighted picking. When Ive got 3 candidate words, I dont just pick one randomly. I look at which untested letters are most common in English. If one candidate tests an H and another tests a Z, I go with H every time. Even if that guess is wrong, the feedback will be more useful.
-
-And honestly? Just play a lot. After a few hundred rounds, you start seeing patterns without thinking about them. -ATCH, -OUND, -IGHT, -TION, -NESS. Your brain builds a lookup table over time, and that pattern recognition is what turns a 4-guess average into a 3-guess average. Theres no shortcut for it. But thats also what makes the improvement feel earned.`,
+There is a daily Word Hunt with the same board for everyone, so you can compare with friends, and a live multiplayer version where the first player to trace the target wins the round.`,
       },
     ],
     faq: [
       {
-        question: 'What is the best starting word for Word Hunt in LexiClash?',
-        answer: 'I personally go back and forth between STARE and CRANE. Both hit the most common vowels and consonants without repeating any letters. The whole point of your opener is to learn stuff, not to get lucky and guess right.',
+        question: 'How do I get better at Word Hunt?',
+        answer: 'Scan the grid on a route instead of staring at one spot, hunt common endings like -ING, -ED, -ER and a final S, and when you find a word, check for longer versions of it before moving on. Most improvement comes from finding families of words around the ones you already have.',
       },
       {
-        question: 'How many attempts do I get in Word Hunt?',
-        answer: 'You get a limited number of tries. The fewer guesses you need, the more points and coins you walk away with. The daily puzzle is the same word for everyone, which makes it fun to compare with friends.',
+        question: 'Can you go diagonally in Word Hunt?',
+        answer: 'Yes. On a letter grid each tile connects to the tiles touching it in all 8 directions, including diagonals. You cannot use the same tile twice in one word.',
       },
       {
-        question: 'What do the colors mean in Word Hunt clues?',
-        answer: 'Green = right letter, right position. Yellow = letter is in the word but you put it in the wrong spot. Gray = not in the word at all. Green is great, yellow is useful, gray is information too (now you know what to avoid).',
+        question: 'Should I go for short words or long words?',
+        answer: 'Both. Short words are fast and keep you moving, long words score much more. Many players clear easy short words first, then spend the rest of the round building long words from the endings they have spotted.',
       },
       {
-        question: 'How can I improve my Word Hunt solve rate?',
-        answer: 'Start with a strong opener like STARE or CRANE, never reuse gray letters (seriously, this alone will help), be systematic about testing yellow letters in new positions, and start memorizing word-ending clusters like -IGHT and -OUND. Itll feel slow at first but your average will drop fast.',
+        question: 'How is LexiClash Word Hunt different?',
+        answer: 'It adds a hidden target word to the grid. Your life drains over time, board words heal you and reveal green, yellow and gray clue letters about the target, and you win by tracing the target before your life runs out. You can play it free in the browser, solo as a daily puzzle or live against other players.',
       },
     ],
     ctaText: 'Play Word Hunt',
@@ -139,499 +117,417 @@ And honestly? Just play a lot. After a few hundred rounds, you start seeing patt
     backToGuides: 'Back to Guides',
   },
   he: {
-    title: 'אסטרטגיית ציד מילים: איך ירדתי מ-5 ניחושים לפתרון ב-3',
-    subtitle: 'טקטיקות אמיתיות ממאות סיבובים. בחירת מילה פותחת, טריקים לקריאת רמזים, והמלכודות שנפלתי אליהן שוב ושוב.',
+    title: 'איך להשתפר בציד מילים: טיפים ללוח האותיות שבאמת עוזרים',
+    subtitle: 'איך לסרוק לוח אותיות, לזהות משפחות של מילים ולהמשיך למצוא מילים ארוכות, ומה שונה בציד המילים של LexiClash.',
     category: 'אסטרטגיה',
-    readTime: '8 דקות קריאה',
-    authorName: 'חנון המילים',
-    authorBio: 'אני עוקב אחרי הסטטיסטיקות שלי באובססיביות. 95% פתרון, ממוצע 3.2 ניסיונות. כן, יש לי אקסל.',
+    readTime: '7 דקות קריאה',
+    authorName: 'Ohad Fisher',
+    authorBio: 'אני בונה את LexiClash ומשחק במצבי הלוח שלו כל יום.',
     quickTips: [
-      'אני מחליף בין כמה מילים פותחות טובות בהתאם למצב רוח. שתיהן בודקות את האותיות שחשובות.',
-      'שימוש חוזר באות אפורה זו טעות מספר 1 של מתחילים. אני עדיין תופס את עצמי עושה את זה כשממהר.',
-      'ירוק = אות נכונה, מקום נכון. צהוב = אות נכונה, מקום לא נכון. תקעקעו את זה על המוח.',
-      'קיבלתם צהוב? אל תזיזו את האות סתם. נסו אותה בכל מיקום שטרם בדקתם.',
-      'שתי מילים פותחות טובות בלי אותיות חופפות = 10 אותיות בדוקות. זה 40% מהאלפבית ב-2 ניחושים.',
-      'תלמדו את האשכולות -ים, -ות, -ון, -ית. ברגע שמזהים אחד, התשובה בדרך כלל מסתתרת שם.',
-      'נותרו 2-3 אפשרויות? לכו על המילה הנפוצה יותר. התשובה כמעט אף פעם לא המילה המוזרה.',
+      'חפשו סיומות קודם. ים, ות, ה ו-ת בסוף מילה הופכות מילה אחת לכמה: ספר וספרים, תלמיד ותלמידה.',
+      'כל אות נוגעת בעד 8 שכנות, כולל באלכסון. קראו את הלוח לכל הכיוונים, לא רק מימין לשמאל.',
+      'מצאתם מילה? לפני שממשיכים, בדקו אם אפשר להוסיף לה אות בהתחלה או בסוף.',
+      'מילים קצרות נותנות נקודות מהירות ושומרות על הקצב. הניקוד הגדול נמצא במילים הארוכות.',
+      'לאותיות פחות נפוצות כמו ז, ט ו-צ יש מעט שותפות. בדקו אותן פעם אחת ותמשיכו הלאה.',
+      'סמנו בדיוק. החלקה שגויה עולה יותר זמן משנייה של מבט לפני שגוררים.',
+      'בציד המילים של LexiClash מילת המטרה תמיד נמצאת על הלוח, והמילים שאתם מוצאים בדרך שומרות אתכם בחיים בזמן שאתם מחפשים אותה.',
     ],
     sections: [
       {
-        title: 'אז מה זה בעצם ציד מילים?',
-        content: `אם שיחקתם וורדל, אתם כבר מבינים. ציד מילים זה הגרסה של לקסיקלאש לנוסחה: נחשו את המילה הנסתרת, קבלו משוב צבעוני, חזרו על זה עד שפוצחים או שנגמרים הניסיונות.
+        title: 'שני משחקים שנקראים Word Hunt',
+        content: `רוב מי שמחפש טיפים ל-Word Hunt מתכוון למשחק לוח האותיות עם השעון מחבילת GamePigeon ב-iMessage. גם בארץ קוראים לו פשוט Word Hunt: לוח קטן של אותיות, מעט זמן, ומחליקים על אותיות סמוכות כדי ליצור כמה שיותר מילים. מילה ארוכה יותר שווה יותר נקודות.
 
-אריח ירוק אומר אות נכונה, מקום נכון. צהוב אומר שהאות נמצאת במילה אבל שמתם אותה במקום הלא נכון. אפור אומר שהאות לא נמצאת במילה בכלל. פשוט על הנייר, אבל הפאזל הדדוקטיבי שזה יוצר ממכר ברמות מטורפות.
+ב-LexiClash יש מצב משלו בשם ציד מילים, על אותו סוג של לוח, עם טוויסט. על הלוח מסתתרת מילת מטרה סודית. פס החיים שלכם יורד כל שנייה, וכל מילה שאתם מוצאים על הלוח מרפאת אתכם ומדליקה רמזים על מילת המטרה. סמנו את המטרה על הלוח לפני שהחיים נגמרים, והסיבוב שלכם.
 
-מה שהופך את זה לשונה ממצב קלאסי או בלאסט (שם האותיות נמצאות שם על הלוח) הוא שעובדים בעיוורון. זה דדוקציה טהורה ואוצר מילים. אני מרגיש הרבה יותר סיפוק כשפוצח אחד ב-2 ניסיונות מאשר כל דבר אחר במשחק, בכנות.
-
-יש חידה חדשה כל יום באתגר היומי, פלוס סיבובי תרגול בלתי מוגבלים למי שכמוני ולא יכול לעצור אחרי אחד. פחות ניחושים = יותר נקודות ומטבעות, שזה הגזר שהפך אותי משחקן מזדמן למישהו שבאמת חושב על תדירות אותיות בארוחת בוקר.`,
+הטיפים על הלוח מתאימים לשני המשחקים. שני החלקים האחרונים עוסקים בגרסה של LexiClash.`,
       },
       {
-        title: 'המילה הפותחת חשובה יותר ממה שחושבים',
-        content: `הנה טעות שעשיתי ב-50+ הסיבובים הראשונים: ניסיתי לנחש את המילה בפועל בניסיון הראשון. אל תעשו את זה. הניחוש הראשון הוא לא בשביל לצדוק. הוא בשביל ללמוד כמה שיותר.
+        title: 'לסרוק את הלוח בשיטה',
+        content: `הטעות הכי נפוצה היא להיתקע על פינה אחת. העין ננעלת על מילה שכמעט רואים, השעון רץ, ושאר הלוח נשאר בלי שקראתם אותו.
 
-אני מחליף בין כמה מילים פותחות שבודקות תנועות נפוצות ועיצורים בתדירות גבוהה בלי אותיות חוזרות. העיקר הוא שבודקים את האותיות שמופיעות בהכי הרבה מילים.
+תנו לעצמכם מסלול. התחילו מאות בפינה ובדקו לאן היא מתחברת: למעלה, למטה, לצדדים ולארבעת האלכסונים. אחר כך עברו לאות הבאה. לא תספיקו לבדוק כל אות בכל סיבוב, אבל מסלול מונע מכם לקרוא שוב ושוב את אותו אזור.
 
-חשבו על זה: יש אותיות שמופיעות בבערך 80% מהמילים הנפוצות. אם המילה הפותחת שלכם בודקת 5 מהן, יש לכם מיד יתרון מסיבי.
+חפשו צירופים מוכרים לפני מילים שלמות. בעברית כדאי לחשוב בשורשים: אם ראיתם כ, ת ו-ב צמודות, נסו כתב, מכתב, כתבה וכתיבה, לפי מה שנמצא מסביב. אותו דבר עם ש-מ-ר (שמר, שומר, משמר) או ל-מ-ד (למד, מלמד, תלמיד).
 
-עם מה לא לפתוח: מילים עם אותיות כפולות (בודקות פחות אותיות ייחודיות, בזבוז), מילים עם אותיות נדירות, או כל דבר שלא תואם את אורך היעד.
-
-הטריק האהוב עליי: לשלב שתי מילים פותחות משלימות. שתי מילים בלי חפיפה נותנות 9-10 אותיות ייחודיות על פני שני ניחושים. אחרי שתיהן, בדרך כלל יש לי מספיק מידע להתחיל לצמצם.`,
+האותיות א, ה, ו ו-י הן העוגנים. בעברית הן ממלאות הרבה פעמים את תפקיד התנועות, ואות כזאת באמצע הלוח נוגעת בהכי הרבה שכנות ובדרך כלל נמצאת בתוך הכי הרבה מילים. כשנתקעים, התחילו משם.`,
       },
       {
-        title: 'לקרוא את הרמזים בלי לאבד את השפיות',
-        content: `אוקיי אז עשיתם את הניחוש הראשון והצבעים חוזרים. הנה איפה רוב האנשים (כולל אני בעבר) טועים.
+        title: 'להפוך מילה אחת למשפחה',
+        content: `זה ההרגל שמוסיף הכי הרבה מילים לסיבוב. מצאתם מילה? אל תמשיכו עדיין. בדקו:
 
-אותיות ירוקות קלות. נועלים אותן. אם ש נדלקת ירוקה במיקום 1, כל ניחוש מעכשיו מתחיל ב-ש. בלי חריגים, בלי יצירתיות. פשוט לנעול.
+רבים ורבות. אם ים או ות נוגעות בסוף המילה, כנראה יש לכם עוד מילה: ספר וספרים, דלת ודלתות. שימו לב שלפעמים אות נופלת בדרך, כמו מילה שהופכת למילים.
 
-אותיות צהובות זה איפה שזה נהיה מסובך, ואיפה שבזבזתי הכי הרבה ניחושים בהתחלה. א צהובה במיקום 2 אומרת שני דברים: א כן נמצאת במילה, ו-א לא נמצאת במיקום 2. המלכודת היא להזיז אותה למיקום אקראי. במקום, תהיו שיטתיים. נסו מיקום 1, אז 3, אז 4. תסמנו תוך כדי.
+זכר ונקבה. תלמיד ותלמידה, גנן וגננת. ה או ת שנוגעות בסוף המילה פותחות עוד מילה.
 
-אותיות אפורות נעלמו. מתות בשבילכם. תשכחו שהן קיימות. אני לא יכול לספר כמה פעמים תפסתי את עצמי מנסה ר שכבר ידעתי שהיא אפורה כי לא שמתי לב. אם תזכרו דבר אחד מהמדריך הזה, זה: לעולם אל תשתמשו שוב באות אפורה.
+אותיות בהתחלה. הרבה שמות עצם נבנים מהשורש עם מ בהתחלה: גדל ומגדל, כתב ומכתב, חשב ומחשב. גם ה, ו, ב, ל ו-ש נפוצות מאוד בתחילת מילים, אז כדאי לבדוק מה נוגע באות הראשונה.
 
-הקסם האמיתי קורה כשמשלבים הכל. נגיד שאתם יודעים ש-א צהובה ממיקום 2 ו-ר ירוקה במיקום 4. עכשיו מחפשים _ _ _ ר _ עם א במקום שזה לא מיקום 2. המגבלה הזו לבד בדרך כלל מצמצמת את האפשרויות לקומץ.`,
+מילים בתוך המילה. מכתב מכיל את כתב, ותלמידה מכילה את תלמיד. כל אחת נחשבת בדרך כלל מילה בפני עצמה.
+
+החלפות סביב גרעין משותף. ראיתם ור באיזו פינה? כל אות שנוגעת ב-ו היא מועמדת: אור, בור, דור, שור, תור.
+
+בסיבוב עם שעון, מציאה אחת יכולה להפוך כך לארבע או חמש מילים, ואתם כבר יודעים איפה הן.`,
       },
       {
-        title: 'לצמצם את זה (החלק הכיפי)',
-        content: `אחרי 2 ניחושים טובים, הייתם צריכים לבדוק בערך 10 אותיות. זה כמעט 40% מהאלפבית שנפסלו או אושרו. אם לא מרגיש שהשדה הצטמצם דרמטית, כנראה שהניחושים שלכם חפפו יותר מדי.
+        title: 'מילים קצרות, מילים ארוכות והשעון',
+        content: `במשחק לוח עם שעון אתם מאזנים בין שני דברים: כמה מילים מצאתם וכמה הן ארוכות.
 
-אותיות ירוקות הן הכי טובות. שתי ירוקות אחרי שני ניחושים אומר שבערך 95% מהאפשרויות למיקומים האלה נפסלו. תחושה מדהימה.
+מילים קצרות, של שלוש וארבע אותיות, נמצאות מהר. הן שומרות אתכם בתנועה ולא נותנות לכם לקפוא בתחילת הסיבוב. מילים ארוכות לוקח יותר זמן לראות, אבל הן שוות הרבה יותר, כך שמילה אחת של שש או שבע אותיות יכולה לנצח חופן של קצרות.
 
-פה אני מתחיל לשרבט (מנטלית או ממש). לוקח את הדפוס שאני יודע ופשוט מפרט מילים שמתאימות. מיקום 1 זה ש, מיקום 4 זה ר, א הולכת למקום שזה לא מיקום 2? אוקיי: שמירה, שעורה, שחררה... אז מצליבים עם האותיות האפורות והרשימה מצטמצמת מהר.
+קצב שעובד להרבה שחקנים: קודם לנקות את המילים הקצרות הברורות כדי להתחמם, ואז להקדיש את שאר הזמן למילים ארוכות שנבנות על הסיומות והמשפחות שכבר זיהיתם. אם אתם מרגישים שאתם מחפשים מילים ארוכות ולא מוצאים כלום, חזרו לכמה שניות למילים קצרות כדי לאפס את הראש.
 
-הנה עיקרון ששינה לי את המשחק: כל ניחוש צריך לצמצם בערך חצי מהאפשרויות שנשארו. אם ניחוש מבטל רק מילה אחת או שתיים, הוא לא היה ניחוש טוב. רוצים טבח מקסימלי עם כל ניסיון.
-
-כשנשארים עם 2-3 מועמדים, אני הולך עם תחושת תדירות. מילה נפוצה לפני מילה נדירה. מעצבי החידות לא מנסים לתקוע אתכם עם אוצר מילים אקזוטי.`,
+סמנו בדיוק. החלקה שנדחתה עולה לכם את הזמן שלקחה, ועוד את הזמן שלוקח למצוא שוב את המקום. אם אתם לא בטוחים שהאותיות נוגעות, הסתכלו שנייה לפני שגוררים.`,
       },
       {
-        title: 'להוציא יותר מרמזים ודפוסים',
-        content: `יש מערכת רמזים בציד מילים שחושפת מיקום אות נוסף, ויש לי דעות לגבי מתי להשתמש בזה.
+        title: 'ציד מילים ב-LexiClash: למצוא את המילה הנסתרת',
+        content: `בציד המילים של LexiClash אתם מחפשים מילה אחת מסוימת, והמשחק מראה לכם כמה אותיות יש בה. המטרה תמיד נמצאת איפשהו על הלוח, כך שאתם צדים ולא מנחשים בעיוורון.
 
-אל תשתמשו ברמז כשעדיין יש 5+ מילים אפשריות. ניחוש נוסף ייתן הרבה יותר מידע מחשיפת אות אחת. תשמרו רמזים לכשבוהים ב-2-3 מועמדים שווים ובאמת אי אפשר לדעת מי מהם. שם רמז משלם על עצמו.
+הרמזים מגיעים מהמילים שאתם מוצאים. מילים מהלוח שיש להן אותיות משותפות עם המטרה מדליקות את תיבות הרמז למעלה: ירוק אומר שהאות במקום הנכון, צהוב אומר שהיא במילה אבל במקום אחר, ואפור אומר שהיא לא במילה. ככל שתמצאו יותר מילים, תראו יותר מהמטרה.
 
-גם בלי רמזים, תדירות אותיות היא הנשק הסודי שלכם. אחרי האותיות הגדולות, השכבה הבאה היא ל, ד, כ, מ, פ. אם שני הניחושים הראשונים לא נגעו באלה, תוודאו שניחוש 3 כן.
+מילה שסימנתם באורך של המטרה נחשבת ניחוש. מילים קצרות יותר לא נחשבות ניחוש, אז הן דרך חינמית לאסוף רמזים וחיים.
 
-אני שומר "אשכולות" מנטליים של סיומות מילים, וזה כנראה חסך לי יותר ניחושים מכל דבר אחר. ברגע שרואים _ות מתגבש, יודעים שמחפשים משהו כמו שמירות/ברכות/מתנות ובדרך כלל אפשר לסגור את זה בעוד ניחוש. אותו דבר עם -ים, -ון, -ית. בנו את האשכולות האלה בראש ותתחילו לזהות דפוסים כמעט מיידית.
-
-אה, ואותיות כפולות. הן תופסות אותי כל פעם. אם כל הניחושים חוזרים נקיים בלי כפולות, זה דווקא סימן שלתשובה אולי יש כפולות. לקח לי חודשים להבין את זה.`,
+ניחוש שגוי עולה לכם בחיים, אז כדאי לאסוף קודם כמה רמזים. כשיש לכם שתיים או שלוש אותיות ירוקות, חפשו על הלוח מסלול שיוצר מילה באורך הנכון עם האותיות האלה במקומות האלה. המטרה חייבת להיות מילה שאפשר לסמן על הלוח, וזה פוסל את רוב המילים שמתאימות לרמזים רק על הנייר.`,
       },
       {
-        title: 'מלכודות שאני ממשיך ליפול אליהן (וגם אתם)',
-        content: `אני רוצה להיות כנה: אני עדיין נופל לחלק מאלה. לדעת עליהן עוזר, אבל ברגע האמת, המוח פשוט עושה מה שהוא רוצה.
+        title: 'ציד מילים ב-LexiClash: להישאר בחיים',
+        content: `פס החיים מתחיל מלא ויורד כל שנייה, וככל שהסיבוב נמשך הוא יורד מהר יותר. כל מילה שאתם מוצאים על הלוח מרפאת אתכם, ומילים ארוכות מרפאות יותר מקצרות.
 
-ראיית מנהרה. זו הגדולה. משכנעים את עצמכם שזה בטוח מילה ספציפית, אז מנסים את זה, וריאציה, עוד וריאציה... בינתיים התשובה היא משהו אחר לגמרי שלא חולק אף אות. אם הניחוש חוזר כולו אפור, זה אומר שלתשובה אין שום דבר משותף עם מה שניסיתם. תכריחו את עצמכם לחשוב בכיוון אחר לגמרי.
+זה משנה את המשחק לעומת לוח רגיל עם שעון. בתחילת הסיבוב, רצף מהיר של מילים קצרות שומר על הפס בזמן שתיבות הרמז מתמלאות. בהמשך, כשהירידה מואצת, מילה ארוכה אחת שווה כמה קצרות בזכות החיים שהיא מחזירה.
 
-סינדרום המילה הנדירה. עשיתי את זה. "אולי זה קוקייה? פלפלון?" לא. זו כמעט בוודאות מילה שמשתמשים בה בשיחה יומיומית. אם לא הייתם אומרים את זה לחבר, זו כנראה לא התשובה.
+אם הפס נמוך, עזבו לרגע את המטרה ומצאו כל מילה שאפשר עד שאתם שוב בטוחים. כשהחיים נגמרים הסיבוב נגמר, והמטרה תחכה לכם על הלוח גם בעוד עשר שניות.
 
-קיבוע מיקום. מקבלים ת צהובה, מנסים אותה במיקום 3, עדיין צהובה, מנסים מיקום 3 שוב כי שכחתם. תשמרו צ'קליסט מנטלי (או פיזי) של איפה בדקתם כל אות צהובה. אני ממש ממלמל לעצמי את המיקומים: "ת לא 1, לא 3, ננסה 4."
-
-ניחוש הפאניקה. נשארו שני ניחושים, המוח מתרוקן, דוחפים פנימה את המילה הראשונה שקופצת לראש. עצרו. קחו 10 שניות. קראו מחדש כל רמז. פרטו כל מגבלה. התשובה חייבת לענות על כולן. הרגע הזה של רוגע הציל לי את רצף הפתרונות יותר מפעם אחת.
-
-עיוורון אותיות כפולות. אם א חזרה צהובה פעם, זכרו: אולי יש שתי אותיות א במילה. פעם הפסדתי מילה ממש ברורה כי הנחתי שמספיק א אחת. מביך, אבל לימודי.`,
-      },
-      {
-        title: 'הטריקים שהורידו אותי לממוצע 2-3',
-        content: `זה המאטריאל שהפריד בין "די טוב" ל"מעצבן את החברים עם אחוז הפתרון שלי."
-
-לפני שאני מגיש ניחוש, אני מנגן בראש כל תרחיש. אם א חוזרת ירוקה, אנסה את זה. צהובה, אנסה את זה. אפורה, משהו אחר לגמרי. נשמע איטי אבל זה בעצם מזרז אתכם כי לא יושבים שם ומנתחים מחדש אחרי כל תוצאה.
-
-אני משחק מצב קשה גם כשהמשחק לא מכריח. זה אומר שכל ניחוש משתמש בכל האותיות הירוקות והצהובות שכבר אושרו. מרגיש מגביל בהתחלה, אבל זה מכריח משחק יעיל. אי אפשר לבזבז ניחוש על מילה זריקה שמתעלמת ממה שכבר יודעים.
-
-בחירה משוקללת תדירות. כשיש 3 מילים מועמדות, אני לא בוחר אחת באקראי. מסתכל אילו אותיות שטרם נבדקו הכי נפוצות. אם מועמד אחד בודק ל ואחר בודק ץ, אני הולך עם ל כל פעם. גם אם הניחוש לא נכון, המשוב יהיה שימושי יותר.
-
-ובכנות? פשוט תשחקו הרבה. אחרי כמה מאות סיבובים, מתחילים לראות דפוסים בלי לחשוב עליהם. -ות, -ים, -ון, -ית, -ות. המוח בונה טבלת חיפוש לאורך הזמן, וזיהוי הדפוסים הזה הוא מה שהופך ממוצע 4 ניחושים לממוצע 3. אין לזה קיצור דרך. אבל בדיוק בגלל זה ההתקדמות מרגישה מגיעה.`,
+יש ציד מילים יומי עם אותו לוח לכולם, כדי שתוכלו להשוות עם חברים, וגרסה מרובת משתתפים בלייב שבה מי שמסמן ראשון את המטרה מנצח בסיבוב.`,
       },
     ],
     faq: [
       {
-        question: 'מהי מילת הפתיחה הטובה ביותר לציד מילים בלקסיקלאש?',
-        answer: 'אני אישית מחליף בין כמה מילים טובות שבודקות את התנועות והעיצורים הנפוצים ביותר בלי אותיות חוזרות. כל העניין של המילה הפותחת הוא ללמוד דברים, לא להצליח בניחוש מזל.',
+        question: 'איך משתפרים ב-Word Hunt?',
+        answer: 'סרקו את הלוח במסלול במקום להיתקע על נקודה אחת, חפשו סיומות נפוצות כמו ים, ות ו-ה, וכשמצאתם מילה בדקו גרסאות ארוכות שלה לפני שממשיכים. רוב השיפור מגיע ממציאת משפחות של מילים סביב אלה שכבר מצאתם.',
       },
       {
-        question: 'כמה ניסיונות יש בציד מילים?',
-        answer: 'יש מספר מוגבל של ניסיונות. ככל שצריכים פחות ניחושים, מקבלים יותר נקודות ומטבעות. החידה היומית היא אותה מילה לכולם, מה שהופך את זה לכיף להשוות עם חברים.',
+        question: 'אפשר ללכת באלכסון ב-Word Hunt?',
+        answer: 'כן. בלוח אותיות כל משבצת מתחברת למשבצות שנוגעות בה בכל 8 הכיוונים, כולל אלכסונים. אי אפשר להשתמש באותה משבצת פעמיים באותה מילה.',
       },
       {
-        question: 'מה המשמעות של הצבעים ברמזי ציד מילים?',
-        answer: 'ירוק = אות נכונה, מיקום נכון. צהוב = האות נמצאת במילה אבל שמתם אותה במקום לא נכון. אפור = לא נמצאת במילה בכלל. ירוק זה מעולה, צהוב זה שימושי, אפור זה גם מידע (עכשיו יודעים מה להימנע ממנו).',
+        question: 'עדיף ללכת על מילים קצרות או ארוכות?',
+        answer: 'גם וגם. מילים קצרות נמצאות מהר ושומרות על הקצב, ארוכות שוות הרבה יותר. הרבה שחקנים מנקים קודם את הקצרות הקלות, ואז מקדישים את שאר הסיבוב לבניית מילים ארוכות מהסיומות שזיהו.',
       },
       {
-        question: 'איך אפשר לשפר את שיעור הפתרון בציד מילים?',
-        answer: 'תתחילו עם מילה פותחת חזקה, לעולם אל תשתמשו שוב באותיות אפורות (ברצינות, רק זה לבד יעזור), תהיו שיטתיים בבדיקת אותיות צהובות במיקומים חדשים, ותתחילו לשנן אשכולות סיומות כמו -ים ו-ות. ירגיש איטי בהתחלה אבל הממוצע יירד מהר.',
+        question: 'מה שונה בציד המילים של LexiClash?',
+        answer: 'יש בו מילת מטרה נסתרת על הלוח. החיים שלכם יורדים עם הזמן, מילים מהלוח מרפאות אתכם וחושפות רמזים בירוק, בצהוב ובאפור על המטרה, ומנצחים כשמסמנים את המטרה לפני שהחיים נגמרים. אפשר לשחק בחינם בדפדפן, לבד כפאזל יומי או בלייב מול שחקנים אחרים.',
       },
     ],
-    ctaText: 'יאללה לשחק ציד מילים',
+    ctaText: 'לשחק ציד מילים',
     ctaLink: '/daily',
     backToGuides: 'חזרה למדריכים',
   },
   sv: {
-    title: 'Word Hunt Strategi: Hur Jag Gick Från 5 Försök till Att Lösa På 3',
-    subtitle: 'Riktiga taktiker från hundratals rundor. Val av öppnare, ledtrådsknep och fallorna jag hela tiden gick i.',
+    title: 'Bli bättre på Word Hunt: tips för rutnätet som faktiskt hjälper',
+    subtitle: 'Så läser du av ett bokstavsrutnät, hittar ordfamiljer och fortsätter hitta långa ord, och vad som är annorlunda i Ordjakt på LexiClash.',
     category: 'Strategi',
-    readTime: '8 min läsning',
-    authorName: 'Ordnörden',
-    authorBio: 'Jag följer min statistik besatt. 95% lösningsgrad, 3.2 i genomsnitt. Ja, jag har ett kalkylark.',
+    readTime: '7 min läsning',
+    authorName: 'Ohad Fisher',
+    authorBio: 'Jag bygger LexiClash och spelar rutnätslägena i spelet varje dag.',
     quickTips: [
-      'STARE eller CRANE som öppnare. Jag växlar mellan dem beroende på humor. Båda träffar bokstaverna som spelar roll.',
-      'Att återanvända en grå bokstav är det största nybörjarmisstaget. Jag ertappar mig fortfarande med det när jag stressar.',
-      'Grönt = rätt bokstav, rätt plats. Gult = rätt bokstav, fel plats. Tatuera det på hjärnan.',
-      'Fick du en gul? Flytta den inte slumpmässigt. Prova den i varje position du inte testat än.',
-      'Två bra öppnare utan överlappande bokstäver = 10 testade bokstäver. Det är 40% av alfabetet på 2 gissningar.',
-      'Lär dig -IGHT, -OUND, -ATCH-klustren. När du ser ett är svaret oftast gömt där.',
-      'Nere på 2-3 alternativ? Gå med det vanligare ordet. Svaret är nästan aldrig det obskyra.',
+      'Leta efter ändelser först. -en, -et, -na, -ar, -or och -er gör ett ord till flera: bil, bilen, bilar, bilarna.',
+      'Varje bricka har upp till 8 grannar, diagonalerna inräknade. Läs rutnätet åt alla håll, inte bara från vänster till höger.',
+      'Hittat ett ord? Testa att sätta en bokstav före eller efter innan du går vidare.',
+      'Korta ord ger snabba poäng och håller tempot uppe. De stora poängen finns i de långa orden.',
+      'Ovanliga bokstäver som Q, W, X och Z har få partner. Kolla dem en gång och släpp dem sedan.',
+      'Svep noggrant. Ett felsvep kostar mer tid än att titta en sekund innan du drar.',
+      'I Ordjakt på LexiClash finns det dolda målordet alltid på brädet, och orden du hittar på vägen håller dig vid liv medan du letar.',
     ],
     sections: [
       {
-        title: 'Så Vad Är Egentligen Word Hunt?',
-        content: `Om du spelat Wordle fattar du redan grejen. Word Hunt är LexiClashs variant på formeln: gissa det dolda ordet, få färgkodad feedback, upprepa tills du når det eller kör slut på försök.
+        title: 'Två spel som heter Word Hunt',
+        content: `De flesta som söker tips om Word Hunt menar det tidsbegränsade bokstavsspelet i GamePigeon-paketet i iMessage. Det heter Word Hunt även på svenska: ett litet rutnät med bokstäver, en kort klocka, och du sveper över bokstäver som ligger intill varandra för att bilda så många ord som möjligt. Längre ord ger mer poäng.
 
-Grön platta betyder rätt bokstav, rätt plats. Gul betyder att bokstaven finns i ordet men du har den på fel ställe. Grå betyder att bokstaven inte finns i ordet alls. Enkelt på pappret, men det deduktiva pusslet det skapar är genuint beroendeframkallande.
+LexiClash har ett eget läge, Ordjakt, på samma sorts rutnät men med en twist. Ett hemligt målord är gömt på brädet. Din livmätare töms varje sekund, och varje ord du hittar på brädet ger dig liv tillbaka och tänder ledtrådsbokstäver om målordet. Svep målordet innan livet tar slut så vinner du rundan.
 
-Det som skiljer det från Klassiskt eller Blast-läge (där bokstaverna ligger framför dig på brädet) är att du jobbar i blindo. Det är ren deduktion och ordförråd. Jag tycker ärligt talat att det är mycket mer tillfredsställande när jag knacker ett på 2 försök än något annat i spelet.
-
-Det finns ett farskt pussel varje dag i Dagliga Utmaningen, plus obegransade övningsrundor om du är som jag och inte kan sluta efter bara ett. Färre gissningar = mer poäng och mynt, vilket är moroten som förvandlade mig från en casual spelare till någon som genuint tänker på bokstavsfrekvens vid frukosten.`,
+Tipsen om rutnätet nedan fungerar i båda spelen. De två sista avsnitten handlar om LexiClash-versionen.`,
       },
       {
-        title: 'Din Öppnare Spelar Större Roll Än Du Tror',
-        content: `Här är ett misstag jag gjorde mina första 50+ rundor: jag försökte gissa det riktiga ordet på försök ett. Gör inte det. Din första gissning handlar inte om att ha rätt. Den handlar om att lära sig så mycket som möjligt.
+        title: 'Läs av rutnätet med en metod',
+        content: `Det vanligaste misstaget är att stirra på ett hörn. Blicken fastnar på ett ord du nästan ser, klockan tickar och resten av rutnätet blir aldrig läst.
 
-Jag växlar mellan STARE och CRANE. Båda träffar vanliga vokaler (A, E) och hogfrekventa konsonanter (S, T, R, N) utan upprepade bokstäver. SLATE och ROAST funkar också bra. Poängen är att du testar bokstaverna som dyker upp i flest ord.
+Ge dig själv en rutt. Börja i en hörnbricka och se vad den hänger ihop med: uppåt, nedåt, åt sidorna och de fyra diagonalerna. Gå sedan vidare till nästa bricka. Du hinner inte kolla varje bricka varje runda, men med en rutt slipper du läsa samma hörna om och om igen.
 
-Tänk på det: E, T, A, O, I, N, S, R forekommer i något i stil med 80% av alla vanliga ord. Om din öppnare testar 5 av dem här du omedelbart ett massivt forsprang.
+Leta efter vanliga bokstavspar och bokstavsgrupper innan du letar efter hela ord. ST, SK, SP, TR, ER, EN, AR och OR finns överallt i svenskan. När du ser en av dem, försök bygga ut den åt båda hållen: ST kan bli STOR, STEN, BÄST eller REST, beroende på vad som ligger runt omkring.
 
-Vad du INTE ska öppna med: TEETH (testar bara 3 unika bokstäver, totalt slaseri), JAZZY (coolt ord, hemsk öppnare), eller något med Q, X eller Z. De bokstaverna dyker nästan aldrig upp i svaret.
-
-Mitt favorittrick: para ihop två kompletterande öppnare. STARE sen COIL ger dig 9 unika bokstäver över två gissningar och täcker alla 5 vokaler. Efter de två vet jag oftast tillräckligt för att börja ringa in.`,
+Vokalerna är dina ankare, och i svenskan hör Å, Ä och Ö dit. En vokal mitt i rutnätet har flest grannar och sitter oftast i flest ord. Börja där när du kör fast.`,
       },
       {
-        title: 'Att Lasa Ledtradarna Utan Att Tappa Förståndet',
-        content: `OK så du här gjort din första gissning och färgerna kommer tillbaka. Här är där de flesta (inklusive gamla jag) går fel.
+        title: 'Gör ett ord till en familj',
+        content: `Det här är vanan som ger flest extra ord per runda. När du hittar ett ord, gå inte vidare direkt. Kolla efter:
 
-Grona bokstäver är lätta. Läs dem. Om S lyser grönt på position 1 börjar varje gissning harifrån med S. Inga undantag, inget smarthetförsök. Bara läs den.
+Bestämd form och plural. Svenska ord växer med ändelser. BIL blir BILEN, BILAR och BILARNA. HUS blir HUSET och HUSEN. FLICKA blir FLICKOR och FLICKORNA. Ligger rätt bokstäver intill slutet av ordet har du troligen ett ord till.
 
-Gula bokstäver är där det blir klurigare, och där jag slösade flest gissningar i början. Ett gult A på position 2 betyder två saker: A FINNS i ordet, och A är INTE på position 2. Fallan är att flytta det till något slumpmässigt ställe. Var istället metodisk. Prova position 1, sen 3, sen 4. Bocka av när du går.
+Bokstäver framför. ARM kan bli VARM eller LARM om rätt bokstav ligger intill A:et. ÖRA kan bli HÖRA eller KÖRA.
 
-Grå bokstäver är borta. Doda för dig. Glöm att de existerar. Jag kan inte beskriva hur många gånger jag ertappat mig med att prova ett R som jag redan visste var gråt för att jag inte var uppmärksam. Om du minns en sak från den här guiden så är det det här: återanvänd aldrig grå bokstäver.
+Sammansättningar. Svenskan bygger gärna ihop ord. Hittar du SOL, kolla om ROS ligger intill så att det blir SOLROS. Långa sammansättningar ryms sällan på ett litet bräde, men korta är värda att leta efter.
 
-Den riktiga magin händer när du kombinerar allt. Sag att du vet att A är gult från position 2 och R är grönt på position 4. Nu letar du efter _ _ _ R _ med ett A någonstans som inte är position 2. Den begränsningen ensam brukar skara ner alternativen till en handfull.`,
+Ord inuti ordet. Om du drog STRAND passerade du också RAND och AND. Vart och ett räknas oftast för sig.
+
+Byten kring en gemensam kärna. Ser du -AND i ett hörn är varje konsonant som ligger intill A:et en kandidat: BAND, HAND, LAND, SAND.
+
+I en runda med klocka kan ett fynd bli fyra eller fem ord på det här sättet, och du vet redan var de ligger.`,
       },
       {
-        title: 'Att Begränsa Alternativen (Den Roliga Delen)',
-        content: `Efter 2 bra gissningar borde du ha testat runt 10 bokstäver. Det är nästan 40% av alfabetet eliminerat eller bekraftat. Om det inte känns som att faltet här smalnat dramatiskt hade dina gissningar förmodligen för mycket överlapp.
+        title: 'Korta ord, långa ord och klockan',
+        content: `I ett rutnätsspel med klocka väger du två saker mot varandra: hur många ord du hittar och hur långa de är.
 
-Grona bokstäver är det bästa. Två grona efter två gissningar betyder att ungefär 95% av möjligheterna för de positionerna är borta. Det är en underbar känsla.
+Korta ord, med tre eller fyra bokstäver, går snabbt. De håller dig igång och gör att du inte låser dig i början av rundan. Långa ord tar längre tid att se men ger betydligt mer, så ett enda ord på sex eller sju bokstäver kan slå en handfull korta.
 
-Det är här jag börjar klottra (mentalt eller bokstavligen). Jag tar mönstret jag vet och listar bara ord som passar. Position 1 är S, position 4 är R, A går någonstans som inte är position 2? OK: SHARP, SNARE, SUGAR, SOLAR... sen korskontrollerar jag mot mina grå bokstäver och listan krymper snabbt.
+En rytm som funkar för många: ta de uppenbara korta orden först för att komma igång, och lägg sedan resten av tiden på långa ord som bygger på ändelserna och familjerna du redan har sett. Märker du att du jagar långa ord utan att något händer, gå tillbaka till korta ord i några sekunder för att komma ur det.
 
-Här är en princip som ändrade mitt spel: varje gissning borde ungefär halvera dina återstående alternativ. Om en gissning bara eliminerar ett eller två ord var det inte en bra gissning. Du vill maximal förödelse med varje försök.
-
-När jag är nere på 2-3 kandidater går jag på magkänsla och frekvens. SHARE fore SNARE. SNARE fore SCARE. Ju vanligare ordet känns, desto troligare är det att våra svaret. Pusseldesignerna försökter inte stumpa dig med obskyrt ordförråd.`,
+Svep exakt. Ett nekat svep kostar tiden det tog plus tiden det tar att hitta tillbaka. Är du osäker på om bokstäverna ligger intill varandra, titta en sekund innan du drar.`,
       },
       {
-        title: 'Att Få Mer Ut Av Ledtradar och Monster',
-        content: `Det finns ett ledtrådssystem i Word Hunt som avslöjar en extra bokstavsposition, och jag här asikter om när man ska använda det.
+        title: 'Ordjakt på LexiClash: hitta det dolda ordet',
+        content: `I Ordjakt letar du efter ett bestämt ord, och spelet visar hur långt det är. Målordet finns alltid någonstans på brädet, så du jagar det i stället för att gissa i blindo.
 
-Använd inte en ledtråd när du fortfarande här 5+ möjliga ord. En gissning till ger dig mycket mer information än en enda bokstavsavslöjning. Spara ledtrådar för när du stirrar på 2-3 lika sannolika kandidater och genuint inte kan avgöra vilken det är. Da betalar en ledtråd för sig själv.
+Ledtrådarna kommer från orden du hittar. Ord på brädet som har bokstäver gemensamma med målordet tänder ledtrådsrutorna högst upp: grönt betyder att bokstaven står på rätt plats, gult att den finns i ordet men på en annan plats, och grått att den inte finns i ordet. Ju fler ord du hittar, desto mer av målordet ser du.
 
-Även utan ledtrådar är bokstavsfrekvens ditt hemliga vapen. Efter de stora (E, T, A, O, I, N, S, R) är nästa nivå H, L, D, C, U, M, F, P. Om dina första två gissningar inte rort någon av dem, se till att gissning 3 gör det.
+Ett ord du drar som är lika långt som målordet räknas som en gissning. Kortare ord räknas inte som gissningar, så de är ett gratis sätt att samla ledtrådar och liv.
 
-Jag här mentala "kluster" av ordanslutningar, och det här förmodligen sparat mig fler gissningar än något annat. När jag ser _IGHT ta form vet jag att jag tittar på light/right/sight/might/night/fight/tight och kan oftast spika det på en gissning till. Samma med -OUND (bound/found/hound/mound/pound/round/sound/wound). Bygg de här klustren i huvudet och du börjar känna igen mönster nästan direkt.
-
-Och dubbla bokstäver. De får mig varje gång. SLEEP, TEETH, LLAMA. Om alla dina gissningar kommer tillbaka rena utan dubblar är det faktiskt en signal att svaret kanske HAR dubblar. Prova ord med LL, SS, EE, TT. Jag spenderade en gång 4 gissningar utan att överväga dubblar och kande mig extremt dum.`,
+En felaktig gissning kostar liv, så samla några ledtrådar först. När du har två eller tre gröna bokstäver, leta på brädet efter en väg som stavar ett ord av rätt längd med de bokstäverna på de platserna. Målordet måste gå att dra på brädet, och det utesluter de flesta ord som passar ledtrådarna på papperet.`,
       },
       {
-        title: 'Fallor Jag Fortsatter Gå I (Och Du Också Kommer)',
-        content: `Jag vill våra ärlig: jag går fortfarande i några av de här. Att veta om dem hjälper, men i stundens hetta gör hjärnan bara vad den vill.
+        title: 'Ordjakt på LexiClash: håll dig vid liv',
+        content: `Livmätaren börjar full och töms varje sekund, och den töms snabbare ju längre rundan pågår. Varje ord du hittar på brädet ger dig liv tillbaka, och långa ord ger mer än korta.
 
-Tunnelseende. Det här är det stora. Du övertygar dig om att det är CRANE, så du provar CRANE, CRONE, CRAZE... samtidigt är svaret PLUMB och delar noll bokstäver. Om din gissning kommer tillbaka hel-grå betyder det att svaret här INGENTING gemensamt med det du provade. Tvinga dig att tänka i en helt annan riktning.
+Det ändrar hur du spelar jämfört med ett vanligt rutnät med klocka. Tidigt i rundan håller en jämn ström av korta ord mätaren på en säker nivå medan ledtrådsrutorna fylls i. Senare, när mätaren töms snabbare, är ett långt ord värt flera korta för livet det ger tillbaka.
 
-Sällsynt-ord-syndromet. Jag här gjort det. "Kanske är det KNOLL? FJORD?" Nej. Det är nästan säkert ett ord du använder i vardagligt tal. Om du inte skulle saga det till en vän är det förmodligen inte svaret.
+Blir mätaren låg, sluta jaga målordet och ta alla ord du kan hitta tills du är säker igen. Tar livet slut är rundan över, medan målordet ligger kvar på brädet om tio sekunder också.
 
-Positionsfixering. Du får ett gult T, provar det på position 3, fortfarande gult, provar position 3 igen för att du glömde. Håll en mental (eller fysisk) checklista över var du testat varje gul bokstav. Jag mumlar faktiskt positionerna för mig själv: "T inte 1, inte 3, prova 4."
-
-Panikgissningen. Två gissningar kvar, hjärnan blankar, du slamrar in vilket ord som helst som dyker upp. Stanna. Ta 10 sekunder. Läs om varje ledtrad. Lista varje begråansning. Svaret måste uppfylla ALLA. Det där lugna ögonblicket här räddat min lösningssvit mer än en gång.
-
-Dubbelbokstavsblindhet. Om E kom tillbaka gult en gang, kom ihag: ordet kanske här TVÅ E. Jag förlorade en gång ett uppenbart GEESE för att jag antog att ett E räckte. Pinsamt, men lärorikt.`,
-      },
-      {
-        title: 'Tricken Som Fick Mig Till 2-3 I Genomsnitt',
-        content: `Det här är det som skilde "ganska bra" från "irriterar mina vänner med min lösningsgrad."
-
-Innan jag skickar en gissning spelar jag igenom varje scenario i huvudet. Om A kommer tillbaka grönt provar jag DET HAR. Gult, jag provar DET DAR. Gråt, något helt annat. Det låter langsamt men det snabbar faktiskt upp dig för att du inte sitter och omanalyserar efter varje resultat.
-
-Jag spelar svårt läge även när spelet inte tvingar det. Det betyder att varje gissning använder alla bekraftade grona och gula bokstäver. Det känns begransande först, men det tvingar dig till effektivt spel. Du kan inte slösa en gissning på ett slangord som ignorerar det du redan vet.
-
-Frekvensviktad gissning. När jag här 3 kandidatord valjer jag inte bara slumpmässigt. Jag kollar vilka otestade bokstäver som är vanligast. Om en kandidat testar ett H och en annan testar ett Z går jag med H varje gång. Även om den gissningen är fel kommer feedbacken våra mer anvandbar.
-
-Och ärligt talat? Bara spela mycket. Efter några hundra rundor börjar du se mönster utan att tänka på dem. -ATCH, -OUND, -IGHT, -TION, -NESS. Hjärnan bygger en uppslagstabell över tid, och det är den mönsterigenkänningen som förvandlar ett 4-gissningssnitt till ett 3-gissningssnitt. Det finns ingen genvag. Men det är också det som gör att förbättringen känns fortjanad.`,
+Det finns en daglig Ordjakt med samma bräde för alla, så att du kan jämföra med kompisar, och en version där ni spelar live mot varandra och den som först drar målordet vinner rundan.`,
       },
     ],
     faq: [
       {
-        question: 'Vad är det bästa startordet för Word Hunt i LexiClash?',
-        answer: 'Jag personligen växlar mellan STARE och CRANE. Båda träffar de vanligaste vokalerna och konsonanterna utan att upprepa bokstäver. Hela poängen med din öppnare är att lära dig saker, inte att ha tur och gissa rätt.',
+        question: 'Hur blir man bättre på Word Hunt?',
+        answer: 'Läs av rutnätet längs en rutt i stället för att stirra på ett ställe, leta efter vanliga ändelser som -en, -et, -ar och -na, och när du hittar ett ord, kolla efter längre varianter innan du går vidare. Det mesta av förbättringen kommer från att hitta ordfamiljer kring de ord du redan har.',
       },
       {
-        question: 'Hur många försök får jag i Word Hunt?',
-        answer: 'Du får ett begränsat antal försök. Ju färre gissningar du behöver, desto mer poäng och mynt går du ifrån med. Det dagliga pusslet är samma ord för alla, vilket gör det kul att jämföra med vänner.',
+        question: 'Kan man gå diagonalt i Word Hunt?',
+        answer: 'Ja. I ett bokstavsrutnät hänger varje bricka ihop med brickorna runt den i alla 8 riktningar, även diagonalt. Du kan inte använda samma bricka två gånger i ett ord.',
       },
       {
-        question: 'Vad betyder färgerna i Word Hunt-ledtrådar?',
-        answer: 'Grönt = rätt bokstav, rätt position. Gult = bokstaven finns i ordet men du la den på fel plats. Gråt = inte i ordet alls. Grönt är toppen, gult är anvandbart, gråt är också information (nu vet du vad du ska undvika).',
+        question: 'Ska jag satsa på korta eller långa ord?',
+        answer: 'Båda. Korta ord går snabbt och håller tempot uppe, långa ger mycket mer poäng. Många tar de lätta korta orden först och lägger resten av rundan på att bygga långa ord av ändelserna de har sett.',
       },
       {
-        question: 'Hur kan jag förbättra min lösningsgrad i Word Hunt?',
-        answer: 'Börja med en stark öppnare som STARE eller CRANE, återanvänd aldrig grå bokstäver (serioost, det ensamt hjälper), var systematisk med att testa gula bokstäver i nya positioner, och börja memorera ordsluts-kluster som -IGHT och -OUND. Det känns langsamt först men ditt genomsnitt kommer sjunka snabbt.',
+        question: 'Vad är annorlunda i Ordjakt på LexiClash?',
+        answer: 'Det finns ett dolt målord på brädet. Ditt liv töms med tiden, ord på brädet ger dig liv tillbaka och visar gröna, gula och grå ledtrådsbokstäver om målordet, och du vinner genom att dra målordet innan livet tar slut. Du kan spela gratis i webbläsaren, ensam som dagligt pussel eller live mot andra spelare.',
       },
     ],
-    ctaText: 'Spela Word Hunt',
+    ctaText: 'Spela Ordjakt',
     ctaLink: '/daily',
     backToGuides: 'Tillbaka till guider',
   },
   ja: {
-    title: 'ワードハント攻略：5回かかってたのを3回で解けるようになった話',
-    subtitle: '何百ラウンドもやって見つけたリアルなコツ。オープナーの選び方、ヒントの読み方、僕がハマり続けた罠の話。',
+    title: 'Word Hunt上達のコツ：文字盤で本当に役立つ攻略法',
+    subtitle: '文字盤の見方、単語の仲間の見つけ方、長い単語を探し続けるコツをまとめました。LexiClashのワードハントならではの違いも解説します。',
     category: '攻略',
-    readTime: '8分で読める',
-    authorName: 'ワードオタク',
-    authorBio: '統計を異常なほど記録してます。解決率95%、平均試行3.2回。はい、スプレッドシートがあります。',
+    readTime: '7分で読めます',
+    authorName: 'Ohad Fisher',
+    authorBio: 'LexiClashを開発していて、文字盤のモードを毎日プレイしています。',
     quickTips: [
-      'STAREかCRANEでスタート。気分で使い分けてます。どっちも重要な文字をカバーしてくれる。',
-      '灰色の文字を再利用するのが初心者の一番の失敗。焦ると僕もまだやっちゃう。',
-      '緑=正しい文字、正しい場所。黄色=正しい文字、間違った場所。脳に刻んで。',
-      '黄色が出た？適当に動かさない。まだ試してない位置を1つずつ潰していく。',
-      '被りなしの良いオープナー2つで10文字テスト。アルファベットの40%を2手でカバー。',
-      '-IGHT、-OUND、-ATCHのクラスターを覚えよう。見つけたら答えはだいたいそこにいる。',
-      '2-3個まで絞れた？より一般的な単語を選べ。答えがマニアックな単語だった試しはほぼない。',
+      '語尾から探しましょう。「い」で終わる形容詞や「る」で終わる動詞は、ひとつ見つかると仲間が続きます。',
+      'どのマスも周りの最大8マスとつながっています。斜めも含めて、左から右だけでなく全方向に読みましょう。',
+      '単語を見つけたら、次に行く前に、前か後ろに1文字足せないか試してみましょう。',
+      '短い単語はすばやく点が取れて、リズムも保てます。大きな得点は長い単語にあります。',
+      '「ぬ」「へ」のようにあまり使われないかなは、つながる相手も少なめです。一度確認したら、あとは気にしなくて大丈夫です。',
+      'なぞるときは正確に。なぞり間違いは、なぞる前に1秒見るよりも多くの時間を失います。',
+      'LexiClashのワードハントでは、隠された単語は必ず盤面のどこかにあります。探しているあいだも、盤面で見つけた単語がライフを支えてくれます。',
     ],
     sections: [
       {
-        title: 'そもそもワードハントって何？',
-        content: `Wordleをやったことがあるなら、もう分かります。ワードハントはLexiClash版のあのゲーム。隠された単語を推測して、色付きのフィードバックをもらって、当たるか回数切れになるまで繰り返す。
+        title: '「Word Hunt」という名前のゲームは2つある',
+        content: `Word Huntのコツを検索する人の多くは、iMessageのGamePigeonに入っている、制限時間つきの文字盤ゲームのことを指しています。日本でもそのまま「Word Hunt」と呼ばれています。小さな文字盤と短い制限時間があり、隣り合う文字を指でなぞって、できるだけ多くの単語を作ります。長い単語ほど高得点です。
 
-緑のタイルは正しい文字が正しい位置にあるということ。黄色はその文字は単語に入ってるけど位置が違う。灰色はその文字は単語にない。紙の上ではシンプルだけど、これが生み出す推理パズルは本当に中毒性がある。
+LexiClashにも同じような文字盤を使った独自の「ワードハント」モードがあり、日本語の盤面はひらがなです。ただし、ひとひねりあります。盤面には秘密の正解の単語が隠されています。ライフゲージは毎秒減っていき、盤面で単語を見つけるたびに回復して、正解についてのヒントの文字が点灯します。ライフが尽きる前に正解の単語をなぞれば、そのラウンドはあなたの勝ちです。
 
-クラシックやブラストモード（文字がボードに見えてる）と違うのは、完全にブラインドで戦うこと。純粋な推理力と語彙力の勝負。正直に言うと、2手で正解した時の快感はゲーム内の何よりも上です。
-
-デイリーチャレンジで毎日新しいパズルが出るし、僕みたいに1問で止められない人には無制限の練習ラウンドもある。少ない推測ほど多くのポイントとコインがもらえる。これが僕をカジュアルプレイヤーから、朝食中に文字の出現頻度を考える人間に変えました。`,
+このあとの文字盤のコツは、どちらのゲームにも使えます。最後の2つのセクションはLexiClash版の話です。`,
       },
       {
-        title: '最初の1手は思ってる以上に大事',
-        content: `最初の50ラウンドくらいで僕がやった間違い：1手目で答えを当てようとすること。これはダメ。最初の推測は当てるためじゃない。できるだけ多くの情報を集めるため。
+        title: '決まった順番で盤面を見る',
+        content: `いちばん多い失敗は、ひとつの角ばかり見つめてしまうことです。あと少しで見えそうな単語に目が釘付けになり、時間だけが過ぎて、盤面の残りは読まれないまま終わります。
 
-僕はSTAREとCRANEを使い分けてます。どっちも頻出母音（A、E）と高頻度子音（S、T、R、N）をカバーして、文字の被りがゼロ。SLATEやROASTもいい。ポイントは、一番多くの英単語に登場する文字をテストすること。
+自分なりの順路を決めましょう。角のマスから始めて、そのマスが上、下、左右、斜め4方向のどこにつながっているかを見ます。それから次のマスへ移ります。毎ラウンドすべてのマスを確認できるわけではありませんが、順路があれば同じ場所を何度も読み直さずにすみます。
 
-考えてみてください：E、T、A、O、I、N、S、Rは一般的な単語の約80%に出現します。オープナーでこのうち5つをチェックできたら、もう巨大なアドバンテージ。
+単語全体より先に、よく出る文字の組み合わせを探しましょう。ひらがなの盤面では「か」「し」「た」「な」「い」「う」などがよく使われます。見つけたら、その前後に文字を足して広げてみます。たとえば「くら」があれば、周りの文字しだいで「さくら」や「くらし」になるかもしれません。
 
-ダメなオープナー：TEETH（ユニークな文字が3つしかない、無駄）、JAZZY（カッコいい単語だけどオープナーとしては最悪）、Q、X、Zが入ってる単語。これらの文字が答えに出ることはほぼない。
-
-僕のお気に入りのワザ：補完的なオープナー2つをセットで使う。STAREの後にCOILで、2手で9個のユニークな文字をテストして母音5つ全部カバー。この2手の後はだいたい絞り込みに入れます。`,
+「い」「う」「ん」は多くの単語の途中や最後に出てくるので、盤面の真ん中にあれば、周りのたくさんのマスとつながって多くの単語に関わります。行き詰まったら、そこから始めてみましょう。`,
       },
       {
-        title: 'ヒントの読み方（頭を爆発させないために）',
-        content: `1手目を打って色が返ってきた。ここで大半の人（昔の僕を含む）がミスる。
+        title: '1つの単語を仲間に広げる',
+        content: `1ラウンドで見つかる単語をいちばん増やしてくれるのがこの習慣です。単語を見つけても、すぐに次へ行かずに確認しましょう。
 
-緑の文字は簡単。ロックする。Sが1番目で緑になったら、これ以降のすべての推測はSで始まる。例外なし。ひねりなし。固定。
+語尾。「あか」の隣に「い」があれば「あかい」、「はな」の隣に「し」があれば「はなし」になります。形容詞の「い」や動詞の「る」が最後の文字に接していれば、もう1語あるかもしれません。
 
-黄色が厄介で、僕が一番推測を無駄にした部分。2番目にAが黄色で出たということは2つ意味がある：Aはこの単語に入ってる、そしてAは2番目の位置にはない。罠は適当な場所に動かすこと。代わりに、系統的にやる。位置1、次に3、次に4。1つずつ潰していく。
+前に足す文字。「かな」の前に「さ」があれば「さかな」、「なか」の前に「お」があれば「おなか」になります。
 
-灰色の文字は死んだ文字。存在を忘れる。何回やったか分からないけど、もう灰色って分かってるRを使おうとしたこと。集中してなかっただけ。このガイドから1つだけ覚えるなら、これ：灰色の文字は二度と使わない。
+単語の中の単語。「さくら」をなぞったなら、「さく」と「くら」も通っています。たいていはそれぞれ1語として数えられます。
 
-本当の魔法は全部組み合わせた時に起きます。Aが2番目で黄色、Rが4番目で緑。ということは「_ _ _ R _」でAが2番目以外のどこかにある。この制約だけで候補が一気に数個まで減ります。`,
+共通の部分を使った入れ替え。盤面のどこかに「かい」を見つけたら、「か」に接している文字はすべて候補です。「あかい」「たかい」「ちかい」「ふかい」のように広がります。
+
+制限時間のあるラウンドでは、こうして1つの発見が4〜5語になることもあり、しかも場所はもうわかっています。`,
       },
       {
-        title: '絞り込み（一番楽しいパート）',
-        content: `良い推測を2回した後、10文字くらいテストできてるはず。アルファベットの約40%が消去済みか確認済み。もし「だいぶ絞れた」感覚がなかったら、推測の文字が被りすぎてた可能性が高いです。
+        title: '短い単語、長い単語、そして制限時間',
+        content: `制限時間のある文字盤ゲームでは、見つける単語の数と長さのバランスを取ることになります。
 
-緑の文字は最高。2手で緑が2つあれば、その位置の可能性の約95%が消えたことになる。気持ちいい。
+短い単語はすぐに見つかります。手が止まらず、ラウンドの出だしで固まるのを防いでくれます。長い単語は見つけるのに時間がかかりますが、得点はずっと高いので、長い単語1つが短い単語いくつ分にもなることがあります。
 
-ここで僕は頭の中（か実際に）でメモを取り始めます。分かってるパターンを並べて、当てはまる単語をリストアップ。1番目がS、4番目がR、Aは2番目以外のどこか？OK：SHARP、SNARE、SUGAR、SOLAR...で灰色の文字と照合するとリストがどんどん縮む。
+多くのプレイヤーに合うのはこんなリズムです。最初は目につく短い単語を片づけて調子を上げ、残りの時間は、すでに見つけた語尾や仲間をもとに長い単語を探します。長い単語を探しているのに何も見つからないと感じたら、数秒だけ短い単語に戻って仕切り直しましょう。
 
-ゲームを変えた原則：1回の推測で候補をだいたい半分に減らすべき。推測の結果、1-2個しか消えなかったら、良い推測じゃなかった。1手ごとに最大限の絞り込みを狙う。
-
-2-3個の候補に絞れたら、直感的な頻度で選ぶ。SHAREの方がSNAREより先。SNAREの方がSCAREより先。より日常的に使いそうな単語ほど正解の確率が高い。パズルの出題者はマニアックな語彙で引っかけようとはしてません。`,
+正確になぞりましょう。認められなかったなぞりは、それにかかった時間に加えて、元の場所を探し直す時間も失います。文字がつながっているか自信がないときは、なぞる前に1秒だけ確認しましょう。`,
       },
       {
-        title: 'ヒントシステムとパターン認識',
-        content: `ワードハントには追加の文字位置を教えてくれるヒントシステムがあって、使うタイミングについて僕なりの考えがあります。
+        title: 'LexiClashのワードハント：隠された単語を見つける',
+        content: `LexiClashのワードハントでは、決まった1つの単語を探します。ゲームはその単語の文字数を教えてくれます。正解は必ず盤面のどこかにあるので、やみくもに当てるのではなく、探し出すゲームです。
 
-まだ候補が5個以上ある時にヒントを使わない。もう1回推測する方がずっと多くの情報が手に入る。ヒントは候補が2-3個で、本当にどれか分からない時に使う。その時こそヒントの元が取れます。
+ヒントは見つけた単語から得られます。正解と同じ文字を含む単語を盤面で見つけると、上にあるヒントのマスが点灯します。緑はその位置で合っている文字、黄色は単語に含まれているが位置が違う文字、灰色は単語に含まれていない文字です。単語を見つけるほど、正解が見えてきます。
 
-ヒントなしでも、文字頻度は最強の武器です。頻出文字（E、T、A、O、I、N、S、R）の次のグループはH、L、D、C、U、M、F、P。最初の2手でこのグループに全く触れてなかったら、3手目で必ず入れる。
+正解と同じ文字数の単語をなぞると、それが1回の回答として扱われます。それより短い単語は回答の回数を使わないので、ヒントとライフを集めるのにコストのかからない手段です。
 
-僕は頭の中に単語末尾の「クラスター」を持ってて、これが一番推測を節約してくれてる。_IGHTのパターンが見えたら、light/right/sight/might/night/fight/tightのどれかで、だいたいあと1手で当たる。-OUND（bound/found/hound/mound/pound/round/sound/wound）も同じ。こういうクラスターを頭に作ると、パターン認識がほぼ瞬間的になります。
-
-それと二重文字。毎回やられる。SLEEP、TEETH、LLAMA。すべての推測がキレイに返ってきて二重文字が1つもないなら、逆にそれが信号。答えに二重文字があるかも。LL、SS、EE、TTが入った単語を試す。一度、4回も二重文字を考慮しなくて、自分が本当にバカだと思いました。`,
+回答を間違えるとライフが減るので、まずはヒントをいくつか集めましょう。緑の文字が2つか3つそろったら、その文字がその位置に来る、正しい文字数の単語をなぞれる道筋を盤面で探します。正解は盤面でなぞれる単語でなければならないので、ヒントに合うだけの単語の多くはこれで外れます。`,
       },
       {
-        title: '僕が何度もハマる罠（あなたもハマるでしょう）',
-        content: `正直に言います：これらの罠、今でも引っかかります。知ってても、その瞬間は脳が勝手にやります。
+        title: 'LexiClashのワードハント：生き残るコツ',
+        content: `ライフゲージは満タンから始まって毎秒減り、ラウンドが進むほど減るのが速くなります。盤面で単語を見つけると回復し、長い単語ほど多く回復します。
 
-トンネルビジョン。これが最大。CRANEだと確信して、CRANE、CRONE、CRAZE...と試し続ける。一方で答えはPLUMBで共通する文字がゼロ。全部灰色で返ってきたら、それは答えがあなたの試した単語と何も共通してないということ。全く違う方向に頭を切り替えて。
+そのため、普通の制限時間つき文字盤とは戦い方が変わります。ラウンドの序盤は、短い単語をテンポよく見つけてゲージを保ちながら、ヒントのマスを埋めていきます。終盤、減りが速くなってきたら、長い単語1つで短い単語何個分ものライフが戻ってきます。
 
-珍しい単語症候群。やったことあります。「もしかしてKNOLL？FJORD？」いいえ。答えはほぼ確実に日常会話で使う単語です。友達に言わないような単語は、たぶん答えじゃない。
+ゲージが少なくなったら、いったん正解探しをやめて、安全になるまで見つけられる単語をどんどん見つけましょう。ライフが尽きればラウンドは終わりですが、正解は10秒後も盤面に残っています。
 
-位置固定。黄色のTが出て、位置3で試して、まだ黄色で、また位置3で試す。忘れてたから。黄色の文字をどこで試したかのメンタルチェックリストを作る。僕は実際に口でつぶやいてます：「Tは1番目じゃない、3番目じゃない、4番目を試す。」
-
-パニック推測。残り2手、頭が真っ白、思いついた単語をバーンと入力。ストップ。10秒取る。全部のヒントを読み直す。すべての制約をリストアップ。答えはその全部を満たさないといけない。この10秒の冷静さが、連続正解記録を何度も救ってくれました。
-
-二重文字の盲点。Eが黄色で1回出たとして、覚えておいて：その単語にEが2つあるかもしれない。一度、明らかなGEESEを逃しました。Eは1個で十分だと思い込んでたから。恥ずかしいけど、勉強になった。`,
-      },
-      {
-        title: '平均2-3手に到達した方法',
-        content: `ここが「まあまあ上手い」から「友達に解決率を自慢してウザがられる」に変わったコツです。
-
-推測を送信する前に、あらゆるシナリオを頭の中でシミュレーションします。Aが緑で返ったらこれを試す。黄色ならあれ。灰色なら全然別のやつ。遅そうに聞こえるけど、実はスピードアップする。結果が返ってきた後に改めて分析する必要がなくなるから。
-
-ゲームが強制しなくてもハードモードでプレイしてます。つまり確認された緑と黄色の文字を必ず次の推測に含める。最初は窮屈に感じるけど、効率的なプレイを強制される。既に分かっていることを無視した捨て推測ができなくなる。
-
-頻度加重で候補を選ぶ。3つの候補単語があったら、ランダムには選ばない。まだテストしていない文字のうち、英語で出現頻度が一番高いのはどれかを見る。一方がHをテストして、もう一方がZなら、毎回Hの方を選ぶ。外れても、そのフィードバックの方が有用。
-
-そして正直なところ、たくさんプレイすること。数百ラウンドやると、考えなくてもパターンが見えるようになる。-ATCH、-OUND、-IGHT、-TION、-NESS。脳が勝手にルックアップテーブルを作ってくれて、そのパターン認識が4手平均を3手平均に変えてくれる。近道はありません。でもだからこそ、上達した時の達成感があるんです。`,
+毎日のワードハントは全員が同じ盤面なので、友だちと結果を比べられます。また、ほかのプレイヤーとリアルタイムで対戦するマルチプレイ版もあり、最初に正解をなぞった人がそのラウンドの勝者になります。`,
       },
     ],
     faq: [
       {
-        question: 'LexiClashのワードハントで一番いい最初の単語は？',
-        answer: '僕はSTAREとCRANEを使い分けてます。どっちも頻出の母音と子音をカバーして文字の被りがない。オープナーの目的はラッキーで当てることじゃなくて、情報を集めること。',
+        question: 'Word Huntがうまくなるには？',
+        answer: '1か所を見つめるのではなく順路を決めて盤面を見ること、よく使われる語尾を探すこと、そして単語を見つけたら次に行く前にもっと長い形がないか確かめることです。上達の多くは、すでに見つけた単語の周りで仲間を見つけることから生まれます。',
       },
       {
-        question: 'ワードハントって何回推測できるの？',
-        answer: '回数は限られてます。少ない推測で解くほど、もらえるポイントとコインが多い。デイリーパズルはみんな同じ単語なので、友達と比べるのが楽しいですよ。',
+        question: 'Word Huntは斜めにつなげられますか？',
+        answer: 'はい。文字盤では、各マスは接している周囲8方向すべてのマスとつながっていて、斜めも含まれます。1つの単語で同じマスを2回使うことはできません。',
       },
       {
-        question: 'ワードハントのヒントの色って何？',
-        answer: '緑=正しい文字、正しい位置。黄色=その文字は単語にいるけど場所が違う。灰色=単語にない。緑は最高、黄色は役立つ、灰色も情報（何を避けるべきか分かるから）。',
+        question: '短い単語と長い単語、どちらを狙うべき？',
+        answer: '両方です。短い単語はすばやく見つかってリズムを保てますし、長い単語はずっと高得点です。多くのプレイヤーは、まず簡単な短い単語を片づけ、残りの時間で見つけた語尾をもとに長い単語を組み立てています。',
       },
       {
-        question: 'ワードハントの正解率を上げるには？',
-        answer: 'STAREやCRANEみたいな強いオープナーで始める。灰色の文字は二度と使わない（マジでこれだけでも変わる）。黄色の文字は新しい位置で系統的にテスト。そして-IGHTや-OUNDみたいな単語末尾のクラスターを覚え始める。最初はゆっくりだけど、平均はすぐ下がりますよ。',
+        question: 'LexiClashのワードハントは何が違うの？',
+        answer: '盤面に正解の単語が隠されていることです。ライフは時間とともに減り、盤面の単語を見つけると回復して、正解について緑・黄・灰色のヒントの文字が表示されます。ライフが尽きる前に正解をなぞれば勝ちです。ブラウザで無料で遊べて、毎日のパズルとして1人で、またはほかのプレイヤーとリアルタイムで対戦できます。',
       },
     ],
-    ctaText: 'ワードハントをやってみよう',
+    ctaText: 'ワードハントをプレイする',
     ctaLink: '/daily',
     backToGuides: 'ガイドに戻る',
   },
   es: {
-    title: 'Estrategia Word Hunt: como pase de 5 intentos a resolverlo en 3',
-    subtitle: 'Tacticas reales de cientos de rondas. Eleccion de palabra inicial, trucos para leer pistas, y las trampas en las que yo caia.',
+    title: 'Cómo mejorar en Word Hunt: consejos para la cuadrícula que funcionan de verdad',
+    subtitle: 'Cómo recorrer una cuadrícula de letras, detectar familias de palabras y seguir encontrando palabras largas, y qué cambia en Caza de palabras de LexiClash.',
     category: 'Estrategia',
-    readTime: '8 min de lectura',
-    authorName: 'El Nerd de las Palabras',
-    authorBio: 'Registro mis estadisticas obsesivamente. 95% de tasa de resolucion, 3.2 intentos promedio. Si, tengo una hoja de calculo.',
+    readTime: '7 min de lectura',
+    authorName: 'Ohad Fisher',
+    authorBio: 'Desarrollo LexiClash y juego a sus modos de cuadrícula todos los días.',
     quickTips: [
-      'Empieza con una palabra que tenga vocales y consonantes comunes sin repetir letras. Yo alterno dependiendo del humor.',
-      'Reutilizar una letra gris es el error #1 de principiante. Yo todavia me pillo haciendolo cuando voy apurado.',
-      'Verde = letra correcta, lugar correcto. Amarillo = letra correcta, lugar equivocado. Tatuate esto en el cerebro.',
-      'Tienes una amarilla? No la muevas al azar. Pruebala en cada posicion que no hayas testeado.',
-      'Dos buenas aperturas sin letras repetidas = 10 letras probadas. Eso es 40% del alfabeto en 2 intentos.',
-      'Aprende los grupos -CION, -MENTE, -ABLE, -ANDO. Cuando los detectas, la respuesta generalmente esta escondida ahi.',
-      'Te quedan 2-3 opciones? Ve con la palabra mas comun. La respuesta casi nunca es la rebuscada.',
+      'Busca primero las terminaciones. -S, -ES, -AR, -ER, -IR y -ANDO convierten una palabra en varias: CANTA, CANTAR, CANTANDO.',
+      'Cada casilla toca hasta 8 vecinas, incluidas las diagonales. Lee la cuadrícula en todas las direcciones, no solo de izquierda a derecha.',
+      '¿Encontraste una palabra? Antes de seguir, prueba a añadirle una letra delante o detrás.',
+      'Las palabras cortas dan puntos rápidos y mantienen el ritmo. Las puntuaciones grandes están en las largas.',
+      'Letras poco frecuentes como K, W y X tienen pocas compañeras. Revísalas una vez y olvídate de ellas.',
+      'Traza con precisión. Un trazo fallido cuesta más tiempo que mirar un segundo antes de arrastrar.',
+      'En Caza de palabras de LexiClash, la palabra objetivo siempre está en el tablero, y las palabras que encuentras por el camino te mantienen con vida mientras la buscas.',
     ],
     sections: [
       {
-        title: 'Que es Word Hunt en realidad?',
-        content: `Si jugaste Wordle, ya lo entiendes. Word Hunt es la version de LexiClash de la formula: adivina la palabra oculta, recibe pistas con colores, repite hasta que la claves o te quedes sin intentos.
+        title: 'Dos juegos llamados Word Hunt',
+        content: `Casi todo el que busca consejos para Word Hunt se refiere al juego de cuadrícula con cronómetro del paquete GamePigeon de iMessage. En español también se le llama Word Hunt: una cuadrícula pequeña de letras, poco tiempo, y deslizas el dedo por letras que se tocan para formar todas las palabras que puedas. Las palabras más largas valen más puntos.
 
-Ficha verde significa letra correcta en el lugar correcto. Amarillo significa que la letra esta en la palabra pero la pusiste en el lugar equivocado. Gris significa que esa letra no esta en la palabra para nada. Bastante simple en papel, pero el puzzle deductivo que crea es genuinamente adictivo.
+LexiClash tiene su propio modo, Caza de palabras, sobre el mismo tipo de cuadrícula y con un giro. En el tablero hay escondida una palabra objetivo secreta. Tu barra de vida baja cada segundo, y cada palabra que encuentras en el tablero te cura y enciende pistas sobre el objetivo. Si trazas el objetivo antes de quedarte sin vida, ganas la ronda.
 
-Lo que lo hace diferente del modo Clasico o Blast (donde las letras estan ahi en el tablero) es que trabajas a ciegas. Es pura deduccion y vocabulario. La verdad me da mucha mas satisfaccion acertar en 2 intentos que cualquier otra cosa en el juego.
-
-Hay un puzzle nuevo cada dia en el Desafio Diario, mas rondas de practica ilimitadas si eres como yo y no puedes parar despues de solo uno. Menos intentos = mas puntos y monedas, que es la zanahoria que me convirtio de jugador casual a alguien que genuinamente piensa en frecuencia de letras durante el desayuno.`,
+Los consejos sobre la cuadrícula sirven para los dos juegos. Las dos últimas secciones tratan de la versión de LexiClash.`,
       },
       {
-        title: 'Tu palabra inicial importa mas de lo que crees',
-        content: `Aqui va un error que cometi durante mis primeras 50+ rondas: intentaba adivinar la palabra real en el primer intento. No hagas esto. Tu primer intento no se trata de acertar. Se trata de aprender lo mas posible.
+        title: 'Recorre la cuadrícula con un método',
+        content: `El error más común es quedarse mirando una esquina. La vista se engancha en una palabra que casi ves, el reloj corre y el resto de la cuadrícula se queda sin leer.
 
-La apertura ideal tiene vocales comunes (al menos 2), consonantes frecuentes, y cero letras repetidas. El punto es que estes probando las letras que aparecen en la mayor cantidad de palabras.
+Márcate un recorrido. Empieza por una casilla de una esquina y mira con qué conecta: arriba, abajo, a los lados y en las cuatro diagonales. Luego pasa a la siguiente. No vas a revisar todas las casillas en cada ronda, pero con un recorrido no vuelves a leer la misma zona una y otra vez.
 
-Piensalo: hay letras que aparecen en algo asi como el 80% de las palabras comunes. Si tu apertura checa 5 de esas, inmediatamente tienes una ventaja enorme.
+Busca grupos de letras frecuentes antes que palabras enteras. En español aparecen por todas partes ES, EN, AR, ER, OS, AS, TR y PR. Cuando veas uno, intenta hacerlo crecer hacia los dos lados: AR puede convertirse en MAR, PARA, CARO o ARTE, según lo que tenga alrededor.
 
-Con que NO abrir: palabras con letras repetidas (prueban menos letras unicas, desperdicio total), palabras con letras raras como Q, X, Z (esas letras casi nunca aparecen en la respuesta), o cualquier cosa que no coincida con la longitud del objetivo.
-
-Mi truco favorito: combinar dos aperturas complementarias. Dos palabras sin letras compartidas te dan 9-10 letras unicas en dos intentos y cubren un monton de terreno. Despues de esas dos, generalmente ya se lo suficiente para empezar a afinar.`,
+Las vocales son tus anclas. En español casi todas las palabras alternan vocales y consonantes, y una vocal en el centro de la cuadrícula tiene el mayor número de vecinas, así que suele estar dentro de muchas palabras. Empieza por ahí cuando te atasques.`,
       },
       {
-        title: 'Leer las pistas sin perder la cabeza',
-        content: `OK, hiciste tu primer intento y los colores vuelven. Aqui es donde la mayoria de la gente (incluyendo el yo del pasado) la riega.
+        title: 'Convierte una palabra en una familia',
+        content: `Este es el hábito que más palabras suma por ronda. Cuando encuentres una, no pases a otra todavía. Revisa:
 
-Letras verdes son faciles. Bloqueadas. Si la S sale verde en posicion 1, cada intento de aqui en adelante empieza con S. Sin excepciones, sin intentar ser listo. Solo bloquealas.
+Plurales. Si hay una S junto a la última letra, seguramente tienes otra palabra: CASA y CASAS. Si la palabra acaba en consonante, busca -ES: MAR y MARES, PAN y PANES.
 
-Letras amarillas es donde se pone dificil, y donde yo desperdicie mas intentos al principio. Una A amarilla en posicion 2 significa dos cosas: la A SI esta en la palabra, y la A NO esta en posicion 2. La trampa es moverla a cualquier lugar al azar. En vez de eso, se metodico. Prueba posicion 1, luego 3, luego 4. Ve tachandolas conforme avanzas.
+Género y verbos. Muchas palabras cambian de -O a -A, como GATO y GATA o NIÑO y NIÑA. De CANTA pueden salir CANTAR, CANTO y CANTANDO si las letras están cerca. Cada vez que veas una raíz verbal, échale un vistazo a -AR, -ER, -IR y -ANDO.
 
-Letras grises estan muertas. Muertas para ti. Olvida que existen. No puedo decirte cuantas veces me cache intentando una R que ya sabia que era gris porque no estaba poniendo atencion. Si recuerdas una sola cosa de esta guia, que sea esta: nunca reutilices letras grises.
+Letras delante. ORO puede convertirse en LORO, TORO o CORO si la letra adecuada toca la O. RATO puede ser GRATO.
 
-La magia real pasa cuando combinas todo. Digamos que sabes que A es amarilla de posicion 2 y R es verde en posicion 4. Ahora estas buscando _ _ _ R _ con una A en algun lugar que no sea posicion 2. Solo esa restriccion generalmente reduce tus opciones a un punado.`,
+Palabras dentro de la palabra. Si trazaste SALTO, también pasaste por SAL y ALTO. Normalmente cada una cuenta por separado.
+
+Cambios alrededor de un núcleo común. Si ves -ASA en una esquina, cualquier consonante que toque la A es candidata: CASA, MASA, PASA, TASA.
+
+En una ronda con reloj, un hallazgo puede convertirse así en cuatro o cinco palabras, y ya sabes dónde están.`,
       },
       {
-        title: 'Reduciendo las opciones (la parte divertida)',
-        content: `Despues de 2 buenos intentos, deberias haber probado unas 10 letras. Eso es casi 40% del alfabeto eliminado o confirmado. Si no sientes que el campo se redujo dramaticamente, tus intentos probablemente tenian demasiada superposicion.
+        title: 'Palabras cortas, palabras largas y el reloj',
+        content: `En un juego de cuadrícula con tiempo estás equilibrando dos cosas: cuántas palabras encuentras y cuánto miden.
 
-Letras verdes son lo mejor. Dos verdes despues de dos intentos significa que como el 95% de posibilidades para esas posiciones se fue. Es una sensacion hermosa.
+Las cortas, de tres y cuatro letras, salen rápido. Te mantienen en movimiento y evitan que te bloquees al empezar la ronda. Las largas cuesta más verlas, pero valen mucho más, así que una sola de seis o siete letras puede superar a un puñado de cortas.
 
-Aqui es donde empiezo a anotar (mental o literalmente). Tomo el patron que conozco y simplemente listo palabras que encajen. Posicion 1 es S, posicion 4 es R, la A va en algun lugar que no sea posicion 2? OK: SOLAR, SANAR, SONAR, SUMAR... luego cruzo con mis letras grises y la lista se achica rapido.
+Un ritmo que funciona a muchos jugadores: saca primero las palabras cortas evidentes para arrancar y dedica el resto del tiempo a buscar palabras largas a partir de las terminaciones y familias que ya has visto. Si notas que llevas un rato buscando largas sin sacar nada, vuelve a las cortas unos segundos para despejarte.
 
-Un principio que me cambio el juego: cada intento deberia reducir tus opciones restantes mas o menos a la mitad. Si un intento solo elimina una o dos palabras, no fue un buen intento. Quieres maxima destruccion con cada oportunidad.
-
-Cuando me quedan 2-3 candidatos, voy con instinto de frecuencia. La palabra que se sienta mas comun, mas probable de escuchar en una conversacion, esa suele ser la respuesta. Los disenadores del puzzle no estan tratando de sorprenderte con vocabulario rebuscado.`,
+Traza con cuidado. Un trazo rechazado te cuesta el tiempo que tardaste, más el que tardas en volver a ubicarte. Si no estás seguro de que las letras se tocan, mira un segundo antes de arrastrar.`,
       },
       {
-        title: 'Sacandole mas jugo a las pistas y los patrones',
-        content: `Hay un sistema de pistas en Word Hunt que revela una posicion de letra extra, y tengo opiniones sobre cuando usarlo.
+        title: 'Caza de palabras en LexiClash: encontrar la palabra oculta',
+        content: `En Caza de palabras buscas una palabra concreta, y el juego te dice cuántas letras tiene. El objetivo siempre está en algún lugar del tablero, así que estás cazando, no adivinando a ciegas.
 
-No uses una pista cuando todavia tienes 5+ palabras posibles. Otro intento te va a dar mucha mas informacion que revelar una sola letra. Guarda las pistas para cuando estes mirando 2-3 candidatos igualmente plausibles y genuinamente no puedas distinguir cual es. Ahi es cuando una pista se paga sola.
+Las pistas salen de las palabras que encuentras. Las palabras del tablero que comparten letras con el objetivo encienden las casillas de pista de arriba: verde significa que la letra está en esa posición, amarillo que está en la palabra pero en otro sitio, y gris que no está en la palabra. Cuantas más palabras encuentres, más verás del objetivo.
 
-Incluso sin pistas, la frecuencia de letras es tu arma secreta. Despues de las grandes (E, A, O, S, R, N, I, L), la siguiente camada es D, C, T, U, M, P. Si tus primeros dos intentos no tocaron ninguna de esas, asegurate de que el tercero lo haga.
+Trazar una palabra con la misma longitud que el objetivo cuenta como un intento. Las palabras más cortas no gastan intentos, así que son una forma gratis de reunir pistas y vida.
 
-Yo mantengo "grupos" mentales de terminaciones de palabras, y esto probablemente me ha ahorrado mas intentos que cualquier otra cosa. Una vez que veo _CION formandose, se que estoy viendo accion/cancion/opcion/nacion y generalmente puedo clavarla en un intento mas. Igual con -MENTE, -ABLE, -ANDO. Construye estos grupos en tu cabeza y empezaras a reconocer patrones casi al instante.
-
-Ah, y las letras dobles. Me atrapan siempre. LLAMA, PERRO, CALLE. Si todos tus intentos vuelven limpios sin dobles, eso es en realidad una senal de que la respuesta podria TENER dobles. Prueba palabras con LL, RR, CC. Una vez gaste 4 intentos sin considerar dobles y me senti tremendamente tonto.`,
+Un intento fallido te cuesta vida, así que junta unas cuantas pistas primero. Cuando tengas dos o tres letras en verde, busca en el tablero un camino que forme una palabra de la longitud correcta con esas letras en esas posiciones. El objetivo tiene que poder trazarse en el tablero, y eso descarta la mayoría de las palabras que encajan con las pistas sobre el papel.`,
       },
       {
-        title: 'Trampas en las que sigo cayendo (y tu tambien vas a caer)',
-        content: `Quiero ser honesto: todavia caigo en algunas de estas. Saber de ellas ayuda, pero en el momento, tu cerebro simplemente hace lo que quiere.
+        title: 'Caza de palabras en LexiClash: seguir con vida',
+        content: `Tu barra de vida empieza llena y baja cada segundo, y baja más rápido cuanto más avanza la ronda. Cada palabra que encuentras en el tablero te cura, y las largas curan más que las cortas.
 
-Vision de tunel. Esta es la grande. Te convences de que es TRAJE, entonces pruebas TRAJE, TRAGO, TRAZO... mientras tanto la respuesta es PLUMA y no comparte ni una letra. Si tu intento vuelve todo gris, significa que la respuesta no tiene NADA en comun con lo que probaste. Forzate a pensar en una direccion completamente diferente.
+Eso cambia tu forma de jugar respecto a una cuadrícula normal con reloj. Al principio de la ronda, una racha rápida de palabras cortas mantiene la barra a salvo mientras se van llenando las pistas. Más adelante, cuando la vida baja más deprisa, una palabra larga vale por varias cortas por la vida que te devuelve.
 
-Sindrome de palabra rara. Lo he hecho. "Quizas es ENJUTO? AZOGUE?" No. Casi seguro es una palabra que usas en conversacion diaria. Si no se la dirias a un amigo, probablemente no es la respuesta.
+Si la barra está baja, deja de buscar el objetivo y encuentra cualquier palabra que puedas hasta estar a salvo. Si te quedas sin vida se acaba la ronda, y el objetivo seguirá en el tablero dentro de diez segundos.
 
-Fijacion de posicion. Te sale una T amarilla, la pruebas en posicion 3, sigue amarilla, la pruebas en posicion 3 de nuevo porque se te olvido. Lleva un checklist mental (o fisico) de donde has probado cada letra amarilla. Yo literalmente murmuro las posiciones: "T no 1, no 3, probar 4."
-
-El intento panico. Quedan 2 intentos, el cerebro se pone en blanco, metes la primera palabra que te viene a la mente. Para. Tomate 10 segundos. Relee cada pista. Lista cada restriccion. La respuesta tiene que satisfacer TODAS. Ese momento de calma me ha salvado la racha de resoluciones mas de una vez.
-
-Ceguera de letras dobles. Si la E salio amarilla una vez, recuerda: la palabra podria tener DOS Es. Una vez perdi una palabra obvia porque asumi que una E era suficiente. Vergonzoso, pero educativo.`,
-      },
-      {
-        title: 'Los trucos que me llevaron a un promedio de 2-3',
-        content: `Esto es lo que separo "bastante bueno" de "mis amigos ya no quieren jugar conmigo por mi tasa de resolucion."
-
-Antes de mandar un intento, juego cada escenario en mi cabeza. Si la A vuelve verde, pruebo ESTO. Amarilla, pruebo AQUELLO. Gris, algo completamente diferente. Suena lento pero en realidad te acelera porque no te quedas ahi re-analizando despues de cada resultado.
-
-Juego en modo dificil aunque el juego no me obligue. Eso significa que cada intento usa todas las letras verdes y amarillas confirmadas. Se siente restrictivo al principio, pero te fuerza a jugar eficientemente. No puedes desperdiciar un intento en una palabra que ignora lo que ya sabes.
-
-Seleccion ponderada por frecuencia. Cuando tengo 3 palabras candidatas, no elijo una al azar. Miro cuales letras no probadas son mas comunes. Si un candidato prueba una D y otro prueba una Z, voy con la D siempre. Aunque ese intento sea incorrecto, la retroalimentacion va a ser mas util.
-
-Y honestamente? Simplemente juega mucho. Despues de unos cientos de rondas, empiezas a ver patrones sin pensarlos. -CION, -MENTE, -ABLE, -ANDO, -ENTE. Tu cerebro construye una tabla de busqueda con el tiempo, y ese reconocimiento de patrones es lo que convierte un promedio de 4 intentos en uno de 3. No hay atajo. Pero eso tambien es lo que hace que la mejora se sienta ganada.`,
+Hay una Caza de palabras diaria con el mismo tablero para todos, para que puedas compararte con tus amigos, y una versión multijugador en vivo donde gana la ronda el primero que traza el objetivo.`,
       },
     ],
     faq: [
       {
-        question: 'Cual es la mejor palabra inicial para Word Hunt en LexiClash?',
-        answer: 'Yo personalmente busco palabras que tengan las vocales y consonantes mas comunes sin repetir ninguna letra. El punto de tu apertura es aprender cosas, no tener suerte y acertar a la primera.',
+        question: '¿Cómo mejorar en Word Hunt?',
+        answer: 'Recorre la cuadrícula con un método en lugar de quedarte mirando un punto, busca terminaciones comunes como -S, -ES, -AR o -ANDO y, cuando encuentres una palabra, revisa sus versiones más largas antes de seguir. La mayor parte de la mejora viene de encontrar familias de palabras alrededor de las que ya tienes.',
       },
       {
-        question: 'Cuantos intentos tengo en Word Hunt?',
-        answer: 'Tienes un numero limitado de intentos. Mientras menos necesites, mas puntos y monedas te llevas. El puzzle diario es la misma palabra para todos, lo cual lo hace divertido para comparar con amigos.',
+        question: '¿Se puede ir en diagonal en Word Hunt?',
+        answer: 'Sí. En una cuadrícula de letras cada casilla conecta con las que la tocan en las 8 direcciones, incluidas las diagonales. No puedes usar la misma casilla dos veces en una palabra.',
       },
       {
-        question: 'Que significan los colores en las pistas de Word Hunt?',
-        answer: 'Verde = letra correcta, posicion correcta. Amarillo = la letra esta en la palabra pero la pusiste en el lugar equivocado. Gris = no esta en la palabra para nada. Verde es genial, amarillo es util, gris tambien es informacion (ahora sabes que evitar).',
+        question: '¿Conviene buscar palabras cortas o largas?',
+        answer: 'Las dos. Las cortas son rápidas y mantienen el ritmo, las largas valen mucho más. Muchos jugadores sacan primero las cortas fáciles y dedican el resto de la ronda a construir palabras largas con las terminaciones que han visto.',
       },
       {
-        question: 'Como puedo mejorar mi tasa de resolucion en Word Hunt?',
-        answer: 'Empieza con una apertura fuerte, nunca reutilices letras grises (en serio, solo esto ya te ayuda un monton), se sistematico probando letras amarillas en posiciones nuevas, y empieza a memorizar grupos de terminaciones como -CION y -MENTE. Se siente lento al principio pero tu promedio va a bajar rapido.',
+        question: '¿Qué tiene de distinto Caza de palabras de LexiClash?',
+        answer: 'Añade una palabra objetivo oculta en el tablero. Tu vida baja con el tiempo, las palabras del tablero te curan y revelan letras de pista en verde, amarillo y gris sobre el objetivo, y ganas si trazas el objetivo antes de quedarte sin vida. Puedes jugar gratis en el navegador, en solitario como reto diario o en vivo contra otros jugadores.',
       },
     ],
-    ctaText: 'Juega Word Hunt',
+    ctaText: 'Jugar a Caza de palabras',
     ctaLink: '/daily',
-    backToGuides: 'Volver a guias',
+    backToGuides: 'Volver a guías',
   },
 };
