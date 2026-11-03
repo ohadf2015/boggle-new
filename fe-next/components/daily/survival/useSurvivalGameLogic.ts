@@ -239,6 +239,7 @@ export function useSurvivalGameLogic({
     isPaused: state.isGameOver,
     enabled: true,
     earthquakeState: 'fire-round', // Always fire-round for survival mode
+    fireRoundBed: 'daily',
   });
 
   // Check if player is new (first 3 daily challenges) - calculated once
@@ -307,7 +308,7 @@ export function useSurvivalGameLogic({
     gameOverRef.current = true;
     dispatch({ type: 'GAME_OVER', payload: { won } });
 
-    fadeToTrack(TRACKS.BOSSA, 1000, 1500);
+    fadeToTrack(TRACKS.RESULTS, 1000, 1500);
 
     lifeDrainInterval.stop();
 
