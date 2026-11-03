@@ -43,7 +43,12 @@ export const THIRD_PARTY_SCRIPT_NOISE: RegExp[] = [
   /to WebGL2RenderingContext\.shaderSource must be an instance of WebGLShader/,
   /Error invoking postMessage: Java object is gone/,
   /^SecurityError: The request was denied\.?$/,
+  // GIS console.error when Google answers its One Tap call with an HTML 400 page (crawlers)
+  /^malformed JSON response: <html/,
 ];
+
+/** Frame URLs of scripts we embed but don't ship, for Sentry `denyUrls`. */
+export const THIRD_PARTY_SCRIPT_URLS: RegExp[] = [/^https:\/\/accounts\.google\.com\/gsi\//];
 
 /**
  * Expected, handled conditions that still reach Sentry through a warn: rrweb's
@@ -54,4 +59,6 @@ export const EXPECTED_CLIENT_NOISE: RegExp[] = [
   /^\[rrweb\] dropped \d+ node\(s\)/,
   /Failed to find Server Action/,
   /\[SOCKET\.IO\] Socket error event.*(SOCIAL_RESTRICTED|GAME_ALREADY_EXISTS)/,
+  // Pixi's warn-once when it falls back to Canvas2D (no WebGL) and skips a glow filter
+  /^CanvasRenderer: filter ".*" is not supported in Canvas2D/,
 ];

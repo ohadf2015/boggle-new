@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { WASM_STREAMING_COMPILE_FAILED, THIRD_PARTY_SCRIPT_NOISE, EXPECTED_CLIENT_NOISE, isStaleAssetLinkRejection } from '../benignErrorPatterns';
+import { WASM_STREAMING_COMPILE_FAILED, THIRD_PARTY_SCRIPT_NOISE, THIRD_PARTY_SCRIPT_URLS, EXPECTED_CLIENT_NOISE, isStaleAssetLinkRejection } from '../benignErrorPatterns';
 
 /**
  * PixiJS lazily loads its basis-transcoder WASM. When the browser rejects
@@ -90,12 +90,27 @@ describe('THIRD_PARTY_SCRIPT_NOISE', () => {
     "TypeError: Argument 1 ('shader') to WebGL2RenderingContext.shaderSource must be an instance of WebGLShader",
     'Error invoking postMessage: Java object is gone',
     'SecurityError: The request was denied.',
+    'malformed JSON response: <html lang="en" dir=ltr><meta charset=utf-8><title>Error 400 (Bad Request)!!1</title>',
   ])('matches %s', (msg) => {
     expect(THIRD_PARTY_SCRIPT_NOISE.some((re) => re.test(msg))).toBe(true);
   });
 
   it('does not swallow first-party errors', () => {
     expect(THIRD_PARTY_SCRIPT_NOISE.some((re) => re.test('TypeError: x.foo is not a function'))).toBe(false);
+    expect(THIRD_PARTY_SCRIPT_NOISE.some((re) => re.test('SyntaxError: malformed JSON in /api/streak'))).toBe(false);
+  });
+});
+
+describe('THIRD_PARTY_SCRIPT_URLS', () => {
+  const denied = (url: string) => THIRD_PARTY_SCRIPT_URLS.some((re) => re.test(url));
+
+  it('denies frames from the Google Identity Services client', () => {
+    expect(denied('https://accounts.google.com/gsi/client')).toBe(true);
+  });
+
+  it('keeps our own chunks', () => {
+    expect(denied('app:///_next/static/chunks/23388.98f755de3d41c170.js')).toBe(false);
+    expect(denied('https://www.lexiclash.live/_next/static/chunks/gsi-button.js')).toBe(false);
   });
 });
 
@@ -107,6 +122,7 @@ describe('EXPECTED_CLIENT_NOISE', () => {
     'Failed to find Server Action "7f3a". This request might be from an older or newer deployment.',
     '[SOCKET.IO] Socket error event: {"code":"SOCIAL_RESTRICTED"}',
     '[SOCKET.IO] Socket error event: {"code":"GAME_ALREADY_EXISTS"}',
+    'CanvasRenderer: filter "t" is not supported in Canvas2D and will be skipped.',
   ])('matches %s', (msg) => {
     expect(matches(msg)).toBe(true);
   });
