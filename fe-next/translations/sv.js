@@ -17766,7 +17766,7 @@ const sv = {
       "status_unknown_body": "Något gick fel hos oss. Öppna lärarpanelen eller ladda om sidan för att kolla igen.",
       "auth_required_title": "Börja med ditt konto",
       "auth_required_body": "Snabbast med Google. E-post går också: vi skickar en länk som tar dig direkt tillbaka hit.",
-      "auth_required_cta": "Skapa mitt gratis lärarkonto",
+      "auth_required_cta": "Registrera med e-post",
       "auth_signin_cta": "Har du redan ett konto? Logga in",
       "trust_instant": "Direkt åtkomst, ingen granskningskö",
       "trust_free": "Gratis lärarplan, utan slutdatum",

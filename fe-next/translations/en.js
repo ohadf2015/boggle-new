@@ -15800,7 +15800,7 @@ const en = {
       "status_unknown_body": "Something went wrong on our side. Open your teacher dashboard, or reload this page to check again.",
       "auth_required_title": "Start with your account",
       "auth_required_body": "Google is the fastest way in. Email works too: we send a link that brings you right back here.",
-      "auth_required_cta": "Create my free teacher account",
+      "auth_required_cta": "Sign up with email",
       "auth_signin_cta": "Already have an account? Sign in",
       "trust_instant": "Instant access, no review queue",
       "trust_free": "Free teacher plan, no expiry",

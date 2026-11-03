@@ -100,6 +100,7 @@ function AnalyticsPreview({ calm = false }: { calm?: boolean }) {
 
 function MasteryPreview() {
   const { t, names, words } = useSample();
+  const { language } = useLanguage();
   const grid = sampleMasteryGrid();
   const hardest = sampleHardestWords().slice(0, 3).map((i) => words[i]).join(', ');
   return (
@@ -107,7 +108,19 @@ function MasteryPreview() {
       <div className="grid gap-1" style={{ gridTemplateColumns: `3.5rem repeat(${SAMPLE_WORD_COUNT}, minmax(0, 1fr))` }}>
         <span />
         {words.map((w) => (
-          <span key={w} className="truncate text-center text-[10px] font-bold text-neo-white/70" title={w}>{w}</span>
+          <span
+            key={w}
+            data-testid="pro-preview-word"
+            title={w}
+            dir="auto"
+            className={cn(
+              'max-h-20 self-end justify-self-center overflow-hidden text-[10px] font-bold leading-tight text-neo-white/70 [writing-mode:vertical-rl]',
+              // Latin, Cyrillic and Hebrew read bottom-up like a chart axis; Japanese stays upright top-down.
+              language !== 'ja' && 'rotate-180',
+            )}
+          >
+            {w}
+          </span>
         ))}
         {grid.map((row, r) => (
           <div key={names[r]} className="contents">

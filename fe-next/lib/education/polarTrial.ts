@@ -134,3 +134,12 @@ export function isPolarTrialLapse(row: PolarTrialLapseRow | null | undefined): b
   }
   return status === 'canceled' || status === 'unpaid' || status === 'incomplete_expired' || status === 'paused';
 }
+
+type TrialTitleT = (key: string, params?: Record<string, string | number>) => string;
+
+export function polarTrialDaysTitle(t: TrialTitleT, daysLeft: number | null): string {
+  if (daysLeft === null) return t('teacher.plan.trialActive');
+  if (daysLeft <= 0) return t('teacher.subscription.trialLifecycleTitleToday');
+  if (daysLeft === 1) return t('teacher.subscription.trialLifecycleTitleOne');
+  return t('teacher.subscription.trialLifecycleTitle', { count: String(daysLeft) });
+}

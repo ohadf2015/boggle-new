@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { Target } from 'lucide-react';
-import type { MissedWord } from '@/components/education/live/eduReteachModel';
+import { foundPercent, type MissedWord } from '@/components/education/live/eduReteachModel';
 
 type Translate = (key: string, params?: Record<string, string | number>) => string;
 
@@ -15,6 +15,11 @@ interface MissedWordsListProps {
   t: Translate;
   /** The action that practices exactly these words, drawn inside the panel so it reads as acting on them. */
   children?: ReactNode;
+}
+
+function percentSuffix(w: MissedWord): string {
+  const pct = foundPercent(w.found, w.of);
+  return pct === null ? '' : ` · ${pct}%`;
 }
 
 /** "Words your class missed": the free reteach insight, sized off the results container so the back row can read it. */
@@ -57,6 +62,7 @@ export function MissedWordsList({ words, underHalf, maxChips = 8, title, t, chil
             ) : (
               <span dir="ltr" className="font-neo-body text-[0.7em] font-bold tabular-nums text-neo-black/75">
                 {w.found}/{w.of}
+                {percentSuffix(w)}
               </span>
             )}
           </li>

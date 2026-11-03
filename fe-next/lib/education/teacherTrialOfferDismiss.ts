@@ -1,42 +1,15 @@
-/**
- * Dismiss window for the Teacher Pro 14-day trial offer on HQ.
- *
- * Permanent hide is how 65 approved teachers never started a trial (PR #1143
- * shipped the Polar path, but only /teacher/upgrade called it). "Not now"
- * stays quiet for a week, then the banner comes back — same TTL shape as
- * the milestone Pro ask.
- */
+import { isDismissedWithin, persistDismissedAt } from '@/hooks/useLocalStorageState';
 
+/** 14-day trial offer on teacher home: "Not now" stays quiet for a week, then the offer returns (a permanent hide once kept approved teachers from ever starting a trial). */
 export const TEACHER_TRIAL_OFFER_DISMISS_KEY = 'lexiclash.teacher_trial_offer_dismissed';
 export const TEACHER_TRIAL_OFFER_DISMISS_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
-type StorageLike = {
-  getItem?(key: string): string | null;
-  setItem?(key: string, value: string): void;
-} | null | undefined;
+type StorageLike = Parameters<typeof isDismissedWithin>[0];
 
-export function isTeacherTrialOfferDismissed(
-  storage: StorageLike,
-  now: number = Date.now(),
-): boolean {
-  try {
-    const raw = storage?.getItem?.(TEACHER_TRIAL_OFFER_DISMISS_KEY);
-    if (!raw) return false;
-    const ts = Number(raw);
-    if (!Number.isFinite(ts)) return false;
-    return now - ts < TEACHER_TRIAL_OFFER_DISMISS_TTL_MS;
-  } catch {
-    return false;
-  }
+export function isTeacherTrialOfferDismissed(storage: StorageLike, now: number = Date.now()): boolean {
+  return isDismissedWithin(storage, TEACHER_TRIAL_OFFER_DISMISS_KEY, TEACHER_TRIAL_OFFER_DISMISS_TTL_MS, now);
 }
 
-export function persistTeacherTrialOfferDismissed(
-  storage: StorageLike,
-  now: number = Date.now(),
-): void {
-  try {
-    storage?.setItem?.(TEACHER_TRIAL_OFFER_DISMISS_KEY, String(now));
-  } catch {
-    /* private mode / quota — in-session hide still works */
-  }
+export function persistTeacherTrialOfferDismissed(storage: StorageLike, now: number = Date.now()): void {
+  persistDismissedAt(storage, TEACHER_TRIAL_OFFER_DISMISS_KEY, now);
 }

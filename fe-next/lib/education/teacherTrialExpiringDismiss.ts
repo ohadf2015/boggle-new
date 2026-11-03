@@ -1,40 +1,15 @@
-/**
- * Dismiss window for the Teacher Pro trial expiring banner on HQ.
- *
- * Stored in localStorage so dismissing the urgency banner stays quiet
- * for 24 hours rather than flashing on every page reload.
- */
+import { isDismissedWithin, persistDismissedAt } from '@/hooks/useLocalStorageState';
 
+/** Trial-expiring banner on teacher home: "Not now" stays quiet for 24 hours. */
 export const TEACHER_TRIAL_EXPIRING_DISMISS_KEY = 'lexiclash.teacher_trial_expiring_dismissed';
 export const TEACHER_TRIAL_EXPIRING_DISMISS_TTL_MS = 24 * 60 * 60 * 1000;
 
-type StorageLike = {
-  getItem?(key: string): string | null;
-  setItem?(key: string, value: string): void;
-} | null | undefined;
+type StorageLike = Parameters<typeof isDismissedWithin>[0];
 
-export function isTeacherTrialExpiringDismissed(
-  storage: StorageLike,
-  now: number = Date.now(),
-): boolean {
-  try {
-    const raw = storage?.getItem?.(TEACHER_TRIAL_EXPIRING_DISMISS_KEY);
-    if (!raw) return false;
-    const ts = Number(raw);
-    if (!Number.isFinite(ts)) return false;
-    return now - ts < TEACHER_TRIAL_EXPIRING_DISMISS_TTL_MS;
-  } catch {
-    return false;
-  }
+export function isTeacherTrialExpiringDismissed(storage: StorageLike, now: number = Date.now()): boolean {
+  return isDismissedWithin(storage, TEACHER_TRIAL_EXPIRING_DISMISS_KEY, TEACHER_TRIAL_EXPIRING_DISMISS_TTL_MS, now);
 }
 
-export function persistTeacherTrialExpiringDismissed(
-  storage: StorageLike,
-  now: number = Date.now(),
-): void {
-  try {
-    storage?.setItem?.(TEACHER_TRIAL_EXPIRING_DISMISS_KEY, String(now));
-  } catch {
-    /* private mode / quota — in-session hide still works */
-  }
+export function persistTeacherTrialExpiringDismissed(storage: StorageLike, now: number = Date.now()): void {
+  persistDismissedAt(storage, TEACHER_TRIAL_EXPIRING_DISMISS_KEY, now);
 }

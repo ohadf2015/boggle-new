@@ -36,6 +36,11 @@ export function mostMissedWords(summary: ClassroomSummary): MissedWord[] {
     .sort((a, b) => a.found - b.found);
 }
 
+export function foundPercent(found: number, of: number): number | null {
+  if (!(of > 0)) return null;
+  return Math.round((found / of) * 100);
+}
+
 /** What a replay sends: every lesson word unfound is the whole lesson again, which is Play again, not a replay. */
 export function reteachList(summary: ClassroomSummary): MissedWord[] {
   return reteachVerdict(summary).words;

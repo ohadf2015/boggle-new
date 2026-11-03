@@ -62,10 +62,10 @@ describe('<TeacherDashboard> Pro state', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  it('shows the Free chip for a free teacher and no celebration', () => {
+  it('leaves "Free plan" to the shell header for a free teacher, so it is not said twice, and shows no celebration', () => {
     proState = { hasPro: false, loading: false, source: 'polar', periodEnd: null, grant: null, grantExpired: false, refresh: vi.fn() };
     render(<TeacherDashboard />);
-    expect(screen.getByTestId('teacher-plan-badge')).toHaveAttribute('data-plan', 'free');
+    expect(screen.queryByTestId('teacher-plan-badge')).not.toBeInTheDocument();
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 });

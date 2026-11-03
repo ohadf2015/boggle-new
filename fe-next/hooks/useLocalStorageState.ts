@@ -122,6 +122,48 @@ export function useDismissedFlag(key: string): {
   return { isDismissed, dismiss };
 }
 
+type StorageLike = Pick<Storage, 'getItem' | 'setItem'> | Partial<Pick<Storage, 'getItem' | 'setItem'>> | null | undefined;
+
+/** A dismissal stored as its epoch-ms time, honoured until `ttlMs` has passed. */
+export function isDismissedWithin(storage: StorageLike, key: string, ttlMs: number, now: number = Date.now()): boolean {
+  try {
+    const raw = storage?.getItem?.(key);
+    if (!raw) return false;
+    const ts = Number(raw);
+    if (!Number.isFinite(ts)) return false;
+    return now - ts < ttlMs;
+  } catch {
+    return false;
+  }
+}
+
+export function persistDismissedAt(storage: StorageLike, key: string, now: number = Date.now()): void {
+  try {
+    storage?.setItem?.(key, String(now));
+  } catch {
+    /* private mode / quota: the in-session hide still works */
+  }
+}
+
+/**
+ * "Not now" that comes back after `ttlMs`. Starts dismissed until storage is
+ * read, so a reload never flashes a banner the user already closed.
+ */
+export function useTimedDismissal(key: string, ttlMs: number): { dismissed: boolean; dismiss: () => void } {
+  const [dismissed, setDismissed] = useState(true);
+
+  useEffect(() => {
+    setDismissed(isDismissedWithin(window.localStorage, key, ttlMs));
+  }, [key, ttlMs]);
+
+  const dismiss = useCallback(() => {
+    persistDismissedAt(window.localStorage, key);
+    setDismissed(true);
+  }, [key]);
+
+  return { dismissed, dismiss };
+}
+
 /**
  * Utility functions for direct localStorage access (for use outside React components).
  * Prefer the hooks for React components.

@@ -122,6 +122,7 @@ function ScorePop({ pop }: { pop: Pop }) {
     <AdaptiveMotion.span
       key={pop.id}
       data-testid="live-board-pop"
+      dir="ltr"
       initial={{ y: 10, scale: 0.6, opacity: 0 }}
       animate={{ y: 0, scale: 1.1, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 520, damping: 22 }}

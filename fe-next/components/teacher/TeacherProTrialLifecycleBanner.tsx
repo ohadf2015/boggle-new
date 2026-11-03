@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { polarTrialDaysLeft } from '@/lib/education/polarTrial';
+import { polarTrialDaysLeft, polarTrialDaysTitle } from '@/lib/education/polarTrial';
 import { TeacherProCheckoutButton } from '@/components/teacher/TeacherProCheckoutButton';
 
 /**
@@ -21,14 +21,7 @@ export function TeacherProTrialLifecycleBanner({
   const [nowMs] = useState(() => Date.now());
   const daysLeft = polarTrialDaysLeft(trialExpires, nowMs);
   const urgent = daysLeft !== null && daysLeft <= 3;
-  const title =
-    daysLeft === null
-      ? t('teacher.plan.trialActive')
-      : daysLeft <= 0
-        ? t('teacher.subscription.trialLifecycleTitleToday')
-        : daysLeft === 1
-          ? t('teacher.subscription.trialLifecycleTitleOne')
-          : t('teacher.subscription.trialLifecycleTitle', { count: String(daysLeft) });
+  const title = polarTrialDaysTitle(t, daysLeft);
 
   return (
     <aside

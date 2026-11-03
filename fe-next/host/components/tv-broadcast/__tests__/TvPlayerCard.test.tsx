@@ -28,6 +28,7 @@ vi.mock('framer-motion', () => {
             data-layout={rest.layout ? 'true' : undefined}
             data-layout-id={rest.layoutId}
             data-testid={rest['data-testid']}
+            dir={rest.dir}
             aria-label={rest['aria-label']}
             role={rest.role}
           >
@@ -174,6 +175,12 @@ describe('TvPlayerCard score bar', () => {
     const { rerender } = render(<TvPlayerCard {...defaultProps} score={100} />);
     rerender(<TvPlayerCard {...defaultProps} score={145} />);
     expect(screen.getByTestId('score-delta').className).toMatch(/(^|\s)absolute(\s|$)/);
+  });
+
+  it('given a Hebrew page, when the delta shows, then it is laid out left to right so it reads "+45", not "45+"', () => {
+    const { rerender } = render(<TvPlayerCard {...defaultProps} score={100} />);
+    rerender(<TvPlayerCard {...defaultProps} score={145} />);
+    expect(screen.getByTestId('score-delta')).toHaveAttribute('dir', 'ltr');
   });
 
   it('no delta badge on first render', () => {

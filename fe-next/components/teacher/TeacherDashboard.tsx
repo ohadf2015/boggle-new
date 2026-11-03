@@ -293,7 +293,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
                 </p>
               ) : null}
             </div>
-            <TeacherPlanBadge quiet className="mt-1 shrink-0 lg:hidden" />
+            {hasPro ? <TeacherPlanBadge quiet className="mt-1 shrink-0 lg:hidden" /> : null}
           </header>
 
           {!ready ? (
