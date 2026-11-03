@@ -19626,6 +19626,7 @@ const sv = {
     "belowYourNorm": "{{delta}}% under ditt snitt"
   },
   "wordcraft": {
+    "botPassed": "WordBot hoppade över sin tur",
     "combo": "COMBO",
     "title": "WordCraft",
     "adminBadge": "Admin-sandlåda · Tävlings-ordbräde",

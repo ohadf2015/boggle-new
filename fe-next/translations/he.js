@@ -19529,6 +19529,7 @@ const he = {
     "belowYourNorm": "{{delta}}% מתחת לממוצע שלך"
   },
   "wordcraft": {
+    "botPassed": "WordBot דילג על התור שלו",
     "domination": "שליטה מוחלטת!",
     "combo": "קומבו",
     "title": "WordCraft",

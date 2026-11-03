@@ -19268,6 +19268,7 @@ const ja = {
     "belowYourNorm": "平均より{{delta}}%"
   },
   "wordcraft": {
+    "botPassed": "WordBotはこのターンをパスしました",
     "combo": "コンボ",
     "title": "WordCraft",
     "adminBadge": "管理者サンドボックス · 単語グリッド",

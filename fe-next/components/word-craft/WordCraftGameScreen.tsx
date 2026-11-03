@@ -46,6 +46,7 @@ import { pickMiniCelebration } from '@/lib/word-craft/celebration/miniCelebratio
 import { useWordCraftSound } from '@/components/word-craft/useWordCraftSound';
 import { useAccessibility } from '@/contexts/AccessibilityContext';
 import { WordCraftScorePreviewBadge } from '@/components/word-craft/WordCraftScorePreviewBadge';
+import { useBotPassNotice } from '@/components/word-craft/hooks/useBotPassNotice';
 import { playBotMoveReveal } from '@/lib/word-craft/pixi/scenes/botMoveReveal';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { inferAxis, resolveTap, type Axis } from '@/lib/word-craft/placement';
@@ -561,6 +562,7 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, daily,
 
 
   const captureToast = useWordCraftBoardEffects({ game, juice, sceneCtx, hotseat });
+  const botPassNotice = useBotPassNotice(game.state.history, hotseat);
 
   useWordCraftMoveFeedback({
     game, juice, sceneCtx, cosyMode, achievementsOn, t, queueAchievement, playCommitSound, playOpponentScored, setScoreFloat, setCelebration,
@@ -1036,6 +1038,16 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, daily,
           {captureToast.by === 'player'
             ? t('wordcraft.territory.captureYou', { count: captureToast.count, bonus: captureToast.bonus })
             : t('wordcraft.territory.captureBot', { count: captureToast.count, bonus: captureToast.bonus })}
+        </div>
+      ) : null}
+
+      {botPassNotice ? (
+        <div
+          key={botPassNotice.key}
+          role="status"
+          className="absolute left-1/2 -translate-x-1/2 top-[calc(72px+40px)] z-40 px-3 py-1.5 border-neo-thick border-black rounded-neo shadow-hard-lg font-neo-display font-bold text-sm bg-neo-cream text-neo-navy animate-neo-pop"
+        >
+          {t('wordcraft.botPassed', 'WordBot skipped its turn')}
         </div>
       ) : null}
 
