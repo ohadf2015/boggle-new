@@ -8,4 +8,6 @@ export const PRO_OFFER_PLACEMENTS: ReadonlySet<string> = new Set([
   'class_report_button',
   // "N students tried to join after your game ended" on the teacher's HQ (EndedCodeTriesNotice).
   'late_join_notice',
+  // Locked "Export class report (PDF)" on the classroom round-results screen (ReportPdfExportButton).
+  'results_report_pdf',
 ]);
