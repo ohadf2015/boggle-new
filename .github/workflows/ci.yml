@@ -74,17 +74,18 @@ jobs:
         run: |
           run_vitest() {
             NAME="$1"; shift
+            OUT="$PWD/vitest-$NAME.json"
             set +e
-            npx vitest run "$@" --passWithNoTests --reporter=default --reporter=json --outputFile.json="vitest-$NAME.json"
+            npx vitest run "$@" --passWithNoTests --reporter=default --reporter=json --outputFile.json="$OUT"
             RC=$?
             set -e
             # A clean exit that selected no tests (a PR touching only docs or workflows) is fine;
             # any other zero-test report still fails the assert below.
-            if [ "$RC" = 0 ] && node -e "process.exit(require('./vitest-$NAME.json').numTotalTests === 0 ? 0 : 1)"; then
+            if [ "$RC" = 0 ] && node -e "process.exit(require('$OUT').numTotalTests === 0 ? 0 : 1)"; then
               echo "$NAME: no tests selected"
               return 0
             fi
-            node scripts/ci/assert-vitest-passed.mjs "vitest-$NAME.json" "$RC"
+            node scripts/ci/assert-vitest-passed.mjs "$OUT" "$RC"
           }
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             run_vitest frontend --config vitest.config.ts --changed HEAD^1
