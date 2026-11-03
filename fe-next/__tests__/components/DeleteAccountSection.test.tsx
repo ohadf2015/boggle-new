@@ -180,6 +180,8 @@ describe('DeleteAccountSection', () => {
     it('continue reveals the irreversible DELETE form', () => {
       render(<DeleteAccountSection isDarkMode={false} />);
       fireEvent.click(screen.getByText('settings.deleteAccountButton'));
+      // Reason is required before continue is enabled (t_b2cbcbd0).
+      fireEvent.click(screen.getByText('settings.teacherDeleteReason.too_many_emails'));
       fireEvent.click(screen.getByText('settings.teacherDeleteContinue'));
       expect(screen.getByPlaceholderText('DELETE')).toBeInTheDocument();
     });
