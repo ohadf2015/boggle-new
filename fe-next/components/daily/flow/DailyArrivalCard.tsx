@@ -32,6 +32,16 @@ export function DailyArrivalCard({ modeId }: { modeId: DailyModeId }) {
   }, []);
 
   if (!mode) return null;
+  if (mode.ownsIntro) {
+    return (
+      <div
+        role="status"
+        aria-label={t(mode.titleKey)}
+        data-testid="daily-arrival"
+        className="flex-1 min-h-[100svh] bg-neo-navy page-content-safe"
+      />
+    );
+  }
   const pips = chainPips(modeId);
 
   return (
