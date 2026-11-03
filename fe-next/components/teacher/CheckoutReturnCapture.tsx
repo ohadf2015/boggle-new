@@ -8,14 +8,19 @@ import {
   GRANT_POLL_INTERVAL_MS,
   GRANT_POLL_MAX_TRIES,
   checkoutReturnPhase,
+  clearCheckoutRedirect,
   clearReturnIntent,
+  forgetCheckoutOriginAwayFrom,
   isCheckoutSuccessSearch,
+  markCheckoutRedirect,
   readReturnIntent,
   rememberReturnIntent,
   takeCheckoutOrigin,
 } from '@/lib/education/checkoutReturn';
 import { trackEduProCheckoutReturnLanded } from '@/lib/education/proFunnelTelemetry';
 import { ProWelcomeCelebration } from '@/components/teacher/ProWelcomeCelebration';
+import { TeacherTrialWelcome } from '@/components/teacher/TeacherTrialWelcome';
+import { polarCheckoutWelcomeKind, type PolarCheckoutWelcomeKind } from '@/lib/education/polarTrial';
 
 const TEACHER_HOME = /^\/[a-z]{2}\/teacher\/?$/;
 
@@ -30,6 +35,12 @@ export function CheckoutReturnCapture() {
   const [active, setActive] = useState(false);
   const { language } = useLanguage();
   const router = useRouter();
+  const currentPathname = usePathname();
+
+  useEffect(() => {
+    if (!currentPathname || isCheckoutSuccessSearch(window.location.search)) return;
+    forgetCheckoutOriginAwayFrom(window.sessionStorage, currentPathname);
+  }, [currentPathname]);
 
   useLayoutEffect(() => {
     const search = window.location.search;
@@ -40,7 +51,10 @@ export function CheckoutReturnCapture() {
         locale: language,
         currentPath: `${window.location.pathname}${search}`,
       });
-      if (origin) router.replace(origin, { scroll: false });
+      if (origin) {
+        markCheckoutRedirect(window.sessionStorage, origin);
+        router.replace(origin, { scroll: false });
+      }
       setActive(true);
       return;
     }
@@ -60,6 +74,11 @@ function CheckoutReturnBanner() {
   const [attempts, setAttempts] = useState(0);
   const [pollGen, setPollGen] = useState(0);
   const [dismissed, setDismissed] = useState(false);
+  const offHome = !!pathname && !TEACHER_HOME.test(pathname);
+
+  useEffect(() => {
+    if (offHome) clearCheckoutRedirect(window.sessionStorage);
+  }, [offHome]);
 
   useEffect(() => {
     if (dismissed || pro.hasPro) return;
@@ -81,7 +100,10 @@ function CheckoutReturnBanner() {
   });
   if (phase === 'idle') return null;
   // Off the home page nobody else celebrates the upgrade, so the unlocked page does.
-  if (phase === 'success' && pathname && !TEACHER_HOME.test(pathname)) return <PaidOnThisPage />;
+  const welcome = polarCheckoutWelcomeKind({ checkoutSuccess: true, hasPro: pro.hasPro, source: pro.source, status: pro.status ?? 'active' });
+  if (phase === 'success' && offHome && welcome !== 'none') {
+    return <WelcomeOnThisPage kind={welcome} trialExpires={pro.trialExpires ?? pro.periodEnd ?? null} />;
+  }
 
   const copy = {
     activating: ['teacher.checkoutReturn.activatingTitle', 'teacher.checkoutReturn.activatingBody'],
@@ -143,9 +165,9 @@ function CheckoutReturnBanner() {
   );
 }
 
-function PaidOnThisPage() {
+function WelcomeOnThisPage({ kind, trialExpires }: { kind: Exclude<PolarCheckoutWelcomeKind, 'none'>; trialExpires: string | null }) {
   useEffect(() => {
     clearReturnIntent(window.sessionStorage);
   }, []);
-  return <ProWelcomeCelebration grant={null} paid />;
+  return kind === 'trial' ? <TeacherTrialWelcome trialExpires={trialExpires} onReturnPage /> : <ProWelcomeCelebration grant={null} paid onReturnPage />;
 }

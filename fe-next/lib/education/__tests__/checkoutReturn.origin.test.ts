@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import {
   CHECKOUT_ORIGIN_KEY,
   CHECKOUT_ORIGIN_TTL_MS,
+  forgetCheckoutOriginAwayFrom,
   rememberCheckoutOrigin,
   takeCheckoutOrigin,
 } from '../checkoutReturn';
@@ -57,5 +58,21 @@ describe('checkout origin (client-side return to the page checkout started on)',
     };
     expect(() => rememberCheckoutOrigin(broken, REPORT, NOW)).not.toThrow();
     expect(takeCheckoutOrigin(broken, { locale: 'he', currentPath: '/he/teacher', now: NOW })).toBeNull();
+  });
+});
+
+describe('an abandoned checkout origin', () => {
+  beforeEach(() => sessionStorage.clear());
+
+  it('is kept while the teacher is still on that page', () => {
+    rememberCheckoutOrigin(sessionStorage, REPORT, NOW);
+    forgetCheckoutOriginAwayFrom(sessionStorage, '/he/teacher/reports');
+    expect(sessionStorage.getItem(CHECKOUT_ORIGIN_KEY)).not.toBeNull();
+  });
+
+  it('is dropped once the teacher moves to another page, so a later checkout is not sent back', () => {
+    rememberCheckoutOrigin(sessionStorage, REPORT, NOW);
+    forgetCheckoutOriginAwayFrom(sessionStorage, '/he/teacher/upgrade');
+    expect(sessionStorage.getItem(CHECKOUT_ORIGIN_KEY)).toBeNull();
   });
 });

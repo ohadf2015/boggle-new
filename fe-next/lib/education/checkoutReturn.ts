@@ -140,6 +140,50 @@ export function takeCheckoutOrigin(
   return path;
 }
 
+/** A teacher who left checkout and moved on to another page must not be sent back later. */
+export function forgetCheckoutOriginAwayFrom(storage: GetStorage & ClearStorage, pathname: string): void {
+  try {
+    const raw = storage.getItem(CHECKOUT_ORIGIN_KEY);
+    if (!raw) return;
+    const path = (JSON.parse(raw) as { path?: unknown }).path;
+    if (typeof path !== 'string' || path.split('?')[0] !== pathname) storage.removeItem(CHECKOUT_ORIGIN_KEY);
+  } catch {
+    try {
+      storage.removeItem(CHECKOUT_ORIGIN_KEY);
+    } catch {
+      /* nothing to forget */
+    }
+  }
+}
+
+export const CHECKOUT_REDIRECT_KEY = 'lexi_edu_checkout_redirect';
+
+/** The landing is about to move to `path`; the page being left must not celebrate first. */
+export function markCheckoutRedirect(storage: SetStorage, path: string): void {
+  try {
+    storage.setItem(CHECKOUT_REDIRECT_KEY, path);
+  } catch {
+    /* worst case: one extra celebration */
+  }
+}
+
+export function isCheckoutRedirectPending(storage: GetStorage, currentPathname: string): boolean {
+  try {
+    const target = storage.getItem(CHECKOUT_REDIRECT_KEY);
+    return !!target && target.split('?')[0] !== currentPathname;
+  } catch {
+    return false;
+  }
+}
+
+export function clearCheckoutRedirect(storage: ClearStorage): void {
+  try {
+    storage.removeItem(CHECKOUT_REDIRECT_KEY);
+  } catch {
+    /* already gone */
+  }
+}
+
 export function rememberReturnIntent(storage: SetStorage, now: number = Date.now()): void {
   try {
     storage.setItem(RETURN_INTENT_KEY, String(now));
