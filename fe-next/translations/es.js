@@ -4250,6 +4250,7 @@ const es = {
     "gameCodeNotExist": "Código no encontrado. Revísalo.",
     "usernameTaken": "Alguien se te adelantó. Prueba otro nombre",
     "tooManyAttempts": "Frena un poco. Espera un segundo y vuelve a intentarlo",
+    "roomCreateTooSoon": "Acabas de abrir una sala. Prueba de nuevo en unos segundos",
     "gameCodeExists": "Ese código ya está en uso. Elige otro",
     "somethingWentWrong": "Pausa técnica",
     "unexpectedError": "Un pequeño fallo, pero tu juego está a salvo",

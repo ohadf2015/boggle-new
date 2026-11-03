@@ -3792,6 +3792,7 @@ const en = {
     "roomNotFoundJoinAnother": "Room not found. It may have ended. Browse rooms below.",
     "usernameTaken": "Name taken. Try another one",
     "tooManyAttempts": "Too fast. Wait a second, then tap again",
+    "roomCreateTooSoon": "You just opened a room. Try again in a few seconds",
     "gameCodeExists": "That code's taken. Pick another.",
     "somethingWentWrong": "Quick timeout",
     "unexpectedError": "Tiny hiccup. Your game is safe.",

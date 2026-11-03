@@ -19,6 +19,7 @@ import { sanitizeRoomName, sanitizeUsername } from '@/utils/consts';
 import { sanitizeGameCode } from '@/lib/multiplayer/sanitizeGameCode';
 import { getGuestSessionId, hashToken } from '@/utils/guestManager';
 import { setRejoinIntent } from '@/utils/socketRejoin';
+import { getSharedSocketIfExists } from '@/utils/SocketContext';
 import type { Language, Avatar } from '@/shared/types/game';
 
 // Hex color validation pattern (must match backend schema)
@@ -110,7 +111,7 @@ type HandleJoinFn = (
 ) => Promise<void>;
 
 export function useMultiplayerJoin({
-  socket,
+  socket: socketFromProps,
   gameCode,
   username,
   roomName,
@@ -131,8 +132,8 @@ export function useMultiplayerJoin({
   // Synchronous double-submit guard. React's `isJoining` state (used to disable
   // the button) updates asynchronously, so two rapid invocations — Enter key +
   // button click, or auto-join racing a manual tap — can both pass the disabled
-  // check and double-emit. A ref flips synchronously, closing that window.
-  const inFlightRef = useRef(false);
+  // check and double-emit. Holds the live attempt so only that attempt can clear it.
+  const attemptRef = useRef<object | null>(null);
 
   // Auth-sensitive values, re-read AFTER the await in the join body. The
   // callback's closure copies go stale the instant we yield, and picking up the
@@ -150,15 +151,18 @@ export function useMultiplayerJoin({
       options?: { isPrivate?: boolean; isClassroom?: boolean; quickPlay?: boolean; autoRetry?: boolean },
     ) => {
       if (process.env.NODE_ENV === 'development') {
-        console.log(`[JOIN] handleJoin called - mode: ${isHostMode ? 'HOST' : 'PLAYER'}, socket connected: ${socket?.connected}`);
+        console.log(`[JOIN] handleJoin called - mode: ${isHostMode ? 'HOST' : 'PLAYER'}, socket connected: ${socketFromProps?.connected}`);
       }
 
-      if (inFlightRef.current) {
+      if (attemptRef.current) {
         logger.debug('[JOIN] Ignoring duplicate join — a join is already in flight');
         return;
       }
-      inFlightRef.current = true;
-      const releaseInFlight = (): void => { inFlightRef.current = false; };
+      const attempt = {};
+      attemptRef.current = attempt;
+      const releaseInFlight = (): void => { if (attemptRef.current === attempt) attemptRef.current = null; };
+      // The page hands over its socket only after the first connect; an early tap must still reach the connect wait.
+      const socket = socketFromProps ?? getSharedSocketIfExists();
 
       const joinStartedAt = Date.now();
 
@@ -208,8 +212,8 @@ export function useMultiplayerJoin({
         const connected = await new Promise<boolean>((resolve) => {
           // 5s was too short for a cold mobile radio: 50 dead-socket taps from
           // 27 people in 11 days, 26 of them in their first 24 hours.
-          const timeout = setTimeout(() => resolve(false), SOCKET_CONNECT_TIMEOUT_MS);
           const onConnect = (): void => { clearTimeout(timeout); resolve(true); };
+          const timeout = setTimeout(() => { socket.off('connect', onConnect); resolve(false); }, SOCKET_CONNECT_TIMEOUT_MS);
           socket.once('connect', onConnect);
           if (socket.connected) { clearTimeout(timeout); socket.off('connect', onConnect); resolve(true); }
         });
@@ -300,6 +304,7 @@ export function useMultiplayerJoin({
       const effectiveAvatar = buildAvatar(liveProfile, fallbackAvatar, avatarImageId, isGuest);
 
       const safetyTimeout = setTimeout(() => {
+        detachListeners();
         releaseInFlight();
         setIsJoining(false);
         logger.debug('[JOIN] Safety timeout triggered');
@@ -337,10 +342,14 @@ export function useMultiplayerJoin({
             asSpectator: result === 'joinedAsSpectator',
           });
         }
+        detachListeners();
+      };
+      const detachListeners = (): void => {
         socket.off('joined', onJoined);
         socket.off('error', onError);
         socket.off('joinedAsSpectator', onSpectator);
         socket.off('rateLimited', onRateLimited);
+        socket.off('rate-limited', onRoomCreateLimited);
       };
       const onJoined = (): void => resolveJoin('joined');
       // Keep the server's reason. This handler used to drop the payload, which is
@@ -361,10 +370,18 @@ export function useMultiplayerJoin({
       };
       const onSpectator = (): void => resolveJoin('joinedAsSpectator');
       const onRateLimited = (): void => resolveJoin('rateLimited');
+      // createGame answers its per-socket room limit on this event; without it the tap sat out the 10s timer.
+      const onRoomCreateLimited = (payload?: { action?: string }): void => {
+        if (payload?.action !== 'roomCreate') return;
+        resolveJoin('rateLimited', 'roomCreate');
+        setIsJoining(false);
+        toast.error(t('errors.roomCreateTooSoon'), { duration: 4000, icon: '⏳', id: MP_TOAST_IDS.rateLimited });
+      };
       socket.on('joined', onJoined);
       socket.on('error', onError);
       socket.on('joinedAsSpectator', onSpectator);
       socket.on('rateLimited', onRateLimited);
+      socket.on('rate-limited', onRoomCreateLimited);
 
       // Sanitize at the emit chokepoint so EVERY entry path (typed input,
       // paste, ?room= URL param, auto-join) is covered before it hits the
@@ -462,7 +479,7 @@ export function useMultiplayerJoin({
     // listing them here only churned handleJoin's identity on every auth
     // render and re-rendered the whole lobby with it.
     [
-      socket, gameCode, roomName, language, t,
+      socketFromProps, gameCode, roomName, language, t,
       isSupabaseEnabled, authLoadingStartTime,
       hostUsername, setGuestAvatar, setUsername, setError, setIsJoining,
     ]
