@@ -23,6 +23,10 @@ for (const rate of [1, 4]) {
     test.setTimeout(120_000);
     await page.setViewportSize({ width: 1366, height: 768 });
     await signInAs(context, page, baseURL!, 'student-full');
+    // A returning student: the consent banner would land inside the motion window at 4x and read as motion.
+    await context.addInitScript(() => {
+      localStorage.setItem('cookie-consent-v2', JSON.stringify({ essential: true, analytics: false, advertising: false, timestamp: Date.now() }));
+    });
     await observeLayoutShift(page);
     await page.goto('/en/student');
     await expect(page.getByTestId('academy-hub')).toBeVisible({ timeout: 60_000 });
@@ -77,3 +81,23 @@ test('reduced motion: the hub settles with nothing left moving', async ({ page, 
   );
   expect(running).toEqual([]);
 });
+
+for (const reduced of [false, true]) {
+  test(`chest badge idle wiggle ${reduced ? 'is still under' : 'moves without'} reduced motion`, async ({ page, context, baseURL }) => {
+    if (reduced) await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await signInAs(context, page, baseURL!, 'student-full');
+    await page.goto('/en/student');
+    const badge = page.getByTestId('academy-daily-chest');
+    await expect(badge).toBeEnabled({ timeout: 60_000 });
+    await page.waitForTimeout(800);
+    const samples: string[] = [];
+    for (let i = 0; i < 12; i++) {
+      samples.push(await badge.evaluate((el) => getComputedStyle(el).transform));
+      await page.waitForTimeout(350);
+    }
+    const distinct = new Set(samples).size;
+    if (reduced) expect(distinct, samples.join(' | ')).toBe(1);
+    else expect(distinct, samples.join(' | ')).toBeGreaterThan(1);
+  });
+}

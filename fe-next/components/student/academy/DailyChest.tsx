@@ -68,7 +68,7 @@ export function DailyChest({ userId, reducedMotion, onGranted, size = 'sm', onRe
     });
   };
 
-  // One layer per couple of frames: mounting rays, coins and confetti in the same task as the burst cost a 4x-throttled frame 60-80ms.
+  // Rays, then coins and confetti, mount on later frames than the burst so one task does not pay for all of them.
   const [layers, setLayers] = useState(0);
   useEffect(() => {
     if (phase !== 'open') { setLayers(0); return; }
@@ -161,10 +161,14 @@ export function DailyChest({ userId, reducedMotion, onGranted, size = 'sm', onRe
               </m.div>
             </BoundedConfettiBurst>
 
-            {phase === 'open' && (
+            {/* Laid out from the rattle on, so opening never moves the chest. */}
+            {covering && (
               <m.div
-                className="relative z-10 mt-6 flex flex-col items-center gap-4 text-center"
-                initial={reducedMotion ? false : { y: 24, scale: 0.8 }}
+                key={phase}
+                data-testid="academy-chest-reward"
+                aria-hidden={phase !== 'open'}
+                className={cn('relative z-10 mt-6 flex flex-col items-center gap-4 text-center', phase !== 'open' && 'invisible')}
+                initial={reducedMotion || phase !== 'open' ? false : { y: 24, scale: 0.8 }}
                 animate={{ y: 0, scale: 1 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 18, delay: 0.15 }}
               >

@@ -68,3 +68,18 @@ describe('<DailyChest> reveal lifetime', () => {
     expect(onReveal).toHaveBeenLastCalledWith(false);
   });
 });
+
+describe('<DailyChest> stable reveal layout', () => {
+  it('lays the reward out (invisible) during the rattle so the chest does not jump when it opens', () => {
+    vi.useFakeTimers();
+    window.localStorage.clear();
+    global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ newTotalXp: 1 }) }) as never;
+    render(<DailyChest userId="d" reducedMotion={false} onGranted={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('academy-daily-chest'));
+    const reward = screen.getByTestId('academy-chest-reward');
+    expect(reward.className).toContain('invisible');
+    act(() => { vi.advanceTimersByTime(KEY_MOMENTS.chest.transition.duration * 1000 + 20); });
+    expect(screen.getByTestId('academy-chest-reward').className).not.toContain('invisible');
+    vi.useRealTimers();
+  });
+});

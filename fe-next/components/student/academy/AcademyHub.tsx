@@ -146,9 +146,11 @@ export function AcademyHub(props: AcademyHubProps) {
     if (shouldOpenClassSheet(searchParams, classroomId)) setClassOpen(true);
   }, [searchParams, classroomId]);
   const [grantedXp, setGrantedXp] = useState<number | null>(null);
-  // The map keeps animating under the 95% chest overlay; hiding it there halves the frame cost of the reveal.
+  // The map keeps animating under the 95% chest overlay unless it is hidden while the reveal covers it.
   const hubRef = useRef<HTMLDivElement>(null);
-  const onChestCover = useCallback((covering: boolean) => { hubRef.current?.toggleAttribute('data-covered', covering); }, []);
+  const onChestCover = useCallback((covering: boolean) => {
+    requestAnimationFrame(() => hubRef.current?.toggleAttribute('data-covered', covering));
+  }, []);
   const [live, setLive] = useState<LiveState>(NO_LIVE);
   const [note, setNote] = useState<Note>(null);
   const liveGame = classroomId ? live.activeGame : null;
