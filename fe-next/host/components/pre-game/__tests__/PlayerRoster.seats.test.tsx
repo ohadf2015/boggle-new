@@ -23,6 +23,19 @@ describe('PlayerRoster — the 8-seat lobby grid', () => {
     expect(screen.getAllByTestId('lobby-seat-empty')).toHaveLength(5);
   });
 
+  it('squad header shows the real room cap once a big room outgrows 8 chairs (prod read "SQUAD 11/8")', () => {
+    const crowd = [{ username: 'Host', isHost: true }, ...Array.from({ length: 10 }, (_, i) => ({ username: `P${i}` }))];
+    render(<PlayerRoster players={crowd} username="Host" gameCode="ABCD" maxPlayers={50} t={t} />);
+    const header = screen.getByText('mpUi.lobby.squad').parentElement!;
+    expect(header).toHaveTextContent('11/50');
+    expect(header).not.toHaveTextContent('11/8');
+  });
+
+  it('squad header keeps the familiar n/8 while the room fits the chairs', () => {
+    render(<PlayerRoster players={room} username="Host" gameCode="ABCD" maxPlayers={50} t={t} />);
+    expect(screen.getByText('mpUi.lobby.squad').parentElement!).toHaveTextContent('3/8');
+  });
+
   it('marks my own seat', () => {
     render(<PlayerRoster players={room} username="Ada" gameCode="ABCD" maxPlayers={8} t={t} variant="guest" />);
     const mine = screen.getAllByTestId('lobby-seat').find((el) => el.getAttribute('data-me') === 'true');

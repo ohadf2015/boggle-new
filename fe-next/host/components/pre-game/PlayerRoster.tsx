@@ -9,7 +9,7 @@ import { cn } from '../../../lib/utils';
 import { ConfirmationDialog } from '../../../components/ui/ConfirmationDialog';
 import { MAX_BOTS_PER_ROOM } from '@/shared/constants/gameConstants';
 import { SeatNameText } from '@/components/multiplayer/lobby/SeatName';
-import { lobbySeats, readyTally, LOBBY_SEATS, type LobbyPlayerInput, type LobbySeat } from '@/components/multiplayer/lobby/lobbySeats';
+import { lobbySeats, readyTally, lobbyMax, LOBBY_SEATS, type LobbyPlayerInput, type LobbySeat } from '@/components/multiplayer/lobby/lobbySeats';
 import styles from '@/components/multiplayer/lobby/lobby.module.css';
 
 type T = (path: string, params?: Record<string, string | number>) => string;
@@ -344,7 +344,7 @@ export const PlayerRoster = memo(function PlayerRoster({
       <div className="flex items-center justify-between gap-2 min-h-11">
         <h2 className={cn('flex items-center gap-2 font-neo-display font-bold uppercase tracking-wider text-neo-white/80', variant === 'tv' ? 'text-[clamp(18px,2.6vh,28px)]' : 'text-[length:calc(14px*var(--mp-u,1))]')}>
           <span>{t('mpUi.lobby.squad')}</span>
-          <span className="tabular-nums text-neo-white" dir="ltr">{seats.length}/{chairs}</span>
+          <span className="tabular-nums text-neo-white" dir="ltr">{seats.length}/{seats.length > chairs ? Math.max(lobbyMax(seats.length), maxPlayers) : chairs}</span>
           {tally.total > 0 && (
             <span
               data-testid="roster-ready-count"
