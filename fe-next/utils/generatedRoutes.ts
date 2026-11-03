@@ -170,6 +170,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/lexiclash-vs-wordle",
   "/lexiclash-vs-wordwall",
   "/lexiclash-vs-wordwall-kahoot-quizlet",
+  "/mischaqey-safa-imun-kogniti",
   "/multiplayer",
   "/multiplayer-word-game-online",
   "/online-word-games-with-friends",

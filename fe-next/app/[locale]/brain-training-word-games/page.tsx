@@ -268,6 +268,12 @@ export default async function BrainTrainingWordGamesPage({ params }: PageProps) 
               <h3 className="font-bold text-neo-cyan">{copy.relatedScienceTitle}</h3>
               <p className="mt-1 text-xs text-neo-gray-200">{copy.relatedScienceSub}</p>
             </Link>
+            {locale === 'he' && (
+              <Link href="/he/mischaqey-safa-imun-kogniti" className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-purple/40">
+                <h3 className="font-bold text-neo-cyan">משחקי שפה לאימון קוגניטיבי</h3>
+                <p className="mt-1 text-xs text-neo-gray-200">איזה משחק מתרגל איזו יכולת, ותוכנית של 10 דקות ביום</p>
+              </Link>
+            )}
             <Link href={`/${locale}/best-online-word-games`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-purple/40">
               <h3 className="font-bold text-neo-cyan">{copy.relatedBestTitle}</h3>
               <p className="mt-1 text-xs text-neo-gray-200">{copy.relatedBestSub}</p>
