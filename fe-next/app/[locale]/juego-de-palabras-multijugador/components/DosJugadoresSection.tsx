@@ -10,7 +10,7 @@ export function DosJugadoresSection({ locale }: { locale: string }) {
         <p>
           Para jugar <strong className="text-neo-cyan">scrabble online 2 jugadores</strong> no hace
           falta llenar una sala: con dos basta. Creas la sala, le mandas el enlace (o el código, o el
-          QR) a tu amigo y, en cuanto entra, empieza la partida. Uno puede estar en el móvil y el otro en el
+          QR) a tu amigo y, en cuanto entra, le das a empezar. Uno puede estar en el móvil y el otro en el
           ordenador, en el mismo sofá o en otro país.
         </p>
         <ol className="list-decimal space-y-1 pl-5">
