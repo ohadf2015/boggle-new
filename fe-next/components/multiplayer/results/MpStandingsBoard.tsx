@@ -1,6 +1,6 @@
 'use client';
 
-import { memo } from 'react';
+import { Fragment, memo } from 'react';
 import { cn } from '@/lib/utils';
 import type { MpStandingRow } from './mpStandings';
 import { MpStandingRowItem } from './MpStandingRow';
@@ -10,6 +10,8 @@ type TFn = (key: string, params?: Record<string, string | number>) => string;
 export interface MpStandingsBoardProps {
   rows: MpStandingRow[];
   hiddenCount: number;
+  /** My row was pulled up from below the cut: mark the skipped places above it. */
+  gapBeforeLast?: boolean;
   /** Is the row at visual position `pos` (1 = top) revealed yet? */
   isRevealed: (pos: number) => boolean;
   onShowAll?: () => void;
@@ -27,11 +29,22 @@ const CHIP = 'rounded-full bg-neo-navy-light border-2 border-neo-cream/40 px-3 p
  * rows are the series ladder: the crown is the champion's and each row carries
  * its round points (`roundScore`) under the name.
  */
-function MpStandingsBoardImpl({ rows, hiddenCount, isRevealed, onShowAll, t, className }: MpStandingsBoardProps) {
+function MpStandingsBoardImpl({ rows, hiddenCount, gapBeforeLast = false, isRevealed, onShowAll, t, className }: MpStandingsBoardProps) {
   return (
     <ol data-testid="mp-standings" className={cn('flex flex-col justify-center min-h-0 gap-[calc(6px*var(--mp-u,1))]', className)}>
       {rows.map((r, i) => (
-        <MpStandingRowItem key={r.username} row={r} shown={isRevealed(i + 1)} layout="fit" t={t} />
+        <Fragment key={r.username}>
+          {gapBeforeLast && i === rows.length - 1 && (
+            <li
+              data-testid="mp-standings-gap"
+              aria-hidden="true"
+              className={cn('shrink-0 self-center leading-none tracking-[0.3em] font-bold text-neo-white/50 text-[calc(14px*var(--mp-u,1))]', !isRevealed(i + 1) && 'invisible')}
+            >
+              ···
+            </li>
+          )}
+          <MpStandingRowItem row={r} shown={isRevealed(i + 1)} layout="fit" t={t} />
+        </Fragment>
       ))}
       {hiddenCount > 0 && (onShowAll ? (
         <li className="shrink-0 self-center">

@@ -4,6 +4,7 @@ import { memo } from 'react';
 import { MpPrimaryCta } from '@/components/multiplayer/shell/MpPrimaryCta';
 import { cn } from '../../../lib/utils';
 import styles from '@/components/multiplayer/lobby/lobby.module.css';
+import { lobbyMax } from '@/components/multiplayer/lobby/lobbySeats';
 
 interface StartButtonProps {
   onStartGame: () => void;
@@ -34,7 +35,7 @@ export const StartButton = memo<StartButtonProps>(function StartButton({
   disabled,
   tournamentCreating,
   playerCount,
-  maxPlayers = 8,
+  maxPlayers,
   t,
   className = '',
   labelKey = DEFAULT_LABEL_KEY,
@@ -46,7 +47,7 @@ export const StartButton = memo<StartButtonProps>(function StartButton({
       testId="lobby-start"
       tone="lime"
       label={tournamentCreating ? t('hostView.creatingTournament') : t(labelKey)}
-      sublabel={tournamentCreating ? undefined : (sublabel ?? `${playerCount}/${maxPlayers}`)}
+      sublabel={tournamentCreating ? undefined : (sublabel ?? `${playerCount}/${maxPlayers ?? lobbyMax(playerCount)}`)}
       onPress={onStartGame}
       disabled={disabled}
       className={cn(
