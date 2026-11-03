@@ -222,6 +222,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
                 <div className={PANEL}>
                   <AssignmentTrackingPanel
                     classroomId={classroomId}
+                    classroomName={classroomName}
                     onCreateAssignment={() => router.push(teacherAssignHref(locale, classroomId))}
                   />
                 </div>

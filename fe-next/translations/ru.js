@@ -14542,7 +14542,18 @@ const ru = {
       "notCompleted": "Не выполнено",
       "strugglingAreas": "Проблемные области",
       "studentsMissed": "учеников пропустили",
-      "noStrugglingAreas": "Проблемные области не выявлены"
+      "noStrugglingAreas": "Проблемные области не выявлены",
+      "playedCount": "Сыграли {played}/{total}",
+      "nobodyYet": "Пока никто не сыграл. Результаты появятся здесь, когда ученики закончат.",
+      "needHelp": "Нужна помощь",
+      "onTrack": "Все, кто сыграл, набрали 70% и больше.",
+      "mostMissed": "Чаще всего ошибались",
+      "missedBy": "ошиблись {count}/{played}",
+      "notPlayedTitle": "Ещё не сыграли ({count})",
+      "allPlayed": "Все сыграли.",
+      "noMisses": "Без ошибок",
+      "loadFailed": "Не удалось загрузить, кто сыграл.",
+      "eachStudent": "По ученикам ({count})"
     },
     "tracking": {
       "all": "Все",

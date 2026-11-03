@@ -21,6 +21,7 @@ interface AssignmentTrackingPanelProps {
   onCreateAssignment?: () => void;
   joinCode?: string;
   studentCount?: number;
+  classroomName?: string;
 }
 
 type FilterTab = 'all' | 'active' | 'overdue' | 'completed';
@@ -30,7 +31,11 @@ function AssignmentCard({
   status,
   onExpand,
   isExpanded,
+  classroomId,
+  classroomName,
 }: {
+  classroomId: string;
+  classroomName?: string;
   assignment: TeacherAssignment;
   status: AssignmentStatus;
   onExpand: () => void;
@@ -66,7 +71,9 @@ function AssignmentCard({
   return (
     <div className="rounded-neo border-neo border-neo-cream/40 bg-neo-navy/50 overflow-hidden">
       <button
+        type="button"
         onClick={onExpand}
+        aria-expanded={isExpanded}
         className="w-full p-4 hover:bg-neo-navy/80 transition-colors"
       >
         <div className="flex items-start justify-between gap-4">
@@ -142,6 +149,8 @@ function AssignmentCard({
           <CompletionTracker
             assignmentId={assignment.id}
             totalStudents={assignment.student_count || 0}
+            classroomId={classroomId}
+            classroomName={classroomName}
           />
         </div>
       )}
@@ -154,6 +163,7 @@ export default function AssignmentTrackingPanel({
   onCreateAssignment,
   joinCode = '',
   studentCount,
+  classroomName,
 }: AssignmentTrackingPanelProps) {
   const { t, language } = useLanguage();
   const router = useRouter();
@@ -274,6 +284,8 @@ export default function AssignmentTrackingPanel({
             <AssignmentCard
               key={assignment.id}
               assignment={assignment}
+              classroomId={classroomId}
+              classroomName={classroomName}
               status={getAssignmentStatus(assignment)}
               onExpand={() => setExpandedId(expandedId === assignment.id ? null : assignment.id)}
               isExpanded={expandedId === assignment.id}

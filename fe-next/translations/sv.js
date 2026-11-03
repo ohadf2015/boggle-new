@@ -15339,7 +15339,18 @@ const sv = {
       "notCompleted": "Ej slutförd",
       "strugglingAreas": "Svåra områden",
       "studentsMissed": "elever missade",
-      "noStrugglingAreas": "Inga svåra områden hittade än"
+      "noStrugglingAreas": "Inga svåra områden hittade än",
+      "playedCount": "{played}/{total} har spelat",
+      "nobodyYet": "Ingen har spelat än. Resultaten visas här när eleverna blir klara.",
+      "needHelp": "Behöver hjälp",
+      "onTrack": "Alla som spelat fick 70 % eller mer.",
+      "mostMissed": "Mest missade ord",
+      "missedBy": "{count}/{played} missade",
+      "notPlayedTitle": "Har inte spelat än ({count})",
+      "allPlayed": "Alla har spelat.",
+      "noMisses": "Inga missar",
+      "loadFailed": "Kunde inte ladda vem som spelat.",
+      "eachStudent": "Varje elev ({count})"
     },
     "tracking": {
       "all": "Alla",

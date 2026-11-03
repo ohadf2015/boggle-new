@@ -15349,7 +15349,18 @@ const es = {
       "notCompleted": "No completada",
       "strugglingAreas": "Áreas de dificultad",
       "studentsMissed": "estudiantes fallaron",
-      "noStrugglingAreas": "Aún no se identificaron áreas de dificultad"
+      "noStrugglingAreas": "Aún no se identificaron áreas de dificultad",
+      "playedCount": "{played}/{total} jugaron",
+      "nobodyYet": "Nadie ha jugado todavía. Los resultados aparecen aquí cuando los alumnos terminan.",
+      "needHelp": "Necesitan ayuda",
+      "onTrack": "Todos los que jugaron sacaron 70 % o más.",
+      "mostMissed": "Palabras más falladas",
+      "missedBy": "{count}/{played} fallaron",
+      "notPlayedTitle": "Aún no han jugado ({count})",
+      "allPlayed": "Todos han jugado.",
+      "noMisses": "Sin fallos",
+      "loadFailed": "No se pudo cargar quién jugó.",
+      "eachStudent": "Cada alumno ({count})"
     },
     "tracking": {
       "all": "Todas",

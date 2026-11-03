@@ -14886,7 +14886,18 @@ const he = {
       "notCompleted": "לא הושלם",
       "strugglingAreas": "תחומי קושי",
       "studentsMissed": "תלמידים החטיאו",
-      "noStrugglingAreas": "לא זוהו תחומי קושי"
+      "noStrugglingAreas": "לא זוהו תחומי קושי",
+      "playedCount": "{played}/{total} שיחקו",
+      "nobodyYet": "עוד אף אחד לא שיחק. התוצאות יופיעו כאן כשהתלמידים יסיימו.",
+      "needHelp": "צריכים עזרה",
+      "onTrack": "כל מי ששיחק קיבל 70% ומעלה.",
+      "mostMissed": "המילים שהכי טעו בהן",
+      "missedBy": "{count}/{played} טעו",
+      "notPlayedTitle": "עוד לא שיחקו ({count})",
+      "allPlayed": "כולם שיחקו.",
+      "noMisses": "בלי טעויות",
+      "loadFailed": "לא הצלחנו לטעון מי שיחק.",
+      "eachStudent": "כל תלמיד ({count})"
     },
     "tracking": {
       "all": "הכל",
