@@ -3158,7 +3158,8 @@ const ru = {
       "grandSlam": "БОЛЬШОЙ ШЛЕМ!",
       "grandSlamDesc": "Все дневные миссии выполнены!",
       "xpReward": "+{{xp}} опыта",
-      "goldReward": "+{{gold}} золота"
+      "goldReward": "+{{gold}} золота",
+      "progress": "Выполнено {{done}} из {{total}} ежедневных заданий"
     }
   },
   "wordAlchemy": {

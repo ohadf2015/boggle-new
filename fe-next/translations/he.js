@@ -17908,7 +17908,8 @@ const he = {
       "grandSlam": "גרנד סלאם!",
       "grandSlamDesc": "כל המשימות היומיות הושלמו!",
       "xpReward": "+{{xp}} XP",
-      "goldReward": "+{{gold}} זהב"
+      "goldReward": "+{{gold}} זהב",
+      "progress": "{{done}} מתוך {{total}} משימות יומיות הושלמו"
     }
   },
   "ads": {
