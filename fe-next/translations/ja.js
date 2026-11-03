@@ -17458,7 +17458,7 @@ const ja = {
       "status_unknown_body": "こちら側で問題が発生しました。ティーチャーダッシュボードを開くか、ページを再読み込みしてもう一度お試しください。",
       "auth_required_title": "まずはアカウントから",
       "auth_required_body": "Googleなら最短で始められます。メールでもOK：届いたリンクからこのページに戻れます。",
-      "auth_required_cta": "無料の先生アカウントを作成",
+      "auth_required_cta": "メールで登録",
       "auth_signin_cta": "アカウントをお持ちの方はログイン",
       "trust_instant": "すぐに使えます。審査待ちなし",
       "trust_free": "教師向け無料プラン、期限なし",

@@ -334,6 +334,7 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
           {scoreDelta !== null && (
             <m.div
               data-testid="score-delta"
+              dir="ltr"
               initial={{ y: 8, scale: 0.85, opacity: 0 }}
               animate={{ y: 0, scale: 1, opacity: 1 }}
               exit={{ y: -8, opacity: 0 }}

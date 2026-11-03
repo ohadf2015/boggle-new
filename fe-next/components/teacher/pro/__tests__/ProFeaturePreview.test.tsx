@@ -41,6 +41,16 @@ describe('ProFeaturePreview — a concrete sample of each Pro surface', () => {
     expect(screen.getAllByTestId('pro-preview-cell')).toHaveLength(SAMPLE_STUDENTS.length * SAMPLE_WORD_COUNT);
   });
 
+  it('given a phone-width card, when the mastery preview labels its columns, then each word stands vertically in full instead of being cut to "neces..."', () => {
+    render(<ProFeaturePreview feature="mastery" />);
+    const heads = screen.getAllByTestId('pro-preview-word');
+    expect(heads).toHaveLength(SAMPLE_WORD_COUNT);
+    for (const head of heads) {
+      expect(head.className).toContain('[writing-mode:vertical-rl]');
+      expect(head.className).not.toMatch(/(^|\s)truncate(\s|$)/);
+    }
+  });
+
   it('lays the missed-word rounds out on the 1-3-7 day schedule', () => {
     render(<ProFeaturePreview feature="missedPractice" />);
     const days = screen.getAllByTestId('pro-preview-day').map((d) => d.textContent);

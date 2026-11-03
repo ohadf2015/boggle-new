@@ -73,7 +73,7 @@ describe('EduHostResults: the words to reteach lead the wall', () => {
     renderWall();
     const panel = screen.getByTestId('edu-reteach-words');
     expect(panel).toHaveTextContent('eduLiveRoom.hostResults.missedTitle');
-    expect(screen.getAllByTestId('edu-most-missed-word').map((el) => el.textContent)).toEqual(['fog0/3', 'hail0/3']);
+    expect(screen.getAllByTestId('edu-most-missed-word').map((el) => el.textContent)).toEqual(['fog0/3 · 0%', 'hail0/3 · 0%']);
   });
 
   it('given missed words, then "Practice these words" is the only primary and it sits in the panel', () => {

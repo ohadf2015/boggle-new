@@ -62,7 +62,7 @@ describe('EduHostResults reteach', () => {
 
   it('given words most of the class missed, when the wall shows results, then the teacher sees them and a count of who needs help', () => {
     render(<EduHostResults summary={summary} players={players} t={t} onRematch={vi.fn()} />);
-    expect(screen.getAllByTestId('edu-most-missed-word').map((el) => el.textContent)).toEqual(['enzyme0/3', 'membrane1/3']);
+    expect(screen.getAllByTestId('edu-most-missed-word').map((el) => el.textContent)).toEqual(['enzyme0/3 · 0%', 'membrane1/3 · 33%']);
     expect(screen.getByTestId('edu-needs-help-count')).toHaveTextContent('{"count":2}');
   });
 

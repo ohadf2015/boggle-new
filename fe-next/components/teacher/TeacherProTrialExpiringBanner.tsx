@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { polarTrialDaysLeft, isPolarTrialDay10Expiring } from '@/lib/education/polarTrial';
+import { polarTrialDaysLeft, polarTrialDaysTitle, isPolarTrialDay10Expiring } from '@/lib/education/polarTrial';
 import posthog from '@/lib/analytics/lazyPosthog';
 import { goToPolarCheckout, postTeacherProCheckout, checkoutFailureKey } from '@/lib/education/postTeacherProCheckout';
 
@@ -86,12 +86,7 @@ export function TeacherProTrialExpiringBanner({
     return null;
   }
 
-  const title =
-    daysRemaining <= 0
-      ? t('teacher.subscription.trialLifecycleTitleToday')
-      : daysRemaining === 1
-        ? t('teacher.subscription.trialLifecycleTitleOne')
-        : t('teacher.subscription.trialLifecycleTitle', { count: String(daysRemaining) });
+  const title = polarTrialDaysTitle(t, daysRemaining);
 
   const lossDescription =
     t('teacher.subscription.trialExpiringLoss') ||

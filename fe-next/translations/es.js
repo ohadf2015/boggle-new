@@ -17381,7 +17381,7 @@ const es = {
       "status_unknown_body": "Algo falló por nuestra parte. Abre tu panel de profesor o recarga esta página para volver a comprobarlo.",
       "auth_required_title": "Empieza con tu cuenta",
       "auth_required_body": "Con Google es lo más rápido. También con correo: te enviamos un enlace que te trae de vuelta aquí.",
-      "auth_required_cta": "Crear mi cuenta docente gratis",
+      "auth_required_cta": "Regístrate con email",
       "auth_signin_cta": "¿Ya tienes cuenta? Inicia sesión",
       "trust_instant": "Acceso al instante, sin cola de revisión",
       "trust_free": "Plan docente gratuito, sin caducidad",

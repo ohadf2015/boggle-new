@@ -96,6 +96,12 @@ describe('LiveClassroomLeaderboard — projector', () => {
     expect(screen.getByTestId('live-board-pop').className).toContain('@[52rem]:hidden');
   });
 
+  it('given a Hebrew page, when a score pops, then the "+N" is laid out left to right so it never reads "N+"', () => {
+    const { rerender } = render(<LiveClassroomLeaderboard variant="projector" gameMode="classic" leaderboard={board(['Ada', 30], ['Bo', 20])} />);
+    rerender(<LiveClassroomLeaderboard variant="projector" gameMode="classic" leaderboard={board(['Ada', 30], ['Bo', 21])} />);
+    expect(screen.getByTestId('live-board-pop')).toHaveAttribute('dir', 'ltr');
+  });
+
   it('does not celebrate scores that were already there on first paint (refresh restore)', () => {
     render(<LiveClassroomLeaderboard variant="projector" gameMode="classic" leaderboard={board(['Ada', 30])} />);
     expect(screen.queryByTestId('live-board-pop')).toBeNull();

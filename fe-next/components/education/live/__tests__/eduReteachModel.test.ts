@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type { ClassroomSummary } from '@/shared/types/classroom';
-import { mostMissedWords, reteachList, reteachVerdict, studentsUnderHalf } from '@/components/education/live/eduReteachModel';
+import { foundPercent, mostMissedWords, reteachList, reteachVerdict, studentsUnderHalf } from '@/components/education/live/eduReteachModel';
 
 const mastery = (rows: Record<string, [number, number]>) =>
   Object.fromEntries(Object.entries(rows).map(([name, [found, total]]) => [name, { found, total }]));
@@ -175,5 +175,19 @@ describe('reteachVerdict — the one rule every results surface reads', () => {
       missedWords: ['enzyme'],
     });
     expect(reteachVerdict(summary).words).toEqual(reteachList(summary));
+  });
+});
+
+describe('foundPercent', () => {
+  it('given finders out of the class, when shown, then it is the rounded share', () => {
+    expect(foundPercent(0, 12)).toBe(0);
+    expect(foundPercent(1, 3)).toBe(33);
+    expect(foundPercent(2, 3)).toBe(67);
+    expect(foundPercent(12, 12)).toBe(100);
+  });
+
+  it('given no students, when shown, then there is no percent rather than NaN', () => {
+    expect(foundPercent(0, 0)).toBeNull();
+    expect(foundPercent(3, -1)).toBeNull();
   });
 });
