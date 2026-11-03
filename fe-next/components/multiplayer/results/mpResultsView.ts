@@ -5,14 +5,17 @@ import type { MpStandingRow } from './mpStandings';
  * testable and shared by intermission + final).
  */
 
-/** At most `max` rows; in a big room I stay on screen (top max-1 + me). */
-export function pickVisibleRows(rows: MpStandingRow[], max: number): { rows: MpStandingRow[]; hiddenCount: number } {
-  if (rows.length <= max) return { rows, hiddenCount: 0 };
+/**
+ * At most `max` rows; in a big room I stay on screen (top max-1 + me). `gapBeforeLast` is by position, not rank:
+ * a tie (1, 2, 2, 4) skips a number without hiding anyone.
+ */
+export function pickVisibleRows(rows: MpStandingRow[], max: number): { rows: MpStandingRow[]; hiddenCount: number; gapBeforeLast: boolean } {
+  if (rows.length <= max) return { rows, hiddenCount: 0, gapBeforeLast: false };
   const meIndex = rows.findIndex((r) => r.isMe);
   if (meIndex >= 0 && meIndex >= max) {
-    return { rows: [...rows.slice(0, max - 1), rows[meIndex]], hiddenCount: rows.length - max };
+    return { rows: [...rows.slice(0, max - 1), rows[meIndex]], hiddenCount: rows.length - max, gapBeforeLast: meIndex > max - 1 };
   }
-  return { rows: rows.slice(0, max), hiddenCount: rows.length - max };
+  return { rows: rows.slice(0, max), hiddenCount: rows.length - max, gapBeforeLast: false };
 }
 
 export type MascotMood = 'victory' | 'cheer' | 'think' | 'oops';

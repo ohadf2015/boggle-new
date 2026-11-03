@@ -17,7 +17,7 @@ export interface HostStatusLaneProps {
   botCountdown: number | null;
   onCancelBotCountdown: () => void;
   showSoloPrompt: boolean;
-  onPlayVsBots: () => void;
+  onPlayVsBots?: () => void;
   /** A player is mid rewarded-ad: Start is held. */
   adHold: boolean;
   className?: string;

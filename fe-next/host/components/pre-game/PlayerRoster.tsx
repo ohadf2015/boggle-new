@@ -10,7 +10,7 @@ import { ConfirmationDialog } from '../../../components/ui/ConfirmationDialog';
 import { MAX_BOTS_PER_ROOM } from '@/shared/constants/gameConstants';
 import { SeatNameText } from '@/components/multiplayer/lobby/SeatName';
 import { lobbySeats, readyTally, lobbyMax, LOBBY_SEATS, type LobbyPlayerInput, type LobbySeat } from '@/components/multiplayer/lobby/lobbySeats';
-import { tvWall, useHiddenAhead } from './rosterLayout';
+import { deskWall, tvWall, useHiddenAhead, useHiddenBelow } from './rosterLayout';
 import styles from '@/components/multiplayer/lobby/lobby.module.css';
 
 type T = (path: string, params?: Record<string, string | number>) => string;
@@ -45,12 +45,6 @@ interface PlayerRosterProps {
   variant?: 'host' | 'guest' | 'tv';
   className?: string;
 }
-
-/** Seat size is one CSS var so the whole grid scales per breakpoint (and by --mp-u on TV). */
-const SEAT_SIZE = {
-  host: '[--seat:calc(56px*var(--mp-u,1))] tall:[--seat:calc(64px*var(--mp-u,1))] min-[720px]:[--seat:min(calc(84px*var(--mp-u,1)),9vh)] desktop-tall:[--seat:min(calc(96px*var(--mp-u,1)),11vh)]',
-  guest: '[--seat:calc(56px*var(--mp-u,1))] tall:[--seat:calc(64px*var(--mp-u,1))] min-[720px]:[--seat:min(calc(84px*var(--mp-u,1)),9vh)] desktop-tall:[--seat:min(calc(96px*var(--mp-u,1)),11vh)]',
-} as const;
 
 const AVATAR_PX = { host: 128, guest: 128, tv: 160 } as const;
 
@@ -99,6 +93,7 @@ export const PlayerRoster = memo(function PlayerRoster({
   const capShown = seats.length > chairs ? lobbyMax(seats.length) : chairs;
   const isTv = variant === 'tv';
   const wall = tvWall(seats.length);
+  const desk = deskWall(seats.length);
   const dense = isTv && wall.dense;
   const wallHidden = isTv ? seats.length - wall.shown : 0;
   const botCount = seats.filter((s) => s.isBot).length;
@@ -110,6 +105,9 @@ export const PlayerRoster = memo(function PlayerRoster({
   const otherSeats = seats.filter((s) => s.id !== username).slice(wallHidden > 0 ? -wall.shown : 0);
   const stripRef = useRef<HTMLDivElement>(null);
   const hiddenAhead = useHiddenAhead(stripRef, otherSeats.length + emptyCount);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const seatsBelow = useHiddenBelow(gridRef, seats.length);
+  const hiddenBelow = isTv ? 0 : seatsBelow;
   const scrollAhead = () => {
     const scroller = stripRef.current?.parentElement;
     if (!scroller) return;
@@ -304,7 +302,7 @@ export const PlayerRoster = memo(function PlayerRoster({
           // The emote trigger lives on MY seat, under my name — clearly mine,
           // and the picker floats below it without ever clipping (my seat sits
           // outside the phone scroller). The label makes it read as "emotes".
-          <span data-testid="self-seat-actions" className="mt-0.5 flex flex-col items-center gap-0.5">
+          <span data-testid="self-seat-actions" className="mt-0.5 flex flex-col items-center gap-0.5 min-[720px]:hidden">
             {selfActions}
             <span className="font-neo-display text-[10px] font-bold uppercase tracking-wide text-neo-pink">
               {t('lobby.emote.title')}
@@ -360,7 +358,7 @@ export const PlayerRoster = memo(function PlayerRoster({
   };
 
   return (
-    <section className={cn('relative flex flex-col gap-2 min-w-0', isTv ? wall.seat : SEAT_SIZE[variant], className)}>
+    <section className={cn('relative flex flex-col gap-2 min-w-0', isTv ? wall.seat : desk.seat, className)}>
       <div className="flex items-center justify-between gap-2 min-h-11">
         <h2 className={cn('flex items-center gap-2 font-neo-display font-bold uppercase tracking-wider text-neo-white/80', variant === 'tv' ? 'text-[clamp(18px,2.6vh,28px)]' : 'text-[length:calc(14px*var(--mp-u,1))]')}>
           <span>{t('mpUi.lobby.squad')}</span>
@@ -389,8 +387,16 @@ export const PlayerRoster = memo(function PlayerRoster({
             </span>
           )}
         </h2>
-        {headerExtra && (
-          <div className="flex items-center gap-2 shrink-0">{headerExtra}</div>
+        {(headerExtra || (selfActions && !isTv)) && (
+          <div className="flex items-center gap-2 shrink-0">
+            {selfActions && !isTv && (
+              <span data-testid="self-header-actions" className="flex items-center gap-1.5 max-[719px]:hidden">
+                <span className="font-neo-display text-[11px] font-bold uppercase tracking-wide text-neo-pink">{t('lobby.emote.title')}</span>
+                {selfActions}
+              </span>
+            )}
+            {headerExtra}
+          </div>
         )}
       </div>
       {/*
@@ -399,11 +405,13 @@ export const PlayerRoster = memo(function PlayerRoster({
        * so the 4×2 grid sees every seat as a direct child.
        */}
       <div
+        ref={gridRef}
         data-testid="roster-grid"
         className={cn(
           'flex items-start gap-2 pt-3 min-[720px]:grid min-[720px]:gap-x-2 min-[720px]:gap-y-3',
-          isTv ? wall.cols : 'min-[720px]:grid-cols-4',
-          dense && 'max-h-[42vh] overflow-hidden',
+          isTv ? wall.cols : desk.grid,
+          dense && 'max-h-[42vh] overflow-hidden min-[720px]:gap-y-2',
+          hiddenBelow > 0 && 'min-[720px]:[mask-image:linear-gradient(to_bottom,black_70%,transparent)]',
         )}
       >
         {meSeat ? renderSeat(meSeat) : null}
@@ -443,6 +451,17 @@ export const PlayerRoster = memo(function PlayerRoster({
           )}
         </div>
       </div>
+      {hiddenBelow > 0 && (
+        <button
+          type="button"
+          data-testid="roster-below-cue"
+          onClick={() => gridRef.current?.scrollBy({ top: gridRef.current.clientHeight * 0.8, behavior: 'smooth' })}
+          aria-label={t('mpUi.lobby.morePlayers', { count: hiddenBelow })}
+          className="absolute bottom-0 end-2 min-w-9 rounded-full border-2 border-neo-black bg-neo-pink text-neo-black px-2.5 py-1 font-neo-display text-xs font-bold leading-none tabular-nums shadow-hard-sm max-[719px]:hidden"
+        >
+          <span dir="ltr">+{hiddenBelow}</span>
+        </button>
+      )}
       {isHostView && (
         <ConfirmationDialog
           open={pendingKick !== null}

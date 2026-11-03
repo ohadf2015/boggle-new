@@ -35,6 +35,7 @@ function renderRoom(size: number, myRank: number, onOpenChange = vi.fn()) {
       allRows={all}
       rows={visible.rows}
       hiddenCount={visible.hiddenCount}
+      gapBeforeLast={visible.gapBeforeLast}
       isRevealed={() => true}
       onOpenChange={onOpenChange}
       t={t}
@@ -141,5 +142,20 @@ describe('MpStandingsSection: full standings in big rooms', () => {
     const root = screen.getByTestId('mp-full-standings-root');
     expect(root.parentElement).toBe(document.body);
     expect(container.contains(root)).toBe(false);
+  });
+});
+
+describe('MpStandingsSection: the board marks the skipped places above my row', () => {
+  it('Given I finished 27th of 27, Then a gap marker sits between 7th and my row', () => {
+    renderRoom(27, 27);
+    const items = [...board().children];
+    const gap = screen.getByTestId('mp-standings-gap');
+    const myRow = within(board()).getAllByTestId('mp-standing-row')[7];
+    expect(items.indexOf(gap)).toBe(items.indexOf(myRow) - 1);
+  });
+
+  it('Given I am in the top 8, Then there is no gap marker', () => {
+    renderRoom(27, 3);
+    expect(screen.queryByTestId('mp-standings-gap')).toBeNull();
   });
 });

@@ -191,14 +191,16 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
       botCountdown={lobby.botCountdown}
       onCancelBotCountdown={lobby.cancelBotCountdown}
       showSoloPrompt={lobby.showSoloPrompt}
-      onPlayVsBots={lobby.handleSoloPlayVsBots}
+      onPlayVsBots={lobby.startsVsBots ? undefined : lobby.handleSoloPlayVsBots}
       adHold={lobby.anyAdActive}
     />
   );
 
   const roster = (headerExtra?: React.ReactNode) => (
-    <div className={CARD}>
+    // Wide: the roster card is the one that gives up height (its grid scrolls) so the mode picker stays whole.
+    <div className={cn(CARD, 'min-[720px]:min-h-[9rem] min-[720px]:flex min-[720px]:flex-col')}>
       <PlayerRoster
+        className="min-[720px]:min-h-0 min-[720px]:flex-1"
         players={lobby.seatedPlayers}
         username={username}
         gameCode={gameCode}
@@ -215,9 +217,8 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
   );
 
   const modePicker = !isClassroomRoom && (
-    // flex-1 WITHOUT min-h-0: the automatic minimum keeps the mode grid at its
-    // content height, so tiles can never be squashed into overlapping rows.
-    <div className={cn(CARD, 'flex-1 flex flex-col')}>
+    // Grows into free height but never shrinks below its content, so tiles can never be squashed into overlapping rows.
+    <div className={cn(CARD, 'flex-[1_0_auto] flex flex-col')}>
       <BattleModeCard
         fill
         selectedGameMode={lobby.selectedGameMode}

@@ -131,7 +131,7 @@ export function BattleModeCard({
                 mode={mode}
                 className={cn(
                   styles.modeArt,
-                  'block w-full flex-1 min-h-0 max-h-[calc(72px*var(--mp-u,1))]',
+                  'block w-full flex-1 min-h-0 max-h-[calc(72px*var(--mp-u,1))] desktop-medium-short:max-h-[calc(52px*var(--mp-u,1))]',
                   family.icon,
                   isActive && styles.modeArtOn,
                 )}
@@ -154,7 +154,7 @@ export function BattleModeCard({
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
             )}
           >
-            <HowToArt className={cn(styles.modeArt, 'block w-full flex-1 min-h-0 max-h-[calc(72px*var(--mp-u,1))]')} />
+            <HowToArt className={cn(styles.modeArt, 'block w-full flex-1 min-h-0 max-h-[calc(72px*var(--mp-u,1))] desktop-medium-short:max-h-[calc(52px*var(--mp-u,1))]')} />
             <span className="shrink-0 max-w-full font-neo-display text-[11px] tall:text-xs desktop-tall:text-[length:calc(14px*var(--mp-u,1))] font-bold uppercase leading-[1.1] line-clamp-2 break-words">
               {t('mpUi.lobby.howToPlay')}
             </span>
