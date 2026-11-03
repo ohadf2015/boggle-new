@@ -142,3 +142,11 @@ export const PRO_FEATURES_GATED_ON_SOCKET: Record<string, { handler: string; gua
     test: 'backend/handlers/__tests__/classroomPressureHandler.test.ts',
   },
 };
+
+export const PRO_FEATURES_GATED_IN_DATABASE: Record<string, { migration: string; guard: string; test: string }> = {
+  assignmentsPerClass: {
+    migration: 'supabase/migrations/20261026170100_enforce_free_assignment_cap.sql',
+    guard: 'ASSIGNMENT_LIMIT_REACHED',
+    test: 'lib/supabase/education/__tests__/assignments.capLimit.test.ts',
+  },
+};
