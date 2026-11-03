@@ -20443,6 +20443,8 @@ const sv = {
       "squad": "Gänget",
       "startVsBots": "mot bottar · {count}/{max}",
       "seatsTaken": "{count}/{max} spelare",
+      "playersInRoom": "{count} spelare",
+      "morePlayers": "{count} spelare till, scrolla för att se dem",
       "chat": "Chatt",
       "invite": "Bjud in",
       "inviteTitle": "Bjud in vänner",

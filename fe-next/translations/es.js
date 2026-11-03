@@ -20456,6 +20456,8 @@ const es = {
       "squad": "Tu equipo",
       "startVsBots": "contra bots · {count}/{max}",
       "seatsTaken": "{count}/{max} jugadores",
+      "playersInRoom": "{count} jugadores",
+      "morePlayers": "{count} jugadores más, desliza para verlos",
       "chat": "Chat",
       "invite": "Invitar",
       "inviteTitle": "Invita a tus amigos",

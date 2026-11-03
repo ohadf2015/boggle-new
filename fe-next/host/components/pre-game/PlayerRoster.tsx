@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useState } from 'react';
+import React, { memo, useRef, useState } from 'react';
 import { Bot, Check, Crown, Pencil, Plus, X } from 'lucide-react';
 import Avatar from '../../../components/Avatar';
 import { useSocket } from '../../../utils/SocketContext';
@@ -10,6 +10,7 @@ import { ConfirmationDialog } from '../../../components/ui/ConfirmationDialog';
 import { MAX_BOTS_PER_ROOM } from '@/shared/constants/gameConstants';
 import { SeatNameText } from '@/components/multiplayer/lobby/SeatName';
 import { lobbySeats, readyTally, lobbyMax, LOBBY_SEATS, type LobbyPlayerInput, type LobbySeat } from '@/components/multiplayer/lobby/lobbySeats';
+import { tvWall, useHiddenAhead } from './rosterLayout';
 import styles from '@/components/multiplayer/lobby/lobby.module.css';
 
 type T = (path: string, params?: Record<string, string | number>) => string;
@@ -49,7 +50,6 @@ interface PlayerRosterProps {
 const SEAT_SIZE = {
   host: '[--seat:calc(56px*var(--mp-u,1))] tall:[--seat:calc(64px*var(--mp-u,1))] min-[720px]:[--seat:min(calc(84px*var(--mp-u,1)),9vh)] desktop-tall:[--seat:min(calc(96px*var(--mp-u,1)),11vh)]',
   guest: '[--seat:calc(56px*var(--mp-u,1))] tall:[--seat:calc(64px*var(--mp-u,1))] min-[720px]:[--seat:min(calc(84px*var(--mp-u,1)),9vh)] desktop-tall:[--seat:min(calc(96px*var(--mp-u,1)),11vh)]',
-  tv: '[--seat:clamp(80px,12vh,150px)]',
 } as const;
 
 const AVATAR_PX = { host: 128, guest: 128, tv: 160 } as const;
@@ -66,7 +66,7 @@ const seatBox = { width: 'var(--seat)', height: 'var(--seat)' } as const;
 const SEAT_NAME = 'max-w-full min-w-0 text-center line-clamp-2 text-balance [overflow-wrap:break-word]';
 
 /**
- * The lobby seat grid: 8 chairs from `lobbySeats` → `toMpRoster`, the one
+ * The lobby seat grid: every player (at least 8 chairs) from `lobbySeats` → `toMpRoster`, the one
  * roster source. Phone lays them out as ONE row — my seat pinned, the rest
  * scrolling horizontally — so the roster stops spending two grid rows and the
  * battle-mode picker gets the space. Desktop/TV keeps the 4×2 grid (the
@@ -96,12 +96,26 @@ export const PlayerRoster = memo(function PlayerRoster({
   const isHostView = variant === 'host';
   const chairs = Math.min(maxPlayers, LOBBY_SEATS);
   const emptyCount = Math.max(0, chairs - seats.length);
+  const capShown = seats.length > chairs ? lobbyMax(seats.length) : chairs;
+  const isTv = variant === 'tv';
+  const wall = tvWall(seats.length);
+  const dense = isTv && wall.dense;
+  const wallHidden = isTv ? seats.length - wall.shown : 0;
   const botCount = seats.filter((s) => s.isBot).length;
   // My seat stays pinned outside the phone scroller; the rest of the crew
   // scrolls. Desktop renders both wrappers as `display:contents`, so order in
   // the grid is me-first then the rest — pinned-you reads correctly there too.
   const meSeat = seats.find((s) => s.id === username);
-  const otherSeats = seats.filter((s) => s.id !== username);
+  // A TV wall past its tile cap keeps the newest joiners: they are the ones scanning for their face.
+  const otherSeats = seats.filter((s) => s.id !== username).slice(wallHidden > 0 ? -wall.shown : 0);
+  const stripRef = useRef<HTMLDivElement>(null);
+  const hiddenAhead = useHiddenAhead(stripRef, otherSeats.length + emptyCount);
+  const scrollAhead = () => {
+    const scroller = stripRef.current?.parentElement;
+    if (!scroller) return;
+    const rtl = scroller.closest('[dir]')?.getAttribute('dir') === 'rtl';
+    scroller.scrollBy({ left: (rtl ? -1 : 1) * scroller.clientWidth * 0.8, behavior: 'smooth' });
+  };
   const canAddBot = isHostView && seats.length < chairs && botCount < MAX_BOTS_PER_ROOM;
   // Ohad 2026-09-27: at most MAX_BOTS_PER_ROOM clickable "+ BOT" chairs — the
   // room cap stays 3; the leftover empty seats render as plain open chairs so
@@ -135,6 +149,11 @@ export const PlayerRoster = memo(function PlayerRoster({
     if (pendingKick) socket?.emit('kickPlayer', { targetUsername: pendingKick.name });
     setPendingKick(null);
   };
+
+  const nameSize = cn(
+    isTv ? 'text-[clamp(16px,2.2vh,24px)]' : 'text-xs desktop-tall:text-[length:calc(14px*var(--mp-u,1))]',
+    dense && 'line-clamp-1 text-[clamp(13px,1.8vh,20px)]',
+  );
 
   const renderSeat = (seat: LobbySeat) => {
     const isMe = seat.id === username;
@@ -197,7 +216,7 @@ export const PlayerRoster = memo(function PlayerRoster({
           {seat.isBot && (
             <span
               aria-label={t('hostView.bot')}
-              className="absolute -bottom-1 -start-1 w-6 h-6 rounded-full bg-neo-cyan border-2 border-neo-black flex items-center justify-center shadow-hard-sm"
+              className={cn('absolute -bottom-1 -start-1 rounded-full bg-neo-cyan border-2 border-neo-black flex items-center justify-center shadow-hard-sm', dense ? 'w-5 h-5' : 'w-6 h-6')}
             >
               <Bot aria-hidden="true" className="w-3.5 h-3.5 text-neo-black" />
             </span>
@@ -207,11 +226,12 @@ export const PlayerRoster = memo(function PlayerRoster({
               data-testid="roster-ready-badge"
               aria-label={t('playerView.readyConfirmed')}
               className={cn(
-                'absolute -bottom-1 -end-1 w-7 h-7 rounded-full bg-neo-lime border-2 border-neo-black flex items-center justify-center shadow-hard-sm',
+                'absolute -bottom-1 -end-1 rounded-full bg-neo-lime border-2 border-neo-black flex items-center justify-center shadow-hard-sm',
+                dense ? 'w-5 h-5' : 'w-7 h-7',
                 styles.stamp,
               )}
             >
-              <Check aria-hidden="true" className="w-4 h-4 text-neo-black stroke-[3.5]" />
+              <Check aria-hidden="true" className={cn('text-neo-black stroke-[3.5]', dense ? 'w-3 h-3' : 'w-4 h-4')} />
             </span>
           )}
           {isHostView && !isMe && (
@@ -263,7 +283,7 @@ export const PlayerRoster = memo(function PlayerRoster({
             aria-label={t('playerView.editName')}
             className={cn(
               'max-w-full min-w-0 flex items-center justify-center font-neo-body font-bold leading-tight text-neo-lime rounded-neo border-[2px] border-transparent hover:border-neo-cream px-0.5',
-              variant === 'tv' ? 'text-[clamp(16px,2.2vh,24px)]' : 'text-xs desktop-tall:text-[length:calc(14px*var(--mp-u,1))]',
+              nameSize,
             )}
           >
             <span dir="auto" className={cn(SEAT_NAME, 'underline decoration-dashed decoration-neo-lime/60 underline-offset-[3px]')}><SeatNameText name={seat.name} /></span>
@@ -273,7 +293,7 @@ export const PlayerRoster = memo(function PlayerRoster({
             dir="auto"
             className={cn(
               SEAT_NAME, 'font-neo-body font-bold leading-tight',
-              variant === 'tv' ? 'text-[clamp(16px,2.2vh,24px)]' : 'text-xs desktop-tall:text-[length:calc(14px*var(--mp-u,1))]',
+              nameSize,
               isMe ? 'text-neo-lime' : 'text-neo-white',
             )}
           >
@@ -340,11 +360,20 @@ export const PlayerRoster = memo(function PlayerRoster({
   };
 
   return (
-    <section className={cn('relative flex flex-col gap-2 min-w-0', SEAT_SIZE[variant], className)}>
+    <section className={cn('relative flex flex-col gap-2 min-w-0', isTv ? wall.seat : SEAT_SIZE[variant], className)}>
       <div className="flex items-center justify-between gap-2 min-h-11">
         <h2 className={cn('flex items-center gap-2 font-neo-display font-bold uppercase tracking-wider text-neo-white/80', variant === 'tv' ? 'text-[clamp(18px,2.6vh,28px)]' : 'text-[length:calc(14px*var(--mp-u,1))]')}>
           <span>{t('mpUi.lobby.squad')}</span>
-          <span className="tabular-nums text-neo-white" dir="ltr">{seats.length}/{seats.length > chairs ? Math.max(lobbyMax(seats.length), maxPlayers) : chairs}</span>
+          {dense ? (
+            <span
+              data-testid="roster-players-chip"
+              className="rounded-full border-2 border-neo-black bg-neo-cyan text-neo-black px-3 py-1.5 leading-none shadow-hard-sm tabular-nums text-[clamp(16px,2.2vh,24px)]"
+            >
+              {t('mpUi.lobby.playersInRoom', { count: seats.length })}
+            </span>
+          ) : (
+            <span data-testid="roster-count" className="tabular-nums text-neo-white" dir="ltr">{seats.length}/{capShown}</span>
+          )}
           {tally.total > 0 && (
             <span
               data-testid="roster-ready-count"
@@ -369,13 +398,49 @@ export const PlayerRoster = memo(function PlayerRoster({
        * scroll horizontally; ≥720px renders both wrappers as display:contents
        * so the 4×2 grid sees every seat as a direct child.
        */}
-      <div className="flex items-start gap-2 pt-3 min-[720px]:grid min-[720px]:grid-cols-4 min-[720px]:gap-x-2 min-[720px]:gap-y-3">
+      <div
+        data-testid="roster-grid"
+        className={cn(
+          'flex items-start gap-2 pt-3 min-[720px]:grid min-[720px]:gap-x-2 min-[720px]:gap-y-3',
+          isTv ? wall.cols : 'min-[720px]:grid-cols-4',
+          dense && 'max-h-[42vh] overflow-hidden',
+        )}
+      >
         {meSeat ? renderSeat(meSeat) : null}
-        <div className="flex-1 min-w-0 overflow-x-auto scrollbar-none min-[720px]:contents">
-          <div className="flex items-start gap-2 min-[720px]:contents">
-            {otherSeats.map(renderSeat)}
-            {Array.from({ length: emptyCount }, (_, i) => renderEmptySeat(i))}
+        <div className="relative flex-1 min-w-0 min-[720px]:contents">
+          <div
+            className={cn(
+              'overflow-x-auto scrollbar-none min-[720px]:contents',
+              hiddenAhead > 0 && 'max-[719px]:[mask-image:linear-gradient(to_right,black_70%,transparent)] max-[719px]:rtl:[mask-image:linear-gradient(to_left,black_70%,transparent)]',
+            )}
+          >
+            <div ref={stripRef} data-testid="roster-strip" className="flex items-start gap-2 min-[720px]:contents">
+              {otherSeats.map(renderSeat)}
+              {Array.from({ length: emptyCount }, (_, i) => renderEmptySeat(i))}
+              {wallHidden > 0 && (
+                <div data-testid="roster-overflow-tile" className="flex flex-col items-center gap-1 min-w-0">
+                  <span
+                    className="flex items-center justify-center rounded-full border-[3px] border-neo-black bg-neo-pink text-neo-black font-neo-display font-bold tabular-nums shadow-hard-sm text-[clamp(14px,2vh,24px)]"
+                    style={seatBox}
+                    dir="ltr"
+                  >
+                    +{wallHidden}
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
+          {hiddenAhead > 0 && (
+            <button
+              type="button"
+              data-testid="roster-more-cue"
+              onClick={scrollAhead}
+              aria-label={t('mpUi.lobby.morePlayers', { count: hiddenAhead })}
+              className="absolute end-0 top-[calc(var(--seat)/2)] -translate-y-1/2 min-w-9 rounded-full border-2 border-neo-black bg-neo-pink text-neo-black px-2 py-1 font-neo-display text-xs font-bold leading-none tabular-nums shadow-hard-sm min-[720px]:hidden"
+            >
+              <span dir="ltr">+{hiddenAhead}</span>
+            </button>
+          )}
         </div>
       </div>
       {isHostView && (

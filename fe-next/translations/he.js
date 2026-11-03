@@ -20374,6 +20374,8 @@ const he = {
       "squad": "החבורה",
       "startVsBots": "נגד בוטים · {count}/{max}",
       "seatsTaken": "{count}/{max} שחקנים",
+      "playersInRoom": "{count} שחקנים",
+      "morePlayers": "עוד {count} שחקנים, גללו כדי לראות",
       "chat": "צ׳אט",
       "invite": "הזמנה",
       "inviteTitle": "הזמינו חברים",

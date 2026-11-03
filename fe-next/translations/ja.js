@@ -20443,6 +20443,8 @@ const ja = {
       "squad": "メンバー",
       "startVsBots": "ボット対戦 · {count}/{max}",
       "seatsTaken": "{count}/{max}人",
+      "playersInRoom": "{count}人",
+      "morePlayers": "あと{count}人、スクロールして表示",
       "chat": "チャット",
       "invite": "招待",
       "inviteTitle": "友だちを招待",

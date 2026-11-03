@@ -19493,6 +19493,8 @@ const en = {
       "squad": "Squad",
       "startVsBots": "vs bots · {count}/{max}",
       "seatsTaken": "{count}/{max} players",
+      "playersInRoom": "{count} players",
+      "morePlayers": "{count} more players, scroll to see them",
       "chat": "Chat",
       "invite": "Invite",
       "inviteTitle": "Invite friends",

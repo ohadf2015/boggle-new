@@ -20143,6 +20143,8 @@ const ru = {
       "squad": "Команда",
       "startVsBots": "против ботов · {count}/{max}",
       "seatsTaken": "{count}/{max} игроков",
+      "playersInRoom": "Игроков: {count}",
+      "morePlayers": "Ещё игроков: {count}, пролистайте",
       "chat": "Чат",
       "invite": "Позвать",
       "inviteTitle": "Позови друзей",
