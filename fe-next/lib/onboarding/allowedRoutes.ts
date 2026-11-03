@@ -45,6 +45,7 @@ const MARKETING_LANDING_PREFIXES: ReadonlyArray<string> = [
   '/best-online-word-games',
   '/boggle-word-shake-free',
   '/play-boggle-online-free',
+  '/play-boggle-5x5-online',
   '/word-games-online-free',
   '/word-finder',
   '/brain-training-word-games',

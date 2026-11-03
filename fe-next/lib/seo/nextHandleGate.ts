@@ -106,6 +106,7 @@ export const KNOWN_APP_ROOT_SEGMENTS: ReadonlySet<string> = new Set([
   'multiplayer-word-game-online',
   'online-word-games-with-friends',
   'party',
+  'play-boggle-5x5-online',
   'play-boggle-online-free',
   'player',
   'pricing',
