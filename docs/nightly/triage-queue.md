@@ -2648,3 +2648,16 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
   - status: deferred
   - why: too large (31 files across many subsystems) to restore + diagnose the original gate-fail cause + re-verify within this lane's remaining time budget tonight; a half-done restore this close to the time cutoff is worse than leaving it queued
   - recommended owner: self (dedicated restore lane with full 15-min budget, ideally run.sh's lane 01 first act tomorrow per nightly-learnings)
+
+## 2026-11-03
+- [PostHog] ResizeObserver loop noise missing from PostHog exception filter (Sentry + console override already suppress it)
+  - issue id 019ebbf9-0103-7023-8967-d0b4c19de466, first_seen 2026-06-12, last_seen 2026-11-02, occurrences 48 (47 in last 3d, +4600%), users 2, sessions 5
+  - https://eu.posthog.com/project/151059/error-tracking/019ebbf9-0103-7023-8967-d0b4c19de466
+  - status: shipped (fe-next/utils/posthogExceptionFilter.ts)
+  - why: benign browser quirk (layout settles same frame observer fires), not an app bug — matches existing Sentry ignoreErrors + consoleOverride.ts IGNORED_ERROR_PATTERNS suppression of the exact same two message strings. PostHog was the one surface missing parity.
+  - recommended owner: review-by-eod
+- [Stale restores] 8 dropped nightly-code salvage stamps queued (20261024-010154 oldest at 10 nights) — NOT restored this run, sweep + fix took the full time budget
+  - recommended owner: self (tomorrow's lane 01, restore newest stamp first per playbook)
+- [exp-connections-hint-gate-v1 unmeasurable] running since 2026-07-08 (~4 months), ~300 users/variant/30d, but its own guardrail event `connections_hint_used` NEVER fired (0 in 30d across both arms) — cannot be decided either way.
+  - status: fixed the instrumentation gap this run (HintButton.tsx now fires `connections_hint_used` with method=free|ad|fallback|admin on every reveal path), flag left running as-is
+  - recommended owner: review-by-eod — re-check `connections_hint_used` volume in ~7 days; if still near-zero the event wiring itself needs another look before any winner call

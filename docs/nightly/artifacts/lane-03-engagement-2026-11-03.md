@@ -1,0 +1,3 @@
+status: shipped
+files_touched: fe-next/components/connections/HintButton.tsx, fe-next/lib/experiments.ts, fe-next/components/connections/__tests__/HintButton.unavailableFeedback.test.tsx, docs/nightly/triage-queue.md, docs/nightly/impact-ledger.ndjson, docs/nightly/reports/2026-11-03.md
+next_steps: re-check connections_hint_used volume in ~7d (guardrail was silent for 4mo on exp-connections-hint-gate-v1 before this fix); re-check rage-click count on /he/connections/daily in ~7d for exp-connections-hint-unavailable-feedback-v1 verdict; no flags retired this run (no decided winner in brief slice)
