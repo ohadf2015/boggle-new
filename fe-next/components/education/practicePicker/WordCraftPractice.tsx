@@ -162,7 +162,7 @@ export default function WordCraftPractice({ words, language, onComplete, onBack,
       );
     }
     return (
-      <div className="flex w-full items-center justify-center py-4" data-testid="wordcraft-practice-complete">
+      <div className="flex min-h-full w-full items-center justify-center py-4" data-testid="wordcraft-practice-complete">
         <PracticeCompletionMoment
           correct={results.vocabularyWordsFound.length}
           total={targets.length}
