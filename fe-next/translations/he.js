@@ -19540,6 +19540,7 @@ const he = {
     "yourTurn": "התור שלכם",
     "botTurn": "WordBot חושב…",
     "player1": "שחקן 1",
+    "botPassed": "WordBot דילג על התור",
     "player2": "שחקן 2",
     "player1Turn": "תור שחקן 1",
     "player2Turn": "תור שחקן 2",

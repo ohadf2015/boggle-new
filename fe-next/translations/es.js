@@ -19405,6 +19405,7 @@ const es = {
     "yourTurn": "Tu turno",
     "botTurn": "WordBot está pensando…",
     "player1": "Jugador 1",
+    "botPassed": "WordBot pasó su turno",
     "player2": "Jugador 2",
     "player1Turn": "Turno del Jugador 1",
     "player2Turn": "Turno del Jugador 2",

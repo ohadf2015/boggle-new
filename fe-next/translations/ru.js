@@ -16971,6 +16971,7 @@ const ru = {
     "yourTurn": "Твой ход",
     "botTurn": "WordBot думает…",
     "player1": "Игрок 1",
+    "botPassed": "WordBot пропустил ход",
     "player2": "Игрок 2",
     "player1Turn": "Ход игрока 1",
     "player2Turn": "Ход игрока 2",

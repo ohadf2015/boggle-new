@@ -19278,6 +19278,7 @@ const ja = {
     "yourTurn": "あなたの番",
     "botTurn": "WordBotが考え中…",
     "player1": "プレイヤー1",
+    "botPassed": "WordBotがパスしました",
     "player2": "プレイヤー2",
     "player1Turn": "プレイヤー1のターン",
     "player2Turn": "プレイヤー2のターン",

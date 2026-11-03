@@ -17880,6 +17880,7 @@ const en = {
     "yourTurn": "Your turn",
     "botTurn": "WordBot is thinking…",
     "player1": "Player 1",
+    "botPassed": "WordBot skipped its turn",
     "player2": "Player 2",
     "player1Turn": "Player 1's turn",
     "player2Turn": "Player 2's turn",
