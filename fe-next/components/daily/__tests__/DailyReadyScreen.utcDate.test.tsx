@@ -8,6 +8,7 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import DailyReadyScreen from "../DailyReadyScreen";
 
+vi.mock('@/components/quests/QuestGoalChip', () => ({ QuestGoalChip: () => null }));
 vi.mock("@/contexts/MusicContext", () => ({
   useMusic: () => ({
     preloadMusicTrack: vi.fn(),

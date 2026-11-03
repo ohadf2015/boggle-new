@@ -1,5 +1,6 @@
 'use client';
 
+import { QuestGoalChip } from '@/components/quests/QuestGoalChip';
 import React, { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { m, AnimatePresence } from 'framer-motion';
@@ -175,6 +176,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
           {/* priority: this above-fold mascot is the measured LCP on /daily/word-hunt — load eager, not lazy */}
           <MascotWithEntrance variant="explorer" size="sm" delay={0.1} priority />
         </div>
+        <div className="flex justify-center empty:hidden"><QuestGoalChip screen="hunt" /></div>
 
         {/* Guest Mode Notice - Show only for anonymous users */}
         {!isAuthenticated && !isOnCrazyGamesPlatform && (

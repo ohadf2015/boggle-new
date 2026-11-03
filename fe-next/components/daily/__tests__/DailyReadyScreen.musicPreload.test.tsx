@@ -20,6 +20,7 @@ const mockTracks = {
   BOSSA: 'bossa',
 };
 
+vi.mock('@/components/quests/QuestGoalChip', () => ({ QuestGoalChip: () => null }));
 vi.mock('@/contexts/MusicContext', () => ({
   useMusic: () => ({
     preloadMusicTrack: mockPreloadMusicTrack,

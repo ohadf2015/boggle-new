@@ -13,11 +13,14 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
+const { getWithAuth } = vi.hoisted(() => ({ getWithAuth: vi.fn() }));
+vi.mock('@/utils/authFetch', () => ({ getWithAuth }));
+
 function mockFetch(entries: unknown[]) {
-  global.fetch = vi.fn().mockResolvedValue({
+  getWithAuth.mockResolvedValue({
     ok: true,
     json: async () => ({ success: true, entries }),
-  }) as unknown as typeof fetch;
+  });
 }
 
 describe('QuestFeed', () => {
@@ -27,7 +30,7 @@ describe('QuestFeed', () => {
   it('renders nothing when the feed is empty', async () => {
     mockFetch([]);
     const { container } = render(<QuestFeed />);
-    await waitFor(() => expect(global.fetch).toHaveBeenCalled());
+    await waitFor(() => expect(getWithAuth).toHaveBeenCalled());
     expect(container.firstChild).toBeNull();
   });
 
@@ -49,9 +52,9 @@ describe('QuestFeed', () => {
   });
 
   it('renders nothing on fetch failure', async () => {
-    global.fetch = vi.fn().mockRejectedValue(new Error('network')) as unknown as typeof fetch;
+    getWithAuth.mockRejectedValue(new Error('network'));
     const { container } = render(<QuestFeed />);
-    await waitFor(() => expect(global.fetch).toHaveBeenCalled());
+    await waitFor(() => expect(getWithAuth).toHaveBeenCalled());
     expect(container.firstChild).toBeNull();
   });
 });

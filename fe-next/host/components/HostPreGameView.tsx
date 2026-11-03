@@ -10,6 +10,7 @@
  * summary and a chat launcher right (chat itself only ever opens in a sheet).
  * All timers / bot rescue / start guards live in `useHostLobby`.
  */
+import { QuestGoalChip } from '@/components/quests/QuestGoalChip';
 import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { BookOpen, Monitor, UserPlus } from 'lucide-react';
@@ -231,7 +232,10 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
   );
 
   const settingsSummary = (
-    <LobbySettingsSummary timerValue={timerValue} difficulty={difficulty} minWordLength={minWordLength} t={t} onPress={() => setSettingsOpen(true)} />
+    <div className="flex flex-col items-center gap-2">
+      <LobbySettingsSummary timerValue={timerValue} difficulty={difficulty} minWordLength={minWordLength} t={t} onPress={() => setSettingsOpen(true)} />
+      {!isClassroomRoom && <QuestGoalChip screen="multiplayer" />}
+    </div>
   );
 
   const startButton = (
