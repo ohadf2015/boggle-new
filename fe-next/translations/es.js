@@ -3455,6 +3455,7 @@ const es = {
     }
   },
   "common": {
+    "pressBackAgainToExit": "Pulsa atrás otra vez para salir",
     "used": "Usado",
     "free": "Gratis",
     "loading": "Mezclando letras...",

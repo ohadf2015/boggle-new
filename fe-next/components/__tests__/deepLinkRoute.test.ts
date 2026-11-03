@@ -11,7 +11,7 @@
  * onto that produced `/en/en/daily`, which is a hard 404 on the site, so every
  * shared link bounced the user to the home page.
  */
-import { buildDeepLinkRoute } from '../DeepLinkHandler';
+import { buildDeepLinkRoute, buildPushTapRoute } from '../DeepLinkHandler';
 
 describe('buildDeepLinkRoute', () => {
   describe('https App Links (the shape real shared links have)', () => {
@@ -89,6 +89,29 @@ describe('buildDeepLinkRoute', () => {
   describe('bad input', () => {
     it('returns null for an unparseable URL', () => {
       expect(buildDeepLinkRoute('not a url', 'en')).toBeNull();
+    });
+  });
+  describe('/room/CODE alias', () => {
+    it('maps the shareable /room/CODE shape onto /join/CODE', () => {
+      expect(buildDeepLinkRoute('https://www.lexiclash.live/room/ABCD', 'en')?.route).toBe('/en/join/ABCD');
+      expect(buildDeepLinkRoute('lexiclash://room/ABCD', 'he')?.route).toBe('/he/join/ABCD');
+    });
+  });
+
+  describe('buildPushTapRoute', () => {
+    it('does not double-prefix a deepLink that already has a locale', () => {
+      expect(buildPushTapRoute('/he/daily', 'he')).toBe('/he/daily');
+      expect(buildPushTapRoute('/he/daily', 'en')).toBe('/he/daily');
+    });
+    it('prefixes the ambient locale for bare paths, with or without a leading slash', () => {
+      expect(buildPushTapRoute('/daily', 'es')).toBe('/es/daily');
+      expect(buildPushTapRoute('quests', 'es')).toBe('/es/quests');
+    });
+    it('keeps the query string', () => {
+      expect(buildPushTapRoute('/join/ABCD?ref=push', 'en')).toBe('/en/join/ABCD?ref=push');
+    });
+    it('ignores a foreign host in an absolute deepLink', () => {
+      expect(buildPushTapRoute('https://evil.example/daily', 'en')).toBe('/en/daily');
     });
   });
 });

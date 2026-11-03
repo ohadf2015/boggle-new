@@ -51,6 +51,8 @@
         </activity>
 
         <!-- AdMob App ID — required by Google Mobile Ads SDK or app crashes on launch -->
+        <meta-data android:name="com.google.firebase.messaging.default_notification_channel_id" android:value="default" />
+        <meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@drawable/ic_stat_icon_config_sample" />
         <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="${ADMOB_APP_ID}" />
 
         <!--

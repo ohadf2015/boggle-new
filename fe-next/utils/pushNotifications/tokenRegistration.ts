@@ -143,12 +143,16 @@ async function registerTokenWithServer(
  * Request push notification permission and register token
  * Returns true if registration was successful
  */
-export async function registerPushToken(): Promise<boolean> {
-  // Only works on native platforms
-  if (!isNative()) {
-    return false;
-  }
+let registerInFlight: Promise<boolean> | null = null;
 
+/** `silent` registers only when the OS permission is already granted, never raising the system dialog. */
+export function registerPushToken(opts: { silent?: boolean } = {}): Promise<boolean> {
+  if (!isNative()) return Promise.resolve(false);
+  registerInFlight ??= doRegisterPushToken(!!opts.silent).finally(() => { registerInFlight = null; });
+  return registerInFlight;
+}
+
+async function doRegisterPushToken(silent: boolean): Promise<boolean> {
   try {
     const PushNotifications = capGlobal.Capacitor?.Plugins?.PushNotifications;
     if (!PushNotifications) return false;
@@ -162,6 +166,7 @@ export async function registerPushToken(): Promise<boolean> {
 
     // Request permission if not granted
     if (permStatus.receive !== 'granted') {
+      if (silent) return false;
       const newStatus = await PushNotifications.requestPermissions();
       if (newStatus.receive !== 'granted') {
         return false;
@@ -175,41 +180,32 @@ export async function registerPushToken(): Promise<boolean> {
     // Set up registration handler
     return new Promise<boolean>((resolve) => {
       let resolved = false;
-
-      // Handle successful registration
-      PushNotifications.addListener('registration', async (token: PushNotificationToken) => {
+      const handles: Array<Promise<{ remove: () => void }>> = [];
+      const finish = (ok: boolean) => {
         if (resolved) return;
         resolved = true;
+        clearTimeout(timer);
+        handles.forEach((h) => h.then((l) => l.remove()).catch(() => {}));
+        resolve(ok);
+      };
 
-        const success = await registerTokenWithServer(token.value, platform, deviceId);
-        resolve(success);
-      });
-
-      // Handle registration error
-      PushNotifications.addListener('registrationError', (error: PushNotificationRegistrationError) => {
+      handles.push(Promise.resolve(PushNotifications.addListener('registration', async (token: PushNotificationToken) => {
         if (resolved) return;
-        resolved = true;
-
+        finish(await registerTokenWithServer(token.value, platform, deviceId));
+      })));
+      handles.push(Promise.resolve(PushNotifications.addListener('registrationError', (error: PushNotificationRegistrationError) => {
         console.error('Push registration error:', error.error);
-        resolve(false);
-      });
+        finish(false);
+      })));
 
-      // Trigger registration
       PushNotifications.register().catch((err: Error) => {
-        if (resolved) return;
-        resolved = true;
-
         console.error('Push registration failed:', err);
-        resolve(false);
+        finish(false);
       });
 
-      // Timeout after 10 seconds
-      setTimeout(() => {
-        if (resolved) return;
-        resolved = true;
-
+      const timer = setTimeout(() => {
         console.error('Push registration timeout');
-        resolve(false);
+        finish(false);
       }, 10000);
     });
   } catch (error) {

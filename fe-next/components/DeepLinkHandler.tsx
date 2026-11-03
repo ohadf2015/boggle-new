@@ -74,6 +74,8 @@ export function buildDeepLinkRoute(
   // so it can win over the locale the app happens to be showing. A player who
   // shares /he/daily should open the Hebrew board on the recipient's device.
   const localeFromLink = isValidLocale(segments[0]) ? segments.shift() : undefined;
+  // /room/CODE is the shareable shape; the real route is /join/CODE.
+  if (segments[0] === 'room' && segments[1]) segments[0] = 'join';
   const path = segments.join('/');
 
   const searchParams = new URLSearchParams(url.search);
@@ -89,6 +91,12 @@ export function buildDeepLinkRoute(
   const route = `/${locale}${path ? `/${path}` : ''}${queryString ? `?${queryString}` : ''}`;
 
   return { route, isAuthCallback: path.includes('auth/callback') };
+}
+
+/** Push `deepLink` payloads go through the same locale arithmetic as URLs; only the path and query are trusted. */
+export function buildPushTapRoute(deepLink: string, ambientLocale: string): string | null {
+  const url = new URL(deepLink.startsWith('http') ? deepLink : `https://www.lexiclash.live/${deepLink.replace(/^\/+/, '')}`);
+  return buildDeepLinkRoute(url.href, ambientLocale)?.route ?? null;
 }
 
 /**
@@ -306,8 +314,9 @@ export default function DeepLinkHandler() {
             handlePushData(queryClient, data);
             const deepLink = data.deepLink;
             if (deepLink) {
-              const validLocale = (typeof window !== 'undefined' && locales.find((l) => window.location.pathname.startsWith(`/${l}`))) || defaultLocale;
-              const route = deepLink.startsWith('/') ? `/${validLocale}${deepLink}` : `/${validLocale}/${deepLink}`;
+              let route: string | null = null;
+              try { route = buildPushTapRoute(deepLink, resolvePreferredLocale(null)); } catch { /* malformed deepLink */ }
+              if (!route) return;
               logger.log('Push notification tap routing to:', route);
               router.replace(route);
             }

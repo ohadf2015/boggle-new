@@ -130,7 +130,7 @@ export function useAuthInitialization({
                 userId: session.user.id,
               });
             });
-            registerPushToken().catch(() => {});
+            registerPushToken({ silent: true }).catch(() => {});
           }
         }
       } catch (err) {
@@ -329,7 +329,7 @@ async function handleAuthStateChange(
             }
           }
           // Register push token for native mobile apps (fire-and-forget)
-          registerPushToken().catch(() => {});
+          registerPushToken({ silent: true }).catch(() => {});
           // Check for pending classroom join after successful sign-in
           if (typeof window !== 'undefined') {
             const pendingJoinCode = sessionStorage.getItem('joinClassroomReturnCode');

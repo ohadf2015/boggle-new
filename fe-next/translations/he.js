@@ -3456,6 +3456,7 @@ const he = {
     }
   },
   "common": {
+    "pressBackAgainToExit": "לחצו שוב על חזרה כדי לצאת",
     "used": "בשימוש",
     "email": "אימייל",
     "free": "חינם",

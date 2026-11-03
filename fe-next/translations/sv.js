@@ -3814,6 +3814,7 @@ const sv = {
     }
   },
   "common": {
+    "pressBackAgainToExit": "Tryck bakåt igen för att avsluta",
     "used": "Används",
     "email": "E-post",
     "free": "Gratis",

@@ -58,6 +58,9 @@ describe('AASA route', () => {
     expect(paths).toContain('/*/join/*');
     expect(paths).toContain('/join/*');
     expect(paths).toContain('/*/adventure*');
+    for (const p of ['daily', 'quests', 'quick-play', 'singleplayer', 'player', 'friend-challenge', 'challenge', 'connections', 'room']) {
+      expect(paths).toContain(`/*/${p}*`);
+    }
   });
 
   it('should include webcredentials', async () => {

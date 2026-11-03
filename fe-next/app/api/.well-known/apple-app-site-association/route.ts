@@ -39,6 +39,7 @@ export async function GET() {
             '/*/adventure*',
             '/*/multiplayer*',
             '/*/leaderboard*',
+            ...['daily', 'quests', 'quick-play', 'singleplayer', 'player', 'friend-challenge', 'challenge', 'connections', 'room'].flatMap((p) => [`/${p}*`, `/*/${p}*`]),
           ],
         },
       ],
