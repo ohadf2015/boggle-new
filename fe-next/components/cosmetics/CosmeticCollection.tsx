@@ -39,7 +39,7 @@ export function CosmeticCollection({ rankTier, streakDays, coins, totalScore = 0
   const items = getCosmeticsByCategory(activeTab);
 
   return (
-    <div className="w-full">
+    <div className="w-full @container">
       <h2 className="text-xl font-neo-display font-bold mb-4">{t('cosmetics.collection')}</h2>
 
       {/* Current rank + progress to next + expandable ladder */}
@@ -62,8 +62,9 @@ export function CosmeticCollection({ rankTier, streakDays, coins, totalScore = 0
         ))}
       </div>
 
-      {/* Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+      {/* Grid — columns follow the collection's own width, not the viewport: the signed-out
+          wall is a narrow column on desktop, where 4 viewport columns truncated every name. */}
+      <div className="grid grid-cols-2 @md:grid-cols-3 @xl:grid-cols-4 gap-3">
         {items.map((item) => {
           const rarityClass = RARITY_COLORS[item.rarity];
           return (
