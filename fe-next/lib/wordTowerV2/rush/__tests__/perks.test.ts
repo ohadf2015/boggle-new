@@ -121,4 +121,18 @@ describe('rollDraft', () => {
     expect(counts.rare).toBeGreaterThan(counts.epic);
     expect(counts.epic).toBeGreaterThan(0);
   });
+
+  it('rolls the rarity tier first: first card is ~60/30/10 common/rare/epic', () => {
+    const counts = { common: 0, rare: 0, epic: 0 };
+    const N = 6000;
+    for (let seed = 0; seed < N; seed++) {
+      counts[rollDraft(seed, 5, [])[0].rarity]++;
+    }
+    expect(counts.common / N).toBeGreaterThan(0.55);
+    expect(counts.common / N).toBeLessThan(0.65);
+    expect(counts.rare / N).toBeGreaterThan(0.25);
+    expect(counts.rare / N).toBeLessThan(0.35);
+    expect(counts.epic / N).toBeGreaterThan(0.07);
+    expect(counts.epic / N).toBeLessThan(0.13);
+  });
 });
