@@ -16726,6 +16726,34 @@ const sv = {
       "notStarted": "Inte påbörjad",
       "student": "Elev",
       "studentDetail": "Elevprofil",
+      "overview": {
+        "statusTitle": "Hur det går för alla",
+        "status": {
+          "needsHelp": "Behöver hjälp",
+          "inactive": "Har tystnat",
+          "notStarted": "Inte börjat",
+          "steady": "På rätt spår",
+          "thriving": "Glänser"
+        },
+        "attentionTitle": "Vem behöver dig först",
+        "attentionEmpty": "Ingen behöver dig just nu.",
+        "activityTitle": "Övning den här veckan",
+        "activityHint": "Elever efter senaste övningsdag",
+        "starsTitle": "Stigande stjärnor",
+        "starsEmpty": "Visas efter 3 övningsdagar med minst 80 % rätt.",
+        "hardWordsTitle": "Svåraste orden",
+        "hardWordsEmpty": "Inget ord stjälper klassen.",
+        "hardWordsMeta": "{{count}} elever · {{pct}} % fel",
+        "rosterTitle": "Alla",
+        "reason": {
+          "needsHelp": "{{pct}} % rätt den här veckan",
+          "notStarted": "Har inte börjat"
+        },
+        "today": "Idag",
+        "openReport": "Öppna {{name}}s rapport",
+        "unnamed": "Elev",
+        "drillDescription": "Detaljerad framstegsrapport för eleven"
+      },
       "studentProgress": "Elevframsteg",
       "students": "Elever",
       "studentsNeedingHelp": "Elever som behöver stöd",

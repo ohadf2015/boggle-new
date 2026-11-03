@@ -49,8 +49,8 @@ vi.mock('@/components/teacher/assignments', () => ({
 }));
 
 // Mock all analytics components
-vi.mock('@/components/teacher/analytics/AnalyticsDashboard', () => ({
-  AnalyticsDashboard: ({ classroomId }: any) => (
+vi.mock('@/components/teacher/analytics/overview/ClassOverview', () => ({
+  ClassOverview: ({ classroomId }: any) => (
     <div data-testid="analytics-dashboard">Dashboard for {classroomId}</div>
   ),
 }));

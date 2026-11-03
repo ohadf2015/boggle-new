@@ -20,7 +20,8 @@ describe('readClassAnalytics', () => {
     const sb = client({ classroom_memberships: { data: [], error: null } });
     const { data } = await readClassAnalytics(sb as never, 'c1', 'teacher-1');
     expect(data).toEqual({
-      studentsNeedingHelp: 0, classAverageXp: 0, activeStudentsToday: 0, weeklyEngagement: 0, totalStudents: 0, commonMistakes: [],
+      studentsNeedingHelp: 0, classAverageXp: 0, activeStudentsToday: 0, weeklyEngagement: 0, totalStudents: 0, commonMistakes: [], students: [],
+      dailyActive: expect.any(Array),
     });
   });
 
@@ -43,6 +44,8 @@ describe('readClassAnalytics', () => {
     expect(data?.studentsNeedingHelp).toBe(1);
     expect(data?.activeStudentsToday).toBe(1);
     expect(data?.commonMistakes).toEqual([{ word: 'desk', errorRate: 5 / 6, studentCount: 2 }]);
+    expect(data?.students.map((s) => [s.id, s.status])).toEqual([['a', 'needsHelp'], ['b', 'inactive']]);
+    expect(data?.dailyActive.at(-1)).toEqual({ day: today, count: 1 });
   });
 
   it('surfaces a read error instead of empty metrics', async () => {

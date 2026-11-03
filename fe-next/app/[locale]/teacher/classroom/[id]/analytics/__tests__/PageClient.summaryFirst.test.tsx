@@ -24,15 +24,12 @@ vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => teacherPro }));
 
 vi.mock('@/components/teacher/assignments', () => ({ AssignmentTrackingPanel: () => null }));
 
-type DashProps = {
-  onViewStudents?: (f: 'struggling') => void;
-  onCreateReviewLesson?: (w: string[]) => void;
-};
-const dash: { props: DashProps } = { props: {} };
-vi.mock('@/components/teacher/analytics/AnalyticsDashboard', () => ({
-  AnalyticsDashboard: (props: DashProps) => {
-    dash.props = props;
-    return <div data-testid="analytics-dashboard" />;
+type OverviewProps = { openStudentId?: string | null; onOpenChange?: (id: string | null) => void };
+const overview: { props: OverviewProps } = { props: {} };
+vi.mock('@/components/teacher/analytics/overview/ClassOverview', () => ({
+  ClassOverview: (props: OverviewProps) => {
+    overview.props = props;
+    return <div data-testid="analytics-dashboard" data-open={props.openStudentId ?? ''} />;
   },
 }));
 vi.mock('@/components/teacher/analytics/StudentProgressTable', () => ({
@@ -128,36 +125,23 @@ describe('analytics page: summary first, every control does something', () => {
     expect(screen.queryByText('teacher.proGate.analytics.title')).not.toBeInTheDocument();
   });
 
-  it('View Students brings the students tab back from any other tab', async () => {
-    const user = userEvent.setup();
-    render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
-
-    await user.click(screen.getByText('education.analytics.tabs.lessons'));
-    await waitFor(() => expect(screen.queryByTestId('student-progress-table')).not.toBeInTheDocument());
-
-    act(() => dash.props.onViewStudents?.('struggling'));
-    expect(await screen.findByTestId('student-progress-table')).toBeInTheDocument();
-  });
-
-  it('opens a student’s own report inside education when a row is tapped', async () => {
+  it('opens a tapped student row in the in-page drill-down, without leaving the class', async () => {
     const user = userEvent.setup();
     render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
 
     await user.click(screen.getByText('education.analytics.tabs.students'));
     await user.click(await screen.findByTestId('student-progress-table'));
-    expect(push).toHaveBeenCalledWith('/en/teacher/reports?classroomId=classroom-1&studentId=s1');
+    expect(screen.getByTestId('analytics-dashboard')).toHaveAttribute('data-open', 's1');
+    expect(push).not.toHaveBeenCalled();
   });
 
-  it('Create review lesson opens the class pulse section, where the missed-words practice lives, without scrolling', async () => {
+  it('closing the drill-down clears the open student', async () => {
     const user = userEvent.setup();
-    const scroll = vi.fn();
-    Element.prototype.scrollIntoView = scroll;
     render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
 
     await user.click(screen.getByText('education.analytics.tabs.students'));
-    await waitFor(() => expect(screen.queryByTestId('word-mastery-report')).not.toBeInTheDocument());
-    act(() => dash.props.onCreateReviewLesson?.(['river']));
-    expect(await screen.findByTestId('word-mastery-report')).toBeInTheDocument();
-    expect(scroll).not.toHaveBeenCalled();
+    await user.click(await screen.findByTestId('student-progress-table'));
+    act(() => overview.props.onOpenChange?.(null));
+    expect(screen.getByTestId('analytics-dashboard')).toHaveAttribute('data-open', '');
   });
 });

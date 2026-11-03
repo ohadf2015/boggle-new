@@ -1,8 +1,13 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { ClassroomMetrics, CommonMistake, WordsAttemptedRecord } from '@/lib/supabase/analyticsTypes';
 import { fetchInChunks } from './fetchAll';
+import { buildDailyActive, buildStudentPulses, type DailyActive, type StudentPulse } from './classInsights';
 
-export type ClassAnalytics = ClassroomMetrics & { commonMistakes: CommonMistake[] };
+export type ClassAnalytics = ClassroomMetrics & {
+  commonMistakes: CommonMistake[];
+  students: StudentPulse[];
+  dailyActive: DailyActive[];
+};
 
 interface ProgressRow {
   student_id: string;
@@ -95,7 +100,7 @@ export async function readClassAnalytics(
   );
   if (members.error) return { data: null, error: members.error };
   const ids = [...new Set(members.data.map((m) => m.student_id))];
-  if (ids.length === 0) return { data: { ...weekMetrics([], 0), commonMistakes: [] }, error: null };
+  if (ids.length === 0) return { data: { ...weekMetrics([], 0), commonMistakes: [], students: [], dailyActive: buildDailyActive([], isoDay(new Date())) }, error: null };
 
   const [lessons, assigned] = await Promise.all([
     fetchInChunks<{ id: string }>(sb, 'vocabulary_lessons', 'id', 'teacher_id', [teacherId]),
@@ -115,5 +120,14 @@ export async function readClassAnalytics(
   weekStart.setDate(weekStart.getDate() - 7);
   const since = isoDay(weekStart);
   const thisWeek = rows.filter((r) => r.last_practice_date !== null && r.last_practice_date >= since);
-  return { data: { ...weekMetrics(thisWeek, ids.length), commonMistakes: commonMistakes(rows) }, error: null };
+  const today = isoDay(new Date());
+  return {
+    data: {
+      ...weekMetrics(thisWeek, ids.length),
+      commonMistakes: commonMistakes(rows),
+      students: buildStudentPulses(rows, ids, today),
+      dailyActive: buildDailyActive(rows, today),
+    },
+    error: null,
+  };
 }

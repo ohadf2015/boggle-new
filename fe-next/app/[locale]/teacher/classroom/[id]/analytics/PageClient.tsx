@@ -19,7 +19,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useRealtimeClassroomProgress } from '@/hooks/useRealtimeClassroomProgress';
-import { AnalyticsDashboard } from '@/components/teacher/analytics/AnalyticsDashboard';
+import { ClassOverview } from '@/components/teacher/analytics/overview/ClassOverview';
 import { ProGate } from '@/components/teacher/ProGate';
 import { FreeGameHeadlineCard } from '@/components/teacher/rounds/FreeGameHeadlineCard';
 import { StudentProgressTable } from '@/components/teacher/analytics/StudentProgressTable';
@@ -62,6 +62,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
   const [tab, setTab] = useState('pulse');
   const revealRef = useTeacherReveal<HTMLDivElement>();
   const [classroomName, setClassroomName] = useState('');
+  const [openStudentId, setOpenStudentId] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -125,14 +126,6 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
     router.push(`/${locale}/teacher/classroom`);
   };
 
-  const handleViewStudents = (_filter: 'struggling') => setTab('students');
-
-  const handleCreateReviewLesson = (_words: string[]) => setTab('pulse');
-
-  const handleStudentClick = (studentId: string) => {
-    const params = new URLSearchParams({ classroomId, studentId });
-    router.push(`/${locale}/teacher/reports?${params.toString()}`);
-  };
 
   // ==================== RENDER ====================
 
@@ -180,12 +173,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
           }
         >
           <div data-testid="analytics-pro-body" className="space-y-3">
-            <AnalyticsDashboard
-              classroomId={classroomId}
-              onViewStudents={handleViewStudents}
-              onCreateReviewLesson={handleCreateReviewLesson}
-              showHeader={false}
-            />
+            <ClassOverview classroomId={classroomId} openStudentId={openStudentId} onOpenChange={setOpenStudentId} />
 
             <Tabs value={tab} onValueChange={setTab} className="space-y-3">
               <TabsList aria-label={t('education.analytics.tabs.label')} className="grid h-auto w-full grid-cols-5 gap-1.5 rounded-neo border-2 border-neo-cream/40 bg-neo-navy p-1.5">
@@ -202,7 +190,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
 
               <TabsContent value="students">
                 <section aria-label={t('education.analytics.studentProgress')} className={PANEL}>
-                  <StudentProgressTable classroomId={classroomId} onStudentClick={handleStudentClick} />
+                  <StudentProgressTable classroomId={classroomId} onStudentClick={setOpenStudentId} />
                 </section>
               </TabsContent>
 

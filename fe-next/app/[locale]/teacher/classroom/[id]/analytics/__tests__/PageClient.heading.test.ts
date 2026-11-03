@@ -6,9 +6,10 @@ const ROOT = join(__dirname, '../../../../../../..');
 const read = (rel: string) => readFileSync(join(ROOT, rel), 'utf8');
 
 describe('analytics page says its title once', () => {
-  it('suppresses the dashboard card header the page already shows', () => {
+  it('mounts an overview with no header of its own, so the page title shows once', () => {
     const page = read('app/[locale]/teacher/classroom/[id]/analytics/PageClient.tsx');
-    expect(page).toMatch(/<AnalyticsDashboard[\s\S]*?showHeader=\{false\}/);
+    expect(page).toContain('<ClassOverview');
+    expect(read('components/teacher/analytics/overview/ClassOverview.tsx')).not.toContain('education.analytics.title');
     expect(page.match(/education\.analytics\.title/g)).toHaveLength(1);
   });
 
