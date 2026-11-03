@@ -144,7 +144,7 @@ describe('free tier limits', () => {
     }
   });
 
-  it('refuses the analytics dashboard to free teachers everywhere it renders', () => {
+  it('refuses the class overview to free teachers everywhere it renders', () => {
     // A gate on only one render site is the asymmetric-path bug this repo keeps shipping:
     // one entry paywalls while a direct URL stays open. Add every new site here.
     const sites = [
@@ -152,8 +152,11 @@ describe('free tier limits', () => {
     ];
     for (const site of sites) {
       const src = readFileSync(join(__dirname, site), 'utf8');
-      expect(src, `${site} renders AnalyticsDashboard`).toContain('AnalyticsDashboard');
-      expect(src, `${site} renders AnalyticsDashboard without a ProGate`).toContain('ProGate');
+      const render = src.indexOf('<ClassOverview');
+      expect(render, `${site} no longer renders the class overview`).toBeGreaterThan(-1);
+      const gate = src.indexOf('<ProGate');
+      expect(gate, `${site} renders the class overview without a ProGate`).toBeGreaterThan(-1);
+      expect(gate, `${site} mounts the class overview outside its ProGate`).toBeLessThan(render);
     }
   });
 
