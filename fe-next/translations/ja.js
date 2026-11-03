@@ -5602,10 +5602,6 @@ const ja = {
       "title": "明日：新しいデイリーチャレンジ",
       "countdown": "新しいパズルまで {time}"
     },
-    "firstGameBridge": {
-      "quickMatch": "次へ：本物の相手とクイックマッチ",
-      "wordWheel": "次へ：今日のワードホイール（2分）"
-    },
     "saveStreak": {
       "title": "ストリークを保存",
       "body": "ストリークはこの端末に保存されます。無料アカウントを作成すれば、どこでも引き継げます。"
@@ -8558,11 +8554,6 @@ const ja = {
     },
     "home": {
       "greeting": "こんにちは、{name}さん",
-      "signupFirstGame": {
-        "title": "最初のゲームをプレイ、{name}",
-        "titleNoName": "最初のゲームをプレイ",
-        "daily": "今日のワードホイール（2分）"
-      },
       "levelTitle": "レベル{level}・{title}",
       "levelOnly": "レベル{level}",
       "titles": {
@@ -10289,7 +10280,6 @@ const ja = {
       "guestNameRejected": "別の名前を選んでください",
       "guestNameFailed": "名前を保存できませんでした。もう一度お試しください。",
       "guestNamePrompt": "スコアを保存する名前を入力",
-      "guestNameKeep": "この名前のままにする",
       "guestNameProudFirst": "今日の1位です!",
       "guestNameProudRank": "今日は{total}人中{rank}位!",
       "guestNameProudRankOnly": "今日は{rank}位!",

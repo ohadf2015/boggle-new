@@ -11,9 +11,9 @@ export function HomeSessionAll({ open, onOpenChange, language, classroomId, t }:
   const packs = useThemedPacks(language);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent data-testid="home-session-all" className="max-h-[90dvh] overflow-auto border-[3px] border-neo-cream bg-neo-navy sm:max-w-5xl">
+      <DialogContent data-testid="home-session-all" className="max-h-[90dvh] overflow-auto border-[3px] border-neo-cream/50 bg-neo-navy sm:max-w-5xl">
         <DialogTitle className="sr-only">{t('education.starterPacks.sessions.title')}</DialogTitle>
-        <div className="@container">
+        <div className="@container px-3 pb-4 pt-3 sm:p-5 [&_section>div:first-child]:pe-14 sm:[&_section>div:first-child]:pe-16">
           <SessionTemplatesSection language={language} packs={packs} classroomId={classroomId} />
         </div>
       </DialogContent>

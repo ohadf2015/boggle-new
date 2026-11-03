@@ -5371,10 +5371,6 @@ const es = {
       "title": "MAÑANA: nuevo Desafío Diario",
       "countdown": "Nuevo puzzle en {time}"
     },
-    "firstGameBridge": {
-      "quickMatch": "Siguiente: partida rápida contra jugadores reales",
-      "wordWheel": "Siguiente: la Rueda de hoy (2 min)"
-    },
     "saveStreak": {
       "title": "Guardar mi racha",
       "body": "Tus rachas se guardan solo en este dispositivo. Crea una cuenta gratis para tenerlas en todos lados."
@@ -8541,11 +8537,6 @@ const es = {
     },
     "home": {
       "greeting": "Hola, {name}",
-      "signupFirstGame": {
-        "title": "Juega tu primera partida, {name}",
-        "titleNoName": "Juega tu primera partida",
-        "daily": "La rueda de hoy (2 min)"
-      },
       "levelTitle": "Nivel {level} · {title}",
       "levelOnly": "Nivel {level}",
       "titles": {
@@ -10164,7 +10155,6 @@ const es = {
       "guestNameRejected": "Elige otro nombre",
       "guestNameFailed": "No se pudo guardar tu nombre. Inténtalo de nuevo.",
       "guestNamePrompt": "¿Con qué nombre guardamos tu puntuación?",
-      "guestNameKeep": "Mantener este nombre",
       "guestNameProudFirst": "¡Hoy estás en el puesto 1!",
       "guestNameProudRank": "¡Hoy estás en el puesto {rank} de {total}!",
       "guestNameProudRankOnly": "¡Hoy estás en el puesto {rank}!",

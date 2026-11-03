@@ -84,6 +84,21 @@ export interface DailyModePlayState {
   connections: boolean;
 }
 
+/** Server/local "played today" flags -> the play state the pickers read. */
+export function playStateFromToday(today: {
+  wordHunt: boolean;
+  wordWheel: boolean;
+  wordTower: boolean;
+  connections: boolean;
+}): DailyModePlayState {
+  return {
+    wordHunt: today.wordHunt ? 'won' : 'new',
+    wordWheel: today.wordWheel ? 'played' : 'new',
+    wordTower: today.wordTower,
+    connections: today.connections,
+  };
+}
+
 /**
  * Determine which mode should be the primary action (most prominent on hub).
  *

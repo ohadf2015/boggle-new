@@ -1,7 +1,6 @@
 /**
  * MpResultsScreen: the results_inline guest signup shows on the series-end
- * screen only, never in the auto-advance gap between rounds, and the first-game
- * bridge never paints a second filled primary under the footer's.
+ * screen only, never in the auto-advance gap between rounds.
  */
 import React from 'react';
 import { render, fireEvent, screen, waitFor } from '@testing-library/react';
@@ -49,7 +48,6 @@ vi.mock('next/dynamic', () => ({
   __esModule: true,
   default: () => (props: Record<string, unknown>) =>
     props && props.analyticsSource === 'results_inline' ? <div data-testid="inline-signup-card" />
-      : props && props.surface === 'classic-mp' ? <div data-testid="bridge-probe" data-emphasis={String(props.emphasis)} />
       : null,
 }));
 vi.mock('@/hooks/usePostHogFlag', () => ({
@@ -150,12 +148,6 @@ describe('MpResultsScreen results_inline signup is series-end only', () => {
     renderScreen({ seriesRoundNumber: 5, seriesTotalGames: 5 });
     skipReveal();
     expect(h.flagKeys).not.toContain('ri-mp-series-end');
-  });
-
-  it('the first-game bridge renders as a secondary (outline) action under the footer primary', () => {
-    renderScreen({ seriesRoundNumber: 1, seriesTotalGames: 5 });
-    skipReveal();
-    expect(screen.getByTestId('bridge-probe').getAttribute('data-emphasis')).toBe('secondary');
   });
 
   it('a guest never looks up a head-to-head record', () => {

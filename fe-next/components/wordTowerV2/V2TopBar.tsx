@@ -180,6 +180,9 @@ export const V2TopBar = memo(function V2TopBar({
                 className="rounded-neo border-neo border-neo-cream/40 bg-neo-navy/85 px-2 py-0.5 font-neo-display leading-tight tabular-nums"
               >
                 <AnimatedCounter value={score} formatValue={formatScore} size="xs" className="font-bold text-neo-cream lg:text-base" />
+                <span className="ms-1 text-[9px] font-bold uppercase text-neo-cream opacity-70 lg:text-xs" aria-hidden>
+                  {t('common.pts')}
+                </span>
               </div>
             ) : null}
             {daily && dailyTarget && dailyTarget.targetM > 0 ? (

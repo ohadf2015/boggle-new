@@ -17,13 +17,6 @@ import { OfflineSyncBridge } from '@/components/offline/OfflineSyncBridge';
 import { isLandingPath } from '@/lib/i18n/isLandingPath';
 import type { Language } from '@/shared/types/game';
 
-// Deferred like the other heavy widgets: a static edge into the landing/home
-// chunk graph crashed the webpack production build (t_5ebe9081 CI, 2x).
-const SignupFirstGameGlobalCard = nextDynamic(
-  () => import('@/components/landing/home/SignupFirstGameCard').then((m) => m.SignupFirstGameGlobalCard),
-  { ssr: false, loading: () => null },
-);
-
 const DeferredLayoutWidgets = nextDynamic(() => import('@/components/DeferredLayoutWidgets'), {
   ssr: false,
   loading: () => null,
@@ -83,7 +76,6 @@ export default function SiteExtras({ lang }: SiteExtrasProps) {
       <NativePGSInitializer />
       <OfflineBanner />
       <OfflineSyncBridge />
-      <SignupFirstGameGlobalCard />
       <SiteFooter className="relative z-0 shrink-0" />
       <PlayerBottomNav />
       <DeferredLayoutWidgets />

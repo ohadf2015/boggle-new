@@ -4,7 +4,8 @@ import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { m } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { DAILY_MODES, dailyModeHref, type DailyModeId } from '@/lib/dailyModes';
+import { useDailyPlayedStatus } from '@/hooks/useDailyPlayedStatus';
+import { DAILY_MODES, dailyModeHref, pickNextUnplayedMode, playStateFromToday, type DailyModeId } from '@/lib/dailyModes';
 import { cn } from '@/lib/utils';
 import { consumeDailyHandoff, markDailyHandoff } from './dailyHandoff';
 import { DailyStepBanner } from './DailyStepBanner';
@@ -41,6 +42,7 @@ const introKey = (id: DailyModeId) => `lc:daily-intro:${id}:${new Date().toISOSt
  */
 export function DailyFlowChrome({ modeId, intro = true, introDeferred = false, backLink = true, inline = false, skip = true }: DailyFlowChromeProps) {
   const { t, language } = useLanguage();
+  const played = useDailyPlayedStatus();
   const index = DAILY_MODES.findIndex((md) => md.id === modeId);
   const mode = DAILY_MODES[index];
   const [showIntro, setShowIntro] = useState(false);
@@ -78,8 +80,9 @@ export function DailyFlowChrome({ modeId, intro = true, introDeferred = false, b
 
   if (!mode) return null;
   const hubHref = `/${language}/daily`;
-  // Skip = move on along the chain; only the last quest skips back to the hub.
-  const nextMode = DAILY_MODES[index + 1];
+  // Skip = next quest still open today (never a finished one); hub once the day is clear.
+  const nextId = pickNextUnplayedMode(playStateFromToday(played.today), modeId);
+  const nextMode = DAILY_MODES.find((md) => md.id === nextId);
   const skipHref = nextMode ? dailyModeHref(nextMode, language) : hubHref;
 
   return (
@@ -94,7 +97,7 @@ export function DailyFlowChrome({ modeId, intro = true, introDeferred = false, b
             <span aria-hidden className="ltr:rotate-180 inline-block">›</span>
             {t('daily.backToDailyHub')}
           </Link>
-          {mode.optional && skip && (
+          {mode.optional && skip && !played.loading && (
             <Link
               href={skipHref}
               onClick={() => { if (nextMode) markDailyHandoff(nextMode.id); }}

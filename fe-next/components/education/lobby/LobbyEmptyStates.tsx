@@ -58,7 +58,7 @@ export interface LobbyNoLessonsProps {
 export function LobbyNoLessons({ starterPacks, isCreating, onCreateLesson }: LobbyNoLessonsProps) {
   const { t } = useLanguage();
   return (
-    <div data-testid="lobby-no-lessons" className="min-h-0 flex-1 overflow-y-auto overscroll-contain rounded-neo border-[3px] border-neo-cream/40 bg-neo-navy p-3 shadow-hard sm:p-6">
+    <div data-testid="lobby-no-lessons" className="min-h-0 flex-1 overflow-y-auto overscroll-contain rounded-neo border-[3px] border-neo-cream/40 bg-neo-navy p-3 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-hard sm:p-6">
       <div className="mb-3 flex flex-wrap items-center justify-end gap-2">
         <p className="font-neo-body text-sm text-neo-white">{t('education.lesson.preferCustom')}</p>
         <button type="button" data-testid="lobby-no-lessons-library" onClick={onCreateLesson} className={`${GHOST_BTN} min-h-11 px-4 py-2 text-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan`}>

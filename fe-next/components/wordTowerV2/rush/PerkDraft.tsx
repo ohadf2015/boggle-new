@@ -247,7 +247,7 @@ function PerkCard({
           : undefined
       }
       whileTap={live && !reducedMotion ? { scale: 0.96, y: 0 } : undefined}
-      className={`relative flex min-h-[7.5rem] w-full flex-1 items-center gap-3 overflow-hidden rounded-neo-lg border-neo-thick border-black bg-neo-cream p-3 pe-10 text-start text-neo-navy shadow-hard-xl outline-none [transform-style:preserve-3d] focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-neo-white sm:min-h-[17rem] sm:flex-col sm:items-center sm:justify-start sm:gap-3 sm:p-5 sm:pe-5 sm:text-center ${
+      className={`svg-free relative flex min-h-[7.5rem] w-full flex-1 items-center gap-3 overflow-hidden rounded-neo-lg border-neo-thick border-black bg-neo-cream p-3 pe-10 text-start text-neo-navy shadow-hard-xl outline-none [transform-style:preserve-3d] focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-neo-white sm:min-h-[17rem] sm:flex-col sm:items-center sm:justify-start sm:gap-3 sm:p-5 sm:pe-5 sm:text-center ${
         reducedMotion
           ? "animate-in fade-in-0 duration-150"
           : "animate-in fade-in-0 zoom-in-90 slide-in-from-bottom-4 duration-500"
