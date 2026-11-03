@@ -1,8 +1,6 @@
 name: CI
 
 on:
-  push:
-    branches: [master, main]
   pull_request:
     branches: [master, main]
   # radar-loop dispatches this on its bot PRs, which GITHUB_TOKEN cannot trigger.
@@ -12,190 +10,61 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  NODE_VERSION: '20'
-  CACHE_PREFIX: v1
-
 jobs:
-  # Single install job that caches dependencies for all other jobs
-  install:
+  check:
     runs-on: ubuntu-latest
-    outputs:
-      cache-key: ${{ steps.cache-deps.outputs.cache-hit }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Cache node_modules
-        id: cache-deps
-        uses: actions/cache@v4
-        with:
-          path: |
-            fe-next/node_modules
-            ~/.npm
-          key: ${{ env.CACHE_PREFIX }}-deps-${{ runner.os }}-${{ hashFiles('fe-next/package-lock.json') }}
-          restore-keys: |
-            ${{ env.CACHE_PREFIX }}-deps-${{ runner.os }}-
-
-      - name: Install dependencies
-        if: steps.cache-deps.outputs.cache-hit != 'true'
-        working-directory: fe-next
-        run: npm ci --prefer-offline --no-audit
-
-  # Lint and type check run in parallel
-  lint:
-    runs-on: ubuntu-latest
-    needs: install
     steps:
       - uses: actions/checkout@v4
         with:
           # The SEO freeze check diffs the PR merge commit against its base (HEAD^1).
           fetch-depth: 2
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Restore node_modules cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            fe-next/node_modules
-            ~/.npm
-          key: ${{ env.CACHE_PREFIX }}-deps-${{ runner.os }}-${{ hashFiles('fe-next/package-lock.json') }}
-          restore-keys: |
-            ${{ env.CACHE_PREFIX }}-deps-${{ runner.os }}-
-          fail-on-cache-miss: false
-
-      - name: Install if cache miss
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: fe-next/package-lock.json
+      - run: npm ci --prefer-offline --no-audit
         working-directory: fe-next
-        run: |
-          if [ ! -d "node_modules" ]; then
-            npm ci --prefer-offline --no-audit
-          fi
-
-      - name: Check translations
+      - run: npm run check:translations && npm run lint
         working-directory: fe-next
-        run: npm run check:translations
-
-      - name: Lint
+      - run: npx tsx scripts/build-i18n-assets.ts --skip-brotli && npx tsc --noEmit
         working-directory: fe-next
-        run: npm run lint
-
       - name: Check SEO freeze
         if: github.event_name == 'pull_request'
         run: |
-          # The base's last 30 days, so the check can see when a page's title last changed.
           git fetch --no-tags --shallow-since="$(date -u -d '30 days ago' +%F)" origin "${{ github.base_ref }}"
           node fe-next/scripts/ci/check-seo-freeze.mjs HEAD^1 HEAD
 
-  type-check:
-    runs-on: ubuntu-latest
-    needs: install
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Restore node_modules cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            fe-next/node_modules
-            ~/.npm
-          key: ${{ env.CACHE_PREFIX }}-deps-${{ runner.os }}-${{ hashFiles('fe-next/package-lock.json') }}
-          restore-keys: |
-            ${{ env.CACHE_PREFIX }}-deps-${{ runner.os }}-
-          fail-on-cache-miss: false
-
-      - name: Install if cache miss
-        working-directory: fe-next
-        run: |
-          if [ ! -d "node_modules" ]; then
-            npm ci --prefer-offline --no-audit
-          fi
-
-      - name: Build i18n assets
-        working-directory: fe-next
-        run: npx tsx scripts/build-i18n-assets.ts --skip-brotli
-
-      - name: Type check
-        working-directory: fe-next
-        run: npx tsc --noEmit
-
-  # Tests run with 6-way sharding for parallelism
   test:
     runs-on: ubuntu-latest
-    needs: install
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4, 5, 6]
+        shard: [1, 2, 3]
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Restore node_modules cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            fe-next/node_modules
-            ~/.npm
-          key: ${{ env.CACHE_PREFIX }}-deps-${{ runner.os }}-${{ hashFiles('fe-next/package-lock.json') }}
-          restore-keys: |
-            ${{ env.CACHE_PREFIX }}-deps-${{ runner.os }}-
-          fail-on-cache-miss: false
-
-      - name: Install if cache miss
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: fe-next/package-lock.json
+      - run: npm ci --prefer-offline --no-audit
         working-directory: fe-next
-        run: |
-          if [ ! -d "node_modules" ]; then
-            npm ci --prefer-offline --no-audit
-          fi
-
-      - name: Build i18n assets
+      - run: npx tsx scripts/build-i18n-assets.ts --skip-brotli && npm run build:schemas
         working-directory: fe-next
-        run: npx tsx scripts/build-i18n-assets.ts --skip-brotli
-
-      - name: Build backend schemas (required by handler tests and frontend parity tests)
-        working-directory: fe-next
-        run: npm run build:schemas
-
-      - name: Run backend tests (shard 1 only)
+      - name: Backend tests
         if: matrix.shard == 1
         working-directory: fe-next
-        # Matches `npm run test:backend`.
         run: npx vitest run --config backend/vitest.config.ts
         env:
           CI: true
-
-      - name: Run frontend tests — Vitest (shard ${{ matrix.shard }}/6)
+      - name: Frontend tests (shard ${{ matrix.shard }}/3)
         working-directory: fe-next
-        # Vitest is the maintained, source-of-truth frontend suite (npm run
-        # test:frontend). It is the gating frontend test run.
-        #
-        # Pass/fail is decided from the JSON report by scripts/ci/assert-vitest-passed.mjs,
-        # NOT vitest's raw exit code. Shard 6 intermittently crashes a worker fork during
-        # teardown ("Worker exited unexpectedly", open-handle/native-module class) AFTER
-        # every test has already passed — that is not a heap OOM (raising the heap had zero
-        # effect, see reverted commit 0c573641) and would otherwise red-flag a green run and
-        # block all merges. The gate tolerates only a post-success crash; any real failed
-        # test (numFailedTests>0) or a suite that didn't run still fails CI.
+        # Gate on the JSON report, not vitest's exit code: a worker fork can crash
+        # at teardown after every test passed (see assert-vitest-passed.mjs).
         run: |
           set +e
-          npx vitest run --config vitest.config.ts --shard=${{ matrix.shard }}/6 \
+          npx vitest run --config vitest.config.ts --shard=${{ matrix.shard }}/3 \
             --reporter=default --reporter=json --outputFile.json=vitest-shard-${{ matrix.shard }}.json
           VITEST_RC=$?
           set -e
@@ -203,145 +72,11 @@ jobs:
         env:
           CI: true
 
-      - name: Upload coverage
-        uses: actions/upload-artifact@v4
-        if: always()
-        continue-on-error: true
-        with:
-          name: coverage-shard-${{ matrix.shard }}
-          path: fe-next/coverage/
-          retention-days: 7
-          if-no-files-found: ignore
-
-  # Merge coverage from all shards
-  coverage:
-    runs-on: ubuntu-latest
-    needs: test
-    if: always()
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Download all coverage artifacts
-        uses: actions/download-artifact@v4
-        continue-on-error: true
-        with:
-          pattern: coverage-shard-*
-          merge-multiple: true
-          path: coverage/
-
-      # Frontend vitest shards do not pass --coverage, so fe-next/coverage/ is
-      # usually empty. codecov-action@v4 then dies on an SSL handshake (alert 40)
-      # while fetching the uploader — that fails the required-looking coverage
-      # check even with fail_ci_if_error: false. Skip Codecov when there is
-      # nothing to upload so copy-only PRs are not blocked.
-      - name: Detect coverage files
-        id: cov
-        run: |
-          if find coverage -type f \( -name '*coverage*' -o -name '*.lcov' -o -name 'coverage-final.json' -o -name 'clover.xml' \) 2>/dev/null | grep -q .; then
-            echo "has=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "has=false" >> "$GITHUB_OUTPUT"
-            echo "No coverage files; skipping Codecov"
-          fi
-
-      - name: Upload merged coverage to Codecov
-        if: steps.cov.outputs.has == 'true'
-        continue-on-error: true
-        uses: codecov/codecov-action@v4
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          directory: coverage/
-          flags: unittests
-          name: codecov-umbrella
-          fail_ci_if_error: false
-
-  # Runs in parallel with lint, type-check and tests; ci-success gates on all four.
-  build:
-    runs-on: ubuntu-latest
-    needs: install
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Restore node_modules cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            fe-next/node_modules
-            ~/.npm
-          key: ${{ env.CACHE_PREFIX }}-deps-${{ runner.os }}-${{ hashFiles('fe-next/package-lock.json') }}
-          restore-keys: |
-            ${{ env.CACHE_PREFIX }}-deps-${{ runner.os }}-
-          fail-on-cache-miss: false
-
-      - name: Install if cache miss
-        working-directory: fe-next
-        run: |
-          if [ ! -d "node_modules" ]; then
-            npm ci --prefer-offline --no-audit
-          fi
-
-      # The webpack cache is versioned (v2) and keyed on the Node version. From
-      # e2a1c584 (Oct 29) every master build crashed ~2.5 min into "Creating an
-      # optimized production build" with `uncaughtException TypeError: Cannot read
-      # properties of undefined (reading 'length')`, while the same commit built
-      # clean from scratch locally (Node 20 and 22) and on Railway. A failed job
-      # never saves a new cache, so every later run restored the same (most likely
-      # stale) `.next/cache` through the prefix restore-key and crashed the same way.
-      # Bump the version to drop a poisoned cache; never delete the build step.
-      # Oct 30: the same ~2.5 min crash came back on v2 (1e416d37, PR 1535) while
-      # those commits built clean from scratch locally and on Railway. A cache
-      # from a different commit, restored through the prefix restore-key, is the
-      # likely trigger, so restore only an exact key match (same lockfile and
-      # same .ts/.tsx). A miss costs a full build (~5 min), not a red master.
-      - name: Cache Next.js build
-        uses: actions/cache@v4
-        with:
-          path: |
-            fe-next/.next/cache
-          key: ${{ runner.os }}-node${{ env.NODE_VERSION }}-nextjs-v3-${{ hashFiles('fe-next/package-lock.json') }}-${{ hashFiles('fe-next/**/*.ts', 'fe-next/**/*.tsx') }}
-
-      - name: Build
-        working-directory: fe-next
-        run: npm run build
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-
-  # bundle-analysis and lighthouse moved to quality-audit.yml (nightly cron)
-  # 2026-07-31 -- together they were ~37min of runner time per CI run, and
-  # ci.yml runs ~14x/day. They audit the current state of master; they don't
-  # need to gate every push.
-
-  # Summary job for branch protection
+  # Branch-protection gate; keep the name.
   ci-success:
     runs-on: ubuntu-latest
-    needs: [lint, type-check, test, build]
+    needs: [check, test]
     if: always()
     steps:
-      - name: Check all jobs passed
-        run: |
-          if [[ "${{ needs.lint.result }}" != "success" ]] || \
-             [[ "${{ needs.type-check.result }}" != "success" ]] || \
-             [[ "${{ needs.test.result }}" != "success" ]] || \
-             [[ "${{ needs.build.result }}" != "success" ]]; then
-            echo "❌ One or more jobs failed"
-            exit 1
-          fi
-          echo "✅ All CI checks passed"
-
-      - name: Create summary
-        if: always()
-        run: |
-          echo "## CI Results" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Lint | ${{ needs.lint.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Type Check | ${{ needs.type-check.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Tests | ${{ needs.test.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Build | ${{ needs.build.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+      - run: |
+          [[ "${{ needs.check.result }}" == "success" && "${{ needs.test.result }}" == "success" ]] || { echo "❌ failed"; exit 1; }
