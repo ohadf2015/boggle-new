@@ -82,7 +82,7 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
       },
     },
     robots: {
-      index: true,
+      index: false,
       follow: true,
     },
   };

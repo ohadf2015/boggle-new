@@ -103,9 +103,8 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   });
 
   // ─── Core game mode pages ───
-  // /singleplayer omitted: bare hits 308 → /multiplayer?quickPlay=true (see app/[locale]/singleplayer/page.tsx).
-  // Route still serves variants (?autoStart, ?preset, ?boardCode, ?returnTo) but those are not sitemap-worthy.
-  addForAllLocales(routes, '/multiplayer', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.9 });
+  // /multiplayer and /singleplayer are noindexed game shells with no visible copy (the lobby must fill the screen);
+  // multiplayer search intent lands on /free-multiplayer-word-game and its locale siblings.
   addForAllLocales(routes, '/daily', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.9 });
   // /blast, /word-craft, /daily/word-hunt, /daily/word-wheel are near-empty
   // game shells (30-282 crawlable words, measured live 2026-07-02) — noindexed
@@ -149,10 +148,7 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   // playable — we just don't advertise them. The /daily/archive hub (above)
   // remains the canonical entry point. See docs/2026-06-04-adsense-approval-plan.md.
 
-  // ─── Brain training ───
-  addForAllLocales(routes, '/brain', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.8 });
-  // /brain/drills/* dropped (2026-07-02): 30 URLs at ~212 crawlable words each,
-  // now noindex at page level. The /brain hub remains the indexable entry.
+  // /brain and /brain/drills/* are noindexed game shells; brain-training searches land on /brain-training-word-games.
 
   // ─── Practice / tutorial ───
   // Interactive-only pages — noindexed in the AdSense thin-page sweep (2026-06-17), so

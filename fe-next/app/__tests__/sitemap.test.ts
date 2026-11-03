@@ -292,9 +292,14 @@ describe('sitemap', () => {
 
   // Regression guard: genuinely-localized routes must STILL appear in all five
   // locales. Catches an over-eager refactor that narrows a localized route.
+  it('keeps the noindexed game shells out of the sitemap', () => {
+    const urls = sitemap().map((e) => e.url);
+    expect(urls.filter((u) => /\/(multiplayer|singleplayer|brain)$/.test(u))).toEqual([]);
+  });
+
   it('still lists genuinely-localized routes for all five locales', () => {
     const urls = new Set(sitemap().map((e) => e.url));
-    const localizedPaths = ['/multiplayer', '/daily', '/blog', '/blog/word-game-history', '/how-to-play'];
+    const localizedPaths = ['/daily', '/blog', '/blog/word-game-history', '/how-to-play'];
     for (const path of localizedPaths) {
       for (const locale of ['en', 'he', 'sv', 'ja', 'es']) {
         expect(

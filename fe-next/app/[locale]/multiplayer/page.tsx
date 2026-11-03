@@ -20,7 +20,7 @@ export function generateStaticParams(): Array<{ locale: string }> {
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
-  return generatePageMetadata({ seoKey: 'multiplayer', path: '/multiplayer', locale });
+  return generatePageMetadata({ seoKey: 'multiplayer', path: '/multiplayer', locale, noIndex: true });
 }
 
 const seoContent: Record<string, {

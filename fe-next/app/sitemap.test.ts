@@ -82,8 +82,8 @@ describe('sitemap', () => {
     ).toEqual([]);
   });
 
-  it('still lists the content-rich game siblings (/word-craft-game, /daily, /brain hubs)', () => {
-    for (const path of ['/word-craft-game', '/daily', '/brain']) {
+  it('still lists the content-rich game siblings (/word-craft-game, /daily, /brain-training-word-games)', () => {
+    for (const path of ['/word-craft-game', '/daily', '/brain-training-word-games']) {
       expect(
         routes.find((r) => r.url === `${BASE_URL}/en${path}`),
         `missing ${path} for en`
