@@ -34,6 +34,7 @@ import {
   persistGameStateNow as doPersistNow,
   restoreGameFromRedis as doRestore,
   restoreAllGamesFromRedis as doRestoreAll,
+  refreshRestoredGameFromRedis as doRefreshRestored,
   getAllGameCodesFromRedis,
   deleteGameFromRedis,
   clearPersistTimer
@@ -103,6 +104,11 @@ function markActiveRoomsDirty(): void {
 const persistGameState = (gameCode: string): void => doPersist(gameCode, games);
 const persistGameStateNow = (gameCode: string): Promise<void> => doPersistNow(gameCode, games);
 const restoreAllGamesFromRedis = (): Promise<number> => doRestoreAll(games);
+const refreshRestoredGameFromRedis = async (gameCode: string): Promise<GameState | null> => {
+  const game = await doRefreshRestored(gameCode, games);
+  markActiveRoomsDirty();
+  return game;
+};
 
 // Per-game restoration lock to prevent duplicate concurrent restores
 const restoreLocks = new Map<string, Promise<GameState | null>>();
@@ -731,7 +737,7 @@ export {
   updateUserPresence, updateUserHeartbeat, markUserActivity, getPresenceConfig, checkUserConnectionHealth, markHostActive, reactivateHost,
   getAuthUserConnection, setAuthUserConnection, removeAuthUserConnection, clearSocketMappings, clearSocketMappingsForLeave,
   getTournamentIdFromGame, setTournamentIdForGame,
-  persistGameState, persistGameStateNow, restoreGameFromRedis, restoreAllGamesFromRedis, getAllGameCodesFromRedis,
+  persistGameState, persistGameStateNow, restoreGameFromRedis, restoreAllGamesFromRedis, refreshRestoredGameFromRedis, getAllGameCodesFromRedis,
   initCacheInvalidation, shutdownCacheInvalidation
 };
 
@@ -753,7 +759,7 @@ const gameStateManager = {
   updateUserPresence, updateUserHeartbeat, markUserActivity, getPresenceConfig, checkUserConnectionHealth, markHostActive, reactivateHost,
   getAuthUserConnection, setAuthUserConnection, removeAuthUserConnection, clearSocketMappings, clearSocketMappingsForLeave,
   getTournamentIdFromGame, setTournamentIdForGame,
-  persistGameState, persistGameStateNow, restoreGameFromRedis, restoreAllGamesFromRedis, getAllGameCodesFromRedis,
+  persistGameState, persistGameStateNow, restoreGameFromRedis, restoreAllGamesFromRedis, refreshRestoredGameFromRedis, getAllGameCodesFromRedis,
   initCacheInvalidation, shutdownCacheInvalidation
 };
 export default gameStateManager;
