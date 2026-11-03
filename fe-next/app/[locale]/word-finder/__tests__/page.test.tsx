@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { generateMetadata, faqs } from '../page';
+import { generateMetadata } from '../page';
+import { faqs } from '../faqs';
 import { buildFinderBody, canSearch } from '../finderRequest';
 import { KNOWN_APP_ROOT_SEGMENTS } from '@/lib/seo/nextHandleGate';
 
