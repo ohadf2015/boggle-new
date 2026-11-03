@@ -47,13 +47,15 @@ const RARITY: Record<PerkRarity, RarityStyle> = {
 
 interface Custom {
   rm: boolean;
-  i: number;
 }
 
+// ENTRANCE IS CSS, NOT FRAMER (popupRevealGuard): `animate-in` classes run off
+// the main thread and always settle visible; a framer hidden `initial` pins the
+// card invisible when the rAF loop is starved (mobile Hebrew black-screen bug).
+// Framer is kept ONLY for the post-entrance pick/drop/hover/tap interactions,
+// which carry no hidden initial.
 const cardVariants: Variants = {
-  hidden: ({ rm }: Custom) =>
-    rm ? { opacity: 0 } : { opacity: 0, rotateY: -100, y: 28, scale: 0.9 },
-  shown: ({ rm, i }: Custom) => ({
+  shown: ({ rm }: Custom) => ({
     opacity: 1,
     rotateY: 0,
     y: 0,
@@ -65,7 +67,6 @@ const cardVariants: Variants = {
           stiffness: 300,
           damping: 17,
           mass: 0.9,
-          delay: 0.12 + i * 0.11,
         },
   }),
   picked: ({ rm }: Custom) =>
@@ -157,17 +158,12 @@ export function PerkDraft({
       onKeyDown={trapTab}
       className="fixed inset-0 z-[70] flex flex-col items-center justify-center gap-3 overflow-y-auto bg-neo-navy/95 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))] sm:gap-6"
     >
-      <m.header
-        className="flex flex-col items-center gap-1 text-center"
-        initial={
-          reducedMotion ? { opacity: 0 } : { opacity: 0, y: -16, scale: 0.9 }
-        }
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={
+      <header
+        className={`flex flex-col items-center gap-1 text-center ${
           reducedMotion
-            ? { duration: 0.1 }
-            : { type: "spring", stiffness: 380, damping: 16 }
-        }
+            ? "animate-in fade-in-0 duration-150"
+            : "animate-in fade-in-0 slide-in-from-top-4 duration-300"
+        }`}
       >
         <h2
           id={titleId}
@@ -178,7 +174,7 @@ export function PerkDraft({
         <p className="font-neo-display text-sm font-bold text-neo-cream sm:text-base">
           {t("wordTowerV2.rush.draft.subtitle", { n: floor })}
         </p>
-      </m.header>
+      </header>
 
       <div className="flex w-full max-w-sm flex-col gap-3 [perspective:1100px] sm:max-w-3xl sm:flex-row sm:items-stretch sm:gap-5">
         {perks.map((perk, i) => (
@@ -238,9 +234,8 @@ function PerkCard({
       data-rarity={perk.rarity}
       disabled={state === "dropped"}
       onClick={() => onPick(perk.id)}
-      custom={{ rm: reducedMotion, i: index }}
+      custom={{ rm: reducedMotion }}
       variants={cardVariants}
-      initial="hidden"
       animate={state}
       whileHover={
         live && !reducedMotion
@@ -252,7 +247,11 @@ function PerkCard({
           : undefined
       }
       whileTap={live && !reducedMotion ? { scale: 0.96, y: 0 } : undefined}
-      className={`relative flex min-h-[7.5rem] w-full flex-1 items-center gap-3 overflow-hidden rounded-neo-lg border-neo-thick border-black bg-neo-cream p-3 pe-10 text-start text-neo-navy shadow-hard-xl outline-none [transform-style:preserve-3d] focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-neo-white sm:min-h-[17rem] sm:flex-col sm:items-center sm:justify-start sm:gap-3 sm:p-5 sm:pe-5 sm:text-center ${style.ring}`}
+      className={`relative flex min-h-[7.5rem] w-full flex-1 items-center gap-3 overflow-hidden rounded-neo-lg border-neo-thick border-black bg-neo-cream p-3 pe-10 text-start text-neo-navy shadow-hard-xl outline-none [transform-style:preserve-3d] focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-neo-white sm:min-h-[17rem] sm:flex-col sm:items-center sm:justify-start sm:gap-3 sm:p-5 sm:pe-5 sm:text-center ${
+        reducedMotion
+          ? "animate-in fade-in-0 duration-150"
+          : "animate-in fade-in-0 zoom-in-90 slide-in-from-bottom-4 duration-500"
+      } ${style.ring}`}
     >
       {style.shimmer && !reducedMotion ? (
         <m.span
@@ -272,7 +271,7 @@ function PerkCard({
 
       <span
         aria-hidden
-        className="absolute end-2 top-2 flex h-6 w-6 items-center justify-center rounded-neo-sm border-2 border-black bg-neo-navy font-neo-display text-xs font-black text-neo-cream shadow-hard-sm"
+        className="absolute end-2 top-2 flex h-6 w-6 items-center justify-center rounded-neo-sm border-2 border-neo-cream bg-neo-navy font-neo-display text-xs font-black text-neo-cream shadow-hard-sm"
       >
         {index + 1}
       </span>
