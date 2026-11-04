@@ -20,6 +20,7 @@ import {
 } from '../utils/educationRoundTelemetry';
 import { loadTestAccountIds } from '@/lib/education/eduTestAccount';
 import { markTeacherLiveStarted } from '../modules/supabase/teacherActivation';
+import { bumpTeacherLastSeen } from './bumpTeacherLastSeen';
 
 
 export interface RoundMembership {
@@ -154,6 +155,10 @@ export async function recordClassroomRound(
       completed_at: now.toISOString(),
     } as never);
     if (insertError) throw new Error(insertError.message);
+
+    // Presence for teachers who never mount useFriends. Isolated: a failed bump
+    // must not skip the round row (already written) or the events below.
+    await bumpTeacherLastSeen(supabase, game.teacherId, now);
 
     let memberships: RoundMembership[] = [];
     if (opts.playerIds.length > 0) {
