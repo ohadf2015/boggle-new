@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getAssignmentCompletions } from '@/lib/supabase/education/assignments';
 import { getClassroomStudents } from '@/lib/supabase/education/classrooms';
-import { resolveDisplayName } from '@/lib/displayName';
+import { teacherFacingName } from '@/lib/education/rosterName';
 import {
   buildAssignmentResults,
   type AssignmentResults,
@@ -40,8 +40,7 @@ async function loadRoster(
   const { data, error } = await getClassroomStudents(classroomId).catch(() => ({ data: [], error: { message: 'roster' } }));
   if (error) return [];
   return (data ?? []).map((s) => {
-    const profile = s.profiles as { display_name?: string; username?: string } | null;
-    return { studentId: s.student_id, name: resolveDisplayName([profile?.display_name, profile?.username], fallbackName) };
+    return { studentId: s.student_id, name: teacherFacingName(s.roster_name, s.profiles, fallbackName) };
   });
 }
 

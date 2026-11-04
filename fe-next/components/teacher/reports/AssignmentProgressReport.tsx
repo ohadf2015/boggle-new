@@ -14,7 +14,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { getClassroomAssignments, getAssignmentCompletions } from '@/lib/supabase/education/assignments';
 import { getClassroomStudents } from '@/lib/supabase/education/classrooms';
-import { resolveDisplayName } from '@/lib/displayName';
+import { teacherFacingName } from '@/lib/education/rosterName';
 import {
   assignmentProgressToCsv,
   buildAssignmentProgressRows,
@@ -62,10 +62,9 @@ export function AssignmentProgressReport({ classroomId, classroomName }: Assignm
 
     const rows = buildAssignmentProgressRows({
       students: students.map((s) => {
-        const profile = s.profiles as { display_name?: string; username?: string } | null;
         return {
           studentId: s.student_id,
-          name: resolveDisplayName([profile?.display_name, profile?.username], anonymous(s.student_id)),
+          name: teacherFacingName(s.roster_name, s.profiles, anonymous(s.student_id)),
         };
       }),
       assignments: assignments.map((a) => ({

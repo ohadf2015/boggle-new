@@ -21560,8 +21560,17 @@ const ru = {
   // @eduPolish:start
   "eduPolish": {
     "seatCapReached": "{name} смотрит: класс заполнен ({cap} игроков)",
-  }
+  },
   // @eduPolish:end
+  // @eduRoster:start
+  "eduRoster": {
+    "rename": "Переименовать {name} в этом классе",
+    "inputLabel": "Имя в этом классе",
+    "tooLong": "Не больше {max} символов",
+    "saveFailed": "Не удалось сохранить имя. Попробуйте ещё раз.",
+    "originalName": "Зарегистрирован(а) как {name}"
+  }
+  // @eduRoster:end
 };
 
 export { ru };

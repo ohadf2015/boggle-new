@@ -21860,8 +21860,17 @@ const sv = {
   // @eduPolish:start
   "eduPolish": {
     "seatCapReached": "{name} tittar på: klassen är full ({cap} spelare)",
-  }
+  },
   // @eduPolish:end
+  // @eduRoster:start
+  "eduRoster": {
+    "rename": "Byt namn på {name} i den här klassen",
+    "inputLabel": "Namn i den här klassen",
+    "tooLong": "Använd högst {max} tecken",
+    "saveFailed": "Namnet kunde inte sparas. Försök igen.",
+    "originalName": "Registrerad som {name}"
+  }
+  // @eduRoster:end
 };
 
 export { sv };

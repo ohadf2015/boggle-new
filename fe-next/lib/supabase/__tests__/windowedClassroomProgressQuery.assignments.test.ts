@@ -69,12 +69,12 @@ describe('getClassroomWindowSource assignment window', () => {
     expect(data?.assignmentCompletions[0]?.completedAt).toBe('2026-10-12T12:00:00.000Z');
   });
 
-  it('selects roster joined_at and returns classroom words-mastered rows for the weekly email report', async () => {
+  it('reads the roster (joined_at, roster name) and returns classroom words-mastered rows for the weekly email report', async () => {
     const calls: { selects: string[] } = { selects: [] };
     const client = mockClient(
       {
         classroom_memberships: [
-          { student_id: 's1', joined_at: '2026-10-11T08:00:00.000Z' },
+          { student_id: 's1', joined_at: '2026-10-11T08:00:00.000Z', roster_name: 'Sammy' },
           { student_id: 's2', joined_at: null },
         ],
         practice_sessions: [],
@@ -108,10 +108,11 @@ describe('getClassroomWindowSource assignment window', () => {
     );
 
     expect(error).toBeNull();
-    expect(calls.selects).toContain('student_id, joined_at');
+    expect(calls.selects).toContain('*');
     expect(calls.selects).toContain('assignment_id, completed_at, student_id, words_mastered');
     expect(data?.roster[0]?.joinedAt).toBe('2026-10-11T08:00:00.000Z');
     expect(data?.roster[1]?.joinedAt ?? null).toBeNull();
+    expect(data?.roster.map((r) => r.name)).toEqual(['Sammy', 'Pat']);
     expect(data?.wordsMastered).toEqual([
       { studentId: 's1', completedAt: '2026-10-12T12:00:00.000Z', words: ['cat', 'sun'] },
       { studentId: 's2', completedAt: '2026-10-13T09:30:00.000Z', words: [] },

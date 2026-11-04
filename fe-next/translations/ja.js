@@ -21860,8 +21860,17 @@ const ja = {
   // @eduPolish:start
   "eduPolish": {
     "seatCapReached": "{name}さんは観戦中です：クラスが満員です（{cap}人）",
-  }
+  },
   // @eduPolish:end
+  // @eduRoster:start
+  "eduRoster": {
+    "rename": "このクラスでの{name}さんの名前を変更",
+    "inputLabel": "このクラスでの名前",
+    "tooLong": "{max}文字以内で入力してください",
+    "saveFailed": "名前を保存できませんでした。もう一度お試しください。",
+    "originalName": "登録名：{name}"
+  }
+  // @eduRoster:end
 };
 
 export { ja };

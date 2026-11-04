@@ -13,7 +13,7 @@
 
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
-import { resolveDisplayName } from '@/lib/displayName';
+import { teacherFacingName } from '@/lib/education/rosterName';
 import { normalizeForStorage } from '@/lib/supabase/education/types';
 
 export interface LastGamePlayer {
@@ -249,13 +249,18 @@ export async function getRecentClassroomGames(
     // roster failure degrades to "no absentees", never to a broken card.
     const rosterResult = await db
       .from('classroom_memberships')
-      .select('student_id, joined_at', { count: 'exact' })
+      .select('*', { count: 'exact' })
       .eq('classroom_id', classroomId);
 
     if (rosterResult.error) {
       logger.error('Error counting classroom roster:', rosterResult.error);
     }
     const roster = rosterResult.error ? null : (rosterResult.count ?? null);
+
+    const rosterNames = new Map<string, unknown>();
+    for (const r of rosterResult.error ? [] : ((rosterResult.data ?? []) as Array<{ student_id?: string | null; roster_name?: unknown }>)) {
+      if (typeof r.student_id === 'string') rosterNames.set(r.student_id, r.roster_name);
+    }
 
     const seenMembers = new Set<string>();
     const rosterMembers: RosterMember[] = rosterResult.error
@@ -294,7 +299,7 @@ export async function getRecentClassroomGames(
     let unnamed = 0;
     for (const id of studentIds) {
       const p = profiles.get(id);
-      const resolved = resolveDisplayName([p?.display_name, p?.username], '');
+      const resolved = teacherFacingName(rosterNames.get(id), p, '');
       names.set(id, resolved || `${fallbackName} ${++unnamed}`);
     }
 

@@ -5,7 +5,7 @@
 
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
-import { resolveDisplayName } from '@/lib/displayName';
+import { teacherFacingName } from '@/lib/education/rosterName';
 import { windowStartIso, type WindowRosterStudent, type WindowSession } from '@/lib/education/windowedClassroomProgress';
 import { foldClassroomAssignmentWindow } from '@/lib/education/classroomAssignmentWindow';
 import {
@@ -58,7 +58,7 @@ export async function getClassroomWindowSource(
     const since = windowStartIso(30, now);
     const assignmentSince = new Date(now - 2 * WEEK_MS).toISOString();
     const [rosterResult, sessionResult, assignmentResult] = await Promise.all([
-      db.from('classroom_memberships').select('student_id, joined_at').eq('classroom_id', classroomId),
+      db.from('classroom_memberships').select('*').eq('classroom_id', classroomId),
       db
         .from('practice_sessions')
         .select('student_id, completed_at, results')
@@ -82,12 +82,14 @@ export async function getClassroomWindowSource(
     const seen = new Set<string>();
     const studentIds: string[] = [];
     const joinedAtById = new Map<string, string>();
-    for (const row of (rosterResult.data ?? []) as Array<{ student_id?: string | null; joined_at?: string | null }>) {
+    const rosterNames = new Map<string, unknown>();
+    for (const row of (rosterResult.data ?? []) as Array<{ student_id?: string | null; joined_at?: string | null; roster_name?: unknown }>) {
       const id = row.student_id;
       if (typeof id !== 'string' || id === '' || seen.has(id)) continue;
       seen.add(id);
       studentIds.push(id);
       if (typeof row.joined_at === 'string') joinedAtById.set(id, row.joined_at);
+      rosterNames.set(id, row.roster_name);
     }
 
     const profilesResult =
@@ -109,7 +111,7 @@ export async function getClassroomWindowSource(
     let unnamed = 0;
     const roster: WindowRosterStudent[] = studentIds.map((id) => {
       const p = profiles.get(id);
-      const resolved = resolveDisplayName([p?.display_name, p?.username], '');
+      const resolved = teacherFacingName(rosterNames.get(id), p, '');
       return { studentId: id, name: resolved || `Student ${++unnamed}`, joinedAt: joinedAtById.get(id) ?? null };
     });
 

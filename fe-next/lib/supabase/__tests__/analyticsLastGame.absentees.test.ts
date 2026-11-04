@@ -204,4 +204,30 @@ describe('getRecentClassroomGames — absent roster students', () => {
     expect(data[0].absentStudents[0].name).toBe('Student 1');
     expect(data[0].absentStudents[0].name).not.toMatch(/player_/i);
   });
+
+  it("names players and absentees by the teacher's roster name, falling back to their own name for rows without one", async () => {
+    mockTables({
+      practice_sessions: { data: [sessionRow('stu-1', ['cat'], ['dog'])] },
+      classroom_memberships: {
+        data: [
+          { student_id: 'stu-1', roster_name: 'Ali' },
+          { student_id: 'stu-2', roster_name: null },
+          { student_id: 'stu-3', roster_name: 'Cleo M.' },
+        ],
+        count: 3,
+      },
+      public_profiles: {
+        data: [
+          { id: 'stu-1', display_name: 'Alice' },
+          { id: 'stu-2', display_name: 'Bob' },
+          { id: 'stu-3', display_name: 'Cleo' },
+        ],
+      },
+    });
+
+    const { data } = await getRecentClassroomGames('class-1', 5);
+
+    expect(data[0].players.map((p) => p.name)).toEqual(['Ali']);
+    expect(data[0].absentStudents.map((a) => a.name)).toEqual(['Bob', 'Cleo M.']);
+  });
 });

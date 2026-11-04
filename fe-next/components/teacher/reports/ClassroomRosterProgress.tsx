@@ -21,7 +21,7 @@ import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { getClassroomAssignments, getAssignmentCompletions } from '@/lib/supabase/education/assignments';
 import { getClassroomStudents } from '@/lib/supabase/education/classrooms';
 import { getStudentsProgressSummary } from '@/lib/supabase/analytics';
-import { resolveDisplayName } from '@/lib/displayName';
+import { teacherFacingName } from '@/lib/education/rosterName';
 import {
   buildAssignmentProgressRows,
   mapProgressRowToCompletion,
@@ -125,7 +125,7 @@ export function ClassroomRosterProgress({ classroomId, classroomName = '' }: Cla
       const profile = s.profiles as { display_name?: string; username?: string } | null;
       return {
         studentId: s.student_id,
-        name: resolveDisplayName([profile?.display_name, profile?.username], anonymous(s.student_id)),
+        name: teacherFacingName(s.roster_name, profile, anonymous(s.student_id)),
         joinedAt: s.joined_at ?? null,
         displayName: profile?.display_name ?? null,
         username: profile?.username ?? null,
