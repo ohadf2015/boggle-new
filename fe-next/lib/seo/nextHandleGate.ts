@@ -232,13 +232,50 @@ const SOCIAL_UNFURL_RE =
 const HIGH_CARDINALITY_NOINDEX_RE =
   /^\/(?:en|he|sv|ja|es|ru)\/(?:join|challenge|brag|friend-challenge|custom)\/[^/]+\/?$/i;
 
-export type NextHandleDropReason = 'probe' | 'unknown-segment' | 'cardinality' | 'too-long';
+export type NextHandleDropReason = 'probe' | 'unknown-segment' | 'cardinality' | 'too-long' | 'dotted-misroute';
 
 export type NextHandleDecision =
   | { action: 'pass' }
-  | { action: 'drop'; reason: NextHandleDropReason };
+  | { action: 'drop'; reason: NextHandleDropReason }
+  | { action: 'redirect'; location: string };
 
 const MAX_PATH = 512;
+/** Must match lib/i18n.js defaultLocale. Locale-less real pages live under /en. */
+const DEFAULT_LOCALE = LOCALES[0];
+
+/** Reject path tricks before we build a Location. Known-page head is not enough:
+ *  /sitemap.xml/blog/../../evil would otherwise 308 off-site. */
+function isSafePathSegment(segment: string): boolean {
+  if (!segment || segment.length > 200) return false;
+  if (segment === '.' || segment === '..') return false;
+  if (/[/\\:@]|%2e|%2f|%5c/i.test(segment)) return false;
+  try {
+    const decoded = decodeURIComponent(segment);
+    if (decoded.includes('/') || decoded.includes('\\') || decoded.includes('..')) return false;
+  } catch {
+    return false;
+  }
+  return true;
+}
+
+/**
+ * /sitemap.xml/<page> is not a sitemap route. The first segment contains a dot,
+ * so it used to pass this gate and app/[locale] rendered it as English HTML (200).
+ * A real page under that prefix 308s to /en/<rest>; anything else 404s.
+ * Bare files (sitemap.xml, robots.txt) and public dirs (.well-known) stay pass.
+ */
+function dottedNonLocaleDecision(parts: string[]): NextHandleDecision | null {
+  const first = parts[0];
+  if (!first || !first.includes('.')) return null;
+  if (parts.length === 1 || PUBLIC_DIRS.has(first)) return { action: 'pass' };
+  const rest = parts.slice(1);
+  if (!rest.every(isSafePathSegment)) return { action: 'drop', reason: 'dotted-misroute' };
+  const restHead = rest[0];
+  if (!KNOWN_APP_ROOT_SEGMENTS.has(restHead) && !REDIRECT_ONLY_SEGMENTS.has(restHead)) {
+    return { action: 'drop', reason: 'dotted-misroute' };
+  }
+  return { action: 'redirect', location: `/${DEFAULT_LOCALE}/${rest.join('/')}` };
+}
 
 export function pathSegments(pathname: string): string[] {
   const cut = (pathname.split('?')[0] || '/').replace(/\/+$/, '') || '/';
@@ -265,7 +302,8 @@ export function decideNextHandle(
 
   const first = parts[0];
   if (first === '_next' || first === 'static' || first === 'api') return { action: 'pass' };
-  if (first.includes('.')) return { action: 'pass' }; // public files: favicon.ico, ads.txt, …
+  const dotted = dottedNonLocaleDecision(parts);
+  if (dotted) return dotted;
   // Static files in public/ subdirectories (/mascot/winner.webp,
   // /mascots/styles/arcade.png, /home/daily-streak.webp …). These never hit the
   // locale layout SSR, so the leak gate must not 404 them — it did, which broke

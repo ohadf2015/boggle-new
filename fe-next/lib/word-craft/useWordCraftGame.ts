@@ -432,11 +432,13 @@ export interface UseWordCraftGameOptions {
   lessonTargets?: readonly string[];
   /** Academy Word Workshop: tiles already on the board at the start (unclaimed). Omit for the stock empty board. */
   initialTiles?: readonly PlacedTile[];
+  /** A lesson round saved on the device (lib/word-craft/runSnapshot.ts): resume it instead of dealing. */
+  restoredState?: WordCraftState | null;
 }
 
 export { reducer as wordCraftReducer, buildInitial as buildInitialState }
 
-export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15, territoryEnabled = true, difficulty = DEFAULT_BOT_DIFFICULTY, botSkillVariance, hotseat = false, forcedDims, modifierOverride, lessonTargets, initialTiles }: UseWordCraftGameOptions) {
+export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15, territoryEnabled = true, difficulty = DEFAULT_BOT_DIFFICULTY, botSkillVariance, hotseat = false, forcedDims, modifierOverride, lessonTargets, initialTiles, restoredState }: UseWordCraftGameOptions) {
   const tuning = botTuning(difficulty);
   const effectiveVariance = botSkillVariance ?? tuning.skillVariance;
   // Capture dims at initialization and lock them for the game lifetime. A duel
@@ -448,7 +450,7 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
   const initialDims = initialDimsRef.current;
 
   const initArg = useMemo(() => ({ seed, boardSize, locale, viewportDims: initialDims, territoryEnabled, hotseat, modifierOverride, lessonTargets, initialTiles }), [seed, boardSize, locale, initialDims, territoryEnabled, hotseat, modifierOverride, lessonTargets, initialTiles]);
-  const [state, dispatch] = useReducer(reducer, initArg, buildInitial);
+  const [state, dispatch] = useReducer(reducer, initArg, (arg) => restoredState ?? buildInitial(arg));
 
   // Active per-game scoring modifier, applied symmetrically to player commits,
   // bot commits, and the bot's internal candidate ranking.

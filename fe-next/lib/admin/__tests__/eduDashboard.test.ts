@@ -31,6 +31,21 @@ describe('buildEduDashboard KPIs', () => {
     expect(out.sparklines.activeTeachers).toBeNull();
   });
 
+  it('counts a teacher active at their latest round when last_seen_at is stuck at signup', () => {
+    // CR teacher: rounds on 10-30, last_seen_at never moved off signup, sign-in in between.
+    const signup = ago(40);
+    const signIn = ago(20);
+    const roundStart = ago(2);
+    const out = buildEduDashboard(
+      base({
+        teachers: [{ id: 'cr', name: 'CR', last_seen_at: signup, last_sign_in_at: signIn, last_round_started_at: roundStart }],
+      }),
+    );
+    expect(out.kpis.activeTeachers).toEqual({ current: 1, prior: 0, pct: null });
+    expect(out.teachers.find((t) => t.id === 'cr')?.lastActiveAt).toBe(roundStart);
+    expect(out.drill.kpi.activeTeachers).toEqual({ kind: 'teachers', ids: ['cr'] });
+  });
+
   it('reports rounds-based KPIs as null when classroom_rounds is not live', () => {
     const out = buildEduDashboard(base({ rounds: null }));
     expect(out.roundsAvailable).toBe(false);

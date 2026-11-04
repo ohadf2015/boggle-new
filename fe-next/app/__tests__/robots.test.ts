@@ -38,6 +38,19 @@ describe('robots.txt', () => {
     expect(yandex?.disallow).toEqual(wildcard?.disallow);
   });
 
+  /**
+   * Google renders with the page's JS and CSS. Blocking /_next/static/ made every
+   * render's chunk loads fail, the boot guard then reloaded with ?_lc_chunk, and
+   * pages fell out of the index (2026-11-04).
+   */
+  it('lets crawlers fetch Next.js scripts, styles and images', () => {
+    for (const rule of rulesOf()) {
+      const dis = Array.isArray(rule.disallow) ? rule.disallow : rule.disallow ? [rule.disallow] : [];
+      expect(dis).not.toContain('/_next/static/');
+      expect(dis).not.toContain('/_next/image/');
+    }
+  });
+
   it('still points at the sitemap', () => {
     expect(robots().sitemap).toBe('https://www.lexiclash.live/sitemap.xml');
   });

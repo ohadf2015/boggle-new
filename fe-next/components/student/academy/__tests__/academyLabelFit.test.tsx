@@ -45,6 +45,11 @@ describe('hero CTA names its lesson in full', () => {
     expect(title.className).toContain('line-clamp-2');
   });
 
+  it('a hero with a sub-line pads its top and bottom, so the sub-line is never cut by the rounded edge', () => {
+    render(<AcademyCta {...ctaBase} kind="join-class" target={undefined} targetLabel="" />);
+    expect(screen.getByTestId('academy-cta').className).toMatch(/\bpy-2\b/);
+  });
+
   it('sublabel clamps too — a teacher name must survive', () => {
     render(<AcademyCta {...ctaBase} kind="live" target={undefined} targetLabel="" />);
     const sub = screen.getByTestId('academy-cta-sub');

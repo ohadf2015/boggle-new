@@ -97,4 +97,41 @@ describe('GoogleClassroomRosterImport', () => {
     await userEvent.click(screen.getByRole('button', { name: `${K}.check` }));
     expect(await screen.findByRole('alert')).toHaveTextContent(`${K}.error`);
   });
+
+  it('says so when the teacher has no active Google Classroom classes', async () => {
+    vi.stubEnv('NEXT_PUBLIC_GC_ROSTER_IMPORT_ENABLED', 'true');
+    fetchMock.mockResolvedValueOnce(json({ ok: true, courses: [] }));
+    render(<GoogleClassroomRosterImport classroomId={CLASSROOM} />);
+    await userEvent.click(screen.getByRole('button', { name: `${K}.action` }));
+    expect(await screen.findByText(`${K}.noCourses`)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: `${K}.check` })).not.toBeInTheDocument();
+  });
+
+  it('lets the teacher retry after the course list fails to load', async () => {
+    vi.stubEnv('NEXT_PUBLIC_GC_ROSTER_IMPORT_ENABLED', 'true');
+    fetchMock
+      .mockRejectedValueOnce(new Error('offline'))
+      .mockResolvedValueOnce(json({ ok: true, courses: [{ id: 'c-1', name: 'G4' }] }));
+    render(<GoogleClassroomRosterImport classroomId={CLASSROOM} />);
+    await userEvent.click(screen.getByRole('button', { name: `${K}.action` }));
+    expect(await screen.findByRole('alert')).toHaveTextContent(`${K}.error`);
+    await userEvent.click(screen.getByRole('button', { name: 'common.retry' }));
+    expect(await screen.findByRole('option', { name: 'G4' })).toBeInTheDocument();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('offers no link button when every match still needs consent', async () => {
+    vi.stubEnv('NEXT_PUBLIC_GC_ROSTER_IMPORT_ENABLED', 'true');
+    fetchMock
+      .mockResolvedValueOnce(json({ ok: true, courses: [{ id: 'c-1', name: 'G4' }] }))
+      .mockResolvedValueOnce(
+        json({ ok: true, matchedCount: 1, matched: [{ studentId: 's1', name: 'Dana', consentNeeded: true }], unmatched: [], linked: 0 }),
+      );
+    render(<GoogleClassroomRosterImport classroomId={CLASSROOM} />);
+    await userEvent.click(screen.getByRole('button', { name: `${K}.action` }));
+    await screen.findByRole('option', { name: 'G4' });
+    await userEvent.click(screen.getByRole('button', { name: `${K}.check` }));
+    expect(await screen.findByText(`${K}.consentTitle 1`)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: `${K}.link` })).not.toBeInTheDocument();
+  });
 });

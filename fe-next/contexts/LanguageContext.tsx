@@ -8,6 +8,7 @@ import { loadTranslation, getCachedTranslation, seedTranslationCache, type Trans
 import { runWhenScrollSettles } from '@/lib/perf/runWhenScrollSettles';
 import { isPartialCatalogue } from '@/lib/i18n/isPartialCatalogue';
 import { isHeavyGamePath } from '@/lib/perf/heavyGamePath';
+import { localeSwitchPath } from '@/lib/navigation/localeSwitchPath';
 import logger from '@/utils/logger';
 import { trackTelemetryEvent } from '@/utils/sentry';
 import { hasSupabaseSession } from '@/utils/onboardingStorage';
@@ -272,11 +273,8 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
                 locales.includes(savedLanguage as Language) &&
                 savedLanguage !== urlLocale
             ) {
-                const segments = (pathname ?? '').split('/');
-                segments[1] = savedLanguage;
-                const newPath = segments.join('/') || `/${savedLanguage}`;
                 setLanguageState(savedLanguage as Language);
-                router.replace(newPath);
+                router.replace(localeSwitchPath(pathname, savedLanguage, window.location.search));
             }
             return;
         }
@@ -383,20 +381,7 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
                 return;
             }
 
-            // Navigate to new locale preserving FULL path (everything after locale)
-            const segments = (pathname ?? '').split('/');
-            // segments[0] is empty string, segments[1] is locale
-            const currentLocale = segments[1];
-
-            if (locales.includes(currentLocale as Language)) {
-                segments[1] = newLang;
-                // Join segments and ensure we have a valid path
-                const newPath = segments.join('/') || `/${newLang}`;
-                router.push(newPath);
-            } else {
-                // Fallback if locale is missing (shouldn't happen with middleware)
-                router.push(`/${newLang}${pathname ?? ''}`);
-            }
+            router.push(localeSwitchPath(pathname, newLang, window.location.search));
         }
     }, [pathname, router]);
 

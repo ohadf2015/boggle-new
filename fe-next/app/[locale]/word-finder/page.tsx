@@ -145,7 +145,7 @@ export default async function WordFinderPage({ params }: PageProps) {
             <Link href={`/${locale}/anagram`} className="text-neo-cyan underline">anagram solver</Link> when you want
             the exact rearrangements of a set of letters, such as a jumble puzzle. Use the{' '}
             <Link href={`/${locale}/tools/word-solver`} className="text-neo-cyan underline">word solver</Link> for a
-            quick list of every word in your letters in English, Hebrew, Swedish, Japanese or Spanish. Use this word
+            quick list of every word in your letters in English, Hebrew, Swedish, Japanese, Spanish or Russian. Use this word
             finder when position matters: a crossword gap, a Wordle row, or a word that has to hook onto tiles already
             on the board.
           </p>

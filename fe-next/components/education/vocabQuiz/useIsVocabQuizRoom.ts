@@ -80,6 +80,8 @@ export interface ProjectorGateInput {
   hasBoard?: boolean;
   /** The server's quiz traffic has claimed this room. */
   isQuizRoom?: boolean;
+  /** The classroom recap (`classroomSummary`) has arrived; it owns the wall from here. */
+  hasRecap?: boolean;
 }
 
 /**
@@ -93,8 +95,8 @@ export interface ProjectorGateInput {
  * the TV genuinely must not be up — the host is playing, or results are
  * pending.
  *
- * `isQuizRoom` latches for the life of the room, so this also keeps the podium
- * on the wall after the last question instead of blanking at the whistle.
+ * `isQuizRoom` latches for the life of the room, so this also keeps the quiz
+ * standings on the wall after the last question until the classroom recap lands.
  */
 export function projectorShowsQuiz({
   gameStarted,
@@ -103,8 +105,10 @@ export function projectorShowsQuiz({
   hostPlaying,
   hasBoard,
   isQuizRoom,
+  hasRecap,
 }: ProjectorGateInput): boolean {
   if (hostPlaying) return false;
+  if (hasRecap) return false;
   // `waitingForResults` is a BOARD fact — "the grid's clock hit zero and the
   // server has not sent scores yet" — raised by the shell's own watchdogs. A
   // quiz has no grid and no board clock, so for a quiz room the flag is never
@@ -139,14 +143,17 @@ export interface RoundEndOwnershipInput {
   showResults?: boolean;
   /** The shell still has a room mounted to render into. */
   isActive?: boolean;
+  /** The results carry the server's lesson recap, so the quiz's scores are real and the shared card owns the ending. */
+  hasClassroomRecap?: boolean;
 }
 
 export function quizOwnsRoundEnd({
   isQuizRoom,
   showResults,
   isActive,
+  hasClassroomRecap,
 }: RoundEndOwnershipInput): boolean {
-  if (!isQuizRoom || !showResults) return false;
+  if (!isQuizRoom || !showResults || hasClassroomRecap) return false;
   // With no room mounted there is nothing for the quiz surfaces to render into;
   // the board's fallback beats a blank screen.
   return !!isActive;
@@ -189,4 +196,27 @@ export function useBoardWaitingScreen(
   waitingForResults?: boolean
 ): boolean {
   return showBoardWaitingScreen({ isQuizRoom: useIsVocabQuizRoom(socket), waitingForResults });
+}
+
+/**
+ * True from the moment the classroom recap lands until the next `startGame`.
+ *
+ * Play again and Next mode clear the host's `finalScores` before the server
+ * starts the next round, while the quiz latch is still set; without this the
+ * quiz's own finale would reappear on the wall in that gap.
+ */
+export function useRecapShownLatch(socket: Socket | null, hasRecap: boolean): boolean {
+  const [shown, setShown] = useState(false);
+  if (hasRecap && !shown) setShown(true);
+
+  useEffect(() => {
+    if (!socket) return;
+    const release = () => setShown(false);
+    socket.on('startGame', release);
+    return () => {
+      socket.off('startGame', release);
+    };
+  }, [socket]);
+
+  return hasRecap || shown;
 }

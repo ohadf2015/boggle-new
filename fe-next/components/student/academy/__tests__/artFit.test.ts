@@ -105,6 +105,17 @@ describe('fitArt', () => {
     expect(fit.crowded).toBe(true);
   });
 
+  it('reports spills when even its smallest size cannot keep every island inside the safe area', () => {
+    const pts: FitPoint[] = [
+      { x: 50, y: 10, up: 120, down: 30, half: 60 },
+      { x: 50, y: 90, up: 120, down: 30, half: 60 },
+    ];
+    const tight = fitArt({ view: { width: 390, height: 744 }, aspect: 0.5654, points: pts, insets: { top: 300, bottom: 300, left: 8, right: 8 } });
+    expect(tight.spills).toBe(true);
+    const roomy = fitArt({ view: { width: 390, height: 844 }, aspect: 0.5654, points: pts, insets: { top: 120, bottom: 160, left: 8, right: 8 } });
+    expect(roomy.spills).toBe(false);
+  });
+
   it('leans toward the focus island, but never past the safe area', () => {
     const pts = mapPoints('landscape');
     const insets = VIEWPORTS[10][2];

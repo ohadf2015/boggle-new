@@ -3464,6 +3464,7 @@ const he = {
     "updateReady": "העדכון מוכן",
     "updateRestart": "הפעלה מחדש",
     "pressBackAgainToExit": "לחצו שוב על חזרה כדי לצאת",
+    "stop": "עצירה",
     "used": "בשימוש",
     "email": "אימייל",
     "free": "חינם",
@@ -14216,7 +14217,7 @@ const he = {
       }
     },
     "proWelcome": {
-      "title": "את/ה בפרו למורים",
+      "title": "יש לכם פרו למורים",
       "until": "שלכם עד {date}. אין מה לממש, בלי כרטיס.",
       "perk": {
         "analytics": "לראות אילו מילים היו קשות לכיתה, אחרי כל משחק",
@@ -14275,6 +14276,8 @@ const he = {
       },
       "trialPreview": "תצוגת פרו: העמוד הזה פתוח עוד {{days}} ימים. אחר כך הוא דורש פרו.",
       "trialPreviewCta": "להישאר עם פרו",
+      "trialEnded": "תצוגת פרו הסתיימה. הכיתות והיסטוריית המשחקים שלכם שמורות. עם פרו העמוד הזה ייפתח שוב.",
+      "freeKeeps": "בחינם נשארים לכם כל {{modes}} מצבי המשחק בכיתה, רשימות המילים שלכם, ובלי פרסומות לתלמידים.",
       "cta": "פתחו עם פרו: {{price}} לחודש"
     },
     "digest": {
@@ -14931,7 +14934,19 @@ const he = {
       "notCompleted": "לא הושלם",
       "strugglingAreas": "תחומי קושי",
       "studentsMissed": "תלמידים החטיאו",
-      "noStrugglingAreas": "לא זוהו תחומי קושי"
+      "noStrugglingAreas": "לא זוהו תחומי קושי",
+      "playedCount": "{played}/{total} שיחקו",
+      "nobodyYet": "עוד אף אחד לא שיחק. התוצאות יופיעו כאן כשהתלמידים יסיימו.",
+      "needHelp": "צריכים עזרה",
+      "onTrack": "כל מי ששיחק קיבל 70% ומעלה.",
+      "mostMissed": "המילים שהכי טעו בהן",
+      "missedBy": "{count}/{played} טעו",
+      "notPlayedTitle": "עוד לא שיחקו ({count})",
+      "allPlayed": "כולם שיחקו.",
+      "noMisses": "בלי טעויות",
+      "loadFailed": "לא הצלחנו לטעון מי שיחק.",
+      "eachStudent": "כל תלמיד ({count})",
+      "noScores": "אין עדיין ציונים: המשחקים האלה לא שמרו תוצאות למילים."
     },
     "tracking": {
       "all": "הכל",
@@ -15683,7 +15698,9 @@ const he = {
     "wordBank": {
       "title": "בנק מילים ({{count}})",
       "hint": "המילים האלה מסתתרות בלוח. הקישו כדי לסגור.",
-      "challengeBadge": "אתגר: חפשו מילים של {{min}}+ אותיות"
+      "challengeBadge": "אתגר: חפשו מילים של {{min}}+ אותיות",
+      "huntTitle": "מילות השיעור {{found}}/{{total}}",
+      "huntHidden": "מילת שיעור נסתרת, {{length}} אותיות"
     },
     "studentPreview": {
       "button": "תצוגה מקדימה של מסך התלמידים",
@@ -19664,6 +19681,9 @@ const he = {
       }
     },
     "setup": {
+      "tagline": "מניחים מילים, כובשים שטח ומערימים על הבוט.",
+      "showAdvanced": "אפשרויות מתקדמות",
+      "hideAdvanced": "הסתרת האפשרויות המתקדמות",
       "title": "מכינים את המשחק",
       "opponent": {
         "label": "יריב",
@@ -19686,6 +19706,7 @@ const he = {
       "sendChallengeNow": "עכשיו שולחים את האתגר!"
     },
     "daily": {
+      "goals": { "title": "המטרות של היום" },
       "title": "הלוח היומי",
       "play": "משחקים את הלוח של היום",
       "done": "הושלם היום · עוד סיבוב",
@@ -21361,7 +21382,8 @@ const he = {
       "leave": "יציאה",
       "calculating": "סופרים את המילים…",
       "classGoal": "השלל של הכיתה: {found}/{total} מילים",
-      "waitNext": "מה הלאה? זה אצל המורה. בינתיים, חימום!"
+      "waitNext": "מה הלאה? זה אצל המורה. בינתיים, חימום!",
+      "moreFromRound": "עוד מהסבב הזה"
     }
   }
   // @eduLiveRoom:end
@@ -21426,6 +21448,7 @@ const he = {
       "colStudents": "תלמידים",
       "colLastPlayed": "משחק אחרון",
       "students": "{count} תלמידים",
+      "studentsOne": "תלמיד אחד",
       "notPlayedRecently": "אין משחקים ב‑30 הימים האחרונים",
       "playWith": "התחלת משחק עם {name}",
       "showCode": "הצגת קוד",
@@ -21587,7 +21610,9 @@ const he = {
       "packWords": "{count} מילים",
       "packRecommended": "הבחירה שלנו",
       "startLive": "מתחילים משחק חי",
-      "createOnly": "רק ליצור את הכיתה"
+      "createOnly": "רק ליצור את הכיתה",
+      "packHint": "התלמידים יקבלו את המילים האלה גם כשיעורי בית כשיצטרפו.",
+      "assignFailed": "הכיתה מוכנה, אבל המילים לא הוקצו. אפשר להקצות אותן מדף הכיתה."
     },
     "host": {
       "classLabel": "כיתה",
@@ -21714,6 +21739,13 @@ const he = {
   }
   // @teacherLifecycleEmail:end
   ,
+  // @wordcraftReview:start
+  "wordcraftReview": {
+    "cta": "חזרה על מילים שפספסת ({count})",
+    "homeworkDone": "שיעורי הבית הושלמו",
+    "next": "מילים שפספסת ({count})",
+  },
+  // @wordcraftReview:end
   // @eduPolish:start
   "eduPolish": {
     "seatCapReached": "{name} צופה: הכיתה מלאה ({cap} שחקנים)",

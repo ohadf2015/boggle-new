@@ -7,3 +7,4 @@ export { CelebrationBeats, type CelebrationBeatsProps, type CelebrationBeat, typ
 export { BeforeAfterNumber, type BeforeAfterNumberProps } from './BeforeAfterNumber';
 export { RoundCelebration, type RoundCelebrationProps } from './RoundCelebration';
 export { VerdictSheet, type VerdictSheetProps } from './VerdictSheet';
+export { ChestBurst, type ChestBurstProps } from './ChestBurst';

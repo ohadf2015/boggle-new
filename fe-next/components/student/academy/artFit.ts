@@ -40,6 +40,8 @@ export interface ArtFit {
   covers: boolean;
   /** The islands could not all be kept apart at this size. */
   crowded: boolean;
+  /** Some island box pokes out of the safe area (into the chrome): the view is too short for this many islands. */
+  spills: boolean;
 }
 
 export interface FitInput {
@@ -65,7 +67,7 @@ export function fitArt({ view, aspect, points, insets, focus = null, maxZoom = 1
 
   if (points.length === 0) {
     const h = coverW / aspect;
-    return { left: (vw - coverW) / 2, top: (vh - h) / 2, width: coverW, height: h, covers: true, crowded: false };
+    return { left: (vw - coverW) / 2, top: (vh - h) / 2, width: coverW, height: h, covers: true, crowded: false, spills: false };
   }
 
   const L = insets.left;
@@ -114,6 +116,7 @@ export function fitArt({ view, aspect, points, insets, focus = null, maxZoom = 1
   const height = width / aspect;
 
   // (4) Offsets, one axis at a time.
+  let spills = false;
   const axis = (viewLen: number, size: number, pos: (p: FitPoint) => number, lowExt: (p: FitPoint) => number, highExt: (p: FitPoint) => number, lo: number, hi: number, f: number | null) => {
     let nLo = -Infinity;
     let nHi = Infinity;
@@ -128,7 +131,10 @@ export function fitArt({ view, aspect, points, insets, focus = null, maxZoom = 1
       const toFocus = viewLen / 2 - (f / 100) * size - centre;
       want = centre + Math.max(-MAX_LEAN * size, Math.min(MAX_LEAN * size, toFocus * LEAN_PULL));
     }
-    if (nLo > nHi) return (nLo + nHi) / 2;
+    if (nLo > nHi + 0.5) {
+      spills = true;
+      return (nLo + nHi) / 2;
+    }
     let rLo = nLo;
     let rHi = nHi;
     if (size >= viewLen) {
@@ -144,5 +150,5 @@ export function fitArt({ view, aspect, points, insets, focus = null, maxZoom = 1
   const top = axis(vh, height, (p) => p.y, (p) => p.up, (p) => p.down, T, B, focus?.y ?? null);
   const covers = left <= 0.5 && top <= 0.5 && left + width >= vw - 0.5 && top + height >= vh - 0.5;
 
-  return { left, top, width, height, covers, crowded };
+  return { left, top, width, height, covers, crowded, spills };
 }

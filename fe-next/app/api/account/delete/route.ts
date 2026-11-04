@@ -222,6 +222,15 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
+    // A timeout or user-not-found can mean GoTrue already committed the delete.
+    // alreadyDeleted is that case — same success body shape as a clean delete.
+    if (outcome.alreadyDeleted) {
+      console.warn(
+        '[account/delete] deleteUser timed out or errored but the user is gone; treating as success',
+        { userId: user.id, attempts: outcome.attempts },
+      );
+    }
+
     // Teacher-only completion telemetry. growth:account_deleted already fired
     // once, before deleteUser, including when this outcome is a retry success.
     const telemetry: EduServerEvent[] = [];

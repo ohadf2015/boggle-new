@@ -62,6 +62,10 @@ ARG NEXT_PUBLIC_ADSENSE_ENABLED
 ARG NEXT_PUBLIC_CHECKOUT_ENABLED
 ARG NEXT_PUBLIC_POSTHOG_KEY
 ARG NEXT_PUBLIC_POSTHOG_HOST
+# FDT widget gate (#1607/#1619). Same trap as AdSense: the client bundle reads
+# NEXT_PUBLIC_FDT_ENABLED at build time, so without this ARG the widget fails closed
+# on www.lexiclash.live even with the service var set to "true".
+ARG NEXT_PUBLIC_FDT_ENABLED
 # Railway injects this at build; next.config.mjs copies it into
 # NEXT_PUBLIC_SENTRY_RELEASE so the client SDK tags releases.
 ARG RAILWAY_GIT_COMMIT_SHA

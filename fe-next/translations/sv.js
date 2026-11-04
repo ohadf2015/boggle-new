@@ -3822,6 +3822,7 @@ const sv = {
     "updateReady": "Uppdateringen är klar",
     "updateRestart": "Starta om",
     "pressBackAgainToExit": "Tryck bakåt igen för att avsluta",
+    "stop": "Stoppa",
     "used": "Används",
     "email": "E-post",
     "free": "Gratis",
@@ -14728,6 +14729,8 @@ const sv = {
       },
       "trialPreview": "Pro-förhandsvisning: den här sidan är öppen i {{days}} dagar till. Därefter krävs Pro.",
       "trialPreviewCta": "Behåll med Pro",
+      "trialEnded": "Pro-förhandsvisningen är slut. Dina klasser och din spelhistorik finns kvar. Med Pro öppnas sidan igen.",
+      "freeKeeps": "Gratis behåller du alla {{modes}} spellägen i klassrummet, dina egna ordlistor och noll reklam för eleverna.",
       "cta": "Lås upp med Pro för {{price}}/månad"
     },
     "digest": {
@@ -15384,7 +15387,19 @@ const sv = {
       "notCompleted": "Ej slutförd",
       "strugglingAreas": "Svåra områden",
       "studentsMissed": "elever missade",
-      "noStrugglingAreas": "Inga svåra områden hittade än"
+      "noStrugglingAreas": "Inga svåra områden hittade än",
+      "playedCount": "{played}/{total} har spelat",
+      "nobodyYet": "Ingen har spelat än. Resultaten visas här när eleverna blir klara.",
+      "needHelp": "Behöver hjälp",
+      "onTrack": "Alla som spelat fick 70 % eller mer.",
+      "mostMissed": "Mest missade ord",
+      "missedBy": "{count}/{played} missade",
+      "notPlayedTitle": "Har inte spelat än ({count})",
+      "allPlayed": "Alla har spelat.",
+      "noMisses": "Inga missar",
+      "loadFailed": "Kunde inte ladda vem som spelat.",
+      "eachStudent": "Varje elev ({count})",
+      "noScores": "Inga resultat än: de här spelen sparade inga ordresultat."
     },
     "tracking": {
       "all": "Alla",
@@ -16136,7 +16151,9 @@ const sv = {
     "wordBank": {
       "title": "Ordbank ({{count}})",
       "hint": "De här orden gömmer sig i brädet. Tryck för att stänga.",
-      "challengeBadge": "Utmaning: sikta på ord med {{min}}+ bokstäver"
+      "challengeBadge": "Utmaning: sikta på ord med {{min}}+ bokstäver",
+      "huntTitle": "Lektionsord {{found}}/{{total}}",
+      "huntHidden": "Dolt lektionsord, {{length}} bokstäver"
     },
     "studentPreview": {
       "button": "Förhandsgranska vad eleverna ser",
@@ -19761,6 +19778,9 @@ const sv = {
       }
     },
     "setup": {
+      "tagline": "Lägg ord. Ta mark. Överlista boten.",
+      "showAdvanced": "Avancerade val",
+      "hideAdvanced": "Dölj avancerat",
       "title": "Ställ in matchen",
       "opponent": {
         "label": "Motståndare",
@@ -19783,6 +19803,7 @@ const sv = {
       "sendChallengeNow": "Skicka din utmaning nu!"
     },
     "daily": {
+      "goals": { "title": "Dagens mål" },
       "title": "Dagens bräde",
       "play": "Spela dagens bräde",
       "done": "Klart idag · spela igen",
@@ -21430,7 +21451,8 @@ const sv = {
       "leave": "Lämna",
       "calculating": "Räknar orden…",
       "classGoal": "Klassens fångst: {found}/{total} ord",
-      "waitNext": "Läraren väljer vad som händer sen. Värm upp medan du väntar."
+      "waitNext": "Läraren väljer vad som händer sen. Värm upp medan du väntar.",
+      "moreFromRound": "Mer från den här rundan"
     }
   }
   // @eduLiveRoom:end
@@ -21495,6 +21517,7 @@ const sv = {
       "colStudents": "Elever",
       "colLastPlayed": "Senast spelat",
       "students": "{count} elever",
+      "studentsOne": "1 elev",
       "notPlayedRecently": "Inga spel på 30 dagar",
       "playWith": "Starta ett spel med {name}",
       "showCode": "Visa kod",
@@ -21656,7 +21679,9 @@ const sv = {
       "packWords": "{count} ord",
       "packRecommended": "Vårt tips",
       "startLive": "Starta live",
-      "createOnly": "Skapa bara klassen"
+      "createOnly": "Skapa bara klassen",
+      "packHint": "Eleverna får också orden som läxa när de går med.",
+      "assignFailed": "Klassen är klar, men orden tilldelades inte. Tilldela dem från klassens sida."
     },
     "host": {
       "classLabel": "Klass",
@@ -21783,6 +21808,13 @@ const sv = {
   }
   // @teacherLifecycleEmail:end
   ,
+  // @wordcraftReview:start
+  "wordcraftReview": {
+    "cta": "Repetera missade ord ({count})",
+    "homeworkDone": "Läxan är klar",
+    "next": "Missade ord ({count})",
+  },
+  // @wordcraftReview:end
   // @eduPolish:start
   "eduPolish": {
     "seatCapReached": "{name} tittar på: klassen är full ({cap} spelare)",

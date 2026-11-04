@@ -148,9 +148,16 @@ describe('DELETE /api/account/delete', () => {
   });
 
   it('deletes the auth user', async () => {
-    const res = await DELETE(req());
-    expect(res.status).toBe(200);
-    expect(cap.deletedUserIds).toEqual(['user-1']);
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      const res = await DELETE(req());
+      expect(res.status).toBe(200);
+      expect(cap.deletedUserIds).toEqual(['user-1']);
+      expect(await res.json()).toEqual({ success: true, alreadyDeleted: false });
+      expect(warn.mock.calls.some((c) => String(c[0]).includes('treating as success'))).toBe(false);
+    } finally {
+      warn.mockRestore();
+    }
   });
 
   it('clears the email-keyed teacher access rows a cascade cannot reach', async () => {
@@ -350,16 +357,42 @@ describe('DELETE /api/account/delete', () => {
   });
 
   it('deleteUser timeout-then-already-deleted resolves as success (idempotent recovery)', async () => {
-    cap.deleteUserResults = [
-      { error: { message: 'Gateway Timeout', status: 504 } },
-    ];
-    // Lookup confirms user is already gone
-    cap.getUserByIdResult = { data: { user: null }, error: { status: 404, message: 'User not found' } };
-    const res = await DELETE(req());
-    expect(res.status).toBe(200);
-    const body = await res.json();
-    expect(body.success).toBe(true);
-    expect(body.alreadyDeleted).toBe(true);
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      cap.deleteUserResults = [
+        { error: { message: 'Gateway Timeout', status: 504 } },
+      ];
+      // Lookup confirms user is already gone
+      cap.getUserByIdResult = { data: { user: null }, error: { status: 404, message: 'User not found' } };
+      const res = await DELETE(req());
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.success).toBe(true);
+      expect(body.alreadyDeleted).toBe(true);
+      expect(warn).toHaveBeenCalledWith(
+        expect.stringContaining('treating as success'),
+        expect.objectContaining({ userId: 'user-1' }),
+      );
+    } finally {
+      warn.mockRestore();
+    }
+  });
+
+  it('getUserById unexpected failure after a deleteUser error falls back to 500', async () => {
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      cap.deleteUserResults = [{ error: { message: 'Gateway Timeout', status: 504 } }];
+      cap.getUserByIdResult = { data: null, error: { message: 'connection reset', status: 500 } };
+      const res = await DELETE(req());
+      expect(res.status).toBe(500);
+      expect(await res.json()).toEqual({ error: 'Failed to delete account' });
+      expect(errSpy).toHaveBeenCalledWith(
+        expect.stringContaining('getUserById failed unexpectedly'),
+        expect.objectContaining({ userId: 'user-1', status: 500 }),
+      );
+    } finally {
+      errSpy.mockRestore();
+    }
   });
 
   it('deleteUser hard failure (user still exists) returns 500 and does NOT claim success', async () => {

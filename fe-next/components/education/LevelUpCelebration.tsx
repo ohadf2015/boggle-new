@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { fireLevelUpConfetti } from '@/utils/confettiUtils';
 import { SilentVideo } from '@/components/ui/SilentVideo';
+import { useEduReducedMotion } from '@/lib/education/motion/useEduReducedMotion';
 
 // ==============================================
 // TYPES
@@ -52,14 +53,16 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
     const { t } = useLanguage();
     const titleId = useId();
     const modalRef = useRef<HTMLDivElement>(null);
+    const reduced = useEduReducedMotion();
 
     useFocusTrap(modalRef, !!levelUpData, onClose);
 
     // Fire confetti when modal opens
     useEffect(() => {
-      if (levelUpData) {
+      if (levelUpData && !reduced) {
         fireLevelUpConfetti();
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- a mid-modal preference flip must not re-fire confetti
     }, [levelUpData]);
 
     // Don't render if no level-up data
@@ -93,7 +96,7 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
               'rounded-neo shadow-hard-lg',
               'p-6 md:p-8',
               'text-center',
-              'motion-safe:animate-[lvl-pop_320ms_cubic-bezier(0.23,1,0.32,1)_both]'
+              !reduced && 'animate-[lvl-pop_320ms_cubic-bezier(0.23,1,0.32,1)_both]'
             )}
             onClick={(e: React.MouseEvent) => e.stopPropagation()}
           >
@@ -132,7 +135,7 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
                   'w-20 h-20 md:w-24 md:h-24',
                   'bg-neo-pink/20 border-4 border-neo-pink',
                   'rounded-full',
-                  'motion-safe:animate-[lvl-pop_320ms_cubic-bezier(0.23,1,0.32,1)_both] motion-safe:[animation-delay:200ms]'
+                  !reduced && 'animate-[lvl-pop_320ms_cubic-bezier(0.23,1,0.32,1)_both] [animation-delay:200ms]'
                 )}
               >
                 <span

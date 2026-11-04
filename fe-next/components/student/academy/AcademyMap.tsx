@@ -8,17 +8,18 @@
  * left/top: the picture does not mirror in Hebrew, so neither do its markers.
  *
  * Fewer destinations → fewer islands, and the art zooms in on the stretch of
- * path that is used, never padded with placeholders. A crowded view (small
- * phone) sheds node detail step by step (`nodeExtents`) until the islands fit
- * apart.
+ * path that is used, never padded with placeholders. A crowded view sheds node
+ * detail, then whole islands (`mapPlan`), until the rest fit apart and clear of
+ * the chrome.
  */
 
 import Image from 'next/image';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { ISLANDS, CASTLE, MAP_ASPECT, type IslandPoint } from './academyNodes';
-import { placeIslands, type AcademyIsland } from './academyIslands';
-import { fitArt, type ArtFit, type FitPoint, type Insets } from './artFit';
+import { CASTLE, type IslandPoint } from './academyNodes';
+import type { AcademyIsland } from './academyIslands';
+import type { Insets } from './artFit';
+import { planMap } from './mapPlan';
 import { nodeExtents } from './nodeExtents';
 import { AcademyNodeButton, bossChip, nodeLabel } from './AcademyNodeButton';
 import { AcademyAmbient } from './AcademyAmbient';
@@ -28,9 +29,6 @@ import type { Tone } from './chrome';
 const BEAM_RGB: Partial<Record<Tone, string>> = { gold: '255,238,160', pink: '255,130,200', teal: '140,245,235' };
 
 export type MapLayout = 'portrait' | 'landscape';
-
-/** Deepest crowding level (see nodeExtents). */
-const MAX_COMPACT = 3;
 
 interface Props {
   layout: MapLayout;
@@ -58,7 +56,7 @@ function readWindow() {
 }
 
 /** The map region's size in px — measured, falling back to the window (no layout engine, first frame). */
-function useRegionSize(ref: React.RefObject<HTMLDivElement | null>) {
+export function useRegionSize(ref: React.RefObject<HTMLDivElement | null>) {
   const [size, setSize] = useState(readWindow);
   useLayoutEffect(() => {
     const el = ref.current;
@@ -123,36 +121,27 @@ export function AcademyMap({ layout, islands, boss, recommendedKey, spotlightTag
   const region = useRegionSize(regionRef);
   const view = useMemo(() => ({ width: region.width, height: region.height }), [region.width, region.height]);
   // Without a layout engine (tests, a first frame) there is nothing real to crowd: full detail.
-  const maxLevel = region.measured ? MAX_COMPACT : 0;
-  const aspect = MAP_ASPECT[layout];
-  const points = useMemo(() => placeIslands(islands.length, ISLANDS[layout]), [islands.length, layout]);
-  const focusIndex = islands.findIndex((n) => n.key === recommendedKey);
-  const focus: IslandPoint | null =
-    focusIndex >= 0 ? points[focusIndex] : boss && recommendedKey === boss.key ? CASTLE[layout] : null;
-
-  // Solve the art rect; if the islands cannot be kept apart, shed detail and solve again.
-  const { fit, compact } = useMemo(() => {
-    const nodes: Array<{ node: AcademyIsland; at: IslandPoint }> = islands.length
-      ? [...islands.map((node, i) => ({ node, at: points[i] })), ...(boss ? [{ node: boss, at: CASTLE[layout] }] : [])]
-      : [];
-    let last: ArtFit | null = null;
-    for (let level = 0; level <= maxLevel; level++) {
-      const pts: FitPoint[] = nodes.map(({ node, at }) => {
-        const recommended = node.key === recommendedKey;
-        const ext = nodeExtents(
-          node,
-          nodeLabel(node, t),
-          node.kind === 'boss' ? bossChip(node, t) : null,
-          { big, recommended, tag: recommended && !!spotlightTag, compact: level },
-          scale,
-        );
-        return { ...at, ...ext };
-      });
-      last = fitArt({ view, aspect, points: pts, insets, focus });
-      if (!last.crowded) return { fit: last, compact: level };
-    }
-    return { fit: last as ArtFit, compact: maxLevel };
-  }, [islands, boss, points, layout, recommendedKey, spotlightTag, big, scale, t, view, aspect, insets, focus, maxLevel]);
+  const { shown, points, fit, compact, focus } = useMemo(
+    () =>
+      planMap({
+        islands,
+        boss,
+        recommendedKey,
+        layout,
+        view,
+        insets,
+        measured: region.measured,
+        extentsOf: (node, recommended, level) =>
+          nodeExtents(
+            node,
+            nodeLabel(node, t),
+            node.kind === 'boss' ? bossChip(node, t) : null,
+            { big, recommended, tag: recommended && !!spotlightTag, compact: level },
+            scale,
+          ),
+      }),
+    [islands, boss, recommendedKey, layout, view, insets, region.measured, spotlightTag, big, scale, t],
+  );
 
   // Glide only between solved rects after the first paint — never in from a default.
   const [settled, setSettled] = useState(false);
@@ -250,11 +239,11 @@ export function AcademyMap({ layout, islands, boss, recommendedKey, spotlightTag
         )}
         {focus && <Spotlight at={focus} still={still} tone={spotlightTone} />}
 
-        {boss && islands.length > 0 && (
+        {boss && shown.length > 0 && (
           <AcademyNodeButton
             node={boss}
             at={CASTLE[layout]}
-            index={islands.length}
+            index={shown.length}
             big={big}
             recommended={recommendedKey === boss.key}
             tag={recommendedKey === boss.key ? spotlightTag : undefined}
@@ -265,7 +254,7 @@ export function AcademyMap({ layout, islands, boss, recommendedKey, spotlightTag
             scale={scale}
           />
         )}
-        {islands.map((node, i) => (
+        {shown.map((node, i) => (
           <AcademyNodeButton
             key={node.key}
             node={node}

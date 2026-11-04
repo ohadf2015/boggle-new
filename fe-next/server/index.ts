@@ -239,6 +239,14 @@ async function start(): Promise<void> {
         res.status(404).end();
         return;
       }
+      if (gate.action === 'redirect') {
+        // Path-only Location so crawlers see /en/<page>, not another host.
+        const search = parsedUrl.search || '';
+        res.status(308);
+        res.setHeader('Location', `${gate.location}${search}`);
+        res.end();
+        return;
+      }
 
       // Next 16.2 self-host leaks (router LRU / RSC abort / fetch tee) grow
       // with handle() traffic even when games=0. Count hits vs unique paths

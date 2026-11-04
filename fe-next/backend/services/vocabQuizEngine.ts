@@ -95,6 +95,8 @@ export interface VocabQuizSession {
   chestHoldEndsAt: number;
   /** Treasure chest results, keyed by `${questionIndex}:${username}`. */
   chestResults: Map<string, TreasureChestState>;
+  /** The shell `startGame` id this round went out with; its results carry it back. */
+  shellSessionId?: string;
 }
 
 export interface CreateQuizSessionInput {

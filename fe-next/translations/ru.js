@@ -3846,7 +3846,9 @@ const ru = {
     "wordBank": {
       "title": "Банк слов ({{count}})",
       "hint": "Эти слова спрятаны на доске. Нажмите, чтобы закрыть.",
-      "challengeBadge": "Вызов: ищите слова из {{min}}+ букв"
+      "challengeBadge": "Вызов: ищите слова из {{min}}+ букв",
+      "huntTitle": "Слова урока {{found}}/{{total}}",
+      "huntHidden": "Скрытое слово урока, букв: {{length}}"
     },
     "studentPreview": {
       "button": "Посмотреть глазами учеников",
@@ -12514,6 +12516,7 @@ const ru = {
     "updateReady": "Обновление готово",
     "updateRestart": "Перезапустить",
     "pressBackAgainToExit": "Нажмите «Назад» ещё раз, чтобы выйти",
+    "stop": "Стоп",
     "used": "Использован",
     "email": "Электронная почта",
     "free": "Бесплатно",
@@ -13958,6 +13961,8 @@ const ru = {
       },
       "trialPreview": "Предпросмотр Pro: эта страница открыта ещё {{days}} дн. После этого нужен Pro.",
       "trialPreviewCta": "Оставить с Pro",
+      "trialEnded": "Предпросмотр Pro закончился. Ваши классы и история игр сохранены. С Pro эта страница снова откроется.",
+      "freeKeeps": "Бесплатно остаются все режимы игры в классе ({{modes}}), ваши списки слов и никакой рекламы для учеников.",
       "cta": "Открыть с Pro — {{price}}/месяц"
     },
     "digest": {
@@ -14614,7 +14619,19 @@ const ru = {
       "notCompleted": "Не выполнено",
       "strugglingAreas": "Проблемные области",
       "studentsMissed": "учеников пропустили",
-      "noStrugglingAreas": "Проблемные области не выявлены"
+      "noStrugglingAreas": "Проблемные области не выявлены",
+      "playedCount": "Сыграли {played}/{total}",
+      "nobodyYet": "Пока никто не сыграл. Результаты появятся здесь, когда ученики закончат.",
+      "needHelp": "Нужна помощь",
+      "onTrack": "Все, кто сыграл, набрали 70% и больше.",
+      "mostMissed": "Чаще всего ошибались",
+      "missedBy": "ошиблись {count}/{played}",
+      "notPlayedTitle": "Ещё не сыграли ({count})",
+      "allPlayed": "Все сыграли.",
+      "noMisses": "Без ошибок",
+      "loadFailed": "Не удалось загрузить, кто сыграл.",
+      "eachStudent": "По ученикам ({count})",
+      "noScores": "Пока нет оценок: в этих играх не сохранились результаты по словам."
     },
     "tracking": {
       "all": "Все",
@@ -17095,6 +17112,9 @@ const ru = {
       }
     },
     "setup": {
+      "tagline": "Ставь слова, захватывай поле, перехитри бота.",
+      "showAdvanced": "Дополнительные настройки",
+      "hideAdvanced": "Скрыть дополнительные настройки",
       "title": "Настрой матч",
       "opponent": {
         "label": "Соперник",
@@ -17117,6 +17137,7 @@ const ru = {
       "sendChallengeNow": "Теперь отправь вызов!"
     },
     "daily": {
+      "goals": { "title": "Цели на сегодня" },
       "title": "Доска дня",
       "play": "Играть доску дня",
       "done": "Сегодня пройдено · ещё раз",
@@ -21130,7 +21151,8 @@ const ru = {
       "leave": "Выйти",
       "calculating": "Считаем слова…",
       "classGoal": "Улов класса: {found}/{total} слов",
-      "waitNext": "Что дальше, решает учитель. А пока разомнись."
+      "waitNext": "Что дальше, решает учитель. А пока разомнись.",
+      "moreFromRound": "Ещё об этом раунде"
     }
   }
   // @eduLiveRoom:end
@@ -21195,6 +21217,7 @@ const ru = {
       "colStudents": "Ученики",
       "colLastPlayed": "Последняя игра",
       "students": "Учеников: {count}",
+      "studentsOne": "1 ученик",
       "notPlayedRecently": "Нет игр за 30 дней",
       "playWith": "Начать игру с классом {name}",
       "showCode": "Показать код",
@@ -21356,7 +21379,9 @@ const ru = {
       "packWords": "Слов: {count}",
       "packRecommended": "Советуем",
       "startLive": "Начать игру",
-      "createOnly": "Просто создать класс"
+      "createOnly": "Просто создать класс",
+      "packHint": "Ученики также получат эти слова как домашнее задание, когда присоединятся.",
+      "assignFailed": "Класс готов, но слова не назначены. Назначьте их на странице класса."
     },
     "host": {
       "classLabel": "Класс",
@@ -21483,6 +21508,13 @@ const ru = {
   }
   // @teacherLifecycleEmail:end
   ,
+  // @wordcraftReview:start
+  "wordcraftReview": {
+    "cta": "Повторить пропущенные слова ({count})",
+    "homeworkDone": "Домашка готова",
+    "next": "Пропущенные слова ({count})",
+  },
+  // @wordcraftReview:end
   // @eduPolish:start
   "eduPolish": {
     "seatCapReached": "{name} смотрит: класс заполнен ({cap} игроков)",
