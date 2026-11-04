@@ -32,10 +32,9 @@ const BOUNCES: [string, RegExp][] = [
   ['consumer site page', /['"`]\/(\$\{\w+\}\/)?(how-to-play|blog|faq|about|contact)(?=['"`/?#])/g],
 ];
 
-// The one sanctioned way out, plus prefixes that are only ever extended (breadcrumb trail, SEO canonical URL).
+// The one sanctioned way out (the header's comes from educationExitHref), plus prefixes that are only ever extended (breadcrumb trail, SEO canonical URL).
 const LOCALE_ROOT_ALLOWED: Record<string, number> = {
   'components/education/EducationBreadcrumbs.tsx': 2,
-  'components/education/EducationHeader.tsx': 1,
   'components/education/EducationMenuDropdown.tsx': 1,
   'app/[locale]/student/profile/layout.tsx': 2,
 };

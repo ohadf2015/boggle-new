@@ -10,6 +10,7 @@ import { supabase } from '@/lib/supabase';
 import { isNative } from '@/utils/platform';
 import { defaultLocale, locales } from '@/lib/i18n';
 import logger from '@/utils/logger';
+import { nativeOAuthNext, nativeOAuthRedirectUrl } from '@/lib/navigation/authReturnPath';
 
 export interface MobileOAuthResult {
   success: boolean;
@@ -31,14 +32,11 @@ function getCapacitor(): any {
 }
 
 function getOAuthRedirectUrl(locale: string): string {
-  const cap = getCapacitor();
-  const platform = cap?.getPlatform?.() ?? 'web';
-
-  if (platform === 'android') {
-    return `https://www.lexiclash.live/${locale}/auth/callback?from_app=true`;
-  } else {
-    return `lexiclash://auth/callback${locale ? `?locale=${locale}` : ''}`;
-  }
+  const platform = getCapacitor()?.getPlatform?.() ?? 'web';
+  const next = typeof window === 'undefined'
+    ? null
+    : nativeOAuthNext(window.location.pathname, window.location.search);
+  return nativeOAuthRedirectUrl(platform, locale, next);
 }
 
 export async function performMobileOAuth(
