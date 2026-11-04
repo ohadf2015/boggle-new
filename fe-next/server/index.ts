@@ -40,9 +40,10 @@ import { withBootTimeout } from './bootTimeout';
 import { sendOpsAlert } from '../backend/modules/notificationService';
 import { startMemoryWatchdog } from '../backend/modules/memoryWatchdog';
 import { formatMemwatchCounts } from '../backend/modules/memoryWatchdogCounts';
-import { noteNextHandle, noteNextHandleDrop } from '../backend/modules/nextHandleStats';
-import { decideNextHandle } from '../lib/seo/nextHandleGate';
+import { noteNextHandle } from '../backend/modules/nextHandleStats';
 import { registerSqlWasmRoute } from './sqlWasmRoute';
+import { finishNextHandleGate } from './nextHandleGateRoute';
+import { sitemapXmlHandler } from './sitemapXml';
 import { registerActiveGamesProvider } from '../backend/modules/scoreManager';
 import { getAllGameCodes } from '../backend/modules/gameStateManager';
 
@@ -65,7 +66,6 @@ import playerProfileRoutes from '../backend/routes/playerProfile';
 import avatarPngRoutes from '../backend/routes/avatarPng';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import { appRouter } from '../backend/trpc/root';
-import { sendGateNotFound } from './gateNotFound';
 
 // Configuration
 const dev: boolean = process.env.NODE_ENV !== 'production';
@@ -140,37 +140,9 @@ async function start(): Promise<void> {
     createContext: ({ req, res }) => ({ req, res }),
   }));
 
-  // SEO file bypass - handle directly via Express to avoid Next.js catch-all interference
-  app.get('/sitemap.xml', async (req, res, next) => {
-    try {
-      const sitemapModule = await import('../app/sitemap');
-      const routes = sitemapModule.default();
-      
-      let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
-      xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n';
-      
-      for (const route of routes) {
-        xml += '  <url>\n';
-        xml += `    <loc>${route.url}</loc>\n`;
-        if (route.lastModified) xml += `    <lastmod>${route.lastModified}</lastmod>\n`;
-        if (route.changeFrequency) xml += `    <changefreq>${route.changeFrequency}</changefreq>\n`;
-        if (route.priority) xml += `    <priority>${route.priority}</priority>\n`;
-        if (route.alternates?.languages) {
-          for (const [lang, url] of Object.entries(route.alternates.languages)) {
-            xml += `    <xhtml:link rel="alternate" hreflang="${lang}" href="${url}" />\n`;
-          }
-        }
-        xml += '  </url>\n';
-      }
-      xml += '</urlset>';
-      
-      res.setHeader('Content-Type', 'application/xml');
-      res.send(xml);
-    } catch (err) {
-      httpLogger.error({ err }, 'Failed to generate sitemap.xml');
-      next(err);
-    }
-  });
+  // SEO file bypass - handle directly via Express to avoid Next.js catch-all interference.
+  // Exact route: /sitemap.xml/<page> must not match this and fall through to the gate.
+  app.get('/sitemap.xml', sitemapXmlHandler);
 
   app.get('/robots.txt', async (req, res, next) => {
     try {
@@ -234,20 +206,8 @@ async function start(): Promise<void> {
       // used to rewrite them into /{locale}/… which SSRs the locale layout
       // and is the idle old-space leak (t_f5eb034e). Count drops separately
       // so MEMWATCH can see the gate working.
-      const gate = decideNextHandle(pathname ?? '', req.headers['user-agent']);
-      if (gate.action === 'drop') {
-        noteNextHandleDrop(gate.reason);
-        sendGateNotFound(res, req.method);
-        return;
-      }
-      if (gate.action === 'redirect') {
-        // Path-only Location so crawlers see /en/<page>, not another host.
-        const search = parsedUrl.search || '';
-        res.status(308);
-        res.setHeader('Location', `${gate.location}${search}`);
-        res.end();
-        return;
-      }
+      // 404 or path-only 308 before Next handle(). Shared with the route-level GET tests.
+      if (finishNextHandleGate(req, res)) return;
 
       // Next 16.2 self-host leaks (router LRU / RSC abort / fetch tee) grow
       // with handle() traffic even when games=0. Count hits vs unique paths
