@@ -5,7 +5,7 @@ import { getPolarClient, getProProductId, probeCheckoutUrl } from '@/lib/polar';
 import { productionRefusesSandbox } from '@/lib/polarBillingRuntime';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { locales, defaultLocale } from '@/i18n/config';
-import { returnPathFromReferer } from '@/lib/education/checkoutReturn';
+import { returnPathFromReferer, safeTeacherReturnPath } from '@/lib/education/checkoutReturn';
 import logger from '@/utils/logger';
 import { isNativeAppUserAgent } from '@/lib/native/nativeHandoff';
 import { logSubscriptionEvent } from '@/lib/subscriptions';
@@ -205,16 +205,14 @@ export async function POST(request: NextRequest) {
       allowTrial: trial,
       trialDays: trial ? trialPlan?.days : undefined,
       locale,
-      // Same-origin fetch sends the full Referer, so a checkout from a class report
-      // returns there; the success_url builder only keeps /teacher paths.
-      returnPath:
-        body.returnTo ||
+      returnPath: [
+        body.returnTo,
         returnPathFromReferer(
           request.headers.get('referer'),
           process.env.NEXT_PUBLIC_APP_URL,
           request.headers.get('x-forwarded-host') ?? request.headers.get('host'),
-        ) ||
-        undefined,
+        ),
+      ].find((candidate) => safeTeacherReturnPath(candidate, locale) !== null) ?? undefined,
     });
     const checkoutUrl = checkout.url;
     const checkoutId = checkout.id;

@@ -4,7 +4,7 @@
  * Gate semantics (pitfall class 1): while the entitlement is unresolved the
  * rows are DISABLED — never painted enabled and then yanked when /api/
  * subscription/status comes back free. A free teacher sees the dials frozen
- * on the loud defaults with a Pro lock and an upgrade link, because a control
+ * on the loud defaults with an inline Pro lock, because a control
  * that is invisible cannot be sold.
  */
 import React from 'react';
@@ -24,6 +24,10 @@ vi.mock('@/hooks/useTeacherPro', () => ({
 vi.mock('@/utils/growthTracking', () => ({
   trackGrowthEvent: mockTrackGrowthEvent,
 }));
+const mockCheckoutStart = vi.hoisted(() => vi.fn());
+vi.mock('@/hooks/useTeacherProCheckout', () => ({ useTeacherProCheckout: () => ({ pending: false, start: mockCheckoutStart }) }));
+vi.mock('@/hooks/useCheckoutBlockedInApp', () => ({ useCheckoutBlockedInApp: () => false }));
+vi.mock('@/lib/education/proFunnelTelemetry', () => ({ trackProUpgradeClicked: vi.fn() }));
 
 import { LobbyPressureDials } from '../LobbyPressureDials';
 import { DEFAULT_CLASSROOM_PRESSURE } from '@/shared/utils/classroomPressure';
@@ -64,7 +68,7 @@ describe('LobbyPressureDials', () => {
   it('unlocks the dials for a free teacher while their access trial is live, and re-locks after', () => {
     mockProState = { hasPro: false, loading: false, accessTrialExpires: new Date(Date.now() + 5 * 86_400_000).toISOString() };
     const { onChange } = setup();
-    expect(screen.queryByTestId('pressure-pro-lock')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('pro-inline-lock-pressureDials')).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('radio', { name: 'teacher.classroom.pressure.leaderboard.hidden' }));
     expect(onChange).toHaveBeenCalledWith({ ...DEFAULT_CLASSROOM_PRESSURE, leaderboard: 'hidden' });
   });
@@ -72,7 +76,7 @@ describe('LobbyPressureDials', () => {
   it('keeps the dials locked once the access trial window has passed', () => {
     mockProState = { hasPro: false, loading: false, accessTrialExpires: new Date(Date.now() - 86_400_000).toISOString() };
     setup();
-    expect(screen.getByTestId('pressure-pro-lock')).toBeInTheDocument();
+    expect(screen.getByTestId('pro-inline-lock-pressureDials')).toBeInTheDocument();
   });
 
   it('emits the flipped dial on choice', () => {
@@ -92,14 +96,17 @@ describe('LobbyPressureDials', () => {
     expect(onChange).toHaveBeenCalledWith({ ...DEFAULT_CLASSROOM_PRESSURE, speedScoring: false });
   });
 
-  it('disables every dial for a free teacher, frozen on the loud defaults, with an upgrade link', () => {
+  it('disables every dial for a free teacher, frozen on the loud defaults, with an inline Pro lock', () => {
     mockProState = { hasPro: false, loading: false };
     setup({ pressure: { leaderboard: 'hidden', timer: 'off', speedScoring: false } });
 
-    // The lock renders, pointing at the upgrade page.
-    const lock = screen.getByTestId('pressure-pro-lock');
-    expect(lock).toBeInTheDocument();
-    expect(lock.closest('a')).toHaveAttribute('href', '/en/teacher/upgrade');
+    const lock = screen.getByTestId('pro-inline-lock-pressureDials');
+    expect(lock).toHaveTextContent('teacher.proGate.pressureDials.title');
+    expect(screen.queryAllByRole('link')).toHaveLength(0);
+    fireEvent.click(lock);
+    expect(screen.getByTestId('pro-preview-pressureDials')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('pro-inline-upgrade-pressureDials'));
+    expect(mockCheckoutStart).toHaveBeenCalledTimes(1);
 
     // Every choice is disabled — a free teacher cannot set calm mode.
     for (const radio of screen.getAllByRole('radio')) {
@@ -130,7 +137,7 @@ describe('LobbyPressureDials', () => {
       expect(radio).toBeDisabled();
     }
     // No lock either: a paying teacher must not be told to pay.
-    expect(screen.queryByTestId('pressure-pro-lock')).toBeNull();
+    expect(screen.queryByTestId('pro-inline-lock-pressureDials')).toBeNull();
     expect(mockTrackGrowthEvent).not.toHaveBeenCalled();
   });
 });
