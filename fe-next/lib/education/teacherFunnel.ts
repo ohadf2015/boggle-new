@@ -15,6 +15,7 @@
  */
 
 import { isChipEcho, normalizeUseCase } from './useCaseChips';
+import { greatestTimestamp } from './teacherLastActivity';
 
 export type TeacherStage =
   | 'declined'
@@ -81,6 +82,8 @@ export interface TeacherFunnelInput {
     /** Set by a DB trigger for QA rigs. Such a profile is excluded from every number. */
     is_test_account?: boolean | null;
     last_seen_at?: string | null;
+    /** auth.users.last_sign_in_at, joined on profiles.id. */
+    last_sign_in_at?: string | null;
     display_name?: string | null;
     username?: string | null;
   }>;
@@ -94,6 +97,8 @@ export interface TeacherFunnelInput {
   }>;
   memberships: Array<{ classroom_id: string; student_id: string }>;
   assignments: Array<{ teacher_id: string | null }>;
+  /** Latest classroom_rounds.started_at per teacher. Absent when the table is not migrated. */
+  roundStarts?: Array<{ teacher_id: string; started_at: string | null }>;
   checkoutEvents?: CheckoutFunnelEventRow[];
   nowMs: number;
 }
@@ -297,6 +302,12 @@ export function buildTeacherFunnel(input: TeacherFunnelInput): TeacherFunnelResu
 
   const roleById = new Map(profiles.map((p) => [p.id, p.user_role]));
   const lastSeenById = new Map(profiles.map((p) => [p.id, p.last_seen_at ?? null]));
+  const lastSignInById = new Map(profiles.map((p) => [p.id, p.last_sign_in_at ?? null]));
+  const roundStartById = new Map<string, string>();
+  for (const row of input.roundStarts ?? []) {
+    const next = greatestTimestamp(roundStartById.get(row.teacher_id), row.started_at);
+    if (next) roundStartById.set(row.teacher_id, next);
+  }
 
   const studentsByClassroom = new Map<string, Set<string>>();
   for (const m of memberships) {
@@ -344,7 +355,9 @@ export function buildTeacherFunnel(input: TeacherFunnelInput): TeacherFunnelResu
       trialExpiresAt: r.trial_expires_at,
       trialState: trialStateOf(r.trial_expires_at, nowMs),
       roleGranted,
-      lastSeenAt: (r.user_id ? lastSeenById.get(r.user_id) : null) ?? null,
+      lastSeenAt: r.user_id
+        ? greatestTimestamp(lastSeenById.get(r.user_id), roundStartById.get(r.user_id), lastSignInById.get(r.user_id))
+        : null,
       classrooms: ownedClassrooms.length,
       students,
       assignments: assignmentCount,
