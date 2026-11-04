@@ -161,7 +161,7 @@ export default async function MultiplayerWordGameOnlinePage({ params }: PageProp
         <section className="mb-12 rounded-neo border-3 border-neo-lime/60 bg-neo-navy-light p-5 shadow-hard">
           <Link href={`/${validLocale}/scrabble-alternative-online`} className="block group">
             <h3 className="font-neo-display text-lg font-black text-neo-lime underline decoration-2 underline-offset-4 group-hover:text-neo-white transition-colors">
-              Looking for a free Scrabble alternative online?
+              Looking for a Scrabble online multiplayer alternative?
             </h3>
             <p className="mt-2 text-sm text-slate-300">Real-time multiplayer, 2-20 players in one browser room, no download — see LexiClash vs Scrabble GO →</p>
           </Link>
