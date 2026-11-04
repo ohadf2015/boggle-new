@@ -77,6 +77,11 @@ const content: Record<Locale, ToolContent> = {
           'From 7 random letters, you can typically make between 20 and 80 valid English words, depending on the letter combination. Common vowel-consonant mixes yield more words. Our solver finds all possibilities from a curated word list instantly.',
       },
       {
+        question: 'Can it solve anagrams with multiple words?',
+        answer:
+          "Partly. You can type a phrase with spaces, like 'moon starer', and it searches all the letters, but each result is one word, such as 'astronomer'. To build a phrase, pick a long word from the results, take its letters out of your search, and run it again on what is left.",
+      },
+      {
         question: 'What is an anagram solver?',
         answer:
           'An anagram solver is a tool that takes a set of letters and finds all valid words that can be formed using some or all of those letters. It checks every possible combination against a dictionary to find words you might miss.',
