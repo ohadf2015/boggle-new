@@ -20,7 +20,10 @@ export async function DELETE(req: Request, ctx: { params: Promise<{ id: string }
     return NextResponse.json({ ok: false, error: 'service role key not configured' }, { status: 500 });
   }
 
-  const outcome = await deleteOwnedClassroom(classroomDeleteClient(admin), auth.classroom.id);
+  // Postgrest builders are thenables, not Promises, so the structural adapter
+  // type does not accept SupabaseClient directly; the runtime shape matches.
+  const client = classroomDeleteClient(admin as unknown as Parameters<typeof classroomDeleteClient>[0]);
+  const outcome = await deleteOwnedClassroom(client, auth.classroom.id);
   if (!outcome.ok) {
     logger.error('[classroom-delete] failed', outcome.error);
     return NextResponse.json(
