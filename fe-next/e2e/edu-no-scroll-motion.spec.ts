@@ -88,7 +88,7 @@ for (const rate of [1, 4]) {
     await info.attach('pacing', { body: JSON.stringify(report), contentType: 'application/json' });
     if (RESULTS) console.log(`PACING ${JSON.stringify(report)}`);
 
-    // Entry overlaps the app shell's lazy analytics/replay tags (request 11); their script time is
+    // Entry overlaps the app shell's lazy analytics/replay tags; their script time is
     // excused by attribution, anything else in the frame still counts. The celebration excuses nothing.
     expect(entry.ownMax, JSON.stringify(report)).toBeLessThanOrEqual(MAX_FRAME_MS);
     expect(celebration.max, JSON.stringify(report)).toBeLessThanOrEqual(MAX_FRAME_MS);
