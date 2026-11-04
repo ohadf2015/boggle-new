@@ -21353,7 +21353,8 @@ const ja = {
       "leave": "退出",
       "calculating": "単語を集計中…",
       "classGoal": "クラスの合計：{found}/{total}語",
-      "waitNext": "次は先生が決めるよ。待つ間にウォームアップ！"
+      "waitNext": "次は先生が決めるよ。待つ間にウォームアップ！",
+      "moreFromRound": "このラウンドの詳細"
     }
   }
   // @eduLiveRoom:end

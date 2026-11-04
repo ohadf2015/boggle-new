@@ -21053,7 +21053,8 @@ const ru = {
       "leave": "Выйти",
       "calculating": "Считаем слова…",
       "classGoal": "Улов класса: {found}/{total} слов",
-      "waitNext": "Что дальше, решает учитель. А пока разомнись."
+      "waitNext": "Что дальше, решает учитель. А пока разомнись.",
+      "moreFromRound": "Ещё об этом раунде"
     }
   }
   // @eduLiveRoom:end

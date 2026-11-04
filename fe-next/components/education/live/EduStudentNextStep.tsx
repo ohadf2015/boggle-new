@@ -8,17 +8,33 @@ import { shareOrCopy } from '@/lib/education/shareOrCopy';
 import { trackEduStudentResultShared } from '@/lib/education/shareTelemetry';
 import { PRESS, type Translate } from './eduLiveStyles';
 
+type Placing = { rank: number; total: number; score: number } | null;
+
 interface EduStudentNextStepProps {
   t: Translate;
-  language: string;
-  placing: { rank: number; total: number; score: number } | null;
+  placing: Placing;
   onPractice?: () => void;
+  /** Round one only: from round two the momentum chips already say what to beat. */
+  showTomorrow?: boolean;
+}
+
+export function EduStudentNextStep({ t, placing, onPractice, showTomorrow = true }: EduStudentNextStepProps) {
+  return (
+    <div data-testid="edu-student-next-step" className="flex w-full flex-col gap-1.5">
+      <StudentNextActions onPractice={onPractice} t={t} compact />
+      {placing && showTomorrow && (
+        <p data-testid="edu-student-tomorrow" className="min-w-0 font-neo-body text-xs font-bold leading-snug text-neo-cream/85">
+          {t('eduLiveRoom.studentResults.tomorrowHook', { score: placing.score })}
+        </p>
+      )}
+    </div>
+  );
 }
 
 /** The share carries rank and score only: a child's name, class and room code never leave the phone. */
-export function EduStudentNextStep({ t, language, placing, onPractice }: EduStudentNextStepProps) {
+export function EduStudentShareButton({ t, language, placing }: { t: Translate; language: string; placing: Placing }) {
+  if (!placing) return null;
   const share = async () => {
-    if (!placing) return;
     const outcome = await shareOrCopy({
       title: 'LexiClash',
       text: t('eduLiveRoom.studentResults.shareText', { rank: placing.rank, total: placing.total, score: placing.score }),
@@ -28,29 +44,19 @@ export function EduStudentNextStep({ t, language, placing, onPractice }: EduStud
     if (outcome === 'copy') toast.success(t('share.linkCopied'));
     if (outcome === 'failed') toast.error(t('errors.generic'));
   };
-
   return (
-    <div data-testid="edu-student-next-step" className="flex w-full flex-col gap-1.5">
-      <StudentNextActions onPractice={onPractice} t={t} />
-      {placing && (
-        <div className="flex items-center justify-between gap-2">
-          <p data-testid="edu-student-tomorrow" className="min-w-0 font-neo-body text-xs font-bold leading-snug text-neo-cream/85">
-            {t('eduLiveRoom.studentResults.tomorrowHook', { score: placing.score })}
-          </p>
-          <button
-            type="button"
-            data-testid="edu-student-share"
-            onClick={() => void share()}
-            className={cn(
-              'inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-neo border-2 border-neo-cream/60 px-3 font-neo-display text-xs font-black uppercase text-neo-cream hover:bg-neo-navy-light',
-              PRESS
-            )}
-          >
-            <Share2 className="size-4" aria-hidden="true" />
-            {t('eduLiveRoom.studentResults.share')}
-          </button>
-        </div>
+    <button
+      type="button"
+      data-testid="edu-student-share"
+      aria-label={t('eduLiveRoom.studentResults.share')}
+      title={t('eduLiveRoom.studentResults.share')}
+      onClick={() => void share()}
+      className={cn(
+        'inline-flex size-11 shrink-0 items-center justify-center rounded-neo border-[3px] border-neo-cream bg-neo-navy-elevated text-neo-cream shadow-hard-sm hover:bg-neo-navy-light',
+        PRESS
       )}
-    </div>
+    >
+      <Share2 className="size-5" aria-hidden="true" />
+    </button>
   );
 }

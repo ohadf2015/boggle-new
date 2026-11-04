@@ -21366,7 +21366,8 @@ const es = {
       "leave": "Salir",
       "calculating": "Contando las palabras…",
       "classGoal": "Botín de la clase: {found}/{total} palabras",
-      "waitNext": "Tu profe decide qué sigue. Calienta mientras esperas."
+      "waitNext": "Tu profe decide qué sigue. Calienta mientras esperas.",
+      "moreFromRound": "Más de esta ronda"
     }
   }
   // @eduLiveRoom:end

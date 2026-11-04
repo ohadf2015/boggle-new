@@ -24,7 +24,7 @@ import { resultsExitCopy } from '@/lib/multiplayer/resultsExitCopy';
 import type { PlayerResult } from '@/types/components';
 import { studentGap, studentPlacing } from './eduResultsModel';
 import { EduStudentHero } from './EduStudentHero';
-import { EduStudentNextStep } from './EduStudentNextStep';
+import { EduStudentNextStep, EduStudentShareButton } from './EduStudentNextStep';
 import { EduStudentClassGoal, EduStudentWaitNext, EduStudentXpBar } from './EduStudentProgress';
 import { LIVE_KEYFRAMES, PRESS } from './eduLiveStyles';
 
@@ -119,7 +119,13 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
   return (
     <div data-testid="edu-student-results" className="flex min-h-0 flex-1 flex-col overflow-hidden bg-neo-navy text-neo-cream">
       <style>{LIVE_KEYFRAMES}</style>
-      <header className="flex shrink-0 justify-end pe-16 ps-4 pt-1.5">
+      <header className="flex shrink-0 items-center justify-end gap-2 pe-16 ps-4 pt-1.5">
+        {props.gameCode && (
+          <div className="min-w-0 flex-1 [&_button]:min-h-11 [&_button]:py-1 [&_img]:!size-8">
+            <ChestRewardCta quiet gameCode={props.gameCode} roundId={rewardRoundId(props.gameSessionId, props.gameCode)} />
+          </div>
+        )}
+        <EduStudentShareButton t={t} language={c.language} placing={placing} />
         <button
           type="button"
           data-testid="edu-student-results-leave"
@@ -148,10 +154,15 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
                 gap={gap}
                 reduceMotion={reduceMotion}
                 t={t}
-                extra={classTotal > 0 ? <EduStudentClassGoal found={classFound ?? 0} total={classTotal} t={t} /> : null}
+                extra={
+                  (classTotal > 0 || momentum) && (
+                  <>
+                    {classTotal > 0 && <EduStudentClassGoal found={classFound ?? 0} total={classTotal} t={t} />}
+                    {momentum && <StudentMomentumChips momentum={momentum} t={t} className="contents" />}
+                  </>
+                  )
+                }
               />
-              {momentum && <StudentMomentumChips momentum={momentum} t={t} className="mt-2" />}
-              {xpGained && xpGained.newTotalXp > 0 && <div className="mt-2"><EduStudentXpBar totalXp={xpGained.newTotalXp} /></div>}
             </Beat>
           )}
 
@@ -160,8 +171,8 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
           <Beat index={beat++}>
             <EduStudentNextStep
               t={t}
-              language={c.language}
               placing={placing}
+              showTomorrow={!momentum}
               onPractice={lessonId && missed.length > 0 ? () => openLessonPractice(lessonId) : undefined}
             />
           </Beat>
@@ -170,25 +181,21 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
             <EduStudentWaitNext username={props.username} t={t} />
           </Beat>
 
-          {props.gameCode && (
-            <Beat index={beat++}>
-              <ChestRewardCta quiet gameCode={props.gameCode} roundId={rewardRoundId(props.gameSessionId, props.gameCode)} />
-            </Beat>
-          )}
-
           <Beat index={beat++}>
             <details data-testid="edu-student-more" className="group rounded-neo-lg border-[3px] border-neo-cream bg-neo-navy-elevated shadow-hard">
               <summary
                 data-testid="edu-student-more-summary"
                 className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 px-3 py-2 font-neo-display text-lg font-black [&::-webkit-details-marker]:hidden"
               >
-                <span>{t('eduLiveRoom.studentResults.yourWords')}</span>
-                <span className="flex items-center gap-2">
-                  <span className="font-neo-body text-sm font-bold tabular-nums text-neo-cream/70">{words.length}</span>
-                  <ChevronDown className="size-5 transition-transform duration-200 ease-out group-open:rotate-180 motion-reduce:transition-none" aria-hidden="true" />
-                </span>
+                <span>{t('eduLiveRoom.studentResults.moreFromRound')}</span>
+                <ChevronDown className="size-5 shrink-0 transition-transform duration-200 ease-out group-open:rotate-180 motion-reduce:transition-none" aria-hidden="true" />
               </summary>
               <div className="flex flex-col gap-3 px-3 pb-3">
+                {xpGained && xpGained.newTotalXp > 0 && <EduStudentXpBar totalXp={xpGained.newTotalXp} />}
+                <h2 className="flex items-baseline justify-between gap-2 font-neo-display text-base font-black">
+                  {t('eduLiveRoom.studentResults.yourWords')}
+                  {words.length > 0 && <span className="font-neo-body text-sm font-bold tabular-nums text-neo-cream/70">{words.length}</span>}
+                </h2>
                 {words.length > 0 ? (
                   <ul className="flex flex-wrap gap-1.5">
                     {words.map((w, i) => (

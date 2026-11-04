@@ -73,12 +73,43 @@ describe('EduStudentResults on a 390x844 phone', () => {
     for (const id of ['edu-student-hero', 'edu-student-next-step', 'waiting-warmup']) {
       expect(more).not.toContainElement(screen.getByTestId(id));
     }
-    expect(screen.getByTestId('edu-student-more-summary')).toHaveTextContent('2');
+    expect(screen.getByTestId('edu-student-more-summary')).toHaveTextContent('eduLiveRoom.studentResults.moreFromRound');
+  });
+
+  it('given a round reward, when results show, then the chest sits beside Leave instead of taking its own row', () => {
+    render(<EduStudentResults {...(props as object)} />);
+    expect(screen.getByTestId('edu-student-results-leave').closest('header')).toContainElement(screen.getByTestId('chest-cta'));
+  });
+
+  it('given a signed-in student, when results show, then the XP bar folds away and the earned XP chip stays on the card', () => {
+    controller.current = makeController({ socketEvents: { xpGainedData: { xpEarned: 30, newTotalXp: 400 } } });
+    render(<EduStudentResults {...(props as object)} />);
+    expect(screen.getByTestId('edu-student-more')).toContainElement(screen.getByTestId('edu-student-xp-bar'));
+    expect(screen.getByTestId('edu-student-hero')).toContainElement(screen.getByTestId('edu-student-xp'));
   });
 
   it('given my round, when the class goal shows, then it rides inside my card instead of its own row', () => {
     render(<EduStudentResults {...(props as object)} classroomSummary={{ teacherName: 'Ms Cohen', classFoundCount: 3, totalWords: 5, lessonIds: ['l1'] }} />);
     expect(screen.getByTestId('edu-student-hero')).toContainElement(screen.getByTestId('edu-student-class-goal'));
+  });
+
+  it('given my round, when results show, then Share is an icon beside Leave, not a row of its own', () => {
+    render(<EduStudentResults {...(props as object)} />);
+    expect(screen.getByTestId('edu-student-results-leave').closest('header')).toContainElement(screen.getByTestId('edu-student-share'));
+    expect(screen.getByTestId('edu-student-share')).toHaveAccessibleName('eduLiveRoom.studentResults.share');
+  });
+
+  it('given a later round this session, when results show, then momentum chips replace the tomorrow line and ride in my card', () => {
+    const summary = { teacherName: 'Ms Cohen', missedWords: [], lessonIds: ['l1'], lessonNames: ['Animals'], totalWords: 4, classFoundCount: 1, coverage: [], masteryByPlayer: { Maya: { found: 1, total: 4 } } };
+    window.sessionStorage.setItem(sessionKeyFor(summary as never), JSON.stringify([{ score: 12, rank: 2, players: 2, sweep: false, at: 1 }]));
+    render(<EduStudentResults {...({ ...(props as object), classroomSummary: summary } as never)} />);
+    expect(screen.getByTestId('edu-student-hero')).toContainElement(screen.getByTestId('student-outcome-delta'));
+    expect(screen.queryByTestId('edu-student-tomorrow')).toBeNull();
+  });
+
+  it('given the lime wait card on this screen, then it says it once, without the second "stay here" line', () => {
+    render(<EduStudentResults {...(props as object)} />);
+    expect(screen.getByTestId('wait-for-teacher-message')).not.toHaveTextContent('education.results.stayInClass');
   });
 
   it('given a Boss round, when results show, then the boss verdict is the slim strip', () => {

@@ -21284,7 +21284,8 @@ const he = {
       "leave": "יציאה",
       "calculating": "סופרים את המילים…",
       "classGoal": "השלל של הכיתה: {found}/{total} מילים",
-      "waitNext": "מה הלאה? זה אצל המורה. בינתיים, חימום!"
+      "waitNext": "מה הלאה? זה אצל המורה. בינתיים, חימום!",
+      "moreFromRound": "עוד מהסבב הזה"
     }
   }
   // @eduLiveRoom:end

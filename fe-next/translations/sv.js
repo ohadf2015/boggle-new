@@ -21353,7 +21353,8 @@ const sv = {
       "leave": "Lämna",
       "calculating": "Räknar orden…",
       "classGoal": "Klassens fångst: {found}/{total} ord",
-      "waitNext": "Läraren väljer vad som händer sen. Värm upp medan du väntar."
+      "waitNext": "Läraren väljer vad som händer sen. Värm upp medan du väntar.",
+      "moreFromRound": "Mer från den här rundan"
     }
   }
   // @eduLiveRoom:end

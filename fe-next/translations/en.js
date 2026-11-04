@@ -20403,7 +20403,8 @@ const en = {
       "leave": "Leave",
       "calculating": "Counting up the words…",
       "classGoal": "Class haul: {found}/{total} words",
-      "waitNext": "Your teacher picks what's next. Warm up while you wait."
+      "waitNext": "Your teacher picks what's next. Warm up while you wait.",
+      "moreFromRound": "More from this round"
     }
   }
   // @eduLiveRoom:end

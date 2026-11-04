@@ -100,7 +100,7 @@ function EduStudentHeroImpl({ rank, total, score, bestWord, lesson, xp, coins, g
           {/* "#1 of 1" on zero points is not a placing. */}
           <div className="mt-1.5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
             {score > 0 && total > 1 && (
-              <p data-testid="edu-student-rank" className="font-neo-display text-4xl font-black leading-none tabular-nums sm:text-5xl">
+              <p data-testid="edu-student-rank" className="font-neo-display text-3xl font-black leading-none tabular-nums sm:text-5xl">
                 {t('eduLiveRoom.studentResults.rankOf', { rank, total })}
               </p>
             )}
@@ -118,7 +118,7 @@ function EduStudentHeroImpl({ rank, total, score, bestWord, lesson, xp, coins, g
           alt=""
           width={192}
           height={192}
-          className="size-20 shrink-0 select-none object-contain drop-shadow-[3px_3px_0_rgb(var(--neo-black))] motion-safe:animate-[edu-live-bob_2.4s_ease-in-out_infinite]"
+          className="size-16 shrink-0 select-none sm:size-20 object-contain drop-shadow-[3px_3px_0_rgb(var(--neo-black))] motion-safe:animate-[edu-live-bob_2.4s_ease-in-out_infinite]"
         />
       </div>
 
