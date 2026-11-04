@@ -21728,6 +21728,13 @@ const he = {
   }
   // @teacherLifecycleEmail:end
   ,
+  // @wordcraftReview:start
+  "wordcraftReview": {
+    "cta": "חזרה על מילים שפספסת ({count})",
+    "homeworkDone": "שיעורי הבית הושלמו",
+    "next": "מילים שפספסת ({count})",
+  },
+  // @wordcraftReview:end
   // @eduPolish:start
   "eduPolish": {
     "seatCapReached": "{name} צופה: הכיתה מלאה ({cap} שחקנים)",

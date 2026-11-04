@@ -25,7 +25,7 @@ import { useAcademyPlayer } from '@/components/education/academyModes/useAcademy
 import { toVocabularyWords } from '@/lib/education/practiceWordShape';
 import { getGuestSessionId } from '@/utils/guestManager';
 
-function WorkshopSession({ lesson, onBack }: { lesson: PracticeLesson; onBack: () => void }) {
+function WorkshopSession({ lesson, onBack, reviewStudentId }: { lesson: PracticeLesson; onBack: () => void; reviewStudentId?: string }) {
   const words = useMemo(() => toVocabularyWords(lesson.words).map((w) => w.word), [lesson.words]);
   const { startSession } = usePracticeProgress(lesson.id, undefined, { totalWords: words.length });
   const record = useRecordedXp();
@@ -39,6 +39,7 @@ function WorkshopSession({ lesson, onBack }: { lesson: PracticeLesson; onBack: (
       lessonLanguage={lesson.language}
       onBack={onBack}
       player={player}
+      review={reviewStudentId ? { studentId: reviewStudentId, lessonId: lesson.id } : undefined}
       startSession={async () => {
         const result = await startSession('solo_board', { variant: 'wordcraft' });
         sessionIdRef.current = result.sessionId;
@@ -94,7 +95,7 @@ export default function WordWorkshopPageClient() {
 
   return (
     <PracticeSessionProvider studentId={studentId} lessonId={lesson.id}>
-      <WorkshopSession lesson={lesson} onBack={onBack} />
+      <WorkshopSession lesson={lesson} onBack={onBack} reviewStudentId={user?.id} />
     </PracticeSessionProvider>
   );
 }

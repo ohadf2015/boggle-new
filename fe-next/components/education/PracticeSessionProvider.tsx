@@ -71,6 +71,11 @@ export interface CompletePracticeSessionData {
   masteryLevel?: 'not_started' | 'started' | 'practicing' | 'mastered';
 }
 
+export interface PracticeServerOutcome {
+  completed: boolean;
+  assignmentCompleted: boolean;
+}
+
 export interface PracticeSessionContextValue {
   // XP State (from useEducationXp)
   totalXp: number;
@@ -83,7 +88,8 @@ export interface PracticeSessionContextValue {
   sessionMasteryMessage: string | null;
 
   // Actions
-  completePracticeSession: (sessionData: CompletePracticeSessionData) => Promise<void>;
+  /** Resolves with the server's verdict on the round, or null when no session was patched. */
+  completePracticeSession: (sessionData: CompletePracticeSessionData) => Promise<PracticeServerOutcome | null>;
 
   // Level up state
   levelUpData: LevelUpPayload | null;
@@ -171,8 +177,9 @@ export function PracticeSessionProvider({
    * Handles XP calculation, level up detection, and database persistence
    */
   const completePracticeSession = useCallback(
-    async (sessionData: CompletePracticeSessionData) => {
+    async (sessionData: CompletePracticeSessionData): Promise<PracticeServerOutcome | null> => {
       setIsPersisting(true);
+      let outcome: PracticeServerOutcome | null = null;
 
       try {
         /*
@@ -251,6 +258,7 @@ export function PracticeSessionProvider({
                 setSessionXpEarned(0);
                 completedSessionIdsRef.current.delete(sessionData.sessionId);
               }
+              if (data?.session) outcome = { completed: data.session.completed_at != null, assignmentCompleted: data.assignmentCompleted === true };
             } else {
               logger.error('Failed to complete practice session on server', {
                 sessionId: sessionData.sessionId,
@@ -371,6 +379,7 @@ export function PracticeSessionProvider({
       } finally {
         setIsPersisting(false);
       }
+      return outcome;
     },
     [
       awardPracticeXp,

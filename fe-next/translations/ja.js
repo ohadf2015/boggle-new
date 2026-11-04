@@ -21797,6 +21797,13 @@ const ja = {
   }
   // @teacherLifecycleEmail:end
   ,
+  // @wordcraftReview:start
+  "wordcraftReview": {
+    "cta": "逃した単語を復習 ({count})",
+    "homeworkDone": "宿題クリア",
+    "next": "逃した単語 ({count})",
+  },
+  // @wordcraftReview:end
   // @eduPolish:start
   "eduPolish": {
     "seatCapReached": "{name}さんは観戦中です：クラスが満員です（{cap}人）",

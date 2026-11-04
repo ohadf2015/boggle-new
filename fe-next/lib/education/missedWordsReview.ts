@@ -77,7 +77,7 @@ export function graphemes(word: string): string[] {
   return [...word];
 }
 
-function isReviewable(word: string): boolean {
+export function isReviewableWord(word: string): boolean {
   const len = graphemes(word).length;
   return len >= 2 && len <= MAX_WORD_CHARS && !/\s/.test(word);
 }
@@ -99,7 +99,7 @@ export function collectReviewCandidates(
     const seen = new Set<string>();
     for (const entry of lesson.words) {
       const word = (entry?.word ?? '').trim();
-      if (!isReviewable(word)) continue;
+      if (!isReviewableWord(word)) continue;
       const c = canon(word);
       if (!c || mastered.has(c) || seen.has(c)) continue;
       seen.add(c);
