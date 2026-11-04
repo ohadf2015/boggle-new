@@ -13,6 +13,10 @@ export interface RawProfile {
   id: string;
   user_role?: string | null;
   last_seen_at: string | null;
+  /** Stamped by the fetcher from auth.users.last_sign_in_at. Not a profiles column. */
+  last_sign_in_at?: string | null;
+  /** Stamped by the fetcher from the latest classroom_rounds.started_at. Not a profiles column. */
+  last_round_started_at?: string | null;
   display_name: string | null;
   username: string | null;
   is_test_account: boolean | null;
@@ -88,6 +92,8 @@ export function prepareEduDashboardInput(
       id: p.id,
       name: (p.display_name ?? '').trim() || (p.username ?? '').trim() || null,
       last_seen_at: p.last_seen_at,
+      last_sign_in_at: p.last_sign_in_at ?? null,
+      last_round_started_at: p.last_round_started_at ?? null,
     }));
 
   const requests = raw.requests.filter(

@@ -4,6 +4,7 @@
  */
 
 import type { ClassroomGameSummary } from '@/lib/education/teacherActivity';
+import { greatestTimestamp } from '@/lib/education/teacherLastActivity';
 
 const DAY_MS = 86_400_000;
 const ROUNDS_WINDOW_DAYS = 30;
@@ -23,6 +24,8 @@ export interface ClassDetailInput {
     display_name: string | null;
     username: string | null;
     last_seen_at: string | null;
+    /** auth.users.last_sign_in_at for this profile. Only the teacher row uses it. */
+    last_sign_in_at?: string | null;
     is_test_account: boolean | null;
   }>;
   memberships: Array<{ student_id: string; joined_at: string | null }>;
@@ -31,6 +34,11 @@ export interface ClassDetailInput {
   progress: Array<{ assignment_id: string | null; student_id: string; completed_at: string | null }>;
   /** Null when classroom_rounds is not migrated in this database. */
   rounds: Array<{ game_mode: string; player_count: number; completed_at: string }> | null;
+  /**
+   * Latest classroom_rounds.started_at for the classroom's teacher, any class.
+   * Not derived from `rounds`, which is this class and a 90-day lookback.
+   */
+  teacherLastRoundStartedAt?: string | null;
   games: ClassroomGameSummary[];
 }
 
@@ -125,7 +133,11 @@ export function buildClassDetail(input: ClassDetailInput): ClassDetail {
       ? {
           id: teacherId,
           name: nameOf(teacherId),
-          lastSeenAt: profileOf.get(teacherId)?.last_seen_at ?? null,
+          lastSeenAt: greatestTimestamp(
+            profileOf.get(teacherId)?.last_seen_at,
+            profileOf.get(teacherId)?.last_sign_in_at,
+            input.teacherLastRoundStartedAt,
+          ),
           isTestAccount: isTest(teacherId),
         }
       : null,

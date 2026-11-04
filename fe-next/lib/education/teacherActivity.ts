@@ -6,12 +6,16 @@
  * `buildTeacherFunnel` does.
  */
 
+import { greatestTimestamp } from './teacherLastActivity';
+
 export interface TeacherActivityInput {
   userId: string;
   profile: {
     id: string;
     user_role: string | null;
     last_seen_at: string | null;
+    /** auth.users.last_sign_in_at, joined on profiles.id. */
+    last_sign_in_at?: string | null;
     display_name: string | null;
     username: string | null;
   } | null;
@@ -67,6 +71,8 @@ export interface TeacherActivityInput {
     hasPro: boolean;
     periodEnd: string | null;
   };
+  /** Latest classroom_rounds.started_at for this teacher. Null when the table is missing. */
+  latestRoundStartedAt?: string | null;
 }
 
 /**
@@ -253,7 +259,7 @@ export function buildTeacherActivity(input: TeacherActivityInput): TeacherActivi
       displayName: profile?.display_name ?? null,
       username: profile?.username ?? null,
       roleGranted: profile?.user_role === 'teacher',
-      lastSeenAt: profile?.last_seen_at ?? null,
+      lastSeenAt: greatestTimestamp(profile?.last_seen_at, profile?.last_sign_in_at, input.latestRoundStartedAt),
       trialExpiresAt: request?.trial_expires_at ?? null,
       status: request?.status ?? null,
     },

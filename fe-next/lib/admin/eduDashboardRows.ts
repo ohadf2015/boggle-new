@@ -6,7 +6,8 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { fetchAllRows } from './fetchAllRows';
 import { migrationPendingHint, type PostgrestLikeError } from '@/lib/supabase/migrationPendingHint';
-import type { EduRawRows, RawRound } from './eduDashboardInput';
+import { fetchLastSignIns, fetchLatestRoundStarts } from '@/lib/education/teacherLastActivity';
+import type { EduRawRows, RawProfile, RawRound } from './eduDashboardInput';
 
 export type FetchEduRowsResult = { ok: true; raw: EduRawRows } | { ok: false; error: string };
 
@@ -79,6 +80,18 @@ export async function fetchEduRawRows(supabase: SupabaseClient, sinceIso: string
   const failure = [profiles, testAccounts, requests, classrooms, memberships, subscriptions].find((r) => r.error);
   if (failure?.error) return { ok: false, error: failure.error };
 
+  const teacherIds = profiles.data.map((p) => p.id);
+  const [signIns, roundStarts] = await Promise.all([
+    fetchLastSignIns(supabase, teacherIds),
+    fetchLatestRoundStarts(supabase, teacherIds),
+  ]);
+  if (roundStarts.error) return { ok: false, error: roundStarts.error };
+  const stampedProfiles: RawProfile[] = profiles.data.map((p) => ({
+    ...p,
+    last_sign_in_at: signIns.get(p.id) ?? null,
+    last_round_started_at: roundStarts.unavailable ? null : (roundStarts.byTeacher.get(p.id) ?? null),
+  }));
+
   let outreachRows: Array<{ teacher_id: string; channel: string; created_at: string }> | null = outreach.data;
   if (outreach.error) {
     if (!migrationPendingHint(outreachError)) return { ok: false, error: outreach.error };
@@ -94,7 +107,7 @@ export async function fetchEduRawRows(supabase: SupabaseClient, sinceIso: string
   return {
     ok: true,
     raw: {
-      profiles: profiles.data,
+      profiles: stampedProfiles,
       testAccountIds: testAccounts.data.filter((p) => p.is_test_account === true).map((p) => p.id),
       requests: requests.data,
       classrooms: classrooms.data,
