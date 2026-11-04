@@ -123,6 +123,12 @@ describe('EduHostResults: fits the wall with the Teacher Pro card', () => {
     expect(screen.getByTestId('podium-detail-1').className).not.toMatch(/\btruncate\b/);
   });
 
+  it('given a free teacher on a 1366x768 wall (any round, not only Boss), then the Pro card steps aside so the wall never clips', () => {
+    renderZeroRound();
+    const card = screen.getByTestId('class-report-teaser').parentElement!;
+    expect(card.className).toMatch(/\[@container_results_\(height<56\.25rem\)\]:hidden/);
+  });
+
   it('given a winner on the calm wall, then the big name has room for its glyphs and is never cut', () => {
     render(<WinnerSpotlight winner={{ username: 'Maya', score: 40 }} active tone="calm" size="projector" t={t} />);
     expect(screen.getByTestId('winner-names').className).toMatch(/\bleading-tight\b/);

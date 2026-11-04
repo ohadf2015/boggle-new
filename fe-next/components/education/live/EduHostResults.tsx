@@ -308,7 +308,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
                 underHalf={studentsUnderHalf(summary)}
                 bars={reportBars(summary)}
                 proLabel={tf('eduLiveRoom.hostResults.proPill', 'Pro')}
-                className={cn(shortWall && '[@container_results_(height<65rem)]:hidden')}
+                className={shortWall ? '[@container_results_(height<65rem)]:hidden' : '[@container_results_(height<56.25rem)]:hidden'}
               />
             )}
             {!proLoading && hasPro && summary.totalWords > 0 && (
