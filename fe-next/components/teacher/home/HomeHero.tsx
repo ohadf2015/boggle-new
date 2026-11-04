@@ -53,11 +53,14 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
   const code = showCode ? (selected?.join_code?.trim() ?? '') : '';
 
   return (
-    <section data-testid="home-hero" aria-labelledby="home-hero-title" className={cn(PANEL, 'relative border-s-[6px] border-s-neo-cyan @container/hero')}>
-      <div className="flex flex-col gap-2.5 p-3 sm:gap-4 sm:p-5 [@media(max-height:820px)]:gap-2.5 [@media(max-height:820px)]:p-3.5">
-        <div className="flex min-w-0 flex-col gap-1 sm:gap-1.5">
-          <div className="flex items-center justify-between gap-3">
-            <span className="font-neo-body text-sm font-bold text-neo-cream/70">{t('eduShell.home.startWith')}</span>
+    <section data-testid="home-hero" aria-labelledby="home-hero-title" className={cn(PANEL, 'relative @container/hero')}>
+      <div
+        data-testid="home-hero-grid"
+        className="grid gap-3 p-3 sm:gap-4 sm:p-5 @3xl/hero:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] @3xl/hero:grid-rows-[auto_1fr] @3xl/hero:gap-x-6 [@media(max-height:820px)]:gap-2.5 [@media(max-height:820px)]:p-3.5"
+      >
+        <div className="flex min-w-0 flex-col gap-1 sm:gap-1.5 @3xl/hero:col-start-1 @3xl/hero:row-start-1">
+          <div className="flex flex-wrap items-center justify-between gap-x-3">
+            <span className="whitespace-nowrap font-neo-body text-sm font-bold text-neo-cream/70">{t('eduShell.home.startWith')}</span>
             {corner}
           </div>
           <h2 id="home-hero-title" className="min-w-0 font-neo-display text-2xl font-black leading-tight text-neo-cream sm:text-3xl [@media(max-height:820px)]:text-2xl">
@@ -66,15 +69,14 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
           {meta}
         </div>
 
-        <div data-testid="home-hero-actions" className="flex flex-col gap-2.5 sm:gap-4 @2xl/hero:flex-row @2xl/hero:items-center">
         {codeSlot ? (
-          <div data-testid="home-hero-code-slot" className="min-w-0 @2xl/hero:flex-1">
+          <div data-testid="home-hero-code-slot" className="min-w-0 @3xl/hero:col-start-2 @3xl/hero:row-span-2 @3xl/hero:row-start-1 @3xl/hero:self-center">
             {codeSlot}
           </div>
         ) : code ? (
           <div
             data-testid="home-desk-code-panel"
-            className="flex flex-wrap items-center gap-x-2 gap-y-1.5 rounded-neo border-2 border-neo-cream/35 bg-neo-navy p-2.5 sm:gap-x-3 sm:p-3 @2xl/hero:flex-1"
+            className="flex flex-wrap items-center gap-x-2 gap-y-1.5 rounded-neo border-2 border-neo-cream/35 bg-neo-navy p-2.5 sm:gap-x-3 sm:p-3 @3xl/hero:col-start-2 @3xl/hero:row-span-2 @3xl/hero:row-start-1 @3xl/hero:self-center"
           >
             <span className="w-full font-neo-body text-xs font-bold text-neo-cream/70 max-sm:sr-only">{t('academy.hq.classCode')}</span>
             <p data-testid="home-desk-code" className="flex gap-1 sm:gap-1.5" dir="ltr">
@@ -104,7 +106,10 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
           </div>
         ) : null}
 
-        <div className="flex items-center gap-x-2 gap-y-1 sm:flex-wrap sm:gap-x-4 @2xl/hero:flex-col @2xl/hero:items-stretch @2xl/hero:gap-y-2">
+        <div
+          data-testid="home-hero-start-row"
+          className="flex flex-col items-stretch gap-1 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-4 sm:gap-y-2 @3xl/hero:col-start-1 @3xl/hero:row-start-2 @3xl/hero:flex-col @3xl/hero:items-stretch @3xl/hero:self-end"
+        >
           <Link
             href={teacherHostHref(language, { classroomId: selected?.id })}
             data-testid="home-start-live"
@@ -114,7 +119,7 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
               setPending(true);
               onStart?.();
             }}
-            className={cn(PRIMARY_BUTTON, 'whitespace-nowrap max-sm:min-w-0 max-sm:flex-1 max-sm:px-3 sm:min-w-[16rem]')}
+            className={cn(PRIMARY_BUTTON, 'w-full whitespace-nowrap sm:w-auto sm:min-w-[16rem] @3xl/hero:w-full')}
           >
             {pending ? (
               <Loader2 className="size-5 animate-spin motion-reduce:animate-none" aria-hidden="true" />
@@ -123,12 +128,11 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
             )}
             {t('eduShell.home.startLive')}
           </Link>
-          {rehearse}
-        </div>
+          {rehearse ? <div className="flex justify-center sm:justify-start @3xl/hero:justify-center">{rehearse}</div> : null}
         </div>
 
-        {codeSlot || !insight ? null : <div className="max-sm:hidden [@media(max-height:780px)]:hidden">{insight}</div>}
-        {nudge}
+        {codeSlot || !insight ? null : <div className="max-sm:hidden @3xl/hero:col-span-2 [@media(max-height:780px)]:hidden">{insight}</div>}
+        {nudge ? <div className="min-w-0 @3xl/hero:col-span-2">{nudge}</div> : null}
       </div>
 
       {projectorOpen && selected && code ? (

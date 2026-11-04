@@ -21517,6 +21517,7 @@ const ja = {
       "colStudents": "生徒",
       "colLastPlayed": "最後のプレイ",
       "students": "生徒 {count}人",
+      "studentsOne": "生徒 1人",
       "notPlayedRecently": "30日間プレイなし",
       "playWith": "{name}でゲームを始める",
       "showCode": "コードを表示",

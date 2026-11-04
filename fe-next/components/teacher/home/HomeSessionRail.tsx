@@ -74,13 +74,13 @@ export function HomeSessionRail({ classroomId, languages, gradeBand, nowMs, last
         </div>
       ) : null}
       {ready && language ? (
-        <ul className="-mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-1.5 [scrollbar-width:none] @2xl:mx-0 @2xl:grid @2xl:grid-cols-3 @2xl:overflow-visible @2xl:px-0 @2xl:pb-0">
+        <ul className="flex flex-col gap-2 @2xl:grid @2xl:grid-cols-3 @2xl:gap-3">
           {rail.map((item, i) => (
             <HomeSessionFlowCard key={item.session.id} accent={CARD_ACCENTS[i % CARD_ACCENTS.length]} item={item} language={language} gradeBand={gradeBand} href={railRunHref(locale, item, classroomId)} t={t} />
           ))}
         </ul>
       ) : (
-        <div aria-busy="true" className="min-h-[9rem]" />
+        <div aria-busy="true" className="min-h-[13.5rem] @2xl:min-h-[9rem]" />
       )}
       {ready && language && more.length > 0 ? (
         <div data-testid="home-session-more" className="hidden @2xl:block min-h-0 flex-1 [container:session-more/size]">

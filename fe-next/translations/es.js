@@ -21530,6 +21530,7 @@ const es = {
       "colStudents": "Alumnos",
       "colLastPlayed": "Última partida",
       "students": "{count} alumnos",
+      "studentsOne": "1 alumno",
       "notPlayedRecently": "Sin partidas en 30 días",
       "playWith": "Empezar una partida con {name}",
       "showCode": "Ver código",

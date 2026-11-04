@@ -20563,6 +20563,7 @@ const en = {
       "colStudents": "Students",
       "colLastPlayed": "Last played",
       "students": "{count} students",
+      "studentsOne": "1 student",
       "notPlayedRecently": "No games in 30 days",
       "playWith": "Start a game with {name}",
       "showCode": "Show code",

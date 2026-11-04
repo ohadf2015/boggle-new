@@ -21217,6 +21217,7 @@ const ru = {
       "colStudents": "Ученики",
       "colLastPlayed": "Последняя игра",
       "students": "Учеников: {count}",
+      "studentsOne": "1 ученик",
       "notPlayedRecently": "Нет игр за 30 дней",
       "playWith": "Начать игру с классом {name}",
       "showCode": "Показать код",
