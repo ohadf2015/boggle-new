@@ -75,7 +75,7 @@ describe('<JoinFlow> layout', () => {
     render(<JoinFlow variant="academy" />);
     const stage = screen.getByTestId('join-stage').className;
     expect(stage).toMatch(/(^|\s)bg-neo-navy(\s|$)/);
-    expect(stage).toContain('border-neo-black');
+    expect(stage).toContain('border-neo-cream');
     expect(stage).toContain('lg:max-w-2xl');
   });
 
