@@ -8,6 +8,8 @@
  * Same retry discipline as account delete: one retry on a transient error,
  * and "already gone" is success.
  */
+import type { SupabaseClient } from '@supabase/supabase-js';
+
 export interface ClassroomDeleteError {
   message?: string;
   status?: number;
@@ -58,12 +60,7 @@ function rowGone(result: ClassroomDeleteResult): boolean {
  * Adapts a service-role Supabase client. select() after delete is what turns
  * an RLS no-op into "zero rows" instead of a silent success.
  */
-export function classroomDeleteClient(admin: {
-  from: (table: string) => {
-    delete: () => { eq: (column: string, value: string) => { select: (cols: string) => Promise<ClassroomDeleteResult> } };
-    select: (cols: string) => { eq: (column: string, value: string) => { maybeSingle: () => Promise<ClassroomDeleteResult> } };
-  };
-}): ClassroomDeleteClient {
+export function classroomDeleteClient(admin: SupabaseClient): ClassroomDeleteClient {
   return {
     deleteWhere: async (table, column, value) => {
       const res = await admin.from(table).delete().eq(column, value).select('id');
