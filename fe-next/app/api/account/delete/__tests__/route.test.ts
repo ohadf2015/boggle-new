@@ -424,6 +424,85 @@ describe('DELETE /api/account/delete', () => {
       (eduTelemetry as any).captureEduServerEvents = originalCapture;
     }
   });
+
+  it('fires growth:account_deleted exactly once on a successful Costa Rica teacher delete, with no PII', async () => {
+    authUser.v = {
+      id: 'user-1',
+      email: 'Teacher@School.org',
+      created_at: '2026-10-29T00:00:00.000Z',
+      user_metadata: { full_name: 'Ada Teacher', signup_surface: 'edu_access' },
+    };
+    db.classrooms = [{ id: 'c4efdd30', name: 'Period 3' }];
+    db.memberships = Array.from({ length: 19 }, (_, i) => ({
+      classroom_id: 'c4efdd30',
+      student_id: `s${i}`,
+      is_rehearsal: false,
+    }));
+    db.allRoundsCount = 15;
+    db.roundsCount = 15;
+    db.latestRound = { started_at: '2026-10-30T12:00:00.000Z', completed_at: '2026-10-30T12:20:00.000Z' };
+    db.profile = {
+      daily_email_subscribed: true,
+      user_role: 'teacher',
+      signup_surface: 'edu_access',
+      utm_source: 'google',
+      utm_medium: 'cpc',
+      utm_campaign: 'brand',
+    };
+    db.analyticsEmail = { utm_campaign: 'day2_value', created_at: '2026-10-31T01:35:00.000Z' };
+
+    const edu = await import('@/backend/utils/educationTelemetry');
+    const capturedAt: number[] = [];
+    const original = edu.captureEduServerEvents;
+    (edu as { captureEduServerEvents: typeof original }).captureEduServerEvents = (events) => {
+      for (const ev of events) {
+        if (ev.event === 'growth:account_deleted') capturedAt.push(cap.deletedUserIds.length);
+      }
+      telemetry.events.push(...events);
+    };
+    try {
+      const res = await DELETE(req({ reason: 'too_expensive', surface: 'settings' }));
+      expect(res.status).toBe(200);
+      expect(await res.json()).toEqual({ success: true, alreadyDeleted: false });
+    } finally {
+      (edu as { captureEduServerEvents: typeof original }).captureEduServerEvents = original;
+    }
+
+    const growth = telemetry.events.filter((e) => e.event === 'growth:account_deleted');
+    expect(growth).toHaveLength(1);
+    expect(capturedAt).toEqual([0]);
+    expect(growth[0].properties).toMatchObject({
+      role: 'teacher',
+      classes: 1,
+      members: 19,
+      rounds: 15,
+      signup_surface: 'edu_access',
+      utm_campaign: 'day2_value',
+      reason: 'too_expensive',
+    });
+    expect(growth[0].properties.account_age_hours).toEqual(expect.any(Number));
+    expect(growth[0].properties.last_round_age_hours).toEqual(expect.any(Number));
+    const blob = JSON.stringify(growth[0].properties);
+    expect(blob).not.toContain('Teacher@School.org');
+    expect(blob).not.toContain('Ada Teacher');
+    expect(blob).not.toContain('Period 3');
+    for (const key of Object.keys(growth[0].properties)) {
+      expect(key).not.toMatch(/email|name|phone/i);
+    }
+  });
+
+  it('omits utm_campaign when no email landing is known', async () => {
+    authUser.v = { id: 'user-1', email: 'teacher@school.org', created_at: '2026-11-01T00:00:00.000Z' };
+    db.classrooms = [{ id: 'c1', name: 'Period 3' }];
+    db.memberships = [{ classroom_id: 'c1', student_id: 's1', is_rehearsal: false }];
+    db.profile = { daily_email_subscribed: true, user_role: 'teacher', signup_surface: 'edu_access' };
+    const res = await DELETE(req());
+    expect(res.status).toBe(200);
+    const growth = telemetry.events.filter((e) => e.event === 'growth:account_deleted');
+    expect(growth).toHaveLength(1);
+    expect(growth[0].properties.utm_campaign).toBeNull();
+    expect(growth[0].properties.reason).toBeNull();
+  });
 });
 
 describe('GET /api/account/delete (impact summary)', () => {
