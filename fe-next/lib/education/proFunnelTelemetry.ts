@@ -84,7 +84,8 @@ export type ProUpgradeSource =
   | 'pro_gate_reports'
   | 'pro_gate_pressureDials'
   | 'pro_gate_mastery'
-  | 'pro_gate_missedPractice';
+  | 'pro_gate_missedPractice'
+  | 'progress_report';
 
 export type TrialCtaSource =
   | 'dashboard_trial_offer'

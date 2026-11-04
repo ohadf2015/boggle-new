@@ -15641,6 +15641,21 @@ const sv = {
         "untitled": "Namnlös lektion",
         "anonymousStudent": "Elev {{id}}"
       },
+      "progressMatrix": {
+        "title": "Framsteg per elev",
+        "empty": "Inga elever eller uppgifter i den här klassen ännu",
+        "trend": "Trend",
+        "trendUp": "Förbättras",
+        "trendDown": "Försämras",
+        "trendFlat": "Stabil",
+        "trendNone": "Inte tillräckligt med data ännu",
+        "cellCompleted": "Klar, {{score}}% rätt",
+        "cellMissing": "Ej klar",
+        "sampleTitle": "Korrekthet per elev",
+        "gateTitle": "Elevpoäng är en Pro-funktion",
+        "gateBody": "Se varje elevs korrekthet på varje uppgift och om de förbättras eller faller — poängen bakom slutförandeantalen.",
+        "gateCta": "Se elevpoäng med Pro: {{price}}/månad"
+      },
       "classGrid": {
         "title": "Klassens framsteg",
         "empty": "Inga elever eller uppgifter i den här klassen ännu",

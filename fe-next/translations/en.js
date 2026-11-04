@@ -13464,6 +13464,21 @@ const en = {
         "untitled": "Untitled lesson",
         "anonymousStudent": "Student {{id}}"
       },
+      "progressMatrix": {
+        "title": "Per-student progress",
+        "empty": "No students or assignments in this class yet",
+        "trend": "Trend",
+        "trendUp": "Improving",
+        "trendDown": "Declining",
+        "trendFlat": "Holding steady",
+        "trendNone": "Not enough data yet",
+        "cellCompleted": "Completed, {{score}}% correct",
+        "cellMissing": "Not completed",
+        "sampleTitle": "Per-student correctness",
+        "gateTitle": "Per-student scores are a Pro feature",
+        "gateBody": "See each student's correctness on every assignment and whether they are improving or slipping — the score behind the completion counts.",
+        "gateCta": "See per-student scores with Pro: {{price}}/month"
+      },
       "classGrid": {
         "title": "Class progress",
         "empty": "No students or assignments in this class yet",
