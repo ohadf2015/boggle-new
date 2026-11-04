@@ -63,15 +63,17 @@ type AuthAdmin = {
 export async function fetchLastSignIns(supabase: SupabaseClient, ids: string[]): Promise<Map<string, string>> {
   const out = new Map<string, string>();
   const unique = [...new Set(ids.filter(Boolean))];
-  const getUser = (supabase as { auth?: { admin?: AuthAdmin } }).auth?.admin?.getUserById;
-  if (typeof getUser !== 'function' || unique.length === 0) return out;
+  // Call getUserById on the admin object. supabase-js GoTrueAdminApi reads this.fetch;
+  // detaching the method throws TypeError and the catch below would drop every sign-in.
+  const admin = (supabase as { auth?: { admin?: AuthAdmin } }).auth?.admin;
+  if (!admin || typeof admin.getUserById !== 'function' || unique.length === 0) return out;
 
   let next = 0;
   async function worker() {
     while (next < unique.length) {
       const id = unique[next++];
       try {
-        const { data, error } = await getUser(id);
+        const { data, error } = await admin.getUserById(id);
         if (error) continue;
         const ts = data?.user?.last_sign_in_at;
         if (ts) out.set(id, ts);

@@ -108,4 +108,24 @@ describe('teacher activity signal reads', () => {
     const signIns = await fetchLastSignIns({ from: () => ({}) } as never, ['cr']);
     expect(signIns.size).toBe(0);
   });
+
+  it('keeps the auth admin binding so a this-sensitive getUserById still returns last_sign_in_at', async () => {
+    // supabase-js GoTrueAdminApi.getUserById reads this.fetch. Detaching it throws
+    // TypeError('reading fetch'); the catch then drops the sign-in clock entirely
+    // (sign-in-only returner, last_seen stuck at signup).
+    const admin = {
+      fetch: true as const,
+      getUserById(id: string) {
+        if (!this?.fetch) {
+          throw new TypeError("Cannot read properties of undefined (reading 'fetch')");
+        }
+        return {
+          data: { user: { id, last_sign_in_at: '2026-10-27T11:45:33.732099Z' } },
+          error: null,
+        };
+      },
+    };
+    const signIns = await fetchLastSignIns({ auth: { admin } } as never, ['1f8f47b9']);
+    expect(signIns.get('1f8f47b9')).toBe('2026-10-27T11:45:33.732099Z');
+  });
 });
