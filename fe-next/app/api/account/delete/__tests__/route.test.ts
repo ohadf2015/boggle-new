@@ -19,7 +19,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const authUser = {
-  v: { id: 'user-1', email: 'Teacher@School.org' } as { id: string; email?: string } | null,
+  v: { id: 'user-1', email: 'Teacher@School.org' } as {
+    id: string;
+    email?: string;
+    created_at?: string;
+    user_metadata?: Record<string, unknown>;
+  } | null,
 };
 vi.mock('@/utils/supabase/server', () => ({
   createClient: async () => ({
@@ -39,8 +44,14 @@ vi.mock('@/backend/utils/educationTelemetry', () => ({
 const db = {
   classrooms: [] as Array<{ id: string; name: string | null }>,
   memberships: [] as Array<{ classroom_id: string; student_id: string; is_rehearsal: boolean | null }>,
+  /** Completed rounds with players — the interstitial impact query. */
   roundsCount: 0,
-  profile: { daily_email_subscribed: true } as { daily_email_subscribed: boolean | null } | null,
+  /** Every classroom_rounds row for the owned classes — growth:account_deleted. */
+  allRoundsCount: 0,
+  latestRound: null as { started_at: string | null; completed_at: string | null } | null,
+  profile: { daily_email_subscribed: true } as Record<string, unknown> | null,
+  analyticsEmail: null as { utm_campaign: string | null; created_at: string } | null,
+  guestEmail: null as { utm_campaign: string | null; last_visit_at: string } | null,
 };
 
 const cap = {
@@ -60,23 +71,34 @@ function runDeleteUser(id: string) {
 vi.mock('@/utils/supabase/admin', () => ({
   createAdminClient: () => ({
     from: (table: string) => {
+      const state = { countHead: false, completedOnly: false };
       const qb: Record<string, unknown> = {};
       const resolveQuery = () => {
         if (table === 'classrooms') return { data: db.classrooms, error: null };
         if (table === 'classroom_memberships') return { data: db.memberships, error: null };
-        if (table === 'classroom_rounds') return { data: null, count: db.roundsCount, error: null };
+        if (table === 'classroom_rounds' && state.countHead && state.completedOnly) {
+          return { data: null, count: db.roundsCount, error: null };
+        }
+        if (table === 'classroom_rounds' && state.countHead) {
+          return { data: null, count: db.allRoundsCount, error: null };
+        }
+        if (table === 'classroom_rounds') return { data: db.latestRound, error: null };
         if (table === 'profiles') return { data: db.profile, error: null };
+        if (table === 'analytics_events') return { data: db.analyticsEmail, error: null };
+        if (table === 'guest_sessions') return { data: db.guestEmail, error: null };
         return { data: null, error: null };
       };
-      for (const m of ['select', 'eq', 'in', 'not', 'gte', 'delete'] as const) {
+      for (const m of ['select', 'eq', 'in', 'not', 'gte', 'delete', 'or', 'order', 'limit'] as const) {
         qb[m] = (...args: unknown[]) => {
+          if (m === 'select' && args[1] && (args[1] as { head?: boolean }).head) state.countHead = true;
+          if (m === 'not') state.completedOnly = true;
           if (m === 'eq' && (table === 'teacher_access_requests' || table === 'teacher_access_allowlist' || table === 'user_push_tokens')) {
             cap.deletes.push({ table, col: args[0], val: args[1] });
           }
           return qb;
         };
       }
-      qb.maybeSingle = () => Promise.resolve({ data: db.profile, error: null });
+      qb.maybeSingle = () => Promise.resolve(resolveQuery());
       (qb as { then: unknown }).then = (resolve: (v: unknown) => void) => resolve(resolveQuery());
       return qb;
     },
@@ -110,7 +132,11 @@ beforeEach(() => {
   db.classrooms = [];
   db.memberships = [];
   db.roundsCount = 0;
+  db.allRoundsCount = 0;
+  db.latestRound = null;
   db.profile = { daily_email_subscribed: true };
+  db.analyticsEmail = null;
+  db.guestEmail = null;
   authUser.v = { id: 'user-1', email: 'Teacher@School.org' };
 });
 
@@ -252,6 +278,67 @@ describe('DELETE /api/account/delete', () => {
     });
     expect(typeof growth!.properties.account_age_days).toBe('number');
     expect(growth!.properties.account_age_days).toBeGreaterThan(0);
+  });
+
+  it('fires growth:account_deleted once before deleteUser, even when deleteUser fails', async () => {
+    authUser.v = {
+      id: 'user-1',
+      email: 'Teacher@School.org',
+      created_at: '2026-11-04T00:00:00.000Z',
+      user_metadata: { signup_surface: 'edu_access' },
+    };
+    db.classrooms = [{ id: 'c1', name: 'Period 3' }];
+    db.memberships = [{ classroom_id: 'c1', student_id: 's1', is_rehearsal: false }];
+    db.allRoundsCount = 3;
+    db.latestRound = { started_at: '2026-11-03T00:00:00.000Z', completed_at: '2026-11-03T00:10:00.000Z' };
+    db.profile = {
+      daily_email_subscribed: true,
+      user_role: 'teacher',
+      signup_surface: 'edu_access',
+      utm_source: 'google',
+      utm_medium: 'cpc',
+      utm_campaign: 'brand',
+    };
+    db.analyticsEmail = { utm_campaign: 'day2_value', created_at: '2026-11-03T12:00:00.000Z' };
+    cap.deleteUserResults = [{ error: { message: 'Forbidden', status: 403 } }];
+
+    const edu = await import('@/backend/utils/educationTelemetry');
+    const capturedAt: number[] = [];
+    const original = edu.captureEduServerEvents;
+    (edu as { captureEduServerEvents: typeof original }).captureEduServerEvents = (events) => {
+      for (const ev of events) {
+        if (ev.event === 'growth:account_deleted') capturedAt.push(cap.deletedUserIds.length);
+      }
+      telemetry.events.push(...events);
+    };
+    try {
+      const res = await DELETE(req({ reason: 'privacy', surface: 'settings' }));
+      expect(res.status).toBe(500);
+    } finally {
+      (edu as { captureEduServerEvents: typeof original }).captureEduServerEvents = original;
+    }
+
+    const growth = telemetry.events.filter((e) => e.event === 'growth:account_deleted');
+    expect(growth).toHaveLength(1);
+    expect(capturedAt).toEqual([0]);
+    expect(growth[0].properties).toMatchObject({
+      role: 'teacher',
+      classes: 1,
+      members: 1,
+      rounds: 3,
+      signup_surface: 'edu_access',
+      utm_campaign: 'day2_value',
+      reason: 'privacy',
+    });
+    expect(growth[0].properties.last_round_age_hours).toEqual(expect.any(Number));
+    expect(growth[0].properties.account_age_hours).toEqual(expect.any(Number));
+    const blob = JSON.stringify(growth[0].properties);
+    expect(blob).not.toContain('Teacher@School.org');
+    expect(blob).not.toContain('teacher@school.org');
+    expect(blob).not.toContain('Period 3');
+    for (const key of Object.keys(growth[0].properties)) {
+      expect(key).not.toMatch(/email|name|phone/i);
+    }
   });
 
   it('emits growth:account_deleted for non-teacher with is_teacher:false', async () => {
