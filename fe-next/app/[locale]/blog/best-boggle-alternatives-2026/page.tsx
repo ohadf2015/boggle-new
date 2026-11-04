@@ -13,7 +13,7 @@ interface PageProps {
 
 const SLUG = 'best-boggle-alternatives-2026';
 const DATE_PUBLISHED = '2025-12-01';
-const DATE_MODIFIED = '2026-05-19';
+const DATE_MODIFIED = '2026-11-04';
 
 const metaTitles: Record<string, string> = {
   en: '6 Free Games Like Boggle — No Signup, Live | LexiClash',
