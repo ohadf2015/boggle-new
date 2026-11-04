@@ -65,6 +65,7 @@ import playerProfileRoutes from '../backend/routes/playerProfile';
 import avatarPngRoutes from '../backend/routes/avatarPng';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import { appRouter } from '../backend/trpc/root';
+import { sendGateNotFound } from './gateNotFound';
 
 // Configuration
 const dev: boolean = process.env.NODE_ENV !== 'production';
@@ -236,7 +237,7 @@ async function start(): Promise<void> {
       const gate = decideNextHandle(pathname ?? '', req.headers['user-agent']);
       if (gate.action === 'drop') {
         noteNextHandleDrop(gate.reason);
-        res.status(404).end();
+        sendGateNotFound(res, req.method);
         return;
       }
       if (gate.action === 'redirect') {
