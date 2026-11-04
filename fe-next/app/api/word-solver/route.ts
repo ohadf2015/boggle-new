@@ -7,13 +7,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit, rateLimitResponse } from '@/lib/apiRateLimit';
 import { normalizeHebrewWord, applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
-import { BLANK_CHARS, MAX_BLANKS, buildMatcher, parsePattern } from './matcher';
+import { BLANK_CHARS, MAX_BLANKS, MAX_RESULTS, buildMatcher, parsePattern, type FinderQuery } from './matcher';
 import { foldJapaneseInput } from './japaneseInput';
+import { foldYo, solveRussian } from './russianSolver';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const VALID_LANGUAGES = ['en', 'es', 'he', 'sv', 'ja'] as const;
+const VALID_LANGUAGES = ['en', 'es', 'he', 'sv', 'ja', 'ru'] as const;
 type SolverLanguage = (typeof VALID_LANGUAGES)[number];
 
 interface WordSolverRequest {
@@ -56,6 +57,8 @@ function normalizeInput(letters: string, language: SolverLanguage): string {
       return letters.toLowerCase().replace(/[^a-zåäöéàü]/gi, '').toLowerCase();
     case 'es':
       return letters.toLowerCase().replace(/[^a-záéíóúüñ]/gi, '').toLowerCase();
+    case 'ru':
+      return foldYo(letters.normalize('NFC').toLowerCase()).replace(/[^а-я]/g, '');
     case 'en':
     default:
       return letters.toLowerCase().replace(/[^a-z]/g, '');
@@ -129,13 +132,12 @@ export async function POST(request: NextRequest) {
       : null;
 
   try {
-    const dictionary = await getDictionary(language);
     const normalizedInput = normalizeInput(letters.replace(BLANK_CHARS, ''), language);
     if (!pattern && normalizedInput.length + blanks < 2) {
       return NextResponse.json({ words: [], total: 0 });
     }
 
-    const matches = buildMatcher({
+    const query: FinderQuery = {
       rack: normalizedInput,
       blanks,
       pattern,
@@ -143,7 +145,13 @@ export async function POST(request: NextRequest) {
       endsWith: filterText(body.endsWith),
       contains: filterText(body.contains),
       length: lengthFilter,
-    });
+    };
+    if (language === 'ru') {
+      return NextResponse.json(solveRussian(query));
+    }
+
+    const dictionary = await getDictionary(language);
+    const matches = buildMatcher(query);
     // Set: the Hebrew dictionary stores sofit-folded forms, so restoring the
     // final letter can collapse two entries into one display word.
     const found = new Set<string>();
@@ -161,12 +169,12 @@ export async function POST(request: NextRequest) {
     results.sort((a, b) => b.length - a.length || a.localeCompare(b));
 
     // Cap at 500 results to prevent huge responses
-    const capped = results.slice(0, 500);
+    const capped = results.slice(0, MAX_RESULTS);
 
     return NextResponse.json({
       words: capped,
       total: results.length,
-      capped: results.length > 500,
+      capped: results.length > MAX_RESULTS,
     });
   } catch (error) {
     console.error('[word-solver] Error:', error);
