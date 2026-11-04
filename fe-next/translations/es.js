@@ -10198,6 +10198,7 @@ const es = {
       "guestNameDefaultHint": "Ahora apareces como \"{name}\", un nombre aleatorio que reciben muchos jugadores.",
       "guestNamePlaceholder": "Tu nombre",
       "guestNameClaim": "Mostrar mi nombre",
+      "guestNameNotNow": "Ahora no",
       "guestNameDefaultNudge": "Estás en la clasificación como {name}, un nombre aleatorio. Haz tuya esta puntuación.",
       "guestNameUseMine": "Usar mi nombre",
       "wordsFound": "Palabras encontradas",

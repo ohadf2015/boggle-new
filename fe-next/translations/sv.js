@@ -10632,6 +10632,7 @@ const sv = {
       "guestNameDefaultHint": "Just nu syns du som \"{name}\", ett slumpat namn som många spelare får.",
       "guestNamePlaceholder": "Ditt namn",
       "guestNameClaim": "Visa mitt namn",
+      "guestNameNotNow": "Inte nu",
       "guestNameDefaultNudge": "Du står på listan som {name}, ett slumpat namn. Gör resultatet till ditt.",
       "guestNameUseMine": "Använd mitt namn",
       "wordsFound": "Hittade ord",
