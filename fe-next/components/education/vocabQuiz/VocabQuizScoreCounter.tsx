@@ -98,6 +98,7 @@ export function VocabQuizScoreCounter({ score, pop, t, className }: VocabQuizSco
         <span
           key={flying.key}
           data-testid="vocab-quiz-score-pop"
+          dir="ltr"
           aria-hidden
           className={cn(
             'pointer-events-none absolute -top-5 end-0 whitespace-nowrap',

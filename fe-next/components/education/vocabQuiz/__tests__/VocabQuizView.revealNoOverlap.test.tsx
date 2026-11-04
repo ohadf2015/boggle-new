@@ -76,6 +76,13 @@ describe('VocabQuizView — the reveal never sits on the answer tiles', () => {
 });
 
 describe('VocabQuizView — the verdict is loud', () => {
+  it('puts the reacting mascot inside the verdict, in flow', () => {
+    toReveal({ correct: true, choiceIndex: 0, points: 148, streak: 1 });
+    const face = screen.getByTestId('vocab-quiz-verdict-mascot');
+    expect(screen.getByTestId('vocab-quiz-verdict')).toContainElement(face);
+    expect(absoluteAncestor(face)).toBeNull();
+  });
+
   it('shows the points this answer earned in the verdict itself', () => {
     toReveal({ correct: true, choiceIndex: 0, points: 148, streak: 3 });
     expect(screen.getByTestId('vocab-quiz-verdict-points')).toHaveTextContent('+148');

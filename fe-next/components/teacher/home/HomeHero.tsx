@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { teacherHostHref } from '@/lib/education/teacherHostHref';
 import { HqProjectorSheet } from '@/components/teacher/hq/HqProjectorSheet';
-import { OUTLINE_BUTTON, PANEL, PRIMARY_BUTTON } from './homeStyles';
+import { OUTLINE_BUTTON, PANEL_RAISED, PRIMARY_BUTTON } from './homeStyles';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -43,17 +43,19 @@ export interface HomeHeroProps {
   showCode?: boolean;
   /** Replaces the code panel: the Get students in card for a class still below its student goal. */
   codeSlot?: ReactNode;
+  /** Free-plan class count ("2 of 3 free classes used"), shown inside the class menu; omit for Pro. */
+  capLabel?: string;
 }
 
 /** The class desk: which class, its join code at a glance, and the one Start button. */
-export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, t, rehearse, nudge, meta, insight, corner, showCode = true, codeSlot }: HomeHeroProps) {
+export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, t, rehearse, nudge, meta, insight, corner, showCode = true, codeSlot, capLabel }: HomeHeroProps) {
   const selected = classrooms.find((c) => c.id === selectedId) ?? classrooms[0];
   const [pending, setPending] = useState(false);
   const [projectorOpen, setProjectorOpen] = useState(false);
   const code = showCode ? (selected?.join_code?.trim() ?? '') : '';
 
   return (
-    <section data-testid="home-hero" aria-labelledby="home-hero-title" className={cn(PANEL, 'relative @container/hero')}>
+    <section data-testid="home-hero" aria-labelledby="home-hero-title" className={cn(PANEL_RAISED, 'relative @container/hero')}>
       <div
         data-testid="home-hero-grid"
         className="grid gap-3 p-3 sm:gap-4 sm:p-5 @3xl/hero:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] @3xl/hero:grid-rows-[auto_1fr] @3xl/hero:gap-x-6 [@media(max-height:820px)]:gap-2.5 [@media(max-height:820px)]:p-3.5"
@@ -64,7 +66,7 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
             {corner}
           </div>
           <h2 id="home-hero-title" className="min-w-0 font-neo-display text-2xl font-black leading-tight text-neo-cream sm:text-3xl [@media(max-height:820px)]:text-2xl">
-            <ClassPicker classrooms={classrooms} selected={selected} onSelect={onSelect} t={t} />
+            <ClassPicker classrooms={classrooms} selected={selected} onSelect={onSelect} capLabel={capLabel} t={t} />
           </h2>
           {meta}
         </div>
@@ -149,11 +151,13 @@ function ClassPicker({
   classrooms,
   selected,
   onSelect,
+  capLabel,
   t,
 }: {
   classrooms: readonly HomeHeroClass[];
   selected: HomeHeroClass | undefined;
   onSelect: (id: string) => void;
+  capLabel?: string;
   t: T;
 }) {
   const label = <span dir="auto" className="min-w-0 break-words">{selected?.name}</span>;
@@ -189,6 +193,11 @@ function ClassPicker({
             <span dir="auto" className="truncate">{c.name}</span>
           </DropdownMenuItem>
         ))}
+        {capLabel ? (
+          <p data-testid="home-class-menu-cap" className="mt-1 border-t-2 border-neo-cream/10 px-2 pb-1 pt-2 font-neo-body text-xs font-bold text-neo-cream/70">
+            {capLabel}
+          </p>
+        ) : null}
       </DropdownMenuContent>
     </DropdownMenu>
   );

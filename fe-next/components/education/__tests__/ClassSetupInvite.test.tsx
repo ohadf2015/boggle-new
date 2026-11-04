@@ -58,6 +58,15 @@ describe('ClassSetupInvite', () => {
     expect(tel.shared).toHaveBeenCalledWith({ classroomId: 'c1', method: 'whatsapp' });
   });
 
+  it('Given the invite step, Then the way home sits after the actions so nothing splits the roster from the hero action', () => {
+    render(<ClassSetupInvite classroomId="c1" />);
+    const actions = screen.getByTestId('setup-actions');
+    const quiet = screen.getByTestId('setup-quiet-links');
+    expect(quiet).toHaveTextContent('eduShell.setup.backHome');
+    expect(actions.compareDocumentPosition(quiet) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.getByTestId('invite-roster').compareDocumentPosition(actions) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
   it('Given students on the roster, Then their names show and Start leads', () => {
     roster.current = { students: [{ id: 's1', name: 'Maya S', avatar: null }], loading: false, arrivals: ['s1'] };
     render(<ClassSetupInvite classroomId="c1" />);
@@ -80,6 +89,18 @@ describe('ClassSetupInvite', () => {
     expect(sessionStorage.getItem(QUICK_LAUNCH_KEY)).toBeNull();
     fireEvent.click(start);
     expect(JSON.parse(sessionStorage.getItem(QUICK_LAUNCH_KEY) ?? '{}')).toMatchObject({ source: 'pack', packKey: pack.nameKey, classroomId: 'c1' });
+  });
+
+  it.each([
+    ['no students yet', [] as { id: string; name: string; avatar: null }[]],
+    ['students in', [{ id: 's1', name: 'Maya S', avatar: null }]],
+  ])('Given %s, Then the one hero action sits in the same bottom slot', (_label, students) => {
+    roster.current = { students, loading: false, arrivals: [] };
+    render(<ClassSetupInvite classroomId="c1" />);
+    const slot = screen.getByTestId('setup-hero-slot');
+    const heroes = [screen.getByTestId('setup-projector'), screen.getByTestId('setup-start-game')].filter((el) => el.dataset.hero === 'true');
+    expect(heroes).toHaveLength(1);
+    expect(slot).toContainElement(heroes[0]);
   });
 
   it('Given an unknown class id, Then it says so and links to the class list', () => {

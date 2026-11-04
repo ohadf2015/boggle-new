@@ -31,4 +31,22 @@ describe('education landing — page-level horizontal rhythm', () => {
     expect(tag, `section for ${key} has no max width`).toMatch(/\bmax-w-/);
     expect(tag, `section for ${key} has no horizontal padding`).toMatch(/\bpx-\d/);
   });
+
+  it('centres the no-account join under the closing CTA with a gap above it', () => {
+    const at = SOURCE.indexOf('<NoAccountCta');
+    const open = SOURCE.lastIndexOf('<div', at);
+    const tag = SOURCE.slice(open, SOURCE.indexOf('>', open) + 1);
+    expect(tag).toMatch(/\bjustify-center\b/);
+    expect(tag).toMatch(/\bw-full\b/);
+    expect(tag).toMatch(/\bpt-\d/);
+  });
+
+  it('stretches the resource links section to the page column', () => {
+    // A flex child with mx-auto loses stretch and shrinks to its content.
+    const page = readFileSync(join(__dirname, '..', 'page.tsx'), 'utf8');
+    const open = page.indexOf('<section aria-label={resourcesAriaLabel}');
+    const tag = page.slice(open, page.indexOf('>', open) + 1);
+    expect(tag).toMatch(/\bmx-auto\b/);
+    expect(tag).toMatch(/\bw-full\b/);
+  });
 });
