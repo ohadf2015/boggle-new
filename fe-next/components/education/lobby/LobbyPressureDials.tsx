@@ -4,7 +4,7 @@
  *
  * Three rows, one per dial: leaderboard visibility, timer pressure, scoring
  * weight. They are PRO (or a live access trial): a free teacher sees them frozen on the loud defaults
- * with a lock and an upgrade link, because a control that is invisible cannot
+ * with an inline Pro lock, because a control that is invisible cannot
  * be sold — and what is shown frozen is what the game will run, never a calm
  * draft the server will ignore.
  *
@@ -16,8 +16,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { Gauge, Trophy, Timer, Target, Lock } from 'lucide-react';
+import { Gauge, Trophy, Timer, Target } from 'lucide-react';
+import { ProInlineLock } from '@/components/teacher/pro/ProInlineLock';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { pressureDialsUnlocked } from './pressureAccess';
@@ -38,7 +38,7 @@ export interface LobbyPressureDialsProps {
 }
 
 export function LobbyPressureDials({ pressure, onChange }: LobbyPressureDialsProps) {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const { hasPro, loading, accessTrialExpires } = useTeacherPro();
   const [nowMs] = useState(() => Date.now());
   const locked = !pressureDialsUnlocked({ hasPro, loading, accessTrialExpires: accessTrialExpires ?? null }, nowMs);
@@ -70,14 +70,7 @@ export function LobbyPressureDials({ pressure, onChange }: LobbyPressureDialsPro
           </span>
         </span>
         {!loading && locked && (
-          <Link
-            href={`/${language}/teacher/upgrade`}
-            data-testid="pressure-pro-lock"
-            className="inline-flex min-h-11 items-center gap-1.5 rounded-neo border-2 border-neo-cream/35 bg-transparent px-3 py-1 font-neo-display text-sm font-bold text-neo-cream transition-colors hover:border-neo-cream/60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
-          >
-            <Lock className="size-3.5" strokeWidth={3} aria-hidden="true" />
-            {t('teacher.proGate.pressureDials.title')}
-          </Link>
+          <ProInlineLock feature="pressureDials" label={t('teacher.proGate.pressureDials.title')} />
         )}
       </div>
 

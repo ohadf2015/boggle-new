@@ -12,6 +12,8 @@ vi.mock('@/utils/authFetch', () => ({ fetchWithAuth: vi.fn() }));
 vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
 const pro = { hasPro: true, loading: false };
 vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => pro }));
+vi.mock('@/hooks/useTeacherProCheckout', () => ({ useTeacherProCheckout: () => ({ pending: false, start: vi.fn() }) }));
+vi.mock('@/hooks/useCheckoutBlockedInApp', () => ({ useCheckoutBlockedInApp: () => false }));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, params?: Record<string, unknown>) => (params ? `${key}:${JSON.stringify(params)}` : key),
@@ -106,11 +108,11 @@ describe('CompletionTracker', () => {
     expect(JSON.parse(init.body).words).toEqual(['apple']);
   });
 
-  it('offers the re-practice as an upgrade on the free plan', async () => {
+  it('offers the re-practice as an inline Pro lock on the free plan', async () => {
     pro.hasPro = false;
     completions.mockResolvedValue({ data: [progress('s1', { apple: [0, 1] })], error: null });
     renderTracker();
-    expect(await screen.findByRole('link', { name: /eduPro.practice.cta/ })).toHaveAttribute('href', '/en/teacher/upgrade');
+    expect(await screen.findByTestId('pro-inline-lock-missedPractice')).toHaveTextContent('eduPro.practice.cta');
   });
 
   it('reads a finished row with no word data as played, with no misses and no bare %', async () => {

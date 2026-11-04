@@ -1,14 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
-import { CalendarCheck, Loader2, Lock, Sparkles } from 'lucide-react';
+import { CalendarCheck, Loader2, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { SPACED_REVIEW_DAYS } from '@/lib/education/wordMasteryReport';
-import { trackGrowthEvent } from '@/utils/growthTracking';
 import { fetchWithAuth } from '@/utils/authFetch';
 import { cn } from '@/lib/utils';
+import { ProInlineLock } from '@/components/teacher/pro/ProInlineLock';
 
 type Status =
   | { kind: 'idle' }
@@ -42,20 +41,9 @@ export function MissedPracticeAction({
 
   if (locked) {
     return (
-      <div className="flex flex-wrap items-center gap-3">
-      <Link
-        href={`/${language}/teacher/upgrade`}
-        onClick={() => trackGrowthEvent('landing_cta_clicked', { cta: 'pro_gate_missedPractice' })}
-        className={cn(
-          'inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-neo-lime bg-neo-navy px-4 py-2 font-neo-display text-sm font-black text-neo-lime shadow-hard',
-          PRESS,
-        )}
-      >
-        <Lock className="size-4" aria-hidden="true" />
-        {t('eduPro.practice.cta')}
-        <span className="rounded-neo border-2 border-black bg-neo-lime px-1.5 text-[11px] text-neo-black">{t('eduPro.mastery.proBadge')}</span>
-      </Link>
-      <span className="text-xs font-bold text-neo-cream/70">{t('eduPro.practice.hint')}</span>
+      <div className="flex flex-wrap items-start gap-3">
+        <ProInlineLock feature="missedPractice" label={t('eduPro.practice.cta')} />
+        <span className="self-center text-xs font-bold text-neo-cream/70">{t('eduPro.practice.hint')}</span>
       </div>
     );
   }
