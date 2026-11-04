@@ -24,7 +24,11 @@ interface Copy {
   lead: (n: number, m: number) => string;
   report: string;
   pro: string;
+  /** Softened free-plan claim. Never the hard line "no card required, nothing renews automatically". */
+  reassurance: string;
   price: string;
+  /** Quieter lead-in for the secondary Pro link. Not a second button. */
+  proLead: string;
   ask: string;
   signoff: string;
   dir: 'ltr' | 'rtl';
@@ -39,7 +43,9 @@ const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
     lead: (n, m) => `${n} students joined, ${m} games played in your class.`,
     report: 'Open the progress report',
     pro: 'Unlock Teacher Pro — $9/mo',
+    reassurance: 'The free plan stays free. No card is needed to keep using it, and you will not be charged unless you choose to upgrade.',
     price: 'Teacher Pro is $9/month: unlimited classes and the full progress report. Cancel any time.',
+    proLead: 'If you ever want more, Teacher Pro is here:',
     ask: 'Hit a problem or have a question? Just reply to this email — I read every one.',
     signoff: '— Ohad, the creator of LexiClash',
     dir: 'ltr',
@@ -50,7 +56,9 @@ const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
     lead: (n, m) => `${n} תלמידים הצטרפו, ${m} משחקים שוחקו בכיתה שלך.`,
     report: 'לפתוח את דוח ההתקדמות',
     pro: 'לשדרג ל-Teacher Pro — 9$ לחודש',
+    reassurance: 'התוכנית החינמית נשארת חינמית. לא צריך כרטיס אשראי כדי להמשיך להשתמש בה, ולא נחייב אותך אלא אם תבחר/י לשדרג.',
     price: 'Teacher Pro עולה 9$ לחודש: כיתות ללא הגבלה ודוח התקדמות מלא. אפשר לבטל בכל רגע.',
+    proLead: 'ואם מתישהו תרצה/י יותר — Teacher Pro כאן בשבילך:',
     ask: 'נתקעת או שיש לך שאלה? פשוט השב/י למייל הזה — אני קורא הכול.',
     signoff: '— אוהד, היוצר של LexiClash',
     dir: 'rtl',
@@ -61,7 +69,9 @@ const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
     lead: (n, m) => `${n} elever har gått med och ${m} spel har spelats i din klass.`,
     report: 'Öppna framstegsrapporten',
     pro: 'Lås upp Teacher Pro — $9/mån',
+    reassurance: 'Den kostnadsfria planen förblir gratis. Du behöver inget kort för att fortsätta använda den, och vi debiterar dig inte om du inte själv väljer att uppgradera.',
     price: 'Teacher Pro kostar $9/månad: obegränsade klasser och hela framstegsrapporten. Avsluta när du vill.',
+    proLead: 'Om du någon gång vill ha mer finns Teacher Pro här:',
     ask: 'Fastnade du eller har du en fråga? Svara på det här mejlet — jag läser alla.',
     signoff: '— Ohad, skaparen av LexiClash',
     dir: 'ltr',
@@ -72,7 +82,9 @@ const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
     lead: (n, m) => `クラスに生徒が${n}人参加し、ゲームが${m}回プレイされました。`,
     report: '進捗レポートを開く',
     pro: 'Teacher Proを解除 — 月額$9',
+    reassurance: '無料プランはそのまま無料です。使い続けるのにカードは不要で、アップグレードを選ばない限り請求されることはありません。',
     price: 'Teacher Proは月額$9です。クラス数無制限と完全な進捗レポート。いつでも解約できます。',
+    proLead: 'もっと必要になったら、Teacher Proはこちらです。',
     ask: '困ったことや質問があれば、このメールに返信してください。すべて読みます。',
     signoff: '— LexiClashの作者、Ohad',
     dir: 'ltr',
@@ -83,7 +95,9 @@ const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
     lead: (n, m) => `${n} estudiantes se unieron y se jugaron ${m} juegos en tu clase.`,
     report: 'Abrir el informe de progreso',
     pro: 'Activa Teacher Pro — $9/mes',
+    reassurance: 'El plan gratuito sigue siendo gratis. No necesitas tarjeta para seguir usándolo, y no te cobraremos a menos que decidas mejorar a Pro.',
     price: 'Teacher Pro cuesta $9 al mes: clases ilimitadas y el informe de progreso completo. Cancela cuando quieras.',
+    proLead: 'Si algún día quieres más, Teacher Pro está aquí:',
     ask: '¿Algo falló o tienes una pregunta? Responde a este correo — los leo todos.',
     signoff: '— Ohad, el creador de LexiClash',
     dir: 'ltr',
@@ -94,7 +108,9 @@ const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
     lead: (n, m) => `${n} учеников присоединились, ${m} игр сыграно в вашем классе.`,
     report: 'Открыть отчёт о прогрессе',
     pro: 'Подключить Teacher Pro — $9/мес',
+    reassurance: 'Бесплатный план остаётся бесплатным. Карта не нужна, чтобы продолжать им пользоваться, и мы не спишем деньги, пока вы сами не решите перейти на Pro.',
     price: 'Teacher Pro стоит $9 в месяц: неограниченные классы и полный отчёт о прогрессе. Отмена в любой момент.',
+    proLead: 'Если когда-нибудь захотите больше — Teacher Pro здесь:',
     ask: 'Что-то не так или есть вопрос? Просто ответьте на это письмо — я читаю каждое.',
     signoff: '— Охад, автор LexiClash',
     dir: 'ltr',
@@ -120,8 +136,9 @@ export function teacherDay2Value({ fullName, locale, studentsJoined, gamesPlayed
 <p>${escape(copy.greeting(fullName || 'Teacher'))}</p>
 <p>${escape(copy.lead(n, m))}</p>
 <p><a href="${report}" style="display:inline-block;background:#7CFF6B;color:#0b1220;font-weight:800;padding:12px 20px;text-decoration:none;border-radius:8px">${escape(copy.report)}</a></p>
-<p>${escape(copy.price)}</p>
-<p><a href="${upgrade}" style="display:inline-block;background:#ff4d8d;color:#0b1220;font-weight:800;padding:12px 20px;text-decoration:none;border-radius:8px">${escape(copy.pro)}</a></p>
+<p id="free-plan-reassurance">${escape(copy.reassurance)}</p>
+<p style="font-size:12px;line-height:1.4;margin:16px 0 4px;color:#6b7280;">${escape(copy.price)}</p>
+<p style="font-size:14px;line-height:1.5;margin:0;color:#6b7280;">${escape(copy.proLead)} <a id="teacher-pro-line" href="${upgrade}" style="color:#7a1fa2;font-weight:700;text-decoration:underline;">${escape(copy.pro)}</a></p>
 <p>${escape(copy.ask)}</p>
 <p>${escape(copy.signoff)}</p>
 </body></html>`;
