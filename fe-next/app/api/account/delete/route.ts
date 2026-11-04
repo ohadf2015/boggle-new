@@ -9,6 +9,10 @@ import {
   normalizeDeleteReason,
   type DeleteImpactSummary,
 } from '@/lib/account/deleteAccountImpact';
+import {
+  buildAccountDeletedEvent,
+  loadAccountDeletedFacts,
+} from '@/lib/account/accountDeletedEvent';
 
 /**
  * DELETE /api/account/delete
@@ -27,7 +31,9 @@ import {
  * warning, no lighter alternative, and a deleteUser that timed out (504)
  * without retry. Now: GET reports classroom impact for the interstitial, the
  * delete carries an optional { reason, surface } body onto teacher_delete_*
- * telemetry, and deleteUser retries a timeout/5xx once — treating
+ * telemetry, growth:account_deleted is captured once before deleteUser (so a
+ * failed delete is still visible to Growth Radar, with no email or name), and
+ * deleteUser retries a timeout/5xx once — treating
  * user-not-found as the success a completed-then-retried delete returns.
  */
 
@@ -138,14 +144,51 @@ export async function DELETE(request: NextRequest) {
       }
     }
 
-    // 6. Delete the auth user — cascades to profiles and all FK'd tables.
+    // 6. Snapshot + growth event BEFORE deleteUser. A 504/5xx used to erase
+    //    the only record that a teacher left — teacher_delete_failed only
+    //    fires for classroom owners, and the old growth:account_deleted ran
+    //    after a successful delete. Capture once, here, so it is recorded
+    //    even when deleteUser errors. captureEduServerEvents stamps $host.
+    let deletedFacts = {
+      role: null as string | null,
+      signupSurface: null as string | null,
+      utmCampaign: null as string | null,
+      rounds: 0,
+      lastRoundAt: null as string | null,
+    };
+    try {
+      deletedFacts = await loadAccountDeletedFacts(
+        admin,
+        user.id,
+        impact.classrooms.map((c) => c.id),
+      );
+    } catch {
+      // Failed snapshot still emits the event (nulls), and never blocks deletion.
+    }
+    const metaSurface = typeof user.user_metadata?.signup_surface === 'string'
+      ? user.user_metadata.signup_surface
+      : null;
+    try {
+      captureEduServerEvents([
+        buildAccountDeletedEvent({
+          userId: user.id,
+          createdAt: user.created_at,
+          reason,
+          impact,
+          facts: {
+            ...deletedFacts,
+            signupSurface: deletedFacts.signupSurface ?? metaSurface,
+          },
+        }),
+      ]);
+    } catch {
+      // Fire-and-forget — telemetry failure must never block or fail the deletion.
+    }
+
+    // 7. Delete the auth user — cascades to profiles and all FK'd tables.
     //    Retried once on timeout/5xx; user-not-found or confirmed gone means
     //    a previous attempt already completed and is treated as success.
     const outcome = await deleteUserWithRetry(admin, user.id);
-
-    const accountAgeDays = user.created_at
-      ? Math.max(0, Math.floor((Date.now() - new Date(user.created_at).getTime()) / (1000 * 60 * 60 * 24)))
-      : 0;
 
     if (!outcome.ok) {
       if (impact.isTeacher) {
@@ -188,20 +231,9 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Telemetry on successful deletion
-    const telemetry: EduServerEvent[] = [
-      {
-        distinctId: user.id,
-        event: 'growth:account_deleted',
-        properties: {
-          is_teacher: impact.isTeacher,
-          class_count: impact.classrooms.length,
-          student_count: impact.totalStudents,
-          deletion_reason: reason,
-          account_age_days: accountAgeDays,
-        },
-      },
-    ];
+    // Teacher-only completion telemetry. growth:account_deleted already fired
+    // once, before deleteUser, including when this outcome is a retry success.
+    const telemetry: EduServerEvent[] = [];
 
     if (impact.isTeacher) {
       telemetry.push({
