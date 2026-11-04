@@ -23,7 +23,7 @@ export type ModeBestFor =
   | 'teamwork';
 /** Where a mode is played: the class screen, students' phones, or either. */
 export type ModeDelivery = 'projector' | 'phones' | 'both';
-export type ModePreviewKind = 'quiz' | 'board' | 'blast' | 'hunt' | 'wheel' | 'craft' | 'boss';
+export type ModePreviewKind = 'quiz' | 'board' | 'blast' | 'hunt' | 'wheel' | 'craft' | 'boss' | 'crossword';
 
 export interface CatalogueMode {
   id: ClassroomCatalogueId;
@@ -38,6 +38,8 @@ export interface CatalogueMode {
   delivery: ModeDelivery;
   /** camelCase tail of the steps block (and of the name/how keys for an engine mode). */
   suffix: string;
+  /** Prefix of the three numbered how-it-plays steps. */
+  stepsKey: string;
   nameKey: string;
   howKey: string;
   poster: string;
@@ -46,12 +48,13 @@ export interface CatalogueMode {
   accent: ModeAccent;
 }
 
-type Row = Omit<CatalogueMode, 'suffix' | 'poster' | 'cover' | 'accent' | 'launch' | 'nameKey' | 'howKey'>;
+type Row = Omit<CatalogueMode, 'suffix' | 'stepsKey' | 'poster' | 'cover' | 'accent' | 'launch' | 'nameKey' | 'howKey'>;
 
 // Most-played first inside each group (finished classroom rounds, 30 days to 2026-11-02): quiz 18, classic 16, blast 6, hunt 4, wheel 2, craft 1.
 const ROWS: readonly Row[] = [
   { id: 'vocab-quiz', category: 'meaning', complexity: 'simple', style: 'ffa', teamsCapable: false, bestFor: ['meanings', 'testPrep'], preview: 'quiz', delivery: 'projector' },
   { id: 'wordcraft', category: 'meaning', complexity: 'medium', style: 'solo', teamsCapable: false, bestFor: ['lessonWords', 'independent'], preview: 'craft', delivery: 'both' },
+  { id: 'crossword', category: 'meaning', complexity: 'medium', style: 'solo', teamsCapable: false, bestFor: ['meanings', 'spelling'], preview: 'crossword', delivery: 'phones' },
   { id: 'classic', category: 'board', complexity: 'medium', style: 'ffa', teamsCapable: true, bestFor: ['spelling', 'mixedLevels'], preview: 'board', delivery: 'both' },
   { id: 'blast', category: 'board', complexity: 'simple', style: 'ffa', teamsCapable: true, bestFor: ['energy', 'warmup'], preview: 'blast', delivery: 'phones' },
   { id: BOSS_BATTLE_ID, category: 'board', complexity: 'simple', style: 'class', teamsCapable: false, bestFor: ['teamwork', 'review'], preview: 'boss', delivery: 'projector' },
@@ -62,15 +65,18 @@ const ROWS: readonly Row[] = [
 export const BOSS_POSTER = '/images/bosses/boss-lexicon-dragon.png';
 const BOSS_CARD_POSTER = '/mascot/teacher/modes/boss-battle.webp';
 
+/** Modes whose steps live in their own namespace. */
+const STEPS_KEY: Record<string, string> = { crossword: 'eduCrossword.steps' };
+
 const MODES: readonly CatalogueMode[] = ROWS.flatMap((row): CatalogueMode[] => {
   const launch = launchOf(row.id);
   const cover = `/mascot/teacher/modes/covers-v3/${row.id}.webp`;
   if (row.id === BOSS_BATTLE_ID) {
-    return [{ ...row, launch, suffix: 'bossBattle', nameKey: 'eg2Modes.boss.name', howKey: 'classroomBoss.cardHow', poster: BOSS_CARD_POSTER, cover, accent: 'pink' }];
+    return [{ ...row, launch, suffix: 'bossBattle', stepsKey: 'eg2Modes.steps.bossBattle', nameKey: 'eg2Modes.boss.name', howKey: 'classroomBoss.cardHow', poster: BOSS_CARD_POSTER, cover, accent: 'pink' }];
   }
   const base = teacherGameMode(launch.gameMode);
   if (!base) return [];
-  return [{ ...row, launch, suffix: base.nameKeySuffix, nameKey: base.nameKey, howKey: base.howKey, poster: base.poster, cover, accent: base.accent }];
+  return [{ ...row, launch, suffix: base.nameKeySuffix, stepsKey: STEPS_KEY[row.id] ?? `eg2Modes.steps.${base.nameKeySuffix}`, nameKey: base.nameKey, howKey: base.howKey, poster: base.poster, cover, accent: base.accent }];
 });
 
 /** The three modes classes play most; they get a "Most popular" tag and lead the landing. */
@@ -117,7 +123,7 @@ export function catalogueKeys(mode: CatalogueMode, style: ModeStyle = mode.style
     complexity: `eg2Modes.complexity.${mode.complexity}`,
     style: `eg2Modes.style.${style}`,
     bestFor: mode.bestFor.map((b) => `eg2Modes.bestFor.${b}`),
-    steps: [1, 2, 3].map((n) => `eg2Modes.steps.${mode.suffix}.${n}`),
+    steps: [1, 2, 3].map((n) => `${mode.stepsKey}.${n}`),
   };
 }
 

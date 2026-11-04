@@ -21836,6 +21836,27 @@ const sv = {
     "next": "Missade ord ({count})",
   },
   // @wordcraftReview:end
+  // @eduCrossword:start
+  "eduCrossword": {
+    "name": "Korsord",
+    "how": "Varje elev löser ett korsord byggt av lektionens ord, med betydelserna som ledtrådar.",
+    "blurb": "Ett korsord byggt av listans ord, där varje betydelse är ledtråden.",
+    "studentRule": "Läs varje ledtråd och fyll i lektionsordet.",
+    "steps": {
+      "1": "Alla mobiler får samma korsord, byggt av dina lektionsord.",
+      "2": "Varje ledtråd är ordets betydelse från lektionen.",
+      "3": "Eleverna tävlar om att fylla rutnätet. Varje löst ledtråd räknas i sammanfattningen.",
+    },
+    "tooFewWords": "Den här listan räcker inte till ett korsord än. Det behövs minst 3 ord med betydelser som delar bokstäver. Lägg till betydelser eller spela Klassiskt.",
+    "waiting": "Delar ut korsordet…",
+    "gridLabel": "Korsordets rutnät",
+    "standingsLabel": "Ställning i loppet",
+    "finished": "{count} av {total} klara",
+    "done": "Klar!",
+    "percent": "{percent} %",
+    "more": "+{count} till",
+  },
+  // @eduCrossword:end
   // @eduPolish:start
   "eduPolish": {
     "seatCapReached": "{name} tittar på: klassen är full ({cap} spelare)",

@@ -12,6 +12,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 
 const submitProgress = vi.fn();
+const { solvedIds, revealedCells } = vi.hoisted(() => ({ solvedIds: { value: [] as string[] }, revealedCells: { value: [] as string[] } }));
 let mp: Record<string, unknown>;
 vi.mock('../useCrosswordMp', () => ({ useCrosswordMp: () => ({ ...mp, submitProgress }) }));
 
@@ -23,7 +24,7 @@ vi.mock('@/hooks/useCrosswordGame', () => ({
   useCrosswordGame: (...args: unknown[]) => {
     useCrosswordGameArgs.push(args);
     return {
-      state: { status: 'playing', revealed: [], entries: {}, active: { row: 0, col: 0 }, dir: 'across' },
+      state: { status: 'playing', revealed: revealedCells.value, entries: {}, active: { row: 0, col: 0 }, dir: 'across' },
       activeSlot: null, elapsedMs: 10000,
       focusCell: vi.fn(), toggleDir: vi.fn(), inputLetter, backspace,
       moveInSlot: vi.fn(), moveVertical: vi.fn(), revealCell: vi.fn(), revealWord: vi.fn(), checkAll: vi.fn(),
@@ -31,7 +32,7 @@ vi.mock('@/hooks/useCrosswordGame', () => ({
     };
   },
 }));
-vi.mock('@/lib/crossword/stats', () => ({ crosswordStats: () => ({ percent: 25, wordsSolved: 1, wordsTotal: 4, totalCells: 20, filledCells: 5, correctCells: 5 }), solvedSlotIds: () => [] }));
+vi.mock('@/lib/crossword/stats', () => ({ crosswordStats: () => ({ percent: 25, wordsSolved: 1, wordsTotal: 4, totalCells: 20, filledCells: 5, correctCells: 5 }), solvedSlotIds: () => solvedIds.value }));
 vi.mock('@/lib/solo/soloReward', () => ({ crosswordScore: () => 30 }));
 // Stub heavy daemon components so this stays a unit test of the wrapper.
 vi.mock('@/components/crossword/CrosswordGrid', () => ({ CrosswordGrid: () => <div data-testid="grid" /> }));
@@ -40,6 +41,7 @@ vi.mock('@/components/crossword/ClueBar', () => ({ ClueBar: () => <div data-test
 vi.mock('@/components/crossword/CrosswordClueList', () => ({ CrosswordClueList: () => <div data-testid="cluelist" /> }));
 
 import { CrosswordVersus } from '../CrosswordVersus';
+import { useClassroomPressureStore } from '@/hooks/gameState/classroomPressureStore';
 
 const PUZZLE = { id: 'en-mini-001', locale: 'en', size: 5, rtl: false, cells: [], slots: [], difficulty: 'easy', source: 'authored' };
 const standings = [
@@ -53,6 +55,8 @@ describe('CrosswordVersus', () => {
     inputLetter.mockClear();
     backspace.mockClear();
     useCrosswordGameArgs.length = 0;
+    solvedIds.value = [];
+    revealedCells.value = [];
     mp = { puzzle: PUZZLE, standings, raceOver: false, ready: true, startedAt: 1234 };
   });
 
@@ -79,6 +83,30 @@ describe('CrosswordVersus', () => {
     expect(submitProgress).toHaveBeenCalledWith(
       expect.objectContaining({ percent: 25, solved: false, elapsedMs: 10000 }),
     );
+  });
+
+  it('on a phone, a full class shrinks to my rank instead of a rail over the board', () => {
+    render(<CrosswordVersus socket={null} username="bob" />);
+    expect(screen.getByTestId('crossword-my-rank').textContent).toMatch(/^#2.*2$/);
+    expect(screen.getByText('bob').closest('aside')).toHaveClass('hidden', 'lg:block');
+  });
+
+  it('in a calm classroom, hides the rivals rail and the clock', () => {
+    useClassroomPressureStore.getState().setClassroomPressure({ leaderboard: 'hidden', timer: 'off', speedScoring: false });
+    render(<CrosswordVersus socket={null} username="me" remainingTime={90} />);
+    expect(screen.queryByText('bob')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('crossword-timer')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('crossword-my-rank')).not.toBeInTheDocument();
+    useClassroomPressureStore.getState().setClassroomPressure(null);
+  });
+
+  it('reports which clues the player solved without a hint', () => {
+    const slot = (id: string, row: number) => ({ id, cells: [{ row, col: 0 }, { row, col: 1 }] });
+    mp = { ...mp, puzzle: { ...PUZZLE, slots: [slot('A1', 0), slot('A2', 1), slot('A3', 2)] } };
+    solvedIds.value = ['A1', 'A2'];
+    revealedCells.value = ['1,1'];
+    render(<CrosswordVersus socket={null} username="me" />);
+    expect(submitProgress).toHaveBeenLastCalledWith(expect.objectContaining({ solvedSlotIds: ['A1'] }));
   });
 
   it('keeps race progress apart from the solo save of the same puzzle', () => {

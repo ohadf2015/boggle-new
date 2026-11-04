@@ -121,7 +121,7 @@ export function ProjectorStartBar({
         )}
         {lobby.quizBlocked && (
           <div className="flex-[1_1_12rem]">
-            <ProjectorQuizBlocked gameCode={gameCode} currentMode={lobby.modeId} t={t} onApplied={lobby.applyMode} />
+            <ProjectorQuizBlocked gameCode={gameCode} reasonKey={lobby.blockedReasonKey} currentMode={lobby.modeId} t={t} onApplied={lobby.applyMode} />
           </div>
         )}
         {botsBlocked && onStartPracticeRound && (

@@ -15,14 +15,17 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import ExitRoomButton from '@/components/ExitRoomButton';
 import type { CrosswordPuzzle } from '@/lib/crossword/types';
 import { useCrosswordGame } from '@/hooks/useCrosswordGame';
+import { useClassroomPressure } from '@/hooks/gameState/classroomPressureStore';
+import { isLeaderboardHidden, isStudentTimerHidden } from '@/shared/utils/classroomPressure';
 import { useCrosswordHardwareKeys } from '@/hooks/useCrosswordHardwareKeys';
 import { crosswordStats, solvedSlotIds } from '@/lib/crossword/stats';
+import { earnedSlotIds } from '@/lib/crossword/earnedSlots';
 import { crosswordScore } from '@/lib/solo/soloReward';
 import { CrosswordGrid } from '@/components/crossword/CrosswordGrid';
 import { CrosswordInputDock } from '@/components/crossword/CrosswordInputDock';
 import { ClueBar } from '@/components/crossword/ClueBar';
 import { CrosswordClueList } from '@/components/crossword/CrosswordClueList';
-import { useCrosswordMp, type CrosswordMpSocketLike, type CrosswordStanding } from './useCrosswordMp';
+import { useCrosswordMp, type CrosswordMpSocketLike, type CrosswordProgressUpdate, type CrosswordStanding } from './useCrosswordMp';
 
 interface CrosswordVersusProps {
   socket: Socket | null;
@@ -61,7 +64,7 @@ function CrosswordRace({
   username: string;
   standings: CrosswordStanding[];
   raceOver: boolean;
-  submitProgress: (u: { percent: number; solved: boolean; elapsedMs: number; score: number }) => void;
+  submitProgress: (u: CrosswordProgressUpdate) => void;
   onQuit?: () => void;
   remainingTime?: number | null;
 }) {
@@ -71,6 +74,10 @@ function CrosswordRace({
   const solved = game.state.status === 'solved';
   const mySolvedSlotIds = useMemo(() => solvedSlotIds(game.state), [game.state]);
   const hintsUsed = game.state.revealed.length;
+  const pressure = useClassroomPressure();
+  const railHidden = pressure ? isLeaderboardHidden(pressure) : false;
+  const clockHidden = pressure ? isStudentTimerHidden(pressure) : false;
+  const myRank = standings.find((s) => s.username === username);
   useCrosswordHardwareKeys(game, puzzle.rtl, !solved);
 
   // Report progress on each newly-solved word + on final solve (word-granularity,
@@ -82,6 +89,7 @@ function CrosswordRace({
       solved,
       elapsedMs: game.elapsedMs,
       score: solved ? crosswordScore(game.elapsedMs, hintsUsed, stats.wordsTotal) : 0,
+      solvedSlotIds: earnedSlotIds(puzzle, mySolvedSlotIds, game.state.revealed),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stats.wordsSolved, solved]);
@@ -92,9 +100,14 @@ function CrosswordRace({
       <div className="flex items-center gap-3 pe-14">
         {onQuit && <ExitRoomButton onClick={onQuit} label={t('common.backToHome')} />}
         <span className="font-neo-display text-sm font-bold text-neo-cyan">{t('crossword.mp.title')}</span>
-        {remainingTime != null && remainingTime >= 0 && (
+        {!clockHidden && remainingTime != null && remainingTime >= 0 && (
           <span data-testid="crossword-timer" className={`ms-auto font-neo-display text-sm font-bold tabular-nums ${remainingTime <= 30 ? 'text-neo-pink' : 'text-neo-white'}`}>
             {Math.floor(remainingTime / 60)}:{String(Math.floor(remainingTime % 60)).padStart(2, '0')}
+          </span>
+        )}
+        {!railHidden && myRank && (
+          <span data-testid="crossword-my-rank" dir="ltr" className="rounded-neo border-2 border-neo-cyan px-1.5 font-neo-display text-xs font-bold tabular-nums text-neo-cyan lg:hidden">
+            #{myRank.rank}{t('crossword.mp.statSeparator', '/')}{standings.length}
           </span>
         )}
         <span className="ms-auto font-neo-body text-xs tabular-nums text-neo-cream/70">
@@ -149,10 +162,12 @@ function CrosswordRace({
         </div>
 
         {/* Standings rail */}
-        <aside className="shrink-0 overflow-y-auto">
-          <h3 className="mb-1.5 font-neo-display text-[11px] font-bold uppercase tracking-wide text-neo-cream/50">{t('crossword.mp.standings')}</h3>
-          <StandingsRail standings={standings} me={username} t={t} />
-        </aside>
+        {!railHidden && (
+          <aside className="hidden shrink-0 overflow-y-auto lg:block">
+            <h3 className="mb-1.5 font-neo-display text-[11px] font-bold uppercase tracking-wide text-neo-cream/50">{t('crossword.mp.standings')}</h3>
+            <StandingsRail standings={standings} me={username} t={t} />
+          </aside>
+        )}
       </div>
 
       {/* Race-over / you-solved banner (non-blocking — grid stays visible) */}

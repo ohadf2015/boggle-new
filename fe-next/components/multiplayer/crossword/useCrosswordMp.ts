@@ -24,6 +24,7 @@ export interface CrosswordProgressUpdate {
   solved: boolean;
   elapsedMs: number;
   score: number;
+  solvedSlotIds?: string[];
 }
 
 interface InitPayload { puzzle: CrosswordPuzzle; players: string[]; standings: CrosswordStanding[]; startedAt: number }

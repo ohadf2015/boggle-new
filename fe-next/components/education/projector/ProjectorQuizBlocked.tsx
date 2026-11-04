@@ -34,12 +34,14 @@ export function useQuizStartRefused(gameCode: string, t: Translate): [boolean, (
 
 interface ProjectorQuizBlockedProps {
   gameCode: string;
+  /** Why the start was refused; the quiz reason unless another mode says otherwise. */
+  reasonKey?: string;
   currentMode: ClassroomCatalogueId;
   t: Translate;
   onApplied: (mode: ClassroomCatalogueId) => void;
 }
 
-export function ProjectorQuizBlocked({ gameCode, currentMode, t, onApplied }: ProjectorQuizBlockedProps) {
+export function ProjectorQuizBlocked({ gameCode, reasonKey = REASON_KEY, currentMode, t, onApplied }: ProjectorQuizBlockedProps) {
   const { pendingMode, switchTo } = useClassroomModeSwitch({
     gameCode,
     currentMode,
@@ -64,7 +66,7 @@ export function ProjectorQuizBlocked({ gameCode, currentMode, t, onApplied }: Pr
         role="alert"
         className="font-neo-body leading-snug text-neo-cream/85 text-[clamp(0.8125rem,min(1cqw,1.9cqh),1.375rem)]"
       >
-        {t(REASON_KEY)}
+        {t(reasonKey)}
       </p>
     </div>
   );

@@ -7,6 +7,7 @@ import { initCrosswordMpState, standings } from '../modules/crosswordMpManager';
 import { getPool, getDailyPuzzle } from '@/lib/crossword/puzzles/index';
 import type { PuzzleLocale } from '@/lib/crossword/types';
 import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers';
+import { stageClassroomCrossword } from '../modules/crosswordClassroomStart';
 
 /** Deterministic non-negative seed from a room key (FNV-1a) for picking a puzzle. */
 export function crosswordRoomSeed(key: string): number {
@@ -21,14 +22,23 @@ export function crosswordRoomSeed(key: string): number {
 export const crosswordMode: GameModeModule = {
   id: 'crossword',
 
+  prepareRound(io, gameCode, game) {
+    return stageClassroomCrossword(io, gameCode, game);
+  },
+
   initRound({ game, gameCode, language, playerUsernames }) {
+    const lesson = game.lessonCrossword;
+    game.lessonCrossword = null;
     const locale = language as PuzzleLocale;
-    const pool = getPool(locale);
+    const pool = lesson ? [] : getPool(locale);
     // Seeded by room + round: different rooms get different grids, deterministic per room.
-    const puzzle = (pool.length > 0 ? pool[crosswordRoomSeed(`${gameCode}:${game.gameSessionId ?? ''}`) % pool.length] : null)
+    const puzzle = lesson?.puzzle
+      ?? (pool.length > 0 ? pool[crosswordRoomSeed(`${gameCode}:${game.gameSessionId ?? ''}`) % pool.length] : null)
       ?? getDailyPuzzle(new Date().toISOString().slice(0, 10), locale);
     const racers = playerUsernames.filter((u) => !game.users[u]?.isBot);
-    if (puzzle) game.crosswordMpState = initCrosswordMpState(racers, puzzle);
+    if (!puzzle) return;
+    game.crosswordMpState = initCrosswordMpState(racers, puzzle);
+    if (lesson) game.crosswordMpState.lessonWordBySlot = lesson.lessonWordBySlot;
   },
 
   onLateJoin(game, username) {

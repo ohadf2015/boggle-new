@@ -28,6 +28,15 @@ describe('crosswordMpManager', () => {
     expect(s.progress.b.percent).toBe(0);
   });
 
+  it('keeps only solved slot ids that belong to the puzzle', () => {
+    const puzzle = { ...PUZZLE, slots: [{ id: 'A1' }, { id: 'D2' }] };
+    let s = initCrosswordMpState(['a'], puzzle, 1000);
+    s = applyProgress(s, 'a', { percent: 50, solved: false, elapsedMs: 1, score: 0, solvedSlotIds: ['A1', 'Z9', 'A1'] });
+    expect(s.progress.a.solvedSlotIds).toEqual(['A1']);
+    s = applyProgress(s, 'a', { percent: 60, solved: false, elapsedMs: 2, score: 0 });
+    expect(s.progress.a.solvedSlotIds).toEqual(['A1']);
+  });
+
   it('clamps percent to 0..100', () => {
     let s = initCrosswordMpState(['a'], PUZZLE, 1000);
     s = applyProgress(s, 'a', { percent: 150, solved: false, elapsedMs: 1, score: 0 });

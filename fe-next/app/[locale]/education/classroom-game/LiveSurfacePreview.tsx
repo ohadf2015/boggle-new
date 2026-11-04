@@ -32,6 +32,7 @@ import type { LiveSurfacePreviewKind } from './previewKinds';
 import { StudentQuizPreview } from './StudentQuizPreview';
 import { InGamePreview } from './InGamePreview';
 import { PhoneGamePreview } from './PhoneGamePreview';
+import { CrosswordPreview } from './CrosswordPreview';
 
 export type { LiveSurfacePreviewKind };
 
@@ -123,5 +124,7 @@ export default function LiveSurfacePreview({ kind }: { kind: LiveSurfacePreviewK
   if (kind === 'quizphone') return <StudentQuizPreview />;
   if (kind === 'ingame') return <InGamePreview />;
   if (kind === 'phonegame') return <PhoneGamePreview />;
+  if (kind === 'crosswordwall') return <CrosswordPreview surface="wall" />;
+  if (kind === 'crosswordphone') return <CrosswordPreview surface="phone" />;
   return <ProjectorPreview />;
 }

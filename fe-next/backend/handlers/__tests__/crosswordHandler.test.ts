@@ -59,6 +59,15 @@ describe('crosswordHandler', () => {
     expect(call![3].standings[0].username).toBe('p1'); // ahead of p2 at 0%
   });
 
+  it('records which clues a player solved, without sending them to the room', () => {
+    const game = mkGame({ crosswordMpState: initCrosswordMpState(['p1', 'p2'], { ...PUZZLE, slots: [{ id: 'A1' }, { id: 'D2' }] }, 1000) });
+    (getGame as unknown as Mock).mockReturnValue(game);
+    handleSubmitCrosswordProgress(mkIo(), mkSocket(), { percent: 40, solved: false, elapsedMs: 1, score: 0, solvedSlotIds: ['D2'] });
+    expect(game.crosswordMpState.progress.p1.solvedSlotIds).toEqual(['D2']);
+    const call = (broadcastToRoom as unknown as Mock).mock.calls.find((c) => c[2] === 'crosswordStandings');
+    expect(call![3].standings[0]).not.toHaveProperty('solvedSlotIds');
+  });
+
   it('mirrors score onto playerScores', () => {
     const game = mkGame();
     (getGame as unknown as Mock).mockReturnValue(game);

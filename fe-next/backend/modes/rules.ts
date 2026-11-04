@@ -10,6 +10,7 @@ import type { GameMode, Language } from '@/shared/types';
 import { BLAST_MP_DEFAULT_TIMER, DEFAULT_TIMER } from '@/shared/constants/gameConstants';
 import { WHEEL_RUSH_DURATION_SEC } from '@/shared/constants/wheelRushConstants';
 import { WORD_TOWER_VERSUS_MATCH_S } from '@/shared/constants/wordTowerConstants';
+import { CROSSWORD_RACE_DURATION_SEC } from '@/shared/constants/crosswordConstants';
 
 export interface GameModeRules {
   /** Round length when the host supplied none. */
@@ -23,6 +24,8 @@ export interface GameModeRules {
   gridSize?: { rows: number; cols: number };
   /** Beta (in-work) mode: host must be admin/beta tester. Name used in the refusal. */
   betaName?: string;
+  /** A beta mode any teacher may run in a classroom room. */
+  classroomOpen?: boolean;
   /** Beta modes with curated content only in some languages. */
   languages?: Language[];
   /** Invite-a-human modes: no bot auto-fill (bots have no move logic there). */
@@ -53,7 +56,7 @@ export const GAME_MODE_RULES: Record<GameMode, GameModeRules> = {
   'wheel-rush': { ...BOARD, defaultTimerSec: WHEEL_RUSH_DURATION_SEC, duplicatesAllowed: true, rarityScoring: false },
   'word-tower': { ...BOARD, betaName: 'Word Tower', fixedTimerSec: WORD_TOWER_VERSUS_MATCH_S, humanOnly: true },
   // Generous race cap (a 5x5 can take minutes).
-  crossword: { ...BOARD, betaName: 'Crossword', fixedTimerSec: 420, humanOnly: true, languages: ['en', 'he', 'sv', 'ja', 'es', 'ru'] },
+  crossword: { ...BOARD, betaName: 'Crossword', classroomOpen: true, fixedTimerSec: CROSSWORD_RACE_DURATION_SEC, humanOnly: true, languages: ['en', 'he', 'sv', 'ja', 'es', 'ru'] },
   // Per-student lesson-dealt race: 5min clock, no classic bots, shared list
   // words bank at full value for everyone who crafts them.
   wordcraft: { ...BOARD, defaultTimerSec: 300, humanOnly: true, duplicatesAllowed: true, rarityScoring: false },

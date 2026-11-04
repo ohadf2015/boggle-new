@@ -1,11 +1,12 @@
 /**
- * A crossword race reports progress, not words. For the classroom recap a
- * solved grid means every answer was found; an unsolved one credits nothing.
+ * A crossword race reports progress, not words. For the classroom recap each
+ * solved clue counts as that word found; a solved grid means every clue.
  */
 
 interface CrosswordRaceState {
   puzzle: unknown;
-  progress: Record<string, { solved: boolean }>;
+  progress: Record<string, { solved: boolean; solvedSlotIds?: string[] }>;
+  lessonWordBySlot?: Record<string, string>;
 }
 
 export interface CrosswordClassroomWords {
@@ -14,17 +15,28 @@ export interface CrosswordClassroomWords {
   wordDetailsFor(username: string): Array<{ word: string; validated: boolean }>;
 }
 
-function answersOf(puzzle: unknown): string[] {
-  const slots = (puzzle as { slots?: Array<{ answer?: unknown }> } | null)?.slots ?? [];
-  return slots.flatMap((s) => (typeof s.answer === 'string' && s.answer ? [s.answer.toLowerCase()] : []));
+function slotWords(state: CrosswordRaceState): Array<{ id: string; word: string }> {
+  const slots = (state.puzzle as { slots?: Array<{ id?: unknown; answer?: unknown }> } | null)?.slots ?? [];
+  return slots.flatMap((s) => {
+    const id = typeof s.id === 'string' ? s.id : '';
+    const word = state.lessonWordBySlot?.[id] ?? (typeof s.answer === 'string' ? s.answer.toLowerCase() : '');
+    return word ? [{ id, word }] : [];
+  });
 }
 
 export function crosswordClassroomWords(state: CrosswordRaceState | null | undefined, lessonWords: readonly string[]): CrosswordClassroomWords | null {
   if (!state) return null;
-  const answers = answersOf(state.puzzle);
-  const onGrid = new Set(answers);
+  const words = slotWords(state);
+  const onGrid = new Set(words.map((w) => w.word.toLowerCase()));
   return {
     placedWords: lessonWords.filter((w) => onGrid.has(w.toLowerCase())),
-    wordDetailsFor: (username) => (state.progress[username]?.solved ? answers.map((word) => ({ word, validated: true })) : []),
+    wordDetailsFor: (username) => {
+      const progress = state.progress[username];
+      if (!progress) return [];
+      const solved = new Set(progress.solvedSlotIds ?? []);
+      return words
+        .filter((w) => progress.solved || solved.has(w.id))
+        .map(({ word }) => ({ word, validated: true }));
+    },
   };
 }

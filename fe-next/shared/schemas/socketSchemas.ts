@@ -285,6 +285,7 @@ export const SubmitCrosswordProgressSchema = z.object({
   solved: z.boolean(),
   elapsedMs: z.number().min(0).max(36_000_000),
   score: z.number().min(0).max(100_000),
+  solvedSlotIds: z.array(z.string().max(8)).max(64).optional(),
 });
 
 /**

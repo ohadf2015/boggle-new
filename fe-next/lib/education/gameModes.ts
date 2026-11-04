@@ -36,6 +36,8 @@ export interface TeacherGameMode {
   nameKey: string;
   /** `education.modePicker.how.<suffix>` — one line, what a student does. */
   howKey: string;
+  /** `education.classroomModeBlurb.<suffix>` — what it drills, for the public landing pages. */
+  blurbKey: string;
   /**
    * Transparent sticker art, served from `public/mascot/teacher/modes/`. The
    * path is the cache key: `/_next/image` answers a stable URL with a one-year
@@ -60,6 +62,12 @@ const MODE_KEY_SUFFIX: Record<string, string> = {
   'wheel-rush': 'wheelRush',
   [VOCAB_QUIZ_MODE]: 'vocabQuiz',
   wordcraft: 'wordcraft',
+  crossword: 'crossword',
+};
+
+/** Modes whose copy lives in their own namespace instead of the shared name/how tables. */
+const MODE_COPY_KEYS: Record<string, { nameKey: string; howKey: string; blurbKey: string }> = {
+  crossword: { nameKey: 'eduCrossword.name', howKey: 'eduCrossword.how', blurbKey: 'eduCrossword.blurb' },
 };
 
 interface ModeShape {
@@ -76,6 +84,7 @@ const MODE_SHAPE: Record<string, ModeShape> = {
   'wheel-rush': { poster: '/mascot/teacher/modes/wheel-rush.webp', accent: 'purple', minutes: Math.ceil(fixedRoundSeconds('wheel-rush')! / 60), needsDefinitions: false },
   [VOCAB_QUIZ_MODE]: { poster: '/mascot/teacher/modes/vocab-quiz.webp', accent: 'cyan', minutes: 5, needsDefinitions: true },
   wordcraft: { poster: '/mascot/teacher/modes/wordcraft.webp', accent: 'lime', minutes: 5, needsDefinitions: false },
+  crossword: { poster: '/mascot/teacher/modes/crossword.webp', accent: 'cyan', minutes: Math.ceil(fixedRoundSeconds('crossword')! / 60), needsDefinitions: true },
 };
 
 /** A round with no catalog entry still needs a plannable number on screen. */
@@ -99,6 +108,8 @@ export const TEACHER_GAME_MODES: readonly TeacherGameMode[] = CLASSROOM_GAME_MOD
     nameKeySuffix: suffix,
     nameKey: `teacher.classroom.gameModes.${suffix}`,
     howKey: `education.modePicker.how.${suffix}`,
+    blurbKey: `education.classroomModeBlurb.${suffix}`,
+    ...MODE_COPY_KEYS[id],
     ...shape,
   };
 });
