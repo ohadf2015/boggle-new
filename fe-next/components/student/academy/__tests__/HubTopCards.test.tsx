@@ -65,4 +65,22 @@ describe('<HubTopCards>', () => {
     expect(screen.queryByTestId('academy-warmup-cta')).toBeNull();
     expect(screen.getByTestId('academy-today-warmup')).toHaveAttribute('data-done', 'false');
   });
+
+  it('Given a short screen (one card) and homework due soon, Then only the due card shows, so the map keeps its room', () => {
+    render(
+      <HubTopCards {...base} oneCard goals={dayTwo} warmup={null} due={{ assignmentId: 'A2', title: 'Planets', href: '/en/student/lessons/L2', dueDate: '2026-10-30T10:00:00Z', kind: 'due_soon' }} />
+    );
+    expect(screen.getByTestId('assignment-due-card')).toBeInTheDocument();
+    expect(screen.queryByTestId('academy-today')).toBeNull();
+  });
+
+  it('Given a lead (the chest badge), Then it sits in the same row as the card, and alone while data loads', () => {
+    const { rerender } = render(<HubTopCards {...base} ready={false} lead={<button data-testid="lead" />} goals={dayOne} warmup={null} />);
+    expect(screen.getByTestId('lead')).toBeInTheDocument();
+    expect(screen.queryByTestId('academy-first-day')).toBeNull();
+    rerender(<HubTopCards {...base} lead={<button data-testid="lead" />} goals={dayOne} warmup={null} />);
+    const row = screen.getByTestId('academy-top-row');
+    expect(row).toContainElement(screen.getByTestId('lead'));
+    expect(row).toContainElement(screen.getByTestId('academy-first-day'));
+  });
 });

@@ -20,6 +20,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { getSupabaseAdmin } from '@/lib/admin/server';
 import { buildTeacherFunnel, type CheckoutFunnelEventRow } from '@/lib/education/teacherFunnel';
+import { fetchLastSignIns, fetchLatestRoundStarts } from '@/lib/education/teacherLastActivity';
 import { fetchAllRows } from '@/lib/admin/fetchAllRows';
 
 const CHECKOUT_FUNNEL_EVENT_TYPES = [
@@ -102,7 +103,18 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: profilesRes.error.message }, { status: 500 });
   }
 
-  const profiles = profilesRes.data ?? [];
+  const [signIns, roundStarts] = await Promise.all([
+    fetchLastSignIns(supabase, userIds),
+    fetchLatestRoundStarts(supabase, userIds),
+  ]);
+  if (roundStarts.error) {
+    return NextResponse.json({ error: roundStarts.error }, { status: 500 });
+  }
+
+  const profiles = (profilesRes.data ?? []).map((p) => ({
+    ...p,
+    last_sign_in_at: signIns.get(p.id) ?? null,
+  }));
   const classrooms = classroomsRes.data;
   // Test-owned classrooms are removed inside buildTeacherFunnel; reading memberships and
   // assignments only for the survivors keeps every activity count on the same population.
@@ -155,6 +167,9 @@ export async function GET(request: NextRequest) {
     memberships: membershipsRes.data ?? [],
     assignments,
     checkoutEvents,
+    roundStarts: roundStarts.unavailable
+      ? undefined
+      : [...roundStarts.byTeacher].map(([teacher_id, started_at]) => ({ teacher_id, started_at })),
     nowMs: Date.now(),
   });
 

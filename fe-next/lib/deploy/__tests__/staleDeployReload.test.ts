@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
+  isCrawlerUserAgent,
   isChunkLoadError,
   shouldReloadForStaleDeploy,
   shouldReloadForMissingChunk,
@@ -312,5 +313,19 @@ describe('clearCachesAndReload activates waiting SW before unregister (t_9cc3561
     expect(String((window.location.replace as unknown as ReturnType<typeof vi.fn>).mock.calls[0][0])).toContain(
       `${CHUNK_RELOAD_PARAM}=`,
     );
+  });
+});
+
+describe('isCrawlerUserAgent', () => {
+  it.each([
+    ['Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)', true],
+    ['Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)', true],
+    ['Mozilla/5.0 (compatible; Google-InspectionTool/1.0)', true],
+    ['Mozilla/5.0 (compatible; Baiduspider/2.0)', true],
+    ['Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/140 Safari/537.36', false],
+    ['Mozilla/5.0 (Linux; Android 14; CUBOT X30) AppleWebKit/537.36 Chrome/140 Mobile Safari/537.36', false],
+    ['', false],
+  ])('%s -> %s', (ua, expected) => {
+    expect(isCrawlerUserAgent(ua)).toBe(expected);
   });
 });

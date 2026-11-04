@@ -31,6 +31,7 @@ import { DuelPreview, EndedPreview, HostResultsPreview, PhoneResultsPreview, Qui
 import type { LiveSurfacePreviewKind } from './previewKinds';
 import { StudentQuizPreview } from './StudentQuizPreview';
 import { InGamePreview } from './InGamePreview';
+import { PhoneGamePreview } from './PhoneGamePreview';
 
 export type { LiveSurfacePreviewKind };
 
@@ -121,5 +122,6 @@ export default function LiveSurfacePreview({ kind }: { kind: LiveSurfacePreviewK
   if (kind === 'ended') return <EndedPreview />;
   if (kind === 'quizphone') return <StudentQuizPreview />;
   if (kind === 'ingame') return <InGamePreview />;
+  if (kind === 'phonegame') return <PhoneGamePreview />;
   return <ProjectorPreview />;
 }

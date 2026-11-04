@@ -45,7 +45,10 @@ const lastFrame = (target: Target): Frame =>
 
 /** Reduced motion renders the end state with no tween, so nothing moves and nothing is hidden. */
 export function resolvePreset(name: EduPresetName, reduced: boolean): EduPreset {
-  const preset: EduPreset = EDU_PRESETS[name];
+  return settlePreset(EDU_PRESETS[name], reduced);
+}
+
+export function settlePreset(preset: EduPreset, reduced: boolean): EduPreset {
   if (!reduced) return preset;
   return { initial: false, animate: lastFrame(preset.animate), transition: { duration: 0 } };
 }

@@ -15,6 +15,8 @@ import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
 import { teacherTrialStatus } from '@/lib/education/trial';
 import { TrialStripRecap } from '@/components/teacher/TrialStripRecap';
 import { ProFeaturePreview } from '@/components/teacher/pro/ProFeaturePreview';
+import { rememberCheckoutOrigin } from '@/lib/education/checkoutReturn';
+import { PRO_COPY_PARAMS } from '@/lib/education/proFeatures';
 import {
   trackProGateViewed,
   trackProTrialPreviewUpgradeClicked,
@@ -99,11 +101,12 @@ export function ProGate({ feature, children, active = true, whileChecking = null
   const calm = tone === 'calm';
   const insideOpenGate = useContext(OpenGate);
   const { t, language } = useLanguage();
-  const { hasPro, loading, accessTrialExpires, known, status, source, trialUsed } = useTeacherPro();
+  const { hasPro, loading, accessTrialExpires, accessTrialEnded, known, status, source, trialUsed } = useTeacherPro();
   const [nowMs] = useState(() => Date.now());
   // A live access trial opens every Pro surface (the server-enforced reads honour it too).
   const trial = teacherTrialStatus(accessTrialExpires, nowMs);
   const previewDaysLeft = trial && !trial.isExpired ? trial.daysLeft : null;
+  const trialOver = accessTrialEnded === true || trial?.isExpired === true;
   const checkoutSource = `pro_gate_${feature}` as ProUpgradeSource;
   const paid = useTeacherProCheckout(checkoutSource);
   const polarTrial = useStartTeacherProTrial(t, language, polarTrialPlacement ?? 'reports_teaser');
@@ -114,6 +117,10 @@ export function ProGate({ feature, children, active = true, whileChecking = null
   const { pending, start } = paid;
   const lockAction = offerTrial ? polarTrial : paid;
   const blockedInApp = useCheckoutBlockedInApp();
+  const startFromHere = (begin: () => Promise<void> | void) => {
+    rememberCheckoutOrigin(window.sessionStorage, `${window.location.pathname}${window.location.search}`);
+    void begin();
+  };
 
   useEffect(() => {
     if (insideOpenGate || !active || loading || hasPro) return;
@@ -152,7 +159,7 @@ export function ProGate({ feature, children, active = true, whileChecking = null
             disabled={pending}
             onClick={() => {
               trackProTrialPreviewUpgradeClicked({ feature, days_left: previewDaysLeft });
-              void start();
+              startFromHere(start);
             }}
             className={cn(
               'shrink-0 rounded-neo px-4 py-2 text-sm font-black disabled:opacity-60',
@@ -210,7 +217,7 @@ export function ProGate({ feature, children, active = true, whileChecking = null
             onClick={() => {
               trackGrowthEvent('landing_cta_clicked', { cta: `pro_gate_${feature}` });
               if (!offerTrial) trackProUpgradeClicked({ feature });
-              void lockAction.start();
+              startFromHere(lockAction.start);
             }}
             className={cn(
               'inline-block rounded-neo border-neo px-6 py-3 font-black text-neo-navy shadow-hard transition-shadow hover:shadow-hard-lg disabled:opacity-60',
@@ -227,6 +234,9 @@ export function ProGate({ feature, children, active = true, whileChecking = null
               : t('teacher.subscription.trustCancel')}
           </p>
           </>)}
+          <p data-testid="pro-gate-honest-line" className="mt-2 text-xs font-bold text-neo-cream/80">
+            {trialOver ? t('teacher.proGate.trialEnded') : t('teacher.proGate.freeKeeps', { modes: PRO_COPY_PARAMS.modes })}
+          </p>
         </div>
       </div>
     </div>

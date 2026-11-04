@@ -44,7 +44,9 @@ import { selectNextGameMode, ALL_GAME_MODES } from '../modules/gameModeSelector.
 import { initializePlayerData } from './playerDataInit.js';
 import { startVocabQuizForClassroom } from './vocabQuizHandler.js';
 import { DIFFICULTIES, DEFAULT_DIFFICULTY } from '@/shared/constants/gameConstants';
-import { beginClassroomRound } from '../modules/classroomGameManager.js';
+import { beginClassroomRound, getClassroomGame } from '../modules/classroomGameManager.js';
+import { getSupabase } from '../modules/supabase/client.js';
+import { bumpAuthedClassroomTeacher, classroomStarterAuthId } from './bumpTeacherLastSeen.js';
 import { readClassroomPressure } from '@/shared/utils/classroomPressure';
 import { autoAddBotsForSoloPlayer, autoAddBotForDuo } from '../services/gameLifecycle/autoAddBots.js';
 import { scheduleRoundEvent } from '../modules/roundEventsManager.js';
@@ -222,6 +224,18 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
           return;
         }
         if (quizStart) {
+          // Quiz returns before beginClassroomRound. A presence failure must not
+          // fall through into a board round.
+          try {
+            const quizRecord = await getClassroomGame(gameCode);
+            await bumpAuthedClassroomTeacher(
+              getSupabase(),
+              classroomStarterAuthId(socket, game),
+              quizRecord?.teacherId,
+            );
+          } catch (err) {
+            logger.warn('CLASSROOM_GAME', `last_seen bump skipped for quiz ${gameCode}: ${err instanceof Error ? err.message : String(err)}`);
+          }
           // The board path below arms or clears the boss; a quiz round returns first, so it clears here.
           armRoomBoss(io, gameCode, game, { bossId: undefined, students: 0, roundSeconds: 0 });
           logger.info('SOCKET', `Game ${gameCode} started as a live vocab quiz`);
@@ -252,6 +266,17 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
 
       // Classroom game? Reads the record AND marks the code live for this round.
       const classroomGame = await beginClassroomRound(gameCode);
+      if (classroomGame) {
+        try {
+          await bumpAuthedClassroomTeacher(
+            getSupabase(),
+            classroomStarterAuthId(socket, game),
+            classroomGame.teacherId,
+          );
+        } catch (err) {
+          logger.warn('CLASSROOM_GAME', `last_seen bump skipped for ${gameCode}: ${err instanceof Error ? err.message : String(err)}`);
+        }
+      }
       // The teacher's pressure dials, resolved ONCE here and stashed on the
       // game state: buildRoundPayload echoes them into every start-shaped
       // payload of the round (start/retry/reconnect/late-join/recovery), so
@@ -348,7 +373,7 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
 
       // Lesson words the FINAL board carries — only now is the grid the one the class sees.
       if (classroomGame && vocabToEmbed.length > 0) {
-        recordClassroomWordBank(io, gameCode, game, letterGrid, gameLang, vocabToEmbed);
+        recordClassroomWordBank(io, gameCode, game, letterGrid, gameLang, vocabToEmbed, classroomGame.teacherId);
       }
 
       const bossId = resolvedMode === 'classic' ? classroomGame?.settings?.classroomBossId : undefined;

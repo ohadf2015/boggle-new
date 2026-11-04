@@ -32,7 +32,6 @@ import { cn } from '@/lib/utils';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { fireRankConfetti, cleanupConfetti } from '@/utils/confettiUtils';
 import { playRoundEndCue, ROUND_WIN_SOUND } from '@/lib/education/roundEndSound';
-import { useCountUp } from '@/hooks/useCountUp';
 import type { RoundOutcomeKind } from './roundOutcome';
 
 const TROPHY_STILL = '/mascot/teacher/badge-trophy.webp';
@@ -107,7 +106,6 @@ export function WinnerSpotlight({
   const calm = prefersReducedMotion();
   // The class lost to the boss: the top scorer is a top hitter, never a trophy winner (no win cue, no cup).
   const lostBoss = useClassroomBossStore((s) => (s.view?.status === 'escaped' ? s.view.bossId : null));
-  const shownScore = useCountUp({ target: active && earned ? winner?.score ?? 0 : 0, duration: 900, immediate: calm });
 
   useEffect(() => {
     if (!active || !winner || !earned || !cue || lostBoss || celebratedRef.current) return;
@@ -226,6 +224,7 @@ export function WinnerSpotlight({
         >
           {active ? t(lostBoss ? 'classroomBoss.topHitter' : BANNER[kind]) : t('education.results.moment.drumroll')}
         </p>
+        {/* No score here: the podium plate above counts its own, and a second count-up ran out of step with it. */}
         {active && earned && (
           <p
             className={cn(
@@ -235,16 +234,6 @@ export function WinnerSpotlight({
           >
             <span data-testid="winner-names" dir="auto" className={cn('truncate', quiet && 'leading-tight')}>
               {names.join(' & ')}
-            </span>
-            <span
-              className={cn(
-                'shrink-0 tabular-nums',
-                quiet ? 'text-neo-cream/85' : 'text-neo-lime',
-                projector ? 'text-4xl @[137.5rem]/results:text-6xl' : 'text-xl'
-              )}
-            >
-              {shownScore}
-              <span className="sr-only">{winner.score}</span>
             </span>
           </p>
         )}

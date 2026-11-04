@@ -2661,3 +2661,17 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
 - [exp-connections-hint-gate-v1 unmeasurable] running since 2026-07-08 (~4 months), ~300 users/variant/30d, but its own guardrail event `connections_hint_used` NEVER fired (0 in 30d across both arms) — cannot be decided either way.
   - status: fixed the instrumentation gap this run (HintButton.tsx now fires `connections_hint_used` with method=free|ad|fallback|admin on every reveal path), flag left running as-is
   - recommended owner: review-by-eod — re-check `connections_hint_used` volume in ~7 days; if still near-zero the event wiring itself needs another look before any winner call
+
+## 2026-11-04
+- [Restore] Salvage 20261024-010154 (34 files, dropped 2026-10-24, 11 nights stale)
+  - restored via scripts/nightly/restore-salvaged-code.sh: 28 merged, 6 skipped (conflicts, left untouched: apple-app-site-association route+test, BannerCoordinatorMount.tsx+test, lib/admob-routes.ts, lib/native/bannerController.ts)
+  - root-caused original gate break: useMpPageState.ts + lib/__tests__/admob-routes.test.ts imported AD_FREE_SURFACE_CLASS, a rename that only existed in the skipped (conflicting) admob-routes.ts. Renamed both back to the live export AD_FREE_ROUTE_CLASS.
+  - RunPageClient.tsx / CardPickScreen.tsx TS2322 from the original drop log no longer reproduces — both files came from the same salvage snapshot and their props already match.
+  - status: shipped (uncommitted, orchestrator commits)
+  - why: reversible, small blast radius — pure rename to an existing live constant, no behavior change
+  - recommended owner: review-by-eod (verify eslint/tsc clean on these 4 files before merge; full gate re-runs the project-wide check)
+  - after merge, append {"resolve":"20261024-010154"} to docs/nightly/restore-queue.ndjson
+- [PostHog] Checked active error-tracking issues last 24h — top hit is "ResizeObserver loop completed with undelivered notifications" (48 occurrences/2 users, browser-benign noise, not actionable). No Supabase/Sentry MCP data this run (servers did not connect) — no fresh advisor/issue sweep possible tonight.
+  - status: deferred (not a real bug)
+  - why: known-benign browser warning, 2 users total
+  - recommended owner: self (re-check next night when Supabase/Sentry MCP connects)

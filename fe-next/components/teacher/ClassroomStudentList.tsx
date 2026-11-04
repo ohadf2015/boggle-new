@@ -83,6 +83,7 @@ export default function ClassroomStudentList({ classroomId, joinCode }: Classroo
   const [students, setStudents] = useState<ClassroomStudent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [attempt, setAttempt] = useState(0);
   /** student_id → in-flight, so the control is disabled while its own save is pending. */
   const [savingLevelFor, setSavingLevelFor] = useState<Set<string>>(() => new Set());
 
@@ -134,7 +135,7 @@ export default function ClassroomStudentList({ classroomId, joinCode }: Classroo
     }
 
     fetchStudents();
-  }, [classroomId]);
+  }, [classroomId, attempt]);
 
   if (isLoading) {
     return (
@@ -148,6 +149,13 @@ export default function ClassroomStudentList({ classroomId, joinCode }: Classroo
     return (
       <div className="bg-neo-pink border-3 border-black rounded-neo p-4 text-center shadow-hard-sm">
         <p className="text-black font-neo-body font-bold">{t('teacher.classrooms.students.error')}</p>
+        <button
+          type="button"
+          onClick={() => setAttempt((n) => n + 1)}
+          className="mt-3 min-h-11 rounded-neo border-2 border-black bg-neo-cream px-4 font-neo-body text-sm font-bold text-neo-black shadow-hard-sm active:translate-y-px focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-black"
+        >
+          {t('common.retry')}
+        </button>
       </div>
     );
   }

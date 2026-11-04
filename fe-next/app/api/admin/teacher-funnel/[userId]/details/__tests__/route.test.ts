@@ -44,6 +44,7 @@ function buildSupabaseMock(tables: TableState) {
       not: vi.fn(() => builder),
       order: vi.fn(() => builder),
       limit: vi.fn(() => builder),
+      range: vi.fn(() => builder),
       maybeSingle: vi.fn(async () => {
         const data = result.data;
         if (Array.isArray(data)) return { data: data[0] ?? null, error: result.error };

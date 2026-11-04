@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { pickHubLayout } from '../hubLayout';
+import { pickHubLayout, pickMapArt, showMascot } from '../hubLayout';
 
 /**
  * The hub's layout is picked from aspect AND height, never width alone:
@@ -49,5 +49,42 @@ describe('pickHubLayout', () => {
     expect(pickHubLayout({ width: 1366, height: 768 }).sideCard).toBe(false);
     expect(pickHubLayout({ width: 1920, height: 1080 }).sideCard).toBe(true);
     expect(pickHubLayout({ width: 2560, height: 1440 }).sideCard).toBe(true);
+  });
+});
+
+describe('pickMapArt', () => {
+  const ins = (top: number, bottom: number) => ({ top, bottom, left: 8, right: 8 });
+
+  it('gives a tablet in portrait the landscape map when the chrome leaves a wide band for it', () => {
+    expect(pickMapArt('portrait', { width: 768, height: 948 }, ins(240, 290))).toBe('landscape');
+  });
+
+  it('keeps a phone on the portrait map: its band is too narrow to spread the landscape path across', () => {
+    expect(pickMapArt('portrait', { width: 390, height: 744 }, ins(180, 200))).toBe('portrait');
+  });
+
+  it('keeps the portrait map on a tablet whose band is still tall', () => {
+    expect(pickMapArt('portrait', { width: 768, height: 1366 }, ins(220, 280))).toBe('portrait');
+  });
+
+  it('never turns a landscape view portrait', () => {
+    expect(pickMapArt('landscape', { width: 1366, height: 768 }, ins(120, 140))).toBe('landscape');
+  });
+});
+
+describe('showMascot', () => {
+  it('keeps Lexi on a roomy phone, a tablet and a desktop', () => {
+    expect(showMascot('stack', 844)).toBe(true);
+    expect(showMascot('stack', 948)).toBe(true);
+    expect(showMascot('wide', 700)).toBe(true);
+  });
+
+  it('gives her row to the map on a short phone (or one under a cookie banner)', () => {
+    expect(showMascot('stack', 744)).toBe(false);
+    expect(showMascot('stack', 640)).toBe(false);
+  });
+
+  it('never shows her on a phone on its side: one short row has no room for a bubble', () => {
+    expect(showMascot('rail', 390)).toBe(false);
   });
 });

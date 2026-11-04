@@ -140,90 +140,100 @@ export function GetStudentsInCard({
     onOpenProjector();
   }, [onOpenProjector, sfx]);
 
-  const waiting = rosterLoading || count === 0;
   const copyLabel = t("academy.hq.copyLink", "Copy link");
   const projectorLabel = t("academy.hq.openProjector", "Open projector");
+  const projectorShort = t("eduShell.home.showCode", "Show code");
+
+  const belowGoal = count < STUDENT_GOAL;
+  const codeChars = Array.from(classroom.join_code ?? "");
 
   return (
     <section
       data-testid="hq-get-students-in"
       aria-labelledby={headingId}
-      className={cn("@container flex flex-col gap-2 rounded-neo border-2 border-neo-cream/35 bg-neo-navy p-2.5", className)}
+      className={cn("@container flex flex-col gap-2.5 rounded-neo border-2 border-neo-cream/35 bg-neo-navy p-2.5 sm:p-3", className)}
     >
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
-        <h3 id={headingId} className="w-full whitespace-nowrap font-neo-body text-xs font-bold leading-snug text-neo-cream/70 max-sm:sr-only">
+      <div className="flex items-center justify-between gap-2">
+        <h3 id={headingId} className="whitespace-nowrap font-neo-body text-xs font-bold leading-snug text-neo-cream/70">
           {t("academy.hq.getStudentsIn", "Get students in")}
         </h3>
-        <p data-testid="hq-join-code" dir="ltr" className="flex gap-1">
+        <span
+          data-testid="hq-join-status"
+          title={t("academy.hq.codeReady", "Code ready")}
+          className="hidden shrink-0 items-center gap-1.5 rounded-full border border-neo-cream/35 px-2 py-0.5 font-neo-body text-xs font-bold text-neo-cream/80 @md:inline-flex"
+        >
+          <span className="size-2 rounded-full bg-neo-cream/70" aria-hidden="true" />
+          <span>{t("academy.hq.codeReady", "Code ready")}</span>
+        </span>
+      </div>
+
+      <div className="flex flex-col gap-2 @xl:flex-row @xl:items-center @xl:gap-3">
+        <p
+          data-testid="hq-join-code"
+          dir="ltr"
+          className="grid gap-1.5 @xl:flex-1"
+          style={{ gridTemplateColumns: `repeat(${Math.max(codeChars.length, 1)}, minmax(0, 1fr))` }}
+        >
           <span className="sr-only">{classroom.join_code}</span>
-          {Array.from(classroom.join_code ?? "").map((ch, i) => (
+          {codeChars.map((ch, i) => (
             <span
               key={`${ch}-${i}`}
               aria-hidden="true"
-              className="grid size-[clamp(1.75rem,6cqi,2.75rem)] place-items-center rounded-neo border-2 border-neo-black bg-neo-cream font-neo-display text-[clamp(1rem,3.4cqi,1.5rem)] font-black uppercase text-neo-black"
+              className="grid h-11 min-w-0 place-items-center rounded-neo border-2 border-neo-black bg-neo-cream font-neo-display text-xl font-black uppercase text-neo-black shadow-hard-sm @xl:h-14 @xl:text-3xl"
             >
               {ch}
             </span>
           ))}
         </p>
-        <div data-testid="hq-join-actions" className="flex gap-1.5 sm:gap-2">
-          <button type="button" data-testid="hq-copy-link" onClick={copyLink} aria-label={copyLabel} title={copyLabel} className={cn(OUTLINE_BUTTON, "min-w-11 px-0 @xl:px-3")}>
-            {copied ? <Check className="size-4" strokeWidth={3} aria-hidden="true" /> : <Link2 className="size-4" strokeWidth={3} aria-hidden="true" />}
-            <span className="hidden @xl:inline">{copyLabel}</span>
+        <div data-testid="hq-join-actions" className="flex gap-2 @xl:w-auto @xl:flex-col">
+          <button type="button" data-testid="hq-copy-link" onClick={copyLink} aria-label={copyLabel} title={copyLabel} className={cn(OUTLINE_BUTTON, "min-w-0 flex-1 px-2")}>
+            {copied ? <Check className="size-4 shrink-0" strokeWidth={3} aria-hidden="true" /> : <Link2 className="size-4 shrink-0" strokeWidth={3} aria-hidden="true" />}
+            <span className="truncate">{copyLabel}</span>
           </button>
-          <button type="button" data-testid="hq-open-projector" onClick={openProjector} aria-label={projectorLabel} title={projectorLabel} className={cn(OUTLINE_BUTTON, "min-w-11 px-0 @xl:px-3")}>
-            <MonitorUp className="size-4" strokeWidth={3} aria-hidden="true" />
-            <span className="hidden @xl:inline">{projectorLabel}</span>
+          <button type="button" data-testid="hq-open-projector" onClick={openProjector} aria-label={projectorLabel} title={projectorLabel} className={cn(OUTLINE_BUTTON, "min-w-0 flex-1 px-2")}>
+            <MonitorUp className="size-4 shrink-0" strokeWidth={3} aria-hidden="true" />
+            <span className="truncate">{projectorShort}</span>
           </button>
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-        {!rosterLoading && count < STUDENT_GOAL ? (
-          <div data-testid="hq-joined-goal" className="flex shrink-0 items-center gap-1.5">
-            <span className="flex gap-1" aria-hidden="true">
-              {Array.from({ length: STUDENT_GOAL }, (_, i) => (
-                <span key={i} className={cn("size-2 rounded-full", i < count ? "bg-neo-cream" : "bg-neo-cream/25")} />
-              ))}
-            </span>
-            <span className="inline-flex items-baseline gap-1 font-neo-body text-xs font-bold text-neo-cream/80">
-              <span data-testid="hq-joined-goal-count" className="tabular-nums">{t("academy.hq.joinedGoal", { count, goal: STUDENT_GOAL })}</span>
-            </span>
+      <div
+        data-testid="hq-roster-row"
+        className={cn(
+          "flex min-h-10 min-w-0 items-center gap-2.5 rounded-neo border border-neo-cream/25 px-2.5 py-1",
+          empty && "border-dashed border-neo-cream/35",
+        )}
+      >
+        {rosterLoading ? (
+          <div data-testid="hq-roster-waiting" className="flex min-w-0 flex-1 items-center gap-2">
+            <JoinedCount loading count={count} shown={shownCount} reduced={reduced} label={t("academy.hq.joinedLabel")} empty={t("academy.hq.nobodyYet")} />
           </div>
-        ) : null}
-        <div
-          data-testid="hq-roster-row"
-          className={cn(
-            "flex min-h-9 min-w-0 flex-1 items-center gap-2 rounded-neo border border-neo-cream/35 px-2 py-1",
-            empty && "border-dashed",
-          )}
-        >
-          {waiting ? (
-            <div data-testid={empty ? "hq-first-student-panel" : "hq-roster-waiting"} className="flex min-w-0 flex-1 items-center gap-2">
-              {empty && joinUrl ? (
-                <span data-testid="hq-first-student-qr" className="hidden size-9 shrink-0 rounded-sm bg-neo-white p-0.5 lg:block">
-                  <QRCodeSVG value={joinUrl} size={96} level="L" style={{ width: "100%", height: "100%" }} aria-hidden="true" />
-                </span>
-              ) : null}
-              {empty ? (
-                <p data-testid="hq-first-student-title" className="min-w-0 font-neo-body text-xs font-bold leading-snug text-neo-cream sm:text-sm">
-                  {t("academy.hq.firstStudentTitle", "Get your first student in")}
-                </p>
-              ) : (
-                <JoinedCount loading={rosterLoading} count={count} shown={shownCount} reduced={reduced} label={t("academy.hq.joinedLabel")} empty={t("academy.hq.nobodyYet")} />
-              )}
-            </div>
-          ) : (
-            <>
-              <RosterSeats
-                students={students}
-                arrivals={arrivals}
-                reduced={reduced}
-                seats={wide ? Math.min(Math.max(count, 1), 8) : 5}
-                size={28}
-                showNames={false}
-                className="shrink-0"
-              />
+        ) : empty ? (
+          <div data-testid="hq-first-student-panel" className="flex min-w-0 flex-1 items-center gap-2">
+            {joinUrl ? (
+              <span data-testid="hq-first-student-qr" className="hidden size-9 shrink-0 rounded-sm bg-neo-white p-0.5 lg:block">
+                <QRCodeSVG value={joinUrl} size={96} level="L" style={{ width: "100%", height: "100%" }} aria-hidden="true" />
+              </span>
+            ) : null}
+            <p data-testid="hq-first-student-title" className="min-w-0 flex-1 font-neo-body text-sm font-bold leading-snug text-neo-cream">
+              {t("academy.hq.firstStudentTitle", "Get your first student in")}
+            </p>
+            <GoalCount count={0} label={t("academy.hq.joinedGoal", { count: 0, goal: STUDENT_GOAL })} />
+          </div>
+        ) : (
+          <>
+            <RosterSeats
+              students={students}
+              arrivals={arrivals}
+              reduced={reduced}
+              seats={belowGoal ? STUDENT_GOAL : wide ? Math.min(count, 8) : Math.min(count, 4)}
+              size={28}
+              showNames={false}
+              className="shrink-0"
+            />
+            {belowGoal ? (
+              <GoalCount count={count} label={t("academy.hq.joinedGoal", { count, goal: STUDENT_GOAL })} />
+            ) : (
               <JoinedCount
                 loading={false}
                 count={count}
@@ -232,19 +242,27 @@ export function GetStudentsInCard({
                 label={t("academy.hq.joinedLabel", "joined")}
                 empty={t("academy.hq.nobodyYet", "No one yet. Share the code")}
               />
-            </>
-          )}
-        </div>
-        <span
-          data-testid="hq-join-status"
-          title={t("academy.hq.codeReady", "Code ready")}
-          className="hidden shrink-0 items-center gap-1.5 rounded-full border border-neo-cream/35 px-2 py-0.5 font-neo-body text-xs font-bold text-neo-cream/80 @xl:inline-flex"
-        >
-          <span className="size-2 rounded-full bg-neo-cream/70" aria-hidden="true" />
-          <span>{t("academy.hq.codeReady", "Code ready")}</span>
-        </span>
+            )}
+          </>
+        )}
       </div>
     </section>
+  );
+}
+
+/** The goal line ("1 joined, aim for 3"): the one count while the class is below its goal. */
+function GoalCount({ count, label }: { count: number; label: string }) {
+  return (
+    <p
+      data-testid="hq-joined-goal"
+      aria-live="polite"
+      className={cn(
+        "min-w-0 font-neo-body text-sm font-bold leading-tight",
+        count > 0 ? "text-neo-cream" : "text-neo-cream/70",
+      )}
+    >
+      <span data-testid="hq-joined-goal-count" className="tabular-nums">{label}</span>
+    </p>
   );
 }
 

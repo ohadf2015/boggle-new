@@ -11,6 +11,7 @@ vi.mock('../../modules/gameStateManager', () => ({
 vi.mock('../../modules/classroomGameManager', () => ({
   getClassroomGame: vi.fn().mockResolvedValue(null),
   updateClassroomGameStatus: vi.fn().mockResolvedValue(undefined),
+  saveClassroomSessionScores: vi.fn().mockResolvedValue(undefined),
 }));
 vi.mock('../classroomGamePersistence', () => ({
   persistClassroomGameScores: vi.fn().mockResolvedValue([]),
@@ -24,6 +25,8 @@ import { finishQuiz } from '../../services/vocabQuizRound';
 import { setQuizSession, clearAllQuizSessions } from '../../modules/vocabQuizStore';
 import { createQuizSession, addQuizPlayer } from '../../services/vocabQuizEngine';
 import { VOCAB_QUIZ_EVENTS } from '@/shared/types/vocabQuiz';
+import { getClassroomGame } from '../../modules/classroomGameManager';
+import { resendFinishedResults } from '../finishedResultsResend';
 
 const LESSON = ['abandon', 'brittle', 'candid', 'dwindle', 'endure'].map((word) => ({
   word, definition: `meaning of ${word}`, canIntegrate: true,
@@ -56,5 +59,29 @@ describe('finishQuiz', () => {
     const broadcast = emit.mock.calls.find((c) => c[0] === VOCAB_QUIZ_EVENTS.ended)?.[1];
     expect(broadcast).toBeDefined();
     expect(room.cachedResultsPayload).toEqual({ vocabQuizEnded: broadcast });
+  });
+
+  it('ends a classroom quiz on the shared results payload, recap first, finale after', async () => {
+    startSession();
+    vi.mocked(getClassroomGame).mockResolvedValueOnce({
+      gameCode: 'QUIZ01', classroomId: 'class-1', teacherId: 't', teacherName: 'Ms Lee', lessonIds: ['l'],
+      lessonNames: ['Unit'], vocabularyWords: LESSON.map((w) => w.word), settings: {}, players: [],
+      createdAt: '', status: 'playing',
+    } as never);
+
+    await finishQuiz(fakeIo, 'QUIZ01');
+
+    const order = emit.mock.calls.map((c) => c[0]);
+    expect(order.indexOf('validatedScores')).toBeGreaterThanOrEqual(0);
+    expect(order.indexOf('validationComplete')).toBeGreaterThanOrEqual(0);
+    expect(order.indexOf('validatedScores')).toBeLessThan(order.indexOf(VOCAB_QUIZ_EVENTS.ended));
+    const results = emit.mock.calls.find((c) => c[0] === 'validatedScores')?.[1];
+    expect(results.classroomSummary.podium.map((p: { username: string }) => p.username)).toEqual(['ana']);
+    expect(results.gameMode).toBe('vocab-quiz');
+    expect((room.cachedResultsPayload as Record<string, unknown>).classroomSummary).toBeDefined();
+
+    const socketEmit = vi.fn();
+    resendFinishedResults({ emit: socketEmit, connected: true } as never, 'QUIZ01', room as never);
+    expect(socketEmit.mock.calls.map((c) => c[0])).toEqual(['validatedScores', 'validationComplete', VOCAB_QUIZ_EVENTS.ended]);
   });
 });

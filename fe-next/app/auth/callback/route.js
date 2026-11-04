@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { locales, defaultLocale } from '@/lib/i18n';
+import { authFailureHref, isEduAuthOrigin, resolveAuthNext } from '@/lib/navigation/authReturnPath';
 
 // Helper to detect user's preferred locale from request
 function getPreferredLocale(request) {
@@ -78,8 +79,7 @@ export async function GET(request) {
 
   // Handle OAuth errors from provider
   if (errorParam) {
-    const errorUrl = new URL(`/${locale}`, origin);
-    errorUrl.searchParams.set('auth_error', 'true');
+    const errorUrl = new URL(authFailureHref(locale, next, errorParam), origin);
     if (errorDescription) {
       errorUrl.searchParams.set('error_message', errorDescription);
     }
@@ -97,6 +97,7 @@ export async function GET(request) {
     return NextResponse.redirect(clientCallbackUrl);
   }
 
-  // No code provided - redirect to home with locale
-  return NextResponse.redirect(new URL(`/${locale}`, origin));
+  const { url: resolvedNext } = resolveAuthNext(next, locale);
+  const fallback = isEduAuthOrigin(resolvedNext) ? resolvedNext : `/${locale}`;
+  return NextResponse.redirect(new URL(fallback, origin));
 }

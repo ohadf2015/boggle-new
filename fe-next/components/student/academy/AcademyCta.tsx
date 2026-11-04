@@ -10,7 +10,9 @@
  */
 
 import Image from 'next/image';
-import { m, useReducedMotion } from 'framer-motion';
+import { m } from 'framer-motion';
+import { useEduReducedMotion } from '@/lib/education/motion/useEduReducedMotion';
+import { useCompositorLoop } from '@/lib/education/motion/compositorLoop';
 import { Loader2, Play, Sparkles, UserPlus } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -71,9 +73,13 @@ export function AcademyCta({ kind, activeGame, target, targetLabel, isJoining, j
   const compact = size === 'compact';
   const { t } = useLanguage();
   const sfx = useSoundEffects();
-  const osReduced = useReducedMotion();
+  const osReduced = useEduReducedMotion();
   const still = reducedMotion || !!osReduced;
   const overline = useCtaOverline(kind);
+  const live = kind === 'live';
+  // `scale`, not `transform`: the tap squash is framer's transform and composes with it.
+  const pulse = useCompositorLoop<HTMLButtonElement>(still ? null : { keyframes: [{ scale: '1' }, { scale: '1.025' }, { scale: '1' }], duration: live ? 1000 : 1800 });
+  const shine = useCompositorLoop<HTMLSpanElement>(still ? null : { keyframes: [{ transform: 'translateX(-100%)' }, { transform: 'translateX(400%)' }], duration: 1400, repeatDelay: live ? 500 : 2200 });
 
   const title =
     kind === 'live'
@@ -111,6 +117,7 @@ export function AcademyCta({ kind, activeGame, target, targetLabel, isJoining, j
         </p>
       )}
       <m.button
+        ref={pulse}
         type="button"
         data-testid="academy-cta"
         data-kind={kind}
@@ -123,19 +130,18 @@ export function AcademyCta({ kind, activeGame, target, targetLabel, isJoining, j
         className={cn(
           'icon-only relative flex w-full items-center gap-3 overflow-hidden rounded-[20px] border-3 border-neo-black ps-2 pe-2 text-start text-neo-black disabled:cursor-wait',
           big ? 'min-h-[92px] gap-4 ps-3 pe-3' : compact ? 'h-14 gap-2' : 'min-h-[68px] sm:min-h-[76px]',
+          sub && !compact && 'py-2',
         )}
-        style={toneStyle(tone, { shadow: 5, trim: 2.5 })}
-        animate={still ? undefined : { scale: [1, 1.025, 1] }}
-        transition={still ? undefined : { duration: kind === 'live' ? 1 : 1.8, repeat: Infinity, ease: 'easeInOut' }}
+        // Its own layer: the endless pulse then never repaints the chrome around it.
+        style={{ ...toneStyle(tone, { shadow: 5, trim: 2.5 }), willChange: 'transform' }}
         whileTap={{ scaleX: 1.04, scaleY: 0.9, y: 3 }}
       >
         {/* Shine sweep — the hero catches the light. */}
         {!still && (
-          <m.span
+          <span
+            ref={shine}
             aria-hidden="true"
             className="pointer-events-none absolute inset-y-0 left-0 w-1/4 -skew-x-12 bg-neo-white/45"
-            animate={{ x: ['-100%', '400%'] }}
-            transition={{ duration: 1.4, repeat: Infinity, repeatDelay: kind === 'live' ? 0.5 : 2.2, ease: 'easeInOut' }}
           />
         )}
         <span className={cn('relative flex shrink-0 items-center justify-center', big ? 'h-20 w-20' : compact ? 'h-11 w-11' : 'h-14 w-14 sm:h-16 sm:w-16')}>

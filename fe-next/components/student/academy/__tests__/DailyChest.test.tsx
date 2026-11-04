@@ -32,8 +32,19 @@ describe('<DailyChest>', () => {
     // Not inside the z-20 map layer, where the dock would paint over it.
     expect(reveal.parentElement).toBe(document.body);
     expect(canOpenChest('u1', new Date())).toBe(false);
+    fireEvent.click(await screen.findByText('academy.student.chestCollect'));
     await waitFor(() => expect(onGranted).toHaveBeenCalledWith(300));
     expect(screen.getByTestId('academy-daily-chest')).toBeDisabled();
+  });
+
+  it('hands the new XP to the hub only once the reveal is collected, so the hub does not re-render mid-celebration', async () => {
+    const onGranted = vi.fn();
+    render(<DailyChest userId="u5" reducedMotion onGranted={onGranted} />);
+    fireEvent.click(screen.getByTestId('academy-daily-chest'));
+    await new Promise((r) => setTimeout(r, 20));
+    expect(onGranted).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByText('academy.student.chestCollect'));
+    await waitFor(() => expect(onGranted).toHaveBeenCalledWith(300));
   });
 
   it('labels the badge through t() and isolates its direction (no reversed "!FREE" in Hebrew)', () => {

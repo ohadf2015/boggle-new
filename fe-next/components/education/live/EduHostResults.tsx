@@ -308,16 +308,18 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
                 underHalf={studentsUnderHalf(summary)}
                 bars={reportBars(summary)}
                 proLabel={tf('eduLiveRoom.hostResults.proPill', 'Pro')}
-                className={cn(shortWall && '[@container_results_(height<65rem)]:hidden')}
+                className={shortWall ? '[@container_results_(height<65rem)]:hidden' : '[@container_results_(height<56.25rem)]:hidden'}
               />
             )}
             {!proLoading && hasPro && summary.totalWords > 0 && (
-              <div className={cn(shortWall && '[@container_results_(height<56.25rem)]:hidden')}>
+              <div className={cn((shortWall || phone) && '[@container_results_(height<56.25rem)]:hidden')}>
                 <StrugglePreview masteryByPlayer={summary.masteryByPlayer ?? {}} teacherName={summary.teacherName ?? ''} language={language} t={t} />
               </div>
             )}
             {!proLoading && hasPro && showTeacherInvite(outcome.celebrate, students) && (
-              <TeacherInviteNudge students={students} language={language} whatsapp={phone} compact={phone} t={t} />
+              <div className="[@container_results_(height<56.25rem)]:hidden">
+                <TeacherInviteNudge students={students} language={language} whatsapp={phone} compact={phone} t={t} />
+              </div>
             )}
           </div>
         </div>

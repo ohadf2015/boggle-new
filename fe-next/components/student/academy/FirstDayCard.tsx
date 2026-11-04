@@ -8,9 +8,11 @@ import { isFirstDayDone, type FirstDayGoal, type FirstDayGoalId } from './firstD
 interface Props {
   goals: FirstDayGoal[];
   hasClass: boolean;
+  /** Decorative chest; off when the real chest badge sits beside the card. */
+  chestArt?: boolean;
 }
 
-export function FirstDayCard({ goals, hasClass }: Props) {
+export function FirstDayCard({ goals, hasClass, chestArt = true }: Props) {
   const { t } = useLanguage();
   if (isFirstDayDone(goals)) return null;
 
@@ -30,10 +32,12 @@ export function FirstDayCard({ goals, hasClass }: Props) {
       className="pointer-events-auto flex flex-col gap-1 rounded-[14px] border-2 border-neo-cream/40 bg-neo-navy/90 p-1.5 text-neo-white shadow-hard-sm"
     >
       <div className="flex items-center gap-2">
-        <span className="relative h-9 w-9 shrink-0">
-          <Image src="/images/classroom-chests/classroom-chest-common-closed.webp" alt="" aria-hidden="true" fill unoptimized sizes="36px" className="object-contain" />
-        </span>
-        <ul className="grid min-w-0 flex-1 grid-cols-1 min-[420px]:grid-cols-3 gap-1">
+        {chestArt && (
+          <span className="relative h-9 w-9 shrink-0">
+            <Image src="/images/classroom-chests/classroom-chest-common-closed.webp" alt="" aria-hidden="true" fill unoptimized sizes="36px" className="object-contain" />
+          </span>
+        )}
+        <ul className="grid min-w-0 flex-1 grid-cols-3 gap-1">
           {goals.map((g) => (
             <li
               key={g.id}
@@ -52,7 +56,7 @@ export function FirstDayCard({ goals, hasClass }: Props) {
           ))}
         </ul>
       </div>
-      <p className="font-neo-body text-xs font-bold uppercase tracking-wide text-neo-yellow">
+      <p className="font-neo-body text-xs font-bold uppercase tracking-wide text-neo-yellow [@media(max-height:900px)]:sr-only">
         {hasClass
           ? t('student.firstDay.classStreakHint', "Today's class game starts your class streak")
           : t('student.firstDay.chestHint', 'Win chests in class games')}

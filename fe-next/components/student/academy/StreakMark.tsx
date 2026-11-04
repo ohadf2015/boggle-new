@@ -1,6 +1,6 @@
 'use client';
 
-import { useReducedMotion } from 'framer-motion';
+import { useEduReducedMotion } from '@/lib/education/motion/useEduReducedMotion';
 import { Flame } from 'lucide-react';
 import { Medallion } from './chrome';
 
@@ -8,7 +8,7 @@ type T = (key: string, fallback?: string) => string;
 
 /** The Academy's one day-streak flame: ember medallion that breathes when alive and burns hot when tonight is the last chance. */
 export function StreakMark({ streak, atRisk = false, still, size, t }: { streak: number; atRisk?: boolean; still: boolean; size: number; t: T }) {
-  const osReduced = useReducedMotion();
+  const osReduced = useEduReducedMotion();
   const calm = still || !!osReduced;
   const alive = streak > 0;
   const warn = alive && atRisk;

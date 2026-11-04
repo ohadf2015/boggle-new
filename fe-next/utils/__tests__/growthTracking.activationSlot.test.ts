@@ -82,4 +82,20 @@ describe('markFirstGameActivation — slot waits until PostHog will keep the cap
     const payload = capture.mock.calls.find(c => c[0] === 'growth:first_game_played')?.[1];
     expect(payload).toMatchObject({ score: 90, wordCount: 4 });
   });
+
+  it('emits for an arcade completion when posthog is loaded even if this chunk never armed', async () => {
+    // Page chunks duplicate activationGate. PostHogProvider arms its own copy;
+    // blast/wheel-rush/word-wheel only see isLoaded(). Requiring the local flag
+    // stashed the completion and never replayed it.
+    isLoaded.mockReturnValue(true);
+    const { markFirstGameActivation, trackGameEnd } = await import('../growthTracking');
+    trackGameEnd('wheel-rush', 40, 3, true, 25);
+    markFirstGameActivation({ won: false, score: 12, wordCount: 2, mode: 'blast' });
+
+    const names = capture.mock.calls.map(c => c[0]);
+    expect(names).toContain('growth:first_game_played');
+    expect(names).toContain('growth:game_completed');
+    expect(localStorage.getItem('lexiclash_first_game_played')).toBe('1');
+    expect(sessionStorage.getItem('lexiclash_activation_pending')).toBeNull();
+  });
 });

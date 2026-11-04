@@ -15,6 +15,7 @@
 
 import { memo, useMemo } from 'react';
 import { m } from 'framer-motion';
+import { useEduReducedMotion } from '@/lib/education/motion/useEduReducedMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getXpProgress, type XpProgress } from '@/backend/modules/xpManager';
 import { cn } from '@/lib/utils';
@@ -83,11 +84,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
     return getXpProgress(totalXp);
   }, [totalXp]);
 
-  // Check for reduced motion preference
-  const prefersReducedMotion = useMemo(() => {
-    if (typeof window === 'undefined') return false;
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  }, []);
+  const prefersReducedMotion = useEduReducedMotion();
 
   const sizeConfig = SIZE_CONFIG[size];
 

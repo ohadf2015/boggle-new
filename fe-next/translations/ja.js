@@ -3464,6 +3464,7 @@ const ja = {
     "updateReady": "アップデートの準備ができました",
     "updateRestart": "再起動",
     "pressBackAgainToExit": "もう一度戻るで終了",
+    "stop": "停止",
     "used": "使用済み",
     "email": "メール",
     "free": "無料",
@@ -14420,6 +14421,8 @@ const ja = {
       },
       "trialPreview": "Proプレビュー：このページはあと{{days}}日間開けます。その後はProが必要です。",
       "trialPreviewCta": "Proで使い続ける",
+      "trialEnded": "Proプレビューは終了しました。クラスとゲームの記録はそのまま残っています。Proにすると、このページがまた使えます。",
+      "freeKeeps": "無料プランでも、教室向けゲーム{{modes}}種類、自分の単語リスト、広告なしの環境はそのまま使えます。",
       "cta": "Proで使えるようにする（月額 {{price}}）"
     },
     "digest": {
@@ -15076,7 +15079,19 @@ const ja = {
       "notCompleted": "未完了",
       "strugglingAreas": "苦手分野",
       "studentsMissed": "生徒が間違えた",
-      "noStrugglingAreas": "苦手分野は特定されていません"
+      "noStrugglingAreas": "苦手分野は特定されていません",
+      "playedCount": "{played}/{total}人がプレイ",
+      "nobodyYet": "まだ誰もプレイしていません。生徒が終えると結果がここに表示されます。",
+      "needHelp": "サポートが必要",
+      "onTrack": "プレイした全員が70%以上でした。",
+      "mostMissed": "よく間違えた単語",
+      "missedBy": "{count}/{played}人が間違えた",
+      "notPlayedTitle": "未プレイ（{count}人）",
+      "allPlayed": "全員がプレイしました。",
+      "noMisses": "ミスなし",
+      "loadFailed": "プレイした生徒を読み込めませんでした。",
+      "eachStudent": "生徒ごと（{count}人）",
+      "noScores": "まだスコアがありません。このプレイでは単語の結果が保存されていません。"
     },
     "tracking": {
       "all": "すべて",
@@ -15828,7 +15843,9 @@ const ja = {
     "wordBank": {
       "title": "単語バンク（{{count}}）",
       "hint": "これらの単語はボードに隠れています。タップで閉じる。",
-      "challengeBadge": "チャレンジ：{{min}}文字以上の単語をねらおう"
+      "challengeBadge": "チャレンジ：{{min}}文字以上の単語をねらおう",
+      "huntTitle": "レッスンの単語 {{found}}/{{total}}",
+      "huntHidden": "かくれたレッスンの単語（{{length}}文字）"
     },
     "studentPreview": {
       "button": "生徒に見える画面をプレビュー",
@@ -19403,6 +19420,9 @@ const ja = {
       }
     },
     "setup": {
+      "tagline": "単語を置いて陣地を広げ、ボットを出し抜こう。",
+      "showAdvanced": "詳細設定",
+      "hideAdvanced": "詳細設定を閉じる",
       "title": "対戦のセットアップ",
       "opponent": {
         "label": "対戦相手",
@@ -19425,6 +19445,7 @@ const ja = {
       "sendChallengeNow": "さあ、挑戦状を送ろう！"
     },
     "daily": {
+      "goals": { "title": "今日の目標" },
       "title": "デイリーボード",
       "play": "今日のボードをプレイ",
       "done": "今日はクリア · もう一度",
@@ -21430,7 +21451,8 @@ const ja = {
       "leave": "退出",
       "calculating": "単語を集計中…",
       "classGoal": "クラスの合計：{found}/{total}語",
-      "waitNext": "次は先生が決めるよ。待つ間にウォームアップ！"
+      "waitNext": "次は先生が決めるよ。待つ間にウォームアップ！",
+      "moreFromRound": "このラウンドの詳細"
     }
   }
   // @eduLiveRoom:end
@@ -21495,6 +21517,7 @@ const ja = {
       "colStudents": "生徒",
       "colLastPlayed": "最後のプレイ",
       "students": "生徒 {count}人",
+      "studentsOne": "生徒 1人",
       "notPlayedRecently": "30日間プレイなし",
       "playWith": "{name}でゲームを始める",
       "showCode": "コードを表示",
@@ -21656,7 +21679,9 @@ const ja = {
       "packWords": "{count}語",
       "packRecommended": "おすすめ",
       "startLive": "ライブ開始",
-      "createOnly": "クラスだけ作る"
+      "createOnly": "クラスだけ作る",
+      "packHint": "参加した生徒には、これらの単語が宿題としても届きます。",
+      "assignFailed": "クラスはできましたが、単語の割り当てに失敗しました。クラスのページから割り当ててください。"
     },
     "host": {
       "classLabel": "クラス",
@@ -21783,6 +21808,13 @@ const ja = {
   }
   // @teacherLifecycleEmail:end
   ,
+  // @wordcraftReview:start
+  "wordcraftReview": {
+    "cta": "逃した単語を復習 ({count})",
+    "homeworkDone": "宿題クリア",
+    "next": "逃した単語 ({count})",
+  },
+  // @wordcraftReview:end
   // @eduPolish:start
   "eduPolish": {
     "seatCapReached": "{name}さんは観戦中です：クラスが満員です（{cap}人）",

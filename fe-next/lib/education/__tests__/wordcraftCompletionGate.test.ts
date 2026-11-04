@@ -6,6 +6,7 @@ vi.mock('@/utils/logger', () => ({
 }));
 
 import { gateWordCraftCompletion } from '../wordcraftCompletionGate';
+import { lessonWordsPlayed } from '../wordcraftAssignment';
 
 /**
  * Server-side bar for Word Craft homework. The game runs on the client, so the
@@ -66,5 +67,23 @@ describe('gateWordCraftCompletion', () => {
     expect(out.completed).toBe(false);
     const three = await gateWordCraftCompletion(null, { ...base, wordsFound: ['A1', 'B2', 'C3'] });
     expect(three.completed).toBe(true);
+  });
+
+  it('Given what the homework screen reports for a round that built one lesson word, When gated, Then the assignment completes', async () => {
+    const history = [
+      { who: 'player' as const, words: ['שלום'] },
+      { who: 'bot' as const, words: ['ספר'] },
+    ];
+    const vocabularyWordsFound = lessonWordsPlayed(history, ['שלום', 'ספר'], 'he');
+    const out = await gateWordCraftCompletion(adminWith(HE_LESSON), { ...base, vocabularyWordsFound, wordsFound: ['שלום'] });
+    expect(out.completed).toBe(true);
+    expect(out.results).toEqual({ outcome: 'completed', lessonWords: 1, validWords: 1 });
+  });
+
+  it('Given a lesson stored as plain strings, When its word is built, Then it still counts', async () => {
+    const admin = adminWith({ words: ['cat', 'dog'] as never, language: 'en' });
+    const out = await gateWordCraftCompletion(admin, { ...base, vocabularyWordsFound: ['CAT'], wordsFound: ['CAT'] });
+    expect(out.completed).toBe(true);
+    expect(out.vocabularyWordsFound).toEqual(['CAT']);
   });
 });
