@@ -6,6 +6,7 @@ import { syncAuthAnalyticsTransition } from '@/utils/authAnalytics';
 import { consumePendingSignupCompletion, consumeSignupSource, isRecentAccount, maybeTrackSignupCompleted, setAnalyticsIdentity } from '@/utils/growthTracking';
 import { markAuthProviderMounted } from '@/lib/auth/authProviderMounted';
 import { persistProfileAttribution } from '@/utils/profileAttribution';
+import { emailSignupNeedsCatchup, metaString } from '@/lib/auth/signupAttributionApply';
 import { markFreshSignup } from '@/lib/retention/accountFirstGame';
 import { isCountableSignupUser } from './auth/signupCountability';
 import type { AuthContextValue } from './auth/authTypes';
@@ -148,24 +149,31 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
         // results_inline: a tap on the post-results inline card latches its
         // own source and wins attribution over the sheet funnel variant.
         const latchedSource = consumeSignupSource();
+        const meta = (user.user_metadata ?? null) as Record<string, unknown> | null;
+        const stashedSurface = metaString(meta, 'signup_surface');
         const source = latchedSource ??
           (pending === 'first_win'
             ? 'first_win_prompt'
             : pending === 'multi_game'
             ? 'multi_game_prompt'
-            : 'header_or_menu');
+            : stashedSurface ?? 'header_or_menu');
+        const recent = isRecentAccount(user.created_at, Date.now());
         // Re-fire-proof: only fires for a *just-created* account, deduped per
         // user per device. A restored session on cold load (returning user)
         // resets `wasGuest` to true via the in-memory ref, but its account is
         // not recent and/or already counted, so no spurious signup is emitted.
-        maybeTrackSignupCompleted({ userId: user.id, createdAt: user.created_at, source });
+        if (recent) {
+          maybeTrackSignupCompleted({ userId: user.id, createdAt: user.created_at, source });
+        }
         consumePendingSignupCompletion();
-        // t_a80f937b: persist first-touch attribution (referrer domain,
-        // landing path, utm_*) + the signup surface onto the profile — only
-        // for a genuinely fresh account, server never overwrites non-null
-        // values. Fire-and-forget; must never block the auth flow.
-        if (isRecentAccount(user.created_at, Date.now())) {
-          void persistProfileAttribution(source);
+        // t_a80f937b / t_9eb9ad5f: persist first-touch + surface. Email confirms
+        // older than the 1h client window still POST when this signup stashed
+        // signup_surface in user_metadata — the server emits growth:signup_completed
+        // once and ignores old accounts that never stashed it.
+        if (recent || emailSignupNeedsCatchup(user)) {
+          void persistProfileAttribution(source, { metadata: meta });
+        }
+        if (recent) {
           // Arm the once-per-account first-game goal. Never blocks auth.
           markFreshSignup(user, source);
         }

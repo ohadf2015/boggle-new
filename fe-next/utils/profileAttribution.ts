@@ -18,6 +18,20 @@ export interface ProfileAttributionPayload {
   utm_medium?: string | null;
   utm_campaign?: string | null;
   signup_surface?: string | null;
+  language?: string | null;
+  country_code?: string | null;
+}
+
+export interface AttributionExtras {
+  /** raw_user_meta_data from the signup, present even in a different browser. */
+  metadata?: Record<string, unknown> | null;
+  language?: string | null;
+  countryCode?: string | null;
+}
+
+function metaStr(meta: Record<string, unknown> | null | undefined, key: string): string | null {
+  const value = meta?.[key];
+  return typeof value === 'string' && value.trim() ? value.trim() : null;
 }
 
 /**
@@ -26,21 +40,27 @@ export interface ProfileAttributionPayload {
  */
 export async function persistProfileAttribution(
   signupSurface: string | null,
+  extras?: AttributionExtras,
 ): Promise<boolean> {
   if (typeof window === 'undefined') return false;
 
   const firstTouch = getFirstTouchAttribution();
+  const meta = extras?.metadata ?? null;
+  const surface = signupSurface || metaStr(meta, 'signup_surface');
   const payload: ProfileAttributionPayload = {
-    referrer_domain: firstTouch?.referrer_domain ?? null,
-    landing_path: firstTouch?.landing_path ?? null,
-    utm_source: firstTouch?.utm_source ?? null,
-    utm_medium: firstTouch?.utm_medium ?? null,
-    utm_campaign: firstTouch?.utm_campaign ?? null,
-    signup_surface: signupSurface,
+    referrer_domain: firstTouch?.referrer_domain ?? metaStr(meta, 'referrer_domain'),
+    landing_path: firstTouch?.landing_path ?? metaStr(meta, 'landing_path'),
+    utm_source: firstTouch?.utm_source ?? metaStr(meta, 'utm_source'),
+    utm_medium: firstTouch?.utm_medium ?? metaStr(meta, 'utm_medium'),
+    utm_campaign: firstTouch?.utm_campaign ?? metaStr(meta, 'utm_campaign'),
+    signup_surface: surface,
+    language: extras?.language ?? metaStr(meta, 'language'),
+    country_code: extras?.countryCode ?? metaStr(meta, 'country_code'),
   };
 
-  // Nothing to persist — skip the round-trip.
-  if (!firstTouch && !signupSurface) return false;
+  // Nothing to persist — skip the round-trip. Metadata from a cross-browser
+  // confirm counts: the local first-touch is gone, the account still has it.
+  if (!Object.values(payload).some((value) => value)) return false;
 
   try {
     // Attach a bearer token when a session is available so the route
@@ -55,16 +75,25 @@ export async function persistProfileAttribution(
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
 
-    const res = await fetch('/api/auth/attribution', {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(payload),
-    });
-    if (!res.ok) {
-      if (res.status !== 401) logger.warn('[attribution] profile persist failed with status', res.status);
-      return false;
+    // The profile row is created by a trigger that can lose the race with
+    // this POST. One retry on 404; anything else fails closed.
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const res = await fetch('/api/auth/attribution', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(payload),
+      });
+      if (res.status === 404 && attempt === 0) {
+        await new Promise((resolve) => setTimeout(resolve, 400));
+        continue;
+      }
+      if (!res.ok) {
+        if (res.status !== 401) logger.warn('[attribution] profile persist failed with status', res.status);
+        return false;
+      }
+      return true;
     }
-    return true;
+    return false;
   } catch (error) {
     logger.warn('[attribution] profile persist error:', error);
     return false;

@@ -7123,6 +7123,13 @@ const ja = {
       "codeSent": "コード送信しました",
       "resend": "再送信"
     },
+    "emailHint": {
+      "suggest": "{email} の間違いではありませんか？",
+      "useSuggestion": "このアドレスを使う",
+      "noMx": "そのドメインにはメールサーバーがありません。確認メールは届きません。",
+      "useAnyway": "このまま送る",
+      "teacherToggle": "教師です"
+    },
     "trustBadge": "安全＆プライベート",
     "callback": {
       "completingSignIn": "サインイン中...",

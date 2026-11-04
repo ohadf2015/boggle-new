@@ -7165,6 +7165,13 @@ const he = {
       "changeEmail": "שינוי אימייל",
       "resend": "שליחה מחדש"
     },
+    "emailHint": {
+      "suggest": "התכוונתם ל-{email}?",
+      "useSuggestion": "השתמשו בכתובת הזו",
+      "noMx": "לדומיין הזה אין שרת דואר. מייל האימות לא יגיע.",
+      "useAnyway": "שלחו בכל זאת",
+      "teacherToggle": "אני מורה"
+    },
     "trustBadge": "מאובטח ופרטי",
     "callback": {
       "completingSignIn": "משלים התחברות...",
