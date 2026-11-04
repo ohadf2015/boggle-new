@@ -60,6 +60,13 @@ ARG NEXT_PUBLIC_ADSENSE_ENABLED
 # PageClient.tsx:19 reads this at BUILD time and it was never forwarded, so the client
 # bundle bakes it as undefined. Declared here so Railway forwards the service var.
 ARG NEXT_PUBLIC_CHECKOUT_ENABLED
+# FDT widget + server error reporter gate (#1607/#1619): both fail closed unless
+# NEXT_PUBLIC_FDT_ENABLED is exactly "true", and Next inlines it at build time.
+# Defaulted to true here because this Dockerfile only builds the Railway image
+# serving www.lexiclash.live; local `next dev` never sees it, so localhost stays
+# gated. A Railway service var of the same name still overrides it.
+ARG NEXT_PUBLIC_FDT_ENABLED=true
+ENV NEXT_PUBLIC_FDT_ENABLED=$NEXT_PUBLIC_FDT_ENABLED
 ARG NEXT_PUBLIC_POSTHOG_KEY
 ARG NEXT_PUBLIC_POSTHOG_HOST
 # Railway injects this at build; next.config.mjs copies it into
@@ -112,6 +119,8 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+# Runtime copy for lib/feedback/serverErrorReport.ts, which reads process.env.
+ENV NEXT_PUBLIC_FDT_ENABLED=true
 
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
