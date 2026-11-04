@@ -1,12 +1,7 @@
 import type { NextFunction, Request, Response } from 'express';
+import type { MetadataRoute } from 'next';
 
-type SitemapEntry = {
-  url: string;
-  lastModified?: string | Date;
-  changeFrequency?: string;
-  priority?: number;
-  alternates?: { languages?: Record<string, string> };
-};
+type SitemapEntry = MetadataRoute.Sitemap[number];
 
 /** Same bytes the Express /sitemap.xml route has always sent. */
 export function buildSitemapXml(routes: SitemapEntry[]): string {
