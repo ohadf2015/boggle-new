@@ -6,6 +6,7 @@ import { extractFaqFromSections } from '@/utils/seo/parseFaqProse';
 import { EsScrabbleCrossLink } from '@/components/seo/EsScrabbleCrossLink';
 import { SvScrabbleCrossLink } from '@/components/seo/SvScrabbleCrossLink';
 import { HeScrabbleCrossLink } from '@/components/seo/HeScrabbleCrossLink';
+import { EnBoggleCrossLink } from '@/components/seo/EnBoggleCrossLink';
 import BoggleVsScrabblePageClient from './PageClient';
 import { contentByLocale } from './content';
 
@@ -78,6 +79,7 @@ export default async function BoggleVsScrabblePage({ params }: PageProps) {
               <p className="mt-2 text-sm text-slate-300">LexiClash is the browser-based, real-time Scrabble alternative: 2-20 players, no download, no signup. See the full comparison →</p>
             </Link>
           </aside>
+          <EnBoggleCrossLink locale={locale} anchorVariant="blog" />
         </div>
       )}
       <EsScrabbleCrossLink locale={locale} anchorVariant="blog" />

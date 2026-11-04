@@ -6,6 +6,7 @@ import { EducationIntentCta } from '@/components/education/EducationIntentCta';
 import { FRIENDS_ANSWER, PlayBoggleWithFriendsSection } from '@/components/seo/PlayBoggleWithFriendsSection';
 import { ApalabradosSinDescargarLink } from '@/components/seo/ApalabradosSinDescargarLink';
 import { DescargarScrabblePcLink } from '@/components/seo/DescargarScrabblePcLink';
+import { RoundSetupSection, TWO_PLAYER_FAQ } from './RoundSetupSection';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -69,12 +70,13 @@ const faqs = [
   },
   {
     q: 'Is this like real Boggle?',
-    a: "LexiClash is inspired by Boggle with exciting additions! Like Boggle, you find words by connecting adjacent letters on a grid. But LexiClash adds real-time multiplayer, combo scoring, multiple grid sizes (4x4, 5x5, 6x6), daily challenges, and boss battles — all free.",
+    a: "LexiClash is inspired by Boggle with exciting additions! Like Boggle, you find words by connecting adjacent letters on a grid. But LexiClash adds real-time multiplayer, combo scoring, three board sizes (5x5, 6x6, 7x7), daily challenges, and boss battles — all free.",
   },
   {
     q: 'Can I play with friends online?',
     a: 'Yes. Create a room in Multiplayer, then share the 4-letter code, the QR, or the share button. Friends join from any browser. No download and no account. One room holds up to 50 players.',
   },
+  TWO_PLAYER_FAQ,
   {
     q: 'Is LexiClash better than Words With Friends?',
     a: "LexiClash offers a different experience. Unlike Words With Friends (turn-based), LexiClash is real-time — everyone plays simultaneously, making it faster and more exciting. It combines Boggle-style grid word finding with competitive multiplayer. Both are great, but LexiClash is completely free with no pay-to-win mechanics.",
@@ -133,7 +135,7 @@ const softwareAppJsonLd = JSON.stringify({
     'No download required — play in browser',
     'Daily Word Wheel puzzle',
     '6 language support (EN, HE, SV, JA, ES, RU)',
-    '4x4, 5x5, 6x6 grid sizes',
+    '5x5, 6x6, 7x7 grid sizes',
     'Adventure mode with boss battles',
     'Combo scoring system',
   ],
@@ -162,7 +164,7 @@ const modeBgMap = {
 } as const;
 
 const stats = [
-  { value: '4×4-6×6', label: 'Grid Sizes', color: 'text-neo-lime' },
+  { value: '5×5-7×7', label: 'Grid Sizes', color: 'text-neo-lime' },
   { value: '6', label: 'Languages', color: 'text-neo-cyan' },
   { value: '50', label: 'Max Players', color: 'text-neo-pink' },
   { value: '8', label: 'Game Modes', color: 'text-neo-yellow' },
@@ -172,7 +174,7 @@ const features = [
   { icon: '⚡', text: 'Free online — no download, no signup, no ads-hell' },
   { icon: '🤖', text: 'Solo mode vs AI bots at three sass levels' },
   { icon: '🎉', text: 'Real-time multiplayer with 2–50 players' },
-  { icon: '🔠', text: 'Three grid sizes: 4×4, 5×5, 6×6' },
+  { icon: '🔠', text: 'Three grid sizes: 5×5, 6×6, 7×7' },
   { icon: '🌀', text: 'Daily Word Wheel — chase the global record' },
   { icon: '🔥', text: 'Combo scoring rewards lightning chains' },
   { icon: '📱', text: 'Phone, tablet, desktop — same game everywhere' },
@@ -189,7 +191,7 @@ const compareRows: ReadonlyArray<readonly [string, string, string, string]> = [
   ['Daily challenges', '✓', '✗', '✗'],
   ['Multi-language', '6 langs', '✗', '✗'],
   ['Boss battles', '✓', '✗', '✗'],
-  ['Grid sizes', '4×4 · 5×5 · 6×6', '4×4 only', 'N/A'],
+  ['Grid sizes', '5×5 · 6×6 · 7×7', '4×4 only', 'N/A'],
 ];
 
 export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
@@ -433,6 +435,8 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
             .
           </p>
         </section>
+
+        <RoundSetupSection />
 
         {/* APP INTENT — GR #11385. Extend this page; do not publish a second URL. */}
         <section className="mt-20">
