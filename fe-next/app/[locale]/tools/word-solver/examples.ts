@@ -20,6 +20,23 @@ export interface SolverExamples {
 }
 
 export const SOLVER_EXAMPLES: Partial<Record<Locale, SolverExamples>> = {
+  en: {
+    heading: 'Anagram solver examples',
+    lead: 'These are real searches on this page. The count is how many words those letters make in our English dictionary, which includes rare Scrabble-style words.',
+    lettersLabel: 'Letters',
+    countLabel: 'Words found',
+    picksLabel: 'Some of the words',
+    countSuffix: ' words',
+    listSeparator: ', ',
+    rows: [
+      { letters: 'listen', total: 119, picks: ['silent', 'enlist', 'tinsel'], note: 'A classic: all six letters rearrange into three everyday words.' },
+      { letters: 'earth', total: 55, picks: ['heart', 'hater', 'hear'], note: 'Shorter words count too, so five letters go further than you might expect.' },
+      { letters: 'aelrst', total: 168, picks: ['alert', 'alter', 'staler'], note: 'Common letters like these are worth keeping on a Scrabble rack.' },
+      { letters: 'moon starer', total: 782, picks: ['astronomer', 'restroom', 'resonator'], note: 'Spaces are ignored, so you can paste a whole phrase. Results are single words.' },
+      { letters: 'cat?', total: 140, picks: ['coat', 'cart', 'chat'], note: 'A question mark is a blank tile that can be any letter. You can use up to three.' },
+    ],
+    outro: 'Each search shows up to 500 words, longest first. Want to find them yourself against the clock? Play a round of LexiClash.',
+  },
   ja: {
     heading: 'アナグラム検索の例',
     lead: 'このページの検索で実際に出た結果です。ひらがな・カタカナ・漢字のどれで入れても探せます。カタカナはひらがなに直してから辞書と照らし合わせます。',
