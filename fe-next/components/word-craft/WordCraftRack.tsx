@@ -123,21 +123,24 @@ function WordCraftRackImpl({
             onClick={() => {
               // If the gesture ended as a drop, the tile is now pending — skip toggle.
               if (consumeDropFlag?.()) return;
-              // Real axis locked (≥2 collinear tiles): a single tap on ANY tile
-              // auto-places it at the only legal next cell. This is the
-              // lightweight "tap-tap-tap to spell" flow for letters 3..7. It is
-              // unambiguous (one legal cell), so it cannot reproduce the old
-              // length-1 "tap doesn't work" confusion — that was direction
-              // ambiguity, which only exists before a real axis is set.
-              if (autoPlaceOnTap && onFastTap) {
-                onFastTap(tile);
-                return;
-              }
-              // Length-1 convenience: re-tapping the ALREADY-selected tile while a
-              // (provisional) axis is locked auto-places along the chosen axis.
-              // Tapping any OTHER tile just selects it — so "tap a letter, then
-              // tap the cell I want" still works while the direction is being set.
-              if (isSelected && axisLocked && onFastTap) {
+
+              // Contract, from the player complaint that tap-to-aim stopped
+              // working once a tile was down: tapping an UNSELECTED tile always
+              // just SELECTS it, so "tap a letter, then tap the cell I want"
+              // keeps working at every stage. Fast-tap is the opt-in
+              // convenience — the caller passes autoPlaceOnTap, or the player
+              // re-taps the tile they already selected while an axis is locked.
+              // Auto-placing every tap (briefly the case) took the aiming away.
+              const isPending = pendingIds.has(tile.id);
+              const shouldFastTap =
+                !isPending &&
+                onFastTap &&
+                // caller opted in, or the player re-taps the tile they already
+                // selected while an axis is locked (explicit confirm gesture).
+                // The first tile of the game is centred by the reducer, not here.
+                (autoPlaceOnTap || (isSelected && axisLocked));
+
+              if (shouldFastTap) {
                 onFastTap(tile);
                 return;
               }
