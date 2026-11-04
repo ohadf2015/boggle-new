@@ -1,6 +1,6 @@
 {
-  "date": "2026-11-03",
-  "note": "IMPACT CHECK on 10-24 AcademyMap image-optimize: /en/student p75 LCP 1476ms (baseline 4984ms) but n=2, below 50-sample floor -- verdict 'improved' logged to impact-ledger.ndjson as LOW CONFIDENCE, directionally consistent only. Frontend brief's other items (he/daily 9741ms, es/blast 5332ms, es/multijugador 5412ms, en/education/access 4948ms) all n<=9 on direct check -- all DEFERRED, below floor, no new regression could be verdicted. A raw unfiltered query surfaced '/app' at n=56/p75=4357ms looking like a real signal; re-run with $host LIKE '%lexiclash%' made it vanish entirely -- confirmed cross-tenant noise per the known PostHog multi-tenant-project pitfall, not a real route. Max real lexiclash route traffic tonight: /en n=19, /en/multiplayer n=15 -- neither clears the 50-sample floor. Backend: supabase MCP never connected this run (server stayed in 'connecting' state for the full session, no mcp__supabase__* tool ever became available) and no REST fallback script exists under scripts/nightly/lib -- advisor/pg_stat_statements unreachable, carrying prior numbers forward unchanged. No fresh .next build present -- bundle not re-measured, carrying 10-23 numbers unchanged. No code shipped tonight; research-only -- two consecutive nights (10-27, 11-03) with zero lexiclash routes clearing n>=50, same root cause (low absolute traffic on the shared PostHog project).",
+  "date": "2026-11-04",
+  "note": "IMPACT CHECK on 10-24 AcademyMap: /[locale]/student p75 LCP 10518ms but n=6, below 50-sample floor -- verdict 'neutral'/DEFERRED logged to impact-ledger.ndjson, not a real regression signal (3rd night this metric can't be confirmed either way). Brief's 4 other LCP items (titrate.day blog -- NOT a lexiclash host, cross-tenant noise; es/profile n=3; es/word-tower/daily n=2; en/student n=5) all sub-floor or off-tenant -- none actionable. Raw unfiltered query again surfaced phantom '/app' (n=61, p75=5157ms); re-run with $host filtered to lexiclash confirmed it vanishes again -- 3rd consecutive night confirming this is cross-tenant noise, not a real route (see prior note). Host-filtered real routes tonight: /en/join n=39 (lcp 1805, inp 124), /en/multiplayer n=34 (lcp 2164, inp 456, cls 0.092), /en n=22 (lcp 2007, inp 864), / n=16 (lcp 1491), /he/education n=12 -- ALL below the 50-sample floor, so none eligible for a regression verdict. /en's inp=864 and /en/multiplayer's inp=456 are both >200ms and worth re-checking once traffic clears 50, but recording as DEFERRED only (3rd consecutive night zero lexiclash routes clear n>=50). Backend: supabase MCP again never surfaced a callable tool this run (3rd consecutive night) and no REST fallback script exists under scripts/nightly/lib -- flagging for lane 7 to script (per 'anything repeatable -> script it'); carrying prior advisor/pg_stat numbers unchanged. No fresh .next build present -- bundle not re-measured, carrying 10-23 numbers unchanged. No code shipped tonight: the one real-traffic page inspected (/en/multiplayer) is already hand-tuned by a prior lane (ReactDOM.preload hero image, ssr:false split) with no further safe/verifiable win found inside the time budget -- research-only.",
   "backend": {
     "advisor_warnings_count": 2,
     "shipped": [],
@@ -9,23 +9,27 @@
       "multiple_permissive_policies": "115 findings of overlapping permissive policies per table/role/action (e.g. assignment_completions SELECT has 3 policies) -- same RLS-out-of-scope reasoning",
       "auth_db_connections_absolute": "dashboard config toggle, not code/migration -- human queue, unchanged",
       "realtime_wal_json_parser_cpu": "governed by 50-supabase-perf.md pg_cron auto-remediation (jobid 22-24), no new flag tonight",
-      "mcp_unreachable_2026-11-03": "supabase MCP server never finished connecting this run -- no execute_sql call was possible, numbers below are carried from 10-27 verbatim, not re-verified tonight"
+      "mcp_unreachable_2026-11-04": "supabase MCP again never surfaced a callable tool this run (3rd consecutive night) -- no execute_sql call was possible, numbers below carried forward verbatim, not re-verified tonight"
     }
   },
   "frontend": {
     "by_route": [
-      { "route": "/en", "p75_lcp": 2220, "n": 19 },
-      { "route": "/en/multiplayer", "p75_lcp": 1404, "n": 15 }
+      { "route": "/en/join", "p75_lcp": 1805, "p75_inp": 124, "p75_cls": 0.0018, "n": 39 },
+      { "route": "/en/multiplayer", "p75_lcp": 2164, "p75_inp": 456, "p75_cls": 0.092, "n": 34 },
+      { "route": "/en", "p75_lcp": 2007, "p75_inp": 864, "p75_cls": 0.056, "n": 22 },
+      { "route": "/", "p75_lcp": 1491, "p75_inp": 184, "p75_cls": 0, "n": 16 },
+      { "route": "/he/education", "p75_lcp": 968, "p75_inp": 88, "p75_cls": 0.012, "n": 12 }
     ],
     "shipped": [],
     "deferred": [
-      { "route": "/en/student", "p75_lcp": 1476, "n": 2, "reason": "IMPACT CHECK, below 50-sample floor, logged to impact-ledger.ndjson as low-confidence 'improved'" },
-      { "route": "/he/daily", "p75_lcp": 9741, "n": 1, "reason": "below 50-sample floor" },
-      { "route": "/es/blast", "p75_lcp": 5332, "n": 1, "reason": "below 50-sample floor" },
-      { "route": "/es/juego-de-palabras-multijugador", "p75_lcp": 5412, "n": 1, "reason": "below 50-sample floor" },
-      { "route": "/en/education/access", "p75_lcp": 4948, "n": 2, "reason": "below 50-sample floor" }
+      { "route": "/[locale]/student?class=open", "p75_lcp": 10518, "n": 6, "reason": "IMPACT CHECK, below 50-sample floor, logged to impact-ledger.ndjson as 'neutral'" },
+      { "route": "/es/profile?tab=collection", "p75_lcp": 12200, "n": 3, "reason": "below 50-sample floor" },
+      { "route": "/es/word-tower/daily", "p75_lcp": 9444, "n": 2, "reason": "below 50-sample floor" },
+      { "route": "/en/student", "p75_lcp": 10518, "n": 5, "reason": "below 50-sample floor" },
+      { "route": "/en", "p75_inp": 864, "n": 22, "reason": "INP above 200ms threshold but below 50-sample floor -- watch, don't verdict" },
+      { "route": "/en/multiplayer", "p75_inp": 456, "n": 34, "reason": "INP above 200ms threshold but below 50-sample floor -- watch, don't verdict" }
     ],
-    "note": "Project still shared by 8+ tenants -- a $host-unfiltered query surfaces a phantom '/app' route (n=56, p75=4357ms) that disappears entirely once filtered to lexiclash.live. Always filter $host before trusting a route's n. Zero lexiclash.live routes cleared n>=50 in the last 24h (2nd consecutive night, following 10-27)."
+    "note": "3rd consecutive night zero lexiclash.live routes clear n>=50 on the shared PostHog project. '/app' phantom route reconfirmed as cross-tenant noise for the 2nd night running -- always filter $host before trusting any route's n."
   },
   "bundle": {
     "note": "not re-measured tonight (no fresh .next build in this lane) -- carrying 10-23 numbers unchanged.",
