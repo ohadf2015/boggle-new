@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit, rateLimitResponse } from '@/lib/apiRateLimit';
 import { normalizeHebrewWord, applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import { BLANK_CHARS, MAX_BLANKS, buildMatcher, parsePattern } from './matcher';
+import { foldJapaneseInput } from './japaneseInput';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -50,7 +51,7 @@ function normalizeInput(letters: string, language: SolverLanguage): string {
     case 'he':
       return normalizeHebrewWord(letters.replace(/\s+/g, ''));
     case 'ja':
-      return letters.replace(/\s+/g, '');
+      return foldJapaneseInput(letters).replace(/\s+/g, '');
     case 'sv':
       return letters.toLowerCase().replace(/[^a-zåäöéàü]/gi, '').toLowerCase();
     case 'es':
@@ -98,7 +99,8 @@ export async function POST(request: NextRequest) {
 
   const { letters: rawLetters, language: rawLang = 'en', pattern: rawPattern } = body;
   const language = (VALID_LANGUAGES.includes(rawLang as SolverLanguage) ? rawLang : 'en') as SolverLanguage;
-  const letters = typeof rawLetters === 'string' ? rawLetters : '';
+  const typed = typeof rawLetters === 'string' ? rawLetters : '';
+  const letters = language === 'ja' ? foldJapaneseInput(typed) : typed;
   const patternText = typeof rawPattern === 'string' ? rawPattern.trim() : '';
 
   if (letters.trim().length < 2 && patternText.length < 2) {

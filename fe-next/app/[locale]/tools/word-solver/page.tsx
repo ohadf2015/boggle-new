@@ -5,6 +5,8 @@ import WordSolverPageClient from './PageClient';
 import { getContent, type Locale } from './content';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import { GuidesCalloutLink } from '@/components/seo/GuidesCalloutLink';
+import { SOLVER_EXAMPLES } from './examples';
+import { SolverExamplesSection } from './SolverExamplesSection';
 
 const POPULAR_ANAGRAM_SEEDS = ['listen', 'stared', 'heart', 'stone', 'rates', 'learn', 'smart', 'great', 'earth', 'words'];
 
@@ -94,6 +96,7 @@ export default async function WordSolverPage({ params }: PageParams) {
   const { locale } = await params;
   const validLocale = (['en','he','sv','ja','es','ru'].includes(locale) ? locale : 'en') as ValidLocale;
   const content = getContent(validLocale);
+  const examples = SOLVER_EXAMPLES[validLocale];
   const pageUrl = `${BASE_URL}/${locale}/tools/word-solver`;
 
   // All JSON-LD data is from our own static content.ts — no user input, safe from XSS
@@ -150,6 +153,7 @@ export default async function WordSolverPage({ params }: PageParams) {
         />
       ))}
       <WordSolverPageClient />
+      {examples && <SolverExamplesSection examples={examples} />}
       <GamePageSeoContent
         title={content.title}
         description={content.metaDescription}
@@ -165,27 +169,29 @@ export default async function WordSolverPage({ params }: PageParams) {
         )}
         <GuidesCalloutLink locale={locale} />
       </div>
-      <section className="mx-auto max-w-4xl px-4 pb-12">
-        <h2 className="text-xl font-neo-display font-bold text-neo-pink uppercase tracking-wider mb-3">
-          Popular Anagram Lookups
-        </h2>
-        <p className="text-slate-400 text-sm mb-4">
-          Shareable URLs for every anagram search — perfect for sending to friends or bookmarking.
-        </p>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
-          {POPULAR_ANAGRAM_SEEDS.map((letters) => (
-            <Link
-              key={letters}
-              href={`/${locale}/anagram/${letters}`}
-              className="bg-neo-navy border-2 border-neo-black rounded-neo px-3 py-2 shadow-hard-sm hover:shadow-hard hover:border-neo-pink transition-[box-shadow,border-color] text-center"
-            >
-              <span className="text-sm font-neo-display font-bold text-neo-white uppercase">
-                {letters}
-              </span>
-            </Link>
-          ))}
-        </div>
-      </section>
+      {!examples && (
+        <section className="mx-auto max-w-4xl px-4 pb-12">
+          <h2 className="text-xl font-neo-display font-bold text-neo-pink uppercase tracking-wider mb-3">
+            Popular Anagram Lookups
+          </h2>
+          <p className="text-slate-400 text-sm mb-4">
+            Shareable URLs for every anagram search — perfect for sending to friends or bookmarking.
+          </p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+            {POPULAR_ANAGRAM_SEEDS.map((letters) => (
+              <Link
+                key={letters}
+                href={`/${locale}/anagram/${letters}`}
+                className="bg-neo-navy border-2 border-neo-black rounded-neo px-3 py-2 shadow-hard-sm hover:shadow-hard hover:border-neo-pink transition-[box-shadow,border-color] text-center"
+              >
+                <span className="text-sm font-neo-display font-bold text-neo-white uppercase">
+                  {letters}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
     </>
   );
 }
