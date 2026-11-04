@@ -71,6 +71,7 @@ function CheckoutReturnBanner() {
   const router = useRouter();
   const pathname = usePathname();
   const pro = useTeacherPro();
+  const refreshPro = pro.refresh;
   const [attempts, setAttempts] = useState(0);
   const [pollGen, setPollGen] = useState(0);
   const [dismissed, setDismissed] = useState(false);
@@ -86,11 +87,11 @@ function CheckoutReturnBanner() {
     const id = setInterval(() => {
       tries += 1;
       setAttempts(tries);
-      void pro.refresh();
+      void refreshPro();
       if (tries >= GRANT_POLL_MAX_TRIES) clearInterval(id);
     }, GRANT_POLL_INTERVAL_MS);
     return () => clearInterval(id);
-  }, [dismissed, pro.hasPro, pro.refresh, pollGen]);
+  }, [dismissed, pro.hasPro, refreshPro, pollGen]);
 
   const phase = checkoutReturnPhase({
     active: !dismissed,
