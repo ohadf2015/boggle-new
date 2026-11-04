@@ -6,7 +6,7 @@ import { TeacherGate } from '@/components/education/TeacherGate';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import { useTeacherReveal } from '@/components/teacher/motion/useTeacherReveal';
 import { ClassSetupInvite } from '@/components/education/ClassSetupInvite';
-import { ClassSetupStart } from '@/components/education/ClassSetupStart';
+import { ClassSetupCreate } from '@/components/teacher/setup/ClassSetupCreate';
 
 /** The shell wraps the gate so the gate's loading/denial states keep the body lock too. */
 export default function NewClassPageClient() {
@@ -26,7 +26,7 @@ function SetupMain() {
   const classroomId = searchParams?.get('classroomId');
   return (
     <main ref={revealRef}>
-      {classroomId ? <ClassSetupInvite classroomId={classroomId} packKey={searchParams?.get('pack')} /> : <ClassSetupStart />}
+      {classroomId ? <ClassSetupInvite classroomId={classroomId} packKey={searchParams?.get('pack')} /> : <ClassSetupCreate />}
     </main>
   );
 }

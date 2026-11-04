@@ -13210,7 +13210,19 @@ const en = {
       "notCompleted": "Not completed",
       "strugglingAreas": "Struggling areas",
       "studentsMissed": "students missed",
-      "noStrugglingAreas": "No struggling areas identified yet"
+      "noStrugglingAreas": "No struggling areas identified yet",
+      "playedCount": "{played}/{total} played",
+      "nobodyYet": "Nobody has played this yet. Results show up here as students finish.",
+      "needHelp": "Need help",
+      "onTrack": "Everyone who played scored 70% or more.",
+      "mostMissed": "Most missed words",
+      "missedBy": "{count}/{played} missed",
+      "notPlayedTitle": "Not played yet ({count})",
+      "allPlayed": "Everyone has played.",
+      "noMisses": "No misses",
+      "loadFailed": "Couldn't load who played.",
+      "eachStudent": "Each student ({count})",
+      "noScores": "No scores yet: these plays saved no word results."
     },
     "tracking": {
       "all": "All",
@@ -20706,7 +20718,9 @@ const en = {
       "packWords": "{count} words",
       "packRecommended": "Our pick",
       "startLive": "Start live",
-      "createOnly": "Just create the class"
+      "createOnly": "Just create the class",
+      "packHint": "Students also get these words as homework when they join.",
+      "assignFailed": "Your class is ready, but the words weren't assigned. Assign them from the class page."
     },
     "host": {
       "classLabel": "Class",

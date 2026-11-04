@@ -15076,7 +15076,19 @@ const ja = {
       "notCompleted": "未完了",
       "strugglingAreas": "苦手分野",
       "studentsMissed": "生徒が間違えた",
-      "noStrugglingAreas": "苦手分野は特定されていません"
+      "noStrugglingAreas": "苦手分野は特定されていません",
+      "playedCount": "{played}/{total}人がプレイ",
+      "nobodyYet": "まだ誰もプレイしていません。生徒が終えると結果がここに表示されます。",
+      "needHelp": "サポートが必要",
+      "onTrack": "プレイした全員が70%以上でした。",
+      "mostMissed": "よく間違えた単語",
+      "missedBy": "{count}/{played}人が間違えた",
+      "notPlayedTitle": "未プレイ（{count}人）",
+      "allPlayed": "全員がプレイしました。",
+      "noMisses": "ミスなし",
+      "loadFailed": "プレイした生徒を読み込めませんでした。",
+      "eachStudent": "生徒ごと（{count}人）",
+      "noScores": "まだスコアがありません。このプレイでは単語の結果が保存されていません。"
     },
     "tracking": {
       "all": "すべて",
@@ -21656,7 +21668,9 @@ const ja = {
       "packWords": "{count}語",
       "packRecommended": "おすすめ",
       "startLive": "ライブ開始",
-      "createOnly": "クラスだけ作る"
+      "createOnly": "クラスだけ作る",
+      "packHint": "参加した生徒には、これらの単語が宿題としても届きます。",
+      "assignFailed": "クラスはできましたが、単語の割り当てに失敗しました。クラスのページから割り当ててください。"
     },
     "host": {
       "classLabel": "クラス",

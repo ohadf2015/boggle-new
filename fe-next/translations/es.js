@@ -15394,7 +15394,19 @@ const es = {
       "notCompleted": "No completada",
       "strugglingAreas": "Áreas de dificultad",
       "studentsMissed": "estudiantes fallaron",
-      "noStrugglingAreas": "Aún no se identificaron áreas de dificultad"
+      "noStrugglingAreas": "Aún no se identificaron áreas de dificultad",
+      "playedCount": "{played}/{total} jugaron",
+      "nobodyYet": "Nadie ha jugado todavía. Los resultados aparecen aquí cuando los alumnos terminan.",
+      "needHelp": "Necesitan ayuda",
+      "onTrack": "Todos los que jugaron sacaron 70 % o más.",
+      "mostMissed": "Palabras más falladas",
+      "missedBy": "{count}/{played} fallaron",
+      "notPlayedTitle": "Aún no han jugado ({count})",
+      "allPlayed": "Todos han jugado.",
+      "noMisses": "Sin fallos",
+      "loadFailed": "No se pudo cargar quién jugó.",
+      "eachStudent": "Cada alumno ({count})",
+      "noScores": "Aún no hay puntuaciones: estas partidas no guardaron resultados por palabra."
     },
     "tracking": {
       "all": "Todas",
@@ -21669,7 +21681,9 @@ const es = {
       "packWords": "{count} palabras",
       "packRecommended": "Te lo recomendamos",
       "startLive": "Empezar en vivo",
-      "createOnly": "Solo crear la clase"
+      "createOnly": "Solo crear la clase",
+      "packHint": "Tus alumnos también reciben estas palabras como tarea al unirse.",
+      "assignFailed": "Tu clase está lista, pero las palabras no se asignaron. Asígnalas desde la página de la clase."
     },
     "host": {
       "classLabel": "Clase",
