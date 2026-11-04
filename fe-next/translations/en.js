@@ -6661,6 +6661,13 @@ const en = {
       "changeEmail": "Change email",
       "resend": "Resend code"
     },
+    "emailHint": {
+      "suggest": "Did you mean {email}?",
+      "useSuggestion": "Use this address",
+      "noMx": "That domain has no mail server. The confirmation will not arrive.",
+      "useAnyway": "Send anyway",
+      "teacherToggle": "I'm a teacher"
+    },
     "trustBadge": "Secure & private",
     "callback": {
       "completingSignIn": "Finishing up...",

@@ -31,6 +31,9 @@ interface ProfileRow {
   referrer: string | null;
   landing_path: string | null;
   signup_surface: string | null;
+  language?: string | null;
+  country_code?: string | null;
+  user_role?: string | null;
   is_test_account: boolean;
 }
 
@@ -225,6 +228,29 @@ describe('POST /api/auth/attribution — server-canonical GR signup (t_b6131f7d)
     expect(await res.json()).toMatchObject({ ok: true, applied: [] });
     expect(state.updates).toHaveLength(0);
     expect(captureEduServerEvents).not.toHaveBeenCalled();
+  });
+
+  it('email catch-up: trigger already wrote the surface, so this session still emits once with method=email', async () => {
+    getUser.mockResolvedValue({
+      data: {
+        user: {
+          id: 'user-1',
+          app_metadata: { provider: 'email' },
+          user_metadata: { signup_surface: 'edu_access', intended_role: 'teacher' },
+        },
+      },
+      error: null,
+    });
+    state.profile = { ...EMPTY_PROFILE, signup_surface: 'edu_access', user_role: 'student' };
+    const res = await POST(req({ language: 'en' }));
+    expect(res.status).toBe(200);
+    expect(state.updates[0]).toMatchObject({ language: 'en', user_role: 'teacher' });
+    expect(state.updates[0].signup_surface).toBeUndefined();
+    const [events] = captureEduServerEvents.mock.calls[0];
+    expect(events[0]).toMatchObject({
+      event: 'growth:signup_completed',
+      properties: { source: 'edu_access', method: 'email' },
+    });
   });
 
   it('marks QA signups on the event so funnels can exclude them', async () => {

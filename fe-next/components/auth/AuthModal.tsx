@@ -19,6 +19,8 @@ import { isNative } from '../../utils/platform';
 import { getGuestStatsSummary } from '../../utils/guestManager';
 import { AuthModalTeacherHeader } from './AuthModalTeacherHeader';
 import { TeacherCheckEmail } from '@/components/education/landing/TeacherCheckEmail';
+import { EmailDomainHint } from './EmailDomainHint';
+import { emailDomain, emailHintBlocksSubmit, looksLikeSchoolDomain, resolveEmailHint, type EmailHint } from '@/lib/auth/emailDomainHint';
 import { cn } from '../../lib/utils';
 import { validateEmail, validatePassword } from '../../utils/validation';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
@@ -70,6 +72,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
   const errorShake = useErrorShake(error);
   const [success, setSuccess] = useState<string | null>(null);
   const [teacherCheckEmail, setTeacherCheckEmail] = useState<{ email: string; magic: boolean } | null>(null);
+  const [teacherIntent, setTeacherIntent] = useState(false);
+  const [emailHint, setEmailHint] = useState<EmailHint | null>(null);
+  const [hintAck, setHintAck] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
   const { isOnCrazyGamesPlatform, showAuthPrompt } = useCrazyGames();
@@ -139,6 +144,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
       setError(null);
       setSuccess(null);
       setTeacherCheckEmail(null);
+      setTeacherIntent(false);
+      setEmailHint(null);
+      setHintAck(false);
       setOtpStep('enter-email');
       setOtpCode('');
       setOtpCooldown(0);
@@ -192,6 +200,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
 
   const handleEmailChange = (value: string) => {
     setEmail(value);
+    setHintAck(false);
     if (value) {
       const result = validateEmail(value);
       setEmailError(result.isValid ? null : (result.error ? t(result.error) : null));
@@ -231,8 +240,19 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
     setPasswordError(null);
 
     try {
+      if (authMode === 'signup') {
+        const hint = await resolveEmailHint(email, emailHint);
+        if (hint !== emailHint) setEmailHint(hint);
+        if (emailHintBlocksSubmit(hint, hintAck)) {
+          setIsLoading(null);
+          return;
+        }
+      }
+      const intendedRole = isTeacher || teacherIntent ? 'teacher' as const : undefined;
       const result = authMode === 'signup'
-        ? await signUpWithEmail(email, password)
+        ? (intendedRole
+            ? await signUpWithEmail(email, password, { intendedRole })
+            : await signUpWithEmail(email, password))
         : await signInWithEmail(email, password);
 
       if (result.error) {
@@ -280,8 +300,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
 
       if (authMode === 'signup') {
         trackEvent('funnel_sign_up', { method: 'password' });
-        if (isTeacher) setTeacherCheckEmail({ email, magic: false });
-        else setSuccess(t('auth.inlineSignup.checkEmail'));
+        setTeacherCheckEmail({ email, magic: false });
         setIsLoading(null);
         return;
       }
@@ -316,8 +335,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
         setError(result.error.message);
       } else {
         trackEvent('funnel_sign_up', { method: 'magic_link' });
-        if (isTeacher) setTeacherCheckEmail({ email, magic: true });
-        else setSuccess(t('auth.magicLink.checkEmail'));
+        setTeacherCheckEmail({ email, magic: true });
       }
       setIsLoading(null);
     } catch (err) {
@@ -753,6 +771,16 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                         />
                         {emailError && (
                           <m.p id="pwd-email-error" role="alert" className="mt-1 text-xs text-red-400" {...ERROR_ENTER}>{emailError}</m.p>
+                        )}
+                        {authMode === 'signup' && (
+                          <EmailDomainHint
+                            hint={emailHint}
+                            onApply={(next) => { setEmail(next); setHintAck(false); setEmailHint(null); }}
+                            onAcknowledge={() => setHintAck(true)}
+                            showTeacherToggle={!isTeacher && looksLikeSchoolDomain(emailDomain(email) ?? '')}
+                            teacherIntent={teacherIntent}
+                            onTeacherIntent={setTeacherIntent}
+                          />
                         )}
                       </div>
 
