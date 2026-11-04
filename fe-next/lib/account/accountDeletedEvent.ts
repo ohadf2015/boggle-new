@@ -195,7 +195,9 @@ export async function loadAccountDeletedFacts(
     ].filter((c): c is { at: number; campaign: string } => c !== null);
     landings.sort((a, b) => b.at - a.at);
 
-    let utmCampaign = landings[0]?.campaign ?? null;
+    // noUncheckedIndexedAccess is off, so landings[0]?.campaign ?? null
+    // infers string. The profile fallback is string | null (scrubToken).
+    let utmCampaign: string | null = landings[0]?.campaign ?? null;
     if (!utmCampaign && profile && isEmailAttr(profile.utm_source, profile.utm_medium)) {
       utmCampaign = scrubToken(profile.utm_campaign);
     }
