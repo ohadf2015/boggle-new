@@ -14,6 +14,8 @@
  * Analytics (cookie-free server twins, placement `results_report_pdf`, format `report_button`):
  * the locked button rendering -> rendered (once per session, proOfferSession.ts), a locked tap ->
  * edu_pro_offer_clicked. Compare against the `dashboard` placement.
+ *
+ * A free teacher with 3+ classes also gets "Get a school quote" under it (ResultsSchoolQuoteLink).
  */
 'use client';
 
@@ -34,6 +36,7 @@ import type { ClassroomSummary } from '@/shared/types/classroom';
 import type { PlayerResult } from '@/types/components';
 import { buildRoundReportPdfData } from './roundReportPdfData';
 import { ProPill } from './ProPill';
+import { ResultsSchoolQuoteLink } from './ResultsSchoolQuoteLink';
 
 export const REPORT_PDF_PLACEMENT = 'results_report_pdf' as const;
 
@@ -180,6 +183,8 @@ export function ReportPdfExportButton({ language, summary, players, proLabel = '
         {' · '}
         {proOffer.note}
       </p>
+      {/* Teachers with 3+ classes: the Schools plan beside the $9/mo ask (placement results_school_quote). */}
+      <ResultsSchoolQuoteLink language={language} />
     </div>
   );
 }

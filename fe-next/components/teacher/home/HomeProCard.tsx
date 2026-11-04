@@ -44,14 +44,17 @@ const CTA =
  * Every ask goes straight to Polar checkout (the server caps trial days).
  */
 export function HomeProCard({ kind, onDismiss, trackImpression, language, t }: HomeProCardProps) {
-  const { known, trialUsed, accessTrialExpires, accessTrialEnded } = useTeacherPro();
+  const { loading, known, trialUsed, accessTrialExpires, accessTrialEnded } = useTeacherPro();
   const proOffer = resolveProOffer(language, { known, trialUsed, accessTrialExpires, accessTrialEnded }, resultsTrialCopy(language));
   // A/B (`edu_pro_copy_v1`): the heading leads with class reports (a) or the trial (b).
   const { user } = useAuth();
   const userId = user?.id ?? null;
   const variant = proCopyVariant(user?.id);
   // Session cap (proOfferSession.ts): the full card only if no other placement showed it this session.
-  const slot = useProOfferSlot(userId, true);
+  // Waits for the entitlement read: before it lands every teacher looks never-trialed, so the card
+  // flashed "Start your 14-day trial" at teachers inside their free access trial and the once-per-session
+  // rendered/viewed twins locked in offer=trial (every dashboard impression, Nov 2026).
+  const slot = useProOfferSlot(userId, !loading);
   const full = slot === 'full';
   const lines = proCopyLines(language, variant, proOffer, { accessTrialExpires, placement: DASHBOARD_PRO_PLACEMENT });
   const trial = useStartTeacherProTrial(t, language, 'dashboard_trial_offer', { trial: proOffer.checkoutTrial });
