@@ -92,7 +92,7 @@ const literalKeys = files.flatMap(({ file, text }) =>
 );
 
 const dynamicKeys = [
-  ...TEACHER_GAME_MODES.flatMap((m) => [m.nameKey, m.howKey, `education.classroomModeBlurb.${m.nameKeySuffix}`]),
+  ...TEACHER_GAME_MODES.flatMap((m) => [m.nameKey, m.howKey, m.blurbKey]),
   ...catalogueModes().flatMap((m) => {
     const k = catalogueKeys(m);
     return [k.name, k.how, k.category, k.complexity, k.style, ...k.bestFor, ...k.steps];

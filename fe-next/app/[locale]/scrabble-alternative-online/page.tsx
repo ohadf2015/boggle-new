@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
+import { MULTIPLAYER_FAQ, MULTIPLAYER_HEADING, MULTIPLAYER_INTRO, MULTIPLAYER_STEPS } from './multiplayer';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -74,10 +75,7 @@ const faqs = [
     q: 'Is there a free online Scrabble alternative with no download?',
     a: 'Yes. LexiClash runs entirely in any modern browser — desktop, phone, or tablet. No app store install, no account creation, no email required. Open the link, create a room, share the code, play. It also installs as a Progressive Web App if you want a home-screen icon.',
   },
-  {
-    q: 'Can I play a Scrabble-style word game with friends online for free?',
-    a: 'LexiClash supports 2-20+ players in a single room. Create a room, share the link or QR, friends join from any device. Always free to play, no pay-to-win, nothing to buy to compete. The leaderboard is global with daily, weekly, and all-time rankings.',
-  },
+  MULTIPLAYER_FAQ,
   {
     q: 'What languages are supported?',
     a: 'Six full dictionaries: English, Spanish, Swedish, Japanese, Hebrew (with right-to-left support), and Russian. Useful for ESL classrooms, language learners, and mixed-language friend groups who want a Scrabble-style word game in their native language.',
@@ -144,7 +142,7 @@ const compareRows: ReadonlyArray<readonly [string, string, string]> = [
   ['Browser play', 'Yes (no install)', 'No (app required)'],
   ['Mid-game ads', 'None', 'Frequent in Scrabble GO'],
   ['Sign-up required', 'No', 'Yes (Scopely account)'],
-  ['Languages', '5 (EN · ES · SV · JA · HE)', '1 (English primary)'],
+  ['Languages', '6 (EN · ES · SV · JA · HE · RU)', '1 (English primary)'],
   ['Daily challenges', 'Yes (Word Wheel + Word Hunt)', 'Limited events'],
   ['Pay-to-win mechanics', 'None', 'Boosts buy advantages'],
 ];
@@ -212,6 +210,23 @@ export default async function ScrabbleAlternativeOnlinePage({ params }: PageProp
           >
             Start a free room →
           </Link>
+        </section>
+
+        <section id="online-multiplayer" className="mb-12">
+          <h2 className="mb-3 font-neo-display text-3xl font-black tracking-tight text-neo-lime">
+            {MULTIPLAYER_HEADING}
+          </h2>
+          <p className="mb-5 max-w-2xl text-lg leading-relaxed text-slate-300">{MULTIPLAYER_INTRO}</p>
+          <ol className="grid gap-4 sm:grid-cols-2">
+            {MULTIPLAYER_STEPS.map((step, i) => (
+              <li key={step.title} className="rounded-neo border-3 border-neo-black bg-neo-navy-light p-4 shadow-hard">
+                <h3 className="font-neo-display text-lg font-black text-neo-cyan">
+                  {i + 1}. {step.title}
+                </h3>
+                <p className="mt-1 text-sm leading-relaxed text-slate-300">{step.body}</p>
+              </li>
+            ))}
+          </ol>
         </section>
 
         <section className="mb-12">
@@ -303,6 +318,7 @@ export default async function ScrabbleAlternativeOnlinePage({ params }: PageProp
             <li><Link className="text-neo-pink hover:underline" href="/en/words-with-friends-alternative">Words With Friends alternative</Link></li>
             <li><Link className="text-neo-lime hover:underline" href="/en/best-online-word-games">9 best word games (compare)</Link></li>
             <li><Link className="text-neo-cyan hover:underline" href="/en/blog/boggle-vs-scrabble">Boggle vs Scrabble</Link></li>
+            <li><Link className="text-neo-lime hover:underline" href="/en/play-boggle-online-free">Play Boggle online free</Link></li>
           </ul>
         </nav>
       </div>

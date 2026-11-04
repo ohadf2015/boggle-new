@@ -30,6 +30,16 @@ describe('best-boggle-alternatives-2026 snippet', () => {
     expect(description.length).toBeLessThanOrEqual(160);
   });
 
+  it('EN body keeps exactly six numbered alternatives, matching the title', async () => {
+    const { contentByLocale } = await import('./content');
+    const numbered = contentByLocale.en.sections.filter((s) => /^\d+\. /.test(s.title ?? ''));
+    expect(numbered).toHaveLength(6);
+    const slugs = contentByLocale.en.sections.map((s) => s.slug);
+    for (const slug of ['games-like-boggle-online', 'games-like-boggle-party', 'boggle-on-netflix', 'best-boggle-app']) {
+      expect(slugs).toContain(slug);
+    }
+  });
+
   it('leaves the English H1 alone', () => {
     const content = readFileSync(join(dir, 'content.ts'), 'utf8');
     expect(content).toContain(

@@ -6,7 +6,7 @@
 
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
-import { resolveDisplayName } from '@/lib/displayName';
+import { teacherFacingName } from '@/lib/education/rosterName';
 import { summarizeStudentWords, wordKey } from '@/lib/education/wordTally';
 import type {
   WordsAttemptedRecord,
@@ -51,13 +51,14 @@ export async function getStudentsProgressSummary(
   try {
     const { data: memberships, error: memberError } = await supabase
       .from('classroom_memberships')
-      .select('student_id')
+      .select('*')
       .eq('classroom_id', classroomId);
 
     if (memberError) {
       logger.error('Error fetching classroom memberships:', memberError);
       return { data: [], error: { message: memberError.message } };
     }
+    const rosterNames = new Map<string, unknown>((memberships ?? []).map(m => [m.student_id, (m as { roster_name?: unknown }).roster_name]));
 
     if (!memberships || memberships.length === 0) {
       return { data: [], error: null };
@@ -138,7 +139,7 @@ export async function getStudentsProgressSummary(
         studentId,
         // Placeholder display names ('Player_<hex>') are truthy, so the `|| 'Unknown'`
         // guard never fired and the teacher's progress table listed hex ids.
-        displayName: resolveDisplayName([profile.display_name], 'Unknown'),
+        displayName: teacherFacingName(rosterNames.get(studentId), { display_name: profile.display_name }, 'Unknown'),
         avatarUrl: avatarForProgress(profile), avatarConfig: avatarConfigForProgress(profile), totalXp, currentLevel, vocabularyMastery,
         overallAccuracy, wordsAttempted, wordsMastered, lastPracticeDate,
         isStruggling, currentStreak,

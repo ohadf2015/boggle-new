@@ -15,7 +15,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { subscribeToClassroomProgress, type ClassroomProgressUpdate } from '@/lib/supabaseRealtime';
 import { getClassroomStudents } from '@/lib/supabase/education';
-import { resolveDisplayName } from '@/lib/displayName';
+import { teacherFacingName } from '@/lib/education/rosterName';
 
 // ============================================
 // TYPE DEFINITIONS
@@ -88,7 +88,7 @@ export function useRealtimeClassroomProgress({
         const p = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles;
         const id = row.student_id;
         if (!id) continue;
-        next.set(id, resolveDisplayName([p?.display_name, p?.username], ''));
+        next.set(id, teacherFacingName(row.roster_name, p, ''));
       }
       namesRef.current = next;
     }).catch(() => { /* roster unavailable — fall back to the short id below */ });

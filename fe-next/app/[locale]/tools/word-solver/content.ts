@@ -77,6 +77,11 @@ const content: Record<Locale, ToolContent> = {
           'From 7 random letters, you can typically make between 20 and 80 valid English words, depending on the letter combination. Common vowel-consonant mixes yield more words. Our solver finds all possibilities from a curated word list instantly.',
       },
       {
+        question: 'Can it solve anagrams with multiple words?',
+        answer:
+          "Partly. You can type a phrase with spaces, like 'moon starer', and it searches all the letters, but each result is one word, such as 'astronomer'. To build a phrase, pick a long word from the results, take its letters out of your search, and run it again on what is left.",
+      },
+      {
         question: 'What is an anagram solver?',
         answer:
           'An anagram solver is a tool that takes a set of letters and finds all valid words that can be formed using some or all of those letters. It checks every possible combination against a dictionary to find words you might miss.',
@@ -240,7 +245,7 @@ const content: Record<Locale, ToolContent> = {
     ctaTitle: 'Öva på att hitta ord snabbare',
     ctaButton: 'Spela LexiClash gratis',
     ctaDescription: 'Utmana vänner i ordstrider i realtid. Träna din hjärna!',
-    fullDictionaryNote: 'Visar resultat från en lista med 500+ vanliga ord. För hela ordboken, spela LexiClash!',
+    fullDictionaryNote: 'Visar upp till 500 ord, de längsta först. Orden kontrolleras mot samma svenska ordlista som i LexiClash, med drygt 400 000 ord.',
     howToTitle: 'Hur man använder ordlösaren',
     howToSteps: [
       'Skriv eller klistra in dina tillgängliga bokstäver i fältet ovan.',
@@ -252,10 +257,12 @@ const content: Record<Locale, ToolContent> = {
     faqTitle: 'Vanliga frågor',
     faqs: [
       { question: 'Hur bildar man ord med bokstäver?', answer: 'Ange dina bokstäver i fältet ovan och klicka "Hitta ord" — verktyget hittar automatiskt alla möjliga ord du kan bilda av dina bokstäver på svenska. Resultaten sorteras efter ordlängd.' },
-      { question: 'Hur många ord kan man bilda av 7 bokstäver?', answer: 'Från 7 slumpmässiga bokstäver kan du vanligtvis bilda mellan 20 och 80 giltiga ord. Vår lösare hittar alla möjligheter direkt.' },
+      { question: 'Hur många ord kan man bilda av 7 bokstäver?', answer: 'Det beror helt på vilka bokstäver det är. ”Stjärna” ger 114 ord, medan ”kärlek” med sex bokstäver bara ger 27. En blank bricka (?) ökar antalet snabbt.' },
       { question: 'Vad är en anagramlösare?', answer: 'En anagramlösare tar en uppsättning bokstäver och hittar alla giltiga ord som kan bildas.' },
       { question: 'Kan jag använda detta för Scrabble?', answer: 'Ja! Denna ordfinnare fungerar för alla ordspel inklusive Scrabble, Boggle och LexiClash.' },
-      { question: 'Varför saknas vissa ord?', answer: 'Vårt gratisverktyg använder en lista med 500+ vanliga ord. För hela ordboken, spela LexiClash!' },
+      { question: 'Varför saknas vissa ord?', answer: 'Ordlösaren visar bara ord som finns i vår svenska ordlista, och högst 500 per sökning, de längsta först. Underkänns ett riktigt ord i en multiplayermatch kan du överklaga det, så granskar vi det.' },
+      { question: 'Kan jag använda blanka brickor?', answer: 'Ja. Skriv ett frågetecken (?) för varje blank bricka, högst tre. ”kärl?k” ger till exempel 172 ord, bland annat kälkar och lärka.' },
+      { question: 'Fungerar det för Wordfeud och Alfapet?', answer: 'Ja, skriv in brickorna du har på hand så ser du vilka ord de räcker till. Ordlistan är inte exakt samma som Wordfeuds, så ett ord kan ibland godkännas i det ena spelet men inte i det andra.' },
       { question: 'Hur blir man bättre på att hitta ord?', answer: 'Öva regelbundet med tidsbegränsade ordspel som LexiClash. Leta efter vanliga prefix och suffix.' },
     ],
     tipsTitle: 'Tips för ordspel',
@@ -299,7 +306,7 @@ const content: Record<Locale, ToolContent> = {
     fullDictionaryNote: '長い単語から順に最大500語を表示。LexiClashのゲームと同じ辞書で判定しています。',
     howToTitle: 'ワードソルバーの使い方',
     howToSteps: [
-      '上の入力フィールドに利用可能な文字を入力またはペーストしてください。',
+      '上の欄に文字を入れます。ひらがな・カタカナ・漢字のどれでもよく、わからない文字は「?」にします。',
       '「単語を検索」をクリックするかEnterキーを押して検索します。',
       '単語の長さ別にグループ化された結果を確認します。',
       '結果を使って、ゲームで見逃した単語を発見しましょう。',
@@ -309,7 +316,7 @@ const content: Record<Locale, ToolContent> = {
     faqTitle: 'よくある質問',
     faqs: [
       { question: 'アナグラムソルバーとは？', answer: 'LexiClashのアナグラムソルバーは、入力した文字を並べ替えて作れる日本語の単語をすべて表示する無料ツールです。ひらがな・カタカナ・漢字に対応し、約40万語の日本語辞書と照合します。例：「さくらんぼ」と入力すると「ぼんくら」「ぼくら」など20語が見つかります。最大20文字、登録不要。英語・スペイン語・スウェーデン語・ヘブライ語の辞書にも切り替えられます（ロシア語の辞書には未対応です）。' },
-      { question: '7文字からいくつの単語が作れますか？', answer: '7つのランダムな文字から、通常20〜80個の有効な英単語を作ることができます。当ソルバーはすべての可能性を瞬時に見つけます。' },
+      { question: '何文字あれば、いくつの言葉が作れますか？', answer: '文字の組み合わせでかなり変わります。「とうきょう」や「ちょこれーと」では14語、漢字の「会議室」では3語でした。「?」を1つ足すと候補が一気に増え、「ねこ?」だけで111語見つかります。' },
       { question: 'スクラブルなどに使えますか？', answer: 'はい！このワードファインダーはScrabble、Boggle、LexiClashなどすべてのワードゲームで使えます。' },
       { question: 'なぜ一部の単語が結果にないのですか？', answer: 'LexiClashのゲーム辞書（日本語は約40万語）に載っていない語は表示されません。また、1回の検索で表示されるのは長い単語から順に最大500語です。' },
       { question: '単語探しが上手くなるには？', answer: 'LexiClashのような時間制限付きワードゲームで定期的に練習しましょう。一般的な接頭辞と接尾辞を探しましょう。' },

@@ -14,7 +14,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { getClassroomAssignments, getAssignmentCompletions } from '@/lib/supabase/education/assignments';
 import { getClassroomStudents } from '@/lib/supabase/education/classrooms';
-import { resolveDisplayName } from '@/lib/displayName';
+import { teacherFacingName } from '@/lib/education/rosterName';
 import {
   buildClassProgressGrid,
   buildWeeklySummary,
@@ -65,10 +65,9 @@ export function ClassAssignmentGrid({ classroomId, classroomName }: ClassAssignm
 
     const grid = buildClassProgressGrid({
       students: students.map((student) => {
-        const profile = student.profiles as { display_name?: string; username?: string } | null;
         return {
           id: student.student_id,
-          name: resolveDisplayName([profile?.display_name, profile?.username], anonymous(student.student_id)),
+          name: teacherFacingName(student.roster_name, student.profiles, anonymous(student.student_id)),
         };
       }),
       assignments: assignments.map((assignment) => ({

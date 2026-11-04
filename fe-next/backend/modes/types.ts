@@ -45,6 +45,8 @@ export interface PayloadView {
 
 export interface GameModeModule {
   id: GameMode;
+  /** Runs before the round is announced; 'refused' leaves the room in the lobby (the mode already told the host why). */
+  prepareRound?(io: Server, gameCode: string, game: GameState): Promise<'refused' | unknown>;
   /** Create the mode's round state on `ctx.game`. */
   initRound?(ctx: ModeRoundContext): ModeRoundResult | void | Promise<ModeRoundResult | void>;
   /** Mode fields on every startGame-shaped payload (start, retry, reconnect, late join, recovery). */

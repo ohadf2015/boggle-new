@@ -32,7 +32,7 @@ export default function BoggleVsWwfPageClient(): React.ReactElement {
   };
   const relatedHeading = relatedHeadingByLocale[locale] || relatedHeadingByLocale.en;
   const relatedArticlesData = [
-    { slug: 'best-boggle-alternatives-2026', title: 'Best Boggle Alternatives in 2026', excerpt: '', readTime: '10 min read', category: 'Reviews', image: '' },
+    { slug: 'best-boggle-alternatives-2026', title: 'Word Games Like Boggle: 6 Free Alternatives', excerpt: '', readTime: '10 min read', category: 'Reviews', image: '' },
     { slug: '10-surprising-benefits-word-games', title: '10 Surprising Benefits of Playing Word Games Daily', excerpt: '', readTime: '5 min read', category: 'Research', image: '' },
     { slug: 'science-behind-word-games', title: 'The Science Behind Word Games', excerpt: '', readTime: '6 min read', category: 'Science', image: '' },
     { slug: 'daily-challenge-strategies', title: '7 Proven Daily Challenge Strategies', excerpt: '', readTime: '7 min read', category: 'Strategy', image: '' },

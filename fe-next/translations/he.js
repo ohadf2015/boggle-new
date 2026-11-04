@@ -7216,6 +7216,13 @@ const he = {
       "changeEmail": "שינוי אימייל",
       "resend": "שליחה מחדש"
     },
+    "emailHint": {
+      "suggest": "התכוונתם ל-{email}?",
+      "useSuggestion": "השתמשו בכתובת הזו",
+      "noMx": "לדומיין הזה אין שרת דואר. מייל האימות לא יגיע.",
+      "useAnyway": "שלחו בכל זאת",
+      "teacherToggle": "אני מורה"
+    },
     "trustBadge": "מאובטח ופרטי",
     "callback": {
       "completingSignIn": "משלים התחברות...",
@@ -21886,11 +21893,41 @@ const he = {
     "next": "מילים שפספסת ({count})",
   },
   // @wordcraftReview:end
+  // @eduCrossword:start
+  "eduCrossword": {
+    "name": "תשבץ",
+    "how": "כל תלמיד פותר תשבץ שנבנה ממילות השיעור שלך, וההגדרות הן הפירושים שלהן.",
+    "blurb": "תשבץ שנבנה ממילות הרשימה, והפירוש של כל מילה הוא ההגדרה.",
+    "studentRule": "קראו כל הגדרה ומלאו את מילת השיעור.",
+    "steps": {
+      "1": "כל טלפון מקבל את אותו תשבץ, בנוי ממילות השיעור שלך.",
+      "2": "כל הגדרה היא הפירוש של המילה מהשיעור.",
+      "3": "התלמידים מתחרים מי ימלא ראשון, וכל הגדרה שנפתרה נספרת בסיכום.",
+    },
+    "tooFewWords": "מהרשימה הזו עוד אי אפשר לבנות תשבץ. צריך לפחות 3 מילים עם פירוש שיש להן אותיות משותפות. הוסיפו פירושים או שחקו קלאסי.",
+    "waiting": "מכינים את התשבץ…",
+    "gridLabel": "לוח התשבץ",
+    "standingsLabel": "מצב המרוץ",
+    "finished": "{count} מתוך {total} סיימו",
+    "done": "הושלם!",
+    "percent": "{percent}%",
+    "more": "ועוד {count}",
+  },
+  // @eduCrossword:end
   // @eduPolish:start
   "eduPolish": {
     "seatCapReached": "{name} צופה: הכיתה מלאה ({cap} שחקנים)",
-  }
+  },
   // @eduPolish:end
+  // @eduRoster:start
+  "eduRoster": {
+    "rename": "שינוי השם של {name} בכיתה הזו",
+    "inputLabel": "השם בכיתה הזו",
+    "tooLong": "עד {max} תווים",
+    "saveFailed": "לא הצלחנו לשמור את השם. נסו שוב.",
+    "originalName": "נרשם/ה בשם {name}"
+  }
+  // @eduRoster:end
 };
 
 export { he };

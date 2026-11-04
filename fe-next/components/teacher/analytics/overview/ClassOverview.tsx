@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { resolveDisplayName } from '@/lib/displayName';
+import { teacherFacingName } from '@/lib/education/rosterName';
 import { getClassroomStudents } from '@/lib/supabase/education/classrooms';
 import { StudentProgressReport } from '@/components/teacher/reports/StudentProgressReport';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
@@ -35,7 +35,7 @@ export function ClassOverview({ classroomId, openStudentId, onOpenChange }: Prop
     let cancelled = false;
     getClassroomStudents(classroomId).then(({ data }) => {
       if (cancelled) return;
-      setNames(new Map(data.map((s) => [s.student_id, resolveDisplayName([s.profiles?.display_name, s.profiles?.username], '')])));
+      setNames(new Map(data.map((s) => [s.student_id, teacherFacingName(s.roster_name, s.profiles, '')])));
     }).catch(() => {});
     return () => { cancelled = true; };
   }, [classroomId]);

@@ -7174,6 +7174,13 @@ const ja = {
       "codeSent": "コード送信しました",
       "resend": "再送信"
     },
+    "emailHint": {
+      "suggest": "{email} の間違いではありませんか？",
+      "useSuggestion": "このアドレスを使う",
+      "noMx": "そのドメインにはメールサーバーがありません。確認メールは届きません。",
+      "useAnyway": "このまま送る",
+      "teacherToggle": "教師です"
+    },
     "trustBadge": "安全＆プライベート",
     "callback": {
       "completingSignIn": "サインイン中...",
@@ -21956,11 +21963,41 @@ const ja = {
     "next": "逃した単語 ({count})",
   },
   // @wordcraftReview:end
+  // @eduCrossword:start
+  "eduCrossword": {
+    "name": "クロスワード",
+    "how": "生徒一人ひとりが、レッスンの単語で作ったクロスワードを解きます。ヒントは単語の意味です。",
+    "blurb": "リストの単語で作るクロスワード。各単語の意味がヒントになります。",
+    "studentRule": "ヒントを読んで、レッスンの単語を入れよう。",
+    "steps": {
+      "1": "全員のスマホに、レッスンの単語で作った同じクロスワードが届きます。",
+      "2": "ヒントはレッスンにある単語の意味です。",
+      "3": "生徒はマスを早く埋めるのを競います。解いたヒントはすべて結果に反映されます。",
+    },
+    "tooFewWords": "このリストではまだクロスワードを作れません。文字を共有する、意味つきの単語が3つ以上必要です。意味を追加するか、クラシックで遊びましょう。",
+    "waiting": "クロスワードを準備中…",
+    "gridLabel": "クロスワードの盤面",
+    "standingsLabel": "レースの順位",
+    "finished": "{total}人中{count}人が完成",
+    "done": "完成！",
+    "percent": "{percent}%",
+    "more": "ほか{count}人",
+  },
+  // @eduCrossword:end
   // @eduPolish:start
   "eduPolish": {
     "seatCapReached": "{name}さんは観戦中です：クラスが満員です（{cap}人）",
-  }
+  },
   // @eduPolish:end
+  // @eduRoster:start
+  "eduRoster": {
+    "rename": "このクラスでの{name}さんの名前を変更",
+    "inputLabel": "このクラスでの名前",
+    "tooLong": "{max}文字以内で入力してください",
+    "saveFailed": "名前を保存できませんでした。もう一度お試しください。",
+    "originalName": "登録名：{name}"
+  }
+  // @eduRoster:end
 };
 
 export { ja };

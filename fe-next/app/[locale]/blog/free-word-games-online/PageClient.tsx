@@ -32,7 +32,7 @@ export default function FreeWordGamesOnlinePageClient(): React.ReactElement {
   };
   const relatedHeading = relatedHeadingByLocale[locale] || relatedHeadingByLocale.en;
   const relatedArticlesData = [
-    { slug: 'best-boggle-alternatives-2026', title: 'Best Boggle Alternatives in 2026', excerpt: '', readTime: '10 min read', category: 'Reviews', image: '' },
+    { slug: 'best-boggle-alternatives-2026', title: 'Word Games Like Boggle: 6 Free Alternatives', excerpt: '', readTime: '10 min read', category: 'Reviews', image: '' },
     { slug: 'boggle-vs-scrabble', title: 'Boggle vs Scrabble: The Honest Showdown', excerpt: '', readTime: '12 min read', category: 'Versus', image: '' },
     { slug: 'daily-challenge-strategies', title: '7 Proven Daily Challenge Strategies', excerpt: '', readTime: '7 min read', category: 'Strategy', image: '' },
     { slug: '10-surprising-benefits-word-games', title: '10 Surprising Benefits of Playing Word Games Daily', excerpt: '', readTime: '5 min read', category: 'Research', image: '' },

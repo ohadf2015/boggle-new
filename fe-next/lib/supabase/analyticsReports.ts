@@ -8,6 +8,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { supabase as browserSupabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
+import { teacherFacingName } from '@/lib/education/rosterName';
 import { fetchStudentInsights, type StudentInsightsFetch } from '@/lib/education/studentInsightsClient';
 import { percent, summarizeStudentWords, tallyStudentWords, wordKey } from '@/lib/education/wordTally';
 import type {
@@ -175,7 +176,7 @@ export async function getClassReportData(
     // references auth.users, not profiles)
     const { data: memberships, error: studentsError } = await supabase
       .from('classroom_memberships')
-      .select('student_id')
+      .select('*')
       .eq('classroom_id', classroomId);
 
     if (studentsError) {
@@ -183,7 +184,8 @@ export async function getClassReportData(
       return { data: null, error: { message: studentsError.message } };
     }
 
-    const studentIds = memberships?.map(m => m.student_id) || [];
+    const studentIds: string[] = memberships?.map(m => m.student_id) || [];
+    const rosterNames = new Map<string, unknown>((memberships || []).map(m => [m.student_id, (m as { roster_name?: unknown }).roster_name]));
     const totalStudents = studentIds.length;
 
     const { data: studentProfiles } = studentIds.length > 0
@@ -243,7 +245,7 @@ export async function getClassReportData(
 
       studentMetrics.push({
         studentId,
-        studentName: profile?.display_name || 'Unknown',
+        studentName: teacherFacingName(rosterNames.get(studentId), profile, 'Unknown'),
         accuracy: studentAccuracy,
         wordsLearned: studentWords,
         lastActive,
@@ -341,7 +343,7 @@ export async function getVocabularyHeatmapData(
   try {
     const { data: memberships, error: memberError } = await supabase
       .from('classroom_memberships')
-      .select('student_id')
+      .select('*')
       .eq('classroom_id', classroomId);
 
     if (memberError) {
@@ -365,7 +367,8 @@ export async function getVocabularyHeatmapData(
       return { data: emptyData, error: { message: profileError.message } };
     }
 
-    const students = (profiles || []).map(p => ({ id: p.id, name: p.display_name || 'Unknown' }));
+    const rosterNames = new Map<string, unknown>(memberships.map(m => [m.student_id, (m as { roster_name?: unknown }).roster_name]));
+    const students = (profiles || []).map(p => ({ id: p.id, name: teacherFacingName(rosterNames.get(p.id), { display_name: p.display_name }, 'Unknown') }));
 
     let query = supabase
       .from('student_lesson_progress')

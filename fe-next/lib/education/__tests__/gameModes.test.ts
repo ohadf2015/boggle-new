@@ -55,8 +55,9 @@ describe('TEACHER_GAME_MODES — one poster per playable classroom mode', () => 
   it('gives every mode a poster, a name key, a how-it-plays line and a duration', () => {
     for (const mode of TEACHER_GAME_MODES) {
       expect(mode.poster, `${mode.id} has no poster`).toMatch(/^\/mascot\/teacher\/modes\/[a-z-]+\.webp$/);
-      expect(mode.nameKey).toBe(`teacher.classroom.gameModes.${mode.nameKeySuffix}`);
-      expect(mode.howKey).toBe(`education.modePicker.how.${mode.nameKeySuffix}`);
+      const own = mode.nameKey.startsWith('eduCrossword.');
+      expect(mode.nameKey).toBe(own ? 'eduCrossword.name' : `teacher.classroom.gameModes.${mode.nameKeySuffix}`);
+      expect(mode.howKey).toBe(own ? 'eduCrossword.how' : `education.modePicker.how.${mode.nameKeySuffix}`);
       expect(mode.minutes).toBeGreaterThan(0);
     }
   });

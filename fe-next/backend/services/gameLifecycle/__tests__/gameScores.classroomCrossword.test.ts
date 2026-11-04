@@ -90,6 +90,30 @@ describe('a crossword round in a classroom room', () => {
     expect(summary.neverPlacedWords).toEqual(['castle']);
   });
 
+  it('on a lesson-dealt grid, each solved clue counts as that lesson word found', async () => {
+    const round = crosswordRound();
+    round.crosswordMpState = {
+      ...round.crosswordMpState,
+      puzzle: { id: 'lesson-CLS', slots: [{ id: 'A1', answer: 'hello' }, { id: 'D2', answer: 'world' }] },
+      lessonWordBySlot: { A1: 'hello', D2: 'world' },
+      progress: {
+        alice: { percent: 50, solved: false, elapsedMs: 60000, score: 0, solvedSlotIds: ['D2'] },
+        bob: { percent: 0, solved: false, elapsedMs: 90000, score: 0 },
+      },
+    } as typeof round.crosswordMpState;
+    mockGetGame.mockReturnValue(round);
+    mockGetClassroomGame.mockResolvedValue(classroomGame);
+    const { io } = ioMock();
+
+    await calculateAndBroadcastFinalScores(io, 'CLS');
+
+    const summary = summaryFromBroadcast();
+    const found = Object.fromEntries(summary.coverage.map((c: { word: string; foundBy: string[] }) => [c.word, c.foundBy]));
+    expect(found.world).toEqual(['alice']);
+    expect(found.hello).toEqual([]);
+    expect(summary.neverPlacedWords).toEqual(['castle']);
+  });
+
   it('an arcade crossword room still ends without a classroom recap', async () => {
     mockGetGame.mockReturnValue({ ...crosswordRound(), isClassroom: false });
     mockGetClassroomGame.mockResolvedValue(null);

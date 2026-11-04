@@ -240,11 +240,21 @@ describe('updateClassroomGameMode — the room keeps its code', () => {
     expect(socket.emit.mock.calls.map((c) => c[0])).toContain('classroomGameError');
   });
 
-  it('rejects a mode that is not a classroom mode', async () => {
+  it('switches a waiting room to crossword', async () => {
     const socket = makeSocket(TEACHER_ID);
     registerClassroomGameModeHandlers(makeIo(), socket as never);
 
     await handlerOf(socket)({ gameCode: CODE, gameMode: 'crossword' });
+
+    expect(mockSetMode).toHaveBeenCalledWith(CODE, 'crossword');
+    expect(socket.emit.mock.calls.map((c) => c[0])).toContain('classroomGameModeChanged');
+  });
+
+  it('rejects a mode that is not a classroom mode', async () => {
+    const socket = makeSocket(TEACHER_ID);
+    registerClassroomGameModeHandlers(makeIo(), socket as never);
+
+    await handlerOf(socket)({ gameCode: CODE, gameMode: 'word-tower' });
 
     expect(mockSetMode).not.toHaveBeenCalled();
     expect(socket.emit.mock.calls.map((c) => c[0])).toContain('classroomGameError');

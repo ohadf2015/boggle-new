@@ -20,6 +20,14 @@ describe('classroomBoardMode', () => {
     expect(classroomBoardMode('blast')).toBe('blast');
     expect(classroomBoardMode('wheel-rush')).toBe('wheel-rush');
     expect(classroomBoardMode('wordcraft')).toBe('wordcraft');
+    expect(classroomBoardMode('crossword')).toBe('crossword');
+  });
+
+  it('a crossword room starts as crossword, never a server-rolled random mode', () => {
+    __resetClassroomModeSeeds();
+    useGameStore.getState().setHostSelectedGameMode('random');
+    renderHook(() => useClassroomModeSeed({ isClassroomMode: true, gameCode: 'CW1234', classroomGameMode: 'crossword' }));
+    expect(hostMode()).toBe('crossword');
   });
 
   it('a wordcraft room starts as wordcraft, never a server-rolled random mode', () => {

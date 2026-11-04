@@ -6786,7 +6786,14 @@ const es = {
       "codeSent": "Código enviado",
       "enterCode": "Ingresa tu código"
     },
-    "trustBadge": "Seguro y privado"
+    "emailHint": {
+      "suggest": "¿Quisiste decir {email}?",
+      "useSuggestion": "Usar esta dirección",
+      "noMx": "Ese dominio no tiene servidor de correo. El mensaje de confirmación no llegará.",
+      "useAnyway": "Enviar igual",
+      "teacherToggle": "Soy docente"
+    },
+    "trustBadge": "Seguro y privado",
   },
   "legal": {
     "title": "Legal",
@@ -21968,11 +21975,41 @@ const es = {
     "next": "Palabras que faltaron ({count})",
   },
   // @wordcraftReview:end
+  // @eduCrossword:start
+  "eduCrossword": {
+    "name": "Crucigrama",
+    "how": "Cada estudiante resuelve un crucigrama hecho con las palabras de tu lección; las pistas son sus significados.",
+    "blurb": "Un crucigrama hecho con las palabras de la lista, con cada significado como pista.",
+    "studentRule": "Lee cada pista y escribe la palabra de la lección.",
+    "steps": {
+      "1": "Todos los móviles reciben el mismo crucigrama, hecho con las palabras de tu lección.",
+      "2": "Cada pista es el significado de la palabra en tu lección.",
+      "3": "Los estudiantes compiten por llenar la cuadrícula. Cada pista resuelta cuenta en el resumen.",
+    },
+    "tooFewWords": "Con esta lista todavía no se puede armar un crucigrama. Necesita al menos 3 palabras con significado que compartan letras. Añade significados o juega Clásico.",
+    "waiting": "Preparando el crucigrama…",
+    "gridLabel": "Cuadrícula del crucigrama",
+    "standingsLabel": "Clasificación de la carrera",
+    "finished": "{count} de {total} terminaron",
+    "done": "¡Listo!",
+    "percent": "{percent} %",
+    "more": "+{count} más",
+  },
+  // @eduCrossword:end
   // @eduPolish:start
   "eduPolish": {
     "seatCapReached": "{name} está mirando: la clase está llena ({cap} jugadores)",
-  }
+  },
   // @eduPolish:end
+  // @eduRoster:start
+  "eduRoster": {
+    "rename": "Cambiar el nombre de {name} en esta clase",
+    "inputLabel": "Nombre en esta clase",
+    "tooLong": "Usa {max} caracteres o menos",
+    "saveFailed": "No se pudo guardar el nombre. Inténtalo de nuevo.",
+    "originalName": "Se registró como {name}"
+  }
+  // @eduRoster:end
 };
 
 export { es };

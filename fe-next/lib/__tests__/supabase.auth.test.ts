@@ -128,12 +128,19 @@ describe('signInWithEmail', () => {
 describe('signUpWithEmail', () => {
   beforeEach(() => { vi.clearAllMocks(); mockLocation.pathname = '/en/multiplayer'; mockLocation.search = ''; });
 
-  it('calls signUp with locale-aware redirect including next param', async () => {
+  it('calls signUp with locale-aware redirect and stashed signup metadata', async () => {
     mockAuth.signUp.mockResolvedValue({ data: { user: {} }, error: null });
-    await signUpWithEmail('new@example.com', 'password123');
+    await signUpWithEmail('new@example.com', 'password123', { intendedRole: 'teacher' });
     expect(mockAuth.signUp).toHaveBeenCalledWith({
       email: 'new@example.com', password: 'password123',
-      options: { emailRedirectTo: 'https://www.lexiclash.live/en/auth/callback?next=%2Fen%2Fmultiplayer' },
+      options: {
+        emailRedirectTo: 'https://www.lexiclash.live/en/auth/callback?next=%2Fen%2Fmultiplayer',
+        data: expect.objectContaining({
+          signup_surface: 'header_or_menu',
+          language: 'en',
+          intended_role: 'teacher',
+        }),
+      },
     });
   });
 });
