@@ -66,7 +66,7 @@ const MODE_KEY_SUFFIX: Record<string, string> = {
 };
 
 /** Modes whose copy lives in their own namespace instead of the shared name/how tables. */
-const MODE_COPY_KEYS: Record<string, { nameKey: string; howKey: string; blurbKey: string }> = {
+const MODE_COPY_KEYS: Partial<Record<string, { nameKey: string; howKey: string; blurbKey: string }>> = {
   crossword: { nameKey: 'eduCrossword.name', howKey: 'eduCrossword.how', blurbKey: 'eduCrossword.blurb' },
 };
 

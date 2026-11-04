@@ -212,6 +212,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/tools/word-solver",
   "/unsubscribe",
   "/vocabulary-games-for-middle-school",
+  "/web-handoff",
   "/word-blast-game",
   "/word-craft",
   "/word-craft-game",
