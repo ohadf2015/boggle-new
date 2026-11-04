@@ -17,102 +17,14 @@ import {
   type AuthSyncMessage,
 } from '@/utils/crossTabAuthSync';
 import { PageLoader } from '@/components/ui/PageLoader';
-import { useLanguage } from '@/contexts/LanguageContext';
-import Cookies from 'js-cookie';
+import { authFailureHref, resolveAuthNext } from '@/lib/navigation/authReturnPath';
+import { LoadingUI } from './CallbackLoadingUI';
+import { clearSupabaseAuthData } from './clearSupabaseAuthData';
 import { isBareCallbackVisit } from './noSessionReport';
 
 // Timeout constants
 const CODE_EXCHANGE_TIMEOUT = 15000; // 15 seconds timeout for code exchange
 const RETRY_TIMEOUT_SECONDS = 6; // Show retry button after 6 seconds
-
-/**
- * Returns the default post-login redirect URL.
- * All users land on the home page — education dashboards are manual entry only.
- */
-function getDefaultRedirect(locale: string): string {
-  return `/${locale}`;
-}
-
-/**
- * Clears all Supabase auth-related cookies and storage from the browser.
- * This allows the user to start fresh with a new sign-in attempt.
- */
-function clearSupabaseAuthData(): void {
-  // Clear all cookies that start with 'sb-' (Supabase auth cookies)
-  const allCookies = Cookies.get();
-  Object.keys(allCookies).forEach((cookieName) => {
-    if (cookieName.startsWith('sb-')) {
-      Cookies.remove(cookieName, { path: '/' });
-      // Also try removing with domain variations
-      Cookies.remove(cookieName);
-    }
-  });
-
-  // Clear Supabase-related items from localStorage and sessionStorage
-  if (typeof window !== 'undefined') {
-    const storageKeys = Object.keys(localStorage);
-    storageKeys.forEach((key) => {
-      if (key.startsWith('sb-') || key.includes('supabase')) {
-        localStorage.removeItem(key);
-      }
-    });
-
-    const sessionKeys = Object.keys(sessionStorage);
-    sessionKeys.forEach((key) => {
-      if (key.startsWith('sb-') || key.includes('supabase')) {
-        sessionStorage.removeItem(key);
-      }
-    });
-  }
-
-  logger.log('Auth callback: Cleared Supabase auth data from browser');
-}
-
-interface LoadingUIProps {
-  secondsRemaining: number;
-  showRetry: boolean;
-  onRetry: () => void;
-  locale: string;
-}
-
-// Loading UI component with countdown and retry
-function LoadingUI({ secondsRemaining, showRetry, onRetry, locale }: LoadingUIProps): React.JSX.Element {
-  const { t } = useLanguage();
-  const isRtl = locale === 'he';
-
-  return (
-    <div className="flex-1 flex items-center justify-center bg-neo-navy" dir={isRtl ? 'rtl' : 'ltr'}>
-      <div className="flex flex-col items-center gap-6">
-        <PageLoader size="lg" text={t('auth.callback.completingSignIn')} />
-
-        {!showRetry && secondsRemaining > 0 && (
-          <p className="text-neo-white text-sm">
-            {secondsRemaining}...
-          </p>
-        )}
-
-        {showRetry && (
-          <div className="flex flex-col items-center gap-3 animate-neo-pop">
-            <p className="text-neo-white text-sm text-center max-w-xs">
-              {t('auth.callback.takingTooLong')}
-            </p>
-            <button
-              type="button"
-              onClick={onRetry}
-              className="px-6 py-3 bg-neo-pink text-neo-white font-neo-display font-bold
-                         rounded-neo border-neo-thick border-black shadow-hard
-                         hover:shadow-hard-pressed hover:translate-x-[2px] hover:translate-y-[2px]
-                         active:shadow-none active:translate-x-[4px] active:translate-y-[4px]
-                         transition-[box-shadow,translate,scale,rotate,transform] duration-150"
-            >
-              {t('auth.callback.tryAgain')}
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
 
 // Helper to wrap a promise with a timeout
 function withTimeout<T>(promise: Promise<T>, ms: number, errorMessage: string): Promise<T> {
@@ -158,25 +70,19 @@ function AuthCallbackContent(): React.JSX.Element {
   // Handle retry - clear cookies and redirect to sign-in
   const handleRetry = useCallback(() => {
     clearSupabaseAuthData();
-    // Clear URL params and redirect to home with auth error
+    const next = searchParams.get('next');
     window.history.replaceState(null, '', window.location.pathname);
-    router.replace(`/${locale}?auth_error=true&reason=timeout`);
-  }, [router, locale]);
+    router.replace(authFailureHref(locale, next, 'timeout'));
+  }, [router, locale, searchParams]);
 
-  // Helper to get redirect URL. Returns { url, isDefault } where isDefault means no explicit destination was provided.
-  const getRedirectUrl = useCallback(() => {
-    const nextParam = searchParams.get('next');
-    let next = nextParam || `/${locale}`;
-    if (next === '/') {
-      next = `/${locale}`;
-    } else if (!next.startsWith(`/${locale}`)) {
-      const pathWithoutLocale = next.replace(/^\/(he|en|sv|ja)/, '');
-      next = `/${locale}${pathWithoutLocale || ''}`;
-    }
-    // isDefault = no explicit next param was provided (user came from login, not a deep link)
-    const isDefault = !nextParam || nextParam === '/' || nextParam === `/${locale}`;
-    return { url: next, isDefault };
-  }, [searchParams, locale]);
+  const getRedirectUrl = useCallback(
+    () => resolveAuthNext(searchParams.get('next'), locale),
+    [searchParams, locale],
+  );
+  const failureHref = useCallback(
+    (reason?: string) => authFailureHref(locale, searchParams.get('next'), reason),
+    [searchParams, locale],
+  );
 
   // Track if we've already navigated away
   const hasNavigated = useRef<boolean>(false);
@@ -194,11 +100,10 @@ function AuthCallbackContent(): React.JSX.Element {
     router.replace(url);
   }, [router]);
 
-  // Helper to redirect after auth. When no explicit destination was requested,
-  // always go to home page — education dashboards are manual entry only.
+  // No explicit destination: home page. Education dashboards are manual entry only.
   const redirectWithRole = useCallback(async (_userId: string | undefined, next: string, isDefault: boolean) => {
     if (isDefault) {
-      safeRedirect(getDefaultRedirect(locale));
+      safeRedirect(`/${locale}`);
     } else {
       safeRedirect(next);
     }
@@ -303,7 +208,7 @@ function AuthCallbackContent(): React.JSX.Element {
         if (!supabase) {
           logger.error('Supabase not configured');
           broadcastAuthFailed('Supabase not configured');
-          safeRedirect(`/${locale}?auth_error=true`);
+          safeRedirect(failureHref());
           return;
         }
 
@@ -319,7 +224,7 @@ function AuthCallbackContent(): React.JSX.Element {
             description: oauthErrorDescription
           });
           broadcastAuthFailed(errorMessage);
-          safeRedirect(`/${locale}?auth_error=true&reason=${encodeURIComponent(oauthError)}`);
+          safeRedirect(failureHref(oauthError));
           return;
         }
 
@@ -356,7 +261,7 @@ function AuthCallbackContent(): React.JSX.Element {
                 return;
               }
               logger.debug('Auth callback: Timed out waiting for session from other tab');
-              safeRedirect(`/${locale}?auth_error=true`);
+              safeRedirect(failureHref());
             }
             return;
           }
@@ -374,7 +279,7 @@ function AuthCallbackContent(): React.JSX.Element {
                 return;
               }
               broadcastAuthFailed('Timed out waiting for other tab');
-              safeRedirect(`/${locale}?auth_error=true`);
+              safeRedirect(failureHref());
             }
             return;
           }
@@ -418,7 +323,7 @@ function AuthCallbackContent(): React.JSX.Element {
             const logExchange = /code verifier not found/i.test(authMessage) ? logger.log : logger.error;
             logExchange.call(logger, 'Auth callback: Code exchange error:', authMessage);
             broadcastAuthFailed(authMessage);
-            safeRedirect(`/${locale}?auth_error=true`);
+            safeRedirect(failureHref());
             return;
           }
 
@@ -462,7 +367,7 @@ function AuthCallbackContent(): React.JSX.Element {
             const authError = sessionError as SupabaseAuthError;
             logger.error('Auth callback: Error setting session from hash tokens:', getAuthErrorMessage(authError));
             broadcastAuthFailed(getAuthErrorMessage(authError));
-            safeRedirect(`/${locale}?auth_error=true`);
+            safeRedirect(failureHref());
             return;
           }
 
@@ -498,7 +403,7 @@ function AuthCallbackContent(): React.JSX.Element {
           logger.warn('Auth callback: No session found, redirecting with error', noSessionDiag);
         }
         broadcastAuthFailed('No session found');
-        safeRedirect(`/${locale}?auth_error=true&reason=no_session`);
+        safeRedirect(failureHref('no_session'));
       } catch (err) {
         logger.error('Auth callback exception:', err);
         releaseCodeLock();
@@ -516,7 +421,7 @@ function AuthCallbackContent(): React.JSX.Element {
         }
 
         broadcastAuthFailed(err instanceof Error ? err.message : 'Unknown error');
-        safeRedirect(`/${locale}?auth_error=true`);
+        safeRedirect(failureHref());
       }
     };
 
@@ -527,7 +432,7 @@ function AuthCallbackContent(): React.JSX.Element {
       cleanupFunctions.current.forEach(fn => fn());
       cleanupFunctions.current = [];
     };
-  }, [router, searchParams, locale, getRedirectUrl, safeRedirect, waitForSessionFromOtherTab, redirectWithRole]);
+  }, [router, searchParams, locale, getRedirectUrl, failureHref, safeRedirect, waitForSessionFromOtherTab, redirectWithRole]);
 
   return (
     <LoadingUI

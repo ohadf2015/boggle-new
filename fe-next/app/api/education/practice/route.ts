@@ -421,7 +421,7 @@ export async function PATCH(request: NextRequest) {
       lessonId: existing.lesson_id, assignmentId: satisfiedAssignment.id, classroomId: satisfiedAssignment.classroomId }).catch((err) => { logger.error('Assignment stamp failed:', err); return false; })
       : Promise.resolve(null);
 
-    const [{ data: session, error }, xpResult, profileXpResult] = await Promise.all([
+    const [{ data: session, error }, xpResult, profileXpResult, stamped] = await Promise.all([
       sessionWrite,
       awardEducationXp,
       incrementProfileXp,
@@ -461,7 +461,7 @@ export async function PATCH(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({ session });
+    return NextResponse.json({ session, assignmentCompleted: stamped === true });
   } catch (error) {
     logger.error('PATCH practice error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

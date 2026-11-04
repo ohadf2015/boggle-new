@@ -15,6 +15,7 @@
 
 import { createHmac, timingSafeEqual } from 'crypto'
 import { TEACHER_PRO_TRIAL_DAYS } from '@/lib/education/pro/trialDays'
+import { buildCheckoutSuccessUrl } from '@/lib/education/checkoutReturn'
 
 // ---- Environment ----
 
@@ -148,6 +149,7 @@ export class PolarClient {
     name,
     redirectUrl,
     locale,
+    returnPath,
     allowTrial = false,
     trialDays,
   }: {
@@ -159,6 +161,8 @@ export class PolarClient {
     redirectUrl?: string
     /** Locale prefix for the fallback success_url (validated by callers). */
     locale?: string
+    /** The teacher page checkout started from; validated, else the teacher home. */
+    returnPath?: string
     allowTrial?: boolean
     /**
      * Polar trial length in days when `allowTrial`. Defaults to the standard 14; a teacher
@@ -175,7 +179,8 @@ export class PolarClient {
     const payload = {
       products: [productId],
       success_url:
-        redirectUrl || `${process.env.NEXT_PUBLIC_APP_URL}/${successLocale}/teacher?checkout=success&checkout_id={CHECKOUT_ID}`,
+        redirectUrl ||
+        buildCheckoutSuccessUrl({ appUrl: process.env.NEXT_PUBLIC_APP_URL, locale: successLocale, returnPath }),
       external_customer_id: userId,
       metadata: {
         user_id: userId,

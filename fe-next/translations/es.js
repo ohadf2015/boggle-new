@@ -3463,6 +3463,7 @@ const es = {
     "updateReady": "Actualización lista",
     "updateRestart": "Reiniciar",
     "pressBackAgainToExit": "Pulsa atrás otra vez para salir",
+    "stop": "Detener",
     "used": "Usado",
     "free": "Gratis",
     "loading": "Mezclando letras...",
@@ -14369,6 +14370,8 @@ const es = {
       },
       "trialPreview": "Vista previa de Pro: esta página está abierta {{days}} días más. Después requiere Pro.",
       "trialPreviewCta": "Quedarme con Pro",
+      "trialEnded": "Tu vista previa de Pro terminó. Tus clases y el historial de partidas siguen guardados. Con Pro, esta página se vuelve a abrir.",
+      "freeKeeps": "Gratis sigues teniendo los {{modes}} modos de juego en clase, tus propias listas de palabras y cero anuncios para tus alumnos.",
       "cta": "Desbloquéalo con Pro: {{price}}/mes"
     },
     "digest": {
@@ -15394,7 +15397,19 @@ const es = {
       "notCompleted": "No completada",
       "strugglingAreas": "Áreas de dificultad",
       "studentsMissed": "estudiantes fallaron",
-      "noStrugglingAreas": "Aún no se identificaron áreas de dificultad"
+      "noStrugglingAreas": "Aún no se identificaron áreas de dificultad",
+      "playedCount": "{played}/{total} jugaron",
+      "nobodyYet": "Nadie ha jugado todavía. Los resultados aparecen aquí cuando los alumnos terminan.",
+      "needHelp": "Necesitan ayuda",
+      "onTrack": "Todos los que jugaron sacaron 70 % o más.",
+      "mostMissed": "Palabras más falladas",
+      "missedBy": "{count}/{played} fallaron",
+      "notPlayedTitle": "Aún no han jugado ({count})",
+      "allPlayed": "Todos han jugado.",
+      "noMisses": "Sin fallos",
+      "loadFailed": "No se pudo cargar quién jugó.",
+      "eachStudent": "Cada alumno ({count})",
+      "noScores": "Aún no hay puntuaciones: estas partidas no guardaron resultados por palabra."
     },
     "tracking": {
       "all": "Todas",
@@ -15777,7 +15792,9 @@ const es = {
     "wordBank": {
       "title": "Banco de palabras ({{count}})",
       "hint": "Estas palabras están escondidas en el tablero. Toca para cerrar.",
-      "challengeBadge": "Reto: busca palabras de {{min}}+ letras"
+      "challengeBadge": "Reto: busca palabras de {{min}}+ letras",
+      "huntTitle": "Palabras de la lección {{found}}/{{total}}",
+      "huntHidden": "Palabra de la lección oculta, {{length}} letras"
     },
     "studentPreview": {
       "button": "Ver lo que verán los alumnos",
@@ -19529,6 +19546,9 @@ const es = {
       }
     },
     "setup": {
+      "tagline": "Coloca palabras. Conquista territorio. Gánale al bot.",
+      "showAdvanced": "Opciones avanzadas",
+      "hideAdvanced": "Ocultar opciones avanzadas",
       "title": "Prepara tu partida",
       "opponent": {
         "label": "Rival",
@@ -19551,6 +19571,7 @@ const es = {
       "sendChallengeNow": "Ahora envía tu reto"
     },
     "daily": {
+      "goals": { "title": "Metas de hoy" },
       "title": "Tablero diario",
       "play": "Juega el tablero de hoy",
       "done": "Hecho hoy · jugar otra vez",
@@ -21443,7 +21464,8 @@ const es = {
       "leave": "Salir",
       "calculating": "Contando las palabras…",
       "classGoal": "Botín de la clase: {found}/{total} palabras",
-      "waitNext": "Tu profe decide qué sigue. Calienta mientras esperas."
+      "waitNext": "Tu profe decide qué sigue. Calienta mientras esperas.",
+      "moreFromRound": "Más de esta ronda"
     }
   }
   // @eduLiveRoom:end
@@ -21669,7 +21691,9 @@ const es = {
       "packWords": "{count} palabras",
       "packRecommended": "Te lo recomendamos",
       "startLive": "Empezar en vivo",
-      "createOnly": "Solo crear la clase"
+      "createOnly": "Solo crear la clase",
+      "packHint": "Tus alumnos también reciben estas palabras como tarea al unirse.",
+      "assignFailed": "Tu clase está lista, pero las palabras no se asignaron. Asígnalas desde la página de la clase."
     },
     "host": {
       "classLabel": "Clase",
@@ -21796,6 +21820,13 @@ const es = {
   }
   // @teacherLifecycleEmail:end
   ,
+  // @wordcraftReview:start
+  "wordcraftReview": {
+    "cta": "Repasar palabras que faltaron ({count})",
+    "homeworkDone": "Tarea completada",
+    "next": "Palabras que faltaron ({count})",
+  },
+  // @wordcraftReview:end
   // @eduPolish:start
   "eduPolish": {
     "seatCapReached": "{name} está mirando: la clase está llena ({cap} jugadores)",

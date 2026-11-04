@@ -7,7 +7,8 @@
  *               embedded in the board (large type, tap to expand; collapsed by default
  *               so it never covers the grid unasked).
  *   challenge → small badge: "Challenge: aim for 5+ letter words".
- *   core      → renders nothing.
+ *   core      → in a Classic round, a "Lesson words 1/4" strip: each word on the board
+ *               shows only its first letter until the student finds it. Nothing elsewhere.
  *
  * Both `level` and `words` come from the server's per-socket `classroomContext`
  * (see useMultiplayerSocket). The board is shared, so this changes what the
@@ -16,11 +17,14 @@
  * Dark-only surface → hardcoded `bg-neo-navy` (no `bg-neo-cream dark:` pair; see
  * pitfalls class 5). No entrance opacity tween: it appears statically.
  */
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { BookOpen, ChevronUp, Target } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { useGameStore } from '@/hooks/gameState';
 import type { VocabularyLevel } from '@/lib/supabase/education/types';
+import { LessonTargetStrip } from '@/components/education/live/LessonTargetStrip';
+import { buildLessonTargets } from '@/components/education/live/lessonTargets';
 
 export interface StudentWordBankProps {
   level: VocabularyLevel;
@@ -42,6 +46,19 @@ export function StudentWordBank({
   const { t, language } = useLanguage();
   const [open, setOpen] = useState(false);
   const isRTL = language === 'he';
+  const grid = useGameStore((s) => s.letterGrid);
+  const foundWords = useGameStore((s) => s.foundWords);
+  const gameMode = useGameStore((s) => s.gameMode);
+  const gameModeConfirmed = useGameStore((s) => s.gameModeConfirmed);
+  const gameLanguage = useGameStore((s) => s.gameLanguage);
+  const targets = useMemo(
+    () => (level === 'core'
+      ? buildLessonTargets({ words, foundWords, grid, language: gameLanguage ?? language, gameMode, gameModeConfirmed })
+      : null),
+    [level, words, foundWords, grid, gameLanguage, language, gameMode, gameModeConfirmed],
+  );
+
+  if (targets) return <LessonTargetStrip targets={targets} t={t} dir={isRTL ? 'rtl' : 'ltr'} className={className} />;
 
   if (level === 'challenge') {
     return (

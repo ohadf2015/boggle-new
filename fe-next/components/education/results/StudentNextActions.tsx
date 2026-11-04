@@ -25,9 +25,11 @@ export interface StudentNextActionsProps {
   onPractice?: () => void;
   /** Translator function */
   t: (key: string, params?: Record<string, string | number>) => string;
+  /** Drop the "stay here" sub-line where the warm-up right below already keeps the student on the screen. */
+  compact?: boolean;
 }
 
-export function StudentNextActions({ onPlayAgain, onPractice, t }: StudentNextActionsProps) {
+export function StudentNextActions({ onPlayAgain, onPractice, t, compact = false }: StudentNextActionsProps) {
   return (
     <div className="space-y-3">
       {/* Primary: Play Again — loud, full-width, lime color (neo-brutalist primary) */}
@@ -80,9 +82,11 @@ export function StudentNextActions({ onPlayAgain, onPractice, t }: StudentNextAc
             <span className="block font-neo-display font-bold text-base leading-snug">
               {t('education.results.waitingForTeacher')}
             </span>
-            <span className="block font-neo-body font-bold text-sm leading-snug text-neo-black/75">
-              {t('education.results.stayInClass')}
-            </span>
+            {!compact && (
+              <span className="block font-neo-body font-bold text-sm leading-snug text-neo-black/75">
+                {t('education.results.stayInClass')}
+              </span>
+            )}
           </span>
         </div>
       )}

@@ -50,6 +50,7 @@ function isProduceFocus(focus: VocabFocus): focus is ProduceFocus {
   return (PRODUCE_FOCUSES as readonly string[]).includes(focus);
 }
 import type { PracticeType } from '@/hooks/usePracticeSession';
+import { asServerOutcome } from '@/lib/education/wordcraftServerOutcome';
 import type { PracticeVariant } from '@/lib/education/practicePicker';
 import type { Language, VocabularyWord } from '@/lib/supabase/education/types';
 
@@ -71,12 +72,16 @@ export interface PracticeModeStageProps {
   language: Language;
   words: VocabularyWord[];
   /** Normalised round-finished handler — one path for all eight modes. */
-  onFinish: (type: PracticeType, payload: PracticeRoundPayload) => void | Promise<void>;
+  onFinish: (type: PracticeType, payload: PracticeRoundPayload) => unknown;
   onBack: () => void;
   xpSessionData: { sessionXpEarned: number; sessionMasteryMessage: string | null };
   /** Straight into the next ready mode, when the lesson has one left. */
   onNext?: () => void;
   nextLabel?: string;
+  /** Word Craft only: where the round's missed lesson words are queued for review. */
+  wordCraftReview?: { studentId: string; lessonId: string };
+  /** Word Craft only: device key a round in progress is saved under, so a reload resumes it. */
+  wordCraftRunKey?: string;
 }
 
 export default function PracticeModeStage({
@@ -91,6 +96,8 @@ export default function PracticeModeStage({
   xpSessionData,
   onNext,
   nextLabel,
+  wordCraftReview,
+  wordCraftRunKey,
 }: PracticeModeStageProps) {
   if (words.length === 0) return null;
 
@@ -119,10 +126,11 @@ export default function PracticeModeStage({
           <WordCraftPractice
             words={words.map((entry) => entry.word)}
             language={language}
-            onComplete={async (results) => {
-              await onFinish('solo_board', { vocabularyWordsFound: results.vocabularyWordsFound, wordsFound: results.wordsFound, newWordsFound: [] });
-            }}
+            onComplete={async (results) =>
+              asServerOutcome(await onFinish('solo_board', { vocabularyWordsFound: results.vocabularyWordsFound, wordsFound: results.wordsFound, newWordsFound: [] }))}
             onBack={onBack}
+            review={wordCraftReview}
+            runKey={wordCraftRunKey}
             {...forward}
           />
         );

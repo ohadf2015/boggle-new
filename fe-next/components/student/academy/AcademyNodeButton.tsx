@@ -11,7 +11,9 @@
 
 import Image from 'next/image';
 import { useState } from 'react';
-import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
+import { useEduReducedMotion } from '@/lib/education/motion/useEduReducedMotion';
+import { useCompositorLoop } from '@/lib/education/motion/compositorLoop';
 import { Flag, Lock, Moon, Star } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -61,6 +63,12 @@ const TWINKLES = [
 ];
 
 /** Two crossed chains over a locked node — ink under-stroke, steel links on top. */
+const bob = (rise: number) => [{ transform: 'translateY(0px)' }, { transform: `translateY(-${rise}px)` }, { transform: 'translateY(0px)' }];
+const GLOW = [
+  { keyframes: [{ transform: 'scale(0.9)' }, { transform: 'scale(1.12)' }, { transform: 'scale(0.9)' }], duration: 1800 },
+  { keyframes: [{ opacity: 0.75 }, { opacity: 1 }, { opacity: 0.75 }], duration: 1800 },
+];
+
 function Chains() {
   return (
     <svg aria-hidden="true" viewBox="0 0 100 100" className="pointer-events-none absolute inset-[6%] h-[88%] w-[88%]">
@@ -131,7 +139,7 @@ function BossRing({ have, need, size }: { have: number; need: number; size: numb
 export function AcademyNodeButton({ node, at, index, big, recommended, tag: tagWord, tone = 'gold', onOpen, reducedMotion, compact = 0, scale = 1 }: Props) {
   const { t } = useLanguage();
   const sfx = useSoundEffects();
-  const osReduced = useReducedMotion();
+  const osReduced = useEduReducedMotion();
   const still = reducedMotion || !!osReduced;
   const [burst, setBurst] = useState(0);
   const label = useNodeLabel(node);
@@ -142,6 +150,9 @@ export function AcademyNodeButton({ node, at, index, big, recommended, tag: tagW
   const chip = isBoss && showBossChip(compact) ? bossChip(node, t) : null;
   // Everything that is not the spotlit island (or a live game) stays calm.
   const calm = !recommended && node.state !== 'live' && !locked;
+  const bounce = useCompositorLoop<HTMLSpanElement>(recommended && !still ? { keyframes: bob(9), duration: 900 } : null);
+  const glow = useCompositorLoop<HTMLSpanElement>((recommended || node.state === 'live') && !still ? GLOW : null);
+  const hover = useCompositorLoop<HTMLDivElement>(recommended && !still ? { keyframes: bob(6), duration: 1600 } : null);
 
   const aria = isBoss
     ? locked
@@ -198,13 +209,12 @@ export function AcademyNodeButton({ node, at, index, big, recommended, tag: tagW
     >
       {/* Bouncing pointer over the ONE recommended island. */}
       {recommended && (
-        <m.span
+        <span
+          ref={bounce}
           aria-hidden="true"
           data-testid="academy-spotlight-pointer"
           data-tone={tone}
           className={cn('absolute left-1/2 z-20 flex -translate-x-1/2 flex-col items-center', tag ? '-top-[3.75rem] sm:-top-16' : '-top-9 sm:-top-11')}
-          animate={still ? undefined : { y: [0, -9, 0] }}
-          transition={still ? undefined : { duration: 0.9, repeat: Infinity, ease: 'easeInOut' }}
         >
           {tag && (
             <span
@@ -219,7 +229,7 @@ export function AcademyNodeButton({ node, at, index, big, recommended, tag: tagW
             <path d="M3 3 H31 L17 27 Z" className={cn(POINTER_FILL[tone] ?? 'fill-neo-yellow', 'stroke-neo-black')} strokeWidth="3.5" strokeLinejoin="round" />
             <path d="M9 7 H22 L16 17 Z" style={{ fill: 'color-mix(in srgb, var(--neo-yellow) 35%, var(--neo-cream))' }} opacity="0.8" />
           </svg>
-        </m.span>
+        </span>
       )}
 
       {node.state === 'done' && (
@@ -248,7 +258,8 @@ export function AcademyNodeButton({ node, at, index, big, recommended, tag: tagW
           />
         )}
         {(recommended || node.state === 'live') && (
-          <m.span
+          <span
+            ref={glow}
             aria-hidden="true"
             className="absolute -inset-[22%] rounded-full"
             style={{
@@ -257,8 +268,6 @@ export function AcademyNodeButton({ node, at, index, big, recommended, tag: tagW
                   ? 'radial-gradient(circle, rgba(255,61,154,0.75) 0%, rgba(255,61,154,0.25) 45%, transparent 70%)'
                   : 'radial-gradient(circle, rgba(255,226,90,0.8) 0%, rgba(255,190,40,0.28) 45%, transparent 70%)',
             }}
-            animate={still ? undefined : { scale: [0.9, 1.12, 0.9], opacity: [0.75, 1, 0.75] }}
-            transition={still ? undefined : { duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
           />
         )}
         {recommended && !still && (
@@ -278,11 +287,7 @@ export function AcademyNodeButton({ node, at, index, big, recommended, tag: tagW
           </>
         )}
         {isBoss && node.progress && locked && <BossRing have={node.progress.have} need={node.progress.need} size={size} />}
-        <m.div
-          className={cn('relative h-full w-full', isBoss && locked && 'p-[16%]')}
-          animate={recommended && !still ? { y: [0, -6, 0] } : undefined}
-          transition={recommended && !still ? { duration: 1.6, repeat: Infinity, ease: 'easeInOut' } : undefined}
-        >
+        <div ref={hover} className={cn('relative h-full w-full', isBoss && locked && 'p-[16%]')}>
           <span className="relative block h-full w-full">
             <Image
               src={ART[node.type]}
@@ -300,7 +305,7 @@ export function AcademyNodeButton({ node, at, index, big, recommended, tag: tagW
               draggable={false}
             />
           </span>
-        </m.div>
+        </div>
 
         {node.state === 'done' && (
           <span className="absolute -top-1 -end-1">

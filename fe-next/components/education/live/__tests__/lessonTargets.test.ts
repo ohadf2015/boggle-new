@@ -1,0 +1,83 @@
+import { describe, it, expect } from 'vitest';
+import { buildLessonTargets, maskLessonWord } from '../lessonTargets';
+
+const GRID = [
+  ['S', 'T', 'O', 'R', 'M'],
+  ['H', 'A', 'D', 'E', 'W'],
+  ['I', 'N', 'L', 'S', 'A'],
+  ['V', 'E', 'R', 'T', 'Y'],
+  ['O', 'C', 'K', 'B', 'U'],
+];
+
+const base = {
+  words: ['storm', 'shad', 'planet'],
+  foundWords: [] as Array<{ word: string; isValid: boolean | null }>,
+  grid: GRID,
+  language: 'en',
+  gameMode: 'classic',
+  gameModeConfirmed: true,
+};
+
+describe('buildLessonTargets', () => {
+  it('lists only the lesson words a path on the visible board can spell', () => {
+    const targets = buildLessonTargets(base);
+    expect(targets?.map((x) => x.word)).toEqual(['storm', 'shad']);
+  });
+
+  it('marks a word found once the server validated it, in any case', () => {
+    const targets = buildLessonTargets({ ...base, foundWords: [{ word: 'STORM', isValid: true }] });
+    expect(targets).toEqual([
+      { word: 'storm', found: true },
+      { word: 'shad', found: false },
+    ]);
+  });
+
+  it('does not reveal a word that is still pending or was rejected', () => {
+    const targets = buildLessonTargets({
+      ...base,
+      foundWords: [{ word: 'storm', isValid: null }, { word: 'shad', isValid: false }],
+    });
+    expect(targets?.every((x) => !x.found)).toBe(true);
+  });
+
+  it.each(['word-hunt', 'blast', 'wheel-rush', 'wordcraft', 'vocab-quiz'])(
+    'hides in %s, whose screen is not the board the lesson words were placed on',
+    (gameMode) => {
+      expect(buildLessonTargets({ ...base, gameMode })).toBeNull();
+    },
+  );
+
+  it('hides until the server confirms the mode, so a random rematch never flashes it', () => {
+    expect(buildLessonTargets({ ...base, gameModeConfirmed: false })).toBeNull();
+  });
+
+  it('hides with no board yet and when no lesson word made it onto the board', () => {
+    expect(buildLessonTargets({ ...base, grid: null })).toBeNull();
+    expect(buildLessonTargets({ ...base, words: ['planet'] })).toBeNull();
+    expect(buildLessonTargets({ ...base, words: [] })).toBeNull();
+  });
+
+  it('matches a Hebrew word placed with its final letter against the regular-letter submission', () => {
+    const heGrid = [
+      ['ש', 'ל', 'ו', 'א'],
+      ['ב', 'מ', 'ה', 'ר'],
+      ['ק', 'ד', 'י', 'ת'],
+      ['ג', 'נ', 'ע', 'פ'],
+    ];
+    const targets = buildLessonTargets({
+      ...base,
+      language: 'he',
+      grid: heGrid,
+      words: ['שלום'],
+      foundWords: [{ word: 'שלומ', isValid: true }],
+    });
+    expect(targets).toEqual([{ word: 'שלום', found: true }]);
+  });
+});
+
+describe('maskLessonWord', () => {
+  it('keeps the first letter and counts the rest', () => {
+    expect(maskLessonWord('storm')).toEqual({ first: 'S', rest: 4 });
+    expect(maskLessonWord('שלום')).toEqual({ first: 'ש', rest: 3 });
+  });
+});

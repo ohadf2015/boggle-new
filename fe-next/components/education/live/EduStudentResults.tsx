@@ -4,7 +4,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import dynamic from 'next/dynamic';
 import { useReducedMotion } from 'framer-motion';
-import { LogOut, Star } from 'lucide-react';
+import { ChevronDown, LogOut, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ResultsFriendStatusProvider } from '@/components/results/ResultsFriendStatus';
 import { useMpResultsController, type MpResultsProps } from '@/components/multiplayer/results/useMpResultsController';
@@ -24,7 +24,7 @@ import { resultsExitCopy } from '@/lib/multiplayer/resultsExitCopy';
 import type { PlayerResult } from '@/types/components';
 import { studentGap, studentPlacing } from './eduResultsModel';
 import { EduStudentHero } from './EduStudentHero';
-import { EduStudentNextStep } from './EduStudentNextStep';
+import { EduStudentNextStep, EduStudentShareButton } from './EduStudentNextStep';
 import { EduStudentClassGoal, EduStudentWaitNext, EduStudentXpBar } from './EduStudentProgress';
 import { LIVE_KEYFRAMES, PRESS } from './eduLiveStyles';
 
@@ -89,7 +89,8 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
     () => [...(c.data.currentPlayerValidWords ?? [])].sort((a, b) => (b.score ?? 0) - (a.score ?? 0) || b.word.length - a.word.length),
     [c.data.currentPlayerValidWords],
   );
-  const best = words[0] ? { word: words[0].word, score: words[0].score ?? 0 } : null;
+  // A quiz round's words carry no per-word points; a "+0" best word would read as a mistake.
+  const best = words[0] && (words[0].score ?? 0) > 0 ? { word: words[0].word, score: words[0].score ?? 0 } : null;
   const mastery = summary?.masteryByPlayer?.[props.username];
   const lesson = typeof mastery?.found === 'number' && typeof mastery?.total === 'number' ? { found: mastery.found, total: mastery.total } : null;
   const missed = useMemo(() => myMissedWords(summary, props.username), [summary, props.username]);
@@ -118,7 +119,13 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
   return (
     <div data-testid="edu-student-results" className="flex min-h-0 flex-1 flex-col overflow-hidden bg-neo-navy text-neo-cream">
       <style>{LIVE_KEYFRAMES}</style>
-      <header className="flex shrink-0 justify-end pe-16 ps-4 pt-4">
+      <header className="flex shrink-0 items-center justify-end gap-2 pe-16 ps-4 pt-1.5">
+        {props.gameCode && (
+          <div className="min-w-0 flex-1 [&_button]:min-h-11 [&_button]:py-1 [&_img]:!size-7">
+            <ChestRewardCta quiet gameCode={props.gameCode} roundId={rewardRoundId(props.gameSessionId, props.gameCode)} />
+          </div>
+        )}
+        <EduStudentShareButton t={t} language={c.language} placing={placing} />
         <button
           type="button"
           data-testid="edu-student-results-leave"
@@ -133,7 +140,7 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
       {scores.length === 0 ? (
         <ResultsSkeleton />
       ) : (
-        <main className="flex min-h-0 flex-1 flex-col items-center gap-4 overflow-y-auto px-4 pb-6 pt-3">
+        <main className="flex min-h-0 flex-1 flex-col items-center gap-2 overflow-y-auto px-4 pb-2 pt-1.5">
           {placing && (
             <Beat index={beat++}>
               <EduStudentHero
@@ -147,24 +154,25 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
                 gap={gap}
                 reduceMotion={reduceMotion}
                 t={t}
+                extra={
+                  (classTotal > 0 || momentum) && (
+                  <>
+                    {classTotal > 0 && <EduStudentClassGoal found={classFound ?? 0} total={classTotal} t={t} />}
+                    {momentum && <StudentMomentumChips momentum={momentum} t={t} className="contents" />}
+                  </>
+                  )
+                }
               />
-              {momentum && <StudentMomentumChips momentum={momentum} t={t} className="mt-3" />}
-              {xpGained && xpGained.newTotalXp > 0 && <div className="mt-3"><EduStudentXpBar totalXp={xpGained.newTotalXp} /></div>}
-              {classTotal > 0 && (
-                <div className="mt-3 flex justify-center">
-                  <EduStudentClassGoal found={classFound ?? 0} total={classTotal} t={t} />
-                </div>
-              )}
             </Beat>
           )}
 
-          <BossOutcomeCard size="phone" className="w-full max-w-sm" />
+          <BossOutcomeCard size="phone" density="compact" className="w-full max-w-sm" />
 
           <Beat index={beat++}>
             <EduStudentNextStep
               t={t}
-              language={c.language}
               placing={placing}
+              showTomorrow={!momentum}
               onPractice={lessonId && missed.length > 0 ? () => openLessonPractice(lessonId) : undefined}
             />
           </Beat>
@@ -173,50 +181,46 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
             <EduStudentWaitNext username={props.username} t={t} />
           </Beat>
 
-          {props.gameCode && (
-            <Beat index={beat++}>
-              <ChestRewardCta quiet gameCode={props.gameCode} roundId={rewardRoundId(props.gameSessionId, props.gameCode)} />
-            </Beat>
-          )}
-
           <Beat index={beat++}>
-            <StudentMissedWords words={missed} language={props.roomLanguage ?? c.language} t={t} className="w-full" />
+            <details data-testid="edu-student-more" className="group rounded-neo-lg border-[3px] border-neo-cream bg-neo-navy-elevated shadow-hard">
+              <summary
+                data-testid="edu-student-more-summary"
+                className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 px-3 py-2 font-neo-display text-lg font-black [&::-webkit-details-marker]:hidden"
+              >
+                <span>{t('eduLiveRoom.studentResults.moreFromRound')}</span>
+                <ChevronDown className="size-5 shrink-0 transition-transform duration-200 ease-out group-open:rotate-180 motion-reduce:transition-none" aria-hidden="true" />
+              </summary>
+              <div className="flex flex-col gap-3 px-3 pb-3">
+                {xpGained && xpGained.newTotalXp > 0 && <EduStudentXpBar totalXp={xpGained.newTotalXp} />}
+                <h2 className="flex items-baseline justify-between gap-2 font-neo-display text-base font-black">
+                  {t('eduLiveRoom.studentResults.yourWords')}
+                  {words.length > 0 && <span className="font-neo-body text-sm font-bold tabular-nums text-neo-cream/70">{words.length}</span>}
+                </h2>
+                {words.length > 0 ? (
+                  <ul className="flex flex-wrap gap-1.5">
+                    {words.map((w, i) => (
+                      <li
+                        key={w.word}
+                        data-testid="edu-student-word"
+                        dir="auto"
+                        className={cn(
+                          'inline-flex items-center gap-1 rounded-full border-2 border-neo-black px-2.5 py-0.5 font-neo-display text-sm font-black uppercase text-neo-black',
+                          i === 0 ? 'bg-neo-yellow shadow-hard-sm' : 'bg-neo-lime'
+                        )}
+                      >
+                        {i === 0 && <Star className="size-3.5 fill-neo-black" aria-hidden="true" />}
+                        {w.word}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="font-neo-body text-sm font-bold text-neo-cream/80">{t('eduLiveRoom.studentResults.noWords')}</p>
+                )}
+                <StudentMissedWords words={missed} language={props.roomLanguage ?? c.language} t={t} className="w-full" />
+                {props.gameCode && <RoundShop compact gameCode={props.gameCode} />}
+              </div>
+            </details>
           </Beat>
-
-          <Beat index={beat++}>
-            <section className="rounded-neo-lg border-[3px] border-neo-cream bg-neo-navy-elevated p-3 shadow-hard">
-              <h2 className="mb-2 flex items-baseline justify-between gap-2 font-neo-display text-lg font-black">
-                {t('eduLiveRoom.studentResults.yourWords')}
-                {words.length > 0 && <span className="font-neo-body text-sm font-bold tabular-nums text-neo-cream/70">{words.length}</span>}
-              </h2>
-              {words.length > 0 ? (
-                <ul className="flex flex-wrap gap-1.5">
-                  {words.map((w, i) => (
-                    <li
-                      key={w.word}
-                      data-testid="edu-student-word"
-                      dir="auto"
-                      className={cn(
-                        'inline-flex items-center gap-1 rounded-full border-2 border-neo-black px-2.5 py-0.5 font-neo-display text-sm font-black uppercase text-neo-black',
-                        i === 0 ? 'bg-neo-yellow shadow-hard-sm' : 'bg-neo-lime'
-                      )}
-                    >
-                      {i === 0 && <Star className="size-3.5 fill-neo-black" aria-hidden="true" />}
-                      {w.word}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="font-neo-body text-sm font-bold text-neo-cream/80">{t('eduLiveRoom.studentResults.noWords')}</p>
-              )}
-            </section>
-          </Beat>
-
-          {props.gameCode && (
-            <Beat index={beat++}>
-              <RoundShop compact gameCode={props.gameCode} />
-            </Beat>
-          )}
         </main>
       )}
 

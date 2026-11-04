@@ -48,6 +48,10 @@ describe('quizOwnsRoundEnd', () => {
   it('treats every field as optional, the way the shell supplies them', () => {
     expect(quizOwnsRoundEnd({})).toBe(false);
   });
+
+  it('yields to the shared classroom results card once the server sent a lesson recap', () => {
+    expect(quizOwnsRoundEnd({ ...QUIZ_ENDED, hasClassroomRecap: true })).toBe(false);
+  });
 });
 
 describe('showBoardWaitingScreen', () => {

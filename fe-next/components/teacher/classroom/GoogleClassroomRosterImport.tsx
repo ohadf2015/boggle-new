@@ -97,9 +97,14 @@ export function GoogleClassroomRosterImport({ classroomId }: { classroomId: stri
         </a>
       )}
       {phase.kind === 'error' && (
-        <p role="alert" className="font-bold">
-          {t(`${K}.error`)}
-        </p>
+        <div className="space-y-2">
+          <p role="alert" className="font-bold">
+            {t(`${K}.error`)}
+          </p>
+          <button type="button" className={ACTION} onClick={loadCourses}>
+            {t('common.retry')}
+          </button>
+        </div>
       )}
       {phase.kind === 'courses' && courses.length === 0 && <p>{t(`${K}.noCourses`)}</p>}
       {courses.length > 0 && (

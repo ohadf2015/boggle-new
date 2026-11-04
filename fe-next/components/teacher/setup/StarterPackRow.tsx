@@ -14,13 +14,16 @@ export interface StarterPackRowProps {
   t: T;
 }
 
-/** Ready-made word packs, one already picked, so a new class never starts from a blank list. */
+/** Ready-made word packs, one already picked; it becomes the new class's first assignment. */
 export function StarterPackRow({ packs, selectedKey, recommendedKey, onSelect, t }: StarterPackRowProps) {
   return (
-    <div role="radiogroup" aria-labelledby="setup-pack-label" className="@container flex flex-col gap-1.5">
+    <div role="radiogroup" aria-labelledby="setup-pack-label" aria-describedby="setup-pack-hint" className="@container flex flex-col gap-1.5">
       <span id="setup-pack-label" className="font-neo-body text-sm font-bold text-neo-cream">
         {t('eduShell.setup.packLabel')}
       </span>
+      <p id="setup-pack-hint" className="-mt-1 font-neo-body text-xs text-neo-cream/75 max-sm:sr-only">
+        {t('eduShell.setup.packHint')}
+      </p>
       <div className="grid grid-cols-2 gap-2">
         {packs.map((pack) => {
           const on = pack.nameKey === selectedKey;
