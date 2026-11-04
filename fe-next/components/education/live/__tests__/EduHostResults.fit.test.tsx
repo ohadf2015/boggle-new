@@ -18,6 +18,8 @@ vi.mock('@/lib/education/roundEndSound', () => ({ playRoundEndCue: vi.fn(() => n
 const pro = vi.hoisted(() => ({ hasPro: false, loading: false }));
 vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => pro }));
 vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
+const phoneRecap = vi.hoisted(() => ({ current: false }));
+vi.mock('@/components/education/results/useIsPhoneRecap', () => ({ useIsPhoneRecap: () => phoneRecap.current }));
 vi.mock('@/lib/education/reportProCtaClick', () => ({ reportProOfferImpression: vi.fn(), reportProOfferClick: vi.fn(), reportProCtaClick: vi.fn() }));
 
 const t = (key: string, params?: Record<string, string | number>) => (params ? `${key}:${JSON.stringify(params)}` : key);
@@ -51,6 +53,7 @@ describe('EduHostResults: fits the wall with the Teacher Pro card', () => {
     vi.useFakeTimers();
     pro.hasPro = false;
     pro.loading = false;
+    phoneRecap.current = false;
   });
 
   it('given a free teacher, when results show, then the one Pro preview sits right under the actions, never above them', () => {
@@ -139,6 +142,19 @@ describe('EduHostResults: fits the wall with the Teacher Pro card', () => {
     });
     const nudge = screen.getByTestId('teacher-invite').parentElement!;
     expect(nudge.className).toMatch(/\[@container_results_\(height<56\.25rem\)\]:hidden/);
+  });
+
+  it('given a Pro teacher hosting from a phone, then the struggle preview steps aside so the recap fits the phone', () => {
+    pro.hasPro = true;
+    phoneRecap.current = true;
+    render(<EduHostResults summary={summary()} players={players.map((p, i) => ({ ...p, score: 10 * (i + 1) }))} t={t} onRematch={vi.fn()} />);
+    expect(screen.getByTestId('struggle-preview').parentElement!.className).toMatch(/\[@container_results_\(height<56\.25rem\)\]:hidden/);
+  });
+
+  it('given a Pro teacher on a 1366x768 wall, then the struggle preview stays: it fits and it is the paid insight', () => {
+    pro.hasPro = true;
+    render(<EduHostResults summary={summary()} players={players.map((p, i) => ({ ...p, score: 10 * (i + 1) }))} t={t} onRematch={vi.fn()} />);
+    expect(screen.getByTestId('struggle-preview').parentElement!.className).not.toMatch(/:hidden/);
   });
 
   it('given a winner on the calm wall, then the big name has room for its glyphs and is never cut', () => {

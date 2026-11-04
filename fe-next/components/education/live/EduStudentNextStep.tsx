@@ -30,11 +30,11 @@ export function EduStudentNextStep({ t, language, placing, onPractice }: EduStud
   };
 
   return (
-    <div data-testid="edu-student-next-step" className="flex w-full flex-col gap-2">
+    <div data-testid="edu-student-next-step" className="flex w-full flex-col gap-1.5">
       <StudentNextActions onPractice={onPractice} t={t} />
       {placing && (
         <div className="flex items-center justify-between gap-2">
-          <p data-testid="edu-student-tomorrow" className="min-w-0 font-neo-body text-sm font-bold text-neo-cream/85">
+          <p data-testid="edu-student-tomorrow" className="min-w-0 font-neo-body text-xs font-bold leading-snug text-neo-cream/85">
             {t('eduLiveRoom.studentResults.tomorrowHook', { score: placing.score })}
           </p>
           <button

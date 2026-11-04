@@ -312,7 +312,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
               />
             )}
             {!proLoading && hasPro && summary.totalWords > 0 && (
-              <div className={cn(shortWall && '[@container_results_(height<56.25rem)]:hidden')}>
+              <div className={cn((shortWall || phone) && '[@container_results_(height<56.25rem)]:hidden')}>
                 <StrugglePreview masteryByPlayer={summary.masteryByPlayer ?? {}} teacherName={summary.teacherName ?? ''} language={language} t={t} />
               </div>
             )}
