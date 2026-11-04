@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { loadTranslation } from '@/translations/loadTranslation';
+import { getHelpContent } from '@/components/education/help/content';
+import { HELP_POPULAR, helpArticleHref } from '@/components/education/help/helpRegistry';
+import { servesHelp } from '@/components/education/help/helpTypes';
 
 export const revalidate = 86400;
 
@@ -30,12 +33,15 @@ const SECTIONS = [
       { href: '/daily/word-wheel', labelKey: 'sitemap.wordWheel', fallback: 'Word Wheel' },
       { href: '/blast', labelKey: 'sitemap.blast', fallback: 'Blast Mode' },
       { href: '/adventure', labelKey: 'sitemap.adventure', fallback: 'Adventure Mode' },
+      { href: '/connections', labelKey: 'connections.title', fallback: 'Word Bridge' },
+      { href: '/daily/archive', labelKey: 'daily.archivePage.title', fallback: 'Past puzzles' },
     ],
   },
   {
     titleKey: 'sitemap.tools',
     fallback: 'Tools & Resources',
     links: [
+      { href: '/tools', labelKey: 'sitemap.tools', fallback: 'Tools & Resources' },
       { href: '/tools/word-solver', labelKey: 'footer.wordSolver', fallback: 'Word Solver' },
       { href: '/word-of-the-day', labelKey: 'footer.wordOfTheDay', fallback: 'Word of the Day' },
       { href: '/glossary', labelKey: 'footer.glossary', fallback: 'Glossary' },
@@ -53,6 +59,8 @@ const SECTIONS = [
       { href: '/guides/blast-strategy', labelKey: 'sitemap.blastStrategy', fallback: 'Blast Strategy Guide' },
       { href: '/guides/word-hunt-strategy', labelKey: 'sitemap.wordHuntStrategy', fallback: 'Word Hunt Strategy Guide' },
       { href: '/education', labelKey: 'sitemap.education', fallback: 'Education' },
+      { href: '/education/classroom-game', labelKey: 'education.header.breadcrumbs.classroomGame', fallback: 'Classroom Game' },
+      { href: '/education/duels', labelKey: 'education.header.breadcrumbs.duels', fallback: 'Duels' },
     ],
   },
   {
@@ -96,6 +104,7 @@ export default async function SitemapPage({ params }: PageProps) {
   const t = await loadTranslation(locale as 'en' | 'he' | 'sv' | 'ja' | 'es') as Record<string, unknown>;
 
   const resolve = (key: string, fallback: string) => getNestedValue(t, key) || fallback;
+  const helpArticles = servesHelp(locale) ? getHelpContent(locale).articles : null;
 
   return (
     <main className="min-h-screen bg-neo-navy text-neo-white">
@@ -124,6 +133,25 @@ export default async function SitemapPage({ params }: PageProps) {
               </ul>
             </div>
           ))}
+          {helpArticles && (
+            <div>
+              <h2 className="text-sm font-black uppercase tracking-widest text-neo-yellow mb-3">
+                {resolve('footer.forTeachers', 'For Teachers')}
+              </h2>
+              <ul className="space-y-2">
+                {HELP_POPULAR.filter((slug) => helpArticles[slug]).map((slug) => (
+                  <li key={slug}>
+                    <Link
+                      href={helpArticleHref(locale, slug)}
+                      className="text-sm text-neo-white hover:text-neo-cyan transition-colors duration-100"
+                    >
+                      {helpArticles[slug].title}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </div>
     </main>
