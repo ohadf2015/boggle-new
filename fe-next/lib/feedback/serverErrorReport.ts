@@ -12,11 +12,18 @@
  * a crash loop is one row with a rising count. The page is the ROUTE PATTERN
  * (/[locale]/play/[code]), never the concrete URL, so room codes and query
  * strings neither split the fold nor end up in the report. Best-effort: 3s
- * timeout, never throws, production only unless FEEDBACK_SERVER_ERRORS=1.
+ * timeout, never throws. Fail closed: no fetch unless NODE_ENV is
+ * production, NEXT_PUBLIC_FDT_ENABLED is exactly "true", and the ingest
+ * origin is the hard-coded production origin. A dev/preview origin, a
+ * missing flag, or FEEDBACK_SERVER_ERRORS=1 outside that check does nothing.
  */
 
 import { sentryRelease } from '@/lib/sentry/release';
-import { FEEDBACK_SERVER_ORIGIN, FEEDBACK_WIDGET_TOKEN } from '@/lib/feedback/feedbackIngest';
+import {
+    FEEDBACK_SERVER_ORIGIN,
+    FEEDBACK_WIDGET_TOKEN,
+    isProductionFdtOrigin,
+} from '@/lib/feedback/feedbackIngest';
 
 const SITE_ORIGIN = 'https://lexiclash.live';
 const TIMEOUT_MS = 3000;
@@ -53,13 +60,37 @@ function errorParts(err: unknown): { name: string; message: string; stack?: stri
     return { name: 'NonError', message: typeof err === 'string' ? err : JSON.stringify(err) ?? String(err) };
 }
 
-/** On in production (Railway's production environment) by default; FEEDBACK_SERVER_ERRORS=1/0 overrides. */
+/**
+ * Fail closed. Server code has no window.location, so the gate is env-only.
+ * Reads `env` once. Missing, empty, and unexpected values are off — including
+ * NEXT_PUBLIC_FDT_ENABLED of "1" / "TRUE" / "yes", a non-production Railway
+ * environment (preview deploys still set NODE_ENV=production), and any ingest
+ * URL whose origin is not the hard-coded production origin.
+ * FEEDBACK_SERVER_ERRORS=1 cannot open this. "0" / "false" still kills it.
+ */
+export function isProductionFeedbackEnabled(env: NodeJS.ProcessEnv = process.env): boolean {
+    const nodeEnv = env.NODE_ENV;
+    const flag = env.NEXT_PUBLIC_FDT_ENABLED?.trim() ?? '';
+    const kill = env.FEEDBACK_SERVER_ERRORS?.trim() ?? '';
+    const railwayEnv = env.RAILWAY_ENVIRONMENT_NAME?.trim() ?? '';
+    const ingestOverride = env.FEEDBACK_INGEST_URL?.trim() ?? '';
+
+    if (nodeEnv !== 'production') return false;
+    if (flag !== 'true') return false;
+    if (kill === '0' || kill === 'false') return false;
+    if (railwayEnv && railwayEnv !== 'production') return false;
+    if (!isProductionFdtOrigin(FEEDBACK_SERVER_ORIGIN)) return false;
+    if (!ingestOverride) return true;
+    try {
+        return isProductionFdtOrigin(new URL(ingestOverride).origin);
+    } catch {
+        return false;
+    }
+}
+
+/** Same gate. Kept so existing imports stay fail-closed. */
 export function serverErrorReportingEnabled(env: NodeJS.ProcessEnv = process.env): boolean {
-    const flag = env.FEEDBACK_SERVER_ERRORS?.trim();
-    if (flag === '0' || flag === 'false') return false;
-    if (flag === '1' || flag === 'true') return true;
-    const railwayEnv = env.RAILWAY_ENVIRONMENT_NAME?.trim();
-    return env.NODE_ENV === 'production' && (!railwayEnv || railwayEnv === 'production');
+    return isProductionFeedbackEnabled(env);
 }
 
 export function buildServerErrorReport(
@@ -103,9 +134,12 @@ export async function reportServerError(
     env: NodeJS.ProcessEnv = process.env,
     fetchImpl: typeof fetch = fetch,
 ): Promise<void> {
-    if (!serverErrorReportingEnabled(env)) return;
+    if (!isProductionFeedbackEnabled(env)) return;
+    // Canonical prod path only. The gate already rejected a non-prod origin,
+    // so an env override cannot retarget this fetch.
+    const ingest = `${FEEDBACK_SERVER_ORIGIN}/api/v1/feedback`;
     const token = env.FEEDBACK_SDK_TOKEN?.trim() || FEEDBACK_WIDGET_TOKEN;
-    const ingest = env.FEEDBACK_INGEST_URL?.trim() || `${FEEDBACK_SERVER_ORIGIN}/api/v1/feedback`;
+    if (!token) return;
     try {
         await fetchImpl(`${ingest}?sdk=${encodeURIComponent(token)}`, {
             method: 'POST',

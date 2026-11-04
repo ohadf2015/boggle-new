@@ -14,6 +14,18 @@ export const FEEDBACK_WIDGET_TOKEN =
     'fdt_bd9b22165d84d2f5480f76cdf8c6cdeee434f9df94293fcd';
 
 /**
+ * Production FDT origin only. Empty, dev, and preview hosts are false.
+ * The literal is pinned next to the constant so retargeting
+ * FEEDBACK_SERVER_ORIGIN at a dev/preview host fails closed instead of
+ * becoming the new allowed origin. Server reports must not fetch anything
+ * this rejects — there is no override path in this module.
+ */
+export function isProductionFdtOrigin(origin: string | null | undefined): boolean {
+    return origin === FEEDBACK_SERVER_ORIGIN
+        && FEEDBACK_SERVER_ORIGIN === 'https://server-production-14a9.up.railway.app';
+}
+
+/**
  * Short build id for the widget's data-app-version, so every report in the
  * dashboard names the deploy it came from (and lines up with the Sentry
  * release). Falls back to 'web', the value the widget sent before.
