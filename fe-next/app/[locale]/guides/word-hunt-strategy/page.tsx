@@ -16,18 +16,18 @@ const DATE_PUBLISHED = '2026-03-10';
 
 const metaTitles: Record<string, string> = {
   en: 'How to Get Better at Word Hunt — Strategy Guide | LexiClash',
-  he: 'איך להשתפר בציד מילים (Word Hunt): טיפים ללוח | LexiClash',
-  sv: 'Bli bättre på Word Hunt: strategi för rutnätet | LexiClash',
-  ja: 'Word Hunt上達のコツ：文字盤の攻略法 | LexiClash',
-  es: 'Cómo mejorar en Word Hunt: guía de estrategia | LexiClash',
+  he: 'אסטרטגיית ציד מילים: מצאו את המילה הנסתרת בפחות ניסיונות | לקסיקלאש',
+  sv: 'Word Hunt Strategi: Hitta det Dolda Ordet pa Farre Forsok | LexiClash',
+  ja: 'ワードハント攻略：より少ない試行で隠された単語を見つける | LexiClash',
+  es: 'Estrategia Word Hunt: Encuentra la Palabra Oculta en Menos Intentos | LexiClash',
 };
 
 const metaDescriptions: Record<string, string> = {
-  en: 'Get better at Word Hunt: scan the grid on a route, hunt -ING, -ED and -ER endings, and turn one word into five. Plus how LexiClash Word Hunt works.',
-  he: 'איך להשתפר ב-Word Hunt: לסרוק את הלוח במסלול, לחפש סיומות כמו ים ו-ות, ולהפוך מילה אחת לחמש. וגם איך עובד ציד המילים של LexiClash.',
-  sv: 'Bli bättre på Word Hunt: läs av rutnätet längs en rutt, leta efter ändelser som -en, -ar och -na, och gör ett ord till fem. Plus hur Ordjakt fungerar.',
-  ja: 'Word Huntがうまくなるコツ。順路を決めて盤面を見る、語尾から探す、1つの単語を5つに広げる。LexiClashのワードハントの遊び方も紹介します。',
-  es: 'Mejora en Word Hunt: recorre la cuadrícula con método, busca terminaciones como -S, -ES o -AR y convierte una palabra en cinco. Y cómo es Caza de palabras.',
+  en: 'Learn how to get better at Word Hunt fast: eliminate letters, read clues, and deduce the hidden word in fewer guesses. Free LexiClash guide.',
+  he: 'שלטו בציד מילים של לקסיקלאש עם אסטרטגיות אלימינציה, פירוש רמזים וטכניקות דדוקציה מתקדמות.',
+  sv: 'Bemestra LexiClash Word Hunt med elimineringsstrategier, ledtradstolkning och avancerade deduktionstekniker.',
+  ja: 'LexiClashワードハントを消去法、ヒントの解釈、高度な推論テクニックでマスター。',
+  es: 'Domina Word Hunt de LexiClash con estrategias de eliminacion, interpretacion de pistas y tecnicas avanzadas de deduccion.',
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
