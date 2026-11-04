@@ -13,14 +13,14 @@ export default function robots(): MetadataRoute.Robots {
     };
   }
 
-  // Paths to block from crawling
+  // Paths to block from crawling. /_next/static/ and /_next/image/ stay OPEN:
+  // Google renders pages with their JS and CSS, and blocking them made every
+  // render's chunk loads fail (2026-11-04 index drop).
   // Share/tracking params are blocked to prevent duplicate-content dilution:
   // multiple URLs resolve to the same canonical page, and crawlers waste budget
   // on parametrized variants that add no unique value.
   const disallowPaths = [
     '/api/',
-    '/_next/static/',
-    '/_next/image/',
     '/admin/',
     '/*?room=*',
     '/*?share=*',

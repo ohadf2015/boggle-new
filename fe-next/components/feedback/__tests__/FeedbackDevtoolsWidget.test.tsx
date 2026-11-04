@@ -27,6 +27,22 @@ function widgetScript(): HTMLScriptElement | null {
     return document.getElementById(FEEDBACK_WIDGET_SCRIPT_ID) as HTMLScriptElement | null;
 }
 
+const originalLocation = window.location;
+const originalFlag = process.env.NEXT_PUBLIC_FDT_ENABLED;
+
+function stubHost(hostname: string): void {
+    Object.defineProperty(window, 'location', {
+        configurable: true,
+        value: { ...originalLocation, hostname },
+    });
+}
+
+/** Existing cases describe the open-gate path (prod host + explicit flag). */
+function openProdGates(): void {
+    stubHost('www.lexiclash.live');
+    process.env.NEXT_PUBLIC_FDT_ENABLED = 'true';
+}
+
 async function flushEffects(): Promise<void> {
     await act(async () => {
         await Promise.resolve();
@@ -35,11 +51,18 @@ async function flushEffects(): Promise<void> {
 
 beforeEach(() => {
     vi.useFakeTimers();
+    openProdGates();
 });
 
 afterEach(() => {
     vi.useRealTimers();
     widgetScript()?.remove();
+    Object.defineProperty(window, 'location', {
+        configurable: true,
+        value: originalLocation,
+    });
+    if (originalFlag === undefined) delete process.env.NEXT_PUBLIC_FDT_ENABLED;
+    else process.env.NEXT_PUBLIC_FDT_ENABLED = originalFlag;
 });
 
 const settle = () => act(() => { vi.advanceTimersByTime(SCROLL_QUIET_MS + 50); });
@@ -123,4 +146,53 @@ describe('<FeedbackDevtoolsWidget>', () => {
         settle();
         expect(document.querySelectorAll(`script[src="${FEEDBACK_WIDGET_SRC}"]`).length).toBe(1);
     });
+});
+
+describe('<FeedbackDevtoolsWidget> production gate', () => {
+    async function gesture(): Promise<void> {
+        await flushEffects();
+        await act(async () => {
+            window.dispatchEvent(new Event('pointerdown'));
+            window.dispatchEvent(new Event('keydown'));
+            window.dispatchEvent(new Event('touchstart'));
+        });
+        settle();
+    }
+
+    it('does not inject on localhost even when the flag is true', async () => {
+        stubHost('localhost');
+        process.env.NEXT_PUBLIC_FDT_ENABLED = 'true';
+        render(<FeedbackDevtoolsWidget />);
+        await gesture();
+        expect(widgetScript()).toBeNull();
+        expect(document.querySelector('script[src*="widget.js"]')).toBeNull();
+    });
+
+    it('does not inject on a non-prod host', async () => {
+        stubHost('staging.lexiclash.live');
+        process.env.NEXT_PUBLIC_FDT_ENABLED = 'true';
+        render(<FeedbackDevtoolsWidget />);
+        await gesture();
+        expect(widgetScript()).toBeNull();
+    });
+
+    it('does not inject on the apex host (www is the hard backstop)', async () => {
+        stubHost('lexiclash.live');
+        process.env.NEXT_PUBLIC_FDT_ENABLED = 'true';
+        render(<FeedbackDevtoolsWidget />);
+        await gesture();
+        expect(widgetScript()).toBeNull();
+    });
+
+    it.each([undefined, '', 'false', 'TRUE', '1'])(
+        'does not inject on the prod host when the flag is %s',
+        async (flag) => {
+            stubHost('www.lexiclash.live');
+            if (flag === undefined) delete process.env.NEXT_PUBLIC_FDT_ENABLED;
+            else process.env.NEXT_PUBLIC_FDT_ENABLED = flag;
+            render(<FeedbackDevtoolsWidget />);
+            await gesture();
+            expect(widgetScript()).toBeNull();
+        },
+    );
 });

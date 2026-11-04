@@ -43,6 +43,9 @@ export async function proxy(request: NextRequest) {
   if (gate.action === 'drop') {
     return new NextResponse(null, { status: 404 });
   }
+  if (gate.action === 'redirect') {
+    return NextResponse.redirect(new URL(`${gate.location}${search}`, request.url), 308);
+  }
 
   // A page-level notFound() streams under [locale]/loading.tsx and answers 200.
   if (isHiddenQaRoute(pathname)) {

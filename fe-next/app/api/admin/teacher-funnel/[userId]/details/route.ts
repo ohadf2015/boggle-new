@@ -13,6 +13,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { getSupabaseAdmin } from '@/lib/admin/server';
 import { buildTeacherActivity, slimClassroomGame } from '@/lib/education/teacherActivity';
+import { fetchLastSignIns, fetchLatestRoundStarts } from '@/lib/education/teacherLastActivity';
 import { getRecentClassroomGames } from '@/lib/supabase/analyticsLastGame';
 import { checkTeacherSubscription } from '@/lib/subscriptions';
 
@@ -159,10 +160,18 @@ export async function GET(request: NextRequest, context: RouteContext) {
     // free-plan default above
   }
 
+  const [signIns, roundStarts] = await Promise.all([
+    fetchLastSignIns(supabase, [userId]),
+    fetchLatestRoundStarts(supabase, [userId]),
+  ]);
+  if (roundStarts.error) {
+    return NextResponse.json({ error: roundStarts.error }, { status: 500 });
+  }
+
   return NextResponse.json(
     buildTeacherActivity({
       userId,
-      profile: profileRes.data,
+      profile: { ...profileRes.data, last_sign_in_at: signIns.get(userId) ?? null },
       request: requestRes.data,
       classrooms,
       memberships: membershipsRes.data ?? [],
@@ -171,6 +180,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
       progress: progressRes.data ?? [],
       gamesByClassroom,
       plan,
+      latestRoundStartedAt: roundStarts.unavailable ? null : (roundStarts.byTeacher.get(userId) ?? null),
     }),
   );
 }

@@ -6,6 +6,7 @@ import {
   RACK_SIZE,
   createBag,
   draw,
+  drawWithVowelGuarantee,
   remaining,
   swap,
   isEmpty,
@@ -158,5 +159,34 @@ describe('swap', () => {
     const result = swap(bag, dummyTiles);
     expect(result).toHaveLength(1);
     expect(remaining(bag)).toBe(7);
+  });
+});
+
+describe('drawWithVowelGuarantee', () => {
+  const VOWELS = new Set(['A', 'E', 'I', 'O', 'U']);
+
+  it('initial rack: always has at least one vowel (across many seeds)', () => {
+    for (let seed = 1; seed <= 20; seed++) {
+      const bag = createBag({ seed });
+      const rack = drawWithVowelGuarantee(bag, 7);
+      const hasVowel = rack.some(tile => VOWELS.has(tile.letter));
+      expect(hasVowel).toBe(true);
+    }
+  });
+
+  it('refill: all-consonant remaining rack + refill should have vowel', () => {
+    // After a player plays and might have a consonant-only remaining rack,
+    // the refill must ensure at least one vowel
+    const bag = createBag({ seed: 99 });
+    const initial = drawWithVowelGuarantee(bag, 7);
+
+    // Simulate playing everything except consonants
+    const consonants = initial.filter(t => !VOWELS.has(t.letter));
+    if (consonants.length > 0 && consonants.length < 7) {
+      const refillCount = 7 - consonants.length;
+      const refilled = drawWithVowelGuarantee(bag, refillCount);
+      const newRack = [...consonants, ...refilled];
+      expect(newRack.some(t => VOWELS.has(t.letter))).toBe(true);
+    }
   });
 });

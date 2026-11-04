@@ -86,6 +86,8 @@ export function resolveTap(
   board: Board,
   chosenAxis: Axis = 'h',
 ): ResolveResult {
+  // No pending tiles means no axis to resolve along — the caller decides what a
+  // bare tap means. (The game's first tap is centred by the reducer.)
   if (pending.length === 0) return { reason: 'no-axis-yet' };
 
   // One pending tile: no axis is locked yet, so honor the player's pre-selected

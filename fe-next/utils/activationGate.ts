@@ -7,9 +7,15 @@
  * game never retries. That is the completed-round cohort with no
  * `growth:first_game_played`.
  *
- * PostHogProvider calls `armActivationCapture()` at the end of the loaded()
- * consent dance (opt-in, or the explicit opt-out that starts cookieless
- * capture) and again when consent flips to granted.
+ * The proxy's isLoaded() flips only after posthog.init returns, and loaded()
+ * (consent dance) runs synchronously inside that init. So isLoaded() === true
+ * means a capture will stick, in every chunk. A module-local armed bit does
+ * not: page chunks duplicate this file, PostHogProvider arms a different copy,
+ * and arcade trackGameEnd stashed forever while game_completed still captured.
+ *
+ * PostHogProvider's loaded() still replays a sessionStorage stash via
+ * flushPendingActivation, and calls armActivationCapture({ force: true })
+ * when there is no PostHog key.
  *
  * Unit tests that mock posthog without `isLoaded` cannot observe the drop, so
  * they stay armed. Production always has `isLoaded`.
@@ -25,12 +31,14 @@ export type PendingActivation = {
   mode: string;
 };
 
-let armed = false;
-/** No PostHog key — nothing will ever load. Don't hold the referral/activation forever. */
 let forceArm = false;
 
 export function armActivationCapture(opts?: { force?: boolean }): void {
-  armed = true;
+  // No-force calls used to flip a module-local `armed` bit. Page chunks
+  // duplicate this module, so that bit never reached arcade trackGameEnd and
+  // a loaded client still stashed. isLoaded() is the cross-chunk signal
+  // (it flips only after loaded()'s consent dance). force still covers a
+  // build with no PostHog key, where nothing will ever load.
   if (opts?.force) forceArm = true;
 }
 
@@ -40,7 +48,8 @@ export function isActivationCaptureArmed(): boolean {
   // loaded() runs inside posthog.init, before the lazy proxy flips isLoaded.
   // Until then a capture is queued and flushed into the opted-out default.
   if (!ph.isLoaded()) return forceArm;
-  return armed;
+  // Consent dance has finished. Capture. Do not consult a per-chunk flag.
+  return true;
 }
 
 export function stashPendingActivation(args: PendingActivation): void {
@@ -82,6 +91,5 @@ export function clearPendingActivation(): void {
 
 /** @internal */
 export function __resetActivationGateForTests(): void {
-  armed = false;
   forceArm = false;
 }

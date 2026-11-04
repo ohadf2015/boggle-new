@@ -10,7 +10,7 @@ const t = (k: string) => k;
 const CLASS = { id: 'c1', name: 'Period 3', join_code: 'AB12CD', member_count: 1 };
 
 describe('<HomeHero> code slot', () => {
-  it('Given a size-contained card in the code slot, When the desk lays out in a row, Then the slot grows instead of collapsing to its padding', () => {
+  it('Given a size-contained card in the code slot, When the desk lays out in two columns, Then the slot owns a grid column instead of collapsing to its padding', () => {
     render(
       <HomeHero
         classrooms={[CLASS]}
@@ -24,7 +24,7 @@ describe('<HomeHero> code slot', () => {
     );
     const wrapper = screen.getByTestId('slot-card').parentElement!;
     expect(wrapper).toHaveAttribute('data-testid', 'home-hero-code-slot');
-    expect(wrapper.className.split(/\s+/)).toEqual(expect.arrayContaining(['min-w-0', '@2xl/hero:flex-1']));
-    expect(wrapper.parentElement).toHaveAttribute('data-testid', 'home-hero-actions');
+    expect(wrapper.className.split(/\s+/)).toEqual(expect.arrayContaining(['min-w-0', '@3xl/hero:col-start-2']));
+    expect(wrapper.parentElement).toHaveAttribute('data-testid', 'home-hero-grid');
   });
 });

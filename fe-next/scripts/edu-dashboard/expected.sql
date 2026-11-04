@@ -43,10 +43,22 @@ classes as (
 real_members as (
   select m.classroom_id, m.student_id from public.classroom_memberships m
   where not exists (select 1 from public.profiles p where p.id = m.student_id and p.is_test_account)
+),
+-- Last activity is the latest of the three clocks, not profiles.last_seen_at alone.
+-- Postgres greatest() ignores nulls, matching greatestTimestamp().
+teacher_last as (
+  select p.id,
+    greatest(
+      p.last_seen_at,
+      (select max(r.started_at) from public.classroom_rounds r where r.teacher_id = p.id),
+      (select u.last_sign_in_at from auth.users u where u.id = p.id)
+    ) as last_active_at
+  from public.profiles p
+  where p.user_role = 'teacher' and not p.is_test_account
 )
 select
-  (select count(*) from public.profiles p, w where p.user_role = 'teacher' and not p.is_test_account
-     and p.last_seen_at > w.start_at and p.last_seen_at <= w.end_at) as active_teachers_cur,
+  (select count(*) from teacher_last t, w
+     where t.last_active_at > w.start_at and t.last_active_at <= w.end_at) as active_teachers_cur,
   (select count(*) from approved, w where reviewed_at > w.start_at and reviewed_at <= w.end_at) as new_teachers_cur,
   (select count(*) from approved, w where reviewed_at > w.prior_start and reviewed_at <= w.start_at) as new_teachers_prior,
   (select count(*) from trial_users, w where reviewed_at > w.start_at and reviewed_at <= w.end_at) as trials_started_cur,

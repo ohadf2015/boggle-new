@@ -97,4 +97,50 @@ describe('decideNextHandle', () => {
   it('still drops unknown slugs next to the redirect-only ones', () => {
     expect(decideNextHandle('/es/scrabble-gratis').action).toBe('drop');
   });
+
+  it('308s dotted non-locale prefixes when the rest is a real page', () => {
+    expect(decideNextHandle('/sitemap.xml/online-word-games-with-friends')).toEqual({
+      action: 'redirect',
+      location: '/en/online-word-games-with-friends',
+    });
+    expect(decideNextHandle('/sitemap.xml/education/sight-words-practice')).toEqual({
+      action: 'redirect',
+      location: '/en/education/sight-words-practice',
+    });
+    expect(decideNextHandle('/robots.txt/blog/')).toEqual({
+      action: 'redirect',
+      location: '/en/blog',
+    });
+  });
+
+  it('404s dotted non-locale prefixes when the rest is not a real page', () => {
+    expect(decideNextHandle('/foo.php/x')).toEqual({
+      action: 'drop',
+      reason: 'dotted-misroute',
+    });
+    expect(decideNextHandle('/sitemap.xml/not-a-page')).toEqual({
+      action: 'drop',
+      reason: 'dotted-misroute',
+    });
+    expect(decideNextHandle('/sitemap.xml/blog/../../evil')).toEqual({
+      action: 'drop',
+      reason: 'dotted-misroute',
+    });
+  });
+
+  it('still passes bare sitemap/robots/public files and .well-known', () => {
+    expect(decideNextHandle('/sitemap.xml')).toEqual({ action: 'pass' });
+    expect(decideNextHandle('/robots.txt')).toEqual({ action: 'pass' });
+    expect(decideNextHandle('/llms.txt')).toEqual({ action: 'pass' });
+    expect(decideNextHandle('/.well-known/apple-app-site-association')).toEqual({ action: 'pass' });
+    expect(decideNextHandle('/en/online-word-games-with-friends')).toEqual({ action: 'pass' });
+  });
+
+  it('proxy and the custom server 308 before Next handle, and leave /sitemap.xml alone', () => {
+    const proxy = fs.readFileSync(path.resolve(__dirname, '../../../proxy.ts'), 'utf8');
+    const server = fs.readFileSync(path.resolve(__dirname, '../../../server/index.ts'), 'utf8');
+    expect(proxy).toMatch(/gate\.action === 'redirect'[\s\S]{0,180}308/);
+    expect(server).toMatch(/gate\.action === 'redirect'[\s\S]{0,240}res\.status\(308\)/);
+    expect(server).toMatch(/app\.get\('\/sitemap\.xml'/);
+  });
 });

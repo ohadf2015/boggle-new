@@ -67,6 +67,7 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
             <ul className="space-y-2">
               <li><Link prefetch={false} href={`/${language}/about`} className={footerLinkClass}>{t('footer.about')}</Link></li>
               <li><Link prefetch={false} href={`/${language}/how-to-play`} className={footerLinkClass}>{t('footer.howToPlay', 'How to Play')}</Link></li>
+              <li><Link prefetch={false} href={`/${language}/connections`} className={footerLinkClass}>{t('connections.title', 'Word Bridge')}</Link></li>
               <li><Link prefetch={false} href={`/${language}/blog`} className={footerLinkClass}>{t('footer.blog')}</Link></li>
               <li><Link prefetch={false} href={`/${language}/faq`} className={footerLinkClass}>{t('footer.faq')}</Link></li>
               <li><Link prefetch={false} href={`/${language}/contact`} className={footerLinkClass}>{t('footer.contact')}</Link></li>
@@ -143,6 +144,8 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
             </h3>
             <ul className="space-y-2">
               <li><Link prefetch={false} href={`/${language}/word-of-the-day`} className={footerLinkClass}>{t('footer.wordOfTheDay')}</Link></li>
+              <li><Link prefetch={false} href={`/${language}/daily/archive`} className={footerLinkClass}>{t('daily.archivePage.title', 'Past puzzles')}</Link></li>
+              <li><Link prefetch={false} href={`/${language}/tools`} className={footerLinkClass}>{t('sitemap.tools', 'Tools & Resources')}</Link></li>
               <li><Link prefetch={false} href={`/${language}/guides`} className={footerLinkClass}>{t('footer.guides', 'Guides')}</Link></li>
               <li><Link prefetch={false} href={`/${language}/glossary`} className={footerLinkClass}>{t('footer.glossary', 'Glossary')}</Link></li>
               <li><Link prefetch={false} href={`/${language}/tools/word-solver`} className={footerLinkClass}>{t('footer.wordSolver')}</Link></li>

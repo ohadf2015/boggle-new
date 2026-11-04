@@ -323,3 +323,25 @@ export async function setStudentLevel(
     return { error: { message } };
   }
 }
+
+/**
+ * How many classrooms a teacher has (a head-only count, no rows). Null when the
+ * read fails or Supabase is not configured, so callers can tell "unknown" from 0.
+ */
+export async function countTeacherClassrooms(teacherId: string): Promise<number | null> {
+  if (!supabase || !teacherId) return null;
+  try {
+    const { count, error } = await supabase
+      .from('classrooms')
+      .select('id', { count: 'exact', head: true })
+      .eq('teacher_id', teacherId);
+    if (error) {
+      logger.error('Error counting classrooms:', error);
+      return null;
+    }
+    return typeof count === 'number' ? count : null;
+  } catch (err) {
+    logger.error('Exception in countTeacherClassrooms:', err instanceof Error ? err.message : err);
+    return null;
+  }
+}

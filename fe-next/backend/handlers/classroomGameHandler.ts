@@ -32,6 +32,8 @@ import { isRecordJoinLockedOut, ROOM_LOCKED } from '../modules/classroomLobbyLoc
 import { registerClassroomGameModeHandlers } from './classroomGameModeHandler.js';
 import { registerClassroomReteachHandlers } from './classroomReteachHandler.js';
 import { getAuthUserId } from './classroomSocketAuth.js';
+import { getSupabase } from '../modules/supabase/client.js';
+import { bumpTeacherLastSeen } from './bumpTeacherLastSeen.js';
 import { markTeacherRoomOpened } from '../modules/supabase/teacherActivation.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { validatePayload, gameCodeSchema, usernameSchema } from '../utils/socketValidation.js';
@@ -438,6 +440,8 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
       }
 
       await updateClassroomGameStatus(payload.gameCode, 'playing');
+      // authUserId was checked against game.teacherId above. Never throws.
+      await bumpTeacherLastSeen(getSupabase(), authUserId);
 
       io.to(`classroom:${game.classroomId}`).emit('classroomGameStarted', {
         gameCode: payload.gameCode,

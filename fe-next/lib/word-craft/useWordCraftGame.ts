@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
 import { createBoard, getCell, isFirstMove, placeTiles, type Board, type BoardSize } from './board';
-import { createBag, draw, remaining, swap as swapBag, type SupportedLocale, type TileBag } from './tileBag';
+import { createBag, draw, drawWithVowelGuarantee, remaining, swap as swapBag, type SupportedLocale, type TileBag } from './tileBag';
 import { seedOpeningRack, drawTowardTarget, nextLessonTarget } from './lessonBag';
 import { validateAndScoreMove, type DictionaryCheck } from './moveValidator';
 import { findBestBotMove } from './botMove';
@@ -137,8 +137,8 @@ function buildInitial(init: number | { seed: number; boardSize?: 13 | 15; locale
       : rollModifier(seed);
   const rackSize = modifierRackSize(modifier);
   if (lessonTargets?.length) bag.tiles = seedOpeningRack(bag.tiles, lessonTargets[0], locale);
-  const playerRack = draw(bag, rackSize);
-  const botRack = draw(bag, rackSize);
+  const playerRack = drawWithVowelGuarantee(bag, rackSize);
+  const botRack = drawWithVowelGuarantee(bag, rackSize);
   const board = createBoard(finalBoardSize, { premiums: false });
   if (initialTiles?.length) placeTiles(board, initialTiles.map((t) => ({ ...t })));
   return {

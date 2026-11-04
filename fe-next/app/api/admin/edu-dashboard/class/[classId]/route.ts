@@ -11,6 +11,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { getSupabaseAdmin } from '@/lib/admin/server';
 import { buildClassDetail, type ClassDetailInput } from '@/lib/admin/eduClassDetail';
+import { fetchLastSignIns, fetchLatestRoundStarts } from '@/lib/education/teacherLastActivity';
 import { slimClassroomGame } from '@/lib/education/teacherActivity';
 import { getRecentClassroomGames } from '@/lib/supabase/analyticsLastGame';
 import { migrationPendingHint } from '@/lib/supabase/migrationPendingHint';
@@ -79,7 +80,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
   const lessonIds = [...new Set(assignments.map((a) => a.lesson_id))];
   const assignmentIds = assignments.map((a) => a.id);
 
-  const [profilesRes, lessonsRes, progressRes] = await Promise.all([
+  const [profilesRes, lessonsRes, progressRes, signIns, roundStarts] = await Promise.all([
     profileIds.length
       ? fetchAllRows<ClassDetailInput['profiles'][number]>((from, to) =>
           supabase.from('profiles').select('id, display_name, username, last_seen_at, is_test_account').in('id', profileIds).order('id').range(from, to),
@@ -99,11 +100,20 @@ export async function GET(request: NextRequest, context: RouteContext) {
             .range(from, to),
         )
       : Promise.resolve({ data: [], error: null }),
+    classroom.teacher_id ? fetchLastSignIns(supabase, [classroom.teacher_id]) : Promise.resolve(new Map<string, string>()),
+    classroom.teacher_id
+      ? fetchLatestRoundStarts(supabase, [classroom.teacher_id])
+      : Promise.resolve({ byTeacher: new Map<string, string>(), unavailable: false, error: null }),
   ]);
-  const followError = profilesRes.error || lessonsRes.error?.message || progressRes.error;
+  const followError = profilesRes.error || lessonsRes.error?.message || progressRes.error || roundStarts.error;
   if (followError) {
     return NextResponse.json({ error: followError }, { status: 500 });
   }
+
+  const teacherId = classroom.teacher_id;
+  const profiles = ((profilesRes.data ?? []) as ClassDetailInput['profiles']).map((p) =>
+    p.id === teacherId ? { ...p, last_sign_in_at: signIns.get(p.id) ?? null } : p,
+  );
 
   return NextResponse.json(
     buildClassDetail({
@@ -111,10 +121,11 @@ export async function GET(request: NextRequest, context: RouteContext) {
       classroom,
       memberships,
       assignments,
-      profiles: (profilesRes.data ?? []) as ClassDetailInput['profiles'],
+      profiles,
       lessons: (lessonsRes.data ?? []) as ClassDetailInput['lessons'],
       progress: (progressRes.data ?? []) as ClassDetailInput['progress'],
       rounds: roundsRes.error ? null : ((roundsRes.data ?? []) as NonNullable<ClassDetailInput['rounds']>),
+      teacherLastRoundStartedAt: roundStarts.unavailable ? null : (teacherId ? roundStarts.byTeacher.get(teacherId) ?? null : null),
       games: (gamesRes.data ?? []).map(slimClassroomGame),
     }),
   );

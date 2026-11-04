@@ -106,6 +106,14 @@ describe('buildTeacherFunnel', () => {
     expect(out.rows[0].lastSeenAt).toBe('2026-08-10T00:00:00Z');
   });
 
+  it('uses the latest of last_seen, round start and last sign-in', () => {
+    const out = buildTeacherFunnel(input({
+      profiles: [{ id: 'u1', user_role: 'teacher', last_seen_at: '2026-08-01T00:00:00Z', last_sign_in_at: '2026-08-03T00:00:00Z' }],
+      roundStarts: [{ teacher_id: 'u1', started_at: '2026-08-10T12:00:00Z' }],
+    }));
+    expect(out.rows[0].lastSeenAt).toBe('2026-08-10T12:00:00Z');
+  });
+
   it('leaves last-seen null when the applicant has no account yet', () => {
     const out = buildTeacherFunnel(input({ requests: [req({ user_id: null })], profiles: [] }));
 

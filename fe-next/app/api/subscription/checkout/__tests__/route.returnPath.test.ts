@@ -87,6 +87,19 @@ describe('POST /api/subscription/checkout return path', () => {
     expect(passedReturnPath()).toBe('/en/teacher/reports?classroomId=c-9')
   })
 
+  it.each(['https://evil.example/he/teacher', '//evil.example/he/teacher', '/he/teacher/../../evil'])(
+    'refuses an off-site returnTo %s and falls back to the referer',
+    async (returnTo) => {
+      await checkoutFrom(`${APP}${REPORT}`, { returnTo })
+      expect(passedReturnPath()).toBe(REPORT)
+    },
+  )
+
+  it('refuses an off-site returnTo with no referer', async () => {
+    await checkoutFrom(null, { returnTo: 'https://evil.example/he/teacher' })
+    expect(passedReturnPath()).toBeUndefined()
+  })
+
   it('drops a non-string returnTo and falls back to the referer', async () => {
     await checkoutFrom(`${APP}${REPORT}`, { returnTo: 42 })
     expect(passedReturnPath()).toBe(REPORT)

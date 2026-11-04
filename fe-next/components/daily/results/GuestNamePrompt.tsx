@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { isDefaultPlayerName } from '@/utils/defaultPlayerNames';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { proudHeadline } from './guestNameCopy';
+import { getGuestNamePromptArm, markGuestNamePromptDismissedToday } from './guestNamePromptArm';
 import { MAX_GUEST_NAME_LENGTH, useGuestNameSave, type GuestNameT } from './useGuestNameSave';
 
 interface GuestNamePromptProps {
@@ -26,24 +27,35 @@ export function GuestNamePrompt({ name, guestFingerprint, rank, totalPlayers, on
   // A generated name is not offered back; a name the guest typed elsewhere is.
   const [draft, setDraft] = useState(isDefault ? '' : name);
   const { save, saving, error } = useGuestNameSave(name, guestFingerprint, onRenamed, t);
+  const arm = getGuestNamePromptArm(guestFingerprint);
+  const closable = arm === 'closable';
   const shownRef = useRef(false);
 
   useEffect(() => {
     if (shownRef.current) return;
     shownRef.current = true;
-    trackGrowthEvent('daily_guest_name_prompt_shown', { is_default: isDefault, rank: rank ?? null });
-  }, [isDefault, rank]);
+    trackGrowthEvent('daily_guest_name_prompt_shown', { is_default: isDefault, rank: rank ?? null, arm });
+  }, [isDefault, rank, arm]);
+
+  // Closable arm only: back to the results, with the yellow random-name bar,
+  // until tomorrow's finish asks again.
+  const close = () => {
+    if (!closable) return;
+    markGuestNamePromptDismissedToday();
+    trackGrowthEvent('daily_guest_name_prompt_closed', { is_default: isDefault, arm });
+    onDone();
+  };
 
   const placeholder = t('wordHunt.results.guestNamePlaceholder', 'Your name');
   const preview = draft.trim() || (isDefault ? placeholder : name);
 
   return (
-    <Dialog open onOpenChange={() => {}}>
+    <Dialog open onOpenChange={(open) => !open && close()}>
       <DialogContent
         hideCloseButton
         noDescription
         className="max-w-sm"
-        onInteractOutside={(e) => e.preventDefault()}
+        onInteractOutside={(e) => !closable && e.preventDefault()}
       >
         <form
           data-testid="guest-name-prompt"
@@ -104,6 +116,15 @@ export function GuestNamePrompt({ name, guestFingerprint, rank, totalPlayers, on
             </button>
           </div>
           {error && <p role="alert" className="text-xs text-neo-red font-bold">{error}</p>}
+          {closable && (
+            <button
+              type="button"
+              onClick={close}
+              className="self-center min-h-[44px] px-3 text-sm font-bold text-neo-white/70 underline underline-offset-2"
+            >
+              {t('wordHunt.results.guestNameNotNow', 'Not now')}
+            </button>
+          )}
         </form>
       </DialogContent>
     </Dialog>

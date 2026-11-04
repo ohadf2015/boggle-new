@@ -38,6 +38,14 @@ export const CHUNK_RECOVERY_GUARD_KEY = 'chunk_error_refresh';
  *  mount so URLs stay tidy. The SW must treat this as network-only. */
 export const CHUNK_RELOAD_PARAM = '_lc_chunk';
 
+/** Search and AI crawlers. Kept in step with the regex in utils/chunkBootGuard.ts. */
+export const CRAWLER_UA_PATTERN = /bot[/]|crawler|spider|slurp|google-inspectiontool/i;
+
+/** True for crawler user agents, which must never get a recovery navigation. */
+export function isCrawlerUserAgent(ua: string | undefined | null): boolean {
+  return CRAWLER_UA_PATTERN.test(ua || '');
+}
+
 /** Message type the page posts to a waiting worker so it calls skipWaiting(). */
 export const SW_SKIP_WAITING_MESSAGE = { type: 'SKIP_WAITING' as const };
 
@@ -215,6 +223,9 @@ export async function clearCachesAndReload(): Promise<void> {
 /** Stamp `_lc_chunk=<ts>` and replace so HTTP cache cannot reuse the document. */
 export function hardNavigateCacheBust(now: () => number = Date.now): void {
   if (typeof window === 'undefined') return;
+  // Crawlers render once and never come back to a "fixed" tab; a recovery
+  // navigation only turns their render into a JS redirect. Leave them be.
+  if (isCrawlerUserAgent(typeof navigator === 'undefined' ? '' : navigator.userAgent)) return;
   try {
     const url = new URL(window.location.href);
     url.searchParams.set(CHUNK_RELOAD_PARAM, String(now()));

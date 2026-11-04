@@ -1,3 +1,5 @@
+import type { SupabaseClient } from '@supabase/supabase-js';
+
 /**
  * Delete one classroom the caller owns.
  *
@@ -8,8 +10,6 @@
  * Same retry discipline as account delete: one retry on a transient error,
  * and "already gone" is success.
  */
-import type { SupabaseClient } from '@supabase/supabase-js';
-
 export interface ClassroomDeleteError {
   message?: string;
   status?: number;

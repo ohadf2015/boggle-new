@@ -322,7 +322,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
                       onSelect={setSelectedId}
                       language={language}
                       t={t}
-                      rehearse={<RehearseWithBotsButton classroomId={effectiveId || undefined} source="hq" language={language} t={t} compact />}
+                      rehearse={<RehearseWithBotsButton classroomId={effectiveId || undefined} source="hq" language={language} t={t} />}
                       corner={<HomeNewClass href={newClassHref} count={classrooms.length} limit={!proLoading && !hasPro ? FREE_TIER_LIMITS.classes : null} t={t} />}
                       meta={selectedClassroom ? (
                         <HomeClassMeta

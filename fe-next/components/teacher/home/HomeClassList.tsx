@@ -95,7 +95,7 @@ export function HomeClassMeta({
       {previewIds.length > 0 ? <StudentStack ids={previewIds} total={memberCount} /> : null}
       <span className="inline-flex items-center gap-1.5">
         <Users className="size-4" aria-hidden="true" />
-        {t('eduShell.home.students', { count: memberCount })}
+        {memberCount === 1 ? t('eduShell.home.studentsOne') : t('eduShell.home.students', { count: memberCount })}
       </span>
       <span className="inline-flex items-center gap-1.5">
         <CalendarDays className="size-4" aria-hidden="true" />
@@ -177,7 +177,7 @@ export function HomeClassList({
                     <span className="inline-flex items-center gap-1">
                       <Users className="size-3.5 sm:size-4" aria-hidden="true" />
                       <span className="sm:hidden">{c.member_count ?? 0}</span>
-                      <span className="hidden sm:inline">{t('eduShell.home.students', { count: c.member_count ?? 0 })}</span>
+                      <span className="hidden sm:inline">{c.member_count === 1 ? t('eduShell.home.studentsOne') : t('eduShell.home.students', { count: c.member_count ?? 0 })}</span>
                     </span>
                     <span className="inline-flex items-center gap-1">
                       <CalendarDays className="size-3.5 sm:size-4" aria-hidden="true" />
