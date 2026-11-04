@@ -30,6 +30,7 @@ import { updateRankedMmr, fetchRankedBaselines, type RankedParticipant, type Mmd
 import { getClassroomGame, updateClassroomGameStatus } from '../../modules/classroomGameManager';
 import { hasQuizSession } from '../../modules/vocabQuizStore.js';
 import { buildClassroomRoundSummary } from '../../modules/classroomRoundSummary';
+import { crosswordClassroomWords } from '../../modules/crosswordClassroomRound';
 import { persistClassroomGameScores, playerScoresFromGameResults, roundHasStudents } from '../../handlers/classroomGamePersistence';
 import { DEFAULT_RATING, DEFAULT_RD } from '@/shared/utils/eloRating';
 import { PARTICIPATION_BONUS } from '@/shared/types/classroom';
@@ -226,16 +227,20 @@ export async function calculateAndBroadcastFinalScores(
   let classroomSummary;
   try {
     if (classroomGame) {
+      const crossword = game.gameMode === 'crossword' ? crosswordClassroomWords(game.crosswordMpState, classroomGame.vocabularyWords ?? []) : null;
       classroomSummary = await buildClassroomRoundSummary({
         gameCode,
         language,
         classroomGame,
         participationBonus,
+        ...(crossword ? { placedWords: crossword.placedWords } : {}),
         players: resultsWithIconAchievements.map((p) => ({
           username: p.username,
           totalScore: p.totalScore,
           isBot: !!game.users?.[p.username]?.isBot,
-          wordDetails: (p.wordDetails || []) as Array<{ word: string; validated: boolean; isDuplicate?: boolean }>,
+          wordDetails: crossword
+            ? crossword.wordDetailsFor(p.username)
+            : ((p.wordDetails || []) as Array<{ word: string; validated: boolean; isDuplicate?: boolean }>),
         })),
       });
     }
