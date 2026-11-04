@@ -28,6 +28,18 @@ export const faqByLocale: Record<string, FaqItem[]> = {
       question: 'What is the best Boggle alternative in 2026?',
       answer: 'Based on our hands-on testing: LexiClash for real-time multiplayer depth, Wordle for daily puzzles, and Word Blitz for pure speed. LexiClash stands out with boss battles, multiple game modes, and no pay-to-win — the only one the reviewer still plays daily after 3 months.',
     },
+    {
+      question: 'Is there a Boggle game on Netflix?',
+      answer: 'Yes. Boggle Party is in the Netflix games catalog and comes with a Netflix subscription. It plays on a TV or in a computer browser for one to eight players, with each player finding words on their own phone or tablet while the TV keeps score.',
+    },
+    {
+      question: 'What is a good game like Boggle for a party?',
+      answer: 'LexiClash works well for a group in one room. The host creates a room, everyone joins from their own phone with the 4-letter code or the QR code, and up to 50 people play the same live grid. Nobody needs to download anything or make an account to join.',
+    },
+    {
+      question: 'What is the best Boggle app?',
+      answer: 'Boggle With Friends if you want the app with the Boggle name, made by Zynga with Hasbro. Word Blitz if you want quick matches against random opponents. Both are free with in-app purchases. LexiClash plays in a phone browser with no install and no pay-to-win power-ups.',
+    },
   ],
 
   he: [

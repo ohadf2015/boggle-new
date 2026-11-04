@@ -123,7 +123,7 @@ LexiClash is what happens when someone looks at Boggle and says "what if this, b
 
 But what hooked me was variety. Daily challenges with global leaderboards. Boss battles against AI with special abilities. A blast mode that's basically Boggle with combos and chain reactions. Word Hunt where everyone races to find target words.
 
-It supports four languages (English, Hebrew, Swedish, Japanese), which is useful if you want vocabulary practice in another language while native speakers destroy you. Educational masochism.
+It supports six languages (English, Hebrew, Swedish, Japanese, Spanish, Russian), which is useful if you want vocabulary practice in another language while native speakers destroy you. Educational masochism.
 
 Most importantly. It's free. Genuinely, actually free. No pay-to-win power-ups. No "watch an ad to continue." Monetization doesn't interfere with gameplay at all, which in 2026 feels almost radical and refreshing.
 
@@ -158,6 +158,36 @@ If you want real-time chaos with actual competition—LexiClash. That's the Bogg
 If you want relaxing solo play—Wordscapes.
 
 If you want classic Boggle feel without pay-to-win mechanics—also LexiClash. I tried to find another option. Couldn't.`,
+      },
+      {
+        slug: 'games-like-boggle-online',
+        title: 'Games like Boggle you can play online for free',
+        content: `Two of the six are made to run in a web browser with nothing to install: Wordle, on the New York Times site, and LexiClash. The other four are mainly phone apps. All six are free to start, and the apps make their money from ads and in-app purchases.
+
+If you want the actual Boggle part, a grid of letters where you trace words through neighbouring tiles, the list gets shorter. Boggle With Friends, Word Blitz and LexiClash all use a grid like that. Wordle is a guessing puzzle, Words With Friends 2 is a Scrabble-style board, and Wordscapes fills a crossword from a wheel of letters.
+
+LexiClash opens straight into a game in any browser, on a phone or a laptop, and the word lists come in six languages: English, Hebrew, Swedish, Japanese, Spanish and Russian.`,
+      },
+      {
+        slug: 'games-like-boggle-party',
+        title: 'Games like Boggle for a party',
+        content: `For a group in the same room, the easiest setup is a LexiClash room. The host opens Multiplayer and creates a room. The lobby shows a 4-letter room code, a QR code of the join link and a share button. Everyone else scans the QR or types the code on their own phone and lands on the same live grid. Guests don't need an account, a room holds up to 50 players, and a small group can add up to three bots.
+
+Classic follows Boggle rules: connect neighbouring letters, diagonals included, and use each tile once per word. Blast adds tile bonuses that clear tiles as you score. Word Hunt is a race to one target word with letter feedback after every guess. Wheel Rush puts everyone on the same letter wheel, and the first person to find a word gets a bonus.`,
+      },
+      {
+        slug: 'boggle-on-netflix',
+        title: 'Is there Boggle on Netflix?',
+        content: `Yes. Boggle Party is in the Netflix games catalog and comes with a Netflix subscription. It carries the Boggle name, so it isn't one of the six alternatives above, but it belongs on this page because many people searching for games like Boggle are really looking for it.
+
+It plays on a TV or in a computer browser through Netflix, for one to eight players. Each player finds and swipes words on their own phone or tablet, and the TV keeps score. That makes it a good fit for a living room with a TV and a Netflix account. With more than eight people, or no TV, a browser game you join by code does the same job.`,
+      },
+      {
+        slug: 'best-boggle-app',
+        title: 'What is the best Boggle app?',
+        content: `Boggle With Friends is the app with the Boggle name on it. Zynga made it together with Hasbro, the owner of Boggle, and it is free to download with in-app purchases. Word Blitz, from LOTUM, is the quickest fix: you swipe adjacent letters against the clock and get matched with random opponents. It is also free, and it sells gem packs.
+
+If you would rather not install anything, LexiClash runs in your phone's browser, with no pay-to-win power-ups and no account needed to join a friend's room.`,
       },
       {
         slug: 'getting-sentimental',
