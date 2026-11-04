@@ -121,7 +121,7 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
       <style>{LIVE_KEYFRAMES}</style>
       <header className="flex shrink-0 items-center justify-end gap-2 pe-16 ps-4 pt-1.5">
         {props.gameCode && (
-          <div className="min-w-0 flex-1 [&_button]:min-h-11 [&_button]:py-1 [&_img]:!size-8">
+          <div className="min-w-0 flex-1 [&_button]:min-h-11 [&_button]:py-1 [&_img]:!size-7">
             <ChestRewardCta quiet gameCode={props.gameCode} roundId={rewardRoundId(props.gameSessionId, props.gameCode)} />
           </div>
         )}
