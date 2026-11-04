@@ -21448,6 +21448,7 @@ const he = {
       "colStudents": "תלמידים",
       "colLastPlayed": "משחק אחרון",
       "students": "{count} תלמידים",
+      "studentsOne": "תלמיד אחד",
       "notPlayedRecently": "אין משחקים ב‑30 הימים האחרונים",
       "playWith": "התחלת משחק עם {name}",
       "showCode": "הצגת קוד",

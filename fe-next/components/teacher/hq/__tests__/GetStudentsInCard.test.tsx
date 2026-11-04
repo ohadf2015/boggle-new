@@ -67,24 +67,42 @@ describe('<GetStudentsInCard>', () => {
     expect(trackCopied).toHaveBeenCalledWith({ classroomId: 'c1' });
   });
 
-  it('Given the card is narrow beside the Start button, Then the share buttons drop their labels by the card width, not the screen width', () => {
+  it('Given a phone-width card, Then copy and projector keep their words and split one row evenly', () => {
     render(<GetStudentsInCard classroom={CLASS} onOpenProjector={vi.fn()} />);
     for (const id of ['hq-copy-link', 'hq-open-projector']) {
-      const label = screen.getByTestId(id).querySelector('span')!;
-      expect(label.className).toMatch(/(^|\s)hidden(\s|$)/);
-      expect(label.className).toMatch(/@\w+:inline/);
-      expect(label.className).not.toMatch(/max-sm:hidden/);
+      const button = screen.getByTestId(id);
+      const label = button.querySelector('span')!;
+      expect(label.className).not.toMatch(/(^|\s)(hidden|sr-only)(\s|$)/);
+      expect(button.className).toMatch(/(^|\s)flex-1(\s|$)/);
     }
   });
 
-  it('Given one student joined, Then the heading stays one line above the code and the goal sits with the roster in a second row', () => {
+  it('Given a phone-width card, Then the code tiles share the full width, one column per character', () => {
+    render(<GetStudentsInCard classroom={CLASS} onOpenProjector={vi.fn()} />);
+    const code = screen.getByTestId('hq-join-code');
+    expect(code.className).toMatch(/(^|\s)grid(\s|$)/);
+    expect(code.style.gridTemplateColumns).toBe('repeat(6, minmax(0, 1fr))');
+  });
+
+  it('Given one student joined, Then the heading is visible above the code and the goal sits inside the roster row', () => {
     roster.mockReturnValue({ students: [{ id: 's1', name: 'Ava', avatar: null }], loading: false, arrivals: [] });
     render(<GetStudentsInCard classroom={{ ...CLASS, member_count: 1 }} onOpenProjector={vi.fn()} />);
     const heading = screen.getByRole('heading');
     expect(heading.className).toMatch(/whitespace-nowrap/);
-    const goal = screen.getByTestId('hq-joined-goal');
-    expect(goal.parentElement).toBe(screen.getByTestId('hq-roster-row').parentElement);
-    expect(goal.parentElement).not.toBe(screen.getByTestId('hq-join-code').parentElement);
+    expect(heading.className).not.toMatch(/sr-only/);
+    const row = screen.getByTestId('hq-roster-row');
+    expect(row.contains(screen.getByTestId('hq-joined-goal'))).toBe(true);
+    expect(screen.getByTestId('hq-join-code').parentElement!.contains(row)).toBe(false);
+  });
+
+  it('Given one student below the goal, Then the row holds exactly goal-many seats and states the count once', () => {
+    roster.mockReturnValue({ students: [{ id: 's1', name: 'Ava', avatar: null }], loading: false, arrivals: [] });
+    render(<GetStudentsInCard classroom={{ ...CLASS, member_count: 1 }} onOpenProjector={vi.fn()} />);
+    expect(screen.getAllByTestId('hq-roster-seat')).toHaveLength(1);
+    expect(screen.getAllByTestId('hq-roster-ghost')).toHaveLength(2);
+    expect(screen.getByTestId('hq-joined-goal-count')).toHaveTextContent('academy.hq.joinedGoal:{"count":1,"goal":3}');
+    expect(screen.queryByTestId('hq-joined-count')).toBeNull();
+    expect(screen.queryByText('academy.hq.joinedLabel')).toBeNull();
   });
 
   it('When projector is tapped, Then the projector opens', () => {
@@ -97,8 +115,19 @@ describe('<GetStudentsInCard>', () => {
   it('Given two students, Then two seats are filled and the rest are ghosts', () => {
     render(<GetStudentsInCard classroom={CLASS} onOpenProjector={vi.fn()} />);
     expect(screen.getAllByTestId('hq-roster-seat')).toHaveLength(2);
-    expect(screen.getAllByTestId('hq-roster-ghost').length).toBeGreaterThan(0);
+    expect(screen.getAllByTestId('hq-roster-ghost')).toHaveLength(1);
+    expect(screen.getByTestId('hq-joined-goal-count')).toHaveTextContent('academy.hq.joinedGoal:{"count":2,"goal":3}');
+  });
+
+  it('Given the class already met its goal, Then every student gets a seat and the joined count takes over', () => {
+    roster.mockReturnValue({
+      students: ['a', 'b', 'c', 'd'].map((id) => ({ id, name: id, avatar: null })),
+      loading: false,
+      arrivals: [],
+    });
+    render(<GetStudentsInCard classroom={{ ...CLASS, member_count: 4 }} onOpenProjector={vi.fn()} />);
     expect(screen.getByTestId('hq-joined-count')).toHaveTextContent('academy.hq.joinedLabel');
+    expect(screen.queryByTestId('hq-joined-goal')).toBeNull();
   });
 
   it('Given nobody yet, Then one statement asks for the first student and the 0/3 goal is the only count', () => {
@@ -186,7 +215,7 @@ describe('<GetStudentsInCard>', () => {
     expect(row.contains(screen.getByTestId('hq-join-code'))).toBe(false);
   });
 
-  it('Given the phone layout hides their words, Then link and projector still name themselves on hover and to screen readers', () => {
+  it('Given link and projector, Then they also name themselves on hover and to screen readers', () => {
     render(<GetStudentsInCard classroom={CLASS} onOpenProjector={vi.fn()} />);
     expect(screen.getByTestId('hq-copy-link')).toHaveAttribute('title', 'academy.hq.copyLink');
     expect(screen.getByTestId('hq-open-projector')).toHaveAttribute('title', 'academy.hq.openProjector');
@@ -244,6 +273,6 @@ describe('<GetStudentsInCard>', () => {
 
   it('Given students in, Then the joined count is neutral cream, not lime', () => {
     render(<GetStudentsInCard classroom={CLASS} onOpenProjector={vi.fn()} />);
-    expect(screen.getByTestId('hq-joined-count').innerHTML).not.toMatch(/text-neo-lime/);
+    expect(screen.getByTestId('hq-joined-goal').outerHTML).not.toMatch(/text-neo-lime/);
   });
 });

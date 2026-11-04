@@ -21517,6 +21517,7 @@ const sv = {
       "colStudents": "Elever",
       "colLastPlayed": "Senast spelat",
       "students": "{count} elever",
+      "studentsOne": "1 elev",
       "notPlayedRecently": "Inga spel på 30 dagar",
       "playWith": "Starta ett spel med {name}",
       "showCode": "Visa kod",
