@@ -111,3 +111,57 @@ export function swap(bag: TileBag, returned: RackTile[], rackSize: number = RACK
   shuffleInPlace(bag.tiles, bag.rng);
   return replacements;
 }
+
+/**
+ * Draw n tiles from the bag, guaranteeing at least one vowel (A, E, I, O, U) in
+ * the result. If the bag has fewer than n tiles, returns all remaining tiles.
+ * Used for initial rack setup and post-move refills to ensure playable racks.
+ */
+export function drawWithVowelGuarantee(bag: TileBag, n: number): RackTile[] {
+  const VOWELS = new Set(['A', 'E', 'I', 'O', 'U']);
+  const rack = draw(bag, n);
+
+  // If we already have a vowel, we're done
+  if (rack.some((t) => VOWELS.has(t.letter))) {
+    return rack;
+  }
+
+  // Hebrew and Japanese bags carry no Latin vowels at all, so searching for one
+  // would drain the whole bag into the rack. Leave those racks exactly as drawn.
+  if (!bag.tiles.some((t) => VOWELS.has(t.letter))) {
+    return rack;
+  }
+
+  // No vowel — keep drawing until we get one, then rebuild the rack
+  const extraDrawn: RackTile[] = [];
+  while (bag.tiles.length > 0) {
+    const nextTile = draw(bag, 1)[0];
+    if (!nextTile) break;
+    extraDrawn.push(nextTile);
+    if (VOWELS.has(nextTile.letter)) {
+      // Found a vowel! Put back tiles we don't need and return the final rack
+      const finalRack = [...rack];
+      const remainingExtra = extraDrawn.slice(0, -1); // all but the vowel we just found
+      if (remainingExtra.length > 0) {
+        bag.tiles.unshift(...remainingExtra);
+        shuffleInPlace(bag.tiles, bag.rng);
+      }
+      // Add the vowel to the final rack, replacing one consonant if needed
+      if (finalRack.length < n) {
+        finalRack.push(extraDrawn[extraDrawn.length - 1]);
+      } else {
+        // Swap out a consonant (the one least likely to extend words)
+        const consonantIndex = finalRack.findIndex((t) => !VOWELS.has(t.letter));
+        if (consonantIndex >= 0) {
+          bag.tiles.unshift(finalRack[consonantIndex]);
+          finalRack[consonantIndex] = extraDrawn[extraDrawn.length - 1];
+          shuffleInPlace(bag.tiles, bag.rng);
+        }
+      }
+      return finalRack;
+    }
+  }
+
+  // Bag exhausted — return what we have (extremely unlikely if bag has vowels)
+  return [...rack, ...extraDrawn];
+}
