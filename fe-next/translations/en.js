@@ -20884,8 +20884,17 @@ const en = {
   // @eduPolish:start
   "eduPolish": {
     "seatCapReached": "{name} is watching: the class is full ({cap} players)",
-  }
+  },
   // @eduPolish:end
+  // @eduRoster:start
+  "eduRoster": {
+    "rename": "Rename {name} in this class",
+    "inputLabel": "Name in this class",
+    "tooLong": "Use {max} characters or fewer",
+    "saveFailed": "Couldn't save the name. Try again.",
+    "originalName": "Signed up as {name}"
+  }
+  // @eduRoster:end
 };
 
 export { en };

@@ -21851,8 +21851,17 @@ const es = {
   // @eduPolish:start
   "eduPolish": {
     "seatCapReached": "{name} está mirando: la clase está llena ({cap} jugadores)",
-  }
+  },
   // @eduPolish:end
+  // @eduRoster:start
+  "eduRoster": {
+    "rename": "Cambiar el nombre de {name} en esta clase",
+    "inputLabel": "Nombre en esta clase",
+    "tooLong": "Usa {max} caracteres o menos",
+    "saveFailed": "No se pudo guardar el nombre. Inténtalo de nuevo.",
+    "originalName": "Se registró como {name}"
+  }
+  // @eduRoster:end
 };
 
 export { es };
