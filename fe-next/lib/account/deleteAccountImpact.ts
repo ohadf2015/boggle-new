@@ -274,6 +274,17 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 /**
  * Checks if the user is actually gone in auth.users via getUserById.
  */
+function logUnexpectedUserLookup(
+  userId: string,
+  detail: { status?: number; code?: string; message?: string },
+): void {
+  // Conservative: an unexpected lookup failure is not proof the user is gone.
+  console.error(
+    '[account/delete] getUserById failed unexpectedly; treating the user as still present',
+    { userId, ...detail },
+  );
+}
+
 export async function checkUserActuallyGone(admin: AdminAuth, userId: string): Promise<boolean> {
   if (typeof admin.auth.admin.getUserById !== 'function') return false;
   try {
@@ -284,11 +295,21 @@ export async function checkUserActuallyGone(admin: AdminAuth, userId: string): P
     if (!lookup?.data?.user && !lookup?.error) {
       return true;
     }
+    if (lookup?.error) {
+      logUnexpectedUserLookup(userId, {
+        status: lookup.error.status,
+        code: lookup.error.code,
+        message: lookup.error.message,
+      });
+    }
     return false;
   } catch (err) {
     if (err instanceof Error && isUserNotFoundError({ message: err.message })) {
       return true;
     }
+    logUnexpectedUserLookup(userId, {
+      message: err instanceof Error ? err.message : String(err),
+    });
     return false;
   }
 }
