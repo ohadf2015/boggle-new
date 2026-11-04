@@ -37,4 +37,21 @@ export const SOLVER_EXAMPLES: Partial<Record<Locale, SolverExamples>> = {
     ],
     outro: '結果は長い言葉から順に最大500語まで表示します。英単語のアナグラムを調べたいときは、辞書の言語を「English」に切り替えてください。',
   },
+  sv: {
+    heading: 'Exempel: bilda ord av bokstäver',
+    lead: 'Så här ser riktiga sökningar ut i ordlösaren. Siffrorna är antalet ord som bokstäverna räcker till i vår svenska ordlista.',
+    lettersLabel: 'Bokstäver',
+    countLabel: 'Antal ord',
+    picksLabel: 'Några av orden',
+    countSuffix: ' ord',
+    listSeparator: ', ',
+    rows: [
+      { letters: 'bokstäver', total: 296, picks: ['beskärt', 'osäkert', 'vätskor'], note: 'Nio bokstäver ger många långa ord.' },
+      { letters: 'stjärna', total: 114, picks: ['tjänar', 'tränas', 'nästa'], note: 'Sju bokstäver räcker till över hundra ord.' },
+      { letters: 'sommar', total: 39, picks: ['morsa', 'arom', 'mars'], note: 'Dubbla bokstäver räknas var för sig.' },
+      { letters: 'kärlek', total: 27, picks: ['läker', 'kälke', 'relä'], note: 'Å, ä och ö är egna bokstäver, inte a och o.' },
+      { letters: 'kärl?k', total: 172, picks: ['kälkar', 'lärka', 'kläck'], note: 'Frågetecknet är en blank bricka som kan bli vilken bokstav som helst.' },
+    ],
+    outro: 'Upp till 500 ord visas per sökning, de längsta först. Vill du träna på att hitta dem själv under tidspress? Spela en omgång LexiClash.',
+  },
 };
