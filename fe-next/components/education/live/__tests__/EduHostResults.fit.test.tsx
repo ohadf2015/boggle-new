@@ -129,6 +129,18 @@ describe('EduHostResults: fits the wall with the Teacher Pro card', () => {
     expect(card.className).toMatch(/\[@container_results_\(height<56\.25rem\)\]:hidden/);
   });
 
+  it('given a Pro teacher on a 1366x768 wall, then the invite nudge steps aside so the wall never clips', () => {
+    pro.hasPro = true;
+    const three = ['Noa', 'Dan', 'Ari'].map((username, i) => ({ username, score: 10 * (i + 1), wordsFoundCount: i + 1 })) as unknown as PlayerResult[];
+    const s = { ...summary(), masteryByPlayer: { Noa: { found: 1, total: 12 }, Dan: { found: 2, total: 12 }, Ari: { found: 3, total: 12 } } };
+    render(<EduHostResults summary={s} players={three} t={t} onRematch={vi.fn()} />);
+    act(() => {
+      vi.advanceTimersByTime(8000);
+    });
+    const nudge = screen.getByTestId('teacher-invite').parentElement!;
+    expect(nudge.className).toMatch(/\[@container_results_\(height<56\.25rem\)\]:hidden/);
+  });
+
   it('given a winner on the calm wall, then the big name has room for its glyphs and is never cut', () => {
     render(<WinnerSpotlight winner={{ username: 'Maya', score: 40 }} active tone="calm" size="projector" t={t} />);
     expect(screen.getByTestId('winner-names').className).toMatch(/\bleading-tight\b/);

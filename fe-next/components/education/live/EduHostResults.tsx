@@ -317,7 +317,9 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
               </div>
             )}
             {!proLoading && hasPro && showTeacherInvite(outcome.celebrate, students) && (
-              <TeacherInviteNudge students={students} language={language} whatsapp={phone} compact={phone} t={t} />
+              <div className="[@container_results_(height<56.25rem)]:hidden">
+                <TeacherInviteNudge students={students} language={language} whatsapp={phone} compact={phone} t={t} />
+              </div>
             )}
           </div>
         </div>
