@@ -489,7 +489,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
           ))}
         </div>
         {Array.from({ length: 4 }).map((_, i) => (
-          <SkeletonCard key={`skel-row-${i}`} hasImage lines={1} className="py-3" />
+          <SkeletonCard key={`skel-row-${i}`} lines={1} className="py-3" />
         ))}
       </div>
     );
