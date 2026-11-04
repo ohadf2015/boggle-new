@@ -411,7 +411,9 @@ const es = {
       "cta": "Pedir presupuesto para el centro"
     },
     "faq": {
-      "title": "Preguntas de docentes"
+      "title": "Preguntas de docentes",
+      "intro": "Respuestas breves a lo que preguntan los docentes antes de su primera clase.",
+      "helpLink": "Más respuestas en el centro de ayuda"
     },
     "final": {
       "title": "Lanza hoy tu primer juego de clase",
@@ -1215,8 +1217,17 @@ const es = {
       "moreLessons": "Las nuevas lecciones de tu profe aparecerán aquí.",
       "maxTier": "MÁX",
       "noAwards": "Juega una lección para empezar a ganar premios.",
+      "awardsEmptyTitle": "Aún no tienes premios",
+      "awardsEmptyBody": "Termina tu primera lección y tu primer premio aparecerá aquí.",
+      "awardsEmptyCta": "Jugar una lección",
       "firstAward": "Termina una lección para ganar tu primer premio.",
       "awardsEarned": "Ganados: {earned}/{total}",
+      "awardsWon": "Logros ganados",
+      "awardsOfTotal": "de {total}",
+      "awardsNextUp": "Lo siguiente",
+      "awardsToTier": "Faltan {left} para {tier}",
+      "awardsAllMaxed": "¡Todos tus logros al máximo!",
+      "awardsTierCount": "{tier}: {count}",
       "lessonsDone": "Hechas: {done}/{total}",
       "lessonsRegion": "Tus lecciones"
     }
@@ -1901,6 +1912,36 @@ const es = {
     "starsEarned": "{stars} de 3 estrellas"
   },
   "vocabQuiz": {
+    "ask": {
+      "any": "Elige la mejor respuesta",
+      "definition": "¿Qué palabra significa esto?",
+      "synonym": "¿Qué palabra significa lo mismo?",
+      "antonym": "¿Qué palabra significa lo contrario?",
+      "context": "¿Qué palabra completa el hueco?",
+      "multiple_meaning": "¿Qué palabra tiene los dos significados?",
+      "roots_affixes": "¿Cuál encaja?"
+    },
+    "exit": "Salir del juego",
+    "footer": {
+      "pick": "Toca una respuesta",
+      "keys": "o pulsa 1–4",
+      "waiting": "Elige una",
+      "locked": "Enviada",
+      "roomCount": "{locked} de {total} han respondido",
+      "streakHint": "Racha {count} · más rápido = más puntos",
+      "streakRun": "¡{count} seguidas! Sigue así",
+      "timeUp": "¡Se acabó el tiempo! Ya viene la respuesta",
+      "speedTip": "Cuanto más rápido, más puntos",
+      "keepStreak": "Que no se corte la racha",
+      "youPicked": "Elegiste {word}",
+      "startStreak": "Empieza una racha"
+    },
+    "stakes": {
+      "label": "En juego",
+      "streak": "{count} seguidas",
+      "seconds": "{seconds} s",
+      "timeUp": "Se acabó el tiempo"
+    },
     "correctShort": "¡Bien hecho!",
     "lockedInCount": "{locked}/{total} ya respondieron",
     "rank": "Puesto {position} de {total}",
@@ -1920,6 +1961,11 @@ const es = {
       "tease": "La siguiente palabra empieza por {letter} y tiene {count} letras"
     },
     "progress": "Pregunta {current} de {total}",
+    "progressShort": "{current}/{total}",
+    "hud": {
+      "question": "Pregunta",
+      "score": "Puntos"
+    },
     "timeLeft": "Quedan {seconds} segundos",
     "paused": "Tu profe puso el test en pausa",
     "waiting": "Ya viene la primera pregunta.",
@@ -4353,7 +4399,12 @@ const es = {
     "title": "Únete a la partida",
     "subtitle": "Introduce el código que te dio tu profe o el anfitrión.",
     "placeholder": "Introduce tu código",
-    "submit": "Entrar"
+    "submit": "Entrar",
+    "stepsLabel": "Lo que viene",
+    "stepCode": "Código",
+    "stepName": "Tu nombre",
+    "stepPlay": "A jugar",
+    "waiting": "Busca el código en la pantalla de tu profe"
   },
   "validation": {
     "gameCodeRequired": "Introduce un código para entrar.",
@@ -15884,6 +15935,27 @@ const es = {
       "allFound": "La clase encontró todas las palabras de la lección.",
       "waitingForTeacher": "Esperando a que tu profe empiece la siguiente ronda…",
       "stayInClass": "Quédate aquí: el próximo juego empieza en esta pantalla.",
+      "steps": {
+        "roundDone": "¡Ronda completada!",
+        "points": "puntos",
+        "place": "#{{rank}} de {{players}}",
+        "lessonLabel": "Palabras de la lección",
+        "lessonCount": "Encontraste {{found}} de {{total}} palabras de la lección",
+        "allFound": "¡Encontraste todas las palabras de la lección!",
+        "toGo": "Te faltan {{left}}. ¡Tú puedes!",
+        "noneFound": "¡Palabras nuevas! Vamos a aprenderlas.",
+        "missedTitle": "Palabras para repasar ({{count}})",
+        "missedHint": "Toca el altavoz para escuchar cada una.",
+        "hear": "Escuchar {{word}}",
+        "continue": "Continuar",
+        "review": "Repasar palabras",
+        "practice": "Practicar",
+        "progress": "Paso {{step}} de {{total}}",
+        "tilePoints": "Puntos",
+        "tileRank": "Puesto",
+        "reviewCount": "Repasar las palabras ({{count}})",
+        "moreWords": "+{{count}} más"
+      },
       "practiceMissed": "Practicar estas palabras",
       "playReteachRound": "Jugar ronda de repaso: solo las palabras falladas",
       "backToLobby": "Volver a la sala",
@@ -21438,7 +21510,9 @@ const es = {
       "noRoomStudent": "Pídele el código a tu profe y únete.",
       "noRoomHost": "Empieza un juego desde tu inicio de profe.",
       "enterCode": "Escribir un código",
-      "toTeacher": "Volver al inicio de profe"
+      "toTeacher": "Volver al inicio de profe",
+      "pickGame": "Elegir un juego",
+      "soloPractice": "Practicar por tu cuenta"
     },
     "hostResults": {
       "missedTitle": "Palabras que tu clase falló",
@@ -21552,6 +21626,50 @@ const es = {
       "students": "{count} alumnos",
       "studentsOne": "1 alumno",
       "notPlayedRecently": "Sin partidas en 30 días",
+      "roster": {
+        "title": "Alumnos",
+        "colName": "Nombre",
+        "colXp": "XP",
+        "colWords": "Palabras",
+        "colAccuracy": "Precisión",
+        "colWeek": "Esta semana",
+        "status": {
+          "done": "Jugó esta semana",
+          "late": "Atrasado",
+          "idle": "Sin empezar"
+        },
+        "statusShort": {
+          "done": "Jugó",
+          "late": "Atrasado",
+          "idle": "Sin empezar"
+        },
+        "count": {
+          "done": "{count} jugaron",
+          "late": "{count} atrasados",
+          "idle": "{count} sin empezar"
+        },
+        "statXp": "XP ganada",
+        "statWords": "Palabras dominadas",
+        "recent": "Actividad reciente",
+        "lastPlayed": "Última partida: {when}",
+        "notYet": "todavía no",
+        "streak": "Racha de {count} días",
+        "accuracy": "{count}% de aciertos",
+        "noStreak": "Sin racha ahora mismo",
+        "noWordsYet": "Aún no ha practicado palabras",
+        "empty": "Aún no hay alumnos. Comparte el código de la clase y aparecerán aquí.",
+        "error": "No pudimos cargar los alumnos. Inténtalo de nuevo en un momento.",
+        "assign": "Asignar",
+        "assignFor": "Asignar práctica: {name} va atrasado"
+      },
+      "focus": {
+        "title": "Quién te necesita",
+        "barLabel": "{done} jugaron, {late} atrasados, {idle} sin empezar",
+        "need": "{count} aún tienen que jugar esta semana",
+        "assign": "Asignar práctica",
+        "allDone": "Todos jugaron esta semana"
+      },
+      "lastGameAt": "Última partida: {when}",
       "playWith": "Empezar una partida con {name}",
       "showCode": "Ver código",
       "showCodeFor": "Mostrar el código de {name}",
@@ -21580,7 +21698,9 @@ const es = {
       "active": "Clases que jugaron",
       "empty": "Tus datos aparecerán aquí después de la primera partida.",
       "unavailable": "No pudimos cargar los datos de esta semana. Volverán en tu próxima visita.",
-      "quiet": "Semana tranquila por ahora. Una ronda corta los despierta."
+      "quiet": "Semana tranquila por ahora. Una ronda corta los despierta.",
+      "idle": "Sin partidas esta semana",
+      "more": "{count} clases más"
     },
     "insight": {
       "title": "Dato de esta visita",

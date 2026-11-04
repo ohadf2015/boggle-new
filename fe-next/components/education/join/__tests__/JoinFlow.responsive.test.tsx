@@ -71,6 +71,19 @@ describe('<JoinFlow> layout', () => {
     expect(root().className).toMatch(/(^|\s)h-dvh(\s|$)/);
   });
 
+  it('Given the academy door, Then the form sits on a solid panel over the busy stage and widens on desktop', () => {
+    render(<JoinFlow variant="academy" />);
+    const stage = screen.getByTestId('join-stage').className;
+    expect(stage).toMatch(/(^|\s)bg-neo-navy(\s|$)/);
+    expect(stage).toContain('border-neo-black');
+    expect(stage).toContain('lg:max-w-2xl');
+  });
+
+  it('Given the standalone door, Then there is no panel behind the form', () => {
+    render(<JoinFlow />);
+    expect(screen.getByTestId('join-stage').className).not.toContain('border-neo-black');
+  });
+
   it('sizes with CSS, not a JS zoom pinned to a phone design', () => {
     render(<JoinFlow variant="academy" />);
     expect(screen.getByTestId('join-stage').style.zoom).toBe('');

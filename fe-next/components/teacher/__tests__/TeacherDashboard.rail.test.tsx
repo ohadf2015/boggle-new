@@ -25,6 +25,7 @@ let activation: Record<string, unknown>;
 vi.mock('@/hooks/useTeacherActivationProgress', () => ({ useTeacherActivationProgress: () => activation }));
 let week: Record<string, unknown>;
 vi.mock('@/hooks/useTeacherWeekStats', () => ({ useTeacherWeekStats: () => week }));
+vi.mock('@/hooks/useStudentProgressMetrics', () => ({ useStudentProgressMetrics: () => ({ students: [], isLoading: true, error: null, refresh: vi.fn() }) }));
 vi.mock('@/hooks/useClassStudentPreview', () => ({ useClassStudentPreview: () => null }));
 let lessonsState: Record<string, unknown>;
 vi.mock('@/hooks/useVocabularyLesson', () => ({ useLessons: () => lessonsState }));
@@ -49,7 +50,7 @@ describe('Teacher Home ready-to-run rail', () => {
     render(<TeacherDashboard />);
     const rail = screen.getByTestId('home-session-rail');
     expect(rail.closest('aside')).toBeNull();
-    expect(rail.previousElementSibling?.lastElementChild).toContainElement(screen.getByTestId('home-hero'));
+    expect(rail.previousElementSibling).toContainElement(screen.getByTestId('home-hero'));
     const cards = within(rail).getAllByTestId('home-session-card');
     expect(cards).toHaveLength(3);
     for (const run of within(rail).getAllByTestId('home-session-run')) {

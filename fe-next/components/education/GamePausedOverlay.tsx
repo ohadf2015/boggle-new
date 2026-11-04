@@ -3,6 +3,8 @@
 import { Pause } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { EduMascot } from './EduMascot';
+import { Reveal } from './motion/Reveal';
 
 interface GamePausedOverlayProps {
   /** Host sees "tap Resume" guidance; students see "paused by your teacher". */
@@ -33,19 +35,24 @@ export function GamePausedOverlay({ isHost = false }: GamePausedOverlayProps) {
         'pointer-events-auto bg-neo-navy/90',
       )}
     >
-      <div
-        className={cn(
-          'w-full max-w-sm rounded-neo border-3 border-neo-black bg-neo-cream p-6 text-center text-neo-black shadow-hard-lg',
-        )}
-      >
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full border-3 border-neo-black bg-neo-cyan shadow-hard">
-          <Pause className="h-8 w-8" aria-hidden="true" />
+      <Reveal className="w-full max-w-sm">
+        <div className="relative rounded-neo border-3 border-neo-black bg-neo-cream px-6 pb-6 pt-16 text-center text-neo-black shadow-hard-lg">
+          <EduMascot
+            moment="brainBreak"
+            size={128}
+            className="absolute start-1/2 top-0 size-32 -translate-y-1/2 ltr:-translate-x-1/2 rtl:translate-x-1/2"
+          />
+          <h2 className="inline-flex items-center justify-center gap-2 font-neo-display text-[clamp(1.75rem,7vw,2.75rem)] font-black leading-none">
+            <span className="grid size-10 shrink-0 place-items-center rounded-full border-[3px] border-neo-black bg-neo-cyan shadow-hard-sm">
+              <Pause className="size-5" strokeWidth={3} aria-hidden="true" />
+            </span>
+            {t('education.liveControls.pausedTitle')}
+          </h2>
+          <p className="mt-3 font-neo-body text-lg font-semibold">
+            {isHost ? t('education.liveControls.pausedBodyHost') : t('education.liveControls.pausedBody')}
+          </p>
         </div>
-        <h2 className="font-neo-display text-2xl font-bold">{t('education.liveControls.pausedTitle')}</h2>
-        <p className="mt-2 font-neo-body text-base">
-          {isHost ? t('education.liveControls.pausedBodyHost') : t('education.liveControls.pausedBody')}
-        </p>
-      </div>
+      </Reveal>
     </div>
   );
 }

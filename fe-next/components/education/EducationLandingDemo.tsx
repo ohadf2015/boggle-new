@@ -7,6 +7,7 @@ import { isAdjacent, wordFromPath } from '@/lib/education/eslCefrDemo';
 import { wordsFoundKey } from '@/lib/education/landingDemo';
 import { displayDemoWord, landingDemoBoard, landingHintPath } from '@/lib/education/landingDemoBoards';
 import { EducationLandingProjector } from './EducationLandingProjector';
+import { CelebrationBurst, Pop } from './motion';
 import { useExperiment } from '@/hooks/useExperiment';
 import posthog from '@/lib/analytics/lazyPosthog';
 
@@ -109,36 +110,39 @@ export function EducationLandingDemo() {
       className="overflow-hidden rounded-neo border-3 border-neo-cream/60 bg-neo-navy-light shadow-hard-lg"
     >
       <EducationLandingProjector youScore={found.length}>
-        <p aria-live="polite" className="mb-2 truncate font-neo-display text-xs font-black uppercase tracking-wider text-neo-lime sm:text-sm">
+        <p aria-live="polite" className="mb-2 min-h-[2lh] text-balance font-neo-display text-xs font-black uppercase leading-tight tracking-wide text-neo-lime">
           {watching ? t('eg6Land.demo.watching') : t('eg6Land.demo.yourTurn')}
         </p>
-        <div
-          dir={language === 'he' ? 'rtl' : 'ltr'}
-          className="mx-auto grid max-w-[15rem] gap-1.5 sm:max-w-[17rem] sm:gap-2 lg:max-w-[20rem]"
-          style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
-        >
-          {letters.map((ch, i) => {
-            const active = path.includes(i);
-            return (
-              <button
-                key={i}
-                type="button"
-                onClick={() => onTile(i)}
-                disabled={watching && interruptVariant !== 'interrupt'}
-                aria-label={ch}
-                className={cn(
-                  'aspect-square rounded-neo border-2 border-neo-black font-neo-display text-xl font-black shadow-hard-sm sm:text-2xl',
-                  'transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.97] motion-reduce:transition-none',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan',
-                  active ? 'bg-neo-lime text-neo-navy -translate-y-0.5' : 'bg-neo-cream text-neo-navy',
-                  !watching && !active && 'hover:-translate-y-0.5',
-                  'disabled:cursor-default',
-                )}
-              >
-                {ch}
-              </button>
-            );
-          })}
+        <div data-testid="education-landing-demo-board" className="relative mx-auto max-w-[15rem] sm:max-w-[17rem] lg:max-w-[20rem]">
+          <CelebrationBurst playing={found.length > 0} burstKey={found.length} variant="sparkle" className="-m-2" />
+          <div
+            dir={language === 'he' ? 'rtl' : 'ltr'}
+            className="grid gap-1.5 sm:gap-2"
+            style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
+          >
+            {letters.map((ch, i) => {
+              const active = path.includes(i);
+              return (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => onTile(i)}
+                  disabled={watching && interruptVariant !== 'interrupt'}
+                  aria-label={ch}
+                  className={cn(
+                    'aspect-square rounded-neo border-2 border-neo-black font-neo-display text-xl font-black shadow-hard-sm sm:text-2xl',
+                    'transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.97] motion-reduce:transition-none',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan',
+                    active ? 'bg-neo-lime text-neo-navy -translate-y-0.5' : 'bg-neo-cream text-neo-navy',
+                    !watching && !active && 'hover:-translate-y-0.5',
+                    'disabled:cursor-default',
+                  )}
+                >
+                  {ch}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </EducationLandingProjector>
       <div className="flex flex-wrap items-center justify-between gap-2 border-t-2 border-neo-black/60 px-3 py-2.5 sm:px-4">
@@ -150,13 +154,14 @@ export function EducationLandingDemo() {
             })}
           </span>
           {found.map((w) => (
-            <span
-              key={w}
-              aria-label={t('eg6Land.demo.found', undefined, { word: displayDemoWord(w, language) })}
-              className="rounded-neo border-2 border-neo-black bg-neo-pink px-1.5 font-neo-display text-xs font-black text-neo-black"
-            >
-              {displayDemoWord(w, language)}
-            </span>
+            <Pop key={w}>
+              <span
+                aria-label={t('eg6Land.demo.found', undefined, { word: displayDemoWord(w, language) })}
+                className="block rounded-neo border-2 border-neo-black bg-neo-pink px-1.5 font-neo-display text-xs font-black text-neo-black"
+              >
+                {displayDemoWord(w, language)}
+              </span>
+            </Pop>
           ))}
         </div>
         <button

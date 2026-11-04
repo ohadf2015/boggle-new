@@ -33,8 +33,6 @@ function setup(overrides: Partial<Parameters<typeof VocabQuizStudentHeader>[0]> 
       score={0}
       pop={null}
       mascot="thinking"
-      lockedIn={null}
-      rank={null}
       t={t}
       {...overrides}
     />
@@ -58,7 +56,19 @@ describe('VocabQuizStudentHeader', () => {
     expect(px(twenty)).toBeLessThanOrEqual(32);
   });
 
+  it('Given a question, Then the header row carries the compact count and the bar keeps the full label', () => {
+    const header = setup({ questionNumber: 3, totalQuestions: 8, streak: 3, score: 640 });
+    expect(screen.getByTestId('vocab-quiz-progress-count')).toHaveTextContent('vocabQuiz.progressShort:3,8');
+    expect(header.textContent).not.toContain('vocabQuiz.progress:3,8');
+    expect(screen.getByRole('progressbar').getAttribute('aria-label')).toBe('vocabQuiz.progress:3,8');
+  });
+
+  it('Given the round is over, Then no question count is drawn', () => {
+    setup({ finished: true });
+    expect(screen.queryByTestId('vocab-quiz-progress-count')).toBeNull();
+  });
+
   it('shows no flame at all below a streak of two', () => {
-    expect(setup({ streak: 1 }).querySelector('svg')).toBeNull();
+    expect(setup({ streak: 1 }).querySelector('.lucide-flame')).toBeNull();
   });
 });

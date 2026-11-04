@@ -46,7 +46,7 @@ export function HomeSessionRail({ classroomId, languages, gradeBand, nowMs, last
           <h2 id={headingId} className="font-neo-display text-lg font-bold text-neo-cream">
             {t('education.starterPacks.sessions.title')}
           </h2>
-          <p className="font-neo-body text-sm text-neo-cream/75 [@media(max-height:820px),(max-width:639px)]:sr-only">{t('eduShell.home.flow.subtitle')}</p>
+          <p className="font-neo-body text-sm text-neo-cream/75 [@media(max-height:960px),(max-width:639px)]:sr-only">{t('eduShell.home.flow.subtitle')}</p>
         </div>
         <button type="button" data-testid="home-session-see-all" onClick={() => setAllOpen(true)} className={cn(QUIET_LINK, 'shrink-0')}>
           {t('eduShell.home.rail.seeAll')}

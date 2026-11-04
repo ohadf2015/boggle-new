@@ -14,7 +14,7 @@ import type { RailSession } from "@/lib/education/homeSessionRail";
 import { catalogueEntry } from "@/components/education/ClassroomModeCatalogueData";
 import { gradeBandsLabel } from "@/components/teacher/StarterPacksSection.data";
 import { ARCADE_ACCENTS, ARCADE_BLOCK, type ArcadeAccent } from "@/lib/education/arcadeAccent";
-import { OUTLINE_BUTTON } from "./homeStyles";
+import { GHOST_BUTTON } from "./homeStyles";
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -132,7 +132,7 @@ export function HomeSessionFlowCard({
           href={href}
           data-testid="home-session-run"
           className={cn(
-            OUTLINE_BUTTON,
+            GHOST_BUTTON,
             "size-11 shrink-0 px-0 after:absolute after:inset-0 after:rounded-neo-lg @2xl:mt-auto @2xl:h-auto @2xl:min-h-10 @2xl:w-full @2xl:px-3",
           )}
           title={startLabel}

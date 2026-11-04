@@ -20,12 +20,13 @@ const demoColumn = () => screen.getByTestId('education-landing-demo-slot').close
 describe('EducationHero', () => {
   beforeEach(() => mockTrackLandingCtaClick.mockClear());
 
-  it('keeps the headline off the 6xl scale and the two actions in one row on large screens', () => {
+  it('keeps the headline off the 6xl scale and stacks the quiet student link under the one primary', () => {
     render(<EducationHero />);
     const h1 = screen.getByRole('heading', { level: 1 });
     expect(h1.className).not.toMatch(/text-6xl/);
-    const free = screen.getByTestId('education-hero-free-cta');
-    expect(free.parentElement?.className).toMatch(/lg:flex-row/);
+    const ctaRow = screen.getByTestId('education-hero-free-cta').parentElement?.className.split(/\s+/) ?? [];
+    expect(ctaRow).toContain('flex-col');
+    expect(ctaRow).not.toContain('lg:flex-row');
     const grid = h1.parentElement?.parentElement;
     expect(grid?.className).toMatch(/items-start/);
     expect(grid?.className).not.toMatch(/items-center/);
@@ -86,6 +87,51 @@ describe('EducationHero', () => {
       expect(quiet.className).not.toMatch(/\bbg-neo-/);
       expect(quiet.className).not.toMatch(/animate-pulse/);
     }
+  });
+
+  it('Given a long locale, When the CTAs are wider than their column, Then they wrap instead of widening the hero grid', () => {
+    render(<EducationHero />);
+    const grid = screen.getByRole('heading', { level: 1 }).parentElement?.parentElement;
+    expect(grid?.className.split(/\s+/)).toContain('grid-cols-[minmax(0,1fr)]');
+    for (const id of ['education-hero-free-cta', 'education-hero-join-cta']) {
+      const classes = screen.getByTestId(id).className.split(/\s+/);
+      expect(classes).not.toContain('whitespace-nowrap');
+      expect(classes).not.toContain('sm:whitespace-nowrap');
+    }
+  });
+
+  it('Given a desktop viewport, When the hero lays out, Then the copy has a fixed max width and the board owns its own column', () => {
+    render(<EducationHero />);
+    const h1 = screen.getByRole('heading', { level: 1 });
+    const grid = h1.parentElement?.parentElement?.className.split(/\s+/) ?? [];
+    expect(grid).toContain('lg:grid-cols-[minmax(0,30rem)_minmax(0,1fr)]');
+    expect(grid).toContain('xl:grid-cols-[minmax(0,34rem)_minmax(0,1fr)]');
+    expect(h1.parentElement?.className.split(/\s+/)).toContain('lg:max-w-[34rem]');
+  });
+
+  it('keeps one boxed action at every width: the student join is a borderless link, never a second button', () => {
+    render(<EducationHero />);
+    const classes = screen.getByTestId('education-hero-join-cta').className.split(/\s+/);
+    for (const boxed of ['border-3', 'sm:border-3', 'min-h-14', 'sm:min-h-14', 'shadow-hard']) {
+      expect(classes).not.toContain(boxed);
+    }
+    expect(classes).toContain('min-h-11');
+  });
+
+  it('shows the tilted backing card behind the board on phones too', () => {
+    render(<EducationHero />);
+    const backing = demoColumn()?.querySelector('span[aria-hidden="true"]');
+    expect(backing).not.toBeNull();
+    expect(backing!.className.split(/\s+/)).not.toContain('hidden');
+  });
+
+  it('puts the proof points in a full-width strip under both columns, not under the copy only', () => {
+    render(<EducationHero />);
+    const proof = screen.getByRole('list', { name: 'eg2Land.proof.label' });
+    const h1 = screen.getByRole('heading', { level: 1 });
+    expect(h1.parentElement?.contains(proof)).toBe(false);
+    expect(demoColumn()?.contains(proof)).toBe(false);
+    expect(proof.className).toMatch(/sm:grid-cols-3/);
   });
 
   it('never sends the free CTA through the /teacher gate, so no ?from= bounce notice', () => {

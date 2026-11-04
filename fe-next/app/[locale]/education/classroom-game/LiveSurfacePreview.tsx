@@ -10,6 +10,7 @@
  *   (&count=N sets the projector roster size, default 12)
  *   ?preview=hostresults|phone|quiz|duel|ended — the round-end surfaces, see LiveResultsPreviews
  *   ?preview=ingame — the teacher's in-game projector mid-round
+ *   ?preview=lobby — the game picker; ?preview=setup — the new-class invite step, students landing
  *
  * Mounted from PageClient behind `process.env.NODE_ENV !== 'production'` on a
  * lazy `dynamic()` import, so production never ships this chunk (same pattern
@@ -32,6 +33,8 @@ import type { LiveSurfacePreviewKind } from './previewKinds';
 import { StudentQuizPreview } from './StudentQuizPreview';
 import { InGamePreview } from './InGamePreview';
 import { PhoneGamePreview } from './PhoneGamePreview';
+import { LobbyPickerPreview } from './LobbyPickerPreview';
+import { SetupInvitePreview } from './SetupInvitePreview';
 
 export type { LiveSurfacePreviewKind };
 
@@ -123,5 +126,7 @@ export default function LiveSurfacePreview({ kind }: { kind: LiveSurfacePreviewK
   if (kind === 'quizphone') return <StudentQuizPreview />;
   if (kind === 'ingame') return <InGamePreview />;
   if (kind === 'phonegame') return <PhoneGamePreview />;
+  if (kind === 'lobby') return <LobbyPickerPreview />;
+  if (kind === 'setup') return <SetupInvitePreview />;
   return <ProjectorPreview />;
 }

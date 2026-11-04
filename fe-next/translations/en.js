@@ -411,7 +411,9 @@ const en = {
       "cta": "Get a school quote"
     },
     "faq": {
-      "title": "Teacher questions"
+      "title": "Teacher questions",
+      "intro": "Short answers to what teachers ask before their first class.",
+      "helpLink": "More answers in the help center"
     },
     "final": {
       "title": "Run your first class game today",
@@ -1215,8 +1217,17 @@ const en = {
       "moreLessons": "New lessons from your teacher show up here.",
       "maxTier": "MAX",
       "noAwards": "Play a lesson to start earning awards.",
+      "awardsEmptyTitle": "No awards yet",
+      "awardsEmptyBody": "Finish your first lesson and your first award lands here.",
+      "awardsEmptyCta": "Play a lesson",
       "firstAward": "Finish a lesson to win your first award",
       "awardsEarned": "{earned}/{total} earned",
+      "awardsWon": "Awards won",
+      "awardsOfTotal": "of {total}",
+      "awardsNextUp": "Next up",
+      "awardsToTier": "{left} more for {tier}",
+      "awardsAllMaxed": "Every award maxed out!",
+      "awardsTierCount": "{tier}: {count}",
       "lessonsDone": "{done}/{total} done",
       "lessonsRegion": "Your lessons"
     }
@@ -1901,6 +1912,36 @@ const en = {
     "starsEarned": "{stars} of 3 stars"
   },
   "vocabQuiz": {
+    "ask": {
+      "any": "Pick the best answer",
+      "definition": "Which word means this?",
+      "synonym": "Which word means the same?",
+      "antonym": "Which word means the opposite?",
+      "context": "Which word fills the blank?",
+      "multiple_meaning": "Which word has both meanings?",
+      "roots_affixes": "Which one matches?"
+    },
+    "exit": "Leave game",
+    "footer": {
+      "pick": "Tap an answer",
+      "keys": "or press 1–4",
+      "waiting": "Pick one",
+      "locked": "Locked in",
+      "roomCount": "{locked} of {total} answered",
+      "streakHint": "Streak {count} · faster = more points",
+      "streakRun": "{count} in a row! Keep it going",
+      "timeUp": "Time's up! The answer is coming",
+      "speedTip": "Faster answers score more",
+      "keepStreak": "Keep the streak alive",
+      "youPicked": "You picked {word}",
+      "startStreak": "Start a streak"
+    },
+    "stakes": {
+      "label": "Up for grabs",
+      "streak": "{count} in a row",
+      "seconds": "{seconds}s",
+      "timeUp": "Time's up"
+    },
     "correctShort": "Nailed it!",
     "lockedInCount": "{locked}/{total} locked in",
     "rank": "#{position} of {total}",
@@ -1920,6 +1961,11 @@ const en = {
       "tease": "The next word starts with {letter} and has {count} letters"
     },
     "progress": "Question {current} of {total}",
+    "progressShort": "{current}/{total}",
+    "hud": {
+      "question": "Question",
+      "score": "Score"
+    },
     "timeLeft": "{seconds} seconds left",
     "paused": "Your teacher paused the quiz",
     "waiting": "Get ready. The first question is on its way.",
@@ -3895,7 +3941,12 @@ const en = {
     "title": "Join your game",
     "subtitle": "Enter the code your teacher or host gave you.",
     "placeholder": "Enter your code",
-    "submit": "Join"
+    "submit": "Join",
+    "stepsLabel": "What happens next",
+    "stepCode": "Code",
+    "stepName": "Your name",
+    "stepPlay": "Play",
+    "waiting": "Look for the code on your teacher's screen"
   },
   "validation": {
     "gameCodeRequired": "Enter a game code to join.",
@@ -14272,6 +14323,27 @@ const en = {
       "allFound": "The class found every lesson word.",
       "waitingForTeacher": "Waiting for your teacher to start the next round…",
       "stayInClass": "Stay here. The next game starts on this screen.",
+      "steps": {
+        "roundDone": "Round complete!",
+        "points": "points",
+        "place": "#{{rank}} of {{players}}",
+        "lessonLabel": "Lesson words",
+        "lessonCount": "You found {{found}} of {{total}} lesson words",
+        "allFound": "You found every lesson word!",
+        "toGo": "{{left}} more to learn. You've got this.",
+        "noneFound": "New words! Let's learn them.",
+        "missedTitle": "Words to review ({{count}})",
+        "missedHint": "Tap the speaker to hear each one.",
+        "hear": "Hear {{word}}",
+        "continue": "Continue",
+        "review": "Review words",
+        "practice": "Practice",
+        "progress": "Step {{step}} of {{total}}",
+        "tilePoints": "Points",
+        "tileRank": "Place",
+        "reviewCount": "Review missed words ({{count}})",
+        "moreWords": "+{{count}} more"
+      },
       "practiceMissed": "Practice these words",
       "playReteachRound": "Play reteach round: missed words only",
       "backToLobby": "Back to lobby",
@@ -20471,7 +20543,9 @@ const en = {
       "noRoomStudent": "Ask your teacher for the code, then join.",
       "noRoomHost": "Start a game from your teacher home.",
       "enterCode": "Enter a code",
-      "toTeacher": "Back to teacher home"
+      "toTeacher": "Back to teacher home",
+      "pickGame": "Pick a game",
+      "soloPractice": "Practice on your own"
     },
     "hostResults": {
       "missedTitle": "Words your class missed",
@@ -20585,6 +20659,50 @@ const en = {
       "students": "{count} students",
       "studentsOne": "1 student",
       "notPlayedRecently": "No games in 30 days",
+      "roster": {
+        "title": "Students",
+        "colName": "Name",
+        "colXp": "XP",
+        "colWords": "Words",
+        "colAccuracy": "Accuracy",
+        "colWeek": "This week",
+        "status": {
+          "done": "Played this week",
+          "late": "Behind",
+          "idle": "Not started"
+        },
+        "statusShort": {
+          "done": "Played",
+          "late": "Behind",
+          "idle": "Not started"
+        },
+        "count": {
+          "done": "{count} played",
+          "late": "{count} behind",
+          "idle": "{count} not started"
+        },
+        "statXp": "XP earned",
+        "statWords": "Words mastered",
+        "recent": "Recent activity",
+        "lastPlayed": "Last played: {when}",
+        "notYet": "not yet",
+        "streak": "{count}-day streak",
+        "accuracy": "{count}% answers right",
+        "noStreak": "No streak right now",
+        "noWordsYet": "No words practised yet",
+        "empty": "No students yet. Share the class code and they show up here.",
+        "error": "Couldn't load the students. Try again in a moment.",
+        "assign": "Assign",
+        "assignFor": "Assign practice: {name} is behind"
+      },
+      "focus": {
+        "title": "Who needs you",
+        "barLabel": "{done} played, {late} behind, {idle} not started",
+        "need": "{count} still need to play this week",
+        "assign": "Assign practice",
+        "allDone": "Everyone played this week"
+      },
+      "lastGameAt": "Last game: {when}",
       "playWith": "Start a game with {name}",
       "showCode": "Show code",
       "showCodeFor": "Show the join code for {name}",
@@ -20613,7 +20731,9 @@ const en = {
       "active": "Classes that played",
       "empty": "Your numbers show up here after your first game.",
       "unavailable": "Couldn't load this week's numbers. They'll be back on the next visit.",
-      "quiet": "Quiet week so far. One short round wakes it up."
+      "quiet": "Quiet week so far. One short round wakes it up.",
+      "idle": "No game this week",
+      "more": "{count} more classes"
     },
     "insight": {
       "title": "Insight of the visit",

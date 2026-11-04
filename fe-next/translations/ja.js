@@ -411,7 +411,9 @@ const ja = {
       "cta": "学校の見積もりを依頼する"
     },
     "faq": {
-      "title": "先生からのよくある質問"
+      "title": "先生からのよくある質問",
+      "intro": "初めての授業の前に先生がよく聞くことに、短く答えます。",
+      "helpLink": "ヘルプセンターでもっと見る"
     },
     "final": {
       "title": "今日、最初のクラスゲームを",
@@ -1215,8 +1217,17 @@ const ja = {
       "moreLessons": "先生からの新しいレッスンはここに届くよ。",
       "maxTier": "MAX",
       "noAwards": "レッスンで遊んでアワードを集めよう。",
+      "awardsEmptyTitle": "まだアワードはありません",
+      "awardsEmptyBody": "最初のレッスンを終えると、最初のアワードがここに届きます。",
+      "awardsEmptyCta": "レッスンで遊ぶ",
       "firstAward": "レッスンをクリアして、最初のアワードをゲットしよう。",
       "awardsEarned": "{earned}/{total} 獲得",
+      "awardsWon": "獲得したトロフィー",
+      "awardsOfTotal": "/ {total}",
+      "awardsNextUp": "次の目標",
+      "awardsToTier": "{tier}まであと{left}",
+      "awardsAllMaxed": "すべてのトロフィーが最高ランク！",
+      "awardsTierCount": "{tier}: {count}",
       "lessonsDone": "{done}/{total} クリア",
       "lessonsRegion": "マイレッスン"
     }
@@ -1901,6 +1912,36 @@ const ja = {
     "starsEarned": "星 {stars}/3"
   },
   "vocabQuiz": {
+    "ask": {
+      "any": "いちばん合うものを選ぼう",
+      "definition": "この意味の言葉はどれ？",
+      "synonym": "同じ意味の言葉はどれ？",
+      "antonym": "反対の意味の言葉はどれ？",
+      "context": "空欄に入る言葉はどれ？",
+      "multiple_meaning": "両方の意味を持つ言葉はどれ？",
+      "roots_affixes": "合うのはどれ？"
+    },
+    "exit": "ゲームをやめる",
+    "footer": {
+      "pick": "答えをタップ",
+      "keys": "または1〜4キー",
+      "waiting": "1つ選ぼう",
+      "locked": "回答済み",
+      "roomCount": "{total}人中{locked}人が回答",
+      "streakHint": "連続{count} · 速いほど高得点",
+      "streakRun": "{count}問連続正解！この調子",
+      "timeUp": "時間切れ！答えはこのあと",
+      "speedTip": "早く答えるほど高得点",
+      "keepStreak": "連続正解をキープしよう",
+      "youPicked": "あなたの答え：{word}",
+      "startStreak": "連続正解をはじめよう"
+    },
+    "stakes": {
+      "label": "獲得チャンス",
+      "streak": "{count}連続",
+      "seconds": "{seconds}秒",
+      "timeUp": "時間切れ"
+    },
     "correctShort": "せいかい！",
     "lockedInCount": "{total}人中{locked}人が回答",
     "rank": "{total}人中{position}位",
@@ -1920,6 +1961,11 @@ const ja = {
       "tease": "つぎのことばは {letter} ではじまる{count}文字です"
     },
     "progress": "第{current}問 / 全{total}問",
+    "progressShort": "{current}/{total}問",
+    "hud": {
+      "question": "問題",
+      "score": "スコア"
+    },
     "timeLeft": "残り{seconds}秒",
     "paused": "先生が一時停止しました",
     "waiting": "まもなく最初の問題が出ます。",
@@ -4295,7 +4341,12 @@ const ja = {
     "title": "ゲームに参加",
     "subtitle": "先生またはホストから受け取ったコードを入力してください。",
     "placeholder": "コードを入力",
-    "submit": "参加する"
+    "submit": "参加する",
+    "stepsLabel": "このあとの流れ",
+    "stepCode": "コード",
+    "stepName": "なまえ",
+    "stepPlay": "あそぶ",
+    "waiting": "コードは先生の画面に出ているよ"
   },
   "validation": {
     "gameCodeRequired": "ゲームコードを入力してください。",
@@ -15936,6 +15987,27 @@ const ja = {
       "allFound": "クラスはすべての単語を見つけました。",
       "waitingForTeacher": "先生が次のラウンドを始めるのを待っています…",
       "stayInClass": "このまま待っていてね。次のゲームはこの画面で始まります。",
+      "steps": {
+        "roundDone": "ラウンドクリア！",
+        "points": "ポイント",
+        "place": "{{players}}人中{{rank}}位",
+        "lessonLabel": "レッスンの単語",
+        "lessonCount": "レッスンの単語を{{total}}個中{{found}}個見つけました",
+        "allFound": "レッスンの単語を全部見つけた！",
+        "toGo": "あと{{left}}個。きっとできる！",
+        "noneFound": "新しい単語！いっしょに覚えよう。",
+        "missedTitle": "復習する単語（{{count}}）",
+        "missedHint": "スピーカーをタップすると発音が聞けます。",
+        "hear": "{{word}}を聞く",
+        "continue": "続ける",
+        "review": "単語を復習",
+        "practice": "練習する",
+        "progress": "ステップ {{step}} / {{total}}",
+        "tilePoints": "ポイント",
+        "tileRank": "順位",
+        "reviewCount": "見逃した単語を復習（{{count}}）",
+        "moreWords": "ほか{{count}}語"
+      },
       "playAgain": "もう一度プレイ",
       "practiceMissed": "この単語を練習する",
       "playReteachRound": "復習ラウンドをプレイ：見つからなかった単語だけ",
@@ -21426,7 +21498,9 @@ const ja = {
       "noRoomStudent": "先生にコードを聞いて参加しよう。",
       "noRoomHost": "先生ホームからゲームを始めましょう。",
       "enterCode": "コードを入力",
-      "toTeacher": "先生ホームに戻る"
+      "toTeacher": "先生ホームに戻る",
+      "pickGame": "ゲームを選ぶ",
+      "soloPractice": "ひとりで練習する"
     },
     "hostResults": {
       "missedTitle": "クラスが見逃した単語",
@@ -21540,6 +21614,50 @@ const ja = {
       "students": "生徒 {count}人",
       "studentsOne": "生徒 1人",
       "notPlayedRecently": "30日間プレイなし",
+      "roster": {
+        "title": "生徒",
+        "colName": "名前",
+        "colXp": "XP",
+        "colWords": "単語",
+        "colAccuracy": "正答率",
+        "colWeek": "今週",
+        "status": {
+          "done": "今週プレイ済み",
+          "late": "遅れ気味",
+          "idle": "未開始"
+        },
+        "statusShort": {
+          "done": "プレイ済み",
+          "late": "遅れ気味",
+          "idle": "未開始"
+        },
+        "count": {
+          "done": "{count}人プレイ",
+          "late": "{count}人遅れ",
+          "idle": "{count}人未開始"
+        },
+        "statXp": "獲得XP",
+        "statWords": "覚えた単語",
+        "recent": "最近のアクティビティ",
+        "lastPlayed": "最後のプレイ：{when}",
+        "notYet": "まだ",
+        "streak": "{count}日連続",
+        "accuracy": "正答率{count}%",
+        "noStreak": "現在連続記録なし",
+        "noWordsYet": "まだ単語の練習なし",
+        "empty": "まだ生徒がいません。クラスコードを共有するとここに表示されます。",
+        "error": "生徒を読み込めませんでした。少ししてからもう一度お試しください。",
+        "assign": "課題",
+        "assignFor": "練習を割り当てる：{name}さんが遅れ気味"
+      },
+      "focus": {
+        "title": "フォローが必要な生徒",
+        "barLabel": "{done}人プレイ、{late}人遅れ、{idle}人未開始",
+        "need": "今週まだ{count}人がプレイしていません",
+        "assign": "練習を割り当てる",
+        "allDone": "今週は全員がプレイしました"
+      },
+      "lastGameAt": "前回のゲーム：{when}",
       "playWith": "{name}でゲームを始める",
       "showCode": "コードを表示",
       "showCodeFor": "{name}の参加コードを表示",
@@ -21568,7 +21686,9 @@ const ja = {
       "active": "遊んだクラス",
       "empty": "最初のゲームのあと、ここに数字が表示されます。",
       "unavailable": "今週の数字を読み込めませんでした。次回また表示されます。",
-      "quiet": "今週はまだ静かです。短いラウンドを1回やってみましょう。"
+      "quiet": "今週はまだ静かです。短いラウンドを1回やってみましょう。",
+      "idle": "今週はまだ",
+      "more": "ほか{count}クラス"
     },
     "insight": {
       "title": "今回のインサイト",

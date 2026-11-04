@@ -411,7 +411,9 @@ const he = {
       "cta": "קבלת הצעת מחיר לבית הספר"
     },
     "faq": {
-      "title": "שאלות של מורים"
+      "title": "שאלות של מורים",
+      "intro": "תשובות קצרות למה שמורים שואלים לפני השיעור הראשון.",
+      "helpLink": "עוד תשובות במרכז העזרה"
     },
     "final": {
       "title": "מריצים משחק כיתתי ראשון כבר היום",
@@ -1215,8 +1217,17 @@ const he = {
       "moreLessons": "שיעורים חדשים מהמורה יופיעו כאן.",
       "maxTier": "מקס",
       "noAwards": "שחקו שיעור כדי להתחיל לאסוף פרסים.",
+      "awardsEmptyTitle": "עוד אין פרסים",
+      "awardsEmptyBody": "סיימו את השיעור הראשון, והפרס הראשון יחכה כאן.",
+      "awardsEmptyCta": "לשחק שיעור",
       "firstAward": "סיימו שיעור כדי לזכות בפרס הראשון",
       "awardsEarned": "הושגו: {earned}/{total}",
+      "awardsWon": "הישגים שהשגת",
+      "awardsOfTotal": "מתוך {total}",
+      "awardsNextUp": "הבא בתור",
+      "awardsToTier": "עוד {left} עד {tier}",
+      "awardsAllMaxed": "כל ההישגים בדרגה המקסימלית!",
+      "awardsTierCount": "{tier}: {count}",
       "lessonsDone": "הושלמו: {done}/{total}",
       "lessonsRegion": "השיעורים שלכם"
     }
@@ -1901,6 +1912,36 @@ const he = {
     "starsEarned": "{stars} מתוך 3 כוכבים"
   },
   "vocabQuiz": {
+    "ask": {
+      "any": "בחרו את התשובה הכי טובה",
+      "definition": "איזו מילה אומרת את זה?",
+      "synonym": "איזו מילה אומרת אותו דבר?",
+      "antonym": "איזו מילה אומרת את ההפך?",
+      "context": "איזו מילה משלימה את החסר?",
+      "multiple_meaning": "לאיזו מילה יש את שתי המשמעויות?",
+      "roots_affixes": "מה מתאים?"
+    },
+    "exit": "יציאה מהמשחק",
+    "footer": {
+      "pick": "בחרו תשובה",
+      "keys": "או לחצו 1–4",
+      "waiting": "בחרו אחת",
+      "locked": "נשלח",
+      "roomCount": "{locked} מתוך {total} ענו",
+      "streakHint": "רצף {count} · מהר יותר = יותר נקודות",
+      "streakRun": "{count} ברצף! תמשיכו ככה",
+      "timeUp": "נגמר הזמן! התשובה כבר מגיעה",
+      "speedTip": "תשובה מהירה שווה יותר נקודות",
+      "keepStreak": "אל תשברו את הרצף",
+      "youPicked": "בחרת {word}",
+      "startStreak": "התחילו רצף"
+    },
+    "stakes": {
+      "label": "על הכף",
+      "streak": "{count} ברצף",
+      "seconds": "{seconds} שנ׳",
+      "timeUp": "נגמר הזמן"
+    },
     "correctShort": "יש!",
     "lockedInCount": "{locked} מתוך {total} ענו",
     "rank": "מקום {position} מתוך {total}",
@@ -1920,6 +1961,11 @@ const he = {
       "tease": "המילה הבאה מתחילה ב-{letter} ויש בה {count} אותיות"
     },
     "progress": "שאלה {current} מתוך {total}",
+    "progressShort": "{current}/{total}",
+    "hud": {
+      "question": "שאלה",
+      "score": "ניקוד"
+    },
     "timeLeft": "נותרו {seconds} שניות",
     "paused": "החידון הושהה בידי המורה",
     "waiting": "מתכוננים. השאלה הראשונה בדרך.",
@@ -4294,7 +4340,12 @@ const he = {
     "title": "הצטרפו למשחק",
     "subtitle": "הזינו את הקוד שקיבלתם מהמורה או מהמארח.",
     "placeholder": "הזינו את הקוד",
-    "submit": "הצטרפו"
+    "submit": "הצטרפו",
+    "stepsLabel": "מה קורה אחר כך",
+    "stepCode": "קוד",
+    "stepName": "השם שלך",
+    "stepPlay": "משחקים",
+    "waiting": "הקוד מחכה לך על המסך של המורה"
   },
   "validation": {
     "gameCodeRequired": "הזינו קוד משחק כדי להצטרף.",
@@ -15790,6 +15841,27 @@ const he = {
       "allFound": "הכיתה מצאה את כל מילות השיעור.",
       "waitingForTeacher": "מחכים שהמורה יתחיל את הסבב הבא…",
       "stayInClass": "הישארו כאן. המשחק הבא יתחיל במסך הזה.",
+      "steps": {
+        "roundDone": "הסבב הסתיים!",
+        "points": "נקודות",
+        "place": "מקום {{rank}} מתוך {{players}}",
+        "lessonLabel": "מילות השיעור",
+        "lessonCount": "מצאתם {{found}} מתוך {{total}} מילות שיעור",
+        "allFound": "מצאתם את כל מילות השיעור!",
+        "toGo": "עוד {{left}} ללמוד. אתם על זה.",
+        "noneFound": "מילים חדשות! בואו נלמד אותן.",
+        "missedTitle": "מילים לחזרה ({{count}})",
+        "missedHint": "הקישו על הרמקול כדי לשמוע כל מילה.",
+        "hear": "להשמיע את {{word}}",
+        "continue": "המשך",
+        "review": "לחזור על המילים",
+        "practice": "תרגול",
+        "progress": "שלב {{step}} מתוך {{total}}",
+        "tilePoints": "נקודות",
+        "tileRank": "מקום",
+        "reviewCount": "לחזרה על המילים ({{count}})",
+        "moreWords": "ועוד {{count}}"
+      },
       "playAgain": "שחקו שוב",
       "practiceMissed": "תרגלו את המילים האלה",
       "playReteachRound": "שחקו סבב חזרה: רק המילים שהחסרנו",
@@ -21356,7 +21428,9 @@ const he = {
       "noRoomStudent": "בקשו מהמורה את הקוד ואז הצטרפו.",
       "noRoomHost": "התחילו משחק מדף הבית של המורה.",
       "enterCode": "הקלדת קוד",
-      "toTeacher": "חזרה לדף המורה"
+      "toTeacher": "חזרה לדף המורה",
+      "pickGame": "לבחור משחק",
+      "soloPractice": "להתאמן לבד"
     },
     "hostResults": {
       "missedTitle": "מילים שהכיתה פספסה",
@@ -21470,6 +21544,50 @@ const he = {
       "students": "{count} תלמידים",
       "studentsOne": "תלמיד אחד",
       "notPlayedRecently": "אין משחקים ב‑30 הימים האחרונים",
+      "roster": {
+        "title": "תלמידים",
+        "colName": "שם",
+        "colXp": "XP",
+        "colWords": "מילים",
+        "colAccuracy": "דיוק",
+        "colWeek": "השבוע",
+        "status": {
+          "done": "שיחק השבוע",
+          "late": "צריך להשלים",
+          "idle": "עוד לא התחיל"
+        },
+        "statusShort": {
+          "done": "שיחק",
+          "late": "צריך להשלים",
+          "idle": "לא התחיל"
+        },
+        "count": {
+          "done": "{count} שיחקו",
+          "late": "{count} צריכים להשלים",
+          "idle": "{count} עוד לא התחילו"
+        },
+        "statXp": "XP שנצבר",
+        "statWords": "מילים שנלמדו",
+        "recent": "פעילות אחרונה",
+        "lastPlayed": "משחק אחרון: {when}",
+        "notYet": "עוד לא",
+        "streak": "רצף של {count} ימים",
+        "accuracy": "{count}% תשובות נכונות",
+        "noStreak": "אין רצף כרגע",
+        "noWordsYet": "עוד לא תרגל מילים",
+        "empty": "עוד אין תלמידים. שתפו את קוד הכיתה והם יופיעו כאן.",
+        "error": "לא הצלחנו לטעון את התלמידים. נסו שוב עוד רגע.",
+        "assign": "לתרגל",
+        "assignFor": "שליחת תרגול: {name} צריך להשלים"
+      },
+      "focus": {
+        "title": "מי צריך אותך",
+        "barLabel": "{done} שיחקו, {late} צריכים להשלים, {idle} עוד לא התחילו",
+        "need": "{count} עוד צריכים לשחק השבוע",
+        "assign": "שליחת תרגול",
+        "allDone": "כולם שיחקו השבוע"
+      },
+      "lastGameAt": "משחק אחרון: {when}",
       "playWith": "התחלת משחק עם {name}",
       "showCode": "הצגת קוד",
       "showCodeFor": "הצגת קוד ההצטרפות של {name}",
@@ -21498,7 +21616,9 @@ const he = {
       "active": "כיתות ששיחקו",
       "empty": "הנתונים יופיעו כאן אחרי המשחק הראשון.",
       "unavailable": "לא הצלחנו לטעון את נתוני השבוע. ננסה שוב בביקור הבא.",
-      "quiet": "שבוע שקט בינתיים. סבב קצר אחד יעיר את הכיתה."
+      "quiet": "שבוע שקט בינתיים. סבב קצר אחד יעיר את הכיתה.",
+      "idle": "אין משחק השבוע",
+      "more": "עוד {count} כיתות"
     },
     "insight": {
       "title": "תובנה לביקור הזה",
