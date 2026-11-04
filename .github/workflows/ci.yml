@@ -115,6 +115,8 @@ jobs:
         working-directory: fe-next
       - run: npx tsx scripts/build-i18n-assets.ts --skip-brotli && npx tsc --noEmit
         working-directory: fe-next
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
 
   # Frontend tests, sharded. On a PR, --changed picks the tests whose import graph touches the diff;
   # a shared file (translations, a context) selects a large slice, so the slice is split across shards.
