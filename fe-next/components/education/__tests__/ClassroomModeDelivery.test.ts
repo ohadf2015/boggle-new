@@ -10,6 +10,7 @@ describe('mode delivery (SPEC modes table)', () => {
       blast: 'phones',
       'vocab-quiz': 'projector',
       wordcraft: 'both',
+      crossword: 'phones',
       'boss-battle': 'projector',
     };
     for (const mode of catalogueModes()) expect([mode.id, mode.delivery]).toEqual([mode.id, table[mode.id]]);
