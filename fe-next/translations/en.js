@@ -9718,6 +9718,7 @@ const en = {
       "guestNameDefaultHint": "Right now you show up as \"{name}\", a random name lots of players get.",
       "guestNamePlaceholder": "Your name",
       "guestNameClaim": "Show my name",
+      "guestNameNotNow": "Not now",
       "guestNameDefaultNudge": "You're on the board as {name}, a random name. Make this score yours.",
       "guestNameUseMine": "Use my name",
       "wordsFound": "Words found",

@@ -415,6 +415,9 @@ export type GrowthEvent =
   | 'daily_guest_name_prompt_shown'
   | 'daily_guest_name_saved'
   | 'daily_guest_name_kept'
+  // exp-guest-name-closable-v1: closable arm tapped "Not now" ({ is_default, arm }).
+  // prompt_shown and saved also carry { arm }.
+  | 'daily_guest_name_prompt_closed'
   | 'wordhunt_leaderboard_tap'
   // Multiplayer results page funnel — fills mp_round blind spots.
   //   results_viewed: also fired on ResultsMainContent mount (canonical mode funnel;

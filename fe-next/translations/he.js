@@ -10248,6 +10248,7 @@ const he = {
       "guestNameDefaultHint": "כרגע אתם מופיעים בתור \"{name}\", שם אקראי שהרבה שחקנים מקבלים.",
       "guestNamePlaceholder": "השם שלכם",
       "guestNameClaim": "להציג את השם שלי",
+      "guestNameNotNow": "לא עכשיו",
       "guestNameDefaultNudge": "אתם בלוח בתור {name}, שם אקראי. תנו לתוצאה הזאת את השם שלכם.",
       "guestNameUseMine": "להשתמש בשם שלי",
       "wordsFound": "מילים שנמצאו",

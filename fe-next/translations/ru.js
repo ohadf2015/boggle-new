@@ -2350,6 +2350,7 @@ const ru = {
       "guestNameDefaultHint": "Сейчас ты в таблице как «{name}». Это случайное имя, такое получают многие игроки.",
       "guestNamePlaceholder": "Твоё имя",
       "guestNameClaim": "Показать моё имя",
+      "guestNameNotNow": "Не сейчас",
       "guestNameDefaultNudge": "Ты в таблице как {name}, это случайное имя. Пусть результат будет под твоим именем.",
       "guestNameUseMine": "Указать своё имя",
       "wordsFound": "Найденные слова",
