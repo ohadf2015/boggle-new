@@ -303,6 +303,7 @@ export default async function ScrabbleAlternativeOnlinePage({ params }: PageProp
             <li><Link className="text-neo-pink hover:underline" href="/en/words-with-friends-alternative">Words With Friends alternative</Link></li>
             <li><Link className="text-neo-lime hover:underline" href="/en/best-online-word-games">9 best word games (compare)</Link></li>
             <li><Link className="text-neo-cyan hover:underline" href="/en/blog/boggle-vs-scrabble">Boggle vs Scrabble</Link></li>
+            <li><Link className="text-neo-lime hover:underline" href="/en/play-boggle-online-free">Play Boggle online free</Link></li>
           </ul>
         </nav>
       </div>
