@@ -10,6 +10,7 @@
  * lists exactly the teachers or classes it counted.
  */
 
+import { greatestTimestamp } from '@/lib/education/teacherLastActivity';
 import { buildAttention, type AttentionList } from './eduAttention';
 import {
   countInRange,
@@ -32,7 +33,15 @@ export interface EduDashboardInput {
   nowMs: number;
   windowDays: WindowDays;
   /** Non-test profiles with the teacher role. */
-  teachers: Array<{ id: string; name: string | null; last_seen_at: string | null }>;
+  teachers: Array<{
+    id: string;
+    name: string | null;
+    last_seen_at: string | null;
+    /** auth.users.last_sign_in_at, joined on profiles.id. Absent on older fixtures. */
+    last_sign_in_at?: string | null;
+    /** Latest classroom_rounds.started_at for this teacher, any window. */
+    last_round_started_at?: string | null;
+  }>;
   /** Non-test access requests that were approved, one per person. */
   approvals: Array<{
     user_id: string | null;
@@ -200,9 +209,12 @@ export function buildEduDashboard(input: EduDashboardInput): EduDashboard {
     if (!prev || (toMs(o.created_at) ?? 0) > (toMs(prev) ?? 0)) lastOutreachOf.set(o.teacher_id, o.created_at);
   }
 
-  const teacherTs = input.teachers.map((t) => t.last_seen_at);
+  // Each clock is a last-value, not a history, so a prior-window count would still miss
+  // anyone active in both windows. Current uses the latest of the three clocks.
+  const activityAt = (t: EduDashboardInput['teachers'][number]) =>
+    greatestTimestamp(t.last_seen_at, t.last_round_started_at, t.last_sign_in_at);
+  const teacherTs = input.teachers.map(activityAt);
   const kpis: KpiSet = {
-    // profiles keep only the last visit, so a prior-window count would miss everyone active in both windows.
     activeTeachers: { current: countWin(teacherTs, false), prior: 0, pct: null },
     newTeachers: periodDelta(
       countWin(input.approvals.map((a) => a.reviewed_at), false),
@@ -263,7 +275,7 @@ export function buildEduDashboard(input: EduDashboardInput): EduDashboard {
   };
 
   const teachers: TeacherRow[] = [
-    ...input.teachers.map((t) => teacherRow(t.id, t.name, t.last_seen_at)),
+    ...input.teachers.map((t) => teacherRow(t.id, t.name, activityAt(t))),
     ...approvedIds.filter((id) => !teacherIds.has(id)).map((id) => teacherRow(id, null, null)),
   ].sort((a, b) => (toMs(b.lastActiveAt) ?? 0) - (toMs(a.lastActiveAt) ?? 0));
   const nameOf = new Map(teachers.map((t) => [t.id, t.name ?? t.email]));
@@ -328,7 +340,7 @@ export function buildEduDashboard(input: EduDashboardInput): EduDashboard {
   const teachersOf = (ids: Array<string | null | undefined>): DrillTarget => ({ kind: 'teachers', ids: recentFirst(uniq(ids)) });
   const drill: EduDrill = {
     kpi: {
-      activeTeachers: teachersOf(input.teachers.filter((t) => inWin(t.last_seen_at)).map((t) => t.id)),
+      activeTeachers: teachersOf(input.teachers.filter((t) => inWin(activityAt(t))).map((t) => t.id)),
       newTeachers: teachersOf(input.approvals.filter((a) => inWin(a.reviewed_at)).map((a) => a.user_id)),
       trialsStarted: teachersOf(trialApprovals.filter((a) => inWin(a.reviewed_at)).map((a) => a.user_id)),
       trialsPaid: teachersOf(paidTrials.filter((s) => inWin(s.created_at)).map((s) => s.user_id)),

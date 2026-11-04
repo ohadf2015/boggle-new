@@ -58,6 +58,23 @@ describe('buildTeacherActivity', () => {
     expect(out.teacher.roleGranted).toBe(false);
   });
 
+  it('reports last seen as the latest of signup, round start and sign-in', () => {
+    const out = buildTeacherActivity(
+      input({
+        profile: {
+          id: 'u1',
+          user_role: 'teacher',
+          last_seen_at: '2026-08-01T00:00:00Z',
+          last_sign_in_at: '2026-08-04T00:00:00Z',
+          display_name: 'Ada D',
+          username: 'ada',
+        },
+        latestRoundStartedAt: '2026-10-30T16:40:00Z',
+      }),
+    );
+    expect(out.teacher.lastSeenAt).toBe('2026-10-30T16:40:00Z');
+  });
+
   it('shouldNestStudentsUnderClassroomsWhenMembershipsExist', () => {
     // GIVEN one classroom with two members
     const out = buildTeacherActivity(

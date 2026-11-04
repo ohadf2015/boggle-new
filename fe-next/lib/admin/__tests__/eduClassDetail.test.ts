@@ -75,4 +75,16 @@ describe('buildClassDetail', () => {
   it('names the teacher and flags a test-account teacher', () => {
     expect(buildClassDetail(input()).teacher).toEqual({ id: 't1', name: 'Ada', lastSeenAt: ago(1), isTestAccount: false });
   });
+
+  it('reports the teacher last seen at the latest round, not the stuck signup last_seen', () => {
+    const out = buildClassDetail(
+      input({
+        profiles: [
+          { id: 't1', display_name: 'Ada', username: 'ada', last_seen_at: ago(40), last_sign_in_at: ago(20), is_test_account: false },
+        ],
+        teacherLastRoundStartedAt: ago(2),
+      }),
+    );
+    expect(out.teacher).toEqual({ id: 't1', name: 'Ada', lastSeenAt: ago(2), isTestAccount: false });
+  });
 });
