@@ -15695,7 +15695,9 @@ const he = {
     "wordBank": {
       "title": "בנק מילים ({{count}})",
       "hint": "המילים האלה מסתתרות בלוח. הקישו כדי לסגור.",
-      "challengeBadge": "אתגר: חפשו מילים של {{min}}+ אותיות"
+      "challengeBadge": "אתגר: חפשו מילים של {{min}}+ אותיות",
+      "huntTitle": "מילות השיעור {{found}}/{{total}}",
+      "huntHidden": "מילת שיעור נסתרת, {{length}} אותיות"
     },
     "studentPreview": {
       "button": "תצוגה מקדימה של מסך התלמידים",
@@ -21373,7 +21375,8 @@ const he = {
       "leave": "יציאה",
       "calculating": "סופרים את המילים…",
       "classGoal": "השלל של הכיתה: {found}/{total} מילים",
-      "waitNext": "מה הלאה? זה אצל המורה. בינתיים, חימום!"
+      "waitNext": "מה הלאה? זה אצל המורה. בינתיים, חימום!",
+      "moreFromRound": "עוד מהסבב הזה"
     }
   }
   // @eduLiveRoom:end

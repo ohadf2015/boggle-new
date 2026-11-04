@@ -24,12 +24,10 @@
 
 /**
  * The modes the CLIENT's next-round selector offers (`ALL_MODES` in
- * `components/results/StickyReadyBar.tsx`). Not the set `random` can deal:
- * the server rolls `selectNextGameMode(history, ALL_GAME_MODES)`, a SUPERSET
- * that also carries word-tower / crossword. That mismatch is
- * exactly why a per-mode allowlist was never a safe way to protect the recap,
- * and why the decision below keys on `classroomSummary` instead. This list is
- * a convenience for tests, never a gate.
+ * `components/results/StickyReadyBar.tsx`). `random` itself resolves on the
+ * server from `ALL_GAME_MODES` (classic, blast, word-hunt, wheel-rush), so the
+ * decision below keys on `classroomSummary`, never on a mode list. This list
+ * is a convenience for tests, never a gate.
  */
 export const NEXT_ROUND_MODES = [
   'word-hunt',

@@ -14177,7 +14177,9 @@ const en = {
     "wordBank": {
       "title": "Word bank ({{count}})",
       "hint": "These words are hidden in the board. Tap to close.",
-      "challengeBadge": "Challenge: aim for {{min}}+ letter words"
+      "challengeBadge": "Challenge: aim for {{min}}+ letter words",
+      "huntTitle": "Lesson words {{found}}/{{total}}",
+      "huntHidden": "Hidden lesson word, {{length}} letters"
     },
     "studentPreview": {
       "button": "Preview what students will see",
@@ -20492,7 +20494,8 @@ const en = {
       "leave": "Leave",
       "calculating": "Counting up the words…",
       "classGoal": "Class haul: {found}/{total} words",
-      "waitNext": "Your teacher picks what's next. Warm up while you wait."
+      "waitNext": "Your teacher picks what's next. Warm up while you wait.",
+      "moreFromRound": "More from this round"
     }
   }
   // @eduLiveRoom:end

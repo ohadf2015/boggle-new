@@ -15840,7 +15840,9 @@ const ja = {
     "wordBank": {
       "title": "単語バンク（{{count}}）",
       "hint": "これらの単語はボードに隠れています。タップで閉じる。",
-      "challengeBadge": "チャレンジ：{{min}}文字以上の単語をねらおう"
+      "challengeBadge": "チャレンジ：{{min}}文字以上の単語をねらおう",
+      "huntTitle": "レッスンの単語 {{found}}/{{total}}",
+      "huntHidden": "かくれたレッスンの単語（{{length}}文字）"
     },
     "studentPreview": {
       "button": "生徒に見える画面をプレビュー",
@@ -21442,7 +21444,8 @@ const ja = {
       "leave": "退出",
       "calculating": "単語を集計中…",
       "classGoal": "クラスの合計：{found}/{total}語",
-      "waitNext": "次は先生が決めるよ。待つ間にウォームアップ！"
+      "waitNext": "次は先生が決めるよ。待つ間にウォームアップ！",
+      "moreFromRound": "このラウンドの詳細"
     }
   }
   // @eduLiveRoom:end

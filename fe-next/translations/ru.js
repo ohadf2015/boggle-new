@@ -3846,7 +3846,9 @@ const ru = {
     "wordBank": {
       "title": "Банк слов ({{count}})",
       "hint": "Эти слова спрятаны на доске. Нажмите, чтобы закрыть.",
-      "challengeBadge": "Вызов: ищите слова из {{min}}+ букв"
+      "challengeBadge": "Вызов: ищите слова из {{min}}+ букв",
+      "huntTitle": "Слова урока {{found}}/{{total}}",
+      "huntHidden": "Скрытое слово урока, букв: {{length}}"
     },
     "studentPreview": {
       "button": "Посмотреть глазами учеников",
@@ -21142,7 +21144,8 @@ const ru = {
       "leave": "Выйти",
       "calculating": "Считаем слова…",
       "classGoal": "Улов класса: {found}/{total} слов",
-      "waitNext": "Что дальше, решает учитель. А пока разомнись."
+      "waitNext": "Что дальше, решает учитель. А пока разомнись.",
+      "moreFromRound": "Ещё об этом раунде"
     }
   }
   // @eduLiveRoom:end

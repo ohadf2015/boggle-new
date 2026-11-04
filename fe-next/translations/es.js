@@ -15789,7 +15789,9 @@ const es = {
     "wordBank": {
       "title": "Banco de palabras ({{count}})",
       "hint": "Estas palabras están escondidas en el tablero. Toca para cerrar.",
-      "challengeBadge": "Reto: busca palabras de {{min}}+ letras"
+      "challengeBadge": "Reto: busca palabras de {{min}}+ letras",
+      "huntTitle": "Palabras de la lección {{found}}/{{total}}",
+      "huntHidden": "Palabra de la lección oculta, {{length}} letras"
     },
     "studentPreview": {
       "button": "Ver lo que verán los alumnos",
@@ -21455,7 +21457,8 @@ const es = {
       "leave": "Salir",
       "calculating": "Contando las palabras…",
       "classGoal": "Botín de la clase: {found}/{total} palabras",
-      "waitNext": "Tu profe decide qué sigue. Calienta mientras esperas."
+      "waitNext": "Tu profe decide qué sigue. Calienta mientras esperas.",
+      "moreFromRound": "Más de esta ronda"
     }
   }
   // @eduLiveRoom:end
