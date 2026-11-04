@@ -130,7 +130,7 @@ export default async function LexiClashVsScrabblePage({ params }: PageProps) {
         featuresStyle="pain"
         faqs={faqs}
         moreComparisons={[
-          { href: `/${locale}/scrabble-alternative-online`, title: 'Scrabble Alternative Online', subtitle: 'Real-time, browser-based, 2-20 players' },
+          { href: `/${locale}/scrabble-alternative-online#online-multiplayer`, title: 'Online Multiplayer Scrabble Alternative', subtitle: 'How a live room works, up to 50 players' },
           { href: `/${locale}/lexiclash-vs-wordle`, title: 'LexiClash vs Wordle', subtitle: 'Unlimited play vs 1 puzzle/day' },
           { href: `/${locale}/best-online-word-games`, title: 'Best Word Games 2026', subtitle: 'Complete comparison guide' },
           { href: `/${locale}/play-boggle-online-free`, title: 'Play Boggle Online Free', subtitle: 'No download, instant play' },
