@@ -382,6 +382,8 @@ export interface CrosswordMpPlayerProgress {
   solved: boolean;
   elapsedMs: number;
   score: number;
+  /** Slots this player has filled correctly, limited to the puzzle's own slot ids. */
+  solvedSlotIds?: string[];
 }
 
 /** Crossword race (parallel-race) multiplayer mode state. All players solve the
@@ -393,6 +395,8 @@ export interface CrosswordMpModeState {
   puzzle: unknown;
   progress: Record<string, CrosswordMpPlayerProgress>;
   startedAt: number;
+  /** Classroom grid only: slot id -> the lesson word as the teacher wrote it. */
+  lessonWordBySlot?: Record<string, string>;
 }
 
 // ==================== Tournament Types ====================

@@ -20881,6 +20881,27 @@ const en = {
     "next": "Missed words ({count})",
   },
   // @wordcraftReview:end
+  // @eduCrossword:start
+  "eduCrossword": {
+    "name": "Crossword",
+    "how": "Each student solves a crossword built from your lesson words, clued with their meanings.",
+    "blurb": "A crossword built from the list's words, with each meaning as the clue.",
+    "studentRule": "Read each clue and fill in the lesson word.",
+    "steps": {
+      "1": "Every phone gets the same crossword, built from your lesson words.",
+      "2": "Each clue is the word's meaning from your lesson.",
+      "3": "Students race to fill the grid. Every solved clue counts in the recap.",
+    },
+    "tooFewWords": "This list can't make a crossword yet. It needs at least 3 words with meanings that share letters. Add meanings or play Classic.",
+    "waiting": "Dealing the grid…",
+    "gridLabel": "Crossword grid",
+    "standingsLabel": "Race standings",
+    "finished": "{count} of {total} finished",
+    "done": "Done!",
+    "percent": "{percent}%",
+    "more": "+{count} more",
+  },
+  // @eduCrossword:end
   // @eduPolish:start
   "eduPolish": {
     "seatCapReached": "{name} is watching: the class is full ({cap} players)",

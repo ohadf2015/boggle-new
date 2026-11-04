@@ -21,6 +21,7 @@ import fs from 'fs';
 import path from 'path';
 
 import { CLASSROOM_GAME_MODES } from '@/shared/types/vocabQuiz';
+import { classroomModeLabelKey } from '../classroomModeLabels';
 import { TEACHER_GAME_MODES } from '@/lib/education/gameModes';
 
 /**
@@ -66,9 +67,9 @@ vi.mock('qrcode.react', () => ({ QRCodeCanvas: () => <div data-testid="qr" /> })
 vi.mock('react-hot-toast', () => ({ default: { success: vi.fn(), error: vi.fn() } }));
 
 describe('CLASSROOM_GAME_MODES is the single source', () => {
-  it('lists the six live classroom modes', () => {
+  it('lists the live classroom modes', () => {
     expect([...CLASSROOM_GAME_MODES].sort()).toEqual(
-      ['blast', 'classic', 'vocab-quiz', 'wheel-rush', 'word-hunt', 'wordcraft'].sort()
+      ['blast', 'classic', 'crossword', 'vocab-quiz', 'wheel-rush', 'word-hunt', 'wordcraft'].sort()
     );
   });
 });
@@ -159,12 +160,10 @@ describe('every classroom mode is complete on every surface', () => {
   });
 
   it.each([...CLASSROOM_GAME_MODES])('%s has a label in all six locales', (mode) => {
-    const key = MODE_TRANSLATION_KEY[mode];
+    const key = classroomModeLabelKey(mode);
     for (const [locale, dict] of Object.entries(LOCALES)) {
-      const label = (dict as never as {
-        teacher?: { classroom?: { gameModes?: Record<string, string> } };
-      }).teacher?.classroom?.gameModes?.[key];
-      expect(typeof label, `${locale} is missing teacher.classroom.gameModes.${key}`).toBe('string');
+      const label = key.split('.').reduce<unknown>((n, p) => (n && typeof n === 'object' ? (n as Record<string, unknown>)[p] : undefined), dict) as string | undefined;
+      expect(typeof label, `${locale} is missing ${key}`).toBe('string');
       expect(label!.length, `${locale} has an empty label for ${mode}`).toBeGreaterThan(0);
     }
   });

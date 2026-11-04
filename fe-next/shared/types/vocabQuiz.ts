@@ -30,7 +30,7 @@ export type ClassroomGameMode = GameMode | VocabQuizMode;
  * The modes a teacher can actually pick in the classroom mode picker, in picker order.
  *
  * `GameMode` is wider (nine values) because it covers every board the app ships;
- * only these five are offered for a live class. The teacher-facing catalog built
+ * only these are offered for a live class. The teacher-facing catalog built
  * from this list lives in `lib/education/gameModes.ts` (`TEACHER_GAME_MODES`);
  * the Zod enum in `backend/handlers/classroomGameSchemas.ts` is the enforcing
  * twin. `app/[locale]/education/__tests__/playFormats.test.ts` asserts this
@@ -46,6 +46,7 @@ export const CLASSROOM_GAME_MODES: readonly ClassroomGameMode[] = [
   // bot; the room leaderboard aggregates. It IS a GameMode already (the solo
   // engine ships as one) — here it only joins the classroom offer.
   'wordcraft',
+  'crossword',
 ] as const;
 
 /** Boss Battle is a quiz setting, not a mode: the server owns the HP; clients only display it. */

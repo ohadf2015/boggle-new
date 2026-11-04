@@ -36,7 +36,9 @@ export async function checkInWorkModeAccess(socket: Socket, game: GameState, mod
   const hostAuthId = hostUser?.authUserId || (socket.data?.verifiedUserId as string | undefined);
   const supabase = getSupabase();
   let allowed = false;
-  if (!supabase) {
+  if (game.isClassroom && rules.classroomOpen) {
+    allowed = true;
+  } else if (!supabase) {
     allowed = true; // dev/test (no Supabase) → allow
   } else if (hostAuthId) {
     const { data: profile } = await supabase.from('profiles').select('is_admin, is_beta_tester').eq('id', hostAuthId).single();

@@ -6,7 +6,7 @@
  * ships (the live vocab quiz did exactly that: it went live while the copy still
  * described four classroom modes). So the list is derived:
  *
- *   CLASSROOM_GAME_MODES  (shared/types/vocabQuiz.ts)      — 5 live class modes
+ *   CLASSROOM_GAME_MODES  (shared/types/vocabQuiz.ts)      — live class modes
  *   BASE_PRACTICE_MODES   (lib/education/practicePicker.ts) — 7 solo drills
  *   VOCAB_FOCUSES         (lib/education/vocabFocus.ts)     — 6 skill drills
  *
@@ -25,6 +25,7 @@ import { ru } from '@/translations/ru';
 import { CLASSROOM_GAME_MODES, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
 import { BASE_PRACTICE_MODES, type BasePracticeMode } from './practicePicker';
 import { VOCAB_FOCUSES, type VocabFocus } from './vocabFocus';
+import { teacherGameMode } from './gameModes';
 
 const CATALOGUES: Record<string, unknown> = { en, he, es, sv, ja, ru };
 
@@ -38,16 +39,6 @@ function lookup(locale: string, key: string): string {
   };
   return from(CATALOGUES[locale] ?? CATALOGUES.en) ?? from(CATALOGUES.en) ?? '';
 }
-
-/** Wire value -> the camelCase segment the translation keys use. */
-const MODE_KEY: Record<string, string> = {
-  classic: 'classic',
-  'word-hunt': 'wordHunt',
-  blast: 'blast',
-  'wheel-rush': 'wheelRush',
-  'vocab-quiz': 'vocabQuiz',
-  wordcraft: 'wordcraft',
-};
 
 const PRACTICE_KEY: Record<BasePracticeMode, string> = {
   solo_board: 'soloBoard',
@@ -78,8 +69,8 @@ export type PlayFormats = {
 export function playFormats(locale: string): PlayFormats {
   const live = CLASSROOM_GAME_MODES.map((mode: ClassroomGameMode) => ({
     id: mode,
-    name: lookup(locale, `teacher.classroom.gameModes.${MODE_KEY[mode] ?? mode}`),
-    note: lookup(locale, `education.classroomModeBlurb.${MODE_KEY[mode] ?? mode}`),
+    name: lookup(locale, teacherGameMode(mode)?.nameKey ?? `teacher.classroom.gameModes.${mode}`),
+    note: lookup(locale, teacherGameMode(mode)?.blurbKey ?? `education.classroomModeBlurb.${mode}`),
   }));
 
   const practice: PlayFormat[] = [

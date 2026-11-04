@@ -36,6 +36,7 @@ export function handleSubmitCrosswordProgress(io: Server, socket: Socket, data: 
     solved: data.solved,
     elapsedMs: data.elapsedMs,
     score: data.score,
+    solvedSlotIds: data.solvedSlotIds,
   });
   // Mirror score onto the game for the standard results pipeline.
   if (!game.playerScores) game.playerScores = {};

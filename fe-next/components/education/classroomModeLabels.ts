@@ -24,8 +24,14 @@ export const MODE_TRANSLATION_KEY: Record<string, string> = {
 /** Fallback when a mode has no entry — a cosmetic gap must never crash a host. */
 export const FALLBACK_MODE_TRANSLATION_KEY = 'classic';
 
+/** Modes named from their own namespace rather than `teacher.classroom.gameModes`. */
+const MODE_NAME_KEY: Record<string, string> = {
+  crossword: 'eduCrossword.name',
+};
+
 export function classroomModeLabelKey(mode: string | undefined, vocabQuizVariant?: string | null): string {
   if (mode === 'vocab-quiz' && vocabQuizVariant === 'boss') return 'eg2Modes.boss.name';
+  if (mode && MODE_NAME_KEY[mode]) return MODE_NAME_KEY[mode];
   return `teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[mode ?? ''] ?? FALLBACK_MODE_TRANSLATION_KEY}`;
 }
 

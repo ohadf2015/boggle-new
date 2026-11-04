@@ -158,6 +158,8 @@ export interface GameState {
   wordHuntState?: WordHuntState | null;
   wheelRushState?: WheelRushState | null;
   crosswordMpState?: CrosswordMpState | null;
+  /** Classroom crossword dealt from the lesson before the round starts; consumed by the mode's initRound. */
+  lessonCrossword?: { puzzle: unknown; lessonWordBySlot: Record<string, string> } | null;
   wordTowerVersusState?: VersusMatchState | null;
   /** Live classroom Wordcraft race (per-student boards), rebuilt every round. */
   wordcraftState?: WordcraftLiveSession | null;

@@ -73,7 +73,7 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
       lessonIds?: string[]; lessonNames?: string[]; vocabularyWords?: string[]; language?: string;
       settings?: {
         timerMinutes?: number; boardSize?: 'small' | 'medium' | 'large'; allowLateJoin?: boolean;
-        gameMode?: 'classic' | 'blast' | 'word-hunt' | 'wheel-rush' | 'vocab-quiz' | 'wordcraft'; targetWord?: string;
+        gameMode?: 'classic' | 'blast' | 'word-hunt' | 'wheel-rush' | 'vocab-quiz' | 'wordcraft' | 'crossword'; targetWord?: string;
         vocabQuizVariant?: 'classic' | 'boss'; classroomBossId?: ClassroomBossId;
         vocabQuizFocus?: PracticeFocusSetting;
         vocabQuizQuestionCount?: number; vocabQuizSeconds?: number;
