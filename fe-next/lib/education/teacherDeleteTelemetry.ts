@@ -16,7 +16,7 @@ import type { DeleteImpactSummary, TeacherDeleteReason } from '@/lib/account/del
 
 export type TeacherDeleteSurface = 'settings' | 'account_delete_page';
 
-export type TeacherDeleteAlternative = 'unsubscribe_emails' | 'keep_free_account';
+export type TeacherDeleteAlternative = 'unsubscribe_emails' | 'keep_free_account' | 'delete_one_class';
 
 function impactProps(impact: DeleteImpactSummary): Record<string, unknown> {
   return {
@@ -34,8 +34,9 @@ export function trackTeacherDeleteViewed(impact: DeleteImpactSummary, surface: T
 export function trackTeacherDeleteReasonSelected(
   reason: TeacherDeleteReason,
   surface: TeacherDeleteSurface,
+  isTeacher = true,
 ): void {
-  safeCapture('teacher_delete_reason_selected', { reason, surface });
+  safeCapture('teacher_delete_reason_selected', { reason, surface, is_teacher: isTeacher });
 }
 
 export function trackTeacherDeleteAlternativeChosen(
@@ -56,10 +57,12 @@ export function trackTeacherDeleteConfirmed(
   impact: DeleteImpactSummary,
   reason: TeacherDeleteReason | null,
   surface: TeacherDeleteSurface,
+  isTeacher = true,
 ): void {
   safeCapture('teacher_delete_confirmed', {
     ...impactProps(impact),
     ...(reason ? { reason } : {}),
     surface,
+    is_teacher: isTeacher,
   });
 }

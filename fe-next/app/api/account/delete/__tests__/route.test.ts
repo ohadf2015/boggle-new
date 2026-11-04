@@ -343,6 +343,8 @@ describe('GET /api/account/delete (impact summary)', () => {
     expect(body.totalStudents).toBe(3);
     expect(body.roundsPlayed).toBe(15);
     expect(body.emailSubscribed).toBe(false);
+    expect(body.perClassDeleteAvailable).toBe(true);
+    expect(body.billing.renews).toBe(false);
     const c1 = body.classrooms.find((c: { id: string }) => c.id === 'c1');
     expect(c1.studentCount).toBe(1);
     expect(c1.name).toBe('Period 3');
