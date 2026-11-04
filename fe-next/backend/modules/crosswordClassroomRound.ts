@@ -19,7 +19,7 @@ function answersOf(puzzle: unknown): string[] {
   return slots.flatMap((s) => (typeof s.answer === 'string' && s.answer ? [s.answer.toLowerCase()] : []));
 }
 
-export function crosswordClassroomWords(state: CrosswordRaceState | undefined, lessonWords: readonly string[]): CrosswordClassroomWords | null {
+export function crosswordClassroomWords(state: CrosswordRaceState | null | undefined, lessonWords: readonly string[]): CrosswordClassroomWords | null {
   if (!state) return null;
   const answers = answersOf(state.puzzle);
   const onGrid = new Set(answers);
