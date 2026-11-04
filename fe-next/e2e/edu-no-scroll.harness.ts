@@ -233,12 +233,15 @@ export async function measureFit(page: Page, keys: string[]): Promise<FitReport>
 /** rAF deltas recorded in the page until `stopRecording` is called. */
 export async function startFrameRecording(page: Page) {
   await page.evaluate(() => {
-    const w = window as unknown as { __rafDeltas: number[]; __rafStop: boolean };
+    const w = window as unknown as { __rafDeltas: number[]; __rafAt: number[]; __rafStop: boolean };
     w.__rafDeltas = [];
+    w.__rafAt = [];
     w.__rafStop = false;
-    let last = performance.now();
+    const t0 = performance.now();
+    let last = t0;
     const tick = (now: number) => {
       w.__rafDeltas.push(now - last);
+      w.__rafAt.push(last - t0);
       last = now;
       if (!w.__rafStop) requestAnimationFrame(tick);
     };
@@ -247,14 +250,16 @@ export async function startFrameRecording(page: Page) {
 }
 
 export async function stopFrameRecording(page: Page) {
-  const deltas = await page.evaluate(() => {
-    const w = window as unknown as { __rafDeltas: number[]; __rafStop: boolean };
+  const { deltas, at } = await page.evaluate(() => {
+    const w = window as unknown as { __rafDeltas: number[]; __rafAt: number[]; __rafStop: boolean };
     w.__rafStop = true;
-    return w.__rafDeltas.slice(1);
+    return { deltas: w.__rafDeltas.slice(1), at: w.__rafAt.slice(1) };
   });
   const sorted = [...deltas].sort((a, b) => a - b);
   const p95 = sorted[Math.floor(sorted.length * 0.95)] ?? 0;
-  return { frames: deltas.length, max: Math.round(sorted[sorted.length - 1] ?? 0), p95: Math.round(p95), over50: deltas.filter((d) => d > 50).length };
+  /** Where the slow frames start, ms from the start of the window, as "start+length". */
+  const spikes = deltas.flatMap((d, i) => (d > 50 ? [`${Math.round(at[i])}+${Math.round(d)}`] : []));
+  return { frames: deltas.length, max: Math.round(sorted[sorted.length - 1] ?? 0), p95: Math.round(p95), over50: spikes.length, spikes };
 }
 
 export async function observeLayoutShift(page: Page) {
