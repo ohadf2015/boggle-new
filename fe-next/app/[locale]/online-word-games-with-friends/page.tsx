@@ -221,6 +221,10 @@ export default async function OnlineWordGamesWithFriendsPage({ params }: PagePro
               <h3 className="font-bold text-neo-lime">Multiplayer Word Game Online</h3>
               <p className="mt-1 text-xs text-neo-gray-200">Real-time Scrabble alternative — play live</p>
             </Link>
+            <Link href={`/${locale}/scrabble-alternative-online`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-pink/40">
+              <h3 className="font-bold text-neo-pink">Online Multiplayer Scrabble Alternative</h3>
+              <p className="mt-1 text-xs text-neo-gray-200">One live grid for the whole group, in the browser</p>
+            </Link>
             <Link href={`/${locale}/word-games-online-free`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-cyan/40">
               <h3 className="font-bold text-neo-cyan">Word Games Online Free</h3>
               <p className="mt-1 text-xs text-neo-gray-200">7+ free modes — no download, no signup</p>
