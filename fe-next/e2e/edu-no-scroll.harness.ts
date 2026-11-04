@@ -9,7 +9,8 @@ export const VIEWPORTS = [
 
 export const LOCALES = ['en', 'he', 'ru'] as const;
 
-export type HubPersona = 'student-full' | 'student-empty' | 'guest' | 'teacher';
+/** student-busy: first-day goals done, so the Today card shows, plus homework due within hours under it. */
+export type HubPersona = 'student-full' | 'student-busy' | 'student-empty' | 'guest' | 'teacher';
 
 const USER_ID = '00000000-0000-4000-8000-00000000e2e5';
 const CLASSROOM_ID = '00000000-0000-4000-8000-0000000c1a55';
@@ -78,12 +79,16 @@ export async function signInAs(context: BrowserContext, page: Page, baseURL: str
     display_name: 'Maya',
     user_role: role,
     is_admin: false,
-    total_xp: persona === 'student-full' ? 1840 : 0,
+    total_xp: persona === 'student-empty' || persona === 'guest' ? 0 : 1840,
     avatar_config: null,
     onboarding_completed: true,
     preferred_language: 'en',
   };
-  const full = persona === 'student-full';
+  const busy = persona === 'student-busy';
+  const full = persona === 'student-full' || busy;
+  const soon = new Date(Date.now() + 6 * 3_600_000).toISOString();
+  const assignment = { id: 'e2e-assign-0', lesson_id: 'e2e-lesson-0', classroom_id: CLASSROOM_ID, due_date: soon, created_at: '2026-10-03T00:00:00Z', vocabulary_lessons: lesson(0) };
+  const progress = { id: 'e2e-progress-1', student_id: USER_ID, lesson_id: 'e2e-lesson-1', started_at: '2026-10-04T00:00:00Z', completed_at: '2026-10-04T00:10:00Z', words_mastered: lesson(1).words.map((w) => w.word) };
 
   await context.route(/\.supabase\.co\//, (route) => {
     const req = route.request();
@@ -94,6 +99,8 @@ export async function signInAs(context: BrowserContext, page: Page, baseURL: str
     const single = (req.headers()['accept'] ?? '').includes('vnd.pgrst.object');
     const table = u.pathname.replace('/rest/v1/', '');
     if (table === 'profiles') return json(route, single ? profile : [profile]);
+    if (busy && table === 'lesson_assignments') return json(route, [assignment]);
+    if (busy && table === 'student_lesson_progress') return json(route, [progress]);
     if (table === 'classroom_memberships') {
       const row = full
         ? { student_id: USER_ID, classroom_id: CLASSROOM_ID, level: 'core', joined_at: '2026-10-02T00:00:00Z', classrooms: { id: CLASSROOM_ID, teacher_id: 't', name: 'Class 5B Explorers', join_code: 'ABC123', language: 'en', created_at: '2026-10-01T00:00:00Z', updated_at: '2026-10-01T00:00:00Z' } }
@@ -126,6 +133,71 @@ export interface FitReport {
   hiddenScrollers: string[];
   /** Key controls whose box leaves the viewport. */
   offscreen: string[];
+}
+
+export interface IslandReport {
+  /** Island plaques another element covers (the hit at a sample point is not the island). */
+  covered: string[];
+  /** Island plaques that overlap each other. */
+  overlapping: string[];
+  /** Map art width / viewport width (a narrow strip over blurred filler reads as broken). */
+  artShare: number;
+  islands: number;
+}
+
+/** Every island's name plate must be visible and tappable: nothing on top of it, no two touching. */
+export async function measureIslands(page: Page): Promise<IslandReport> {
+  return page.evaluate(() => {
+    const nodes = Array.from(document.querySelectorAll<HTMLElement>('button[data-testid^="academy-node-"]'));
+    const covered: string[] = [];
+    const plates: Array<{ key: string; r: DOMRect }> = [];
+    for (const node of nodes) {
+      const key = node.dataset.testid!.replace('academy-node-', '');
+      const label = node.querySelector<HTMLElement>('[data-testid="academy-node-label"]');
+      if (!label) continue;
+      const r = label.getBoundingClientRect();
+      plates.push({ key, r });
+      const y = r.top + r.height / 2;
+      for (const fx of [0.15, 0.5, 0.85]) {
+        const x = r.left + r.width * fx;
+        const hit = document.elementFromPoint(x, y);
+        if (!hit || !node.contains(hit)) {
+          const by = hit ? `${hit.tagName.toLowerCase()}[${(hit as HTMLElement).dataset?.testid ?? String(hit.className).slice(0, 30)}]` : 'offscreen';
+          covered.push(`${key}@${Math.round(x)},${Math.round(y)} under ${by}`);
+          break;
+        }
+      }
+    }
+    const overlapping: string[] = [];
+    for (let i = 0; i < plates.length; i++) {
+      for (let j = i + 1; j < plates.length; j++) {
+        const a = plates[i].r;
+        const b = plates[j].r;
+        if (a.left < b.right - 1 && b.left < a.right - 1 && a.top < b.bottom - 1 && b.top < a.bottom - 1) {
+          overlapping.push(`${plates[i].key}x${plates[j].key}`);
+        }
+      }
+    }
+    const art = document.querySelector<HTMLElement>('[data-testid="academy-map-art"]');
+    const artShare = art ? Math.round((art.getBoundingClientRect().width / innerWidth) * 100) / 100 : 0;
+    return { covered, overlapping, artShare, islands: plates.length };
+  });
+}
+
+/** The chest badge's tag (its longest word is ru) must stay on screen and off the cards beside it. */
+export async function measureChestTag(page: Page): Promise<string[]> {
+  return page.evaluate(() => {
+    const tag = document.querySelector('[data-testid="academy-daily-chest"] > span');
+    if (!tag) return ['tag:missing'];
+    const r = tag.getBoundingClientRect();
+    const bad: string[] = [];
+    if (r.left < 0 || r.right > innerWidth) bad.push(`offscreen ${Math.round(r.left)}-${Math.round(r.right)}`);
+    for (const id of ['academy-first-day', 'academy-today', 'assignment-due-card']) {
+      const c = document.querySelector(`[data-testid="${id}"]`)?.getBoundingClientRect();
+      if (c && r.left < c.right - 1 && c.left < r.right - 1 && r.top < c.bottom - 1 && c.top < r.bottom - 1) bad.push(`over ${id}`);
+    }
+    return bad;
+  });
 }
 
 export async function measureFit(page: Page, keys: string[]): Promise<FitReport> {

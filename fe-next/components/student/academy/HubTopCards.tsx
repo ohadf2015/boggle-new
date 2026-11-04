@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import type { AssignmentDueKind } from '@/lib/education/assignmentDueReminder';
 import { FirstDayCard } from './FirstDayCard';
 import { isFirstDayDone, type FirstDayGoal } from './firstDayGoals';
@@ -23,29 +24,42 @@ interface Props {
   chestOpen: boolean;
   streak: number;
   streakDoneToday: boolean;
+  /** Shown at the start of the row (the chest badge), even before the data lands. */
+  lead?: ReactNode;
+  /** False while the hub's data is still loading: only the lead shows. */
+  ready?: boolean;
+  /** A short screen: homework due wins the one card slot over the checklist. */
+  oneCard?: boolean;
 }
 
 /** The cards under the HUD: first-day goals until they are done (or homework is waiting), then Today. */
-export function HubTopCards({ goals, classroomId, warmup, due, chestOpen, streak, streakDoneToday }: Props) {
+export function HubTopCards({ goals, classroomId, warmup, due, chestOpen, streak, streakDoneToday, lead, ready = true, oneCard = false }: Props) {
   const showToday = !!warmup || isFirstDayDone(goals);
   // The due card keeps its reminder telemetry; for the warm-up homework it simply opens the warm-up drill.
   const dueIsWarmup = !!due && !!warmup && due.assignmentId === warmup.assignmentId;
+  const checklist = !(oneCard && due);
   return (
-    <div className="mx-auto mt-1.5 flex w-full max-w-xl flex-col gap-1.5">
-      {showToday ? (
-        <TodayCard items={buildTodayItems({ warmup, chestOpen, streak, streakDoneToday })} warmup={dueIsWarmup ? null : warmup} />
-      ) : (
-        <FirstDayCard goals={goals} hasClass={!!classroomId} />
-      )}
-      {due && (
-        <AssignmentDueCard
-          assignmentId={due.assignmentId}
-          classroomId={classroomId}
-          title={due.title}
-          href={dueIsWarmup && warmup ? warmup.href : due.href}
-          dueDate={due.dueDate}
-          kind={due.kind}
-        />
+    <div data-testid="academy-top-row" className="mx-auto mt-1.5 flex min-h-12 w-full max-w-xl items-center gap-2">
+      {/* As wide as the chest's longest tag (ru), so the tag never reaches the screen edge or the card. */}
+      {lead && <div className="flex w-[5.75rem] shrink-0 justify-center">{lead}</div>}
+      {ready && (
+        <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+          {checklist && (showToday ? (
+            <TodayCard items={buildTodayItems({ warmup, chestOpen, streak, streakDoneToday })} warmup={dueIsWarmup ? null : warmup} />
+          ) : (
+            <FirstDayCard goals={goals} hasClass={!!classroomId} chestArt={!lead} />
+          ))}
+          {due && (
+            <AssignmentDueCard
+              assignmentId={due.assignmentId}
+              classroomId={classroomId}
+              title={due.title}
+              href={dueIsWarmup && warmup ? warmup.href : due.href}
+              dueDate={due.dueDate}
+              kind={due.kind}
+            />
+          )}
+        </div>
       )}
     </div>
   );

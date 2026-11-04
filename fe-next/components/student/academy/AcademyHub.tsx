@@ -15,7 +15,7 @@
  * classroom reward toast.
  */
 
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import type { Socket } from 'socket.io-client';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -33,9 +33,9 @@ import { ISLANDS } from './academyNodes';
 import { buildAcademyIslands, pickNextAction, type AcademyIsland } from './academyIslands';
 import { useAcademyData } from './useAcademyData';
 import { AcademyHud } from './AcademyHud';
-import { AcademyMap } from './AcademyMap';
-import { useHubLayout } from './hubLayout';
-import type { Insets } from './artFit';
+import { AcademyMap, useRegionSize } from './AcademyMap';
+import { pickMapArt, showMascot, useHubLayout } from './hubLayout';
+import { useChromeInsets } from './useChromeInsets';
 import { AcademyCta, ctaTone, useCtaOverline } from './AcademyCta';
 import { academyMascotMood } from './academyMascotMood';
 import { AcademyMascot } from './AcademyMascot';
@@ -90,40 +90,7 @@ function LiveGameBridge({ classroomId, onChange }: { classroomId: string; onChan
 
 type Note = { kind: 'arena' } | { kind: 'boss'; left: number } | null;
 
-/** Breathing room between the chrome and the nearest island box, px. */
-const CHROME_GAP = 8;
-
-/**
- * How much of each edge the chrome covers, measured (visual px, zoom included)
- * so the islands are solved against the real HUD and bottom bar.
- */
-function useChromeInsets(top: React.RefObject<HTMLElement | null>, bottom: React.RefObject<HTMLElement | null>, deps: unknown[]): Insets {
-  const [insets, setInsets] = useState<Insets>({ top: 96, bottom: 170, left: 8, right: 8 });
-  useLayoutEffect(() => {
-    const read = () => {
-      const tr = top.current?.getBoundingClientRect();
-      const br = bottom.current?.getBoundingClientRect();
-      const vh = window.innerHeight;
-      // jsdom (no layout) reports zeros — keep the estimate.
-      if (!tr || !br || (tr.height === 0 && br.height === 0)) return;
-      const next = { top: tr.bottom + CHROME_GAP, bottom: Math.max(0, vh - br.top) + CHROME_GAP, left: CHROME_GAP, right: CHROME_GAP };
-      setInsets((prev) =>
-        Math.abs(prev.top - next.top) < 1 && Math.abs(prev.bottom - next.bottom) < 1 ? prev : next,
-      );
-    };
-    read();
-    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(read) : null;
-    if (top.current) ro?.observe(top.current);
-    if (bottom.current) ro?.observe(bottom.current);
-    window.addEventListener('resize', read);
-    return () => {
-      ro?.disconnect();
-      window.removeEventListener('resize', read);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, deps);
-  return insets;
-}
+const CHEST_COVER_DELAY_MS = 180;
 
 export function AcademyHub(props: AcademyHubProps) {
   const { userId, studentName, classroomId, classroomName, level, avatarConfig, profileXp, isGuest, onSignOut, classroomLoading } = props;
@@ -131,11 +98,12 @@ export function AcademyHub(props: AcademyHubProps) {
   const router = useRouter();
   const reducedMotion = useEduReducedMotion();
   const hub = useHubLayout();
-  const layout = hub.art;
   const wide = hub.chrome === 'wide';
   const rail = hub.chrome === 'rail';
   const zoom: CSSProperties | undefined = hub.scale !== 1 ? { zoom: hub.scale } : undefined;
   const topRef = useRef<HTMLDivElement>(null);
+  // The map keeps animating under the 95% chest overlay unless its rendering is skipped while the reveal covers it.
+  const hubRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const [classOpen, setClassOpen] = useState(false);
   // A fresh join lands here as /student?class=open — open the class sheet on
@@ -146,11 +114,14 @@ export function AcademyHub(props: AcademyHubProps) {
     if (shouldOpenClassSheet(searchParams, classroomId)) setClassOpen(true);
   }, [searchParams, classroomId]);
   const [grantedXp, setGrantedXp] = useState<number | null>(null);
-  // The map keeps animating under the 95% chest overlay unless it is hidden while the reveal covers it.
-  const hubRef = useRef<HTMLDivElement>(null);
+  // Hidden a beat after the reveal shows, so the two restyles never share the tap's frame.
+  const coverTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const onChestCover = useCallback((covering: boolean) => {
-    requestAnimationFrame(() => hubRef.current?.toggleAttribute('data-covered', covering));
+    clearTimeout(coverTimer.current);
+    if (covering) coverTimer.current = setTimeout(() => hubRef.current?.setAttribute('data-covered', ''), CHEST_COVER_DELAY_MS);
+    else requestAnimationFrame(() => hubRef.current?.removeAttribute('data-covered'));
   }, []);
+  useEffect(() => () => clearTimeout(coverTimer.current), []);
   const [live, setLive] = useState<LiveState>(NO_LIVE);
   const [note, setNote] = useState<Note>(null);
   const liveGame = classroomId ? live.activeGame : null;
@@ -158,6 +129,12 @@ export function AcademyHub(props: AcademyHubProps) {
   const isLive = !!liveGame?.gameCode;
 
   const data = useAcademyData(level);
+  // Pessimistic until every source answers: a student with a class must never
+  // see "Join a classroom" or a half-built map flash first (pitfall class 1).
+  const ready = !classroomLoading && (!data.lessonsLoading || data.lessons.length > 0);
+  const insets = useChromeInsets(hubRef, topRef, bottomRef, [hub.chrome, hub.scale, hub.sideCard, ready]);
+  const hubSize = useRegionSize(hubRef);
+  const layout = pickMapArt(hub.art, hubSize, insets);
   const { join, isJoining, joinError } = useClassroomGameJoin({
     activeGame: liveGame,
     socket,
@@ -235,11 +212,6 @@ export function AcademyHub(props: AcademyHubProps) {
   );
   const targetLabel = useNodeLabel(target ?? { key: 'none', kind: 'lesson', type: 'lesson', state: 'open', stars: 0, mastery: 0 });
 
-  // Pessimistic until every source answers: a student with a class must never
-  // see "Join a classroom" or a half-built map flash first (pitfall class 1).
-  const ready = !classroomLoading && (!data.lessonsLoading || data.lessons.length > 0);
-  const insets = useChromeInsets(topRef, bottomRef, [hub.chrome, hub.scale, hub.sideCard, ready]);
-
   // A late profile value must never roll the bar back below what the chest granted.
   const totalXp = Math.max(profileXp, grantedXp ?? 0);
 
@@ -309,7 +281,7 @@ export function AcademyHub(props: AcademyHubProps) {
       data-chrome={hub.chrome}
       data-scale={hub.scale}
       ref={hubRef}
-      className="fixed inset-x-0 top-0 bottom-[var(--cookie-consent-height,0px)] overflow-hidden bg-neo-navy text-neo-white [&[data-covered]>*]:invisible"
+      className="fixed inset-x-0 top-0 bottom-[var(--cookie-consent-height,0px)] overflow-hidden bg-neo-navy text-neo-white [&[data-covered]>main]:[content-visibility:hidden]"
     >
       {classroomId && <LiveGameBridge classroomId={classroomId} onChange={setLive} />}
 
@@ -342,8 +314,11 @@ export function AcademyHub(props: AcademyHubProps) {
         <div style={zoom} className={rail ? 'flex items-start justify-between gap-3' : undefined}>
           <div ref={topRef} className={cn('pointer-events-auto', rail && 'min-w-0 max-w-md flex-1')}>
             {hud}
-            {ready && (
+            {(ready || hub.chrome === 'stack') && (
               <HubTopCards
+                lead={hub.chrome === 'stack' ? chest : undefined}
+                ready={ready}
+                oneCard={hub.chrome === 'stack'}
                 goals={firstDayGoals}
                 classroomId={classroomId}
                 warmup={warmup}
@@ -354,13 +329,9 @@ export function AcademyHub(props: AcademyHubProps) {
               />
             )}
           </div>
-          {/* Phone: the chest is a small badge on the START side, away from the totals (end).
+          {/* Phone and tablet: the chest leads the card row (inside the measured top chrome).
               Phone on its side: at the far end of the top row, clear of the map's middle. */}
-          {!wide && (
-            <div className={cn('pointer-events-auto flex', rail ? 'shrink-0 pt-0.5' : 'mt-3')}>
-              <div className={rail ? 'me-1' : 'ms-1'}>{chest}</div>
-            </div>
-          )}
+          {rail && <div className="pointer-events-auto flex shrink-0 pt-0.5 me-1">{chest}</div>}
         </div>
         <p className="sr-only">{t('student.dashboard.greeting', { name: studentName })}</p>
       </div>
@@ -443,9 +414,8 @@ export function AcademyHub(props: AcademyHubProps) {
             </div>
           )}
           {wide && !hub.sideCard && <div className="shrink-0 pb-3">{chest}</div>}
-          <div className={cn('flex flex-col gap-1', wide && 'w-full', wide && !hub.sideCard && 'min-w-0 max-w-[40rem] flex-1', rail && 'min-w-0 flex-1')}>
-            {/* Lexi sits out the phone-on-its-side row: one short row has no room for a bubble. */}
-            {!rail && (ready
+          <div className={cn('pointer-events-none flex flex-col gap-1 [&>:last-child]:pointer-events-auto', wide && 'w-full', wide && !hub.sideCard && 'min-w-0 max-w-[40rem] flex-1', rail && 'min-w-0 flex-1')}>
+            {showMascot(hub.chrome, hubSize.height) && (ready
               ? <AcademyMascot mood={mascotMood} reducedMotion={reducedMotion} />
               : <div aria-hidden="true" data-testid="academy-mascot-slot" className="h-16" />)}
             {ready ? (
@@ -476,7 +446,7 @@ export function AcademyHub(props: AcademyHubProps) {
               locale={language}
               reviewCount={data.reviewCount}
               onOpenClass={classroomId ? () => setClassOpen(true) : undefined}
-              onSolo={ready && action.kind !== 'solo' ? goSolo : undefined}
+              onSolo={!ready || action.kind !== 'solo' ? goSolo : undefined}
               big={wide}
               iconOnly={rail}
             />
