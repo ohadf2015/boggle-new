@@ -240,7 +240,7 @@ const content: Record<Locale, ToolContent> = {
     ctaTitle: 'Öva på att hitta ord snabbare',
     ctaButton: 'Spela LexiClash gratis',
     ctaDescription: 'Utmana vänner i ordstrider i realtid. Träna din hjärna!',
-    fullDictionaryNote: 'Visar resultat från en lista med 500+ vanliga ord. För hela ordboken, spela LexiClash!',
+    fullDictionaryNote: 'Visar upp till 500 ord, de längsta först. Orden kontrolleras mot samma svenska ordlista som i LexiClash, med drygt 400 000 ord.',
     howToTitle: 'Hur man använder ordlösaren',
     howToSteps: [
       'Skriv eller klistra in dina tillgängliga bokstäver i fältet ovan.',
@@ -252,10 +252,12 @@ const content: Record<Locale, ToolContent> = {
     faqTitle: 'Vanliga frågor',
     faqs: [
       { question: 'Hur bildar man ord med bokstäver?', answer: 'Ange dina bokstäver i fältet ovan och klicka "Hitta ord" — verktyget hittar automatiskt alla möjliga ord du kan bilda av dina bokstäver på svenska. Resultaten sorteras efter ordlängd.' },
-      { question: 'Hur många ord kan man bilda av 7 bokstäver?', answer: 'Från 7 slumpmässiga bokstäver kan du vanligtvis bilda mellan 20 och 80 giltiga ord. Vår lösare hittar alla möjligheter direkt.' },
+      { question: 'Hur många ord kan man bilda av 7 bokstäver?', answer: 'Det beror helt på vilka bokstäver det är. ”Stjärna” ger 114 ord, medan ”kärlek” med sex bokstäver bara ger 27. En blank bricka (?) ökar antalet snabbt.' },
       { question: 'Vad är en anagramlösare?', answer: 'En anagramlösare tar en uppsättning bokstäver och hittar alla giltiga ord som kan bildas.' },
       { question: 'Kan jag använda detta för Scrabble?', answer: 'Ja! Denna ordfinnare fungerar för alla ordspel inklusive Scrabble, Boggle och LexiClash.' },
-      { question: 'Varför saknas vissa ord?', answer: 'Vårt gratisverktyg använder en lista med 500+ vanliga ord. För hela ordboken, spela LexiClash!' },
+      { question: 'Varför saknas vissa ord?', answer: 'Ordlösaren visar bara ord som finns i vår svenska ordlista, och högst 500 per sökning, de längsta först. Underkänns ett riktigt ord i en multiplayermatch kan du överklaga det, så granskar vi det.' },
+      { question: 'Kan jag använda blanka brickor?', answer: 'Ja. Skriv ett frågetecken (?) för varje blank bricka, högst tre. ”kärl?k” ger till exempel 172 ord, bland annat kälkar och lärka.' },
+      { question: 'Fungerar det för Wordfeud och Alfapet?', answer: 'Ja, skriv in brickorna du har på hand så ser du vilka ord de räcker till. Ordlistan är inte exakt samma som Wordfeuds, så ett ord kan ibland godkännas i det ena spelet men inte i det andra.' },
       { question: 'Hur blir man bättre på att hitta ord?', answer: 'Öva regelbundet med tidsbegränsade ordspel som LexiClash. Leta efter vanliga prefix och suffix.' },
     ],
     tipsTitle: 'Tips för ordspel',

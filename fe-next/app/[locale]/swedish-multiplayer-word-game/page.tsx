@@ -282,6 +282,13 @@ export default async function SwedishMultiplayerWordGamePage({ params }: PagePro
             </Link>
             {' '}— gissa det dolda ordet på 10 försök. Båda är gratis, nya pussel varje dag.
           </p>
+          <p className="mt-4 text-neo-gray-200">
+            Kör du fast på dina brickor kan du{' '}
+            <Link href={`/${locale}/tools/word-solver`} className="text-neo-cyan hover:underline">
+              bilda ord av bokstäver
+            </Link>
+            {' '}med vår ordlösare: skriv in bokstäverna och se alla ord de räcker till.
+          </p>
         </section>
         <NativePageEnhancements locale={locale} />
       </div>
