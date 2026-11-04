@@ -18,7 +18,8 @@ interface ClassroomGuestDemoCodeTilesProps {
 
 /** One real input under a row of tiles, so paste, autofill and the phone keyboard behave like a plain field. */
 export function ClassroomGuestDemoCodeTiles({ code, onChange, label, error, ready, reduced: reducedProp, describedBy }: ClassroomGuestDemoCodeTilesProps) {
-  const reduced = reducedProp || !!useReducedMotion();
+  const prefersReduced = useReducedMotion();
+  const reduced = reducedProp || !!prefersReduced;
   const chars = code.toUpperCase().split('');
   const count = Math.max(MIN_TILES, chars.length);
   const state = error ? 'error' : ready ? 'ready' : 'idle';
