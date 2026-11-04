@@ -21769,8 +21769,17 @@ const he = {
   // @eduPolish:start
   "eduPolish": {
     "seatCapReached": "{name} צופה: הכיתה מלאה ({cap} שחקנים)",
-  }
+  },
   // @eduPolish:end
+  // @eduRoster:start
+  "eduRoster": {
+    "rename": "שינוי השם של {name} בכיתה הזו",
+    "inputLabel": "השם בכיתה הזו",
+    "tooLong": "עד {max} תווים",
+    "saveFailed": "לא הצלחנו לשמור את השם. נסו שוב.",
+    "originalName": "נרשם/ה בשם {name}"
+  }
+  // @eduRoster:end
 };
 
 export { he };

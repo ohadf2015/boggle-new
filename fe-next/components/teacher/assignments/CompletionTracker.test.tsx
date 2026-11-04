@@ -60,6 +60,19 @@ describe('CompletionTracker', () => {
     expect(within(waiting).queryByText('Noa')).not.toBeInTheDocument();
   });
 
+  it("names students by the teacher's roster name, and by their own name when a row has none", async () => {
+    students.mockResolvedValue({
+      data: [{ ...member('s1', 'Noa'), roster_name: 'Noa K.' }, { ...member('s2', 'Ari'), roster_name: null }, member('s3', 'Dana'), member('s4', 'Yoni')],
+      error: null,
+    });
+    completions.mockResolvedValue({ data: [progress('s1', { cat: [0, 2] }, 'Noa'), progress('s3', { cat: [2, 2] }, 'Dana')], error: null });
+    renderTracker();
+    const help = await screen.findByTestId('results-need-help');
+    expect(within(help).getByText('Noa K.')).toBeInTheDocument();
+    expect(within(screen.getByTestId('results-not-played')).getByText('Ari')).toBeInTheDocument();
+    expect(screen.queryByText('Noa')).not.toBeInTheDocument();
+  });
+
   it('lists the students who need help with their score', async () => {
     completions.mockResolvedValue({
       data: [progress('s1', { cat: [0, 2] }), progress('s2', { cat: [2, 2] })],

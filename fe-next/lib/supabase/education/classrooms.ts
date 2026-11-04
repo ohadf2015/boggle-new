@@ -299,17 +299,34 @@ export async function setStudentLevel(
   studentId: string,
   level: VocabularyLevel
 ): Promise<{ error: { message: string } | null }> {
+  return patchMembership(classroomId, studentId, { level }, 'level');
+}
+
+export async function setStudentRosterName(
+  classroomId: string,
+  studentId: string,
+  rosterName: string | null
+): Promise<{ error: { message: string } | null }> {
+  return patchMembership(classroomId, studentId, { roster_name: rosterName }, 'name');
+}
+
+async function patchMembership(
+  classroomId: string,
+  studentId: string,
+  body: Record<string, unknown>,
+  what: string
+): Promise<{ error: { message: string } | null }> {
   try {
     const response = await fetch(
       `/api/education/classroom/${encodeURIComponent(classroomId)}/members/${encodeURIComponent(studentId)}`,
       {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ level }),
+        body: JSON.stringify(body),
       }
     );
     if (!response.ok) {
-      let message = `Failed to update level (${response.status})`;
+      let message = `Failed to update ${what} (${response.status})`;
       try {
         const data = await response.json();
         if (typeof data?.error === 'string') message = data.error;
@@ -318,8 +335,8 @@ export async function setStudentLevel(
     }
     return { error: null };
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to update level';
-    logger.error('Exception in setStudentLevel:', message);
+    const message = err instanceof Error ? err.message : `Failed to update ${what}`;
+    logger.error(`Exception updating membership ${what}:`, message);
     return { error: { message } };
   }
 }

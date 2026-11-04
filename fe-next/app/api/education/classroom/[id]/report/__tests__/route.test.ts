@@ -25,7 +25,7 @@ const sb = { from: vi.fn() };
 const classReport = { classroomId: CLASS, classroomName: '7B', studentRankings: [{ studentId: STUDENT, accuracy: 62 }] };
 const studentReport = { studentId: STUDENT, studentName: 'Ana', metrics: { accuracy: 62 } };
 
-let member: { id: string } | null = { id: 'm1' };
+let member: { id: string; roster_name?: string | null } | null = { id: 'm1' };
 const admin = {
   from: vi.fn(() => ({
     select: () => ({ eq: () => ({ eq: () => ({ maybeSingle: async () => ({ data: member, error: null }) }) }) }),
@@ -100,5 +100,12 @@ describe('GET /api/education/classroom/[id]/report', () => {
   it('500s when the read fails', async () => {
     vi.mocked(getClassReportData).mockResolvedValue({ data: null, error: { message: 'boom' } });
     expect((await call()).status).toBe(500);
+  });
+
+  it("shows the teacher's roster name on a student report, and the student's own name when there is none", async () => {
+    member = { id: 'm1', roster_name: 'Ana B.' };
+    await expect((await call(`?studentId=${STUDENT}`)).json()).resolves.toMatchObject({ report: { studentName: 'Ana B.' } });
+    member = { id: 'm1', roster_name: null };
+    await expect((await call(`?studentId=${STUDENT}`)).json()).resolves.toMatchObject({ report: { studentName: 'Ana' } });
   });
 });

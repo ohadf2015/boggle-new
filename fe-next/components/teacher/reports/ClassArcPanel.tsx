@@ -22,7 +22,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useWordMasteryTrend } from '@/hooks/useWordMasteryTrend';
 import { useLessons } from '@/hooks/useVocabularyLesson';
 import { getClassroomStudents } from '@/lib/supabase/education/classrooms';
-import { resolveDisplayName } from '@/lib/displayName';
+import { teacherFacingName } from '@/lib/education/rosterName';
 import { createLessonAndAssign } from '@/lib/education/createLessonWithAssignment';
 import { buildClassArcRows, pickFollowUpWords, type ArcRosterEntry } from '@/lib/education/studentArc';
 import type { Language } from '@/lib/supabase/education/types';
@@ -47,7 +47,7 @@ export function ClassArcPanel({ classroomId, classroomName, classroomLanguage, o
   const { user } = useAuth();
   const { mastery, isLoading: masteryLoading, error } = useWordMasteryTrend({ classroomId });
   const { createLesson } = useLessons();
-  const [profiles, setProfiles] = useState<{ studentId: string; candidates: (string | null | undefined)[] }[] | null>(null);
+  const [profiles, setProfiles] = useState<{ studentId: string; rosterName: unknown; profile: { display_name?: string | null; username?: string | null } | null }[] | null>(null);
   const [status, setStatus] = useState<AssignStatus>('idle');
 
   useEffect(() => {
@@ -59,7 +59,8 @@ export function ClassArcPanel({ classroomId, classroomName, classroomLanguage, o
       setProfiles(
         (data ?? []).map((s) => ({
           studentId: s.student_id,
-          candidates: [s.profiles?.display_name, s.profiles?.username],
+          rosterName: s.roster_name,
+          profile: s.profiles,
         }))
       );
     });
@@ -74,7 +75,7 @@ export function ClassArcPanel({ classroomId, classroomName, classroomLanguage, o
     () =>
       (profiles ?? []).map((p) => ({
         studentId: p.studentId,
-        name: resolveDisplayName(p.candidates, t('teacher.reports.arc.unknownStudent')),
+        name: teacherFacingName(p.rosterName, p.profile, t('teacher.reports.arc.unknownStudent')),
       })),
     [profiles, t]
   );

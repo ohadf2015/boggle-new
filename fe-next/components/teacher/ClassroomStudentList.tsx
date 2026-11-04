@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { getClassroomStudents, setStudentLevel, type ClassroomStudent } from '@/lib/supabase/education';
+import { getClassroomStudents, setStudentLevel, setStudentRosterName, type ClassroomStudent } from '@/lib/supabase/education';
 import type { VocabularyLevel } from '@/lib/supabase/education/types';
 import { LEVEL_ORDER, levelLabelKey } from '@/lib/education/differentiation';
 import { cn } from '@/lib/utils';
@@ -13,6 +13,7 @@ import Avatar from '@/components/Avatar';
 import { resolveDisplayName } from '@/lib/displayName';
 import { InviteStudentsCta } from '@/components/teacher/classroom/InviteStudentsCta';
 import { RosterRemoveButton } from '@/components/teacher/classroom/RosterRemoveButton';
+import { RosterNameEditor } from '@/components/teacher/classroom/RosterNameEditor';
 import { lastPlayedLabel } from '@/components/teacher/home/HomeClassList';
 
 /** Selected-segment fill per level. Unselected segments are plain white. */
@@ -114,6 +115,21 @@ export default function ClassroomStudentList({ classroomId, joinCode }: Classroo
     toast.success(t('teacher.levels.saved'));
   }, [classroomId, students, t]);
 
+  const handleRosterName = useCallback(async (studentId: string, next: string | null) => {
+    const previous = students.find((s) => s.student_id === studentId)?.roster_name ?? null;
+    const paint = (value: string | null) =>
+      setStudents((prev) => prev.map((s) => (s.student_id === studentId ? { ...s, roster_name: value } : s)));
+
+    paint(next);
+    const { error: saveError } = await setStudentRosterName(classroomId, studentId, next);
+    if (saveError) {
+      paint(previous);
+      toast.error(t('eduRoster.saveFailed'));
+      return false;
+    }
+    return true;
+  }, [classroomId, students, t]);
+
   const handleRemoved = useCallback((studentId: string) => {
     setStudents((prev) => prev.filter((s) => s.student_id !== studentId));
   }, []);
@@ -187,10 +203,12 @@ export default function ClassroomStudentList({ classroomId, joinCode }: Classroo
         // `username` is a DB placeholder ('Player_<8hex>') for anyone who never picked a
         // handle, and it is truthy — so `username || fallback` never fired and a teacher
         // saw "Player_570b3674" for a student whose display_name said "Victoria Delong".
-        const username = resolveDisplayName(
+        const ownName = resolveDisplayName(
           [profile?.display_name, profile?.username],
           t('teacher.classrooms.students.unknown')
         );
+        const rosterName = student.roster_name?.trim() || null;
+        const username = rosterName ?? ownName;
         const email = profile?.email || '';
         const avatarConfig = profile?.avatar_config;
         const joinedAt = lastPlayedLabel(student.joined_at, language, nowMs);
@@ -207,9 +225,16 @@ export default function ClassroomStudentList({ classroomId, joinCode }: Classroo
             </div>
 
             <div data-testid="roster-identity" className="flex-1 min-w-0">
-              <h4 title={username} className="text-black font-neo-display font-black text-base truncate">
-                {username}
-              </h4>
+              <RosterNameEditor
+                rosterName={rosterName}
+                ownName={ownName}
+                onSave={(next) => handleRosterName(student.student_id, next)}
+              />
+              {rosterName && (
+                <p data-testid="roster-own-name" className="text-black/60 text-xs font-bold truncate">
+                  {t('eduRoster.originalName', { name: ownName })}
+                </p>
+              )}
               <p data-testid="roster-joined" className="flex items-center gap-1 text-black/60 text-xs mt-0.5 font-bold">
                 <Calendar className="w-3 h-3 shrink-0" aria-hidden="true" />
                 <span className="truncate">{joinedAt}</span>

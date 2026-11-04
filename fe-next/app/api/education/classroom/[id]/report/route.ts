@@ -40,7 +40,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
   if (!admin) return NextResponse.json({ ok: false, error: 'service role key not configured' }, { status: 500 });
   const { data: membership, error: memberErr } = await admin
     .from('classroom_memberships')
-    .select('id')
+    .select('*')
     .eq('classroom_id', classroomId)
     .eq('student_id', studentId)
     .maybeSingle();
@@ -61,5 +61,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
     logger.error('[student-report] read failed', error);
     return NextResponse.json({ ok: false, error: 'Could not read the student report' }, { status: 500 });
   }
-  return NextResponse.json({ ok: true, report: data });
+  const rosterName = (membership as { roster_name?: unknown }).roster_name;
+  const report = typeof rosterName === 'string' && rosterName.trim() ? { ...data, studentName: rosterName.trim() } : data;
+  return NextResponse.json({ ok: true, report });
 }

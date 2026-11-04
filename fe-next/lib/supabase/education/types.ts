@@ -140,6 +140,8 @@ export interface ClassroomStudent {
   joined_at: string;
   /** Teacher-set differentiation tier for this student in this classroom. Defaults to core. */
   level: VocabularyLevel;
+  /** The teacher's own name for this student in this classroom; absent on databases without the column. */
+  roster_name?: string | null;
   profiles: any; // Supabase returns array, need to normalize
 }
 

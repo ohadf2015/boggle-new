@@ -5,28 +5,34 @@ import { createAdminClient } from '@/utils/supabase/admin';
 import logger from '@/utils/logger';
 import { LEVEL_ORDER } from '@/lib/education/differentiation';
 import { authorizeClassroomOwner } from '@/lib/education/ownedClassroomRoute';
+import { parseRosterName } from '@/lib/education/rosterName';
 
 const paramsSchema = z.object({
   id: z.string().uuid(),
   studentId: z.string().uuid(),
 });
 
-const bodySchema = z.object({
-  level: z.enum(LEVEL_ORDER as unknown as [string, ...string[]]),
-});
+const bodySchema = z.union([
+  z.object({ level: z.enum(LEVEL_ORDER as unknown as [string, ...string[]]) }).strict(),
+  z.object({ roster_name: z.string().nullable() }).strict(),
+]);
+
+const MISSING_COLUMN_CODES = new Set(['42703', 'PGRST204']);
 
 /**
  * PATCH /api/education/classroom/[id]/members/[studentId]
- * Body: { level: 'support' | 'core' | 'challenge' }
+ * Body: { level: 'support' | 'core' | 'challenge' } or { roster_name: string | null }
  *
- * Sets the differentiation level on ONE membership row (this student, in this
- * classroom). Owning teacher only.
+ * Sets the differentiation level, or the teacher's own name for the student, on ONE
+ * membership row (this student, in this classroom). Owning teacher only. The
+ * student's profile name is never written.
  *
  * - 401 not signed in
  * - 403 caller does not own the classroom
  * - 400 bad ids / bad body
  * - 404 no membership row changed (student is not on this roster)
  * - 500 service role missing or DB error
+ * - 503 roster_name column not in this database yet
  *
  * Mutation path, so auth is the direct `auth.getUser()` (see getAuthedUser docs).
  * The ownership check runs on the request-scoped client (classrooms SELECT is
@@ -54,9 +60,21 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string; s
   }
   const parsedBody = bodySchema.safeParse(body);
   if (!parsedBody.success) {
-    return NextResponse.json({ ok: false, error: 'level must be support | core | challenge' }, { status: 400 });
+    return NextResponse.json(
+      { ok: false, error: 'Send either level (support | core | challenge) or roster_name (string | null)' },
+      { status: 400 },
+    );
   }
-  const level = parsedBody.data.level;
+  let patch: { level: string } | { roster_name: string | null };
+  if ('level' in parsedBody.data) {
+    patch = { level: parsedBody.data.level };
+  } else {
+    const name = parseRosterName(parsedBody.data.roster_name);
+    if (!name.ok) {
+      return NextResponse.json({ ok: false, error: `roster_name ${name.reason}` }, { status: 400 });
+    }
+    patch = { roster_name: name.value };
+  }
 
   const { data: owned, error: ownErr } = await sb
     .from('classrooms')
@@ -77,13 +95,14 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string; s
 
   const r = await admin
     .from('classroom_memberships')
-    .update({ level })
+    .update(patch)
     .eq('classroom_id', classroomId)
     .eq('student_id', studentId)
-    .select('id, level');
+    .select('id');
   if (r.error) {
     logger.error('[member-level] update failed', r.error);
-    return NextResponse.json({ ok: false, error: r.error.message }, { status: 500 });
+    const status = MISSING_COLUMN_CODES.has((r.error as { code?: string }).code ?? '') ? 503 : 500;
+    return NextResponse.json({ ok: false, error: r.error.message }, { status });
   }
   if (!r.data || r.data.length !== 1) {
     // Zero rows = not on this roster (or already removed). >1 is impossible under the
@@ -92,7 +111,7 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string; s
     return NextResponse.json({ ok: false, error: 'Student is not a member of this classroom' }, { status: 404 });
   }
 
-  return NextResponse.json({ ok: true, level });
+  return NextResponse.json({ ok: true, ...patch });
 }
 
 /** DELETE — free roster remove on the owner's own client; `.select()` turns an RLS no-op into a 404. */
