@@ -67,13 +67,16 @@ export async function fetchLastSignIns(supabase: SupabaseClient, ids: string[]):
   // detaching the method throws TypeError and the catch below would drop every sign-in.
   const admin = (supabase as { auth?: { admin?: AuthAdmin } }).auth?.admin;
   if (!admin || typeof admin.getUserById !== 'function' || unique.length === 0) return out;
+  // Closure below does not keep the typeof narrowing. Keep the call on the object
+  // (GoTrueAdminApi reads this.fetch); a detached getUserById drops every sign-in.
+  const authAdmin = admin as AuthAdmin & { getUserById: NonNullable<AuthAdmin['getUserById']> };
 
   let next = 0;
   async function worker() {
     while (next < unique.length) {
       const id = unique[next++];
       try {
-        const { data, error } = await admin.getUserById(id);
+        const { data, error } = await authAdmin.getUserById(id);
         if (error) continue;
         const ts = data?.user?.last_sign_in_at;
         if (ts) out.set(id, ts);
