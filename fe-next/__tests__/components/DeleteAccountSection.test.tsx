@@ -164,6 +164,8 @@ describe('DeleteAccountSection', () => {
       totalStudents: 19,
       roundsPlayed: 15,
       emailSubscribed: true,
+      billing: { tier: 'free' as const, status: null, renews: false, portalUrl: null },
+      perClassDeleteAvailable: true,
     };
 
     beforeEach(() => {
@@ -180,8 +182,8 @@ describe('DeleteAccountSection', () => {
     it('continue reveals the irreversible DELETE form', () => {
       render(<DeleteAccountSection isDarkMode={false} />);
       fireEvent.click(screen.getByText('settings.deleteAccountButton'));
-      // Reason is required before continue is enabled (t_b2cbcbd0).
-      fireEvent.click(screen.getByText('settings.teacherDeleteReason.too_many_emails'));
+      // Reason is optional; continue still reveals the irreversible form.
+      fireEvent.click(screen.getByText('settings.teacherDeleteReason.too_expensive'));
       fireEvent.click(screen.getByText('settings.teacherDeleteContinue'));
       expect(screen.getByPlaceholderText('DELETE')).toBeInTheDocument();
     });
@@ -206,7 +208,7 @@ describe('DeleteAccountSection', () => {
 
       render(<DeleteAccountSection isDarkMode={false} />);
       fireEvent.click(screen.getByText('settings.deleteAccountButton'));
-      fireEvent.click(screen.getByText('settings.teacherDeleteReason.too_many_emails'));
+      fireEvent.click(screen.getByText('settings.teacherDeleteReason.too_expensive'));
       fireEvent.click(screen.getByText('settings.teacherDeleteContinue'));
       fireEvent.change(screen.getByPlaceholderText('DELETE'), { target: { value: 'DELETE' } });
       fireEvent.click(screen.getByText('settings.deleteAccountConfirmButton'));
@@ -216,7 +218,7 @@ describe('DeleteAccountSection', () => {
           '/api/account/delete',
           expect.objectContaining({
             method: 'DELETE',
-            body: JSON.stringify({ reason: 'too_many_emails', surface: 'settings' }),
+            body: JSON.stringify({ reason: 'too_expensive', surface: 'settings' }),
           })
         );
       });

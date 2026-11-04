@@ -4332,22 +4332,42 @@ const sv = {
     "deleteAccountError": "Kunde inte radera kontot. Försök igen.",
     "teacherDeleteImpactTitle": "Ditt klassrum försvinner med kontot",
     "teacherDeleteImpactSummary": "{students} elever i {classes} klasser och {rounds} spelade omgångar förlorar åtkomsten till klassens framsteg.",
+    // TODO(native-review): teacher-delete v2 strings below are machine-translated.
+    "teacherDeleteImpactSummaryV2": "{classes} {classNoun}, {students} {studentNoun}, {rounds} {roundNoun} och deras rapporter raderas permanent.",
+    "teacherDeleteNoun": {
+      "class": { "one": "klass", "other": "klasser" },
+      "student": { "one": "elev", "other": "elever" },
+      "round": { "one": "omgång", "other": "omgångar" }
+    },
     "teacherDeleteUnnamedClass": "Namnlös klass",
     "teacherDeleteRosterCount": "{count} elever",
     "teacherDeleteAlternativesTitle": "Innan du går — enklare alternativ",
     "teacherDeleteStopEmails": "Stoppa bara mejlen",
-    "teacherDeleteStopEmailsHint": "Avsluta prenumerationen på lärarmejl, behåll allt annat",
+    "teacherDeleteStopEmailsHint": "Avsluta prenumerationen på lärarmejl — ditt konto, dina klasser och dina rapporter finns kvar.",
     "teacherDeleteStopEmailsWorking": "Stoppar mejlen...",
     "teacherDeleteStopEmailsDone": "Mejlen stoppade — kontot behålls",
     "teacherDeleteStopEmailsError": "Kunde inte uppdatera mejlinställningarna. Försök igen.",
-    "teacherDeleteKeepFree": "Behåll mitt gratiskonto",
-    "teacherDeleteKeepFreeHint": "Gratis är gratis — din klass och dina spel väntar på dig",
-    "teacherDeleteReasonTitle": "Vad är huvudorsaken till att du lämnar?",
+    "teacherDeleteStopEmailsFallbackLink": "Eller avsluta via mejlsidan",
+    "teacherDeleteKeepFree": "Gratisplanen förblir gratis",
+    "teacherDeleteKeepFreeHint": "Inget kort sparat, inget förnyas automatiskt. Dina klasser väntar på dig.",
+    "teacherDeleteProActiveNote": "Pro förnyas automatiskt — hantera eller avsluta det först i faktureringsportalen.",
+    "teacherDeleteProActiveLink": "Öppna faktureringsportalen",
+    "teacherDeleteOneClass": {
+      "oneClass": "Radera din klass i stället",
+      "other": "Radera en klass i stället"
+    },
+    "teacherDeleteOneClassHint": {
+      "oneClass": "'{name}' och dess lista tas bort; ditt konto finns kvar.",
+      "other": "Ta bort en klass och dess lista; behåll resten."
+    },
+    "teacherDeleteReasonTitle": "Vad är huvudorsaken? (valfritt)",
     "teacherDeleteReason": {
       "too_many_emails": "För många mejl",
       "missing_features": "Funktioner saknas",
       "too_expensive": "För dyrt",
-      "privacy": "Integritetsskäl",
+      "didnt_work_for_class": "Fungerade inte för min klass",
+      "duplicate_account": "Dubblettkonto",
+      "privacy": "Integritet",
       "privacy_concerns": "Integritetsskäl",
       "not_using_it": "Använder det inte längre",
       "found_alternative": "Hittat ett alternativ",

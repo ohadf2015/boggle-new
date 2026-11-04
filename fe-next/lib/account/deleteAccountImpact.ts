@@ -21,6 +21,49 @@ export interface DeleteImpactClassroom {
   studentCount: number;
 }
 
+/**
+ * Billing truth for the "free stays free" card. LexiClash never stores cards;
+ * `renews` is the only honest local proxy for "a charge will happen again".
+ * portalUrl is not a column on public.subscriptions — null, and the client
+ * falls back to /[locale]/teacher/upgrade.
+ */
+export interface DeleteImpactBilling {
+  tier: 'free' | 'pro' | null;
+  status: string | null;
+  renews: boolean;
+  portalUrl: string | null;
+}
+
+export const EMPTY_DELETE_BILLING: DeleteImpactBilling = {
+  tier: null,
+  status: null,
+  renews: false,
+  portalUrl: null,
+};
+
+const RENEWING_STATUSES = new Set(['active', 'trialing', 'past_due']);
+
+/**
+ * renews = pro + a provider subscription id + a live status + not already
+ * set to cancel. No row, free, canceled, paused, and cancel_at_period_end
+ * all come back renews:false. Polar ids live in lemon_squeezy_subscription_id.
+ */
+export function billingFromSubscriptionRow(row: unknown): DeleteImpactBilling {
+  if (!row || typeof row !== 'object') return EMPTY_DELETE_BILLING;
+  const r = row as Record<string, unknown>;
+  const tier = r.tier === 'pro' || r.tier === 'free' ? r.tier : null;
+  const status = typeof r.status === 'string' ? r.status : null;
+  const subId = typeof r.lemon_squeezy_subscription_id === 'string' ? r.lemon_squeezy_subscription_id : null;
+  const renews =
+    tier === 'pro' &&
+    subId !== null &&
+    subId.length > 0 &&
+    status !== null &&
+    RENEWING_STATUSES.has(status) &&
+    r.cancel_at_period_end !== true;
+  return { tier, status, renews, portalUrl: null };
+}
+
 export interface DeleteImpactSummary {
   /** True when the user owns at least one classroom — the interstitial trigger. */
   isTeacher: boolean;
@@ -30,6 +73,12 @@ export interface DeleteImpactSummary {
   roundsPlayed: number;
   /** profiles.daily_email_subscribed — drives the "just stop the emails" alternative. */
   emailSubscribed: boolean;
+  billing: DeleteImpactBilling;
+  /**
+   * True once DELETE /api/education/classroom/[id] and the class-page affordance
+   * exist. Card C stays hidden when this is false — never a dead link.
+   */
+  perClassDeleteAvailable: boolean;
 }
 
 export const EMPTY_DELETE_IMPACT: DeleteImpactSummary = {
@@ -38,6 +87,8 @@ export const EMPTY_DELETE_IMPACT: DeleteImpactSummary = {
   totalStudents: 0,
   roundsPlayed: 0,
   emailSubscribed: true,
+  billing: EMPTY_DELETE_BILLING,
+  perClassDeleteAvailable: false,
 };
 
 type Db = Pick<SupabaseClient, 'from'>;
@@ -68,7 +119,7 @@ export async function loadDeleteImpact(db: Db, userId: string): Promise<DeleteIm
     if (classrooms.length === 0) return EMPTY_DELETE_IMPACT;
 
     const classroomIds = classrooms.map((c) => c.id);
-    const [membersRes, roundsRes, profileRes] = await Promise.all([
+    const [membersRes, roundsRes, profileRes, subRes] = await Promise.all([
       db
         .from('classroom_memberships')
         .select('classroom_id, student_id, is_rehearsal')
@@ -83,6 +134,11 @@ export async function loadDeleteImpact(db: Db, userId: string): Promise<DeleteIm
         .from('profiles')
         .select('daily_email_subscribed')
         .eq('id', userId)
+        .maybeSingle(),
+      db
+        .from('subscriptions')
+        .select('tier, status, lemon_squeezy_subscription_id, cancel_at_period_end')
+        .eq('user_id', userId)
         .maybeSingle(),
     ]);
 
@@ -107,6 +163,9 @@ export async function loadDeleteImpact(db: Db, userId: string): Promise<DeleteIm
       emailSubscribed: profileRes.error
         ? true
         : ((profileRes.data as { daily_email_subscribed: boolean | null } | null)?.daily_email_subscribed ?? true),
+      billing: subRes.error ? EMPTY_DELETE_BILLING : billingFromSubscriptionRow(subRes.data),
+      // Shipped with DELETE /api/education/classroom/[id] and the [id] page.
+      perClassDeleteAvailable: true,
     };
     impact.totalStudents = impact.classrooms.reduce((sum, c) => sum + c.studentCount, 0);
     return impact;
@@ -115,23 +174,51 @@ export async function loadDeleteImpact(db: Db, userId: string): Promise<DeleteIm
   }
 }
 
-/** Reasons the delete confirm can report; rides teacher_delete_* telemetry. */
+/** Reasons the delete confirm picker offers. Optional; never blocks deletion. */
 export const TEACHER_DELETE_REASONS = [
-  'too_many_emails',
-  'missing_features',
   'too_expensive',
+  'didnt_work_for_class',
+  'duplicate_account',
   'privacy',
   'other',
 ] as const;
 
 export type TeacherDeleteReason = (typeof TEACHER_DELETE_REASONS)[number];
 
-export function normalizeDeleteReason(raw: unknown): TeacherDeleteReason | null {
+/**
+ * Older picker values. Still accepted on the wire so a stale client (and
+ * historical events) keep a reason. Not shown in the picker.
+ */
+const LEGACY_DELETE_REASONS = [
+  'too_many_emails',
+  'missing_features',
+  'not_using_it',
+  'found_alternative',
+] as const;
+
+export type AcceptedDeleteReason = TeacherDeleteReason | (typeof LEGACY_DELETE_REASONS)[number];
+
+export function normalizeDeleteReason(raw: unknown): AcceptedDeleteReason | null {
   if (typeof raw !== 'string') return null;
   if (raw === 'privacy_concerns') return 'privacy';
-  return (TEACHER_DELETE_REASONS as readonly string[]).includes(raw)
-    ? (raw as TeacherDeleteReason)
-    : null;
+  if ((TEACHER_DELETE_REASONS as readonly string[]).includes(raw)) return raw as TeacherDeleteReason;
+  if ((LEGACY_DELETE_REASONS as readonly string[]).includes(raw)) return raw as AcceptedDeleteReason;
+  return null;
+}
+
+/** Plural-aware impact sentence. Nouns are already translated (one|other). */
+export function formatTeacherDeleteImpactSummary(
+  template: string,
+  counts: { classes: number; students: number; rounds: number },
+  nouns: { classNoun: string; studentNoun: string; roundNoun: string },
+): string {
+  return template
+    .replace('{classes}', String(counts.classes))
+    .replace('{students}', String(counts.students))
+    .replace('{rounds}', String(counts.rounds))
+    .replace('{classNoun}', nouns.classNoun)
+    .replace('{studentNoun}', nouns.studentNoun)
+    .replace('{roundNoun}', nouns.roundNoun);
 }
 
 export interface AdminDeleteResult {
