@@ -136,11 +136,13 @@ describe('AssignmentProgressReport', () => {
     expect(String(csv)).toContain('Missing');
   });
 
-  it('sends a free teacher to the existing upgrade route instead of downloading', () => {
+  it('renders no student rows for a free teacher — the matrix owns the Polar paywall', () => {
     proState.hasPro = false;
     render(<AssignmentProgressReport classroomId="c1" classroomName="English 101" />);
-    const cta = screen.getByTestId('assignment-progress-csv-upgrade');
-    expect(cta).toHaveAttribute('href', '/en/teacher/upgrade');
+    expect(screen.queryByTestId('assignment-progress-report')).not.toBeInTheDocument();
+    expect(screen.queryByText('Ada')).not.toBeInTheDocument();
+    expect(screen.queryByText('Ben')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('assignment-progress-csv-upgrade')).not.toBeInTheDocument();
     expect(screen.queryByTestId('assignment-progress-csv-export')).not.toBeInTheDocument();
     expect(downloadCsvFile).not.toHaveBeenCalled();
   });

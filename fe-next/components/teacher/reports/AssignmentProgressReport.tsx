@@ -3,15 +3,18 @@
 /**
  * Per-classroom assignment progress: every student × assignment as
  * completed/missing, with word-level score when the progress row has one.
- * On-screen for every teacher; CSV export is Teacher Pro only — free teachers
- * get a CTA to the existing /{locale}/teacher/upgrade route.
+ * The rows are Teacher Pro (paid or a live access trial) — the same rule as
+ * AssignmentProgressMatrix. A free teacher or an expired trial gets nothing
+ * here: no client read of student scores, no names. The matrix owns the
+ * Polar paywall. CSV export stays paid-Pro only.
  */
 
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import Link from 'next/link';
 import { Download, Lock } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
+import { teacherTrialStatus } from '@/lib/education/trial';
 import { getClassroomAssignments, getAssignmentCompletions } from '@/lib/supabase/education/assignments';
 import { getClassroomStudents } from '@/lib/supabase/education/classrooms';
 import { teacherFacingName } from '@/lib/education/rosterName';
@@ -40,9 +43,16 @@ export interface AssignmentProgressReportProps {
 
 export function AssignmentProgressReport({ classroomId, classroomName }: AssignmentProgressReportProps) {
   const { t, language } = useLanguage();
-  const { hasPro, loading: proLoading } = useTeacherPro();
+  const { hasPro, loading: proLoading, accessTrialExpires } = useTeacherPro();
+  const [nowMs] = useState(() => Date.now());
+  // Same entitlement as the matrix / ProGate: paid Pro or an unexpired access trial.
+  const trial = teacherTrialStatus(accessTrialExpires, nowMs);
+  const entitled = !proLoading && (hasPro || (trial !== null && !trial.isExpired));
 
   const load = useCallback(async () => {
+    // Never read student rows for a free teacher or an expired trial. The
+    // matrix paywall is the surface; this table must not be a second path.
+    if (!entitled) return { data: null, error: null };
     const [assignmentRes, studentRes] = await Promise.all([
       getClassroomAssignments(classroomId),
       getClassroomStudents(classroomId),
@@ -84,7 +94,7 @@ export function AssignmentProgressReport({ classroomId, classroomName }: Assignm
     });
 
     return { data: { rows }, error: null };
-  }, [classroomId, t]);
+  }, [classroomId, t, entitled]);
 
   const { data, loading, failed, retry } = useReportData(load);
 
@@ -104,6 +114,7 @@ export function AssignmentProgressReport({ classroomId, classroomName }: Assignm
     downloadCsvFile(t('teacher.reports.assignmentProgress.fileName', { name: classroomName }), csv);
   }, [data, t, classroomName]);
 
+  if (!entitled) return null;
   if (loading) return <ReportSkeleton />;
   if (failed) return <ReportError onRetry={retry} />;
   if (!data || data.rows.length === 0) {
