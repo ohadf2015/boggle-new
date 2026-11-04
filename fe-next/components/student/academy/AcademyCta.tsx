@@ -124,6 +124,7 @@ export function AcademyCta({ kind, activeGame, target, targetLabel, isJoining, j
         className={cn(
           'icon-only relative flex w-full items-center gap-3 overflow-hidden rounded-[20px] border-3 border-neo-black ps-2 pe-2 text-start text-neo-black disabled:cursor-wait',
           big ? 'min-h-[92px] gap-4 ps-3 pe-3' : compact ? 'h-14 gap-2' : 'min-h-[68px] sm:min-h-[76px]',
+          sub && !compact && 'py-2',
         )}
         // Its own layer: the endless pulse then never repaints the chrome around it.
         style={{ ...toneStyle(tone, { shadow: 5, trim: 2.5 }), willChange: 'transform' }}

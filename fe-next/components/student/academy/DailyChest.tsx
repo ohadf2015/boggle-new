@@ -150,26 +150,30 @@ export function DailyChest({ userId, reducedMotion, onGranted, size = 'sm', onRe
         title={label}
         disabled={!available}
         // Its own layer: the wiggle and the tap squash then never repaint the HUD and cards around it.
-        className={cn('icon-only relative flex flex-col items-center will-change-transform', size === 'md' ? 'h-[72px] w-[72px]' : 'h-12 w-12', !available && 'cursor-default')}
+        className={cn('icon-only relative flex flex-col items-center will-change-transform', size === 'md' && 'h-[72px] w-[72px]', !available && 'cursor-default')}
         // Idle wiggle: a small, rare shake — it asks, it does not shout.
         animate={wiggle ? { rotate: [0, -6, 6, -3, 0] } : undefined}
         transition={wiggle ? { duration: 0.8, repeat: Infinity, repeatDelay: 3.2 } : undefined}
         whileTap={available ? { scale: 0.9 } : undefined}
       >
-        <Image
-          src="/images/education/chest-books.webp"
-          alt=""
-          aria-hidden="true"
-          fill
-          unoptimized
-          sizes="96px"
-          className={cn('object-contain drop-shadow-[3px_3px_0_#000]', !fresh && 'opacity-60 grayscale')}
-        />
+        <span className={cn('relative block', size === 'md' ? 'h-full w-full' : 'h-12 w-12')}>
+          <Image
+            src="/images/education/chest-books.webp"
+            alt=""
+            aria-hidden="true"
+            fill
+            unoptimized
+            sizes="96px"
+            className={cn('object-contain drop-shadow-[3px_3px_0_#000]', !fresh && 'opacity-60 grayscale')}
+          />
+        </span>
+        {/* Small badge: the tag sits in flow, so the badge is as wide as its longest word (ru) and nothing it sits beside is covered. */}
         <span
           dir="auto"
+          data-testid="academy-daily-chest-tag"
           className={cn(
-            'absolute -bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border-2 font-neo-display text-xs font-black uppercase leading-[14px]',
-            size === 'md' ? 'px-1.5 tracking-wider' : 'px-1 tracking-normal',
+            'whitespace-nowrap rounded-full border-2 font-neo-display text-xs font-black uppercase leading-[14px]',
+            size === 'md' ? 'absolute -bottom-2 left-1/2 -translate-x-1/2 px-1.5 tracking-wider' : 'relative -mt-2.5 px-1 tracking-normal',
             fresh ? 'border-neo-black bg-neo-yellow text-neo-black' : 'border-neo-cream bg-neo-navy text-neo-white/80',
           )}
           style={fresh ? toneStyle('gold', { shadow: 2, trim: 1 }) : undefined}

@@ -40,8 +40,7 @@ export function HubTopCards({ goals, classroomId, warmup, due, chestOpen, streak
   const checklist = !(oneCard && due);
   return (
     <div data-testid="academy-top-row" className="mx-auto mt-1.5 flex min-h-12 w-full max-w-xl items-center gap-2">
-      {/* As wide as the chest's longest tag (ru), so the tag never reaches the screen edge or the card. */}
-      {lead && <div className="flex w-[5.75rem] shrink-0 justify-center">{lead}</div>}
+      {lead && <div className="flex shrink-0 justify-center ps-1">{lead}</div>}
       {ready && (
         <div className="flex min-w-0 flex-1 flex-col gap-1.5">
           {checklist && (showToday ? (

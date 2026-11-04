@@ -187,7 +187,7 @@ export async function measureIslands(page: Page): Promise<IslandReport> {
 /** The chest badge's tag (its longest word is ru) must stay on screen and off the cards beside it. */
 export async function measureChestTag(page: Page): Promise<string[]> {
   return page.evaluate(() => {
-    const tag = document.querySelector('[data-testid="academy-daily-chest"] > span');
+    const tag = document.querySelector('[data-testid="academy-daily-chest-tag"]');
     if (!tag) return ['tag:missing'];
     const r = tag.getBoundingClientRect();
     const bad: string[] = [];
