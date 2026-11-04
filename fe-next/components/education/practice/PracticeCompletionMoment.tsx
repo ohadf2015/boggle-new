@@ -21,7 +21,7 @@
  * reduced motion is a motion preference, not a silence preference.
  */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { AdaptiveMotion, useSkipAnimations } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -55,6 +55,10 @@ export interface PracticeCompletionMomentProps {
   nextLabel?: string;
   /** Back to the picker. */
   onBack: () => void;
+  /** A quieter follow-up under the actions (e.g. the words to review). */
+  footer?: ReactNode;
+  /** A status line under the headline (e.g. homework confirmed done). */
+  badge?: ReactNode;
   className?: string;
 }
 
@@ -73,6 +77,8 @@ export default function PracticeCompletionMoment({
   onNext,
   nextLabel,
   onBack,
+  footer,
+  badge,
   className,
 }: PracticeCompletionMomentProps) {
   const { t, dir } = useLanguage();
@@ -191,6 +197,7 @@ export default function PracticeCompletionMoment({
         <h2 className="font-neo-display text-2xl font-black uppercase leading-none text-neo-white text-balance">
           {headline}
         </h2>
+        {badge}
 
         {/* Mascot reacts to the rank — celebration, trophy or a pat on the back. */}
         <Mascot variant={plan.mascot} size="sm" animated clipBorder="none" />
@@ -288,6 +295,7 @@ export default function PracticeCompletionMoment({
               {t('student.practiceFun.again')}
             </button>
           )}
+          {footer}
         </div>
       </div>
 

@@ -52,6 +52,26 @@ export function pickHubLayout({ width, height }: { width: number; height: number
   return { art, chrome, scale: rounded, sideCard: chrome === 'wide' && width / rounded >= SIDE_CARD_MIN_WIDTH };
 }
 
+/** The portrait path needs a tall band; a band this much wider than tall reads better as the landscape map. */
+const LANDSCAPE_BAND_ASPECT = 1.25;
+/** Below this width the landscape path's plaques cannot sit side by side. */
+const LANDSCAPE_BAND_MIN_WIDTH = 600;
+
+/** The art for the band the chrome leaves free, not for the window: a 4:3 tablet's band is wide. */
+export function pickMapArt(base: MapArt, view: { width: number; height: number }, insets: { top: number; bottom: number }): MapArt {
+  if (base === 'landscape') return base;
+  const band = Math.max(1, view.height - insets.top - insets.bottom);
+  return view.width >= LANDSCAPE_BAND_MIN_WIDTH && view.width / band >= LANDSCAPE_BAND_ASPECT ? 'landscape' : 'portrait';
+}
+
+/** A stacked hub shorter than this needs Lexi's row for the map. */
+const MASCOT_MIN_STACK_HEIGHT = 800;
+
+export function showMascot(chrome: HubChrome, hubHeight: number): boolean {
+  if (chrome === 'rail') return false;
+  return chrome !== 'stack' || hubHeight >= MASCOT_MIN_STACK_HEIGHT;
+}
+
 function readView() {
   if (typeof window === 'undefined') return { width: 390, height: 844 };
   return { width: window.innerWidth, height: window.innerHeight };

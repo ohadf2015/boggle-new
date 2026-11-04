@@ -137,18 +137,22 @@ export function scheduleSpecialWords(gameCode: string, letterGrid: LetterGrid, g
  * and re-send each student their own word bank. Per-socket, not a broadcast:
  * `classroomLevel` differs per student (pitfall class 3).
  */
-export function recordClassroomWordBank(io: Server, gameCode: string, game: GameState, letterGrid: LetterGrid, gameLang: Language, vocabToEmbed: string[]): void {
+export function recordClassroomWordBank(io: Server, gameCode: string, game: GameState, letterGrid: LetterGrid, gameLang: Language, vocabToEmbed: string[], teacherId?: string): void {
   const finalPositions = makePositionsMap(letterGrid, gameLang);
   const placedVocabulary = vocabToEmbed
     .filter((word) => isWordOnBoard(word, letterGrid, finalPositions, gameLang))
     .map((word) => (gameLang === 'he' ? applyHebrewFinalLetters(word) : word));
   void setClassroomGamePlacedVocabulary(gameCode, placedVocabulary).then(() => {
     for (const user of Object.values(game.users || {})) {
-      const memberSocket = getSocketById(io, (user as { socketId?: string })?.socketId ?? '');
+      const { socketId, authUserId } = (user ?? {}) as { socketId?: string; authUserId?: string | null };
+      const memberSocket = getSocketById(io, socketId ?? '');
       if (!memberSocket) continue;
+      const data = (memberSocket.data ?? {}) as Record<string, unknown>;
+      // The host creates the room rather than joining it, so its socket may never carry the join-path flag.
+      const isTeacher = (!!teacherId && authUserId === teacherId) || !!data.classroomIsTeacher;
       safeEmit(memberSocket, 'classroomContext', {
-        classroomLevel: ((memberSocket.data as Record<string, unknown>)?.classroomLevel as string) ?? 'core',
-        classroomWordBank: placedVocabulary,
+        classroomLevel: (data.classroomLevel as string) ?? 'core',
+        classroomWordBank: isTeacher ? [] : placedVocabulary,
       });
     }
   }).catch((err) => {

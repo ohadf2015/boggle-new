@@ -36,6 +36,7 @@ import {
   type VocabQuizSession,
 } from './vocabQuizEngine.js';
 import { withBoss } from './vocabQuizBoss.js';
+import { buildQuizResultsPayload, type QuizResultsPayload } from './vocabQuizResults.js';
 import { getQuizSession, deleteQuizSession } from '../modules/vocabQuizStore.js';
 import { VOCAB_QUIZ_EVENTS, VOCAB_QUIZ_REVEAL_MS } from '@/shared/types/vocabQuiz';
 import { getGameRoom } from '../utils/socketHelpers.js';
@@ -77,9 +78,6 @@ export async function finishQuiz(io: Server, gameCode: string): Promise<void> {
     standings,
     totalQuestions: session.questions.length,
   });
-  toRoom(io, gameCode, VOCAB_QUIZ_EVENTS.ended, endedPayload);
-  const room = getGame(gameCode);
-  if (room) room.cachedResultsPayload = quizEndedResultsPayload(endedPayload as unknown as Record<string, unknown>);
 
   // Retire the room in the board engine's state machine too, so its timeout
   // path can never fire a second, board-shaped end for this room.
@@ -90,8 +88,35 @@ export async function finishQuiz(io: Server, gameCode: string): Promise<void> {
     logger.warn('VOCAB_QUIZ', `Could not retire room ${gameCode}: ${(err as Error).message}`);
   }
 
+  let classroomGame: Awaited<ReturnType<typeof getClassroomGame>> = null;
   try {
-    const classroomGame = await getClassroomGame(gameCode);
+    classroomGame = await getClassroomGame(gameCode);
+  } catch (err) {
+    logger.warn('VOCAB_QUIZ', `Could not load classroom game ${gameCode}: ${(err as Error).message}`);
+  }
+
+  // A teacher-run quiz ends on the shared classroom recap. The results go out
+  // before `ended` so no surface paints the quiz's own finale first.
+  let results: QuizResultsPayload | null = null;
+  if (classroomGame) {
+    try {
+      results = await buildQuizResultsPayload({ session, gameCode, classroomGame, room: getGame(gameCode) });
+    } catch (err) {
+      logger.warn('VOCAB_QUIZ', `Failed to build classroom recap for quiz ${gameCode}: ${(err as Error).message}`);
+    }
+  }
+  if (results) {
+    toRoom(io, gameCode, 'validatedScores', results);
+    toRoom(io, gameCode, 'validationComplete', results);
+  }
+  toRoom(io, gameCode, VOCAB_QUIZ_EVENTS.ended, endedPayload);
+  const room = getGame(gameCode);
+  if (room) {
+    const ended = quizEndedResultsPayload(endedPayload as unknown as Record<string, unknown>);
+    room.cachedResultsPayload = results ? { ...results, ...ended } : ended;
+  }
+
+  try {
     if (!classroomGame) return;
 
     await updateClassroomGameStatus(gameCode, 'finished');

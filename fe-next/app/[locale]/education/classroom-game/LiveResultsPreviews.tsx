@@ -11,7 +11,7 @@
  *   ?preview=duel        — a duel reveal (`&duel=win|loss|draw`)
  *   ?preview=ended       — a student whose room is gone
  *
- * Shared query: `&outcome=zero|solo|tie|nolesson`, `&boss=defeated|escaped`,
+ * Shared query: `&outcome=zero|solo|tie|nolesson`, `&boss=defeated|escaped`, `&qboss=defeated|escaped`,
  * `&count=N` (class size), `&long=1` (a 28-character winner name), `&rounds=N`, `&me=Name`.
  */
 
@@ -31,6 +31,7 @@ import { EduStudentHero } from '@/components/education/live/EduStudentHero';
 import LockerGrid from '@/components/education/economy/LockerGrid';
 import { LIVE_KEYFRAMES } from '@/components/education/live/eduLiveStyles';
 import { useClassroomBossStore } from '@/stores/classroomBossStore';
+import { quizBossView } from '@/components/education/boss/useQuizBossVerdict';
 import { CLASSROOM_ROOM_GONE_KEY } from '@/lib/education/classroomRoomGone';
 import type { PreviewOutcome } from '@/components/education/results/previewFixtures';
 import {
@@ -53,14 +54,19 @@ function usePreviewRound() {
   return useMemo(() => samplePreviewRound(outcome, { count, longNames, rounds }), [outcome, count, longNames, rounds]);
 }
 
-/** Seeds the boss store from `&boss=`, and clears it again so other previews start clean. */
+/** Seeds the boss store from `&boss=` (board boss) or `&qboss=` (quiz boss), and clears it so other previews start clean. */
 function useSeededBoss() {
-  const boss = useSearchParams()?.get('boss');
+  const params = useSearchParams();
+  const boss = params?.get('boss');
+  const qboss = params?.get('qboss');
   useEffect(() => {
-    if (boss !== 'defeated' && boss !== 'escaped') return;
-    useClassroomBossStore.getState().receiveState(sampleBossView(boss));
+    const store = useClassroomBossStore.getState();
+    if (boss === 'defeated' || boss === 'escaped') store.receiveState(sampleBossView(boss));
+    else if (qboss === 'defeated' || qboss === 'escaped') {
+      store.receiveState(quizBossView({ maxHp: 100, hp: qboss === 'defeated' ? 0 : 38, lastHits: 3, defeated: qboss === 'defeated' }));
+    } else return;
     return () => useClassroomBossStore.getState().reset();
-  }, [boss]);
+  }, [boss, qboss]);
 }
 
 export function HostResultsPreview() {

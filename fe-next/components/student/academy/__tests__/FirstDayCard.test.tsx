@@ -43,3 +43,17 @@ describe('<FirstDayCard>', () => {
     expect(container).toBeEmptyDOMElement();
   });
 });
+
+describe('<FirstDayCard> on a phone', () => {
+  it('keeps the three goals in one row at every width, so the card never grows into the map', () => {
+    render(<FirstDayCard goals={buildFirstDayGoals({ hasClass: true, stars: 0, streak: 0 })} hasClass />);
+    const list = screen.getByTestId('academy-first-day-join').parentElement!;
+    expect(list.className).toMatch(/\bgrid-cols-3\b/);
+    expect(list.className).not.toMatch(/grid-cols-1/);
+  });
+
+  it('drops its own chest art when the real chest badge sits beside it', () => {
+    const { container } = render(<FirstDayCard goals={buildFirstDayGoals({ hasClass: true, stars: 0, streak: 0 })} hasClass chestArt={false} />);
+    expect(container.querySelector('img')).toBeNull();
+  });
+});

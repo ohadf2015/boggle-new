@@ -67,9 +67,12 @@ export async function emitClassroomContext(
     // not have to re-query Supabase per student — nor guess, which would quietly
     // demote a support student to core mid-round.
     (socket.data as Record<string, unknown>).classroomLevel = classroomLevel;
+    // The bank is a student's hunt list; on the teacher's projector it would paint over the board.
+    const isTeacher = !!authUserId && authUserId === classroomGame.teacherId;
+    (socket.data as Record<string, unknown>).classroomIsTeacher = isTeacher;
     safeEmit(socket, 'classroomContext', {
       classroomLevel,
-      classroomWordBank: wordBank,
+      classroomWordBank: isTeacher ? [] : wordBank,
     });
   } catch (err) {
     logger.warn('CLASSROOM_GAME', `classroomContext lookup failed for ${gameCode}: ${(err as Error)?.message ?? err}`);

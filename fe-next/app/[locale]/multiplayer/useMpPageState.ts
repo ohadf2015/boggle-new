@@ -12,6 +12,7 @@ import { useClassroomLiveGame } from '@/hooks/useLiveClassroomGameInfo';
 import { useFollowedClassroomGame } from '@/components/student/live/useFollowedClassroomGame';
 import { useTeacherStripState } from '@/components/education/controls/useTeacherStripState';
 import { useIsVocabQuizRoom, quizOwnsRoundEnd } from '@/components/education/vocabQuiz/useIsVocabQuizRoom';
+import { useQuizBossVerdict } from '@/components/education/boss/useQuizBossVerdict';
 import { resolveClassroomContext, type ClassroomContext } from '@/lib/education/classroomRoomGone';
 import { SocketContext } from '@/utils/SocketContext';
 import { clearSessionPreservingUsername } from '@/utils/session';
@@ -371,8 +372,9 @@ export function useMpPageState() {
   // Round state from the server's own traffic: the host never writes the store's `gameActive` (see controls/teacherStripVisibility).
   const teacherStrip = useTeacherStripState({ socket, isActive, isHost, isClassroomMode, showResults, storeGameActive: gameActive });
   const quizOwnsScreen = useIsVocabQuizRoom(socket);
-  // A Vocab Quiz ends on its own podium; the board results would show zeros (see quizOwnsRoundEnd).
-  const quizEndsThisRound = quizOwnsRoundEnd({ isQuizRoom: quizOwnsScreen, showResults, isActive });
+  useQuizBossVerdict(socket);
+  // A classroom quiz ends on the shared recap; without one, the board results would show zeros (see quizOwnsRoundEnd).
+  const quizEndsThisRound = quizOwnsRoundEnd({ isQuizRoom: quizOwnsScreen, showResults, isActive, hasClassroomRecap: !!resultsData?.classroomSummary });
   const phase = resolveMpPagePhase({ showResults, quizEndsThisRound, isActive, isHost });
 
   const routerProps: MpPhaseRouterProps = {

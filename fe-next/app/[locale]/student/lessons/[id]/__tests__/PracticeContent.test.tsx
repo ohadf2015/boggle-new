@@ -62,8 +62,8 @@ vi.mock('@/components/education/practicePicker/PracticePicker', () => ({
 
 vi.mock('@/components/education/practice/PracticeModeStage', () => ({
   __esModule: true,
-  default: ({ mode, variant, onBack }: { mode: string; variant: string | null; onBack: () => void }) => (
-    <div data-testid="stage" data-mode={mode} data-variant={variant ?? ''}>
+  default: ({ mode, variant, onBack, wordCraftReview }: { mode: string; variant: string | null; onBack: () => void; wordCraftReview?: { studentId: string; lessonId: string } }) => (
+    <div data-testid="stage" data-mode={mode} data-variant={variant ?? ''} data-review={wordCraftReview ? `${wordCraftReview.studentId}/${wordCraftReview.lessonId}` : ''}>
       <button type="button" data-testid="stage-back" onClick={onBack}>leave</button>
     </div>
   ),
@@ -139,6 +139,16 @@ describe('PracticeContent', () => {
     expect(stage).toHaveAttribute('data-mode', 'solo_board');
     expect(stage).toHaveAttribute('data-variant', 'wordcraft');
     expect(mockStartSession).toHaveBeenCalledWith('solo_board', { variant: 'wordcraft' });
+  });
+
+  it('GIVEN a signed-in student WHEN Word Craft opens THEN its missed words are queued for that student on this lesson', async () => {
+    renderContent({ initialMode: 'solo_board', initialVariant: 'wordcraft', reviewStudentId: 'stu-1' });
+    expect(await screen.findByTestId('stage')).toHaveAttribute('data-review', 'stu-1/lesson-1');
+  });
+
+  it('GIVEN no account WHEN Word Craft opens THEN nothing is queued for review', async () => {
+    renderContent({ initialMode: 'solo_board', initialVariant: 'wordcraft' });
+    expect(await screen.findByTestId('stage')).toHaveAttribute('data-review', '');
   });
 
   // Guard test. NOTE: under this vitest setup StrictMode does not replay mount

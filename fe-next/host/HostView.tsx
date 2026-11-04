@@ -19,7 +19,7 @@ import {
 import HostPreGameView from './components/HostPreGameView';
 import HostInGameView from './components/HostInGameView';
 import TvBroadcastView from './components/TvBroadcastView';
-import { projectorShowsQuiz } from '@/components/education/vocabQuiz/useIsVocabQuizRoom';
+import { projectorShowsQuiz, useRecapShownLatch } from '@/components/education/vocabQuiz/useIsVocabQuizRoom';
 import TvLobbyView from './components/tv-broadcast/TvLobbyView';
 import { TvResultsView } from './components/tv-results';
 import {
@@ -51,6 +51,7 @@ const HostView: React.FC<HostViewProps> = memo((props) => {
     handleHostNameChange, handleHostAvatarChange,
   } = useHostPhase(props);
   useClassroomBossSocket(isClassroomMode ? socket : null, gameCode);
+  const recapShown = useRecapShownLatch(socket, !!tournament.finalScores?.classroomSummary);
 
   useClassroomSettingsSeed({
     isClassroomMode,
@@ -272,7 +273,7 @@ const HostView: React.FC<HostViewProps> = memo((props) => {
         />
         </MpRoundScreen>
       )}
-      {projectorShowsQuiz({ gameStarted: !!runtime.gameStarted, hasActiveGameData: !!hasActiveGameData, waitingForResults: !!runtime.waitingForResults, hostPlaying: !!settings.hostPlaying, hasBoard: !!runtime.tableData, isQuizRoom: isVocabQuizRoom }) && (
+      {projectorShowsQuiz({ gameStarted: !!runtime.gameStarted, hasActiveGameData: !!hasActiveGameData, waitingForResults: !!runtime.waitingForResults, hostPlaying: !!settings.hostPlaying, hasBoard: !!runtime.tableData, isQuizRoom: isVocabQuizRoom, hasRecap: recapShown }) && (
         <TvBroadcastView
           gameCode={gameCode}
           username={username}

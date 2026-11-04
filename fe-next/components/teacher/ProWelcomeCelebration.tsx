@@ -1,5 +1,6 @@
 'use client';
 
+import { isCheckoutRedirectPending } from '@/lib/education/checkoutReturn';
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Gift, BarChart3, FileText, Users, X } from 'lucide-react';
@@ -27,16 +28,18 @@ const DATE_LOCALE: Record<string, string> = {
  *   and must be told where to manage or cancel it — the gifted "no card, ends
  *   on {date}" lines would be a lie for her.
  */
-export function ProWelcomeCelebration({ grant, paid = false }: { grant: TeacherProGrant | null; paid?: boolean }) {
+export function ProWelcomeCelebration({ grant, paid = false, onReturnPage = false }: { grant: TeacherProGrant | null; paid?: boolean; onReturnPage?: boolean }) {
   const { t, language } = useLanguage();
-  const [open, setOpen] = useState(() => paid || (!!grant && !grant.welcomed));
+  // The landing is moving on to the page checkout started from; that page celebrates instead.
+  const leaving = paid && !onReturnPage && typeof window !== 'undefined' && isCheckoutRedirectPending(window.sessionStorage, window.location.pathname);
+  const [open, setOpen] = useState(() => (paid && !leaving) || (!!grant && !grant.welcomed));
   const marked = useRef(false);
 
   // Paid can flip to true after mount: the dashboard keeps re-reading the
   // entitlement while Polar's webhook is still in flight.
   useEffect(() => {
-    if (paid) setOpen(true);
-  }, [paid]);
+    if (paid && !leaving) setOpen(true);
+  }, [paid, leaving]);
 
   useEffect(() => {
     if (!open || marked.current) return;
@@ -54,14 +57,14 @@ export function ProWelcomeCelebration({ grant, paid = false }: { grant: TeacherP
   // is a gift, not a conversion, so it never counts. The tracker dedupes reloads.
   const successTracked = useRef(false);
   useEffect(() => {
-    if (!paid || successTracked.current) return;
+    if (!paid || leaving || successTracked.current) return;
     successTracked.current = true;
     try {
       trackEduProCheckoutSuccessSeen();
     } catch {
       /* analytics must never block the celebration */
     }
-  }, [paid]);
+  }, [paid, leaving]);
 
   const close = () => {
     setOpen(false);
@@ -108,9 +111,9 @@ export function ProWelcomeCelebration({ grant, paid = false }: { grant: TeacherP
           type="button"
           onClick={close}
           aria-label={t('common.close')}
-          className="absolute top-3 end-3 flex h-9 w-9 items-center justify-center rounded-full border-2 border-black bg-neo-white shadow-hard-sm hover:-translate-y-0.5 transition-transform"
+          className="absolute top-3 end-3 flex h-9 w-9 items-center justify-center rounded-full border-2 border-black bg-neo-white text-black shadow-hard-sm hover:-translate-y-0.5 transition-transform"
         >
-          <X className="size-4" />
+          <X className="size-4" aria-hidden="true" />
         </button>
 
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-neo border-3 border-black bg-neo-lime shadow-hard">

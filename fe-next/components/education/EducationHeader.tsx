@@ -20,6 +20,7 @@ import { SearchIconButton } from './SearchIconButton';
 import { useSafeArea } from '@/hooks/useSafeArea';
 import { isTeacherProfile } from '@/lib/education/teacherRole';
 import { educationBackHref, educationHomeFor } from '@/lib/navigation/educationBackHref';
+import { educationExitHref, educationViewerRole } from '@/lib/navigation/eduExitTargets';
 
 /**
  * Flattens the controls inside the utility bar: no per-button border, hard
@@ -79,7 +80,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
   compact = false,
 }) => {
   const { t, language } = useLanguage();
-  const { isAuthenticated, profile } = useAuth();
+  const { isAuthenticated, profile, user } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const safeArea = useSafeArea();
@@ -126,9 +127,8 @@ export const EducationHeader = memo<EducationHeaderProps>(({
   const isOnTeacherSection = pathname?.includes('/teacher');
   const isOnStudentSection = pathname?.includes('/student');
 
-  const eduRole = isTeacher ? 'teacher' : profile?.user_role === 'student' ? 'student' : null;
-  // Only a signed-out visitor on a public page may leave for the game home; a teacher or student stays in their hub.
-  const exitHref = eduRole ? undefined : `/${language}`;
+  const eduRole = educationViewerRole({ isTeacher, userRole: profile?.user_role, isAnonymous: user?.is_anonymous });
+  const exitHref = educationExitHref(language, eduRole);
 
   const handleBackClick = useCallback(() => {
     if (onBack) return onBack();

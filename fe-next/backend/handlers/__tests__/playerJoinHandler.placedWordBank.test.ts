@@ -97,6 +97,25 @@ describe('emitClassroomContext — the word bank is what is on the board', () =>
       classroomWordBank: [],
     });
   });
+  it('sends the teacher no word bank, so the projector never paints a student hunt strip', async () => {
+    (classroomGameManager.getClassroomGame as Mock).mockResolvedValue({
+      classroomId: 'c1',
+      teacherId: 'teacher-1',
+      vocabularyWords: LESSON_WORDS,
+      placedVocabulary: ['STOMATA'],
+      status: 'playing',
+    });
+    (membership.getClassroomMembershipLevel as Mock).mockResolvedValue('core');
+
+    await emitClassroomContextForTest(SOCKET as never, 'ABC123', 'teacher-1');
+
+    expect(safeEmit).toHaveBeenCalledWith(SOCKET as never, 'classroomContext', {
+      classroomLevel: 'core',
+      classroomWordBank: [],
+    });
+    expect(SOCKET.data.classroomIsTeacher).toBe(true);
+  });
+
   it('caches the resolved level on the socket for the game-start re-send', async () => {
     // GIVEN a support student in a waiting classroom game
     (classroomGameManager.getClassroomGame as Mock).mockResolvedValue({

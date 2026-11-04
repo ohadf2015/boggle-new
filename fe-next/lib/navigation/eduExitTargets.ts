@@ -2,7 +2,7 @@
  * Destinations for education exits that were decided inline in components or
  * hooks. Kept pure so the route matrix can pin them.
  */
-import { educationHomeFor } from '@/lib/navigation/educationBackHref';
+import { educationHomeFor, type EducationRole } from '@/lib/navigation/educationBackHref';
 import { classroomLivePath } from '@/lib/education/classroomLivePath';
 
 /** Quick Play opened from the student Academy goes back to the Academy, not the arcade home. */
@@ -29,4 +29,22 @@ const CLASSROOM_GAME_RE = /^\/([a-z]{2})\/education\/classroom-game\/?$/;
 export function classroomGameAndroidBackHref(pathname: string | null | undefined, isTeacher: boolean): string | null {
   const match = CLASSROOM_GAME_RE.exec(pathname || '');
   return match && isTeacher ? educationHomeFor(match[1], 'teacher') : null;
+}
+
+interface EducationViewer {
+  isTeacher: boolean;
+  userRole: string | null | undefined;
+  isAnonymous: boolean | null | undefined;
+}
+
+/** A guest student (anonymous account) belongs to the student hub, like a signed-in student. */
+export function educationViewerRole({ isTeacher, userRole, isAnonymous }: EducationViewer): EducationRole {
+  if (isTeacher) return 'teacher';
+  if (userRole === 'student' || isAnonymous) return 'student';
+  return null;
+}
+
+/** Only a signed-out visitor on a public page may leave for the game home. */
+export function educationExitHref(locale: string, role: EducationRole): string | undefined {
+  return role ? undefined : `/${locale}`;
 }

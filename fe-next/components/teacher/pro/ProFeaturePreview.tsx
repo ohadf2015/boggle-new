@@ -16,6 +16,9 @@ import {
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
+/** On a phone the sample keeps two rows, so the upgrade button stays above the fold. */
+const PHONE_ROWS = 2;
+
 const LEVEL_BG: Record<SampleLevel, string> = {
   mastered: 'bg-neo-lime',
   learning: 'bg-neo-yellow',
@@ -76,6 +79,7 @@ function AnalyticsPreview({ calm = false }: { calm?: boolean }) {
             data-testid="pro-preview-student-row"
             className={cn(
               'flex items-center gap-2 rounded-neo border-2 px-2 py-1',
+              i >= PHONE_ROWS && 'max-sm:hidden',
               s.trend === 'down' && !calm ? 'border-neo-pink bg-neo-pink/10' : 'border-neo-cream/40 bg-neo-navy-light',
             )}
           >
@@ -185,7 +189,7 @@ function ReportsPreview({ calm = false }: { calm?: boolean }) {
         </div>
         <ul className="mt-1 space-y-0.5">
           {SAMPLE_STUDENTS.map((s, i) => (
-            <li key={names[i]} className="flex justify-between text-[11px] font-bold">
+            <li key={names[i]} className={cn('flex justify-between text-[11px] font-bold', i >= PHONE_ROWS && 'max-sm:hidden')}>
               <span className="truncate">{names[i]}</span>
               <span className="tabular-nums">{s.accuracy}%</span>
             </li>
@@ -193,7 +197,7 @@ function ReportsPreview({ calm = false }: { calm?: boolean }) {
         </ul>
         <p className="mt-1 text-[11px] font-black">{t('eg2Pro.sample.reportWords')}: {reteach}</p>
       </div>
-      <p className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-neo-white/80">
+      <p className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-neo-white/80 max-sm:hidden">
         <Printer className="h-3.5 w-3.5" aria-hidden /> {t('eg2Pro.sample.print')}
       </p>
     </Frame>

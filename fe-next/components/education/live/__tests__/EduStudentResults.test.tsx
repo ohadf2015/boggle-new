@@ -205,11 +205,11 @@ describe('EduStudentResults', () => {
     expect(screen.queryByTestId('edu-student-class-goal')).toBeNull();
   });
 
-  it('given results are up, then the phone says the teacher picks what is next and offers the warm-up while waiting', () => {
+  it('given results are up, then the phone says once that the teacher starts the next round and offers the warm-up while waiting', () => {
     render(<EduStudentResults {...(props as object)} />);
-    const wait = screen.getByTestId('edu-student-wait-next');
-    expect(wait).toHaveTextContent('eduLiveRoom.studentResults.waitNext');
-    expect(wait.querySelector('[data-testid="waiting-warmup"]')).not.toBeNull();
+    expect(screen.getAllByRole('status')).toHaveLength(1);
+    expect(screen.getByTestId('wait-for-teacher-message')).toHaveTextContent('education.results.waitingForTeacher');
+    expect(screen.getByTestId('edu-student-wait-next').querySelector('[data-testid="waiting-warmup"]')).not.toBeNull();
   });
 
   it('given the first round of a session, when results show, then no momentum chips appear', () => {
