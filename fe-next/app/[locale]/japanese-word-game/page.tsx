@@ -174,6 +174,14 @@ export default async function JapaneseWordGamePage({ params }: PageProps) {
           </Link>
         </section>
 
+        <p className="mb-12 text-neo-gray-200">
+          手持ちの文字で作れる言葉を知りたいときは、
+          <Link href="/ja/tools/word-solver" className="text-neo-cyan underline">
+            アナグラム検索
+          </Link>
+          で並べ替えの候補をまとめて確認できます。
+        </p>
+
         <section className="mb-12">
           <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">よくある質問</h2>
           <div className="space-y-4">
