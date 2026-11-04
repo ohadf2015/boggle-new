@@ -3,7 +3,7 @@ import { CHUNK_BOOT_GUARD_SCRIPT } from '../chunkBootGuard';
 
 type Handler = (e: unknown) => void;
 
-function makeWindow(storageThrows = false) {
+function makeWindow(storageThrows = false, userAgent = 'Mozilla/5.0 (Macintosh) Chrome/140 Safari/537.36') {
   const listeners: Record<string, Handler[]> = {};
   const store: Record<string, string> = {};
   const sessionStorage = storageThrows
@@ -18,6 +18,7 @@ function makeWindow(storageThrows = false) {
         removeItem: (k: string) => { delete store[k]; },
       };
   const win = {
+    navigator: { userAgent },
     sessionStorage,
     location: {
       href: 'https://lexiclash.live/en',
@@ -146,5 +147,28 @@ describe('CHUNK_BOOT_GUARD_SCRIPT', () => {
     runGuard(w.win as unknown as Record<string, unknown>);
     fire(w, 'error', script404);
     expect((w.win as unknown as { name?: string }).name).toBe('oauth-popup__lc_cbr1');
+  });
+});
+
+describe('CHUNK_BOOT_GUARD_SCRIPT with crawlers', () => {
+  it.each([
+    'Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+    'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm) Chrome/136.0.0.0 Safari/537.36',
+    'Mozilla/5.0 (compatible; YandexBot/3.0; +http://yandex.com/bots)',
+    'Mozilla/5.0 (compatible; Baiduspider-render/2.0; +http://www.baidu.com/search/spider.html)',
+  ])('never navigates for %s', (ua) => {
+    const w = makeWindow(false, ua);
+    runGuard(w.win);
+    fire(w, 'error', script404);
+    fire(w, 'error', chunkMessage);
+    expect(w.win.location.replace).not.toHaveBeenCalled();
+    expect(w.win.location.reload).not.toHaveBeenCalled();
+  });
+
+  it('still recovers a real visitor', () => {
+    const w = makeWindow(false, 'Mozilla/5.0 (Linux; Android 14; CUBOT X30) AppleWebKit/537.36 Chrome/140 Mobile Safari/537.36');
+    runGuard(w.win);
+    fire(w, 'error', script404);
+    expectNavigatedOnce(w);
   });
 });
