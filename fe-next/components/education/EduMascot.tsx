@@ -1,6 +1,6 @@
 'use client';
 
-import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { useEduReducedMotion } from '@/lib/education/motion/useEduReducedMotion';
 import { cn } from '@/lib/utils';
 import { EDU_MASCOT, EDU_MASCOT_VIDEO, type EduMascotPose } from '@/lib/education/mascotArt';
 
@@ -20,7 +20,7 @@ export function EduMascot({
   className?: string;
   animate?: boolean;
 }) {
-  const reduced = usePrefersReducedMotion();
+  const reduced = useEduReducedMotion();
   const loop = (EDU_MASCOT_VIDEO as Partial<Record<EduMascotPose, { src: string; poster: string }>>)[moment];
   const video = loop?.src;
   const poster = loop?.poster;
