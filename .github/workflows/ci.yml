@@ -15,7 +15,8 @@ concurrency:
   cancel-in-progress: ${{ github.event_name != 'push' }}
 
 # Two gates:
-#   ci-success  REQUIRED for merge. Needs only `quick`, which installs nothing heavy and ends in about a minute.
+#   ci-success  REQUIRED for merge. Needs `quick` and `types`: Railway's build stops at the type check, so a type
+#               error on master blocks every deploy.
 #   ci-full     NOT required. Waits for lint, tsc, the sharded tests, guards and backend, and fails the run when
 #               any of them fails, so a PR shows red within minutes and a bad merge to master opens an issue.
 jobs:
@@ -235,11 +236,12 @@ jobs:
   # REQUIRED branch-protection gate; keep the name. Only the quick job: ends in about a minute.
   ci-success:
     runs-on: ubuntu-latest
-    needs: [quick]
+    needs: [quick, types]
     if: always()
     steps:
       - run: |
           [[ "${{ needs.quick.result }}" == "success" ]] || { echo "❌ quick checks failed"; exit 1; }
+          [[ "${{ needs.types.result }}" == "success" ]] || { echo "❌ type check failed"; exit 1; }
 
   # NOT required. Fails the run if any heavy job failed, so the PR shows red and master opens an issue.
   ci-full:
