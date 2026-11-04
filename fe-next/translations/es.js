@@ -6735,7 +6735,14 @@ const es = {
       "codeSent": "Código enviado",
       "enterCode": "Ingresa tu código"
     },
-    "trustBadge": "Seguro y privado"
+    "emailHint": {
+      "suggest": "¿Quisiste decir {email}?",
+      "useSuggestion": "Usar esta dirección",
+      "noMx": "Ese dominio no tiene servidor de correo. El mensaje de confirmación no llegará.",
+      "useAnyway": "Enviar igual",
+      "teacherToggle": "Soy docente"
+    },
+    "trustBadge": "Seguro y privado",
   },
   "legal": {
     "title": "Legal",

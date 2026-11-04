@@ -7481,6 +7481,13 @@ const sv = {
       "changeEmail": "Ändra e-post",
       "resend": "Skicka igen"
     },
+    "emailHint": {
+      "suggest": "Menade du {email}?",
+      "useSuggestion": "Använd den här adressen",
+      "noMx": "Den domänen har ingen e-postserver. Bekräftelsen kommer inte fram.",
+      "useAnyway": "Skicka ändå",
+      "teacherToggle": "Jag är lärare"
+    },
     "trustBadge": "Säkert och privat",
     "callback": {
       "completingSignIn": "Slutför inloggning...",

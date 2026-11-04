@@ -62,6 +62,18 @@ describe('persistProfileAttribution', () => {
     expect(body.utm_source).toBeNull();
   });
 
+  it('fills landing_path from signup metadata when this browser has no first touch', async () => {
+    fetchMock.mockResolvedValue({ ok: true, status: 200 });
+    const ok = await persistProfileAttribution(null, {
+      metadata: { signup_surface: 'edu_access', landing_path: '/en/education', language: 'en' },
+    });
+    expect(ok).toBe(true);
+    const body = JSON.parse(fetchMock.mock.calls[0][1].body);
+    expect(body.signup_surface).toBe('edu_access');
+    expect(body.landing_path).toBe('/en/education');
+    expect(body.language).toBe('en');
+  });
+
   it('skips the round-trip entirely when there is nothing to persist', async () => {
     const ok = await persistProfileAttribution(null);
     expect(ok).toBe(false);
