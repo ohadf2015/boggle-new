@@ -36,6 +36,7 @@ function StatefulChild() {
 describe('DeferredAuthProvider mount', () => {
   beforeEach(() => {
     resetDeferredAuthForTests();
+    sessionStorage.removeItem('lc_engaged');
     pathname.current = '/en';
     (globalThis as { __lcPathname?: string }).__lcPathname = '/en';
   });
@@ -87,6 +88,39 @@ describe('DeferredAuthProvider mount', () => {
       expect(await screen.findByTestId('auth-provider')).toBeTruthy();
     } finally {
       localStorage.removeItem('sb-test-auth-token');
+    }
+  });
+
+  it.each([
+    '/en?code=abc',
+    '/en?token_hash=abc&type=recovery',
+    '/en?error=access_denied',
+    '/en#access_token=abc&refresh_token=def',
+  ])('mounts AuthProvider without a gesture on the auth return %s', async (url) => {
+    window.history.replaceState(null, '', url);
+    try {
+      render(
+        <DeferredAuthProvider>
+          <span>child</span>
+        </DeferredAuthProvider>,
+      );
+      expect(await screen.findByTestId('auth-provider')).toBeTruthy();
+    } finally {
+      window.history.replaceState(null, '', '/');
+    }
+  });
+
+  it('mounts AuthProvider without a gesture for a session that already engaged', async () => {
+    sessionStorage.setItem('lc_engaged', '1');
+    try {
+      render(
+        <DeferredAuthProvider>
+          <span>child</span>
+        </DeferredAuthProvider>,
+      );
+      expect(await screen.findByTestId('auth-provider')).toBeTruthy();
+    } finally {
+      sessionStorage.removeItem('lc_engaged');
     }
   });
 

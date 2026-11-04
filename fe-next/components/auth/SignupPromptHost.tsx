@@ -26,6 +26,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useSignupPrompt } from '@/components/singleplayer/results/hooks/useSignupPrompt';
 import { GsiClientPreloader } from '@/components/auth/GsiClientPreloader';
 import { useQuickResultsOnScreen } from '@/lib/quickPlay/resultsCalm';
+import { useLandingAuthGate } from '@/lib/auth/landingAuthGate';
 
 const FirstWinSignupModal = dynamic(() => import('@/components/auth/FirstWinSignupModal'), {
   ssr: false,
@@ -40,6 +41,7 @@ export function SignupPromptHost() {
   const pathname = usePathname();
   const { isAuthenticated, user, loading: authLoading } = useAuth();
   const quickResultsOnScreen = useQuickResultsOnScreen();
+  const authGateOpen = useLandingAuthGate();
 
   const { showSignupModal, dismissSignupModal, isFirstWin, frictionVariant } = useSignupPrompt({
     isAuthenticated,
@@ -56,16 +58,18 @@ export function SignupPromptHost() {
           /en mobile PSI window via afterInteractive — same weight class as the
           deleted AdSense loader. FirstWinSignupModal also mounts the preloader. */}
       {!isAuthenticated && showSignupModal && <GsiClientPreloader />}
-      <FirstWinSignupModal
-        isOpen={showSignupModal}
-        onClose={dismissSignupModal}
-        // Honor the hook's first-win classification. This used to be hardcoded
-        // to "multiGames", so first-time winners — the largest prompt population
-        // under the default after-first-win variant — got generic copy and no
-        // celebration. PostHog 14d ordered path: prompt 145 → completed 3.
-        variant={isFirstWin ? 'firstWin' : 'multiGames'}
-        surface={frictionVariant === 'control' ? 'dialog' : 'sheet'}
-      />
+      {(authGateOpen || showSignupModal) && (
+        <FirstWinSignupModal
+          isOpen={showSignupModal}
+          onClose={dismissSignupModal}
+          // Honor the hook's first-win classification. This used to be hardcoded
+          // to "multiGames", so first-time winners — the largest prompt population
+          // under the default after-first-win variant — got generic copy and no
+          // celebration. PostHog 14d ordered path: prompt 145 → completed 3.
+          variant={isFirstWin ? 'firstWin' : 'multiGames'}
+          surface={frictionVariant === 'control' ? 'dialog' : 'sheet'}
+        />
+      )}
     </>
   );
 }

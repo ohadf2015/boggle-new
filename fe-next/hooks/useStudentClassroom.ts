@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMounted } from '@/hooks/useMounted';
-import { getStudentClassroom, type Classroom } from '@/lib/supabase/education';
+import type { Classroom } from '@/lib/supabase/education';
 import type { VocabularyLevel } from '@/lib/supabase/education/types';
 import logger from '@/utils/logger';
 
@@ -63,6 +63,7 @@ export function useStudentClassroom(): UseStudentClassroomReturn {
     }
 
     try {
+      const { getStudentClassroom } = await import('@/lib/supabase/education');
       const { data, level, error } = await getStudentClassroom(user.id);
 
       if (isMounted.current) {

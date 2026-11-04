@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const mockUseAuth = vi.fn();
@@ -22,10 +22,13 @@ vi.mock('@/components/auth/GsiClientPreloader', () => ({
   GsiClientPreloader: () => React.createElement('div', { 'data-testid': 'gsi-client-preload' }),
 }));
 
+const modalMounts = vi.hoisted(() => ({ count: 0 }));
+
 vi.mock('next/dynamic', () => ({
   default: () => {
-    const Stub = (props: { isOpen: boolean; variant?: string; surface?: string }) =>
-      props.isOpen
+    const Stub = (props: { isOpen: boolean; variant?: string; surface?: string }) => {
+      modalMounts.count += 1;
+      return props.isOpen
         ? React.createElement(
             'div',
             {
@@ -36,15 +39,21 @@ vi.mock('next/dynamic', () => ({
             'modal'
           )
         : null;
+    };
     return Stub;
   },
 }));
 
 import { SignupPromptHost } from '../SignupPromptHost';
+import { resetLandingAuthGateForTests } from '@/lib/auth/landingAuthGate';
 
 describe('SignupPromptHost', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    modalMounts.count = 0;
+    resetLandingAuthGateForTests();
+    localStorage.clear();
+    sessionStorage.clear();
     mockUseSignupPrompt.mockReturnValue({
       showSignupModal: false,
       setShowSignupModal: vi.fn(),
@@ -54,6 +63,37 @@ describe('SignupPromptHost', () => {
     });
     mockUsePathname.mockReturnValue('/he');
     mockUseAuth.mockReturnValue({ isAuthenticated: false, user: null, loading: false });
+  });
+
+  it('does not pull the signup modal on a cold landing visit', () => {
+    render(<SignupPromptHost />);
+    expect(modalMounts.count).toBe(0);
+  });
+
+  it('mounts the signup modal after the first tap so it is ready to open', async () => {
+    render(<SignupPromptHost />);
+    await act(async () => {
+      window.dispatchEvent(new Event('pointerdown'));
+    });
+    expect(modalMounts.count).toBeGreaterThan(0);
+  });
+
+  it('mounts the signup modal right away off the landing page', () => {
+    mockUsePathname.mockReturnValue('/en/practice');
+    render(<SignupPromptHost />);
+    expect(modalMounts.count).toBeGreaterThan(0);
+  });
+
+  it('still opens the signup prompt on a landing visit with no tap yet', () => {
+    mockUseSignupPrompt.mockReturnValue({
+      showSignupModal: true,
+      setShowSignupModal: vi.fn(),
+      dismissSignupModal: vi.fn(),
+      isFirstWin: true,
+      frictionVariant: 'soft-sheet',
+    });
+    render(<SignupPromptHost />);
+    expect(screen.getByTestId('first-win-signup-modal')).toBeTruthy();
   });
 
   it('renders nothing when hook says not to show', () => {
