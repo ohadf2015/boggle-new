@@ -83,7 +83,30 @@ export const FEEDBACK_WIDGET_IGNORE_NETWORK = JSON.stringify([
  */
 export const FEEDBACK_WIDGET_IGNORE_CONSOLE = JSON.stringify(['GSI_LOGGER', 'FedCM']);
 
+/** Hard backstop. Apex, previews, and localhost fail closed. */
+const FDT_PROD_HOST = 'www.lexiclash.live';
+
+/**
+ * Fail closed before any listener, script, or FDT call. Both must hold:
+ * the public production host, and NEXT_PUBLIC_FDT_ENABLED==='true' (set
+ * only in the Railway prod env — absent/other values do nothing, including
+ * on the production host). Read the flag inside the call so a test can
+ * stub it; Next inlines NEXT_PUBLIC_* at build time in the client bundle.
+ */
+function isFeedbackWidgetEnabled(): boolean {
+    if (typeof window === 'undefined') return false;
+    const hostOk = window.location.hostname === FDT_PROD_HOST;
+    const flagOk = process.env.NEXT_PUBLIC_FDT_ENABLED === 'true';
+    if (hostOk && flagOk) return true;
+    const host = window.location.hostname;
+    if (host === 'localhost' || host === '127.0.0.1' || host === '[::1]') {
+        console.debug('[fdt] widget not injected (localhost is never production)');
+    }
+    return false;
+}
+
 function injectFeedbackWidget(): void {
+    if (!isFeedbackWidgetEnabled()) return;
     if (document.getElementById(FEEDBACK_WIDGET_SCRIPT_ID)) return;
     const s = document.createElement('script');
     s.id = FEEDBACK_WIDGET_SCRIPT_ID;
@@ -101,6 +124,7 @@ function injectFeedbackWidget(): void {
 
 export default function FeedbackDevtoolsWidget(): ReactNode {
     useEffect(() => {
+        if (!isFeedbackWidgetEnabled()) return;
         let cancelPending: (() => void) | undefined;
         const onIntent = () => {
             for (const ev of FEEDBACK_WIDGET_INTENT_EVENTS) {
