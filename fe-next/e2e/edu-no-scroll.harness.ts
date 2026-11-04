@@ -233,11 +233,12 @@ export async function measureFit(page: Page, keys: string[]): Promise<FitReport>
 /** rAF deltas recorded in the page until `stopRecording` is called. */
 export async function startFrameRecording(page: Page) {
   await page.evaluate(() => {
-    const w = window as unknown as { __rafDeltas: number[]; __rafAt: number[]; __rafStop: boolean };
+    const w = window as unknown as { __rafDeltas: number[]; __rafAt: number[]; __rafStop: boolean; __rafT0: number };
     w.__rafDeltas = [];
     w.__rafAt = [];
     w.__rafStop = false;
     const t0 = performance.now();
+    w.__rafT0 = t0;
     let last = t0;
     const tick = (now: number) => {
       w.__rafDeltas.push(now - last);
@@ -249,17 +250,32 @@ export async function startFrameRecording(page: Page) {
   });
 }
 
+/**
+ * `max` is the slowest frame. `ownMax` subtracts the time a long frame spent in scripts from another
+ * origin (the app shell's analytics and replay tags), as Long Animation Frame attribution reports
+ * it; a frame with no attribution counts in full. Needs observeLongFrames.
+ */
 export async function stopFrameRecording(page: Page) {
-  const { deltas, at } = await page.evaluate(() => {
-    const w = window as unknown as { __rafDeltas: number[]; __rafAt: number[]; __rafStop: boolean };
+  const { deltas, at, foreign } = await page.evaluate(() => {
+    const w = window as unknown as { __rafDeltas: number[]; __rafAt: number[]; __rafStop: boolean; __rafT0: number; __longFrames?: Array<{ start: number; end: number; foreign: number; src: string }> };
     w.__rafStop = true;
-    return { deltas: w.__rafDeltas.slice(1), at: w.__rafAt.slice(1) };
+    // A frame that began before recording started belongs to what came before (load, the last action).
+    const keep = w.__rafAt.map((t, i) => i > 0 && t >= 0);
+    const deltas = w.__rafDeltas.filter((_, i) => keep[i]);
+    const at = w.__rafAt.filter((_, i) => keep[i]);
+    const foreign = deltas.map((d, i) => {
+      const from = w.__rafT0 + at[i];
+      const hit = (w.__longFrames ?? []).filter((f) => f.end > from && f.start < from + d);
+      return { ms: hit.reduce((t, f) => t + f.foreign, 0), src: hit.map((f) => f.src).filter(Boolean).join(' ') };
+    });
+    return { deltas, at, foreign };
   });
   const sorted = [...deltas].sort((a, b) => a - b);
   const p95 = sorted[Math.floor(sorted.length * 0.95)] ?? 0;
   /** Where the slow frames start, ms from the start of the window, as "start+length". */
-  const spikes = deltas.flatMap((d, i) => (d > 50 ? [`${Math.round(at[i])}+${Math.round(d)}`] : []));
-  return { frames: deltas.length, max: Math.round(sorted[sorted.length - 1] ?? 0), p95: Math.round(p95), over50: spikes.length, spikes };
+  const spikes = deltas.flatMap((d, i) => (d > 50 ? [`${Math.round(at[i])}+${Math.round(d)}${foreign[i].ms ? ` (${Math.round(foreign[i].ms)}ms ${foreign[i].src})` : ''}`] : []));
+  const ownMax = Math.round(Math.max(0, ...deltas.map((d, i) => d - foreign[i].ms)));
+  return { frames: deltas.length, max: Math.round(sorted[sorted.length - 1] ?? 0), ownMax, p95: Math.round(p95), over50: spikes.length, spikes };
 }
 
 export async function observeLayoutShift(page: Page) {
@@ -281,11 +297,24 @@ export const readLayoutShift = (page: Page) => page.evaluate(() => (window as un
 /** Long-animation-frame log, so a settle wait can tell a busy main thread from a quiet one. */
 export async function observeLongFrames(page: Page) {
   await page.addInitScript(() => {
-    const w = window as unknown as { __longFrameEnd: number };
+    type Script = { sourceURL?: string; duration: number };
+    const w = window as unknown as { __longFrameEnd: number; __longFrames: Array<{ start: number; end: number; foreign: number; src: string }> };
     w.__longFrameEnd = 0;
+    w.__longFrames = [];
     try {
       new PerformanceObserver((list) => {
-        for (const e of list.getEntries()) w.__longFrameEnd = Math.max(w.__longFrameEnd, e.startTime + e.duration);
+        for (const e of list.getEntries()) {
+          w.__longFrameEnd = Math.max(w.__longFrameEnd, e.startTime + e.duration);
+          const scripts = ((e as unknown as { scripts?: Script[] }).scripts ?? []).filter((x) => {
+            try { return !!x.sourceURL && new URL(x.sourceURL).origin !== location.origin; } catch { return false; }
+          });
+          w.__longFrames.push({
+            start: e.startTime,
+            end: e.startTime + e.duration,
+            foreign: scripts.reduce((t, x) => t + x.duration, 0),
+            src: scripts.map((x) => new URL(x.sourceURL!).pathname.split('/').pop()).join(' '),
+          });
+        }
       }).observe({ type: 'long-animation-frame', buffered: true });
     } catch { /* not supported: the idle probe still has to fire */ }
   });
