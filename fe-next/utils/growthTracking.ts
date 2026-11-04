@@ -264,6 +264,11 @@ export type GrowthEvent =
   | 'dead_time_detected'
   // Landing-page CTA instrumentation (visitor → onboarding funnel leak)
   | 'landing_cta_clicked'
+  // PLAY handled after hydration attached the click listener but before the
+  // mount effect ran — the pre-fix `mounted` gate dropped these clicks to a
+  // plain navigation. Counts the residual gap now that PLAY is wired
+  // synchronously (PageClient).
+  | 'landing_play_hydration_gap'
   | 'education_upsell_impression'
   | 'school_lead_submitted'
   | 'school_lead_form_viewed'

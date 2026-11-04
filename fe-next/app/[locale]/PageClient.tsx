@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { retryImport } from '@/utils/retryImport';
@@ -161,14 +161,25 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
     if (inviteRoomCode || bounced || isCrazyGames) setShowFTUE(true);
   }, [inviteRoomCode]); // frozen initial state → runs once
 
-  // Hydration gate for the render-affecting, window-derived branches below
-  // (invite spinner, isNewUser CTA). The server (SSG, no window) emits LandingView;
-  // these branches must NOT flip the first CLIENT render or React #418 fires (seen
-  // in prod on /en?room=… invite links). The side-effects in the initializers above
-  // still run synchronously (invite saved before child effects) — only the RENDER
-  // waits for mount, same discipline as showFTUE.
+  // Hydration gate for the render-affecting, window-derived redirect spinners
+  // below (invite, QR). Those branches must NOT flip the first CLIENT render or
+  // React #418 fires (seen in prod on /en?room=… invite links). The side-effects
+  // in the initializers above still run synchronously (invite saved before child
+  // effects) — only those RENDER swaps wait for mount, same discipline as showFTUE.
+  //
+  // The PLAY handler is deliberately NOT gated here: it only upgrades the click
+  // on a real <a href>, never the markup (freshPlayBridge doc), so wiring it
+  // from the first client render cannot mismatch the server HTML. The old
+  // `mounted` gate stranded early clicks in plain navigation — 87% of
+  // landing_cta_clicked never reached onboarding_started (PostHog 7d).
+  // mountedRef still records mount so a click in the hydration→effect window
+  // fires landing_play_hydration_gap for measurement.
   const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const mountedRef = useRef(false);
+  useEffect(() => {
+    mountedRef.current = true;
+    setMounted(true);
+  }, []);
 
   // Instrument landing page views — fires once after hydration on the real
   // homepage (not redirects, not crawlers). Fills the funnel's top-step gap
@@ -226,6 +237,10 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
 
   const handleStartOnboarding = useCallback(() => {
     if (!routeAllowsOnboarding) return;
+    // A click handled after hydration attached the listener but before the
+    // mount effect ran: open the flow anyway (the setters queue on the
+    // hydrated component) and count it, so PostHog can size the residual gap.
+    if (!mountedRef.current) trackGrowthEvent('landing_play_hydration_gap', {});
     let isCrazyGames = false;
     try {
       isCrazyGames = detectCrazyGamesSync();
@@ -295,7 +310,7 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
     <>
       <LandingView
         initialData={initialData}
-        onStartOnboarding={mounted && isNewUser && routeAllowsOnboarding ? handleStartOnboarding : undefined}
+        onStartOnboarding={isNewUser && routeAllowsOnboarding ? handleStartOnboarding : undefined}
       />
       {showFTUE && routeAllowsOnboarding && (
         <OnboardingFlow onComplete={handleFTUEComplete} entry={ftueEntry} />
