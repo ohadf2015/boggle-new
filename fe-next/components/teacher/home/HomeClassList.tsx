@@ -92,14 +92,14 @@ export function HomeClassMeta({
 }) {
   return (
     <div data-testid="home-desk-meta" className="flex flex-wrap items-center gap-x-4 gap-y-2 font-neo-body text-sm font-semibold text-neo-cream/80 sm:text-base">
-      {previewIds.length > 0 ? <StudentStack ids={previewIds} total={memberCount} /> : null}
+      {previewIds.length > 0 ? <span className="contents max-sm:hidden"><StudentStack ids={previewIds} total={memberCount} /></span> : null}
       <span className="inline-flex items-center gap-1.5">
         <Users className="size-4" aria-hidden="true" />
         {memberCount === 1 ? t('eduShell.home.studentsOne') : t('eduShell.home.students', { count: memberCount })}
       </span>
-      <span className="inline-flex items-center gap-1.5">
+      <span data-testid="home-desk-last-game" className="inline-flex items-center gap-1.5">
         <CalendarDays className="size-4" aria-hidden="true" />
-        <LastPlayed played={played} pending={pending} failed={failed} language={language} nowMs={nowMs} t={t} />
+        <LastPlayed played={played} pending={pending} failed={failed} language={language} nowMs={nowMs} t={t} labelKey="eduShell.home.lastGameAt" />
       </span>
     </div>
   );
@@ -229,6 +229,7 @@ function LastPlayed({
   language,
   nowMs,
   t,
+  labelKey,
 }: {
   played: string | undefined;
   pending: boolean;
@@ -236,11 +237,14 @@ function LastPlayed({
   language: string;
   nowMs: number;
   t: T;
+  /** Wraps the date in a sentence ("Last game: Oct 9") where it stands alone. */
+  labelKey?: string;
 }) {
   if (pending) return <span aria-hidden="true" className={cn(SKELETON, 'inline-block h-3 w-16')} />;
   if (failed) return <span>-</span>;
   if (!played) return <span>{t('eduShell.home.notPlayedRecently')}</span>;
-  return <span>{lastPlayedLabel(played, language, nowMs)}</span>;
+  const when = lastPlayedLabel(played, language, nowMs);
+  return <span>{labelKey ? t(labelKey, { when }) : when}</span>;
 }
 
 export default HomeClassList;

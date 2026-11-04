@@ -1,0 +1,143 @@
+'use client';
+
+import { useSyncExternalStore, type ReactNode } from 'react';
+import Link from 'next/link';
+import { MonitorPlay, Play, UsersRound } from 'lucide-react';
+import { EduMascot } from '@/components/education/EduMascot';
+import { cn } from '@/lib/utils';
+import { RosterSeats } from '@/components/teacher/hq/RosterSeats';
+import type { RosterStudent } from '@/components/teacher/hq/rosterModel';
+import { PANEL, PRIMARY_BUTTON, QUIET_LINK, SECONDARY_BUTTON } from '@/components/teacher/home/homeStyles';
+import { CelebrationBurst } from '@/components/education/motion';
+import { ClassSetupInviteCode, type InviteChannel } from './ClassSetupInviteCode';
+
+type T = (key: string, params?: Record<string, string | number>) => string;
+
+export interface InviteRoster {
+  students: RosterStudent[];
+  arrivals: string[];
+  loading: boolean;
+}
+
+export interface ClassSetupInviteViewProps {
+  classroom: { name: string; join_code: string };
+  roster: InviteRoster;
+  joinUrl: string;
+  displayHost: string;
+  startHref: string;
+  homeHref: string;
+  reduced: boolean;
+  onShare: (channel: InviteChannel, payload: { url: string; text: string }) => void;
+  onOpenProjector: () => void;
+  onStart?: () => void;
+  /** Rehearse-with-bots door; shown only before anyone joins. */
+  rehearse?: ReactNode;
+  footer?: ReactNode;
+  t: T;
+}
+
+const WIDE_ROSTER_QUERY = '(min-width: 1280px)';
+
+function subscribeWide(onChange: () => void): () => void {
+  const mq = window.matchMedia(WIDE_ROSTER_QUERY);
+  mq.addEventListener('change', onChange);
+  return () => mq.removeEventListener('change', onChange);
+}
+
+/** Seven named seats fit one row of the desktop panel; phones keep five so the row never wraps. Server and first paint use five. */
+function useRosterSeats(): number {
+  const wide = useSyncExternalStore(subscribeWide, () => window.matchMedia(WIDE_ROSTER_QUERY).matches, () => false);
+  return wide ? 7 : 5;
+}
+
+function joinedText(joined: number | null, t: T): string {
+  if (joined === null) return '…';
+  if (joined === 0) return t('eduShell.setup.joinedNone');
+  return joined === 1 ? t('eduShell.setup.joinedOne') : t('eduShell.setup.joinedMany', { count: joined });
+}
+
+/** Code, roster and actions for the invite step; the hero action always lands in the bottom slot so the thumb never hunts for it. */
+export function ClassSetupInviteView({ classroom, roster, joinUrl, displayHost, startHref, homeHref, reduced, onShare, onOpenProjector, onStart, rehearse, footer, t }: ClassSetupInviteViewProps) {
+  const joined = roster.loading ? null : roster.students.length;
+  const studentsIn = (joined ?? 0) > 0;
+  const seats = useRosterSeats();
+  const newest = roster.arrivals[roster.arrivals.length - 1];
+
+  const projector = (
+    <button
+      type="button"
+      data-testid="setup-projector"
+      data-hero={studentsIn ? 'false' : 'true'}
+      onClick={onOpenProjector}
+      className={cn(studentsIn ? SECONDARY_BUTTON : PRIMARY_BUTTON, 'w-full', !studentsIn && 'min-h-14 text-xl')}
+    >
+      <MonitorPlay className={studentsIn ? 'size-5' : 'size-6'} aria-hidden="true" />
+      {t('eduShell.setup.showProjector')}
+    </button>
+  );
+  const start = (
+    <Link
+      href={startHref}
+      data-testid="setup-start-game"
+      data-hero={studentsIn ? 'true' : 'false'}
+      onClick={onStart}
+      className={cn(studentsIn ? PRIMARY_BUTTON : SECONDARY_BUTTON, 'w-full', studentsIn && 'min-h-14 text-xl')}
+    >
+      <Play className={cn(studentsIn ? 'size-6' : 'size-5', 'fill-current')} aria-hidden="true" />
+      {t(studentsIn ? 'eduShell.setup.startQuick' : 'eduShell.setup.firstRound.start')}
+    </Link>
+  );
+
+  return (
+    <section
+      data-testid="setup-step-ready"
+      aria-labelledby="setup-ready-title"
+      className="mx-auto grid w-full max-w-xl grid-cols-1 gap-3 px-3 pt-3 sm:gap-4 sm:px-4 sm:pt-5 lg:min-h-[calc(100dvh-7rem)] lg:max-w-6xl lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:content-center lg:gap-x-8 lg:pb-6"
+    >
+      <header className="flex items-center gap-3 lg:col-span-2">
+        <EduMascot moment="success" size={96} className="size-12 shrink-0 sm:size-20" />
+        <div className="min-w-0">
+          <h1 id="setup-ready-title" tabIndex={-1} style={{ outline: 'none' }} className="font-neo-display text-2xl font-black leading-tight text-neo-cream sm:text-4xl">
+            {t('eduShell.setup.readyTitle')}
+          </h1>
+          <p dir="auto" className="truncate font-neo-body text-base font-semibold text-neo-cream/80">
+            {classroom.name}
+          </p>
+        </div>
+      </header>
+
+      <ClassSetupInviteCode code={classroom.join_code} className={classroom.name} joinUrl={joinUrl} displayHost={displayHost} onShare={onShare} t={t} />
+
+      <div className="flex min-w-0 flex-col gap-3">
+        <div data-testid="invite-roster" className={cn(PANEL, 'relative flex flex-col gap-2 p-3 sm:gap-3 sm:p-4 lg:flex-1 lg:justify-between lg:p-5')}>
+          <p data-testid="setup-joined-count" aria-live="polite" className="inline-flex items-center gap-2 font-neo-display text-lg font-bold text-neo-cream">
+            <UsersRound className={cn('size-5 shrink-0', studentsIn ? 'text-neo-lime' : 'text-neo-cream/70')} aria-hidden="true" />
+            {joinedText(joined, t)}
+          </p>
+          <RosterSeats students={roster.students} arrivals={roster.arrivals} seats={seats} size={40} reduced={reduced} showNames className="min-h-[56px]" />
+          {newest && !reduced ? <CelebrationBurst playing burstKey={newest} variant="sparkle" /> : null}
+          <p className="font-neo-body text-sm text-neo-cream/75">{t('eduShell.setup.noAccount')}</p>
+        </div>
+
+        <div
+          data-testid="setup-actions"
+          className="sticky bottom-0 z-10 -mx-3 flex flex-col gap-2 border-t-2 border-neo-cream/40 bg-neo-navy px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 sm:-mx-4 sm:px-4 lg:static lg:mx-0 lg:border-t-0 lg:bg-transparent lg:px-0"
+        >
+          {studentsIn ? projector : start}
+          <div data-testid="setup-hero-slot">{studentsIn ? start : projector}</div>
+        </div>
+      </div>
+
+      <div data-testid="setup-quiet-links" className="flex flex-wrap items-center justify-center gap-2 lg:col-span-2">
+        {studentsIn ? null : rehearse}
+        <Link href={homeHref} className={QUIET_LINK}>
+          {t('eduShell.setup.backHome')}
+        </Link>
+      </div>
+
+      {footer}
+    </section>
+  );
+}
+
+export default ClassSetupInviteView;

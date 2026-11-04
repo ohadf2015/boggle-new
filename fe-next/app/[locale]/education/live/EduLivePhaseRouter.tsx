@@ -9,6 +9,7 @@ import { EduLiveSurfacesProvider, type EduLiveSurfaces } from '@/components/educ
 import EduLiveEntry from '@/components/education/live/EduLiveEntry';
 import EduAbortedModal from '@/components/education/live/EduAbortedModal';
 import type { Translate } from '@/components/education/live/eduLiveStyles';
+import { EduLiveNoRoom } from './EduLiveNoRoom';
 
 const EduStudentLobby = nextDynamic(() => import('@/components/education/live/EduStudentLobby'), { ssr: false });
 const EduHostResults = nextDynamic(() => import('@/components/education/live/EduHostResults'), { ssr: false });
@@ -33,6 +34,7 @@ export function EduLivePhaseRouter({ routerProps, urlRoom, isTeacher, isSpectato
   const { phase } = routerProps;
 
   if (phase === 'entry') {
+    if (!(isSpectator && !isTeacher) && !urlRoom && !routerProps.entry.prefilledRoom) return <EduLiveNoRoom isHost={isTeacher} language={language} t={t} />;
     return (
       <FeatureErrorBoundary featureName="Classroom Entry">
         <EduLiveEntry entry={routerProps.entry} urlRoom={urlRoom} isHost={isTeacher} isSpectator={isSpectator} language={language} t={t} />

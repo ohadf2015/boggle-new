@@ -83,22 +83,22 @@ describe('VocabQuizView — pressure dials', () => {
     expect(screen.queryByRole('timer')).toBeNull();
   });
 
-  it('timer=gentle: the last seconds keep the calm cyan, no pulse', () => {
+  it('timer=gentle: the last seconds stay neutral, no orange, no pulse', () => {
     setPressure({ ...DEFAULT_CLASSROOM_PRESSURE, timer: 'gentle' });
     const { socket, server } = makeSocket();
     const { container } = render(<VocabQuizView socket={socket} username="ana" t={t} />);
     server(VOCAB_QUIZ_EVENTS.question, QUESTION); // remainingMs 4000 = urgent zone
     const bar = screen.getByRole('timer');
     expect(bar.className).not.toContain('animate-pulse');
-    expect(container.querySelector('.bg-neo-orange')).toBeNull();
-    expect(container.querySelector('.bg-neo-cyan')).not.toBeNull();
+    expect(bar.dataset.urgent).toBe('false');
+    expect(container.querySelector('[role="timer"].text-neo-orange')).toBeNull();
   });
 
   it('default (loud): the last seconds turn orange', () => {
     const { socket, server } = makeSocket();
     const { container } = render(<VocabQuizView socket={socket} username="ana" t={t} />);
     server(VOCAB_QUIZ_EVENTS.question, QUESTION);
-    expect(container.querySelector('.bg-neo-orange')).not.toBeNull();
+    expect(container.querySelector('[role="timer"].text-neo-orange')).not.toBeNull();
   });
 
   it('leaderboard=hidden: the reveal shows no rank in the header', () => {

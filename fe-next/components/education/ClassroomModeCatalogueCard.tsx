@@ -2,7 +2,9 @@
 
 import type { ReactNode } from 'react';
 import { Check, Clock, Flame, Sparkles } from 'lucide-react';
+import { m } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { pressMotion, useReducedMotionSafe } from './motion';
 import type { CatalogueMode } from './ClassroomModeCatalogueData';
 
 export interface ClassroomModeCatalogueCardProps {
@@ -33,21 +35,23 @@ export function ClassroomModeCatalogueCard({
   busy,
   onPick,
 }: ClassroomModeCatalogueCardProps) {
+  const reduced = useReducedMotionSafe();
   return (
-    <button
+    <m.button
       type="button"
       role="radio"
       aria-checked={selected}
       data-testid={`mode-tile-${mode.id}`}
       data-selected={selected ? 'true' : 'false'}
       disabled={busy}
+      {...(busy || selected ? {} : pressMotion(reduced))}
       onClick={() => {
         if (busy || selected) return;
         onPick(mode.id);
       }}
       className={cn(
         'group relative flex w-[6.6rem] shrink-0 snap-center flex-col items-stretch gap-1 rounded-neo-lg border-2 bg-neo-navy-light p-1.5 text-center text-neo-cream lg:w-auto lg:p-2',
-        'transition-[transform,border-color] duration-150 motion-reduce:transition-none motion-safe:active:scale-95',
+        'transition-[border-color] duration-150 motion-reduce:transition-none',
         'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy disabled:cursor-wait',
         selected
           ? 'z-10 border-neo-lime ring-2 ring-neo-lime ring-offset-2 ring-offset-neo-navy-light'
@@ -88,7 +92,7 @@ export function ClassroomModeCatalogueCard({
           </span>
         ) : null}
       </span>
-      <span className="line-clamp-3 min-h-[2.2em] font-neo-display text-[0.8rem] font-bold leading-[1.1] lg:text-sm">
+      <span className={cn('line-clamp-3 min-h-[2.2em] font-neo-display text-[0.8rem] font-bold leading-[1.1] lg:text-sm', selected && 'text-neo-lime')}>
         {name}
       </span>
       <span className="mx-auto inline-flex items-center gap-1 whitespace-nowrap font-neo-body text-xs font-bold leading-none text-neo-cream/80">
@@ -96,7 +100,7 @@ export function ClassroomModeCatalogueCard({
         {minutesLabel}
       </span>
       {deliveryTag ? <span className="flex justify-center">{deliveryTag}</span> : null}
-    </button>
+    </m.button>
   );
 }
 

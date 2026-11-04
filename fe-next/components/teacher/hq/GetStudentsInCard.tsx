@@ -215,7 +215,7 @@ export function GetStudentsInCard({
                 <QRCodeSVG value={joinUrl} size={96} level="L" style={{ width: "100%", height: "100%" }} aria-hidden="true" />
               </span>
             ) : null}
-            <p data-testid="hq-first-student-title" className="min-w-0 flex-1 font-neo-body text-sm font-bold leading-snug text-neo-cream">
+            <p data-testid="hq-first-student-title" className="min-w-0 flex-1 text-balance font-neo-body text-sm font-bold leading-snug text-neo-cream">
               {t("academy.hq.firstStudentTitle", "Get your first student in")}
             </p>
             <GoalCount count={0} label={t("academy.hq.joinedGoal", { count: 0, goal: STUDENT_GOAL })} />
