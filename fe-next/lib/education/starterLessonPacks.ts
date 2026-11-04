@@ -96,30 +96,30 @@ const academicVocabulary: LessonWord[] = [
 ];
 
 // ============================================
-// PACK 3: Beginner Hebrew (for Hebrew learners)
+// PACK 3: Beginner Hebrew
 // ============================================
 
 const beginnerHebrew: LessonWord[] = [
-  { word: 'שלום', definition: 'Hello / Peace', hint: 'The most common greeting', difficulty: 'easy' },
-  { word: 'תודה', definition: 'Thank you', hint: 'Say this when someone helps you', difficulty: 'easy' },
-  { word: 'מים', definition: 'Water', hint: 'You drink this every day', difficulty: 'easy' },
-  { word: 'לחם', definition: 'Bread', hint: 'A basic food item', difficulty: 'easy' },
-  { word: 'בית', definition: 'House / Home', hint: 'Where you live', difficulty: 'easy' },
-  { word: 'ספר', definition: 'Book', hint: 'You read this', difficulty: 'easy' },
-  { word: 'שמש', definition: 'Sun', hint: 'Shines in the sky during the day', difficulty: 'easy' },
-  { word: 'ירח', definition: 'Moon', hint: 'Visible at night', difficulty: 'easy' },
-  { word: 'חתול', definition: 'Cat', hint: 'A small furry pet that purrs', difficulty: 'easy' },
-  { word: 'כלב', definition: 'Dog', hint: 'A loyal pet that barks', difficulty: 'easy' },
-  { word: 'ילד', definition: 'Boy / Child', hint: 'A young person', difficulty: 'easy' },
-  { word: 'ילדה', definition: 'Girl', hint: 'A young female person', difficulty: 'easy' },
-  { word: 'מורה', definition: 'Teacher', hint: 'Works in a school', difficulty: 'medium' },
-  { word: 'חבר', definition: 'Friend', hint: 'Someone you like to spend time with', difficulty: 'medium' },
-  { word: 'משפחה', definition: 'Family', hint: 'Parents, siblings, grandparents', difficulty: 'medium' },
-  { word: 'גשם', definition: 'Rain', hint: 'Falls from clouds', difficulty: 'medium' },
-  { word: 'פרח', definition: 'Flower', hint: 'Grows in a garden, smells nice', difficulty: 'medium' },
-  { word: 'עץ', definition: 'Tree', hint: 'Has leaves and branches', difficulty: 'easy' },
-  { word: 'דג', definition: 'Fish', hint: 'Lives in water', difficulty: 'easy' },
-  { word: 'ציפור', definition: 'Bird', hint: 'Has wings and can fly', difficulty: 'medium' },
+  { word: 'שלום', definition: 'ברכה כשנפגשים וכשנפרדים', hint: 'וגם ההפך ממלחמה', difficulty: 'easy' },
+  { word: 'תודה', definition: 'מה שאומרים כשמישהו עוזר לנו', hint: 'מילה של נימוס', difficulty: 'easy' },
+  { word: 'מים', definition: 'שותים אותם כשצמאים', hint: 'זורמים מהברז', difficulty: 'easy' },
+  { word: 'לחם', definition: 'אופים אותו מקמח', hint: 'עושים ממנו כריך', difficulty: 'easy' },
+  { word: 'בית', definition: 'המקום שבו גרים', hint: 'יש בו חדרים, דלת וחלונות', difficulty: 'easy' },
+  { word: 'ספר', definition: 'קוראים בו סיפורים', hint: 'יש לו עמודים וכריכה', difficulty: 'easy' },
+  { word: 'שמש', definition: 'מאירה ומחממת ביום', hint: 'זורחת בבוקר', difficulty: 'easy' },
+  { word: 'ירח', definition: 'מאיר בשמיים בלילה', hint: 'לפעמים עגול ולפעמים חצי', difficulty: 'easy' },
+  { word: 'חתול', definition: 'חיית מחמד שמגרגרת', hint: 'עושה מיאו', difficulty: 'easy' },
+  { word: 'כלב', definition: 'חיית מחמד שנובחת', hint: 'עושה הב הב', difficulty: 'easy' },
+  { word: 'ילד', definition: 'בן קטן, עוד לא גדול', hint: 'לומד בבית הספר', difficulty: 'easy' },
+  { word: 'ילדה', definition: 'בת קטנה, עוד לא גדולה', hint: 'גם היא לומדת בבית הספר', difficulty: 'easy' },
+  { word: 'מורה', definition: 'מי שמלמד בכיתה', hint: 'כותב על הלוח', difficulty: 'medium' },
+  { word: 'חבר', definition: 'מישהו שכיף לנו איתו', hint: 'משחקים יחד בהפסקה', difficulty: 'medium' },
+  { word: 'משפחה', definition: 'הורים, אחים, סבא וסבתא', hint: 'נפגשים בארוחת שישי', difficulty: 'medium' },
+  { word: 'גשם', definition: 'מים שיורדים מהעננים', hint: 'צריך מטרייה', difficulty: 'medium' },
+  { word: 'פרח', definition: 'צומח בגינה ומריח טוב', hint: 'יש לו עלי כותרת צבעוניים', difficulty: 'medium' },
+  { word: 'עץ', definition: 'צמח גבוה עם גזע וענפים', hint: 'נותן צל בקיץ', difficulty: 'easy' },
+  { word: 'דג', definition: 'חי במים ושוחה', hint: 'יש לו סנפירים', difficulty: 'easy' },
+  { word: 'ציפור', definition: 'יש לה כנפיים ונוצות', hint: 'עפה ומצייצת', difficulty: 'medium' },
 ];
 
 // ============================================
@@ -195,19 +195,19 @@ const beginnerJapanese: LessonWord[] = [
 const beginnerRussian: LessonWord[] = [
   { word: 'кот', definition: 'Домашний питомец, который мяукает', hint: 'Маленький пушистый', difficulty: 'easy' },
   { word: 'собака', definition: 'Домашний питомец, который лает', hint: 'Верный друг', difficulty: 'easy' },
-  { word: 'дом', definition: 'Строение где люди живут', hint: 'Там твоя семья', difficulty: 'easy' },
-  { word: 'вода', definition: 'Прозрачная жидкость для питья', hint: 'Пьешь каждый день', difficulty: 'easy' },
-  { word: 'солнце', definition: 'Яркое светило на небе днем', hint: 'Источник света и тепла', difficulty: 'easy' },
+  { word: 'дом', definition: 'Здание, где живут люди', hint: 'Там твоя семья', difficulty: 'easy' },
+  { word: 'вода', definition: 'Прозрачная жидкость для питья', hint: 'Пьёшь каждый день', difficulty: 'easy' },
+  { word: 'солнце', definition: 'Яркое светило на небе днём', hint: 'Источник света и тепла', difficulty: 'easy' },
   { word: 'луна', definition: 'Светит на небе ночью', hint: 'Видна ночью', difficulty: 'easy' },
-  { word: 'рыба', definition: 'Животное живущее в воде', hint: 'Плывет в море', difficulty: 'easy' },
+  { word: 'рыба', definition: 'Животное, которое живёт в воде', hint: 'Плавает в море', difficulty: 'easy' },
   { word: 'птица', definition: 'Животное с крыльями и перьями', hint: 'Летает в небе', difficulty: 'easy' },
-  { word: 'дерево', definition: 'Большое растение с стволом и листьями', hint: 'Растет из земли', difficulty: 'easy' },
+  { word: 'дерево', definition: 'Большое растение со стволом и листьями', hint: 'Растёт из земли', difficulty: 'easy' },
   { word: 'цветок', definition: 'Красивая часть растения', hint: 'Приятный запах', difficulty: 'easy' },
-  { word: 'глаз', definition: 'Орган зрения', hint: 'Видишь этим', difficulty: 'medium' },
-  { word: 'рука', definition: 'Конечность для работы и движения', hint: 'У тебя их две', difficulty: 'medium' },
+  { word: 'глаз', definition: 'Орган зрения', hint: 'Им ты видишь', difficulty: 'medium' },
+  { word: 'рука', definition: 'Ею берут и держат вещи', hint: 'У тебя их две', difficulty: 'medium' },
   { word: 'нога', definition: 'Конечность для ходьбы', hint: 'Ходишь на них', difficulty: 'medium' },
-  { word: 'озеро', definition: 'Большое количество воды на суше', hint: 'Вода пресная', difficulty: 'medium' },
-  { word: 'гора', definition: 'Высокий холм', hint: 'Надо подняться', difficulty: 'medium' },
+  { word: 'озеро', definition: 'Большой водоём на суше', hint: 'Вода пресная', difficulty: 'medium' },
+  { word: 'гора', definition: 'Высокий холм', hint: 'На неё поднимаются', difficulty: 'medium' },
 ];
 
 // ============================================

@@ -1,5 +1,6 @@
 'use client';
 
+import { isCheckoutRedirectPending } from '@/lib/education/checkoutReturn';
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { polarTrialDaysLeft } from '@/lib/education/polarTrial';
@@ -13,9 +14,11 @@ import { cn } from '@/lib/utils';
  * same paid Polar checkout CTA the lifecycle banner uses — convert now, or
  * dismiss and keep using Pro for the rest of the trial.
  */
-export function TeacherTrialWelcome({ trialExpires }: { trialExpires: string | null }) {
+export function TeacherTrialWelcome({ trialExpires, onReturnPage = false }: { trialExpires: string | null; onReturnPage?: boolean }) {
   const { t, language } = useLanguage();
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(
+    () => onReturnPage || typeof window === 'undefined' || !isCheckoutRedirectPending(window.sessionStorage, window.location.pathname),
+  );
   const [nowMs] = useState(() => Date.now());
   const days = polarTrialDaysLeft(trialExpires, nowMs);
   const isRTL = language === 'he';

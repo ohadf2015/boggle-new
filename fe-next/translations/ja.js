@@ -3464,6 +3464,7 @@ const ja = {
     "updateReady": "アップデートの準備ができました",
     "updateRestart": "再起動",
     "pressBackAgainToExit": "もう一度戻るで終了",
+    "stop": "停止",
     "used": "使用済み",
     "email": "メール",
     "free": "無料",
@@ -14420,6 +14421,8 @@ const ja = {
       },
       "trialPreview": "Proプレビュー：このページはあと{{days}}日間開けます。その後はProが必要です。",
       "trialPreviewCta": "Proで使い続ける",
+      "trialEnded": "Proプレビューは終了しました。クラスとゲームの記録はそのまま残っています。Proにすると、このページがまた使えます。",
+      "freeKeeps": "無料プランでも、教室向けゲーム{{modes}}種類、自分の単語リスト、広告なしの環境はそのまま使えます。",
       "cta": "Proで使えるようにする（月額 {{price}}）"
     },
     "digest": {
@@ -19417,6 +19420,9 @@ const ja = {
       }
     },
     "setup": {
+      "tagline": "単語を置いて陣地を広げ、ボットを出し抜こう。",
+      "showAdvanced": "詳細設定",
+      "hideAdvanced": "詳細設定を閉じる",
       "title": "対戦のセットアップ",
       "opponent": {
         "label": "対戦相手",
@@ -19439,6 +19445,7 @@ const ja = {
       "sendChallengeNow": "さあ、挑戦状を送ろう！"
     },
     "daily": {
+      "goals": { "title": "今日の目標" },
       "title": "デイリーボード",
       "play": "今日のボードをプレイ",
       "done": "今日はクリア · もう一度",

@@ -3822,6 +3822,7 @@ const sv = {
     "updateReady": "Uppdateringen är klar",
     "updateRestart": "Starta om",
     "pressBackAgainToExit": "Tryck bakåt igen för att avsluta",
+    "stop": "Stoppa",
     "used": "Används",
     "email": "E-post",
     "free": "Gratis",
@@ -14728,6 +14729,8 @@ const sv = {
       },
       "trialPreview": "Pro-förhandsvisning: den här sidan är öppen i {{days}} dagar till. Därefter krävs Pro.",
       "trialPreviewCta": "Behåll med Pro",
+      "trialEnded": "Pro-förhandsvisningen är slut. Dina klasser och din spelhistorik finns kvar. Med Pro öppnas sidan igen.",
+      "freeKeeps": "Gratis behåller du alla {{modes}} spellägen i klassrummet, dina egna ordlistor och noll reklam för eleverna.",
       "cta": "Lås upp med Pro för {{price}}/månad"
     },
     "digest": {
@@ -19775,6 +19778,9 @@ const sv = {
       }
     },
     "setup": {
+      "tagline": "Lägg ord. Ta mark. Överlista boten.",
+      "showAdvanced": "Avancerade val",
+      "hideAdvanced": "Dölj avancerat",
       "title": "Ställ in matchen",
       "opponent": {
         "label": "Motståndare",
@@ -19797,6 +19803,7 @@ const sv = {
       "sendChallengeNow": "Skicka din utmaning nu!"
     },
     "daily": {
+      "goals": { "title": "Dagens mål" },
       "title": "Dagens bräde",
       "play": "Spela dagens bräde",
       "done": "Klart idag · spela igen",

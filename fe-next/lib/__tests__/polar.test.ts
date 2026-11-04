@@ -297,6 +297,45 @@ describe('PolarClient.createCheckout', () => {
     delete process.env.NEXT_PUBLIC_APP_URL
   })
 
+  it('sends a checkout started from a class report back to that report', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ url: 'https://sandbox.polar.sh/checkout/abc' }),
+    })
+    vi.stubGlobal('fetch', fetchMock)
+    process.env.NEXT_PUBLIC_APP_URL = 'https://www.lexiclash.live'
+
+    const client = new PolarClient('token-123', 'sandbox')
+    await client.createCheckout({
+      userId: 'user-1',
+      productId: 'prod-1',
+      locale: 'he',
+      returnPath: '/he/teacher/reports?classroomId=c-1',
+    })
+
+    const body = JSON.parse(fetchMock.mock.calls[0][1].body)
+    expect(body.success_url).toBe(
+      'https://www.lexiclash.live/he/teacher/reports?classroomId=c-1&checkout=success&checkout_id={CHECKOUT_ID}',
+    )
+    delete process.env.NEXT_PUBLIC_APP_URL
+  })
+
+  it('sends a hostile return path to the teacher home instead', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ url: 'https://sandbox.polar.sh/checkout/abc' }),
+    })
+    vi.stubGlobal('fetch', fetchMock)
+    process.env.NEXT_PUBLIC_APP_URL = 'https://www.lexiclash.live'
+
+    const client = new PolarClient('token-123', 'sandbox')
+    await client.createCheckout({ userId: 'user-1', productId: 'prod-1', locale: 'en', returnPath: '//evil.example' })
+
+    const body = JSON.parse(fetchMock.mock.calls[0][1].body)
+    expect(body.success_url).toBe('https://www.lexiclash.live/en/teacher?checkout=success&checkout_id={CHECKOUT_ID}')
+    delete process.env.NEXT_PUBLIC_APP_URL
+  })
+
   it('lets redirectUrl override the locale-aware success_url verbatim', async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,

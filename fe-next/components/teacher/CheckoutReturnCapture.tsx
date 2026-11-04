@@ -8,12 +8,21 @@ import {
   GRANT_POLL_INTERVAL_MS,
   GRANT_POLL_MAX_TRIES,
   checkoutReturnPhase,
+  clearCheckoutRedirect,
   clearReturnIntent,
+  forgetCheckoutOriginAwayFrom,
   isCheckoutSuccessSearch,
+  markCheckoutRedirect,
   readReturnIntent,
   rememberReturnIntent,
+  takeCheckoutOrigin,
 } from '@/lib/education/checkoutReturn';
 import { trackEduProCheckoutReturnLanded } from '@/lib/education/proFunnelTelemetry';
+import { ProWelcomeCelebration } from '@/components/teacher/ProWelcomeCelebration';
+import { TeacherTrialWelcome } from '@/components/teacher/TeacherTrialWelcome';
+import { polarCheckoutWelcomeKind, type PolarCheckoutWelcomeKind } from '@/lib/education/polarTrial';
+
+const TEACHER_HOME = /^\/[a-z]{2}\/teacher\/?$/;
 
 /**
  * Records a Polar return before TeacherGate can redirect, then shows whether
@@ -24,16 +33,33 @@ import { trackEduProCheckoutReturnLanded } from '@/lib/education/proFunnelTeleme
  */
 export function CheckoutReturnCapture() {
   const [active, setActive] = useState(false);
+  const { language } = useLanguage();
+  const router = useRouter();
+  const currentPathname = usePathname();
+
+  useEffect(() => {
+    if (!currentPathname || isCheckoutSuccessSearch(window.location.search)) return;
+    forgetCheckoutOriginAwayFrom(window.sessionStorage, currentPathname);
+  }, [currentPathname]);
 
   useLayoutEffect(() => {
     const search = window.location.search;
     if (isCheckoutSuccessSearch(search)) {
       rememberReturnIntent(window.sessionStorage);
       trackEduProCheckoutReturnLanded();
+      const origin = takeCheckoutOrigin(window.sessionStorage, {
+        locale: language,
+        currentPath: `${window.location.pathname}${search}`,
+      });
+      if (origin) {
+        markCheckoutRedirect(window.sessionStorage, origin);
+        router.replace(origin, { scroll: false });
+      }
       setActive(true);
       return;
     }
     if (readReturnIntent(window.sessionStorage)) setActive(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- the landing is read once per mount
   }, []);
 
   if (!active) return null;
@@ -48,6 +74,11 @@ function CheckoutReturnBanner() {
   const [attempts, setAttempts] = useState(0);
   const [pollGen, setPollGen] = useState(0);
   const [dismissed, setDismissed] = useState(false);
+  const offHome = !!pathname && !TEACHER_HOME.test(pathname);
+
+  useEffect(() => {
+    if (offHome) clearCheckoutRedirect(window.sessionStorage);
+  }, [offHome]);
 
   useEffect(() => {
     if (dismissed || pro.hasPro) return;
@@ -68,6 +99,11 @@ function CheckoutReturnBanner() {
     attempts,
   });
   if (phase === 'idle') return null;
+  // Off the home page nobody else celebrates the upgrade, so the unlocked page does.
+  const welcome = polarCheckoutWelcomeKind({ checkoutSuccess: true, hasPro: pro.hasPro, source: pro.source, status: pro.status ?? 'active' });
+  if (phase === 'success' && offHome && welcome !== 'none') {
+    return <WelcomeOnThisPage kind={welcome} trialExpires={pro.trialExpires ?? pro.periodEnd ?? null} />;
+  }
 
   const copy = {
     activating: ['teacher.checkoutReturn.activatingTitle', 'teacher.checkoutReturn.activatingBody'],
@@ -127,4 +163,11 @@ function CheckoutReturnBanner() {
       </div>
     </div>
   );
+}
+
+function WelcomeOnThisPage({ kind, trialExpires }: { kind: Exclude<PolarCheckoutWelcomeKind, 'none'>; trialExpires: string | null }) {
+  useEffect(() => {
+    clearReturnIntent(window.sessionStorage);
+  }, []);
+  return kind === 'trial' ? <TeacherTrialWelcome trialExpires={trialExpires} onReturnPage /> : <ProWelcomeCelebration grant={null} paid onReturnPage />;
 }

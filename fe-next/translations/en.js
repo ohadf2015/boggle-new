@@ -3080,6 +3080,7 @@ const en = {
     "updateReady": "Update ready",
     "updateRestart": "Restart",
     "pressBackAgainToExit": "Press back again to exit",
+    "stop": "Stop",
     "used": "Used",
     "email": "Email",
     "free": "Free",
@@ -13641,6 +13642,8 @@ const en = {
       },
       "trialPreview": "Pro preview: this page is open for {{days}} more days. After that it needs Pro.",
       "trialPreviewCta": "Keep it with Pro",
+      "trialEnded": "Your Pro preview has ended. Your classes and game history are kept. With Pro, this page opens again.",
+      "freeKeeps": "Free still gives you all {{modes}} class game modes, your own word lists and no ads for students.",
       "cta": "Unlock this with Pro: {{price}}/month"
     },
     "digest": {
@@ -17957,7 +17960,7 @@ const en = {
     "difficulty": { "label": "Bot difficulty", "easy": "Easy", "medium": "Medium", "hard": "Hard" },
     "clue": { "button": "Clue", "reveal": "Try: {{word}}", "none": "No move found. Try swapping", "granted": "+1 clue!", "adFailed": "Ad unavailable. Try again" },
     "modifier": { "bingo_bonanza": "Bingo Bonanza", "long_words": "Long Words", "rich_letters": "Rich Letters", "land_grab": "Land Grab", "quick_draw": "Quick Draw", "golden_tiles": "Golden Tiles", "star_squares": "Star Squares", "none": "", "desc": { "bingo_bonanza": "Bingos score +90", "long_words": "5+ letter words +15", "rich_letters": "Rare tiles count double", "land_grab": "Captures spread to neighbors", "quick_draw": "5-tile rack, faster turns", "golden_tiles": "✦ tiles capture the cells around them", "star_squares": "Land on a star to capture the cells around it" } },
-    "setup": { "title": "Set up your match", "opponent": { "label": "Opponent", "bot": "Vs. Bot", "botDesc": "Play against WordBot", "hotseat": "Pass & Play", "hotseatDesc": "Two players, one device", "friend": "Challenge a friend", "friendDesc": "Send a beat-my-score link anywhere" }, "difficulty": { "label": "Bot level" }, "twist": { "label": "Twist", "surprise": "Surprise me" }, "start": "Start game", "challengeHint": "Beat-a-friend links appear on your results screen", "sendChallengeNow": "Now send your challenge" }, "daily": {"title": "Daily Board", "play": "Play today's board", "done": "Done today · play again", "streak": "{n}-day streak", "streakNow": "{n}-day streak!", "tomorrow": "Come back tomorrow to keep it going"}, "highlights": {"best": "Best move", "longest": "Longest word", "pts": "{n} pts"},
+    "setup": { "title": "Set up your match", "tagline": "Place words. Claim territory. Outsmart the bot.", "showAdvanced": "Advanced options", "hideAdvanced": "Hide advanced", "opponent": { "label": "Opponent", "bot": "Vs. Bot", "botDesc": "Play against WordBot", "hotseat": "Pass & Play", "hotseatDesc": "Two players, one device", "friend": "Challenge a friend", "friendDesc": "Send a beat-my-score link anywhere" }, "difficulty": { "label": "Bot level" }, "twist": { "label": "Twist", "surprise": "Surprise me" }, "start": "Start game", "challengeHint": "Beat-a-friend links appear on your results screen", "sendChallengeNow": "Now send your challenge" }, "daily": {"title": "Daily Board", "goals": {"title": "Today's goals"}, "play": "Play today's board", "done": "Done today · play again", "streak": "{n}-day streak", "streakNow": "{n}-day streak!", "tomorrow": "Come back tomorrow to keep it going"}, "highlights": {"best": "Best move", "longest": "Longest word", "pts": "{n} pts"},
     "squares": "squares",
     "place": { "step1": "Tap a letter", "step2": "Tap a square", "step3": "Submit" },
     "newBest": "New Best!",
