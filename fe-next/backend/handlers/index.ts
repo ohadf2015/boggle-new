@@ -31,6 +31,7 @@ import { registerWheelRushHandlers } from './wheelRushHandler.js';
 import { registerCrosswordHandlers } from './crosswordHandler.js';
 import { registerWordTowerHandlers } from './wordTowerHandler.js';
 import { registerWordPackHandler } from './wordPackHandler.js';
+import { registerWordCraftHandlers } from './wordcraftHandler.js';
 import { registerKickHandler } from './kickHandler.js';
 import { registerReactionHandlers } from './reactionHandler.js';
 import { registerLobbyEmoteHandlers } from './lobbyEmoteHandler.js';
@@ -77,6 +78,7 @@ function registerAllHandlers(io: Server, socket: Socket): void {
   registerCrosswordHandlers(io, socket);
   registerWordTowerHandlers(io, socket);
   registerWordPackHandler(io, socket);
+  registerWordCraftHandlers(io, socket);
   registerKickHandler(io, socket);
   registerReactionHandlers(io, socket);
   registerLobbyEmoteHandlers(io, socket);

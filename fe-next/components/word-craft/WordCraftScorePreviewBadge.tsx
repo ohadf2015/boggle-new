@@ -34,7 +34,7 @@ export function WordCraftScorePreviewBadge({ board: _board, placements, diceBonu
     <div
       role="status"
       aria-live="polite"
-      className="pointer-events-none absolute left-1/2 top-2 -translate-x-1/2 z-30 flex flex-col items-center gap-1"
+      className="mx-auto flex flex-col items-center gap-1 shrink-0"
     >
       <div
         className={`rounded-neo border-neo-thick px-3 py-1 font-neo-display text-base font-black shadow-hard ${tintForCells(cells)}`}
