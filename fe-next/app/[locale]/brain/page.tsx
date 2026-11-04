@@ -25,7 +25,7 @@ export function generateStaticParams(): Array<{ locale: string }> {
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
-  return generatePageMetadata({ seoKey: 'brain', path: '/brain', locale });
+  return generatePageMetadata({ seoKey: 'brain', path: '/brain', locale, noIndex: true });
 }
 
 const seoContent: Record<string, { title: string; description: string; features: string[]; faq: { question: string; answer: string }[] }> = {

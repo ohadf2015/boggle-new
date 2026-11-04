@@ -5,6 +5,7 @@ import { VideoGameJsonLd } from '@/components/seo/VideoGameJsonLd';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import MultiplayerPageClient from './PageClient';
 import { SUPPORTED_LOCALES } from '@/lib/localeResolution';
+import { INDEXED_LOBBY_LOCALE } from './indexedLobby';
 
 export const revalidate = 3600;
 
@@ -20,7 +21,7 @@ export function generateStaticParams(): Array<{ locale: string }> {
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
-  return generatePageMetadata({ seoKey: 'multiplayer', path: '/multiplayer', locale });
+  return generatePageMetadata({ seoKey: 'multiplayer', path: '/multiplayer', locale, noIndex: locale !== INDEXED_LOBBY_LOCALE });
 }
 
 const seoContent: Record<string, {

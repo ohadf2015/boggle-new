@@ -24,8 +24,9 @@ vi.mock('../brain/PageClient', () => ({ default: () => null }));
 vi.mock('../multiplayer/PageClient', () => ({ default: () => null }));
 vi.mock('@/components/daily/DailyRedirect', () => ({ default: () => null }));
 
-import BrainPage from '../brain/page';
-import MultiplayerPage from '../multiplayer/page';
+import BrainPage, { generateMetadata as brainMetadata } from '../brain/page';
+import MultiplayerPage, { generateMetadata as multiplayerMetadata } from '../multiplayer/page';
+import { generateMetadata as singleplayerMetadata } from '../singleplayer/page';
 import DailyPage from '../daily/page';
 
 type ServerPage = (p: {
@@ -82,5 +83,21 @@ describe('play surfaces render no marketing/FAQ card', () => {
       .map((s) => s.textContent ?? '')
       .join(' ');
     expect(jsonLd).toContain('Wheel Rush');
+  });
+
+  it('/es/multiplayer stays indexable', async () => {
+    const m = await multiplayerMetadata({ params: Promise.resolve({ locale: 'es' }) });
+    expect(m.robots).toEqual({ index: true, follow: true });
+  });
+
+  it.each([
+    ['multiplayer', multiplayerMetadata],
+    ['singleplayer', singleplayerMetadata],
+    ['brain', brainMetadata],
+  ])('/%s is noindex,follow since it carries no indexable copy', async (name, meta) => {
+    for (const locale of name === 'multiplayer' ? ['en', 'he', 'sv'] : ['en', 'he', 'es']) {
+      const m = await meta({ params: Promise.resolve({ locale }) });
+      expect(m.robots).toEqual({ index: false, follow: true });
+    }
   });
 });
