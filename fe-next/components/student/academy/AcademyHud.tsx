@@ -7,8 +7,8 @@
  */
 
 import Image from 'next/image';
-import { m } from 'framer-motion';
 import { useEduReducedMotion } from '@/lib/education/motion/useEduReducedMotion';
+import { useCompositorLoop } from '@/lib/education/motion/compositorLoop';
 import { UserX } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -51,6 +51,7 @@ export function AcademyHud({ userId, name, avatarConfig, totalXp, streak, streak
   const xp = getXpProgress(totalXp);
   const shownXp = useCountUp({ target: xp.xpInCurrentLevel, duration: 1100, startDelay: 250, immediate: still });
   const shownStars = useCountUp({ target: stars, duration: 900, startDelay: 400, immediate: still });
+  const shine = useCompositorLoop<HTMLSpanElement>(still ? null : { keyframes: [{ transform: 'translateX(-100%)' }, { transform: 'translateX(400%)' }], duration: 1300, repeatDelay: 2600, delay: 1400 });
   const pct = xp.xpNeededForNextLevel > 0 ? Math.min(100, (shownXp / xp.xpNeededForNextLevel) * 100) : xp.progressPercent;
 
   return (
@@ -119,11 +120,10 @@ export function AcademyHud({ userId, name, avatarConfig, totalXp, streak, streak
             }}
           >
             {!still && (
-              <m.span
+              <span
+                ref={shine}
                 aria-hidden="true"
                 className="absolute inset-y-0 left-0 w-6 -skew-x-12 bg-neo-white/60"
-                animate={{ x: ['-100%', '400%'] }}
-                transition={{ duration: 1.3, repeat: Infinity, repeatDelay: 2.6, ease: 'easeInOut', delay: 1.4 }}
               />
             )}
           </div>

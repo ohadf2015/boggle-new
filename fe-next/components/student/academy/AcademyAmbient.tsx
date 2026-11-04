@@ -14,8 +14,8 @@
  */
 
 import Image from 'next/image';
-import { m } from 'framer-motion';
 import { useEduReducedMotion } from '@/lib/education/motion/useEduReducedMotion';
+import { useCompositorLoop, type LoopSpec } from '@/lib/education/motion/compositorLoop';
 import type { MapLayout } from './AcademyMap';
 
 const RUNES: Record<MapLayout, { x: number; y: number; r: number }[]> = {
@@ -86,6 +86,88 @@ const FALLS: Record<MapLayout, { x: number; y: number; h: number; w: number }[]>
  * Keyframes live in app/globals.css (single definition, no per-mount injection).
  */
 
+const pulse = (from: number, to: number) => [{ transform: `scale(${from})` }, { transform: `scale(${to})` }, { transform: `scale(${from})` }];
+
+function Rune({ rune, i, still }: { rune: (typeof RUNES)[MapLayout][number]; i: number; still: boolean }) {
+  const cycle = { duration: (3.2 + i * 0.5) * 1000, delay: i * 700 };
+  const glow = useCompositorLoop<HTMLSpanElement>(still ? null : [
+    { keyframes: pulse(0.85, 1.15), ...cycle },
+    { keyframes: [{ opacity: 0.55 }, { opacity: 1 }, { opacity: 0.55 }], ...cycle },
+  ]);
+  const orbit = useCompositorLoop<HTMLSpanElement>(still ? null : { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(360deg)' }], duration: (9 + i * 2) * 1000, easing: 'linear' });
+  return (
+    <span
+      className="absolute -translate-x-1/2 -translate-y-1/2"
+      style={{ left: `${rune.x}%`, top: `${rune.y}%`, width: `${rune.r * 2}%`, aspectRatio: '1' }}
+    >
+      <span
+        ref={glow}
+        className="absolute inset-0 rounded-full mix-blend-screen"
+        style={{ background: 'radial-gradient(circle, rgba(255,214,90,0.55) 0%, rgba(255,170,40,0.18) 40%, transparent 68%)' }}
+      />
+      {!still && (
+        <span ref={orbit} className="absolute inset-0">
+          <span className="absolute left-1/2 top-[8%] -translate-x-1/2 drop-shadow-[0_0_4px_rgba(255,220,120,0.9)]">
+            <Sparkle size={10} />
+          </span>
+        </span>
+      )}
+    </span>
+  );
+}
+
+function Mote({ mote, i }: { mote: (typeof MOTES)[number]; i: number }) {
+  const cycle = { duration: mote.dur * 1000, delay: mote.delay * 1000, easing: 'ease-out' };
+  const loops: LoopSpec[] = [
+    { keyframes: [{ opacity: 0 }, { opacity: 0.9 }, { opacity: 0 }], ...cycle },
+    { keyframes: [{ transform: 'translate(0px, 0px)' }, { transform: `translate(${i % 2 ? 10 : -10}px, -60px)` }], ...cycle },
+  ];
+  const ref = useCompositorLoop<HTMLSpanElement>(loops);
+  return (
+    <span
+      ref={ref}
+      className="absolute rounded-full"
+      style={{
+        left: `${mote.x}%`,
+        top: `${mote.y}%`,
+        width: mote.size,
+        height: mote.size,
+        opacity: 0,
+        background: 'radial-gradient(circle, color-mix(in srgb, var(--neo-yellow) 20%, var(--neo-cream)) 0%, color-mix(in srgb, var(--neo-red) 10%, var(--neo-yellow)) 45%, rgba(255,210,58,0) 72%)',
+      }}
+    />
+  );
+}
+
+function Cloud({ cloud, still }: { cloud: (typeof CLOUDS)[MapLayout][number]; still: boolean }) {
+  const drift = (cloud.depth + 1) * 14;
+  // `translate`, not `transform`: the flip lives on transform.
+  const ref = useCompositorLoop<HTMLSpanElement>(still ? null : { keyframes: [{ translate: '0px' }, { translate: `${drift}px` }, { translate: '0px' }], duration: (16 + cloud.depth * 6) * 1000 });
+  return (
+    <span
+      ref={ref}
+      className="absolute"
+      style={{
+        left: `${cloud.x}%`,
+        top: `${cloud.y}%`,
+        width: `${cloud.w}%`,
+        aspectRatio: '1264 / 848',
+        opacity: cloud.depth === 0 ? 0.3 : 0.55,
+        transform: cloud.flip ? 'scaleX(-1)' : undefined,
+      }}
+    >
+      <Image
+        src="/images/adventure/cloud.webp"
+        alt=""
+        fill
+        unoptimized
+        sizes="40vw"
+        className="object-contain [filter:hue-rotate(40deg)_saturate(0.7)_brightness(0.85)]"
+      />
+    </span>
+  );
+}
+
 function Sparkle({ size }: { size: number }) {
   return (
     <svg viewBox="0 0 12 12" width={size} height={size} aria-hidden="true">
@@ -127,75 +209,11 @@ export function AcademyAmbient({ layout, reducedMotion }: { layout: MapLayout; r
             />
           </span>
         ))}
-      {RUNES[layout].map((rune, i) => (
-        <span
-          key={`rune-${i}`}
-          className="absolute -translate-x-1/2 -translate-y-1/2"
-          style={{ left: `${rune.x}%`, top: `${rune.y}%`, width: `${rune.r * 2}%`, aspectRatio: '1' }}
-        >
-          <m.span
-            className="absolute inset-0 rounded-full mix-blend-screen"
-            style={{ background: 'radial-gradient(circle, rgba(255,214,90,0.55) 0%, rgba(255,170,40,0.18) 40%, transparent 68%)' }}
-            animate={still ? undefined : { scale: [0.85, 1.15, 0.85], opacity: [0.55, 1, 0.55] }}
-            transition={still ? undefined : { duration: 3.2 + i * 0.5, repeat: Infinity, ease: 'easeInOut', delay: i * 0.7 }}
-          />
-          {!still && (
-            <m.span
-              className="absolute inset-0"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 9 + i * 2, repeat: Infinity, ease: 'linear' }}
-            >
-              <span className="absolute left-1/2 top-[8%] -translate-x-1/2 drop-shadow-[0_0_4px_rgba(255,220,120,0.9)]">
-                <Sparkle size={10} />
-              </span>
-            </m.span>
-          )}
-        </span>
-      ))}
+      {RUNES[layout].map((rune, i) => <Rune key={`rune-${i}`} rune={rune} i={i} still={still} />)}
 
-      {!still &&
-        MOTES.map((mote, i) => (
-          <m.span
-            key={`mote-${i}`}
-            className="absolute rounded-full"
-            style={{
-              left: `${mote.x}%`,
-              top: `${mote.y}%`,
-              width: mote.size,
-              height: mote.size,
-              background: 'radial-gradient(circle, color-mix(in srgb, var(--neo-yellow) 20%, var(--neo-cream)) 0%, color-mix(in srgb, var(--neo-red) 10%, var(--neo-yellow)) 45%, rgba(255,210,58,0) 72%)',
-            }}
-            initial={{ opacity: 0, y: 0 }}
-            animate={{ opacity: [0, 0.9, 0], y: [0, -60], x: [0, i % 2 ? 10 : -10] }}
-            transition={{ duration: mote.dur, repeat: Infinity, delay: mote.delay, ease: 'easeOut' }}
-          />
-        ))}
+      {!still && MOTES.map((mote, i) => <Mote key={`mote-${i}`} mote={mote} i={i} />)}
 
-      {CLOUDS[layout].map((cloud, i) => (
-        <m.span
-          key={`cloud-${i}`}
-          className="absolute"
-          style={{
-            left: `${cloud.x}%`,
-            top: `${cloud.y}%`,
-            width: `${cloud.w}%`,
-            aspectRatio: '1264 / 848',
-            opacity: cloud.depth === 0 ? 0.3 : 0.55,
-            scaleX: cloud.flip ? -1 : 1,
-          }}
-          animate={still ? undefined : { x: [0, (cloud.depth + 1) * 14, 0] }}
-          transition={still ? undefined : { duration: 16 + cloud.depth * 6, repeat: Infinity, ease: 'easeInOut' }}
-        >
-          <Image
-            src="/images/adventure/cloud.webp"
-            alt=""
-            fill
-            unoptimized
-            sizes="40vw"
-            className="object-contain [filter:hue-rotate(40deg)_saturate(0.7)_brightness(0.85)]"
-          />
-        </m.span>
-      ))}
+      {CLOUDS[layout].map((cloud, i) => <Cloud key={`cloud-${i}`} cloud={cloud} still={still} />)}
     </div>
   );
 }

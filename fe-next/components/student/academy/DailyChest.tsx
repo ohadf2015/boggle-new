@@ -22,6 +22,7 @@ import { cn } from '@/lib/utils';
 import RewardChipRow, { XpIcon } from '@/components/education/rewards/RewardChipRow';
 import { EDU_EASE } from '@/lib/education/motion/tokens';
 import { KEY_MOMENTS } from '@/lib/education/motion/keyMoments';
+import { useCompositorLoop } from '@/lib/education/motion/compositorLoop';
 import { toneStyle } from './chrome';
 import { canOpenChest, markChestOpened, clearChestOpened, claimDailyChestXp, DAILY_CHEST_XP } from './dailyChestStore';
 
@@ -45,6 +46,9 @@ const OPEN_BURST = {
   animate: { scale: [0.9, 1.25, 1.1], y: [0, -18, 0] },
   transition: { duration: 0.4, ease: EDU_EASE.outQuint },
 };
+
+/** Idle wiggle: a small, rare shake — it asks, it does not shout. */
+const WIGGLE = { keyframes: [0, -6, 6, -3, 0].map((d) => ({ rotate: `${d}deg` })), duration: 800, repeatDelay: 3200 };
 
 /** Its own component so the count-up's per-frame updates re-render one number, not the reveal. */
 function ChestXp({ counting, reducedMotion }: { counting: boolean; reducedMotion: boolean }) {
@@ -138,10 +142,13 @@ export function DailyChest({ userId, reducedMotion, onGranted, size = 'sm', onRe
   const fresh = available || covering;
   const wiggle = available && !covering && !reducedMotion;
   const mounted = armed || covering;
+  // `rotate`, not `transform`: the tap squash is framer's transform and composes with it.
+  const wiggleRef = useCompositorLoop<HTMLButtonElement>(wiggle ? WIGGLE : null);
 
   return (
     <>
       <m.button
+        ref={wiggleRef}
         type="button"
         data-testid="academy-daily-chest"
         data-available={available}
@@ -151,9 +158,6 @@ export function DailyChest({ userId, reducedMotion, onGranted, size = 'sm', onRe
         disabled={!available}
         // Its own layer: the wiggle and the tap squash then never repaint the HUD and cards around it.
         className={cn('icon-only relative flex flex-col items-center will-change-transform', size === 'md' && 'h-[72px] w-[72px]', !available && 'cursor-default')}
-        // Idle wiggle: a small, rare shake — it asks, it does not shout.
-        animate={wiggle ? { rotate: [0, -6, 6, -3, 0] } : undefined}
-        transition={wiggle ? { duration: 0.8, repeat: Infinity, repeatDelay: 3.2 } : undefined}
         whileTap={available ? { scale: 0.9 } : undefined}
       >
         <span className={cn('relative block', size === 'md' ? 'h-full w-full' : 'h-12 w-12')}>

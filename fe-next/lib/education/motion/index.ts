@@ -4,3 +4,4 @@ export { celebrationTimeline, CELEBRATION_MAX_MS, type CelebrationTimeline } fro
 export { useEduReducedMotion } from './useEduReducedMotion';
 export { KEY_MOMENTS, KEY_MOMENT_MAX_MS, resolveKeyMoment, type KeyMoment } from './keyMoments';
 export { EDU_FIT_SCREEN, fitScale, useFitToViewport } from './fitToViewport';
+export { loopEffect, useCompositorLoop, type LoopSpec } from './compositorLoop';

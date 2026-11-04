@@ -277,3 +277,59 @@ export async function observeLayoutShift(page: Page) {
 }
 
 export const readLayoutShift = (page: Page) => page.evaluate(() => (window as unknown as { __cls: number }).__cls ?? 0);
+
+/** Long-animation-frame log, so a settle wait can tell a busy main thread from a quiet one. */
+export async function observeLongFrames(page: Page) {
+  await page.addInitScript(() => {
+    const w = window as unknown as { __longFrameEnd: number };
+    w.__longFrameEnd = 0;
+    try {
+      new PerformanceObserver((list) => {
+        for (const e of list.getEntries()) w.__longFrameEnd = Math.max(w.__longFrameEnd, e.startTime + e.duration);
+      }).observe({ type: 'long-animation-frame', buffered: true });
+    } catch { /* not supported: the idle probe still has to fire */ }
+  });
+}
+
+/** A tap on the hub where nothing reacts: the student's first engagement, without opening anything. */
+export async function tapInertSpot(page: Page) {
+  const spot = await page.evaluate(() => {
+    const live = 'button,a,input,select,textarea,[role="button"],[role="link"],[tabindex]:not([tabindex="-1"])';
+    for (let y = 120; y < innerHeight - 120; y += 40) for (let x = 40; x < innerWidth - 40; x += 40) {
+      const el = document.elementFromPoint(x, y);
+      if (el?.closest('[data-testid="academy-hub"]') && !el.closest(live)) return { x, y };
+    }
+    return null;
+  });
+  if (!spot) throw new Error('no inert spot on the hub to tap');
+  await page.mouse.click(spot.x, spot.y);
+}
+
+/**
+ * Waits until the work the first gesture releases (the app's deferred loaders, staggered one per
+ * quiet window) has run: no script has arrived and no frame was long for `quietMs`, at least
+ * `minMs` after the gesture, and an idle callback fires. Throws past `capMs`: a measurement taken
+ * before then would pace someone else's script.
+ */
+export async function waitForSettledMainThread(page: Page, { quietMs = 2000, minMs = 4000, capMs = 30_000 } = {}) {
+  const start = Date.now();
+  const until = start + capMs;
+  for (;;) {
+    const left = until - Date.now();
+    if (left <= 0) throw new Error(`main thread never settled within ${capMs}ms`);
+    const probe = await page.evaluate(({ quietMs, wait }) => new Promise<{ idle: boolean; quiet: boolean }>((resolve) => {
+      const w = window as unknown as { __longFrameEnd?: number; requestIdleCallback?: (cb: () => void) => number };
+      const quiet = () => {
+        const lastScript = performance.getEntriesByType('resource')
+          .filter((r) => (r as PerformanceResourceTiming).initiatorType === 'script')
+          .reduce((t, r) => Math.max(t, (r as PerformanceResourceTiming).responseEnd), 0);
+        return performance.now() - Math.max(w.__longFrameEnd ?? 0, lastScript) >= quietMs;
+      };
+      const timer = setTimeout(() => resolve({ idle: false, quiet: quiet() }), wait);
+      if (!w.requestIdleCallback) { clearTimeout(timer); resolve({ idle: true, quiet: quiet() }); return; }
+      w.requestIdleCallback(() => { clearTimeout(timer); resolve({ idle: true, quiet: quiet() }); });
+    }), { quietMs, wait: Math.min(5000, left) });
+    if (probe.idle && probe.quiet && Date.now() - start >= minMs) return;
+    await page.waitForTimeout(250);
+  }
+}
