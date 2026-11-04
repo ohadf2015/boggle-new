@@ -131,22 +131,23 @@ export async function updateClassroom(
 }
 
 /**
- * Delete a classroom (cascades to memberships via foreign key)
+ * Delete a classroom. Goes through DELETE /api/education/classroom/[id] so
+ * rounds are removed first — the FK is ON DELETE SET NULL, and a direct
+ * classrooms delete would orphan the reports.
  */
 export async function deleteClassroom(id: string): Promise<{ error: { message: string } | null }> {
-  if (!supabase) return { error: { message: 'Supabase not configured' } };
-
   try {
-    const { error } = await supabase
-      .from('classrooms')
-      .delete()
-      .eq('id', id);
-
-    if (error) {
-      logger.error('Error deleting classroom:', error);
-      return { error: { message: error.message } };
+    const { fetchWithAuth } = await import('@/utils/authFetch');
+    const res = await fetchWithAuth(`/api/education/classroom/${id}`, {
+      method: 'DELETE',
+      requireSession: true,
+    });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      const message = typeof body?.error === 'string' ? body.error : 'Could not delete classroom';
+      logger.error('Error deleting classroom:', message);
+      return { error: { message } };
     }
-
     return { error: null };
   } catch (err) {
     const error = err instanceof Error ? err.message : 'Unknown error';

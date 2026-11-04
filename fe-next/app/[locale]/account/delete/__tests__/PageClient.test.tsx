@@ -43,6 +43,8 @@ describe('DeleteAccountPageClient teacher vs non-teacher flows', () => {
         totalStudents: 15,
         roundsPlayed: 10,
         emailSubscribed: true,
+        billing: { tier: 'free', status: null, renews: false, portalUrl: null },
+        perClassDeleteAvailable: true,
       },
       isLoading: false,
       error: null,
@@ -68,6 +70,8 @@ describe('DeleteAccountPageClient teacher vs non-teacher flows', () => {
         totalStudents: 0,
         roundsPlayed: 0,
         emailSubscribed: true,
+        billing: { tier: null, status: null, renews: false, portalUrl: null },
+        perClassDeleteAvailable: false,
       },
       isLoading: false,
       error: null,
@@ -81,5 +85,6 @@ describe('DeleteAccountPageClient teacher vs non-teacher flows', () => {
     expect(screen.queryByText('settings.teacherDeleteImpactTitle')).not.toBeInTheDocument();
     expect(screen.getByPlaceholderText('DELETE')).toBeInTheDocument();
     expect(screen.getByText('settings.deleteAccountConfirmButton')).toBeInTheDocument();
+    expect(screen.getByTestId('delete-reason-picker')).toBeInTheDocument();
   });
 });
