@@ -15470,24 +15470,44 @@ const ru = {
     "deleteAccountError": "Не удалось удалить аккаунт. Попробуйте ещё раз.",
     "teacherDeleteImpactTitle": "Ваш класс удалится вместе с аккаунтом",
     "teacherDeleteImpactSummary": "{students} учеников в {classes} классах и {rounds} сыгранных игр потеряют доступ к прогрессу класса.",
+    // TODO(native-review): teacher-delete v2 strings below are machine-translated.
+    "teacherDeleteImpactSummaryV2": "{classes} {classNoun}, {students} {studentNoun}, {rounds} {roundNoun} и их отчёты будут удалены навсегда.",
+    "teacherDeleteNoun": {
+      "class": { "one": "класс", "other": "классов" },
+      "student": { "one": "ученик", "other": "учеников" },
+      "round": { "one": "игра", "other": "игр" }
+    },
     "teacherDeleteUnnamedClass": "Класс без названия",
     "teacherDeleteRosterCount": "{count} учеников",
     "teacherDeleteAlternativesTitle": "Прежде чем уйти — более лёгкие варианты",
     "teacherDeleteStopEmails": "Просто отключить письма",
-    "teacherDeleteStopEmailsHint": "Отписаться от писем для учителей, всё остальное сохранится",
+    "teacherDeleteStopEmailsHint": "Отписка от писем для учителей — аккаунт, классы и отчёты сохраняются.",
     "teacherDeleteStopEmailsWorking": "Отключаем письма...",
     "teacherDeleteStopEmailsDone": "Письма отключены — аккаунт сохранён",
     "teacherDeleteStopEmailsError": "Не удалось обновить настройки почты. Попробуйте ещё раз.",
-    "teacherDeleteKeepFree": "Оставить бесплатный аккаунт",
-    "teacherDeleteKeepFreeHint": "Бесплатное остаётся бесплатным — класс и игры подождут вас",
-    "teacherDeleteReasonTitle": "Какова главная причина ухода?",
+    "teacherDeleteStopEmailsFallbackLink": "Или отпишитесь на странице почты",
+    "teacherDeleteKeepFree": "Бесплатный план остаётся бесплатным",
+    "teacherDeleteKeepFreeHint": "Карта не сохранена, ничего не продлевается само. Классы ждут вас.",
+    "teacherDeleteProActiveNote": "Pro продлевается автоматически — сначала управляйте или отмените его в платёжном портале.",
+    "teacherDeleteProActiveLink": "Открыть платёжный портал",
+    "teacherDeleteOneClass": {
+      "oneClass": "Удалить ваш класс вместо этого",
+      "other": "Удалить один класс вместо этого"
+    },
+    "teacherDeleteOneClassHint": {
+      "oneClass": "«{name}» и его список удалятся; аккаунт останется.",
+      "other": "Удалите один класс и его список; остальное сохранится."
+    },
+    "teacherDeleteReasonTitle": "Какова главная причина? (необязательно)",
     "teacherDeleteReason": {
       "too_many_emails": "Слишком много писем",
       "not_using_it": "Больше не пользуюсь",
       "privacy_concerns": "Вопросы приватности",
       "missing_features": "Не хватает функций",
       "too_expensive": "Слишком дорого",
-      "privacy": "Вопросы приватности",
+      "didnt_work_for_class": "Не подошло для моего класса",
+      "duplicate_account": "Дублирующий аккаунт",
+      "privacy": "Приватность",
       "found_alternative": "Нашёл альтернативу",
       "other": "Другое"
     },

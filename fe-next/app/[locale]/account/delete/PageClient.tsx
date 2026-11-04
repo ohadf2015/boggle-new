@@ -11,9 +11,10 @@ import { useTheme } from '@/utils/ThemeContext';
 import { signInWithMagicLink, signOut } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import { useDeleteImpact } from '@/lib/account/useDeleteImpact';
-import type { TeacherDeleteReason } from '@/lib/account/deleteAccountImpact';
+import { EMPTY_DELETE_IMPACT, type TeacherDeleteReason } from '@/lib/account/deleteAccountImpact';
 import { trackTeacherDeleteConfirmed } from '@/lib/education/teacherDeleteTelemetry';
 import TeacherDeleteInterstitial from '@/components/settings/TeacherDeleteInterstitial';
+import DeleteReasonPicker from '@/components/settings/DeleteReasonPicker';
 
 type Step = 'email' | 'check-email' | 'confirm' | 'deleted';
 
@@ -63,6 +64,8 @@ export default function DeleteAccountPageClient() {
     try {
       if (impact?.isTeacher) {
         trackTeacherDeleteConfirmed(impact, reason, 'account_delete_page');
+      } else {
+        trackTeacherDeleteConfirmed(impact ?? EMPTY_DELETE_IMPACT, reason, 'account_delete_page', false);
       }
       const res = await fetch('/api/account/delete', {
         method: 'DELETE',
@@ -190,6 +193,13 @@ export default function DeleteAccountPageClient() {
                   {t('settings.deleteAccountConfirm')}
                 </p>
               </div>
+              <DeleteReasonPicker
+                reason={reason}
+                onReasonChange={setReason}
+                isDarkMode={isDarkMode}
+                surface="account_delete_page"
+                isTeacher={false}
+              />
               <p className={cn('text-xs', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
                 {t('settings.deleteAccountTypeConfirm')}
               </p>
@@ -206,10 +216,10 @@ export default function DeleteAccountPageClient() {
               <button
                 type="button"
                 onClick={handleDelete}
-                disabled={confirmText !== 'DELETE' || isLoading || (Boolean(impact?.isTeacher) && !reason)}
+                disabled={confirmText !== 'DELETE' || isLoading}
                 className={cn(
                   'w-full px-4 py-3 rounded-neo border-3 border-neo-red font-bold text-sm min-h-[44px] transition-colors',
-                  confirmText === 'DELETE' && !isLoading && (!impact?.isTeacher || Boolean(reason))
+                  confirmText === 'DELETE' && !isLoading
                     ? 'bg-neo-red text-white hover:bg-red-600'
                     : 'bg-gray-300 text-gray-500 border-gray-400 cursor-not-allowed'
                 )}

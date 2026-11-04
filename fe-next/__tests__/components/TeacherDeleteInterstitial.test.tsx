@@ -22,6 +22,8 @@ vi.mock('@/lib/education/teacherDeleteTelemetry', () => ({
 
 const mockT = (key: string) => key;
 
+const FREE_BILLING = { tier: 'free' as const, status: null, renews: false, portalUrl: null };
+
 const TEACHER_IMPACT: DeleteImpactSummary = {
   isTeacher: true,
   classrooms: [
@@ -31,6 +33,8 @@ const TEACHER_IMPACT: DeleteImpactSummary = {
   totalStudents: 21,
   roundsPlayed: 15,
   emailSubscribed: true,
+  billing: FREE_BILLING,
+  perClassDeleteAvailable: false,
 };
 
 function renderInterstitial(overrides: Partial<Parameters<typeof TeacherDeleteInterstitial>[0]> = {}) {
@@ -70,9 +74,9 @@ describe('TeacherDeleteInterstitial', () => {
 
   it('picking a reason lifts it up and emits teacher_delete_reason_selected', () => {
     const props = renderInterstitial();
-    fireEvent.click(screen.getByText('settings.teacherDeleteReason.too_many_emails'));
-    expect(props.onReasonChange).toHaveBeenCalledWith('too_many_emails');
-    expect(trackTeacherDeleteReasonSelected).toHaveBeenCalledWith('too_many_emails', 'settings');
+    fireEvent.click(screen.getByText('settings.teacherDeleteReason.too_expensive'));
+    expect(props.onReasonChange).toHaveBeenCalledWith('too_expensive');
+    expect(trackTeacherDeleteReasonSelected).toHaveBeenCalledWith('too_expensive', 'settings', true);
   });
 
   it('"keep free account" emits the alternative and keeps the account', () => {
@@ -118,19 +122,50 @@ describe('TeacherDeleteInterstitial', () => {
     expect(screen.getByText('settings.teacherDeleteStopEmailsDone')).toBeInTheDocument();
   });
 
-  it('disables continue button until a reason is selected', () => {
+  it('continue is optional — a missing reason does not block it', () => {
     const props = renderInterstitial({ reason: null });
-    const continueBtn = screen.getByText('settings.teacherDeleteContinue').closest('button');
-    expect(continueBtn).toBeDisabled();
-    fireEvent.click(continueBtn!);
-    expect(props.onContinueToDelete).not.toHaveBeenCalled();
-  });
-
-  it('enables continue button and calls onContinueToDelete when reason is selected', () => {
-    const props = renderInterstitial({ reason: 'too_many_emails' });
     const continueBtn = screen.getByText('settings.teacherDeleteContinue').closest('button');
     expect(continueBtn).not.toBeDisabled();
     fireEvent.click(continueBtn!);
     expect(props.onContinueToDelete).toHaveBeenCalled();
+  });
+
+  it('renders the acceptance sentence, free-stays-free, and the delete-one-class link', () => {
+    const dict: Record<string, string> = {
+      'settings.teacherDeleteImpactSummaryV2': '{classes} {classNoun}, {students} {studentNoun}, {rounds} {roundNoun} and their reports will be permanently deleted.',
+      'settings.teacherDeleteNoun.class.one': 'class',
+      'settings.teacherDeleteNoun.student.other': 'students',
+      'settings.teacherDeleteNoun.round.other': 'rounds',
+      'settings.teacherDeleteKeepFree': 'The free plan stays free',
+      'settings.teacherDeleteOneClass.oneClass': 'Delete your class instead',
+    };
+    (useLanguage as Mock).mockReturnValue({ t: (key: string) => dict[key] ?? key, language: 'en' });
+    renderInterstitial({
+      impact: {
+        ...TEACHER_IMPACT,
+        classrooms: [{ id: 'c1', name: 'Period 3', studentCount: 19 }],
+        totalStudents: 19,
+        roundsPlayed: 15,
+        perClassDeleteAvailable: true,
+        billing: FREE_BILLING,
+      },
+    });
+    expect(screen.getByTestId('teacher-delete-impact-summary')).toHaveTextContent(
+      '1 class, 19 students, 15 rounds and their reports will be permanently deleted.'
+    );
+    expect(screen.getByText('The free plan stays free')).toBeInTheDocument();
+    expect(screen.getByTestId('teacher-delete-one-class')).toHaveAttribute('href', '/en/teacher/classroom/c1');
+  });
+
+  it('hides free-stays-free when Pro renews and shows the billing note instead', () => {
+    renderInterstitial({
+      impact: {
+        ...TEACHER_IMPACT,
+        billing: { tier: 'pro', status: 'active', renews: true, portalUrl: 'https://billing.example/portal' },
+      },
+    });
+    expect(screen.queryByText('settings.teacherDeleteKeepFree')).not.toBeInTheDocument();
+    expect(screen.getByTestId('teacher-delete-pro-note')).toBeInTheDocument();
+    expect(screen.getByText('settings.teacherDeleteProActiveLink')).toHaveAttribute('href', 'https://billing.example/portal');
   });
 });
