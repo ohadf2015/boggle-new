@@ -251,6 +251,8 @@ const FROZEN_EXTRA = [
 ];
 
 describe('education + teacher card borders', () => {
+  // AssignmentProgressMatrix sample cells are separate elements on purpose:
+  // a ternary className concatenates and false-fails cream against lime.
   it('every education-root border is visible against its own fill (>= 3:1)', () => {
     const violations = scan().filter((v) => !isExtra(v.file));
     const report = violations
