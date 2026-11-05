@@ -15564,6 +15564,8 @@ const he = {
       "rehearseBotsBlocked": "בוטים לא יכולים לשחק במשחק הזה, אז אי אפשר לתרגל אותו איתם.",
       "rehearseUseClassic": "לתרגל עם בוטים בקלאסי במקום",
       "startWhenReady": "מתחילים כשכולם בפנים",
+      "startAnyway": "להתחיל בכל זאת",
+      "stillLearning": "{count} עדיין לומדים את המילים",
       "lateJoinOn": "אפשר להצטרף באיחור",
       "lateJoinOff": "אי אפשר להצטרף באיחור",
       "lock": {
@@ -20772,7 +20774,15 @@ const he = {
       "pickLook": "בחרו לוק",
       "shuffleLooks": "ערבבו לוקים",
       "buildLook": "עצבו לוק משלכם",
-      "readySticker": "מוכן!"
+      "readySticker": "מוכן!",
+      "studyTitle": "המילים של היום",
+      "studyProgress": "{current} מתוך {total}",
+      "studyLearned": "{count} מילים נלמדו",
+      "studyHint": "רמז: {hint}",
+      "studyBack": "הקודם",
+      "studyNext": "הבא",
+      "studyDone": "סיימתי ללמוד",
+      "studyReadyLocked": "קודם עוברים על כל {count} המילים, ואז אפשר ללחוץ 'מוכן'"
     },
     "exit": {
       "title": "לצאת מהמשחק?",

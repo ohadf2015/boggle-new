@@ -84,6 +84,7 @@ export function useProjectorLobbyMode({ gameCode, classroomGameMode, templateSet
     facts,
     className: liveGame?.classroomName ?? null,
     lessonNames: liveGame?.lessonNames ?? [],
+    studyWordCount: liveGame?.studyWordCount ?? 0,
     roundSettings: {
       timerMinutes: settings?.timerMinutes ?? undefined,
       vocabQuizQuestionCount: settings?.vocabQuizQuestionCount ?? undefined,

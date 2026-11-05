@@ -15710,6 +15710,8 @@ const ja = {
       "rehearseBotsBlocked": "このゲームはボットがプレイできないため、ボットで練習できません。",
       "rehearseUseClassic": "代わりにクラシックでボットと練習",
       "startWhenReady": "全員そろったらスタート",
+      "startAnyway": "このまま開始",
+      "stillLearning": "{count}人がまだことばを練習中",
       "lateJoinOn": "途中参加OK",
       "lateJoinOff": "途中参加なし",
       "lock": {
@@ -20842,7 +20844,15 @@ const ja = {
       "pickLook": "見た目をえらぶ",
       "shuffleLooks": "見た目をシャッフル",
       "buildLook": "自分でつくる",
-      "readySticker": "準備OK！"
+      "readySticker": "準備OK！",
+      "studyTitle": "今日のことば",
+      "studyProgress": "{current} / {total}",
+      "studyLearned": "{count}語おぼえた",
+      "studyHint": "ヒント：{hint}",
+      "studyBack": "もどる",
+      "studyNext": "つぎへ",
+      "studyDone": "おぼえた！",
+      "studyReadyLocked": "{count}語ぜんぶ見たら「準備OK」を押せるよ"
     },
     "exit": {
       "title": "ゲームをぬける？",

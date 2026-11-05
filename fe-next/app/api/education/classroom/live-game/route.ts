@@ -94,6 +94,7 @@ export async function GET(request: NextRequest) {
         classroomId: game.classroomId,
         classroomName,
         lessonNames: game.lessonNames ?? [],
+        studyWordCount: game.studyWordCount ?? 0,
         // Hoisted out of `settings` because every caller branches on it first.
         gameMode: settings.gameMode ?? 'classic',
         // Explicitly enumerated, not spread: a spread would ship whatever a

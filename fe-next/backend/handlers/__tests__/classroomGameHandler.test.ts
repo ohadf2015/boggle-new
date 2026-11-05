@@ -138,6 +138,7 @@ describe('ClassroomGameHandler', () => {
         lessonNames: gameData.lessonNames,
         vocabularyWords: gameData.vocabularyWords,
         language: 'en',
+        studyCards: [{ word: 'cat' }, { word: 'dog' }],
         settings: {
           timerMinutes: gameData.settings.timerMinutes,
           boardSize: gameData.settings.boardSize,

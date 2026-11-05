@@ -3,6 +3,8 @@
  * Manages connection lifecycle, room events, and error handling
  */
 
+import { useStudyDeck } from '@/lib/education/studyDeckStore';
+import { parseStudyCards } from '@/shared/utils/studyCards';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import type { Socket } from 'socket.io-client';
@@ -276,6 +278,7 @@ export function useMultiplayerSocket(
       // right after `joined` for classroom games.
       setClassroomLevel('core');
       setClassroomWordBank([]);
+      useStudyDeck.getState().clear();
       // Forward-only: persist a GUEST's chosen room name so it reaches analytics
       // (game_completed metadata.guest_name via getGuestName). Without this the
       // admin game log can only show a guest's session-id fragment, never their
@@ -542,6 +545,10 @@ export function useMultiplayerSocket(
           ? data.classroomWordBank.filter((w): w is string => typeof w === 'string')
           : []
       );
+    });
+
+    listen('classroomStudyCards', (data: { gameCode?: unknown; cards?: unknown }) => {
+      if (typeof data?.gameCode === 'string') useStudyDeck.getState().setDeck(data.gameCode, parseStudyCards(data.cards));
     });
 
     listen('resetGame', () => {

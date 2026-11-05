@@ -1,3 +1,4 @@
+import { buildStudyCards } from '@/shared/utils/studyCards';
 import { getCacheClient } from '@/backend/cache/redisCache';
 import logger from '@/utils/logger';
 
@@ -49,6 +50,8 @@ export interface LiveClassroomGame {
   teacherName: string;
   /** Lesson titles, for the student-facing "what are we playing" summary. */
   lessonNames: string[];
+  /** Words in the lobby study deck; READY unlocks only after a student has seen them all. */
+  studyWordCount?: number;
   /**
    * What the teacher actually picked. The student's own client has no copy of
    * this — `lessonGameData` is written to the TEACHER's sessionStorage — so
@@ -106,6 +109,8 @@ export async function lookupLiveClassroomGame(
 
     const game = JSON.parse(raw) as Partial<LiveClassroomGame> & {
       endedAt?: string;
+      vocabularyWords?: string[];
+      studyCards?: unknown[];
       players?: Array<{ userId?: string }>;
     };
     if (!game?.classroomId) return null;
@@ -117,6 +122,7 @@ export async function lookupLiveClassroomGame(
       lessonIds: game.lessonIds ?? [],
       teacherName: game.teacherName ?? '',
       lessonNames: game.lessonNames ?? [],
+      studyWordCount: (game.studyCards ?? buildStudyCards(game.vocabularyWords ?? [], [])).length,
       settings: game.settings ?? {},
       teacherId: game.teacherId,
       status: game.status,

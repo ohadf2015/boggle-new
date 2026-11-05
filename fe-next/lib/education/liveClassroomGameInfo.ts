@@ -33,6 +33,8 @@ export interface LiveClassroomGameInfo {
   /** Null when the server could not resolve it — fall back to the generic label. */
   classroomName: string | null;
   lessonNames: string[];
+  /** Absent from an older server: treat as no deck. */
+  studyWordCount?: number;
   gameMode: ClassroomGameMode;
   settings: LiveClassroomGameSettingsInfo;
 }

@@ -21,6 +21,7 @@ import { safeEmit } from '../utils/socketHelpers.js';
 import logger from '../utils/logger.js';
 import { getClassroomGame, type ClassroomGame } from './classroomGameManager.js';
 import { getClassroomLevelCached } from './classroomLevelCache.js';
+import { buildStudyCards } from '@/shared/utils/studyCards';
 
 /**
  * A classroom record a caller has ALREADY loaded.
@@ -74,6 +75,8 @@ export async function emitClassroomContext(
       classroomLevel,
       classroomWordBank: isTeacher ? [] : wordBank,
     });
+    const cards = classroomGame.studyCards ?? buildStudyCards(classroomGame.vocabularyWords ?? [], []);
+    if (!isTeacher && cards.length) safeEmit(socket, 'classroomStudyCards', { gameCode, cards });
   } catch (err) {
     logger.warn('CLASSROOM_GAME', `classroomContext lookup failed for ${gameCode}: ${(err as Error)?.message ?? err}`);
   }

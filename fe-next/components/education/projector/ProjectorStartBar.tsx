@@ -17,6 +17,8 @@ interface ProjectorStartBarProps {
   lobby: ReturnType<typeof useProjectorLobbyMode>;
   /** Real students only: bots seated by a practice round never unlock Start. */
   studentCount: number;
+  /** Students who have not finished the word deck; Start stays pressable as an override. */
+  stillLearning?: number;
   startLabelKey: string;
   starting: boolean;
   onStartGame: () => void;
@@ -36,6 +38,7 @@ export function ProjectorStartBar({
   t,
   lobby,
   studentCount,
+  stillLearning = 0,
   startLabelKey,
   starting,
   onStartGame,
@@ -55,7 +58,8 @@ export function ProjectorStartBar({
   const rehearseHere = !canStart && !!onStartPracticeRound && botsCanRehearse;
   const botsBlocked = !canStart && !!onStartPracticeRound && !botsCanRehearse && !lobby.quizBlocked;
   const altPrimary = rehearseHere || botsBlocked || lobby.quizBlocked;
-  const label = projectorStartLabel({ starting, canStart, isBoss: lobby.modeId === BOSS_BATTLE_ID, switched: lobby.switched, isQuiz: lobby.isQuiz, startLabelKey });
+  const waitingOnClass = canStart && stillLearning > 0 && !starting;
+  const label = waitingOnClass ? 'education.projectorLobby.startAnyway' : projectorStartLabel({ starting, canStart, isBoss: lobby.modeId === BOSS_BATTLE_ID, switched: lobby.switched, isQuiz: lobby.isQuiz, startLabelKey });
 
   return (
     <div
@@ -89,10 +93,10 @@ export function ProjectorStartBar({
             PRIMARY_BUTTON,
             PRESS,
             'normal-case tracking-normal',
-            canStart
+            canStart && !waitingOnClass
               ? 'min-h-16 flex-[2_1_14rem] px-6 py-3 text-[clamp(1.5rem,min(3cqw,5.5cqh),4.5rem)]'
               : 'min-h-12 flex-[1_1_14rem] px-4 py-2 text-[clamp(1rem,min(1.4cqw,2.6cqh),2rem)]',
-            startLocked
+            startLocked || waitingOnClass
               ? 'border-2 border-neo-cream/40 bg-neo-navy-light font-bold text-neo-cream/75 shadow-none hover:translate-y-0 hover:shadow-none'
               : 'motion-safe:animate-[edu-live-unlock_300ms_cubic-bezier(0.23,1,0.32,1)]',
             (lobby.quizBlocked || (!canStart && altPrimary)) && 'hidden'
@@ -129,6 +133,11 @@ export function ProjectorStartBar({
         )}
         {lockSlot}
       </div>
+      {waitingOnClass && (
+        <p data-testid="projector-still-learning" role="status" className="font-neo-display font-bold text-neo-cream text-[clamp(1rem,min(1.3cqw,2.4cqh),1.875rem)]">
+          {t('education.projectorLobby.stillLearning', { count: stillLearning })}
+        </p>
+      )}
       {!canStart && (
         <p data-testid="projector-start-reason" role="status" className="font-neo-body text-neo-cream/75 text-[clamp(0.8125rem,min(1cqw,1.9cqh),1.375rem)]">
           <span className={cn('block', altPrimary && '@max-5xl:hidden')}>{t('eduLiveRoom.lobby.startBlocked')}</span>

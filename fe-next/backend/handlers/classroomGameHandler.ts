@@ -5,6 +5,7 @@
  * Teachers create games, students receive notifications and join.
  */
 
+import { loadStudyCards } from '../modules/classroomStudyCards.js';
 import { z } from 'zod';
 import type { Server, Socket } from 'socket.io';
 import {
@@ -127,6 +128,7 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
         lessonNames: payload.lessonNames || [],
         vocabularyWords: payload.vocabularyWords || [],
         language: await resolveCreatedRoomLanguage(payload.classroomId, payload.language, payload.vocabularyWords),
+        studyCards: await loadStudyCards(payload.lessonIds || [], payload.vocabularyWords || [], payload.gameCode),
         settings: {
           timerMinutes: payload.settings?.timerMinutes,
           boardSize: payload.settings?.boardSize,
