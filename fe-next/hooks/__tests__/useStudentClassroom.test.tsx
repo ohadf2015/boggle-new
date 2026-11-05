@@ -40,6 +40,10 @@ vi.mock('@/lib/supabase/education', () => ({
 }));
 
 describe('useStudentClassroom', () => {
+  beforeAll(async () => {
+    await import('@/lib/supabase/education');
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
     mockUseAuth.mockReturnValue({
@@ -132,6 +136,17 @@ describe('useStudentClassroom', () => {
   });
 
   describe('error handling', () => {
+    it('reports a failed lookup as an error, not as no classroom', async () => {
+      mockGetStudentClassroom.mockRejectedValue(new Error('chunk failed'));
+
+      const { result } = renderHook(() => useStudentClassroom());
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+      expect(result.current.error).toBe('Failed to load classroom');
+    });
+
     it('should return error when fetch fails', async () => {
       // GIVEN: API returns error
       mockGetStudentClassroom.mockResolvedValue({

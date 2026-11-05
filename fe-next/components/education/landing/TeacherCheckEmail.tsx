@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { MailCheck, ExternalLink } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { resendEmailVerification } from '@/lib/supabase';
+import { loadAuthClient } from '@/lib/auth/loadAuthClient';
 
 const INBOXES = [
   { id: 'gmail', href: 'https://mail.google.com/mail/u/0/#search/LexiClash+in%3Aanywhere', label: 'Gmail' },
@@ -11,10 +11,15 @@ const INBOXES = [
 
 type ResendResult = { error: { message: string } | null | undefined };
 
+async function resendConfirmation(email: string): Promise<ResendResult> {
+  const { resendEmailVerification } = await loadAuthClient();
+  return resendEmailVerification(email);
+}
+
 export function TeacherCheckEmail({
   email,
   onChangeEmail,
-  onResend: resendFn = resendEmailVerification,
+  onResend: resendFn = resendConfirmation,
 }: {
   email: string;
   onChangeEmail: () => void;
@@ -27,8 +32,12 @@ export function TeacherCheckEmail({
   const onResend = async () => {
     if (resend === 'sending') return;
     setResend('sending');
-    const { error } = await resendFn(email);
-    setResend(error ? 'error' : 'sent');
+    try {
+      const { error } = await resendFn(email);
+      setResend(error ? 'error' : 'sent');
+    } catch {
+      setResend('error');
+    }
   };
 
   return (
