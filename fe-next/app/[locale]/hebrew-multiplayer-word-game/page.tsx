@@ -152,6 +152,26 @@ export default async function HebrewMultiplayerWordGamePage({ params }: PageProp
           </div>
         </section>
 
+        <section className="mb-12">
+          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">סקראבל בעברית מול לקסיקלאש</h2>
+          <div className="space-y-4 text-lg leading-relaxed text-neo-gray-200">
+            <p>
+              בסקראבל הקלאסי משחקים שניים עד ארבעה. כל אחד מחזיק שבע אותיות, מניח מילה על לוח של 15 על 15 ומחכה
+              לתור הבא. הכיף הוא בתכנון: איפה לשים אות יקרה ואיך לתפוס משבצת שמכפילה את הניקוד.
+            </p>
+            <p>
+              בלקסיקלאש אין תורות. כולם רואים את אותו לוח אותיות ומחפשים מילים בעברית באותו הזמן, עד שהשעון נגמר.
+              גם בחדר של 50 שחקנים אף אחד לא יושב ומחכה.
+            </p>
+            <p>
+              רוצים את ההשוואה המלאה?{' '}
+              <Link href={`/${locale}/lexiclash-vs-scrabble`} className="text-neo-lime underline underline-offset-2">
+                לקסיקלאש מול סקראבל
+              </Link>
+            </p>
+          </div>
+        </section>
+
         <section className="mb-12 flex flex-col gap-3 sm:flex-row-reverse sm:gap-4">
           <Link
             href={`/${locale}/multiplayer`}
