@@ -74,6 +74,17 @@ export const PRO_FEATURE_BACKING: Record<string, ProFeatureBacking> = {
       status: 402,
     },
   },
+  assignmentProgress: {
+    route: 'app/api/education/classroom/[id]/assignment-progress/route.ts',
+    guard: 'requireTeacherPro(',
+    ui: 'components/teacher/reports/AssignmentProgressMatrix.tsx',
+    tapsFromHq: 2,
+    refusal: {
+      file: 'app/api/education/classroom/[id]/assignment-progress/__tests__/route.test.ts',
+      name: '402s a free teacher and reads no student rows',
+      status: 402,
+    },
+  },
   mastery: {
     route: 'app/api/education/classroom/[id]/word-mastery/route.ts',
     guard: 'teacherHasProAccess(',

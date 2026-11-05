@@ -15400,6 +15400,21 @@ const ja = {
         "untitled": "無題のレッスン",
         "anonymousStudent": "生徒 {{id}}"
       },
+      "progressMatrix": {
+        "title": "生徒ごとの進捗",
+        "empty": "このクラスにはまだ生徒や課題がありません",
+        "trend": "傾向",
+        "trendUp": "向上中",
+        "trendDown": "下降中",
+        "trendFlat": "安定",
+        "trendNone": "まだデータが不足しています",
+        "cellCompleted": "完了 · 正答率{{score}}%",
+        "cellMissing": "未完了",
+        "sampleTitle": "生徒ごとの正答率",
+        "gateTitle": "生徒ごとのスコアはPro機能です",
+        "gateBody": "各課題で各生徒の正答率が向上しているか低下しているかを確認できます。完了数の背後にあるスコアです。",
+        "gateCta": "Proで生徒ごとのスコアを見る: {{price}}/月"
+      },
       "classGrid": {
         "title": "クラスの進捗",
         "empty": "このクラスにはまだ生徒も課題もありません",

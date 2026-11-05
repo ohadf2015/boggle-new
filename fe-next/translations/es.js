@@ -15176,6 +15176,21 @@ const es = {
         "untitled": "Lección sin título",
         "anonymousStudent": "Alumno {{id}}"
       },
+      "progressMatrix": {
+        "title": "Progreso por estudiante",
+        "empty": "Aún no hay estudiantes ni tareas en esta clase",
+        "trend": "Tendencia",
+        "trendUp": "Mejorando",
+        "trendDown": "En descenso",
+        "trendFlat": "Estable",
+        "trendNone": "Aún no hay datos suficientes",
+        "cellCompleted": "Completada, {{score}}% correcto",
+        "cellMissing": "No completada",
+        "sampleTitle": "Corrección por estudiante",
+        "gateTitle": "Las puntuaciones por estudiante son de Pro",
+        "gateBody": "Ve la corrección de cada estudiante en cada tarea y si está mejorando o empeorando: la puntuación detrás de los recuentos de completado.",
+        "gateCta": "Ve las puntuaciones por estudiante con Pro: {{price}}/mes"
+      },
       "classGrid": {
         "title": "Progreso de la clase",
         "empty": "Todavía no hay alumnos ni tareas en esta clase",
