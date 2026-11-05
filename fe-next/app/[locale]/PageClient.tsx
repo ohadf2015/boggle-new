@@ -162,11 +162,14 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
   }, [inviteRoomCode]); // frozen initial state → runs once
 
   // Hydration gate for the render-affecting, window-derived branches below
-  // (invite spinner, isNewUser CTA). The server (SSG, no window) emits LandingView;
+  // (invite spinner, QR spinner). The server (SSG, no window) emits LandingView;
   // these branches must NOT flip the first CLIENT render or React #418 fires (seen
   // in prod on /en?room=… invite links). The side-effects in the initializers above
   // still run synchronously (invite saved before child effects) — only the RENDER
-  // waits for mount, same discipline as showFTUE.
+  // waits for mount, same discipline as showFTUE. The PLAY CTA handler
+  // (onStartOnboarding) is intentionally NOT gated on mounted: it only attaches a
+  // click handler (no DOM change), and gating it dropped ~86% of PLAY clicks
+  // (FreshPlayLink fell through to href nav before the first effect fired).
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
@@ -295,7 +298,7 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
     <>
       <LandingView
         initialData={initialData}
-        onStartOnboarding={mounted && isNewUser && routeAllowsOnboarding ? handleStartOnboarding : undefined}
+        onStartOnboarding={isNewUser && routeAllowsOnboarding ? handleStartOnboarding : undefined}
       />
       {showFTUE && routeAllowsOnboarding && (
         <OnboardingFlow onComplete={handleFTUEComplete} entry={ftueEntry} />

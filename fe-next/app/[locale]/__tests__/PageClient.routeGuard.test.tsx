@@ -3,8 +3,10 @@ import { render, act } from '@testing-library/react';
 import HomePageClient from '@/app/[locale]/PageClient';
 
 let landingProps: { onStartOnboarding?: () => void } = {};
+const landingCalls: { onStartOnboarding?: () => void }[] = [];
 const captureLanding = (props: { onStartOnboarding?: () => void }) => {
   landingProps = props;
+  landingCalls.push(props);
   return <div data-testid="landing-view" />;
 };
 
@@ -25,6 +27,7 @@ describe('HomePageClient route allowlist guard', () => {
     sessionStorage.clear();
     localStorage.clear();
     landingProps = {};
+    landingCalls.length = 0;
     Object.defineProperty(window, 'location', {
       value: { search: '', pathname: '/en', origin: 'http://localhost' },
       writable: true,
@@ -43,6 +46,16 @@ describe('HomePageClient route allowlist guard', () => {
     expect(getByTestId('onboarding-flow')).toBeTruthy();
     // LandingView stays mounted beneath the FTUE overlay (CLS fix 2026-07-29).
     expect(getByTestId('landing-view')).toBeTruthy();
+  });
+
+  // Regression: the PLAY CTA must be live on the very first render. Gating it
+  // behind the mounted effect let clicks in the pre-mount window fall through
+  // to raw href nav (86% of PLAY clicks never opened onboarding).
+  it('provides onStartOnboarding on the first render, before mount effects fire', () => {
+    mockPathname.mockReturnValue('/en');
+    render(<HomePageClient />);
+    expect(landingCalls.length).toBeGreaterThan(0);
+    expect(landingCalls[0].onStartOnboarding).toBeDefined();
   });
 
   it('hides onStartOnboarding CTA on blog route', () => {
