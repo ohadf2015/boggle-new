@@ -6,6 +6,7 @@ import TeacherDashboard from '@/components/teacher/TeacherDashboard';
 import { TrialEndedBannerWithRecap, TrialUrgencyBannerWithRecap } from '@/components/teacher/TrialRecapBanners';
 import { TeacherProTrialExpiringBanner } from '@/components/teacher/TeacherProTrialExpiringBanner';
 import { TeacherProTrialLifecycleBanner } from '@/components/teacher/TeacherProTrialLifecycleBanner';
+import { TeacherTrialReminderBanner } from '@/components/education/TeacherTrialReminderBanner';
 import { PendingCheckoutBanner } from '@/components/teacher/PendingCheckoutBanner';
 import { TeacherProUsagePromptCard } from '@/components/teacher/TeacherProUsagePromptCard';
 import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
@@ -18,8 +19,9 @@ import { useTeacherUsagePrompt } from '@/hooks/useTeacherUsagePrompt';
 import { useRecentGameSettings } from '@/hooks/useRecentGameSettings';
 import { pickHomeAsk, pickTeacherBanner } from '@/lib/education/teacherBannerPriority';
 import { polarTrialUx, polarTrialDaysLeft, isPolarTrialDay10Expiring } from '@/lib/education/polarTrial';
-import { isTrialUpgradeNudgeWindow } from '@/lib/education/trial';
+import { isTrialUpgradeNudgeWindow, isTrialReminderWindow } from '@/lib/education/trial';
 import { useTrialUpgradeNudge } from '@/lib/education/useTrialUpgradeNudge';
+import { useTrialReminderBanner } from '@/lib/education/useTrialReminderBanner';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import {
   captureTeacherOnboardingViewedOnce,
@@ -61,6 +63,8 @@ function TeacherDashboardInner() {
   } = useTeacherUsagePrompt();
   const { dismissed: trialNudgeDismissed, dismiss: dismissTrialNudge } =
     useTrialUpgradeNudge(trial);
+  const { dismissed: trialReminderDismissed, dismiss: dismissTrialReminder } =
+    useTrialReminderBanner(trial);
 
   // At most one banner above the dashboard. This page used to stack a trial
   // countdown, a district-pricing upsell and a Pro strip before the thing the
@@ -73,9 +77,13 @@ function TeacherDashboardInner() {
   // not a 14-day activation countdown — Polar checkout is the CTA. Brand-new
   // teachers still wait for a first live game before the countdown, but an
   // expired trial always gets the renewal card.
+  // When trial daysLeft <= 3, the urgent reminder banner displays above the dashboard
+  // with a direct Polar trial checkout CTA.
+  const trialReminderOpen = isTrialReminderWindow(trial) && !trialReminderDismissed;
   const trialNudgeOpen = isTrialUpgradeNudgeWindow(trial) && !trialNudgeDismissed;
   const picked = pickTeacherBanner({
     hasTrial: trialNudgeOpen || !!trial?.isExpired,
+    trialReminderOpen,
     isAdmin,
     hasPro,
     proLoading,
@@ -103,6 +111,7 @@ function TeacherDashboardInner() {
       banner === 'pendingCheckout' ||
       banner === 'reactivate' ||
       banner === 'trialing' ||
+      banner === 'trialReminder' ||
       (banner === 'trial' && !!trial?.isExpired),
     onboarding: false,
     trial: banner === 'offerTrial' || trialNudgeAsk,
@@ -169,12 +178,15 @@ function TeacherDashboardInner() {
     <TeacherDashboard
       pinBanner={
         (banner === 'trialing' && (!isTrialExpiring || !trialExpiringDismissed)) ||
-        banner === 'reactivate'
+        banner === 'reactivate' ||
+        banner === 'trialReminder'
       }
       proOffer={proOffer}
       banner={
         banner === 'pendingCheckout' ? (
           <PendingCheckoutBanner />
+        ) : banner === 'trialReminder' ? (
+          <TeacherTrialReminderBanner trial={trial} onDismiss={dismissTrialReminder} />
         ) : banner === 'trial' && trial?.isExpired ? (
           // An expired access trial is account state: the renewal card, never dismissible.
           <TrialUrgencyBannerWithRecap trial={trial} href={`/${language}${TEACHER_PRO_CHECKOUT_PATH}`} />

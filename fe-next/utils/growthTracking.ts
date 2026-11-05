@@ -280,6 +280,8 @@ export type GrowthEvent =
   | 'trial_cta_tap'
   | 'edu_pro_upgrade_clicked'
   | 'edu_pro_checkout_success_seen'
+  | 'edu_trial_reminder_shown'
+  | 'edu_trial_reminder_cta_click'
   // Unconditional return-from-Polar signal (t: webhook-broken vs abandoned).
   // Fires on ?checkout=success regardless of entitlement, unlike
   // edu_pro_checkout_success_seen which waits for hasPro.

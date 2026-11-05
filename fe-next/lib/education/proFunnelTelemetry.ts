@@ -102,6 +102,29 @@ export function trackTrialCtaTap(args: { source: TrialCtaSource }): void {
   captureStep('trial_cta_tap', { source: args.source, product: 'teacher_pro' });
 }
 
+/**
+ * Access trial urgent reminder banner shown (<=3 days remaining).
+ * Fires at most once per actual display (ref guard in banner component).
+ */
+export function trackEduTrialReminderShown(args: { days_remaining: number }): void {
+  captureStep('edu_trial_reminder_shown', {
+    days_remaining: args.days_remaining,
+    product: 'teacher_pro',
+    placement: 'dashboard_trial_reminder',
+  });
+}
+
+/**
+ * Access trial urgent reminder CTA clicked (before starting Polar checkout).
+ */
+export function trackEduTrialReminderCtaClick(args: { days_remaining: number }): void {
+  captureStep('edu_trial_reminder_cta_click', {
+    days_remaining: args.days_remaining,
+    product: 'teacher_pro',
+    placement: 'dashboard_trial_reminder',
+  });
+}
+
 export function trackEduProUpgradeClicked(args: { source: ProUpgradeSource }): void {
   captureStep('edu_pro_upgrade_clicked', { source: args.source });
   // Canonical conversion-funnel name (trial_start → checkout_open → checkout_complete → paid).

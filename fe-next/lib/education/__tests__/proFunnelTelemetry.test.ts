@@ -48,6 +48,8 @@ import {
   PRO_SUCCESS_SEEN_STORAGE_KEY,
   RETURN_LANDED_STORAGE_KEY,
   trackEduProCheckoutReturnLanded,
+  trackEduTrialReminderShown,
+  trackEduTrialReminderCtaClick,
 } from '../proFunnelTelemetry';
 
 describe('trackEduProUpgradeClicked', () => {
@@ -471,5 +473,46 @@ describe('Growth Radar mirror (trackGrowthEvent)', () => {
     });
     trackTrialCtaView({ source: 'upgrade_page' });
     expect(growthMock).toHaveBeenCalledWith('trial_cta_view', { source: 'upgrade_page', product: 'teacher_pro' });
+  });
+});
+
+describe('edu_trial_reminder events', () => {
+  beforeEach(() => {
+    captureMock.mockReset();
+    growthMock.mockReset();
+  });
+
+  it('Given trackEduTrialReminderShown, When tracked, Then PostHog and Growth Radar receive exact name and props', () => {
+    trackEduTrialReminderShown({ days_remaining: 3 });
+    const expectedProps = {
+      days_remaining: 3,
+      product: 'teacher_pro',
+      placement: 'dashboard_trial_reminder',
+    };
+    expect(captureMock).toHaveBeenCalledWith('edu_trial_reminder_shown', expectedProps);
+    expect(growthMock).toHaveBeenCalledWith('edu_trial_reminder_shown', expectedProps);
+  });
+
+  it('Given trackEduTrialReminderCtaClick, When tracked, Then PostHog and Growth Radar receive exact name and props', () => {
+    trackEduTrialReminderCtaClick({ days_remaining: 1 });
+    const expectedProps = {
+      days_remaining: 1,
+      product: 'teacher_pro',
+      placement: 'dashboard_trial_reminder',
+    };
+    expect(captureMock).toHaveBeenCalledWith('edu_trial_reminder_cta_click', expectedProps);
+    expect(growthMock).toHaveBeenCalledWith('edu_trial_reminder_cta_click', expectedProps);
+  });
+
+  it('Given telemetry throws, When tracked, Then it never bubbles or throws', () => {
+    captureMock.mockImplementationOnce(() => {
+      throw new Error('capture error');
+    });
+    expect(() => trackEduTrialReminderShown({ days_remaining: 2 })).not.toThrow();
+
+    growthMock.mockImplementationOnce(() => {
+      throw new Error('growth error');
+    });
+    expect(() => trackEduTrialReminderCtaClick({ days_remaining: 2 })).not.toThrow();
   });
 });
