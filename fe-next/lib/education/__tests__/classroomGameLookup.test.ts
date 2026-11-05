@@ -42,9 +42,16 @@ describe('lookupLiveClassroomGame', () => {
     }));
     await expect(lookupLiveClassroomGame('TZCOQ7')).resolves.toEqual({
       classroomId: 'c1', lessonIds: ['l1'], teacherName: 'Ms. G',
-      lessonNames: [], settings: {},
+      lessonNames: [], studyWordCount: 0, settings: {},
     });
     expect(get).toHaveBeenCalledWith('classroom_game:TZCOQ7');
+  });
+
+  it('counts the study deck, falling back to the game words on a record made before decks', async () => {
+    get.mockResolvedValueOnce(JSON.stringify({ classroomId: 'c1', studyCards: [{ word: 'a' }, { word: 'b' }] }));
+    await expect(lookupLiveClassroomGame('A')).resolves.toMatchObject({ studyWordCount: 2 });
+    get.mockResolvedValueOnce(JSON.stringify({ classroomId: 'c1', vocabularyWords: ['x', 'y', 'z'] }));
+    await expect(lookupLiveClassroomGame('B')).resolves.toMatchObject({ studyWordCount: 3 });
   });
 
   /**

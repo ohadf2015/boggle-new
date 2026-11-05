@@ -1,10 +1,12 @@
 'use client';
 
-/** The one student waiting stage: same slots as before, so READY still drives the teacher's ready count and auto-start. */
+/** The one student waiting stage. With lesson words, READY unlocks only after the student has gone through every word. */
 import { LogOut, Pencil, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ClassroomWaitingStageProps } from '@/components/education/lobby/ClassroomWaitingStage';
 import { WaitingWarmUp } from '@/components/education/lobby/WaitingWarmUp';
+import { useStudyDeck } from '@/lib/education/studyDeckStore';
+import { LobbyWordStudy } from './LobbyWordStudy';
 import { LIVE_KEYFRAMES, PRESS } from './eduLiveStyles';
 import { EduStudentLobbyCrowd } from './EduStudentLobbyCrowd';
 import { EduStudentLobbyHud } from './EduStudentLobbyHud';
@@ -28,6 +30,8 @@ export function EduStudentLobby({
 }: ClassroomWaitingStageProps) {
   const others = classmates.filter((c) => c.username !== username);
   const classSize = others.length + 1;
+  const { cards, studied, markStudied } = useStudyDeck();
+  const mustStudy = cards.length > 0 && !studied;
 
   return (
     <div data-testid="edu-student-lobby" className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-neo-navy text-neo-cream">
@@ -90,16 +94,26 @@ export function EduStudentLobby({
 
           {quickPickSlot}
 
-          <div className="flex w-full justify-center [@container(max-height:380px)]:hidden">
-            <WaitingWarmUp username={username} t={t} />
-          </div>
+          {cards.length > 0 ? (
+            <LobbyWordStudy cards={cards} studied={studied} onDone={markStudied} t={t} />
+          ) : (
+            <div className="flex w-full justify-center [@container(max-height:380px)]:hidden">
+              <WaitingWarmUp username={username} t={t} />
+            </div>
+          )}
 
           <EduStudentLobbyCrowd others={others} statusSlot={statusSlot} t={t} />
         </div>
       </main>
 
       <footer className="flex shrink-0 flex-col gap-2 border-t-[3px] border-neo-cream bg-neo-navy-light px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
-        {readySlot}
+        {mustStudy ? (
+          <p data-testid="study-ready-locked" role="status" className="rounded-neo border-2 border-neo-cream/40 px-3 py-3 text-center font-neo-display text-base font-bold text-neo-cream">
+            {t('eduStudent.lobby.studyReadyLocked', { count: cards.length })}
+          </p>
+        ) : (
+          readySlot
+        )}
         {instructionsSlot}
       </footer>
     </div>

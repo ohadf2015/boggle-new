@@ -3656,6 +3656,8 @@ const ru = {
       "rehearseBotsBlocked": "Боты не умеют играть в эту игру, поэтому потренироваться с ними нельзя.",
       "rehearseUseClassic": "Потренироваться с ботами в классическом режиме",
       "startWhenReady": "Начните, когда все войдут",
+      "startAnyway": "Начать всё равно",
+      "stillLearning": "Ещё учат слова: {count}",
       "lateJoinOn": "Можно присоединиться позже",
       "lateJoinOff": "Позже присоединиться нельзя",
       "lock": {
@@ -20542,7 +20544,15 @@ const ru = {
       "pickLook": "Выбери образ",
       "shuffleLooks": "Перемешать образы",
       "buildLook": "Создать свой образ",
-      "readySticker": "Готов!"
+      "readySticker": "Готов!",
+      "studyTitle": "Слова на сегодня",
+      "studyProgress": "{current} из {total}",
+      "studyLearned": "Выучено слов: {count}",
+      "studyHint": "Подсказка: {hint}",
+      "studyBack": "Назад",
+      "studyNext": "Дальше",
+      "studyDone": "Я их знаю",
+      "studyReadyLocked": "Пройди все слова ({count}), чтобы нажать «Готов»"
     },
     "exit": {
       "title": "Выйти из игры?",

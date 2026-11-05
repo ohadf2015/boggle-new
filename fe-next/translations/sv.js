@@ -16018,6 +16018,8 @@ const sv = {
       "rehearseBotsBlocked": "Bottar kan inte spela det här spelet, så du kan inte öva på det med dem.",
       "rehearseUseClassic": "Öva med bottar i Klassiskt i stället",
       "startWhenReady": "Starta när alla är med",
+      "startAnyway": "Starta ändå",
+      "stillLearning": "{count} lär sig fortfarande orden",
       "lateJoinOn": "Sen anslutning tillåten",
       "lateJoinOff": "Sen anslutning stängd",
       "lock": {
@@ -20842,7 +20844,15 @@ const sv = {
       "pickLook": "Välj en look",
       "shuffleLooks": "Blanda looks",
       "buildLook": "Skapa din egen look",
-      "readySticker": "Redo!"
+      "readySticker": "Redo!",
+      "studyTitle": "Dagens ord",
+      "studyProgress": "{current} av {total}",
+      "studyLearned": "{count} ord klara",
+      "studyHint": "Ledtråd: {hint}",
+      "studyBack": "Tillbaka",
+      "studyNext": "Nästa",
+      "studyDone": "Jag kan dem",
+      "studyReadyLocked": "Gå igenom alla {count} ord för att bli redo"
     },
     "exit": {
       "title": "Lämna spelet?",

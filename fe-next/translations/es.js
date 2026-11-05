@@ -15658,6 +15658,8 @@ const es = {
       "rehearseBotsBlocked": "Los bots no pueden jugar a este juego, así que no puedes practicarlo con ellos.",
       "rehearseUseClassic": "Practica con bots en Clásico",
       "startWhenReady": "Empieza cuando estén todos",
+      "startAnyway": "Empezar igual",
+      "stillLearning": "{count} todavía están aprendiendo las palabras",
       "lateJoinOn": "Se puede entrar tarde",
       "lateJoinOff": "No se puede entrar tarde",
       "lock": {
@@ -20854,7 +20856,15 @@ const es = {
       "pickLook": "Elige un look",
       "shuffleLooks": "Mezclar looks",
       "buildLook": "Crea tu propio look",
-      "readySticker": "¡Listo!"
+      "readySticker": "¡Listo!",
+      "studyTitle": "Palabras de hoy",
+      "studyProgress": "{current} de {total}",
+      "studyLearned": "{count} palabras aprendidas",
+      "studyHint": "Pista: {hint}",
+      "studyBack": "Atrás",
+      "studyNext": "Siguiente",
+      "studyDone": "Ya me las sé",
+      "studyReadyLocked": "Repasa las {count} palabras para poder marcar listo"
     },
     "exit": {
       "title": "¿Salir del juego?",

@@ -3,6 +3,7 @@ import {
   HERO_CODE_TEXT,
   HERO_QR_SIZE,
   ROSTER_TIERS,
+  studentsNotReady,
   WIDE_MIN_REM,
   arrivalsSince,
   isArrivalBurst,
@@ -122,5 +123,16 @@ describe('projectorStartLabel', () => {
 
   it('names the boss fight for Boss Battle', () => {
     expect(projectorStartLabel({ ...base, isBoss: true })).toBe('eg2Modes.boss.start');
+  });
+});
+
+describe('studentsNotReady', () => {
+  it('lists connected students who have not pressed ready, ignoring bots and ready names of students who left', () => {
+    const students = [{ username: 'Maya' }, { username: 'Noa' }, { username: 'Bot', isBot: true }];
+    expect(studentsNotReady(students, ['Maya', 'Gone'])).toEqual(['Noa']);
+  });
+
+  it('is empty once everyone is ready', () => {
+    expect(studentsNotReady([{ username: 'Maya' }], ['Maya'])).toEqual([]);
   });
 });

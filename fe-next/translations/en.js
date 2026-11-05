@@ -14046,6 +14046,8 @@ const en = {
       "rehearseBotsBlocked": "Bots can't play this game, so you can't practice it with them.",
       "rehearseUseClassic": "Practice with bots in Classic instead",
       "startWhenReady": "Start game when everyone is in",
+      "startAnyway": "Start anyway",
+      "stillLearning": "{count} still learning the words",
       "lateJoinOn": "Late join on",
       "lateJoinOff": "Late join off",
       "lock": {
@@ -19887,7 +19889,15 @@ const en = {
       "pickLook": "Pick a look",
       "shuffleLooks": "Shuffle looks",
       "buildLook": "Make your own look",
-      "readySticker": "Ready!"
+      "readySticker": "Ready!",
+      "studyTitle": "Today's words",
+      "studyProgress": "{current} of {total}",
+      "studyLearned": "{count} words learned",
+      "studyHint": "Hint: {hint}",
+      "studyBack": "Back",
+      "studyNext": "Next",
+      "studyDone": "I know these",
+      "studyReadyLocked": "Go through all {count} words to get ready"
     },
     "exit": {
       "title": "Leave the game?",

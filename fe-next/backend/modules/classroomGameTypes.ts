@@ -1,3 +1,4 @@
+import type { StudyCard } from '@/shared/utils/studyCards';
 import type { Language } from '@/shared/types';
 /** Classroom game record shapes (Redis `classroom_game:<code>`). */
 
@@ -83,6 +84,8 @@ export interface ClassroomGame {
    * list until then.
    */
   placedVocabulary?: string[];
+  /** The lobby study deck (word + teacher's definition), built once at creation. Absent on older records. */
+  studyCards?: StudyCard[];
   /** Set while `vocabularyWords` is narrowed for a replay; `pending` until that replay round starts. */
   reteach?: { fullVocabularyWords: string[]; fullTargetWord?: string; pending: boolean };
   settings: ClassroomGameSettings;
@@ -131,5 +134,7 @@ export interface CreateClassroomGameData {
   vocabularyWords: string[];
   /** The round's deal + validation language (resolveClassroomGameLanguage). Absent on records made before it existed. */
   language?: Language;
+  /** The lobby study deck (word + teacher's definition), built once at creation. Absent on older records. */
+  studyCards?: StudyCard[];
   settings: ClassroomGameSettings;
 }

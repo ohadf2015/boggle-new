@@ -64,6 +64,11 @@ describe('GET /api/education/classroom/live-game', () => {
     });
   });
 
+  it('tells the projector how many words students study before READY unlocks', async () => {
+    lookupLiveClassroomGame.mockResolvedValue({ ...liveQuiz, studyWordCount: 6 });
+    await expect((await GET(req('TZCOQ7'))).json()).resolves.toMatchObject({ studyWordCount: 6 });
+  });
+
   it('tells a student the mode and settings their teacher actually chose', async () => {
     const res = await GET(req('TZCOQ7'));
     expect(res.status).toBe(200);

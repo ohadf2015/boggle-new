@@ -13,6 +13,7 @@ import ProjectorJoinPanel from './ProjectorJoinPanel';
 import ProjectorRoster, { type ProjectorStudent } from './ProjectorRoster';
 import { ProjectorModeCard } from './ProjectorModeCard';
 import { ProjectorStartBar } from './ProjectorStartBar';
+import { studentsNotReady } from './projectorLobbyModel';
 import { ProjectorLobbyLock } from './ProjectorLobbyLock';
 import { useProjectorLobbyMode } from './useProjectorLobbyMode';
 import { markRoomPlayed, roomPlayed } from './roomPlayed';
@@ -81,6 +82,8 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
   const lobby = useProjectorLobbyMode({ gameCode, classroomGameMode, templateSettings, t });
   const { kick, statusOf } = useKickStudent(getSharedSocketIfExists());
   const studentCount = realStudentCount(students);
+  // Lesson words mean students study them before READY unlocks, so READY now means "learned".
+  const stillLearning = Math.max(wordCount, lobby.studyWordCount) > 0 ? studentsNotReady(students, readyUsernames).length : 0;
   const delay = useEnterStyle();
   const lesson = lessonName || lobby.lessonNames.join(' · ');
   // Read every render, not once: the lobby may stay mounted under the results layer between rounds.
@@ -158,6 +161,7 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
             t={t}
             lobby={lobby}
             studentCount={studentCount}
+            stillLearning={stillLearning}
             startLabelKey={startLabelKey}
             starting={starting}
             onStartGame={startGame}

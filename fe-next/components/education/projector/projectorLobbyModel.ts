@@ -79,6 +79,12 @@ export function canStartProjectorRound(studentCount: number): boolean {
   return studentCount > 0;
 }
 
+/** Read against the live roster: the server's ready list keeps names of students who already left. */
+export function studentsNotReady(students: readonly { username: string; isBot?: boolean }[], readyUsernames: readonly string[]): string[] {
+  const ready = new Set(readyUsernames);
+  return students.filter((s) => !s.isBot && !ready.has(s.username)).map((s) => s.username);
+}
+
 /** Names present now that were not before. `null` = first paint: a reconnecting wall plays no fanfare. */
 export function arrivalsSince(previous: readonly string[] | null, current: readonly string[]): string[] {
   if (previous === null) return [];
