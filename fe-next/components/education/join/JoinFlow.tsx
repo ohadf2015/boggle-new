@@ -3,6 +3,8 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { signedInNeedsRecovery } from '@/lib/education/unconfirmedJoinEmail';
 import { cn } from '@/lib/utils';
 import { JOIN_CODE_LENGTH, joinCodeOverflows, sanitizeJoinCode } from './JoinCodeField';
 import { useJoinFlow } from './useJoinFlow';
@@ -13,6 +15,7 @@ import { JoinCodeStep } from './JoinCodeStep';
 import { JoinNameStep } from './JoinNameStep';
 import { JoinEndedPanel } from './JoinEndedPanel';
 import { BoundedConfettiBurst } from '@/components/motion/BoundedConfettiBurst';
+import { UnconfirmedJoinEmail } from './UnconfirmedJoinEmail';
 
 /**
  * The student's whole way in: code, nickname, playing.
@@ -51,6 +54,7 @@ export function JoinFlow({
   variant = 'standalone',
 }: JoinFlowProps) {
   const { t, dir, language } = useLanguage();
+  const { user } = useAuth();
   const academy = variant === 'academy';
   const [showSuccessCelebration, setShowSuccessCelebration] = useState(false);
 
@@ -203,7 +207,13 @@ export function JoinFlow({
           ) : flow.step === 'code' ? (
             <JoinCodeStep flow={flow} pasteNoteKey={pasteNoteKey} onPaste={handlePaste} />
           ) : (
-            <JoinNameStep flow={flow} nameRef={nameRef} goRef={goRef} />
+            <>
+              <JoinNameStep flow={flow} nameRef={nameRef} goRef={goRef} />
+              <UnconfirmedJoinEmail
+                joinCode={flow.code}
+                signedInEmail={signedInNeedsRecovery(user) ? user?.email : null}
+              />
+            </>
           )}
         </main>
         <nav className="relative z-10 flex justify-center gap-4 px-4 pb-3 text-xs text-neo-white/60">

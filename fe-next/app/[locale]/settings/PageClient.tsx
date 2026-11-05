@@ -24,6 +24,7 @@ import { RemoveAdsProbe } from '@/components/ads/RemoveAdsProbe';
 import { NotificationCategoryPreferences } from '@/components/notifications/NotificationCategoryPreferences';
 import { OfflineDownloadManager } from '@/components/offline/OfflineDownloadManager';
 import { PlayGamesCard } from '@/components/settings/PlayGamesCard';
+import { StudentTeacherSwitch } from '@/components/settings/StudentTeacherSwitch';
 
 // Language options
 const LANGUAGES = [
@@ -528,6 +529,8 @@ export default function SettingsPageClient(): React.JSX.Element {
           </m.section>
           </div>{/* end right column */}
         </div>{/* end grid */}
+
+        <StudentTeacherSwitch isDarkMode={isDarkMode} />
 
         {/* Delete Account */}
         <DeleteAccountSection isDarkMode={isDarkMode} />
