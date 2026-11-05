@@ -3392,10 +3392,10 @@ const sv = {
   },
   "seo": {
     "teacherUpgrade": {
-      "title": "Teacher Pro – obegränsat antal klasser och elever | LexiClash",
-      "description": "Uppgradera till Teacher Pro för obegränsat antal klassrum och elever per klass. $9/månad. Hantera hela skolans ordförrådsprogram med en prenumeration.",
-      "ogTitle": "Uppgradera till Teacher Pro – obegränsat antal klasser",
-      "ogDescription": "Hantera obegränsat antal klassrum och elever för $9/månad. Väx din ordförrådsundervisning med LexiClash Pro."
+      "title": "Se vem som fattade, innan klockan ringer | LexiClash",
+      "description": "Se vem som fattade, innan klockan ringer. Teacher Pro kostar 9 $/månad efter 14 dagar gratis.",
+      "ogTitle": "Se vem som fattade, innan klockan ringer.",
+      "ogDescription": "Se vem som fattade, innan klockan ringer. Teacher Pro kostar 9 $/månad efter 14 dagar gratis."
     },
     "teacherPricing": {
       "title": "LexiClash priser: gratisplan eller Teacher Pro för 9 $/månad",

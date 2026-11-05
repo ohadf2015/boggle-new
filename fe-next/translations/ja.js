@@ -3034,10 +3034,10 @@ const ja = {
   },
   "seo": {
     "teacherUpgrade": {
-      "title": "Teacher Pro - クラスと生徒が無制限 | LexiClash",
-      "description": "Teacher Proにアップグレードすると、クラスも1クラスあたりの生徒数も無制限。月額$9。学校全体の語彙プログラムを1つのサブスクリプションで管理。",
-      "ogTitle": "Teacher Proにアップグレード - 無制限のクラス",
-      "ogDescription": "月額$9で無制限のクラスと生徒を管理。LexiClash Proで語彙指導を拡大しましょう。"
+      "title": "授業が終わる前に、誰が理解したか分かる | LexiClash",
+      "description": "授業が終わる前に、誰が理解したか分かる。Teacher Proは14日間の無料体験後、月額9ドルです。",
+      "ogTitle": "授業が終わる前に、誰が理解したか分かる。",
+      "ogDescription": "授業が終わる前に、誰が理解したか分かる。Teacher Proは14日間の無料体験後、月額9ドルです。"
     },
     "teacherPricing": {
       "title": "LexiClash 料金プラン：無料プランとTeacher Pro（月額9ドル）",

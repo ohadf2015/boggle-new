@@ -2717,10 +2717,10 @@ const en = {
       "ogDescription": "Get in touch with the LexiClash team. Send feedback, report issues, or just say hello."
     },
     "teacherUpgrade": {
-      "title": "Teacher Pro - Unlimited Classes & Students | LexiClash",
-      "description": "Teacher Pro: unlimited classrooms and students per class, plus reports and word mastery. $9/month, 14-day free trial. Cancel anytime.",
-      "ogTitle": "Upgrade to Teacher Pro - Unlimited Classes",
-      "ogDescription": "Manage unlimited classrooms and students for $9/month with LexiClash Teacher Pro."
+      "title": "See who got it before the bell | LexiClash",
+      "description": "See who got it before the bell. Teacher Pro is $9/month after a 14-day free trial. Cancel anytime.",
+      "ogTitle": "See who got it before the bell.",
+      "ogDescription": "See who got it before the bell. Teacher Pro is $9/month after a 14-day free trial. Cancel anytime."
     },
     "teacherPricing": {
       "title": "LexiClash Pricing: Free Plan and Teacher Pro at $9/month",
