@@ -15,7 +15,8 @@ concurrency:
   cancel-in-progress: ${{ github.event_name != 'push' }}
 
 # Two gates:
-#   ci-success  REQUIRED for merge. Needs only `quick`, which installs nothing heavy and ends in about a minute.
+#   ci-success  REQUIRED for merge. Needs `quick` and `types`: Railway's build stops at the type check, so a type
+#               error on master blocks every deploy.
 #   ci-full     NOT required. Waits for lint, tsc, the sharded tests, guards and backend, and fails the run when
 #               any of them fails, so a PR shows red within minutes and a bad merge to master opens an issue.
 jobs:
@@ -114,6 +115,8 @@ jobs:
         working-directory: fe-next
       - run: npx tsx scripts/build-i18n-assets.ts --skip-brotli && npx tsc --noEmit
         working-directory: fe-next
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
 
   # Frontend tests, sharded. On a PR, --changed picks the tests whose import graph touches the diff;
   # a shared file (translations, a context) selects a large slice, so the slice is split across shards.
@@ -232,14 +235,15 @@ jobs:
           fi
           node scripts/ci/assert-vitest-passed.mjs "$OUT" "$RC"
 
-  # REQUIRED branch-protection gate; keep the name. Only the quick job: ends in about a minute.
+  # REQUIRED branch-protection gate; keep the name. Waits for quick and types.
   ci-success:
     runs-on: ubuntu-latest
-    needs: [quick]
+    needs: [quick, types]
     if: always()
     steps:
       - run: |
           [[ "${{ needs.quick.result }}" == "success" ]] || { echo "❌ quick checks failed"; exit 1; }
+          [[ "${{ needs.types.result }}" == "success" ]] || { echo "❌ type check failed"; exit 1; }
 
   # NOT required. Fails the run if any heavy job failed, so the PR shows red and master opens an issue.
   ci-full:
