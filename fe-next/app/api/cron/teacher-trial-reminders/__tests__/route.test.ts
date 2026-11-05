@@ -129,6 +129,38 @@ describe('/api/cron/teacher-trial-reminders', () => {
     expect(h.sendEmailSpy).not.toHaveBeenCalled();
   });
 
+  it('sends replies to Ohad and the footer in Swedish for a Swedish teacher', async () => {
+    h.tables.teacher_access_requests = { data: [access({ locale: 'sv' })], error: null };
+    await POST(authed());
+    const mail = h.sendEmailSpy.mock.calls[0][0];
+    expect(mail.replyTo).toBe('ohadf2015@gmail.com');
+    expect(mail.html).toContain('Avsluta prenumerationen');
+    expect(mail.html).toContain('Svara bara på det här mejlet');
+  });
+
+  it('sends the feedback check-in five days in, with no upgrade link', async () => {
+    h.tables.teacher_access_requests = {
+      data: [access({ reviewed_at: inDays(-6), trial_expires_at: inDays(8) })],
+      error: null,
+    };
+    const body = await (await POST(authed())).json();
+    expect(body).toMatchObject({ success: true, sent: 1 });
+    const mail = h.sendEmailSpy.mock.calls[0][0];
+    expect(mail.subject).toBe('How is LexiClash going with your class?');
+    expect(mail.html).not.toContain('/teacher/upgrade');
+    expect(h.updates[0].values).toEqual({ trial_reminders_sent: ['feedback'] });
+  });
+
+  it('skips the check-in when the trial ends within five days', async () => {
+    h.tables.teacher_access_requests = {
+      data: [access({ reviewed_at: inDays(-10), trial_expires_at: inDays(4) })],
+      error: null,
+    };
+    const body = await (await POST(authed())).json();
+    expect(body).toMatchObject({ sent: 0 });
+    expect(h.sendEmailSpy).not.toHaveBeenCalled();
+  });
+
   it('rejects a request without the cron secret', async () => {
     const res = await POST(makeRequest());
     expect(res.status).toBe(401);
