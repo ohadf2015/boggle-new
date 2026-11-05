@@ -94,6 +94,14 @@ export function JoinCodeField({
     [onOverflow, onChange, onComplete]
   );
 
+  // A full field swallows every keystroke (`maxLength`) behind an invisible
+  // caret, so a refused code looked untypeable. Select it all on focus/tap:
+  // the next key replaces it and backspace clears it.
+  const selectFullCode = useCallback((e: React.SyntheticEvent<HTMLInputElement>) => {
+    const el = e.currentTarget;
+    if (el.value.length >= JOIN_CODE_LENGTH) el.setSelectionRange(0, el.value.length);
+  }, []);
+
   return (
     <div
       // The code itself is direction-neutral data. Pin it.
@@ -136,6 +144,8 @@ export function JoinCodeField({
             value={value}
             onChange={handleChange}
             onPaste={handleNativePaste}
+            onFocus={selectFullCode}
+            onClick={selectFullCode}
             aria-label={label}
             aria-describedby={describedBy}
             aria-invalid={invalid || undefined}
@@ -152,7 +162,7 @@ export function JoinCodeField({
             data-testid="join-code-input"
             // Transparent, but a real focusable input covering the cells: the
             // software keyboard, the caret and long-press-paste all belong to it.
-            className="absolute inset-0 h-full w-full cursor-pointer rounded-neo bg-transparent text-center font-neo-display text-3xl tracking-[0.6em] text-transparent caret-transparent outline-none focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-neo-cyan"
+            className="absolute inset-0 h-full w-full cursor-pointer rounded-neo bg-transparent text-center font-neo-display text-3xl tracking-[0.6em] text-transparent caret-transparent selection:bg-transparent outline-none focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-neo-cyan"
           />
         </div>
 
