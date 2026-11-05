@@ -126,6 +126,17 @@ describe('landing gotrue defer', () => {
     }
   });
 
+  it.each(['components/auth/AuthModal.tsx', 'components/auth/FirstWinSignupModal.tsx', 'components/auth/GoogleOneTapInitializer.tsx'])(
+    'lets %s open without waiting for the supabase client',
+    (start) => {
+      const rel = [...reachableFrom(join(feRoot, start))].map((f) => f.slice(feRoot.length + 1));
+      const offenders = rel.filter(
+        (f) => /^lib\/supabase(\.ts|Enhanced\.ts|\/)/.test(f) || f.startsWith('utils/supabase/client'),
+      );
+      expect(offenders).toEqual([]);
+    },
+  );
+
   it('does not statically import the supabase client from the landing page or site chrome', () => {
     const home = join(feRoot, 'app', '[locale]', '(home)', 'HomeClient.tsx');
     const extras = join(feRoot, 'app', '[locale]', 'SiteExtras.tsx');

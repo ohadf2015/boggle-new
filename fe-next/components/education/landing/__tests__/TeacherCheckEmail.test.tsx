@@ -31,7 +31,7 @@ describe('TeacherCheckEmail', () => {
     resend.mockResolvedValue({ error: null });
     render(<TeacherCheckEmail email="a@b.co" onChangeEmail={() => {}} />);
     fireEvent.click(screen.getByTestId('teacher-check-email-resend'));
-    expect(resend).toHaveBeenCalledWith('a@b.co');
+    await waitFor(() => expect(resend).toHaveBeenCalledWith('a@b.co'));
     await waitFor(() => expect(screen.getByTestId('teacher-check-email-resend')).toHaveTextContent('eg2Land.checkEmail.resent'));
   });
 

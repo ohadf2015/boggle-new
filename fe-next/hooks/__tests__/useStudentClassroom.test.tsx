@@ -40,6 +40,10 @@ vi.mock('@/lib/supabase/education', () => ({
 }));
 
 describe('useStudentClassroom', () => {
+  beforeAll(async () => {
+    await import('@/lib/supabase/education');
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
     mockUseAuth.mockReturnValue({

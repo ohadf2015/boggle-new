@@ -9,7 +9,7 @@ import { Reveal } from '@/components/ui/Reveal';
 import Link from 'next/link';
 import { Button } from '../ui/button';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { signUpWithEmail, signInWithEmail, signInWithMagicLink, sendOtpCode, verifyOtpCode } from '../../lib/supabase';
+import { AuthClientLoadError, loadAuthClient } from '@/lib/auth/loadAuthClient';
 import { useOAuthSignIn } from './hooks/useOAuthSignIn';
 import GoogleSignInButton from './GoogleSignInButton';
 import { authModalProviders, type AuthModalProviderId } from './shared/authModalProviders';
@@ -219,6 +219,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
     }
   };
 
+  const submitFailureMessage = (err: unknown): string =>
+    err instanceof AuthClientLoadError
+      ? t('errors.signInFailedRetry')
+      : (err as Error).message || t('common.errorOccurred');
+
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -249,6 +254,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
         }
       }
       const intendedRole = isTeacher || teacherIntent ? 'teacher' as const : undefined;
+      const { signUpWithEmail, signInWithEmail } = await loadAuthClient();
       const result = authMode === 'signup'
         ? (intendedRole
             ? await signUpWithEmail(email, password, { intendedRole })
@@ -310,7 +316,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
       setError(t('auth.invalidCredentials'));
       setIsLoading(null);
     } catch (err) {
-      setError((err as Error).message || t('common.errorOccurred'));
+      setError(submitFailureMessage(err));
       setIsLoading(null);
     }
   };
@@ -329,6 +335,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
     setEmailError(null);
 
     try {
+      const { signInWithMagicLink } = await loadAuthClient();
       const result = await signInWithMagicLink(email);
 
       if (result.error) {
@@ -339,7 +346,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
       }
       setIsLoading(null);
     } catch (err) {
-      setError((err as Error).message || t('common.errorOccurred'));
+      setError(submitFailureMessage(err));
       setIsLoading(null);
     }
   };
@@ -357,6 +364,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
     setEmailError(null);
 
     try {
+      const { sendOtpCode } = await loadAuthClient();
       const result = await sendOtpCode(email);
       if (result.error) {
         setError(result.error.message);
@@ -374,7 +382,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
       }
       setIsLoading(null);
     } catch (err) {
-      setError((err as Error).message || t('common.errorOccurred'));
+      setError(submitFailureMessage(err));
       setIsLoading(null);
     }
   };
@@ -387,6 +395,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
     setError(null);
 
     try {
+      const { verifyOtpCode } = await loadAuthClient();
       const result = await verifyOtpCode(email, otpCode);
       if (result.error) {
         setError(result.error.message);
@@ -396,7 +405,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
       }
       setIsLoading(null);
     } catch (err) {
-      setError((err as Error).message || t('common.errorOccurred'));
+      setError(submitFailureMessage(err));
       setIsLoading(null);
     }
   };
@@ -515,7 +524,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
           {teacherCheckEmail && (
             <TeacherCheckEmail
               email={teacherCheckEmail.email}
-              onResend={teacherCheckEmail.magic ? signInWithMagicLink : undefined}
+              onResend={teacherCheckEmail.magic ? async (address) => (await loadAuthClient()).signInWithMagicLink(address) : undefined}
               onChangeEmail={() => setTeacherCheckEmail(null)}
             />
           )}
