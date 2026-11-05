@@ -15644,7 +15644,7 @@ const sv = {
       "progressMatrix": {
         "title": "Framsteg per elev",
         "empty": "Inga elever eller uppgifter i den här klassen ännu",
-        "trend": "Trend",
+        "trend": "Tendens",
         "trendUp": "Förbättras",
         "trendDown": "Försämras",
         "trendFlat": "Stabil",

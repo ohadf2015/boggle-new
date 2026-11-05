@@ -60,7 +60,7 @@ export function AssignmentProgressMatrix({ classroomId, classroomName }: Assignm
 
 /** Fetch + render for an entitled teacher. A 402 (stale entitlement) degrades to the paywall. */
 function MatrixReport({ classroomId, classroomName }: AssignmentProgressMatrixProps) {
-  const load = useCallback(async () => {
+  const load = useCallback(async (): Promise<{ data: MatrixPayload | null; error: { message: string } | null }> => {
     const res = await fetch(`/api/education/classroom/${classroomId}/assignment-progress`, {
       credentials: 'same-origin',
     });
@@ -71,7 +71,7 @@ function MatrixReport({ classroomId, classroomName }: AssignmentProgressMatrixPr
     return { data: { kind: 'matrix', matrix: body.matrix } satisfies MatrixPayload, error: null };
   }, [classroomId]);
 
-  const { data, loading, failed, retry } = useReportData(load);
+  const { data, loading, failed, retry } = useReportData<MatrixPayload>(load);
 
   if (loading) return <ReportSkeleton />;
   if (failed) return <ReportError onRetry={retry} />;

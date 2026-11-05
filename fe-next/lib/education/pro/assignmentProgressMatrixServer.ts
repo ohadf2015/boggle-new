@@ -53,7 +53,8 @@ export async function readAssignmentProgressMatrix(
     : { data: [], error: null };
   if (progressError) return { data: null, error: { message: progressError.message } };
 
-  const profileMap = new Map((profiles ?? []).map((p: { id: string }) => [p.id, p]));
+  type NameProfile = { id: string; username?: string | null; display_name?: string | null };
+  const profileMap = new Map((profiles ?? []).map((p: NameProfile) => [p.id, p]));
   type ProgressRow = AssignmentProgressSourceRow & { assignment_id?: string | null };
   const matrix = buildAssignmentProgressMatrix({
     students: (memberships ?? []).map((m: { student_id: string; roster_name?: string | null }) => ({
