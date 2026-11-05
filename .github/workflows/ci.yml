@@ -235,7 +235,7 @@ jobs:
           fi
           node scripts/ci/assert-vitest-passed.mjs "$OUT" "$RC"
 
-  # REQUIRED branch-protection gate; keep the name. Only the quick job: ends in about a minute.
+  # REQUIRED branch-protection gate; keep the name. Waits for quick and types.
   ci-success:
     runs-on: ubuntu-latest
     needs: [quick, types]
