@@ -42,7 +42,7 @@ const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
     buckets: {
       't-3': {
         subject: (date) => `Your LexiClash trial ends on ${date}`,
-        preheader: 'No pressure. Here is what happens next, and a quick question.',
+        preheader: 'Your trial date, and a question.',
         lead: (date) => `Your free teacher access ends on ${date}.`,
         body: 'If LexiClash has been useful for your class, you can keep everything with Teacher Pro for $9 a month and cancel any time.',
         cta: 'Keep Teacher Pro',
@@ -62,7 +62,7 @@ const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
         cta: 'See Teacher Pro',
       },
     },
-    ask: 'And if it was not the right fit, that is completely fine. I would love to know what was missing or what got in the way. Just reply to this email; it comes straight to me.',
+    ask: 'Not the right fit? Reply and tell me what was missing or what got in the way. I read every reply.',
     classroom: 'Open my classroom',
     signoff: 'Thanks, Ohad (I build LexiClash)',
     dir: 'ltr',
@@ -73,7 +73,7 @@ const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
     buckets: {
       't-3': {
         subject: (date) => `תקופת הניסיון שלך ב-LexiClash מסתיימת ב-${date}`,
-        preheader: 'בלי לחץ. מה קורה עכשיו, ושאלה קצרה.',
+        preheader: 'התאריך, ושאלה קצרה.',
         lead: (date) => `הגישה החינמית שלך למורים מסתיימת ב-${date}.`,
         body: 'אם LexiClash עזר לכיתה שלך, אפשר להמשיך עם Teacher Pro ב-9$ לחודש ולבטל בכל רגע.',
         cta: 'להמשיך עם Teacher Pro',
@@ -93,7 +93,7 @@ const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
         cta: 'ל-Teacher Pro',
       },
     },
-    ask: 'ואם זה לא התאים, זה בסדר גמור. אשמח מאוד לדעת מה היה חסר או מה הפריע. אפשר פשוט להשיב למייל הזה, הוא מגיע ישירות אליי.',
+    ask: 'אם זה לא התאים, אשמח לדעת מה היה חסר או מה הפריע. אפשר פשוט להשיב למייל הזה, הוא מגיע ישירות אליי.',
     classroom: 'לכיתה שלי',
     signoff: 'תודה, אוהד (אני בונה את LexiClash)',
     dir: 'rtl',
@@ -104,7 +104,7 @@ const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
     buckets: {
       't-3': {
         subject: (date) => `Din LexiClash-provperiod slutar ${date}`,
-        preheader: 'Ingen press. Så här går det till, och en snabb fråga.',
+        preheader: 'Datumet, och en snabb fråga.',
         lead: (date) => `Din kostnadsfria lärartillgång slutar ${date}.`,
         body: 'Om LexiClash har varit till nytta för din klass kan du behålla allt med Teacher Pro för 9 $ i månaden och avsluta när du vill.',
         cta: 'Behåll Teacher Pro',
@@ -124,7 +124,7 @@ const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
         cta: 'Se Teacher Pro',
       },
     },
-    ask: 'Och om det inte passade är det helt okej. Jag vill gärna veta vad som saknades eller vad som stod i vägen. Svara bara på det här mejlet, det kommer direkt till mig.',
+    ask: 'Om det inte passade vill jag veta vad som saknades eller vad som stod i vägen. Svara bara på det här mejlet, det kommer direkt till mig.',
     classroom: 'Öppna mitt klassrum',
     signoff: 'Tack, Ohad (jag bygger LexiClash)',
     dir: 'ltr',
