@@ -16,6 +16,10 @@ vi.mock('@/lib/supabase/education', () => ({
 }));
 
 describe('useStudentClassroom — level', () => {
+  beforeAll(async () => {
+    await import('@/lib/supabase/education');
+  });
+
   beforeEach(() => vi.clearAllMocks());
 
   it('exposes the membership level returned by getStudentClassroom', async () => {

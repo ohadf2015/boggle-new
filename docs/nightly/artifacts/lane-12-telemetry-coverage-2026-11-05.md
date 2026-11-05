@@ -1,0 +1,4 @@
+status: research-only
+attempted: ran posthog coverage audit (DEAD/CRATERED/per-mode holes), found + alerted on a real product regression
+files_touched: none (docs/nightly/reports/2026-11-05.md appended, telegram alert sent)
+next_steps: adventure mode page traffic cratered 1489->3 visits/wk starting 10-29 (pathname LIKE %/adventure%), taking adventure_node_entered/adventure_run_ended/adventure_exit/wt2_upgrade_bought newly-dead with it. Route 200s, LandingChallengeCards.tsx:150/193 still wires + features adventure on home. Root cause is NOT telemetry wiring - needs product/UX investigation (nav change, promo ending, CrazyGames traffic shift, or real demand drop). Alerted via telegram instead of guess-fixing. Next lane: check if a referrer/entry-source breakdown for pre-10-29 adventure traffic shows it was mostly a single promo/campaign that ended (explains cliff w/o code bug) vs an actual broken funnel link.

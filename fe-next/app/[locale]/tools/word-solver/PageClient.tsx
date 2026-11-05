@@ -15,6 +15,7 @@ const LANGUAGES = [
   { code: 'sv', label: 'Svenska', flag: '\u{1F1F8}\u{1F1EA}' },
   { code: 'ja', label: '\u65E5\u672C\u8A9E', flag: '\u{1F1EF}\u{1F1F5}' },
   { code: 'es', label: 'Espa\u00F1ol', flag: '\u{1F1EA}\u{1F1F8}' },
+  { code: 'ru', label: '\u0420\u0443\u0441\u0441\u043A\u0438\u0439', flag: '\u{1F1F7}\u{1F1FA}' },
 ] as const;
 
 export default function WordSolverPageClient() {

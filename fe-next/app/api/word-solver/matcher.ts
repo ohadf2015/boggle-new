@@ -1,6 +1,7 @@
 export const BLANK_CHARS = /[?*]/g;
 const PATTERN_WILDCARDS = new Set(['_', '?', '.', '*', '-', ' ']);
 export const MAX_BLANKS = 3;
+export const MAX_RESULTS = 500;
 
 export interface FinderQuery {
   /** Rack letters (already normalized, blanks removed); empty = no rack limit. */

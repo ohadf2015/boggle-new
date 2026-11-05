@@ -22,7 +22,9 @@ const ROOT = path.resolve(__dirname, '..', '..', '..', '..');
 
 /** Every screen named in the no-scroll contract. */
 const SCREENS: readonly [string, string][] = [
-  ['/teacher', 'components/teacher/TeacherDashboard.tsx'],
+  // #1652 moved the shell mount into TeacherHomeView. The dashboard always renders that view,
+  // including loading and error, so the contract is checked on the view (see the describe below).
+  ['/teacher', 'components/teacher/home/TeacherHomeView.tsx'],
   ['/teacher/classroom', 'app/[locale]/teacher/classroom/PageClient.tsx'],
   ['/teacher/classroom/new', 'app/[locale]/teacher/classroom/new/PageClient.tsx'],
   ['/teacher/curriculum', 'app/[locale]/teacher/curriculum/PageClient.tsx'],
@@ -42,6 +44,24 @@ describe.each(SCREENS)('%s', (_route, file) => {
     // Student Academy pages (2026-09-24) mount AcademyPageFrame; the frame itself is held to the
     // same one-scroller / no-min-h-screen contract below.
     expect(src).toMatch(/EducationShell|AcademyPageFrame/);
+  });
+
+  it('has no min-h-screen / min-h-dvh / h-screen root left, on any branch', () => {
+    expect(src).not.toMatch(/min-h-screen/);
+    expect(src).not.toMatch(/min-h-dvh/);
+    expect(src).not.toMatch(/\bh-screen\b/);
+  });
+
+  it('adds no scroller of its own — the shell owns the only one', () => {
+    expect(src).not.toMatch(/overflow-y-auto/);
+  });
+});
+
+describe('/teacher dashboard delegates into the shell view', () => {
+  const src = readFileSync(path.join(ROOT, 'components/teacher/TeacherDashboard.tsx'), 'utf8');
+
+  it('renders TeacherHomeView, which is what mounts EducationShell', () => {
+    expect(src).toMatch(/<TeacherHomeView[\s>]/);
   });
 
   it('has no min-h-screen / min-h-dvh / h-screen root left, on any branch', () => {

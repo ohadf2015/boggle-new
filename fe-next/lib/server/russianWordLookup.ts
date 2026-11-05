@@ -16,9 +16,10 @@ function load() {
   if (buf) return;
   const file = path.join(process.cwd(), 'backend', 'russian_words.txt');
   buf = fs.existsSync(file) ? fs.readFileSync(file) : Buffer.alloc(0);
-  const starts: number[] = buf.length ? [0] : [];
-  for (let i = 0; i < buf.length; i++) if (buf[i] === 10 && i + 1 < buf.length) starts.push(i + 1);
-  lineStarts = Uint32Array.from(starts);
+  let count = buf.length ? 1 : 0;
+  for (let i = 0; i + 1 < buf.length; i++) if (buf[i] === 10) count++;
+  lineStarts = new Uint32Array(count);
+  for (let i = 0, line = 1; i + 1 < buf.length; i++) if (buf[i] === 10) lineStarts[line++] = i + 1;
 }
 
 function lineAt(i: number): Buffer {
@@ -74,4 +75,103 @@ export function hasRussianPrefix(prefix: string): boolean {
   if (lo >= n) return false;
   const line = lineAt(lo);
   return line.length >= needle.length && line.subarray(0, needle.length).equals(needle);
+}
+
+export interface RussianWordQuery {
+  /** Letters to draw from (а-я, ё folded to е); rack and blanks both empty = no limit. */
+  rack: string;
+  blanks: number;
+  /** One entry per position: a fixed letter, or null for an open slot that draws on the rack. */
+  pattern: (string | null)[] | null;
+  startsWith: string;
+  endsWith: string;
+  contains: string;
+  length: number | null;
+}
+
+const YO_FOLDED_SLOT = 5;
+const OPEN_SLOT = -1;
+
+function slotAt(b: Buffer, i: number): number {
+  if (b[i] === 0xd0) return b[i + 1] - 0xb0;
+  return b[i + 1] === 0x91 ? YO_FOLDED_SLOT : b[i + 1] - 0x70;
+}
+
+function toSlots(text: string): Uint8Array {
+  const bytes = Buffer.from(text, 'utf8');
+  const slots = new Uint8Array(bytes.length >> 1);
+  for (let i = 0; i < slots.length; i++) slots[i] = slotAt(bytes, i * 2);
+  return slots;
+}
+
+function slotsMatchAt(b: Buffer, at: number, slots: Uint8Array): boolean {
+  for (let i = 0; i < slots.length; i++) if (slotAt(b, at + i * 2) !== slots[i]) return false;
+  return true;
+}
+
+function containsSlots(b: Buffer, start: number, end: number, slots: Uint8Array): boolean {
+  for (let at = start; at + slots.length * 2 <= end; at += 2) if (slotsMatchAt(b, at, slots)) return true;
+  return false;
+}
+
+function fitsLetters(
+  b: Buffer, start: number, end: number,
+  fixed: Int8Array | null, available: Uint8Array, used: Uint8Array, blanks: number,
+): boolean {
+  let missing = 0;
+  let i = start;
+  let fits = true;
+  for (; i < end; i += 2) {
+    const slot = slotAt(b, i);
+    if (fixed !== null && fixed[(i - start) >> 1] !== OPEN_SLOT) {
+      if (fixed[(i - start) >> 1] !== slot) { fits = false; break; }
+    } else if (used[slot] < available[slot]) used[slot]++;
+    else if (missing === blanks) { fits = false; break; }
+    else missing++;
+  }
+  for (let j = start; j < i; j += 2) used[slotAt(b, j)] = 0;
+  return fits;
+}
+
+/** Matches on raw bytes (every letter is two) so a request allocates no per-word strings; mirrors buildMatcher. */
+export function scanRussianWords(query: RussianWordQuery, visit: (start: number, letters: number) => void): void {
+  load();
+  const b = buf!;
+  const starts = lineStarts!;
+  const n = starts.length;
+  if (!n) return;
+
+  // Reading past the last word's end makes V8 deoptimize this loop about tenfold.
+  let fileEnd = b.length;
+  while (fileEnd > 0 && (b[fileEnd - 1] === 10 || b[fileEnd - 1] === 13)) fileEnd--;
+
+  const { rack, pattern, length } = query;
+  const available = new Uint8Array(32);
+  for (const slot of toSlots(rack)) available[slot]++;
+  const used = new Uint8Array(32);
+  const blanks = rack.length + query.blanks > 0 ? query.blanks : Infinity;
+  const maxLetters = pattern || blanks === Infinity ? Infinity : rack.length + blanks;
+  const prefix = toSlots(query.startsWith);
+  const suffix = toSlots(query.endsWith);
+  const inner = toSlots(query.contains);
+  const fixed = pattern ? Int8Array.from(pattern, (ch) => (ch === null ? OPEN_SLOT : toSlots(ch)[0])) : null;
+
+  for (let w = 0; w < n; w++) {
+    const start = starts[w];
+    const end = w + 1 < n ? starts[w + 1] - 1 : fileEnd;
+    const letters = (end - start) >> 1;
+    if (letters < 2 || letters > maxLetters) continue;
+    if (length !== null && letters !== length) continue;
+    if (pattern && letters !== pattern.length) continue;
+    if (letters < prefix.length || letters < suffix.length) continue;
+    if (prefix.length && !slotsMatchAt(b, start, prefix)) continue;
+    if (suffix.length && !slotsMatchAt(b, end - suffix.length * 2, suffix)) continue;
+    if (inner.length && !containsSlots(b, start, end, inner)) continue;
+    if (!fitsLetters(b, start, end, fixed, available, used, blanks)) continue;
+    visit(start, letters);
+  }
+}
+
+export function readRussianWord(start: number, letters: number): string {
+  return buf!.toString('utf8', start, start + letters * 2);
 }

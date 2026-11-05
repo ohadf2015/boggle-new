@@ -105,7 +105,11 @@ export async function signInWithMicrosoft() {
   });
 }
 
-export async function signUpWithEmail(email: string, password: string) {
+export async function signUpWithEmail(
+  email: string,
+  password: string,
+  opts?: { intendedRole?: 'teacher' | 'student' | null },
+) {
   if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
 
   // Include current locale in the URL path so proxy.ts preserves it (not as query param)
@@ -113,33 +117,28 @@ export async function signUpWithEmail(email: string, password: string) {
   const locale = currentLocale || 'en';
   const redirectUrl = appendNextParam(new URL(`/${locale}/auth/callback`, window.location.origin));
 
-  // t_a80f937b: pass the first-touch attribution as user metadata so
-  // handle_new_user() stamps it on the profile at insert time. This matters
-  // for email signups whose confirm link opens in a DIFFERENT browser (no
-  // localStorage there). Null values are dropped — an absent key is cleaner
-  // than an empty string in raw_user_meta_data.
-  const { getFirstTouchAttribution } = await import('@/utils/utmCapture');
-  const ft = getFirstTouchAttribution();
-  const attributionData = ft
-    ? Object.fromEntries(
-        Object.entries({
-          utm_source: ft.utm_source,
-          utm_medium: ft.utm_medium,
-          utm_campaign: ft.utm_campaign,
-          referrer_domain: ft.referrer_domain,
-          landing_path: ft.landing_path,
-        }).filter(([, v]) => v != null)
-      )
-    : undefined;
+  // t_a80f937b / t_9eb9ad5f: stash first-touch + surface + language + role in
+  // user metadata so handle_new_user() stamps the profile at insert. The
+  // confirm link opens in a different browser (no localStorage, no
+  // sessionStorage latch). signup_surface is always set so the row is not
+  // an unattributed email signup.
+  const [{ getFirstTouchAttribution }, meta] = await Promise.all([
+    import('@/utils/utmCapture'),
+    import('@/lib/auth/emailSignupMeta'),
+  ]);
+  const attributionData = meta.buildEmailSignupMetadata({
+    firstTouch: getFirstTouchAttribution(),
+    signupSurface: meta.peekClientSignupSurface(),
+    language: meta.readStoredSignupLanguage() || currentLocale,
+    intendedRole: opts?.intendedRole ?? null,
+  });
 
   return supabase.auth.signUp({
     email,
     password,
     options: {
       emailRedirectTo: redirectUrl,
-      ...(attributionData && Object.keys(attributionData).length > 0
-        ? { data: attributionData }
-        : {}),
+      data: attributionData,
     },
   });
 }

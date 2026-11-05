@@ -7,6 +7,9 @@ import logger from '@/utils/logger';
 import { haptics } from '@/utils/haptics/HapticsManager';
 import { useLocalStorageObject } from '@/hooks/useLocalStorageState';
 import { createLazyHowl, preloadAudioOnDemand, preloadByPriority, AUDIO_LOAD_PRIORITY, ensureHowl } from '@/lib/audio/audioLoader';
+import { isLandingPath } from '@/lib/i18n/isLandingPath';
+import { hasPriorEngagement, onFirstEngagement } from '@/lib/perf/onFirstEngagement';
+import { isNativeShell } from '@/utils/returningVisitor';
 import { getCountdownBeepParams } from '@/utils/countdownBeepParams';
 import { pickVariant, SOUND_VARIATIONS, comboLevelSrc, wordLengthSrc } from '@/lib/audio/soundVariations';
 import { SOUND_EFFECTS, SOUND_PRIORITIES, type SoundEffectOptions, type SoundEffectsContextType } from '@/lib/audio/soundEffectsConfig';
@@ -199,8 +202,9 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     if (soundsLoadedRef.current) return; // Prevent re-initialization
 
     let cancelled = false;
+    let cancelBuild = () => {};
 
-    ensureHowl().then(() => {
+    const buildSounds = () => {
       if (cancelled || soundsLoadedRef.current) return;
 
       // Create Howl instances for each sound effect using lazy loading
@@ -232,10 +236,21 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
       });
 
       soundsLoadedRef.current = true;
+    };
+
+    ensureHowl().then(() => {
+      // The first Howl creates the AudioContext, the costliest task of a cold landing visit,
+      // and nothing can play before a gesture anyway.
+      if (isLandingPath(window.location.pathname) && !isNativeShell() && !hasPriorEngagement()) {
+        cancelBuild = onFirstEngagement(buildSounds);
+      } else {
+        buildSounds();
+      }
     }).catch(() => {});
 
     return () => {
       cancelled = true;
+      cancelBuild();
       // Cleanup on unmount
       // eslint-disable-next-line react-hooks/exhaustive-deps -- soundsRef is stable and not a React-rendered node
       const sounds = soundsRef.current;

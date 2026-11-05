@@ -77,6 +77,11 @@ const content: Record<Locale, ToolContent> = {
           'From 7 random letters, you can typically make between 20 and 80 valid English words, depending on the letter combination. Common vowel-consonant mixes yield more words. Our solver finds all possibilities from a curated word list instantly.',
       },
       {
+        question: 'Can it solve anagrams with multiple words?',
+        answer:
+          "Partly. You can type a phrase with spaces, like 'moon starer', and it searches all the letters, but each result is one word, such as 'astronomer'. To build a phrase, pick a long word from the results, take its letters out of your search, and run it again on what is left.",
+      },
+      {
         question: 'What is an anagram solver?',
         answer:
           'An anagram solver is a tool that takes a set of letters and finds all valid words that can be formed using some or all of those letters. It checks every possible combination against a dictionary to find words you might miss.',
@@ -406,7 +411,7 @@ const content: Record<Locale, ToolContent> = {
     ctaTitle: 'Практикуйся находить слова быстрее',
     ctaButton: 'Играй в LexiClash бесплатно',
     ctaDescription: 'Вызывай друзей на боевые слои в реальном времени. Тренируй свой мозг!',
-    fullDictionaryNote: 'Показываются результаты из списка 500+ частых русских слов. Для полного словаря играй в LexiClash!',
+    fullDictionaryNote: 'Показываем до 500 слов, сначала самые длинные. Слова проверяются по тому же русскому словарю, что и в LexiClash. В нём есть формы слов, редкие слова, имена и сокращения.',
     howToTitle: 'Как использовать решатель слов',
     howToSteps: [
       'Введи или вставь свои доступные буквы в поле ввода.',
@@ -418,10 +423,10 @@ const content: Record<Locale, ToolContent> = {
     tipsTitle: 'Советы для словесных игр',
     faqTitle: 'Часто задаваемые вопросы',
     faqs: [
-      { question: 'Сколько слов можно составить из 7 букв?', answer: 'Из 7 случайных букв обычно можно составить от 20 до 80 действительных русских слов, в зависимости от комбинации букв. Наш решатель находит все возможности мгновенно.' },
+      { question: 'Сколько слов можно составить из 7 букв?', answer: 'Из 7 букв обычно получается от нескольких десятков до двухсот с лишним слов, считая формы слов. Всё зависит от самих букв.' },
       { question: 'Что такое решатель анаграмм?', answer: 'Решатель анаграмм берет набор букв и находит все действительные слова, которые можно составить из этих букв.' },
       { question: 'Могу ли я использовать это для Scrabble?', answer: 'Да! Этот искатель слов работает для всех словесных игр, включая Scrabble, Boggle и LexiClash.' },
-      { question: 'Почему отсутствуют некоторые слова?', answer: 'Наш бесплатный инструмент использует список 500+ частых русских слов. Для полного словаря играй в LexiClash!' },
+      { question: 'Почему отсутствуют некоторые слова?', answer: 'Решатель показывает только слова из нашего русского словаря и не больше 500 за один поиск, сначала самые длинные. Е и Ё считаются одной буквой.' },
       { question: 'Как улучшить навыки поиска слов?', answer: 'Занимайся регулярно с помощью словесных игр с таймером, таких как LexiClash. Ищи распространенные префиксы и суффиксы.' },
     ],
     tips: [

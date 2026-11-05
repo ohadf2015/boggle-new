@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { RuLandingLinks } from '@/components/landing/RuLandingLinks';
+import { WHEEL_EXAMPLE } from './wheelExample';
 
 export const revalidate = 86400;
 
@@ -99,6 +100,30 @@ export default async function Page({ params }: PageProps) {
           <Link href={`/${locale}/multiplayer`} className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10 sm:px-8 sm:py-4">
             Игры в слова
           </Link>
+        </section>
+
+        <section className="mb-12">
+          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">Как устроена игра</h2>
+          <p className="mb-4 text-neo-gray-200">
+            На колесе семь букв, одна из них стоит в центре. Слово засчитывается, если в нём есть центральная буква и
+            не меньше трёх букв. Каждую букву колеса можно взять в слове только один раз. На раунд даётся две минуты, а
+            длинные слова стоят намного дороже: слово из трёх букв приносит 12 очков, из семи букв — 144.
+          </p>
+          <h3 className="mb-2 font-bold text-neo-cyan">Пример: колесо за 2 ноября</h3>
+          <p className="text-neo-gray-200">
+            В центре буква <strong>{WHEEL_EXAMPLE.center}</strong>, вокруг неё {WHEEL_EXAMPLE.outer.join(', ')}. По нашему
+            словарю из этих букв получается {WHEEL_EXAMPLE.total} слово, например: {WHEEL_EXAMPLE.picks.join(', ')}. Самая
+            дорогая находка в этом колесе — «{WHEEL_EXAMPLE.longest}»: в ней заняты все семь букв.
+          </p>
+        </section>
+
+        <section className="mb-12">
+          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">Если вы искали игру, где надо угадать слово</h2>
+          <p className="text-neo-gray-200">
+            Во многих играх со словом дня, как в Wordle, нужно за шесть попыток угадать одно слово из пяти букв. Здесь всё
+            иначе: загаданного слова нет, ошибки не заканчивают игру, а результат зависит от того, сколько слов вы успели
+            найти за две минуты. Цветных подсказок тоже нет, зато вы сразу видите все буквы, которые можно использовать.
+          </p>
         </section>
 
         <section className="mb-12">

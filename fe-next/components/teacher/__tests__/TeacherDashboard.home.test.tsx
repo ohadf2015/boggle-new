@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, within, cleanup, act, fireEvent } from '@testing-library/react';
+import { render, screen, within, cleanup, act, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -34,6 +34,7 @@ vi.mock('@/hooks/useTeacherActivationProgress', () => ({ useTeacherActivationPro
 let week: Record<string, unknown>;
 vi.mock('@/hooks/useTeacherWeekStats', () => ({ useTeacherWeekStats: () => week }));
 vi.mock('@/hooks/useClassStudentPreview', () => ({ useClassStudentPreview: () => null }));
+vi.mock('@/hooks/useStudentProgressMetrics', () => ({ useStudentProgressMetrics: () => ({ students: [], isLoading: true, error: null, refresh: vi.fn() }) }));
 
 import TeacherDashboard from '../TeacherDashboard';
 
@@ -122,19 +123,43 @@ describe('Teacher Home', () => {
     expect(screen.queryAllByTestId('home-class-row')).toHaveLength(0);
   });
 
-  it('Then This week shows the three real numbers', () => {
+  it('Given several classes, Then This week breaks down by class and picking a row puts that class on the desk', () => {
     render(<TeacherDashboard />);
-    const card = screen.getByTestId('home-week');
-    expect(within(card).getByTestId('home-week-games')).toHaveTextContent('12');
-    expect(within(card).getByTestId('home-week-students')).toHaveTextContent('54');
-    expect(within(card).getByTestId('home-week-active')).toHaveTextContent('2');
+    const roster = within(screen.getByTestId('home-week')).getByTestId('home-week-classes');
+    expect(within(roster).getByRole('button', { name: /5B - English/ })).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.click(within(roster).getByRole('button', { name: /4A - Reading/ }));
+    expect(within(screen.getByTestId('home-hero')).getByTestId('home-start-live')).toHaveAttribute('href', '/en/education/classroom-game?classroomId=c4a');
   });
 
-  it('Given an insight, Then it sits in the hero beside Start, where the reason to play meets the button', () => {
+  it('Given one class, Then This week shows no per-class rows that would repeat the hero', () => {
+    classroomsState = { ...classroomsState, classrooms: [CLASSES[0]] };
+    render(<TeacherDashboard />);
+    expect(screen.queryByTestId('home-week-classes')).toBeNull();
+  });
+
+  it('Then This week counts up to the three real numbers', async () => {
+    render(<TeacherDashboard />);
+    const card = screen.getByTestId('home-week');
+    await waitFor(() => expect(within(card).getByTestId('home-week-games')).toHaveTextContent('12'));
+    await waitFor(() => expect(within(card).getByTestId('home-week-students')).toHaveTextContent('54'));
+    await waitFor(() => expect(within(card).getByTestId('home-week-active')).toHaveTextContent('2'));
+  });
+
+  it('Given an insight, Then the hero stays on the class and its Start button, with no filler line', () => {
     week = { ...week, insights: [{ id: 'momentum', value: 3 }] };
     render(<TeacherDashboard />);
-    expect(within(screen.getByTestId('home-hero')).getByTestId('home-insight')).toBeInTheDocument();
-    expect(within(screen.getByTestId('home-week')).queryByTestId('home-insight')).toBeNull();
+    expect(within(screen.getByTestId('home-hero')).queryByTestId('home-insight')).toBeNull();
+  });
+
+  it('Given a Pro teacher, Then the class desk shows the student roster under the hero', () => {
+    proState = PRO;
+    render(<TeacherDashboard />);
+    expect(screen.getByTestId('home-roster')).toBeInTheDocument();
+  });
+
+  it('Given a free teacher, Then the per-student roster stays behind Pro like the class analytics page', () => {
+    render(<TeacherDashboard />);
+    expect(screen.queryByTestId('home-roster')).toBeNull();
   });
 
   it('Given the stats read failed, Then the numbers read "—", never a false zero', () => {

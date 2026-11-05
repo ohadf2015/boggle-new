@@ -21,7 +21,11 @@ function stub() {
 }
 
 describe('GoogleSignInButton click_listener (t_147a0f0c)', () => {
-  beforeEach(() => vi.stubEnv('NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID', 'cid.apps.googleusercontent.com'));
+  beforeEach(() => {
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://x.supabase.co');
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'anon');
+    vi.stubEnv('NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID', 'cid.apps.googleusercontent.com');
+  });
   afterEach(() => {
     vi.unstubAllEnvs();
     delete (window as unknown as { google?: unknown }).google;

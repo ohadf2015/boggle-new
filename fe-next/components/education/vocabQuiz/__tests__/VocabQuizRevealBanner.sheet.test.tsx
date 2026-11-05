@@ -32,4 +32,9 @@ describe('VocabQuizRevealBanner as the answer sheet', () => {
     expect(screen.getByText('easily broken')).toBeInTheDocument();
     expect(screen.getByText('brittle')).toBeInTheDocument();
   });
+
+  it('keeps the points chip reading +N in Hebrew', () => {
+    render(<VocabQuizRevealBanner {...props} correct points={140} />);
+    expect(screen.getByTestId('vocab-quiz-verdict-points')).toHaveAttribute('dir', 'ltr');
+  });
 });
