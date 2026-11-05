@@ -43,6 +43,7 @@ import type { Language, ActiveRoom, GameMode } from '@/shared/types/game';
 import type { Socket } from 'socket.io-client';
 import { useMultiplayerJoin } from './useMultiplayerJoin';
 import { useClassroomRoomWait } from './useClassroomRoomWait';
+import { useClassroomGameMove } from './useClassroomGameMove';
 import { useMpRoomSocket, type MpRoomPlayer, type MpHostLeftState } from './useMpRoomSocket';
 import { useMpPageEffects } from './useMpPageEffects';
 import { applyMpPreselectMode } from './preselectMode';
@@ -346,6 +347,30 @@ export function useMpPageState() {
     try { sessionStorage.removeItem('boggle_intentional_exit'); } catch { /* storage blocked */ }
     handleJoin(false, null, code, undefined, username);
   }, [handleJoin, username]);
+
+  // The teacher opened a new game for this class: re-join it in place (useClassroomGameMove).
+  const followClassroomMove = useCallback((toCode: string, data: { fromCode?: string; reason?: string }) => {
+    setHostLeftState(null);
+    setClassroomEnded(null);
+    roomWait.release();
+    setIsActive(false); setShowResults(false); setResultsData(null); setGameCode('');
+    try { sessionStorage.removeItem('boggle_intentional_exit'); } catch { /* storage blocked */ }
+    if (typeof window !== 'undefined') {
+      try {
+        const url = new URL(window.location.href);
+        if (url.searchParams.has('room')) {
+          url.searchParams.set('room', toCode);
+          window.history.replaceState({}, '', url.toString());
+        }
+      } catch { /* malformed URL: the join below still runs */ }
+    }
+    trackGrowthEvent('classroom_game_move_followed', { from_code: data?.fromCode ?? null, to_code: toCode, reason: data?.reason ?? null });
+    handleJoin(false, null, toCode, undefined, username, { autoRetry: true });
+  }, [roomWait, setIsActive, setShowResults, setResultsData, setGameCode, handleJoin, username]);
+  useClassroomGameMove({
+    socket, currentCode: gameCode || roomWait.waitingCode || prefilledRoomCode,
+    isHost: isHost || isClassroomHost, follow: followClassroomMove,
+  });
 
   useMpPageEffects({
     socket, t, username, isActive, gameCode, showResults, resultsData, showStartAnimation,

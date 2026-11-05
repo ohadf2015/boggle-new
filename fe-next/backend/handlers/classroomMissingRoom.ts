@@ -33,6 +33,7 @@ import { isClassroomSessionEnded } from '../modules/classroomGameSessionState.js
 import { captureJoinRefusal } from '../utils/eduLiveEvents';
 import { lateJoinStudentKey } from '@/lib/education/endedCodeTries';
 import { emitError, ErrorCodes } from '../utils/errorHandler.js';
+import { captureClassroomGameMoved, emitClassroomGameMoved, findNewerClassroomGame } from './classroomGameMove';
 import { getGameRoom } from '../utils/socketHelpers.js';
 import logger from '../utils/logger.js';
 
@@ -143,6 +144,24 @@ export async function answerMissingRoom(
     }
 
     emitError(socket, ErrorCodes.CLASSROOM_NOT_OPEN);
+    return;
+  }
+
+  // The teacher opened a newer game for this class: send the student there,
+  // not out of the lesson (classroomGameMove.ts).
+  const toCode = record ? await findNewerClassroomGame(record) : null;
+  if (record && toCode) {
+    logger.info('CLASSROOM_GAME', `Old code ${gameCode} re-joined: class moved to ${toCode}`);
+    emitClassroomGameMoved(socket, { fromCode: gameCode, toCode, reason: 'old_code_rejoin' });
+    captureClassroomGameMoved({
+      fromCode: gameCode,
+      toCode,
+      reason: 'old_code_rejoin',
+      classroomId: record.classroomId,
+      teacherId: record.teacherId,
+      actorId: (socket.data?.verifiedUserId as string | undefined) ?? null,
+      students: 1,
+    });
     return;
   }
 
