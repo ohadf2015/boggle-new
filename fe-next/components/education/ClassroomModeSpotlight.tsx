@@ -88,7 +88,7 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, dir, busy, blocked
             className="size-11 shrink-0 rounded-neo border border-neo-cream/35 object-cover object-[50%_28%] @4xl/lobby:hidden"
           />
           <div className="flex min-w-0 flex-1 flex-col gap-1 @4xl/lobby:gap-2">
-            <span data-testid="spotlight-category" className="hidden font-neo-body text-xs font-black uppercase tracking-[0.08em] text-neo-cyan @4xl/lobby:block">{t(keys.category)}</span>
+            <span data-testid="spotlight-category" className="hidden font-neo-body text-xs font-black uppercase tracking-[0.08em] text-neo-cream/60 @4xl/lobby:block">{t(keys.category)}</span>
             <h2 className="font-neo-display text-lg font-bold leading-tight text-neo-cream @4xl/lobby:text-3xl">{name}</h2>
             <p data-testid="spotlight-how" className="hidden font-neo-body text-sm leading-snug text-neo-cream/80 [@media(min-height:740px)]:block @4xl/lobby:block @4xl/lobby:text-base">
               <span className="line-clamp-2 @4xl/lobby:line-clamp-none">{t(keys.how)}</span>
