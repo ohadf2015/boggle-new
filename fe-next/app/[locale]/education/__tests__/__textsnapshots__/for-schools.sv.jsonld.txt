@@ -9,7 +9,7 @@
       "name": "Är LexiClash gratis för lärare?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Ja. Varje lärare får en 14-dagars gratis provperiod av Teacher Pro: klassomfattande spel, alla 7 spellägen, alla sex språken, inga annonser, ingen inloggning för elever, inget kreditkort. Efter provperioden förblir klassrumsspelet gratis för enskilda lärare — upp till 3 klasser med 50 elever vardera. Teacher Pro kostar $9/månad och lägger till statistik per klass, PDF/CSV-rapporter och obegränsat antal klasser."
+        "text": "Ja. Varje lärare får en 14-dagars gratis provperiod av Teacher Pro: klassomfattande spel, alla 8 spellägen, alla sex språken, inga annonser, ingen inloggning för elever, inget kreditkort. Efter provperioden förblir klassrumsspelet gratis för enskilda lärare — upp till 3 klasser med 50 elever vardera. Teacher Pro kostar $9/månad och lägger till statistik per klass, PDF/CSV-rapporter och obegränsat antal klasser."
       }
     },
     {
@@ -49,7 +49,7 @@
       "name": "Hur skiljer sig detta från Kahoot, Gimkit eller Quizlet?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Det är quiz-/flashcardverktyg som är engelskfokuserade. LexiClash är ett ordbyggande spel (inte flervalsfrågor), stöder sex språk inklusive hebreiska RTL, får plats för en hel klass på upp till 50 elever gratis, med 7 livelägen."
+        "text": "Det är quiz-/flashcardverktyg som är engelskfokuserade. LexiClash är ett ordbyggande spel (inte flervalsfrågor), stöder sex språk inklusive hebreiska RTL, får plats för en hel klass på upp till 50 elever gratis, med 8 livelägen."
       }
     },
     {

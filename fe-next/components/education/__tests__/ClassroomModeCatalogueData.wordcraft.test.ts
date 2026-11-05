@@ -14,7 +14,8 @@ describe('classroom mode catalogue', () => {
     expect(catalogueEntry('wordcraft')!.complexity).not.toBe('tricky');
   });
 
-  it('keeps beta-only Crossword out of the classroom', () => {
-    expect(catalogueModes().map((m) => m.id)).not.toContain('crossword');
+  it('offers Crossword to every teacher: one player per phone, no teams, not Pro', () => {
+    const crossword = catalogueModes().find((m) => m.id === 'crossword');
+    expect(crossword).toMatchObject({ style: 'solo', teamsCapable: false, delivery: 'phones', nameKey: 'eduCrossword.name', stepsKey: 'eduCrossword.steps' });
   });
 });

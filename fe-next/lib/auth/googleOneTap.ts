@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { AUTH_CLIENT_LOAD_FAILED_EVENT, AuthClientLoadError, loadAuthClient } from '@/lib/auth/loadAuthClient';
 import logger from '@/utils/logger';
 import { trackSignupFailed } from '@/utils/growthTracking';
 import { stripLocalePrefix } from '@/lib/perf/heavyGamePath';
@@ -62,13 +62,14 @@ export async function generateOneTapNonce(): Promise<OneTapNonce> {
 export async function exchangeGoogleOneTapCredential(
   credential: string,
   rawNonce: string,
-  auth: AuthClientLike | null | undefined = supabase?.auth,
+  authOverride?: AuthClientLike | null,
 ): Promise<OneTapExchangeResult> {
-  if (!auth) {
-    return { success: false, error: 'Supabase not configured' };
-  }
-
   try {
+    const auth = authOverride === undefined ? (await loadAuthClient()).supabase?.auth : authOverride;
+    if (!auth) {
+      return { success: false, error: 'Supabase not configured' };
+    }
+
     const { data, error } = await auth.signInWithIdToken({
       provider: 'google',
       token: credential,
@@ -83,6 +84,9 @@ export async function exchangeGoogleOneTapCredential(
     }
     return { success: true };
   } catch (err) {
+    if (err instanceof AuthClientLoadError && typeof window !== 'undefined') {
+      window.dispatchEvent(new Event(AUTH_CLIENT_LOAD_FAILED_EVENT));
+    }
     return { success: false, error: err instanceof Error ? err.message : 'Sign in failed' };
   }
 }

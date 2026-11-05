@@ -24,6 +24,11 @@ export function initCrosswordMpState(
   return { players: [...players], puzzle, progress, startedAt: now };
 }
 
+function puzzleSlotIds(puzzle: unknown, claimed: readonly string[]): string[] {
+  const ids = new Set(((puzzle as { slots?: Array<{ id?: unknown }> } | null)?.slots ?? []).map((s) => s.id));
+  return [...new Set(claimed)].filter((id) => ids.has(id));
+}
+
 /**
  * Record a player's progress. Monotonic on `solved` (a solved player stays
  * solved with their winning percent/score), clamps percent, ignores unknowns.
@@ -42,12 +47,17 @@ export function applyProgress(
     elapsedMs: Math.max(0, update.elapsedMs),
     score: Math.max(0, update.score),
   };
+  const solvedSlotIds = update.solvedSlotIds ? puzzleSlotIds(state.puzzle, update.solvedSlotIds) : prev.solvedSlotIds;
+  if (solvedSlotIds) next.solvedSlotIds = solvedSlotIds;
   return { ...state, progress: { ...state.progress, [username]: next } };
 }
 
 /** Rank: solved-first, then higher percent, then faster solve time. */
 export function standings(state: CrosswordMpModeState): CrosswordStanding[] {
-  const rows = state.players.map((username) => ({ username, ...state.progress[username] }));
+  const rows = state.players.map((username) => {
+    const { solvedSlotIds: _private, ...progress } = state.progress[username] ?? { percent: 0, solved: false, elapsedMs: 0, score: 0 };
+    return { username, ...progress };
+  });
   rows.sort((a, b) => {
     if (a.solved !== b.solved) return a.solved ? -1 : 1;
     if (a.solved && b.solved) return a.elapsedMs - b.elapsedMs;

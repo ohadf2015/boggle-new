@@ -16,9 +16,9 @@
 import { useEffect } from 'react';
 import { useGameActions } from '@/hooks/gameState';
 import type { GameMode } from '@/shared/types/game';
-import type { ClassroomGameMode } from '@/shared/types/vocabQuiz';
+import { CLASSROOM_GAME_MODES, VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
 
-const BOARD_MODES: readonly string[] = ['classic', 'word-hunt', 'blast', 'wheel-rush', 'wordcraft'];
+const BOARD_MODES: readonly string[] = CLASSROOM_GAME_MODES.filter((m) => m !== VOCAB_QUIZ_MODE);
 
 /**
  * The board mode a classroom room plays, or null. The quiz is null on purpose:

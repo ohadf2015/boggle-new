@@ -57,9 +57,9 @@ export default function BoggleAlternativesPageClient(): React.ReactElement {
 
   const comparisonRows = [
     { name: 'Wordle', realtime: false, p2w: false, modes: '1', free: true },
-    { name: 'Words With Friends 2', realtime: false, p2w: true, modes: '2', free: false },
-    { name: 'Wordscapes', realtime: false, p2w: false, modes: '1', free: false },
-    { name: 'Boggle With Friends', realtime: true, p2w: true, modes: '2', free: false },
+    { name: 'Words With Friends 2', realtime: false, p2w: true, modes: '2', free: true },
+    { name: 'Wordscapes', realtime: false, p2w: false, modes: '1', free: true },
+    { name: 'Boggle With Friends', realtime: true, p2w: true, modes: '2', free: true },
     { name: 'Word Blitz', realtime: true, p2w: false, modes: '1', free: true },
     { name: 'LexiClash', realtime: true, p2w: false, modes: '6+', free: true },
   ];

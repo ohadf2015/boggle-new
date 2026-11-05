@@ -68,7 +68,9 @@ describe('VocabQuizAnswerGrid', () => {
     setup();
     for (const choice of CHOICES) {
       const button = screen.getByRole('button', { name: new RegExp(choice) });
-      expect(button.className).toContain('min-h-[64px]');
+      expect(button.className).toContain('max-sm:min-h-[5.5rem]');
+      expect(button.className).toContain('sm:min-h-[clamp(4rem');
+      expect(button.className).toContain('[@media(max-height:560px)]:min-h-12');
     }
   });
 
@@ -87,7 +89,7 @@ describe('VocabQuizAnswerGrid', () => {
     expect(new Set(glyphs).size).toBe(CHOICES.length);
   });
 
-  it('uses logical text alignment so Hebrew is not left-aligned', () => {
+  it('starts the word at the reading edge so Hebrew and English both lead with it', () => {
     setup();
     expect(screen.getByRole('button', { name: /abandon/ }).className).toContain('text-start');
   });

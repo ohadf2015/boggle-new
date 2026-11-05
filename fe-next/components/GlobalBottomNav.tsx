@@ -21,6 +21,7 @@ import { useDailyMissions } from '../hooks/useDailyMissions';
 import { useWeeklyQuest } from '@/hooks/useWeeklyQuest';
 import { useFriends } from '../hooks/useFriends';
 import { useFriendMessages } from '../hooks/useFriendMessages';
+import { useLandingAuthGate } from '@/lib/auth/landingAuthGate';
 import { neoInfoToast } from './NeoToast';
 import type { Message } from '@/shared/types/friends';
 
@@ -174,6 +175,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
     const safeArea = useSafeArea();
     const { user, profile } = useAuth();
     const [showAuthModal, setShowAuthModal] = useState(false);
+    const authGateOpen = useLandingAuthGate();
     const { missions } = useDailyMissions();
     useWeeklyQuest();
     const { pendingRequests, pendingChallenges, friends } = useFriends();
@@ -517,10 +519,12 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
             </div>
 
             {/* Auth Modal */}
-            <AuthModal
-                isOpen={showAuthModal}
-                onClose={() => setShowAuthModal(false)}
-            />
+            {(authGateOpen || showAuthModal) && (
+                <AuthModal
+                    isOpen={showAuthModal}
+                    onClose={() => setShowAuthModal(false)}
+                />
+            )}
         </nav>
     );
 });

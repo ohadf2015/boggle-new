@@ -55,13 +55,16 @@ describe('useTeacherReveal', () => {
     expect(vars.once).toBe(true);
   });
 
-  it('hides targets only with transform+opacity', async () => {
+  it('moves targets with transform only, so every card is readable from the first frame', async () => {
     render(<Probe />);
-    await waitFor(() => expect(gsapMock.set).toHaveBeenCalled());
-    const props = Object.keys(gsapMock.set.mock.calls[0][1]);
-    const compositorOnly = ['opacity', 'x', 'y', 'rotate', 'scale', 'rotateX', 'transformPerspective', 'transformOrigin'];
-    expect(props.filter((p) => !compositorOnly.includes(p))).toEqual([]);
-    expect(props).toContain('opacity');
+    await waitFor(() => expect(gsapMock.batch).toHaveBeenCalled());
+    const transformOnly = ['x', 'y', 'rotate', 'scale', 'rotateX', 'transformPerspective', 'transformOrigin'];
+    expect(Object.keys(gsapMock.set.mock.calls[0][1]).filter((p) => !transformOnly.includes(p))).toEqual([]);
+    const enter = gsapMock.batch.mock.calls[0][1].onEnter as (batch: Element[]) => void;
+    enter([document.createElement('p')]);
+    const settle = gsapMock.to.mock.calls.at(-1)![1];
+    expect(settle).not.toHaveProperty('opacity');
+    expect(settle.clearProps).not.toMatch(/opacity/);
   });
 
   it('leaves content alone under reduced motion', async () => {

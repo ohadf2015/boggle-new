@@ -3,7 +3,7 @@
 import { BookOpen, Brain, Clock, Grid2x2, Grid3x3, LayoutGrid, RotateCw, Search, Swords, Zap, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ClassroomGameMode } from '@/shared/types/vocabQuiz';
-import { MODE_TRANSLATION_KEY, boardSizeLabel } from './classroomModeLabels';
+import { boardSizeLabel, classroomModeLabelKey } from './classroomModeLabels';
 
 type Translate = (key: string, params?: Record<string, string | number>) => string;
 
@@ -39,6 +39,7 @@ const TONE: Record<string, string> = {
   blast: 'bg-neo-orange',
   'wheel-rush': 'bg-neo-cyan',
   wordcraft: 'bg-neo-purple',
+  crossword: 'bg-neo-cyan',
   'vocab-quiz': 'bg-neo-cyan',
 };
 
@@ -46,13 +47,15 @@ export function studentModeCopy(mode: ClassroomGameMode | string, vocabQuizVaria
   if (mode === 'vocab-quiz' && vocabQuizVariant === 'boss') {
     return { nameKey: 'eg2Modes.boss.name', ruleKey: 'eg2Modes.boss.how', icon: Swords, tone: 'bg-neo-pink' };
   }
-  const nameKey = `teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[mode] ?? 'classic'}`;
+  const nameKey = classroomModeLabelKey(mode);
   const ruleKey =
     mode === 'vocab-quiz'
       ? 'eduStudent.mode.vocabQuiz.rule'
       : mode === 'wordcraft'
         ? 'eduStudent.mode.wordcraft.rule'
-        : `mpUi.round.mode.${ROUND_SLUG[mode] ?? 'random'}.rule`;
+        : mode === 'crossword'
+          ? 'eduCrossword.studentRule'
+          : `mpUi.round.mode.${ROUND_SLUG[mode] ?? 'random'}.rule`;
   return { nameKey, ruleKey, icon: ICON[mode] ?? LayoutGrid, tone: TONE[mode] ?? 'bg-neo-lime' };
 }
 

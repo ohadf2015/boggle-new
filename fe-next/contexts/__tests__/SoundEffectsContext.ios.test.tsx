@@ -117,6 +117,7 @@ describe('SoundEffectsContext iOS Safari Compatibility', () => {
   beforeEach(() => {
     howlConstructorCalls.length = 0;
     vi.clearAllMocks();
+    sessionStorage.setItem('lc_engaged', '1');
   });
 
   describe('Howl configuration for iOS', () => {
@@ -173,5 +174,41 @@ describe('SoundEffectsContext iOS Safari Compatibility', () => {
         expect(soundCall?.html5).toBe(true);
       });
     });
+  });
+});
+
+describe('SoundEffectsProvider build gate', () => {
+  const settle = () => act(async () => { await Promise.resolve(); await Promise.resolve(); });
+
+  beforeEach(() => {
+    howlConstructorCalls.length = 0;
+    sessionStorage.removeItem('lc_engaged');
+  });
+
+  afterEach(() => {
+    window.history.pushState({}, '', '/');
+  });
+
+  it('creates no Howl on a cold landing visit until the first pointer', async () => {
+    window.history.pushState({}, '', '/en');
+    renderHook(() => useSoundEffects(), { wrapper: createWrapper() });
+    await settle();
+    expect(howlConstructorCalls.length).toBe(0);
+
+    window.dispatchEvent(new Event('pointerdown'));
+    expect(howlConstructorCalls.length).toBeGreaterThan(0);
+  });
+
+  it('builds at once on a game route', async () => {
+    window.history.pushState({}, '', '/en/daily');
+    renderHook(() => useSoundEffects(), { wrapper: createWrapper() });
+    await waitFor(() => expect(howlConstructorCalls.length).toBeGreaterThan(0));
+  });
+
+  it('builds at once when the visitor already engaged this session', async () => {
+    window.history.pushState({}, '', '/en');
+    sessionStorage.setItem('lc_engaged', '1');
+    renderHook(() => useSoundEffects(), { wrapper: createWrapper() });
+    await waitFor(() => expect(howlConstructorCalls.length).toBeGreaterThan(0));
   });
 });

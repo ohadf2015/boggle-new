@@ -36,6 +36,14 @@ const ALLOWLIST: Record<string, { tokens: string[]; why: string }> = {
     tokens: ['left-0', 'right-0'],
     why: 'isRTL ? right-0 : left-0 ternary',
   },
+  'education/ClassroomResultsCardStepViews.tsx': {
+    tokens: ['left-0', 'border-l-3', 'left-auto', 'right-0'],
+    why: 'speech-bubble tail is a rotated square whose point is the physical left and bottom borders; RTL mirrors it with rtl:right-0 plus a 225deg rotation. border-s would move the borders before that rotation and point the tail the wrong way',
+  },
+  'education/vocabQuiz/VocabQuizFooterBar.tsx': {
+    tokens: ['pl-12'],
+    why: 'max-sm:pl-12 clears a floating launcher pinned to the physical bottom-left in both directions; ps-12 would pad the reading start and cover the hint in Hebrew',
+  },
   // ---- components/teacher ----
 };
 

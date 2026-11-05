@@ -9,7 +9,7 @@
       "name": "Is LexiClash free for teachers?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes. Every teacher gets a 14-day free trial of Teacher Pro: whole-class play, all 7 game modes, all six languages, no ads, no student logins, no credit card. After the trial, the classroom game stays free for individual teachers -- up to 3 classes of 50 students each. Teacher Pro is $9/month and adds per-class analytics, PDF/CSV progress reports and unlimited classes."
+        "text": "Yes. Every teacher gets a 14-day free trial of Teacher Pro: whole-class play, all 8 game modes, all six languages, no ads, no student logins, no credit card. After the trial, the classroom game stays free for individual teachers -- up to 3 classes of 50 students each. Teacher Pro is $9/month and adds per-class analytics, PDF/CSV progress reports and unlimited classes."
       }
     },
     {
@@ -49,7 +49,7 @@
       "name": "How is this different from Kahoot, Gimkit or Quizlet?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Those are quiz/flashcard tools that are English-first. LexiClash is a word-building game (not multiple-choice), supports six languages including Hebrew RTL, fits a whole class of up to 50 students for free, with 7 live game modes."
+        "text": "Those are quiz/flashcard tools that are English-first. LexiClash is a word-building game (not multiple-choice), supports six languages including Hebrew RTL, fits a whole class of up to 50 students for free, with 8 live game modes."
       }
     },
     {

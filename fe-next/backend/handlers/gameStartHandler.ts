@@ -246,6 +246,13 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
         logger.error('SOCKET', `Vocab quiz start failed for ${gameCode}, falling back to board game: ${(err as Error).message}`);
       }
 
+      game.lessonCrossword = null;
+      if ((await getGameModeModule(resolvedMode).prepareRound?.(io, gameCode, game)) === 'refused') {
+        game.gameState = 'waiting';
+        logger.warn('SOCKET', `Game ${gameCode} ${resolvedMode} start refused, room left in the lobby`);
+        return;
+      }
+
       applyStartBoostToken(socket, game, gameCode, validatedData.boostToken);
 
       // The mutex is held through the whole async setup chain (audit SRV-H4): a
@@ -288,7 +295,7 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       const lessonVocabulary = classroomGame?.vocabularyWords
         ? buildLessonVocabulary(classroomGame.vocabularyWords, gameLang)
         : undefined;
-      const vocabToEmbed = embeddableLessonWords(classroomGame?.vocabularyWords ?? [], gameLang);
+      const vocabToEmbed = game.lessonCrossword ? [] : embeddableLessonWords(classroomGame?.vocabularyWords ?? [], gameLang);
 
       // SECURITY: the server deals the board for every competitive (2+) game —
       // a client grid would let the host rig it. Solo keeps the client grid,

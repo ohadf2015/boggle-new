@@ -28,7 +28,7 @@ export interface ClassroomGameSettings {
    * duplicate/rarity scoring, so widening that union would drag it into random
    * mode rolls, quick-play matchmaking and every board-engine mode branch.
    */
-  gameMode?: 'classic' | 'blast' | 'word-hunt' | 'wheel-rush' | 'vocab-quiz' | 'wordcraft';
+  gameMode?: 'classic' | 'blast' | 'word-hunt' | 'wheel-rush' | 'vocab-quiz' | 'wordcraft' | 'crossword';
   vocabQuizVariant?: 'classic' | 'boss';
   /** Boss Battle v2: a classic board round fought against this boss. Absent = plain classic. */
   classroomBossId?: ClassroomBossId;

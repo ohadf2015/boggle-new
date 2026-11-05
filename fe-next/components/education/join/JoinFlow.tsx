@@ -156,7 +156,13 @@ export function JoinFlow({
         >
         <main
           data-testid="join-stage"
-          className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-4 py-6 short:justify-start short:py-3 sm:max-w-lg lg:max-w-xl tv:max-w-3xl [@media(orientation:landscape)_and_(max-height:520px)_and_(min-width:600px)]:max-w-3xl [@media(orientation:landscape)_and_(max-height:520px)_and_(min-width:600px)]:justify-center"
+          className={cn(
+            'mx-auto flex w-full max-w-md flex-col justify-center short:justify-start sm:max-w-lg [@media(orientation:landscape)_and_(max-height:520px)_and_(min-width:600px)]:max-w-3xl [@media(orientation:landscape)_and_(max-height:520px)_and_(min-width:600px)]:justify-center',
+            // The arena art is loud: a solid panel keeps the subtitle and helper text readable and lets the form own the screen.
+            academy
+              ? 'my-auto w-[calc(100%-1.5rem)] flex-none rounded-neo border-3 border-neo-cream/50 bg-neo-navy px-5 py-6 shadow-hard-lg short:py-3 lg:max-w-2xl lg:px-12 lg:py-10 tv:max-w-4xl'
+              : 'flex-1 px-4 py-6 short:py-3 lg:max-w-xl tv:max-w-3xl'
+          )}
         >
           <header className="mb-5 flex items-center justify-between gap-3 short:mb-3 lg:mb-8">
             <span className="inline-block -rotate-2 rounded-neo border-3 border-neo-black bg-neo-lime px-3 py-1 font-neo-display text-lg font-black uppercase tracking-tight text-neo-navy shadow-hard lg:text-2xl">

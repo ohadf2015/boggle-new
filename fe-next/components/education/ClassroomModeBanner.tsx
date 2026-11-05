@@ -11,7 +11,7 @@ import type { Language } from '@/shared/types/game';
 import { VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
 import type { LiveClassroomGameInfo } from '@/lib/education/liveClassroomGameInfo';
 import { isStudentTimerHidden } from '@/shared/utils/classroomPressure';
-import { MODE_TRANSLATION_KEY, boardSizeLabel } from './classroomModeLabels';
+import { boardSizeLabel, classroomModeLabelKey } from './classroomModeLabels';
 import { SocketContext } from '@/utils/SocketContext';
 import { useIsVocabQuizRoom } from './vocabQuiz/useIsVocabQuizRoom';
 import { useClassroomSeatCapNotice } from './controls/useClassroomSeatCapNotice';
@@ -344,7 +344,7 @@ export function ClassroomModeBanner({
                 <SummaryTile
                   icon={<ModeIcon className="w-4 h-4" />}
                   label={t('teacher.classroom.gameModes.title')}
-                  value={t(`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[gameMode] ?? 'classic'}`)}
+                  value={t(classroomModeLabelKey(gameMode))}
                 />
                 {isQuiz ? (
                   <>

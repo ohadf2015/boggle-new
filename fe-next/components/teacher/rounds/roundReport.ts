@@ -8,6 +8,7 @@ const MODE_KEYS: Record<string, string> = {
   'wheel-rush': 'teacher.lastGame.mode.wheelRush',
   'vocab-quiz': 'teacher.lastGame.mode.vocabQuiz',
   wordcraft: 'teacher.classroom.gameModes.wordcraft',
+  crossword: 'eduCrossword.name',
 };
 
 const FALLBACK_TITLE_KEY = 'teacher.classReport.notes.title';

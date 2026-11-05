@@ -29,10 +29,19 @@ export const QUIET_LINK = [
 ].join(' ');
 
 export const PANEL = 'rounded-neo-lg border-2 border-neo-cream/35 bg-neo-navy-light shadow-hard';
+// The one card that leads the page sits a step lighter than the base panels beside it.
+export const PANEL_RAISED = 'rounded-neo-lg border-2 border-neo-cream/60 bg-neo-navy-elevated shadow-hard-lg';
 
 export const OUTLINE_BUTTON = [
   'inline-flex min-h-11 items-center justify-center gap-1.5 whitespace-nowrap rounded-neo border-2 border-neo-cream/40 px-3',
   'font-neo-display text-sm font-bold text-neo-cream hover:border-neo-cream hover:bg-neo-cream/10',
+  PRESS,
+  FOCUS,
+].join(' ');
+
+export const GHOST_BUTTON = [
+  'inline-flex min-h-11 items-center justify-center gap-1.5 whitespace-nowrap rounded-neo border-2 border-transparent bg-transparent px-3',
+  'font-neo-display text-sm font-bold text-neo-cream hover:border-neo-cream/25 hover:bg-neo-cream/10',
   PRESS,
   FOCUS,
 ].join(' ');

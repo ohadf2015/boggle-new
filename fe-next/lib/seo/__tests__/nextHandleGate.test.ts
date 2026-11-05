@@ -139,8 +139,10 @@ describe('decideNextHandle', () => {
   it('proxy and the custom server 308 before Next handle, and leave /sitemap.xml alone', () => {
     const proxy = fs.readFileSync(path.resolve(__dirname, '../../../proxy.ts'), 'utf8');
     const server = fs.readFileSync(path.resolve(__dirname, '../../../server/index.ts'), 'utf8');
+    const gateRoute = fs.readFileSync(path.resolve(__dirname, '../../../server/nextHandleGateRoute.ts'), 'utf8');
     expect(proxy).toMatch(/gate\.action === 'redirect'[\s\S]{0,180}308/);
-    expect(server).toMatch(/gate\.action === 'redirect'[\s\S]{0,240}res\.status\(308\)/);
+    expect(server).toMatch(/finishNextHandleGate\(/);
+    expect(gateRoute).toMatch(/gate\.action === 'redirect'[\s\S]{0,240}res\.status\(308\)/);
     expect(server).toMatch(/app\.get\('\/sitemap\.xml'/);
   });
 });

@@ -8,20 +8,11 @@ import {
   type ComponentType,
   type ReactNode,
 } from 'react';
-import { usePathname } from 'next/navigation';
-import { isLandingPath } from '@/lib/i18n/isLandingPath';
-import { isNativeShell } from '@/utils/returningVisitor';
-import { hasSupabaseSession } from '@/utils/onboardingStorage';
+import { resetLandingAuthGateForTests, useLandingAuthGate } from '@/lib/auth/landingAuthGate';
 // Type + context object only — AuthContext.tsx does not import gotrue.
 import { AuthContext, type AuthContextValue } from '@/contexts/AuthContext';
 
 const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
-
-/**
- * Pointer/key only. Lighthouse scrolls; scroll must not pull @supabase/gotrue
- * into the landing PSI trace (same rule as GoogleOneTapInitializer).
- */
-const ARM_EVENTS = ['pointerdown', 'keydown', 'touchstart'] as const;
 
 type AuthProviderComponent = ComponentType<{ children: ReactNode }>;
 
@@ -29,6 +20,7 @@ let cachedProvider: AuthProviderComponent | null = null;
 
 export function resetDeferredAuthForTests(): void {
   cachedProvider = null;
+  resetLandingAuthGateForTests();
 }
 
 function loadAuthProvider(): Promise<AuthProviderComponent> {
@@ -69,27 +61,9 @@ function AuthValueBridge({ onValue }: { onValue: (value: AuthContextValue | null
  * right after hydration.
  */
 export function DeferredAuthProvider({ children }: { children: ReactNode }) {
-  const pathname = usePathname();
-  const landing = isLandingPath(pathname ?? '');
-  const [armed, setArmed] = useState(!landing || cachedProvider !== null);
+  const armed = useLandingAuthGate();
   // Lazy initializer: a bare component would be called by useState with no props.
   const [Provider, setProvider] = useState<AuthProviderComponent | null>(() => cachedProvider);
-
-  useEffect(() => {
-    // The PSI trace is a signed-out web visit. Anyone else would otherwise load
-    // auth (and re-render the home with their profile) mid-way through a first swipe.
-    if (!landing || isNativeShell() || hasSupabaseSession()) {
-      setArmed(true);
-      return;
-    }
-    if (armed) return;
-    const opts = { capture: true, passive: true } as const;
-    const arm = () => setArmed(true);
-    for (const type of ARM_EVENTS) window.addEventListener(type, arm, opts);
-    return () => {
-      for (const type of ARM_EVENTS) window.removeEventListener(type, arm, opts);
-    };
-  }, [landing, armed]);
 
   useEffect(() => {
     if (!armed || Provider) return;

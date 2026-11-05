@@ -9,7 +9,7 @@ import { TeacherProCompareCheckoutStrip } from '@/components/education/TeacherPr
 import { ACCENT, EducationSectionRenderer } from '@/components/education/EducationLandingSections';
 import { EducationRelatedLinks } from '@/components/education/EducationRelatedLinks';
 import { EducationHeroBanner } from '@/components/education/EducationHeroBanner';
-import { ScrollRevealSection } from '@/components/education/ScrollRevealSection';
+import { EducationLandingReveal } from '@/components/education/EducationLandingReveal';
 import { GeoFaqList } from '@/components/seo/GeoFaqList';
 import {
   buildEducationLandingJsonLd,
@@ -168,7 +168,7 @@ export function EducationLandingTemplate({ locale, path, content }: Props) {
             <EducationSectionRenderer section={section} accent={content.accent} locale={locale} />
           );
           return revealSections ? (
-            <ScrollRevealSection key={`${section.kind}-${i}`}>{rendered}</ScrollRevealSection>
+            <EducationLandingReveal key={`${section.kind}-${i}`}>{rendered}</EducationLandingReveal>
           ) : (
             <Fragment key={`${section.kind}-${i}`}>{rendered}</Fragment>
           );

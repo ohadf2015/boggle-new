@@ -8,7 +8,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { isNative } from '@/utils/platform';
 import { isHeavyGamePath } from '@/lib/perf/heavyGamePath';
 import { isLandingPath } from '@/lib/i18n/isLandingPath';
-import { supabase } from '@/lib/supabase';
+import { isAuthClientConfigured } from '@/lib/auth/loadAuthClient';
 import {
   ensureGoogleIdInitialized,
   shouldEnableGoogleOneTap,
@@ -83,7 +83,7 @@ export default function GoogleOneTapInitializer() {
   const enabled = shouldEnableGoogleOneTap({
     isNativePlatform: isNative(),
     clientId,
-    supabaseConfigured: !!supabase,
+    supabaseConfigured: isAuthClientConfigured(),
     isAuthenticated,
     pathname,
   });

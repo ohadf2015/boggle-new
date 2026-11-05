@@ -26,6 +26,7 @@ vi.mock('@/hooks/useTeacherActivationProgress', () => ({
 let week: Record<string, unknown>;
 vi.mock('@/hooks/useTeacherWeekStats', () => ({ useTeacherWeekStats: () => week }));
 vi.mock('@/hooks/useClassStudentPreview', () => ({ useClassStudentPreview: () => null }));
+vi.mock('@/hooks/useStudentProgressMetrics', () => ({ useStudentProgressMetrics: () => ({ students: [], isLoading: true, error: null, refresh: vi.fn() }) }));
 vi.mock('@/hooks/useVocabularyLesson', () => ({ useLessons: () => ({ lessons: [], isLoading: false, error: null }) }));
 
 import TeacherDashboard from '../TeacherDashboard';
@@ -93,11 +94,11 @@ describe('Teacher Home: calm, one primary', () => {
     expect(title.className).not.toMatch(/text-neo-lime|text-5xl/);
   });
 
-  it('Then the insight is one inline line inside the hero, not a boxed big number', () => {
+  it('Then the hero carries no insight line or free-class count, only the class and its one Start button', () => {
     render(<TeacherDashboard />);
-    const insight = within(screen.getByTestId('home-hero')).getByTestId('home-insight');
-    expect(within(insight).getByTestId('home-insight-value').className).not.toMatch(/text-5xl|text-neo-(lime|orange|cyan|pink|purple)/);
-    expect(insight.parentElement?.className ?? '').not.toContain('border');
+    const hero = screen.getByTestId('home-hero');
+    expect(within(hero).queryByTestId('home-insight')).toBeNull();
+    expect(within(hero).queryByTestId('home-class-cap')).toBeNull();
   });
 
   it('Then the ready-made games are one row of three cards that each say when to use them and show their steps', () => {

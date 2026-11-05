@@ -7,7 +7,6 @@ import { Button } from '../ui/button';
 import { Loader } from '@/components/ui/Loader';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
-import { signOut } from '../../lib/supabase';
 import dynamic from 'next/dynamic';
 const AuthModal = dynamic(() => import('./AuthModal'), { ssr: false });
 import AvatarLite from '@/components/AvatarLite';
@@ -17,6 +16,7 @@ import { getLevelFromXp } from '../XpProgressBar';
 import { cn } from '../../lib/utils';
 import { useRouter } from 'next/navigation';
 import { useCrazyGamesAuth } from '@/hooks/useCrazyGamesAuth';
+import logger from '@/utils/logger';
 import { CalendarRewardsModal } from '../engagement/CalendarRewardsModal';
 import { AuthButtonDropdownMenu } from './AuthButtonDropdownMenu';
 import { DropdownMenu, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -136,9 +136,15 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
 
   const handleSignOut = async (): Promise<void> => {
     setIsSigningOut(true);
-    await signOut();
-    setShowUserMenu(false);
-    setIsSigningOut(false);
+    try {
+      const { signOut } = await import('../../lib/supabase');
+      await signOut();
+      setShowUserMenu(false);
+    } catch (error) {
+      logger.error('[AuthButton] Sign out failed:', error);
+    } finally {
+      setIsSigningOut(false);
+    }
   };
 
   // Authenticated user

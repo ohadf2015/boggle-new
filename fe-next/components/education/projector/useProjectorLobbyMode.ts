@@ -6,6 +6,7 @@ import { useLiveClassroomGameInfo } from '@/hooks/useLiveClassroomGameInfo';
 import { BOSS_BATTLE_ID, catalogueIdOf, launchOf, readLocalBossId, readLocalQuizPlayable, readLocalQuizVariant, type ClassroomCatalogueId } from '@/lib/education/classroomCatalogueId';
 import { readLocalGameMode } from '@/components/education/lobby/useClassroomModeSwitch';
 import { useQuizStartRefused } from '@/components/education/projector/ProjectorQuizBlocked';
+import { CROSSWORD_REFUSED_KEY, useCrosswordStartRefused } from '@/components/education/projector/useCrosswordStartRefused';
 import { boardSizeLabel } from '@/components/education/classroomModeLabels';
 import { isStudentTimerHidden } from '@/shared/utils/classroomPressure';
 import { VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
@@ -41,6 +42,8 @@ export function useProjectorLobbyMode({ gameCode, classroomGameMode, templateSet
   const mode: ClassroomGameMode = legacyQuizBoss ? VOCAB_QUIZ_MODE : launchOf(modeId).gameMode;
   const isQuiz = mode === VOCAB_QUIZ_MODE;
   const [quizRefused, clearQuizRefused] = useQuizStartRefused(gameCode, t);
+  const [crosswordRefused, clearCrosswordRefused] = useCrosswordStartRefused(gameCode, t);
+  const crosswordBlocked = mode === 'crossword' && crosswordRefused;
   const [quizPlayable] = useState(readLocalQuizPlayable);
   const settings = liveGame?.settings ?? null;
   const timerOff = settings?.pressure ? isStudentTimerHidden(settings.pressure) : false;
@@ -59,14 +62,15 @@ export function useProjectorLobbyMode({ gameCode, classroomGameMode, templateSet
     }
   } else {
     if (timerMinutes != null && !timerOff) facts.push({ key: 'timer', text: t('eduLiveRoom.lobby.minutes', { count: timerMinutes }) });
-    // Wordcraft deals every student its own fixed board; the grid setting never reaches it.
-    if (mode !== 'wordcraft') facts.push({ key: 'board', text: boardSizeLabel(templateSettings?.difficulty ?? settings?.boardSize) });
+    // Wordcraft and crossword deal their own grids; the board-size setting never reaches them.
+    if (mode !== 'wordcraft' && mode !== 'crossword') facts.push({ key: 'board', text: boardSizeLabel(templateSettings?.difficulty ?? settings?.boardSize) });
   }
   const allowLateJoin = templateSettings?.allowLateJoin ?? settings?.allowLateJoin ?? true;
   facts.push({ key: 'late', text: t(allowLateJoin ? 'education.projectorLobby.lateJoinOn' : 'education.projectorLobby.lateJoinOff') });
 
   const applyMode = (id: ClassroomCatalogueId) => {
     clearQuizRefused();
+    clearCrosswordRefused();
     setSwitchedMode(id);
   };
 
@@ -75,7 +79,8 @@ export function useProjectorLobbyMode({ gameCode, classroomGameMode, templateSet
     mode,
     isQuiz,
     switched: switchedMode !== null,
-    quizBlocked: isQuiz && (quizRefused || quizPlayable === false),
+    quizBlocked: (isQuiz && (quizRefused || quizPlayable === false)) || crosswordBlocked,
+    blockedReasonKey: crosswordBlocked ? CROSSWORD_REFUSED_KEY : undefined,
     facts,
     className: liveGame?.classroomName ?? null,
     lessonNames: liveGame?.lessonNames ?? [],

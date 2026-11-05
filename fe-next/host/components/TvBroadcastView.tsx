@@ -34,6 +34,7 @@ import { roundHasScore } from '@/shared/utils/roundCelebration';
 import { wordHuntAlive } from './tv-broadcast/wordHuntAlive';
 import TvRoundFxLayers from './tv-broadcast/TvRoundFxLayers';
 import TvWordcraftBroadcast from './tv-broadcast/TvWordcraftBroadcast';
+import TvCrosswordBroadcast from './tv-broadcast/TvCrosswordBroadcast';
 import TvBodyScroller from './tv-broadcast/TvBodyScroller';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import {
@@ -336,6 +337,8 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
   if (bossActive) {
     return <ProjectorBossStage remainingTime={remainingTime ?? 0} trailing={<>{fullscreenButton}{exitButton}</>} style={TEACHER_CONTROLS_INSET} />;
   }
+
+  if (gameMode === 'crossword') return <TvCrosswordBroadcast joinBar={joinBar} socket={socket} remainingTime={remainingTime} t={t} />;
 
   if (gameMode === 'wordcraft') {
     return <TvWordcraftBroadcast joinBar={joinBar} socket={socket} players={leaderboardData} teams={classroomLive?.teams} hostUsername={username} language={roomLanguage} remainingTime={remainingTime} t={t} />;
