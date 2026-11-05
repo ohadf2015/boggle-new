@@ -39,6 +39,7 @@ vi.mock('../../../lib/supabase', () => ({
   signUpWithEmail: (...args: any[]) => mockSignUpWithEmail(...args),
   signInWithEmail: (...args: any[]) => mockSignInWithEmail(...args),
   signInWithMagicLink: (...args: any[]) => mockSignInWithMagicLink(...args),
+  resendEmailVerification: vi.fn().mockResolvedValue({ error: null }),
 }));
 
 vi.mock('../GoogleSignInButton', () => ({
@@ -382,7 +383,7 @@ describe('AuthModal', () => {
       fireEvent.submit(emailInput.closest('form')!);
 
       await waitFor(() => {
-        expect(screen.getByText('Check your email for a sign-in link!')).toBeInTheDocument();
+        expect(screen.getByRole('status')).toHaveTextContent('test@example.com');
       });
     });
 
@@ -475,7 +476,7 @@ describe('AuthModal', () => {
       fireEvent.submit(emailInput.closest('form')!);
 
       await waitFor(() => {
-        expect(screen.getByText('Check your email to verify your account!')).toBeInTheDocument();
+        expect(screen.getByRole('status')).toHaveTextContent('test@example.com');
       });
     });
 
@@ -593,7 +594,7 @@ describe('AuthModal', () => {
       await waitFor(() => {
         expect(onClose).toHaveBeenCalled();
       });
-      expect(screen.queryByText('Check your email to verify your account!')).not.toBeInTheDocument();
+      expect(screen.queryByRole('status')).not.toBeInTheDocument();
     });
 
     // supabase-js does not error on a duplicate signup when confirmations are on —
@@ -612,7 +613,7 @@ describe('AuthModal', () => {
       await waitFor(() => {
         expect(screen.getByText('Email already registered.')).toBeInTheDocument();
       });
-      expect(screen.queryByText('Check your email to verify your account!')).not.toBeInTheDocument();
+      expect(screen.queryByRole('status')).not.toBeInTheDocument();
     });
 
     // Confirmation-required signup: no session, real identity → the "check your
@@ -628,8 +629,9 @@ describe('AuthModal', () => {
       fireEvent.submit(emailInput.closest('form')!);
 
       await waitFor(() => {
-        expect(screen.getByText('Check your email to verify your account!')).toBeInTheDocument();
+        expect(screen.getByRole('status')).toHaveTextContent('test@example.com');
       });
+      expect(screen.getByTestId('teacher-check-email-change')).toBeInTheDocument();
       expect(onClose).not.toHaveBeenCalled();
     });
   });
@@ -687,13 +689,14 @@ describe('AuthModal', () => {
       fireEvent.submit(emailInput.closest('form')!);
 
       await waitFor(() => {
-        expect(screen.getByText('Check your email for a sign-in link!')).toBeInTheDocument();
+        expect(screen.getByRole('status')).toHaveTextContent('test@example.com');
       });
 
-      // OAuth buttons should be hidden
+      // OAuth buttons are hidden with the form. Guest exit stays — it lives
+      // outside that block so a mistyped address can still leave.
       expect(screen.queryByText('Sign in with Google')).not.toBeInTheDocument();
-      // Continue as guest should still be visible
       expect(screen.getByText('Continue as guest')).toBeInTheDocument();
+      expect(screen.getByTestId('teacher-check-email-change')).toBeInTheDocument();
     });
   });
 

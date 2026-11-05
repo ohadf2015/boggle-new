@@ -8,3 +8,9 @@ export { BeforeAfterNumber, type BeforeAfterNumberProps } from './BeforeAfterNum
 export { RoundCelebration, type RoundCelebrationProps } from './RoundCelebration';
 export { VerdictSheet, type VerdictSheetProps } from './VerdictSheet';
 export { ChestBurst, type ChestBurstProps } from './ChestBurst';
+export { EDU_MOTION, staggerDelay } from './tokens';
+export { useReducedMotionSafe } from './useReducedMotionSafe';
+export { CountUp as AnimatedNumber, type CountUpProps as AnimatedNumberProps } from './CountUp';
+export { pressMotion, type PressMotionProps } from './pressMotion';
+export { Reveal, Stagger, type RevealProps, type StaggerProps } from './Reveal';
+export { CelebrationBurst, CELEBRATION_BURST_MAX, SPARKLE_MAX_S, type CelebrationBurstProps } from './CelebrationBurst';

@@ -6,6 +6,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSocketOptional } from '@/utils/SocketContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { isLandingAuthGateOpen } from '@/lib/auth/landingAuthGate';
 import type { Message, MessageThread, Challenge } from '@/shared/types/friends';
 import * as friendMessages from '@/utils/friendMessages';
 import logger from '@/utils/logger';
@@ -72,6 +73,7 @@ export function useFriendMessages(
    * Load message threads
    */
   const refreshThreads = useCallback(async () => {
+    if (!user?.id && !isLandingAuthGateOpen()) return;
     try {
       const fetchedThreads = await friendMessages.getThreads(user?.id);
       setThreads(fetchedThreads);
@@ -509,6 +511,7 @@ export function useFriendMessages(
    * 60s, paused while the tab is hidden (no point fetching in a background tab).
    */
   const loadChallenges = useCallback(async () => {
+    if (!user?.id && !isLandingAuthGateOpen()) return;
     try {
       const challenges = await friendMessages.getPendingChallenges(user?.id);
       setPendingChallenges(challenges);

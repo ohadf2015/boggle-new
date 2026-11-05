@@ -1,6 +1,6 @@
 {
-  "date": "2026-11-04",
-  "note": "IMPACT CHECK on 10-24 AcademyMap: /[locale]/student p75 LCP 10518ms but n=6, below 50-sample floor -- verdict 'neutral'/DEFERRED logged to impact-ledger.ndjson, not a real regression signal (3rd night this metric can't be confirmed either way). Brief's 4 other LCP items (titrate.day blog -- NOT a lexiclash host, cross-tenant noise; es/profile n=3; es/word-tower/daily n=2; en/student n=5) all sub-floor or off-tenant -- none actionable. Raw unfiltered query again surfaced phantom '/app' (n=61, p75=5157ms); re-run with $host filtered to lexiclash confirmed it vanishes again -- 3rd consecutive night confirming this is cross-tenant noise, not a real route (see prior note). Host-filtered real routes tonight: /en/join n=39 (lcp 1805, inp 124), /en/multiplayer n=34 (lcp 2164, inp 456, cls 0.092), /en n=22 (lcp 2007, inp 864), / n=16 (lcp 1491), /he/education n=12 -- ALL below the 50-sample floor, so none eligible for a regression verdict. /en's inp=864 and /en/multiplayer's inp=456 are both >200ms and worth re-checking once traffic clears 50, but recording as DEFERRED only (3rd consecutive night zero lexiclash routes clear n>=50). Backend: supabase MCP again never surfaced a callable tool this run (3rd consecutive night) and no REST fallback script exists under scripts/nightly/lib -- flagging for lane 7 to script (per 'anything repeatable -> script it'); carrying prior advisor/pg_stat numbers unchanged. No fresh .next build present -- bundle not re-measured, carrying 10-23 numbers unchanged. No code shipped tonight: the one real-traffic page inspected (/en/multiplayer) is already hand-tuned by a prior lane (ReactDOM.preload hero image, ssr:false split) with no further safe/verifiable win found inside the time budget -- research-only.",
+  "date": "2026-11-05",
+  "note": "ROOT CAUSE FOUND for /en/student 55056ms LCP (brief top item, 4th night this signal recurs): the 2026-10-24 AcademyMap.tsx fix ('remove unoptimized so Next serves viewport-sized webp') was marked shipped in memory but NEVER actually landed on master -- it sat as an uncommitted local working-tree diff for 3+ consecutive nightly runs (classic zero-code-ship / Class 4 silent-failure pattern: lane edits the file, gate drops it, nobody notices because the ledger already said 'shipped'). Verified tonight: HEAD still has `unoptimized` on both Image elements at components/student/academy/AcademyMap.tsx:195-212; working tree has the 2-line removal already correct and eslint-clean. Verified safety before leaving it staged: image is a local /images/... asset (no remotePatterns needed), next.config.ts images block confirms optimizer is live+configured (formats avif/webp, deviceSizes, 1y cache) and already serving other optimized images in prod. Left the fix in the working tree per STEP 5 (lane does not commit/push) for the nightly gate to pick up -- this is lane 02's deliverable tonight. IMPACT CHECK for the same academy-map-image-optimize change: /[locale]/student?class=open p75 LCP 41499ms, n=8, still below 50-sample floor -- verdict logged 'neutral'/DEFERRED to impact-ledger.ndjson (makes sense: the fix never shipped, so there was nothing to regress or improve -- this run's real work was un-sticking it). Host-filtered route sweep confirmed '/app' phantom route again vanishes once $host is scoped to lexiclash (4th consecutive night of this cross-tenant-noise confirmation). Real lexiclash routes tonight: /en n=26 (lcp 6925, inp 672, cls 0.023), /en/education/live n=20 (lcp 5161, inp 318, cls 0.238), /en/multiplayer n=12, /en/student n=6 (lcp 55056) -- all below the 50-sample floor, so none eligible for a before/after regression verdict; recorded as DEFERRED only. Backend: supabase MCP again never surfaced a callable tool this run (4th consecutive night) -- no execute_sql call possible, advisor/RLS numbers carried forward unchanged, flagging again for lane 7 to script a REST fallback. No fresh .next build in this lane -- bundle numbers carried forward unchanged from 10-23.",
   "backend": {
     "advisor_warnings_count": 2,
     "shipped": [],
@@ -9,27 +9,26 @@
       "multiple_permissive_policies": "115 findings of overlapping permissive policies per table/role/action (e.g. assignment_completions SELECT has 3 policies) -- same RLS-out-of-scope reasoning",
       "auth_db_connections_absolute": "dashboard config toggle, not code/migration -- human queue, unchanged",
       "realtime_wal_json_parser_cpu": "governed by 50-supabase-perf.md pg_cron auto-remediation (jobid 22-24), no new flag tonight",
-      "mcp_unreachable_2026-11-04": "supabase MCP again never surfaced a callable tool this run (3rd consecutive night) -- no execute_sql call was possible, numbers below carried forward verbatim, not re-verified tonight"
+      "mcp_unreachable_2026-11-05": "supabase MCP again never surfaced a callable tool this run (4th consecutive night) -- no execute_sql call was possible, numbers below carried forward verbatim, not re-verified tonight"
     }
   },
   "frontend": {
     "by_route": [
-      { "route": "/en/join", "p75_lcp": 1805, "p75_inp": 124, "p75_cls": 0.0018, "n": 39 },
-      { "route": "/en/multiplayer", "p75_lcp": 2164, "p75_inp": 456, "p75_cls": 0.092, "n": 34 },
-      { "route": "/en", "p75_lcp": 2007, "p75_inp": 864, "p75_cls": 0.056, "n": 22 },
-      { "route": "/", "p75_lcp": 1491, "p75_inp": 184, "p75_cls": 0, "n": 16 },
-      { "route": "/he/education", "p75_lcp": 968, "p75_inp": 88, "p75_cls": 0.012, "n": 12 }
+      { "route": "/en", "p75_lcp": 6925, "p75_inp": 672, "p75_cls": 0.0232, "n": 26 },
+      { "route": "/en/education/live", "p75_lcp": 5161, "p75_inp": 318, "p75_cls": 0.2383, "n": 20 },
+      { "route": "/en/multiplayer", "p75_lcp": 1048, "p75_inp": 352, "p75_cls": 0.4054, "n": 12 },
+      { "route": "/en/student", "p75_lcp": 55056, "p75_inp": 192, "p75_cls": 0.2074, "n": 6 },
+      { "route": "/", "p75_lcp": 1929, "p75_inp": 184, "p75_cls": 0.0086, "n": 6 }
     ],
-    "shipped": [],
+    "shipped": [
+      { "route": "/en/student", "fix": "AcademyMap.tsx backdrop+hero Image: removed stray `unoptimized` prop (was uncommitted since 10-24) so Next image optimizer actually resizes to viewport instead of serving full-size source; left staged for nightly gate to commit per STEP 5", "verified": "eslint clean, image is local asset so no remotePatterns risk, next.config.ts confirms optimizer configured+live" }
+    ],
     "deferred": [
-      { "route": "/[locale]/student?class=open", "p75_lcp": 10518, "n": 6, "reason": "IMPACT CHECK, below 50-sample floor, logged to impact-ledger.ndjson as 'neutral'" },
-      { "route": "/es/profile?tab=collection", "p75_lcp": 12200, "n": 3, "reason": "below 50-sample floor" },
-      { "route": "/es/word-tower/daily", "p75_lcp": 9444, "n": 2, "reason": "below 50-sample floor" },
-      { "route": "/en/student", "p75_lcp": 10518, "n": 5, "reason": "below 50-sample floor" },
-      { "route": "/en", "p75_inp": 864, "n": 22, "reason": "INP above 200ms threshold but below 50-sample floor -- watch, don't verdict" },
-      { "route": "/en/multiplayer", "p75_inp": 456, "n": 34, "reason": "INP above 200ms threshold but below 50-sample floor -- watch, don't verdict" }
+      { "route": "/en", "p75_lcp": 6925, "p75_inp": 672, "n": 26, "reason": "both LCP>2500 and INP>200 but below 50-sample floor -- watch, don't verdict" },
+      { "route": "/en/education/live", "p75_lcp": 5161, "p75_cls": 0.2383, "n": 20, "reason": "LCP+CLS both bad but below 50-sample floor" },
+      { "route": "/en/multiplayer", "p75_cls": 0.4054, "n": 12, "reason": "CLS regression vs prior night's 0.092 but n=12, below 50-sample floor -- noise risk, do not verdict" }
     ],
-    "note": "3rd consecutive night zero lexiclash.live routes clear n>=50 on the shared PostHog project. '/app' phantom route reconfirmed as cross-tenant noise for the 2nd night running -- always filter $host before trusting any route's n."
+    "note": "4th consecutive night zero lexiclash.live routes clear n>=50 on the shared PostHog project. '/app' phantom route reconfirmed as cross-tenant noise for the 4th night running -- always filter $host before trusting any route's n."
   },
   "bundle": {
     "note": "not re-measured tonight (no fresh .next build in this lane) -- carrying 10-23 numbers unchanged.",

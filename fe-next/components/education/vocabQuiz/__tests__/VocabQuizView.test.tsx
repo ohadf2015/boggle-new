@@ -88,7 +88,7 @@ describe('VocabQuizView', () => {
     server(VOCAB_QUIZ_EVENTS.question, QUESTION);
 
     expect(screen.getByText('to leave behind for good')).toBeInTheDocument();
-    expect(screen.getByText('vocabQuiz.progress:1,5')).toBeInTheDocument();
+    expect(screen.getByRole('progressbar', { name: 'vocabQuiz.progress:1,5' })).toBeInTheDocument();
     // Four tiles and nothing else tappable: the header mascot is a reaction,
     // not a control, so it must not answer to a role a thumb can hit.
     expect(screen.getAllByRole('button')).toHaveLength(4);
@@ -103,7 +103,7 @@ describe('VocabQuizView', () => {
 
     const answer = emitted.find((e) => e.event === VOCAB_QUIZ_EVENTS.answer);
     expect(answer?.payload).toEqual({ index: 0, choiceIndex: 0 });
-    expect(screen.getByText('vocabQuiz.lockedIn')).toBeInTheDocument();
+    expect(screen.getByText('vocabQuiz.footer.locked')).toBeInTheDocument();
   });
 
   it('refuses a second answer on the same question', async () => {
@@ -129,7 +129,8 @@ describe('VocabQuizView', () => {
     // The counter rolls up to the server's total rather than snapping — but it
     // is the SERVER's total it lands on, never a sum computed here.
     expect(await screen.findByText('420')).toBeInTheDocument();
-    expect(screen.getByLabelText('vocabQuiz.streak.label:3')).toBeInTheDocument();
+    server(VOCAB_QUIZ_EVENTS.question, { ...QUESTION, index: QUESTION.index + 1 });
+    expect(screen.getByTestId('vocab-quiz-footer-hint')).toHaveTextContent('vocabQuiz.footer.streakRun:3');
   });
 
   it('flies the points that earned the jump instead of explaining them in prose', async () => {
@@ -194,7 +195,7 @@ describe('VocabQuizView', () => {
     server(VOCAB_QUIZ_EVENTS.question, { ...QUESTION, index: 1, prompt: 'hard but easily broken' });
 
     // Without the reset the student would still be locked out of question 2.
-    expect(screen.queryByText('vocabQuiz.lockedIn')).not.toBeInTheDocument();
+    expect(screen.queryByText('vocabQuiz.footer.locked')).not.toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: /abandon/ }));
     expect(emitted.filter((e) => e.event === VOCAB_QUIZ_EVENTS.answer)).toHaveLength(2);
   });
@@ -221,7 +222,7 @@ describe('VocabQuizView', () => {
       standings: REVEAL.standings,
     });
 
-    expect(screen.getByText('vocabQuiz.progress:3,5')).toBeInTheDocument();
+    expect(screen.getByRole('progressbar', { name: 'vocabQuiz.progress:3,5' })).toBeInTheDocument();
     expect(await screen.findByText('260', undefined, { timeout: 5000 })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /brittle/ })).toHaveAttribute('aria-pressed', 'true');
   });

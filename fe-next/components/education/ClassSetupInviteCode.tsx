@@ -4,6 +4,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { Copy, GraduationCap, Link2, MessageCircle, Share2, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { buildGoogleClassroomShareUrl } from '@/lib/education/googleClassroomShare';
+import { pressClasses } from '@/components/education/motion';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -22,7 +23,8 @@ export interface ClassSetupInviteCodeProps {
 const CHIP = cn(
   'flex min-h-[56px] min-w-0 flex-col items-center justify-center gap-1 rounded-neo border-2 border-neo-cream/50 bg-neo-navy px-1 py-1.5',
   'font-neo-body text-xs font-bold leading-tight text-neo-cream sm:text-sm',
-  'hover:border-neo-cream focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan active:translate-y-px',
+  'hover:border-neo-cream',
+  pressClasses(2),
 );
 
 function googleHref(joinUrl: string, name: string, t: T): string | null {
@@ -54,7 +56,7 @@ export function ClassSetupInviteCode({ code, className, joinUrl, displayHost, on
 
   return (
     <div data-testid="invite-code-card" className="flex flex-col gap-3">
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-neo-lg border-[3px] border-neo-black bg-neo-cream p-3 text-start text-neo-black shadow-hard sm:gap-5 sm:p-5">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-neo-lg border-[3px] border-neo-black bg-neo-cream p-3 text-start text-neo-black shadow-hard sm:gap-5 sm:p-5 lg:flex-1">
         <div className="@container flex min-w-0 flex-col gap-1">
           <span className="font-neo-body text-xs font-black uppercase tracking-wide text-neo-black/70">{t('eduShell.setup.joinCode')}</span>
           <span

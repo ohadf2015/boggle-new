@@ -36,6 +36,8 @@ describe('GoogleOneTapInitializer', () => {
     mockIsNative.mockReturnValue(false);
     mockUseAuth.mockReturnValue({ user: null, isAuthenticated: false });
     mockPathname.mockReturnValue('/en/how-to-play');
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://x.supabase.co');
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'anon');
     vi.stubEnv('NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID', 'cid-123.apps.googleusercontent.com');
   });
   afterEach(() => {

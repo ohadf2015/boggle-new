@@ -189,6 +189,7 @@ describe('AuthModal — teacher audience', () => {
     await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('ms.k@school.org'));
     expect(screen.getByTestId('teacher-check-email-resend')).toBeInTheDocument();
     expect(screen.queryByText('Check your email to verify your account!')).toBeNull();
+    expect(mockSignUpWithEmail).toHaveBeenCalledWith('ms.k@school.org', 'Password123!', { intendedRole: 'teacher' });
     fireEvent.click(screen.getByTestId('teacher-check-email-change'));
     expect(document.querySelector('#pwd-email-input')).not.toBeNull();
   });

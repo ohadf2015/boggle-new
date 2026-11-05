@@ -21,8 +21,16 @@ vi.mock('next/link', () => ({
   ),
 }));
 
+const { proState } = vi.hoisted(() => ({
+  proState: {
+    hasPro: true,
+    loading: false,
+    accessTrialExpires: null as string | null,
+  },
+}));
+
 vi.mock('@/hooks/useTeacherPro', () => ({
-  useTeacherPro: () => ({ hasPro: true, loading: false }),
+  useTeacherPro: () => proState,
 }));
 
 // `t` MUST be a stable function reference across renders: the component's
@@ -122,8 +130,19 @@ vi.mock('@/lib/supabase/education/assignments', () => ({
 }));
 
 import { AssignmentProgressReport } from '../AssignmentProgressReport';
+import { getClassroomStudents } from '@/lib/supabase/education/classrooms';
+import { getAssignmentCompletions, getClassroomAssignments } from '@/lib/supabase/education/assignments';
 
 describe('AssignmentProgressReport reading the real student_lesson_progress columns', () => {
+  beforeEach(() => {
+    proState.hasPro = true;
+    proState.loading = false;
+    proState.accessTrialExpires = null;
+    vi.mocked(getClassroomStudents).mockClear();
+    vi.mocked(getClassroomAssignments).mockClear();
+    vi.mocked(getAssignmentCompletions).mockClear();
+  });
+
   it('derives a score/accuracy percentage from words_attempted instead of showing a blank column forever', async () => {
     render(<AssignmentProgressReport classroomId="c1" classroomName="English 101" />);
 
@@ -140,5 +159,30 @@ describe('AssignmentProgressReport reading the real student_lesson_progress colu
     expect(benRow).not.toBeNull();
     expect(benRow!.textContent).toContain('—');
     expect(benRow!.textContent).not.toMatch(/[^0-9]0(%|\s|$)/);
+  });
+
+  it('does not read student rows for a free teacher', async () => {
+    proState.hasPro = false;
+    render(<AssignmentProgressReport classroomId="c1" classroomName="English 101" />);
+    expect(screen.queryByText('Ada')).not.toBeInTheDocument();
+    expect(getClassroomStudents).not.toHaveBeenCalled();
+    expect(getClassroomAssignments).not.toHaveBeenCalled();
+    expect(getAssignmentCompletions).not.toHaveBeenCalled();
+  });
+
+  it('does not read student rows for an expired access trial', async () => {
+    proState.hasPro = false;
+    proState.accessTrialExpires = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
+    render(<AssignmentProgressReport classroomId="c1" classroomName="English 101" />);
+    expect(screen.queryByText('Ada')).not.toBeInTheDocument();
+    expect(getAssignmentCompletions).not.toHaveBeenCalled();
+  });
+
+  it('reads the rows for a teacher on a live access trial', async () => {
+    proState.hasPro = false;
+    proState.accessTrialExpires = new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString();
+    render(<AssignmentProgressReport classroomId="c1" classroomName="English 101" />);
+    expect(await screen.findByText('Ada')).toBeInTheDocument();
+    expect(getAssignmentCompletions).toHaveBeenCalled();
   });
 });

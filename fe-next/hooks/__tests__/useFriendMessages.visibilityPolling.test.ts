@@ -38,6 +38,54 @@ vi.mock('@/utils/friendMessages', () => mockFriendMessages);
 vi.mock('@/utils/logger', () => ({ default: mockLogger }));
 
 import { useFriendMessages } from '../useFriendMessages';
+import { resetLandingAuthGateForTests } from '@/lib/auth/landingAuthGate';
+
+describe('useFriendMessages on a cold signed-out landing visit', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.clearAllMocks();
+    resetLandingAuthGateForTests();
+    sessionStorage.clear();
+    localStorage.clear();
+    window.history.replaceState(null, '', '/en');
+    mockUseAuth.mockReturnValue({ user: null } as never);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    mockUseAuth.mockReturnValue({ user: { id: 'user-a' } });
+    window.history.replaceState(null, '', '/');
+    resetLandingAuthGateForTests();
+  });
+
+  it('does not load the client on mount or from the poll', async () => {
+    renderHook(() => useFriendMessages());
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(130_000);
+    });
+    expect(mockFriendMessages.getThreads).not.toHaveBeenCalled();
+    expect(mockFriendMessages.getPendingChallenges).not.toHaveBeenCalled();
+  });
+
+  it('loads for a known user on the same route', async () => {
+    mockUseAuth.mockReturnValue({ user: { id: 'user-a' } });
+    renderHook(() => useFriendMessages());
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(0);
+    });
+    expect(mockFriendMessages.getThreads).toHaveBeenCalledWith('user-a');
+    expect(mockFriendMessages.getPendingChallenges).toHaveBeenCalledWith('user-a');
+  });
+
+  it('keeps the signed-out lookup off the landing page', async () => {
+    window.history.replaceState(null, '', '/en/friends');
+    renderHook(() => useFriendMessages());
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(0);
+    });
+    expect(mockFriendMessages.getThreads).toHaveBeenCalledWith(undefined);
+  });
+});
 
 function setHidden(hidden: boolean) {
   Object.defineProperty(document, 'hidden', { configurable: true, get: () => hidden });

@@ -75,6 +75,18 @@ describe('<ClassroomModeSpotlight> ready panel', () => {
     expect(screen.getByTestId('how-it-plays-inline').className).toContain('text-start');
   });
 
+  it('Given a tall phone dock, When rendered, Then what the game is and who it suits show without a tap, still clamped', () => {
+    setup();
+    const how = screen.getByTestId('spotlight-how');
+    expect(how).toHaveTextContent(catalogueKeys(catalogueEntry('vocab-quiz')!).how);
+    expect(how.className).toContain('[@media(min-height:740px)]:block');
+    expect(how.firstElementChild?.className).toContain('line-clamp-2');
+    expect(how.className).toContain('@4xl/lobby:block');
+    const bestFor = screen.getByTestId('spotlight-best-for');
+    expect(bestFor.className).toContain('[@media(min-height:740px)]:flex');
+    expect(bestFor.className).toContain('@4xl/lobby:flex');
+  });
+
   it('Given the phone dock, Then the icon-only steps toggle explains itself on hover too', () => {
     setup();
     expect(screen.getByTestId('how-it-plays-toggle')).toHaveAttribute('title', 'eg2Modes.howItPlays');

@@ -46,6 +46,7 @@ import { buildClassroomLaunchPayload } from './lobby/classroomLaunchPayload';
 import { useRepeatLastSetup } from './lobby/useRepeatLastSetup';
 import { useSessionRun } from './lobby/useSessionRun';
 import { libraryHref } from './lobby/inviteLinks';
+import { pressClasses } from './motion';
 
 type Translate = (key: string, params?: Record<string, string | number>) => string;
 
@@ -308,7 +309,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
             data-testid="create-room-retry"
             disabled={isStarting}
             onClick={goLive}
-            className="mt-2 inline-flex min-h-11 items-center rounded-neo border-[3px] border-neo-black bg-neo-cream px-4 font-neo-display text-sm font-black text-neo-black shadow-hard-sm transition-transform active:scale-[0.97] disabled:opacity-60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+            className={`mt-2 mb-0.5 inline-flex min-h-11 items-center rounded-neo border-[3px] border-neo-black bg-neo-cream px-4 font-neo-display text-sm font-black text-neo-black disabled:opacity-60 ${pressClasses(2)}`}
           >
             {t('eduShell.host.retry')}
           </button>

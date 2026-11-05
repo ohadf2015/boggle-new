@@ -48,10 +48,15 @@ const WheelTrail: React.FC<WheelTrailProps> = ({
       } else {
         for (const line of lines) line?.setAttribute('visibility', 'hidden');
       }
+      // jsdom drops requestAnimationFrame after the test that stubbed it; a late tick must not throw.
+      if (typeof requestAnimationFrame !== 'function') return;
       raf = requestAnimationFrame(tick);
     };
+    if (typeof requestAnimationFrame !== 'function') return;
     raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+    return () => {
+      if (typeof cancelAnimationFrame === 'function') cancelAnimationFrame(raf);
+    };
   }, [last, discRef, pointerPosRef, draggingRef]);
 
   const ghostPts = fx ? fx.indices.map((i) => letterPoint(i, outerCount)) : [];

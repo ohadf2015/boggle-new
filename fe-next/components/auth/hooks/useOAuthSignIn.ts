@@ -1,15 +1,9 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { signInWithGoogle, signInWithDiscord, signInWithMicrosoft } from '@/lib/supabase';
+import { AuthClientLoadError, loadAuthClient } from '@/lib/auth/loadAuthClient';
 import { isMicrosoftSsoEnabled } from '@/components/auth/shared/authModalProviders';
 import { isNative } from '@/utils/platform';
-import { performMobileOAuth } from '@/utils/mobileOAuth';
-import {
-  performNativeOAuth,
-  initializeNativeOAuth,
-  isNativeOAuthAvailable
-} from '@/utils/nativeOAuth';
 import logger from '@/utils/logger';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackSignupPromptClicked } from '@/utils/growthTracking';
@@ -76,12 +70,15 @@ export function useOAuthSignIn(options: UseOAuthSignInOptions = {}): UseOAuthSig
   // Initialize native OAuth on mount (for mobile platforms)
   useEffect(() => {
     if (isNative() && !forceBrowserOAuth) {
-      initializeNativeOAuth().then(success => {
-        setNativeOAuthAvailable(success);
-        if (success) {
-          logger.log('[useOAuthSignIn] Native OAuth initialized successfully');
-        }
-      });
+      import('@/utils/nativeOAuth')
+        .then(({ initializeNativeOAuth }) => initializeNativeOAuth())
+        .then(success => {
+          setNativeOAuthAvailable(success);
+          if (success) {
+            logger.log('[useOAuthSignIn] Native OAuth initialized successfully');
+          }
+        })
+        .catch(err => logger.error('[useOAuthSignIn] Native OAuth failed to load:', err));
     }
   }, [forceBrowserOAuth]);
 
@@ -112,7 +109,8 @@ export function useOAuthSignIn(options: UseOAuthSignInOptions = {}): UseOAuthSig
 
       // Check if we should use native OAuth
       // Native OAuth is available for Google (iOS/Android) and Apple (iOS only)
-      const nativeAvail = isNativeOAuthAvailable();
+      const nativeOAuth = isNative() ? await import('@/utils/nativeOAuth') : null;
+      const nativeAvail = nativeOAuth?.isNativeOAuthAvailable() ?? false;
       const canUseNativeOAuth = !forceBrowserOAuth &&
         nativeAvail &&
         (provider === 'google' || provider === 'apple');
@@ -120,9 +118,9 @@ export function useOAuthSignIn(options: UseOAuthSignInOptions = {}): UseOAuthSig
       logger.log(`[useOAuthSignIn] provider=${provider} native=${isNative()} nativeOAuthAvail=${nativeAvail} canUseNative=${canUseNativeOAuth} forceBrowser=${forceBrowserOAuth}`);
 
       // PRIORITY 1: Native SDK OAuth (best UX - no browser)
-      if (canUseNativeOAuth) {
+      if (canUseNativeOAuth && nativeOAuth) {
         logger.log(`[useOAuthSignIn] Using native OAuth for ${provider}`);
-        const nativeResult = await performNativeOAuth(provider);
+        const nativeResult = await nativeOAuth.performNativeOAuth(provider);
 
         if (nativeResult.success) {
           // Native OAuth completed successfully - session is already set
@@ -155,6 +153,7 @@ export function useOAuthSignIn(options: UseOAuthSignInOptions = {}): UseOAuthSig
         // Discord and fallback for Google/Apple when native SDK not available
         if (provider === 'discord' || provider === 'google') {
           logger.log(`[useOAuthSignIn] Using in-app browser OAuth for ${provider}`);
+          const { performMobileOAuth } = await import('@/utils/mobileOAuth');
           const mobileResult = await performMobileOAuth(provider);
           if (!mobileResult.success) {
             const errorMessage = mobileResult.error || 'Mobile sign in failed';
@@ -176,25 +175,27 @@ export function useOAuthSignIn(options: UseOAuthSignInOptions = {}): UseOAuthSig
       }
 
       // PRIORITY 3: Web flow - standard Supabase OAuth redirect
+      if (provider === 'apple') {
+        // Apple OAuth on web requires additional setup
+        // For now, only support on iOS via native SDK
+        const appleErr = t('errors.appleSignInIosOnly');
+        setError(appleErr);
+        onError?.(appleErr);
+        return;
+      }
+
+      const client = await loadAuthClient();
       let result;
       switch (provider) {
         case 'google':
-          result = await signInWithGoogle();
+          result = await client.signInWithGoogle();
           break;
         case 'discord':
-          result = await signInWithDiscord();
+          result = await client.signInWithDiscord();
           break;
         case 'microsoft':
-          result = await signInWithMicrosoft();
+          result = await client.signInWithMicrosoft();
           break;
-        case 'apple': {
-          // Apple OAuth on web requires additional setup
-          // For now, only support on iOS via native SDK
-          const appleErr = t('errors.appleSignInIosOnly');
-          setError(appleErr);
-          onError?.(appleErr);
-          return;
-        }
       }
 
       if (result?.error) {
@@ -204,7 +205,9 @@ export function useOAuthSignIn(options: UseOAuthSignInOptions = {}): UseOAuthSig
       }
       // On success, Supabase will redirect to the callback URL
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+      const errorMessage = err instanceof AuthClientLoadError || (err as Error)?.name === 'ChunkLoadError'
+        ? t('errors.signInFailedRetry')
+        : err instanceof Error ? err.message : 'An unexpected error occurred';
       setError(errorMessage);
       onError?.(errorMessage);
     } finally {

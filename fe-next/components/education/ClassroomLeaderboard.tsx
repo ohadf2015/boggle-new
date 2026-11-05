@@ -90,7 +90,7 @@ const LeaderboardEntryRow = memo<LeaderboardEntryRowProps>(
     return (
       <AdaptiveMotion.div
         data-testid={isCurrentUser ? 'leaderboard-entry-current-user' : `leaderboard-entry-${userId}`}
-        initial={{ opacity: 0, y: 16, scale: 0.97 }}
+        initial={{ y: 16, scale: 0.97 }}
         animate={{
           opacity: isInactive ? 0.5 : 1,
           y: 0,
@@ -302,8 +302,8 @@ const ClassroomLeaderboard = memo<ClassroomLeaderboardProps>(
         {/* Header */}
         <AdaptiveMotion.div
           className="flex items-center gap-3"
-          initial={{ opacity: 0, x: -12 }}
-          animate={{ opacity: 1, x: 0 }}
+          initial={{ x: -12 }}
+          animate={{ x: 0 }}
           transition={{ type: 'spring', stiffness: 400, damping: 22 }}
         >
           <Trophy className="w-5 h-5" />
@@ -320,9 +320,9 @@ const ClassroomLeaderboard = memo<ClassroomLeaderboardProps>(
           <AdaptiveMotion.div
             key={timeScope}
             className="space-y-3 max-h-[60vh] overflow-y-auto"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
+            initial={{ y: 8 }}
+            animate={{ y: 0 }}
+            exit={{ y: -8 }}
             transition={{ duration: 0.2 }}
           >
             {visible.map((entry, index) => {

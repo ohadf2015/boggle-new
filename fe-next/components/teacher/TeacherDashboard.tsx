@@ -3,34 +3,31 @@
 
 import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { BarChart3, ChevronRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { EducationShell } from '@/components/education/shell/EducationShell';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
-import { cn } from '@/lib/utils';
 import { pickHomeAsk } from '@/lib/education/teacherBannerPriority';
 import { useTeacherReveal } from './motion/useTeacherReveal';
 import LessonBuilder from './LessonBuilder';
 import { AssignmentCreator } from './assignments';
 import { TeacherHqWelcome } from './TeacherHqWelcome';
-import { TeacherPlanBadge } from './TeacherPlanBadge';
-import { HqLoadError } from './hq/HqLoadError';
 import { greetingName } from './home/greetingName';
 import { HomeHero } from './home/HomeHero';
 import { HomeGetStudentsIn } from './home/HomeGetStudentsIn';
 import { EndedCodeTriesNotice } from './hq/EndedCodeTriesNotice';
 import { belowStudentGoal } from './hq/studentGoal';
 import { HomeClassMeta, HomeNewClass } from './home/HomeClassList';
-import { HomeWeekCard } from './home/HomeWeekCard';
-import { HomeInsightCard } from './home/HomeInsightCard';
+import { useHomeRoster } from './home/HomeRosterLive';
+import { HomeClassRoster } from './home/HomeClassRoster';
 import { WeeklyProgressDigestCard } from './digest/WeeklyProgressDigestCard';
 import { WeeklyEmailReport } from './digest/WeeklyEmailReport';
 import { HomeProCard, type HomeProOfferKind } from './home/HomeProCard';
 import { HomeOnboardingCard } from './home/HomeOnboardingCard';
 import { RehearseWithBotsButton } from './home/RehearseWithBotsButton';
 import { HomeSessionRail } from './home/HomeSessionRail';
-import { HomeRailSkeleton, HomeSkeleton } from './home/HomeSkeleton';
+import { SESSIONS_BESIDE_RAIL, TeacherHomeView } from './home/TeacherHomeView';
+import { HomeWeekClasses } from './home/HomeWeekClasses';
+import { weekClassRows } from './home/weekClassRows';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useTeacherActivationProgress } from '@/hooks/useTeacherActivationProgress';
@@ -63,6 +60,8 @@ export interface TeacherDashboardProps {
 }
 
 type T = (key: string, params?: Record<string, string | number>) => string;
+
+const WEEK_ROWS = 4;
 
 function greetingKey(hour: number): string {
   if (hour < 12) return 'eduShell.home.greetMorning';
@@ -208,6 +207,9 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
   const showWeek = hasClasses && !(week.summary && Object.keys(week.summary.lastPlayedAt).length === 0);
   const selectedClassroom = classrooms.find((c) => c.id === effectiveId) ?? null;
   const shareCardShown = selectedClassroom !== null && belowStudentGoal(selectedClassroom.member_count);
+  const rosterShown = hasPro && selectedClassroom !== null && (selectedClassroom.member_count ?? 0) > 0;
+  const roster = useHomeRoster(rosterShown && selectedClassroom ? selectedClassroom.id : '', nowMs);
+  const openAssign = () => setShowAssignmentCreator(true);
   const overFreeTierCaps = isDigestOverFreeTierCaps({
     hasPro,
     classroomCount: classrooms.length,
@@ -262,143 +264,97 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
     : null;
 
   return (
-    <EducationShell
-      className={cn(isRTL && 'rtl')}
-      scrollRegionLabel={t('eduShell.home.regionLabel')}
-      contentClassName="relative isolate"
-    >
-      {!proLoading && (
-        <TeacherHqWelcome welcomeKind={welcomeKind} grant={pro.grant} trialExpires={pro.trialExpires ?? pro.periodEnd} />
-      )}
-
-      <div
-        ref={revealRef}
-        data-testid="teacher-home"
-        className={cn(
-          'mx-auto grid w-full max-w-[1280px] gap-3 px-4 py-3 sm:gap-4 sm:px-6 sm:py-4 lg:gap-5 lg:px-8 lg:py-5 lg:[@media(max-height:820px)]:gap-4 lg:[@media(max-height:820px)]:py-3',
-          hasRail && 'lg:grid-cols-[minmax(0,1fr)_20rem]',
-          showSessions && 'lg:min-h-full',
-          showSessions && (accountBanner ? 'lg:grid-rows-[auto_1fr_auto]' : 'lg:grid-rows-[auto_1fr]'),
-        )}
-      >
-        <div className="flex min-w-0 flex-col gap-3 sm:gap-4 lg:col-start-1 lg:row-start-1">
-          <header data-tm className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <h1 data-wipe suppressHydrationWarning className="font-neo-display text-2xl font-black text-neo-cream">
-                {firstName ? t(greetingKey(hour), { name: firstName }) : t('eduShell.home.greetNoName')}
-              </h1>
-              {ready && hasClasses && !classroomsError ? (
-                <p data-testid="home-coach-cue" suppressHydrationWarning className="mt-0.5 min-h-5 font-neo-body text-sm font-semibold text-neo-cream/75 max-sm:hidden [@media(max-height:760px)]:hidden">
-                  {cue ? t(cue.key) : null}
-                </p>
-              ) : null}
-            </div>
-            {hasPro ? <TeacherPlanBadge quiet className="mt-1 shrink-0 lg:hidden" /> : null}
-          </header>
-
-          {!ready ? (
-            <HomeSkeleton />
-          ) : classroomsError ? (
-            <HqLoadError onRetry={() => void classroomsState.refresh?.()} />
-          ) : (
-            <>
-              {!hasClasses ? (
-                <HomeOnboardingCard
-                  onboarding={onboarding}
-                  hrefs={onboardingHrefs}
-                  trial={trialCard}
-                  onStepStart={onOnboardingStep}
-                  variant="full"
+    <TeacherHomeView
+      t={t}
+      isRTL={isRTL}
+      revealRef={revealRef}
+      greeting={firstName ? t(greetingKey(hour), { name: firstName }) : t('eduShell.home.greetNoName')}
+      cue={ready && hasClasses && !classroomsError ? (cue ? t(cue.key) : '') : null}
+      hasPro={hasPro}
+      ready={ready}
+      error={Boolean(classroomsError)}
+      onRetry={() => void classroomsState.refresh?.()}
+      hasClasses={hasClasses}
+      welcome={!proLoading ? <TeacherHqWelcome welcomeKind={welcomeKind} grant={pro.grant} trialExpires={pro.trialExpires ?? pro.periodEnd} /> : null}
+      onboarding={
+        <HomeOnboardingCard
+          onboarding={onboarding}
+          hrefs={onboardingHrefs}
+          trial={trialCard}
+          onStepStart={onOnboardingStep}
+          variant="full"
+          t={t}
+          secondary={<RehearseWithBotsButton classroomId={undefined} source="hq" language={language} t={t} showNote />}
+        />
+      }
+      desk={
+        <>
+          {selectedClassroom ? <EndedCodeTriesNotice classroomId={selectedClassroom.id} pro={pro} /> : null}
+          <div data-tm>
+            <HomeHero
+              classrooms={classrooms}
+              selectedId={effectiveId}
+              onSelect={setSelectedId}
+              language={language}
+              t={t}
+              rehearse={<RehearseWithBotsButton classroomId={effectiveId || undefined} source="hq" language={language} t={t} />}
+              corner={<HomeNewClass href={newClassHref} count={classrooms.length} limit={null} t={t} />}
+              capLabel={!proLoading && !hasPro ? t('eduShell.setup.capMeter', { count: classrooms.length, limit: FREE_TIER_LIMITS.classes }) : undefined}
+              meta={selectedClassroom ? (
+                <HomeClassMeta
+                  previewIds={studentPreview?.[selectedClassroom.id] ?? []}
+                  memberCount={selectedClassroom.member_count ?? 0}
+                  played={week.summary?.lastPlayedAt[selectedClassroom.id]}
+                  pending={week.status === 'loading'}
+                  failed={week.status === 'error'}
+                  language={language}
+                  nowMs={nowMs}
                   t={t}
-                  secondary={<RehearseWithBotsButton classroomId={undefined} source="hq" language={language} t={t} showNote />}
                 />
-              ) : (
-                <>
-                  {selectedClassroom ? <EndedCodeTriesNotice classroomId={selectedClassroom.id} pro={pro} /> : null}
-                  <div data-tm>
-                    <HomeHero
-                      classrooms={classrooms}
-                      selectedId={effectiveId}
-                      onSelect={setSelectedId}
-                      language={language}
-                      t={t}
-                      rehearse={<RehearseWithBotsButton classroomId={effectiveId || undefined} source="hq" language={language} t={t} />}
-                      corner={<HomeNewClass href={newClassHref} count={classrooms.length} limit={!proLoading && !hasPro ? FREE_TIER_LIMITS.classes : null} t={t} />}
-                      meta={selectedClassroom ? (
-                        <HomeClassMeta
-                          previewIds={studentPreview?.[selectedClassroom.id] ?? []}
-                          memberCount={selectedClassroom.member_count ?? 0}
-                          played={week.summary?.lastPlayedAt[selectedClassroom.id]}
-                          pending={week.status === 'loading'}
-                          failed={week.status === 'error'}
-                          language={language}
-                          nowMs={nowMs}
-                          t={t}
-                        />
-                      ) : null}
-                      insight={week.insights?.length ? <HomeInsightCard insights={week.insights} t={t} embedded /> : null}
-                      showCode={!shareCardShown}
-                      codeSlot={selectedClassroom && shareCardShown ? <HomeGetStudentsIn classroom={selectedClassroom} /> : undefined}
-                      nudge={
-                        nextStepShown ? (
-                          <HomeOnboardingCard onboarding={onboarding} hrefs={onboardingHrefs} trial={trialCard} shareCardShown={shareCardShown} onStepStart={onOnboardingStep} onDismiss={activation.dismiss} variant="compact" t={t} />
-                        ) : undefined
-                      }
-                    />
-                  </div>
-                </>
-              )}
-            </>
-          )}
-        </div>
-
-        {showSessions ? (
-          <HomeSessionRail
-            key={effectiveId}
-            className={hasRail ? 'lg:col-span-2' : undefined}
-            classroomId={effectiveId}
-            languages={railLanguages(classLanguage, lessonProfile.languages)}
-            gradeBand={lessonProfile.gradeBand}
-            nowMs={nowMs}
-            lastPlayedMs={lastPlayedMs}
-            ready={railReady}
-            locale={language}
-            t={t}
-          />
-        ) : null}
-        {ready && !classroomsError && hasClasses && accountBanner ? (
-          <div data-testid="home-account-banner" className={cn('min-w-0', hasRail && 'lg:col-span-2')}>{accountBanner}</div>
-        ) : null}
-
-        {hasRail ? (
-          <aside aria-label={t('eduShell.home.railLabel')} className="flex min-w-0 flex-col gap-4 lg:col-start-2 lg:row-start-1">
-            {!ready ? <HomeRailSkeleton /> : showWeek ? (
-              <div data-tm className="max-lg:hidden">
-                <HomeWeekCard summary={week.summary} status={week.status} t={t} />
-              </div>
-            ) : null}
-            {!ready || !selectedClassroom ? null : (
-              <div data-testid="home-weekly-reports" data-tm className="max-lg:hidden">
-                <button
-                  type="button"
-                  aria-haspopup="dialog"
-                  onClick={() => setReportsOpen(true)}
-                  className="group flex w-full items-center gap-3 rounded-neo-lg border-2 border-neo-cream/35 bg-neo-navy-light px-3 py-2.5 text-start transition-colors hover:border-neo-cream/60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream"
-                >
-                  <BarChart3 className="size-5 shrink-0 text-neo-cream/80" strokeWidth={2.5} aria-hidden="true" />
-                  <span className="min-w-0 flex-1">
-                    <span className="block font-neo-display text-base font-bold text-neo-cream">{t('eduShell.home.weeklyReports')}</span>
-                    <span className="block font-neo-body text-xs font-semibold leading-snug text-neo-cream/70 [@media(max-height:820px)]:sr-only">{t('eduShell.home.weeklyReportsHint')}</span>
-                  </span>
-                  <ChevronRight className="size-5 shrink-0 text-neo-cream/70 transition-transform group-hover:translate-x-0.5 rtl:-scale-x-100 motion-reduce:transition-none" aria-hidden="true" />
-                </button>
-              </div>
-            )}
-            {proCard ? <div data-tm>{proCard}</div> : null}
-          </aside>
-        ) : null}
-      </div>
-
+              ) : null}
+              showCode={!shareCardShown}
+              codeSlot={selectedClassroom && shareCardShown ? <HomeGetStudentsIn classroom={selectedClassroom} /> : undefined}
+              nudge={
+                nextStepShown ? (
+                  <HomeOnboardingCard onboarding={onboarding} hrefs={onboardingHrefs} trial={trialCard} shareCardShown={shareCardShown} onStepStart={onOnboardingStep} onDismiss={activation.dismiss} variant="compact" t={t} />
+                ) : undefined
+              }
+            />
+          </div>
+          {rosterShown && selectedClassroom ? (
+            <div data-tm>
+              <HomeClassRoster key={selectedClassroom.id} rows={roster.rows} failed={roster.failed} language={language} nowMs={nowMs} t={t} onAssign={openAssign} onAssignAll={openAssign} />
+            </div>
+          ) : null}
+        </>
+      }
+      sessions={showSessions ? (
+        <HomeSessionRail
+          key={effectiveId}
+          className={hasRail ? SESSIONS_BESIDE_RAIL : undefined}
+          classroomId={effectiveId}
+          languages={railLanguages(classLanguage, lessonProfile.languages)}
+          gradeBand={lessonProfile.gradeBand}
+          nowMs={nowMs}
+          lastPlayedMs={lastPlayedMs}
+          ready={railReady}
+          locale={language}
+          t={t}
+        />
+      ) : null}
+      accountBanner={accountBanner}
+      hasRail={hasRail}
+      week={showWeek ? {
+        summary: week.summary,
+        status: week.status,
+        classCount: classrooms.length,
+        classes: classrooms.length > 1 && week.summary ? (
+          <HomeWeekClasses {...weekClassRows(classrooms, week.summary.lastPlayedAt, nowMs, WEEK_ROWS, effectiveId)} selectedId={effectiveId} onSelect={setSelectedId} moreHref={`/${language}/teacher/classroom`} language={language} nowMs={nowMs} t={t} />
+        ) : null,
+      } : null}
+      onOpenReports={selectedClassroom ? () => setReportsOpen(true) : null}
+      proCard={proCard}
+    >
       {selectedClassroom ? (
         <Dialog open={reportsOpen} onOpenChange={setReportsOpen}>
           <DialogContent
@@ -436,6 +392,6 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
           }}
         />
       ) : null}
-    </EducationShell>
+    </TeacherHomeView>
   );
 }

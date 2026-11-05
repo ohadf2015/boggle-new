@@ -13,9 +13,9 @@ import { useEffect, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { Achievement } from '@/components/education/achievements/AchievementGrid';
 import { AcademyPageFrame, FrameSkeleton } from '@/components/student/pages/AcademyPageFrame';
-import { AwardsFilterBar, AwardsGrid, type AwardsFilter } from '@/components/student/pages/AwardsWall';
+import { AwardsFilterBar, type AwardsFilter } from '@/components/student/pages/AwardsWall';
 import { useStudentSubpageGuard } from '@/components/student/pages/useStudentSubpageGuard';
-import { toneStyle } from '@/components/student/academy/chrome';
+import { AwardsBody } from './AwardsBody';
 import { STUDENT_PROGRESS_SELECT, buildAchievementsRecord } from '@/lib/education/achievementProgress';
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
@@ -66,26 +66,12 @@ export default function StudentAchievementsPageClient() {
   }, [userId]);
 
   const ready = status === 'ready';
-  const all = Object.values(achievements);
-  const earned = all.filter((a) => a.count > 0).length;
-
-  const badge =
-    ready && all.length > 0 ? (
-      <span
-        dir="auto"
-        className="inline-flex h-9 items-center rounded-full border-2 border-neo-black px-3 font-neo-display text-sm font-black text-neo-black"
-        style={toneStyle('gold', { shadow: 2, trim: 1 })}
-      >
-        {t('academy.pages.awardsEarned', '{earned}/{total} earned', { earned, total: all.length })}
-      </span>
-    ) : undefined;
 
   return (
     <AcademyPageFrame
       title={t('teacher.nav.studentAchievements', 'Awards')}
       art="/images/education/chest-books.webp"
-      badge={badge}
-      toolbar={ready ? <AwardsFilterBar active={filter} onChange={setFilter} /> : undefined}
+      toolbar={ready && (isLoadingAchievements || Object.keys(achievements).length > 0) ? <AwardsFilterBar active={filter} onChange={setFilter} /> : undefined}
       regionLabel={t('student.dashboard.achievements')}
       pending={!ready}
       busy={ready && isLoadingAchievements}
@@ -93,9 +79,7 @@ export default function StudentAchievementsPageClient() {
       {!ready || isLoadingAchievements ? (
         <FrameSkeleton rows={8} grid />
       ) : (
-        <div data-testid="student-awards-content">
-          <AwardsGrid achievements={achievements} filter={filter} />
-        </div>
+        <AwardsBody achievements={achievements} filter={filter} />
       )}
     </AcademyPageFrame>
   );

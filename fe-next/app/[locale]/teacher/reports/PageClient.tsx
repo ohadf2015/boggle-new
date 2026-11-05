@@ -20,10 +20,8 @@ import { StudentProgressReport } from '@/components/teacher/reports/StudentProgr
 import { ClassProgressReport } from '@/components/teacher/reports/ClassProgressReport';
 import { ClassArcPanel } from '@/components/teacher/reports/ClassArcPanel';
 import { StudentArcView } from '@/components/teacher/reports/StudentArcView';
-import { AssignmentCompletionReport } from '@/components/teacher/reports/AssignmentCompletionReport';
-import { AssignmentProgressReport } from '@/components/teacher/reports/AssignmentProgressReport';
+import { ReportsHomeworkTab } from '@/components/teacher/reports/ReportsHomeworkTab';
 import { ClassroomRosterProgress } from '@/components/teacher/reports/ClassroomRosterProgress';
-import { ClassAssignmentGrid } from '@/components/teacher/reports/ClassAssignmentGrid';
 import { GoogleClassroomGradePassback } from '@/components/teacher/reports/GoogleClassroomGradePassback';
 import { ProgressDigestDashboard } from '@/components/teacher/digest/ProgressDigestDashboard';
 import { EducationShell } from '@/components/education/shell/EducationShell';
@@ -311,21 +309,10 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
             />
           </TabsContent>
 
-          <TabsContent value="homework" className="space-y-3">
-            <ClassAssignmentGrid
-              classroomId={selectedClassroomId}
-              classroomName={selectedClassroom?.name ?? ''}
-            />
-            <SectionDisclosure section="assignments">
-              <div className="space-y-4">
-                <AssignmentCompletionReport classroomId={selectedClassroomId} />
-                <AssignmentProgressReport
-                  classroomId={selectedClassroomId}
-                  classroomName={selectedClassroom?.name ?? ''}
-                />
-              </div>
-            </SectionDisclosure>
-          </TabsContent>
+          <ReportsHomeworkTab
+            classroomId={selectedClassroomId}
+            classroomName={selectedClassroom?.name ?? ''}
+          />
 
           <TabsContent value="more" className="space-y-2.5">
             <SectionDisclosure section="arc">
