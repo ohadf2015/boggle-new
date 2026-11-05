@@ -1,5 +1,6 @@
 import type { TeacherLocale } from '@/lib/education/types';
 import type { TrialReminderBucket } from '@/lib/education/trialReminders';
+import { firstName, renderTeacherEmail, TEACHER_EMAIL_SITE } from './teacherEmailLayout';
 
 interface Args {
   full_name: string;
@@ -9,124 +10,148 @@ interface Args {
   trialExpiresAt: string;
 }
 
-function escape(s: string): string {
-  return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
-}
-
-const SITE = 'https://www.lexiclash.live';
-const CONTACT = 'ohadf2015@gmail.com';
-
 const DATE_LOCALE: Record<TeacherLocale, string> = {
   en: 'en-US', he: 'he-IL', sv: 'sv-SE', ja: 'ja-JP', es: 'es-ES', ru: 'ru-RU',
 };
 
 interface BucketCopy {
   subject: (date: string) => string;
+  preheader: string;
   lead: (date: string) => string;
+  body: string;
   cta: string;
 }
 
 interface Copy {
   greeting: (n: string) => string;
+  tagline: string;
   buckets: Record<TrialReminderBucket, BucketCopy>;
-  /** The honest reason this email exists — the module was broken during their trial. */
-  body: string;
-  price: string;
+  /** The feedback ask. Soft on purpose: a "no" with a reason is worth more than a pushed sale. */
   ask: string;
+  classroom: string;
   signoff: string;
   dir: 'ltr' | 'rtl';
 }
 
-// ponytail: en + he only, everything else falls back to en. All 29 approved
-// teachers are en/he; adding four more translations for zero recipients is
-// work for an audience that does not exist yet.
+// en, he and sv: every approved teacher so far writes in one of these.
+// Other locales fall back to en.
 const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
   en: {
-    greeting: (n) => `Hi ${n},`,
+    greeting: (n) => (n ? `Hi ${n},` : 'Hi there,'),
+    tagline: 'For teachers',
     buckets: {
       't-3': {
-        subject: () => 'Your LexiClash teacher trial ends in 3 days',
-        lead: (date) => `Your free teacher trial ends on ${date}.`,
-        cta: 'Keep my classroom — $9/mo',
+        subject: (date) => `Your LexiClash trial ends on ${date}`,
+        preheader: 'No pressure. Here is what happens next, and a quick question.',
+        lead: (date) => `Your free teacher access ends on ${date}.`,
+        body: 'If LexiClash has been useful for your class, you can keep everything with Teacher Pro for $9 a month and cancel any time.',
+        cta: 'Keep Teacher Pro',
       },
       't-0': {
-        subject: () => 'Your LexiClash teacher trial ends today',
-        lead: (date) => `Your free teacher trial ends today (${date}).`,
-        cta: 'Keep my classroom — $9/mo',
+        subject: () => 'Your LexiClash trial ends today',
+        preheader: 'A short note before your free access ends.',
+        lead: () => 'Your free teacher access ends today.',
+        body: 'If you would like to keep using LexiClash with your class, Teacher Pro is $9 a month and you can cancel any time.',
+        cta: 'Keep Teacher Pro',
       },
       't+3': {
-        subject: () => 'Your LexiClash teacher trial has ended — want it back?',
-        lead: (date) => `Your free teacher trial ended on ${date}.`,
-        cta: 'Reopen my classroom — $9/mo',
+        subject: () => 'Your LexiClash trial has ended',
+        preheader: 'Thanks for trying LexiClash. One quick question.',
+        lead: (date) => `Thanks for trying LexiClash. Your free teacher access ended on ${date}.`,
+        body: 'If you would like to come back to it with your class, Teacher Pro is $9 a month and you can cancel any time.',
+        cta: 'See Teacher Pro',
       },
     },
-    body:
-      'Straight with you: the teacher module was broken for part of your trial, and I fixed it on August 21. If it never worked for you, that is why — and it works now.',
-    price: 'Teacher Pro is $9/month: unlimited classrooms, live word games, and the progress dashboard. Cancel any time.',
-    ask: `Not the right fit? Reply and tell me why — I read every one: ${CONTACT}`,
-    signoff: '— Ohad, the creator of LexiClash',
+    ask: 'And if it was not the right fit, that is completely fine. I would love to know what was missing or what got in the way. Just reply to this email; it comes straight to me.',
+    classroom: 'Open my classroom',
+    signoff: 'Thanks, Ohad (I build LexiClash)',
     dir: 'ltr',
   },
   he: {
-    greeting: (n) => `שלום ${n},`,
+    greeting: (n) => (n ? `שלום ${n},` : 'שלום,'),
+    tagline: 'למורים',
     buckets: {
       't-3': {
-        subject: () => 'תקופת הניסיון שלך כמורה ב-LexiClash מסתיימת בעוד 3 ימים',
-        lead: (date) => `תקופת הניסיון החינמית שלך מסתיימת ב-${date}.`,
-        cta: 'לשמור על הכיתה שלי — 9$ לחודש',
+        subject: (date) => `תקופת הניסיון שלך ב-LexiClash מסתיימת ב-${date}`,
+        preheader: 'בלי לחץ. מה קורה עכשיו, ושאלה קצרה.',
+        lead: (date) => `הגישה החינמית שלך למורים מסתיימת ב-${date}.`,
+        body: 'אם LexiClash עזר לכיתה שלך, אפשר להמשיך עם Teacher Pro ב-9$ לחודש ולבטל בכל רגע.',
+        cta: 'להמשיך עם Teacher Pro',
       },
       't-0': {
-        subject: () => 'תקופת הניסיון שלך כמורה ב-LexiClash מסתיימת היום',
-        lead: (date) => `תקופת הניסיון החינמית שלך מסתיימת היום (${date}).`,
-        cta: 'לשמור על הכיתה שלי — 9$ לחודש',
+        subject: () => 'תקופת הניסיון שלך ב-LexiClash מסתיימת היום',
+        preheader: 'הודעה קצרה לפני שהגישה החינמית מסתיימת.',
+        lead: () => 'הגישה החינמית שלך למורים מסתיימת היום.',
+        body: 'אם רוצים להמשיך להשתמש ב-LexiClash עם הכיתה, Teacher Pro עולה 9$ לחודש ואפשר לבטל בכל רגע.',
+        cta: 'להמשיך עם Teacher Pro',
       },
       't+3': {
-        subject: () => 'תקופת הניסיון שלך כמורה ב-LexiClash הסתיימה — רוצה אותה בחזרה?',
-        lead: (date) => `תקופת הניסיון החינמית שלך הסתיימה ב-${date}.`,
-        cta: 'לפתוח מחדש את הכיתה — 9$ לחודש',
+        subject: () => 'תקופת הניסיון שלך ב-LexiClash הסתיימה',
+        preheader: 'תודה שניסית את LexiClash. שאלה קצרה.',
+        lead: (date) => `תודה שניסית את LexiClash. הגישה החינמית שלך למורים הסתיימה ב-${date}.`,
+        body: 'אם רוצים לחזור ולהשתמש בו עם הכיתה, Teacher Pro עולה 9$ לחודש ואפשר לבטל בכל רגע.',
+        cta: 'ל-Teacher Pro',
       },
     },
-    body:
-      'בכנות: המודול למורים היה שבור בחלק מתקופת הניסיון שלך, ותיקנתי אותו ב-21 באוגוסט. אם זה לא עבד לך — זו הסיבה, ועכשיו זה עובד.',
-    price: 'מנוי Teacher Pro עולה 9$ לחודש: כיתות ללא הגבלה, משחקי מילים חיים ולוח מעקב התקדמות. אפשר לבטל בכל רגע.',
-    ask: `לא מתאים? השב/י ותספר/י לי למה — אני קורא הכול: ${CONTACT}`,
-    signoff: '— אוהד, היוצר של LexiClash',
+    ask: 'ואם זה לא התאים, זה בסדר גמור. אשמח מאוד לדעת מה היה חסר או מה הפריע. אפשר פשוט להשיב למייל הזה, הוא מגיע ישירות אליי.',
+    classroom: 'לכיתה שלי',
+    signoff: 'תודה, אוהד (אני בונה את LexiClash)',
     dir: 'rtl',
+  },
+  sv: {
+    greeting: (n) => (n ? `Hej ${n},` : 'Hej,'),
+    tagline: 'För lärare',
+    buckets: {
+      't-3': {
+        subject: (date) => `Din LexiClash-provperiod slutar ${date}`,
+        preheader: 'Ingen press. Så här går det till, och en snabb fråga.',
+        lead: (date) => `Din kostnadsfria lärartillgång slutar ${date}.`,
+        body: 'Om LexiClash har varit till nytta för din klass kan du behålla allt med Teacher Pro för 9 $ i månaden och avsluta när du vill.',
+        cta: 'Behåll Teacher Pro',
+      },
+      't-0': {
+        subject: () => 'Din LexiClash-provperiod slutar i dag',
+        preheader: 'En kort hälsning innan din kostnadsfria tillgång slutar.',
+        lead: () => 'Din kostnadsfria lärartillgång slutar i dag.',
+        body: 'Vill du fortsätta använda LexiClash med din klass kostar Teacher Pro 9 $ i månaden, och du kan avsluta när du vill.',
+        cta: 'Behåll Teacher Pro',
+      },
+      't+3': {
+        subject: () => 'Din LexiClash-provperiod har slutat',
+        preheader: 'Tack för att du provade LexiClash. En snabb fråga.',
+        lead: (date) => `Tack för att du provade LexiClash. Din kostnadsfria lärartillgång slutade ${date}.`,
+        body: 'Vill du komma tillbaka med din klass kostar Teacher Pro 9 $ i månaden, och du kan avsluta när du vill.',
+        cta: 'Se Teacher Pro',
+      },
+    },
+    ask: 'Och om det inte passade är det helt okej. Jag vill gärna veta vad som saknades eller vad som stod i vägen. Svara bara på det här mejlet, det kommer direkt till mig.',
+    classroom: 'Öppna mitt klassrum',
+    signoff: 'Tack, Ohad (jag bygger LexiClash)',
+    dir: 'ltr',
   },
 };
 
 export function teacherTrialReminder({ full_name, locale, bucket, trialExpiresAt }: Args) {
-  const c = COPY[locale] || COPY.en;
+  const lang = COPY[locale] ? locale : 'en';
+  const c = COPY[lang]!;
   const b = c.buckets[bucket];
-  const align = c.dir === 'rtl' ? 'right' : 'left';
-  const dateStr = new Date(trialExpiresAt).toLocaleDateString(DATE_LOCALE[locale] || 'en-US', {
-    year: 'numeric', month: 'long', day: 'numeric',
+  const dateStr = new Date(trialExpiresAt).toLocaleDateString(DATE_LOCALE[lang], {
+    month: 'long', day: 'numeric',
   });
 
-  const html = `<!doctype html>
-<html dir="${c.dir}" lang="${locale}">
-<body style="margin:0;padding:0;background:#0e1430;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0e1430;padding:24px 0;">
-    <tr><td align="center">
-      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:12px;overflow:hidden;border:3px solid #1a1a2e;">
-        <tr><td dir="${c.dir}" align="${align}" style="padding:28px 28px 8px 28px;font-family:Arial,Helvetica,sans-serif;color:#1a1a2e;text-align:${align};">
-          <p style="font-size:18px;font-weight:700;margin:0 0 12px 0;">${c.greeting(escape(full_name))}</p>
-          <p style="font-size:15px;line-height:1.6;margin:0 0 16px 0;font-weight:700;">${escape(b.lead(dateStr))}</p>
-          <p style="font-size:15px;line-height:1.6;margin:0 0 16px 0;">${escape(c.body)}</p>
-          <p style="font-size:15px;line-height:1.6;margin:0 0 20px 0;">${escape(c.price)}</p>
-        </td></tr>
-        <tr><td align="center" style="padding:8px 28px 20px 28px;">
-          <a href="${SITE}/${locale}/teacher/upgrade" style="background:#BFFF00;color:#1a1a2e;font-family:Arial,Helvetica,sans-serif;font-weight:800;font-size:16px;padding:14px 28px;border-radius:8px;text-decoration:none;display:inline-block;border:2px solid #1a1a2e;">${escape(b.cta)}</a>
-        </td></tr>
-        <tr><td dir="${c.dir}" align="${align}" style="padding:0 28px 28px 28px;font-family:Arial,Helvetica,sans-serif;color:#6b7280;font-size:13px;text-align:${align};">
-          <p style="margin:0 0 8px 0;">${escape(c.ask)}</p>
-          <p style="margin:0;">${escape(c.signoff)}</p>
-        </td></tr>
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`;
+  const html = renderTeacherEmail({
+    lang,
+    dir: c.dir,
+    preheader: b.preheader,
+    tagline: c.tagline,
+    greeting: c.greeting(firstName(full_name)),
+    lead: b.lead(dateStr),
+    paragraphs: [b.body],
+    callout: c.ask,
+    cta: { label: b.cta, href: `${TEACHER_EMAIL_SITE}/${lang}/teacher/upgrade` },
+    secondary: { label: c.classroom, href: `${TEACHER_EMAIL_SITE}/${lang}/teacher` },
+    signoff: c.signoff,
+  });
 
   return { subject: b.subject(dateStr), html };
 }

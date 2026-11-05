@@ -108,3 +108,43 @@ export function dedupeDueByEmail<
   // Preserve first-seen order so the send sequence stays stable and diffable run to run.
   return order.map((k) => bestByEmail.get(k)!);
 }
+
+/** The one-time "how is it going?" check-in, stored in the same `trial_reminders_sent` ledger. */
+export const TRIAL_FEEDBACK_BUCKET = 'feedback' as const;
+export type TrialEmailPick = TrialReminderBucket | typeof TRIAL_FEEDBACK_BUCKET;
+
+/** The check-in opens this many days after approval... */
+export const FEEDBACK_AFTER_DAYS = 5;
+/**
+ * ...and only while at least this many days of free access are left. Closer to the
+ * end, the t-3 email carries the same feedback ask, so a separate check-in would be
+ * a second email about the same thing within a day or two.
+ */
+export const FEEDBACK_MIN_DAYS_LEFT = 5;
+
+/**
+ * The one trial email to send now: a due trial-ending bucket wins, else the
+ * feedback check-in, else nothing. Still one email per teacher per run.
+ */
+export function pickTrialEmail(
+  approvedAtISO: string | null | undefined,
+  expiresAtISO: string | null | undefined,
+  alreadySent: readonly string[] | null | undefined,
+  nowMs: number,
+): TrialEmailPick | null {
+  const reminder = pickTrialReminder(expiresAtISO, alreadySent, nowMs);
+  if (reminder) return reminder;
+
+  const sent = new Set(alreadySent ?? []);
+  // A teacher who already got any trial email is past the point of a check-in.
+  if (sent.has(TRIAL_FEEDBACK_BUCKET) || TRIAL_REMINDER_BUCKETS.some((b) => sent.has(b))) return null;
+  if (!approvedAtISO || !expiresAtISO) return null;
+  const approved = Date.parse(approvedAtISO);
+  const exp = Date.parse(expiresAtISO);
+  if (Number.isNaN(approved) || Number.isNaN(exp)) return null;
+
+  const daysSinceApproval = (nowMs - approved) / DAY_MS;
+  const daysLeft = (exp - nowMs) / DAY_MS;
+  if (daysSinceApproval < FEEDBACK_AFTER_DAYS || daysLeft < FEEDBACK_MIN_DAYS_LEFT) return null;
+  return TRIAL_FEEDBACK_BUCKET;
+}

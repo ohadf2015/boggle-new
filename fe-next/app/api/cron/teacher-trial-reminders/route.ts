@@ -4,7 +4,9 @@ import logger from '@/utils/logger';
 import { getSupabaseAdmin } from '@/lib/email';
 import { loadLifecycleAudience, reachFor, sendLifecycleEmail } from '@/lib/email/lifecycleUnsubscribe';
 import { teacherTrialReminder } from '@/lib/email/templates/teacherTrialReminder';
-import { pickTrialReminder, dedupeDueByEmail } from '@/lib/education/trialReminders';
+import { teacherTrialFeedback } from '@/lib/email/templates/teacherTrialFeedback';
+import { TEACHER_EMAIL_REPLY_TO } from '@/lib/email/templates/teacherEmailLayout';
+import { pickTrialEmail, dedupeDueByEmail, TRIAL_FEEDBACK_BUCKET } from '@/lib/education/trialReminders';
 import { proUserIdsFrom, type SubscriptionRowLike } from '@/lib/education/proGrant';
 import type { TeacherLocale } from '@/lib/education/types';
 import { captureApiError } from '@/utils/sentry';
@@ -33,6 +35,10 @@ import { withCronLock } from '@/backend/redis/locking';
  *
  * Security: CRON_SECRET via x-cron-secret header or Authorization: Bearer.
  * `?dry=1` returns exactly who would be emailed and sends nothing.
+ *
+ * The same run also sends the one-time feedback check-in (`feedback` bucket) five
+ * days into the free access, when the trial-ending emails are still at least five
+ * days away. Replies to every email here go to Ohad.
  */
 interface Row {
   id: string;
@@ -40,6 +46,7 @@ interface Row {
   email: string;
   full_name: string;
   locale: TeacherLocale;
+  reviewed_at: string | null;
   trial_expires_at: string | null;
   trial_reminders_sent: string[] | null;
 }
@@ -58,7 +65,7 @@ export async function POST(request: NextRequest) {
 
       const { data, error } = await supabase
         .from('teacher_access_requests')
-        .select('id, user_id, email, full_name, locale, trial_expires_at, trial_reminders_sent')
+        .select('id, user_id, email, full_name, locale, reviewed_at, trial_expires_at, trial_reminders_sent')
         .eq('status', 'approved')
         .not('trial_expires_at', 'is', null);
       if (error) throw new Error(`teacher_access_requests select failed: ${error.message}`);
@@ -80,8 +87,8 @@ export async function POST(request: NextRequest) {
 
       const now = Date.now();
       const pickedRows = rows
-        .map((row) => ({ row, bucket: pickTrialReminder(row.trial_expires_at, row.trial_reminders_sent, now) }))
-        .filter((d): d is { row: Row; bucket: NonNullable<ReturnType<typeof pickTrialReminder>> } => d.bucket !== null);
+        .map((row) => ({ row, bucket: pickTrialEmail(row.reviewed_at, row.trial_expires_at, row.trial_reminders_sent, now) }))
+        .filter((d): d is { row: Row; bucket: NonNullable<ReturnType<typeof pickTrialEmail>> } => d.bucket !== null);
       const dueRows = pickedRows.filter((d) => !proEmails.has(emailKey(d.row.email)));
       const skippedPro = new Set(
         pickedRows.filter((d) => proEmails.has(emailKey(d.row.email))).map((d) => emailKey(d.row.email)),
@@ -148,18 +155,22 @@ export async function POST(request: NextRequest) {
       let sent = 0;
       let failed = 0;
       for (const { row, bucket, token } of due) {
-        const tpl = teacherTrialReminder({
-          full_name: row.full_name,
-          locale: row.locale,
-          bucket,
-          trialExpiresAt: row.trial_expires_at!,
-        });
+        const tpl =
+          bucket === TRIAL_FEEDBACK_BUCKET
+            ? teacherTrialFeedback({ full_name: row.full_name, locale: row.locale, trialExpiresAt: row.trial_expires_at! })
+            : teacherTrialReminder({
+                full_name: row.full_name,
+                locale: row.locale,
+                bucket,
+                trialExpiresAt: row.trial_expires_at!,
+              });
         const result = await sendLifecycleEmail({
           to: row.email,
           subject: tpl.subject,
           html: tpl.html,
-          locale: row.locale === 'he' ? 'he' : 'en',
+          locale: row.locale,
           token,
+          replyTo: TEACHER_EMAIL_REPLY_TO,
         });
         if (!result.ok) {
           failed++;
