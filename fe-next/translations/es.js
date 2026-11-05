@@ -3033,10 +3033,10 @@ const es = {
   },
   "seo": {
     "teacherUpgrade": {
-      "title": "Teacher Pro: clases y estudiantes ilimitados | LexiClash",
-      "description": "Mejora a Teacher Pro para tener aulas y estudiantes ilimitados por clase. $9/mes. Gestiona el programa de vocabulario de todo tu centro con una sola suscripción.",
-      "ogTitle": "Mejora a Teacher Pro: clases ilimitadas",
-      "ogDescription": "Gestiona aulas y estudiantes ilimitados por $9/mes. Haz crecer la enseñanza de vocabulario con LexiClash Pro."
+      "title": "Ve quién entendió, antes del timbre | LexiClash",
+      "description": "Ve quién entendió, antes del timbre. Teacher Pro cuesta $9/mes tras 14 días gratis.",
+      "ogTitle": "Ve quién entendió, antes del timbre.",
+      "ogDescription": "Ve quién entendió, antes del timbre. Teacher Pro cuesta $9/mes tras 14 días gratis."
     },
     "teacherPricing": {
       "title": "Precios de LexiClash: plan gratis o Teacher Pro por $9/mes",
