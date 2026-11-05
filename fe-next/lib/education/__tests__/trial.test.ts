@@ -10,6 +10,10 @@ import {
   isTrialUpgradeNudgeDismissed,
   persistTrialUpgradeNudgeDismissed,
   trialUpgradeNudgeDismissKey,
+  isTrialReminderWindow,
+  trialReminderDismissKey,
+  isTrialReminderDismissed,
+  persistTrialReminderDismissed,
 } from '../trial';
 
 const DAY = 24 * 60 * 60 * 1000;
@@ -162,5 +166,80 @@ describe('trial upgrade-nudge dismiss persistence', () => {
     expect(mem.get(trialUpgradeNudgeDismissKey(expiresAt))).toBe('1');
     expect(isTrialUpgradeNudgeDismissed(storage, expiresAt)).toBe(true);
     expect(isTrialUpgradeNudgeDismissed(storage, '2026-08-01T00:00:00.000Z')).toBe(false);
+  });
+});
+
+describe('isTrialReminderWindow', () => {
+  function makeTrial(daysLeft: number, isExpired = false) {
+    return {
+      expiresAt: '2026-07-01T00:00:00.000Z',
+      msLeft: isExpired ? -1000 : daysLeft * DAY,
+      daysLeft: isExpired ? 0 : daysLeft,
+      hoursLeft: isExpired ? 0 : daysLeft * 24,
+      isExpired,
+      isUrgent: !isExpired && daysLeft <= TRIAL_URGENT_DAYS,
+    };
+  }
+
+  it('is true for daysLeft 3 and 1', () => {
+    expect(isTrialReminderWindow(makeTrial(3))).toBe(true);
+    expect(isTrialReminderWindow(makeTrial(1))).toBe(true);
+  });
+
+  it('is false for daysLeft 4', () => {
+    expect(isTrialReminderWindow(makeTrial(4))).toBe(false);
+  });
+
+  it('is false for expired trial', () => {
+    expect(isTrialReminderWindow(makeTrial(0, true))).toBe(false);
+  });
+
+  it('is false for null or undefined', () => {
+    expect(isTrialReminderWindow(null)).toBe(false);
+    expect(isTrialReminderWindow(undefined)).toBe(false);
+  });
+});
+
+describe('trial reminder dismiss persistence', () => {
+  const expiresAt = '2026-07-01T00:00:00.000Z';
+
+  function memStorage() {
+    const mem = new Map<string, string>();
+    return {
+      mem,
+      storage: {
+        getItem: (k: string) => mem.get(k) ?? null,
+        setItem: (k: string, v: string) => {
+          mem.set(k, v);
+        },
+      },
+    };
+  }
+
+  it('dismiss key is different from the 7-day nudge key', () => {
+    const reminderKey = trialReminderDismissKey(expiresAt);
+    const nudgeKey = trialUpgradeNudgeDismissKey(expiresAt);
+    expect(reminderKey).not.toBe(nudgeKey);
+    expect(reminderKey).toContain(expiresAt);
+  });
+
+  it('persist and read round-trip; a different expiry is not dismissed', () => {
+    const { storage } = memStorage();
+    expect(isTrialReminderDismissed(storage, expiresAt)).toBe(false);
+    persistTrialReminderDismissed(storage, expiresAt);
+    expect(isTrialReminderDismissed(storage, expiresAt)).toBe(true);
+    expect(isTrialReminderDismissed(storage, '2026-08-01T00:00:00.000Z')).toBe(false);
+  });
+
+  it('dismissing the 7-day card does not dismiss the reminder and vice versa', () => {
+    const { storage } = memStorage();
+    persistTrialUpgradeNudgeDismissed(storage, expiresAt);
+    expect(isTrialUpgradeNudgeDismissed(storage, expiresAt)).toBe(true);
+    expect(isTrialReminderDismissed(storage, expiresAt)).toBe(false);
+
+    const otherExpiry = '2026-09-01T00:00:00.000Z';
+    persistTrialReminderDismissed(storage, otherExpiry);
+    expect(isTrialReminderDismissed(storage, otherExpiry)).toBe(true);
+    expect(isTrialUpgradeNudgeDismissed(storage, otherExpiry)).toBe(false);
   });
 });

@@ -237,3 +237,105 @@ describe('pickHomeAsk', () => {
     expect(pickHomeAsk({ ...none, pro: true })).toBe('pro');
   });
 });
+
+describe('pickTeacherBanner trialReminder (<=3 days access trial)', () => {
+  it('returns trialReminder when trialReminderOpen is true', () => {
+    expect(
+      pickTeacherBanner({
+        hasTrial: true,
+        trialReminderOpen: true,
+        isAdmin: false,
+        hasPro: false,
+      }),
+    ).toBe('trialReminder');
+  });
+
+  it('when daysLeft is 3 and teacher is in access-trial nudge window, reminder banner is the dashboard banner and Home rail upgrade card is not also the ask', () => {
+    const banner = pickTeacherBanner({
+      hasTrial: true,
+      trialReminderOpen: true,
+      isAdmin: false,
+      hasPro: false,
+    });
+    expect(banner).toBe('trialReminder');
+
+    const trialNudgeAsk = true;
+    const homeAsk = pickHomeAsk({
+      account:
+        banner === 'pendingCheckout' ||
+        banner === 'reactivate' ||
+        banner === 'trialing' ||
+        banner === 'trialReminder',
+      onboarding: false,
+      trial: trialNudgeAsk,
+      usage: false,
+      pro: false,
+    });
+    expect(homeAsk).toBe('account');
+    expect(homeAsk).not.toBe('trial');
+  });
+
+  it('yields to pendingCheckout, polarTrialExpired, and polarTrialing', () => {
+    expect(
+      pickTeacherBanner({
+        hasTrial: true,
+        trialReminderOpen: true,
+        isAdmin: false,
+        hasPro: false,
+        pendingCheckout: true,
+      }),
+    ).toBe('pendingCheckout');
+
+    expect(
+      pickTeacherBanner({
+        hasTrial: true,
+        trialReminderOpen: true,
+        isAdmin: false,
+        hasPro: false,
+        polarTrialExpired: true,
+      }),
+    ).toBe('reactivate');
+
+    expect(
+      pickTeacherBanner({
+        hasTrial: true,
+        trialReminderOpen: true,
+        isAdmin: false,
+        hasPro: true,
+        polarTrialing: true,
+      }),
+    ).toBe('trialing');
+  });
+
+  it('returns none if hasPro or proLoading', () => {
+    expect(
+      pickTeacherBanner({
+        hasTrial: true,
+        trialReminderOpen: true,
+        isAdmin: false,
+        hasPro: true,
+      }),
+    ).toBe('none');
+
+    expect(
+      pickTeacherBanner({
+        hasTrial: true,
+        trialReminderOpen: true,
+        isAdmin: false,
+        hasPro: false,
+        proLoading: true,
+      }),
+    ).toBe('none');
+  });
+
+  it('falls back to 7-day trial or pro ask when trialReminderOpen is false', () => {
+    expect(
+      pickTeacherBanner({
+        hasTrial: true,
+        trialReminderOpen: false,
+        isAdmin: false,
+        hasPro: false,
+      }),
+    ).toBe('trial');
+  });
+});

@@ -22,6 +22,7 @@ export const TRIAL_URGENT_DAYS = 3;
 export const TRIAL_UPGRADE_NUDGE_DAYS = 7;
 
 const TRIAL_UPGRADE_NUDGE_DISMISS_PREFIX = 'lexiclash.teacher_trial_upgrade_nudge_dismissed:';
+const TRIAL_REMINDER_DISMISS_PREFIX = 'lexiclash.teacher_trial_reminder_dismissed:';
 
 /** ISO timestamp for the trial deadline, TEACHER_TRIAL_DAYS after `fromMs`. */
 export function teacherTrialExpiry(fromMs: number): string {
@@ -102,6 +103,11 @@ export function isTrialUpgradeNudgeWindow(trial: TrialStatus | null | undefined)
   return !!trial && !trial.isExpired && trial.daysLeft <= TRIAL_UPGRADE_NUDGE_DAYS;
 }
 
+/** Active trial whose deadline is inside the urgent reminder window (daysLeft <= TRIAL_URGENT_DAYS). */
+export function isTrialReminderWindow(trial: TrialStatus | null | undefined): boolean {
+  return !!trial && !trial.isExpired && trial.daysLeft <= TRIAL_URGENT_DAYS;
+}
+
 /**
  * Classrooms-list header CTA: approved teacher on an *active* trial who is not
  * already Pro. Loading states fail closed so a paying teacher never sees "pay".
@@ -142,6 +148,32 @@ export function persistTrialUpgradeNudgeDismissed(
 ): void {
   try {
     storage?.setItem(trialUpgradeNudgeDismissKey(expiresAt), '1');
+  } catch {
+    // Private mode / quota — the in-session hide still works.
+  }
+}
+
+export function trialReminderDismissKey(expiresAt: string): string {
+  return `${TRIAL_REMINDER_DISMISS_PREFIX}${expiresAt}`;
+}
+
+export function isTrialReminderDismissed(
+  storage: { getItem(key: string): string | null } | null | undefined,
+  expiresAt: string,
+): boolean {
+  try {
+    return storage?.getItem(trialReminderDismissKey(expiresAt)) === '1';
+  } catch {
+    return false;
+  }
+}
+
+export function persistTrialReminderDismissed(
+  storage: { setItem(key: string, value: string): void } | null | undefined,
+  expiresAt: string,
+): void {
+  try {
+    storage?.setItem(trialReminderDismissKey(expiresAt), '1');
   } catch {
     // Private mode / quota — the in-session hide still works.
   }

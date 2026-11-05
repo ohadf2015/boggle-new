@@ -22,6 +22,7 @@
  */
 export type TeacherBanner =
   | 'pendingCheckout'
+  | 'trialReminder'
   | 'trial'
   | 'pro'
   | 'reactivate'
@@ -31,6 +32,7 @@ export type TeacherBanner =
 
 export function pickTeacherBanner({
   hasTrial,
+  trialReminderOpen = false,
   isAdmin,
   hasPro = false,
   proLoading = false,
@@ -44,6 +46,11 @@ export function pickTeacherBanner({
   pendingCheckout = false,
 }: {
   hasTrial: boolean;
+  /**
+   * Active access trial inside the <=3 days urgent reminder window and not
+   * dismissed. Shows a high-urgency dashboard banner with direct checkout CTA.
+   */
+  trialReminderOpen?: boolean;
   isAdmin: boolean;
   hasPro?: boolean;
   proLoading?: boolean;
@@ -88,6 +95,7 @@ export function pickTeacherBanner({
   if (hasPro) return 'none';
   if (pendingCheckout && !isAdmin) return 'pendingCheckout';
   if (polarTrialExpired) return 'reactivate';
+  if (trialReminderOpen) return 'trialReminder';
   // Polar trial start beats the access-trial countdown and the milestone $9
   // strip: 0 of 65 teachers ever started a trial they could not see.
   if (polarOfferTrial && !offerTrialDismissed) return 'offerTrial';
