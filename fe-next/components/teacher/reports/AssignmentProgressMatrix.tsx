@@ -222,18 +222,30 @@ function MatrixPaywall({ trialEnded }: { trialEnded: boolean }) {
                 {sampleStudents.map((s, i) => (
                   <div key={names[i]} className="flex items-center gap-2 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-2 py-1">
                     <span className="w-14 shrink-0 truncate text-xs font-bold text-neo-white">{names[i]}</span>
-                    {[0, 1, 2].map((c) => (
-                      <span
-                        key={c}
-                        className={
-                          (i + c) % 3 === 2
-                            ? 'flex-1 rounded-sm border border-neo-cream/30 px-1 py-0.5 text-center text-[10px] font-bold text-neo-cream/50'
-                            : 'flex-1 rounded-sm border border-neo-black bg-neo-lime/80 px-1 py-0.5 text-center text-[10px] font-black tabular-nums text-neo-black'
-                        }
-                      >
-                        {(i + c) % 3 === 2 ? '—' : `${s.accuracy + c * 2}%`}
-                      </span>
-                    ))}
+                    {[0, 1, 2].map((c) => {
+                      // Separate elements, not a ternary className: the border
+                      // contrast scan concatenates quoted fragments and would
+                      // score cream/30 against the lime fill (1.19:1).
+                      const empty = (i + c) % 3 === 2;
+                      if (empty) {
+                        return (
+                          <span
+                            key={c}
+                            className="flex-1 rounded-sm border border-neo-cream/50 bg-neo-navy px-1 py-0.5 text-center text-[10px] font-bold text-neo-cream/70"
+                          >
+                            —
+                          </span>
+                        );
+                      }
+                      return (
+                        <span
+                          key={c}
+                          className="flex-1 rounded-sm border border-neo-black bg-neo-lime/80 px-1 py-0.5 text-center text-[10px] font-black tabular-nums text-neo-black"
+                        >
+                          {`${s.accuracy + c * 2}%`}
+                        </span>
+                      );
+                    })}
                   </div>
                 ))}
               </div>
