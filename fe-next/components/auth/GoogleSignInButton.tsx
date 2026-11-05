@@ -3,7 +3,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Script from 'next/script';
 import { isNative, isEdgeBrowser } from '@/utils/platform';
-import { supabase, signInWithGoogle } from '@/lib/supabase';
+import {
+  AUTH_CLIENT_LOAD_FAILED_EVENT,
+  AuthClientLoadError,
+  isAuthClientConfigured,
+  loadAuthClient,
+} from '@/lib/auth/loadAuthClient';
+import { neoErrorToast } from '@/components/NeoToast';
 import { ensureGoogleIdInitialized, type GoogleIdServices } from '@/lib/auth/googleOneTap';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -53,7 +59,7 @@ export default function GoogleSignInButton({ className, width, analyticsSource }
   const containerRef = useRef<HTMLDivElement>(null);
   const renderedRef = useRef(false);
 
-  const enabled = !isNative() && !!clientId && !!supabase;
+  const enabled = !isNative() && !!clientId && isAuthClientConfigured();
 
   // GSI iframe swallows clicks — pointerdown on our chrome is the last
   // reliable signal that the soft-sheet Google CTA was engaged.
@@ -73,6 +79,12 @@ export default function GoogleSignInButton({ className, width, analyticsSource }
     trackSignupPromptClicked(source);
     latchSignupSource(source);
   }, []);
+
+  useEffect(() => {
+    const showLoadFailure = () => neoErrorToast(t('errors.signInFailedRetry'));
+    window.addEventListener(AUTH_CLIENT_LOAD_FAILED_EVENT, showLoadFailure);
+    return () => window.removeEventListener(AUTH_CLIENT_LOAD_FAILED_EVENT, showLoadFailure);
+  }, [t]);
 
   const renderButton = useCallback(async () => {
     if (renderedRef.current || !clientId || !containerRef.current) return;
@@ -124,17 +136,19 @@ export default function GoogleSignInButton({ className, width, analyticsSource }
           data-testid="google-signin-edge-fallback"
           onClick={() => {
             handlePromptClickIntent();
-            void signInWithGoogle()
+            void loadAuthClient()
+              .then(({ signInWithGoogle }) => signInWithGoogle())
               .then((res) => {
                 const err = (res as { error?: { message?: string } | null } | undefined)?.error;
                 if (err) trackSignupFailed('oauth_redirect_error', { source: analyticsSource, message: err.message });
               })
-              .catch((e: unknown) =>
+              .catch((e: unknown) => {
+                if (e instanceof AuthClientLoadError) window.dispatchEvent(new Event(AUTH_CLIENT_LOAD_FAILED_EVENT));
                 trackSignupFailed('oauth_redirect_error', {
                   source: analyticsSource,
                   message: e instanceof Error ? e.message : String(e),
-                }),
-              );
+                });
+              });
           }}
           className={cn(
             'w-full flex items-center justify-center gap-2 py-3 rounded-xl',

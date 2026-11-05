@@ -411,7 +411,9 @@ const sv = {
       "cta": "Få en skoloffert"
     },
     "faq": {
-      "title": "Frågor från lärare"
+      "title": "Frågor från lärare",
+      "intro": "Korta svar på det lärare frågar inför sin första lektion.",
+      "helpLink": "Fler svar i hjälpcentret"
     },
     "final": {
       "title": "Kör ditt första klasspel i dag",
@@ -1215,8 +1217,17 @@ const sv = {
       "moreLessons": "Nya lektioner från din lärare dyker upp här.",
       "maxTier": "MAX",
       "noAwards": "Spela en lektion för att börja vinna utmärkelser.",
+      "awardsEmptyTitle": "Inga utmärkelser än",
+      "awardsEmptyBody": "Klara din första lektion så hamnar din första utmärkelse här.",
+      "awardsEmptyCta": "Spela en lektion",
       "firstAward": "Klara en lektion för att vinna din första utmärkelse.",
       "awardsEarned": "Vunna: {earned}/{total}",
+      "awardsWon": "Vunna utmärkelser",
+      "awardsOfTotal": "av {total}",
+      "awardsNextUp": "Nästa mål",
+      "awardsToTier": "{left} kvar till {tier}",
+      "awardsAllMaxed": "Alla utmärkelser maxade!",
+      "awardsTierCount": "{tier}: {count}",
       "lessonsDone": "Klara: {done}/{total}",
       "lessonsRegion": "Dina lektioner"
     }
@@ -1901,6 +1912,36 @@ const sv = {
     "starsEarned": "{stars} av 3 stjärnor"
   },
   "vocabQuiz": {
+    "ask": {
+      "any": "Välj det bästa svaret",
+      "definition": "Vilket ord betyder detta?",
+      "synonym": "Vilket ord betyder samma sak?",
+      "antonym": "Vilket ord betyder motsatsen?",
+      "context": "Vilket ord passar i luckan?",
+      "multiple_meaning": "Vilket ord har båda betydelserna?",
+      "roots_affixes": "Vilket passar?"
+    },
+    "exit": "Lämna spelet",
+    "footer": {
+      "pick": "Tryck på ett svar",
+      "keys": "eller tryck 1–4",
+      "waiting": "Välj ett",
+      "locked": "Låst",
+      "roomCount": "{locked} av {total} har svarat",
+      "streakHint": "Svit {count} · snabbare = fler poäng",
+      "streakRun": "{count} i rad! Fortsätt så",
+      "timeUp": "Tiden är ute! Svaret kommer",
+      "speedTip": "Snabbare svar ger fler poäng",
+      "keepStreak": "Håll sviten vid liv",
+      "youPicked": "Du valde {word}",
+      "startStreak": "Starta en svit"
+    },
+    "stakes": {
+      "label": "Står på spel",
+      "streak": "{count} i rad",
+      "seconds": "{seconds} s",
+      "timeUp": "Tiden är ute"
+    },
     "correctShort": "Snyggt!",
     "lockedInCount": "{locked}/{total} har svarat",
     "rank": "Plats {position} av {total}",
@@ -1920,6 +1961,11 @@ const sv = {
       "tease": "Nästa ord börjar på {letter} och har {count} bokstäver"
     },
     "progress": "Fråga {current} av {total}",
+    "progressShort": "{current}/{total}",
+    "hud": {
+      "question": "Fråga",
+      "score": "Poäng"
+    },
     "timeLeft": "{seconds} sekunder kvar",
     "paused": "Läraren har pausat quizet",
     "waiting": "Gör dig redo – första frågan kommer strax.",
@@ -3346,10 +3392,10 @@ const sv = {
   },
   "seo": {
     "teacherUpgrade": {
-      "title": "Teacher Pro – obegränsat antal klasser och elever | LexiClash",
-      "description": "Uppgradera till Teacher Pro för obegränsat antal klassrum och elever per klass. $9/månad. Hantera hela skolans ordförrådsprogram med en prenumeration.",
-      "ogTitle": "Uppgradera till Teacher Pro – obegränsat antal klasser",
-      "ogDescription": "Hantera obegränsat antal klassrum och elever för $9/månad. Väx din ordförrådsundervisning med LexiClash Pro."
+      "title": "Se vem som fattade, innan klockan ringer | LexiClash",
+      "description": "Se vem som fattade, innan klockan ringer. Teacher Pro kostar 9 $/månad efter 14 dagar gratis.",
+      "ogTitle": "Se vem som fattade, innan klockan ringer.",
+      "ogDescription": "Se vem som fattade, innan klockan ringer. Teacher Pro kostar 9 $/månad efter 14 dagar gratis."
     },
     "teacherPricing": {
       "title": "LexiClash priser: gratisplan eller Teacher Pro för 9 $/månad",
@@ -4653,7 +4699,12 @@ const sv = {
     "title": "Gå med i spelet",
     "subtitle": "Ange koden du fick av din lärare eller värd.",
     "placeholder": "Ange din kod",
-    "submit": "Gå med"
+    "submit": "Gå med",
+    "stepsLabel": "Så här går det till",
+    "stepCode": "Kod",
+    "stepName": "Ditt namn",
+    "stepPlay": "Spela",
+    "waiting": "Koden står på lärarens skärm"
   },
   "validation": {
     "gameCodeRequired": "Ange en spelkod för att gå med.",
@@ -15648,6 +15699,21 @@ const sv = {
         "untitled": "Namnlös lektion",
         "anonymousStudent": "Elev {{id}}"
       },
+      "progressMatrix": {
+        "title": "Framsteg per elev",
+        "empty": "Inga elever eller uppgifter i den här klassen ännu",
+        "trend": "Tendens",
+        "trendUp": "Förbättras",
+        "trendDown": "Försämras",
+        "trendFlat": "Stabil",
+        "trendNone": "Inte tillräckligt med data ännu",
+        "cellCompleted": "Klar, {{score}}% rätt",
+        "cellMissing": "Ej klar",
+        "sampleTitle": "Korrekthet per elev",
+        "gateTitle": "Elevpoäng är en Pro-funktion",
+        "gateBody": "Se varje elevs korrekthet på varje uppgift och om de förbättras eller faller — poängen bakom slutförandeantalen.",
+        "gateCta": "Se elevpoäng med Pro: {{price}}/månad"
+      },
       "classGrid": {
         "title": "Klassens framsteg",
         "empty": "Inga elever eller uppgifter i den här klassen ännu",
@@ -16251,6 +16317,27 @@ const sv = {
       "allFound": "Klassen hittade alla lektionsord.",
       "waitingForTeacher": "Väntar på att din lärare startar nästa runda…",
       "stayInClass": "Stanna kvar, nästa spel startar här.",
+      "steps": {
+        "roundDone": "Rundan klar!",
+        "points": "poäng",
+        "place": "#{{rank}} av {{players}}",
+        "lessonLabel": "Lektionsord",
+        "lessonCount": "Du hittade {{found}} av {{total}} lektionsord",
+        "allFound": "Du hittade alla lektionsord!",
+        "toGo": "{{left}} kvar att lära. Du fixar det.",
+        "noneFound": "Nya ord! Nu lär vi oss dem.",
+        "missedTitle": "Ord att repetera ({{count}})",
+        "missedHint": "Tryck på högtalaren för att höra varje ord.",
+        "hear": "Lyssna på {{word}}",
+        "continue": "Fortsätt",
+        "review": "Repetera orden",
+        "practice": "Öva",
+        "progress": "Steg {{step}} av {{total}}",
+        "tilePoints": "Poäng",
+        "tileRank": "Placering",
+        "reviewCount": "Repetera orden ({{count}})",
+        "moreWords": "+{{count}} till"
+      },
       "playAgain": "Spela igen",
       "practiceMissed": "Öva de här orden",
       "playReteachRound": "Spela repetitionsrunda: bara missade ord",
@@ -21433,7 +21520,9 @@ const sv = {
       "noRoomStudent": "Be läraren om koden och gå med.",
       "noRoomHost": "Starta ett spel från lärarstarten.",
       "enterCode": "Skriv en kod",
-      "toTeacher": "Tillbaka till lärarstarten"
+      "toTeacher": "Tillbaka till lärarstarten",
+      "pickGame": "Välj ett spel",
+      "soloPractice": "Öva på egen hand"
     },
     "hostResults": {
       "missedTitle": "Ord som klassen missade",
@@ -21547,6 +21636,50 @@ const sv = {
       "students": "{count} elever",
       "studentsOne": "1 elev",
       "notPlayedRecently": "Inga spel på 30 dagar",
+      "roster": {
+        "title": "Elever",
+        "colName": "Namn",
+        "colXp": "XP",
+        "colWords": "Ord",
+        "colAccuracy": "Träffsäkerhet",
+        "colWeek": "Den här veckan",
+        "status": {
+          "done": "Spelat den här veckan",
+          "late": "Efter",
+          "idle": "Inte börjat"
+        },
+        "statusShort": {
+          "done": "Spelat",
+          "late": "Efter",
+          "idle": "Inte börjat"
+        },
+        "count": {
+          "done": "{count} har spelat",
+          "late": "{count} efter",
+          "idle": "{count} inte börjat"
+        },
+        "statXp": "Intjänad XP",
+        "statWords": "Inlärda ord",
+        "recent": "Senaste aktivitet",
+        "lastPlayed": "Senast spelat: {when}",
+        "notYet": "inte än",
+        "streak": "{count} dagar i rad",
+        "accuracy": "{count}% rätt svar",
+        "noStreak": "Ingen svit just nu",
+        "noWordsYet": "Har inte övat på ord än",
+        "empty": "Inga elever än. Dela klasskoden så dyker de upp här.",
+        "error": "Kunde inte läsa in eleverna. Försök igen om en stund.",
+        "assign": "Tilldela",
+        "assignFor": "Tilldela övning: {name} ligger efter"
+      },
+      "focus": {
+        "title": "Vem behöver dig",
+        "barLabel": "{done} har spelat, {late} efter, {idle} inte börjat",
+        "need": "{count} behöver fortfarande spela den här veckan",
+        "assign": "Tilldela övning",
+        "allDone": "Alla har spelat den här veckan"
+      },
+      "lastGameAt": "Senaste spelet: {when}",
       "playWith": "Starta ett spel med {name}",
       "showCode": "Visa kod",
       "showCodeFor": "Visa anslutningskoden för {name}",
@@ -21575,7 +21708,9 @@ const sv = {
       "active": "Klasser som spelat",
       "empty": "Dina siffror visas här efter ert första spel.",
       "unavailable": "Veckans siffror gick inte att hämta. De är tillbaka nästa gång.",
-      "quiet": "Lugn vecka hittills. En kort runda väcker klassen."
+      "quiet": "Lugn vecka hittills. En kort runda väcker klassen.",
+      "idle": "Inget spel denna vecka",
+      "more": "{count} klasser till"
     },
     "insight": {
       "title": "Dagens insikt",

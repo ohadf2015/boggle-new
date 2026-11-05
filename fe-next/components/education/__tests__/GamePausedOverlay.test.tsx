@@ -35,6 +35,11 @@ describe('GamePausedOverlay', () => {
     expect(screen.queryByText('education.liveControls.pausedBody')).toBeNull();
   });
 
+  it('Given a pause, Then the mascot keeps the student company on the card', () => {
+    render(<GamePausedOverlay />);
+    expect(screen.getByTestId('game-paused-overlay')).toContainElement(screen.getByTestId('edu-mascot-brainBreak'));
+  });
+
   it('is RTL-safe: sets dir="rtl" for Hebrew', () => {
     mockUseLanguage.mockReturnValue({ language: 'he', t: (k: string) => k, dir: 'rtl' });
     render(<GamePausedOverlay />);

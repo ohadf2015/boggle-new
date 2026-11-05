@@ -1,8 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import { m } from 'framer-motion';
 import { ChevronDown, ChevronUp, Clock, Gamepad2, Puzzle, Radio } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { EDU_MOTION, pressClasses, pressMotion, useReducedMotionSafe } from './motion';
 import { ARCADE_BLOCK } from '@/lib/education/arcadeAccent';
 import { modeArcadeAccent } from './lobby/LobbyModeGrid';
 import type { CatalogueMode, CatalogueModeKeys } from './ClassroomModeCatalogueData';
@@ -42,6 +44,7 @@ function Spec({ testId, icon: Icon, label, value, className }: { testId: string;
  */
 export function ClassroomModeSpotlight({ mode, keys, minutes, dir, busy, blockedKey, onGoLive, t }: ClassroomModeSpotlightProps) {
   const [stepsOpen, setStepsOpen] = useState(false);
+  const reduced = useReducedMotionSafe();
   const name = t(keys.name);
   return (
     <section
@@ -55,22 +58,27 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, dir, busy, blocked
         <div
           data-testid="spotlight-art"
           data-accent-decor
-          className={cn('hidden rounded-neo border-2 border-neo-black p-3 @4xl/lobby:block [@container(max-height:419px)]:hidden', ARCADE_BLOCK[modeArcadeAccent(mode.id)])}
+          className={cn('hidden rounded-neo border-2 border-neo-black p-3 @4xl/lobby:block @4xl/lobby:min-h-[8rem] @4xl/lobby:flex-1 [@container(max-height:419px)]:hidden', ARCADE_BLOCK[modeArcadeAccent(mode.id)])}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element -- static poster cover */}
-          <img
+          <m.img
             key={mode.id}
             src={mode.cover}
             alt=""
             aria-hidden="true"
-            className="aspect-[16/9] w-full -rotate-1 rounded-neo border-2 border-neo-black object-cover object-[50%_28%] shadow-hard [@container(max-height:519px)]:aspect-[5/2]"
+            initial={reduced ? false : { scale: 0.92, rotate: -4 }}
+            animate={{ scale: 1, rotate: -1 }}
+            transition={reduced ? { duration: 0 } : EDU_MOTION.spring.pop}
+            className="aspect-[16/9] max-h-full w-full rounded-neo border-2 border-neo-black object-cover object-[50%_28%] shadow-hard @4xl/lobby:aspect-auto @4xl/lobby:h-full [@container(max-height:519px)]:aspect-[5/2]"
           />
         </div>
 
-        <div
+        <m.div
           key={mode.id}
           data-testid="spotlight-text"
-          className="flex min-w-0 items-center gap-2.5 text-start motion-safe:animate-[edu-ready-swap_220ms_cubic-bezier(0.23,1,0.32,1)] @4xl/lobby:flex-col @4xl/lobby:items-stretch @4xl/lobby:gap-2"
+          initial={reduced ? false : { y: EDU_MOTION.reveal.y }}
+          animate={{ y: 0 }}
+          transition={reduced ? { duration: 0 } : EDU_MOTION.spring.settle}
+          className="flex min-w-0 shrink-0 items-center gap-2.5 text-start @4xl/lobby:flex-col @4xl/lobby:items-stretch @4xl/lobby:gap-2"
         >
           {/* eslint-disable-next-line @next/next/no-img-element -- static poster cover */}
           <img
@@ -80,9 +88,11 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, dir, busy, blocked
             className="size-11 shrink-0 rounded-neo border border-neo-cream/35 object-cover object-[50%_28%] @4xl/lobby:hidden"
           />
           <div className="flex min-w-0 flex-1 flex-col gap-1 @4xl/lobby:gap-2">
-            <span className="hidden font-neo-body text-sm font-bold text-neo-cream/60 @4xl/lobby:block">{t(keys.category)}</span>
+            <span data-testid="spotlight-category" className="hidden font-neo-body text-xs font-black uppercase tracking-[0.08em] text-neo-cream/60 @4xl/lobby:block">{t(keys.category)}</span>
             <h2 className="font-neo-display text-lg font-bold leading-tight text-neo-cream @4xl/lobby:text-3xl">{name}</h2>
-            <p className="hidden font-neo-body text-base leading-snug text-neo-cream/80 @4xl/lobby:block">{t(keys.how)}</p>
+            <p data-testid="spotlight-how" className="hidden font-neo-body text-sm leading-snug text-neo-cream/80 [@media(min-height:740px)]:block @4xl/lobby:block @4xl/lobby:text-base">
+              <span className="line-clamp-2 @4xl/lobby:line-clamp-none">{t(keys.how)}</span>
+            </p>
             <div className="flex min-w-0 flex-wrap gap-1.5">
               <Spec testId="spec-duration" icon={Clock} label={t('eg2Modes.spec.duration')} value={t('education.modePicker.minutes', { count: minutes })} />
               <Spec testId="spec-complexity" icon={Puzzle} label={t('eg2Modes.spec.complexity')} value={t(keys.complexity)} className="hidden @4xl/lobby:inline-flex" />
@@ -100,9 +110,9 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, dir, busy, blocked
           >
             {stepsOpen ? <ChevronUp className="size-5" strokeWidth={3} aria-hidden="true" /> : <ChevronDown className="size-5" strokeWidth={3} aria-hidden="true" />}
           </button>
-        </div>
+        </m.div>
 
-        <div className="hidden flex-wrap items-center gap-1.5 @4xl/lobby:flex [@container(max-height:519px)]:hidden">
+        <div data-testid="spotlight-best-for" className="hidden shrink-0 flex-wrap items-center gap-1.5 [@media(min-height:740px)]:flex @4xl/lobby:flex [@container(max-height:519px)]:hidden">
           <span className="font-neo-body text-sm font-bold text-neo-cream/60">{t('eg2Modes.bestForLabel')}</span>
           {keys.bestFor.map((k) => (
             <span key={k} data-testid="best-for-chip" className={CHIP}>
@@ -125,7 +135,7 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, dir, busy, blocked
         <ol
           data-testid="how-it-plays-inline"
           aria-label={t('eg2Modes.howItPlays')}
-          className="hidden flex-col gap-2 text-start @4xl/lobby:flex [@container(max-height:559px)]:hidden"
+          className="hidden shrink-0 flex-col gap-2 text-start @4xl/lobby:flex [@container(max-height:559px)]:hidden"
         >
           {keys.steps.map((k, i) => (
             <li key={k} className="flex items-start gap-2.5 font-neo-body text-sm leading-snug text-neo-cream/85">
@@ -142,28 +152,30 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, dir, busy, blocked
             {t(blockedKey)}
           </p>
         )}
-        <button
+        <m.button
           type="button"
           data-testid="lobby-go-live"
           aria-label={t('education.modePicker.launch', { mode: name })}
           onClick={onGoLive}
           disabled={!!blockedKey || busy}
+          {...(blockedKey || busy ? {} : pressMotion(reduced))}
           className={cn(
-            'flex min-h-14 w-full items-center justify-center gap-2.5 rounded-neo-lg border-[3px] border-neo-black px-4 py-1.5 @4xl/lobby:min-h-16',
-            'bg-neo-lime font-neo-display text-neo-black shadow-hard',
-            'transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] [@media(hover:hover)]:hover:-translate-y-0.5 active:scale-[0.97] motion-reduce:transition-none',
-            'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
-            'disabled:cursor-not-allowed disabled:bg-neo-navy-light disabled:text-neo-cream/70 disabled:shadow-none disabled:hover:translate-y-0',
+            'mb-1 flex min-h-14 w-full items-center justify-center gap-3 rounded-neo-lg border-[3px] border-neo-black px-4 py-1.5 @4xl/lobby:min-h-16',
+            'bg-neo-lime font-neo-display text-neo-black',
+            pressClasses(4),
+            'disabled:cursor-not-allowed disabled:border-neo-cream/20 disabled:bg-neo-navy-light disabled:text-neo-cream/70',
           )}
         >
-          <Radio className="size-6 shrink-0" strokeWidth={3} aria-hidden="true" />
+          <span aria-hidden="true" className="grid size-9 shrink-0 place-items-center rounded-full border-2 border-neo-cream/40 bg-neo-black/10 @4xl/lobby:size-10">
+            <Radio className={cn('size-5 shrink-0', !reduced && !blockedKey && 'animate-pulse')} strokeWidth={3} />
+          </span>
           <span className="flex min-w-0 flex-col items-start leading-tight">
-            <span data-testid="go-live-label" className="whitespace-nowrap text-xl font-black @4xl/lobby:text-2xl">
+            <span data-testid="go-live-label" className="whitespace-nowrap text-xl font-black tracking-[0.01em] @4xl/lobby:text-2xl">
               {t('teacher.playNow.goLive')}
             </span>
             <span className="font-neo-body text-xs font-bold opacity-80 @4xl/lobby:text-sm">{name}</span>
           </span>
-        </button>
+        </m.button>
       </div>
     </section>
   );

@@ -8,7 +8,7 @@ import { entranceOffset, pickRevealSignature } from '@/lib/education/motion/reve
  * Scroll-in for teacher pages: every `[data-tm]` descendant rises into place
  * as it nears the viewport. EducationShell scrolls an inner div, not the
  * window, so ScrollTrigger must be pointed at it. GSAP loads on demand so it
- * stays out of the first bundle; transform + opacity only. `[data-magnet]`
+ * stays out of the first bundle; transform only, never a fade, so content reads from the first frame. `[data-magnet]`
  * elements lean toward a fine pointer and spring back on leave; `[data-tilt]`
  * cards tilt in 3D; `[data-wipe]` headings unmask on mount.
  */
@@ -78,7 +78,6 @@ export function useTeacherReveal<T extends HTMLElement>(rescan: string | number 
       const ctx = gsap.context(() => {
         const starts = targets.map((_, i) => entranceOffset(sig, i));
         gsap.set(targets, {
-          opacity: 0,
           x: (i: number) => starts[i].x,
           y: (i: number) => starts[i].y,
           rotate: (i: number) => starts[i].rotate,
@@ -95,7 +94,6 @@ export function useTeacherReveal<T extends HTMLElement>(rescan: string | number 
           batchMax: 6,
           onEnter: (batch) =>
             gsap.to(batch, {
-              opacity: 1,
               x: 0,
               y: 0,
               rotate: 0,
@@ -105,7 +103,7 @@ export function useTeacherReveal<T extends HTMLElement>(rescan: string | number 
               ease: sig.ease,
               stagger: { each: sig.stagger, from: sig.from },
               overwrite: true,
-              clearProps: 'transform,opacity',
+              clearProps: 'transform',
             }),
         });
       }, root);

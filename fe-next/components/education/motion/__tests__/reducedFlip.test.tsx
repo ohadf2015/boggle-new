@@ -5,6 +5,7 @@ import { tick } from './tick';
 import { CountUp } from '../CountUp';
 import { CelebrationBeats } from '../CelebrationBeats';
 import { BeforeAfterNumber } from '../BeforeAfterNumber';
+import { Reveal, Stagger } from '../Reveal';
 import type { MotionChip } from '../StaggerChips';
 
 const chips: MotionChip[] = [{ id: 'a', label: 'edu.a', value: 35, tone: 'yellow' }];
@@ -50,5 +51,25 @@ describe('reduced motion resolving to false after mount (SSR snapshot is reduced
     tick(2500);
     expect(screen.getByTestId('edu-before-after').getAttribute('data-state')).toBe('after');
     expect(onIgnite).not.toHaveBeenCalled();
+  });
+
+  it('Reveal keeps the same node and never jumps back to its offset', () => {
+    const { rerender } = render(<Reveal>edu.card</Reveal>);
+    const before = screen.getByTestId('edu-reveal');
+    motionPref.reduced = false;
+    rerender(<Reveal>edu.card</Reveal>);
+    const after = screen.getByTestId('edu-reveal');
+    expect(after).toBe(before);
+    expect(after.style.transform).not.toMatch(/translateY\(12px\)/);
+  });
+
+  it('Stagger keeps its items mounted when the preference resolves', () => {
+    const { rerender } = render(<Stagger><span>edu.a</span><span>edu.b</span></Stagger>);
+    const before = screen.getAllByTestId('edu-reveal');
+    motionPref.reduced = false;
+    rerender(<Stagger><span>edu.a</span><span>edu.b</span></Stagger>);
+    const after = screen.getAllByTestId('edu-reveal');
+    expect(after[0]).toBe(before[0]);
+    expect(after[1]).toBe(before[1]);
   });
 });

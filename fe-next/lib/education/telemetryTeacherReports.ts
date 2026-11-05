@@ -33,10 +33,25 @@ export function trackEduReportsViewed(args: EduReportsViewedArgs = {}): void {
   safeCapture('edu_reports_viewed', props);
 }
 
-/** Class assignment grid opened. Property is `class_id`. */
-export function trackProgressReportViewed(classId: string): void {
+/**
+ * Class assignment grid opened. Property is `class_id`. Callers that ARE the
+ * gated per-student progress report pass surface: 'progress_report' so the
+ * event can be told apart from the free grid; callers that don't pass one keep
+ * the exact { class_id } payload they always had.
+ */
+export function trackProgressReportViewed(classId: string, surface?: string): void {
   if (!classId) return;
-  safeCapture('progress_report_viewed', { class_id: classId });
+  safeCapture('progress_report_viewed', surface ? { class_id: classId, surface } : { class_id: classId });
+}
+
+/** The gated per-student matrix rendered its paywall (entitlement resolved, not entitled). */
+export function trackProgressReportGateShown(): void {
+  safeCapture('pro_gate_shown', { surface: 'progress_report' });
+}
+
+/** Paywall primary CTA tap, immediately before the existing Polar checkout POST. */
+export function trackProgressReportUpgradeClicked(): void {
+  safeCapture('upgrade_clicked', { surface: 'progress_report' });
 }
 
 /** Teacher copied the weekly summary text. Same property as the view event. */

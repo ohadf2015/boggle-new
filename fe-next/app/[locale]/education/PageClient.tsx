@@ -13,6 +13,7 @@ import { LandingModes } from '@/components/education/landing/LandingModes';
 import { LandingHowItWorks, type GeoAnswer } from '@/components/education/landing/LandingHowItWorks';
 import { LandingSchoolLead } from '@/components/education/landing/LandingSchoolLead';
 import { LandingFinalCta } from '@/components/education/landing/LandingFinalCta';
+import { EducationLandingReveal as ScrollIn } from '@/components/education/EducationLandingReveal';
 import { isTeacherProfile } from '@/lib/education/teacherRole';
 
 /**
@@ -56,23 +57,33 @@ export function PageClient({ geo, faq }: { geo?: GeoAnswer; faq?: ReactNode }) {
         </p>
       )}
       <EducationHero setupPending={setupPending} />
-      <LandingHowItWorks geo={geo} />
-      <LandingModes />
-      <ProFramingSection
-        cta={
-          <TeacherProCheckoutCta
-            locale={language}
-            variant="inline"
-            trial
-            impression={{ cta: 'teacher_pro_trial', placement: 'education_landing' }}
-          />
-        }
-      />
-      <LandingSchoolLead />
-      {faq}
-      <LandingFinalCta setupPending={setupPending} />
-      <div className="mx-auto w-full max-w-6xl px-4 pb-12 sm:px-6 lg:px-8">
-        <NoAccountCta locale={language} compact ctaStyle="link" />
+      <ScrollIn>
+        <LandingHowItWorks geo={geo} />
+      </ScrollIn>
+      <ScrollIn>
+        <LandingModes />
+      </ScrollIn>
+      <ScrollIn>
+        <ProFramingSection
+          cta={
+            <TeacherProCheckoutCta
+              locale={language}
+              variant="inline"
+              trial
+              impression={{ cta: 'teacher_pro_trial', placement: 'education_landing' }}
+            />
+          }
+        />
+      </ScrollIn>
+      <ScrollIn>
+        <LandingSchoolLead />
+      </ScrollIn>
+      {faq && <ScrollIn>{faq}</ScrollIn>}
+      <ScrollIn>
+        <LandingFinalCta setupPending={setupPending} />
+      </ScrollIn>
+      <div className="mx-auto flex w-full max-w-6xl justify-center px-4 pb-12 pt-8 sm:px-6 sm:pt-10 lg:px-8">
+        <NoAccountCta locale={language} compact ctaStyle="link" className="w-full" />
       </div>
     </main>
   );

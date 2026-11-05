@@ -78,8 +78,7 @@ describe('landing gotrue defer', () => {
     expect(src).toMatch(/import\(\s*(?:\/\*[\s\S]*?\*\/\s*)?['"]@\/contexts\/AuthProvider['"]\s*\)/);
     expect(src).toMatch(/webpackPrefetch:\s*false/);
     expect(src).toMatch(/webpackPreload:\s*false/);
-    expect(src).toMatch(/pointerdown/);
-    expect(src).toMatch(/keydown/);
+    expect(src).toMatch(/useLandingAuthGate/);
     expect(src).not.toMatch(/['"]scroll['"]/);
     expect(src).not.toMatch(/from\s+['"]@\/contexts\/AuthProvider['"]/);
     expect(src).not.toMatch(/from\s+['"]@\/lib\/supabase['"]/);
@@ -111,6 +110,32 @@ describe('landing gotrue defer', () => {
     expect(readFileSync(authFetch, 'utf8')).not.toMatch(/from\s+['"]@\/lib\/supabase['"]/);
     expect(readFileSync(growth, 'utf8')).toMatch(/shouldDeferLandingGotrue/);
   });
+
+  it('keeps the supabase client out of the landing page dynamic group', () => {
+    const pageClient = join(feRoot, 'app', '[locale]', 'PageClient.tsx');
+    const rel = [...reachableFrom(pageClient)].map((f) => f.slice(feRoot.length + 1));
+    const offenders = rel.filter(
+      (f) => /^lib\/supabase(\.ts|Enhanced\.ts|\/)/.test(f) || f.startsWith('utils/supabase/client'),
+    );
+    expect(offenders).toEqual([]);
+    const nav = readFileSync(join(feRoot, 'components', 'GlobalBottomNav.tsx'), 'utf8');
+    expect(nav).toMatch(/\(authGateOpen \|\| showAuthModal\) && \(\s*<AuthModal/);
+    for (const file of rel) {
+      const src = stripComments(readFileSync(join(feRoot, file), 'utf8'));
+      expect(src, file).not.toMatch(/(?:import|export)\s+(?!type\b)[^;]*from\s+['"]@supabase\//);
+    }
+  });
+
+  it.each(['components/auth/AuthModal.tsx', 'components/auth/FirstWinSignupModal.tsx', 'components/auth/GoogleOneTapInitializer.tsx'])(
+    'lets %s open without waiting for the supabase client',
+    (start) => {
+      const rel = [...reachableFrom(join(feRoot, start))].map((f) => f.slice(feRoot.length + 1));
+      const offenders = rel.filter(
+        (f) => /^lib\/supabase(\.ts|Enhanced\.ts|\/)/.test(f) || f.startsWith('utils/supabase/client'),
+      );
+      expect(offenders).toEqual([]);
+    },
+  );
 
   it('does not statically import the supabase client from the landing page or site chrome', () => {
     const home = join(feRoot, 'app', '[locale]', '(home)', 'HomeClient.tsx');
