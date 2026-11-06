@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { getSupabaseAdmin } from '@/lib/email';
 import { captureApiError } from '@/utils/sentry';
+import { utcDateKey } from '@/lib/wordTower/dailySeed';
 import {
   type Db,
   ESTATES,
@@ -57,6 +58,34 @@ async function nearest(db: Db, me: string, district: number, bestM: number): Pro
   return picked;
 }
 
+/**
+ * `?daily=<lang>`: the daily results ask for people who climbed TODAY. Signed-in
+ * daily players with an estate come first, closest to my own climb; the usual
+ * nearest estates fill the rest. Returns player id -> today's metres.
+ */
+async function todaysRivals(db: Db, me: string, language: string): Promise<{ picked: Row[]; dailyM: Map<string, number> }> {
+  const attempts = await rows(
+    db.from('daily_word_tower_attempts')
+      .select('player_id, best_height_m')
+      .eq('puzzle_date', utcDateKey())
+      .eq('language', language)
+      .not('player_id', 'is', null)
+      .order('best_height_m', { ascending: false })
+      .limit(50),
+  );
+  const dailyM = new Map(attempts.map((a) => [String(a.player_id), Number(a.best_height_m) || 0]));
+  const myM = dailyM.get(me) ?? 0;
+  dailyM.delete(me);
+  if (dailyM.size === 0) return { picked: [], dailyM };
+  const estates = await rows(db.from(ESTATES).select(ESTATE_COLS).in('player_id', [...dailyM.keys()]));
+  const picked = estates
+    .map((r) => ({ r, d: Math.abs((dailyM.get(String(r.player_id)) ?? 0) - myM) }))
+    .sort((a, b) => a.d - b.d)
+    .slice(0, RIVALS)
+    .map((x) => x.r);
+  return { picked, dailyM };
+}
+
 export async function GET(request: NextRequest) {
   try {
     const user = await getAuthedUser(request, { writes: true });
@@ -65,7 +94,9 @@ export async function GET(request: NextRequest) {
     if (!db) return NextResponse.json({ error: 'db unavailable' }, { status: 503 });
 
     const { estate: mine } = await loadOrCreateEstate(db, user.id);
-    const [near, raids] = await Promise.all([
+    const dailyLang = new URL(request.url).searchParams.get('daily')?.slice(0, 8) || null;
+    const today = dailyLang ? await todaysRivals(db, user.id, dailyLang) : { picked: [], dailyM: new Map<string, number>() };
+    const [nearby, raids] = await Promise.all([
       nearest(db, user.id, mine.district, mine.bestM),
       rows(
         db.from(RAIDS)
@@ -76,6 +107,12 @@ export async function GET(request: NextRequest) {
           .limit(REVENGE * 2),
       ),
     ]);
+
+    const near = [...today.picked];
+    for (const r of nearby) {
+      if (near.length >= RIVALS) break;
+      if (!near.some((p) => String(p.player_id) === String(r.player_id))) near.push(r);
+    }
 
     // Latest un-avenged raid per attacker.
     const revengeRaids: Row[] = [];
@@ -134,6 +171,7 @@ export async function GET(request: NextRequest) {
         bestM: e?.bestM ?? 0,
         lastTower: e?.lastTower ?? [],
         ruins: ruinsOf(id),
+        dailyM: today.dailyM.get(id) ?? null,
       };
     };
 

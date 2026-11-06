@@ -125,6 +125,7 @@ export function DailyTowerResults(p: Props) {
                 estate={p.rivals.estate}
                 myTower={p.rivals.myTower}
                 myHeightM={p.peakM}
+                dailyLanguage={p.rivals.dailyLanguage}
                 onPick={(rival, revenge) => setTarget({ rival, revenge })}
               />
             ) : null}

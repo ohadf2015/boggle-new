@@ -17,7 +17,7 @@ type T = (key: string, params?: Record<string, string | number>) => string;
  * do here — with a big labelled button for keyboard and screen readers.
  */
 export function WreckScene({
-  t, title, titleChip, words, tower, balls, reducedMotion, aftermath, overlay, targetIndex, targetWord, hideDamage, onShare, onFinish, onClose,
+  t, title, titleChip, words, tower, balls, reducedMotion, aftermath, overlay, targetIndex, targetWord, hideDamage, onShare, onFinish, onClose, closeLabel,
 }: {
   t: T;
   /** Already translated: "Dana's tower" or "Your tower". */
@@ -56,6 +56,8 @@ export function WreckScene({
    */
   onFinish?: (result: { wrecked: number; total: number }) => void;
   onClose: () => void;
+  /** End card's way out; defaults to "Play again" (the share-link round restarts the run). */
+  closeLabel?: string;
 }) {
   const floors = useMemo(() => tower ?? towerFromWords(words ?? []), [tower, words]);
   const cutRef = useRef<() => void>(() => {});
@@ -229,21 +231,24 @@ export function WreckScene({
               {t('wordTowerV2.wreck.result', { n: state.wrecked, total: state.total })}
             </p>
             <p className="mt-1 font-neo-display text-6xl font-black tabular-nums">{pct}%</p>
+            {onShare ? (
+              <button
+                type="button"
+                onClick={onShare}
+                autoFocus
+                className="mt-5 flex w-full items-center justify-center gap-2 rounded-neo border-neo-thick border-black bg-neo-cyan px-6 py-3 font-neo-display text-xl font-black uppercase text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
+              >
+                <Send className="h-5 w-5" aria-hidden />
+                {t('wordTowerV2.wreck.share')}
+              </button>
+            ) : null}
             <button
               type="button"
-              onClick={() => onShare?.()}
-              autoFocus
-              className="mt-5 flex w-full items-center justify-center gap-2 rounded-neo border-neo-thick border-black bg-neo-cyan px-6 py-3 font-neo-display text-xl font-black uppercase text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
-            >
-              <Send className="h-5 w-5" aria-hidden />
-              {t('wordTowerV2.wreck.share')}
-            </button>
-            <button
-              type="button"
+              autoFocus={!onShare}
               onClick={onClose}
               className="mt-3 w-full rounded-neo border-neo-thick border-black bg-neo-pink px-6 py-3 font-neo-display text-xl font-black uppercase text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
             >
-              {t('wordTowerV2.wreck.back')}
+              {closeLabel ?? t('wordTowerV2.wreck.back')}
             </button>
           </div>
         </div>

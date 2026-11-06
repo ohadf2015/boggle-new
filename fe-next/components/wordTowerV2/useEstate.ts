@@ -68,6 +68,8 @@ export interface RivalView {
   lastTower: TowerBlock[];
   /** Recent damaging raids on this tower — visible to everyone who battled it. */
   ruins?: { count: number; by: string[]; byYou: boolean };
+  /** Metres they grew on today's daily, when the board asked for daily rivals. */
+  dailyM?: number | null;
 }
 
 export interface RevengeEntry {
@@ -104,7 +106,8 @@ export interface UseEstate {
   /** Coins -> one more wrecking ball (raid charge). Signed in only: guests cannot raid. */
   buyCharge: () => Promise<{ ok: true } | { ok: false; reason: string }>;
   /** null for guests (show the sign-in CTA). */
-  rivals: () => Promise<{ rivals: RivalView[]; revenge: RevengeEntry[] } | null>;
+  /** `dailyLanguage`: today's daily players first (the daily results board). */
+  rivals: (dailyLanguage?: string) => Promise<{ rivals: RivalView[]; revenge: RevengeEntry[] } | null>;
   /** null for guests. `accuracy` 0..1 from the wreck mini-game; the server clamps it. */
   raid: (defenderId: string, accuracy: number, revenge?: boolean) => Promise<RaidResult | { error: string } | null>;
   markSeen: (ids?: string[]) => Promise<void>;
@@ -332,9 +335,10 @@ export function useEstate(): UseEstate {
   const upgrade = useCallback((slot: PlotSlot) => spend('upgrade', slot), [spend]);
   const repair = useCallback((slot: PlotSlot) => spend('repair', slot), [spend]);
 
-  const rivals = useCallback<UseEstate['rivals']>(async () => {
+  const rivals = useCallback<UseEstate['rivals']>(async (dailyLanguage) => {
     if (!authed) return null;
-    const res = await getWithAuth(`${API}/rivals`, { requireSession: true });
+    const qs = dailyLanguage ? `?daily=${encodeURIComponent(dailyLanguage)}` : '';
+    const res = await getWithAuth(`${API}/rivals${qs}`, { requireSession: true });
     const body = res.ok ? await readJson(res) : null;
     if (!body) return { rivals: [], revenge: [] };
     return {

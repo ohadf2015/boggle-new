@@ -23,3 +23,13 @@ describe('recordV2DailyClimb — guest board name', () => {
     expect(body).not.toHaveProperty('displayName');
   });
 });
+
+describe('recordV2DailyClimb — tower words', () => {
+  it('Given the standing tower, Then the submit body carries its words for the rival board', () => {
+    const body = recordV2DailyClimb(
+      { climbM: 8, floors: 3, longestWord: 'tower', towerWords: ['sun', 'tower'] },
+      { language: 'en', guestFingerprint: 'g_1', storage: mem() },
+    );
+    expect(body).toMatchObject({ towerWords: ['sun', 'tower'] });
+  });
+});

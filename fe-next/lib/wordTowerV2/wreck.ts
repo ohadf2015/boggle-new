@@ -17,7 +17,7 @@ import { despawnBounds } from './debris';
 import type { TowerBlock } from './estateTower';
 import { cleanUntrustedText } from './sanitizeText';
 import { BLOCK_HEIGHT_PX, blockWidthForWord } from './scoring';
-import { isBlockedWord } from './blocked';
+import { sanitizeWords } from './towerWords';
 
 export { MAX_BALLS } from './run';
 
@@ -374,25 +374,17 @@ export function ballSpent(w: WreckWorld): boolean {
 
 // ── Share link ───────────────────────────────────────────────────────────────
 
+export { sanitizeWords };
+
 export interface RivalTower {
   name: string;
   words: string[];
 }
 
 const MAX_NAME = 20;
-const MAX_WORDS = 30;
 const MAX_WORD = 15;
 // Controls, zero-width and bidi overrides are stripped (see sanitizeText.ts).
 const clean = cleanUntrustedText;
-
-/** Untrusted word list (share link, review URL) -> safe, clamped labels. */
-export function sanitizeWords(raw: unknown[]): string[] {
-  return raw
-    .filter((x): x is string => typeof x === 'string')
-    .slice(0, MAX_WORDS)
-    .map((x) => clean(x, MAX_WORD))
-    .filter((w) => w && !isBlockedWord(w));
-}
 
 export function encodeRival(r: RivalTower): string {
   // Encode the same clamp decode applies — a 200-floor word list blows past

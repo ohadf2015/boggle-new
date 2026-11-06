@@ -98,6 +98,16 @@ export function seedDemoTower(
 }
 
 /**
+ * Where a seeded tower's run starts. Right after seeding the top floors are
+ * still settling, so the measured peak sits a floor or two short and the first
+ * loop tick "climbs" the rest: a restored daily opened straight onto a perk draft.
+ * The seeded floors are standing by construction, so count them all.
+ */
+export function seededPeakM(world: TowerWorld, floors: number): number {
+  return Math.max(world.runPeakPx / PX_PER_M, getTowerHeightM(world), (floors * BLOCK_HEIGHT_PX) / PX_PER_M);
+}
+
+/**
  * Every landed floor's word, lowest first, and the height those floors reach —
  * what the persistent daily tower saves. Unlike `towerBlocksFrom` (a rival's
  * 60-floor copy, lowest first) nothing is cut off the TOP.

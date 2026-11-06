@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BIOMES, biomeAt, floorsAt, lerpColour, skyAt } from '../biomes';
+import { BIOMES, CRITTER_KINDS, biomeAt, floorsAt, lerpColour, skyAt } from '../biomes';
 
 describe('floorsAt', () => {
   it('given 3m storeys, when a height is converted, then it counts floors', () => {
@@ -84,5 +84,16 @@ describe('lerpColour', () => {
     expect(lerpColour(0x000000, 0xffffff, 0)).toBe(0x000000);
     expect(lerpColour(0x000000, 0xffffff, 1)).toBe(0xffffff);
     expect(lerpColour(0x000000, 0x0000ff, 0.5)).toBe(0x000080);
+  });
+});
+
+describe('sky critters', () => {
+  it('given every sky above the street, when read, then something with a face lives there', () => {
+    for (const b of BIOMES.slice(1)) expect(b.props.some((p) => CRITTER_KINDS.includes(p))).toBe(true);
+  });
+
+  it('given space, when read, then the UFO and the astronaut are up there', () => {
+    const space = BIOMES.filter((b) => b.id === 'orbit' || b.id === 'cosmos').flatMap((b) => b.props);
+    expect(space).toEqual(expect.arrayContaining(['ufo', 'astronaut']));
   });
 });

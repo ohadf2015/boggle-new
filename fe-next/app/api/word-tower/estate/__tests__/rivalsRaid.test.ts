@@ -146,6 +146,43 @@ describe('GET /api/word-tower/estate/rivals', () => {
     expect(has(raidCall.ops, 'eq', 'defender_id', ME)).toBe(true);
     expect(has(raidCall.ops, 'is', 'avenged_at', null)).toBe(true);
   });
+
+  it('given ?daily=en, when listed, then today\'s signed-in daily players closest to my climb come first, with their metres', async () => {
+    const mine = row({ best_m: 30 });
+    const db = fakeDb({
+      daily_word_tower_attempts: () => ({
+        data: [
+          { player_id: ME, best_height_m: 20 },
+          { player_id: R4, best_height_m: 90 },
+          { player_id: R2, best_height_m: 24 },
+        ],
+        error: null,
+      }),
+      word_tower_estates: (ops: Op[]) => {
+        if (has(ops, 'eq', 'player_id', ME)) return { data: mine, error: null };
+        if (has(ops, 'in')) return { data: (argOf(ops, 'in', 1) as string[]).map((id) => row({ player_id: id, best_m: 5 })), error: null };
+        if (has(ops, 'gte')) return { data: [row({ player_id: THEM, best_m: 31 })], error: null };
+        if (has(ops, 'lt')) return { data: [row({ player_id: R3, best_m: 29 })], error: null };
+        return { data: [], error: null };
+      },
+      word_tower_raids: () => ({ data: [], error: null }),
+      profiles: (ops: Op[]) => ({ data: (argOf(ops, 'in', 1) as string[]).map((id) => profile(id, 'n')), error: null }),
+    });
+    (getSupabaseAdmin as any).mockReturnValue(db.client);
+    const b = await body(await getRivals({ url: 'http://x/api/word-tower/estate/rivals?daily=en' } as never));
+    expect(b.rivals.map((r: { userId: string }) => r.userId)).toEqual([R2, R4, THEM]);
+    expect(b.rivals[0].dailyM).toBe(24);
+    expect(b.rivals[2].dailyM).toBeNull();
+    const daily = db.calls.find((c) => c.table === 'daily_word_tower_attempts')!;
+    expect(has(daily.ops, 'eq', 'language', 'en')).toBe(true);
+  });
+
+  it('given no ?daily, when listed, then the daily table is never read', async () => {
+    const db = rivalsDb();
+    (getSupabaseAdmin as any).mockReturnValue(db.client);
+    await getRivals(getReq());
+    expect(db.calls.some((c) => c.table === 'daily_word_tower_attempts')).toBe(false);
+  });
 });
 
 /** The raid rpc call (a legacy-coin fold may run sync_coins before it). */

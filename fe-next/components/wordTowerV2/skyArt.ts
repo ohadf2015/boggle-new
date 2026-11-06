@@ -1,6 +1,7 @@
 import { Container, Graphics } from 'pixi.js';
-import { type PropKind, type Sky, type SkyFx, lerpColour } from '@/lib/wordTowerV2/biomes';
+import { type CritterKind, type PropKind, type Sky, type SkyFx, lerpColour } from '@/lib/wordTowerV2/biomes';
 import type { SkyProp } from '@/lib/wordTowerV2/scenery';
+import { buildCritter, isCritter } from './skyCritters';
 
 /**
  * The v2 sky, drawn by Pixi on the tower's own camera.
@@ -27,6 +28,9 @@ const STAR_COUNT = 150;
 const PROP_PARALLAX = 0.7;
 const STAR_PARALLAX = 0.08;
 const BALLOON_COLOURS = [0xff4d9d, 0xbfff00, 0x37e0ff, 0xffe135, 0xb06cff];
+const BOBS = new Set<PropKind>(['balloon', 'blimp', 'whale', 'puff', 'ufo']);
+/** Screen px/s a drifter crosses at; anything not listed holds its x. */
+const DRIFT: Partial<Record<PropKind, number>> = { jet: 60, comet: 40, bird: 26, ufo: 22, whale: 14, blimp: 10, cloud: 7, puff: 7, astronaut: 5 };
 
 /** mulberry32 — star positions only; deterministic so resizes do not reshuffle. */
 function rng(seed: number): () => number {
@@ -115,7 +119,7 @@ function drawComet(g: Graphics, s: number): void {
 function drawProp(g: Graphics, prop: SkyProp, w: number): void {
   const s = prop.size;
   const colour = BALLOON_COLOURS[Math.floor(prop.phase * BALLOON_COLOURS.length)];
-  const draw: Record<PropKind, () => void> = {
+  const draw: Record<Exclude<PropKind, CritterKind>, () => void> = {
     cloud: () => drawCloud(g, s),
     bird: () => drawBird(g, s),
     balloon: () => drawBalloon(g, s, colour),
@@ -125,7 +129,7 @@ function drawProp(g: Graphics, prop: SkyProp, w: number): void {
     planet: () => drawPlanet(g, s, colour),
     comet: () => drawComet(g, s),
   };
-  draw[prop.kind]();
+  if (!isCritter(prop.kind)) draw[prop.kind]();
 }
 
 
@@ -248,7 +252,8 @@ function placeFx(g: Graphics, kind: SkyFx, f: SkyFrame): void {
 
 interface PropView {
   prop: SkyProp;
-  g: Graphics | null;
+  g: Container | null;
+  tick?: (t: number) => void;
 }
 
 export interface SkyFrame {
@@ -340,25 +345,33 @@ export class SkyLayer {
         continue;
       }
       if (!v.g) {
-        v.g = new Graphics();
-        drawProp(v.g, prop, w);
+        if (isCritter(prop.kind)) {
+          const critter = buildCritter(prop.kind, prop.size, prop.phase);
+          v.g = critter.root;
+          v.tick = critter.tick;
+        } else {
+          const g = new Graphics();
+          drawProp(g, prop, w);
+          v.g = g;
+        }
         this.propLayer.addChild(v.g);
       }
       v.g.visible = true;
       this.place(v.g, prop, f, y);
+      v.tick?.(f.reducedMotion ? 0 : f.ts / 1000);
     }
   }
 
-  private place(g: Graphics, prop: SkyProp, f: SkyFrame, y: number): void {
+  private place(g: Container, prop: SkyProp, f: SkyFrame, y: number): void {
     const { w, ts, reducedMotion } = f;
     const t = reducedMotion ? 0 : ts / 1000;
     const span = w + 240;
     // Drifters wrap across the screen; everything else holds its x.
-    const speed = prop.kind === 'jet' ? 60 : prop.kind === 'comet' ? 40 : prop.kind === 'bird' ? 26 : prop.kind === 'cloud' ? 7 : 0;
+    const speed = DRIFT[prop.kind] ?? 0;
     const dir = prop.phase < 0.5 ? -1 : 1;
     const home = w / 2 + prop.x * (w / 2);
     const x = speed ? ((((home + dir * speed * t * prop.size + 120) % span) + span) % span) - 120 : home;
-    g.position.set(x, y + (prop.kind === 'balloon' ? Math.sin(t * 1.3 + prop.phase * 6) * 6 : 0));
+    g.position.set(x, y + (BOBS.has(prop.kind) ? Math.sin(t * 1.3 + prop.phase * 6) * 6 : 0));
     g.scale.x = speed && dir < 0 ? -1 : 1;
     if (prop.kind === 'bird') g.scale.y = 0.6 + 0.4 * Math.abs(Math.sin(t * 7 + prop.phase * 9));
     if (prop.kind === 'satellite') g.rotation = Math.sin(t * 0.4 + prop.phase * 6) * 0.3;

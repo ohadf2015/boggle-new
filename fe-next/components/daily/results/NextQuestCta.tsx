@@ -175,11 +175,12 @@ export function NextQuestCta({
       data-testid="next-quest-cta"
       data-next-mode={mode.id}
       className={cn(
-        'group relative w-full overflow-hidden px-4 py-4 md:px-6 md:py-5 rounded-xl',
+        // Sized by its own width: on desktop it sits in a narrow side column, where viewport `md:` sizes clipped the title.
+        '@container group relative w-full overflow-hidden px-4 py-4 @md:px-6 @md:py-5 rounded-xl',
         SLAB_HEIGHT,
         'border-3 border-neo-black shadow-hard-lg',
         accent.fill,
-        'flex items-center gap-4 md:gap-6 text-start cursor-pointer',
+        'flex items-center gap-4 @md:gap-6 text-start cursor-pointer',
         'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cream',
         'hover:brightness-110 active:translate-y-0.5 active:shadow-none transition-[transform,translate,scale,rotate,box-shadow,filter]',
         className,
@@ -192,11 +193,11 @@ export function NextQuestCta({
         role="presentation"
         data-art-url={mode.art}
         style={{ backgroundImage: `url(${mode.art})` }}
-        className="relative shrink-0 w-20 h-20 md:w-28 md:h-28 rounded-xl bg-cover bg-center border-3 border-neo-black"
+        className="relative shrink-0 w-20 h-20 @md:w-28 @md:h-28 rounded-xl bg-cover bg-center border-3 border-neo-black"
       />
 
       <span className="relative flex-1 min-w-0">
-        <span className="flex items-center gap-2 text-xs md:text-sm font-black uppercase tracking-wide text-neo-black/80">
+        <span className="flex items-center gap-2 text-xs @md:text-sm font-black uppercase tracking-wide text-neo-black/80">
           {t('daily.nextUp')}
           <span aria-hidden="true" data-testid="next-quest-pips" className="flex items-center gap-1">
             {pips.map((pip, i) => (
@@ -204,7 +205,7 @@ export function NextQuestCta({
             ))}
           </span>
         </span>
-        <span className="block mt-1 text-2xl md:text-4xl leading-none font-neo-display font-black uppercase text-neo-black line-clamp-2">
+        <span className="block mt-1 text-2xl @md:text-4xl leading-none font-neo-display font-black uppercase text-neo-black line-clamp-2">
           {t(mode.titleKey)}
         </span>
       </span>
@@ -213,12 +214,12 @@ export function NextQuestCta({
         ref={arrowRef}
         aria-hidden="true"
         className={cn(
-          'relative shrink-0 w-14 h-14 md:w-20 md:h-20 rounded-full border-3 border-neo-black bg-neo-black flex items-center justify-center',
+          'relative shrink-0 w-14 h-14 @md:w-20 @md:h-20 rounded-full border-3 border-neo-black bg-neo-black flex items-center justify-center',
           'shadow-hard-sm transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5',
           accent.chip,
         )}
       >
-        <ArrowRight className="w-7 h-7 md:w-10 md:h-10 rtl:rotate-180" strokeWidth={3.5} />
+        <ArrowRight className="w-7 h-7 @md:w-10 @md:h-10 rtl:rotate-180" strokeWidth={3.5} />
       </span>
     </Link>
   );

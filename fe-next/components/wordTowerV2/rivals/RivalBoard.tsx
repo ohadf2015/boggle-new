@@ -28,9 +28,10 @@ interface Props {
   myHeightM: number;
   /** `revenge` = the raid this swing answers (null = an ordinary wreck). */
   onPick: (rival: RivalView, revenge: RevengeEntry | null) => void;
+  dailyLanguage?: string;
 }
 
-export function RivalBoard({ t, estate, myTower, myHeightM, onPick }: Props) {
+export function RivalBoard({ t, estate, myTower, myHeightM, onPick, dailyLanguage }: Props) {
   const { profile, user } = useAuth();
   const [state, setState] = useState<{ rivals: RivalView[]; revenge: RevengeEntry[] } | null>(null);
   const [failed, setFailed] = useState(false);
@@ -39,7 +40,7 @@ export function RivalBoard({ t, estate, myTower, myHeightM, onPick }: Props) {
   useEffect(() => {
     if (!authed) return;
     let live = true;
-    fetchRivals()
+    fetchRivals(dailyLanguage)
       .then((r) => {
         if (live) setState(r ?? { rivals: [], revenge: [] });
       })
@@ -47,7 +48,7 @@ export function RivalBoard({ t, estate, myTower, myHeightM, onPick }: Props) {
     return () => {
       live = false;
     };
-  }, [authed, fetchRivals]);
+  }, [authed, fetchRivals, dailyLanguage]);
 
   // Auth resolves late: show the board's own loading state until it settles, or
   // a signed-in player gets a flash of the guest sign-in pitch first.
@@ -130,7 +131,7 @@ export function RivalBoard({ t, estate, myTower, myHeightM, onPick }: Props) {
 
 function Panel({ t, children }: { t: T; children: React.ReactNode }) {
   return (
-    <section className="mt-4 rounded-neo border-neo-thick border-black bg-neo-navy p-2.5 text-neo-cream shadow-hard md:mt-0 md:p-4">
+    <section className="mt-4 rounded-neo border-neo-thick border-neo-cream/40 bg-neo-navy p-2.5 text-neo-cream shadow-hard md:mt-0 md:p-4">
       <h3 className="flex items-center justify-center gap-1.5 font-neo-display text-sm font-black uppercase tracking-widest text-neo-lime md:text-lg">
         <Swords className="h-4 w-4 md:h-5 md:w-5" aria-hidden />
         {t('wordTowerV2.rivals.title')}
@@ -176,6 +177,11 @@ function Column({
       </div>
       <p className="truncate text-center font-neo-display text-[11px] font-bold">{s.name}</p>
       {s.rival?.ruins && s.rival.ruins.count > 0 ? <RuinChip t={t} ruins={s.rival.ruins} /> : null}
+      {s.rival?.dailyM ? (
+        <p className="truncate text-center font-neo-display text-[10px] font-black text-neo-yellow">
+          {t('wordTowerV2.dailyTower.todayM', { m: s.rival.dailyM })}
+        </p>
+      ) : null}
       <p className="text-center font-neo-display text-sm font-black tabular-nums text-neo-lime">
         {s.heightM.toFixed(0)}
         {t('wordTowerV2.unitM')}
@@ -195,7 +201,7 @@ function Column({
       onClick={() => s.rival && onPick(s.rival, null)}
       disabled={!canWreck}
       aria-label={t('wordTowerV2.rivals.wreckName', { name: s.name })}
-      className="w-full rounded-neo border-neo border-black bg-neo-navy-light p-1.5 pb-2 text-start shadow-hard-sm transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:opacity-50 motion-safe:hover:-translate-y-0.5"
+      className="w-full rounded-neo border-neo border-neo-cream/40 bg-neo-navy-light p-1.5 pb-2 text-start shadow-hard-sm transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:opacity-50 motion-safe:hover:-translate-y-0.5"
     >
       {body}
       <span className="mt-1 flex items-center justify-center gap-1 rounded-sm border-neo border-black bg-neo-pink px-1 py-0.5 font-neo-display text-[10px] font-black uppercase text-neo-navy">

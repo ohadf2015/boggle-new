@@ -37,7 +37,7 @@ import { MAGNET_VX_MUL, landingModsFor } from './rush/rushHelpers';
 import type { RushApi } from './rush/useRush';
 import { useRushBridge } from './rush/useRushBridge';
 import { useRunBanners } from './useRunBanners';
-import { type Hanging, LANDING_SOUND, type PendingLanding, REWARD_SOUND, dampSway, recordLanding, readBest, seedDemoTower, standing, supportTop, writeBest } from './runHelpers';
+import { type Hanging, LANDING_SOUND, type PendingLanding, REWARD_SOUND, dampSway, recordLanding, readBest, seedDemoTower, seededPeakM, standing, supportTop, writeBest } from './runHelpers';
 
 /** Word Tower v2 run loop: judges the SETTLED sim; a crash that leaves floors standing clears the rubble and the run goes on. */
 
@@ -472,7 +472,7 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean; rus
   /** A seeded tower is not climbed this run: no drafts or overtakes for floors already there. */
   const adoptSeededTower = useCallback(() => {
     baseIdRef.current = 'r0-b0';
-    rushRef.current?.baseline(Math.max(worldRef.current.runPeakPx / PX_PER_M, getTowerHeightM(worldRef.current)));
+    rushRef.current?.baseline(seededPeakM(worldRef.current, dropCountRef.current));
   }, [rushRef]);
 
   /** Review hook (`?demo=1`, optionally `&words=a,b,c` to see another script). */

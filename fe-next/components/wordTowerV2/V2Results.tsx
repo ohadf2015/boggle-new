@@ -66,6 +66,7 @@ export interface V2ResultsProps {
     myTower: TowerBlock[];
     /** A raid takes the whole screen: the parent pauses the game canvas. */
     onRaidOpen: (open: boolean) => void;
+    dailyLanguage?: string;
   };
 }
 

@@ -39,6 +39,7 @@ import { utcDateKey } from '@/lib/wordTower/dailySeed';
 import { creditDailyQuests } from '@/lib/daily/questSeams';
 import { questResultForWordTower } from '@/shared/dailyQuestPool';
 import { acceptGuestBoardName } from '@/lib/daily/guestBoardName';
+import { dailyTowerWords } from '@/lib/wordTowerV2/towerWords';
 
 export const runtime = 'nodejs';
 
@@ -62,6 +63,8 @@ interface SubmitBody {
    * toast would fire for metres the player then loses).
    */
   final?: boolean;
+  /** The standing tower's words, so today's rivals can see and wreck it. */
+  towerWords?: unknown;
 }
 
 export async function POST(request: NextRequest) {
@@ -96,6 +99,7 @@ export async function POST(request: NextRequest) {
       : { column: 'guest_fingerprint' as const, value: guestFingerprint as string };
 
     const floors = Math.floor(Number(body.floors) || 0);
+    const towerWords = dailyTowerWords(body.towerWords);
     const lookup = () =>
       supabase
         .from('daily_word_tower_attempts')
@@ -126,6 +130,7 @@ export async function POST(request: NextRequest) {
           longest_word: body.longestWord ?? null,
           completed_at: new Date().toISOString(),
           ...(guestName ? { display_name: guestName } : {}),
+          ...(towerWords ? { tower_words: towerWords } : {}),
         })
         .eq('id', existing.id);
       if (error) {
@@ -150,6 +155,7 @@ export async function POST(request: NextRequest) {
       floors,
       longest_word: body.longestWord ?? null,
       completed_at: new Date().toISOString(),
+      tower_words: towerWords,
     });
 
     if (error) {
@@ -188,7 +194,7 @@ export async function GET(request: NextRequest) {
     // return zero rows with error:null for every other player.
     const { data: rows, error } = await supabase
       .from('daily_word_tower_leaderboard')
-      .select('player_id, guest_fingerprint, display_name, avatar_emoji, avatar_color, custom_avatar, best_height_m, floors, rank_position')
+      .select('player_id, guest_fingerprint, display_name, avatar_emoji, avatar_color, custom_avatar, best_height_m, floors, rank_position, tower_words')
       .eq('puzzle_date', puzzleDate)
       .eq('language', language)
       .order('rank_position', { ascending: true })
@@ -216,6 +222,7 @@ export async function GET(request: NextRequest) {
       avatarColor: r.avatar_color ?? null,
       bestHeightM: Number(r.best_height_m) || 0,
       floors: r.floors ?? 0,
+      words: Array.isArray(r.tower_words) ? (r.tower_words as string[]) : [],
     }));
 
     return NextResponse.json(
