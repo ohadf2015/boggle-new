@@ -48,6 +48,10 @@ const faqs = [
     a: "LexiClash is a free multiplayer word game like Words With Friends, with one big difference: every player searches the same letter grid simultaneously, in real-time, instead of taking turns. A full match takes 2-3 minutes instead of waiting days for your friend's next move. It's the same social-word-game itch, scratched faster.",
   },
   {
+    q: 'Is there a real-time alternative to Words With Friends that works without an app?',
+    a: "Yes, LexiClash. It runs in the browser on your phone or computer, so there is nothing to install. Instead of taking turns over days, everyone plays the same letter grid at the same time and a round is over in about three minutes. Open a room, send your friends the link, and you can be playing in under a minute.",
+  },
+  {
     q: 'Can I play word games with friends free online?',
     a: 'Yes. LexiClash is 100% free to play online with friends — no download, no signup, no pay-to-win. Create a room, share the 6-character code or QR, and your friends are in the game in seconds. Works in any modern browser on phone, tablet, or laptop.',
   },
