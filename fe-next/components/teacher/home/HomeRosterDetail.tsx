@@ -32,9 +32,15 @@ export function StatusDot({ status, className }: { status: RosterStatus; classNa
 
 // Only Behind is solid so the eye lands on who needs help, not on the many who played.
 const STATUS_PILL: Record<RosterStatus, string> = {
-  done: 'bg-neo-lime/20 text-neo-lime',
-  late: 'bg-neo-yellow text-neo-black',
-  idle: 'bg-neo-cream/15 text-neo-cream/90',
+  done: 'border-neo-lime/60 bg-neo-lime/20 text-neo-lime',
+  late: 'border-neo-black bg-neo-yellow text-neo-black shadow-hard-sm',
+  idle: 'border-neo-cream/30 bg-neo-cream/15 text-neo-cream/90',
+};
+
+export const STATUS_RING: Record<RosterStatus, string> = {
+  done: 'ring-neo-lime',
+  late: 'ring-neo-yellow',
+  idle: 'ring-neo-cream/30',
 };
 
 export function StatusPill({ status, label }: { status: RosterStatus; label: string }) {
@@ -42,7 +48,7 @@ export function StatusPill({ status, label }: { status: RosterStatus; label: str
     <span
       data-testid="home-roster-pill"
       data-status={status}
-      className={cn('inline-block max-w-full truncate rounded-full px-2.5 py-0.5 font-neo-body text-xs font-black', STATUS_PILL[status])}
+      className={cn('inline-block max-w-full truncate rounded-full border-2 px-2 py-px font-neo-body text-xs font-black', STATUS_PILL[status])}
     >
       {label}
     </span>

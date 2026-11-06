@@ -53,7 +53,22 @@ describe('<HomeClassRoster>', () => {
     renderRoster();
     const row = screen.getAllByTestId('home-roster-row')[0];
     expect(within(row).getByText('Ava')).toHaveClass('font-black');
-    expect(row.querySelector('[data-col="xp"]')).toHaveClass('font-bold', 'text-neo-cream');
+    const xp = row.querySelector('[data-col="xp"] [data-testid="home-roster-xp"]')!;
+    expect(xp).toHaveClass('font-black', 'rounded-full');
+    expect(xp).toHaveTextContent('900');
+    expect(xp.querySelector('svg')).not.toBeNull();
+  });
+
+  it('Given a row, Then it reads like a game roster: the avatar wears a ring in its status color and the meter is chunky and striped', () => {
+    renderRoster();
+    const rings = screen.getAllByTestId('home-roster-avatar-ring');
+    expect(rings.map((r) => r.dataset.status)).toEqual(['done', 'late', 'idle']);
+    expect(rings[0].className).toMatch(/ring-neo-lime/);
+    expect(rings[1].className).toMatch(/ring-neo-yellow/);
+    const [fill] = screen.getAllByTestId('home-roster-meter-fill');
+    expect(fill.className).toContain('edu-stripes');
+    expect(fill.parentElement!.className).toMatch(/border-2/);
+    for (const pill of screen.getAllByTestId('home-roster-pill')) expect(pill.className).toMatch(/border-2/);
   });
 
   it('Given an assign handler, Then only Behind rows get a one-tap Assign beside the row', () => {

@@ -55,17 +55,23 @@ describe('Teacher Home: calm, one primary', () => {
     render(<TeacherDashboard proOffer={{ kind: 'trial', onDismiss: vi.fn(), tracked: true }} />);
     const home = screen.getByTestId('teacher-home');
     for (const decor of home.querySelectorAll('[data-accent-decor]')) expect(decor.querySelector('a,button')).toBeNull();
-    const colors = ['games', 'students', 'active'].map((id) => screen.getByTestId(`home-week-${id}`).className.match(/text-neo-(cyan|pink|purple|yellow|orange)/)?.[1]);
+    const accent = (id: string) => {
+      const tile = screen.getByTestId(`home-week-${id}`).closest('dl > div') as HTMLElement;
+      return `${tile.className} ${screen.getByTestId(`home-week-${id}`).className}`.match(/(?:bg|text)-neo-(cyan|pink|purple|yellow|orange)/)?.[1];
+    };
+    const colors = ['games', 'students', 'active'].map(accent);
+    expect(colors.every(Boolean)).toBe(true);
     expect(new Set(colors).size).toBe(3);
   });
 
-  it('Given one class and a Pro offer, Then Start live is the only colored fill on the page apart from the small PRO badge', () => {
+  it('Given one class and a Pro offer, Then Start live is the only lime fill and every other color fill is decoration', () => {
     render(<TeacherDashboard proOffer={{ kind: 'trial', onDismiss: vi.fn(), tracked: true }} />);
-    const fills = colorFills(screen.getByTestId('teacher-home'));
+    const home = screen.getByTestId('teacher-home');
     const start = screen.getByTestId('home-start-live');
     const badge = screen.getByTestId('home-pro-badge');
-    expect(fills.filter((el) => el !== start && el !== badge)).toEqual([]);
-    expect(fills).toContain(start);
+    const limes = Array.from(home.querySelectorAll<HTMLElement>('[class]')).filter((el) => /(^|\s)bg-neo-lime(\s|$)/.test(el.getAttribute('class') ?? ''));
+    expect(limes).toEqual([start]);
+    expect(colorFills(home).filter((el) => el !== start && el !== badge)).toEqual([]);
   });
 
   it('Given three classes, Then the hero switcher picks the class and no class list stacks under the sessions', () => {
@@ -81,10 +87,24 @@ describe('Teacher Home: calm, one primary', () => {
     expect(colorFills(home).filter((el) => el !== screen.getByTestId('home-start-live'))).toEqual([]);
   });
 
-  it('Then no decorative art sits behind the text and nothing in the hero bobs', () => {
+  it('Then no decorative art sits behind the text, and every hero motion is one the stylesheet switches off for reduced motion', () => {
     const { container } = render(<TeacherDashboard />);
     expect(container.innerHTML).not.toContain('teacher-hq-bg');
-    expect(screen.getByTestId('home-hero').innerHTML).not.toMatch(/animate-\[edu-mascot-bob/);
+    const hero = screen.getByTestId('home-hero');
+    const motions = Array.from(hero.querySelectorAll<HTMLElement>('[class]'))
+      .flatMap((el) => (el.getAttribute('class') ?? '').split(/\s+/))
+      .filter((c) => /(^|:)animate-/.test(c) && c !== 'motion-reduce:animate-none');
+    expect(motions.length).toBeGreaterThan(0);
+    for (const c of motions) expect(c).toMatch(/^animate-edu-(tile-in|hop|shine|bob)$|^animate-spin$/);
+  });
+
+  it('Then the greeting has the mascot bobbing beside it and the Start button has a shine sweep', () => {
+    render(<TeacherDashboard />);
+    const mascot = screen.getByTestId('home-greeting-mascot');
+    expect(mascot.className).toContain('animate-edu-bob');
+    expect(mascot.getAttribute('aria-hidden')).toBe('true');
+    expect(screen.getByTestId('home-start-live').className).toContain('animate-edu-shine');
+    expect(screen.getByTestId('home-start-live').querySelector(':scope > .edu-shine-track[aria-hidden="true"]')).not.toBeNull();
   });
 
   it('Then the class name is cream, not a giant lime headline', () => {

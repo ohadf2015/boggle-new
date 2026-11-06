@@ -29,6 +29,8 @@ import { ClassAvatarStack } from './classroom/ClassAvatarStack';
 import { OUTLINE_BUTTON } from './home/homeStyles';
 import { RehearseWithBotsButton } from './home/RehearseWithBotsButton';
 import { ClassroomEmptyState } from './classroom/ClassroomEmptyState';
+import { NewClassSeat } from './classroom/NewClassSeat';
+import { arcadeAccentAt } from '@/lib/education/arcadeAccent';
 import { ClassCarousel } from './hq/ClassCarousel';
 import { ClassroomCardActivity } from './hq/ClassroomCardActivity';
 import { HqProjectorSheet } from './hq/HqProjectorSheet';
@@ -69,6 +71,7 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
   const revealRef = useTeacherReveal<HTMLDivElement>(`${pageSize}-${classrooms.length}`);
 
   const newClassHref = `/${language}/teacher/classroom/new`;
+  const seatFree = classrooms.length > 0 && pageSize > classrooms.length;
   const editing = classrooms.find((c) => c.id === editingId);
 
   const handleEdit = async (name: string, classroomLanguage: Language) => {
@@ -160,7 +163,7 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
           {teacherProUpgradeCtaLabel(language)}
         </Link>
       ) : null}
-      {classrooms.length > 0 ? (
+      {classrooms.length > 0 && !seatFree ? (
         <Link href={newClassHref} data-testid="classroom-create-link" className={cn(OUTLINE_BUTTON, SHORT_LANDSCAPE_BUTTON)}>
           <Plus className="size-4" aria-hidden="true" />
           {t('eduShell.home.newClass', 'New class')}
@@ -187,12 +190,24 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
             perView={pageSize}
             header={<ClassCapMeter count={classrooms.length} />}
             label={t('academy.teacher.classesTitle', 'Your classes')}
-            slides={classrooms.map((classroom) => ({
+            trailing={
+              seatFree ? (
+                <NewClassSeat
+                  href={newClassHref}
+                  label={t('eduShell.home.newClass', 'New class')}
+                  hint={t('teacher.classroom.newClassHint')}
+                  perView={pageSize}
+                  accent={arcadeAccentAt(classrooms.length)}
+                />
+              ) : undefined
+            }
+            slides={classrooms.map((classroom, index) => ({
               key: classroom.id,
               node: (
                 <div data-tm>
                   <ClassCard
                     classroom={classroom}
+                    accent={arcadeAccentAt(index)}
                     expanded={expandedId === classroom.id}
                     onToggleExpanded={() => setExpandedId(expandedId === classroom.id ? null : classroom.id)}
                     onCopy={() => copyJoinCode(classroom.id, classroom.join_code)}

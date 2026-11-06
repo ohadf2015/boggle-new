@@ -77,3 +77,19 @@ describe('HomeSessionRail flow cards', () => {
     expect(new URL(run.getAttribute('href')!, 'https://x.test').searchParams.get('session')).toBe('warm-up');
   });
 });
+
+describe('HomeSessionRail cards as game pieces', () => {
+  it('Then each card is a chunky game card that lifts and tilts on hover, neighbours tilting opposite ways, and its art bobs', () => {
+    render(<HomeSessionRail classroomId="c1" languages={['en']} gradeBand={null} nowMs={NOW} lastPlayedMs={null} ready locale="en" t={t} />);
+    const cards = screen.getAllByTestId('home-session-card');
+    const tilts = cards.map((c) => c.className.match(/hover:(-?)rotate-1/)?.[1]);
+    expect(tilts.every((x) => x !== undefined)).toBe(true);
+    tilts.slice(1).forEach((x, i) => expect(x).not.toBe(tilts[i]));
+    for (const card of cards) {
+      expect(card.className).toContain('border-[3px]');
+      expect(card.className).toContain('hover:-translate-y-1');
+      expect(card.className).toContain('motion-reduce:hover:rotate-0');
+      expect(card.querySelector('[data-accent-decor] .edu-bob-on-hover')).not.toBeNull();
+    }
+  });
+});

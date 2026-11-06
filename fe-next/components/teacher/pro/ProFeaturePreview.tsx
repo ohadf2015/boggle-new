@@ -174,11 +174,72 @@ function PracticePreview() {
   );
 }
 
-function ReportsPreview({ calm = false }: { calm?: boolean }) {
+function accuracyChip(accuracy: number): string {
+  if (accuracy >= 80) return 'bg-neo-cyan';
+  if (accuracy >= 60) return 'bg-neo-yellow';
+  return 'bg-neo-pink';
+}
+
+const AVERAGE_SEGMENTS = 10;
+
+// Diagonal stripes on the filled segments read as a game meter rather than a flat chart bar.
+const STRIPES = '[background-image:repeating-linear-gradient(135deg,transparent_0_3px,color-mix(in_srgb,rgb(var(--neo-black))_22%,transparent)_3px_5px)]';
+
+function SegmentBar({ filled, fill, className, testId }: { filled: number; fill: string; className?: string; testId?: string }) {
+  return (
+    <span data-testid={testId} aria-hidden="true" className={cn('flex gap-0.5', className)}>
+      {Array.from({ length: AVERAGE_SEGMENTS }, (_, i) => (
+        <span key={i} className={cn('h-full flex-1 rounded-[2px] border border-neo-black', i < filled ? cn(fill, STRIPES) : 'bg-neo-navy')} />
+      ))}
+    </span>
+  );
+}
+
+function ArcadeReportSheet({ names, reteach, t }: { names: string[]; reteach: string; t: T }) {
+  const average = sampleClassAverage();
+  return (
+    <div data-testid="pro-preview-report-sheet" className="rounded-neo border-2 border-neo-black bg-neo-navy-light p-2 text-neo-cream sm:p-2.5">
+      <div className="flex items-end justify-between gap-2">
+        <span className="text-[11px] font-bold sm:text-xs">{t('eg2Pro.sample.classAverage')}</span>
+        <span className="font-neo-display text-xl font-black tabular-nums text-neo-white sm:text-2xl">{average}%</span>
+      </div>
+      <SegmentBar filled={Math.round(average / AVERAGE_SEGMENTS)} fill="bg-neo-cyan" className="mt-1 h-2.5 max-sm:hidden" />
+      <ul className="mt-1 space-y-0.5 sm:mt-2 sm:space-y-1">
+        {SAMPLE_STUDENTS.map((s, i) => (
+          <li
+            key={names[i]}
+            data-testid="pro-preview-student-row"
+            className={cn('grid grid-cols-[minmax(0,4.5rem)_minmax(0,1fr)_auto] items-center gap-2 text-[11px] font-bold sm:text-xs', i >= PHONE_ROWS && 'max-sm:hidden')}
+          >
+            <span className="truncate">{names[i]}</span>
+            <SegmentBar testId="pro-preview-accuracy-bar" filled={Math.round(s.accuracy / 10)} fill={accuracyChip(s.accuracy)} className="h-2.5 sm:h-3" />
+            <span
+              data-testid="pro-preview-accuracy-chip"
+              className={cn('shrink-0 rounded-full border-2 border-neo-black px-1.5 font-neo-display text-[11px] font-black leading-[14px] tabular-nums text-neo-black sm:px-2 sm:text-xs sm:leading-4', accuracyChip(s.accuracy))}
+            >
+              {s.accuracy}%
+            </span>
+          </li>
+        ))}
+      </ul>
+      <p className="mt-2 text-[11px] font-black max-sm:hidden">{t('eg2Pro.sample.reportWords')}: {reteach}</p>
+    </div>
+  );
+}
+
+function ReportsPreview({ calm = false, arcade = false }: { calm?: boolean; arcade?: boolean }) {
   const { t, names, words } = useSample();
   const reteach = sampleHardestWords().slice(0, 3).map((i) => words[i]).join(' · ');
   return (
-    <Frame feature="reports" calm={calm} title={t('eg2Pro.sample.reportTitle', { className: t('eg2Pro.sample.className') })}>
+    <Frame
+      feature="reports"
+      calm={calm || arcade}
+      className={arcade ? 'rounded-neo-lg border-neo-black sm:border-[3px] sm:shadow-hard md:-rotate-1' : undefined}
+      title={t('eg2Pro.sample.reportTitle', { className: t('eg2Pro.sample.className') })}
+    >
+      {arcade ? (
+        <ArcadeReportSheet names={names} reteach={reteach} t={t} />
+      ) : (
       <div
         data-testid="pro-preview-report-sheet"
         className={cn('rounded-sm border-2 p-2', calm ? 'border-neo-cream/40 bg-neo-navy-light text-neo-cream' : 'border-neo-black bg-neo-white text-neo-black')}
@@ -197,6 +258,7 @@ function ReportsPreview({ calm = false }: { calm?: boolean }) {
         </ul>
         <p className="mt-1 text-[11px] font-black">{t('eg2Pro.sample.reportWords')}: {reteach}</p>
       </div>
+      )}
       <p className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-neo-white/80 max-sm:hidden">
         <Printer className="h-3.5 w-3.5" aria-hidden /> {t('eg2Pro.sample.print')}
       </p>
@@ -225,7 +287,7 @@ function DialsPreview() {
   );
 }
 
-const PREVIEWS: Record<ProFeature, (props: { calm?: boolean }) => React.JSX.Element> = {
+const PREVIEWS: Record<ProFeature, (props: { calm?: boolean; arcade?: boolean }) => React.JSX.Element> = {
   analytics: AnalyticsPreview,
   mastery: MasteryPreview,
   missedPractice: PracticePreview,
@@ -233,7 +295,8 @@ const PREVIEWS: Record<ProFeature, (props: { calm?: boolean }) => React.JSX.Elem
   pressureDials: DialsPreview,
 };
 
-export function ProFeaturePreview({ feature, calm = false }: { feature: ProFeature; calm?: boolean }) {
+/** `arcade`: game-card sample with colored accuracy chips; only the reports sample has one, others fall back to calm. */
+export function ProFeaturePreview({ feature, calm = false, arcade = false }: { feature: ProFeature; calm?: boolean; arcade?: boolean }) {
   const Preview = PREVIEWS[feature];
-  return <Preview calm={calm} />;
+  return <Preview calm={calm || arcade} arcade={arcade} />;
 }

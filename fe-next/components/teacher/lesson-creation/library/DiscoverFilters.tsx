@@ -9,9 +9,10 @@ import { nativeLanguageName } from '@/components/education/pickers/nativeLanguag
 import { GRADE_BANDS, LIBRARY_TOPICS, isGradeBand, isLibraryTopic } from '@/lib/education/library';
 import type { DiscoverFilters as Filters } from './useDiscoverLibrary';
 
-const PILL = 'inline-flex h-10 shrink-0 items-center gap-1 rounded-neo border-2 px-2.5 text-sm font-bold transition focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cream';
+const PILL =
+  'inline-flex h-10 shrink-0 items-center gap-1 rounded-full border-2 px-2.5 font-neo-display sm:px-3.5 text-sm font-bold transition-[translate,box-shadow,border-color] duration-150 hover:-translate-y-0.5 active:translate-y-0 motion-reduce:transition-none motion-reduce:hover:translate-y-0 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cream';
 const SELECT =
-  'h-10 min-w-0 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-2 text-sm font-bold text-neo-white focus:outline-hidden focus:ring-2 focus:ring-neo-cream';
+  'h-10 min-w-0 rounded-full border-2 border-neo-cream/40 bg-neo-navy-light px-2 text-sm font-bold text-neo-white focus:outline-hidden focus:ring-2 focus:ring-neo-cream';
 
 interface DiscoverFiltersProps {
   filters: Filters;
@@ -36,7 +37,7 @@ export default function DiscoverFilters({ filters, onChange, total }: DiscoverFi
             value={filters.query}
             onChange={(e) => onChange({ query: e.target.value })}
             placeholder={t('eduLibrary.discover.searchPlaceholder')}
-            className="h-11 w-full min-w-0 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light ps-9 pe-9 font-neo-body text-base text-neo-white placeholder:text-neo-cream/55 focus:border-neo-cream focus:outline-hidden"
+            className="h-11 w-full min-w-0 rounded-neo border-2 border-neo-cream/50 bg-neo-navy-light shadow-hard-sm ps-9 pe-9 font-neo-body text-base text-neo-white placeholder:text-neo-cream/55 focus:border-neo-cream focus:outline-hidden"
           />
           {filters.query && (
             <button
@@ -57,7 +58,7 @@ export default function DiscoverFilters({ filters, onChange, total }: DiscoverFi
           aria-controls="discover-more-filters"
           aria-label={t('eduLibrary.discover.filters')}
           title={t('eduLibrary.discover.filters')}
-          className="relative flex h-11 shrink-0 items-center gap-1.5 rounded-neo border-2 border-neo-cream/60 px-3 text-sm font-bold text-neo-white hover:border-neo-cream"
+          className="relative flex h-11 shrink-0 items-center gap-1.5 rounded-neo border-2 border-neo-cream/60 px-3 shadow-hard-sm text-sm font-bold text-neo-white hover:border-neo-cream"
         >
           <SlidersHorizontal className="size-4" aria-hidden="true" />
           <span className="hidden sm:inline">{t('eduLibrary.discover.filters')}</span>
@@ -77,7 +78,7 @@ export default function DiscoverFilters({ filters, onChange, total }: DiscoverFi
             data-testid="discover-language"
             value={filters.language}
             onChange={(e) => onChange({ language: e.target.value as Language | 'all' })}
-            className={cn(SELECT, 'ps-7')}
+            className={cn(SELECT, 'ps-7 pe-3')}
           >
             <option value="all">{t('eduLibrary.discover.allLanguages')}</option>
             {EDUCATION_LANGUAGES.map((code) => (
@@ -94,7 +95,7 @@ export default function DiscoverFilters({ filters, onChange, total }: DiscoverFi
                 type="button"
                 aria-pressed={active}
                 onClick={() => onChange({ source: s })}
-                className={cn(PILL, active ? 'border-neo-lime text-neo-white ring-1 ring-neo-lime' : 'border-neo-cream/40 text-neo-cream/85 hover:border-neo-cream')}
+                className={cn(PILL, active ? 'border-neo-lime text-neo-white shadow-hard-sm ring-1 ring-neo-lime' : 'border-neo-cream/50 text-neo-cream/85 hover:border-neo-cream')}
               >
                 {active && <Check className="size-3.5 text-neo-lime" strokeWidth={3} aria-hidden="true" />}
                 {s === 'all' ? t('eduLibrary.discover.source.all') : t(`eduLibrary.badge.${s}`)}

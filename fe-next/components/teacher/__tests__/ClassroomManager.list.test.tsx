@@ -116,7 +116,7 @@ describe('ClassroomManager — class list', () => {
       expect(within(card).getByText('teacher.classrooms.students.noneYet')).toBeInTheDocument();
       const code = within(card).getByTestId('classroom-join-code');
       expect(code).toHaveTextContent('ABC123');
-      expect(code.className).toMatch(/text-3xl|text-4xl/);
+      expect(code.className).toMatch(/text-\[min\([\d.]+cqw,2\.25rem\)\]/);
       expect(within(card).getByTestId('copy-join-code')).toBeInTheDocument();
       expect(within(card).getByTestId('card-activity')).toHaveTextContent('cls-1');
     });

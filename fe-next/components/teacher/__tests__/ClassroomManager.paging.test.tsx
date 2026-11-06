@@ -96,6 +96,37 @@ describe('ClassroomManager — swipe carousel instead of page scroll', () => {
     expect(screen.queryByTestId('class-carousel-nav')).toBeNull();
   });
 
+  it('Given one class on a desktop row, Then a New class card fills the empty seat and links into setup', () => {
+    mq.wide = true;
+    state.classrooms = [mk(1)];
+    render(<ClassroomManager />);
+    const seat = screen.getByTestId('classroom-new-card');
+    expect(seat).toHaveAttribute('href', '/en/teacher/classroom/new');
+    expect(seat).toHaveTextContent('eduShell.home.newClass');
+    expect(seat).toHaveTextContent('teacher.classroom.newClassHint');
+    expect(seat.className).toContain('self-start');
+    expect(seat.className).not.toContain('border-dashed');
+    expect(seat.className).not.toMatch(/(^|\s)bg-neo-lime(\s|$)/);
+    expect(screen.queryByTestId('classroom-create-link')).toBeNull();
+  });
+
+  it('Given as many classes as the row holds, or a phone, Then no New class card takes a seat', () => {
+    mq.wide = true;
+    render(<ClassroomManager />);
+    expect(screen.queryByTestId('classroom-new-card')).toBeNull();
+    mq.wide = false;
+    state.classrooms = [mk(1)];
+    render(<ClassroomManager />);
+    expect(screen.queryByTestId('classroom-new-card')).toBeNull();
+  });
+
+  it('Given several classes, Then neighbouring cards wear different header colors', () => {
+    mq.wide = true;
+    render(<ClassroomManager />);
+    const colors = screen.getAllByTestId('classroom-card-band').map((b) => b.className.match(/bg-neo-(\w+)/)?.[1]);
+    expect(new Set(colors).size).toBe(3);
+  });
+
   it('Given three classes on a desktop row, Then they all fit and there is no arrow nav', () => {
     mq.wide = true;
     render(<ClassroomManager />);

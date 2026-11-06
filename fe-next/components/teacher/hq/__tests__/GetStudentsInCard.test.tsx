@@ -84,6 +84,16 @@ describe('<GetStudentsInCard>', () => {
     expect(code.style.gridTemplateColumns).toBe('repeat(6, minmax(0, 1fr))');
   });
 
+  it('Then the code tiles drop in one by one and hop on their turn, like the Home desk code', () => {
+    render(<GetStudentsInCard classroom={CLASS} onOpenProjector={vi.fn()} />);
+    const tiles = screen.getAllByTestId('hq-join-code-tile');
+    expect(tiles).toHaveLength(6);
+    for (const tile of tiles) {
+      expect(tile.className).toContain('animate-edu-tile-in');
+      expect((tile.firstElementChild as HTMLElement).className).toContain('animate-edu-hop');
+    }
+  });
+
   it('Given one student joined, Then the heading is visible above the code and the goal sits inside the roster row', () => {
     roster.mockReturnValue({ students: [{ id: 's1', name: 'Ava', avatar: null }], loading: false, arrivals: [] });
     render(<GetStudentsInCard classroom={{ ...CLASS, member_count: 1 }} onOpenProjector={vi.fn()} />);

@@ -14859,6 +14859,7 @@ const ja = {
       },
       "create": "クラス作成",
       "createAnother": "別のクラスを作成",
+      "newClassHint": "クラスごとに専用の参加コードがあります。",
       "creating": "作成中...",
       "defaultName": "私のクラス",
       "edit": "クラス編集",

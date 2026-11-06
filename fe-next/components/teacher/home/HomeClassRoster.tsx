@@ -1,12 +1,12 @@
 'use client';
 
 import { Fragment, useState } from 'react';
-import { ClipboardList } from 'lucide-react';
+import { ClipboardList, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import AvatarLite, { type AvatarLiteConfig } from '@/components/AvatarLite';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
-import { GHOST_BUTTON, OUTLINE_BUTTON, PANEL, SKELETON } from './homeStyles';
-import { RosterDrawer, RosterSheet, StatusDot, StatusPill } from './HomeRosterDetail';
+import { GAME_CARD, GHOST_BUTTON, OUTLINE_BUTTON, SKELETON, STICKER } from './homeStyles';
+import { RosterDrawer, RosterSheet, STATUS_RING, StatusDot, StatusPill } from './HomeRosterDetail';
 import { HomeRosterMeter } from './HomeRosterMeter';
 import { rosterAccuracy, rosterCounts, type RosterRow, type RosterStatus } from './rosterModel';
 
@@ -14,7 +14,7 @@ type T = (key: string, params?: Record<string, string | number>) => string;
 
 const STATUSES: readonly RosterStatus[] = ['done', 'late', 'idle'];
 // Every cell is placed explicitly so a narrow box falls back to the two-line phone row, never a wrapped grid.
-const COLS = 'grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 @md/roster:grid-cols-[minmax(7rem,12rem)_minmax(5.5rem,1fr)_4.5rem_4.5rem] @md/roster:gap-x-4 @[40rem]/list:grid-cols-[minmax(7rem,12rem)_5.5rem_minmax(6rem,1fr)_4.5rem_4.5rem]';
+const COLS = 'grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 @md/roster:grid-cols-[minmax(7rem,12rem)_minmax(5.5rem,1fr)_5.5rem_4.5rem] @md/roster:gap-x-4 @[40rem]/list:grid-cols-[minmax(7rem,12rem)_5.5rem_minmax(6rem,1fr)_5.5rem_4.5rem]';
 const CELL = {
   name: 'col-start-1 row-start-1',
   status: 'col-start-1 row-start-2 ps-10 @md/roster:col-start-2 @md/roster:row-start-1 @md/roster:ps-0',
@@ -51,9 +51,9 @@ export function HomeClassRoster({ rows, failed, language, nowMs, t, className, o
   const close = () => setOpenId(null);
 
   return (
-    <section data-testid="home-roster" aria-labelledby="home-roster-title" className={cn(PANEL, '@container/roster flex min-h-0 flex-col overflow-hidden', className)}>
+    <section data-testid="home-roster" aria-labelledby="home-roster-title" className={cn(GAME_CARD, '@container/roster flex min-h-0 flex-col overflow-hidden', className)}>
       <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-b-2 border-neo-cream/10 px-3 py-2 sm:px-4">
-        <h2 id="home-roster-title" className="font-neo-display text-lg font-black text-neo-cream">
+        <h2 id="home-roster-title" data-accent-decor className={cn(STICKER, 'bg-neo-purple text-base text-neo-cream')}>
           {t('eduShell.home.roster.title')}
         </h2>
         {counts && rows && rows.length > 0 ? (
@@ -124,7 +124,9 @@ export function HomeClassRoster({ rows, failed, language, nowMs, t, className, o
                       className={cn(COLS, 'min-w-0 flex-1 rounded-neo py-1.5 text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan active:bg-neo-cyan/10')}
                     >
                       <span data-col="name" className={cn(CELL.name, 'flex min-w-0 items-center gap-2.5')}>
-                        <AvatarLite userId={r.id} customAvatar={r.avatarConfig as AvatarLiteConfig | null} pixelSize={30} className="shrink-0" />
+                        <span data-testid="home-roster-avatar-ring" data-status={r.status} className={cn('shrink-0 rounded-full ring-[3px] ring-offset-2 ring-offset-neo-navy-light', STATUS_RING[r.status])}>
+                          <AvatarLite userId={r.id} customAvatar={r.avatarConfig as AvatarLiteConfig | null} pixelSize={30} className="block" />
+                        </span>
                         <span dir="auto" className={cn('truncate font-neo-body text-[0.95rem] font-black', selected ? 'text-neo-cyan' : 'text-neo-cream')}>{r.name}</span>
                       </span>
                       <span data-col="status" className={cn(CELL.status, 'flex min-w-0 items-center')}>
@@ -143,7 +145,12 @@ export function HomeClassRoster({ rows, failed, language, nowMs, t, className, o
                           </>
                         )}
                       </span>
-                      <span data-col="xp" className={cn(CELL.xp, NUM, 'font-bold text-neo-cream')}>{r.xp.toLocaleString(language)}</span>
+                      <span data-col="xp" className={CELL.xp}>
+                        <span data-testid="home-roster-xp" className="inline-flex items-center gap-1 rounded-full border-2 border-neo-yellow/50 bg-neo-yellow/10 px-2 py-px font-neo-display text-sm font-black tabular-nums text-neo-yellow">
+                          <Zap className="size-3.5 shrink-0 fill-current" aria-hidden="true" />
+                          {r.xp.toLocaleString(language)}
+                        </span>
+                      </span>
                       <span data-col="words" className={cn(CELL.words, NUM)}>{r.wordsMastered.toLocaleString(language)}</span>
                     </button>
                     {onAssign ? (

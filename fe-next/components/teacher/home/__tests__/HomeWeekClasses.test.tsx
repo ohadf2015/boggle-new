@@ -48,3 +48,18 @@ describe('HomeWeekClasses', () => {
     expect(screen.getByText('5B - English')).toHaveAttribute('dir', 'auto');
   });
 });
+
+describe('HomeWeekClasses as chunky pills', () => {
+  it('Then the picked class is a cream pill with dark text and a hard shadow, the others sit flat with a border', () => {
+    render(<HomeWeekClasses rows={rows} hidden={0} selectedId="a" onSelect={() => undefined} moreHref="/en/teacher/classroom" language="en" nowMs={NOW} t={t} />);
+    const [picked, other] = within(screen.getByTestId('home-week-classes')).getAllByRole('button');
+    expect(picked.className).toMatch(/(^|\s)bg-neo-cream(\s|$)/);
+    expect(picked.className).toContain('shadow-hard');
+    expect(picked.className).toContain('rounded-full');
+    expect(within(picked).getAllByText(/./).every((el) => !/text-neo-cream(\/|\s|$)/.test(el.className))).toBe(true);
+    expect(other.className).not.toMatch(/(^|\s)bg-neo-cream(\s|$)/);
+    expect(other.className).toContain('rounded-full');
+    expect(other.className).toMatch(/border-2/);
+  });
+});
+

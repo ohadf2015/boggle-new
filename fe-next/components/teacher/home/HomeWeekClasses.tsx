@@ -45,16 +45,18 @@ export function HomeWeekClasses({ rows, hidden, selectedId, onSelect, moreHref, 
                 aria-pressed={selected}
                 onClick={() => onSelect(row.id)}
                 className={cn(
-                  'grid min-h-11 w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2.5 rounded-neo border-2 px-2.5 text-start',
-                  'transition-[background-color,border-color,transform] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100',
+                  'grid min-h-11 w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2.5 rounded-full border-2 px-3 text-start',
+                  'transition-[translate,background-color,border-color,box-shadow] duration-200 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:translate-y-0.5 motion-reduce:transition-none motion-reduce:active:translate-y-0',
                   'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream',
                   '[@media(max-height:820px)]:min-h-10',
-                  selected ? 'border-neo-cream/70 bg-neo-cream/10' : 'border-transparent hover:border-neo-cream/30 hover:bg-neo-cream/[0.05]',
+                  selected
+                    ? 'border-neo-black bg-neo-cream shadow-hard'
+                    : 'border-neo-cream/25 bg-neo-navy hover:-translate-y-0.5 hover:border-neo-cream/60 motion-reduce:hover:translate-y-0',
                 )}
               >
-                <span aria-hidden="true" data-testid="home-week-class-dot" data-tone={row.tone} className={cn('size-3 shrink-0 rounded-full border-2', DOT[row.tone])} />
-                <span dir="auto" className="truncate font-neo-body text-sm font-bold text-neo-cream">{row.name}</span>
-                <span data-testid="home-week-class-when" className={cn('inline-block whitespace-nowrap font-neo-body text-xs font-bold first-letter:uppercase', WHEN[row.tone])}>
+                <span aria-hidden="true" data-testid="home-week-class-dot" data-tone={row.tone} className={cn('size-3 shrink-0 rounded-full border-2', DOT[row.tone], selected && row.tone === 'idle' && 'border-neo-black/50')} />
+                <span dir="auto" className={cn('truncate font-neo-body text-sm font-bold', selected ? 'text-neo-black' : 'text-neo-cream')}>{row.name}</span>
+                <span data-testid="home-week-class-when" className={cn('inline-block whitespace-nowrap font-neo-body text-xs font-bold first-letter:uppercase', selected ? 'text-neo-black/75' : WHEN[row.tone])}>
                   {row.playedAt ? lastPlayedLabel(row.playedAt, language, nowMs) : t('eduShell.week.idle')}
                 </span>
               </button>

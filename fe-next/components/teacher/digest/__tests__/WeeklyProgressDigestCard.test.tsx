@@ -136,6 +136,15 @@ describe('WeeklyProgressDigestCard', () => {
     expect(line).toHaveTextContent('+22');
   });
 
+  it('Then the digest is a game card whose title sits on a colored sticker', () => {
+    render(<WeeklyProgressDigestCard classroomId="c1" classroomName="Year 7" />);
+    const card = screen.getByTestId('weekly-progress-digest');
+    expect(card.className).toContain('border-[3px]');
+    const title = card.querySelector('h2')!;
+    expect(title.className).toMatch(/bg-neo-(cyan|pink|purple|yellow|orange)/);
+    expect(title.hasAttribute('data-accent-decor')).toBe(true);
+  });
+
   it('fires teacher_digest_viewed and shows the day-7 Pro CTA', () => {
     render(
       <WeeklyProgressDigestCard

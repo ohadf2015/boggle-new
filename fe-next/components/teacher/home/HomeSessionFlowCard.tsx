@@ -14,7 +14,7 @@ import type { RailSession } from "@/lib/education/homeSessionRail";
 import { catalogueEntry } from "@/components/education/ClassroomModeCatalogueData";
 import { gradeBandsLabel } from "@/components/teacher/StarterPacksSection.data";
 import { ARCADE_ACCENTS, ARCADE_BLOCK, type ArcadeAccent } from "@/lib/education/arcadeAccent";
-import { GHOST_BUTTON } from "./homeStyles";
+import { GAME_CARD, GAME_CARD_HOVER, GHOST_BUTTON } from "./homeStyles";
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -39,6 +39,7 @@ export interface HomeSessionFlowCardProps {
   t: T;
   testId?: string;
   accent?: CardAccent;
+  tilt?: "left" | "right";
 }
 
 export function HomeSessionFlowCard({
@@ -49,6 +50,7 @@ export function HomeSessionFlowCard({
   t,
   testId = "home-session-card",
   accent = "cyan",
+  tilt = "left",
 }: HomeSessionFlowCardProps) {
   const { session } = item;
   const mode = catalogueEntry(session.mode);
@@ -66,18 +68,24 @@ export function HomeSessionFlowCard({
     <li
       data-testid={testId}
       data-accent={accent}
-      className="group relative flex min-w-0 overflow-hidden rounded-neo-lg border-2 border-neo-cream/35 bg-neo-navy-light shadow-hard transition-colors duration-150 focus-within:border-neo-cream/60 hover:border-neo-cream/60 motion-reduce:transition-none @2xl:flex-col"
+      className={cn(
+        GAME_CARD,
+        GAME_CARD_HOVER,
+        "group relative flex min-w-0 overflow-hidden @2xl:flex-col",
+        tilt === "left" ? "hover:-rotate-1" : "hover:rotate-1",
+      )}
     >
       <div
         data-accent-decor
         aria-hidden="true"
         className={cn(
-          "grid w-16 shrink-0 place-items-center border-e-2 border-neo-black @2xl:h-16 @2xl:w-auto @2xl:border-e-0 @2xl:border-b-2 [@media(max-height:820px)]:@2xl:h-10",
+          "grid w-16 shrink-0 place-items-center border-e-[3px] border-neo-black @2xl:h-16 @2xl:w-auto @2xl:border-e-0 @2xl:border-b-[3px] [@media(max-height:820px)]:@2xl:h-10",
           ARCADE_BLOCK[accent],
         )}
       >
         {mode ? (
-          <span className="relative size-10 -rotate-3 overflow-hidden rounded-neo border-2 border-neo-black shadow-hard transition-transform duration-150 group-hover:rotate-0 motion-reduce:transition-none @2xl:size-12 [@media(max-height:820px)]:@2xl:size-8">
+          <span className="edu-bob-on-hover block">
+          <span className="relative block size-10 -rotate-3 overflow-hidden rounded-neo border-2 border-neo-black shadow-hard transition-transform duration-150 group-hover:rotate-0 motion-reduce:transition-none @2xl:size-12 [@media(max-height:820px)]:@2xl:size-8">
             <Image
               src={mode.cover}
               alt=""
@@ -86,9 +94,10 @@ export function HomeSessionFlowCard({
               className="object-cover"
             />
           </span>
+          </span>
         ) : null}
       </div>
-      <div className="flex min-w-0 flex-1 items-center gap-3 px-3 py-2.5 @2xl:flex-col @2xl:items-stretch @2xl:gap-2 @2xl:p-3 [@media(max-height:820px)]:@2xl:gap-1.5 [@media(max-height:820px)]:@2xl:p-2.5">
+      <div className="flex min-w-0 flex-1 items-center gap-3 px-3 py-2.5 [@media(max-height:820px)]:py-2 @2xl:flex-col @2xl:items-stretch @2xl:gap-2 @2xl:p-3 [@media(max-height:820px)]:@2xl:gap-1.5 [@media(max-height:820px)]:@2xl:p-2.5">
         <div className="min-w-0 flex-1">
           <h3 className="truncate font-neo-display text-base font-bold leading-tight text-neo-cream">
             {t(session.nameKey)}

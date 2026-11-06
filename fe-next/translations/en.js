@@ -12990,6 +12990,7 @@ const en = {
       },
       "create": "Create classroom",
       "createAnother": "Create another classroom",
+      "newClassHint": "Each class gets its own join code.",
       "creating": "Creating...",
       "defaultName": "My Class",
       "edit": "Edit classroom",

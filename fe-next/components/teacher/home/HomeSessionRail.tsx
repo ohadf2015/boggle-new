@@ -76,7 +76,7 @@ export function HomeSessionRail({ classroomId, languages, gradeBand, nowMs, last
       {ready && language ? (
         <ul className="flex flex-col gap-2 @2xl:grid @2xl:grid-cols-3 @2xl:gap-3">
           {rail.map((item, i) => (
-            <HomeSessionFlowCard key={item.session.id} accent={CARD_ACCENTS[i % CARD_ACCENTS.length]} item={item} language={language} gradeBand={gradeBand} href={railRunHref(locale, item, classroomId)} t={t} />
+            <HomeSessionFlowCard key={item.session.id} accent={CARD_ACCENTS[i % CARD_ACCENTS.length]} tilt={i % 2 === 0 ? 'left' : 'right'} item={item} language={language} gradeBand={gradeBand} href={railRunHref(locale, item, classroomId)} t={t} />
           ))}
         </ul>
       ) : (
@@ -86,7 +86,7 @@ export function HomeSessionRail({ classroomId, languages, gradeBand, nowMs, last
         <div data-testid="home-session-more" className="hidden @2xl:block min-h-0 flex-1 [container:session-more/size]">
           <ul className="hidden grid-cols-3 gap-3 pt-1 [@container_session-more_(min-height:12.5rem)]:grid">
             {more.map((item, i) => (
-              <HomeSessionFlowCard key={item.session.id} accent={CARD_ACCENTS[(rail.length + i) % CARD_ACCENTS.length]} item={item} language={language} gradeBand={gradeBand} href={railRunHref(locale, item, classroomId)} t={t} testId="home-session-card-more" />
+              <HomeSessionFlowCard key={item.session.id} accent={CARD_ACCENTS[(rail.length + i) % CARD_ACCENTS.length]} tilt={(rail.length + i) % 2 === 0 ? 'left' : 'right'} item={item} language={language} gradeBand={gradeBand} href={railRunHref(locale, item, classroomId)} t={t} testId="home-session-card-more" />
             ))}
           </ul>
         </div>

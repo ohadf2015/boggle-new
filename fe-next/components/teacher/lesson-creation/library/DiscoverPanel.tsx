@@ -14,6 +14,9 @@ import ListPreviewSheet, { type PreviewBusy } from './ListPreviewSheet';
 import ReportListDialog from './ReportListDialog';
 import AssignListDialog from './AssignListDialog';
 import { useDiscoverLibrary } from './useDiscoverLibrary';
+import { cn } from '@/lib/utils';
+import { EduMascot } from '@/components/education/EduMascot';
+import { GAME_CARD, GAME_CARD_HOVER } from '@/components/teacher/home/homeStyles';
 import { useFitPageSize } from './useFitPageSize';
 
 const GRID = 'grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3 md:grid-cols-3 xl:grid-cols-4';
@@ -97,7 +100,7 @@ export default function DiscoverPanel({ onOpenMyLists, onShareFirst, onCopied }:
       {lib.status === 'loading' ? (
         <div ref={gridRef} className={GRID} aria-busy="true">
           {Array.from({ length: pageSize }, (_, i) => (
-            <div key={i} className="h-[78px] animate-pulse rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light sm:h-[136px]" />
+            <div key={i} className="h-[78px] animate-pulse rounded-neo-lg border-[3px] border-neo-black bg-neo-navy-light sm:h-[144px]" />
           ))}
         </div>
       ) : lib.items.length === 0 ? (
@@ -126,11 +129,15 @@ export default function DiscoverPanel({ onOpenMyLists, onShareFirst, onCopied }:
           {showBeFirst && (
             <button
               type="button"
+              data-testid="discover-be-first"
               onClick={onShareFirst}
-              className="flex w-full items-center gap-3 rounded-neo border-2 border-dashed border-neo-cream/40 p-3 text-start text-sm text-neo-cream/85 hover:border-neo-cream"
+              className={cn('group flex w-full items-center gap-3 py-1.5 pe-3 ps-2 text-start text-sm text-neo-cream/85', GAME_CARD, GAME_CARD_HOVER)}
             >
-              <Globe2 className="size-5 shrink-0 text-neo-cream" aria-hidden="true" />
-              <span><strong className="text-neo-white">{t('eduLibrary.discover.beFirstTitle')}</strong> {t('eduLibrary.discover.beFirstHint')}</span>
+              <EduMascot moment="tip" size={48} className="size-12 shrink-0 animate-edu-bob" />
+              <span className="min-w-0 flex-1">
+                <strong className="font-neo-display text-neo-white">{t('eduLibrary.discover.beFirstTitle')}</strong> {t('eduLibrary.discover.beFirstHint')}
+              </span>
+              <Globe2 className="edu-wiggle-on-hover size-5 shrink-0 text-neo-cream" aria-hidden="true" />
             </button>
           )}
           {lib.pageCount > 1 && (
