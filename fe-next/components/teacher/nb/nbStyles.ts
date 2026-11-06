@@ -18,16 +18,19 @@ export const NB_DARK_EDGE = 'border-neo-cream/50';
 /** Panel: dark card with a cream outline and a hard shadow. Pass a color block for the lead card. */
 export const NB_PANEL = `rounded-neo-xl border-[3px] ${NB_DARK_EDGE} bg-[#2a2b4a] text-neo-cream shadow-hard-xl`;
 
-/** Flat color blocks for lead cards. Text color is set for contrast on each. */
+/**
+ * Flat color blocks for lead cards. Text color is set for contrast on each, and so is the outline:
+ * black on a color, cream on navy. Put the block after the base style in cn() so its outline wins.
+ */
 export const NB_BLOCK = {
-  lime: 'bg-neo-lime text-neo-black',
-  pink: 'bg-neo-pink text-white',
-  cyan: 'bg-neo-cyan text-neo-black',
-  yellow: 'bg-neo-yellow text-neo-black',
-  purple: 'bg-neo-purple text-white',
-  orange: 'bg-neo-orange text-neo-black',
-  cream: 'bg-neo-cream text-neo-black',
-  navy: 'bg-neo-navy-light text-neo-cream',
+  lime: 'bg-neo-lime text-neo-black border-neo-black',
+  pink: 'bg-neo-pink text-white border-neo-black',
+  cyan: 'bg-neo-cyan text-neo-black border-neo-black',
+  yellow: 'bg-neo-yellow text-neo-black border-neo-black',
+  purple: 'bg-neo-purple text-white border-neo-black',
+  orange: 'bg-neo-orange text-neo-black border-neo-black',
+  cream: 'bg-neo-cream text-neo-black border-neo-black',
+  navy: `bg-neo-navy-light text-neo-cream ${NB_DARK_EDGE}`,
 } as const;
 export type NbColor = keyof typeof NB_BLOCK;
 
