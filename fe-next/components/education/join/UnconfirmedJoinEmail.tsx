@@ -117,7 +117,7 @@ export function UnconfirmedJoinEmail({
     : null;
 
   return (
-    <div data-testid="join-unconfirmed-panel" className="mt-4 rounded-neo border-3 border-neo-black bg-neo-navy-light p-3 text-neo-white shadow-hard-sm">
+    <div data-testid="join-unconfirmed-panel" className="mt-4 rounded-neo border-3 border-neo-cream bg-neo-navy-light p-3 text-neo-white shadow-hard-sm">
       <h2 className="font-neo-display text-base font-black">{t(`${K}.unconfirmed.title`, 'Fix the email, then join')}</h2>
       <p className="mt-1 text-sm text-neo-white/80">
         {signedInEmail
