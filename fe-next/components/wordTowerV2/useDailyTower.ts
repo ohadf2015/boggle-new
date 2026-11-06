@@ -5,6 +5,7 @@ import { postWithAuth } from '@/utils/authFetch';
 import { getChosenGuestName, getGuestFingerprint } from '@/utils/guestManager';
 import { utcDateKey } from '@/lib/wordTower/dailySeed';
 import { recordV2DailyClimb } from '@/lib/wordTowerV2/daily';
+import { MAX_WRECK_BLOCKS } from '@/lib/wordTowerV2/wreck';
 import {
   type DailyTowerSave,
   commitTower,
@@ -102,6 +103,7 @@ export function useDailyTower({ daily, language, phase, worldRef, labelsRef, han
           climbM: growth,
           floors: Math.max(1, Math.round(growth / 3)),
           longestWord: words.reduce((a, w) => (w.length > a.length ? w : a), ''),
+          towerWords: words.slice(-MAX_WRECK_BLOCKS),
         },
         { language, guestFingerprint: getGuestFingerprint(), displayName: getChosenGuestName(), storage: window.localStorage, final },
       );

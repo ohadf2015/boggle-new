@@ -30,6 +30,15 @@ describe('NextQuestCta is the loud primary action', () => {
     expect(title?.className).toContain('uppercase');
   });
 
+  it('grows its title with its own width, not the viewport (a desktop side column clipped "WORD WHEEL")', () => {
+    render(<NextQuestCta justFinished="word-tower" currentLanguage="en" />);
+    const cta = screen.getByTestId('next-quest-cta');
+    expect(cta.className).toContain('@container');
+    const title = cta.querySelector('.font-neo-display');
+    expect(title?.className).toMatch(/@md:text-4xl/);
+    expect(title?.className).not.toMatch(/(^|\s)md:text-4xl/);
+  });
+
   it('skeleton reserves the same height as the slab (no layout jump)', () => {
     render(<NextQuestCta justFinished="word-wheel" currentLanguage="en" />);
     const cta = screen.getByTestId('next-quest-cta');

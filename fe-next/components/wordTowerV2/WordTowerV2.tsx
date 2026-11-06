@@ -461,6 +461,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
           reducedMotion={reducedMotion}
           onClose={() => setRivalsOpen(false)}
           onRaidOpen={setRaiding}
+          dailyLanguage={daily ? language : undefined}
         />
       ) : null}
 

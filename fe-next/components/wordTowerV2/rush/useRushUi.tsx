@@ -31,7 +31,7 @@ interface Args {
 export function useRushUi({ t, rush, game, daily, language, dailyBoard, dailyBaseM, reducedMotion, canvasClass, getHudPx, inRun }: Args) {
   useRushBoard({ setBoard: rush.setBoard, daily, language, dailyBoard, dailyBaseM });
   const projectorRef = useRef<((hM: number) => number) | null>(null);
-  const registerProjector = useCallback((fn: (hM: number) => number) => {
+  const registerProjector = useCallback((fn: ((hM: number) => number) | null) => {
     projectorRef.current = fn;
   }, []);
   const canvasProps = useMemo(() => ({ registerProjector, getTrait: game.getTrait }), [registerProjector, game.getTrait]);

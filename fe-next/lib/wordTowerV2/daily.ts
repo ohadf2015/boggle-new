@@ -53,6 +53,8 @@ export interface DailyClimb {
   climbM: number;
   floors: number;
   longestWord: string;
+  /** The standing tower's top floors: today's rivals see and wreck this building. */
+  towerWords?: string[];
 }
 
 export interface DailySubmitBody extends DailyClimb {

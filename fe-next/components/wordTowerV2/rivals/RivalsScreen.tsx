@@ -18,6 +18,7 @@ interface Props {
   onClose: () => void;
   /** A raid takes the whole screen: the parent pauses the game canvas. */
   onRaidOpen: (open: boolean) => void;
+  dailyLanguage?: string;
 }
 
 /**
@@ -25,7 +26,7 @@ interface Props {
  * not only after a run ends. Your tower stands next to three real rivals';
  * tap one to see their building, buy a wrecking ball if you are out, and ruin it.
  */
-export function RivalsScreen({ t, estate, myTower, myHeightM, balls, reducedMotion, onClose, onRaidOpen }: Props) {
+export function RivalsScreen({ t, estate, myTower, myHeightM, balls, reducedMotion, onClose, onRaidOpen, dailyLanguage }: Props) {
   const [target, setTarget] = useState<{ rival: RivalView; revenge: RevengeEntry | null } | null>(null);
   useEffect(() => {
     onRaidOpen(target !== null);
@@ -61,6 +62,7 @@ export function RivalsScreen({ t, estate, myTower, myHeightM, balls, reducedMoti
             estate={estate}
             myTower={myTower}
             myHeightM={myHeightM}
+            dailyLanguage={dailyLanguage}
             onPick={(rival, revenge) => setTarget({ rival, revenge })}
           />
         </div>

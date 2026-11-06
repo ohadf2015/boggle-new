@@ -111,7 +111,8 @@ interface Props {
   /** Workshop upgrades to paint on the tower (plinth, braces, cornices, rooftop, crane paint). */
   getGear?: () => TowerGear | null;
   /** Receives a live metres -> canvas-Y projector (same camera maths as the scene). */
-  registerProjector?: (fn: (hM: number) => number) => void;
+  /** null on unmount: the projector reads a scene that no longer exists. */
+  registerProjector?: (fn: ((hM: number) => number) | null) => void;
   getTrait?: (id: string) => BlockTrait | undefined;
   className?: string;
 }
@@ -688,6 +689,7 @@ export default function TowerCanvas(props: Props) {
       host.removeEventListener('pointerup', onPointerUp);
       host.removeEventListener('pointercancel', onPointerUp);
       host.removeEventListener('wheel', onWheel);
+      propsRef.current.registerProjector?.(null);
       app?.destroy(true, { children: true });
     };
   }, []);
