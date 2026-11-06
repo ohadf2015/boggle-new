@@ -20,8 +20,6 @@ function renderDock(wide: boolean, feedSlot?: ReactNode) {
       selected={[]}
       word=""
       valid={false}
-      intensity={0}
-      accentHex="#c4f000"
       reducedMotion
       canPutBack={false}
       onScramble={vi.fn()}
@@ -38,10 +36,11 @@ function renderDock(wide: boolean, feedSlot?: ReactNode) {
 }
 
 describe('V2Dock wheel position', () => {
-  it('Given a phone layout, When the dock renders, Then the wheel sits lifted off the bottom edge', () => {
+  it('Given a phone layout, When the dock renders, Then it is one short solid panel clear of the home indicator', () => {
     const dock = renderDock(false);
-    expect(dock.className).toContain('pb-[max(2.25rem,calc(env(safe-area-inset-bottom)+1.25rem))]');
-    expect(dock.className).not.toContain('pb-[max(0.75rem');
+    expect(dock.className).toContain('pb-[max(1rem,calc(env(safe-area-inset-bottom)+0.5rem))]');
+    expect(dock.className).toContain('bg-neo-navy');
+    expect(dock.querySelector('[data-wt2-letter-row]')).not.toBeNull();
   });
 
   it('Given a wide layout, When the dock renders, Then the side-panel wheel sits above center', () => {

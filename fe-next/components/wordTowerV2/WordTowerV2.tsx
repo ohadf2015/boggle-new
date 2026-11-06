@@ -265,7 +265,6 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
   ) : null;
 
   const biomeNow = biomeAt(floorsAt(heightM));
-  const accentHex = `#${biomeNow.accent.toString(16).padStart(6, '0')}`;
 
   return (
     <div ref={layout.rootRef} className={`relative h-dvh w-full shrink-0 overflow-hidden bg-neo-navy ${layout.railVarsClass}`} dir={dir}>
@@ -394,8 +393,6 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
         selected={selected}
         word={word}
         valid={valid}
-        intensity={Math.min(1, heightM / 40)}
-        accentHex={accentHex}
         reducedMotion={reducedMotion}
         canPutBack={ww.canPutBack}
         stabilitySlot={stabilitySlot}
