@@ -121,7 +121,7 @@ export function ClassSetupInviteView({ classroom, roster, joinUrl, displayHost, 
 
         <div
           data-testid="setup-actions"
-          className="sticky bottom-0 z-10 -mx-3 flex flex-col gap-3 border-t-[3px] border-neo-black bg-neo-navy px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 sm:-mx-4 sm:px-4 lg:static lg:mx-0 lg:border-t-0 lg:bg-transparent lg:px-0"
+          className="sticky bottom-0 z-10 -mx-3 flex flex-col gap-3 border-t-[3px] border-neo-cream/50 bg-neo-navy px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 sm:-mx-4 sm:px-4 lg:static lg:mx-0 lg:border-t-0 lg:bg-transparent lg:px-0"
         >
           {studentsIn ? projector : start}
           <div data-testid="setup-hero-slot">{studentsIn ? start : projector}</div>

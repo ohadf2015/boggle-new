@@ -9,8 +9,14 @@ const FOCUS =
 const PRESS =
   'transition-[transform,box-shadow] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] hover:-translate-x-px hover:-translate-y-px active:translate-x-[3px] active:translate-y-[3px] active:shadow-none motion-reduce:transition-none motion-reduce:hover:translate-x-0 motion-reduce:hover:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60';
 
-/** Panel: navy card with a black outline and a hard shadow. Pass a color block for the lead card. */
-export const NB_PANEL = 'rounded-neo-xl border-[3px] border-neo-black bg-[#2a2b4a] text-neo-cream shadow-hard-xl';
+/**
+ * Outline for anything dark sitting on the dark page. Black on navy is 1.2:1 (no edge at all),
+ * so dark surfaces get a cream outline instead; color blocks keep the black one.
+ */
+export const NB_DARK_EDGE = 'border-neo-cream/50';
+
+/** Panel: dark card with a cream outline and a hard shadow. Pass a color block for the lead card. */
+export const NB_PANEL = `rounded-neo-xl border-[3px] ${NB_DARK_EDGE} bg-[#2a2b4a] text-neo-cream shadow-hard-xl`;
 
 /** Flat color blocks for lead cards. Text color is set for contrast on each. */
 export const NB_BLOCK = {
@@ -34,7 +40,7 @@ const BUTTON_BASE = [
 /** The one main action on a screen. */
 export const NB_PRIMARY = `${BUTTON_BASE} min-h-[56px] px-5 text-xl bg-neo-lime text-neo-black`;
 /** A real second action: dark, still chunky. */
-export const NB_SECONDARY = `${BUTTON_BASE} min-h-[48px] px-4 text-base bg-neo-navy-light text-neo-cream`;
+export const NB_SECONDARY = `${BUTTON_BASE} min-h-[48px] px-4 text-base bg-neo-navy-light text-neo-cream ${NB_DARK_EDGE}`;
 /** Small chunky button for inside cards. Combine with an NB_BLOCK color. */
 export const NB_SMALL = [
   'inline-flex min-h-11 items-center justify-center gap-1.5 whitespace-nowrap rounded-neo border-2 border-neo-black px-3 font-neo-display text-sm font-black shadow-hard-lg',
