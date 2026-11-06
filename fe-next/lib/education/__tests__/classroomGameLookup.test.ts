@@ -42,7 +42,7 @@ describe('lookupLiveClassroomGame', () => {
     }));
     await expect(lookupLiveClassroomGame('TZCOQ7')).resolves.toEqual({
       classroomId: 'c1', lessonIds: ['l1'], teacherName: 'Ms. G',
-      lessonNames: [], studyWordCount: 0, settings: {},
+      lessonNames: [], studyWordCount: 0, studyCards: [], settings: {},
     });
     expect(get).toHaveBeenCalledWith('classroom_game:TZCOQ7');
   });
@@ -52,6 +52,19 @@ describe('lookupLiveClassroomGame', () => {
     await expect(lookupLiveClassroomGame('A')).resolves.toMatchObject({ studyWordCount: 2 });
     get.mockResolvedValueOnce(JSON.stringify({ classroomId: 'c1', vocabularyWords: ['x', 'y', 'z'] }));
     await expect(lookupLiveClassroomGame('B')).resolves.toMatchObject({ studyWordCount: 3 });
+  });
+
+  it('carries the study cards themselves, with a bare-word deck for a record made before decks', async () => {
+    get.mockResolvedValueOnce(JSON.stringify({
+      classroomId: 'c1',
+      studyCards: [{ word: 'orbit', definition: 'a curved path', hint: 'planets' }, { word: '  ' }, 'junk'],
+    }));
+    await expect(lookupLiveClassroomGame('A')).resolves.toMatchObject({
+      studyWordCount: 1,
+      studyCards: [{ word: 'orbit', definition: 'a curved path', hint: 'planets' }],
+    });
+    get.mockResolvedValueOnce(JSON.stringify({ classroomId: 'c1', vocabularyWords: ['x', 'y'] }));
+    await expect(lookupLiveClassroomGame('B')).resolves.toMatchObject({ studyCards: [{ word: 'x' }, { word: 'y' }] });
   });
 
   /**

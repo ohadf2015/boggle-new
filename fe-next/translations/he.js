@@ -15566,6 +15566,8 @@ const he = {
       "startWhenReady": "מתחילים כשכולם בפנים",
       "startAnyway": "להתחיל בכל זאת",
       "stillLearning": "{count} עדיין לומדים את המילים",
+      "wordsTitle": "המילים של היום",
+      "moreWords": "ועוד {count}",
       "lateJoinOn": "אפשר להצטרף באיחור",
       "lateJoinOff": "אי אפשר להצטרף באיחור",
       "lock": {

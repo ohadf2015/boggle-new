@@ -16020,6 +16020,8 @@ const sv = {
       "startWhenReady": "Starta när alla är med",
       "startAnyway": "Starta ändå",
       "stillLearning": "{count} lär sig fortfarande orden",
+      "wordsTitle": "Dagens ord",
+      "moreWords": "+{count} till",
       "lateJoinOn": "Sen anslutning tillåten",
       "lateJoinOff": "Sen anslutning stängd",
       "lock": {

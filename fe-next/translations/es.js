@@ -15660,6 +15660,8 @@ const es = {
       "startWhenReady": "Empieza cuando estén todos",
       "startAnyway": "Empezar igual",
       "stillLearning": "{count} todavía están aprendiendo las palabras",
+      "wordsTitle": "Las palabras de hoy",
+      "moreWords": "+{count} más",
       "lateJoinOn": "Se puede entrar tarde",
       "lateJoinOff": "No se puede entrar tarde",
       "lock": {

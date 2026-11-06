@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { fixedRoundSeconds } from '@/shared/utils/fixedRoundTimer';
 import { useLiveClassroomGameInfo } from '@/hooks/useLiveClassroomGameInfo';
+import { useProjectorStudyCards } from '@/hooks/useProjectorStudyCards';
 import { BOSS_BATTLE_ID, catalogueIdOf, launchOf, readLocalBossId, readLocalQuizPlayable, readLocalQuizVariant, type ClassroomCatalogueId } from '@/lib/education/classroomCatalogueId';
 import { readLocalGameMode } from '@/components/education/lobby/useClassroomModeSwitch';
 import { useQuizStartRefused } from '@/components/education/projector/ProjectorQuizBlocked';
@@ -28,6 +29,7 @@ interface Input {
 /** Mode precedence: an in-place switch, then the teacher's launch, then the room record. */
 export function useProjectorLobbyMode({ gameCode, classroomGameMode, templateSettings, t }: Input) {
   const liveGame = useLiveClassroomGameInfo(gameCode, true);
+  const studyCards = useProjectorStudyCards(gameCode, (liveGame?.studyWordCount ?? 0) > 0);
   // The shell reads lessonGameData once at mount, so a lobby remounted after a round would revert to the launch mode.
   const [switchedMode, setSwitchedMode] = useState<ClassroomCatalogueId | null>(() => {
     const local = readLocalGameMode();
@@ -85,6 +87,7 @@ export function useProjectorLobbyMode({ gameCode, classroomGameMode, templateSet
     className: liveGame?.classroomName ?? null,
     lessonNames: liveGame?.lessonNames ?? [],
     studyWordCount: liveGame?.studyWordCount ?? 0,
+    studyCards,
     roundSettings: {
       timerMinutes: settings?.timerMinutes ?? undefined,
       vocabQuizQuestionCount: settings?.vocabQuizQuestionCount ?? undefined,
