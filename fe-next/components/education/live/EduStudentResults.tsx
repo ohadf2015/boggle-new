@@ -14,6 +14,7 @@ import { rewardRoundId } from '@/shared/constants/classroomEconomy';
 import RoundShop from '@/components/education/economy/RoundShop';
 import { StudentMissedWords } from '@/components/student/live/StudentMissedWords';
 import { myMissedWords } from '@/components/student/live/missedWords';
+import { deckCardsFor, useStudyDeck } from '@/lib/education/studyDeckStore';
 import { BossOutcomeCard } from '@/components/education/boss/BossOutcomeCard';
 import { StudentMomentumChips } from '@/components/education/results/StudentRoundOutcome';
 import { useSessionRoundHistory } from '@/hooks/useSessionRoundHistory';
@@ -23,6 +24,7 @@ import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { resultsExitCopy } from '@/lib/multiplayer/resultsExitCopy';
 import type { PlayerResult } from '@/types/components';
 import { studentGap, studentPlacing } from './eduResultsModel';
+import { EduMissedRecall, missedDefinitions } from './EduMissedRecall';
 import { EduStudentHero } from './EduStudentHero';
 import { EduStudentNextStep, EduStudentShareButton } from './EduStudentNextStep';
 import { EduStudentClassGoal, EduStudentWaitNext, EduStudentXpBar } from './EduStudentProgress';
@@ -94,6 +96,8 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
   const mastery = summary?.masteryByPlayer?.[props.username];
   const lesson = typeof mastery?.found === 'number' && typeof mastery?.total === 'number' ? { found: mastery.found, total: mastery.total } : null;
   const missed = useMemo(() => myMissedWords(summary, props.username), [summary, props.username]);
+  const deck = useStudyDeck((state) => deckCardsFor(state, props.gameCode));
+  const definitions = useMemo(() => missedDefinitions(missed, deck), [missed, deck]);
   const lessonId = summary?.lessonIds?.[0];
   const exitCopy = resultsExitCopy({ isClassroom: true, isHost: false });
   // The same session story the /multiplayer card banks, under the same key: only one of the two ever mounts on a phone.
@@ -216,7 +220,8 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
                 ) : (
                   <p className="font-neo-body text-sm font-bold text-neo-cream/80">{t('eduLiveRoom.studentResults.noWords')}</p>
                 )}
-                <StudentMissedWords words={missed} language={props.roomLanguage ?? c.language} t={t} className="w-full" />
+                <StudentMissedWords words={missed} definitions={definitions} language={props.roomLanguage ?? c.language} t={t} className="w-full" />
+                <EduMissedRecall missed={missed} deck={deck} t={t} />
                 {props.gameCode && <RoundShop compact gameCode={props.gameCode} />}
               </div>
             </details>

@@ -9,6 +9,8 @@ type Translate = (key: string, params?: Record<string, string | number>) => stri
 
 export interface StudentMissedWordsProps {
   words: string[];
+  /** Lower-cased word → meaning, from the lesson deck. */
+  definitions?: Record<string, string>;
   language: string;
   t: Translate;
   onPractice?: () => void;
@@ -16,7 +18,7 @@ export interface StudentMissedWordsProps {
 }
 
 /** End-of-round "catch these next time": tap a word to hear it, one tap into practice. */
-export function StudentMissedWords({ words, language, t, onPractice, className }: StudentMissedWordsProps) {
+export function StudentMissedWords({ words, definitions, language, t, onPractice, className }: StudentMissedWordsProps) {
   const [speaking, setSpeaking] = useState<string | null>(null);
 
   if (words.length === 0) {
@@ -53,8 +55,14 @@ export function StudentMissedWords({ words, language, t, onPractice, className }
         )}
       </div>
       <ul className="flex flex-wrap gap-1.5" aria-label={t('eduStudent.results.tapToHear')}>
-        {words.map((word, i) => (
-          <li key={word} className="motion-safe:animate-[lc-miss-in_320ms_cubic-bezier(.34,1.56,.64,1)_both]" style={{ animationDelay: `${i * 70}ms` }}>
+        {words.map((word, i) => {
+          const definition = definitions?.[word.toLowerCase()];
+          return (
+          <li
+            key={word}
+            className={cn('motion-safe:animate-[lc-miss-in_320ms_cubic-bezier(.34,1.56,.64,1)_both]', definition && 'flex basis-full flex-wrap items-center gap-x-2 gap-y-0.5')}
+            style={{ animationDelay: `${i * 70}ms` }}
+          >
             <button
               type="button"
               aria-label={t('eduStudent.results.hear', { word })}
@@ -71,8 +79,14 @@ export function StudentMissedWords({ words, language, t, onPractice, className }
               <span dir="auto">{word}</span>
               <Volume2 aria-hidden="true" className="size-4 text-neo-navy/70" />
             </button>
+            {definition && (
+              <span data-testid="missed-word-definition" dir="auto" className="min-w-0 flex-1 font-neo-body text-sm leading-snug text-neo-cream/90">
+                {definition}
+              </span>
+            )}
           </li>
-        ))}
+          );
+        })}
       </ul>
       <style>{'@keyframes lc-miss-in{0%{transform:translateY(8px) scale(.8)}100%{transform:none}}'}</style>
     </section>

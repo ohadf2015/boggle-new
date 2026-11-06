@@ -20856,6 +20856,20 @@ const ja = {
       "studyDone": "おぼえた！",
       "studyReadyLocked": "{count}語ぜんぶ見たら「準備OK」を押せるよ"
     },
+    "recall": {
+      "intro": "まず目を通して、そのあと短いクイズで覚えたかチェックしよう。",
+      "start": "クイズをはじめる",
+      "question": "この意味の単語はどれ？",
+      "progress": "{total}語中{mastered}語おぼえた",
+      "streak": "{count}連続！",
+      "correct": "正解！",
+      "wrongLead": "おしい！正解はこれ：",
+      "next": "次へ",
+      "practiceAgain": "もう一度練習する",
+      "readyLocked": "{count}語ぜんぶおぼえたら「準備OK」を押せるよ",
+      "quickRecall": "クイック復習",
+      "finished": "全部思い出せた。すごい！"
+    },
     "exit": {
       "title": "ゲームをぬける？",
       "body": "このラウンドからぬけます。同じコードでまた戻れるよ。",

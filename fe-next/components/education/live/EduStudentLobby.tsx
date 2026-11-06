@@ -1,12 +1,12 @@
 'use client';
 
-/** The one student waiting stage. With lesson words, READY unlocks only after the student has gone through every word. */
+/** The one student waiting stage. With lesson words, READY unlocks only after the student has learned every word. */
 import { LogOut, Pencil, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ClassroomWaitingStageProps } from '@/components/education/lobby/ClassroomWaitingStage';
 import { WaitingWarmUp } from '@/components/education/lobby/WaitingWarmUp';
 import { useStudyDeck } from '@/lib/education/studyDeckStore';
-import { LobbyWordStudy } from './LobbyWordStudy';
+import { LobbyLearnRecall, canRecall } from './LobbyLearnRecall';
 import { LIVE_KEYFRAMES, PRESS } from './eduLiveStyles';
 import { EduStudentLobbyCrowd } from './EduStudentLobbyCrowd';
 import { EduStudentLobbyHud } from './EduStudentLobbyHud';
@@ -95,7 +95,7 @@ export function EduStudentLobby({
           {quickPickSlot}
 
           {cards.length > 0 ? (
-            <LobbyWordStudy cards={cards} studied={studied} onDone={markStudied} t={t} />
+            <LobbyLearnRecall cards={cards} studied={studied} onDone={markStudied} t={t} />
           ) : (
             <div className="flex w-full justify-center [@container(max-height:380px)]:hidden">
               <WaitingWarmUp username={username} t={t} />
@@ -109,7 +109,7 @@ export function EduStudentLobby({
       <footer className="flex shrink-0 flex-col gap-2 border-t-[3px] border-neo-cream bg-neo-navy-light px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
         {mustStudy ? (
           <p data-testid="study-ready-locked" role="status" className="rounded-neo border-2 border-neo-cream/40 px-3 py-3 text-center font-neo-display text-base font-bold text-neo-cream">
-            {t('eduStudent.lobby.studyReadyLocked', { count: cards.length })}
+            {t(canRecall(cards) ? 'eduStudent.recall.readyLocked' : 'eduStudent.lobby.studyReadyLocked', { count: cards.length })}
           </p>
         ) : (
           readySlot

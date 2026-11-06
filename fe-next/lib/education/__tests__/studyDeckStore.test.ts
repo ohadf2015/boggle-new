@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { useStudyDeck } from '../studyDeckStore';
+import { deckCardsFor, useStudyDeck } from '../studyDeckStore';
 
 const cards = [{ word: 'sun' }, { word: 'moon' }];
 
@@ -33,5 +33,19 @@ describe('studyDeckStore', () => {
     useStudyDeck.getState().setDeck('ROOM1', cards);
     useStudyDeck.getState().clear();
     expect(useStudyDeck.getState()).toMatchObject({ gameCode: null, cards: [], studied: false });
+  });
+
+  it('given a cleared deck, when results ask for the same room, then the last cards are still there', () => {
+    useStudyDeck.getState().setDeck('ROOM1', cards);
+    useStudyDeck.getState().clear();
+    expect(deckCardsFor(useStudyDeck.getState(), 'ROOM1')).toEqual(cards);
+    expect(deckCardsFor(useStudyDeck.getState(), 'room1')).toEqual(cards);
+  });
+
+  it('given a kept deck, when results ask for another room, then no cards come back', () => {
+    useStudyDeck.getState().setDeck('ROOM1', cards);
+    useStudyDeck.getState().clear();
+    expect(deckCardsFor(useStudyDeck.getState(), 'ROOM2')).toEqual([]);
+    expect(deckCardsFor(useStudyDeck.getState(), undefined)).toEqual([]);
   });
 });
