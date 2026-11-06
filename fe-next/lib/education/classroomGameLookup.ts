@@ -1,4 +1,4 @@
-import { buildStudyCards } from '@/shared/utils/studyCards';
+import { buildStudyCards, parseStudyCards, type StudyCard } from '@/shared/utils/studyCards';
 import { getCacheClient } from '@/backend/cache/redisCache';
 import logger from '@/utils/logger';
 
@@ -52,6 +52,8 @@ export interface LiveClassroomGame {
   lessonNames: string[];
   /** Words in the lobby study deck; READY unlocks only after a student has seen them all. */
   studyWordCount?: number;
+  /** Teacher-only: the live-game route must never return these to an unauthenticated caller. */
+  studyCards?: StudyCard[];
   /**
    * What the teacher actually picked. The student's own client has no copy of
    * this — `lessonGameData` is written to the TEACHER's sessionStorage — so
@@ -117,12 +119,17 @@ export async function lookupLiveClassroomGame(
     // The session rule, restated. Mirrors `isClassroomSessionEnded`.
     if (game.status === 'ended' || game.endedAt) return null;
 
+    const studyCards = Array.isArray(game.studyCards)
+      ? parseStudyCards(game.studyCards)
+      : buildStudyCards(game.vocabularyWords ?? [], []);
+
     return {
       classroomId: game.classroomId,
       lessonIds: game.lessonIds ?? [],
       teacherName: game.teacherName ?? '',
       lessonNames: game.lessonNames ?? [],
-      studyWordCount: (game.studyCards ?? buildStudyCards(game.vocabularyWords ?? [], [])).length,
+      studyWordCount: studyCards.length,
+      studyCards,
       settings: game.settings ?? {},
       teacherId: game.teacherId,
       status: game.status,

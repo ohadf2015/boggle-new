@@ -14048,6 +14048,8 @@ const en = {
       "startWhenReady": "Start game when everyone is in",
       "startAnyway": "Start anyway",
       "stillLearning": "{count} still learning the words",
+      "wordsTitle": "Today's words",
+      "moreWords": "+{count} more",
       "lateJoinOn": "Late join on",
       "lateJoinOff": "Late join off",
       "lock": {

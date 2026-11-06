@@ -15712,6 +15712,8 @@ const ja = {
       "startWhenReady": "全員そろったらスタート",
       "startAnyway": "このまま開始",
       "stillLearning": "{count}人がまだことばを練習中",
+      "wordsTitle": "今日のことば",
+      "moreWords": "ほか{count}語",
       "lateJoinOn": "途中参加OK",
       "lateJoinOff": "途中参加なし",
       "lock": {

@@ -106,6 +106,8 @@ describe('GET /api/education/classroom/live-game', () => {
       ...liveQuiz,
       teacherId: 'secret-uuid',
       vocabularyWords: ['luminous', 'gravity'],
+      studyCards: [{ word: 'nebula', definition: 'a cloud of gas in space' }],
+      studyWordCount: 1,
       players: [{ userId: 'u1', username: 'Maya' }],
     });
     const body = await (await GET(req('TZCOQ1'))).json();
@@ -113,6 +115,8 @@ describe('GET /api/education/classroom/live-game', () => {
     expect(serialized).not.toContain('secret-uuid');
     expect(serialized).not.toContain('luminous');
     expect(serialized).not.toContain('Maya');
+    expect(serialized).not.toContain('nebula');
+    expect(serialized).not.toContain('cloud of gas');
   });
 
   it('answers 204 for a code with no live game, so every arcade room does not log a failed request', async () => {

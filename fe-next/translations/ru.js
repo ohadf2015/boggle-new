@@ -3658,6 +3658,8 @@ const ru = {
       "startWhenReady": "Начните, когда все войдут",
       "startAnyway": "Начать всё равно",
       "stillLearning": "Ещё учат слова: {count}",
+      "wordsTitle": "Слова урока",
+      "moreWords": "Ещё {count}",
       "lateJoinOn": "Можно присоединиться позже",
       "lateJoinOff": "Позже присоединиться нельзя",
       "lock": {
