@@ -81,7 +81,7 @@ describe('HomeModeGrid', () => {
     const { rerender } = render(<HomeModeGrid models={models.slice(0, 5)} liveCount={0} />);
     expect(screen.queryByTestId('home-group-think')).toBeNull();
     expect(screen.queryByTestId('home-group-preview')).toBeNull();
-    rerender(<HomeModeGrid models={[...models.slice(0, 5), model('wordfall', { badge: 'ADMIN' })]} liveCount={0} />);
+    rerender(<HomeModeGrid models={[...models.slice(0, 5), model('quickPlay', { badge: 'ADMIN' })]} liveCount={0} />);
     expect(within(screen.getByTestId('home-group-preview')).getByRole('heading')).toHaveTextContent('landing.home.groupPreview');
   });
 

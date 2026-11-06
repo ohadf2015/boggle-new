@@ -6,8 +6,7 @@ import { createClient } from '@/utils/supabase/server';
  * Returns true ONLY when a logged-in user has `profiles.is_admin = true`.
  * Fails closed: no session, missing/false `is_admin`, query error, or any
  * thrown exception all return false. Use in server components to gate
- * admin-only routes (e.g. /blast/v2) so the URL is not reachable by
- * surfacing the hub card alone.
+ * admin-only routes so the URL is not reachable by surfacing the hub card alone.
  */
 export async function isAdminSession(): Promise<boolean> {
   try {

@@ -13,7 +13,7 @@
 import {
   Swords, BookOpen, Map, Bomb, Link2, Brain, Layers, Building2,
   Grid3x3,
-  CloudRain, Zap,
+  Zap,
   type LucideIcon,
 } from 'lucide-react';
 import type { AdventureResume } from './adventureResume';
@@ -126,12 +126,6 @@ export const MODE_META: Record<string, ModeMetaEntry> = {
   wordTowerV2: {
     titleKey: 'wordTowerV2.cardTitle', descKey: 'wordTowerV2.cardDesc', path: '/word-tower',
     Icon: Building2, variant: 'purple', badge: 'NEW', genIcon: '/modes/cubes/wordtower.png',
-  },
-  // Wordfall = Blast V2 (falling-tile blast). Admin/beta dev preview. Shares the
-  // blast cube art (same game family) until a bespoke Wordfall sticker exists.
-  wordfall: {
-    titleKey: 'landing.wordfallMode', descKey: 'landing.wordfallModeDesc', path: '/blast/v2',
-    Icon: CloudRain, variant: 'purple', badge: 'ADMIN', genIcon: '/modes/cubes/blast.png',
   },
 };
 

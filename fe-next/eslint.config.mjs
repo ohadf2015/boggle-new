@@ -14,7 +14,6 @@ const PIXI_ALLOWED = [
   "lib/pixiFx/**",
   "lib/word-craft/pixi/**",
   "lib/gameEngine/**",
-  "lib/blast/v2/fx/**",
   "components/wordTowerV2/**",
   "components/wordTower/**",
   "components/results/**",

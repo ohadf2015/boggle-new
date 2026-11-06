@@ -39,7 +39,6 @@ type LandingCardKey =
   | 'brainGym'
   | 'wordCraft'
   | 'crossword'
-  | 'wordfall'
   | 'wordTowerV2'
   | 'quickPlay';
 
@@ -54,7 +53,7 @@ const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'arena', 'blast', 'practice', 
 const FEATURED_MODES = new Set<LandingCardKey>([
   'daily', 'arena', 'blast', 'practice',
   'connections', 'brainGym', 'wordCraft', 'wordTowerV2',
-  'crossword', 'wordfall',
+  'crossword',
   'adventure',
   'quickPlay', // beta/admin-only cube — gated in rawOrder by canSeeInWorkModes
 ]);
@@ -101,8 +100,7 @@ export function LandingChallengeCards({
   // Practice also disappears as soon as the player has finished any game —
   // a recorded personal best is a durable "I've played" signal that survives
   // localStorage clears for signed-in users.
-  // Crossword, Wordfall (Blast V2) and Quick Play are admin/beta previews, gated
-  // on in-work access. Blast V1 (/blast) is public for everyone.
+  // Crossword and Quick Play are admin/beta previews, gated on in-work access.
   const { canSeeInWorkModes } = useAuth();
   const isVeteranRaw = useIsPracticeVeteran();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
@@ -135,8 +133,6 @@ export function LandingChallengeCards({
     // Standalone-route preview modes — admins + beta testers get one hub entry
     // each so previews stay reachable without flipping dashboard flags.
     if (canSeeInWorkModes && hasCrosswordPuzzles(language) && !next.includes('crossword')) next.push('crossword');
-    // Wordfall (Blast V2) — admin/beta dev preview, routes to /blast/v2.
-    if (canSeeInWorkModes && !next.includes('wordfall')) next.push('wordfall');
     // Word Tower v2 — now public (GA), routes to /word-tower.
     // v1 has been retired from the hub and replaced by v2.
     if (!next.includes('wordTowerV2')) next.push('wordTowerV2');
@@ -174,7 +170,7 @@ export function LandingChallengeCards({
 
 
   const MP_MODES = new Set<LandingCardKey>(['arena']);
-  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'crossword', 'wordfall', 'quickPlay', 'wordTowerV2']);
+  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'crossword', 'quickPlay', 'wordTowerV2']);
 
   // New and returning players get the same roster; no cohort hides modes.
   const mpCards = cardOrder.filter((m) => MP_MODES.has(m));
