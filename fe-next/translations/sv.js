@@ -21892,6 +21892,17 @@ const sv = {
       },
       "skip": "Hoppa över så länge",
       "packLabel": "Ord till ert första spel",
+      "advancedOpen": "Ändra årskurs, språk eller ord",
+      "advancedClose": "Dölj alternativ",
+      "bubble": "Bara ett namn. Resten har jag valt åt dig, ändra om du vill.",
+      "createAndPlay": "Skapa och spela",
+      "anyGrade": "Alla årskurser",
+      "side": {
+        "title": "Det här händer sen",
+        "step1": "Du får en anslutningskod",
+        "step2": "Eleverna skriver in den på valfri mobil. Inga konton.",
+        "step3": "Välj ett spel och tryck på Starta live. Första rundan tar 3 minuter."
+      },
       "packWords": "{count} ord",
       "packRecommended": "Vårt tips",
       "startLive": "Starta live",

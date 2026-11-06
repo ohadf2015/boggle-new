@@ -21904,6 +21904,17 @@ const es = {
       },
       "skip": "Ahora no",
       "packLabel": "Palabras para tu primera partida",
+      "advancedOpen": "Cambiar curso, idioma o palabras",
+      "advancedClose": "Ocultar opciones",
+      "bubble": "Solo un nombre. Lo demás ya lo elegí yo, cámbialo si quieres.",
+      "createAndPlay": "Crear y jugar",
+      "anyGrade": "Cualquier curso",
+      "side": {
+        "title": "Qué pasa ahora",
+        "step1": "Recibes un código para unirse",
+        "step2": "Tus estudiantes lo escriben en cualquier móvil. Sin cuentas.",
+        "step3": "Elige un juego y pulsa En vivo. La primera ronda dura 3 minutos."
+      },
       "packWords": "{count} palabras",
       "packRecommended": "Te lo recomendamos",
       "startLive": "Empezar en vivo",

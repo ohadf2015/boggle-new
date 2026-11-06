@@ -20937,6 +20937,17 @@ const en = {
       },
       "skip": "Skip for now",
       "packLabel": "Words for your first game",
+      "advancedOpen": "Change grade, language or words",
+      "advancedClose": "Hide options",
+      "bubble": "Just a name. I picked the rest for you, change it if you like.",
+      "createAndPlay": "Create and play",
+      "anyGrade": "Any grade",
+      "side": {
+        "title": "What happens next",
+        "step1": "You get a join code",
+        "step2": "Students type it on any phone. No accounts.",
+        "step3": "Pick a game and press Go live. The first round takes 3 minutes."
+      },
       "packWords": "{count} words",
       "packRecommended": "Our pick",
       "startLive": "Start live",
