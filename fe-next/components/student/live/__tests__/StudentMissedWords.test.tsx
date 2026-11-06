@@ -64,3 +64,18 @@ describe('<StudentMissedWords>', () => {
     expect(screen.queryByRole('button', { name: /practiceThese/ })).toBeNull();
   });
 });
+
+describe('StudentMissedWords meanings', () => {
+  it('given a meaning for a missed word, when shown, then the meaning sits with that word only', () => {
+    render(<StudentMissedWords words={['apple', 'cloud']} definitions={{ apple: 'A red fruit' }} language="en" t={t} />);
+    const meanings = screen.getAllByTestId('missed-word-definition');
+    expect(meanings).toHaveLength(1);
+    expect(meanings[0]).toHaveTextContent('A red fruit');
+  });
+
+  it('given no meanings, when shown, then no meaning line renders', () => {
+    render(<StudentMissedWords words={['apple']} language="en" t={t} />);
+    expect(screen.queryByTestId('missed-word-definition')).not.toBeInTheDocument();
+  });
+});
+

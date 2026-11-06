@@ -20866,6 +20866,20 @@ const es = {
       "studyDone": "Ya me las sé",
       "studyReadyLocked": "Repasa las {count} palabras para poder marcar listo"
     },
+    "recall": {
+      "intro": "Léelas una vez y luego un quiz rápido comprueba que te las sabes.",
+      "start": "Empezar el quiz",
+      "question": "¿Qué palabra significa esto?",
+      "progress": "{mastered} de {total} palabras aprendidas",
+      "streak": "¡{count} seguidas!",
+      "correct": "¡Bien!",
+      "wrongLead": "Casi. Era esta:",
+      "next": "Siguiente",
+      "practiceAgain": "Practicar otra vez",
+      "readyLocked": "Aprende las {count} palabras para poder marcar listo",
+      "quickRecall": "Repaso rápido",
+      "finished": "¡Las recordaste todas!"
+    },
     "exit": {
       "title": "¿Salir del juego?",
       "body": "Saldrás de esta ronda. Con el mismo código puedes volver.",

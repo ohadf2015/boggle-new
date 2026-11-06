@@ -20854,6 +20854,20 @@ const sv = {
       "studyDone": "Jag kan dem",
       "studyReadyLocked": "Gå igenom alla {count} ord för att bli redo"
     },
+    "recall": {
+      "intro": "Läs igenom dem, sen kollar ett snabbt quiz att de sitter.",
+      "start": "Starta quizet",
+      "question": "Vilket ord betyder det här?",
+      "progress": "{mastered} av {total} ord klara",
+      "streak": "{count} i rad!",
+      "correct": "Rätt!",
+      "wrongLead": "Inte riktigt. Det är det här:",
+      "next": "Nästa",
+      "practiceAgain": "Öva igen",
+      "readyLocked": "Lär dig alla {count} ord för att bli redo",
+      "quickRecall": "Snabbrepetition",
+      "finished": "Alla rätt. Snyggt!"
+    },
     "exit": {
       "title": "Lämna spelet?",
       "body": "Du hoppar av den här rundan. Samma kod tar dig tillbaka.",

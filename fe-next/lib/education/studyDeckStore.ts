@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import type { StudyCard } from '@/shared/utils/studyCards';
 
 const key = (gameCode: string) => `edu-studied:${gameCode}`;
+const NO_CARDS: StudyCard[] = [];
 
 function readStudied(gameCode: string): boolean {
   try {
@@ -15,6 +16,7 @@ interface StudyDeckState {
   gameCode: string | null;
   cards: StudyCard[];
   studied: boolean;
+  kept: { gameCode: string; cards: StudyCard[] } | null;
   setDeck: (gameCode: string, cards: StudyCard[]) => void;
   markStudied: () => void;
   clear: () => void;
@@ -25,7 +27,8 @@ export const useStudyDeck = create<StudyDeckState>((set, get) => ({
   gameCode: null,
   cards: [],
   studied: false,
-  setDeck: (gameCode, cards) => set({ gameCode, cards, studied: readStudied(gameCode) }),
+  kept: null,
+  setDeck: (gameCode, cards) => set({ gameCode, cards, studied: readStudied(gameCode), kept: { gameCode, cards } }),
   markStudied: () => {
     const { gameCode } = get();
     if (gameCode) {
@@ -39,3 +42,11 @@ export const useStudyDeck = create<StudyDeckState>((set, get) => ({
   },
   clear: () => set({ gameCode: null, cards: [], studied: false }),
 }));
+
+/** A reconnect's `joined` clears the live deck without a resend, so results fall back to the last deck seen for this room. */
+export function deckCardsFor(state: Pick<StudyDeckState, 'gameCode' | 'cards' | 'kept'>, gameCode: string | null | undefined): StudyCard[] {
+  if (!gameCode) return NO_CARDS;
+  const code = gameCode.toUpperCase();
+  if (state.gameCode?.toUpperCase() === code && state.cards.length) return state.cards;
+  return state.kept?.gameCode.toUpperCase() === code ? state.kept.cards : NO_CARDS;
+}

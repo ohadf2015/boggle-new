@@ -19899,6 +19899,20 @@ const en = {
       "studyDone": "I know these",
       "studyReadyLocked": "Go through all {count} words to get ready"
     },
+    "recall": {
+      "intro": "Read through them, then a quick quiz checks you've got them.",
+      "start": "Quiz me",
+      "question": "Which word means this?",
+      "progress": "{mastered} of {total} words learned",
+      "streak": "{count} in a row!",
+      "correct": "Got it!",
+      "wrongLead": "Not quite. It's this one:",
+      "next": "Next",
+      "practiceAgain": "Practice again",
+      "readyLocked": "Learn all {count} words to get ready",
+      "quickRecall": "Quick recall",
+      "finished": "All recalled. Nice work!"
+    },
     "exit": {
       "title": "Leave the game?",
       "body": "You'll drop out of this round. The same code gets you back in.",
