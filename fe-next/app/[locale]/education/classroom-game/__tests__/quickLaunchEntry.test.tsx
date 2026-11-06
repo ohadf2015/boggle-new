@@ -14,7 +14,7 @@ vi.mock('next/navigation', () => ({
   usePathname: () => '/en/education/classroom-game',
 }));
 vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ t: (k: string) => k, language: 'en' }) }));
-vi.mock('@/contexts/NavigationContext', () => ({ useNavigation: () => ({ setIsInGame: () => {} }) }));
+vi.mock('@/contexts/NavigationContext', () => ({ useNavigation: () => ({ setIsInGame: () => {}, registerHeaderAudioControl: () => () => {} }) }));
 vi.mock('@/components/education/ClassroomGuestDemo', () => ({ ClassroomGuestDemo: () => null }));
 const lobbyProps = vi.fn();
 vi.mock('@/components/education/ClassroomGameLobby', () => ({

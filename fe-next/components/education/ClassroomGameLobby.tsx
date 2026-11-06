@@ -339,7 +339,6 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
             boardLanguage={lessonLanguage}
             activePreset={opts.activePreset}
           />
-          {sessionPack ? null : <LobbyWarmupButton warmup={warmup} />}
           </div>
           <LobbyModeGrid
             selected={pickedId}
@@ -361,6 +360,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
             allPlayableWords={allPlayableWords}
             lessonWords={lessonWords}
             lessonLanguage={lessonLanguage}
+            homework={sessionPack ? undefined : <LobbyWarmupButton warmup={warmup} />}
           />
         </div>
       )}

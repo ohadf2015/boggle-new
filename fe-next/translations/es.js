@@ -21936,6 +21936,8 @@ const es = {
       "gameOptions": "Opciones de juego",
       "gameOptionsChange": "Cambiar",
       "gameOptionsHint": "Se aplica a la próxima ronda que inicies.",
+      "homeworkTitle": "Tarea",
+      "homeworkHint": "Envía esta lista para que la practiquen antes del juego.",
       "moreOptions": "Más opciones",
       "proBadge": "Pro",
       "lateJoinOn": "Se puede entrar tarde",

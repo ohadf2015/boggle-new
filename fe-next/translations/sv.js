@@ -21924,6 +21924,8 @@ const sv = {
       "gameOptions": "Spelinställningar",
       "gameOptionsChange": "Ändra",
       "gameOptionsHint": "Gäller nästa runda du startar.",
+      "homeworkTitle": "Läxa",
+      "homeworkHint": "Skicka listan så att eleverna övar på den före spelet.",
       "moreOptions": "Fler val",
       "proBadge": "Pro",
       "lateJoinOn": "Sena får gå med",

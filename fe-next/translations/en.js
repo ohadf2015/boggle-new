@@ -20969,6 +20969,8 @@ const en = {
       "gameOptions": "Game options",
       "gameOptionsChange": "Change",
       "gameOptionsHint": "Applies to the next round you start.",
+      "homeworkTitle": "Homework",
+      "homeworkHint": "Send this list so students practice it before the game.",
       "moreOptions": "More options",
       "proBadge": "Pro",
       "lateJoinOn": "Latecomers can join",

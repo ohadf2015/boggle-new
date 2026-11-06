@@ -55,14 +55,14 @@ describe('<ClassroomModeSpotlight> ready panel', () => {
     expect(html.replace(decor[0].outerHTML, '')).not.toMatch(/bg-neo-(cyan|pink|purple|yellow|orange)(?![\w-])/);
   });
 
-  it('Given GO LIVE, When rendered, Then it is the last control and says "Go live" on one line with the mode under it', () => {
+  it('Given the start button, When rendered, Then it is the last control and says "Start a game" on one line with the mode under it', () => {
     setup();
     const buttons = within(screen.getByTestId('mode-spotlight')).getAllByRole('button');
     const go = buttons[buttons.length - 1];
     expect(go).toHaveAttribute('data-testid', 'lobby-go-live');
     expect(go).toHaveAttribute('aria-label', 'education.modePicker.launch');
     const label = within(go).getByTestId('go-live-label');
-    expect(label).toHaveTextContent('teacher.playNow.goLive');
+    expect(label).toHaveTextContent('eduShell.home.startLive');
     expect(label.className).toContain('whitespace-nowrap');
     expect(go.innerHTML).not.toMatch(/truncate|uppercase/);
     expect(go).toHaveTextContent('teacher.classroom.gameModes.vocabQuiz');
@@ -75,15 +75,15 @@ describe('<ClassroomModeSpotlight> ready panel', () => {
     expect(screen.getByTestId('how-it-plays-inline').className).toContain('text-start');
   });
 
-  it('Given a tall phone dock, When rendered, Then what the game is and who it suits show without a tap, still clamped', () => {
+  it('Given the phone dock, When rendered, Then the dock is just the game and Start: the blurb and who it suits wait for the wide panel or the steps toggle', () => {
     setup();
     const how = screen.getByTestId('spotlight-how');
     expect(how).toHaveTextContent(catalogueKeys(catalogueEntry('vocab-quiz')!).how);
-    expect(how.className).toContain('[@media(min-height:740px)]:block');
-    expect(how.firstElementChild?.className).toContain('line-clamp-2');
+    expect(how.className).toMatch(/(^|\s)hidden(\s|$)/);
+    expect(how.className).not.toContain('min-height:740px');
     expect(how.className).toContain('@4xl/lobby:block');
     const bestFor = screen.getByTestId('spotlight-best-for');
-    expect(bestFor.className).toContain('[@media(min-height:740px)]:flex');
+    expect(bestFor.className).not.toContain('min-height:740px');
     expect(bestFor.className).toContain('@4xl/lobby:flex');
   });
 

@@ -6,11 +6,15 @@ import { ClassroomGameLoadingShell } from '../ClassroomGameLoadingShell';
 import { LobbySeoTail } from '../LobbySeoTail';
 
 describe('classroom-game CLS reserve', () => {
-  it('loading shell is one viewport with a header slot matching EducationHeader min-heights', () => {
+  it('loading shell is one viewport with slots matching the teacher shell: top bar below lg, sidebar from lg', () => {
     render(<ClassroomGameLoadingShell />);
     expect(screen.getByTestId('classroom-game-loading-shell')).toHaveClass('h-dvh');
-    expect(screen.getByTestId('classroom-game-header-slot').className).toMatch(/min-h-\[60px\]/);
-    expect(screen.getByTestId('classroom-game-header-slot').className).toMatch(/sm:min-h-\[70px\]/);
+    const top = screen.getByTestId('classroom-game-header-slot').className;
+    expect(top).toMatch(/min-h-\[60px\]/);
+    expect(top).toContain('lg:hidden');
+    const side = screen.getByTestId('classroom-game-sidebar-slot').className;
+    expect(side).toContain('w-60');
+    expect(side).toContain('lg:block');
     expect(screen.getByTestId('classroom-game-lobby-slot')).toBeInTheDocument();
   });
 
@@ -36,5 +40,12 @@ describe('classroom-game CLS reserve', () => {
     expect(src).toMatch(/ClassroomGameLoadingShell/);
     expect(src).toMatch(/loadingFallback=\{<ClassroomGameLoadingShell/);
     expect(src).not.toMatch(/PageLoader/);
+  });
+
+  it('PageClient puts the teacher lobby in the teacher shell (top bar and sidebar, no phone tab bar)', () => {
+    const src = readFileSync(join(__dirname, '..', 'PageClient.tsx'), 'utf8');
+    expect(src).toMatch(/<EducationShell[\s\S]*nav=\{teacherEducationNav\(language\)\}/);
+    expect(src).toMatch(/tabs=\{false\}/);
+    expect(src).not.toMatch(/<EducationHeader/);
   });
 });

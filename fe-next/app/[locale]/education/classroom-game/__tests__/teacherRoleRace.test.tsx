@@ -31,7 +31,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
 }));
 vi.mock('@/contexts/NavigationContext', () => ({
-  useNavigation: () => ({ setIsInGame: () => {} }),
+  useNavigation: () => ({ setIsInGame: () => {}, registerHeaderAudioControl: () => () => {} }),
 }));
 vi.mock('@/components/education/ClassroomGuestDemo', () => ({
   ClassroomGuestDemo: () => <div data-testid="student-join" />,

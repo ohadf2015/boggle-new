@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
 import type { ClassroomGameMode, VocabQuizVariant } from '@/shared/types/vocabQuiz';
@@ -22,10 +22,12 @@ export interface LobbyGameOptionsProps {
   allPlayableWords: string[];
   lessonWords: VocabularyWord[];
   lessonLanguage?: string;
+  /** "Send list as homework": rare, so it lives here and not beside the word list. */
+  homework?: ReactNode;
 }
 
-/** Battle, Pro pressure dials, round, late join and economy: one modal behind a one-line summary. */
-export function LobbyGameOptions({ opts, roundMinutes, gameMode, vocabQuizVariant, classroomBossId, allPlayableWords, lessonWords, lessonLanguage }: LobbyGameOptionsProps) {
+/** Battle, Pro pressure dials, round, late join, economy and homework: one modal behind a one-line summary. */
+export function LobbyGameOptions({ opts, roundMinutes, gameMode, vocabQuizVariant, classroomBossId, allPlayableWords, lessonWords, lessonLanguage, homework }: LobbyGameOptionsProps) {
   const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   const summary = [
@@ -83,6 +85,15 @@ export function LobbyGameOptions({ opts, roundMinutes, gameMode, vocabQuizVarian
             hint={t('eduShell.host.lateJoinHint')}
           />
           <LobbyEconomyToggles value={opts.economy} onChange={opts.setEconomy} />
+          {homework ? (
+            <section data-testid="lobby-options-homework" aria-labelledby="lobby-options-homework-title" className="flex flex-col items-start gap-2">
+              <h3 id="lobby-options-homework-title" className="font-neo-display text-base font-bold text-neo-cream">
+                {t('eduShell.host.homeworkTitle')}
+              </h3>
+              <p className="font-neo-body text-sm text-neo-cream/75">{t('eduShell.host.homeworkHint')}</p>
+              {homework}
+            </section>
+          ) : null}
         </div>
       </div>
     </LobbySetupDisclosure>

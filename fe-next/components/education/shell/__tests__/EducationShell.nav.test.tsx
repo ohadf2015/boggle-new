@@ -129,3 +129,38 @@ describe('EducationShell — nav shell', () => {
     expect(getByTestId('education-shell-scroll').textContent).toBe('body');
   });
 });
+
+describe('EducationShell with a passed nav (a teacher screen under /education)', () => {
+  it('Given the Start a game launcher path, Then the passed teacher nav shows the top bar and sidebar, and tabs={false} drops the phone tab bar', async () => {
+    const { teacherEducationNav } = await import('../navItems');
+    pathname.current = '/en/education/classroom-game';
+    const { getByTestId, queryByTestId } = render(
+      <EducationShell nav={teacherEducationNav('en')} tabs={false}>
+        <p>lobby</p>
+      </EducationShell>,
+    );
+    expect(getByTestId('teacher-topbar')).toBeInTheDocument();
+    expect(getByTestId('education-sidebar')).toBeInTheDocument();
+    expect(queryByTestId('education-tabbar')).toBeNull();
+    expect(queryByTestId('education-shell-header')).toBeNull();
+  });
+
+  it('Given the same path with no nav passed, Then it stays chrome-free', () => {
+    pathname.current = '/en/education/classroom-game';
+    const { queryByTestId } = render(
+      <EducationShell>
+        <p>lobby</p>
+      </EducationShell>,
+    );
+    expect(queryByTestId('teacher-topbar')).toBeNull();
+    expect(queryByTestId('education-sidebar')).toBeNull();
+  });
+
+  it('gives the launcher the teacher tabs with none active', async () => {
+    const { teacherEducationNav } = await import('../navItems');
+    const nav = teacherEducationNav('he');
+    expect(nav.kind).toBe('teacher');
+    expect(nav.activeKey).toBeNull();
+    expect(nav.items.map((i) => i.href)).toEqual(['/he/teacher', '/he/teacher/classroom', '/he/teacher/curriculum', '/he/teacher/reports']);
+  });
+});
