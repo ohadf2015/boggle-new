@@ -4,8 +4,13 @@
  * `/play` as a locale segment and renders the word-validation 404, `/room`
  * lands on the generic one. Both are dead ends at the top of the funnel.
  *
- * Aliases, not canonical moves — `permanent: false`, so making either a real
- * page later is not blocked by a 301 cached in every browser that probed it.
+ * `/ranks` is the same class from the other direction: the nav label is
+ * "Ranks", so users (and older deploys' nav) hit /[locale]/ranks, which never
+ * resolved — live /en/ranks → 404. It aliases to the canonical /leaderboard.
+ *
+ * Aliases, not canonical moves — `permanent: false`, so making any of them a
+ * real page later is not blocked by a 301 cached in every browser that
+ * probed it.
  */
 
 import { describe, it, expect } from 'vitest';
@@ -48,6 +53,16 @@ describe('game route aliases', () => {
     expect(rules.find((r) => r.source === '/room/:code')?.destination).toBe('/en/join/:code');
   });
 
+  it('sends /ranks to the leaderboard, per locale and bare', () => {
+    // The global nav "Ranks" tab is labeled "Ranks" (translations
+    // nav.leaderboard), so users type /ranks and older deploys linked it on
+    // every page — while it 404'd. The leaderboard is the retention hook, so
+    // the alias lands on the canonical page instead of the 404.
+    const localeRule = rules.find((r) => r.source.endsWith('/ranks') && r.source.includes(':locale'));
+    expect(localeRule?.destination).toBe('/:locale/leaderboard');
+    expect(rules.find((r) => r.source === '/ranks')?.destination).toBe('/en/leaderboard');
+  });
+
   it('lists every supported locale in the alternation', () => {
     for (const rule of rules.filter((r) => r.source.includes(':locale'))) {
       const group = rule.source.match(/:locale\(([^)]+)\)/)?.[1]?.split('|');
@@ -63,7 +78,7 @@ describe('game route aliases', () => {
     // A `:rest*` or prefix shape here would eat `/en/connections/play` and
     // `/en/play-boggle-online-free`, both real pages.
     for (const rule of rules) {
-      expect(rule.source).toMatch(/^(\/:locale\(.+\))?\/(play|room|room\/:code)$/);
+      expect(rule.source).toMatch(/^(\/:locale\(.+\))?\/(play|room|room\/:code|ranks)$/);
     }
   });
 });
