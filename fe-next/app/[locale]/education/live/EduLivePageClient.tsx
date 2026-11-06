@@ -12,6 +12,7 @@ import { MpExitProvider } from '@/hooks/useMpExit';
 import { classroomStudentHomePath, CLASSROOM_ROOM_GONE_KEY } from '@/lib/education/classroomRoomGone';
 import { useMpPageState } from '@/app/[locale]/multiplayer/useMpPageState';
 import { EduRoomFullNotice } from '@/components/education/live/EduRoomFullNotice';
+import { readClassroomLiveFlags } from '@/lib/education/classroomLivePath';
 import { EduLivePhaseRouter } from './EduLivePhaseRouter';
 
 const HostLeftGraceModal = nextDynamic(
@@ -31,6 +32,7 @@ const ClassroomGameEndedState = nextDynamic(
   () => import('@/components/education/ClassroomGameEndedState').then((m) => m.ClassroomGameEndedState),
   { ssr: false },
 );
+const PracticeRunPanel = nextDynamic(() => import('@/components/education/live/PracticeRunPanel').then((m) => m.PracticeRunPanel), { ssr: false });
 const StudentWordBank = nextDynamic(() => import('@/components/education/StudentWordBank').then((m) => m.StudentWordBank), { ssr: false });
 
 /** The URL names the room the teacher just launched, so a stale "I left" flag from the last room must not swallow it. */
@@ -43,10 +45,13 @@ function useClearStaleExitFlag(): void {
 
 export default function EduLivePageClient(): React.JSX.Element {
   useClearStaleExitFlag();
-  const urlRoom = useSearchParams()?.get('room') ?? null;
+  const searchParams = useSearchParams();
+  const urlRoom = searchParams?.get('room') ?? null;
   const s = useMpPageState();
   const [hostExitOpen, setHostExitOpen] = React.useState(false);
   const isTeacher = s.isHost || s.isClassroomHost;
+  const practiceRoom = isTeacher && readClassroomLiveFlags('/education/live', searchParams).isPracticeRun ? s.gameCode || urlRoom : null;
+  const practiceJoined = s.playersInRoom.some((p) => p.isPractice === true);
 
   const leaveFromBanner = () => {
     if (isTeacher) {
@@ -68,15 +73,20 @@ export default function EduLivePageClient(): React.JSX.Element {
                 <ConnectionQualityChip />
               </div>
             )}
-            <div className="flex min-h-0 flex-1 flex-col" style={s.classroomAccessibility?.largeText ? { zoom: 1.2 } : undefined}>
-              <EduLivePhaseRouter
-                routerProps={s.routerProps}
-                urlRoom={urlRoom || s.gameCode || null}
-                isTeacher={isTeacher}
-                isSpectator={s.isSpectator}
-                language={s.language}
-                t={s.t as (key: string, params?: Record<string, string | number>) => string}
-              />
+            <div className="flex min-h-0 flex-1">
+              <div className="flex min-h-0 min-w-0 flex-1 flex-col" style={s.classroomAccessibility?.largeText ? { zoom: 1.2 } : undefined}>
+                <EduLivePhaseRouter
+                  routerProps={s.routerProps}
+                  urlRoom={urlRoom || s.gameCode || null}
+                  isTeacher={isTeacher}
+                  isSpectator={s.isSpectator}
+                  language={s.language}
+                  t={s.t as (key: string, params?: Record<string, string | number>) => string}
+                />
+              </div>
+              {practiceRoom && (
+                <PracticeRunPanel gameCode={practiceRoom} language={s.language} joined={practiceJoined} t={s.t as (key: string, params?: Record<string, string | number>) => string} />
+              )}
             </div>
             {isTeacher && !s.showResults && (
               <EduRoomFullNotice players={s.playersInRoom} watching={s.spectators.length} t={s.t as (key: string, params?: Record<string, string | number>) => string} />

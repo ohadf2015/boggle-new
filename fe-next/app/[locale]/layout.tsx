@@ -11,6 +11,7 @@ import GoogleConsentMode from '@/components/GoogleConsentMode';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import { STORAGE_SHIM_SCRIPT } from '@/utils/storageShim';
+import { PRACTICE_SEAT_SCRIPT } from '@/utils/practiceSeatStorage';
 import { CHUNK_BOOT_GUARD_SCRIPT } from '@/utils/chunkBootGuard';
 import { getLocalizedSchemaStrings } from '@/utils/seoLocalizedSchema';
 import { getWebAppDescription } from '@/lib/seo/webAppDescription';
@@ -541,6 +542,15 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <script
                     dangerouslySetInnerHTML={{
                         __html: STORAGE_SHIM_SCRIPT,
+                    }}
+                />
+                {/* Teacher practice seat (?practiceSeat=1): keeps the student page's
+                    app data in memory and its auth cookies undeletable, so it can
+                    run beside the teacher's own board without signing them out.
+                    A no-op on every other page. */}
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: PRACTICE_SEAT_SCRIPT,
                     }}
                 />
                 {/* Pre-hydration stale-chunk guard — must run before any app

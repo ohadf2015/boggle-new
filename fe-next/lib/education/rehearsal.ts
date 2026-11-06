@@ -22,6 +22,8 @@ export function modeAllowsRehearsalBots(mode: string | null | undefined): boolea
 export interface RehearseIntent {
   source: Exclude<RehearsalSource, 'lobby'>;
   classExists: boolean;
+  /** Practice run: the teacher plays as a student beside the board, so the round waits for that seat. */
+  withSeat?: boolean;
 }
 
 export function writeRehearseIntent(intent: RehearseIntent, now = Date.now()): void {
@@ -36,10 +38,10 @@ export function peekRehearseIntent(now = Date.now()): RehearseIntent | null {
   try {
     const raw = sessionStorage.getItem(INTENT_KEY);
     if (!raw) return null;
-    const parsed = JSON.parse(raw) as { source?: unknown; classExists?: unknown; at?: unknown };
+    const parsed = JSON.parse(raw) as { source?: unknown; classExists?: unknown; withSeat?: unknown; at?: unknown };
     if (typeof parsed.at !== 'number' || now - parsed.at > INTENT_TTL_MS) return null;
     if (parsed.source !== 'hq' && parsed.source !== 'class') return null;
-    return { source: parsed.source, classExists: parsed.classExists === true };
+    return { source: parsed.source, classExists: parsed.classExists === true, ...(parsed.withSeat === true ? { withSeat: true } : {}) };
   } catch {
     return null;
   }

@@ -32,6 +32,8 @@ export type MpRoomPlayer = {
   avatar?: Avatar;
   isHost?: boolean;
   isBot?: boolean;
+  /** The teacher's own practice seat (server-flagged). */
+  isPractice?: boolean;
   presenceStatus?: string;
   isWindowFocused?: boolean;
 };

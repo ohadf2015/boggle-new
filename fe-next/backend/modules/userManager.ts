@@ -69,6 +69,8 @@ export interface GameUserInfo {
   botDifficulty?: string | null;
   /** Socket dropped; seat held for the reconnect grace. */
   disconnected?: boolean;
+  /** The teacher's own practice seat: never a student. */
+  isPractice?: boolean;
 }
 
 export interface AuthContext {
@@ -393,6 +395,7 @@ export function getGameUsers(game: GameBase | null): GameUserInfo[] {
       isBot: data.isBot || false,
       botDifficulty: data.botDifficulty || null,
       disconnected: data.disconnected === true,
+      ...(data.isPractice ? { isPractice: true } : {}),
     }));
 }
 

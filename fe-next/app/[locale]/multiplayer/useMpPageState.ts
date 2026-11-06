@@ -48,6 +48,7 @@ import { useMpRoomSocket, type MpRoomPlayer, type MpHostLeftState } from './useM
 import { useMpPageEffects } from './useMpPageEffects';
 import { applyMpPreselectMode } from './preselectMode';
 import type { MpPhaseRouterProps } from './MpPhaseRouter';
+import { isPracticeSeatPage } from '@/utils/practiceSeatStorage';
 
 export function useMpPageState() {
   const searchParams = useSearchParams();
@@ -411,7 +412,8 @@ export function useMpPageState() {
     entry: {
       handleJoin, refreshRooms, activeRooms, roomsLoading,
       isJoining, isAuthenticated, autoCreate, quickPlay,
-      displayName: (isCrazyGames && cgUser?.username) || profile?.display_name || '', profileAvatar: profile?.avatar_config,
+      // The teacher's practice seat joins under its own name: the server keeps the teacher's name for the host seat.
+      displayName: isPracticeSeatPage() ? t('eduLiveRoom.practice.seatName') : (isCrazyGames && cgUser?.username) || profile?.display_name || '', profileAvatar: profile?.avatar_config,
       onCrazyGamesLogin: isCrazyGames && !cgUser ? loginCrazyGames : undefined,
       prefilledRoom: prefilledRoomCode, defaultLanguage: language as Language,
       host: isClassroomHost,

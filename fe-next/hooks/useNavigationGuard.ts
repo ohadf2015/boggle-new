@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { registerNavigationGuard } from '@/lib/navigation/navigationGuardRegistry';
+import { isFramedPracticeSeat } from '@/utils/practiceSeatStorage';
 
 interface UseNavigationGuardOptions {
   /** Whether navigation should be guarded (typically when game is active) */
@@ -83,12 +84,15 @@ export function resetPhantomPopStateForTests(): void {
 }
 
 export function useNavigationGuard({
-  enabled,
+  enabled: requestedEnabled,
   message = 'Are you sure you want to leave? You will lose your progress in the current game.',
   onNavigationAttempt,
   leaving = false,
   onAbandonAttempt,
 }: UseNavigationGuardOptions): void {
+  // A practice seat framed beside the teacher's board shares the top window's
+  // history: its phantom entry and teardown go(-1) would move the board's page.
+  const enabled = requestedEnabled && !isFramedPracticeSeat();
   // Track if we're handling a back navigation
   const isHandlingBackRef = useRef(false);
   // Mirror `leaving` in a ref, updated DURING RENDER (not in an effect). The

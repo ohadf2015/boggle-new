@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Bot, Loader2 } from 'lucide-react';
+import { Bot, Loader2, MonitorSmartphone } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { getLessons } from '@/lib/supabase/education';
@@ -28,9 +28,13 @@ export interface RehearseWithBotsButtonProps {
   className?: string;
   /** Fired on press, before the launch (telemetry hook). */
   onStart?: () => void;
+  /** Practice run: the board opens with the teacher's own student view beside it. */
+  withSeat?: boolean;
+  /** Overrides the default "rehearse" label. */
+  label?: string;
 }
 
-export function RehearseWithBotsButton({ classroomId, source, language, t, showNote = false, compact = false, className, onStart }: RehearseWithBotsButtonProps) {
+export function RehearseWithBotsButton({ classroomId, source, language, t, showNote = false, compact = false, className, onStart, withSeat = false, label }: RehearseWithBotsButtonProps) {
   const router = useRouter();
   const { user } = useAuth();
   const [pending, setPending] = useState(false);
@@ -46,7 +50,7 @@ export function RehearseWithBotsButton({ classroomId, source, language, t, showN
       lessons = await Promise.race([getLessons(user.id).then((r) => r.data ?? []), capped]).catch(() => []);
     }
     writeQuickLaunchIntent(buildRehearsalLaunch({ lessons, uiLanguage: language, classroomId, packName: (key) => t(key) }));
-    writeRehearseIntent({ source, classExists: !!classroomId });
+    writeRehearseIntent({ source, classExists: !!classroomId, ...(withSeat ? { withSeat: true } : {}) });
     router.push(`/${language}/education/classroom-game?flow=${QUICK_LAUNCH_FLOW}`);
   };
 
@@ -64,9 +68,9 @@ export function RehearseWithBotsButton({ classroomId, source, language, t, showN
         {pending ? (
           <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden="true" />
         ) : (
-          <Bot className="size-4" aria-hidden="true" />
+          withSeat ? <MonitorSmartphone className="size-4" aria-hidden="true" /> : <Bot className="size-4" aria-hidden="true" />
         )}
-        <span className={cn(compact && 'max-sm:sr-only')}>{t('education.projectorLobby.rehearseCta')}</span>
+        <span className={cn(compact && 'max-sm:sr-only')}>{label ?? t('education.projectorLobby.rehearseCta')}</span>
       </button>
       {showNote ? (
         <p className="px-2 font-neo-body text-xs font-semibold text-neo-cream/60">{t('education.projectorLobby.rehearsePrivate')}</p>

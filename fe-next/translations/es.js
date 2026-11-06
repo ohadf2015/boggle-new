@@ -21539,6 +21539,23 @@ const es = {
   // @hqCalm:end
   // @eduLiveRoom:start
   "eduLiveRoom": {
+    "practice": {
+      "seatName": "Estudiante de práctica",
+      "title": "Tu vista de estudiante",
+      "body": "Juega aquí como estudiante. El tablero de al lado es lo que ve tu clase.",
+      "joining": "Entrando como estudiante…",
+      "joined": "Estás dentro como estudiante de práctica",
+      "step1": "Entras como estudiante de práctica",
+      "step2": "Entran jugadores de práctica y empieza la ronda",
+      "step3": "Busca palabras aquí y mira el tablero",
+      "step4": "Mira los resultados que verá tu clase",
+      "phoneTitle": "O juega desde tu teléfono",
+      "phoneHint": "Escanea para entrar en esta ronda como estudiante. Sigues con la sesión iniciada en ambos.",
+      "openTab": "Abrir en una pestaña nueva",
+      "hide": "Ocultar vista de estudiante",
+      "show": "Mostrar vista de estudiante",
+      "frameTitle": "Vista de estudiante"
+    },
     "round": {
       "boardLabel": "Tablero de la clase",
       "wheelLabel": "Rueda de la clase"
@@ -21688,7 +21705,8 @@ const es = {
       },
       "practice": {
         "title": "Pruébalo tú primero",
-        "body": "Juega una ronda rápida contra bots y mira lo que verá tu clase. Solo lo ves tú."
+        "body": "Juega una ronda como estudiante junto a tu tablero, con jugadores de práctica. Solo lo ves tú.",
+        "cta": "Pruébalo como estudiante"
       },
       "greetMorning": "Buenos días, {name}",
       "greetAfternoon": "Buenas tardes, {name}",
