@@ -19,7 +19,7 @@
   `purple/60` = 2.18:1. Lime/cyan/yellow need ≥45%; cream/white need ≥40%.
   When in doubt use a **solid** accent border — it matches the brand's
   "solid borders" rule and clears the gate on every tone (min 4.35:1).
-- Guarded by `components/education/__tests__/educationBorderContrast.test.ts`,
+- Guarded by `components/education/__tests__/educationBorderContrast.guard.test.ts`,
   which computes real WCAG ratios from the shipped hex values across
   `components/education`, `components/teacher` and `app/[locale]/education`.
 
