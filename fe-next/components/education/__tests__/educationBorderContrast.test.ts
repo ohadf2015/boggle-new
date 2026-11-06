@@ -243,8 +243,8 @@ const FROZEN_EXTRA = [
   'components/wordTowerV2/rivals/PayoffPanel.tsx|neo-navy|neo-black',
   'components/wordTowerV2/rivals/RaidResultCard.tsx|neo-navy/90|neo-black',
   'components/wordTowerV2/rivals/RevengeHome.tsx|neo-navy-light|neo-black',
-  'components/wordTowerV2/rivals/RivalBoard.tsx|neo-navy|neo-black',
-  'components/wordTowerV2/rivals/RivalBoard.tsx|neo-navy-light|neo-black',
+  // #1666 replaced two RivalBoard black-on-navy edges with cream/lime. One
+  // border-black on navy-light remains; do not re-add the fixed pairs.
   'components/wordTowerV2/rivals/RivalBoard.tsx|neo-navy-light|neo-black',
   'components/wordTowerV2/rivals/RivalBuilding.tsx|neo-navy|neo-black',
   'components/wordTowerV2/rivals/RivalBuilding.tsx|neo-navy-light|neo-black',
