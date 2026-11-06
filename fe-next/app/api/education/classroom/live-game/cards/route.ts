@@ -13,8 +13,6 @@ const querySchema = z.object({ code: z.string().min(1).max(10) });
  *
  * The lesson's study cards for the projector wall. Teacher-only, unlike the sibling
  * `live-game` route, which is open to logged-out phones and so carries no words.
- *
- * 200 { cards } · 204 no live game · 400 bad code · 401 no session · 403 not this room's teacher · 429
  */
 export async function GET(request: NextRequest) {
   try {

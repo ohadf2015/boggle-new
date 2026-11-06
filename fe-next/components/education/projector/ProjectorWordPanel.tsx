@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { RISE, type Translate } from '@/components/education/live/eduLiveStyles';
 import type { StudyCard } from '@/shared/utils/studyCards';
 
-/** Two rows of six on a wide wall: more would push the Start bar off a 1080p screen. */
+/** Two rows of six on a wide wall; the rest of the deck is on the students' phones. */
 export const PROJECTOR_WORDS_MAX = 12;
 
 interface ProjectorWordPanelProps {
