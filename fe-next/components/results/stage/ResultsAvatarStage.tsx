@@ -38,6 +38,7 @@ export function ResultsAvatarStage({
     <div
       className={`relative flex w-full items-center justify-center ${compact ? 'h-[min(22dvh,180px)] lg:h-[200px]' : 'h-[min(34dvh,290px)] lg:h-[300px]'}`}
       data-testid="results-avatar-stage"
+      aria-hidden="true"
     >
       <QuickResultsRays color={accentHex} spinning={animate} />
       <ConfettiPuff count={cheering ? confettiCount : 0} enabled={animate} />
