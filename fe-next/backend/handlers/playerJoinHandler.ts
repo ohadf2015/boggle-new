@@ -215,10 +215,13 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     // normalised above (auth id / guest-token hash map back to their own seat), so a
     // mismatch here is a second student typing a taken name, who would otherwise
     // inherit the first one's score and silence their words.
+    // A signed-in seat is never reclaimed without that account: a guest typing the
+    // teacher's name would otherwise reconnect into the host seat (and its controls).
     const seated = game.users[username];
     if (
       seated &&
       ((seated.authUserId && authUserId && seated.authUserId !== authUserId) ||
+        (seated.authUserId && !authUserId) ||
         (seated.guestTokenHash && guestTokenHash && seated.guestTokenHash !== guestTokenHash))
     ) {
       emitError(socket, ErrorCodes.PLAYER_USERNAME_TAKEN, { message: 'That name is already taken' });
