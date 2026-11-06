@@ -101,7 +101,7 @@ describe('V2TopBar HUD refactor: one row, exactly 4-5 items', () => {
     expect(stabilityInTopBar).toBeNull();
   });
 
-  it('given a daily run with date, when rendered, then the daily badge appears in the top row as a direct child', () => {
+  it('given a daily run with date, when rendered, then the top row has 4 items and no separate daily badge', () => {
     const { container } = render(bar({
       daily: true,
       dailyDateKey: '2026-09-25',
@@ -110,17 +110,13 @@ describe('V2TopBar HUD refactor: one row, exactly 4-5 items', () => {
       onMenuOpen: vi.fn(),
     }));
 
-    // Daily badge should appear with date
-    const dailyBadge = screen.getByLabelText(/DAILY 25 Sep/);
-    expect(dailyBadge).toBeTruthy();
+    // The exit ("back to the daily") and the goal chip already say it is the daily.
+    expect(screen.queryByLabelText(/DAILY 25 Sep/)).toBeNull();
 
-    // It should be a direct child of the top row
     const topBar = container.querySelector('[data-wt2-topbar]');
     const row = topBar?.querySelector('[data-wt2-topbar-row]');
-    expect(row?.contains(dailyBadge)).toBeTruthy();
-
-    // Row should have 5 items: exit, height+score, coins, daily, menu
-    expect(row?.children.length).toBe(5);
+    // Row has 4 items: exit, height+goal, coins, menu
+    expect(row?.children.length).toBe(4);
   });
 
   it('given secondary items are not rendered in V2TopBar, when a menu opener is provided, then it is clickable', () => {

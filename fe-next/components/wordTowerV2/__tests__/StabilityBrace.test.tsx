@@ -43,6 +43,24 @@ describe('StabilityBrace: merged stability + brace control', () => {
     expect(text).toBe(''); // Only pips, no text content
   });
 
+  it('given a steady tower and no offer, when rendered, then the meter keeps its space but is hidden (no news on screen)', () => {
+    const { container } = render(
+      <StabilityBrace t={t} risk={0.2} api={api()} reducedMotion={false} />,
+    );
+    const control = container.querySelector('[data-wt2-stability-brace]');
+    expect(control?.getAttribute('data-idle')).toBe('true');
+    expect(control?.className).toContain('invisible');
+  });
+
+  it('given a swaying tower, when rendered, then the meter shows', () => {
+    const { container } = render(
+      <StabilityBrace t={t} risk={0.5} api={api()} reducedMotion={false} />,
+    );
+    const control = container.querySelector('[data-wt2-stability-brace]');
+    expect(control?.getAttribute('data-idle')).toBeNull();
+    expect(control?.className).not.toContain('invisible');
+  });
+
   it('given wobbly tower (risk >= 0.35, < 0.7), when rendered, then the danger label appears', () => {
     const { container } = render(
       <StabilityBrace

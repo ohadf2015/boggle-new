@@ -11,6 +11,8 @@ interface Props {
   t: T;
   slots: NextUpSlot[];
   reducedMotion?: boolean;
+  /** Smaller chips for the in-run bar on a phone. */
+  compact?: boolean;
 }
 
 const sameSlots = (a: NextUpSlot[], b: NextUpSlot[]) =>
@@ -33,7 +35,7 @@ export function detectReveals(
   });
 }
 
-export function NextUpQueue({ t, slots, reducedMotion = false }: Props) {
+export function NextUpQueue({ t, slots, reducedMotion = false, compact = false }: Props) {
   const [seen, setSeen] = useState(slots);
   const [revealing, setRevealing] = useState<boolean[]>([]);
   const [gen, setGen] = useState<number[]>([]);
@@ -46,7 +48,11 @@ export function NextUpQueue({ t, slots, reducedMotion = false }: Props) {
 
   return (
     <div className="pointer-events-none flex items-center gap-1.5">
-      <span className="font-neo-display text-[11px] font-black uppercase leading-none text-neo-cream [text-shadow:1px_1px_0_rgb(var(--neo-black))]">
+      <span
+        className={`font-neo-display text-[11px] font-black uppercase leading-none text-neo-cream [text-shadow:1px_1px_0_rgb(var(--neo-black))] ${
+          compact ? "rounded-neo-sm bg-neo-navy/85 px-1.5 py-1" : ""
+        }`}
+      >
         {t("wordTowerV2.rush.nextUp.title")}
       </span>
       <ul
@@ -60,6 +66,7 @@ export function NextUpQueue({ t, slots, reducedMotion = false }: Props) {
               t={t}
               slot={slot}
               first={i === 0}
+              compact={compact}
               revealing={revealing[i] ?? false}
               reducedMotion={reducedMotion}
             />
@@ -74,13 +81,28 @@ interface ChipProps {
   t: T;
   slot: NextUpSlot;
   first: boolean;
+  compact: boolean;
   revealing: boolean;
   reducedMotion: boolean;
 }
 
-function Chip({ t, slot, first, revealing, reducedMotion }: ChipProps) {
-  const size = first ? "h-10 w-10" : "h-8 w-8";
-  const base = `relative flex items-center justify-center overflow-hidden rounded-neo border-neo-thick border-black shadow-hard ${size}`;
+function Chip({ t, slot, first, compact, revealing, reducedMotion }: ChipProps) {
+  const size = compact
+    ? first
+      ? "h-8 w-8 lg:h-10 lg:w-10"
+      : "h-6 w-6 lg:h-8 lg:w-8"
+    : first
+      ? "h-10 w-10"
+      : "h-8 w-8";
+  const glyph = compact
+    ? first
+      ? "h-5 w-5 lg:h-6 lg:w-6"
+      : "h-4 w-4 lg:h-5 lg:w-5"
+    : first
+      ? "h-6 w-6"
+      : "h-5 w-5";
+  const shadow = compact && !first ? "shadow-hard-sm" : "shadow-hard";
+  const base = `relative flex items-center justify-center overflow-hidden rounded-neo border-neo-thick border-black ${shadow} ${size}`;
 
   if (slot.sealed) {
     return (
@@ -88,7 +110,7 @@ function Chip({ t, slot, first, revealing, reducedMotion }: ChipProps) {
         role="img"
         aria-label={t("wordTowerV2.rush.nextUp.sealed")}
         data-sealed="true"
-        className={`${base} bg-neo-navy-light font-neo-display text-lg font-black text-neo-cream`}
+        className={`${base} bg-neo-navy-light font-neo-display ${compact ? "text-sm" : "text-lg"} font-black text-neo-cream`}
         initial={reducedMotion ? false : { y: -8, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: "spring", stiffness: 420, damping: 22 }}
@@ -139,7 +161,7 @@ function Chip({ t, slot, first, revealing, reducedMotion }: ChipProps) {
     >
       <TraitGlyph
         trait={slot.trait}
-        className={first ? "h-6 w-6" : "h-5 w-5"}
+        className={glyph}
       />
     </m.span>
   );

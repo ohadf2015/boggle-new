@@ -64,8 +64,6 @@ const dockProps = {
   selected: [],
   word: '',
   valid: false,
-  intensity: 0,
-  accentHex: '#000',
   reducedMotion: false,
   canPutBack: false,
   onScramble: vi.fn(),
@@ -83,7 +81,7 @@ const dockProps = {
  * the dock (floating over the tower), which is forbidden.
  */
 describe('StabilityBrace placement in V2Dock', () => {
-  it('given a stability slot on phone, when dock renders, then slot is in the same grid container as the wheel and scramble button', () => {
+  it('given a stability slot on phone, when dock renders, then slot sits in the panel flow with the word and letters, not floating over the tower', () => {
     const { container } = render(
       <V2Dock
         {...dockProps}
@@ -94,17 +92,10 @@ describe('StabilityBrace placement in V2Dock', () => {
     const marker = screen.getByTestId('stability-marker');
     const scrambleButton = screen.getByLabelText(t('wordTower.hud.scramble'));
 
-    // Both should be inside the same grid container
-    const grids = container.querySelectorAll('[class*="grid"]');
-    expect(grids.length).toBeGreaterThan(0);
-
-    // Check that marker and scramble are in the same grid
-    let markerGrid = marker.closest('[class*="grid"]');
-    let scrambleGrid = scrambleButton.closest('[class*="grid"]');
-
-    if (markerGrid && scrambleGrid) {
-      expect(markerGrid).toBe(scrambleGrid);
-    }
+    // Same column as the word row (scramble lives there) and the letter row.
+    const column = container.querySelector('[data-wt2-letter-row]')!.parentElement!;
+    expect(column.contains(marker)).toBe(true);
+    expect(column.contains(scrambleButton)).toBe(true);
 
     // Marker should NOT have ancestor carrying absolute bottom calc(var(--wt2-dock))
     let ancestor = marker.parentElement;

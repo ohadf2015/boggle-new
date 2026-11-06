@@ -16,8 +16,11 @@ export type PropKind =
   | CritterKind;
 
 /** Props with a face and a moving part of their own (skyCritters.ts): the sky's jokes. */
-export type CritterKind = 'blimp' | 'puff' | 'whale' | 'astronaut' | 'ufo';
-export const CRITTER_KINDS: readonly PropKind[] = ['blimp', 'puff', 'whale', 'astronaut', 'ufo'];
+export type CritterKind = 'puff' | 'whale' | 'astronaut' | 'ufo' | FoodKind;
+/** Snacks and toys with faces (skyFood.ts): they can turn up in ANY sky, which is the joke. */
+export type FoodKind = 'pizza' | 'avocado' | 'donut' | 'duck' | 'icecream';
+export const FOOD_KINDS: readonly FoodKind[] = ['pizza', 'avocado', 'donut', 'duck', 'icecream'];
+export const CRITTER_KINDS: readonly PropKind[] = ['puff', 'whale', 'astronaut', 'ufo', ...FOOD_KINDS];
 
 /**
  * The backdrop effect behind a sky. One rotating sunburst used to hang behind
@@ -45,8 +48,8 @@ export interface Biome {
 }
 
 export const BIOMES: Biome[] = [
-  { id: 'downtown', fromFloor: 0, skyTop: 0x2f7bff, skyBottom: 0x8fd8ff, accent: 0xbfff00, stars: 0, city: 0x2a2f5a, props: ['cloud', 'bird', 'blimp'], fx: 'rays' },
-  { id: 'sunset', fromFloor: 3, skyTop: 0x5b2a86, skyBottom: 0xff8a4c, accent: 0xff4d9d, stars: 0, city: 0x3b1f4f, props: ['bird', 'balloon', 'cloud', 'blimp'], fx: 'haze' },
+  { id: 'downtown', fromFloor: 0, skyTop: 0x2f7bff, skyBottom: 0x8fd8ff, accent: 0xbfff00, stars: 0, city: 0x2a2f5a, props: ['cloud', 'bird', 'balloon'], fx: 'rays' },
+  { id: 'sunset', fromFloor: 3, skyTop: 0x5b2a86, skyBottom: 0xff8a4c, accent: 0xff4d9d, stars: 0, city: 0x3b1f4f, props: ['bird', 'balloon', 'cloud', 'puff'], fx: 'haze' },
   { id: 'clouds', fromFloor: 6, skyTop: 0x7a5cff, skyBottom: 0xffb3d9, accent: 0x37e0ff, stars: 0, city: 0x4a3a8a, props: ['cloud', 'balloon', 'puff', 'whale'], fx: 'rays' },
   { id: 'jetstream', fromFloor: 10, skyTop: 0x1b1f5e, skyBottom: 0x3f6fd8, accent: 0x37e0ff, stars: 0.25, city: 0x1b1f45, props: ['jet', 'cloud', 'whale', 'puff'], fx: 'streaks' },
   { id: 'aurora', fromFloor: 15, skyTop: 0x061233, skyBottom: 0x0f4d5c, accent: 0xbfff00, stars: 0.6, city: 0x0a1a2a, props: ['aurora', 'jet', 'whale'], fx: 'curtain' },

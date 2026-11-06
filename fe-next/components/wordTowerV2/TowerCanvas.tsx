@@ -248,7 +248,8 @@ export default function TowerCanvas(props: Props) {
       const scene = new Container();
       const project = (hM: number) => scene.y - hM * PX_PER_M * scene.scale.y;
       const flash = new Graphics();
-      const sky = new SkyLayer(skyProps(11));
+      // A fresh sky every time the tower screen opens: a fixed seed showed every player the same props at the same floors.
+      const sky = new SkyLayer(skyProps(Math.floor(Math.random() * 2 ** 31)));
       const farCity = createCity();
       const nearCity = createCity();
       created.stage.addChild(sky.container, farCity.container, nearCity.container, scene, flash);

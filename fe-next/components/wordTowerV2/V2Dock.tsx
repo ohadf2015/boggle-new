@@ -2,7 +2,7 @@
 
 import { memo, useEffect, useMemo, useRef, type ReactNode, type RefObject } from 'react';
 import { Delete, Shuffle, Undo2 } from 'lucide-react';
-import { WordTowerWheel } from '@/components/wordTower/WordTowerWheel';
+import { LetterRow, WordBox } from './LetterRow';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -20,8 +20,6 @@ interface Props {
   selected: number[];
   word: string;
   valid: boolean;
-  intensity: number;
-  accentHex: string;
   reducedMotion: boolean;
   /** The hanging word can still be put back (only while it hangs, once). */
   canPutBack: boolean;
@@ -44,15 +42,12 @@ interface Props {
 export const CLEAR_WORD_HOLD_MS = 450;
 
 /**
- * The controls: scramble, the swipe wheel (which morphs into the drop dial),
- * and backspace / put-back.
+ * The controls: the word between shuffle and backspace / put-back, the letters
+ * in one row, and one button that builds the word and then drops it.
  *
- * On a phone the strip itself is TRANSPARENT — only the wheel's own disc and
- * the two buttons are solid — so the city and the base of the tower run on
- * behind the controls instead of ending at a navy slab. The strip is also
- * click-through: a drag on its empty sides pans the camera like the rest of
- * the canvas. Its measured height still frames the ground (WordTowerV2), so
- * nothing about the camera changed.
+ * It replaced the swipe wheel, which players found busy and which took about a
+ * third of a phone's height. Its measured height still frames the ground
+ * (WordTowerV2), so the camera simply gets the room back.
  */
 export const V2Dock = memo(function V2Dock(p: Props) {
   const { t } = p;
@@ -84,6 +79,41 @@ export const V2Dock = memo(function V2Dock(p: Props) {
   const tray = useMemo(() => p.wheel.map((l) => l.toUpperCase()), [p.wheel]);
   const feed = p.wide ? p.feedSlot : null;
 
+  const scramble = (
+    <button
+      type="button"
+      onClick={p.onScramble}
+      disabled={p.scrambles === 0 || !p.composing}
+      aria-label={t('wordTower.hud.scramble')}
+      className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-purple text-neo-navy shadow-hard lg:h-14 lg:w-14 active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed disabled:opacity-40 disabled:shadow-none"
+    >
+      <Shuffle className="h-6 w-6" aria-hidden />
+      <span className="absolute -end-2 -top-2 rounded-full border-neo border-black bg-neo-cream px-1.5 font-neo-display text-xs font-black">
+        {p.scrambles}
+      </span>
+    </button>
+  );
+
+  // One slot, two jobs: rub out a letter while spelling, take the whole word
+  // back off the hook while it hangs.
+  const backspace = (
+    <button
+      type="button"
+      onClick={onBackspaceClick}
+      onPointerDown={onBackspaceDown}
+      onPointerLeave={cancelHold}
+      onPointerCancel={cancelHold}
+      onContextMenu={(e) => e.preventDefault()}
+      disabled={p.swinging ? !p.canPutBack : p.selected.length === 0 || !p.composing}
+      aria-label={t(p.swinging ? 'wordTowerV2.changeWord' : 'wordTower.hud.backspace')}
+      className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-neo border-neo-thick border-black text-neo-navy shadow-hard transition-colors lg:h-14 lg:w-14 active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed disabled:opacity-40 disabled:shadow-none ${
+        p.swinging ? 'bg-neo-pink' : 'bg-neo-cream'
+      }`}
+    >
+      {p.swinging ? <Undo2 className="h-6 w-6" aria-hidden /> : <Delete className="h-6 w-6" aria-hidden />}
+    </button>
+  );
+
   return (
     <div
       ref={p.dockRef}
@@ -94,36 +124,22 @@ export const V2Dock = memo(function V2Dock(p: Props) {
           ? 'absolute bottom-0 end-0 top-0 z-30 flex w-[22rem] flex-col justify-start gap-4 border-s-4 border-neo-cream/30 bg-neo-navy px-5 pb-4 pt-14 xl:w-[26rem]'
           : p.wide
           ? 'absolute bottom-0 end-0 top-0 z-30 flex w-[22rem] flex-col justify-center border-s-4 border-neo-cream/30 bg-neo-navy px-6 pb-24 xl:w-[26rem]'
-          : 'pointer-events-none absolute inset-x-0 bottom-0 z-30 px-4 pb-[max(2.25rem,calc(env(safe-area-inset-bottom)+1.25rem))] pt-7'
+          : // Phone: one short solid panel (word, one row of letters, one button)
+            // instead of the tall transparent wheel strip, so the tower keeps
+            // the screen above it.
+            'absolute inset-x-0 bottom-0 z-30 border-t-4 border-neo-cream/20 bg-neo-navy/90 px-4 pb-[max(1rem,calc(env(safe-area-inset-bottom)+0.5rem))] pt-3'
       }
     >
       {p.rejected ? (
-        <div className="absolute inset-x-0 top-1 z-40 mx-auto w-fit rounded-neo border-neo border-black bg-neo-red px-3 py-1 font-neo-display text-sm font-bold text-neo-navy shadow-hard animate-neo-shake">
+        <div className="absolute inset-x-0 -top-10 z-40 mx-auto w-fit rounded-neo border-neo border-black bg-neo-red px-3 py-1 font-neo-display text-sm font-bold text-neo-navy shadow-hard animate-neo-shake">
           {t(p.rejected.includes('.') ? p.rejected : `wordTower.error.${p.rejected}`)}
         </div>
       ) : null}
 
-      <div
-        className={
-          p.wide
-            ? 'mx-auto flex w-full flex-wrap items-center justify-center gap-6 [&>div]:order-first [&>div]:w-full [&>div]:max-w-none'
-            : 'mx-auto grid max-w-md grid-cols-[3.5rem_1fr_3.5rem] items-center gap-2 md:max-w-4xl md:grid-cols-[5rem_1fr_5rem] md:px-6 [&>*]:pointer-events-auto'
-        }
-      >
-        <button
-          type="button"
-          onClick={p.onScramble}
-          disabled={p.scrambles === 0 || !p.composing}
-          aria-label={t('wordTower.hud.scramble')}
-          className="relative flex h-14 w-14 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-purple text-neo-navy shadow-hard lg:h-16 lg:w-16 active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed disabled:opacity-40 disabled:shadow-none"
-        >
-          <Shuffle className="h-6 w-6" aria-hidden />
-          <span className="absolute -end-2 -top-2 rounded-full border-neo border-black bg-neo-cream px-1.5 font-neo-display text-xs font-black">
-            {p.scrambles}
-          </span>
-        </button>
-
-        {/* Middle column: stability pill stacked above the wheel */}
+      <div className="mx-auto flex w-full max-w-md flex-col gap-2.5 lg:gap-3">
+        {/* Phone: the stability meter heads the panel (never floating over the
+            tower); it keeps its row while hidden, so the camera never jumps. */}
+        {!p.wide && p.stabilitySlot ? <div className="pointer-events-auto flex justify-center">{p.stabilitySlot}</div> : null}
         {p.dictError ? (
           <button
             type="button"
@@ -133,49 +149,31 @@ export const V2Dock = memo(function V2Dock(p: Props) {
             {t('wordTower.loadError')}
           </button>
         ) : (
-          <div className="flex flex-col items-center gap-1">
-            {!p.wide && p.stabilitySlot ? <div className="pointer-events-auto">{p.stabilitySlot}</div> : null}
-            <WordTowerWheel
+          <>
+            <div className="flex items-center gap-2">
+              {scramble}
+              <WordBox t={t} word={p.word.toUpperCase()} placing={p.swinging} reducedMotion={p.reducedMotion} />
+              {backspace}
+            </div>
+            <LetterRow
+              t={t}
               tray={tray}
               selected={p.selected}
-              word={p.word.toUpperCase()}
               placing={p.swinging}
               canBuild={p.valid}
-              intensity={p.intensity}
-              accentHex={p.accentHex}
               reducedMotion={p.reducedMotion}
               dir={p.dir}
-              t={t}
               onSelectTile={p.onSelectTile}
               onDeselectTile={p.onDeselectTile}
               onSubmit={p.onSubmit}
               onDrop={p.onDrop}
             />
-          </div>
+          </>
         )}
-
-        {/* One slot, two jobs: rub out a letter while spelling, take the whole
-            word back off the hook while it hangs. A second button would have
-            been a third control competing for the same corner. */}
-        <button
-          type="button"
-          onClick={onBackspaceClick}
-          onPointerDown={onBackspaceDown}
-          onPointerLeave={cancelHold}
-          onPointerCancel={cancelHold}
-          onContextMenu={(e) => e.preventDefault()}
-          disabled={p.swinging ? !p.canPutBack : p.selected.length === 0 || !p.composing}
-          aria-label={t(p.swinging ? 'wordTowerV2.changeWord' : 'wordTower.hud.backspace')}
-          className={`flex h-14 w-14 items-center justify-center rounded-neo border-neo-thick border-black text-neo-navy shadow-hard transition-colors lg:h-16 lg:w-16 active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed disabled:opacity-40 disabled:shadow-none ${
-            p.swinging ? 'bg-neo-pink' : 'bg-neo-cream'
-          }`}
-        >
-          {p.swinging ? <Undo2 className="h-6 w-6" aria-hidden /> : <Delete className="h-6 w-6" aria-hidden />}
-        </button>
       </div>
 
-      {/* Wide layout: stability slot in the flex row */}
-      {p.wide && p.stabilitySlot && <div className="pointer-events-auto">{p.stabilitySlot}</div>}
+      {/* Wide layout: stability slot under the controls */}
+      {p.wide && p.stabilitySlot && <div className="pointer-events-auto mt-4 flex justify-center">{p.stabilitySlot}</div>}
       {feed ? <div className="flex min-h-0 flex-1 flex-col">{feed}</div> : null}
     </div>
   );

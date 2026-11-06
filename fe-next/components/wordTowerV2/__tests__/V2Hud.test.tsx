@@ -263,7 +263,7 @@ describe('V2Hud', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('renders the daily badge when daily=true with a date key', () => {
+  it('given a daily run, when rendered, then no separate daily badge competes with the goal chip', () => {
     const coinsRef = createRef<HTMLDivElement>();
     const onOpenEstate = vi.fn();
     const onExit = vi.fn();
@@ -303,9 +303,33 @@ describe('V2Hud', () => {
       />,
     );
 
-    // Daily badge should render
-    const dailyBadge = container.querySelector('[class*="bg-neo-cyan"]');
-    expect(dailyBadge).toBeInTheDocument();
+    // The exit and today's goal already say "daily": a third chip was clutter.
+    expect(container.querySelector('[class*="bg-neo-cyan"]')).toBeNull();
+    expect(screen.queryByText('DAILY')).toBeNull();
+  });
+
+  it('given a menu slot, when the menu opens, then it shows first in the sheet', async () => {
+    const user = userEvent.setup();
+    render(
+      <V2Hud
+        t={mockT}
+        heightM={0}
+        score={0}
+        bestM={0}
+        run={mockRun}
+        tenants={0}
+        estate={mockEstate}
+        runCoins={0}
+        raids={0}
+        coinsRef={createRef<HTMLDivElement>()}
+        onOpenEstate={vi.fn()}
+        menuSlot={<div data-testid="rank-meter">rank</div>}
+      />,
+    );
+    expect(screen.queryByTestId('rank-meter')).toBeNull();
+    await user.click(screen.getByLabelText('wordTowerV2.hud.menu'));
+    const top = document.querySelector('[data-wt2-menu-top]');
+    expect(top?.contains(screen.getByTestId('rank-meter'))).toBe(true);
   });
 
   it('given balls, tenants and a live crate effect, when the menu opens, then each chip is present and named', async () => {

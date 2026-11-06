@@ -39,8 +39,6 @@ const base: DockProps = {
   selected,
   word: '',
   valid: false,
-  intensity: 0.2,
-  accentHex: '#c4f000',
   reducedMotion: true,
   canPutBack: false,
   onScramble: noop,

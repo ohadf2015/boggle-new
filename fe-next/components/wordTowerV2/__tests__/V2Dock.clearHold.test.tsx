@@ -22,8 +22,6 @@ function renderDock(over: Partial<Parameters<typeof V2Dock>[0]> = {}) {
       selected={[0, 1, 2]}
       word="ABC"
       valid={false}
-      intensity={0}
-      accentHex="#c4f000"
       reducedMotion
       canPutBack={false}
       onScramble={vi.fn()}

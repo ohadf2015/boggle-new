@@ -36,12 +36,15 @@ export function useRushUi({ t, rush, game, daily, language, dailyBoard, dailyBas
   }, []);
   const canvasProps = useMemo(() => ({ registerProjector, getTrait: game.getTrait }), [registerProjector, game.getTrait]);
 
+  // The bar keeps only what changes the next drop (the blocks coming up). The
+  // rank is progress, not a decision: it lives in the menu, and a rank-up still
+  // gets its own burst on screen.
   const hudSlot = (
-    <div className="flex h-full items-center justify-center gap-2">
-      <RankMeter t={t} rank={rush.rank} reducedMotion={reducedMotion} />
-      <NextUpQueue t={t} slots={rush.slots} reducedMotion={reducedMotion} />
+    <div className="flex h-full w-full items-center justify-center gap-2">
+      <NextUpQueue t={t} slots={rush.slots} reducedMotion={reducedMotion} compact />
     </div>
   );
+  const menuSlot = <RankMeter t={t} rank={rush.rank} reducedMotion={reducedMotion} />;
 
   const toastsOn = inRun && game.phase !== 'draft';
   // In an effect: React Compiler memoizes render-time ref reads, which froze this at 0.
@@ -64,5 +67,5 @@ export function useRushUi({ t, rush, game, daily, language, dailyBoard, dailyBas
     </>
   );
 
-  return { canvasProps, hudSlot, overlays };
+  return { canvasProps, hudSlot, menuSlot, overlays };
 }

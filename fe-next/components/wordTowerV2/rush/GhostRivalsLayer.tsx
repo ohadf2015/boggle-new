@@ -115,12 +115,22 @@ export function GhostRivalsLayer({
                 style={{ top: lineY }}
               />
             ) : null}
+            {/* A rival whose height is off screen is a direction, not a name:
+                a small arrow chip at the edge, so it never sits over the sky
+                like a second headline. */}
             <div
               data-rival-tag
-              className="absolute end-2 flex max-w-[60%] items-center gap-1 rounded-neo-sm border-2 border-neo-cream bg-neo-navy/80 px-1.5 font-neo-display text-[11px] font-bold leading-[20px] text-neo-cream shadow-hard-sm"
+              data-offscreen={onScreen ? undefined : "true"}
+              className={`absolute end-2 flex max-w-[60%] items-center gap-1 rounded-neo-sm border-2 border-neo-cream bg-neo-navy/80 px-1.5 font-neo-display font-bold text-neo-cream shadow-hard-sm ${
+                onScreen ? "text-[11px] leading-[20px]" : "text-[10px] leading-[16px] opacity-70"
+              }`}
               style={{ top: tagY, height: LABEL_H - 4 }}
             >
-              <span className="min-w-0 truncate">{rival.name}</span>
+              {onScreen ? (
+                <span className="min-w-0 truncate">{rival.name}</span>
+              ) : (
+                <span aria-hidden>{lineY < 0 ? "▲" : "▼"}</span>
+              )}
               <span className="shrink-0 tabular-nums text-neo-yellow">
                 {t("wordTowerV2.rush.rival.height", {
                   m: Math.round(rival.peakM),
