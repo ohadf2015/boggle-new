@@ -3,8 +3,8 @@ import { CRITTER_KINDS, type CritterKind, type PropKind } from '@/lib/wordTowerV
 import { FOOD_BUILD } from './skyFood';
 
 /**
- * The sky's jokes: props with a face and one moving part each — a blimp that
- * blinks, a whale that spouts, an astronaut who waves, a UFO stealing a cow.
+ * The sky's jokes: props with a face and one moving part each — a cloud that
+ * puffs, a whale that spouts, an astronaut who waves, a UFO stealing a cow.
  * Same rules as skyArt.ts: every shape is painted once (ink rim, hard offset
  * shadow, brand fills); per frame only a child's transform or alpha moves.
  * `t` is seconds, and t=0 (reduced motion) is a calm, eyes-open pose.
@@ -57,30 +57,6 @@ function cheeks(g: Graphics, s: number, cx: number, cy: number, gap: number): vo
 
 function smile(g: Graphics, s: number, cx: number, cy: number, r: number): void {
   g.arc(cx * s, cy * s, r * s, 0.15 * Math.PI, 0.85 * Math.PI).stroke({ width: 2.5 * s, color: INK, cap: 'round' });
-}
-
-function blimp(s: number, phase: number): Critter {
-  const root = new Container();
-  const body = new Graphics();
-  body.ellipse(5 * s, 5 * s, 70 * s, 28 * s).fill({ color: INK, alpha: 0.35 });
-  body.poly([-58 * s, 0, -84 * s, -26 * s, -74 * s, 0, -84 * s, 26 * s]).fill(YELLOW).stroke({ width: 3 * s, color: INK, join: 'round' });
-  body.roundRect(-16 * s, 22 * s, 32 * s, 12 * s, 4 * s).fill(YELLOW).stroke({ width: 3 * s, color: INK });
-  body.ellipse(0, 0, 70 * s, 28 * s).fill(PINK).stroke({ width: 3 * s, color: INK });
-  body.ellipse(-8 * s, 0, 34 * s, 28 * s).stroke({ width: 3 * s, color: CREAM, alpha: 0.85 });
-  cheeks(body, s, 40, 6, 22);
-  smile(body, s, 40, 3, 5);
-  const prop = new Graphics().roundRect(-2.5 * s, -14 * s, 5 * s, 28 * s, 2 * s).fill(CREAM).stroke({ width: 2 * s, color: INK });
-  prop.position.set(-88 * s, 0);
-  const e = eyes(s, 16);
-  e.position.set(40 * s, -6 * s);
-  root.addChild(body, prop, e);
-  return {
-    root,
-    tick: (t) => {
-      e.scale.y = blinkScale(t, phase);
-      prop.scale.y = t ? Math.cos(t * 26) : 1;
-    },
-  };
 }
 
 function puff(s: number, phase: number): Critter {
@@ -213,7 +189,7 @@ function ufo(s: number, phase: number): Critter {
   };
 }
 
-const BUILD: Record<CritterKind, (s: number, phase: number) => Critter> = { blimp, puff, whale, astronaut, ufo, ...FOOD_BUILD };
+const BUILD: Record<CritterKind, (s: number, phase: number) => Critter> = { puff, whale, astronaut, ufo, ...FOOD_BUILD };
 
 export function buildCritter(kind: CritterKind, size: number, phase: number): Critter {
   const critter = BUILD[kind](size, phase);

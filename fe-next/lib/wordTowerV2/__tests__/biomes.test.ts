@@ -92,6 +92,10 @@ describe('sky critters', () => {
     for (const b of BIOMES.slice(1)) expect(b.props.some((p) => CRITTER_KINDS.includes(p))).toBe(true);
   });
 
+  it('given any sky, when read, then the pink blimp (players read it as a fish) is gone', () => {
+    for (const b of BIOMES) expect(b.props as string[]).not.toContain('blimp');
+  });
+
   it('given space, when read, then the UFO and the astronaut are up there', () => {
     const space = BIOMES.filter((b) => b.id === 'orbit' || b.id === 'cosmos').flatMap((b) => b.props);
     expect(space).toEqual(expect.arrayContaining(['ufo', 'astronaut']));
