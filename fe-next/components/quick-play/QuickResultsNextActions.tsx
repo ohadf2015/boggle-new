@@ -1,7 +1,8 @@
 'use client';
 
-import { Swords } from 'lucide-react';
+import { RotateCcw, Swords } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { ResultsNextBar } from '@/components/results/stage/ResultsNextBar';
 import { ModeGlyph } from './ModeGlyph';
 import { NODE_COLORS } from './modeColors';
 import { QUICK_MODES, type QuickMode } from './types';
@@ -18,42 +19,18 @@ export function QuickResultsCtaBar({
 }) {
   const { t } = useLanguage();
   return (
-    <div
-      className="relative z-20 mb-[var(--bottom-nav-height,0px)] shrink-0 bg-neo-navy px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2.5"
-      data-testid="quick-results-cta-bar"
-    >
-      <span
-        aria-hidden="true"
-        data-testid="quick-results-cta-fade"
-        className="pointer-events-none absolute inset-x-0 bottom-full h-12 bg-linear-to-t from-neo-navy to-transparent"
-      />
-      <div className="mx-auto flex w-full max-w-md items-stretch gap-2.5">
-        <button
-          type="button"
-          data-testid="quick-results-challenge"
-          onClick={onChallenge}
-          aria-label={t('quickPlay.solo.challengeFriend')}
-          title={t('quickPlay.solo.challengeHint')}
-          className="flex h-[56px] min-h-[44px] w-[56px] shrink-0 items-center justify-center rounded-2xl border-[3px] border-neo-white/25 text-neo-cream active:translate-y-0.5"
-        >
-          <Swords className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          data-testid="quick-results-next"
-          onClick={() => onNextRound()}
-          className="relative h-[56px] flex-1 overflow-hidden rounded-2xl border-[3px] border-black bg-neo-lime font-neo-display text-lg font-bold uppercase tracking-[0.12em] text-black shadow-hard-lg active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed"
-        >
-          {shine && (
-            <span
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-white/45 animate-[qp-shine_4s_ease-in-out_2.3s_infinite_both]"
-            />
-          )}
-          <span className="relative">{t('quickPlay.solo.nextRound')}</span>
-        </button>
-      </div>
-    </div>
+    <ResultsNextBar
+      testId="quick-results-cta-bar"
+      shine={shine}
+      primary={{ label: t('quickPlay.solo.nextRound'), onClick: () => onNextRound(), testId: 'quick-results-next' }}
+      secondary={{
+        label: t('quickPlay.solo.challengeFriend'),
+        title: t('quickPlay.solo.challengeHint'),
+        onClick: onChallenge,
+        testId: 'quick-results-challenge',
+        icon: <Swords className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />,
+      }}
+    />
   );
 }
 
@@ -67,27 +44,37 @@ export function QuickResultsModeSwitch({
 }) {
   const { t } = useLanguage();
   return (
-    <div className="flex flex-col gap-1.5" data-testid="quick-next-mode-picker">
-      <span className="text-center font-neo-display text-[10px] uppercase tracking-[0.18em] text-neo-white/50">
+    <div className="flex flex-col gap-2.5 rounded-2xl border-neo-thick border-black bg-neo-navy-elevated p-3 shadow-hard" data-testid="quick-next-mode-picker">
+      <span className="font-neo-display text-[10px] uppercase tracking-[0.18em] text-neo-white/55">
         {t('quickPlay.solo.pickNextMode', 'Next round')}
       </span>
-      <div className="grid grid-cols-4 gap-1.5">
-        {QUICK_MODES.map((mode) => (
-          <button
-            key={mode}
-            type="button"
-            data-testid={`quick-next-mode-${mode}`}
-            onClick={() => onNextRound(mode)}
-            className={`flex h-[52px] flex-col items-center justify-center gap-0.5 rounded-xl border-2 font-neo-display text-[11px] font-bold tracking-wide text-neo-cream active:translate-y-0.5 ${
-              mode === currentMode ? 'border-neo-cream bg-neo-white/10' : 'border-neo-white/20 bg-transparent'
-            }`}
-          >
-            <span className={NODE_COLORS[mode].text}>
-              <ModeGlyph mode={mode} size={18} />
-            </span>
-            {t(`quickPlay.solo.mode.${mode}`)}
-          </button>
-        ))}
+      <div className="grid grid-cols-4 gap-2">
+        {QUICK_MODES.map((mode) => {
+          const isCurrent = mode === currentMode;
+          return (
+            <button
+              key={mode}
+              type="button"
+              data-testid={`quick-next-mode-${mode}`}
+              data-current={isCurrent || undefined}
+              onClick={() => onNextRound(mode)}
+              className={`relative flex h-[60px] min-w-0 flex-col items-center justify-center gap-0.5 rounded-xl border-[3px] border-black px-1 font-neo-display text-[11px] font-bold tracking-wide text-black shadow-hard-sm transition-transform active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${
+                NODE_COLORS[mode].bg
+              } ${isCurrent ? '' : 'saturate-[0.85]'}`}
+            >
+              {isCurrent && (
+                <span
+                  aria-hidden="true"
+                  className="absolute -top-2 end-1 flex h-5 w-5 items-center justify-center rounded-full border-2 border-black bg-neo-white text-black"
+                >
+                  <RotateCcw className="h-3 w-3" strokeWidth={3} />
+                </span>
+              )}
+              <ModeGlyph mode={mode} size={20} />
+              <span className="max-w-full truncate">{t(`quickPlay.solo.mode.${mode}`)}</span>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

@@ -3333,3 +3333,8 @@ html.reduce-motion *::after {
   .group:hover .edu-wiggle-on-hover,
   .group:focus-visible .edu-wiggle-on-hover { animation: edu-wiggle 420ms ease-in-out; }
 }
+
+@keyframes qp-bar-fill {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}

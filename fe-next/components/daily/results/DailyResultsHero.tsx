@@ -10,6 +10,10 @@ import { DAILY_MODES, type DailyModeDef, type DailyModeId } from '@/lib/dailyMod
 import { SPRING_PRESETS } from '@/lib/animation/presets';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { triggerHaptic } from '@/utils/hapticFeedback';
+import { useAuth } from '@/contexts/AuthContext';
+import { useHeroCheer } from '@/lib/quickPlay/useHeroCheer';
+import { getOrCreateStoredCustomAvatar } from '@/utils/profileStorage';
+import { ResultsAvatarStage } from '@/components/results/stage/ResultsAvatarStage';
 import { useDailyReveal, useMountedAfterReveal } from './reveal/DailyRevealContext';
 import { REVEAL, useRevealSequence, type RevealStage } from './reveal/revealSequence';
 
@@ -44,6 +48,13 @@ const ACCENT = {
   purple: { text: 'text-neo-purple', bg: 'bg-neo-purple', ring: 'ring-neo-purple' },
 } as const;
 
+const ACCENT_HEX: Record<keyof typeof ACCENT, string> = {
+  orange: '#ff6b35',
+  yellow: '#ffe135',
+  cyan: '#00ffff',
+  purple: '#8b5cf6',
+};
+
 const PLAYED_KEY: Record<DailyModeId, 'wordWheel' | 'wordHunt' | 'connections' | 'wordTower'> = {
   'word-wheel': 'wordWheel',
   'word-hunt': 'wordHunt',
@@ -77,6 +88,10 @@ export function DailyResultsHero({
   const animateIn = celebrate && !reduced && !late && (!shared.inProvider || shared.active);
   const [shown, setShown] = useState(animateIn ? 0 : score ?? 0);
   const celebrated = useRef(false);
+  const { user, profile } = useAuth();
+  const [guestAvatar] = useState(() => (user ? null : getOrCreateStoredCustomAvatar()));
+  const cheering = outcome !== 'loss';
+  const mood = useHeroCheer(cheering, !reduced);
   const scoreGo = seq.stage >= REVEAL.score;
 
   useEffect(() => {
@@ -136,9 +151,9 @@ export function DailyResultsHero({
       className={cn('relative w-full rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard-lg overflow-hidden', className)}
     >
 
-      <span aria-hidden className={cn('absolute inset-x-0 top-0 h-1.5', accent.bg)} />
+      <span aria-hidden className={cn('absolute inset-x-0 top-0 z-10 h-1.5', accent.bg)} />
 
-      <div className="flex items-center gap-2 px-4 pt-4" data-testid="daily-trail">
+      <div className="relative z-10 flex items-center gap-2 px-4 pt-4" data-testid="daily-trail">
         <ol aria-label={t('daily.results.heroDaily')} className="flex items-center gap-1.5 shrink-0">
           {DAILY_MODES.map((d, i) => {
             const isThis = d.id === mode;
@@ -183,7 +198,17 @@ export function DailyResultsHero({
         )}
       </div>
 
-      <div className="flex items-center gap-4 px-4 pt-4 pb-3">
+      <ResultsAvatarStage
+        compact
+        avatar={{ userId: user?.id ?? 'guest', customAvatar: profile?.avatar_config ?? guestAvatar }}
+        mood={mood}
+        accentHex={ACCENT_HEX[def.accent]}
+        animate={!reduced}
+        cheering={cheering}
+        confettiCount={0}
+      />
+
+      <div className="relative z-10 flex items-center gap-4 px-4 pt-1 pb-3">
         <m.div
           className={cn('relative shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-2xl border-3 border-neo-black overflow-hidden shadow-hard', outcome === 'loss' && 'grayscale-[35%]')}
           {...(animateIn

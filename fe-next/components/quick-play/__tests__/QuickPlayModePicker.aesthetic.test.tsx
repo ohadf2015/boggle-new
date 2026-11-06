@@ -192,7 +192,7 @@ describe('QuickPlayModePicker — Aesthetics', () => {
       expect(hero.className).toMatch(/col-span-2|lg:col-span-2/);
     });
 
-    it('wheel-rush card also has base col-span-2 for exact 2x2 + 2×1 mobile tiling', () => {
+    it('wheel-rush shares its row with Random so 2 columns × 3 rows tile exactly', () => {
       render(
         <QuickPlayModePicker
           selection="random"
@@ -201,8 +201,8 @@ describe('QuickPlayModePicker — Aesthetics', () => {
         />
       );
       const wheel = screen.getByTestId('mode-card-wheel-rush');
-      // Should have col-span-2 at some breakpoint
-      expect(wheel.className).toContain('lg:col-span-2');
+      expect(wheel.className).not.toMatch(/col-span-2/);
+      expect(wheel.parentElement).toContainElement(screen.getByTestId('random-button'));
     });
 
     it('hero has responsive glyph/title size step-up at lg', () => {

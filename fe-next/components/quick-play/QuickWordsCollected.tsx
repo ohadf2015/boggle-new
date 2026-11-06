@@ -61,14 +61,27 @@ export function QuickWordsCollected({ words, collectionTotal }: QuickWordsCollec
         <QuickWordsDetailDialog words={words} />
       </div>
 
-      <div className="mb-2 flex items-baseline gap-2 rounded-lg border-2 border-black bg-neo-abyss/60 px-2.5 py-1.5">
-        <span className="font-neo-display text-[10px] uppercase tracking-widest text-neo-white/45">
+      <div className="mb-3 flex items-center gap-2 rounded-xl border-[3px] border-black bg-neo-abyss px-2.5 py-2">
+        <span className="font-neo-display text-[10px] uppercase tracking-widest text-neo-white/50">
           {t('quickPlay.solo.bestWord', 'Best')}
         </span>
-        <b className="font-neo-display tracking-wide text-neo-yellow" data-testid="quick-best-word">
+        <b className="sr-only" data-testid="quick-best-word">
           {best.word.toUpperCase()}
         </b>
-        <span className="ml-auto font-neo-display text-xs tabular-nums text-neo-white/60">+{best.score}</span>
+        <span className="flex min-w-0 flex-wrap gap-1" aria-hidden="true" dir="ltr">
+          {[...best.word.toUpperCase()].map((ch, i) => (
+            <span
+              key={i}
+              className="flex h-7 w-7 items-center justify-center rounded-md border-2 border-black bg-neo-yellow font-neo-display text-sm font-bold text-black shadow-hard-sm animate-[qp-card-in_0.35s_cubic-bezier(0.34,1.4,0.64,1)_both] motion-reduce:animate-none"
+              style={{ animationDelay: `${600 + i * 70}ms` }}
+            >
+              {ch}
+            </span>
+          ))}
+        </span>
+        <span className="ms-auto shrink-0 rounded-lg border-2 border-black bg-neo-lime px-1.5 font-neo-display text-xs font-bold tabular-nums text-black" dir="ltr">
+          +{best.score}
+        </span>
       </div>
 
       <ul className="flex flex-wrap gap-1.5">
@@ -78,8 +91,8 @@ export function QuickWordsCollected({ words, collectionTotal }: QuickWordsCollec
             data-testid={w.isNew ? 'quick-word-chip-new' : 'quick-word-chip'}
             className={`rounded-lg border-2 px-2 py-0.5 font-neo-display text-xs tracking-wide ${
               w.isNew
-                ? 'border-neo-lime bg-neo-lime/15 text-neo-lime'
-                : 'border-black bg-neo-abyss/60 text-neo-cream/80'
+                ? 'border-black bg-neo-lime font-bold text-black shadow-hard-sm'
+                : 'border-black bg-neo-abyss/60 text-neo-cream/85'
             }`}
           >
             {w.isNew && <span aria-hidden="true">★ </span>}

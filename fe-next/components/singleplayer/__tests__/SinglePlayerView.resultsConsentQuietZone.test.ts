@@ -13,6 +13,7 @@ const dir = dirname(fileURLToPath(import.meta.url));
 const viewSrc = readFileSync(join(dir, '../SinglePlayerView.tsx'), 'utf8');
 const resultsSrc = readFileSync(join(dir, '../SinglePlayerResults.tsx'), 'utf8');
 const practiceSrc = readFileSync(join(dir, '../results/PracticeResults.tsx'), 'utf8');
+const nextBarSrc = readFileSync(join(dir, '../../results/stage/ResultsNextBar.tsx'), 'utf8');
 
 describe('SP results consent quiet-zone wiring', () => {
   it('keeps results in isInGame so the bottom nav stays hidden', () => {
@@ -28,7 +29,8 @@ describe('SP results consent quiet-zone wiring', () => {
   });
 
   it('lifts the sticky results CTA above the compact consent bar', () => {
-    expect(resultsSrc).toContain('bottom-[var(--cookie-consent-height,0px)]');
+    expect(resultsSrc).toMatch(/<ResultsNextBar[\s\S]*?placement="fixed"/);
+    expect(nextBarSrc).toContain('bottom-[var(--cookie-consent-height,0px)]');
     expect(practiceSrc).toContain('bottom-[var(--cookie-consent-height,0px)]');
   });
 });
