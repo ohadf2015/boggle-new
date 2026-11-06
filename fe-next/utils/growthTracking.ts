@@ -501,6 +501,7 @@ export type GrowthEvent =
   //   Props: { stage: 'offered', cameFromInvite: boolean }
   //        | { stage: 'accepted' } | { stage: 'joined', asHost: boolean }.
   | 'mp_room_gone_recovery'
+  | 'classroom_game_move_followed'
   // exp-mp-round-issue-probe-v1 triage chip selection.
   //   Fires when player picks a follow-up chip after bad/ok mp_round rating.
   //   Props: { issue: 'bots_too_strong' | 'technical_issue', language: string }.

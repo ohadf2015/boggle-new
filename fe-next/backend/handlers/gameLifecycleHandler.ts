@@ -41,6 +41,7 @@ import {
 } from '../utils/socketHelpers.js';
 
 import { announceClassroomRoomOpened } from './classroomMissingRoom.js';
+import { announceClassroomMove } from './classroomGameMove';
 import { quizShellStartFor } from '../services/vocabQuizShell.js';
 import { emitError, ErrorCodes } from '../utils/errorHandler.js';
 import {
@@ -188,7 +189,8 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       const { isClassroom, isPrivate } = classroomGate;
 
       if (authUserId) {
-        await handleExistingAuthConnection(io, socket, authUserId, gameCode);
+        await handleExistingAuthConnection(io, socket, authUserId, gameCode,
+          isClassroom ? { classroomId: classroomGate.classroomId, teacherId: classroomGate.teacherId } : undefined);
       }
       const roomLanguage = isClassroom ? (classroomGate.recordLanguage ?? await classroomRoomLanguage(gameCode, language)) : (language || 'en');
 
@@ -796,7 +798,13 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
 /**
  * Handle existing authenticated connection when creating a game
  */
-async function handleExistingAuthConnection(io: Server, socket: Socket, authUserId: string, _gameCode: string): Promise<void> {
+async function handleExistingAuthConnection(
+  io: Server,
+  socket: Socket,
+  authUserId: string,
+  gameCode: string,
+  nextClassroom?: { classroomId?: string; teacherId?: string }
+): Promise<void> {
   const existingConnection: AuthConnection | null = getAuthUserConnection(authUserId);
   if (!existingConnection) return;
 
@@ -819,12 +827,23 @@ async function handleExistingAuthConnection(io: Server, socket: Socket, authUser
         clearTimeout(oldGame.reconnectionTimeout);
         oldGame.reconnectionTimeout = null;
       }
-      broadcastToRoom(io, getGameRoom(existingConnection.gameCode), 'hostLeftRoomClosing', {
-        message: 'Host started a new game. Room is closing.',
-        i18nKey: 'multiplayerFlow.hostLeftReason.hostSwitchedRoom',
-        i18nParams: { host: existingConnection.username },
-        reason: 'host_switched_room'
+      // Same class, new game: the students follow the teacher (classroomGameMove.ts).
+      const classMoved = !!nextClassroom && await announceClassroomMove(io, {
+        fromCode: existingConnection.gameCode,
+        toCode: gameCode,
+        toClassroomId: nextClassroom.classroomId,
+        teacherId: nextClassroom.teacherId,
+        students: Math.max(0, getGameUsers(existingConnection.gameCode).filter((u) => !u.isHost).length),
+        exceptSocketIds: [socket.id, existingConnection.socketId],
       });
+      if (!classMoved) {
+        broadcastToRoom(io, getGameRoom(existingConnection.gameCode), 'hostLeftRoomClosing', {
+          message: 'Host started a new game. Room is closing.',
+          i18nKey: 'multiplayerFlow.hostLeftReason.hostSwitchedRoom',
+          i18nParams: { host: existingConnection.username },
+          reason: 'host_switched_room'
+        });
+      }
       clearGameTimer(existingConnection.gameCode);
       deleteGame(existingConnection.gameCode);
       broadcastActiveRooms(io, getActiveRooms());

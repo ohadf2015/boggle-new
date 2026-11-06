@@ -4,7 +4,7 @@ import { getClassroomGame } from '../modules/classroomGameManager.js';
 
 export type ClassroomHostDecision =
   | { allowed: false }
-  | { allowed: true; isClassroom: boolean; isPrivate: boolean; recordLanguage?: Language };
+  | { allowed: true; isClassroom: boolean; isPrivate: boolean; recordLanguage?: Language; classroomId?: string; teacherId?: string };
 
 /** Classroom status comes from the server's classroom record, never from the createGame payload. */
 export async function decideClassroomHost(
@@ -18,5 +18,5 @@ export async function decideClassroomHost(
   const verifiedUserId = (socket.data as Record<string, unknown> | undefined)?.verifiedUserId;
   if (!verifiedUserId || verifiedUserId !== record.teacherId) return { allowed: false };
 
-  return { allowed: true, isClassroom: true, isPrivate: true, recordLanguage: record.language };
+  return { allowed: true, isClassroom: true, isPrivate: true, recordLanguage: record.language, classroomId: record.classroomId, teacherId: record.teacherId };
 }
