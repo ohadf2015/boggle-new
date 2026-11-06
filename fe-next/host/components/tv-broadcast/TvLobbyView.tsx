@@ -34,6 +34,8 @@ interface PlayerData {
   isHost?: boolean;
   presenceStatus?: PresenceStatus;
   isBot?: boolean;
+  /** The teacher's own practice seat (server-flagged). */
+  isPractice?: boolean;
   /** Socket dropped; the seat is held for the reconnect grace. */
   disconnected?: boolean;
 }
@@ -181,9 +183,13 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
   const [soloDemoFailed, setSoloDemoFailed] = useState(false);
   const rehearsalOrigin = useRef<{ source: RehearsalSource; classExists: boolean }>({ source: 'lobby', classExists: true });
 
-  // When bots are seated (playerCount > 0), invoke the callback to start the game
+  // Seats already taken when the practice round was asked for: the teacher's
+  // own practice seat is one, and the round starts once bots join beside it.
+  const soloDemoBaseline = useRef(0);
+
+  // When bots are seated (more players than at the press), invoke the callback to start the game
   useEffect(() => {
-    if (soloDemoInProgress && soloDemoCallback && playerCount > 0) {
+    if (soloDemoInProgress && soloDemoCallback && playerCount > soloDemoBaseline.current) {
       soloDemoCallback();
       setSoloDemoInProgress(false);
       setSoloDemoCallback(null);
@@ -209,6 +215,7 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
   const handleSoloDemoClick = (origin?: RehearseIntent) => {
     if (!onStartSoloDemoWithBots) return;
     rehearsalOrigin.current = origin ?? { source: 'lobby', classExists: true };
+    soloDemoBaseline.current = playerCount;
     setSoloDemoFailed(false);
     setSoloDemoInProgress(true);
     const callback = onStartSoloDemoWithBots();
@@ -216,9 +223,11 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
   };
 
   const hostSeated = playersReady.some((p) => (typeof p === 'string' ? p === username : p.isHost || p.username === username));
+  const practiceSeated = playersReady.some((p) => typeof p === 'object' && p.isPractice === true && !p.disconnected);
   useRehearseAutoStart({
     enabled: isClassroomMode && !!onStartSoloDemoWithBots,
     hostSeated,
+    practiceSeated,
     botsAllowed: modeAllowsRehearsalBots(readLocalGameMode() ?? classroomGameMode),
     start: handleSoloDemoClick,
   });

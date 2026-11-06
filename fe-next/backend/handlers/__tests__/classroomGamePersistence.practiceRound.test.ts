@@ -121,6 +121,7 @@ describe('roundHasStudents', () => {
     'Taylor Bot': { isBot: true },
     Noa: { authUserId: 'student-a' },
     Guest: { authUserId: null },
+    'Ms K (practice)': { authUserId: null, isPractice: true },
   };
 
   it('given only the teacher and bots played, then the round has no students', () => {
@@ -131,6 +132,11 @@ describe('roundHasStudents', () => {
   it('given a student with an account played, then the round has students', () => {
     const results = [{ username: 'Ms K', totalScore: 10 }, { username: 'Noa', totalScore: 90 }];
     expect(roundHasStudents(results, users, TEACHER_ID)).toBe(true);
+  });
+
+  it("given only the teacher, their practice seat and bots played, then the round has no students", () => {
+    const results = [{ username: 'Ms K', totalScore: 10 }, { username: 'Ms K (practice)', totalScore: 40 }, { username: 'Taylor Bot', totalScore: 90 }];
+    expect(roundHasStudents(results, users, TEACHER_ID)).toBe(false);
   });
 
   it('given a guest without an account played, then the round still has students', () => {

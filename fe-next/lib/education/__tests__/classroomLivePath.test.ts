@@ -4,6 +4,7 @@ import {
   isClassroomLivePathname,
   readClassroomLiveFlags,
   legacyClassroomLiveRedirect,
+  practiceSeatPath,
 } from '@/lib/education/classroomLivePath';
 import { shouldLoadLessonData } from '@/lib/education/classroomGameHandoff';
 import { joinSuccessHref } from '@/lib/navigation/eduExitTargets';
@@ -50,6 +51,7 @@ describe('readClassroomLiveFlags', () => {
     expect(readClassroomLiveFlags('/en/education/live', new URLSearchParams('room=AB12&host=1'))).toEqual({
       isClassroomMode: true,
       isClassroomHost: true,
+      isPracticeRun: false,
     });
   });
 
@@ -57,6 +59,7 @@ describe('readClassroomLiveFlags', () => {
     expect(readClassroomLiveFlags('/en/education/live', new URLSearchParams('room=AB12'))).toEqual({
       isClassroomMode: true,
       isClassroomHost: false,
+      isPracticeRun: false,
     });
   });
 
@@ -64,6 +67,7 @@ describe('readClassroomLiveFlags', () => {
     expect(readClassroomLiveFlags('/en/multiplayer', new URLSearchParams('classroom=true&host=true'))).toEqual({
       isClassroomMode: true,
       isClassroomHost: true,
+      isPracticeRun: false,
     });
   });
 
@@ -71,6 +75,7 @@ describe('readClassroomLiveFlags', () => {
     expect(readClassroomLiveFlags('/en/multiplayer', new URLSearchParams('room=AB12'))).toEqual({
       isClassroomMode: false,
       isClassroomHost: false,
+      isPracticeRun: false,
     });
   });
 });
@@ -107,5 +112,22 @@ describe('legacyClassroomLiveRedirect', () => {
 
   it('given an unprefixed legacy path, when redirected, then it stays unprefixed', () => {
     expect(legacyClassroomLiveRedirect('/multiplayer', '?classroom=true&room=AB12')).toBe('/education/live?room=AB12');
+  });
+});
+
+describe('practice run paths', () => {
+  it('given a practice launch, when the host board is built, then it carries practice=1', () => {
+    expect(classroomLivePath('en', 'AB12', { host: true, practice: true })).toBe('/en/education/live?room=AB12&host=1&practice=1');
+    expect(readClassroomLiveFlags('/en/education/live', new URLSearchParams('room=AB12&host=1&practice=1')).isPracticeRun).toBe(true);
+  });
+
+  it('given practice without host, when built, then no practice flag rides on a student link', () => {
+    expect(classroomLivePath('en', 'AB12', { practice: true })).toBe('/en/education/live?room=AB12');
+  });
+
+  it('given the practice seat page, when read, then it is never the host even if host=1 is added', () => {
+    expect(practiceSeatPath('he', 'AB12')).toBe('/he/education/live?room=AB12&practiceSeat=1');
+    const flags = readClassroomLiveFlags('/he/education/live', new URLSearchParams('room=AB12&practiceSeat=1&host=1&practice=1'));
+    expect(flags).toEqual({ isClassroomMode: true, isClassroomHost: false, isPracticeRun: false });
   });
 });

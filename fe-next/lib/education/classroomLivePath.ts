@@ -5,11 +5,18 @@ const LEGACY_MP_RE = /^(\/[a-z]{2})?\/multiplayer\/?$/;
 
 export interface ClassroomLivePathOptions {
   host?: boolean;
+  /** Host only: open the board with the teacher's own student view beside it. */
+  practice?: boolean;
 }
 
-export function classroomLivePath(locale: string, gameCode: string, { host = false }: ClassroomLivePathOptions = {}): string {
+export function classroomLivePath(locale: string, gameCode: string, { host = false, practice = false }: ClassroomLivePathOptions = {}): string {
   const room = `room=${encodeURIComponent(gameCode)}`;
-  return `/${locale}/education/live?${room}${host ? '&host=1' : ''}`;
+  return `/${locale}/education/live?${room}${host ? '&host=1' : ''}${host && practice ? '&practice=1' : ''}`;
+}
+
+/** The student page the teacher plays from in a practice run (frame, new tab or phone). Never a host page. */
+export function practiceSeatPath(locale: string, gameCode: string): string {
+  return `/${locale}/education/live?room=${encodeURIComponent(gameCode)}&practiceSeat=1`;
 }
 
 export function isClassroomLivePathname(pathname: string | null | undefined): boolean {
@@ -23,6 +30,8 @@ function isHostParam(value: string | null): boolean {
 export interface ClassroomLiveFlags {
   isClassroomMode: boolean;
   isClassroomHost: boolean;
+  /** Host board with the practice student view beside it. */
+  isPracticeRun: boolean;
 }
 
 /** Live route implies classroom; the legacy `/multiplayer?classroom=true` flags still read the same. */
@@ -32,9 +41,13 @@ export function readClassroomLiveFlags(
 ): ClassroomLiveFlags {
   const onLiveRoute = isClassroomLivePathname(pathname);
   const isClassroomMode = onLiveRoute || params?.get('classroom') === 'true';
+  // A practice seat page is a student page, whatever else its URL says.
+  const isPracticeSeat = params?.get('practiceSeat') === '1';
+  const isClassroomHost = !isPracticeSeat && isHostParam(params?.get('host') ?? null);
   return {
     isClassroomMode,
-    isClassroomHost: isHostParam(params?.get('host') ?? null),
+    isClassroomHost,
+    isPracticeRun: isClassroomHost && params?.get('practice') === '1',
   };
 }
 

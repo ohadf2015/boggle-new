@@ -31,6 +31,8 @@ export interface RejoinIntent {
   guestTokenHash?: string | null;
   guestSessionId?: string | null;
   avatar?: unknown;
+  /** Teacher practice seat (see utils/practiceSeatStorage). */
+  practiceSeat?: true;
 }
 
 let currentIntent: RejoinIntent | null = null;

@@ -183,6 +183,8 @@ export async function recordGameResultsToSupabase(
       UserData
     ][]) {
       if ((userData as unknown as { isBot?: boolean }).isBot) continue;
+      // The teacher's practice seat is not a player record.
+      if ((userData as unknown as { isPractice?: boolean }).isPractice) continue;
       userAuthMap[username] = {
         authUserId: userData.authUserId,
         guestTokenHash: userData.guestTokenHash,

@@ -52,4 +52,17 @@ describe('useRehearseAutoStart', () => {
     expect(start).not.toHaveBeenCalled();
     expect(peekRehearseIntent()).toBeNull();
   });
+  it('Given a practice run, When the host is seated but the teacher has not joined as a student yet, Then the round waits for that seat', () => {
+    writeRehearseIntent({ source: 'hq', classExists: true, withSeat: true });
+    const start = vi.fn();
+    const { rerender } = renderHook((p: { practiceSeated: boolean }) => useRehearseAutoStart({ enabled: true, hostSeated: true, practiceSeated: p.practiceSeated, botsAllowed: true, start }), {
+      initialProps: { practiceSeated: false },
+    });
+    expect(start).not.toHaveBeenCalled();
+    expect(peekRehearseIntent()).not.toBeNull();
+
+    rerender({ practiceSeated: true });
+    expect(start).toHaveBeenCalledTimes(1);
+    expect(start).toHaveBeenCalledWith({ source: 'hq', classExists: true, withSeat: true });
+  });
 });

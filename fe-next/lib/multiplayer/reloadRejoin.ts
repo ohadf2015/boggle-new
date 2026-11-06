@@ -1,3 +1,5 @@
+import { practiceSeatJoinFlag } from '@/utils/practiceSeatStorage';
+
 /**
  * The `join` payload that puts a seated player back in their room — used by
  * BOTH doors back in: a socket re-connect (useMultiplayerSocket onConnect) and
@@ -17,11 +19,12 @@ export interface RejoinPayload {
   gameCode: string;
   username: string;
   authToken?: string;
+  practiceSeat?: true;
 }
 
 export function buildRejoinPayload(session: RejoinSessionLike | null | undefined, authToken: unknown): RejoinPayload | null {
   if (!session?.gameCode || !session.username) return null;
   const payload: RejoinPayload = { gameCode: session.gameCode, username: session.username };
   if (typeof authToken === 'string' && authToken) payload.authToken = authToken;
-  return payload;
+  return { ...payload, ...practiceSeatJoinFlag() };
 }

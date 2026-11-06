@@ -50,6 +50,7 @@ export interface AddUserOptions {
   authUserId?: string | null;
   guestTokenHash?: string | null;
   guestSessionId?: string | null;
+  isPractice?: boolean;
 }
 
 export interface GameUserInfo {
@@ -68,6 +69,8 @@ export interface GameUserInfo {
   botDifficulty?: string | null;
   /** Socket dropped; seat held for the reconnect grace. */
   disconnected?: boolean;
+  /** The teacher's own practice seat: never a student. */
+  isPractice?: boolean;
 }
 
 export interface AuthContext {
@@ -138,7 +141,7 @@ export function addUserToGame(
 ): boolean {
   if (!game) return false;
 
-  const { avatar = null, isHost = false, playerId = null, authUserId = null, guestTokenHash = null, guestSessionId = null } = options;
+  const { avatar = null, isHost = false, playerId = null, authUserId = null, guestTokenHash = null, guestSessionId = null, isPractice = false } = options;
 
   // Store user data with auth context and presence tracking
   game.users[username] = {
@@ -149,6 +152,7 @@ export function addUserToGame(
     authUserId,        // Supabase user ID for authenticated users
     guestTokenHash,    // Hashed guest token for guest users
     guestSessionId,    // Session ID for guest game logging
+    ...(isPractice ? { isPractice: true } : {}),
     username,
     // Presence tracking
     lastActivity: Date.now(),
@@ -391,6 +395,7 @@ export function getGameUsers(game: GameBase | null): GameUserInfo[] {
       isBot: data.isBot || false,
       botDifficulty: data.botDifficulty || null,
       disconnected: data.disconnected === true,
+      ...(data.isPractice ? { isPractice: true } : {}),
     }));
 }
 

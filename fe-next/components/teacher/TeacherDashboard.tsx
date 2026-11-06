@@ -351,7 +351,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
       } : null}
       onOpenReports={selectedClassroom ? () => setReportsOpen(true) : null}
       proCard={proCard}
-      practice={<HomePracticeCard t={t} action={<RehearseWithBotsButton classroomId={effectiveId || undefined} source="hq" language={language} t={t} className="[&_button]:text-neo-black" />} />}
+      practice={<HomePracticeCard t={t} action={<RehearseWithBotsButton classroomId={effectiveId || undefined} source="hq" language={language} t={t} withSeat label={t('eduShell.home.practice.cta')} className="[&_button]:text-neo-black" />} />}
     >
       {selectedClassroom ? (
         <Dialog open={reportsOpen} onOpenChange={setReportsOpen}>

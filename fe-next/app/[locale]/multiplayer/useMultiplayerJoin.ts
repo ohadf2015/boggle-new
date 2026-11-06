@@ -19,6 +19,7 @@ import { sanitizeRoomName, sanitizeUsername } from '@/utils/consts';
 import { sanitizeGameCode } from '@/lib/multiplayer/sanitizeGameCode';
 import { getGuestSessionId, hashToken } from '@/utils/guestManager';
 import { setRejoinIntent } from '@/utils/socketRejoin';
+import { practiceSeatJoinFlag } from '@/utils/practiceSeatStorage';
 import { getSharedSocketIfExists } from '@/utils/SocketContext';
 import type { Language, Avatar } from '@/shared/types/game';
 
@@ -459,6 +460,7 @@ export function useMultiplayerJoin({
           guestTokenHash,
           guestSessionId,
           avatar: effectiveAvatar,
+          ...practiceSeatJoinFlag(),
         });
 
         // Remember how to re-join after a socket reconnect (esp. a server
@@ -471,6 +473,7 @@ export function useMultiplayerJoin({
           guestTokenHash,
           guestSessionId,
           avatar: effectiveAvatar,
+          ...practiceSeatJoinFlag(),
         });
       }
     },

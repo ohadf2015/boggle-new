@@ -63,6 +63,7 @@ import {
 } from './playerReconnectHandler';
 import { ensurePlayerState } from './playerDataInit';
 import { classroomSeatName } from './classroomSeatName';
+import { practiceSeatToken } from './practiceSeat';
 import { isLockedOut } from '../modules/classroomLobbyLock.js';
 
 // Types for payloads
@@ -74,6 +75,7 @@ interface JoinGamePayload {
   authUserId?: string;
   guestTokenHash?: string;
   guestSessionId?: string;
+  practiceSeat?: boolean;
 }
 
 interface LeaveRoomPayload {
@@ -109,9 +111,11 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     }
 
     let { gameCode, username, playerId, avatar, authUserId: clientAuthUserId, guestTokenHash, guestSessionId } = validation.data as JoinGamePayload;
+    const wantsPracticeSeat = (validation.data as JoinGamePayload).practiceSeat === true;
 
     // Use server-verified user ID if available (from JWT middleware), ignore client-supplied value
-    const authUserId = (socket.data?.verifiedUserId as string | undefined) || undefined;
+    const verifiedUserId = (socket.data?.verifiedUserId as string | undefined) || undefined;
+    let authUserId = verifiedUserId;
     if (clientAuthUserId && authUserId && clientAuthUserId !== authUserId) {
       logger.warn('SOCKET', `Auth ID mismatch for ${username}: client="${clientAuthUserId}" verified="${authUserId}"`);
     }
@@ -156,6 +160,18 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     const seat = await checkClassroomSeat(socket, gameCode, 'multiplayer', typeof username === 'string' ? username : null);
     if (seat.refused) return;
 
+    // A practice seat is the teacher trying the student side of their own classroom
+    // room, from a frame beside the board, another tab or their phone, often on the
+    // same account as the host seat. It sits as an anonymous seat keyed by its own
+    // token, so it never reaches the account reconnect below (which would take over
+    // the host seat), never registers as that account's connection, and is left out
+    // of the class's students. Ordinary multiplayer rooms ignore the flag.
+    const practiceSeat = wantsPracticeSeat && !!seat.game;
+    if (practiceSeat) {
+      guestTokenHash = practiceSeatToken(verifiedUserId, guestTokenHash, socket.id);
+      authUserId = undefined;
+    }
+
     // Handle multi-tab detection and existing auth connection
     if (authUserId) {
       const authResult = await handleExistingAuthConnectionJoin(io, socket, authUserId, gameCode, username);
@@ -190,7 +206,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     // blocked IP. Checked here — before reconnection/late-join — so a blocked
     // user cannot reclaim a slot or rejoin under a new name.
     const blockMatch = await isBlocked({
-      authUserId,
+      authUserId: verifiedUserId,
       guestSessionId,
       ip: getIpFromSocket(socket),
     });
@@ -304,7 +320,8 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
       playerId,
       authUserId: authUserId || null,
       guestTokenHash: guestTokenHash || null,
-      guestSessionId: guestSessionId || null
+      guestSessionId: guestSessionId || null,
+      isPractice: practiceSeat,
     });
 
     joinRoom(socket, getGameRoom(gameCode));

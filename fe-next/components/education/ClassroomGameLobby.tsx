@@ -15,6 +15,7 @@ import { PageLoader } from '@/components/ui/PageLoader';
 import { StarterPacksSection } from '@/components/teacher/StarterPacksSection';
 import { socketTeacherName } from '@/lib/education/classroomGameHandoff';
 import { classroomLivePath } from '@/lib/education/classroomLivePath';
+import { peekRehearseIntent } from '@/lib/education/rehearsal';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
 import { cefrLessonPack, type CefrLevel } from '@/lib/education/eslCefrDemo';
 import { VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
@@ -98,7 +99,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
 
   // Held while a pressure write awaits its ack, so a refusal is still shown.
   useEffect(() => {
-    if (roomCreatedGameCode && !pressurePending) router.replace(classroomLivePath(language, roomCreatedGameCode, { host: true }));
+    if (roomCreatedGameCode && !pressurePending) router.replace(classroomLivePath(language, roomCreatedGameCode, { host: true, practice: peekRehearseIntent()?.withSeat === true }));
   }, [roomCreatedGameCode, pressurePending, router, language]);
 
   const handleCreateClassroom = useCallback(() => {

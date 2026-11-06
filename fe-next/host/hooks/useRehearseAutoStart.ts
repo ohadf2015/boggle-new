@@ -7,13 +7,15 @@ interface Args {
   enabled: boolean;
   /** The server has the host in the room; before that, setAutoFill is refused as not-in-game. */
   hostSeated: boolean;
+  /** The teacher's practice seat is in the room; a practice run (intent.withSeat) waits for it. */
+  practiceSeated?: boolean;
   /** False when the room's mode ignores bots: the lobby's switch-to-Classic offer takes over instead. */
   botsAllowed: boolean;
   start: (intent: RehearseIntent) => void;
 }
 
 /** Runs the practice round a teacher asked for from HQ or the class page, once, when the lobby can take it. */
-export function useRehearseAutoStart({ enabled, hostSeated, botsAllowed, start }: Args): void {
+export function useRehearseAutoStart({ enabled, hostSeated, practiceSeated = false, botsAllowed, start }: Args): void {
   const fired = useRef(false);
   const startRef = useRef(start);
   startRef.current = start;
@@ -22,8 +24,9 @@ export function useRehearseAutoStart({ enabled, hostSeated, botsAllowed, start }
     if (!enabled || !hostSeated || fired.current) return;
     const intent = peekRehearseIntent();
     if (!intent) return;
+    if (intent.withSeat && !practiceSeated) return;
     fired.current = true;
     clearRehearseIntent();
     if (botsAllowed) startRef.current(intent);
-  }, [enabled, hostSeated, botsAllowed]);
+  }, [enabled, hostSeated, practiceSeated, botsAllowed]);
 }

@@ -21527,6 +21527,23 @@ const sv = {
   // @hqCalm:end
   // @eduLiveRoom:start
   "eduLiveRoom": {
+    "practice": {
+      "seatName": "Övningselev",
+      "title": "Din elevvy",
+      "body": "Spela här som elev. Tavlan bredvid är det klassen ser.",
+      "joining": "Går med som elev…",
+      "joined": "Du är med som övningselev",
+      "step1": "Du går med som övningselev",
+      "step2": "Övningsspelare går med och rundan startar",
+      "step3": "Hitta ord här och se dem på tavlan",
+      "step4": "Se resultaten klassen kommer att se",
+      "phoneTitle": "Eller spela från mobilen",
+      "phoneHint": "Skanna för att gå med i rundan som elev. Du förblir inloggad på båda.",
+      "openTab": "Öppna i ny flik",
+      "hide": "Dölj elevvyn",
+      "show": "Visa elevvyn",
+      "frameTitle": "Elevvy"
+    },
     "round": {
       "boardLabel": "Klassens bräde",
       "wheelLabel": "Klassens bokstavshjul"
@@ -21676,7 +21693,8 @@ const sv = {
       },
       "practice": {
         "title": "Testa själv först",
-        "body": "Spela en snabb runda mot bottar och se vad klassen kommer att se. Bara du ser det."
+        "body": "Spela en runda som elev precis bredvid din tavla, med övningsspelare. Bara du ser det.",
+        "cta": "Testa som elev"
       },
       "greetMorning": "God morgon, {name}",
       "greetAfternoon": "God eftermiddag, {name}",
