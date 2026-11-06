@@ -24,11 +24,19 @@ const BEAM_COLOR: Record<SlotState, string> = {
   solved: 'var(--neo-lime, #BFFF00)',
   gaveUp: 'var(--neo-red, #FF3366)',
   current: 'var(--neo-cyan, #00FFFF)',
-  locked: 'rgba(255,255,255,0.15)',
+  // 0.15 vanished on phone screens: the unlit beams read as a broken drawing.
+  locked: 'rgba(255,255,255,0.3)',
 };
 
-// Slot centers in the 0–100 viewBox (3 × w-20 slots + 2 gaps ≈ 15.6 / 50 / 84.4%).
+// Slot centers in the 0–100 viewBox: the beams SVG spans exactly the base row
+// (3 equal slots + 2 gap-2 gaps ≈ 15.6 / 50 / 84.4%).
 const BEAM_X = [16, 50, 84] as const;
+
+// Phone fit: the `[@container(max-height:42rem)]:` classes below apply only
+// inside the play screen's size container (PyramidChallenge root). A short
+// screen shrinks the apex, beams and slots so the keyboard below stays on
+// screen; results/end screens have no such container and keep full size.
+// Written out in full (no interpolation) so Tailwind's scanner sees them.
 
 /**
  * The pyramid IS the scoreboard: apex (finale word) on top, 3 base slots
@@ -63,7 +71,7 @@ export default function PyramidProgress({
         animate={finaleActive && !prefersReducedMotion ? { scale: 1.08 } : { scale: 1 }}
         transition={{ type: 'spring', stiffness: 260, damping: 16 }}
         className={[
-          'relative z-10 min-w-24 h-12 px-3 rounded-neo border-neo-thick flex items-center justify-center font-neo-display font-black text-lg shadow-hard',
+          'relative z-10 min-w-24 h-12 [@container(max-height:42rem)]:h-9 [@container(max-height:42rem)]:text-base px-3 rounded-neo border-neo-thick flex items-center justify-center font-neo-display font-black text-lg shadow-hard',
           won
             ? 'border-neo-black bg-neo-yellow text-neo-navy'
             : finaleActive
@@ -84,8 +92,19 @@ export default function PyramidProgress({
         )}
       </m.div>
 
-      {/* Beams — light up as each bridge feeds the apex */}
-      <svg className="h-6 w-64 -my-0.5" viewBox="0 0 100 24" preserveAspectRatio="none" aria-hidden="true">
+      {/* The beams and the slot row share one box, so the beams always span
+          exactly the slots they point at (the rail zooms and resizes them). */}
+      <div className="flex flex-col items-stretch">
+      {/* Beams — light up as each bridge feeds the apex. The slot row follows the
+          page direction (stage 1 is rightmost in Hebrew), so the beams mirror with
+          it; unmirrored, the lit beam pointed at the wrong slot in RTL. */}
+      <svg
+        data-testid="pyramid-beams"
+        className="h-6 [@container(max-height:42rem)]:h-4 w-0 min-w-full -my-0.5 rtl:-scale-x-100"
+        viewBox="0 0 100 24"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
         {BEAM_X.map((x, idx) => (
           <line
             key={idx}
@@ -113,13 +132,14 @@ export default function PyramidProgress({
             }
             transition={{ type: 'spring', stiffness: 340, damping: 18 }}
             className={[
-              'w-20 h-12 rounded-neo border-neo-thick flex items-center justify-center font-neo-body text-xs font-bold text-center px-1.5 shadow-hard',
+              'w-20 h-12 [@container(max-height:42rem)]:h-9 rounded-neo border-neo-thick flex items-center justify-center font-neo-body text-xs font-bold leading-tight text-center px-1.5 shadow-hard',
               SLOT_CLASS[state],
             ].join(' ')}
           >
             {solvedBridges[idx] || (state === 'current' ? '···' : '?')}
           </m.div>
         ))}
+      </div>
       </div>
     </div>
   );
