@@ -174,7 +174,7 @@ export const LetterRow = memo(function LetterRow({
               className={cn(
                 'relative flex h-12 min-w-0 max-w-[3.25rem] flex-1 items-center justify-center rounded-neo border-neo-thick font-neo-display text-2xl font-black uppercase transition-colors duration-150 lg:h-14 lg:max-w-[3.5rem]',
                 used
-                  ? 'border-neo-cream/25 bg-neo-navy-light text-neo-cream/40'
+                  ? 'border-neo-cream/40 bg-neo-navy-light text-neo-cream/40'
                   : 'border-black bg-neo-lime text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed',
                 placing && !used && 'opacity-40 shadow-none',
               )}
