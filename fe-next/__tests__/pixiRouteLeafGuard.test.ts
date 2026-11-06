@@ -7,8 +7,7 @@ const ROOT = join(__dirname, '..');
 const APP = join(ROOT, 'app');
 const SEGMENT_FILE = /^(page|layout|template|loading|error|not-found|default)\.(tsx|ts|jsx|js)$/;
 const PIXI = /^(pixi\.js|@pixi\/)/;
-// Admin-only preview (`notFound()` for everyone else).
-const ALLOWED_ROUTES = ['[locale]/blast/v2'];
+const ALLOWED_ROUTES: string[] = [];
 
 const EXTS = ['', '.ts', '.tsx', '.js', '.jsx', '.mjs', '/index.ts', '/index.tsx', '/index.js'];
 const IMPORT_RE = /(?:^|[\n;])\s*(import|export)\s+(type\s+)?([^'";]*?\sfrom\s+)?['"]([^'"\n]+)['"]/g;
