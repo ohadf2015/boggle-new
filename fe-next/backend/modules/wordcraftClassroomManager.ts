@@ -41,7 +41,7 @@ import {
   type DictionaryCheck,
 } from '@/lib/word-craft/moveValidator';
 import { findBestBotMove } from '@/lib/word-craft/botMove';
-import { hashStringToSeed } from '@/lib/blast/v2/prng';
+import { fnv1aHash } from '@/lib/rng/seededRandom';
 import logger from '../utils/logger';
 import type { PlacedTile, RackTile } from '@/lib/word-craft/types';
 import type {
@@ -106,7 +106,7 @@ export interface CreateWordcraftLiveSessionOptions {
 function dealPlayer(sessionSeed: string, username: string, targets: string[], locale: SupportedLocale, boardSize: BoardSize): WordcraftLivePlayer {
   // One bag per student: boards evolve independently from the first move, so a
   // shared sack would only couple students who never see each other's tiles.
-  const bag = createBag({ seed: hashStringToSeed(`${sessionSeed}:${username}`), locale });
+  const bag = createBag({ seed: fnv1aHash(`${sessionSeed}:${username}`), locale });
   if (targets.length) bag.tiles = seedOpeningRack(bag.tiles, targets[0], locale);
   const rack = bag.tiles.splice(0, WORDCRAFT_LIVE_RACK_SIZE);
   // The rival plays by the classic 7-tile rules: findBestBotMove enumerates

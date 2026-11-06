@@ -23,8 +23,7 @@
  * gameCode and advanced once per submit. NO Math.random. Same play → same pops
  * → same final height, on every device and every reload.
  *
- * Mirrors lib/blast/v2/surprise.ts (coins/chest) but re-themed to a vertical
- * climb: the rewards are height, scrambles, and a banked next-word boost.
+ * The rewards are height, scrambles, and a banked next-word boost.
  */
 
 import { fnv1aHash } from '@/lib/rng/seededRandom';

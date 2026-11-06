@@ -122,7 +122,6 @@ describe('OfflineFallback', () => {
       const { container } = render(<OfflineFallback onRetry={() => {}} />);
 
       expect(container.querySelector('a[href="/en/crossword"]')).toBeNull();
-      expect(container.querySelector('a[href="/en/blast/v2"]')).toBeNull();
       for (const mode of LAUNCHER_MODES) {
         const href = mode.entry('en');
         expect(

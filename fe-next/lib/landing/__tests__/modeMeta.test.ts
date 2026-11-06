@@ -126,7 +126,7 @@ describe('modeGroup: home sections by player intent', () => {
   it('puts the live race in "together"', () => expect(modeGroup('arena')).toBe('together'));
   it.each(['adventure', 'wordTowerV2', 'brainGym', 'blast'])('%s is a solo run', (k) => expect(modeGroup(k)).toBe('solo'));
   it.each(['connections', 'crossword', 'wordCraft'])('%s is untimed, so "think"', (k) => expect(modeGroup(k)).toBe('think'));
-  it.each(['wordfall', 'quickPlay', 'nope'])('%s lands in previews', (k) => expect(modeGroup(k)).toBe('preview'));
+  it.each(['quickPlay', 'nope'])('%s lands in previews', (k) => expect(modeGroup(k)).toBe('preview'));
 
   it('every MODE_META key resolves to a known group', () => {
     for (const key of Object.keys(MODE_META)) expect(MODE_GROUPS).toContain(modeGroup(key));

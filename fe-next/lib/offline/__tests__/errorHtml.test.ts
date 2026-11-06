@@ -29,11 +29,9 @@ describe('capacitor-assets/error.html', () => {
     }
   });
 
-  it('does not reveal unreleased modes (crossword, wordfall)', () => {
+  it('does not reveal unreleased modes (crossword)', () => {
     expect(html).not.toContain('"/en/crossword"');
-    expect(html).not.toContain('"/en/blast/v2"');
     expect(html).not.toContain('playCrossword');
-    expect(html).not.toContain('playWordfall');
   });
 
   it('covers all five primary locales (and ru) in the inline strings map', () => {

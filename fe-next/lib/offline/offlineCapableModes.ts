@@ -22,10 +22,6 @@
  *                   one online load (see lib/word-craft/dictionary localStorage cache).
  *  - crossword    — bundled daily puzzles (lib/crossword/puzzles) + localStorage resume; the
  *                   board, clue nav and check/reveal are fully client-side.
- *  - wordfall     — Blast V2 ("Wordfall"); shares the `blast` segment but precaches its own
- *                   /blast/v2 shell. Levels build client-side from the bundled chain packs via
- *                   lib/blast/v2/offlineLevelResolver (zero network), guests persist progress
- *                   to localStorage, authed clears queue for replay on reconnect.
  *  - party        — same-screen pass-and-play Boggle (lib/party). Shared board per round,
  *                   sequential unique-word scoring, localStorage resume. No Socket.IO /
  *                   no Supabase during play; words via the offline dict path.
@@ -33,9 +29,9 @@
  *                   dict as word-craft). Progress persists to localStorage; server writes
  *                   are fire-and-forget and not required to play.
  *
- * Both crossword and wordfall were previously admin-only `force-dynamic` routes (404 for
- * non-admins → no precache-able shell). Their play routes now render for everyone, so the SW
- * can precache a real shell and a rider can launch them offline.
+ * Crossword was previously an admin-only `force-dynamic` route (404 for non-admins → no
+ * precache-able shell). Its play route now renders for everyone, so the SW can precache a
+ * real shell and a rider can launch it offline.
  */
 
 import { locales } from '@/i18n/config';
@@ -76,14 +72,6 @@ export const OFFLINE_MODES: readonly OfflineMode[] = [
   },
   { segment: 'word-craft', labelKey: 'native.offline.playWordCraft', entry: localePath('word-craft') },
   { segment: 'crossword', labelKey: 'native.offline.playCrossword', entry: localePath('crossword'), inLauncher: false },
-  {
-    // Wordfall (Blast V2) shares the `blast` segment for the offline-capable
-    // route gate, but precaches/links its own /blast/v2 shell.
-    segment: 'blast',
-    labelKey: 'native.offline.playWordfall',
-    entry: (locale) => `/${locale}/blast/v2`,
-    inLauncher: false,
-  },
   { segment: 'party', labelKey: 'native.offline.playParty', entry: localePath('party') },
   { segment: 'word-tower', labelKey: 'native.offline.playWordTower', entry: localePath('word-tower') },
 ] as const;

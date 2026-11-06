@@ -1,12 +1,11 @@
-import type { Locale } from '@/lib/blast/v2/types';
-
 /** The mode the homepage heroes for every player, newcomer or returning. */
 export const FEATURED_HOME_MODE = 'blast';
 
 /** Locales with a Blast letter pool; elsewhere the board would deal English letters. */
-export const BLAST_LOCALES: readonly Locale[] = ['en', 'he', 'sv', 'ja', 'es'];
+export const BLAST_LOCALES = ['en', 'he', 'sv', 'ja', 'es'] as const;
+export type BlastLocale = (typeof BLAST_LOCALES)[number];
 
-export function isBlastLocale(language: string): language is Locale {
+export function isBlastLocale(language: string): language is BlastLocale {
   return (BLAST_LOCALES as readonly string[]).includes(language);
 }
 
