@@ -189,7 +189,7 @@ function SegmentBar({ filled, fill, className, testId }: { filled: number; fill:
   return (
     <span data-testid={testId} aria-hidden="true" className={cn('flex gap-0.5', className)}>
       {Array.from({ length: AVERAGE_SEGMENTS }, (_, i) => (
-        <span key={i} className={cn('h-full flex-1 rounded-[2px] border border-neo-black', i < filled ? cn(fill, STRIPES) : 'bg-neo-navy')} />
+        <span key={i} className={cn('h-full flex-1 rounded-[2px] border border-neo-cream/40', i < filled ? cn(fill, STRIPES) : 'bg-neo-navy')} />
       ))}
     </span>
   );
@@ -198,7 +198,7 @@ function SegmentBar({ filled, fill, className, testId }: { filled: number; fill:
 function ArcadeReportSheet({ names, reteach, t }: { names: string[]; reteach: string; t: T }) {
   const average = sampleClassAverage();
   return (
-    <div data-testid="pro-preview-report-sheet" className="rounded-neo border-2 border-neo-black bg-neo-navy-light p-2 text-neo-cream sm:p-2.5">
+    <div data-testid="pro-preview-report-sheet" className="rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light p-2 text-neo-cream sm:p-2.5">
       <div className="flex items-end justify-between gap-2">
         <span className="text-[11px] font-bold sm:text-xs">{t('eg2Pro.sample.classAverage')}</span>
         <span className="font-neo-display text-xl font-black tabular-nums text-neo-white sm:text-2xl">{average}%</span>

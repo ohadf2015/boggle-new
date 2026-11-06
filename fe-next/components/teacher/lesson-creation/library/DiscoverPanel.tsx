@@ -100,7 +100,7 @@ export default function DiscoverPanel({ onOpenMyLists, onShareFirst, onCopied }:
       {lib.status === 'loading' ? (
         <div ref={gridRef} className={GRID} aria-busy="true">
           {Array.from({ length: pageSize }, (_, i) => (
-            <div key={i} className="h-[78px] animate-pulse rounded-neo-lg border-[3px] border-neo-black bg-neo-navy-light sm:h-[144px]" />
+            <div key={i} className="h-[78px] animate-pulse rounded-neo-lg border-[3px] border-neo-cream/40 bg-neo-navy-light sm:h-[144px]" />
           ))}
         </div>
       ) : lib.items.length === 0 ? (
