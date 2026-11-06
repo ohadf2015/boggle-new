@@ -12419,6 +12419,7 @@ const es = {
       "nearMiss": "¡Tan cerca! A {pct}% de lo perfecto",
       "betterThan": "Mejor que el {pct}% de las partidas rápidas de hoy",
       "seeLeaderboard": "Ver clasificación completa",
+      "todayBoard": "Lo mejor de hoy",
       "nextRound": "Girar otra ronda",
       "challengeFriend": "Reta a un amigo con el mismo tablero",
       "challengeHint": "Jugará exactamente tu tablero. Su puntuación será tu próximo rival.",

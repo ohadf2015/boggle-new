@@ -24,6 +24,7 @@ import { useLockedBranch, useResultBeats } from './useResultBeats';
 import { MpResultsHeader } from './MpResultsHeader';
 import { MpStandingsSection } from './MpFullStandings';
 import { MpMyCard } from './MpMyCard';
+import { MpSoloStage } from './MpSoloStage';
 import { useClassroomPressure } from '@/hooks/gameState/classroomPressureStore';
 import { isLeaderboardHidden } from '@/shared/utils/classroomPressure';
 import { MpNextModeCard } from './MpNextModeCard';
@@ -251,6 +252,8 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
           >
             {t('education.classroomGame.pressure.revealAtEnd')}
           </p>
+        ) : boardRows.length < 2 && !c.isClassroom ? (
+          <MpSoloStage scored={myScore > 0} />
         ) : (
           <MpStandingsSection
             allRows={boardRows}

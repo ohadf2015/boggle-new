@@ -49,8 +49,8 @@ export function QuickPlayRankCard({ totalPoints, percentileToday, scorePct }: Qu
               data-current={isCurrent || undefined}
               className={`flex items-center gap-2 rounded-lg px-2 py-1.5 text-xs ${
                 isCurrent
-                  ? 'border-2 border-black bg-neo-cozy/25 shadow-hard-sm'
-                  : 'border-2 border-transparent opacity-55'
+                  ? 'border-[3px] border-black bg-neo-abyss py-2 shadow-hard-sm'
+                  : 'border-2 border-dashed border-neo-white/15 opacity-70'
               }`}
             >
               <span className={`min-w-0 flex-1 truncate font-neo-display font-bold tracking-wide ${rung.color}`}>
@@ -77,9 +77,9 @@ export function QuickPlayRankCard({ totalPoints, percentileToday, scorePct }: Qu
         })}
       </ul>
 
-      <div className="mt-2 h-2.5 overflow-hidden rounded-full border-2 border-black bg-neo-abyss">
+      <div className="mt-2.5 h-3.5 overflow-hidden rounded-full border-[3px] border-black bg-neo-abyss">
         <i
-          className="block h-full border-r-2 border-black bg-neo-cozy transition-[width] duration-700"
+          className="block h-full origin-left border-r-[3px] border-black bg-neo-lime bg-[repeating-linear-gradient(-45deg,transparent_0_6px,rgba(0,0,0,0.14)_6px_12px)] animate-[qp-bar-fill_0.9s_cubic-bezier(0.3,0.9,0.4,1)_0.3s_both] motion-reduce:animate-none rtl:origin-right"
           style={{ width: `${Math.round(rankNow.progress * 100)}%` }}
         />
       </div>

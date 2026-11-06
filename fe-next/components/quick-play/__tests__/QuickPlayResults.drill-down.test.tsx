@@ -227,8 +227,7 @@ describe('QuickPlayResults drill-down — one-tap word details', () => {
     });
   });
 
-  it('handles missing words gracefully', () => {
-    // Result with no words array
+  it('never calls a scoring round scoreless when the word list is missing', () => {
     const emptyResult: QuickRoundResult = { ...result, words: undefined };
 
     render(
@@ -241,7 +240,14 @@ describe('QuickPlayResults drill-down — one-tap word details', () => {
       />
     );
 
-    // Should render the no-words fallback state
-    expect(screen.getByTestId('quick-no-words')).toBeInTheDocument();
+    expect(screen.queryByTestId('quick-no-words')).toBeNull();
+  });
+
+  it('falls back to the round words when no collection list was passed', () => {
+    render(
+      <QuickPlayResults result={result} outcome={outcome} rival={null} onNextRound={vi.fn()} onChallenge={vi.fn()} />
+    );
+
+    expect(screen.getByTestId('quick-words-collected')).toBeInTheDocument();
   });
 });

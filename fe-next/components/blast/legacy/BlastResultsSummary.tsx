@@ -1,7 +1,11 @@
 'use client';
 
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { getOrCreateStoredCustomAvatar } from '@/utils/profileStorage';
+import { Home, RotateCcw } from 'lucide-react';
 import { trackGrowthEvent } from '@/utils/growthTracking';
+import { ResultsNextBar } from '@/components/results/stage/ResultsNextBar';
 import { Button } from '@/components/ui/button';
 import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -30,6 +34,8 @@ interface BlastResultsSummaryProps {
 
 export function BlastResultsSummary({ results, t, onPlayAgain, onQuit, onOpenStore }: BlastResultsSummaryProps) {
   const { language, dir } = useLanguage();
+  const { user, profile } = useAuth();
+  const [guestAvatar] = useState(() => (user ? null : getOrCreateStoredCustomAvatar()));
   const rootRef = useRef<HTMLDivElement>(null);
   const badges = useBlastBadgeUnlocks({ results, t });
   const view = useMemo(() => toBlastResultsView(fromSpResults(results)), [results]);
@@ -58,7 +64,7 @@ export function BlastResultsSummary({ results, t, onPlayAgain, onQuit, onOpenSto
       data-testid="blast-results-summary"
       data-fail={didFail ? 'true' : 'false'}
     >
-      <div className="relative flex-1 overflow-y-auto overflow-x-hidden px-4 pt-6 pb-4 flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-6">
+      <div className="relative flex-1 overflow-y-auto overflow-x-hidden px-4 pt-2 pb-4 flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-6">
         <div className="w-full flex flex-col items-center gap-4 lg:flex-1">
           <BlastResultsHero
             view={view}
@@ -67,6 +73,7 @@ export function BlastResultsSummary({ results, t, onPlayAgain, onQuit, onOpenSto
             headline={headline}
             stars={didFail ? null : { count: results.stars, label: t(`blast.stars${results.stars}`) }}
             footer={didFail ? <FailStrip results={results} passPct={passPct} t={t} /> : null}
+            avatar={{ userId: user?.id ?? 'guest', customAvatar: profile?.avatar_config ?? guestAvatar }}
           />
 
           <BlastRunJourney
@@ -85,43 +92,44 @@ export function BlastResultsSummary({ results, t, onPlayAgain, onQuit, onOpenSto
           <BlastResultsBadges badges={badges} t={t} />
 
           <BlastBragCard results={results} t={t} />
+
+          <div className="flex w-full items-center justify-center gap-2">
+            <Button asChild variant="ghost" size="sm" className={SECONDARY}>
+              <a href={`/${language}/leaderboard`} data-testid="blast-results-leaderboard-link">{t('nav.leaderboard')}</a>
+            </Button>
+            {onOpenStore && (
+              <Button data-testid="blast-results-upgrades-button" variant="ghost" size="sm" onClick={onOpenStore} className={SECONDARY}>
+                {t('blast.store.title', 'Upgrades')}
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 
       <ResultsBannerSlot placement="singleplayer-complete" className="shrink-0" />
 
-      <div
-        className="sticky bottom-0 z-20 shrink-0 flex flex-col gap-2 w-full px-4 py-3 bg-neo-navy border-t-3 border-neo-black pb-[max(0.75rem,env(safe-area-inset-bottom))]"
-        data-testid="blast-results-cta-footer"
-      >
-        <Button
-          data-testid="play-again-button"
-          data-reveal="cta"
-          size="lg"
-          onClick={onPlayAgain}
-          className="min-h-[56px] font-black text-xl uppercase border-3 border-neo-black shadow-hard-lg bg-neo-lime text-neo-black hover:bg-neo-lime/90"
-        >
-          {didFail ? t('blast.results.tryAgain') : t('blast.playAgain')}
-        </Button>
-        <div className="flex items-center justify-center gap-1">
-          <Button asChild variant="ghost" size="sm" className={SECONDARY}>
-            <a href={`/${language}/leaderboard`} data-testid="blast-results-leaderboard-link">{t('nav.leaderboard')}</a>
-          </Button>
-          {onOpenStore && (
-            <Button data-testid="blast-results-upgrades-button" variant="ghost" size="sm" onClick={onOpenStore} className={SECONDARY}>
-              {t('blast.store.title', 'Upgrades')}
-            </Button>
-          )}
-          <Button variant="ghost" size="sm" onClick={onQuit} className={SECONDARY}>
-            {t('common.home')}
-          </Button>
-        </div>
+      <div className="sticky bottom-0 z-20 shrink-0" data-testid="blast-results-cta-footer">
+        <ResultsNextBar
+          shine
+          primary={{
+            label: didFail ? t('blast.results.tryAgain') : t('blast.playAgain'),
+            onClick: onPlayAgain,
+            testId: 'play-again-button',
+            icon: <RotateCcw className="h-5 w-5" strokeWidth={3} />,
+          }}
+          secondary={{
+            label: t('common.home'),
+            onClick: onQuit,
+            testId: 'blast-results-home-button',
+            icon: <Home className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />,
+          }}
+        />
       </div>
     </div>
   );
 }
 
-const SECONDARY = 'font-semibold text-neo-cyan hover:text-neo-cyan hover:bg-transparent uppercase tracking-wider text-xs';
+const SECONDARY = 'h-11 rounded-xl border-[3px] border-black bg-neo-navy-elevated px-4 font-neo-display font-bold text-neo-cyan shadow-hard-sm hover:bg-neo-navy-elevated hover:text-neo-cyan uppercase tracking-wider text-xs';
 
 function FailStrip({ results, passPct, t }: { results: BlastResultsData; passPct: number; t: BlastResultsT }) {
   const reason = computeFailReason({ tilesCleared: results.tilesCleared, totalTiles: results.totalTiles, passPct });

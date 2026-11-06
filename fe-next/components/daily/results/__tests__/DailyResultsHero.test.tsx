@@ -7,6 +7,7 @@ import { fireConfetti } from '@/utils/confettiUtils';
 import { DailyRevealProvider } from '../reveal/DailyRevealContext';
 
 vi.mock('@/utils/confettiUtils', () => ({ fireConfetti: vi.fn() }));
+vi.mock('@/components/Avatar', () => ({ default: ({ mood }: { mood?: string }) => <div data-testid="avatar" data-mood={mood} /> }));
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn() }),
   usePathname: () => '/en/daily/word-hunt',
@@ -194,5 +195,13 @@ describe('DailyResultsHero remounted after the reveal (tab switch)', () => {
     act(() => { vi.advanceTimersByTime(3000); });
     vi.useRealTimers();
     expect(fireConfetti).not.toHaveBeenCalled();
+  });
+
+  it('puts the player avatar on top of every daily result, calm after a loss', () => {
+    const { unmount } = renderHero({ outcome: 'win' });
+    expect(screen.getByTestId('results-avatar-stage')).toBeTruthy();
+    unmount();
+    renderHero({ outcome: 'loss' });
+    expect(screen.getByTestId('avatar').dataset.mood).toBe('idle');
   });
 });

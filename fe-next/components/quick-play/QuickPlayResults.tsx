@@ -20,12 +20,11 @@ import { getOrCreateStoredCustomAvatar } from '@/utils/profileStorage';
 import { holdQuickResultsCalm } from '@/lib/quickPlay/resultsCalm';
 import { useHeroCheer } from '@/lib/quickPlay/useHeroCheer';
 import { getGuestProgress, percentileFromBoard } from '@/lib/quickPlay/guestProgress';
-import Avatar from '@/components/Avatar';
 import BlastWalletHud from '@/components/blast/legacy/BlastWalletHud';
 import { CoinArt } from '@/components/ui/CoinArt';
 import { emitCoinEarned } from '@/utils/coinEarnedFx';
 import RivalCompareCard from '@/components/daily/RivalCompareCard';
-import { BurstLines, ConfettiPuff, QuickResultsRays, SparkleLoop } from './QuickResultsFx';
+import { ResultsAvatarStage } from '@/components/results/stage/ResultsAvatarStage';
 import { QuickResultsStats } from './QuickResultsStats';
 import { QuickResultsCtaBar, QuickResultsModeSwitch } from './QuickResultsNextActions';
 import { QuickPlayRankCard } from './QuickPlayRankCard';
@@ -201,6 +200,8 @@ export function QuickPlayResults({
   }, []);
 
   const modeColor = NODE_COLORS[result.mode];
+  const wordList: CollectedWord[] =
+    collected.length > 0 ? collected : (result.words ?? []).map((w) => ({ word: w.word, score: w.score, isNew: false }));
   const myName = profile?.username || t('common.you', 'You');
   const badge = 'animate-neo-pop rounded-xl border-[3px] border-black px-3 py-1 font-neo-display text-xs font-bold tracking-wide text-black shadow-hard';
 
@@ -247,45 +248,21 @@ export function QuickPlayResults({
             className="relative mx-auto flex w-full max-w-xl flex-1 flex-col items-center justify-center gap-3 px-4 pb-6 lg:max-w-3xl lg:gap-5"
             data-testid="quick-hero-card"
           >
-            <div className="relative flex h-[min(34dvh,290px)] w-full items-center justify-center lg:h-[300px]">
-              <QuickResultsRays color={modeColor.hex} spinning={animate} />
-              <ConfettiPuff count={confettiCount} enabled={animate} />
-              <BurstLines enabled={animate && result.wordsFound > 0} />
-              {hopping && <BurstLines enabled delayMs={0} />}
-              <SparkleLoop enabled={animate && result.wordsFound > 0} />
-              <div
-                className={`relative z-10 ${animate ? 'animate-[qp-avatar-pop_0.7s_cubic-bezier(0.3,0.9,0.4,1)_both]' : ''}`}
-                data-testid="quick-hero-avatar"
-              >
-                <div className={animate ? 'animate-[qp-avatar-bob_2.8s_ease-in-out_0.9s_infinite]' : ''}>
-                  <div
-                    data-testid={hopping ? 'quick-hero-hop' : undefined}
-                    className={hopping ? 'animate-[qp-avatar-hop_0.62s_cubic-bezier(0.3,0.9,0.4,1)_both]' : ''}
-                  >
-                    <div className="-m-5 scale-[0.8] lg:m-0 lg:scale-100">
-                      <Avatar
-                        userId={user?.id ?? 'guest'}
-                        customAvatar={profile?.avatar_config ?? guestAvatar ?? undefined}
-                        pixelSize={200}
-                        mood={heroMood}
-                      />
-                    </div>
-                  </div>
-                </div>
-                <span
-                  aria-hidden="true"
-                  className={`absolute -bottom-3 left-1/2 -z-10 h-3.5 w-28 -translate-x-1/2 rounded-[50%] bg-black/45 ${
-                    animate ? 'animate-[qp-shadow-bob_2.8s_ease-in-out_0.9s_infinite]' : ''
-                  }`}
-                />
-              </div>
-            </div>
+            <ResultsAvatarStage
+              avatar={{ userId: user?.id ?? 'guest', customAvatar: profile?.avatar_config ?? guestAvatar }}
+              mood={heroMood}
+              accentHex={modeColor.hex}
+              animate={animate}
+              cheering={result.wordsFound > 0}
+              confettiCount={confettiCount}
+              hopping={hopping}
+            />
 
             <div className="relative z-10 flex flex-col items-center gap-1 text-center">
               <h1
                 ref={headingRef}
                 tabIndex={-1}
-                className="font-neo-display text-[32px] font-bold leading-tight text-neo-yellow outline-none [text-shadow:0_3px_0_#000] lg:text-5xl"
+                className="font-neo-display text-[32px] font-bold leading-tight text-neo-yellow outline-none! [text-shadow:0_3px_0_#000] lg:text-5xl"
               >
                 {t('quickPlay.solo.roundComplete')}
               </h1>
@@ -397,9 +374,9 @@ export function QuickPlayResults({
             <QuickResultsModeSwitch currentMode={result.mode} onNextRound={onNextRound} />
           </div>
           <div className="flex flex-col gap-3">
-            {collected.length > 0 ? (
-              <QuickWordsCollected words={collected} collectionTotal={collectionTotal} />
-            ) : (
+            {wordList.length > 0 ? (
+              <QuickWordsCollected words={wordList} collectionTotal={Math.max(collectionTotal, wordList.length)} />
+            ) : result.wordsFound === 0 && (
               <div
                 className="flex items-center gap-3 rounded-2xl border-[3px] border-black bg-neo-navy-elevated p-3 shadow-hard"
                 data-testid="quick-no-words"

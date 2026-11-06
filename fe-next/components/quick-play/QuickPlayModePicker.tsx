@@ -14,16 +14,17 @@
  * sharing a single spec, and the hero earns its rank through grid footprint and
  * one responsive step-up at `lg`.
  *
- * Layout (both topologies tile exactly — no orphan cell at any width):
- * - < lg: 2×2, four equal cards. No room for a hero; colour carries the ranking.
- * - lg+: 4×2. Classic 2×2 hero, Blast/Hunt 1×1, Wheel 2×1 across the bottom.
- *   The 4-column grid starts at `lg`, not `md`: at 768px four tracks are ~170px
- *   and an 80-character promise ragged-wraps to five lines in a 13ch measure.
+ * Layout: the grid fills whatever height the hub gives it, so the menu never
+ * scrolls on a phone.
+ * - < lg: 2 columns × 3 rows. Classic spans the top row (the taller one);
+ *   Blast | Hunt, then Wheel | Random. Random is a fifth tile, not a bar.
+ * - lg+: 4×2. Classic 2×2 hero, the other four 1×1 around it.
  *
  * CRITICAL: All text on accent fills is BLACK (text-black) for WCAG contrast.
  */
 
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { Timer } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ModeGlyph } from './ModeGlyph';
 import { RandomGlyph } from './RandomGlyph';
@@ -39,7 +40,8 @@ const HERO: QuickMode = 'classic';
 const SIBLING_SPEC = {
   glyph: 'h-9 w-9 sm:h-10 sm:w-10',
   title: 'text-base sm:text-lg',
-  blurb: 'text-[11px] sm:text-sm',
+  // Short tiles (small phones) drop the promise rather than clip it.
+  blurb: 'text-[11px] leading-snug sm:text-sm line-clamp-3 [@container(max-height:7.5rem)]:hidden',
 } as const;
 
 // The hero owns a cell twice as tall as a sibling's, so it needs mass to match:
@@ -52,10 +54,10 @@ const HERO_SPEC = {
 } as const;
 
 const GRID_SPANS: Record<QuickMode, string> = {
-  classic: 'lg:col-span-2 lg:row-span-2',
+  classic: 'col-span-2 lg:col-span-2 lg:row-span-2',
   blast: '',
   'word-hunt': '',
-  'wheel-rush': 'lg:col-span-2',
+  'wheel-rush': '',
 };
 
 interface QuickPlayModePickerProps {
@@ -129,30 +131,26 @@ export function QuickPlayModePicker({
   return (
     <div
       ref={containerRef}
-      className="relative mx-auto flex w-full max-w-5xl flex-col gap-3 px-3 py-4 sm:gap-4 sm:px-4 sm:py-6"
+      className="relative mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col gap-2.5 px-1 sm:gap-3 lg:justify-center lg:gap-5"
       data-testid="quick-play-mode-picker"
     >
-      {/* Duration banner — shared across all four modes. Neo-brutalist
-          with bold numeral: hard-shadowed slab in the hero's color. */}
-      <div
-        className="flex items-center justify-center gap-2 rounded-neo border-neo border-black bg-neo-navy-elevated px-3 py-2 sm:px-4 sm:py-3"
-        data-testid="duration-banner"
-        id={`${uid}-duration`}
-      >
-        <span className="font-neo-body text-sm text-neo-cream sm:text-base">
-          {t('quickPlay.solo.durationLabel')}
-        </span>
-        <span className="font-neo-display text-xl font-bold text-neo-lime shadow-hard-sm sm:text-2xl">
-          {QUICK_ROUND_SECONDS}
-        </span>
-        <span className="font-neo-body text-sm text-neo-cream sm:text-base">
-          {t('quickPlay.solo.durationUnit')}
-        </span>
+      {/* One sticker for all five tiles: every round is the same length. */}
+      <div className="flex justify-center">
+        <div
+          className="inline-flex -rotate-1 items-center gap-1.5 rounded-full border-[3px] border-black bg-neo-yellow px-3 py-1 text-black shadow-hard-sm"
+          data-testid="duration-banner"
+          id={`${uid}-duration`}
+        >
+          <Timer className="h-4 w-4" strokeWidth={2.75} aria-hidden="true" />
+          <span className="font-neo-display text-sm font-bold sm:text-base">
+            {t('quickPlay.solo.durationLabel')} <b className="tabular-nums">{QUICK_ROUND_SECONDS}</b> {t('quickPlay.solo.durationUnit')}
+          </span>
+        </div>
       </div>
 
       {/* Both topologies tile exactly: 2×2 below lg, 4×2 at lg+ (hero 2×2,
           two 1×1 siblings on the top-right, Wheel 2×1 across the bottom). */}
-      <div className="grid auto-rows-fr grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+      <div className="grid min-h-0 flex-1 grid-cols-2 grid-rows-[minmax(0,1.25fr)_minmax(0,1fr)_minmax(0,1fr)] gap-2.5 sm:gap-3 lg:grid-cols-4 lg:grid-rows-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-4">
         {MODES.map((mode, idx) => {
           const colors = NODE_COLORS[mode];
           const spec = mode === HERO ? HERO_SPEC : SIBLING_SPEC;
@@ -183,11 +181,10 @@ export function QuickPlayModePicker({
                   : undefined
               }
               className={`
-                group relative flex min-h-[9rem] min-w-0 flex-col items-start justify-between gap-3 overflow-hidden rounded-neo border-neo-thick border-black text-start transition duration-200
+                group relative flex min-h-0 min-w-0 flex-col items-start justify-between gap-2 overflow-hidden rounded-neo border-neo-thick border-black text-start transition duration-200 [container-type:size]
                 ${mode === HERO ? 'lg:justify-center lg:gap-5' : ''}
-                ${mode === HERO || mode === 'wheel-rush' ? 'col-span-2' : ''}
                 ${GRID_SPANS[mode]}
-                p-3 sm:p-4 lg:p-5
+                p-2.5 sm:p-4 lg:p-5
                 ${colors.bg} shadow-hard animate-neo-pop
                 ${isPending ? 'ring-4 ring-white ring-offset-2 ring-offset-black' : ''}
                 ${isSiblingDimmed ? 'opacity-50' : 'opacity-100'}
@@ -196,6 +193,10 @@ export function QuickPlayModePicker({
                 focus:outline-none focus:ring-4 focus:ring-white focus:ring-offset-2 focus:ring-offset-black
               `}
             >
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute -end-6 -top-6 h-28 w-28 rounded-full bg-[radial-gradient(circle,rgba(0,0,0,0.18)_1.5px,transparent_1.6px)] bg-size-[9px_9px]"
+              />
               {/* Glyph keycap — the black ink needs an edge to sit against, or it
                   floats as a smudge in the middle of a large colour field. */}
               <span
@@ -217,7 +218,7 @@ export function QuickPlayModePicker({
                 </h3>
                 <p
                   id={`${uid}-${mode}-blurb`}
-                  className={`font-neo-body font-normal leading-snug text-black ${spec.blurb} max-w-[38ch] break-words`}
+                  className={`font-neo-body font-normal text-black ${spec.blurb} max-w-[38ch] break-words`}
                 >
                   {t(`quickPlay.solo.blurb.${mode}`)}
                 </p>
@@ -225,40 +226,37 @@ export function QuickPlayModePicker({
             </button>
           );
         })}
+        {/* Random — the fifth tile, same keycap + name + promise language. */}
+        <button
+          onClick={handleRandomClick}
+          onKeyDown={(e) => handleKeyDown(e, MODES.length)}
+          disabled={isLoading}
+          aria-labelledby={`${uid}-random-name`}
+          aria-describedby={`${uid}-random-blurb`}
+          data-testid="random-button"
+          className={`
+            group relative flex min-h-0 min-w-0 flex-col items-start justify-between gap-2 overflow-hidden rounded-neo border-neo-thick border-black bg-neo-navy-elevated text-start shadow-hard transition duration-200 [container-type:size] p-2.5 sm:p-4 lg:p-5
+            ${isLoading ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:shadow-hard-lg hover:-translate-y-0.5 motion-reduce:hover:translate-y-0'}
+            active:shadow-hard-pressed active:translate-y-0
+            focus:outline-none focus:ring-4 focus:ring-white focus:ring-offset-2 focus:ring-offset-black
+          `}
+        >
+          {/* Glyph keycap — matches mode card styling */}
+          <span className="flex flex-shrink-0 items-center justify-center rounded-[6px] border-2 border-black bg-neo-white p-1.5 text-black transition-transform duration-200 group-active:scale-95">
+            <RandomGlyph size={40} className="h-9 w-9 sm:h-10 sm:w-10" />
+          </span>
+
+          {/* Name + promise */}
+          <span className="flex min-w-0 flex-col gap-0.5">
+            <span id={`${uid}-random-name`} className="font-neo-display font-bold tracking-wide text-neo-cream text-base sm:text-lg">
+              {t('quickPlay.solo.random')}
+            </span>
+            <span id={`${uid}-random-blurb`} className="font-neo-body font-normal text-neo-cream/80 text-[11px] leading-snug sm:text-sm line-clamp-3 [@container(max-height:7.5rem)]:hidden max-w-[38ch] break-words">
+              {t('quickPlay.solo.blurb.random')}
+            </span>
+          </span>
+        </button>
       </div>
-
-      {/* Random — a secondary bar the width of the grid, so the composition
-          closes instead of trailing off into a floating centred pill. Has glyph
-          parity with the mode cards: keycap + name + blurb, same styling language. */}
-      <button
-        onClick={handleRandomClick}
-        onKeyDown={(e) => handleKeyDown(e, MODES.length)}
-        disabled={isLoading}
-        aria-labelledby={`${uid}-random-name`}
-        aria-describedby={`${uid}-random-blurb`}
-        data-testid="random-button"
-        className={`
-          group flex w-full min-w-0 flex-col items-start gap-3 rounded-neo border-neo border-black bg-neo-navy-elevated text-start transition duration-200 sm:flex-row sm:items-center sm:gap-4 p-3 sm:p-4
-          ${isLoading ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:shadow-hard-lg hover:-translate-y-0.5 motion-reduce:hover:translate-y-0'}
-          active:shadow-hard-pressed active:translate-y-0
-          focus:outline-none focus:ring-4 focus:ring-white focus:ring-offset-2 focus:ring-offset-black
-        `}
-      >
-        {/* Glyph keycap — matches mode card styling */}
-        <span className="flex flex-shrink-0 items-center justify-center rounded-[6px] border-2 border-black bg-black/10 p-1.5 text-black transition-transform duration-200 group-active:scale-95">
-          <RandomGlyph size={40} className="h-9 w-9 sm:h-10 sm:w-10" />
-        </span>
-
-        {/* Name + promise */}
-        <span className="flex min-w-0 flex-col gap-0.5">
-          <span id={`${uid}-random-name`} className="font-neo-display font-bold tracking-wide text-neo-cream text-sm sm:text-base">
-            {t('quickPlay.solo.random')}
-          </span>
-          <span id={`${uid}-random-blurb`} className="font-neo-body font-normal leading-snug text-neo-cream text-[11px] sm:text-sm max-w-[38ch] break-words">
-            {t('quickPlay.solo.blurb.random')}
-          </span>
-        </span>
-      </button>
     </div>
   );
 }

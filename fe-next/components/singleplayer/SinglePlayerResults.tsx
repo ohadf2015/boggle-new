@@ -5,7 +5,7 @@ import { m, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import GameFeedback from '@/components/feedback/GameFeedback';
 import { ScreenFlashOverlay } from '@/components/game/ScreenFlashOverlay';
-import { TrendingUp, RotateCcw } from 'lucide-react';
+import { TrendingUp, RotateCcw, Home } from 'lucide-react';
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import PlayerArchetypeBadge from '@/components/results/PlayerArchetypeBadge';
 import { longestWordOf } from '@/components/results/utils';
@@ -39,7 +39,6 @@ import { fireConfetti } from '@/utils/confettiUtils';
 import { displayScore } from '@/utils/scoreDisplay';
 import { useUnfinishedBoard } from '@/hooks/useUnfinishedBoard';
 import { usePostHogFlag } from '@/hooks/usePostHogFlag';
-import { Button } from '@/components/ui/button';
 import type { SinglePlayerResultsData, SinglePlayerMode } from './SinglePlayerView';
 import {
   useResultsData,
@@ -62,8 +61,10 @@ import {
   ChallengeButton,
 } from './results';
 
-import { StatsCardGrid } from '@/components/results/shared';
-import ResultsWinnerBanner from '@/components/results/ResultsWinnerBanner';
+import { ResultsNextBar } from '@/components/results/stage/ResultsNextBar';
+import { SoloResultsHero } from './results/components/SoloResultsHero';
+import { formatRankOrdinal } from '@/utils/formatRankOrdinal';
+import { getOrCreateStoredCustomAvatar } from '@/utils/profileStorage';
 import { GameEmojiShareCard, type SingleplayerShareData } from '@/components/shared/GameEmojiShareCard';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { useAsyncChallengeProducer } from '@/hooks/useAsyncChallengeProducer';
@@ -79,7 +80,6 @@ import type { DifficultyLevel } from '@/shared/types/game';
 
 const PerformanceChart = dynamic(() => import('@/components/results/PerformanceChart'), { ssr: false });
 const InlineSignupCard = dynamic(() => import('@/components/auth/InlineSignupCard'), { ssr: false });
-const PlacementHero = dynamic(() => import('@/components/results/PlacementHero'), { ssr: false });
 const MobileCompactLeaderboard = dynamic(() => import('@/components/results/MobileCompactLeaderboard'), { ssr: false });
 // Streak Ignition (t_89663cfc): the first-session payoff. Both cards read
 // localStorage, so they stay out of SSR and reserve their own min-h (CLS=0).
@@ -172,6 +172,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Snapshot BEFORE useGameHistory (below) appends this game — see the hook.
+  const [guestAvatar] = useState(() => (user ? null : getOrCreateStoredCustomAvatar()));
   const progressSnapshot = useProgressSnapshot(results);
 
   // Async friend-challenge integration: fires POST (challenger flow) or
@@ -328,7 +329,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
   // --- PORTRAIT / DESKTOP ---
   // Same components, different layout: desktop uses two-column grid via isDesktop hook.
-  const profileDisplayName = profile?.display_name || profile?.username || t('common.you');
 
   // "How am I doing?" — every game, right under the hero.
   const progressBlock = <ProgressPulseCard snapshot={progressSnapshot} />;
@@ -369,22 +369,17 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
   const heroBlock = (
     <>
-      {mode === 'solo-bots' ? (
-        <PlacementHero
-          rank={playerRank} score={displayScore(results.playerScore)} totalPlayers={allParticipants.length}
-          username={profileDisplayName} avatar={playerAvatar}
-          gapToWinner={playerRank > 1 ? (allParticipants[0]?.score || 0) - results.playerScore : 0}
-        />
-      ) : (
-        <ResultsWinnerBanner
-          winner={{ username: profileDisplayName, score: results.playerScore, avatar: playerAvatar }}
-          isCurrentUserWinner={true}
-          variant="completion"
-          customMessage={bannerConfig.message || t('results.finalScore')}
-          customAnnouncement={bannerConfig.announcement}
-          compact={true}
-        />
-      )}
+      <SoloResultsHero
+        title={bannerConfig.message ?? (mode === 'solo-bots' && allParticipants.length > 1 ? formatRankOrdinal(playerRank, t) : t('results.finalScore'))}
+        subtitle={bannerConfig.announcement}
+        score={displayScore(results.playerScore)}
+        words={validWordCount}
+        coins={coinReward?.awarded ?? 0}
+        avatar={{ userId: user?.id ?? 'guest', customAvatar: profile?.avatar_config ?? guestAvatar }}
+        rank={playerRank}
+        totalPlayers={mode === 'solo-bots' ? allParticipants.length : 1}
+        isNewHighScore={!!results.isNewHighScore}
+      />
       <RecordBadges
         scoreIsRecord={!!recordFlags?.scoreIsRecord}
         wordIsRecord={!!recordFlags?.wordIsRecord}
@@ -405,20 +400,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   ) : null;
 
   // Zero words + no coins = three empty tiles; the hero already says 0.
-  const statsBlock = validWordCount === 0 && !coinReward?.awarded ? null : (
-    <StatsCardGrid cards={[
-      { label: t('results.words'), value: validWordCount, icon: '📝' },
-      {
-        label: t('results.bestWord'),
-        value: results.playerWordData && results.playerWordData.filter(w => w.isValid).length > 0
-          ? results.playerWordData.filter(w => w.isValid).reduce((a, b) => a.word.length >= b.word.length ? a : b).word.toUpperCase()
-          : '-',
-        icon: '⭐', accent: 'lime' as const,
-      },
-      { label: t('results.coinsEarned'), value: coinReward ? `+${coinReward.awarded}` : '-', icon: '🪙', accent: 'amber' as const },
-    ]} />
-  );
-
   const signupBlock = !isAuthenticated && !authLoading ? (
     <InlineSignupCard
       isAuthenticated={isAuthenticated}
@@ -482,18 +463,8 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   // inline copies render on desktop only.
   const ctaBlock = (
     <div className="space-y-3">
-      <Button
-        className="w-full h-14 text-lg font-black uppercase border-neo-thick border-neo-black bg-neo-yellow text-neo-black shadow-hard-lg hover:bg-neo-yellow hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-xl active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity] duration-150"
-        onClick={handleQuickReplay}
-        data-testid="quick-replay-btn"
-      >
-        <RotateCcw className="me-2 w-5 h-5" />
-        {t('results.playAgainQuestion')}
-      </Button>
       {pickerBlock}
-      {isDesktop && (
-        <NextStepPrompt currentMode={nextStepMode} onBackToLobby={handleBackToLobby} variant="desktop" beforeNavigate={gateWithInterstitial} />
-      )}
+      <NextStepPrompt currentMode={nextStepMode} onBackToLobby={handleBackToLobby} variant={isDesktop ? 'desktop' : 'landscape'} beforeNavigate={gateWithInterstitial} />
       {results.grid && (
         <ChallengeButton grid={results.grid} score={results.playerScore} words={results.playerWords}
           gameLanguage={gameLanguage} gameDuration={results.gameDuration}
@@ -558,13 +529,13 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     <div className="relative min-h-dvh bg-neo-navy text-white">
       {/* Victory flash on new high score */}
       {results.isNewHighScore && <ScreenFlashOverlay trigger={1} colorClass="bg-neo-lime" />}
-      <div className={isDesktop ? 'max-w-5xl mx-auto px-6 xl:px-8 pb-8 pt-4' : 'mx-auto w-full max-w-xl px-3 sm:px-4 pb-28 pt-2'}>
+      <div className={isDesktop ? 'max-w-5xl mx-auto px-6 xl:px-8 pb-32 pt-4' : 'mx-auto w-full max-w-xl px-3 sm:px-4 pb-28 pt-2'}>
         {isDesktop ? (
           <>
+            <div className="mb-6">{heroBlock}</div>
             <div className="grid grid-cols-[1fr_340px] xl:grid-cols-[1fr_380px] gap-6 items-start">
-              <div className="space-y-4">{heroBlock}{leaderboardBlock}{progressBlock}{showShareImmediate && shareBlock}</div>
+              <div className="space-y-4">{leaderboardBlock}{progressBlock}{showShareImmediate && shareBlock}</div>
               <div className="space-y-4">
-                {statsBlock}
                 {ctaBlock}
                 <CoinRewardDisplay reward={coinReward} variant="compact" mode={isAuthenticated ? 'earned' : 'teasing'} />
                 {/* Endowment/anchoring: double the exact amount they just earned */}
@@ -592,9 +563,8 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           <div className="space-y-4">
             {/* Focused order: result → standings → numbers → NEXT GAME, then
                 everything else (retention, rewards, ads, details) below it. */}
-            <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>{heroBlock}</m.div>
+            {heroBlock}
             <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.14 }}>{leaderboardBlock}</m.div>
-            <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }}>{statsBlock}</m.div>
             <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }}>{ctaBlock}</m.div>
             {showShareImmediate && <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.26 }}>{shareBlock}</m.div>}
             <ResultsBannerSlot placement="singleplayer-complete" className="my-3" />
@@ -640,12 +610,13 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         </div>
       </div>
 
-      {!isDesktop && (
-        <div ref={stickyCtaRef} className="fixed bottom-[var(--cookie-consent-height,0px)] inset-x-0 z-50 bg-neo-navy/95 border-t-3 border-neo-black safe-area-bottom px-3 py-2.5">
-          <NextStepPrompt currentMode={nextStepMode} onBackToLobby={handleBackToLobby} variant="landscape" beforeNavigate={gateWithInterstitial} />
-        </div>
-      )}
-
+      <ResultsNextBar
+        barRef={stickyCtaRef}
+        placement="fixed"
+        shine
+        primary={{ label: t('results.playAgainQuestion'), onClick: handleQuickReplay, testId: 'quick-replay-btn', icon: <RotateCcw className="h-5 w-5" strokeWidth={3} /> }}
+        secondary={{ label: t('common.home'), onClick: handleBackToLobby, testId: 'results-home-btn', icon: <Home className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" /> }}
+      />
       <AnimatePresence>
         {showTomorrowPreview && (
           <TomorrowPreview mode={mode === 'practice' ? 'singleplayer' : mode as 'singleplayer'} onDismiss={handleTomorrowDismiss} />
