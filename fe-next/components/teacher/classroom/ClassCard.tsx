@@ -141,7 +141,7 @@ export function ClassCard({
         </h3>
         <span
           data-testid="classroom-card-language"
-          className="shrink-0 -rotate-2 rounded-neo border-2 border-neo-black bg-neo-navy px-1.5 py-px font-neo-body text-xs font-bold text-neo-cream shadow-hard-sm"
+          className="shrink-0 -rotate-2 rounded-neo border-2 border-neo-cream/40 bg-neo-navy px-1.5 py-px font-neo-body text-xs font-bold text-neo-cream shadow-hard-sm"
         >
           {languageKey ? t(languageKey) : classroom.language}
         </span>
@@ -210,7 +210,7 @@ export function ClassCard({
         <div className="flex items-stretch gap-2">
           <div
             data-testid="join-code-plate"
-            className="@container flex min-w-0 flex-1 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-navy px-2 py-2 [background-image:radial-gradient(color-mix(in_srgb,var(--neo-cream)_14%,transparent)_1px,transparent_1px)] [background-size:10px_10px]"
+            className="@container flex min-w-0 flex-1 items-center justify-center rounded-neo border-2 border-neo-cream/40 bg-neo-navy px-2 py-2 [background-image:radial-gradient(color-mix(in_srgb,var(--neo-cream)_14%,transparent)_1px,transparent_1px)] [background-size:10px_10px]"
           >
             <code
               data-testid="classroom-join-code"

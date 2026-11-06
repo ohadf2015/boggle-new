@@ -11,7 +11,7 @@ export function HomeRosterMeter({ share, index, isRTL }: { share: number; index:
   const fill = cn('edu-stripes block h-full', share < ACCURACY_LOW ? 'bg-neo-pink' : 'bg-neo-cyan');
   const width = `${Math.round(share * 100)}%`;
   return (
-    <span aria-hidden="true" className="relative block h-3 min-w-0 flex-1 overflow-hidden rounded-[4px] border-2 border-neo-black bg-neo-navy">
+    <span aria-hidden="true" className="relative block h-3 min-w-0 flex-1 overflow-hidden rounded-[4px] border-2 border-neo-cream/40 bg-neo-navy">
       {reduced ? (
         <span data-testid="home-roster-meter-fill" className={fill} style={{ width }} />
       ) : (

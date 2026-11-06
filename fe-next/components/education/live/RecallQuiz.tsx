@@ -56,7 +56,7 @@ export function RecallQuiz({ items, pool, target, onFinish, t, rng = Math.random
           </span>
         )}
       </div>
-      <div aria-hidden="true" className="h-2.5 overflow-hidden rounded-full border-2 border-neo-black bg-neo-navy-light">
+      <div aria-hidden="true" className="h-2.5 overflow-hidden rounded-full border-2 border-neo-cream/40 bg-neo-navy-light">
         <div className="h-full bg-neo-lime transition-[width] duration-300 motion-reduce:transition-none" style={{ width: `${total ? (mastered / total) * 100 : 0}%` }} />
       </div>
 
@@ -76,8 +76,8 @@ export function RecallQuiz({ items, pool, target, onFinish, t, rng = Math.random
             <div
               key={`${state.question.word}-${state.queue.length}-${mastered}`}
               className={cn(
-                'flex min-h-28 flex-col justify-center gap-1.5 rounded-neo-lg border-[3px] bg-neo-cream px-5 py-4 text-neo-black shadow-hard',
-                last?.correct ? 'border-neo-lime ring-4 ring-neo-lime motion-safe:animate-[edu-live-pop_220ms_cubic-bezier(0.23,1,0.32,1)_both]' : 'border-neo-black'
+                'flex min-h-28 flex-col justify-center gap-1.5 rounded-neo-lg border-[3px] border-neo-black bg-neo-cream px-5 py-4 text-neo-black shadow-hard',
+                last?.correct ? 'ring-4 ring-neo-lime motion-safe:animate-[edu-live-pop_220ms_cubic-bezier(0.23,1,0.32,1)_both]' : ''
               )}
             >
               <p className="font-neo-display text-sm font-black uppercase text-neo-black/70">{t('eduStudent.recall.question')}</p>

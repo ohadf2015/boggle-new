@@ -154,7 +154,7 @@ export default function LibraryCard({ item, index, onOpen }: LibraryCardProps) {
             {sample}
           </span>
         </span>
-        <span className="col-start-3 row-start-1 shrink-0 rounded-full border-2 border-neo-black bg-neo-navy px-2 py-px text-[11px] font-black tabular-nums text-neo-cream sm:text-xs">
+        <span className="col-start-3 row-start-1 shrink-0 rounded-full border-2 border-neo-cream/40 bg-neo-navy px-2 py-px text-[11px] font-black tabular-nums text-neo-cream sm:text-xs">
           {t('eduLibrary.card.words', { count: item.wordCount })}
         </span>
       </span>

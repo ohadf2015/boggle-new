@@ -79,7 +79,7 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
         ) : code ? (
           <div
             data-testid="home-desk-code-panel"
-            className="flex flex-wrap items-center gap-x-2 gap-y-1.5 rounded-neo border-[3px] border-neo-black bg-neo-navy p-2.5 sm:gap-x-3 sm:p-3 @3xl/hero:col-start-2 @3xl/hero:row-span-2 @3xl/hero:row-start-1 @3xl/hero:self-center"
+            className="flex flex-wrap items-center gap-x-2 gap-y-1.5 rounded-neo border-[3px] border-neo-cream/40 bg-neo-navy p-2.5 sm:gap-x-3 sm:p-3 @3xl/hero:col-start-2 @3xl/hero:row-span-2 @3xl/hero:row-start-1 @3xl/hero:self-center"
           >
             <span className="w-full font-neo-body text-xs font-bold text-neo-cream/70 max-sm:sr-only">{t('academy.hq.classCode')}</span>
             <p data-testid="home-desk-code" className="flex gap-1 sm:gap-1.5" dir="ltr">

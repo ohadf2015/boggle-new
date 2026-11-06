@@ -41,7 +41,7 @@ export function ProjectorWordPanel({ cards, t, className, style }: ProjectorWord
           <li
             key={card.word}
             data-testid="projector-word"
-            className="min-w-0 rounded-neo border-2 border-neo-black bg-neo-navy px-[0.6em] py-[0.4em] shadow-hard-sm"
+            className="min-w-0 rounded-neo border-2 border-neo-cream/40 bg-neo-navy px-[0.6em] py-[0.4em] shadow-hard-sm"
           >
             <p dir="auto" className="truncate font-neo-display font-black leading-tight text-neo-lime text-[clamp(1.125rem,min(2.2cqw,3.6cqh),3.25rem)]">
               {card.word}

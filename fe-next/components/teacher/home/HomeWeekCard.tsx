@@ -97,7 +97,7 @@ export function HomeWeekCard({
               aria-valuenow={share.played}
               className="col-span-2"
             >
-              <div data-accent-decor className="relative h-4 overflow-hidden rounded-neo border-2 border-neo-black bg-neo-navy-light [@media(max-height:820px)]:h-3.5">
+              <div data-accent-decor className="relative h-4 overflow-hidden rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light [@media(max-height:820px)]:h-3.5">
                 <m.div
                   data-testid="home-week-active-fill"
                   className="edu-stripes h-full origin-left bg-neo-yellow rtl:origin-right"
