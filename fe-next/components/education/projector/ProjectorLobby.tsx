@@ -13,6 +13,7 @@ import ProjectorJoinPanel from './ProjectorJoinPanel';
 import ProjectorRoster, { type ProjectorStudent } from './ProjectorRoster';
 import { ProjectorModeCard } from './ProjectorModeCard';
 import { ProjectorStartBar } from './ProjectorStartBar';
+import { ProjectorWordPanel } from './ProjectorWordPanel';
 import { studentsNotReady } from './projectorLobbyModel';
 import { ProjectorLobbyLock } from './ProjectorLobbyLock';
 import { useProjectorLobbyMode } from './useProjectorLobbyMode';
@@ -88,6 +89,7 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
   const lesson = lessonName || lobby.lessonNames.join(' · ');
   // Read every render, not once: the lobby may stay mounted under the results layer between rounds.
   const canChangeMode = roomPlayed(gameCode);
+  const hasWords = lobby.studyCards.length > 0;
   const startGame = useCallback(() => {
     markRoomPlayed(gameCode);
     onStartGame();
@@ -102,7 +104,12 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
       <style>{LIVE_KEYFRAMES}</style>
 
       <div className="absolute inset-0 overflow-y-auto overscroll-contain">
-        <div className="grid min-h-full grid-cols-1 content-start gap-3 p-3 @5xl:gap-[clamp(0.75rem,1.4cqw,2rem)] @5xl:p-[clamp(1rem,2cqw,3rem)] @5xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] @5xl:grid-rows-[auto_minmax(min-content,1fr)_auto] @5xl:content-stretch">
+        <div
+          className={cn(
+            'grid min-h-full grid-cols-1 content-start gap-3 p-3 @5xl:gap-[clamp(0.75rem,1.4cqw,2rem)] @5xl:p-[clamp(1rem,2cqw,3rem)] @5xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] @5xl:content-stretch',
+            hasWords ? '@5xl:grid-rows-[auto_minmax(min-content,1fr)_auto_auto]' : '@5xl:grid-rows-[auto_minmax(min-content,1fr)_auto]'
+          )}
+        >
           <header
             data-testid="projector-session"
             style={delay(0)}
@@ -154,7 +161,9 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
             />
           </div>
 
-          <ProjectorModeCard gameCode={gameCode} lobby={lobby} t={t} canChange={canChangeMode} style={delay(3)} className="@5xl:row-start-3" />
+          {hasWords && <ProjectorWordPanel cards={lobby.studyCards} t={t} style={delay(3)} className="@5xl:col-span-2 @5xl:row-start-3" />}
+
+          <ProjectorModeCard gameCode={gameCode} lobby={lobby} t={t} canChange={canChangeMode} style={delay(3)} className={hasWords ? '@5xl:row-start-4' : '@5xl:row-start-3'} />
 
           <ProjectorStartBar
             gameCode={gameCode}
@@ -172,7 +181,7 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
             practiceRoundFailed={practiceRoundFailed}
             lockSlot={<ProjectorLobbyLock gameCode={gameCode} t={t} className="shrink-0" />}
             style={delay(4)}
-            className="@5xl:row-start-3"
+            className={hasWords ? '@5xl:row-start-4' : '@5xl:row-start-3'}
           />
         </div>
       </div>
