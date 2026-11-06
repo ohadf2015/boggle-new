@@ -188,11 +188,13 @@ export default function PuzzleCard({
               height (cqh), so they shrink to fit instead of spilling over the action row
               above or the feedback line below. `safe` centering never pushes content
               past the top edge; the floor keeps a readable stage if a host ever
-              leaves this box without a flex height. */}
+              leaves this box without a flex height. A host that is a height
+              container (the pyramid's phone root) lowers the floor on short
+              screens, so the keyboard dock is never pushed below the fold. */}
           <div
             ref={stageRef}
             data-testid="puzzle-stage"
-            className="relative flex min-h-[11rem] flex-1 flex-col justify-center-safe py-2 group-has-[input:focus]/card:py-0 shell:py-4"
+            className="relative flex min-h-[11rem] flex-1 flex-col [@container(36rem<height<=42rem)]:min-h-[8.5rem] [@container(height<=36rem)]:min-h-[6.5rem] justify-center-safe py-2 group-has-[input:focus]/card:py-0 shell:py-4"
             style={{ containerType: 'size' }}
           >
             <BridgeStage word1={puzzle.word1} word2={puzzle.word2} isCorrect={isCorrect} isGaveUp={isGaveUp} isRTL={isRTL}>
@@ -217,7 +219,7 @@ export default function PuzzleCard({
           </div>
 
           {/* Fixed-height feedback line: a hint or verdict appearing never shifts the keyboard. */}
-          <div className="flex h-10 shrink-0 items-center justify-center" aria-live="polite">
+          <div className="flex h-10 shrink-0 items-center justify-center [@container(max-height:36rem)]:h-8" aria-live="polite">
             <AnimatePresence mode="wait">
               {showHint && !isResolved && (
                 <m.p

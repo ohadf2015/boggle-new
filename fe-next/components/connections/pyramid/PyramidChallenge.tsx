@@ -448,7 +448,10 @@ function PyramidRun({
       left={inShell ? <PyramidLeftRail t={t} state={pyramidState} metaAnswer={pyramid.metaAnswer} /> : null}
       right={<PyramidRightRail t={t} state={pyramidState} />}
     >
-    <div className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col gap-3 px-4 py-3 shell:max-w-none shell:px-0 shell:py-0" data-testid="pyramid-root">
+    {/* A size container on phones: the header and stage read its height (in rem, so
+        an enlarged system font counts) and shed parts on short screens instead of
+        pushing the keyboard below the fold. The shell (desktop) layout opts out. */}
+    <div className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col gap-3 px-4 py-3 [container-type:size] shell:max-w-none shell:px-0 shell:py-0 shell:[container-type:normal]" data-testid="pyramid-root">
       {!inShell && (
         <PyramidHeader
           daily={Boolean(sharePath)}
