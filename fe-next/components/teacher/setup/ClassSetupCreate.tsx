@@ -18,6 +18,7 @@ import type { Language } from '@/lib/supabase/education/types';
 import ClassLimitUpsellModal from '@/components/teacher/ClassLimitUpsellModal';
 import { inviteHref } from '@/components/education/lobby/inviteLinks';
 import { ClassSetupDetails, type SetupBusy } from './ClassSetupDetails';
+import { ClassSetupSide } from './ClassSetupSide';
 import { classCap, defaultClassLanguage, resolveClassName, type GradeBand } from './classSetupDefaults';
 import { packsForLanguage, recommendedPack } from './starterPackPick';
 
@@ -99,7 +100,8 @@ export function ClassSetupCreate() {
   );
 
   return (
-    <div className="mx-auto flex w-full max-w-xl flex-col gap-3 px-3 py-3 sm:gap-4 sm:px-4 sm:py-5 lg:max-w-4xl">
+    <div className="mx-auto grid w-full max-w-xl grid-cols-1 gap-3 px-3 py-3 sm:max-w-2xl sm:gap-4 sm:px-4 sm:py-5 lg:max-w-6xl lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-start lg:gap-8 lg:py-8">
+      <ClassSetupSide t={t} />
       <ClassSetupDetails
         name={name}
         onNameChange={setName}

@@ -72,6 +72,7 @@ describe('ClassSetupCreate', () => {
 
   it('Given a different pack is picked, Then that pack is the one assigned', async () => {
     render(<ClassSetupCreate />);
+    fireEvent.click(screen.getByTestId('setup-advanced-toggle'));
     const packRadios = screen.getAllByRole('radio').filter((r) => r.hasAttribute('data-pack'));
     const other = packRadios.find((r) => r.getAttribute('data-pack') !== pack.nameKey) as HTMLElement;
     fireEvent.click(other);

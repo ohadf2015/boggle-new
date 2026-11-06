@@ -21892,6 +21892,17 @@ const ja = {
       },
       "skip": "あとで設定する",
       "packLabel": "最初のゲームで使う単語",
+      "advancedOpen": "学年・言語・単語を変更",
+      "advancedClose": "オプションを閉じる",
+      "bubble": "名前だけでOK。ほかは選んでおいたので、必要なら変えてね。",
+      "createAndPlay": "作成してプレイ",
+      "anyGrade": "全学年",
+      "side": {
+        "title": "このあとの流れ",
+        "step1": "参加コードが発行されます",
+        "step2": "生徒はどのスマホからでもコードを入力。アカウント不要。",
+        "step3": "ゲームを選んでライブ開始。最初のラウンドは3分です。"
+      },
       "packWords": "{count}語",
       "packRecommended": "おすすめ",
       "startLive": "ライブ開始",

@@ -7,7 +7,7 @@ import { EduMascot } from '@/components/education/EduMascot';
 import { cn } from '@/lib/utils';
 import { RosterSeats } from '@/components/teacher/hq/RosterSeats';
 import type { RosterStudent } from '@/components/teacher/hq/rosterModel';
-import { PANEL, PRIMARY_BUTTON, QUIET_LINK, SECONDARY_BUTTON } from '@/components/teacher/home/homeStyles';
+import { NB_LINK as QUIET_LINK, NB_PANEL as PANEL, NB_PRIMARY as PRIMARY_BUTTON, NB_SECONDARY as SECONDARY_BUTTON } from '@/components/teacher/nb/nbStyles';
 import { CelebrationBurst } from '@/components/education/motion';
 import { ClassSetupInviteCode, type InviteChannel } from './ClassSetupInviteCode';
 
@@ -69,7 +69,7 @@ export function ClassSetupInviteView({ classroom, roster, joinUrl, displayHost, 
       data-testid="setup-projector"
       data-hero={studentsIn ? 'false' : 'true'}
       onClick={onOpenProjector}
-      className={cn(studentsIn ? SECONDARY_BUTTON : PRIMARY_BUTTON, 'w-full', !studentsIn && 'min-h-14 text-xl')}
+      className={cn(studentsIn ? SECONDARY_BUTTON : PRIMARY_BUTTON, 'w-full', !studentsIn && 'min-h-[60px] text-2xl')}
     >
       <MonitorPlay className={studentsIn ? 'size-5' : 'size-6'} aria-hidden="true" />
       {t('eduShell.setup.showProjector')}
@@ -81,7 +81,7 @@ export function ClassSetupInviteView({ classroom, roster, joinUrl, displayHost, 
       data-testid="setup-start-game"
       data-hero={studentsIn ? 'true' : 'false'}
       onClick={onStart}
-      className={cn(studentsIn ? PRIMARY_BUTTON : SECONDARY_BUTTON, 'w-full', studentsIn && 'min-h-14 text-xl')}
+      className={cn(studentsIn ? PRIMARY_BUTTON : SECONDARY_BUTTON, 'w-full', studentsIn && 'min-h-[60px] text-2xl')}
     >
       <Play className={cn(studentsIn ? 'size-6' : 'size-5', 'fill-current')} aria-hidden="true" />
       {t(studentsIn ? 'eduShell.setup.startQuick' : 'eduShell.setup.firstRound.start')}
@@ -95,9 +95,9 @@ export function ClassSetupInviteView({ classroom, roster, joinUrl, displayHost, 
       className="mx-auto grid w-full max-w-xl grid-cols-1 gap-3 px-3 pt-3 sm:gap-4 sm:px-4 sm:pt-5 lg:min-h-[calc(100dvh-7rem)] lg:max-w-6xl lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:content-center lg:gap-x-8 lg:pb-6"
     >
       <header className="flex items-center gap-3 lg:col-span-2">
-        <EduMascot moment="success" size={96} className="size-12 shrink-0 sm:size-20" />
+        <EduMascot moment="success" size={96} className="size-16 shrink-0 drop-shadow-[3px_3px_0_rgb(var(--neo-black))] sm:size-24" />
         <div className="min-w-0">
-          <h1 id="setup-ready-title" tabIndex={-1} style={{ outline: 'none' }} className="font-neo-display text-2xl font-black leading-tight text-neo-cream sm:text-4xl">
+          <h1 id="setup-ready-title" tabIndex={-1} style={{ outline: 'none' }} className="font-neo-display text-3xl font-black leading-tight text-neo-cream sm:text-5xl">
             {t('eduShell.setup.readyTitle')}
           </h1>
           <p dir="auto" className="truncate font-neo-body text-base font-semibold text-neo-cream/80">
@@ -121,7 +121,7 @@ export function ClassSetupInviteView({ classroom, roster, joinUrl, displayHost, 
 
         <div
           data-testid="setup-actions"
-          className="sticky bottom-0 z-10 -mx-3 flex flex-col gap-2 border-t-2 border-neo-cream/40 bg-neo-navy px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 sm:-mx-4 sm:px-4 lg:static lg:mx-0 lg:border-t-0 lg:bg-transparent lg:px-0"
+          className="sticky bottom-0 z-10 -mx-3 flex flex-col gap-3 border-t-[3px] border-neo-cream/50 bg-neo-navy px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 sm:-mx-4 sm:px-4 lg:static lg:mx-0 lg:border-t-0 lg:bg-transparent lg:px-0"
         >
           {studentsIn ? projector : start}
           <div data-testid="setup-hero-slot">{studentsIn ? start : projector}</div>
