@@ -10,14 +10,6 @@ export const metadata: Metadata = {
   robots: { index: false, follow: true },
 };
 
-/**
- * Public Blast route — ALWAYS V1, for every player, permanently.
- *
- * V1 (legacy) is the only player-facing Blast engine and the one used in
- * multiplayer, so single-player and multiplayer stay in parity. There is no
- * `?v2` toggle here by design: Blast V2 lives at its own admin-only route
- * (`/blast/v2`) and must never override the public V1 experience.
- */
 export default async function BlastPage({
   params,
 }: {

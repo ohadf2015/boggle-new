@@ -13,7 +13,6 @@ export const PUBLIC_ROUTES: string[] = [
   "/bell-ringer-word-games",
   "/best-online-word-games",
   "/blast",
-  "/blast/v2",
   "/blog",
   "/blog/10-surprising-benefits-word-games",
   "/blog/ai-vs-word-games-language-learning",

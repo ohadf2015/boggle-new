@@ -25,9 +25,7 @@ describe('offlineCapableModes', () => {
       expect(OFFLINE_CAPABLE_MODES).toContain('word-craft');
     });
 
-    it('includes the newly offline-enabled puzzle modes (crossword + wordfall)', () => {
-      // Crossword is its own segment; Wordfall (blast v2) shares the `blast`
-      // segment but precaches its own /blast/v2 shell.
+    it('includes the offline-enabled puzzle modes', () => {
       expect(OFFLINE_CAPABLE_MODES).toContain('crossword');
       expect(OFFLINE_CAPABLE_MODES).toContain('blast');
     });
@@ -35,7 +33,7 @@ describe('offlineCapableModes', () => {
     it('includes pass-and-play party plus the extra client-side solos', () => {
       expect(OFFLINE_CAPABLE_MODES).toContain('party');
       expect(OFFLINE_CAPABLE_MODES).toContain('word-tower');
-      expect(OFFLINE_MODES.length).toBeGreaterThanOrEqual(11);
+      expect(OFFLINE_MODES.length).toBeGreaterThanOrEqual(10);
     });
 
     it('does NOT include multiplayer or other server-only modes', () => {
@@ -53,7 +51,6 @@ describe('offlineCapableModes', () => {
     it('keeps unreleased modes playable offline but out of the launcher', () => {
       const labels = LAUNCHER_MODES.map((m) => m.labelKey);
       expect(labels).not.toContain('native.offline.playCrossword');
-      expect(labels).not.toContain('native.offline.playWordfall');
       expect(labels).toContain('native.offline.playBlast');
       expect(OFFLINE_CAPABLE_MODES).toContain('crossword');
     });
@@ -90,13 +87,6 @@ describe('offlineCapableModes', () => {
       expect(cw.entry('en')).toBe('/en/crossword');
     });
 
-    it('wordfall entry resolves to the blast/v2 route (shares the blast segment)', () => {
-      const wf = OFFLINE_MODES.find((m) => m.labelKey === 'native.offline.playWordfall')!;
-      expect(wf).toBeDefined();
-      expect(wf.segment).toBe('blast');
-      expect(wf.entry('en')).toBe('/en/blast/v2');
-    });
-
     it('party / word-tower entries resolve to their play routes', () => {
       const party = OFFLINE_MODES.find((m) => m.labelKey === 'native.offline.playParty')!;
       expect(party.segment).toBe('party');
@@ -127,11 +117,9 @@ describe('offlineCapableModes', () => {
       expect(isOfflineCapable('/en/adventure/world/1')).toBe(true);
     });
 
-    it('returns true for crossword and for wordfall (blast/v2 sub-path)', () => {
+    it('returns true for crossword', () => {
       expect(isOfflineCapable('/en/crossword')).toBe(true);
       expect(isOfflineCapable('/he/crossword')).toBe(true);
-      // /blast/v2 resolves to the blast segment, which is offline-capable.
-      expect(isOfflineCapable('/en/blast/v2')).toBe(true);
       // Pyramid is a connections sub-route — gate by first segment, so it
       // stays playable offline even though the shell URL is deeper.
       expect(isOfflineCapable('/he/connections/pyramid')).toBe(true);
@@ -184,15 +172,12 @@ describe('offlineCapableModes', () => {
       // singleplayer precaches the playable URL, not the redirecting bare route
       expect(routes).toContain('/en/singleplayer?practice=1');
       expect(routes).not.toContain('/en/singleplayer');
-      // newly offline-enabled puzzle modes precache their own shells
       expect(routes).toContain('/en/crossword');
-      expect(routes).toContain('/en/blast/v2');
+      expect(routes).not.toContain('/en/blast/v2');
       expect(routes).toContain('/ru/daily');
       expect(routes).toContain('/en/party');
       expect(routes).toContain('/en/word-tower');
-      // One route per (locale × offline mode entry) — derived from the sources so
-      // it never drifts when a locale or a mode is added (7 original modes +
-      // crossword + wordfall = OFFLINE_MODES entries).
+      // Derived from the sources so it never drifts when a locale or a mode is added.
       expect(routes).toHaveLength(locales.length * OFFLINE_MODES.length);
     });
   });

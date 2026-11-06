@@ -1,8 +1,5 @@
 'use client';
-// Mute toggle rendered inside the Blast HUD header band (top-left corner).
-// Exists so Wordfall has a dedicated audio control: the global in-game audio
-// FAB stands down on blast screens via useRegisterHeaderAudioControl, and the
-// corner it used to occupy is taken by the chest badge.
+// The global in-game audio FAB stands down on blast screens, so the Blast HUD carries its own mute.
 import { Volume2, VolumeX } from 'lucide-react';
 import { useMasterMute } from '@/hooks/useMasterMute';
 import { cn } from '@/lib/utils';
