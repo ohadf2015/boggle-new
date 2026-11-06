@@ -23,7 +23,7 @@ export default function PyramidHeader({ state, metaAnswer, className, testId, ra
   const { t } = useLanguage();
   const left = pyramidAttemptsLeft(state);
   return (
-    <header data-testid={testId} className={cn('flex flex-col gap-2', className)}>
+    <header data-testid={testId} className={cn('flex flex-col gap-2 [@container(height<=36rem)]:gap-1', className)}>
       {daily ? (
         <DailyQuestHeading className="justify-center" />
       ) : (
@@ -31,10 +31,17 @@ export default function PyramidHeader({ state, metaAnswer, className, testId, ra
           {t('connections.pyramid.title')}
         </h1>
       )}
-      <p className="text-center font-neo-body text-xs text-neo-white/60">
+      {/* Short phones (inside the play screen's size container) drop the explainer,
+          then the rank, so the keyboard stays on screen. The how-to-play button
+          still explains the mode. */}
+      <p data-testid="pyramid-explainer" className="text-center font-neo-body text-xs text-neo-white/60 [@container(max-height:46rem)]:hidden">
         {state.stage < 3 ? t('connections.pyramid.explainer') : t('connections.pyramid.finalePrompt')}
       </p>
-      {rankSlot}
+      {rankSlot && (
+        <div data-testid="pyramid-rank-slot" className="[@container(max-height:42rem)]:hidden">
+          {rankSlot}
+        </div>
+      )}
       {/* Attempts were spent invisibly — the player only learned a budget existed when the run ended. */}
       <div
         data-testid="pyramid-attempts"
