@@ -123,7 +123,7 @@ vi.mock('../classroomSeatGate', () => ({ checkClassroomSeat: mockCheckSeat }));
 vi.mock('../playerDataInit', () => ({ ensurePlayerState: vi.fn().mockResolvedValue(undefined) }));
 
 import { registerPlayerJoinHandlers } from '../playerJoinHandler';
-import { handleReconnection, handleLateJoin } from '../playerReconnectHandler';
+import { handleReconnection, handleLateJoin, handleExistingAuthConnectionJoin } from '../playerReconnectHandler';
 
 function captureJoinHandler() {
   const listeners: Record<string, (...args: unknown[]) => unknown> = {};
@@ -155,7 +155,6 @@ function inProgressGame(overrides: Record<string, unknown> = {}) {
 
 import { emitError } from '../../utils/errorHandler';
 
-import { handleExistingAuthConnectionJoin } from '../playerReconnectHandler';
 
 const TEACHER = '11111111-1111-4111-8111-111111111111';
 
