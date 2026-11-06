@@ -101,6 +101,8 @@ export interface GameUser extends BaseUser {
   disconnectedAt?: number;
   isBot?: boolean;
   botDifficulty?: string;
+  /** The teacher trying the student side of their own classroom room: never the host, never a student. */
+  isPractice?: boolean;
 }
 
 export interface Spectator {

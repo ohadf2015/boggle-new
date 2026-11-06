@@ -8,7 +8,7 @@ type RoundResult = {
   wordDetails?: Array<{ word: string; validated: boolean; isDuplicate?: boolean }>;
 };
 
-type RoomUsers = Record<string, { authUserId?: string | null; isBot?: boolean } | undefined>;
+type RoomUsers = Record<string, { authUserId?: string | null; isBot?: boolean; isPractice?: boolean } | undefined>;
 
 /**
  * Adapter for the server-side game-end path (gameLifecycle/gameScores.ts):
@@ -45,11 +45,11 @@ export function playerScoresFromGameResults(
   return scores;
 }
 
-/** False for the teacher's bot Practice Round: nobody but the teacher and bots played. */
+/** False for the teacher's Practice Round: nobody but the teacher, their practice seat and bots played. */
 export function roundHasStudents(results: RoundResult[], users: RoomUsers, teacherId: string): boolean {
   return results.some((result) => {
     const user = users[result.username];
-    if (user?.isBot) return false;
+    if (user?.isBot || user?.isPractice) return false;
     return user?.authUserId !== teacherId;
   });
 }

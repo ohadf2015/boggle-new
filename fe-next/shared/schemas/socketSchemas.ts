@@ -180,6 +180,8 @@ export const JoinGameSchema = z.object({
   avatar: AvatarSchema.optional(),
   authUserId: z.string().uuid().optional().nullable(),
   guestTokenHash: GuestTokenHashSchema,
+  /** The teacher's practice seat in their own classroom room (honoured for classroom rooms only). */
+  practiceSeat: z.boolean().optional(),
 });
 
 /**
