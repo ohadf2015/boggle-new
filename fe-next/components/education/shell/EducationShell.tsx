@@ -4,7 +4,7 @@ import { type ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useEducationShellLock, EDUCATION_SHELL_LOCK_CLASS } from './useEducationShellLock';
-import { resolveEducationNav } from './navItems';
+import { resolveEducationNav, type ResolvedEducationNav } from './navItems';
 import { EducationShellNav } from './EducationShellNav';
 import { ArcadeBackdrop } from './ArcadeBackdrop';
 
@@ -67,6 +67,13 @@ export interface EducationShellProps {
    * a picker with no nav is a dead end with no way home.
    */
   chromeFree?: boolean;
+  /**
+   * A nav to show where path resolution gives none: a teacher screen that lives
+   * under /education (the Start a game launcher). Ignored when `chromeFree`.
+   */
+  nav?: ResolvedEducationNav;
+  /** Drop the phone tab bar on a screen whose own bottom bar holds its one action. */
+  tabs?: boolean;
 }
 
 export function EducationShell({
@@ -79,6 +86,8 @@ export function EducationShell({
   className,
   contentClassName,
   chromeFree = false,
+  nav: navOverride,
+  tabs = true,
   'data-testid': testId = 'education-shell',
 }: EducationShellProps) {
   useEducationShellLock();
@@ -88,7 +97,7 @@ export function EducationShell({
   // usePathname must run unconditionally (rules-of-hooks) — the opt-out applies
   // to resolution, not the hook call.
   const pathname = usePathname();
-  const nav = chromeFree ? null : resolveEducationNav(pathname);
+  const nav = chromeFree ? null : (navOverride ?? resolveEducationNav(pathname));
   // A teacher screen's chrome is the shell's own (top bar + sidebar); a page header there would be a second menu.
   const teacherChrome = nav?.kind === 'teacher';
 
@@ -167,7 +176,7 @@ export function EducationShell({
       {/* Laid out in the column, never fixed over it: a fixed bar would keep
           scrollHeight === innerHeight true while hiding the last row of
           content underneath itself. */}
-      {nav ? <EducationShellNav nav={nav} variant="tabs" /> : null}
+      {nav && tabs ? <EducationShellNav nav={nav} variant="tabs" /> : null}
     </div>
   );
 }

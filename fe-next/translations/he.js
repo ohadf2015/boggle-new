@@ -21854,6 +21854,8 @@ const he = {
       "gameOptions": "הגדרות משחק",
       "gameOptionsChange": "שינוי",
       "gameOptionsHint": "ההגדרות יחולו על הסבב הבא.",
+      "homeworkTitle": "שיעורי בית",
+      "homeworkHint": "שולחים את הרשימה כדי שהתלמידים יתרגלו אותה לפני המשחק.",
       "moreOptions": "עוד אפשרויות",
       "proBadge": "Pro",
       "lateJoinOn": "אפשר להצטרף באמצע",

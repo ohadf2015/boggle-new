@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { m } from 'framer-motion';
-import { ChevronDown, ChevronUp, Clock, Gamepad2, Puzzle, Radio } from 'lucide-react';
+import { ChevronDown, ChevronUp, Clock, Gamepad2, Play, Puzzle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { EDU_MOTION, pressClasses, pressMotion, useReducedMotionSafe } from './motion';
 import { ARCADE_BLOCK } from '@/lib/education/arcadeAccent';
@@ -90,7 +90,7 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, dir, busy, blocked
           <div className="flex min-w-0 flex-1 flex-col gap-1 @4xl/lobby:gap-2">
             <span data-testid="spotlight-category" className="hidden font-neo-body text-xs font-black uppercase tracking-[0.08em] text-neo-cream/60 @4xl/lobby:block">{t(keys.category)}</span>
             <h2 className="font-neo-display text-lg font-bold leading-tight text-neo-cream @4xl/lobby:text-3xl">{name}</h2>
-            <p data-testid="spotlight-how" className="hidden font-neo-body text-sm leading-snug text-neo-cream/80 [@media(min-height:740px)]:block @4xl/lobby:block @4xl/lobby:text-base">
+            <p data-testid="spotlight-how" className="hidden font-neo-body text-sm leading-snug text-neo-cream/80 @4xl/lobby:block @4xl/lobby:text-base">
               <span className="line-clamp-2 @4xl/lobby:line-clamp-none">{t(keys.how)}</span>
             </p>
             <div className="flex min-w-0 flex-wrap gap-1.5">
@@ -112,7 +112,7 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, dir, busy, blocked
           </button>
         </m.div>
 
-        <div data-testid="spotlight-best-for" className="hidden shrink-0 flex-wrap items-center gap-1.5 [@media(min-height:740px)]:flex @4xl/lobby:flex [@container(max-height:519px)]:hidden">
+        <div data-testid="spotlight-best-for" className="hidden shrink-0 flex-wrap items-center gap-1.5 @4xl/lobby:flex [@container(max-height:519px)]:hidden">
           <span className="font-neo-body text-sm font-bold text-neo-cream/60">{t('eg2Modes.bestForLabel')}</span>
           {keys.bestFor.map((k) => (
             <span key={k} data-testid="best-for-chip" className={CHIP}>
@@ -167,11 +167,11 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, dir, busy, blocked
           )}
         >
           <span aria-hidden="true" className="grid size-9 shrink-0 place-items-center rounded-full border-2 border-neo-cream/40 bg-neo-black/10 @4xl/lobby:size-10">
-            <Radio className={cn('size-5 shrink-0', !reduced && !blockedKey && 'animate-pulse')} strokeWidth={3} />
+            <Play className={cn('size-5 shrink-0 fill-current', !reduced && !blockedKey && 'animate-pulse')} strokeWidth={3} />
           </span>
           <span className="flex min-w-0 flex-col items-start leading-tight">
             <span data-testid="go-live-label" className="whitespace-nowrap text-xl font-black tracking-[0.01em] @4xl/lobby:text-2xl">
-              {t('teacher.playNow.goLive')}
+              {t('eduShell.home.startLive')}
             </span>
             <span className="font-neo-body text-xs font-bold opacity-80 @4xl/lobby:text-sm">{name}</span>
           </span>

@@ -6,7 +6,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigation } from '@/contexts/NavigationContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { EducationHeader } from '@/components/education/EducationHeader';
+import { EducationShell } from '@/components/education/shell/EducationShell';
+import { teacherEducationNav } from '@/components/education/shell/navItems';
 import { TV_STAGE_ZOOM_CLASS } from '@/components/education/lobby/tvStageScale';
 import { QuickLaunchStage } from '@/components/teacher/hq/QuickLaunchStage';
 import { ClassroomGameLobby } from '@/components/education/ClassroomGameLobby';
@@ -47,7 +48,7 @@ function previewKind(value: string | null | undefined): LiveSurfacePreviewKind |
  * - Uses vocabulary from teacher's lessons (optional pre-selection via URL)
  * - Auto-populates with classroom roster
  * - Syncs progress to student records post-game
- * - Uses EducationHeader (no escape to main app)
+ * - Sits in the teacher shell (top bar on phones, sidebar on desktop)
  *
  * lessonId is optional — when omitted, the lobby lets the teacher pick lessons.
  */
@@ -129,11 +130,14 @@ function ClassroomGameInner() {
    * The cleanup is not optional: without it, BACK to /education leaves every
    * later screen unable to scroll.
    */
-  const { setIsInGame } = useNavigation();
+  const { setIsInGame, registerHeaderAudioControl } = useNavigation();
   useEffect(() => {
     setIsInGame(true);
     return () => setIsInGame(false);
   }, [setIsInGame]);
+  // Setting up a game is not gameplay: keep the floating in-game mute button off
+  // the teacher shell, where it sat on top of the class picker.
+  useEffect(() => registerHeaderAudioControl(), [registerHeaderAudioControl]);
 
   if (isChecking || authLoading) {
     if (flow === QUICK_LAUNCH_FLOW) return <QuickLaunchStage />;
@@ -149,8 +153,16 @@ function ClassroomGameInner() {
        `flex-1 flex flex-col min-h-0` column, and a flex child defaults to
        shrink:1 — so `h-dvh` alone collapsed the whole lobby to 160px and
        `overflow-hidden` clipped the mode picker to a two-pixel sliver. */
-    <div className={cn('relative flex h-dvh shrink-0 flex-col overflow-hidden bg-neo-navy w-full', isRTL && 'rtl')}>
-      <EducationHeader compact showBackButton title={t('education.classroomGame.title')} />
+    /* The teacher area's own chrome (phone top bar, desktop sidebar), so starting a game
+       is not a trip to a different app. The phone tab bar stays off: the lobby's bottom
+       panel holds Start a game there. contentClassName hands scrolling to the lobby. */
+    <EducationShell
+      nav={teacherEducationNav(language)}
+      tabs={false}
+      className={cn('shrink-0', isRTL && 'rtl')}
+      contentClassName="flex flex-col overflow-hidden [scrollbar-gutter:auto]"
+      scrollRegionLabel={t('education.classroomGame.title')}
+    >
 
       {/* TV_STAGE_ZOOM_CLASS: on a 1920/2560 wall the whole launch column
           scales up together (CSS zoom), instead of an 880px card lost on the
@@ -175,7 +187,7 @@ function ClassroomGameInner() {
           />
         )}
       </main>
-    </div>
+    </EducationShell>
   );
 }
 

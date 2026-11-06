@@ -21924,6 +21924,8 @@ const ja = {
       "gameOptions": "ゲーム設定",
       "gameOptionsChange": "変更",
       "gameOptionsHint": "次に始めるラウンドに反映されます。",
+      "homeworkTitle": "宿題",
+      "homeworkHint": "ゲームの前に練習できるよう、このリストを生徒に送ります。",
       "moreOptions": "その他の設定",
       "proBadge": "Pro",
       "lateJoinOn": "途中参加あり",

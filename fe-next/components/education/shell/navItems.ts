@@ -121,4 +121,14 @@ export function resolveEducationNav(
   return { kind: area, locale, items, activeKey };
 }
 
+/**
+ * The teacher nav for a teacher screen that lives outside /teacher, such as the
+ * Start a game launcher at /education/classroom-game. Path resolution keeps
+ * /education chrome-free (projector and in-game surfaces), so such a screen
+ * asks for the teacher nav by name instead. No tab is active there.
+ */
+export function teacherEducationNav(locale: string): ResolvedEducationNav {
+  return resolveEducationNav(`/${locale}/teacher/__outside`) as ResolvedEducationNav;
+}
+
 export default resolveEducationNav;

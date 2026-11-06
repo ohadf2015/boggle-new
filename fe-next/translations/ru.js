@@ -21624,6 +21624,8 @@ const ru = {
       "gameOptions": "Настройки игры",
       "gameOptionsChange": "Изменить",
       "gameOptionsHint": "Действует для следующего раунда.",
+      "homeworkTitle": "Домашнее задание",
+      "homeworkHint": "Отправьте список, чтобы ученики потренировались до игры.",
       "moreOptions": "Ещё настройки",
       "proBadge": "Pro",
       "lateJoinOn": "Можно войти позже",

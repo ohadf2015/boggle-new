@@ -48,7 +48,7 @@ export function ClassroomLobbyShell({ pinned, children, footer, aside, className
           </p>
         </header>
 
-        <div data-testid="lobby-columns" className="flex min-h-0 flex-1 flex-col gap-2 @4xl/lobby:grid @4xl/lobby:grid-cols-[minmax(0,1fr)_minmax(22rem,26rem)] @4xl/lobby:gap-5">
+        <div data-testid="lobby-columns" className="flex min-h-0 flex-1 flex-col gap-2 @4xl/lobby:grid @4xl/lobby:grid-cols-[minmax(0,1fr)_minmax(20rem,24rem)] @4xl/lobby:gap-5">
           <div className="flex min-h-0 flex-1 flex-col gap-2 @4xl/lobby:gap-3">
             <div data-testid="lobby-pinned" className="shrink-0 empty:hidden">
               {pinned}
