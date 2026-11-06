@@ -73,7 +73,7 @@ export default function EduLivePageClient(): React.JSX.Element {
                 <ConnectionQualityChip />
               </div>
             )}
-            <div className="flex min-h-0 flex-1">
+            <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
               <div className="flex min-h-0 min-w-0 flex-1 flex-col" style={s.classroomAccessibility?.largeText ? { zoom: 1.2 } : undefined}>
                 <EduLivePhaseRouter
                   routerProps={s.routerProps}
