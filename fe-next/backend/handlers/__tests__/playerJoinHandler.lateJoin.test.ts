@@ -224,6 +224,14 @@ describe('PlayerJoinHandler — a taken display name is not a reconnect', () => 
     expect(handleReconnection).toHaveBeenCalled();
   });
 
+  it('refuses a guest who types the name of a signed-in seat (the teacher host or a signed-in student)', async () => {
+    mockGetGame.mockReturnValue(inProgressGame({ users: { Dana: { socketId: 'old-socket', authUserId: '11111111-1111-4111-8111-111111111111' } } }));
+    const { join } = captureJoinHandler();
+    await join({ gameCode: 'ABC123', username: 'Dana', guestTokenHash: 'h2' });
+    expect(emitError).toHaveBeenCalledWith(expect.anything(), 'PLAYER_USERNAME_TAKEN', expect.anything());
+    expect(handleReconnection).not.toHaveBeenCalled();
+  });
+
   it('keeps reconnecting when the seat or the joiner carries no identity to compare', async () => {
     mockGetGame.mockReturnValue(inProgressGame({ users: { Sam: { socketId: 'old-socket' } } }));
     const { join } = captureJoinHandler();
