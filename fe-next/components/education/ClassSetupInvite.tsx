@@ -7,6 +7,8 @@ import { useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useClassrooms } from '@/hooks/useClassroom';
+import { getClassroom } from '@/lib/supabase/education/classrooms';
+import { createdClassroom } from '@/lib/education/createdClassroomHandoff';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useTeacherActivationProgress } from '@/hooks/useTeacherActivationProgress';
 import { PageLoader } from '@/components/ui/PageLoader';
@@ -41,9 +43,13 @@ export function ClassSetupInvite({ classroomId, packKey }: ClassSetupInviteProps
   const { t: rawT, language } = useLanguage();
   const t = rawT as T;
   const { classrooms, isLoading } = useClassrooms();
-  const classroom = classrooms.find((c) => c.id === classroomId);
+  const listed = classrooms.find((c) => c.id === classroomId);
+  // The form hands over the row it just made; the list read can be stale (see createdClassroomHandoff).
+  const handed = createdClassroom(classroomId);
+  const lookup = useClassroomLookup(classroomId, !isLoading && !listed?.join_code && !handed);
+  const classroom = listed?.join_code ? listed : (handed ?? lookup.classroom);
 
-  if (isLoading) return <PageLoader text={t('teacher.classroom.settingUp')} size="lg" nested />;
+  if (!classroom?.join_code && (isLoading || lookup.pending)) return <PageLoader text={t('teacher.classroom.settingUp')} size="lg" nested />;
   if (!classroom?.join_code) {
     return (
       <div role="alert" className={cn(PANEL, 'mx-auto my-6 flex max-w-md flex-col items-center gap-3 p-6 text-center')}>
@@ -55,6 +61,26 @@ export function ClassSetupInvite({ classroomId, packKey }: ClassSetupInviteProps
     );
   }
   return <InviteReady classroom={{ id: classroom.id, name: classroom.name, join_code: classroom.join_code }} packKey={packKey ?? null} t={t} language={language} />;
+}
+
+/** Last resort before "not found": read this one class by id, fresh, once. */
+function useClassroomLookup(classroomId: string, enabled: boolean): { pending: boolean; classroom: { id: string; name: string; join_code: string } | null } {
+  const [state, setState] = useState<{ pending: boolean; classroom: { id: string; name: string; join_code: string } | null; done: boolean }>({ pending: false, classroom: null, done: false });
+  useEffect(() => {
+    if (!enabled || state.done) return;
+    let live = true;
+    setState((s) => ({ ...s, pending: true }));
+    void getClassroom(classroomId)
+      .then(({ data }) => {
+        if (!live) return;
+        setState({ pending: false, done: true, classroom: data?.join_code ? { id: data.id, name: data.name, join_code: data.join_code } : null });
+      })
+      .catch(() => live && setState({ pending: false, done: true, classroom: null }));
+    return () => {
+      live = false;
+    };
+  }, [classroomId, enabled, state.done]);
+  return { pending: enabled && !state.done, classroom: state.classroom };
 }
 
 interface InviteReadyProps {
