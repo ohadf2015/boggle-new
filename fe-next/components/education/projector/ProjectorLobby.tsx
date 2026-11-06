@@ -19,6 +19,7 @@ import { ProjectorLobbyLock } from './ProjectorLobbyLock';
 import { useProjectorLobbyMode } from './useProjectorLobbyMode';
 import { markRoomPlayed, roomPlayed } from './roomPlayed';
 import { EduPhoneTestPrompt } from '@/components/education/live/EduPhoneTestPrompt';
+import { EDU_MASCOT } from '@/lib/education/mascotArt';
 
 export interface ProjectorLobbyProps {
   gameCode: string;
@@ -51,7 +52,6 @@ export interface ProjectorLobbyProps {
   practiceRoundFailed?: boolean;
 }
 
-const BRAND = 'LexiClash';
 const CHIP = 'inline-flex min-w-0 max-w-full items-center gap-[0.4em] rounded-full border-2 border-neo-cream/40 bg-neo-navy-light px-[0.6em] py-[0.2em] @5xl:px-[0.8em] font-neo-display font-bold text-neo-cream';
 
 /**
@@ -127,13 +127,12 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
                 <DirectionalIcon icon={ArrowLeft} className="size-5" />
               </button>
             )}
-            <p className="inline-flex items-center gap-2 whitespace-nowrap font-neo-display @max-5xl:hidden text-[1.5em] font-black leading-none text-neo-cream">
-              {BRAND}
-              <span className="rounded-full border-2 border-neo-cream/50 px-2.5 py-0.5 font-neo-body text-[0.5em] font-bold text-neo-cream/85">
-                {t('eduLiveRoom.lobby.brand')}
-              </span>
-            </p>
-            <span className={cn(CHIP, '@5xl:ms-auto')}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- mascot art map path, decorative */}
+            <img src={EDU_MASCOT.welcome} alt="" aria-hidden="true" className="size-[2.6em] shrink-0 select-none drop-shadow-[3px_3px_0_rgb(var(--neo-black))] @max-5xl:hidden motion-safe:animate-[edu-live-bob_2.4s_ease-in-out_infinite]" />
+            <h1 className="whitespace-nowrap font-neo-display text-[1.6em] font-black leading-none text-neo-cream @max-5xl:text-[1.25em]">
+              {t('eduLiveRoom.lobby.joinTitle')}
+            </h1>
+            <span className={CHIP}>
               <GraduationCap className="size-[1em] shrink-0 @max-5xl:hidden" aria-hidden="true" />
               <span dir="auto" className="truncate">{lobby.className || t('education.classroomGame.classroomSession')}</span>
             </span>
@@ -144,6 +143,8 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
                 {wordCount > 0 && <span className="shrink-0 font-neo-body font-bold text-neo-cream/75 @max-5xl:hidden">· {t('education.classroomGame.words', { count: wordCount })}</span>}
               </span>
             )}
+            {/* The padlock sits up here with the room's name, out of the Start row: Start is the one thing to press. */}
+            <ProjectorLobbyLock gameCode={gameCode} t={t} className="ms-auto shrink-0" />
           </header>
 
           <div style={delay(1)} className={cn('@5xl:row-start-2 @5xl:min-h-0', RISE)}>
@@ -179,7 +180,6 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
             onStartPracticeRound={onStartPracticeRound ? startPractice : undefined}
             practiceRoundPending={practiceRoundPending}
             practiceRoundFailed={practiceRoundFailed}
-            lockSlot={<ProjectorLobbyLock gameCode={gameCode} t={t} className="shrink-0" />}
             style={delay(4)}
             className={hasWords ? '@5xl:row-start-4' : '@5xl:row-start-3'}
           />

@@ -21561,6 +21561,7 @@ const es = {
       "wheelLabel": "Rueda de la clase"
     },
     "lobby": {
+      "joinTitle": "¡Únete al juego!",
       "roomFull": "Sala llena: {seated} de {max} puestos ocupados",
       "roomFullWatching": "{count} miran sin puesto",
       "brand": "Clase",
@@ -21607,6 +21608,7 @@ const es = {
       "soloPractice": "Practicar por tu cuenta"
     },
     "hostResults": {
+      "more": "Más",
       "missedTitle": "Palabras que tu clase falló",
       "practiceWords": "Practicar estas palabras ({count})",
       "shareParents": "Compartir con las familias",

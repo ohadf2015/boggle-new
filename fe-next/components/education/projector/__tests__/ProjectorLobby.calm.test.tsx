@@ -36,14 +36,15 @@ describe('ProjectorLobby: calm wall, one lime primary', () => {
     expect(withFill(container, LIME_FILL)).toHaveLength(1);
   });
 
-  it('Given students, Then their name chips are neutral, not a rainbow of fills', () => {
+  // The one loud block on the wall is the way in: the yellow code and QR panel (approved D4 mockup).
+  it('Given students, Then their name chips are neutral, not a rainbow of fills, and only the join block is loud', () => {
     const { container } = render(<ProjectorLobby {...props} students={CLASS_LIST} />);
-    expect(withFill(container, LOUD_FILL).map((el) => el.getAttribute('data-testid') || el.tagName)).toEqual([]);
+    expect(withFill(container, LOUD_FILL).map((el) => el.getAttribute('data-testid') || el.tagName)).toEqual(['projector-join-panel']);
   });
 
-  it('Given an empty room, Then no badge, chip or card is filled with a loud colour', () => {
+  it('Given an empty room, Then no badge, chip or card is loud except the yellow join block', () => {
     const { container } = render(<ProjectorLobby {...props} />);
-    expect(withFill(container, LOUD_FILL).map((el) => el.getAttribute('data-testid') || el.tagName)).toEqual([]);
+    expect(withFill(container, LOUD_FILL).map((el) => el.getAttribute('data-testid') || el.tagName)).toEqual(['projector-join-panel']);
   });
 
   it('paints no art behind the text: the wall is solid navy and the panels are opaque', () => {

@@ -21249,6 +21249,7 @@ const ru = {
       "wheelLabel": "Колесо класса"
     },
     "lobby": {
+      "joinTitle": "Присоединяйтесь к игре!",
       "roomFull": "Комната заполнена: занято {seated} из {max} мест",
       "roomFullWatching": "Без места смотрят: {count}",
       "brand": "Класс",
@@ -21295,6 +21296,7 @@ const ru = {
       "soloPractice": "Тренироваться самому"
     },
     "hostResults": {
+      "more": "Ещё",
       "missedTitle": "Слова, которые класс пропустил",
       "practiceWords": "Потренировать эти слова ({count})",
       "shareParents": "Поделиться с родителями",

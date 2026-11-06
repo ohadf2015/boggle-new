@@ -6,12 +6,12 @@
  * labelled Teacher Pro preview (never after a bots-only practice round).
  * Mounts only in the host tree, so no student sees the report or the upsell; z-[75] clears the lobby's
  * z-[65]. Dark-only and painted from frame one: the reveal only swaps what is written inside (Class 5).
- * One primary (Practice these words when the class missed some, else Play again), one secondary (Share with
- * parents, Pro), a quiet row of room controls, one Pro slot. Sized off its own size container, so a preview
+ * One primary (Practice these words when the class missed some, else Play again), a quiet Play again under
+ * practice, everything rarer (Share with parents, PDF export, Next game, End game) under More, one Pro slot. Sized off its own size container, so a preview
  * frame or a zoomed TV lays out like the wall.
  */
 import type { ReactNode } from 'react';
-import { Loader2, LogOut, RotateCcw, Shuffle, Target } from 'lucide-react';
+import { ChevronDown, Loader2, LogOut, MoreHorizontal, RotateCcw, Shuffle, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { ClassroomTvResultsScreenProps } from '@/host/components/tv-results/ClassroomTvResultsScreen';
@@ -61,11 +61,18 @@ interface ActionsProps extends Pick<ClassroomTvResultsScreenProps, 'onRematch' |
   t: Translate;
   /** Present when the class left words to practice and a round can start: then practice is the primary, in the words panel. */
   practiceLeads: boolean;
-  /** The one secondary (Share with parents), absent on a bots-only practice round. */
+  /** Share with parents (Pro), absent on a bots-only practice round. Lives under More. */
   secondary: ReactNode;
+  /** The PDF export, also under More. */
+  exportSlot?: ReactNode;
 }
 
-function Actions({ t, onRematch, onClose, onExitRoom, practiceLeads, secondary }: ActionsProps) {
+/**
+ * One primary on the wall (Practice these words, else Play again). When practice leads, Play again sits right
+ * under it as the one quiet rematch. Everything rarer (share, next game, export, end) waits under More, so the
+ * wall reads as one choice.
+ */
+function Actions({ t, onRematch, onClose, onExitRoom, practiceLeads, secondary, exportSlot }: ActionsProps) {
   const playAgain = onRematch
     ? () => {
         trackResultsAction('rematch', 'projector');
@@ -73,7 +80,7 @@ function Actions({ t, onRematch, onClose, onExitRoom, practiceLeads, secondary }
       }
     : undefined;
   const quietPlayAgain = practiceLeads && !!playAgain;
-  const hasTertiary = quietPlayAgain || !!onClose || !!onExitRoom;
+  const hasMore = !!secondary || !!exportSlot || !!onClose || !!onExitRoom;
 
   return (
     <div data-testid="edu-results-actions" className="flex shrink-0 flex-col gap-2 @5xl/results:gap-3">
@@ -83,32 +90,52 @@ function Actions({ t, onRematch, onClose, onExitRoom, practiceLeads, secondary }
           {t('eduLiveRoom.hostResults.playAgain')}
         </button>
       )}
-      {secondary}
-      {hasTertiary && (
-        <div data-testid="edu-results-tertiary" className="flex flex-wrap gap-2 border-t-2 border-t-neo-cream/20 pt-2 @5xl/results:gap-3 @5xl/results:pt-3">
-          {quietPlayAgain && (
-            <button type="button" data-testid="edu-results-play-again" onClick={playAgain} className={TERTIARY}>
-              <RotateCcw className="size-4 shrink-0" aria-hidden="true" />
-              {t('eduLiveRoom.hostResults.playAgain')}
-            </button>
-          )}
-          {onClose && (
-            <button type="button" data-testid="edu-results-next-mode" onClick={onClose} className={TERTIARY}>
-              <Shuffle className="size-4 shrink-0" aria-hidden="true" />
-              {t('eduLiveRoom.hostResults.nextMode')}
-            </button>
-          )}
-          {onExitRoom && (
-            <button type="button" data-testid="edu-results-end" onClick={onExitRoom} className={TERTIARY}>
-              <LogOut className="size-4 shrink-0" aria-hidden="true" />
-              {t('eduLiveRoom.hostResults.endGame')}
-            </button>
-          )}
-        </div>
+      {quietPlayAgain && (
+        <button type="button" data-testid="edu-results-play-again" onClick={playAgain} className={cn(TERTIARY, 'basis-auto grow-0')}>
+          <RotateCcw className="size-4 shrink-0" aria-hidden="true" />
+          {t('eduLiveRoom.hostResults.playAgain')}
+        </button>
+      )}
+      {hasMore && (
+        <details data-testid="edu-results-more" className="group">
+          <summary className={MORE_SUMMARY}>
+            <span className="inline-flex items-center gap-2">
+              <MoreHorizontal className="size-4 shrink-0" aria-hidden="true" />
+              {t('eduLiveRoom.hostResults.more')}
+            </span>
+            <ChevronDown className="size-4 shrink-0 transition-transform group-open:rotate-180 motion-reduce:transition-none" aria-hidden="true" />
+          </summary>
+          <div data-testid="edu-results-tertiary" className="mt-2 flex flex-col gap-2 @5xl/results:gap-3">
+            {secondary}
+            {exportSlot}
+            {(onClose || onExitRoom) && (
+              <div className="flex flex-wrap gap-2 @5xl/results:gap-3">
+                {onClose && (
+                  <button type="button" data-testid="edu-results-next-mode" onClick={onClose} className={TERTIARY}>
+                    <Shuffle className="size-4 shrink-0" aria-hidden="true" />
+                    {t('eduLiveRoom.hostResults.nextMode')}
+                  </button>
+                )}
+                {onExitRoom && (
+                  <button type="button" data-testid="edu-results-end" onClick={onExitRoom} className={TERTIARY}>
+                    <LogOut className="size-4 shrink-0" aria-hidden="true" />
+                    {t('eduLiveRoom.hostResults.endGame')}
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        </details>
       )}
     </div>
   );
 }
+
+/** The dashed More row: rarer room controls behind one tap (same look as the teacher area's Advanced). */
+const MORE_SUMMARY = cn(
+  'flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 rounded-neo-lg border-[3px] border-dashed border-neo-cream/35 px-3 font-neo-body text-sm font-bold text-neo-cream/85 hover:border-neo-cream/70 hover:text-neo-cream [&::-webkit-details-marker]:hidden @5xl/results:text-base',
+  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan'
+);
 
 const PRIMARY_CLASS = cn(
   PRIMARY_BUTTON,
@@ -280,6 +307,17 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
                 onClose={onClose}
                 onExitRoom={onExitRoom}
                 practiceLeads={practiceLeads}
+                exportSlot={
+                  // Export class report (PDF): the real export for Pro, locked and straight to checkout for a free teacher.
+                  !proLoading && summary.totalWords > 0 && students > 0 && !isPracticeRound(players) ? (
+                    <ReportPdfExportButton
+                      language={language}
+                      summary={summary}
+                      players={players}
+                      proLabel={tf('eduLiveRoom.hostResults.proPill', 'Pro')}
+                    />
+                  ) : null
+                }
                 secondary={
                   students > 0 && !isPracticeRound(players) ? (
                     <ParentShareLink
@@ -291,15 +329,6 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
                   ) : null
                 }
               />
-              {/* Export class report (PDF): the real export for Pro, locked and straight to checkout for a free teacher. */}
-              {!proLoading && summary.totalWords > 0 && students > 0 && !isPracticeRound(players) && (
-                <ReportPdfExportButton
-                  language={language}
-                  summary={summary}
-                  players={players}
-                  proLabel={tf('eduLiveRoom.hostResults.proPill', 'Pro')}
-                />
-              )}
             </div>
             {/* One Pro slot for a free teacher: a labelled preview of the per-student report, never a wall over the free insight. */}
             {proCard && summary.totalWords > 0 && (

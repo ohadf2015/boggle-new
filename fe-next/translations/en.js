@@ -20594,6 +20594,7 @@ const en = {
       "wheelLabel": "Class wheel"
     },
     "lobby": {
+      "joinTitle": "Join the game!",
       "roomFull": "Room full: {seated} of {max} seated",
       "roomFullWatching": "{count} watching without a seat",
       "brand": "Class",
@@ -20640,6 +20641,7 @@ const en = {
       "soloPractice": "Practice on your own"
     },
     "hostResults": {
+      "more": "More",
       "missedTitle": "Words your class missed",
       "practiceWords": "Practice these words ({count})",
       "shareParents": "Share with parents",

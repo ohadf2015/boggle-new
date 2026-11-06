@@ -21479,6 +21479,7 @@ const he = {
       "wheelLabel": "גלגל הכיתה"
     },
     "lobby": {
+      "joinTitle": "מצטרפים למשחק!",
       "roomFull": "החדר מלא: {seated} מתוך {max} מקומות תפוסים",
       "roomFullWatching": "{count} צופים בלי מקום",
       "brand": "כיתה",
@@ -21525,6 +21526,7 @@ const he = {
       "soloPractice": "להתאמן לבד"
     },
     "hostResults": {
+      "more": "עוד",
       "missedTitle": "מילים שהכיתה פספסה",
       "practiceWords": "לתרגל את המילים האלה ({count})",
       "shareParents": "שיתוף עם ההורים",
