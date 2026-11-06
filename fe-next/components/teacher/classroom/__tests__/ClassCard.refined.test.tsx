@@ -3,10 +3,11 @@
  *
  * The bar is Kahoot's Kahoots page: ONE primary verb in the spotlight (Start
  * a game), the join code readable from the back row (ink-on-cream plate),
- * copy/share as the secondary pair, and everything rare (rename, delete,
- * Google Classroom) demoted behind a "…" menu. The shell follows the Teacher
- * HQ recipe: navy-light panel, hairline cream border, no saturated fills
- * besides the one hero.
+ * copy/share as icon buttons beside it, and everything rare (students,
+ * homework, report, rename, delete, Google Classroom) behind a "…" menu.
+ * The look is the chunky neo-brutalist one the teacher approved (Nov 6): a
+ * colored band with the class name, a dark body with a visible cream
+ * outline, and lime kept for the one Start a game button.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
@@ -73,44 +74,39 @@ describe('ClassCard — refined surfaces', () => {
     expect(screen.queryByTestId('student-cap-meter')).toBeNull();
   });
 
-  it('is a game piece: chunky black edge on navy, with a colored header band that is never lime', () => {
-    render(<ClassCard {...baseProps} accent="pink" />);
+  it('is a chunky dark panel with a visible cream outline and a colored name band', () => {
+    render(<ClassCard {...baseProps} color="cyan" />);
     const cls = screen.getByTestId('classroom-card').className.toString();
     expect(cls).toContain('bg-neo-navy-light');
-    expect(cls).toMatch(/border-\[3px\]/);
-    expect(cls).toContain('border-neo-black');
+    expect(cls).toContain('border-[3px]');
+    expect(cls).toContain('border-neo-cream/50');
+    expect(cls).not.toContain('border-neo-black');
     const band = screen.getByTestId('classroom-card-band');
-    expect(band.className).toMatch(/(^|\s)bg-neo-pink(\s|$)/);
+    expect(band.className).toContain('bg-neo-cyan');
     expect(band).toContainElement(screen.getByRole('heading', { name: 'Period 3' }));
   });
 
-  it('spells the join code as ink-on-cream letter tiles inside one code element, readable from the back row', () => {
+  it('keeps the join code on an ink-on-cream plate, readable from the back row', () => {
     render(<ClassCard {...baseProps} />);
     const code = screen.getByTestId('classroom-join-code');
-    expect(code.textContent).toBe('ABC123');
-    // Sized by the plate's own width (cqw) so six tiles fit a phone and still read from the back row.
-    expect(code.className).toMatch(/text-\[min\(\d+(\.\d+)?cqw,2\.25rem\)\]/);
-    const tiles = screen.getAllByTestId('join-code-tile');
-    expect(tiles.map((el) => el.textContent)).toEqual(['A', 'B', 'C', '1', '2', '3']);
-    tiles.forEach((el) => expect(el.className).toContain('bg-neo-cream'));
-    expect(code.closest('[data-testid="join-code-plate"]')).not.toBeNull();
+    expect(code).toHaveTextContent('ABC123');
+    expect(code.className).toMatch(/text-3xl|text-4xl|text-5xl/);
+    const plate = code.closest('[data-testid="join-code-plate"]');
+    expect(plate).not.toBeNull();
+    expect(plate!.className).toContain('bg-neo-cream');
   });
 
-  it('animates the code tiles only through reduced-motion-safe classes', () => {
-    render(<ClassCard {...baseProps} />);
-    const all = Array.from(screen.getByTestId('classroom-join-code').querySelectorAll<HTMLElement>('[class]')).flatMap((el) => el.className.split(/\s+/));
-    expect(all).toEqual(expect.arrayContaining(['animate-edu-tile-in', 'animate-edu-hop']));
-    expect(all.filter((c) => /^animate-(?!edu-)/.test(c))).toEqual([]);
-  });
-
-  it('gives the card exactly ONE lime fill: the Start-a-game hero', () => {
+  it('keeps lime for the Start-a-game hero alone; the band carries the class color', () => {
     render(<ClassCard {...baseProps} />);
     const start = screen.getByTestId('classroom-card-start-game');
     expect(start.className).toContain('bg-neo-lime');
     expect(start).toHaveAttribute('href', '/en/teacher?classroomId=cls-1');
     const card = screen.getByTestId('classroom-card');
-    const lime = Array.from(card.querySelectorAll('*')).filter((el) => /bg-neo-lime(\/|\s|$)/.test((el as HTMLElement).className?.toString?.() ?? ''));
-    expect(lime).toHaveLength(1);
+    const lime = Array.from(card.querySelectorAll('*')).filter((el) =>
+      /bg-neo-lime(\/|\s|$)/.test((el as HTMLElement).className?.toString?.() ?? ''),
+    );
+    expect(lime).toEqual([start]);
+    expect(screen.getByTestId('classroom-card-band').className).toContain('bg-neo-pink');
   });
 
   it('keeps copy and share visible as the secondary pair beside the code', () => {
@@ -167,6 +163,7 @@ describe('ClassCard — refined surfaces', () => {
     const onToggleExpanded = vi.fn();
     render(<ClassCard {...baseProps} onToggleExpanded={onToggleExpanded} />);
 
+    await user.click(screen.getByTestId('classroom-card-menu'));
     const students = screen.getByTestId('classroom-card-students');
     expect(students).toHaveTextContent('teacher.classroom.cardSeeAllStudents:{"count":12}');
     await user.click(students);
@@ -206,16 +203,16 @@ describe('ClassCard — refined surfaces', () => {
     expect(screen.getByTestId('classroom-card-language')).toHaveTextContent('languages.english');
   });
 
-  it('puts only the code on the cream tile; copy, share and show-on-board are outlined buttons on navy', () => {
+  it('puts only the code on its plate; copy, share and show-on-board are named icon buttons beside it', () => {
     render(<ClassCard {...baseProps} onOpenProjector={vi.fn()} />);
     const plate = screen.getByTestId('join-code-plate');
     for (const id of ['copy-join-code', 'share-join-code', 'classroom-card-projector']) {
       const btn = screen.getByTestId(id);
       expect(plate).not.toContainElement(btn);
-      expect(btn.className).not.toMatch(/(^|\s)bg-neo-(cream|navy|white|black)(\s|$)/);
-      expect(btn.className).toMatch(/border-neo-cream/);
+      expect(btn.getAttribute('aria-label')).toBeTruthy();
+      expect(btn).toHaveAttribute('title', btn.getAttribute('aria-label'));
     }
-    expect(screen.getByTestId('classroom-card-projector')).toHaveTextContent('academy.hq.openProjector');
+    expect(screen.getByTestId('classroom-card-projector')).toHaveAttribute('aria-label', 'academy.hq.openProjector');
   });
 
   it('never cuts a label with an ellipsis', () => {
@@ -227,8 +224,10 @@ describe('ClassCard — refined surfaces', () => {
     expect(cut).toHaveLength(0);
   });
 
-  it('labels the secondary links in teacher words', () => {
+  it('labels the menu links in teacher words', async () => {
+    const user = userEvent.setup();
     render(<ClassCard {...baseProps} reportHref="/r" assignHref="/a" />);
+    await user.click(screen.getByTestId('classroom-card-menu'));
     expect(screen.getByTestId('classroom-card-report')).toHaveTextContent('teacher.classroom.cardClassReport');
     expect(screen.getByTestId('classroom-card-assign')).toHaveTextContent('teacher.classroom.cardAssignHomework');
   });

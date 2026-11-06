@@ -21674,13 +21674,17 @@ const ja = {
         "thenLive": "クラスの大半が練習したら、ライブ開始を押しましょう。",
         "startShort": "開始"
       },
+      "practice": {
+        "title": "まずは自分で試す",
+        "body": "ボット相手に短いラウンドを遊んで、クラスに見える画面を確認。あなただけに表示されます。"
+      },
       "greetMorning": "おはようございます、{name}さん",
       "greetAfternoon": "こんにちは、{name}さん",
       "greetEvening": "こんばんは、{name}さん",
       "greetNoName": "おかえりなさい",
       "startWith": "ゲームを始めるクラス：",
       "switchClass": "クラスを選ぶ",
-      "startLive": "ゲームを選ぶ",
+      "startLive": "ゲームを始める",
       "yourClasses": "あなたのクラス",
       "newClass": "新しいクラス",
       "colClass": "クラス",

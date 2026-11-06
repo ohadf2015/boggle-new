@@ -5,7 +5,7 @@
  * (phone: one class in view) instead of scrolling a long column of cards.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 vi.mock('react-hot-toast', () => ({ default: { success: vi.fn(), error: vi.fn() } }));
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -72,22 +72,13 @@ describe('ClassroomManager — swipe carousel instead of page scroll', () => {
     Element.prototype.scrollIntoView = scrollIntoView;
   });
 
-  it('Given three classes on a phone, Then every card is in the swipe track with a 1 of 3 indicator', () => {
+  it('Given three classes, Then every card sits in one grid, each with its own color band, and no carousel', () => {
     render(<ClassroomManager />);
-    expect(screen.getAllByTestId('classroom-card')).toHaveLength(3);
-    expect(screen.getByTestId('class-carousel-track')).toBeInTheDocument();
-    expect(screen.getByTestId('class-carousel-status')).toHaveTextContent('"page":1');
-    expect(screen.getByTestId('class-carousel-status')).toHaveTextContent('"pages":3');
-    expect(screen.getByTestId('class-carousel-prev')).toBeDisabled();
-  });
-
-  it('When next is tapped, Then the second class scrolls into view', () => {
-    render(<ClassroomManager />);
-    fireEvent.click(screen.getByTestId('class-carousel-next'));
-    const second = screen.getAllByRole('group')[1];
-    expect(scrollIntoView.mock.contexts[0]).toBe(second);
-    expect(second).toHaveTextContent('CODE02');
-    expect(screen.getByTestId('class-carousel-prev')).not.toBeDisabled();
+    const grid = screen.getByTestId('classroom-grid');
+    expect(grid.querySelectorAll('[data-testid="classroom-card"]')).toHaveLength(3);
+    expect(screen.queryByTestId('class-carousel-track')).toBeNull();
+    const bands = screen.getAllByTestId('classroom-card-band').map((b) => b.className.match(/bg-neo-[a-z]+/)?.[0]);
+    expect(new Set(bands).size).toBe(3);
   });
 
   it('Given one class, Then there is no arrow nav at all', () => {
@@ -157,6 +148,7 @@ describe('ClassroomManager — swipe carousel instead of page scroll', () => {
     mq.wide = wide;
     render(<ClassroomManager />);
     expect(screen.queryByTestId('classroom-add-tile')).toBeNull();
+    expect(screen.queryAllByTestId('classroom-new-card')).toHaveLength(wide ? 1 : 0);
     const links = screen.getAllByRole('link').filter((a) => a.getAttribute('href') === '/en/teacher/classroom/new');
     expect(links).toHaveLength(1);
     expect(links[0]).toHaveTextContent('eduShell.home.newClass');

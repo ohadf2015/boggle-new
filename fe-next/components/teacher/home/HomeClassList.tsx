@@ -91,7 +91,7 @@ export function HomeClassMeta({
   t: T;
 }) {
   return (
-    <div data-testid="home-desk-meta" className="flex flex-wrap items-center gap-x-4 gap-y-2 font-neo-body text-sm font-semibold text-neo-cream/80 sm:text-base">
+    <div data-testid="home-desk-meta" className="flex flex-wrap items-center gap-x-4 gap-y-2 font-neo-body text-sm font-bold text-white sm:text-base">
       {previewIds.length > 0 ? <span className="contents max-sm:hidden"><StudentStack ids={previewIds} total={memberCount} /></span> : null}
       <span className="inline-flex items-center gap-1.5">
         <Users className="size-4" aria-hidden="true" />

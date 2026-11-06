@@ -268,10 +268,12 @@ describe('<GetStudentsInCard>', () => {
     expect(screen.queryByTestId('hq-first-student-panel')).not.toBeInTheDocument();
   });
 
-  it('Given an empty class, Then the card is calm and compact: no colored fills or ink, no helper paragraph, and a heading that wraps', () => {
+  it('Given an empty class, Then the card is one yellow code block with black ink, no other color fills, no helper paragraph, and a heading that wraps', () => {
     roster.mockReturnValue({ students: [], loading: false, arrivals: [] });
     render(<GetStudentsInCard classroom={{ ...CLASS, member_count: 0 }} onOpenProjector={vi.fn()} />);
     const card = screen.getByTestId('hq-get-students-in');
+    expect(card.className).toMatch(/(^|\s)bg-neo-yellow(\s|$)/);
+    expect(card.className).toMatch(/(^|\s)text-neo-black(\s|$)/);
     const loud = Array.from(card.querySelectorAll<HTMLElement>('[class]')).filter((el) =>
       /(^|\s)(bg|text)-neo-(lime|cyan|pink|purple|orange|yellow)(\/\d+)?(\s|$)/.test(el.getAttribute('class') ?? ''),
     );

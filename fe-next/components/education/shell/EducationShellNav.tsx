@@ -25,13 +25,15 @@ function TeacherPlanChip({ plan, href, t }: { plan: Plan; href: string; t: (key:
       href={href}
       data-testid="teacher-plan-chip"
       className={cn(
-        'flex min-h-[44px] min-w-0 items-center gap-1.5 rounded-neo px-2 font-neo-display text-sm font-bold text-neo-cream',
-        'transition-[colors,transform] duration-150 hover:bg-neo-navy-light active:scale-[0.97]',
+        'flex min-h-[44px] min-w-0 items-center',
+        'transition-transform duration-150 active:scale-[0.97]',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
       )}
     >
-      <Crown className="size-4 shrink-0 text-neo-yellow" aria-hidden="true" />
-      <span className="truncate">{t(PLAN_LABEL[plan])}</span>
+      <span className="inline-flex min-w-0 items-center gap-1 rounded-neo-pill border-2 border-neo-black bg-neo-cream px-2.5 py-1 font-neo-display text-sm font-black text-neo-black shadow-hard">
+        <Crown className="size-4 shrink-0 text-neo-purple" aria-hidden="true" />
+        <span className="truncate">{t(PLAN_LABEL[plan])}</span>
+      </span>
     </Link>
   );
 }

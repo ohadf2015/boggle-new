@@ -21604,13 +21604,17 @@ const he = {
         "thenLive": "כשרוב הכיתה תרגלה, לוחצים על שידור חי.",
         "startShort": "להתחיל"
       },
+      "practice": {
+        "title": "קודם מנסים לבד",
+        "body": "משחקים סיבוב קצר נגד בוטים ורואים מה הכיתה תראה. זה מוצג רק לך."
+      },
       "greetMorning": "בוקר טוב, {name}",
       "greetAfternoon": "צהריים טובים, {name}",
       "greetEvening": "ערב טוב, {name}",
       "greetNoName": "טוב לראות אותך שוב",
       "startWith": "מתחילים משחק עם",
       "switchClass": "בחירת כיתה",
-      "startLive": "בחירת משחק",
+      "startLive": "מתחילים משחק",
       "yourClasses": "הכיתות שלך",
       "newClass": "כיתה חדשה",
       "colClass": "כיתה",

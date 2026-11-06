@@ -21674,13 +21674,17 @@ const sv = {
         "thenLive": "Tryck på Starta live när de flesta har övat.",
         "startShort": "Starta"
       },
+      "practice": {
+        "title": "Testa själv först",
+        "body": "Spela en snabb runda mot bottar och se vad klassen kommer att se. Bara du ser det."
+      },
       "greetMorning": "God morgon, {name}",
       "greetAfternoon": "God eftermiddag, {name}",
       "greetEvening": "God kväll, {name}",
       "greetNoName": "Välkommen tillbaka",
       "startWith": "Starta ett spel med",
       "switchClass": "Välj klass",
-      "startLive": "Välj ett spel",
+      "startLive": "Starta ett spel",
       "yourClasses": "Dina klasser",
       "newClass": "Ny klass",
       "colClass": "Klass",

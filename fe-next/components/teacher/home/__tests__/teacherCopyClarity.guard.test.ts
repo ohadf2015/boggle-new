@@ -18,7 +18,7 @@ const placeholders = (s: string) => [...s.matchAll(/\{\{?\s*(\w+)\s*\}?\}/g)].ma
 const EXPECTED_EN: Record<string, string> = {
   'education.starterPacks.sessions.title': 'Ready-made class games',
   'eduShell.home.rail.run': 'Use',
-  'eduShell.home.startLive': 'Pick a game',
+  'eduShell.home.startLive': 'Start a game',
   'academy.hq.openProjector': 'Show code on board',
   'education.projectorLobby.rehearseCta': 'Practice with bots',
   'academy.hq.codeReady': 'Open to join',

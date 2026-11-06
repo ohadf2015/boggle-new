@@ -14,7 +14,7 @@ import type { RailSession } from "@/lib/education/homeSessionRail";
 import { catalogueEntry } from "@/components/education/ClassroomModeCatalogueData";
 import { gradeBandsLabel } from "@/components/teacher/StarterPacksSection.data";
 import { ARCADE_ACCENTS, ARCADE_BLOCK, type ArcadeAccent } from "@/lib/education/arcadeAccent";
-import { GAME_CARD, GAME_CARD_HOVER, GHOST_BUTTON } from "./homeStyles";
+import { GHOST_BUTTON } from "./homeStyles";
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -39,6 +39,7 @@ export interface HomeSessionFlowCardProps {
   t: T;
   testId?: string;
   accent?: CardAccent;
+  /** Hover tilt direction, alternated by the rail so neighbours tilt opposite ways. */
   tilt?: "left" | "right";
 }
 
@@ -69,9 +70,8 @@ export function HomeSessionFlowCard({
       data-testid={testId}
       data-accent={accent}
       className={cn(
-        GAME_CARD,
-        GAME_CARD_HOVER,
-        "group relative flex min-w-0 overflow-hidden @2xl:flex-col",
+        "group relative flex min-w-0 flex-col overflow-hidden rounded-neo-xl border-[3px] border-neo-cream/50 bg-neo-navy-light shadow-hard-xl",
+        "transition-[translate,rotate] duration-200 ease-[cubic-bezier(0.34,1.56,0.64,1)] focus-within:-translate-y-1 hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:rotate-0",
         tilt === "left" ? "hover:-rotate-1" : "hover:rotate-1",
       )}
     >
@@ -79,13 +79,13 @@ export function HomeSessionFlowCard({
         data-accent-decor
         aria-hidden="true"
         className={cn(
-          "grid w-16 shrink-0 place-items-center border-e-[3px] border-neo-black @2xl:h-16 @2xl:w-auto @2xl:border-e-0 @2xl:border-b-[3px] [@media(max-height:820px)]:@2xl:h-10",
+          "grid h-16 shrink-0 place-items-center border-b-[3px] border-neo-black @2xl:h-24 [@media(max-height:820px)]:@2xl:h-16",
           ARCADE_BLOCK[accent],
         )}
       >
         {mode ? (
           <span className="edu-bob-on-hover block">
-          <span className="relative block size-10 -rotate-3 overflow-hidden rounded-neo border-2 border-neo-black shadow-hard transition-transform duration-150 group-hover:rotate-0 motion-reduce:transition-none @2xl:size-12 [@media(max-height:820px)]:@2xl:size-8">
+          <span className="relative block size-12 -rotate-3 overflow-hidden rounded-neo-lg border-[3px] border-neo-black shadow-hard-lg transition-transform duration-150 group-hover:rotate-0 motion-reduce:transition-none @2xl:size-16 [@media(max-height:820px)]:@2xl:size-12">
             <Image
               src={mode.cover}
               alt=""
@@ -97,9 +97,9 @@ export function HomeSessionFlowCard({
           </span>
         ) : null}
       </div>
-      <div className="flex min-w-0 flex-1 items-center gap-3 px-3 py-2.5 [@media(max-height:820px)]:py-2 @2xl:flex-col @2xl:items-stretch @2xl:gap-2 @2xl:p-3 [@media(max-height:820px)]:@2xl:gap-1.5 [@media(max-height:820px)]:@2xl:p-2.5">
+      <div className="flex min-w-0 flex-1 flex-col items-stretch gap-1 p-2 @2xl:gap-2 @2xl:p-3 [@media(max-height:820px)]:@2xl:gap-1.5 [@media(max-height:820px)]:@2xl:p-2.5">
         <div className="min-w-0 flex-1">
-          <h3 className="truncate font-neo-display text-base font-bold leading-tight text-neo-cream">
+          <h3 className="line-clamp-2 font-neo-display text-sm font-black leading-tight text-neo-cream @2xl:truncate @2xl:text-lg">
             {t(session.nameKey)}
           </h3>
           <p className="mt-0.5 flex flex-wrap gap-x-1.5 font-neo-body text-xs font-semibold text-neo-cream/70">
@@ -123,7 +123,7 @@ export function HomeSessionFlowCard({
           </p>
           <p
             data-testid="home-session-when"
-            className="mt-0.5 line-clamp-1 font-neo-body text-sm leading-snug text-neo-cream/80 @2xl:mt-2"
+            className="mt-0.5 line-clamp-1 hidden font-neo-body text-sm leading-snug text-neo-cream/80 @2xl:mt-2 @2xl:block"
           >
             {t(session.whenShortKey)}
           </p>
@@ -142,7 +142,8 @@ export function HomeSessionFlowCard({
           data-testid="home-session-run"
           className={cn(
             GHOST_BUTTON,
-            "size-11 shrink-0 px-0 after:absolute after:inset-0 after:rounded-neo-lg @2xl:mt-auto @2xl:h-auto @2xl:min-h-10 @2xl:w-full @2xl:px-3",
+            // Phones: the whole tile is the button (the ::after covers it), so the row collapses to keep three tiles short.
+            "h-0 min-h-0 w-full shrink-0 border-0 p-0 after:absolute after:inset-0 after:rounded-neo-lg [&>svg]:hidden @2xl:mt-auto @2xl:h-auto @2xl:min-h-10 @2xl:border-2 @2xl:px-3 @2xl:[&>svg]:block",
           )}
           title={startLabel}
         >

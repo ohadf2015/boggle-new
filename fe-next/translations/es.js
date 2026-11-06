@@ -21686,13 +21686,17 @@ const es = {
         "thenLive": "Pulsa En directo cuando casi toda la clase haya practicado.",
         "startShort": "Empezar"
       },
+      "practice": {
+        "title": "Pruébalo tú primero",
+        "body": "Juega una ronda rápida contra bots y mira lo que verá tu clase. Solo lo ves tú."
+      },
       "greetMorning": "Buenos días, {name}",
       "greetAfternoon": "Buenas tardes, {name}",
       "greetEvening": "Buenas noches, {name}",
       "greetNoName": "Hola de nuevo",
       "startWith": "Empieza una partida con",
       "switchClass": "Elegir clase",
-      "startLive": "Elegir un juego",
+      "startLive": "Empezar un juego",
       "yourClasses": "Tus clases",
       "newClass": "Nueva clase",
       "colClass": "Clase",

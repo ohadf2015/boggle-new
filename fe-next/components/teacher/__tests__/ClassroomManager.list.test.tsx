@@ -116,17 +116,20 @@ describe('ClassroomManager — class list', () => {
       expect(within(card).getByText('teacher.classrooms.students.noneYet')).toBeInTheDocument();
       const code = within(card).getByTestId('classroom-join-code');
       expect(code).toHaveTextContent('ABC123');
-      expect(code.className).toMatch(/text-\[min\([\d.]+cqw,2\.25rem\)\]/);
+      expect(code.className).toMatch(/(^|\s)text-2xl(\s|$)/);
       expect(within(card).getByTestId('copy-join-code')).toBeInTheDocument();
       expect(within(card).getByTestId('card-activity')).toHaveTextContent('cls-1');
     });
 
-    it('Then the card offers Start a game, Assign, and Report for that class', () => {
+    it('Then the card leads with Start a game and keeps Assign and Report in its menu', async () => {
+      const user = userEvent.setup();
       render(<ClassroomManager />);
       expect(screen.getByTestId('classroom-card-start-game')).toHaveAttribute(
         'href',
         '/en/education/classroom-game?classroomId=cls-1',
       );
+      expect(screen.queryByTestId('classroom-card-assign')).toBeNull();
+      await user.click(screen.getByTestId('classroom-card-menu'));
       expect(screen.getByTestId('classroom-card-assign')).toHaveAttribute(
         'href',
         '/en/teacher?classroomId=cls-1&assign=1',

@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { JoinCodeTile } from "./JoinCodeTile";
 import toast from "react-hot-toast";
 import { AnimatePresence, m } from "framer-motion";
 import { Check, Link2, MonitorUp } from "lucide-react";
@@ -26,7 +25,8 @@ import { RosterSeats } from "./RosterSeats";
 import { useHqJuice } from "./useHqJuice";
 import { useRisingCount } from "./useRisingCount";
 import { STUDENT_GOAL } from "./studentGoal";
-import { OUTLINE_BUTTON } from "../home/homeStyles";
+import { NB_BLOCK, NB_SMALL } from "../nb/nbStyles";
+import { JoinCodeTile } from "./JoinCodeTile";
 
 export interface HqClassroom {
   id: string;
@@ -152,18 +152,18 @@ export function GetStudentsInCard({
     <section
       data-testid="hq-get-students-in"
       aria-labelledby={headingId}
-      className={cn("@container flex flex-col gap-2.5 rounded-neo border-[3px] border-neo-black bg-neo-navy p-2.5 sm:p-3", className)}
+      className={cn("@container flex flex-col gap-2.5 rounded-neo-lg border-[3px] border-neo-black bg-neo-yellow p-2.5 text-neo-black shadow-hard-lg sm:p-3.5", className)}
     >
       <div className="flex items-center justify-between gap-2">
-        <h3 id={headingId} className="whitespace-nowrap font-neo-body text-xs font-bold leading-snug text-neo-cream/70">
+        <h3 id={headingId} className="whitespace-nowrap font-neo-body text-xs font-black uppercase leading-snug tracking-wide text-neo-black/75">
           {t("academy.hq.getStudentsIn", "Get students in")}
         </h3>
         <span
           data-testid="hq-join-status"
           title={t("academy.hq.codeReady", "Code ready")}
-          className="hidden shrink-0 items-center gap-1.5 rounded-full border border-neo-cream/35 px-2 py-0.5 font-neo-body text-xs font-bold text-neo-cream/80 @md:inline-flex"
+          className="hidden shrink-0 items-center gap-1.5 rounded-full border-2 border-neo-black bg-neo-cream px-2 py-0.5 font-neo-body text-xs font-black text-neo-black @md:inline-flex"
         >
-          <span className="size-2 rounded-full bg-neo-cream/70" aria-hidden="true" />
+          <span className="size-2 rounded-full bg-neo-black" aria-hidden="true" />
           <span>{t("academy.hq.codeReady", "Code ready")}</span>
         </span>
       </div>
@@ -183,16 +183,16 @@ export function GetStudentsInCard({
               index={i}
               count={codeChars.length}
               data-testid="hq-join-code-tile"
-              className="h-11 w-full min-w-0 rounded-neo border-[3px] border-neo-black bg-neo-cream font-neo-display text-xl font-black uppercase text-neo-black shadow-hard @xl:h-14 @xl:text-3xl"
+              className="h-12 w-full min-w-0 rounded-neo border-[3px] border-neo-black bg-neo-cream font-neo-display text-2xl font-black uppercase text-neo-black shadow-hard @xl:h-14 @xl:text-3xl"
             />
           ))}
         </p>
         <div data-testid="hq-join-actions" className="flex gap-2 @xl:w-auto @xl:flex-col">
-          <button type="button" data-testid="hq-copy-link" onClick={copyLink} aria-label={copyLabel} title={copyLabel} className={cn(OUTLINE_BUTTON, "min-w-0 flex-1 px-2")}>
+          <button type="button" data-testid="hq-copy-link" onClick={copyLink} aria-label={copyLabel} title={copyLabel} className={cn(NB_SMALL, NB_BLOCK.navy, "min-w-0 flex-1 px-2")}>
             {copied ? <Check className="size-4 shrink-0" strokeWidth={3} aria-hidden="true" /> : <Link2 className="size-4 shrink-0" strokeWidth={3} aria-hidden="true" />}
             <span className="truncate">{copyLabel}</span>
           </button>
-          <button type="button" data-testid="hq-open-projector" onClick={openProjector} aria-label={projectorLabel} title={projectorLabel} className={cn(OUTLINE_BUTTON, "min-w-0 flex-1 px-2")}>
+          <button type="button" data-testid="hq-open-projector" onClick={openProjector} aria-label={projectorLabel} title={projectorLabel} className={cn(NB_SMALL, NB_BLOCK.cream, "min-w-0 flex-1 px-2")}>
             <MonitorUp className="size-4 shrink-0" strokeWidth={3} aria-hidden="true" />
             <span className="truncate">{projectorShort}</span>
           </button>
@@ -202,8 +202,8 @@ export function GetStudentsInCard({
       <div
         data-testid="hq-roster-row"
         className={cn(
-          "flex min-h-10 min-w-0 items-center gap-2.5 rounded-neo border border-neo-cream/25 px-2.5 py-1",
-          empty && "border-dashed border-neo-cream/35",
+          "flex min-h-10 min-w-0 items-center gap-2.5 rounded-neo border-2 border-neo-black/40 bg-neo-cream/60 px-2.5 py-1",
+          empty && "border-dashed",
         )}
       >
         {rosterLoading ? (
@@ -217,7 +217,7 @@ export function GetStudentsInCard({
                 <QRCodeSVG value={joinUrl} size={96} level="L" style={{ width: "100%", height: "100%" }} aria-hidden="true" />
               </span>
             ) : null}
-            <p data-testid="hq-first-student-title" className="min-w-0 flex-1 text-balance font-neo-body text-sm font-bold leading-snug text-neo-cream">
+            <p data-testid="hq-first-student-title" className="min-w-0 flex-1 text-balance font-neo-body text-sm font-black leading-snug text-neo-black">
               {t("academy.hq.firstStudentTitle", "Get your first student in")}
             </p>
             <GoalCount count={0} label={t("academy.hq.joinedGoal", { count: 0, goal: STUDENT_GOAL })} />
@@ -260,7 +260,7 @@ function GoalCount({ count, label }: { count: number; label: string }) {
       aria-live="polite"
       className={cn(
         "min-w-0 font-neo-body text-sm font-bold leading-tight",
-        count > 0 ? "text-neo-cream" : "text-neo-cream/70",
+        count > 0 ? "text-neo-black" : "text-neo-black/70",
       )}
     >
       <span data-testid="hq-joined-goal-count" className="tabular-nums">{label}</span>
@@ -287,10 +287,10 @@ function JoinedCount({ loading, count, shown, reduced, label, empty }: JoinedCou
     <p
       data-testid="hq-joined-count"
       aria-live="polite"
-      className="flex min-w-0 items-baseline gap-1.5 font-neo-body text-sm font-bold leading-tight text-neo-cream"
+      className="flex min-w-0 items-baseline gap-1.5 font-neo-body text-sm font-bold leading-tight text-neo-black"
     >
       {loading ? (
-        <span className="text-base text-neo-cream/50">…</span>
+        <span className="text-base text-neo-black/50">…</span>
       ) : (
         <>
           <AnimatePresence initial={false} mode="popLayout">
@@ -301,7 +301,7 @@ function JoinedCount({ loading, count, shown, reduced, label, empty }: JoinedCou
               transition={{ type: "spring", stiffness: 600, damping: 18 }}
               className={cn(
                 "inline-block shrink-0 font-neo-display text-base font-black tabular-nums",
-                count > 0 ? "text-neo-cream" : "text-neo-cream/60",
+                count > 0 ? "text-neo-black" : "text-neo-black/60",
               )}
             >
               {shown}

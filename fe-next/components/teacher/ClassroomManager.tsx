@@ -30,8 +30,11 @@ import { OUTLINE_BUTTON } from './home/homeStyles';
 import { RehearseWithBotsButton } from './home/RehearseWithBotsButton';
 import { ClassroomEmptyState } from './classroom/ClassroomEmptyState';
 import { NewClassSeat } from './classroom/NewClassSeat';
-import { arcadeAccentAt } from '@/lib/education/arcadeAccent';
-import { ClassCarousel } from './hq/ClassCarousel';
+import { NB_BLOCK, NB_DARK_EDGE, NB_SMALL, type NbColor } from './nb/nbStyles';
+
+// Each class gets its own color band, in the game's order, so a teacher can find a class by color.
+// No lime: lime is kept for the one Start a game button on each card.
+const CARD_COLORS = ['pink', 'cyan', 'yellow', 'purple', 'orange'] as const satisfies readonly NbColor[];
 import { ClassroomCardActivity } from './hq/ClassroomCardActivity';
 import { HqProjectorSheet } from './hq/HqProjectorSheet';
 import type { HqClassroom } from './hq/GetStudentsInCard';
@@ -71,6 +74,7 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
   const revealRef = useTeacherReveal<HTMLDivElement>(`${pageSize}-${classrooms.length}`);
 
   const newClassHref = `/${language}/teacher/classroom/new`;
+  // A wide row with fewer classes than seats ends in a New class card instead of empty space.
   const seatFree = classrooms.length > 0 && pageSize > classrooms.length;
   const editing = classrooms.find((c) => c.id === editingId);
 
@@ -163,8 +167,9 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
           {teacherProUpgradeCtaLabel(language)}
         </Link>
       ) : null}
+      {/* One "New class" entry: the seat card when the row has an empty seat, else this quiet link (lime stays Start a game's). */}
       {classrooms.length > 0 && !seatFree ? (
-        <Link href={newClassHref} data-testid="classroom-create-link" className={cn(OUTLINE_BUTTON, SHORT_LANDSCAPE_BUTTON)}>
+        <Link href={newClassHref} data-testid="classroom-create-link" className={cn(NB_SMALL, NB_BLOCK.navy, NB_DARK_EDGE, SHORT_LANDSCAPE_BUTTON)}>
           <Plus className="size-4" aria-hidden="true" />
           {t('eduShell.home.newClass', 'New class')}
         </Link>
@@ -186,51 +191,55 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
         </>
       ) : (
         <m.div ref={revealRef} variants={stagger} initial="hidden" animate="visible">
-          <ClassCarousel
-            perView={pageSize}
-            header={<ClassCapMeter count={classrooms.length} />}
-            label={t('academy.teacher.classesTitle', 'Your classes')}
-            trailing={
-              seatFree ? (
+          <div className="mb-3">
+            <ClassCapMeter count={classrooms.length} />
+          </div>
+          <ul
+            data-testid="classroom-grid"
+            aria-label={t('academy.teacher.classesTitle', 'Your classes')}
+            // Columns follow the same per-view count as before, so a row never ends in an empty column.
+            className="grid gap-4"
+            style={{ gridTemplateColumns: `repeat(${pageSize}, minmax(0, 1fr))` }}
+          >
+            {classrooms.map((classroom, i) => (
+              <li key={classroom.id} data-tm className="flex">
+                <ClassCard
+                  classroom={classroom}
+                  color={CARD_COLORS[i % CARD_COLORS.length]}
+                  expanded={expandedId === classroom.id}
+                  onToggleExpanded={() => setExpandedId(expandedId === classroom.id ? null : classroom.id)}
+                  onCopy={() => copyJoinCode(classroom.id, classroom.join_code)}
+                  onShare={() => shareInvite(classroom.id, classroom.name, classroom.join_code)}
+                  googleHref={googleClassroomHref(classroom.name, classroom.join_code)}
+                  onEdit={() => setEditingId(classroom.id)}
+                  onDelete={() => setDeletingId(classroom.id)}
+                  activity={<ClassroomCardActivity classroomId={classroom.id} rosterCount={classroom.member_count || 0} />}
+                  studentPreview={<ClassAvatarStack classroomId={classroom.id} />}
+                  startGameHref={teacherHostHref(language, { classroomId: classroom.id })}
+                  rehearse={<RehearseWithBotsButton classroomId={classroom.id} source="class" language={language} t={t} />}
+                  assignHref={teacherAssignHref(language, classroom.id)}
+                  reportHref={`/${language}/teacher/classroom/${classroom.id}/analytics`}
+                  onOpenProjector={
+                    classroom.join_code
+                      ? () => setProjector({ id: classroom.id, name: classroom.name, join_code: classroom.join_code, member_count: classroom.member_count })
+                      : undefined
+                  }
+                />
+              </li>
+            ))}
+            {/* Wider screens: the next class is a tile in the grid, so the row never ends in empty space. */}
+            {seatFree ? (
+              <li className="flex">
                 <NewClassSeat
                   href={newClassHref}
                   label={t('eduShell.home.newClass', 'New class')}
                   hint={t('teacher.classroom.newClassHint')}
                   perView={pageSize}
-                  accent={arcadeAccentAt(classrooms.length)}
+                  accent={CARD_COLORS[classrooms.length % CARD_COLORS.length]}
                 />
-              ) : undefined
-            }
-            slides={classrooms.map((classroom, index) => ({
-              key: classroom.id,
-              node: (
-                <div data-tm>
-                  <ClassCard
-                    classroom={classroom}
-                    accent={arcadeAccentAt(index)}
-                    expanded={expandedId === classroom.id}
-                    onToggleExpanded={() => setExpandedId(expandedId === classroom.id ? null : classroom.id)}
-                    onCopy={() => copyJoinCode(classroom.id, classroom.join_code)}
-                    onShare={() => shareInvite(classroom.id, classroom.name, classroom.join_code)}
-                    googleHref={googleClassroomHref(classroom.name, classroom.join_code)}
-                    onEdit={() => setEditingId(classroom.id)}
-                    onDelete={() => setDeletingId(classroom.id)}
-                    activity={<ClassroomCardActivity classroomId={classroom.id} rosterCount={classroom.member_count || 0} />}
-                    studentPreview={<ClassAvatarStack classroomId={classroom.id} />}
-                    startGameHref={teacherHostHref(language, { classroomId: classroom.id })}
-                    rehearse={<RehearseWithBotsButton classroomId={classroom.id} source="class" language={language} t={t} className="self-center" />}
-                    assignHref={teacherAssignHref(language, classroom.id)}
-                    reportHref={`/${language}/teacher/classroom/${classroom.id}/analytics`}
-                    onOpenProjector={
-                      classroom.join_code
-                        ? () => setProjector({ id: classroom.id, name: classroom.name, join_code: classroom.join_code, member_count: classroom.member_count })
-                        : undefined
-                    }
-                  />
-                </div>
-              ),
-            }))}
-          />
+              </li>
+            ) : null}
+          </ul>
         </m.div>
       )}
 
