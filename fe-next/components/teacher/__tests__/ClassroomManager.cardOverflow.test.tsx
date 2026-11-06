@@ -5,8 +5,9 @@
  * grid gives each card ~300px, COPY CODE and SHARE sit in one non-wrapping
  * flex row, and the card carries `overflow-hidden` — so SHARE rendered as
  * "SHAR" with its right edge sliced off. jsdom cannot measure that, so what
- * this pins is the layout contract that prevents it: the row is allowed to
- * wrap, and neither button may refuse to shrink below its content.
+ * this pins is the layout contract that prevents it. Copy and share are now
+ * icon-only buttons beside the code, so the code plate is the part that gives
+ * way (min-w-0) and the buttons keep their size.
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -59,28 +60,30 @@ import ClassroomManager from '../ClassroomManager';
 describe('ClassroomManager — invite actions in a narrow card', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('gives copy and share a row of their own, under the code, with wrapping labels', () => {
+  it('keeps the code and its three icon actions on one row: the code plate gives way, the buttons never do', () => {
     render(<ClassroomManager />);
 
-    const row = screen.getByTestId('copy-join-code').parentElement;
-    expect(row).not.toBeNull();
-    expect(row!.className).toMatch(/grid-cols-2/);
-    expect(row!.contains(screen.getByTestId('classroom-join-code'))).toBe(false);
+    const plate = screen.getByTestId('join-code-plate');
+    expect(plate.className).toContain('min-w-0');
+    expect(plate.className).toContain('flex-1');
+    const row = plate.parentElement!;
     for (const id of ['copy-join-code', 'share-join-code']) {
-      const cls = screen.getByTestId(id).className;
-      expect(cls).toContain('whitespace-normal');
-      expect(cls).not.toMatch(/(^|\s)whitespace-nowrap(\s|$)/);
+      const button = screen.getByTestId(id);
+      expect(row.contains(button)).toBe(true);
+      expect(button.className).toContain('shrink-0');
     }
   });
 
-  it('lets each invite button shrink below its own label width', () => {
-    // `flex-1` alone does not permit shrinking past the content's min-content
-    // size; without `min-w-0` the pair stays wider than the card and the
-    // second button is the one that gets clipped.
+  it('names each icon-only invite action for screen readers and on hover', () => {
     render(<ClassroomManager />);
 
-    for (const id of ['copy-join-code', 'share-join-code']) {
-      expect(screen.getByTestId(id).className).toContain('min-w-0');
+    for (const [id, key] of [
+      ['copy-join-code', 'teacher.classroom.copyCode'],
+      ['share-join-code', 'teacher.classroom.share'],
+    ]) {
+      const button = screen.getByTestId(id);
+      expect(button).toHaveAttribute('aria-label', expect.stringContaining(key));
+      expect(button).toHaveAttribute('title', expect.stringContaining(key));
     }
   });
 });

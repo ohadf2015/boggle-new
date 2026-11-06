@@ -13,7 +13,7 @@ import {
 import { teacherHostHref } from '@/lib/education/teacherHostHref';
 import { HqProjectorSheet } from '@/components/teacher/hq/HqProjectorSheet';
 import { JoinCodeTile } from '@/components/teacher/hq/JoinCodeTile';
-import { GAME_CARD, OUTLINE_BUTTON, PRIMARY_BUTTON, STICKER } from './homeStyles';
+import { NB_BLOCK, NB_PANEL, NB_PRIMARY, NB_SMALL } from '../nb/nbStyles';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -56,17 +56,17 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
   const code = showCode ? (selected?.join_code?.trim() ?? '') : '';
 
   return (
-    <section data-testid="home-hero" aria-labelledby="home-hero-title" className={cn(GAME_CARD, 'relative mt-3 bg-neo-navy-elevated @container/hero [@media(max-height:820px)]:mt-0')}>
+    <section data-testid="home-hero" aria-labelledby="home-hero-title" className={cn(NB_PANEL, NB_BLOCK.pink, 'relative @container/hero')}>
       <div
         data-testid="home-hero-grid"
         className="grid gap-3 p-3 sm:gap-4 sm:p-5 @3xl/hero:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] @3xl/hero:grid-rows-[auto_1fr] @3xl/hero:gap-x-6 [@media(max-height:820px)]:gap-2.5 [@media(max-height:820px)]:p-3.5"
       >
         <div className="flex min-w-0 flex-col gap-1 sm:gap-1.5 @3xl/hero:col-start-1 @3xl/hero:row-start-1">
-          <div className="flex flex-wrap items-center justify-end gap-x-3">
-            <span data-accent-decor className={cn(STICKER, 'absolute -top-4 start-4 bg-neo-cyan sm:start-5 [@media(max-height:820px)]:-top-3')}>{t('eduShell.home.startWith')}</span>
+          <div className="flex flex-wrap items-center justify-between gap-x-3">
+            <span className="whitespace-nowrap font-neo-body text-sm font-black text-white/85">{t('eduShell.home.startWith')}</span>
             {corner}
           </div>
-          <h2 id="home-hero-title" className="min-w-0 font-neo-display text-2xl font-black leading-tight text-neo-cream sm:text-3xl [@media(max-height:820px)]:text-2xl">
+          <h2 id="home-hero-title" className="min-w-0 font-neo-display text-3xl font-black leading-tight text-white sm:text-4xl [@media(max-height:820px)]:text-3xl">
             <ClassPicker classrooms={classrooms} selected={selected} onSelect={onSelect} capLabel={capLabel} t={t} />
           </h2>
           {meta}
@@ -79,9 +79,9 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
         ) : code ? (
           <div
             data-testid="home-desk-code-panel"
-            className="flex flex-wrap items-center gap-x-2 gap-y-1.5 rounded-neo border-[3px] border-neo-cream/40 bg-neo-navy p-2.5 sm:gap-x-3 sm:p-3 @3xl/hero:col-start-2 @3xl/hero:row-span-2 @3xl/hero:row-start-1 @3xl/hero:self-center"
+            className="flex flex-wrap items-center gap-x-2 gap-y-2 rounded-neo-lg border-[3px] border-neo-black bg-neo-yellow p-2.5 text-neo-black shadow-hard-lg sm:gap-x-3 sm:p-3.5 @3xl/hero:col-start-2 @3xl/hero:row-span-2 @3xl/hero:row-start-1 @3xl/hero:self-center"
           >
-            <span className="w-full font-neo-body text-xs font-bold text-neo-cream/70 max-sm:sr-only">{t('academy.hq.classCode')}</span>
+            <span className="w-full font-neo-body text-xs font-black uppercase tracking-wide text-neo-black/75 max-sm:sr-only">{t('academy.hq.classCode')}</span>
             <p data-testid="home-desk-code" className="flex gap-1 sm:gap-1.5" dir="ltr">
               <span className="sr-only">{code}</span>
               {Array.from(code).map((ch, i, all) => (
@@ -91,7 +91,7 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
                   index={i}
                   count={all.length}
                   data-testid="home-desk-code-tile"
-                  className="size-9 rounded-neo border-[3px] border-neo-black bg-neo-cream font-neo-display text-lg font-black uppercase text-neo-black shadow-hard sm:size-12 sm:text-2xl [@media(max-height:820px)]:size-9 [@media(max-height:820px)]:text-lg"
+                  className="size-9 rounded-neo border-[3px] border-neo-black bg-neo-cream font-neo-display text-xl font-black uppercase text-neo-black shadow-hard sm:size-12 sm:text-2xl [@media(max-height:820px)]:sm:size-10 [@media(max-height:820px)]:text-xl"
                 />
               ))}
             </p>
@@ -101,7 +101,7 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
               onClick={() => setProjectorOpen(true)}
               aria-label={t('eduShell.home.showCodeFor', { name: selected?.name ?? '' })}
               title={t('academy.hq.openProjector')}
-              className={cn(OUTLINE_BUTTON, 'max-sm:min-w-11 max-sm:px-0')}
+              className={cn(NB_SMALL, NB_BLOCK.navy, 'max-sm:min-w-11 max-sm:px-0')}
             >
               <Projector className="size-5" aria-hidden="true" />
               <span className="max-sm:hidden">{t('academy.hq.openProjector')}</span>
@@ -122,13 +122,13 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
               setPending(true);
               onStart?.();
             }}
-            className={cn(PRIMARY_BUTTON, 'group animate-edu-shine w-full whitespace-nowrap sm:w-auto sm:min-w-[16rem] @3xl/hero:w-full')}
+            className={cn(NB_PRIMARY, 'group animate-edu-shine min-h-[60px] w-full whitespace-nowrap text-2xl sm:w-auto sm:min-w-[16rem] @3xl/hero:w-full')}
           >
             <span aria-hidden="true" className="edu-shine-track" />
             {pending ? (
               <Loader2 className="size-5 animate-spin motion-reduce:animate-none" aria-hidden="true" />
             ) : (
-              <Play className="edu-wiggle-on-hover size-5 fill-current" aria-hidden="true" />
+              <Play className="edu-wiggle-on-hover size-6 fill-current" aria-hidden="true" />
             )}
             {t('eduShell.home.startLive')}
           </Link>

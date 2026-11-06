@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 vi.mock('@/components/teacher/home/RehearseWithBotsButton', () => ({
   RehearseWithBotsButton: ({ classroomId, source }: { classroomId?: string; source: string }) => (
@@ -54,8 +55,10 @@ import ClassroomManager from '../ClassroomManager';
 describe('ClassroomManager — rehearse from the class card', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('Given a class, Then its card offers a rehearsal for that class', () => {
+  it('Given a class, Then its menu offers a rehearsal for that class', async () => {
+    const user = userEvent.setup();
     render(<ClassroomManager />);
+    await user.click(screen.getByTestId('classroom-card-menu'));
     const rehearse = screen.getByTestId('rehearse-with-bots');
     expect(rehearse).toHaveAttribute('data-classroom', 'cls-1');
     expect(rehearse).toHaveAttribute('data-source', 'class');

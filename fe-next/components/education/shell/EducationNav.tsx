@@ -59,19 +59,20 @@ export interface EducationNavProps {
 const FOCUS =
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy';
 
-function tabClasses(active: boolean) {
+function tabClasses(active: boolean, chunky = false) {
   return cn(
     'relative z-10 flex min-h-[56px] flex-col items-center justify-center gap-1 rounded-neo px-1 pb-1 pt-1.5',
     'font-neo-display text-xs font-bold transition-[color,transform] duration-150 ease-out active:scale-[0.97]',
     FOCUS,
     active ? 'text-neo-cream' : 'text-neo-cream/70 [@media(hover:hover)]:hover:text-neo-cream',
+    chunky && active && '[&>svg]:text-neo-black',
   );
 }
 
 // Survives the shell remount on every tab tap, so the pill can slide from where it was.
 let lastTabIndex: number | null = null;
 
-function TabIndicator({ index, count }: { index: number; count: number }) {
+function TabIndicator({ index, count, chunky = false }: { index: number; count: number; chunky?: boolean }) {
   const [shown, setShown] = useState(() => lastTabIndex ?? index);
   useEffect(() => {
     lastTabIndex = index;
@@ -91,20 +92,29 @@ function TabIndicator({ index, count }: { index: number; count: number }) {
     >
       <span
         data-testid="education-tab-indicator"
-        className="h-8 w-14 rounded-full border-[2px] border-neo-cream/40 bg-neo-navy-light"
+        className={cn(
+          'h-8 w-14 rounded-full border-[2px]',
+          // Teacher tabs: a chunky cream pill with a black outline and hard shadow. Never lime:
+          // lime belongs to the page's one main button.
+          chunky ? 'border-neo-black bg-neo-cream shadow-hard' : 'border-neo-cream/40 bg-neo-navy-light',
+        )}
       />
     </div>
   );
 }
 
-function sideClasses(active: boolean) {
+function sideClasses(active: boolean, chunky = false) {
   return cn(
     'flex min-h-[44px] w-full items-center gap-3 rounded-neo px-3 py-2 font-neo-display text-[15px] font-bold',
     'transition-[colors,transform] duration-150 active:scale-[0.97]',
     FOCUS,
-    active
-      ? 'border-[2px] border-transparent border-s-[3px] border-s-neo-lime bg-neo-navy-light text-neo-cream'
-      : 'border-[2px] border-transparent text-neo-cream hover:bg-neo-navy-light',
+    chunky
+      ? active
+        ? 'border-[3px] border-neo-black bg-neo-cream text-neo-black shadow-hard-lg'
+        : 'border-[3px] border-transparent text-neo-cream hover:border-neo-cream/50 hover:bg-neo-navy-light hover:shadow-hard-lg'
+      : active
+        ? 'border-[2px] border-transparent border-s-[3px] border-s-neo-lime bg-neo-navy-light text-neo-cream'
+        : 'border-[2px] border-transparent text-neo-cream hover:bg-neo-navy-light',
   );
 }
 
@@ -113,11 +123,13 @@ function NavLink({
   active,
   variant,
   t,
+  chunky = false,
 }: {
   item: EducationNavItem;
   active: boolean;
   variant: 'tabs' | 'sidebar';
   t: EducationNavProps['t'];
+  chunky?: boolean;
 }) {
   const Icon = ICONS[item.icon];
   return (
@@ -125,7 +137,7 @@ function NavLink({
       href={item.href}
       data-testid={`education-${variant === 'tabs' ? 'tab' : 'side'}-${item.key}`}
       aria-current={active ? 'page' : undefined}
-      className={`${variant === 'tabs' ? tabClasses(active) : sideClasses(active)} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}
+      className={`${variant === 'tabs' ? tabClasses(active, chunky) : sideClasses(active, chunky)} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}
     >
       <Icon
         className={cn(
@@ -147,8 +159,10 @@ function NavLink({
 }
 
 export function EducationNav({ nav, t, variant, brand, account, plan, className }: EducationNavProps) {
+  // The teacher area gets the chunky game look; students keep their own nav unchanged.
+  const chunky = nav.kind === 'teacher';
   const links = nav.items.map((item) => (
-    <NavLink key={item.key} item={item} active={item.key === nav.activeKey} variant={variant} t={t} />
+    <NavLink key={item.key} item={item} active={item.key === nav.activeKey} variant={variant} t={t} chunky={chunky} />
   ));
 
   if (variant === 'sidebar') {
@@ -220,7 +234,7 @@ export function EducationNav({ nav, t, variant, brand, account, plan, className 
         className,
       )}
     >
-      {activeIndex >= 0 ? <TabIndicator index={activeIndex} count={nav.items.length} /> : null}
+      {activeIndex >= 0 ? <TabIndicator index={activeIndex} count={nav.items.length} chunky={chunky} /> : null}
       {links}
     </nav>
   );

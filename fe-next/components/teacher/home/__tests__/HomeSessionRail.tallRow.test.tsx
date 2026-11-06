@@ -62,15 +62,15 @@ describe('HomeSessionRail on a tall screen', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it('Given a phone-width rail, Then the sessions stack as full-width rows instead of a sideways strip that clips the next card', () => {
+  it('Given a phone-width rail, Then the three sessions sit as one row of tiles, never a sideways strip that clips the next card', () => {
     renderRail();
     const list = screen.getAllByRole('list')[0];
     expect(list.className).not.toMatch(/overflow-x-auto|snap-x/);
-    expect(list.className).toMatch(/(^|\s)flex-col(\s|$)/);
-    expect(list.className).toMatch(/@2xl:grid-cols-3/);
+    expect(list.className).toMatch(/(^|\s)grid-cols-3(\s|$)/);
     for (const card of screen.getAllByTestId('home-session-card')) {
       expect(card.className).not.toMatch(/w-\[min\(/);
-      expect(card.className).toMatch(/@2xl:flex-col/);
+      expect(card.className).toMatch(/(^|\s)min-w-0(\s|$)/);
+      expect(card.className).toMatch(/(^|\s)flex-col(\s|$)/);
     }
   });
 });

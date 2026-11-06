@@ -187,8 +187,9 @@ describe('Teacher Home', () => {
     expect(screen.queryByTestId('home-pro-card')).not.toBeInTheDocument();
   });
 
-  it('Given the setup nudge is showing, Then no Pro card or usage card stacks beside it', () => {
-    activation = { ...activation, progress: { inviteCopied: true, liveStarted: false, roomOpened: false, dismissed: false } };
+  it('Given the onboarding guide is showing, Then no Pro card or usage card stacks beside it', () => {
+    classroomsState = { classrooms: [], isLoading: false, error: null, refresh: vi.fn() };
+    activation = { ...activation, progress: { inviteCopied: false, liveStarted: false, roomOpened: false, dismissed: false } };
     week = { status: 'ready', summary: { gamesPlayed: 0, totalStudents: 0, activeClasses: 0, lastPlayedAt: {} } };
     render(<TeacherDashboard proOffer={{ kind: 'upgrade', onDismiss: vi.fn(), tracked: true }} usagePrompt={<div data-testid="usage-card" />} />);
     expect(screen.getByTestId('home-onboarding')).toBeInTheDocument();
@@ -295,24 +296,13 @@ describe('Teacher Home', () => {
     expect(screen.getByTestId('home-pro-card').querySelector('.blur-\\[3px\\]')).toBeNull();
   });
 
-  it('Given setup half done, Then the compact card is one slim row with no progress sentence or step blurbs', () => {
+  it('Given setup half done, Then no setup strip stacks on the class: the hero and the practice card carry the next step', () => {
     activation = { ...activation, progress: { inviteCopied: false, liveStarted: false, roomOpened: false, dismissed: false } };
     week = { status: 'ready', summary: { gamesPlayed: 0, totalStudents: 0, activeClasses: 0, lastPlayedAt: {} } };
     render(<TeacherDashboard />);
-    const card = screen.getByTestId('home-onboarding');
-    expect(card).not.toHaveTextContent('eduShell.onboarding.progress');
-    expect(card).not.toHaveTextContent(/eduShell\.onboarding\.steps\.\w+\.body/);
-    expect(within(card).getAllByTestId(/^home-onboarding-step-/)).toHaveLength(3);
-    expect(within(card).getByTestId('home-onboarding-cta')).toBeInTheDocument();
-  });
-
-  it('Given setup half done, Then the next step rides inside the hero, never a row of its own', () => {
-    activation = { ...activation, progress: { inviteCopied: false, liveStarted: false, roomOpened: false, dismissed: false } };
-    week = { status: 'ready', summary: { gamesPlayed: 0, totalStudents: 0, activeClasses: 0, lastPlayedAt: {} } };
-    render(<TeacherDashboard />);
-    const card = screen.getByTestId('home-onboarding');
-    expect(card.closest('[data-testid="home-hero"]')).not.toBeNull();
-    expect(card).toHaveTextContent('eduShell.onboarding.steps.tryDemo.title');
+    expect(screen.queryByTestId('home-onboarding')).toBeNull();
+    expect(screen.getByTestId('home-start-live')).toBeInTheDocument();
+    expect(screen.getByTestId('home-practice-card')).toBeInTheDocument();
   });
 
   it('Given a class that already played but the activation flag never landed, Then no setup nudge shows', () => {

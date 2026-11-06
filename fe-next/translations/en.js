@@ -20719,13 +20719,17 @@ const en = {
         "thenLive": "Press Go live when most of the class has practiced.",
         "startShort": "Start"
       },
+      "practice": {
+        "title": "Try it yourself first",
+        "body": "Play a quick round against bots and see what your class will see. Only you see it."
+      },
       "greetMorning": "Good morning, {name}",
       "greetAfternoon": "Good afternoon, {name}",
       "greetEvening": "Good evening, {name}",
       "greetNoName": "Welcome back",
       "startWith": "Start a game with",
       "switchClass": "Choose a class",
-      "startLive": "Pick a game",
+      "startLive": "Start a game",
       "yourClasses": "Your classes",
       "newClass": "New class",
       "colClass": "Class",

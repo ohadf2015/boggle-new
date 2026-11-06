@@ -127,7 +127,7 @@ describe('<EducationNav>', () => {
     expect(bar.className).not.toMatch(/border-neo(\s|$)/);
   });
 
-  it('marks the active tab with cream text on a neutral pill, never lime', () => {
+  it('marks the active teacher tab with a chunky cream pill behind a black icon, never lime', () => {
     const { getByTestId } = render(<EducationNav nav={nav} t={t} variant="tabs" />);
     const active = getByTestId('education-tab-home');
     const inactive = getByTestId('education-tab-reports');
@@ -137,8 +137,11 @@ describe('<EducationNav>', () => {
     expect(active.className).not.toMatch(/neo-lime/);
 
     const pill = getByTestId('education-tab-indicator');
-    expect(pill.className).toContain('bg-neo-navy-light');
+    expect(pill.className).toContain('bg-neo-cream');
+    expect(pill.className).toContain('border-neo-black');
+    expect(pill.className).toContain('shadow-hard');
     expect(pill.className).not.toMatch(/neo-lime/);
+    expect(active.className).toContain('[&>svg]:text-neo-black');
 
     expect(inactive.getAttribute('aria-current')).toBeNull();
     // One dock, not four boxed buttons.
@@ -212,14 +215,14 @@ describe('EducationNav — the lg handover', () => {
     expect(getByTestId('education-tabbar').className).toContain('lg:hidden');
   });
 
-  it('marks the active sidebar item with cream text, a neutral fill and a thin lime start bar that mirrors in RTL', () => {
+  it('marks the active teacher sidebar item as a chunky cream block with black ink, never lime', () => {
     const { getByTestId } = render(<EducationNav nav={nav} t={t} variant="sidebar" />);
     const active = getByTestId('education-side-home');
     expect(active.getAttribute('aria-current')).toBe('page');
-    expect(active.className).toContain('text-neo-cream');
-    expect(active.className).toContain('bg-neo-navy-light');
-    expect(active.className).toContain('border-s-neo-lime');
-    expect(active.className).not.toMatch(/(^|\s)(text|bg)-neo-lime/);
+    expect(active.className).toContain('bg-neo-cream');
+    expect(active.className).toContain('text-neo-black');
+    expect(active.className).toContain('border-neo-black');
+    expect(active.className).not.toMatch(/neo-lime/);
     expect(active.className).not.toMatch(/border-(l|r)-/);
   });
 
@@ -323,10 +326,10 @@ describe('EducationNav color lock: the page primary CTA is the only lime fill on
     }
   });
 
-  it('keeps lime to one thin start-side bar on the active sidebar item', () => {
+  it('keeps lime out of the teacher sidebar entirely, active item included', () => {
     const nav = resolveEducationNav('/en/teacher/reports')!;
     const { container } = render(<EducationNav nav={nav} t={t} variant="sidebar" plan="free" />);
     const lime = [...container.querySelectorAll('*')].filter((el) => /neo-lime/.test(el.getAttribute('class') ?? ''));
-    expect(lime.map((el) => el.getAttribute('data-testid'))).toEqual(['education-side-reports']);
+    expect(lime).toEqual([]);
   });
 });

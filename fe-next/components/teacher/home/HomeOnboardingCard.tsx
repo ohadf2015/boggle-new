@@ -12,7 +12,8 @@ import {
   type HomeOnboardingStepId,
 } from '@/lib/education/homeOnboarding';
 import type { TrialChecklistState, TrialChecklistStepId } from '@/lib/education/trialChecklistProgress';
-import { PANEL, PRIMARY_BUTTON, SECONDARY_BUTTON } from './homeStyles';
+import { SECONDARY_BUTTON } from './homeStyles';
+import { NB_BLOCK, NB_PANEL, NB_PRIMARY } from '../nb/nbStyles';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -159,7 +160,7 @@ export function HomeOnboardingCard(props: HomeOnboardingCardProps) {
       data-testid="home-onboarding"
       data-source={step.source}
       aria-labelledby="home-onboarding-title"
-      className={cn(PANEL, 'relative overflow-hidden p-4 sm:grid sm:grid-cols-[minmax(0,1fr)_12rem] sm:items-center sm:gap-6 sm:p-6')}
+      className={cn(NB_PANEL, NB_BLOCK.purple, 'relative overflow-hidden p-4 sm:grid sm:grid-cols-[minmax(0,1fr)_14rem] sm:items-center sm:gap-6 sm:p-6 lg:grid-cols-[minmax(0,1fr)_18rem] lg:p-8')}
     >
       {copy.onDismiss ? (
         <button type="button" data-testid="home-onboarding-dismiss" onClick={copy.onDismiss} aria-label={dismissLabel} className={cn(DISMISS, 'absolute end-2 top-2')}>
@@ -168,12 +169,12 @@ export function HomeOnboardingCard(props: HomeOnboardingCardProps) {
       ) : null}
       <div className="flex min-w-0 flex-col gap-4">
         <div className="flex items-center gap-3">
-          <EduMascot moment="firstClass" size={56} className="size-14 shrink-0 sm:hidden" />
+          <EduMascot moment="firstClass" size={72} className="size-[72px] shrink-0 drop-shadow-[3px_3px_0_rgb(var(--neo-black))] sm:hidden" />
           <div className="min-w-0 pe-10">
-            <h2 id="home-onboarding-title" className="font-neo-display text-2xl font-black leading-tight text-neo-cream sm:text-3xl">
+            <h2 id="home-onboarding-title" className="font-neo-display text-3xl font-black leading-tight text-white sm:text-4xl lg:text-5xl">
               {copy.heading}
             </h2>
-            <p className="mt-1 font-neo-body text-sm text-neo-cream/80">{progress}</p>
+            <p className="mt-1 font-neo-body text-sm font-bold text-white/85">{progress}</p>
           </div>
         </div>
 
@@ -185,32 +186,32 @@ export function HomeOnboardingCard(props: HomeOnboardingCardProps) {
               data-status={s.done ? 'done' : s.current ? 'current' : 'todo'}
               aria-current={s.current ? 'step' : undefined}
               className={cn(
-                'flex min-h-[44px] items-center gap-2 rounded-full border-[2px] py-1 pe-3 ps-1',
-                s.current ? 'border-neo-lime bg-neo-lime/10' : 'border-neo-cream/20',
+                'flex min-h-[44px] items-center gap-2 rounded-neo-pill border-[3px] border-neo-black py-1 pe-3 ps-1 shadow-hard-lg',
+                s.current ? 'bg-neo-yellow text-neo-black' : 'bg-neo-navy-light text-neo-cream',
               )}
             >
               <span
                 aria-hidden="true"
                 className={cn(
-                  'grid size-7 shrink-0 place-items-center rounded-full border-[2px] font-neo-display text-xs font-black',
-                  s.done ? 'border-neo-black bg-neo-lime text-neo-black' : 'border-neo-cream/60 text-neo-cream',
+                  'grid size-7 shrink-0 place-items-center rounded-full border-[2px] border-neo-black font-neo-display text-xs font-black',
+                  s.done ? 'bg-neo-lime text-neo-black' : 'bg-neo-cream text-neo-black',
                 )}
               >
                 {s.done ? <Check className="size-4" strokeWidth={3} /> : i + 1}
               </span>
-              <span className={cn('font-neo-body text-sm font-bold', s.done ? 'text-neo-cream/60 line-through' : 'text-neo-cream')}>{s.title}</span>
+              <span className={cn('font-neo-body text-sm font-black', s.done && 'line-through opacity-60')}>{s.title}</span>
             </li>
           ))}
         </ol>
 
-        {copy.body ? <p className="font-neo-body text-sm text-neo-cream/80">{copy.body}</p> : null}
+        {copy.body ? <p className="font-neo-body text-base font-semibold text-white/90">{copy.body}</p> : null}
 
-        <Link href={copy.href} data-testid="home-onboarding-cta" onClick={copy.onClick} className={cn(PRIMARY_BUTTON, 'w-full sm:w-auto sm:self-start')}>
+        <Link href={copy.href} data-testid="home-onboarding-cta" onClick={copy.onClick} className={cn(NB_PRIMARY, 'min-h-[60px] w-full text-2xl sm:w-auto sm:self-start sm:px-8')}>
           {copy.cta}
         </Link>
         {secondary}
       </div>
-      <EduMascot moment="firstClass" size={192} className="mx-auto hidden size-48 sm:block" />
+      <EduMascot moment="firstClass" size={288} className="mx-auto hidden size-52 drop-shadow-[5px_5px_0_rgb(var(--neo-black))] sm:block lg:size-72" />
     </section>
   );
 }

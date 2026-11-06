@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 vi.mock('react-hot-toast', () => ({ default: { success: vi.fn(), error: vi.fn() } }));
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -69,20 +69,12 @@ describe('ClassroomManager: every class count fits the screen', () => {
     Element.prototype.scrollIntoView = vi.fn();
   });
 
-  it('given several classes on a phone, then the free-class meter and the class switcher share one row above the cards', () => {
+  it('given several classes on a phone, then the free-class meter sits above one grid of cards with no switcher', () => {
     render(<ClassroomManager />);
-    const bar = screen.getByTestId('class-carousel-bar');
-    expect(bar).toContainElement(screen.getByTestId('class-cap-meter'));
-    expect(bar).toContainElement(screen.getByTestId('class-carousel-nav'));
-    expect(bar.compareDocumentPosition(screen.getByTestId('class-carousel-track')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-  });
-
-  it('given the switcher, then its arrows are outlined and its "2 of 3" reads in normal case, so Pick a game stays the one lime fill', () => {
-    render(<ClassroomManager />);
-    const nav = screen.getByTestId('class-carousel-nav');
-    for (const el of [nav, ...nav.querySelectorAll('[class]')]) expect(tokens(el).filter((c) => LOUD.test(c))).toEqual([]);
-    expect(nav.innerHTML).not.toMatch(/\buppercase\b/);
-    expect(screen.getByTestId('class-carousel-prev')).toHaveAttribute('aria-label');
+    const grid = screen.getByTestId('classroom-grid');
+    expect(screen.getByTestId('class-cap-meter').compareDocumentPosition(grid) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.queryByTestId('class-carousel-nav')).toBeNull();
+    expect(screen.queryByTestId('class-carousel-bar')).toBeNull();
   });
 
   it('given the free cap is reached, then the meter is a calm line with an outlined Pro link, no yellow fills', () => {

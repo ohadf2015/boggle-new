@@ -22,6 +22,7 @@ import { HomeClassRoster } from './home/HomeClassRoster';
 import { WeeklyProgressDigestCard } from './digest/WeeklyProgressDigestCard';
 import { WeeklyEmailReport } from './digest/WeeklyEmailReport';
 import { HomeProCard, type HomeProOfferKind } from './home/HomeProCard';
+import { HomePracticeCard } from './home/HomePracticeCard';
 import { HomeOnboardingCard } from './home/HomeOnboardingCard';
 import { RehearseWithBotsButton } from './home/RehearseWithBotsButton';
 import { HomeSessionRail } from './home/HomeSessionRail';
@@ -219,7 +220,8 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
   const trialCard = { checklist: trial.checklist, hrefs: trialHrefs, onDismiss: trial.dismiss, onOpenAssignment: () => setShowAssignmentCreator(true) };
   const nextStep = homeNextStep({ onboarding, trial: trial.checklist, shareCardShown });
   const nextStepShown = ready && !classroomsError && nextStep !== null && (!hasClasses || week.status !== 'loading');
-  const onboardingCardShown = nextStepShown && nextStep?.source === 'onboarding';
+  // With classes, Home's one Start button replaces the old "next step" strip; the full guide only shows before the first class.
+  const onboardingCardShown = nextStepShown && nextStep?.source === 'onboarding' && !hasClasses;
   // One ask per screen: the rail Pro card waits until onboarding is known, and yields to it and to account state.
   const askSettled = ready && !classroomsError && (!hasClasses || week.status !== 'loading');
   const railAsk = pickHomeAsk({
@@ -297,7 +299,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
               onSelect={setSelectedId}
               language={language}
               t={t}
-              rehearse={<RehearseWithBotsButton classroomId={effectiveId || undefined} source="hq" language={language} t={t} />}
+              rehearse={<RehearseWithBotsButton classroomId={effectiveId || undefined} source="hq" language={language} t={t} className="lg:hidden" />}
               corner={<HomeNewClass href={newClassHref} count={classrooms.length} limit={null} t={t} />}
               capLabel={!proLoading && !hasPro ? t('eduShell.setup.capMeter', { count: classrooms.length, limit: FREE_TIER_LIMITS.classes }) : undefined}
               meta={selectedClassroom ? (
@@ -314,11 +316,6 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
               ) : null}
               showCode={!shareCardShown}
               codeSlot={selectedClassroom && shareCardShown ? <HomeGetStudentsIn classroom={selectedClassroom} /> : undefined}
-              nudge={
-                nextStepShown ? (
-                  <HomeOnboardingCard onboarding={onboarding} hrefs={onboardingHrefs} trial={trialCard} shareCardShown={shareCardShown} onStepStart={onOnboardingStep} onDismiss={activation.dismiss} variant="compact" t={t} />
-                ) : undefined
-              }
             />
           </div>
           {rosterShown && selectedClassroom ? (
@@ -354,6 +351,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
       } : null}
       onOpenReports={selectedClassroom ? () => setReportsOpen(true) : null}
       proCard={proCard}
+      practice={<HomePracticeCard t={t} action={<RehearseWithBotsButton classroomId={effectiveId || undefined} source="hq" language={language} t={t} className="[&_button]:text-neo-black" />} />}
     >
       {selectedClassroom ? (
         <Dialog open={reportsOpen} onOpenChange={setReportsOpen}>
