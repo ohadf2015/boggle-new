@@ -39,9 +39,7 @@ function ClassesTitle() {
   );
 }
 
-/** Calm canvas, same recipe as Teacher HQ: flat navy with a whisper of light
- *  from the top — no full-bleed illustration behind a working deck. Dark-only
- *  surface (pitfall class 5). */
+/** Dark-only surface (pitfall class 5); the shell paints the arcade backdrop. */
 function ClassesShell({ children }: { children: React.ReactNode }) {
   const { t } = useLanguage();
   return (
@@ -50,11 +48,6 @@ function ClassesShell({ children }: { children: React.ReactNode }) {
       scrollRegionLabel={t('teacher.nav.classes')}
       contentClassName="relative p-4 sm:p-6 lg:px-8 lg:py-5 [@media(orientation:landscape)_and_(max-height:500px)]:px-3 [@media(orientation:landscape)_and_(max-height:500px)]:py-2"
     >
-      <div
-        data-testid="calm-canvas-tint"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_70%_at_50%_0%,rgba(255,254,240,0.05),transparent_60%)]"
-        aria-hidden="true"
-      />
       {children}
     </EducationShell>
   );

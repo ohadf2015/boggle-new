@@ -6,6 +6,8 @@
  */
 'use client';
 
+import { GAME_CARD, STICKER } from '@/components/teacher/home/homeStyles';
+import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Loader2 } from 'lucide-react';
@@ -110,13 +112,13 @@ export function WeeklyProgressDigestCard({
     <section
       data-testid="weekly-progress-digest"
       aria-label={t('teacher.digest.weeklyRegionLabel', { classroom: classroomName })}
-      className="@container space-y-3"
+      className={cn(GAME_CARD, "@container space-y-3 p-4")}
     >
       <header>
-        <h2 className="font-neo-display text-lg font-bold text-neo-white">
+        <h2 data-accent-decor className={cn(STICKER, "bg-neo-cyan text-base")}>
           {t('teacher.digest.weeklyTitle')}
         </h2>
-        <p className="mt-1 text-sm font-bold text-neo-cream/75">{t('teacher.digest.weeklySubtitle')}</p>
+        <p className="mt-2 text-sm font-bold text-neo-cream/75">{t('teacher.digest.weeklySubtitle')}</p>
       </header>
 
       {isLoading ? (

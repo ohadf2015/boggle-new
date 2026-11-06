@@ -15,6 +15,8 @@ import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
 import { teacherTrialStatus } from '@/lib/education/trial';
 import { TrialStripRecap } from '@/components/teacher/TrialStripRecap';
 import { ProFeaturePreview } from '@/components/teacher/pro/ProFeaturePreview';
+import { EduMascot } from '@/components/education/EduMascot';
+import { GAME_CARD } from '@/components/teacher/home/homeStyles';
 import { rememberCheckoutOrigin } from '@/lib/education/checkoutReturn';
 import { PRO_COPY_PARAMS } from '@/lib/education/proFeatures';
 import {
@@ -91,14 +93,15 @@ interface ProGateProps {
   ctaKey?: string;
   /** Offer a never-trialed teacher the Polar trial instead of the paid checkout. */
   polarTrialPlacement?: TrialCtaSource;
-  /** `calm`: neutral lock with one lime CTA and a small PRO badge, for pages on the calm teacher style. */
-  tone?: 'default' | 'calm';
+  /** `calm`: neutral lock with one lime CTA and a small PRO badge. `arcade`: the same copy and CTA as a game card with the mascot. */
+  tone?: 'default' | 'calm' | 'arcade';
 }
 
 const OpenGate = createContext(false);
 
 export function ProGate({ feature, children, active = true, whileChecking = null, lockedTitle = null, ctaKey = 'teacher.proGate.cta', polarTrialPlacement, tone = 'default' }: ProGateProps) {
-  const calm = tone === 'calm';
+  const arcade = tone === 'arcade';
+  const calm = tone !== 'default';
   const insideOpenGate = useContext(OpenGate);
   const { t, language } = useLanguage();
   const { hasPro, loading, accessTrialExpires, accessTrialEnded, known, status, source, trialUsed } = useTeacherPro();
@@ -177,17 +180,29 @@ export function ProGate({ feature, children, active = true, whileChecking = null
   return (
     <>
     {lockedTitle}
-    <div data-testid="pro-gate-lock" className={cn('rounded-neo p-4 sm:p-5', calm ? 'border-2 border-neo-cream/40 bg-neo-navy-light' : 'border-neo border-neo-lime bg-neo-navy-light shadow-hard')}>
+    <div
+      data-testid="pro-gate-lock"
+      className={cn(
+        arcade ? cn(GAME_CARD, 'p-4 sm:p-6') : 'rounded-neo p-4 sm:p-5',
+        !arcade && (calm ? 'border-2 border-neo-cream/40 bg-neo-navy-light' : 'border-neo border-neo-lime bg-neo-navy-light shadow-hard'),
+      )}
+    >
       <div className="grid items-center gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:gap-6">
         {/* Sample data, never the teacher's own rows: a free browser must not receive what the gate sells. */}
-        <div data-testid="pro-gate-preview" aria-hidden="true" className="pointer-events-none select-none">
-          <ProFeaturePreview feature={feature} calm={calm} />
+        <div data-testid="pro-gate-preview" aria-hidden="true" className={cn('pointer-events-none relative select-none', arcade && 'md:pt-8')}>
+          <ProFeaturePreview feature={feature} calm={calm} arcade={arcade} />
+          {arcade ? (
+            <EduMascot moment="pro" size={112} className="absolute -top-7 left-1/2 size-20 -translate-x-1/2 animate-edu-bob max-md:hidden" />
+          ) : null}
         </div>
         <div className="text-center md:text-start">
           {calm ? (
             <span
               data-testid="pro-gate-pill"
-              className="mb-2 inline-flex items-center gap-1 rounded-neo bg-neo-yellow px-1.5 py-px text-[11px] font-black text-neo-black"
+              className={cn(
+                'mb-2 inline-flex items-center gap-1 rounded-neo bg-neo-yellow text-neo-black',
+                arcade ? 'px-1.5 py-px text-[11px] font-black sm:-rotate-2 sm:border-[3px] sm:border-neo-black sm:px-2.5 sm:py-0.5 sm:font-neo-display sm:text-sm sm:shadow-hard' : 'px-1.5 py-px text-[11px] font-black',
+              )}
             >
               <Crown className="size-3" aria-hidden="true" />
               {t('eduShell.nav.pro')}
@@ -200,7 +215,7 @@ export function ProGate({ feature, children, active = true, whileChecking = null
               {t('teacher.subscription.proPlanName')}
             </span>
           )}
-          <h3 className="mb-2 font-neo-display text-xl font-black text-neo-white">
+          <h3 className={cn('mb-2 font-neo-display font-black text-neo-white', arcade ? 'text-xl sm:text-2xl' : 'text-xl')}>
             {t(`teacher.proGate.${feature}.title`)}
           </h3>
           <p className="mb-4 text-sm font-bold leading-relaxed text-neo-white/80">
@@ -222,6 +237,7 @@ export function ProGate({ feature, children, active = true, whileChecking = null
             className={cn(
               'inline-block rounded-neo border-neo px-6 py-3 font-black text-neo-navy shadow-hard transition-shadow hover:shadow-hard-lg disabled:opacity-60',
               calm ? 'bg-neo-lime' : 'bg-neo-cyan',
+              arcade && 'animate-edu-shine font-neo-display sm:text-lg hover:-translate-y-0.5 motion-reduce:hover:translate-y-0',
             )}
           >
             {offerTrial

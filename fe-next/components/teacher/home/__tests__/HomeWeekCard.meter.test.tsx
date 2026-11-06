@@ -54,3 +54,30 @@ describe('HomeWeekCard markup', () => {
     }
   });
 });
+
+describe('HomeWeekCard as a reward panel', () => {
+  it('Then games is the one big filled tile, the other counts stay small, and the fill holds no controls', () => {
+    render(<HomeWeekCard summary={summary} status="ready" classCount={3} t={t} />);
+    const big = screen.getByTestId('home-week-games').closest('dl > div') as HTMLElement;
+    expect(big.className).toMatch(/(^|\s)bg-neo-(cyan|yellow)(\s|$)/);
+    expect(big.className).toContain('text-neo-black');
+    expect(big.hasAttribute('data-accent-decor')).toBe(true);
+    expect(big.querySelector('a,button')).toBeNull();
+    const small = screen.getByTestId('home-week-students').closest('dl > div') as HTMLElement;
+    expect(small.className).not.toMatch(/(^|\s)bg-neo-(cyan|pink|purple|yellow|orange)(\s|$)/);
+  });
+
+  it('Given 1 of 3 classes played, Then the meter is three segments with the first one striped full', () => {
+    render(<HomeWeekCard summary={summary} status="ready" classCount={3} t={t} />);
+    const segments = screen.getAllByTestId('home-week-active-segment');
+    expect(segments).toHaveLength(3);
+    expect(segments.map((s) => s.dataset.filled)).toEqual(['true', 'false', 'false']);
+    expect(screen.getByTestId('home-week-active-fill').className).toContain('edu-stripes');
+  });
+
+  it('Given more classes than fit as segments, Then the meter falls back to one continuous striped bar', () => {
+    render(<HomeWeekCard summary={{ ...summary, activeClasses: 4 }} status="ready" classCount={30} t={t} />);
+    expect(screen.queryAllByTestId('home-week-active-segment')).toHaveLength(0);
+    expect(screen.getByTestId('home-week-active-fill').className).toContain('edu-stripes');
+  });
+});

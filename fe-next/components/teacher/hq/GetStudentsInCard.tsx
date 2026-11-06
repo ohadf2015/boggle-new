@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
+import { JoinCodeTile } from "./JoinCodeTile";
 import toast from "react-hot-toast";
 import { AnimatePresence, m } from "framer-motion";
 import { Check, Link2, MonitorUp } from "lucide-react";
@@ -151,7 +152,7 @@ export function GetStudentsInCard({
     <section
       data-testid="hq-get-students-in"
       aria-labelledby={headingId}
-      className={cn("@container flex flex-col gap-2.5 rounded-neo border-2 border-neo-cream/35 bg-neo-navy p-2.5 sm:p-3", className)}
+      className={cn("@container flex flex-col gap-2.5 rounded-neo border-[3px] border-neo-black bg-neo-navy p-2.5 sm:p-3", className)}
     >
       <div className="flex items-center justify-between gap-2">
         <h3 id={headingId} className="whitespace-nowrap font-neo-body text-xs font-bold leading-snug text-neo-cream/70">
@@ -176,13 +177,14 @@ export function GetStudentsInCard({
         >
           <span className="sr-only">{classroom.join_code}</span>
           {codeChars.map((ch, i) => (
-            <span
+            <JoinCodeTile
               key={`${ch}-${i}`}
-              aria-hidden="true"
-              className="grid h-11 min-w-0 place-items-center rounded-neo border-2 border-neo-black bg-neo-cream font-neo-display text-xl font-black uppercase text-neo-black shadow-hard-sm @xl:h-14 @xl:text-3xl"
-            >
-              {ch}
-            </span>
+              ch={ch}
+              index={i}
+              count={codeChars.length}
+              data-testid="hq-join-code-tile"
+              className="h-11 w-full min-w-0 rounded-neo border-[3px] border-neo-black bg-neo-cream font-neo-display text-xl font-black uppercase text-neo-black shadow-hard @xl:h-14 @xl:text-3xl"
+            />
           ))}
         </p>
         <div data-testid="hq-join-actions" className="flex gap-2 @xl:w-auto @xl:flex-col">

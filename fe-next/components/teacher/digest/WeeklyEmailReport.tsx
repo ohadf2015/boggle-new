@@ -8,6 +8,7 @@
  */
 'use client';
 
+import { GAME_CARD, STICKER } from '@/components/teacher/home/homeStyles';
 import { useState } from 'react';
 import { Check, Copy, Loader2, Mail } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -98,13 +99,13 @@ export function WeeklyEmailReport({ classroomId, classroomName }: WeeklyEmailRep
     <section
       data-testid="weekly-email-report"
       aria-label={t('teacher.digest.emailReportRegionLabel', { classroom: classroomName })}
-      className="space-y-3"
+      className={cn(GAME_CARD, "space-y-3 p-4")}
     >
       <header>
-        <h2 className="font-neo-display text-lg font-bold text-neo-white">
+        <h2 data-accent-decor className={cn(STICKER, "bg-neo-yellow text-base")}>
           {t('teacher.digest.emailReportTitle')}
         </h2>
-        <p className="mt-1 text-sm font-bold text-neo-cream/75">
+        <p className="mt-2 text-sm font-bold text-neo-cream/75">
           {t('teacher.digest.emailReportSubtitle')}
         </p>
       </header>

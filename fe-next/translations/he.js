@@ -14713,6 +14713,7 @@ const he = {
       },
       "create": "צרו כיתה",
       "createAnother": "צרו כיתה נוספת",
+      "newClassHint": "לכל כיתה קוד הצטרפות משלה.",
       "creating": "יוצרים...",
       "defaultName": "הכיתה שלי",
       "edit": "ערכו כיתה",

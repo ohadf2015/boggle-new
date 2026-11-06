@@ -36,20 +36,54 @@ const filters = { language: 'en', query: '', grade: null, topic: null, source: '
 
 afterEach(cleanup);
 
-describe('Library calm style', () => {
+const ACCENT_FILL = /(^|\s)sm:bg-neo-(cyan|pink|purple|yellow|orange)(\s|$)/;
+const LIME_FILL = /(^|:|\s)bg-neo-lime\b/;
+
+describe('Library game cards', () => {
   it.each([
-    ['verified', { source: 'verified' as const }, 'eduLibrary.badge.verified'],
-    ['teacher', { source: 'teacher' as const, authorName: 'Ms. Rivera', copyCount: 0, playCount: 0 }, 'eduLibrary.badge.byTeacher'],
-  ])('Given a %s list card, Then the only fill is the cream sample word tile, the badge is outlined, and nothing shouts', (_l, patch, badgeKey) => {
+    ['verified', { source: 'verified' as const }, 'eduLibrary.badge.verified', /\bbg-neo-cream\b/],
+    ['teacher', { source: 'teacher' as const, authorName: 'Ms. Rivera', copyCount: 0, playCount: 0 }, 'eduLibrary.badge.byTeacher', /\bborder-neo-cream\b/],
+  ])('Given a %s list card, Then it wears an arcade color band, the sample word is a cream letter tile, and nothing is lime', (_l, patch, badgeKey, badgeLook) => {
     render(<LibraryCard item={{ ...base, ...patch }} index={0} onOpen={vi.fn()} />);
     const card = screen.getByTestId('library-card');
+    expect(within(card).getByTestId('library-card-band').className).toMatch(ACCENT_FILL);
     const tile = within(card).getByTestId('library-card-sample');
     expect(tile).toHaveTextContent('whale');
-    expect(fills(card)).toEqual([tile]);
+    expect(tile.className).toMatch(/\bbg-neo-cream\b/);
+    expect(tile.className).toMatch(/shadow/);
+    expect(Array.from(card.querySelectorAll('[class]')).filter((el) => LIME_FILL.test(el.getAttribute('class') ?? ''))).toEqual([]);
     expect(card.querySelectorAll('.uppercase')).toHaveLength(0);
     const badge = within(card).getByTestId('library-card-badge');
     expect(badge).toHaveTextContent(badgeKey);
-    expect(badge.className).toMatch(/\bborder\b|\bborder-2\b/);
+    expect(badge.className).toMatch(badgeLook);
+  });
+
+  it('Given the same list at two grid positions, Then it keeps one accent color', () => {
+    const band = (index: number) => {
+      const { unmount } = render(<LibraryCard item={{ ...base, id: 'pub-42' }} index={index} onOpen={vi.fn()} />);
+      const cls = screen.getByTestId('library-card-band').className.match(ACCENT_FILL)?.[2];
+      unmount();
+      return cls;
+    };
+    expect(band(0)).toBeDefined();
+    expect(band(7)).toBe(band(0));
+  });
+
+  it('Given a list with more words, Then the next words peek behind the sample tile, hidden from assistive tech', () => {
+    render(<LibraryCard item={{ ...base, words: [{ word: 'whale' }, { word: 'squid' }, { word: 'crab' }] }} index={0} onOpen={vi.fn()} />);
+    const fan = screen.getAllByTestId('library-card-fan-tile');
+    expect(fan.map((el) => el.textContent)).toEqual(['squid', 'crab']);
+    fan.forEach((el) => expect(el.closest('[aria-hidden="true"]')).not.toBeNull());
+  });
+
+  it('Given reduced motion, Then every animation and hover tilt on the card is gated behind motion-safe or reset by motion-reduce', () => {
+    render(<LibraryCard item={base} index={0} onOpen={vi.fn()} />);
+    const classes = Array.from(screen.getByTestId('library-card').querySelectorAll<HTMLElement>('[class]'))
+      .concat(screen.getByTestId('library-card'))
+      .flatMap((el) => (el.getAttribute('class') ?? '').split(/\s+/));
+    expect(classes.filter((c) => /^animate-/.test(c))).toEqual([]);
+    const card = screen.getByTestId('library-card').className;
+    expect(card).toMatch(/motion-reduce:hover:rotate-0/);
   });
 
   it('Given a list card, Then it names the language as text and shows what a tap does', () => {

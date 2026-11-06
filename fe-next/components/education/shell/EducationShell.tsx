@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { useEducationShellLock, EDUCATION_SHELL_LOCK_CLASS } from './useEducationShellLock';
 import { resolveEducationNav } from './navItems';
 import { EducationShellNav } from './EducationShellNav';
+import { ArcadeBackdrop } from './ArcadeBackdrop';
 
 export { EDUCATION_SHELL_LOCK_CLASS };
 
@@ -121,7 +122,8 @@ export function EducationShell({
       <div data-testid="education-shell-body" className="flex min-h-0 min-w-0 flex-1">
         {nav ? <EducationShellNav nav={nav} variant="sidebar" /> : null}
 
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+        <div className={cn('flex min-h-0 min-w-0 flex-1 flex-col', teacherChrome && 'relative isolate')}>
+          {teacherChrome ? <ArcadeBackdrop /> : null}
           {statusRow ? (
             <div data-testid="education-shell-status" className="shrink-0">
               {statusRow}

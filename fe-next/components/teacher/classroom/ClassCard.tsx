@@ -25,7 +25,8 @@ import ClassroomStudentList from '../ClassroomStudentList';
 import { GoogleClassroomRosterImport } from './GoogleClassroomRosterImport';
 import { StudentCapMeter } from '../StudentCapMeter';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
-import { OUTLINE_BUTTON, PRIMARY_BUTTON } from '../home/homeStyles';
+import { GAME_CARD, OUTLINE_BUTTON, PRIMARY_BUTTON } from '../home/homeStyles';
+import { ARCADE_BLOCK, type ArcadeAccent } from '@/lib/education/arcadeAccent';
 import { slideUp } from '../teacherDashboardTabs';
 
 export interface ClassCardData {
@@ -58,9 +59,14 @@ export interface ClassCardProps {
   assignHref?: string;
   reportHref?: string;
   onOpenProjector?: () => void;
+  /** Header band color, so neighbouring classes read as different game pieces. */
+  accent?: ArcadeAccent;
 }
 
 const SMALL_ACTION = cn(OUTLINE_BUTTON, 'min-h-10 min-w-0 whitespace-normal px-2 text-center leading-tight');
+
+const ON_BAND_BUTTON =
+  'inline-flex size-10 min-h-10 items-center justify-center rounded-neo border-2 border-neo-black bg-transparent text-neo-black hover:bg-neo-black/10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-black/40';
 
 const MENU_ITEM =
   'flex min-h-11 w-full items-center gap-2 rounded-neo px-3 text-start font-neo-body text-sm font-bold text-neo-cream hover:bg-neo-cream/10 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cream';
@@ -86,6 +92,7 @@ export function ClassCard({
   assignHref,
   reportHref,
   onOpenProjector,
+  accent = 'cyan',
 }: ClassCardProps) {
   const { t } = useLanguage();
   const { hasPro, loading: proLoading } = useTeacherPro();
@@ -120,18 +127,21 @@ export function ClassCard({
     <m.div
       variants={slideUp}
       data-testid="classroom-card"
-      className="@container relative flex flex-col gap-2.5 rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light p-3 shadow-hard sm:px-4"
+      className={cn('@container relative flex flex-col', GAME_CARD)}
     >
-      <div className="flex items-center gap-2">
+      <div
+        data-testid="classroom-card-band"
+        className={cn('flex items-center gap-2 rounded-t-[9px] border-b-[3px] border-neo-black px-3 py-2 sm:px-4', ARCADE_BLOCK[accent])}
+      >
         <h3
           title={classroom.name}
-          className="min-w-0 flex-1 line-clamp-2 font-neo-display text-lg font-bold leading-tight text-neo-cream @[24rem]:text-xl"
+          className="min-w-0 flex-1 line-clamp-2 font-neo-display text-lg font-black leading-tight text-neo-black @[24rem]:text-xl"
         >
           <bdi>{classroom.name}</bdi>
         </h3>
         <span
           data-testid="classroom-card-language"
-          className="shrink-0 rounded-neo border border-neo-cream/35 px-1.5 py-px font-neo-body text-xs font-bold text-neo-cream/80"
+          className="shrink-0 -rotate-2 rounded-neo border-2 border-neo-black bg-neo-navy px-1.5 py-px font-neo-body text-xs font-bold text-neo-cream shadow-hard-sm"
         >
           {languageKey ? t(languageKey) : classroom.language}
         </span>
@@ -144,7 +154,7 @@ export function ClassCard({
             aria-expanded={menuOpen}
             aria-label={actionsLabel}
             title={actionsLabel}
-            className={cn(OUTLINE_BUTTON, 'size-10 min-h-10 px-0')}
+            className={ON_BAND_BUTTON}
           >
             <MoreHorizontal className="size-5" aria-hidden="true" />
           </button>
@@ -188,6 +198,7 @@ export function ClassCard({
         </div>
       </div>
 
+      <div className="flex flex-1 flex-col gap-2.5 p-3 sm:px-4">
       <section aria-labelledby={`class-code-${classroom.id}`} className="flex flex-col gap-1.5">
         <p
           id={`class-code-${classroom.id}`}
@@ -199,14 +210,24 @@ export function ClassCard({
         <div className="flex items-stretch gap-2">
           <div
             data-testid="join-code-plate"
-            className="flex min-w-0 flex-1 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-cream px-2 py-1.5"
+            className="@container flex min-w-0 flex-1 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-navy px-2 py-2 [background-image:radial-gradient(color-mix(in_srgb,var(--neo-cream)_14%,transparent)_1px,transparent_1px)] [background-size:10px_10px]"
           >
             <code
               data-testid="classroom-join-code"
               dir="ltr"
-              className="block whitespace-nowrap text-center font-neo-display text-3xl font-black tabular-nums tracking-wider text-neo-black @[19rem]:text-4xl"
+              className="flex gap-[0.15em] whitespace-nowrap font-neo-display text-[min(11.5cqw,2.25rem)] font-black tabular-nums text-neo-black [perspective:400px]"
             >
-              {classroom.join_code}
+              {Array.from(classroom.join_code ?? '').map((ch, i) => (
+                <span key={i} className="animate-edu-tile-in" style={{ animationDelay: `${120 + i * 70}ms` }}>
+                  <span
+                    data-testid="join-code-tile"
+                    className="animate-edu-hop grid h-[1.45em] w-[1.15em] place-items-center rounded-[6px] border-2 border-neo-black bg-neo-cream leading-none shadow-hard-sm"
+                    style={{ ['--edu-hop-dur' as string]: '7s', animationDelay: `${1.5 + i * 1.1}s` }}
+                  >
+                    {ch}
+                  </span>
+                </span>
+              ))}
             </code>
           </div>
           {onOpenProjector ? (
@@ -284,6 +305,7 @@ export function ClassCard({
           </div>
         ) : null}
         {rehearse}
+      </div>
       </div>
 
       <Dialog open={expanded} onOpenChange={(open) => { if (open !== expanded) onToggleExpanded(); }}>

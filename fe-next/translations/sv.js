@@ -15167,6 +15167,7 @@ const sv = {
       },
       "create": "Skapa klassrum",
       "createAnother": "Skapa ett annat klassrum",
+      "newClassHint": "Varje klass får en egen anslutningskod.",
       "creating": "Skapar...",
       "defaultName": "Min klass",
       "edit": "Redigera klassrum",

@@ -12,7 +12,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { teacherHostHref } from '@/lib/education/teacherHostHref';
 import { HqProjectorSheet } from '@/components/teacher/hq/HqProjectorSheet';
-import { OUTLINE_BUTTON, PANEL_RAISED, PRIMARY_BUTTON } from './homeStyles';
+import { JoinCodeTile } from '@/components/teacher/hq/JoinCodeTile';
+import { GAME_CARD, OUTLINE_BUTTON, PRIMARY_BUTTON, STICKER } from './homeStyles';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -55,14 +56,14 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
   const code = showCode ? (selected?.join_code?.trim() ?? '') : '';
 
   return (
-    <section data-testid="home-hero" aria-labelledby="home-hero-title" className={cn(PANEL_RAISED, 'relative @container/hero')}>
+    <section data-testid="home-hero" aria-labelledby="home-hero-title" className={cn(GAME_CARD, 'relative mt-3 bg-neo-navy-elevated @container/hero [@media(max-height:820px)]:mt-0')}>
       <div
         data-testid="home-hero-grid"
         className="grid gap-3 p-3 sm:gap-4 sm:p-5 @3xl/hero:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] @3xl/hero:grid-rows-[auto_1fr] @3xl/hero:gap-x-6 [@media(max-height:820px)]:gap-2.5 [@media(max-height:820px)]:p-3.5"
       >
         <div className="flex min-w-0 flex-col gap-1 sm:gap-1.5 @3xl/hero:col-start-1 @3xl/hero:row-start-1">
-          <div className="flex flex-wrap items-center justify-between gap-x-3">
-            <span className="whitespace-nowrap font-neo-body text-sm font-bold text-neo-cream/70">{t('eduShell.home.startWith')}</span>
+          <div className="flex flex-wrap items-center justify-end gap-x-3">
+            <span data-accent-decor className={cn(STICKER, 'absolute -top-4 start-4 bg-neo-cyan sm:start-5 [@media(max-height:820px)]:-top-3')}>{t('eduShell.home.startWith')}</span>
             {corner}
           </div>
           <h2 id="home-hero-title" className="min-w-0 font-neo-display text-2xl font-black leading-tight text-neo-cream sm:text-3xl [@media(max-height:820px)]:text-2xl">
@@ -78,20 +79,20 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
         ) : code ? (
           <div
             data-testid="home-desk-code-panel"
-            className="flex flex-wrap items-center gap-x-2 gap-y-1.5 rounded-neo border-2 border-neo-cream/35 bg-neo-navy p-2.5 sm:gap-x-3 sm:p-3 @3xl/hero:col-start-2 @3xl/hero:row-span-2 @3xl/hero:row-start-1 @3xl/hero:self-center"
+            className="flex flex-wrap items-center gap-x-2 gap-y-1.5 rounded-neo border-[3px] border-neo-black bg-neo-navy p-2.5 sm:gap-x-3 sm:p-3 @3xl/hero:col-start-2 @3xl/hero:row-span-2 @3xl/hero:row-start-1 @3xl/hero:self-center"
           >
             <span className="w-full font-neo-body text-xs font-bold text-neo-cream/70 max-sm:sr-only">{t('academy.hq.classCode')}</span>
             <p data-testid="home-desk-code" className="flex gap-1 sm:gap-1.5" dir="ltr">
               <span className="sr-only">{code}</span>
-              {Array.from(code).map((ch, i) => (
-                <span
+              {Array.from(code).map((ch, i, all) => (
+                <JoinCodeTile
                   key={`${ch}-${i}`}
-                  aria-hidden="true"
+                  ch={ch}
+                  index={i}
+                  count={all.length}
                   data-testid="home-desk-code-tile"
-                  className="grid size-9 place-items-center rounded-neo border-2 border-neo-black bg-neo-cream font-neo-display text-lg font-black uppercase text-neo-black sm:size-11 sm:text-2xl [@media(max-height:820px)]:size-9 [@media(max-height:820px)]:text-lg"
-                >
-                  {ch}
-                </span>
+                  className="size-9 rounded-neo border-[3px] border-neo-black bg-neo-cream font-neo-display text-lg font-black uppercase text-neo-black shadow-hard sm:size-12 sm:text-2xl [@media(max-height:820px)]:size-9 [@media(max-height:820px)]:text-lg"
+                />
               ))}
             </p>
             <button
@@ -121,12 +122,13 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
               setPending(true);
               onStart?.();
             }}
-            className={cn(PRIMARY_BUTTON, 'w-full whitespace-nowrap sm:w-auto sm:min-w-[16rem] @3xl/hero:w-full')}
+            className={cn(PRIMARY_BUTTON, 'group animate-edu-shine w-full whitespace-nowrap sm:w-auto sm:min-w-[16rem] @3xl/hero:w-full')}
           >
+            <span aria-hidden="true" className="edu-shine-track" />
             {pending ? (
               <Loader2 className="size-5 animate-spin motion-reduce:animate-none" aria-hidden="true" />
             ) : (
-              <Play className="size-5 fill-current" aria-hidden="true" />
+              <Play className="edu-wiggle-on-hover size-5 fill-current" aria-hidden="true" />
             )}
             {t('eduShell.home.startLive')}
           </Link>

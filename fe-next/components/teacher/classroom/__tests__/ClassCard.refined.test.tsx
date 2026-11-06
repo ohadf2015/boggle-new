@@ -73,36 +73,44 @@ describe('ClassCard — refined surfaces', () => {
     expect(screen.queryByTestId('student-cap-meter')).toBeNull();
   });
 
-  it('is a calm navy panel: hairline cream border, no cream slab, no border-3', () => {
-    render(<ClassCard {...baseProps} />);
+  it('is a game piece: chunky black edge on navy, with a colored header band that is never lime', () => {
+    render(<ClassCard {...baseProps} accent="pink" />);
     const cls = screen.getByTestId('classroom-card').className.toString();
     expect(cls).toContain('bg-neo-navy-light');
-    expect(cls).toContain('border-neo-cream/40');
-    expect(cls).not.toMatch(/border-3|border-\[3px\]/);
-    expect(cls).not.toContain('bg-neo-cream');
+    expect(cls).toMatch(/border-\[3px\]/);
+    expect(cls).toContain('border-neo-black');
+    const band = screen.getByTestId('classroom-card-band');
+    expect(band.className).toMatch(/(^|\s)bg-neo-pink(\s|$)/);
+    expect(band).toContainElement(screen.getByRole('heading', { name: 'Period 3' }));
   });
 
-  it('keeps the join code on an ink-on-cream plate, readable from the back row', () => {
+  it('spells the join code as ink-on-cream letter tiles inside one code element, readable from the back row', () => {
     render(<ClassCard {...baseProps} />);
     const code = screen.getByTestId('classroom-join-code');
-    expect(code).toHaveTextContent('ABC123');
-    expect(code.className).toMatch(/text-3xl|text-4xl|text-5xl/);
-    const plate = code.closest('[data-testid="join-code-plate"]');
-    expect(plate).not.toBeNull();
-    expect(plate!.className).toContain('bg-neo-cream');
+    expect(code.textContent).toBe('ABC123');
+    // Sized by the plate's own width (cqw) so six tiles fit a phone and still read from the back row.
+    expect(code.className).toMatch(/text-\[min\(\d+(\.\d+)?cqw,2\.25rem\)\]/);
+    const tiles = screen.getAllByTestId('join-code-tile');
+    expect(tiles.map((el) => el.textContent)).toEqual(['A', 'B', 'C', '1', '2', '3']);
+    tiles.forEach((el) => expect(el.className).toContain('bg-neo-cream'));
+    expect(code.closest('[data-testid="join-code-plate"]')).not.toBeNull();
   });
 
-  it('gives the card exactly ONE saturated fill: the Start-a-game hero', () => {
+  it('animates the code tiles only through reduced-motion-safe classes', () => {
+    render(<ClassCard {...baseProps} />);
+    const all = Array.from(screen.getByTestId('classroom-join-code').querySelectorAll<HTMLElement>('[class]')).flatMap((el) => el.className.split(/\s+/));
+    expect(all).toEqual(expect.arrayContaining(['animate-edu-tile-in', 'animate-edu-hop']));
+    expect(all.filter((c) => /^animate-(?!edu-)/.test(c))).toEqual([]);
+  });
+
+  it('gives the card exactly ONE lime fill: the Start-a-game hero', () => {
     render(<ClassCard {...baseProps} />);
     const start = screen.getByTestId('classroom-card-start-game');
     expect(start.className).toContain('bg-neo-lime');
     expect(start).toHaveAttribute('href', '/en/teacher?classroomId=cls-1');
-    // No other lime/cyan/pink fill competes on the card.
     const card = screen.getByTestId('classroom-card');
-    const saturated = Array.from(card.querySelectorAll('*')).filter((el) =>
-      /bg-neo-(lime|cyan|pink)(\/|\s|$)/.test((el as HTMLElement).className?.toString?.() ?? ''),
-    );
-    expect(saturated).toHaveLength(1);
+    const lime = Array.from(card.querySelectorAll('*')).filter((el) => /bg-neo-lime(\/|\s|$)/.test((el as HTMLElement).className?.toString?.() ?? ''));
+    expect(lime).toHaveLength(1);
   });
 
   it('keeps copy and share visible as the secondary pair beside the code', () => {

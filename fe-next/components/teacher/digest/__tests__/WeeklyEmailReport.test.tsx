@@ -137,4 +137,13 @@ describe('WeeklyEmailReport', () => {
     );
     expect(screen.getByTestId('weekly-email-report')).toHaveTextContent('—');
   });
+
+  it('Then the email report is a game card whose title sits on a colored sticker', () => {
+    render(<WeeklyEmailReport classroomId="c1" classroomName="Year 7" />);
+    const card = screen.getByTestId('weekly-email-report');
+    expect(card.className).toContain('border-[3px]');
+    const title = card.querySelector('h2')!;
+    expect(title.className).toMatch(/bg-neo-(cyan|pink|purple|yellow|orange)/);
+    expect(title.hasAttribute('data-accent-decor')).toBe(true);
+  });
 });

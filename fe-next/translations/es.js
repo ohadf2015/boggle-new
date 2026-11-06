@@ -14786,6 +14786,7 @@ const es = {
       },
       "create": "Crear aula",
       "createAnother": "Crear otra aula",
+      "newClassHint": "Cada clase tiene su propio código para unirse.",
       "creating": "Creando...",
       "defaultName": "Mi clase",
       "edit": "Editar aula",
