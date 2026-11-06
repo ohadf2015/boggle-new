@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { X } from 'lucide-react';
 import type { RunState } from '@/lib/wordTowerV2/run';
 import type { Estate } from '@/lib/wordTowerV2/estate';
@@ -22,6 +23,8 @@ interface Props {
   /** Open the rival board (see their towers, buy a wrecking ball, ruin one). */
   onOpenRivals?: () => void;
   reducedMotion?: boolean;
+  /** Shown first in the sheet (the rank meter moved here from the in-run bar). */
+  topSlot?: ReactNode;
 }
 
 const EFFECT_CLASS: Record<'steady' | 'plumb' | 'wide', string> = {
@@ -46,6 +49,7 @@ export function V2HudMenu({
   onOpenEstate,
   onOpenRivals,
   reducedMotion,
+  topSlot,
 }: Props) {
   const effects: Array<{ id: 'steady' | 'plumb' | 'wide'; n: number }> = [];
   if (run.steadyDrops > 0) effects.push({ id: 'steady', n: run.steadyDrops });
@@ -92,6 +96,7 @@ export function V2HudMenu({
 
         {/* Menu content */}
         <div className="flex flex-col gap-4 px-4 py-4">
+          {topSlot ? <div data-wt2-menu-top className="flex justify-center [&>*]:max-w-none [&>*]:w-full">{topSlot}</div> : null}
           {/* Streak ring */}
           <div>
             <h3 className="mb-2 text-xs font-bold text-neo-cream/60 uppercase">

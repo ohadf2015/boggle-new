@@ -1,5 +1,6 @@
 import { Container, Graphics } from 'pixi.js';
 import { CRITTER_KINDS, type CritterKind, type PropKind } from '@/lib/wordTowerV2/biomes';
+import { FOOD_BUILD } from './skyFood';
 
 /**
  * The sky's jokes: props with a face and one moving part each — a blimp that
@@ -212,7 +213,7 @@ function ufo(s: number, phase: number): Critter {
   };
 }
 
-const BUILD: Record<CritterKind, (s: number, phase: number) => Critter> = { blimp, puff, whale, astronaut, ufo };
+const BUILD: Record<CritterKind, (s: number, phase: number) => Critter> = { blimp, puff, whale, astronaut, ufo, ...FOOD_BUILD };
 
 export function buildCritter(kind: CritterKind, size: number, phase: number): Critter {
   const critter = BUILD[kind](size, phase);

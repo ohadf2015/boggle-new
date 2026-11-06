@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { biomeAt } from '../biomes';
-import { buildSkyline, rulerTicks, skyProps } from '../scenery';
+import { FOOD_KINDS, biomeAt } from '../biomes';
+import { PROP_CLEAR_X, PROP_EDGE_X, PROP_SIZE_MAX, buildSkyline, rulerTicks, skyProps } from '../scenery';
 
 describe('buildSkyline', () => {
   it('given a seed, when built twice, then identical (no hydration drift)', () => {
@@ -43,14 +43,43 @@ describe('skyProps', () => {
     expect(skyProps(5)).toEqual(skyProps(5));
   });
 
-  it('given every biome, when laid out, then each prop is one its sky owns, inside its band', () => {
+  it('given every biome, when laid out, then each prop is its sky\'s own or a snack from any sky', () => {
     const props = skyProps(9);
     expect(props.length).toBeGreaterThan(15);
     for (const p of props) {
       const home = biomeAt(p.floor);
-      expect(home.props).toContain(p.kind);
+      expect([...home.props, ...FOOD_KINDS]).toContain(p.kind);
       expect(p.x).toBeGreaterThanOrEqual(-1);
       expect(p.x).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('given a climb, when laid out, then snacks and toys turn up in it (pizza, avocado and friends)', () => {
+    const kinds = new Set([1, 2, 3, 4, 5].flatMap((seed) => skyProps(seed).map((p) => p.kind)));
+    for (const food of FOOD_KINDS) expect(kinds).toContain(food);
+  });
+
+  it('given two seeds, when laid out, then the skies differ (a new run is a new sky)', () => {
+    const a = skyProps(101).map((p) => p.kind).join(',');
+    const b = skyProps(202).map((p) => p.kind).join(',');
+    expect(a).not.toBe(b);
+  });
+
+  it('given any prop, when placed, then it keeps out of the tower column and off the very edge', () => {
+    for (const seed of [1, 7, 42, 900]) {
+      for (const p of skyProps(seed)) {
+        if (p.kind === 'aurora') continue;
+        expect(Math.abs(p.x)).toBeGreaterThanOrEqual(PROP_CLEAR_X);
+        expect(Math.abs(p.x)).toBeLessThanOrEqual(PROP_EDGE_X);
+        expect(p.size).toBeLessThanOrEqual(PROP_SIZE_MAX);
+      }
+    }
+  });
+
+  it('given a climb, when laid out, then the same prop never comes twice in a row', () => {
+    for (const seed of [3, 11, 77, 2024]) {
+      const props = skyProps(seed);
+      for (let i = 1; i < props.length; i += 1) expect(props[i].kind).not.toBe(props[i - 1].kind);
     }
   });
 

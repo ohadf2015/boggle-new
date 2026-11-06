@@ -2,7 +2,7 @@
  * Procedural scenery for the v2 backdrop — pure, seeded, so server and client
  * (and every test) agree on the exact same skyline.
  */
-import { BIOMES, type PropKind } from './biomes';
+import { BIOMES, FOOD_KINDS, type PropKind } from './biomes';
 
 export interface SkylineWindow {
   x: number;
@@ -93,24 +93,46 @@ export interface SkyProp {
 
 /** Floors of sky per prop: dense enough to feel the climb, sparse enough to stay calm. */
 const FLOORS_PER_PROP = 1.8;
+/** Share of props that are a snack or toy from any sky instead of the sky's own. */
+export const SURPRISE_SHARE = 0.4;
+/** Props keep out of the middle of the screen, where the tower and the hook are... */
+export const PROP_CLEAR_X = 0.5;
+/** ...and off the very edge, where half of one would hang off screen. */
+export const PROP_EDGE_X = 0.85;
+/** Props stay smaller than the floors so they never compete with the tower. */
+export const PROP_SIZE_MIN = 0.55;
+export const PROP_SIZE_MAX = 0.95;
 /** Nothing in the first floors of sky: it would hang right on the street. */
 const FIRST_PROP_FLOOR = 2;
 /** How far past the last sky's start props keep coming. */
 const LAST_BAND_FLOORS = 30;
 
-/** Every sky prop for a run, placed inside the band of the sky that owns it. */
+/**
+ * Every sky prop for a run, placed inside the band of the sky that owns it.
+ * A share of them are snacks and toys from any sky (a pizza slice past the
+ * jets, an avocado in orbit), and the seed is new each run, so the climb
+ * never shows the same sky twice.
+ */
 export function skyProps(seed: number): SkyProp[] {
   const r = rng(seed);
   const out: SkyProp[] = [];
+  let last: PropKind | null = null;
   BIOMES.forEach((biome, i) => {
     const from = Math.max(FIRST_PROP_FLOOR, biome.fromFloor);
     const to = BIOMES[i + 1]?.fromFloor ?? biome.fromFloor + LAST_BAND_FLOORS;
     for (let floor = from + r() * FLOORS_PER_PROP; floor < to; floor += FLOORS_PER_PROP * (0.6 + r() * 0.8)) {
+      const surprise = r() < SURPRISE_SHARE;
+      const pool: readonly PropKind[] = surprise ? FOOD_KINDS : biome.props;
+      let kind = pool[Math.floor(r() * pool.length)];
+      // Two of the same thing in a row reads as a pattern, not a surprise.
+      if (kind === last && pool.length > 1) kind = pool[(pool.indexOf(kind) + 1) % pool.length];
+      last = kind;
+      const side = r() < 0.5 ? -1 : 1;
       out.push({
-        kind: biome.props[Math.floor(r() * biome.props.length)],
+        kind,
         floor,
-        x: r() * 2 - 1,
-        size: 0.7 + r() * 0.6,
+        x: kind === 'aurora' ? 0 : side * (PROP_CLEAR_X + r() * (PROP_EDGE_X - PROP_CLEAR_X)),
+        size: PROP_SIZE_MIN + r() * (PROP_SIZE_MAX - PROP_SIZE_MIN),
         phase: r(),
       });
     }

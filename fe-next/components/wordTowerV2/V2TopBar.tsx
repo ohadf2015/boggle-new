@@ -82,8 +82,6 @@ export const V2TopBar = memo(function V2TopBar({
   barRef,
   reducedMotion,
   daily = false,
-  dailyDateKey,
-  dailyDateFormatted,
   dailyTarget,
   hasTower,
   rushSlot,
@@ -102,7 +100,8 @@ export const V2TopBar = memo(function V2TopBar({
       className="pointer-events-none absolute start-[calc(var(--wt2-rail,0px)+0.75rem)] end-[calc(var(--wt2-side,0px)+0.75rem)] top-[max(0.5rem,env(safe-area-inset-top))] z-40 flex flex-col gap-1.5"
       aria-live="polite"
     >
-      {/* Row 1 — where am I. ONE row, 4 items (5 on daily): exit, height+score, coins, [daily], menu.
+      {/* Row 1 — where am I. ONE row, 4 items: exit, height+score (or today's goal), coins, menu.
+          No separate "daily" badge: the exit and the goal chip already say it is the daily.
           `pe-12` reserves the corner for the global mute FAB.
           NO flex-wrap: width is constrained and items are compact. */}
       <div data-wt2-topbar-row className="@container flex min-w-0 items-start gap-2 pe-[var(--wt2-fab-gap,3rem)]">
@@ -216,28 +215,20 @@ export const V2TopBar = memo(function V2TopBar({
           </div>
         </div>
 
-        {/* ONE coin number: the bank plus what this run has banked into it. */}
+        {/* ONE coin number: the bank plus what this run has banked into it.
+            Secondary to the climb, so it is a quiet chip, not a second headline. */}
         <div
           ref={coinsRef}
-          className="ms-auto flex shrink-0 items-center gap-1 rounded-neo border-neo-thick border-black bg-neo-yellow px-2 py-1 text-neo-navy shadow-hard lg:px-3"
+          data-wt2-coins
+          className="ms-auto flex shrink-0 items-center gap-1 rounded-neo border-neo border-neo-cream/40 bg-neo-navy/85 px-1.5 py-0.5 text-neo-cream lg:px-2.5 lg:py-1"
           aria-label={t('wordTowerV2.coins.run', { n: coins })}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={ITEM.coin} alt="" aria-hidden className="h-4 w-4 lg:h-6 lg:w-6" />
-          <span className="font-neo-display text-base font-black tabular-nums lg:text-2xl" aria-hidden>
+          <img src={ITEM.coin} alt="" aria-hidden className="h-3.5 w-3.5 lg:h-5 lg:w-5" />
+          <span className="font-neo-display text-xs font-black tabular-nums lg:text-lg" aria-hidden>
             {formatHudCount(coins)}
           </span>
         </div>
-
-        {/* Daily badge (direct child, only on daily runs): replaces the trophy. */}
-        {daily && dailyDateKey ? (
-          <div
-            className="rounded-neo border-neo border-black bg-neo-cyan px-1 py-0.5 font-neo-display text-[9px] font-bold leading-tight text-neo-navy shadow-hard-sm lg:text-xs"
-            aria-label={t('wordTowerV2.hud.dailyBadge', { date: dailyDateFormatted || '' })}
-          >
-            <span className="uppercase">{t('wordTowerV2.hud.daily')}</span>
-          </div>
-        ) : null}
 
         {/* Menu button: opens drawer with secondary items (streak, effects, estate). */}
         {onMenuOpen ? (
@@ -252,7 +243,7 @@ export const V2TopBar = memo(function V2TopBar({
         ) : null}
       </div>
       {rushSlot !== undefined ? (
-        <div data-wt2-rush-slot className="flex h-10 min-w-0 items-center gap-2 lg:h-12">
+        <div data-wt2-rush-slot className="flex h-9 min-w-0 items-center gap-2 lg:h-12">
           {rushSlot}
         </div>
       ) : null}

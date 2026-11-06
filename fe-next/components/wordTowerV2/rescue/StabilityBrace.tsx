@@ -32,7 +32,7 @@ const BAND_TEXT: Record<StabilityBand, string> = {
  * Merged stability meter + brace action in ONE compact control.
  * Lives in the dock row next to the letter wheel (thumb zone).
  *
- * Steady: pips only (no text, no button).
+ * Steady: nothing (the dock stays clear around the wheel).
  * Wobbly/danger: danger label + brace cost when affordable, or rescue option.
  * No rescue countdown — that lives in BraceControl, rendered separately.
  */
@@ -52,6 +52,12 @@ export const StabilityBrace = memo(function StabilityBrace({
   const showBraceButton = api.offered && !api.rescue && api.affordable;
   const showRescueButton = api.offered && !api.rescue && !api.affordable;
 
+  // Steady is the normal case: no news on screen. The meter appears the moment
+  // the tower starts to sway, which is when it changes what the player does.
+  // It stays in the layout (invisible), so the dock's height and with it the
+  // camera never jump when it shows up.
+  const idle = band === 'steady' && !api.offered;
+
   const priceLabel =
     api.price === 0
       ? t('wordTowerV2.brace.freeTag')
@@ -68,9 +74,11 @@ export const StabilityBrace = memo(function StabilityBrace({
         band: t(`wordTowerV2.stability.${band}`),
         pct,
       })}
+      data-idle={idle ? 'true' : undefined}
+      aria-hidden={idle ? true : undefined}
       className={`flex shrink-0 items-center gap-1.5 rounded-neo border-neo border-neo-cream/80 bg-neo-navy/85 px-2 py-1 transition-all duration-200 lg:px-2.5 lg:py-1.5 ${
         showBraceButton || showRescueButton ? 'pointer-events-auto' : ''
-      }`}
+      } ${idle ? 'invisible' : ''}`}
     >
       {/* Steady state: pips only, no text. */}
       {band === 'steady' ? (

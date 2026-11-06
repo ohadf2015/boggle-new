@@ -47,6 +47,13 @@ describe('V2TopBar', () => {
     expect(screen.getByText('520')).toBeTruthy();
   });
 
+  it('given coins, when rendered, then the coin chip is a quiet secondary chip, not a second yellow headline', () => {
+    const { container } = render(bar({ coins: 2_800_000 }));
+    const chip = container.querySelector('[data-wt2-coins]');
+    expect(chip?.className).not.toContain('bg-neo-yellow');
+    expect(chip?.className).not.toContain('border-neo-thick');
+  });
+
   it('given coins banked this run, when rendered, then ONE chip shows bank plus run, not two chips', () => {
     render(bar({ coins: 1255 }));
 
@@ -116,7 +123,7 @@ describe('V2TopBar', () => {
     expect(row1.children.length).toBe(4);
   });
 
-  it('given a daily run, when rendered, then the daily badge shows the date, not the best chip', () => {
+  it('given a daily run, when rendered, then neither a daily badge nor the best chip shows', () => {
     const { container } = render(
       bar({
         daily: true,
@@ -126,9 +133,8 @@ describe('V2TopBar', () => {
       })
     );
 
-    // Daily badge is present with date
-    const dailyBadge = screen.getByLabelText(/DAILY 25 Sep/);
-    expect(dailyBadge).toBeTruthy();
+    // No separate daily badge: today's goal chip is the daily's number.
+    expect(screen.queryByLabelText(/DAILY 25 Sep/)).toBeNull();
 
     // Best chip is absent
     expect(screen.queryByText(/15\.5/)).toBeNull();

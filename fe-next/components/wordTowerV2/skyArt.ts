@@ -28,8 +28,9 @@ const STAR_COUNT = 150;
 const PROP_PARALLAX = 0.7;
 const STAR_PARALLAX = 0.08;
 const BALLOON_COLOURS = [0xff4d9d, 0xbfff00, 0x37e0ff, 0xffe135, 0xb06cff];
-const BOBS = new Set<PropKind>(['balloon', 'blimp', 'whale', 'puff', 'ufo']);
+const BOBS = new Set<PropKind>(['balloon', 'blimp', 'whale', 'puff', 'ufo', 'pizza', 'avocado', 'donut', 'duck', 'icecream']);
 /** Screen px/s a drifter crosses at; anything not listed holds its x. */
+/** Snacks and toys hold their spot beside the tower (they bob and wobble instead): drifting, they crossed the hook. */
 const DRIFT: Partial<Record<PropKind, number>> = { jet: 60, comet: 40, bird: 26, ufo: 22, whale: 14, blimp: 10, cloud: 7, puff: 7, astronaut: 5 };
 
 /** mulberry32 — star positions only; deterministic so resizes do not reshuffle. */

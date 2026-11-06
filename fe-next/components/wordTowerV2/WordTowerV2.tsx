@@ -327,6 +327,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
           dailyTarget={daily ? { growthM: dailyTower.growthM, targetM: dailyTower.targetM } : undefined}
           hasTower={towerFloors > 0}
           rushSlot={rushUi.hudSlot}
+          menuSlot={rushUi.menuSlot}
         />
       ) : null}
       <RunRewards

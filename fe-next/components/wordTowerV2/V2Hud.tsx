@@ -45,6 +45,8 @@ interface Props {
   hasTower?: boolean;
   /** Rush widgets; see V2TopBar: `null` reserves the row, `undefined` omits it. */
   rushSlot?: ReactNode;
+  /** Progress that is not a decision (the rank meter): shown in the menu, not the bar. */
+  menuSlot?: ReactNode;
 }
 
 /**
@@ -74,6 +76,7 @@ export function V2Hud({
   dailyTarget,
   hasTower,
   rushSlot,
+  menuSlot,
 }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
   const coins = estate.coins + runCoins;
@@ -119,6 +122,7 @@ export function V2Hud({
         onOpenEstate={onOpenEstate}
         onOpenRivals={onOpenRivals}
         reducedMotion={reducedMotion}
+        topSlot={menuSlot}
       />
     </>
   );

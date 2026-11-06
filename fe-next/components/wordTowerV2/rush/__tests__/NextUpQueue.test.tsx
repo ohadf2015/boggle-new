@@ -22,6 +22,13 @@ describe("NextUpQueue", () => {
     expect(screen.getAllByRole("listitem")).toHaveLength(3);
   });
 
+  it("given the compact bar size, when rendered, then the chips are smaller and still named", () => {
+    render(<NextUpQueue t={t} slots={SLOTS} reducedMotion compact />);
+    const first = screen.getByLabelText("wordTowerV2.rush.trait.gold");
+    expect(first.className).toContain("h-8 w-8");
+    expect(screen.getByLabelText("wordTowerV2.rush.trait.plain").className).toContain("h-6 w-6");
+  });
+
   it("given open slots, when rendered, then each is named by its trait", () => {
     render(<NextUpQueue t={t} slots={SLOTS} reducedMotion />);
     expect(screen.getByLabelText("wordTowerV2.rush.trait.gold")).toBeTruthy();

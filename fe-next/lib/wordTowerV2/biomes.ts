@@ -16,8 +16,11 @@ export type PropKind =
   | CritterKind;
 
 /** Props with a face and a moving part of their own (skyCritters.ts): the sky's jokes. */
-export type CritterKind = 'blimp' | 'puff' | 'whale' | 'astronaut' | 'ufo';
-export const CRITTER_KINDS: readonly PropKind[] = ['blimp', 'puff', 'whale', 'astronaut', 'ufo'];
+export type CritterKind = 'blimp' | 'puff' | 'whale' | 'astronaut' | 'ufo' | FoodKind;
+/** Snacks and toys with faces (skyFood.ts): they can turn up in ANY sky, which is the joke. */
+export type FoodKind = 'pizza' | 'avocado' | 'donut' | 'duck' | 'icecream';
+export const FOOD_KINDS: readonly FoodKind[] = ['pizza', 'avocado', 'donut', 'duck', 'icecream'];
+export const CRITTER_KINDS: readonly PropKind[] = ['blimp', 'puff', 'whale', 'astronaut', 'ufo', ...FOOD_KINDS];
 
 /**
  * The backdrop effect behind a sky. One rotating sunburst used to hang behind
