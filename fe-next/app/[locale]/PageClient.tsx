@@ -162,11 +162,24 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
   }, [inviteRoomCode]); // frozen initial state → runs once
 
   // Hydration gate for the render-affecting, window-derived branches below
-  // (invite spinner, isNewUser CTA). The server (SSG, no window) emits LandingView;
-  // these branches must NOT flip the first CLIENT render or React #418 fires (seen
-  // in prod on /en?room=… invite links). The side-effects in the initializers above
-  // still run synchronously (invite saved before child effects) — only the RENDER
-  // waits for mount, same discipline as showFTUE.
+  // (invite spinner, QR warp). The server (SSG, no window) emits LandingView;
+  // those branches must NOT flip the first CLIENT render or React #418 fires
+  // (seen in prod on /en?room=… invite links). The side-effects in the
+  // initializers above still run synchronously (invite saved before child
+  // effects) — only those RENDER swaps wait for mount, same discipline as
+  // showFTUE.
+  //
+  // The isNewUser PLAY prop is deliberately NOT gated on `mounted`: PLAY is a
+  // real <a href> either way and the handler only upgrades the click (never
+  // the markup), so the first render is byte-identical with it attached —
+  // there is nothing to mismatch. Gating it on `mounted` left PLAY with no
+  // React click handler until one effect cycle after hydration, and fast
+  // clicks inside that window silently fell through to native /multiplayer
+  // navigation (the landing PLAY→onboarding funnel leak, ~83% of clicks lost).
+  // `isNewUser` is decided in the useState initializer, which already runs on
+  // the first client render, so the handler exists as soon as hydration
+  // attaches listeners. Returning users keep `undefined` → plain navigation,
+  // never an auto-opened FTUE.
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
@@ -295,7 +308,7 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
     <>
       <LandingView
         initialData={initialData}
-        onStartOnboarding={mounted && isNewUser && routeAllowsOnboarding ? handleStartOnboarding : undefined}
+        onStartOnboarding={isNewUser && routeAllowsOnboarding ? handleStartOnboarding : undefined}
       />
       {showFTUE && routeAllowsOnboarding && (
         <OnboardingFlow onComplete={handleFTUEComplete} entry={ftueEntry} />
