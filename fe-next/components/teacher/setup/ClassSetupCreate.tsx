@@ -17,6 +17,7 @@ import { assignStarterPack } from '@/lib/education/createLessonFromPack';
 import type { Language } from '@/lib/supabase/education/types';
 import ClassLimitUpsellModal from '@/components/teacher/ClassLimitUpsellModal';
 import { inviteHref } from '@/components/education/lobby/inviteLinks';
+import { rememberCreatedClassroom } from '@/lib/education/createdClassroomHandoff';
 import { ClassSetupDetails, type SetupBusy } from './ClassSetupDetails';
 import { ClassSetupSide } from './ClassSetupSide';
 import { classCap, defaultClassLanguage, resolveClassName, type GradeBand } from './classSetupDefaults';
@@ -69,6 +70,7 @@ export function ClassSetupCreate() {
       const result = await createClassroom(finalName, classLanguage);
       if (result.success && result.data?.join_code) {
         const classroomId = result.data.id;
+        rememberCreatedClassroom(result.data);
         trackEduClassroomCreated({ classroomId, createdVia: 'dashboard', language: result.data.language ?? classLanguage });
         // teacherFunnelPlan, not a hasPro ternary: a trialing teacher must stay plan=trial.
         captureTeacherOnboardingFunnel(TEACHER_ONBOARDING_FUNNEL_EVENTS.classroomCreated, {

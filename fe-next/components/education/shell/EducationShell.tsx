@@ -97,7 +97,8 @@ export function EducationShell({
   // usePathname must run unconditionally (rules-of-hooks) — the opt-out applies
   // to resolution, not the hook call.
   const pathname = usePathname();
-  const nav = chromeFree ? null : (navOverride ?? resolveEducationNav(pathname));
+  const resolvedNav = chromeFree ? null : resolveEducationNav(pathname);
+  const nav = chromeFree ? null : (navOverride ?? resolvedNav);
   // A teacher screen's chrome is the shell's own (top bar + sidebar); a page header there would be a second menu.
   const teacherChrome = nav?.kind === 'teacher';
 

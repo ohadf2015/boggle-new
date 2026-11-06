@@ -1,4 +1,5 @@
 import { createBrowserClient } from '@supabase/ssr';
+import { freshFetch } from './supabaseFreshFetch';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import logger from '@/utils/logger';
 import type { ProfileData, RankedProgress } from '@/contexts/auth/authTypes';
@@ -23,7 +24,9 @@ export const supabase: SupabaseClient | null = supabaseUrl && supabaseAnonKey
       auth: {
         detectSessionInUrl: false,
         flowType: 'pkce'
-      }
+      },
+      // Reads must never come from the Android WebView's cache-first HTTP cache (see supabaseFreshFetch).
+      global: { fetch: freshFetch() },
     })
   : null;
 
