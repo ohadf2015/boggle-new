@@ -112,14 +112,20 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   const inShell = useMediaQuery(SHELL_MEDIA);
   const setIsInGame = useHideNavigation();
 
-  // Performance optimization for low-end devices + player opt-out.
-  // The in-game effects toggle (and OS reduced-motion) collapse onto the same
-  // skipAnimations lever that already gates particles, flashes, and confetti.
-  const { isLowEnd, enableComplexAnimations } = useDevicePerformance();
+  // Two levers. `calm` is motion the player asked to stop (the in-game effects
+  // toggle or the OS reduced-motion setting): the board, word stage, feedback pill
+  // and finish all hold still. `skipAnimations` adds the device tier on top and only
+  // drops the heavy layers (particles, flashes, confetti, framer extras). Phones are
+  // flagged low-end far more often (Low Power Mode / battery saver caps frames at
+  // 30fps and trips the runtime frame watch; Data Saver and 2GB phones trip the
+  // static check), and the tile lift, path pop and pill are cheap transform
+  // animations, so a low-end flag must not freeze them.
+  const { isLowEnd, enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
   const [effectsReduced] = useReducedEffects();
+  const calm = effectsReduced || prefersReducedMotion;
   const skipAnimations = useMemo(
-    () => isLowEnd || !enableComplexAnimations || effectsReduced,
-    [isLowEnd, enableComplexAnimations, effectsReduced]
+    () => calm || isLowEnd || !enableComplexAnimations,
+    [calm, isLowEnd, enableComplexAnimations]
   );
 
   const extraLife = useSurvivalExtraLife({ practice });
@@ -289,7 +295,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     typedWord: keyboardInput.typedWord,
     feedbackMessage: state.feedbackMessage,
     discoveredWords: state.discoveredWords,
-    calm: skipAnimations,
+    calm,
     t,
   };
 
@@ -304,7 +310,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       targetWord={targetWord}
       language={language}
       tier={state.hasWon ? wordHuntSolveTier(state.attempts.filter((a) => !a.isDiscovery).length) : null}
-      calm={skipAnimations}
+      calm={calm}
       onSkip={actions.skipFinish}
       sourcePath={state.hasWon ? stage.path : undefined}
       timedOut={timed && !state.hasWon && roundClock.remainingTime <= 0}
@@ -448,7 +454,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           type={state.feedbackType}
           message={state.feedbackMessage}
           word={state.feedbackWord}
-          calm={skipAnimations}
+          calm={calm}
         />
       )}
 
