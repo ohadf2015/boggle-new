@@ -38,6 +38,7 @@ export interface PracticeLesson {
   language: Language;
   words: VocabularyWord[];
   classroom_id: string | null;
+  created_at?: string | null;
   assignment: PracticeAssignment | null;
 }
 

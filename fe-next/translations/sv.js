@@ -17809,6 +17809,15 @@ const sv = {
         }
       },
       "classroomRoomGone": "Klassens spel är slut. Be din lärare starta ett nytt.",
+      "deadEnd": {
+        "endedLine": "Lärarens spel är slut. Fortsätt öva tills nästa börjar.",
+        "practiceCta": "Öva nu",
+        "starterWords": "Startord, inget konto behövs",
+        "noRoomLine": "Det finns inget spel här just nu. Värm upp med en övningsrunda eller be din lärare om koden.",
+        "practiceTitle": "Övningsrunda",
+        "wordCount": "{count} ord",
+        "enterCode": "Skriv in en kod"
+      },
       "gameEnded": {
         "title": "Det här spelet är slut",
         "retry": "Försök igen",

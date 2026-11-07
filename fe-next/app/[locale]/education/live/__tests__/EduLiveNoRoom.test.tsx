@@ -7,6 +7,11 @@ vi.mock('@/components/education/live/EduLiveEntry', () => ({ default: () => <div
 vi.mock('@/app/[locale]/multiplayer/MpPhaseRouter', () => ({ MpPhaseRouter: () => null, buildMpResultsProps: () => ({}) }));
 vi.mock('@/components/education/live/eduLiveSurfaces', () => ({ EduLiveSurfacesProvider: ({ children }: { children: React.ReactNode }) => children }));
 vi.mock('@/components/education/live/EduAbortedModal', () => ({ default: () => null }));
+vi.mock('@/components/education/join/DeadEndPracticeLink', () => ({
+  DeadEndPracticeLink: ({ state, className }: { state: string; className?: string }) => (
+    <span data-testid="dead-end-practice" data-state={state} className={className} role="link">practice</span>
+  ),
+}));
 
 import { EduLiveNoRoom } from '../EduLiveNoRoom';
 import { EduLivePhaseRouter } from '../EduLivePhaseRouter';
@@ -15,18 +20,29 @@ const t = (k: string) => k;
 const entryProps = (prefilledRoom = '') => ({ phase: 'entry', entry: { prefilledRoom } }) as never;
 
 describe('EduLiveNoRoom', () => {
-  it('given a student with no room, when the stage renders, then the mascot speaks the title and one primary sends them to the code screen', () => {
+  it('given a student with no room (or one just removed from the room), when the stage renders, then practice is the loud action and the code screen comes second', () => {
     render(<EduLiveNoRoom isHost={false} language="he" t={t} />);
     expect(screen.getByTestId('edu-live-no-room-bubble')).toHaveTextContent('eduLiveRoom.entry.noRoomTitle');
-    expect(screen.getByTestId('edu-live-no-room-cta')).toHaveAttribute('href', '/he/join');
-    expect(screen.getByTestId('edu-live-no-room-secondary')).toHaveAttribute('href', '/he/student');
+    const practice = screen.getByTestId('dead-end-practice');
+    expect(practice).toHaveAttribute('data-state', 'no_room');
+    const code = screen.getByTestId('edu-live-no-room-secondary');
+    expect(code).toHaveAttribute('href', '/he/join');
+    expect(code).toHaveTextContent('eduLiveRoom.entry.enterCode');
+    expect(practice.compareDocumentPosition(code) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.queryByTestId('edu-live-no-room-cta')).toBeNull();
     expect(screen.getAllByRole('link')).toHaveLength(2);
+  });
+
+  it('given any viewer, when the stage renders, then no gradient paints the backdrop', () => {
+    const { container } = render(<EduLiveNoRoom isHost={false} language="en" t={t} />);
+    expect(container.innerHTML).not.toMatch(/gradient/);
   });
 
   it('given a teacher with no room, when the stage renders, then the primary goes home and the secondary opens the game picker', () => {
     render(<EduLiveNoRoom isHost language="en" t={t} />);
     expect(screen.getByTestId('edu-live-no-room-cta')).toHaveAttribute('href', '/en/teacher');
     expect(screen.getByTestId('edu-live-no-room-secondary')).toHaveAttribute('href', '/en/education/classroom-game');
+    expect(screen.queryByTestId('dead-end-practice')).toBeNull();
   });
 
   it('given reduced motion, when the stage renders, then every ambient loop sits behind motion-safe', () => {
@@ -44,6 +60,11 @@ describe('EduLivePhaseRouter entry', () => {
     render(<EduLivePhaseRouter routerProps={entryProps()} urlRoom={null} isTeacher={false} language="en" t={t} />);
     expect(screen.getByTestId('edu-live-no-room')).toBeInTheDocument();
     expect(screen.queryByTestId('entry-flow')).toBeNull();
+  });
+
+  it('given a student the teacher just removed (the kick reloads the page without its room), when the entry phase renders, then a practice round is offered', () => {
+    render(<EduLivePhaseRouter routerProps={entryProps()} urlRoom={null} isTeacher={false} language="en" t={t} />);
+    expect(screen.getByTestId('dead-end-practice')).toHaveAttribute('data-state', 'no_room');
   });
 
   it('given a room in the URL, when the entry phase renders, then the join flow runs', () => {

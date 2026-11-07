@@ -15826,6 +15826,15 @@ const en = {
         }
       },
       "classroomRoomGone": "Your class game ended. Ask your teacher to start a new one.",
+      "deadEnd": {
+        "endedLine": "Your teacher's game is over. Keep practicing until the next one starts.",
+        "practiceCta": "Practice now",
+        "starterWords": "Starter words, no account needed",
+        "noRoomLine": "No game here right now. Warm up with a practice round, or ask your teacher for the code.",
+        "practiceTitle": "Practice round",
+        "wordCount": "{count} words",
+        "enterCode": "Enter a code"
+      },
       "gameEnded": {
         "title": "This game has ended",
         "retry": "Try again",

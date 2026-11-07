@@ -17447,6 +17447,15 @@ const es = {
         }
       },
       "classroomRoomGone": "El juego de tu clase terminó. Pídele a tu profe que empiece otro.",
+      "deadEnd": {
+        "endedLine": "La partida de tu profe ya terminó. Sigue practicando hasta que empiece la próxima.",
+        "practiceCta": "Practicar ahora",
+        "starterWords": "Palabras para empezar, sin cuenta",
+        "noRoomLine": "Ahora mismo no hay ninguna partida. Calienta con una ronda de práctica o pídele el código a tu profe.",
+        "practiceTitle": "Ronda de práctica",
+        "wordCount": "{count} palabras",
+        "enterCode": "Escribir un código"
+      },
       "gameEnded": {
         "title": "Este juego terminó",
         "retry": "Reintentar",
