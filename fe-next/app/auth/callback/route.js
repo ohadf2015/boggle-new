@@ -1,6 +1,13 @@
 import { NextResponse } from 'next/server';
 import { locales, defaultLocale } from '@/lib/i18n';
-import { authFailureHref, isEduAuthOrigin, resolveAuthNext } from '@/lib/navigation/authReturnPath';
+import {
+  authFailureHref,
+  EDU_AUTH_ORIGIN_COOKIE,
+  eduAuthOriginFromCookies,
+  isEduAuthOrigin,
+  resolveAuthNext,
+  withRememberedEduOrigin,
+} from '@/lib/navigation/authReturnPath';
 
 // Helper to detect user's preferred locale from request
 function getPreferredLocale(request) {
@@ -53,12 +60,20 @@ function getOrigin(request) {
   return requestUrl.origin;
 }
 
+// `next` now carries the remembered edu origin, so the marker must not outlive this hop.
+function redirectAndForgetOrigin(request, url) {
+  const res = NextResponse.redirect(url);
+  if (request.cookies.has(EDU_AUTH_ORIGIN_COOKIE)) res.cookies.set(EDU_AUTH_ORIGIN_COOKIE, '', { path: '/', maxAge: 0 });
+  return res;
+}
+
 // This route handles OAuth callback by redirecting to the client-side page
 // which properly exchanges the code and establishes the session client-side
 export async function GET(request) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get('code');
-  const next = requestUrl.searchParams.get('next') || '/';
+  const next =
+    withRememberedEduOrigin(requestUrl.searchParams.get('next'), eduAuthOriginFromCookies(request.headers.get('cookie'))) || '/';
   const errorParam = requestUrl.searchParams.get('error');
   const errorDescription = requestUrl.searchParams.get('error_description');
 
@@ -83,7 +98,7 @@ export async function GET(request) {
     if (errorDescription) {
       errorUrl.searchParams.set('error_message', errorDescription);
     }
-    return NextResponse.redirect(errorUrl);
+    return redirectAndForgetOrigin(request, errorUrl);
   }
 
   if (code) {
@@ -94,10 +109,10 @@ export async function GET(request) {
     if (next && next !== '/') {
       clientCallbackUrl.searchParams.set('next', next);
     }
-    return NextResponse.redirect(clientCallbackUrl);
+    return redirectAndForgetOrigin(request, clientCallbackUrl);
   }
 
   const { url: resolvedNext } = resolveAuthNext(next, locale);
   const fallback = isEduAuthOrigin(resolvedNext) ? resolvedNext : `/${locale}`;
-  return NextResponse.redirect(new URL(fallback, origin));
+  return redirectAndForgetOrigin(request, new URL(fallback, origin));
 }

@@ -30,8 +30,11 @@ const PUBLIC_PAGES = new Set([
 
 const EDU_AREAS = new Set(['teacher', 'education', 'student', 'join', 'api']);
 
-// Not the game home: legal pages any signup or billing screen must link to.
-const ALLOWED_OUTSIDE = [/^legal\//];
+// Not the game home: legal and contact pages, opened in a new tab so the classroom stays open behind them.
+const ALLOWED_OUTSIDE = [/^legal\//, /^contact(?:[/?#]|$)/];
+
+// Files an open peer PR is rewriting; skipped rather than pinned so either merge order stays green.
+const SAME_TAB_PENDING = new Set(['components/teacher/SubscriptionStatusCard.tsx']);
 
 // `area` is narrowed to teacher|student by its own parser; navItems tests pin the hrefs.
 const DYNAMIC_OK: Record<string, string> = {
@@ -39,15 +42,12 @@ const DYNAMIC_OK: Record<string, string> = {
 };
 
 // Owned by other pieces; each has a request filed. Remove an entry when its link moves.
-const PENDING: Record<string, string> = {
-  'components/education/help/HelpHome.tsx': 'contact',
-  'components/student/academy/AcademyHub.tsx': 'quick-play',
-};
+const PENDING: Record<string, string> = {};
 
 const TARGET = new RegExp(
   '(?:' +
   [
-    String.raw`(?:\bhref|Href)\s*[=:]\s*\{?\s*`,
+    String.raw`(?:\bhref|Href)\s*[=:]\s*\{?\s*(?:[\w.?]+\s*\?\?\s*)?`,
     String.raw`\brouter\.(?:push|replace|prefetch)\(\s*`,
     String.raw`\bredirect\(\s*`,
     String.raw`location\.(?:assign|replace)\(\s*`,
@@ -147,6 +147,7 @@ describe('edu exit targets: every in-product link stays in /teacher, /education,
     ["window.location.href = '/'"],
     ['redirect(`/${locale}/pricing`)'],
     ['exitHref: `/${lang}`'],
+    ['href={exitHref ?? `/${language}`}'],
   ])('the target pattern catches %s', (sample) => {
     expect([...sample.matchAll(TARGET)]).toHaveLength(1);
   });
@@ -163,6 +164,20 @@ describe('edu exit targets: every in-product link stays in /teacher, /education,
     const dynamic = findings.filter((f) => f.verdict.kind === 'dynamic');
     const unexpected = dynamic.filter((f) => f.verdict.kind === 'dynamic' && DYNAMIC_OK[f.rel] !== f.verdict.expr);
     expect(unexpected.map((f) => `${f.rel} -> ${f.target}`)).toEqual([]);
+  });
+
+  it('every allowed outside link opens in a new tab', () => {
+    const sameTab = findings
+      .filter((f) => f.verdict.kind === 'allowed' && !SAME_TAB_PENDING.has(f.rel))
+      .filter((f) => {
+        const { src } = files.find((file) => file.rel === f.rel)!;
+        const at = src.indexOf(f.target);
+        const open = src.lastIndexOf('<', at);
+        const close = src.indexOf('>', at);
+        return !/target="_blank"/.test(src.slice(open, close)) || !/rel="noopener noreferrer"/.test(src.slice(open, close));
+      })
+      .map((f) => `${f.rel} -> ${f.target}`);
+    expect(sameTab).toEqual([]);
   });
 
   it.each(Object.entries(PENDING))('pending entry %s -> /%s still exists (delete it once fixed)', (file, head) => {

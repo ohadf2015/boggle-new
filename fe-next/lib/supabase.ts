@@ -7,6 +7,7 @@ import { broadcastSignedOut } from '@/utils/crossTabAuthSync';
 import { captureUserLoggedOut } from '@/utils/authAnalytics';
 import { locales } from './i18n';
 import { isNative } from '@/utils/platform';
+import { nativeOAuthNext, rememberAuthOrigin } from '@/lib/navigation/authReturnPath';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -51,8 +52,17 @@ function getAuthNextPath(): string | null {
 
 function appendNextParam(url: URL): string {
   const next = getAuthNextPath();
+  rememberAuthOrigin(next);
   if (next) url.searchParams.set('next', next);
   return url.toString();
+}
+
+function nativeCallbackUrl(currentLocale: string | null): string {
+  const { pathname, search } = window.location;
+  rememberAuthOrigin(pathname + (search || ''));
+  const next = nativeOAuthNext(pathname, search);
+  const query = new URLSearchParams({ ...(currentLocale && { locale: currentLocale }), ...(next && { next }) }).toString();
+  return 'lexiclash://auth/callback' + (query ? `?${query}` : '');
 }
 
 // Auth helper functions
@@ -69,7 +79,7 @@ export async function signInWithGoogle() {
   // Include locale in the URL path so proxy.ts preserves it (not as query param)
   const locale = currentLocale || 'en';
   const redirectUrl = isNative()
-    ? 'lexiclash://auth/callback' + (currentLocale ? `?locale=${currentLocale}` : '')
+    ? nativeCallbackUrl(currentLocale)
     : appendNextParam(new URL(`/${locale}/auth/callback`, window.location.origin));
 
   return supabase.auth.signInWithOAuth({
@@ -81,15 +91,13 @@ export async function signInWithGoogle() {
 export async function signInWithDiscord() {
   if (!supabase) return { error: { message: 'Supabase not configured' } };
 
-  // Include current locale in the callback URL so we can redirect back correctly
   const currentLocale = getCurrentLocale();
 
-  // Use deep link scheme for native apps, web URL for browser
   // Note: On mobile, useOAuthSignIn uses performMobileOAuth instead of this function
   // Include locale in the URL path so proxy.ts preserves it (not as query param)
   const locale = currentLocale || 'en';
   const redirectUrl = isNative()
-    ? 'lexiclash://auth/callback' + (currentLocale ? `?locale=${currentLocale}` : '')
+    ? nativeCallbackUrl(currentLocale)
     : appendNextParam(new URL(`/${locale}/auth/callback`, window.location.origin));
 
   return supabase.auth.signInWithOAuth({
@@ -148,6 +156,7 @@ export async function signUpWithEmail(
 
 export async function signInWithEmail(email: string, password: string) {
   if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
+  rememberAuthOrigin(getAuthNextPath());
 
   return supabase.auth.signInWithPassword({
     email,

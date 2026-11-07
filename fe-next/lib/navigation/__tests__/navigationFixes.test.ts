@@ -14,11 +14,11 @@ import { parentRoute } from '@/lib/navigation/parentRoute';
 
 describe('Navigation Fixes — All 4 Causes', () => {
   describe('Fix #1: Error Boundaries use sectionHome', () => {
-    it('should direct chunk errors from education routes to /{locale}/education, not /', () => {
+    it('should direct chunk errors from education routes to their section hub, not /', () => {
       // Error boundaries catch errors and should call sectionHome to pick the fallback
       expect(sectionHome({ pathname: '/en/teacher/classroom/abc/analytics' })).toBe('/en/teacher');
       expect(sectionHome({ pathname: '/he/student/achievements' })).toBe('/he/student');
-      expect(sectionHome({ pathname: '/sv/join/XJXEFN' })).toBe('/sv/education');
+      expect(sectionHome({ pathname: '/sv/join/XJXEFN' })).toBe('/sv/join');
     });
 
     it('should direct errors from non-education routes to /{locale}, not /', () => {
@@ -29,7 +29,7 @@ describe('Navigation Fixes — All 4 Causes', () => {
 
     it('should preserve locale for RTL languages on error', () => {
       // Hebrew is RTL — error recovery must preserve it
-      expect(sectionHome({ pathname: '/he/teacher' })).toBe('/he/education');
+      expect(sectionHome({ pathname: '/he/teacher' })).toBe('/he/teacher');
       expect(sectionHome({ pathname: '/he/student/profile' })).toBe('/he/student');
     });
 
@@ -127,7 +127,7 @@ describe('Navigation Fixes — All 4 Causes', () => {
       // - Education home: /education (for returning to edu landing)
       // - Leave education: /{locale} (for returning to main app)
 
-      expect(sectionHome({ pathname: '/en/teacher' })).toBe('/en/education'); // Stay in education on error
+      expect(sectionHome({ pathname: '/en/teacher' })).toBe('/en/teacher'); // Stay in education on error
       expect(sectionHome({ pathname: '/en/multiplayer' })).toBe('/en'); // Go to main home on error
     });
   });
@@ -183,7 +183,7 @@ describe('Navigation Fixes — All 4 Causes', () => {
     it('should handle all 6 locales correctly', () => {
       const locales = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
       locales.forEach((locale) => {
-        expect(sectionHome({ pathname: `/${locale}/teacher` })).toBe(`/${locale}/education`);
+        expect(sectionHome({ pathname: `/${locale}/teacher` })).toBe(`/${locale}/teacher`);
         expect(parentRoute(`/${locale}/student`)).toBe(`/${locale}/education`);
       });
     });

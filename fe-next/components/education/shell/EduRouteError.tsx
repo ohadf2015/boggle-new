@@ -9,10 +9,19 @@ import { readClassroomLiveFlags } from '@/lib/education/classroomLivePath';
 import { multiplayerExitDestination } from '@/lib/multiplayer/exitDestination';
 import { EduMascot } from '@/components/education/EduMascot';
 
-export type EduErrorArea = 'live' | 'student';
+export type EduErrorArea = 'live' | 'student' | 'teacher' | 'join';
+
+const BACK_LABEL: Record<EduErrorArea, [string, string]> = {
+  live: ['eduShell.error.backToClass', 'Back to class'],
+  student: ['eduShell.error.backToClass', 'Back to class'],
+  teacher: ['eduShell.error.backToClasses', 'Back to your classes'],
+  join: ['eduShell.error.enterCode', 'Enter a class code'],
+};
 
 /** The class hub this viewer came from: the teacher's for a live host, the student's for everyone else. */
 export function eduErrorExit(area: EduErrorArea, locale: string, pathname: string, search: string): string {
+  if (area === 'teacher') return `/${locale}/teacher`;
+  if (area === 'join') return `/${locale}/join`;
   if (area === 'live') {
     const flags = readClassroomLiveFlags(pathname, new URLSearchParams(search));
     const hub = multiplayerExitDestination({
@@ -76,7 +85,8 @@ export function EduRouteError({
 
   const backToClass = () => {
     const target = eduErrorExit(area, locale, window.location.pathname, window.location.search);
-    if (staleChunk) window.location.assign(target);
+    // Pushing the URL the crash is already on would do nothing.
+    if (staleChunk || target === window.location.pathname) window.location.assign(target);
     else router.push(target);
   };
 
@@ -109,7 +119,7 @@ export function EduRouteError({
             onClick={backToClass}
             className={`flex min-h-[48px] w-full items-center justify-center rounded-neo border-[3px] border-neo-cream bg-neo-navy px-4 font-neo-display text-base font-bold text-neo-cream ${PRESS}`}
           >
-            {t('eduShell.error.backToClass', 'Back to class')}
+            {t(...BACK_LABEL[area])}
           </button>
         </div>
       </div>

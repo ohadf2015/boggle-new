@@ -21718,7 +21718,13 @@ const sv = {
     "error": {
       "title": "Den här skärmen hakade upp sig",
       "body": "Försök igen. Om det fortsätter, gå tillbaka till klassen och börja därifrån.",
-      "backToClass": "Tillbaka till klassen"
+      "backToClass": "Tillbaka till klassen",
+      "backToClasses": "Tillbaka till dina klasser",
+      "enterCode": "Skriv en klasskod"
+    },
+    "notFound": {
+      "title": "Vi hittar inte den sidan",
+      "body": "Länken kan vara gammal eller felstavad. Gå tillbaka och fortsätt därifrån."
     },
     "nav": {
       "home": "Hem",
