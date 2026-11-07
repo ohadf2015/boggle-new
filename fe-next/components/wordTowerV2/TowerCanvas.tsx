@@ -99,6 +99,8 @@ interface Props {
    * runs before the camera is re-solved); one frame of drift is invisible.
    */
   onLandPoint?: (p: { x: number; y: number; quality: LandingQuality }) => void;
+  /** A tap caught a floating snack at canvas (x, y). */
+  onSnackCatch?: (p: { x: number; y: number }) => void;
   /** Settled height, quantized (m) — the far city sinks away with it. */
   getSceneM?: () => number;
   /**
@@ -124,6 +126,8 @@ function floorNo(id: string): number {
 
 /** How far sideways the free look may pan, as a fraction of the viewport width. */
 const LOOK_X_VIEWPORTS = 0.6;
+/** A finger that moved less than this between down and up tapped (a snack), it did not pan. */
+const SNACK_TAP_SLOP_PX = 10;
 
 function percentile(sorted: number[], p: number): number {
   if (sorted.length === 0) return 0;
@@ -146,6 +150,7 @@ export default function TowerCanvas(props: Props) {
     let disposed = false;
     let raf = 0;
     let app: Application | null = null;
+    let skyLayer: SkyLayer | null = null;
     let resizeObserver: ResizeObserver | null = null;
 
     // Free look: drag or wheel the canvas to walk the tower back down. `target`
@@ -171,6 +176,12 @@ export default function TowerCanvas(props: Props) {
       lookXTarget = dragFrom.lookX + (e.clientX - dragFrom.x);
     };
     const onPointerUp = (e: PointerEvent) => {
+      // A tap (not a pan) on a floating snack catches it.
+      if (dragFrom && e.type === 'pointerup' && Math.hypot(e.clientX - dragFrom.x, e.clientY - dragFrom.y) < SNACK_TAP_SLOP_PX) {
+        const r = host.getBoundingClientRect();
+        const hit = skyLayer?.catchAt(e.clientX - r.left, e.clientY - r.top, performance.now());
+        if (hit) propsRef.current.onSnackCatch?.({ x: hit.x, y: hit.y });
+      }
       dragFrom = null;
       capturedPointers.delete(e.pointerId);
       if (host.hasPointerCapture(e.pointerId)) host.releasePointerCapture(e.pointerId);
@@ -250,6 +261,7 @@ export default function TowerCanvas(props: Props) {
       const flash = new Graphics();
       // A fresh sky every time the tower screen opens: a fixed seed showed every player the same props at the same floors.
       const sky = new SkyLayer(skyProps(Math.floor(Math.random() * 2 ** 31)));
+      skyLayer = sky;
       const farCity = createCity();
       const nearCity = createCity();
       created.stage.addChild(sky.container, farCity.container, nearCity.container, scene, flash);

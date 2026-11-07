@@ -38,13 +38,13 @@ import { useAuthInitialization } from '../useAuthInitialization';
 
 const USER = { id: 'user-1', user_metadata: {}, is_anonymous: false } as unknown as User;
 
-function useHarness() {
+function useHarness(fetchUserData: () => Promise<void> = () => Promise.resolve()) {
   const state = useAuthState();
   useAuthInitialization({
     userIdRef: state.userIdRef,
     lastVisibleTimeRef: state.lastVisibleTimeRef,
     setters: state.setters,
-    fetchUserData: () => Promise.resolve(),
+    fetchUserData,
   });
   return state;
 }
@@ -53,6 +53,8 @@ async function emit(event: string, user: User | null) {
   const listener = auth.listeners[auth.listeners.length - 1];
   await act(async () => {
     await listener(event, user ? { user, access_token: 't' } : null);
+    // The listener hands its work to the next macrotask.
+    await vi.advanceTimersByTimeAsync(0);
   });
 }
 
@@ -140,5 +142,41 @@ describe('useAuthInitialization when the session check is slow', () => {
     await emit('SIGNED_IN', USER);
 
     expect(reload).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not deadlock when the auth event arrives inside the auth lock', async () => {
+    // Given auth-js's lock: getSession waits until the running listener returns
+    // (initialize restoring a saved session, or exchangeCodeForSession), and
+    // fetchUserData's profile query calls getSession for the access token.
+    let releaseLock: () => void = () => {};
+    const lockFree = new Promise<void>((resolve) => {
+      releaseLock = resolve;
+    });
+    const session = { user: USER, access_token: 't' };
+    auth.getSession.mockImplementation(() =>
+      lockFree.then(() => ({ data: { session }, error: null }))
+    );
+    const fetchUserData = vi.fn(async () => {
+      await auth.getSession();
+    });
+    const { result } = renderHook(() => useHarness(fetchUserData));
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(0);
+    });
+
+    // When the restore emits SIGNED_IN inside the lock, and the lock is only
+    // released once the listener's promise settles
+    const listener = auth.listeners[auth.listeners.length - 1];
+    await act(async () => {
+      await listener('SIGNED_IN', session);
+      releaseLock();
+      await vi.advanceTimersByTimeAsync(100);
+    });
+
+    // Then the user is signed in well before the 15s fallback, with no report
+    expect(result.current.user?.id).toBe('user-1');
+    expect(result.current.loading).toBe(false);
+    expect(fetchUserData).toHaveBeenCalled();
+    expect(captureBackgroundError).not.toHaveBeenCalled();
   });
 });

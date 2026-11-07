@@ -2545,7 +2545,7 @@ const en = {
         "home": "Home",
         "close": "Close","floorsA11y": "Reached floor {n}", "combo": "Best streak", "tenants": "Tenants", "crates": "Crates", "badges": "Badges earned", "nextGoal": "Next goal", "coinsLoading": "Coins incoming…"},
     "hint": {"spell": "Spell a word to build the next floor", "drop": "Tap DROP when the floor is over the tower"},
-    "changeWord": "CHANGE WORD",
+    "changeWord": "CHANGE WORD", "cutBack": "Keep the word up to {letter}",
     "editHint": "Tap a letter you used to edit the word",
     "bestFlag": "BEST",
     "leaveConfirm": "Leave this climb? You can resume in this tab, but daily runs are one per day.",

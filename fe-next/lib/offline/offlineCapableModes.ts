@@ -116,9 +116,12 @@ export function isOfflineCapable(pathname: string): boolean {
 export function offlineCapableRoutes(): string[] {
   const routes: string[] = [];
   for (const loc of locales) {
-    for (const mode of OFFLINE_MODES) {
-      routes.push(mode.entry(loc));
-    }
+    routes.push(...offlineCapableRoutesFor(loc));
   }
   return routes;
+}
+
+/** Entry hrefs for every offline-capable mode in ONE locale (the SW warms only the visitor's locale). */
+export function offlineCapableRoutesFor(locale: string): string[] {
+  return OFFLINE_MODES.map((mode) => mode.entry(locale));
 }

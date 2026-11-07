@@ -2971,7 +2971,7 @@ const sv = {
         "home": "Hem",
         "close": "Stäng","floorsA11y": "Nådde våning {n}", "combo": "Bästa serie", "tenants": "Hyresgäster", "crates": "Lådor", "badges": "Märken du fick", "nextGoal": "Nästa mål", "coinsLoading": "Mynt på väg…"},
     "hint": {"spell": "Stava ett ord för att bygga nästa våning", "drop": "Tryck SLÄPP när våningen är över tornet"},
-    "changeWord": "BYT ORD",
+    "changeWord": "BYT ORD", "cutBack": "Behåll ordet fram till {letter}",
     "editHint": "Tryck på en använd bokstav för att ändra ordet",
     "bestFlag": "REKORD",
     "leaveConfirm": "Lämna klättringen? Du kan återuppta den i den här fliken, men den dagliga går bara en gång per dag.",

@@ -87,14 +87,42 @@ describe('LetterRow', () => {
   });
 });
 
+describe('LetterRow first-floor hint', () => {
+  it('given a hint, when rendered, then those letters glow with their order and the rest do not', () => {
+    const { container } = render(
+      <LetterRow t={t} tray={['A', 'C', 'T', 'X']} selected={[]} placing={false} canBuild={false} reducedMotion dir="ltr" onSelectTile={vi.fn()} onDeselectTile={vi.fn()} onSubmit={vi.fn()} onDrop={vi.fn()} hint={[1, 0, 2]} />,
+    );
+    const steps = [...container.querySelectorAll('[data-hint-step]')].map((el) => `${el.getAttribute('data-wheel-letter')}${el.getAttribute('data-hint-step')}`);
+    expect(steps.sort()).toEqual(['A2', 'C1', 'T3']);
+  });
+});
+
 describe('WordBox', () => {
+  const box = (over: Partial<Parameters<typeof WordBox>[0]> = {}) => {
+    const onCutTo = vi.fn();
+    render(<WordBox t={t} letters={[]} placing={false} canCut reducedMotion onCutTo={onCutTo} {...over} />);
+    return onCutTo;
+  };
+
   it('given no letters, when rendered, then it invites the first tap', () => {
-    render(<WordBox t={t} word="" placing={false} reducedMotion />);
+    box();
     expect(screen.getByText('wordTower.hud.pickLetters')).toBeTruthy();
   });
 
-  it('given a word, when rendered, then it shows the word', () => {
-    render(<WordBox t={t} word="שדה" placing={false} reducedMotion />);
-    expect(screen.getByText('שדה')).toBeTruthy();
+  it('given a word, when a letter in it is tapped, then the word is cut back to that letter', () => {
+    const onCutTo = box({ letters: ['S', 'T', 'A', 'R'] });
+    fireEvent.click(screen.getByLabelText('wordTowerV2.cutBack:T'));
+    expect(onCutTo).toHaveBeenCalledWith(1);
+  });
+
+  it('given the last letter, when tapped, then nothing is cut (it is already the end)', () => {
+    const onCutTo = box({ letters: ['S', 'T'] });
+    expect((screen.getByLabelText('wordTowerV2.cutBack:T') as HTMLButtonElement).disabled).toBe(true);
+    expect(onCutTo).not.toHaveBeenCalled();
+  });
+
+  it('given a word on the hook, when rendered, then its letters cannot be cut', () => {
+    box({ letters: ['S', 'T', 'A'], placing: true, canCut: false });
+    expect((screen.getByLabelText('wordTowerV2.cutBack:S') as HTMLButtonElement).disabled).toBe(true);
   });
 });

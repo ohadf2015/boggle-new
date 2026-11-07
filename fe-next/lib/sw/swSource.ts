@@ -13,8 +13,9 @@
  * (`\\/` → `\/`). `swSource.test.ts` parses the output with `new Function` to
  * catch any escaping slip.
  */
-import { offlineCapableRoutes } from '@/lib/offline/offlineCapableModes';
+import { offlineCapableRoutes, offlineCapableRoutesFor } from '@/lib/offline/offlineCapableModes';
 import { locales } from '@/i18n/config';
+import { SW_WARM_SHELLS_MESSAGE_TYPE } from '@/lib/sw/messages';
 
 /**
  * Cache name. The `v{MAJOR}` prefix is bumped manually on a behavior/precache
@@ -34,7 +35,7 @@ import { locales } from '@/i18n/config';
  */
 const BUILD_STAMP =
   (process.env.NEXT_PUBLIC_BUILD_TIME || '').replace(/\D/g, '').slice(0, 14) || '20260605';
-export const SW_CACHE_NAME = `lexiclash-v8-${BUILD_STAMP}`;
+export const SW_CACHE_NAME = `lexiclash-v9-${BUILD_STAMP}`;
 
 /**
  * Route shells to precache so a cold (offline) launch has a cached document to
@@ -53,11 +54,28 @@ const OFFLINE_SHELL_ROUTES: string[] = [
   ...offlineCapableRoutes(),
 ];
 
+/**
+ * Shells to warm per locale: `/`, the locale home and that locale's mode routes
+ * (12 pages, not 67).
+ *
+ * Why not precache everything on install: every deploy stamps a new cache name,
+ * so every returning browser (and Bing's renderer, which runs our JS since
+ * #1622 opened /_next/static to crawlers) re-installed the SW and fired 67
+ * server-rendered page fetches at once. On one Node process that is ~1s of
+ * blocked event loop per install, several times a minute: every visitor's
+ * pages and sockets stalled behind it. The page now asks for its own locale
+ * only, after a real user gesture, and the SW fetches one page at a time.
+ */
+export const SHELLS_BY_LOCALE: Record<string, string[]> = Object.fromEntries(
+  locales.map((l) => [l, ['/', `/${l}`, ...offlineCapableRoutesFor(l)]])
+);
+
 export const SW_SOURCE = `// LexiClash Service Worker — generated from lib/sw/swSource.ts (do not edit served copy)
 // Strategy: cache-first for static assets, network-first for pages (with an
 // offline navigation fallback), stale-while-revalidate for everything else.
 const CACHE_NAME = '${SW_CACHE_NAME}';
 const OFFLINE_SHELL_ROUTES = ${JSON.stringify(OFFLINE_SHELL_ROUTES)};
+const SHELLS_BY_LOCALE = ${JSON.stringify(SHELLS_BY_LOCALE)};
 
 function isCacheable(response) {
   return (
@@ -115,23 +133,31 @@ const CACHE_FIRST_PATTERNS = [
 ];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(async (cache) => {
-      // Critical static assets — install fails if these can't be cached.
-      await cache.addAll(PRECACHE_ASSETS);
-      // Offline-capable shells — best-effort, per-route so one failed/redirected
-      // fetch can't abort install (cache.addAll is all-or-nothing).
-      await Promise.all(
-        OFFLINE_SHELL_ROUTES.map((route) =>
-          fetch(route, { credentials: 'same-origin' })
-            .then((res) => (isCacheable(res) ? safeCachePut(cache, route, res.clone()) : undefined))
-            .catch(() => undefined)
-        )
-      );
-    })
-  );
+  // Only the tiny critical assets. Page shells are NOT fetched here: a
+  // 67-page burst on every install was stalling the whole server. The page
+  // sends WARM_SHELLS for its own locale once a person interacts.
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_ASSETS)));
   self.skipWaiting();
 });
+
+// One page at a time, skipping shells already cached for this build, so a warm
+// costs the server a trickle of renders instead of a burst.
+let warming = null;
+async function warmShells(locale) {
+  const routes = SHELLS_BY_LOCALE[locale];
+  if (!routes) return;
+  const cache = await caches.open(CACHE_NAME);
+  for (const route of routes) {
+    try {
+      if (await cache.match(route)) continue;
+      const res = await fetch(route, { credentials: 'same-origin' });
+      if (isCacheable(res)) await safeCachePut(cache, route, res.clone());
+    } catch (err) {
+      // Offline or a failed render: leave the rest for the next visit.
+      return;
+    }
+  }
+}
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
@@ -149,6 +175,15 @@ self.addEventListener('message', (event) => {
   const data = event && event.data;
   if (data && data.type === 'SKIP_WAITING') {
     self.skipWaiting();
+    return;
+  }
+  if (data && data.type === '${SW_WARM_SHELLS_MESSAGE_TYPE}' && typeof data.locale === 'string') {
+    if (!warming) {
+      warming = warmShells(data.locale).finally(() => {
+        warming = null;
+      });
+    }
+    if (event.waitUntil) event.waitUntil(warming);
   }
 });
 
