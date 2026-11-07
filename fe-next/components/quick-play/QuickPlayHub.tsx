@@ -11,6 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useAnnouncer } from '@/components/GameAnnouncer';
 import posthog from '@/lib/analytics/lazyPosthog';
 import { QuickModeAdapter } from './adapters/QuickModeAdapter';
+import { preloadQuickMode } from './adapters/preloadQuickMode';
 import { QuickPlayResults, type QuickRival } from './QuickPlayResults';
 import type { CollectedWord } from './QuickWordsCollected';
 import { recordGuestRound, quickCoinsFor, quickXpFor, recentAveragePct } from '@/lib/quickPlay/guestProgress';
@@ -33,6 +34,10 @@ type HubPhase = 'loading' | 'error' | 'playing' | 'results';
 function prefersReducedMotion(): boolean {
   if (typeof window === 'undefined' || !window.matchMedia) return false;
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+function isWheelSelection(value: unknown): value is WheelSelection {
+  return value === 'random' || (QUICK_MODES as readonly unknown[]).includes(value);
 }
 
 function sleep(ms: number): Promise<void> {
@@ -162,6 +167,8 @@ export function QuickPlayHub({ challengeId, backHref, startMode }: QuickPlayHubP
       (sel === 'random'
         ? QUICK_MODES[Math.floor(Math.random() * QUICK_MODES.length)]
         : sel);
+    // The board's code downloads during the strike instead of on the clock.
+    preloadQuickMode(mode);
     lastSelection.current = sel;
     posthog.capture('quick_play_mode_selected', { mode: sel, method, roundIndex });
     if (sel === 'random' && !activeChallenge) {
@@ -328,8 +335,13 @@ export function QuickPlayHub({ challengeId, backHref, startMode }: QuickPlayHubP
     [challenge, holdCalmUntilResults, language, roundIndex, user?.id]
   );
 
-  /** Next round: the mode the player named on the results screen, else a random one. */
-  const handleNextRound = useCallback((mode?: QuickMode) => {
+  /**
+   * Next round: the mode the player named on the results screen, else a
+   * random one. Anything that isn't a selection (a click event, a board's own
+   * payload) means "random" rather than a board for "[object Object]".
+   */
+  const handleNextRound = useCallback((next?: WheelSelection) => {
+    const mode = isWheelSelection(next) ? next : undefined;
     setRoundIndex((i) => i + 1);
     setConfig(null);
     setResult(null);

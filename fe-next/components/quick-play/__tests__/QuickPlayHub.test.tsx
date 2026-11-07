@@ -58,7 +58,7 @@ vi.mock('../adapters/QuickModeAdapter', () => ({
 vi.mock('../QuickPlayResults', () => ({
   QuickPlayResults: ({ onNextRound }: any) => (
     <div data-testid="mock-results">
-      <button data-testid="mock-next" onClick={() => onNextRound()}>next</button>
+      <button data-testid="mock-next" onClick={() => onNextRound('random')}>next</button>
     </div>
   ),
 }));

@@ -116,3 +116,21 @@ describe('QuickClassicBoard — ghost rivals', () => {
     expect(lastBoard().leaderboard.length).toBe(1);
   });
 });
+
+describe('QuickClassicBoard — rivals race the 60-second par', () => {
+  beforeEach(() => {
+    captured.length = 0;
+    coreState = { score: 0, remainingTime: 0 };
+  });
+
+  it('a 90% rival finishes at 90% of par, not of the solver perfect', () => {
+    render(
+      <QuickClassicBoard
+        config={{ ...config, perfectScore: 20000, parScore: 250, parWords: 25 } as QuickRoundConfig}
+        onDone={vi.fn()}
+        onQuit={vi.fn()}
+      />
+    );
+    expect(lastBoard().leaderboard.find((r) => r.username === 'Bo')!.score).toBe(225);
+  });
+});

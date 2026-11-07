@@ -6,14 +6,23 @@ import { ResultsNextBar } from '@/components/results/stage/ResultsNextBar';
 import { ModeGlyph } from './ModeGlyph';
 import { NODE_COLORS } from './modeColors';
 import { QUICK_MODES, type QuickMode } from './types';
+import type { WheelSelection } from './wheelGeometry';
 
-/** The one primary action, pinned under the scrolling results. */
+/**
+ * The one primary action, pinned under the scrolling results. "Spin next round"
+ * spins: it deals a random round right away. It used to call onNextRound() with
+ * no mode, which the hub ignores outside a live round (its guard against stale
+ * board quits) — the button did nothing.
+ */
 export function QuickResultsCtaBar({
+  currentMode,
   onNextRound,
   onChallenge,
   shine,
 }: {
-  onNextRound: (mode?: QuickMode) => void;
+  /** The mode just played; when given, the next-mode chips pin above the button. */
+  currentMode?: QuickMode;
+  onNextRound: (mode?: WheelSelection) => void;
   onChallenge: () => void;
   shine: boolean;
 }) {
@@ -22,7 +31,9 @@ export function QuickResultsCtaBar({
     <ResultsNextBar
       testId="quick-results-cta-bar"
       shine={shine}
-      primary={{ label: t('quickPlay.solo.nextRound'), onClick: () => onNextRound(), testId: 'quick-results-next' }}
+      clearAdBand
+      top={currentMode ? <QuickResultsModeSwitch currentMode={currentMode} onNextRound={onNextRound} compact /> : undefined}
+      primary={{ label: t('quickPlay.solo.nextRound'), onClick: () => onNextRound('random'), testId: 'quick-results-next' }}
       secondary={{
         label: t('quickPlay.solo.challengeFriend'),
         title: t('quickPlay.solo.challengeHint'),
@@ -34,17 +45,30 @@ export function QuickResultsCtaBar({
   );
 }
 
-/** Pick a different mode for the next round — secondary, below the hero. */
+/**
+ * Pick the next round's mode. `compact` is the row pinned in the bottom bar
+ * (always on screen, above the tab bar and the ad band); the card form is kept
+ * for any caller that lists it in a scrolling column.
+ */
 export function QuickResultsModeSwitch({
   currentMode,
   onNextRound,
+  compact = false,
 }: {
   currentMode: QuickMode;
-  onNextRound: (mode?: QuickMode) => void;
+  onNextRound: (mode?: WheelSelection) => void;
+  compact?: boolean;
 }) {
   const { t } = useLanguage();
   return (
-    <div className="flex flex-col gap-2.5 rounded-2xl border-neo-thick border-black bg-neo-navy-elevated p-3 shadow-hard" data-testid="quick-next-mode-picker">
+    <div
+      className={
+        compact
+          ? 'flex flex-col gap-1.5'
+          : 'flex flex-col gap-2.5 rounded-2xl border-neo-thick border-black bg-neo-navy-elevated p-3 shadow-hard'
+      }
+      data-testid="quick-next-mode-picker"
+    >
       <span className="font-neo-display text-[10px] uppercase tracking-[0.18em] text-neo-white/55">
         {t('quickPlay.solo.pickNextMode', 'Next round')}
       </span>
@@ -58,7 +82,7 @@ export function QuickResultsModeSwitch({
               data-testid={`quick-next-mode-${mode}`}
               data-current={isCurrent || undefined}
               onClick={() => onNextRound(mode)}
-              className={`relative flex h-[60px] min-w-0 flex-col items-center justify-center gap-0.5 rounded-xl border-[3px] border-black px-1 font-neo-display text-[11px] font-bold tracking-wide text-black shadow-hard-sm transition-transform active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${
+              className={`relative flex ${compact ? 'h-[48px]' : 'h-[60px]'} min-w-0 flex-col items-center justify-center gap-0.5 rounded-xl border-[3px] border-black px-1 font-neo-display text-[11px] font-bold tracking-wide text-black shadow-hard-sm transition-transform active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${
                 NODE_COLORS[mode].bg
               } ${isCurrent ? '' : 'saturate-[0.85]'}`}
             >

@@ -19,6 +19,8 @@ interface RivalCompareCardProps {
   /** Real avatar for the current player — falls back to a 👤 glyph when omitted. */
   myAvatar?: RivalAvatar;
   t: (key: string) => string;
+  /** Overrides the default header, e.g. to say what the two numbers measure. */
+  header?: string;
 }
 
 /**
@@ -33,6 +35,7 @@ export default function RivalCompareCard({
   rivalAvatar,
   myAvatar,
   t,
+  header,
 }: RivalCompareCardProps) {
   // Determine outcome
   let outcomeMessage: string;
@@ -57,7 +60,7 @@ export default function RivalCompareCard({
     >
       {/* Header: "Challenge Comparison" or similar */}
       <h3 className="text-xs font-bold uppercase text-neo-white/70 mb-3 text-center">
-        {t('daily.rival.header')}
+        {header ?? t('daily.rival.header')}
       </h3>
 
       {/* Two-column score comparison */}

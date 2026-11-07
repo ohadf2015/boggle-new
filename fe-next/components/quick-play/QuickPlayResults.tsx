@@ -26,7 +26,7 @@ import { emitCoinEarned } from '@/utils/coinEarnedFx';
 import RivalCompareCard from '@/components/daily/RivalCompareCard';
 import { ResultsAvatarStage } from '@/components/results/stage/ResultsAvatarStage';
 import { QuickResultsStats } from './QuickResultsStats';
-import { QuickResultsCtaBar, QuickResultsModeSwitch } from './QuickResultsNextActions';
+import { QuickResultsCtaBar } from './QuickResultsNextActions';
 import { QuickPlayRankCard } from './QuickPlayRankCard';
 import { QuickRivalsPassed } from './QuickRivalsPassed';
 import { QuickWordsCollected, type CollectedWord } from './QuickWordsCollected';
@@ -36,7 +36,8 @@ import { quickRank } from './quickRank';
 import { NODE_COLORS } from './modeColors';
 import type { QuickGhostRival } from '@/lib/quickPlay/ghostRivals';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
-import type { QuickMode, QuickRoundResult, QuickSubmitOutcome } from './types';
+import type { QuickRoundResult, QuickSubmitOutcome } from './types';
+import type { WheelSelection } from './wheelGeometry';
 
 export interface QuickRival {
   name: string;
@@ -73,8 +74,8 @@ interface QuickPlayResultsProps {
   isGuest?: boolean;
   /** Consecutive days played (guests included). 0/1 hides the badge. */
   dayStreak?: number;
-  /** A mode means "start that one now"; undefined means back to the wheel. */
-  onNextRound: (mode?: QuickMode) => void;
+  /** Start that round now: a mode, or 'random' for a spin. */
+  onNextRound: (mode?: WheelSelection) => void;
   onChallenge: () => void;
   /** Leave the hub from the results screen; omitted = no exit button. */
   onExit?: () => void;
@@ -208,7 +209,7 @@ export function QuickPlayResults({
   return (
     <div className="relative flex max-h-[100dvh] min-h-0 flex-1 flex-col overflow-hidden bg-neo-navy" data-testid="quick-play-results">
       <div className="relative min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain" data-testid="quick-results-scroll">
-        <div className="flex min-h-[calc(100dvh-var(--bottom-nav-height,0px)-6.75rem)] flex-col" data-testid="quick-results-stage">
+        <div className="flex min-h-[calc(100dvh-var(--bottom-nav-height,0px)-var(--admob-banner-height,0px)-11rem)] flex-col" data-testid="quick-results-stage">
           <header className="relative z-20 mx-auto flex w-full max-w-5xl items-center justify-between gap-2 px-4 pt-3">
             {onExit ? (
               <button
@@ -362,6 +363,13 @@ export function QuickPlayResults({
             />
             {rival && rival.avatarUserId && (
               <RivalCompareCard
+                // Weekly rival numbers are this week's rank points (sum of round %),
+                // not this round's score — say so, or "you 2, Joker 0" reads as a bug.
+                header={
+                  rival.type === 'weekly'
+                    ? t('quickPlay.solo.weeklyRival', 'Weekly rival · rank points this week')
+                    : undefined
+                }
                 rivalName={rival.name}
                 rivalEmoji={rival.emoji}
                 rivalScore={rival.theirValue}
@@ -371,7 +379,6 @@ export function QuickPlayResults({
                 t={t}
               />
             )}
-            <QuickResultsModeSwitch currentMode={result.mode} onNextRound={onNextRound} />
           </div>
           <div className="flex flex-col gap-3">
             {wordList.length > 0 ? (
@@ -400,7 +407,12 @@ export function QuickPlayResults({
         />
       </div>
 
-      <QuickResultsCtaBar onNextRound={onNextRound} onChallenge={onChallenge} shine={animate} />
+      <QuickResultsCtaBar
+        currentMode={result.mode}
+        onNextRound={onNextRound}
+        onChallenge={onChallenge}
+        shine={animate}
+      />
     </div>
   );
 }

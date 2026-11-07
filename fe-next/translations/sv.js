@@ -12784,6 +12784,7 @@ const sv = {
       "durationUnit": "sekunder",
       "roundComplete": "Rundan klar",
       "ofPerfect": "av perfekt",
+      "weeklyRival": "Veckans rival · rankpoäng den här veckan",
       "wordsFound": "{found} / {total} ord hittade",
       "targetWordFound": "🎯 Du hittade ordet: {word}",
       "targetWordMissed": "🎯 Ordet var: {word}",

@@ -326,8 +326,9 @@ describe('QuickPlayResults — mascot, standings and words', () => {
     );
     screen.getByTestId('quick-next-mode-blast').click();
     expect(onNextRound).toHaveBeenCalledWith('blast');
+    // The primary CTA spins straight into a random round (no-arg was ignored by the hub).
     screen.getByTestId('quick-results-next').click();
-    expect(onNextRound).toHaveBeenLastCalledWith();
+    expect(onNextRound).toHaveBeenLastCalledWith('random');
   });
 
   it('fills the words column with the mascot when the round scored nothing', () => {

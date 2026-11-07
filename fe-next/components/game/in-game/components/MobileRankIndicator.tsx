@@ -78,12 +78,12 @@ export function MobileRankIndicator({
         : 'bg-neo-purple text-neo-white';
 
   return (
-    <div className="block lg:hidden relative" dir={dir}>
-      <div className="flex items-center justify-center gap-1.5">
+    <div className="block min-w-0 lg:hidden relative" dir={dir}>
+      <div className="flex min-w-0 items-center justify-center gap-1.5">
         {/* Persistent place pill */}
         <div
           className={cn(
-            'flex items-center justify-center gap-1.5 rounded-neo border-neo px-3 py-1 font-neo-display',
+            'flex shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-neo border-neo px-3 py-1 font-neo-display',
             'shadow-hard-sm select-none',
             isLeading
               ? 'bg-neo-yellow text-neo-black border-neo-black'
@@ -107,7 +107,7 @@ export function MobileRankIndicator({
           <div
             data-testid="mobile-rival-chip"
             className={cn(
-              'flex items-center gap-1 rounded-neo border-neo border-neo-black px-2 py-1 font-neo-display',
+              'flex min-w-0 items-center gap-1 rounded-neo border-neo border-neo-black px-2 py-1 font-neo-display',
               'shadow-hard-sm select-none max-w-[9rem]',
               rivalChipColor,
             )}

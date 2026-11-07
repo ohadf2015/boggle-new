@@ -32,7 +32,12 @@ export interface QuickRoundConfig {
   targetWord?: string;
   /** All solver-findable words, lowercase */
   words: string[];
+  /** Every solver word scored — the anti-cheat ceiling, not a target anyone reaches. */
   perfectScore: number;
+  /** The 60-second target: what a strong round looks like. Score % is measured against this. */
+  parScore: number;
+  /** How many words make up the par (the denominator players see). */
+  parWords: number;
 }
 
 export const QUICK_ROUND_DURATION_SEC = 60;
@@ -53,6 +58,29 @@ export function scoreWordsForMode(mode: QuickMode, words: string[]): number {
     return words.reduce((sum, w) => sum + scoreWheelWord(w), 0);
   }
   return words.reduce((sum, w) => sum + calculateWordScore(w, 0), 0);
+}
+
+/**
+ * Words in a strong 60-second round, per mode. "Perfect" (every solver word,
+ * often 400-500 words and 15k-30k points) is unreachable: real rounds land at
+ * 0-5% of it (quick_play_results Jul-Nov 2026: best classic 173 pts vs a
+ * 15k-26k perfect). That one scale broke the % card, the rank ladder and the
+ * 30/60/85% ghost rivals at once. Par is the sum of the N easiest words —
+ * shortest first, the ones people actually find — so a good round reads 50-100%.
+ * Blast is lower: tiles leave the board as you clear them.
+ */
+export const PAR_WORDS: Record<QuickMode, number> = {
+  classic: 25,
+  blast: 15,
+  'word-hunt': 20,
+  'wheel-rush': 30,
+};
+
+export function parScoreForMode(mode: QuickMode, words: string[]): { parScore: number; parWords: number } {
+  const easiest = [...words]
+    .sort((a, b) => a.length - b.length || scoreWordsForMode(mode, [a]) - scoreWordsForMode(mode, [b]))
+    .slice(0, PAR_WORDS[mode]);
+  return { parScore: Math.max(1, scoreWordsForMode(mode, easiest)), parWords: easiest.length };
 }
 
 export async function buildQuickRound(
@@ -90,6 +118,7 @@ export async function buildQuickRound(
       wheel,
       words,
       perfectScore: Math.max(1, scoreWordsForMode(mode, words)),
+      ...parScoreForMode(mode, words),
     };
   }
 
@@ -112,5 +141,6 @@ export async function buildQuickRound(
     words,
     targetWord,
     perfectScore: Math.max(1, scoreWordsForMode(mode, words)),
+    ...parScoreForMode(mode, words),
   };
 }
