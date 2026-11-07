@@ -10409,7 +10409,6 @@ const ja = {
       "guestNameDefaultHint": "今は「{name}」と表示されています。多くのプレイヤーに付くランダムな名前です。",
       "guestNamePlaceholder": "あなたの名前",
       "guestNameClaim": "名前を表示する",
-      "guestNameNotNow": "今はしない",
       "guestNameDefaultNudge": "ランキングでは「{name}」(ランダムな名前)と表示されています。この記録に自分の名前を。",
       "guestNameUseMine": "自分の名前にする",
       "wordsFound": "見つかった単語",

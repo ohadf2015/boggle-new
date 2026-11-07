@@ -18,9 +18,7 @@ const t = (key: string, fallbackOrParams?: string | Record<string, string | numb
 // A name from the generated pool vs one a player typed.
 const GENERATED = 'Sneaky Potato';
 const CHOSEN = 'Zigzag';
-// exp-guest-name-closable-v1 arms are hashed from the fingerprint.
-const FORCED_FP = 'fp-2';
-const CLOSABLE_FP = 'fp-1';
+const FP = 'fp-2';
 
 function jsonResponse(status: number, body: unknown) {
   return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
@@ -48,7 +46,7 @@ describe('GuestNameEditor — a guest who owns their name', () => {
   it('renames on the server, persists every local guest-name store, and notifies the parent', async () => {
     fetchMock.mockResolvedValue(jsonResponse(200, { displayName: 'Ohad' }));
     const onRenamed = vi.fn();
-    render(<GuestNameEditor name={CHOSEN} guestFingerprint={FORCED_FP} onRenamed={onRenamed} t={t} />);
+    render(<GuestNameEditor name={CHOSEN} guestFingerprint={FP} onRenamed={onRenamed} t={t} />);
 
     expect(screen.getByText(CHOSEN)).toBeInTheDocument();
     rename('  Ohad ');
@@ -57,19 +55,19 @@ describe('GuestNameEditor — a guest who owns their name', () => {
     const [url, init] = fetchMock.mock.calls[0];
     expect(url).toBe('/api/daily-challenge/guest-name');
     expect(init.method).toBe('POST');
-    expect(JSON.parse(init.body)).toEqual({ guestFingerprint: FORCED_FP, towerFingerprint: getGuestFingerprint(), displayName: 'Ohad' });
+    expect(JSON.parse(init.body)).toEqual({ guestFingerprint: FP, towerFingerprint: getGuestFingerprint(), displayName: 'Ohad' });
     expect(getGuestFingerprint()).toBeTruthy();
     expect(getStoredUsername()).toBe('Ohad');
     expect(getGuestName()).toBe('Ohad');
     expect(JSON.parse(localStorage.getItem(GUEST_DAILY_PLAYER_KEY) ?? '{}').displayName).toBe('Ohad');
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
-    expect(trackGrowthEvent).toHaveBeenCalledWith('daily_guest_name_saved', { source: 'edit', was_default: false, arm: 'forced' });
+    expect(trackGrowthEvent).toHaveBeenCalledWith('daily_guest_name_saved', { source: 'edit', was_default: false });
   });
 
   it('keeps the old name and shows an error when the server rejects it', async () => {
     fetchMock.mockResolvedValue(jsonResponse(400, { error: 'profane' }));
     const onRenamed = vi.fn();
-    render(<GuestNameEditor name={CHOSEN} guestFingerprint={FORCED_FP} onRenamed={onRenamed} t={t} />);
+    render(<GuestNameEditor name={CHOSEN} guestFingerprint={FP} onRenamed={onRenamed} t={t} />);
 
     rename('badword');
 
@@ -79,54 +77,53 @@ describe('GuestNameEditor — a guest who owns their name', () => {
   });
 
   it('does not call the server for a blank or unchanged name', () => {
-    render(<GuestNameEditor name={CHOSEN} guestFingerprint={FORCED_FP} onRenamed={vi.fn()} t={t} />);
+    render(<GuestNameEditor name={CHOSEN} guestFingerprint={FP} onRenamed={vi.fn()} t={t} />);
     rename('   ');
     rename(CHOSEN);
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it('shows no random-name nudge for a chosen name', () => {
-    render(<GuestNameEditor name={CHOSEN} guestFingerprint={FORCED_FP} onRenamed={vi.fn()} t={t} />);
+    render(<GuestNameEditor name={CHOSEN} guestFingerprint={FP} onRenamed={vi.fn()} t={t} />);
     expect(screen.queryByTestId('guest-name-default-nudge')).not.toBeInTheDocument();
   });
 });
 
-describe('GuestNameEditor — still on a generated name after the prompt', () => {
+describe('GuestNameEditor — kept a generated name on an earlier finish', () => {
   beforeEach(() => markGuestNameChosen());
 
-  it('says the name is random and offers to swap it, without blocking the screen', async () => {
-    // Given a guest who kept "Sneaky Potato" earlier
+  it('asks again, blocking, until they type a real name', async () => {
+    // Given a guest who kept "Sneaky Potato" before the prompt became mandatory
     fetchMock.mockResolvedValue(jsonResponse(200, { displayName: 'Ohad' }));
     const onRenamed = vi.fn();
-    render(<GuestNameEditor name={GENERATED} guestFingerprint={FORCED_FP} onRenamed={onRenamed} t={t} />);
+    render(<GuestNameEditor name={GENERATED} guestFingerprint={FP} onRenamed={onRenamed} t={t} />);
 
-    // Then the bar names it as a random name, and no dialog is open
-    expect(screen.getByTestId('guest-name-default-nudge')).toHaveTextContent(
-      "You're on the board as Sneaky Potato, a random name. Make this score yours.",
-    );
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-
-    // When they take the offer, the field starts empty rather than on the random name
-    fireEvent.click(screen.getByRole('button', { name: 'Use my name' }));
+    // Then the name dialog opens with an empty field
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(screen.getByRole('textbox')).toHaveValue('');
-    expect(screen.getByRole('textbox')).toHaveAttribute('placeholder', 'Your name');
 
     fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Ohad' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Show my name' }));
 
     await waitFor(() => expect(onRenamed).toHaveBeenCalledWith('Ohad'));
-    expect(trackGrowthEvent).toHaveBeenCalledWith('daily_guest_name_saved', { source: 'nudge', was_default: true, arm: 'forced' });
   });
 
   it('spots a generated name from another language too', () => {
-    render(<GuestNameEditor name="דונאט שובב" guestFingerprint={FORCED_FP} onRenamed={vi.fn()} t={t} />);
-    expect(screen.getByTestId('guest-name-default-nudge')).toBeInTheDocument();
+    render(<GuestNameEditor name="דונאט שובב" guestFingerprint={FP} onRenamed={vi.fn()} t={t} />);
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+  });
+
+  it('even when they dismissed the old closable prompt earlier today', () => {
+    localStorage.setItem('lexiclash_guest_name_prompt_dismissed_on', new Date().toISOString().slice(0, 10));
+    render(<GuestNameEditor name={GENERATED} guestFingerprint={FP} onRenamed={vi.fn()} t={t} />);
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Not now' })).not.toBeInTheDocument();
   });
 });
 
 describe('GuestNameEditor — first finish', () => {
   it('opens on the guest\'s rank and shows a live preview of their leaderboard row', () => {
-    render(<GuestNameEditor name={GENERATED} guestFingerprint={FORCED_FP} rank={4} totalPlayers={120} onRenamed={vi.fn()} t={t} />);
+    render(<GuestNameEditor name={GENERATED} guestFingerprint={FP} rank={4} totalPlayers={120} onRenamed={vi.fn()} t={t} />);
 
     expect(screen.getByRole('dialog')).toHaveTextContent("You're #4 of 120 today!");
     const preview = screen.getByTestId('guest-name-preview');
@@ -143,23 +140,23 @@ describe('GuestNameEditor — first finish', () => {
     [40, 50, "You made today's leaderboard!"],
     [null, null, "You made today's leaderboard!"],
   ])('rank %s of %s opens with "%s"', (rank, total, headline) => {
-    render(<GuestNameEditor name={GENERATED} guestFingerprint={FORCED_FP} rank={rank} totalPlayers={total} onRenamed={vi.fn()} t={t} />);
+    render(<GuestNameEditor name={GENERATED} guestFingerprint={FP} rank={rank} totalPlayers={total} onRenamed={vi.fn()} t={t} />);
     expect(screen.getByRole('dialog')).toHaveTextContent(headline);
   });
 
   it('tells a guest on a generated name that it is random, with an empty field', () => {
-    render(<GuestNameEditor name={GENERATED} guestFingerprint={FORCED_FP} onRenamed={vi.fn()} t={t} />);
+    render(<GuestNameEditor name={GENERATED} guestFingerprint={FP} onRenamed={vi.fn()} t={t} />);
 
     expect(screen.getByTestId('guest-name-default-hint')).toHaveTextContent(
       'Right now you show up as "Sneaky Potato", a random name lots of players get.',
     );
     expect(screen.getByRole('textbox')).toHaveValue('');
     expect(screen.getByRole('textbox')).toHaveAttribute('placeholder', 'Your name');
-    expect(trackGrowthEvent).toHaveBeenCalledWith('daily_guest_name_prompt_shown', { is_default: true, rank: null, arm: 'forced' });
+    expect(trackGrowthEvent).toHaveBeenCalledWith('daily_guest_name_prompt_shown', { is_default: true, rank: null });
   });
 
   it('prefills a name the guest typed elsewhere so one tap confirms it', async () => {
-    render(<GuestNameEditor name={CHOSEN} guestFingerprint={FORCED_FP} onRenamed={vi.fn()} t={t} />);
+    render(<GuestNameEditor name={CHOSEN} guestFingerprint={FP} onRenamed={vi.fn()} t={t} />);
 
     expect(screen.queryByTestId('guest-name-default-hint')).not.toBeInTheDocument();
     expect(screen.getByRole('textbox')).toHaveValue(CHOSEN);
@@ -174,7 +171,7 @@ describe('GuestNameEditor — first finish', () => {
   it('saves the typed name and stops asking', async () => {
     fetchMock.mockResolvedValue(jsonResponse(200, { displayName: 'Ohad' }));
     const onRenamed = vi.fn();
-    render(<GuestNameEditor name={GENERATED} guestFingerprint={FORCED_FP} onRenamed={onRenamed} t={t} />);
+    render(<GuestNameEditor name={GENERATED} guestFingerprint={FP} onRenamed={onRenamed} t={t} />);
 
     fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Ohad' } });
     fireEvent.click(screen.getByRole('button', { name: 'Show my name' }));
@@ -182,12 +179,12 @@ describe('GuestNameEditor — first finish', () => {
     await waitFor(() => expect(onRenamed).toHaveBeenCalledWith('Ohad'));
     expect(hasChosenGuestName()).toBe(true);
     expect(screen.queryByTestId('guest-name-prompt')).not.toBeInTheDocument();
-    expect(trackGrowthEvent).toHaveBeenCalledWith('daily_guest_name_saved', { source: 'prompt', was_default: true, arm: 'forced' });
+    expect(trackGrowthEvent).toHaveBeenCalledWith('daily_guest_name_saved', { source: 'prompt', was_default: true });
   });
 
   it('stays open with an error when the server rejects the name', async () => {
     fetchMock.mockResolvedValue(jsonResponse(400, { error: 'profane' }));
-    render(<GuestNameEditor name={GENERATED} guestFingerprint={FORCED_FP} onRenamed={vi.fn()} t={t} />);
+    render(<GuestNameEditor name={GENERATED} guestFingerprint={FP} onRenamed={vi.fn()} t={t} />);
 
     fireEvent.change(screen.getByRole('textbox'), { target: { value: 'badword' } });
     fireEvent.click(screen.getByRole('button', { name: 'Show my name' }));
@@ -198,7 +195,7 @@ describe('GuestNameEditor — first finish', () => {
   });
 
   it('is a blocking dialog with no way to skip it', () => {
-    render(<GuestNameEditor name={GENERATED} guestFingerprint={FORCED_FP} onRenamed={vi.fn()} t={t} />);
+    render(<GuestNameEditor name={GENERATED} guestFingerprint={FP} onRenamed={vi.fn()} t={t} />);
 
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Keep this name' })).not.toBeInTheDocument();
@@ -211,7 +208,7 @@ describe('GuestNameEditor — first finish', () => {
   });
 
   it('refuses to save a generated name as the chosen one', async () => {
-    render(<GuestNameEditor name={CHOSEN} guestFingerprint={FORCED_FP} onRenamed={vi.fn()} t={t} />);
+    render(<GuestNameEditor name={CHOSEN} guestFingerprint={FP} onRenamed={vi.fn()} t={t} />);
 
     fireEvent.change(screen.getByRole('textbox'), { target: { value: 'sneaky potato' } });
     fireEvent.click(screen.getByRole('button', { name: 'Show my name' }));
@@ -223,72 +220,11 @@ describe('GuestNameEditor — first finish', () => {
   });
 
   it('will not submit a blank name', () => {
-    render(<GuestNameEditor name={GENERATED} guestFingerprint={FORCED_FP} onRenamed={vi.fn()} t={t} />);
+    render(<GuestNameEditor name={GENERATED} guestFingerprint={FP} onRenamed={vi.fn()} t={t} />);
 
     fireEvent.change(screen.getByRole('textbox'), { target: { value: '   ' } });
 
     expect(screen.getByRole('button', { name: 'Show my name' })).toBeDisabled();
     expect(fetchMock).not.toHaveBeenCalled();
-  });
-});
-
-describe('GuestNameEditor — closable arm of exp-guest-name-closable-v1', () => {
-  it('closes with "Not now" into the random-name bar, for the rest of the day', () => {
-    // Given a guest in the closable arm on their first finish
-    const { unmount } = render(<GuestNameEditor name={GENERATED} guestFingerprint={CLOSABLE_FP} onRenamed={vi.fn()} t={t} />);
-    expect(trackGrowthEvent).toHaveBeenCalledWith('daily_guest_name_prompt_shown', { is_default: true, rank: null, arm: 'closable' });
-
-    // When they tap "Not now"
-    fireEvent.click(screen.getByRole('button', { name: 'Not now' }));
-
-    // Then the dialog gives way to the yellow bar, without saving anything
-    expect(screen.queryByTestId('guest-name-prompt')).not.toBeInTheDocument();
-    expect(screen.getByTestId('guest-name-default-nudge')).toBeInTheDocument();
-    expect(trackGrowthEvent).toHaveBeenCalledWith('daily_guest_name_prompt_closed', { is_default: true, arm: 'closable' });
-    expect(fetchMock).not.toHaveBeenCalled();
-    expect(hasChosenGuestName()).toBe(false);
-
-    // And another finish the same day doesn't open it again
-    unmount();
-    render(<GuestNameEditor name={GENERATED} guestFingerprint={CLOSABLE_FP} onRenamed={vi.fn()} t={t} />);
-    expect(screen.queryByTestId('guest-name-prompt')).not.toBeInTheDocument();
-    expect(screen.getByTestId('guest-name-default-nudge')).toBeInTheDocument();
-  });
-
-  it('also closes on Escape', () => {
-    render(<GuestNameEditor name={GENERATED} guestFingerprint={CLOSABLE_FP} onRenamed={vi.fn()} t={t} />);
-    fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
-    expect(screen.queryByTestId('guest-name-prompt')).not.toBeInTheDocument();
-  });
-
-  it('asks again on the next day\'s finish', () => {
-    vi.useFakeTimers({ toFake: ['Date'] });
-    try {
-      vi.setSystemTime(new Date('2026-11-04T10:00:00Z'));
-      const { unmount } = render(<GuestNameEditor name={GENERATED} guestFingerprint={CLOSABLE_FP} onRenamed={vi.fn()} t={t} />);
-      fireEvent.click(screen.getByRole('button', { name: 'Not now' }));
-      unmount();
-
-      vi.setSystemTime(new Date('2026-11-06T10:00:00Z'));
-      render(<GuestNameEditor name={GENERATED} guestFingerprint={CLOSABLE_FP} onRenamed={vi.fn()} t={t} />);
-      expect(screen.getByTestId('guest-name-prompt')).toBeInTheDocument();
-    } finally {
-      vi.useRealTimers();
-    }
-  });
-
-  it('tags a save with the closable arm', async () => {
-    fetchMock.mockResolvedValue(jsonResponse(200, { displayName: 'Ohad' }));
-    render(<GuestNameEditor name={GENERATED} guestFingerprint={CLOSABLE_FP} onRenamed={vi.fn()} t={t} />);
-    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Ohad' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Show my name' }));
-    await waitFor(() =>
-      expect(trackGrowthEvent).toHaveBeenCalledWith('daily_guest_name_saved', { source: 'prompt', was_default: true, arm: 'closable' }),
-    );
-  });
-
-  it('never shows "Not now" in the forced arm', () => {
-    render(<GuestNameEditor name={GENERATED} guestFingerprint={FORCED_FP} onRenamed={vi.fn()} t={t} />);
-    expect(screen.queryByRole('button', { name: 'Not now' })).not.toBeInTheDocument();
   });
 });

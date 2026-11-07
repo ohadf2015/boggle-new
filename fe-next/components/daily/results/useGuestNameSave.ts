@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { getGuestFingerprint, markGuestNameChosen, saveGuestNameEverywhere } from '@/utils/guestManager';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { isDefaultPlayerName } from '@/utils/defaultPlayerNames';
-import { getGuestNamePromptArm } from './guestNamePromptArm';
 
 export const MAX_GUEST_NAME_LENGTH = 20;
 
@@ -57,7 +56,7 @@ export function useGuestNameSave(
       }
       saveGuestNameEverywhere(body.displayName);
       markGuestNameChosen();
-      trackGrowthEvent('daily_guest_name_saved', { source, was_default: isDefaultPlayerName(name), arm: getGuestNamePromptArm(guestFingerprint) });
+      trackGrowthEvent('daily_guest_name_saved', { source, was_default: isDefaultPlayerName(name) });
       onRenamed(body.displayName);
       return true;
     } catch {
