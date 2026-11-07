@@ -1,0 +1,14 @@
+{
+  "games": 2315,
+  "average": 3.46,
+  "solvedInSix": 2315,
+  "opener": "trace",
+  "distribution": {
+    "1": 1,
+    "2": 81,
+    "3": 1182,
+    "4": 958,
+    "5": 89,
+    "6": 4
+  }
+}
