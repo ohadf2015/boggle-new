@@ -612,7 +612,35 @@ const sv = {
     "practice": {
       "close": "Stäng",
       "title": "Öva: {title}",
-      "pick": "Välj ett spel"
+      "pick": "Välj ett spel",
+      "spell": {
+        "modeTitle": "Stava",
+        "modeSub": "Lyssna på ordet, tryck på bokstäverna",
+        "welcomeTitle": "Redo att stava?",
+        "welcomeBody": "Lyssna på varje ord och tryck på bokstäverna för att stava det. Blev det fel bokstav? Då försöker du bara igen.",
+        "wordCount": "{count} ord",
+        "start": "Starta",
+        "hear": "Lyssna på ordet",
+        "peek": "Visa ordet",
+        "noVoice": "Den här enheten kan inte läsa upp ord. Titta på ordet och stava det sedan ur minnet.",
+        "listen": "Lyssna och stava",
+        "erase": "Sudda en bokstav",
+        "correct": "Perfekt!",
+        "wrong": "Fortsätt! Du klarar det.",
+        "shown": "Här är ordet. Försök igen.",
+        "stars": "Stjärnor",
+        "progress": "Ord {n} av {total}",
+        "endTitle": "Listan klar!",
+        "endAccuracy": "{correct} av {total} ord rätt på första försöket",
+        "endStars": "Intjänade stjärnor: {stars}",
+        "cheerTop": "Fantastiskt jobbat!",
+        "cheerMid": "Bra övat!",
+        "cheerLow": "Bra kämpat. Spela igen och slå det!",
+        "again": "Öva igen",
+        "teacherTitle": "Undervisar du med den här listan?",
+        "teacherBody": "Visa den på storskärmen som ett livespel för klassen. Eleverna går med via en kod, inga konton.",
+        "teacherCta": "Spela med klassen"
+      }
     },
     "hub": {
       "metaTitle": "Gratis ordlistor för klassrummet, efter årskurs och tema",

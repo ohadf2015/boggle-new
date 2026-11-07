@@ -612,7 +612,35 @@ const en = {
     "practice": {
       "close": "Close",
       "title": "Practice: {title}",
-      "pick": "Pick a game"
+      "pick": "Pick a game",
+      "spell": {
+        "modeTitle": "Spell it",
+        "modeSub": "Hear the word, tap the letters",
+        "welcomeTitle": "Ready to spell?",
+        "welcomeBody": "Listen to each word, then tap the letters to spell it. A wrong letter just means another go.",
+        "wordCount": "{count} words",
+        "start": "Start",
+        "hear": "Hear the word",
+        "peek": "Show the word",
+        "noVoice": "This device can't read words aloud. Look at the word, then spell it from memory.",
+        "listen": "Listen, then spell it",
+        "erase": "Erase a letter",
+        "correct": "Perfect!",
+        "wrong": "Keep going! You've got this.",
+        "shown": "Here's the word. Have another go.",
+        "stars": "Stars",
+        "progress": "Word {n} of {total}",
+        "endTitle": "List done!",
+        "endAccuracy": "{correct} of {total} words right first time",
+        "endStars": "Stars earned: {stars}",
+        "cheerTop": "Amazing work!",
+        "cheerMid": "Great practice!",
+        "cheerLow": "Good effort. Play again to beat it!",
+        "again": "Practice again",
+        "teacherTitle": "Teaching this list?",
+        "teacherBody": "Put it on the big screen as a live class game. Students join with a code, no accounts.",
+        "teacherCta": "Play it with your class"
+      }
     },
     "hub": {
       "metaTitle": "Free word lists for the classroom, by grade and topic",

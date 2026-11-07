@@ -612,7 +612,35 @@ const es = {
     "practice": {
       "close": "Cerrar",
       "title": "Practicar: {title}",
-      "pick": "Elige un juego"
+      "pick": "Elige un juego",
+      "spell": {
+        "modeTitle": "Deletrear",
+        "modeSub": "Escucha la palabra y toca las letras",
+        "welcomeTitle": "¿Empezamos a deletrear?",
+        "welcomeBody": "Escucha cada palabra y toca las letras para escribirla. Si te equivocas de letra, lo intentas otra vez.",
+        "wordCount": "{count} palabras",
+        "start": "Empezar",
+        "hear": "Escuchar la palabra",
+        "peek": "Ver la palabra",
+        "noVoice": "Este dispositivo no puede leer palabras en voz alta. Mira la palabra y escríbela de memoria.",
+        "listen": "Escucha y escríbela",
+        "erase": "Borrar una letra",
+        "correct": "¡Perfecto!",
+        "wrong": "¡Sigue así, tú puedes!",
+        "shown": "Aquí tienes la palabra. Inténtalo otra vez.",
+        "stars": "Estrellas",
+        "progress": "Palabra {n} de {total}",
+        "endTitle": "¡Lista terminada!",
+        "endAccuracy": "{correct} de {total} palabras bien a la primera",
+        "endStars": "Estrellas ganadas: {stars}",
+        "cheerTop": "¡Increíble!",
+        "cheerMid": "¡Muy buena práctica!",
+        "cheerLow": "Buen intento. ¡Juega otra vez para superarlo!",
+        "again": "Practicar otra vez",
+        "teacherTitle": "¿Enseñas esta lista?",
+        "teacherBody": "Ponla en la pantalla grande como juego en vivo para la clase. Los alumnos entran con un código, sin cuentas.",
+        "teacherCta": "Jugar con tu clase"
+      }
     },
     "hub": {
       "metaTitle": "Listas de palabras gratis para el aula, por grado y tema",
