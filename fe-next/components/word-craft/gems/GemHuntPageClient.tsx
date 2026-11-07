@@ -477,6 +477,7 @@ export default function GemHuntPageClient() {
           turnIndex={state.turnIndex}
           outcome={state.outcome}
           onRestart={handleRestart}
+          inventory={state.inventory}
           labels={{
             titleWon: t('wordcraft.gems.win.titleWon'),
             titleLost: t('wordcraft.gems.win.titleLost'),
@@ -485,6 +486,7 @@ export default function GemHuntPageClient() {
             score: t('wordcraft.gems.hud.score'),
             turns: t('wordcraft.gems.hud.turn'),
             restart: t('wordcraft.gems.win.restart'),
+            crownsCaption: t('wordcraft.gems.win.crownsCaption'),
           }}
         />
       ) : null}

@@ -166,6 +166,30 @@ export function trackEduClassroomJoin(args: EduClassroomJoinArgs): void {
   safeCapture('student_join_failed', failed);
 }
 
+export type JoinCodeStepRefusalReason = 'too_short' | 'invalid';
+
+export interface JoinCodeStepRefusedArgs {
+  reason: JoinCodeStepRefusalReason;
+  /** Used ONLY to derive length + charset; never put on the event. */
+  attemptedCode?: string;
+}
+
+/**
+ * `student_join_code_refused` — a tap on the code step's Next button that
+ * never reached the join POST: too few characters, or a code the lookup
+ * already knows is invalid. Was invisible to analytics entirely — only the
+ * post-submit `student_join_failed` was tracked — so a student mashing Next
+ * on a bad code (the rage-click report on /join) left no trace to diagnose.
+ */
+export function trackJoinCodeStepRefused(args: JoinCodeStepRefusedArgs): void {
+  const props: Record<string, unknown> = { reason: args.reason };
+  if (args.attemptedCode) {
+    props.code_length = args.attemptedCode.length;
+    props.code_charset = charsetOf(args.attemptedCode);
+  }
+  safeCapture('student_join_code_refused', props);
+}
+
 export interface EduClassroomCreatedArgs {
   classroomId: string;
   /** Which surface created it — the dashboard form or the express game lobby. */

@@ -16,6 +16,7 @@ import type { Language } from '@/types';
 import { wheelWordDir } from '@/lib/wheelRush/wordDirection';
 import Avatar from '@/components/Avatar';
 import { MyWordsChips, type WordEntry } from './WheelRushPieces';
+import WheelPassToasts from '@/components/daily/wheel/WheelPassToasts';
 import { WheelRushHeader } from './WheelRushHeader';
 import { WheelRushCelebration, type WheelCelebration } from './WheelRushCelebration';
 import { classifyLetterCoverage } from '@/lib/wheelRush/letterCoverage';
@@ -154,6 +155,40 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   const myScore = leaderboard.find(p => p.username === username)?.score ?? 0;
   const nextRival = closestRival && closestRival.score > myScore ? closestRival : null;
   const pointsToPass = nextRival ? nextRival.score - myScore : 0;
+
+  // "You passed X" toasts — the mirror of the pointsToPass pill above: that
+  // pill already celebrates falling behind, this celebrates catching up.
+  // Mirrors the daily wheel's usePassToasts (useWheelRivals.ts), simplified
+  // since MP already has a live leaderboard (no fetch/poll needed).
+  const [passToasts, setPassToasts] = useState<Array<{ id: number; name: string }>>([]);
+  const passedRivalsRef = useRef<Set<string>>(new Set());
+  const passToastIdRef = useRef(0);
+  const passToastTimersRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
+  useEffect(() => {
+    if (fogActive) return;
+    const newlyPassed = leaderboard.filter(p =>
+      p.username !== username && p.score > 0 && p.score < myScore && !passedRivalsRef.current.has(p.username)
+    );
+    newlyPassed.forEach((p, i) => {
+      passedRivalsRef.current.add(p.username);
+      const id = ++passToastIdRef.current;
+      const showTimer = setTimeout(() => {
+        passToastTimersRef.current.delete(showTimer);
+        haptic(15);
+        setPassToasts(prev => [...prev, { id, name: p.username }]);
+        const hideTimer = setTimeout(() => {
+          passToastTimersRef.current.delete(hideTimer);
+          setPassToasts(prev => prev.filter(toast => toast.id !== id));
+        }, 2400);
+        passToastTimersRef.current.add(hideTimer);
+      }, i * 250);
+      passToastTimersRef.current.add(showTimer);
+    });
+  }, [leaderboard, myScore, username, fogActive]);
+  useEffect(() => () => {
+    passToastTimersRef.current.forEach(clearTimeout);
+    passToastTimersRef.current.clear();
+  }, []);
 
   const fbTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shakeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -840,6 +875,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
       {!isDesktopCanvas && <MyWordsChips words={myWords} dir={wordDir} />}
 
       <WheelRushCelebration celebration={celebration} t={t} prefersReduced={!!prefersReduced} />
+      <WheelPassToasts t={t} toasts={passToasts} reducedMotion={!!prefersReduced} />
       </div>
 
       <div className="pointer-events-none absolute inset-0 z-40">

@@ -2,14 +2,16 @@
 
 import { memo, useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
-import { GEM_COLORS, WIN_RARITY } from '@/lib/word-craft/gems/types';
+import { GEM_COLORS, WIN_RARITY, type GemInventory } from '@/lib/word-craft/gems/types';
 import { GemIcon } from './GemIcon';
+import { cn } from '@/lib/utils';
 
 export interface GemHuntWinSceneProps {
   totalScore: number;
   turnIndex: number;
   outcome: 'won' | 'lost';
   onRestart: () => void;
+  inventory: GemInventory;
   labels: {
     titleWon: string;
     titleLost: string;
@@ -18,10 +20,13 @@ export interface GemHuntWinSceneProps {
     score: string;
     turns: string;
     restart: string;
+    crownsCaption: string;
   };
 }
 
-function GemHuntWinSceneImpl({ totalScore, turnIndex, outcome, onRestart, labels }: GemHuntWinSceneProps) {
+function GemHuntWinSceneImpl({ totalScore, turnIndex, outcome, onRestart, inventory, labels }: GemHuntWinSceneProps) {
+  const crownsWon = GEM_COLORS.map((c) => inventory[c][WIN_RARITY] >= 1);
+  const wonCount = crownsWon.filter(Boolean).length;
   const cardRef = useRef<HTMLDivElement>(null);
   const scoreRef = useRef<HTMLSpanElement>(null);
   useEffect(() => {
@@ -70,13 +75,21 @@ function GemHuntWinSceneImpl({ totalScore, turnIndex, outcome, onRestart, labels
         <p className="mb-3 font-neo-body text-sm text-neo-white">
           {isWin ? labels.subtitleWon : labels.subtitleLost}
         </p>
-        <div className="mb-4 flex items-center justify-center gap-2">
-          {GEM_COLORS.map((color) => (
-            <span key={color} data-win-gem>
-              <GemIcon color={color} rarity={WIN_RARITY} sizePx={28} withRing />
+        <div className="mb-1 flex items-center justify-center gap-2">
+          {GEM_COLORS.map((color, i) => (
+            <span
+              key={color}
+              data-win-gem
+              className={cn(!crownsWon[i] && 'opacity-25 grayscale')}
+              aria-hidden
+            >
+              <GemIcon color={color} rarity={WIN_RARITY} sizePx={28} withRing={crownsWon[i]} />
             </span>
           ))}
         </div>
+        <p className="mb-4 font-neo-body text-[11px] uppercase tracking-wider text-neo-white/70">
+          {labels.crownsCaption.replace('{{n}}', String(wonCount))}
+        </p>
         <div className="mb-4 flex items-center justify-around font-neo-display text-xs uppercase tracking-wider text-neo-white">
           <span>{labels.score} <span ref={scoreRef} className="ms-1 text-neo-lime text-lg tabular-nums">{totalScore}</span></span>
           <span>{labels.turns} <span className="ms-1 text-neo-cyan text-lg tabular-nums">{turnIndex}</span></span>

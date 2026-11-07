@@ -9,6 +9,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { NetworkStatusHandler } from '../NetworkStatusHandler';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { isNative } from '@/utils/platform';
+import posthog from '@/lib/analytics/lazyPosthog';
 import type { MockedFunction } from 'vitest';
 
 const { mockPathname } = vi.hoisted(() => ({
@@ -21,6 +22,7 @@ vi.mock('next/navigation', () => ({
 }));
 vi.mock('@/hooks/useOnlineStatus');
 vi.mock('@/utils/platform');
+vi.mock('@/lib/analytics/lazyPosthog', () => ({ default: { capture: vi.fn() } }));
 vi.mock('../OfflineFallback', () => ({
   OfflineFallback: ({ onRetry, isRetrying }: { onRetry: () => void; isRetrying: boolean }) => (
     <div data-testid="offline-fallback">
@@ -172,6 +174,67 @@ describe('NetworkStatusHandler', () => {
 
       // THEN - Button should show "Retrying" text
       expect(screen.getByRole('button', { name: 'Retrying' })).toBeDisabled();
+    });
+  });
+
+  describe('analytics', () => {
+    it('should capture app_offline_fallback_shown when the fallback renders', () => {
+      // GIVEN
+      mockUseOnlineStatus.mockReturnValue(false);
+      mockIsNative.mockReturnValue(true);
+      mockPathname.current = '/ru/multiplayer';
+
+      // WHEN
+      render(
+        <NetworkStatusHandler>
+          <div data-testid="content">App Content</div>
+        </NetworkStatusHandler>
+      );
+
+      // THEN
+      expect(posthog.capture).toHaveBeenCalledWith('app_offline_fallback_shown', {
+        pathname: '/ru/multiplayer',
+      });
+    });
+
+    it('should not capture app_offline_fallback_shown when children render normally', () => {
+      // GIVEN
+      mockUseOnlineStatus.mockReturnValue(true);
+      mockIsNative.mockReturnValue(true);
+
+      // WHEN
+      render(
+        <NetworkStatusHandler>
+          <div data-testid="content">App Content</div>
+        </NetworkStatusHandler>
+      );
+
+      // THEN
+      expect(posthog.capture).not.toHaveBeenCalledWith(
+        'app_offline_fallback_shown',
+        expect.anything()
+      );
+    });
+
+    it('should capture app_offline_retry_clicked when retry is clicked', () => {
+      // GIVEN
+      mockUseOnlineStatus.mockReturnValue(false);
+      mockIsNative.mockReturnValue(true);
+      mockPathname.current = '/ru/multiplayer';
+
+      render(
+        <NetworkStatusHandler>
+          <div data-testid="content">App Content</div>
+        </NetworkStatusHandler>
+      );
+
+      // WHEN
+      fireEvent.click(screen.getByRole('button', { name: 'Retry' }));
+
+      // THEN
+      expect(posthog.capture).toHaveBeenCalledWith('app_offline_retry_clicked', {
+        pathname: '/ru/multiplayer',
+      });
     });
   });
 

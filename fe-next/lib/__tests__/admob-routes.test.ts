@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { isAllowedAdBannerRoute, isAdFreeRoute } from '../admob-routes';
+import { isAllowedAdBannerRoute, isAdFreeRoute, AD_FREE_ROUTE_CLASS } from '../admob-routes';
 
 describe('isAllowedAdBannerRoute', () => {
   it('allows landing/leaderboard/settings (passive pages)', () => {
@@ -197,5 +197,20 @@ describe('Academy solo play stays ad-free', () => {
   it('leaves consumer quick-play monetized', () => {
     expect(isAdFreeRoute('/en/quick-play', new URLSearchParams())).toBe(false);
     expect(isAdFreeRoute('/en/quick-play', null)).toBe(false);
+  });
+});
+
+describe('isAdFreeRoute runtime marker', () => {
+  afterEach(() => document.documentElement.classList.remove(AD_FREE_ROUTE_CLASS));
+
+  it('is ad-free on a non-education URL while a page holds the marker', () => {
+    expect(isAdFreeRoute('/en/multiplayer', new URLSearchParams())).toBe(false);
+    document.documentElement.classList.add(AD_FREE_ROUTE_CLASS);
+    expect(isAdFreeRoute('/en/multiplayer', new URLSearchParams())).toBe(true);
+    expect(isAllowedAdBannerRoute('/en/multiplayer', new URLSearchParams())).toBe(false);
+  });
+
+  it('treats /classroom as education', () => {
+    expect(isAdFreeRoute('/en/classroom/abc')).toBe(true);
   });
 });
