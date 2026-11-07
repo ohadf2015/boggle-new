@@ -21787,6 +21787,15 @@ const ja = {
         "body": "ボードのすぐ横で、練習プレイヤーと一緒に生徒として1ラウンド遊べます。あなただけに表示されます。",
         "cta": "生徒として試す"
       },
+      "loop": {
+        "playAgain": "もう一度遊ぶ",
+        "pickGame": "別のゲームを選ぶ",
+        "loading": "前回のゲームを確認中",
+        "ready": "テストの準備OK {ready}/{total}人",
+        "readyHint": "生徒ごとに間違えた単語を見る",
+        "readyEmpty": "単語ごとの結果は次のゲームのあとに表示されます",
+        "missed": "欠席 {count}人 · 宿題を出す"
+      },
       "greetMorning": "おはようございます、{name}さん",
       "greetAfternoon": "こんにちは、{name}さん",
       "greetEvening": "こんばんは、{name}さん",

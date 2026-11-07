@@ -20832,6 +20832,15 @@ const en = {
         "body": "Play a round as a student right next to your board, with practice players. Only you see it.",
         "cta": "Try it as a student"
       },
+      "loop": {
+        "playAgain": "Play again",
+        "pickGame": "Pick a different game",
+        "loading": "Checking your last game",
+        "ready": "{ready} of {total} ready for the test",
+        "readyHint": "See which words each student missed",
+        "readyEmpty": "Word results show up after your next game",
+        "missed": "{count} missed it · assign homework"
+      },
       "greetMorning": "Good morning, {name}",
       "greetAfternoon": "Good afternoon, {name}",
       "greetEvening": "Good evening, {name}",
