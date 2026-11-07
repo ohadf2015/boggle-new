@@ -11,22 +11,24 @@ export const meta = {
 };
 
 // ── config ────────────────────────────────────────────────────────────────
-const ALL_LANGS = ['en', 'he', 'sv', 'ja', 'es'];
+const ALL_LANGS = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
 const LANG_NAMES = {
   en: 'English',
   he: 'Hebrew',
   sv: 'Swedish',
   ja: 'Japanese (hiragana)',
   es: 'Spanish',
+  ru: 'Russian',
 };
 // Surface-form rules MUST match backend/modules/dictionaryImprovement/candidates.ts
 // FORM_RE — anything else is dropped by the loader, so generating it is wasted.
 const FORM_RULE = {
   en: 'lowercase a-z ONLY; no proper nouns, no accents, no spaces or hyphens',
-  es: 'lowercase a-z and ñ ONLY; STRIP every accent (write "cafe" not "café", "nino" not "niño"); no proper nouns',
+  es: 'lowercase a-z and ñ ONLY; strip vowel accents (write "cafe" not "café") but KEEP ñ (write "niño", never "nino"); no proper nouns',
   sv: 'lowercase a-z plus å ä ö ONLY; no proper nouns',
   he: 'Hebrew letters ONLY (no niqqud/vowel points, no Latin); common standalone words',
   ja: 'HIRAGANA ONLY (no kanji, no katakana, no Latin, no spaces); common standalone words',
+  ru: 'lowercase Cyrillic а-я ONLY; write е instead of ё; no proper nouns, no Latin, no hyphens',
 };
 const CAND_DIR = 'fe-next/backend/dictionary/candidates';
 
@@ -84,14 +86,25 @@ const results = await pipeline(
   async (lang) => {
     const gen = await agent(
       `You are an expert ${LANG_NAMES[lang]} lexicographer improving a word game's dictionary.
-Propose up to ${perLang} COMMON, REAL, standalone dictionary words in ${LANG_NAMES[lang]} that a word game should accept but a basic wordlist might be MISSING — everyday vocabulary, common inflected forms, frequent compounds. Favour higher-frequency words first.
+Propose up to ${perLang * 3} REAL, standalone dictionary words in ${LANG_NAMES[lang]} that a word game should accept but a big wordlist might be MISSING. The game already knows nearly all everyday base forms, so aim for gaps: less common inflections (plurals, conjugations, comparatives), modern everyday words (tech, food, slang that dictionaries now list), and common compounds.
 STRICT FORM RULES (words violating these are discarded downstream): ${FORM_RULE[lang]}.
 Do NOT include offensive slurs or proper nouns. Return JSON {"words":[...]} — just the words, no definitions.`,
       { label: `generate:${lang}`, phase: 'Generate', schema: WORDS_SCHEMA },
     );
     const proposed = Array.isArray(gen && gen.words) ? gen.words.map((w) => String(w).trim()).filter(Boolean) : [];
     log(`[${lang}] generated ${proposed.length} candidate(s)`);
-    return { lang, proposed };
+    if (!proposed.length) return { lang, proposed };
+    // The game dictionary is the novelty authority: words it already accepts are wasted judge calls.
+    const nov = await agent(
+      `Run this exact command from the repo root and return its JSON output (the last line that starts with "["), nothing else:
+cd fe-next && npx tsx scripts/dictionary/novelWords.ts ${lang} '${JSON.stringify(proposed).replace(/'/g, '')}' 2>/dev/null | grep '^\\[' | tail -1
+Return JSON {"words":[...]} with exactly the words in that output.`,
+      { label: `novelty:${lang}`, phase: 'Generate', schema: WORDS_SCHEMA, agentType: 'general-purpose' },
+    );
+    const novel = Array.isArray(nov && nov.words) ? nov.words.slice(0, perLang) : [];
+    log(`[${lang}] ${novel.length}/${proposed.length} not already in the game dictionary`);
+    if (!novel.length) log(`[${lang}] WARNING: novelty check returned nothing — is fe-next/scripts/dictionary/novelWords.ts present in this checkout?`);
+    return { lang, proposed: novel };
   },
 
   // STAGE 2 — dual-judge: two independent personas; keep only words BOTH accept

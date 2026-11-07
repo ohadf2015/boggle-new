@@ -38,6 +38,12 @@ export const hebrewLetters: string[] = [
 
 export const swedishLetters: string[] = 'ABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ'.split('');
 
+// Counts ≈ Swedish letter frequency %; Q/W/Z are near-absent in Swedish words, so they would be dead tiles.
+export const swedishLetterPool: string[] = Object.entries({
+  E: 10, A: 9, N: 8, R: 8, T: 8, S: 7, I: 6, L: 5, D: 5, O: 5, M: 4, K: 3, G: 3,
+  V: 2, H: 2, F: 2, U: 2, P: 2, B: 2, Ä: 2, Å: 2, Ö: 2, C: 1, J: 1, Y: 1, X: 1,
+}).flatMap(([letter, count]) => Array<string>(count).fill(letter));
+
 // Spanish letters - standard Latin alphabet plus Ñ and accented vowels
 const spanishBaseLetters: string[] = 'ABCDEFGHIJKLMNÑOPQRSTUVWXYZ'.split('');
 export const spanishAccentedLetters: string[] = ['Á', 'É', 'Í', 'Ó', 'Ú', 'Ü'];
@@ -77,20 +83,6 @@ export const russianLetterPool: string[] = (() => {
   }
   return pool;
 })();
-
-export const japaneseLetters: string[] = [
-  "日", "本", "人", "年", "月", "火", "水", "木", "金", "土",
-  "一", "二", "三", "四", "五", "六", "七", "八", "九", "十",
-  "大", "小", "中", "上", "下", "左", "右", "前", "後", "内",
-  "外", "多", "少", "高", "低", "長", "短", "新", "古", "明",
-  "暗", "強", "弱", "重", "軽", "早", "遅", "近", "遠", "広",
-  "狭", "深", "浅", "太", "細", "厚", "薄", "硬", "柔", "良",
-  "悪", "美", "醜", "正", "誤", "真", "偽", "善", "安", "危",
-  "生", "死", "男", "女", "父", "母", "子", "兄", "弟", "姉",
-  "妹", "友", "敵", "王", "国", "天", "地", "山", "川", "海",
-  "空", "雲", "雨", "雪", "風", "花", "草", "石", "音", "色",
-  "光", "力", "心", "手", "足", "目", "耳", "口", "頭", "体"
-];
 
 export const kanjiCompounds: string[] = [
   "日本", "本人", "本日", "日中", "人口", "人生", "人物",
@@ -236,6 +228,18 @@ const MAX_BOARD_GENERATION_ATTEMPTS = 5;
 // Grid Generation
 // ==========================================
 
+/** Each language's own weighted tile pool; unknown languages get English, never Hebrew. */
+export function boardLetterPool(language: string): string[] {
+  switch (language) {
+    case 'sv': return swedishLetterPool;
+    case 'es': return spanishLetterPool;
+    case 'ru': return russianLetterPool;
+    case 'ja': return JAPANESE_HIRAGANA_POOL;
+    case 'he': return hebrewLetters;
+    default: return ENGLISH_LETTER_POOL;
+  }
+}
+
 /**
  * Generate a random letter grid
  */
@@ -251,24 +255,8 @@ export function generateRandomTable(
     cols = DIFFICULTIES[DEFAULT_DIFFICULTY].cols;
   }
 
-  let letters: string | string[];
-  if (language === 'en') {
-    letters = ENGLISH_LETTER_POOL;
-  } else if (language === 'sv') {
-    letters = swedishLetters;
-  } else if (language === 'es') {
-    letters = spanishLetterPool;
-  } else if (language === 'ru') {
-    letters = russianLetterPool;
-  } else if (language === 'ja') {
-    return generateJapaneseTable(rows, cols);
-  } else if (language === 'he') {
-    letters = hebrewLetters;
-  } else {
-    // Unknown/undefined language must NOT silently become Hebrew — that leaked a
-    // Hebrew board onto English players. Hebrew now requires an explicit 'he'.
-    letters = ENGLISH_LETTER_POOL;
-  }
+  if (language === 'ja') return generateJapaneseTable(rows, cols);
+  const letters = boardLetterPool(language);
 
   // If we have words to embed, use enhanced generation
   if (wordsToEmbed && wordsToEmbed.length > 0) {

@@ -21,13 +21,7 @@ import {
   uploadBoardCoverImage,
   type GalleryParams,
 } from '../modules/supabase/ugcBoards';
-import {
-  hebrewLetters,
-  swedishLetters,
-  spanishLetterPool,
-  japaneseLetters,
-} from '../utils/gameUtils';
-import { ENGLISH_LETTER_POOL } from '@/shared/constants/englishLetters';
+import { boardLetterPool } from '../utils/gameUtils';
 
 // Use require for cross-rootDir modules (outside backend/)
 const { embedMultipleWordsInGrid: _embedMultipleWordsInGrid } = require('../../utils/dailyChallenge/gridPathFinding');
@@ -105,14 +99,7 @@ router.post('/generate', async (req: Request, res: Response): Promise<void> => {
 
     // Use first seed word as primary, rest as bonus
     const [primary, ...bonus] = seedWords as string[];
-    const letterPoolByLang: Record<string, string[]> = {
-      en: ENGLISH_LETTER_POOL,
-      he: hebrewLetters,
-      sv: swedishLetters,
-      ja: japaneseLetters,
-      es: spanishLetterPool,
-    };
-    const letters = letterPoolByLang[language] ?? letterPoolByLang.en;
+    const letters = boardLetterPool(language);
     const seededRandom = () => Math.random();
 
     const rawGrid = embedMultipleWordsInGrid(
