@@ -22130,8 +22130,22 @@ const he = {
     "tooLong": "עד {max} תווים",
     "saveFailed": "לא הצלחנו לשמור את השם. נסו שוב.",
     "originalName": "נרשם/ה בשם {name}"
-  }
+  },
   // @eduRoster:end
+  // @eduProResults:start
+  "eduProResults": {
+    "freeTitle": "הדוח של הסבב הזה בחינם",
+    "openGrid": "מי פספס איזו מילה",
+    "openGridNote": "שמות התלמידים יוצגו על המסך",
+    "gridTitle": "מי פספס איזו מילה בסבב הזה",
+    "namesNote": "מוצגים כאן שמות התלמידים. כדאי לסגור לפני שמקרינים את המסך לכיתה.",
+    "close": "סגירה",
+    "proDepthTitle": "עוד בפרו למורים",
+    "proDepth": "התקדמות לאורך שבועות · ייצוא של כל הכיתות · דוחות להורים",
+    "schoolQuote": "קונים לכל בית הספר? קבלו הצעת מחיר",
+    "noWords": "בסבב הזה לא היו מילים מהשיעור לבדוק."
+  }
+  // @eduProResults:end
 };
 
 export { he };

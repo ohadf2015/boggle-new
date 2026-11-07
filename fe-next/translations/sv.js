@@ -22200,8 +22200,22 @@ const sv = {
     "tooLong": "Använd högst {max} tecken",
     "saveFailed": "Namnet kunde inte sparas. Försök igen.",
     "originalName": "Registrerad som {name}"
-  }
+  },
   // @eduRoster:end
+  // @eduProResults:start
+  "eduProResults": {
+    "freeTitle": "Rapporten för den här rundan är gratis",
+    "openGrid": "Se vem som missade vilket ord",
+    "openGridNote": "Visar elevernas namn på skärmen",
+    "gridTitle": "Vem missade vilket ord den här rundan",
+    "namesNote": "Visar elevernas namn. Stäng innan du visar skärmen på tavlan.",
+    "close": "Stäng",
+    "proDepthTitle": "Mer med Teacher Pro",
+    "proDepth": "Utveckling vecka för vecka · Exportera alla klasser · Rapporter till vårdnadshavare",
+    "schoolQuote": "Köper du till hela skolan? Begär en offert",
+    "noWords": "Den här rundan hade inga lektionsord att kontrollera."
+  }
+  // @eduProResults:end
 };
 
 export { sv };

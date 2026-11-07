@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { captureProFunnelServerEvent } from '@/lib/education/proFunnelServer';
 import { checkoutClientKind, testEmailReason } from '@/lib/education/checkoutTrafficTags';
+import { resolveCheckoutAnalyticsIdentity, withAnalyticsIdentity } from '@/lib/education/checkoutAnalyticsIdentity';
 
 /**
  * POST /api/education/pro-cta-click — server twin of a Teacher Pro CTA tap.
@@ -30,7 +31,8 @@ export async function POST(request: NextRequest) {
     const locale = typeof body.locale === 'string' && LOCALE_RE.test(body.locale) ? body.locale : null;
     const cta = body.cta === 'teacher_pro' ? 'teacher_pro' : 'teacher_pro_trial';
     const testReason = testEmailReason(user.email ?? null);
-    captureProFunnelServerEvent({
+    const identity = resolveCheckoutAnalyticsIdentity({ userId: user.id, cookieHeader: request.headers.get('cookie') });
+    captureProFunnelServerEvent(withAnalyticsIdentity({
       distinctId: user.id,
       event: 'edu_pro_cta_clicked',
       properties: {
@@ -42,7 +44,7 @@ export async function POST(request: NextRequest) {
         is_test_account: testReason !== null,
         test_reason: testReason,
       },
-    });
+    }, identity, user.id));
   } catch {
     /* analytics only */
   }

@@ -22212,8 +22212,22 @@ const es = {
     "tooLong": "Usa {max} caracteres o menos",
     "saveFailed": "No se pudo guardar el nombre. Inténtalo de nuevo.",
     "originalName": "Se registró como {name}"
-  }
+  },
   // @eduRoster:end
+  // @eduProResults:start
+  "eduProResults": {
+    "freeTitle": "El informe de esta ronda es gratis",
+    "openGrid": "Ver quién falló cada palabra",
+    "openGridNote": "Muestra los nombres de tus alumnos en pantalla",
+    "gridTitle": "Quién falló cada palabra en esta ronda",
+    "namesNote": "Muestra los nombres de tus alumnos. Ciérralo antes de proyectar esta pantalla.",
+    "close": "Cerrar",
+    "proDepthTitle": "Más con Teacher Pro",
+    "proDepth": "Progreso semana a semana · Exportar todas las clases · Informes para familias",
+    "schoolQuote": "¿Compras para tu colegio? Pide un presupuesto",
+    "noWords": "En esta ronda no había palabras de la lección que revisar."
+  }
+  // @eduProResults:end
 };
 
 export { es };

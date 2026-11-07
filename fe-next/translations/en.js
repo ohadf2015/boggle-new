@@ -21245,8 +21245,22 @@ const en = {
     "tooLong": "Use {max} characters or fewer",
     "saveFailed": "Couldn't save the name. Try again.",
     "originalName": "Signed up as {name}"
-  }
+  },
   // @eduRoster:end
+  // @eduProResults:start
+  "eduProResults": {
+    "freeTitle": "This round's report is free",
+    "openGrid": "See who missed which word",
+    "openGridNote": "Shows student names on this screen",
+    "gridTitle": "Who missed which word this round",
+    "namesNote": "Shows student names. Close it before you put this screen on the board.",
+    "close": "Close",
+    "proDepthTitle": "More with Teacher Pro",
+    "proDepth": "Progress across weeks · Export every class · Reports for parents",
+    "schoolQuote": "Buying for your school? Get a quote",
+    "noWords": "This round had no lesson words to check."
+  }
+  // @eduProResults:end
 };
 
 export { en };

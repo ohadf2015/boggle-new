@@ -22200,8 +22200,22 @@ const ja = {
     "tooLong": "{max}文字以内で入力してください",
     "saveFailed": "名前を保存できませんでした。もう一度お試しください。",
     "originalName": "登録名：{name}"
-  }
+  },
   // @eduRoster:end
+  // @eduProResults:start
+  "eduProResults": {
+    "freeTitle": "このラウンドのレポートは無料です",
+    "openGrid": "誰がどの単語を逃したか見る",
+    "openGridNote": "生徒の名前が画面に表示されます",
+    "gridTitle": "このラウンドで誰がどの単語を逃したか",
+    "namesNote": "生徒の名前が表示されます。画面を投影する前に閉じてください。",
+    "close": "閉じる",
+    "proDepthTitle": "Teacher Pro でできること",
+    "proDepth": "週ごとの伸び · 全クラスの書き出し · 保護者向けレポート",
+    "schoolQuote": "学校でまとめて導入しますか？見積もりを依頼",
+    "noWords": "このラウンドには確認するレッスンの単語がありませんでした。"
+  }
+  // @eduProResults:end
 };
 
 export { ja };

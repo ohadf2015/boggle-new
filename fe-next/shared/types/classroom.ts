@@ -80,6 +80,8 @@ export interface ClassroomPodiumEntry {
 
 export interface ClassroomSummary {
   teacherName: string;
+  /** Absent on summaries built before it was added: read as classic. */
+  gameMode?: string;
   lessonNames: string[];
   /** Lesson ids, so results can deep-link the player into practice. */
   lessonIds: string[];

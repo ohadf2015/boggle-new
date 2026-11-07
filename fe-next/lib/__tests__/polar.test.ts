@@ -192,6 +192,16 @@ describe('PolarClient.createCheckout', () => {
     expect(JSON.parse(fetchMock.mock.calls[0][1].body).metadata).not.toHaveProperty('email')
   })
 
+  it('carries the browser analytics id in metadata only when given one', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ url: 'https://sandbox.polar.sh/checkout/abc' }) })
+    vi.stubGlobal('fetch', fetchMock)
+    const client = new PolarClient('token-123', 'sandbox')
+    await client.createCheckout({ userId: 'user-1', productId: 'prod-1', analyticsDistinctId: 'anon-b1' })
+    await client.createCheckout({ userId: 'user-1', productId: 'prod-1' })
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body).metadata.posthog_distinct_id).toBe('anon-b1')
+    expect(JSON.parse(fetchMock.mock.calls[1][1].body).metadata).not.toHaveProperty('posthog_distinct_id')
+  })
+
   it('prefills the customer name on the hosted checkout when given one', async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
