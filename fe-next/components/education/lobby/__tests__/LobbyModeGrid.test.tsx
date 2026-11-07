@@ -28,16 +28,80 @@ describe('<LobbyModeGrid> — the picker is the page', () => {
     expect(screen.getByTestId('mode-tile-classic')).toHaveAttribute('aria-checked', 'true');
   });
 
-  it('Then games are grouped under their category headings (read aloud, not drawn), in catalogue order', () => {
+  it('Then games are grouped under visible category headings, in catalogue order', () => {
     renderGrid();
     for (const category of CATALOGUE_CATEGORIES) {
       const section = screen.getByTestId(`mode-group-${category}`);
-      expect(section).toHaveTextContent(`eg2Modes.category.${category}`);
-      expect(section.className).toMatch(/(^|\s)contents(\s|$)/);
-      expect(within(section).getByRole('heading').className).toMatch(/(^|\s)sr-only(\s|$)/);
+      const heading = within(section).getByRole('heading');
+      expect(heading).toHaveTextContent(`eg2Modes.category.${category}`);
+      expect(heading.className).not.toMatch(/(^|\s)sr-only(\s|$)/);
       const ids = within(section).getAllByRole('radio').map((r) => r.getAttribute('data-testid'));
       expect(ids).toEqual(catalogueModes().filter((m) => m.category === category).map((m) => `mode-tile-${m.id}`));
     }
+  });
+
+  it('Then the first two cards are Classic and Vocab Quiz, the games classes finish', () => {
+    renderGrid();
+    const ids = within(screen.getByRole('radiogroup')).getAllByRole('radio').map((r) => r.getAttribute('data-testid'));
+    expect(ids.slice(0, 2)).toEqual(['mode-tile-classic', 'mode-tile-vocab-quiz']);
+  });
+
+  it('Then Boss Battle is on screen and pickable like any free game: no lock, no Pro word', () => {
+    const { onPick } = renderGrid();
+    const boss = screen.getByTestId('mode-tile-boss-battle');
+    expect(boss).not.toHaveAttribute('aria-disabled', 'true');
+    expect(boss.textContent ?? '').not.toMatch(/\bpro\b|lock|upgrade|teacherPro/i);
+    fireEvent.click(boss);
+    expect(onPick).toHaveBeenCalledWith('boss-battle');
+  });
+
+  it('Then Wordcraft and Crossword sit under "play together", each card with its one-line student hint', () => {
+    renderGrid();
+    const together = screen.getByTestId('mode-group-together');
+    for (const id of ['wordcraft', 'crossword']) {
+      const hint = within(within(together).getByTestId(`mode-tile-${id}`)).getByTestId('mode-hint');
+      expect(hint).toHaveTextContent(`eg2Modes.hint.${id}`);
+    }
+    expect(within(screen.getByTestId('mode-group-board')).queryByTestId('mode-hint')).toBeNull();
+  });
+
+  it('Then on a phone only the play-together hints show and those cards take the full row; the start-here hints wait for the wide grid', () => {
+    renderGrid();
+    for (const id of ['wordcraft', 'crossword']) {
+      const card = screen.getByTestId(`mode-tile-${id}`);
+      expect(card.className).toMatch(/(^|\s)col-span-2(\s|$)/);
+      expect(within(card).getByTestId('mode-hint').className).not.toMatch(/(^|\s)hidden(\s|$)/);
+    }
+    for (const id of ['classic', 'vocab-quiz']) {
+      const card = screen.getByTestId(`mode-tile-${id}`);
+      expect(card.className).not.toMatch(/(^|\s)col-span-2(\s|$)/);
+      expect(within(card).getByTestId('mode-hint').className).toMatch(/(^|\s)hidden(\s|$)/);
+      expect(within(card).getByTestId('mode-hint').className).toContain('@2xl:block');
+    }
+  });
+
+  it('Given Wordcraft cannot be dealt, Then its card stays in the group but is disabled with the reason, and a tap picks nothing', () => {
+    const { onPick } = renderGrid({ blocked: { wordcraft: 'eg2Modes.blocked.wordcraftLanguage' } });
+    const card = screen.getByTestId('mode-tile-wordcraft');
+    expect(card).toHaveAttribute('aria-disabled', 'true');
+    expect(within(card).getByTestId('mode-blocked-reason')).toHaveTextContent('eg2Modes.blocked.wordcraftLanguage');
+    expect(within(card).queryByTestId('mode-hint')).toBeNull();
+    fireEvent.click(card);
+    expect(onPick).not.toHaveBeenCalled();
+    expect(screen.getByTestId('mode-tile-crossword')).not.toHaveAttribute('aria-disabled');
+  });
+
+  it('Then each card has one entrance on mount: a transform-only keyframe, staggered, and skipped under reduced motion', () => {
+    renderGrid();
+    const css = screen.getByTestId('lobby-mode-grid').querySelector('style')!.textContent ?? '';
+    expect(css).toMatch(/@keyframes lc-mode-in/);
+    expect(css).not.toMatch(/opacity/);
+    const tiles = within(screen.getByRole('radiogroup')).getAllByRole('radio');
+    tiles.forEach((tile, i) => {
+      expect(tile.className).toMatch(/motion-safe:animate-\[lc-mode-in_[^\]]*_backwards\]/);
+      expect(tile.className).not.toMatch(/(^|\s)animate-/);
+      expect(tile.style.animationDelay).toBe(`${i * 35}ms`);
+    });
   });
 
   it('Then each tile opens on its own arcade color block holding the art, neighbours never match, and lime stays for GO LIVE', () => {
@@ -98,7 +162,7 @@ describe('<LobbyModeGrid> — the picker is the page', () => {
     expect(screen.getByTestId('mode-tile-blast')).toBeDisabled();
   });
 
-  it('Then all seven tiles share one grid whose columns follow its own width, not the viewport', () => {
+  it('Then every tile shares one grid whose columns follow its own width, not the viewport', () => {
     renderGrid();
     const grid = screen.getByTestId('lobby-mode-grid');
     expect(grid.className).toContain('@container');

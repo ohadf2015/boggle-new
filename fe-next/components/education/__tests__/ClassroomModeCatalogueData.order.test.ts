@@ -4,31 +4,46 @@ import {
   CLASS_FAVORITE_MODES,
   FEATURED_HOME_MODES,
   catalogueEntry,
+  catalogueKeys,
   catalogueModes,
   isClassFavorite,
 } from '@/components/education/ClassroomModeCatalogueData';
 
 const onScreen = () => CATALOGUE_CATEGORIES.flatMap((c) => catalogueModes().filter((m) => m.category === c)).map((m) => m.id);
 
-describe('catalogue order follows what classes actually play', () => {
-  it('Given the grouped picker, Then the board group leads with Classic and Blast, the most-played board games', () => {
+describe('catalogue order leads with the games classes finish', () => {
+  it('Given the grouped picker, Then Classic and Vocab Quiz come first, the two modes most rounds actually start and finish', () => {
+    expect(onScreen().slice(0, 2)).toEqual(['classic', 'vocab-quiz']);
+    expect(catalogueModes()[0].id).toBe('classic');
+    expect(catalogueModes().filter((m) => m.category === 'finish').map((m) => m.id)).toEqual(['classic', 'vocab-quiz']);
+  });
+
+  it('Then Wordcraft and Crossword sit together in a "play together" group, each with a one-line hint for students', () => {
+    const together = catalogueModes().filter((m) => m.category === 'together');
+    expect(together.map((m) => m.id)).toEqual(['wordcraft', 'crossword']);
+    for (const mode of together) {
+      expect(catalogueKeys(mode).hint).toBe(`eg2Modes.hint.${mode.id}`);
+      expect(mode.style).toBe('together');
+    }
+  });
+
+  it('Then the start-here pair carries a student hint too, and the board games none', () => {
+    for (const mode of catalogueModes().filter((m) => m.category === 'finish')) expect(catalogueKeys(mode).hint).toBe(`eg2Modes.hint.${mode.id}`);
+    for (const mode of catalogueModes().filter((m) => m.category === 'board')) expect(catalogueKeys(mode).hint).toBeNull();
+  });
+
+  it('Then the board group leads with Blast, and Boss Battle runs the free dragon', () => {
     const board = catalogueModes().filter((m) => m.category === 'board').map((m) => m.id);
-    expect(board.slice(0, 2)).toEqual(['classic', 'blast']);
+    expect(board[0]).toBe('blast');
+    expect(board).toContain('boss-battle');
+    expect(catalogueEntry('boss-battle')!.launch.classroomBossId).toBe('lexiconDragon');
   });
 
-  it('Given no saved pick, Then the default (first) card is Vocab Quiz, the most-played mode', () => {
-    expect(onScreen()[0]).toBe('vocab-quiz');
-    expect(catalogueModes()[0].id).toBe('vocab-quiz');
-  });
-
-  it('Then the three class favourites are the three most-played modes and each is in the catalogue', () => {
+  it('Then the class favourites the landing and Teacher Home use are unchanged', () => {
     expect([...CLASS_FAVORITE_MODES]).toEqual(['vocab-quiz', 'classic', 'blast']);
     for (const id of CLASS_FAVORITE_MODES) expect(catalogueEntry(id)).toBeDefined();
     expect(isClassFavorite('classic')).toBe(true);
     expect(isClassFavorite('wheel-rush')).toBe(false);
-  });
-
-  it('Then the landing features the class favourites', () => {
     expect([...FEATURED_HOME_MODES]).toEqual([...CLASS_FAVORITE_MODES]);
   });
 

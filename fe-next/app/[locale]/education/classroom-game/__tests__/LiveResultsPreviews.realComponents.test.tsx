@@ -13,6 +13,7 @@ vi.mock('@/components/education/live/EduStudentHero', () => ({ EduStudentHero: (
 vi.mock('@/components/education/economy/LockerGrid', () => ({ default: () => null }));
 
 import { PhoneResultsPreview } from '../LiveResultsPreviews';
+import { useStudyDeck } from '@/lib/education/studyDeckStore';
 
 describe('LiveResultsPreviews phone', () => {
   it('given the old /multiplayer card query, when the phone preview renders, then it still shows the student results /education/live mounts', () => {
@@ -20,5 +21,19 @@ describe('LiveResultsPreviews phone', () => {
     render(<PhoneResultsPreview />);
     expect(screen.getByTestId('real-student-results')).toBeInTheDocument();
     expect(screen.queryByTestId('legacy-results-card')).toBeNull();
+  });
+
+  it('given ?deck=1, when the phone preview renders, then the room deck is seeded so the between-rounds warm-up spells list words', () => {
+    useStudyDeck.setState({ gameCode: null, cards: [], studied: false, kept: null });
+    search.value = 'deck=1';
+    render(<PhoneResultsPreview />);
+    expect(useStudyDeck.getState().cards.map((c) => c.word)).toEqual(['river', 'planet', 'cloud']);
+  });
+
+  it('given no deck param, when the phone preview renders, then no deck is seeded', () => {
+    useStudyDeck.setState({ gameCode: null, cards: [], studied: false, kept: null });
+    search.value = '';
+    render(<PhoneResultsPreview />);
+    expect(useStudyDeck.getState().cards).toEqual([]);
   });
 });

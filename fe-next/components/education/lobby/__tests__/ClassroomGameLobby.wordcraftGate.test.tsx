@@ -59,10 +59,19 @@ describe('ClassroomGameLobby — Wordcraft gate', () => {
     startError = null;
   });
 
-  it('GIVEN no lesson word fits the rack WHEN the teacher picks Wordcraft THEN Go Live says why and never opens a room', () => {
+  it('GIVEN no lesson word fits the rack THEN the Wordcraft card is disabled with the reason and a tap keeps the current game', () => {
     lessonWords = LONG;
     render(<ClassroomGameLobby onBack={vi.fn()} />);
-    fireEvent.click(screen.getByTestId('mode-tile-wordcraft'));
+    const card = screen.getByTestId('mode-tile-wordcraft');
+    expect(card).toHaveAttribute('aria-disabled', 'true');
+    expect(card).toHaveTextContent('eg2Modes.blocked.wordcraftRack');
+    fireEvent.click(card);
+    expect(card).toHaveAttribute('aria-checked', 'false');
+  });
+
+  it('GIVEN a deep link opens Wordcraft on a long-word lesson THEN Go Live says why and never opens a room', () => {
+    lessonWords = LONG;
+    render(<ClassroomGameLobby onBack={vi.fn()} initialMode="wordcraft" />);
     expect(screen.getByTestId('go-live-blocked')).toHaveTextContent('education.modePicker.wordcraftNeedsShortWords');
     expect(screen.getByTestId('lobby-go-live')).toBeDisabled();
     fireEvent.click(screen.getByTestId('lobby-go-live'));
@@ -71,19 +80,20 @@ describe('ClassroomGameLobby — Wordcraft gate', () => {
 
   it('GIVEN Go Live is blocked THEN it drops the lime fill and the raised shadow so it does not read as tappable', () => {
     lessonWords = LONG;
-    render(<ClassroomGameLobby onBack={vi.fn()} />);
-    fireEvent.click(screen.getByTestId('mode-tile-wordcraft'));
+    render(<ClassroomGameLobby onBack={vi.fn()} initialMode="wordcraft" />);
     const cls = screen.getByTestId('lobby-go-live').className.split(/\s+/);
     expect(cls).toEqual(expect.arrayContaining(['disabled:bg-neo-navy-light', 'disabled:text-neo-cream/70', 'disabled:shadow-none']));
     expect(cls).not.toContain('disabled:bg-neo-lime/60');
   });
 
-  it('GIVEN a Russian lesson WHEN the teacher picks Wordcraft THEN Go Live is blocked', () => {
+  it('GIVEN a Russian lesson THEN the Wordcraft card says there are no tiles for the language, and a deep link to it is blocked with that reason', () => {
     lessonWords = [{ word: 'кошка' }, { word: 'собака' }];
     lessonLanguage = 'ru';
-    render(<ClassroomGameLobby onBack={vi.fn()} />);
-    fireEvent.click(screen.getByTestId('mode-tile-wordcraft'));
-    expect(screen.getByTestId('go-live-blocked')).toHaveTextContent('education.modePicker.wordcraftNeedsShortWords');
+    const { unmount } = render(<ClassroomGameLobby onBack={vi.fn()} />);
+    expect(screen.getByTestId('mode-tile-wordcraft')).toHaveTextContent('eg2Modes.blocked.wordcraftLanguage');
+    unmount();
+    render(<ClassroomGameLobby onBack={vi.fn()} initialMode="wordcraft" />);
+    expect(screen.getByTestId('go-live-blocked')).toHaveTextContent('education.modePicker.wordcraftNoTiles');
   });
 
   it('GIVEN a lesson with short words WHEN the teacher picks Wordcraft THEN it launches as Wordcraft', () => {
@@ -105,8 +115,7 @@ describe('ClassroomGameLobby — Wordcraft gate', () => {
   it('GIVEN a failed launch WHEN the teacher retries Wordcraft on a long-word lesson THEN no room opens', () => {
     lessonWords = LONG;
     startError = 'errors.network';
-    render(<ClassroomGameLobby onBack={vi.fn()} />);
-    fireEvent.click(screen.getByTestId('mode-tile-wordcraft'));
+    render(<ClassroomGameLobby onBack={vi.fn()} initialMode="wordcraft" />);
     fireEvent.click(screen.getByTestId('create-room-retry'));
     expect(launch).not.toHaveBeenCalled();
   });

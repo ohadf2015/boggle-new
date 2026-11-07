@@ -703,6 +703,16 @@ const es = {
   // @eg2Seo:end
   // @eg2Modes:start
   "eg2Modes": {
+    "hint": {
+      "classic": "Compiten por encontrar tus palabras en un mismo tablero.",
+      "vocab-quiz": "Unen cada significado con la palabra correcta.",
+      "wordcraft": "Deletrean tus palabras con fichas de letras.",
+      "crossword": "Leen un significado y escriben la palabra."
+    },
+    "blocked": {
+      "wordcraftLanguage": "Aún no hay fichas para este idioma",
+      "wordcraftRack": "Palabras demasiado largas para las fichas"
+    },
     "title": "Elige un modo de juego",
     "spec": {
       "duration": "Duración",
@@ -715,7 +725,9 @@ const es = {
     "previewLabel": "Vista previa de {{mode}}",
     "category": {
       "meaning": "Conoce el significado",
-      "board": "Carrera en el tablero"
+      "board": "Carrera en el tablero",
+      "finish": "Empieza aquí",
+      "together": "Jugar juntos"
     },
     "complexity": {
       "simple": "Reglas fáciles",
@@ -726,7 +738,8 @@ const es = {
       "ffa": "Todos contra todos",
       "teams": "Batalla por equipos",
       "solo": "En solitario contra un bot",
-      "class": "Toda la clase contra el jefe"
+      "class": "Toda la clase contra el jefe",
+      "together": "Tablero propio, una clasificación de clase"
     },
     "bestFor": {
       "meanings": "Aprender significados",
@@ -1209,6 +1222,8 @@ const es = {
     "live": {
       "getReady": "¿Listos?",
       "warmUpHint": "Calentamiento: toca la letra que brilla",
+      "warmUpSpellHint": "Calentamiento: toca las letras en orden",
+      "warmUpSpelled": "¡Bien escrito!",
       "warmUpTapThis": "Toca esta",
       "warmUpTitle": "Calentamiento"
     },
@@ -15691,7 +15706,8 @@ const es = {
         "wordcraft": "Forma palabras en tu propio tablero contra el Barón. La tabla de la clase decide lo demás.",
         "wordTower": "Cada quien apila palabras en su propia torre. Una palabra floja tumba bloques. Gana la torre más alta."
       },
-      "wordcraftNeedsShortWords": "Wordcraft no puede repartir ninguna palabra de esta lista en sus fichas. Agrega palabras más cortas o elige otro modo."
+      "wordcraftNeedsShortWords": "Wordcraft no puede repartir ninguna palabra de esta lista en sus fichas. Agrega palabras más cortas o elige otro modo.",
+      "wordcraftNoTiles": "Wordcraft aún no tiene fichas para el idioma de esta lista. Elige otro juego."
     },
     "projectorLobby": {
       "joinAt": "Entra en",

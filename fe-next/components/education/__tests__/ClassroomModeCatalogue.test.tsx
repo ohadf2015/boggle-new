@@ -40,8 +40,8 @@ describe('<ClassroomModeCatalogue>', () => {
     setupRow();
     const groups = screen.getAllByTestId(/^mode-group-/);
     expect(groups.length).toBeGreaterThan(1);
-    const meaning = screen.getByTestId('mode-group-meaning');
-    expect(within(meaning).getByTestId('mode-tile-vocab-quiz')).toBeInTheDocument();
+    const finish = screen.getByTestId('mode-group-finish');
+    expect(within(finish).getByTestId('mode-tile-vocab-quiz')).toBeInTheDocument();
   });
 
   it('spotlights the selected mode: name, mechanic, duration, complexity, style and best-for', () => {

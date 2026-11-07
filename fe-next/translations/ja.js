@@ -703,6 +703,16 @@ const ja = {
   // @eg2Seo:end
   // @eg2Modes:start
   "eg2Modes": {
+    "hint": {
+      "classic": "同じ盤であなたの単語を探して競います。",
+      "vocab-quiz": "意味に合う単語を選びます。",
+      "wordcraft": "文字タイルであなたの単語をつづります。",
+      "crossword": "意味を読んで、その単語をつづります。"
+    },
+    "blocked": {
+      "wordcraftLanguage": "この言語の文字タイルはまだありません",
+      "wordcraftRack": "単語が長すぎてタイルに入りません"
+    },
     "title": "ゲームモードを選ぶ",
     "spec": {
       "duration": "時間",
@@ -715,7 +725,9 @@ const ja = {
     "previewLabel": "{{mode}}のプレビュー",
     "category": {
       "meaning": "意味で勝負",
-      "board": "盤面でスピード勝負"
+      "board": "盤面でスピード勝負",
+      "finish": "まずはここから",
+      "together": "みんなで遊ぶ"
     },
     "complexity": {
       "simple": "ルールがかんたん",
@@ -726,7 +738,8 @@ const ja = {
       "ffa": "全員対戦",
       "teams": "チーム対抗",
       "solo": "ひとりでボットと対戦",
-      "class": "クラス全員でボスに挑む"
+      "class": "クラス全員でボスに挑む",
+      "together": "一人ひとつの盤、順位はクラスでひとつ"
     },
     "bestFor": {
       "meanings": "意味を覚える",
@@ -1209,6 +1222,8 @@ const ja = {
     "live": {
       "getReady": "準備はいい？",
       "warmUpHint": "ウォームアップ：光る文字をタップ！",
+      "warmUpSpellHint": "ウォームアップ：文字を順番にタップ！",
+      "warmUpSpelled": "できた！",
       "warmUpTapThis": "これをタップ",
       "warmUpTitle": "ウォームアップ"
     },
@@ -15743,7 +15758,8 @@ const ja = {
         "wordcraft": "自分のボードでバロンと単語づくり。あとはクラスのランキングが決める。",
         "wordTower": "それぞれ自分のタワーに単語を積み上げる。ぐらつく単語でブロックが崩れる。いちばん高いタワーが勝ち。"
       },
-      "wordcraftNeedsShortWords": "このリストの単語はワードクラフトのタイルに配れません。短い単語を追加するか、別のモードを選んでください。"
+      "wordcraftNeedsShortWords": "このリストの単語はワードクラフトのタイルに配れません。短い単語を追加するか、別のモードを選んでください。",
+      "wordcraftNoTiles": "ワードクラフトには、このリストの言語の文字タイルがまだありません。別のゲームを選んでください。"
     },
     "projectorLobby": {
       "joinAt": "アクセス先",
