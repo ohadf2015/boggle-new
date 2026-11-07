@@ -21550,6 +21550,7 @@ const ja = {
       "wheelLabel": "クラスの文字ホイール"
     },
     "lobby": {
+      "joinTitle": "ゲームに参加しよう！",
       "roomFull": "満員：{max}席中{seated}席が埋まっています",
       "roomFullWatching": "{count}人が席なしで観戦中",
       "brand": "クラス",
@@ -21596,6 +21597,7 @@ const ja = {
       "soloPractice": "ひとりで練習する"
     },
     "hostResults": {
+      "more": "その他",
       "missedTitle": "クラスが見逃した単語",
       "practiceWords": "この単語を練習する（{count}）",
       "shareParents": "保護者に共有",

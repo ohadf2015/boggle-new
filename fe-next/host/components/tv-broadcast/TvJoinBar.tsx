@@ -56,7 +56,9 @@ const TvJoinBar = memo<TvJoinBarProps>(({
           className="flex flex-wrap md:flex-nowrap items-center justify-between gap-x-4 gap-y-2"
         >
           {/* Left: Join URL */}
-          <div className={dense ? 'hidden md:block md:flex-1 min-w-0 text-start' : 'basis-full md:basis-auto md:flex-1 min-w-0 text-center md:text-start'}>
+          {/* Dense (mid-round): the address only from lg. On a portrait tablet it squeezed into a one-letter
+              column beside the code; the code and QR already get students in there. */}
+          <div className={dense ? 'hidden lg:block lg:flex-1 min-w-0 text-start' : 'basis-full md:basis-auto md:flex-1 min-w-0 text-center md:text-start'}>
             <p className="text-neo-cream/80 text-sm font-bold uppercase tracking-wider mb-1">
               {t('tvBroadcast.joinAt')}
             </p>

@@ -21550,6 +21550,7 @@ const sv = {
       "wheelLabel": "Klassens bokstavshjul"
     },
     "lobby": {
+      "joinTitle": "Gå med i spelet!",
       "roomFull": "Rummet är fullt: {seated} av {max} platser tagna",
       "roomFullWatching": "{count} tittar utan plats",
       "brand": "Klass",
@@ -21596,6 +21597,7 @@ const sv = {
       "soloPractice": "Öva på egen hand"
     },
     "hostResults": {
+      "more": "Mer",
       "missedTitle": "Ord som klassen missade",
       "practiceWords": "Öva på de här orden ({count})",
       "shareParents": "Dela med föräldrar",

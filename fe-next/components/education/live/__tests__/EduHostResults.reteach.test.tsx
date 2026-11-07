@@ -76,7 +76,7 @@ describe('EduHostResults reteach', () => {
     expect(onRematch).toHaveBeenCalledTimes(1);
   });
 
-  it('given words most of the class missed, when results show, then practicing them is the one primary and Play again drops into a quiet row of at most three', () => {
+  it('given words most of the class missed, when results show, then practicing them is the one primary, Play again is the one quiet button, and Next game and End game wait under More', () => {
     const onRematch = vi.fn();
     render(<EduHostResults summary={summary} players={players} t={t} onRematch={onRematch} onClose={vi.fn()} onExitRoom={vi.fn()} />);
     const primary = screen.getByTestId('edu-replay-missed');
@@ -84,9 +84,10 @@ describe('EduHostResults reteach', () => {
     expect(primary).toHaveAttribute('data-results-primary');
     expect(primary).toHaveTextContent('eduLiveRoom.hostResults.practiceWords');
     expect(screen.getAllByRole('button').filter((b) => /bg-neo-(lime|pink)(\s|$)/.test(b.className))).toEqual([primary]);
-    const quiet = screen.getByTestId('edu-results-tertiary');
-    expect(quiet.querySelectorAll('button')).toHaveLength(3);
-    expect(quiet).toContainElement(screen.getByTestId('edu-results-play-again'));
+    const more = screen.getByTestId('edu-results-more');
+    expect(more).not.toContainElement(screen.getByTestId('edu-results-play-again'));
+    expect(screen.getByTestId('edu-results-play-again')).not.toHaveAttribute('data-results-primary');
+    expect(Array.from(screen.getByTestId('edu-results-tertiary').querySelectorAll('button')).map((b) => b.dataset.testid)).toEqual(expect.arrayContaining(['edu-results-next-mode', 'edu-results-end']));
     fireEvent.click(screen.getByTestId('edu-results-play-again'));
     expect(onRematch).toHaveBeenCalledTimes(1);
     expect(screen.queryByTestId('edu-reteach-panel')).toBeNull();

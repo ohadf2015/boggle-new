@@ -33,7 +33,7 @@ export function ProjectorModeCard({ gameCode, lobby, t, canChange, className, st
       data-testid="projector-mode"
       style={style}
       className={cn(
-        'flex flex-wrap items-center gap-[clamp(0.5rem,1cqw,1.25rem)] self-center rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light px-[clamp(0.75rem,1.2cqw,1.5rem)] py-[clamp(0.5rem,0.8cqw,1rem)] text-neo-cream',
+        'flex flex-wrap items-center gap-[clamp(0.5rem,1cqw,1.25rem)] self-center rounded-neo-xl border-[3px] border-neo-cream/50 bg-[#2a2b4a] shadow-hard-lg px-[clamp(0.75rem,1.2cqw,1.5rem)] py-[clamp(0.5rem,0.8cqw,1rem)] text-neo-cream',
         RISE,
         className
       )}

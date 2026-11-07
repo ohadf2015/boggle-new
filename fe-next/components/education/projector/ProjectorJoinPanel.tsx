@@ -19,7 +19,7 @@ interface ProjectorJoinPanelProps {
   waiting?: boolean;
 }
 
-/** The only code and QR on the wall. Code and address are ASCII, so they stay LTR inside an RTL page. */
+/** The only code and QR on the wall, on the room's one yellow block so every eye finds the way in. Code and address are ASCII, so they stay LTR inside an RTL page. */
 export const ProjectorJoinPanel = memo<ProjectorJoinPanelProps>(function ProjectorJoinPanel({ gameCode, language, baseUrl, t, waiting = false }) {
   const joinUrl = `${baseUrl}/${language}/join/${gameCode}`;
   const address = `${tvJoinAddress(baseUrl, language, '')}/join`;
@@ -42,11 +42,11 @@ export const ProjectorJoinPanel = memo<ProjectorJoinPanelProps>(function Project
   return (
     <section
       data-testid="projector-join-panel"
-      className="flex h-full flex-col items-center justify-center gap-[clamp(0.5rem,1.6cqh,1.75rem)] rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light p-3 @5xl:p-[clamp(0.75rem,1.4cqw,2rem)]"
+      className="flex h-full flex-col items-center justify-center gap-[clamp(0.5rem,1.6cqh,1.75rem)] rounded-neo-xl border-[3px] border-neo-black bg-neo-yellow p-3 text-neo-black shadow-hard-xl @5xl:p-[clamp(0.75rem,1.4cqw,2rem)]"
     >
       <div className="flex w-full flex-wrap items-center justify-center gap-x-[0.5em] gap-y-1 font-neo-display font-black leading-tight text-[clamp(1.125rem,min(2.4cqw,4.4cqh),3.75rem)]">
-        <span className="text-[0.62em] font-bold text-neo-cream/80">{t('eduLiveRoom.lobby.joinAt')}</span>
-        <span data-testid="projector-join-address" dir="ltr" className="min-w-0 break-all text-neo-cream [unicode-bidi:isolate]">
+        <span className="text-[0.62em] font-bold text-neo-black/75">{t('eduLiveRoom.lobby.joinAt')}</span>
+        <span data-testid="projector-join-address" dir="ltr" className="min-w-0 break-all text-neo-black [unicode-bidi:isolate]">
           {address}
         </span>
         <button
@@ -55,7 +55,7 @@ export const ProjectorJoinPanel = memo<ProjectorJoinPanelProps>(function Project
           onClick={copy}
           aria-label={t('eduLiveRoom.lobby.copyLink')}
           title={t('eduLiveRoom.lobby.copyLink')}
-          className={cn('grid size-11 shrink-0 place-items-center rounded-neo border-2 border-neo-cream/60 bg-neo-navy text-neo-cream hover:bg-neo-navy-elevated', PRESS)}
+          className={cn('grid size-11 shrink-0 place-items-center rounded-neo border-2 border-neo-black bg-neo-cream text-neo-black shadow-hard-sm hover:bg-neo-white', PRESS)}
         >
           {copied ? <Check className="size-5" aria-hidden="true" /> : <Copy className="size-5" aria-hidden="true" />}
         </button>
@@ -88,7 +88,7 @@ export const ProjectorJoinPanel = memo<ProjectorJoinPanelProps>(function Project
         className="relative shrink-0 rounded-neo-lg border-4 border-neo-black bg-neo-white p-[clamp(0.375rem,0.8cqw,1rem)] shadow-hard-lg"
       >
         {waiting && (
-          <span aria-hidden="true" className="pointer-events-none absolute -inset-[8px] rounded-neo-lg border-4 border-neo-cream/50 motion-safe:animate-[edu-live-beckon_2.2s_ease-in-out_infinite]" />
+          <span aria-hidden="true" className="pointer-events-none absolute -inset-[8px] rounded-neo-lg border-4 border-neo-black/40 motion-safe:animate-[edu-live-beckon_2.2s_ease-in-out_infinite]" />
         )}
         <QRCodeSVG value={joinUrl} size={512} level="M" title={t('education.projectorLobby.scanToJoin')} className={cn('block', HERO_QR_SIZE)} />
       </div>
