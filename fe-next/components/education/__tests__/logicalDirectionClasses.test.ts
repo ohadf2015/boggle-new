@@ -29,8 +29,8 @@ const ALLOWLIST: Record<string, { tokens: string[]; why: string }> = {
     why: 'comet word labels are moved by translate(x, y) in the Pixi canvas\'s physical pixel space; anchoring them at physical left keeps them on the comet in RTL, where start-0 would mirror the origin to the right edge',
   },
   'education/EducationHeaderMobileMenu.tsx': {
-    tokens: ['left-0', 'right-0', 'border-l-4', 'border-r-4', 'rounded-l-neo-lg', 'rounded-r-neo-lg'],
-    why: 'the mobile drawer already mirrors ALL SIX inside one isRTL ternary — RTL gets left-0/border-r-4/rounded-r-neo-lg, LTR gets right-0/border-l-4/rounded-l-neo-lg, so border and radius are on the inner edge in both directions',
+    tokens: ['left-0', 'right-0'],
+    why: 'the drawer is pinned to the physical end edge (left in RTL, right in LTR) to match its slide-in direction; its border and radius use border-s/rounded-s, which land on the inner edge in both directions',
   },
   'education/XpProgressBar.tsx': {
     tokens: ['left-0', 'right-0'],

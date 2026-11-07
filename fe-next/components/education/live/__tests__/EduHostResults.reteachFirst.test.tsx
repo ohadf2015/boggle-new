@@ -62,6 +62,10 @@ function renderWall(extra: Partial<React.ComponentProps<typeof EduHostResults>> 
   );
 }
 
+function openMore() {
+  fireEvent.click(screen.getByTestId('edu-results-more-toggle'));
+}
+
 describe('EduHostResults: the words to reteach lead the wall', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -73,7 +77,7 @@ describe('EduHostResults: the words to reteach lead the wall', () => {
     renderWall();
     const panel = screen.getByTestId('edu-reteach-words');
     expect(panel).toHaveTextContent('eduLiveRoom.hostResults.missedTitle');
-    expect(screen.getAllByTestId('edu-most-missed-word').map((el) => el.textContent)).toEqual(['fog0/3 · 0%', 'hail0/3 · 0%']);
+    expect(screen.getAllByTestId('edu-most-missed-word').map((el) => el.textContent)).toEqual(['fog', 'hail']);
   });
 
   it('given missed words, then "Practice these words" is the only primary and it sits in the panel', () => {
@@ -93,8 +97,23 @@ describe('EduHostResults: the words to reteach lead the wall', () => {
     expect(capture).toHaveBeenCalledWith('edu_reteach_started', { surface: 'projector', words: 2, plan: 'free' });
   });
 
+  it('given the wall, then sharing with parents and the PDF wait behind one closed More row, mounted only once opened', () => {
+    pro.hasPro = true;
+    renderWall();
+    const toggle = screen.getByTestId('edu-results-more-toggle');
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(toggle).toHaveTextContent('eduLiveRoom.hostResults.more');
+    expect(screen.queryByTestId('edu-results-parent-share')).toBeNull();
+    expect(screen.queryByTestId('report-pdf-export')).toBeNull();
+    openMore();
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByTestId('edu-results-more')).toContainElement(screen.getByTestId('edu-results-parent-share'));
+    expect(screen.getByTestId('edu-results-more')).toContainElement(screen.getByTestId('report-pdf-export'));
+  });
+
   it('given a free teacher, then the one secondary is "Share with parents", labelled Pro with a crown, leading to the upgrade page in a new tab', () => {
     renderWall();
+    openMore();
     const share = screen.getByTestId('edu-results-parent-share');
     expect(share).toHaveTextContent('eduLiveRoom.hostResults.shareParents');
     expect(share.querySelector('[data-testid="pro-pill"]')).not.toBeNull();
@@ -105,14 +124,15 @@ describe('EduHostResults: the words to reteach lead the wall', () => {
   it('given a Pro teacher, then "Share with parents" opens the one Reports place', () => {
     pro.hasPro = true;
     renderWall();
+    openMore();
     expect(screen.getByTestId('edu-results-parent-share')).toHaveAttribute('href', '/en/teacher/reports');
   });
 
   it('given practice leads, then Play again is one quiet button and Next game and End game wait under More, none looking like a primary', () => {
     renderWall();
     const more = screen.getByTestId('edu-results-more');
-    expect(more.tagName).toBe('DETAILS');
-    expect(more).not.toHaveAttribute('open');
+    expect(more).toHaveAttribute('data-open', 'false');
+    openMore();
     const quiet = screen.getByTestId('edu-results-tertiary');
     expect(Array.from(quiet.querySelectorAll(':scope > div > button')).map((b) => (b as HTMLElement).dataset.testid)).toEqual(expect.arrayContaining(['edu-results-next-mode', 'edu-results-end']));
     const buttons = [screen.getByTestId('edu-results-play-again'), screen.getByTestId('edu-results-next-mode'), screen.getByTestId('edu-results-end')];
@@ -126,6 +146,7 @@ describe('EduHostResults: the words to reteach lead the wall', () => {
   it('given a free teacher, then no trial card competes: the deeper report is one labelled Pro preview that never blurs or names a student', () => {
     renderWall();
     expect(screen.queryByTestId('results-teacher-pro-trial-card')).toBeNull();
+    openMore();
     const preview = screen.getByTestId('class-report-teaser');
     expect(preview.querySelector('[data-testid="pro-pill"]')).not.toBeNull();
     expect(preview.innerHTML).not.toMatch(/blur-/);
@@ -135,6 +156,7 @@ describe('EduHostResults: the words to reteach lead the wall', () => {
   it('given a Pro teacher, then the wall keeps the same shape: one primary, a quiet Play again, the report card as the one Pro slot, and Share with parents and the PDF export under More', () => {
     pro.hasPro = true;
     renderWall();
+    openMore();
     expect(document.querySelectorAll('[data-results-primary]')).toHaveLength(1);
     expect(screen.queryByTestId('class-report-teaser')).toBeNull();
     const more = screen.getByTestId('edu-results-more');
@@ -152,6 +174,7 @@ describe('EduHostResults: the words to reteach lead the wall', () => {
     expect(screen.queryByTestId('edu-reteach-words')).toBeNull();
     expect(screen.getByTestId('edu-results-play-again')).toHaveAttribute('data-results-primary');
     expect(document.querySelectorAll('[data-results-primary]')).toHaveLength(1);
+    openMore();
     expect(screen.getByTestId('edu-results-parent-share')).toBeInTheDocument();
   });
 

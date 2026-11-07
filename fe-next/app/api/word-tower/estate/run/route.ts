@@ -22,6 +22,7 @@ const Body = z.object({
   crates: z.number().finite(),
   heightM: z.number().finite(),
   braces: z.number().finite().optional(),
+  snacks: z.number().finite().optional(),
   tower: z.array(z.unknown()).max(200).optional(),
 });
 

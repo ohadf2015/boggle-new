@@ -5,9 +5,10 @@ import Link from 'next/link';
 import { Gamepad2, School, Share2, Smartphone, type LucideIcon } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackEduTeacherOnboardingStep } from '@/lib/education/telemetry';
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { Dialog } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
-import { PRIMARY_BUTTON, QUIET_LINK } from '@/components/teacher/home/homeStyles';
+import { NbDialogBody, NbDialogContent, NbDialogFooter, NbDialogHeader } from '@/components/teacher/nb/NbDialog';
+import { NB_BLOCK, NB_LINK, NB_PRIMARY, NB_STICKER } from '@/components/teacher/nb/nbStyles';
 
 const STEPS: { id: string; icon: LucideIcon }[] = [
   { id: 'create', icon: School },
@@ -41,43 +42,35 @@ export function TeacherOnboarding({ open, onDismiss }: TeacherOnboardingProps) {
 
   return (
     <Dialog open={open} onOpenChange={close}>
-      <DialogContent
-        data-testid="how-it-works"
-        noDescription
-        closeButtonLabel={t('common.close')}
-        className="max-h-[90dvh] overflow-y-auto border-[3px] border-neo-cream bg-neo-navy text-neo-cream sm:max-w-md"
-      >
-        <DialogTitle className="pe-8 font-neo-display text-xl font-black leading-tight text-neo-cream">
-          {t('education.onboarding.title')}
-        </DialogTitle>
-        <ol className="flex flex-col gap-2">
-          {STEPS.map(({ id, icon: Icon }, i) => (
-            <li key={id} data-testid={`onboarding-step-${id}`} className="flex items-start gap-3 rounded-neo border-[2px] border-neo-cream/20 px-3 py-2.5">
-              <span
-                aria-hidden="true"
-                className="grid size-9 shrink-0 place-items-center rounded-full border-[2px] border-neo-black bg-neo-lime font-neo-display text-sm font-black text-neo-black"
-              >
-                {i + 1}
-              </span>
-              <span className="flex min-w-0 flex-col">
-                <span className="inline-flex items-center gap-1.5 font-neo-body text-sm font-bold">
-                  <Icon className="size-4 shrink-0 text-neo-cyan" aria-hidden="true" />
-                  {t(`education.onboarding.steps.${id}.title`)}
+      <NbDialogContent data-testid="how-it-works" noDescription size="sm">
+        <NbDialogHeader color="yellow" title={t('education.onboarding.title')} closeLabel={t('common.close')} />
+        <NbDialogBody>
+          <ol className="flex flex-col gap-2.5">
+            {STEPS.map(({ id, icon: Icon }, i) => (
+              <li key={id} data-testid={`onboarding-step-${id}`} className={cn('flex items-start gap-3 rounded-neo-lg border-[3px] px-3 py-2.5 shadow-hard', NB_BLOCK.navy)}>
+                <span aria-hidden="true" className={cn(NB_STICKER, NB_BLOCK.lime, 'mt-0.5 size-8 justify-center px-0 font-neo-display text-sm')}>
+                  {i + 1}
                 </span>
-                <span className="font-neo-body text-sm text-neo-cream/75">{t(`education.onboarding.steps.${id}.text`)}</span>
-              </span>
-            </li>
-          ))}
-        </ol>
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <Link href={`/${language}/education/help`} onClick={onDismiss} className={QUIET_LINK}>
+                <span className="flex min-w-0 flex-col">
+                  <span className="inline-flex items-center gap-1.5 font-neo-display text-base font-black">
+                    <Icon className="size-4 shrink-0 text-neo-cyan" aria-hidden="true" />
+                    {t(`education.onboarding.steps.${id}.title`)}
+                  </span>
+                  <span className="font-neo-body text-sm text-neo-cream/80">{t(`education.onboarding.steps.${id}.text`)}</span>
+                </span>
+              </li>
+            ))}
+          </ol>
+        </NbDialogBody>
+        <NbDialogFooter className="sm:justify-between">
+          <Link href={`/${language}/education/help`} onClick={onDismiss} className={cn(NB_LINK, 'justify-center')}>
             {t('eduShell.account.help')}
           </Link>
-          <button type="button" onClick={done} className={cn(PRIMARY_BUTTON, 'min-h-[48px] text-base')}>
+          <button type="button" onClick={done} className={NB_PRIMARY}>
             {t('education.onboarding.gotIt')}
           </button>
-        </div>
-      </DialogContent>
+        </NbDialogFooter>
+      </NbDialogContent>
     </Dialog>
   );
 }

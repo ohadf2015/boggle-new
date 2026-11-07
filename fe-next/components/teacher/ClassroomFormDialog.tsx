@@ -3,18 +3,11 @@
 import { useEffect, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogBody,
-} from '@/components/ui/dialog';
+import { Dialog } from '@/components/ui/dialog';
 import type { Language } from '@/lib/supabase/education/types';
 import { LanguagePicker } from '@/components/education/pickers/LanguagePicker';
+import { NbDialogBody, NbDialogContent, NbDialogFooter, NbDialogHeader } from '@/components/teacher/nb/NbDialog';
+import { NB_INPUT, NB_PRIMARY, NB_SECONDARY } from '@/components/teacher/nb/nbStyles';
 
 interface ClassroomFormDialogProps {
   open: boolean;
@@ -57,27 +50,19 @@ export function ClassroomFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        className="max-w-md"
-        closeButtonLabel={t('common.close')}
-        aria-describedby={undefined}
-      >
-        <DialogHeader variant="cyan">
-          <DialogTitle>{t('teacher.classroom.edit')}</DialogTitle>
-        </DialogHeader>
-        <DialogDescription className="sr-only">
-          {t('teacher.classroom.dialog.editDescription')}
-        </DialogDescription>
-
-        <DialogBody className="space-y-4">
+      <NbDialogContent size="sm" aria-describedby={undefined}>
+        <NbDialogHeader
+          color="orange"
+          title={t('teacher.classroom.edit')}
+          srDescription={t('teacher.classroom.dialog.editDescription')}
+          closeLabel={t('common.close')}
+        />
+        <NbDialogBody className="space-y-4">
           <div>
-            <label
-              htmlFor="classroom-form-name"
-              className="block text-sm font-neo-body font-black text-neo-black dark:text-neo-cream mb-2"
-            >
+            <label htmlFor="classroom-form-name" className="mb-2 block font-neo-body text-sm font-black text-neo-cream">
               {t('teacher.classroom.name')}
             </label>
-            <Input
+            <input
               id="classroom-form-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -85,7 +70,7 @@ export function ClassroomFormDialog({
                 if (e.key === 'Enter') handleSubmit();
               }}
               placeholder={t('teacher.classroom.namePlaceholder')}
-              className="border-2 border-black shadow-hard-sm font-bold"
+              className={NB_INPUT}
             />
           </div>
 
@@ -93,29 +78,23 @@ export function ClassroomFormDialog({
             label={t('teacher.classroom.defaultLanguage', 'Default language')}
             value={selectedLanguage}
             onChange={setSelectedLanguage}
-            tone="theme"
             showBoardHint
           />
-
-          <div className="flex gap-3 pt-2">
-            <Button
-              type="button"
-              onClick={() => onOpenChange(false)}
-              className="flex-1 bg-neo-cream text-black font-black border-2 border-black shadow-hard-sm hover:bg-black/5 transition"
-            >
-              {t('common.cancel')}
-            </Button>
-            <Button
-              type="button"
-              onClick={handleSubmit}
-              disabled={isSaving || !name.trim()}
-              className="flex-1 bg-neo-cyan text-black font-black border-2 border-black shadow-hard hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed transition"
-            >
-              {isSaving ? t('common.loading') : t('teacher.classroom.edit')}
-            </Button>
-          </div>
-        </DialogBody>
-      </DialogContent>
+        </NbDialogBody>
+        <NbDialogFooter>
+          <button type="button" onClick={() => onOpenChange(false)} className={NB_SECONDARY}>
+            {t('common.cancel')}
+          </button>
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={isSaving || !name.trim()}
+            className={cn(NB_PRIMARY, 'sm:min-w-44')}
+          >
+            {isSaving ? t('common.loading') : t('teacher.classroom.edit')}
+          </button>
+        </NbDialogFooter>
+      </NbDialogContent>
     </Dialog>
   );
 }

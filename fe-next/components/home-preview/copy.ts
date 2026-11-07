@@ -3,7 +3,6 @@ export const HOME_PREVIEW_COPY = {
   heroLine: "Sixty seconds, a fresh board, and three rivals who don't wait for you.",
   playSub: 'Random mode',
   pickMode: 'Or pick the mode yourself',
-  botsNote: 'Bots and practice rounds live in Quick Play now.',
   timerBadge: '60s',
   dailyToday: 'Today',
   dailyNoStreak: 'Start a streak today',
@@ -11,4 +10,8 @@ export const HOME_PREVIEW_COPY = {
   gamesLine: 'For when you want something slower, or a lot stranger.',
   greetingGuest: 'Hey there',
   greetingUser: 'Hey {name}',
+  chipDaily: 'Daily puzzle',
+  chipStreak: '{n}-day streak',
+  chipMp: 'Multiplayer',
+  chipMpSub: 'Play friends live',
 } as const;

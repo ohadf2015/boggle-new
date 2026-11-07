@@ -40,6 +40,7 @@ let englishSet: Set<string> | null = null;
 let spanishBaseSet: Set<string> | null = null;
 let hebrewSet: Set<string> | null = null;
 let swedishSet: Set<string> | null = null;
+let englishApprovedSet: Set<string> | null = null;
 
 const backendDir = (): string => path.join(process.cwd(), 'backend');
 
@@ -124,9 +125,19 @@ export function getSwedishWordSet(): Set<string> {
   return swedishSet;
 }
 
+/** english_words_approved.txt: the Express game merges it into English, so validators that must agree with it check this too. */
+export function getEnglishApprovedWordSet(): Set<string> {
+  if (englishApprovedSet) return englishApprovedSet;
+  const p = path.join(backendDir(), 'english_words_approved.txt');
+  const lines = fs.existsSync(p) ? fs.readFileSync(p, 'utf-8').split('\n') : [];
+  englishApprovedSet = new Set(lines.map((l) => l.trim().toLowerCase()).filter((w) => w && !w.startsWith('#')));
+  return englishApprovedSet;
+}
+
 /** Test escape hatch — drop the cached sets so each test starts cold. */
 export function __resetSharedWordSetsForTest(): void {
   englishSet = null;
+  englishApprovedSet = null;
   spanishBaseSet = null;
   hebrewSet = null;
   swedishSet = null;

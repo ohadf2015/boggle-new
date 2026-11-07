@@ -9,6 +9,7 @@ import { catalogueEntry } from '@/components/education/ClassroomModeCatalogueDat
 import { getSharedSocketIfExists } from '@/utils/SocketContext';
 import { RISE, type Translate } from '@/components/education/live/eduLiveStyles';
 import type { LobbyFact, useProjectorLobbyMode } from './useProjectorLobbyMode';
+import { WALL_PANEL, WALL_STICKER } from './projectorNbStyles';
 
 function factIcon(key: LobbyFact['key']) {
   if (key === 'late') return UserPlus;
@@ -33,21 +34,22 @@ export function ProjectorModeCard({ gameCode, lobby, t, canChange, className, st
       data-testid="projector-mode"
       style={style}
       className={cn(
-        'flex flex-wrap items-center gap-[clamp(0.5rem,1cqw,1.25rem)] self-center rounded-neo-xl border-[3px] border-neo-cream/50 bg-[#2a2b4a] shadow-hard-lg px-[clamp(0.75rem,1.2cqw,1.5rem)] py-[clamp(0.5rem,0.8cqw,1rem)] text-neo-cream',
+        'flex flex-wrap items-center gap-[clamp(0.5rem,1cqw,1.25rem)] self-center px-[clamp(0.75rem,1.2cqw,1.5rem)] py-[clamp(0.5rem,0.8cqw,1rem)]',
+        WALL_PANEL,
         RISE,
         className
       )}
     >
       {entry?.poster && (
-        <Image src={entry.poster} alt="" width={96} height={96} className="size-[clamp(2.75rem,min(4.5cqw,8cqh),7rem)] shrink-0 rounded-neo border-2 border-neo-cream/40 object-cover @max-5xl:hidden" />
+        <Image src={entry.poster} alt="" width={96} height={96} className="size-[clamp(2.75rem,min(4.5cqw,8cqh),7rem)] shrink-0 -rotate-2 rounded-neo border-[3px] border-neo-cream/60 object-cover shadow-hard @max-5xl:hidden" />
       )}
       <div className="min-w-[8rem] flex-1">
-        <p className="font-neo-display font-bold leading-tight text-[clamp(1.25rem,min(2cqw,3.6cqh),3rem)]">{t(entry?.nameKey ?? 'teacher.classroom.gameModes.classic')}</p>
-        <ul className="mt-1 flex flex-wrap gap-x-[0.9em] gap-y-0.5 font-neo-body text-neo-cream/85 text-[clamp(0.875rem,min(1.1cqw,2cqh),1.75rem)]">
+        <p className="font-neo-display font-black leading-tight text-[clamp(1.25rem,min(2cqw,3.6cqh),3rem)]">{t(entry?.nameKey ?? 'teacher.classroom.gameModes.classic')}</p>
+        <ul className="mt-[0.4em] flex flex-wrap gap-[0.45em] text-[clamp(0.875rem,min(1.1cqw,2cqh),1.75rem)]">
           {lobby.facts.map((fact) => {
             const Icon = factIcon(fact.key);
             return (
-              <li key={fact.key} className="inline-flex items-center gap-1.5">
+              <li key={fact.key} data-testid="projector-mode-fact" className={cn(WALL_STICKER, 'font-neo-body font-black shadow-hard-sm')}>
                 <Icon className="size-[1em] shrink-0" aria-hidden="true" />
                 {fact.text}
               </li>

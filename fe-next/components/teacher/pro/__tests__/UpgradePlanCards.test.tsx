@@ -156,3 +156,12 @@ describe('UpgradePlanCards inside the free access trial', () => {
     expect(screen.getByTestId('pricing-trial-cta')).toHaveTextContent('eg2Pro.plans.trialCta|14');
   });
 });
+
+describe('UpgradePlanCards on a tablet', () => {
+  it('keeps the plans stacked until there is room for three columns', () => {
+    setup('free');
+    const grid = screen.getByTestId('pricing-cards');
+    expect(grid.className).toMatch(/(^|\s)lg:grid-cols-3(\s|$)/);
+    expect(grid.className).not.toMatch(/(^|\s)md:grid-cols-3(\s|$)/);
+  });
+});

@@ -3,10 +3,9 @@
  * See docs/2026-06-04-dictionary-extensive-improvement-spec.md.
  */
 
-/** The five game languages with curated dictionaries. */
-export type LangCode = 'en' | 'he' | 'sv' | 'ja' | 'es';
+export type LangCode = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 
-export const DICTIONARY_LANGS: readonly LangCode[] = ['en', 'he', 'sv', 'ja', 'es'];
+export const DICTIONARY_LANGS: readonly LangCode[] = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
 
 /** A normalized candidate word headed for the verify→promote gates. */
 export interface Candidate {

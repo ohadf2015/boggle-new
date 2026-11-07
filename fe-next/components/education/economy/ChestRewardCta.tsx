@@ -34,7 +34,7 @@ export default function ChestRewardCta({ gameCode, roundId, quiet = false }: Che
           'flex w-full items-center gap-3 text-start font-bold active:translate-x-0.5 active:translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
           quiet
             ? 'rounded-neo border-[3px] border-neo-lime bg-neo-navy-elevated px-3 py-2 text-neo-cream shadow-hard-sm'
-            : 'rounded-2xl border-4 border-neo-black bg-neo-lime p-3 text-neo-navy shadow-hard-lg'
+            : 'rounded-neo-lg border-4 border-neo-black bg-neo-lime p-3 text-neo-navy shadow-hard-lg'
         )}
       >
         {/* eslint-disable-next-line @next/next/no-img-element -- small transparent chest sprite */}

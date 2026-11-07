@@ -7,16 +7,17 @@
 
 import { NextRequest } from 'next/server';
 import { checkApiRateLimit, rateLimitResponse } from '@/lib/apiRateLimit';
-import { getAnonClient } from '@/utils/supabase/anon';
 import { captureApiError } from '@/utils/sentry';
 import { normalizeHebrewWord, normalizeSpanishWord } from '@/shared/utils/wordNormalization';
 import {
   getEnglishWordSet,
+  getEnglishApprovedWordSet,
   getSpanishBaseWordSet,
   getHebrewWordSet,
   getSwedishWordSet,
 } from '@/lib/server/sharedWordSets';
 import { isRussianWord } from '@/lib/server/russianWordLookup';
+import { checkCommunityWord } from '@/lib/wordValidation/communityWord';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -70,33 +71,6 @@ function loadJapaneseDictionary(): Set<string> {
 }
 
 
-/**
- * Check if a word is community-validated (net_score >= 6)
- */
-async function checkCommunityWord(word: string, language: string): Promise<boolean> {
-  const supabase = getAnonClient();
-  if (!supabase) return false;
-
-  try {
-    const { data, error } = await supabase
-      .from('word_scores')
-      .select('id')
-      .eq('word', word)
-      .eq('language', language)
-      .eq('is_potentially_valid', true)
-      .limit(1)
-      .maybeSingle();
-
-    if (error) {
-      console.warn('[validate-word] Community word check error:', error.message);
-      return false;
-    }
-
-    return data !== null;
-  } catch {
-    return false;
-  }
-}
 
 function normalizeWord(word: string, language: string): string {
   switch (language) {
@@ -160,7 +134,7 @@ export async function POST(request: NextRequest) {
     let isInDictionary = false;
     switch (language) {
       case 'en':
-        isInDictionary = (await loadEnglishDictionary()).has(normalizedWord);
+        isInDictionary = (await loadEnglishDictionary()).has(normalizedWord) || getEnglishApprovedWordSet().has(normalizedWord);
         break;
       case 'es':
         isInDictionary = (await loadSpanishDictionary()).has(normalizedWord);

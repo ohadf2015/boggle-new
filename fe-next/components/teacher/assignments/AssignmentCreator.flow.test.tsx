@@ -68,10 +68,20 @@ describe('AssignmentCreator — Wayground-order flow', () => {
     mockCreateAssignment.mockResolvedValue({ success: true });
   });
 
-  it('asks for the word list first, then who, then the mode, then the due date', () => {
+  it('asks for the word list first, then the mode, then the due date; who it goes to sits in the header', () => {
     renderCreator();
     const steps = screen.getAllByTestId('assignment-step').map((s) => s.getAttribute('data-step'));
-    expect(steps).toEqual(['list', 'who', 'mode', 'due']);
+    expect(steps).toEqual(['list', 'mode', 'due']);
+    expect(screen.getByTestId('assignment-who').closest('[data-nb-dialog-header]')).not.toBeNull();
+  });
+
+  it('keeps other modes, focus and the note behind one collapsed row', () => {
+    renderCreator();
+    const toggle = screen.getByTestId('assignment-advanced-toggle');
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.queryByRole('button', { name: 'teacher.assignment.practiceMode' })).toBeNull();
+    fireEvent.click(toggle);
+    expect(screen.getByRole('button', { name: 'teacher.assignment.practiceMode' })).toBeVisible();
   });
 
   it('names the class and its size so the teacher knows who gets it', () => {

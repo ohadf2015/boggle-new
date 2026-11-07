@@ -15,10 +15,10 @@ export function AssignmentWordcraftOption({ selected, disabled, onSelect, t }: {
       disabled={disabled}
       onClick={onSelect}
       className={cn(
-        'w-full mb-3 px-4 py-3 rounded-neo border-neo transition flex items-center gap-3 text-start disabled:cursor-not-allowed disabled:opacity-60',
+        'w-full mb-3 px-4 py-3 rounded-neo-lg border-[3px] shadow-hard transition flex items-center gap-3 text-start disabled:cursor-not-allowed disabled:opacity-60',
         selected
-          ? 'bg-neo-lime border-neo-lime text-neo-black shadow-hard-sm'
-          : 'bg-neo-navy/50 border-neo-cream/40 text-neo-white hover:bg-neo-navy/80'
+          ? 'bg-neo-cyan border-neo-black text-neo-black'
+          : 'bg-neo-navy-light border-neo-cream/50 text-neo-white hover:-translate-y-px'
       )}
     >
       <Grid2x2 className="w-8 h-8 shrink-0" aria-hidden="true" />

@@ -84,6 +84,18 @@ describe('analytics page: summary first, every control does something', () => {
     expect(screen.queryByTestId('analytics-live')).toBeNull();
   });
 
+  it('shows no "connecting" box while the live link is still opening with nobody playing', () => {
+    (useRealtimeClassroomProgress as ReturnType<typeof vi.fn>).mockReturnValue({
+      isConnected: false,
+      activeStudentsCount: 0,
+      lastUpdate: null,
+      connectionStatus: 'connecting',
+      recentActivity: [],
+    });
+    render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
+    expect(screen.queryByTestId('analytics-live')).toBeNull();
+  });
+
   it('shows the live box once students are playing', () => {
     (useRealtimeClassroomProgress as ReturnType<typeof vi.fn>).mockReturnValue({
       isConnected: true,

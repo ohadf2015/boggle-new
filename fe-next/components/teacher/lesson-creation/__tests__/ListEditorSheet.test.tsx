@@ -115,8 +115,16 @@ describe('ListEditorSheet', () => {
     expect(sheet.className).toMatch(/bg-neo-navy/);
   });
 
+  it('keeps language, grade, topic and sharing behind one collapsed row', () => {
+    setup();
+    const toggle = screen.getByTestId('list-advanced-toggle');
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.queryByRole('switch', { name: /eduLibrary.share.toggle/ })).toBeNull();
+  });
+
   it('offers a Share to Discover switch', () => {
     const { onSave } = setup({ initial: { ...emptyListDraft('en'), name: 'Fruits', words: [{ word: 'apple', canIntegrate: true }] } });
+    fireEvent.click(screen.getByTestId('list-advanced-toggle'));
     fireEvent.click(screen.getByRole('switch', { name: /eduLibrary.share.toggle/ }));
     fireEvent.click(screen.getByTestId('list-save'));
     return waitFor(() => expect((onSave.mock.calls[0][0] as { isPublic: boolean }).isPublic).toBe(true));

@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { TeacherWhatsNewDialog } from '@/components/teacher/TeacherWhatsNew';
 import AvatarLite from '@/components/AvatarLite';
+import { NB_MENU, NB_MENU_ITEM } from '@/components/teacher/nb/nbDialogStyles';
 
 export interface TeacherAccountMenuProps {
   proHref: string;
@@ -25,7 +26,7 @@ export interface TeacherAccountMenuProps {
   variant?: 'row' | 'icon';
 }
 
-const ITEM = 'min-h-[44px] font-neo-body font-semibold text-neo-cream';
+const ITEM = NB_MENU_ITEM;
 
 export function TeacherAccountMenu({ proHref, profileHref, variant = 'row' }: TeacherAccountMenuProps) {
   const { t, language } = useLanguage();
@@ -68,7 +69,7 @@ export function TeacherAccountMenu({ proHref, profileHref, variant = 'row' }: Te
         <DropdownMenuContent
           align="end"
           side={variant === 'row' ? 'top' : 'bottom'}
-          className="w-64 rounded-neo border-[3px] border-neo-cream bg-neo-navy-light p-1 shadow-hard"
+          className={cn(NB_MENU, 'w-64 rounded-neo-lg!')}
         >
           <DropdownMenuItem asChild className={ITEM}>
             <Link href={profileHref}>
@@ -80,7 +81,7 @@ export function TeacherAccountMenu({ proHref, profileHref, variant = 'row' }: Te
             <Link href={proHref}>
               <Crown className="size-4" aria-hidden="true" />
               {t('eduShell.account.plans')}
-              <span data-testid="teacher-account-pro-badge" className="ms-auto rounded-neo bg-neo-yellow px-1.5 py-px text-xs font-black text-neo-black">
+              <span data-testid="teacher-account-pro-badge" className="ms-auto rounded-neo-pill border-2 border-neo-black bg-neo-yellow px-2 py-px text-xs font-black text-neo-black">
                 {t('eduShell.nav.pro')}
               </span>
             </Link>
@@ -95,7 +96,7 @@ export function TeacherAccountMenu({ proHref, profileHref, variant = 'row' }: Te
             <Sparkles className="size-4" aria-hidden="true" />
             {t('eduShell.account.whatsNew')}
           </DropdownMenuItem>
-          <DropdownMenuSeparator className="bg-neo-cream/15" />
+          <DropdownMenuSeparator className="my-1 h-0.5 bg-neo-cream/25" />
           <DropdownMenuItem className={ITEM} onSelect={() => void handleSignOut()}>
             <LogOut className="size-4" aria-hidden="true" />
             {t('auth.signOut')}

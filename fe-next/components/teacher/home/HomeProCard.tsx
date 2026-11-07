@@ -15,6 +15,8 @@ import { reportProOfferClick, reportProOfferImpression } from '@/lib/education/r
 import { useUpsellImpression } from '@/lib/education/useUpsellImpression';
 import { useProOfferSlot } from '@/lib/education/pro/useProOfferSlot';
 import { ProOfferCompactLink } from '@/components/education/results/ProOfferCompactLink';
+import { cn } from '@/lib/utils';
+import { NB_BLOCK, NB_PANEL, NB_SMALL } from '../nb/nbStyles';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -33,8 +35,7 @@ export interface HomeProCardProps {
   t: T;
 }
 
-const CTA =
-  'inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-neo border-2 border-neo-cream/40 bg-transparent px-2 text-center font-neo-display text-xs font-bold leading-tight text-neo-cream transition-colors duration-150 hover:border-neo-cream hover:bg-neo-cream/10 active:scale-[0.97] disabled:opacity-60 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy';
+const CTA = cn(NB_SMALL, NB_BLOCK.navy, 'w-full whitespace-normal px-2 text-xs leading-tight');
 
 /**
  * The one Pro ask on Home (free teachers only). Same single-trial rules as the
@@ -95,7 +96,7 @@ export function HomeProCard({ kind, onDismiss, trackImpression, language, t }: H
   }
 
   return (
-    <section ref={cardRef} data-testid="home-pro-card" data-kind={kind} data-offer={proOffer.offer} data-variant={variant} aria-labelledby="home-pro-title" className="relative rounded-neo-lg border-2 border-neo-cream/35 bg-neo-navy-light p-2.5 sm:p-3">
+    <section ref={cardRef} data-testid="home-pro-card" data-kind={kind} data-offer={proOffer.offer} data-variant={variant} aria-labelledby="home-pro-title" className={cn(NB_PANEL, 'relative p-2.5 shadow-hard-lg sm:p-3')}>
       <button
         type="button"
         data-testid="home-pro-dismiss"

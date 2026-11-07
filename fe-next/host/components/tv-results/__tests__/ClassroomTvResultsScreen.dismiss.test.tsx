@@ -74,6 +74,7 @@ describe('ClassroomTvResultsScreen — returning to the lobby', () => {
   it('offers a dismiss control that hands the room back to the lobby', () => {
     const onClose = vi.fn();
     render(<ClassroomTvResultsScreen summary={summary} onRematch={vi.fn()} onClose={onClose} t={t} />);
+    fireEvent.click(screen.getByTestId('edu-results-more-toggle'));
     const dismiss = screen.getByTestId('edu-results-next-mode');
     fireEvent.click(dismiss);
     expect(onClose).toHaveBeenCalledTimes(1);
@@ -81,6 +82,7 @@ describe('ClassroomTvResultsScreen — returning to the lobby', () => {
 
   it('the dismiss reads as a control: a real border, not a ghost', () => {
     render(<ClassroomTvResultsScreen summary={summary} onClose={vi.fn()} t={t} />);
+    fireEvent.click(screen.getByTestId('edu-results-more-toggle'));
     const cls = screen.getByTestId('edu-results-next-mode').className;
     // `border-neo` does not survive a cn() merge next to a colour class, so the width is written literally.
     expect(cls).toMatch(/border-\[(2|3)px\]/);
@@ -94,6 +96,7 @@ describe('ClassroomTvResultsScreen — returning to the lobby', () => {
 
   it('keeps REMATCH as the one primary action', () => {
     render(<ClassroomTvResultsScreen summary={summary} onRematch={vi.fn()} onClose={vi.fn()} t={t} />);
+    fireEvent.click(screen.getByTestId('edu-results-more-toggle'));
     const primaries = document.querySelectorAll('[data-results-primary]');
     expect(primaries).toHaveLength(1);
     expect(screen.getByTestId('edu-results-next-mode')).not.toHaveAttribute('data-results-primary');

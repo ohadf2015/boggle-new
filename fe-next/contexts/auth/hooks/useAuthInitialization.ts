@@ -29,13 +29,16 @@ import {
 import type { AuthStateSetters } from '../authTypes';
 import { shouldReloadAfterSignIn } from '../reloadOnSignIn';
 import { shouldRedirectToPendingJoin } from '../pendingJoinRedirect';
+import { handleTabBecameVisible } from './tabVisibleSessionSync';
 
 // Constants for timeout values
 // Increased from 2s to 5s to accommodate slower mobile connections (fixes JAVASCRIPT-NEXTJS-11)
 const SESSION_FETCH_TIMEOUT_MS = 5000;
 const LOADING_SAFETY_TIMEOUT_MS = 6000; // Increased to match new session timeout
 const TAB_VISIBILITY_LOADING_TIMEOUT_MS = 1500;
-const TEN_MINUTES_MS = 10 * 60 * 1000;
+const SESSION_UNANSWERED_FALLBACK_MS = 15000;
+
+type SessionAnswer = 'unknown' | 'absent' | 'present';
 
 interface UseAuthInitializationParams {
   userIdRef: React.MutableRefObject<string | null>;
@@ -86,7 +89,28 @@ export function useAuthInitialization({
   useEffect(() => {
     let subscription: { unsubscribe: () => void } | null = null;
     let visibilityTimeout: NodeJS.Timeout | null = null;
+    // 'unknown' while the session check has not answered: a timeout is not "no session".
+    let sessionAnswer: SessionAnswer = 'unknown';
     isMountedRef.current = true;
+
+    const applyInitialSession = (sessionUser: User | null) => {
+      sessionAnswer = sessionUser ? 'present' : 'absent';
+      if (sessionUser && sessionUser.id !== userIdRef.current) {
+        userIdRef.current = sessionUser.id;
+        setUser(sessionUser);
+        // Fetch user data in background, don't block loading state
+        fetchUserData(sessionUser.id, sessionUser.user_metadata).catch((err) => {
+          logger.warn('Failed to fetch user data:', err.message);
+          captureBackgroundError(err instanceof Error ? err : new Error(String(err)), {
+            operation: 'fetch_user_data',
+            service: 'auth',
+            userId: sessionUser.id,
+          });
+        });
+        registerPushToken({ silent: true }).catch(() => {});
+      }
+      setLoading(false);
+    };
 
     const initAuth = async () => {
       const configured = await isSupabaseConfigured();
@@ -94,13 +118,56 @@ export function useAuthInitialization({
       setIsSupabaseEnabled(configured);
 
       if (!configured || !supabase) {
+        sessionAnswer = 'absent';
         setLoading(false);
         return;
       }
 
+      // Subscribed before getSession so a slow restore's SIGNED_IN is not missed.
+      // auth-js runs this callback inside its auth lock and waits for it, so it
+      // must not await Supabase: fetchUserData's query calls getSession, which
+      // waits on that lock, and sign-in deadlocked (JAVASCRIPT-NEXTJS-2MB).
+      // Record the answer now, do the work on the next macrotask.
+      const { data } = supabase.auth.onAuthStateChange((event, session) => {
+        if (!isMountedRef.current) return;
+
+        // New-signup welcome email. Fire-and-forget — server is idempotent and
+        // NEW-signups-only, so calling on any SIGNED_IN is safe and covers every
+        // signup method (OAuth, email/password, magic-link, OTP).
+        if (event === 'SIGNED_IN' && session) {
+          void triggerWelcomeEmail(session.access_token);
+          void triggerExternalIdentityLink(session);
+        }
+
+        const sessionUser = session?.user ?? null;
+        const knownSignedOut = sessionAnswer === 'absent';
+        if (sessionUser) sessionAnswer = 'present';
+        else if (event === 'SIGNED_OUT' || event === 'INITIAL_SESSION') sessionAnswer = 'absent';
+
+        setTimeout(() => {
+          if (!isMountedRef.current) return;
+          handleAuthStateChange(
+            event,
+            sessionUser,
+            knownSignedOut,
+            userIdRef,
+            setters,
+            fetchUserData,
+            clearAuthState,
+            isMountedRef
+          ).catch((err) => {
+            captureBackgroundError(err instanceof Error ? err : new Error(String(err)), {
+              operation: 'auth_state_change',
+              service: 'auth',
+            });
+          });
+        }, 0);
+      });
+      subscription = data.subscription;
+
       // Get initial session with timeout to prevent slow connections from blocking UI
+      const sessionPromise = supabase.auth.getSession();
       try {
-        const sessionPromise = supabase.auth.getSession();
         const timeoutPromise = new Promise<{ data: { session: null }; error: SupabaseAuthError }>(
           (_, reject) =>
             setTimeout(
@@ -117,54 +184,27 @@ export function useAuthInitialization({
 
         if (error) {
           await handleSessionError(error, clearAuthState);
-        } else if (session?.user) {
-          // Only update user if ID changed to prevent infinite loops
-          if (session.user.id !== userIdRef.current) {
-            setUser(session.user);
-            // Fetch user data in background, don't block loading state
-            fetchUserData(session.user.id, session.user.user_metadata).catch((err) => {
-              logger.warn('Failed to fetch user data:', err.message);
-              captureBackgroundError(err instanceof Error ? err : new Error(String(err)), {
-                operation: 'fetch_user_data',
-                service: 'auth',
-                userId: session.user.id,
-              });
-            });
-            registerPushToken({ silent: true }).catch(() => {});
-          }
+          if (isMountedRef.current && sessionAnswer === 'unknown') applyInitialSession(null);
+        } else if (sessionAnswer === 'unknown' || session?.user) {
+          applyInitialSession(session?.user ?? null);
         }
       } catch (err) {
         if (!isMountedRef.current) return;
-        await handleInitError(err as SupabaseAuthError, clearAuthState);
-      }
-
-      if (isMountedRef.current) {
-        setLoading(false);
-      }
-
-      // Listen for auth changes (including cross-tab events)
-      const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
-        if (!isMountedRef.current) return;
-
-        // New-signup welcome email. Fire-and-forget — server is idempotent and
-        // NEW-signups-only, so calling on any SIGNED_IN is safe and covers every
-        // signup method (OAuth, email/password, magic-link, OTP).
-        if (event === 'SIGNED_IN' && session) {
-          void triggerWelcomeEmail(session.access_token);
-          void triggerExternalIdentityLink(session);
+        if (isSessionTimeout(err as SupabaseAuthError)) {
+          // Keep loading: the listener or the late getSession answers, or the outage fallback ends it.
+          logger.info('Auth session fetch timed out after 5s - waiting for the session to answer');
+          sessionPromise
+            .then(({ data: late, error }) => {
+              if (isMountedRef.current && sessionAnswer === 'unknown' && !error) {
+                applyInitialSession(late.session?.user ?? null);
+              }
+            })
+            .catch(() => {});
+          return;
         }
-
-        await handleAuthStateChange(
-          event,
-          session?.user ?? null,
-          userIdRef,
-          setters,
-          fetchUserData,
-          clearAuthState,
-          isMountedRef
-        );
-      });
-      subscription = data.subscription;
+        await handleInitError(err as SupabaseAuthError, clearAuthState);
+        if (isMountedRef.current && sessionAnswer === 'unknown') applyInitialSession(null);
+      }
     };
 
     // Listen for auth errors from API calls
@@ -198,7 +238,7 @@ export function useAuthInitialization({
         // Existing loading state reset logic
         if (visibilityTimeout) clearTimeout(visibilityTimeout);
         visibilityTimeout = setTimeout(() => {
-          if (isMountedRef.current) {
+          if (isMountedRef.current && sessionAnswer !== 'unknown') {
             setLoading((currentLoading) => {
               if (currentLoading) {
                 logger.warn('Tab visibility change - forcing loading to false');
@@ -214,9 +254,8 @@ export function useAuthInitialization({
 
     initAuth();
 
-    // Safety timeout: ensure loading is set to false after 3 seconds
     const loadingTimeout = setTimeout(() => {
-      if (isMountedRef.current) {
+      if (isMountedRef.current && sessionAnswer !== 'unknown') {
         setLoading((currentLoading) => {
           if (currentLoading) {
             logger.debug('Auth loading timeout - forcing loading to false');
@@ -227,10 +266,21 @@ export function useAuthInitialization({
       }
     }, LOADING_SAFETY_TIMEOUT_MS);
 
+    const unansweredTimeout = setTimeout(() => {
+      if (!isMountedRef.current || sessionAnswer !== 'unknown') return;
+      logger.warn('Auth session never answered - showing the signed-out screen');
+      captureBackgroundError(new Error('Auth session check never answered'), {
+        operation: 'auth_session_unanswered',
+        service: 'auth',
+      });
+      setLoading(false);
+    }, SESSION_UNANSWERED_FALLBACK_MS);
+
     // Cleanup function
     return () => {
       isMountedRef.current = false;
       clearTimeout(loadingTimeout);
+      clearTimeout(unansweredTimeout);
       if (visibilityTimeout) clearTimeout(visibilityTimeout);
       if (subscription) {
         subscription.unsubscribe();
@@ -271,17 +321,18 @@ async function handleSessionError(
   }
 }
 
+function isSessionTimeout(error: SupabaseAuthError): boolean {
+  return error?.message === 'Session fetch timeout' || error?.code === 'TIMEOUT';
+}
+
 /**
- * Handle init errors (timeouts, network issues, etc.)
+ * Handle init errors (network issues, etc.)
  */
 async function handleInitError(
   error: SupabaseAuthError,
   clearAuthState: (reason: string) => Promise<void>
 ): Promise<void> {
-  if (error.message === 'Session fetch timeout' || error.code === 'TIMEOUT') {
-    // Changed from warn to info - this is expected behavior on slow connections (JAVASCRIPT-NEXTJS-11)
-    logger.info('Auth session fetch timed out after 5s - continuing without blocking');
-  } else if (isRefreshTokenError(error)) {
+  if (isRefreshTokenError(error)) {
     await clearAuthState('Invalid or expired refresh token');
   } else if (isRecoverableError(error)) {
     logger.debug('Recoverable auth error during init:', getAuthErrorMessage(error));
@@ -296,6 +347,7 @@ async function handleInitError(
 async function handleAuthStateChange(
   event: string,
   sessionUser: User | null,
+  knownSignedOut: boolean,
   userIdRef: React.MutableRefObject<string | null>,
   setters: AuthStateSetters,
   fetchUserData: (userId: string, userMetadata?: Record<string, unknown>) => Promise<void>,
@@ -309,9 +361,11 @@ async function handleAuthStateChange(
       if (sessionUser) {
         // Captured BEFORE setUser/userIdRef advances — true only on a genuine
         // guest → authenticated transition (drives the one-shot reload below).
-        const wasUnauthenticated = userIdRef.current === null;
+        // Only a session check that answered "no session" counts as a guest; a timeout does not.
+        const wasUnauthenticated = knownSignedOut && userIdRef.current === null;
         const isNewUser = sessionUser.id !== userIdRef.current;
         if (isNewUser) {
+          userIdRef.current = sessionUser.id;
           setUser(sessionUser);
           linkSessionToUser(sessionUser.id).catch((err) => {
             logger.debug('Failed to link guest session to user:', err);
@@ -388,6 +442,7 @@ async function handleAuthStateChange(
       if (sessionUser) {
         const isNewUser = sessionUser.id !== userIdRef.current;
         if (isNewUser) {
+          userIdRef.current = sessionUser.id;
           setUser(sessionUser);
           linkSessionToUser(sessionUser.id).catch((err) => {
             logger.debug('Failed to link guest session to user:', err);
@@ -418,61 +473,5 @@ async function handleAuthStateChange(
 
     default:
       break;
-  }
-}
-
-/**
- * Handle tab becoming visible - verify session and sync state
- */
-async function handleTabBecameVisible(
-  userIdRef: React.MutableRefObject<string | null>,
-  lastVisibleTimeRef: React.MutableRefObject<number>,
-  setters: AuthStateSetters,
-  fetchUserData: (userId: string, userMetadata?: Record<string, unknown>) => Promise<void>,
-  clearAuthState: (reason: string) => Promise<void>,
-  isMountedRef: React.MutableRefObject<boolean>
-): Promise<void> {
-  const { setUser } = setters;
-  const now = Date.now();
-  const timeInactive = now - lastVisibleTimeRef.current;
-  const currentUserId = userIdRef.current;
-
-  if (timeInactive > TEN_MINUTES_MS && currentUserId) {
-    // Verify session is still valid after long inactivity
-    logger.log('Tab visible after long inactivity, checking session validity');
-    if (supabase) {
-      const { data: sessionData } = await supabase.auth.getSession();
-      if (!sessionData?.session && isMountedRef.current) {
-        logger.log('Session expired during inactivity');
-        await clearAuthState('Session expired during inactivity');
-        return;
-      }
-    }
-  }
-
-  // Always sync session when tab becomes visible (fixes stuck auth issue)
-  logger.log('Tab became visible, syncing session state');
-  if (supabase) {
-    const { data: sessionData } = await supabase.auth.getSession();
-    if (sessionData?.session?.user) {
-      if (sessionData.session.user.id !== userIdRef.current) {
-        if (isMountedRef.current) {
-          logger.log('Session synced from cookies on tab visibility');
-          setUser(sessionData.session.user);
-          try {
-            await fetchUserData(
-              sessionData.session.user.id,
-              sessionData.session.user.user_metadata
-            );
-          } catch (err) {
-            logger.warn('Error fetching user data on tab visibility:', err);
-          }
-        }
-      }
-    } else if (userIdRef.current && isMountedRef.current) {
-      // Downgraded warn → debug: expected when user logs out in another tab.
-      logger.debug('No session found on tab visibility but user state exists');
-      await clearAuthState('Session not found on tab visibility');
-    }
   }
 }

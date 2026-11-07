@@ -29,6 +29,14 @@ export const HERO_CODE_TEXT = 'text-[min(14cqw,12cqh)] @5xl:text-[min(7.6cqw,14c
 
 export const HERO_QR_SIZE = 'size-[min(32cqw,19cqh)] @5xl:size-[min(14cqw,30cqh)]';
 
+/** With the lesson words on the wall too, code and QR sit side by side so Start never drops below the fold. */
+export const HERO_CODE_TEXT_COMPACT = 'text-[min(14cqw,12cqh)] @5xl:text-[min(5.4cqw,12cqh)]';
+
+/** A 720p projector: the variant prefix that tightens the lobby so Start stays on screen. Classes are written out literally for Tailwind. */
+export const SHORT_WALL = '[@container(max-height:800px)]:';
+
+export const HERO_QR_SIZE_COMPACT = 'size-[min(32cqw,19cqh)] @5xl:size-[min(11.5cqw,24cqh)]';
+
 export interface RosterTier {
   readonly upTo: number;
   readonly grid: string;

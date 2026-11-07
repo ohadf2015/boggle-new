@@ -156,3 +156,17 @@ describe('plan page — inside the native app', () => {
     expect(screen.queryByTestId('pricing-cards')).toBeNull();
   });
 });
+
+describe('plan page — the full Free vs Pro table', () => {
+  it('Given a free teacher, Then the table waits behind a closed "compare" row and opens on tap', () => {
+    render(<PageClient />);
+    expect(screen.queryByTestId('plan-comparison-matrix')).not.toBeInTheDocument();
+    const toggle = screen.getByTestId('upgrade-matrix-toggle');
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(toggle).toHaveTextContent('eg2Pro.compareAll');
+    fireEvent.click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByTestId('plan-comparison-matrix')).toBeInTheDocument();
+  });
+});
+

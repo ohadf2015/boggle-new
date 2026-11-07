@@ -96,3 +96,13 @@ describe('loadSpanishDictionary — accent-stripped at load, ñ preserved', () =
     expect(dict.has('zznqx')).toBe(false);
   });
 });
+
+describe('approved-word overlays', () => {
+  it('skips # comment lines instead of loading them as words', async () => {
+    const read: SafeReadFile = vi.fn(async (p: string) =>
+      p.endsWith('spanish_words_approved.txt') ? '# community-approved spanish words\nzarpazo\n' : '');
+    const dict = await loadSpanishDictionary(read);
+    expect(dict.has('zarpazo')).toBe(true);
+    expect([...dict].some((w) => w.startsWith('#'))).toBe(false);
+  });
+});

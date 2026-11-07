@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import EduHostResults from '@/components/education/live/EduHostResults';
 import { TvRecapHeader } from '@/components/education/results/TvRecapHeader';
 import { ZeroRoundNote } from '@/components/education/results/ZeroRoundNote';
@@ -34,6 +34,7 @@ describe('EduHostResults: calm round-end wall', () => {
 
   it('labels every action in normal case', () => {
     render(<EduHostResults summary={summary} players={[{ username: 'Noa', score: 30, wordsFoundCount: 6 }]} t={t} onRematch={vi.fn()} onClose={vi.fn()} onExitRoom={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('edu-results-more-toggle'));
     for (const id of ['edu-results-play-again', 'edu-results-next-mode', 'edu-results-end']) {
       expect(tokens(screen.getByTestId(id))).toContain('normal-case');
     }

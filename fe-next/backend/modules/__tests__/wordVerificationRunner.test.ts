@@ -65,4 +65,11 @@ describe('runWordVerification', () => {
     expect(result.ja.verified).toBe(1);
     expect(result.totalVerified).toBe(3);
   });
+
+  it('verifies Russian through the generic Wiktionary queue', async () => {
+    mockSvQueue.mockImplementation(async (lang: string) => (lang === 'ru' ? { ...empty, processed: 3, verified: 2 } : { ...empty }));
+    const result = await runWordVerification();
+    expect(mockSvQueue).toHaveBeenCalledWith('ru');
+    expect(result.ru.verified).toBe(2);
+  });
 });

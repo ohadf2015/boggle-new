@@ -45,7 +45,7 @@ export interface ClassReportButtonProps {
 }
 
 const LINK =
-  'inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-neo border-[3px] px-3 text-center font-neo-display text-sm font-bold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan active:brightness-90 @5xl/results:text-base @[96rem]/results:min-h-14 @[96rem]/results:text-xl';
+  'inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-neo-lg border-[3px] px-3 text-center font-neo-display text-sm font-black shadow-hard-lg transition-[transform,box-shadow] duration-150 hover:-translate-y-px active:translate-x-[3px] active:translate-y-[3px] active:shadow-none motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan @5xl/results:text-base @[96rem]/results:min-h-14 @[96rem]/results:text-xl';
 
 export function ClassReportButton({ language, underHalf, bars, proLabel = 'Pro', className }: ClassReportButtonProps) {
   const { hasPro, loading, known, trialUsed, accessTrialExpires, accessTrialEnded } = useTeacherPro();
@@ -76,7 +76,7 @@ export function ClassReportButton({ language, underHalf, bars, proLabel = 'Pro',
         data-testid="class-report-teaser"
         data-offer={proOffer.offer}
         aria-labelledby="class-report-teaser-title"
-        className="flex flex-col gap-2 rounded-neo border-2 border-dashed border-neo-cream/50 bg-neo-navy px-3 py-3 text-neo-cream @5xl/results:px-4"
+        className="flex flex-col gap-2 rounded-neo-xl border-[3px] border-dashed border-neo-cream/50 bg-neo-navy-light px-3 py-3 text-neo-cream shadow-hard-xl @5xl/results:px-4"
       >
         <div className="flex items-start justify-between gap-2">
           <h2 id="class-report-teaser-title" className="flex min-w-0 items-center gap-2 font-neo-display text-sm font-black leading-tight text-neo-cream @5xl/results:text-base @[96rem]/results:text-xl">
@@ -89,9 +89,9 @@ export function ClassReportButton({ language, underHalf, bars, proLabel = 'Pro',
           <ul aria-hidden="true" data-testid="class-report-teaser-bars" className="pointer-events-none flex w-24 shrink-0 select-none flex-col gap-1 @[96rem]/results:w-36">
             {shownBars.map((pct, i) => (
               <li key={i} className="flex items-center gap-1.5">
-                <span className="h-2 w-6 shrink-0 rounded-full bg-neo-cream/40" />
-                <span className="h-2 flex-1 overflow-hidden rounded-full bg-neo-navy-elevated">
-                  <span className="block h-full origin-left rounded-full bg-neo-cream rtl:origin-right" style={{ transform: `scaleX(${Math.max(0.06, pct / 100)})` }} />
+                <span className="h-2 w-6 shrink-0 rounded-sm bg-neo-cream/50" />
+                <span className="h-2 flex-1 overflow-hidden rounded-sm bg-neo-navy">
+                  <span className="block h-full origin-left bg-neo-cream rtl:origin-right" style={{ transform: `scaleX(${Math.max(0.06, pct / 100)})` }} />
                 </span>
               </li>
             ))}
@@ -121,7 +121,7 @@ export function ClassReportButton({ language, underHalf, bars, proLabel = 'Pro',
                 /* analytics must never block */
               }
             }}
-            className={cn(LINK, 'border-neo-cream/70 text-neo-cream hover:bg-neo-navy-light')}
+            className={cn(LINK, 'border-neo-cream/50 bg-neo-navy text-neo-cream')}
           >
             <BarChart3 className="size-4 shrink-0" aria-hidden="true" />
             {copy.openReport}
@@ -145,7 +145,7 @@ export function ClassReportButton({ language, underHalf, bars, proLabel = 'Pro',
                   /* analytics must never block */
                 }
               }}
-              className={cn(LINK, 'border-neo-pink text-neo-pink-light hover:bg-neo-pink/10')}
+              className={cn(LINK, 'border-neo-black bg-neo-pink text-neo-white')}
             >
               <Sparkles className="size-4 shrink-0" aria-hidden="true" />
               {proOffer.label}

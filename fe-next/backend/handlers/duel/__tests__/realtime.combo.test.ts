@@ -11,7 +11,7 @@ import type { Namespace } from 'socket.io';
 import type { DuelSocket } from '../types';
 import { registerRealtimeHandlers, realtimeGames } from '../realtime';
 import { getSupabase } from '@/backend/modules/supabase/client';
-import { isDictionaryWord } from '@/backend/dictionary';
+import { isValidWordLoaded } from '@/backend/dictionary';
 import { isWordOnBoardAsync } from '@/backend/modules/wordValidatorPool';
 import { calculateWordScore } from '@/backend/modules/scoringEngine.types';
 import { DUEL_COMBO_BONUS_STEP, DUEL_COMBO_WINDOW_MS } from '@/backend/modules/duelCombo';
@@ -69,7 +69,7 @@ describe('real-time duel combo bonus', () => {
     mockNamespace = { to: vi.fn().mockReturnValue({ emit: vi.fn() }) } as any;
 
     vi.mocked(getSupabase).mockReturnValue({} as any);
-    vi.mocked(isDictionaryWord).mockReturnValue(true);
+    vi.mocked(isValidWordLoaded).mockResolvedValue(true);
     vi.mocked(isWordOnBoardAsync).mockResolvedValue(true);
     vi.mocked(calculateWordScore).mockReturnValue(BASE_SCORE);
   });
@@ -126,13 +126,13 @@ describe('real-time duel combo bonus', () => {
     const handler = getHandler();
 
     await handler({ duelId: DUEL_ID, word: 'cats' });
-    vi.mocked(isDictionaryWord).mockReturnValue(false);
+    vi.mocked(isValidWordLoaded).mockResolvedValue(false);
     await handler({ duelId: DUEL_ID, word: 'zzzz' });
 
     const rejected = emitted.find((e) => e.event === 'duel:word-rejected');
     expect(rejected?.data.comboStreak).toBe(0);
 
-    vi.mocked(isDictionaryWord).mockReturnValue(true);
+    vi.mocked(isValidWordLoaded).mockResolvedValue(true);
     await handler({ duelId: DUEL_ID, word: 'cast' });
 
     const accepted = emitted.filter((e) => e.event === 'duel:word-accepted');

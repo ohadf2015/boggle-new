@@ -24,6 +24,8 @@ export interface LetterRowProps {
   onDeselectTile: (i: number) => void;
   onSubmit: () => void;
   onDrop: () => void;
+  /** A real word to light up for a stuck new player (tray slots, in order), or null. */
+  hint?: number[] | null;
 }
 
 /** Same hand-off beat as the old wheel: a buildable word rests this long, then goes to the crane. */
@@ -41,7 +43,7 @@ const DRAG_ENGAGEMENT_THRESHOLD_PX = 8;
  * find them exactly as they found the wheel's.
  */
 export const LetterRow = memo(function LetterRow({
-  t, tray, selected, placing, canBuild, reducedMotion, dir, onSelectTile, onDeselectTile, onSubmit, onDrop,
+  t, tray, selected, placing, canBuild, reducedMotion, dir, onSelectTile, onDeselectTile, onSubmit, onDrop, hint = null,
 }: LetterRowProps) {
   const draggingRef = useRef(false);
   const pointerPosRef = useRef<{ x: number; y: number } | null>(null);
@@ -161,6 +163,7 @@ export const LetterRow = memo(function LetterRow({
         {tray.map((letter, i) => {
           const order = selected.indexOf(i);
           const used = order >= 0;
+          const hintStep = !used && hint ? hint.indexOf(i) : -1;
           return (
             <button
               key={i}
@@ -177,17 +180,19 @@ export const LetterRow = memo(function LetterRow({
                   ? 'border-neo-cream/40 bg-neo-navy-light text-neo-cream/40'
                   : 'border-black bg-neo-lime text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed',
                 placing && !used && 'opacity-40 shadow-none',
+                hintStep >= 0 && cn('bg-neo-yellow', !reducedMotion && 'animate-pulse'),
               )}
+              data-hint-step={hintStep >= 0 ? hintStep + 1 : undefined}
             >
               <span key={used ? `u${order}` : 'f'} className={cn('inline-block', used && !reducedMotion && 'wt-tile-pop')}>
                 {letter}
               </span>
-              {used ? (
+              {used || hintStep >= 0 ? (
                 <span
                   aria-hidden
                   className="absolute -top-2 -start-2 flex h-[18px] w-[18px] items-center justify-center rounded-full border-2 border-black bg-neo-yellow font-neo-display text-[10px] font-black leading-none text-neo-navy"
                 >
-                  {order + 1}
+                  {used ? order + 1 : hintStep + 1}
                 </span>
               ) : null}
             </button>
@@ -230,8 +235,29 @@ export const LetterRow = memo(function LetterRow({
   );
 });
 
-/** The word being spelled, in one plain box between shuffle and backspace. */
-export const WordBox = memo(function WordBox({ t, word, placing, reducedMotion }: { t: T; word: string; placing: boolean; reducedMotion: boolean }) {
+/**
+ * The word being spelled, in one plain box between shuffle and backspace.
+ * Each letter is a button: tap one to keep the word up to it and drop the rest
+ * (backspace was the most rage-tapped control; a long wrong tail took a tap per letter).
+ */
+export const WordBox = memo(function WordBox({
+  t,
+  letters,
+  placing,
+  canCut,
+  reducedMotion,
+  onCutTo,
+}: {
+  t: T;
+  /** The spelled letters, in order. */
+  letters: string[];
+  placing: boolean;
+  /** Letters can be cut while spelling (not while the word hangs on the hook). */
+  canCut: boolean;
+  reducedMotion: boolean;
+  /** Keep letters 0..k, drop everything after. */
+  onCutTo: (k: number) => void;
+}) {
   return (
     <div
       data-wt2-word
@@ -241,9 +267,24 @@ export const WordBox = memo(function WordBox({ t, word, placing, reducedMotion }
         placing ? 'bg-neo-cyan text-neo-navy' : 'bg-neo-cream text-neo-navy',
       )}
     >
-      {word ? (
-        <span key={word.length} className={cn('truncate text-2xl tracking-[0.12em]', !reducedMotion && 'wt-tile-pop')}>
-          {word}
+      {letters.length > 0 ? (
+        <span key={letters.length} className={cn('flex min-w-0 items-center', !reducedMotion && 'wt-tile-pop')}>
+          {letters.map((letter, k) => {
+            const last = k === letters.length - 1;
+            return (
+              <button
+                key={k}
+                type="button"
+                data-wt2-word-letter={k}
+                disabled={!canCut || last}
+                onClick={() => onCutTo(k)}
+                aria-label={t('wordTowerV2.cutBack', { letter })}
+                className="rounded-sm px-[0.08em] text-2xl leading-none tracking-normal enabled:active:bg-neo-yellow disabled:cursor-default"
+              >
+                {letter}
+              </button>
+            );
+          })}
         </span>
       ) : (
         <span className="truncate font-neo-body text-sm font-bold normal-case text-neo-navy/50">{t('wordTower.hud.pickLetters')}</span>

@@ -797,6 +797,7 @@ const ja = {
       "editTitle": "単語リストを編集",
       "description": "単語を貼り付けて、意味を足して、保存。",
       "newList": "新しいリスト",
+      "moreOptions": "言語・学年・テーマ・共有",
       "titleLabel": "リスト名",
       "titlePlaceholder": "リストに名前をつけよう…",
       "pasteLabel": "単語を貼り付け・入力",
@@ -2595,7 +2596,7 @@ const ja = {
         "home": "ホーム",
         "close": "閉じる","floorsA11y": "{n}階に到達", "combo": "最高連続", "tenants": "住人", "crates": "ボックス", "badges": "獲得バッジ", "nextGoal": "次の目標", "coinsLoading": "コインを受け取り中…"},
     "hint": {"spell": "単語をつくって次のフロアを建てよう", "drop": "タワーの真上に来たら「落とす」をタップ"},
-    "changeWord": "ことばをかえる",
+    "changeWord": "ことばをかえる", "cutBack": "{letter} までのこす",
     "editHint": "使った文字をタップして単語を直せます",
     "bestFlag": "ベスト",
     "leaveConfirm": "この登りを離れますか？このタブなら再開できますが、デイリーは1日1回です。",
@@ -15104,6 +15105,7 @@ const ja = {
       "galleryTitle": "テンプレートから始める",
       "galleryHint": "学年と教科を選び、単語リストを確認してワンタップで出題。Word Craft、提出は明日。",
       "galleryBrowse": "課題テンプレートを見る",
+      "moreOptions": "ほかの遊び方・重点・メモ",
       "galleryPreview": "単語を見る",
       "galleryAssign": "クラスに出す",
       "galleryHidePreview": "単語を隠す",
@@ -21231,6 +21233,7 @@ const ja = {
       "teacher": "先生向け",
       "school": "学校向け"
     },
+    "compareAll": "無料プランと有料プランを並べて比べる",
     "strip": {
       "title": "1回のゲームのあとにProで見えること",
       "lead": "サンプルのクラスデータです。実際のクラスのデータがここに入ります。"
@@ -21622,7 +21625,6 @@ const ja = {
       "endGame": "ゲームを終了",
       "noScores": "このラウンドは誰も得点できませんでした",
       "mostMissed": "見逃しが多かった単語",
-      "needHelpCount": "半分未満の生徒：{count}人（名前はレポートで確認）",
       "replayMissed": "見逃した単語でもう一回（{count}）",
       "replayFailed": "もう一回の準備ができませんでした。もう一度お試しください。",
       "replayUnconfirmed": "まだルームから応答がありません。次のラウンドは見つからなかった単語だけになるかもしれません。",

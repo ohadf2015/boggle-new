@@ -52,4 +52,13 @@ describe('TeacherHomeView on a phone', () => {
     view({ week: { summary: null, status: 'error', classCount: 3 } });
     expect(screen.queryByTestId('home-week-chips')).toBeNull();
   });
+
+  it('Then below sm the greeting bubble takes the full row and the chips drop under it, lined up with the bubble', () => {
+    view();
+    const row = screen.getByTestId('home-greeting-row');
+    expect(row.className).toMatch(/(^|\s)max-sm:flex-col(\s|$)/);
+    expect(screen.getByTestId('home-greeting-stats').className).toMatch(/(^|\s)max-sm:ps-20(\s|$)/);
+    expect(row.firstElementChild?.className).toMatch(/(^|\s)max-sm:self-stretch(\s|$)/);
+  });
 });
+

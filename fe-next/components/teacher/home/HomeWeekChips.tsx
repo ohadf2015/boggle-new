@@ -9,7 +9,7 @@ import { classesPlayedShare } from './weekPulse';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
-const CHIP = 'inline-flex h-7 items-center gap-1 rounded-full border-2 border-neo-cream/25 bg-neo-navy-light px-2 font-neo-display text-sm font-black tabular-nums leading-none';
+const CHIP = 'inline-flex h-7 items-center gap-1 rounded-full border-2 border-neo-cream/50 bg-neo-navy-light px-2 shadow-hard font-neo-display text-sm font-black tabular-nums leading-none';
 const RING_R = 7;
 
 /** Phone stats row: the rail's week card is hidden below lg, so its two headline numbers ride the greeting row. */

@@ -127,6 +127,7 @@ describe.each(CASES)('$name: one teacher path for the live round and its end', (
     if (c.boss) expect(screen.getByTestId('edu-host-results')).toContainElement(screen.getByTestId('boss-outcome'));
     expect(screen.getByTestId('edu-replay-missed')).toHaveAttribute('data-results-primary');
     fireEvent.click(screen.getByTestId('edu-results-play-again'));
+    fireEvent.click(screen.getByTestId('edu-results-more-toggle'));
     fireEvent.click(screen.getByTestId('edu-results-next-mode'));
     fireEvent.click(screen.getByTestId('edu-results-end'));
     expect(onRematch).toHaveBeenCalledTimes(1);

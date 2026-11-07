@@ -266,9 +266,7 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
     // A finished game inside an open ad-outcome window = the player kept
     // playing after the ad (lib/ads/adQuality — Deloitte × AdMob measurement).
     noteGameEndedAfterAd();
-    // A slot came due and the ONLY blocker is that we don't know the user's
-    // age — surface the age prompt at this natural break instead of an ad.
-    // Declared 13+ → tier 'adult' → real interstitials from the next slot.
+    // Ask the age at a due slot: a declared 13+ unlocks Teen-rated, personalized fill.
     if (tier === 'unknown' && interstitialSlotDue()) {
       setAgeGatePromptOpportunity(true);
     }
@@ -308,8 +306,6 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
   }, []);
 
   function shouldShowInterstitial(): boolean {
-    // Families Ad Format: interstitials only for KNOWN adults (suppresses child
-    // AND undeclared-guest tiers). This is the v5740 rejection fix.
     if (shouldSuppressInterstitialForTier(tier)) return false;
     return interstitialSlotDue();
   }
@@ -323,7 +319,6 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
   // session cap, and past warmup (the first eligible interstitial is game 6, so
   // warming at the warmup edge — game 3 — keeps that first one instant too).
   function shouldPreloadInterstitial(): boolean {
-    // Don't even warm an interstitial for non-adults — they can never show one.
     if (shouldSuppressInterstitialForTier(tier)) return false;
     if (interstitialsShown.current >= MAX_INTERSTITIALS_PER_SESSION) return false;
     return totalGameEnds.current >= WARMUP_GAMES;

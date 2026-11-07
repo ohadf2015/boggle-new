@@ -91,7 +91,7 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
                   index={i}
                   count={all.length}
                   data-testid="home-desk-code-tile"
-                  className="size-9 rounded-neo border-[3px] border-neo-black bg-neo-cream font-neo-display text-xl font-black uppercase text-neo-black shadow-hard sm:size-12 sm:text-2xl [@media(max-height:820px)]:sm:size-10 [@media(max-height:820px)]:text-xl"
+                  className="size-9 rounded-neo border-[3px] border-neo-black bg-neo-cream font-neo-display text-xl font-black uppercase text-neo-black shadow-hard max-[379px]:size-8 max-[379px]:text-lg sm:size-12 sm:text-2xl [@media(max-height:820px)]:sm:size-10 [@media(max-height:820px)]:text-xl"
                 />
               ))}
             </p>
