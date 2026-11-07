@@ -28,4 +28,11 @@ describe('PracticeRunPanel', () => {
     fireEvent.click(screen.getByTestId('practice-run-show'));
     expect(screen.getByTestId('practice-run-frame')).toBeInTheDocument();
   });
+
+  it('given the practice run, then it shows one status and the student view, with no step list, body copy or QR to read first', () => {
+    const { container } = render(<PracticeRunPanel gameCode="AB12CD" language="en" joined={false} t={t} />);
+    expect(container.textContent).not.toMatch(/eduLiveRoom\.practice\.(step\d|body|phoneTitle|phoneHint)/);
+    expect(container.querySelector('svg[role="img"], canvas')).toBeNull();
+    expect(container.querySelectorAll('svg path[d^="M0 0h"]').length).toBe(0);
+  });
 });

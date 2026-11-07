@@ -1,20 +1,17 @@
 'use client';
 
 /**
- * Practice run: the teacher's board on the left, their own student view on the
- * right. The student view is the real student page in a same-origin frame
- * (?practiceSeat=1): it keeps the teacher's account but gets its own practice
- * seat, never the host seat and never a student (utils/practiceSeatStorage,
- * backend/handlers/practiceSeat). The QR and the new-tab link open the same
- * page on a phone or in another tab.
+ * Practice run: the teacher's board, with their own student view beside it.
+ * The student view is the real student page in a same-origin frame
+ * (?practiceSeat=1): the teacher's account, but its own practice seat, never the
+ * host seat and never a student (utils/practiceSeatStorage, backend/handlers/practiceSeat).
+ * The round starts by itself once that seat joins, so the frame is the only thing to act on.
  *
- * Wide screens get the frame beside the board. Phones and portrait tablets get
- * a strip under the board with the QR and link, since a second page squeezed
- * beside the board would be unusable there. The strip is in the flow, never
- * floating, so it can't cover the board's Start button.
+ * Wide screens get the frame beside the board. Phones and portrait tablets get one
+ * button that opens the student view in a new tab; a second page squeezed beside
+ * the board would be unusable there, and a QR to scan makes no sense on the phone itself.
  */
-import { useEffect, useState } from 'react';
-import { QRCodeSVG } from 'qrcode.react';
+import { useState } from 'react';
 import { Check, ExternalLink, MonitorSmartphone, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { practiceSeatPath } from '@/lib/education/classroomLivePath';
@@ -29,33 +26,9 @@ interface PracticeRunPanelProps {
   t: Translate;
 }
 
-const STEPS = ['step1', 'step2', 'step3', 'step4'] as const;
-
-function useOrigin(): string {
-  const [origin, setOrigin] = useState('');
-  useEffect(() => setOrigin(window.location.origin), []);
-  return origin;
-}
-
-function PhoneJoin({ url, t, compact = false }: { url: string; t: Translate; compact?: boolean }) {
-  return (
-    <div className="flex items-center gap-3">
-      <div className="shrink-0 rounded-neo border-[3px] border-neo-black bg-neo-white p-1 shadow-hard-sm">
-        {url ? <QRCodeSVG value={url} size={compact ? 72 : 84} level="M" /> : <span className={cn('block', compact ? 'size-[72px]' : 'size-[84px]')} />}
-      </div>
-      <div className="min-w-0">
-        <p className="font-neo-display text-sm font-black leading-tight">{t('eduLiveRoom.practice.phoneTitle')}</p>
-        <p className="mt-0.5 font-neo-body text-xs font-semibold leading-snug text-neo-cream/80">{t('eduLiveRoom.practice.phoneHint')}</p>
-      </div>
-    </div>
-  );
-}
-
 export function PracticeRunPanel({ gameCode, language, joined, t }: PracticeRunPanelProps) {
   const [open, setOpen] = useState(true);
-  const origin = useOrigin();
   const path = practiceSeatPath(language, gameCode);
-  const url = origin ? `${origin}${path}` : '';
 
   const status = (
     <span data-testid="practice-run-status" className={cn(NB_STICKER, joined ? NB_BLOCK.lime : NB_BLOCK.yellow)}>
@@ -106,13 +79,10 @@ export function PracticeRunPanel({ gameCode, language, joined, t }: PracticeRunP
         aria-labelledby="practice-run-title"
         className={cn(NB_PANEL, 'm-3 ms-0 hidden w-[min(25rem,32vw)] shrink-0 flex-col gap-3 p-3 lg:flex')}
       >
-        <div className="flex items-start gap-2">
-          <div className="min-w-0 flex-1">
-            <h2 id="practice-run-title" className="font-neo-display text-xl font-black leading-tight">{t('eduLiveRoom.practice.title')}</h2>
-            <p className="mt-0.5 font-neo-body text-sm font-semibold leading-snug text-neo-cream/80">{t('eduLiveRoom.practice.body')}</p>
-          </div>
+        <div className="flex items-center justify-between gap-2">
+          <h2 id="practice-run-title" className="min-w-0 font-neo-display text-xl font-black leading-tight">{t('eduLiveRoom.practice.title')}</h2>
+          {status}
         </div>
-        {status}
         <div className="relative min-h-0 flex-1 overflow-hidden rounded-[1.75rem] border-[5px] border-neo-cream bg-neo-navy shadow-hard-lg">
           <iframe
             data-testid="practice-run-frame"
@@ -122,44 +92,21 @@ export function PracticeRunPanel({ gameCode, language, joined, t }: PracticeRunP
             className="absolute inset-0 size-full border-0"
           />
         </div>
-        <ol className="grid grid-cols-2 gap-1.5">
-          {STEPS.map((step, i) => (
-            <li key={step} className="flex items-start gap-1.5 font-neo-body text-xs font-bold leading-snug text-neo-cream/85">
-              <span
-                aria-hidden="true"
-                className={cn(
-                  'grid size-5 shrink-0 place-items-center rounded-full border-2 border-neo-black font-neo-display text-[0.7rem] font-black',
-                  i === 0 && joined ? 'bg-neo-lime text-neo-black' : 'bg-neo-cream text-neo-black',
-                )}
-              >
-                {i === 0 && joined ? <Check className="size-3" /> : i + 1}
-              </span>
-              {t(`eduLiveRoom.practice.${step}`)}
-            </li>
-          ))}
-        </ol>
-        <div className="flex flex-col gap-2 border-t-2 border-dashed border-neo-cream/30 pt-3">
-          <PhoneJoin url={url} t={t} />
-          {/* The close sits down here: the top corner belongs to the page's sound button. */}
-          <div className="flex items-center justify-between gap-2">{openTab}{hide}</div>
-        </div>
+        {/* The close sits down here: the top corner belongs to the page's sound button. */}
+        <div className="flex items-center justify-between gap-2">{openTab}{hide}</div>
       </aside>
 
-      {/* Phones and portrait tablets: join from another tab or a phone. */}
       <section
         data-testid="practice-run-card"
         aria-labelledby="practice-run-card-title"
-        className={cn(NB_PANEL, NB_BLOCK.navy, 'order-last m-3 mt-0 flex shrink-0 flex-col gap-2 p-3 sm:flex-row sm:items-center sm:gap-4 lg:hidden')}
+        className={cn(NB_PANEL, NB_BLOCK.navy, 'order-last m-3 mt-0 flex shrink-0 flex-wrap items-center gap-3 p-3 lg:hidden')}
       >
-        <div className="flex min-w-0 flex-col gap-2 sm:w-56 sm:shrink-0">
-          <div className="flex items-start gap-2">
-            <h2 id="practice-run-card-title" className="min-w-0 flex-1 font-neo-display text-lg font-black leading-tight">{t('eduLiveRoom.practice.title')}</h2>
-            {hide}
-          </div>
-          <div className="self-start">{status}</div>
+        <h2 id="practice-run-card-title" className="min-w-0 flex-1 font-neo-display text-lg font-black leading-tight">{t('eduLiveRoom.practice.title')}</h2>
+        {status}
+        <div className="flex w-full items-center gap-2">
+          <div className="flex-1 [&>a]:w-full">{openTab}</div>
+          {hide}
         </div>
-        <div className="min-w-0 flex-1"><PhoneJoin url={url} t={t} compact /></div>
-        <div className="sm:shrink-0">{openTab}</div>
       </section>
     </>
   );
