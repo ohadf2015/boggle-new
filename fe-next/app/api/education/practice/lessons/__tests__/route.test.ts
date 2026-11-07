@@ -145,6 +145,22 @@ describe('list mode — a lesson needs no assignment to be practisable', () => {
     expect(plain.assignment).toBeNull();
   });
 
+  it('carries the lesson created_at so clients can order unassigned lists', async () => {
+    mockGetAuthedUser.mockResolvedValue({ id: 'student-1' });
+    mockAdmin.mockReturnValue(
+      supabaseDouble({
+        classroom_memberships: [{ classroom_id: 'c1' }],
+        lesson_assignments: [],
+        vocabulary_lessons: [{ ...LESSON_A, created_at: '2026-11-01T00:00:00Z' }],
+      })
+    );
+
+    const res = await GET(new NextRequest('http://localhost/api/education/practice/lessons'));
+    const body = await res.json();
+
+    expect(body.lessons[0].created_at).toBe('2026-11-01T00:00:00Z');
+  });
+
   it('never leaks the teacher id', async () => {
     mockGetAuthedUser.mockResolvedValue({ id: 'student-1' });
     mockAdmin.mockReturnValue(

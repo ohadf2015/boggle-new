@@ -17390,6 +17390,15 @@ const ja = {
         }
       },
       "classroomRoomGone": "クラスのゲームが終了しました。先生に新しいゲームを始めてもらってね。",
+      "deadEnd": {
+        "endedLine": "先生のゲームは終了しました。次が始まるまで練習しよう。",
+        "practiceCta": "練習する",
+        "starterWords": "はじめての言葉・アカウント不要",
+        "noRoomLine": "今はゲームがありません。練習でウォームアップするか、先生にコードを聞いてね。",
+        "practiceTitle": "練習ラウンド",
+        "wordCount": "言葉 {count}個",
+        "enterCode": "コードを入力"
+      },
       "gameEnded": {
         "title": "このゲームは終了しました",
         "retry": "もう一度試す",

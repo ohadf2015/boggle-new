@@ -22,6 +22,8 @@ vi.mock('@/contexts/LanguageContext', () => ({
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: mockUseAuth }));
 vi.mock('@/hooks/useJoinClassroom', () => ({ useJoinClassroom: () => ({ joinClassroom: mockJoin }) }));
 vi.mock('@/hooks/useStudentClassroom', () => ({ useStudentClassroom: mockClassroom }));
+const { mockLessons } = vi.hoisted(() => ({ mockLessons: vi.fn() }));
+vi.mock('@/hooks/usePracticeLessons', () => ({ usePracticeLessons: mockLessons }));
 vi.mock('@/lib/education/telemetry', () => ({ trackEduClassroomJoin: vi.fn(), trackStudentJoinStarted: vi.fn() }));
 vi.mock('react-hot-toast', () => ({ default: { success: vi.fn(), error: vi.fn() } }));
 vi.mock('../joinTarget', () => ({ resolveJoinTarget: mockResolve }));
@@ -39,6 +41,7 @@ describe('<JoinFlow> — a code whose game has ended', () => {
     vi.clearAllMocks();
     mockUseAuth.mockReturnValue({ user: null, loading: false });
     mockClassroom.mockReturnValue({ classroomId: null, isLoading: false });
+    mockLessons.mockReturnValue({ lessons: [], isLoading: false, error: null, refresh: vi.fn() });
   });
 
   it('GIVEN the lookup says ended WHEN the QR lands THEN the ended state shows, not the code field with an error', async () => {
@@ -47,19 +50,37 @@ describe('<JoinFlow> — a code whose game has ended', () => {
 
     await waitFor(() => expect(endedPanel()).toBeInTheDocument());
     expect(screen.getByText('education.student.gameEnded.title')).toBeInTheDocument();
-    expect(screen.getByText('education.student.gameEnded.practiceLine')).toBeInTheDocument();
+    expect(screen.getByText('education.student.deadEnd.endedLine')).toBeInTheDocument();
     expect(codeField()).toBeNull();
     expect(screen.queryByRole('alert')).toBeNull();
   });
 
-  it('GIVEN a late student on the ended screen WHEN they tap the practice round THEN it opens today\'s solo round and records the start', async () => {
+  it('GIVEN a late student with no class WHEN they tap practice THEN the no-account practice round opens and the start is recorded', async () => {
     mockResolve.mockResolvedValue({ verdict: 'ended' });
     render(<JoinFlow initialCode="ABC123" />);
 
-    const practice = await screen.findByRole('link', { name: 'education.student.gameEnded.practiceCta' });
-    expect(practice).toHaveAttribute('href', '/en/daily/word-hunt?from=late_join');
+    const practice = await screen.findByTestId('dead-end-practice');
+    expect(practice).toHaveAttribute('href', '/en/join/practice');
+    expect(practice).toHaveTextContent('education.student.deadEnd.practiceCta');
     fireEvent.click(practice);
     expect(mockReportPractice).toHaveBeenCalledWith({ gameCode: 'ABC123', door: 'join_flow' });
+  });
+
+  it("GIVEN an enrolled student WHEN the ended state shows THEN practice opens the class's latest list and leads the actions", async () => {
+    mockClassroom.mockReturnValue({ classroomId: 'c1', isLoading: false });
+    mockLessons.mockReturnValue({
+      lessons: [{ id: 'L7', name: 'Week 9', classroom_id: 'c1', words: [{ word: 'cat' }], assignment: null }],
+      isLoading: false,
+      error: null,
+      refresh: vi.fn(),
+    });
+    mockResolve.mockResolvedValue({ verdict: 'ended' });
+    render(<JoinFlow initialCode="ABC123" />);
+
+    const practice = await screen.findByTestId('dead-end-practice');
+    expect(practice).toHaveAttribute('href', '/en/student/lessons/L7?mode=spelling');
+    const newCode = screen.getByRole('button', { name: 'education.student.gameEnded.newCode' });
+    expect(practice.compareDocumentPosition(newCode) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it('GIVEN the ended state takes focus THEN its heading opts out of the global focus ring', async () => {
