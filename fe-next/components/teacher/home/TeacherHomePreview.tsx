@@ -21,6 +21,7 @@ import { weekClassRows } from './weekClassRows';
 import { HomeWeekLoop } from './HomeWeekLoop';
 import { weekLoopFixture } from './weekLoopFixture';
 import { missedLastGame, playAgainTarget, readyForTest, replayDetail } from './weekLoopModel';
+import { previewBanner } from './TeacherProBannersPreview';
 
 export type TeacherHomePreviewState = 'classes' | 'empty' | 'loading';
 
@@ -45,7 +46,7 @@ function activity(nowMs: number): TeacherActivityRow[] {
 }
 
 /** Dev-only: the real Home grid on fixture data, so the signed-in screen can be captured without an account. */
-export function TeacherHomePreview({ state }: { state: TeacherHomePreviewState }) {
+export function TeacherHomePreview({ state, banner }: { state: TeacherHomePreviewState; banner?: string }) {
   const { t: rawT, language } = useLanguage();
   const t = rawT as T;
   const [nowMs] = useState(() => Date.now());
@@ -124,7 +125,7 @@ export function TeacherHomePreview({ state }: { state: TeacherHomePreviewState }
           t={t}
         />
       ) : null}
-      accountBanner={null}
+      accountBanner={previewBanner(banner)}
       hasRail={!ready || hasClasses}
       week={hasClasses ? {
         summary,

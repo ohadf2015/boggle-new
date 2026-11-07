@@ -51,14 +51,16 @@ describe('ProGate calm tone (reports)', () => {
     expect(fills(screen.getByTestId('pro-trial-preview'))).toEqual([]);
   });
 
-  it('Given no tone, Then the default lock keeps its existing look for other pages', () => {
+  it('Given no tone, Then the default lock wears the same chunky panel, yellow PRO sticker and lime CTA', () => {
     mockUseTeacherPro.mockReturnValue({ hasPro: false, loading: false, known: true, status: 'active', trialUsed: false });
     render(
       <ProGate feature="analytics" polarTrialPlacement="reports_teaser">
         <div>paid</div>
       </ProGate>,
     );
-    expect(screen.getByTestId('pro-gate-upgrade-analytics').className).toMatch(/\bbg-neo-cyan\b/);
+    expect(screen.getByTestId('pro-gate-upgrade-analytics').className).toMatch(/\bbg-neo-lime\b/);
+    expect(screen.getByTestId('pro-gate-pill').className).toMatch(/\bbg-neo-yellow\b/);
+    expect(screen.getByTestId('pro-gate-lock').className).toMatch(/\bshadow-hard-xl\b/);
     expect(screen.getByTestId('pro-gate-upgrade-analytics')).toHaveTextContent('eduPlans.reports.trialCta');
   });
 

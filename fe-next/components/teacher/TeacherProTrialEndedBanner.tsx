@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect } from 'react';
-import { X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { ProBanner } from './pro/ProBanner';
 import { TeacherProCheckoutButton } from '@/components/teacher/TeacherProCheckoutButton';
 import { TrialRecapLine, type TrialRecap } from '@/components/education/TrialRecapLine';
 import { trackTrialExpiredShown } from '@/lib/education/proFunnelTelemetry';
@@ -24,40 +24,22 @@ export function TeacherProTrialEndedBanner({ onDismiss, recap }: { onDismiss?: (
   }, []);
 
   return (
-    <aside
-      data-testid="teacher-pro-trial-ended"
-      className="border-b-3 border-black bg-neo-pink px-4 py-3"
+    <ProBanner
+      testId="teacher-pro-trial-ended"
+      tone="urgent"
+      proLabel={t('eduShell.nav.pro')}
+      title={t('teacher.subscription.trialEndedTitle')}
+      body={t('teacher.subscription.trialEndedBody')}
+      onDismiss={onDismiss}
+      dismissLabel={t('common.close')}
+      dismissTestId="teacher-pro-trial-ended-dismiss"
+      action={
+        <TeacherProCheckoutButton source="dashboard_trial_ended" testId="teacher-pro-trial-ended-cta">
+          {t('teacher.subscription.trialReactivateCta')}
+        </TeacherProCheckoutButton>
+      }
     >
-      <div className="mx-auto flex max-w-5xl flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div className="min-w-0 flex-1">
-          <p className="font-neo-display text-sm font-black leading-tight text-black">
-            {t('teacher.subscription.trialEndedTitle')}
-          </p>
-          <p className="mt-0.5 font-neo-body text-xs font-bold text-black/80">
-            {t('teacher.subscription.trialEndedBody')}
-          </p>
-          <TrialRecapLine recap={recap} className="mt-0.5 font-neo-body text-xs font-black text-black" />
-        </div>
-        <div className="flex shrink-0 items-center gap-2">
-          <TeacherProCheckoutButton
-            source="dashboard_trial_ended"
-            testId="teacher-pro-trial-ended-cta"
-          >
-            {t('teacher.subscription.trialReactivateCta')}
-          </TeacherProCheckoutButton>
-          {onDismiss ? (
-            <button
-              type="button"
-              data-testid="teacher-pro-trial-ended-dismiss"
-              onClick={onDismiss}
-              aria-label={t('common.close')}
-              className="inline-flex size-10 items-center justify-center rounded-neo border-2 border-black bg-neo-pink text-black hover:bg-neo-black hover:text-white focus:outline-hidden focus-visible:ring-2 focus-visible:ring-black"
-            >
-              <X className="size-5" aria-hidden="true" />
-            </button>
-          ) : null}
-        </div>
-      </div>
-    </aside>
+      <TrialRecapLine recap={recap} className="mt-1 font-neo-body text-sm font-black text-neo-cream" />
+    </ProBanner>
   );
 }

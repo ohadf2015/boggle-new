@@ -1,6 +1,5 @@
 'use client';
 import Link from 'next/link';
-import { X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { TrialRecapLine, type TrialRecap } from '@/components/education/TrialRecapLine';
 import { trialCountdownUnit, type TrialStatus } from '@/lib/education/trial';
@@ -8,6 +7,7 @@ import {
   TEACHER_PRO_CHECKOUT_PATH,
   teacherProUpgradeCtaLabel,
 } from '@/components/education/TeacherProCheckoutCta';
+import { PRO_BANNER_CTA, ProBanner, ProCountdownTile, ProShine } from '@/components/teacher/pro/ProBanner';
 
 // Activation-urgency banner for a teacher trial. Renders a live countdown and
 // "start now / don't miss it" framing so approved teachers act before the
@@ -43,86 +43,54 @@ export function TrialUrgencyBanner({ trial, href, onDismiss, ctaLabel, recap }: 
   // ---- Expired: trial ended, soft nudge to renew. ----
   if (trial.isExpired) {
     return (
-      <div
-        data-testid="trial-urgency-banner"
+      <ProBanner
+        testId="trial-urgency-banner"
         role="status"
-        className="rounded-neo border-neo bg-neo-pink p-4 text-neo-white shadow-hard"
+        tone="urgent"
+        proLabel={t('eduShell.nav.pro')}
+        title={<span data-testid="trial-title">{t('education.trial.expired_title')}</span>}
+        body={t('teacher.subscription.upgradeProDescription')}
+        action={
+          <Link href={checkoutHref} className={PRO_BANNER_CTA}>
+            <ProShine />
+            {t('teacher.subscription.upgradeNow')}
+          </Link>
+        }
       >
-        <h3 data-testid="trial-title" className="text-lg font-black font-neo-display">
-          {t('education.trial.expired_title')}
-        </h3>
-        <p className="mt-1 text-sm">{t('teacher.subscription.upgradeProDescription')}</p>
-        <TrialRecapLine recap={recap} className="mt-1 text-sm font-bold" />
-        <p data-testid="trial-expired-kept" className="mt-1 text-sm font-semibold">
+        <TrialRecapLine recap={recap} className="mt-1 font-neo-body text-sm font-black text-neo-cream" />
+        <p data-testid="trial-expired-kept" className="mt-1 font-neo-body text-sm font-semibold text-neo-cream/70">
           {t('education.trial.expired_kept')}
         </p>
-        {/* The expired CTA used to point at /education/access — the free access
-            request form, which auto-approves. So the one screen where a teacher
-            has just lost something sent them to ask for more free access instead
-            of to the $9/mo page, and nothing in the product ever asked for the
-            money. Both strings already exist in every locale. */}
-        <Link
-          href={checkoutHref}
-          className="mt-3 inline-block rounded-neo bg-neo-navy px-4 py-2 font-bold text-neo-white border-neo border-neo-cream/40 shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
-        >
-          {t('teacher.subscription.upgradeNow')}
-        </Link>
-      </div>
+      </ProBanner>
     );
   }
 
   // ---- Active: countdown + urgency. Final day counts down in hours. ----
   const { key: unitKey, count } = trialCountdownUnit(trial, language);
   const titleKey = trial.isUrgent ? 'education.trial.urgent_title' : 'education.trial.title';
-  const tone = trial.isUrgent ? 'bg-neo-pink text-neo-white' : 'bg-neo-lime text-neo-navy';
+  const tone = trial.isUrgent ? 'urgent' : 'calm';
   const isUpgradeNudge = Boolean(onDismiss) || Boolean(ctaLabel);
   const ctaHref = isUpgradeNudge ? checkoutHref : target;
   const ctaText = isUpgradeNudge ? upgradeLabel : t('education.trial.cta');
 
   return (
-    <div
-      data-testid="trial-urgency-banner"
+    <ProBanner
+      testId="trial-urgency-banner"
       role="status"
-      className={`rounded-neo border-neo p-4 shadow-hard ${tone}`}
-    >
-      <div className="flex items-start gap-4">
-        <div className="flex min-w-0 flex-1 items-center gap-4">
-          <div className="shrink-0 rounded-neo border-neo border-neo-cream/40 bg-neo-navy px-3 py-2 text-center text-neo-white shadow-hard-sm">
-            <div data-testid="trial-count" className="text-2xl font-black font-neo-display leading-none">
-              {count}
-            </div>
-            <div data-testid="trial-unit" className="mt-0.5 text-xs font-bold uppercase tracking-wide">
-              {t(unitKey)}
-            </div>
-          </div>
-          <div className="min-w-0">
-            <h3 data-testid="trial-title" className="text-lg font-black font-neo-display">
-              {t(titleKey)}
-            </h3>
-            <p className="mt-0.5 text-sm font-semibold">
-              {t('education.trial.body', { date: dateStr, days: trial.daysLeft })}
-            </p>
-          </div>
-        </div>
-        {onDismiss ? (
-          <button
-            type="button"
-            data-testid="trial-urgency-banner-dismiss"
-            onClick={onDismiss}
-            aria-label={t('common.close')}
-            className="inline-flex size-11 shrink-0 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-lime text-neo-navy hover:bg-neo-navy hover:text-neo-lime focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-navy"
-          >
-            <X className="size-5" aria-hidden="true" />
-          </button>
-        ) : null}
-      </div>
-      <Link
-        href={ctaHref}
-        data-testid="trial-urgency-banner-cta"
-        className="mt-3 inline-block rounded-neo bg-neo-navy px-4 py-2 font-bold text-neo-white border-neo border-neo-cream/40 shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
-      >
-        {ctaText}
-      </Link>
-    </div>
+      tone={tone}
+      proLabel={t('eduShell.nav.pro')}
+      lead={<ProCountdownTile count={count} unit={t(unitKey)} tone={tone} />}
+      title={<span data-testid="trial-title">{t(titleKey)}</span>}
+      body={t('education.trial.body', { date: dateStr, days: trial.daysLeft })}
+      onDismiss={onDismiss}
+      dismissLabel={t('common.close')}
+      dismissTestId="trial-urgency-banner-dismiss"
+      action={
+        <Link href={ctaHref} data-testid="trial-urgency-banner-cta" className={PRO_BANNER_CTA}>
+          <ProShine />
+          {ctaText}
+        </Link>
+      }
+    />
   );
 }
