@@ -32,7 +32,7 @@ const rooms: ActiveRoom[] = [
 ];
 const props = {
   activeRooms: rooms, roomsLoading: false, onRefreshRooms: vi.fn(), onRoomClick: vi.fn(), onCreateRoom: vi.fn(),
-  onJoinCode: vi.fn(),
+  onJoinCode: vi.fn(), roomLanguage: 'en' as const, onRoomLanguageChange: vi.fn(), onStartRoom: vi.fn(),
 };
 
 describe('RoomListView (entry body)', () => {
@@ -41,11 +41,11 @@ describe('RoomListView (entry body)', () => {
     net.online = true;
   });
 
-  it('puts identity, join-by-code and the arenas on one screen', () => {
+  it('puts identity, join-by-code and the arenas in the chosen language on one screen', () => {
     render(<RoomListView {...props} />);
     expect(screen.getByTestId('entry-identity')).toBeInTheDocument();
     expect(screen.getAllByRole('textbox')).toHaveLength(6);
-    expect(within(screen.getByRole('list')).getAllByRole('listitem')).toHaveLength(2);
+    expect(within(screen.getByRole('list')).getAllByRole('listitem')).toHaveLength(1);
   });
 
   it('a complete code joins through onJoinCode', () => {
