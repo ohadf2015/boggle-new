@@ -65,7 +65,7 @@ describe('classroom mode catalogue data', () => {
     expect(modeStyleFor(catalogueEntry('classic')!, 'teams')).toBe('teams');
     expect(modeStyleFor(catalogueEntry('classic')!, 'ffa')).toBe('ffa');
     expect(modeStyleFor(catalogueEntry('vocab-quiz')!, 'teams')).toBe('ffa');
-    expect(modeStyleFor(catalogueEntry('wordcraft')!, 'teams')).toBe('solo');
+    expect(modeStyleFor(catalogueEntry('wordcraft')!, 'teams')).toBe('together');
   });
 
   for (const [lang, bundle] of Object.entries(LOCALES)) {
@@ -75,7 +75,7 @@ describe('classroom mode catalogue data', () => {
         ...BOSS_LIVE_KEYS,
         ...catalogueModes().flatMap((m) => {
           const k = catalogueKeys(m);
-          return [k.name, k.how, k.category, k.complexity, k.style, ...k.bestFor, ...k.steps];
+          return [k.name, k.how, k.category, k.complexity, k.style, ...k.bestFor, ...k.steps, ...(k.hint ? [k.hint] : [])];
         }),
       ];
       for (const key of keys) {

@@ -703,6 +703,16 @@ const en = {
   // @eg2Seo:end
   // @eg2Modes:start
   "eg2Modes": {
+    "hint": {
+      "classic": "Students race to find your words on one board.",
+      "vocab-quiz": "Students match each meaning to the right word.",
+      "wordcraft": "Students spell your words from letter tiles.",
+      "crossword": "Students read a meaning, then spell the word."
+    },
+    "blocked": {
+      "wordcraftLanguage": "No letter tiles for this language yet",
+      "wordcraftRack": "Words too long for the tiles"
+    },
     "title": "Pick a game mode",
     "spec": {
       "duration": "Duration",
@@ -715,7 +725,9 @@ const en = {
     "previewLabel": "Preview of {{mode}}",
     "category": {
       "meaning": "Know the meaning",
-      "board": "Race the board"
+      "board": "Race the board",
+      "finish": "Start here",
+      "together": "Play together"
     },
     "complexity": {
       "simple": "Easy rules",
@@ -726,7 +738,8 @@ const en = {
       "ffa": "Everyone vs everyone",
       "teams": "Team battle",
       "solo": "Solo vs a bot",
-      "class": "Whole class vs the boss"
+      "class": "Whole class vs the boss",
+      "together": "Own board, one class leaderboard"
     },
     "bestFor": {
       "meanings": "Learning meanings",
@@ -1209,6 +1222,8 @@ const en = {
     "live": {
       "getReady": "Get ready!",
       "warmUpHint": "Warm-up: tap the glowing letter",
+      "warmUpSpellHint": "Warm-up: tap the letters in order",
+      "warmUpSpelled": "Spelled!",
       "warmUpTapThis": "Tap this one",
       "warmUpTitle": "Warm-up"
     },
@@ -14079,7 +14094,8 @@ const en = {
         "wordcraft": "Craft words on your own board against the Baron. The class leaderboard decides the rest.",
         "wordTower": "Everyone stacks words on their own tower. A shaky word knocks blocks off. Tallest tower wins."
       },
-      "wordcraftNeedsShortWords": "Wordcraft can't deal any word from this list onto its tiles. Add shorter words or pick another mode."
+      "wordcraftNeedsShortWords": "Wordcraft can't deal any word from this list onto its tiles. Add shorter words or pick another mode.",
+      "wordcraftNoTiles": "Wordcraft has no letter tiles for this list's language yet. Pick another game."
     },
     "projectorLobby": {
       "joinAt": "Go to",

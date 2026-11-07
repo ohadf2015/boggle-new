@@ -703,6 +703,16 @@ const sv = {
   // @eg2Seo:end
   // @eg2Modes:start
   "eg2Modes": {
+    "hint": {
+      "classic": "Eleverna tävlar om att hitta dina ord på samma bräda.",
+      "vocab-quiz": "Eleverna matchar varje betydelse med rätt ord.",
+      "wordcraft": "Eleverna stavar dina ord med bokstavsbrickor.",
+      "crossword": "Eleverna läser en betydelse och stavar ordet."
+    },
+    "blocked": {
+      "wordcraftLanguage": "Inga bokstavsbrickor för det här språket än",
+      "wordcraftRack": "Orden är för långa för brickorna"
+    },
     "title": "Välj spelläge",
     "spec": {
       "duration": "Längd",
@@ -715,7 +725,9 @@ const sv = {
     "previewLabel": "Förhandsvisning av {{mode}}",
     "category": {
       "meaning": "Kan betydelsen",
-      "board": "Tävla på brädet"
+      "board": "Tävla på brädet",
+      "finish": "Börja här",
+      "together": "Spela tillsammans"
     },
     "complexity": {
       "simple": "Enkla regler",
@@ -726,7 +738,8 @@ const sv = {
       "ffa": "Alla mot alla",
       "teams": "Lagkamp",
       "solo": "Solo mot en bot",
-      "class": "Hela klassen mot bossen"
+      "class": "Hela klassen mot bossen",
+      "together": "Egen bräda, en topplista för klassen"
     },
     "bestFor": {
       "meanings": "Lära sig betydelser",
@@ -1209,6 +1222,8 @@ const sv = {
     "live": {
       "getReady": "Gör dig redo!",
       "warmUpHint": "Uppvärmning: tryck på den lysande bokstaven",
+      "warmUpSpellHint": "Uppvärmning: tryck på bokstäverna i rätt ordning",
+      "warmUpSpelled": "Rätt stavat!",
       "warmUpTapThis": "Tryck på den här",
       "warmUpTitle": "Uppvärmning"
     },
@@ -16051,7 +16066,8 @@ const sv = {
         "wordcraft": "Bygg ord på din egen tavla mot Baronen. Klassens topplista avgör resten.",
         "wordTower": "Alla staplar ord på sitt eget torn. Ett vingligt ord fäller block. Högsta tornet vinner."
       },
-      "wordcraftNeedsShortWords": "Wordcraft kan inte lägga ut något ord från den här listan på brickorna. Lägg till kortare ord eller välj ett annat läge."
+      "wordcraftNeedsShortWords": "Wordcraft kan inte lägga ut något ord från den här listan på brickorna. Lägg till kortare ord eller välj ett annat läge.",
+      "wordcraftNoTiles": "Wordcraft har inga bokstavsbrickor för listans språk än. Välj ett annat spel."
     },
     "projectorLobby": {
       "joinAt": "Gå till",

@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, Clock, MonitorPlay, MonitorSmartphone, Smartphone, Sparkles } from 'lucide-react';
+import { Ban, Check, Clock, MonitorPlay, MonitorSmartphone, Smartphone, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { teacherGameMode } from '@/lib/education/gameModes';
 import { ARCADE_BLOCK, arcadeAccentAt, type ArcadeAccent } from '@/lib/education/arcadeAccent';
@@ -19,6 +19,8 @@ export interface LobbyModeGridProps {
   busy?: boolean;
   /** Shorter covers when the lesson run sheet takes a row above the grid. */
   dense?: boolean;
+  /** Games this list cannot play, each with the translation key saying why; the card stays but cannot be picked. */
+  blocked?: Partial<Record<CatalogueMode['id'], string>>;
   onPick: (id: CatalogueMode['id']) => void;
   t: T;
 }
@@ -29,15 +31,30 @@ export function modeArcadeAccent(id: CatalogueMode['id']): ArcadeAccent {
   return arcadeAccentAt(Math.max(0, order.findIndex((m) => m.id === id)));
 }
 
-/** Every game in one compact grid; a tile only selects, GO LIVE lives in the ready panel. */
-export function LobbyModeGrid({ selected, recommended = null, suggested = null, selectedMinutes, minutesFor, busy, dense = false, onPick, t }: LobbyModeGridProps) {
+// Transform only (no opacity start: it flashes on the mobile renderer) and `backwards`, so the press scale still works after it.
+const ENTRANCE_KEYFRAMES = '@keyframes lc-mode-in{from{transform:translateY(12px) scale(0.94)}to{transform:none}}';
+const ENTRANCE_STAGGER_MS = 35;
+
+const GROUP_SPAN: Record<(typeof CATALOGUE_CATEGORIES)[number], string> = {
+  finish: 'col-span-2',
+  together: 'col-span-2',
+  board: 'col-span-2 @2xl:col-span-4',
+};
+
+/** Every game in one grid of labelled groups; a tile only selects, GO LIVE lives in the ready panel. */
+export function LobbyModeGrid({ selected, recommended = null, suggested = null, selectedMinutes, minutesFor, busy, dense = false, blocked = {}, onPick, t }: LobbyModeGridProps) {
   const modes = catalogueModes();
+  let index = 0;
   return (
     <div role="radiogroup" aria-label={t('eg2Modes.title')} data-testid="lobby-mode-grid" className="@container">
-      <div data-testid="lobby-mode-cells" className="grid grid-cols-2 gap-1.5 p-1 @2xl:grid-cols-4 @2xl:gap-3">
+      <style>{ENTRANCE_KEYFRAMES}</style>
+      <div data-testid="lobby-mode-cells" className="grid grid-cols-2 gap-x-1.5 gap-y-2.5 p-1 @2xl:grid-cols-4 @2xl:gap-x-3 @2xl:gap-y-4">
         {CATALOGUE_CATEGORIES.map((category) => (
-          <section key={category} data-testid={`mode-group-${category}`} className="contents">
-            <h2 className="sr-only">{t(`eg2Modes.category.${category}`)}</h2>
+          <section key={category} data-testid={`mode-group-${category}`} className={cn('grid grid-cols-subgrid content-start gap-y-1.5', GROUP_SPAN[category])}>
+            <h2 className="col-span-full flex items-center gap-1.5 px-0.5 font-neo-body text-xs font-bold leading-none text-neo-cream/80 @2xl:text-sm">
+              <span aria-hidden="true" className="h-[3px] w-3 shrink-0 bg-neo-cream" />
+              {t(`eg2Modes.category.${category}`)}
+            </h2>
             {modes
               .filter((m) => m.category === category)
               .map((mode) => {
@@ -45,6 +62,8 @@ export function LobbyModeGrid({ selected, recommended = null, suggested = null, 
                 const minutes = isOn && selectedMinutes !== undefined
                   ? selectedMinutes
                   : (minutesFor?.(mode.id) ?? teacherGameMode(mode.launch.gameMode)?.minutes ?? 3);
+                const hintKey = catalogueKeys(mode).hint;
+                const blockedKey = blocked[mode.id];
                 return (
                   <ModeTile
                     key={mode.id}
@@ -52,11 +71,14 @@ export function LobbyModeGrid({ selected, recommended = null, suggested = null, 
                     accent={modeArcadeAccent(mode.id)}
                     name={t(catalogueKeys(mode).name)}
                     minutesLabel={t('education.modePicker.minutes', { count: minutes })}
+                    hint={hintKey ? t(hintKey) : null}
+                    blockedReason={blockedKey ? t(blockedKey) : null}
                     recommendedLabel={recommended === mode.id ? t('eduShell.host.bestForList') : null}
                     newLabel={suggested === mode.id && !isOn ? t('eduShell.host.untried') : null}
                     selected={isOn}
                     busy={busy}
                     dense={dense}
+                    entranceDelayMs={index++ * ENTRANCE_STAGGER_MS}
                     onPick={onPick}
                     t={t}
                   />
@@ -79,11 +101,14 @@ function ModeTile({
   accent,
   name,
   minutesLabel,
+  hint,
+  blockedReason,
   recommendedLabel,
   newLabel,
   selected,
   busy,
   dense,
+  entranceDelayMs,
   onPick,
   t,
 }: {
@@ -91,6 +116,9 @@ function ModeTile({
   accent: ArcadeAccent;
   name: string;
   minutesLabel: string;
+  hint: string | null;
+  blockedReason: string | null;
+  entranceDelayMs: number;
   recommendedLabel: string | null;
   newLabel: string | null;
   selected: boolean;
@@ -105,21 +133,28 @@ function ModeTile({
       type="button"
       role="radio"
       aria-checked={selected}
+      aria-disabled={blockedReason ? true : undefined}
       data-testid={`mode-tile-${mode.id}`}
       data-selected={selected ? 'true' : 'false'}
       data-accent={accent}
       disabled={busy}
+      style={{ animationDelay: `${entranceDelayMs}ms` }}
       onClick={() => {
-        if (!selected) onPick(mode.id);
+        if (!selected && !blockedReason) onPick(mode.id);
       }}
       className={cn(
         'group relative flex min-w-0 items-center gap-2 overflow-hidden rounded-neo border-2 bg-neo-navy-light p-1.5 text-start text-neo-cream',
+        'motion-safe:animate-[lc-mode-in_360ms_cubic-bezier(0.23,1,0.32,1)_backwards]',
+        mode.category === 'together' && 'col-span-2 @2xl:col-span-1',
+        blockedReason && 'cursor-not-allowed border-dashed [&_img]:grayscale',
         '@2xl:flex-col @2xl:items-stretch @2xl:gap-0 @2xl:p-0',
         'transition-[border-color,box-shadow] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.98] motion-reduce:transition-none',
         'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy disabled:cursor-wait',
         selected
           ? 'border-neo-lime ring-2 ring-neo-lime ring-offset-2 ring-offset-neo-navy'
-          : 'border-neo-cream/35 [@media(hover:hover)]:hover:border-neo-cream/50',
+          : blockedReason
+            ? 'border-neo-cream/25'
+            : 'border-neo-cream/35 [@media(hover:hover)]:hover:border-neo-cream/50',
       )}
     >
       <span
@@ -179,6 +214,16 @@ function ModeTile({
             {t(`eduShell.deliveryShort.${mode.delivery}`)}
           </span>
         </span>
+        {blockedReason ? (
+          <span data-testid="mode-blocked-reason" className="flex items-start gap-1 font-neo-body text-xs font-bold leading-snug text-neo-cream/85">
+            <Ban className="mt-px size-3 shrink-0" strokeWidth={2.5} aria-hidden="true" />
+            {blockedReason}
+          </span>
+        ) : hint ? (
+          <span data-testid="mode-hint" className={cn('font-neo-body text-xs leading-snug text-neo-cream/80', mode.category !== 'together' && 'hidden @2xl:block')}>
+            {hint}
+          </span>
+        ) : null}
       </span>
     </button>
   );

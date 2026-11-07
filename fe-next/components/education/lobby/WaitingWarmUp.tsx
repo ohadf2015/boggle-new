@@ -1,5 +1,5 @@
 /**
- * The waiting room's warm-up: tap the lit letter of your own name.
+ * The waiting room warm-up: spell list words from tiles, or tap the lit letter of your own name.
  *
  * Something for thumbs to do in the 20-60s before the teacher presses Start —
  * zero stakes (a miss only resets the combo), language-neutral, no network.
@@ -17,11 +17,11 @@ import { useReducedEffects } from '@/hooks/useReducedEffects';
 import { pulseLive } from '@/lib/education/liveHaptics';
 import { tr, type EduT } from './eduText';
 import { initialWarmUp, warmUpLetters, warmUpReducer } from './warmUpTap';
+import { useStudyDeck } from '@/lib/education/studyDeckStore';
+import { spellableWords } from './warmUpSpell';
+import { WARM_UP_KEYFRAMES, WarmUpSpellTiles } from './WarmUpSpellTiles';
 
 const MILESTONE = 5;
-const WARM_UP_KEYFRAMES =
-  '@keyframes lc-tile-hit{0%{transform:scale(1.35)}100%{transform:scale(1)}}' +
-  '@keyframes lc-tile-glow{0%,100%{transform:scale(1.1)}50%{transform:scale(1.18)}}';
 
 function seedFor(name: string): number {
   let h = 7;
@@ -29,7 +29,15 @@ function seedFor(name: string): number {
   return h;
 }
 
-export function WaitingWarmUp({ username, t }: { username: string; t: EduT }) {
+/** With list words (passed, or this room's deck) it is a spelling-tiles warm-up; without (or only kanji) it stays the name tap game. */
+export function WaitingWarmUp({ username, words, t }: { username: string; words?: readonly string[]; t: EduT }) {
+  const deck = useStudyDeck((s) => s.cards);
+  const spellable = useMemo(() => spellableWords(words ?? deck.map((c) => c.word)), [words, deck]);
+  if (spellable.length > 0) return <WarmUpSpellTiles key={spellable.map((w) => w.join('')).join('|')} words={spellable} seed={seedFor(username)} t={t} />;
+  return <NameTapWarmUp username={username} t={t} />;
+}
+
+function NameTapWarmUp({ username, t }: { username: string; t: EduT }) {
   const letters = useMemo(() => warmUpLetters(username), [username]);
   const [state, setState] = useState(() => initialWarmUp(seedFor(username)));
   const sfx = useSoundEffects();
@@ -48,6 +56,7 @@ export function WaitingWarmUp({ username, t }: { username: string; t: EduT }) {
   return (
     <section
       data-testid="waiting-warmup"
+      data-kind="tap"
       aria-label={tr(t, 'academy.live.warmUpTitle', 'Warm-up')}
       className="w-full max-w-sm rounded-neo-lg border-[3px] border-neo-cream bg-neo-navy/90 p-2 shadow-hard"
     >
