@@ -75,6 +75,22 @@ describe('useRewardedAd — rewardKind', () => {
     expect(onRewardEarned).toHaveBeenCalledTimes(1);
   });
 
+  it('tags the tap-time offered event so it is not counted as a second impression', async () => {
+    const { trackRewardedAdOffered } = await import('@/utils/growthTracking');
+    vi.mocked(trackRewardedAdOffered).mockClear();
+    const { result } = renderHook(() => useRewardedAd({ rewardKind: 'feature' }));
+
+    await act(async () => {
+      result.current.showAd();
+      await new Promise((r) => setTimeout(r, 0));
+    });
+
+    expect(trackRewardedAdOffered).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({ trigger: 'tap' }),
+    );
+  });
+
   it("with rewardKind='feature', does NOT call awardWatchedAd but still fires onRewardEarned", async () => {
     const onRewardEarned = vi.fn();
     const { result } = renderHook(() =>

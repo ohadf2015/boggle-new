@@ -630,6 +630,12 @@ function getAllRoutes(): MetadataRoute.Sitemap {
     priority: 0.8,
   });
 
+  addForLocaleOnly(routes, '/wordle-solver', {
+    lastModified: LAST_DEPLOYED,
+    changeFrequency: 'monthly',
+    priority: 0.8,
+  });
+
   // ─── Anagram solver: programmatic /anagram/[letters] RETIRED from sitemap 2026-06-08 ───
   // The 150 seed pages earned 0 clicks / 0% CTR over 28d and are now noindexed
   // (app/[locale]/anagram/[letters]/page.tsx robots:{index:false}). Keeping them

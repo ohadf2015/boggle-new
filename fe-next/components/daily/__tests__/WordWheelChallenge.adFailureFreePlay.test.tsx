@@ -65,6 +65,7 @@ vi.mock('@/utils/dailyChallenge/wordWheelGeneration', () => ({
 vi.mock('@/utils/guestManager', () => ({ getGuestFingerprint: () => null }));
 
 // showAd() simulates a non-reward terminal by firing the onAdError callback.
+vi.mock('@/hooks/useInterstitialAd', () => ({ useInterstitialAd: () => ({ showInterstitial: () => Promise.resolve() }) }));
 vi.mock('@/hooks/useRewardedAd', () => ({
   useRewardedAd: (opts: { onAdError?: (msg: string) => void } = {}) => ({
     showAd: () => { opts.onAdError?.('Ad timed out — please try again'); },

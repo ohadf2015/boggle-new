@@ -44,10 +44,6 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
   variant = 'button',
   surface,
 }) => {
-  useEffect(() => {
-    trackRewardedAdOffered(surface);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const [showSuccess, setShowSuccess] = useState(false);
   const [earnedAmount, setEarnedAmount] = useState(0);
@@ -55,7 +51,7 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
   const { refreshCoins } = useCoinContext();
 
   // Update effect to refresh coins when ad succeeds
-  const { showAd, isAdAvailable, isPlaceholderCooldown, status, error, rewardAmount } = useRewardedAd({
+  const { showAd, canShowAd, isAdAvailable, isPlaceholderCooldown, status, error, rewardAmount } = useRewardedAd({
     surface: 'generic',
     analyticsSurface: surface,
     onRewardEarned: async (earned) => {
@@ -75,6 +71,11 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
       console.warn('Ad error:', errorMsg);
     },
   });
+
+  useEffect(() => {
+    if (canShowAd) trackRewardedAdOffered(surface);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canShowAd]);
 
   const isLoading = status === 'loading';
   const isShowing = status === 'showing';
@@ -119,6 +120,8 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
   };
 
   const content = getStatusContent();
+
+  if (!canShowAd) return null;
 
   if (variant === 'card') {
     // Full card variant for settings/dedicated section

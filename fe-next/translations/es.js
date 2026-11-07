@@ -21833,12 +21833,20 @@ const es = {
     "onboarding": {
       "title": "Tu primera partida en clase en 3 pasos",
       "titleCompact": "Termina de preparar todo",
+      "howItWorks": {
+        "title": "Cómo funciona un juego en clase",
+        "hint": "Cuatro palabras que verás en todas partes",
+        "joinCode": { "title": "Código para unirse", "body": "Un código corto en tu tablero. Los alumnos lo escriben en cualquier móvil o portátil. Sin cuentas." },
+        "board": { "title": "El tablero", "body": "La pantalla que muestras a la clase, en un proyector o una pantalla grande. Desde ahí empiezas cada ronda." },
+        "round": { "title": "Una ronda", "body": "Todos buscan palabras en la misma cuadrícula de letras durante unos minutos. Luego ves los puntos y las palabras para repasar." },
+        "wordList": { "title": "Lista de palabras", "body": "Las palabras que practica tu clase. Elegimos una para empezar y puedes cambiarla cuando quieras." }
+      },
       "progress": "{done} de {total} hechos",
       "dismiss": "Ocultar los pasos iniciales",
       "steps": {
         "createClass": {
           "title": "Crea una clase",
-          "body": "Un nombre y un idioma. Son 20 segundos.",
+          "body": "Solo un nombre. El idioma y las palabras ya están elegidos.",
           "cta": "Crear tu primera clase"
         },
         "shareCode": {
@@ -21943,12 +21951,14 @@ const es = {
         "title": "Qué pasa ahora",
         "step1": "Recibes un código para unirse",
         "step2": "Tus estudiantes lo escriben en cualquier móvil. Sin cuentas.",
-        "step3": "Elige un juego y pulsa En vivo. La primera ronda dura 3 minutos."
+        "step3": "Pulsa Empezar en el tablero. La primera ronda dura 3 minutos."
       },
       "packWords": "{count} palabras",
       "packRecommended": "Te lo recomendamos",
       "startLive": "Empezar en vivo",
-      "createOnly": "Solo crear la clase",
+      "createOnly": "Crear ahora, jugar después",
+      "createAndPlayHint": "Abre el tablero de juego con tu código. Los alumnos se unen y luego pulsas Empezar.",
+      "packSticker": "Lista de palabras: {name}",
       "packHint": "Tus alumnos también reciben estas palabras como tarea al unirse.",
       "assignFailed": "Tu clase está lista, pero las palabras no se asignaron. Asígnalas desde la página de la clase."
     },

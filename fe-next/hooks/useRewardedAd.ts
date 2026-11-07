@@ -434,7 +434,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       : shouldUseSimulation ? 'simulation'
       : 'no-ad-placeholder';
 
-    trackRewardedAdOffered(telemetrySurface ?? 'unknown', { platform });
+    trackRewardedAdOffered(telemetrySurface ?? 'unknown', { platform, trigger: 'tap' });
 
     // Single idempotent settle guard for this showAd session. The FIRST
     // terminal outcome — reward, error, or the stuck-state watchdog — wins;

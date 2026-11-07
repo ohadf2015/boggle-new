@@ -136,6 +136,7 @@ export const KNOWN_APP_ROOT_SEGMENTS: ReadonlySet<string> = new Set([
   'word-craft-game',
   'word-craft-landing',
   'word-finder',
+  'wordle-solver',
   'word-games-for-the-classroom',
   'word-games-online-free',
   'word-of-the-day',

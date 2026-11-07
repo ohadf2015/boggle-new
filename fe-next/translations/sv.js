@@ -21821,12 +21821,20 @@ const sv = {
     "onboarding": {
       "title": "Ditt första klasspel i 3 steg",
       "titleCompact": "Gör klart starten",
+      "howItWorks": {
+        "title": "Så fungerar ett klasspel",
+        "hint": "Fyra ord du ser överallt",
+        "joinCode": { "title": "Anslutningskod", "body": "En kort kod på ditt bräde. Eleverna skriver in den på valfri mobil eller dator. Inga konton." },
+        "board": { "title": "Brädet", "body": "Skärmen du visar klassen, på en projektor eller stor skärm. Där startar du varje runda." },
+        "round": { "title": "En runda", "body": "Alla letar ord i samma bokstavsrutnät i några minuter. Sedan ser du poängen och orden att repetera." },
+        "wordList": { "title": "Ordlista", "body": "Orden klassen övar på. Vi väljer en att börja med, och du kan byta när du vill." }
+      },
       "progress": "{done} av {total} klara",
       "dismiss": "Dölj startstegen",
       "steps": {
         "createClass": {
           "title": "Skapa en klass",
-          "body": "Ett namn och ett språk. Tar 20 sekunder.",
+          "body": "Bara ett namn. Språk och ord är redan valda åt dig.",
           "cta": "Skapa din första klass"
         },
         "shareCode": {
@@ -21931,12 +21939,14 @@ const sv = {
         "title": "Det här händer sen",
         "step1": "Du får en anslutningskod",
         "step2": "Eleverna skriver in den på valfri mobil. Inga konton.",
-        "step3": "Välj ett spel och tryck på Starta live. Första rundan tar 3 minuter."
+        "step3": "Tryck på Starta på brädet. Första rundan tar 3 minuter."
       },
       "packWords": "{count} ord",
       "packRecommended": "Vårt tips",
       "startLive": "Starta live",
-      "createOnly": "Skapa bara klassen",
+      "createOnly": "Skapa nu, spela senare",
+      "createAndPlayHint": "Öppnar spelbrädet med er anslutningskod. Eleverna ansluter, sedan trycker du på Starta.",
+      "packSticker": "Ordlista: {name}",
       "packHint": "Eleverna får också orden som läxa när de går med.",
       "assignFailed": "Klassen är klar, men orden tilldelades inte. Tilldela dem från klassens sida."
     },

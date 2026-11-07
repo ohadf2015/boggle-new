@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, act } from '@testing-library/react';
 import { AdMobProvider, useAdMobContext } from '../AdMobContext';
+import { signalGameEnded } from '@/lib/ads/gameEndSignal';
 
 vi.mock('@capacitor/core', () => ({
   Capacitor: {
@@ -607,6 +608,80 @@ describe('AdMobProvider', () => {
         for (let i = 0; i < 6; i++) ctx().recordGameEnd();
       });
       expect(ctx().ageGatePromptOpportunity).toBe(false);
+    });
+  });
+
+  describe('game-end counting across every mode', () => {
+    async function mount(tier: 'adult' | 'unknown' = 'adult') {
+      social.tier = tier;
+      let captured: ReturnType<typeof useAdMobContext> | null = null;
+      await act(async () => {
+        render(
+          <AdMobProvider>
+            <TestConsumer onMount={(ctx) => { captured = ctx; }} />
+          </AdMobProvider>
+        );
+      });
+      return () => captured!;
+    }
+
+    it('Given a slot came due on a game with no ad screen, When the next game ends, Then the slot is still due', async () => {
+      const ctx = await mount();
+      for (let i = 0; i < 6; i++) ctx().recordGameEnd();
+      ctx().recordGameEnd(); // 7th: the due slot was never spent
+      expect(ctx().shouldShowInterstitial()).toBe(true);
+    });
+
+    it('Given an interstitial showed, When the app restarts, Then the next slot waits 3 more games', async () => {
+      const first = await mount();
+      for (let i = 0; i < 6; i++) first().recordGameEnd();
+      first().recordInterstitialShown();
+
+      const second = await mount();
+      vi.setSystemTime(Date.now() + 10 * 60 * 1000);
+      second().recordGameEnd(); // 7
+      expect(second().shouldShowInterstitial()).toBe(false);
+      second().recordGameEnd(); // 8
+      second().recordGameEnd(); // 9
+      expect(second().shouldShowInterstitial()).toBe(true);
+    });
+
+    it('Given any mode reports a game end, When signalGameEnded fires, Then the provider counts it', async () => {
+      const ctx = await mount();
+      await act(async () => {
+        for (let i = 0; i < 6; i++) signalGameEnded();
+      });
+      expect(ctx().shouldShowInterstitial()).toBe(true);
+    });
+
+    it('Given an unknown-age guest, When signalled games reach a slot, Then the age prompt opportunity opens', async () => {
+      const ctx = await mount('unknown');
+      await act(async () => {
+        for (let i = 0; i < 6; i++) signalGameEnded();
+      });
+      expect(ctx().ageGatePromptOpportunity).toBe(true);
+    });
+
+    it('Given trackGameEnd already signalled this game, When the ad break runs, Then the game counts once', async () => {
+      const ctx = await mount();
+      await act(async () => {
+        for (let i = 0; i < 5; i++) {
+          signalGameEnded();
+          ctx().countGameEndAtAdBreak();
+        }
+      });
+      expect(ctx().shouldShowInterstitial()).toBe(false); // 5 games, not 10
+      ctx().countGameEndAtAdBreak(); // a screen with no signal still counts
+      expect(ctx().shouldShowInterstitial()).toBe(true);
+    });
+
+    it('Given a rewarded ad just played, When an interstitial slot is due, Then it waits out the gap', async () => {
+      const ctx = await mount();
+      for (let i = 0; i < 6; i++) ctx().recordGameEnd();
+      ctx().recordRewardedShown();
+      expect(ctx().shouldShowInterstitial()).toBe(false);
+      vi.setSystemTime(Date.now() + 3 * 60 * 1000);
+      expect(ctx().shouldShowInterstitial()).toBe(true);
     });
   });
 });

@@ -84,9 +84,6 @@ vi.mock('../WatchAdButton', () => ({
   default: function MockWatchAdButton() { return <div data-testid="watch-ad" />; },
 }));
 
-vi.mock('@/components/ads/WatchAdForRevealButton', () => ({
-  default: function MockWatchAdForRevealButton() { return <div data-testid="watch-ad-reveal" />; },
-}));
 
 vi.mock('@/components/results/NextStepPrompt', () => ({
   default: function MockNextStepPrompt() { return <div data-testid="next-step" />; },

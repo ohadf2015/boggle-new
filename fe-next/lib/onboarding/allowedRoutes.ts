@@ -48,6 +48,7 @@ const MARKETING_LANDING_PREFIXES: ReadonlyArray<string> = [
   '/play-boggle-5x5-online',
   '/word-games-online-free',
   '/word-finder',
+  '/wordle-solver',
   '/brain-training-word-games',
   '/competitive-word-games',
   '/multiplayer-word-game-online',
