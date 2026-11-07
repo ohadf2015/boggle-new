@@ -57,6 +57,8 @@ let ready = false;
 vi.mock('@/contexts/AdMobContext', () => ({
   useAdMobContext: () => ({
     recordGameEnd: vi.fn(),
+    countGameEndAtAdBreak: vi.fn(),
+    recordRewardedShown: vi.fn(),
     shouldShowInterstitial: () => true,
     recordInterstitialShown: vi.fn(),
     hasNoAds: () => false,
