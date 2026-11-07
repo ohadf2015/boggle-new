@@ -1,11 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 
-const { postWithAuth, emitCoinEarned, useAuth } = vi.hoisted(() => ({
-  postWithAuth: vi.fn(),
-  emitCoinEarned: vi.fn(),
-  useAuth: vi.fn(),
-}));
+const { postWithAuth, useAuth } = vi.hoisted(() => ({ postWithAuth: vi.fn(), useAuth: vi.fn() }));
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
@@ -14,66 +10,51 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 vi.mock('@/contexts/AuthContext', () => ({ useAuth }));
 vi.mock('@/utils/authFetch', () => ({ postWithAuth }));
-vi.mock('@/utils/coinEarnedFx', () => ({ emitCoinEarned }));
-vi.mock('@/utils/confettiUtils', () => ({ fireVictoryConfetti: vi.fn() }));
+vi.mock('@/utils/coinEarnedFx', () => ({ emitCoinEarned: vi.fn() }));
+vi.mock('@/utils/confettiUtils', () => ({ fireVictoryConfetti: vi.fn(), fireConfetti: vi.fn(), fireFireworks: vi.fn() }));
 vi.mock('@/utils/hapticFeedback', () => ({ triggerHaptic: vi.fn() }));
+vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
 
 import { DailyAllClearCard } from '../DailyAllClearCard';
+import { getDailyChallengeDate } from '@/utils/dailyChallenge/dateUtils';
 
-const ok = (body: unknown) => ({ ok: true, json: async () => body });
-
-describe('DailyAllClearCard reward', () => {
+describe('DailyAllClearCard prize boxes', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
     useAuth.mockReturnValue({ user: { id: 'u1' } });
   });
 
-  it('claims once, shows what was earned and flies the coins', async () => {
-    postWithAuth.mockResolvedValue(ok({ claimed: true, coins: 50, xp: 100 }));
+  it('does not pay on show: both boxes wait for a tap', () => {
     render(<DailyAllClearCard streak={2} />);
-    const chip = await screen.findByTestId('all-clear-reward');
-    expect(chip.textContent).toContain('"coins":50');
-    expect(chip.textContent).toContain('"xp":100');
-    expect(postWithAuth).toHaveBeenCalledTimes(1);
-    expect(postWithAuth.mock.calls[0][0]).toBe('/api/daily/all-clear/claim');
-    expect(emitCoinEarned).toHaveBeenCalledWith(50);
-  });
-
-  it('on a revisit still shows the reward but does not fly coins again', async () => {
-    postWithAuth.mockResolvedValue(ok({ claimed: false, coins: 50, xp: 100 }));
-    render(<DailyAllClearCard streak={2} />);
-    await screen.findByTestId('all-clear-reward');
-    expect(emitCoinEarned).not.toHaveBeenCalled();
-  });
-
-  it('shows no reward chip and does not crash when the claim fails', async () => {
-    postWithAuth.mockResolvedValue({ ok: false, json: async () => ({}) });
-    render(<DailyAllClearCard streak={2} />);
-    await waitFor(() => expect(postWithAuth).toHaveBeenCalled());
-    expect(screen.queryByTestId('all-clear-reward')).toBeNull();
-    expect(screen.getByTestId('daily-all-clear')).toBeTruthy();
-  });
-
-  it('does not throw when the request rejects', async () => {
-    postWithAuth.mockRejectedValue(new Error('offline'));
-    render(<DailyAllClearCard streak={0} />);
-    await waitFor(() => expect(postWithAuth).toHaveBeenCalled());
-    expect(screen.queryByTestId('all-clear-reward')).toBeNull();
-  });
-
-  it('guests get a sign-up nudge naming the reward and never call the API', () => {
-    useAuth.mockReturnValue({ user: null });
-    render(<DailyAllClearCard streak={1} />);
-    expect(screen.getByTestId('all-clear-guest-nudge').textContent).toContain('"coins":50');
+    expect(screen.getByTestId('day-prize-waiting-clear')).toBeTruthy();
+    expect(screen.getByTestId('day-prize-waiting-perfect')).toBeTruthy();
     expect(postWithAuth).not.toHaveBeenCalled();
   });
 
-  it('wears the reward art as a decorative tile (hidden from assistive tech)', () => {
-    useAuth.mockReturnValue({ user: null });
+  it('shows what an opened box held', () => {
+    localStorage.setItem(
+      `lc:day-prize:perfect:${getDailyChallengeDate()}`,
+      JSON.stringify({ kind: 'perfect', tier: 'jackpot', coins: 150, xp: 100, claimed: true }),
+    );
     render(<DailyAllClearCard streak={0} />);
-    const art = screen.getByTestId('all-clear-art');
-    expect(art.getAttribute('aria-hidden')).toBe('true');
-    expect(art.getAttribute('style')).toContain('/daily/all-clear-coin.webp');
+    const opened = screen.getByTestId('day-prize-opened-perfect');
+    expect(opened.getAttribute('data-tier')).toBe('jackpot');
+    expect(opened.textContent).toContain('"coins":150');
+    expect(screen.queryByTestId('all-clear-streak')).toBeNull();
+  });
+
+  it('tapping the perfect box opens the reveal', () => {
+    render(<DailyAllClearCard streak={1} />);
+    fireEvent.click(screen.getByTestId('day-prize-waiting-perfect'));
+    expect(screen.getByTestId('day-prize-reveal').getAttribute('data-phase')).toBe('closed');
+  });
+
+  it('guests see one sign-in line, for the perfect-day box, and no API call', () => {
+    useAuth.mockReturnValue({ user: null });
+    render(<DailyAllClearCard streak={1} />);
+    expect(screen.queryByTestId('day-prize-guest-clear')).toBeNull();
+    expect(screen.getByTestId('day-prize-guest-perfect').textContent).toContain('daily.allClear.guestNudge');
+    expect(postWithAuth).not.toHaveBeenCalled();
   });
 });

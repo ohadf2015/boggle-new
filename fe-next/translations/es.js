@@ -9646,13 +9646,14 @@ const es = {
     "aPlayer": "Un jugador",
     "modesPlayedCount": "{count} de 4 juegos hoy",
     "nextUp": "A continuación",
+    "dayPrize": {"title": "¡Día superado!", "titlePerfect": "¡Día perfecto!", "ready": "Tu caja de premio está lista", "readyPerfect": "Los cuatro hechos. Caja extra desbloqueada", "tapToOpen": "Toca para abrir", "open": "Ábrela", "opening": "Abriendo...", "later": "Luego", "collect": "Recoger", "coins": "+{coins} monedas", "xp": "+{xp} XP", "notYet": "Termina los dos puzles de hoy para abrirla", "failed": "No se pudo abrir ahora. Inténtalo de nuevo desde la página diaria", "tier": {"common": "¡Bien!", "lucky": "¡Suerte!", "jackpot": "¡Premio gordo!"}, "lines": {"common": {"0": "Monedas al banco. La caja de mañana puede ser mayor.", "1": "Buen botín. ¿Mañana a la misma hora?", "2": "Cada caja es distinta. A ver qué trae mañana."}, "lucky": {"0": "¡Caja de la suerte! Casi el doble de lo normal.", "1": "Hoy la caja te quiere."}, "jackpot": {"0": "¡Premio gordo! La caja más rara de todas.", "1": "¡Enorme! Muy pocos jugadores la consiguen."}}, "hubReady": "La caja de premio de hoy te espera", "hubReadyPerfect": "Tu caja de día perfecto te espera", "hubOpened": "Caja de hoy: +{coins} monedas", "hubOpenedPerfect": "Caja de día perfecto: +{coins} monedas", "oneToGo": "1 más para el premio de hoy", "guestNudge": "Inicia sesión para abrir una caja diaria, hasta {coins} monedas"},
     "allClearToday": "Todo listo por hoy. Hasta mañana",
     "allClear": {
       "title": "¡Todo listo!",
       "body": "Completaste todas las misiones de hoy.",
       "streak": "Racha de {n} días. Vuelve mañana para mantenerla.",
-      "reward": "Premio del día: +{coins} monedas, +{xp} XP",
-      "guestNudge": "Inicia sesión para ganar {coins} monedas por completar el día."
+      "reward": "Caja de día perfecto: +{coins} monedas, +{xp} XP",
+      "guestNudge": "Inicia sesión para abrir una caja de día perfecto de hasta {coins} monedas."
     },
     "adminBeta": "Beta",
     "replay": "Repetir",

@@ -8891,13 +8891,14 @@ const en = {
     "aPlayer": "A player",
     "modesPlayedCount": "{count} of 4 games today",
     "nextUp": "Next up",
+    "dayPrize": {"title": "Day cleared!", "titlePerfect": "Perfect day!", "ready": "Your prize box is ready", "readyPerfect": "All four done. Bonus box unlocked", "tapToOpen": "Tap to open", "open": "Open it", "opening": "Opening...", "later": "Later", "collect": "Collect", "coins": "+{coins} coins", "xp": "+{xp} XP", "notYet": "Finish today's two puzzles to open it", "failed": "Couldn't open it right now. Try again from the daily page", "tier": {"common": "Nice!", "lucky": "Lucky!", "jackpot": "Jackpot!"}, "lines": {"common": {"0": "Coins in the bank. Tomorrow's box could be bigger.", "1": "A solid haul. Same time tomorrow?", "2": "Every box is different. See what tomorrow brings."}, "lucky": {"0": "Lucky box! About double the usual.", "1": "The box liked you today."}, "jackpot": {"0": "Jackpot! The rarest box there is.", "1": "Huge! Only a few players get this one."}}, "hubReady": "Today's prize box is waiting", "hubReadyPerfect": "Your perfect-day box is waiting", "hubOpened": "Today's box: +{coins} coins", "hubOpenedPerfect": "Perfect-day box: +{coins} coins", "oneToGo": "1 more for today's prize", "guestNudge": "Sign in to open a daily prize box, up to {coins} coins"},
     "allClearToday": "Today's board is clear. See you tomorrow.",
     "allClear": {
       "title": "All clear!",
       "body": "You finished every quest today.",
       "streak": "{n}-day streak. Come back tomorrow to keep it alive.",
-      "reward": "Day reward: +{coins} coins, +{xp} XP",
-      "guestNudge": "Sign in to earn {coins} coins for clearing the day."
+      "reward": "Perfect-day box: +{coins} coins, +{xp} XP",
+      "guestNudge": "Sign in to open a perfect-day box worth up to {coins} coins."
     },
     "adminBeta": "Beta",
     "replay": "Replay",

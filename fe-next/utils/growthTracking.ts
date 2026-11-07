@@ -351,6 +351,8 @@ export type GrowthEvent =
   | 'esl_list_used'
   // Cross-promo CTA tracking (e.g. Word Hunt → Word Wheel, Daily → Multiplayer)
   | 'cross_promo_click'
+  | 'day_prize_shown'
+  | 'day_prize_opened'
   // Cross-promo CTA exposure — fires once when a cross-promo card is rendered, so
   // PostHog can compute click-through rate (clicks / impressions). Props mirror
   // cross_promo_click: { target, source, placement?, language? }.
