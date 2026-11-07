@@ -19,6 +19,7 @@ export interface QueryGameBase {
   gameState: GameStateValue;
   isRanked: boolean;
   isPrivate: boolean;
+  isClassroom?: boolean;
   createdAt: number;
   timerSeconds: number;
   lastActivity: number;
@@ -179,7 +180,7 @@ export function getActiveRooms(games: Record<string, QueryGameBase>): GameSummar
     }
 
     if (humanCount === 0) continue;
-    if (game.isPrivate) continue;
+    if (game.isPrivate || game.isClassroom) continue;
 
     result.push({
       gameCode: game.gameCode,
