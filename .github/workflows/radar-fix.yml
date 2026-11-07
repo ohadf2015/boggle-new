@@ -3,6 +3,9 @@ name: radar-fix
 # Inline copy of ohadf2015/growth-radar radar-loop.yml (this repo is public and cannot call it). One app's daily Growth Radar loop. Refresh its data, have Claude verify the open
 # recommendations over the MCP, dismiss the noise and fix one real issue in a PR. Never merges.
 # Callers: radar-fix.yml here and in every app repo. radar-close.yml closes the loop on merge.
+# RADAR_GIT_TOKEN is a repo secret: a user or GitHub App token with contents and pull-requests write.
+# PRs opened with GITHUB_TOKEN park pull_request workflows at action_required, and a workflow_dispatch
+# check does not satisfy a required status check. Mirrored from growth-radar 80c9655e.
 on:
   schedule:
     - cron: "0 11 * * *"
@@ -186,20 +189,35 @@ jobs:
         if: steps.result.outputs.outcome == 'fixed'
         env:
           GH_TOKEN: ${{ github.token }}
+          RADAR_GIT_TOKEN: ${{ secrets.RADAR_GIT_TOKEN }}
           BRANCH: ${{ steps.result.outputs.branch }}
           ID: ${{ steps.result.outputs.id }}
         run: |
+          # A user/app token makes the pull_request event run CI. GITHUB_TOKEN
+          # parks that run at action_required, and workflow_dispatch checks do
+          # not satisfy required status checks (they never appear on the PR).
+          if [ -n "$RADAR_GIT_TOKEN" ]; then
+            export GH_TOKEN="$RADAR_GIT_TOKEN"
+            git config --unset-all http.https://github.com/.extraheader || true
+            gh auth setup-git
+          fi
           git push -u origin "$BRANCH"
           { cat "$OUT/body.md"; printf '\n\n```radar\n'; jq -c '.intervention + {recommendationId: (.recommendationId // .rec_id)}' "$OUT/result.json"; printf '```\n'; } > "$RUNNER_TEMP/pr.md"
           url=$(gh pr create --base "$BASE" --head "$BRANCH" --title "$(jq -r .title "$OUT/result.json")" --body-file "$RUNNER_TEMP/pr.md")
           echo "PR: $url" >> "$GITHUB_STEP_SUMMARY"
-          # GITHUB_TOKEN pushes and PRs trigger no workflows; workflow_dispatch is the one event it may fire.
-          for wf in .github/workflows/*.y*ml; do
-            grep -qE '^\s+pull_request:|^on:.*pull_request' "$wf" && grep -qE '^\s+workflow_dispatch:' "$wf" || continue
-            gh workflow run "$(basename "$wf")" --ref "$BRANCH" \
-              && echo "CI dispatched: $(basename "$wf")" >> "$GITHUB_STEP_SUMMARY" \
-              || echo "::warning::Could not dispatch $(basename "$wf"); the caller needs permissions actions: write"
-          done
+          if [ -n "$RADAR_GIT_TOKEN" ]; then
+            echo "Opened with RADAR_GIT_TOKEN; pull_request checks run without approval." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::warning::RADAR_GIT_TOKEN is unset. pull_request CI will wait for approval, and workflow_dispatch will not satisfy required checks."
+            # GITHUB_TOKEN may only fire workflow_dispatch. That check does not
+            # unblock a protected branch; it only runs the suite.
+            for wf in .github/workflows/*.y*ml; do
+              grep -qE '^\s+pull_request:|^on:.*pull_request' "$wf" && grep -qE '^\s+workflow_dispatch:' "$wf" || continue
+              gh workflow run "$(basename "$wf")" --ref "$BRANCH" \
+                && echo "CI dispatched: $(basename "$wf")" >> "$GITHUB_STEP_SUMMARY" \
+                || echo "::warning::Could not dispatch $(basename "$wf"); the caller needs permissions actions: write"
+            done
+          fi
           [ -z "$ID" ] || curl -sS --fail-with-body -H "Authorization: Bearer $GROWTH_RADAR_TOKEN" -H 'content-type: application/json' "$RADAR/api/mcp" \
             -d "$(jq -n --argjson id "$ID" '{jsonrpc:"2.0",id:1,method:"tools/call",params:{name:"update_recommendation",arguments:{id:$id,action:"activate"}}}')" \
             | jq -e '.result.isError != true' > /dev/null
