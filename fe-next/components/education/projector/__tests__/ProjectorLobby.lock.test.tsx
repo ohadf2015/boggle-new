@@ -35,10 +35,7 @@ function renderLobby() {
 }
 
 const fromServer = (event: string, data: unknown) => act(() => listeners.get(event)?.forEach((fn) => fn(data)));
-const toggle = () => {
-  if (!screen.queryByTestId('projector-lobby-lock')) fireEvent.click(screen.getByTestId('projector-more'));
-  return screen.getByTestId('projector-lobby-lock');
-};
+const toggle = () => screen.getByTestId('projector-lobby-lock');
 
 describe('ProjectorLobby — room lock', () => {
   beforeEach(() => {
@@ -129,18 +126,5 @@ describe('ProjectorLobby — room lock', () => {
     socketRef.current = null;
     renderLobby();
     expect(screen.queryByTestId('projector-lobby-lock')).toBeNull();
-    expect(screen.queryByTestId('projector-more')).toBeNull();
-  });
-
-  it('GIVEN a fresh lobby THEN the lock waits behind a collapsed More options row', () => {
-    renderLobby();
-    expect(screen.getByTestId('projector-more')).toHaveAttribute('aria-expanded', 'false');
-    expect(screen.queryByTestId('projector-lobby-lock')).toBeNull();
-  });
-
-  it('GIVEN the room is locked and More is closed THEN the row still says it is locked', () => {
-    renderLobby();
-    fromServer('classroomLobbyLockChanged', { gameCode: 'LOCK01', locked: true });
-    expect(screen.getByTestId('projector-more-locked')).toHaveTextContent(`${K}.locked`);
   });
 });

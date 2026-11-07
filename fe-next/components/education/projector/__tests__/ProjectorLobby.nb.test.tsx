@@ -36,7 +36,6 @@ describe('ProjectorLobby: neo-brutalist wall', () => {
     '%s has a 3px edge and a hard shadow',
     (id) => {
       render(<ProjectorLobby {...props} />);
-      if (id === 'projector-lobby-lock') fireEvent.click(screen.getByTestId('projector-more'));
       expect(chunky(screen.getByTestId(id))).toBe(true);
     }
   );

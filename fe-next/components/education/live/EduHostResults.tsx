@@ -104,7 +104,6 @@ function Actions({ t, onRematch, onClose, onExitRoom, practiceLeads, secondary, 
           <div data-testid="edu-results-tertiary" className="flex flex-col gap-2 @5xl/results:gap-3">
             {secondary}
             {exportSlot}
-            {proSlot}
             {(onClose || onExitRoom) && (
               <div className="flex flex-wrap gap-2 @5xl/results:gap-3">
                 {onClose && (
@@ -121,6 +120,7 @@ function Actions({ t, onRematch, onClose, onExitRoom, practiceLeads, secondary, 
                 )}
               </div>
             )}
+            {proSlot}
           </div>
         </ResultsMoreTools>
       )}
