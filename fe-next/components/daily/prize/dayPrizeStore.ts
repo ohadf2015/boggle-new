@@ -1,0 +1,74 @@
+import { getDailyChallengeDate } from '@/utils/dailyChallenge/dateUtils';
+import { isDayPrizeResponse, type DayPrizeClaimResponse, type DayPrizeKind } from '@/lib/daily/dayPrize';
+import { postWithAuth } from '@/utils/authFetch';
+
+/**
+ * Per-device memory for the daily prize box: whether the box already popped up
+ * on a results screen today (so it pops once), and the prize it held once
+ * opened (so the hub shows it without asking the server again).
+ */
+
+const shownKey = (kind: DayPrizeKind, date: string) => `lc:day-prize-shown:${kind}:${date}`;
+const openedKey = (kind: DayPrizeKind, date: string) => `lc:day-prize:${kind}:${date}`;
+
+/** Boxes on screen right now; some results screens mount the CTA twice. */
+const onScreen = new Set<DayPrizeKind>();
+
+export function claimPopupSlot(kind: DayPrizeKind, date: string = getDailyChallengeDate()): boolean {
+  if (onScreen.has(kind)) return false;
+  try {
+    if (localStorage.getItem(shownKey(kind, date)) || localStorage.getItem(openedKey(kind, date))) return false;
+    localStorage.setItem(shownKey(kind, date), '1');
+  } catch {
+    // storage off: still pop once per mount
+  }
+  onScreen.add(kind);
+  return true;
+}
+
+export function releasePopupSlot(kind: DayPrizeKind): void {
+  onScreen.delete(kind);
+}
+
+export function readOpenedPrize(kind: DayPrizeKind, date: string = getDailyChallengeDate()): DayPrizeClaimResponse | null {
+  try {
+    const raw = localStorage.getItem(openedKey(kind, date));
+    if (!raw) return null;
+    const parsed: unknown = JSON.parse(raw);
+    return isDayPrizeResponse(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+export function rememberOpenedPrize(prize: DayPrizeClaimResponse, date: string = getDailyChallengeDate()): void {
+  try {
+    localStorage.setItem(openedKey(prize.kind, date), JSON.stringify(prize));
+  } catch {
+    // storage off: the hub asks the server again, which answers with the same prize
+  }
+}
+
+export type ClaimOutcome =
+  | { ok: true; prize: DayPrizeClaimResponse }
+  | { ok: false; reason: 'not-cleared' | 'failed' };
+
+const ROUTES: Record<DayPrizeKind, string> = {
+  clear: '/api/daily/day-clear/claim',
+  perfect: '/api/daily/all-clear/claim',
+};
+
+/** Opens the box on the server. Safe to repeat: an opened box answers with the same prize and pays nothing. */
+export async function claimDayPrize(kind: DayPrizeKind): Promise<ClaimOutcome> {
+  try {
+    const res = await postWithAuth(ROUTES[kind]);
+    if (res.status === 400) return { ok: false, reason: 'not-cleared' };
+    if (!res.ok) return { ok: false, reason: 'failed' };
+    const body: unknown = await res.json();
+    if (!isDayPrizeResponse(body)) return { ok: false, reason: 'failed' };
+    rememberOpenedPrize(body);
+    return { ok: true, prize: body };
+  } catch {
+    return { ok: false, reason: 'failed' };
+  }
+}
