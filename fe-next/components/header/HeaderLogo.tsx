@@ -2,7 +2,7 @@ import { memo, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '../../contexts/LanguageContext';
 
-const TILE_TILT = ['-rotate-6', 'rotate-3', '-rotate-2', 'rotate-6', '-rotate-3'];
+const TILE_TILT = ['-rotate-3', 'rotate-2', '-rotate-1', 'rotate-3', '-rotate-2'];
 
 const HeaderLogo = memo(() => {
     const { t, language } = useLanguage();
@@ -42,12 +42,12 @@ const HeaderLogo = memo(() => {
             onClick={handleLogoClick}
             aria-label={t('common.goToHome')}
         >
-            <span aria-hidden="true" className="relative flex items-center gap-1 whitespace-nowrap pe-2.5 sm:gap-1.5" style={{ fontFamily }}>
-                <span data-testid="logo-tiles" className="flex items-center gap-[3px]">
+            <span aria-hidden="true" className="relative flex items-center gap-1 whitespace-nowrap pe-2 sm:gap-1.5 sm:pe-2.5" style={{ fontFamily }}>
+                <span data-testid="logo-tiles" className="flex items-center gap-[2px] sm:gap-[3px]">
                     {tiles.map((ch, i) => (
                         <span
                             key={i}
-                            className={`flex h-[26px] w-[23px] items-center justify-center rounded-[6px] border-2 border-neo-black bg-neo-lime text-[17px] font-black uppercase leading-none text-neo-black shadow-[2px_2px_0_0_rgb(var(--neo-black))] transition-transform group-hover:-translate-y-0.5 sm:h-[30px] sm:w-[26px] sm:text-[19px] ${TILE_TILT[i % TILE_TILT.length]}`}
+                            className={`flex h-[21px] w-[18px] items-center justify-center rounded-[5px] border-[1.5px] border-neo-black bg-neo-lime text-[13px] font-black uppercase leading-none text-neo-black shadow-[1.5px_1.5px_0_0_rgb(var(--neo-black))] sm:border-2 sm:shadow-[2px_2px_0_0_rgb(var(--neo-black))] transition-transform group-hover:-translate-y-0.5 sm:h-[30px] sm:w-[26px] sm:text-[19px] ${TILE_TILT[i % TILE_TILT.length]}`}
                         >
                             {ch}
                         </span>
@@ -55,17 +55,17 @@ const HeaderLogo = memo(() => {
                 </span>
                 <span className="relative">
                 <span
-                    className="-skew-x-6 text-[22px] font-black uppercase leading-none tracking-tight text-neo-cyan sm:text-[25px]"
+                    className="-skew-x-6 text-[18px] font-black uppercase leading-none tracking-tight text-neo-cyan sm:text-[25px]"
                     style={{
-                        WebkitTextStroke: '1.5px rgb(var(--neo-black))',
+                        WebkitTextStroke: '1.25px rgb(var(--neo-black))',
                         paintOrder: 'stroke fill',
-                        textShadow: '2px 2px 0 rgb(var(--neo-black))',
+                        textShadow: '1.5px 1.5px 0 rgb(var(--neo-black))',
                     }}
                 >
                     {t('logo.clash')}
                 </span>
                 <svg
-                    className="absolute -end-3 -top-2.5 h-[18px] w-[14px] rotate-12 text-neo-pink sm:-end-3.5 sm:h-5 sm:w-4"
+                    className="absolute -end-2.5 -top-2 h-[14px] w-[11px] rotate-12 text-neo-pink sm:-end-3.5 sm:h-5 sm:w-4"
                     viewBox="0 0 24 32"
                 >
                     <path

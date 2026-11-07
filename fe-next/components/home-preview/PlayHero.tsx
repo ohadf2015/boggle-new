@@ -30,8 +30,10 @@ interface PlayHeroProps {
 
 function AvatarStage({ avatar, animate, t, onAvatarSaved }: Pick<PlayHeroProps, 'avatar' | 'animate' | 't' | 'onAvatarSaved'>) {
   return (
-    <div className="relative flex h-[224px] w-full items-center [@media(max-height:700px)]:h-[150px] justify-center lg:h-[520px] 2xl:h-[600px]">
-      <QuickResultsRays color={NODE_COLORS.classic.hex} spinning={animate} />
+    <div className="relative flex h-[176px] w-full items-center [@media(max-height:700px)]:h-[132px] justify-center lg:h-[440px] 2xl:h-[520px]">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-40 lg:opacity-60">
+        <QuickResultsRays color={NODE_COLORS.classic.hex} spinning={animate} />
+      </div>
       <SparkleLoop enabled={animate} />
       <div className="relative z-10">
       <div className={`relative [@media(max-height:700px)]:scale-[0.7] ${animate ? 'animate-[qp-avatar-pop_0.7s_cubic-bezier(0.3,0.9,0.4,1)_both]' : ''}`}>
@@ -39,28 +41,28 @@ function AvatarStage({ avatar, animate, t, onAvatarSaved }: Pick<PlayHeroProps, 
           {avatar ? (
             <>
               <div className="lg:hidden">
-                <Avatar userId={avatar.userId} customAvatar={avatar.customAvatar ?? undefined} pixelSize={180} mood="idle" />
+                <Avatar userId={avatar.userId} customAvatar={avatar.customAvatar ?? undefined} pixelSize={140} mood="idle" />
               </div>
               <div className="hidden lg:block 2xl:hidden">
-                <Avatar userId={avatar.userId} customAvatar={avatar.customAvatar ?? undefined} pixelSize={300} mood="idle" />
+                <Avatar userId={avatar.userId} customAvatar={avatar.customAvatar ?? undefined} pixelSize={260} mood="idle" />
               </div>
               <div className="hidden 2xl:block">
-                <Avatar userId={avatar.userId} customAvatar={avatar.customAvatar ?? undefined} pixelSize={360} mood="idle" />
+                <Avatar userId={avatar.userId} customAvatar={avatar.customAvatar ?? undefined} pixelSize={300} mood="idle" />
               </div>
             </>
           ) : (
-            <div className="h-[180px] w-[180px] lg:h-[300px] lg:w-[300px] 2xl:h-[360px] 2xl:w-[360px]" />
+            <div className="h-[140px] w-[140px] lg:h-[260px] lg:w-[260px] 2xl:h-[300px] 2xl:w-[300px]" />
           )}
         </div>
         <span
           aria-hidden="true"
-          className={`absolute -bottom-3 left-1/2 -z-10 h-3.5 w-28 -translate-x-1/2 rounded-[50%] bg-black/45 lg:w-48 ${
+          className={`absolute -bottom-2 left-1/2 -z-10 h-3 w-24 -translate-x-1/2 rounded-[50%] bg-black/45 lg:w-48 ${
             animate ? 'animate-[qp-shadow-bob_2.8s_ease-in-out_0.9s_infinite]' : ''
           }`}
         />
         <span
           aria-hidden="true"
-          className="absolute -start-[64px] bottom-0 -z-10 -rotate-12 lg:-start-[96px] lg:bottom-0 2xl:-start-[110px]"
+          className="absolute -start-[50px] bottom-0 -z-10 -rotate-12 lg:-start-[84px] lg:bottom-0 2xl:-start-[96px]"
         >
           <span className={`block ${animate ? 'animate-[qp-avatar-bob_2.2s_ease-in-out_0.4s_infinite]' : ''}`}>
             <Image
@@ -71,7 +73,7 @@ function AvatarStage({ avatar, animate, t, onAvatarSaved }: Pick<PlayHeroProps, 
               data-testid="hp-mascot"
               loading="eager"
               unoptimized
-              className="h-[108px] w-[108px] drop-shadow-[0_3px_0_black] lg:h-[160px] lg:w-[160px] 2xl:h-[190px] 2xl:w-[190px]"
+              className="h-[80px] w-[80px] drop-shadow-[0_3px_0_black] lg:h-[136px] lg:w-[136px] 2xl:h-[160px] 2xl:w-[160px]"
             />
           </span>
         </span>
@@ -84,7 +86,8 @@ function AvatarStage({ avatar, animate, t, onAvatarSaved }: Pick<PlayHeroProps, 
       </div>
       <span
         aria-hidden="true"
-        className="absolute end-[14%] top-3 z-20 flex h-14 w-14 rotate-12 items-center justify-center rounded-full border-[3px] border-black bg-neo-yellow font-neo-display text-lg font-bold text-black shadow-hard lg:end-[16%] lg:top-[16%] lg:h-24 lg:w-24 lg:text-3xl"
+        data-testid="hp-timer-badge"
+        className="absolute end-[10%] top-2 z-20 rotate-6 whitespace-nowrap rounded-full border-2 border-black bg-neo-yellow px-2.5 py-1 font-neo-display text-sm font-bold leading-none text-black shadow-hard-sm lg:end-[12%] lg:top-[14%] lg:border-[3px] lg:px-4 lg:py-2 lg:text-2xl lg:shadow-hard"
       >
         {t('homePlay.timerBadge')}
       </span>
@@ -99,17 +102,17 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
       className="relative overflow-hidden border-b-[3px] border-black lg:rounded-[28px] lg:border-[3px] lg:bg-neo-navy-elevated lg:shadow-hard-xl"
       data-testid="hp-hero"
     >
-      <div className="relative mx-auto grid w-full max-w-md gap-3 px-4 pb-5 lg:max-w-none lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-10 lg:px-14 lg:py-12">
+      <div className="relative mx-auto grid w-full max-w-md gap-3 px-4 pb-5 lg:max-w-none lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-10 lg:px-14 lg:py-10">
         <AvatarStage avatar={avatar} animate={animate} t={t} onAvatarSaved={onAvatarSaved} />
 
         <div className="relative z-10 flex flex-col gap-3 lg:gap-6">
           <div className="text-center lg:text-start">
-            <p className="font-neo-display text-sm font-bold tracking-[0.18em] text-neo-lime uppercase lg:text-xl">
+            <p className="font-neo-display text-xs font-bold tracking-[0.14em] text-neo-lime/90 uppercase lg:text-lg">
               {greeting} · {t('quickPlay.solo.title')}
             </p>
             <h1
               id="hp-play-title"
-              className="mt-1 font-neo-display text-[26px] font-bold [@media(max-height:700px)]:text-[21px] leading-[1.1] text-neo-cream [text-shadow:0_3px_0_black] lg:text-6xl 2xl:text-7xl"
+              className="mt-1 font-neo-display text-[21px] font-bold [@media(max-height:700px)]:text-[19px] leading-[1.15] text-neo-cream [text-shadow:0_2px_0_black] lg:text-5xl 2xl:text-6xl"
             >
               {t('homePlay.heroLine')}
             </h1>
@@ -119,7 +122,7 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
             href={quickPlayHref(lang, 'random')}
             data-testid="hp-play"
             onClick={onPlay ? (e) => { e.preventDefault(); onPlay(); } : undefined}
-            className="group relative flex h-[68px] items-center justify-center gap-3 [@media(max-height:700px)]:h-[58px] overflow-hidden rounded-2xl border-[3px] border-black bg-neo-lime px-4 text-black shadow-hard-lg active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed lg:h-28 lg:rounded-3xl 2xl:h-32"
+            className="group relative flex h-[58px] items-center justify-center gap-3 [@media(max-height:700px)]:h-[52px] overflow-hidden rounded-2xl border-[3px] border-black bg-neo-lime px-4 text-black shadow-hard active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed lg:h-24 lg:rounded-3xl lg:shadow-hard-lg 2xl:h-28"
           >
             {animate && (
               <span
@@ -127,9 +130,9 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
                 className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-white/45 animate-[qp-shine_4s_ease-in-out_1.6s_infinite_both]"
               />
             )}
-            <RandomGlyph size={34} className="relative shrink-0 lg:h-14 lg:w-14" />
+            <RandomGlyph size={28} className="relative shrink-0 lg:h-12 lg:w-12" />
             <span className="relative flex flex-col items-start leading-none">
-              <span className="font-neo-display text-[28px] font-bold tracking-[0.14em] lg:text-5xl">
+              <span className="font-neo-display text-[24px] font-bold tracking-[0.1em] lg:text-4xl">
                 {t('quickPlay.solo.play')}
               </span>
               <span className="mt-0.5 text-xs font-bold tracking-wide opacity-70 lg:text-base">{t('homePlay.playSub')}</span>
