@@ -89,7 +89,7 @@ export default function FinaleCard({
     placement: 'connections_reveal_answer',
     surface: 'hint',
     onUnlock: onGiveUp,
-    disabled: isAdmin || isDisabled,
+    disabled: isAdmin || (status !== 'playing' && status !== 'wrong'),
     context: { pyramidId: pyramid.id },
   });
 

@@ -43,13 +43,28 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
   const { showInterstitial } = useInterstitialAd();
   const { submitLeaderboardScore } = useCrazyGames();
 
-  // Ads + leaderboard on mount
   useEffect(() => {
-    showInterstitial('challenge-complete');
     if (results.playerScore > 0) {
       submitLeaderboardScore(results.playerScore);
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Shown on exit, not over the score reveal; the hook dedupes by name and a stalled ad never blocks leaving.
+  const gateWithInterstitial = useCallback(async () => {
+    try {
+      await showInterstitial('challenge-complete');
+    } catch {
+      /* never block the exit */
+    }
+  }, [showInterstitial]);
+
+  const handlePlayAgain = useCallback(() => {
+    void gateWithInterstitial().then(onPlayAgain);
+  }, [gateWithInterstitial, onPlayAgain]);
+
+  const handleBackToHome = useCallback(() => {
+    void gateWithInterstitial().then(onBackToHome);
+  }, [gateWithInterstitial, onBackToHome]);
 
   const beatCreator = attemptResult?.beatCreator ?? results.playerScore > challenge.creatorScore;
   const scoreDiff = attemptResult?.scoreDifference ?? (results.playerScore - challenge.creatorScore);
@@ -207,7 +222,7 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
           className="space-y-3 lg:self-center"
         >
           <Button
-            onClick={onPlayAgain}
+            onClick={handlePlayAgain}
             className="w-full flex items-center justify-center gap-2 p-4 font-black text-lg uppercase rounded-neo border-4 border-neo-black shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 transition bg-neo-lime text-neo-black"
           >
             <RotateCw className="w-5 h-5" />
@@ -232,7 +247,7 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
           </div>
 
           <Button
-            onClick={onBackToHome}
+            onClick={handleBackToHome}
             variant="ghost"
             className="w-full flex items-center justify-center gap-2 p-3 font-bold uppercase rounded-neo text-neo-white hover:text-white hover:bg-neo-white/10"
           >

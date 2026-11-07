@@ -45,7 +45,6 @@ vi.mock('../TabbedDailyLeaderboard', () => ({ default: function MockLeaderboard(
 // stays gone even if a future edit re-imports it here.
 vi.mock('@/components/auth/DailyChallengeInlineSignup', () => ({ default: function MockLegacyInlineSignup() { return <div data-testid="legacy-inline-signup-card" />; } }));
 vi.mock('../WatchAdButton', () => ({ default: function MockWatchAdButton() { return <div data-testid="watch-ad" />; } }));
-vi.mock('@/components/ads/WatchAdForRevealButton', () => ({ default: function MockWatchAdForReveal() { return <div data-testid="watch-ad-reveal" />; } }));
 // Minimal signup line + modal that replaced the heavy inline signup card.
 vi.mock('@/components/daily/results/DismissibleSignupLine', () => ({
   __esModule: true,

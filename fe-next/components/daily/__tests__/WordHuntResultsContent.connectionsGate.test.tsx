@@ -50,7 +50,6 @@ vi.mock('../DailyInsightStack', () => ({ default: () => <div data-testid="insigh
 vi.mock('../CatchUpSuggestion', () => ({ default: () => <div data-testid="catch-up" /> }));
 vi.mock('@/components/auth/DailyChallengeInlineSignup', () => ({ default: () => <div data-testid="inline-signup" /> }));
 vi.mock('../WatchAdButton', () => ({ default: () => <div data-testid="watch-ad" /> }));
-vi.mock('@/components/ads/WatchAdForRevealButton', () => ({ default: () => <div data-testid="watch-ad-reveal" /> }));
 
 import { WordHuntResultsContent, type WordHuntResultsContentProps } from '../WordHuntResultsContent';
 

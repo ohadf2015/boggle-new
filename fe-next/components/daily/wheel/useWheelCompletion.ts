@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import type { WordWheelGameResult } from '../WordWheelGame';
 import type { WordWheelPuzzle } from '@/utils/dailyChallenge/wordWheelGeneration';
 import { saveWordWheelResult, getDailyStreak, updateDailyStreak, getDailyChallengeDate } from '@/utils/dailyChallenge';
@@ -29,14 +29,17 @@ interface UseWheelCompletionArgs {
   setGameActive: (active: boolean) => void;
   setGameResult: (result: WordWheelGameResult | null) => void;
   setPhase: (phase: WordWheelPhase) => void;
+  showInterstitial?: (placement: string) => Promise<unknown>;
 }
+
+const RESULTS_AD_CAP_MS = 3000;
 
 type PuzzleMeta = Pick<WordWheelPuzzle, 'puzzleDate' | 'puzzleNumber' | 'centerLetter'>;
 
 /** One save-and-submit path for a finished run, a quit, a reload mid-run and a retry of an unsent result. */
 export function useWheelCompletion({
   language, isPractice, isCatchup, isAuthenticated, profile, guestFingerprint,
-  setGameActive, setGameResult, setPhase,
+  setGameActive, setGameResult, setPhase, showInterstitial,
 }: UseWheelCompletionArgs) {
   const [leaderboardKey, setLeaderboardKey] = useState(0);
   const [finishing, setFinishing] = useState(false);
@@ -76,18 +79,40 @@ export function useWheelCompletion({
     submit(result, meta, streak.currentStreak);
   }, [isAuthenticated, isCatchup, language, submit]);
 
+  // Same break as Word Hunt: ad between the game and the results, capped so a
+  // stalled ad never holds the results. Catch-up days already paid with a rewarded ad.
+  // useInterstitialAd fires once per name per mount; practice replays need a fresh name each run.
+  const runIndex = useRef(0);
+  const revealResults = useCallback(() => {
+    if (isCatchup || !showInterstitial) {
+      setPhase('completed');
+      return;
+    }
+    let shown = false;
+    const showOnce = () => {
+      if (shown) return;
+      shown = true;
+      setPhase('completed');
+    };
+    const cap = setTimeout(showOnce, RESULTS_AD_CAP_MS);
+    showInterstitial(`word-wheel-complete-${runIndex.current++}`).catch(() => {}).finally(() => {
+      clearTimeout(cap);
+      showOnce();
+    });
+  }, [isCatchup, showInterstitial, setPhase]);
+
   const handleComplete = useCallback((result: WordWheelGameResult, meta: PuzzleMeta) => {
     setGameActive(false);
     setGameResult(result);
     if (isPractice) {
-      setPhase('completed');
+      revealResults();
       return;
     }
     persist(result, meta);
     // Results wait for the buzzer beat; the run is already saved above.
     if (shouldPlayFinishBeat(result.timeSeconds)) setFinishing(true);
-    else setPhase('completed');
-  }, [isPractice, persist, setGameActive, setGameResult, setPhase]);
+    else revealResults();
+  }, [isPractice, persist, setGameActive, setGameResult, revealResults]);
 
   /** A run left mid-game (quit or reload) counts with what was found; there is no fresh board. */
   const settleRun = useCallback((run: WordWheelRun, meta: PuzzleMeta): WordWheelGameResult => {
@@ -108,8 +133,8 @@ export function useWheelCompletion({
 
   const finishBeatDone = useCallback(() => {
     setFinishing(false);
-    setPhase('completed');
-  }, [setPhase]);
+    revealResults();
+  }, [revealResults]);
 
   return { handleComplete, settleRun, retryUnsent, finishing, finishBeatDone, leaderboardKey };
 }

@@ -144,3 +144,19 @@ describe('trackGameEnd — one end per start', () => {
     trackGameEnd('lightning', 30, 6, true, 90, { roundId: 'mp:203', isMultiplayer: true });
     expect(endEvents('lightning')).toHaveLength(3);
   });
+
+it('signals the ad cadence once per deduped game end', async () => {
+  vi.resetModules();
+  const { trackGameStart, trackGameEnd } = await import('../growthTracking');
+  const { GAME_ENDED_EVENT } = await import('@/lib/ads/gameEndSignal');
+  const onEnd = vi.fn();
+  window.addEventListener(GAME_ENDED_EVENT, onEnd);
+  try {
+    trackGameStart('word-wheel', {});
+    trackGameEnd('word-wheel', 10, 3, true, 60);
+    trackGameEnd('word-wheel', 10, 3, true, 60);
+    expect(onEnd).toHaveBeenCalledTimes(1);
+  } finally {
+    window.removeEventListener(GAME_ENDED_EVENT, onEnd);
+  }
+});

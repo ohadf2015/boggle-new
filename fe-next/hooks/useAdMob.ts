@@ -87,7 +87,7 @@ export interface ShowBannerOptions {
 }
 
 export function useAdMob() {
-  const { recordGameEnd, shouldShowInterstitial, recordInterstitialShown, hasNoAds, getConfig, whenReady, prepareInterstitial: prepareInterstitialAd, isInterstitialReady, consumeInterstitial, noteInterstitialTerminal } = useAdMobContext();
+  const { countGameEndAtAdBreak, recordRewardedShown, shouldShowInterstitial, recordInterstitialShown, hasNoAds, getConfig, whenReady, prepareInterstitial: prepareInterstitialAd, isInterstitialReady, consumeInterstitial, noteInterstitialTerminal } = useAdMobContext();
   const isDev = process.env.NODE_ENV !== 'production';
 
   const showRewarded = useCallback(async (onReward: () => void, onError?: (err: string) => void, opts?: ShowRewardedOptions) => {
@@ -305,14 +305,11 @@ export function useAdMob() {
       onError?.(msg);
     }
 
-    // Re-warm the cache after a granted reward. The preload-on-mount only fires
-    // once, so without this the SECOND opt-in would cold-load again and risk
-    // the same stall. Only on success: the consumed ad is gone, so there's no
-    // concurrent in-flight prepare to collide with. Fire-and-forget.
-    if (rewarded) {
-      void prepareAd().catch(() => {});
-    }
-  }, [hasNoAds, getConfig, whenReady]);
+    if (adShown) recordRewardedShown();
+    // Re-warm after every settled session, skip and no-fill included: the
+    // preload-on-mount fires once, so the next opt-in would otherwise cold-load.
+    void prepareAd().catch(() => {});
+  }, [hasNoAds, getConfig, whenReady, recordRewardedShown]);
 
   // Resolves when the interstitial dismisses, fails, or never serves.
   // Callers (e.g. MP host's "play again") await this so the next-round emit
@@ -322,7 +319,7 @@ export function useAdMob() {
   // Safety timeout caps the wait in case Dismissed never arrives — see the
   // INTERSTITIAL_*_TIMEOUT_MS constants at module scope.
   const showInterstitial = useCallback(async (): Promise<void> => {
-    recordGameEnd();
+    countGameEndAtAdBreak();
     if (!shouldShowInterstitial()) {
       // Not eligible this game — keep an ad warm for the next eligible slot so
       // the first/next interstitial shows with zero latency. No-op until warmup
@@ -491,7 +488,7 @@ export function useAdMob() {
         }
       })();
     });
-  }, [recordGameEnd, shouldShowInterstitial, recordInterstitialShown, getConfig, whenReady, prepareInterstitialAd, isInterstitialReady, consumeInterstitial, noteInterstitialTerminal]);
+  }, [countGameEndAtAdBreak, shouldShowInterstitial, recordInterstitialShown, getConfig, whenReady, prepareInterstitialAd, isInterstitialReady, consumeInterstitial, noteInterstitialTerminal]);
 
   const showBanner = useCallback(async (position = BannerAdPosition.BOTTOM_CENTER, margin?: number, opts?: ShowBannerOptions) => {
     if (hasNoAds()) return;
