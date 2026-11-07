@@ -78,8 +78,7 @@ export function QuickModeAdapter({ config, onDone, onQuit }: QuickModeAdapterPro
 
   // Wheel + word-hunt rivals are finished targets ("N points to pass Ada"), so
   // they need no per-tick pacing — unlike the classic/blast boards, which race
-  // them live on the MP leaderboard. Word hunt in particular has no round clock
-  // to pace against (it is life-drain survival, not a timer).
+  // them live on the MP leaderboard.
   const selfUsername = t('mp.rivals.you');
   const targetScore = roundTarget(config).score;
   const wheelRivals = useMemo(() => {
@@ -134,6 +133,7 @@ export function QuickModeAdapter({ config, onDone, onQuit }: QuickModeAdapterPro
             }
             onQuit={onQuit}
             quitStaysOnPage={true}
+            timeLimitSec={config.durationSec}
           />
         </div>
       );

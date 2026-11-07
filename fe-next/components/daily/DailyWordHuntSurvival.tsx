@@ -46,6 +46,8 @@ import { HuntFinishOverlay } from './survival/hunt/HuntFinishOverlay';
 import { HuntFeedbackPill } from './survival/hunt/HuntFeedbackPill';
 import { wordHuntSolveTier } from '@/shared/utils/wordHuntScoring';
 import { HuntHintSlots } from './survival/hunt/HuntHintSlots';
+import { HuntRoundClock } from './survival/hunt/HuntRoundClock';
+import { useGameTimer } from '@/hooks/useGameTimer';
 import PracticeCoachTip from '@/components/practice/PracticeCoachTip';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
 
@@ -82,6 +84,12 @@ interface DailyWordHuntSurvivalProps {
    * guard's phantom-history handling below — see the `leaving` comment.
    */
   quitStaysOnPage?: boolean;
+  /**
+   * Quick Play: the round lasts this many seconds. A clock takes the life
+   * bar's place and the round ends unsolved when it runs out. Undefined for
+   * the daily challenge, which is life-drain survival with no clock.
+   */
+  timeLimitSec?: number;
 }
 
 const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
@@ -98,6 +106,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   rivals,
   hideModeCoach = false,
   quitStaysOnPage = false,
+  timeLimitSec,
 }) => {
   const { t } = useLanguage();
   const inShell = useMediaQuery(SHELL_MEDIA);
@@ -133,6 +142,16 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     disableLifeDrain: practice,
   });
   extraLife.restoreRef.current = actions.restoreLife;
+
+  const timed = typeof timeLimitSec === 'number' && timeLimitSec > 0;
+  const { endRound } = actions;
+  const roundClock = useGameTimer({
+    initialTime: timed ? timeLimitSec : 0,
+    autoStart: timed,
+    // Stops on game over; holds while the quit dialog asks, like the life drain.
+    isPaused: !timed || state.isGameOver || state.showQuitConfirm,
+    onTimeUp: endRound,
+  });
 
   const extraLifeModalOpen = extraLife.offerOpen && state.lifePoints === 0 && !state.isGameOver;
 
@@ -288,6 +307,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       calm={skipAnimations}
       onSkip={actions.skipFinish}
       sourcePath={state.hasWon ? stage.path : undefined}
+      timedOut={timed && !state.hasWon && roundClock.remainingTime <= 0}
       t={t}
     />
   ) : null;
@@ -346,6 +366,16 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     />
   );
 
+  // A timed round has no life drain, so its bar would sit at 100 forever: the
+  // clock takes that slot instead.
+  const statusBar = timed ? (
+    <HuntRoundClock
+      remaining={roundClock.remainingTime}
+      total={timeLimitSec ?? 0}
+      label={t('gameShell.time')}
+    />
+  ) : lifeBar;
+
   // One tree for every screen; on desktop the GameShell frames it with rails.
   // pt-3 ensures game header doesn't overlap with the sticky app header on mobile
   return (
@@ -383,7 +413,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         isScoreAnimating={state.isScoreAnimating}
         onQuitClick={handleQuitClick}
         practice={practice}
-        center={inShell ? lifeBar : undefined}
+        center={inShell ? statusBar : undefined}
         t={t}
       />
 
@@ -409,26 +439,33 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         />
       </div>
 
-      <HuntFeedbackPill
-        seq={state.feedbackSeq}
-        type={state.feedbackType}
-        message={state.feedbackMessage}
-        word={state.feedbackWord}
-        calm={skipAnimations}
-      />
+      {/* A timed round needs every pixel for the board: the word stage above
+          the board already shows each verdict and its reason, and the hint
+          rows only take room once a hint is actually showing. */}
+      {!timed && (
+        <HuntFeedbackPill
+          seq={state.feedbackSeq}
+          type={state.feedbackType}
+          message={state.feedbackMessage}
+          word={state.feedbackWord}
+          calm={skipAnimations}
+        />
+      )}
 
-      <HuntHintSlots
-        showCategory={state.showCategory}
-        category={state.category}
-        showExample={state.showExample}
-        exampleSentence={state.exampleSentence}
-        targetWord={targetWord}
-        t={t}
-      />
+      {(!timed || state.showCategory || state.showExample) && (
+        <HuntHintSlots
+          showCategory={state.showCategory}
+          category={state.category}
+          showExample={state.showExample}
+          exampleSentence={state.exampleSentence}
+          targetWord={targetWord}
+          t={t}
+        />
+      )}
 
       {!inShell && (
-        <div data-testid="hunt-life-row" className="shrink-0 overflow-x-clip">
-          {lifeBar}
+        <div data-testid={timed ? 'hunt-clock-row' : 'hunt-life-row'} className="shrink-0 overflow-x-clip">
+          {statusBar}
         </div>
       )}
 
