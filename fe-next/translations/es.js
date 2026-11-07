@@ -21799,6 +21799,15 @@ const es = {
         "body": "Juega una ronda como estudiante junto a tu tablero, con jugadores de práctica. Solo lo ves tú.",
         "cta": "Pruébalo como estudiante"
       },
+      "loop": {
+        "playAgain": "Jugar otra vez",
+        "pickGame": "Elegir otro juego",
+        "loading": "Revisando tu última partida",
+        "ready": "{ready} de {total} listos para el examen",
+        "readyHint": "Ver qué palabras falló cada estudiante",
+        "readyEmpty": "Los resultados por palabra aparecen después de tu próxima partida",
+        "missed": "Faltaron: {count} · asignar tarea"
+      },
       "greetMorning": "Buenos días, {name}",
       "greetAfternoon": "Buenas tardes, {name}",
       "greetEvening": "Buenas noches, {name}",

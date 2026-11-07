@@ -34,6 +34,16 @@ describe('TeacherHomePreview', () => {
     expect(viewed).not.toHaveBeenCalled();
   });
 
+  it('Given the class desk state, Then the returning-teacher desk leads with Play again, the ready count and homework for absentees', () => {
+    render(<TeacherHomePreview state="classes" />);
+    const play = screen.getByTestId('home-play-again');
+    expect(play.getAttribute('href')).toContain('flow=quick');
+    expect(play.getAttribute('href')).toContain('mode=word-hunt');
+    expect(screen.queryByTestId('home-start-live')).toBeNull();
+    expect(screen.getByTestId('home-ready-chip')).toBeInTheDocument();
+    expect(screen.getByTestId('home-homework')).toBeInTheDocument();
+  });
+
   it('Given the class desk state, Then This week lists every class with the desk class pressed', () => {
     render(<TeacherHomePreview state="classes" />);
     const roster = within(screen.getByTestId('home-week')).getByTestId('home-week-classes');

@@ -21787,6 +21787,15 @@ const sv = {
         "body": "Spela en runda som elev precis bredvid din tavla, med övningsspelare. Bara du ser det.",
         "cta": "Testa som elev"
       },
+      "loop": {
+        "playAgain": "Spela igen",
+        "pickGame": "Välj ett annat spel",
+        "loading": "Kollar ert senaste spel",
+        "ready": "{ready} av {total} redo för provet",
+        "readyHint": "Se vilka ord varje elev missade",
+        "readyEmpty": "Resultat per ord visas efter nästa spel",
+        "missed": "{count} missade det · ge läxa"
+      },
       "greetMorning": "God morgon, {name}",
       "greetAfternoon": "God eftermiddag, {name}",
       "greetEvening": "God kväll, {name}",

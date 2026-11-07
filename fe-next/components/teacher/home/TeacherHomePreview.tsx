@@ -18,6 +18,9 @@ import { HomeOnboardingCard } from './HomeOnboardingCard';
 import { HomeSessionRail } from './HomeSessionRail';
 import { HomeWeekClasses } from './HomeWeekClasses';
 import { weekClassRows } from './weekClassRows';
+import { HomeWeekLoop } from './HomeWeekLoop';
+import { weekLoopFixture } from './weekLoopFixture';
+import { missedLastGame, playAgainTarget, readyForTest, replayDetail } from './weekLoopModel';
 
 export type TeacherHomePreviewState = 'classes' | 'empty' | 'loading';
 
@@ -55,7 +58,10 @@ export function TeacherHomePreview({ state }: { state: TeacherHomePreviewState }
   const selected = classes.find((c) => c.id === selectedId) ?? null;
 
   const summary = useMemo(() => summarizeTeacherWeek(activity(nowMs), CLASSES, nowMs), [nowMs]);
-  const roster = selected ? rosterRows(rosterFixture(selected.id, selected.member_count, nowMs), nowMs) : null;
+  const rosterInput = selected ? rosterFixture(selected.id, selected.member_count, nowMs) : null;
+  const roster = rosterInput ? rosterRows(rosterInput, nowMs) : null;
+  const loop = selected && rosterInput ? weekLoopFixture(selected.id, rosterInput, language, nowMs) : null;
+  const replay = loop && selected ? playAgainTarget({ game: loop.game, lessons: loop.lessons, classroomId: selected.id, locale: language }) : null;
 
   const lastPlayedIso = selected ? summary.lastPlayedAt[selected.id] : undefined;
   const lastPlayedMs = lastPlayedIso ? Date.parse(lastPlayedIso) : null;
@@ -93,6 +99,10 @@ export function TeacherHomePreview({ state }: { state: TeacherHomePreviewState }
               <HomeClassMeta previewIds={[]} memberCount={selected.member_count} played={lastPlayedIso} pending={false} failed={false} language={language} nowMs={nowMs} t={t} />
             }
             showCode
+            replay={replay ? { kind: 'ready', href: replay.href, detail: replayDetail(replay, t) } : undefined}
+            nudge={loop ? (
+              <HomeWeekLoop ready={readyForTest(loop.game)} missed={missedLastGame(loop.game)} reportsHref={`/${language}/teacher/reports`} locked onHomework={() => undefined} t={t} />
+            ) : undefined}
           />
         </div>
         <div data-tm>

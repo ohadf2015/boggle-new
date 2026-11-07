@@ -2,7 +2,7 @@
 
 import { useState, type ReactNode } from 'react';
 import Link from 'next/link';
-import { Check, ChevronDown, Loader2, Play, Projector } from 'lucide-react';
+import { Check, ChevronDown, Loader2, Play, Projector, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   DropdownMenu,
@@ -14,6 +14,9 @@ import { teacherHostHref } from '@/lib/education/teacherHostHref';
 import { HqProjectorSheet } from '@/components/teacher/hq/HqProjectorSheet';
 import { JoinCodeTile } from '@/components/teacher/hq/JoinCodeTile';
 import { NB_BLOCK, NB_PANEL, NB_PRIMARY, NB_SMALL } from '../nb/nbStyles';
+import { QUIET_LINK } from './homeStyles';
+
+const PRIMARY_SLOT = cn(NB_PRIMARY, 'min-h-[60px] w-full whitespace-nowrap text-2xl sm:w-auto sm:min-w-[16rem] @3xl/hero:w-full');
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -46,10 +49,14 @@ export interface HomeHeroProps {
   codeSlot?: ReactNode;
   /** Free-plan class count ("2 of 3 free classes used"), shown inside the class menu; omit for Pro. */
   capLabel?: string;
+  /** A class that already played: Play again (last mode, this week's list) takes the primary slot. */
+  replay?: HomeReplay;
 }
 
+export type HomeReplay = { kind: 'pending' } | { kind: 'ready'; href: string; detail: string };
+
 /** The class desk: which class, its join code at a glance, and the one Start button. */
-export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, t, rehearse, nudge, meta, insight, corner, showCode = true, codeSlot, capLabel }: HomeHeroProps) {
+export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, t, rehearse, nudge, meta, insight, corner, showCode = true, codeSlot, capLabel, replay }: HomeHeroProps) {
   const selected = classrooms.find((c) => c.id === selectedId) ?? classrooms[0];
   const [pending, setPending] = useState(false);
   const [projectorOpen, setProjectorOpen] = useState(false);
@@ -113,26 +120,65 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
           data-testid="home-hero-start-row"
           className="flex flex-col items-stretch gap-1 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-4 sm:gap-y-2 @3xl/hero:col-start-1 @3xl/hero:row-start-2 @3xl/hero:flex-col @3xl/hero:items-stretch @3xl/hero:self-end"
         >
-          <Link
-            href={teacherHostHref(language, { classroomId: selected?.id })}
-            data-testid="home-start-live"
-            data-magnet
-            aria-busy={pending || undefined}
-            onClick={() => {
-              setPending(true);
-              onStart?.();
-            }}
-            className={cn(NB_PRIMARY, 'group animate-edu-shine min-h-[60px] w-full whitespace-nowrap text-2xl sm:w-auto sm:min-w-[16rem] @3xl/hero:w-full')}
-          >
-            <span aria-hidden="true" className="edu-shine-track" />
-            {pending ? (
-              <Loader2 className="size-5 animate-spin motion-reduce:animate-none" aria-hidden="true" />
-            ) : (
-              <Play className="edu-wiggle-on-hover size-6 fill-current" aria-hidden="true" />
-            )}
-            {t('eduShell.home.startLive')}
-          </Link>
-          {rehearse ? <div className="flex justify-center sm:justify-start @3xl/hero:justify-center">{rehearse}</div> : null}
+          {replay?.kind === 'pending' ? (
+            <div data-testid="home-start-pending" aria-busy="true" className={cn(PRIMARY_SLOT, 'cursor-progress opacity-80')}>
+              <Loader2 className="size-6 animate-spin motion-reduce:animate-none" aria-hidden="true" />
+              <span className="sr-only">{t('eduShell.home.loop.loading')}</span>
+            </div>
+          ) : replay?.kind === 'ready' ? (
+            <Link
+              href={replay.href}
+              data-testid="home-play-again"
+              data-magnet
+              aria-busy={pending || undefined}
+              onClick={() => {
+                setPending(true);
+                onStart?.();
+              }}
+              className={cn(PRIMARY_SLOT, 'group animate-edu-shine')}
+            >
+              <span aria-hidden="true" className="edu-shine-track" />
+              {pending ? (
+                <Loader2 className="size-5 shrink-0 animate-spin motion-reduce:animate-none" aria-hidden="true" />
+              ) : (
+                <RotateCcw className="edu-wiggle-on-hover size-6 shrink-0" strokeWidth={3} aria-hidden="true" />
+              )}
+              <span className="flex min-w-0 flex-col items-start leading-tight">
+                <span>{t('eduShell.home.loop.playAgain')}</span>
+                {replay.detail ? <span data-testid="home-play-again-detail" className="max-w-full truncate font-neo-body text-sm font-bold opacity-80">{replay.detail}</span> : null}
+              </span>
+            </Link>
+          ) : (
+            <Link
+              href={teacherHostHref(language, { classroomId: selected?.id })}
+              data-testid="home-start-live"
+              data-magnet
+              aria-busy={pending || undefined}
+              onClick={() => {
+                setPending(true);
+                onStart?.();
+              }}
+              className={cn(PRIMARY_SLOT, 'group animate-edu-shine')}
+            >
+              <span aria-hidden="true" className="edu-shine-track" />
+              {pending ? (
+                <Loader2 className="size-5 animate-spin motion-reduce:animate-none" aria-hidden="true" />
+              ) : (
+                <Play className="edu-wiggle-on-hover size-6 fill-current" aria-hidden="true" />
+              )}
+              {t('eduShell.home.startLive')}
+            </Link>
+          )}
+          {rehearse || replay?.kind === 'ready' ? (
+            <div className="flex flex-wrap items-center justify-center gap-x-3 sm:justify-start @3xl/hero:justify-center">
+              {replay?.kind === 'ready' ? (
+                <Link href={teacherHostHref(language, { classroomId: selected?.id })} data-testid="home-pick-game" className={cn(QUIET_LINK, 'text-white/90 hover:text-white')}>
+                  {t('eduShell.home.loop.pickGame')}
+                </Link>
+              ) : null}
+              {rehearse}
+            </div>
+          ) : null}
         </div>
 
         {codeSlot || !insight ? null : <div className="max-sm:hidden @3xl/hero:col-span-2 [@media(max-height:780px)]:hidden">{insight}</div>}
