@@ -112,17 +112,18 @@ describe('TeacherProfilePageClient', () => {
   test('shows total student count across all classrooms', () => {
     render(<TeacherProfilePageClient />);
     // 12 + 8 = 20 total students
-    expect(screen.getByTestId('total-student-count')).toBeInTheDocument();
+    expect(screen.getByTestId('total-student-count')).toHaveTextContent('20');
   });
 
-  test('shows contact admin section', () => {
+  test('offers the school plan, not an admin-access help box', () => {
     render(<TeacherProfilePageClient />);
-    expect(screen.getByTestId('contact-admin-section')).toBeInTheDocument();
+    expect(screen.getByTestId('contact-admin-section')).toHaveTextContent('teacher.profile.schoolTitle');
   });
 
-  test('shows user role status', () => {
+  test('shows the email once, in the header, with no separate role card', () => {
     render(<TeacherProfilePageClient />);
-    expect(screen.getByTestId('user-role-status')).toBeInTheDocument();
+    expect(screen.getAllByTestId('teacher-email')).toHaveLength(1);
+    expect(screen.queryByTestId('user-role-status')).not.toBeInTheDocument();
   });
 
   test('redirects to the education access page when not authenticated', () => {

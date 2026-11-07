@@ -14554,10 +14554,10 @@ const he = {
     "profile": {
       "teacherBadge": "מורה",
       "classrooms": "כיתות",
-      "totalStudents": "סה\"כ תלמידים",
-      "roleStatus": "תפקיד",
-      "contactAdmin": "צריכים עזרה?",
-      "contactAdminDesc": "לעדכון הגישה או התפקיד, פנו למנהל. חשבונות מורים מוקצים על ידי מנהלי בית הספר.",
+      "totalStudents": "תלמידים",
+      "schoolTitle": "רוצים שבית הספר ישלם?",
+      "schoolBody": "בית הספר יכול לקנות Pro בשבילכם ובשביל הצוות. הצעת מחיר אחת במייל, בלי שיחת מכירה.",
+      "schoolCta": "תוכניות לבתי ספר",
       "avatar": "אווטאר מורה"
     },
     "districtBanner": {
@@ -21112,6 +21112,7 @@ const he = {
       "schoolF2": "הצעת מחיר במייל, בלי שיחת מכירה",
       "schoolF3": "התלמידים תמיד בחינם, בלי פרסומות",
       "askSchool": "רוצים שבית הספר ישלם?",
+      "moreFeatures": "עוד {count} ב-Pro",
       "featureParentPack": "קישורי דוח להורים לכל הכיתה בלחיצה אחת"
     },
     "preCheckout": {

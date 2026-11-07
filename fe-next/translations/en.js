@@ -12830,11 +12830,11 @@ const en = {
     "accessDenied": "Only teacher accounts can open this page.",
     "profile": {
       "teacherBadge": "Teacher",
-      "classrooms": "Classrooms",
-      "totalStudents": "Total students",
-      "roleStatus": "Role",
-      "contactAdmin": "Need help?",
-      "contactAdminDesc": "To update your teacher access or role, contact your administrator. Teacher accounts are granted by school administrators.",
+      "classrooms": "Classes",
+      "totalStudents": "Students",
+      "schoolTitle": "Want your school to pay?",
+      "schoolBody": "Your school can buy Pro for you and your colleagues. One quote by email, no sales call.",
+      "schoolCta": "Plans for schools",
       "avatar": "Teacher avatar"
     },
     "districtBanner": {
@@ -20227,6 +20227,7 @@ const en = {
       "schoolF2": "Quote by email, no sales call needed",
       "schoolF3": "Students always free, never see ads",
       "askSchool": "Want your school to pay?",
+      "moreFeatures": "{count} more in Pro",
       "featureParentPack": "Parent report links for a whole class in one click"
     },
     "preCheckout": {

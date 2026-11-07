@@ -1,7 +1,7 @@
 /**
  * Teacher Profile Page
  *
- * Shows teacher name, classroom/student counts, role status, and contact admin info.
+ * Who you are (name, email, classes, students), your plan, and how to get your school to pay.
  */
 
 'use client';
@@ -18,11 +18,10 @@ import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import SubscriptionStatusCard from '@/components/teacher/SubscriptionStatusCard';
 import { cn } from '@/lib/utils';
 import { useTeacherReveal } from '@/components/teacher/motion/useTeacherReveal';
-import { ArrowRight, GraduationCap, Users, BookOpen, Mail, ShieldCheck } from 'lucide-react';
+import { ArrowRight, BookOpen, School, Users } from 'lucide-react';
+import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
+import { NB_BLOCK, NB_PANEL, NB_SMALL, NB_STICKER } from '@/components/teacher/nb/nbStyles';
 import { trackForSchoolsClick } from '@/components/education/ForSchoolsLink';
-
-const REPORT_CARD =
-  'rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light p-5 text-neo-white shadow-hard';
 
 function TeacherProfileInner() {
   const { user, profile, loading } = useAuth();
@@ -81,149 +80,66 @@ function TeacherProfileInner() {
   }
 
   const displayName = profile?.display_name || profile?.username || t('common.guest');
-  const userRole = profile?.user_role || (profile?.is_admin ? 'teacher' : 'student');
+  const usage = !classroomsLoading ? t('eduShell.setup.capMeter', { count: classrooms.length, limit: FREE_TIER_LIMITS.classes }) : undefined;
 
   return (
-    <div ref={revealRef} data-testid="teacher-profile-page" className="w-full max-w-3xl mx-auto space-y-6">
-      {/* Profile Header */}
-      <div data-tm className={cn(REPORT_CARD, 'p-6')}>
-        <div className="flex flex-wrap items-center gap-4">
-          <Avatar
-            customAvatar={profile?.avatar_config ?? null}
-            userId={user?.id}
-            size="xl"
-            className="shrink-0"
-          />
-
-          <div className="min-w-0 flex-1">
-            <h1
-              data-testid="teacher-display-name"
-              className="text-2xl sm:text-3xl font-neo-display font-bold text-neo-white break-words"
-            >
-              {displayName}
-            </h1>
-            <div className="flex flex-wrap items-center gap-2 mt-2">
-              <div className="px-3 py-1 bg-neo-cyan text-neo-black font-bold text-xs rounded-neo border-2 border-neo-black uppercase tracking-wide">
-                {t('teacher.profile.teacherBadge')}
-              </div>
-              {user.email && (
-                <span className="inline-flex items-center gap-1.5 text-sm font-bold text-neo-cream/70">
-                  <GraduationCap className="w-4 h-4 text-neo-cyan shrink-0" aria-hidden="true" />
-                  <span>{user.email}</span>
-                </span>
-              )}
+    <div ref={revealRef} data-testid="teacher-profile-page" className="mx-auto flex w-full max-w-3xl flex-col gap-5">
+      {/* Who you are, once: name, email and your classes in one header. */}
+      <section data-tm className={cn(NB_PANEL, 'flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:p-6')}>
+        <div className="flex min-w-0 flex-1 items-center gap-4">
+          <Avatar customAvatar={profile?.avatar_config ?? null} userId={user?.id} size="xl" className="shrink-0" />
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 data-testid="teacher-display-name" className="break-words font-neo-display text-2xl font-black leading-tight text-neo-cream sm:text-3xl">
+                {displayName}
+              </h1>
+              <span className={cn(NB_STICKER, NB_BLOCK.cyan)}>{t('teacher.profile.teacherBadge')}</span>
             </div>
+            {user.email ? (
+              <p data-testid="teacher-email" className="mt-1 break-all font-neo-body text-sm font-bold text-neo-cream/80">{user.email}</p>
+            ) : null}
           </div>
         </div>
+        <dl className="grid shrink-0 grid-cols-2 gap-2 sm:w-56">
+          {[
+            { id: 'classroom-count', icon: BookOpen, label: t('teacher.profile.classrooms'), value: classrooms.length },
+            { id: 'total-student-count', icon: Users, label: t('teacher.profile.totalStudents'), value: totalStudents },
+          ].map(({ id, icon: Icon, label, value }) => (
+            <div key={id} className="rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy px-3 py-2">
+              <dt className="flex items-center gap-1 font-neo-body text-xs font-bold text-neo-cream/80">
+                <Icon className="size-3.5 shrink-0 text-neo-cyan" aria-hidden="true" />
+                {label}
+              </dt>
+              <dd data-testid={id} className="font-neo-display text-3xl font-black tabular-nums text-neo-cream">
+                {classroomsLoading ? <span className="inline-block h-8 w-8 animate-pulse rounded bg-neo-cream/15 motion-reduce:animate-none" /> : value}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
+      <div data-tm>
+        <SubscriptionStatusCard usage={usage} />
       </div>
 
-      {/* Stats Grid */}
-      <div data-tm className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {classroomsLoading ? (
-          <>
-            {['a', 'b', 'c'].map((id) => (
-              <div key={`skeleton-${id}`} className={cn(REPORT_CARD, 'animate-pulse')}>
-                <div className="h-4 w-24 bg-neo-cream/10 rounded mb-3" />
-                <div className="h-9 w-16 bg-neo-cream/20 rounded" />
-              </div>
-            ))}
-          </>
-        ) : (
-          <>
-            {/* Classroom count */}
-            <div className={REPORT_CARD}>
-              <div className="flex items-center gap-2 mb-2 text-neo-cream/70 font-bold text-xs uppercase tracking-wide">
-                <BookOpen className="w-4 h-4 text-neo-cyan shrink-0" aria-hidden="true" />
-                <span>{t('teacher.profile.classrooms')}</span>
-              </div>
-              <div
-                data-testid="classroom-count"
-                className="text-3xl sm:text-4xl font-neo-display font-black text-neo-white tabular-nums"
-              >
-                {classrooms.length}
-              </div>
-            </div>
-
-            {/* Student count */}
-            <div className={REPORT_CARD}>
-              <div className="flex items-center gap-2 mb-2 text-neo-cream/70 font-bold text-xs uppercase tracking-wide">
-                <Users className="w-4 h-4 text-neo-lime shrink-0" aria-hidden="true" />
-                <span>{t('teacher.profile.totalStudents')}</span>
-              </div>
-              <div
-                data-testid="total-student-count"
-                className="text-3xl sm:text-4xl font-neo-display font-black text-neo-white tabular-nums"
-              >
-                {totalStudents}
-              </div>
-            </div>
-
-            {/* Role status */}
-            <div className={REPORT_CARD}>
-              <div className="flex items-center gap-2 mb-2 text-neo-cream/70 font-bold text-xs uppercase tracking-wide">
-                <ShieldCheck className="w-4 h-4 text-neo-cyan shrink-0" aria-hidden="true" />
-                <span>{t('teacher.profile.roleStatus')}</span>
-              </div>
-              <div
-                data-testid="user-role-status"
-                className="text-xl font-neo-display font-bold text-neo-white capitalize"
-              >
-                {userRole}
-              </div>
-            </div>
-          </>
-        )}
-      </div>
-
-      {/* Subscription Status Card */}
-      <div>
-        <SubscriptionStatusCard />
-      </div>
-
-      {/* School / District Contact Admin Section */}
-      <div
-        data-testid="contact-admin-section"
-        className="p-5 sm:p-6 bg-neo-navy-light border-2 border-neo-cyan rounded-neo-lg shadow-hard text-neo-white"
-      >
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-start gap-3.5">
-            <div className="w-11 h-11 rounded-neo bg-neo-cyan/15 border-2 border-neo-cyan flex items-center justify-center shrink-0">
-              <Mail className="w-5 h-5 text-neo-cyan" aria-hidden="true" />
-            </div>
-            <div>
-              <h2 className="text-lg font-neo-display font-bold text-neo-white mb-1">
-                {t('teacher.profile.contactAdmin')}
-              </h2>
-              <p className="text-neo-cream/70 font-bold text-sm leading-relaxed">
-                {t('teacher.profile.contactAdminDesc')}
-              </p>
-            </div>
-          </div>
-          <Link
-            href={`/${language}/education/for-schools`}
-            onClick={() => trackForSchoolsClick('teacher_profile')}
-            className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-neo border-2 border-neo-black bg-neo-cyan px-4 py-2 font-neo-display text-sm font-black uppercase text-neo-black shadow-hard-sm transition hover:-translate-y-0.5 hover:shadow-hard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white"
-          >
-            <span>{t('teacher.profile.contactAdmin')}</span>
-            <DirectionalIcon icon={ArrowRight} className="w-4 h-4" />
-          </Link>
+      {/* The one other thing a teacher comes here for: getting the school to pay. */}
+      <section data-tm data-testid="contact-admin-section" className={cn(NB_PANEL, 'flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:gap-4')}>
+        <span aria-hidden="true" className={cn('grid size-11 shrink-0 place-items-center rounded-neo border-[3px] shadow-hard', NB_BLOCK.purple)}>
+          <School className="size-5" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <h2 className="font-neo-display text-lg font-black leading-tight text-neo-cream">{t('teacher.profile.schoolTitle')}</h2>
+          <p className="mt-0.5 font-neo-body text-sm font-semibold leading-snug text-neo-cream/80">{t('teacher.profile.schoolBody')}</p>
         </div>
-      </div>
-
-      {/* Account Info */}
-      {user.email && (
-        <div className={cn(REPORT_CARD, 'divide-y divide-neo-cream/20')}>
-          <div className="flex items-center gap-3">
-            <GraduationCap className="w-5 h-5 text-neo-cyan shrink-0" aria-hidden="true" />
-            <div>
-              <p className="text-neo-cream/70 text-xs font-bold uppercase mb-0.5">
-                {t('common.email')}
-              </p>
-              <p className="text-neo-white font-bold">{user.email}</p>
-            </div>
-          </div>
-        </div>
-      )}
+        <Link
+          href={`/${language}/education/for-schools`}
+          onClick={() => trackForSchoolsClick('teacher_profile')}
+          className={cn(NB_SMALL, NB_BLOCK.cream, 'shrink-0 self-start sm:self-center')}
+        >
+          {t('teacher.profile.schoolCta')}
+          <DirectionalIcon icon={ArrowRight} className="size-4" />
+        </Link>
+      </section>
     </div>
   );
 }

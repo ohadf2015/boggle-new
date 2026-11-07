@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Check, Sparkles, School, Loader2 } from 'lucide-react';
+import { Check, ChevronDown, Sparkles, School, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
@@ -36,6 +36,9 @@ export interface UpgradePlanCardsProps {
   accessTrialEnded?: boolean;
 }
 
+/** Pro's strongest four outcomes stay in view; the rest fold under "N more". */
+export const PRO_FEATURES_SHOWN = 4;
+
 const BTN =
   'inline-flex min-h-12 w-full items-center justify-center rounded-neo border-3 border-neo-black px-4 font-neo-display text-base font-black shadow-hard transition-transform hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan disabled:cursor-wait disabled:opacity-70 motion-reduce:transition-none';
 
@@ -60,23 +63,52 @@ function BestFor({ text, dark }: { text: string; dark?: boolean }) {
   );
 }
 
-function FeatureList({ items, dark }: { items: Array<{ label: string }>; dark?: boolean }) {
+function FeatureRow({ label, dark }: { label: string; dark?: boolean }) {
   return (
-    <ul className="mt-3 space-y-1.5">
-      {items.map((f) => (
-        <li key={f.label} className="flex items-start gap-2">
-          <span
+    <li className="flex items-start gap-2">
+      <span
+        className={cn(
+          'mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded border-2 border-neo-black',
+          dark ? 'bg-neo-black' : 'bg-neo-lime',
+        )}
+      >
+        <Check className={cn('h-3 w-3', dark ? 'text-neo-yellow' : 'text-neo-black')} strokeWidth={3} aria-hidden />
+      </span>
+      <span className={cn('text-sm font-bold leading-snug', dark ? 'text-neo-black' : 'text-neo-white')}>{label}</span>
+    </li>
+  );
+}
+
+/**
+ * The first `visible` items show; the rest fold under "N more", so the three cards and their
+ * buttons fit one screen and the list still has every feature one tap away.
+ */
+function FeatureList({ items, dark, visible }: { items: Array<{ label: string }>; dark?: boolean; visible?: number }) {
+  const { t } = useLanguage();
+  const shown = visible === undefined ? items : items.slice(0, visible);
+  const rest = visible === undefined ? [] : items.slice(visible);
+  return (
+    <>
+      <ul className="mt-3 space-y-1.5">
+        {shown.map((f) => <FeatureRow key={f.label} label={f.label} dark={dark} />)}
+      </ul>
+      {rest.length > 0 ? (
+        <details data-testid="plan-more-features" className="group mt-1.5">
+          <summary
             className={cn(
-              'mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded border-2 border-neo-black',
-              dark ? 'bg-neo-black' : 'bg-neo-lime',
+              'inline-flex min-h-11 cursor-pointer list-none items-center gap-1 rounded-neo font-neo-body text-sm font-black underline decoration-2 underline-offset-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan [&::-webkit-details-marker]:hidden',
+              dark ? 'text-neo-black' : 'text-neo-white',
             )}
           >
-            <Check className={cn('h-3 w-3', dark ? 'text-neo-yellow' : 'text-neo-black')} strokeWidth={3} aria-hidden />
-          </span>
-          <span className={cn('text-sm font-bold leading-snug', dark ? 'text-neo-black' : 'text-neo-white')}>{f.label}</span>
-        </li>
-      ))}
-    </ul>
+            {t('eg2Pro.plans.moreFeatures', { count: rest.length })}
+            <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180 motion-reduce:transition-none" aria-hidden />
+          </summary>
+          <ul className="mt-1 space-y-1.5">
+            {rest.map((f) => <FeatureRow key={f.label} label={f.label} dark={dark} />)}
+          </ul>
+        </details>
+      ) : null}
+    </>
   );
 }
 
@@ -208,7 +240,7 @@ export function UpgradePlanCards({
           )}
         </div>
         <BestFor text={t('eg2Pro.plans.proBestFor')} dark />
-        <FeatureList items={proFeatures.map((label) => ({ label }))} dark />
+        <FeatureList items={proFeatures.map((label) => ({ label }))} dark visible={PRO_FEATURES_SHOWN} />
       </article>
 
       <article
