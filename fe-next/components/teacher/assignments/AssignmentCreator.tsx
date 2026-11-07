@@ -18,14 +18,14 @@ import {
   DialogContent,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Swords, BookOpen } from 'lucide-react';
+import { Swords, BookOpen, ChevronDown, LayoutTemplate } from 'lucide-react';
+import { NB_ADVANCED, NB_LINK, NB_PRIMARY, NB_SECONDARY } from '../nb/nbStyles';
 import { AssignmentWordcraftOption } from './AssignmentWordcraftOption';
 import { contentLanguagesFor } from '@/components/education/pickers/ContentLanguageChips';
 import { wordCraftHomeworkSupports } from '@/lib/word-craft/lessonBag';
 import { AssignmentCreatorDueDate, assignmentSubmitHintKey } from './AssignmentCreatorDueDate';
 import { AssignmentStep } from './AssignmentStep';
 import { AssignmentLessonStep } from './AssignmentLessonStep';
-import { Button } from '@/components/ui/button';
 import toast from 'react-hot-toast';
 import {
   VOCAB_FOCUSES,
@@ -341,15 +341,15 @@ export default function AssignmentCreator({
           />
         ) : (
         <div className="space-y-4">
-            <Button
+            <button
               type="button"
-              variant="outline"
               data-testid="assignment-browse-templates"
               onClick={() => setGalleryOpen(true)}
-              className="w-full border-neo-cyan text-neo-cyan hover:bg-neo-cyan/20"
+              className={cn(NB_LINK, '-ms-2 -mt-1')}
             >
+              <LayoutTemplate className="size-4" aria-hidden="true" />
               {t('teacher.assignment.galleryBrowse')}
-            </Button>
+            </button>
             {!isWordGoal && (
             <AssignmentLessonStep
               lessons={lessons}
@@ -375,45 +375,57 @@ export default function AssignmentCreator({
 
             <AssignmentStep step="mode" n={3} label={t('teacher.assignment.typeLabel')}>
               <AssignmentWordcraftOption selected={selectedType === 'wordcraft'} disabled={!wordcraftOk} onSelect={() => setSelectedType('wordcraft')} t={t} />
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setSelectedType('practice')}
-                  className={cn(
-                    'px-4 py-3 rounded-neo border-neo transition',
-                    'flex items-center justify-center gap-2',
-                    selectedType === 'practice'
-                      ? 'bg-neo-cyan border-neo-cyan text-neo-black shadow-hard-sm'
-                      : 'bg-neo-navy/50 border-neo-black text-neo-white hover:bg-neo-navy/80'
-                  )}
-                >
-                  <BookOpen className="w-6 h-6 shrink-0" aria-hidden="true" />
-                  <span className="font-bold">{t('teacher.assignment.practiceMode')}</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSelectedType('duel')}
-                  className={cn(
-                    'px-4 py-3 rounded-neo border-neo transition',
-                    'flex items-center justify-center gap-2',
-                    selectedType === 'duel'
-                      ? 'bg-neo-pink border-neo-pink text-neo-black shadow-hard-sm'
-                      : 'bg-neo-navy/50 border-neo-black text-neo-white hover:bg-neo-navy/80'
-                  )}
-                >
-                  <Swords className="w-6 h-6 shrink-0" aria-hidden="true" />
-                  <span className="font-bold">{t('teacher.assignment.duelChallenge')}</span>
-                </button>
-              </div>
-              <AssignmentGoalModes
-                selectedType={selectedType}
-                onSelect={(kind) => setSelectedType(kind)}
-                wordCount={wordCount}
-                onWordCount={setWordCount}
-                wordListRaw={wordListRaw}
-                onWordListRaw={setWordListRaw}
-                t={t}
-              />
+              <details
+                data-testid="assignment-more-types"
+                open={selectedType !== 'wordcraft' || undefined}
+                className="group mt-3"
+              >
+                <summary className={cn(NB_ADVANCED, 'cursor-pointer list-none [&::-webkit-details-marker]:hidden')}>
+                  {t('teacher.assignment.otherTypes')}
+                  <ChevronDown className="size-5 shrink-0 transition-transform group-open:rotate-180 motion-reduce:transition-none" aria-hidden="true" />
+                </summary>
+                <div className="mt-3 flex flex-col gap-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedType('practice')}
+                      className={cn(
+                        'px-4 py-3 rounded-neo border-neo transition',
+                        'flex items-center justify-center gap-2',
+                        selectedType === 'practice'
+                          ? 'bg-neo-cyan border-neo-cyan text-neo-black shadow-hard-sm'
+                          : 'bg-neo-navy/50 border-neo-cream/50 text-neo-white hover:bg-neo-navy/80'
+                      )}
+                    >
+                      <BookOpen className="w-6 h-6 shrink-0" aria-hidden="true" />
+                      <span className="font-bold">{t('teacher.assignment.practiceMode')}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedType('duel')}
+                      className={cn(
+                        'px-4 py-3 rounded-neo border-neo transition',
+                        'flex items-center justify-center gap-2',
+                        selectedType === 'duel'
+                          ? 'bg-neo-pink border-neo-pink text-neo-black shadow-hard-sm'
+                          : 'bg-neo-navy/50 border-neo-cream/50 text-neo-white hover:bg-neo-navy/80'
+                      )}
+                    >
+                      <Swords className="w-6 h-6 shrink-0" aria-hidden="true" />
+                      <span className="font-bold">{t('teacher.assignment.duelChallenge')}</span>
+                    </button>
+                  </div>
+                  <AssignmentGoalModes
+                    selectedType={selectedType}
+                    onSelect={(kind) => setSelectedType(kind)}
+                    wordCount={wordCount}
+                    onWordCount={setWordCount}
+                    wordListRaw={wordListRaw}
+                    onWordListRaw={setWordListRaw}
+                    t={t}
+                  />
+                </div>
+              </details>
             </AssignmentStep>
 
             {/* Vocabulary focus (practice only, once a lesson is chosen) */}
@@ -425,20 +437,21 @@ export default function AssignmentCreator({
               <AssignmentCreatorDueDate value={dueDate} onChange={setDueDate} />
             </AssignmentStep>
 
-            {/* Optional Instructions */}
-            <div>
-              <label className="block text-sm font-neo-body text-neo-white mb-2">
-                {t('teacher.assignment.instructionsLabel')} {t('common.optional')}
-              </label>
+            {/* Optional note: most homework goes out without one. */}
+            <details data-testid="assignment-note" open={instructions ? true : undefined} className="group">
+              <summary className={cn(NB_ADVANCED, 'cursor-pointer list-none [&::-webkit-details-marker]:hidden')}>
+                {t('teacher.assignment.addNote')}
+                <ChevronDown className="size-5 shrink-0 transition-transform group-open:rotate-180 motion-reduce:transition-none" aria-hidden="true" />
+              </summary>
               <textarea
                 value={instructions}
                 onChange={(e) => setInstructions(e.target.value)}
                 rows={2}
                 aria-label={t('teacher.assignment.instructionsLabel')}
-                className="w-full p-3 rounded-neo border-neo border-neo-cream/40 bg-neo-navy text-neo-white font-neo-body resize-none"
+                className="mt-3 w-full resize-none rounded-neo-lg border-[3px] border-neo-cream/40 bg-neo-navy p-3 font-neo-body text-neo-white"
                 placeholder={t('teacher.assignment.instructionsPlaceholder')}
               />
-            </div>
+            </details>
 
             {/* Actions */}
             {submitHint && (
@@ -452,22 +465,19 @@ export default function AssignmentCreator({
               </p>
             )}
             <div data-testid="assignment-actions" className="sticky -bottom-6 z-10 -mx-6 -mb-6 flex gap-3 border-t-2 border-neo-cream/60 bg-neo-navy px-6 pb-6 pt-4">
-              <Button
+              <button
+                type="button"
                 onClick={handleSubmit}
+                data-testid="assignment-submit"
                 aria-describedby={submitHint ? 'assignment-submit-hint' : undefined}
                 disabled={isSubmitting || (!isWordGoal && !selectedLessonId) || !dueDate}
-                className="flex-1 bg-neo-cyan text-neo-black font-bold shadow-hard hover:shadow-hard-pressed disabled:opacity-50"
+                className={cn(NB_PRIMARY, 'min-w-0 flex-1 text-lg disabled:opacity-50')}
               >
                 {isSubmitting ? t('teacher.assignment.creating') : t('teacher.assignment.create')}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={onClose}
-                disabled={isSubmitting}
-                className="border-neo-pink text-neo-pink hover:bg-neo-pink/20"
-              >
+              </button>
+              <button type="button" onClick={onClose} disabled={isSubmitting} className={cn(NB_SECONDARY, 'shrink-0')}>
                 {t('common.cancel')}
-              </Button>
+              </button>
             </div>
         </div>
         )}
