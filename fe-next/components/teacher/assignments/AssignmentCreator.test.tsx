@@ -287,3 +287,26 @@ describe('AssignmentCreator — free-tier assignment cap', () => {
     expect(screen.queryByTestId('assignment-limit-upsell')).toBeNull();
   });
 });
+
+describe('AssignmentCreator keeps the rare choices folded', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    (useAssignments as Mock).mockReturnValue({ createAssignment: mockCreateAssignment });
+  });
+
+  it('Given a new assignment, Then WordCraft leads and the other types and the note wait behind closed folds', () => {
+    render(<AssignmentCreator classroomId="classroom-1" onComplete={mockOnComplete} isOpen={true} onClose={mockOnClose} />);
+    const types = screen.getByTestId('assignment-more-types');
+    expect(types.tagName.toLowerCase()).toBe('details');
+    expect(types).not.toHaveAttribute('open');
+    expect(within(types).getByText('teacher.assignment.practiceMode')).toBeInTheDocument();
+    expect(screen.getByTestId('assignment-note')).not.toHaveAttribute('open');
+    expect(screen.getByTestId('assignment-submit')).toHaveTextContent('teacher.assignment.create');
+  });
+
+  it('When the teacher picks Practice, Then its fold stays open so the choice is visible', () => {
+    render(<AssignmentCreator classroomId="classroom-1" onComplete={mockOnComplete} isOpen={true} onClose={mockOnClose} />);
+    fireEvent.click(screen.getByText('teacher.assignment.practiceMode'));
+    expect(screen.getByTestId('assignment-more-types')).toHaveAttribute('open');
+  });
+});
