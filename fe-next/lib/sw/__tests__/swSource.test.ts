@@ -145,7 +145,7 @@ function runSwInSandbox(opts: { fetchImpl: (req: MockRequest) => Promise<MockRes
     return responded ?? Promise.reject(new Error('event not handled (no respondWith)'));
   };
 
-  return { dispatchFetch, store };
+  return { dispatchFetch, store, handlers };
 }
 
 describe('swSource — dictionary offline-first behavior', () => {
@@ -211,5 +211,92 @@ describe('swSource — chunk recovery (t_9cc3561f)', () => {
     };
     const res = await dispatchFetch(req);
     expect(res._body).toBe('<html>fresh</html>');
+  });
+});
+
+
+describe('swSource — install stays light, warm is one locale at a time', () => {
+  it('install fetches no page shells (only the critical static assets)', async () => {
+    const fetched: string[] = [];
+    const { handlers } = runSwInSandbox({
+      fetchImpl: (req) => {
+        fetched.push(typeof req === 'string' ? req : req.url);
+        return Promise.resolve(mockResponse('<html></html>'));
+      },
+    });
+    let pending: Promise<unknown> = Promise.resolve();
+    handlers.install({ waitUntil: (p: Promise<unknown>) => { pending = p; } });
+    await pending;
+    expect(fetched).toEqual([]);
+  });
+
+  it('WARM_SHELLS caches only the asked locale, one fetch in flight at a time', async () => {
+    const fetched: string[] = [];
+    let inFlight = 0;
+    let maxInFlight = 0;
+    const { handlers, store } = runSwInSandbox({
+      fetchImpl: async (req) => {
+        const url = typeof req === 'string' ? req : req.url;
+        fetched.push(url);
+        inFlight += 1;
+        maxInFlight = Math.max(maxInFlight, inFlight);
+        await new Promise((r) => setTimeout(r, 1));
+        inFlight -= 1;
+        return mockResponse('<html>' + url + '</html>');
+      },
+    });
+    let pending: Promise<unknown> = Promise.resolve();
+    handlers.message({
+      data: { type: 'WARM_SHELLS', locale: 'he' },
+      waitUntil: (p: Promise<unknown>) => { pending = p; },
+    });
+    await pending;
+    expect(maxInFlight).toBe(1);
+    expect(fetched).toContain('/');
+    expect(fetched).toContain('/he');
+    expect(fetched).toContain('/he/daily');
+    expect(fetched.every((u) => u === '/' || u.startsWith('/he'))).toBe(true);
+    expect(fetched.length).toBe(12);
+    expect(store.get('/he/daily')?._body).toBe('<html>/he/daily</html>');
+  });
+
+  it('a second WARM_SHELLS skips shells already cached', async () => {
+    let calls = 0;
+    const { handlers } = runSwInSandbox({
+      fetchImpl: () => {
+        calls += 1;
+        return Promise.resolve(mockResponse('<html></html>'));
+      },
+    });
+    const warm = async () => {
+      let pending: Promise<unknown> = Promise.resolve();
+      handlers.message({
+        data: { type: 'WARM_SHELLS', locale: 'en' },
+        waitUntil: (p: Promise<unknown>) => { pending = p; },
+      });
+      await pending;
+    };
+    await warm();
+    const first = calls;
+    await warm();
+    expect(first).toBe(12);
+    expect(calls).toBe(first);
+  });
+
+  it('ignores an unknown locale', async () => {
+    let calls = 0;
+    const { handlers } = runSwInSandbox({
+      fetchImpl: () => {
+        calls += 1;
+        return Promise.resolve(mockResponse(''));
+      },
+    });
+    let pending: Promise<unknown> = Promise.resolve();
+    handlers.message({
+      data: { type: 'WARM_SHELLS', locale: 'xx' },
+      waitUntil: (p: Promise<unknown>) => { pending = p; },
+    });
+    await pending;
+    expect(calls).toBe(0);
   });
 });
