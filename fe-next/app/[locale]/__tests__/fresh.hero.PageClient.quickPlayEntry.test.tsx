@@ -48,6 +48,7 @@ vi.mock('@/utils/growthTracking', () => ({
   trackGrowthEvent: vi.fn(),
   trackInviteLanded: vi.fn(),
   trackInviteRedirectFired: vi.fn(),
+  trackOnboardingOpenRequested: vi.fn(),
 }));
 
 function setSearch(search: string) {

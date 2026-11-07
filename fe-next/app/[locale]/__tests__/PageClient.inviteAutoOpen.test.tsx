@@ -48,6 +48,7 @@ vi.mock('@/utils/growthTracking', () => ({
   trackInviteLanded: vi.fn(),
   trackInviteRedirectFired: vi.fn(),
   trackGrowthEvent: vi.fn(),
+  trackOnboardingOpenRequested: vi.fn(),
 }));
 
 describe('HomePageClient new-user room invite', () => {

@@ -239,7 +239,11 @@ export type GrowthEvent =
   | 'web_ads_fill_audit'
   // Preference
   | 'language_changed'
-  // Onboarding funnel
+  // Onboarding funnel. `onboarding_open_requested` is the PLAY-click hand-off,
+  // one step upstream of `onboarding_started` — the pair splits the
+  // landing_cta_clicked → onboarding_started leak three ways (see
+  // trackOnboardingOpenRequested).
+  | 'onboarding_open_requested'
   | 'onboarding_started'
   | 'onboarding_step_completed'
   | 'onboarding_first_word_found'
@@ -2003,6 +2007,26 @@ export const trackInterstitialLifecycle = (
   stage: InterstitialLifecycleStage,
 ): void => {
   trackGrowthEvent('interstitial_ad_lifecycle', { stage });
+};
+
+/**
+ * PLAY → onboarding hand-off request. Fires from PageClient.handleStartOnboarding
+ * the moment a landing PLAY click reaches the handler — BEFORE OnboardingFlow
+ * mounts (its chunk is lazy-loaded, so a gap here means the flow never rendered).
+ * Splits the landing_cta_clicked → onboarding_started leak three ways:
+ *   cta_clicked − open_requested = clicks that never reached the handler
+ *     (native <a href> navigation fall-through — the mounted-gate signature);
+ *   open_requested − onboarding_started = handler ran but the flow never
+ *     mounted (lazy-chunk load failure, render crash, route guard);
+ *   started − skipped/completed = the flow opened, then the user bailed.
+ * Auto-open entries (?room= / ?next= / CrazyGames) bypass the PLAY CTA and do
+ * NOT fire this — they never emit landing_cta_clicked, so including them would
+ * corrupt the subtraction.
+ */
+export const trackOnboardingOpenRequested = (
+  extras: Record<string, unknown> = {},
+): void => {
+  trackGrowthEvent('onboarding_open_requested', extras);
 };
 
 /**
