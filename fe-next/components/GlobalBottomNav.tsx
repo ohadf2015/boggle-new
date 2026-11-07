@@ -117,7 +117,7 @@ const LANDING_PREFIXES: ReadonlyArray<string> = [
     '/words', '/anagram', '/editorial-policy', '/legal', '/contact', '/accessibility',
     // English SEO landings
     '/best-online-word-games', '/boggle-word-shake-free',
-    '/play-boggle-online-free', '/play-boggle-5x5-online', '/word-games-online-free', '/word-finder',
+    '/play-boggle-online-free', '/play-boggle-5x5-online', '/word-games-online-free', '/word-finder', '/wordle-solver',
     // Education keyword landings
     '/vocabulary-games-for-middle-school', '/word-games-for-the-classroom',
     '/bell-ringer-word-games', '/substitute-teacher-word-games',
