@@ -79,7 +79,7 @@ export function PracticeRunPanel({ gameCode, language, joined, t }: PracticeRunP
         aria-labelledby="practice-run-title"
         className={cn(NB_PANEL, 'm-3 ms-0 hidden w-[min(25rem,32vw)] shrink-0 flex-col gap-3 p-3 lg:flex')}
       >
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex flex-col items-start gap-1.5">
           <h2 id="practice-run-title" className="min-w-0 font-neo-display text-xl font-black leading-tight">{t('eduLiveRoom.practice.title')}</h2>
           {status}
         </div>
