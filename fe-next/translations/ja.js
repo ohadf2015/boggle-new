@@ -11469,6 +11469,7 @@ const ja = {
       "nearMiss": "惜しい！パーフェクトまであと{pct}%",
       "betterThan": "今日のクイックプレイの{pct}%より上位",
       "seeLeaderboard": "ランキングを見る",
+      "todayBoard": "今日のトップスコア",
       "nextRound": "次のラウンドへ",
       "challengeFriend": "友達に挑戦状：同じボード",
       "challengeHint": "友達はあなたと同じボードをプレイ。そのスコアが次のライバルに。",

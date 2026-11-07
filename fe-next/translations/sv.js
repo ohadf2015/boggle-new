@@ -12773,6 +12773,7 @@ const sv = {
       "nearMiss": "Så nära! {pct}% från perfekt",
       "betterThan": "Bättre än {pct}% av dagens snabbspelsresultat",
       "seeLeaderboard": "Visa hela topplistan",
+      "todayBoard": "Dagens bästa",
       "nextRound": "Snurra nästa runda",
       "challengeFriend": "Utmana en vän med samma bräde",
       "challengeHint": "De spelar exakt ditt bräde. Deras resultat blir din nästa rival.",

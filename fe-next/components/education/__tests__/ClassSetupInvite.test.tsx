@@ -32,8 +32,11 @@ vi.mock('@/components/teacher/hq/HqProjectorSheet', () => ({ HqProjectorSheet: (
 vi.mock('@/components/teacher/home/RehearseWithBotsButton', () => ({ RehearseWithBotsButton: () => null }));
 vi.mock('@/components/education/results/ResultsTeacherProTrialCard', () => ({ ResultsTeacherProTrialCard: () => null, CLASS_CREATED_TRIAL_PLACEMENT: 'class_created' }));
 vi.mock('@/components/education/EduMascot', () => ({ EduMascot: () => null }));
+const single = vi.hoisted(() => ({ getClassroom: vi.fn() }));
+vi.mock('@/lib/supabase/education/classrooms', () => ({ getClassroom: single.getClassroom }));
 
 import { ClassSetupInvite } from '../ClassSetupInvite';
+import { forgetCreatedClassrooms, rememberCreatedClassroom } from '@/lib/education/createdClassroomHandoff';
 
 describe('ClassSetupInvite', () => {
   beforeEach(() => {
@@ -41,6 +44,32 @@ describe('ClassSetupInvite', () => {
     sessionStorage.clear();
     roster.current = { students: [], loading: false, arrivals: [] };
     classrooms.current = [{ id: 'c1', name: 'Room 7', join_code: 'BLDA7Q' }];
+    forgetCreatedClassrooms();
+    single.getClassroom.mockResolvedValue({ data: null, error: null });
+  });
+
+  it('Given a class just made but a stale class list without it, Then the ready screen still shows its code, never "not found"', () => {
+    classrooms.current = [];
+    rememberCreatedClassroom({ id: 'new1', name: 'Grade 4', join_code: 'NEW4AB' });
+    render(<ClassSetupInvite classroomId="new1" />);
+    expect(screen.getByTestId('setup-join-code')).toHaveTextContent('NEW4AB');
+    expect(screen.queryByText('education.classroomGame.classroomNotFound')).toBeNull();
+    expect(single.getClassroom).not.toHaveBeenCalled();
+  });
+
+  it('Given the list misses the class and nothing was handed over (a reload), Then it reads that one class before giving up', async () => {
+    classrooms.current = [];
+    single.getClassroom.mockResolvedValue({ data: { id: 'new2', name: 'Grade 5', join_code: 'NEW5CD' }, error: null });
+    render(<ClassSetupInvite classroomId="new2" />);
+    expect(screen.queryByText('education.classroomGame.classroomNotFound')).toBeNull();
+    expect(await screen.findByTestId('setup-join-code')).toHaveTextContent('NEW5CD');
+    expect(single.getClassroom).toHaveBeenCalledWith('new2');
+  });
+
+  it('Given a class that really is not there, Then "not found" shows after the one lookup', async () => {
+    classrooms.current = [];
+    render(<ClassSetupInvite classroomId="gone" />);
+    expect(await screen.findByText('education.classroomGame.classroomNotFound')).toBeInTheDocument();
   });
 
   it('Given a new class, Then the code, QR and every share channel are on the one screen and the view is recorded once', () => {
@@ -103,8 +132,8 @@ describe('ClassSetupInvite', () => {
     expect(slot).toContainElement(heroes[0]);
   });
 
-  it('Given an unknown class id, Then it says so and links to the class list', () => {
+  it('Given an unknown class id, Then after the one lookup it says so and links to the class list', async () => {
     render(<ClassSetupInvite classroomId="nope" />);
-    expect(screen.getByRole('alert')).toHaveTextContent('education.classroomGame.classroomNotFound');
+    expect(await screen.findByRole('alert')).toHaveTextContent('education.classroomGame.classroomNotFound');
   });
 });

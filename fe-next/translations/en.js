@@ -10865,6 +10865,7 @@ const en = {
       "nearMiss": "So close! {pct}% from perfect",
       "betterThan": "Better than {pct}% of today's Quick Play scores",
       "seeLeaderboard": "See full leaderboard",
+      "todayBoard": "Today's top scores",
       "nextRound": "Spin next round",
       "challengeFriend": "Challenge a friend: same board",
       "challengeHint": "They play your exact board. Their score becomes your next rival.",

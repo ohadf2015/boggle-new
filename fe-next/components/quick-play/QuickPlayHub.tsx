@@ -418,27 +418,23 @@ export function QuickPlayHub({ challengeId, backHref }: QuickPlayHubProps) {
 
   return (
     <div
-      className="relative flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto bg-neo-navy pb-8 animate-[fadeInUp_0.25s_ease-out_0s_both]"
+      className="relative flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto bg-neo-navy animate-[fadeInUp_0.25s_ease-out_0s_both]"
       data-testid="quick-play-hub"
     >
-      {/* Arcade atmosphere — soft color blobs, non-interactive */}
+      {/* Arcade atmosphere: a halftone field, the brand texture (no soft blobs). */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 overflow-hidden"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle,rgba(255,255,255,0.07)_1.2px,transparent_1.3px)] bg-size-[14px_14px]"
         data-testid="quick-hub-atmosphere"
-      >
-        <div className="absolute -left-16 top-24 h-48 w-48 rounded-full bg-neo-lime/10 blur-3xl" />
-        <div className="absolute -right-12 top-40 h-56 w-56 rounded-full bg-neo-pink/10 blur-3xl" />
-        <div className="absolute bottom-24 left-1/3 h-40 w-40 rounded-full bg-neo-purple/10 blur-3xl" />
-      </div>
+      />
 
-      <header className="relative z-[1] flex items-center justify-between px-4 pt-5 sm:px-5 sm:pt-6">
+      <header className="relative z-[1] flex shrink-0 items-center justify-between px-4 pt-3 sm:px-5 sm:pt-5">
         <BackButton onClick={goBack} label={t('common.back')} isDarkMode />
         <div className="text-center">
           <h1
             ref={wheelHeadingRef}
             tabIndex={-1}
-            className="font-neo-display text-xl font-bold tracking-wide text-neo-cream outline-none drop-shadow-[0_2px_0_rgba(0,0,0,0.45)] sm:text-2xl"
+            className="font-neo-display text-xl font-bold tracking-wide text-neo-cream outline-none! drop-shadow-[0_2px_0_rgba(0,0,0,0.45)] sm:text-2xl"
           >
             {t('quickPlay.solo.title')}
           </h1>
@@ -502,7 +498,7 @@ export function QuickPlayHub({ challengeId, backHref }: QuickPlayHubProps) {
         </div>
       )}
 
-      <div className="relative z-[1] flex min-h-0 flex-1 items-center justify-center overflow-x-hidden overflow-y-auto px-2 py-4 sm:py-6">
+      <div className="relative z-[1] flex min-h-0 flex-1 flex-col px-3 pb-2 pt-3 sm:px-4 sm:py-5">
         {/* Mode picker stays mounted during loading so selection state is visible.
             Loading state dims siblings and disables random while selected card locks. */}
         {(phase === 'wheel' || phase === 'loading') && (

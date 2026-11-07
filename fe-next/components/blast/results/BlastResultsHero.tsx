@@ -4,6 +4,9 @@ import type { ReactNode } from 'react';
 import { ArrowDown, ArrowUp, Crosshair, Star, Swords, TrendingUp, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
+import useReducedMotion from '@/hooks/useReducedMotion';
+import { useHeroCheer } from '@/lib/quickPlay/useHeroCheer';
+import { ResultsAvatarStage, type ResultsAvatar } from '@/components/results/stage/ResultsAvatarStage';
 import { BLAST_RESULT_ASSETS, TIER_THEME } from './blastResultsTheme';
 import type { BlastResultsView } from './blastResultsViewModel';
 import type { BlastTranslate } from './types';
@@ -17,45 +20,39 @@ interface BlastResultsHeroProps {
   subline?: ReactNode;
   footer?: ReactNode;
   stars?: { count: 1 | 2 | 3; label: string } | null;
+  avatar: ResultsAvatar;
 }
 
-export function BlastResultsHero({ view, t, locale, headline, subline, footer, stars }: BlastResultsHeroProps) {
+const BLAST_ACCENT = '#ff4d9a';
+
+export function BlastResultsHero({ view, t, locale, headline, subline, footer, stars, avatar }: BlastResultsHeroProps) {
   const theme = TIER_THEME[view.tier];
   const showMedal = view.tier === 'high' || view.tier === 'newBest';
+  const animate = !useReducedMotion();
+  // A wave-1 bust is the one outcome that does not cheer; reaching later waves reads as progress.
+  const cheering = view.tier !== 'low';
+  const mood = useHeroCheer(cheering, animate);
+  const bigMoment = view.tier === 'newBest' || view.tier === 'high';
 
   return (
-    <div className="relative w-full flex flex-col items-center" data-testid="blast-results-hero" data-tier={view.tier}>
-      {view.celebrate.confetti && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={BLAST_RESULT_ASSETS.confetti}
-          alt=""
-          aria-hidden="true"
-          data-testid="blast-results-confetti"
-          data-reveal="mascot"
-          className="pointer-events-none absolute -top-4 inset-x-0 mx-auto w-72 max-w-none opacity-60"
-        />
-      )}
-
-      <div className="relative z-10 h-28 w-28 sm:h-32 sm:w-32" data-reveal="mascot">
-        <div aria-hidden="true" className={cn('absolute inset-3 rounded-full', theme.glow)} />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={theme.mascot}
-          alt=""
-          aria-hidden="true"
-          data-testid="blast-results-mascot"
-          data-tier={view.tier}
-          className="relative h-full w-full object-contain drop-shadow-[3px_3px_0_rgb(var(--neo-black))]"
-        />
-      </div>
+    <div
+      className="relative w-full flex flex-col items-center"
+      data-testid="blast-results-hero"
+      data-tier={view.tier}
+      data-cheering={cheering ? 'true' : 'false'}
+    >
+      <ResultsAvatarStage
+        avatar={avatar}
+        mood={mood}
+        accentHex={BLAST_ACCENT}
+        animate={animate}
+        cheering={view.celebrate.confetti}
+        confettiCount={bigMoment ? 16 : 10}
+        hopping={animate && bigMoment && mood === 'win'}
+      />
 
       <h2
-        data-reveal="headline"
-        className={cn(
-          'relative z-10 mt-1 text-center font-neo-display text-3xl font-black uppercase tracking-wide [text-shadow:3px_3px_0_rgb(var(--neo-black))]',
-          theme.headline,
-        )}
+        className="relative z-10 text-center font-neo-display text-[32px] font-bold leading-tight text-neo-yellow [text-shadow:0_3px_0_#000] lg:text-5xl"
       >
         {headline ?? t(theme.headlineKey)}
       </h2>
@@ -68,14 +65,14 @@ export function BlastResultsHero({ view, t, locale, headline, subline, footer, s
                 key={n}
                 data-reveal="star"
                 className={cn(
-                  'h-7 w-7 drop-shadow-[2px_2px_0_rgb(var(--neo-black))]',
+                  'h-8 w-8 drop-shadow-[2px_2px_0_rgb(var(--neo-black))]',
                   n <= stars.count ? 'fill-neo-yellow text-neo-yellow' : 'text-neo-white/40',
                 )}
                 strokeWidth={2.5}
               />
             ))}
           </div>
-          <span className="rounded-neo border-2 border-neo-black bg-neo-navy px-2 py-0.5 text-[10px] font-black uppercase tracking-widest text-neo-yellow">{stars.label}</span>
+          <span className="-rotate-1 rounded-xl border-[3px] border-black bg-neo-black px-3 py-0.5 font-neo-display text-xs font-bold uppercase tracking-wide text-neo-yellow shadow-hard">{stars.label}</span>
         </div>
       )}
 
@@ -83,8 +80,7 @@ export function BlastResultsHero({ view, t, locale, headline, subline, footer, s
         data-reveal="hero-card"
         data-testid="blast-results-score-card"
         className={cn(
-          'relative z-10 mt-3 w-full rounded-neo border-3 bg-neo-navy-light px-4 pb-4 pt-5 text-center shadow-hard-lg',
-          theme.frame,
+          'relative z-10 mt-4 w-full rounded-2xl border-[3px] border-black bg-neo-navy-elevated px-4 pb-4 pt-5 text-center shadow-hard-lg animate-[qp-card-in_0.42s_cubic-bezier(0.34,1.4,0.64,1)_0.25s_both] motion-reduce:animate-none',
         )}
       >
         {showMedal && (
@@ -113,7 +109,7 @@ export function BlastResultsHero({ view, t, locale, headline, subline, footer, s
 
         <p
           data-reveal="score"
-          className="font-neo-display text-6xl font-black tabular-nums text-neo-white [text-shadow:3px_3px_0_rgb(var(--neo-black))]"
+          className="font-neo-display text-6xl font-black tabular-nums text-neo-yellow [text-shadow:3px_3px_0_rgb(var(--neo-black))]"
           dir="ltr"
         >
           {safeToLocaleString(view.score, locale)}

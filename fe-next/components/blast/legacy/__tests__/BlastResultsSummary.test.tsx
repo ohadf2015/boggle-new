@@ -4,6 +4,9 @@ import { BlastResultsSummary } from '../BlastResultsSummary';
 import type { BlastResultsData } from '../types';
 
 vi.mock('../../results/useBlastResultsReveal', () => ({ useBlastResultsReveal: vi.fn() }));
+vi.mock('@/hooks/useReducedMotion', () => ({ default: () => false }));
+vi.mock('@/components/Avatar', () => ({ default: () => <div data-testid="avatar" /> }));
+vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ user: null, profile: null }) }));
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ language: 'en', dir: 'ltr' }),
@@ -222,7 +225,7 @@ describe('BlastResultsSummary', () => {
     expect(old.textContent).not.toContain('blast.results.newBadge');
   });
 
-  it('picks the results mascot pose by outcome tier', () => {
+  it('puts the player avatar on the hero and sets the mood by outcome tier', () => {
     const { rerender } = render(
       <BlastResultsSummary
         results={makeResults({ finalScore: 9000, previousBest: 6000, clearPercentage: 95 })}
@@ -231,9 +234,9 @@ describe('BlastResultsSummary', () => {
         onQuit={noop}
       />,
     );
-    const celebrating = screen.getByTestId('blast-results-mascot') as HTMLImageElement;
-    expect(celebrating.dataset.tier).toBe('newBest');
-    expect(celebrating.src).toContain('/blast/results/mascot-celebrate.webp');
+    expect(screen.getByTestId('quick-hero-avatar')).toBeDefined();
+    expect(screen.getByTestId('blast-results-hero').dataset.tier).toBe('newBest');
+    expect(screen.getByTestId('blast-results-hero').dataset.cheering).toBe('true');
 
     rerender(
       <BlastResultsSummary
@@ -244,7 +247,7 @@ describe('BlastResultsSummary', () => {
       />,
     );
     // Failing after clearing waves reads as progress, not defeat.
-    expect((screen.getByTestId('blast-results-mascot') as HTMLImageElement).dataset.tier).toBe('mid');
+    expect(screen.getByTestId('blast-results-hero').dataset.tier).toBe('mid');
 
     rerender(
       <BlastResultsSummary
@@ -257,9 +260,8 @@ describe('BlastResultsSummary', () => {
         onQuit={noop}
       />,
     );
-    const sad = screen.getByTestId('blast-results-mascot') as HTMLImageElement;
-    expect(sad.dataset.tier).toBe('low');
-    expect(sad.src).toContain('/blast/results/mascot-sad.webp');
+    expect(screen.getByTestId('blast-results-hero').dataset.tier).toBe('low');
+    expect(screen.getByTestId('blast-results-hero').dataset.cheering).toBe('false');
   });
 
   it('shows coin, diamond and bomb chips, defaulting diamonds to 0', () => {
@@ -362,9 +364,8 @@ describe('BlastResultsSummary', () => {
     expect(footer).toBeDefined();
     // Footer is the actual parent of the CTAs (not just the document).
     expect(footer.contains(screen.getByTestId('play-again-button'))).toBe(true);
-    expect(footer.contains(screen.getByText('common.home'))).toBe(true);
-    expect(footer.contains(screen.getByTestId('blast-results-leaderboard-link'))).toBe(true);
-    expect(footer.querySelectorAll('[data-reveal="cta"]')).toHaveLength(1);
+    expect(footer.contains(screen.getByRole('button', { name: 'common.home' }))).toBe(true);
+    expect(footer.contains(screen.getByTestId('blast-results-leaderboard-link'))).toBe(false);
   });
 
   it('uses tryAgain copy on play-again button when wave failed', () => {
@@ -394,7 +395,7 @@ describe('BlastResultsSummary', () => {
     );
     fireEvent.click(screen.getByTestId('play-again-button'));
     expect(onPlayAgain).toHaveBeenCalledTimes(1);
-    fireEvent.click(screen.getByText('common.home'));
+    fireEvent.click(screen.getByRole('button', { name: 'common.home' }));
     expect(onQuit).toHaveBeenCalledTimes(1);
   });
 });
@@ -408,14 +409,14 @@ describe('BlastResultsSummary — neo-brutalist polish', () => {
     render(
       <BlastResultsSummary results={win()} t={t} onPlayAgain={noop} onQuit={noop} />,
     );
-    expect(screen.getByTestId('blast-results-confetti')).toBeDefined();
+    expect(screen.getByTestId('quick-confetti')).toBeDefined();
   });
 
   it('does NOT render confetti on a failed run', () => {
     render(
       <BlastResultsSummary results={fail()} t={t} onPlayAgain={noop} onQuit={noop} />,
     );
-    expect(screen.queryByTestId('blast-results-confetti')).toBeNull();
+    expect(screen.queryByTestId('quick-confetti')).toBeNull();
   });
 
   it('score card uses a solid surface, not a soft gradient', () => {
@@ -424,7 +425,7 @@ describe('BlastResultsSummary — neo-brutalist polish', () => {
     );
     const card = screen.getByTestId('blast-results-score-card');
     expect(card.className).not.toMatch(/bg-linear|bg-gradient/);
-    expect(card.className).toContain('bg-neo-navy-light');
+    expect(card.className).toContain('bg-neo-navy-elevated');
   });
 
   it('new-record ribbon uses a solid lime fill, not a gradient', () => {
