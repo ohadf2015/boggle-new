@@ -4,16 +4,23 @@ import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { X } from 'lucide-react';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
 import type { Language } from '@/types';
+import { SpellTilesPractice, type SpellLabels } from './SpellTilesPractice';
+import { hasTiles } from './spellPuzzle';
+import type { TeacherCta } from './SpellTilesCards';
 
-export type PracticeMode = 'grid' | 'spelling' | 'matching';
+export type PracticeMode = 'tiles' | 'grid' | 'spelling' | 'matching';
 
 export interface PracticeOverlayProps {
+  locale: string;
   title: string;
+  /** The list's own name, for the spelling practice's welcome card. */
+  listTitle: string;
   lang: string;
   words: Array<{ word: string; definition: string }>;
   playable: string[];
   initialMode: PracticeMode | null;
-  labels: { close: string; pick: string; modes: Record<PracticeMode, { title: string; sub: string }> };
+  labels: { close: string; pick: string; modes: Record<PracticeMode, { title: string; sub: string }>; spell: SpellLabels };
+  teacherCta: TeacherCta;
   onClose: () => void;
 }
 
@@ -25,10 +32,9 @@ const WordMatchingPractice = lazy(() =>
   import('@/components/practice/WordMatchingPractice').then((m) => ({ default: m.WordMatchingPractice })),
 );
 
-const MODES: PracticeMode[] = ['grid', 'spelling', 'matching'];
+const MODES: PracticeMode[] = ['tiles', 'grid', 'spelling', 'matching'];
 
-export default function PracticeOverlay({ title, lang, words, playable, initialMode, labels, onClose }: PracticeOverlayProps) {
-  const [mode, setMode] = useState<PracticeMode | null>(initialMode);
+export default function PracticeOverlay({ locale, title, listTitle, lang, words, playable, initialMode, labels, teacherCta, onClose }: PracticeOverlayProps) {
 
   /* Board and spelling compare typed letters, so they get the niqqud-free spelling. */
   const vocab = useMemo<VocabularyWord[]>(
@@ -39,6 +45,15 @@ export default function PracticeOverlay({ title, lang, words, playable, initialM
     () => vocab.map((w, i) => ({ ...w, word: playable[i] ?? w.word })),
     [vocab, playable],
   );
+  const spellWords = useMemo(
+    () =>
+      words
+        .map((w, i) => ({ word: playable[i] ?? w.word, say: w.word, definition: w.definition }))
+        .filter((w) => hasTiles(w.word)),
+    [words, playable],
+  );
+  const modes = spellWords.length > 0 ? MODES : MODES.filter((m) => m !== 'tiles');
+  const [mode, setMode] = useState<PracticeMode | null>(initialMode && modes.includes(initialMode) ? initialMode : null);
 
   useEffect(() => {
     const prev = document.body.style.overflow;
@@ -80,7 +95,7 @@ export default function PracticeOverlay({ title, lang, words, playable, initialM
           <div className="mx-auto max-w-xl">
             <h2 className="font-neo-display text-2xl font-black uppercase">{labels.pick}</h2>
             <div className="mt-4 grid gap-3">
-              {MODES.map((m) => (
+              {modes.map((m) => (
                 <button
                   key={m}
                   type="button"
@@ -101,6 +116,17 @@ export default function PracticeOverlay({ title, lang, words, playable, initialM
           >
             {/* The board measures its leftover height, so this column must fill the dialog. */}
             <div className="mx-auto flex min-h-0 w-full max-w-3xl flex-1 flex-col">
+              {mode === 'tiles' && (
+                <SpellTilesPractice
+                  locale={locale}
+                  title={listTitle}
+                  lang={lang}
+                  words={spellWords}
+                  labels={labels.spell}
+                  teacherCta={teacherCta}
+                  onClose={onClose}
+                />
+              )}
               {mode === 'grid' && (
                 <SoloPracticeBoard
                   lessonName={title}

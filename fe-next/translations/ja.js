@@ -612,7 +612,35 @@ const ja = {
     "practice": {
       "close": "閉じる",
       "title": "練習：{title}",
-      "pick": "ゲームを選ぶ"
+      "pick": "ゲームを選ぶ",
+      "spell": {
+        "modeTitle": "書き取り",
+        "modeSub": "ことばを聞いて、文字をタップ",
+        "welcomeTitle": "書き取り、はじめる？",
+        "welcomeBody": "ことばを聞いて、文字をタップしてならべよう。まちがえても、もう一度やればだいじょうぶ。",
+        "wordCount": "{count}語",
+        "start": "スタート",
+        "hear": "ことばを聞く",
+        "peek": "ことばを見る",
+        "noVoice": "この端末では読み上げができません。ことばを見てから、思い出してならべてみよう。",
+        "listen": "聞いて、ならべよう",
+        "erase": "1文字けす",
+        "correct": "パーフェクト！",
+        "wrong": "その調子！もう一回やってみよう。",
+        "shown": "答えはこれ。もう一度やってみよう。",
+        "stars": "スター",
+        "progress": "{total}語中 {n}語目",
+        "endTitle": "リスト完了！",
+        "endAccuracy": "{total}語中 {correct}語が一回で正解",
+        "endStars": "もらったスター：{stars}",
+        "cheerTop": "すばらしい！",
+        "cheerMid": "よくがんばったね！",
+        "cheerLow": "いいチャレンジ！もう一度やって記録をこえよう。",
+        "again": "もう一度れんしゅう",
+        "teacherTitle": "このリストで授業をしますか？",
+        "teacherBody": "大きな画面に映して、クラスみんなでライブゲーム。生徒はコードで参加、アカウントは不要です。",
+        "teacherCta": "クラスで遊ぶ"
+      }
     },
     "hub": {
       "metaTitle": "教室で使える無料の単語リスト（学年・テーマ別）",
