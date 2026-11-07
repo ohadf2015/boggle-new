@@ -3,6 +3,7 @@
 import { BarChart3, Check, Globe2, GraduationCap, Pencil, Play, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { NB_BLOCK, NB_SMALL } from '@/components/teacher/nb/nbStyles';
 import type { LibraryLesson } from '@/lib/education/libraryTypes';
 import { nativeLanguageName } from '@/components/education/pickers/nativeLanguageName';
 
@@ -18,11 +19,7 @@ interface MyListCardProps {
   onToggleShare: () => void;
 }
 
-const GHOST = cn(
-  'inline-flex min-h-10 items-center justify-center gap-1.5 whitespace-nowrap rounded-neo border-2 border-neo-cream/50 px-2.5',
-  'font-neo-display text-xs font-bold text-neo-white transition hover:border-neo-cream hover:bg-neo-cream/10',
-  'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cream',
-);
+const GHOST = cn(NB_SMALL, NB_BLOCK.navy, 'px-2.5 text-xs');
 
 export default function MyListCard({
   lesson,
@@ -45,7 +42,7 @@ export default function MyListCard({
     <article
       data-testid={`my-list-${lesson.id}`}
       style={{ animationDelay: `${Math.min(index, 8) * 40}ms` }}
-      className="flex min-w-0 flex-col gap-2 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light p-3 motion-safe:animate-pop-in [animation-fill-mode:both]"
+      className="flex min-w-0 flex-col gap-2 rounded-neo-xl border-[3px] border-neo-cream/50 bg-neo-navy-light p-3 shadow-hard-lg motion-safe:animate-pop-in [animation-fill-mode:both]"
     >
       <div className="flex min-w-0 items-start gap-2">
         <div className="min-w-0 flex-1">
@@ -71,7 +68,7 @@ export default function MyListCard({
           onClick={onEdit}
           aria-label={t('teacher.lesson.editLesson')}
           title={t('teacher.lesson.editLesson')}
-          className="flex size-9 shrink-0 items-center justify-center rounded-neo border-2 border-neo-cream/50 text-neo-white transition hover:border-neo-cream hover:bg-neo-cream/10"
+          className={cn(NB_SMALL, NB_BLOCK.navy, 'size-11 shrink-0 px-0')}
         >
           <Pencil className="size-4" aria-hidden="true" />
         </button>
@@ -97,7 +94,7 @@ export default function MyListCard({
           type="button"
           data-testid={`lesson-host-${lesson.id}`}
           onClick={onHost}
-          className={cn(GHOST, 'border-neo-cream text-sm sm:flex-1')}
+          className={cn(NB_SMALL, NB_BLOCK.navy, 'border-neo-cream px-2.5 text-sm sm:flex-1')}
         >
           <Play className="size-4 fill-current" aria-hidden="true" />
           {t('education.template.startGame')}

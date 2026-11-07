@@ -60,7 +60,7 @@ import ClassroomManager from '../ClassroomManager';
 describe('ClassroomManager — invite actions in a narrow card', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('keeps the code and its three icon actions on one row: the code plate gives way, the buttons never do', () => {
+  it('keeps the code and its icon actions together: in a narrow card the code takes its own row, and the buttons never shrink', () => {
     render(<ClassroomManager />);
 
     const plate = screen.getByTestId('join-code-plate');

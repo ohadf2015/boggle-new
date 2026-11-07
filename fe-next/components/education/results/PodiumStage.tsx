@@ -1,25 +1,19 @@
 /**
- * PodiumStage — the projector's round-end podium, standing on the painted
- * pedestals of `podium-bg` (silver left, gold centre, bronze right).
+ * PodiumStage — the projector's round-end podium: three flat, hard-edged blocks
+ * (silver left, gold centre, bronze right) standing on a floor strip.
  *
  * Same contract as `ResultsPodium` (same props, same `podium-place-N` rows, the
  * same reveal stages), so the two can be swapped at a call site: DOM order is
  * rank order for a screen reader, an unrevealed placing is `aria-hidden` with a
- * placeholder, every plinth carries `data-plinth-height` (1st tallest) and a
+ * placeholder, every block carries `data-plinth-height` (1st tallest) and a
  * `min-height`, never a fixed height.
  *
- * THE ART IS ASPECT-LOCKED. The pedestals are pixels in a 1920×1086 painting,
- * so the box keeps that ratio and every placard is positioned in % of it
- * (`PEDESTALS`, measured off the art with a grid overlay). The box is
- * `dir="ltr"` and uses physical `left`: the painting does not mirror in Hebrew,
- * so logical offsets would slide RTL names off their pedestals. Type inside is
- * sized in `cqw` of the box, so a 1100px projector column and a 390px phone
- * preview read the same.
+ * The box keeps a 1920×1086 aspect (EduHostResults sizes the wall off it) and
+ * is `dir="ltr"`: gold stays in the middle in Hebrew too. Type inside is sized
+ * in `cqw`, so a 1100px projector column and a 390px phone read the same.
  *
- * No entrance opacity anywhere (Class 5): the art and the pedestals are painted
- * from frame one; the reveal swaps placard CONTENT on a transform-only pop and
- * the score counts up (`useCountUp`), landing on the real number — which is
- * also printed for assistive tech from the start of the reveal.
+ * No entrance opacity anywhere (Class 5): the blocks are painted from frame
+ * one; the reveal swaps CONTENT on a transform-only pop and the score counts up.
  */
 
 'use client';
@@ -35,30 +29,36 @@ import type { PodiumEntry } from './ResultsPodium';
 import { orderPodiumByScore, podiumCountFloor } from './podiumOrder';
 
 export interface PedestalSpot {
-  /** Horizontal centre of the pedestal, % of the art's width. */
+  /** Horizontal centre of the block, % of the stage's width. */
   x: number;
-  /** Far edge of the pedestal's top surface, % of the art's height. */
-  top: number;
-  /** Centre of the pedestal's front face, % of the art's height. */
-  face: number;
-  /** Pedestal width, % of the art's width. */
+  /** Block width, % of the stage's width. */
   width: number;
-  /** Plinth "height" in rem-equivalents — the step 1 > 2 > 3 the podium is for. */
+  /** Block min-height in cqw of the stage — the step 1 > 2 > 3 the podium is for. */
   plinth: number;
+  /** Top of the block at its min-height, % of the stage's height (1st highest). */
+  top: number;
 }
 
-/** Measured off public/images/education/podium-bg.webp (1920×1086). */
+/** Floor strip the three blocks stand on, % of the stage's height. */
+const FLOOR = 12;
+/** The stage box is locked to 1920×1086, so its height is this many cqw. */
+const STAGE_CQH = (100 * 1086) / 1920;
+
+function spot(x: number, width: number, plinth: number): PedestalSpot {
+  return { x, width, plinth, top: 100 - FLOOR - (plinth / STAGE_CQH) * 100 };
+}
+
+/** Gold in the centre, silver left, bronze right; the blocks touch like one podium. */
 export const PEDESTALS: Record<1 | 2 | 3, PedestalSpot> = {
-  1: { x: 48.8, top: 37.0, face: 54.0, width: 21.0, plinth: 12 },
-  2: { x: 29.7, top: 46.8, face: 59.0, width: 18.7, plinth: 9 },
-  3: { x: 68.2, top: 50.0, face: 62.0, width: 18.2, plinth: 7 },
+  1: spot(50, 21, 27),
+  2: spot(30, 19, 20),
+  3: spot(70, 19, 14.5),
 };
 
 /**
- * The three metals. A plate must read as GOLD / SILVER / BRONZE from the back
- * row with the digit covered — fill, trim and a medal disc all agree. Whole
- * literal classes (Tailwind v4 only emits what it can read verbatim); the
- * sheen is an inline gradient over the fill, so the fill still paints alone.
+ * The three metals as flat neo blocks: gold, silver, bronze must read from the
+ * back row with the digit covered. Whole literal classes (Tailwind v4 only
+ * emits what it can read verbatim).
  */
 export type Medal = 'gold' | 'silver' | 'bronze';
 
@@ -66,31 +66,40 @@ export const MEDAL: Record<1 | 2 | 3, Medal> = { 1: 'gold', 2: 'silver', 3: 'bro
 
 export const MEDAL_FILL: Record<Medal, string> = {
   gold: 'bg-neo-yellow',
-  silver: 'bg-[#dfe5ee]',
-  bronze: 'bg-[#e8894b]',
+  silver: 'bg-neo-cream',
+  bronze: 'bg-neo-orange',
 };
 
 const PLATE: Record<1 | 2 | 3, string> = {
-  1: `${MEDAL_FILL.gold} text-neo-black`,
-  2: `${MEDAL_FILL.silver} text-neo-black`,
-  3: `${MEDAL_FILL.bronze} text-neo-black`,
+  1: `${MEDAL_FILL.gold} border-neo-black text-neo-black`,
+  2: `${MEDAL_FILL.silver} border-neo-black text-neo-black`,
+  3: `${MEDAL_FILL.bronze} border-neo-black text-neo-black`,
 };
 
-const SHEEN: Record<1 | 2 | 3, string> = {
-  1: 'linear-gradient(160deg, #fff6b0 0%, var(--neo-yellow) 38%, #f2b90c 72%, #c98a00 100%)',
-  2: 'linear-gradient(160deg, rgb(var(--neo-white)) 0%, #e4e9f0 40%, #b9c2cf 75%, #8e99a8 100%)',
-  3: 'linear-gradient(160deg, #ffd0a3 0%, #e8894b 42%, #b85a24 78%, #8a3d12 100%)',
-};
+/** Nobody scored: a plain slate block, so no metal hands out a place nobody earned. */
+const MUTED_PLATE = 'bg-neo-navy-light border-neo-cream/50 text-neo-cream';
 
-/** Nobody scored: a plain slate plate, so no metal hands out a place nobody earned. */
-const MUTED_PLATE = 'bg-neo-navy-light text-neo-cream';
+const RIBBON: Record<1 | 2 | 3, string> = { 1: 'bg-neo-pink', 2: 'bg-neo-cyan', 3: 'bg-neo-purple' };
 
-/** The medal disc's face — same metal, deeper, with a darker rim. */
-const DISC: Record<1 | 2 | 3, { face: string; rim: string; ribbon: string }> = {
-  1: { face: 'radial-gradient(circle at 35% 30%, #fffbd1 0%, #ffd400 45%, #d19a00 100%)', rim: '#8a6200', ribbon: 'var(--neo-pink)' },
-  2: { face: 'radial-gradient(circle at 35% 30%, rgb(var(--neo-white)) 0%, #cfd6e0 50%, #8b96a6 100%)', rim: '#5b6574', ribbon: 'color-mix(in srgb, var(--neo-cyan) 50%, var(--neo-purple))' },
-  3: { face: 'radial-gradient(circle at 35% 30%, #ffe0c2 0%, #d9793c 50%, #8a3d12 100%)', rim: '#5e2708', ribbon: 'var(--neo-purple)' },
-};
+/** Flat confetti chips stuck to the stage: [left %, top %, size cqw, tilt deg, fill]. */
+const CONFETTI: Array<[number, number, number, number, string]> = [
+  [5, 12, 3.4, -18, 'bg-neo-pink'],
+  [15, 30, 2.4, 24, 'bg-neo-cyan'],
+  [22, 6, 2.2, 40, 'bg-neo-orange'],
+  [36, 18, 2, -30, 'bg-neo-purple'],
+  [63, 8, 2.8, 12, 'bg-neo-cyan'],
+  [80, 22, 2.2, -42, 'bg-neo-pink'],
+  [88, 6, 3, 28, 'bg-neo-orange'],
+  [93, 34, 2.4, -12, 'bg-neo-yellow'],
+];
+
+/** A hard-edged comic burst: 16 solid wedges, no gradient, no mask. */
+const BURST_POINTS = Array.from({ length: 16 }, (_, i) => {
+  const a0 = (i / 16) * Math.PI * 2;
+  const a1 = a0 + Math.PI / 32;
+  const r = 50;
+  return `50,50 ${(50 + r * Math.cos(a0)).toFixed(2)},${(50 + r * Math.sin(a0)).toFixed(2)} ${(50 + r * Math.cos(a1)).toFixed(2)},${(50 + r * Math.sin(a1)).toFixed(2)}`;
+});
 
 export interface PodiumStageProps {
   entries: PodiumEntry[];
@@ -108,27 +117,25 @@ function rankOf(entry: PodiumEntry): 1 | 2 | 3 {
 }
 
 function MedalDisc({ position, rank }: { position: 1 | 2 | 3; rank: 1 | 2 | 3 }) {
-  const disc = DISC[rank];
   return (
     <span
       data-testid={`podium-medal-${position}`}
       aria-hidden="true"
-      className="absolute left-1/2 top-0 flex -translate-x-1/2 -translate-y-[70%] flex-col items-center"
+      className="absolute left-1/2 top-0 flex -translate-x-1/2 -translate-y-[62%] flex-col items-center"
     >
-      {/* Ribbon: two tails in a V, behind the disc. */}
       <span className="flex" style={{ gap: '0.3cqw', marginBottom: '-1.2cqw' }}>
-        <span className="block -rotate-12 border-[2px] border-neo-black" style={{ width: '1.3cqw', height: '2cqw', background: disc.ribbon }} />
-        <span className="block rotate-12 border-[2px] border-neo-black" style={{ width: '1.3cqw', height: '2cqw', background: disc.ribbon }} />
+        <span className={cn('block -rotate-12 border-[2px] border-neo-black', RIBBON[rank])} style={{ width: '1.3cqw', height: '2cqw' }} />
+        <span className={cn('block rotate-12 border-[2px] border-neo-black', RIBBON[rank])} style={{ width: '1.3cqw', height: '2cqw' }} />
       </span>
       <span
-        className="grid place-items-center rounded-full font-neo-display font-black leading-none text-neo-black shadow-[0.25cqw_0.25cqw_0_rgb(var(--neo-black))]"
+        className={cn(
+          'grid place-items-center rounded-full border-[3px] border-neo-black font-neo-display font-black leading-none text-neo-black shadow-[0.3cqw_0.3cqw_0_rgb(var(--neo-black))]',
+          MEDAL_FILL[MEDAL[rank]]
+        )}
         style={{
-          width: rank === 1 ? '4.4cqw' : '3.6cqw',
-          height: rank === 1 ? '4.4cqw' : '3.6cqw',
-          background: disc.face,
-          border: `0.35cqw solid ${disc.rim}`,
-          outline: '0.18cqw solid rgb(var(--neo-black))',
-          fontSize: rank === 1 ? '2.3cqw' : '1.9cqw',
+          width: rank === 1 ? '4.6cqw' : '3.8cqw',
+          height: rank === 1 ? '4.6cqw' : '3.8cqw',
+          fontSize: rank === 1 ? '2.4cqw' : '2cqw',
         }}
       >
         {rank}
@@ -148,8 +155,7 @@ function Placing({ entry, place, stage, floor, muted }: { entry: PodiumEntry; pl
   const rank = rankOf(entry);
   const spot = PEDESTALS[rank];
   const revealed = isRevealed(rank, stage);
-  // Counts up FROM the placing below it, so silver can never read under bronze
-  // on a frame caught mid-reveal.
+  // Counts up FROM the placing below it, so silver can never read under bronze on a frame caught mid-reveal.
   const climbed = useCountUp({
     target: revealed ? Math.max(0, entry.score - floor) : 0,
     duration: rank === 1 ? 1600 : 1100,
@@ -168,30 +174,24 @@ function Placing({ entry, place, stage, floor, muted }: { entry: PodiumEntry; pl
       aria-hidden={revealed ? undefined : true}
       className="contents"
     >
-      {/* The plate on the pedestal's face: score + sub-line. First in the
-          row so it is the plinth element a reader of `[style]` finds. */}
       <div
         data-testid={`podium-plate-${rank}`}
         className={cn(
-          'absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-neo border-[3px] border-neo-black px-[1cqw] pt-[1.6cqw] shadow-[0.35cqw_0.35cqw_0_rgb(var(--neo-black))]',
+          'absolute flex -translate-x-1/2 flex-col items-center justify-start gap-[0.4cqw] rounded-t-neo border-[3px] px-[1cqw] pb-[1cqw] pt-[3cqw] shadow-[0.5cqw_0.5cqw_0_rgb(var(--neo-black))]',
           muted ? MUTED_PLATE : PLATE[place]
         )}
         style={{
           left: `${spot.x}%`,
-          top: `${spot.face}%`,
-          minWidth: `${spot.width * 0.62}%`,
-          maxWidth: `${spot.width * 0.9}%`,
-          minHeight: `${spot.plinth * 0.6}cqw`,
-          backgroundImage: muted ? undefined : SHEEN[place],
-          // An inner trim line in the metal's own dark tone: a plate, not a sticker.
-          boxShadow: `inset 0 0 0 0.3cqw rgba(255,255,255,0.55), inset 0 -0.6cqw 0 rgba(0,0,0,0.18), 0.35cqw 0.35cqw 0 rgb(var(--neo-black))`,
+          bottom: `${FLOOR}%`,
+          width: `${spot.width}%`,
+          minHeight: `${spot.plinth}cqw`,
         }}
       >
         {!muted && <MedalDisc position={rank} rank={place} />}
         <span
           aria-hidden="true"
           className="font-neo-display font-black tabular-nums leading-none"
-          style={{ fontSize: winner ? '5.2cqw' : '4.2cqw' }}
+          style={{ fontSize: winner ? '5.6cqw' : '4.4cqw' }}
         >
           {revealed ? shown : '···'}
         </span>
@@ -199,18 +199,16 @@ function Placing({ entry, place, stage, floor, muted }: { entry: PodiumEntry; pl
         {entry.detail && revealed && (
           <span
             data-testid={`podium-detail-${rank}`}
-            className="max-w-full text-balance text-center font-neo-body font-bold leading-tight opacity-85"
+            className="max-w-full text-balance text-center font-neo-body font-bold leading-tight"
             style={{ fontSize: '1.4cqw' }}
           >
             {entry.detail}
           </span>
         )}
       </div>
-      {/* The student, standing on the pedestal top: face, crown, name plate. */}
       <m.div
         className="absolute flex -translate-x-1/2 flex-col items-center"
-        // The lower plates sit close under their pedestal tops; lifting those two students keeps the medal clear of the name.
-        style={{ left: `${spot.x}%`, bottom: `${100 - spot.top - 2.5 + (winner ? 0 : 3)}%`, width: `${spot.width + 4}%` }}
+        style={{ left: `${spot.x}%`, bottom: `calc(${FLOOR}% + ${spot.plinth + (muted ? 1 : 3.4)}cqw)`, width: `${spot.width + 4}%` }}
         initial={false}
         animate={revealed ? { scale: 1, y: 0 } : { scale: 0.85, y: 6 }}
         transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 420, damping: 13 }}
@@ -218,7 +216,7 @@ function Placing({ entry, place, stage, floor, muted }: { entry: PodiumEntry; pl
         {winner && revealed && !muted && (
           <Crown
             data-testid="podium-crown"
-            className="mb-[-0.6cqw] text-neo-yellow drop-shadow-[0.25cqw_0.25cqw_0_rgb(var(--neo-black))] motion-safe:animate-neo-wobble"
+            className="mb-[-0.6cqw] fill-neo-yellow text-neo-black motion-safe:animate-neo-wobble"
             style={{ width: '5cqw', height: '5cqw' }}
             aria-hidden
           />
@@ -227,7 +225,7 @@ function Placing({ entry, place, stage, floor, muted }: { entry: PodiumEntry; pl
           data-testid={revealed ? 'podium-avatar' : undefined}
           aria-hidden="true"
           className={cn(
-            'relative grid place-items-center overflow-hidden rounded-full border-[3px] border-neo-cream bg-neo-navy shadow-[0.4cqw_0.4cqw_0_rgb(var(--neo-black))] [&_svg]:h-full [&_svg]:w-full',
+            'relative grid place-items-center overflow-hidden rounded-full border-[3px] border-neo-cream bg-neo-navy-light shadow-[0.4cqw_0.4cqw_0_rgb(var(--neo-black))] [&_svg]:h-full [&_svg]:w-full',
             winner && !muted ? 'ring-[0.4cqw] ring-neo-yellow' : ''
           )}
           style={{ width: winner ? '10cqw' : '8cqw', height: winner ? '10cqw' : '8cqw' }}
@@ -240,75 +238,63 @@ function Placing({ entry, place, stage, floor, muted }: { entry: PodiumEntry; pl
         </span>
         <p
           dir="auto"
-          className="mt-[0.6cqw] max-w-full truncate rounded-neo border-[2px] border-neo-cream bg-neo-navy px-[1cqw] py-[0.3cqw] text-center font-neo-display font-black leading-tight text-neo-white shadow-[0.3cqw_0.3cqw_0_rgb(var(--neo-black))]"
+          className="mt-[0.6cqw] max-w-full truncate rounded-neo border-[2px] border-neo-black bg-neo-cream px-[1cqw] py-[0.3cqw] text-center font-neo-display font-black leading-tight text-neo-black shadow-[0.3cqw_0.3cqw_0_rgb(var(--neo-black))]"
           style={{ fontSize: winner ? '2.6cqw' : '2.1cqw' }}
         >
           {revealed ? entry.username : '—'}
         </p>
       </m.div>
-
     </li>
   );
 }
 
 export function PodiumStage({ entries, stage = FINAL_STAGE, t, children, className, muted = false }: PodiumStageProps) {
-  const reduceMotion = useReducedMotion();
-  // Rank follows SCORE here too (not only at the call site): a pedestal must
-  // never hold more points than the one above it, whatever the payload says.
+  // Rank follows SCORE here too (not only at the call site): a block must never hold more points than the one above it.
   const ordered = orderPodiumByScore(entries);
   const winnerUp = isRevealed(1, stage) && !muted;
 
   return (
     <div
       data-testid="podium-stage"
+      data-muted={muted ? 'true' : undefined}
       dir="ltr"
       className={cn(
         'relative mx-auto aspect-[1920/1086] w-full overflow-hidden rounded-neo-lg border-4 border-neo-cream bg-neo-navy shadow-hard-lg [container-type:inline-size]',
         className
       )}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element -- decorative art / avatar data URLs: next/image adds nothing */}
-      <img
-        data-testid="podium-stage-art"
-        src="/images/education/podium-bg.webp"
-        alt=""
-        aria-hidden="true"
-        loading="eager"
-        decoding="async"
-        data-muted={muted ? 'true' : undefined}
-        className={cn(
-          'pointer-events-none absolute inset-0 h-full w-full select-none object-cover',
-          // The painting has confetti and spotlights baked in; a scoreless round turns the lights down.
-          muted && 'brightness-[0.45] grayscale-[0.85]'
-        )}
-      />
-
-      {/* God rays wheel out from behind the gold pedestal once the winner lands.
-          Static opacity, transform-only spin; still under reduced motion. */}
       {winnerUp && (
-        <m.div
+        <svg
           aria-hidden="true"
-          data-testid="podium-god-rays"
-          className="pointer-events-none absolute rounded-full"
-          style={{
-            left: `${PEDESTALS[1].x}%`,
-            top: `${PEDESTALS[1].top}%`,
-            width: '90cqw',
-            height: '90cqw',
-            marginLeft: '-45cqw',
-            marginTop: '-45cqw',
-            opacity: 0.35,
-            background:
-              'conic-gradient(from 0deg, var(--neo-yellow) 0deg 10deg, transparent 10deg 30deg, var(--neo-yellow) 30deg 40deg, transparent 40deg 60deg, var(--neo-yellow) 60deg 70deg, transparent 70deg 90deg, var(--neo-yellow) 90deg 100deg, transparent 100deg 120deg, var(--neo-yellow) 120deg 130deg, transparent 130deg 150deg, var(--neo-yellow) 150deg 160deg, transparent 160deg 180deg, var(--neo-yellow) 180deg 190deg, transparent 190deg 210deg, var(--neo-yellow) 210deg 220deg, transparent 220deg 240deg, var(--neo-yellow) 240deg 250deg, transparent 250deg 270deg, var(--neo-yellow) 270deg 280deg, transparent 280deg 300deg, var(--neo-yellow) 300deg 310deg, transparent 310deg 330deg, var(--neo-yellow) 330deg 340deg, transparent 340deg 360deg)',
-            WebkitMaskImage: 'radial-gradient(circle, transparent 4%, black 18%, transparent 60%)',
-            maskImage: 'radial-gradient(circle, transparent 4%, black 18%, transparent 60%)',
-            willChange: 'transform',
-          }}
-          initial={false}
-          animate={reduceMotion ? { rotate: 0 } : { rotate: 360 }}
-          transition={reduceMotion ? { duration: 0 } : { duration: 30, ease: 'linear', repeat: Infinity }}
-        />
+          data-testid="podium-burst"
+          viewBox="0 0 100 100"
+          className="pointer-events-none absolute"
+          style={{ left: `${PEDESTALS[1].x}%`, top: `${PEDESTALS[1].top - 18}%`, width: '62cqw', height: '62cqw', marginLeft: '-31cqw', marginTop: '-31cqw' }}
+        >
+          <g className="motion-safe:animate-[spin_40s_linear_infinite]" style={{ transformOrigin: '50px 50px', transformBox: 'view-box' }}>
+            {BURST_POINTS.map((points) => (
+              <polygon key={points} points={points} className="fill-neo-yellow" opacity={0.16} />
+            ))}
+          </g>
+        </svg>
       )}
+
+      {!muted &&
+        CONFETTI.map(([left, top, size, tilt, fill]) => (
+          <span
+            key={`${left}-${top}`}
+            aria-hidden="true"
+            className={cn('pointer-events-none absolute border-[2px] border-neo-black', fill)}
+            style={{ left: `${left}%`, top: `${top}%`, width: `${size}cqw`, height: `${size * 0.55}cqw`, transform: `rotate(${tilt}deg)` }}
+          />
+        ))}
+
+      <div
+        aria-hidden="true"
+        data-testid="podium-floor"
+        className="absolute inset-x-0 bottom-0 border-t-[3px] border-t-neo-cream/50 bg-neo-navy-light"
+        style={{ height: `${FLOOR}%` }}
+      />
 
       <ol aria-label={t('education.results.podium.title')} className="absolute inset-0 m-0 list-none p-0">
         {ordered.map((entry) => (

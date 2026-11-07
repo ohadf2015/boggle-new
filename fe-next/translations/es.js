@@ -797,6 +797,7 @@ const es = {
       "editTitle": "Editar lista",
       "description": "Pega palabras, añade significados y guarda.",
       "newList": "Nueva lista",
+      "moreOptions": "Idioma, curso, tema y compartir",
       "titleLabel": "Nombre de la lista",
       "titlePlaceholder": "Ponle nombre a tu lista…",
       "pasteLabel": "Pega o escribe palabras",
@@ -15436,6 +15437,7 @@ const es = {
       "galleryTitle": "Empieza con una plantilla",
       "galleryHint": "Elige curso y asignatura, previsualiza la lista y asígnala en un toque. Word Craft, para mañana.",
       "galleryBrowse": "Ver plantillas de tarea",
+      "moreOptions": "Otras formas de jugar, un enfoque o una nota",
       "galleryPreview": "Ver palabras",
       "galleryAssign": "Asignar a la clase",
       "galleryHidePreview": "Ocultar palabras",
@@ -21238,6 +21240,7 @@ const es = {
       "teacher": "Para docentes",
       "school": "Para centros"
     },
+    "compareAll": "Ver Free y Pro lado a lado",
     "strip": {
       "title": "Lo que Pro te muestra tras una partida",
       "lead": "Datos de una clase de ejemplo; tus clases los rellenan."
@@ -21629,7 +21632,6 @@ const es = {
       "endGame": "Terminar juego",
       "noScores": "Nadie ha puntuado en esta ronda",
       "mostMissed": "Palabras más falladas",
-      "needHelpCount": "Estudiantes por debajo de la mitad: {count}. Los nombres están en el informe.",
       "replayMissed": "Repetir palabras falladas ({count})",
       "replayFailed": "No se pudo preparar la repetición. Inténtalo de nuevo.",
       "replayUnconfirmed": "La sala aún no responde. La próxima ronda podría usar solo las palabras falladas.",

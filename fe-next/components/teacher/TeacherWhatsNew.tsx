@@ -7,8 +7,10 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Sparkles, Gift, Trophy, Puzzle, QrCode, Repeat, BarChart3, BookOpen, X } from 'lucide-react';
-import { Dialog, DialogContent, DialogTitle, DialogClose } from '@/components/ui/dialog';
+import { Sparkles, Gift, Trophy, Puzzle, QrCode, Repeat, BarChart3, BookOpen } from 'lucide-react';
+import { Dialog, DialogClose } from '@/components/ui/dialog';
+import { NbDialogBody, NbDialogContent, NbDialogFooter, NbDialogHeader } from '@/components/teacher/nb/NbDialog';
+import { NB_BLOCK, NB_PRIMARY, NB_STICKER } from '@/components/teacher/nb/nbStyles';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import {
@@ -88,30 +90,18 @@ export function TeacherWhatsNewDialog({ open, onOpenChange }: { open: boolean; o
   }, [open]);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      {/* Light-only surface (Pitfalls Class 5): every child sets its own dark text. */}
-      <DialogContent
-        className="sm:max-w-lg bg-neo-cream dark:bg-neo-cream text-black dark:text-black border-3 border-black shadow-hard-lg rounded-neo overflow-hidden p-0"
-        hideCloseButton
-      >
-        <div className="bg-neo-lime px-5 py-4 border-b-3 border-black flex items-center justify-between gap-3">
-          <div>
-            <DialogTitle className="text-2xl font-neo-display font-black normal-case text-black">
-              {t('education.whatsNew.title')}
-            </DialogTitle>
-            <p className="text-sm font-bold text-black/70">{t('education.whatsNew.subtitle')}</p>
-          </div>
-          <DialogClose asChild>
-            <button className="text-black hover:bg-black/10 p-1 rounded transition-colors" aria-label={t('common.close')}>
-              <X className="size-5" />
-            </button>
-          </DialogClose>
-        </div>
-
-        <div className="max-h-[65dvh] overflow-y-auto p-5 space-y-6">
+      <NbDialogContent size="md">
+        <NbDialogHeader
+          color="lime"
+          title={t('education.whatsNew.title')}
+          description={t('education.whatsNew.subtitle')}
+          closeLabel={t('common.close')}
+        />
+        <NbDialogBody className="space-y-6">
           {TEACHER_CHANGELOG.map((entry) => (
             <section key={entry.id} aria-labelledby={`whats-new-${entry.id}`}>
-              <p className="text-xs font-black uppercase tracking-wider text-black/60">{formatDate(entry.date, language)}</p>
-              <h3 id={`whats-new-${entry.id}`} className="font-neo-display font-black text-lg text-black mb-3">
+              <p className={cn(NB_STICKER, NB_BLOCK.cream)}>{formatDate(entry.date, language)}</p>
+              <h3 id={`whats-new-${entry.id}`} className="mb-3 mt-2 font-neo-display text-lg font-black text-neo-cream">
                 {t(`education.whatsNew.entries.${entry.id}.title`)}
               </h3>
               <ul className="space-y-2.5">
@@ -119,10 +109,10 @@ export function TeacherWhatsNewDialog({ open, onOpenChange }: { open: boolean; o
                   const Icon = ICONS[icon];
                   return (
                     <li key={key} className="flex items-start gap-3">
-                      <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-neo border-2 border-black bg-neo-cyan">
-                        <Icon className="size-4 text-black" aria-hidden="true" />
+                      <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-cyan shadow-hard">
+                        <Icon className="size-4 text-neo-black" aria-hidden="true" />
                       </span>
-                      <span className="text-sm font-semibold leading-snug text-black">
+                      <span className="font-neo-body text-sm font-semibold leading-snug text-neo-cream/90">
                         {t(`education.whatsNew.entries.${entry.id}.${key}`)}
                       </span>
                     </li>
@@ -131,16 +121,15 @@ export function TeacherWhatsNewDialog({ open, onOpenChange }: { open: boolean; o
               </ul>
             </section>
           ))}
-        </div>
-
-        <div className="border-t-3 border-black p-4">
+        </NbDialogBody>
+        <NbDialogFooter>
           <DialogClose asChild>
-            <button className="w-full rounded-neo border-3 border-black bg-neo-black py-3 font-neo-display font-black uppercase text-white shadow-hard-sm">
+            <button type="button" className={cn(NB_PRIMARY, 'w-full sm:w-auto')}>
               {t('education.whatsNew.close')}
             </button>
           </DialogClose>
-        </div>
-      </DialogContent>
+        </NbDialogFooter>
+      </NbDialogContent>
     </Dialog>
   );
 }

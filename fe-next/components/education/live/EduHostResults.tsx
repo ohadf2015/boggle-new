@@ -11,7 +11,7 @@
  * frame or a zoomed TV lays out like the wall.
  */
 import type { ReactNode } from 'react';
-import { ChevronDown, Loader2, LogOut, MoreHorizontal, RotateCcw, Shuffle, Target } from 'lucide-react';
+import { Loader2, LogOut, RotateCcw, Shuffle, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { ClassroomTvResultsScreenProps } from '@/host/components/tv-results/ClassroomTvResultsScreen';
@@ -30,6 +30,7 @@ import { ParentShareLink } from '@/components/education/results/ParentShareLink'
 import { reteachPanelWords } from '@/components/education/results/reteachPanelModel';
 import { ClassReportButton } from '@/components/education/results/ClassReportButton';
 import { ReportPdfExportButton } from '@/components/education/results/ReportPdfExportButton';
+import { ResultsMoreTools } from '@/components/education/results/ResultsMoreTools';
 import { ZeroRoundNote } from '@/components/education/results/ZeroRoundNote';
 import { TeacherInviteNudge, showTeacherInvite } from '@/components/education/results/TeacherInviteNudge';
 import { EmptyRoundCard } from '@/components/education/results/EmptyRoundCard';
@@ -52,7 +53,7 @@ import { useReteachRound } from './useReteachRound';
 /** Play again, Next mode and End game: room controls, drawn as a quiet row so they never compete with the one primary. */
 const TERTIARY = cn(
   PRESS,
-  'inline-flex min-h-11 min-w-0 grow basis-32 items-center justify-center gap-1.5 rounded-neo border-[2px] border-neo-cream/40 bg-transparent px-3 text-center font-neo-body text-sm font-bold normal-case text-neo-cream hover:bg-neo-navy-light @5xl/results:text-base @[96rem]/results:min-h-14 @[96rem]/results:text-xl'
+  'inline-flex min-h-11 min-w-0 grow basis-32 items-center justify-center gap-1.5 rounded-neo-lg border-[3px] border-neo-cream/50 bg-neo-navy-light px-3 text-center font-neo-display text-sm font-black normal-case text-neo-cream shadow-hard transition-[transform,box-shadow] duration-150 hover:-translate-y-px active:translate-x-[2px] active:translate-y-[2px] active:shadow-none motion-reduce:transition-none @5xl/results:text-base @[96rem]/results:min-h-14 @[96rem]/results:text-xl'
 );
 
 type FallbackTranslate = (key: string, fallback: string, params?: Record<string, string | number>) => string;
@@ -65,6 +66,8 @@ interface ActionsProps extends Pick<ClassroomTvResultsScreenProps, 'onRematch' |
   secondary: ReactNode;
   /** The PDF export, also under More. */
   exportSlot?: ReactNode;
+  /** A free teacher's Teacher Pro report preview: for the teacher, not the class watching the wall, so under More. */
+  proSlot?: ReactNode;
 }
 
 /**
@@ -72,7 +75,7 @@ interface ActionsProps extends Pick<ClassroomTvResultsScreenProps, 'onRematch' |
  * under it as the one quiet rematch. Everything rarer (share, next game, export, end) waits under More, so the
  * wall reads as one choice.
  */
-function Actions({ t, onRematch, onClose, onExitRoom, practiceLeads, secondary, exportSlot }: ActionsProps) {
+function Actions({ t, onRematch, onClose, onExitRoom, practiceLeads, secondary, exportSlot, proSlot }: ActionsProps) {
   const playAgain = onRematch
     ? () => {
         trackResultsAction('rematch', 'projector');
@@ -80,7 +83,7 @@ function Actions({ t, onRematch, onClose, onExitRoom, practiceLeads, secondary, 
       }
     : undefined;
   const quietPlayAgain = practiceLeads && !!playAgain;
-  const hasMore = !!secondary || !!exportSlot || !!onClose || !!onExitRoom;
+  const hasMore = !!secondary || !!exportSlot || !!proSlot || !!onClose || !!onExitRoom;
 
   return (
     <div data-testid="edu-results-actions" className="flex shrink-0 flex-col gap-2 @5xl/results:gap-3">
@@ -97,17 +100,8 @@ function Actions({ t, onRematch, onClose, onExitRoom, practiceLeads, secondary, 
         </button>
       )}
       {hasMore && (
-        <details data-testid="edu-results-more" className="group">
-          <summary className={MORE_SUMMARY}>
-            <span className="inline-flex items-center gap-2">
-              <MoreHorizontal className="size-4 shrink-0" aria-hidden="true" />
-              {t('eduLiveRoom.hostResults.more')}
-            </span>
-            <ChevronDown className="size-4 shrink-0 transition-transform group-open:rotate-180 motion-reduce:transition-none" aria-hidden="true" />
-          </summary>
-          <div data-testid="edu-results-tertiary" className="mt-2 flex flex-col gap-2 @5xl/results:gap-3">
-            {secondary}
-            {exportSlot}
+        <ResultsMoreTools label={t('eduLiveRoom.hostResults.more')}>
+          <div data-testid="edu-results-tertiary" className="flex flex-col gap-2 @5xl/results:gap-3">
             {(onClose || onExitRoom) && (
               <div className="flex flex-wrap gap-2 @5xl/results:gap-3">
                 {onClose && (
@@ -124,18 +118,16 @@ function Actions({ t, onRematch, onClose, onExitRoom, practiceLeads, secondary, 
                 )}
               </div>
             )}
+            {secondary}
+            {exportSlot}
+            {proSlot}
           </div>
-        </details>
+        </ResultsMoreTools>
       )}
     </div>
   );
 }
 
-/** The dashed More row: rarer room controls behind one tap (same look as the teacher area's Advanced). */
-const MORE_SUMMARY = cn(
-  'flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 rounded-neo-lg border-[3px] border-dashed border-neo-cream/35 px-3 font-neo-body text-sm font-bold text-neo-cream/85 hover:border-neo-cream/70 hover:text-neo-cream [&::-webkit-details-marker]:hidden @5xl/results:text-base',
-  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan'
-);
 
 const PRIMARY_CLASS = cn(
   PRIMARY_BUTTON,
@@ -187,9 +179,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
   };
   const students = stats?.students ?? 0;
   const shortWall = bossOver;
-  const proCard = !proLoading && !hasPro && !isPracticeRound(players);
-  // Laid out for the card while the entitlement resolves, so its arrival never reflows the wall.
-  const roomForCard = !hasPro && !isPracticeRound(players);
+  const proCard = !proLoading && !hasPro && !isPracticeRound(players) && summary.totalWords > 0;
   // On the wall the class numbers stand under the winner, so the side column holds coverage, actions and the Pro card.
   const pulseBesideStage = showPodium && !phone && !bossOver;
   const podiumWidth = bossOver
@@ -212,7 +202,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
       data-outcome={outcome.kind}
       className="fixed inset-0 z-[75] flex flex-col gap-2 overflow-hidden bg-neo-navy px-3 pb-3 pt-4 text-neo-cream [container:results_/_size] lg:gap-4 lg:px-8 lg:pb-6 lg:pt-6"
     >
-      <BossOutcomeCard size="tv" density="compact" className="shrink-0" />
+      <BossOutcomeCard size="tv" density="compact" className="shrink-0 rounded-neo-lg border-[3px] border-neo-cream/50 shadow-hard-xl" />
       <TvRecapHeader
         title={
           !hasStage
@@ -237,7 +227,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
                   muted={!outcome.celebrate}
                   stage={stage}
                   t={t}
-                  className={cn((roomForCard || phone) && 'w-[min(100%,14rem)] @xl/results:w-[min(100%,24rem)]', podiumWidth)}
+                  className={cn(phone && 'w-[min(100%,14rem)] @xl/results:w-[min(100%,24rem)]', podiumWidth)}
                 >
                   {landed && <ClassChest found={summary.classFoundCount} total={summary.totalWords} open={winnerBeat} tone="calm" t={t} />}
                   {!outcome.celebrate && <ZeroRoundNote t={t} />}
@@ -270,9 +260,8 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
                 stage={stage}
                 pointsWithoutLesson={!landed && outcome.celebrate}
                 phone={phone}
-                maxChips={roomForCard ? (phone ? 2 : 3) : bossOver ? 6 : 9}
+                maxChips={bossOver ? 6 : 9}
                 verdict={reteachVerdict(summary).kind}
-                compact={roomForCard}
                 t={t}
               />
             )}
@@ -280,7 +269,6 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
             <div className="flex flex-col gap-2 @max-[64rem]/results:order-first @5xl/results:gap-3 [&>*]:shrink-0">
               <MissedWordsList
                 words={missed}
-                underHalf={studentsUnderHalf(summary)}
                 maxChips={bossOver ? 6 : 8}
                 title={tf('eduLiveRoom.hostResults.missedTitle', 'Words your class missed')}
                 t={t}
@@ -307,6 +295,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
                 onClose={onClose}
                 onExitRoom={onExitRoom}
                 practiceLeads={practiceLeads}
+                proSlot={proCard ? <ClassReportButton language={language} underHalf={studentsUnderHalf(summary)} bars={reportBars(summary)} proLabel={tf('eduLiveRoom.hostResults.proPill', 'Pro')} /> : null}
                 exportSlot={
                   // Export class report (PDF): the real export for Pro, locked and straight to checkout for a free teacher.
                   !proLoading && summary.totalWords > 0 && students > 0 && !isPracticeRound(players) ? (
@@ -315,6 +304,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
                       summary={summary}
                       players={players}
                       proLabel={tf('eduLiveRoom.hostResults.proPill', 'Pro')}
+                      hideOffer={proCard}
                     />
                   ) : null
                 }
@@ -330,16 +320,6 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
                 }
               />
             </div>
-            {/* One Pro slot for a free teacher: a labelled preview of the per-student report, never a wall over the free insight. */}
-            {proCard && summary.totalWords > 0 && (
-              <ClassReportButton
-                language={language}
-                underHalf={studentsUnderHalf(summary)}
-                bars={reportBars(summary)}
-                proLabel={tf('eduLiveRoom.hostResults.proPill', 'Pro')}
-                className={shortWall ? '[@container_results_(height<65rem)]:hidden' : '[@container_results_(height<56.25rem)]:hidden'}
-              />
-            )}
             {!proLoading && hasPro && summary.totalWords > 0 && (
               <div className={cn((shortWall || phone) && '[@container_results_(height<56.25rem)]:hidden')}>
                 <StrugglePreview masteryByPlayer={summary.masteryByPlayer ?? {}} teacherName={summary.teacherName ?? ''} language={language} t={t} />

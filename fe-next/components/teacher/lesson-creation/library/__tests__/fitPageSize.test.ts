@@ -21,4 +21,12 @@ describe('fitPageSize', () => {
   it('Given an exact fit including gaps, Then the last row is counted', () => {
     expect(fitPageSize({ availH: 128 * 3 + 12 * 2, cardH: 128, gap: 12, cols: 1 })).toBe(3);
   });
+
+  it('Given a one-column phone list with room for two cards, When a stacked minimum is set, Then the page holds the minimum and scrolls', () => {
+    expect(fitPageSize({ availH: 300, cardH: 104, gap: 8, cols: 1, minStacked: 6 })).toBe(6);
+  });
+
+  it('Given several columns, Then the stacked minimum does not apply', () => {
+    expect(fitPageSize({ availH: 300, cardH: 128, gap: 12, cols: 2, minStacked: 6 })).toBe(4);
+  });
 });

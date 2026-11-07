@@ -5,7 +5,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { teacherFacingName } from '@/lib/education/rosterName';
 import { getClassroomStudents } from '@/lib/supabase/education/classrooms';
 import { StudentProgressReport } from '@/components/teacher/reports/StudentProgressReport';
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
+import { Dialog } from '@/components/ui/dialog';
+import { NbDialogBody, NbDialogContent, NbDialogHeader } from '@/components/teacher/nb/NbDialog';
 import type { StudentStatus } from '@/lib/education/pro/classInsights';
 import { useProClassAnalytics } from '../useProClassAnalytics';
 import { ATTENTION, STATUSES, pct } from './overviewModel';
@@ -125,11 +126,14 @@ export function ClassOverview({ classroomId, openStudentId, onOpenChange }: Prop
       </section>
 
       <Dialog open={open !== null} onOpenChange={(o) => !o && setOpen(null)}>
-        <DialogContent className="max-h-[90dvh] max-w-3xl overflow-y-auto">
-          <DialogTitle>{open ? nameOf(open) : ''}</DialogTitle>
-          <DialogDescription className="sr-only">{t('education.analytics.overview.drillDescription')}</DialogDescription>
-          {open && <StudentProgressReport studentId={open} classroomId={classroomId} />}
-        </DialogContent>
+        <NbDialogContent size="xl" phone="full">
+          <NbDialogHeader
+            title={open ? <bdi>{nameOf(open)}</bdi> : ''}
+            srDescription={t('education.analytics.overview.drillDescription')}
+            closeLabel={t('common.close')}
+          />
+          <NbDialogBody>{open && <StudentProgressReport studentId={open} classroomId={classroomId} />}</NbDialogBody>
+        </NbDialogContent>
       </Dialog>
     </div>
   );

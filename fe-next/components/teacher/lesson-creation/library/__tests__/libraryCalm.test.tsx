@@ -12,8 +12,10 @@ import DiscoverFilters from '../DiscoverFilters';
 import ListPreviewSheet from '../ListPreviewSheet';
 
 const COLOR_FILL = /(^|\s)bg-neo-(lime|cyan|pink|purple|orange|yellow|white|cream)(\/\d+)?(\s|$)/;
+// The cream close square is the shared teacher dialog chrome, not a competing action.
+const isDialogClose = (el: HTMLElement) => el.matches('[data-nb-dialog-header] > button[aria-label]');
 const fills = (root: ParentNode) =>
-  Array.from(root.querySelectorAll<HTMLElement>('[class]')).filter((el) => COLOR_FILL.test(el.getAttribute('class') ?? ''));
+  Array.from(root.querySelectorAll<HTMLElement>('[class]')).filter((el) => COLOR_FILL.test(el.getAttribute('class') ?? '') && !isDialogClose(el));
 
 const base: LibraryItem = {
   id: 'pub-1',
@@ -101,6 +103,9 @@ describe('Library game cards', () => {
     const { container } = render(<DiscoverFilters filters={{ ...filters }} onChange={onChange} total={3} />);
     expect(fills(container)).toEqual([]);
     expect(container.querySelectorAll('.uppercase')).toHaveLength(0);
+    expect(screen.queryByRole('button', { name: /eduLibrary.discover.source.all/ })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'eduLibrary.discover.filters' }));
+    expect(fills(container)).toEqual([]);
     const active = screen.getByRole('button', { name: /eduLibrary.discover.source.all/ });
     expect(active).toHaveAttribute('aria-pressed', 'true');
     expect(active.className).toMatch(/ring-neo-lime|border-neo-lime/);
@@ -135,5 +140,24 @@ describe('Library game cards', () => {
       <ListPreviewSheet item={base} onClose={vi.fn()} busy={null} copied onHost={vi.fn()} onAssign={vi.fn()} onCopy={vi.fn()} onOpenMyLists={vi.fn()} onReport={vi.fn()} />,
     );
     expect(fills(screen.getByTestId('list-preview-sheet'))).toEqual([screen.getByTestId('preview-host')]);
+  });
+});
+
+describe('LibraryCard on a phone', () => {
+  it('Then the title gets its own full row between the sample/count row and the meta row', () => {
+    render(<LibraryCard item={{ ...base, name: 'If you are reading this, a long list name' }} index={0} onOpen={() => {}} />);
+    const title = screen.getByTitle('If you are reading this, a long list name');
+    expect(title.className).toMatch(/(^|\s)col-span-3(\s|$)/);
+    expect(title.className).toMatch(/(^|\s)row-start-2(\s|$)/);
+    expect(screen.getByTestId('library-card').className).not.toMatch(/(^|\s)h-\[78px\](\s|$)/);
+  });
+});
+
+describe('DiscoverFilters first view', () => {
+  it('Given a teacher picked Verified only, Then the closed Filters button counts it so the narrowed list is never a mystery', () => {
+    render(<DiscoverFilters filters={{ ...filters, source: 'verified' }} onChange={vi.fn()} total={3} />);
+    const toggle = screen.getByRole('button', { name: 'eduLibrary.discover.filters' });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(toggle).toHaveTextContent('1');
   });
 });

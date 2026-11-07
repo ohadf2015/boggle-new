@@ -797,6 +797,7 @@ const sv = {
       "editTitle": "Redigera ordlista",
       "description": "Klistra in ord, lägg till betydelser, spara.",
       "newList": "Ny lista",
+      "moreOptions": "Språk, årskurs, ämne och delning",
       "titleLabel": "Listans namn",
       "titlePlaceholder": "Döp din lista…",
       "pasteLabel": "Klistra in eller skriv ord",
@@ -15412,6 +15413,7 @@ const sv = {
       "galleryTitle": "Börja med en mall",
       "galleryHint": "Välj årskurs och ämne, förhandsgranska listan och tilldela med ett tryck. Word Craft, inlämning imorgon.",
       "galleryBrowse": "Bläddra bland uppgiftsmallar",
+      "moreOptions": "Andra sätt att spela, ett fokus eller en anteckning",
       "galleryPreview": "Visa ord",
       "galleryAssign": "Tilldela klassen",
       "galleryHidePreview": "Dölj ord",
@@ -21226,6 +21228,7 @@ const sv = {
       "teacher": "För lärare",
       "school": "För skolor"
     },
+    "compareAll": "Jämför Free och Pro sida vid sida",
     "strip": {
       "title": "Det här visar Pro efter ett spel",
       "lead": "Exempeldata från en klass. Dina egna klasser fyller i resten."
@@ -21617,7 +21620,6 @@ const sv = {
       "endGame": "Avsluta spelet",
       "noScores": "Ingen fick poäng den här rundan",
       "mostMissed": "Mest missade ord",
-      "needHelpCount": "Elever under hälften: {count}. Namnen finns i rapporten.",
       "replayMissed": "Spela de missade orden igen ({count})",
       "replayFailed": "Det gick inte att förbereda omgången. Försök igen.",
       "replayUnconfirmed": "Rummet har inte svarat än. Nästa omgång kan bara använda de missade orden.",

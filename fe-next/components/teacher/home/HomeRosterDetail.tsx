@@ -7,7 +7,8 @@ import { BookOpenCheck, CalendarDays, ClipboardList, Flame, Target, X, Zap } fro
 import { cn } from '@/lib/utils';
 import AvatarLite, { type AvatarLiteConfig } from '@/components/AvatarLite';
 import { EDU_MOTION, useReducedMotionSafe } from '@/components/education/motion';
-import { OUTLINE_BUTTON } from './homeStyles';
+import { NB_DIALOG_CLOSE, NB_DIALOG_TITLE } from '@/components/teacher/nb/nbDialogStyles';
+import { NB_BLOCK, NB_DARK_EDGE, NB_SMALL } from '@/components/teacher/nb/nbStyles';
 import { lastPlayedLabel } from './HomeClassList';
 import type { RosterRow, RosterStatus } from './rosterModel';
 
@@ -74,9 +75,9 @@ function DetailBody({ row, onClose, onAssign, language, nowMs, t, titleAs }: Det
         <AvatarLite userId={row.id} customAvatar={row.avatarConfig as AvatarLiteConfig | null} pixelSize={44} className="shrink-0" />
         <div className="min-w-0 flex-1">
           {titleAs === 'dialog' ? (
-            <DialogPrimitive.Title className="truncate font-neo-display text-xl font-black text-neo-cream">{name}</DialogPrimitive.Title>
+            <DialogPrimitive.Title className={cn(NB_DIALOG_TITLE, 'truncate text-neo-cream')}>{name}</DialogPrimitive.Title>
           ) : (
-            <h3 className="truncate font-neo-display text-xl font-black text-neo-cream">{name}</h3>
+            <h3 className={cn(NB_DIALOG_TITLE, 'truncate text-neo-cream')}>{name}</h3>
           )}
           <p className="mt-1">
             <StatusPill status={row.status} label={t(`eduShell.home.roster.status.${row.status}`)} />
@@ -86,9 +87,9 @@ function DetailBody({ row, onClose, onAssign, language, nowMs, t, titleAs }: Det
           type="button"
           onClick={onClose}
           aria-label={t('common.close')}
-          className="grid size-11 shrink-0 place-items-center rounded-neo text-neo-cream/70 transition-colors hover:bg-neo-cream/10 hover:text-neo-cream focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream motion-reduce:transition-none"
+          className={NB_DIALOG_CLOSE}
         >
-          <X className="size-5" aria-hidden="true" />
+          <X className="size-5" strokeWidth={3} aria-hidden="true" />
         </button>
       </div>
 
@@ -98,8 +99,8 @@ function DetailBody({ row, onClose, onAssign, language, nowMs, t, titleAs }: Det
       </div>
 
       <div>
-        <h4 className="mb-1.5 font-neo-body text-xs font-bold text-neo-cream/70">{t('eduShell.home.roster.recent')}</h4>
-        <ul data-testid="home-roster-activity" className="divide-y-2 divide-neo-cream/10 rounded-neo border-2 border-neo-cream/15">
+        <h4 className="mb-1.5 font-neo-display text-sm font-black text-neo-cream">{t('eduShell.home.roster.recent')}</h4>
+        <ul data-testid="home-roster-activity" className={cn('divide-y-2 divide-neo-cream/15 rounded-neo-lg border-[3px] bg-neo-navy-light', NB_DARK_EDGE)}>
           <Activity icon={<CalendarDays className="size-4" aria-hidden="true" />} text={t('eduShell.home.roster.lastPlayed', { when: played })} />
           <Activity icon={<Flame className="size-4" aria-hidden="true" />} text={row.streak > 0 ? t('eduShell.home.roster.streak', { count: row.streak }) : t('eduShell.home.roster.noStreak')} />
           <Activity
@@ -113,7 +114,7 @@ function DetailBody({ row, onClose, onAssign, language, nowMs, t, titleAs }: Det
         <button
           type="button"
           onClick={() => onAssign(row)}
-          className={cn(OUTLINE_BUTTON, 'w-full text-base')}
+          className={cn(NB_SMALL, NB_BLOCK.cyan, 'min-h-12 w-full text-base')}
         >
           <ClipboardList className="size-5" aria-hidden="true" />
           {t('eduShell.home.focus.assign')}
@@ -125,7 +126,7 @@ function DetailBody({ row, onClose, onAssign, language, nowMs, t, titleAs }: Det
 
 function Stat({ icon, value, label }: { icon: ReactNode; value: string; label: string }) {
   return (
-    <div data-testid="home-roster-stat" className="rounded-neo border-2 border-neo-cream/40 bg-neo-navy px-3 py-2">
+    <div data-testid="home-roster-stat" className={cn('rounded-neo-lg border-[3px] bg-neo-navy-light px-3 py-2 shadow-hard', NB_DARK_EDGE)}>
       <span className="flex items-center gap-1.5 font-neo-display text-lg font-black tabular-nums text-neo-cream">
         {icon}
         {value}
@@ -168,13 +169,13 @@ export function RosterSheet(props: DetailProps) {
   return (
     <DialogPrimitive.Root open onOpenChange={(open) => !open && props.onClose()}>
       <DialogPrimitive.Portal>
-        <DialogPrimitive.Overlay className="fixed inset-0 z-90 bg-neo-black/70" />
+        <DialogPrimitive.Overlay className="fixed inset-0 z-90 bg-neo-black/85" />
         <DialogPrimitive.Content
           aria-describedby={undefined}
-          className="fixed inset-x-0 bottom-0 z-90 max-h-[85dvh] overflow-y-auto rounded-t-neo-lg border-2 border-b-0 border-neo-cream/35 bg-neo-navy-light px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 shadow-hard focus:outline-none"
+          className={cn('fixed inset-x-0 bottom-0 z-90 max-h-[85dvh] overflow-y-auto rounded-t-neo-xl border-[3px] border-b-0 bg-neo-navy px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 focus:outline-none', NB_DARK_EDGE)}
         >
           <m.div initial={reduced ? false : { y: 48 }} animate={{ y: 0 }} transition={EDU_MOTION.spring.settle}>
-            <span aria-hidden="true" className="mx-auto mb-3 block h-1.5 w-10 rounded-full bg-neo-cream/25" />
+            <span aria-hidden="true" className="mx-auto mb-3 block h-1.5 w-12 rounded-full bg-neo-cream/40" />
             <DetailBody {...props} titleAs="dialog" />
           </m.div>
         </DialogPrimitive.Content>

@@ -149,7 +149,7 @@ export function ProGate({ feature, children, active = true, whileChecking = null
           role="status"
           className={cn(
             'mb-4 flex flex-col gap-2 rounded-neo p-3 sm:flex-row sm:items-center sm:justify-between',
-            calm ? 'border-2 border-neo-cream/40' : 'border-neo border-neo-lime bg-neo-navy-light shadow-hard-sm',
+            calm ? 'rounded-neo-lg border-[3px] border-neo-cream/50 bg-neo-navy-light shadow-hard-lg' : 'border-neo border-neo-lime bg-neo-navy-light shadow-hard-sm',
           )}
         >
           <div className="min-w-0">
@@ -184,7 +184,7 @@ export function ProGate({ feature, children, active = true, whileChecking = null
       data-testid="pro-gate-lock"
       className={cn(
         arcade ? cn(GAME_CARD, 'p-4 sm:p-6') : 'rounded-neo p-4 sm:p-5',
-        !arcade && (calm ? 'border-2 border-neo-cream/40 bg-neo-navy-light' : 'border-neo border-neo-lime bg-neo-navy-light shadow-hard'),
+        !arcade && (calm ? 'rounded-neo-xl border-[3px] border-neo-cream/50 bg-neo-navy-light shadow-hard-xl' : 'border-neo border-neo-lime bg-neo-navy-light shadow-hard'),
       )}
     >
       <div className="grid items-center gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:gap-6">
@@ -195,7 +195,8 @@ export function ProGate({ feature, children, active = true, whileChecking = null
             <EduMascot moment="pro" size={112} className="absolute -top-7 left-1/2 size-20 -translate-x-1/2 animate-edu-bob max-md:hidden" />
           ) : null}
         </div>
-        <div className="text-center md:text-start">
+        {/* Phones: the pitch and its button lead, the sample sits under them instead of pushing the button off screen. */}
+        <div data-testid="pro-gate-pitch" className="text-center max-md:order-first md:text-start">
           {calm ? (
             <span
               data-testid="pro-gate-pill"
@@ -235,7 +236,7 @@ export function ProGate({ feature, children, active = true, whileChecking = null
               startFromHere(lockAction.start);
             }}
             className={cn(
-              'inline-block rounded-neo border-neo px-6 py-3 font-black text-neo-navy shadow-hard transition-shadow hover:shadow-hard-lg disabled:opacity-60',
+              'inline-block rounded-neo border-neo px-6 py-3 font-black text-neo-navy shadow-hard transition-shadow hover:shadow-hard-lg disabled:opacity-60 max-sm:w-full',
               calm ? 'bg-neo-lime' : 'bg-neo-cyan',
               arcade && 'animate-edu-shine font-neo-display sm:text-lg hover:-translate-y-0.5 motion-reduce:hover:translate-y-0',
             )}

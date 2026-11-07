@@ -1,17 +1,10 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import {
-  AlertDialog,
-  AlertDialogPortal,
-  AlertDialogOverlay,
-  AlertDialogContent,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogAction,
-  AlertDialogCancel,
-} from '@/components/ui/alert-dialog';
+import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog';
+import { AlertDialog, AlertDialogContent, AlertDialogTitle, AlertDialogDescription } from '@/components/ui/alert-dialog';
+import { NB_DIALOG_DESCRIPTION, NB_DIALOG_FOOTER, NB_DIALOG_PHONE, NB_DIALOG_TITLE, nbDialogHeaderClass } from '@/components/teacher/nb/nbDialogStyles';
+import { NB_PRIMARY, NB_SECONDARY } from '@/components/teacher/nb/nbStyles';
 
 interface LessonBuilderDraftPromptProps {
   open: boolean;
@@ -32,42 +25,35 @@ export default function LessonBuilderDraftPrompt({
 }: LessonBuilderDraftPromptProps) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogPortal>
-        <AlertDialogOverlay className="z-[60]" />
-        <AlertDialogContent
-          className={cn(
-            'w-full max-w-md p-6 bg-neo-navy border-neo border-neo-cream shadow-hard-lg z-[60]',
-            'rounded-neo'
-          )}
-        >
-          <AlertDialogTitle className="text-2xl font-neo-display text-neo-white mb-2 text-balance">
-            {t('teacher.lesson.resumeDraft')}
-          </AlertDialogTitle>
-          <AlertDialogDescription className="text-neo-white mb-6 text-pretty">
-            {t('teacher.lesson.draftFound', { time: formattedAge })}
-          </AlertDialogDescription>
-
-          <div className="flex gap-3">
-            <AlertDialogAction asChild>
-              <Button
-                onClick={onRestore}
-                className="flex-1 bg-neo-cyan text-neo-black font-bold shadow-hard hover:shadow-hard-pressed"
-              >
-                {t('teacher.lesson.resumeDraftButton')}
-              </Button>
-            </AlertDialogAction>
-            <AlertDialogCancel asChild>
-              <Button
-                onClick={onDiscard}
-                variant="outline"
-                className="border-neo-pink text-neo-pink hover:bg-neo-pink/20"
-              >
-                {t('teacher.lesson.discardDraftButton')}
-              </Button>
-            </AlertDialogCancel>
+      <AlertDialogContent
+        data-testid="lesson-draft-prompt"
+        className={cn(
+          'flex w-[calc(100%-2rem)] max-w-md flex-col gap-0 overflow-hidden p-0 sm:max-w-md',
+          'border-[3px] border-neo-cream/50 bg-neo-navy text-neo-cream shadow-hard-xl rounded-neo-xl! sm:rounded-neo-xl!',
+          NB_DIALOG_PHONE.sheet,
+        )}
+      >
+        <div className={nbDialogHeaderClass('cyan')}>
+          <div className="min-w-0 flex-1">
+            <AlertDialogTitle className={NB_DIALOG_TITLE}>{t('teacher.lesson.resumeDraft')}</AlertDialogTitle>
+            <AlertDialogDescription className={NB_DIALOG_DESCRIPTION}>
+              {t('teacher.lesson.draftFound', { time: formattedAge })}
+            </AlertDialogDescription>
           </div>
-        </AlertDialogContent>
-      </AlertDialogPortal>
+        </div>
+        <div className={NB_DIALOG_FOOTER}>
+          <AlertDialogPrimitive.Cancel asChild>
+            <button type="button" onClick={onDiscard} className={NB_SECONDARY}>
+              {t('teacher.lesson.discardDraftButton')}
+            </button>
+          </AlertDialogPrimitive.Cancel>
+          <AlertDialogPrimitive.Action asChild>
+            <button type="button" onClick={onRestore} className={NB_PRIMARY}>
+              {t('teacher.lesson.resumeDraftButton')}
+            </button>
+          </AlertDialogPrimitive.Action>
+        </div>
+      </AlertDialogContent>
     </AlertDialog>
   );
 }

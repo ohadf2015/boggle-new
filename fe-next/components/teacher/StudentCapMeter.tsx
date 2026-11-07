@@ -51,14 +51,14 @@ export function StudentCapMeter({
   const showCta = !pro.loading && shouldShowStudentCapUpgradeCta(count, hasPro);
   const [gateOpen, setGateOpen] = useState(false);
 
-  const ctaClass = 'inline-flex min-h-10 shrink-0 items-center justify-center rounded-neo border-2 border-neo-cream/60 px-3 font-neo-display text-xs font-bold text-neo-cream transition hover:border-neo-cream hover:bg-neo-cream/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cream';
+  const ctaClass = 'inline-flex min-h-10 shrink-0 items-center justify-center rounded-neo border-[3px] border-neo-black bg-neo-yellow px-3 font-neo-display text-xs font-black text-neo-black shadow-hard transition hover:-translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cream';
   const ctaLabel = t('academy.classes.proCta', 'Get Pro: {{price}}/mo', { price: `$${TEACHER_PRO_PRICE_USD}` });
 
   return (
     <div
       data-testid="student-cap-meter"
       data-at-cap={atCap ? 'true' : 'false'}
-      className={cn('flex flex-col gap-1 rounded-neo border-2 border-neo-cream/35 px-3 py-1.5 text-neo-cream', className)}
+      className={cn('flex flex-col gap-1 rounded-neo-lg border-[3px] border-neo-cream/50 bg-neo-navy-light px-3 py-1.5 text-neo-cream shadow-hard', className)}
     >
       <div className="flex min-h-10 flex-wrap items-center justify-between gap-x-3 gap-y-1">
         <p data-testid="student-cap-count" className="font-neo-body text-sm font-bold tabular-nums text-neo-cream/85">

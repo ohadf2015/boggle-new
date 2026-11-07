@@ -21,6 +21,7 @@ import { useFitPageSize } from './useFitPageSize';
 
 const GRID = 'grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3 md:grid-cols-3 xl:grid-cols-4';
 const PAGER_RESERVE = 56;
+const PHONE_MIN_CARDS = 6;
 const BE_FIRST_RESERVE = 64;
 const PAGER_BUTTON = 'min-h-11 rounded-neo border-2 border-neo-cream/60 px-4 font-bold text-neo-white hover:border-neo-cream disabled:opacity-40';
 
@@ -35,7 +36,7 @@ export default function DiscoverPanel({ onOpenMyLists, onShareFirst, onCopied }:
   const { user } = useAuth();
   const router = useRouter();
   const [beFirst, setBeFirst] = useState(false);
-  const [gridRef, pageSize] = useFitPageSize(LIBRARY_CARD_H, PAGER_RESERVE + (beFirst ? BE_FIRST_RESERVE : 0));
+  const [gridRef, pageSize] = useFitPageSize(LIBRARY_CARD_H, PAGER_RESERVE + (beFirst ? BE_FIRST_RESERVE : 0), 12, PHONE_MIN_CARDS);
   const lib = useDiscoverLibrary(pageSize);
   const showBeFirst = lib.status === 'ready' && lib.teacherCount === 0 && lib.filters.source !== 'verified';
   if (showBeFirst !== beFirst) setBeFirst(showBeFirst);
@@ -100,7 +101,7 @@ export default function DiscoverPanel({ onOpenMyLists, onShareFirst, onCopied }:
       {lib.status === 'loading' ? (
         <div ref={gridRef} className={GRID} aria-busy="true">
           {Array.from({ length: pageSize }, (_, i) => (
-            <div key={i} className="h-[78px] animate-pulse rounded-neo-lg border-[3px] border-neo-cream/40 bg-neo-navy-light sm:h-[144px]" />
+            <div key={i} className="h-[104px] animate-pulse rounded-neo-lg border-[3px] border-neo-cream/40 bg-neo-navy-light sm:h-[144px]" />
           ))}
         </div>
       ) : lib.items.length === 0 ? (

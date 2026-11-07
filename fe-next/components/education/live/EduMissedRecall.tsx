@@ -61,7 +61,7 @@ export function EduMissedRecall({ missed, deck, t }: EduMissedRecallProps) {
               setRound((r) => r + 1);
               setPhase('quiz');
             }}
-            className={cn(BUTTON, PRESS, 'border-neo-cream/40 bg-neo-navy-light text-neo-cream')}
+            className={cn(BUTTON, PRESS, 'border-neo-cream/50 bg-neo-navy-light text-neo-cream')}
           >
             <RotateCcw className="size-5" aria-hidden="true" />
             {t('eduStudent.recall.practiceAgain')}

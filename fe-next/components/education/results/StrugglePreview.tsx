@@ -29,15 +29,15 @@ export function StrugglePreview({ masteryByPlayer, teacherName, language, t, max
   return (
     <section
       data-testid="struggle-preview"
-      className="flex shrink-0 items-center gap-3 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-3 py-2 @lg/results:gap-4 @lg/results:px-4 @lg/results:py-3"
+      className="flex shrink-0 items-center gap-3 rounded-neo-xl border-[3px] border-neo-cream/50 bg-neo-navy-light px-3 py-2 shadow-hard-xl @lg/results:gap-4 @lg/results:px-4 @lg/results:py-3"
     >
       <ul aria-hidden="true" className="flex w-24 shrink-0 flex-col gap-1 @lg/results:w-36 @lg/results:gap-1.5">
         {pcts.slice(0, maxBars).map((pct, i) => (
           <li key={i} data-testid="struggle-bar" data-pct={String(pct)} className="flex items-center gap-1.5">
-            <span className="h-2 w-6 shrink-0 rounded-full bg-neo-cream/40 @lg/results:h-2.5 @lg/results:w-8" />
-            <span className="h-2 flex-1 overflow-hidden rounded-full bg-neo-navy @lg/results:h-2.5">
+            <span className="h-2 w-6 shrink-0 rounded-sm bg-neo-cream/50 @lg/results:h-2.5 @lg/results:w-8" />
+            <span className="h-2 flex-1 overflow-hidden rounded-sm bg-neo-navy @lg/results:h-2.5">
               <span
-                className="block h-full origin-left rounded-full bg-neo-cream rtl:origin-right"
+                className="block h-full origin-left bg-neo-cream rtl:origin-right"
                 style={{ transform: `scaleX(${Math.max(0.06, pct / 100)})` }}
               />
             </span>
@@ -54,7 +54,7 @@ export function StrugglePreview({ masteryByPlayer, teacherName, language, t, max
           rel="noopener noreferrer"
           data-testid="edu-results-report"
           onClick={() => trackResultsAction('view_report', 'projector')}
-          className="inline-flex min-h-11 items-center gap-1.5 rounded-neo border-[2px] border-neo-cream/60 px-3 font-neo-display text-sm font-bold text-neo-cream hover:bg-neo-navy focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan @[96rem]/results:min-h-14 @[96rem]/results:text-lg"
+          className="inline-flex min-h-11 items-center gap-1.5 rounded-neo border-[3px] border-neo-black bg-neo-cyan px-3 font-neo-display text-sm font-black text-neo-black shadow-hard-lg transition-[transform,box-shadow] duration-150 hover:-translate-y-px active:translate-x-[3px] active:translate-y-[3px] active:shadow-none motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan @[96rem]/results:min-h-14 @[96rem]/results:text-lg"
         >
           <BarChart3 className="size-4 shrink-0" aria-hidden="true" />
           {t('education.results.fullReport')}

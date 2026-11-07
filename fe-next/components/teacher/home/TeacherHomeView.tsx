@@ -70,9 +70,9 @@ export function TeacherHomeView({
         )}
       >
         <div className="flex min-w-0 flex-col gap-3 sm:gap-4 lg:col-start-1 lg:row-start-1">
-          <header data-tm className="flex items-start justify-between gap-3">
+          <header data-tm data-testid="home-greeting-row" className="flex items-start justify-between gap-3 max-sm:flex-col max-sm:gap-2">
             {/* The mascot says hello and the one thing worth doing today, like a teammate would. */}
-            <MascotBubble pose={hasClasses ? 'gameStart' : 'welcome'} size={72} className="min-w-0 flex-1 lg:[&>img]:size-20">
+            <MascotBubble pose={hasClasses ? 'gameStart' : 'welcome'} size={72} className="min-w-0 flex-1 max-sm:self-stretch lg:[&>img]:size-20">
               <h1 data-wipe suppressHydrationWarning className="font-neo-display text-lg font-black leading-tight text-neo-black sm:text-xl">
                 {greeting}
               </h1>
@@ -82,7 +82,7 @@ export function TeacherHomeView({
                 </p>
               ) : null}
             </MascotBubble>
-            <div className="mt-0.5 flex shrink-0 items-center gap-1.5 lg:hidden">
+            <div data-testid="home-greeting-stats" className="mt-0.5 flex shrink-0 items-center gap-1.5 empty:hidden max-sm:mt-0 max-sm:ps-20 lg:hidden">
               {ready && !error && hasClasses && week?.summary && week.status === 'ready' ? (
                 <HomeWeekChips summary={week.summary} classCount={week.classCount} t={t} />
               ) : null}

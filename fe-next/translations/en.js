@@ -797,6 +797,7 @@ const en = {
       "editTitle": "Edit word list",
       "description": "Paste words, add definitions, save.",
       "newList": "New list",
+      "moreOptions": "Language, grade, topic and sharing",
       "titleLabel": "List title",
       "titlePlaceholder": "Name your list…",
       "pasteLabel": "Paste or type words",
@@ -13235,6 +13236,7 @@ const en = {
       "galleryTitle": "Start from a template",
       "galleryHint": "Pick a grade and subject, preview the word list, then assign in one tap. Word Craft, due tomorrow.",
       "galleryBrowse": "Browse assignment templates",
+      "moreOptions": "Other ways to play, a focus or a note",
       "galleryPreview": "Preview words",
       "galleryAssign": "Assign to class",
       "galleryHidePreview": "Hide words",
@@ -20271,6 +20273,7 @@ const en = {
       "teacher": "For teachers",
       "school": "For schools"
     },
+    "compareAll": "Compare Free and Pro side by side",
     "strip": {
       "title": "What Pro shows you after one game",
       "lead": "Sample class data. Your own classes fill these in."
@@ -20662,7 +20665,6 @@ const en = {
       "endGame": "End game",
       "noScores": "No one scored this round",
       "mostMissed": "Most missed words",
-      "needHelpCount": "Students under half: {count}. Names are in the report.",
       "replayMissed": "Replay missed words ({count})",
       "replayFailed": "Couldn't set up the replay. Try again.",
       "replayUnconfirmed": "No answer from the room yet. The next round may use only the missed words.",

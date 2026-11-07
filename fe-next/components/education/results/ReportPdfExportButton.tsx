@@ -48,10 +48,12 @@ export interface ReportPdfExportButtonProps {
   players?: PlayerResult[];
   proLabel?: string;
   className?: string;
+  /** Drop the trial line when another card on the screen already makes the offer. */
+  hideOffer?: boolean;
 }
 
 const BUTTON =
-  'inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-neo border-[2px] px-3 text-center font-neo-body text-sm font-bold normal-case focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan active:brightness-90 disabled:opacity-60 @5xl/results:text-base @[96rem]/results:min-h-14 @[96rem]/results:text-xl';
+  'inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-neo-lg border-[3px] px-3 text-center font-neo-display text-sm font-black normal-case shadow-hard-lg transition-[transform,box-shadow] duration-150 hover:-translate-y-px active:translate-x-[3px] active:translate-y-[3px] active:shadow-none motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan disabled:opacity-60 @5xl/results:text-base @[96rem]/results:min-h-14 @[96rem]/results:text-xl';
 
 /** A blank tab opened inside the tap (so no popup blocker), pointed at checkout once the URL is back. */
 function openBlankTab(): Window | null {
@@ -64,7 +66,7 @@ function openBlankTab(): Window | null {
   }
 }
 
-export function ReportPdfExportButton({ language, summary, players, proLabel = 'Pro', className }: ReportPdfExportButtonProps) {
+export function ReportPdfExportButton({ language, summary, players, proLabel = 'Pro', className, hideOffer = false }: ReportPdfExportButtonProps) {
   const { hasPro, loading, known, trialUsed, accessTrialExpires, accessTrialEnded } = useTeacherPro();
   const { user } = useAuth();
   const lang = useLanguage();
@@ -148,7 +150,7 @@ export function ReportPdfExportButton({ language, summary, players, proLabel = '
           disabled={busy}
           aria-busy={busy}
           onClick={() => void exportPdf()}
-          className={cn(BUTTON, 'border-neo-cream/60 bg-transparent text-neo-cream hover:bg-neo-navy-light')}
+          className={cn(BUTTON, 'border-neo-cream/50 bg-neo-navy-light text-neo-cream')}
         >
           {busy ? <Loader2 className="size-4 shrink-0 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : <Download className="size-4 shrink-0" aria-hidden="true" />}
           {busy ? copy.preparing : copy.button}
@@ -172,17 +174,19 @@ export function ReportPdfExportButton({ language, summary, players, proLabel = '
         aria-busy={busy}
         aria-label={copy.lockedLabel}
         onClick={() => void startCheckout()}
-        className={cn(BUTTON, 'border-dashed border-neo-cream/50 bg-transparent text-neo-cream hover:bg-neo-navy-light')}
+        className={cn(BUTTON, 'border-dashed border-neo-cream/50 bg-neo-navy-light text-neo-cream')}
       >
         {busy ? <Loader2 className="size-4 shrink-0 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : <Lock className="size-4 shrink-0" aria-hidden="true" />}
         <span className="min-w-0">{copy.button}</span>
         <ProPill label={proLabel} />
       </button>
-      <p data-testid="report-pdf-offer" className="text-center text-xs font-semibold text-neo-cream/80 @[96rem]/results:text-sm">
-        <span className="font-bold text-neo-cream">{proOffer.label}</span>
-        {' · '}
-        {proOffer.note}
-      </p>
+      {!hideOffer && (
+        <p data-testid="report-pdf-offer" className="text-center text-xs font-semibold text-neo-cream/80 @[96rem]/results:text-sm">
+          <span className="font-bold text-neo-cream">{proOffer.label}</span>
+          {' · '}
+          {proOffer.note}
+        </p>
+      )}
       {/* Teachers with 3+ classes: the Schools plan beside the $9/mo ask (placement results_school_quote). */}
       <ResultsSchoolQuoteLink language={language} />
     </div>

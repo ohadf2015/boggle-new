@@ -116,11 +116,11 @@ export function UpgradePlanCards({
   };
 
   return (
-    <div data-testid="pricing-cards" className="grid grid-cols-1 items-stretch gap-4 md:grid-cols-3 md:gap-5">
+    <div data-testid="pricing-cards" className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-3 lg:gap-5">
       <article
         data-testid="plan-card-free"
         data-tilt
-        className="order-2 flex flex-col rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light p-4 md:order-1 sm:p-5"
+        className="order-2 flex flex-col rounded-neo border-[3px] border-neo-cream/50 bg-neo-navy-light p-4 shadow-hard-lg lg:order-1 sm:p-5"
       >
         <h2 className="font-neo-display text-lg font-black text-neo-white">{t('teacher.subscription.freePlanName')}</h2>
         <p className="mb-3 text-xs font-bold text-neo-white/65">{t('teacher.subscription.freeForever')}</p>
@@ -157,7 +157,7 @@ export function UpgradePlanCards({
       <article
         data-testid="plan-card-pro"
         data-tilt
-        className="relative order-1 flex flex-col rounded-neo border-3 border-neo-black bg-neo-yellow p-4 shadow-hard-lg md:order-2 sm:p-5"
+        className="relative order-1 flex flex-col rounded-neo border-3 border-neo-black bg-neo-yellow p-4 shadow-hard-lg lg:order-2 sm:p-5"
       >
         <span className="absolute -top-3 start-4 inline-flex items-center gap-1 rounded-neo border-2 border-neo-black bg-neo-pink px-2.5 py-0.5 font-neo-display text-xs font-black text-neo-black">
           <Sparkles className="h-3 w-3" strokeWidth={3} aria-hidden />

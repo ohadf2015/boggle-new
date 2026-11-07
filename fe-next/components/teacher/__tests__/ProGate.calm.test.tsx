@@ -61,4 +61,19 @@ describe('ProGate calm tone (reports)', () => {
     expect(screen.getByTestId('pro-gate-upgrade-analytics').className).toMatch(/\bbg-neo-cyan\b/);
     expect(screen.getByTestId('pro-gate-upgrade-analytics')).toHaveTextContent('eduPlans.reports.trialCta');
   });
+
+  it('Given a phone, Then the pitch and its button come before the sample report and the calm lock is a chunky panel', () => {
+    mockUseTeacherPro.mockReturnValue({ hasPro: false, loading: false, known: true, status: 'active', trialUsed: false });
+    render(
+      <ProGate feature="reports" tone="calm" polarTrialPlacement="reports_teaser">
+        <div>paid</div>
+      </ProGate>,
+    );
+    expect(screen.getByTestId('pro-gate-pitch').className).toMatch(/(^|\s)max-md:order-first(\s|$)/);
+    expect(screen.getByTestId('pro-gate-upgrade-reports').className).toMatch(/(^|\s)max-sm:w-full(\s|$)/);
+    const lock = screen.getByTestId('pro-gate-lock');
+    expect(lock.className).toMatch(/border-\[3px\]/);
+    expect(lock.className).toMatch(/(^|\s)shadow-hard-xl(\s|$)/);
+  });
 });
+
