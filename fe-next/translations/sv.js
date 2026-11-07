@@ -22016,7 +22016,7 @@ const sv = {
       "advancedOpen": "Ändra årskurs, språk eller ord",
       "advancedClose": "Dölj alternativ",
       "bubble": "Bara ett namn. Resten har jag valt åt dig, ändra om du vill.",
-      "createAndPlay": "Skapa och spela",
+      "createClass": "Skapa klass",
       "anyGrade": "Alla årskurser",
       "side": {
         "title": "Det här händer sen",
@@ -22028,10 +22028,26 @@ const sv = {
       "packRecommended": "Vårt tips",
       "startLive": "Starta live",
       "createOnly": "Skapa nu, spela senare",
-      "createAndPlayHint": "Öppnar spelbrädet med er anslutningskod. Eleverna ansluter, sedan trycker du på Starta.",
       "packSticker": "Ordlista: {name}",
       "packHint": "Eleverna får också orden som läxa när de går med.",
-      "assignFailed": "Klassen är klar, men orden tilldelades inte. Tilldela dem från klassens sida."
+      "assignFailed": "Klassen är klar, men orden tilldelades inte. Tilldela dem från klassens sida.",
+      "words": {
+        "title": "Ord till första spelet",
+        "label": "Din ordlista",
+        "placeholder": "Klistra in veckans ord. Ett per rad eller med kommatecken.",
+        "count": "{count} klara",
+        "tooFew": "Lägg till minst {min} ord, eller töm rutan och spela ett startpaket.",
+        "phrasesOnly": "Fraser med flera ord får inte plats på brädet. Lägg till enstaka ord, eller töm rutan och spela ett startpaket.",
+        "skipped": "Fraser som utelämnades: {count}. Brädet tar bara enstaka ord.",
+        "playFailed": "Spelet öppnades inte. Tryck på Spela nu igen.",
+        "yours": "Rundan körs med dina ord, och de sparas i klassen också.",
+        "packLabel": "Ingen lista än? Spela ett startpaket",
+        "packHint": "Det sparas i klassen så att eleverna kan öva på det senare.",
+        "listName": "Ord för {date}",
+        "playNow": "Spela nu",
+        "saved": "Redan i klassen",
+        "createHint": "Därefter: klasskoden och en ruta för veckans ord. Tryck sedan på Spela nu."
+      }
     },
     "host": {
       "classLabel": "Klass",

@@ -84,9 +84,9 @@ export function ClassSetupCreate() {
         } else {
           toast.error(t('eduShell.setup.assignFailed'));
         }
-        // A saved lesson is the lobby's newest list; a pack intent on top would make a duplicate lesson at launch.
-        const livePack = mode === 'live' && !assigned.success ? pack.nameKey : null;
-        router.replace(inviteHref(language, classroomId, livePack), { scroll: false });
+        const savedLessonId = assigned.success ? assigned.lesson?.id : null;
+        const href = inviteHref(language, classroomId, pack.nameKey);
+        router.replace(savedLessonId ? `${href}&lessonId=${encodeURIComponent(savedLessonId)}` : href, { scroll: false });
         return;
       }
       inFlight.current = false;
@@ -119,7 +119,6 @@ export function ClassSetupCreate() {
         busy={busy}
         errorKey={errorKey}
         onStartLive={() => void create('live')}
-        onCreateOnly={() => void create('create')}
         skipHref={`/${language}/teacher`}
         t={t}
       />

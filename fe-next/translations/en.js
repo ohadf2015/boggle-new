@@ -21061,7 +21061,7 @@ const en = {
       "advancedOpen": "Change grade, language or words",
       "advancedClose": "Hide options",
       "bubble": "Just a name. I picked the rest for you, change it if you like.",
-      "createAndPlay": "Create and play",
+      "createClass": "Create class",
       "anyGrade": "Any grade",
       "side": {
         "title": "What happens next",
@@ -21073,10 +21073,26 @@ const en = {
       "packRecommended": "Our pick",
       "startLive": "Start live",
       "createOnly": "Create now, play later",
-      "createAndPlayHint": "Opens the game board with your join code. Students join, then you press Start.",
       "packSticker": "Word list: {name}",
       "packHint": "Students also get these words as homework when they join.",
-      "assignFailed": "Your class is ready, but the words weren't assigned. Assign them from the class page."
+      "assignFailed": "Your class is ready, but the words weren't assigned. Assign them from the class page.",
+      "words": {
+        "title": "Words for the first game",
+        "label": "Your word list",
+        "placeholder": "Paste this week's words. One per line or with commas.",
+        "count": "{count} ready",
+        "tooFew": "Add at least {min} words, or clear the box to play a starter pack.",
+        "phrasesOnly": "Phrases with more than one word can't go on the board. Add single words, or clear the box to play a starter pack.",
+        "skipped": "Phrases left out: {count}. The board only takes single words.",
+        "playFailed": "The game didn't open. Tap Play now again.",
+        "yours": "The round uses your words, and they're saved to this class too.",
+        "packLabel": "No list yet? Play a starter pack",
+        "packHint": "It's saved to this class, so students can practice it later.",
+        "listName": "Words for {date}",
+        "playNow": "Play now",
+        "saved": "In your class",
+        "createHint": "Next: your join code and a box for this week's words. Then tap Play now."
+      }
     },
     "host": {
       "classLabel": "Class",
