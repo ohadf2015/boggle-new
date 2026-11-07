@@ -23,7 +23,7 @@ import { HqProjectorSheet } from '@/components/teacher/hq/HqProjectorSheet';
 import { RehearseWithBotsButton } from '@/components/teacher/home/RehearseWithBotsButton';
 import { PANEL, SECONDARY_BUTTON } from '@/components/teacher/home/homeStyles';
 import { writeQuickLaunchIntent } from '@/components/teacher/dashboard/quickLaunchIntent';
-import { ResultsTeacherProTrialCard, CLASS_CREATED_TRIAL_PLACEMENT } from '@/components/education/results/ResultsTeacherProTrialCard';
+import { ClassCreatedAsk } from '@/components/education/ClassCreatedAsk';
 import type { InviteChannel } from './ClassSetupInviteCode';
 import { ClassSetupInviteView } from './ClassSetupInviteView';
 import { firstStudentSeen, inviteStartTarget } from './lobby/inviteLinks';
@@ -188,7 +188,14 @@ function InviteReady({ classroom, packKey, t, language }: InviteReadyProps) {
             onStart={() => trackFirstRoundGuideClicked({ surface: 'class_ready', locale: language, step: 'practice_bots' })}
           />
         }
-        footer={<ResultsTeacherProTrialCard language={language} placement={CLASS_CREATED_TRIAL_PLACEMENT} className="w-full text-start lg:col-span-2 lg:mx-auto lg:max-w-xl" />}
+        footer={
+          <ClassCreatedAsk
+            language={language}
+            href={start.href}
+            onStart={onStart}
+            className="w-full text-start lg:col-span-2 lg:mx-auto lg:max-w-xl"
+          />
+        }
         t={t}
       />
       {projectorOpen ? <HqProjectorSheet classroom={classroom} onClose={() => setProjectorOpen(false)} /> : null}

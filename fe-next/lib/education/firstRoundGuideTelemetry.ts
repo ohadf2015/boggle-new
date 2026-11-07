@@ -18,7 +18,8 @@ export type FirstRoundGuideStep =
   | 'start_round'
   | 'createClass'
   | 'shareCode'
-  | 'tryDemo';
+  | 'tryDemo'
+  | 'day0_bridge';
 
 export const FIRST_ROUND_GUIDE_EVENTS = {
   shown: 'edu_first_round_guide_shown',
