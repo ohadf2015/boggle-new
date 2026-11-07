@@ -10463,6 +10463,7 @@ const en = {
       }
     },
     "title": "Brain Gym",
+    "subtitle": "Short, adaptive drills — earn XP and level up every round.",
     "score": "Brain Score",
     "points": "Brain Points",
     "loading": "Warming up your brain...",
@@ -12171,7 +12172,7 @@ const en = {
       "objectives": "Objectives",
       "go": "GO!",
       "moves": "{moves} Moves",
-      "dragHint": "Drag to connect letters into words",
+      "dragHint": "Drag or type to connect letters into words",
       "tapToStart": "Tap to start"
     },
     "objective": {
@@ -16131,7 +16132,7 @@ const en = {
         "name": "Teacher Pro",
         "interval": "/mo",
         "blurb": "All reports, miss-gap homework, and reteach tools for one teacher.",
-        "cta": "Upgrade for $9/mo"
+        "cta": "Start 14-day free trial"
       },
       "school": {
         "name": "Schools & departments",
@@ -18269,13 +18270,15 @@ const en = {
       },
       "cardPick": {
         "title": "Pick a power card",
-        "subtitle": "It stacks for the rest of your run."
+        "subtitle": "It stacks for the rest of your run.",
+        "yourBuild": "Your build"
       },
       "roundResult": {
         "passed": "Target cleared!",
         "passedSub": "Pick a power card and keep the run going.",
         "failed": "Just short!",
-        "failedSub": "You didn't reach the target this round."
+        "failedSub": "You didn't reach the target this round.",
+        "closeSub": "So close — one more word would've done it!"
       },
       "runResult": {
         "cleared": "Run cleared!",
@@ -18403,7 +18406,8 @@ const en = {
         "titleLost": "Out of Tiles",
         "subtitleWon": "You collected every crown gem. Hunt complete.",
         "subtitleLost": "Bag emptied before you could finish. Try again.",
-        "restart": "New Hunt"
+        "restart": "New Hunt",
+        "crownsCaption": "{{n}}/4 crowns collected"
       },
       "error": {
         "insufficientGems": "Not enough gems for that ability.",

@@ -56,6 +56,8 @@ import { useSeasonBadges } from '@/hooks/useSeasonBadges';
 import { useCoinContext } from '@/contexts/CoinContext';
 import { useEngagementStatus } from '@/hooks/useEngagementStatus';
 import { getGlobalLeaderboardTier } from '@/lib/ranked/leaderboardTiers';
+import { useExperiment } from '@/hooks/useExperiment';
+import posthog from '@/lib/analytics/lazyPosthog';
 
 interface GameSession {
   gameCode?: string;
@@ -87,6 +89,9 @@ export default function ProfilePageClient(): React.JSX.Element {
 
   // State
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const { variant: lockedTileVariant, trackExposure: trackLockedTileExposure } = useExperiment(
+    'exp-profile-locked-tile-tap-v1',
+  );
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const [activeGameSession, setActiveGameSession] = useState<GameSession | null>(null);
   // Collection-tab node the header portals the avatar collection card into.
@@ -104,6 +109,19 @@ export default function ProfilePageClient(): React.JSX.Element {
   const cosmeticRankTier = getGlobalLeaderboardTier(profile?.total_score ?? 0).id;
 
   useProfileViewTracking({ profileKey: profile?.id ?? user?.id, isOwn: true, ready: !loading && isAuthenticated });
+
+  // Guest teaser view — baseline for the locked-tile rage-click fix.
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      posthog.capture('profile_locked_teaser_viewed');
+      trackLockedTileExposure();
+    }
+  }, [loading, isAuthenticated, trackLockedTileExposure]);
+
+  const handleLockedTileTap = useCallback(() => {
+    posthog.capture('profile_locked_tile_tapped');
+    setShowAuthModal(true);
+  }, []);
 
   // Pull-to-refresh
   const { pullToRefreshHandlers, pullState } = usePullToRefresh({
@@ -184,16 +202,35 @@ export default function ProfilePageClient(): React.JSX.Element {
                 { icon: <Star strokeWidth={2.5} className="w-4 h-4" />, label: t('profile.totalScore'), color: 'text-neo-cyan' },
                 { icon: <Trophy strokeWidth={2.5} className="w-4 h-4" />, label: t('profile.wins'), color: 'text-neo-pink' },
                 { icon: <Gem strokeWidth={2.5} className="w-4 h-4" />, label: t('profile.achievements'), color: 'text-neo-lime' },
-              ].map((tile) => (
-                <div key={tile.label} className="relative bg-neo-black/40 border-2 border-neo-black rounded-neo px-2 py-2.5">
-                  <span className={cn('inline-flex mb-1', tile.color)}>{tile.icon}</span>
-                  <p className="text-[9px] font-black uppercase tracking-[0.1em] text-neo-white truncate leading-none">{tile.label}</p>
-                  <div className="mt-1 flex items-center justify-center gap-1 text-gray-500">
-                    <Lock className="w-3 h-3" />
-                    <span className="font-neo-display font-black text-base">—</span>
+              ].map((tile) => {
+                const tappable = lockedTileVariant === 'tappable';
+                return (
+                  <div
+                    key={tile.label}
+                    className={cn(
+                      'relative bg-neo-black/40 border-2 border-neo-black rounded-neo px-2 py-2.5',
+                      tappable && 'cursor-pointer active:scale-95 transition-transform',
+                    )}
+                    {...(tappable
+                      ? {
+                          role: 'button',
+                          tabIndex: 0,
+                          onClick: handleLockedTileTap,
+                          onKeyDown: (e: React.KeyboardEvent) => {
+                            if (e.key === 'Enter' || e.key === ' ') handleLockedTileTap();
+                          },
+                        }
+                      : {})}
+                  >
+                    <span className={cn('inline-flex mb-1', tile.color)}>{tile.icon}</span>
+                    <p className="text-[9px] font-black uppercase tracking-[0.1em] text-neo-white truncate leading-none">{tile.label}</p>
+                    <div className="mt-1 flex items-center justify-center gap-1 text-gray-500">
+                      <Lock className="w-3 h-3" />
+                      <span className="font-neo-display font-black text-base">—</span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 justify-center">

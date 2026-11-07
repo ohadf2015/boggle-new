@@ -11072,6 +11072,7 @@ const ja = {
       }
     },
     "title": "ブレインジム",
+    "subtitle": "短い適応型ドリルで、毎ラウンドXPを獲得してレベルアップ。",
     "score": "ブレインスコア",
     "points": "ブレインポイント",
     "loading": "脳をウォームアップ中...",
@@ -13829,7 +13830,7 @@ const ja = {
       "objectives": "目標",
       "go": "スタート!",
       "moves": "{moves} 手",
-      "dragHint": "文字をドラッグして単語を作ろう",
+      "dragHint": "文字をドラッグまたは入力して単語を作ろう",
       "tapToStart": "タップしてスタート"
     },
     "objective": {
@@ -17821,7 +17822,7 @@ const ja = {
         "name": "Teacher Pro",
         "interval": "/月",
         "blurb": "1人の教員向けに、すべてのレポート、取りこぼし宿題、再指導ツール。",
-        "cta": "月$9でアップグレード"
+        "cta": "14日間の無料トライアルを開始"
       },
       "school": {
         "name": "学校・学科",
@@ -19775,13 +19776,15 @@ const ja = {
       },
       "cardPick": {
         "title": "パワーカードを選択",
-        "subtitle": "ランの残り全体で効果が続きます。"
+        "subtitle": "ランの残り全体で効果が続きます。",
+        "yourBuild": "所持カード"
       },
       "roundResult": {
         "passed": "目標達成！",
         "passedSub": "パワーカードを選んでランを続けよう。",
         "failed": "あと少し！",
-        "failedSub": "このラウンドは目標に届きませんでした。"
+        "failedSub": "このラウンドは目標に届きませんでした。",
+        "closeSub": "惜しい！あと一語で届いたのに！"
       },
       "runResult": {
         "cleared": "ランクリア！",
@@ -19909,7 +19912,8 @@ const ja = {
         "titleLost": "タイル切れ",
         "subtitleWon": "すべてのクラウンジェムを集めました。ハント完了。",
         "subtitleLost": "袋が空になりました。もう一度挑戦しよう。",
-        "restart": "新しいハント"
+        "restart": "新しいハント",
+        "crownsCaption": "クラウン {{n}}/4 個獲得"
       },
       "error": {
         "insufficientGems": "アビリティ用のジェムが足りません。",

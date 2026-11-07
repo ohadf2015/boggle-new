@@ -11380,6 +11380,7 @@ const sv = {
       }
     },
     "title": "Hjärngym",
+    "subtitle": "Korta, anpassningsbara övningar — tjäna XP och gå upp i nivå varje omgång.",
     "score": "Hjärnpoäng",
     "points": "Hjärnpoäng",
     "loading": "Värmer upp hjärnan...",
@@ -14137,7 +14138,7 @@ const sv = {
       "objectives": "Mål",
       "go": "KÖR!",
       "moves": "{moves} drag",
-      "dragHint": "Dra bokstäver för att bilda ord",
+      "dragHint": "Dra eller skriv bokstäver för att bilda ord",
       "tapToStart": "Tryck för att starta"
     },
     "objective": {
@@ -18129,7 +18130,7 @@ const sv = {
         "name": "Teacher Pro",
         "interval": "/mån",
         "blurb": "Alla rapporter, miss-gap-läxor och omlärningsverktyg för en lärare.",
-        "cta": "Uppgradera för $9/mån"
+        "cta": "Starta gratis provperiod på 14 dagar"
       },
       "school": {
         "name": "Skolor och avdelningar",
@@ -20133,13 +20134,15 @@ const sv = {
       },
       "cardPick": {
         "title": "Välj ett kraftkort",
-        "subtitle": "Det gäller resten av rundan."
+        "subtitle": "Det gäller resten av rundan.",
+        "yourBuild": "Dina kort"
       },
       "roundResult": {
         "passed": "Målet klarat!",
         "passedSub": "Välj ett kraftkort och fortsätt.",
         "failed": "Nästan!",
-        "failedSub": "Du nådde inte målet den här rundan."
+        "failedSub": "Du nådde inte målet den här rundan.",
+        "closeSub": "Så nära — ett ord till hade räckt!"
       },
       "runResult": {
         "cleared": "Rundan klar!",
@@ -20267,7 +20270,8 @@ const sv = {
         "titleLost": "Slut på brickor",
         "subtitleWon": "Du samlade alla kronstenar. Jakten klar.",
         "subtitleLost": "Påsen tog slut innan du blev klar. Försök igen.",
-        "restart": "Ny jakt"
+        "restart": "Ny jakt",
+        "crownsCaption": "{{n}}/4 kronor samlade"
       },
       "error": {
         "insufficientGems": "Inte tillräckligt med stenar för förmågan.",

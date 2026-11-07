@@ -1,0 +1,3 @@
+status: shipped
+files_touched: fe-next/components/multiplayer/WheelRushView.tsx
+next_steps: eslint on this file hung/timed out twice locally (not a new-code issue — machine-wide slow config, see .claude/rules/60-recurring-pitfalls.md); verified correctness by manual diff read instead (hooks already imported, types match, braces balanced) — rely on the nightly gate's authoritative tsc/lint pass. Human playtest — overtake a rival's score in Wheel Rush, confirm "You passed {name}!" toast fires once per rival with haptic; no new strings needed (reused existing wordWheel.passedPlayer key, all 6 locales already have it).

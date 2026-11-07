@@ -14,6 +14,7 @@ import { useTeacherStripState } from '@/components/education/controls/useTeacher
 import { useIsVocabQuizRoom, quizOwnsRoundEnd } from '@/components/education/vocabQuiz/useIsVocabQuizRoom';
 import { useQuizBossVerdict } from '@/components/education/boss/useQuizBossVerdict';
 import { resolveClassroomContext, type ClassroomContext } from '@/lib/education/classroomRoomGone';
+import { AD_FREE_ROUTE_CLASS } from '@/lib/admob-routes';
 import { SocketContext } from '@/utils/SocketContext';
 import { clearSessionPreservingUsername } from '@/utils/session';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -166,6 +167,15 @@ export function useMpPageState() {
   // guessing arcade (pitfall class 1 — an optimistic default a later source
   // flips).
   const classroomContext = resolveClassroomContext({ urlClassroom: isClassroomMode, recordStatus: liveClassroomGameStatus });
+
+  // Ad gates read the URL, which misses a class code typed into the arcade lobby.
+  const adFree = classroomContext !== 'arcade';
+  useEffect(() => {
+    if (!adFree) return;
+    const root = document.documentElement;
+    root.classList.add(AD_FREE_ROUTE_CLASS);
+    return () => root.classList.remove(AD_FREE_ROUTE_CLASS);
+  }, [adFree]);
 
   const {
     showResults, setShowResults, resultsData, setResultsData,
