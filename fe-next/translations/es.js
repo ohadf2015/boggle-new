@@ -22028,7 +22028,7 @@ const es = {
       "advancedOpen": "Cambiar curso, idioma o palabras",
       "advancedClose": "Ocultar opciones",
       "bubble": "Solo un nombre. Lo demás ya lo elegí yo, cámbialo si quieres.",
-      "createAndPlay": "Crear y jugar",
+      "createClass": "Crear clase",
       "anyGrade": "Cualquier curso",
       "side": {
         "title": "Qué pasa ahora",
@@ -22040,10 +22040,26 @@ const es = {
       "packRecommended": "Te lo recomendamos",
       "startLive": "Empezar en vivo",
       "createOnly": "Crear ahora, jugar después",
-      "createAndPlayHint": "Abre el tablero de juego con tu código. Los alumnos se unen y luego pulsas Empezar.",
       "packSticker": "Lista de palabras: {name}",
       "packHint": "Tus alumnos también reciben estas palabras como tarea al unirse.",
-      "assignFailed": "Tu clase está lista, pero las palabras no se asignaron. Asígnalas desde la página de la clase."
+      "assignFailed": "Tu clase está lista, pero las palabras no se asignaron. Asígnalas desde la página de la clase.",
+      "words": {
+        "title": "Palabras para la primera partida",
+        "label": "Tu lista de palabras",
+        "placeholder": "Pega las palabras de esta semana. Una por línea o separadas por comas.",
+        "count": "{count} listas",
+        "tooFew": "Añade al menos {min} palabras, o vacía el cuadro para jugar con un paquete inicial.",
+        "phrasesOnly": "Las frases de varias palabras no caben en el tablero. Añade palabras sueltas, o vacía el cuadro para jugar con un paquete inicial.",
+        "skipped": "Frases que se quedan fuera: {count}. En el tablero solo caben palabras sueltas.",
+        "playFailed": "El juego no se abrió. Pulsa Jugar ahora otra vez.",
+        "yours": "La ronda usará tus palabras, y también se guardan en esta clase.",
+        "packLabel": "¿Aún sin lista? Juega con un paquete inicial",
+        "packHint": "Se guarda en esta clase para que tus alumnos lo practiquen después.",
+        "listName": "Palabras del {date}",
+        "playNow": "Jugar ahora",
+        "saved": "Ya en tu clase",
+        "createHint": "Después: tu código para unirse y un cuadro para las palabras de la semana. Luego pulsa Jugar ahora."
+      }
     },
     "host": {
       "classLabel": "Clase",

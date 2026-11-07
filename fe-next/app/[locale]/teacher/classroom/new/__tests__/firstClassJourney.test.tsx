@@ -69,7 +69,7 @@ describe('First class journey', () => {
     fireEvent.click(screen.getByTestId('setup-start-live'));
     await waitFor(() => expect(nav.replace).toHaveBeenCalledTimes(1));
     const inviteHref = nav.replace.mock.calls[0][0] as string;
-    expect(inviteHref).toBe('/en/teacher/classroom/new?classroomId=c-new');
+    expect(inviteHref).toMatch(/^\/en\/teacher\/classroom\/new\?classroomId=c-new&pack=[^&]+&lessonId=lesson-1$/);
     cleanup();
 
     screens.push(inviteHref);

@@ -56,18 +56,16 @@ describe('ClassSetupCreate', () => {
     expect(api.createLesson).toHaveBeenCalledWith(expect.objectContaining({ name: pack.nameKey, language: pack.language, classroomId: 'new1' }));
     expect(api.assign).toHaveBeenCalledTimes(1);
     expect(api.assign).toHaveBeenCalledWith(expect.objectContaining({ classroom_id: 'new1', lesson_id: 'lesson-1' }));
-    expect(nav.replace.mock.calls[0][0]).toBe('/en/teacher/classroom/new?classroomId=new1');
+    expect(nav.replace.mock.calls[0][0]).toBe(`/en/teacher/classroom/new?classroomId=new1&pack=${encodeURIComponent(pack.nameKey)}&lessonId=lesson-1`);
     expect(toastMock.success).toHaveBeenCalledWith('teacher.assignment.created');
     expect(api.firstAssignment).toHaveBeenCalledWith({ classroomId: 'new1' });
     expect(api.created).toHaveBeenCalledWith(expect.objectContaining({ classroomId: 'new1' }));
     expect(api.funnel).toHaveBeenCalledWith('classroom_created', expect.anything());
   });
 
-  it('When "Just create the class" is tapped, Then the pack is still assigned and the invite opens without a live pack', async () => {
+  it('Given the details step, Then there is one create button, not a second one that does the same thing', () => {
     render(<ClassSetupCreate />);
-    fireEvent.click(screen.getByTestId('setup-create'));
-    await waitFor(() => expect(nav.replace).toHaveBeenCalledWith('/en/teacher/classroom/new?classroomId=new1', { scroll: false }));
-    expect(api.assign).toHaveBeenCalledTimes(1);
+    expect(screen.queryByTestId('setup-create')).toBeNull();
   });
 
   it('Given a different pack is picked, Then that pack is the one assigned', async () => {
@@ -76,7 +74,7 @@ describe('ClassSetupCreate', () => {
     const packRadios = screen.getAllByRole('radio').filter((r) => r.hasAttribute('data-pack'));
     const other = packRadios.find((r) => r.getAttribute('data-pack') !== pack.nameKey) as HTMLElement;
     fireEvent.click(other);
-    fireEvent.click(screen.getByTestId('setup-create'));
+    fireEvent.click(screen.getByTestId('setup-start-live'));
     await waitFor(() => expect(api.createLesson).toHaveBeenCalled());
     expect(api.createLesson.mock.calls[0][0].name).toBe(other.getAttribute('data-pack'));
   });
@@ -93,8 +91,8 @@ describe('ClassSetupCreate', () => {
   it('Given the class is made but the assignment fails, Then the teacher still reaches the code and is told the words were not assigned', async () => {
     api.assign.mockResolvedValue({ data: null, error: { message: 'boom' } });
     render(<ClassSetupCreate />);
-    fireEvent.click(screen.getByTestId('setup-create'));
-    await waitFor(() => expect(nav.replace).toHaveBeenCalledWith('/en/teacher/classroom/new?classroomId=new1', { scroll: false }));
+    fireEvent.click(screen.getByTestId('setup-start-live'));
+    await waitFor(() => expect(nav.replace).toHaveBeenCalledWith(`/en/teacher/classroom/new?classroomId=new1&pack=${encodeURIComponent(pack.nameKey)}&lessonId=lesson-1`, { scroll: false }));
     expect(toastMock.error).toHaveBeenCalledWith('eduShell.setup.assignFailed');
     expect(toastMock.success).not.toHaveBeenCalled();
     expect(api.firstAssignment).not.toHaveBeenCalled();
@@ -112,15 +110,15 @@ describe('ClassSetupCreate', () => {
   it('Given the class cannot be created, Then the error shows on the form and nothing is assigned', async () => {
     api.create.mockResolvedValue({ success: false, error: 'offline' });
     render(<ClassSetupCreate />);
-    fireEvent.click(screen.getByTestId('setup-create'));
+    fireEvent.click(screen.getByTestId('setup-start-live'));
     expect(await screen.findByRole('alert')).toHaveTextContent('eduShell.setup.createFailed');
     expect(api.createLesson).not.toHaveBeenCalled();
   });
 
   it('Given a double tap, Then only one class and one assignment are made', async () => {
     render(<ClassSetupCreate />);
-    fireEvent.click(screen.getByTestId('setup-create'));
-    fireEvent.click(screen.getByTestId('setup-create'));
+    fireEvent.click(screen.getByTestId('setup-start-live'));
+    fireEvent.click(screen.getByTestId('setup-start-live'));
     await waitFor(() => expect(nav.replace).toHaveBeenCalled());
     expect(api.create).toHaveBeenCalledTimes(1);
     expect(api.assign).toHaveBeenCalledTimes(1);
