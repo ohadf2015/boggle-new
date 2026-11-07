@@ -11,6 +11,7 @@ import { captureApiError } from '@/utils/sentry';
 import { normalizeHebrewWord, normalizeSpanishWord } from '@/shared/utils/wordNormalization';
 import {
   getEnglishWordSet,
+  getEnglishApprovedWordSet,
   getSpanishBaseWordSet,
   getHebrewWordSet,
   getSwedishWordSet,
@@ -133,7 +134,7 @@ export async function POST(request: NextRequest) {
     let isInDictionary = false;
     switch (language) {
       case 'en':
-        isInDictionary = (await loadEnglishDictionary()).has(normalizedWord);
+        isInDictionary = (await loadEnglishDictionary()).has(normalizedWord) || getEnglishApprovedWordSet().has(normalizedWord);
         break;
       case 'es':
         isInDictionary = (await loadSpanishDictionary()).has(normalizedWord);

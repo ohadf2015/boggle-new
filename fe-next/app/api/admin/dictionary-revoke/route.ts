@@ -91,6 +91,8 @@ export async function POST(request: NextRequest) {
     // 6. Invalidate Redis milog cache
     const { invalidateMilogCache } = await import('@/backend/services/milogWordVerifier');
     await invalidateMilogCache(trimmedWord);
+    const { setCachedWordValidation } = await import('@/backend/cache/wordCache');
+    await setCachedWordValidation(language, trimmedWord, false);
 
     // Audit log
     logger.log(

@@ -26,11 +26,15 @@ const { mockPointerCheck } = vi.hoisted(() => ({ mockPointerCheck: vi.fn() }));
 vi.mock('../../services/wiktionaryEnVerifier', () => ({ verifyWordOnWiktionaryEn: (w: string) => mockPointerCheck(w, 'en') }));
 vi.mock('../../services/wiktionaryEsVerifier', () => ({ verifyWordOnWiktionaryEs: (w: string) => mockPointerCheck(w, 'es') }));
 vi.mock('../../services/wiktionaryVerifier', () => ({ verifyWordOnWiktionary: (w: string, l: string) => mockPointerCheck(w, l) }));
+const { mockSetCachedWordValidation } = vi.hoisted(() => ({ mockSetCachedWordValidation: vi.fn() }));
+vi.mock('../../cache/wordCache', () => ({ setCachedWordValidation: mockSetCachedWordValidation }));
 vi.mock('../../modules/communityWordManager', () => ({
   removeFromCommunityCache: mockRemoveFromCommunityCache,
 }));
+const { mockIsValidWordLoaded } = vi.hoisted(() => ({ mockIsValidWordLoaded: vi.fn(async () => false) }));
 vi.mock('../../dictionary', () => ({
   removeApprovedWord: mockRemoveApprovedWord,
+  isValidWordLoaded: mockIsValidWordLoaded,
 }));
 vi.mock('../../utils/logger', () => ({
   __esModule: true,
@@ -125,8 +129,23 @@ describe('runDictionaryHealing', () => {
     const result = await runDictionaryHealing();
 
     expect(result.words).toEqual(['yuo']);
+    expect(mockSetCachedWordValidation).toHaveBeenCalledWith('en', 'yuo', false);
     expect(mockPointerCheck).not.toHaveBeenCalledWith('שלומ', 'he');
     expect(calls.blacklisted).toContainEqual(expect.objectContaining({ word: 'yuo', reason: 'auto_heal:pointer_only' }));
+  });
+
+  it('demotes Spanish spellings that drop the ñ of a dictionary word', async () => {
+    mockSupabase.__setCandidates([
+      { id: 'n', word: 'senorita', language: 'es' },
+      { id: 'c', word: 'chevere', language: 'es' },
+    ]);
+    mockIsOffensiveWord.mockResolvedValue(false);
+    mockPointerCheck.mockResolvedValue({ verified: true, status: 'verified' });
+    mockIsValidWordLoaded.mockImplementation(async (w: string) => w === 'señorita');
+
+    const result = await runDictionaryHealing();
+
+    expect(result.words).toEqual(['senorita']);
   });
 
   it('demotes an offensive auto-promoted word everywhere', async () => {

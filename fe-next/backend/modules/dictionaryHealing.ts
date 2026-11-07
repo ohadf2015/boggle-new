@@ -25,9 +25,10 @@ import { verifyWordOnWiktionaryEn } from '../services/wiktionaryEnVerifier';
 import { verifyWordOnWiktionaryEs } from '../services/wiktionaryEsVerifier';
 import { verifyWordOnWiktionary } from '../services/wiktionaryVerifier';
 import { removeFromCommunityCache } from './communityWordManager';
-import { removeApprovedWord } from '../dictionary';
+import { removeApprovedWord, isValidWordLoaded } from '../dictionary';
 import { emitDictionaryRun } from './dictionaryPipelineTelemetry';
 import type { Language } from '@/shared/types/game';
+import { setCachedWordValidation } from '../cache/wordCache';
 
 const DEFAULT_BATCH = 500;
 const HEAL_LANGS = ['en', 'es', 'sv', 'he', 'ru'] as const;
@@ -85,7 +86,8 @@ export async function runDictionaryHealing(
     try {
       const reason = (await isOffensiveWord(row.word, row.language))
         ? 'offensive'
-        : (await isPointerOnlyWord(row.word, row.language)) ? 'pointer_only' : null;
+        : (await isPointerOnlyWord(row.word, row.language)) ? 'pointer_only'
+        : (await dropsEnye(row.word, row.language)) ? 'missing_enye' : null;
       if (!reason) continue;
 
       await demote(supabase, row.id, row.word, row.language, reason);
@@ -104,6 +106,15 @@ export async function runDictionaryHealing(
 }
 
 // Only the pointer-only verdict heals: other rejections (e.g. a Symbol sense on "sea") also hit real words.
+/** Spanish boards deal Ñ, so "senorita" is a misspelling of a real word, not a keyboard fallback. */
+async function dropsEnye(word: string, language: string): Promise<boolean> {
+  if (language !== 'es') return false;
+  for (let i = word.indexOf('n'); i !== -1; i = word.indexOf('n', i + 1)) {
+    if (await isValidWordLoaded(`${word.slice(0, i)}ñ${word.slice(i + 1)}`, 'es')) return true;
+  }
+  return false;
+}
+
 async function isPointerOnlyWord(word: string, language: string): Promise<boolean> {
   const check =
     language === 'en' ? verifyWordOnWiktionaryEn(word)
@@ -122,6 +133,7 @@ async function demote(supabase: Supa, id: string, word: string, language: string
   // 2 + 3. evict from both in-memory Sets (immediate)
   removeFromCommunityCache(word, language);
   await removeApprovedWord(word, language as Language);
+  await setCachedWordValidation(language, word, false);
   // 4. blacklist (bots/solver)
   await supabase
     .from('bot_word_blacklist')

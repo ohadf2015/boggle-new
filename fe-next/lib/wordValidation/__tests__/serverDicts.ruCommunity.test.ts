@@ -34,6 +34,10 @@ describe('validateWordOnServer — offline replay matches the live game', () => 
     expect(await validateWordOnServer('щщщщ', 'ru')).toBe(false);
   });
 
+  it('accepts English words the live game merges from the approved list', async () => {
+    expect(await validateWordOnServer('abacist', 'en')).toBe(true);
+  });
+
   it('accepts community-approved words that the base list lacks', async () => {
     communityRows.add('en:zzyzxq');
     expect(await validateWordOnServer('zzyzxq', 'en')).toBe(true);

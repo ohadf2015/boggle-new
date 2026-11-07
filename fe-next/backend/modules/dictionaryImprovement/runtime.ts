@@ -59,6 +59,7 @@ const SET_BY_LANG: Record<LangCode, () => Set<string> | undefined> = {
   sv: () => (dictionary as { swedishWords?: Set<string> }).swedishWords,
   ja: () => (dictionary as { japaneseWords?: Set<string> }).japaneseWords,
   es: () => (dictionary as { spanishWords?: Set<string> }).spanishWords,
+  ru: () => (dictionary as { russianWords?: Set<string> }).russianWords,
 };
 
 function dictHas(word: string, lang: LangCode): boolean {
@@ -72,7 +73,7 @@ async function verifyHolds(lang: LangCode, word: string): Promise<boolean> {
     switch (lang) {
       case 'en': verified = (await verifyWordOnWiktionaryEn(word)).verified; break;
       case 'es': verified = (await verifyWordOnWiktionaryEs(word)).verified; break;
-      case 'sv': verified = (await verifyWordOnWiktionary(word, 'sv')).verified; break;
+      case 'sv': case 'ru': verified = (await verifyWordOnWiktionary(word, lang)).verified; break;
       case 'ja': verified = (await verifyWordOnJisho(word)).verified; break;
       case 'he': verified = (await verifyWordOnMilog(word)).verified; break;
     }
@@ -235,7 +236,7 @@ function makeMetricsDeps(boundLang: LangCode): MetricsDeps {
 export function rotateTargetLang(date = new Date()): LangCode {
   const dayOfYear = Math.floor((date.getTime() - Date.UTC(date.getUTCFullYear(), 0, 0)) / 86_400_000);
   // weakest coverage first so they get the most frequent attention
-  const order: LangCode[] = ['ja', 'sv', 'es', 'en', 'he'];
+  const order: LangCode[] = ['ru', 'ja', 'sv', 'es', 'en', 'he'];
   return order[dayOfYear % order.length];
 }
 

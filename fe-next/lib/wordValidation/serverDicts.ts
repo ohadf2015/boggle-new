@@ -11,6 +11,7 @@ import { checkCommunityWord } from './communityWord';
 import { extractHiraganaWords } from '@/shared/constants/japaneseLetters';
 import {
   getEnglishWordSet,
+  getEnglishApprovedWordSet,
   getHebrewWordSet,
   getSwedishWordSet,
   __resetSharedWordSetsForTest,
@@ -51,7 +52,7 @@ function loadJapanese(): Set<string> {
 async function inBaseDictionary(word: string, language: string): Promise<boolean> {
   switch (language) {
     case 'en':
-      return (await getEnglishWordSet()).has(word);
+      return (await getEnglishWordSet()).has(word) || getEnglishApprovedWordSet().has(word);
     case 'es':
       return (await loadSpanish()).has(word);
     case 'he':
