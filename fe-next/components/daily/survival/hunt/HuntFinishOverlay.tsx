@@ -23,11 +23,13 @@ export interface HuntFinishOverlayProps {
   onSkip: () => void;
   /** The swipe that found the word: its letters fly from these board tiles into the answer row. */
   sourcePath?: HuntCell[];
+  /** A timed round's clock ran out (Quick Play): say so instead of "So close". */
+  timedOut?: boolean;
   t: (key: string) => string;
 }
 
 /** Locks the board at game over: dims it, names the outcome, pops the answer in. Tap to go to results. */
-export function HuntFinishOverlay({ outcome, targetWord, language, tier, calm, onSkip, sourcePath, t }: HuntFinishOverlayProps) {
+export function HuntFinishOverlay({ outcome, targetWord, language, tier, calm, onSkip, sourcePath, timedOut = false, t }: HuntFinishOverlayProps) {
   const win = outcome === 'win';
   const word = language === 'he' ? applyHebrewFinalLetters(targetWord) : targetWord.toUpperCase();
   const letters = Array.from(word);
@@ -41,7 +43,9 @@ export function HuntFinishOverlay({ outcome, targetWord, language, tier, calm, o
   const pop = (delay: number) => (still
     ? {}
     : { initial: { scale: 0.3, y: 14 }, animate: { scale: 1, y: 0 }, transition: { ...SPRING_PRESETS.bouncy, delay: lead + delay } });
-  const headline = win ? (tier ? t(tier.labelKey) : t('wordHunt.mp.youFoundIt')) : t('closeLoss.soClose');
+  const headline = win ? (tier ? t(tier.labelKey) : t('wordHunt.mp.youFoundIt')) : timedOut
+      ? t('wordWheel.gameOver')
+      : t('closeLoss.soClose');
 
   return (
     <button
