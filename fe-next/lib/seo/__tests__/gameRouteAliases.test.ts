@@ -25,18 +25,15 @@ describe('game route aliases', () => {
     for (const alias of ['play', 'room'] as const) {
       const rule = rules.find((r) => r.source.endsWith(`/${alias}`) && r.source.includes(':locale'));
       expect(rule, `missing locale rule for /${alias}`).toBeDefined();
-      // ?autoStart=bots, not bare /singleplayer — see redirectLogic.ts: bare
-      // entries are resolved to bots on the client, and carrying the param
-      // skips that hop.
       expect(rule?.destination).toBe(
-        alias === 'play' ? '/:locale/singleplayer?autoStart=bots' : '/:locale/multiplayer',
+        alias === 'play' ? '/:locale/quick-play?mode=random' : '/:locale/multiplayer',
       );
     }
   });
 
   it('covers the locale-less shapes too', () => {
     expect(rules.find((r) => r.source === '/play')?.destination).toBe(
-      '/en/singleplayer?autoStart=bots',
+      '/en/quick-play?mode=random',
     );
     expect(rules.find((r) => r.source === '/room')?.destination).toBe('/en/multiplayer');
   });

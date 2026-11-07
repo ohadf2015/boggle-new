@@ -39,7 +39,7 @@
             android:action="android.intent.action.VIEW"
             android:targetPackage="live.lexiclash.app"
             android:targetClass="live.lexiclash.app.MainActivity"
-            android:data="https://www.lexiclash.live/singleplayer" />
+            android:data="https://www.lexiclash.live/quick-play" />
     </shortcut>
 
     <shortcut

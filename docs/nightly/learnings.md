@@ -2,46 +2,40 @@
 
 Rewritten by **lane 7** each night from prior 7 reports. **≤200 lines.** All lane prompts inject this file as preamble.
 
-> **Window: 2026-10-21..10-27. 7 scheduled nights. Lanes ran on 7. CODE SHIPPED ON 0.**
+> **Window: 2026-10-31..11-06. 7 scheduled nights. Lanes ran on 7. CODE SHIPPED ON 0.**
 >
-> | Night | Lanes | Gate | Code files DROPPED | What reached master |
+> | Night | Gate | Bisect | Code files DROPPED | What reached master |
 > |---|---|---|---|---|
-> | 10-21 | 9 | FAIL → bisect GAVE UP 14:17 (7/31 calls, 4514/3600s) | **19** | `c2712f82a` — 14 docs |
-> | 10-22 | 7 | FAIL → GAVE UP 04:45 (7/19, 4506s) | **8** | `412cde5b0` — 14 docs |
-> | 10-23 | 8 | FAIL → GAVE UP 05:06 (7/23, 4153s) | **10** | `469aaed99` — 16 docs |
-> | 10-24 | 9 | FAIL → GAVE UP 14:11 (6/**61**, 3626s) | **34** | `2453cd95a` — 17 docs |
-> | 10-25 | 8 | FAIL → GAVE UP 03:57 (8/29, 4504s) | **18** | `131c16452` — 15 docs |
-> | 10-26 | 7 | FAIL 08:32, docs-only (no bisect) | **11** | `4d8f6402e` — 11 docs (`git show --stat`: zero code) |
-> | 10-27 | 7 | pending | — | in flight |
+> | 10-31 | FAIL 03:09 | GAVE UP 04:18 (7/71, 4155s) | **39** | 16 docs |
+> | 11-01 | FAIL 03:09 | GAVE UP 04:21 (8/77, 4306s) | **42** | 17 docs |
+> | 11-02 | FAIL 12:38 | GAVE UP 13:46 (3/21, 4127s) | **14** | 17 docs |
+> | 11-03 | FAIL 03:56 | GAVE UP 05:08 (8/35, 4330s) | **21** | 16 docs (`d1a65b7d2`) |
+> | 11-04 | FAIL 03:56 | GAVE UP 04:57 (7/59, 3619s) | **33** | 15 docs (`fed97dcbd`) |
+> | 11-05 | FAIL 04:00 | GAVE UP 05:18 (8/61, 4636s) | **34** | 13 docs (`5e3ff4bc9`) |
+> | 11-06 | FAIL 03:24 | GAVE UP 04:55 (6/63, 4224s) | **35** | **NOTHING — see Headline 0** |
 >
-> **100 code files dropped in 6 nights. 27 consecutive days of zero nightly code on master.** Every
-> `fix(`/`feat(` in `git log --since="14 days ago"` is founder or company-brain work (10-26 alone has ~30 —
-> all founder). Verify a ship with `git show --stat <sha>` — **never** with `isolated-shipped <sha>`, which
-> printed on 10-23/24/25 for docs-only commits, and **never** with `kept N authored file(s)`.
+> **218 code files dropped in 7 nights. 35 consecutive days of zero nightly code on master.** Verify a ship
+> with `git show --stat <sha>` — NEVER `isolated-shipped <sha>` or `kept N authored file(s)`. All of
+> 5e3ff4bc9 fed97dcbd d1a65b7d2 are on `origin/master` (so the push path works) yet
+> `git show --name-only --format='' <sha> | rg -c '^fe-next/'` → **0 code files on each**.
 
-> ## 🔴 HEADLINE — THE GATE'S OWN REPAIR IS CATEGORICALLY UNSHIPPABLE BY THE LOOP. **FOUNDER ACTION REQUIRED.**
-> Last night's lane 7 wrote `build:i18n` into the four tsc chains of `scripts/nightly/lib/gate-isolated.sh`
-> and declared it shipped. It was not. **`scripts/` is code, so the docs-only salvage reverted it** —
-> the exact failure it was written to prevent. Proof, all three legs:
-> 1. `rg -n 'build:i18n' scripts/nightly/lib/gate-isolated.sh` → **no match on master.** Lines 142/160/173/203
->    still read `npm run build:schemas && npx --no-install tsc --noEmit`.
-> 2. The edit survives only as a backup: `salvaged-code-20261023-010005/scripts/nightly/lib/gate-isolated.sh`
->    (`rg -l build:i18n ~/logs/lexi-nightly/salvaged-code-*` hits that one path and nothing else).
-> 3. `git log --oneline -- scripts/nightly/lib/gate-isolated.sh` top entry is `743f71b6fc`, pre-dating 10-23.
->
-> So the TS2307 never stopped. `rg -Nc TS2307 <log>` per night: **10-21 → 12, 10-22 → 11, 10-23 → 13,
-> 10-24 → 10, 10-25 → 11, 10-26 → 4.** All four on 10-26 are
-> `app/[locale]/layout.tsx(4,31): error TS2307: Cannot find module '@/lib/i18n/messagesManifest.json'`.
-> `layout.tsx` is authored by no lane → `all N gate-failing file(s) are non-authored` → `unattributable gate
-> failure` → `docs-only salvage`. **Every tier, every night, by construction.**
->
-> **AND: last night's "verify the oracle is green" check was a FALSE NEGATIVE of my own making.** The
-> handed-down command was `rg 'TS2307 .*messagesManifest'` — a *space* after TS2307, where the real output
-> has a *colon*. It returned 0 on all 7 logs and read as "fix held". This is pitfall #4 (silent failure) and
-> the `✓`→`✔` glyph lesson, committed by this lane. **Grep the error CODE alone (`rg -c TS2307`), never a
-> code plus prose.**
->
-> **THE FIX (founder, S, 5 min — the loop cannot do this itself):**
+> ## 🔴 HEADLINE 0 — NEW: 11-06 SHIPPED **NOTHING**, NOT EVEN DOCS. THE ARTIFACT FLOOR IS NOT A FLOOR.
+> The log printed `docs-only salvage — shipping ... (16 docs)` at 04:55:59. **No such commit exists
+> anywhere:** `git log --all --oneline --grep="improvement loop 2026-11-06"` → **empty**. Those docs sit
+> **uncommitted in the working tree** (`learnings.md`, `impact-ledger.ndjson`, `mode-readiness.md`,
+> `perf-baseline.json`, `triage-queue.md` all modified). The salvage **log line prints independently of
+> the commit succeeding**, so a failed commit reads as a successful docs ship. Fix: print the SHA created
+> and fail loudly when `git rev-parse` finds none. **Never report the floor as "holds 7/7" off a log line
+> — check `git log --all --grep` for the night's commit.**
+
+> ## 🔴 HEADLINE 1 — ROOT CAUSE UNCHANGED AFTER 15 NIGHTS. ONE `cp`. **FOUNDER ACTION REQUIRED.**
+> `rg -Nc TS2307` per night: **10-31 → 11, 11-01 → 12, 11-02 → 7, 11-03 → 11, 11-04 → 13, 11-05 → 11,
+> 11-06 → 10.** On 11-06 all 10 are the same module: `TS2307: Cannot find module
+> '@/lib/i18n/messagesManifest.json'`, failing `app/[locale]/layout.tsx` — authored by no lane →
+> `unattributable gate failure` → `docs-only salvage`. **Every tier, every night, by construction.**
+> The file is gitignored (`fe-next/.gitignore:133`), absent in the gate's fresh checkout, and the
+> typecheck chain never generates it: `rg -c 'build:i18n' scripts/nightly/lib/gate-isolated.sh` →
+> **still NO MATCH on master.**
 > ```bash
 > cd ~/git/boggle-new
 > cp ~/logs/lexi-nightly/salvaged-code-20261023-010005/scripts/nightly/lib/gate-isolated.sh \
@@ -49,134 +43,140 @@ Rewritten by **lane 7** each night from prior 7 reports. **≤200 lines.** All l
 > bash -n scripts/nightly/lib/gate-isolated.sh && git add -A scripts/nightly && \
 >   git commit -m 'fix(nightly): gate typecheck chains run build:i18n (messagesManifest TS2307)'
 > ```
-> Then **add `scripts/nightly/**` to the salvage keep-set** alongside `docs/` (`scripts/nightly/run.sh`,
-> near the `docs-only` keep logic at ~:1179). Same rationale as `docs/`: outside `fe-next/`, cannot affect
-> the app's lint/type/test/build verdict — so it is gate-neutral by definition. Without this, every future
-> loop self-repair is reverted on the night it is written.
+> Backup **verified present 11-07** (58668B, Oct 23 03:20) — re-confirm with one `ls`. If it ever rotates
+> away: **add `npm run build:i18n` to the gate's typecheck chain before `tsc`** in `gate-isolated.sh`
+> (`build:i18n` = `tsx scripts/build-i18n-assets.ts`, `fe-next/package.json:15`; already inside
+> `build:prebuild`:11, which the gate never calls). **Do not re-derive this. It is one command.**
+> ⚠️ **A 0 in a TS2307 count on TONIGHT's log means the gate has not run yet** — lane 07 executes ~02:10,
+> the gate ~03:30. Reading the in-flight log as "fixed" is a false green (cost: most of this window).
 
-> **HEADLINE 2 — `build:i18n` IS SAFE IN THE GATE WORKTREE (settled, do not re-litigate).** `tsx
-> scripts/build-i18n-assets.ts` (`package.json:15`), standalone, no dependency on `build:schemas`. Inputs
-> (`translations/<lang>.js`, `i18n/normalizeMessages.ts`, `lib/i18n/landingNamespaces.ts`) are all tracked →
-> present in any checkout. `mkdirSync(..., {recursive:true})` at lines 53–54. Both outputs (`public/i18n/`,
-> `lib/i18n/messagesManifest.json`) are gitignored → cannot dirty the tracked set. `tsx` resolves from the
-> CoW-cloned `node_modules`. (Line 833 is the `test:backend`/`test:frontend` chain — adding it there fixes nothing.)
+> ## 🔴 HEADLINE 2 — `scripts/` IS DROPPED AS CODE, SO THE LOOP CANNOT SHIP ITS OWN REPAIR.
+> Add `scripts/nightly/**` to the salvage keep-set beside `docs/` (`scripts/nightly/run.sh`, near the
+> `docs-only` keep logic ~:1179) — same rationale: outside `fe-next/`, so it cannot change the app's
+> lint/type/test/build verdict. Until this lands, **every lane-7 infra fix must be emitted as a
+> copy-pasteable patch in loop-improvements, never as an edit.**
 
-> **HEADLINE 3 — A ZERO-CODE SHIP IS STILL REPORTED AS SUCCESS.** Six commits of proof in this window alone.
-> `N authored CODE files > 0 and 0 code files committed` must be a loud **ERROR** in the Telegram card with
-> the dropped-path list and the salvage stamp. Until it is, every dropped night reads as a good one — which
-> is exactly how this bug survived two full windows.
+> ## 🔴 HEADLINE 3 — THE PEEL IS LINEAR (2N−7); ITS PER-CALL COST IS WHAT LOSES.
+> Planned calls = **2×(dropped files) − 7**, 7/7 nights (14→21, 21→35, 33→59, 34→61, 35→63, 39→71, 42→77).
+> Binding constraint is per-call cost: `elapsed ÷ completed` = **~580–700s** (4224/6 on 11-06). 63 × 700s
+> ≈ **12h vs a 3600s budget** → 3–8 calls, 7/7. Fix = **fewer calls AND a cheaper call**: per-lane sets
+> (**8**, not 2N−7) + a tsc-only tier. Worthless until Headline 1 — a poisoned oracle fails per-lane too.
 
 ## FOUNDER DIRECTIVE — highest priority
 - **2026-06-23 (standing):** (1) SPEED without bugs, (2) MODE READINESS to release quality, (3) EDUCATION
   growth into real `/[locale]/education` pages, (4) AUTONOMY (ship reversible, defer only irreversible).
   HARD LINE: never touch coin amounts, ad-reward values, the coin economy, or payment logic.
-- **ADMIN-BETA TARGET LIST.** NOT admin-gated, never pick as STEP-0 targets: `blast`/`blast/v2`, `crossword`
-  (noindex-only), `shiritori` (**DELETED 09-08**), `word-tower` (public), `party`/`word-alchemy`/`word-forge`/
-  `word-vault` (DELETED 07-06). **Surviving admin-gated set: `sealed-bid`, `word-craft` (`?mode=gems`,
-  `?mode=cards`), `brain-drill`, `wheel-rush`.** `wheel-rush` has **no standalone route** (MP-rotation pick
-  only) — its report URL 404s by design; use `/en/multiplayer/`.
-- **The lane scheduler skipping lanes is BY DESIGN** (`run.sh:421`). 10-27 skipped `10-dictionary`,
-  `04-competitor`, `08-adsense` as zero-signal. `NIGHTLY_SCHEDULER=0` restores all 12.
-- **2026-06-27 (blog cadence):** new blog every 2 days — word-game + education/"AI to learn a language"
-  angles, link a live MODE.
+- **2026-11-07 inbound: "Can we have trial for unity?"** → **lane 09 (monetization / edu upsell)** owns a
+  trial offer; not a self-learn item. Carried here so it is not lost if lane 09 is skipped.
+- **ADMIN-BETA TARGET LIST.** Never STEP-0 targets: `blast`/`blast/v2`, `crossword` (noindex-only),
+  `shiritori` (DELETED 09-08), `word-tower` (public), `party`/`word-alchemy`/`word-forge`/`word-vault`
+  (DELETED 07-06). **Admin-gated set: `sealed-bid`, `word-craft` (`?mode=gems`, `?mode=cards`),
+  `brain-drill`, `wheel-rush`.** `wheel-rush` has **no standalone route** — use `/en/multiplayer/`.
+- **The lane scheduler skipping lanes is BY DESIGN** (`run.sh:421`). `NIGHTLY_SCHEDULER=0` restores all.
+- **Lane 06-seo was DROPPED 10-31** (`a6f57e90d`) — SEO routes via Growth Radar. Never re-add it.
+- **2026-06-27 (blog cadence):** new blog every 2 days — word-game + education angles, link a live MODE.
 - **Improve admin-beta modes nightly — NO new modes** (2026-06-16). Lane 05 STEP 0 improves ONE existing
   admin-gated mode/night, EXISTING files only, keeps the admin gate.
 - **Write all locale translations FIRST** — **`ru` is a live 6th locale**. `file-cap=8` is armed in the
-  time-guard line but NOT enforced on the keep path.
+  time-guard line but **NOT enforced on the keep path** (11-06: lane 1 kept 35).
 
-## Telegram-button feedback (last 7 days)
-- **ZERO callbacks. `docs/nightly/feedback/*.ndjson` still ends 2026-07-26 — 93 days, 112 lines total.**
-  Sixteenth consecutive window at 0 across `night:*`, `polish:*`, `idea:*`, `reddit:*`, `mode:*`.
-  **The inbound Telegram leg is dead. Stop adding buttons; never gate a lane on a vote.** Outbound sends fine.
-- The **player** sentiment digest (`feedback/summary-*.md`) is a different, live signal — keep using it.
+## Telegram feedback (last 7 days)
+- **CORRECTION — inbound Telegram is NOT dead. Inbound TEXT works; only BUTTONS are dead.** Newest ndjson
+  line is `{"text":"Can we have trial for unity?"}` from `of201` with **no `callback_data`** — founder free
+  text, arrived fine. **Buttons: ZERO callbacks; 41 files, 113 lines, last callback 2026-07-26 — 104 days.**
+  **Stop adding buttons, never gate a lane on a vote — but DO read the newest ndjson lines for free text.**
+- **Player** sentiment digest (`feedback/summary-*.md`) is a different, live signal — keep using it.
 
 ## What works (validated this week)
-- **Lanes are healthy; the gate is the only bottleneck.** 7/7 nights every selected lane finished `rc=0`.
-  10-27 ran lanes 1–7 in **77 minutes total** (01:00 → 02:17), 3–16 min each — the fastest night on record.
-  No `exit 124`, no idle-kill, 7 nights running. **Stop tuning lane prompts for reliability.**
-- **The Mandatory-Minimum-Artifact floor holds 7/7**, including every dropped night. `docs/nightly/artifacts/`
-  is the only output never lost. Keep it first in every prompt.
-- **Recoverable salvage works mechanically.** All 6 dropped nights have a backup + a working
-  `restore-salvaged-code.sh <stamp>`. It is how tonight's headline was proven. **But nobody replays it** —
-  and `salvaged-code-20261024-010154` holds **34 files**, the largest unshipped set.
-- **Per-tier gate escalation localizes without wedging**, and the bisect-budget guard correctly stops the
-  infinite loop. **The machinery is sound; its oracle is poisoned.** Repair the oracle, not the loop.
+- **Lanes are healthy; the gate is the only bottleneck.** 7/7 nights every selected lane `rc=0`; no
+  `exit 124`/idle-kill in 15 nights. 11-07 lanes 4 and 5 finished 02:02 and 02:10 (kept 4 and 3 files).
+  **Stop tuning lane prompts for reliability — it is not the problem.**
+- **Artifacts survive on DISK 7/7** (incl. 11-06, no commit) — but Headline 0: **on disk ≠ on master.**
+- **THE SALVAGE REPLAY RUNS AND SELF-HEALS.** 11-06 lane 01 replayed `20261104-010003` — 33 files, 3-way
+  merged, 0 skipped, eslint-clean on all 20 ts/tsx — and the merge resolved the set's one real failure
+  (`RunPageClient.tsx` TS2322, fixed by `CardPickScreen.tsx` in the same set). **Keep it as lane 01's
+  first act — the only mechanism turning dropped work back into shippable.**
+- **The "conclusive typecheck tier before drop-all" guard is correct — keep it.** It refuses to discard
+  build-clean code on an undecidable red; it just never gets a clean answer while Headline 1 stands.
 - **Preflight divergence → isolated ship** stays validated (7/7 reached lanes, founder WIP untouched).
-  No `not on master` abort in this window — the 10-19/10-20 failure mode did not recur. Do not re-litigate.
 - **Doctrine (unchanged):** Pixi `.destroyed`/`.geometry` null-guards in rAF · BOOLEAN not bare Capacitor
-  proxy · try/catch on async generation · `initial={false}` on above-fold Framer entrances · `DirectionalIcon`
-  NAMED import + logical `start-`/`end-` for RTL · local JWT verify on read-only GET · `priority={false}` on
-  Suspense-fallback images · `neo-*` tokens only · a Next `app/**/route.ts` exports ONLY handlers + route config.
+  proxy · try/catch on async generation · `initial={false}` on above-fold Framer entrances ·
+  `DirectionalIcon` NAMED import + logical `start-`/`end-` for RTL · local JWT verify on read-only GET ·
+  `priority={false}` on Suspense-fallback images · `neo-*` tokens only · a Next `app/**/route.ts` exports
+  ONLY handlers + route config.
 
 ## What to avoid (failed this week)
-- **#1 — THE LOOP CANNOT SHIP ITS OWN REPAIR; `scripts/` IS DROPPED AS CODE.** Headline 1. Cost: the
-  `build:i18n` fix lost on the night it was written, then 3 more dropped nights believing it had landed.
-  **Every lane-7 infra fix must go in the loop-improvements doc as a copy-pasteable patch, not an edit.** (open, FOUNDER)
-- **#2 — THE GATE'S FRESH-CHECKOUT TYPECHECK STILL LACKS `build:i18n`.** 61 TS2307 lines across 6 logs.
-  Root cause of all 6 drops. Fix is one `cp` from the 10-23 salvage (Headline 1). (open, FOUNDER, S)
-- **#3 — VERIFYING A FIX WITH A PROSE-MATCHING GREP IS A FALSE NEGATIVE.** `rg 'TS2307 .*messagesManifest'`
-  (space) vs `TS2307: Cannot find module` (colon) → 0 hits, read as green, cost a whole window.
-  **Match the error CODE alone.** Same class as the `✓`→`✔` break. (new, carried into every lane)
-- **#4 — A ZERO-CODE SHIP IS REPORTED AS SUCCESS.** Headline 3, now 6 commits of proof. (open, carried 3 windows, S)
-- **#5 — THE PEEL LOOP LEARNS NOTHING FROM A REPEATED ERROR SET.** 10-24 burned **61 minutes on 6 of 61**
-  planned gate calls, every tier printing the identical TS2307. **Abort when attempt N's error set is no
-  smaller than N−1's; cap at 3.** Would have saved ~5 hours across this window. (open, carried, S)
-- **#6 — `kept N authored file(s)` IS NOT A CODE COUNT AND `lane N` IS NOT A LANE ID.** `lane N` is
-  positional over the *selected* set, which changes nightly with the scheduler — so 10-26's "lane 6" and
-  10-27's "lane 6" are different lanes. Any per-lane stat read off these lines is wrong twice over.
-  **Print `lane=<name> kept=<n> code=<n>`.** (open, carried, S, `run.sh`)
-- **#7 — `docs/nightly/reports/` IS GITIGNORED (`.gitignore:82`).** Every `### Lane N` section lanes append
-  in STEP 6 is never committed; only `artifacts/`, `ideas/`, `loop-improvements/` and the ndjson ledgers
-  ship. The 7 report files this lane reads exist **only on this machine**. **Un-ignore it, or stop telling
-  lanes it is their report of record.** (open, carried, S)
-- **#8 — ADDING A PROP TO A COMPONENT IS A TWO-SITE EDIT.** `WheelRushView.tsx:840` → `MyWordsChips`
-  TS2322 dropped the whole 10-22 set. **`rg` the props interface AND every call site in one pass.
+- **#0 — A SALVAGE LOG LINE IS NOT A COMMIT.** 11-06 printed "shipping (16 docs)", created none. **Verify:
+  `git log --all --oneline --grep="improvement loop <date>"`.** (new, S)
+- **#1 — THE GATE'S FRESH-CHECKOUT TYPECHECK STILL LACKS `build:i18n`.** 75 TS2307 lines across 7 logs,
+  all one gitignored module. Root cause of all 7 drops and all 35 zero-code days. **One `cp`**
+  (Headline 1). (open, FOUNDER, S, carried 4 windows)
+- **#2 — `scripts/` IS DROPPED AS CODE; THE LOOP CANNOT SHIP ITS OWN REPAIR.** Headline 2. The fix was lost the night it was written, then **14 more dropped nights** believed it landed. (open, FOUNDER, S)
+- **#3 — THE PEEL LOOP LOSES 7/7 ON PER-CALL COST, AND IT IS LINEAR (2N−7).** 3–8 of 21–77 calls at
+  ~580–700s each, ~70 min burned nightly (**~8.2h this window**) to always reach `docs-only drop-all`.
+  Fix = fewer calls (per-lane, 8) AND a cheaper call (tsc-only tier). Worthless until #1. (carried, M)
+- **#4 — ONE LANE'S VOLUME DISCARDS EVERY OTHER LANE'S WORK.** 11-06: lane 1 kept **35** files vs lanes
+  2–8's 1–4 each. `file-cap=8` is advertised but unenforced. **Enforce the cap on the keep path.** (S)
+- **#5 — READING AN IN-FLIGHT LOG AS A RESULT IS A FALSE GREEN.** `rg -Nc TS2307` on tonight's log → 0,
+  because lane 07 runs 90 min before the gate. Same class as the prose-vs-code grep miss and the `✓`→`✔`
+  glyph break. **Only count errors in a log whose run reached its gate.** (new, confirmed, S)
+- **#6 — A ZERO-CODE SHIP IS REPORTED AS SUCCESS.** 7 more commits of proof. `authored CODE files > 0 and
+  0 code files committed` must be a loud **ERROR** in the Telegram card with the dropped-path list and the
+  salvage stamp. (open, carried 5 windows, S)
+- **#7 — `kept N authored file(s)` IS NOT A CODE COUNT AND `lane N` IS NOT A LANE ID** (positional over a
+  nightly-varying set). **Print `lane=<name> kept=<n> code=<n>`.** (open, carried, S)
+- **#8 — `docs/nightly/reports/` IS GITIGNORED (`.gitignore:82`).** Every `### Lane N` section lanes
+  append in STEP 6 is never committed. **Un-ignore it, or stop calling it their report of record.** (S)
+- **#9 — `translations/*.js` IS A MULTI-LANE HOTSPOT AND LAST WRITE WINS.** A "vanished" i18n string is
+  usually never-applied, not gate-eaten — **`git diff` it before re-fixing.** Same for `AcademyMap.tsx`'s
+  eslint-clean 2-line `unoptimized` removal: **uncommitted 14 consecutive nights.** (carried, S)
+- **#10 — ADDING A PROP TO A COMPONENT IS A TWO-SITE EDIT.** The `CardPickScreen`/`RunPageClient` TS2322
+  `activeCards` is in the 11-06 log again. **`rg` the props interface AND every call site in one pass;
   `npx eslint` does NOT type-check.** (open, confirmed drop cause)
-- **#9 — Stranded `refs/nightly-pending/` is STILL 2026-08-03, -08-06, -08-28** — ~85 nights, `cherry-pick/push
-  failed` 7/7. **No root `.gitattributes`.** Create it with `merge=union` for `docs/nightly/impact-ledger.ndjson`,
-  `mode-readiness.md`, `perf-baseline.json`. Oldest open item. (M)
-- **Brief hygiene:** stale-source warnings recur nightly (`collector restore failed → stale fallback`). LCP
-  top-5 is cross-tenant PostHog contamination (imposketch.io) — **filter `$host` in the collector, not the
-  lane** · `reddit-fetch search` returns garbage, RSS works · subagents fabricate non-English word lists
-  (spot-check 5/locale) · a bare `count` in a supabase-js select is a PostgREST AGGREGATE (42803) · Supabase
-  advisor warnings go stale, confirm against `pg_indexes` · **grep for the helper before proposing to build
-  it** (`ls scripts/nightly/lib scripts/nightly/tools`) · MCP scoping works, do not escalate — `(none)`
-  appears only for prompt-only lanes, by design.
+- **#11 — STRANDED `refs/nightly-pending/` GREW 3 → 9.** Was 08-03/-08-06/-08-28; now also **10-28..11-02**,
+  each `cherry-pick/push failed` every run — yet 11-03/04/05 commits ARE on `origin/master`, so the
+  dual-write strands even on nights that push fine. `ls .gitattributes` → **still NONE**; create it with
+  `merge=union` for `impact-ledger.ndjson`, `mode-readiness.md`, `perf-baseline.json`. Local checkout sits
+  **20 commits behind `origin/master`** at lane time — fetch before the salvage commit. (escalated, M)
+- **Brief hygiene:** LCP top-5 is cross-tenant PostHog contamination (imposketch.io) — **filter `$host` in
+  the collector, not the lane** · `reddit-fetch search` returns garbage, RSS works · subagents fabricate
+  non-English word lists (spot-check 5/locale) · a bare `count` in a supabase-js select is a PostgREST
+  AGGREGATE (42803) · Supabase advisor warnings go stale, confirm vs `pg_indexes` · **grep for the helper
+  before proposing to build it** (`ls scripts/nightly/lib scripts/nightly/tools`).
 
 ## Open watches (carry forward)
-- **#1 + #2 together explain all 27 days of zero code. Nothing else in this list matters until they land.**
-- **Nobody replays the salvage.** 6 stamps on disk (`20261021`–`20261026`), 100 files, script ready.
-  **Lane 01 replays the newest stamp as its first act** once #2 lands — newest is `20261026-010726` (11 files);
-  largest is `20261024-010154` (34).
-- **Spend-cap / abort leaves no artifact.** A pre-lane probe writing `docs/nightly/artifacts/run-aborted-<date>.md`
-  + a Telegram card covers this and the `not on master` abort.
-- **Blast disconnect/reconnect-mid-wave board reset** — MAJOR, carried **10+ nights**. 6 files + a gating
+- **#0 + #1 + #2 + #3 together explain all 35 days of zero code. Nothing else matters until they land.**
+- **Replay the NEXT-oldest stamp nightly** — 11-06 took `20261104-010003`; oldest left `20261029-010003`.
+- **Spend-cap / abort leaves no artifact.** A pre-lane probe writing
+  `docs/nightly/artifacts/run-aborted-<date>.md` + a Telegram card covers this and `not on master`.
+- **Blast disconnect/reconnect-mid-wave board reset** — MAJOR, carried **19+ nights**. 6 files + a gating
   condition + a reconnect test. **Never fits a 15-min lane. Human queue. Stop re-auditing nightly.**
 - **agent-browser cannot dismiss the cookie-consent overlay** (dialog outside the a11y snapshot tree) —
   still blocking lane 11 visual QA. Longest-running open item.
 - **Unwired-but-typed experiments** — `exp-practice-wheel-cta-v1` + 9 more, 0 non-test call sites
   (`rg "n\('exp-" fe-next`). **Brain Drill has no traffic** (`drill_completed` 0) — discoverability, not
-  features. **MP CLS 0.92+** (socket `connecting→lobby` DOM swap) — fix = a `RoomListView` skeleton; human queue.
-- **GSC/human queue** — GSC creds drifted to `lf-finance.co.il`; IndexNow Bing parity; AdSense re-submit after
+  features. **MP CLS 0.92+** (socket `connecting→lobby` swap) — fix = a `RoomListView` skeleton; human queue.
+- **Human queue** — GSC creds drifted to `lf-finance.co.il`; IndexNow Bing parity; AdSense re-submit after
   ≥5 informational pages clear 400w; Sentry MCP write-403; Supabase never-expire PAT.
-- **`/es/juego-de-palabras-multijugador`** — 23.5k impr, ~0.4% CTR, 3 title rewrites moved nothing. Not a meta problem. **Lane 06: stop rewriting its title.**
 
 ## Specialized Skills (maintained by lane 7)
+> Figures come from `lane N — kept M authored file(s)`, positional over a nightly-varying set — best-effort
+> attribution, not fact (avoid-#7).
 
 | Lane | Recommended skills | Evidence |
 |---|---|---|
-| 01 triage | `security`, `supabase-db-manager` | ran 7/7; fastest coder lane (10-27: 16 min, 4 files). Most reliable — give it the salvage replay |
-| 02 perf | `superpowers:systematic-debugging`, `agent-browser:agent-browser` | 7/7; **10-27 kept 9 files, highest of any lane** — watch its blast radius; still burns time on cross-tenant LCP noise |
-| 03 engagement | `frontend-design` | 7/7, lowest volume (1–3 files), 3–20 min — never a named gate offender |
-| 04 competitor | `humanizer`, `game-designer` | skipped 10-27 (zero-signal); **kept 18 on 10-17** — needs a hard in-prompt scope clamp, not a new skill |
-| 05 landing | `frontend-design`, `impeccable` | 7/7, 2 files/night in this window (down from 15–19 min sprawl); design quality non-negotiable; keep `tsc --noEmit` in its finalize |
-| 06 seo | `seo-daily` | 6/7 — mandatory when it runs; `docs/seo-daily/2026-10-26.md` (124 lines) is its only output that ever ships |
-| 07 self-learn | none — prompt-only | 7/7. **Its 10-23 gate fix was dropped by the gate (Headline 1).** It must emit patches, not edits |
-| 08 adsense | `humanizer`, `higgsfield-generate` | skipped 3/7 — blocked on AdSense approval, not on skills |
-| 09 monetization | `frontend-design` | ran 10-26 (23-line artifact); 2/7 — scheduler reads it as low-signal |
-| 10 dict | `dictionary-improvement`, `crossword-clue-craft` | skipped 10-27; ~1 output in 3 windows |
-| 11 mode-qa | `senior-qa`, `ccgs-design-review`, `agent-browser:agent-browser` | ran 10-26 (3-line artifact — blocked on the cookie overlay); cap its screenshot output |
-| 12 telemetry | none — prompt-only | not selected this window |
+| 01 triage | `security`, `supabase-db-manager` | ran 7/7; **35 kept files on 11-06 is the #1 reason the bisect loses** — clamp it; keep the salvage replay as its first act |
+| 02 perf | `superpowers:systematic-debugging`, `agent-browser:agent-browser` | 7/7; 2 files/night — well-scoped; still burns time on cross-tenant LCP noise |
+| 03 engagement | `frontend-design` | 7/7, 2 files/night, 5–7 min (11-07: 02:02→02:10) — never a named gate offender |
+| 04 competitor | `humanizer`, `game-designer` | skipped 11-06 (zero-signal); kept 4 on 11-07 — the in-prompt scope clamp held |
+| 05 landing | `frontend-design`, `impeccable` | 7/7, 2–3 files/night (11-07: 3); design quality non-negotiable; keep `tsc --noEmit` in its finalize |
+| 06 seo | — | **lane DROPPED 10-31 (`a6f57e90d`)**, SEO via Growth Radar. Row kept only so no one re-adds it |
+| 07 self-learn | none — prompt-only | 7/7. **Its 10-23 gate fix is still unshipped (Headline 2).** Must emit patches, not edits |
+| 08 adsense | `humanizer`, `higgsfield-generate` | ran 11-06 (kept 1); blocked on AdSense approval, not on skills |
+| 09 monetization | `frontend-design` | ran 11-06 rc=0; **owns the 11-07 founder "trial for unity" ask**; never the coin economy |
+| 10 dict | `dictionary-improvement`, `crossword-clue-craft` | skipped 11-06; ~1 output in 3 windows |
+| 11 mode-qa | `senior-qa`, `ccgs-design-review`, `agent-browser:agent-browser` | blocked on the cookie overlay; cap its screenshot output |
+| 12 telemetry | none — prompt-only | ran 11-05 + 11-06 (artifact only) |
 
 ## Reddit reply etiquette (lane 4 sub-output)
 - **Never auto-post.** Drafts only. User reviews + posts manually.
@@ -186,7 +186,7 @@ Rewritten by **lane 7** each night from prior 7 reports. **≤200 lines.** All l
 - Two drafts per thread: (a) pure-value, (b) value + one-line product mention. User picks.
 - Use older account (fresh 0-karma = spam-flagged).
 - **Reddit JSON API blocked since 05-27.** Use RSS fallback (`c5b0c4c10`); OAuth un-configured — stop retrying. Wrap fetch in error-tolerant parse.
-- **Zero reddit callbacks in feedback (100+ d)** — accept silence.
+- **Zero reddit callbacks in feedback (104 d)** — accept silence.
 
 ## Core principle (granted by user) — DO NOT EDIT
 - **Anything repeatable -> script it.** If a lane repeats the same WebSearch / WebFetch / SQL / shell sequence on multiple nights, codify it under `scripts/nightly/lib/` or `scripts/nightly/tools/`. Lane 7 is empowered to create AND update these helpers. Each new script must be: (a) under 200 lines, (b) idempotent, (c) syntax-checked with `bash -n`, (d) referenced from at least one lane prompt.

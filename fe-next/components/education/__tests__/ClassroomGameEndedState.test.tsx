@@ -7,6 +7,11 @@ let mockClassroomLoading = false;
 vi.mock('@/hooks/useStudentClassroom', () => ({
   useStudentClassroom: () => ({ classroomId: mockClassroomId, isLoading: mockClassroomLoading }),
 }));
+let mockLessons: unknown[] = [];
+vi.mock('@/hooks/usePracticeLessons', () => ({
+  usePracticeLessons: () => ({ lessons: mockLessons, isLoading: false, error: null, refresh: vi.fn() }),
+}));
+vi.mock('@/lib/education/telemetryCore', () => ({ safeCapture: vi.fn() }));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
 }));
@@ -18,6 +23,7 @@ const base = { message: 'Your class game ended.', hubHref: '/en/student', onRetr
 beforeEach(() => {
   mockClassroomId = 'class-1';
   mockClassroomLoading = false;
+  mockLessons = [];
   base.onRetry.mockClear();
 });
 
@@ -53,19 +59,30 @@ describe('<ClassroomGameEndedState>', () => {
   });
 });
 
-describe('<ClassroomGameEndedState> — a way on first, the retry second', () => {
-  it('leads with the class hub as the loud action; retry is a quiet text button', () => {
+describe('<ClassroomGameEndedState> — practice first, the retry last', () => {
+  it("GIVEN an enrolled student THEN the loud action practises the class's latest list, the class hub comes next and retry stays quiet", () => {
+    mockLessons = [{ id: 'L3', name: 'Week 9', classroom_id: 'class-1', words: [{ word: 'cat' }], assignment: null }];
     render(<ClassroomGameEndedState {...base} roomCode="ABC123" />);
-    const primary = screen.getByTestId('ended-primary');
-    expect(primary).toHaveTextContent('education.student.gameEnded.toClass');
+    const practice = screen.getByTestId('dead-end-practice');
+    expect(practice).toHaveAttribute('href', '/en/student/lessons/L3?mode=spelling');
+    const hub = screen.getByTestId('ended-primary');
+    expect(hub).toHaveTextContent('education.student.gameEnded.toClass');
+    expect(hub.className).not.toMatch(/bg-neo-black/);
     const retry = screen.getByRole('button', { name: 'education.student.gameEnded.retry' });
-    expect(retry.className).not.toMatch(/bg-neo-black/);
-    expect(primary.compareDocumentPosition(retry) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(practice.compareDocumentPosition(hub) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(hub.compareDocumentPosition(retry) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
-  it('makes a new code the loud action for a student without a class', () => {
+  it('GIVEN a student without a class THEN practice opens the no-account starter round and a new code is the second action', () => {
     mockClassroomId = null;
     render(<ClassroomGameEndedState {...base} roomCode="ABC123" />);
+    expect(screen.getByTestId('dead-end-practice')).toHaveAttribute('href', '/en/join/practice');
     expect(screen.getByTestId('ended-primary')).toHaveTextContent('education.student.gameEnded.newCode');
+  });
+
+  it('never shows a Pro prompt, price or upgrade link', () => {
+    const { container } = render(<ClassroomGameEndedState {...base} roomCode="ABC123" />);
+    expect(container.textContent).not.toMatch(/upgrade|\$|price/i);
+    for (const a of screen.getAllByRole('link')) expect(a.getAttribute('href')).not.toMatch(/pricing|upgrade/);
   });
 });

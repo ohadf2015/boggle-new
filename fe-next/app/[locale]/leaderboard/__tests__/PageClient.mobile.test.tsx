@@ -156,7 +156,7 @@ describe('Leaderboard PageClient', () => {
     const card = screen.getByTestId('leaderboard-you');
     expect(card.textContent).toContain('leaderboard.noRankYet');
     fireEvent.click(screen.getByRole('button', { name: 'common.playNow' }));
-    expect(push).toHaveBeenCalledWith('/en/singleplayer');
+    expect(push).toHaveBeenCalledWith('/en/quick-play');
   });
 
   it('shouldShowARankedPlayerTheirRankAndThePointsToPassThePlayerAbove', () => {

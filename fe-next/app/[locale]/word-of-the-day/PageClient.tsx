@@ -173,7 +173,7 @@ export default function WordOfTheDayClient({ allWords, featuredWord }: Props) {
             {/* Action Buttons */}
             <div className="flex flex-wrap gap-3">
               <Link
-                href={`/${lang}/singleplayer`}
+                href={`/${lang}/quick-play`}
                 className="inline-flex items-center px-5 py-2.5 font-neo-display font-bold text-sm uppercase border-3 border-neo-black rounded-neo bg-neo-yellow text-neo-black shadow-hard hover:shadow-hard-pressed hover:translate-x-[2px] hover:translate-y-[2px] transition-[box-shadow,translate,scale,rotate,transform] duration-100"
               >
                 {label('practiceNow', lang)}
@@ -256,7 +256,7 @@ export default function WordOfTheDayClient({ allWords, featuredWord }: Props) {
             className="text-center mt-8"
           >
             <Link
-              href={`/${lang}/singleplayer`}
+              href={`/${lang}/quick-play`}
               className="inline-flex items-center px-8 py-3 font-neo-display font-bold text-lg uppercase border-3 border-neo-black rounded-neo bg-neo-pink text-white shadow-hard hover:shadow-hard-pressed hover:translate-x-[2px] hover:translate-y-[2px] transition-[box-shadow,translate,scale,rotate,transform] duration-100"
             >
               {label('playNow', lang)}

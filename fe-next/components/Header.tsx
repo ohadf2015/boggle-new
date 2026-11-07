@@ -114,7 +114,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     "px-2 sm:px-3 lg:px-4 py-2 sm:py-2 lg:py-2.5 short:py-1 medium-short:py-1.5 desktop-short:lg:py-1.5",
                     "bg-neo-white/90 dark:bg-neo-navy",
                     "backdrop-blur-xs",
-                    "border-b-4 border-neo-black dark:border-neo-cream/30",
+                    "border-b-2 sm:border-b-4 border-neo-black dark:border-neo-cream/15 sm:dark:border-neo-cream/30",
                     "transition-all duration-100",
                     "min-w-0"
                 )}
@@ -127,13 +127,13 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     <div className="block min-w-0"><LeaguePositionBadge /></div>
                     {/* Daily streak chip — the D1 habit loop, always visible once
                         the player has a streak going. Self-hides at 0 days. */}
-                    <div className="block shrink-0"><StreakBadge /></div>
+                    <div className="hidden min-[400px]:block shrink-0"><StreakBadge /></div>
                 </div>
 
                 {/* Right cluster: desktop strip (sm+) + side-menu trigger.
                     Wrapped so justify-between treats them as a single end-aligned
                     block, keeping the burger adjacent to the desktop controls. */}
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                     <HeaderDesktopControls
                         unclaimedCount={unclaimedCount}
                         onOpenGiftModal={handleOpenGiftModal}

@@ -2,11 +2,12 @@
 
 import Link from 'next/link';
 import { Flame, Users } from 'lucide-react';
+import { useTodayLabel } from './useTodayLabel';
 import type { ReactNode } from 'react';
-import { HOME_PREVIEW_COPY as C } from './copy';
 
 interface HeroQuickLinksProps {
   lang: string;
+  t: (key: string, params?: Record<string, string | number>) => string;
   streak: number;
   streakLoading: boolean;
 }
@@ -38,9 +39,9 @@ function Chip({ href, testId, icon, iconBg, title, sub }: {
   );
 }
 
-export function HeroQuickLinks({ lang, streak, streakLoading }: HeroQuickLinksProps) {
-  const date = new Intl.DateTimeFormat(lang, { weekday: 'short', day: 'numeric', month: 'short' }).format(new Date());
-  const dailySub = !streakLoading && streak > 0 ? C.chipStreak.replace('{n}', String(streak)) : date;
+export function HeroQuickLinks({ lang, t, streak, streakLoading }: HeroQuickLinksProps) {
+  const date = useTodayLabel(lang, { weekday: 'short', day: 'numeric', month: 'short' });
+  const dailySub = !streakLoading && streak > 0 ? t('homePlay.chipStreak', { n: streak }) : date;
   return (
     <ul className="grid grid-cols-2 gap-2.5 lg:gap-4" data-testid="hp-quick-links">
       <Chip
@@ -48,7 +49,7 @@ export function HeroQuickLinks({ lang, streak, streakLoading }: HeroQuickLinksPr
         testId="hp-chip-daily"
         iconBg="bg-neo-orange"
         icon={<Flame className="h-5 w-5 lg:h-6 lg:w-6" strokeWidth={2.75} aria-hidden="true" />}
-        title={C.chipDaily}
+        title={t('homePlay.chipDaily')}
         sub={dailySub}
       />
       <Chip
@@ -56,8 +57,8 @@ export function HeroQuickLinks({ lang, streak, streakLoading }: HeroQuickLinksPr
         testId="hp-chip-mp"
         iconBg="bg-neo-pink"
         icon={<Users className="h-5 w-5 lg:h-6 lg:w-6" strokeWidth={2.75} aria-hidden="true" />}
-        title={C.chipMp}
-        sub={C.chipMpSub}
+        title={t('homePlay.chipMp')}
+        sub={t('homePlay.chipMpSub')}
       />
     </ul>
   );

@@ -208,7 +208,7 @@ export default async function StartingWithLetterPage({ params }: PageParams) {
                     Free, no signup required — play instantly.
                   </p>
                 </div>
-                <PulseCTA href={`/${locale}/singleplayer`} color="lime" className="text-lg">
+                <PulseCTA href={`/${locale}/quick-play`} color="lime" className="text-lg">
                   Play Free Now →
                 </PulseCTA>
               </div>
@@ -315,7 +315,7 @@ export default async function StartingWithLetterPage({ params }: PageParams) {
                           <span className="text-neo-lime font-bold">{getWordScore(words[words.length - 1])}pt</span>.
                         </p>
                       </div>
-                      <PulseCTA href={`/${locale}/singleplayer`} color="cyan" className="text-sm">
+                      <PulseCTA href={`/${locale}/quick-play`} color="cyan" className="text-sm">
                         Try It Free →
                       </PulseCTA>
                     </div>
@@ -398,7 +398,7 @@ export default async function StartingWithLetterPage({ params }: PageParams) {
                     <p className="text-slate-400">{letterInfo.strategy}</p>
                   )}
                   <Link
-                    href={`/${locale}/singleplayer`}
+                    href={`/${locale}/quick-play`}
                     className="inline-block bg-neo-lime text-neo-black font-bold px-4 py-2 rounded-neo border-2 border-neo-black shadow-hard-sm hover:shadow-hard-pressed active:translate-y-0.5 transition-[box-shadow,translate,scale,rotate,transform] text-sm"
                   >
                     Start Practicing →
@@ -429,7 +429,7 @@ export default async function StartingWithLetterPage({ params }: PageParams) {
                 Free word game — no download, no signup. Find words on a grid against the clock.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <PulseCTA href={`/${locale}/singleplayer`} color="lime">
+                <PulseCTA href={`/${locale}/quick-play`} color="lime">
                   Play Solo →
                 </PulseCTA>
                 <PulseCTA href={`/${locale}/multiplayer`} color="pink">

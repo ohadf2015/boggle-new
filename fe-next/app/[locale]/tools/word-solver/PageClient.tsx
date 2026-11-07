@@ -244,7 +244,7 @@ export default function WordSolverPageClient() {
           </h2>
           <p className="text-neo-black/80 mb-4">{content.ctaDescription}</p>
           <Link
-            href={`/${locale}/singleplayer`}
+            href={`/${locale}/quick-play`}
             className={cn(
               'inline-block px-8 py-3 font-neo-display font-bold text-lg',
               'bg-neo-navy text-white border-3 border-neo-black rounded-neo',

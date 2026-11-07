@@ -41,7 +41,7 @@ export const dynamic = 'force-dynamic';
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 /** Columns a student is allowed to see. `teacher_id` is deliberately absent. */
-const LESSON_COLUMNS = 'id, name, description, language, words, classroom_id';
+const LESSON_COLUMNS = 'id, name, description, language, words, classroom_id, created_at';
 
 interface LessonRow {
   id: string;
@@ -50,6 +50,7 @@ interface LessonRow {
   language: string | null;
   words: unknown[] | null;
   classroom_id: string | null;
+  created_at?: string | null;
 }
 
 interface AssignmentRow {
@@ -68,6 +69,7 @@ function shapeLesson(row: LessonRow) {
     language: row.language ?? 'en',
     words: Array.isArray(row.words) ? row.words : [],
     classroom_id: row.classroom_id ?? null,
+    created_at: row.created_at ?? null,
   };
 }
 

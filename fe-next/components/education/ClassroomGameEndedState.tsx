@@ -5,6 +5,7 @@ import { RotateCcw } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useStudentClassroom } from '@/hooks/useStudentClassroom';
 import { EDU_MASCOT } from '@/lib/education/mascotArt';
+import { DeadEndPracticeLink } from '@/components/education/join/DeadEndPracticeLink';
 
 interface ClassroomGameEndedStateProps {
   /** The room the student tried to reach; empty when unknown. */
@@ -14,10 +15,9 @@ interface ClassroomGameEndedStateProps {
   onRetry: (roomCode: string) => void;
 }
 
-const PRIMARY =
-  'flex min-h-12 w-full items-center justify-center rounded-neo border-3 border-neo-black bg-neo-black px-6 py-3 font-neo-display font-black text-neo-lime shadow-hard-sm transition hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px]';
+const SECONDARY =
+  'flex min-h-12 w-full items-center justify-center rounded-neo border-3 border-neo-black bg-neo-cream px-6 py-3 font-neo-display font-black text-neo-black shadow-hard-sm transition hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-black';
 
-/** Shown to a classroom student whose room is gone: what happened, a way on, and a quiet retry. */
 export function ClassroomGameEndedState({ roomCode, message, hubHref, onRetry }: ClassroomGameEndedStateProps) {
   const { t, language } = useLanguage();
   const { classroomId, isLoading } = useStudentClassroom();
@@ -41,13 +41,14 @@ export function ClassroomGameEndedState({ roomCode, message, hubHref, onRetry }:
         </h1>
         <p className="mb-5 font-neo-body text-neo-black/80">{message}</p>
         <div className="flex flex-col gap-3">
+          <DeadEndPracticeLink state="room_gone" className="bg-neo-black text-neo-lime focus-visible:outline-neo-black" />
           {!isLoading && classroomId && (
-            <Link data-testid="ended-primary" href={hubHref} className={`${PRIMARY} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}>
+            <Link data-testid="ended-primary" href={hubHref} className={SECONDARY}>
               {t('education.student.gameEnded.toClass')}
             </Link>
           )}
           {!isLoading && !classroomId && (
-            <Link data-testid="ended-primary" href={`/${language}/join`} className={`${PRIMARY} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}>
+            <Link data-testid="ended-primary" href={`/${language}/join`} className={SECONDARY}>
               {t('education.student.gameEnded.newCode')}
             </Link>
           )}

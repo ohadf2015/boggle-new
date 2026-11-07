@@ -899,6 +899,22 @@ export const EXPERIMENTS = {
     description:
       'TeacherGate no-access redirect state. control = renders null while router.replace to /education/access is in flight. redirect-status = shows PageLoader instead of a blank screen. Targets /en/teacher rage-click signal (score 0.51, 2026-08-31). Conversion = rage-click rate on /teacher falls. Guardrail = education_access_redirect_landed stable.',
   }),
+
+  /**
+   * Guest /profile view: the 3 locked stat tiles (score/wins/achievements)
+   * render with a Lock icon but no onClick — a guest tapping them (arriving
+   * via header, matching the /es/profile?from=header rage-click signal,
+   * 2026-11-07) gets zero feedback. tappable makes the tiles act as a
+   * sign-in CTA instead of a dead tap.
+   * Conversion = signup_prompt_shown rate from this surface; rage-click
+   * rate on /profile falls.
+   */
+  'exp-profile-locked-tile-tap-v1': defineExperiment({
+    variants: ['control', 'tappable'] as const,
+    default: 'control',
+    description:
+      'Guest /profile locked stat tiles. control = static, no onClick (dead tap). tappable = tiles open the sign-in modal on tap. Targets /es/profile?from=header rage-click signal (score 0.358, 2026-11-07). Conversion = rage-click rate on /profile falls; guardrail = signup_prompt_shown from profile_locked_tile.',
+  }),
 } as const;
 
 export type ExperimentKey = keyof typeof EXPERIMENTS;

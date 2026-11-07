@@ -1,8 +1,7 @@
 /**
- * Piece A (shell): LandingView renders the fresh page for fresh visitors and
- * today's tree for returning users. The server emits both (CSS + a pre-paint
- * script choose); the client mounts only the chosen one, so a fresh visitor
- * never runs the returning tree's data hooks, ads or music.
+ * LandingView renders one play-first home for every visitor. The pre-paint
+ * script still marks returning visitors and the native app (html[data-home]),
+ * which hides the SEO tail and footer for them.
  */
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -20,42 +19,36 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn(), replace: vi.fn() }) }));
 vi.mock('@/components/Header', () => ({ default: () => <header data-testid="header" /> }));
-vi.mock('../ReturningHome', () => ({ ReturningHome: () => <div data-testid="returning-home" /> }));
-vi.mock('../fresh/FreshPage', () => ({
-  FreshPage: ({ onPlay }: { onPlay?: () => void }) => (
-    <div data-testid="fresh-page" data-has-play={onPlay ? 'yes' : 'no'} />
+vi.mock('@/components/home-preview/HomePreview', () => ({
+  HomePreview: ({ onPlay }: { onPlay?: () => void }) => (
+    <div data-testid="home-preview" data-has-play={onPlay ? 'yes' : 'no'} />
   ),
 }));
 vi.mock('../LandingSEOSection', () => ({ LandingSEOSection: () => <section data-testid="seo" /> }));
 vi.mock('../LandingBlogSection', () => ({ LandingBlogSection: () => <section data-testid="blog" /> }));
 
-describe('LandingView tree selection', () => {
+describe('LandingView home', () => {
   beforeEach(() => {
     completed = false;
     document.documentElement.removeAttribute('data-home');
   });
 
-  it('fresh visitor: mounts FreshPage, leaves the returning tree inert', () => {
-    const { queryByTestId } = render(<LandingView />);
-    expect(queryByTestId('fresh-page')).not.toBeNull();
-    expect(queryByTestId('returning-home')).toBeNull();
-    expect(document.documentElement.getAttribute('data-home')).toBe('fresh');
+  it.each([
+    [false, 'fresh'],
+    [true, 'returning'],
+  ])('given onboarding completed=%s, then the same home renders and html is marked %s', (c, tree) => {
+    completed = c;
+    const { getAllByTestId } = render(<LandingView />);
+    expect(getAllByTestId('home-preview')).toHaveLength(1);
+    expect(document.documentElement.getAttribute('data-home')).toBe(tree);
   });
 
-  it('returning visitor: mounts the returning tree, leaves FreshPage inert', () => {
-    completed = true;
-    const { queryByTestId } = render(<LandingView />);
-    expect(queryByTestId('returning-home')).not.toBeNull();
-    expect(queryByTestId('fresh-page')).toBeNull();
-    expect(document.documentElement.getAttribute('data-home')).toBe('returning');
-  });
-
-  it('passes onStartOnboarding through to the fresh PLAY', () => {
+  it('passes onStartOnboarding through to the home PLAY', () => {
     const { getByTestId } = render(<LandingView onStartOnboarding={() => {}} />);
-    expect(getByTestId('fresh-page').getAttribute('data-has-play')).toBe('yes');
+    expect(getByTestId('home-preview').getAttribute('data-has-play')).toBe('yes');
   });
 
-  it('SEO and blog render once, outside both trees, for either visitor', () => {
+  it('SEO and blog render once for either visitor', () => {
     for (const c of [false, true]) {
       completed = c;
       const { getAllByTestId, unmount } = render(<LandingView />);
@@ -65,15 +58,11 @@ describe('LandingView tree selection', () => {
     }
   });
 
-  it('pre-paint script precedes both tree wrappers in the HTML', () => {
+  it('pre-paint script precedes the home in the HTML', () => {
     const html = renderToString(<LandingView />);
     const script = html.indexOf('<script');
+    const home = html.indexOf('data-testid="home-preview"');
     expect(script).toBeGreaterThan(-1);
-    const fresh = html.indexOf('<div data-home-tree="fresh"');
-    const returning = html.indexOf('<div data-home-tree="returning"');
-    expect(fresh).toBeGreaterThan(-1);
-    expect(returning).toBeGreaterThan(-1);
-    expect(script).toBeLessThan(fresh);
-    expect(script).toBeLessThan(returning);
+    expect(home).toBeGreaterThan(script);
   });
 });

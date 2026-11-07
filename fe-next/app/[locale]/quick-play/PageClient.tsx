@@ -4,11 +4,12 @@
  * Quick Play page shell — renders the solo arcade wheel hub.
  * Ungated and available to all players as the default mode after onboarding.
  */
-import { Suspense } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { QuickPlayHub } from '@/components/quick-play/QuickPlayHub';
 import { quickPlayBackHref } from '@/lib/navigation/eduExitTargets';
+import { parseQuickPlayStartMode } from '@/lib/quickPlay/startMode';
 
 function LoadingFallback() {
   return <div className="min-h-screen bg-neo-navy" />;
@@ -19,7 +20,14 @@ function QuickPlayGate() {
   const searchParams = useSearchParams();
 
   const backHref = quickPlayBackHref(language, searchParams.get('academy') === '1');
-  return <QuickPlayHub challengeId={searchParams.get('challenge')} backHref={backHref} />;
+  const [startMode] = useState(() => parseQuickPlayStartMode(searchParams.get('mode')));
+  useEffect(() => {
+    if (!startMode) return;
+    const url = new URL(window.location.href);
+    url.searchParams.delete('mode');
+    window.history.replaceState(window.history.state, '', url.pathname + url.search + url.hash);
+  }, [startMode]);
+  return <QuickPlayHub challengeId={searchParams.get('challenge')} backHref={backHref} startMode={startMode} />;
 }
 
 export default function QuickPlayPageClient() {

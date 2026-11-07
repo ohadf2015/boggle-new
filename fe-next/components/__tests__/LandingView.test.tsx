@@ -8,6 +8,9 @@ import React from 'react';
 
 // Mock contexts (auto-mock pattern)
 vi.mock('@/contexts/AuthContext');
+vi.mock('@/components/home-preview/HomePreview', () => ({
+  HomePreview: ({ onPlay }: { onPlay?: () => void }) => <div data-testid="home-preview" data-has-play={onPlay ? 'yes' : 'no'} />,
+}));
 vi.mock('@/contexts/LanguageContext');
 vi.mock('@/contexts/MusicContext');
 vi.mock('@/utils/ThemeContext', () => ({
@@ -118,7 +121,6 @@ import LandingView from '../landing/LandingView';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
-import { hasSupabaseSession } from '@/utils/onboardingStorage';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { Mock } from 'vitest';
 
@@ -159,19 +161,9 @@ describe('LandingView', () => {
     });
   });
 
-  it('renders game mode selection cards', () => {
+  it('renders the play-first home for every visitor', () => {
     render(<LandingView />, { wrapper: createWrapper() });
-
-    const links = screen.getAllByRole('link');
-    // Landing renders a featured mode set: practice, multiplayer (arena/quickPlay),
-    // singleplayer, and daily are all valid mode-card hrefs depending on player tier.
-    // Assert at least one game-mode link surfaces.
-    const hasGameModeLink = links.some((link) => {
-      const href = link.getAttribute('href') ?? '';
-      return /\/(singleplayer|multiplayer|practice|daily|adventure|blast|connections|brain)/.test(href);
-    });
-
-    expect(hasGameModeLink).toBe(true);
+    expect(screen.getByTestId('home-preview')).toBeTruthy();
   });
 
   it('queues lobby music on mount (MusicContext handles autoplay unlock)', () => {
@@ -180,30 +172,6 @@ describe('LandingView', () => {
     // Component calls playTrack unconditionally on mount; MusicContext queues
     // the track via pendingUnlockTrackRef and plays on first gesture.
     expect(mockPlayTrack).toHaveBeenCalledWith('bossa');
-  });
-
-  it('keeps SSR-painted cards (no skeleton downgrade) for a returning authed user whose profile is still loading', () => {
-    // SSR renders the real cards (no window → no session → always ready). A returning
-    // user has a Supabase token in localStorage and auth is still resolving on the
-    // client. The client must NOT replace the painted cards with a skeleton.
-    (hasSupabaseSession as Mock).mockReturnValue(true);
-    (useAuth as Mock).mockReturnValue({
-      isAuthenticated: false,
-      isAdmin: false,
-      profile: null,
-      loading: true,
-    });
-
-    render(<LandingView />, { wrapper: createWrapper() });
-
-    expect(screen.queryByTestId('landing-cards-skeleton')).toBeNull();
-
-    const links = screen.getAllByRole('link');
-    const hasGameModeLink = links.some((link) => {
-      const href = link.getAttribute('href') ?? '';
-      return /\/(singleplayer|multiplayer|practice|daily|adventure|blast|connections|brain)/.test(href);
-    });
-    expect(hasGameModeLink).toBe(true);
   });
 
   it('has accessible navigation links', () => {

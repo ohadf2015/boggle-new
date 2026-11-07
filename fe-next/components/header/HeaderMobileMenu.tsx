@@ -275,12 +275,12 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
             {/* Mobile-only inline strip: Volume + Lang + Auth.
                 Desktop already renders these via HeaderDesktopControls,
                 so we keep the trio gated `sm:hidden` to avoid duplicates. */}
-            <div className="sm:hidden flex items-center gap-2 min-w-0 shrink-0">
-                <MusicControls />
+            <div className="sm:hidden flex items-center gap-1.5 min-w-0 shrink-0">
+                <MusicControls compact />
 
                 {/* Quick UI-language pill — always visible on mobile (incl. CrazyGames),
                     so embed players can switch language without the hamburger menu. */}
-                <QuickLanguageSwitcher compact />
+                <QuickLanguageSwitcher compact className="w-9 h-9 border-2" />
 
                 {/* Unified auth button for guests (hidden on CrazyGames).
                     Also gated on `cgLoading` so the button does not flash
@@ -336,9 +336,9 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                     }}
                     className={cn(
                         "relative flex items-center justify-center shrink-0",
-                        "w-11 h-11 min-w-[44px] min-h-[44px]",
+                        "w-9 h-9 min-w-9 min-h-9 sm:w-11 sm:h-11 sm:min-w-[44px] sm:min-h-[44px]",
                         "bg-neo-cream text-neo-black",
-                        "border-3 border-neo-black",
+                        "border-2 sm:border-3 border-neo-black",
                         "rounded-neo shadow-hard-sm",
                         "hover:-translate-x-px hover:-translate-y-px hover:shadow-hard",
                         "active:translate-x-px active:translate-y-px active:shadow-none",
