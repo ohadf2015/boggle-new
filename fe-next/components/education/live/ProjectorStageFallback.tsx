@@ -54,7 +54,7 @@ export function ProjectorStageFallback({ mode, players, t }: { mode?: string; pl
             {leaders.map((p, i) => (
               <li
                 key={p.username}
-                className="flex items-center gap-[3cqw] rounded-neo border-[3px] border-neo-cream/40 bg-neo-navy px-[3cqw] py-[1.5cqw] shadow-hard-sm"
+                className="flex items-center gap-[3cqw] rounded-neo border-[3px] border-neo-cream/50 bg-neo-navy px-[3cqw] py-[1.5cqw] shadow-hard"
               >
                 <span className={`grid size-[clamp(1.75rem,9cqw,3.5rem)] shrink-0 place-items-center rounded-full border-[3px] border-neo-black font-neo-display text-[clamp(1rem,5.5cqw,2rem)] font-black text-neo-black ${RANK_FILL[i]}`}>
                   {i + 1}

@@ -24,7 +24,7 @@ export function ClassroomReteachBox({ summary, neverPlaced, links, onReteach, re
 
   if (verdict.kind !== 'replay' && !sendHome) {
     return (
-      <p className="p-3 rounded-neo border border-neo-lime/40 bg-neo-lime/10 text-neo-white font-neo-body text-sm">
+      <p className="p-3 rounded-neo-lg border-[3px] border-neo-cream/50 bg-neo-navy-light text-neo-white shadow-hard font-neo-body text-sm">
         {t('education.results.allFound')}
       </p>
     );
@@ -33,7 +33,7 @@ export function ClassroomReteachBox({ summary, neverPlaced, links, onReteach, re
   const missedOnBoard = summary.missedWords.filter((w) => !neverPlaced.has(w.toLowerCase()));
 
   return (
-    <div data-testid="reteach-list" className="p-3 rounded-neo border border-neo-pink bg-neo-pink/10">
+    <div data-testid="reteach-list" className="p-3 rounded-neo-lg border-[3px] border-neo-pink bg-neo-navy-light shadow-hard">
       {verdict.kind === 'replay' ? (
         <>
           <p className="text-neo-white font-bold text-sm mb-2">{t('eduLiveRoom.hostResults.mostMissed')}</p>

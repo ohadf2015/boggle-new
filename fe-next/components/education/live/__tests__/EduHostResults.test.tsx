@@ -77,6 +77,7 @@ describe('EduHostResults', () => {
     render(<EduHostResults summary={summary} players={players} t={t} onRematch={onRematch} onClose={onClose} onExitRoom={onExitRoom} />);
     expect(screen.getAllByRole('button').filter((b) => b.className.includes('bg-neo-lime'))).toEqual([screen.getByTestId('edu-results-play-again')]);
     fireEvent.click(screen.getByTestId('edu-results-play-again'));
+    fireEvent.click(screen.getByTestId('edu-results-more-toggle'));
     fireEvent.click(screen.getByTestId('edu-results-next-mode'));
     fireEvent.click(screen.getByTestId('edu-results-end'));
     expect(onRematch).toHaveBeenCalledTimes(1);
@@ -93,6 +94,7 @@ describe('EduHostResults', () => {
   it('given a free teacher, when results show, then the labelled Pro preview is the one Pro slot and no trial card or second unlock ask competes', () => {
     render(<EduHostResults summary={lessonSummary} players={players} t={t} onRematch={vi.fn()} />);
     finishReveal();
+    fireEvent.click(screen.getByTestId('edu-results-more-toggle'));
     expect(screen.getByTestId('class-report-teaser')).toBeInTheDocument();
     expect(screen.queryByTestId('results-teacher-pro-trial-card')).toBeNull();
     expect(screen.queryByTestId('unlock-report-upgrade-cta')).toBeNull();
@@ -100,8 +102,10 @@ describe('EduHostResults', () => {
     expect(document.querySelector('a[href="/he/teacher/reports"]')).toBeNull();
   });
 
-  it('given a free teacher, when the Pro preview mounts on the wall, then its server-side rendered impression fires', () => {
+  it('given a free teacher, when they open "Share and export", then the Pro preview mounts and only then its impression fires', () => {
     render(<EduHostResults summary={lessonSummary} players={players} t={t} onRematch={vi.fn()} />);
+    expect(proOffer.reportProOfferImpression).not.toHaveBeenCalledWith(expect.objectContaining({ placement: 'class_report_button' }), expect.anything());
+    fireEvent.click(screen.getByTestId('edu-results-more-toggle'));
     expect(proOffer.reportProOfferImpression).toHaveBeenCalledWith(expect.objectContaining({ placement: 'class_report_button', format: 'report_teaser', stage: 'rendered' }), expect.anything());
   });
 
@@ -197,6 +201,7 @@ describe('EduHostResults', () => {
   it('given a free teacher, when results show, then the Pro preview says how many struggled, never who, with no tap needed', () => {
     render(<EduHostResults summary={lessonSummary} players={players} t={t} onRematch={vi.fn()} />);
     finishReveal();
+    fireEvent.click(screen.getByTestId('edu-results-more-toggle'));
     const teaser = screen.getByTestId('class-report-teaser');
     expect(teaser).toHaveTextContent(/2 students found under half the words|2 תלמידים/);
     expect(teaser).not.toHaveTextContent(/Noa|Ido/);

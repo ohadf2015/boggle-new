@@ -46,7 +46,7 @@ function GridSilhouette({ puzzle, t }: { puzzle: CrosswordPuzzle; t: Translate }
 
 function StandingRow({ row, t }: { row: CrosswordStanding; t: Translate }) {
   return (
-    <li className="flex min-h-0 items-center gap-3 overflow-hidden rounded-neo border-2 border-neo-cream/40 bg-neo-navy px-3 py-1">
+    <li className="flex min-h-0 items-center gap-3 overflow-hidden rounded-neo border-[3px] border-neo-cream/50 bg-neo-navy px-3 py-1 shadow-hard-sm">
       <span className="w-8 shrink-0 font-neo-display text-xl font-black tabular-nums text-neo-cream/70">{row.rank}</span>
       <span className="min-w-0 flex-1">
         <span className="block truncate font-neo-display text-lg font-black md:text-2xl">{row.username}</span>

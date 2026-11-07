@@ -5,11 +5,10 @@ import { join } from 'node:path';
 const src = readFileSync(join(__dirname, '..', 'AssignmentCreator.tsx'), 'utf8');
 
 describe('AssignmentCreator fits a 1440x900 screen', () => {
-  it('pins the create/cancel row to the bottom of the scrolling dialog so it is never below the fold', () => {
-    const actions = src.match(/data-testid="assignment-actions"[^>]*className="([^"]+)"/);
-    expect(actions?.[1]).toMatch(/\bsticky\b/);
-    expect(actions?.[1]).toMatch(/(^|\s)-bottom-6(\s|$)/);
-    expect(actions?.[1]).toMatch(/\bbg-neo-navy\b/);
+  it('keeps the create/cancel row in the dialog footer, outside the scrolling body, so it is never below the fold', () => {
+    expect(src).toMatch(/<NbDialogFooter data-testid="assignment-actions"/);
+    const body = src.slice(src.indexOf('<NbDialogBody className="space-y-5">'), src.indexOf('<NbDialogFooter data-testid="assignment-actions"'));
+    expect(body).toContain('</NbDialogBody>');
   });
 
   it('keeps the optional instructions field short', () => {

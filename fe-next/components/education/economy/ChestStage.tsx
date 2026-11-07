@@ -43,7 +43,7 @@ const ChestStage = forwardRef<HTMLDivElement, Props>(function ChestStage({ phase
       <div
         aria-hidden="true"
         className="pointer-events-none absolute left-1/2 top-[42%] h-[min(60vw,30vh)] w-[min(60vw,30vh)] -translate-x-1/2 -translate-y-1/2 rounded-full"
-        style={{ background: `radial-gradient(circle, ${rays.hex}88 0%, transparent 65%)` }}
+        style={{ backgroundColor: rays.hex, opacity: 0.22 }}
       />
 
       <m.div
@@ -77,7 +77,7 @@ const ChestStage = forwardRef<HTMLDivElement, Props>(function ChestStage({ phase
           tabIndex={phase === 'revealed' ? -1 : 0}
           aria-hidden={phase === 'revealed' ? true : undefined}
           aria-label={openLabel}
-          className="h-full w-full cursor-pointer rounded-3xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime"
+          className="h-full w-full cursor-pointer rounded-neo-xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime"
         >
           {/* eslint-disable-next-line @next/next/no-img-element -- pre-sized chest art; the optimizer would re-encode it */}
           <img src={chestSrcForPhase(phase, rarity)} alt="" draggable={false} className="h-full w-full select-none object-contain drop-shadow-[6px_6px_0_rgb(var(--neo-black))]" />

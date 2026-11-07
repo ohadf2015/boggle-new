@@ -797,6 +797,7 @@ const he = {
       "editTitle": "עריכת רשימה",
       "description": "מדביקים מילים, מוסיפים פירוש, שומרים.",
       "newList": "רשימה חדשה",
+      "moreOptions": "שפה, שכבת גיל, נושא ושיתוף",
       "titleLabel": "שם הרשימה",
       "titlePlaceholder": "איך נקרא לרשימה?",
       "pasteLabel": "הדביקו או הקלידו מילים",
@@ -14958,6 +14959,7 @@ const he = {
       "galleryTitle": "התחילו מתבנית",
       "galleryHint": "בחרו שכבת גיל ומקצוע, תצוגה מקדימה של רשימת המילים, והקצאה בלחיצה אחת. Word Craft, להגשה מחר.",
       "galleryBrowse": "עיון בתבניות משימה",
+      "moreOptions": "דרכי משחק אחרות, מיקוד או הערה",
       "galleryPreview": "תצוגת מילים",
       "galleryAssign": "הקצה לכיתה",
       "galleryHidePreview": "הסתר מילים",
@@ -21156,6 +21158,7 @@ const he = {
       "teacher": "למורים",
       "school": "לבתי ספר"
     },
+    "compareAll": "השוואה בין החינמי לפרו",
     "strip": {
       "title": "מה פרו מראה לכם אחרי משחק אחד",
       "lead": "נתוני כיתה לדוגמה. הכיתות שלכם ימלאו אותם."
@@ -21531,6 +21534,7 @@ const he = {
       "missedTitle": "מילים שהכיתה פספסה",
       "practiceWords": "לתרגל את המילים האלה ({count})",
       "shareParents": "שיתוף עם ההורים",
+      "moreTools": "שיתוף וייצוא",
       "proPill": "Pro",
       "invitePrompt": "מכירים מורה שזה יתאים לה?",
       "inviteCta": "להזמין עמית",

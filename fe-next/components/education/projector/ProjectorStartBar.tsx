@@ -66,16 +66,16 @@ export function ProjectorStartBar({
       data-testid="projector-start-bar"
       style={style}
       className={cn(
-        'flex flex-col gap-2 self-center @max-5xl:sticky @max-5xl:bottom-0 @max-5xl:z-10 @max-5xl:-mx-3 @max-5xl:-mb-3 @max-5xl:border-t-2 @max-5xl:border-neo-cream/40 @max-5xl:bg-neo-navy @max-5xl:p-3',
+        'flex flex-col gap-2 self-center [@container(max-height:800px)]:sticky [@container(max-height:800px)]:bottom-0 [@container(max-height:800px)]:z-10 [@container(max-height:800px)]:bg-neo-navy [@container(max-height:800px)]:py-2 @max-5xl:sticky @max-5xl:bottom-0 @max-5xl:z-10 @max-5xl:-mx-3 @max-5xl:-mb-3 @max-5xl:border-t-[3px] @max-5xl:border-neo-cream/50 @max-5xl:bg-neo-navy @max-5xl:p-3',
         RISE,
         className
       )}
     >
       {autoStartSecondsLeft !== null && (
-        <div role="status" aria-live="polite" className="flex items-center justify-between gap-3 rounded-neo border-2 border-neo-cream bg-neo-navy-light px-3 py-2 font-neo-display font-bold text-neo-cream text-[clamp(1rem,min(1.2cqw,2.2cqh),1.75rem)]">
+        <div role="status" aria-live="polite" className="flex items-center justify-between gap-3 rounded-neo border-[3px] border-neo-black bg-neo-cream px-3 py-2 font-neo-display font-black text-neo-black shadow-hard text-[clamp(1rem,min(1.2cqw,2.2cqh),1.75rem)]">
           {t('hostView.allReadyAutoStart', { seconds: autoStartSecondsLeft })}
           {onCancelAutoStart && (
-            <button type="button" data-testid="projector-autostart-cancel" onClick={onCancelAutoStart} className={cn('min-h-11 rounded-neo border-2 border-neo-cream/60 bg-neo-navy px-3 text-sm text-neo-cream', PRESS)}>
+            <button type="button" data-testid="projector-autostart-cancel" onClick={onCancelAutoStart} className={cn('min-h-11 rounded-neo border-[3px] border-neo-black bg-neo-white px-3 text-sm text-neo-black shadow-hard-sm', PRESS)}>
               {t('common.cancel')}
             </button>
           )}
@@ -96,9 +96,11 @@ export function ProjectorStartBar({
             canStart && !waitingOnClass
               ? 'min-h-16 flex-[2_1_14rem] px-6 py-3 text-[clamp(1.5rem,min(3cqw,5.5cqh),4.5rem)]'
               : 'min-h-12 flex-[1_1_14rem] px-4 py-2 text-[clamp(1rem,min(1.4cqw,2.6cqh),2rem)]',
-            startLocked || waitingOnClass
-              ? 'border-2 border-neo-cream/40 bg-neo-navy-light font-bold text-neo-cream/75 shadow-none hover:translate-y-0 hover:shadow-none'
-              : 'motion-safe:animate-[edu-live-unlock_300ms_cubic-bezier(0.23,1,0.32,1)]',
+            startLocked
+              ? 'border-[3px] border-dashed border-neo-cream/50 bg-neo-navy-light font-bold text-neo-cream/80 shadow-none hover:translate-y-0 hover:shadow-none'
+              : waitingOnClass
+                ? 'border-[3px] border-neo-cream/50 bg-neo-navy-elevated font-bold text-neo-cream shadow-hard'
+                : 'motion-safe:animate-[edu-live-unlock_300ms_cubic-bezier(0.23,1,0.32,1)]',
             (lobby.quizBlocked || (!canStart && altPrimary)) && 'hidden'
           )}
         >

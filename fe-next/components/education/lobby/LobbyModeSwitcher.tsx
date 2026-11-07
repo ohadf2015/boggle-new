@@ -35,6 +35,7 @@ import { catalogueEntry } from '../ClassroomModeCatalogueData';
 import { launchOf, type ClassroomCatalogueId } from '@/lib/education/classroomCatalogueId';
 import { configuredRoundMinutes, type ConfiguredRoundSettings } from '@/lib/education/gameModes';
 import { useClassroomModeSwitch } from './useClassroomModeSwitch';
+import { NB_DIALOG_BODY, NB_DIALOG_CLOSE, NB_DIALOG_DESCRIPTION, NB_DIALOG_TITLE, NB_OVERLAY_LAYER, NB_OVERLAY_PANEL, nbDialogHeaderClass } from '@/components/teacher/nb/nbDialogStyles';
 
 export interface LobbyModeSwitcherProps {
   gameCode: string;
@@ -128,39 +129,38 @@ export function LobbyModeSwitcher({
           role="dialog"
           aria-modal="true"
           aria-label={t('education.modePicker.sheetTitle')}
-          className="fixed inset-0 z-[80] flex items-center justify-center bg-neo-navy/90 p-4"
+          className={cn(NB_OVERLAY_LAYER, 'z-[80]')}
         >
-          <div className="w-full max-w-md rounded-neo border-[3px] border-neo-cream bg-neo-navy-light p-4 shadow-hard-lg md:max-w-4xl">
-            <div className="mb-1 flex items-start justify-between gap-3">
-              <h2 className="font-neo-display text-lg font-bold leading-tight text-neo-cream">
-                {t('education.modePicker.sheetTitle')}
-              </h2>
+          <div className={cn(NB_OVERLAY_PANEL, 'sm:max-w-md md:max-w-4xl')}>
+            <div className={nbDialogHeaderClass('navy')}>
+              <div className="min-w-0 flex-1">
+                <h2 className={NB_DIALOG_TITLE}>{t('education.modePicker.sheetTitle')}</h2>
+                {/* Said BEFORE the tap, because the teacher's real fear here is
+                    losing the students who have already typed the code. */}
+                <p className={NB_DIALOG_DESCRIPTION}>{t('education.modePicker.sameCode')}</p>
+              </div>
               <button
                 type="button"
                 data-testid="lobby-mode-sheet-close"
                 onClick={() => setOpen(false)}
                 aria-label={t('education.modePicker.close')}
-                className="shrink-0 rounded-neo border-[2px] border-neo-cream bg-neo-navy p-1.5 text-neo-cream transition-colors hover:bg-neo-navy-light focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+                className={NB_DIALOG_CLOSE}
               >
-                <X className="size-4" strokeWidth={3} aria-hidden="true" />
+                <X className="size-5" strokeWidth={3} aria-hidden="true" />
               </button>
             </div>
-            {/* Said BEFORE the tap, because the teacher's real fear here is
-                losing the students who have already typed the code. */}
-            <p className="mb-3 font-neo-body text-xs font-bold leading-snug text-neo-cream">
-              {t('education.modePicker.sameCode')}
-            </p>
-
-            <ClassroomModeCardRow
-              selected={liveMode}
-              minutesFor={roundSettings ? (id) => configuredRoundMinutes(launchOf(id).gameMode, roundSettings) : undefined}
-              busy={!!pendingMode}
-              onPick={(mode) => {
-                switchTo(mode);
-                setOpen(false);
-              }}
-              t={t}
-            />
+            <div className={cn(NB_DIALOG_BODY, 'pb-[max(1rem,env(safe-area-inset-bottom))]')}>
+              <ClassroomModeCardRow
+                selected={liveMode}
+                minutesFor={roundSettings ? (id) => configuredRoundMinutes(launchOf(id).gameMode, roundSettings) : undefined}
+                busy={!!pendingMode}
+                onPick={(mode) => {
+                  switchTo(mode);
+                  setOpen(false);
+                }}
+                t={t}
+              />
+            </div>
           </div>
         </div>
       )}

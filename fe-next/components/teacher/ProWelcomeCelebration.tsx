@@ -8,6 +8,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { fireConfetti } from '@/utils/confettiUtils';
 import type { TeacherProGrant } from '@/hooks/useTeacherPro';
 import { cn } from '@/lib/utils';
+import { NB_DIALOG_BODY, NB_DIALOG_CLOSE, NB_DIALOG_FOOTER, NB_DIALOG_TITLE, NB_OVERLAY_LAYER, NB_OVERLAY_PANEL, nbDialogHeaderClass } from '@/components/teacher/nb/nbDialogStyles';
+import { NB_BLOCK, NB_PRIMARY } from '@/components/teacher/nb/nbStyles';
 import { trackEduProCheckoutSuccessSeen } from '@/lib/education/proFunnelTelemetry';
 
 const DATE_LOCALE: Record<string, string> = {
@@ -99,67 +101,63 @@ export function ProWelcomeCelebration({ grant, paid = false, onReturnPage = fals
   ] as const;
 
   return (
-    <div className="fixed inset-0 z-[90] flex items-center justify-center bg-neo-navy/85 p-4" data-testid="pro-welcome-celebration">
+    <div className={NB_OVERLAY_LAYER} data-testid="pro-welcome-celebration">
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="pro-welcome-title"
         dir={isRTL ? 'rtl' : 'ltr'}
-        className={cn('relative w-full max-w-md rounded-neo border-3 border-black bg-neo-cream p-6 text-start shadow-hard-lg', isRTL && 'rtl')}
+        className={cn(NB_OVERLAY_PANEL, 'sm:max-w-md', isRTL && 'rtl')}
       >
-        <button
-          type="button"
-          onClick={close}
-          aria-label={t('common.close')}
-          className="absolute top-3 end-3 flex h-9 w-9 items-center justify-center rounded-full border-2 border-black bg-neo-white text-black shadow-hard-sm hover:-translate-y-0.5 transition-transform"
-        >
-          <X className="size-4" aria-hidden="true" />
-        </button>
-
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-neo border-3 border-black bg-neo-lime shadow-hard">
-          <Gift className="size-8 text-black" aria-hidden="true" />
+        <div className={nbDialogHeaderClass('lime')}>
+          <span className="mt-0.5 flex size-11 shrink-0 items-center justify-center rounded-neo border-[3px] border-neo-black bg-neo-cream shadow-hard">
+            <Gift className="size-6 text-neo-black" aria-hidden="true" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <h2 id="pro-welcome-title" className={NB_DIALOG_TITLE}>
+              {t('teacher.proWelcome.title')}
+            </h2>
+            <p className="mt-1 font-neo-body text-sm font-bold">
+              {paid ? t('teacher.proWelcome.paidBody') : t('teacher.proWelcome.until', { date: until })}
+            </p>
+          </div>
+          <button type="button" onClick={close} aria-label={t('common.close')} className={NB_DIALOG_CLOSE}>
+            <X className="size-5" strokeWidth={3} aria-hidden="true" />
+          </button>
         </div>
-        <h2 id="pro-welcome-title" className="text-center font-neo-display text-2xl font-black text-black">
-          {t('teacher.proWelcome.title')}
-        </h2>
-        <p className="mt-2 text-center text-sm font-bold text-black/70">
-          {paid ? t('teacher.proWelcome.paidBody') : t('teacher.proWelcome.until', { date: until })}
-        </p>
 
-        {!paid && grant?.note && (
-          <blockquote className="mt-4 rounded-neo border-2 border-black bg-neo-white p-3 text-sm italic text-black/80 border-s-4 border-s-neo-cyan">
-            {grant.note}
-          </blockquote>
-        )}
+        <div className={NB_DIALOG_BODY}>
+          {!paid && grant?.note && (
+            <blockquote className="mb-4 rounded-neo border-[3px] border-s-[6px] border-neo-cream/50 border-s-neo-cyan bg-neo-navy-light p-3 font-neo-body text-sm italic text-neo-cream/90">
+              {grant.note}
+            </blockquote>
+          )}
+          <ul className="space-y-2.5">
+            {perks.map(({ icon: Icon, key }) => (
+              <li key={key} className={cn('flex items-center gap-3 rounded-neo-lg border-[3px] px-3 py-2.5 shadow-hard', NB_BLOCK.navy)}>
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-cyan">
+                  <Icon className="size-4 text-neo-black" aria-hidden="true" />
+                </span>
+                <span className="font-neo-body text-sm font-bold">{t(`teacher.proWelcome.perk.${key}`)}</span>
+              </li>
+            ))}
+          </ul>
+          {paid ? (
+            <p className="mt-4 text-center font-neo-body text-xs font-bold text-neo-cream/75">
+              <Link href={`/${language}/teacher/profile`} className="underline decoration-2 underline-offset-4 hover:text-neo-cream">
+                {t('teacher.proWelcome.manage')}
+              </Link>
+            </p>
+          ) : (
+            <p className="mt-4 text-center font-neo-body text-xs font-bold text-neo-cream/75">{t('teacher.proWelcome.noCard')}</p>
+          )}
+        </div>
 
-        <ul className="mt-5 space-y-2">
-          {perks.map(({ icon: Icon, key }) => (
-            <li key={key} className="flex items-center gap-3 rounded-neo border-2 border-black bg-neo-white px-3 py-2">
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-neo border-2 border-black bg-neo-cyan">
-                <Icon className="size-4 text-black" aria-hidden="true" />
-              </span>
-              <span className="text-sm font-bold text-black">{t(`teacher.proWelcome.perk.${key}`)}</span>
-            </li>
-          ))}
-        </ul>
-
-        {paid ? (
-          <p className="mt-4 text-center text-xs font-bold text-black/60">
-            <Link href={`/${language}/teacher/profile`} className="underline underline-offset-2 hover:text-black">
-              {t('teacher.proWelcome.manage')}
-            </Link>
-          </p>
-        ) : (
-          <p className="mt-4 text-center text-xs font-bold text-black/60">{t('teacher.proWelcome.noCard')}</p>
-        )}
-
-        <button
-          type="button"
-          onClick={close}
-          className="mt-5 w-full rounded-neo border-3 border-black bg-black py-3 font-neo-display text-base font-black text-neo-lime shadow-hard hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 transition focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan"
-        >
-          {t('teacher.proWelcome.cta')}
-        </button>
+        <div className={NB_DIALOG_FOOTER}>
+          <button type="button" onClick={close} className={cn(NB_PRIMARY, 'w-full')}>
+            {t('teacher.proWelcome.cta')}
+          </button>
+        </div>
       </div>
     </div>
   );

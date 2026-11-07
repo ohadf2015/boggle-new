@@ -32,10 +32,10 @@ describe('UpgradePricingPageClient scroll fix', () => {
     expect(pageSource).toContain('data-testid="upgrade-footer"');
   });
 
-  it('lays the plans out side by side from md up', () => {
+  it('lays the plans out side by side from lg up, stacked on a tablet', () => {
     const cards = readFileSync(join(process.cwd(), 'components/teacher/pro/UpgradePlanCards.tsx'), 'utf8');
     expect(cards).toContain('grid-cols-1');
-    expect(cards).toContain('md:grid-cols-3');
+    expect(cards).toContain('lg:grid-cols-3');
     expect(pageSource).toContain('data-testid="upgrade-hero-section"');
   });
 

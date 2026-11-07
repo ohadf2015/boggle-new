@@ -797,6 +797,7 @@ const ja = {
       "editTitle": "単語リストを編集",
       "description": "単語を貼り付けて、意味を足して、保存。",
       "newList": "新しいリスト",
+      "moreOptions": "言語・学年・テーマ・共有",
       "titleLabel": "リスト名",
       "titlePlaceholder": "リストに名前をつけよう…",
       "pasteLabel": "単語を貼り付け・入力",
@@ -15104,6 +15105,7 @@ const ja = {
       "galleryTitle": "テンプレートから始める",
       "galleryHint": "学年と教科を選び、単語リストを確認してワンタップで出題。Word Craft、提出は明日。",
       "galleryBrowse": "課題テンプレートを見る",
+      "moreOptions": "ほかの遊び方・重点・メモ",
       "galleryPreview": "単語を見る",
       "galleryAssign": "クラスに出す",
       "galleryHidePreview": "単語を隠す",
@@ -21226,6 +21228,7 @@ const ja = {
       "teacher": "先生向け",
       "school": "学校向け"
     },
+    "compareAll": "無料プランと有料プランを並べて比べる",
     "strip": {
       "title": "1回のゲームのあとにProで見えること",
       "lead": "サンプルのクラスデータです。実際のクラスのデータがここに入ります。"
@@ -21601,6 +21604,7 @@ const ja = {
       "missedTitle": "クラスが見逃した単語",
       "practiceWords": "この単語を練習する（{count}）",
       "shareParents": "保護者に共有",
+      "moreTools": "共有と書き出し",
       "proPill": "Pro",
       "invitePrompt": "気に入りそうな先生はいますか？",
       "inviteCta": "同僚を招待",

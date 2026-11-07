@@ -247,7 +247,7 @@ export function ClassroomResultsCard({
       {isTeacher && summary.participationBonus ? (
         <p
           data-testid="participation-bonus-note"
-          className="mb-4 p-3 rounded-neo border border-neo-lime/40 bg-neo-lime/10 text-neo-white font-neo-body text-sm"
+          className="mb-4 p-3 rounded-neo-lg border-[3px] border-neo-cream/50 bg-neo-navy-light text-neo-white shadow-hard font-neo-body text-sm"
         >
           {t('education.results.participationBonus', { points: summary.participationBonus })}
         </p>

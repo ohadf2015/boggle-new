@@ -77,6 +77,7 @@ describe('EduHostResults practice rounds, rematch and lesson honesty', () => {
 
   it('given a free teacher after a real class round, when results show, then the labelled Pro preview still shows', () => {
     render(<EduHostResults summary={summary()} players={students} t={t} onRematch={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('edu-results-more-toggle'));
     expect(screen.getByTestId('class-report-teaser')).toBeInTheDocument();
   });
 

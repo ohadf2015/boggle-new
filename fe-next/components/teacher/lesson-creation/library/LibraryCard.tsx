@@ -103,7 +103,7 @@ export default function LibraryCard({ item, index, onOpen }: LibraryCardProps) {
       onClick={onOpen}
       style={{ animationDelay: `${Math.min(index, 11) * 35}ms` }}
       className={cn(
-        'group relative grid h-[78px] min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] content-center items-start gap-x-2 gap-y-1 overflow-hidden ps-4 pe-2.5 py-2 text-start',
+        'group relative grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] content-center items-center gap-x-2 gap-y-1.5 overflow-hidden ps-4 pe-2.5 py-2.5 text-start',
         GAME_CARD,
         'sm:flex sm:h-[144px] sm:flex-col sm:items-stretch sm:gap-0 sm:p-0',
         'transition-[translate,rotate,box-shadow] duration-200 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:-translate-y-1 active:translate-y-0.5',
@@ -146,7 +146,7 @@ export default function LibraryCard({ item, index, onOpen }: LibraryCardProps) {
             dir="auto"
             className={cn(
               TILE,
-              'relative max-w-[7rem] px-1.5 py-px text-xs shadow-hard-sm [overflow-wrap:anywhere] sm:max-w-full sm:-rotate-3 sm:px-2 sm:py-0.5 sm:leading-tight',
+              'relative max-w-[12rem] px-1.5 py-px text-xs shadow-hard-sm [overflow-wrap:anywhere] sm:max-w-full sm:-rotate-3 sm:px-2 sm:py-0.5 sm:leading-tight',
               sample.length > 8 ? 'sm:text-sm' : 'sm:text-lg',
               'transition-[rotate] duration-200 group-hover:sm:rotate-0 motion-reduce:transition-none',
             )}
@@ -159,11 +159,11 @@ export default function LibraryCard({ item, index, onOpen }: LibraryCardProps) {
         </span>
       </span>
       <span className="contents sm:flex sm:min-h-0 sm:flex-1 sm:flex-col sm:gap-0.5 sm:px-3 sm:pb-1.5 sm:pt-1.5">
-        <span dir="auto" title={item.name} className="col-start-2 row-start-1 line-clamp-2 shrink-0 font-neo-display text-sm font-bold leading-tight text-neo-white">
+        <span dir="auto" title={item.name} className="col-span-3 row-start-2 line-clamp-2 shrink-0 font-neo-display text-base font-bold leading-tight text-neo-white sm:text-sm">
           {item.name}
         </span>
-        <span className="col-span-3 row-start-2 flex min-w-0 items-center gap-2 sm:contents">
-          <span className="min-w-0 flex-1 shrink-0 text-[11px] text-neo-cream/75 sm:flex-none" dir="auto">
+        <span className="col-span-3 row-start-3 flex min-w-0 items-center gap-2 sm:contents">
+          <span className="min-w-0 flex-1 shrink-0 truncate text-[11px] text-neo-cream/75 sm:flex-none sm:whitespace-normal" dir="auto">
             <span lang={item.language}>{nativeLanguageName(item.language)}</span>
             {' · '}
             {author}

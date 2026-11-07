@@ -147,8 +147,8 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
               <bdi>{classroomName || t('education.analytics.title')}</bdi>
             </h1>
           </div>
-          {connectionStatus === 'connected' && activeStudentsCount === 0 ? null : (
-            <div data-testid="analytics-live" className="rounded-neo border-2 border-neo-cream/35 px-3 py-2">
+          {(connectionStatus === 'connected' || connectionStatus === 'connecting') && activeStudentsCount === 0 ? null : (
+            <div data-testid="analytics-live" className="rounded-neo border-[3px] border-neo-cream/50 bg-neo-navy-light px-3 py-2 shadow-hard">
               <LiveActivityIndicator
                 isConnected={isConnected}
                 activeStudentsCount={activeStudentsCount}
@@ -167,7 +167,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
           feature="analytics"
           tone="calm"
           whileChecking={
-            <div data-testid="analytics-pro-pending" aria-busy="true" className="flex min-h-60 items-center justify-center rounded-neo border-[2px] border-neo-cream/40 bg-neo-navy/30 shadow-hard">
+            <div data-testid="analytics-pro-pending" aria-busy="true" className="flex min-h-60 items-center justify-center rounded-neo-xl border-[3px] border-neo-cream/50 bg-neo-navy-light shadow-hard-lg">
               <PageLoader size="md" text={t('common.loading')} />
             </div>
           }
@@ -176,7 +176,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
             <ClassOverview classroomId={classroomId} openStudentId={openStudentId} onOpenChange={setOpenStudentId} />
 
             <Tabs value={tab} onValueChange={setTab} className="space-y-3">
-              <TabsList aria-label={t('education.analytics.tabs.label')} className="grid h-auto w-full grid-cols-5 gap-1.5 rounded-neo border-2 border-neo-cream/40 bg-neo-navy p-1.5">
+              <TabsList aria-label={t('education.analytics.tabs.label')} className="grid h-auto w-full grid-cols-5 gap-1.5 rounded-neo-lg border-[3px] border-neo-cream/50 bg-neo-navy p-1.5 shadow-hard">
                 {ANALYTICS_TABS.map((id) => (
                   <TabsTrigger key={id} value={id} className={cn(TAB_BASE, TAB_ACTIVE)}>
                     {t(`education.analytics.tabs.${id}`)}
@@ -224,7 +224,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
         {recentActivity.length > 0 && (
           <div
             className={cn(
-              'bg-neo-navy/30 border-[2px] border-neo-cream/40 shadow-hard rounded-neo p-4',
+              'rounded-neo-xl border-[3px] border-neo-cream/50 bg-neo-navy-light p-4 shadow-hard-lg',
               'hidden lg:block'
             )}
           >
@@ -266,7 +266,7 @@ import { TeacherGate } from '@/components/education/TeacherGate';
 
 const ANALYTICS_TABS = ['pulse', 'students', 'lessons', 'words', 'homework'] as const;
 
-const PANEL = 'rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light p-3 sm:p-4';
+const PANEL = 'rounded-neo-xl border-[3px] border-neo-cream/50 bg-neo-navy-light p-3 shadow-hard-lg sm:p-4';
 
 // Selected = lime ring on navy; unselected keeps a cream edge so it reads as tappable.
 const TAB_ACTIVE =

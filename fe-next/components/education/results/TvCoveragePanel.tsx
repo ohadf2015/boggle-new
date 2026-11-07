@@ -37,7 +37,7 @@ export function TvCoveragePanel({ summary, players, neverPlaced, stage, pointsWi
   return (
     <section
       data-testid="tv-coverage-panel"
-      className="flex flex-col @5xl/results:min-h-0 @5xl/results:flex-initial @5xl/results:overflow-hidden rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-3 pt-3 pb-0 @5xl/results:p-3 @[96rem]/results:p-4"
+      className="flex flex-col @5xl/results:min-h-0 @5xl/results:flex-initial @5xl/results:overflow-hidden rounded-neo-xl border-[3px] border-neo-cream/50 bg-neo-navy-light shadow-hard-xl px-3 pt-3 pb-0 @5xl/results:p-3 @[96rem]/results:p-4"
     >
       {verdict === 'wholeLesson' && !(compact && phone) && (
         <p

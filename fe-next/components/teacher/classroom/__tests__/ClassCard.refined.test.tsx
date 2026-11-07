@@ -238,4 +238,16 @@ describe('ClassCard — refined surfaces', () => {
     expect(menu).toHaveAttribute('aria-label', 'academy.teacher.classActions');
     expect(menu).toHaveAttribute('title', 'academy.teacher.classActions');
   });
+
+  it('Given a phone-width card, Then the code plate takes its own row and the three buttons share the row under it', () => {
+    render(<ClassCard {...baseProps} onOpenProjector={vi.fn()} />);
+    const plate = screen.getByTestId('join-code-plate');
+    expect(plate.className).toMatch(/(^|\s)basis-full(\s|$)/);
+    expect(plate.parentElement!.className).toMatch(/(^|\s)flex-wrap(\s|$)/);
+    for (const id of ['copy-join-code', 'share-join-code', 'classroom-card-projector']) {
+      expect(screen.getByTestId(id).className).toMatch(/(^|\s)flex-1(\s|$)/);
+      expect(screen.getByTestId(id).className).toMatch(/(^|\s)min-h-12(\s|$)/);
+    }
+  });
 });
+

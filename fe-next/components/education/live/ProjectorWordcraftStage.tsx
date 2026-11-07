@@ -101,7 +101,7 @@ export function ProjectorWordcraftStage({ socket, players, teams, hostUsername, 
           {older.length > 0 && (
             <ol data-testid="wordcraft-ticker" className="flex shrink-0 flex-col gap-2">
               {older.slice(0, 3).map((a) => (
-                <li key={a.key} className="flex items-center gap-2 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-3 py-1.5 text-base font-bold md:text-xl">
+                <li key={a.key} className="flex items-center gap-2 rounded-neo border-[3px] border-neo-cream/50 bg-neo-navy-light px-3 py-1.5 shadow-hard-sm text-base font-bold md:text-xl">
                   <span className="min-w-0 flex-1 truncate">
                     {t('education.wordcraftLive.builtBy', { name: a.username, word: a.words[0]?.word ?? '' })}
                   </span>

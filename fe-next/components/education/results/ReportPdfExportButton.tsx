@@ -51,7 +51,7 @@ export interface ReportPdfExportButtonProps {
 }
 
 const BUTTON =
-  'inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-neo border-[2px] px-3 text-center font-neo-body text-sm font-bold normal-case focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan active:brightness-90 disabled:opacity-60 @5xl/results:text-base @[96rem]/results:min-h-14 @[96rem]/results:text-xl';
+  'inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-neo-lg border-[3px] px-3 text-center font-neo-display text-sm font-black normal-case shadow-hard-lg transition-[transform,box-shadow] duration-150 hover:-translate-y-px active:translate-x-[3px] active:translate-y-[3px] active:shadow-none motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan disabled:opacity-60 @5xl/results:text-base @[96rem]/results:min-h-14 @[96rem]/results:text-xl';
 
 /** A blank tab opened inside the tap (so no popup blocker), pointed at checkout once the URL is back. */
 function openBlankTab(): Window | null {
@@ -148,7 +148,7 @@ export function ReportPdfExportButton({ language, summary, players, proLabel = '
           disabled={busy}
           aria-busy={busy}
           onClick={() => void exportPdf()}
-          className={cn(BUTTON, 'border-neo-cream/60 bg-transparent text-neo-cream hover:bg-neo-navy-light')}
+          className={cn(BUTTON, 'border-neo-cream/50 bg-neo-navy-light text-neo-cream')}
         >
           {busy ? <Loader2 className="size-4 shrink-0 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : <Download className="size-4 shrink-0" aria-hidden="true" />}
           {busy ? copy.preparing : copy.button}
@@ -172,7 +172,7 @@ export function ReportPdfExportButton({ language, summary, players, proLabel = '
         aria-busy={busy}
         aria-label={copy.lockedLabel}
         onClick={() => void startCheckout()}
-        className={cn(BUTTON, 'border-dashed border-neo-cream/50 bg-transparent text-neo-cream hover:bg-neo-navy-light')}
+        className={cn(BUTTON, 'border-dashed border-neo-cream/50 bg-neo-navy-light text-neo-cream')}
       >
         {busy ? <Loader2 className="size-4 shrink-0 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : <Lock className="size-4 shrink-0" aria-hidden="true" />}
         <span className="min-w-0">{copy.button}</span>

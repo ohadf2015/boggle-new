@@ -5,8 +5,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import type { DailyActive, StudentPulse, StudentStatus } from '@/lib/education/pro/classInsights';
 import { STATUSES, STATUS_VIEW, daysSince, pct } from './overviewModel';
 
-export const PANEL = 'rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light/95 p-3 sm:p-4';
-export const PANEL_TITLE = 'font-neo-display text-lg font-bold text-neo-cream';
+export const PANEL = 'rounded-neo-xl border-[3px] border-neo-cream/50 bg-neo-navy-light p-3 shadow-hard-lg sm:p-4';
+export const PANEL_TITLE = 'font-neo-display text-lg font-black text-neo-cream';
 
 export function StatusStrip({
   counts, active, onToggle,
@@ -26,8 +26,8 @@ export function StatusStrip({
             title={label}
             onClick={() => onToggle(s)}
             className={cn(
-              'flex min-h-14 items-center gap-2 rounded-neo border-2 px-3 py-2 text-start transition-transform active:translate-y-px motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
-              chip, active === s && 'ring-2 ring-neo-cream',
+              'flex min-h-14 items-center gap-2 rounded-neo-lg border-[3px] px-3 py-2 text-start shadow-hard transition-transform active:translate-y-px motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
+              chip, active === s && 'ring-4 ring-neo-cream',
             )}
           >
             <Icon aria-hidden className={cn('size-5 shrink-0', text)} />

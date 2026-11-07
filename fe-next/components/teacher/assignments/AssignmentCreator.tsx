@@ -13,11 +13,10 @@ import { AssignmentTemplateGallery } from './AssignmentTemplateGallery';
 import { useLessons } from '@/hooks/useVocabularyLesson';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { cn } from '@/lib/utils';
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog } from '@/components/ui/dialog';
+import { NbDialogBody, NbDialogContent, NbDialogFooter, NbDialogHeader } from '@/components/teacher/nb/NbDialog';
+import { NbAdvanced } from '@/components/teacher/nb/NbAdvanced';
+import { NB_BLOCK, NB_INPUT, NB_PRIMARY, NB_SECONDARY, NB_SMALL } from '@/components/teacher/nb/nbStyles';
 import { Swords, BookOpen } from 'lucide-react';
 import { AssignmentWordcraftOption } from './AssignmentWordcraftOption';
 import { contentLanguagesFor } from '@/components/education/pickers/ContentLanguageChips';
@@ -25,7 +24,6 @@ import { wordCraftHomeworkSupports } from '@/lib/word-craft/lessonBag';
 import { AssignmentCreatorDueDate, assignmentSubmitHintKey } from './AssignmentCreatorDueDate';
 import { AssignmentStep } from './AssignmentStep';
 import { AssignmentLessonStep } from './AssignmentLessonStep';
-import { Button } from '@/components/ui/button';
 import toast from 'react-hot-toast';
 import {
   VOCAB_FOCUSES,
@@ -310,168 +308,147 @@ export default function AssignmentCreator({
     showFailure(result.assignmentError || result.error);
   };
 
+  const modeButton = (on: boolean, color: 'cyan' | 'pink') =>
+    cn(NB_SMALL, 'min-h-12 w-full gap-2 whitespace-normal px-3 text-start', on ? NB_BLOCK[color] : NB_BLOCK.navy);
+  const advancedInUse = selectedType !== 'wordcraft' || instructions.trim() !== '';
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
-      <DialogContent
-        noDescription
-        closeButtonLabel={t('common.close')}
-        className={cn(
-          'w-full max-w-xl sm:max-w-xl lg:max-w-xl xl:max-w-xl p-6 sm:max-h-[94vh]',
-          'bg-neo-navy border-neo-cream text-neo-white'
-        )}
-      >
-        <DialogTitle className="text-2xl font-neo-display text-neo-white mb-3 normal-case tracking-normal">
-          {atAssignmentCap
-            ? t('teacher.subscription.assignmentLimitTitle')
-            : t('teacher.assignment.createTitle')}
-        </DialogTitle>
+      <NbDialogContent noDescription size="lg" phone="full">
+        <NbDialogHeader
+          color="yellow"
+          title={atAssignmentCap ? t('teacher.subscription.assignmentLimitTitle') : t('teacher.assignment.createTitle')}
+          closeLabel={t('common.close')}
+        >
+          {!atAssignmentCap && !galleryOpen && classroom ? (
+            <p data-testid="assignment-who" className="mt-1 flex flex-wrap items-center gap-x-2 font-neo-body text-sm font-bold">
+              <span dir="auto">{classroom.name}</span>
+              <span aria-hidden="true">·</span>
+              <span>{t('eg2Rep.assign.students', { count: classroom.member_count ?? 0 })}</span>
+            </p>
+          ) : null}
+        </NbDialogHeader>
 
         {atAssignmentCap ? (
-          <AssignmentLimitUpsell currentCount={assignmentCount} onClose={onClose} />
+          <NbDialogBody>
+            <AssignmentLimitUpsell currentCount={assignmentCount} onClose={onClose} />
+          </NbDialogBody>
         ) : galleryOpen ? (
-          <AssignmentTemplateGallery
-            templates={galleryTemplates}
-            language={contentLanguage}
-            languages={contentLanguages}
-            onLanguageChange={setGalleryLanguage}
-            isSubmitting={isSubmitting}
-            onAssign={(pack) => void handleAssignTemplate(pack)}
-            onClose={onClose}
-            onCreateOwn={() => setGalleryOpen(false)}
-          />
-        ) : (
-        <div className="space-y-4">
-            <Button
-              type="button"
-              variant="outline"
-              data-testid="assignment-browse-templates"
-              onClick={() => setGalleryOpen(true)}
-              className="w-full border-neo-cyan text-neo-cyan hover:bg-neo-cyan/20"
-            >
-              {t('teacher.assignment.galleryBrowse')}
-            </Button>
-            {!isWordGoal && (
-            <AssignmentLessonStep
-              lessons={lessons}
-              classrooms={classrooms}
-              classroomId={classroomId}
-              classroomLanguage={classroomLanguage}
-              selectedLessonId={selectedLessonId}
-              isLoading={isLoadingLessons}
-              onSelect={setSelectedLessonId}
+          <NbDialogBody>
+            <AssignmentTemplateGallery
+              templates={galleryTemplates}
+              language={contentLanguage}
+              languages={contentLanguages}
+              onLanguageChange={setGalleryLanguage}
+              isSubmitting={isSubmitting}
+              onAssign={(pack) => void handleAssignTemplate(pack)}
+              onClose={onClose}
+              onCreateOwn={() => setGalleryOpen(false)}
             />
-            )}
-
-            <AssignmentStep step="who" n={2} label={t('eg2Rep.assign.who')}>
-              <p
-                data-testid="assignment-who"
-                className="flex flex-wrap items-center gap-2 rounded-neo border-2 border-neo-cream/50 bg-neo-navy-light px-3 py-2 font-neo-body text-sm text-neo-white"
+          </NbDialogBody>
+        ) : (
+          <>
+            <NbDialogBody className="space-y-5">
+              {!isWordGoal && (
+                <AssignmentLessonStep
+                  lessons={lessons}
+                  classrooms={classrooms}
+                  classroomId={classroomId}
+                  classroomLanguage={classroomLanguage}
+                  selectedLessonId={selectedLessonId}
+                  isLoading={isLoadingLessons}
+                  onSelect={setSelectedLessonId}
+                />
+              )}
+              <button
+                type="button"
+                data-testid="assignment-browse-templates"
+                onClick={() => setGalleryOpen(true)}
+                className={cn(NB_SECONDARY, 'w-full text-sm')}
               >
-                <span dir="auto" className="font-bold">{classroom?.name}</span>
-                <span className="text-neo-cream/70">·</span>
-                <span className="text-neo-cream/80">{t('eg2Rep.assign.students', { count: classroom?.member_count ?? 0 })}</span>
-              </p>
-            </AssignmentStep>
+                {t('teacher.assignment.galleryBrowse')}
+              </button>
 
-            <AssignmentStep step="mode" n={3} label={t('teacher.assignment.typeLabel')}>
-              <AssignmentWordcraftOption selected={selectedType === 'wordcraft'} disabled={!wordcraftOk} onSelect={() => setSelectedType('wordcraft')} t={t} />
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setSelectedType('practice')}
-                  className={cn(
-                    'px-4 py-3 rounded-neo border-neo transition',
-                    'flex items-center justify-center gap-2',
-                    selectedType === 'practice'
-                      ? 'bg-neo-cyan border-neo-cyan text-neo-black shadow-hard-sm'
-                      : 'bg-neo-navy/50 border-neo-black text-neo-white hover:bg-neo-navy/80'
-                  )}
-                >
-                  <BookOpen className="w-6 h-6 shrink-0" aria-hidden="true" />
-                  <span className="font-bold">{t('teacher.assignment.practiceMode')}</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSelectedType('duel')}
-                  className={cn(
-                    'px-4 py-3 rounded-neo border-neo transition',
-                    'flex items-center justify-center gap-2',
-                    selectedType === 'duel'
-                      ? 'bg-neo-pink border-neo-pink text-neo-black shadow-hard-sm'
-                      : 'bg-neo-navy/50 border-neo-black text-neo-white hover:bg-neo-navy/80'
-                  )}
-                >
-                  <Swords className="w-6 h-6 shrink-0" aria-hidden="true" />
-                  <span className="font-bold">{t('teacher.assignment.duelChallenge')}</span>
-                </button>
-              </div>
-              <AssignmentGoalModes
-                selectedType={selectedType}
-                onSelect={(kind) => setSelectedType(kind)}
-                wordCount={wordCount}
-                onWordCount={setWordCount}
-                wordListRaw={wordListRaw}
-                onWordListRaw={setWordListRaw}
-                t={t}
-              />
-            </AssignmentStep>
+              <AssignmentStep step="mode" n={2} label={t('teacher.assignment.typeLabel')}>
+                <AssignmentWordcraftOption selected={selectedType === 'wordcraft'} disabled={!wordcraftOk} onSelect={() => setSelectedType('wordcraft')} t={t} />
+              </AssignmentStep>
 
-            {/* Vocabulary focus (practice only, once a lesson is chosen) */}
-            {selectedType === 'practice' && selectedLesson && (
-              <AssignmentFocusPicker focus={focus} onFocus={setFocus} supportedFocuses={supportedFocuses} focusCounts={focusCounts} t={t} />
-            )}
+              <AssignmentStep step="due" n={3} label={t('teacher.assignment.dueDate')}>
+                <AssignmentCreatorDueDate value={dueDate} onChange={setDueDate} />
+              </AssignmentStep>
 
-            <AssignmentStep step="due" n={4} label={t('teacher.assignment.dueDate')}>
-              <AssignmentCreatorDueDate value={dueDate} onChange={setDueDate} />
-            </AssignmentStep>
-
-            {/* Optional Instructions */}
-            <div>
-              <label className="block text-sm font-neo-body text-neo-white mb-2">
-                {t('teacher.assignment.instructionsLabel')} {t('common.optional')}
-              </label>
-              <textarea
-                value={instructions}
-                onChange={(e) => setInstructions(e.target.value)}
-                rows={2}
-                aria-label={t('teacher.assignment.instructionsLabel')}
-                className="w-full p-3 rounded-neo border-neo border-neo-cream/40 bg-neo-navy text-neo-white font-neo-body resize-none"
-                placeholder={t('teacher.assignment.instructionsPlaceholder')}
-              />
-            </div>
-
-            {/* Actions */}
-            {submitHint && (
-              <p
-                id="assignment-submit-hint"
-                data-testid="assignment-submit-hint"
-                role="status"
-                className="-mb-2 text-sm font-bold text-neo-cream/80"
+              <NbAdvanced
+                testId="assignment-advanced-toggle"
+                forceOpen={advancedInUse}
+                label={t('teacher.assignment.moreOptions')}
+                closeLabel={t('eduShell.setup.advancedClose')}
               >
-                {t(submitHint)}
-              </p>
-            )}
-            <div data-testid="assignment-actions" className="sticky -bottom-6 z-10 -mx-6 -mb-6 flex gap-3 border-t-2 border-neo-cream/60 bg-neo-navy px-6 pb-6 pt-4">
-              <Button
+                <div className="grid grid-cols-2 gap-3">
+                  <button type="button" aria-pressed={selectedType === 'practice'} onClick={() => setSelectedType('practice')} className={modeButton(selectedType === 'practice', 'cyan')}>
+                    <BookOpen className="size-5 shrink-0" aria-hidden="true" />
+                    <span>{t('teacher.assignment.practiceMode')}</span>
+                  </button>
+                  <button type="button" aria-pressed={selectedType === 'duel'} onClick={() => setSelectedType('duel')} className={modeButton(selectedType === 'duel', 'pink')}>
+                    <Swords className="size-5 shrink-0" aria-hidden="true" />
+                    <span>{t('teacher.assignment.duelChallenge')}</span>
+                  </button>
+                </div>
+                <AssignmentGoalModes
+                  selectedType={selectedType}
+                  onSelect={(kind) => setSelectedType(kind)}
+                  wordCount={wordCount}
+                  onWordCount={setWordCount}
+                  wordListRaw={wordListRaw}
+                  onWordListRaw={setWordListRaw}
+                  t={t}
+                />
+                {selectedType === 'practice' && selectedLesson && (
+                  <AssignmentFocusPicker focus={focus} onFocus={setFocus} supportedFocuses={supportedFocuses} focusCounts={focusCounts} t={t} />
+                )}
+                <div>
+                  <label htmlFor="assignment-instructions" className="mb-2 block font-neo-body text-sm font-bold text-neo-cream">
+                    {t('teacher.assignment.instructionsLabel')} {t('common.optional')}
+                  </label>
+                  <textarea
+                    id="assignment-instructions"
+                    value={instructions}
+                    onChange={(e) => setInstructions(e.target.value)}
+                    rows={2}
+                    aria-label={t('teacher.assignment.instructionsLabel')}
+                    className={cn(NB_INPUT, 'resize-none py-2.5')}
+                    placeholder={t('teacher.assignment.instructionsPlaceholder')}
+                  />
+                </div>
+              </NbAdvanced>
+            </NbDialogBody>
+
+            <NbDialogFooter data-testid="assignment-actions" className="sm:justify-between">
+              {submitHint ? (
+                <p
+                  id="assignment-submit-hint"
+                  data-testid="assignment-submit-hint"
+                  role="status"
+                  className="font-neo-body text-sm font-bold text-neo-cream/85 max-sm:order-last sm:me-auto"
+                >
+                  {t(submitHint)}
+                </p>
+              ) : null}
+              <button type="button" onClick={onClose} disabled={isSubmitting} className={NB_SECONDARY}>
+                {t('common.cancel')}
+              </button>
+              <button
+                type="button"
                 onClick={handleSubmit}
                 aria-describedby={submitHint ? 'assignment-submit-hint' : undefined}
                 disabled={isSubmitting || (!isWordGoal && !selectedLessonId) || !dueDate}
-                className="flex-1 bg-neo-cyan text-neo-black font-bold shadow-hard hover:shadow-hard-pressed disabled:opacity-50"
+                className={cn(NB_PRIMARY, 'sm:min-w-44')}
               >
                 {isSubmitting ? t('teacher.assignment.creating') : t('teacher.assignment.create')}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={onClose}
-                disabled={isSubmitting}
-                className="border-neo-pink text-neo-pink hover:bg-neo-pink/20"
-              >
-                {t('common.cancel')}
-              </Button>
-            </div>
-        </div>
+              </button>
+            </NbDialogFooter>
+          </>
         )}
-      </DialogContent>
+      </NbDialogContent>
     </Dialog>
   );
 }

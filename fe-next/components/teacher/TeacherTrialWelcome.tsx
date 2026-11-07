@@ -6,6 +6,11 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { polarTrialDaysLeft } from '@/lib/education/polarTrial';
 import { TeacherProCheckoutButton } from '@/components/teacher/TeacherProCheckoutButton';
 import { cn } from '@/lib/utils';
+import { NB_DIALOG_BODY, NB_DIALOG_FOOTER, NB_DIALOG_TITLE, NB_OVERLAY_LAYER, NB_OVERLAY_PANEL, nbDialogHeaderClass } from '@/components/teacher/nb/nbDialogStyles';
+import { NB_BLOCK, NB_SECONDARY, NB_STICKER } from '@/components/teacher/nb/nbStyles';
+
+/** The checkout button takes no className; restyle it from here as this sheet's one lime action. */
+const LIME_CTA = '[&>button]:min-h-14 [&>button]:w-full [&>button]:rounded-neo-lg [&>button]:border-[3px] [&>button]:border-neo-black [&>button]:bg-neo-lime [&>button]:text-lg [&>button]:text-neo-black [&>button]:shadow-hard-xl';
 
 /**
  * HQ welcome after Polar opens the 14-day Teacher Pro trial.
@@ -45,7 +50,7 @@ export function TeacherTrialWelcome({ trialExpires, onReturnPage = false }: { tr
 
   return (
     <div
-      className="fixed inset-0 z-[90] flex items-center justify-center bg-neo-navy/85 p-4"
+      className={NB_OVERLAY_LAYER}
       data-testid="teacher-trial-welcome"
       data-days={days === null ? '' : String(days)}
     >
@@ -54,41 +59,32 @@ export function TeacherTrialWelcome({ trialExpires, onReturnPage = false }: { tr
         aria-modal="true"
         aria-labelledby="teacher-trial-welcome-title"
         dir={isRTL ? 'rtl' : 'ltr'}
-        className={cn(
-          'relative w-full max-w-md rounded-neo border-3 border-black bg-neo-cream p-6 text-start shadow-hard-lg',
-          isRTL && 'rtl',
-        )}
+        className={cn(NB_OVERLAY_PANEL, 'sm:max-w-md', isRTL && 'rtl')}
       >
-        <h2
-          id="teacher-trial-welcome-title"
-          className="text-center font-neo-display text-2xl font-black text-black"
-        >
-          {t('teacher.proWelcome.title')}
-        </h2>
-        <p
-          data-testid="teacher-trial-welcome-days"
-          className="mt-2 text-center font-neo-display text-lg font-black text-black"
-        >
-          {daysLabel}
-        </p>
-        <p className="mt-2 text-center text-sm font-bold text-black/70">
-          {t('teacher.subscription.trialLifecycleBody')}
-        </p>
-        <div className="mt-5 flex flex-col gap-2">
-          <TeacherProCheckoutButton
-            source="dashboard_trial_lifecycle"
-            testId="teacher-trial-welcome-upgrade"
-          >
-            {t('teacher.subscription.trialLifecycleCta')}
-          </TeacherProCheckoutButton>
-          <button
-            type="button"
-            data-testid="teacher-trial-welcome-dismiss"
-            onClick={close}
-            className="w-full rounded-neo border-3 border-black bg-neo-white py-3 font-neo-display text-base font-black text-black shadow-hard hover:-translate-y-0.5"
-          >
+        <div className={nbDialogHeaderClass('lime')}>
+          <div className="min-w-0 flex-1">
+            <h2 id="teacher-trial-welcome-title" className={NB_DIALOG_TITLE}>
+              {t('teacher.proWelcome.title')}
+            </h2>
+            <p data-testid="teacher-trial-welcome-days" className={cn(NB_STICKER, NB_BLOCK.cream, 'mt-2 text-sm')}>
+              {daysLabel}
+            </p>
+          </div>
+        </div>
+        <div className={NB_DIALOG_BODY}>
+          <p className="font-neo-body text-base font-semibold leading-relaxed text-neo-cream/90">
+            {t('teacher.subscription.trialLifecycleBody')}
+          </p>
+        </div>
+        <div className={NB_DIALOG_FOOTER}>
+          <button type="button" data-testid="teacher-trial-welcome-dismiss" onClick={close} className={NB_SECONDARY}>
             {t('teacher.proWelcome.cta')}
           </button>
+          <span className={cn('flex', LIME_CTA)}>
+            <TeacherProCheckoutButton source="dashboard_trial_lifecycle" testId="teacher-trial-welcome-upgrade">
+              {t('teacher.subscription.trialLifecycleCta')}
+            </TeacherProCheckoutButton>
+          </span>
         </div>
       </div>
     </div>

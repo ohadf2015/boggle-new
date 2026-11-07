@@ -72,7 +72,7 @@ export function ClassChest({ found, total, open, tone = 'default', t }: ClassChe
         data-testid="class-chest-label"
         className={cn(
           '-mt-[1cqw] flex flex-col items-center whitespace-nowrap rounded-neo border-[3px] px-[1.2cqw] py-[0.4cqw] shadow-[0.4cqw_0.4cqw_0_rgb(var(--neo-black))]',
-          tone === 'calm' ? 'border-neo-cream/60 bg-neo-navy-light text-neo-cream' : 'border-neo-black bg-neo-lime text-neo-black'
+          tone === 'calm' ? 'border-neo-cream/50 bg-neo-navy-light text-neo-cream' : 'border-neo-black bg-neo-lime text-neo-black'
         )}
       >
         <span className={cn('font-neo-display font-black leading-none', tone !== 'calm' && 'uppercase tracking-wide')} style={{ fontSize: 'max(9px, 1.9cqw)' }}>

@@ -20,7 +20,8 @@ import {
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { LANGUAGE_LABEL_KEYS } from '@/lib/i18n/languageLabels';
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
+import { Dialog } from '@/components/ui/dialog';
+import { NbDialogBody, NbDialogContent, NbDialogHeader } from '@/components/teacher/nb/NbDialog';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import ClassroomStudentList from '../ClassroomStudentList';
 import { GoogleClassroomRosterImport } from './GoogleClassroomRosterImport';
@@ -63,7 +64,9 @@ export interface ClassCardProps {
   color?: NbColor;
 }
 
-const ICON_ACTION = cn(NB_SMALL, NB_BLOCK.cream, 'size-12 min-h-12 shrink-0 px-0');
+// Below 24rem the code takes its own row so six letters never run under the buttons.
+const ICON_SIZE = 'h-12 min-h-12 flex-1 shrink-0 px-0 @[24rem]:w-12 @[24rem]:flex-none';
+const ICON_ACTION = cn(NB_SMALL, NB_BLOCK.cream, ICON_SIZE);
 
 const MENU_ITEM =
   'flex min-h-12 w-full items-center gap-3 rounded-neo-lg border-2 border-neo-black bg-white px-3 text-start font-neo-display text-[15px] font-black text-neo-black shadow-hard transition-transform hover:-translate-y-px focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan motion-reduce:transition-none';
@@ -232,18 +235,18 @@ export function ClassCard({
           {activity}
         </div>
 
-        <section aria-labelledby={`class-code-${classroom.id}`} className="flex items-stretch gap-2">
+        <section aria-labelledby={`class-code-${classroom.id}`} className="flex flex-wrap items-stretch gap-2 @[24rem]:flex-nowrap">
           <p id={`class-code-${classroom.id}`} data-testid="invite-students-label" className="sr-only">
             {t('academy.hq.classCode', 'Class code')}
           </p>
           <div
             data-testid="join-code-plate"
-            className="flex min-w-0 flex-1 items-center justify-center rounded-neo-lg border-[3px] border-neo-black bg-neo-cream px-2 shadow-hard-lg"
+            className="flex min-h-14 min-w-0 basis-full items-center justify-center rounded-neo-lg border-[3px] border-neo-black bg-neo-cream px-2 shadow-hard-lg @[24rem]:min-h-0 @[24rem]:flex-1 @[24rem]:basis-0"
           >
             <code
               data-testid="classroom-join-code"
               dir="ltr"
-              className="block whitespace-nowrap text-center font-neo-display text-2xl font-black tabular-nums tracking-wider text-neo-black @[19rem]:text-3xl"
+              className="block whitespace-nowrap text-center font-neo-display text-3xl font-black tabular-nums tracking-wider text-neo-black @[24rem]:@max-[28rem]:text-2xl"
             >
               {classroom.join_code}
             </code>
@@ -261,7 +264,7 @@ export function ClassCard({
               onClick={onOpenProjector}
               aria-label={t('academy.hq.openProjector', 'Show code on board')}
               title={t('academy.hq.openProjector', 'Show code on board')}
-              className={cn(NB_SMALL, NB_BLOCK.navy, NB_DARK_EDGE, 'size-12 min-h-12 shrink-0 px-0')}
+              className={cn(NB_SMALL, NB_BLOCK.navy, NB_DARK_EDGE, ICON_SIZE)}
             >
               <MonitorPlay className="size-5" aria-hidden="true" />
             </button>
@@ -279,23 +282,17 @@ export function ClassCard({
       </div>
 
       <Dialog open={expanded} onOpenChange={(open) => { if (open !== expanded) onToggleExpanded(); }}>
-        <DialogContent
-          className="max-w-lg border-[3px] border-neo-cream/50 bg-neo-navy-light text-neo-cream shadow-hard-xl"
-          closeButtonLabel={t('common.close')}
-        >
-          <div className="flex max-h-[80dvh] flex-col gap-3 p-4">
-            <DialogTitle className="font-neo-display text-2xl font-black text-neo-cream">
-              <bdi>{t('teacher.classroom.cardRosterTitle', { name: classroom.name })}</bdi>
-            </DialogTitle>
-            <DialogDescription className="sr-only">
-              {t('teacher.classroom.cardSeeAllStudents', { count })}
-            </DialogDescription>
-            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
-              <ClassroomStudentList classroomId={classroom.id} joinCode={classroom.join_code} />
-              <GoogleClassroomRosterImport classroomId={classroom.id} />
-            </div>
-          </div>
-        </DialogContent>
+        <NbDialogContent size="lg" phone="full">
+          <NbDialogHeader
+            title={<bdi>{t('teacher.classroom.cardRosterTitle', { name: classroom.name })}</bdi>}
+            srDescription={t('teacher.classroom.cardSeeAllStudents', { count })}
+            closeLabel={t('common.close')}
+          />
+          <NbDialogBody>
+            <ClassroomStudentList classroomId={classroom.id} joinCode={classroom.join_code} />
+            <GoogleClassroomRosterImport classroomId={classroom.id} />
+          </NbDialogBody>
+        </NbDialogContent>
       </Dialog>
     </m.div>
   );

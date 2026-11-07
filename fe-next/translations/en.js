@@ -797,6 +797,7 @@ const en = {
       "editTitle": "Edit word list",
       "description": "Paste words, add definitions, save.",
       "newList": "New list",
+      "moreOptions": "Language, grade, topic and sharing",
       "titleLabel": "List title",
       "titlePlaceholder": "Name your list…",
       "pasteLabel": "Paste or type words",
@@ -13235,6 +13236,7 @@ const en = {
       "galleryTitle": "Start from a template",
       "galleryHint": "Pick a grade and subject, preview the word list, then assign in one tap. Word Craft, due tomorrow.",
       "galleryBrowse": "Browse assignment templates",
+      "moreOptions": "Other ways to play, a focus or a note",
       "galleryPreview": "Preview words",
       "galleryAssign": "Assign to class",
       "galleryHidePreview": "Hide words",
@@ -20271,6 +20273,7 @@ const en = {
       "teacher": "For teachers",
       "school": "For schools"
     },
+    "compareAll": "Compare Free and Pro side by side",
     "strip": {
       "title": "What Pro shows you after one game",
       "lead": "Sample class data. Your own classes fill these in."
@@ -20646,6 +20649,7 @@ const en = {
       "missedTitle": "Words your class missed",
       "practiceWords": "Practice these words ({count})",
       "shareParents": "Share with parents",
+      "moreTools": "Share and export",
       "proPill": "Pro",
       "invitePrompt": "Know a teacher who'd like this?",
       "inviteCta": "Invite a colleague",

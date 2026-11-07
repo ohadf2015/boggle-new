@@ -45,9 +45,9 @@ export default function EduStudentResults(props: EduStudentResultsProps) {
 function ResultsSkeleton() {
   return (
     <div data-testid="edu-student-results-skeleton" aria-busy="true" className="flex flex-1 flex-col items-center gap-4 bg-neo-navy p-4">
-      <div className="h-48 w-full max-w-sm animate-pulse rounded-neo-lg border-4 border-neo-cream/40 bg-neo-navy-light motion-reduce:animate-none" />
-      <div className="h-24 w-full max-w-sm animate-pulse rounded-neo-lg border-[3px] border-neo-cream/40 bg-neo-navy-light motion-reduce:animate-none" />
-      <div className="h-24 w-full max-w-sm animate-pulse rounded-neo-lg border-[3px] border-neo-cream/40 bg-neo-navy-light motion-reduce:animate-none" />
+      <div className="h-48 w-full max-w-sm animate-pulse rounded-neo-lg border-4 border-neo-cream/50 bg-neo-navy-light motion-reduce:animate-none" />
+      <div className="h-24 w-full max-w-sm animate-pulse rounded-neo-lg border-[3px] border-neo-cream/50 bg-neo-navy-light motion-reduce:animate-none" />
+      <div className="h-24 w-full max-w-sm animate-pulse rounded-neo-lg border-[3px] border-neo-cream/50 bg-neo-navy-light motion-reduce:animate-none" />
     </div>
   );
 }
@@ -170,7 +170,7 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
             </Beat>
           )}
 
-          <BossOutcomeCard size="phone" density="compact" className="w-full max-w-sm" />
+          <BossOutcomeCard size="phone" density="compact" className="w-full max-w-sm rounded-neo-lg border-[3px] border-neo-cream/50 shadow-hard-lg" />
 
           <Beat index={beat++}>
             <EduStudentNextStep
