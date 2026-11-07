@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { PRACTICE_SEAT_SCRIPT } from '../practiceSeatStorage';
+import { PRACTICE_SEAT_SCRIPT, resolvePracticeSeatName } from '../practiceSeatStorage';
 
 function memStorage() {
   const store: Record<string, string> = {};
@@ -161,5 +161,15 @@ describe('PRACTICE_SEAT_SCRIPT when framed beside the board', () => {
     run(win);
     expect((win.localStorage as Storage).getItem('boggle_music_settings')).toBeNull();
     expect(win.__LC_PRACTICE_FRAMED__).toBe(false);
+  });
+});
+
+describe('resolvePracticeSeatName', () => {
+  it('waits while the catalogue still answers with the raw key', () => {
+    expect(resolvePracticeSeatName((k) => k)).toBeNull();
+  });
+
+  it('returns the translated seat name once loaded', () => {
+    expect(resolvePracticeSeatName(() => 'תלמיד לתרגול')).toBe('תלמיד לתרגול');
   });
 });

@@ -102,7 +102,7 @@ interface UseMultiplayerJoinOptions {
   setIsJoining: (isJoining: boolean) => void;
 }
 
-type HandleJoinFn = (
+export type HandleJoinFn = (
   isHostMode: boolean,
   roomLang?: Language | null,
   overrideGameCode?: string,

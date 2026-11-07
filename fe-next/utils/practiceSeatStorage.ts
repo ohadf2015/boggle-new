@@ -70,3 +70,11 @@ export function isFramedPracticeSeat(): boolean {
 export function practiceSeatJoinFlag(): { practiceSeat?: true } {
   return isPracticeSeatPage() ? { practiceSeat: true } : {};
 }
+
+const SEAT_NAME_KEY = 'eduLiveRoom.practice.seatName';
+
+/** The practice seat's name, or null while the catalogue still returns the raw key (joining then would name the seat after the key). */
+export function resolvePracticeSeatName(t: (key: string) => string): string | null {
+  const name = t(SEAT_NAME_KEY);
+  return name && name !== SEAT_NAME_KEY ? name : null;
+}
