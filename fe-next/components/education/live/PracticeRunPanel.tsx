@@ -99,7 +99,7 @@ export function PracticeRunPanel({ gameCode, language, joined, t }: PracticeRunP
       <section
         data-testid="practice-run-card"
         aria-labelledby="practice-run-card-title"
-        className={cn(NB_PANEL, NB_BLOCK.navy, 'order-last m-3 mt-0 flex shrink-0 flex-wrap items-center gap-3 p-3 lg:hidden')}
+        className={cn(NB_PANEL, NB_BLOCK.navy, 'order-last m-3 mt-0 mb-[calc(var(--lc-teacher-bar-h,0px)+0.75rem)] flex shrink-0 flex-wrap items-center gap-3 p-3 lg:hidden')}
       >
         <h2 id="practice-run-card-title" className="min-w-0 flex-1 font-neo-display text-lg font-black leading-tight">{t('eduLiveRoom.practice.title')}</h2>
         {status}

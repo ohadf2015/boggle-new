@@ -41,4 +41,9 @@ describe('PracticeRunPanel', () => {
     const header = document.getElementById('practice-run-title')?.parentElement as HTMLElement;
     expect(header.className).toContain('flex-col');
   });
+
+  it('given a phone, then the practice card sits above the fixed teacher bar instead of under it', () => {
+    render(<PracticeRunPanel gameCode="AB12CD" language="en" joined t={t} />);
+    expect(screen.getByTestId('practice-run-card').className).toContain('--lc-teacher-bar-h');
+  });
 });
