@@ -2595,7 +2595,7 @@ const es = {
         "home": "Inicio",
         "close": "Cerrar","floorsA11y": "Llegaste al piso {n}", "combo": "Mejor racha", "tenants": "Inquilinos", "crates": "Cajas", "badges": "Insignias ganadas", "nextGoal": "Próxima meta", "coinsLoading": "Monedas en camino…"},
     "hint": {"spell": "Forma una palabra para construir el siguiente piso", "drop": "Toca SOLTAR cuando el piso esté sobre la torre"},
-    "changeWord": "CAMBIAR PALABRA",
+    "changeWord": "CAMBIAR PALABRA", "cutBack": "Dejar la palabra hasta {letter}",
     "editHint": "Toca una letra usada para editar la palabra",
     "bestFlag": "RÉCORD",
     "leaveConfirm": "¿Salir de esta subida? Puedes reanudarla en esta pestaña, pero el reto diario es solo una vez al día.",

@@ -2596,7 +2596,7 @@ const ja = {
         "home": "ホーム",
         "close": "閉じる","floorsA11y": "{n}階に到達", "combo": "最高連続", "tenants": "住人", "crates": "ボックス", "badges": "獲得バッジ", "nextGoal": "次の目標", "coinsLoading": "コインを受け取り中…"},
     "hint": {"spell": "単語をつくって次のフロアを建てよう", "drop": "タワーの真上に来たら「落とす」をタップ"},
-    "changeWord": "ことばをかえる",
+    "changeWord": "ことばをかえる", "cutBack": "{letter} までのこす",
     "editHint": "使った文字をタップして単語を直せます",
     "bestFlag": "ベスト",
     "leaveConfirm": "この登りを離れますか？このタブなら再開できますが、デイリーは1日1回です。",

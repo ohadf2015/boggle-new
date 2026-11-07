@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useEffect, useMemo, useRef, type ReactNode, type RefObject } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, type ReactNode, type RefObject } from 'react';
 import { Delete, Shuffle, Undo2 } from 'lucide-react';
 import { LetterRow, WordBox } from './LetterRow';
 
@@ -36,6 +36,8 @@ interface Props {
   onBackspace: () => void;
   /** Long-press on backspace: rub out the whole word at once. */
   onClearWord?: () => void;
+  /** A real word to light up for a stuck new player (tray slots), or null. */
+  hint?: number[] | null;
 }
 
 /** Hold this long on backspace to clear the whole word. */
@@ -77,6 +79,16 @@ export const V2Dock = memo(function V2Dock(p: Props) {
     if (p.swinging) p.onPutBack(); else p.onBackspace();
   };
   const tray = useMemo(() => p.wheel.map((l) => l.toUpperCase()), [p.wheel]);
+  const wordLetters = useMemo(() => p.selected.map((i) => tray[i] ?? ''), [p.selected, tray]);
+  // Keep letters 0..k: rewinding the path to before letter k+1 drops it and everything after.
+  const { selected, onDeselectTile } = p;
+  const cutTo = useCallback(
+    (k: number) => {
+      const next = selected[k + 1];
+      if (next !== undefined) onDeselectTile(next);
+    },
+    [selected, onDeselectTile],
+  );
   const feed = p.wide ? p.feedSlot : null;
 
   const scramble = (
@@ -152,7 +164,14 @@ export const V2Dock = memo(function V2Dock(p: Props) {
           <>
             <div className="flex items-center gap-2">
               {scramble}
-              <WordBox t={t} word={p.word.toUpperCase()} placing={p.swinging} reducedMotion={p.reducedMotion} />
+              <WordBox
+                t={t}
+                letters={wordLetters}
+                placing={p.swinging}
+                canCut={p.composing && !p.swinging}
+                reducedMotion={p.reducedMotion}
+                onCutTo={cutTo}
+              />
               {backspace}
             </div>
             <LetterRow
@@ -167,6 +186,7 @@ export const V2Dock = memo(function V2Dock(p: Props) {
               onDeselectTile={p.onDeselectTile}
               onSubmit={p.onSubmit}
               onDrop={p.onDrop}
+              hint={p.hint}
             />
           </>
         )}
