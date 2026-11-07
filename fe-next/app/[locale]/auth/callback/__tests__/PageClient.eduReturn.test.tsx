@@ -31,6 +31,31 @@ describe('auth callback keeps a classroom sign-in in the classroom', () => {
   beforeEach(() => {
     replace.mockClear();
     getSession.mockResolvedValue({ data: { session: null } });
+    document.cookie = 'lexi_edu_auth_origin=; Path=/; Max-Age=0';
+  });
+
+  it('a sign-in that lost its next lands back on the edu page it started from', async () => {
+    document.cookie = `lexi_edu_auth_origin=${encodeURIComponent('/he/teacher')}; Path=/`;
+    query = '';
+    getSession.mockResolvedValue({ data: { session: { user: { id: 'u1' } } } });
+    render(<AuthCallbackPageClient />);
+    await waitFor(() => expect(replace).toHaveBeenCalledWith('/he/teacher'));
+    expect(replace).not.toHaveBeenCalledWith('/en');
+    expect(document.cookie).not.toContain('lexi_edu_auth_origin');
+  });
+
+  it('a teacher who signs in from the arcade with no next still lands on the homepage', async () => {
+    query = '';
+    getSession.mockResolvedValue({ data: { session: { user: { id: 'teacher-1' } } } });
+    render(<AuthCallbackPageClient />);
+    await waitFor(() => expect(replace).toHaveBeenCalledWith('/en'));
+  });
+
+  it('a failed sign-in that lost its next returns to the remembered edu entry', async () => {
+    document.cookie = `lexi_edu_auth_origin=${encodeURIComponent('/en/join/ABC123')}; Path=/`;
+    query = 'error=access_denied';
+    render(<AuthCallbackPageClient />);
+    await waitFor(() => expect(replace).toHaveBeenCalledWith('/en/join/ABC123?auth_error=true&reason=access_denied'));
   });
 
   it('a provider error from an edu sign-in returns to the edu entry', async () => {
@@ -65,6 +90,20 @@ describe('auth callback keeps a classroom sign-in in the classroom', () => {
     });
     fireEvent.click(screen.getByText('auth.callback.tryAgain'));
     expect(replace).toHaveBeenCalledWith('/en/student/join?auth_error=true&reason=timeout');
+    vi.useRealTimers();
+  });
+
+  it('Try again on a stuck sign-in that lost its next returns to the remembered edu page', async () => {
+    vi.useFakeTimers();
+    document.cookie = `lexi_edu_auth_origin=${encodeURIComponent('/en/teacher')}; Path=/`;
+    query = 'code=abc';
+    getSession.mockReturnValue(new Promise(() => {}));
+    render(<AuthCallbackPageClient />);
+    await act(async () => {
+      vi.advanceTimersByTime(7000);
+    });
+    fireEvent.click(screen.getByText('auth.callback.tryAgain'));
+    expect(replace).toHaveBeenCalledWith('/en/teacher?auth_error=true&reason=timeout');
     vi.useRealTimers();
   });
 });

@@ -20,7 +20,12 @@ import { SearchIconButton } from './SearchIconButton';
 import { useSafeArea } from '@/hooks/useSafeArea';
 import { isTeacherProfile } from '@/lib/education/teacherRole';
 import { educationBackHref, educationHomeFor } from '@/lib/navigation/educationBackHref';
-import { educationExitHref, educationViewerRole } from '@/lib/navigation/eduExitTargets';
+import {
+  educationExitHref,
+  educationSignOutHref,
+  educationViewerResolved,
+  educationViewerRole,
+} from '@/lib/navigation/eduExitTargets';
 
 /**
  * Flattens the controls inside the utility bar: no per-button border, hard
@@ -80,7 +85,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
   compact = false,
 }) => {
   const { t, language } = useLanguage();
-  const { isAuthenticated, profile, user } = useAuth();
+  const { isAuthenticated, profile, user, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const safeArea = useSafeArea();
@@ -128,7 +133,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
   const isOnStudentSection = pathname?.includes('/student');
 
   const eduRole = educationViewerRole({ isTeacher, userRole: profile?.user_role, isAnonymous: user?.is_anonymous });
-  const exitHref = educationExitHref(language, eduRole);
+  const exitHref = educationExitHref(language, eduRole, educationViewerResolved({ loading, user, profile }));
 
   const handleBackClick = useCallback(() => {
     if (onBack) return onBack();
@@ -138,8 +143,8 @@ export const EducationHeader = memo<EducationHeaderProps>(({
   const handleSignOut = useCallback(async () => {
     setShowMobileMenu(false);
     await signOut();
-    router.push(`/${language}/education`);
-  }, [router, language]);
+    router.push(educationSignOutHref(language, eduRole, pathname));
+  }, [router, language, eduRole, pathname]);
 
   return (
     <header

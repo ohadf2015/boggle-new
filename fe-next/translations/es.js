@@ -21730,7 +21730,13 @@ const es = {
     "error": {
       "title": "Esta pantalla se ha atascado",
       "body": "Inténtalo de nuevo. Si vuelve a pasar, vuelve a tu clase y empieza desde ahí.",
-      "backToClass": "Volver a la clase"
+      "backToClass": "Volver a la clase",
+      "backToClasses": "Volver a tus clases",
+      "enterCode": "Escribe un código de clase"
+    },
+    "notFound": {
+      "title": "No encontramos esa página",
+      "body": "Puede que el enlace sea antiguo o tenga un error. Vuelve atrás y sigue desde ahí."
     },
     "nav": {
       "home": "Inicio",

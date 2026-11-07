@@ -58,3 +58,52 @@ export function authFailureHref(locale: string, nextParam: string | null | undef
   if (reason) params.set('reason', reason);
   return `${path}?${params.toString()}`;
 }
+
+/**
+ * A sign-in that starts in edu but loses `next` on the way (email link, provider fallback)
+ * returns to that edu page. Origin-based only: a bare sign-in from the arcade still lands home.
+ */
+export const EDU_AUTH_ORIGIN_COOKIE = 'lexi_edu_auth_origin';
+const EDU_AUTH_ORIGIN_MAX_AGE_S = 60 * 60;
+
+function validEduOrigin(path: string | null | undefined): string | null {
+  if (!path || !isSafeInternalPath(path) || path.includes('/auth/callback') || !isEduAuthOrigin(path)) return null;
+  return path;
+}
+
+function writeOriginCookie(value: string, lifetime: string): void {
+  if (typeof document === 'undefined') return;
+  const secure = typeof location !== 'undefined' && location.protocol === 'https:' ? '; Secure' : '';
+  document.cookie = `${EDU_AUTH_ORIGIN_COOKIE}=${value}; Path=/; ${lifetime}; SameSite=Lax${secure}`;
+}
+
+export function forgetEduAuthOrigin(): void {
+  if (typeof document === 'undefined' || !document.cookie.includes(`${EDU_AUTH_ORIGIN_COOKIE}=`)) return;
+  writeOriginCookie('', 'Expires=Thu, 01 Jan 1970 00:00:00 GMT');
+}
+
+export function rememberAuthOrigin(path: string | null | undefined): void {
+  if (!path || path.includes('/auth/callback')) return;
+  const origin = validEduOrigin(path);
+  if (origin) writeOriginCookie(encodeURIComponent(origin), `Max-Age=${EDU_AUTH_ORIGIN_MAX_AGE_S}`);
+  else forgetEduAuthOrigin();
+}
+
+export function eduAuthOriginFromCookies(cookieHeader: string | null | undefined): string | null {
+  if (!cookieHeader) return null;
+  const prefix = `${EDU_AUTH_ORIGIN_COOKIE}=`;
+  const raw = cookieHeader.split(';').map((c) => c.trim()).find((c) => c.startsWith(prefix))?.slice(prefix.length);
+  if (!raw) return null;
+  try {
+    return validEduOrigin(decodeURIComponent(raw));
+  } catch {
+    return null;
+  }
+}
+
+/** Only a lost `next` falls back to the marker; an explicit homepage `next` means the sign-in started in the arcade. */
+export function withRememberedEduOrigin(nextParam: string | null | undefined, remembered: string | null): string | null {
+  const next = nextParam ?? null;
+  if (next && next !== '/' && isSafeInternalPath(next)) return next;
+  return validEduOrigin(remembered) ?? next;
+}

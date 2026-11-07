@@ -30,7 +30,7 @@ export function educationBackHref({ pathname, locale, role }: EducationBackHrefP
 
   if (section === 'teacher' && sub) return `/${locale}/teacher`;
   // `/student` sends a signed-out visitor straight back to `/student/join`.
-  if (section === 'student' && sub === 'join') return `/${locale}/education`;
+  if (section === 'student' && sub === 'join') return `/${locale}/join`;
   if (section === 'student' && sub) return `/${locale}/student`;
   return educationHomeFor(locale, role);
 }

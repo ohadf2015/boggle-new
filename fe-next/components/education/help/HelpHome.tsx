@@ -220,8 +220,9 @@ export function HelpHome({ locale }: { locale: string }) {
             <p className="font-neo-display text-lg font-black">{t('eg2Help.home.stuckTitle')}</p>
             <p className="text-neo-gray-300">{t('eg2Help.home.stuckBody')}</p>
           </div>
-          <Link href={`/${locale}/contact`} className="rounded-neo border-3 border-neo-black bg-neo-cream px-4 py-2 font-bold text-neo-navy shadow-hard focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black">
+          <Link href={`/${locale}/contact`} target="_blank" rel="noopener noreferrer" className="rounded-neo border-3 border-neo-black bg-neo-cream px-4 py-2 font-bold text-neo-navy shadow-hard focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black">
             {t('eg2Help.home.stuckCta')}
+            <span className="sr-only"> ({t('common.opensInNewTab')})</span>
           </Link>
         </aside>
       </div>

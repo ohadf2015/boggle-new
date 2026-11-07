@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { translateKey } from '@/lib/i18n/serverTranslate';
 import { parseHelpText } from './helpText';
 import { helpArticleHref } from './helpRegistry';
+import { isEduAppSurface } from '@/lib/navigation/eduAppSurface';
 
 function linkHref(locale: string, target: string): string {
   const [kind, rest] = target.split(':');
@@ -26,13 +27,17 @@ export function HelpRichText({ text, locale }: { text: string; locale: string })
           );
         }
         if (seg.type === 'link') {
+          const href = linkHref(locale, seg.target);
+          const leavesEdu = !isEduAppSurface(href);
           return (
             <Link
               key={i}
-              href={linkHref(locale, seg.target)}
+              href={href}
+              {...(leavesEdu && { target: '_blank', rel: 'noopener noreferrer' })}
               className="font-bold text-neo-cyan underline decoration-2 underline-offset-4 hover:text-neo-lime focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
             >
               {seg.value}
+              {leavesEdu && <span className="sr-only"> ({translateKey('common.opensInNewTab', locale)})</span>}
             </Link>
           );
         }

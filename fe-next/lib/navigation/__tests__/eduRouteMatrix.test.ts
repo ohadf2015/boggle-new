@@ -23,7 +23,7 @@ const BACK: Array<[string, string]> = [
   ['teacher/curriculum', 'teacher'],
   ['teacher/profile', 'teacher'],
   ['teacher/classroom/abc123/analytics', 'teacher'],
-  ['student/join', 'education'],
+  ['student/join', 'join'],
   ['student/lessons/x', 'student'],
   ['student/achievements', 'student'],
   ['student/profile', 'student'],
@@ -81,14 +81,15 @@ describe.each(LOCALES)('education route matrix, locale=%s', (locale) => {
   describe('error / 404 boundary, exact', () => {
     it.each(EDU_PAGES)('/%s → its role hub, or the education landing', (path) => {
       let want = at('education');
-      if (path === 'education' || path === 'education/classroom-game') want = at('education/for-schools');
-      else if (path.startsWith('teacher/')) want = at('teacher');
-      else if (path.startsWith('student/') && path !== 'student/join') want = at('student');
+      if (path === 'education') want = at('education/for-schools');
+      else if (path.startsWith('teacher/') || path === 'education/classroom-game') want = at('teacher');
+      else if (path === 'student/join' || path.startsWith('join/')) want = at('join');
+      else if (path.startsWith('student/') || path.startsWith('education/duels')) want = at('student');
       expect(sectionHome({ pathname: at(path) })).toBe(want);
     });
 
-    it('classroom-game error does not return to the landing that bounces approved teachers back into it', () => {
-      expect(sectionHome({ pathname: at('education/classroom-game') })).toBe(at('education/for-schools'));
+    it('classroom-game error returns to the teacher hub, not the landing that bounces approved teachers back into it', () => {
+      expect(sectionHome({ pathname: at('education/classroom-game') })).toBe(at('teacher'));
     });
 
     it.each(SEO_TOP_LEVEL)('SEO landing /%s → education landing', (seg) => {

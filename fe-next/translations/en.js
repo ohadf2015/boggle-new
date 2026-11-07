@@ -20763,7 +20763,13 @@ const en = {
     "error": {
       "title": "This screen hit a snag",
       "body": "Try again. If it keeps happening, head back to your class and start from there.",
-      "backToClass": "Back to class"
+      "backToClass": "Back to class",
+      "backToClasses": "Back to your classes",
+      "enterCode": "Enter a class code"
+    },
+    "notFound": {
+      "title": "We can't find that page",
+      "body": "The link may be old or mistyped. Head back and pick up from there."
     },
     "nav": {
       "home": "Home",

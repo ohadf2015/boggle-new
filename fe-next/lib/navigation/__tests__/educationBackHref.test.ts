@@ -28,8 +28,8 @@ describe('educationBackHref', () => {
     expect(educationBackHref({ pathname, locale: 'en', role: 'student' })).toBe('/en/student');
   });
 
-  it('/student/join never points at /student (anonymous users are pushed straight back to join)', () => {
-    expect(educationBackHref({ pathname: '/en/student/join', locale: 'en', role: null })).toBe('/en/education');
+  it('/student/join backs to the class code entry, never /student (anonymous users are pushed straight back to join)', () => {
+    expect(educationBackHref({ pathname: '/en/student/join', locale: 'en', role: null })).toBe('/en/join');
   });
 
   it.each([

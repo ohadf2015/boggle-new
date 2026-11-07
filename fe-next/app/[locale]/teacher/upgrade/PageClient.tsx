@@ -137,9 +137,12 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
         <Link
           key={page}
           href={`/${language}/legal/${page}`}
+          target="_blank"
+          rel="noopener noreferrer"
           className="text-neo-cyan hover:text-neo-lime font-bold text-xs underline transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
         >
           {t(page === 'terms' ? 'legal.termsOfService' : page === 'refund' ? 'legal.refundPolicy' : 'legal.privacyPolicy')}
+          <span className="sr-only"> ({t('common.opensInNewTab')})</span>
         </Link>
       ))}
     </>
