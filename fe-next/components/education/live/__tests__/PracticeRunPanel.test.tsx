@@ -35,4 +35,10 @@ describe('PracticeRunPanel', () => {
     expect(container.querySelector('svg[role="img"], canvas')).toBeNull();
     expect(container.querySelectorAll('svg path[d^="M0 0h"]').length).toBe(0);
   });
+
+  it('given the wide panel, then its status sits under the title, clear of the page sound button in the top corner', () => {
+    render(<PracticeRunPanel gameCode="AB12CD" language="en" joined t={t} />);
+    const header = document.getElementById('practice-run-title')?.parentElement as HTMLElement;
+    expect(header.className).toContain('flex-col');
+  });
 });

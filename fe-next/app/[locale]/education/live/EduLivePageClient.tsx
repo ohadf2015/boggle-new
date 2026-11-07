@@ -104,6 +104,7 @@ function EduLiveRoom(): React.JSX.Element {
             {s.isActive && s.gameActive && !s.showResults && <StudentWordBank level={s.classroomLevel} words={s.classroomWordBank} />}
             {s.teacherStrip.visible && (
               <TeacherLiveControls
+                sidePanelOpen={!!practiceRoom}
                 isPaused={s.isPaused || s.teacherStrip.quizPaused} gameMode={s.liveGameMode} isQuizRound={s.teacherStrip.quizRound}
                 onPause={s.pauseGame} onResume={s.resumeGame} onExtendTime={s.extendTime}
                 onEndRound={s.endRoundNow} onSkipWord={s.skipTargetWord}

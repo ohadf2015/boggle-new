@@ -26,6 +26,8 @@ const END_ROUND_CONFIRM_MS = 4000;
 
 interface TeacherLiveControlsProps {
   isPaused: boolean;
+  /** The practice-run student view sits beside the board on wide screens (PracticeRunPanel, same width). */
+  sidePanelOpen?: boolean;
   /** Resolved mode of the live round (store `gameMode`); only 'word-hunt' matters here. */
   gameMode?: string | null;
   /**
@@ -58,6 +60,7 @@ interface TeacherLiveControlsProps {
  */
 export function TeacherLiveControls({
   isPaused,
+  sidePanelOpen = false,
   gameMode,
   isQuizRound = false,
   onPause,
@@ -150,6 +153,7 @@ export function TeacherLiveControls({
         // Above GamePausedOverlay (z-[60]) so Resume is always reachable.
         'pointer-events-none fixed inset-x-0 bottom-0 z-[70] flex flex-col',
         'px-2 sm:px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2',
+        sidePanelOpen && 'lg:end-[calc(min(25rem,32vw)+0.75rem)]',
       )}
     >
       {rosterOpen && showPulse && (

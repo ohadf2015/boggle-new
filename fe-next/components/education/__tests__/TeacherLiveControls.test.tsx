@@ -337,3 +337,15 @@ describe('TeacherLiveControls', () => {
     });
   });
 });
+
+describe('TeacherLiveControls beside a side panel', () => {
+  it('given a side panel on wide screens, then the bar stops at its edge instead of covering it', () => {
+    renderControls({ sidePanelOpen: true });
+    expect(screen.getByTestId('teacher-live-controls').className).toMatch(/lg:end-\[/);
+  });
+
+  it('without a side panel, the bar spans the screen', () => {
+    renderControls();
+    expect(screen.getByTestId('teacher-live-controls').className).not.toMatch(/lg:end-\[/);
+  });
+});
