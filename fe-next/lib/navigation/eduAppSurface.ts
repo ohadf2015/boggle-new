@@ -1,5 +1,7 @@
 /** Classroom-product surfaces, SEO landings included: the player tab bar's Home tab would drop an edu visitor on the game home. */
-const WHOLE_SECTIONS = new Set(['teacher', 'student', 'join', 'pricing', 'education']);
+import { EDU_SECTIONS } from './eduSections';
+
+const WHOLE_SECTIONS: ReadonlySet<string> = new Set(EDU_SECTIONS);
 
 export function isEduAppSurface(pathname: string | null | undefined): boolean {
   if (!pathname) return false;

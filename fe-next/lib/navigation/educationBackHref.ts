@@ -34,3 +34,8 @@ export function educationBackHref({ pathname, locale, role }: EducationBackHrefP
   if (section === 'student' && sub) return `/${locale}/student`;
   return educationHomeFor(locale, role);
 }
+
+/** Where `/classroom` sends a viewer: null until auth settles, so a teacher is never shown the guest page first. */
+export function classroomHubHref(locale: string, { role, resolved }: { role: EducationRole; resolved: boolean }): string | null {
+  return resolved ? educationHomeFor(locale, role) : null;
+}
