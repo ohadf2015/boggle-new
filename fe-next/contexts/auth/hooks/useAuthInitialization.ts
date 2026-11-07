@@ -124,7 +124,11 @@ export function useAuthInitialization({
       }
 
       // Subscribed before getSession so a slow restore's SIGNED_IN is not missed.
-      const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
+      // auth-js runs this callback inside its auth lock and waits for it, so it
+      // must not await Supabase: fetchUserData's query calls getSession, which
+      // waits on that lock, and sign-in deadlocked (JAVASCRIPT-NEXTJS-2MB).
+      // Record the answer now, do the work on the next macrotask.
+      const { data } = supabase.auth.onAuthStateChange((event, session) => {
         if (!isMountedRef.current) return;
 
         // New-signup welcome email. Fire-and-forget — server is idempotent and
@@ -140,16 +144,24 @@ export function useAuthInitialization({
         if (sessionUser) sessionAnswer = 'present';
         else if (event === 'SIGNED_OUT' || event === 'INITIAL_SESSION') sessionAnswer = 'absent';
 
-        await handleAuthStateChange(
-          event,
-          sessionUser,
-          knownSignedOut,
-          userIdRef,
-          setters,
-          fetchUserData,
-          clearAuthState,
-          isMountedRef
-        );
+        setTimeout(() => {
+          if (!isMountedRef.current) return;
+          handleAuthStateChange(
+            event,
+            sessionUser,
+            knownSignedOut,
+            userIdRef,
+            setters,
+            fetchUserData,
+            clearAuthState,
+            isMountedRef
+          ).catch((err) => {
+            captureBackgroundError(err instanceof Error ? err : new Error(String(err)), {
+              operation: 'auth_state_change',
+              service: 'auth',
+            });
+          });
+        }, 0);
       });
       subscription = data.subscription;
 
