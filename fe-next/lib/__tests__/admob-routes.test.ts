@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, afterEach } from 'vitest';
 import { isAllowedAdBannerRoute, isAdFreeRoute, AD_FREE_ROUTE_CLASS } from '../admob-routes';
 
 describe('isAllowedAdBannerRoute', () => {

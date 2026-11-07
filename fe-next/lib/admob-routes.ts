@@ -92,7 +92,7 @@ export function isAllowedAdBannerRoute(
 /** `<html>` class set while an ad-free route is on screen; read by the banner coordinator and CSS. */
 export const AD_FREE_ROUTE_CLASS = 'ad-free-route';
 
-const AD_FREE_ROUTES = ['/education', '/teacher', '/student', '/join', '/admin', '/report'];
+const AD_FREE_ROUTES = ['/education', '/teacher', '/student', '/join', '/admin', '/report', '/classroom'];
 
 /**
  * Whether NO ad of any kind may run on this route.
@@ -106,6 +106,7 @@ export function isAdFreeRoute(
   search?: URLSearchParams | null,
 ): boolean {
   if (!pathname) return false;
+  if (typeof document !== 'undefined' && document.documentElement.classList.contains(AD_FREE_ROUTE_CLASS)) return true;
   const path = pathname.replace(LOCALE_PREFIX, '') || '/';
   if (path.startsWith('/multiplayer') && search?.get('classroom') === 'true') return true;
   // Solo play launched from the student Academy (`?academy=1`) — a student surface.
