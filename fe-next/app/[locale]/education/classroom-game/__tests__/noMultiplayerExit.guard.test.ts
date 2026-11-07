@@ -39,6 +39,6 @@ describe('Pick-a-game never sends a teacher to the consumer /multiplayer page', 
   });
 
   it('Given a room was created, Then the host lands on the edu live route', () => {
-    expect(classroomLivePath('en', 'ABC123', { host: true })).toMatch(/^\/en\/education\/live\?/);
+    expect(classroomLivePath('en', 'ABC123', { host: true })).toMatch(/^\/en\/education\/live\/host\?/);
   });
 });
