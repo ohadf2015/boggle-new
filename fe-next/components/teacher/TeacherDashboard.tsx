@@ -24,6 +24,9 @@ import { WeeklyEmailReport } from './digest/WeeklyEmailReport';
 import { HomeProCard, type HomeProOfferKind } from './home/HomeProCard';
 import { HomePracticeCard } from './home/HomePracticeCard';
 import { HomeOnboardingCard } from './home/HomeOnboardingCard';
+import { HomeHowItWorks } from './home/HomeHowItWorks';
+import { NB_BLOCK, NB_SMALL } from './nb/nbStyles';
+import { cn } from '@/lib/utils';
 import { RehearseWithBotsButton } from './home/RehearseWithBotsButton';
 import { HomeSessionRail } from './home/HomeSessionRail';
 import { SESSIONS_BESIDE_RAIL, TeacherHomeView } from './home/TeacherHomeView';
@@ -279,15 +282,35 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
       hasClasses={hasClasses}
       welcome={!proLoading ? <TeacherHqWelcome welcomeKind={welcomeKind} grant={pro.grant} trialExpires={pro.trialExpires ?? pro.periodEnd} /> : null}
       onboarding={
-        <HomeOnboardingCard
-          onboarding={onboarding}
-          hrefs={onboardingHrefs}
-          trial={trialCard}
-          onStepStart={onOnboardingStep}
-          variant="full"
-          t={t}
-          secondary={<RehearseWithBotsButton classroomId={undefined} source="hq" language={language} t={t} showNote />}
-        />
+        <div className="flex min-w-0 flex-col gap-4">
+          <HomeOnboardingCard
+            onboarding={onboarding}
+            hrefs={onboardingHrefs}
+            trial={trialCard}
+            onStepStart={onOnboardingStep}
+            variant="full"
+            t={t}
+            secondary={
+              <div data-testid="home-onboarding-practice" className="flex flex-col gap-2 rounded-neo-lg border-[3px] border-dashed border-white/55 p-3 sm:flex-row sm:items-center sm:gap-3">
+                <p className="min-w-0 flex-1 font-neo-body text-sm font-semibold leading-snug text-white">
+                  <span className="block font-neo-display text-base font-black">{t('eduShell.home.practice.title')}</span>
+                  {t('eduShell.home.practice.body')}
+                </p>
+                <RehearseWithBotsButton
+                  classroomId={undefined}
+                  source="hq"
+                  language={language}
+                  t={t}
+                  withSeat
+                  label={t('eduShell.home.practice.cta')}
+                  buttonClassName={cn(NB_SMALL, NB_BLOCK.cyan)}
+                  className="shrink-0"
+                />
+              </div>
+            }
+          />
+          <HomeHowItWorks t={t} />
+        </div>
       }
       desk={
         <>

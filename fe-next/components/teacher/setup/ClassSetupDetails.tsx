@@ -90,7 +90,7 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
             {nativeLanguageName(language)}
           </li>
           <li className={cn(NB_STICKER, NB_BLOCK.cyan)}>
-            {t(props.pack.nameKey)} · {t('eduShell.setup.packWords', { count: props.pack.words.length })}
+            {t('eduShell.setup.packSticker', { name: t(props.pack.nameKey) })} · {t('eduShell.setup.packWords', { count: props.pack.words.length })}
           </li>
           <li className={cn(NB_STICKER, NB_BLOCK.cream)}>
             {grade ? t(`eduShell.setup.grade.${grade}`) : t('eduShell.setup.anyGrade')}
@@ -159,6 +159,7 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
       <button
         type="submit"
         data-testid="setup-start-live"
+        aria-describedby="setup-start-live-hint"
         data-hero="true"
         disabled={busy !== null}
         aria-busy={busy === 'live' || undefined}
@@ -171,6 +172,9 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
         )}
         {t(errorKey ? 'eduShell.setup.retry' : 'eduShell.setup.createAndPlay')}
       </button>
+      <p id="setup-start-live-hint" data-testid="setup-start-live-hint" className="-mt-1 text-center font-neo-body text-sm font-semibold text-neo-cream/80">
+        {t('eduShell.setup.createAndPlayHint')}
+      </p>
       <button
         type="button"
         data-testid="setup-create"
