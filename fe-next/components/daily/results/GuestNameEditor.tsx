@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { hasChosenGuestName } from '@/utils/guestManager';
 import { isDefaultPlayerName } from '@/utils/defaultPlayerNames';
 import { GuestNamePrompt } from './GuestNamePrompt';
-import { wasGuestNamePromptDismissedToday } from './guestNamePromptArm';
 import { MAX_GUEST_NAME_LENGTH, useGuestNameSave, type GuestNameSource, type GuestNameT } from './useGuestNameSave';
 
 interface GuestNameEditorProps {
@@ -18,11 +17,9 @@ interface GuestNameEditorProps {
 }
 
 export function GuestNameEditor({ name, guestFingerprint, rank, totalPlayers, onRenamed, t }: GuestNameEditorProps) {
-  // A guest who never picked a name is asked right after the finish, so the
-  // board shows a real name rather than "Sneaky Potato". The closable arm can
-  // put it off until the next day.
+  // The chosen flag alone is not enough: older builds set it when a guest kept "Sneaky Potato".
   const [prompting, setPrompting] = useState(
-    () => !!guestFingerprint && !hasChosenGuestName() && !wasGuestNamePromptDismissedToday(),
+    () => !!guestFingerprint && (isDefaultPlayerName(name) || !hasChosenGuestName()),
   );
   const [editing, setEditing] = useState<GuestNameSource | null>(null);
   const [draft, setDraft] = useState(name);
