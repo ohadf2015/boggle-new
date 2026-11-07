@@ -6,7 +6,7 @@
  * Does NOT include game-specific logic (combos, first-finder, community validation).
  */
 
-import { isDictionaryWord } from '@/backend/dictionary';
+import { isValidWordLoaded } from '@/backend/dictionary';
 import { isWordOnBoardAsync } from '@/backend/modules/wordValidatorPool';
 import { calculateWordScore } from '@/backend/modules/scoringEngine.types';
 import type { Language } from '@/shared/types';
@@ -56,7 +56,7 @@ export async function validateAndScoreWord(
   }
 
   // Check dictionary
-  const inDictionary = isDictionaryWord(normalizedWord, language as Language);
+  const inDictionary = await isValidWordLoaded(normalizedWord, language as Language);
   if (!inDictionary) {
     return { valid: false, reason: 'not_in_dictionary', score: 0, normalizedWord };
   }

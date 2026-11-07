@@ -38,7 +38,7 @@ const REDIS_TIMEOUT_MS = 2000;
  * language under `{{lb|<lang>|...}}`, e.g. `{{lb|he|ethnic slur}}`).
  * ja → Jisho verifier does its own best-effort offensive check (Wiktionary can't
  * resolve hiragana). */
-const SUPPORTED_LANGS = new Set(['en', 'es', 'sv', 'he']);
+const SUPPORTED_LANGS = new Set(['en', 'es', 'sv', 'he', 'ru']);
 
 /**
  * A label param is blocking if it contains any of these substrings.

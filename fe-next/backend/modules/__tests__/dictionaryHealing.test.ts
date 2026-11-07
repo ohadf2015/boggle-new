@@ -22,6 +22,10 @@ const {
 vi.mock('../../services/wiktionaryOffensiveFilter', () => ({
   isOffensiveWord: mockIsOffensiveWord,
 }));
+const { mockPointerCheck } = vi.hoisted(() => ({ mockPointerCheck: vi.fn() }));
+vi.mock('../../services/wiktionaryEnVerifier', () => ({ verifyWordOnWiktionaryEn: (w: string) => mockPointerCheck(w, 'en') }));
+vi.mock('../../services/wiktionaryEsVerifier', () => ({ verifyWordOnWiktionaryEs: (w: string) => mockPointerCheck(w, 'es') }));
+vi.mock('../../services/wiktionaryVerifier', () => ({ verifyWordOnWiktionary: (w: string, l: string) => mockPointerCheck(w, l) }));
 vi.mock('../../modules/communityWordManager', () => ({
   removeFromCommunityCache: mockRemoveFromCommunityCache,
 }));
@@ -40,6 +44,8 @@ const { mockSupabase, calls } = vi.hoisted(() => {
     deletedScores: [] as Array<Record<string, unknown>>,
     blacklisted: [] as Array<Record<string, unknown>>,
     updatedSubs: [] as Array<Record<string, unknown>>,
+    ranges: [] as Array<[number, number]>,
+    total: 0,
   };
   let candidates: Array<{ id: string; word: string; language: string }> = [];
 
@@ -52,6 +58,8 @@ const { mockSupabase, calls } = vi.hoisted(() => {
     b.in = chain;
     b.is = chain;
     b.limit = chain;
+    b.order = chain;
+    b.range = (from: number, to: number) => { calls.ranges.push([from, to]); return b; };
     b.eq = (col: string, val: unknown) => { filters[col] = val; return b; };
     b.delete = () => { (b as { _op?: string })._op = 'delete'; return b; };
     b.update = (row: Record<string, unknown>) => { (b as { _op?: string; _row?: unknown })._op = 'update'; (b as { _row?: unknown })._row = row; return b; };
@@ -71,7 +79,7 @@ const { mockSupabase, calls } = vi.hoisted(() => {
         return resolve({ data: null, error: null });
       }
       // default: select query for candidates
-      return resolve({ data: candidates, error: null });
+      return resolve({ data: candidates, error: null, count: calls.total } as never);
     };
     return b;
   }
@@ -95,8 +103,30 @@ describe('runDictionaryHealing', () => {
     calls.deletedScores.length = 0;
     calls.blacklisted.length = 0;
     calls.updatedSubs.length = 0;
+    calls.ranges.length = 0;
+    calls.total = 0;
     mockRemoveFromCommunityCache.mockReturnValue(undefined);
     mockRemoveApprovedWord.mockResolvedValue(true);
+    mockPointerCheck.mockResolvedValue({ verified: true, status: 'verified' });
+  });
+
+  it('demotes words whose only Wiktionary senses are misspelling/abbreviation pointers', async () => {
+    mockSupabase.__setCandidates([
+      { id: 'p', word: 'yuo', language: 'en' },
+      { id: 's', word: 'sea', language: 'en' },
+      { id: 'h', word: 'שלומ', language: 'he' },
+    ]);
+    mockIsOffensiveWord.mockResolvedValue(false);
+    mockPointerCheck.mockImplementation(async (w: string) =>
+      w === 'yuo'
+        ? { verified: false, status: 'rejected_type', partOfSpeechRaw: 'pointer-only' }
+        : { verified: false, status: 'rejected_type', partOfSpeechRaw: 'Symbol' });
+
+    const result = await runDictionaryHealing();
+
+    expect(result.words).toEqual(['yuo']);
+    expect(mockPointerCheck).not.toHaveBeenCalledWith('שלומ', 'he');
+    expect(calls.blacklisted).toContainEqual(expect.objectContaining({ word: 'yuo', reason: 'auto_heal:pointer_only' }));
   });
 
   it('demotes an offensive auto-promoted word everywhere', async () => {
@@ -147,5 +177,21 @@ describe('runDictionaryHealing', () => {
     const result = await runDictionaryHealing();
     expect(result.scanned).toBe(0);
     expect(result.demoted).toBe(0);
+  });
+
+  it('sweeps a different page each day so every promoted word is re-checked', async () => {
+    mockSupabase.__setCandidates([]);
+    calls.total = 1200;
+    vi.useFakeTimers();
+    try {
+      const day = 86_400_000;
+      vi.setSystemTime(day * 30);
+      await runDictionaryHealing({ batchSize: 500 });
+      vi.setSystemTime(day * 31);
+      await runDictionaryHealing({ batchSize: 500 });
+    } finally {
+      vi.useRealTimers();
+    }
+    expect(calls.ranges).toEqual([[0, 499], [500, 999]]);
   });
 });

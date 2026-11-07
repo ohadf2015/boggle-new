@@ -21,13 +21,16 @@
 import logger from '../utils/logger';
 import { getSupabase } from './supabaseServer';
 import { isOffensiveWord } from '../services/wiktionaryOffensiveFilter';
+import { verifyWordOnWiktionaryEn } from '../services/wiktionaryEnVerifier';
+import { verifyWordOnWiktionaryEs } from '../services/wiktionaryEsVerifier';
+import { verifyWordOnWiktionary } from '../services/wiktionaryVerifier';
 import { removeFromCommunityCache } from './communityWordManager';
 import { removeApprovedWord } from '../dictionary';
 import { emitDictionaryRun } from './dictionaryPipelineTelemetry';
 import type { Language } from '@/shared/types/game';
 
 const DEFAULT_BATCH = 500;
-const HEAL_LANGS = ['en', 'es', 'sv', 'he'] as const;
+const HEAL_LANGS = ['en', 'es', 'sv', 'he', 'ru'] as const;
 
 export interface DictionaryHealingResult {
   scanned: number;
@@ -47,13 +50,26 @@ export async function runDictionaryHealing(
     return result;
   }
 
+  const langs = HEAL_LANGS as unknown as string[];
+
+  // One page per day, rotating, so the whole back-catalogue is re-checked rather than the same first batch.
+  const { count } = await supabase
+    .from('invalid_word_submissions')
+    .select('id', { count: 'exact', head: true })
+    .not('auto_promoted_at', 'is', null)
+    .in('language', langs)
+    .is('rejected_at', null);
+  const pages = Math.max(1, Math.ceil((count ?? 0) / batchSize));
+  const from = (Math.floor(Date.now() / 86_400_000) % pages) * batchSize;
+
   const { data: candidates, error } = await supabase
     .from('invalid_word_submissions')
     .select('id, word, language')
     .not('auto_promoted_at', 'is', null)
-    .in('language', HEAL_LANGS as unknown as string[])
+    .in('language', langs)
     .is('rejected_at', null)
-    .limit(batchSize);
+    .order('id')
+    .range(from, from + batchSize - 1);
 
   if (error) {
     logger.error('DICT_HEAL', `Candidate fetch failed: ${error.message}`);
@@ -67,12 +83,15 @@ export async function runDictionaryHealing(
   for (const row of candidates as Array<{ id: string; word: string; language: string }>) {
     result.scanned++;
     try {
-      if (!(await isOffensiveWord(row.word, row.language))) continue;
+      const reason = (await isOffensiveWord(row.word, row.language))
+        ? 'offensive'
+        : (await isPointerOnlyWord(row.word, row.language)) ? 'pointer_only' : null;
+      if (!reason) continue;
 
-      await demote(supabase, row.id, row.word, row.language);
+      await demote(supabase, row.id, row.word, row.language, reason);
       result.demoted++;
       result.words.push(row.word);
-      logger.warn('DICT_HEAL', `Demoted offensive word: ${row.word} [${row.language}]`);
+      logger.warn('DICT_HEAL', `Demoted ${reason} word: ${row.word} [${row.language}]`);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       logger.error('DICT_HEAL', `Healing failed for "${row.word}": ${msg}`);
@@ -84,9 +103,20 @@ export async function runDictionaryHealing(
   return result;
 }
 
+// Only the pointer-only verdict heals: other rejections (e.g. a Symbol sense on "sea") also hit real words.
+async function isPointerOnlyWord(word: string, language: string): Promise<boolean> {
+  const check =
+    language === 'en' ? verifyWordOnWiktionaryEn(word)
+    : language === 'es' ? verifyWordOnWiktionaryEs(word)
+    : language === 'sv' || language === 'ru' ? verifyWordOnWiktionary(word, language)
+    : null;
+  if (!check) return false;
+  return (await check).partOfSpeechRaw === 'pointer-only';
+}
+
 type Supa = NonNullable<ReturnType<typeof getSupabase>>;
 
-async function demote(supabase: Supa, id: string, word: string, language: string): Promise<void> {
+async function demote(supabase: Supa, id: string, word: string, language: string, reason: string): Promise<void> {
   // 1. canonical DB signal
   await supabase.from('word_scores').delete().eq('word', word).eq('language', language);
   // 2 + 3. evict from both in-memory Sets (immediate)
@@ -95,7 +125,7 @@ async function demote(supabase: Supa, id: string, word: string, language: string
   // 4. blacklist (bots/solver)
   await supabase
     .from('bot_word_blacklist')
-    .upsert({ word, language, reason: 'auto_heal:offensive' }, { onConflict: 'word,language' });
+    .upsert({ word, language, reason: `auto_heal:${reason}` }, { onConflict: 'word,language' });
   // 5. mark the submission rejected so it is never re-promoted
   await supabase
     .from('invalid_word_submissions')

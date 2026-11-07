@@ -19,7 +19,7 @@ import {
   endWordCraftMatch,
   getRemainingTurnTime,
 } from '../modules/wordcraftManager.js';
-import { getCachedTrie } from '../modules/boggleSolver.js';
+import { isValidWordLoaded } from '../dictionary.js';
 import { createWordCraftBoard, createWordCraftBag } from '@/shared/utils/wordcraftBag.js';
 import type {
   WordCraftPlacement,
@@ -217,17 +217,8 @@ export function registerWordCraftHandlers(io: Server, socket: Socket): void {
     const { placements, rack } = validation.data as SubmitMovePayload;
 
     try {
-      // Word validator using cached trie (Shiritori pattern)
-      const wordValidator = async (word: string) => {
-        const trie = getCachedTrie('en'); // TODO: use game language
-        if (!trie) return false;
-        let node = trie as any;
-        for (const char of word.toLowerCase()) {
-          node = node[char];
-          if (!node) return false;
-        }
-        return !!(node && node.isWord === true);
-      };
+      // ponytail: 1v1 racks are English-only (createWordCraftBag); pass the room language once it has one.
+      const wordValidator = (word: string) => isValidWordLoaded(word.toLowerCase(), 'en');
 
       const result = await submitWordCraftMove(
         currentRoomId,

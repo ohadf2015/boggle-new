@@ -42,6 +42,7 @@ export interface AutoPromotionResult {
     wiktionaryBased: string[];
     wiktionaryEsBased: string[];
     wiktionarySvBased: string[];
+    wiktionaryRuBased: string[];
     jishoBased: string[];
   };
 }
@@ -60,7 +61,7 @@ export function _resetLockForTesting(): void {
 export async function runAutoPromotion(): Promise<AutoPromotionResult> {
   if (isRunning) {
     logger.warn('AUTO_PROMOTE', 'Skipped: another run is in progress');
-    return { promoted: 0, failed: 0, blocked: 0, skipped: true, words: { milogBased: [], wiktionaryBased: [], wiktionaryEsBased: [], wiktionarySvBased: [], jishoBased: [] } };
+    return { promoted: 0, failed: 0, blocked: 0, skipped: true, words: { milogBased: [], wiktionaryBased: [], wiktionaryEsBased: [], wiktionarySvBased: [], wiktionaryRuBased: [], jishoBased: [] } };
   }
 
   isRunning = true;
@@ -68,7 +69,7 @@ export async function runAutoPromotion(): Promise<AutoPromotionResult> {
     promoted: 0,
     failed: 0,
     blocked: 0,
-    words: { milogBased: [], wiktionaryBased: [], wiktionaryEsBased: [], wiktionarySvBased: [], jishoBased: [] },
+    words: { milogBased: [], wiktionaryBased: [], wiktionaryEsBased: [], wiktionarySvBased: [], wiktionaryRuBased: [], jishoBased: [] },
   };
 
   try {
@@ -95,6 +96,9 @@ export async function runAutoPromotion(): Promise<AutoPromotionResult> {
     await promoteVerified(supabase, sv, 'sv', 'wiktionary_sv_verified', result.words.wiktionarySvBased, result);
 
     // Path 5: Jisho/JMdict-verified Japanese words (offensive already filtered at verify time)
+    const ru = await getVerifiedWordsForPromotionByLang('ru');
+    await promoteVerified(supabase, ru, 'ru', 'wiktionary_ru_verified', result.words.wiktionaryRuBased, result);
+
     const ja = await getVerifiedWordsForPromotionByLang('ja');
     await promoteVerified(supabase, ja, 'ja', 'jisho_verified', result.words.jishoBased, result);
 

@@ -407,7 +407,7 @@ class Dictionary {
     const sourceWords = nounList && nounList.size > 0 ? nounList : dictionary;
 
     const filtered = Array.from(sourceWords).filter(
-      w => w.length >= minLength && w.length <= maxLength && validator(w)
+      w => w.length >= minLength && w.length <= maxLength && validator(w) && dictionary.has(normalizeWord(w, language))
     );
     if (filtered.length === 0) return [];
 
@@ -512,6 +512,11 @@ export {
 export const load = (): Promise<void> => dictionary.load();
 export const loadEnglishOnly = (): Promise<void> => dictionary.loadEnglishOnly();
 export const isValidWord = (word: string, language: Language): boolean | null => dictionary.isValidWord(word, language);
+/** Loads the language first, so a cold (never loaded) language can't silently reject every word. */
+export const isValidWordLoaded = async (word: string, language: Language): Promise<boolean> => {
+  await dictionary.ensureLanguageLoaded(language);
+  return dictionary.isValidWord(word, language) === true;
+};
 /**
  * Async word validation with Redis cache layer.
  * Checks cache first, falls back to in-memory dictionary, then populates cache.
