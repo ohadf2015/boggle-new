@@ -430,7 +430,7 @@ export function SerpGapSections({ locale }: { locale: string }) {
         <p className="font-neo-body text-sm leading-relaxed text-neo-white sm:text-base">
           Contra humanos no hay niveles: el tablero es el mismo. Si practicas
           solo, hay bots fácil / medio / difícil en{' '}
-          <Link href={`/${locale}/singleplayer?autoStart=bots`} className="text-neo-lime underline">
+          <Link href={`/${locale}/quick-play`} className="text-neo-lime underline">
             modo individual
           </Link>
           . No es una IA de Scrabble 15×15 (Minijuegos, Locura de Letras): busca

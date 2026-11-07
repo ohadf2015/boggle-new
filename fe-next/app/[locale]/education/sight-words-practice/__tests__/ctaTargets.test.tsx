@@ -17,7 +17,7 @@ describe('sight-words-practice Practice-now tiles', () => {
     expect(hrefs).toEqual([
       '/en/daily/word-hunt',
       '/en/daily/word-wheel',
-      '/en/singleplayer',
+      '/en/quick-play',
       '/en/education/duels',
     ]);
     expect(hrefs.some((h) => h?.includes('/teacher'))).toBe(false);

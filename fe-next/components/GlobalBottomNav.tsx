@@ -91,7 +91,7 @@ const DYNAMIC_ROUTES: ReadonlyArray<readonly [string, DynamicSpec]> = [
     ['/settings',           { labelKey: 'nav.settings',     icon: SettingsIcon,   color: 'text-neo-cyan',   glowColor: 'bg-neo-cyan/15' }],
     ['/community',          { labelKey: 'nav.community',    icon: Users2,         color: 'text-neo-lime',   glowColor: 'bg-neo-lime/15' }],
     ['/referrals',          { labelKey: 'nav.referrals',    icon: Gift,           color: 'text-neo-pink',   glowColor: 'bg-neo-pink/15' }],
-    ['/singleplayer',       { labelKey: 'nav.singleplayer', icon: Target,         color: 'text-neo-cyan',   glowColor: 'bg-neo-cyan/15' }],
+    ['/quick-play',         { labelKey: 'nav.singleplayer', icon: Target,         color: 'text-neo-cyan',   glowColor: 'bg-neo-cyan/15' }],
 ];
 
 // SEO landings whose primary intent is "play multiplayer / play with friends".

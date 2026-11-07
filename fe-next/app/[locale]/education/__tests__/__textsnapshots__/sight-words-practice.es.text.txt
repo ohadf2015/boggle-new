@@ -7,7 +7,7 @@ HREFS
 /es/education/duels
 /es/daily/word-hunt
 /es/daily/word-wheel
-/es/singleplayer
+/es/quick-play
 /es/education/duels
 /es/daily/word-hunt
 /es/education

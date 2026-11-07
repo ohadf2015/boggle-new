@@ -7,10 +7,9 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 import Header from '@/components/Header';
 import type { LandingInitialData } from '@/lib/landing/fetchLandingData';
-import { HomeTreeBoot, HomeTreeSlot, useHomeTree } from './homeTree';
-import { FreshPage } from './fresh/FreshPage';
+import { HomeTreeBoot, useHomeTree } from './homeTree';
 import { setFreshPlay } from './fresh/freshPlayBridge';
-import { ReturningHome } from './ReturningHome';
+import { HomePreview } from '@/components/home-preview/HomePreview';
 
 // SSR enabled (code-split only): the authored SEO copy and the /blog interlinks are
 // the landing page's organic-search surface and MUST be in the server HTML — LandingSEOSection's
@@ -35,15 +34,14 @@ interface LandingViewProps {
 }
 
 /**
- * Homepage shell. Fresh visitors (and crawlers) get the one-page FreshPage;
- * returning users keep ReturningHome. The choice is made before paint (see
- * ./homeTree): the server renders both, CSS shows one, the client mounts one.
- * SEO copy + blog interlinks render ONCE below both trees, for everyone.
+ * Homepage shell: one play-first home for everyone (HomePreview). homeTree still
+ * marks returning visitors and the native app before paint, which hides the SEO
+ * tail, FAQ and footer for them (an app home, not a marketing page).
  */
-const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboarding }) => {
+const LandingView: React.FC<LandingViewProps> = ({ onStartOnboarding }) => {
   const { language } = useLanguage();
   const router = useRouter();
-  const tree = useHomeTree();
+  useHomeTree();
   const { playTrack, TRACKS } = useMusic();
 
   // Ambient bed lives on the SHELL, not ReturningHome. Fresh visitors never
@@ -82,13 +80,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
       <HomeTreeBoot />
       <Header />
 
-      <HomeTreeSlot tree={tree} which="fresh">
-        <FreshPage onPlay={onStartOnboarding} />
-      </HomeTreeSlot>
-
-      <HomeTreeSlot tree={tree} which="returning">
-        <ReturningHome initialData={initialData} />
-      </HomeTreeSlot>
+      <HomePreview onPlay={onStartOnboarding} />
 
       {/* How to Play (homepage gauntlet, round 6): a section at the width and
           rhythm of sections 2-6, not a narrow fine-print column. Its steps are

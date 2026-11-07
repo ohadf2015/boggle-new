@@ -84,7 +84,7 @@ export const MODE_META: Record<string, ModeMetaEntry> = {
     // directly by a real consumer (`lib/email/welcomeModes.ts`, the welcome/
     // re-engagement email mode grid), so it must point at where practice
     // actually lives today, not the retired route.
-    titleKey: 'landing.practice', descKey: 'landing.practiceDesc', path: '/singleplayer?autoStart=practice',
+    titleKey: 'landing.practice', descKey: 'landing.practiceDesc', path: '/quick-play?mode=classic',
     Icon: BookOpen, variant: 'cyan', modeImage: '/modes/practice.png', genIcon: '/modes/cubes/practice.png',
     imgScale: 1.6, // sticker fills ~47% of frame → scale up to read full-bleed
   },

@@ -203,7 +203,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
           rank={user ? userRank?.rank_position : undefined}
           score={user ? userRank?.total_score : undefined}
           leaderboard={leaderboard}
-          onPlay={() => router.push(`/${language}/singleplayer`)}
+          onPlay={() => router.push(`/${language}/quick-play`)}
           pending={authLoading || (!!user && rankLoading)}
         >
           {tierPanelEnabled && tierPosition && user?.id && (
@@ -232,7 +232,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
               icon="sparkles"
               action={{
                 label: t('common.playNow'),
-                onClick: () => router.push(`/${language}/singleplayer`),
+                onClick: () => router.push(`/${language}/quick-play`),
                 variant: 'primary',
               }}
             />

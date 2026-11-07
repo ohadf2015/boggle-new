@@ -26,18 +26,15 @@ const LOCALE = ':locale(en|he|sv|ja|es|ru)';
 
 /** @type {RedirectRule[]} */
 export const GAME_ROUTE_ALIASES = [
-  // /play → a solo bot round, which is what "play" with no further intent
-  // means. Explicit ?autoStart=bots, not bare /singleplayer: bare is handled
-  // client-side as bots, and redirectLogic.ts asks entry points to carry the
-  // param so the player skips that client hop.
+  // /play → a random Quick Play round, which is what "play" with no further intent means.
   {
     source: `/${LOCALE}/play`,
-    destination: '/:locale/singleplayer?autoStart=bots',
+    destination: '/:locale/quick-play?mode=random',
     permanent: false,
   },
   {
     source: '/play',
-    destination: '/en/singleplayer?autoStart=bots',
+    destination: '/en/quick-play?mode=random',
     permanent: false,
   },
   // /room → the multiplayer lobby. Next carries the query string through, so a

@@ -82,17 +82,17 @@ describe('retired practice routes', () => {
 
   it('sends the practice hub to a coached single-player round (not bots)', () => {
     // Live bug after #1229: catch-all `:rest*` before the hub made
-    // GET /en/practice → 308 /en/singleplayer (bots). Intent + classic sibling
+    // GET /en/practice → 308 /en/quick-play?mode=classic. Intent + classic sibling
     // both require ?autoStart=coach.
     const rule = match(rules(), '/en/practice');
     expect(rule).toBeDefined();
-    expect(rule?.destination).toBe('/:locale/singleplayer?autoStart=coach');
+    expect(rule?.destination).toBe('/:locale/quick-play?mode=classic');
     expect(rule?.permanent).toBe(true);
   });
 
   it('sends each mode to the real game it was wrapping', () => {
     const all = rules();
-    expect(match(all, '/en/practice/classic')?.destination).toBe('/:locale/singleplayer?autoStart=coach');
+    expect(match(all, '/en/practice/classic')?.destination).toBe('/:locale/quick-play?mode=classic');
     expect(match(all, '/en/practice/wordHunt')?.destination).toBe('/:locale/daily/word-hunt');
     expect(match(all, '/en/practice/wheelRush')?.destination).toBe('/:locale/daily/word-wheel');
   });
@@ -102,7 +102,7 @@ describe('retired practice routes', () => {
     // even a valid practice mode.
     const rule = match(rules(), '/en/practice/brain');
     expect(rule).toBeDefined();
-    expect(rule?.destination).toBe('/:locale/singleplayer');
+    expect(rule?.destination).toBe('/:locale/quick-play');
   });
 
   it('lists hub before catch-all and uses :rest+ so order cannot swallow the hub', () => {
@@ -119,7 +119,7 @@ describe('retired practice routes', () => {
     const all = rules();
     for (const locale of ['he', 'sv', 'ja', 'es', 'ru']) {
       expect(match(all, `/${locale}/practice`)?.destination).toBe(
-        '/:locale/singleplayer?autoStart=coach',
+        '/:locale/quick-play?mode=classic',
       );
       expect(match(all, `/${locale}/practice/wheelRush`)?.destination).toBe(
         '/:locale/daily/word-wheel',

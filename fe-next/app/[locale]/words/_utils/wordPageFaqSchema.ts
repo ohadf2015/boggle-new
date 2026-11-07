@@ -35,7 +35,7 @@ function buildFaqSchema(faqs: FaqItem[]): object {
  */
 export function getStartingWithFaqs(letter: string, totalWords: number, locale: string): object {
   const upper = letter.toUpperCase();
-  const url = `${BASE_URL}/${locale}/singleplayer`;
+  const url = `${BASE_URL}/${locale}/quick-play`;
 
   return buildFaqSchema([
     {
@@ -61,7 +61,7 @@ export function getStartingWithFaqs(letter: string, totalWords: number, locale: 
  * FAQ schema for "N-letter words" pages.
  */
 export function getNLetterWordsFaqs(n: number, totalWords: number, locale: string): object {
-  const url = `${BASE_URL}/${locale}/singleplayer`;
+  const url = `${BASE_URL}/${locale}/quick-play`;
 
   const scoringMap: Record<number, string> = {
     3: '1 point',

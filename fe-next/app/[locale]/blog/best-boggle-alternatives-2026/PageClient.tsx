@@ -336,7 +336,7 @@ export default function BoggleAlternativesPageClient(): React.ReactElement {
                   {content.playDaily}
                 </Button>
               </Link>
-              <Link href={`/${locale}/singleplayer`}>
+              <Link href={`/${locale}/quick-play`}>
                 <Button className="rounded-neo border-3 border-neo-black bg-neo-cyan text-neo-black font-bold shadow-hard hover:shadow-hard-lg">
                   {content.startPracticing}
                 </Button>

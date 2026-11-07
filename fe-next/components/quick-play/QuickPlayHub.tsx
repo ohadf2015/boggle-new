@@ -51,9 +51,10 @@ interface ChallengeInfo {
 interface QuickPlayHubProps {
   challengeId?: string | null;
   backHref?: string;
+  startMode?: WheelSelection | null;
 }
 
-export function QuickPlayHub({ challengeId, backHref }: QuickPlayHubProps) {
+export function QuickPlayHub({ challengeId, backHref, startMode }: QuickPlayHubProps) {
   const { t, language } = useLanguage();
   const { user } = useAuth();
   const { announce } = useAnnouncer();
@@ -78,6 +79,7 @@ export function QuickPlayHub({ challengeId, backHref }: QuickPlayHubProps) {
   const holdCalmUntilResults = useQuickResultsCalmBridge(phase === 'results');
   const loadingRef = useRef(false);
   const wheelHeadingRef = useRef<HTMLHeadingElement>(null);
+  const autoStarted = useRef(false);
   // Track current phase for handleNextRound to guard against stale adapter onQuit calls.
   // If an adapter timer fires onQuit after the game has ended (phase !== 'playing'),
   // the call should be ignored so results don't auto-dismiss.
@@ -199,6 +201,12 @@ export function QuickPlayHub({ challengeId, backHref }: QuickPlayHubProps) {
       loadingRef.current = false;
     }
   }, [challenge, language, roundIndex]);
+
+  useEffect(() => {
+    if (!startMode || challengeId || autoStarted.current) return;
+    autoStarted.current = true;
+    void handlePlay(startMode, 'tap');
+  }, [startMode, challengeId, handlePlay]);
 
   const handleDone = useCallback(
     async (r: QuickRoundResult) => {

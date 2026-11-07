@@ -39,7 +39,7 @@ vi.mock('@/utils/growthTracking', () => ({ trackLandingCtaClick: vi.fn(), trackG
 
 /** Hero PLAY by contract (coached first round), not by label. */
 function heroPlay(container: HTMLElement): HTMLAnchorElement {
-  const a = container.querySelector<HTMLAnchorElement>('[data-fresh-section="hero"] a[href="/en/singleplayer?autoStart=coach"]');
+  const a = container.querySelector<HTMLAnchorElement>('[data-fresh-section="hero"] a[href="/en/quick-play?mode=classic"]');
   if (!a) throw new Error('no hero PLAY link to the coached round');
   return a;
 }
@@ -78,7 +78,7 @@ describe('FreshPage', () => {
 
   it('hero PLAY is a real link to the coached round without JS', () => {
     const { container } = render(<FreshPage />);
-    expect(heroPlay(container)).toHaveAttribute('href', '/en/singleplayer?autoStart=coach');
+    expect(heroPlay(container)).toHaveAttribute('href', '/en/quick-play?mode=classic');
   });
 
   it('with onPlay, PLAY clicks open onboarding instead of navigating', () => {

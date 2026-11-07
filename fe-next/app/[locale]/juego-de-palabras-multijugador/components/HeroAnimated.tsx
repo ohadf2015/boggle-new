@@ -87,7 +87,7 @@ export function HeroAnimated({ locale }: HeroAnimatedProps) {
               <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Link>
             <Link
-              href={`/${locale}/singleplayer?autoStart=bots`}
+              href={`/${locale}/quick-play`}
               className={cn(
                 'inline-flex items-center justify-center gap-2 rounded-neo border-3 border-neo-cyan bg-transparent px-7 py-4 font-neo-display text-base font-black uppercase tracking-wide text-neo-cyan shadow-hard-cyan',
                 'transition-[translate,scale,rotate,transform,background-color] duration-150 hover:-translate-y-0.5 hover:bg-neo-cyan/10 sm:text-lg'

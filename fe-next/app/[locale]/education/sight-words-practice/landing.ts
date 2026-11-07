@@ -10,7 +10,7 @@ const KEYWORDS =
   'sight words practice, dolch sight words, fry sight words, sight word games, sight word activities, high frequency words practice, dolch word list games, fry first 100 words, sight word flashcards online, kindergarten sight words games';
 
 /** Each practice-mode card links to the mode it names. Order matters. */
-const MODE_HREFS = ['/daily/word-hunt', '/daily/word-wheel', '/singleplayer', '/education/duels'];
+const MODE_HREFS = ['/daily/word-hunt', '/daily/word-wheel', '/quick-play', '/education/duels'];
 /**
  * Adapter onto the shared landing shape. The copy above is untouched — this
  * only re-labels it for `components/education/EducationLandingTemplate`.

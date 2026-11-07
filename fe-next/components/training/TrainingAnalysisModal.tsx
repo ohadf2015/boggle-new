@@ -101,7 +101,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
 
   const handleTryAgain = () => {
     triggerHaptic('selection');
-    router.push(`/${language}/singleplayer?autoStart=practice`);
+    router.push(`/${language}/quick-play?mode=classic`);
     onClose();
   };
 

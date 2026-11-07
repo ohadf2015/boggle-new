@@ -26,7 +26,7 @@ const SECTIONS = [
     titleKey: 'sitemap.gameModes',
     fallback: 'Game Modes',
     links: [
-      { href: '/singleplayer', labelKey: 'sitemap.singleplayer', fallback: 'Single Player' },
+      { href: '/quick-play', labelKey: 'sitemap.singleplayer', fallback: 'Single Player' },
       { href: '/multiplayer', labelKey: 'sitemap.multiplayer', fallback: 'Multiplayer' },
       { href: '/daily', labelKey: 'sitemap.daily', fallback: 'Daily Challenge' },
       { href: '/daily/word-hunt', labelKey: 'sitemap.wordHunt', fallback: 'Word Hunt' },

@@ -152,7 +152,7 @@ My most important piece of advice: consistency crushes peaks. A player who holds
       },
     ],
     ctaText: 'Try Blast Mode',
-    ctaLink: '/singleplayer',
+    ctaLink: '/quick-play',
     backToGuides: 'Back to Guides',
   },
   he: {
@@ -267,7 +267,7 @@ My most important piece of advice: consistency crushes peaks. A player who holds
       },
     ],
     ctaText: 'יאללה לנסות בלאסט',
-    ctaLink: '/singleplayer',
+    ctaLink: '/quick-play',
     backToGuides: 'חזרה למדריכים',
   },
   sv: {
@@ -382,7 +382,7 @@ Mitt viktigaste rad: konsekvens krossar toppar. En spelare som håller kombiniv�
       },
     ],
     ctaText: 'Testa Blast-läge',
-    ctaLink: '/singleplayer',
+    ctaLink: '/quick-play',
     backToGuides: 'Tillbaka till guider',
   },
   ja: {
@@ -499,7 +499,7 @@ Mitt viktigaste rad: konsekvens krossar toppar. En spelare som håller kombiniv�
       },
     ],
     ctaText: 'ブラストモードやってみよう',
-    ctaLink: '/singleplayer',
+    ctaLink: '/quick-play',
     backToGuides: 'ガイドに戻る',
   },
   es: {
@@ -628,7 +628,7 @@ Mi consejo mas importante: la consistencia le gana a los picos. Un jugador que m
       },
     ],
     ctaText: 'Prueba el Modo Blast',
-    ctaLink: '/singleplayer',
+    ctaLink: '/quick-play',
     backToGuides: 'Volver a guias',
   },
 };

@@ -6,9 +6,8 @@
  * game — for half its intake the practice hub was where the funnel stopped, not
  * a warm-up. So onboarding now ends inside the actual engine.
  *
- * The first 60 seconds are one coached classic round: find a real short word,
- * then the clock starts. No bots. Play-a-friend stays on that same screen.
- * `/singleplayer?autoStart=bots` is unchanged for people who asked for bots.
+ * The first 60 seconds are one Quick Play classic round, started straight from
+ * the link (no wheel tap).
  *
  * One function, because OnboardingFlow reaches "onboarding done" from three
  * different handlers — style-complete, quick-start, and the Play Now skip. Three
@@ -17,5 +16,5 @@
  */
 
 export function firstGameRoute(language: string): string {
-  return `/${language}/singleplayer?autoStart=coach`;
+  return `/${language}/quick-play?mode=classic`;
 }

@@ -7,11 +7,7 @@
  * terminal destination for half the people it caught, so FTUE now hands players
  * straight to the real engine.
  *
- * `/singleplayer?autoStart=bots` is not a new path — it already exists and is
- * built for exactly this: it auto-starts a real solo-vs-bot round with the
- * first-win config, and once the player has one bot game behind them the SAME
- * url graduates them to multiplayer Quick Play (see useSinglePlayerConfig's
- * returning-player gate). That is the ladder the practice hub was imitating.
+ * It now hands them a Quick Play classic round that starts from the link.
  *
  * This lives in one function because OnboardingFlow reaches "onboarding done"
  * from three separate handlers, and three paths to one outcome that each build
@@ -23,12 +19,12 @@ import { firstGameRoute } from '../firstGameRoute';
 
 describe('firstGameRoute', () => {
   it('sends a new player into a real auto-started game', () => {
-    expect(firstGameRoute('en')).toBe('/en/singleplayer?autoStart=coach');
+    expect(firstGameRoute('en')).toBe('/en/quick-play?mode=classic');
   });
 
   it('keeps the player in their own language', () => {
-    expect(firstGameRoute('he')).toBe('/he/singleplayer?autoStart=coach');
-    expect(firstGameRoute('ja')).toBe('/ja/singleplayer?autoStart=coach');
+    expect(firstGameRoute('he')).toBe('/he/quick-play?mode=classic');
+    expect(firstGameRoute('ja')).toBe('/ja/quick-play?mode=classic');
   });
 
   it('never routes into practice', () => {

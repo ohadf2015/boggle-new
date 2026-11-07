@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { Users } from 'lucide-react';
 import Avatar from '@/components/Avatar';
-import { HOME_PREVIEW_COPY as C } from './copy';
 
 const ROOM_CODE = ['K', '7', 'Q', 'B'];
 const TILE_TILT = ['-rotate-3', 'rotate-2', '-rotate-1', 'rotate-3'];
@@ -80,7 +79,7 @@ export function FriendsBlock({ lang, t, showAvatars }: FriendsBlockProps) {
           href={`/${lang}/multiplayer`}
           className="flex-1 rounded-xl border-[3px] border-black bg-neo-cream px-4 py-2.5 text-center font-neo-display text-sm font-bold whitespace-nowrap text-black shadow-hard-sm active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed lg:py-3.5 lg:text-lg"
         >
-          {C.friendsJoin}
+          {t('homePlay.friendsJoin')}
         </Link>
       </div>
     </section>

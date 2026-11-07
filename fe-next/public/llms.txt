@@ -23,7 +23,7 @@ LexiClash is a free online multiplayer word game and an alternative to Words Wit
 - Practice mode (no timer)
 - Boss battles with cinematic animations
 - Adventure mode with world progression
-- [Play Single Player](https://www.lexiclash.live/en/singleplayer)
+- [Play Single Player](https://www.lexiclash.live/en/quick-play)
 
 ### Daily Challenge
 - New puzzle every day at midnight UTC; same board for every player worldwide (no per-user randomization)
@@ -48,7 +48,7 @@ LexiClash is a free online multiplayer word game and an alternative to Words Wit
 - Fast-paced cascading word game
 - Tiles fall and chain for combos
 - Unique juice effects and animations
-- [Play Blast](https://www.lexiclash.live/en/singleplayer)
+- [Play Blast](https://www.lexiclash.live/en/quick-play)
 
 ### WordCraft
 - Word-strategy grid game (Scrabble-adjacent) with a territory-claiming twist: tiles you play claim cells, and crossing a rival's word captures their cells
@@ -236,7 +236,7 @@ Native-language llms.txt for AI assistants serving non-English queries:
 - [Home](https://www.lexiclash.live/en)
 - [Rules / How to Play](https://www.lexiclash.live/en/rules)
 - [Multiplayer](https://www.lexiclash.live/en/multiplayer)
-- [Single Player](https://www.lexiclash.live/en/singleplayer)
+- [Single Player](https://www.lexiclash.live/en/quick-play)
 - [Daily Challenge](https://www.lexiclash.live/en/daily)
 - [Adventure Mode](https://www.lexiclash.live/en/adventure)
 - [Word Tower](https://www.lexiclash.live/en/word-tower)

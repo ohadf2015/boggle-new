@@ -194,7 +194,7 @@ export default function HowToPlayPageClient({ locale }: HowToPlayPageClientProps
                     <p className="text-neo-white mb-6">{c.cta.subtitle}</p>
                     <div className="flex flex-wrap justify-center gap-3">
                         <Link
-                            href={`/${locale}/singleplayer`}
+                            href={`/${locale}/quick-play`}
                             className="px-5 py-3 bg-neo-cyan text-neo-black font-bold border-3 border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard-pressed transition-shadow"
                         >
                             {c.cta.classic}

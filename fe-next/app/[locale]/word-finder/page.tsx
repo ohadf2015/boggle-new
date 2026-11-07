@@ -179,7 +179,7 @@ export default async function WordFinderPage({ params }: PageProps) {
             LexiClash is a free word game where you race friends or the clock to find words in a letter grid. No download.
           </p>
           <Link
-            href={`/${locale}/singleplayer`}
+            href={`/${locale}/quick-play`}
             className="inline-block px-8 py-3 font-neo-display font-bold text-lg bg-neo-navy text-white border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-pressed transition-shadow duration-100"
           >
             Play LexiClash free

@@ -162,7 +162,7 @@ export default function ImproveSkillsPageClient(): React.ReactElement {
 
           <div className={cn('mt-12 pt-6 border-t', isDarkMode ? 'border-slate-700' : 'border-gray-200')}>
             <div className="flex gap-4">
-              <Link href={`/${locale}/singleplayer`}>
+              <Link href={`/${locale}/quick-play`}>
                 <Button className="rounded-neo border-3 border-neo-black bg-neo-lime text-neo-black font-bold shadow-hard hover:shadow-hard-lg">
                   {content.practiceNow}
                 </Button>
