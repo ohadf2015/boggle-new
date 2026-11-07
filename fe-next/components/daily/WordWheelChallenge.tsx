@@ -43,6 +43,7 @@ import type { WordWheelEffect } from './WordWheelEffectsCanvas';
 import { usePracticeFlag } from '@/hooks/usePracticeFlag';
 import { useDailyModePlayed } from '@/hooks/useDailyModePlayed';
 import { useRewardedAd } from '@/hooks/useRewardedAd';
+import { useInterstitialAd } from '@/hooks/useInterstitialAd';
 import { isNative } from '@/utils/platform';
 import PracticeBadge from '@/components/practice/PracticeBadge';
 import { useDesktopLayout } from '@/hooks/useDesktopLayout';
@@ -120,6 +121,7 @@ const WordWheelChallenge: React.FC = () => {
     onUnsent: (stored) => completionRef.current?.retryUnsent(stored),
     onUnfinishedRun: (run, meta) => completionRef.current?.settleRun(run, meta) ?? { wordsFound: run.wordsFound, score: run.score, timeSeconds: 0 },
   });
+  const { showInterstitial } = useInterstitialAd();
   const completion = useWheelCompletion({
     language: gameLang,
     isPractice,
@@ -130,6 +132,7 @@ const WordWheelChallenge: React.FC = () => {
     setGameActive,
     setGameResult,
     setPhase,
+    showInterstitial,
   });
   completionRef.current = completion;
   const { leaderboardKey, finishing, finishBeatDone } = completion;

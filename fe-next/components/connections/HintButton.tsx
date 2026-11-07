@@ -35,11 +35,13 @@ export default function HintButton({
 }: HintButtonProps) {
   const { t } = useLanguage();
   const [freeHints, setFreeHints] = useState(() => freeHintsRemaining());
+  // The transient `disabled` prop stays off the hook: it would reset the offered latch and re-fire the event.
+  const adButtonShown = !(isAdmin || hintRevealed || !hasHint || freeHints > 0);
   const ad = useRewardedFeatureUnlock({
     placement: 'connections_reveal_hint',
     surface: 'hint',
     onUnlock: onRevealHint,
-    disabled: isAdmin || hintRevealed || disabled || !hasHint,
+    disabled: !adButtonShown,
     context: adContext,
   });
   const { variant, trackExposure } = useExperiment('exp-connections-hint-gate-v1');

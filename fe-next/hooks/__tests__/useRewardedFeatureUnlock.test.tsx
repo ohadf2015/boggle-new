@@ -135,6 +135,16 @@ describe('useRewardedFeatureUnlock', () => {
   // modals, hint buttons at the moment of need), so the wrapper pre-warms the
   // underlying rewarded slot whenever it is enabled — tap→ad must be instant
   // (cold loads on tap lost 36% of retry watches, AdMob audit 2026-07-03).
+  it('tags tap and watch analytics with the placement, not the shared ad unit', () => {
+    renderHook(() =>
+      useRewardedFeatureUnlock({ placement: 'connections_reveal_hint', surface: 'hint', onUnlock: vi.fn() }),
+    );
+    expect(mockRewardedAdReturn._capturedOpts).toMatchObject({
+      surface: 'hint',
+      analyticsSurface: 'connections_reveal_hint',
+    });
+  });
+
   describe('warm passthrough', () => {
     it('passes warm: true to useRewardedAd when enabled', () => {
       renderHook(() =>

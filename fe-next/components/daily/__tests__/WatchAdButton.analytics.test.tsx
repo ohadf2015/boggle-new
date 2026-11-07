@@ -10,9 +10,12 @@ vi.mock('@/utils/growthTracking', () => ({
   trackRewardedAdOffered: vi.fn(),
 }));
 
+const rewardedAdState = vi.hoisted(() => ({ canShowAd: true }));
+
 vi.mock('@/hooks/useRewardedAd', () => ({
   useRewardedAd: () => ({
     status: 'idle',
+    canShowAd: rewardedAdState.canShowAd,
     isAdAvailable: true,
     isPlaceholderCooldown: false,
     showAd: vi.fn(),
@@ -30,7 +33,27 @@ import WatchAdButton from '../WatchAdButton';
 import { trackRewardedAdOffered } from '@/utils/growthTracking';
 
 describe('WatchAdButton analytics', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    rewardedAdState.canShowAd = true;
+  });
+
+  it('renders nothing and fires no offer when no ad can be shown', () => {
+    rewardedAdState.canShowAd = false;
+    const { container } = render(
+      <WatchAdButton t={(k) => k} onCoinsEarned={() => {}} surface="gold_top_up" />,
+    );
+    expect(container).toBeEmptyDOMElement();
+    expect(trackRewardedAdOffered).not.toHaveBeenCalled();
+  });
+
+  it('renders nothing for the card variant when no ad can be shown', () => {
+    rewardedAdState.canShowAd = false;
+    const { container } = render(
+      <WatchAdButton t={(k) => k} onCoinsEarned={() => {}} surface="x" variant="card" />,
+    );
+    expect(container).toBeEmptyDOMElement();
+  });
 
   it('fires trackRewardedAdOffered on mount with caller-supplied surface', () => {
     render(

@@ -38,6 +38,7 @@ import {
   stashPendingActivation,
 } from '@/utils/activationGate';
 import { trackRetentionPlay } from '@/lib/retention/tracking';
+import { signalGameEnded } from '@/lib/ads/gameEndSignal';
 import { consumeAccountFirstGamePending } from '@/lib/retention/accountFirstGame';
 import {
   stampFirstWinClockStart,
@@ -1738,6 +1739,7 @@ export const trackGameEnd = (
   // Game lifecycle ended (either path) — clear active flag so a later pagehide
   // does not double-emit `game_abandoned`.
   markGameInactive();
+  signalGameEnded();
 
   // Activation must land BEFORE game_completed on the same tick. Ordered
   // funnels (PostHog + Growth Radar) with first_game_played → game_completed

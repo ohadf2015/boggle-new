@@ -34,7 +34,7 @@ export function PuzzleActions({ puzzle, state, isAdmin, isDisabled, onGiveUp, on
     placement: 'connections_reveal_answer',
     surface: 'hint',
     onUnlock: onGiveUp,
-    disabled: isAdmin || isDisabled,
+    disabled: isAdmin || (state.status !== 'playing' && state.status !== 'wrong'),
     context: { puzzleId: puzzle.id, difficulty: puzzle.difficulty },
   });
 

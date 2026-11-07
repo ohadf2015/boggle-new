@@ -12,11 +12,16 @@ import {
   interstitialMinGapMs,
 } from '@/lib/families/adPolicy';
 import { noteGameEndedAfterAd, type AdTerminal } from '@/lib/ads/adQuality';
+import { GAME_ENDED_EVENT } from '@/lib/ads/gameEndSignal';
 
 interface AdMobContextValue {
   recordGameEnd: () => void;
+  /** Ad-break screens call this: counts the game unless trackGameEnd already did. */
+  countGameEndAtAdBreak: () => void;
   shouldShowInterstitial: () => boolean;
   recordInterstitialShown: () => void;
+  /** A rewarded ad just played: hold the next interstitial for the same gap. */
+  recordRewardedShown: () => void;
   hasNoAds: () => boolean;
   getConfig: () => AdmobConfig | null;
   whenReady: () => Promise<void>;
@@ -79,19 +84,27 @@ const INTERSTITIAL_TTL_MS = 50 * 60 * 1000;
 // games instead makes the slot reachable; MAX_INTERSTITIALS_PER_SESSION still
 // caps the per-session frequency, and the Families tier gate is untouched.
 const GAME_ENDS_KEY = 'lc_total_game_ends';
+// Lifetime game count at the last interstitial. Slots are "3 games since the
+// last ad", not an exact modulo, because most modes have no screen that shows
+// one: an exact slot landing on Word Tower used to be lost for 3 more games.
+const GAMES_AT_LAST_AD_KEY = 'lc_games_at_last_interstitial';
+const WARMUP_GAMES = 3;
+const GAMES_BETWEEN_INTERSTITIALS = 3;
 
-function readTotalGameEnds(): number {
+function readCount(key: string, fallback: number): number {
   try {
-    const n = Number(localStorage.getItem(GAME_ENDS_KEY));
-    return Number.isFinite(n) && n >= 0 ? Math.floor(n) : 0;
+    const raw = localStorage.getItem(key);
+    if (raw === null) return fallback;
+    const n = Number(raw);
+    return Number.isFinite(n) && n >= 0 ? Math.floor(n) : fallback;
   } catch {
-    return 0; // storage unavailable — degrade to the old session-scoped behaviour
+    return fallback; // storage unavailable — degrade to session-scoped counting
   }
 }
 
-function writeTotalGameEnds(n: number): void {
+function writeCount(key: string, n: number): void {
   try {
-    localStorage.setItem(GAME_ENDS_KEY, String(n));
+    localStorage.setItem(key, String(n));
   } catch {
     // ponytail: best-effort. A failed write just means this game doesn't count.
   }
@@ -116,8 +129,12 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
   // runs exactly once (a bare useRef(readTotalGameEnds()) would hit localStorage
   // on every render); under SSR the read throws and seeds 0, which is the old
   // behaviour and is never rendered, so hydration can't mismatch on it.
-  const [seededGameEnds] = useState(readTotalGameEnds);
-  const totalGameEnds = useRef(seededGameEnds);
+  const [seeded] = useState(() => ({
+    gameEnds: readCount(GAME_ENDS_KEY, 0),
+    atLastAd: readCount(GAMES_AT_LAST_AD_KEY, WARMUP_GAMES),
+  }));
+  const totalGameEnds = useRef(seeded.gameEnds);
+  const gamesAtLastInterstitial = useRef(seeded.atLastAd);
   const interstitialsShown = useRef(0);
   // Wall-clock of the last confirmed show — 0 = none this session.
   const lastInterstitialAt = useRef(0);
@@ -236,16 +253,16 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
   // opportunity: warmup of 3 games, then every 3rd game, capped per session.
   function interstitialSlotDue(): boolean {
     if (interstitialsShown.current >= MAX_INTERSTITIALS_PER_SESSION) return false;
-    if (totalGameEnds.current <= 3) return false;
+    if (totalGameEnds.current <= WARMUP_GAMES) return false;
     if (lastInterstitialAt.current && Date.now() - lastInterstitialAt.current < interstitialMinGapMs(lastInterstitialTerminal.current)) {
       return false;
     }
-    return (totalGameEnds.current - 3) % 3 === 0;
+    return totalGameEnds.current - gamesAtLastInterstitial.current >= GAMES_BETWEEN_INTERSTITIALS;
   }
 
   function recordGameEnd() {
     totalGameEnds.current += 1;
-    writeTotalGameEnds(totalGameEnds.current);
+    writeCount(GAME_ENDS_KEY, totalGameEnds.current);
     // A finished game inside an open ad-outcome window = the player kept
     // playing after the ad (lib/ads/adQuality — Deloitte × AdMob measurement).
     noteGameEndedAfterAd();
@@ -260,7 +277,35 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
   function recordInterstitialShown() {
     interstitialsShown.current += 1;
     lastInterstitialAt.current = Date.now();
+    gamesAtLastInterstitial.current = totalGameEnds.current;
+    writeCount(GAMES_AT_LAST_AD_KEY, totalGameEnds.current);
   }
+
+  function recordRewardedShown() {
+    lastInterstitialAt.current = Date.now();
+  }
+
+  // Every mode reports its end through trackGameEnd, which signals here; the
+  // ref keeps the listener on the latest render's tier without re-subscribing.
+  const signalledGameEnd = useRef(false);
+  function countGameEndAtAdBreak() {
+    if (signalledGameEnd.current) {
+      signalledGameEnd.current = false;
+      return;
+    }
+    recordGameEnd();
+  }
+
+  const recordGameEndRef = useRef(recordGameEnd);
+  recordGameEndRef.current = recordGameEnd;
+  useEffect(() => {
+    const onGameEnded = () => {
+      signalledGameEnd.current = true;
+      recordGameEndRef.current();
+    };
+    window.addEventListener(GAME_ENDED_EVENT, onGameEnded);
+    return () => window.removeEventListener(GAME_ENDED_EVENT, onGameEnded);
+  }, []);
 
   function shouldShowInterstitial(): boolean {
     // Families Ad Format: interstitials only for KNOWN adults (suppresses child
@@ -281,7 +326,7 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
     // Don't even warm an interstitial for non-adults — they can never show one.
     if (shouldSuppressInterstitialForTier(tier)) return false;
     if (interstitialsShown.current >= MAX_INTERSTITIALS_PER_SESSION) return false;
-    return totalGameEnds.current >= 3;
+    return totalGameEnds.current >= WARMUP_GAMES;
   }
 
   function isInterstitialReady(): boolean {
@@ -323,7 +368,7 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AdMobContext.Provider value={{ recordGameEnd, shouldShowInterstitial, recordInterstitialShown, hasNoAds, getConfig, whenReady, prepareInterstitial, isInterstitialReady, consumeInterstitial, noteInterstitialTerminal, ageGatePromptOpportunity }}>
+    <AdMobContext.Provider value={{ recordGameEnd, countGameEndAtAdBreak, shouldShowInterstitial, recordInterstitialShown, recordRewardedShown, hasNoAds, getConfig, whenReady, prepareInterstitial, isInterstitialReady, consumeInterstitial, noteInterstitialTerminal, ageGatePromptOpportunity }}>
       {children}
     </AdMobContext.Provider>
   );
@@ -331,8 +376,10 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
 
 const ADMOB_FALLBACK: AdMobContextValue = {
   recordGameEnd: () => {},
+  countGameEndAtAdBreak: () => {},
   shouldShowInterstitial: () => false,
   recordInterstitialShown: () => {},
+  recordRewardedShown: () => {},
   hasNoAds: () => false,
   getConfig: () => null,
   whenReady: () => Promise.resolve(),

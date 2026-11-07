@@ -326,6 +326,49 @@ describe('useAdMob', () => {
     expect(AdMob.showInterstitial).toHaveBeenCalled();
   });
 
+  it('Given a rewarded ad just played, When the next interstitial slot comes due, Then no interstitial stacks on it', async () => {
+    const wrapper = makeWrapper(true);
+    const { result } = renderHook(() => useAdMob(), { wrapper });
+    await act(async () => {
+      await drainInterstitial(() => result.current.showInterstitial(), 5);
+    });
+    await act(async () => {
+      const p = result.current.showRewarded(vi.fn());
+      await flush();
+      fireEvent('onRewardedVideoAdReward', { type: 'coins', amount: 10 });
+      fireEvent('onRewardedVideoAdDismissed');
+      await p;
+    });
+    vi.mocked(AdMob.showInterstitial).mockClear();
+    clockOffsetMs += 30 * 1000;
+    await act(async () => {
+      await drainInterstitial(() => result.current.showInterstitial(), 1);
+    });
+    expect(AdMob.showInterstitial).not.toHaveBeenCalled();
+  });
+
+  it('Given a rewarded ad was skipped, When it settles, Then the next one is preloaded', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    try {
+      const wrapper = makeWrapper(true);
+      const { result } = renderHook(() => useAdMob(), { wrapper });
+      vi.mocked(AdMob.prepareRewardVideoAd).mockClear();
+      await act(async () => {
+        const p = result.current.showRewarded(vi.fn(), vi.fn());
+        await Promise.resolve();
+        await Promise.resolve();
+        fireEvent('onRewardedVideoAdDismissed');
+        await vi.advanceTimersByTimeAsync(800);
+        await p;
+      });
+      await act(async () => { await vi.advanceTimersByTimeAsync(0); });
+      // One load for the skipped ad, one warm load for the next tap.
+      expect(AdMob.prepareRewardVideoAd).toHaveBeenCalledTimes(2);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('eligible interstitial shows a preloaded ad with no cold load at show time', async () => {
     // Revenue/stability: by show time the ad was already warmed during play, so
     // the show is zero-latency and a show-time no-fill can't burn a session slot.

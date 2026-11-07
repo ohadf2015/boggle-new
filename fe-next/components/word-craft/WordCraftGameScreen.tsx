@@ -11,8 +11,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { useWordCraftGame, type WordCraftState } from '@/lib/word-craft/useWordCraftGame';
-import { useAdMob } from '@/hooks/useAdMob';
-import { isNative } from '@/utils/platform';
+import { useClueAd } from '@/components/word-craft/hooks/useClueAd';
 import { loadWordCraftDictionary } from '@/lib/word-craft/dictionary';
 import { DictStatusChip } from '@/components/word-craft/DictStatusChip';
 import { toWordCraftLocale, type SupportedLocale } from '@/lib/word-craft/tileBag';
@@ -492,7 +491,6 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, daily,
   // 2 free clues per game; once spent, watch a rewarded ad for one more (native
   // only — on web we free-grant so there's never a dead button). A clue reveals
   // the strongest word the player could play, shown as a transient pill.
-  const { showRewarded } = useAdMob();
   const [clueReveal, setClueReveal] = useState<{ word: string; row: number; col: number } | null>(null);
   const [clueMessage, setClueMessage] = useState<string | null>(null);
   const clueTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -513,6 +511,11 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, daily,
     },
     [cosyMode, prefersReducedMotion, juice],
   );
+  const clueAd = useClueAd({
+    grantClue: game.grantClue,
+    cluesRemaining: game.state.cluesRemaining,
+    onFailed: useCallback(() => setClueMessage(t('wordcraft.clue.adFailed')), [t]),
+  });
   const handleClue = useCallback(() => {
     if (game.state.cluesRemaining > 0) {
       const clue = game.requestClue();
@@ -521,18 +524,14 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, daily,
       return;
     }
     // Out of clues → earn one more.
-    if (isNative()) {
-      showRewarded(
-        () => game.grantClue(),
-        () => setClueMessage(t('wordcraft.clue.adFailed')),
-        { surface: 'generic' },
-      );
+    if (clueAd.isAdClue) {
+      if (!clueAd.busy) clueAd.offer();
     } else {
       // Web has no rewarded inventory; grant directly (wordlists are public).
       game.grantClue();
       setClueMessage(t('wordcraft.clue.granted'));
     }
-  }, [game, showClue, showRewarded, t]);
+  }, [game, showClue, clueAd, t]);
   useEffect(() => () => { if (clueTimerRef.current) clearTimeout(clueTimerRef.current); }, []);
 
   // Keyboard shortcuts and arrow-key reticle (declared AFTER the callbacks it consumes)

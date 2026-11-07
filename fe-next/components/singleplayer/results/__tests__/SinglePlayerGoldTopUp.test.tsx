@@ -5,10 +5,12 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import SinglePlayerGoldTopUp from '../components/SinglePlayerGoldTopUp';
 
+const adState = vi.hoisted(() => ({ canShowAd: true }));
+
 vi.mock('@/hooks/useRewardedAd', () => ({
   useRewardedAd: () => ({
     status: 'idle', isAdAvailable: true, isPlaceholderCooldown: false,
-    showAd: vi.fn(), error: null, rewardAmount: 30, canShowAd: true,
+    showAd: vi.fn(), error: null, rewardAmount: 30, canShowAd: adState.canShowAd,
     viewsToday: 0, maxViews: 10, isDailyLimitReached: false,
   }),
   AdStatus: {},
@@ -21,5 +23,12 @@ describe('SinglePlayerGoldTopUp (R7)', () => {
   it('renders WatchAdButton with reward amount', () => {
     render(<SinglePlayerGoldTopUp t={(k: string) => k} />);
     expect(screen.getByText(/30/)).toBeInTheDocument();
+  });
+
+  it('renders nothing when no ad provider can serve (production web)', () => {
+    adState.canShowAd = false;
+    const { container } = render(<SinglePlayerGoldTopUp t={(k: string) => k} />);
+    expect(container).toBeEmptyDOMElement();
+    adState.canShowAd = true;
   });
 });

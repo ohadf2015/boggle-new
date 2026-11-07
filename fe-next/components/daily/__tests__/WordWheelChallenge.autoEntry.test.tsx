@@ -61,6 +61,7 @@ vi.mock('@/utils/dailyChallenge/guestPlayer', () => ({
   getGuestFingerprint: async () => 'guest-fp',
   getGuestDailyPlayer: async () => ({ displayName: 'Guest', avatarEmoji: '🎯', avatarColor: '#fff' }),
 }));
+vi.mock('@/hooks/useInterstitialAd', () => ({ useInterstitialAd: () => ({ showInterstitial: () => Promise.resolve() }) }));
 vi.mock('@/hooks/useRewardedAd', () => ({
   useRewardedAd: () => ({ showAd: vi.fn(), isAdAvailable: true, isPlaceholderCooldown: false, status: 'idle' }),
 }));
