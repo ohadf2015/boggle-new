@@ -20,7 +20,7 @@ export interface ProfileEntryButtonProps {
  * The player's face in the header, one tap from their profile. Presentational
  * (plain props) so the /avatar-test lab can capture it without auth. Uses
  * AvatarLite only — header is first-paint, the full renderer never loads here.
- * 36px under 380px wide: the guest header row measured only 42px free at 360.
+ * 36px on phones (matches the compact header strip), 44px from sm up.
  */
 export default function ProfileEntryButton({ href, label, avatarConfig, userId, level, hasNew, onClick, revision }: ProfileEntryButtonProps) {
   return (
@@ -29,10 +29,10 @@ export default function ProfileEntryButton({ href, label, avatarConfig, userId, 
       onClick={onClick}
       data-testid="header-profile-entry"
       aria-label={label}
-      className="relative shrink-0 flex items-center justify-center w-9 h-9 min-[380px]:w-11 min-[380px]:h-11 rounded-full hover:-translate-y-px active:translate-y-px transition-transform"
+      className="relative shrink-0 flex items-center justify-center w-9 h-9 sm:w-11 sm:h-11 rounded-full hover:-translate-y-px active:translate-y-px transition-transform"
     >
-      <span className="block rounded-full border-3 border-neo-black bg-neo-navy shadow-hard-sm">
-        <AvatarLite customAvatar={avatarConfig} userId={userId} revision={revision} pixelSize={30} className="border-0 min-[380px]:!w-[34px] min-[380px]:!h-[34px]" />
+      <span className="block rounded-full border-2 sm:border-3 border-neo-black bg-neo-navy shadow-hard-sm">
+        <AvatarLite customAvatar={avatarConfig} userId={userId} revision={revision} pixelSize={30} className="border-0 sm:!w-[34px] sm:!h-[34px]" />
       </span>
       {level != null && (
         <span

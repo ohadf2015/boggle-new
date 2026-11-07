@@ -17,7 +17,8 @@ import { Reveal } from '@/components/ui/Reveal';
  * MusicControls - Neo-Brutalist styled volume controls with separate music and SFX sliders
  * Memoized to prevent unnecessary re-renders
  */
-const MusicControls: React.FC = memo(() => {
+/** compact: the 36px phone-header size (main header strip); default stays 44px. */
+const MusicControls: React.FC<{ compact?: boolean }> = memo(({ compact = false }) => {
   const { volume, setVolume, isMuted, toggleMute, isPlaying, audioUnlocked, unlockAudio } = useMusic();
   const { sfxVolume, setSfxVolume, sfxMuted, toggleSfxMute } = useSoundEffects();
   const { t, language } = useLanguage();
@@ -65,7 +66,7 @@ const MusicControls: React.FC = memo(() => {
   }, [hapticsEnabled, setHapticsEnabled]);
 
   // Responsive icon class for consistent sizing with button
-  const iconClass = "w-[18px] h-[18px]";
+  const iconClass = compact ? "w-4 h-4" : "w-[18px] h-[18px]";
 
   // Memoized volume icon
   const volumeIcon = useMemo(() => {
@@ -78,7 +79,7 @@ const MusicControls: React.FC = memo(() => {
     const avgVolume = ((isMuted ? 0 : volume) + (sfxMuted ? 0 : sfxVolume)) / 2;
     if (avgVolume < 0.5) return <Volume1 className={iconClass} strokeWidth={2.5} aria-hidden="true" />;
     return <Volume2 className={iconClass} strokeWidth={2.5} aria-hidden="true" />;
-  }, [hasMounted, isMuted, volume, sfxMuted, sfxVolume]);
+  }, [hasMounted, isMuted, volume, sfxMuted, sfxVolume, iconClass]);
 
   // Volume sliders are pure volume controls. Mute is a separate axis the user
   // toggles via the master button — sliding the volume up while muted should
@@ -139,7 +140,7 @@ const MusicControls: React.FC = memo(() => {
         variant="outline"
         size="icon"
         onClick={handleClick}
-        className={`relative flex items-center justify-center w-10 h-10 min-w-[44px] min-h-[44px] border-3 border-neo-black dark:border-neo-cream rounded-neo shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard active:translate-x-px active:translate-y-px active:shadow-none transition-all duration-100 shrink-0 ${hasMounted && (isMuted || volume === 0) && (sfxMuted || sfxVolume === 0) ? 'bg-slate-200 text-slate-400 dark:bg-slate-600 dark:text-slate-400' : 'bg-neo-cream dark:bg-neo-navy-elevated text-neo-black dark:text-white'}`}
+        className={`relative flex items-center justify-center ${compact ? 'w-9 h-9 min-w-9 min-h-9 border-2' : 'w-10 h-10 min-w-[44px] min-h-[44px] border-3'} border-neo-black dark:border-neo-cream rounded-neo shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard active:translate-x-px active:translate-y-px active:shadow-none transition-all duration-100 shrink-0 ${hasMounted && (isMuted || volume === 0) && (sfxMuted || sfxVolume === 0) ? 'bg-slate-200 text-slate-400 dark:bg-slate-600 dark:text-slate-400' : 'bg-neo-cream dark:bg-neo-navy-elevated text-neo-black dark:text-white'}`}
         aria-label={hasMounted ? (isMuted ? (t('music.unmute')) : (t('music.mute'))) : (t('music.mute'))}
         aria-pressed={hasMounted ? !isMuted : true}
         title={hasMounted ? (isMuted ? (t('music.soundOff')) : (t('music.soundOn'))) : (t('music.sound'))}

@@ -82,4 +82,13 @@ describe('PlayHero', () => {
       '/he/quick-play?mode=wheel-rush',
     ]);
   });
+
+  it('given the hero, then the 60-second badge is a one-line pill so the label never wraps or clips', () => {
+    renderHero();
+    const badge = screen.getByTestId('hp-timer-badge');
+    expect(badge.textContent).toBe(en.homePlay.timerBadge);
+    expect(badge.className).toContain('whitespace-nowrap');
+    expect(badge.className).not.toMatch(/\bw-14\b|\bh-14\b/);
+    expect(badge.getAttribute('aria-hidden')).toBe('true');
+  });
 });
