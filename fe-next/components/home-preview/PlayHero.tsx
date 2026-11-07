@@ -1,7 +1,7 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
-import { Bot } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { ModeGlyph } from '@/components/quick-play/ModeGlyph';
 import { RandomGlyph } from '@/components/quick-play/RandomGlyph';
@@ -10,6 +10,8 @@ import { NODE_COLORS } from '@/components/quick-play/modeColors';
 import type { QuickMode } from '@/components/quick-play/types';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { HOME_PREVIEW_COPY as C } from './copy';
+import { EditAvatarButton } from './EditAvatarButton';
+import { HeroQuickLinks } from './HeroQuickLinks';
 
 const MODES: QuickMode[] = ['classic', 'blast', 'word-hunt', 'wheel-rush'];
 const KEY_TILT = ['-rotate-2', 'rotate-1', '-rotate-1', 'rotate-2'];
@@ -20,14 +22,18 @@ interface PlayHeroProps {
   animate: boolean;
   avatar: { userId: string; customAvatar: CustomAvatarConfig | null } | null;
   greeting: string;
+  streak: number;
+  streakLoading: boolean;
+  onAvatarSaved: (config: CustomAvatarConfig) => void;
 }
 
-function AvatarStage({ avatar, animate }: Pick<PlayHeroProps, 'avatar' | 'animate'>) {
+function AvatarStage({ avatar, animate, t, onAvatarSaved }: Pick<PlayHeroProps, 'avatar' | 'animate' | 't' | 'onAvatarSaved'>) {
   return (
     <div className="relative flex h-[224px] w-full items-center [@media(max-height:700px)]:h-[150px] justify-center lg:h-[520px] 2xl:h-[600px]">
       <QuickResultsRays color={NODE_COLORS.classic.hex} spinning={animate} />
       <SparkleLoop enabled={animate} />
-      <div className={`relative z-10 [@media(max-height:700px)]:scale-[0.7] ${animate ? 'animate-[qp-avatar-pop_0.7s_cubic-bezier(0.3,0.9,0.4,1)_both]' : ''}`}>
+      <div className="relative z-10">
+      <div className={`relative [@media(max-height:700px)]:scale-[0.7] ${animate ? 'animate-[qp-avatar-pop_0.7s_cubic-bezier(0.3,0.9,0.4,1)_both]' : ''}`}>
         <div className={animate ? 'animate-[qp-avatar-bob_2.8s_ease-in-out_0.9s_infinite]' : ''}>
           {avatar ? (
             <>
@@ -51,6 +57,29 @@ function AvatarStage({ avatar, animate }: Pick<PlayHeroProps, 'avatar' | 'animat
             animate ? 'animate-[qp-shadow-bob_2.8s_ease-in-out_0.9s_infinite]' : ''
           }`}
         />
+        <span
+          aria-hidden="true"
+          className="absolute -start-[64px] bottom-0 -z-10 -rotate-12 lg:-start-[96px] lg:bottom-0 2xl:-start-[110px]"
+        >
+          <span className={`block ${animate ? 'animate-[qp-avatar-bob_2.2s_ease-in-out_0.4s_infinite]' : ''}`}>
+            <Image
+              src="/mascot/hello-nobg.webp"
+              alt=""
+              width={320}
+              height={320}
+              data-testid="hp-mascot"
+              loading="eager"
+              unoptimized
+              className="h-[108px] w-[108px] drop-shadow-[0_3px_0_black] lg:h-[160px] lg:w-[160px] 2xl:h-[190px] 2xl:w-[190px]"
+            />
+          </span>
+        </span>
+      </div>
+      {avatar && (
+        <div className="absolute end-1 bottom-2 z-20 [@media(max-height:700px)]:end-7 [@media(max-height:700px)]:bottom-8 lg:-end-4 lg:bottom-6">
+          <EditAvatarButton t={t} config={avatar.customAvatar} onSaved={onAvatarSaved} />
+        </div>
+      )}
       </div>
       <span
         aria-hidden="true"
@@ -62,7 +91,7 @@ function AvatarStage({ avatar, animate }: Pick<PlayHeroProps, 'avatar' | 'animat
   );
 }
 
-export function PlayHero({ lang, t, animate, avatar, greeting }: PlayHeroProps) {
+export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoading, onAvatarSaved }: PlayHeroProps) {
   const href = `/${lang}/quick-play`;
   return (
     <section
@@ -71,7 +100,7 @@ export function PlayHero({ lang, t, animate, avatar, greeting }: PlayHeroProps) 
       data-testid="hp-hero"
     >
       <div className="relative mx-auto grid w-full max-w-md gap-3 px-4 pb-5 lg:max-w-none lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-10 lg:px-14 lg:py-12">
-        <AvatarStage avatar={avatar} animate={animate} />
+        <AvatarStage avatar={avatar} animate={animate} t={t} onAvatarSaved={onAvatarSaved} />
 
         <div className="relative z-10 flex flex-col gap-3 lg:gap-6">
           <div className="text-center lg:text-start">
@@ -128,19 +157,7 @@ export function PlayHero({ lang, t, animate, avatar, greeting }: PlayHeroProps) 
             </ul>
           </div>
 
-          <Link
-            href={href}
-            data-testid="hp-bots"
-            className="flex items-center gap-2.5 self-center rounded-full border-[3px] border-neo-white/25 py-1.5 ps-1.5 pe-4 text-neo-cream active:translate-y-0.5 lg:self-start"
-          >
-            <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-black bg-neo-cyan text-black">
-              <Bot className="h-5 w-5" strokeWidth={2.5} aria-hidden="true" />
-            </span>
-            <span className="flex flex-col leading-tight">
-              <span className="font-neo-display text-sm font-bold lg:text-base">{t('hostView.soloPrompt.cta')}</span>
-              <span className="text-[11px] text-neo-white/60 lg:text-sm">{C.botsNote}</span>
-            </span>
-          </Link>
+          <HeroQuickLinks lang={lang} streak={streak} streakLoading={streakLoading} />
         </div>
       </div>
     </section>

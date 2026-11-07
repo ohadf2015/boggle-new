@@ -60,7 +60,16 @@ export function HomePreview() {
       </header>
 
       <div className="mx-auto w-full lg:max-w-[1600px] lg:px-14 lg:pt-6">
-        <PlayHero lang={language} t={tt} animate={animate} avatar={avatar} greeting={greeting} />
+        <PlayHero
+          lang={language}
+          t={tt}
+          animate={animate}
+          avatar={avatar}
+          greeting={greeting}
+          streak={streak}
+          streakLoading={streakLoading}
+          onAvatarSaved={setGuestAvatar}
+        />
       </div>
 
       <div className="mx-auto mt-8 grid w-full max-w-md gap-8 px-4 lg:mt-14 lg:max-w-[1600px] lg:grid-cols-12 lg:gap-10 lg:px-14">
