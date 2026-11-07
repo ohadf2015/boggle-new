@@ -179,12 +179,13 @@ describe('ArenaList', () => {
     expect(tail.className).not.toMatch(/(^|\s)hidden(\s|$)/);
   });
 
-  it("a row's seat icon and chevron scale with its TV type, not stay phone-sized", () => {
+  it("a row's seat icon and JOIN pill scale with its TV type, not stay phone-sized", () => {
     render(<ArenaList {...base} rooms={rooms(1)} />);
     const seatsIcon = screen.getByTestId('arena-row-seats').querySelector('svg')!;
     expect(seatsIcon.getAttribute('class')).toMatch(/(^|\s)tv:h-5(\s|$)/);
-    const chevron = screen.getByTestId('arena-row-seats').nextElementSibling!;
-    expect(chevron.getAttribute('class')).toMatch(/(^|\s)tv:h-6(\s|$)/);
+    const join = screen.getByTestId('arena-row-join');
+    expect(join.className).toMatch(/(^|\s)tv:text-lg(\s|$)/);
+    expect(join.querySelector('svg')!.getAttribute('class')).toMatch(/(^|\s)tv:h-5(\s|$)/);
   });
 
   it("the tail's mascot loads eagerly — with a short list it is the phone's LCP element", () => {

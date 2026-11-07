@@ -20659,6 +20659,7 @@ const ja = {
       "emptyInLanguage": "いま{{language}}で参加できるゲームはありません",
       "startOne": "自分で始める",
       "openElsewhere": "{{language}}なら{{count}}件あります",
+      "joinRow": "参加",
       "roomLanguage": "ルームの言語",
       "languageChip": "{{language}}：{{count}}件",
       "emptyLine": "クイックスタートならボットが席を埋めます",

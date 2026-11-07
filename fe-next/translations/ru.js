@@ -20359,6 +20359,7 @@ const ru = {
       "emptyInLanguage": "Сейчас нет открытых игр (язык: {{language}})",
       "startOne": "Начать свою",
       "openElsewhere": "Открыто {{count}} · язык: {{language}}",
+      "joinRow": "Войти",
       "roomLanguage": "Язык комнаты",
       "languageChip": "{{language}}: открыто {{count}}",
       "emptyLine": "Быстрый старт заполнит места ботами",

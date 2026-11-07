@@ -19704,6 +19704,7 @@ const en = {
       "emptyInLanguage": "No open games in {{language}} right now",
       "startOne": "Start one",
       "openElsewhere": "{{count}} open in {{language}}",
+      "joinRow": "Join",
       "roomLanguage": "Room language",
       "languageChip": "{{language}}: {{count}} open",
       "emptyLine": "Quick Start fills the seats with bots",

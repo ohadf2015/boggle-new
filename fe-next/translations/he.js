@@ -20589,6 +20589,7 @@ const he = {
       "emptyInLanguage": "אין כרגע משחקים פתוחים ב{{language}}",
       "startOne": "פתחו משחק",
       "openElsewhere": "{{count}} פתוחים ב{{language}}",
+      "joinRow": "הצטרפו",
       "roomLanguage": "שפת החדר",
       "languageChip": "{{language}}: {{count}} פתוחים",
       "emptyLine": "התחלה מהירה ממלאת את המקומות בבוטים",

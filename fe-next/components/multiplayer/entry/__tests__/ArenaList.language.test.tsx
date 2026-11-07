@@ -86,6 +86,18 @@ describe('ArenaList language filter', () => {
     expect(empty.querySelector('a')).toBeNull();
   });
 
+  it('Given a joinable and a full room, When listed, Then only the joinable row shows a JOIN pill', () => {
+    renderList({ rooms: [room('OPEN', 'en'), room('FULL', 'en', { playerCount: 8, maxPlayers: 8 })] });
+    const pill = (code: string) => screen.getByRole('button', { name: new RegExp(code) }).querySelector('[data-testid="arena-row-join"]');
+    expect(pill('OPEN')?.textContent).toBe('mpUi.entry.joinRow');
+    expect(pill('FULL')).toBeNull();
+  });
+
+  it('Given the filter is a language no chip offers any more, When rendered, Then that language still has its active chip', () => {
+    renderList({ rooms: [], language: 'ru' });
+    expect(screen.getByTestId('arena-lang-ru')).toHaveAttribute('aria-pressed', 'true');
+  });
+
   it('Given a full room, When its row is pressed, Then no join is attempted', () => {
     const p = renderList({ rooms: [room('FULL', 'en', { playerCount: 8, maxPlayers: 8 })] });
     const row = screen.getByRole('button', { name: /FULL/ });

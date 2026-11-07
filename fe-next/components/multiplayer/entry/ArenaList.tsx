@@ -58,7 +58,10 @@ export function ArenaList({
   );
   const online = useMemo(() => shown.reduce((sum, r) => sum + (r.playerCount || 0), 0), [shown]);
   const counts = useMemo(() => countByLanguage(rooms), [rooms]);
-  const choices = useMemo(() => arenaLanguages(rooms, uiLocale as Language), [rooms, uiLocale]);
+  const choices = useMemo(() => {
+    const base = arenaLanguages(rooms, uiLocale as Language);
+    return base.includes(language) ? base : [...base, language];
+  }, [rooms, uiLocale, language]);
   const elsewhere = useMemo(() => {
     let best: Language | null = null;
     for (const code of choices) {

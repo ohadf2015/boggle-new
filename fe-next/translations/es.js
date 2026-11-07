@@ -20671,6 +20671,7 @@ const es = {
       "emptyInLanguage": "Ahora mismo no hay partidas abiertas en {{language}}",
       "startOne": "Crea una",
       "openElsewhere": "{{count}} abiertas en {{language}}",
+      "joinRow": "Entrar",
       "roomLanguage": "Idioma de la sala",
       "languageChip": "{{language}}: {{count}} abiertas",
       "emptyLine": "Inicio rápido llena los asientos con bots",

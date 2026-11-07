@@ -20659,6 +20659,7 @@ const sv = {
       "emptyInLanguage": "Inga öppna spel på {{language}} just nu",
       "startOne": "Starta ett",
       "openElsewhere": "{{count}} öppna på {{language}}",
+      "joinRow": "Gå med",
       "roomLanguage": "Rummets språk",
       "languageChip": "{{language}}: {{count}} öppna",
       "emptyLine": "Snabbstart fyller platserna med botar",
