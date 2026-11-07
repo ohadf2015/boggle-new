@@ -1,8 +1,8 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, cleanup } from '@testing-library/react';
+import { render, screen, cleanup, fireEvent } from '@testing-library/react';
 
-const tMock = vi.fn((key: string) => key);
+const tMock = vi.fn((key: string, _p?: Record<string, unknown>) => key);
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: tMock, dir: 'ltr', language: 'en' }),
 }));
@@ -24,66 +24,43 @@ vi.mock('next/link', () => ({
 
 import ArenaEmptyState from '../ArenaEmptyState';
 
-/**
- * MP rebuild (DESIGN §b.1): the empty state is ONE mascot line — "No open
- * arenas — Quick Start fills the seats with bots" — and no buttons. The old
- * QUICK PLAY / DAILY CHALLENGE CTAs competed with the footer's QUICK START
- * (four lime/pink CTAs on one phone screen) and DAILY linked out of MP.
- */
-describe('ArenaEmptyState (one mascot line, no buttons)', () => {
+const props = { languageName: 'Hebrew', onStart: vi.fn() };
+
+describe('ArenaEmptyState', () => {
   beforeEach(() => {
     tMock.mockClear();
+    props.onStart.mockClear();
   });
   afterEach(() => {
     cleanup();
   });
 
-  it('renders the spectating mascot, headline and the bots line', () => {
-    const { container } = render(<ArenaEmptyState />);
+  it('Given no rooms in a language, When shown, Then the mascot and a line naming that language render', () => {
+    const { container } = render(<ArenaEmptyState {...props} />);
     expect(screen.getByTestId('arena-empty-state')).toBeInTheDocument();
-    expect(screen.getByText('mpUi.entry.emptyTitle')).toBeInTheDocument();
+    expect(tMock).toHaveBeenCalledWith('mpUi.entry.emptyInLanguage', { language: 'Hebrew' });
     expect(screen.getByText('mpUi.entry.emptyLine')).toBeInTheDocument();
-    const mascot = container.querySelector('img');
-    expect(mascot).toHaveAttribute('src', '/mascot/spectating.webp');
+    expect(container.querySelector('img')).toHaveAttribute('src', '/mascot/spectating.webp');
   });
 
-  // With no open arena the mascot is the entry's LCP element (Next warned in
-  // dev); a lazy image would start loading only after layout.
-  it('loads the mascot eagerly — it is the LCP element of an empty entry', () => {
-    const { container } = render(<ArenaEmptyState />);
+  // With no open arena the mascot is the entry's LCP element; a lazy image would start loading only after layout.
+  it('loads the mascot eagerly', () => {
+    const { container } = render(<ArenaEmptyState {...props} />);
     expect(container.querySelector('img')).toHaveAttribute('loading', 'eager');
   });
 
-  it('renders no buttons or links (the footer owns QUICK START; nothing leaves MP)', () => {
-    const { container } = render(<ArenaEmptyState />);
-    expect(screen.queryAllByRole('button')).toHaveLength(0);
+  it('Given the empty state, When START ONE is pressed, Then it starts a room and nothing links out of MP', () => {
+    const { container } = render(<ArenaEmptyState {...props} />);
+    fireEvent.click(screen.getByTestId('arena-empty-start'));
+    expect(props.onStart).toHaveBeenCalledTimes(1);
+    expect(screen.getAllByRole('button')).toHaveLength(1);
     expect(container.querySelector('a')).toBeNull();
-    expect(screen.queryByText('mp.dailyChallengeAction')).toBeNull();
   });
 
-  it('does NOT render mode-teaser chips (decluttered)', () => {
-    render(<ArenaEmptyState />);
-    expect(screen.queryByText('multiplayerFlow.roomList.gameModes.classic')).toBeNull();
-    expect(screen.queryByText('multiplayerFlow.roomList.gameModes.blast')).toBeNull();
-    expect(screen.queryByText('multiplayerFlow.roomList.gameModes.wordHunt')).toBeNull();
-    expect(screen.queryByText('multiplayerFlow.roomList.gameModes.wheelRush')).toBeNull();
-  });
-
-  // spectating.webp carries its own dark backdrop, a box a shade off the page
-  // navy (visible at TV size). Lightening it into a navy group erases the box.
-  it('the sticker blends into a navy group of its own, so its baked box never shows', () => {
-    const { container } = render(<ArenaEmptyState />);
-    const img = container.querySelector('img')!;
-    expect(img.className).toMatch(/(^|\s)mix-blend-lighten(\s|$)/);
-    const group = img.parentElement!;
-    expect(group.className).toMatch(/(^|\s)isolate(\s|$)/);
-    expect(group.className).toMatch(/(^|\s)bg-neo-navy(\s|$)/);
-  });
-
-  it('mascot image is decorative (empty alt)', () => {
-    const { container } = render(<ArenaEmptyState />);
-    const mascot = container.querySelector('img');
-    expect(mascot).toHaveAttribute('alt', '');
-    expect(screen.queryByRole('img')).toBeNull();
+  it('Given rooms open in another language, When shown, Then a chip switches to it', () => {
+    const onSwitch = vi.fn();
+    render(<ArenaEmptyState {...props} elsewhere={{ flag: 'x', name: 'English', count: 2, onSwitch }} />);
+    fireEvent.click(screen.getByTestId('arena-empty-elsewhere'));
+    expect(onSwitch).toHaveBeenCalled();
   });
 });

@@ -71,7 +71,7 @@ export const ArenaRow = memo(function ArenaRow({ room, joining, locked, onPick }
       data-code={room.gameCode}
       aria-label={t('multiplayerFlow.roomList.joinRoomAction', { roomName: title })}
       aria-busy={joining}
-      disabled={locked}
+      disabled={locked || full}
       onClick={() => onPick(room)}
       onKeyDown={(e) => {
         if (e.key === 'ArrowDown') moveFocus(e, 1);

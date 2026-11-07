@@ -5,7 +5,7 @@ import { Plus } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useNetworkState } from '@/hooks/useNetworkState';
 import CrazyGamesFriendsStrip from '@/components/multiplayer/CrazyGamesFriendsStrip';
-import type { ActiveRoom } from '@/shared/types/game';
+import type { ActiveRoom, Language } from '@/shared/types/game';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { EntryIdentity } from './entry/EntryIdentity';
 import { CodeEntry } from './entry/CodeEntry';
@@ -30,6 +30,10 @@ export interface RoomListViewProps {
   profileAvatar?: CustomAvatarConfig | null;
   /** Admin-only ranked queue control. */
   rankedSlot?: ReactNode;
+  roomLanguage: Language;
+  onRoomLanguageChange: (language: Language) => void;
+  /** Empty list's START ONE (CREATE in roomLanguage). */
+  onStartRoom: () => void;
 }
 
 /**
@@ -53,6 +57,9 @@ const RoomListView: React.FC<RoomListViewProps> = ({
   displayName = '',
   profileAvatar = null,
   rankedSlot,
+  roomLanguage,
+  onRoomLanguageChange,
+  onStartRoom,
 }) => {
   const { t, dir } = useLanguage();
   // Same offline guard as the footer CTAs (ArenaCTAStrip): a tap that cannot work stays inert.
@@ -89,6 +96,9 @@ const RoomListView: React.FC<RoomListViewProps> = ({
         onRoomClick={onRoomClick}
         onRefresh={onRefreshRooms}
         fetchTimedOut={roomFetchTimedOut}
+        language={roomLanguage}
+        onLanguageChange={onRoomLanguageChange}
+        onStartRoom={onStartRoom}
       />
     </div>
   );

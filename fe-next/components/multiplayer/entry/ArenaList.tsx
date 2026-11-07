@@ -7,6 +7,10 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import ArenaEmptyState from '@/components/multiplayer/ArenaEmptyState';
 import { trackMpRoomJoinBlocked, trackMpRoomJoinClicked } from '@/utils/posthogEngagement';
 import { cn } from '@/lib/utils';
+import type { Language } from '@/shared/types/game';
+import { LANGUAGE_FLAGS } from '@/lib/languageConfig';
+import { arenaLanguages, countByLanguage, languageDisplayName, roomsInLanguage } from './arenaLanguage';
+import { ArenaLanguageFilter } from './ArenaLanguageFilter';
 import { ArenaRow, isRoomFull, isRoomLive, type ArenaRoom } from './ArenaRow';
 import { EntrySheet } from './EntrySheet';
 import './arenaList.css';
@@ -23,6 +27,11 @@ interface ArenaListProps {
   onRefresh: () => void;
   fetchTimedOut?: boolean;
   className?: string;
+  /** Board language the list shows; rooms in other languages wait behind the chips. */
+  language: Language;
+  onLanguageChange: (language: Language) => void;
+  /** Empty state's START ONE: opens CREATE in the filtered language. */
+  onStartRoom: () => void;
 }
 
 /** Joinable first (waiting, seats free), then live, then full; server order within each (stable sort). */
@@ -36,15 +45,27 @@ function rank(r: ArenaRoom): number {
  * OPEN ARENAS (DESIGN §b.1). The list never extends the page: phone shows 4
  * rows, desktop/TV 8, and a "+N more" chip opens every room in an MpSheet.
  */
-export function ArenaList({ rooms, loading, joiningRoomCode, onRoomClick, onRefresh, fetchTimedOut, className }: ArenaListProps) {
-  const { t } = useLanguage();
+export function ArenaList({
+  rooms, loading, joiningRoomCode, onRoomClick, onRefresh, fetchTimedOut, className, language, onLanguageChange, onStartRoom,
+}: ArenaListProps) {
+  const { t, language: uiLocale } = useLanguage();
   const [showAll, setShowAll] = useState(false);
 
+  const shown = useMemo(() => roomsInLanguage(rooms, language), [rooms, language]);
   const sorted = useMemo(
-    () => [...rooms].sort((a, b) => rank(a) - rank(b)),
-    [rooms],
+    () => [...shown].sort((a, b) => rank(a) - rank(b)),
+    [shown],
   );
-  const online = useMemo(() => rooms.reduce((sum, r) => sum + (r.playerCount || 0), 0), [rooms]);
+  const online = useMemo(() => shown.reduce((sum, r) => sum + (r.playerCount || 0), 0), [shown]);
+  const counts = useMemo(() => countByLanguage(rooms), [rooms]);
+  const choices = useMemo(() => arenaLanguages(rooms, uiLocale as Language), [rooms, uiLocale]);
+  const elsewhere = useMemo(() => {
+    let best: Language | null = null;
+    for (const code of choices) {
+      if (code !== language && (counts[code] ?? 0) > (best ? counts[best] ?? 0 : 0)) best = code;
+    }
+    return best;
+  }, [choices, counts, language]);
   const locked = joiningRoomCode != null;
 
   const pick = (room: ArenaRoom) => {
@@ -96,6 +117,8 @@ export function ArenaList({ rooms, loading, joiningRoomCode, onRoomClick, onRefr
         </button>
       </div>
 
+      <ArenaLanguageFilter languages={choices} counts={counts} value={language} onChange={onLanguageChange} />
+
       {fetchTimedOut && !loading && rooms.length === 0 && (
         <div className="flex items-center justify-between gap-3 rounded-neo border-2 border-neo-red bg-neo-navy-light px-3 py-2">
           <p className="text-xs font-bold text-neo-white">{t('multiplayerFlow.roomList.fetchTimeout')}</p>
@@ -122,7 +145,20 @@ export function ArenaList({ rooms, loading, joiningRoomCode, onRoomClick, onRefr
           ))}
         </div>
       ) : sorted.length === 0 ? (
-        <ArenaEmptyState />
+        <ArenaEmptyState
+          languageName={languageDisplayName(language, uiLocale)}
+          onStart={onStartRoom}
+          elsewhere={
+            elsewhere
+              ? {
+                  flag: LANGUAGE_FLAGS[elsewhere] || '🌐',
+                  name: languageDisplayName(elsewhere, uiLocale),
+                  count: counts[elsewhere] ?? 0,
+                  onSwitch: () => onLanguageChange(elsewhere),
+                }
+              : undefined
+          }
+        />
       ) : (
         <>
           <ul role="list" aria-label={t('multiplayerFlow.roomList.roomsListLabel')} className="flex min-h-0 flex-col gap-2 overflow-y-auto overscroll-contain p-0.5">
