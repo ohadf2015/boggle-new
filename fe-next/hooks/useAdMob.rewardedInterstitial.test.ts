@@ -49,6 +49,8 @@ const getConfig = vi.fn();
 vi.mock('@/contexts/AdMobContext', () => ({
   useAdMobContext: () => ({
     recordGameEnd: vi.fn(),
+    countGameEndAtAdBreak: vi.fn(),
+    recordRewardedShown: vi.fn(),
     shouldShowInterstitial: () => false,
     recordInterstitialShown: vi.fn(),
     noteInterstitialTerminal: vi.fn(),
