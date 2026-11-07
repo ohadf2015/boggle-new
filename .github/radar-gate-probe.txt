@@ -1,1 +1,3 @@
 Temporary probe. Do not merge. Proves a radar/* PR opened by the write-user token reports ci-success without an action_required hold.
+
+Probe 2. Close, do not merge.
