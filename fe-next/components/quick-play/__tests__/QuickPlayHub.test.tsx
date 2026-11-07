@@ -13,19 +13,10 @@ vi.mock('@/lib/analytics/lazyPosthog', () => ({ default: { capture: vi.fn() } })
 vi.mock('@/components/ui/BackButton', () => ({
   BackButton: ({ label }: any) => <button data-testid="mock-back">{label}</button>,
 }));
+const goBack = vi.fn();
 vi.mock('@/hooks/useBackOneLevel', () => ({
-  useBackOneLevel: () => vi.fn(),
+  useBackOneLevel: () => goBack,
 }));
-vi.mock('../QuickPlayModePicker', () => ({
-  QuickPlayModePicker: ({ onSelect, pendingMode }: any) => (
-    <div data-testid="mock-picker" data-pending-mode={pendingMode ?? ''}>
-      <button data-testid="mock-select" onClick={() => onSelect('blast', 'tap')}>sel</button>
-      <button data-testid="mock-play" onClick={() => onSelect('random', 'tap')}>play</button>
-      {pendingMode && <div data-testid="quick-play-loading">loading</div>}
-    </div>
-  ),
-}));
-
 // Speed up the strike/loading hold so tests stay snappy; still assert it runs.
 vi.mock('../lightningPath', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../lightningPath')>();
@@ -47,18 +38,18 @@ vi.mock('../adapters/QuickModeAdapter', () => ({
     }, [onQuit, config.durationSec]);
     return (
       <>
-        <button
-          data-testid="mock-finish"
-          onClick={() =>
-            onDone({
-              mode: config.mode, seed: config.seed, score: 340, perfectScore: 500,
-              scorePct: 68, wordsFound: 7, totalWords: 12, durationMs: 60000,
-            })
-          }
-        >
-          finish
-        </button>
-        <button data-testid="mock-quit" onClick={() => onQuit()}>quit</button>
+      <button data-testid="mock-quit" onClick={() => onQuit()}>quit</button>
+      <button
+        data-testid="mock-finish"
+        onClick={() =>
+          onDone({
+            mode: config.mode, seed: config.seed, score: 340, perfectScore: 500,
+            scorePct: 68, wordsFound: 7, totalWords: 12, durationMs: 60000,
+          })
+        }
+      >
+        finish
+      </button>
       </>
     );
   },
@@ -102,67 +93,39 @@ describe('QuickPlayHub', () => {
     vi.clearAllMocks();
   });
 
-  it('starts on the wheel', () => {
+  it('never shows a mode picker: opening the hub starts a random round', async () => {
     render(<QuickPlayHub />);
     expect(screen.getByTestId('quick-play-hub')).toBeTruthy();
-  });
-
-  it('reserves the bottom band OUTSIDE the centred picker column', () => {
-    render(<QuickPlayHub />);
-    const spacer = screen.getByTestId('quick-picker-bottom-spacer');
-    expect(spacer.getAttribute('aria-hidden')).toBe('true');
-    expect(spacer.className).toContain('h-[calc(5rem+var(--admob-banner-height,0px))]');
-    // Must be a direct child of the hub, not of the vertically-centred row —
-    // inside it, the cards get shunted upward by half the reservation.
-    expect(spacer.parentElement?.getAttribute('data-testid')).toBe('quick-play-hub');
-  });
-
-  it('selection fires analytics with method', () => {
-    render(<QuickPlayHub />);
-    fireEvent.click(screen.getByTestId('mock-select'));
-    expect(vi.mocked(posthog.capture)).toHaveBeenCalledWith(
-      'quick_play_mode_selected',
-      expect.objectContaining({ mode: 'blast', method: 'tap' })
-    );
-  });
-
-  it('random PLAY resolves a mode, fetches round, mounts adapter', async () => {
-    render(<QuickPlayHub />);
-    fireEvent.click(screen.getByTestId('mock-play'));
-    // Loading hold keeps the picker visible with pending state before enter.
-    expect(screen.getByTestId('quick-play-loading')).toBeTruthy();
-    expect(screen.getByTestId('mock-picker').getAttribute('data-pending-mode')).not.toBe('');
+    expect(screen.queryByTestId('quick-mode-picker')).toBeNull();
+    expect(screen.getByTestId('quick-loading-mascot')).toBeTruthy();
     await waitFor(() => expect(screen.getByTestId('mock-finish')).toBeTruthy(), { timeout: 3000 });
     expect(vi.mocked(posthog.capture)).toHaveBeenCalledWith(
       'quick_play_mode_selected',
       expect.objectContaining({ method: 'random' })
     );
-    const roundCall = fetchMock.mock.calls.find((c) => String(c[0]).includes('/round'));
-    expect(roundCall).toBeTruthy();
+    expect(fetchMock.mock.calls.filter((c) => String(c[0]).includes('/round'))).toHaveLength(1);
   });
 
-  it('shows loading + pending state on the picker before mounting the game', async () => {
-    let resolveRound: (v: unknown) => void = () => undefined;
+  it('a round that fails to load shows the error with a retry that fetches again', async () => {
+    let fail = true;
     fetchMock.mockImplementation((url: string) => {
       if (String(url).includes('/round')) {
-        return new Promise((resolve) => {
-          resolveRound = resolve;
-        });
+        if (fail) return Promise.resolve({ ok: false, json: async () => ({}) });
+        return Promise.resolve({ ok: true, json: async () => roundPayload });
       }
       return Promise.resolve({ ok: true, json: async () => ({}) });
     });
-    render(<QuickPlayHub />);
-    fireEvent.click(screen.getByTestId('mock-select'));
-    await waitFor(() => expect(screen.getByTestId('quick-play-loading')).toBeTruthy());
-    expect(screen.queryByTestId('mock-finish')).toBeNull();
-    expect(screen.getByTestId('mock-picker').getAttribute('data-pending-mode')).toBe('blast');
-    resolveRound({ ok: true, json: async () => roundPayload });
+    render(<QuickPlayHub startMode="blast" />);
+    await waitFor(() => expect(screen.getByTestId('quick-load-error')).toBeTruthy());
+    fail = false;
+    fireEvent.click(screen.getByTestId('quick-load-retry'));
     await waitFor(() => expect(screen.getByTestId('mock-finish')).toBeTruthy(), { timeout: 3000 });
+    const bodies = fetchMock.mock.calls.filter((c) => String(c[0]).includes('/round')).map((c) => JSON.parse(c[1].body).mode);
+    expect(bodies).toEqual(['blast', 'blast']);
   });
 
-  it('round completion submits and shows results, then "Spin next round" deals the next board', async () => {
+  it('round completion shows results, and Next round starts another round instead of a picker', async () => {
     render(<QuickPlayHub />);
-    fireEvent.click(screen.getByTestId('mock-play'));
     await waitFor(() => screen.getByTestId('mock-finish'));
     fireEvent.click(screen.getByTestId('mock-finish'));
     await waitFor(() => expect(screen.getByTestId('mock-results')).toBeTruthy());
@@ -171,8 +134,16 @@ describe('QuickPlayHub', () => {
       expect.objectContaining({ mode: 'blast', scorePct: 68 })
     );
     fireEvent.click(screen.getByTestId('mock-next'));
-    await waitFor(() => expect(screen.getByTestId('mock-finish')).toBeTruthy());
-    expect(fetchMock.mock.calls.filter(([u]) => String(u).includes('/round'))).toHaveLength(2);
+    await waitFor(() => expect(screen.getByTestId('mock-finish')).toBeTruthy(), { timeout: 3000 });
+    expect(fetchMock.mock.calls.filter((c) => String(c[0]).includes('/round'))).toHaveLength(2);
+    expect(goBack).not.toHaveBeenCalled();
+  });
+
+  it('quitting mid-round leaves Quick Play instead of opening a picker', async () => {
+    render(<QuickPlayHub />);
+    await waitFor(() => screen.getByTestId('mock-finish'));
+    fireEvent.click(screen.getByTestId('mock-quit'));
+    expect(goBack).toHaveBeenCalledTimes(1);
   });
 
   it('submit network failure still reaches results (no stranded round)', async () => {
@@ -186,21 +157,12 @@ describe('QuickPlayHub', () => {
       return Promise.resolve({ ok: true, json: async () => ({}) });
     });
     render(<QuickPlayHub />);
-    fireEvent.click(screen.getByTestId('mock-play'));
     await waitFor(() => screen.getByTestId('mock-finish'));
     fireEvent.click(screen.getByTestId('mock-finish'));
     await waitFor(() => expect(screen.getByTestId('mock-results')).toBeTruthy());
   });
 
-  it('returning to the wheel screen moves focus to its heading (screen swap has no nav to anchor on)', async () => {
-    render(<QuickPlayHub />);
-    fireEvent.click(screen.getByTestId('mock-play'));
-    await waitFor(() => screen.getByTestId('mock-quit'));
-    fireEvent.click(screen.getByTestId('mock-quit'));
-    await waitFor(() => expect(document.activeElement).toBe(screen.getByText('quickPlay.solo.title')));
-  });
-
-  it('challenge deep link shows banner and locks board', async () => {
+  it('challenge deep link shows banner and plays the friend board without a tap', async () => {
     fetchMock.mockImplementation((url: string) => {
       if (String(url).includes('/challenge?id=ch-9')) {
         return Promise.resolve({
@@ -216,28 +178,33 @@ describe('QuickPlayHub', () => {
       }
       return Promise.resolve({ ok: true, json: async () => ({}) });
     });
-    render(<QuickPlayHub challengeId="ch-9" />);
-    await waitFor(() => expect(screen.getByTestId('quick-challenge-banner')).toBeTruthy());
-    fireEvent.click(screen.getByTestId('mock-play'));
-    await waitFor(() => screen.getByTestId('mock-finish'));
-    const roundCall = fetchMock.mock.calls.find((c) => String(c[0]).includes('/round'));
-    expect(JSON.parse(roundCall![1].body as string)).toMatchObject({ mode: 'classic', seed: 'shared-seed' });
+    render(<QuickPlayHub challengeId="ch-9" startMode="blast" />);
+    await waitFor(() => screen.getByTestId('mock-finish'), { timeout: 3000 });
+    const roundCalls = fetchMock.mock.calls.filter((c) => String(c[0]).includes('/round'));
+    expect(roundCalls).toHaveLength(1);
+    expect(JSON.parse(roundCalls[0][1].body as string)).toMatchObject({ mode: 'classic', seed: 'shared-seed' });
+  });
+
+  it('a challenge link that fails to load still starts a round', async () => {
+    fetchMock.mockImplementation((url: string) => {
+      if (String(url).includes('/challenge?id=')) return Promise.resolve({ ok: false, json: async () => null });
+      if (String(url).includes('/round')) return Promise.resolve({ ok: true, json: async () => roundPayload });
+      return Promise.resolve({ ok: true, json: async () => ({}) });
+    });
+    render(<QuickPlayHub challengeId="gone" />);
+    await waitFor(() => screen.getByTestId('mock-finish'), { timeout: 3000 });
   });
 
   it('results screen persists until player explicitly leaves (no auto-dismiss after timer)', async () => {
+    render(<QuickPlayHub />);
+    await waitFor(() => screen.getByTestId('mock-finish'), { timeout: 3000 });
     vi.useFakeTimers();
     try {
-      render(<QuickPlayHub />);
-      fireEvent.click(screen.getByTestId('mock-play'));
-      await waitFor(() => screen.getByTestId('mock-finish'));
-      // Finish the round — moves to results screen
       fireEvent.click(screen.getByTestId('mock-finish'));
-      await waitFor(() => expect(screen.getByTestId('mock-results')).toBeTruthy());
-      // Advance time well past the round duration (60s)
+      await vi.waitFor(() => expect(screen.getByTestId('mock-results')).toBeTruthy());
       vi.advanceTimersByTime(70_000);
-      // Results screen MUST still be visible — player decides when to leave
       expect(screen.getByTestId('mock-results')).toBeTruthy();
-      expect(screen.queryByTestId('mock-picker')).toBeNull();
+      expect(goBack).not.toHaveBeenCalled();
     } finally {
       vi.useRealTimers();
     }

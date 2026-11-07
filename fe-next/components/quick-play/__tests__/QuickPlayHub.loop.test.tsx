@@ -23,16 +23,6 @@ vi.mock('@/hooks/useBackOneLevel', () => ({
     return exitSpy;
   },
 }));
-vi.mock('../QuickPlayModePicker', () => ({
-  QuickPlayModePicker: ({ onSelect, pendingMode }: any) => (
-    <div data-testid="mock-picker" data-pending-mode={pendingMode ?? ''}>
-      <button data-testid="mock-select" onClick={() => onSelect('blast', 'tap')}>sel</button>
-      <button data-testid="mock-play" onClick={() => onSelect('random', 'tap')}>play</button>
-      {pendingMode && <div data-testid="quick-play-loading">loading</div>}
-    </div>
-  ),
-}));
-
 // Speed up the strike/loading hold so tests stay snappy; still assert it runs.
 vi.mock('../lightningPath', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../lightningPath')>();
@@ -97,20 +87,18 @@ describe('QuickPlayHub — the play / results loop', () => {
     vi.clearAllMocks();
   });
 
-  it('quitting a round goes back to the wheel with no "couldn\'t build your board" error', async () => {
-    render(<QuickPlayHub />);
-    fireEvent.click(screen.getByTestId('mock-select'));
+  it('a board passing its click event to onQuit just leaves Quick Play, no "couldn\'t build your board"', async () => {
+    render(<QuickPlayHub startMode="blast" />);
     await waitFor(() => screen.getByTestId('mock-quit'));
     fireEvent.click(screen.getByTestId('mock-quit'));
-    await waitFor(() => screen.getByTestId('mock-picker'));
+    expect(exitSpy).toHaveBeenCalledTimes(1);
     expect(screen.queryByTestId('quick-load-error')).toBeNull();
     // The quit must not be mistaken for a mode and fetch another board.
     expect(roundCalls()).toHaveLength(1);
   });
 
-  it('"Spin next round" deals a random round straight away, without a stop at the wheel', async () => {
-    render(<QuickPlayHub />);
-    fireEvent.click(screen.getByTestId('mock-select'));
+  it('"Spin next round" deals a random round straight away', async () => {
+    render(<QuickPlayHub startMode="blast" />);
     await waitFor(() => screen.getByTestId('mock-finish'));
     fireEvent.click(screen.getByTestId('mock-finish'));
     await waitFor(() => screen.getByTestId('mock-results'));
@@ -122,8 +110,7 @@ describe('QuickPlayHub — the play / results loop', () => {
   });
 
   it('picking a mode on the results screen plays that mode', async () => {
-    render(<QuickPlayHub />);
-    fireEvent.click(screen.getByTestId('mock-select'));
+    render(<QuickPlayHub startMode="blast" />);
     await waitFor(() => screen.getByTestId('mock-finish'));
     fireEvent.click(screen.getByTestId('mock-finish'));
     await waitFor(() => screen.getByTestId('mock-results'));
@@ -132,8 +119,7 @@ describe('QuickPlayHub — the play / results loop', () => {
   });
 
   it("starts downloading the chosen mode's board while the strike plays", async () => {
-    render(<QuickPlayHub />);
-    fireEvent.click(screen.getByTestId('mock-select'));
+    render(<QuickPlayHub startMode="blast" />);
     expect(preloadQuickMode).toHaveBeenCalledWith('blast');
     await waitFor(() => screen.getByTestId('mock-round'));
   });

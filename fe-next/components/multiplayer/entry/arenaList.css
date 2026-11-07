@@ -13,3 +13,7 @@
 @container (max-height: 110px) {
   .mp-arena-tail-inner { display: none; }
 }
+
+/* The language chips scroll sideways on narrow phones without a visible bar. */
+.mp-arena-langs { scrollbar-width: none; }
+.mp-arena-langs::-webkit-scrollbar { display: none; }

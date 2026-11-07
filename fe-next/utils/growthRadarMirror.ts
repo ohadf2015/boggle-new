@@ -35,6 +35,9 @@ declare global {
 const MIRRORED_EVENTS: ReadonlySet<string> = new Set([
   'session_start',
   'landing_cta_clicked',
+  // Leak discriminator between the two above/below: did the PLAY click reach
+  // the handler before OnboardingFlow mounts (mounted-gate verification).
+  'onboarding_open_requested',
   'onboarding_started',
   'onboarding_completed',
   'signup_completed',

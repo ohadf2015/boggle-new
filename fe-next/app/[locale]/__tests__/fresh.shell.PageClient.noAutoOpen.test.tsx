@@ -28,6 +28,7 @@ vi.mock('@/utils/growthTracking', () => ({
   trackGrowthEvent: (...a: unknown[]) => track(...a),
   trackInviteLanded: vi.fn(),
   trackInviteRedirectFired: vi.fn(),
+  trackOnboardingOpenRequested: vi.fn(),
 }));
 
 describe('HomePageClient — fresh visitors land on the page, not the overlay', () => {

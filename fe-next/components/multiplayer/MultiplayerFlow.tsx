@@ -1,6 +1,6 @@
 'use client';
 
-import React, { type ReactNode } from 'react';
+import React, { useEffect, useState, type ReactNode } from 'react';
 import RoomListView from './RoomListView';
 import JoinRoomModal from './entry/JoinSheet';
 import CreateRoomModal from './entry/CreateSheet';
@@ -106,6 +106,9 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = (props) => {
     refreshRooms, activeRooms, roomsLoading, isJoining, isAuthenticated, displayName, prefilledRoom,
     defaultLanguage, waitingForTeacher, profileAvatar, header,
   } = props;
+  // The language the open-games list shows; CREATE opens in it too.
+  const [roomLanguage, setRoomLanguage] = useState<Language>(defaultLanguage);
+  useEffect(() => setRoomLanguage(defaultLanguage), [defaultLanguage]);
 
   // Classroom joins with a room code own the screen. A guest with NO stored
   // profile (QR target, share link, dashboard "JOIN NOW") cannot be auto-joined —
@@ -200,6 +203,9 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = (props) => {
               displayName={displayName}
               profileAvatar={profileAvatar}
               rankedSlot={rankedSlot}
+              roomLanguage={roomLanguage}
+              onRoomLanguageChange={setRoomLanguage}
+              onStartRoom={s.openCreate}
             />
           )
         }
@@ -242,7 +248,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = (props) => {
         onClose={s.handleModalClose}
         isCreating={isJoining}
         onCreate={s.handleCreateFromModal}
-        defaultLanguage={defaultLanguage}
+        defaultLanguage={roomLanguage}
         isAuthenticated={isAuthenticated}
         displayName={displayName || null}
         profileAvatar={profileAvatar}

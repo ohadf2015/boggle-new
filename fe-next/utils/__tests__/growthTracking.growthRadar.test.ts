@@ -124,6 +124,7 @@ describe('trackGrowthEvent → Growth Radar mirror', () => {
     const spine: readonly GrowthEvent[] = [
       'session_start',
       'landing_cta_clicked',
+      'onboarding_open_requested',
       'onboarding_started',
       'onboarding_completed',
       'signup_completed',

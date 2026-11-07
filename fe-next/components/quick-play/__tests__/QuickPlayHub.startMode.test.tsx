@@ -7,7 +7,6 @@ vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ user: null }) }));
 vi.mock('@/lib/analytics/lazyPosthog', () => ({ default: { capture: vi.fn() } }));
 vi.mock('@/components/ui/BackButton', () => ({ BackButton: () => null }));
 vi.mock('@/hooks/useBackOneLevel', () => ({ useBackOneLevel: () => vi.fn() }));
-vi.mock('../QuickPlayModePicker', () => ({ QuickPlayModePicker: () => <div data-testid="mock-picker" /> }));
 vi.mock('../lightningPath', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../lightningPath')>()),
   strikeHoldMs: () => 1,
@@ -47,15 +46,16 @@ describe('QuickPlayHub start mode deep link', () => {
     expect(roundCalls()).toHaveLength(1);
   });
 
-  it('given no startMode, then the wheel waits for the player', async () => {
-    const { getByTestId } = render(<QuickPlayHub />);
-    await waitFor(() => expect(getByTestId('mock-picker')).toBeTruthy());
-    expect(roundCalls()).toHaveLength(0);
+  it('given no startMode, then a random round starts on its own (no picker screen)', async () => {
+    const { findByTestId } = render(<QuickPlayHub />);
+    expect(['classic', 'blast', 'word-hunt', 'wheel-rush']).toContain((await findByTestId('mock-round')).getAttribute('data-mode'));
+    expect(roundCalls()).toHaveLength(1);
   });
 
-  it('given a challenge link, then startMode is ignored and the challenge owns the round', async () => {
+  it('given a challenge link, then startMode waits for the challenge, which owns the round', async () => {
     render(<QuickPlayHub startMode="blast" challengeId="c1" />);
+    await waitFor(() => expect(roundCalls()).toHaveLength(1));
     await new Promise((r) => setTimeout(r, 30));
-    expect(roundCalls()).toHaveLength(0);
+    expect(roundCalls()).toHaveLength(1);
   });
 });
