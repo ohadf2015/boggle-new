@@ -1,4 +1,4 @@
-import { legacyClassroomLiveRedirect } from './lib/education/classroomLivePath';
+import { legacyClassroomLiveRedirect, legacyHostLiveRedirect } from './lib/education/classroomLivePath';
 import { NextResponse, type NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { matchAcceptLanguage } from './lib/localeResolution';
@@ -77,7 +77,9 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const classroomLive = pathnameHasLocale ? legacyClassroomLiveRedirect(pathname, request.nextUrl.search) : null;
+  const classroomLive = pathnameHasLocale
+    ? legacyClassroomLiveRedirect(pathname, request.nextUrl.search) ?? legacyHostLiveRedirect(pathname, request.nextUrl.search)
+    : null;
   if (classroomLive) {
     return NextResponse.redirect(new URL(classroomLive, request.url), 307);
   }

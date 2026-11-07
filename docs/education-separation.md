@@ -23,12 +23,12 @@ Deliberately left alone:
 - The six top-level edu SEO pages (`word-games-for-the-classroom` and the others) keep the site footer. It carries their internal links, and changing their chrome or ads would hit pages Search Console is grading.
 - The student result share link to `/daily` stays: it's a deliberate growth link, and the shared text carries no student data.
 
-## Phase 2 (proposed): separate host and student live routes
+## Phase 2 (done): separate host and student live routes
 
-`/education/live` serves both the teacher's board and the student's seat from one URL, told apart only by `?host=1` and `?practiceSeat=1`. The 2026-11-07 practice-run bug (the host page took the student branch and waited forever) comes from that shared surface. Proposal:
-- `/education/live/host?room=` for the teacher's board.
-- `/education/live?room=` for students.
-- Each route gets its own entry component, and the old `?host=1` link redirects to the host route.
+`/education/live` serves both the teacher's board and the student's seat from one URL, told apart only by `?host=1` and `?practiceSeat=1`. The 2026-11-07 practice-run bug (the host page took the student branch and waited forever) comes from that shared surface. Done:
+- The teacher's board lives on `/education/live/host?room=`. On the live routes, the path alone decides who is host. A stray `host=1` on the student route is ignored.
+- Old `?host=1` links redirect to the host route: the proxy (307) on the web, and a client gate on native builds that renders nothing until the redirect fires, so the room hook never joins as a student.
+- Legacy `/multiplayer?classroom=true&host=true` links go straight to the host route.
 
 ## Option B (owner decision): a separate domain
 
