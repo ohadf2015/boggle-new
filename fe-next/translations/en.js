@@ -10877,6 +10877,7 @@ const en = {
       },
       "roundComplete": "Round complete",
       "ofPerfect": "of perfect",
+      "weeklyRival": "Weekly rival · rank points this week",
       "wordsFound": "{found} / {total} words found",
       "targetWordFound": "🎯 You found the word: {word}",
       "targetWordMissed": "🎯 The word was: {word}",

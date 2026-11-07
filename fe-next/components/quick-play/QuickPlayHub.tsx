@@ -12,6 +12,7 @@ import { useAnnouncer } from '@/components/GameAnnouncer';
 import posthog from '@/lib/analytics/lazyPosthog';
 import { QuickPlayModePicker } from './QuickPlayModePicker';
 import { QuickModeAdapter } from './adapters/QuickModeAdapter';
+import { preloadQuickMode } from './adapters/preloadQuickMode';
 import { QuickPlayResults, type QuickRival } from './QuickPlayResults';
 import type { CollectedWord } from './QuickWordsCollected';
 import { recordGuestRound, quickCoinsFor, quickXpFor, recentAveragePct } from '@/lib/quickPlay/guestProgress';
@@ -34,6 +35,10 @@ type HubPhase = 'wheel' | 'loading' | 'playing' | 'results';
 function prefersReducedMotion(): boolean {
   if (typeof window === 'undefined' || !window.matchMedia) return false;
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+function isWheelSelection(value: unknown): value is WheelSelection {
+  return value === 'random' || (QUICK_MODES as readonly unknown[]).includes(value);
 }
 
 function sleep(ms: number): Promise<void> {
@@ -164,6 +169,8 @@ export function QuickPlayHub({ challengeId, backHref, startMode }: QuickPlayHubP
       (sel === 'random'
         ? QUICK_MODES[Math.floor(Math.random() * QUICK_MODES.length)]
         : sel);
+    // The board's code downloads during the strike instead of on the clock.
+    preloadQuickMode(mode);
     // Lock UI to the resolved mode (for Random, show the picked mode on the bolt).
     setSelection(mode);
     setStrikeMode(mode);
@@ -344,7 +351,12 @@ export function QuickPlayHub({ challengeId, backHref, startMode }: QuickPlayHubP
    * adapter's timer fires after results appear (phase !== 'playing'), ignore it
    * so results don't auto-dismiss while the player is reading their score.
    */
-  const handleNextRound = useCallback((mode?: QuickMode) => {
+  const handleNextRound = useCallback((next?: WheelSelection) => {
+    // Boards call onQuit with whatever they have (a click event, their own
+    // payload). Anything that isn't a selection is a plain quit — treating it
+    // as a mode fetched a board for "[object Object]" and showed "couldn't
+    // build your board" on every quit.
+    const mode = isWheelSelection(next) ? next : undefined;
     // Ignore stale quit calls after the game ends.
     if (!mode && phaseRef.current !== 'playing') return;
     setRoundIndex((i) => i + 1);
@@ -361,6 +373,9 @@ export function QuickPlayHub({ challengeId, backHref, startMode }: QuickPlayHubP
     if (mode) void handlePlayRef.current?.(mode, 'tap', null); // it owns the phase from here
     else setPhase('wheel');
   }, []);
+
+  // A board's quit is never a mode choice, whatever it passes along.
+  const handleRoundQuit = useCallback(() => handleNextRound(), [handleNextRound]);
 
   // handlePlay is declared above but closes over `challenge`, which this
   // callback clears — a direct dependency would rebuild it every round and
@@ -401,7 +416,7 @@ export function QuickPlayHub({ challengeId, backHref, startMode }: QuickPlayHubP
           </div>
         }
       >
-        <QuickModeAdapter config={config} onDone={handleDone} onQuit={handleNextRound} />
+        <QuickModeAdapter config={config} onDone={handleDone} onQuit={handleRoundQuit} />
       </BaseErrorBoundary>
     );
   }

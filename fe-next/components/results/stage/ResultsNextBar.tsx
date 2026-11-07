@@ -17,6 +17,14 @@ interface ResultsNextBarProps {
   placement?: 'inline' | 'fixed';
   testId?: string;
   barRef?: React.Ref<HTMLDivElement>;
+  /** Extra row pinned above the buttons (e.g. a next-mode picker). */
+  top?: ReactNode;
+  /**
+   * Inline placement also clears the native ad banner, which sits directly
+   * above the tab bar: with only the tab bar reserved, the banner covered the
+   * whole pinned bar on phones.
+   */
+  clearAdBand?: boolean;
 }
 
 /** The one primary "keep playing" action, pinned under the scrolling results. */
@@ -27,11 +35,15 @@ export function ResultsNextBar({
   placement = 'inline',
   testId = 'results-next-bar',
   barRef,
+  top,
+  clearAdBand = false,
 }: ResultsNextBarProps) {
   const position =
     placement === 'fixed'
       ? 'fixed inset-x-0 bottom-[var(--cookie-consent-height,0px)] z-50'
-      : 'relative z-20 mb-[var(--bottom-nav-height,0px)] shrink-0';
+      : clearAdBand
+        ? 'relative z-20 mb-[calc(var(--bottom-nav-height,0px)+var(--admob-banner-height,0px))] shrink-0'
+        : 'relative z-20 mb-[var(--bottom-nav-height,0px)] shrink-0';
   return (
     <div
       ref={barRef}
@@ -43,6 +55,7 @@ export function ResultsNextBar({
         data-testid="quick-results-cta-fade"
         className="pointer-events-none absolute inset-x-0 bottom-full h-12 bg-linear-to-t from-neo-navy to-transparent"
       />
+      {top && <div className="mx-auto mb-2.5 w-full max-w-md">{top}</div>}
       <div className="mx-auto flex w-full max-w-md items-stretch gap-2.5">
         {secondary && (
           <button

@@ -12431,6 +12431,7 @@ const es = {
       },
       "roundComplete": "Ronda completada",
       "ofPerfect": "del perfecto",
+      "weeklyRival": "Rival semanal · puntos de rango esta semana",
       "wordsFound": "{found} / {total} palabras",
       "targetWordFound": "🎯 Encontraste la palabra: {word}",
       "targetWordMissed": "🎯 La palabra era: {word}",

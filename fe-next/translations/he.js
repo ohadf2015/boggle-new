@@ -12338,6 +12338,7 @@ const he = {
       },
       "roundComplete": "הסיבוב הושלם",
       "ofPerfect": "מהמושלם",
+      "weeklyRival": "יריב השבוע · נקודות דירוג השבוע",
       "wordsFound": "נמצאו {found} מתוך {total} מילים",
       "targetWordFound": "🎯 מצאתם את המילה: {word}",
       "targetWordMissed": "🎯 המילה הייתה: {word}",

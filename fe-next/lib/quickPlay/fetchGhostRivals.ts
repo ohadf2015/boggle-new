@@ -8,6 +8,13 @@ import { getSeededAvatarConfig, hashString, type CustomAvatarConfig } from '@/sh
 import { pickGhostRivals, GHOST_COUNT, type QuickGhostRival } from './ghostRivals';
 import { computeScoreBands, padRivalsWithSynthetic } from './syntheticRivals';
 
+/**
+ * Rounds from this moment on are scored against the 60-second par
+ * (quickPlayRound.parScoreForMode). Older rows were % of the solver perfect —
+ * 0-5% for everyone — so they would read as near-zero rivals on today's scale.
+ */
+export const PAR_SCALE_SINCE = '2026-11-08T00:00:00Z';
+
 /** How many recent rows to draw the cohort from. */
 const GHOST_CANDIDATE_LIMIT = 120;
 
@@ -52,7 +59,8 @@ export async function fetchGhostRivals(
       .from('quick_play_results')
       .select('user_id, score_pct')
       .eq('mode', mode)
-      .gt('score_pct', 0);
+      .gt('score_pct', 0)
+      .gte('created_at', PAR_SCALE_SINCE);
     if (excludeUserId) query = query.neq('user_id', excludeUserId);
     const { data, error } = await query
       .order('created_at', { ascending: false })

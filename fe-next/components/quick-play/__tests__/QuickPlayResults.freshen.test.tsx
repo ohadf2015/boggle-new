@@ -182,7 +182,11 @@ describe('QuickPlayResults freshen', () => {
     const bar = screen.getByTestId('quick-results-cta-bar');
     expect(bar).toContainElement(screen.getByTestId('quick-results-next'));
     expect(screen.getByTestId('quick-results-scroll')).not.toContainElement(bar);
-    expect(bar.querySelectorAll('button.bg-neo-lime')).toHaveLength(1);
+    // Mode chips wear their mode's colour (Classic is lime); the action row has one filled button.
+    const actionButtons = [...bar.querySelectorAll('button.bg-neo-lime')].filter(
+      (b) => !screen.getByTestId('quick-next-mode-picker').contains(b)
+    );
+    expect(actionButtons).toHaveLength(1);
   });
 
   it('fades the details peeking under the pinned action instead of clipping them', () => {
@@ -210,18 +214,18 @@ describe('QuickPlayResults freshen', () => {
     expect(screen.getByTestId('quick-results-cta-bar').className).toContain('var(--bottom-nav-height');
   });
 
-  it('lists the mode switch after the rank card, so the pinned button stays the one obvious next step', () => {
+  // Owner ask (Nov 7): the next-round modes stay on screen, never under the ad.
+  it('pins the next-round mode picker in the bar with the primary button, not in the scrolling details', () => {
     renderResults();
-    const rank = screen.getByTestId('quick-rank-bar');
-    const picker = screen.getByTestId('quick-next-mode-picker');
-    expect(rank.compareDocumentPosition(picker) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    const bar = screen.getByTestId('quick-results-cta-bar');
+    expect(bar).toContainElement(screen.getByTestId('quick-next-mode-picker'));
+    expect(screen.getByTestId('quick-results-scroll')).not.toContainElement(screen.getByTestId('quick-next-mode-picker'));
+    expect(screen.getByTestId('quick-results-details')).toContainElement(screen.getByTestId('quick-rank-bar'));
   });
 
-  it('moves the mode switcher and standings into the details below the hero', () => {
+  it('lifts the pinned bar above the native ad band as well as the tab bar', () => {
     renderResults();
-    const details = screen.getByTestId('quick-results-details');
-    expect(details).toContainElement(screen.getByTestId('quick-next-mode-picker'));
-    expect(details).toContainElement(screen.getByTestId('quick-rank-bar'));
+    expect(screen.getByTestId('quick-results-cta-bar').className).toContain('var(--admob-banner-height');
   });
 
   it('gives the hero the whole first screen and leaves the details below the fold', () => {

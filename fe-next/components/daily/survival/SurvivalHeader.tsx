@@ -48,8 +48,8 @@ export const SurvivalHeader = memo<SurvivalHeaderProps>(({
       ? [{ username: selfUsername, score: liveScore }, ...rivals]
       : null;
   return (
-    <div data-testid="survival-header" className="sticky top-0 z-20 flex items-center justify-between mb-1 ps-2 pe-12 py-1 max-w-3xl mx-auto w-full bg-neo-navy/90 backdrop-blur-sm rounded-b-neo overflow-visible">
-      <div className="flex items-center gap-1.5">
+    <div data-testid="survival-header" className="sticky top-0 z-20 flex items-center justify-between gap-1.5 mb-1 ps-2 pe-14 py-1 max-w-3xl mx-auto w-full bg-neo-navy/90 backdrop-blur-sm rounded-b-neo overflow-visible">
+      <div className="flex shrink-0 items-center gap-1.5">
         <button
           type="button"
           onClick={onQuitClick}
@@ -68,8 +68,12 @@ export const SurvivalHeader = memo<SurvivalHeaderProps>(({
         </div>
       )}
 
+      {/* min-w-0 + flex-1: on a 390px phone the place pill and rival chip were
+          wider than what's left after Quit + effects, so they spilled into the
+          global mute button's corner (and off-screen). They shrink here instead;
+          pe-14 keeps that corner clear of the 40px button and its inset. */}
       {standing && (
-        <div data-testid="survival-rank-indicator">
+        <div data-testid="survival-rank-indicator" className="flex min-w-0 flex-1 justify-end">
           <MobileRankIndicator
             leaderboard={standing}
             currentUsername={selfUsername}

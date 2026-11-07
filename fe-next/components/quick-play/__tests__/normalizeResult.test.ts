@@ -59,3 +59,28 @@ describe('normalizeResult', () => {
     expect(r.scorePct).toBe(0);
   });
 });
+
+describe('normalizeResult — measured against the 60-second par', () => {
+  const parCfg: QuickRoundConfig = {
+    mode: 'classic', seed: 's2', durationSec: 60, grid: [],
+    totalWords: 480, perfectScore: 24000, parScore: 250, parWords: 25,
+  };
+
+  it('scorePct and the words target come from par, not the 24k solver perfect', () => {
+    const r = fromSinglePlayer({ score: 125, wordsFound: ['cat'] }, parCfg);
+    expect(r.scorePct).toBe(50);
+    expect(r.perfectScore).toBe(250);
+    expect(r.totalWords).toBe(25);
+  });
+
+  it('a round above par reads 100%, never more', () => {
+    const r = fromSinglePlayer({ score: 900, wordsFound: [] }, parCfg);
+    expect(r.scorePct).toBe(100);
+  });
+
+  it('falls back to perfect when an older server sends no par', () => {
+    const r = fromSinglePlayer({ score: 100, wordsFound: [] }, { ...parCfg, parScore: undefined, parWords: undefined });
+    expect(r.scorePct).toBe(0);
+    expect(r.totalWords).toBe(480);
+  });
+});

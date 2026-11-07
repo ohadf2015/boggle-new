@@ -46,17 +46,20 @@ vi.mock('../adapters/QuickModeAdapter', () => ({
       return () => clearTimeout(timeoutId);
     }, [onQuit, config.durationSec]);
     return (
-      <button
-        data-testid="mock-finish"
-        onClick={() =>
-          onDone({
-            mode: config.mode, seed: config.seed, score: 340, perfectScore: 500,
-            scorePct: 68, wordsFound: 7, totalWords: 12, durationMs: 60000,
-          })
-        }
-      >
-        finish
-      </button>
+      <>
+        <button
+          data-testid="mock-finish"
+          onClick={() =>
+            onDone({
+              mode: config.mode, seed: config.seed, score: 340, perfectScore: 500,
+              scorePct: 68, wordsFound: 7, totalWords: 12, durationMs: 60000,
+            })
+          }
+        >
+          finish
+        </button>
+        <button data-testid="mock-quit" onClick={() => onQuit()}>quit</button>
+      </>
     );
   },
 }));
@@ -64,7 +67,7 @@ vi.mock('../adapters/QuickModeAdapter', () => ({
 vi.mock('../QuickPlayResults', () => ({
   QuickPlayResults: ({ onNextRound }: any) => (
     <div data-testid="mock-results">
-      <button data-testid="mock-next" onClick={onNextRound}>next</button>
+      <button data-testid="mock-next" onClick={() => onNextRound('random')}>next</button>
     </div>
   ),
 }));
@@ -157,7 +160,7 @@ describe('QuickPlayHub', () => {
     await waitFor(() => expect(screen.getByTestId('mock-finish')).toBeTruthy(), { timeout: 3000 });
   });
 
-  it('round completion submits and shows results, then next round returns to wheel', async () => {
+  it('round completion submits and shows results, then "Spin next round" deals the next board', async () => {
     render(<QuickPlayHub />);
     fireEvent.click(screen.getByTestId('mock-play'));
     await waitFor(() => screen.getByTestId('mock-finish'));
@@ -168,7 +171,8 @@ describe('QuickPlayHub', () => {
       expect.objectContaining({ mode: 'blast', scorePct: 68 })
     );
     fireEvent.click(screen.getByTestId('mock-next'));
-    await waitFor(() => expect(screen.getByTestId('quick-play-hub')).toBeTruthy());
+    await waitFor(() => expect(screen.getByTestId('mock-finish')).toBeTruthy());
+    expect(fetchMock.mock.calls.filter(([u]) => String(u).includes('/round'))).toHaveLength(2);
   });
 
   it('submit network failure still reaches results (no stranded round)', async () => {
@@ -191,10 +195,8 @@ describe('QuickPlayHub', () => {
   it('returning to the wheel screen moves focus to its heading (screen swap has no nav to anchor on)', async () => {
     render(<QuickPlayHub />);
     fireEvent.click(screen.getByTestId('mock-play'));
-    await waitFor(() => screen.getByTestId('mock-finish'));
-    fireEvent.click(screen.getByTestId('mock-finish'));
-    await waitFor(() => screen.getByTestId('mock-next'));
-    fireEvent.click(screen.getByTestId('mock-next'));
+    await waitFor(() => screen.getByTestId('mock-quit'));
+    fireEvent.click(screen.getByTestId('mock-quit'));
     await waitFor(() => expect(document.activeElement).toBe(screen.getByText('quickPlay.solo.title')));
   });
 

@@ -10650,6 +10650,7 @@ const ru = {
       "durationUnit": "секунд",
       "roundComplete": "Раунд завершён",
       "ofPerfect": "от идеала",
+      "weeklyRival": "Соперник недели · очки рейтинга за неделю",
       "wordsFound": "Найдено {found} из {total} слов",
       "targetWordFound": "🎯 Слово найдено: {word}",
       "targetWordMissed": "🎯 Слово было: {word}",

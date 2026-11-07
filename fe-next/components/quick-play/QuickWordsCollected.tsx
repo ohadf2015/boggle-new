@@ -49,7 +49,7 @@ export function QuickWordsCollected({ words, collectionTotal }: QuickWordsCollec
         </span>
         <span className="truncate text-[11px] text-neo-white/55">
           {newCount > 0 && (
-            <b className="mr-2 font-neo-display text-neo-lime" data-testid="quick-words-new-count">
+            <b className="me-2 font-neo-display text-neo-lime" data-testid="quick-words-new-count">
               {t('quickPlay.solo.wordsNew', '{count} new', { count: String(newCount) })}
             </b>
           )}
@@ -68,7 +68,8 @@ export function QuickWordsCollected({ words, collectionTotal }: QuickWordsCollec
         <b className="sr-only" data-testid="quick-best-word">
           {best.word.toUpperCase()}
         </b>
-        <span className="flex min-w-0 flex-wrap gap-1" aria-hidden="true" dir="ltr">
+        {/* auto, not ltr: a Hebrew best word laid out ltr read backwards. */}
+        <span className="flex min-w-0 flex-wrap gap-1" aria-hidden="true" dir="auto">
           {[...best.word.toUpperCase()].map((ch, i) => (
             <span
               key={i}

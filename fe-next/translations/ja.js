@@ -11481,6 +11481,7 @@ const ja = {
       "durationUnit": "秒",
       "roundComplete": "ラウンド終了",
       "ofPerfect": "パーフェクト比",
+      "weeklyRival": "今週のライバル・今週のランクポイント",
       "wordsFound": "{found} / {total} 語発見",
       "targetWordFound": "🎯 単語を発見: {word}",
       "targetWordMissed": "🎯 単語は「{word}」でした",

@@ -131,6 +131,31 @@ describe('processQuickSubmit', () => {
   });
 });
 
+describe('processQuickSubmit — pct against the 60-second par', () => {
+  it('scores against parScore when the round has one (perfect stays the cheat ceiling)', async () => {
+    const { buildQuickRound } = await import('../quickPlayRound');
+    vi.mocked(buildQuickRound).mockResolvedValueOnce({
+      mode: 'classic', seed: 's', language: 'en', durationSec: 60, grid: [['a']], words: ['cat'],
+      perfectScore: 20000, parScore: 250, parWords: 25,
+    } as never);
+    const { db, chain } = makeDb();
+    const out = await processQuickSubmit(db, { ...baseInput, score: 125 });
+    expect(out.scorePct).toBe(50);
+    expect(chain.insert).toHaveBeenCalledWith(expect.objectContaining({ score_pct: 50 }));
+  });
+
+  it('a round above par caps at 100% instead of being rejected', async () => {
+    const { buildQuickRound } = await import('../quickPlayRound');
+    vi.mocked(buildQuickRound).mockResolvedValueOnce({
+      mode: 'classic', seed: 's', language: 'en', durationSec: 60, grid: [['a']], words: ['cat'],
+      perfectScore: 20000, parScore: 250, parWords: 25,
+    } as never);
+    const { db } = makeDb();
+    const out = await processQuickSubmit(db, { ...baseInput, score: 900 });
+    expect(out.scorePct).toBe(100);
+  });
+});
+
 describe('quickPlayCoinsFor', () => {
   it('flat completion + pct, capped 200', () => {
     expect(quickPlayCoinsFor(0)).toBe(25);

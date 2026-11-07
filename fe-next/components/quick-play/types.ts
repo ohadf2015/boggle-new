@@ -34,7 +34,12 @@ export interface QuickRoundConfig {
   /** Seeded target word for word-hunt only */
   targetWord?: string;
   totalWords: number;
+  /** Every solver word scored — the cheat ceiling, never a target (nobody gets near it). */
   perfectScore: number;
+  /** The 60-second target score. Missing on rounds from an older server. */
+  parScore?: number;
+  /** Words in the par. Missing on rounds from an older server. */
+  parWords?: number;
   /**
    * Real players' recent results on this mode, paced across the round clock so
    * a solo round reads as a live race. Empty when nobody has played the mode
@@ -43,12 +48,29 @@ export interface QuickRoundConfig {
   ghosts?: QuickGhostRival[];
 }
 
+/**
+ * What a round is measured against: the 60-second par when the server sent one,
+ * else the solver perfect (older servers). Score %, ghost rivals and the words
+ * line on the results screen all read this, so they share one scale.
+ */
+export function roundTarget(cfg: Pick<QuickRoundConfig, 'perfectScore' | 'totalWords' | 'parScore' | 'parWords'>): {
+  score: number;
+  words: number;
+} {
+  const usePar = typeof cfg.parScore === 'number' && cfg.parScore > 0;
+  return {
+    score: usePar ? (cfg.parScore as number) : cfg.perfectScore,
+    words: usePar && typeof cfg.parWords === 'number' && cfg.parWords > 0 ? cfg.parWords : cfg.totalWords,
+  };
+}
+
 export interface QuickRoundResult {
   mode: QuickMode;
   seed: string;
   score: number;
+  /** The round's target (par when the server sent one — see roundTarget). */
   perfectScore: number;
-  /** score/perfectScore as 0-100, capped at 100 */
+  /** score/target as 0-100, capped at 100 */
   scorePct: number;
   wordsFound: number;
   totalWords: number;
