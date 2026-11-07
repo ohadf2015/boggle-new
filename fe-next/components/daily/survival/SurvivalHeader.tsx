@@ -43,9 +43,11 @@ export const SurvivalHeader = memo<SurvivalHeaderProps>(({
   center,
   t,
 }) => {
+  // The rank pill reads place from array order (best first), so the board has
+  // to be sorted: unsorted, "You" always came first and read "#1 leading".
   const standing =
     practice && rivals && rivals.length > 0
-      ? [{ username: selfUsername, score: liveScore }, ...rivals]
+      ? [{ username: selfUsername, score: liveScore }, ...rivals].sort((a, b) => b.score - a.score)
       : null;
   return (
     <div data-testid="survival-header" className="sticky top-0 z-20 flex items-center justify-between gap-1.5 mb-1 ps-2 pe-14 py-1 max-w-3xl mx-auto w-full bg-neo-navy/90 backdrop-blur-sm rounded-b-neo overflow-visible">

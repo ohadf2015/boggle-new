@@ -10,11 +10,17 @@ vi.mock('framer-motion', () => {
     const { initial, animate, exit, whileHover, whileTap, transition, variants, layout, ...domProps } = props;
     return domProps;
   };
-  const motion = {
-    div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <div {...strip(props)}>{children}</div>,
-    span: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <span {...strip(props)}>{children}</span>,
-    button: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <button {...strip(props)}>{children}</button>,
-  };
+  const cache: Record<string, unknown> = {};
+  const motion = new Proxy({}, {
+    get: (_t, tag: string) => {
+      if (!cache[tag]) {
+        const Tag = tag as keyof JSX.IntrinsicElements;
+        cache[tag] = ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) =>
+          React.createElement(Tag, strip(props), children);
+      }
+      return cache[tag];
+    },
+  });
   return {
     motion,
     m: motion,
@@ -128,5 +134,13 @@ describe('DailyWordHuntSurvival - timed round (Quick Play)', () => {
     expect(screen.getByTestId('hunt-life-row')).toBeInTheDocument();
     expect(screen.getByTestId('hunt-feedback-row')).toBeInTheDocument();
     expect(screen.getByTestId('wordhunt-category-slot')).toBeInTheDocument();
+  });
+
+  it('races rivals on the round score (sum of found words), not the daily 800 projection', () => {
+    renderHunt({ timeLimitSec: 60, rivals: [{ username: 'Ada', score: 50 }, { username: 'Bo', score: 30 }] });
+    const pill = screen.getByTestId('survival-rank-indicator');
+    // No words yet: 0 points puts the player last, not "leading".
+    expect(pill.textContent).toContain('#3');
+    expect(pill.textContent).not.toContain('multiplayer.rank.leading');
   });
 });

@@ -48,6 +48,7 @@ import { wordHuntSolveTier } from '@/shared/utils/wordHuntScoring';
 import { HuntHintSlots } from './survival/hunt/HuntHintSlots';
 import { HuntRoundClock } from './survival/hunt/HuntRoundClock';
 import { useGameTimer } from '@/hooks/useGameTimer';
+import { calculateWordScore } from '@/shared/utils/scoring';
 import PracticeCoachTip from '@/components/practice/PracticeCoachTip';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
 
@@ -372,6 +373,16 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     />
   );
 
+  // The daily HUD projects the daily score (800 at the start, eroding with
+  // misses), but a Quick Play round is scored as the sum of its words, and the
+  // rivals it races are on that scale. Showing 800 against rivals' 168 put
+  // every player "in the lead" before their first word.
+  const roundScore = useMemo(
+    () => state.discoveredWords.reduce((sum, d) => sum + calculateWordScore(d.word, 0), 0),
+    [state.discoveredWords],
+  );
+  const shownScore = timed ? roundScore : state.liveScore;
+
   // A timed round has no life drain, so its bar would sit at 100 forever: the
   // clock takes that slot instead.
   const statusBar = timed ? (
@@ -391,7 +402,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       left={
         <HuntLeftRail
           t={t}
-          liveScore={state.liveScore}
+          liveScore={shownScore}
           lifePoints={state.lifePoints}
           hintStage={state.hintStage}
           attempts={state.attempts}
@@ -414,7 +425,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         // On desktop the start rail already races the rivals.
         rivals={inShell ? undefined : rivals}
         selfUsername={t('mp.rivals.you')}
-        liveScore={state.liveScore}
+        liveScore={shownScore}
         lastScoreIncrement={state.lastScoreIncrement}
         isScoreAnimating={state.isScoreAnimating}
         onQuitClick={handleQuitClick}
