@@ -102,8 +102,6 @@ function Actions({ t, onRematch, onClose, onExitRoom, practiceLeads, secondary, 
       {hasMore && (
         <ResultsMoreTools label={t('eduLiveRoom.hostResults.more')}>
           <div data-testid="edu-results-tertiary" className="flex flex-col gap-2 @5xl/results:gap-3">
-            {secondary}
-            {exportSlot}
             {(onClose || onExitRoom) && (
               <div className="flex flex-wrap gap-2 @5xl/results:gap-3">
                 {onClose && (
@@ -120,6 +118,8 @@ function Actions({ t, onRematch, onClose, onExitRoom, practiceLeads, secondary, 
                 )}
               </div>
             )}
+            {secondary}
+            {exportSlot}
             {proSlot}
           </div>
         </ResultsMoreTools>
@@ -269,7 +269,6 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
             <div className="flex flex-col gap-2 @max-[64rem]/results:order-first @5xl/results:gap-3 [&>*]:shrink-0">
               <MissedWordsList
                 words={missed}
-                underHalf={studentsUnderHalf(summary)}
                 maxChips={bossOver ? 6 : 8}
                 title={tf('eduLiveRoom.hostResults.missedTitle', 'Words your class missed')}
                 t={t}
@@ -305,6 +304,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
                       summary={summary}
                       players={players}
                       proLabel={tf('eduLiveRoom.hostResults.proPill', 'Pro')}
+                      hideOffer={proCard}
                     />
                   ) : null
                 }

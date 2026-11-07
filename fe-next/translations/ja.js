@@ -21620,7 +21620,6 @@ const ja = {
       "endGame": "ゲームを終了",
       "noScores": "このラウンドは誰も得点できませんでした",
       "mostMissed": "見逃しが多かった単語",
-      "needHelpCount": "半分未満の生徒：{count}人（名前はレポートで確認）",
       "replayMissed": "見逃した単語でもう一回（{count}）",
       "replayFailed": "もう一回の準備ができませんでした。もう一度お試しください。",
       "replayUnconfirmed": "まだルームから応答がありません。次のラウンドは見つからなかった単語だけになるかもしれません。",

@@ -21632,7 +21632,6 @@ const es = {
       "endGame": "Terminar juego",
       "noScores": "Nadie ha puntuado en esta ronda",
       "mostMissed": "Palabras más falladas",
-      "needHelpCount": "Estudiantes por debajo de la mitad: {count}. Los nombres están en el informe.",
       "replayMissed": "Repetir palabras falladas ({count})",
       "replayFailed": "No se pudo preparar la repetición. Inténtalo de nuevo.",
       "replayUnconfirmed": "La sala aún no responde. La próxima ronda podría usar solo las palabras falladas.",

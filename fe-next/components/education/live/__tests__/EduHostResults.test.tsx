@@ -119,7 +119,7 @@ describe('EduHostResults', () => {
 
   it('given lesson words, when results show, then the words still to teach are on the wall', () => {
     render(<EduHostResults summary={lessonSummary} players={players} t={t} />);
-    expect(screen.getAllByTestId('edu-most-missed-word').map((el) => el.textContent)).toEqual(['dog0/2 · 0%']);
+    expect(screen.getAllByTestId('edu-most-missed-word').map((el) => el.textContent)).toEqual(['dog']);
   });
 
   it('given nobody scored, when results show, then the wall says so honestly with the stats and Play again', () => {

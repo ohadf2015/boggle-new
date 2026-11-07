@@ -60,10 +60,10 @@ describe('EduHostResults reteach', () => {
     window.sessionStorage.clear();
   });
 
-  it('given words most of the class missed, when the wall shows results, then the teacher sees them and a count of who needs help', () => {
+  it('given words most of the class missed, when the wall shows results, then the teacher sees them, with a count only on words some students found', () => {
     render(<EduHostResults summary={summary} players={players} t={t} onRematch={vi.fn()} />);
-    expect(screen.getAllByTestId('edu-most-missed-word').map((el) => el.textContent)).toEqual(['enzyme0/3 · 0%', 'membrane1/3 · 33%']);
-    expect(screen.getByTestId('edu-needs-help-count')).toHaveTextContent('{"count":2}');
+    expect(screen.getAllByTestId('edu-most-missed-word').map((el) => el.textContent)).toEqual(['enzyme', 'membrane1/3']);
+    expect(screen.queryByTestId('edu-needs-help-count')).toBeNull();
   });
 
   it('given the replay tap, when the server narrows the room, then the next round starts on those words', () => {

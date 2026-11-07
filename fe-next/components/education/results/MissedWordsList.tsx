@@ -3,14 +3,13 @@
 import type { ReactNode } from 'react';
 import { Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { NB_PANEL, NB_STICKER } from '@/components/teacher/nb/nbStyles';
-import { foundPercent, type MissedWord } from '@/components/education/live/eduReteachModel';
+import { NB_PANEL } from '@/components/teacher/nb/nbStyles';
+import type { MissedWord } from '@/components/education/live/eduReteachModel';
 
 type Translate = (key: string, params?: Record<string, string | number>) => string;
 
 interface MissedWordsListProps {
   words: MissedWord[];
-  underHalf: number;
   maxChips?: number;
   /** The localized heading, "Words your class missed". */
   title: string;
@@ -19,13 +18,8 @@ interface MissedWordsListProps {
   children?: ReactNode;
 }
 
-function percentSuffix(w: MissedWord): string {
-  const pct = foundPercent(w.found, w.of);
-  return pct === null ? '' : ` · ${pct}%`;
-}
-
 /** "Words your class missed": the free reteach insight, sized off the results container so the back row can read it. */
-export function MissedWordsList({ words, underHalf, maxChips = 8, title, t, children }: MissedWordsListProps) {
+export function MissedWordsList({ words, maxChips = 8, title, t, children }: MissedWordsListProps) {
   if (words.length === 0) return null;
   const shown = words.slice(0, maxChips);
   const rest = words.length - shown.length;
@@ -44,11 +38,6 @@ export function MissedWordsList({ words, underHalf, maxChips = 8, title, t, chil
           <Target className="size-[1em] shrink-0 text-neo-pink" aria-hidden="true" />
           {title}
         </h2>
-        {underHalf > 0 && (
-          <p data-testid="edu-needs-help-count" className={cn(NB_STICKER, 'rotate-1 whitespace-normal bg-neo-yellow text-neo-black text-sm @5xl/results:text-base @[96rem]/results:text-xl')}>
-            {t('eduLiveRoom.hostResults.needHelpCount', { count: underHalf })}
-          </p>
-        )}
       </div>
       <ul className="flex flex-wrap gap-1.5 @5xl/results:gap-2.5">
         {shown.map((w) => (
@@ -61,12 +50,11 @@ export function MissedWordsList({ words, underHalf, maxChips = 8, title, t, chil
             {w.word}
             {w.notOnBoard ? (
               <span className="font-neo-body text-[0.7em] font-bold text-neo-black/75">{t('eduLiveRoom.hostResults.notOnBoard')}</span>
-            ) : (
+            ) : w.found > 0 ? (
               <span dir="ltr" className="font-neo-body text-[0.7em] font-bold tabular-nums text-neo-black/75">
                 {w.found}/{w.of}
-                {percentSuffix(w)}
               </span>
-            )}
+            ) : null}
           </li>
         ))}
         {rest > 0 && (

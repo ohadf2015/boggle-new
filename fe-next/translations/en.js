@@ -20665,7 +20665,6 @@ const en = {
       "endGame": "End game",
       "noScores": "No one scored this round",
       "mostMissed": "Most missed words",
-      "needHelpCount": "Students under half: {count}. Names are in the report.",
       "replayMissed": "Replay missed words ({count})",
       "replayFailed": "Couldn't set up the replay. Try again.",
       "replayUnconfirmed": "No answer from the room yet. The next round may use only the missed words.",

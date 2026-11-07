@@ -65,6 +65,16 @@ describe('EduHostResults: fits the wall with the Teacher Pro card', () => {
     expect(more.lastElementChild!.lastElementChild).toContainElement(screen.getByTestId('class-report-teaser'));
   });
 
+  it('given a free teacher opens More, then room controls come first and the trial is offered once, on the Pro preview', () => {
+    renderZeroRound();
+    fireEvent.click(screen.getByTestId('edu-results-more-toggle'));
+    const ids = Array.from(screen.getByTestId('edu-results-tertiary').querySelectorAll('[data-testid]')).map((el) => el.getAttribute('data-testid'));
+    expect(ids.indexOf('edu-results-next-mode')).toBeLessThan(ids.indexOf('edu-results-parent-share'));
+    expect(ids.indexOf('edu-results-end')).toBeLessThan(ids.indexOf('report-pdf-locked'));
+    expect(screen.queryByTestId('report-pdf-offer')).toBeNull();
+    expect(screen.getByTestId('class-report-teaser')).toBeInTheDocument();
+  });
+
   it('given a free teacher, when the class missed many words, then the wall prints the full chip list a Pro wall gets', () => {
     renderZeroRound();
     const free = screen.getByTestId('coverage-words').querySelectorAll('[data-testid^="lesson-word-"]').length;

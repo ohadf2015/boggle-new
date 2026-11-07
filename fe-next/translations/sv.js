@@ -21620,7 +21620,6 @@ const sv = {
       "endGame": "Avsluta spelet",
       "noScores": "Ingen fick poäng den här rundan",
       "mostMissed": "Mest missade ord",
-      "needHelpCount": "Elever under hälften: {count}. Namnen finns i rapporten.",
       "replayMissed": "Spela de missade orden igen ({count})",
       "replayFailed": "Det gick inte att förbereda omgången. Försök igen.",
       "replayUnconfirmed": "Rummet har inte svarat än. Nästa omgång kan bara använda de missade orden.",

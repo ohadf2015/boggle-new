@@ -48,6 +48,8 @@ export interface ReportPdfExportButtonProps {
   players?: PlayerResult[];
   proLabel?: string;
   className?: string;
+  /** Drop the trial line when another card on the screen already makes the offer. */
+  hideOffer?: boolean;
 }
 
 const BUTTON =
@@ -64,7 +66,7 @@ function openBlankTab(): Window | null {
   }
 }
 
-export function ReportPdfExportButton({ language, summary, players, proLabel = 'Pro', className }: ReportPdfExportButtonProps) {
+export function ReportPdfExportButton({ language, summary, players, proLabel = 'Pro', className, hideOffer = false }: ReportPdfExportButtonProps) {
   const { hasPro, loading, known, trialUsed, accessTrialExpires, accessTrialEnded } = useTeacherPro();
   const { user } = useAuth();
   const lang = useLanguage();
@@ -178,11 +180,13 @@ export function ReportPdfExportButton({ language, summary, players, proLabel = '
         <span className="min-w-0">{copy.button}</span>
         <ProPill label={proLabel} />
       </button>
-      <p data-testid="report-pdf-offer" className="text-center text-xs font-semibold text-neo-cream/80 @[96rem]/results:text-sm">
-        <span className="font-bold text-neo-cream">{proOffer.label}</span>
-        {' · '}
-        {proOffer.note}
-      </p>
+      {!hideOffer && (
+        <p data-testid="report-pdf-offer" className="text-center text-xs font-semibold text-neo-cream/80 @[96rem]/results:text-sm">
+          <span className="font-bold text-neo-cream">{proOffer.label}</span>
+          {' · '}
+          {proOffer.note}
+        </p>
+      )}
       {/* Teachers with 3+ classes: the Schools plan beside the $9/mo ask (placement results_school_quote). */}
       <ResultsSchoolQuoteLink language={language} />
     </div>
