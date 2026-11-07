@@ -147,10 +147,11 @@ describe('AutoPromotion', () => {
   });
 
   it('promotes Swedish (wiktionary) and Japanese (jisho) verified words', async () => {
-    // generic getter is called once per lang ('sv' then 'ja'); return per call
-    mockGetVerifiedByLang
-      .mockResolvedValueOnce([{ id: 'sv-1', word: 'hund', url: 'u' }])   // sv
-      .mockResolvedValueOnce([{ id: 'ja-1', word: 'ねこ', url: 'u' }]);   // ja
+    const byLang: Record<string, unknown[]> = {
+      sv: [{ id: 'sv-1', word: 'hund', url: 'u' }],
+      ja: [{ id: 'ja-1', word: 'ねこ', url: 'u' }],
+    };
+    mockGetVerifiedByLang.mockImplementation(async (lang: string) => byLang[lang] ?? []);
 
     const result = await runAutoPromotion();
 
@@ -265,5 +266,13 @@ describe('AutoPromotion', () => {
     expect(result.promoted).toBe(0);
     expect(result.words.wiktionaryBased).toEqual([]);
     expect(result.words.milogBased).toEqual([]);
+  });
+
+  it('promotes Russian Wiktionary-verified words', async () => {
+    mockGetVerifiedByLang.mockImplementation(async (lang: string) => (lang === 'ru' ? [{ id: 'ru-1', word: 'кошка', url: 'u' }] : []));
+    const result = await runAutoPromotion();
+    expect(result.words.wiktionaryRuBased).toEqual(['кошка']);
+    expect(mockAddToCommunityCache).toHaveBeenCalledWith('кошка', 'ru');
+    expect(mockRpc).toHaveBeenCalledWith('mark_word_auto_promoted', { p_word_id: 'ru-1', p_source: 'wiktionary_ru_verified' });
   });
 });

@@ -8,7 +8,7 @@ import type { Namespace } from 'socket.io';
 import type { DuelSocket } from '../types';
 import { registerRealtimeHandlers, realtimeGames, startRealtimeDuel } from '../realtime';
 import { getSupabase } from '@/backend/modules/supabase/client';
-import { isDictionaryWord } from '@/backend/dictionary';
+import { isValidWordLoaded } from '@/backend/dictionary';
 import { isWordOnBoardAsync } from '@/backend/modules/wordValidatorPool';
 import { calculateWordScore } from '@/backend/modules/scoringEngine.types';
 import { EDUCATION_XP_CONFIG } from '@/backend/modules/educationXpManager';
@@ -22,7 +22,7 @@ vi.mock('@/backend/utils/logger');
 vi.mock('@/backend/modules/educationXpManager');
 
 const mockedGetSupabase = vi.mocked(getSupabase);
-const mockedIsDictionaryWord = vi.mocked(isDictionaryWord);
+const mockedIsValidWordLoaded = vi.mocked(isValidWordLoaded);
 const mockedIsWordOnBoardAsync = vi.mocked(isWordOnBoardAsync);
 const mockedCalculateWordScore = vi.mocked(calculateWordScore);
 
@@ -136,7 +136,7 @@ describe('Real-Time Duel Handlers', () => {
 
       // Mock dictionary validation
 
-      mockedIsDictionaryWord.mockReturnValue(false);
+      mockedIsValidWordLoaded.mockResolvedValue(false);
 
       registerRealtimeHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
 
@@ -174,7 +174,7 @@ describe('Real-Time Duel Handlers', () => {
       });
 
 
-      mockedIsDictionaryWord.mockReturnValue(true);
+      mockedIsValidWordLoaded.mockResolvedValue(true);
 
 
       mockedIsWordOnBoardAsync.mockResolvedValue(false);
@@ -215,7 +215,7 @@ describe('Real-Time Duel Handlers', () => {
       });
 
 
-      mockedIsDictionaryWord.mockReturnValue(true);
+      mockedIsValidWordLoaded.mockResolvedValue(true);
 
 
       mockedIsWordOnBoardAsync.mockResolvedValue(true);
@@ -291,7 +291,7 @@ describe('Real-Time Duel Handlers', () => {
       });
 
 
-      mockedIsDictionaryWord.mockReturnValue(true);
+      mockedIsValidWordLoaded.mockResolvedValue(true);
 
 
       mockedIsWordOnBoardAsync.mockResolvedValue(true);
@@ -340,7 +340,7 @@ describe('Real-Time Duel Handlers', () => {
       });
 
 
-      mockedIsDictionaryWord.mockReturnValue(true);
+      mockedIsValidWordLoaded.mockResolvedValue(true);
 
 
       mockedIsWordOnBoardAsync.mockResolvedValue(true);
