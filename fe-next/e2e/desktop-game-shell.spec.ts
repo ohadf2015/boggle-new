@@ -47,8 +47,7 @@ test.describe('desktop game shell (1440x900)', () => {
 
   test('quick classic: board owns the centre, clock and race in the rail, a typed word lands in the feed', async ({ page, baseURL }) => {
     test.setTimeout(90_000);
-    await page.goto('/en/quick-play');
-    await page.getByTestId('mode-card-classic').click();
+    await page.goto('/en/quick-play?mode=classic');
     await dismissCoaches(page);
     await expectShell(page, 'quick-classic');
     await expectBoardOwnsHeight(page);
@@ -120,8 +119,7 @@ test.describe('desktop game shell (1440x900)', () => {
 
   test('quick wheel: the wheel takes the centre, ranks left, one found-words list right', async ({ page }) => {
     test.setTimeout(90_000);
-    await page.goto('/en/quick-play');
-    await page.getByTestId('mode-card-wheel-rush').click();
+    await page.goto('/en/quick-play?mode=wheel-rush');
     await dismissCoaches(page);
     await expectShell(page, 'wheel');
     const orbit = await page.getByTestId('wheel-orbit').boundingBox();
@@ -155,8 +153,7 @@ test.describe('phone keeps its own layout (390x844)', () => {
 
   test('quick classic: no rails, the board keeps its own clock', async ({ page }) => {
     test.setTimeout(60_000);
-    await page.goto('/en/quick-play');
-    await page.getByTestId('mode-card-classic').click();
+    await page.goto('/en/quick-play?mode=classic');
     await dismissCoaches(page);
     await expect(page.locator('.game-board-frame').first()).toBeVisible({ timeout: 30_000 });
     await expect(page.getByTestId('game-shell-left')).toBeHidden();
@@ -165,8 +162,7 @@ test.describe('phone keeps its own layout (390x844)', () => {
 
   test('quick wheel: rails stay empty, one ladder and one word strip on the phone', async ({ page }) => {
     test.setTimeout(60_000);
-    await page.goto('/en/quick-play');
-    await page.getByTestId('mode-card-wheel-rush').click();
+    await page.goto('/en/quick-play?mode=wheel-rush');
     await dismissCoaches(page);
     await expect(page.getByTestId('wheel-orbit')).toBeVisible({ timeout: 30_000 });
     await expect(page.getByTestId('game-shell-left')).toBeHidden();

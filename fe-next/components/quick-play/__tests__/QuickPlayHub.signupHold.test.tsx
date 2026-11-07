@@ -24,16 +24,6 @@ vi.mock('@/hooks/useBackOneLevel', () => ({
     return exitSpy;
   },
 }));
-vi.mock('../QuickPlayModePicker', () => ({
-  QuickPlayModePicker: ({ onSelect, pendingMode }: any) => (
-    <div data-testid="mock-picker" data-pending-mode={pendingMode ?? ''}>
-      <button data-testid="mock-select" onClick={() => onSelect('blast', 'tap')}>sel</button>
-      <button data-testid="mock-play" onClick={() => onSelect('random', 'tap')}>play</button>
-      {pendingMode && <div data-testid="quick-play-loading">loading</div>}
-    </div>
-  ),
-}));
-
 // Speed up the strike/loading hold so tests stay snappy; still assert it runs.
 vi.mock('../lightningPath', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../lightningPath')>();
@@ -109,7 +99,6 @@ describe('QuickPlayHub signup hold across the submit gap', () => {
 
   it('holds the signup nudge from the buzzer, before the results screen has even loaded', async () => {
     render(<QuickPlayHub backHref="/en" />);
-    fireEvent.click(screen.getByTestId('mock-play'));
     await waitFor(() => screen.getByTestId('mock-finish'));
     expect(isQuickResultsOnScreen()).toBe(false);
 
