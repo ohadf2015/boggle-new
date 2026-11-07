@@ -45,6 +45,8 @@ export interface RewardsFlow {
   onDone: () => void;
   /** Bank a run that is still standing (the player is leaving). Once per run. */
   bank: (keepalive?: boolean) => Promise<void>;
+  /** A snack caught at canvas (x, y): pays its coins and bursts them there. */
+  catchSnack: (at: { x: number; y: number }) => void;
 }
 
 /**
@@ -149,9 +151,20 @@ export function useRewardsFlow({ game, estateApi, run, heightM, phase, playSound
    * owns it and this hook hands out no navigation at all.
    */
 
+  const { catchSnack: paySnack } = rewards;
+  const { report } = fx;
+  const catchSnack = useCallback(
+    (at: { x: number; y: number }) => {
+      playSound('balloonPop', { volume: 0.5 });
+      if (paySnack() > 0) report({ x: at.x, y: at.y, quality: 'good' });
+    },
+    [paySnack, report, playSound],
+  );
+
   return {
     rewards,
     fx,
+    catchSnack,
     chest:
       payout && !done
         ? { coins: payout.coins, chest: payout.chest, tease: chestTease(payout.summary), guest: !estateApi.authed }

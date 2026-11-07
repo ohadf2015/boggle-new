@@ -47,6 +47,7 @@ import { useOverHold } from './useOverHold';
 import { dailyDateLabel } from './dailyDateLabel';
 import { GuidedWordCoach } from './guide/GuidedWordCoach';
 import { useGuidedFirstWord } from './guide/useGuidedFirstWord';
+import { useFirstFloorHint } from './guide/useFirstFloorHint';
 import { resolveWt2Screen } from '@/lib/wordTowerV2/exitTracking';
 import { useRush } from './rush/useRush';
 import { useRushUi } from './rush/useRushUi';
@@ -191,6 +192,8 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
   });
   const { wheel, selected, word, valid, resetForRun } = ww;
   const guide = useGuidedFirstWord({ daily, dict: dictRef.current, dictReady, dictError, wheel, selected, phase, towerFloors, floors: run.floors });
+  const guideActive = guide.status !== 'off' && guide.status !== 'done';
+  const firstFloorHint = useFirstFloorHint({ dict: dictRef.current, dictReady, wheel, selectedCount: selected.length, phase, floors: run.floors, towerFloors, guideActive });
 
   const feeds = useCanvasFeeds({ game, estateApi, word, valid, playSound });
   const { tenantsShown, onTenantArrive } = useTenantArrivals(run.tenants, playSound);
@@ -289,6 +292,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
           onImpact={feeds.onImpact}
           onTenantArrive={onTenantArrive}
           onLandPoint={rewardsFlow.fx.report}
+          onSnackCatch={phase === 'over' ? undefined : rewardsFlow.catchSnack}
           getSceneM={feeds.getSceneM}
           homeKey={feeds.homeKey}
           reducedMotion={reducedMotion}
@@ -404,6 +408,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
         onPutBack={ww.putBack}
         onBackspace={ww.backspace}
         onClearWord={ww.clearWord}
+        hint={firstFloorHint}
         feedSlot={rails ? <DailyTowerFeed t={t} words={builtWords} /> : undefined}
       />
 

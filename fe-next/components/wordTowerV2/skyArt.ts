@@ -1,5 +1,5 @@
 import { Container, Graphics } from 'pixi.js';
-import { type CritterKind, type PropKind, type Sky, type SkyFx, lerpColour } from '@/lib/wordTowerV2/biomes';
+import { type CritterKind, FOOD_KINDS, type PropKind, type Sky, type SkyFx, lerpColour } from '@/lib/wordTowerV2/biomes';
 import type { SkyProp } from '@/lib/wordTowerV2/scenery';
 import { buildCritter, isCritter } from './skyCritters';
 
@@ -255,6 +255,24 @@ interface PropView {
   prop: SkyProp;
   g: Container | null;
   tick?: (t: number) => void;
+  /** A snack the player tapped: it pops, then is gone for the rest of the climb. */
+  caughtAt?: number;
+}
+
+/** How far from a snack's centre a tap still catches it, per unit of prop size (screen px). */
+export const SNACK_HIT_PX = 44;
+/** The pop after a catch. */
+const SNACK_POP_MS = 320;
+const FOOD = new Set<PropKind>(FOOD_KINDS);
+
+export function isSnack(kind: PropKind): boolean {
+  return FOOD.has(kind);
+}
+
+/** Scale and alpha of a caught snack `ms` after the tap: a quick swell, then gone. */
+export function snackPop(ms: number): { scale: number; alpha: number } {
+  const k = Math.min(1, Math.max(0, ms / SNACK_POP_MS));
+  return { scale: 1 + 0.6 * k, alpha: 1 - k };
 }
 
 export interface SkyFrame {
@@ -287,6 +305,26 @@ export class SkyLayer {
   constructor(props: SkyProp[]) {
     this.container.addChild(this.bands, this.stars, this.fxFrom.g, this.fxTo.g, this.propLayer);
     this.views = props.map((prop) => ({ prop, g: null }));
+  }
+
+  /**
+   * A tap at screen (x, y): the nearest visible snack within reach is caught.
+   * Returns where it was, for the coin burst, or null.
+   */
+  catchAt(x: number, y: number, now: number): { kind: PropKind; x: number; y: number } | null {
+    let best: PropView | null = null;
+    let bestD = Infinity;
+    for (const v of this.views) {
+      if (!v.g || !v.g.visible || v.caughtAt !== undefined || !isSnack(v.prop.kind)) continue;
+      const d = Math.hypot(v.g.x - x, v.g.y - y);
+      if (d <= SNACK_HIT_PX * v.prop.size && d < bestD) {
+        best = v;
+        bestD = d;
+      }
+    }
+    if (!best?.g) return null;
+    best.caughtAt = now;
+    return { kind: best.prop.kind, x: best.g.x, y: best.g.y };
   }
 
   update(f: SkyFrame): void {
@@ -356,6 +394,18 @@ export class SkyLayer {
           v.g = g;
         }
         this.propLayer.addChild(v.g);
+      }
+      if (v.caughtAt !== undefined) {
+        const pop = snackPop(f.ts - v.caughtAt);
+        if (pop.alpha <= 0) {
+          v.g.visible = false;
+          continue;
+        }
+        v.g.visible = true;
+        this.place(v.g, prop, f, y);
+        v.g.scale.set(pop.scale);
+        v.g.alpha = pop.alpha;
+        continue;
       }
       v.g.visible = true;
       this.place(v.g, prop, f, y);

@@ -43,6 +43,8 @@ export interface RunRewards {
   milestone: Milestone | null;
   clearFlight: (key: number) => void;
   clearMilestone: () => void;
+  /** A floating snack was caught: count it and pay what the server will pay for it. Returns the coins. */
+  catchSnack: () => number;
 }
 
 interface Options {
@@ -101,6 +103,7 @@ export function useRunRewards({ run, heightM, coinMult = 1, district = 1, onPayo
       bestCombo: run.bestCombo,
       crates: run.crates,
       heightM: heightRef.current,
+      ...(before.snacks ? { snacks: before.snacks } : {}),
     };
     const amount = coinDelta(before, after, { coinMult, district });
     const crate = run.crates > prev.crates;
@@ -124,9 +127,26 @@ export function useRunRewards({ run, heightM, coinMult = 1, district = 1, onPayo
     }
   }, [run.floors, run.combo, run.crates, run.bestCombo, coinMult, district, onPayout, onMilestone]);
 
+  const catchSnack = useCallback((): number => {
+    const before = summaryRef.current;
+    const after: RunSummary = { ...before, snacks: (before.snacks ?? 0) + 1 };
+    // Same rule as every other coin: the difference of the server's own formula.
+    const amount = coinDelta(before, after, { coinMult, district });
+    summaryRef.current = after;
+    if (amount > 0) {
+      keyRef.current += 1;
+      const key = keyRef.current;
+      setFlights((f) => [...f.slice(-5), { key, amount, crate: false }]);
+      setCoins((c) => c + amount);
+      onPayout?.(amount, false, 0);
+    }
+    return amount;
+  }, [coinMult, district, onPayout]);
+
   return {
     coins,
     perfects,
+    catchSnack,
     summary: { ...summaryRef.current, heightM },
     getSummary,
     flights,
