@@ -1,11 +1,12 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 const pro = vi.hoisted(() => ({ hasPro: false, loading: false }));
 vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => pro }));
 vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
+vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ t: (k: string) => k, language: 'en', dir: 'ltr' }) }));
 vi.mock('next/link', () => ({ default: ({ href, children, ...rest }: { href: string; children: React.ReactNode }) => <a href={href} {...rest}>{children}</a> }));
 
 import { StrugglePreview } from '../StrugglePreview';
@@ -59,5 +60,17 @@ describe('StrugglePreview — the Pro report door on the wall', () => {
   it('given no students with a tally, then it renders nothing', () => {
     const { container } = render(<StrugglePreview masteryByPlayer={{ 'Ms Cohen': { found: 0, total: 10 } }} teacherName="Ms Cohen" language="he" t={t} />);
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it('Given a Pro teacher with this round\'s data, When they open the grid, Then the full word-by-student grid shows with no Pro pill, price or upsell', () => {
+    const round = { gameMode: 'classic', coverage: [{ word: 'cat', foundBy: ['Noa'] }], masteryByPlayer: mastery, hostName: 'Ms Cohen' };
+    render(<StrugglePreview masteryByPlayer={mastery} teacherName="Ms Cohen" language="en" t={t} round={round} />);
+    expect(screen.getByTestId('struggle-open-grid-note')).toHaveTextContent('eduProResults.openGridNote');
+    fireEvent.click(screen.getByTestId('struggle-open-grid'));
+    const dialog = screen.getByTestId('round-grid-dialog');
+    expect(dialog).toHaveTextContent('Noa');
+    expect(dialog.querySelector('[data-testid="pro-pill"]')).toBeNull();
+    expect(screen.queryByTestId('round-grid-depth')).toBeNull();
+    expect(screen.queryByTestId('round-grid-cta')).toBeNull();
   });
 });

@@ -180,6 +180,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
   const students = stats?.students ?? 0;
   const shortWall = bossOver;
   const proCard = !proLoading && !hasPro && !isPracticeRound(players) && summary.totalWords > 0;
+  const round = { gameMode: summary.gameMode ?? 'classic', coverage: summary.coverage, masteryByPlayer: summary.masteryByPlayer, hostName: summary.teacherName };
   // On the wall the class numbers stand under the winner, so the side column holds coverage, actions and the Pro card.
   const pulseBesideStage = showPodium && !phone && !bossOver;
   const podiumWidth = bossOver
@@ -295,7 +296,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
                 onClose={onClose}
                 onExitRoom={onExitRoom}
                 practiceLeads={practiceLeads}
-                proSlot={proCard ? <ClassReportButton language={language} underHalf={studentsUnderHalf(summary)} bars={reportBars(summary)} proLabel={tf('eduLiveRoom.hostResults.proPill', 'Pro')} /> : null}
+                proSlot={proCard ? <ClassReportButton language={language} underHalf={studentsUnderHalf(summary)} bars={reportBars(summary)} round={round} proLabel={tf('eduLiveRoom.hostResults.proPill', 'Pro')} /> : null}
                 exportSlot={
                   // Export class report (PDF): the real export for Pro, locked and straight to checkout for a free teacher.
                   !proLoading && summary.totalWords > 0 && students > 0 && !isPracticeRound(players) ? (
@@ -322,7 +323,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
             </div>
             {!proLoading && hasPro && summary.totalWords > 0 && (
               <div className={cn((shortWall || phone) && '[@container_results_(height<56.25rem)]:hidden')}>
-                <StrugglePreview masteryByPlayer={summary.masteryByPlayer ?? {}} teacherName={summary.teacherName ?? ''} language={language} t={t} />
+                <StrugglePreview masteryByPlayer={summary.masteryByPlayer ?? {}} teacherName={summary.teacherName ?? ''} language={language} t={t} round={round} />
               </div>
             )}
             {!proLoading && hasPro && showTeacherInvite(outcome.celebrate, students) && (

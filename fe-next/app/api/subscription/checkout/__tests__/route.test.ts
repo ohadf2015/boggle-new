@@ -168,6 +168,7 @@ describe('POST /api/subscription/checkout', () => {
       email: 'teacher@example.com',
       allowTrial: false,
       locale: 'en',
+      analyticsDistinctId: 'u1',
     })
   })
 

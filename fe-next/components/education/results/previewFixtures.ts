@@ -24,10 +24,8 @@ export type PreviewOutcome = 'winner' | 'zero' | 'solo' | 'tie' | 'nolesson';
 export function sampleClassroomSummary(variant: PreviewOutcome = 'winner'): ClassroomSummary {
   if (variant === 'nolesson') return noLessonSummary();
   if (variant !== 'winner') return outcomeSummary(variant);
-  const coverage = WORDS.map((word, i) => ({
-    word,
-    foundBy: i % 4 === 3 ? [] : [NAMES[i % 5]],
-  }));
+  const found: Array<[string, number]> = [['Maya', 6], ['Leo', 4], ['Noa', 3], ['Ari', 1]];
+  const coverage = coverageFor(found);
   const missedWords = coverage.filter((c) => c.foundBy.length === 0).map((c) => c.word);
   const classFoundCount = coverage.length - missedWords.length;
   return {
@@ -50,6 +48,16 @@ export function sampleClassroomSummary(variant: PreviewOutcome = 'winner'): Clas
       { username: 'Noa', score: 87, rank: 3, wordsFound: 3, totalWords: WORDS.length },
     ],
   };
+}
+
+/** Words with i % 4 === 3 stay unfound; each player is spread over that many of the rest, so the grid matches the podium. */
+function coverageFor(found: Array<[string, number]>): ClassroomSummary['coverage'] {
+  const coverage = WORDS.map((word) => ({ word, foundBy: [] as string[] }));
+  const open = WORDS.map((_, i) => i).filter((i) => i % 4 !== 3);
+  found.forEach(([name, n], p) => {
+    for (let k = 0; k < Math.min(n, open.length); k++) coverage[open[(p * 3 + k) % open.length]].foundBy.push(name);
+  });
+  return coverage;
 }
 
 function noLessonSummary(): ClassroomSummary {

@@ -60,6 +60,7 @@ describe('buildQuizResultsPayload', () => {
     expect(summary.podium?.map((p) => p.username)).toEqual(['leo', 'maya']);
     expect(summary.roundsPlayed).toBe(1);
     expect(summary.classFoundCount).toBe(2);
+    expect(summary.gameMode).toBe('vocab-quiz');
     expect(saveClassroomSessionScores).toHaveBeenCalledWith('QUIZ01', expect.any(Object), 1);
   });
 

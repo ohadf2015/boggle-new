@@ -9,6 +9,7 @@ import { PodiumStage } from '@/components/education/results/PodiumStage';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 import type { PlayerResult } from '@/types/components';
 
+vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'u1' }, loading: false, isTeacher: true }) }));
 vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ language: 'en', t: (key: string) => key }) }));
 vi.mock('next/image', () => ({ default: () => <span /> }));
 vi.mock('@/components/Avatar', () => ({ default: () => <span /> }));

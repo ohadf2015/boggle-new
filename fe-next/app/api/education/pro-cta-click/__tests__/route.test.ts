@@ -29,6 +29,16 @@ describe('POST /api/education/pro-cta-click', () => {
     })
   })
 
+  it('Given an anonymous browser cookie, When a teacher taps, Then the tap lands on the browser person', async () => {
+    getAuthedUser.mockResolvedValue({ id: 't1', email: 'teacher@school.org' })
+    const cookie = `ph_phc_x_posthog=${encodeURIComponent(JSON.stringify({ distinct_id: 'anon-7', $sesid: [1, 's7', 1], $user_state: 'anonymous' }))}`
+    await POST(req({ placement: 'class_created', locale: 'en' }, { cookie }))
+    expect(capture.mock.calls[0][0]).toMatchObject({
+      distinctId: 'anon-7',
+      properties: expect.objectContaining({ teacher_id: 't1', $session_id: 's7' }),
+    })
+  })
+
   it('flags a QA alias', async () => {
     getAuthedUser.mockResolvedValue({ id: 't1', email: 'x+lexitest@gmail.com' })
     await POST(req({ placement: 'class_created', locale: 'en' }))

@@ -13,6 +13,11 @@ import { withTimeout } from '@/lib/server/routeTimeout';
 import { accessTrialExpiryAny } from '@/lib/education/accessTrialServer';
 import { polarTrialPlan } from '@/lib/education/pro/accessTrialCheckout';
 import { buildCheckoutTrafficTags } from '@/lib/education/checkoutTrafficTags';
+import {
+  resolveCheckoutAnalyticsIdentity,
+  withAnalyticsIdentity,
+  type CheckoutAnalyticsIdentity,
+} from '@/lib/education/checkoutAnalyticsIdentity';
 import { CHECKOUT_STARTED_EVENT, checkoutStartedPayload } from '@/lib/education/abandonedCheckout';
 import {
   buildProCheckoutStartedEvent,
@@ -23,6 +28,7 @@ import {
   buildProCheckoutFailedEvent,
   captureProFunnelServerEvent,
 } from '@/lib/education/proFunnelServer';
+import type { EduServerEvent } from '@/backend/utils/educationTelemetry';
 
 const CHECKOUT_START_RECORD_TIMEOUT_MS = 1500;
 const CHECKOUT_PROBE_RECORD_TIMEOUT_MS = 400;
@@ -148,6 +154,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'not_in_app' }, { status: 403 });
   }
   let user: Awaited<ReturnType<typeof getAuthedUser>> = null;
+  let identity: CheckoutAnalyticsIdentity | null = null;
+  const emit = (event: EduServerEvent) =>
+    captureProFunnelServerEvent(identity && user ? withAnalyticsIdentity(event, identity, user.id) : event);
   try {
     // Checkout gate: keep the till shut while Polar wiring is missing.
     // This is a runtime check, so it auto-opens the moment env vars are set
@@ -184,6 +193,7 @@ export async function POST(request: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    identity = resolveCheckoutAnalyticsIdentity({ userId: user.id, cookieHeader: request.headers.get('cookie') });
 
     const body = await parseCheckoutBody(request);
     // One trial: inside the free access window the Polar trial runs only to its end,
@@ -205,6 +215,7 @@ export async function POST(request: NextRequest) {
       allowTrial: trial,
       trialDays: trial ? trialPlan?.days : undefined,
       locale,
+      analyticsDistinctId: identity.distinctId,
       returnPath: [
         body.returnTo,
         returnPathFromReferer(
@@ -223,7 +234,7 @@ export async function POST(request: NextRequest) {
       hosts: [request.headers.get('x-forwarded-host'), request.headers.get('host')],
       checkoutUrl,
     })) {
-      captureProFunnelServerEvent(buildProCheckoutFailedEvent(user.id, 'polar_environment_mismatch'));
+      emit(buildProCheckoutFailedEvent(user.id, 'polar_environment_mismatch'));
       return NextResponse.json(
         {
           error: 'POLAR_ENVIRONMENT must not be sandbox on the live LexiClash deploy (refusing sandbox checkout)',
@@ -273,11 +284,11 @@ export async function POST(request: NextRequest) {
     try {
       const startTags: Record<string, unknown> = { ...tags, ...(checkoutId ? { checkout_id: checkoutId } : {}) };
       if (trial) {
-        captureProFunnelServerEvent(buildProTrialStartedEvent(user.id, startTags));
-        captureProFunnelServerEvent(buildCheckoutStartedEvent(user.id, startTags));
+        emit(buildProTrialStartedEvent(user.id, startTags));
+        emit(buildCheckoutStartedEvent(user.id, startTags));
       } else {
-        captureProFunnelServerEvent(buildProCheckoutStartedEvent(user.id, startTags));
-        captureProFunnelServerEvent(buildCheckoutStartedEvent(user.id, startTags));
+        emit(buildProCheckoutStartedEvent(user.id, startTags));
+        emit(buildCheckoutStartedEvent(user.id, startTags));
       }
 
       // Diagnostic only — never blocks the redirect. A teacher who started
@@ -311,11 +322,11 @@ export async function POST(request: NextRequest) {
       }
 
       if (probe?.ok) {
-        captureProFunnelServerEvent(buildCheckoutUrlReachableEvent(user.id, probe.status, { ...tags }));
+        emit(buildCheckoutUrlReachableEvent(user.id, probe.status, { ...tags }));
       } else {
-        captureProFunnelServerEvent(buildCheckoutUrlErrorEvent(user.id, probeStatus, { ...tags }));
+        emit(buildCheckoutUrlErrorEvent(user.id, probeStatus, { ...tags }));
         if (probe && !probe.ok) {
-          captureProFunnelServerEvent(buildProCheckoutFailedEvent(user.id, `checkout_page_${probe.status}`));
+          emit(buildProCheckoutFailedEvent(user.id, `checkout_page_${probe.status}`));
         }
       }
     } catch {
@@ -327,13 +338,13 @@ export async function POST(request: NextRequest) {
     const error = err instanceof Error ? err.message : 'Unknown error';
     logger.error('Exception in POST /api/subscription/checkout:', error);
     if (error.includes('timed out')) {
-      captureProFunnelServerEvent(buildProCheckoutFailedEvent(user?.id ?? 'anonymous', 'polar_checkout_timeout'));
+      emit(buildProCheckoutFailedEvent(user?.id ?? 'anonymous', 'polar_checkout_timeout'));
       return NextResponse.json(
         { error: 'Polar checkout URL creation timed out' },
         { status: 503 }
       );
     }
-    captureProFunnelServerEvent(buildProCheckoutFailedEvent(user?.id ?? 'anonymous', 'server_error'));
+    emit(buildProCheckoutFailedEvent(user?.id ?? 'anonymous', 'server_error'));
     return NextResponse.json(
       { error: 'Failed to create checkout' },
       { status: 500 }
