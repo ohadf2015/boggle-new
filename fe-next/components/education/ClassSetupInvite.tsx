@@ -183,6 +183,8 @@ function InviteReady({ classroom, packKey, t, language }: InviteReadyProps) {
             source="class"
             language={language}
             t={t}
+            withSeat
+            label={t('eduShell.home.practice.cta')}
             onStart={() => trackFirstRoundGuideClicked({ surface: 'class_ready', locale: language, step: 'practice_bots' })}
           />
         }

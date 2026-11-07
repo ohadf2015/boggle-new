@@ -20861,12 +20861,20 @@ const en = {
     "onboarding": {
       "title": "Your first class game in 3 steps",
       "titleCompact": "Finish setting up",
+      "howItWorks": {
+        "title": "How a class game works",
+        "hint": "Four words you'll see everywhere",
+        "joinCode": { "title": "Join code", "body": "A short code on your board. Students type it on any phone or laptop. No accounts." },
+        "board": { "title": "The board", "body": "The screen you show the class, on a projector or a big screen. You start each round there." },
+        "round": { "title": "A round", "body": "Everyone finds words in the same letter grid for a few minutes. Then you see the scores and the words to reteach." },
+        "wordList": { "title": "Word list", "body": "The words your class practices. We pick one to start, and you can change it any time." }
+      },
       "progress": "{done} of {total} done",
       "dismiss": "Hide setup steps",
       "steps": {
         "createClass": {
           "title": "Create a class",
-          "body": "A name and a language. Takes 20 seconds.",
+          "body": "Just a name. Language and words are already picked for you.",
           "cta": "Create your first class"
         },
         "shareCode": {
@@ -20971,12 +20979,14 @@ const en = {
         "title": "What happens next",
         "step1": "You get a join code",
         "step2": "Students type it on any phone. No accounts.",
-        "step3": "Pick a game and press Go live. The first round takes 3 minutes."
+        "step3": "Press Start on the board. The first round takes 3 minutes."
       },
       "packWords": "{count} words",
       "packRecommended": "Our pick",
       "startLive": "Start live",
-      "createOnly": "Just create the class",
+      "createOnly": "Create now, play later",
+      "createAndPlayHint": "Opens the game board with your join code. Students join, then you press Start.",
+      "packSticker": "Word list: {name}",
       "packHint": "Students also get these words as homework when they join.",
       "assignFailed": "Your class is ready, but the words weren't assigned. Assign them from the class page."
     },

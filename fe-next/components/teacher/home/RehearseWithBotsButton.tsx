@@ -32,9 +32,11 @@ export interface RehearseWithBotsButtonProps {
   withSeat?: boolean;
   /** Overrides the default "rehearse" label. */
   label?: string;
+  /** Replaces the quiet-link look, for a place where the practice run is the offer. */
+  buttonClassName?: string;
 }
 
-export function RehearseWithBotsButton({ classroomId, source, language, t, showNote = false, compact = false, className, onStart, withSeat = false, label }: RehearseWithBotsButtonProps) {
+export function RehearseWithBotsButton({ classroomId, source, language, t, showNote = false, compact = false, className, onStart, withSeat = false, label, buttonClassName }: RehearseWithBotsButtonProps) {
   const router = useRouter();
   const { user } = useAuth();
   const [pending, setPending] = useState(false);
@@ -63,7 +65,7 @@ export function RehearseWithBotsButton({ classroomId, source, language, t, showN
         disabled={pending}
         aria-busy={pending || undefined}
         title={showNote ? undefined : t('education.projectorLobby.rehearsePrivate')}
-        className={cn(QUIET_LINK, compact && 'max-sm:min-w-11 max-sm:justify-center max-sm:border-2 max-sm:border-neo-cream/40 max-sm:no-underline')}
+        className={buttonClassName ?? cn(QUIET_LINK, compact && 'max-sm:min-w-11 max-sm:justify-center max-sm:border-2 max-sm:border-neo-cream/40 max-sm:no-underline')}
       >
         {pending ? (
           <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden="true" />

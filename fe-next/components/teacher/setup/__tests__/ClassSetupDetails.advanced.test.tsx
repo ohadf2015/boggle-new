@@ -65,3 +65,12 @@ describe('ClassSetupDetails advanced options', () => {
     expect(screen.getByTestId('setup-advanced-summary').textContent).toContain('eduShell.setup.grade.g68');
   });
 });
+
+describe('ClassSetupDetails explains the two ways out', () => {
+  it('Then "Create and play" says what it opens, and the word list sticker says it is the word list', () => {
+    renderDetails();
+    expect(screen.getByTestId('setup-start-live')).toHaveAttribute('aria-describedby', 'setup-start-live-hint');
+    expect(screen.getByTestId('setup-start-live-hint')).toHaveTextContent('eduShell.setup.createAndPlayHint');
+    expect(screen.getByTestId('setup-advanced-summary').textContent).toContain('eduShell.setup.packSticker');
+  });
+});
