@@ -23,6 +23,9 @@ import { useMusic } from '@/contexts/MusicContext';
 import { getRecentBlogPostsForLocale } from '@/lib/blog/data';
 
 vi.mock('@/contexts/AuthContext');
+vi.mock('@/components/home-preview/HomePreview', () => ({
+  HomePreview: ({ onPlay }: { onPlay?: () => void }) => <div data-testid="home-preview" data-has-play={onPlay ? 'yes' : 'no'} />,
+}));
 vi.mock('@/contexts/LanguageContext');
 vi.mock('@/contexts/MusicContext');
 vi.mock('@/utils/ThemeContext', () => ({ useTheme: () => ({ theme: 'dark', setTheme: vi.fn() }) }));

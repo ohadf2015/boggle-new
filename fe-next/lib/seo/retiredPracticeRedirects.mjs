@@ -44,18 +44,16 @@ export const RETIRED_PRACTICE_REDIRECTS = [
     destination: '/:locale/daily/word-wheel',
     permanent: true,
   },
-  // Classic practice was the single-player grid. Land on one coached round,
-  // not a bot match (bare /singleplayer is treated as autoStart=bots).
+  // Classic practice was the single-player grid: land straight in a classic round.
   {
     source: `/${LOCALE}/practice/classic`,
-    destination: '/:locale/singleplayer?autoStart=coach',
+    destination: '/:locale/quick-play?mode=classic',
     permanent: true,
   },
-  // The hub itself — must precede the catch-all. Coach, not bare singleplayer
-  // (bots), so old /practice bookmarks land the same place as /practice/classic.
+  // The hub itself — must precede the catch-all; lands where /practice/classic does.
   {
     source: `/${LOCALE}/practice`,
-    destination: '/:locale/singleplayer?autoStart=coach',
+    destination: '/:locale/quick-play?mode=classic',
     permanent: true,
   },
   // Anything else under /practice — including `/practice/brain`, which
@@ -64,7 +62,7 @@ export const RETIRED_PRACTICE_REDIRECTS = [
   // the hub above.
   {
     source: `/${LOCALE}/practice/:rest+`,
-    destination: '/:locale/singleplayer',
+    destination: '/:locale/quick-play',
     permanent: true,
   },
 ];

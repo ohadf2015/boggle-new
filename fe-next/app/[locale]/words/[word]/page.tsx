@@ -320,7 +320,7 @@ export default async function WordExplorerPage({ params }: PageParams) {
           {/* CTA */}
           <div className="text-center">
             <Link
-              href={`/${locale}/singleplayer`}
+              href={`/${locale}/quick-play`}
               className="inline-block bg-neo-yellow text-neo-black font-neo-display font-black px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard hover:shadow-hard-pressed active:translate-y-0.5 transition-[box-shadow,translate,scale,rotate,transform]"
             >
               Play Now →

@@ -443,7 +443,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete, entry }) =>
           ? `/${language}/daily`
           : mode === 'multiplayer'
             ? `/${language}/multiplayer`
-            : `/${language}/singleplayer?autoStart=practice`;
+            : `/${language}/quick-play?mode=classic`;
       router.push(route);
       emitCompleted({ via: 'crazygames_welcome', selected_mode: mode });
       onComplete();

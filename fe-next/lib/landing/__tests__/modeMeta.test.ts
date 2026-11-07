@@ -15,7 +15,7 @@ describe('MODE_META — parity with control renderCard', () => {
     // practice is off the hub for everyone (712e2475d) — this route is never
     // rendered by the control switch anymore. It stays real (not the retired
     // `/practice`) because welcomeModes.ts reads it directly for email links.
-    ['practice', '/singleplayer?autoStart=practice', 'cyan'],
+    ['practice', '/quick-play?mode=classic', 'cyan'],
     ['blast', '/blast', 'orange'],
     ['adventure', '/adventure', 'lime'],
     ['connections', '/connections/pyramid', 'blue'],

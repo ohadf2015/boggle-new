@@ -9,9 +9,9 @@ import { QuickResultsRays, SparkleLoop } from '@/components/quick-play/QuickResu
 import { NODE_COLORS } from '@/components/quick-play/modeColors';
 import type { QuickMode } from '@/components/quick-play/types';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
-import { HOME_PREVIEW_COPY as C } from './copy';
 import { EditAvatarButton } from './EditAvatarButton';
 import { HeroQuickLinks } from './HeroQuickLinks';
+import { quickPlayHref } from '@/lib/quickPlay/startMode';
 
 const MODES: QuickMode[] = ['classic', 'blast', 'word-hunt', 'wheel-rush'];
 const KEY_TILT = ['-rotate-2', 'rotate-1', '-rotate-1', 'rotate-2'];
@@ -25,6 +25,7 @@ interface PlayHeroProps {
   streak: number;
   streakLoading: boolean;
   onAvatarSaved: (config: CustomAvatarConfig) => void;
+  onPlay?: () => void;
 }
 
 function AvatarStage({ avatar, animate, t, onAvatarSaved }: Pick<PlayHeroProps, 'avatar' | 'animate' | 't' | 'onAvatarSaved'>) {
@@ -85,14 +86,13 @@ function AvatarStage({ avatar, animate, t, onAvatarSaved }: Pick<PlayHeroProps, 
         aria-hidden="true"
         className="absolute end-[14%] top-3 z-20 flex h-14 w-14 rotate-12 items-center justify-center rounded-full border-[3px] border-black bg-neo-yellow font-neo-display text-lg font-bold text-black shadow-hard lg:end-[16%] lg:top-[16%] lg:h-24 lg:w-24 lg:text-3xl"
       >
-        {C.timerBadge}
+        {t('homePlay.timerBadge')}
       </span>
     </div>
   );
 }
 
-export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoading, onAvatarSaved }: PlayHeroProps) {
-  const href = `/${lang}/quick-play`;
+export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoading, onAvatarSaved, onPlay }: PlayHeroProps) {
   return (
     <section
       aria-labelledby="hp-play-title"
@@ -111,13 +111,14 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
               id="hp-play-title"
               className="mt-1 font-neo-display text-[26px] font-bold [@media(max-height:700px)]:text-[21px] leading-[1.1] text-neo-cream [text-shadow:0_3px_0_black] lg:text-6xl 2xl:text-7xl"
             >
-              {C.heroLine}
+              {t('homePlay.heroLine')}
             </h1>
           </div>
 
           <Link
-            href={href}
+            href={quickPlayHref(lang, 'random')}
             data-testid="hp-play"
+            onClick={onPlay ? (e) => { e.preventDefault(); onPlay(); } : undefined}
             className="group relative flex h-[68px] items-center justify-center gap-3 [@media(max-height:700px)]:h-[58px] overflow-hidden rounded-2xl border-[3px] border-black bg-neo-lime px-4 text-black shadow-hard-lg active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed lg:h-28 lg:rounded-3xl 2xl:h-32"
           >
             {animate && (
@@ -131,17 +132,17 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
               <span className="font-neo-display text-[28px] font-bold tracking-[0.14em] lg:text-5xl">
                 {t('quickPlay.solo.play')}
               </span>
-              <span className="mt-0.5 text-xs font-bold tracking-wide opacity-70 lg:text-base">{C.playSub}</span>
+              <span className="mt-0.5 text-xs font-bold tracking-wide opacity-70 lg:text-base">{t('homePlay.playSub')}</span>
             </span>
           </Link>
 
           <div>
-            <p className="mb-2 text-center text-xs font-bold text-neo-white/60 lg:text-start lg:text-base">{C.pickMode}</p>
+            <p className="mb-2 text-center text-xs font-bold text-neo-white/60 lg:text-start lg:text-base">{t('homePlay.pickMode')}</p>
             <ul className="grid grid-cols-4 gap-2.5 lg:gap-4" data-testid="hp-keycaps">
               {MODES.map((mode, i) => (
                 <li key={mode}>
                   <Link
-                    href={href}
+                    href={quickPlayHref(lang, mode)}
                     className={`flex aspect-square flex-col items-center justify-center gap-1 rounded-2xl border-[3px] border-black text-black shadow-hard transition-transform hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed ${NODE_COLORS[mode].bg} ${KEY_TILT[i]} ${
                       animate ? 'animate-[qp-card-in_0.55s_cubic-bezier(0.3,0.9,0.4,1)_both]' : ''
                     }`}
@@ -157,7 +158,7 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
             </ul>
           </div>
 
-          <HeroQuickLinks lang={lang} streak={streak} streakLoading={streakLoading} />
+          <HeroQuickLinks lang={lang} t={t} streak={streak} streakLoading={streakLoading} />
         </div>
       </div>
     </section>

@@ -173,7 +173,7 @@ export async function NLetterWordsView({ locale, n }: { locale: string; n: WordL
               </p>
             </div>
             <Link
-              href={`/${locale}/singleplayer`}
+              href={`/${locale}/quick-play`}
               className="shrink-0 bg-neo-lime text-neo-black font-neo-display font-black px-5 py-2.5 rounded-neo border-3 border-neo-black shadow-hard-sm hover:shadow-hard-pressed active:translate-y-0.5 transition-[box-shadow,translate,scale,rotate,transform]"
             >
               Play Now →
@@ -281,7 +281,7 @@ export async function NLetterWordsView({ locale, n }: { locale: string; n: WordL
                   Where can I practice finding {n}-letter words?
                 </summary>
                 <p className="mt-2 text-slate-300 text-sm leading-relaxed ps-4">
-                  Play a <Link href={`/${locale}/singleplayer`} className="text-neo-cyan hover:underline">single-player game</Link> or
+                  Play a <Link href={`/${locale}/quick-play`} className="text-neo-cyan hover:underline">single-player game</Link> or
                   try the <Link href={`/${locale}/daily/word-hunt`} className="text-neo-cyan hover:underline">Word Hunt daily challenge</Link>,
                   which often rewards finding words of specific lengths.
                 </p>

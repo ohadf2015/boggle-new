@@ -239,7 +239,7 @@ export default async function LexiClashVsWordlePage({ params }: PageProps) {
         {/* CTA Section */}
         <section className="mb-12 flex flex-col gap-3 sm:flex-row-reverse sm:gap-4">
           <Link
-            href={`/${locale}/singleplayer`}
+            href={`/${locale}/quick-play`}
             className="rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4"
           >
             שחקו עכשיו - בחינם!

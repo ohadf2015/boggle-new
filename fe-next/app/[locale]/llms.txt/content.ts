@@ -12,7 +12,7 @@ type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 const COMMON_URLS = (locale: Locale) => ({
     home: `${BASE}/${locale}`,
     multiplayer: `${BASE}/${locale}/multiplayer`,
-    singleplayer: `${BASE}/${locale}/singleplayer`,
+    singleplayer: `${BASE}/${locale}/quick-play`,
     daily: `${BASE}/${locale}/daily`,
     adventure: `${BASE}/${locale}/adventure`,
     wordTower: `${BASE}/${locale}/word-tower`,

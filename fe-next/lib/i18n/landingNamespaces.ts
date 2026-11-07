@@ -17,6 +17,7 @@ export const LANDING_NAMESPACES = [
   // Fresh-visitor homepage copy (components/landing/fresh/*), generated into
   // translations/*.js by the homepage gauntlet merge.
   'homeFresh',
+  'homePlay',
   'nav',
   'common',
   'footer',
@@ -62,6 +63,12 @@ export const LANDING_NAMESPACES = [
 ] as const;
 
 export const LANDING_EXTRA_KEYS = [
+  'quickPlay.solo.title',
+  'quickPlay.solo.play',
+  'quickPlay.solo.mode.classic',
+  'quickPlay.solo.mode.blast',
+  'quickPlay.solo.mode.word-hunt',
+  'quickPlay.solo.mode.wheel-rush',
   'education.home.badge_promo',
   'education.home.badge_student',
   'education.home.badge_teacher',

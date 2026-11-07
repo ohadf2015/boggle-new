@@ -22,7 +22,7 @@ URL: https://www.lexiclash.live/en/multiplayer
 ### Single Player
 Solo vs AI bots of varying difficulty (Easy, Medium, Hard, Expert). Practice mode with no timer. Adventure mode features world progression, boss battles with cinematic animations, and an upgrade system. Blast Mode offers fast-paced cascading word gameplay with combo chains.
 
-URL: https://www.lexiclash.live/en/singleplayer
+URL: https://www.lexiclash.live/en/quick-play
 
 ### Daily Challenge - Word Hunt Survival
 A Wordle-style daily puzzle. Same board worldwide. Players get 10 attempts to find a hidden target word by guessing words on the grid. Feedback shows which letters are correct (green), in the wrong position (yellow), or not in the target word (gray). Results are shareable as emoji grids. Daily leaderboards track performance, and streak tracking encourages daily play.
@@ -229,7 +229,7 @@ Common queries this section answers:
 - Home: https://www.lexiclash.live/en
 - Rules / How to Play: https://www.lexiclash.live/en/how-to-play
 - Multiplayer: https://www.lexiclash.live/en/multiplayer
-- Single Player: https://www.lexiclash.live/en/singleplayer
+- Single Player: https://www.lexiclash.live/en/quick-play
 - Daily Challenge: https://www.lexiclash.live/en/daily
 - Daily Archive: https://www.lexiclash.live/en/daily/archive
 - Adventure Mode: https://www.lexiclash.live/en/adventure

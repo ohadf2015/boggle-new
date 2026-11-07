@@ -142,7 +142,7 @@ Panicking at the end. When that timer hits 30 seconds, something in your brain j
       },
     ],
     ctaText: 'Go try this stuff right now',
-    ctaLink: '/singleplayer',
+    ctaLink: '/quick-play',
     backToGuides: 'Back to Guides',
   },
   he: {
@@ -263,7 +263,7 @@ Panicking at the end. When that timer hits 30 seconds, something in your brain j
       },
     ],
     ctaText: 'יאללה לנסות את זה עכשיו',
-    ctaLink: '/singleplayer',
+    ctaLink: '/quick-play',
     backToGuides: 'חזרה למדריכים',
   },
   sv: {
@@ -372,7 +372,7 @@ Panik på slutet. När timern visar 30 sekunder går något sönder i hjärnan. 
       },
     ],
     ctaText: 'Testa det här nu direkt',
-    ctaLink: '/singleplayer',
+    ctaLink: '/quick-play',
     backToGuides: 'Tillbaka till guider',
   },
   ja: {
@@ -481,7 +481,7 @@ Panik på slutet. När timern visar 30 sekunder går något sönder i hjärnan. 
       },
     ],
     ctaText: 'さっそく試してみよう',
-    ctaLink: '/singleplayer',
+    ctaLink: '/quick-play',
     backToGuides: 'ガイドに戻る',
   },
   es: {
@@ -602,7 +602,7 @@ Entrar en panico al final. Cuando el reloj llega a 30 segundos, algo en tu cereb
       },
     ],
     ctaText: 'Ve a probar esto ahora mismo',
-    ctaLink: '/singleplayer',
+    ctaLink: '/quick-play',
     backToGuides: 'Volver a guias',
   },
 };

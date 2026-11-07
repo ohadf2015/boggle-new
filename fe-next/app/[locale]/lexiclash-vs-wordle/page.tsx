@@ -112,7 +112,7 @@ export default async function LexiClashVsWordlePage({ params }: PageProps) {
           'Let’s get this out of the way: Wordle is a masterpiece of game design. One puzzle, five letters, six tries, done. It turned the entire internet into word nerds and that rules. But if you’ve ever finished your daily Wordle at 8:03 AM and thought "now what?" — that’s where LexiClash comes in. Unlimited rounds, live multiplayer, a full adventure mode with boss fights, and support for six languages. Same word-game brain, completely different animal.',
         ]}
         quickCtas={[
-          { href: `/${locale}/singleplayer`, label: 'Try LexiClash Free', variant: 'lime' },
+          { href: `/${locale}/quick-play`, label: 'Try LexiClash Free', variant: 'lime' },
           { href: `/${locale}/daily`, label: 'Daily Challenge', variant: 'cyan' },
           { href: `/${locale}/multiplayer`, label: 'Play With Friends', variant: 'pink' },
         ]}
@@ -140,7 +140,7 @@ export default async function LexiClashVsWordlePage({ params }: PageProps) {
           body: [
             'If you love Wordle, you’ll probably love this too — it scratches the same part of your brain but lets you keep scratching. No download, no signup, no credit card. Open the link, pick a mode, start finding words. You’ll know within 30 seconds if it’s your thing.',
           ],
-          href: `/${locale}/singleplayer`,
+          href: `/${locale}/quick-play`,
           label: 'Play LexiClash Free Now',
         }}
       />

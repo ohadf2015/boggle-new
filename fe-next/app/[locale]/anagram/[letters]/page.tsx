@@ -239,7 +239,7 @@ export default async function AnagramPage({ params }: PageParams) {
                   </p>
                 </div>
                 <Link
-                  href={`/${locale}/singleplayer`}
+                  href={`/${locale}/quick-play`}
                   className="shrink-0 bg-neo-lime text-neo-black font-neo-display font-black px-5 py-2.5 rounded-neo border-3 border-neo-black shadow-hard-sm hover:shadow-hard-pressed active:translate-y-0.5 transition-[box-shadow,translate,scale,rotate,transform]"
                 >
                   Play Free →
@@ -343,7 +343,7 @@ export default async function AnagramPage({ params }: PageParams) {
                 Word Solver →
               </Link>
               <Link
-                href={`/${locale}/singleplayer`}
+                href={`/${locale}/quick-play`}
                 className="flex-1 bg-neo-navy-light border border-slate-700 rounded-neo px-4 py-3 hover:border-neo-cyan transition-colors text-sm font-bold"
               >
                 Play Solo →
