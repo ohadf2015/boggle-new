@@ -252,7 +252,7 @@ export function SpellTilesPractice({ locale, title, lang, words, labels, teacher
         <span className="shrink-0 font-neo-display text-sm font-black uppercase tracking-widest text-neo-white/80">
           {fill(labels.progress, { n: index + 1, total: words.length }, locale)}
         </span>
-        <span className="h-3 flex-1 overflow-hidden rounded-full border-2 border-neo-black bg-neo-navy-light" aria-hidden>
+        <span className="h-3 flex-1 overflow-hidden rounded-full border-2 border-neo-cream/40 bg-neo-navy-light" aria-hidden>
           <span className="block h-full bg-neo-lime" style={{ width: `${(index / words.length) * 100}%` }} />
         </span>
         <span className="inline-flex shrink-0 items-center gap-1 rounded-full border-2 border-neo-black bg-neo-yellow px-3 py-1 font-neo-display text-sm font-black text-neo-navy" aria-label={labels.stars}>
@@ -375,7 +375,7 @@ export function SpellTilesPractice({ locale, title, lang, words, labels, teacher
         </div>
       </div>
 
-      <div className="rounded-neo-lg border-4 border-neo-black bg-neo-navy-light p-3 shadow-hard">
+      <div className="rounded-neo-lg border-4 border-neo-cream/40 bg-neo-navy-light p-3 shadow-hard">
         <div dir={dir} lang={lang} className={`flex flex-wrap items-center justify-center ${denseTiles ? 'gap-1.5' : 'gap-2'}`}>
           {puzzle.tiles.map((t) => {
             const used = answer.includes(t.id);
@@ -387,7 +387,7 @@ export function SpellTilesPractice({ locale, title, lang, words, labels, teacher
                 data-char={t.char}
                 disabled={used || locked}
                 onClick={() => commit(placeTile(puzzle, answer, t.id))}
-                className={`flex items-center justify-center rounded-neo border-3 border-neo-black px-2 font-neo-display font-black ${denseTiles ? 'h-12 min-w-12 text-2xl' : 'h-14 min-w-14 text-3xl sm:h-16 sm:min-w-16'} shadow-hard transition-transform duration-100 active:translate-y-0.5 motion-reduce:transition-none ${used ? 'bg-neo-navy text-transparent shadow-none' : 'bg-neo-white text-neo-navy'}`}
+                className={`flex items-center justify-center rounded-neo border-3 px-2 font-neo-display font-black ${denseTiles ? 'h-12 min-w-12 text-2xl' : 'h-14 min-w-14 text-3xl sm:h-16 sm:min-w-16'} shadow-hard transition-transform duration-100 active:translate-y-0.5 motion-reduce:transition-none ${used ? 'border-neo-cream/40 bg-neo-navy text-transparent shadow-none' : 'border-neo-black bg-neo-white text-neo-navy'}`}
               >
                 {t.char}
               </button>

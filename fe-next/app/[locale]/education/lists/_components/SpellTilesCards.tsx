@@ -94,7 +94,7 @@ export function EndCard({ labels, locale, firstTry, total, stars, teacherCta, on
             teacherCta.onClick?.(e);
           }}
           data-cta="practice-end-teacher"
-          className="mt-4 rounded-neo border-3 border-neo-black bg-neo-navy px-4 py-3 text-center font-neo-display font-black uppercase tracking-wider text-neo-lime shadow-hard focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+          className="mt-4 rounded-neo border-3 border-neo-cream/40 bg-neo-navy px-4 py-3 text-center font-neo-display font-black uppercase tracking-wider text-neo-lime shadow-hard focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
         >
           {labels.teacherCta}
         </a>
