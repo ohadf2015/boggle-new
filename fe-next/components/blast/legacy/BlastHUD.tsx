@@ -9,7 +9,7 @@ import { computeTimerUrgency } from '@/lib/cosy/timerUrgency';
 import { useSuppressTimerUrgency } from '@/contexts/AccessibilityContext';
 import { BlastComboStreakBadge } from './BlastComboStreakBadge';
 import BlastWalletHud from './BlastWalletHud';
-import { BlastHudMuteButton } from '../v2/BlastHudMuteButton';
+import { BlastHudMuteButton } from './BlastHudMuteButton';
 import { useRegisterHeaderAudioControl } from '@/contexts/NavigationContext';
 import { BLAST_MAX_LIVES } from './utils/blastLives';
 import type { ComboStreakState } from './hooks/useBlastComboStreak';
