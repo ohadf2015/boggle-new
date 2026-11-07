@@ -21604,7 +21604,6 @@ const ja = {
       "missedTitle": "クラスが見逃した単語",
       "practiceWords": "この単語を練習する（{count}）",
       "shareParents": "保護者に共有",
-      "moreTools": "共有と書き出し",
       "proPill": "Pro",
       "invitePrompt": "気に入りそうな先生はいますか？",
       "inviteCta": "同僚を招待",

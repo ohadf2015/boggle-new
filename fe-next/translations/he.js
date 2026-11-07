@@ -21534,7 +21534,6 @@ const he = {
       "missedTitle": "מילים שהכיתה פספסה",
       "practiceWords": "לתרגל את המילים האלה ({count})",
       "shareParents": "שיתוף עם ההורים",
-      "moreTools": "שיתוף וייצוא",
       "proPill": "Pro",
       "invitePrompt": "מכירים מורה שזה יתאים לה?",
       "inviteCta": "להזמין עמית",

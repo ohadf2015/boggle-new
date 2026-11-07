@@ -21604,7 +21604,6 @@ const sv = {
       "missedTitle": "Ord som klassen missade",
       "practiceWords": "Öva på de här orden ({count})",
       "shareParents": "Dela med föräldrar",
-      "moreTools": "Dela och exportera",
       "proPill": "Pro",
       "invitePrompt": "Känner du en lärare som skulle gilla det här?",
       "inviteCta": "Bjud in en kollega",

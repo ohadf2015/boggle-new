@@ -21616,7 +21616,6 @@ const es = {
       "missedTitle": "Palabras que tu clase falló",
       "practiceWords": "Practicar estas palabras ({count})",
       "shareParents": "Compartir con las familias",
-      "moreTools": "Compartir y exportar",
       "proPill": "Pro",
       "invitePrompt": "¿Conoces a un docente a quien le gustaría?",
       "inviteCta": "Invitar a un colega",

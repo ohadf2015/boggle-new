@@ -20649,7 +20649,6 @@ const en = {
       "missedTitle": "Words your class missed",
       "practiceWords": "Practice these words ({count})",
       "shareParents": "Share with parents",
-      "moreTools": "Share and export",
       "proPill": "Pro",
       "invitePrompt": "Know a teacher who'd like this?",
       "inviteCta": "Invite a colleague",
