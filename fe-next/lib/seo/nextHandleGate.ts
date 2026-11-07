@@ -157,6 +157,7 @@ export const REDIRECT_ONLY_SEGMENTS: ReadonlySet<string> = new Set([
   'practice',
   'privacy',
   'privacy-policy',
+  'ranks',
   'room',
   'schools',
   'scrabble',
