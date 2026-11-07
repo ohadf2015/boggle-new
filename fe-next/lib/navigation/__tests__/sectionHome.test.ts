@@ -187,7 +187,7 @@ describe('sectionHome', () => {
 
     describe('edu live route', () => {
       it('given the teacher on the live route, when recovering, then they return to the teacher hub', () => {
-        expect(sectionHome({ pathname: '/en/education/live', search: '?room=ABCD&host=1' })).toBe('/en/teacher');
+        expect(sectionHome({ pathname: '/en/education/live/host', search: '?room=ABCD' })).toBe('/en/teacher');
       });
 
       it('given a student on the live route, when recovering, then they return to the student hub', () => {

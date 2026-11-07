@@ -30,7 +30,7 @@ afterEach(() => {
 
 describe('eduErrorExit', () => {
   it.each([
-    ['live', '/he/education/live', '?room=AB12&host=1', 'he', '/he/teacher'],
+    ['live', '/he/education/live/host', '?room=AB12', 'he', '/he/teacher'],
     ['live', '/he/education/live', '?room=AB12', 'he', '/he/student'],
     ['live', '/en/multiplayer', '?classroom=true&host=true', 'en', '/en/teacher'],
     ['student', '/sv/student/lessons/7', '', 'sv', '/sv/student'],
@@ -71,7 +71,7 @@ describe('<EduRouteError>', () => {
   });
 
   it('Given the live host, When Back to class is pressed, Then the teacher lands on their hub', () => {
-    setUrl('/en/education/live?room=AB12&host=1');
+    setUrl('/en/education/live/host?room=AB12');
     render(<EduRouteError error={new Error('boom')} reset={vi.fn()} boundary="edu-live" area="live" />);
     fireEvent.click(screen.getByRole('button', { name: 'Back to class' }));
     expect(push).toHaveBeenCalledWith('/en/teacher');

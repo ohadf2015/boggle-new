@@ -31,7 +31,7 @@ import { ClassroomGameLobby } from '../ClassroomGameLobby';
 describe('ClassroomGameLobby — after GO LIVE', () => {
   it('goes straight to the projector lobby, like the express launch, with no second join screen in between', () => {
     render(<ClassroomGameLobby onBack={vi.fn()} />);
-    expect(replace).toHaveBeenCalledWith('/en/education/live?room=A2Y79C&host=1');
+    expect(replace).toHaveBeenCalledWith('/en/education/live/host?room=A2Y79C');
     expect(screen.queryByText('education.classroomGame.joinTheGame')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /start/i })).not.toBeInTheDocument();
   });

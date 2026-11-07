@@ -72,7 +72,7 @@ describe('Proxy — legacy classroom multiplayer links', () => {
 
   it('given an old teacher link, when requested, then it redirects temporarily to the live route with room and host', async () => {
     const res = (await proxy(makeRequest('/en/multiplayer', { search: '?room=AB12CD&classroom=true&host=true' }))) as unknown as { url: string; status: number };
-    expect(res.url).toBe('http://localhost:3000/en/education/live?room=AB12CD&host=1');
+    expect(res.url).toBe('http://localhost:3000/en/education/live/host?room=AB12CD');
     expect(res.status).toBe(307);
   });
 
