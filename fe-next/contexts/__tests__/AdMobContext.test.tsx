@@ -437,9 +437,7 @@ describe('AdMobProvider', () => {
     });
   });
 
-  // Families Ad Format Requirements: interstitials are the cited format and must
-  // not reach anyone we don't KNOW is an adult. These are the v5740 fix.
-  it('shouldShowInterstitial NEVER fires for undeclared guests, even past warmup', async () => {
+  it('Given an undeclared guest past warmup, When a slot is due, Then the interstitial shows', async () => {
     social.tier = 'unknown';
     let captured: ReturnType<typeof useAdMobContext> | null = null;
     await act(async () => {
@@ -449,9 +447,8 @@ describe('AdMobProvider', () => {
         </AdMobProvider>
       );
     });
-    // Six game-ends would make an adult eligible; an undeclared guest stays blocked.
     for (let i = 0; i < 6; i++) captured!.recordGameEnd();
-    expect(captured!.shouldShowInterstitial()).toBe(false);
+    expect(captured!.shouldShowInterstitial()).toBe(true);
   });
 
   it('shouldShowInterstitial NEVER fires for a known child', async () => {

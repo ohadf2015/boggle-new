@@ -27,20 +27,13 @@ describe('shouldSuppressAdsForTier', () => {
   });
 });
 
-/**
- * Families Ad Format Requirements: interstitials (and IAP offers) must not reach
- * a user who might be a child. Only KNOWN adults see them; an undeclared guest
- * ('unknown') is treated as a child for this format — matching how socialPolicy
- * already treats 'unknown' for every social surface. This is the gap that caused
- * the v5740 rejection.
- */
 describe('shouldSuppressInterstitialForTier', () => {
   it('suppresses interstitials for a known child', () => {
     expect(shouldSuppressInterstitialForTier('child')).toBe(true);
   });
 
-  it('suppresses interstitials for undeclared guests (could be a child)', () => {
-    expect(shouldSuppressInterstitialForTier('unknown')).toBe(true);
+  it('serves interstitials to undeclared guests (app is 13+ since leaving Families)', () => {
+    expect(shouldSuppressInterstitialForTier('unknown')).toBe(false);
   });
 
   it('serves interstitials to known adults (declared 13+)', () => {
