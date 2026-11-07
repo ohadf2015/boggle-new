@@ -11011,6 +11011,7 @@ const es = {
       }
     },
     "title": "Gimnasio Mental",
+    "subtitle": "Ejercicios cortos y adaptativos: gana XP y sube de nivel en cada ronda.",
     "score": "Puntos de Cerebro",
     "points": "Puntos de Cerebro",
     "loading": "Calentando el cerebro...",
@@ -13763,7 +13764,7 @@ const es = {
       "objectives": "Objetivos",
       "go": "¡YA!",
       "moves": "{moves} Movimientos",
-      "dragHint": "Arrastra las letras para formar palabras",
+      "dragHint": "Arrastra o escribe las letras para formar palabras",
       "tapToStart": "Toca para empezar"
     },
     "objective": {
@@ -17726,7 +17727,7 @@ const es = {
         "name": "Teacher Pro",
         "interval": "/mes",
         "blurb": "Todos los informes, deberes de palabras falladas y herramientas de reenseñanza para un docente.",
-        "cta": "Mejorar por $9/mes"
+        "cta": "Empieza 14 días gratis"
       },
       "school": {
         "name": "Escuelas y departamentos",
@@ -19883,13 +19884,15 @@ const es = {
       },
       "cardPick": {
         "title": "Elige una carta de poder",
-        "subtitle": "Se acumula durante el resto de la partida."
+        "subtitle": "Se acumula durante el resto de la partida.",
+        "yourBuild": "Tus cartas"
       },
       "roundResult": {
         "passed": "¡Objetivo superado!",
         "passedSub": "Elige una carta de poder y sigue jugando.",
         "failed": "¡Por poco!",
-        "failedSub": "No alcanzaste el objetivo esta ronda."
+        "failedSub": "No alcanzaste el objetivo esta ronda.",
+        "closeSub": "¡Tan cerca! Una palabra más y lo lograbas."
       },
       "runResult": {
         "cleared": "¡Partida completada!",
@@ -20017,7 +20020,8 @@ const es = {
         "titleLost": "Sin fichas",
         "subtitleWon": "Recolectaste todas las gemas corona. Caza completada.",
         "subtitleLost": "Se vació la bolsa antes de terminar. Inténtalo de nuevo.",
-        "restart": "Nueva caza"
+        "restart": "Nueva caza",
+        "crownsCaption": "{{n}}/4 coronas conseguidas"
       },
       "error": {
         "insufficientGems": "Gemas insuficientes para esa habilidad.",

@@ -195,7 +195,6 @@ export function AcademyMap({ layout, islands, boss, recommendedKey, spotlightTag
           alt=""
           aria-hidden="true"
           fill
-          unoptimized
           sizes="100vw"
           data-testid="academy-map-backdrop"
           className="pointer-events-none select-none object-cover"
@@ -211,7 +210,6 @@ export function AcademyMap({ layout, islands, boss, recommendedKey, spotlightTag
           aria-hidden="true"
           fill
           priority
-          unoptimized
           sizes="100vw"
           className="pointer-events-none select-none object-cover"
           style={{ maxWidth: 'none' }}

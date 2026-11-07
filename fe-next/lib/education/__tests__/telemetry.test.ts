@@ -70,6 +70,7 @@ import {
   trackTeacherAssignmentReportUpgradeClicked,
   trackTeacherInviteStudentsCtaViewed,
   trackTeacherInviteStudentsCtaClicked,
+  trackJoinCodeStepRefused,
 } from '../telemetry';
 
 describe('education telemetry', () => {
@@ -265,6 +266,36 @@ describe('education telemetry', () => {
       expect(captureMock).toHaveBeenCalledWith('edu_classroom_join', {
         result: 'error',
       });
+    });
+  });
+
+  describe('join code step refusal — never reached submit', () => {
+    it('Given a too-short code at Next, When tracked, Then the reason and code shape are recorded', () => {
+      trackJoinCodeStepRefused({ reason: 'too_short', attemptedCode: 'AB1' });
+      expect(captureMock).toHaveBeenCalledWith('student_join_code_refused', {
+        reason: 'too_short',
+        code_length: 3,
+        code_charset: 'alphanumeric',
+      });
+    });
+
+    it('Given a full code the lookup already knows is invalid, When tracked, Then reason is invalid', () => {
+      trackJoinCodeStepRefused({ reason: 'invalid', attemptedCode: 'ABC123' });
+      expect(captureMock).toHaveBeenCalledWith('student_join_code_refused', {
+        reason: 'invalid',
+        code_length: 6,
+        code_charset: 'alphanumeric',
+      });
+    });
+
+    it('Given no code, When tracked, Then shape props are omitted rather than faked', () => {
+      trackJoinCodeStepRefused({ reason: 'too_short' });
+      expect(captureMock).toHaveBeenCalledWith('student_join_code_refused', { reason: 'too_short' });
+    });
+
+    it('never sends the code itself', () => {
+      trackJoinCodeStepRefused({ reason: 'invalid', attemptedCode: 'UHMKL4' });
+      expect(JSON.stringify(captureMock.mock.calls)).not.toContain('UHMKL4');
     });
   });
 

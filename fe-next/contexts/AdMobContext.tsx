@@ -13,6 +13,12 @@ import {
 } from '@/lib/families/adPolicy';
 import { noteGameEndedAfterAd, type AdTerminal } from '@/lib/ads/adQuality';
 import { GAME_ENDED_EVENT } from '@/lib/ads/gameEndSignal';
+import { isAdFreeRoute } from '@/lib/admob-routes';
+
+function onAdFreeSurface(): boolean {
+  if (typeof window === 'undefined') return false;
+  return isAdFreeRoute(window.location.pathname, new URLSearchParams(window.location.search));
+}
 
 interface AdMobContextValue {
   recordGameEnd: () => void;
@@ -246,7 +252,7 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
   }
 
   function hasNoAds(): boolean {
-    return shouldSuppressAdsForTier(tier);
+    return shouldSuppressAdsForTier(tier) || onAdFreeSurface();
   }
 
   // Cadence + cap check shared by the real interstitial gate and the age-gate
@@ -306,7 +312,9 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
   }, []);
 
   function shouldShowInterstitial(): boolean {
-    if (shouldSuppressInterstitialForTier(tier)) return false;
+    // Families Ad Format: interstitials only for KNOWN adults (suppresses child
+    // AND undeclared-guest tiers). This is the v5740 rejection fix.
+    if (shouldSuppressInterstitialForTier(tier) || onAdFreeSurface()) return false;
     return interstitialSlotDue();
   }
 

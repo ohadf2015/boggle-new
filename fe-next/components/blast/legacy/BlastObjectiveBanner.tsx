@@ -27,11 +27,11 @@ function ObjectiveTilePreview({ tileType }: { tileType: BlastTileType }) {
     <span
       data-testid={`blast-objective-tile-preview-${tileType}`}
       aria-hidden="true"
-      className={cn(
-        'shrink-0 inline-flex items-center justify-center w-[20px] h-[20px] rounded',
-        visual.text,
-      )}
-      style={visual.style}
+      // Same navy chip BlastTile.tsx uses for its corner type-icon: several
+      // visual.text/style face pairs (crystal, shuffle, anchor, countdown)
+      // measure <3:1 WCAG contrast for a raw white icon on their face color.
+      // The navy chip clears contrast on every face, same as the tile badge.
+      className="shrink-0 inline-flex items-center justify-center w-[20px] h-[20px] rounded-full bg-neo-navy text-white"
     >
       {Icon ? <Icon className="w-3.5 h-3.5" strokeWidth={2.25} /> : null}
     </span>

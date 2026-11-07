@@ -4,6 +4,26 @@ Items deferred from automated nightly triage. Human review required.
 
 ---
 
+## 2026-11-07
+- [Sentry] JAVASCRIPT-NEXTJS-2M4 + 2M3 — canvas ellipse IndexSizeError + Bing NotAuthorized
+  - first/last seen 2026-11-06 ~14:00-16:35 UTC, 5+2 events, tag `app: growth-radar`, `url: growthradar.app`
+  - status: no action (not LexiClash) — both issues are cross-tenant noise from growth-radar.app sharing the `lexiclash` Sentry project. Same class as the known PostHog `$host` cross-tenant contamination (imposketch.io).
+  - why: not our codebase; nothing to fix in boggle-new
+  - recommended owner: self (next time) — filter `app:growth-radar` out of lexiclash Sentry queries, or split the Sentry project per app
+- [Supabase] `authenticated_security_definer_function_executable` — 87 RPCs callable by signed-in users as SECURITY DEFINER
+  - count 87 (up from ~69 noted 2026-04-29), level WARN
+  - status: deferred — too broad to vet in one lane (each needs a callsite grep to confirm it should be authenticated-callable; most likely intentional game RPCs like `add_league_xp`)
+  - why: ambiguous root cause at this volume, no single quick safe action
+  - recommended owner: backend / future lane — spot-check for any RPC with no client callsite (candidate for REVOKE)
+- [Supabase] `security_definer_view` on `public.public_profiles`
+  - status: deferred, not touched — view intentionally uses SECURITY DEFINER + its own `CURRENT_USER`/classroom-membership gating to expose a filtered profile subset despite restrictive RLS on `profiles`. Looks deliberate (matches memory `public_profiles security_invoker` history), flipping it blind risks breaking public profile reads.
+  - why: auth/RLS-adjacent, ambiguous whether advisor is flagging a regression or the known-intentional pattern
+  - recommended owner: review-by-eod — confirm this is still the intended shape
+- [Restore queue] skipped all 7 brief-listed restore tags tonight
+  - status: deferred — the working tree already has uncommitted modifications to several of the exact files the restore queue lists (e.g. `useMpPageState.ts`, `RunPageClient.tsx`, dictionary candidates), consistent with a concurrent/prior lane already mid-restore. Running `restore-salvaged-code.sh` again on top risked a collision/race with that in-flight work.
+  - why: irreversible-ish (file corruption risk) if two processes 3-way-merge the same file concurrently
+  - recommended owner: orchestrator — confirm which lane owns those dirty files before the next restore attempt
+
 ## 2026-10-24
 
 ### [Rage-click root cause found, instrumented not fixed] ru/multiplayer — native WebView offline-retry loop
@@ -2675,3 +2695,35 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
   - status: deferred (not a real bug)
   - why: known-benign browser warning, 2 users total
   - recommended owner: self (re-check next night when Supabase/Sentry MCP connects)
+
+## 2026-11-06
+- [Sentry] Cross-tenant noise, not a lexiclash bug
+  - 4 "lexiclash" Sentry issues in last 24h (JAVASCRIPT-NEXTJS-2M0/2KZ/2KY/2KR), all tag `app: growth-radar`, url growthradar.app — shared Sentry org, zero lexiclash-specific errors in window.
+  - status: deferred (no code change — nothing to fix in this repo)
+  - why: not this codebase; needs the Sentry project split by app/tag at the source, same class as the known PostHog `$host` cross-tenant contamination.
+  - recommended owner: self (next infra pass) — scope the Sentry MCP query/project to lexiclash only, or filter `app:lexiclash` in every sweep.
+- [PostHog] Cross-tenant noise, not a lexiclash bug
+  - 2 active error-tracking issues in posthog project 151059, both 100% growthradar.app/signup events (same shared PostHog project).
+  - status: deferred
+  - why: not this codebase.
+  - recommended owner: self — same fix as above, scope by `$current_url`/app tag.
+- [Supabase] `public.public_profiles` view flagged `security_definer_view` (ERROR)
+  - View has no `security_invoker` reloption; its WHERE clause manually re-implements anon-safe filtering (hides classroom_memberships/parental_consents rows from anon) in place of relying on `profiles` RLS.
+  - status: deferred
+  - why: RLS-adjacent — switching to security_invoker could leak extra rows or break anon leaderboard/profile reads depending on `profiles` RLS policies; needs a human check against the RLS policies before flipping.
+  - recommended owner: backend/review-by-eod
+- [Supabase] 87 `authenticated` + 8 `anon` SECURITY DEFINER functions grant EXECUTE to that role (advisor WARN)
+  - Grew from the ~69 authd-secdef baseline noted in memory `supabase-advisor-cleanup-2026-04-29`. The 8 anon ones (get_leaderboard, lookup_classroom_by_join_code, etc.) look intentional (guest play). Did not triage all 87 authenticated ones tonight — too large a surface for one lane session.
+  - status: deferred
+  - why: ambiguous — revoking any of these needs a per-function callsite grep; a wrong REVOKE could break a live RPC path.
+  - recommended owner: backend/review-by-eod — diff against the 69-baseline to find what's new since 2026-04-29.
+- [PostHog flags] 58 active experiment flags, no decided-winner sweep done tonight
+  - Lane 03 ran out of time budget before pulling per-flag n/p-value; `exp-practice-wheel-cta-v1` and `exp-game-abandon-confirm-v1` wiring status (flagged unwired in 06-16 playbook) also unverified — a repo-wide `rg` timed out at 2min.
+  - status: deferred
+  - why: statistical significance check needs one HogQL query per flag; not safe to call winners from memory.
+  - recommended owner: self (tomorrow's lane 03) — script a batch n/p-value pull instead of one-off greps.
+- [Word Tower] he/word-tower/daily rage clicks root-caused to disabled-wheel taps during placement lock
+  - 27 rage clicks/8 users/48h (brief top signal). Instrumented `word_tower_tap_blocked` this run; the actual fix (shorten the lock or give blocked-tap visual feedback) is a game-feel tuning call outside this lane's scope.
+  - status: instrumentation shipped, fix deferred
+  - why: touching crane-placement timing risks the animation feel the founder has tuned multiple times (`lib/wordTower/craneSweep.ts`); needs real data first.
+  - recommended owner: lane 02/11 — re-check `word_tower_tap_blocked` volume in ~3 days, then decide fix.

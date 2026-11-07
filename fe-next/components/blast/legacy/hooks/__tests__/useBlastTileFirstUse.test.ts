@@ -1,5 +1,7 @@
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useBlastTileFirstUse } from '../useBlastTileFirstUse';
+import { setCoachOnScreen } from '@/lib/tutorial/modeCoachStore';
 import type { BlastTileState, BlastTileType } from '../../types';
 
 const cell = (type: BlastTileType, isCleared = false): BlastTileState => ({
@@ -37,6 +39,24 @@ describe('useBlastTileFirstUse', () => {
     // Fresh mount, bomb already seen → no repeat even though it's on the board.
     const second = renderHook(() => useBlastTileFirstUse(board('bomb'), true));
     expect(second.result.current.teaching).toBeNull();
+  });
+
+  it('waits for the mode coach to leave the screen before teaching', () => {
+    vi.useFakeTimers();
+    setCoachOnScreen(true);
+    try {
+      const { result } = renderHook(() => useBlastTileFirstUse(board('bomb'), true));
+      expect(result.current.teaching).toBeNull();
+
+      setCoachOnScreen(false);
+      act(() => {
+        vi.advanceTimersByTime(300);
+      });
+      expect(result.current.teaching).toBe('bomb');
+    } finally {
+      setCoachOnScreen(false);
+      vi.useRealTimers();
+    }
   });
 
   it('advances to the next unseen tile after dismiss + board change', () => {

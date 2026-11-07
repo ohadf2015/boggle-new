@@ -3,6 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { BlastTileState, BlastTileType } from '../types';
 import { selectBlastTileToTeach, collectVisibleSpecialTypes } from '@/lib/blast/blastTileFirstUse';
+import { isCoachOnScreen } from '@/lib/tutorial/modeCoachStore';
+
+const COACH_RECHECK_MS = 300;
 
 const STORAGE_KEY = 'blast.tilesSeen.v1';
 
@@ -53,14 +56,32 @@ export function useBlastTileFirstUse(
     if (!enabled) return;
     // Don't replace a callout the player is still reading.
     if (teaching) return;
-    const present = collectVisibleSpecialTypes(tileStates);
-    const next = selectBlastTileToTeach(present, seenRef.current);
-    if (next) {
-      // Mark seen immediately so it shows exactly once, even if dismissed fast.
-      seenRef.current.add(next);
-      persistSeen(seenRef.current);
-      setTeaching(next);
-    }
+    let cancelled = false;
+    let retryId: number | undefined;
+
+    const tryTeach = () => {
+      if (cancelled) return;
+      // Stay quiet while the mode-level FTUE coach is on screen — two
+      // competing onboarding overlays at once is confusing, not helpful.
+      if (isCoachOnScreen()) {
+        retryId = window.setTimeout(tryTeach, COACH_RECHECK_MS);
+        return;
+      }
+      const present = collectVisibleSpecialTypes(tileStates);
+      const next = selectBlastTileToTeach(present, seenRef.current);
+      if (next) {
+        // Mark seen immediately so it shows exactly once, even if dismissed fast.
+        seenRef.current.add(next);
+        persistSeen(seenRef.current);
+        setTeaching(next);
+      }
+    };
+    tryTeach();
+
+    return () => {
+      cancelled = true;
+      if (retryId !== undefined) window.clearTimeout(retryId);
+    };
   }, [tileStates, enabled, teaching]);
 
   return { teaching, dismiss };

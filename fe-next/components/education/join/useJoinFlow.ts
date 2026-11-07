@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useJoinClassroom } from '@/hooks/useJoinClassroom';
-import { trackEduClassroomJoin, trackStudentJoinStarted } from '@/lib/education/telemetry';
+import { trackEduClassroomJoin, trackJoinCodeStepRefused, trackStudentJoinStarted } from '@/lib/education/telemetry';
 import logger from '@/utils/logger';
 import type { JoinTarget } from './joinTarget';
 import { sanitizeJoinCode, joinCodeOverflows, JOIN_CODE_LENGTH } from './JoinCodeField';
@@ -212,6 +212,7 @@ export function useJoinFlow(
       if (effective.length !== JOIN_CODE_LENGTH) {
         setCodeErrorKey('education.student.join.flow.codeTooShort');
         setRefusalTick((n) => n + 1);
+        trackJoinCodeStepRefused({ reason: 'too_short', attemptedCode: effective });
         return;
       }
       // Rule 1 above says nothing WAITS on the lookup. It does not say we throw

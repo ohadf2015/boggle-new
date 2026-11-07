@@ -148,6 +148,7 @@ export function RunPageClient() {
     return (
       <CardPickScreen
         cards={state.cardChoice}
+        activeCards={state.activeCards}
         onPick={(id) => {
           playSound('coinCollect', {});
           run.pickCard(id);

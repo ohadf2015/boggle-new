@@ -19,6 +19,7 @@ import CoinRewardDisplay from '@/components/results/CoinRewardDisplay';
 import SinglePlayerGoldTopUp from './results/components/SinglePlayerGoldTopUp';
 import DoubleGoldAdButton from '@/components/ads/DoubleGoldAdButton';
 import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
+import { SupporterInterestCard } from '@/components/monetization/SupporterInterestCard';
 
 import NextStepPrompt, { type NextStepMode } from '@/components/results/NextStepPrompt';
 import TomorrowPreview from '@/components/results/TomorrowPreview';
@@ -233,6 +234,9 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   // A/B test: show share prompt immediately after hero vs in normal results-page position
   const sharePromptTiming = usePostHogFlag<string>('share-prompt-timing', 'results-page');
   const showShareImmediate = sharePromptTiming === 'immediate';
+
+  // Web demand probe: honest "remove ads" interest card next to the rewarded gold top-up.
+  const showSupporterCard = usePostHogFlag<boolean>('supporter-card-sp-results', false);
 
   const { coinReward } = useCoinRewards({
     results, playerRank, totalParticipants: allParticipants.length,
@@ -544,6 +548,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                 ) : null}
                 {/* R7 — Rewarded gold top-up */}
                 <SinglePlayerGoldTopUp t={t} />
+                {showSupporterCard && <SupporterInterestCard />}
                 {!showShareImmediate && shareBlock}
                 {achievementsBlock}
                 {globalRank && <GlobalRankBadge rank={globalRank} label={t('leaderboard.globalRank')} />}
@@ -578,6 +583,11 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             ) : null}
             {/* R7 — Rewarded gold top-up */}
             <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}><SinglePlayerGoldTopUp t={t} /></m.div>
+            {showSupporterCard && (
+              <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.41 }}>
+                <SupporterInterestCard />
+              </m.div>
+            )}
             {!showShareImmediate && <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.42 }}>{shareBlock}</m.div>}
             <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.44 }}>{achievementsBlock}</m.div>
             {globalRank && (
