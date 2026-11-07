@@ -37,6 +37,7 @@ export const KNOWN_APP_ROOT_SEGMENTS: ReadonlySet<string> = new Set([
   'brain',
   'brain-training-word-games',
   'challenge',
+  'classroom',
   'comeback-test',
   'community',
   'competitive-word-games',

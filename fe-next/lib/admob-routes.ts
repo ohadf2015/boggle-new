@@ -10,6 +10,8 @@
 // shows the banner; active gameplay/results add `screen-fit-locked` to <body>,
 // which bannerController's shouldSuppressBanner() hides at the global level.
 // Do NOT re-add `/multiplayer` here — it would silently kill the lobby banner.
+import { EDU_SECTIONS } from '@/lib/navigation/eduSections';
+
 const GAME_ROUTES = [
   '/singleplayer',
   '/daily',
@@ -92,7 +94,8 @@ export function isAllowedAdBannerRoute(
 /** `<html>` class set while an ad-free route is on screen; read by the banner coordinator and CSS. */
 export const AD_FREE_ROUTE_CLASS = 'ad-free-route';
 
-const AD_FREE_ROUTES = ['/education', '/teacher', '/student', '/join', '/admin', '/report', '/classroom'];
+// Every education section except the Pro pricing page (ads stay allowed there), plus admin.
+const AD_FREE_ROUTES = [...EDU_SECTIONS.filter((s) => s !== 'pricing').map((s) => `/${s}`), '/admin'];
 
 /**
  * Whether NO ad of any kind may run on this route.

@@ -240,6 +240,8 @@ describe('sectionHome', () => {
         'classroom',
         'education',
         'join',
+        'pricing',
+        'report',
         'student',
         'teacher',
       ]);

@@ -14,6 +14,7 @@ import { locales as LOCALES } from '@/lib/i18n';
 import { multiplayerExitDestination } from '@/lib/multiplayer/exitDestination';
 import { isClassroomLivePathname, readClassroomLiveFlags } from '@/lib/education/classroomLivePath';
 import { EDUCATION_SEO_TOP_LEVEL_SEGMENTS } from '@/lib/navigation/educationSeoSegments';
+import { EDU_SECTIONS } from '@/lib/navigation/eduSections';
 
 export interface SectionHomeParams {
   /** The pathname to analyze, e.g. '/en/teacher/classroom/abc' */
@@ -40,7 +41,7 @@ export interface SectionHomeParams {
  * Exported so the registry test pins the exact contents: adding a consumer
  * route whose name collides (e.g. a consumer "join") must fail loudly.
  */
-export const EDUCATION_TOP_LEVEL_SEGMENTS: ReadonlySet<string> = new Set(['teacher', 'student', 'join', 'classroom', 'education']);
+export const EDUCATION_TOP_LEVEL_SEGMENTS: ReadonlySet<string> = new Set(EDU_SECTIONS);
 
 /**
  * Extract locale from pathname, e.g. '/en/teacher' → 'en', '/foo/bar' → undefined
