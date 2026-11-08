@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import { useCallback, useEffect } from 'react';
 import { Users } from 'lucide-react';
-import Avatar from '@/components/Avatar';
+import { setFriendsAvatarsEnabled, setHeroAvatarSlot } from './heroAvatarBridge';
 
 const ROOM_CODE = ['K', '7', 'Q', 'B'];
 const TILE_TILT = ['-rotate-3', 'rotate-2', '-rotate-1', 'rotate-3'];
@@ -15,6 +16,17 @@ interface FriendsBlockProps {
 
 /** A live room in miniature: two players squaring off over a room code. */
 export function FriendsBlock({ lang, t, showAvatars }: FriendsBlockProps) {
+  // The demo faces stay OUT of the landing module graph: this block publishes
+  // two empty boxes on heroAvatarBridge and HeroAvatarIsland (runtime import()
+  // from HeroAvatarMount) portals the seeded Avatars in after first paint —
+  // LandingView.bundleGraph.test.ts. The boxes are fixed-size, so no CLS.
+  const youSlotCallback = useCallback((el: HTMLDivElement | null) => setHeroAvatarSlot('friendsYou', el), []);
+  const rivalSlotCallback = useCallback((el: HTMLDivElement | null) => setHeroAvatarSlot('friendsRival', el), []);
+
+  useEffect(() => {
+    setFriendsAvatarsEnabled(showAvatars);
+    return () => setFriendsAvatarsEnabled(false);
+  }, [showAvatars]);
   return (
     <section
       aria-labelledby="hp-friends-title"
@@ -37,8 +49,7 @@ export function FriendsBlock({ lang, t, showAvatars }: FriendsBlockProps) {
       <div className="flex items-center justify-between gap-2 rounded-2xl border-[3px] border-black bg-neo-navy px-3 py-3 lg:px-6 lg:py-5">
         <div className="flex flex-col items-center gap-1">
           <div className="h-14 w-14 lg:h-20 lg:w-20">
-            {showAvatars && <Avatar userId="hp-friend-you" pixelSize={56} mood="emoteCool" className="lg:hidden" />}
-            {showAvatars && <Avatar userId="hp-friend-you" pixelSize={80} mood="emoteCool" className="hidden lg:block" />}
+            {showAvatars && <div ref={youSlotCallback} data-testid="hp-friend-you-slot" className="h-full w-full" />}
           </div>
           <span className="text-[11px] font-bold text-neo-cream lg:text-sm">{t('homeFresh.sections.friends.you')}</span>
         </div>
@@ -61,8 +72,7 @@ export function FriendsBlock({ lang, t, showAvatars }: FriendsBlockProps) {
 
         <div className="flex flex-col items-center gap-1">
           <div className="h-14 w-14 lg:h-20 lg:w-20">
-            {showAvatars && <Avatar userId="hp-friend-maya" pixelSize={56} mood="emoteSilly" className="lg:hidden" />}
-            {showAvatars && <Avatar userId="hp-friend-maya" pixelSize={80} mood="emoteSilly" className="hidden lg:block" />}
+            {showAvatars && <div ref={rivalSlotCallback} data-testid="hp-friend-rival-slot" className="h-full w-full" />}
           </div>
           <span className="text-[11px] font-bold text-neo-cream lg:text-sm">{t('homeFresh.sections.friends.rival')}</span>
         </div>

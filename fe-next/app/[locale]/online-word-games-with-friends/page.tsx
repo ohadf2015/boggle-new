@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { EducationIntentCta } from '@/components/education/EducationIntentCta';
 import { ApalabradosSinDescargarLink } from '@/components/seo/ApalabradosSinDescargarLink';
 import { BoggleAppFreeLink } from '@/components/seo/BoggleAppFreeLink';
+import { AnagramSolverLink } from '@/components/seo/AnagramSolverLink';
 import { DescargarScrabblePcLink } from '@/components/seo/DescargarScrabblePcLink';
 
 
@@ -234,6 +235,7 @@ export default async function OnlineWordGamesWithFriendsPage({ params }: PagePro
 
         <EducationIntentCta locale={locale} variant="teachers" />
         <BoggleAppFreeLink lead="The no-download page for a" />
+        <AnagramSolverLink lead="Stuck mid-game? Unscramble any rack with the free" />
         <ApalabradosSinDescargarLink />
         <DescargarScrabblePcLink lead="En español, para el PC sin instalar nada:" />
 
