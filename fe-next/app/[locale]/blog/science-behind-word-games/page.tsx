@@ -12,7 +12,7 @@ interface PageProps {
 
 const SLUG = 'science-behind-word-games';
 const DATE_PUBLISHED = '2025-07-03';
-const DATE_MODIFIED = '2026-05-19';
+const DATE_MODIFIED = '2026-11-08';
 
 const metaTitles: Record<string, string> = {
   en: 'Word Games & Brain Health - Scientific Benefits Explained',
