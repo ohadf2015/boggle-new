@@ -5,7 +5,6 @@
  * - Streaks and login bonuses
  * - Calendar rewards
  * - Come-back campaigns
- * - Mystery rewards
  */
 
 import type { Server, Socket } from 'socket.io';
@@ -13,8 +12,6 @@ import type {
   DailyChallenge,
   ChallengeProgress,
   CompletedChallenge,
-  MysteryReward,
-  NearMiss,
   OneMoreGamePrompt
 } from '@/shared/types';
 
@@ -31,10 +28,7 @@ import {
   claimCalendarReward,
   checkComebackBonus,
   claimComebackBonus,
-  calculateNearMisses,
   getOneMoreGamePrompt,
-  rollMysteryReward,
-  logMysteryReward,
   getEngagementStatus,
 } from '../modules/engagementManager';
 
@@ -505,33 +499,10 @@ async function processGameEndEngagement(socket: Socket, playerId: string, gameSt
       });
     }
 
-    // Calculate and send near-miss notifications
-    const nearMisses = calculateNearMisses(gameStats, gameStats.achievements || []);
-    if (nearMisses.length > 0) {
-      safeEmit(socket, 'engagement:nearMisses', { nearMisses });
-    }
-
     // Get one-more-game prompt
     const prompt = getOneMoreGamePrompt(gameStats);
     if (prompt) {
       safeEmit(socket, 'engagement:oneMoreGame', { prompt });
-    }
-
-    // Roll for mystery rewards
-    const mysteryReward = rollMysteryReward('game_completion');
-    if (mysteryReward) {
-      await logMysteryReward(playerId, gameCode, mysteryReward);
-      safeEmit(socket, 'engagement:mysteryReward', { reward: mysteryReward });
-      logger.info('ENGAGEMENT', `Mystery reward: ${mysteryReward.display} for ${playerId}`);
-    }
-
-    // Check for win reward
-    if (gameStats.isWinner) {
-      const winReward = rollMysteryReward('win');
-      if (winReward) {
-        await logMysteryReward(playerId, gameCode, winReward);
-        safeEmit(socket, 'engagement:mysteryReward', { reward: winReward });
-      }
     }
 
     logger.debug('ENGAGEMENT', `Processed game end engagement for ${playerId}`);
@@ -541,57 +512,7 @@ async function processGameEndEngagement(socket: Socket, playerId: string, gameSt
   }
 }
 
-/**
- * Process long word found engagement
- * Called when a player finds a long word (8+ letters)
- * @param socket - Player socket
- * @param playerId - Player UUID
- * @param word - The word found
- * @param gameCode - Game code
- */
-async function processLongWordEngagement(socket: Socket, playerId: string, word: string, gameCode: string): Promise<void> {
-  if (!playerId || word.length < 8) return;
-
-  try {
-    const reward = rollMysteryReward('long_word');
-    if (reward) {
-      await logMysteryReward(playerId, gameCode, reward);
-      safeEmit(socket, 'engagement:mysteryReward', { reward });
-      logger.debug('ENGAGEMENT', `Long word reward: ${reward.display} for ${word}`);
-    }
-  } catch (error: unknown) {
-    const err = error as Error;
-    logger.error('ENGAGEMENT', `Error processing long word engagement: ${err.message}`);
-  }
-}
-
-/**
- * Process achievement earned engagement
- * Called when a player earns an achievement
- * @param socket - Player socket
- * @param playerId - Player UUID
- * @param achievementId - Achievement ID
- * @param gameCode - Game code
- */
-async function processAchievementEngagement(socket: Socket, playerId: string, achievementId: string, gameCode: string): Promise<void> {
-  if (!playerId) return;
-
-  try {
-    const reward = rollMysteryReward('achievement');
-    if (reward) {
-      await logMysteryReward(playerId, gameCode, reward);
-      safeEmit(socket, 'engagement:mysteryReward', { reward });
-      logger.debug('ENGAGEMENT', `Achievement reward: ${reward.display} for ${achievementId}`);
-    }
-  } catch (error: unknown) {
-    const err = error as Error;
-    logger.error('ENGAGEMENT', `Error processing achievement engagement: ${err.message}`);
-  }
-}
-
 export {
   registerEngagementHandlers,
   processGameEndEngagement,
-  processLongWordEngagement,
-  processAchievementEngagement,
 };

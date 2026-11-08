@@ -7,14 +7,14 @@ import { getSupabase } from './supabaseServer';
 import logger from '../utils/logger';
 import type {
   StreakBonus, StreakBonusWithDays, CalendarReward, LoginResult,
-  CalendarStatus, EngagementStatus, MysteryRewardResult,
+  CalendarStatus, EngagementStatus,
 } from './engagementTypes';
 
 // Re-export all types
 export type {
   StreakBonus, StreakBonusWithDays, CalendarReward, ComebackTier,
   NearMissThreshold, GameStats, NearMiss, OneMoreGamePrompt,
-  MysteryReward, MysteryRewardResult, LoginResult, CalendarStatus,
+  LoginResult, CalendarStatus,
   ComebackBonusInfo, EngagementStatus,
 } from './engagementTypes';
 
@@ -22,7 +22,6 @@ export type {
 export {
   NEAR_MISS_THRESHOLDS, calculateNearMisses,
   ONE_MORE_GAME_PROMPTS, getOneMoreGamePrompt,
-  MYSTERY_REWARD_POOLS, rollMysteryReward,
 } from './engagementRewards';
 
 // Re-export comeback module
@@ -228,13 +227,6 @@ export async function rollMysteryBox(playerId: string, rarity: string): Promise<
   const rewardTypes = [{ type: 'xp', baseAmount: 100 }, { type: 'hints', baseAmount: 2 }, { type: 'streak_freeze', baseAmount: 1 }];
   const selected = rewardTypes[Math.floor(Math.random() * rewardTypes.length)];
   return { type: 'mystery_box', rarity, contents: { type: selected.type, amount: selected.baseAmount * multiplier } };
-}
-
-export async function logMysteryReward(playerId: string, gameCode: string, reward: MysteryRewardResult): Promise<void> {
-  const supabase = getSupabase()!;
-  await supabase.from('mystery_rewards_log').insert({
-    player_id: playerId, game_code: gameCode, trigger_type: reward.triggerType, reward_type: reward.type, reward_value: String(reward.value),
-  });
 }
 
 export async function getEngagementStatus(playerId: string): Promise<EngagementStatus> {

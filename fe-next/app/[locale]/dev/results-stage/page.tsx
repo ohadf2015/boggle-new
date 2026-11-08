@@ -80,7 +80,6 @@ function SoloScenario({ bots, zero }: { bots: boolean; zero?: boolean }) {
           subtitle={zero ? "Didn't find any words this time" : 'Found 14 words — 47 more were hiding!'}
           score={zero ? 0 : 186}
           words={zero ? 0 : 14}
-          coins={zero ? 0 : 18}
           avatar={{ userId: 'guest' }}
           rank={1}
           totalPlayers={bots ? 4 : 1}

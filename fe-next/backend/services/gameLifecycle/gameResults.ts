@@ -19,7 +19,7 @@ import { emptyQuestResult, isQuestEligibleMode } from '@/shared/dailyQuestPool';
 import type { GameStats } from '@/shared/weeklyQuestTemplates';
 import { getSocketById, safeEmit } from '../../utils/socketHelpers';
 import { incrementWordApproval } from '../../redis/wordApproval';
-import { processGameEndEngagement, processAchievementEngagement } from '../../handlers/engagementHandler';
+import { processGameEndEngagement } from '../../handlers/engagementHandler';
 import { updateRankedMmr, fetchRankedBaselines, type RankedParticipant, type MmdDelta } from '../../modules/supabase/rankedMmr';
 import { DEFAULT_RATING, DEFAULT_RD } from '@/shared/utils/eloRating';
 import logger from '../../utils/logger';
@@ -522,8 +522,8 @@ async function processEngagementEvents(
       achievements: playerResult.achievements?.map((a) => a.key) || [],
     };
 
-    // Process engagement (daily challenges, near-misses, mystery rewards)
-    // Mystery rewards are delayed by 15 seconds to avoid overwhelming users
+    // Process engagement (daily challenges, one-more-game prompt), delayed
+    // 15 seconds so it never lands on top of the results reveal
     if (playerSocket && playerId) {
       scheduleEngagementTimeout(gameCode, async () => {
         // Skip if socket disconnected while we were waiting
@@ -534,17 +534,6 @@ async function processEngagementEvents(
 
         try {
           await processGameEndEngagement(playerSocket, playerId, gameStats, gameCode);
-
-          // Process achievement engagement for mystery rewards
-          for (const achievement of playerResult.achievements || []) {
-            if (playerSocket.disconnected) break;
-            await processAchievementEngagement(
-              playerSocket,
-              playerId,
-              achievement.key,
-              gameCode
-            );
-          }
         } catch (err) {
           logger.error('ENGAGEMENT', `Delayed engagement failed for ${playerId}: ${(err as Error).message}`);
         }

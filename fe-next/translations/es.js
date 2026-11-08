@@ -5501,6 +5501,8 @@ const es = {
     "newMessages": "Mensajes nuevos"
   },
   "results": {
+    "bestMissedWord": "Te faltó {word} ({letters} letras, {points} puntos)",
+    "rewardLine": { "coins": "monedas", "xp": "XP" },
     "progressPulse": {
       "title": "Tu progreso",
       "game": "Partida #{n}",
@@ -5882,13 +5884,6 @@ const es = {
     "blast": "El Blast de mañana trae nuevos patrones de combo",
     "adventure": "Vista previa del siguiente nivel en camino. Vuelve a descubrirlo",
     "seeYou": "Nos vemos mañana"
-  },
-  "unfinishedBoard": {
-    "teaser": "3 palabras te esperan mañana",
-    "resumeTitle": "Tu tablero sin terminar",
-    "resumeDesc": "Encontraste {{found}}/{{total}} palabras",
-    "resumeCta": "Reanudar tablero",
-    "wordsWaiting": "palabras esperando"
   },
   "catalystTeaser": {
     "title": "Te espera en partidas reales",
@@ -6667,31 +6662,9 @@ const es = {
       "levelsRemaining": "{{count}} niveles restantes"
     }
   },
-  "nearMiss": {
-    "almostThere": "¡Casi lo logras!",
-    "oneMoreGame": "¡Una partida más!",
-    "tip": "Consejo",
-    "more": "más",
-    "soClose": "¡Estás muy cerca! Una partida más podría bastar."
-  },
   "oneMoreGame": {
     "defaultTitle": "¿Una partida más?",
     "defaultMessage": "Mantén la racha: ¡vuelve a jugar!"
-  },
-  "mysteryReward": {
-    "title": "Recompensa misteriosa",
-    "youFound": "¡Encontraste una recompensa misteriosa!",
-    "opening": "Abriendo...",
-    "revealing": "Revelando...",
-    "awesome": "¡Genial!",
-    "gameCompletion": "Bonus por completar partida",
-    "winBonus": "Bonus de victoria",
-    "longWord": "Bonus de palabra larga",
-    "achievement": "Bonus de logro",
-    "gameCompletionExplain": "¡Sigue jugando para más sorpresas!",
-    "winBonusExplain": "Los ganadores reciben sorpresas extra.",
-    "longWordExplain": "Tu vocabulario dio frutos.",
-    "achievementExplain": "Los logros traen recompensas."
   },
   "auth": {
     "google": {
@@ -7408,16 +7381,6 @@ const es = {
     "title": "Perfil de jugador",
     "notFound": "Jugador no encontrado",
     "error": "No se pudo cargar el perfil"
-  },
-  "streaks": {
-    "wager": {
-      "title": "¡Apuesta tus monedas!",
-      "description": "Apuesta monedas a tu racha: gana 3x o piérdelo todo.",
-      "payout": "Pago potencial",
-      "risk": "Pierdes tu apuesta si rompes la racha.",
-      "confirm": "Apostar",
-      "skip": "Saltar"
-    }
   },
   "comebackBonus": {
     "title": "¡Mira quién volvió!",

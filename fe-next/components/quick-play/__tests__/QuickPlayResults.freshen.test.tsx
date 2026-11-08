@@ -239,7 +239,7 @@ describe('QuickPlayResults freshen', () => {
 
   it('keeps the plus sign in front of the earned amounts in Hebrew', () => {
     renderResults();
-    for (const id of ['quick-coins-reward', 'quick-xp-reward']) {
+    for (const id of ['results-reward-coins', 'results-reward-xp']) {
       const amount = screen.getByTestId(id).querySelector('[dir="ltr"]');
       expect(amount?.textContent).toMatch(/^\+\d+$/);
     }

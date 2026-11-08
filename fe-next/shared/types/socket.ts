@@ -255,9 +255,7 @@ export interface ServerToClientEvents {
   'engagement:comebackAvailable': (data: ComebackStatus) => void;
   'engagement:comebackStatus': (data: ComebackStatus) => void;
   'engagement:comebackClaimed': (data: ComebackClaimResult) => void;
-  'engagement:nearMisses': (data: { nearMisses: NearMiss[] }) => void;
   'engagement:oneMoreGame': (data: { prompt: OneMoreGamePrompt }) => void;
-  'engagement:mysteryReward': (data: { reward: MysteryReward }) => void;
   'engagement:referralMilestone': (data: { milestone: ReferralMilestone }) => void;
   'engagement:status': (data: EngagementStatus) => void;
   'engagement:error': (data: { message: string }) => void;
@@ -720,13 +718,6 @@ export interface OneMoreGamePrompt {
   type: string;
   message: string;
   incentive?: string;
-}
-
-export interface MysteryReward {
-  type: 'xp' | 'badge' | 'title' | 'cosmetic';
-  value: string | number;
-  display: string;
-  rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 }
 
 export interface ReferralMilestone {

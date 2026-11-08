@@ -5,8 +5,6 @@
  * - Word feedback (crowd-sourced validation)
  * - XP gained notifications
  * - Level up celebrations
- * - Near-miss notifications
- * - Mystery rewards
  * - Referral milestones
  * - Players ready for next game
  */
@@ -16,7 +14,6 @@ import type { Socket } from 'socket.io-client';
 import logger from '@/utils/logger';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { neoInfoToast } from '@/components/NeoToast';
-import type { NearMiss } from './NearMissCard';
 import type { ReferralMilestone } from '@/shared/types/socket';
 import type { WordToVote, XpGainedData, LevelUpData } from '@/types/components';
 import type { OneMoreGamePrompt } from '@/shared/types/engagement';
@@ -36,9 +33,6 @@ export interface ResultsSocketEventsState {
   xpGainedData: XpGainedData | null;
   levelUpData: LevelUpData | null;
   showLevelUpCelebration: boolean;
-
-  // Near-miss notifications
-  nearMisses: NearMiss[];
 
   // Referral milestone state
   referralMilestone: ReferralMilestone | null;
@@ -78,9 +72,6 @@ export function useResultsSocketEvents({
   const [xpGainedData, setXpGainedData] = useState<XpGainedData | null>(null);
   const [levelUpData, setLevelUpData] = useState<LevelUpData | null>(null);
   const [showLevelUpCelebration, setShowLevelUpCelebration] = useState(false);
-
-  // Near-miss notifications
-  const [nearMisses, setNearMisses] = useState<NearMiss[]>([]);
 
   const hasShownLevelUpRef = useRef<boolean>(false); // Prevent duplicate level-up celebrations
   const hasShownWordFeedbackRef = useRef<boolean>(false); // Show the dictionary-building modal only once per results page
@@ -167,13 +158,6 @@ export function useResultsSocketEvents({
       setShowLevelUpCelebration(true);
     };
 
-    const handleNearMisses = (data: { nearMisses: NearMiss[] }) => {
-      logger.log('[RESULTS] Near-miss notifications:', data);
-      if (data.nearMisses && data.nearMisses.length > 0) {
-        setNearMisses(data.nearMisses);
-      }
-    };
-
     const handleReferralMilestone = (data: { milestone: ReferralMilestone }) => {
       logger.log('[RESULTS] Referral milestone received:', data);
       if (data.milestone) {
@@ -206,7 +190,6 @@ export function useResultsSocketEvents({
     socket.on('voteRecorded', handleVoteRecorded);
     socket.on('xpGained', handleXpGained);
     socket.on('levelUp', handleLevelUp);
-    socket.on('engagement:nearMisses', handleNearMisses);
     socket.on('engagement:referralMilestone', handleReferralMilestone);
     socket.on('engagement:oneMoreGame', handleOneMoreGame);
     socket.on('weeklyQuestCompleted', handleWeeklyQuestCompleted);
@@ -216,7 +199,6 @@ export function useResultsSocketEvents({
       socket.off('voteRecorded', handleVoteRecorded);
       socket.off('xpGained', handleXpGained);
       socket.off('levelUp', handleLevelUp);
-      socket.off('engagement:nearMisses', handleNearMisses);
       socket.off('engagement:referralMilestone', handleReferralMilestone);
       socket.off('engagement:oneMoreGame', handleOneMoreGame);
       socket.off('weeklyQuestCompleted', handleWeeklyQuestCompleted);
@@ -319,7 +301,6 @@ export function useResultsSocketEvents({
     xpGainedData,
     levelUpData,
     showLevelUpCelebration,
-    nearMisses,
     referralMilestone,
     showReferralMilestone,
     readyUsernames,

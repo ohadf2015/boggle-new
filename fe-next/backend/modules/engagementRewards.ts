@@ -1,6 +1,6 @@
 /**
  * Engagement Rewards
- * Near-miss notifications, one-more-game prompts, and mystery rewards (variable ratio)
+ * Near-miss detection (feeds the one-more-game prompt) and one-more-game prompts
  */
 
 import type {
@@ -8,8 +8,6 @@ import type {
   NearMiss,
   NearMissThreshold,
   OneMoreGamePrompt,
-  MysteryReward,
-  MysteryRewardResult,
 } from './engagementTypes';
 
 // ==================== NEAR-MISS NOTIFICATIONS ====================
@@ -181,92 +179,4 @@ export function getOneMoreGamePrompt(gameStats: GameStats): OneMoreGamePrompt | 
   }
 
   return matchingPrompts[0].getMessage(gameStats);
-}
-
-// ==================== MYSTERY REWARDS (Variable Ratio) ====================
-
-interface MysteryRewardPool {
-  probability: number;
-  rewards: MysteryReward[];
-}
-
-export const MYSTERY_REWARD_POOLS: Record<string, MysteryRewardPool> = {
-  game_completion: {
-    probability: 0.15,
-    rewards: [
-      { type: 'xp_multiplier', value: 2, weight: 50, display: '2x XP Bonus!' },
-      { type: 'xp_multiplier', value: 3, weight: 25, display: '3x XP Jackpot!' },
-      { type: 'bonus_hints', value: 2, weight: 40, display: '+2 Free Hints!' },
-      { type: 'bonus_hints', value: 5, weight: 10, display: '+5 Hint Bundle!' },
-      { type: 'streak_freeze', value: 1, weight: 20, display: 'Streak Freeze!' },
-      { type: 'xp_flat', value: 500, weight: 15, display: '500 Bonus XP!' },
-      { type: 'rare_title', value: 'LUCKY_FINDER', weight: 3, display: 'Rare Title: Lucky Finder!' },
-    ],
-  },
-  long_word: {
-    probability: 0.25,
-    rewards: [
-      { type: 'instant_xp', value: 50, weight: 60, display: '+50 XP!' },
-      { type: 'instant_xp', value: 100, weight: 30, display: '+100 XP!' },
-      { type: 'combo_boost', value: 2, weight: 25, display: '+2 Combo!' },
-      { type: 'combo_boost', value: 3, weight: 10, display: '+3 Combo!' },
-    ],
-  },
-  achievement: {
-    probability: 0.3,
-    rewards: [
-      { type: 'xp_flat', value: 100, weight: 50, display: 'Achievement Bonus: +100 XP!' },
-      { type: 'xp_flat', value: 250, weight: 25, display: 'Achievement Jackpot: +250 XP!' },
-      { type: 'bonus_hints', value: 1, weight: 35, display: 'Free Hint!' },
-    ],
-  },
-  win: {
-    probability: 0.2,
-    rewards: [
-      { type: 'xp_multiplier', value: 1.5, weight: 50, display: '1.5x Win Bonus!' },
-      { type: 'xp_multiplier', value: 2, weight: 30, display: '2x Win Bonus!' },
-      { type: 'streak_freeze', value: 1, weight: 15, display: 'Streak Freeze Won!' },
-      { type: 'rare_title', value: 'FORTUNE_FAVORS', weight: 5, display: 'Rare Title: Fortune Favors!' },
-    ],
-  },
-};
-
-/**
- * Roll for mystery reward
- */
-export function rollMysteryReward(triggerType: string): MysteryRewardResult | null {
-  const pool = MYSTERY_REWARD_POOLS[triggerType];
-  if (!pool) return null;
-
-  if (Math.random() > pool.probability) {
-    return null;
-  }
-
-  const totalWeight = pool.rewards.reduce((sum, r) => sum + r.weight, 0);
-  let random = Math.random() * totalWeight;
-
-  for (const reward of pool.rewards) {
-    random -= reward.weight;
-    if (random <= 0) {
-      return {
-        triggerType,
-        ...reward,
-        rarity: calculateRewardRarity(reward.weight, totalWeight),
-      };
-    }
-  }
-
-  return null;
-}
-
-/**
- * Calculate rarity based on weight
- */
-function calculateRewardRarity(weight: number, totalWeight: number): 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' {
-  const percentage = (weight / totalWeight) * 100;
-  if (percentage <= 5) return 'legendary';
-  if (percentage <= 15) return 'epic';
-  if (percentage <= 30) return 'rare';
-  if (percentage <= 50) return 'uncommon';
-  return 'common';
 }

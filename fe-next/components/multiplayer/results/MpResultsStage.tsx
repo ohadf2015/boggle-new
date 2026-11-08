@@ -24,6 +24,7 @@ import { useLockedBranch, useResultBeats } from './useResultBeats';
 import { MpResultsHeader } from './MpResultsHeader';
 import { MpStandingsSection } from './MpFullStandings';
 import { MpMyCard } from './MpMyCard';
+import { pickBestMissedWord } from '@/components/results/bestMissedWord';
 import { MpSoloStage } from './MpSoloStage';
 import { useClassroomPressure } from '@/hooks/gameState/classroomPressureStore';
 import { isLeaderboardHidden } from '@/shared/utils/classroomPressure';
@@ -194,6 +195,13 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   const nextModeLabel = switchedTo ? t(classroomRoundModeMeta(switchedTo).nameKey) : undefined;
   const me = data.currentPlayerData;
   const bestWord = useMemo(() => pickBestWord(me?.allWords), [me]);
+  // Board words the others found and I didn't (useResultsData.missedWords): the best one, as one line.
+  // A classroom student already gets the lesson's missed-word list below the card.
+  const boardLanguage = props.roomLanguage ?? c.language;
+  const bestMissed = useMemo(
+    () => (classroomStudent ? null : pickBestMissedWord((data.missedWords ?? []).map((w) => w.word), [], boardLanguage)),
+    [classroomStudent, data.missedWords, boardLanguage],
+  );
   const uniqueCount = useMemo(() => (username ? selectUniqueWords(c.allPlayerWords, username).length : 0), [c.allPlayerWords, username]);
   const rival = useMemo(() => calloutRival(boardRows), [boardRows]);
   const h2hLive = useRivalHeadToHead(rival, c.isAuthenticated && !c.isGuest);
@@ -292,6 +300,8 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
           bestWord={bestWord}
           xp={socketEvents.xpGainedData?.xpEarned ?? null}
           coins={c.sideEffects.coinReward?.awarded ?? null}
+          bestMissed={bestMissed}
+          language={boardLanguage}
           callout={callout}
           revealed={seen('card')}
           series={!!series}

@@ -39,8 +39,6 @@ vi.mock('../../modules/engagementManager', () => ({
   claimComebackBonus: vi.fn(),
   calculateNearMisses: vi.fn(),
   getOneMoreGamePrompt: vi.fn(),
-  rollMysteryReward: vi.fn(),
-  logMysteryReward: vi.fn(),
   getEngagementStatus: vi.fn(),
 }));
 

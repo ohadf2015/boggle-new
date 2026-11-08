@@ -22,7 +22,6 @@ export const LANDING_NAMESPACES = [
   'common',
   'footer',
   'home',
-  'unfinishedBoard',
   'wotd',
   'presence',
   'cookieConsent',

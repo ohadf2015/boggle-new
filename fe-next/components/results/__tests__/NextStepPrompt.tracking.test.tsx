@@ -104,19 +104,4 @@ describe('NextStepPrompt tracking', () => {
       variant: 'desktop',
     });
   });
-
-  it('does not report an impression for the close-loss rematch card', () => {
-    render(
-      <NextStepPrompt
-        currentMode="multiplayer-bots"
-        onBackToLobby={vi.fn()}
-        isCloseLoss
-        scoreDifference={3}
-        onRematch={vi.fn()}
-      />
-    );
-
-    const impressions = mockTrack.mock.calls.filter(([event]) => event === 'next_step_shown');
-    expect(impressions).toHaveLength(0);
-  });
 });

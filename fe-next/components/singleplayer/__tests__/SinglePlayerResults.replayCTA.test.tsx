@@ -109,9 +109,6 @@ vi.mock('@/hooks/useSaveCognitiveScore', () => ({
   useSaveCognitiveScore: () => ({ saveCognitiveScore: vi.fn().mockResolvedValue(null) }),
 }));
 vi.mock('@/hooks/useConsentDecided', () => ({ useConsentDecided: () => true }));
-vi.mock('@/hooks/useUnfinishedBoard', () => ({
-  useUnfinishedBoard: () => ({ saveUnfinishedBoard: vi.fn(), unfinishedBoard: null }),
-}));
 vi.mock('@/hooks/useAsyncChallengeProducer', () => ({ useAsyncChallengeProducer: vi.fn() }));
 
 vi.mock('@/hooks/usePostHogFlag', () => ({

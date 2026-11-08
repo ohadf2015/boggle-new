@@ -5733,6 +5733,8 @@ const ja = {
     "newMessages": "新メッセージ"
   },
   "results": {
+    "bestMissedWord": "見逃した単語：{word}（{letters}文字・{points}ポイント）",
+    "rewardLine": { "coins": "コイン", "xp": "XP" },
     "progressPulse": {
       "title": "あなたの成長",
       "game": "ゲーム #{n}",
@@ -6114,13 +6116,6 @@ const ja = {
     "blast": "明日のブラストには新コンボパターン。準備は？",
     "adventure": "次のレベルは準備中。また見に来てね",
     "seeYou": "また明日"
-  },
-  "unfinishedBoard": {
-    "teaser": "明日、3つの単語があなたを待ってるよ",
-    "resumeTitle": "未完了のボード",
-    "resumeDesc": "{{found}}/{{total}}個の単語を発見済み",
-    "resumeCta": "ボードを再開",
-    "wordsWaiting": "個の単語が待機中"
   },
   "catalystTeaser": {
     "title": "本番ゲームで起こること",
@@ -7060,31 +7055,9 @@ const ja = {
       "levelsRemaining": "残り{{count}}レベル"
     }
   },
-  "nearMiss": {
-    "almostThere": "もう少し！",
-    "oneMoreGame": "もう1ゲーム！",
-    "tip": "ヒント",
-    "more": "あと",
-    "soClose": "あと少しでした！もう1ゲームで達成できるかも。"
-  },
   "oneMoreGame": {
     "defaultTitle": "もう1ゲーム？",
     "defaultMessage": "連続記録を続けよう。もう1回プレイ！"
-  },
-  "mysteryReward": {
-    "title": "ミステリー報酬",
-    "youFound": "ミステリー報酬を見つけました！",
-    "opening": "開封中...",
-    "revealing": "中身を確認中...",
-    "awesome": "すごい！",
-    "gameCompletion": "ゲーム完了ボーナス",
-    "winBonus": "勝利ボーナス",
-    "longWord": "長い単語ボーナス",
-    "achievement": "実績ボーナス",
-    "gameCompletionExplain": "プレイを続けてチャンスを増やそう。",
-    "winBonusExplain": "勝つと特別なご褒美がもらえるよ。",
-    "longWordExplain": "語彙力が報われたね。",
-    "achievementExplain": "実績には特典がつくよ。"
   },
   "auth": {
     "google": {
@@ -7496,16 +7469,6 @@ const ja = {
     "title": "プレイヤープロフィール",
     "notFound": "プレイヤーが見つかりません",
     "error": "プロフィール読み込みエラー"
-  },
-  "streaks": {
-    "wager": {
-      "title": "コインを賭けよう",
-      "description": "連勝にコインを賭けて、3倍か全損か。",
-      "payout": "予想配当",
-      "risk": "連勝が途切れると賭け金を失います。",
-      "confirm": "賭ける",
-      "skip": "スキップ"
-    }
   },
   "comebackBonus": {
     "title": "おかえり！",

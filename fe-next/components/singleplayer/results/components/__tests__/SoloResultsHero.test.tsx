@@ -13,7 +13,6 @@ const base = {
   subtitle: 'Found 12 words',
   score: 140,
   words: 12,
-  coins: 20,
   avatar: { userId: 'u1' },
   isNewHighScore: false,
 };
@@ -28,11 +27,10 @@ describe('SoloResultsHero', () => {
     render(<SoloResultsHero {...base} rank={1} totalPlayers={1} />);
     expect(screen.queryByTestId('results-badge-rank')).toBeNull();
     expect(screen.getByTestId('results-stat-score').textContent).toContain('140');
-    expect(screen.getByTestId('results-stat-coins').textContent).toContain('+20');
   });
 
-  it('drops the coins card when nothing was awarded', () => {
-    render(<SoloResultsHero {...base} coins={0} rank={1} totalPlayers={1} />);
+  it('never shows a separate coins tile (coins live on the one reward line)', () => {
+    render(<SoloResultsHero {...base} rank={1} totalPlayers={1} />);
     expect(screen.queryByTestId('results-stat-coins')).toBeNull();
   });
 });

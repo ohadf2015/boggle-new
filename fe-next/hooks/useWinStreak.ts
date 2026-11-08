@@ -11,7 +11,6 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { fetchWithAuth } from '@/utils/authFetch';
-import { spendCoins, canAfford } from '@/utils/coinManager';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   getStreakTier as getStreakTierConfig,
@@ -26,8 +25,6 @@ const BEST_STREAK_KEY = 'lexiclash_best_streak';
 const TOTAL_WINS_KEY = 'lexiclash_total_wins';
 const STREAK_FREEZES_KEY = 'lexiclash_streak_freezes';
 const FREEZE_LAST_AWARDED_KEY = 'lexiclash_freeze_last_awarded';
-const BROKEN_STREAK_KEY = 'lexiclash_broken_streak';
-const BROKEN_STREAK_DATE_KEY = 'lexiclash_broken_streak_date';
 
 /**
  * Debug helper to log raw localStorage state
@@ -41,19 +38,13 @@ const debugLogLocalStorage = (context: string): void => {
     [STREAK_DATE_KEY]: localStorage.getItem(STREAK_DATE_KEY),
     [BEST_STREAK_KEY]: localStorage.getItem(BEST_STREAK_KEY),
     [TOTAL_WINS_KEY]: localStorage.getItem(TOTAL_WINS_KEY),
-    [BROKEN_STREAK_KEY]: localStorage.getItem(BROKEN_STREAK_KEY),
-    [BROKEN_STREAK_DATE_KEY]: localStorage.getItem(BROKEN_STREAK_DATE_KEY),
     currentTime: new Date().toISOString(),
     currentTimeLocal: new Date().toString(),
   });
 };
 
-/** Cost in coins to recover a broken streak */
-export const STREAK_RECOVERY_COST = 500;
 /** Number of free freezes awarded per week */
 export const FREE_FREEZES_PER_WEEK = 1;
-/** Hours within which a broken streak can be recovered */
-export const RECOVERY_WINDOW_HOURS = 24;
 
 export interface WinStreakData {
   currentStreak: number;
@@ -64,10 +55,6 @@ export interface WinStreakData {
   streakBroken: boolean;
   /** Number of streak freezes available */
   freezesAvailable: number;
-  /** Broken streak that can be recovered */
-  recoverableStreak: number | null;
-  /** Time remaining to recover broken streak (ms) */
-  recoveryTimeRemaining: number | null;
 }
 
 /**
@@ -107,8 +94,6 @@ const DEFAULT_STREAK_DATA: WinStreakData = {
   isStreakActive: false,
   streakBroken: false,
   freezesAvailable: FREE_FREEZES_PER_WEEK,
-  recoverableStreak: null,
-  recoveryTimeRemaining: null,
 };
 
 /**
@@ -143,27 +128,6 @@ const getStoredStreakData = (): WinStreakData => {
     localStorage.setItem(FREEZE_LAST_AWARDED_KEY, new Date().toISOString());
   }
 
-  // Check for recoverable broken streak
-  const brokenStreak = parseInt(localStorage.getItem(BROKEN_STREAK_KEY) || '0', 10);
-  const brokenStreakDate = localStorage.getItem(BROKEN_STREAK_DATE_KEY);
-  let recoverableStreak: number | null = null;
-  let recoveryTimeRemaining: number | null = null;
-
-  if (brokenStreak > 0 && brokenStreakDate) {
-    const brokenDate = new Date(brokenStreakDate);
-    const now = new Date();
-    const hoursSinceBroken = (now.getTime() - brokenDate.getTime()) / (1000 * 60 * 60);
-
-    if (hoursSinceBroken < RECOVERY_WINDOW_HOURS) {
-      recoverableStreak = brokenStreak;
-      recoveryTimeRemaining = (RECOVERY_WINDOW_HOURS * 60 * 60 * 1000) - (now.getTime() - brokenDate.getTime());
-    } else {
-      // Recovery window expired - clear the broken streak data
-      localStorage.removeItem(BROKEN_STREAK_KEY);
-      localStorage.removeItem(BROKEN_STREAK_DATE_KEY);
-    }
-  }
-
   // Check if streak is still active
   let isStreakActive = false;
   let streakBroken = false;
@@ -193,14 +157,9 @@ const getStoredStreakData = (): WinStreakData => {
       // Won yesterday - streak is active but needs a win today to continue
       isStreakActive = true;
     } else {
-      // Gap > 1 day - streak was broken (unless already saved for recovery)
-      if (currentStreak > 0 && !recoverableStreak) {
+      // Gap > 1 day - streak was broken
+      if (currentStreak > 0) {
         streakBroken = true;
-        // Save the broken streak for potential recovery
-        localStorage.setItem(BROKEN_STREAK_KEY, currentStreak.toString());
-        localStorage.setItem(BROKEN_STREAK_DATE_KEY, new Date().toISOString());
-        recoverableStreak = currentStreak;
-        recoveryTimeRemaining = RECOVERY_WINDOW_HOURS * 60 * 60 * 1000;
         if (process.env.NODE_ENV === 'development') {
           console.log('[WinStreak] Streak broken - gap > 1 day since last win');
         }
@@ -216,8 +175,6 @@ const getStoredStreakData = (): WinStreakData => {
     isStreakActive,
     streakBroken,
     freezesAvailable,
-    recoverableStreak,
-    recoveryTimeRemaining,
   };
 };
 
@@ -264,7 +221,6 @@ export const useWinStreak = () => {
         lastWinDate: data.lastWinDate,
         isStreakActive: data.isStreakActive,
         streakBroken: data.streakBroken,
-        recoverableStreak: data.recoverableStreak,
       });
     }
 
@@ -424,10 +380,6 @@ export const useWinStreak = () => {
     const newBestStreak = Math.max(newStreak, currentData.bestStreak);
     const newTotalWins = currentData.totalWins + 1;
 
-    // Clear any recoverable streak since we just won
-    localStorage.removeItem(BROKEN_STREAK_KEY);
-    localStorage.removeItem(BROKEN_STREAK_DATE_KEY);
-
     const newData: WinStreakData = {
       currentStreak: newStreak,
       bestStreak: newBestStreak,
@@ -436,8 +388,6 @@ export const useWinStreak = () => {
       isStreakActive: true,
       streakBroken: false,
       freezesAvailable: currentData.freezesAvailable,
-      recoverableStreak: null,
-      recoveryTimeRemaining: null,
     };
 
     saveStreakData(newData);
@@ -496,50 +446,6 @@ export const useWinStreak = () => {
       freezesAvailable: newFreezes,
       lastWinDate: today,
       isStreakActive: true,
-    }));
-
-    return true;
-  }, []);
-
-  /**
-   * Recover a broken streak by paying coins
-   * Returns true if recovery was successful
-   */
-  const recoverStreak = useCallback((): boolean => {
-    const currentData = getStoredStreakData();
-
-    if (!currentData.recoverableStreak || currentData.recoveryTimeRemaining === null || currentData.recoveryTimeRemaining <= 0) {
-      return false;
-    }
-
-    // Deduct coins BEFORE recovering — fail if insufficient
-    if (!canAfford(STREAK_RECOVERY_COST)) {
-      return false;
-    }
-    const spent = spendCoins(STREAK_RECOVERY_COST, 'Streak Recovery', {
-      recoveredStreak: currentData.recoverableStreak,
-    });
-    if (!spent) {
-      return false;
-    }
-
-    // Restore the streak
-    const restoredStreak = currentData.recoverableStreak;
-    const today = new Date().toISOString();
-
-    localStorage.setItem(STREAK_KEY, restoredStreak.toString());
-    localStorage.setItem(STREAK_DATE_KEY, today);
-    localStorage.removeItem(BROKEN_STREAK_KEY);
-    localStorage.removeItem(BROKEN_STREAK_DATE_KEY);
-
-    setStreakData(prev => ({
-      ...prev,
-      currentStreak: restoredStreak,
-      lastWinDate: today,
-      isStreakActive: true,
-      streakBroken: false,
-      recoverableStreak: null,
-      recoveryTimeRemaining: null,
     }));
 
     return true;
@@ -617,7 +523,6 @@ export const useWinStreak = () => {
     isLoaded,
     recordWin,
     applyStreakFreeze,
-    recoverStreak,
     purchaseFreeze,
     getStreakEmoji,
     getStreakTier,

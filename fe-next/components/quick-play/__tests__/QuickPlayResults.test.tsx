@@ -139,22 +139,16 @@ describe('QuickPlayResults redesign', () => {
     expect(screen.getByTestId('quick-hero-card')).toHaveTextContent('quickPlay.solo.wordsFound');
   });
 
-  it('coins reward is not a full-width slab', () => {
+  it('coins and XP share ONE small reward line (not two chips, not a full-width slab)', () => {
     render(
       <QuickPlayResults result={result} outcome={outcome} rival={null} onNextRound={vi.fn()} onChallenge={vi.fn()} />
     );
-    const coinsReward = screen.getByTestId('quick-coins-reward');
-    // Should be a small chip, not flex-1 or full-width
-    expect(coinsReward.className).not.toContain('flex-1');
-  });
-
-  it('xp reward is not a full-width slab', () => {
-    render(
-      <QuickPlayResults result={result} outcome={outcome} rival={null} onNextRound={vi.fn()} onChallenge={vi.fn()} />
-    );
-    const xpReward = screen.getByTestId('quick-xp-reward');
-    // Should be a small chip, not flex-1 or full-width
-    expect(xpReward.className).not.toContain('flex-1');
+    const line = screen.getByTestId('results-reward-line');
+    expect(line.className).not.toContain('flex-1');
+    expect(line).toHaveTextContent(`+${outcome.coins}`);
+    expect(line).toHaveTextContent(`+${outcome.xp}`);
+    expect(screen.queryByTestId('quick-coins-reward')).toBeNull();
+    expect(screen.queryByTestId('quick-xp-reward')).toBeNull();
   });
 
   it('next-round CTA is the only filled button', () => {

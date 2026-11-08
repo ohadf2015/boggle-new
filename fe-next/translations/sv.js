@@ -6091,6 +6091,8 @@ const sv = {
     "newMessages": "Nya meddelanden"
   },
   "results": {
+    "bestMissedWord": "Du missade {word} ({letters} bokstäver, {points} poäng)",
+    "rewardLine": { "coins": "mynt", "xp": "XP" },
     "progressPulse": {
       "title": "Din utveckling",
       "game": "Spel #{n}",
@@ -6472,13 +6474,6 @@ const sv = {
     "blast": "Morgondagens Blast har nya kombomönster.",
     "adventure": "Nästa nivå förbereds. Kom tillbaka så får du se.",
     "seeYou": "Vi ses imorgon"
-  },
-  "unfinishedBoard": {
-    "teaser": "3 ord väntar på dig imorgon",
-    "resumeTitle": "Ditt oavslutade bräde",
-    "resumeDesc": "Du hittade {{found}}/{{total}} ord",
-    "resumeCta": "Fortsätt spela",
-    "wordsWaiting": "ord väntar"
   },
   "catalystTeaser": {
     "title": "Kommer i riktiga spel",
@@ -7418,31 +7413,9 @@ const sv = {
       "levelsRemaining": "{{count}} nivåer kvar"
     }
   },
-  "nearMiss": {
-    "almostThere": "Nästan där!",
-    "oneMoreGame": "Ett spel till!",
-    "tip": "Tips",
-    "more": "mer",
-    "soClose": "Du var så nära! Ett spel till kan göra det."
-  },
   "oneMoreGame": {
     "defaultTitle": "Ännu ett spel?",
     "defaultMessage": "Håll igång serien. Spela igen!"
-  },
-  "mysteryReward": {
-    "title": "Mysteriebelöning",
-    "youFound": "Du hittade en mysteriebelöning!",
-    "opening": "Öppnar...",
-    "revealing": "Avslöjar...",
-    "awesome": "Snyggt!",
-    "gameCompletion": "Spelslutbonus",
-    "winBonus": "Vinnarbonus",
-    "longWord": "Långordsbonus",
-    "achievement": "Prestationsbonus",
-    "gameCompletionExplain": "Fortsätt spela för fler chanser",
-    "winBonusExplain": "Vinnare får extra överraskningar",
-    "longWordExplain": "Ditt ordförråd lönade sig!",
-    "achievementExplain": "Prestationer ger bonus"
   },
   "auth": {
     "google": {
@@ -7777,16 +7750,6 @@ const sv = {
     "title": "Spelarprofil",
     "notFound": "Spelaren hittades inte",
     "error": "Kunde inte ladda profilen"
-  },
-  "streaks": {
-    "wager": {
-      "title": "Satsa dina mynt",
-      "description": "Satsa mynt på din svit: vinn 3x eller förlora allt.",
-      "payout": "Potentiell utbetalning",
-      "risk": "Du förlorar din insats om du bryter sviten.",
-      "confirm": "Lägg insats",
-      "skip": "Hoppa över"
-    }
   },
   "consent": {
     "title": "Samtycke krävs",
