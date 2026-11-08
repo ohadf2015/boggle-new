@@ -32,7 +32,10 @@ export function FreshPlayLink({ onPlay, cta, locale, href, className, children }
   const { language } = useLanguage();
 
   const handleClick = (e: MouseEvent<HTMLAnchorElement>) => {
-    trackLandingCtaClick(cta);
+    // `opens_ftue` splits the PLAY funnel by cohort: the handler exists only
+    // for new users (PageClient gates onStartOnboarding on isNewUser), so
+    // false = returning-user native navigation by design, not gate loss.
+    trackLandingCtaClick(cta, { opens_ftue: !!onPlay });
     if (!onPlay || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
     e.preventDefault();
     onPlay();
