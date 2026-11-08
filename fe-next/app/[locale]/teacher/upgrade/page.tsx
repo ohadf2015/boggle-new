@@ -37,7 +37,7 @@ export default async function UpgradePricingPage({ params }: { params: Promise<{
     name: sub.proPlanName || 'Teacher Pro',
     description:
       seo.description ||
-      'See who got it before the bell. Teacher Pro is $9/month after a 14-day free trial. Cancel anytime.',
+      'See who understood — before the bell. Teacher Pro is $9/month after a 14-day free trial. Cancel anytime.',
   });
   const faqSchema = buildTeacherUpgradeFaqJsonLd(validLocale, faq);
 
