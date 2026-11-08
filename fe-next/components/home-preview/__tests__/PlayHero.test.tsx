@@ -65,11 +65,41 @@ describe('PlayHero', () => {
     expect(mascot.closest('[aria-hidden="true"]')).not.toBeNull();
   });
 
-  it('given the hero, then Daily and Multiplayer entry points link to their routes', () => {
+  it('given the hero, then the quick-links row holds the daily puzzle only (multiplayer has its own big button)', () => {
     renderHero({ lang: 'he' });
     const row = screen.getByTestId('hp-quick-links');
     const hrefs = Array.from(row.querySelectorAll('a')).map((a) => a.getAttribute('href'));
-    expect(hrefs).toEqual(['/he/daily', '/he/multiplayer']);
+    expect(hrefs).toEqual(['/he/daily']);
+    expect(screen.queryByTestId('hp-chip-mp')).toBeNull();
+  });
+
+  it('given the hero, then "Play with friends" is a big button right after PLAY, before the solo modes', () => {
+    renderHero({ lang: 'he' });
+    const friends = screen.getByTestId('hp-play-friends');
+    expect(friends.getAttribute('href')).toBe('/he/multiplayer');
+    expect(friends.textContent).toContain(en.homePlay.friendsPlay);
+    expect(friends.textContent).toContain(en.homePlay.friendsPlaySub);
+    const play = screen.getByTestId('hp-play');
+    const keycaps = screen.getByTestId('hp-keycaps');
+    // Document order: PLAY, then friends, then the solo mode keys.
+    expect(play.compareDocumentPosition(friends) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(friends.compareDocumentPosition(keycaps) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    // Same hard-shadow button family as PLAY, in the multiplayer pink.
+    expect(friends.className).toContain('bg-neo-pink');
+    expect(friends.className).toContain('shadow-hard');
+  });
+
+  it('given the hero, when "Play with friends" is tapped, then the click is tracked', () => {
+    mockTrackCta.mockClear();
+    renderHero();
+    fireEvent.click(screen.getByTestId('hp-play-friends'));
+    expect(mockTrackCta).toHaveBeenCalledWith('home_play_friends');
+  });
+
+  it('given the hero, then the kicker no longer labels the whole hero as solo', () => {
+    renderHero();
+    const kicker = screen.getByRole('heading', { level: 1 }).previousElementSibling;
+    expect(kicker?.textContent).toBe('Hey there');
   });
 
   it('given a running streak, then the daily chip shows it', () => {

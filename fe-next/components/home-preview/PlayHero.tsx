@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCallback, useEffect, type MouseEvent } from 'react';
+import { Users } from 'lucide-react';
 import { ModeGlyph } from '@/components/quick-play/ModeGlyph';
 import { RandomGlyph } from '@/components/quick-play/RandomGlyph';
 import { QuickResultsRays, SparkleLoop } from '@/components/quick-play/QuickResultsFx';
@@ -146,7 +147,7 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
         <div className="relative z-10 flex flex-col gap-3 lg:gap-6">
           <div className="text-center lg:text-start">
             <p className="font-neo-display text-xs font-bold tracking-[0.14em] text-neo-lime/90 uppercase lg:text-lg">
-              {greeting} · {t('quickPlay.solo.title')}
+              {greeting}
             </p>
             <h1
               id="hp-play-title"
@@ -177,6 +178,23 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
                 {t('quickPlay.solo.play')}
               </span>
               <span className="mt-0.5 text-xs font-bold tracking-wide opacity-70 lg:text-base">{t('homePlay.playSub')}</span>
+            </span>
+          </Link>
+
+          {/* Multiplayer sits right under PLAY, same button family, so the hero
+              reads as two ways to play: alone now, or live with friends. */}
+          <Link
+            href={`/${lang}/multiplayer`}
+            data-testid="hp-play-friends"
+            onClick={() => trackLandingCtaClick('home_play_friends')}
+            className="relative flex h-[54px] items-center justify-center gap-3 [@media(max-height:700px)]:h-[48px] rounded-2xl border-[3px] border-black bg-neo-pink px-4 text-black shadow-hard active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed lg:h-20 lg:rounded-3xl lg:shadow-hard-lg 2xl:h-24"
+          >
+            <Users className="h-6 w-6 shrink-0 lg:h-10 lg:w-10" strokeWidth={2.75} aria-hidden="true" />
+            <span className="flex flex-col items-start leading-none">
+              <span className="font-neo-display text-[19px] font-bold tracking-[0.04em] lg:text-3xl">
+                {t('homePlay.friendsPlay')}
+              </span>
+              <span className="mt-0.5 text-xs font-bold tracking-wide opacity-70 lg:text-base">{t('homePlay.friendsPlaySub')}</span>
             </span>
           </Link>
 
