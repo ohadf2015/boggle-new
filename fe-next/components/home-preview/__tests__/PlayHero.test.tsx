@@ -1,18 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 
-vi.mock('@/components/Avatar', () => ({ default: () => <div data-testid="avatar" /> }));
 vi.mock('@/components/quick-play/QuickResultsFx', () => ({ QuickResultsRays: () => null, SparkleLoop: () => null }));
-vi.mock('@/contexts/AuthContext', () => ({
-  useAuth: () => ({ user: null, updateProfile: vi.fn(), refreshProfile: vi.fn() }),
-}));
-vi.mock('@/hooks/useAvatarPremium', () => ({ useAvatarPremium: () => null }));
-vi.mock('next/dynamic', () => ({
-  default: () =>
-    function BuilderStub({ isOpen }: { isOpen: boolean }) {
-      return isOpen ? <div role="dialog" data-testid="avatar-builder" /> : null;
-    },
-}));
 vi.mock('@/utils/growthTracking', () => ({ trackLandingCtaClick: vi.fn() }));
 
 import { PlayHero } from '../PlayHero';
@@ -54,12 +43,13 @@ describe('PlayHero', () => {
     expect(words).toBeLessThanOrEqual(60);
   });
 
-  it('given the hero, when tapping the edit-avatar button, then the real avatar builder opens', () => {
+  it('given the hero, then the avatar and edit button arrive through bridge slots, not the landing bundle', () => {
     renderHero();
-    const edit = screen.getByRole('button', { name: 'Edit avatar' });
-    expect(screen.queryByTestId('avatar-builder')).toBeNull();
-    fireEvent.click(edit);
-    expect(screen.getByTestId('avatar-builder')).toBeTruthy();
+    // Bare slots only — the avatar UI itself is portaled in by HeroAvatarIsland
+    // (HeroAvatarIsland.test.tsx), keeping chunk 65990 out of the landing graph.
+    expect(screen.getByTestId('hp-avatar-slot')).toBeTruthy();
+    expect(screen.getByTestId('hp-edit-avatar-slot')).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Edit avatar' })).toBeNull();
   });
 
   it('given the hero, then the mascot is decorative and hidden from assistive tech', () => {
