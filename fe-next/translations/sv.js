@@ -10260,6 +10260,7 @@ const sv = {
     }
   },
   "wordWheel": {
+    "golden": { "reveal": "Guldordet!", "found": "Du hittade guldordet", "share": "Hittade guldordet" },
     "climb": {
       "showBoard": "Dagens ranking",
       "hideBoard": "Dölj ranking",

@@ -38,8 +38,6 @@ import {
 
 import {
   getWordOfTheDay,
-  recordWotdAttempt,
-  getWotdStats,
 } from '../modules/wordOfTheDayManager';
 
 import { safeEmit } from '../utils/socketHelpers';
@@ -424,44 +422,6 @@ function registerEngagementHandlers(io: Server, socket: Socket): void {
       const err = error as Error;
       logger.error('ENGAGEMENT', `Error getting WOTD: ${err.message}`);
       safeEmit(socket, 'engagement:error', { message: 'Failed to get Word of the Day' });
-    }
-  });
-
-  socket.on('engagement:recordWotd', async (data: {
-    word: string;
-    found: boolean;
-    language: string;
-    date?: string;
-  }) => {
-    if (!checkRateLimit(socket.id)) {
-      socket.emit('rateLimited');
-      return;
-    }
-
-    const playerId = getAuthedPlayerId(socket);
-    if (!playerId) {
-      safeEmit(socket, 'engagement:error', { message: 'Authentication required' });
-      return;
-    }
-
-    const { word, language, found, date } = data || {};
-    if (!word || !language) {
-      safeEmit(socket, 'engagement:error', { message: 'Word and language required' });
-      return;
-    }
-
-    try {
-      const result = await recordWotdAttempt(playerId, word, found, language, date);
-      safeEmit(socket, 'engagement:wotdRecorded', result);
-
-      const stats = await getWotdStats(language, date);
-      safeEmit(socket, 'engagement:wotdStats', stats);
-
-      logger.info('ENGAGEMENT', `WOTD attempt recorded for ${playerId}: found=${found}`);
-    } catch (error: unknown) {
-      const err = error as Error;
-      logger.error('ENGAGEMENT', `Error recording WOTD: ${err.message}`);
-      safeEmit(socket, 'engagement:error', { message: 'Failed to record Word of the Day attempt' });
     }
   });
 }

@@ -60,4 +60,12 @@ describe('WheelRushCelebration', () => {
     expect(banner.textContent).toContain('wordWheel.onFireBadge');
     expect(banner.textContent).not.toContain('wordWheel.streakBadge');
   });
+
+  it("shows the distinct golden-word reveal for a 'golden' celebration", () => {
+    render(<WheelRushCelebration celebration={{ tier: 'golden', word: 'RETAINS', key: 3 }} t={t} prefersReduced={false} />);
+    const banner = screen.getByTestId('wheel-celebration');
+    expect(banner.getAttribute('data-tier')).toBe('golden');
+    expect(banner.textContent).toContain('wordWheel.golden.reveal');
+    expect(banner.textContent).not.toContain('wordWheel.allLettersUsed');
+  });
 });

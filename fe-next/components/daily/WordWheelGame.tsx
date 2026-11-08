@@ -16,6 +16,7 @@ import type { WordWheelEffect } from './WordWheelEffectsCanvas';
 import WheelDisc from './wheel/WheelDisc';
 import WheelCoachSlot from './wheel/WheelCoachSlot';
 import { useWheelWordFx } from './wheel/useWheelWordFx';
+import { reportGoldenWordFound, useWheelGoldenWord } from './wheel/useWheelGoldenWord';
 import { useWordWheelKeyboard } from '@/hooks/useWordWheelKeyboard';
 import { useEquippedCosmetic } from '@/hooks/useEquippedCosmetic';
 import { trackGameEnd, trackGameStart, trackGrowthEvent } from '@/utils/growthTracking';
@@ -56,6 +57,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
 }) => {
   const goldLetter = bonuses ? goldProp : null;
   const goldIndex = goldLetter ? puzzle.outerLetters.indexOf(goldLetter) : -1;
+  const isGoldenWord = useWheelGoldenWord(puzzle.puzzleDate, puzzle.language, !practice);
   const { t } = useLanguage();
   const inShell = useMediaQuery(SHELL_MEDIA);
   const prefersReducedMotion = useReducedMotion() ?? false;
@@ -172,14 +174,14 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     return cancelIdleSubmit;
   }, [builtLetters, cancelIdleSubmit, timers, puzzle.centerLetter, onQuickVerdict, draggingRef, handleSubmitRef]);
 
-  // 'all' rides the Pixi pangram burst; 'almost' gets a light DOM confetti pop (self-gated on low-end).
+  // 'all' rides the Pixi pangram burst; 'almost' and the day's golden word (an 'all' word) add a DOM confetti pop.
   const triggerFeatBanner = useCallback((tier: 'all' | 'almost', word: string, points: number) => {
-    setCelebration({ tier, word, key: Date.now(), points });
-    if (tier === 'almost') {
-      fireConfetti({ particleCount: 36, spread: 80, startVelocity: 50, origin: { y: 0.5 } });
-    }
+    const golden = tier === 'all' && isGoldenWord(word);
+    setCelebration({ tier: golden ? 'golden' : tier, word, key: Date.now(), points });
+    if (tier === 'almost' || golden) fireConfetti({ particleCount: golden ? 80 : 36, spread: 80, startVelocity: 50, origin: { y: 0.5 } });
+    if (golden) reportGoldenWordFound(puzzle.puzzleDate, puzzle.language, 'in_game');
     timers.set('celebration', () => setCelebration(null), 1900);
-  }, [timers]);
+  }, [timers, isGoldenWord, puzzle.puzzleDate, puzzle.language]);
 
   const builtWord = useMemo(
     () => builtLetters.map(bl => bl.letter).join(''),
@@ -372,7 +374,6 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     <>
 
       {practice && !hideModeCoach && <WheelCoachSlot wordsFound={wordsFound.length} />}
-
 
       <div className="w-full flex flex-col gap-3 shell:gap-4 shrink-0">
         {hud}

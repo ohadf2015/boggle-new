@@ -2,11 +2,12 @@
 
 import React from 'react';
 import { AnimatePresence, m } from 'framer-motion';
-import { Sparkles, Flame, Zap } from 'lucide-react';
+import { Sparkles, Flame, Zap, Crown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface WheelCelebration {
-  tier: 'all' | 'almost';
+  /** 'golden' = the daily wheel's golden word (always an all-letters word too). */
+  tier: 'all' | 'almost' | 'golden';
   word: string;
   /** Bump on each fire so a new pangram replaces (re-animates) the previous banner. */
   key: number;
@@ -42,9 +43,11 @@ export const WheelRushCelebration: React.FC<Props> = ({ celebration, t, prefersR
           data-tier={celebration.tier}
           className={cn(
             'flex flex-col items-center gap-1 px-5 py-3 rounded-neo border-3 border-neo-black shadow-hard-lg',
-            celebration.tier === 'all'
-              ? 'bg-neo-yellow text-neo-black'
-              : 'bg-neo-orange text-neo-black',
+            celebration.tier === 'golden'
+              ? 'bg-neo-yellow text-neo-black ring-4 ring-neo-orange'
+              : celebration.tier === 'all'
+                ? 'bg-neo-yellow text-neo-black'
+                : 'bg-neo-orange text-neo-black',
           )}
           initial={prefersReduced ? { opacity: 0 } : { opacity: 0, scale: 0.6, y: 12 }}
           animate={
@@ -63,11 +66,13 @@ export const WheelRushCelebration: React.FC<Props> = ({ celebration, t, prefersR
           }
         >
           <span className="flex items-center gap-1.5 font-neo-display font-black text-lg sm:text-xl tracking-wide">
-            {celebration.tier === 'all' ? <Sparkles className="w-5 h-5" /> : <Zap className="w-5 h-5" />}
-            {celebration.tier === 'all'
-              ? t('wordWheel.allLettersUsed')
-              : t('wordWheel.almostAllLetters')}
-            {celebration.tier === 'all' ? <Sparkles className="w-5 h-5" /> : <Zap className="w-5 h-5" />}
+            {celebration.tier === 'golden' ? <Crown className="w-5 h-5" /> : celebration.tier === 'all' ? <Sparkles className="w-5 h-5" /> : <Zap className="w-5 h-5" />}
+            {celebration.tier === 'golden'
+              ? t('wordWheel.golden.reveal')
+              : celebration.tier === 'all'
+                ? t('wordWheel.allLettersUsed')
+                : t('wordWheel.almostAllLetters')}
+            {celebration.tier === 'golden' ? <Crown className="w-5 h-5" /> : celebration.tier === 'all' ? <Sparkles className="w-5 h-5" /> : <Zap className="w-5 h-5" />}
           </span>
           <span className="flex items-center gap-2">
             <span dir="auto" className="font-neo-body font-bold text-sm uppercase tracking-widest opacity-80">

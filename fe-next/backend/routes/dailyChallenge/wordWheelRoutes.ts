@@ -22,6 +22,7 @@ import { awardCoinsServer } from '../../services/economy/awardCoins';
 import { resolveDailyPlayer } from './resolveDailyPlayer';
 import wordWheelLeaderboardRoutes from './wordWheelLeaderboardRoutes';
 import { sanitizeWheelSubmission, isWheelCatchup } from './wordWheelSubmission';
+import { handleGoldenWordKey, payGoldenWord } from './wheelGoldenWord';
 
 
 const router: Router = express.Router();
@@ -237,15 +238,17 @@ router.post('/submit', async (req: Request<unknown, unknown, WordWheelSubmitBody
     }
 
     let coins = playerId ? goldCoinsFor(wordsFound, goldLetter) : 0;
-    if (playerId && coins > 0) {
-      // The gold-coin cap is per day: a second language's board that day pays nothing.
+    let otherLanguagesToday = 0;
+    if (playerId) {
+      // Gold coins and the golden word pay once per day: a second language's board that day pays nothing.
       const { count: otherLanguages } = await supabase
         .from('daily_word_wheel_attempts')
         .select('id', { count: 'exact', head: true })
         .eq('player_id', playerId)
         .eq('puzzle_date', puzzleDate)
         .neq('language', language);
-      if ((otherLanguages ?? 0) > 0) coins = 0;
+      otherLanguagesToday = otherLanguages ?? 0;
+      if (otherLanguagesToday > 0) coins = 0;
     }
     if (playerId && coins > 0) {
       // Fresh-insert path only, so the one-row-per-day unique key keeps this from paying twice.
@@ -253,7 +256,9 @@ router.post('/submit', async (req: Request<unknown, unknown, WordWheelSubmitBody
       if (!award.success) logger.warn('API', `[WordWheel] gold coins not awarded to ${playerId}: ${award.error}`);
     }
 
-    res.json({ success: true, alreadySubmitted: false, data, rank });
+    const goldenWordFound = await payGoldenWord({ puzzle, wordsFound, playerId, otherLanguagesToday });
+
+    res.json({ success: true, alreadySubmitted: false, data, rank, goldenWordFound });
   } catch (error) {
     const err = error as Error;
     logger.error('API', `Word Wheel submit error: ${err.message}`);
@@ -442,6 +447,7 @@ const handleWords = async (req: Request<WordsRouteParams>, res: Response): Promi
   }
 };
 
+router.get('/golden/:date/:language', handleGoldenWordKey);
 router.get('/words/:date/:language/:playerId', handleWords);
 router.post('/words/:date/:language', handleWords);
 

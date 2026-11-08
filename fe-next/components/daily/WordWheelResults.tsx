@@ -18,6 +18,7 @@ import DailyInsightStack from './DailyInsightStack';
 import { DailyResultsHero } from './results/DailyResultsHero';
 import WheelRankMeter from './wheel/WheelRankMeter';
 import WheelShareRow from './wheel/WheelShareRow';
+import { reportGoldenWordFound, useWheelGoldenWord } from './wheel/useWheelGoldenWord';
 import { WHEEL_RANKS, rankProgress, wheelRankLadder } from '@/lib/wordWheel/rankLadder';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import { useIsGuest } from '@/hooks/useIsGuest';
@@ -84,6 +85,12 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
   const formatWord = (w: string) => (gameLang === 'he' ? applyHebrewFinalLetters(w) : w);
   const longest = result.wordsFound.reduce((best, w) => (w.length > best.length ? w : best), '');
   const [rareFind, setRareFind] = useState<RareFind | null>(null);
+  const isGoldenWord = useWheelGoldenWord(puzzleDate, gameLang, !isPractice);
+  const goldenWord = result.wordsFound.find(isGoldenWord) ?? null;
+  const goldenWordFound = goldenWord !== null;
+  useEffect(() => {
+    if (goldenWordFound) reportGoldenWordFound(puzzleDate, gameLang, 'results');
+  }, [goldenWordFound, puzzleDate, gameLang]);
   // Live rank + field size for today, reported up by the leaderboard below.
   // Feeds the rank-aware guest signup hook ("you're #1 today"). The same board
   // already lists this player (by id or guest fingerprint), so this is just
@@ -163,12 +170,16 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
           celebrate={celebrate}
           className="z-10"
         >
+          {goldenWordFound && (
+            <p data-testid="wheel-golden-line" className="text-center font-neo-display font-black text-sm text-neo-yellow">{t('wordWheel.golden.found')}</p>
+          )}
           {result.wordsFound.length > 0 && (
             <WheelShareRow
               t={t}
               score={result.score}
               wordsFound={result.wordsFound}
               puzzleNumber={puzzleNumber}
+              goldenWord={goldenWord}
               onShareClick={(method) => trackGrowthEvent('cross_promo_click', {
                 target: 'share',
                 source: 'word_wheel_results',

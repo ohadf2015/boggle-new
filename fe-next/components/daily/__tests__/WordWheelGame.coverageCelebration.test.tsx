@@ -58,6 +58,12 @@ vi.mock('next/dynamic', () => ({
 
 vi.mock('@/utils/confettiUtils', () => ({ fireConfetti: fireConfettiSpy }));
 
+const golden = vi.hoisted(() => ({ word: '', report: vi.fn() }));
+vi.mock('../wheel/useWheelGoldenWord', () => ({
+  useWheelGoldenWord: () => (w: string) => !!golden.word && w.toUpperCase() === golden.word,
+  reportGoldenWordFound: (...a: unknown[]) => golden.report(...a),
+}));
+
 // Real letter-validity (so coverage reflects the actual wheel); dictionary is
 // the async onValidateWord prop, mocked true below.
 vi.mock('@/utils/dailyChallenge/wordWheelGeneration', async () => {
@@ -116,6 +122,17 @@ const buildAndSubmit = async (word: string) => {
 };
 
 describe('WordWheelGame coverage celebration', () => {
+  it("Given today's golden word, When found, Then the distinct golden reveal shows and golden_word_found is reported", async () => {
+    golden.word = 'CANTERS';
+    const { onEffect } = mountGame();
+    await buildAndSubmit('CANTERS');
+    const banner = await screen.findByTestId('wheel-celebration');
+    expect(banner).toHaveAttribute('data-tier', 'golden');
+    expect(onEffect).toHaveBeenCalledWith(expect.objectContaining({ type: 'pangram' }));
+    expect(golden.report).toHaveBeenCalledWith('2026-06-01', 'en', 'in_game');
+    golden.word = '';
+  });
+
   it('shows the ALL-letters banner + pangram effect + legendary sound for a full-wheel word', async () => {
     const { onEffect } = mountGame();
     await buildAndSubmit('CANTERS'); // A C N T E R S → all 7 distinct wheel letters

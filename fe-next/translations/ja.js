@@ -9952,6 +9952,7 @@ const ja = {
     }
   },
   "wordWheel": {
+    "golden": { "reveal": "ゴールデンワード!", "found": "ゴールデンワードを見つけました", "share": "ゴールデンワードを見つけた" },
     "climb": {
       "showBoard": "今日のランキング",
       "hideBoard": "ランキングを閉じる",

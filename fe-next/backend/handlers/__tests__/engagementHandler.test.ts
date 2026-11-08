@@ -52,8 +52,6 @@ vi.mock('../../modules/dailyMissionsManager', () => ({
 // Mock wordOfTheDayManager
 vi.mock('../../modules/wordOfTheDayManager', () => ({
   getWordOfTheDay: vi.fn(),
-  recordWotdAttempt: vi.fn(),
-  getWotdStats: vi.fn(),
 }));
 
 import { registerEngagementHandlers } from '../engagementHandler';

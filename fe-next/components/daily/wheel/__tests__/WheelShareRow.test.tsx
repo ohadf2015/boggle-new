@@ -29,4 +29,16 @@ describe('WheelShareRow', () => {
     expect(text).toContain('lexiclash.live');
     expect(text).not.toMatch(/\p{Extended_Pictographic}/u);
   });
+
+  it('Given the golden word was found, When copied, Then the text says so without revealing the word', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
+    render(<WheelShareRow {...base} wordsFound={['ANT', 'RETAINS']} goldenWord="RETAINS" />);
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'share.emojiCard.copy' }));
+    });
+    const text = writeText.mock.calls[0][0] as string;
+    expect(text).toContain('wordWheel.golden.share');
+    expect(text).not.toContain('RETAINS');
+  });
 });

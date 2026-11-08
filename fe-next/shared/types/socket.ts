@@ -345,8 +345,6 @@ export interface ServerToClientEvents {
 
   // Engagement — Word of the Day
   'engagement:wotd': (data: { word: string; language: string; [key: string]: unknown }) => void;
-  'engagement:wotdRecorded': (data: { success?: boolean; found?: boolean; [key: string]: unknown }) => void;
-  'engagement:wotdStats': (data: { stats?: unknown; [key: string]: unknown }) => void;
 
   // Party game events
   'party:gameUpdate': (data: Record<string, unknown>) => void;

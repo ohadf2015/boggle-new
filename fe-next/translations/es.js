@@ -9912,6 +9912,7 @@ const es = {
     }
   },
   "wordWheel": {
+    "golden": { "reveal": "¡Palabra dorada!", "found": "Encontraste la palabra dorada", "share": "Encontré la palabra dorada" },
     "climb": {
       "showBoard": "Tabla de hoy",
       "hideBoard": "Ocultar tabla",
