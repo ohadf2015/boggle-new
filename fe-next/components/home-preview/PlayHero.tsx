@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import type { MouseEvent } from 'react';
 import Avatar from '@/components/Avatar';
 import { ModeGlyph } from '@/components/quick-play/ModeGlyph';
 import { RandomGlyph } from '@/components/quick-play/RandomGlyph';
@@ -12,6 +13,7 @@ import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { EditAvatarButton } from './EditAvatarButton';
 import { HeroQuickLinks } from './HeroQuickLinks';
 import { quickPlayHref } from '@/lib/quickPlay/startMode';
+import { trackLandingCtaClick } from '@/utils/growthTracking';
 
 const MODES: QuickMode[] = ['classic', 'blast', 'word-hunt', 'wheel-rush'];
 const KEY_TILT = ['-rotate-2', 'rotate-1', '-rotate-1', 'rotate-2'];
@@ -96,6 +98,23 @@ function AvatarStage({ avatar, animate, t, onAvatarSaved }: Pick<PlayHeroProps, 
 }
 
 export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoading, onAvatarSaved, onPlay }: PlayHeroProps) {
+  // Funnel numerator for the landing PLAY→onboarding leak, restored: the
+  // play-first redesign (#1706) replaced FreshHero — which fired
+  // `fresh_hero_play` on this CTA — with this hero, and the event's main
+  // contributor went silent (read as "mounted-gate telemetry dead"). Same cta
+  // value as the old hero keeps before/after funnels comparable
+  // (FreshPlayLink convention). `opens_ftue` splits the leak cohorts: false =
+  // returning user navigating natively BY DESIGN (their clicks must not count
+  // as gate fall-through); true − onboarding_open_requested = the real
+  // mounted-gate loss. Fires on every click, handler or not — same
+  // "tracking is not gated on onPlay" semantics as FreshPlayLink.
+  const handlePlayClick = (e: MouseEvent<HTMLAnchorElement>) => {
+    trackLandingCtaClick('fresh_hero_play', { opens_ftue: !!onPlay });
+    if (!onPlay || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    e.preventDefault();
+    onPlay();
+  };
+
   return (
     <section
       aria-labelledby="hp-play-title"
@@ -116,12 +135,15 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
             >
               {t('homePlay.heroLine')}
             </h1>
+            <p className="mx-auto mt-2 max-w-sm text-sm leading-snug text-neo-white/75 [@media(max-height:700px)]:text-xs lg:mx-0 lg:mt-4 lg:max-w-xl lg:text-lg">
+              {t('homePlay.intro')}
+            </p>
           </div>
 
           <Link
             href={quickPlayHref(lang, 'random')}
             data-testid="hp-play"
-            onClick={onPlay ? (e) => { e.preventDefault(); onPlay(); } : undefined}
+            onClick={handlePlayClick}
             className="group relative flex h-[58px] items-center justify-center gap-3 [@media(max-height:700px)]:h-[52px] overflow-hidden rounded-2xl border-[3px] border-black bg-neo-lime px-4 text-black shadow-hard active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed lg:h-24 lg:rounded-3xl lg:shadow-hard-lg 2xl:h-28"
           >
             {animate && (

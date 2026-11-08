@@ -10,6 +10,24 @@ describe('global mute button clearance', () => {
     render(
       <SurvivalHeader liveScore={120} lastScoreIncrement={null} isScoreAnimating={false} onQuitClick={() => {}} t={t} />,
     );
-    expect(screen.getByTestId('survival-header').className).toMatch(/\bpe-12\b/);
+    // 40px button + its inset from the edge: pe-12 (48px) let the rank pill touch it.
+    expect(screen.getByTestId('survival-header').className).toMatch(/\bpe-14\b/);
+  });
+
+  it('lets the race standings shrink instead of spilling into the mute corner (quick play Hunt, phone)', () => {
+    render(
+      <SurvivalHeader
+        liveScore={120}
+        lastScoreIncrement={null}
+        isScoreAnimating={false}
+        onQuitClick={() => {}}
+        practice
+        rivals={[{ username: 'Gugu', score: 40 }]}
+        selfUsername="You"
+        t={t}
+      />,
+    );
+    expect(screen.getByTestId('survival-rank-indicator').className).toMatch(/\bmin-w-0\b/);
+    expect(screen.getByTestId('mobile-rival-chip').className).toMatch(/\bmin-w-0\b/);
   });
 });

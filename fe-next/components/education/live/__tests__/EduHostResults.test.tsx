@@ -7,6 +7,7 @@ import type { ClassroomSummary } from '@/shared/types/classroom';
 import type { ClassroomBossView } from '@/shared/types/classroomBoss';
 import { useClassroomBossStore } from '@/stores/classroomBossStore';
 
+vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'u1' }, loading: false, isTeacher: true }) }));
 vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ language: 'he', t: (key: string) => key }) }));
 vi.mock('next/image', () => ({ default: () => <span data-testid="boss-art" /> }));
 vi.mock('@/components/Avatar', () => ({ default: () => <span data-testid="avatar" /> }));
@@ -100,6 +101,22 @@ describe('EduHostResults', () => {
     expect(screen.queryByTestId('unlock-report-upgrade-cta')).toBeNull();
     expect(screen.queryByTestId('struggle-preview')).toBeNull();
     expect(document.querySelector('a[href="/he/teacher/reports"]')).toBeNull();
+  });
+
+  it('Given a vocab-quiz round, When a free teacher opens the word grid, Then the cells read as quiz answers, not board finds', () => {
+    render(<EduHostResults summary={{ ...lessonSummary, gameMode: 'vocab-quiz' }} players={players} t={t} onRematch={vi.fn()} />);
+    finishReveal();
+    fireEvent.click(screen.getByTestId('edu-results-more-toggle'));
+    fireEvent.click(screen.getByTestId('class-report-open-grid'));
+    expect(screen.getByTestId('round-grid-dialog').innerHTML).toContain('teacher.classReport.state.quizFound');
+  });
+
+  it('Given a vocab-quiz round, When a Pro teacher opens the word grid, Then the cells read as quiz answers too', () => {
+    pro.hasPro = true;
+    render(<EduHostResults summary={{ ...lessonSummary, gameMode: 'vocab-quiz' }} players={players} t={t} onRematch={vi.fn()} />);
+    finishReveal();
+    fireEvent.click(screen.getByTestId('struggle-open-grid'));
+    expect(screen.getByTestId('round-grid-dialog').innerHTML).toContain('teacher.classReport.state.quizFound');
   });
 
   it('given a free teacher, when they open "Share and export", then the Pro preview mounts and only then its impression fires', () => {

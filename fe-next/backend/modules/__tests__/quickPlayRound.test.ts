@@ -19,7 +19,7 @@ vi.mock('../../dictionary', () => {
   };
 });
 
-import { buildQuickRound, scoreWordsForMode } from '../quickPlayRound';
+import { buildQuickRound, scoreWordsForMode, parScoreForMode, PAR_WORDS } from '../quickPlayRound';
 
 describe('buildQuickRound', () => {
   it('same seed → identical board and perfectScore (deterministic)', async () => {
@@ -76,5 +76,39 @@ describe('scoreWordsForMode', () => {
   });
   it('wheel-rush uses wheel length ladder (3 letters = 12)', () => {
     expect(scoreWordsForMode('wheel-rush', ['cat'])).toBe(12);
+  });
+});
+
+/**
+ * Par: the 60-second target. "Perfect" is every solver word on the board
+ * (hundreds of words, 15k-30k points); real players score 0-5% of that
+ * (quick_play_results, Jul-Nov 2026), so "% of perfect", the rank ladder and
+ * the 30/60/85% ghost rivals were all on a scale nobody can reach.
+ */
+describe('parScoreForMode', () => {
+  it('sums the easiest PAR_WORDS words, shortest first', () => {
+    const words = ['abcdefg', ...Array.from({ length: 40 }, (_, i) => `w${String(i).padStart(2, '0')}`)];
+    const par = parScoreForMode('classic', words);
+    expect(par.parWords).toBe(PAR_WORDS.classic);
+    // 3-letter words score 10 each; the 7-letter word is never in the par.
+    expect(par.parScore).toBe(PAR_WORDS.classic * scoreWordsForMode('classic', ['abc']));
+  });
+
+  it('a board with fewer words than PAR_WORDS uses all of them (par = perfect)', () => {
+    const words = ['cat', 'tea', 'trade'];
+    const par = parScoreForMode('classic', words);
+    expect(par.parWords).toBe(3);
+    expect(par.parScore).toBe(scoreWordsForMode('classic', words));
+  });
+
+  it('never below 1, even with no words', () => {
+    expect(parScoreForMode('blast', []).parScore).toBe(1);
+  });
+
+  it('buildQuickRound returns a par no bigger than perfect', async () => {
+    const r = await buildQuickRound('classic', 'en', 'seed-1');
+    expect(r.parScore).toBeGreaterThanOrEqual(1);
+    expect(r.parScore).toBeLessThanOrEqual(r.perfectScore);
+    expect(r.parWords).toBeLessThanOrEqual(r.words.length);
   });
 });

@@ -13,8 +13,12 @@ vi.mock('next/dynamic', () => ({
       return isOpen ? <div role="dialog" data-testid="avatar-builder" /> : null;
     },
 }));
+vi.mock('@/utils/growthTracking', () => ({ trackLandingCtaClick: vi.fn() }));
 
 import { PlayHero } from '../PlayHero';
+import { trackLandingCtaClick } from '@/utils/growthTracking';
+
+const mockTrackCta = vi.mocked(trackLandingCtaClick);
 
 import { en } from '@/translations/en';
 
@@ -40,6 +44,16 @@ function renderHero(overrides: Partial<React.ComponentProps<typeof PlayHero>> = 
 }
 
 describe('PlayHero', () => {
+  it('given the hero, then the first paragraph after the title says what LexiClash is', () => {
+    renderHero();
+    const title = screen.getByRole('heading', { level: 1 });
+    const intro = title.parentElement?.querySelector('h1 + p');
+    expect(intro?.textContent).toBe(en.homePlay.intro);
+    const words = (intro?.textContent ?? '').split(/\s+/).filter(Boolean).length;
+    expect(words).toBeGreaterThanOrEqual(10);
+    expect(words).toBeLessThanOrEqual(60);
+  });
+
   it('given the hero, when tapping the edit-avatar button, then the real avatar builder opens', () => {
     renderHero();
     const edit = screen.getByRole('button', { name: 'Edit avatar' });
@@ -90,5 +104,23 @@ describe('PlayHero', () => {
     expect(badge.className).toContain('whitespace-nowrap');
     expect(badge.className).not.toMatch(/\bw-14\b|\bh-14\b/);
     expect(badge.getAttribute('aria-hidden')).toBe('true');
+  });
+
+  it('given a new user (onPlay set), when PLAY is tapped, then the funnel numerator fires with opens_ftue:true and the handler runs', () => {
+    mockTrackCta.mockClear();
+    const onPlay = vi.fn();
+    renderHero({ onPlay });
+    fireEvent.click(screen.getByTestId('hp-play'));
+    expect(mockTrackCta).toHaveBeenCalledTimes(1);
+    expect(mockTrackCta).toHaveBeenCalledWith('fresh_hero_play', { opens_ftue: true });
+    expect(onPlay).toHaveBeenCalledTimes(1);
+  });
+
+  it('given a returning user (no onPlay), when PLAY is tapped, then the click still counts with opens_ftue:false and nothing is hijacked', () => {
+    mockTrackCta.mockClear();
+    renderHero();
+    fireEvent.click(screen.getByTestId('hp-play'));
+    expect(mockTrackCta).toHaveBeenCalledTimes(1);
+    expect(mockTrackCta).toHaveBeenCalledWith('fresh_hero_play', { opens_ftue: false });
   });
 });

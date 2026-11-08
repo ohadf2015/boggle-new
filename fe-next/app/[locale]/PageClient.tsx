@@ -7,7 +7,7 @@ import { retryImport } from '@/utils/retryImport';
 import { LoadingDancer } from '@/components/ui/LoadingDancer';
 import { getPendingRoomInvite, isReturningVisitor, savePendingRoomInvite } from '@/utils/onboardingStorage';
 import { detectCrazyGamesSync } from '@/components/CrazyGamesSDK';
-import { trackInviteLanded, trackInviteRedirectFired, trackGrowthEvent } from '@/utils/growthTracking';
+import { trackInviteLanded, trackInviteRedirectFired, trackGrowthEvent, trackOnboardingOpenRequested } from '@/utils/growthTracking';
 import { isOnboardingAllowedRoute } from '@/lib/onboarding/allowedRoutes';
 import { isQrScanArrival } from '@/utils/utmCapture';
 import { isCrawler } from '@/lib/seo/isCrawler';
@@ -238,6 +238,12 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
   }, [quickCover, quickTitle]);
 
   const handleStartOnboarding = useCallback(() => {
+    // Leak discriminator for the PLAY→onboarding funnel: fires the moment a PLAY
+    // click reaches this handler, BEFORE OnboardingFlow mounts. cta_clicked −
+    // open_requested = clicks lost to native <a> navigation (the mounted-gate
+    // fall-through signature); open_requested − onboarding_started = handler ran
+    // but the flow never mounted (lazy-chunk failure / render crash).
+    trackOnboardingOpenRequested({ allowed: routeAllowsOnboarding });
     if (!routeAllowsOnboarding) return;
     let isCrazyGames = false;
     try {

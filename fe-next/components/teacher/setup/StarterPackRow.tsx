@@ -11,18 +11,21 @@ export interface StarterPackRowProps {
   selectedKey: string;
   recommendedKey: string;
   onSelect: (nameKey: string) => void;
+  labelKey?: string;
+  hintKey?: string;
+  badgeKey?: string;
   t: T;
 }
 
 /** Ready-made word packs, one already picked; it becomes the new class's first assignment. */
-export function StarterPackRow({ packs, selectedKey, recommendedKey, onSelect, t }: StarterPackRowProps) {
+export function StarterPackRow({ packs, selectedKey, recommendedKey, onSelect, labelKey = 'eduShell.setup.packLabel', hintKey = 'eduShell.setup.packHint', badgeKey = 'eduShell.setup.packRecommended', t }: StarterPackRowProps) {
   return (
     <div role="radiogroup" aria-labelledby="setup-pack-label" aria-describedby="setup-pack-hint" className="@container flex flex-col gap-1.5">
       <span id="setup-pack-label" className="font-neo-body text-sm font-bold text-neo-cream">
-        {t('eduShell.setup.packLabel')}
+        {t(labelKey)}
       </span>
       <p id="setup-pack-hint" className="-mt-1 font-neo-body text-xs text-neo-cream/75 max-sm:sr-only">
-        {t('eduShell.setup.packHint')}
+        {t(hintKey)}
       </p>
       <div className="grid grid-cols-2 gap-2">
         {packs.map((pack) => {
@@ -34,6 +37,7 @@ export function StarterPackRow({ packs, selectedKey, recommendedKey, onSelect, t
                 'relative flex min-h-[52px] cursor-pointer items-center gap-2 rounded-neo border-2 px-2.5 py-1.5 text-neo-cream transition-[transform,colors] duration-150 active:scale-[0.98] motion-reduce:transition-none',
                 'has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-neo-cream',
                 on ? 'border-neo-lime ring-2 ring-neo-lime' : 'border-neo-cream/50 hover:border-neo-cream',
+                pack.nameKey === recommendedKey && 'pt-3',
               )}
             >
               <input
@@ -58,7 +62,7 @@ export function StarterPackRow({ packs, selectedKey, recommendedKey, onSelect, t
               </span>
               {pack.nameKey === recommendedKey ? (
                 <span className="absolute -top-2 end-2 rounded-full border border-neo-cream/50 bg-neo-navy-light px-1.5 font-neo-body text-[0.65rem] font-bold leading-4 text-neo-cream">
-                  {t('eduShell.setup.packRecommended')}
+                  {t(badgeKey)}
                 </span>
               ) : null}
             </label>

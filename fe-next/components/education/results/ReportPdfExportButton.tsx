@@ -66,7 +66,14 @@ function openBlankTab(): Window | null {
   }
 }
 
-export function ReportPdfExportButton({ language, summary, players, proLabel = 'Pro', className, hideOffer = false }: ReportPdfExportButtonProps) {
+/** Students and guests never mount it: no locked control, no price, no status call from their phones. */
+export function ReportPdfExportButton(props: ReportPdfExportButtonProps) {
+  const { loading, isTeacher } = useAuth();
+  if (loading || !isTeacher) return null;
+  return <TeacherReportPdfExport {...props} />;
+}
+
+function TeacherReportPdfExport({ language, summary, players, proLabel = 'Pro', className, hideOffer = false }: ReportPdfExportButtonProps) {
   const { hasPro, loading, known, trialUsed, accessTrialExpires, accessTrialEnded } = useTeacherPro();
   const { user } = useAuth();
   const lang = useLanguage();

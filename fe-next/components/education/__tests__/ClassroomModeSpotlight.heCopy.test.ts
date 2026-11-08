@@ -15,7 +15,7 @@ describe('Hebrew launch-screen copy for Vocab Quiz', () => {
     const keys = catalogueKeys(mode!);
 
     expect(lookup('academy.launch.subtitle')).toBe('בוחרים משחק, משתפים קוד וכולם מצטרפים!');
-    expect(lookup(keys.category)).toBe('מכירים מילים');
+    expect(lookup(keys.category)).toBe('מתחילים כאן');
     expect(keys.bestFor.map(lookup)).toEqual(['לומדים תוך כדי משחק', 'מתכוננים למבחן']);
     expect(lookup(keys.name)).toBe('חידון אוצר מילים');
     expect(lookup(keys.how)).toBe('ארבע אפשרויות, תשובה אחת נכונה. עונים מהר, צוברים נקודות ומגלים מי אלוף המילים!');

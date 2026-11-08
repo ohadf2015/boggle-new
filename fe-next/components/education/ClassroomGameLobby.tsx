@@ -31,7 +31,7 @@ import { ClassroomLobbyShell } from './lobby/ClassroomLobbyShell';
 import { ClassroomModeCatalogue } from './ClassroomModeCatalogue';
 import { LobbyModeGrid } from './lobby/LobbyModeGrid';
 import { useModeSuggestion } from './lobby/ModeSuggestion';
-import { wordcraftPlayable } from './lobby/wordcraftPlayable';
+import { wordcraftBlockReason, WORDCRAFT_BLOCK_GO_LIVE_KEY, WORDCRAFT_BLOCK_TILE_KEY } from './lobby/wordcraftPlayable';
 import { LobbyNoClassrooms, LobbyNoLessons } from './lobby/LobbyEmptyStates';
 import { LobbyClassPicker } from './lobby/LobbyClassPicker';
 import { LobbyLessonStep } from './lobby/LobbyLessonStep';
@@ -155,7 +155,13 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
   const minutesFor = (id: ClassroomCatalogueId) => configuredRoundMinutes(launchOf(id).gameMode, quizShape);
 
   const cannotStart = selectedLessonIds.length === 0 || !selectedClassroomId || allPlayableWords.length === 0;
-  const wordcraftOk = wordcraftPlayable(allPlayableWords, { lessonLanguage, classroomLanguage: classroom?.language, preset: opts.activePreset });
+  const wordcraftBlock = wordcraftBlockReason(allPlayableWords, { lessonLanguage, classroomLanguage: classroom?.language, preset: opts.activePreset });
+  const wordcraftOk = wordcraftBlock === null;
+  // Only once a list is attached: with no words every card is waiting on the same list, not on Wordcraft.
+  const blockedTiles = useMemo(
+    () => (wordcraftBlock && allPlayableWords.length > 0 ? { wordcraft: WORDCRAFT_BLOCK_TILE_KEY[wordcraftBlock] } : {}),
+    [wordcraftBlock, allPlayableWords.length]
+  );
   const isBlocked = useCallback(
     (id: ClassroomCatalogueId) => (id === VOCAB_QUIZ_MODE && !quizPlayable) || (id === 'wordcraft' && !wordcraftOk),
     [quizPlayable, wordcraftOk]
@@ -256,8 +262,8 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
     ? 'education.modePicker.needsLesson'
     : gameMode === VOCAB_QUIZ_MODE && !quizPlayable
       ? 'eg2Modes.needsMeanings'
-      : gameMode === 'wordcraft' && !wordcraftOk
-        ? 'education.modePicker.wordcraftNeedsShortWords'
+      : gameMode === 'wordcraft' && wordcraftBlock
+        ? WORDCRAFT_BLOCK_GO_LIVE_KEY[wordcraftBlock]
         : null;
 
   // `repeatPending` gates paint: the restored list decides which poster leads (pitfall class 1).
@@ -349,6 +355,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
             minutesFor={minutesFor}
             busy={isStarting}
             dense={!!sessionPack}
+            blocked={blockedTiles}
             onPick={pickMode}
             t={tt}
           />

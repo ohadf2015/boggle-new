@@ -53,12 +53,14 @@ vi.mock('@/utils/logger', () => ({
   default: { warn: vi.fn(), error: vi.fn(), info: vi.fn() },
 }));
 vi.mock('@/utils/crossTabAuthSync', () => ({ broadcastSignedOut: vi.fn() }));
-vi.mock('@/utils/platform', () => ({ isNative: () => false }));
+const platform = vi.hoisted(() => ({ native: false }));
+vi.mock('@/utils/platform', () => ({ isNative: () => platform.native }));
 
 const mockLocation = { pathname: '/en/multiplayer', search: '', origin: 'https://www.lexiclash.live' };
 Object.defineProperty(window, 'location', { value: mockLocation, writable: true });
 
 import { signInWithMagicLink, signInWithEmail, signUpWithEmail, signInWithGoogle, signInWithDiscord } from '../supabase';
+import { eduAuthOriginFromCookies, resolveAuthNext, withRememberedEduOrigin } from '@/lib/navigation/authReturnPath';
 
 describe('signInWithMagicLink', () => {
   beforeEach(() => { vi.clearAllMocks(); mockLocation.pathname = '/en/multiplayer'; mockLocation.search = ''; });
@@ -166,5 +168,85 @@ describe('signInWithDiscord', () => {
     expect(mockAuth.signInWithOAuth).toHaveBeenCalledWith({
       provider: 'discord', options: { redirectTo: 'https://www.lexiclash.live/sv/auth/callback?next=%2Fsv%2Fgame' },
     });
+  });
+});
+
+describe('sign-in from the classroom product carries its edu page back', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    platform.native = false;
+    mockLocation.search = '';
+    document.cookie = 'lexi_edu_auth_origin=; Path=/; Max-Age=0';
+    mockAuth.signInWithOAuth.mockResolvedValue({ data: {}, error: null });
+    mockAuth.signInWithOtp.mockResolvedValue({ data: {}, error: null });
+  });
+
+  it.each([
+    ['/en/teacher', '', 'en', '%2Fen%2Fteacher'],
+    ['/he/student/join', '?code=AB12', 'he', '%2Fhe%2Fstudent%2Fjoin%3Fcode%3DAB12'],
+    ['/en/join/ABC123', '', 'en', '%2Fen%2Fjoin%2FABC123'],
+    ['/en/education/access', '?from=teacher', 'en', '%2Fen%2Feducation%2Faccess%3Ffrom%3Dteacher'],
+  ])('Google from %s%s returns there and remembers it', async (pathname, search, locale, encoded) => {
+    mockLocation.pathname = pathname;
+    mockLocation.search = search;
+    await signInWithGoogle();
+    expect(mockAuth.signInWithOAuth).toHaveBeenCalledWith({
+      provider: 'google', options: { redirectTo: `https://www.lexiclash.live/${locale}/auth/callback?next=${encoded}` },
+    });
+    expect(document.cookie).toContain(`lexi_edu_auth_origin=${encodeURIComponent(pathname + search)}`);
+  });
+
+  it('a magic link from the teacher page carries next and remembers it', async () => {
+    mockLocation.pathname = '/en/teacher';
+    await signInWithMagicLink('t@lexiclash.test');
+    expect(mockAuth.signInWithOtp).toHaveBeenCalledWith(expect.objectContaining({
+      options: { emailRedirectTo: 'https://www.lexiclash.live/en/auth/callback?next=%2Fen%2Fteacher' },
+    }));
+    expect(document.cookie).toContain('lexi_edu_auth_origin=');
+  });
+
+  it('a later sign-in from the arcade forgets the edu page', async () => {
+    mockLocation.pathname = '/en/teacher';
+    await signInWithGoogle();
+    mockLocation.pathname = '/en/multiplayer';
+    await signInWithDiscord();
+    expect(document.cookie).not.toContain('lexi_edu_auth_origin=');
+  });
+
+  it('the native deep link from an edu page carries next', async () => {
+    platform.native = true;
+    mockLocation.pathname = '/ru/student/join';
+    await signInWithGoogle();
+    expect(mockAuth.signInWithOAuth).toHaveBeenCalledWith({
+      provider: 'google', options: { redirectTo: 'lexiclash://auth/callback?locale=ru&next=%2Fru%2Fstudent%2Fjoin' },
+    });
+  });
+
+  it('the native deep link from the arcade is unchanged', async () => {
+    platform.native = true;
+    mockLocation.pathname = '/en/multiplayer';
+    await signInWithGoogle();
+    expect(mockAuth.signInWithOAuth).toHaveBeenCalledWith({
+      provider: 'google', options: { redirectTo: 'lexiclash://auth/callback?locale=en' },
+    });
+  });
+
+  it('a password sign-in from the arcade forgets an abandoned edu sign-in', async () => {
+    mockLocation.pathname = '/en/teacher';
+    await signInWithGoogle();
+    mockLocation.pathname = '/en';
+    mockAuth.signInWithPassword.mockResolvedValue({ data: { user: {} }, error: null });
+    await signInWithEmail('p@lexiclash.test', 'pw');
+    expect(document.cookie).not.toContain('lexi_edu_auth_origin=');
+  });
+
+  it('a magic link from the homepage after an abandoned edu sign-in lands home', async () => {
+    mockLocation.pathname = '/en/teacher';
+    await signInWithGoogle();
+    mockLocation.pathname = '/en';
+    await signInWithMagicLink('p@lexiclash.test');
+    const sent = new URL(mockAuth.signInWithOtp.mock.calls[0][0].options.emailRedirectTo);
+    const next = withRememberedEduOrigin(sent.searchParams.get('next'), eduAuthOriginFromCookies(document.cookie));
+    expect(resolveAuthNext(next, 'en').url).toBe('/en');
   });
 });

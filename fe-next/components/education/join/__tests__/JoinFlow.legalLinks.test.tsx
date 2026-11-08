@@ -35,9 +35,15 @@ describe('<JoinFlow> legal links', () => {
     mockResolve.mockResolvedValue({ verdict: 'classroom', label: 'Ms Levy' });
   });
 
-  it('GIVEN the code screen THEN privacy and terms are one tap away in the locale', () => {
+  it('GIVEN the code screen THEN privacy and terms are one tap away in the locale, in a new tab', () => {
     render(<JoinFlow />);
-    expect(screen.getByRole('link', { name: 'legal.privacyPolicy' })).toHaveAttribute('href', '/en/legal/privacy');
-    expect(screen.getByRole('link', { name: 'legal.termsOfService' })).toHaveAttribute('href', '/en/legal/terms');
+    const privacy = screen.getByRole('link', { name: /legal\.privacyPolicy/ });
+    const terms = screen.getByRole('link', { name: /legal\.termsOfService/ });
+    expect(privacy).toHaveAttribute('href', '/en/legal/privacy');
+    expect(terms).toHaveAttribute('href', '/en/legal/terms');
+    for (const link of [privacy, terms]) {
+      expect(link).toHaveAttribute('target', '_blank');
+      expect(link).toHaveAccessibleName(expect.stringContaining('common.opensInNewTab'));
+    }
   });
 });

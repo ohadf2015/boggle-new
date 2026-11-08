@@ -31,6 +31,8 @@ import { RehearseWithBotsButton } from './home/RehearseWithBotsButton';
 import { HomeSessionRail } from './home/HomeSessionRail';
 import { SESSIONS_BESIDE_RAIL, TeacherHomeView } from './home/TeacherHomeView';
 import { HomeWeekClasses } from './home/HomeWeekClasses';
+import { HomeWeekLoop } from './home/HomeWeekLoop';
+import { useHomeWeekLoop } from './home/useHomeWeekLoop';
 import { weekClassRows } from './home/weekClassRows';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
@@ -121,6 +123,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
     '';
 
   const [showAssignmentCreator, setShowAssignmentCreator] = useState(() => deepLink.openAssignment);
+  const [assignLessonId, setAssignLessonId] = useState<string | undefined>(undefined);
   const [lessonsOpen, setLessonsOpen] = useState(() => deepLink.reviewWords.length > 0);
   // One-shot: drop ?assign=1 once read so a refresh doesn't reopen the creator.
   useEffect(() => {
@@ -213,7 +216,10 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
   const shareCardShown = selectedClassroom !== null && belowStudentGoal(selectedClassroom.member_count);
   const rosterShown = hasPro && selectedClassroom !== null && (selectedClassroom.member_count ?? 0) > 0;
   const roster = useHomeRoster(rosterShown && selectedClassroom ? selectedClassroom.id : '', nowMs);
-  const openAssign = () => setShowAssignmentCreator(true);
+  const openAssign = () => {
+    setAssignLessonId(undefined);
+    setShowAssignmentCreator(true);
+  };
   const overFreeTierCaps = isDigestOverFreeTierCaps({
     hasPro,
     classroomCount: classrooms.length,
@@ -264,6 +270,15 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
   const lastPlayedMs = lastPlayedIso ? Date.parse(lastPlayedIso) : null;
   const railReady = (!lessons.isLoading || lessonsCapped) && week.status !== 'loading';
   const everPlayed = activation.progress.liveStarted || (week.summary?.gamesLast30d ?? 0) > 0;
+  const loop = useHomeWeekLoop({
+    classroomId: ready && hasClasses && !classroomsError ? effectiveId : '',
+    fresh: !activation.progress.liveStarted && week.status !== 'loading' && !lastPlayedIso,
+    lessons: lessons.lessons,
+    lessonsReady: !lessons.isLoading || lessonsCapped,
+    language,
+    nowMs,
+    t,
+  });
   const cue = ready && hasClasses && week.status !== 'loading'
     ? homeCoachCue({ nowMs, lastPlayedMs, everPlayed, rail: homeSessionRail({ language: classLanguage, gradeBand: null, nowMs, lastPlayedMs }) })
     : null;
@@ -338,6 +353,20 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
                 />
               ) : null}
               showCode={!shareCardShown}
+              replay={loop.replay}
+              nudge={loop.ready || loop.missed.length > 0 ? (
+                <HomeWeekLoop
+                  ready={loop.ready}
+                  missed={loop.missed}
+                  reportsHref={`/${language}/teacher/reports?classroomId=${encodeURIComponent(effectiveId)}`}
+                  locked={!proLoading && !hasPro}
+                  onHomework={() => {
+                    setAssignLessonId(loop.listId);
+                    setShowAssignmentCreator(true);
+                  }}
+                  t={t}
+                />
+              ) : undefined}
               codeSlot={selectedClassroom && shareCardShown ? <HomeGetStudentsIn classroom={selectedClassroom} /> : undefined}
             />
           </div>
@@ -405,6 +434,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
       {effectiveId ? (
         <AssignmentCreator
           classroomId={effectiveId}
+          initialLessonId={assignLessonId}
           isOpen={showAssignmentCreator}
           onClose={() => setShowAssignmentCreator(false)}
           onComplete={() => {

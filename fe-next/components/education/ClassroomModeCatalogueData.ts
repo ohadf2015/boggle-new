@@ -4,11 +4,11 @@ import { teacherGameMode, type ModeAccent } from '@/lib/education/gameModes';
 import { BOSS_BATTLE_ID, launchOf, type CatalogueLaunch, type ClassroomCatalogueId } from '@/lib/education/classroomCatalogueId';
 import type { PlayStyle } from '@/shared/utils/teamBattle';
 
-export const CATALOGUE_CATEGORIES = ['meaning', 'board'] as const;
+export const CATALOGUE_CATEGORIES = ['finish', 'together', 'board'] as const;
 export type ModeCategory = (typeof CATALOGUE_CATEGORIES)[number];
 
 export type ModeComplexity = 'simple' | 'medium' | 'tricky';
-export type ModeStyle = 'ffa' | 'teams' | 'solo' | 'class';
+export type ModeStyle = 'ffa' | 'teams' | 'solo' | 'class' | 'together';
 export type ModeBestFor =
   | 'meanings'
   | 'review'
@@ -50,12 +50,13 @@ export interface CatalogueMode {
 
 type Row = Omit<CatalogueMode, 'suffix' | 'stepsKey' | 'poster' | 'cover' | 'accent' | 'launch' | 'nameKey' | 'howKey'>;
 
-// Most-played first inside each group (finished classroom rounds, 30 days to 2026-11-02): quiz 18, classic 16, blast 6, hunt 4, wheel 2, craft 1.
+// Classic and Vocab Quiz lead: classroom rooms that actually start a round and that students finish.
+// Wordcraft and Crossword are played one board per student but raced on one class leaderboard, so they are offered as "play together".
 const ROWS: readonly Row[] = [
-  { id: 'vocab-quiz', category: 'meaning', complexity: 'simple', style: 'ffa', teamsCapable: false, bestFor: ['meanings', 'testPrep'], preview: 'quiz', delivery: 'projector' },
-  { id: 'wordcraft', category: 'meaning', complexity: 'medium', style: 'solo', teamsCapable: false, bestFor: ['lessonWords', 'independent'], preview: 'craft', delivery: 'both' },
-  { id: 'crossword', category: 'meaning', complexity: 'medium', style: 'solo', teamsCapable: false, bestFor: ['meanings', 'spelling'], preview: 'crossword', delivery: 'phones' },
-  { id: 'classic', category: 'board', complexity: 'medium', style: 'ffa', teamsCapable: true, bestFor: ['spelling', 'mixedLevels'], preview: 'board', delivery: 'both' },
+  { id: 'classic', category: 'finish', complexity: 'medium', style: 'ffa', teamsCapable: true, bestFor: ['spelling', 'mixedLevels'], preview: 'board', delivery: 'both' },
+  { id: 'vocab-quiz', category: 'finish', complexity: 'simple', style: 'ffa', teamsCapable: false, bestFor: ['meanings', 'testPrep'], preview: 'quiz', delivery: 'projector' },
+  { id: 'wordcraft', category: 'together', complexity: 'medium', style: 'together', teamsCapable: false, bestFor: ['lessonWords', 'spelling'], preview: 'craft', delivery: 'both' },
+  { id: 'crossword', category: 'together', complexity: 'medium', style: 'together', teamsCapable: false, bestFor: ['meanings', 'spelling'], preview: 'crossword', delivery: 'phones' },
   { id: 'blast', category: 'board', complexity: 'simple', style: 'ffa', teamsCapable: true, bestFor: ['energy', 'warmup'], preview: 'blast', delivery: 'phones' },
   { id: BOSS_BATTLE_ID, category: 'board', complexity: 'simple', style: 'class', teamsCapable: false, bestFor: ['teamwork', 'review'], preview: 'boss', delivery: 'projector' },
   { id: 'word-hunt', category: 'board', complexity: 'medium', style: 'ffa', teamsCapable: true, bestFor: ['focus', 'spelling'], preview: 'hunt', delivery: 'phones' },
@@ -113,6 +114,8 @@ export interface CatalogueModeKeys {
   style: string;
   bestFor: string[];
   steps: string[];
+  /** One line on what students do in a start-here or play-together mode; null for the board games. */
+  hint: string | null;
 }
 
 export function catalogueKeys(mode: CatalogueMode, style: ModeStyle = mode.style): CatalogueModeKeys {
@@ -124,6 +127,7 @@ export function catalogueKeys(mode: CatalogueMode, style: ModeStyle = mode.style
     style: `eg2Modes.style.${style}`,
     bestFor: mode.bestFor.map((b) => `eg2Modes.bestFor.${b}`),
     steps: [1, 2, 3].map((n) => `${mode.stepsKey}.${n}`),
+    hint: mode.category === 'board' ? null : `eg2Modes.hint.${mode.id}`,
   };
 }
 

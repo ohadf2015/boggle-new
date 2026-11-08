@@ -38,6 +38,7 @@ import { StudentQuizPreview } from './StudentQuizPreview';
 import { InGamePreview } from './InGamePreview';
 import { PhoneGamePreview } from './PhoneGamePreview';
 import { LobbyPickerPreview } from './LobbyPickerPreview';
+import { WarmUpPreview } from './WarmUpPreview';
 import { SetupInvitePreview } from './SetupInvitePreview';
 import { CrosswordPreview } from './CrosswordPreview';
 
@@ -157,6 +158,7 @@ export default function LiveSurfacePreview({ kind }: { kind: LiveSurfacePreviewK
   if (kind === 'ingame') return <InGamePreview />;
   if (kind === 'phonegame') return <PhoneGamePreview />;
   if (kind === 'lobby') return <LobbyPickerPreview />;
+  if (kind === 'warmup') return <WarmUpPreview />;
   if (kind === 'setup') return <SetupInvitePreview />;
   if (kind === 'crosswordwall') return <CrosswordPreview surface="wall" />;
   if (kind === 'crosswordphone') return <CrosswordPreview surface="phone" />;

@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Zap, ExternalLink, Gift } from 'lucide-react';
 import Link from 'next/link';
 import { Loader } from '@/components/ui/Loader';
+import { NB_BLOCK, NB_LINK, NB_PANEL, NB_PRIMARY, NB_SMALL, NB_STICKER } from './nb/nbStyles';
 
 interface SubscriptionStatus {
   has_pro: boolean;
@@ -20,7 +20,8 @@ interface SubscriptionStatus {
   grant?: { id: string; expires_at: string; days: number; note: string | null; welcomed: boolean } | null;
 }
 
-export default function SubscriptionStatusCard() {
+/** `usage` is the free plan's one-line usage, like "2 of 3 free classes used". */
+export default function SubscriptionStatusCard({ usage }: { usage?: string } = {}) {
   const { t, language } = useLanguage();
   const [subscription, setSubscription] = useState<SubscriptionStatus | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -49,7 +50,7 @@ export default function SubscriptionStatusCard() {
 
   if (isLoading) {
     return (
-      <div className="p-6 bg-neo-navy-light border-3 border-neo-cream/40 rounded-neo shadow-hard flex items-center justify-center min-h-32">
+      <div className={cn(NB_PANEL, 'flex min-h-32 items-center justify-center p-6')}>
         <Loader size="sm" text={t('common.loading')} />
       </div>
     );
@@ -64,97 +65,72 @@ export default function SubscriptionStatusCard() {
   const isGift = subscription.has_pro && subscription.source === 'admin_grant';
   const endDate = subscription.grant?.expires_at ?? subscription.current_period_end;
 
+  const dateLabel = endDate
+    ? new Date(endDate).toLocaleDateString(language === 'he' ? 'he-IL' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+    : null;
+
   return (
-    <div
-      className={cn(
-        'p-6 border-3 border-neo-black rounded-neo shadow-hard',
-        subscription.has_pro ? 'bg-neo-cyan' : 'bg-neo-cream'
-      )}
+    <section
+      data-testid="subscription-card"
+      data-plan={subscription.has_pro ? 'pro' : 'free'}
+      aria-labelledby="subscription-card-title"
+      className={cn(NB_PANEL, subscription.has_pro ? NB_BLOCK.cyan : NB_BLOCK.navy, 'flex flex-col gap-4 p-5 sm:p-6')}
     >
-      <div className="flex items-start justify-between mb-4">
-        <div>
-          <h2 className={cn(
-            'text-2xl font-neo-display font-black mb-1',
-            subscription.has_pro ? 'text-neo-black' : 'text-neo-black'
-          )}>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h2 id="subscription-card-title" className="font-neo-display text-2xl font-black leading-tight">
             {subscription.has_pro ? t('teacher.subscription.proPlanName') : t('teacher.subscription.freePlanName')}
           </h2>
-          <p className={cn(
-            'font-bold',
-            subscription.has_pro ? 'text-neo-black/70' : 'text-neo-black/60'
-          )}>
+          <p className={cn('mt-0.5 font-neo-body text-sm font-bold', subscription.has_pro ? 'text-neo-black/75' : 'text-neo-cream/80')}>
             {subscription.has_pro ? t('teacher.subscription.unlimitedAccess') : t('teacher.subscription.freeForever')}
           </p>
+          {!subscription.has_pro && usage ? (
+            <p data-testid="subscription-usage" className="mt-2 font-neo-body text-sm font-semibold text-neo-cream/80">{usage}</p>
+          ) : null}
         </div>
-        {subscription.has_pro && (
-          <div className="bg-neo-lime px-3 py-1 rounded-neo border-2 border-neo-black flex items-center gap-1.5">
-            {isGift && <Gift className="w-4 h-4 text-neo-black" aria-hidden="true" />}
-            <span className="font-bold text-neo-black text-sm">
-              {isGift ? t('teacher.subscription.giftedBadge') : t('teacher.subscription.popular')}
-            </span>
-          </div>
-        )}
+        {subscription.has_pro ? (
+          <span className={cn(NB_STICKER, NB_BLOCK.lime)}>
+            {isGift && <Gift className="size-3.5" aria-hidden="true" />}
+            {isGift ? t('teacher.subscription.giftedBadge') : t('teacher.subscription.popular')}
+          </span>
+        ) : null}
       </div>
 
-      {subscription.has_pro && endDate && (
-        <div className="mb-4 p-3 bg-black/10 rounded-neo border-2 border-black">
-          <p className="text-xs font-bold text-neo-black/60 mb-1">
+      {subscription.has_pro && dateLabel && (
+        <div className="rounded-neo-lg border-2 border-neo-black bg-neo-white/50 px-3 py-2">
+          <p className="font-neo-body text-xs font-bold text-neo-black/70">
             {isGift ? t('teacher.subscription.giftedUntil') : t('teacher.subscription.renewsOn')}
           </p>
-          <p className="font-bold text-neo-black">
-            {new Date(endDate).toLocaleDateString(language === 'he' ? 'he-IL' : 'en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}
-          </p>
-          {isGift && (
-            <p className="text-xs font-bold text-neo-black/70 mt-2">
-              {t('teacher.subscription.giftedNoCard')}
-            </p>
-          )}
+          <p className="font-neo-display text-lg font-black text-neo-black">{dateLabel}</p>
+          {isGift && <p className="mt-1 font-neo-body text-xs font-bold text-neo-black/75">{t('teacher.subscription.giftedNoCard')}</p>}
           {!isGift && subscription.cancel_at_period_end && (
-            <p className="text-xs font-bold text-neo-black/70 mt-2">
-              {t('teacher.subscription.canceledAt')}
-            </p>
+            <p className="mt-1 font-neo-body text-xs font-bold text-neo-black/75">{t('teacher.subscription.canceledAt')}</p>
           )}
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
         {!subscription.has_pro && (
-          <Button asChild className="bg-neo-black text-white font-black border-2 border-black shadow-hard hover:-translate-y-0.5 transition flex items-center justify-center gap-2">
-            <Link href={`/${language}/teacher/upgrade`}>
-              <Zap className="w-4 h-4" />
-              {t('teacher.subscription.upgradeNow')}
-            </Link>
-          </Button>
+          <Link href={`/${language}/teacher/upgrade`} data-testid="subscription-upgrade" className={cn(NB_PRIMARY, 'w-full sm:w-auto sm:px-8')}>
+            <Zap className="size-5" aria-hidden="true" />
+            {t('teacher.subscription.upgradeNow')}
+          </Link>
         )}
 
         {subscription.has_pro && subscription.portal_url && (
-          <Button asChild className="bg-neo-black text-white font-black border-2 border-black shadow-hard hover:-translate-y-0.5 transition flex items-center justify-center gap-2">
-            <a href={subscription.portal_url} target="_blank" rel="noopener noreferrer">
-              <ExternalLink className="w-4 h-4" />
-              {t('teacher.subscription.manageSubscription')}
-            </a>
-          </Button>
+          <a href={subscription.portal_url} target="_blank" rel="noopener noreferrer" className={cn(NB_SMALL, 'bg-neo-black text-neo-white')}>
+            <ExternalLink className="size-4" aria-hidden="true" />
+            {t('teacher.subscription.manageSubscription')}
+          </a>
         )}
 
-        <Button
-          asChild
-          variant="outline"
-          className={cn(
-            'font-black border-2 border-black shadow-hard hover:-translate-y-0.5 transition',
-            subscription.has_pro
-              ? 'bg-black text-white hover:bg-black/80'
-              : 'bg-neo-cream text-neo-black hover:bg-neo-cream/80'
-          )}
+        <Link
+          href={`/${language}/legal/refund`}
+          className={cn(NB_LINK, subscription.has_pro && 'text-neo-black/80 hover:text-neo-black')}
         >
-          <Link href={`/${language}/legal/refund`}>
-            {t('legal.refundPolicy')}
-          </Link>
-        </Button>
+          {t('legal.refundPolicy')}
+        </Link>
       </div>
-    </div>
+    </section>
   );
 }

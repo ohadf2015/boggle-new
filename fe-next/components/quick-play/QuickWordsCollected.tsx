@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { QuickWordsDetailDialog } from './QuickWordsDetailDialog';
+import { QuickDetailCard } from './QuickDetailCard';
 
 export interface CollectedWord {
   word: string;
@@ -39,47 +40,46 @@ export function QuickWordsCollected({ words, collectionTotal }: QuickWordsCollec
   const best = sorted[0];
 
   return (
-    <div
-      className="rounded-2xl border-neo-thick border-black bg-neo-navy-elevated p-3 shadow-hard"
-      data-testid="quick-words-collected"
-    >
-      <div className="mb-2 flex items-baseline justify-between gap-2">
-        <span className="font-neo-display text-[10px] uppercase tracking-[0.18em] text-neo-white/55">
-          {t('quickPlay.solo.wordsCollected', '{count} words', { count: String(words.length) })}
-        </span>
-        <span className="truncate text-[11px] text-neo-white/55">
+    <QuickDetailCard
+      testId="quick-words-collected"
+      band="bg-neo-yellow"
+      title={t('quickPlay.solo.wordsCollected', '{count} words', { count: String(words.length) })}
+      aside={
+        <>
           {newCount > 0 && (
-            <b className="mr-2 font-neo-display text-neo-lime" data-testid="quick-words-new-count">
+            <b className="me-2 rounded-md bg-black px-1.5 py-0.5 text-neo-lime" data-testid="quick-words-new-count">
               {t('quickPlay.solo.wordsNew', '{count} new', { count: String(newCount) })}
             </b>
           )}
           {t('quickPlay.solo.wordsTotal', '{count} collected', { count: String(collectionTotal) })}
-        </span>
-      </div>
-
+        </>
+      }
+      bodyClassName="p-3"
+    >
       <div className="mb-2">
         <QuickWordsDetailDialog words={words} />
       </div>
 
-      <div className="mb-3 flex items-center gap-2 rounded-xl border-[3px] border-black bg-neo-abyss px-2.5 py-2">
+      <div className="mb-3 flex items-center gap-2 rounded-xl border-[3px] border-black bg-neo-abyss px-2.5 py-2.5 shadow-hard-sm">
         <span className="font-neo-display text-[10px] uppercase tracking-widest text-neo-white/50">
           {t('quickPlay.solo.bestWord', 'Best')}
         </span>
         <b className="sr-only" data-testid="quick-best-word">
           {best.word.toUpperCase()}
         </b>
-        <span className="flex min-w-0 flex-wrap gap-1" aria-hidden="true" dir="ltr">
+        {/* auto, not ltr: a Hebrew best word laid out ltr read backwards. */}
+        <span className="flex min-w-0 flex-wrap gap-1" aria-hidden="true" dir="auto">
           {[...best.word.toUpperCase()].map((ch, i) => (
             <span
               key={i}
-              className="flex h-7 w-7 items-center justify-center rounded-md border-2 border-black bg-neo-yellow font-neo-display text-sm font-bold text-black shadow-hard-sm animate-[qp-card-in_0.35s_cubic-bezier(0.34,1.4,0.64,1)_both] motion-reduce:animate-none"
+              className={`flex h-7 w-7 items-center justify-center rounded-md border-2 border-black bg-neo-yellow font-neo-display text-base font-bold text-black shadow-hard-sm ${i % 2 ? 'rotate-3' : '-rotate-2'} animate-[qp-card-in_0.35s_cubic-bezier(0.34,1.4,0.64,1)_both] motion-reduce:animate-none`}
               style={{ animationDelay: `${600 + i * 70}ms` }}
             >
               {ch}
             </span>
           ))}
         </span>
-        <span className="ms-auto shrink-0 rounded-lg border-2 border-black bg-neo-lime px-1.5 font-neo-display text-xs font-bold tabular-nums text-black" dir="ltr">
+        <span className="ms-auto shrink-0 rotate-3 rounded-lg border-2 border-black bg-neo-lime px-2 py-0.5 font-neo-display text-sm font-bold tabular-nums text-black shadow-hard-sm" dir="ltr">
           +{best.score}
         </span>
       </div>
@@ -91,7 +91,7 @@ export function QuickWordsCollected({ words, collectionTotal }: QuickWordsCollec
             data-testid={w.isNew ? 'quick-word-chip-new' : 'quick-word-chip'}
             className={`rounded-lg border-2 px-2 py-0.5 font-neo-display text-xs tracking-wide ${
               w.isNew
-                ? 'border-black bg-neo-lime font-bold text-black shadow-hard-sm'
+                ? '-rotate-2 border-black bg-neo-lime font-bold text-black shadow-hard-sm'
                 : 'border-black bg-neo-abyss/60 text-neo-cream/85'
             }`}
           >
@@ -111,6 +111,6 @@ export function QuickWordsCollected({ words, collectionTotal }: QuickWordsCollec
           {t('quickPlay.solo.wordsShowAll', 'Show all {count}', { count: String(sorted.length) })}
         </button>
       )}
-    </div>
+    </QuickDetailCard>
   );
 }

@@ -612,7 +612,35 @@ const en = {
     "practice": {
       "close": "Close",
       "title": "Practice: {title}",
-      "pick": "Pick a game"
+      "pick": "Pick a game",
+      "spell": {
+        "modeTitle": "Spell it",
+        "modeSub": "Hear the word, tap the letters",
+        "welcomeTitle": "Ready to spell?",
+        "welcomeBody": "Listen to each word, then tap the letters to spell it. A wrong letter just means another go.",
+        "wordCount": "{count} words",
+        "start": "Start",
+        "hear": "Hear the word",
+        "peek": "Show the word",
+        "noVoice": "This device can't read words aloud. Look at the word, then spell it from memory.",
+        "listen": "Listen, then spell it",
+        "erase": "Erase a letter",
+        "correct": "Perfect!",
+        "wrong": "Keep going! You've got this.",
+        "shown": "Here's the word. Have another go.",
+        "stars": "Stars",
+        "progress": "Word {n} of {total}",
+        "endTitle": "List done!",
+        "endAccuracy": "{correct} of {total} words right first time",
+        "endStars": "Stars earned: {stars}",
+        "cheerTop": "Amazing work!",
+        "cheerMid": "Great practice!",
+        "cheerLow": "Good effort. Play again to beat it!",
+        "again": "Practice again",
+        "teacherTitle": "Teaching this list?",
+        "teacherBody": "Put it on the big screen as a live class game. Students join with a code, no accounts.",
+        "teacherCta": "Play it with your class"
+      }
     },
     "hub": {
       "metaTitle": "Free word lists for the classroom, by grade and topic",
@@ -675,6 +703,16 @@ const en = {
   // @eg2Seo:end
   // @eg2Modes:start
   "eg2Modes": {
+    "hint": {
+      "classic": "Students race to find your words on one board.",
+      "vocab-quiz": "Students match each meaning to the right word.",
+      "wordcraft": "Students spell your words from letter tiles.",
+      "crossword": "Students read a meaning, then spell the word."
+    },
+    "blocked": {
+      "wordcraftLanguage": "No letter tiles for this language yet",
+      "wordcraftRack": "Words too long for the tiles"
+    },
     "title": "Pick a game mode",
     "spec": {
       "duration": "Duration",
@@ -687,7 +725,9 @@ const en = {
     "previewLabel": "Preview of {{mode}}",
     "category": {
       "meaning": "Know the meaning",
-      "board": "Race the board"
+      "board": "Race the board",
+      "finish": "Start here",
+      "together": "Play together"
     },
     "complexity": {
       "simple": "Easy rules",
@@ -698,7 +738,8 @@ const en = {
       "ffa": "Everyone vs everyone",
       "teams": "Team battle",
       "solo": "Solo vs a bot",
-      "class": "Whole class vs the boss"
+      "class": "Whole class vs the boss",
+      "together": "Own board, one class leaderboard"
     },
     "bestFor": {
       "meanings": "Learning meanings",
@@ -1181,6 +1222,8 @@ const en = {
     "live": {
       "getReady": "Get ready!",
       "warmUpHint": "Warm-up: tap the glowing letter",
+      "warmUpSpellHint": "Warm-up: tap the letters in order",
+      "warmUpSpelled": "Spelled!",
       "warmUpTapThis": "Tap this one",
       "warmUpTitle": "Warm-up"
     },
@@ -1237,6 +1280,7 @@ const en = {
   // @home-play:start
   "homePlay": {
     "heroLine": "Sixty seconds, a fresh board, and three rivals who don't wait for you.",
+    "intro": "LexiClash is a free word game you play in your browser. Find as many words as you can on a letter board, against bots, friends or a whole class, in six languages.",
     "playSub": "Random mode",
     "pickMode": "Or pick the mode yourself",
     "timerBadge": "60s",
@@ -8891,13 +8935,14 @@ const en = {
     "aPlayer": "A player",
     "modesPlayedCount": "{count} of 4 games today",
     "nextUp": "Next up",
+    "dayPrize": {"title": "Day cleared!", "titlePerfect": "Perfect day!", "ready": "Your prize box is ready", "readyPerfect": "All four done. Bonus box unlocked", "tapToOpen": "Tap to open", "open": "Open it", "opening": "Opening...", "later": "Later", "collect": "Collect", "coins": "+{coins} coins", "xp": "+{xp} XP", "notYet": "Finish today's two puzzles to open it", "failed": "Couldn't open it right now. Try again from the daily page", "tier": {"common": "Nice!", "lucky": "Lucky!", "jackpot": "Jackpot!"}, "lines": {"common": {"0": "Coins in the bank. Tomorrow's box could be bigger.", "1": "A solid haul. Same time tomorrow?", "2": "Every box is different. See what tomorrow brings."}, "lucky": {"0": "Lucky box! About double the usual.", "1": "The box liked you today."}, "jackpot": {"0": "Jackpot! The rarest box there is.", "1": "Huge! Only a few players get this one."}}, "hubReady": "Today's prize box is waiting", "hubReadyPerfect": "Your perfect-day box is waiting", "hubOpened": "Today's box: +{coins} coins", "hubOpenedPerfect": "Perfect-day box: +{coins} coins", "oneToGo": "1 more for today's prize", "guestNudge": "Sign in to open a daily prize box, up to {coins} coins"},
     "allClearToday": "Today's board is clear. See you tomorrow.",
     "allClear": {
       "title": "All clear!",
       "body": "You finished every quest today.",
       "streak": "{n}-day streak. Come back tomorrow to keep it alive.",
-      "reward": "Day reward: +{coins} coins, +{xp} XP",
-      "guestNudge": "Sign in to earn {coins} coins for clearing the day."
+      "reward": "Perfect-day box: +{coins} coins, +{xp} XP",
+      "guestNudge": "Sign in to open a perfect-day box worth up to {coins} coins."
     },
     "adminBeta": "Beta",
     "replay": "Replay",
@@ -9803,7 +9848,6 @@ const en = {
       "guestNameDefaultHint": "Right now you show up as \"{name}\", a random name lots of players get.",
       "guestNamePlaceholder": "Your name",
       "guestNameClaim": "Show my name",
-      "guestNameNotNow": "Not now",
       "guestNameDefaultNudge": "You're on the board as {name}, a random name. Make this score yours.",
       "guestNameUseMine": "Use my name",
       "wordsFound": "Words found",
@@ -10877,6 +10921,7 @@ const en = {
       },
       "roundComplete": "Round complete",
       "ofPerfect": "of perfect",
+      "weeklyRival": "Weekly rival · rank points this week",
       "wordsFound": "{found} / {total} words found",
       "targetWordFound": "🎯 You found the word: {word}",
       "targetWordMissed": "🎯 The word was: {word}",
@@ -12849,11 +12894,11 @@ const en = {
     "accessDenied": "Only teacher accounts can open this page.",
     "profile": {
       "teacherBadge": "Teacher",
-      "classrooms": "Classrooms",
-      "totalStudents": "Total students",
-      "roleStatus": "Role",
-      "contactAdmin": "Need help?",
-      "contactAdminDesc": "To update your teacher access or role, contact your administrator. Teacher accounts are granted by school administrators.",
+      "classrooms": "Classes",
+      "totalStudents": "Students",
+      "schoolTitle": "Want your school to pay?",
+      "schoolBody": "Your school can buy Pro for you and your colleagues. One quote by email, no sales call.",
+      "schoolCta": "Plans for schools",
       "avatar": "Teacher avatar"
     },
     "districtBanner": {
@@ -14050,7 +14095,8 @@ const en = {
         "wordcraft": "Craft words on your own board against the Baron. The class leaderboard decides the rest.",
         "wordTower": "Everyone stacks words on their own tower. A shaky word knocks blocks off. Tallest tower wins."
       },
-      "wordcraftNeedsShortWords": "Wordcraft can't deal any word from this list onto its tiles. Add shorter words or pick another mode."
+      "wordcraftNeedsShortWords": "Wordcraft can't deal any word from this list onto its tiles. Add shorter words or pick another mode.",
+      "wordcraftNoTiles": "Wordcraft has no letter tiles for this list's language yet. Pick another game."
     },
     "projectorLobby": {
       "joinAt": "Go to",
@@ -19729,13 +19775,18 @@ const en = {
       "codeLabel": "Got a room code?",
       "codeAria": "Room code, character {{n}} of {{total}}",
       "codeHint": "6 characters from your host · No code? Hit Quick Start",
-      "openArenas": "Open arenas",
+      "openArenas": "Open games",
       "playingNow": "{{count}} playing",
       "moreArenas": "+{{count}} more",
-      "allArenas": "All open arenas",
-      "emptyTitle": "No open arenas",
+      "allArenas": "All open games",
+      "emptyInLanguage": "No open games in {{language}} right now",
+      "startOne": "Start one",
+      "openElsewhere": "{{count}} open in {{language}}",
+      "joinRow": "Join",
+      "roomLanguage": "Room language",
+      "languageChip": "{{language}}: {{count}} open",
       "emptyLine": "Quick Start fills the seats with bots",
-      "moreSoon": "New arenas pop in live",
+      "moreSoon": "New games pop in live",
       "hostedBy": "Host: {{name}}",
       "full": "Full",
       "live": "Live",
@@ -20259,6 +20310,7 @@ const en = {
       "schoolF2": "Quote by email, no sales call needed",
       "schoolF3": "Students always free, never see ads",
       "askSchool": "Want your school to pay?",
+      "moreFeatures": "{count} more in Pro",
       "featureParentPack": "Parent report links for a whole class in one click"
     },
     "preCheckout": {
@@ -20609,15 +20661,8 @@ const en = {
     "practice": {
       "seatName": "Practice student",
       "title": "Your student view",
-      "body": "Play here as a student. The board beside you is what your class sees.",
       "joining": "Joining as a student…",
-      "joined": "You're in as a practice student",
-      "step1": "You join as a practice student",
-      "step2": "Practice players join, then the round starts",
-      "step3": "Find words here and watch the board",
-      "step4": "See the results your class will see",
-      "phoneTitle": "Or play from your phone",
-      "phoneHint": "Scan to join this round as a student. You stay signed in on both.",
+      "joined": "You're in. Play right here.",
       "openTab": "Open in a new tab",
       "hide": "Hide student view",
       "show": "Show student view",
@@ -20729,7 +20774,13 @@ const en = {
     "error": {
       "title": "This screen hit a snag",
       "body": "Try again. If it keeps happening, head back to your class and start from there.",
-      "backToClass": "Back to class"
+      "backToClass": "Back to class",
+      "backToClasses": "Back to your classes",
+      "enterCode": "Enter a class code"
+    },
+    "notFound": {
+      "title": "We can't find that page",
+      "body": "The link may be old or mistyped. Head back and pick up from there."
     },
     "nav": {
       "home": "Home",
@@ -20775,6 +20826,15 @@ const en = {
         "title": "Try it yourself first",
         "body": "Play a round as a student right next to your board, with practice players. Only you see it.",
         "cta": "Try it as a student"
+      },
+      "loop": {
+        "playAgain": "Play again",
+        "pickGame": "Pick a different game",
+        "loading": "Checking your last game",
+        "ready": "{ready} of {total} ready for the test",
+        "readyHint": "See which words each student missed",
+        "readyEmpty": "Word results show up after your next game",
+        "missed": "{count} missed it · assign homework"
       },
       "greetMorning": "Good morning, {name}",
       "greetAfternoon": "Good afternoon, {name}",
@@ -21005,7 +21065,7 @@ const en = {
       "advancedOpen": "Change grade, language or words",
       "advancedClose": "Hide options",
       "bubble": "Just a name. I picked the rest for you, change it if you like.",
-      "createAndPlay": "Create and play",
+      "createClass": "Create class",
       "anyGrade": "Any grade",
       "side": {
         "title": "What happens next",
@@ -21017,10 +21077,26 @@ const en = {
       "packRecommended": "Our pick",
       "startLive": "Start live",
       "createOnly": "Create now, play later",
-      "createAndPlayHint": "Opens the game board with your join code. Students join, then you press Start.",
       "packSticker": "Word list: {name}",
       "packHint": "Students also get these words as homework when they join.",
-      "assignFailed": "Your class is ready, but the words weren't assigned. Assign them from the class page."
+      "assignFailed": "Your class is ready, but the words weren't assigned. Assign them from the class page.",
+      "words": {
+        "title": "Words for the first game",
+        "label": "Your word list",
+        "placeholder": "Paste this week's words. One per line or with commas.",
+        "count": "{count} ready",
+        "tooFew": "Add at least {min} words, or clear the box to play a starter pack.",
+        "phrasesOnly": "Phrases with more than one word can't go on the board. Add single words, or clear the box to play a starter pack.",
+        "skipped": "Phrases left out: {count}. The board only takes single words.",
+        "playFailed": "The game didn't open. Tap Play now again.",
+        "yours": "The round uses your words, and they're saved to this class too.",
+        "packLabel": "No list yet? Play a starter pack",
+        "packHint": "It's saved to this class, so students can practice it later.",
+        "listName": "Words for {date}",
+        "playNow": "Play now",
+        "saved": "In your class",
+        "createHint": "Next: your join code and a box for this week's words. Then tap Play now."
+      }
     },
     "host": {
       "classLabel": "Class",
@@ -21189,8 +21265,22 @@ const en = {
     "tooLong": "Use {max} characters or fewer",
     "saveFailed": "Couldn't save the name. Try again.",
     "originalName": "Signed up as {name}"
-  }
+  },
   // @eduRoster:end
+  // @eduProResults:start
+  "eduProResults": {
+    "freeTitle": "This round's report is free",
+    "openGrid": "See who missed which word",
+    "openGridNote": "Shows student names on this screen",
+    "gridTitle": "Who missed which word this round",
+    "namesNote": "Shows student names. Close it before you put this screen on the board.",
+    "close": "Close",
+    "proDepthTitle": "More with Teacher Pro",
+    "proDepth": "Progress across weeks · Export every class · Reports for parents",
+    "schoolQuote": "Buying for your school? Get a quote",
+    "noWords": "This round had no lesson words to check."
+  }
+  // @eduProResults:end
 };
 
 export { en };

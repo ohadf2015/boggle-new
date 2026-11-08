@@ -6,7 +6,7 @@
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useClassroomRoomWait, ROOM_WAIT_RETRY_MS, ROOM_WAIT_MAX_MS } from '../useClassroomRoomWait';
+import { useClassroomRoomWait, rejoinWaitingRoom, ROOM_WAIT_RETRY_MS, ROOM_WAIT_MAX_MS } from '../useClassroomRoomWait';
 
 function fakeSocket() {
   const listeners: Record<string, Array<(d: unknown) => void>> = {};
@@ -76,5 +76,19 @@ describe('useClassroomRoomWait', () => {
     expect(onGiveUp).toHaveBeenCalledWith('ABC123');
     expect(hook.result.current.waitingCode).toBeNull();
     expect(rejoin.mock.calls.length).toBeGreaterThan(0);
+  });
+});
+
+describe('rejoinWaitingRoom', () => {
+  it('a classroom host told the room is not open creates it again instead of joining as a student', () => {
+    const handleJoin = vi.fn();
+    rejoinWaitingRoom(handleJoin, { code: 'ABC123', username: 'Fish', isHost: true, language: 'he' });
+    expect(handleJoin).toHaveBeenCalledWith(true, 'he', 'ABC123', 'Fish Room', 'Fish', { isPrivate: true, isClassroom: true });
+  });
+
+  it('a student re-asks with a plain join', () => {
+    const handleJoin = vi.fn();
+    rejoinWaitingRoom(handleJoin, { code: 'ABC123', username: 'Dana', isHost: false, language: 'he' });
+    expect(handleJoin).toHaveBeenCalledWith(false, null, 'ABC123', undefined, 'Dana', { autoRetry: true });
   });
 });

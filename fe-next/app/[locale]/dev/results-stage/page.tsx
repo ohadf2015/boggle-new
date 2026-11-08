@@ -55,6 +55,11 @@ function QuickScenario() {
         result={{ mode: 'classic', seed: 'x', score: 142, perfectScore: 260, scorePct: 55, wordsFound: 14, totalWords: 61, durationMs: 60000, words: WORDS }}
         outcome={{ scorePct: 55, coins: 12, xp: 30, percentileToday: 0, history: [55, 40, 48], totalPoints: 340 }}
         rival={null}
+        rivals={[
+          { userId: 'r1', name: 'Noa', scorePct: 71 },
+          { userId: 'r2', name: 'Lior', scorePct: 49 },
+          { userId: 'r3', name: 'Maya', scorePct: 38 },
+        ]}
         collected={WORDS.map((w, i) => ({ ...w, isNew: i % 4 === 0 }))}
         collectionTotal={212}
         dayStreak={3}

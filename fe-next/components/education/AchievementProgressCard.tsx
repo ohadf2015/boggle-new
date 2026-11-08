@@ -44,30 +44,10 @@ export interface AchievementProgressCardProps {
 // >= 4.5:1. Silver in particular previously used `bg-neo-white/60` as a
 // text color, which renders ~2.5:1 on navy.
 const TIER_COLORS = {
-  bronze: {
-    bg: 'bg-amber-700',
-    border: 'border-amber-800',
-    fill: 'bg-amber-500',
-    text: 'text-amber-300',
-  },
-  silver: {
-    bg: 'bg-slate-300',
-    border: 'border-slate-400',
-    fill: 'bg-slate-300',
-    text: 'text-slate-200',
-  },
-  gold: {
-    bg: 'bg-yellow-500',
-    border: 'border-yellow-600',
-    fill: 'bg-yellow-400',
-    text: 'text-yellow-300',
-  },
-  platinum: {
-    bg: 'bg-cyan-400',
-    border: 'border-cyan-500',
-    fill: 'bg-cyan-300',
-    text: 'text-cyan-200',
-  },
+  bronze: { bg: 'bg-neo-orange', fill: 'bg-neo-orange', text: 'text-neo-orange' },
+  silver: { bg: 'bg-neo-cream', fill: 'bg-neo-cream', text: 'text-neo-cream' },
+  gold: { bg: 'bg-neo-yellow', fill: 'bg-neo-yellow', text: 'text-neo-yellow' },
+  platinum: { bg: 'bg-neo-cyan', fill: 'bg-neo-cyan', text: 'text-neo-cyan' },
 };
 
 // ============================================

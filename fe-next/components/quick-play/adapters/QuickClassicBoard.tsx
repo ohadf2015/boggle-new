@@ -12,7 +12,7 @@
  * so a solo round reads clean, the same way AdventureHuntGame reuses the MP
  * word-hunt board offline.
  */
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSinglePlayerCore } from '@/components/singleplayer/game/hooks/useSinglePlayerCore';
 import InGameScreen from '@/components/game/InGameScreen';
@@ -24,7 +24,7 @@ import { GameShell, SHELL_MEDIA } from '@/components/game/shell';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { QuickClassicLeftRail, QuickClassicRightRail } from './QuickClassicRails';
 import shellStyles from './quickClassicShell.module.css';
-import type { QuickRoundConfig, QuickRoundResult } from '../types';
+import { roundTarget, type QuickRoundConfig, type QuickRoundResult } from '../types';
 
 interface QuickClassicBoardProps {
   config: QuickRoundConfig;
@@ -67,7 +67,17 @@ export function QuickClassicBoard({ config, onDone, onQuit }: QuickClassicBoardP
       onDone(fromSinglePlayer({ score: r.playerScore, wordsFound: r.playerWords }, config)),
     onQuit,
     quitStaysOnPage: true,
+    // InGameScreen below types and submits on its own keyboard handler.
+    externalInput: true,
   });
+
+  // The engine deals a timed board and then waits for a Start tap — a card this
+  // MP board doesn't have, so the clock sat at 1:00 and the round never ended.
+  // Quick Play is "tap a mode, you're playing": start the moment there's a board.
+  const { grid: dealt, awaitingStart, handleStart } = core;
+  useEffect(() => {
+    if (dealt && awaitingStart) handleStart();
+  }, [dealt, awaitingStart, handleStart]);
 
   // InGameScreen derives the shown score from the leaderboard entry matching
   // `username`, and every piece of race chrome (mobile rank rail, live
@@ -76,6 +86,7 @@ export function QuickClassicBoard({ config, onDone, onQuit }: QuickClassicBoardP
   // a race. With no ghosts this collapses back to the single self-entry and the
   // room chrome stays hidden, exactly as before.
   const selfUsername = t('mp.rivals.you');
+  const target = roundTarget(config);
   const progress =
     config.durationSec > 0
       ? 1 - core.timer.remainingTime / config.durationSec
@@ -85,8 +96,8 @@ export function QuickClassicBoard({ config, onDone, onQuit }: QuickClassicBoardP
     () => [
       { username: selfUsername, score: core.score, wordCount: core.foundWords.length },
       ...buildGhostRows(config.ghosts ?? [], {
-        perfectScore: config.perfectScore,
-        totalWords: config.totalWords,
+        perfectScore: target.score,
+        totalWords: target.words,
         progress,
         selfUsername,
       }),
@@ -96,8 +107,8 @@ export function QuickClassicBoard({ config, onDone, onQuit }: QuickClassicBoardP
       core.score,
       core.foundWords.length,
       config.ghosts,
-      config.perfectScore,
-      config.totalWords,
+      target.score,
+      target.words,
       progress,
     ]
   );
@@ -107,7 +118,8 @@ export function QuickClassicBoard({ config, onDone, onQuit }: QuickClassicBoardP
     [core.foundWords]
   );
 
-  const gameActive = Boolean(core.grid) && !core.isPaused && !core.isGameOver && core.timer.remainingTime > 0;
+  const gameActive =
+    Boolean(core.grid) && !core.awaitingStart && !core.isPaused && !core.isGameOver && core.timer.remainingTime > 0;
 
   // Hold until the board resolves — InGameScreen is built around a real grid.
   if (!core.grid) {

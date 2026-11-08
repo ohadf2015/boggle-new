@@ -3,6 +3,7 @@ import {
   classroomLivePath,
   isClassroomLivePathname,
   readClassroomLiveFlags,
+  legacyHostLiveRedirect,
   legacyClassroomLiveRedirect,
   practiceSeatPath,
 } from '@/lib/education/classroomLivePath';
@@ -15,8 +16,8 @@ describe('classroomLivePath', () => {
     expect(classroomLivePath('en', 'ABC123')).toBe('/en/education/live?room=ABC123');
   });
 
-  it('given the teacher, when built with host, then carries host=1', () => {
-    expect(classroomLivePath('he', 'ABC123', { host: true })).toBe('/he/education/live?room=ABC123&host=1');
+  it('given the teacher, when built with host, then it opens the host route', () => {
+    expect(classroomLivePath('he', 'ABC123', { host: true })).toBe('/he/education/live/host?room=ABC123');
   });
 
   it('given a code with stray characters, when built, then the code is URL-encoded', () => {
@@ -47,8 +48,8 @@ describe('isClassroomLivePathname', () => {
 });
 
 describe('readClassroomLiveFlags', () => {
-  it('given the live route, when read, then classroom is implied and host=1 marks the teacher', () => {
-    expect(readClassroomLiveFlags('/en/education/live', new URLSearchParams('room=AB12&host=1'))).toEqual({
+  it('given the host route, when read, then classroom is implied and the route marks the teacher', () => {
+    expect(readClassroomLiveFlags('/en/education/live/host', new URLSearchParams('room=AB12'))).toEqual({
       isClassroomMode: true,
       isClassroomHost: true,
       isPracticeRun: false,
@@ -93,7 +94,7 @@ describe('shouldLoadLessonData', () => {
 describe('legacyClassroomLiveRedirect', () => {
   it('given an old teacher URL, when redirected, then room and host survive', () => {
     expect(legacyClassroomLiveRedirect('/en/multiplayer', '?room=AB12&classroom=true&host=true')).toBe(
-      '/en/education/live?room=AB12&host=1'
+      '/en/education/live/host?room=AB12'
     );
   });
 
@@ -117,8 +118,8 @@ describe('legacyClassroomLiveRedirect', () => {
 
 describe('practice run paths', () => {
   it('given a practice launch, when the host board is built, then it carries practice=1', () => {
-    expect(classroomLivePath('en', 'AB12', { host: true, practice: true })).toBe('/en/education/live?room=AB12&host=1&practice=1');
-    expect(readClassroomLiveFlags('/en/education/live', new URLSearchParams('room=AB12&host=1&practice=1')).isPracticeRun).toBe(true);
+    expect(classroomLivePath('en', 'AB12', { host: true, practice: true })).toBe('/en/education/live/host?room=AB12&practice=1');
+    expect(readClassroomLiveFlags('/en/education/live/host', new URLSearchParams('room=AB12&practice=1')).isPracticeRun).toBe(true);
   });
 
   it('given practice without host, when built, then no practice flag rides on a student link', () => {
@@ -129,5 +130,35 @@ describe('practice run paths', () => {
     expect(practiceSeatPath('he', 'AB12')).toBe('/he/education/live?room=AB12&practiceSeat=1');
     const flags = readClassroomLiveFlags('/he/education/live', new URLSearchParams('room=AB12&practiceSeat=1&host=1&practice=1'));
     expect(flags).toEqual({ isClassroomMode: true, isClassroomHost: false, isPracticeRun: false });
+  });
+});
+
+describe('host board has its own route', () => {
+  const q = (s: string) => new URLSearchParams(s);
+
+  it('builds host links on /education/live/host', () => {
+    expect(classroomLivePath('he', 'AB12CD', { host: true })).toBe('/he/education/live/host?room=AB12CD');
+    expect(classroomLivePath('he', 'AB12CD', { host: true, practice: true })).toBe('/he/education/live/host?room=AB12CD&practice=1');
+    expect(classroomLivePath('he', 'AB12CD')).toBe('/he/education/live?room=AB12CD');
+  });
+
+  it('the host route is the host, with no flag in the query', () => {
+    const f = readClassroomLiveFlags('/he/education/live/host', q('room=AB12CD&practice=1'));
+    expect(f).toEqual({ isClassroomMode: true, isClassroomHost: true, isPracticeRun: true });
+  });
+
+  it('the student route never becomes host, even with a stray host flag', () => {
+    expect(readClassroomLiveFlags('/he/education/live', q('room=AB12CD&host=1')).isClassroomHost).toBe(false);
+  });
+
+  it('old ?host=1 links move to the host route', () => {
+    expect(legacyHostLiveRedirect('/he/education/live', '?room=AB12CD&host=1&practice=1')).toBe('/he/education/live/host?room=AB12CD&practice=1');
+    expect(legacyHostLiveRedirect('/he/education/live', '?room=AB12CD')).toBeNull();
+    expect(legacyHostLiveRedirect('/he/education/live/host', '?room=AB12CD&host=1')).toBeNull();
+  });
+
+  it('both routes count as the classroom live page', () => {
+    expect(isClassroomLivePathname('/he/education/live/host')).toBe(true);
+    expect(isClassroomLivePathname('/he/education/live')).toBe(true);
   });
 });

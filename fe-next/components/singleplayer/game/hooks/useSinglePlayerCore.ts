@@ -90,6 +90,13 @@ interface UseSinglePlayerCoreOptions {
   quitStaysOnPage?: boolean;
   /** Freeze the clock while a full-screen lesson moment is on screen. */
   clockHold?: boolean;
+  /**
+   * The board on top of this engine owns the keyboard (Quick Play classic runs
+   * the MP InGameScreen, which types and submits on its own). Turns off the
+   * engine's typing and its Esc-quits / Space-pauses shortcuts so a key is not
+   * handled twice — and so Space can't freeze a clock that has no pause UI.
+   */
+  externalInput?: boolean;
 }
 
 interface AvailableWords {
@@ -106,6 +113,7 @@ const MIN_TRACKED_WORD_LENGTH = 5;
  */
 export function useSinglePlayerCore({
   settings, targetHighScore, onGameEnd, onQuit, quitStaysOnPage = false, clockHold = false,
+  externalInput = false,
 }: UseSinglePlayerCoreOptions) {
   const { t } = useLanguage();
   // Cozy / Calm Mode (single-player only): calmer bot pacing + no urgency cues.
@@ -292,7 +300,8 @@ export function useSinglePlayerCore({
   const effects = useSinglePlayerEffects({
     grid, isPaused, isGameOver, score, language: settings.language, mode: settings.mode,
     difficulty: settings.difficulty,
-    isLandscape: false, isDesktop, isTv, remainingTime: timer.remainingTime, gameActive,
+    isLandscape: false, isDesktop: isDesktop && !externalInput, isTv: isTv && !externalInput,
+    remainingTime: timer.remainingTime, gameActive,
     foundWords, timerSeconds: settings.timerSeconds,
     trainingCompletedSkillsRef, trainingUpdateProgress, announceTimer, setGameActive,
     onQuit, t, isTypingModeRef, showHintPromptRef, setShowHintPrompt, setShowQuitConfirm, setIsPaused,
@@ -494,7 +503,7 @@ export function useSinglePlayerCore({
 
   const keyboardInput = useKeyboardWordInput({
     grid: grid || ([] as LetterGrid), language: settings.language, gameLanguage: settings.language,
-    enabled: !!grid && !held && !isGameOver, onWordSubmit: handleWordSubmit,
+    enabled: !externalInput && !!grid && !held && !isGameOver, onWordSubmit: handleWordSubmit,
     minWordLength: settings.minWordLength ?? 2,
   });
 

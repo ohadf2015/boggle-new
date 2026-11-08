@@ -26,6 +26,7 @@ function makeDb(resultsRows: any[], profileRows: any[] = []) {
       select: () => builder,
       eq: () => builder,
       gt: () => builder,
+      gte: () => builder,
       in: () => Promise.resolve({ data: rows, error: null }),
       order: () => builder,
       neq: (col: string, val: unknown) => {

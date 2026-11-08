@@ -13,7 +13,7 @@
  */
 import { useRef, useCallback, useEffect, useMemo } from 'react';
 import dynamic from 'next/dynamic';
-import type { QuickRoundConfig, QuickRoundResult } from '../types';
+import { roundTarget, type QuickRoundConfig, type QuickRoundResult } from '../types';
 import { BlastQuickRound } from './BlastQuickRound';
 import { fromWordWheel, fromSurvival } from './normalizeResult';
 import { ghostsToWheelRivals } from '@/lib/quickPlay/ghostRivals';
@@ -78,13 +78,13 @@ export function QuickModeAdapter({ config, onDone, onQuit }: QuickModeAdapterPro
 
   // Wheel + word-hunt rivals are finished targets ("N points to pass Ada"), so
   // they need no per-tick pacing — unlike the classic/blast boards, which race
-  // them live on the MP leaderboard. Word hunt in particular has no round clock
-  // to pace against (it is life-drain survival, not a timer).
+  // them live on the MP leaderboard.
   const selfUsername = t('mp.rivals.you');
+  const targetScore = roundTarget(config).score;
   const wheelRivals = useMemo(() => {
-    const rows = ghostsToWheelRivals(config.ghosts ?? [], config.perfectScore, selfUsername);
+    const rows = ghostsToWheelRivals(config.ghosts ?? [], targetScore, selfUsername);
     return rows.length > 0 ? rows : undefined;
-  }, [config.ghosts, config.perfectScore, selfUsername]);
+  }, [config.ghosts, targetScore, selfUsername]);
 
   const huntRivals = useMemo(
     () => wheelRivals?.map((r) => ({ username: r.name, score: r.score })),
@@ -133,6 +133,7 @@ export function QuickModeAdapter({ config, onDone, onQuit }: QuickModeAdapterPro
             }
             onQuit={onQuit}
             quitStaysOnPage={true}
+            timeLimitSec={config.durationSec}
           />
         </div>
       );

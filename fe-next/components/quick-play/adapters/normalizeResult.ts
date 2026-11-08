@@ -3,7 +3,7 @@
  * Pure functions — the dispatcher component calls the matching one.
  */
 import { calculateWordScore } from '@/shared/utils/scoring';
-import type { QuickRoundConfig, QuickRoundResult } from '../types';
+import { roundTarget, type QuickRoundConfig, type QuickRoundResult } from '../types';
 
 function base(
   score: number,
@@ -12,17 +12,18 @@ function base(
   durationMs?: number,
   words?: Array<{ word: string; score: number }>
 ): QuickRoundResult {
-  const scorePct = cfg.perfectScore > 0
-    ? Math.min(100, Math.round((score / cfg.perfectScore) * 100))
+  const target = roundTarget(cfg);
+  const scorePct = target.score > 0
+    ? Math.min(100, Math.round((score / target.score) * 100))
     : 0;
   return {
     mode: cfg.mode,
     seed: cfg.seed,
     score,
-    perfectScore: cfg.perfectScore,
+    perfectScore: target.score,
     scorePct,
     wordsFound,
-    totalWords: cfg.totalWords,
+    totalWords: target.words,
     durationMs: durationMs ?? cfg.durationSec * 1000,
     ...(words ? { words } : {}),
   };

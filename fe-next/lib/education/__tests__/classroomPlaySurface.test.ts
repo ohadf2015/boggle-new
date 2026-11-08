@@ -42,6 +42,6 @@ describe('isClassroomStudentPlay', () => {
   });
 
   it('given the edu live route, when the teacher hosts, then it is not student play', () => {
-    expect(isClassroomStudentPlay(params('room=ABC123&host=1'), '/en/education/live')).toBe(false);
+    expect(isClassroomStudentPlay(params('room=ABC123'), '/en/education/live/host')).toBe(false);
   });
 });

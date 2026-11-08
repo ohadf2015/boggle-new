@@ -11,7 +11,7 @@ const pro = vi.hoisted(() => ({ hasPro: false, loading: false, known: true, tria
 vi.mock('@/utils/SocketContext', () => ({ getSharedSocketIfExists: () => socket }));
 vi.mock('next/navigation', () => ({ useSearchParams: () => new URLSearchParams('room=ABC123&host=1') }));
 vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ language: 'en', t: (key: string) => key }) }));
-vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'u1' } }) }));
+vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'u1' }, loading: false, isTeacher: true }) }));
 vi.mock('next/image', () => ({ default: () => <span /> }));
 vi.mock('@/components/Avatar', () => ({ default: () => <span /> }));
 vi.mock('next/link', () => ({
@@ -162,7 +162,7 @@ describe('EduHostResults: the words to reteach lead the wall', () => {
     const more = screen.getByTestId('edu-results-more');
     const invite = screen.queryByTestId('teacher-invite');
     const outside = Array.from(document.querySelectorAll('a, button')).filter((el) => !more.contains(el) && !invite?.contains(el));
-    expect(outside.map((el) => el.getAttribute('data-testid'))).toEqual(['edu-replay-missed', 'edu-results-play-again', 'edu-results-report']);
+    expect(outside.map((el) => el.getAttribute('data-testid'))).toEqual(['edu-replay-missed', 'edu-results-play-again', 'edu-results-report', 'struggle-open-grid']);
     expect(more).toContainElement(screen.getByTestId('edu-results-parent-share'));
     expect(more).toContainElement(screen.getByTestId('report-pdf-export'));
     expect(screen.getByTestId('edu-results-report')).toHaveAttribute('target', '_blank');

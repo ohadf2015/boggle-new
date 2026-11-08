@@ -61,7 +61,9 @@ export async function processQuickSubmit(
     throw new Error(`Implausible score ${score} for ${mode} round (perfect=${round.perfectScore})`);
   }
 
-  const scorePct = Math.min(100, Math.round((score / round.perfectScore) * 100));
+  // Measured against the 60-second par; perfect only bounds what is plausible.
+  const target = round.parScore > 0 ? round.parScore : round.perfectScore;
+  const scorePct = Math.min(100, Math.round((score / target) * 100));
 
   const { error: insertError } = await db.from('quick_play_results').insert({
     user_id: userId,

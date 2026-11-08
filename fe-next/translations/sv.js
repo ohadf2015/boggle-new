@@ -612,7 +612,35 @@ const sv = {
     "practice": {
       "close": "Stäng",
       "title": "Öva: {title}",
-      "pick": "Välj ett spel"
+      "pick": "Välj ett spel",
+      "spell": {
+        "modeTitle": "Stava",
+        "modeSub": "Lyssna på ordet, tryck på bokstäverna",
+        "welcomeTitle": "Redo att stava?",
+        "welcomeBody": "Lyssna på varje ord och tryck på bokstäverna för att stava det. Blev det fel bokstav? Då försöker du bara igen.",
+        "wordCount": "{count} ord",
+        "start": "Starta",
+        "hear": "Lyssna på ordet",
+        "peek": "Visa ordet",
+        "noVoice": "Den här enheten kan inte läsa upp ord. Titta på ordet och stava det sedan ur minnet.",
+        "listen": "Lyssna och stava",
+        "erase": "Sudda en bokstav",
+        "correct": "Perfekt!",
+        "wrong": "Fortsätt! Du klarar det.",
+        "shown": "Här är ordet. Försök igen.",
+        "stars": "Stjärnor",
+        "progress": "Ord {n} av {total}",
+        "endTitle": "Listan klar!",
+        "endAccuracy": "{correct} av {total} ord rätt på första försöket",
+        "endStars": "Intjänade stjärnor: {stars}",
+        "cheerTop": "Fantastiskt jobbat!",
+        "cheerMid": "Bra övat!",
+        "cheerLow": "Bra kämpat. Spela igen och slå det!",
+        "again": "Öva igen",
+        "teacherTitle": "Undervisar du med den här listan?",
+        "teacherBody": "Visa den på storskärmen som ett livespel för klassen. Eleverna går med via en kod, inga konton.",
+        "teacherCta": "Spela med klassen"
+      }
     },
     "hub": {
       "metaTitle": "Gratis ordlistor för klassrummet, efter årskurs och tema",
@@ -675,6 +703,16 @@ const sv = {
   // @eg2Seo:end
   // @eg2Modes:start
   "eg2Modes": {
+    "hint": {
+      "classic": "Eleverna tävlar om att hitta dina ord på samma bräda.",
+      "vocab-quiz": "Eleverna matchar varje betydelse med rätt ord.",
+      "wordcraft": "Eleverna stavar dina ord med bokstavsbrickor.",
+      "crossword": "Eleverna läser en betydelse och stavar ordet."
+    },
+    "blocked": {
+      "wordcraftLanguage": "Inga bokstavsbrickor för det här språket än",
+      "wordcraftRack": "Orden är för långa för brickorna"
+    },
     "title": "Välj spelläge",
     "spec": {
       "duration": "Längd",
@@ -687,7 +725,9 @@ const sv = {
     "previewLabel": "Förhandsvisning av {{mode}}",
     "category": {
       "meaning": "Kan betydelsen",
-      "board": "Tävla på brädet"
+      "board": "Tävla på brädet",
+      "finish": "Börja här",
+      "together": "Spela tillsammans"
     },
     "complexity": {
       "simple": "Enkla regler",
@@ -698,7 +738,8 @@ const sv = {
       "ffa": "Alla mot alla",
       "teams": "Lagkamp",
       "solo": "Solo mot en bot",
-      "class": "Hela klassen mot bossen"
+      "class": "Hela klassen mot bossen",
+      "together": "Egen bräda, en topplista för klassen"
     },
     "bestFor": {
       "meanings": "Lära sig betydelser",
@@ -1181,6 +1222,8 @@ const sv = {
     "live": {
       "getReady": "Gör dig redo!",
       "warmUpHint": "Uppvärmning: tryck på den lysande bokstaven",
+      "warmUpSpellHint": "Uppvärmning: tryck på bokstäverna i rätt ordning",
+      "warmUpSpelled": "Rätt stavat!",
       "warmUpTapThis": "Tryck på den här",
       "warmUpTitle": "Uppvärmning"
     },
@@ -1237,6 +1280,7 @@ const sv = {
   // @home-play:start
   "homePlay": {
     "heroLine": "Sextio sekunder, en ny bricka och tre motståndare som inte väntar på dig.",
+    "intro": "LexiClash är ett gratis ordspel som du spelar direkt i webbläsaren. Hitta så många ord du kan på en bokstavsbräda, mot botar, kompisar eller en hel klass, på sex språk.",
     "playSub": "Slumpat läge",
     "pickMode": "Eller välj läge själv",
     "timerBadge": "60 s",
@@ -9841,13 +9885,14 @@ const sv = {
     "aPlayer": "En spelare",
     "modesPlayedCount": "{count} av 4 spel idag",
     "nextUp": "Härnäst",
+    "dayPrize": {"title": "Dagen klar!", "titlePerfect": "Perfekt dag!", "ready": "Din prislåda är redo", "readyPerfect": "Alla fyra klara. Bonuslåda upplåst", "tapToOpen": "Tryck för att öppna", "open": "Öppna", "opening": "Öppnar...", "later": "Senare", "collect": "Hämta", "coins": "+{coins} mynt", "xp": "+{xp} XP", "notYet": "Klara dagens två pussel för att öppna den", "failed": "Kunde inte öppna just nu. Försök igen från dagliga sidan", "tier": {"common": "Snyggt!", "lucky": "Tur!", "jackpot": "Jackpot!"}, "lines": {"common": {"0": "Mynten är på banken. Morgondagens låda kan bli större.", "1": "Fin fångst. Samma tid i morgon?", "2": "Varje låda är olika. Se vad morgondagen bjuder på."}, "lucky": {"0": "Turlåda! Ungefär dubbelt så mycket som vanligt.", "1": "Lådan gillade dig i dag."}, "jackpot": {"0": "Jackpot! Den ovanligaste lådan som finns.", "1": "Enormt! Bara ett fåtal spelare får den här."}}, "hubReady": "Dagens prislåda väntar", "hubReadyPerfect": "Din perfekta-dagen-låda väntar", "hubOpened": "Dagens låda: +{coins} mynt", "hubOpenedPerfect": "Perfekt dag-låda: +{coins} mynt", "oneToGo": "1 kvar till dagens pris", "guestNudge": "Logga in för att öppna en daglig prislåda, upp till {coins} mynt"},
     "allClearToday": "Klart för idag — vi ses i morgon",
     "allClear": {
       "title": "Allt klart!",
       "body": "Du har klarat alla dagens uppdrag.",
       "streak": "{n} dagar i rad. Kom tillbaka i morgon så håller sviten.",
-      "reward": "Dagens belöning: +{coins} mynt, +{xp} XP",
-      "guestNudge": "Logga in för att få {coins} mynt för att klara dagen."
+      "reward": "Perfekt dag-låda: +{coins} mynt, +{xp} XP",
+      "guestNudge": "Logga in för att öppna en perfekt dag-låda värd upp till {coins} mynt."
     },
     "adminBeta": "Beta",
     "replay": "Spela igen",
@@ -10717,7 +10762,6 @@ const sv = {
       "guestNameDefaultHint": "Just nu syns du som \"{name}\", ett slumpat namn som många spelare får.",
       "guestNamePlaceholder": "Ditt namn",
       "guestNameClaim": "Visa mitt namn",
-      "guestNameNotNow": "Inte nu",
       "guestNameDefaultNudge": "Du står på listan som {name}, ett slumpat namn. Gör resultatet till ditt.",
       "guestNameUseMine": "Använd mitt namn",
       "wordsFound": "Hittade ord",
@@ -12785,6 +12829,7 @@ const sv = {
       "durationUnit": "sekunder",
       "roundComplete": "Rundan klar",
       "ofPerfect": "av perfekt",
+      "weeklyRival": "Veckans rival · rankpoäng den här veckan",
       "wordsFound": "{found} / {total} ord hittade",
       "targetWordFound": "🎯 Du hittade ordet: {word}",
       "targetWordMissed": "🎯 Ordet var: {word}",
@@ -15026,11 +15071,11 @@ const sv = {
     "accessDenied": "Du behöver lärarbehörighet för denna sida.",
     "profile": {
       "teacherBadge": "Lärare",
-      "classrooms": "Klassrum",
-      "totalStudents": "Elever totalt",
-      "roleStatus": "Roll",
-      "contactAdmin": "Behöver du hjälp?",
-      "contactAdminDesc": "Kontakta din administratör om du vill ändra läraråtkomst eller roll. Lärarkonton ges av skoladministratörer.",
+      "classrooms": "Klasser",
+      "totalStudents": "Elever",
+      "schoolTitle": "Vill du att skolan betalar?",
+      "schoolBody": "Skolan kan köpa Pro åt dig och dina kollegor. En offert via mejl, inget säljsamtal.",
+      "schoolCta": "Planer för skolor",
       "avatar": "Läraravatar"
     },
     "districtBanner": {
@@ -16022,7 +16067,8 @@ const sv = {
         "wordcraft": "Bygg ord på din egen tavla mot Baronen. Klassens topplista avgör resten.",
         "wordTower": "Alla staplar ord på sitt eget torn. Ett vingligt ord fäller block. Högsta tornet vinner."
       },
-      "wordcraftNeedsShortWords": "Wordcraft kan inte lägga ut något ord från den här listan på brickorna. Lägg till kortare ord eller välj ett annat läge."
+      "wordcraftNeedsShortWords": "Wordcraft kan inte lägga ut något ord från den här listan på brickorna. Lägg till kortare ord eller välj ett annat läge.",
+      "wordcraftNoTiles": "Wordcraft har inga bokstavsbrickor för listans språk än. Välj ett annat spel."
     },
     "projectorLobby": {
       "joinAt": "Gå till",
@@ -20684,13 +20730,18 @@ const sv = {
       "codeLabel": "Har du en rumskod?",
       "codeAria": "Rumskod, tecken {{n}} av {{total}}",
       "codeHint": "6 tecken från värden · Ingen kod? Tryck på Snabbstart",
-      "openArenas": "Öppna arenor",
+      "openArenas": "Öppna spel",
       "playingNow": "{{count}} spelar",
       "moreArenas": "+{{count}} till",
-      "allArenas": "Alla öppna arenor",
-      "emptyTitle": "Inga öppna arenor",
+      "allArenas": "Alla öppna spel",
+      "emptyInLanguage": "Inga öppna spel på {{language}} just nu",
+      "startOne": "Starta ett",
+      "openElsewhere": "{{count}} öppna på {{language}}",
+      "joinRow": "Gå med",
+      "roomLanguage": "Rummets språk",
+      "languageChip": "{{language}}: {{count}} öppna",
       "emptyLine": "Snabbstart fyller platserna med botar",
-      "moreSoon": "Nya arenor dyker upp live",
+      "moreSoon": "Nya spel dyker upp live",
       "hostedBy": "Värd: {{name}}",
       "full": "Fullt",
       "live": "Live",
@@ -21214,6 +21265,7 @@ const sv = {
       "schoolF2": "Offert via mejl, inget säljsamtal",
       "schoolF3": "Gratis för eleverna, aldrig reklam",
       "askSchool": "Vill du att skolan betalar?",
+      "moreFeatures": "{count} till i Pro",
       "featureParentPack": "Föräldrarapporter för hela klassen med ett klick"
     },
     "preCheckout": {
@@ -21564,15 +21616,8 @@ const sv = {
     "practice": {
       "seatName": "Övningselev",
       "title": "Din elevvy",
-      "body": "Spela här som elev. Tavlan bredvid är det klassen ser.",
       "joining": "Går med som elev…",
-      "joined": "Du är med som övningselev",
-      "step1": "Du går med som övningselev",
-      "step2": "Övningsspelare går med och rundan startar",
-      "step3": "Hitta ord här och se dem på tavlan",
-      "step4": "Se resultaten klassen kommer att se",
-      "phoneTitle": "Eller spela från mobilen",
-      "phoneHint": "Skanna för att gå med i rundan som elev. Du förblir inloggad på båda.",
+      "joined": "Du är med! Spela här.",
       "openTab": "Öppna i ny flik",
       "hide": "Dölj elevvyn",
       "show": "Visa elevvyn",
@@ -21684,7 +21729,13 @@ const sv = {
     "error": {
       "title": "Den här skärmen hakade upp sig",
       "body": "Försök igen. Om det fortsätter, gå tillbaka till klassen och börja därifrån.",
-      "backToClass": "Tillbaka till klassen"
+      "backToClass": "Tillbaka till klassen",
+      "backToClasses": "Tillbaka till dina klasser",
+      "enterCode": "Skriv en klasskod"
+    },
+    "notFound": {
+      "title": "Vi hittar inte den sidan",
+      "body": "Länken kan vara gammal eller felstavad. Gå tillbaka och fortsätt därifrån."
     },
     "nav": {
       "home": "Hem",
@@ -21730,6 +21781,15 @@ const sv = {
         "title": "Testa själv först",
         "body": "Spela en runda som elev precis bredvid din tavla, med övningsspelare. Bara du ser det.",
         "cta": "Testa som elev"
+      },
+      "loop": {
+        "playAgain": "Spela igen",
+        "pickGame": "Välj ett annat spel",
+        "loading": "Kollar ert senaste spel",
+        "ready": "{ready} av {total} redo för provet",
+        "readyHint": "Se vilka ord varje elev missade",
+        "readyEmpty": "Resultat per ord visas efter nästa spel",
+        "missed": "{count} missade det · ge läxa"
       },
       "greetMorning": "God morgon, {name}",
       "greetAfternoon": "God eftermiddag, {name}",
@@ -21960,7 +22020,7 @@ const sv = {
       "advancedOpen": "Ändra årskurs, språk eller ord",
       "advancedClose": "Dölj alternativ",
       "bubble": "Bara ett namn. Resten har jag valt åt dig, ändra om du vill.",
-      "createAndPlay": "Skapa och spela",
+      "createClass": "Skapa klass",
       "anyGrade": "Alla årskurser",
       "side": {
         "title": "Det här händer sen",
@@ -21972,10 +22032,26 @@ const sv = {
       "packRecommended": "Vårt tips",
       "startLive": "Starta live",
       "createOnly": "Skapa nu, spela senare",
-      "createAndPlayHint": "Öppnar spelbrädet med er anslutningskod. Eleverna ansluter, sedan trycker du på Starta.",
       "packSticker": "Ordlista: {name}",
       "packHint": "Eleverna får också orden som läxa när de går med.",
-      "assignFailed": "Klassen är klar, men orden tilldelades inte. Tilldela dem från klassens sida."
+      "assignFailed": "Klassen är klar, men orden tilldelades inte. Tilldela dem från klassens sida.",
+      "words": {
+        "title": "Ord till första spelet",
+        "label": "Din ordlista",
+        "placeholder": "Klistra in veckans ord. Ett per rad eller med kommatecken.",
+        "count": "{count} klara",
+        "tooFew": "Lägg till minst {min} ord, eller töm rutan och spela ett startpaket.",
+        "phrasesOnly": "Fraser med flera ord får inte plats på brädet. Lägg till enstaka ord, eller töm rutan och spela ett startpaket.",
+        "skipped": "Fraser som utelämnades: {count}. Brädet tar bara enstaka ord.",
+        "playFailed": "Spelet öppnades inte. Tryck på Spela nu igen.",
+        "yours": "Rundan körs med dina ord, och de sparas i klassen också.",
+        "packLabel": "Ingen lista än? Spela ett startpaket",
+        "packHint": "Det sparas i klassen så att eleverna kan öva på det senare.",
+        "listName": "Ord för {date}",
+        "playNow": "Spela nu",
+        "saved": "Redan i klassen",
+        "createHint": "Därefter: klasskoden och en ruta för veckans ord. Tryck sedan på Spela nu."
+      }
     },
     "host": {
       "classLabel": "Klass",
@@ -22144,8 +22220,22 @@ const sv = {
     "tooLong": "Använd högst {max} tecken",
     "saveFailed": "Namnet kunde inte sparas. Försök igen.",
     "originalName": "Registrerad som {name}"
-  }
+  },
   // @eduRoster:end
+  // @eduProResults:start
+  "eduProResults": {
+    "freeTitle": "Rapporten för den här rundan är gratis",
+    "openGrid": "Se vem som missade vilket ord",
+    "openGridNote": "Visar elevernas namn på skärmen",
+    "gridTitle": "Vem missade vilket ord den här rundan",
+    "namesNote": "Visar elevernas namn. Stäng innan du visar skärmen på tavlan.",
+    "close": "Stäng",
+    "proDepthTitle": "Mer med Teacher Pro",
+    "proDepth": "Utveckling vecka för vecka · Exportera alla klasser · Rapporter till vårdnadshavare",
+    "schoolQuote": "Köper du till hela skolan? Begär en offert",
+    "noWords": "Den här rundan hade inga lektionsord att kontrollera."
+  }
+  // @eduProResults:end
 };
 
 export { sv };

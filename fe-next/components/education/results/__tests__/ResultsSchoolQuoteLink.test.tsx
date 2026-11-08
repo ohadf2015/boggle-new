@@ -5,7 +5,7 @@ import '@testing-library/jest-dom';
 
 const pro = vi.hoisted(() => ({ hasPro: false, loading: false, known: true, trialUsed: false, accessTrialExpires: null as string | null, accessTrialEnded: false }));
 vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => pro }));
-vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'teacher-1' } }) }));
+vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'teacher-1' }, loading: false, isTeacher: true }) }));
 vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ t: (k: string) => k, language: 'en', dir: 'ltr' }) }));
 vi.mock('@/lib/education/proFunnelTelemetry', () => ({ trackTeacherProUpgradeClick: vi.fn() }));
 vi.mock('react-hot-toast', () => ({ default: { error: vi.fn() } }));

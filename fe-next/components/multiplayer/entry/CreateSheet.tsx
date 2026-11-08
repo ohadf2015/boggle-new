@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Swords } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LANGUAGE_CONFIG } from '@/lib/languageConfig';
+import { BOARD_LANGUAGES } from './arenaLanguage';
 import { sanitizeRoomName } from '@/utils/consts';
 import type { Language } from '@/shared/types/game';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
@@ -30,8 +31,6 @@ export interface CreateSheetProps {
   profileAvatar?: CustomAvatarConfig | null;
 }
 
-/** Board languages a room can be created in (one row of flags). */
-const BOARD_LANGUAGES: Language[] = ['en', 'he', 'sv', 'ja', 'es'];
 const MAX_ROOM_LENGTH = 30;
 
 /**

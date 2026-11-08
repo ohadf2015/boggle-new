@@ -58,6 +58,7 @@ import {
 import { InkPanel } from './chrome';
 import { useNodeLabel } from './AcademyNodeButton';
 import { cn } from '@/lib/utils';
+import { studentPracticeHref } from '@/lib/navigation/eduExitTargets';
 
 export interface AcademyHubProps {
   userId: string;
@@ -247,7 +248,7 @@ export function AcademyHub(props: AcademyHubProps) {
     </div>
   );
 
-  const goSolo = () => router.push(`/${language}/quick-play?academy=1`);
+  const goSolo = () => router.push(studentPracticeHref(language));
 
   const pressCta = () => {
     posthog.capture('student_academy_cta_clicked', { kind: action.kind });

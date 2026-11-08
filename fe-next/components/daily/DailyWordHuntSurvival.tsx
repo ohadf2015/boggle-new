@@ -46,6 +46,9 @@ import { HuntFinishOverlay } from './survival/hunt/HuntFinishOverlay';
 import { HuntFeedbackPill } from './survival/hunt/HuntFeedbackPill';
 import { wordHuntSolveTier } from '@/shared/utils/wordHuntScoring';
 import { HuntHintSlots } from './survival/hunt/HuntHintSlots';
+import { HuntRoundClock } from './survival/hunt/HuntRoundClock';
+import { useGameTimer } from '@/hooks/useGameTimer';
+import { calculateWordScore } from '@/shared/utils/scoring';
 import PracticeCoachTip from '@/components/practice/PracticeCoachTip';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
 
@@ -82,6 +85,12 @@ interface DailyWordHuntSurvivalProps {
    * guard's phantom-history handling below — see the `leaving` comment.
    */
   quitStaysOnPage?: boolean;
+  /**
+   * Quick Play: the round lasts this many seconds. A clock takes the life
+   * bar's place and the round ends unsolved when it runs out. Undefined for
+   * the daily challenge, which is life-drain survival with no clock.
+   */
+  timeLimitSec?: number;
 }
 
 const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
@@ -98,19 +107,26 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   rivals,
   hideModeCoach = false,
   quitStaysOnPage = false,
+  timeLimitSec,
 }) => {
   const { t } = useLanguage();
   const inShell = useMediaQuery(SHELL_MEDIA);
   const setIsInGame = useHideNavigation();
 
-  // Performance optimization for low-end devices + player opt-out.
-  // The in-game effects toggle (and OS reduced-motion) collapse onto the same
-  // skipAnimations lever that already gates particles, flashes, and confetti.
-  const { isLowEnd, enableComplexAnimations } = useDevicePerformance();
+  // Two levers. `calm` is motion the player asked to stop (the in-game effects
+  // toggle or the OS reduced-motion setting): the board, word stage, feedback pill
+  // and finish all hold still. `skipAnimations` adds the device tier on top and only
+  // drops the heavy layers (particles, flashes, confetti, framer extras). Phones are
+  // flagged low-end far more often (Low Power Mode / battery saver caps frames at
+  // 30fps and trips the runtime frame watch; Data Saver and 2GB phones trip the
+  // static check), and the tile lift, path pop and pill are cheap transform
+  // animations, so a low-end flag must not freeze them.
+  const { isLowEnd, enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
   const [effectsReduced] = useReducedEffects();
+  const calm = effectsReduced || prefersReducedMotion;
   const skipAnimations = useMemo(
-    () => isLowEnd || !enableComplexAnimations || effectsReduced,
-    [isLowEnd, enableComplexAnimations, effectsReduced]
+    () => calm || isLowEnd || !enableComplexAnimations,
+    [calm, isLowEnd, enableComplexAnimations]
   );
 
   const extraLife = useSurvivalExtraLife({ practice });
@@ -133,6 +149,16 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     disableLifeDrain: practice,
   });
   extraLife.restoreRef.current = actions.restoreLife;
+
+  const timed = typeof timeLimitSec === 'number' && timeLimitSec > 0;
+  const { endRound } = actions;
+  const roundClock = useGameTimer({
+    initialTime: timed ? timeLimitSec : 0,
+    autoStart: timed,
+    // Stops on game over; holds while the quit dialog asks, like the life drain.
+    isPaused: !timed || state.isGameOver || state.showQuitConfirm,
+    onTimeUp: endRound,
+  });
 
   const extraLifeModalOpen = extraLife.offerOpen && state.lifePoints === 0 && !state.isGameOver;
 
@@ -270,7 +296,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     typedWord: keyboardInput.typedWord,
     feedbackMessage: state.feedbackMessage,
     discoveredWords: state.discoveredWords,
-    calm: skipAnimations,
+    calm,
     t,
   };
 
@@ -285,9 +311,10 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       targetWord={targetWord}
       language={language}
       tier={state.hasWon ? wordHuntSolveTier(state.attempts.filter((a) => !a.isDiscovery).length) : null}
-      calm={skipAnimations}
+      calm={calm}
       onSkip={actions.skipFinish}
       sourcePath={state.hasWon ? stage.path : undefined}
+      timedOut={timed && !state.hasWon && roundClock.remainingTime <= 0}
       t={t}
     />
   ) : null;
@@ -346,6 +373,26 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     />
   );
 
+  // The daily HUD projects the daily score (800 at the start, eroding with
+  // misses), but a Quick Play round is scored as the sum of its words, and the
+  // rivals it races are on that scale. Showing 800 against rivals' 168 put
+  // every player "in the lead" before their first word.
+  const roundScore = useMemo(
+    () => state.discoveredWords.reduce((sum, d) => sum + calculateWordScore(d.word, 0), 0),
+    [state.discoveredWords],
+  );
+  const shownScore = timed ? roundScore : state.liveScore;
+
+  // A timed round has no life drain, so its bar would sit at 100 forever: the
+  // clock takes that slot instead.
+  const statusBar = timed ? (
+    <HuntRoundClock
+      remaining={roundClock.remainingTime}
+      total={timeLimitSec ?? 0}
+      label={t('gameShell.time')}
+    />
+  ) : lifeBar;
+
   // One tree for every screen; on desktop the GameShell frames it with rails.
   // pt-3 ensures game header doesn't overlap with the sticky app header on mobile
   return (
@@ -355,7 +402,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       left={
         <HuntLeftRail
           t={t}
-          liveScore={state.liveScore}
+          liveScore={shownScore}
           lifePoints={state.lifePoints}
           hintStage={state.hintStage}
           attempts={state.attempts}
@@ -378,12 +425,12 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         // On desktop the start rail already races the rivals.
         rivals={inShell ? undefined : rivals}
         selfUsername={t('mp.rivals.you')}
-        liveScore={state.liveScore}
+        liveScore={shownScore}
         lastScoreIncrement={state.lastScoreIncrement}
         isScoreAnimating={state.isScoreAnimating}
         onQuitClick={handleQuitClick}
         practice={practice}
-        center={inShell ? lifeBar : undefined}
+        center={inShell ? statusBar : undefined}
         t={t}
       />
 
@@ -409,26 +456,33 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         />
       </div>
 
-      <HuntFeedbackPill
-        seq={state.feedbackSeq}
-        type={state.feedbackType}
-        message={state.feedbackMessage}
-        word={state.feedbackWord}
-        calm={skipAnimations}
-      />
+      {/* A timed round needs every pixel for the board: the word stage above
+          the board already shows each verdict and its reason, and the hint
+          rows only take room once a hint is actually showing. */}
+      {!timed && (
+        <HuntFeedbackPill
+          seq={state.feedbackSeq}
+          type={state.feedbackType}
+          message={state.feedbackMessage}
+          word={state.feedbackWord}
+          calm={calm}
+        />
+      )}
 
-      <HuntHintSlots
-        showCategory={state.showCategory}
-        category={state.category}
-        showExample={state.showExample}
-        exampleSentence={state.exampleSentence}
-        targetWord={targetWord}
-        t={t}
-      />
+      {(!timed || state.showCategory || state.showExample) && (
+        <HuntHintSlots
+          showCategory={state.showCategory}
+          category={state.category}
+          showExample={state.showExample}
+          exampleSentence={state.exampleSentence}
+          targetWord={targetWord}
+          t={t}
+        />
+      )}
 
       {!inShell && (
-        <div data-testid="hunt-life-row" className="shrink-0 overflow-x-clip">
-          {lifeBar}
+        <div data-testid={timed ? 'hunt-clock-row' : 'hunt-life-row'} className="shrink-0 overflow-x-clip">
+          {statusBar}
         </div>
       )}
 

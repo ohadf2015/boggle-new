@@ -300,7 +300,6 @@ export function useKeyboardWordInput(options: UseKeyboardWordInputOptions): UseK
       if (isTypingTarget(e)) {
         return;
       }
-
       // Handle Enter - submit word
       if (e.key === 'Enter') {
         e.preventDefault();
@@ -336,6 +335,13 @@ export function useKeyboardWordInput(options: UseKeyboardWordInputOptions): UseK
 
       // Check if it's a single printable character (letter)
       if (key.length === 1 && /[\p{L}]/u.test(key)) {
+        // A focused letter board traces typed letters itself (useBoardKeyboard)
+        // and preventDefault()s each one it takes. Collecting it here too built
+        // the same word twice, and Enter then submitted both — accepted, then
+        // "Already found". A letter the board took is the board's; with this
+        // word left empty, Enter here has nothing to send. (Enter/Backspace are
+        // not skipped: boards with disableLetterKeyInput still type here.)
+        if (e.defaultPrevented) return;
         e.preventDefault();
 
         // Desktop only: Check for language mismatch and show notification once per session

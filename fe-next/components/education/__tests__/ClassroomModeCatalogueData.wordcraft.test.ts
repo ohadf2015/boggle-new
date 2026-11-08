@@ -14,8 +14,8 @@ describe('classroom mode catalogue', () => {
     expect(catalogueEntry('wordcraft')!.complexity).not.toBe('tricky');
   });
 
-  it('offers Crossword to every teacher: one player per phone, no teams, not Pro', () => {
+  it('offers Crossword to every teacher: one board per phone raced on one class leaderboard, no teams, not Pro', () => {
     const crossword = catalogueModes().find((m) => m.id === 'crossword');
-    expect(crossword).toMatchObject({ style: 'solo', teamsCapable: false, delivery: 'phones', nameKey: 'eduCrossword.name', stepsKey: 'eduCrossword.steps' });
+    expect(crossword).toMatchObject({ style: 'together', teamsCapable: false, delivery: 'phones', nameKey: 'eduCrossword.name', stepsKey: 'eduCrossword.steps' });
   });
 });

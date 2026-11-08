@@ -52,6 +52,15 @@ describe('game route aliases', () => {
     }
   });
 
+  it('sends /ranks to the leaderboard, per locale and bare', () => {
+    // The nav labels the page "Ranks" but the route is /leaderboard — typed
+    // /ranks 404'd on every locale.
+    expect(rules.find((r) => r.source.endsWith('/ranks') && r.source.includes(':locale'))?.destination).toBe(
+      '/:locale/leaderboard',
+    );
+    expect(rules.find((r) => r.source === '/ranks')?.destination).toBe('/en/leaderboard');
+  });
+
   it('stays a temporary alias so /play can become a real page', () => {
     for (const rule of rules) expect(rule.permanent).toBe(false);
   });
@@ -60,7 +69,7 @@ describe('game route aliases', () => {
     // A `:rest*` or prefix shape here would eat `/en/connections/play` and
     // `/en/play-boggle-online-free`, both real pages.
     for (const rule of rules) {
-      expect(rule.source).toMatch(/^(\/:locale\(.+\))?\/(play|room|room\/:code)$/);
+      expect(rule.source).toMatch(/^(\/:locale\(.+\))?\/(play|room|room\/:code|ranks)$/);
     }
   });
 });

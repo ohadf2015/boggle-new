@@ -30,10 +30,13 @@ afterEach(() => {
 
 describe('eduErrorExit', () => {
   it.each([
-    ['live', '/he/education/live', '?room=AB12&host=1', 'he', '/he/teacher'],
+    ['live', '/he/education/live/host', '?room=AB12', 'he', '/he/teacher'],
     ['live', '/he/education/live', '?room=AB12', 'he', '/he/student'],
     ['live', '/en/multiplayer', '?classroom=true&host=true', 'en', '/en/teacher'],
     ['student', '/sv/student/lessons/7', '', 'sv', '/sv/student'],
+    ['teacher', '/ja/teacher/curriculum', '', 'ja', '/ja/teacher'],
+    ['teacher', '/ru/education/classroom-game', '', 'ru', '/ru/teacher'],
+    ['join', '/he/join/AB12CD', '', 'he', '/he/join'],
   ] as const)('%s at %s%s goes to %s hub %s', (area, path, search, loc, expected) => {
     expect(eduErrorExit(area, loc, path, search)).toBe(expected);
   });
@@ -68,7 +71,7 @@ describe('<EduRouteError>', () => {
   });
 
   it('Given the live host, When Back to class is pressed, Then the teacher lands on their hub', () => {
-    setUrl('/en/education/live?room=AB12&host=1');
+    setUrl('/en/education/live/host?room=AB12');
     render(<EduRouteError error={new Error('boom')} reset={vi.fn()} boundary="edu-live" area="live" />);
     fireEvent.click(screen.getByRole('button', { name: 'Back to class' }));
     expect(push).toHaveBeenCalledWith('/en/teacher');
@@ -79,6 +82,16 @@ describe('<EduRouteError>', () => {
     render(<EduRouteError error={new Error('boom')} reset={vi.fn()} boundary="student" area="student" />);
     fireEvent.click(screen.getByRole('button', { name: 'Back to class' }));
     expect(push).toHaveBeenCalledWith('/en/student');
+  });
+
+  it('Given a cached bundle, When a teacher or join boundary renders, Then its back label is localized', () => {
+    locale = 'he';
+    cached = { eduShell: { error: { backToClasses: 'חזרה לכיתות שלי', enterCode: 'הקלדת קוד כיתה' } } };
+    render(<EduRouteError error={new Error('boom')} reset={vi.fn()} boundary="teacher" area="teacher" />);
+    expect(screen.getByRole('button', { name: 'חזרה לכיתות שלי' })).toBeInTheDocument();
+    cleanup();
+    render(<EduRouteError error={new Error('boom')} reset={vi.fn()} boundary="join" area="join" />);
+    expect(screen.getByRole('button', { name: 'הקלדת קוד כיתה' })).toBeInTheDocument();
   });
 
   it('reports the crash once with its boundary name', () => {

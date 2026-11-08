@@ -32,6 +32,8 @@ export interface BuildClassroomRoundSummaryArgs {
   participationBonus: number;
   /** Lesson words the round could have produced; defaults to the board's placed set. */
   placedWords?: string[];
+  /** The round's own mode; the room setting can lag it (a quiz round in a board room). */
+  gameMode?: string;
 }
 
 export async function buildClassroomRoundSummary({
@@ -41,6 +43,7 @@ export async function buildClassroomRoundSummary({
   players,
   participationBonus,
   placedWords = classroomGame.placedVocabulary,
+  gameMode,
 }: BuildClassroomRoundSummaryArgs): Promise<ClassroomSummary | undefined> {
   const classroomSettings = classroomGame.settings;
   const summary = buildClassroomSummary({
@@ -53,6 +56,7 @@ export async function buildClassroomRoundSummary({
     players: players.map((p) => ({ username: p.username, isBot: p.isBot, wordDetails: p.wordDetails })),
   });
   if (!summary) return undefined;
+  summary.gameMode = gameMode ?? classroomSettings?.gameMode ?? 'classic';
 
   if (classroomSettings?.playStyle === 'teams') {
     const humanNames = players.filter((p) => !p.isBot).map((p) => p.username);

@@ -612,7 +612,35 @@ const es = {
     "practice": {
       "close": "Cerrar",
       "title": "Practicar: {title}",
-      "pick": "Elige un juego"
+      "pick": "Elige un juego",
+      "spell": {
+        "modeTitle": "Deletrear",
+        "modeSub": "Escucha la palabra y toca las letras",
+        "welcomeTitle": "¿Empezamos a deletrear?",
+        "welcomeBody": "Escucha cada palabra y toca las letras para escribirla. Si te equivocas de letra, lo intentas otra vez.",
+        "wordCount": "{count} palabras",
+        "start": "Empezar",
+        "hear": "Escuchar la palabra",
+        "peek": "Ver la palabra",
+        "noVoice": "Este dispositivo no puede leer palabras en voz alta. Mira la palabra y escríbela de memoria.",
+        "listen": "Escucha y escríbela",
+        "erase": "Borrar una letra",
+        "correct": "¡Perfecto!",
+        "wrong": "¡Sigue así, tú puedes!",
+        "shown": "Aquí tienes la palabra. Inténtalo otra vez.",
+        "stars": "Estrellas",
+        "progress": "Palabra {n} de {total}",
+        "endTitle": "¡Lista terminada!",
+        "endAccuracy": "{correct} de {total} palabras bien a la primera",
+        "endStars": "Estrellas ganadas: {stars}",
+        "cheerTop": "¡Increíble!",
+        "cheerMid": "¡Muy buena práctica!",
+        "cheerLow": "Buen intento. ¡Juega otra vez para superarlo!",
+        "again": "Practicar otra vez",
+        "teacherTitle": "¿Enseñas esta lista?",
+        "teacherBody": "Ponla en la pantalla grande como juego en vivo para la clase. Los alumnos entran con un código, sin cuentas.",
+        "teacherCta": "Jugar con tu clase"
+      }
     },
     "hub": {
       "metaTitle": "Listas de palabras gratis para el aula, por grado y tema",
@@ -675,6 +703,16 @@ const es = {
   // @eg2Seo:end
   // @eg2Modes:start
   "eg2Modes": {
+    "hint": {
+      "classic": "Compiten por encontrar tus palabras en un mismo tablero.",
+      "vocab-quiz": "Unen cada significado con la palabra correcta.",
+      "wordcraft": "Deletrean tus palabras con fichas de letras.",
+      "crossword": "Leen un significado y escriben la palabra."
+    },
+    "blocked": {
+      "wordcraftLanguage": "Aún no hay fichas para este idioma",
+      "wordcraftRack": "Palabras demasiado largas para las fichas"
+    },
     "title": "Elige un modo de juego",
     "spec": {
       "duration": "Duración",
@@ -687,7 +725,9 @@ const es = {
     "previewLabel": "Vista previa de {{mode}}",
     "category": {
       "meaning": "Conoce el significado",
-      "board": "Carrera en el tablero"
+      "board": "Carrera en el tablero",
+      "finish": "Empieza aquí",
+      "together": "Jugar juntos"
     },
     "complexity": {
       "simple": "Reglas fáciles",
@@ -698,7 +738,8 @@ const es = {
       "ffa": "Todos contra todos",
       "teams": "Batalla por equipos",
       "solo": "En solitario contra un bot",
-      "class": "Toda la clase contra el jefe"
+      "class": "Toda la clase contra el jefe",
+      "together": "Tablero propio, una clasificación de clase"
     },
     "bestFor": {
       "meanings": "Aprender significados",
@@ -1181,6 +1222,8 @@ const es = {
     "live": {
       "getReady": "¿Listos?",
       "warmUpHint": "Calentamiento: toca la letra que brilla",
+      "warmUpSpellHint": "Calentamiento: toca las letras en orden",
+      "warmUpSpelled": "¡Bien escrito!",
       "warmUpTapThis": "Toca esta",
       "warmUpTitle": "Calentamiento"
     },
@@ -1237,6 +1280,7 @@ const es = {
   // @home-play:start
   "homePlay": {
     "heroLine": "Sesenta segundos, un tablero nuevo y tres rivales que no te esperan.",
+    "intro": "LexiClash es un juego de palabras gratis que se juega en el navegador. Encuentra todas las palabras que puedas en un tablero de letras, contra bots, amigos o toda una clase, en seis idiomas.",
     "playSub": "Modo aleatorio",
     "pickMode": "O elige tú el modo",
     "timerBadge": "60 s",
@@ -9646,13 +9690,14 @@ const es = {
     "aPlayer": "Un jugador",
     "modesPlayedCount": "{count} de 4 juegos hoy",
     "nextUp": "A continuación",
+    "dayPrize": {"title": "¡Día superado!", "titlePerfect": "¡Día perfecto!", "ready": "Tu caja de premio está lista", "readyPerfect": "Los cuatro hechos. Caja extra desbloqueada", "tapToOpen": "Toca para abrir", "open": "Ábrela", "opening": "Abriendo...", "later": "Luego", "collect": "Recoger", "coins": "+{coins} monedas", "xp": "+{xp} XP", "notYet": "Termina los dos puzles de hoy para abrirla", "failed": "No se pudo abrir ahora. Inténtalo de nuevo desde la página diaria", "tier": {"common": "¡Bien!", "lucky": "¡Suerte!", "jackpot": "¡Premio gordo!"}, "lines": {"common": {"0": "Monedas al banco. La caja de mañana puede ser mayor.", "1": "Buen botín. ¿Mañana a la misma hora?", "2": "Cada caja es distinta. A ver qué trae mañana."}, "lucky": {"0": "¡Caja de la suerte! Casi el doble de lo normal.", "1": "Hoy la caja te quiere."}, "jackpot": {"0": "¡Premio gordo! La caja más rara de todas.", "1": "¡Enorme! Muy pocos jugadores la consiguen."}}, "hubReady": "La caja de premio de hoy te espera", "hubReadyPerfect": "Tu caja de día perfecto te espera", "hubOpened": "Caja de hoy: +{coins} monedas", "hubOpenedPerfect": "Caja de día perfecto: +{coins} monedas", "oneToGo": "1 más para el premio de hoy", "guestNudge": "Inicia sesión para abrir una caja diaria, hasta {coins} monedas"},
     "allClearToday": "Todo listo por hoy. Hasta mañana",
     "allClear": {
       "title": "¡Todo listo!",
       "body": "Completaste todas las misiones de hoy.",
       "streak": "Racha de {n} días. Vuelve mañana para mantenerla.",
-      "reward": "Premio del día: +{coins} monedas, +{xp} XP",
-      "guestNudge": "Inicia sesión para ganar {coins} monedas por completar el día."
+      "reward": "Caja de día perfecto: +{coins} monedas, +{xp} XP",
+      "guestNudge": "Inicia sesión para abrir una caja de día perfecto de hasta {coins} monedas."
     },
     "adminBeta": "Beta",
     "replay": "Repetir",
@@ -10283,7 +10328,6 @@ const es = {
       "guestNameDefaultHint": "Ahora apareces como \"{name}\", un nombre aleatorio que reciben muchos jugadores.",
       "guestNamePlaceholder": "Tu nombre",
       "guestNameClaim": "Mostrar mi nombre",
-      "guestNameNotNow": "Ahora no",
       "guestNameDefaultNudge": "Estás en la clasificación como {name}, un nombre aleatorio. Haz tuya esta puntuación.",
       "guestNameUseMine": "Usar mi nombre",
       "wordsFound": "Palabras encontradas",
@@ -12431,6 +12475,7 @@ const es = {
       },
       "roundComplete": "Ronda completada",
       "ofPerfect": "del perfecto",
+      "weeklyRival": "Rival semanal · puntos de rango esta semana",
       "wordsFound": "{found} / {total} palabras",
       "targetWordFound": "🎯 Encontraste la palabra: {word}",
       "targetWordMissed": "🎯 La palabra era: {word}",
@@ -15392,11 +15437,11 @@ const es = {
     },
     "profile": {
       "teacherBadge": "Profesor",
-      "classrooms": "Salones",
-      "totalStudents": "Total de estudiantes",
-      "roleStatus": "Rol",
-      "contactAdmin": "¿Necesitas ayuda?",
-      "contactAdminDesc": "Para actualizar tu acceso de profesor o rol, contacta a tu administrador. Las cuentas de profesor las otorgan los administradores escolares.",
+      "classrooms": "Clases",
+      "totalStudents": "Alumnos",
+      "schoolTitle": "¿Quieres que pague tu escuela?",
+      "schoolBody": "Tu escuela puede comprar Pro para ti y tus colegas. Un presupuesto por correo, sin llamadas de ventas.",
+      "schoolCta": "Planes para escuelas",
       "avatar": "Avatar del profesor"
     },
     "districtBanner": {
@@ -15662,7 +15707,8 @@ const es = {
         "wordcraft": "Forma palabras en tu propio tablero contra el Barón. La tabla de la clase decide lo demás.",
         "wordTower": "Cada quien apila palabras en su propia torre. Una palabra floja tumba bloques. Gana la torre más alta."
       },
-      "wordcraftNeedsShortWords": "Wordcraft no puede repartir ninguna palabra de esta lista en sus fichas. Agrega palabras más cortas o elige otro modo."
+      "wordcraftNeedsShortWords": "Wordcraft no puede repartir ninguna palabra de esta lista en sus fichas. Agrega palabras más cortas o elige otro modo.",
+      "wordcraftNoTiles": "Wordcraft aún no tiene fichas para el idioma de esta lista. Elige otro juego."
     },
     "projectorLobby": {
       "joinAt": "Entra en",
@@ -20696,13 +20742,18 @@ const es = {
       "codeLabel": "¿Tienes un código de sala?",
       "codeAria": "Código de sala, carácter {{n}} de {{total}}",
       "codeHint": "6 caracteres del anfitrión · ¿Sin código? Pulsa Inicio rápido",
-      "openArenas": "Arenas abiertas",
+      "openArenas": "Partidas abiertas",
       "playingNow": "{{count}} jugando",
       "moreArenas": "+{{count}} más",
-      "allArenas": "Todas las arenas abiertas",
-      "emptyTitle": "No hay arenas abiertas",
+      "allArenas": "Todas las partidas abiertas",
+      "emptyInLanguage": "Ahora mismo no hay partidas abiertas en {{language}}",
+      "startOne": "Crea una",
+      "openElsewhere": "{{count}} abiertas en {{language}}",
+      "joinRow": "Entrar",
+      "roomLanguage": "Idioma de la sala",
+      "languageChip": "{{language}}: {{count}} abiertas",
       "emptyLine": "Inicio rápido llena los asientos con bots",
-      "moreSoon": "Nuevas arenas aparecen en vivo",
+      "moreSoon": "Nuevas partidas aparecen en vivo",
       "hostedBy": "Anfitrión: {{name}}",
       "full": "Llena",
       "live": "En juego",
@@ -21226,6 +21277,7 @@ const es = {
       "schoolF2": "Presupuesto por correo, sin llamada comercial",
       "schoolF3": "Gratis para el alumnado y sin anuncios",
       "askSchool": "¿Quieres que pague tu centro?",
+      "moreFeatures": "{count} más en Pro",
       "featureParentPack": "Enlaces de informe para las familias de toda la clase, con un clic"
     },
     "preCheckout": {
@@ -21576,15 +21628,8 @@ const es = {
     "practice": {
       "seatName": "Estudiante de práctica",
       "title": "Tu vista de estudiante",
-      "body": "Juega aquí como estudiante. El tablero de al lado es lo que ve tu clase.",
       "joining": "Entrando como estudiante…",
-      "joined": "Estás dentro como estudiante de práctica",
-      "step1": "Entras como estudiante de práctica",
-      "step2": "Entran jugadores de práctica y empieza la ronda",
-      "step3": "Busca palabras aquí y mira el tablero",
-      "step4": "Mira los resultados que verá tu clase",
-      "phoneTitle": "O juega desde tu teléfono",
-      "phoneHint": "Escanea para entrar en esta ronda como estudiante. Sigues con la sesión iniciada en ambos.",
+      "joined": "¡Ya estás dentro! Juega aquí.",
       "openTab": "Abrir en una pestaña nueva",
       "hide": "Ocultar vista de estudiante",
       "show": "Mostrar vista de estudiante",
@@ -21696,7 +21741,13 @@ const es = {
     "error": {
       "title": "Esta pantalla se ha atascado",
       "body": "Inténtalo de nuevo. Si vuelve a pasar, vuelve a tu clase y empieza desde ahí.",
-      "backToClass": "Volver a la clase"
+      "backToClass": "Volver a la clase",
+      "backToClasses": "Volver a tus clases",
+      "enterCode": "Escribe un código de clase"
+    },
+    "notFound": {
+      "title": "No encontramos esa página",
+      "body": "Puede que el enlace sea antiguo o tenga un error. Vuelve atrás y sigue desde ahí."
     },
     "nav": {
       "home": "Inicio",
@@ -21742,6 +21793,15 @@ const es = {
         "title": "Pruébalo tú primero",
         "body": "Juega una ronda como estudiante junto a tu tablero, con jugadores de práctica. Solo lo ves tú.",
         "cta": "Pruébalo como estudiante"
+      },
+      "loop": {
+        "playAgain": "Jugar otra vez",
+        "pickGame": "Elegir otro juego",
+        "loading": "Revisando tu última partida",
+        "ready": "{ready} de {total} listos para el examen",
+        "readyHint": "Ver qué palabras falló cada estudiante",
+        "readyEmpty": "Los resultados por palabra aparecen después de tu próxima partida",
+        "missed": "Faltaron: {count} · asignar tarea"
       },
       "greetMorning": "Buenos días, {name}",
       "greetAfternoon": "Buenas tardes, {name}",
@@ -21972,7 +22032,7 @@ const es = {
       "advancedOpen": "Cambiar curso, idioma o palabras",
       "advancedClose": "Ocultar opciones",
       "bubble": "Solo un nombre. Lo demás ya lo elegí yo, cámbialo si quieres.",
-      "createAndPlay": "Crear y jugar",
+      "createClass": "Crear clase",
       "anyGrade": "Cualquier curso",
       "side": {
         "title": "Qué pasa ahora",
@@ -21984,10 +22044,26 @@ const es = {
       "packRecommended": "Te lo recomendamos",
       "startLive": "Empezar en vivo",
       "createOnly": "Crear ahora, jugar después",
-      "createAndPlayHint": "Abre el tablero de juego con tu código. Los alumnos se unen y luego pulsas Empezar.",
       "packSticker": "Lista de palabras: {name}",
       "packHint": "Tus alumnos también reciben estas palabras como tarea al unirse.",
-      "assignFailed": "Tu clase está lista, pero las palabras no se asignaron. Asígnalas desde la página de la clase."
+      "assignFailed": "Tu clase está lista, pero las palabras no se asignaron. Asígnalas desde la página de la clase.",
+      "words": {
+        "title": "Palabras para la primera partida",
+        "label": "Tu lista de palabras",
+        "placeholder": "Pega las palabras de esta semana. Una por línea o separadas por comas.",
+        "count": "{count} listas",
+        "tooFew": "Añade al menos {min} palabras, o vacía el cuadro para jugar con un paquete inicial.",
+        "phrasesOnly": "Las frases de varias palabras no caben en el tablero. Añade palabras sueltas, o vacía el cuadro para jugar con un paquete inicial.",
+        "skipped": "Frases que se quedan fuera: {count}. En el tablero solo caben palabras sueltas.",
+        "playFailed": "El juego no se abrió. Pulsa Jugar ahora otra vez.",
+        "yours": "La ronda usará tus palabras, y también se guardan en esta clase.",
+        "packLabel": "¿Aún sin lista? Juega con un paquete inicial",
+        "packHint": "Se guarda en esta clase para que tus alumnos lo practiquen después.",
+        "listName": "Palabras del {date}",
+        "playNow": "Jugar ahora",
+        "saved": "Ya en tu clase",
+        "createHint": "Después: tu código para unirse y un cuadro para las palabras de la semana. Luego pulsa Jugar ahora."
+      }
     },
     "host": {
       "classLabel": "Clase",
@@ -22156,8 +22232,22 @@ const es = {
     "tooLong": "Usa {max} caracteres o menos",
     "saveFailed": "No se pudo guardar el nombre. Inténtalo de nuevo.",
     "originalName": "Se registró como {name}"
-  }
+  },
   // @eduRoster:end
+  // @eduProResults:start
+  "eduProResults": {
+    "freeTitle": "El informe de esta ronda es gratis",
+    "openGrid": "Ver quién falló cada palabra",
+    "openGridNote": "Muestra los nombres de tus alumnos en pantalla",
+    "gridTitle": "Quién falló cada palabra en esta ronda",
+    "namesNote": "Muestra los nombres de tus alumnos. Ciérralo antes de proyectar esta pantalla.",
+    "close": "Cerrar",
+    "proDepthTitle": "Más con Teacher Pro",
+    "proDepth": "Progreso semana a semana · Exportar todas las clases · Informes para familias",
+    "schoolQuote": "¿Compras para tu colegio? Pide un presupuesto",
+    "noWords": "En esta ronda no había palabras de la lección que revisar."
+  }
+  // @eduProResults:end
 };
 
 export { es };

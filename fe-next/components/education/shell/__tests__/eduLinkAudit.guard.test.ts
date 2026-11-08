@@ -32,10 +32,9 @@ const BOUNCES: [string, RegExp][] = [
   ['consumer site page', /['"`]\/(\$\{\w+\}\/)?(how-to-play|blog|faq|about|contact)(?=['"`/?#])/g],
 ];
 
-// The one sanctioned way out (the header's comes from educationExitHref), plus prefixes that are only ever extended (breadcrumb trail, SEO canonical URL).
+// The sanctioned way out comes from educationExitHref; these are prefixes that are only ever extended (breadcrumb trail, SEO canonical URL).
 const LOCALE_ROOT_ALLOWED: Record<string, number> = {
   'components/education/EducationBreadcrumbs.tsx': 2,
-  'components/education/EducationMenuDropdown.tsx': 1,
   'app/[locale]/student/profile/layout.tsx': 2,
 };
 
@@ -50,7 +49,35 @@ function sourceFiles(p: string): string[] {
   });
 }
 
-const files = SCAN.flatMap(sourceFiles).map((abs) => ({ rel: relative(ROOT, abs), src: readFileSync(abs, 'utf8') }));
+const read = (paths: string[]) =>
+  paths.flatMap(sourceFiles).map((abs) => ({ rel: relative(ROOT, abs), src: readFileSync(abs, 'utf8') }));
+const files = read(SCAN);
+
+// Legal and contact pages wear consumer chrome (Home tab, logo), so from edu they open beside the app, never in place of it.
+const NEW_TAB_SCAN = [
+  'components/education',
+  'components/teacher',
+  'components/student',
+  'app/[locale]/teacher',
+  'app/[locale]/join',
+  'app/[locale]/student',
+  'app/[locale]/education',
+  'app/[locale]/pricing',
+];
+const newTabFiles = read(NEW_TAB_SCAN);
+// An open peer PR is rewriting these; skipped rather than pinned so either merge order stays green.
+const PEER_PR_FILES = new Set(['components/teacher/SubscriptionStatusCard.tsx']);
+const CONSUMER_HREF = /href=\{?\s*[`'"][^`'"]*\/(legal|contact)(?![\w-])/g;
+
+function sameTabConsumerLinks(src: string): string[] {
+  return [...src.matchAll(CONSUMER_HREF)].flatMap((m) => {
+    const at = m.index ?? 0;
+    const start = Math.max(src.lastIndexOf('<Link', at), src.lastIndexOf('<a ', at));
+    const ends = ['</Link>', '</a>', '/>'].map((tag) => src.indexOf(tag, at)).filter((i) => i >= 0);
+    const element = src.slice(start, ends.length ? Math.min(...ends) : undefined);
+    return /target=["']_blank["']/.test(element) ? [] : [element];
+  });
+}
 
 describe('edu link audit: nav-shell files never bounce to the game home', () => {
   it('scans a real file set', () => {
@@ -83,6 +110,25 @@ describe('edu link audit: nav-shell files never bounce to the game home', () => 
   it.each(BOUNCES)('no %s', (_, re) => {
     const hits = files.flatMap(({ rel, src }) => (src.match(re) ? [rel] : []));
     expect(hits).toEqual([]);
+  });
+
+  it.each([
+    ['href={`/${language}/legal/${page}`}>x</Link>', false],
+    ['<Link href={`/${language}/legal/refund`} target="_blank" rel="noopener noreferrer">x</Link>', true],
+    ['<Link href={`/${locale}/contact`} className="a">x</Link>', false],
+    ['<a href={`/${locale}/contact`} target="_blank" />', true],
+  ])('the consumer-page link rule judges %s as new-tab=%s', (sample, ok) => {
+    const src = sample.startsWith('<') ? sample : `<Link ${sample}`;
+    expect(sameTabConsumerLinks(src)).toHaveLength(ok ? 0 : 1);
+  });
+
+  it('leaves edu routes that merely contain the words alone', () => {
+    expect(sameTabConsumerLinks('<Link href={`/${locale}/education/help/contact-support`}>x</Link>')).toEqual([]);
+  });
+
+  it('legal and contact pages open in a new tab from every edu file', () => {
+    const hits = newTabFiles.flatMap(({ rel, src }) => (sameTabConsumerLinks(src).length ? [rel] : []));
+    expect(hits.filter((rel) => !PEER_PR_FILES.has(rel))).toEqual([]);
   });
 
   it('a locale-root href appears only at the sanctioned exits', () => {

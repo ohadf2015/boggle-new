@@ -156,6 +156,22 @@ describe('UpgradePlanCards inside the free access trial', () => {
     expect(screen.getByTestId('pricing-trial-cta')).toHaveTextContent('eg2Pro.plans.trialCta|14');
   });
 });
+describe('UpgradePlanCards on one screen', () => {
+  it('shows Pro’s first four outcomes and folds the rest under "N more", every feature still in the card', () => {
+    setup('free', { showTrial: false, proFeatures: ['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7'] });
+    const fold = screen.getByTestId('plan-more-features');
+    expect(fold.tagName.toLowerCase()).toBe('details');
+    expect(fold).not.toHaveAttribute('open');
+    expect(fold).toHaveTextContent('eg2Pro.plans.moreFeatures|3');
+    for (const f of ['p5', 'p6', 'p7']) expect(fold).toHaveTextContent(f);
+    for (const f of ['p1', 'p2', 'p3', 'p4']) expect(fold).not.toHaveTextContent(f);
+  });
+
+  it('adds no fold when Pro has four outcomes or fewer', () => {
+    setup('free', { showTrial: false });
+    expect(screen.queryByTestId('plan-more-features')).not.toBeInTheDocument();
+  });
+});
 
 describe('UpgradePlanCards on a tablet', () => {
   it('keeps the plans stacked until there is room for three columns', () => {

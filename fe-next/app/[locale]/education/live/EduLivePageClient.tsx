@@ -3,7 +3,9 @@
 /** State is the shared useMpPageState; this frame owns only the classroom chrome around the phases. */
 import React from 'react';
 import nextDynamic from 'next/dynamic';
-import { useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { useLegacyClassroomRedirect } from '@/components/education/live/useLegacyClassroomRedirect';
+import EduLiveLoading from './loading';
 import ErrorBoundary from '@/app/components/ErrorBoundary';
 import { ConnectionDot, ConnectionBanner } from '@/components/ConnectionStatusIndicator';
 import { ConnectionQualityChip } from '@/components/multiplayer/ConnectionQualityChip';
@@ -43,14 +45,21 @@ function useClearStaleExitFlag(): void {
   });
 }
 
+/** An old `?host=1` link must reach the host route before the room hook joins as a student. */
 export default function EduLivePageClient(): React.JSX.Element {
+  const legacyTarget = useLegacyClassroomRedirect();
+  return legacyTarget ? <EduLiveLoading /> : <EduLiveRoom />;
+}
+
+function EduLiveRoom(): React.JSX.Element {
   useClearStaleExitFlag();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const urlRoom = searchParams?.get('room') ?? null;
   const s = useMpPageState();
   const [hostExitOpen, setHostExitOpen] = React.useState(false);
   const isTeacher = s.isHost || s.isClassroomHost;
-  const practiceRoom = isTeacher && readClassroomLiveFlags('/education/live', searchParams).isPracticeRun ? s.gameCode || urlRoom : null;
+  const practiceRoom = isTeacher && readClassroomLiveFlags(pathname, searchParams).isPracticeRun ? s.gameCode || urlRoom : null;
   const practiceJoined = s.playersInRoom.some((p) => p.isPractice === true);
 
   const leaveFromBanner = () => {
@@ -95,6 +104,7 @@ export default function EduLivePageClient(): React.JSX.Element {
             {s.isActive && s.gameActive && !s.showResults && <StudentWordBank level={s.classroomLevel} words={s.classroomWordBank} />}
             {s.teacherStrip.visible && (
               <TeacherLiveControls
+                sidePanelOpen={!!practiceRoom}
                 isPaused={s.isPaused || s.teacherStrip.quizPaused} gameMode={s.liveGameMode} isQuizRound={s.teacherStrip.quizRound}
                 onPause={s.pauseGame} onResume={s.resumeGame} onExtendTime={s.extendTime}
                 onEndRound={s.endRoundNow} onSkipWord={s.skipTargetWord}

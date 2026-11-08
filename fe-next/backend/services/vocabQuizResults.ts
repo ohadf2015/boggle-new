@@ -89,6 +89,7 @@ export async function buildQuizResultsPayload({
       wordDetails: row.wordDetails,
     })),
     placedWords: askedWords(session),
+    gameMode: VOCAB_QUIZ_MODE,
   });
   if (!classroomSummary) return null;
 

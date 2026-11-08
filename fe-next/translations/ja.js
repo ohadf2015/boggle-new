@@ -612,7 +612,35 @@ const ja = {
     "practice": {
       "close": "閉じる",
       "title": "練習：{title}",
-      "pick": "ゲームを選ぶ"
+      "pick": "ゲームを選ぶ",
+      "spell": {
+        "modeTitle": "書き取り",
+        "modeSub": "ことばを聞いて、文字をタップ",
+        "welcomeTitle": "書き取り、はじめる？",
+        "welcomeBody": "ことばを聞いて、文字をタップしてならべよう。まちがえても、もう一度やればだいじょうぶ。",
+        "wordCount": "{count}語",
+        "start": "スタート",
+        "hear": "ことばを聞く",
+        "peek": "ことばを見る",
+        "noVoice": "この端末では読み上げができません。ことばを見てから、思い出してならべてみよう。",
+        "listen": "聞いて、ならべよう",
+        "erase": "1文字けす",
+        "correct": "パーフェクト！",
+        "wrong": "その調子！もう一回やってみよう。",
+        "shown": "答えはこれ。もう一度やってみよう。",
+        "stars": "スター",
+        "progress": "{total}語中 {n}語目",
+        "endTitle": "リスト完了！",
+        "endAccuracy": "{total}語中 {correct}語が一回で正解",
+        "endStars": "もらったスター：{stars}",
+        "cheerTop": "すばらしい！",
+        "cheerMid": "よくがんばったね！",
+        "cheerLow": "いいチャレンジ！もう一度やって記録をこえよう。",
+        "again": "もう一度れんしゅう",
+        "teacherTitle": "このリストで授業をしますか？",
+        "teacherBody": "大きな画面に映して、クラスみんなでライブゲーム。生徒はコードで参加、アカウントは不要です。",
+        "teacherCta": "クラスで遊ぶ"
+      }
     },
     "hub": {
       "metaTitle": "教室で使える無料の単語リスト（学年・テーマ別）",
@@ -675,6 +703,16 @@ const ja = {
   // @eg2Seo:end
   // @eg2Modes:start
   "eg2Modes": {
+    "hint": {
+      "classic": "同じ盤であなたの単語を探して競います。",
+      "vocab-quiz": "意味に合う単語を選びます。",
+      "wordcraft": "文字タイルであなたの単語をつづります。",
+      "crossword": "意味を読んで、その単語をつづります。"
+    },
+    "blocked": {
+      "wordcraftLanguage": "この言語の文字タイルはまだありません",
+      "wordcraftRack": "単語が長すぎてタイルに入りません"
+    },
     "title": "ゲームモードを選ぶ",
     "spec": {
       "duration": "時間",
@@ -687,7 +725,9 @@ const ja = {
     "previewLabel": "{{mode}}のプレビュー",
     "category": {
       "meaning": "意味で勝負",
-      "board": "盤面でスピード勝負"
+      "board": "盤面でスピード勝負",
+      "finish": "まずはここから",
+      "together": "みんなで遊ぶ"
     },
     "complexity": {
       "simple": "ルールがかんたん",
@@ -698,7 +738,8 @@ const ja = {
       "ffa": "全員対戦",
       "teams": "チーム対抗",
       "solo": "ひとりでボットと対戦",
-      "class": "クラス全員でボスに挑む"
+      "class": "クラス全員でボスに挑む",
+      "together": "一人ひとつの盤、順位はクラスでひとつ"
     },
     "bestFor": {
       "meanings": "意味を覚える",
@@ -1181,6 +1222,8 @@ const ja = {
     "live": {
       "getReady": "準備はいい？",
       "warmUpHint": "ウォームアップ：光る文字をタップ！",
+      "warmUpSpellHint": "ウォームアップ：文字を順番にタップ！",
+      "warmUpSpelled": "できた！",
       "warmUpTapThis": "これをタップ",
       "warmUpTitle": "ウォームアップ"
     },
@@ -1237,6 +1280,7 @@ const ja = {
   // @home-play:start
   "homePlay": {
     "heroLine": "60秒、まっさらな盤面、そして待ってくれないライバルが3人。",
+    "intro": "LexiClashはブラウザで遊べる無料の単語ゲームです。文字盤からできるだけ多くの単語を見つけて、ボットや友だち、クラスのみんなと対戦できます。6つの言語で遊べます。",
     "playSub": "ランダムモード",
     "pickMode": "モードを自分で選ぶ",
     "timerBadge": "60秒",
@@ -9504,13 +9548,14 @@ const ja = {
     "aPlayer": "プレイヤー",
     "modesPlayedCount": "今日のゲーム {count}/4",
     "nextUp": "次はこれ",
+    "dayPrize": {"title": "今日をクリア!", "titlePerfect": "パーフェクトデー!", "ready": "プライズボックスの準備ができました", "readyPerfect": "4つすべてクリア。ボーナスボックス解放", "tapToOpen": "タップして開ける", "open": "開ける", "opening": "開けています...", "later": "あとで", "collect": "受け取る", "coins": "+{coins} コイン", "xp": "+{xp} XP", "notYet": "今日の2つのパズルをクリアすると開けられます", "failed": "今は開けられませんでした。デイリーページからもう一度お試しください", "tier": {"common": "ナイス!", "lucky": "ラッキー!", "jackpot": "ジャックポット!"}, "lines": {"common": {"0": "コインを獲得。明日のボックスはもっと大きいかも。", "1": "いい収穫。また明日同じ時間に?", "2": "ボックスは毎日ちがいます。明日は何が出るかな。"}, "lucky": {"0": "ラッキーボックス!いつものほぼ2倍。", "1": "今日はボックスに好かれました。"}, "jackpot": {"0": "ジャックポット!いちばんレアなボックス。", "1": "すごい!ごく一部のプレイヤーしか出せません。"}}, "hubReady": "今日のプライズボックスが待っています", "hubReadyPerfect": "パーフェクトデーのボックスが待っています", "hubOpened": "今日のボックス: +{coins} コイン", "hubOpenedPerfect": "パーフェクトデーのボックス: +{coins} コイン", "oneToGo": "あと1つで今日の賞品", "guestNudge": "ログインすると毎日のプライズボックスを開けられます(最大 {coins} コイン)"},
     "allClearToday": "今日はすべてクリア。また明日",
     "allClear": {
       "title": "オールクリア！",
       "body": "今日のクエストはすべてクリアしました。",
       "streak": "{n}日連続！明日も来て記録をつなごう。",
-      "reward": "今日のごほうび: +{coins}コイン、+{xp} XP",
-      "guestNudge": "ログインすると、全クリアで{coins}コインがもらえます。"
+      "reward": "パーフェクトデーのボックス: +{coins} コイン、+{xp} XP",
+      "guestNudge": "ログインすると最大 {coins} コインのパーフェクトデーボックスを開けられます。"
     },
     "adminBeta": "ベータ",
     "replay": "もう一度",
@@ -10409,7 +10454,6 @@ const ja = {
       "guestNameDefaultHint": "今は「{name}」と表示されています。多くのプレイヤーに付くランダムな名前です。",
       "guestNamePlaceholder": "あなたの名前",
       "guestNameClaim": "名前を表示する",
-      "guestNameNotNow": "今はしない",
       "guestNameDefaultNudge": "ランキングでは「{name}」(ランダムな名前)と表示されています。この記録に自分の名前を。",
       "guestNameUseMine": "自分の名前にする",
       "wordsFound": "見つかった単語",
@@ -11481,6 +11525,7 @@ const ja = {
       "durationUnit": "秒",
       "roundComplete": "ラウンド終了",
       "ofPerfect": "パーフェクト比",
+      "weeklyRival": "今週のライバル・今週のランクポイント",
       "wordsFound": "{found} / {total} 語発見",
       "targetWordFound": "🎯 単語を発見: {word}",
       "targetWordMissed": "🎯 単語は「{word}」でした",
@@ -14719,10 +14764,10 @@ const ja = {
     "profile": {
       "teacherBadge": "教師",
       "classrooms": "クラス",
-      "totalStudents": "生徒合計",
-      "roleStatus": "役割",
-      "contactAdmin": "お困りですか?",
-      "contactAdminDesc": "教師アクセスや役割を変更するには、管理者にお問い合わせください。教師アカウントは学校管理者が付与します。",
+      "totalStudents": "生徒",
+      "schoolTitle": "学校に払ってもらいたいですか？",
+      "schoolBody": "学校があなたと同僚の分のProを購入できます。見積もりはメールで1通、営業電話はありません。",
+      "schoolCta": "学校向けプラン",
       "avatar": "教師アバター"
     },
     "districtBanner": {
@@ -15714,7 +15759,8 @@ const ja = {
         "wordcraft": "自分のボードでバロンと単語づくり。あとはクラスのランキングが決める。",
         "wordTower": "それぞれ自分のタワーに単語を積み上げる。ぐらつく単語でブロックが崩れる。いちばん高いタワーが勝ち。"
       },
-      "wordcraftNeedsShortWords": "このリストの単語はワードクラフトのタイルに配れません。短い単語を追加するか、別のモードを選んでください。"
+      "wordcraftNeedsShortWords": "このリストの単語はワードクラフトのタイルに配れません。短い単語を追加するか、別のモードを選んでください。",
+      "wordcraftNoTiles": "ワードクラフトには、このリストの言語の文字タイルがまだありません。別のゲームを選んでください。"
     },
     "projectorLobby": {
       "joinAt": "アクセス先",
@@ -20684,13 +20730,18 @@ const ja = {
       "codeLabel": "ルームコードある？",
       "codeAria": "ルームコード {{total}}文字中{{n}}文字目",
       "codeHint": "ホストから届く6文字のコード・コードがなければクイックスタート",
-      "openArenas": "参加できるアリーナ",
+      "openArenas": "参加できるゲーム",
       "playingNow": "{{count}}人がプレイ中",
       "moreArenas": "ほか{{count}}件",
-      "allArenas": "参加できるアリーナ一覧",
-      "emptyTitle": "参加できるアリーナはありません",
+      "allArenas": "参加できるゲーム一覧",
+      "emptyInLanguage": "いま{{language}}で参加できるゲームはありません",
+      "startOne": "自分で始める",
+      "openElsewhere": "{{language}}なら{{count}}件あります",
+      "joinRow": "参加",
+      "roomLanguage": "ルームの言語",
+      "languageChip": "{{language}}：{{count}}件",
       "emptyLine": "クイックスタートならボットが席を埋めます",
-      "moreSoon": "新しいアリーナがリアルタイムで登場",
+      "moreSoon": "新しいゲームがリアルタイムで登場",
       "hostedBy": "ホスト: {{name}}",
       "full": "満員",
       "live": "対戦中",
@@ -21214,6 +21265,7 @@ const ja = {
       "schoolF2": "見積もりはメールで。営業電話はありません",
       "schoolF3": "生徒は無料で、広告も表示されません",
       "askSchool": "学校に費用を負担してもらいたい場合",
+      "moreFeatures": "Proの機能をあと{count}つ見る",
       "featureParentPack": "クラス全員分の保護者向けレポートリンクをワンクリックで作成"
     },
     "preCheckout": {
@@ -21564,15 +21616,8 @@ const ja = {
     "practice": {
       "seatName": "練習用の生徒",
       "title": "あなたの生徒画面",
-      "body": "ここで生徒として遊びます。横のボードがクラスに見える画面です。",
       "joining": "生徒として参加中…",
-      "joined": "練習用の生徒として参加しました",
-      "step1": "練習用の生徒として参加",
-      "step2": "練習プレイヤーが入り、ラウンド開始",
-      "step3": "ここで単語を探し、ボードで確認",
-      "step4": "クラスに見える結果を確認",
-      "phoneTitle": "スマホからも遊べます",
-      "phoneHint": "スキャンすると生徒としてこのラウンドに参加します。どちらもログインしたままです。",
+      "joined": "参加しました。ここで遊べます。",
       "openTab": "新しいタブで開く",
       "hide": "生徒画面を隠す",
       "show": "生徒画面を表示",
@@ -21684,7 +21729,13 @@ const ja = {
     "error": {
       "title": "この画面で問題が起きました",
       "body": "もう一度お試しください。何度も起きる場合は、クラスに戻ってそこからやり直してください。",
-      "backToClass": "クラスに戻る"
+      "backToClass": "クラスに戻る",
+      "backToClasses": "クラス一覧に戻る",
+      "enterCode": "クラスコードを入力"
+    },
+    "notFound": {
+      "title": "ページが見つかりません",
+      "body": "リンクが古いか、入力ミスがあるかもしれません。戻ってそこから続けてください。"
     },
     "nav": {
       "home": "ホーム",
@@ -21730,6 +21781,15 @@ const ja = {
         "title": "まずは自分で試す",
         "body": "ボードのすぐ横で、練習プレイヤーと一緒に生徒として1ラウンド遊べます。あなただけに表示されます。",
         "cta": "生徒として試す"
+      },
+      "loop": {
+        "playAgain": "もう一度遊ぶ",
+        "pickGame": "別のゲームを選ぶ",
+        "loading": "前回のゲームを確認中",
+        "ready": "テストの準備OK {ready}/{total}人",
+        "readyHint": "生徒ごとに間違えた単語を見る",
+        "readyEmpty": "単語ごとの結果は次のゲームのあとに表示されます",
+        "missed": "欠席 {count}人 · 宿題を出す"
       },
       "greetMorning": "おはようございます、{name}さん",
       "greetAfternoon": "こんにちは、{name}さん",
@@ -21960,7 +22020,7 @@ const ja = {
       "advancedOpen": "学年・言語・単語を変更",
       "advancedClose": "オプションを閉じる",
       "bubble": "名前だけでOK。ほかは選んでおいたので、必要なら変えてね。",
-      "createAndPlay": "作成してプレイ",
+      "createClass": "クラスを作成",
       "anyGrade": "全学年",
       "side": {
         "title": "このあとの流れ",
@@ -21972,10 +22032,26 @@ const ja = {
       "packRecommended": "おすすめ",
       "startLive": "ライブ開始",
       "createOnly": "今は作成だけ、あとで遊ぶ",
-      "createAndPlayHint": "参加コード付きのゲームボードが開きます。生徒が参加したら「スタート」を押します。",
       "packSticker": "単語リスト：{name}",
       "packHint": "参加した生徒には、これらの単語が宿題としても届きます。",
-      "assignFailed": "クラスはできましたが、単語の割り当てに失敗しました。クラスのページから割り当ててください。"
+      "assignFailed": "クラスはできましたが、単語の割り当てに失敗しました。クラスのページから割り当ててください。",
+      "words": {
+        "title": "最初のゲームで使う単語",
+        "label": "単語リスト",
+        "placeholder": "今週の単語を貼り付けてください。1行に1語、またはカンマ区切り。",
+        "count": "{count}語",
+        "tooFew": "{min}語以上入れてください。空にすると、スターターパックで遊べます。",
+        "phrasesOnly": "複数の語でできたフレーズはボードに置けません。1語ずつ入れるか、空にしてスターターパックで遊びましょう。",
+        "skipped": "外したフレーズ：{count}件。ボードに置けるのは1語だけです。",
+        "playFailed": "ゲームを開けませんでした。もう一度「今すぐプレイ」を押してください。",
+        "yours": "この単語でラウンドを始めます。単語はこのクラスにも保存されます。",
+        "packLabel": "リストがまだない場合は、スターターパックで",
+        "packHint": "このクラスに保存されるので、生徒はあとで練習できます。",
+        "listName": "{date}の単語",
+        "playNow": "今すぐプレイ",
+        "saved": "クラスに保存済み",
+        "createHint": "次に参加コードと今週の単語を入れる欄が出ます。あとは「今すぐプレイ」を押すだけ。"
+      }
     },
     "host": {
       "classLabel": "クラス",
@@ -22144,8 +22220,22 @@ const ja = {
     "tooLong": "{max}文字以内で入力してください",
     "saveFailed": "名前を保存できませんでした。もう一度お試しください。",
     "originalName": "登録名：{name}"
-  }
+  },
   // @eduRoster:end
+  // @eduProResults:start
+  "eduProResults": {
+    "freeTitle": "このラウンドのレポートは無料です",
+    "openGrid": "誰がどの単語を逃したか見る",
+    "openGridNote": "生徒の名前が画面に表示されます",
+    "gridTitle": "このラウンドで誰がどの単語を逃したか",
+    "namesNote": "生徒の名前が表示されます。画面を投影する前に閉じてください。",
+    "close": "閉じる",
+    "proDepthTitle": "Teacher Pro でできること",
+    "proDepth": "週ごとの伸び · 全クラスの書き出し · 保護者向けレポート",
+    "schoolQuote": "学校でまとめて導入しますか？見積もりを依頼",
+    "noWords": "このラウンドには確認するレッスンの単語がありませんでした。"
+  }
+  // @eduProResults:end
 };
 
 export { ja };

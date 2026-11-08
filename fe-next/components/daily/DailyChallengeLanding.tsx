@@ -36,6 +36,7 @@ import { NewcomerTip } from './landing/NewcomerTip';
 import { QuestCard } from './landing/QuestCard';
 import { CompactModeRow } from './landing/CompactModeRow';
 import { DailyAllClearCard } from './landing/DailyAllClearCard';
+import { DayPrizeHubCard } from './prize/DayPrizeHubCard';
 import { LeaderboardTeaser } from './landing/LeaderboardTeaser';
 import { useUtcDay } from './landing/useUtcDay';
 import { WeeklyChestPlaceholder } from './WeeklyChestPlaceholder';
@@ -225,9 +226,12 @@ export function DailyChallengeLanding({
         {isNewcomer && primaryMode && <NewcomerTip modeTitle={t(primaryMode.titleKey)} />}
 
         {completedCount >= REQUIRED_COUNT && wordHuntStatus !== 'lost' && !dayCleared && (
-          <p className="w-full text-center text-sm font-black text-neo-lime" data-testid="required-done-note">
-            {t('daily.hub.requiredDone')}
-          </p>
+          <>
+            <p className="w-full text-center text-sm font-black text-neo-lime" data-testid="required-done-note">
+              {t('daily.hub.requiredDone')}
+            </p>
+            <DayPrizeHubCard kind="clear" />
+          </>
         )}
 
         {dayCleared && <DailyAllClearCard streak={dailyPlayedStatus.streak.current} />}

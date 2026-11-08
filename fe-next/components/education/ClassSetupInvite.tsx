@@ -2,12 +2,16 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useLessons } from '@/hooks/useVocabularyLesson';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { getClassroom } from '@/lib/supabase/education/classrooms';
+import { getLesson } from '@/lib/supabase/education/lessons';
 import { createdClassroom } from '@/lib/education/createdClassroomHandoff';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useTeacherActivationProgress } from '@/hooks/useTeacherActivationProgress';
@@ -22,11 +26,15 @@ import { useClassRoster } from '@/components/teacher/hq/useClassRoster';
 import { HqProjectorSheet } from '@/components/teacher/hq/HqProjectorSheet';
 import { RehearseWithBotsButton } from '@/components/teacher/home/RehearseWithBotsButton';
 import { PANEL, SECONDARY_BUTTON } from '@/components/teacher/home/homeStyles';
-import { writeQuickLaunchIntent } from '@/components/teacher/dashboard/quickLaunchIntent';
+import { MIN_PASTED_WORDS, QUICK_LAUNCH_FLOW, writeQuickLaunchIntent } from '@/components/teacher/dashboard/quickLaunchIntent';
+import { STARTER_LESSON_PACKS } from '@/lib/education/starterLessonPacks';
+import { packsForLanguage, recommendedPack } from '@/components/teacher/setup/starterPackPick';
+import { FirstGameWords, PlayNowButton, type FirstGameError } from '@/components/teacher/setup/FirstGameWords';
+import { firstGameIntent, readPasted, type FirstGameChoice } from '@/components/teacher/setup/firstGameLaunch';
 import { ClassCreatedAsk } from '@/components/education/ClassCreatedAsk';
 import type { InviteChannel } from './ClassSetupInviteCode';
 import { ClassSetupInviteView } from './ClassSetupInviteView';
-import { firstStudentSeen, inviteStartTarget } from './lobby/inviteLinks';
+import { firstStudentSeen } from './lobby/inviteLinks';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -34,12 +42,15 @@ const JOIN_POLL_MS = 5_000;
 
 export interface ClassSetupInviteProps {
   classroomId: string;
-  /** Starter pack picked on the details step; Start then runs it on this class. */
   packKey?: string | null;
+  /** That pack's list, already saved to this class; Play now runs it with no new write. */
+  lessonId?: string | null;
 }
 
+type ReadyClassroom = { id: string; name: string; join_code: string; language?: string | null };
+
 /** The one "get students in" moment after a class is made: code, QR, every share channel, and names landing live. */
-export function ClassSetupInvite({ classroomId, packKey }: ClassSetupInviteProps) {
+export function ClassSetupInvite({ classroomId, packKey, lessonId }: ClassSetupInviteProps) {
   const { t: rawT, language } = useLanguage();
   const t = rawT as T;
   const { classrooms, isLoading } = useClassrooms();
@@ -60,12 +71,22 @@ export function ClassSetupInvite({ classroomId, packKey }: ClassSetupInviteProps
       </div>
     );
   }
-  return <InviteReady classroom={{ id: classroom.id, name: classroom.name, join_code: classroom.join_code }} packKey={packKey ?? null} t={t} language={language} />;
+  const rowLanguage = 'language' in classroom && typeof classroom.language === 'string' ? classroom.language : null;
+  const classLanguage: string = rowLanguage || STARTER_LESSON_PACKS.find((p) => p.nameKey === packKey)?.language || language;
+  return (
+    <InviteReady
+      classroom={{ id: classroom.id, name: classroom.name, join_code: classroom.join_code, language: classLanguage }}
+      packKey={packKey ?? null}
+      lessonId={lessonId ?? null}
+      t={t}
+      language={language}
+    />
+  );
 }
 
 /** Last resort before "not found": read this one class by id, fresh, once. */
-function useClassroomLookup(classroomId: string, enabled: boolean): { pending: boolean; classroom: { id: string; name: string; join_code: string } | null } {
-  const [state, setState] = useState<{ pending: boolean; classroom: { id: string; name: string; join_code: string } | null; done: boolean }>({ pending: false, classroom: null, done: false });
+function useClassroomLookup(classroomId: string, enabled: boolean): { pending: boolean; classroom: ReadyClassroom | null } {
+  const [state, setState] = useState<{ pending: boolean; classroom: ReadyClassroom | null; done: boolean }>({ pending: false, classroom: null, done: false });
   useEffect(() => {
     if (!enabled || state.done) return;
     let live = true;
@@ -73,7 +94,7 @@ function useClassroomLookup(classroomId: string, enabled: boolean): { pending: b
     void getClassroom(classroomId)
       .then(({ data }) => {
         if (!live) return;
-        setState({ pending: false, done: true, classroom: data?.join_code ? { id: data.id, name: data.name, join_code: data.join_code } : null });
+        setState({ pending: false, done: true, classroom: data?.join_code ? { id: data.id, name: data.name, join_code: data.join_code, language: data.language } : null });
       })
       .catch(() => live && setState({ pending: false, done: true, classroom: null }));
     return () => {
@@ -84,13 +105,14 @@ function useClassroomLookup(classroomId: string, enabled: boolean): { pending: b
 }
 
 interface InviteReadyProps {
-  classroom: { id: string; name: string; join_code: string };
+  classroom: { id: string; name: string; join_code: string; language: string };
   packKey: string | null;
+  lessonId: string | null;
   t: T;
   language: string;
 }
 
-function InviteReady({ classroom, packKey, t, language }: InviteReadyProps) {
+function InviteReady({ classroom, packKey, lessonId, t, language }: InviteReadyProps) {
   const { hasPro, status, loading: proLoading } = useTeacherPro();
   const { markInviteCopied } = useTeacherActivationProgress();
   const { playPlayerJoinedSound } = useSoundEffects();
@@ -158,11 +180,8 @@ function InviteReady({ classroom, packKey, t, language }: InviteReadyProps) {
 
   const joinUrl = origin ? classroomJoinUrl(origin, language, classroom.join_code) : '';
   const displayHost = origin ? `${origin.replace(/^https?:\/\//, '')}/${language}/join` : '';
-  const start = inviteStartTarget({ locale: language, classroomId: classroom.id, packKey });
-  const onStart = () => {
-    if (start.intent) writeQuickLaunchIntent({ ...start.intent, title: t(start.intent.packKey ?? '') });
-    trackFirstRoundGuideClicked({ surface: 'class_ready', locale: language, step: 'start_round' });
-  };
+  const startHref = `/${language}/education/classroom-game?flow=${QUICK_LAUNCH_FLOW}`;
+  const firstGame = useFirstGame({ classroom, packKey, lessonId, t, language });
 
   return (
     <>
@@ -171,12 +190,13 @@ function InviteReady({ classroom, packKey, t, language }: InviteReadyProps) {
         roster={roster}
         joinUrl={joinUrl}
         displayHost={displayHost}
-        startHref={start.href}
+        startHref={startHref}
         homeHref={`/${language}/teacher`}
         reduced={reduced}
         onShare={(c, p) => void share(c, p)}
         onOpenProjector={() => setProjectorOpen(true)}
-        onStart={onStart}
+        words={firstGame.words}
+        play={firstGame.play}
         rehearse={
           <RehearseWithBotsButton
             classroomId={classroom.id}
@@ -191,8 +211,8 @@ function InviteReady({ classroom, packKey, t, language }: InviteReadyProps) {
         footer={
           <ClassCreatedAsk
             language={language}
-            href={start.href}
-            onStart={onStart}
+            href={startHref}
+            onStart={() => trackFirstRoundGuideClicked({ surface: 'class_ready', locale: language, step: 'day0_bridge' })}
             className="w-full text-start lg:col-span-2 lg:mx-auto lg:max-w-xl"
           />
         }
@@ -201,6 +221,86 @@ function InviteReady({ classroom, packKey, t, language }: InviteReadyProps) {
       {projectorOpen ? <HqProjectorSheet classroom={classroom} onClose={() => setProjectorOpen(false)} /> : null}
     </>
   );
+}
+
+async function lessonExists(id: string): Promise<boolean> {
+  const { data, error } = await getLesson(id);
+  if (error) throw new Error(error.message);
+  return Boolean(data);
+}
+
+function useFirstGame({ classroom, packKey, lessonId, t, language }: { classroom: InviteReadyProps['classroom']; packKey: string | null; lessonId: string | null; t: T; language: string }) {
+  const router = useRouter();
+  const { user } = useAuth();
+  const { createLesson } = useLessons();
+  const packs = packsForLanguage(classroom.language);
+  const savedPack = packs.find((p) => p.nameKey === packKey) ?? null;
+  const [text, setText] = useState('');
+  const [picked, setPicked] = useState<string>(() => (savedPack ?? recommendedPack(classroom.language, null)).nameKey);
+  const [error, setError] = useState<FirstGameError>(null);
+  const [busy, setBusy] = useState(false);
+  const inFlight = useRef(false);
+  const box = useRef<HTMLTextAreaElement>(null);
+  const { words, skipped } = readPasted(text);
+  const pack = packs.find((p) => p.nameKey === picked) ?? packs[0];
+
+  useEffect(() => {
+    const onPageShow = (e: PageTransitionEvent) => {
+      if (!e.persisted) return;
+      inFlight.current = false;
+      setBusy(false);
+    };
+    window.addEventListener('pageshow', onPageShow);
+    return () => window.removeEventListener('pageshow', onPageShow);
+  }, []);
+
+  const onPlay = async () => {
+    if (inFlight.current) return;
+    const blocked: FirstGameError = skipped > 0 && words.length === 0 ? 'phrasesOnly' : words.length > 0 && words.length < MIN_PASTED_WORDS ? 'tooFew' : null;
+    if (blocked) {
+      setError(blocked);
+      box.current?.focus();
+      return;
+    }
+    inFlight.current = true;
+    setBusy(true);
+    trackFirstRoundGuideClicked({ surface: 'class_ready', locale: language, step: 'start_round' });
+    const choice: FirstGameChoice = words.length > 0 ? { kind: 'paste', words } : { kind: 'pack', pack, lessonId: savedPack && pack.nameKey === savedPack.nameKey ? lessonId : null };
+    const title = choice.kind === 'paste' ? t('eduShell.setup.words.listName', { date: new Date().toLocaleDateString(language, { month: 'short', day: 'numeric' }) }) : t(pack.nameKey);
+    try {
+      const launch = await firstGameIntent({ choice, classroomId: classroom.id, language: classroom.language, title, teacherId: user?.id ?? '', createLesson, lessonExists });
+      if (launch.assignFailed) toast.error(t('eduShell.setup.assignFailed'));
+      writeQuickLaunchIntent(launch.intent);
+      router.push(`/${language}/education/classroom-game?flow=${QUICK_LAUNCH_FLOW}`);
+    } catch {
+      inFlight.current = false;
+      setBusy(false);
+      toast.error(t('eduShell.setup.words.playFailed'));
+    }
+  };
+
+  return {
+    words: (
+      <FirstGameWords
+        text={text}
+        onTextChange={(next) => {
+          setText(next);
+          setError(null);
+        }}
+        count={words.length}
+        skipped={skipped}
+        minWords={MIN_PASTED_WORDS}
+        error={error}
+        packs={packs}
+        packKey={pack.nameKey}
+        savedPackKey={lessonId ? savedPack?.nameKey ?? null : null}
+        onPackChange={setPicked}
+        textareaRef={box}
+        t={t}
+      />
+    ),
+    play: <PlayNowButton busy={busy} onClick={() => void onPlay()} t={t} />,
+  };
 }
 
 export default ClassSetupInvite;

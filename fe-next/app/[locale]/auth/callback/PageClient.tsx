@@ -17,7 +17,13 @@ import {
   type AuthSyncMessage,
 } from '@/utils/crossTabAuthSync';
 import { PageLoader } from '@/components/ui/PageLoader';
-import { authFailureHref, resolveAuthNext } from '@/lib/navigation/authReturnPath';
+import {
+  authFailureHref,
+  eduAuthOriginFromCookies,
+  forgetEduAuthOrigin,
+  resolveAuthNext,
+  withRememberedEduOrigin,
+} from '@/lib/navigation/authReturnPath';
 import { LoadingUI } from './CallbackLoadingUI';
 import { clearSupabaseAuthData } from './clearSupabaseAuthData';
 import { isBareCallbackVisit } from './noSessionReport';
@@ -68,20 +74,22 @@ function AuthCallbackContent(): React.JSX.Element {
   }, []);
 
   // Handle retry - clear cookies and redirect to sign-in
+  const nextParam = useCallback(
+    () => withRememberedEduOrigin(searchParams.get('next'), eduAuthOriginFromCookies(document.cookie)),
+    [searchParams],
+  );
+
   const handleRetry = useCallback(() => {
     clearSupabaseAuthData();
-    const next = searchParams.get('next');
+    const next = nextParam();
     window.history.replaceState(null, '', window.location.pathname);
     router.replace(authFailureHref(locale, next, 'timeout'));
-  }, [router, locale, searchParams]);
+  }, [router, locale, nextParam]);
 
-  const getRedirectUrl = useCallback(
-    () => resolveAuthNext(searchParams.get('next'), locale),
-    [searchParams, locale],
-  );
+  const getRedirectUrl = useCallback(() => resolveAuthNext(nextParam(), locale), [nextParam, locale]);
   const failureHref = useCallback(
-    (reason?: string) => authFailureHref(locale, searchParams.get('next'), reason),
-    [searchParams, locale],
+    (reason?: string) => authFailureHref(locale, nextParam(), reason),
+    [nextParam, locale],
   );
 
   // Track if we've already navigated away
@@ -92,6 +100,7 @@ function AuthCallbackContent(): React.JSX.Element {
     // Prevent double navigation
     if (hasNavigated.current) return;
     hasNavigated.current = true;
+    if (!url.includes('auth_error=')) forgetEduAuthOrigin();
     // Clean up all listeners
     cleanupFunctions.current.forEach(fn => fn());
     cleanupFunctions.current = [];

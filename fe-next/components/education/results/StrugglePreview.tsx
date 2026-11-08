@@ -1,11 +1,14 @@
 'use client';
 
+import { useCallback, useState } from 'react';
 import Link from 'next/link';
-import { BarChart3 } from 'lucide-react';
+import { BarChart3, Table2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import type { ClassroomPlayerMastery } from '@/shared/types/classroom';
 import { trackResultsAction } from './trackResultsAction';
+import { RoundWordGridDialog } from './RoundWordGridDialog';
+import type { RoundWordGridInput } from './roundWordGrid';
 
 export interface StrugglePreviewProps {
   masteryByPlayer: Record<string, ClassroomPlayerMastery>;
@@ -14,11 +17,15 @@ export interface StrugglePreviewProps {
   t: (key: string, params?: Record<string, string | number>) => string;
   /** Bars drawn on the wall; the report has the rest. */
   maxBars?: number;
+  /** This round's coverage, for the word-by-student grid. */
+  round?: RoundWordGridInput;
 }
 
 /** A Pro teacher's door to the class report. Read by the whole class, so it never prints a name. */
-export function StrugglePreview({ masteryByPlayer, teacherName, language, t, maxBars = 5 }: StrugglePreviewProps) {
+export function StrugglePreview({ masteryByPlayer, teacherName, language, t, maxBars = 5, round }: StrugglePreviewProps) {
   const { hasPro, loading } = useTeacherPro();
+  const [gridOpen, setGridOpen] = useState(false);
+  const closeGrid = useCallback(() => setGridOpen(false), []);
   const host = teacherName.trim().toLowerCase();
   const pcts = Object.entries(masteryByPlayer)
     .filter(([name, m]) => name.trim().toLowerCase() !== host && m && m.total > 0)
@@ -59,7 +66,26 @@ export function StrugglePreview({ masteryByPlayer, teacherName, language, t, max
           <BarChart3 className="size-4 shrink-0" aria-hidden="true" />
           {t('education.results.fullReport')}
         </Link>
+        {round && (round.coverage?.length ?? 0) > 0 ? (
+          <>
+            <button
+              type="button"
+              data-testid="struggle-open-grid"
+              onClick={() => setGridOpen(true)}
+              className="inline-flex min-h-11 items-center gap-1.5 rounded-neo border-[3px] border-neo-black bg-neo-cream px-3 font-neo-display text-sm font-black text-neo-black shadow-hard-lg transition-[transform,box-shadow] duration-150 hover:-translate-y-px active:translate-x-[3px] active:translate-y-[3px] active:shadow-none motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan @[96rem]/results:min-h-14 @[96rem]/results:text-lg"
+            >
+              <Table2 className="size-4 shrink-0" aria-hidden="true" />
+              {t('eduProResults.openGrid')}
+            </button>
+            <p data-testid="struggle-open-grid-note" className="text-xs font-semibold text-neo-cream/80 @[96rem]/results:text-sm">
+              {t('eduProResults.openGridNote')}
+            </p>
+          </>
+        ) : null}
       </div>
+      {gridOpen && round ? (
+        <RoundWordGridDialog language={language} round={round} offer={null} upsell={false} onClose={closeGrid} />
+      ) : null}
     </section>
   );
 }

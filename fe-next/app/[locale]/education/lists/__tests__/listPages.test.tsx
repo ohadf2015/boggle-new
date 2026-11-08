@@ -15,6 +15,7 @@ import ItemPage, { generateMetadata as itemMeta } from '../[lang]/[item]/page';
 import TopicPage, { generateMetadata as topicMeta } from '../topic/[topic]/page';
 import { getCatalog } from '@/lib/seo/wordLists/catalog';
 import { listPath, LANG_SEGMENT } from '@/lib/seo/wordLists/paths';
+import { accessReturnPath } from '@/lib/education/accessReturnPath';
 
 const catalog = getCatalog();
 const p = <T,>(v: T) => Promise.resolve(v);
@@ -87,6 +88,19 @@ describe('list detail page', () => {
     expect(container.querySelector('[data-cta="practice-solo"]')).toBeTruthy();
     expect(container.querySelector('a[href^="/he/education/access"]')).toBeTruthy();
     expect(container.textContent).not.toMatch(/eg2Seo\./);
+  });
+
+  it('Given a signed-out teacher, When either teacher CTA is followed, Then sign-up returns to new-class carrying this list', async () => {
+    const { container } = render(await ItemPage({ params: p({ locale: 'he', lang: 'english', item: enList.slug }) }));
+    const want = `/he/education/access?from=${encodeURIComponent(`/he/teacher/classroom/new?publicList=${encodeURIComponent(`english/${enList.slug}`)}`)}`;
+    const hrefs = [...container.querySelectorAll('a[href^="/he/education/access"]')].map((a) => a.getAttribute('href'));
+    expect(hrefs.length).toBeGreaterThanOrEqual(2);
+    for (const h of hrefs) expect(h).toBe(want);
+    const back = accessReturnPath(new URL(want, 'https://x.test').searchParams.get('from'));
+    expect(back).not.toBeNull();
+    const target = new URL(back!, 'https://x.test');
+    expect(target.pathname).toBe('/he/teacher/classroom/new');
+    expect(target.searchParams.get('publicList')).toBe(`english/${enList.slug}`);
   });
 
   it('sets canonical and a reciprocal hreflang cluster limited to the locales that have the list', async () => {

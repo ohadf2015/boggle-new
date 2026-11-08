@@ -70,7 +70,19 @@ describe('ClassSetupDetails explains the two ways out', () => {
   it('Then "Create and play" says what it opens, and the word list sticker says it is the word list', () => {
     renderDetails();
     expect(screen.getByTestId('setup-start-live')).toHaveAttribute('aria-describedby', 'setup-start-live-hint');
-    expect(screen.getByTestId('setup-start-live-hint')).toHaveTextContent('eduShell.setup.createAndPlayHint');
+    expect(screen.getByTestId('setup-start-live-hint')).toHaveTextContent('eduShell.setup.words.createHint');
     expect(screen.getByTestId('setup-advanced-summary').textContent).toContain('eduShell.setup.packSticker');
+  });
+
+  it('Then the main button says it creates the class, with no play icon, since the game starts on the next screen', () => {
+    renderDetails();
+    const main = screen.getByTestId('setup-start-live');
+    expect(main).toHaveTextContent('eduShell.setup.createClass');
+    expect(main.querySelector('svg')).toBeNull();
+  });
+
+  it('Given no separate "create only" handler, Then there is one create button, not two that do the same thing', () => {
+    renderDetails({ onCreateOnly: undefined });
+    expect(screen.queryByTestId('setup-create')).toBeNull();
   });
 });

@@ -233,6 +233,7 @@ export async function calculateAndBroadcastFinalScores(
         language,
         classroomGame,
         participationBonus,
+        gameMode: game.gameMode,
         ...(crossword ? { placedWords: crossword.placedWords } : {}),
         players: resultsWithIconAchievements.map((p) => ({
           username: p.username,
