@@ -64,7 +64,7 @@ describe('teacher upgrade metadata matches the winning H1', () => {
     const pricing = readFileSync(join(__dirname, '..', '..', '..', 'pricing', 'page.tsx'), 'utf8');
     for (const page of [upgrade, pricing]) {
       expect(page).not.toContain('unlimited classrooms');
-      expect(page).toContain('See who got it before the bell');
+      expect(page).toContain('See who understood — before the bell');
     }
   });
 });

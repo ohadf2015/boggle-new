@@ -2779,10 +2779,10 @@ const en = {
       "ogDescription": "Get in touch with the LexiClash team. Send feedback, report issues, or just say hello."
     },
     "teacherUpgrade": {
-      "title": "See who got it before the bell | LexiClash",
-      "description": "See who got it before the bell. Teacher Pro is $9/month after a 14-day free trial. Cancel anytime.",
-      "ogTitle": "See who got it before the bell.",
-      "ogDescription": "See who got it before the bell. Teacher Pro is $9/month after a 14-day free trial. Cancel anytime."
+      "title": "See who understood — before the bell | LexiClash",
+      "description": "See who understood — before the bell. Teacher Pro is $9/month after a 14-day free trial. Cancel anytime.",
+      "ogTitle": "See who understood — before the bell.",
+      "ogDescription": "See who understood — before the bell. Teacher Pro is $9/month after a 14-day free trial. Cancel anytime."
     },
     "teacherPricing": {
       "title": "LexiClash Pricing: Free Plan and Teacher Pro at $9/month",
@@ -13932,7 +13932,7 @@ const en = {
       "checkoutError": "Couldn't start checkout. Try again.",
       "signInRequired": "Sign in to upgrade to Teacher Pro.",
       "currentPlan": "You're on this plan",
-      "upgradePricingTitle": "See who got it before the bell.",
+      "upgradePricingTitle": "See who understood — before the bell.",
       "upgradePricingSubtitle": "Manage unlimited classrooms and students",
       "upgradePricingReassure": "Cancel anytime. Your classrooms, lessons and student data always stay safe.",
       "classLimitReached": "Classroom limit reached. Upgrade to Teacher Pro for unlimited classrooms.",
