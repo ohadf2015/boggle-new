@@ -2,15 +2,14 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import type { MouseEvent } from 'react';
-import Avatar from '@/components/Avatar';
+import { useCallback, useEffect, type MouseEvent } from 'react';
 import { ModeGlyph } from '@/components/quick-play/ModeGlyph';
 import { RandomGlyph } from '@/components/quick-play/RandomGlyph';
 import { QuickResultsRays, SparkleLoop } from '@/components/quick-play/QuickResultsFx';
 import { NODE_COLORS } from '@/components/quick-play/modeColors';
 import type { QuickMode } from '@/components/quick-play/types';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
-import { EditAvatarButton } from './EditAvatarButton';
+import { setHeroAvatarProps, setHeroAvatarSlot } from './heroAvatarBridge';
 import { HeroQuickLinks } from './HeroQuickLinks';
 import { quickPlayHref } from '@/lib/quickPlay/startMode';
 import { trackLandingCtaClick } from '@/utils/growthTracking';
@@ -31,6 +30,25 @@ interface PlayHeroProps {
 }
 
 function AvatarStage({ avatar, animate, t, onAvatarSaved }: Pick<PlayHeroProps, 'avatar' | 'animate' | 't' | 'onAvatarSaved'>) {
+  // The avatar UI (Avatar.tsx → AvatarRenderer → avatar/parts, and the edit
+  // button → AvatarBuilderModal) must stay OUT of the landing module graph —
+  // LandingView.bundleGraph.test.ts. The stage publishes two bare slot <div>s
+  // and the avatar props on heroAvatarBridge; HeroAvatarIsland (runtime
+  // import() from HeroAvatarMount, outside LandingView's graph) portals the
+  // avatar trio and the edit button in after first paint. The slots carry the
+  // same fixed box the avatar fills, so the swap causes no CLS.
+  const avatarSlotCallback = useCallback((el: HTMLDivElement | null) => {
+    setHeroAvatarSlot('hero', el);
+  }, []);
+  const editSlotCallback = useCallback((el: HTMLDivElement | null) => {
+    setHeroAvatarSlot('heroEdit', el);
+  }, []);
+
+  useEffect(() => {
+    setHeroAvatarProps(avatar ? { userId: avatar.userId, customAvatar: avatar.customAvatar, t, onAvatarSaved } : null);
+    return () => setHeroAvatarProps(null);
+  }, [avatar, t, onAvatarSaved]);
+
   return (
     <div className="relative flex h-[176px] w-full items-center [@media(max-height:700px)]:h-[132px] justify-center lg:h-[440px] 2xl:h-[520px]">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-40 lg:opacity-60">
@@ -40,21 +58,11 @@ function AvatarStage({ avatar, animate, t, onAvatarSaved }: Pick<PlayHeroProps, 
       <div className="relative z-10">
       <div className={`relative [@media(max-height:700px)]:scale-[0.7] ${animate ? 'animate-[qp-avatar-pop_0.7s_cubic-bezier(0.3,0.9,0.4,1)_both]' : ''}`}>
         <div className={animate ? 'animate-[qp-avatar-bob_2.8s_ease-in-out_0.9s_infinite]' : ''}>
-          {avatar ? (
-            <>
-              <div className="lg:hidden">
-                <Avatar userId={avatar.userId} customAvatar={avatar.customAvatar ?? undefined} pixelSize={140} mood="idle" />
-              </div>
-              <div className="hidden lg:block 2xl:hidden">
-                <Avatar userId={avatar.userId} customAvatar={avatar.customAvatar ?? undefined} pixelSize={260} mood="idle" />
-              </div>
-              <div className="hidden 2xl:block">
-                <Avatar userId={avatar.userId} customAvatar={avatar.customAvatar ?? undefined} pixelSize={300} mood="idle" />
-              </div>
-            </>
-          ) : (
-            <div className="h-[140px] w-[140px] lg:h-[260px] lg:w-[260px] 2xl:h-[300px] 2xl:w-[300px]" />
-          )}
+          <div
+            ref={avatar ? avatarSlotCallback : undefined}
+            data-testid="hp-avatar-slot"
+            className="h-[140px] w-[140px] lg:h-[260px] lg:w-[260px] 2xl:h-[300px] 2xl:w-[300px]"
+          />
         </div>
         <span
           aria-hidden="true"
@@ -82,7 +90,7 @@ function AvatarStage({ avatar, animate, t, onAvatarSaved }: Pick<PlayHeroProps, 
       </div>
       {avatar && (
         <div className="absolute end-1 bottom-2 z-20 [@media(max-height:700px)]:end-7 [@media(max-height:700px)]:bottom-8 lg:-end-4 lg:bottom-6">
-          <EditAvatarButton t={t} config={avatar.customAvatar} onSaved={onAvatarSaved} />
+          <div ref={editSlotCallback} data-testid="hp-edit-avatar-slot" />
         </div>
       )}
       </div>

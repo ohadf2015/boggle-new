@@ -12,6 +12,7 @@ import { isOnboardingAllowedRoute } from '@/lib/onboarding/allowedRoutes';
 import { isQrScanArrival } from '@/utils/utmCapture';
 import { isCrawler } from '@/lib/seo/isCrawler';
 import { LandingView } from '@/components/landing';
+import { HeroAvatarMount } from '@/components/home-preview/HeroAvatarMount';
 import { dropLaunch, raiseLaunch } from '@/components/landing/home/launchStore';
 import { useExperiment } from '@/hooks/useExperiment';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -316,6 +317,10 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
         initialData={initialData}
         onStartOnboarding={isNewUser && routeAllowsOnboarding ? handleStartOnboarding : undefined}
       />
+      {/* Hero avatar island loads from HERE, not inside LandingView: a runtime
+          import() after first paint keeps the avatar SVG part library out of
+          the landing route's module graph (LandingView.bundleGraph.test.ts). */}
+      <HeroAvatarMount />
       {showFTUE && routeAllowsOnboarding && (
         <OnboardingFlow onComplete={handleFTUEComplete} entry={ftueEntry} />
       )}
