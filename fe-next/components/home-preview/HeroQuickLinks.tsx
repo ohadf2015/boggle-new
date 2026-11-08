@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Flame, Users } from 'lucide-react';
+import { Flame } from 'lucide-react';
 import { useTodayLabel } from './useTodayLabel';
 import type { ReactNode } from 'react';
 
@@ -43,7 +43,7 @@ export function HeroQuickLinks({ lang, t, streak, streakLoading }: HeroQuickLink
   const date = useTodayLabel(lang, { weekday: 'short', day: 'numeric', month: 'short' });
   const dailySub = !streakLoading && streak > 0 ? t('homePlay.chipStreak', { n: streak }) : date;
   return (
-    <ul className="grid grid-cols-2 gap-2.5 lg:gap-4" data-testid="hp-quick-links">
+    <ul className="grid grid-cols-1 gap-2.5 lg:gap-4" data-testid="hp-quick-links">
       <Chip
         href={`/${lang}/daily`}
         testId="hp-chip-daily"
@@ -51,14 +51,6 @@ export function HeroQuickLinks({ lang, t, streak, streakLoading }: HeroQuickLink
         icon={<Flame className="h-5 w-5 lg:h-6 lg:w-6" strokeWidth={2.75} aria-hidden="true" />}
         title={t('homePlay.chipDaily')}
         sub={dailySub}
-      />
-      <Chip
-        href={`/${lang}/multiplayer`}
-        testId="hp-chip-mp"
-        iconBg="bg-neo-pink"
-        icon={<Users className="h-5 w-5 lg:h-6 lg:w-6" strokeWidth={2.75} aria-hidden="true" />}
-        title={t('homePlay.chipMp')}
-        sub={t('homePlay.chipMpSub')}
       />
     </ul>
   );
