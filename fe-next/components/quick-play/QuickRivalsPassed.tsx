@@ -3,6 +3,9 @@
 import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { QuickGhostRival } from '@/lib/quickPlay/ghostRivals';
+import { QuickDetailCard } from './QuickDetailCard';
+
+const MEDAL = ['bg-neo-yellow', 'bg-neo-cyan', 'bg-neo-orange'];
 
 interface QuickRivalsPassedProps {
   /** The rivals this round actually raced (from the round payload). */
@@ -39,42 +42,48 @@ export function QuickRivalsPassed({ rivals, myScorePct, myName, myUserId, myAvat
   ].sort((a, b) => b.pct - a.pct);
 
   return (
-    <div
-      className="overflow-hidden rounded-2xl border-neo-thick border-black bg-neo-navy-elevated shadow-hard"
-      data-testid="quick-rivals-passed"
-    >
-      <div className="flex items-baseline justify-between border-b-2 border-black/40 px-3 py-2">
-        <span className="font-neo-display text-[10px] uppercase tracking-[0.18em] text-neo-white/55">
-          {t('quickPlay.solo.raceStandings', 'This round')}
-        </span>
-        <span className="font-neo-display text-xs font-bold text-neo-lime" data-testid="quick-rivals-passed-count">
+    <QuickDetailCard
+      testId="quick-rivals-passed"
+      band="bg-neo-lime"
+      title={t('quickPlay.solo.raceStandings', 'This round')}
+      aside={
+        <span data-testid="quick-rivals-passed-count">
           {t('quickPlay.solo.rivalsPassed', 'Passed {passed} of {total}', {
             passed: String(passed),
             total: String(rivals.length),
           })}
         </span>
-      </div>
+      }
+    >
       <ul>
         {rows.map((row, i) => (
           <li
             key={row.key}
             data-testid={row.isMe ? 'quick-rival-row-me' : 'quick-rival-row'}
-            className={`flex items-center gap-2.5 border-b-2 border-black/30 px-3 py-1.5 text-sm last:border-b-0 ${
-              row.isMe ? 'bg-neo-lime/15 text-neo-cream' : 'text-neo-cream/85'
+            className={`flex items-center gap-2.5 border-b-2 border-black/30 px-3 py-2 text-sm last:border-b-0 ${
+              row.isMe
+                ? 'relative z-10 mx-1 -rotate-1 rounded-lg border-[3px] border-black bg-neo-yellow font-bold text-black shadow-hard'
+                : 'text-neo-cream/85'
             }`}
           >
-            <span className="w-4 text-center font-neo-display text-xs font-bold text-neo-white/45">{i + 1}</span>
+            <span
+              className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 border-black font-neo-display text-xs font-bold ${
+                i < 3 ? `${MEDAL[i]} text-black` : row.isMe ? 'text-black' : 'text-neo-white/60'
+              }`}
+            >
+              {i + 1}
+            </span>
             <Avatar userId={row.userId} customAvatar={row.customAvatar} size="sm" disableEffects />
             <span className="min-w-0 flex-1 truncate">{row.name}</span>
             {!row.isMe && myScorePct > row.pct && (
-              <span className="shrink-0 rounded-md border-2 border-black bg-neo-lime px-1.5 text-[10px] font-bold uppercase tracking-wide text-black">
+              <span className="shrink-0 -rotate-6 rounded-md border-2 border-black bg-neo-lime px-1.5 font-neo-display text-[10px] font-bold uppercase tracking-wide text-black shadow-hard-sm">
                 {t('quickPlay.solo.passed', 'passed')}
               </span>
             )}
-            <span className="w-11 shrink-0 text-right font-neo-display font-bold tabular-nums">{row.pct}%</span>
+            <span className={`w-12 shrink-0 text-end font-neo-display font-bold tabular-nums ${row.isMe ? 'text-base' : ''}`} dir="ltr">{row.pct}%</span>
           </li>
         ))}
       </ul>
-    </div>
+    </QuickDetailCard>
   );
 }
