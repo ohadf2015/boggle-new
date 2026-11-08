@@ -367,6 +367,8 @@ export type GrowthEvent =
   // ({ coins, xp, mode }). Each fires once per results screen.
   | 'best_missed_word_shown'
   | 'results_reward_line_shown'
+  // Daily Word Wheel: the day's golden word was found ({ date, language, source: in_game | results }), once per day.
+  | 'golden_word_found'
   // Word Wheel daily post-game signup funnel (experiment wheel-signup-offer-v1).
   // The wheel bypasses the generic guest-stats signup gate, so these are its own
   // conversion events. Properties: { experiment, variant, offerType, streakDays, score }.

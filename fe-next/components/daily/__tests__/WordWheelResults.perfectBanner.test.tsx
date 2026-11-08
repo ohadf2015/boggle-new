@@ -9,6 +9,12 @@ import { render, screen } from '@testing-library/react';
 import WordWheelResults from '../WordWheelResults';
 import type { WordWheelGameResult } from '../WordWheelGame';
 
+const golden = vi.hoisted(() => ({ word: '' }));
+vi.mock('../wheel/useWheelGoldenWord', () => ({
+  useWheelGoldenWord: () => (w: string) => !!golden.word && w.toUpperCase() === golden.word,
+  reportGoldenWordFound: vi.fn(),
+}));
+
 vi.mock('framer-motion', () => ({
   m: new Proxy({}, {
     get: () => ({ children, ...props }: React.ComponentProps<'div'>) => <div {...props}>{children}</div>,
@@ -88,5 +94,17 @@ describe('WordWheelResults — exceptional banner gating', () => {
   it('many short words alone do not make a wizard', () => {
     renderResults(coverage);
     expect(screen.queryByTestId('word-wheel-perfect-banner')).toBeNull();
+  });
+
+  it('Given the golden word among the found words, Then one "you found the golden word" line shows', () => {
+    golden.word = 'DEFGH';
+    renderResults(mid);
+    expect(screen.getByTestId('wheel-golden-line').textContent).toBe('wordWheel.golden.found');
+    golden.word = '';
+  });
+
+  it('Given no golden word found, Then no line', () => {
+    renderResults(mid);
+    expect(screen.queryByTestId('wheel-golden-line')).toBeNull();
   });
 });

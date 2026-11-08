@@ -9353,6 +9353,7 @@ const en = {
     }
   },
   "wordWheel": {
+    "golden": { "reveal": "Golden word!", "found": "You found the golden word", "share": "Found the golden word" },
     "climb": {
       "showBoard": "Today's board",
       "hideBoard": "Hide board",

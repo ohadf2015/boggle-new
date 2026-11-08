@@ -9880,6 +9880,7 @@ const he = {
     }
   },
   "wordWheel": {
+    "golden": { "reveal": "מילת הזהב!", "found": "מצאתם את מילת הזהב", "share": "מצאתי את מילת הזהב" },
     "climb": {
       "showBoard": "הלוח של היום",
       "hideBoard": "הסתר לוח",

@@ -12,14 +12,18 @@ interface WheelShareRowProps {
   score: number;
   wordsFound: string[];
   puzzleNumber: number;
+  /** The golden word, when found: the text says "Found the golden word" and never names it. */
+  goldenWord?: string | null;
   onShareClick?: (method: 'native' | 'copy') => void;
 }
 
-export default function WheelShareRow({ t, score, wordsFound, puzzleNumber, onShareClick }: WheelShareRowProps) {
+export default function WheelShareRow({ t, score, wordsFound, puzzleNumber, goldenWord = null, onShareClick }: WheelShareRowProps) {
   const [copied, setCopied] = useState(false);
-  const shareText = stripEmoji(
-    buildShareText({ mode: 'classic', puzzleNumber, score, words: wordsFound }, t as (k: string) => string),
-  );
+  const base = buildShareText({ mode: 'classic', puzzleNumber, score, words: wordsFound }, t as (k: string) => string);
+  // The golden line goes under the title; any line naming the word (e.g. "longest") is left out.
+  const [title, ...rest] = base.split('\n');
+  const hides = (line: string) => !!goldenWord && line.toUpperCase().includes(goldenWord.toUpperCase());
+  const shareText = stripEmoji(goldenWord ? [title, t('wordWheel.golden.share'), ...rest.filter((l) => !hides(l))].join('\n') : base);
 
   const copy = useCallback(async () => {
     onShareClick?.('copy');
