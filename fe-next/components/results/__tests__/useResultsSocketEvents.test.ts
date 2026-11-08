@@ -114,7 +114,6 @@ describe('useResultsSocketEvents', () => {
       expect(result.current.xpGainedData).toBeNull();
       expect(result.current.levelUpData).toBeNull();
       expect(result.current.showLevelUpCelebration).toBe(false);
-      expect(result.current.nearMisses).toEqual([]);
       expect(result.current.referralMilestone).toBeNull();
       expect(result.current.showReferralMilestone).toBe(false);
       expect(result.current.readyUsernames).toEqual([]);
@@ -157,7 +156,8 @@ describe('useResultsSocketEvents', () => {
         'levelUp',
         expect.any(Function)
       );
-      expect(mockSocket.on).toHaveBeenCalledWith(
+      // Nothing renders near-misses any more, so nothing listens for them.
+      expect(mockSocket.on).not.toHaveBeenCalledWith(
         'engagement:nearMisses',
         expect.any(Function)
       );
@@ -416,48 +416,6 @@ describe('useResultsSocketEvents', () => {
       // THEN
       expect(result.current.levelUpData).toEqual(levelUpData);
       expect(result.current.showLevelUpCelebration).toBe(true);
-    });
-  });
-
-  describe('Near Miss Events', () => {
-    it('should update nearMisses when engagement:nearMisses event is received', () => {
-      // GIVEN
-      const { result } = renderHook(() =>
-        useResultsSocketEvents({ socket: mockSocket as unknown as Socket })
-      );
-
-      const nearMissData = {
-        nearMisses: [
-          { type: 'streak', current: 4, target: 5, remaining: 1, message: 'Almost there!' },
-          { type: 'score', current: 90, target: 100, remaining: 10, message: 'So close!' },
-        ],
-      };
-
-      // WHEN
-      act(() => {
-        triggerSocketEvent(mockSocket, 'engagement:nearMisses', nearMissData);
-      });
-
-      // THEN
-      expect(result.current.nearMisses).toHaveLength(2);
-      expect(result.current.nearMisses[0].message).toBe('Almost there!');
-    });
-
-    it('should not update nearMisses when array is empty', () => {
-      // GIVEN
-      const { result } = renderHook(() =>
-        useResultsSocketEvents({ socket: mockSocket as unknown as Socket })
-      );
-
-      // WHEN
-      act(() => {
-        triggerSocketEvent(mockSocket, 'engagement:nearMisses', {
-          nearMisses: [],
-        });
-      });
-
-      // THEN
-      expect(result.current.nearMisses).toEqual([]);
     });
   });
 

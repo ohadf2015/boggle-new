@@ -13,9 +13,9 @@ import { AchievementBadge } from '@/components/AchievementBadge';
 import { useShareOpenGuard } from '@/hooks/useShareOpenGuard';
 
 import WordFeedbackModal from '@/components/voting/WordFeedbackModal';
-import UnfinishedBoardTeaser from '@/components/results/UnfinishedBoardTeaser';
 import BonusBadgesRow from '@/components/results/BonusBadgesRow';
-import CoinRewardDisplay from '@/components/results/CoinRewardDisplay';
+import { BestMissedWordLine, RewardLine } from '@/components/results/ResultsLines';
+import { pickBestMissedWord } from '@/components/results/bestMissedWord';
 import SinglePlayerGoldTopUp from './results/components/SinglePlayerGoldTopUp';
 import DoubleGoldAdButton from '@/components/ads/DoubleGoldAdButton';
 import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
@@ -38,7 +38,6 @@ import { useIsDesktop } from '@/hooks/useDesktopLayout';
 import { useResultsStickyCtaHeight } from '@/hooks/useResultsStickyCtaHeight';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { displayScore } from '@/utils/scoreDisplay';
-import { useUnfinishedBoard } from '@/hooks/useUnfinishedBoard';
 import { usePostHogFlag } from '@/hooks/usePostHogFlag';
 import type { SinglePlayerResultsData, SinglePlayerMode } from './SinglePlayerView';
 import {
@@ -251,18 +250,13 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     trackGrowthEvent('results_viewed', { mode, score: results.playerScore });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Save unfinished board for carry-over feature
-  const { saveUnfinishedBoard } = useUnfinishedBoard();
-  const missedWordStrings = useMemo(
-    () => missedWords.map(w => w.word),
-    [missedWords]
-  );
-
-  useEffect(() => {
-    if (missedWordStrings.length >= 3 && results.grid) {
-      saveUnfinishedBoard(results.grid, missedWordStrings, mode, results.playerScore);
-    }
-  }, [missedWordStrings, results.grid, mode, results.playerScore, saveUnfinishedBoard]);
+  // The one best word on this board the player didn't find: the full board
+  // list when the game produced one, else the words the bots found.
+  const bestMissed = useMemo(() => pickBestMissedWord(
+    results.allPossibleWords?.length ? results.allPossibleWords : missedWords.map(w => w.word),
+    (results.playerWordData ?? []).map(w => w.word),
+    results.language || language,
+  ), [results.allPossibleWords, results.playerWordData, results.language, missedWords, language]);
 
   useAchievementsSave({ isAuthenticated, profile, results, updateProfile });
 
@@ -378,7 +372,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         subtitle={bannerConfig.announcement}
         score={displayScore(results.playerScore)}
         words={validWordCount}
-        coins={coinReward?.awarded ?? 0}
         avatar={{ userId: user?.id ?? 'guest', customAvatar: profile?.avatar_config ?? guestAvatar }}
         rank={playerRank}
         totalPlayers={mode === 'solo-bots' ? allParticipants.length : 1}
@@ -391,6 +384,10 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         longestWord={longestWordOf(results.playerWords || []) ?? ''}
       />
       <MissionsCompletedNote count={results.missionsCompleted} />
+      <div className="mt-2 flex flex-col items-center gap-1 text-center">
+        <RewardLine coins={coinReward?.awarded} xp={null} mode={mode} t={t} className="text-base text-neo-yellow" />
+        <BestMissedWordLine best={bestMissed} mode={mode} language={results.language || language} t={t} className="text-neo-cream/85" />
+      </div>
     </>
   );
 
@@ -513,9 +510,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           </CollapsibleSection>
         </div>
         <div className="space-y-3">
-          {missedWordStrings.length >= 3 && (
-            <UnfinishedBoardTeaser missedWords={missedWordStrings.slice(0, 3)} />
-          )}
           {mode === 'solo-bots' && botWordDetails.length > 0 && (
             <BotWordsSection botWordDetails={botWordDetails} language={gameLanguage}
               title={t('singlePlayer.botWordsFound')} t={t} defaultExpanded={false} />
@@ -541,7 +535,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
               <div className="space-y-4">{leaderboardBlock}{progressBlock}{showShareImmediate && shareBlock}</div>
               <div className="space-y-4">
                 {ctaBlock}
-                <CoinRewardDisplay reward={coinReward} variant="compact" mode={isAuthenticated ? 'earned' : 'teasing'} />
                 {/* Endowment/anchoring: double the exact amount they just earned */}
                 {isAuthenticated && coinReward?.awarded ? (
                   <DoubleGoldAdButton earnedAmount={coinReward.awarded} surface="sp_results_double" />

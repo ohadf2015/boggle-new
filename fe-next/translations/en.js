@@ -5274,6 +5274,8 @@ const en = {
     "newMessages": "New messages"
   },
   "results": {
+    "bestMissedWord": "You missed {word} ({letters} letters, {points} points)",
+    "rewardLine": { "coins": "coins", "xp": "XP" },
     "progressPulse": {
       "title": "Your progress",
       "game": "Game #{n}",
@@ -5655,13 +5657,6 @@ const en = {
     "blast": "Tomorrow's Blast has new combo patterns.",
     "adventure": "Next level preview loading... Come back to find out.",
     "seeYou": "See you tomorrow"
-  },
-  "unfinishedBoard": {
-    "teaser": "3 words are waiting for you tomorrow",
-    "resumeTitle": "Your unfinished board",
-    "resumeDesc": "You found {{found}}/{{total}} words",
-    "resumeCta": "Resume board",
-    "wordsWaiting": "words waiting"
   },
   "catalystTeaser": {
     "title": "Coming up in real games",
@@ -6598,31 +6593,9 @@ const en = {
       "levelsRemaining": "{{count}} levels remaining"
     }
   },
-  "nearMiss": {
-    "almostThere": "Almost There!",
-    "oneMoreGame": "One more game!",
-    "tip": "Tip",
-    "more": "more",
-    "soClose": "You're so close! One more game could do it."
-  },
   "oneMoreGame": {
     "defaultTitle": "One more game?",
     "defaultMessage": "Keep the streak going. Play again!"
-  },
-  "mysteryReward": {
-    "title": "Mystery Reward",
-    "youFound": "You found a mystery reward!",
-    "opening": "Opening...",
-    "revealing": "Revealing...",
-    "awesome": "Awesome!",
-    "gameCompletion": "Game Completion Bonus",
-    "winBonus": "Victory Bonus",
-    "longWord": "Long Word Bonus",
-    "achievement": "Achievement Bonus",
-    "gameCompletionExplain": "Keep playing for more chances.",
-    "winBonusExplain": "Winners get extra surprises.",
-    "longWordExplain": "Your vocabulary paid off.",
-    "achievementExplain": "Achievements come with perks."
   },
   "auth": {
     "google": {
@@ -7417,16 +7390,6 @@ const en = {
     "notFound": "Player not found",
     "error": "Couldn't load profile",
     "title": "Player Profile"
-  },
-  "streaks": {
-    "wager": {
-      "title": "Wager your coins",
-      "description": "Bet coins on your streak: win 3x or lose it all.",
-      "payout": "Potential payout",
-      "risk": "Break the streak and you lose your wager.",
-      "confirm": "Place wager",
-      "skip": "Skip"
-    }
   },
   "comebackBonus": {
     "title": "Welcome Back!",

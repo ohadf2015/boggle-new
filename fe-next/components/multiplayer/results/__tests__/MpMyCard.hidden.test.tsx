@@ -38,8 +38,7 @@ describe('MpMyCard — hideClassPosition (leaderboard hidden, intermission)', ()
     render(<MpMyCard {...base} hideClassPosition />);
     expect(screen.getByTestId('mp-my-score')).toHaveTextContent('240');
     expect(screen.getByTestId('mp-my-best-word')).toBeInTheDocument();
-    expect(screen.getByTestId('mp-my-xp')).toBeInTheDocument();
-    expect(screen.getByTestId('mp-my-coins')).toBeInTheDocument();
+    expect(screen.getByTestId('results-reward-line')).toBeInTheDocument();
   });
 
   it('prints no rank stamp, no winner framing, no rival gap', () => {

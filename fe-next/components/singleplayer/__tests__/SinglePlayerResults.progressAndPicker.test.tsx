@@ -355,6 +355,14 @@ describe('SinglePlayerResults — progress, picker, interstitial-on-exit', () =>
     expect(showInterstitial).toHaveBeenCalledWith('singleplayer-complete');
   });
 
+  it('Given board words the player did not find, When rendered, Then ONE "you missed" line shows the best of them (no masked teaser)', () => {
+    renderResults();
+    const lines = screen.getAllByTestId('best-missed-word');
+    expect(lines).toHaveLength(1);
+    expect(lines[0]).toHaveTextContent('results.bestMissedWord');
+    expect(screen.queryByTestId('masked-word-0')).toBeNull();
+  });
+
   it('Given no onStartPreset (older callers), When rendered, Then the picker is simply absent', () => {
     render(
       <SinglePlayerResults results={baseResults as any} mode="solo-bots" onPlayAgain={onPlayAgain} onBackToLobby={onBackToLobby} />

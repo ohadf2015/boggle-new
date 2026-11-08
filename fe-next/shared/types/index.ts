@@ -38,9 +38,6 @@ export type {
   CalendarClaimResult,
   AppliedReward,
   ComebackTier,
-  MysteryRewardTrigger,
-  MysteryRewardType,
-  RewardRarity,
   GameStatsForEngagement,
   EngagementSocketEvents,
 } from './engagement';

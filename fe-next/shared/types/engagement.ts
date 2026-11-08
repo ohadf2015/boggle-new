@@ -190,34 +190,6 @@ export interface OneMoreGamePrompt {
   xpNeeded?: number;
 }
 
-// ==================== Mystery Rewards ====================
-
-export type MysteryRewardTrigger =
-  | 'game_completion'
-  | 'long_word'
-  | 'achievement'
-  | 'win';
-
-export type MysteryRewardType =
-  | 'xp_multiplier'
-  | 'bonus_hints'
-  | 'streak_freeze'
-  | 'xp_flat'
-  | 'rare_title'
-  | 'instant_xp'
-  | 'combo_boost';
-
-export type RewardRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
-
-export interface MysteryReward {
-  triggerType: MysteryRewardTrigger;
-  type: MysteryRewardType;
-  value: number | string;
-  weight: number;
-  display: string;
-  rarity: RewardRarity;
-}
-
 // ==================== Engagement Status ====================
 
 export interface EngagementStatus {
@@ -278,8 +250,6 @@ export interface EngagementSocketEvents {
   'engagement:comebackStatus': (status: ComebackStatus) => void;
   'engagement:comebackClaimed': (result: ComebackClaimResult) => void;
   'engagement:loginResult': (result: LoginResult) => void;
-  'engagement:nearMisses': (nearMisses: NearMiss[]) => void;
   'engagement:oneMoreGame': (prompt: OneMoreGamePrompt | null) => void;
-  'engagement:mysteryReward': (reward: MysteryReward) => void;
   'engagement:status': (status: EngagementStatus) => void;
 }

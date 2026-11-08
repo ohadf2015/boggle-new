@@ -3,12 +3,11 @@
 import React, { memo, useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { m } from 'framer-motion';
-import { Bot, ArrowLeft, ArrowRight, Sparkles, Trophy, Swords, Infinity as InfinityIcon } from 'lucide-react';
+import { Bot, ArrowLeft, ArrowRight, Sparkles, Trophy, Infinity as InfinityIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { clearSessionPreservingUsername } from '@/utils/session';
-import { getCloseLossMessage } from '@/shared/utils/closeLossDetector';
 import useReducedMotion from '@/hooks/useReducedMotion';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 
@@ -25,12 +24,6 @@ interface NextStepPromptProps {
   variant?: 'desktop' | 'mobile' | 'landscape';
   /** Additional CSS classes */
   className?: string;
-  /** Whether this was a close multiplayer loss */
-  isCloseLoss?: boolean;
-  /** Absolute score difference for close loss */
-  scoreDifference?: number;
-  /** Callback for rematch action */
-  onRematch?: () => void;
   /** Hide the secondary "back to lobby" button (when a top-level back button already exists) */
   hideBackButton?: boolean;
   /**
@@ -70,9 +63,6 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
   onAction,
   variant = 'desktop',
   className,
-  isCloseLoss: isCloseLossProp = false,
-  scoreDifference,
-  onRematch,
   hideBackButton = false,
   beforeNavigate,
 }) => {
@@ -191,85 +181,13 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
   const description = t(config.descKey) || config.descKey;
   const backText = t('nextStep.backToLobby');
 
-  // Impression, once per mount. The close-loss branch below renders a rematch
-  // card instead of the cross-mode CTA, so it must not count as one — otherwise
-  // the click-through rate is diluted by a surface that has no such CTA.
-  const isCloseLossCard = isCloseLossProp && scoreDifference != null;
+  // Impression, once per mount.
   const impressionSent = useRef(false);
   useEffect(() => {
-    if (isCloseLossCard || impressionSent.current) return;
+    if (impressionSent.current) return;
     impressionSent.current = true;
     trackGrowthEvent('next_step_shown', { from: currentMode, to: config.destination, variant });
-  }, [isCloseLossCard, currentMode, config.destination, variant]);
-
-  // Close loss rematch prompt - overrides normal flow
-  if (isCloseLossProp && scoreDifference != null) {
-    const closeLossMsg = getCloseLossMessage(scoreDifference, t);
-    const rematchText = t('closeLoss.rematch');
-
-    return (
-      <m.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
-        className={cn(
-          'bg-linear-to-br from-neo-red to-neo-pink',
-          'border-4 border-neo-black rounded-neo-lg shadow-hard-xl',
-          'p-6 relative overflow-hidden',
-          className
-        )}
-      >
-        <div className="relative z-10 text-center space-y-4">
-          <Swords className="w-10 h-10 text-neo-black mx-auto" />
-          <div>
-            <h3 className="text-xl sm:text-2xl font-black uppercase text-neo-black tracking-tight">
-              {t('closeLoss.soClose')}
-            </h3>
-            <p className="text-neo-black/80 font-bold mt-1">
-              {closeLossMsg}
-            </p>
-          </div>
-
-          {onRematch && (
-            <button
-              type="button"
-              onClick={onRematch}
-              className={cn(
-                'inline-flex items-center justify-center gap-2',
-                'px-8 py-4',
-                'bg-neo-black text-neo-white',
-                'font-black text-lg uppercase',
-                'border-4 border-neo-black rounded-neo',
-                'shadow-hard-lg hover:shadow-hard-xl',
-                'hover:-translate-x-1 hover:-translate-y-1',
-                'active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed',
-                'transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity] duration-150'
-              )}
-            >
-              {rematchText}
-            </button>
-          )}
-
-          <button
-            type="button"
-            onClick={onBackToLobby}
-            className={cn(
-              'inline-flex items-center justify-center gap-2',
-              'px-6 py-2.5',
-              'bg-neo-white/80 text-neo-black',
-              'font-bold text-sm uppercase',
-              'border-3 border-neo-black rounded-neo',
-              'shadow-hard hover:shadow-hard-lg',
-              'transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity] duration-150'
-            )}
-          >
-            <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
-            {backText}
-          </button>
-        </div>
-      </m.div>
-    );
-  }
+  }, [currentMode, config.destination, variant]);
 
   // Landscape variant - compact horizontal layout
   if (variant === 'landscape') {

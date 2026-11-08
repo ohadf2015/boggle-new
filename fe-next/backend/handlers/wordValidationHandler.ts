@@ -23,7 +23,6 @@ import { inc, incPerGame } from '../utils/metrics.js';
 import logger from '../utils/logger.js';
 import { handlePeerRejection, type PeerValidationResult } from './peerRejectionHandler';
 import { hitRoomBoss } from '../services/classroomBoss/roomBoss.js';
-import { processLongWordEngagement } from './engagementHandler';
 import { getTilesOnBoardPath, recordBlastMove, recordBlastCollection, getWordPath, getOrInitPlayerBoard, safeCascadeBlastWord, validateBlastWordPath } from '../modules/blastModeManager.js';
 import { regenerateBlastBoardIfExhausted } from '../modules/blastBoardRegen.js';
 import { makePositionsMap } from '../modules/wordValidator.js';
@@ -372,14 +371,6 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
   if (achievements.length > 0) {
     logger.info('ACHIEVEMENT', `Emitting liveAchievementUnlocked to ${username}: ${achievements.map(a => a.key).join(', ')} (gameState: ${game.gameState})`);
     socket.emit('liveAchievementUnlocked', { achievements });
-  }
-
-  // Process long word engagement (8+ letters triggers mystery reward chance)
-  if (normalizedWord.length >= 8) {
-    if (userData?.authUserId) {
-      processLongWordEngagement(socket, userData.authUserId, normalizedWord, gameCode)
-        .catch((err: Error) => logger.debug('ENGAGEMENT', `Long word engagement error: ${err.message}`));
-    }
   }
 }
 

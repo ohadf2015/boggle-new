@@ -3,16 +3,15 @@
 import { useClassroomBossStore } from '@/stores/classroomBossStore';
 import { memo } from 'react';
 import Image from 'next/image';
-import { Coins, Sparkles, Star } from 'lucide-react';
+import { Star } from 'lucide-react';
 import AnimatedCounter from '@/components/ui/AnimatedCounter';
 import { cn } from '@/lib/utils';
 import { MASCOT_SRC, mascotFor } from './mpResultsView';
 import type { ResultCallout } from './mpResultsStory';
 import { MEDAL_SRC, MpCalloutLine, ResultArt } from './MpResultArt';
 import fx from './mpResults.module.css';
-
-const REWARD_DELAY_MS = 450;
-const REWARD_STAGGER_MS = 160;
+import { BestMissedWordLine, RewardLine } from '@/components/results/ResultsLines';
+import type { BestMissedWord } from '@/components/results/bestMissedWord';
 
 type TFn = (key: string, params?: Record<string, string | number>) => string;
 
@@ -27,6 +26,10 @@ export interface MpMyCardProps {
   bestWord: { word: string; score: number } | null;
   xp: number | null;
   coins: number | null;
+  /** The single highest-scoring word on the board I did not find. */
+  bestMissed?: BestMissedWord | null;
+  /** Board language (Hebrew final letters on the missed word). */
+  language?: string;
   /** The one rivalry line (photo finish, comeback, gap…), already prioritised. */
   callout: ResultCallout | null;
   /** The card's beat has landed: counters roll from 0 to the server number. */
@@ -51,17 +54,13 @@ export interface MpMyCardProps {
  * up, the best word and what I earned. Numbers are the server's (the counter
  * only animates the display, from 0 to `score`).
  */
-function MpMyCardImpl({ rank, winner, total, score, bestWord, xp, coins, callout, revealed, series = false, hideClassPosition = false, t, className }: MpMyCardProps) {
+function MpMyCardImpl({ rank, winner, total, score, bestWord, xp, coins, bestMissed = null, language = 'en', callout, revealed, series = false, hideClassPosition = false, t, className }: MpMyCardProps) {
   const calm = hideClassPosition;
   // A class that lost to the boss has no winner: the top scorer keeps a rank, not a crown.
   const lostBoss = useClassroomBossStore((s) => s.view?.status === 'escaped');
   const mood = calm || (lostBoss && winner) ? 'cheer' : mascotFor(rank, total, score);
   const showWinner = !calm && winner && !lostBoss;
   const medal = !calm && score > 0 && rank >= 1 && rank <= 3 ? (rank as 1 | 2 | 3) : null;
-  const rewards = [
-    xp != null && xp > 0 ? { id: 'xp', label: t('mpUi.results.xp', { xp }), icon: Sparkles, tone: 'bg-neo-cyan' } : null,
-    coins != null && coins > 0 ? { id: 'coins', label: t('mpUi.results.coins', { coins }), icon: Coins, tone: 'bg-neo-yellow' } : null,
-  ].filter((r) => r !== null);
 
   return (
     <section
@@ -141,18 +140,9 @@ function MpMyCardImpl({ rank, winner, total, score, bestWord, xp, coins, callout
               <span dir="ltr" className="tabular-nums opacity-70">+{bestWord.score}</span>
             </span>
           )}
-          {rewards.map((r, i) => (
-            <span
-              key={r.id}
-              data-testid={`mp-my-${r.id}`}
-              style={{ animationDelay: `${REWARD_DELAY_MS + i * REWARD_STAGGER_MS}ms` }}
-              className={cn('inline-flex items-center gap-1 rounded-full border-2 border-neo-black px-2 py-0.5 text-[calc(12px*var(--mp-u,1))] font-bold', r.tone, revealed && fx.rewardPop)}
-            >
-              <r.icon aria-hidden="true" className="w-3.5 h-3.5" />
-              {r.label}
-            </span>
-          ))}
         </div>
+        {revealed && <RewardLine coins={coins} xp={xp} mode="multiplayer" t={t} className={cn('text-[calc(13px*var(--mp-u,1))]', fx.rewardPop)} />}
+        {revealed && <BestMissedWordLine best={bestMissed} mode="multiplayer" language={language} t={t} className="text-[calc(12px*var(--mp-u,1))] opacity-80" />}
       </div>
     </section>
   );

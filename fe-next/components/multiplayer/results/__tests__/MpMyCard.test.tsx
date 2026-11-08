@@ -49,6 +49,34 @@ describe('MpMyCard best word chip', () => {
   });
 });
 
+describe('MpMyCard reward line (one line, no separate chips)', () => {
+  it('Given coins and XP, When revealed, Then one "+N coins · +N XP" line replaces the two chips', () => {
+    render(<MpMyCard {...base} xp={40} coins={10} />);
+    const line = screen.getByTestId('results-reward-line');
+    expect(line.textContent).toContain('+10');
+    expect(line.textContent).toContain('+40');
+    expect(screen.queryByTestId('mp-my-xp')).toBeNull();
+    expect(screen.queryByTestId('mp-my-coins')).toBeNull();
+  });
+
+  it('Given nothing earned, Then no reward line', () => {
+    render(<MpMyCard {...base} xp={null} coins={0} />);
+    expect(screen.queryByTestId('results-reward-line')).toBeNull();
+  });
+});
+
+describe('MpMyCard best missed word', () => {
+  it('Given a best missed word, Then the card shows the one "You missed" line', () => {
+    render(<MpMyCard {...base} bestMissed={{ word: 'stranger', letters: 8, points: 500 }} />);
+    expect(screen.getByTestId('best-missed-word').textContent).toContain('STRANGER');
+  });
+
+  it('Given no missed word, Then no line', () => {
+    render(<MpMyCard {...base} bestMissed={null} />);
+    expect(screen.queryByTestId('best-missed-word')).toBeNull();
+  });
+});
+
 describe('MpMyCard points in RTL', () => {
   it('Given a best word, Then its "+N" is an LTR island (never "12+" in Hebrew)', () => {
     render(<MpMyCard {...base} />);

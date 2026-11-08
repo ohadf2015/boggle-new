@@ -22,6 +22,7 @@ import { useHeroCheer } from '@/lib/quickPlay/useHeroCheer';
 import { getGuestProgress, percentileFromBoard } from '@/lib/quickPlay/guestProgress';
 import BlastWalletHud from '@/components/blast/legacy/BlastWalletHud';
 import { CoinArt } from '@/components/ui/CoinArt';
+import { RewardLine } from '@/components/results/ResultsLines';
 import { emitCoinEarned } from '@/utils/coinEarnedFx';
 import RivalCompareCard from '@/components/daily/RivalCompareCard';
 import { ResultsAvatarStage } from '@/components/results/stage/ResultsAvatarStage';
@@ -315,21 +316,14 @@ export function QuickPlayResults({
             )}
 
             <div className="flex flex-wrap items-center justify-center gap-2.5">
-              <span
-                className="inline-flex items-center gap-1.5 rounded-full border-[3px] border-black bg-neo-navy-elevated px-3 py-1 font-neo-display text-sm font-bold text-neo-yellow shadow-hard"
-                data-testid="quick-coins-reward"
-              >
-                <span ref={coinChipRef} className="block">
-                  <CoinArt size={20} />
-                </span>
-                <span dir="ltr">+{outcome.coins}</span>
-              </span>
-              <span
-                className="inline-flex items-center gap-1 rounded-full border-[3px] border-black bg-neo-navy-elevated px-3 py-1 font-neo-display text-sm font-bold text-neo-purple shadow-hard"
-                data-testid="quick-xp-reward"
-              >
-                ★ <span dir="ltr">+{outcome.xp}</span>
-              </span>
+              <RewardLine
+                coins={outcome.coins}
+                xp={outcome.xp}
+                mode={`quick-${result.mode}`}
+                t={t}
+                className="rounded-full border-[3px] border-black bg-neo-navy-elevated px-3 py-1 text-sm text-neo-yellow shadow-hard"
+                leading={<span ref={coinChipRef} className="block"><CoinArt size={20} /></span>}
+              />
               {improvementPct !== null && improvementPct !== 0 && (
                 <span
                   className={`rounded-full border-2 px-2.5 py-1 text-xs font-bold ${

@@ -5775,6 +5775,8 @@ const he = {
     "newMessages": "הודעות חדשות"
   },
   "results": {
+    "bestMissedWord": "פספסת את {word} ({letters} אותיות, {points} נקודות)",
+    "rewardLine": { "coins": "מטבעות", "xp": "XP" },
     "progressPulse": {
       "title": "ההתקדמות שלך",
       "game": "משחק #{n}",
@@ -6156,13 +6158,6 @@ const he = {
     "blast": "לבלאסט של מחר יש דפוסי קומבו חדשים. מוכנים?",
     "adventure": "הצצה לשלב הבא בטעינה... חזרו לגלות!",
     "seeYou": "נתראה מחר"
-  },
-  "unfinishedBoard": {
-    "teaser": "3 מילים מחכות לכם מחר",
-    "resumeTitle": "הלוח שלא סיימתם",
-    "resumeDesc": "מצאתם {{found}}/{{total}} מילים",
-    "resumeCta": "חזרו ללוח",
-    "wordsWaiting": "מילים מחכות"
   },
   "catalystTeaser": {
     "title": "מה מחכה לכם במשחקים אמיתיים",
@@ -7102,31 +7097,9 @@ const he = {
       "levelsRemaining": "נותרו {{count}} רמות"
     }
   },
-  "nearMiss": {
-    "almostThere": "כמעט שם!",
-    "oneMoreGame": "עוד משחק אחד!",
-    "tip": "טיפ",
-    "more": "עוד",
-    "soClose": "הייתם כל כך קרובים! עוד משחק אחד יכול להספיק."
-  },
   "oneMoreGame": {
     "defaultTitle": "עוד משחק?",
     "defaultMessage": "המשיכו את הרצף, שחקו שוב!"
-  },
-  "mysteryReward": {
-    "title": "פרס מסתורי",
-    "youFound": "מצאת פרס מסתורי!",
-    "opening": "פותח...",
-    "revealing": "מגלה...",
-    "awesome": "מדהים!",
-    "gameCompletion": "בונוס סיום משחק",
-    "winBonus": "בונוס ניצחון",
-    "longWord": "בונוס מילה ארוכה",
-    "achievement": "בונוס הישג",
-    "gameCompletionExplain": "המשיכו לשחק לעוד הפתעות!",
-    "winBonusExplain": "למנצחים מגיע יותר!",
-    "longWordExplain": "אוצר המילים שלך השתלם!",
-    "achievementExplain": "הישגים מגיעים עם בונוסים!"
   },
   "auth": {
     "google": {
@@ -7921,16 +7894,6 @@ const he = {
     "title": "פרופיל שחקן",
     "notFound": "לא מצאנו את השחקן",
     "error": "לא הצלחנו לטעון את הפרופיל"
-  },
-  "streaks": {
-    "wager": {
-      "title": "הימרו על המטבעות שלכם",
-      "description": "הימרו מטבעות על הרצף שלכם. מנצחים פי 3 או מפסידים הכל.",
-      "payout": "זכייה אפשרית",
-      "risk": "שוברים את הרצף, מפסידים את ההימור.",
-      "confirm": "הימרו",
-      "skip": "דלגו"
-    }
   },
   "comebackBonus": {
     "title": "ברוכים השבים!",

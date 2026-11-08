@@ -8051,6 +8051,8 @@ const ru = {
   "wordsFound": "слов найдено",
   "secondsLeft": "секунд осталось",
   "results": {
+    "bestMissedWord": "Вы пропустили {word} ({letters} букв, {points} очков)",
+    "rewardLine": { "coins": "монет", "xp": "XP" },
     "progressPulse": {
       "title": "Твой прогресс",
       "game": "Игра #{n}",
@@ -9152,21 +9154,6 @@ const ru = {
     "ariaLabel": "Обучение ТВ режиму",
     "help": "Показать обучение"
   },
-  "mysteryReward": {
-    "title": "Загадочная награда",
-    "youFound": "Тебе выпала награда!",
-    "opening": "Открываю...",
-    "revealing": "Открываю...",
-    "awesome": "Отлично!",
-    "gameCompletion": "Бонус за завершение",
-    "winBonus": "Бонус победы",
-    "longWord": "Бонус длинного слова",
-    "achievement": "Бонус достижения",
-    "gameCompletionExplain": "Чем больше играешь, тем больше шансов",
-    "winBonusExplain": "Победителям — ещё больше сюрпризов",
-    "longWordExplain": "Богатый словарный запас окупился!",
-    "achievementExplain": "За достижения полагаются бонусы"
-  },
   "deleteAccountWeb": {
     "title": "Удалить аккаунт",
     "subtitle": "Навсегда удалить аккаунт и данные",
@@ -9225,16 +9212,6 @@ const ru = {
       "description": "Проверь, кто круче"
     },
     "maybeLater": "Не сейчас"
-  },
-  "streaks": {
-    "wager": {
-      "title": "Поставь монеты!",
-      "description": "Поставь монеты на серию: выиграй 3x или потеряй всё",
-      "payout": "Возможный выигрыш",
-      "risk": "Если серия прервётся, ставка сгорит.",
-      "confirm": "Сделать ставку",
-      "skip": "Пока что нет"
-    }
   },
   "social": {
     "playersOnline": "игроков онлайн",
@@ -10779,13 +10756,6 @@ const ru = {
     },
     "dismiss": "Ясно!"
   },
-  "nearMiss": {
-    "almostThere": "Почти получилось!",
-    "oneMoreGame": "Ещё одна игра!",
-    "tip": "Совет",
-    "more": "ещё",
-    "soClose": "Ты так близко! Ещё одна игра может всё решить."
-  },
   "messaging": {
     "timeNow": "сейчас",
     "timeMinutes": "м",
@@ -12211,13 +12181,6 @@ const ru = {
     "hint": "Печатай буквы · Enter отправляет · Esc очищает",
     "doubleClick": "2×клик",
     "releaseToSubmit": "Отпусти, чтобы отправить"
-  },
-  "unfinishedBoard": {
-    "teaser": "3 слова ждут тебя завтра",
-    "resumeTitle": "Недоигранная доска",
-    "resumeDesc": "Ты нашёл {{found}}/{{total}} слов",
-    "resumeCta": "Вернуться к доске",
-    "wordsWaiting": "слов ждут"
   },
   "notFound": {
     "heading": "404: слово не найдено",

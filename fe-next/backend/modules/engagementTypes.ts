@@ -81,18 +81,6 @@ export interface OneMoreGamePrompt {
   xpNeeded?: number;
 }
 
-export interface MysteryReward {
-  type: string;
-  value: number | string;
-  weight: number;
-  display: string;
-}
-
-export interface MysteryRewardResult extends MysteryReward {
-  triggerType: string;
-  rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
-}
-
 export interface LoginResult {
   streak: number;
   previousStreak?: number;

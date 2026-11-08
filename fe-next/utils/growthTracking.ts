@@ -360,6 +360,11 @@ export type GrowthEvent =
   // Results-page CTA tracking — experiment conversion funnel (exp-results-replay-cta-v1)
   // Properties: { cta: 'quick_replay' | 'back_to_lobby' | 'next_step', mode?: string }
   | 'results_cta_clicked'
+  // Results screens (multiplayer, solo, Quick Play): the one "best word you
+  // missed" line ({ word_length, points, mode }) and the single reward line
+  // ({ coins, xp, mode }). Each fires once per results screen.
+  | 'best_missed_word_shown'
+  | 'results_reward_line_shown'
   // Word Wheel daily post-game signup funnel (experiment wheel-signup-offer-v1).
   // The wheel bypasses the generic guest-stats signup gate, so these are its own
   // conversion events. Properties: { experiment, variant, offerType, streakDays, score }.

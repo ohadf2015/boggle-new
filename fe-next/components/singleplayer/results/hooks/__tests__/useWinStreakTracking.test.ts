@@ -20,8 +20,6 @@ let mockStreakData = {
   isStreakActive: false,
   streakBroken: false,
   freezesAvailable: 1,
-  recoverableStreak: null as number | null,
-  recoveryTimeRemaining: null as number | null,
   isLoaded: false,
 };
 
@@ -58,7 +56,6 @@ vi.mock('@/hooks/useWinStreak', () => ({
     ...mockStreakData,
     recordWin: mockRecordWin,
     applyStreakFreeze: vi.fn(),
-    recoverStreak: vi.fn(),
     purchaseFreeze: vi.fn(),
     getStreakEmoji: vi.fn(),
     getStreakTier: vi.fn(),
@@ -99,8 +96,6 @@ describe('useWinStreakTracking', () => {
       isStreakActive: false,
       streakBroken: false,
       freezesAvailable: 1,
-      recoverableStreak: null,
-      recoveryTimeRemaining: null,
       isLoaded: false,
     };
     // Restore mock implementation after clearAllMocks
