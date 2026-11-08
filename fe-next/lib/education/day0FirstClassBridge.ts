@@ -3,9 +3,10 @@
  *
  * Prod 2026-11-06: teachers who try a second mode return at 22%. Day-0
  * quitters return at 4.3%. The class-created screen was asking for Polar
- * before the first live round. This window sends them into the existing
- * class/assignment start instead, and brings the paywall back on day 3 of
- * the access trial, or once that trial has ended.
+ * before the first live round; #1726 then took the Pro offer off that
+ * screen entirely. This window sends day-0 teachers into the existing
+ * class/assignment start instead; from day 3 of the access trial (or once
+ * it has ended) the screen simply shows no card.
  *
  * Days since approval are read off the approval stamp. Approval sets
  * trial_expires_at to TEACHER_TRIAL_DAYS ahead, and daysLeft is rounded up,

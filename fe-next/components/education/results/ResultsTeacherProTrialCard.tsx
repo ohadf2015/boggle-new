@@ -49,11 +49,9 @@ function readDismissed(placement: string): boolean {
 
 /**
  * `placement="class_created"` is the same card on the class-ready screen
- * (ClassCreatedAsk, teacher setup flow) once the access trial is on day 3
- * or has ended. A newly approved teacher on day 0–2 sees the first-class
- * bridge instead. Its own title, its own impression/click placement, and a
- * "Not now" that hides it for 14 days on this device. The results screen
- * keeps no dismiss.
+ * (ClassSetupInvite, teacher setup flow), right after a teacher makes a class: its own
+ * title, its own impression/click placement, and a "Not now" that hides it for
+ * 14 days on this device. The results screen keeps no dismiss.
  */
 
 export function ResultsTeacherProTrialCard({
