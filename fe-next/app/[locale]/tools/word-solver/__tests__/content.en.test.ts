@@ -5,13 +5,11 @@ describe('word-solver en content (GR #25983 — "solver" queries)', () => {
   const en = getContent('en');
   const allText = JSON.stringify(en);
 
-  it('leads the SERP title and H1 with the head query "anagram solver"', () => {
+  it('leads the SERP title with the head query "anagram solver" (frozen snippet, #1485/#1487)', () => {
+    // The title/description are frozen in seo-freeze.json until 2026-11-28;
+    // this asserts the frozen snippet already targets the rising query.
     expect(en.metaTitle?.toLowerCase()).toContain('anagram solver');
-    expect(en.title.toLowerCase()).toContain('anagram solver');
-  });
-
-  it('answers in searchers\' words in the first sentence of the visible description', () => {
-    expect(en.description.toLowerCase()).toMatch(/^an anagram solver/);
+    expect(en.description.toLowerCase()).toContain('anagram solver');
   });
 
   it('has a quotable FAQ line for the exact queries people search', () => {

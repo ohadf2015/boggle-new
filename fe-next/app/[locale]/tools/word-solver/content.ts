@@ -38,13 +38,13 @@ export interface ToolContent {
 
 const content: Record<Locale, ToolContent> = {
   en: {
-    title: 'Anagram Solver & Word Finder',
-    metaTitle: 'Anagram Solver — Find Words From Letters (Free)',
-    subtitle: 'Type your letters. Get every word they spell.',
+    title: 'Word Solver & Anagram Finder',
+    metaTitle: 'Anagram Solver: Unscramble Letters Into Words',
+    subtitle: 'Unscramble letters and find every possible word',
     description:
-      'An anagram solver turns scrambled letters into real words. Type up to 20 letters above and this free solver lists every English word they can spell, longest first — checked against the same dictionary that scores LexiClash matches. Works for Scrabble racks, Words With Friends, Boggle grids, and crossword letters, with no signup and nothing to install.',
+      'Free online anagram solver and word unscrambler. Enter your letters and instantly find all possible words. Perfect for Scrabble, Boggle, Words With Friends, and LexiClash.',
     metaDescription:
-      'Free anagram solver: enter your letters and see every word they spell, longest first. Handles multiple-word anagrams, Scrabble racks and crossword letters. No signup.',
+      'Enter up to 20 letters and see every word they spell, longest first. Free anagram and letter solver with a full dictionary, no signup.',
     inputPlaceholder: 'Enter your letters (e.g. AELRST)',
     inputLabel: 'Your Letters',
     languageLabel: 'Dictionary Language',
