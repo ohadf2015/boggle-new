@@ -139,3 +139,30 @@ describe('Leaderboard PageClient without Supabase (static fallback)', () => {
     expect(screen.queryByRole('tab')).toBeNull();
   });
 });
+
+describe('Leaderboard PageClient SSR seeding', () => {
+  beforeEach(() => {
+    push.mockClear();
+    fetchMock = vi.fn(async () => ({
+      ok: true,
+      json: async () => ({ data: STATIC_ENTRIES }),
+    }));
+    vi.stubGlobal('fetch', fetchMock);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('renders server-provided initialEntries immediately, without a client fetch', () => {
+    render(<LeaderboardPageClient initialEntries={STATIC_ENTRIES} />);
+
+    // Synchronous assertions — the rows come from the prop, not the fetch
+    // effect, so SSR HTML and first client paint both contain rankings.
+    expect(screen.getByText('Dee')).toBeTruthy();
+    expect(screen.getByText('Eve')).toBeTruthy();
+    expect(screen.getAllByTestId('leaderboard-row').length).toBe(3);
+    expect(screen.getByTestId('podium')).toBeTruthy();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+});

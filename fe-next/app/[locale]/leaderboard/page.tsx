@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { buildLeaderboardFaqJsonLd, encodeJsonLd } from '@/lib/seo/leaderboardJsonLd';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
-import LeaderboardPageClient from './PageClientNoSsr';
+import LeaderboardPageClient, { type LeaderboardEntry } from './PageClient';
+import { getServerLeaderboardTop100 } from '@/lib/leaderboard/serverTop100';
 import { EsScrabbleCrossLink } from '@/components/seo/EsScrabbleCrossLink';
 
 export const revalidate = 300;
@@ -142,6 +143,11 @@ const SITE_URL = 'https://www.lexiclash.live';
 export default async function LeaderboardPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const content = seoContent[locale] ?? seoContent.en;
+  // Seed the client with the same top-100 the /api/leaderboard route serves so
+  // the SSR HTML contains real rankings (crawlers + slow-JS users). Null when
+  // Redis/Supabase are unreachable (e.g. build-time prerender) — the client
+  // fetch takes over there.
+  const initialEntries = (await getServerLeaderboardTop100()) as LeaderboardEntry[] | null;
   const faqJsonLd = buildLeaderboardFaqJsonLd(locale, content.faq);
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
@@ -153,12 +159,11 @@ export default async function LeaderboardPage({ params }: { params: Promise<{ lo
   };
   return (
     <>
-      <LeaderboardPageClient />
-      {/* PageClient (the h1 + live rankings) is ssr:false — Googlebot's initial
-          HTML otherwise has zero page content. This renders the same authored
-          title/description/features/faq visibly so the SSR response isn't just
-          nav+footer chrome. Collapsible: players came to see rankings, not read
-          copy (matches /daily, /multiplayer pattern). */}
+      <LeaderboardPageClient initialEntries={initialEntries ?? undefined} />
+      {/* The rankings render in SSR now (initialEntries above) — this authored
+          title/description/features/faq stays as supporting content below the
+          live board. Collapsible: players came to see rankings, not read copy
+          (matches /daily, /multiplayer pattern). */}
       <GamePageSeoContent
         title={content.title}
         description={content.description}

@@ -35,7 +35,7 @@ import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { getGlobalLeaderboardTier } from '@/lib/ranked/leaderboardTiers';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
-interface LeaderboardEntry {
+export interface LeaderboardEntry {
   player_id: string;
   display_name?: string;
   username?: string;
@@ -45,7 +45,15 @@ interface LeaderboardEntry {
   games_played?: number;
 }
 
-export default function LeaderboardPageClient(): React.JSX.Element {
+interface LeaderboardPageClientProps {
+  /** Server-rendered top-100 (the /api/leaderboard payload) so the SSR HTML
+      contains real rows for crawlers and slow-JS users. Undefined when the
+      server had no Redis/Supabase (e.g. build-time prerender) — the client
+      fetch below takes over. */
+  initialEntries?: LeaderboardEntry[];
+}
+
+export default function LeaderboardPageClient({ initialEntries }: LeaderboardPageClientProps): React.JSX.Element {
   const { t, language } = useLanguage();
   const { user, profile, loading: authLoading, isSupabaseEnabled } = useAuth();
   const router = useRouter();
@@ -74,8 +82,10 @@ export default function LeaderboardPageClient(): React.JSX.Element {
   // the server-side /api/leaderboard route (Redis-cached, coalesced) serves
   // the same top-100 shape without a realtime subscription. Without this the
   // page dead-ended on a "Coming soon" stub — the nav links here as "Ranks"
-  // from every page.
-  const [staticEntries, setStaticEntries] = useState<LeaderboardEntry[] | null>(null);
+  // from every page. Seeded from SSR via initialEntries (server component
+  // reads the same Redis cache / Supabase query), so first paint — including
+  // the server-rendered HTML — already contains rows.
+  const [staticEntries, setStaticEntries] = useState<LeaderboardEntry[] | null>(initialEntries ?? null);
   const [staticError, setStaticError] = useState<string | null>(null);
 
   const fetchStaticLeaderboard = useCallback(async () => {
@@ -91,9 +101,9 @@ export default function LeaderboardPageClient(): React.JSX.Element {
   }, []);
 
   useEffect(() => {
-    if (isSupabaseEnabled) return;
+    if (isSupabaseEnabled || staticEntries) return;
     void fetchStaticLeaderboard();
-  }, [isSupabaseEnabled, fetchStaticLeaderboard]);
+  }, [isSupabaseEnabled, staticEntries, fetchStaticLeaderboard]);
 
   const leaderboard = useMemo(
     () => (isSupabaseEnabled ? realtimeLeaderboard : (staticEntries ?? [])),
