@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import Avatar from '@/components/Avatar';
+import { QuickDetailCard } from './QuickDetailCard';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 interface LeaderboardEntry {
@@ -37,10 +38,7 @@ export function QuickLeaderboardCard({ entries }: QuickLeaderboardCardProps) {
   const rows = showFullBoard ? entries : mine && !preview.includes(mine) ? [...preview, mine] : preview;
 
   return (
-    <div className="overflow-hidden rounded-2xl border-neo-thick border-black bg-neo-navy-elevated shadow-hard" data-testid="quick-leaderboard">
-      <div className="border-b-[3px] border-black bg-neo-cyan px-3 py-1.5 font-neo-display text-[11px] font-bold uppercase tracking-[0.16em] text-black">
-        {t('quickPlay.solo.todayBoard', "Today's top scores")}
-      </div>
+    <QuickDetailCard testId="quick-leaderboard" band="bg-neo-cyan" title={t('quickPlay.solo.todayBoard', "Today's top scores")}>
       <ol>
         {rows.map((e) => {
           const isMe = e.userId === user?.id;
@@ -48,13 +46,13 @@ export function QuickLeaderboardCard({ entries }: QuickLeaderboardCardProps) {
             <li
               key={e.userId}
               data-me={isMe || undefined}
-              className={`flex items-center gap-3 border-b-2 border-black/40 px-3 py-2 text-sm text-neo-cream last:border-b-0 ${
-                isMe ? 'bg-neo-lime/15 shadow-[inset_4px_0_0_rgb(var(--neo-lime))]' : ''
+              className={`flex items-center gap-3 border-b-2 border-black/40 px-3 py-2 text-sm last:border-b-0 ${
+                isMe ? 'relative z-10 mx-1 -rotate-1 rounded-lg border-[3px] border-black bg-neo-yellow font-bold text-black shadow-hard' : 'text-neo-cream'
               }`}
             >
               <span
                 className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border-2 border-black font-neo-display text-xs font-bold ${
-                  e.rank <= 3 ? `${MEDAL[e.rank - 1]} text-black shadow-hard-sm` : 'text-neo-white/60'
+                  e.rank <= 3 ? `${MEDAL[e.rank - 1]} text-black shadow-hard-sm` : isMe ? 'text-black' : 'text-neo-white/60'
                 }`}
               >
                 {e.rank}
@@ -75,6 +73,6 @@ export function QuickLeaderboardCard({ entries }: QuickLeaderboardCardProps) {
           {t('quickPlay.solo.seeLeaderboard')}
         </button>
       )}
-    </div>
+    </QuickDetailCard>
   );
 }

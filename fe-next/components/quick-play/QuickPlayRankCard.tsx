@@ -2,6 +2,7 @@
 
 import { useLanguage } from '@/contexts/LanguageContext';
 import { quickRank, QUICK_RANKS } from './quickRank';
+import { QuickDetailCard } from './QuickDetailCard';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
 
 interface QuickPlayRankCardProps {
@@ -29,16 +30,13 @@ export function QuickPlayRankCard({ totalPoints, percentileToday, scorePct }: Qu
   const toNext = rankNow.nextAt === null ? 0 : rankNow.nextAt - totalPoints;
 
   return (
-    <div className="rounded-2xl border-neo-thick border-black bg-neo-navy-elevated p-3 shadow-hard" data-testid="quick-rank-bar">
-      <div className="mb-2 flex items-baseline justify-between">
-        <span className="font-neo-display text-[10px] uppercase tracking-[0.18em] text-neo-white/55">
-          {t('quickPlay.solo.rankLadder', 'Rank')}
-        </span>
-        <span className="font-neo-display text-xs font-bold text-neo-cream" data-testid="quick-rank-total">
-          {safeToLocaleString(totalPoints, language)}
-        </span>
-      </div>
-
+    <QuickDetailCard
+      testId="quick-rank-bar"
+      band="bg-neo-pink"
+      title={t('quickPlay.solo.rankLadder', 'Rank')}
+      aside={<span data-testid="quick-rank-total">{safeToLocaleString(totalPoints, language)}</span>}
+      bodyClassName="p-3"
+    >
       <ul className="flex flex-col gap-1">
         {rungs.map((rung) => {
           const isCurrent = rung.key === rankNow.key;
@@ -49,11 +47,16 @@ export function QuickPlayRankCard({ totalPoints, percentileToday, scorePct }: Qu
               data-current={isCurrent || undefined}
               className={`flex items-center gap-2 rounded-lg px-2 py-1.5 text-xs ${
                 isCurrent
-                  ? 'border-[3px] border-black bg-neo-abyss py-2 shadow-hard-sm'
+                  ? '-rotate-1 border-[3px] border-black bg-neo-abyss py-2.5 text-sm shadow-hard'
                   : 'border-2 border-dashed border-neo-white/15 opacity-70'
               }`}
             >
-              <span className={`min-w-0 flex-1 truncate font-neo-display font-bold tracking-wide ${rung.color}`}>
+              {isCurrent && <span aria-hidden="true" className={`font-neo-display text-base ${rung.color}`}>▶</span>}
+              <span
+                className={`min-w-0 flex-1 truncate font-neo-display font-bold tracking-wide ${rung.color} ${
+                  isCurrent ? 'text-lg [text-shadow:0_2px_0_#000]' : ''
+                }`}
+              >
                 {t(`quickPlay.solo.rank.${rung.key}`)}
               </span>
               {isCurrent && rankNow.nextAt !== null && (
@@ -77,15 +80,15 @@ export function QuickPlayRankCard({ totalPoints, percentileToday, scorePct }: Qu
         })}
       </ul>
 
-      <div className="mt-2.5 h-3.5 overflow-hidden rounded-full border-[3px] border-black bg-neo-abyss">
+      <div className="mt-3 h-5 overflow-hidden rounded-full border-[3px] border-black bg-neo-abyss shadow-hard-sm">
         <i
           className="block h-full origin-left border-r-[3px] border-black bg-neo-lime bg-[repeating-linear-gradient(-45deg,transparent_0_6px,rgba(0,0,0,0.14)_6px_12px)] animate-[qp-bar-fill_0.9s_cubic-bezier(0.3,0.9,0.4,1)_0.3s_both] motion-reduce:animate-none rtl:origin-right"
           style={{ width: `${Math.round(rankNow.progress * 100)}%` }}
         />
       </div>
 
-      <div className="mt-1.5 flex items-center justify-between text-[11px]">
-        <span className="font-bold text-neo-lime" data-testid="quick-rank-gained">
+      <div className="mt-2 flex items-center justify-between gap-2 text-[11px]">
+        <span className="rotate-1 rounded-md border-2 border-black bg-neo-lime px-1.5 py-0.5 font-neo-display font-bold text-black shadow-hard-sm" data-testid="quick-rank-gained">
           {t('quickPlay.solo.rankGained', { pts: String(scorePct) })}
         </span>
         <span className="text-neo-white/50">
@@ -106,6 +109,6 @@ export function QuickPlayRankCard({ totalPoints, percentileToday, scorePct }: Qu
           <i className="block h-full bg-neo-cyan" style={{ width: `${percentileToday}%` }} />
         </div>
       )}
-    </div>
+    </QuickDetailCard>
   );
 }
