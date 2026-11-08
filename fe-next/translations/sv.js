@@ -15071,11 +15071,11 @@ const sv = {
     "accessDenied": "Du behöver lärarbehörighet för denna sida.",
     "profile": {
       "teacherBadge": "Lärare",
-      "classrooms": "Klassrum",
-      "totalStudents": "Elever totalt",
-      "roleStatus": "Roll",
-      "contactAdmin": "Behöver du hjälp?",
-      "contactAdminDesc": "Kontakta din administratör om du vill ändra läraråtkomst eller roll. Lärarkonton ges av skoladministratörer.",
+      "classrooms": "Klasser",
+      "totalStudents": "Elever",
+      "schoolTitle": "Vill du att skolan betalar?",
+      "schoolBody": "Skolan kan köpa Pro åt dig och dina kollegor. En offert via mejl, inget säljsamtal.",
+      "schoolCta": "Planer för skolor",
       "avatar": "Läraravatar"
     },
     "districtBanner": {
@@ -21265,6 +21265,7 @@ const sv = {
       "schoolF2": "Offert via mejl, inget säljsamtal",
       "schoolF3": "Gratis för eleverna, aldrig reklam",
       "askSchool": "Vill du att skolan betalar?",
+      "moreFeatures": "{count} till i Pro",
       "featureParentPack": "Föräldrarapporter för hela klassen med ett klick"
     },
     "preCheckout": {

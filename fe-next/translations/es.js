@@ -15437,11 +15437,11 @@ const es = {
     },
     "profile": {
       "teacherBadge": "Profesor",
-      "classrooms": "Salones",
-      "totalStudents": "Total de estudiantes",
-      "roleStatus": "Rol",
-      "contactAdmin": "¿Necesitas ayuda?",
-      "contactAdminDesc": "Para actualizar tu acceso de profesor o rol, contacta a tu administrador. Las cuentas de profesor las otorgan los administradores escolares.",
+      "classrooms": "Clases",
+      "totalStudents": "Alumnos",
+      "schoolTitle": "¿Quieres que pague tu escuela?",
+      "schoolBody": "Tu escuela puede comprar Pro para ti y tus colegas. Un presupuesto por correo, sin llamadas de ventas.",
+      "schoolCta": "Planes para escuelas",
       "avatar": "Avatar del profesor"
     },
     "districtBanner": {
@@ -21277,6 +21277,7 @@ const es = {
       "schoolF2": "Presupuesto por correo, sin llamada comercial",
       "schoolF3": "Gratis para el alumnado y sin anuncios",
       "askSchool": "¿Quieres que pague tu centro?",
+      "moreFeatures": "{count} más en Pro",
       "featureParentPack": "Enlaces de informe para las familias de toda la clase, con un clic"
     },
     "preCheckout": {

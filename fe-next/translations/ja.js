@@ -14764,10 +14764,10 @@ const ja = {
     "profile": {
       "teacherBadge": "教師",
       "classrooms": "クラス",
-      "totalStudents": "生徒合計",
-      "roleStatus": "役割",
-      "contactAdmin": "お困りですか?",
-      "contactAdminDesc": "教師アクセスや役割を変更するには、管理者にお問い合わせください。教師アカウントは学校管理者が付与します。",
+      "totalStudents": "生徒",
+      "schoolTitle": "学校に払ってもらいたいですか？",
+      "schoolBody": "学校があなたと同僚の分のProを購入できます。見積もりはメールで1通、営業電話はありません。",
+      "schoolCta": "学校向けプラン",
       "avatar": "教師アバター"
     },
     "districtBanner": {
@@ -21265,6 +21265,7 @@ const ja = {
       "schoolF2": "見積もりはメールで。営業電話はありません",
       "schoolF3": "生徒は無料で、広告も表示されません",
       "askSchool": "学校に費用を負担してもらいたい場合",
+      "moreFeatures": "Proの機能をあと{count}つ見る",
       "featureParentPack": "クラス全員分の保護者向けレポートリンクをワンクリックで作成"
     },
     "preCheckout": {
