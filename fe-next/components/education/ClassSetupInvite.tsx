@@ -31,6 +31,7 @@ import { STARTER_LESSON_PACKS } from '@/lib/education/starterLessonPacks';
 import { packsForLanguage, recommendedPack } from '@/components/teacher/setup/starterPackPick';
 import { FirstGameWords, PlayNowButton, type FirstGameError } from '@/components/teacher/setup/FirstGameWords';
 import { firstGameIntent, readPasted, type FirstGameChoice } from '@/components/teacher/setup/firstGameLaunch';
+import { ClassCreatedAsk } from '@/components/education/ClassCreatedAsk';
 import type { InviteChannel } from './ClassSetupInviteCode';
 import { ClassSetupInviteView } from './ClassSetupInviteView';
 import { firstStudentSeen } from './lobby/inviteLinks';
@@ -179,6 +180,7 @@ function InviteReady({ classroom, packKey, lessonId, t, language }: InviteReadyP
 
   const joinUrl = origin ? classroomJoinUrl(origin, language, classroom.join_code) : '';
   const displayHost = origin ? `${origin.replace(/^https?:\/\//, '')}/${language}/join` : '';
+  const startHref = `/${language}/education/classroom-game?flow=${QUICK_LAUNCH_FLOW}`;
   const firstGame = useFirstGame({ classroom, packKey, lessonId, t, language });
 
   return (
@@ -188,7 +190,7 @@ function InviteReady({ classroom, packKey, lessonId, t, language }: InviteReadyP
         roster={roster}
         joinUrl={joinUrl}
         displayHost={displayHost}
-        startHref={`/${language}/education/classroom-game?flow=${QUICK_LAUNCH_FLOW}`}
+        startHref={startHref}
         homeHref={`/${language}/teacher`}
         reduced={reduced}
         onShare={(c, p) => void share(c, p)}
@@ -204,6 +206,14 @@ function InviteReady({ classroom, packKey, lessonId, t, language }: InviteReadyP
             withSeat
             label={t('eduShell.home.practice.cta')}
             onStart={() => trackFirstRoundGuideClicked({ surface: 'class_ready', locale: language, step: 'practice_bots' })}
+          />
+        }
+        footer={
+          <ClassCreatedAsk
+            language={language}
+            href={startHref}
+            onStart={() => trackFirstRoundGuideClicked({ surface: 'class_ready', locale: language, step: 'day0_bridge' })}
+            className="w-full text-start lg:col-span-2 lg:mx-auto lg:max-w-xl"
           />
         }
         t={t}
