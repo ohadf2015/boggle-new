@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { m } from "framer-motion";
 import type { NextUpSlot } from "@/lib/wordTowerV2/rush/types";
 import { TRAIT_FILL, TraitGlyph } from "./perkGlyphs";
@@ -35,7 +35,18 @@ export function detectReveals(
   });
 }
 
+/** How long the tap-to-explain line stays up. */
+export const NEXT_UP_HINT_MS = 4000;
+
 export function NextUpQueue({ t, slots, reducedMotion = false, compact = false }: Props) {
+  // "Next" alone read as a mystery (player report, Nov 2026): the strip now
+  // says "Next blocks", and a tap explains it in one line, then fades.
+  const [hint, setHint] = useState(false);
+  useEffect(() => {
+    if (!hint) return;
+    const id = setTimeout(() => setHint(false), NEXT_UP_HINT_MS);
+    return () => clearTimeout(id);
+  }, [hint]);
   const [seen, setSeen] = useState(slots);
   const [revealing, setRevealing] = useState<boolean[]>([]);
   const [gen, setGen] = useState<number[]>([]);
@@ -47,7 +58,21 @@ export function NextUpQueue({ t, slots, reducedMotion = false, compact = false }
   }
 
   return (
-    <div className="pointer-events-none flex items-center gap-1.5">
+    <div
+      role="button"
+      tabIndex={0}
+      aria-expanded={hint}
+      aria-label={t("wordTowerV2.rush.nextUp.hint")}
+      data-next-up
+      onClick={() => setHint((h) => !h)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          setHint((h) => !h);
+        }
+      }}
+      className="pointer-events-auto relative flex cursor-pointer items-center gap-1.5 rounded-neo-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-neo-cream"
+    >
       <span
         className={`font-neo-display text-[11px] font-black uppercase leading-none text-neo-cream [text-shadow:1px_1px_0_rgb(var(--neo-black))] ${
           compact ? "rounded-neo-sm bg-neo-navy/85 px-1.5 py-1" : ""
@@ -73,6 +98,15 @@ export function NextUpQueue({ t, slots, reducedMotion = false, compact = false }
           </li>
         ))}
       </ul>
+      {hint ? (
+        <p
+          role="status"
+          data-next-up-hint
+          className="absolute start-1/2 top-full z-50 mt-2 w-max max-w-[16rem] -translate-x-1/2 rounded-neo-sm border-2 border-black bg-neo-cream px-2 py-1 text-center font-neo-display text-xs font-bold leading-snug text-neo-navy shadow-hard-sm rtl:translate-x-1/2"
+        >
+          {t("wordTowerV2.rush.nextUp.hint")}
+        </p>
+      ) : null}
     </div>
   );
 }

@@ -234,7 +234,7 @@ export function RivalBuilding({ t, rival, revenge, grievance, charges, busy, onW
             {/* The mute FAB floats over this corner on a phone, so the price
                 line keeps clear of it instead of being read half-covered. */}
             <p
-              className={`mt-1.5 flex flex-wrap items-center justify-center gap-x-1.5 pe-12 pb-[max(0.5rem,env(safe-area-inset-bottom))] text-center font-neo-display text-xs font-bold uppercase tracking-wide md:pe-0 md:pb-0 md:text-base ${
+              className={`mt-1.5 flex flex-wrap items-center justify-center gap-x-1.5 pe-12 pb-[max(0.5rem,env(safe-area-inset-bottom),var(--cap-safe-area-bottom,0px))] text-center font-neo-display text-xs font-bold uppercase tracking-wide md:pe-0 md:pb-0 md:text-base ${
                 revenge ? 'text-neo-lime' : 'opacity-80'
               }`}
             >

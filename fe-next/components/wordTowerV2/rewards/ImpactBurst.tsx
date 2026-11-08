@@ -82,7 +82,7 @@ export function ImpactBurst({ t, fx, counterRef, canvasClass, points, reducedMot
       <div
         ref={setLayer}
         data-wt2-burst-layer
-        className="pointer-events-none fixed inset-0 z-[45] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] pt-[env(safe-area-inset-top)]"
+        className="pointer-events-none fixed inset-0 z-[45] pb-[max(env(safe-area-inset-bottom),var(--cap-safe-area-bottom,0px))] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] pt-[env(safe-area-inset-top)]"
         aria-hidden
       >
         {host ? (

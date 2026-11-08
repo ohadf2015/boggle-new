@@ -156,7 +156,7 @@ export function PerkDraft({
       aria-modal="true"
       aria-labelledby={titleId}
       onKeyDown={trapTab}
-      className="fixed inset-0 z-[70] flex flex-col items-center justify-center gap-3 overflow-y-auto bg-neo-navy/95 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))] sm:gap-6"
+      className="fixed inset-0 z-[70] flex flex-col items-center justify-center gap-3 overflow-y-auto bg-neo-navy/95 px-4 pb-[max(1rem,env(safe-area-inset-bottom),var(--cap-safe-area-bottom,0px))] pt-[max(1rem,env(safe-area-inset-top))] sm:gap-6"
     >
       <header
         className={`flex flex-col items-center gap-1 text-center ${

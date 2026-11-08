@@ -102,7 +102,7 @@ export function GhostRivalsLayer({
         className="invisible absolute"
         style={{
           paddingTop: "env(safe-area-inset-top, 0px)",
-          paddingBottom: "env(safe-area-inset-bottom, 0px)",
+          paddingBottom: "max(env(safe-area-inset-bottom, 0px), var(--cap-safe-area-bottom, 0px))",
         }}
       />
       {rows.map(({ rival, lineY, tagY }) => {
@@ -111,7 +111,7 @@ export function GhostRivalsLayer({
           <div key={rival.id}>
             {onScreen ? (
               <div
-                className="absolute inset-x-0 border-t-2 border-dashed border-neo-cream opacity-60"
+                className="absolute inset-x-0 border-t border-dashed border-neo-cream/35"
                 style={{ top: lineY }}
               />
             ) : null}
@@ -121,8 +121,10 @@ export function GhostRivalsLayer({
             <div
               data-rival-tag
               data-offscreen={onScreen ? undefined : "true"}
-              className={`absolute end-2 flex max-w-[60%] items-center gap-1 rounded-neo-sm border-2 border-neo-cream bg-neo-navy/80 px-1.5 font-neo-display font-bold text-neo-cream shadow-hard-sm ${
-                onScreen ? "text-[11px] leading-[20px]" : "text-[10px] leading-[16px] opacity-70"
+              // Calm on purpose: one quiet chip, no hard border or shadow, so
+              // it marks a height without competing with the tower.
+              className={`absolute end-2 flex max-w-[55%] items-center gap-1 rounded-full border border-neo-cream/30 bg-neo-navy/60 px-2 font-neo-display font-bold text-neo-cream/85 ${
+                onScreen ? "text-[10px] leading-[18px]" : "text-[10px] leading-[16px] opacity-60"
               }`}
               style={{ top: tagY, height: LABEL_H - 4 }}
             >
@@ -131,7 +133,7 @@ export function GhostRivalsLayer({
               ) : (
                 <span aria-hidden>{lineY < 0 ? "▲" : "▼"}</span>
               )}
-              <span className="shrink-0 tabular-nums text-neo-yellow">
+              <span className="shrink-0 tabular-nums text-neo-yellow/80">
                 {t("wordTowerV2.rush.rival.height", {
                   m: Math.round(rival.peakM),
                 })}

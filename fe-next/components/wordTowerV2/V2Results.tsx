@@ -277,7 +277,7 @@ function EndlessResults({ t, peakM, score, bestM, isBest, run, badges, unlocked,
       </div>
 
       {/* Sticky bottom bar: Home and Play Again buttons never scroll away. */}
-      <div data-wt2-results-actions className="shrink-0 border-t border-neo-navy bg-neo-navy/75 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-0">
+      <div data-wt2-results-actions className="shrink-0 border-t border-neo-navy bg-neo-navy/75 p-4 pb-[max(1rem,env(safe-area-inset-bottom),var(--cap-safe-area-bottom,0px))] pt-0">
         <div className="mx-auto flex max-w-sm items-center justify-between gap-2">
           <button
             type="button"

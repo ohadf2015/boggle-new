@@ -217,7 +217,7 @@ function RevengeList({
   const towers = useMemo(() => debts.map((d) => wreckableTower(d.rival.lastTower)), [debts]);
   const viewH = useMemo(() => boardViewH(towers), [towers]);
   return (
-    <div className="absolute inset-0 z-50 flex flex-col overflow-hidden bg-neo-navy p-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))] text-neo-cream" role="dialog" aria-modal="true">
+    <div className="absolute inset-0 z-50 flex flex-col overflow-hidden bg-neo-navy p-4 pb-[max(1rem,env(safe-area-inset-bottom),var(--cap-safe-area-bottom,0px))] pt-[max(1rem,env(safe-area-inset-top))] text-neo-cream" role="dialog" aria-modal="true">
       <div className="mx-auto flex w-full max-w-md flex-1 flex-col overflow-hidden md:max-w-[84rem] md:justify-center md:gap-2">
         <div className="flex items-center gap-2">
           <h2 className="flex min-w-0 flex-1 items-center gap-2 font-neo-display text-2xl font-black uppercase leading-none text-neo-pink md:text-5xl">

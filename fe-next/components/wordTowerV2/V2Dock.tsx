@@ -139,7 +139,7 @@ export const V2Dock = memo(function V2Dock(p: Props) {
           : // Phone: one short solid panel (word, one row of letters, one button)
             // instead of the tall transparent wheel strip, so the tower keeps
             // the screen above it.
-            'absolute inset-x-0 bottom-0 z-30 border-t-4 border-neo-cream/20 bg-neo-navy/90 px-4 pb-[max(1rem,calc(env(safe-area-inset-bottom)+0.5rem))] pt-3'
+            'absolute inset-x-0 bottom-0 z-30 border-t-4 border-neo-cream/20 bg-neo-navy/90 px-4 pb-[max(1rem,calc(env(safe-area-inset-bottom)+0.5rem),calc(var(--cap-safe-area-bottom,0px)+0.5rem))] pt-3'
       }
     >
       {p.rejected ? (

@@ -209,7 +209,7 @@ export function WreckScene({
           onClick={() => cutRef.current()}
           disabled={!state.armed}
           aria-label={t('wordTowerV2.wreck.cut')}
-          className="absolute inset-0 z-10 flex items-end justify-center pb-[max(1.5rem,env(safe-area-inset-bottom))] disabled:cursor-default"
+          className="absolute inset-0 z-10 flex items-end justify-center pb-[max(1.5rem,env(safe-area-inset-bottom),var(--cap-safe-area-bottom,0px))] disabled:cursor-default"
         >
           <span
             className={
@@ -225,7 +225,7 @@ export function WreckScene({
           </span>
         </button>
       ) : onFinish || overlay ? null : (
-        <div className="absolute inset-0 z-30 flex items-end justify-center bg-gradient-to-t from-neo-navy via-neo-navy/70 to-transparent p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <div className="absolute inset-0 z-30 flex items-end justify-center bg-gradient-to-t from-neo-navy via-neo-navy/70 to-transparent p-4 pb-[max(1rem,env(safe-area-inset-bottom),var(--cap-safe-area-bottom,0px))]">
           <div className="w-full max-w-sm rounded-neo border-neo-thick border-black bg-neo-cream p-5 text-center text-neo-navy shadow-hard-lg animate-neo-pop">
             <p className="font-neo-display text-3xl font-black uppercase">
               {t('wordTowerV2.wreck.result', { n: state.wrecked, total: state.total })}

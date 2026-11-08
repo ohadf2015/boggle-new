@@ -36,9 +36,12 @@ function renderDock(wide: boolean, feedSlot?: ReactNode) {
 }
 
 describe('V2Dock wheel position', () => {
-  it('Given a phone layout, When the dock renders, Then it is one short solid panel clear of the home indicator', () => {
+  it('Given a phone layout, When the dock renders, Then it is one short solid panel clear of the home indicator and the Android gesture bar', () => {
     const dock = renderDock(false);
-    expect(dock.className).toContain('pb-[max(1rem,calc(env(safe-area-inset-bottom)+0.5rem))]');
+    // env() is 0 inside the Android app's WebView; the real inset is the Capacitor var.
+    expect(dock.className).toContain(
+      'pb-[max(1rem,calc(env(safe-area-inset-bottom)+0.5rem),calc(var(--cap-safe-area-bottom,0px)+0.5rem))]',
+    );
     expect(dock.className).toContain('bg-neo-navy');
     expect(dock.querySelector('[data-wt2-letter-row]')).not.toBeNull();
   });
