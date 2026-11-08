@@ -111,6 +111,10 @@ export default function BrainTrainingPageClient() {
       />
 
       <div className="px-4 py-6 pb-24 space-y-6 max-w-4xl mx-auto w-full flex-1">
+        <p className={cn('text-sm text-center -mt-2', isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70')}>
+          {t('brain.subtitle')}
+        </p>
+
         <QuickDrillsSection drillProgress={isAuthenticated ? drillProgress : undefined} />
 
         {isAuthenticated ? (

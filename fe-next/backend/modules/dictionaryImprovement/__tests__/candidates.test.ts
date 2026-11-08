@@ -22,6 +22,12 @@ describe('isAcceptableForm', () => {
     expect(isAcceptableForm('cat3', 'es')).toBe(false);
   });
 
+  it('accepts Cyrillic for Russian (ё folded) and rejects latin', () => {
+    expect(isAcceptableForm('кошка', 'ru')).toBe(true);
+    expect(prioritizeCandidates(['ёлка'], { lang: 'ru', isKnown: () => false })[0]?.word).toBe('елка');
+    expect(isAcceptableForm('koshka', 'ru')).toBe(false);
+  });
+
   it('accepts Hebrew letters and rejects latin', () => {
     expect(isAcceptableForm('שלום', 'he')).toBe(true);
     expect(isAcceptableForm('shalom', 'he')).toBe(false);
@@ -80,5 +86,15 @@ describe('prioritizeCandidates', () => {
       { lang: 'es', isKnown: (w) => w === 'perro', limit: 5 },
     );
     expect(out).toHaveLength(0);
+  });
+});
+
+describe('rotateTargetLang', () => {
+  it('reaches every dictionary language, Russian included', async () => {
+    const { rotateTargetLang } = await import('../runtime');
+    const { DICTIONARY_LANGS } = await import('../types');
+    const seen = new Set(Array.from({ length: 10 }, (_, d) => rotateTargetLang(new Date(Date.UTC(2026, 0, 1 + d)))));
+    expect(DICTIONARY_LANGS).toContain('ru');
+    expect([...seen].sort()).toEqual([...DICTIONARY_LANGS].sort());
   });
 });

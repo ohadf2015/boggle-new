@@ -43,7 +43,7 @@ export function NoLessonWordsPanel({ words, size, children, compact = false, hid
               animate={{ scale: 1, rotate: 0 }}
               transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 420, damping: 18, delay: 0.08 * i }}
               className={cn(
-                'flex items-center gap-1.5 rounded-neo border-2 border-neo-cream/40 bg-neo-navy font-bold text-neo-cream',
+                'flex items-center gap-1.5 rounded-neo border-2 border-neo-cream/50 bg-neo-navy font-bold text-neo-cream',
                 projector ? 'px-2.5 py-1 text-base @[96rem]/results:px-3.5 @[96rem]/results:py-1.5 @[96rem]/results:text-2xl' : 'px-2.5 py-1 text-sm'
               )}
             >

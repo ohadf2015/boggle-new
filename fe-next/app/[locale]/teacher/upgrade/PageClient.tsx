@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import nextDynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { ShieldCheck, Lock, Smile, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Lock, Smile, ArrowRight, ChevronDown } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
@@ -33,6 +33,7 @@ import { UpgradeYourClasses } from '@/components/teacher/pro/UpgradeYourClasses'
 import { PreCheckoutExplainer } from '@/components/teacher/pro/PreCheckoutExplainer';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { useTeacherReveal } from '@/components/teacher/motion/useTeacherReveal';
+import { NB_ADVANCED } from '@/components/teacher/nb/nbStyles';
 
 const AuthModal = nextDynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
 
@@ -46,6 +47,7 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
   const { tab: linkTab, requester } = readAskSchoolParams(new URLSearchParams(searchParams?.toString() ?? ''));
   const [tab, setTab] = useState<UpgradeTab>(linkTab);
   const [askOpen, setAskOpen] = useState(false);
+  const [matrixOpen, setMatrixOpen] = useState(false);
   const tabsRef = useRef<HTMLDivElement>(null);
   const revealRef = useTeacherReveal<HTMLDivElement>(tab);
   const { hasPro, loading: proLoading, status, source, trialUsed, known, portalUrl, refresh, trialExpires, periodEnd, accessTrialExpires, accessTrialEnded } = useTeacherPro();
@@ -135,9 +137,12 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
         <Link
           key={page}
           href={`/${language}/legal/${page}`}
+          target="_blank"
+          rel="noopener noreferrer"
           className="text-neo-cyan hover:text-neo-lime font-bold text-xs underline transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
         >
           {t(page === 'terms' ? 'legal.termsOfService' : page === 'refund' ? 'legal.refundPolicy' : 'legal.privacyPolicy')}
+          <span className="sr-only"> ({t('common.opensInNewTab')})</span>
         </Link>
       ))}
     </>
@@ -230,7 +235,7 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
             {tab === 'teacher' ? (
               <div id="upgrade-panel-teacher" role="tabpanel" aria-labelledby="upgrade-tab-teacher" data-testid="upgrade-hero-section">
                 {blockedInApp ? (
-                  <p data-testid="upgrade-not-in-app" className="rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light p-4 text-center text-sm font-bold text-neo-white">
+                  <p data-testid="upgrade-not-in-app" className="rounded-neo-xl border-[3px] border-neo-cream/50 bg-neo-navy-light p-4 text-center text-sm font-bold text-neo-white shadow-hard-lg">
                     {t('teacher.subscription.notInApp')}
                   </p>
                 ) : (
@@ -281,7 +286,7 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
                     <div
                       key={label}
                       data-testid="trust-chip"
-                      className="flex items-center gap-2 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-3 py-2"
+                      className="flex items-center gap-2 rounded-neo border-[3px] border-neo-cream/50 bg-neo-navy-light px-3 py-2 shadow-hard"
                     >
                       <Icon className="h-4 w-4 shrink-0 text-neo-lime" strokeWidth={2.5} aria-hidden />
                       <span className="text-xs font-bold leading-snug text-neo-white">{label}</span>
@@ -289,8 +294,18 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
                   ))}
                 </div>
                 <div data-tm><ProPreviewStrip /></div>
-                <div data-tm className="mt-8">
-                  <PlanComparisonMatrix compact />
+                <div data-tm className="mt-6">
+                  <button
+                    type="button"
+                    data-testid="upgrade-matrix-toggle"
+                    aria-expanded={matrixOpen}
+                    onClick={() => setMatrixOpen((v) => !v)}
+                    className={NB_ADVANCED}
+                  >
+                    {t('eg2Pro.compareAll')}
+                    <ChevronDown className={cn('size-5 shrink-0 transition-transform motion-reduce:transition-none', matrixOpen && 'rotate-180')} aria-hidden="true" />
+                  </button>
+                  {matrixOpen ? <div className="mt-3"><PlanComparisonMatrix compact /></div> : null}
                 </div>
               </div>
             ) : (

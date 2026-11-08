@@ -2,7 +2,7 @@
  * A throw inside the mounted round (any of the four mode adapters) had nothing
  * to catch it: QuickPlayHub renders QuickModeAdapter bare, and the page has no
  * error-boundary ancestor. React then unmounts the whole tree, so the hub is
- * gone too — the round never appears AND there is no way back to the picker.
+ * gone too — the round never appears AND there is no way out.
  * That is "it didn't enter at all / the whole game got stuck", and it is silent:
  * nothing is reported, so it never showed up in Sentry.
  *
@@ -23,13 +23,6 @@ vi.mock('@/components/ui/BackButton', () => ({
   BackButton: ({ label }: any) => <button data-testid="mock-back">{label}</button>,
 }));
 vi.mock('@/hooks/useBackOneLevel', () => ({ useBackOneLevel: () => vi.fn() }));
-vi.mock('../QuickPlayModePicker', () => ({
-  QuickPlayModePicker: ({ onSelect }: any) => (
-    <div data-testid="mock-picker">
-      <button data-testid="mock-play" onClick={() => onSelect('wheel-rush', 'tap')}>play</button>
-    </div>
-  ),
-}));
 vi.mock('../lightningPath', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../lightningPath')>();
   return { ...actual, strikeHoldMs: () => 10, STRIKE_HOLD_MS: 10, STRIKE_HOLD_REDUCED_MS: 10 };
@@ -62,23 +55,21 @@ describe('QuickPlayHub — a crashing round must not take the page down', () => 
   });
 
   it('contains the crash instead of unmounting the app', async () => {
-    expect(() => render(<QuickPlayHub />)).not.toThrow();
-
-    fireEvent.click(screen.getByTestId('mock-play'));
+    expect(() => render(<QuickPlayHub startMode="wheel-rush" />)).not.toThrow();
 
     // The boundary fallback renders — the page is alive, not a blank document.
     await waitFor(() => expect(screen.queryByTestId('quick-round-error')).toBeTruthy());
     expect(document.body.textContent?.trim().length).toBeGreaterThan(0);
   });
 
-  it('offers a way back to the mode picker', async () => {
-    render(<QuickPlayHub />);
-    fireEvent.click(screen.getByTestId('mock-play'));
-
+  it('offers a retry that starts a fresh round', async () => {
+    render(<QuickPlayHub startMode="wheel-rush" />);
     await waitFor(() => expect(screen.queryByTestId('quick-round-error')).toBeTruthy());
+    const roundsBefore = vi.mocked(fetch).mock.calls.filter(([u]) => String(u).includes('/round')).length;
 
-    // Retry resets the boundary AND the hub's round state, so the picker returns.
     fireEvent.click(screen.getByTestId('quick-round-error-retry'));
-    await waitFor(() => expect(screen.queryByTestId('mock-picker')).toBeTruthy());
+    await waitFor(() =>
+      expect(vi.mocked(fetch).mock.calls.filter(([u]) => String(u).includes('/round')).length).toBe(roundsBefore + 1)
+    );
   });
 });

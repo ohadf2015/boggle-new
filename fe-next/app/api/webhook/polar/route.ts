@@ -15,11 +15,17 @@ import { PolarClient } from '@/lib/polar'
 import { upsertSubscription, logSubscriptionEvent, grantProFromOrder, grantProFromCheckout, type Tier, type SubscriptionStatus } from '@/lib/subscriptions'
 import { maybeSendPaymentFailedEmail } from '@/lib/education/dunning'
 import { buildPolarCheckoutStatusEvent, buildPolarOrderPaidEvent, buildPolarSubscriptionEndedEvent, polarRevenueProps, withRevenue } from '@/lib/education/polarRevenue'
+import { withPolarMetadataIdentity } from '@/lib/education/checkoutAnalyticsIdentity'
+import type { EduServerEvent } from '@/backend/utils/educationTelemetry'
 import { buildProCheckoutSucceededEvent, buildProTrialSucceededEvent, buildTrialActivatedEvent, buildTrialStartEvent, buildTeacherTrialStartedEvent, buildCheckoutCompleteEvent, buildPaidEvent, buildTeacherTrialConvertedEvent, buildTrialExpiredEvent, buildTrialStartedEvent, buildTeacherProUpgradedEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer'
 import { isPolarTrialLapse } from '@/lib/education/polarTrial'
 
 // Polar payloads are large; we only read a handful of fields.
 type WebhookPayload = any
+
+function captureFunnel(payload: WebhookPayload, userId: string | undefined, event: EduServerEvent) {
+  captureProFunnelServerEvent(withPolarMetadataIdentity(event, payload?.data?.metadata, userId))
+}
 
 /** Map Polar subscription statuses onto our internal union. Anything unrecognised fails closed. */
 function mapStatus(polarStatus: unknown): SubscriptionStatus {
@@ -268,12 +274,12 @@ function trackProConversion(payload: WebhookPayload, userId?: string) {
     if (!userId || getTierFromProductId(getProductId(payload)) !== 'pro') return
     if (mapStatus(payload?.data?.status) === 'trialing') return
     const subId = String(payload?.data?.id ?? '')
-    captureProFunnelServerEvent(withRevenue(buildProCheckoutSucceededEvent(userId, subId), payload?.data))
-    captureProFunnelServerEvent(withRevenue(buildCheckoutCompleteEvent(userId, subId), payload?.data))
-    captureProFunnelServerEvent(withRevenue(buildPaidEvent(userId, subId), payload?.data))
-    captureProFunnelServerEvent(withRevenue(buildTeacherProUpgradedEvent(userId, subId, getLocale(payload)), payload?.data))
+    captureFunnel(payload, userId, withRevenue(buildProCheckoutSucceededEvent(userId, subId), payload?.data))
+    captureFunnel(payload, userId, withRevenue(buildCheckoutCompleteEvent(userId, subId), payload?.data))
+    captureFunnel(payload, userId, withRevenue(buildPaidEvent(userId, subId), payload?.data))
+    captureFunnel(payload, userId, withRevenue(buildTeacherProUpgradedEvent(userId, subId, getLocale(payload)), payload?.data))
     if (trialMarker(payload?.data).trial) {
-      captureProFunnelServerEvent(withRevenue(buildTeacherTrialConvertedEvent(userId, subId), payload?.data))
+      captureFunnel(payload, userId, withRevenue(buildTeacherTrialConvertedEvent(userId, subId), payload?.data))
     }
   } catch (err) {
     console.error('[Polar] conversion telemetry threw:', err)
@@ -291,11 +297,11 @@ function trackProTrial(payload: WebhookPayload, userId?: string) {
     if (!userId || getTierFromProductId(getProductId(payload)) !== 'pro') return
     if (mapStatus(payload?.data?.status) !== 'trialing') return
     const subId = String(payload?.data?.id ?? '')
-    captureProFunnelServerEvent(withRevenue(buildProTrialSucceededEvent(userId, subId), payload?.data))
-    captureProFunnelServerEvent(withRevenue(buildTrialActivatedEvent(userId, subId), payload?.data))
-    captureProFunnelServerEvent(withRevenue(buildTrialStartEvent(userId, subId), payload?.data))
-    captureProFunnelServerEvent(withRevenue(buildTeacherTrialStartedEvent(userId, subId), payload?.data))
-    captureProFunnelServerEvent(withRevenue(buildTrialStartedEvent(userId, subId, getLocale(payload)), payload?.data))
+    captureFunnel(payload, userId, withRevenue(buildProTrialSucceededEvent(userId, subId), payload?.data))
+    captureFunnel(payload, userId, withRevenue(buildTrialActivatedEvent(userId, subId), payload?.data))
+    captureFunnel(payload, userId, withRevenue(buildTrialStartEvent(userId, subId), payload?.data))
+    captureFunnel(payload, userId, withRevenue(buildTeacherTrialStartedEvent(userId, subId), payload?.data))
+    captureFunnel(payload, userId, withRevenue(buildTrialStartedEvent(userId, subId, getLocale(payload)), payload?.data))
   } catch (err) {
     console.error('[Polar] trial telemetry threw:', err)
   }
@@ -319,7 +325,7 @@ function trackTrialExpired(payload: WebhookPayload, userId?: string) {
       current_period_end: periodEnd,
     })) return
     const subId = String(data?.id ?? '')
-    captureProFunnelServerEvent(withRevenue(buildTrialExpiredEvent(userId, subId), data))
+    captureFunnel(payload, userId, withRevenue(buildTrialExpiredEvent(userId, subId), data))
   } catch (err) {
     console.error('[Polar] trial_expired telemetry threw:', err)
   }
@@ -332,7 +338,7 @@ function trackTrialExpired(payload: WebhookPayload, userId?: string) {
 function trackOrderPaid(payload: WebhookPayload, userId?: string) {
   try {
     if (!userId || getTierFromProductId(getProductId(payload)) !== 'pro') return
-    captureProFunnelServerEvent(buildPolarOrderPaidEvent(userId, payload?.data))
+    captureFunnel(payload, userId, buildPolarOrderPaidEvent(userId, payload?.data))
   } catch (err) {
     console.error('[Polar] order telemetry threw:', err)
   }
@@ -343,7 +349,7 @@ function trackSubscriptionEnded(kind: 'canceled' | 'revoked', payload: WebhookPa
   try {
     if (!userId || getTierFromProductId(getProductId(payload)) !== 'pro') return
     const data = payload?.data ?? {}
-    captureProFunnelServerEvent(buildPolarSubscriptionEndedEvent(kind, userId, data, trialMarker(data).trial))
+    captureFunnel(payload, userId, buildPolarSubscriptionEndedEvent(kind, userId, data, trialMarker(data).trial))
   } catch (err) {
     console.error('[Polar] cancel telemetry threw:', err)
   }
@@ -357,7 +363,7 @@ function trackSubscriptionEnded(kind: 'canceled' | 'revoked', payload: WebhookPa
 function trackCheckoutStatus(eventType: string, payload: WebhookPayload, userId?: string) {
   try {
     if (getTierFromProductId(getProductId(payload)) !== 'pro') return
-    captureProFunnelServerEvent(buildPolarCheckoutStatusEvent(userId, eventType, payload?.data))
+    captureFunnel(payload, userId, buildPolarCheckoutStatusEvent(userId, eventType, payload?.data))
   } catch (err) {
     console.error('[Polar] checkout status telemetry threw:', err)
   }

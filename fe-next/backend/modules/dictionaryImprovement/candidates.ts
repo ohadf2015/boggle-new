@@ -22,6 +22,8 @@ const FORM_RE: Record<LangCode, RegExp> = {
   // Japanese: hiragana block + prolonged-sound mark (ー). Katakana/kanji rejected
   // — the JA validation set is hiragana-only (correct for boards).
   ja: /^[ぁ-ゖー]+$/,
+  // ё is folded to е by normalizeWord
+  ru: /^[а-я]+$/,
 };
 
 /**

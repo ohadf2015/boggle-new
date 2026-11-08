@@ -73,6 +73,14 @@ describe('locale tile bags', () => {
     expect(distribution['あ']).toBeGreaterThan(0);
   });
 
+  it('ja bag deals voiced and small kana, so words like がっこう are playable', () => {
+    const { distribution, values } = getTileBag('ja');
+    for (const kana of ['が', 'で', 'ば', 'っ', 'ゃ', 'ょ']) {
+      expect(distribution[kana]).toBeGreaterThan(0);
+      expect(values[kana]).toBeGreaterThan(0);
+    }
+  });
+
   it('unknown locale falls back to en', () => {
     const { distribution } = getTileBag('xx' as any);
     expect(distribution['E']).toBeGreaterThan(0);

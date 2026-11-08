@@ -95,8 +95,10 @@ describe('removeApprovedWord', () => {
     // DB (`word_scores.is_potentially_valid`) is the authoritative store.
     const approvedFile = path.join(path.resolve(__dirname, '..'), 'hebrew_words_approved.txt');
 
+    const realContent = await fsp.readFile(approvedFile, 'utf-8');
     const originalContent = 'מילה\nבדיקה\nשלום\n';
     await fsp.writeFile(approvedFile, originalContent, 'utf-8');
+    try {
 
     dictionary.hebrewWords.add('בדיקה');
     await removeApprovedWord('בדיקה', 'he');
@@ -108,8 +110,9 @@ describe('removeApprovedWord', () => {
     const fileContent = await fsp.readFile(approvedFile, 'utf-8');
     expect(fileContent).toBe(originalContent);
 
-    // Clean up
-    await fsp.writeFile(approvedFile, '', 'utf-8');
+    } finally {
+      await fsp.writeFile(approvedFile, realContent, 'utf-8');
+    }
   });
 
   it('should handle missing approved file gracefully', async () => {

@@ -6,13 +6,17 @@
  */
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Trash2 } from 'lucide-react';
+import Link from 'next/link';
+import { ArrowLeft, Trash2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { TeacherGate } from '@/components/education/TeacherGate';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { fetchWithAuth } from '@/utils/authFetch';
 import { cn } from '@/lib/utils';
+import { useClassrooms } from '@/hooks/useClassroom';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
+import { NB_BLOCK, NB_PANEL, NB_SMALL, NB_STICKER } from '@/components/teacher/nb/nbStyles';
 
 export default function DeleteClassPageClient({ classroomId }: { classroomId: string }) {
   const { t } = useLanguage();
@@ -31,6 +35,8 @@ function DeleteClassPanel({ classroomId }: { classroomId: string }) {
   const [open, setOpen] = useState(false);
   const [working, setWorking] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { classrooms } = useClassrooms();
+  const name = classrooms.find((c) => c.id === classroomId)?.name;
 
   const handleDelete = async () => {
     if (working) return;
@@ -55,26 +61,32 @@ function DeleteClassPanel({ classroomId }: { classroomId: string }) {
   };
 
   return (
-    <main className="mx-auto max-w-lg p-4">
-      <h1 className="font-neo-display text-2xl font-bold text-neo-cream mb-4">
-        {t('teacher.classroom.delete')}
-      </h1>
-      <p className="text-sm text-neo-cream/80 mb-4">{t('teacher.classroom.confirmDelete')}</p>
-      {error ? (
-        <p className="text-neo-red text-sm font-medium mb-3" role="alert">{error}</p>
-      ) : null}
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        data-testid="delete-class-affordance"
-        className={cn(
-          'inline-flex items-center gap-2 px-4 py-2 rounded-neo border-3 border-neo-red',
-          'bg-neo-red/10 text-neo-red font-bold text-sm min-h-[44px]'
-        )}
-      >
-        <Trash2 className="w-4 h-4" />
-        {t('teacher.classroom.delete')}
-      </button>
+    <main className="mx-auto flex max-w-lg flex-col gap-4 p-4">
+      <Link href={`/${language}/teacher/classroom`} className={cn(NB_SMALL, NB_BLOCK.navy, 'self-start')}>
+        <DirectionalIcon icon={ArrowLeft} className="size-4" />
+        {t('education.analytics.backToClassroom')}
+      </Link>
+      <section className={cn(NB_PANEL, 'flex flex-col gap-3 p-4 sm:p-5')}>
+        <h1 className="font-neo-display text-2xl font-black text-neo-cream">{t('teacher.classroom.delete')}</h1>
+        {name ? (
+          <span data-testid="delete-class-name" dir="auto" className={cn(NB_STICKER, NB_BLOCK.cream, 'self-start text-sm')}>
+            {name}
+          </span>
+        ) : null}
+        <p className="text-sm font-semibold text-neo-cream/80">{t('teacher.classroom.confirmDelete')}</p>
+        {error ? (
+          <p className="text-sm font-bold text-neo-red" role="alert">{error}</p>
+        ) : null}
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          data-testid="delete-class-affordance"
+          className={cn(NB_SMALL, 'min-h-12 self-start border-neo-black bg-neo-red px-4 text-base text-white')}
+        >
+          <Trash2 className="size-4" aria-hidden="true" />
+          {t('teacher.classroom.delete')}
+        </button>
+      </section>
       <ConfirmationDialog
         open={open}
         onOpenChange={setOpen}

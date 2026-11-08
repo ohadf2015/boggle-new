@@ -7,7 +7,8 @@
  *   /en/education/classroom-game?preview=podium     — alias of ?preview=hostresults (emulate reduced motion for the settled podium)
  *   /en/education/classroom-game?preview=projector  — the projector lobby, students popping in
  *   /en/education/classroom-game?preview=waiting    — a student's /education/live lobby
- *   (&count=N sets the projector roster size, default 12)
+ *   (&count=N sets the projector roster size, default 12; &ready=all readies everyone so Start unlocks)
+ *   &stage=wheel|fallback|wordcraft — an in-game projector stage instead of the lobby
  *   ?preview=hostresults|phone|quiz|duel|ended — the round-end surfaces, see LiveResultsPreviews
  *   ?preview=ingame — the teacher's in-game projector mid-round
  *   ?preview=lobby — the game picker; ?preview=setup — the new-class invite step, students landing
@@ -24,6 +25,9 @@ import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useNavigation } from '@/contexts/NavigationContext';
 import ProjectorLobby from '@/components/education/projector/ProjectorLobby';
+import ProjectorWheel from '@/components/education/live/ProjectorWheel';
+import { ProjectorStageFallback } from '@/components/education/live/ProjectorStageFallback';
+import { useGameStore } from '@/hooks/gameState/store';
 import Avatar from '@/components/Avatar';
 import { EduStudentLobby } from '@/components/education/live/EduStudentLobby';
 import { sampleProjectorStudents } from '@/components/education/results/previewFixtures';
@@ -34,14 +38,40 @@ import { StudentQuizPreview } from './StudentQuizPreview';
 import { InGamePreview } from './InGamePreview';
 import { PhoneGamePreview } from './PhoneGamePreview';
 import { LobbyPickerPreview } from './LobbyPickerPreview';
+import { WarmUpPreview } from './WarmUpPreview';
 import { SetupInvitePreview } from './SetupInvitePreview';
 import { CrosswordPreview } from './CrosswordPreview';
 
 export type { LiveSurfacePreviewKind };
 
+function StagePreview({ stage }: { stage: string }) {
+  const { t } = useLanguage();
+  const players = useMemo(() => sampleProjectorStudents(6).map((s, i) => ({ username: s.username, score: 120 - i * 17 })), []);
+  const [modeSet, setModeSet] = useState(false);
+  useEffect(() => {
+    if (stage !== 'wordcraft') return;
+    const store = useGameStore.getState();
+    const before = store.gameMode;
+    store.setGameMode('wordcraft');
+    setModeSet(true);
+    return () => useGameStore.getState().setGameMode(before);
+  }, [stage]);
+
+  if (stage === 'wordcraft') return modeSet ? <InGamePreview /> : null;
+  return (
+    <div className="fixed inset-0 z-[80] flex items-stretch justify-center gap-6 bg-neo-navy p-8">
+      {stage === 'wheel' && (
+        <ProjectorWheel puzzle={{ centerLetter: 'r', outerLetters: ['s', 't', 'o', 'm', 'a', 'i'], allLetters: ['r', 's', 't', 'o', 'm', 'a', 'i'] }} label={t('eduLiveRoom.round.wheelLabel')} />
+      )}
+      <ProjectorStageFallback mode={stage === 'wheel' ? 'wheel-rush' : 'blast'} players={players} t={t} />
+    </div>
+  );
+}
+
 function ProjectorPreview() {
   const { t, language } = useLanguage();
   const params = useSearchParams();
+  const allReady = params?.get('ready') === 'all';
   const total = Math.max(0, Math.min(60, Number(params?.get('count') ?? 12) || 0));
   const roster = useMemo(() => sampleProjectorStudents(total), [total]);
   // Students arrive one at a time so the pop-in + join sting can be judged.
@@ -57,7 +87,7 @@ function ProjectorPreview() {
       gameCode="YHNCF4"
       language={language}
       students={roster.slice(0, shown)}
-      readyUsernames={roster.slice(0, Math.floor(shown / 3)).map((s) => s.username)}
+      readyUsernames={roster.slice(0, allReady ? shown : Math.floor(shown / 3)).map((s) => s.username)}
       t={t}
       onStartGame={() => toast('Preview: start')}
       onStartPracticeRound={() => toast('Preview: practice with bots')}
@@ -128,8 +158,14 @@ export default function LiveSurfacePreview({ kind }: { kind: LiveSurfacePreviewK
   if (kind === 'ingame') return <InGamePreview />;
   if (kind === 'phonegame') return <PhoneGamePreview />;
   if (kind === 'lobby') return <LobbyPickerPreview />;
+  if (kind === 'warmup') return <WarmUpPreview />;
   if (kind === 'setup') return <SetupInvitePreview />;
   if (kind === 'crosswordwall') return <CrosswordPreview surface="wall" />;
   if (kind === 'crosswordphone') return <CrosswordPreview surface="phone" />;
-  return <ProjectorPreview />;
+  return <ProjectorOrStagePreview />;
+}
+
+function ProjectorOrStagePreview() {
+  const stage = useSearchParams()?.get('stage');
+  return stage ? <StagePreview stage={stage} /> : <ProjectorPreview />;
 }

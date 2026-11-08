@@ -28,4 +28,22 @@ describe('PracticeRunPanel', () => {
     fireEvent.click(screen.getByTestId('practice-run-show'));
     expect(screen.getByTestId('practice-run-frame')).toBeInTheDocument();
   });
+
+  it('given the practice run, then it shows one status and the student view, with no step list, body copy or QR to read first', () => {
+    const { container } = render(<PracticeRunPanel gameCode="AB12CD" language="en" joined={false} t={t} />);
+    expect(container.textContent).not.toMatch(/eduLiveRoom\.practice\.(step\d|body|phoneTitle|phoneHint)/);
+    expect(container.querySelector('svg[role="img"], canvas')).toBeNull();
+    expect(container.querySelectorAll('svg path[d^="M0 0h"]').length).toBe(0);
+  });
+
+  it('given the wide panel, then its status sits under the title, clear of the page sound button in the top corner', () => {
+    render(<PracticeRunPanel gameCode="AB12CD" language="en" joined t={t} />);
+    const header = document.getElementById('practice-run-title')?.parentElement as HTMLElement;
+    expect(header.className).toContain('flex-col');
+  });
+
+  it('given a phone, then the practice card sits above the fixed teacher bar instead of under it', () => {
+    render(<PracticeRunPanel gameCode="AB12CD" language="en" joined t={t} />);
+    expect(screen.getByTestId('practice-run-card').className).toContain('--lc-teacher-bar-h');
+  });
 });

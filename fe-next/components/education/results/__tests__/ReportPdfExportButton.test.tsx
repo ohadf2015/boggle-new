@@ -4,8 +4,10 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 const pro = vi.hoisted(() => ({ hasPro: false, loading: false, known: true, trialUsed: false, accessTrialExpires: null as string | null, accessTrialEnded: false }));
-vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => pro }));
-vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'teacher-1' } }) }));
+const useTeacherPro = vi.hoisted(() => vi.fn());
+vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => useTeacherPro() }));
+const auth = vi.hoisted(() => ({ user: { id: 'teacher-1' } as { id: string } | null, loading: false, isTeacher: true }));
+vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => auth }));
 vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ t: (k: string, p?: Record<string, string>) => (p?.name ? `${k}:${p.name}` : k), language: 'en', dir: 'ltr' }) }));
 vi.mock('@/lib/education/proFunnelTelemetry', () => ({ trackTeacherProUpgradeClick: vi.fn() }));
 vi.mock('react-hot-toast', () => ({ default: { error: vi.fn() } }));
@@ -38,6 +40,23 @@ const players = [
 ];
 
 describe('ReportPdfExportButton', () => {
+  beforeEach(() => {
+    Object.assign(auth, { user: { id: 'teacher-1' }, loading: false, isTeacher: true });
+    useTeacherPro.mockReset();
+    useTeacherPro.mockImplementation(() => pro);
+  });
+
+  it.each([
+    ['a student', { user: { id: 's1' }, loading: false, isTeacher: false }],
+    ['an anonymous guest', { user: null, loading: false, isTeacher: false }],
+    ['a viewer whose role is still loading', { user: { id: 't1' }, loading: true, isTeacher: false }],
+  ])('Given %s, Then no locked export or price renders and Pro status is never fetched', (_label, viewer) => {
+    Object.assign(auth, viewer);
+    const { container } = render(<ReportPdfExportButton language="en" summary={summary} players={players} />);
+    expect(container).toBeEmptyDOMElement();
+    expect(useTeacherPro).not.toHaveBeenCalled();
+  });
+
   let tab: { location: { href: string }; close: ReturnType<typeof vi.fn>; opener: unknown };
   beforeEach(() => {
     Object.assign(pro, { hasPro: false, loading: false, known: true, trialUsed: false, accessTrialExpires: null, accessTrialEnded: false });

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { polarTrialDaysLeft, polarTrialDaysTitle } from '@/lib/education/polarTrial';
+import { ProBanner } from './pro/ProBanner';
 import { TeacherProCheckoutButton } from '@/components/teacher/TeacherProCheckoutButton';
 
 /**
@@ -24,27 +25,18 @@ export function TeacherProTrialLifecycleBanner({
   const title = polarTrialDaysTitle(t, daysLeft);
 
   return (
-    <aside
-      data-testid="teacher-pro-trial-lifecycle"
-      data-days={daysLeft === null ? '' : String(daysLeft)}
-      className={`border-b-3 border-black px-4 py-3 ${urgent ? 'bg-neo-pink' : 'bg-neo-lime'}`}
-    >
-      <div className="mx-auto flex max-w-5xl flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div className="min-w-0">
-          <p className="font-neo-display text-sm font-black leading-tight text-black">
-            {title}
-          </p>
-          <p className="mt-0.5 font-neo-body text-xs font-bold text-black/80">
-            {t('teacher.subscription.trialLifecycleBody')}
-          </p>
-        </div>
-        <TeacherProCheckoutButton
-          source="dashboard_trial_lifecycle"
-          testId="teacher-pro-trial-lifecycle-cta"
-        >
+    <ProBanner
+      testId="teacher-pro-trial-lifecycle"
+      data={{ 'data-days': daysLeft === null ? '' : String(daysLeft) }}
+      tone={urgent ? 'urgent' : 'calm'}
+      proLabel={t('eduShell.nav.pro')}
+      title={title}
+      body={t('teacher.subscription.trialLifecycleBody')}
+      action={
+        <TeacherProCheckoutButton source="dashboard_trial_lifecycle" testId="teacher-pro-trial-lifecycle-cta">
           {t('teacher.subscription.trialLifecycleCta')}
         </TeacherProCheckoutButton>
-      </div>
-    </aside>
+      }
+    />
   );
 }

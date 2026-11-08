@@ -28,6 +28,8 @@ import { DuelRevealScreen, type DuelOutcome } from '@/components/education/duels
 import { ClassroomGameEndedState } from '@/components/education/ClassroomGameEndedState';
 import { ClassroomBossOutcome } from '@/components/education/ClassroomBossOutcome';
 import { EduStudentHero } from '@/components/education/live/EduStudentHero';
+import { useStudyDeck } from '@/lib/education/studyDeckStore';
+import { WARM_UP_SAMPLE } from './WarmUpPreview';
 import LockerGrid from '@/components/education/economy/LockerGrid';
 import { LIVE_KEYFRAMES } from '@/components/education/live/eduLiveStyles';
 import { useClassroomBossStore } from '@/stores/classroomBossStore';
@@ -86,10 +88,15 @@ export function HostResultsPreview() {
 }
 
 export function PhoneResultsPreview() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const params = useSearchParams();
   const { summary, players } = usePreviewRound();
   useSeededBoss();
+  // `&deck=1`: the room's word deck, as the live socket would send it, so the between-rounds warm-up spells list words.
+  const seedDeck = params?.get('deck') === '1';
+  useEffect(() => {
+    if (seedDeck) useStudyDeck.getState().setDeck('PREVIEW', (WARM_UP_SAMPLE[language] ?? WARM_UP_SAMPLE.en).map((word) => ({ word })));
+  }, [seedDeck, language]);
   const me = params?.get('me') ?? players[1]?.username ?? players[0]?.username ?? 'Maya';
   if (params?.get('hero') === '1') {
     return (

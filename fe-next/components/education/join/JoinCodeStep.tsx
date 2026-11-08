@@ -7,6 +7,7 @@ import { JoinCodeField } from './JoinCodeField';
 import { JoinAlert } from './JoinAlert';
 import { JoinPrimaryButton } from './JoinPrimaryButton';
 import { useKeepInView } from './useKeepInView';
+import { DeadEndPracticeLink } from './DeadEndPracticeLink';
 import type { JoinFlowState } from './useJoinFlow';
 
 const K = 'education.student.join';
@@ -23,6 +24,7 @@ export function JoinCodeStep({ flow, pasteNoteKey, onPaste }: JoinCodeStepProps)
   const nextRef = useRef<HTMLButtonElement>(null);
   useKeepInView(formRef, nextRef);
   const refused = !!flow.codeErrorKey || flow.codeRejected;
+  const wrongCode = flow.codeErrorKey ? flow.codeErrorKey === `${K}.invalidCode` : flow.codeRejected;
 
   return (
     <form
@@ -58,7 +60,10 @@ export function JoinCodeStep({ flow, pasteNoteKey, onPaste }: JoinCodeStepProps)
 
         <div id="join-code-note" className="min-h-11">
           {refused ? (
-            <JoinAlert key={flow.refusalTick}>{t(flow.codeErrorKey ?? `${K}.invalidCode`)}</JoinAlert>
+            <div className="flex flex-col gap-2">
+              <JoinAlert key={flow.refusalTick}>{t(flow.codeErrorKey ?? `${K}.invalidCode`)}</JoinAlert>
+              {wrongCode && <DeadEndPracticeLink state="invalid_code" variant="quiet" />}
+            </div>
           ) : (
             <p
               role="status"

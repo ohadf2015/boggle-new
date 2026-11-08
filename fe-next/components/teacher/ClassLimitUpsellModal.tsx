@@ -16,9 +16,11 @@ import {
   trackTeacherPlanGateUpgradeClick,
 } from '@/lib/education/proFunnelTelemetry';
 import { teacherProUpgradeCtaLabel } from '@/components/education/TeacherProCheckoutCta';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogTitle, DialogClose } from '@/components/ui/dialog';
-import { X, Zap } from 'lucide-react';
+import { Dialog } from '@/components/ui/dialog';
+import { Zap } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { NbDialogBody, NbDialogContent, NbDialogFooter, NbDialogHeader } from '@/components/teacher/nb/NbDialog';
+import { NB_BLOCK, NB_LINK, NB_PANEL, NB_PRIMARY, NB_SECONDARY, NB_STICKER } from '@/components/teacher/nb/nbStyles';
 import { ProFeaturePreview } from '@/components/teacher/pro/ProFeaturePreview';
 
 export type PlanGateLimitType = 'classrooms' | 'students';
@@ -120,132 +122,101 @@ export default function ClassLimitUpsellModal({
           limit: limit ?? FREE_TIER_LIMITS.classes,
         });
 
+  const upgradeClass = cn(NB_PRIMARY, 'cursor-pointer');
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      {/* Light-only surface: dark: variants are pinned to the light values on purpose
-          (.claude/rules/60-recurring-pitfalls.md Class 5) — every child sets text-black. */}
-      <DialogContent
-        className="sm:max-w-md bg-neo-cream dark:bg-neo-cream text-black dark:text-black border-3 border-black shadow-hard-lg rounded-neo overflow-hidden p-0"
-        hideCloseButton
-      >
-          <div className="bg-neo-cyan px-6 py-4 border-b-3 border-black flex items-center justify-between">
-            <DialogTitle className="text-2xl font-neo-display font-black normal-case text-black">
-              {t(titleKey)}
-            </DialogTitle>
-            <DialogClose asChild>
-              <button
-                className="cursor-pointer text-black hover:bg-black/10 p-1 rounded transition-colors"
-                aria-label={t('common.close')}
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </DialogClose>
+      <NbDialogContent size="sm" noDescription>
+        <NbDialogHeader
+          color="cyan"
+          icon={<Zap className="size-6" strokeWidth={3} aria-hidden="true" />}
+          title={t(titleKey)}
+          closeLabel={t('common.close')}
+        />
+        <NbDialogBody className="space-y-4">
+          <div className={cn(NB_PANEL, 'p-4')}>
+            <p className="font-neo-display text-lg font-black leading-snug">{message}</p>
+            <p className="mt-1 font-neo-body text-sm font-semibold leading-relaxed text-neo-cream/80">
+              {t('teacher.subscription.upgradeProDescription')}
+            </p>
           </div>
 
-          <div className="p-6 space-y-4">
-            <div className="bg-neo-pink/20 border-2 border-neo-cream/40 rounded-neo p-4">
-              <div className="flex items-center gap-3 mb-2">
-                <Zap className="w-5 h-5 text-black flex-shrink-0" />
-                <p className="font-bold text-black">{message}</p>
-              </div>
-              <p className="text-sm text-black/70 font-bold leading-relaxed">
-                {t('teacher.subscription.upgradeProDescription')}
-              </p>
+          <div className="space-y-2">
+            <h3 className="font-neo-display text-lg font-black text-neo-cream">
+              {t('teacher.subscription.proFeatures')}
+            </h3>
+            <div aria-hidden="true" className="pointer-events-none select-none">
+              <ProFeaturePreview feature="analytics" />
             </div>
-
-            <div className="space-y-2">
-              <h3 className="font-neo-display font-black text-black text-lg">
-                {t('teacher.subscription.proFeatures')}
-              </h3>
-              <div aria-hidden="true" className="pointer-events-none select-none">
-                <ProFeaturePreview feature="analytics" />
-              </div>
-              <ul className="flex flex-wrap gap-2 text-sm">
-                {['teacher.subscription.unlimitedClasses', 'teacher.subscription.unlimitedStudents'].map((key) => (
-                  <li key={key} className="rounded-neo border-2 border-black bg-neo-lime px-2 py-0.5 font-bold text-black">
-                    {t(key)}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="border-2 border-black rounded-neo p-4 bg-white">
-              <p className="text-sm font-bold text-black/70">
-                {t('teacher.subscription.priceUSD')}
-              </p>
-              <p className="text-3xl font-neo-display font-black text-neo-cyan">
-                ${TEACHER_PRO_PRICE_USD}{' '}
-                <span className="text-lg text-black/60 font-bold">
-                  {t('teacher.subscription.perMonth')}
-                </span>
-              </p>
-              <p className="text-xs font-bold text-black/50 mt-2">
-                {t('teacher.subscription.autoRenew')}
-              </p>
-            </div>
-
-            <div className="flex gap-3 pt-4">
-              {isTrialExpired ? (
-                <Button
-                  asChild
-                  className="flex-1 cursor-pointer bg-neo-cyan text-black font-black border-2 border-black shadow-hard hover:-translate-y-0.5 transition"
-                >
-                  <Link
-                    href={`/${language}/teacher/upgrade`}
-                    onClick={() =>
-                      trackGrowthEvent('landing_cta_clicked', {
-                        cta: 'teacher_pro',
-                        source: 'trial_expired_modal',
-                      })
-                    }
-                  >
-                    {t('teacher.subscription.upgradeNow')}
-                  </Link>
-                </Button>
-              ) : (
-                <Button
-                  type="button"
-                  data-testid="plan-gate-upgrade"
-                  disabled={pending}
-                  aria-busy={pending || undefined}
-                  onClick={() => {
-                    void startPolarCheckout();
-                  }}
-                  className="flex-1 cursor-pointer bg-neo-cyan text-black font-black border-2 border-black shadow-hard hover:-translate-y-0.5 transition disabled:opacity-60"
-                >
-                  {pending ? t('common.loading') : teacherProUpgradeCtaLabel(language)}
-                </Button>
-              )}
-              <Button
-                onClick={isTrialExpired && onContinueFree ? onContinueFree : onClose}
-                variant="outline"
-                className="flex-1 cursor-pointer border-2 border-black bg-neo-cream text-black font-black shadow-hard hover:-translate-y-0.5 transition"
-              >
-                {isTrialExpired && onContinueFree
-                  ? t('teacher.subscription.continueFree')
-                  : t('common.cancel')}
-              </Button>
-            </div>
-
-            <div className="border-t-2 border-black/10 pt-4 text-center">
-              <p className="text-xs font-bold text-black/60">
-                {t('education.landing.districtCta.title')} {t('education.landing.districtCta.body')}
-              </p>
-              <Link
-                href={`/${language}/education/for-schools`}
-                onClick={() =>
-                  trackGrowthEvent('landing_cta_clicked', {
-                    cta: 'district_upsell',
-                    source: isStudentLimit ? 'student_limit_modal' : 'class_limit_modal',
-                  })
-                }
-                className="mt-1 inline-block cursor-pointer text-sm font-black text-neo-purple underline underline-offset-2 hover:text-black"
-              >
-                {t('education.landing.districtCta.button')}
-              </Link>
-            </div>
+            <ul className="flex flex-wrap gap-2">
+              {['teacher.subscription.unlimitedClasses', 'teacher.subscription.unlimitedStudents'].map((key) => (
+                <li key={key} className={cn(NB_STICKER, NB_BLOCK.lime, 'text-sm')}>
+                  {t(key)}
+                </li>
+              ))}
+            </ul>
           </div>
-      </DialogContent>
+
+          <p className="flex flex-wrap items-baseline gap-x-2 font-neo-body text-sm font-bold text-neo-cream/80">
+            <span>{t('teacher.subscription.priceUSD')}</span>
+            <span className="font-neo-display text-3xl font-black text-neo-cyan">${TEACHER_PRO_PRICE_USD}</span>
+            <span>{t('teacher.subscription.perMonth')}</span>
+            <span className="basis-full text-xs text-neo-cream/65">{t('teacher.subscription.autoRenew')}</span>
+          </p>
+
+          <p className="border-t-2 border-neo-cream/20 pt-3 text-center font-neo-body text-xs font-bold text-neo-cream/70">
+            {t('education.landing.districtCta.title')} {t('education.landing.districtCta.body')}{' '}
+            <Link
+              href={`/${language}/education/for-schools`}
+              onClick={() =>
+                trackGrowthEvent('landing_cta_clicked', {
+                  cta: 'district_upsell',
+                  source: isStudentLimit ? 'student_limit_modal' : 'class_limit_modal',
+                })
+              }
+              className={cn(NB_LINK, 'cursor-pointer text-xs')}
+            >
+              {t('education.landing.districtCta.button')}
+            </Link>
+          </p>
+        </NbDialogBody>
+        <NbDialogFooter>
+          <button
+            type="button"
+            onClick={isTrialExpired && onContinueFree ? onContinueFree : onClose}
+            className={cn(NB_SECONDARY, 'cursor-pointer')}
+          >
+            {isTrialExpired && onContinueFree ? t('teacher.subscription.continueFree') : t('common.cancel')}
+          </button>
+          {isTrialExpired ? (
+            <Link
+              href={`/${language}/teacher/upgrade`}
+              onClick={() =>
+                trackGrowthEvent('landing_cta_clicked', {
+                  cta: 'teacher_pro',
+                  source: 'trial_expired_modal',
+                })
+              }
+              className={upgradeClass}
+            >
+              {t('teacher.subscription.upgradeNow')}
+            </Link>
+          ) : (
+            <button
+              type="button"
+              data-testid="plan-gate-upgrade"
+              disabled={pending}
+              aria-busy={pending || undefined}
+              onClick={() => {
+                void startPolarCheckout();
+              }}
+              className={upgradeClass}
+            >
+              {pending ? t('common.loading') : teacherProUpgradeCtaLabel(language)}
+            </button>
+          )}
+        </NbDialogFooter>
+      </NbDialogContent>
     </Dialog>
   );
 }

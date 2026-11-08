@@ -113,6 +113,8 @@ export interface SurvivalGameActions {
   restoreLife: (amount: number) => void;
   /** Ends the finish beat early (tap on the board) and opens results now. */
   skipFinish: () => void;
+  /** Ends the round unsolved (a timed round's clock ran out). No-op once the game is over. */
+  endRound: () => void;
   gameDir: 'ltr' | 'rtl';
   clueContainerRef: React.RefObject<HTMLDivElement | null>;
 }
@@ -392,6 +394,10 @@ export function useSurvivalGameLogic({
     dispatch({ type: 'SET_LIFE_GAIN_ANIMATION', payload: { amount, isGaining: amount !== null } });
   }, []);
 
+  const endRound = useCallback(() => {
+    handleGameOverRef.current?.(false);
+  }, []);
+
   const restoreLife = useCallback((amount: number) => {
     dispatch({ type: 'RESTORE_LIFE', payload: { amount } });
   }, []);
@@ -444,6 +450,7 @@ export function useSurvivalGameLogic({
     dismissNotification,
     restoreLife,
     skipFinish: finishHold.skip,
+    endRound,
     gameDir,
     clueContainerRef,
   };

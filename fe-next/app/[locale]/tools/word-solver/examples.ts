@@ -80,7 +80,7 @@ export const SOLVER_EXAMPLES: Partial<Record<Locale, SolverExamples>> = {
     countSuffix: ' ord',
     listSeparator: ', ',
     rows: [
-      { letters: 'bokstäver', total: 296, picks: ['beskärt', 'osäkert', 'vätskor'], note: 'Nio bokstäver ger många långa ord.' },
+      { letters: 'bokstäver', total: 297, picks: ['beskärt', 'osäkert', 'vätskor'], note: 'Nio bokstäver ger många långa ord.' },
       { letters: 'stjärna', total: 114, picks: ['tjänar', 'tränas', 'nästa'], note: 'Sju bokstäver räcker till över hundra ord.' },
       { letters: 'sommar', total: 39, picks: ['morsa', 'arom', 'mars'], note: 'Dubbla bokstäver räknas var för sig.' },
       { letters: 'kärlek', total: 27, picks: ['läker', 'kälke', 'relä'], note: 'Å, ä och ö är egna bokstäver, inte a och o.' },

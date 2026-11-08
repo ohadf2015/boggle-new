@@ -6,7 +6,7 @@
  * external authority, writing `verification_status`. The every-4h auto-promotion
  * cron then promotes anything `verified` (gated by the offensive filter).
  *
- *   en / es / sv → Wiktionary  (REST definition API, `body.<lang>`)
+ *   en / es / sv / ru → Wiktionary  (REST definition API, `body.<lang>`)
  *   ja           → Jisho/JMdict (hiragana; Wiktionary can't verify kana)
  *   he           → milog, owned by startDictionaryEnrichmentCron (not here)
  *
@@ -18,8 +18,8 @@ import logger from '../utils/logger';
 import { emitDictionaryRun } from './dictionaryPipelineTelemetry';
 import type { ProcessQueueResult } from '../services/wiktionaryEnVerifier';
 
-type Lang = 'en' | 'es' | 'sv' | 'ja';
-const LANGS: readonly Lang[] = ['en', 'es', 'sv', 'ja'] as const;
+type Lang = 'en' | 'es' | 'sv' | 'ja' | 'ru';
+const LANGS: readonly Lang[] = ['en', 'es', 'sv', 'ja', 'ru'] as const;
 
 export type WordVerificationSummary = Record<Lang, ProcessQueueResult> & { totalVerified: number };
 
@@ -53,9 +53,10 @@ async function verifyLang(lang: Lang): Promise<ProcessQueueResult> {
         const { processWiktionaryEsVerificationQueue } = await import('../services/wiktionaryEsVerifier');
         return await processWiktionaryEsVerificationQueue();
       }
-      case 'sv': {
+      case 'sv':
+      case 'ru': {
         const { processWiktionaryVerificationQueue } = await import('../services/wiktionaryVerifier');
-        return await processWiktionaryVerificationQueue('sv');
+        return await processWiktionaryVerificationQueue(lang);
       }
       case 'ja': {
         const { processJishoVerificationQueue } = await import('../services/jishoVerifier');

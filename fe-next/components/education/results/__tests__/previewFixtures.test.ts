@@ -30,3 +30,13 @@ describe('dev preview podium reads true', () => {
     }
   });
 });
+
+describe('preview round coverage agrees with each player\'s mastery', () => {
+  it.each([0, 8, 20])('Given a class of %i, Then every player is listed on exactly as many words as they found', async (count) => {
+    const { samplePreviewRound } = await import('../resultsPreviewFixtures');
+    const { summary } = samplePreviewRound('winner', { count });
+    for (const [name, m] of Object.entries(summary.masteryByPlayer)) {
+      expect(summary.coverage.filter((c) => c.foundBy.includes(name)).length, name).toBe(m.found);
+    }
+  });
+});

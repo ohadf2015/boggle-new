@@ -1,14 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { CheckCheck, Coins, Flame } from 'lucide-react';
+import { useEffect } from 'react';
+import { CheckCheck, Flame } from 'lucide-react';
 import { fireVictoryConfetti } from '@/utils/confettiUtils';
 import { triggerHaptic } from '@/utils/hapticFeedback';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useAuth } from '@/contexts/AuthContext';
-import { postWithAuth } from '@/utils/authFetch';
-import { emitCoinEarned } from '@/utils/coinEarnedFx';
-import { ALL_CLEAR_COINS } from '@/lib/daily/allClearReward';
+import { DayPrizeHubCard } from '../prize/DayPrizeHubCard';
 
 interface DailyAllClearCardProps {
   /** Current daily streak; the streak line is omitted at 0. */
@@ -37,37 +34,12 @@ function celebrateOncePerDay(): boolean {
 
 export function DailyAllClearCard({ streak }: DailyAllClearCardProps) {
   const { t } = useLanguage();
-  const { user } = useAuth();
-  const userId = user?.id;
-  const [reward, setReward] = useState<{ coins: number; xp: number } | null>(null);
 
   useEffect(() => {
     if (!celebrateOncePerDay()) return;
     fireVictoryConfetti();
     triggerHaptic('success');
   }, []);
-
-  // The server re-checks the four modes and pays once per day; a repeat call
-  // just returns claimed:false, so this is safe on every show.
-  useEffect(() => {
-    if (!userId) return;
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await postWithAuth('/api/daily/all-clear/claim');
-        if (!res.ok) return;
-        const body = (await res.json()) as { claimed?: boolean; coins?: number; xp?: number };
-        if (cancelled || typeof body.coins !== 'number' || typeof body.xp !== 'number') return;
-        setReward({ coins: body.coins, xp: body.xp });
-        if (body.claimed) emitCoinEarned(body.coins);
-      } catch {
-        // offline or signed out: the card still closes the day, just without the chip
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [userId]);
 
   return (
     <section
@@ -93,17 +65,9 @@ export function DailyAllClearCard({ streak }: DailyAllClearCardProps) {
             {t('daily.allClear.streak', { n: streak })}
           </p>
         )}
-        {reward && (
-          <p data-testid="all-clear-reward" className="mt-1.5 inline-flex items-center gap-1 text-xs font-black text-neo-yellow">
-            <Coins className="w-4 h-4 shrink-0" aria-hidden="true" />
-            {t('daily.allClear.reward', { coins: reward.coins, xp: reward.xp })}
-          </p>
-        )}
-        {!userId && (
-          <p data-testid="all-clear-guest-nudge" className="mt-1.5 text-xs font-bold text-neo-cream">
-            {t('daily.allClear.guestNudge', { coins: ALL_CLEAR_COINS })}
-          </p>
-        )}
+        {/* Today's two pay their own box; finishing the bonuses opens a second, bigger one. */}
+        <DayPrizeHubCard kind="clear" className="mt-1.5 flex" guestNudge={false} />
+        <DayPrizeHubCard kind="perfect" className="mt-1.5 flex" />
       </div>
       <span
         aria-hidden="true"

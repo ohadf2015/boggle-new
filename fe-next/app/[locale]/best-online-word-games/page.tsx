@@ -603,7 +603,7 @@ export default async function BestOnlineWordGamesPage({ params }: PageProps) {
             browser — give LexiClash a shot. Worst case, you waste five fun minutes.
           </p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:gap-4">
-            <Link href={`/${locale}/singleplayer`} className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg">
+            <Link href={`/${locale}/quick-play`} className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg">
               Play LexiClash Free
             </Link>
             <Link href={`/${locale}/daily`} className="inline-block rounded-neo border-4 border-neo-cyan bg-transparent px-8 py-4 text-center font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10">

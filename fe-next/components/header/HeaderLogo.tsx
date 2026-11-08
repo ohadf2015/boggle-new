@@ -2,6 +2,8 @@ import { memo, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '../../contexts/LanguageContext';
 
+const TILE_TILT = ['-rotate-3', 'rotate-2', '-rotate-1', 'rotate-3', '-rotate-2'];
+
 const HeaderLogo = memo(() => {
     const { t, language } = useLanguage();
     const router = useRouter();
@@ -31,72 +33,51 @@ const HeaderLogo = memo(() => {
         router.push(`/${language}`);
     }, [language, router]);
 
+    const tiles = Array.from(t('logo.lexi'));
+
     return (
         <button
             type="button"
-            className="flex items-center gap-0.5 xs:gap-1 cursor-pointer bg-transparent border-none p-0 shrink-0 relative active:scale-95 transition-transform"
+            className="group flex shrink-0 cursor-pointer items-center border-none bg-transparent p-0 transition-transform active:scale-95"
             onClick={handleLogoClick}
             aria-label={t('common.goToHome')}
         >
-            {/* Lime-light lightning bolt - left */}
-            <svg
-                className="player-accent-ink w-4 h-5 xs:w-5 xs:h-6 sm:w-5 sm:h-6 shrink-0 text-neo-black dark:text-neo-lime-light"
-                viewBox="0 0 24 32"
-                fill="none"
-                style={{ transform: 'rotate(-15deg)', filter: 'drop-shadow(0 0 4px currentColor)' }}
-                aria-hidden="true"
-            >
-                <path
-                    d="M14 2L4 18h7l-3 12 13-18h-8l5-10H14z"
-                    fill="currentColor"
-                    stroke="#1a365d"
-                    strokeWidth="2"
-                    strokeLinejoin="round"
-                />
-            </svg>
-
-            <span
-                className="font-black uppercase tracking-tight flex items-center gap-0.5 whitespace-nowrap"
-                style={{ fontFamily }}
-            >
-                <span
-                    className="player-accent-ink text-xl xs:text-2xl sm:text-2xl text-neo-black dark:text-neo-lime relative"
-                    style={{
-                        WebkitTextStroke: '2px #1a365d',
-                        paintOrder: 'stroke fill',
-                        textShadow: '3px 3px 0px #1a365d',
-                    }}
-                >
-                    {t('logo.lexi')}
+            <span aria-hidden="true" className="relative flex items-center gap-1 whitespace-nowrap pe-2 sm:gap-1.5 sm:pe-2.5" style={{ fontFamily }}>
+                <span data-testid="logo-tiles" className="flex items-center gap-[2px] sm:gap-[3px]">
+                    {tiles.map((ch, i) => (
+                        <span
+                            key={i}
+                            className={`flex h-[21px] w-[18px] items-center justify-center rounded-[5px] border-[1.5px] border-neo-black bg-neo-lime text-[13px] font-black uppercase leading-none text-neo-black shadow-[1.5px_1.5px_0_0_rgb(var(--neo-black))] sm:border-2 sm:shadow-[2px_2px_0_0_rgb(var(--neo-black))] transition-transform group-hover:-translate-y-0.5 sm:h-[30px] sm:w-[26px] sm:text-[19px] ${TILE_TILT[i % TILE_TILT.length]}`}
+                        >
+                            {ch}
+                        </span>
+                    ))}
                 </span>
+                <span className="relative">
                 <span
-                    className="text-base xs:text-lg sm:text-lg text-slate-800 dark:text-neo-cyan-muted relative"
+                    className="-skew-x-6 text-[18px] font-black uppercase leading-none tracking-tight text-neo-cyan sm:text-[25px]"
                     style={{
-                        WebkitTextStroke: '1px #1a365d',
+                        WebkitTextStroke: '1.25px rgb(var(--neo-black))',
                         paintOrder: 'stroke fill',
-                        textShadow: '2px 2px 0px rgba(26, 54, 93, 0.7)',
+                        textShadow: '1.5px 1.5px 0 rgb(var(--neo-black))',
                     }}
                 >
                     {t('logo.clash')}
                 </span>
+                <svg
+                    className="absolute -end-2.5 -top-2 h-[14px] w-[11px] rotate-12 text-neo-pink sm:-end-3.5 sm:h-5 sm:w-4"
+                    viewBox="0 0 24 32"
+                >
+                    <path
+                        d="M14 2L4 18h7l-3 12 13-18h-8l5-10H14z"
+                        fill="currentColor"
+                        stroke="rgb(var(--neo-black))"
+                        strokeWidth="2.5"
+                        strokeLinejoin="round"
+                    />
+                </svg>
+                </span>
             </span>
-
-            {/* Cyan lightning bolt - right */}
-            <svg
-                className="w-4 h-5 xs:w-5 xs:h-6 sm:w-5 sm:h-6 shrink-0 text-neo-black dark:text-neo-cyan-light"
-                viewBox="0 0 24 32"
-                fill="none"
-                style={{ transform: 'rotate(15deg)', filter: 'drop-shadow(0 0 4px currentColor)' }}
-                aria-hidden="true"
-            >
-                <path
-                    d="M14 2L4 18h7l-3 12 13-18h-8l5-10H14z"
-                    fill="currentColor"
-                    stroke="#1a365d"
-                    strokeWidth="2"
-                    strokeLinejoin="round"
-                />
-            </svg>
         </button>
     );
 });

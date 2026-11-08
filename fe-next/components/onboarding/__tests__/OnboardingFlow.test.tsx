@@ -257,7 +257,7 @@ describe('OnboardingFlow', () => {
   it('navigates straight into a real auto-started game from the play button', () => {
     render(<OnboardingFlow {...defaultProps} />);
     finishFlow();
-    expect(mockPush).toHaveBeenCalledWith('/en/singleplayer?autoStart=coach');
+    expect(mockPush).toHaveBeenCalledWith('/en/quick-play?mode=classic');
   });
 
   it('calls onComplete after play', () => {
@@ -354,7 +354,7 @@ describe('OnboardingFlow', () => {
       mockConsumePendingRoom.mockReturnValue(null);
       render(<OnboardingFlow {...defaultProps} />);
       finishFlow();
-      expect(mockPush).toHaveBeenCalledWith('/en/singleplayer?autoStart=coach');
+      expect(mockPush).toHaveBeenCalledWith('/en/quick-play?mode=classic');
     });
   });
 

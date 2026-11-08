@@ -106,10 +106,10 @@ export function StudentNextActions({ onPlayAgain, onPractice, t, compact = false
             onPractice();
           }}
           className={cn(
-            'w-full flex items-center justify-center gap-2 px-4 py-3 font-bold',
-            'bg-neo-cyan/20 text-neo-cyan border-[2px] border-neo-cyan rounded-neo',
-            'shadow-hard hover:shadow-hard-lg transition',
-            'min-h-11 hover:bg-neo-cyan/30',
+            'w-full flex items-center justify-center gap-2 px-4 py-3 font-neo-display font-black',
+            'bg-neo-cyan text-neo-black border-[3px] border-neo-black rounded-neo-lg',
+            'shadow-hard-lg transition',
+            'min-h-12',
             'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
           )}
         >

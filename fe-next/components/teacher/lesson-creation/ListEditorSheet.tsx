@@ -4,7 +4,12 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Check, LayoutGrid, ListChecks, Loader2, Sparkles, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Dialog, DialogClose, DialogDescription, DialogTitle } from '@/components/ui/dialog';
+import { nativeLanguageName } from '@/components/education/pickers/nativeLanguageName';
+import { NbDialogBody, NbDialogContent, NbDialogFooter } from '@/components/teacher/nb/NbDialog';
+import { NbAdvanced } from '@/components/teacher/nb/NbAdvanced';
+import { NB_DIALOG_CLOSE, nbDialogHeaderClass } from '@/components/teacher/nb/nbDialogStyles';
+import { NB_BLOCK, NB_PRIMARY, NB_STICKER } from '@/components/teacher/nb/nbStyles';
 import WordListEditor from '@/components/teacher/WordListEditor';
 import type { Language, VocabularyWord } from '@/lib/supabase/education/types';
 import {
@@ -157,31 +162,18 @@ export default function ListEditorSheet({ open, onOpenChange, initial, classroom
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
+      <NbDialogContent
         data-testid="list-editor-sheet"
-        hideCloseButton
+        size="xl"
+        phone="full"
         onKeyDown={(e) => {
           if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') void handleSave();
         }}
-        className={cn(
-          'flex h-dvh max-h-dvh w-full max-w-none flex-col overflow-hidden rounded-none border-0 bg-neo-navy p-0 text-neo-white',
-          'max-sm:data-[state=open]:animate-none max-sm:data-[state=closed]:animate-none',
-          'sm:h-auto sm:max-h-[92dvh] sm:w-[calc(100%-2rem)] sm:max-w-3xl lg:max-w-3xl xl:max-w-3xl sm:rounded-neo-lg sm:border-4 sm:border-neo-cream',
-        )}
-        style={{ backgroundImage: 'none' }}
       >
         <DialogTitle className="sr-only">{draft.id ? t('eduLibrary.editor.editTitle') : t('eduLibrary.editor.createTitle')}</DialogTitle>
         <DialogDescription className="sr-only">{t('eduLibrary.editor.description')}</DialogDescription>
 
-        <header className="flex shrink-0 items-center gap-2 border-b-3 border-neo-cream/50 bg-neo-navy-light px-3 py-2 sm:px-4">
-          <button
-            type="button"
-            onClick={() => onOpenChange(false)}
-            aria-label={t('common.close')}
-            className="flex size-11 shrink-0 items-center justify-center rounded-neo border-2 border-neo-cream bg-neo-navy text-neo-white shadow-hard-sm active:translate-y-0.5 active:shadow-none"
-          >
-            <X className="size-5" strokeWidth={3} aria-hidden="true" />
-          </button>
+        <header className={cn(nbDialogHeaderClass('navy'), 'items-center py-2.5 sm:py-3')}>
           <input
             ref={titleRef}
             data-testid="list-title"
@@ -190,14 +182,17 @@ export default function ListEditorSheet({ open, onOpenChange, initial, classroom
             placeholder={t('eduLibrary.editor.titlePlaceholder')}
             aria-label={t('eduLibrary.editor.titleLabel')}
             maxLength={80}
-            style={{ fontFamily: 'var(--font-fredoka), var(--font-heebo-hebrew), var(--font-rubik), sans-serif', fontSize: 'clamp(1.25rem, 2.5vw, 1.5rem)' }}
-            className="h-11 min-w-0 flex-1 rounded-neo border-2 border-transparent bg-transparent px-2 font-neo-display text-xl font-bold text-neo-white placeholder:text-neo-white/40 focus:border-neo-cyan focus:outline-hidden sm:text-2xl"
+            dir="auto"
+            className="h-12 min-w-0 flex-1 rounded-neo border-[3px] border-dashed border-neo-cream/40 bg-transparent px-2.5 font-neo-display text-xl font-black text-neo-cream placeholder:text-neo-cream/45 focus:border-solid focus:border-neo-cyan focus:outline-hidden sm:text-2xl"
           />
+          <DialogClose aria-label={t('common.close')} title={t('common.close')} className={NB_DIALOG_CLOSE}>
+            <X className="size-5" strokeWidth={3} aria-hidden="true" />
+          </DialogClose>
         </header>
 
-        <div className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain px-3 py-4 sm:px-5">
+        <NbDialogBody className="space-y-5">
           {remixedFrom && (
-            <p className="inline-flex items-center gap-1.5 rounded-neo bg-neo-purple/25 px-2 py-1 text-xs font-bold text-neo-white">
+            <p className={cn(NB_STICKER, NB_BLOCK.purple, 'whitespace-normal')}>
               <Sparkles className="size-3.5 text-neo-yellow" aria-hidden="true" />
               {remixedFrom.author
                 ? t('eduLibrary.remixedFrom', { title: remixedFrom.title, author: remixedFrom.author })
@@ -205,14 +200,8 @@ export default function ListEditorSheet({ open, onOpenChange, initial, classroom
             </p>
           )}
 
-          <ListMetaFields
-            draft={draft}
-            classrooms={draft.id ? [] : classrooms}
-            onChange={update}
-          />
-
           <div>
-            <label htmlFor="list-paste-box" className="mb-1.5 block font-neo-display text-sm font-bold uppercase text-neo-lime">
+            <label htmlFor="list-paste-box" className="mb-1.5 block font-neo-display text-base font-black text-neo-cream">
               {t('eduLibrary.editor.pasteLabel')}
             </label>
             <textarea
@@ -235,7 +224,7 @@ export default function ListEditorSheet({ open, onOpenChange, initial, classroom
                 }
               }}
               placeholder={t('eduLibrary.editor.pastePlaceholder')}
-              className="block min-h-[4.5rem] w-full resize-y rounded-neo border-3 border-dashed border-neo-cream/70 bg-neo-black/30 px-3 py-2.5 font-neo-body text-base text-neo-white placeholder:text-neo-white/45 focus:border-solid focus:border-neo-cyan focus:outline-hidden"
+              className="block min-h-[5.5rem] w-full resize-y rounded-neo-lg border-[3px] border-neo-black bg-neo-cream px-3 py-2.5 font-neo-body text-base font-bold text-neo-black shadow-hard-lg placeholder:font-semibold placeholder:text-neo-black/50 focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
             />
             <p data-testid="list-paste-feedback" aria-live="polite" className="mt-1.5 min-h-5 text-xs font-bold">
               {feedback && feedback.added > 0 && (
@@ -265,14 +254,14 @@ export default function ListEditorSheet({ open, onOpenChange, initial, classroom
 
           <section aria-labelledby="list-words-heading" className="space-y-2">
             <div className="flex items-center justify-between gap-2">
-              <h3 id="list-words-heading" className="flex items-center gap-2 font-neo-display text-base font-bold text-neo-white">
+              <h3 id="list-words-heading" className="flex items-center gap-2 font-neo-display text-base font-black text-neo-cream">
                 {t('eduLibrary.editor.wordsHeading')}
-                <span key={draft.words.length} className="rounded border-2 border-neo-black bg-neo-cyan px-1.5 text-sm tabular-nums text-neo-black motion-safe:animate-neo-pop">
+                <span key={draft.words.length} className={cn(NB_STICKER, NB_BLOCK.cyan, 'text-sm tabular-nums motion-safe:animate-neo-pop')}>
                   {draft.words.length}
                 </span>
               </h3>
               {draft.words.length > 0 && (
-                <div role="group" aria-label={t('eduLibrary.editor.viewLabel')} className="flex overflow-hidden rounded-neo border-2 border-neo-cream">
+                <div role="group" aria-label={t('eduLibrary.editor.viewLabel')} className="flex overflow-hidden rounded-neo border-[3px] border-neo-cream/50">
                   {(['chips', 'details'] as const).map((v) => (
                     <button
                       key={v}
@@ -280,8 +269,8 @@ export default function ListEditorSheet({ open, onOpenChange, initial, classroom
                       aria-pressed={view === v}
                       onClick={() => setView(v)}
                       className={cn(
-                        'flex min-h-9 items-center gap-1 px-2.5 text-xs font-bold uppercase',
-                        view === v ? 'bg-neo-cream text-neo-black' : 'bg-neo-navy-light text-neo-white',
+                        'flex min-h-11 items-center gap-1 px-3 text-xs font-black',
+                        view === v ? 'bg-neo-cream text-neo-black' : 'bg-neo-navy-light text-neo-cream',
                       )}
                     >
                       {v === 'chips' ? <LayoutGrid className="size-3.5" aria-hidden="true" /> : <ListChecks className="size-3.5" aria-hidden="true" />}
@@ -293,7 +282,7 @@ export default function ListEditorSheet({ open, onOpenChange, initial, classroom
             </div>
 
             {draft.words.length === 0 ? (
-              <p className="rounded-neo border-2 border-dashed border-neo-cream/30 px-3 py-6 text-center text-sm text-neo-white/70">
+              <p className="rounded-neo-lg border-[3px] border-dashed border-neo-cream/35 px-3 py-6 text-center font-neo-body text-sm font-semibold text-neo-cream/75">
                 {t('eduLibrary.editor.emptyWords')}
               </p>
             ) : view === 'chips' ? (
@@ -311,11 +300,24 @@ export default function ListEditorSheet({ open, onOpenChange, initial, classroom
             )}
           </section>
 
-          <ShareToDiscoverSwitch checked={draft.isPublic} onChange={(isPublic) => update({ isPublic })} issues={issues} />
-        </div>
+          <NbAdvanced
+            testId="list-advanced-toggle"
+            forceOpen={draft.isPublic}
+            label={
+              <span className="flex flex-wrap items-center gap-2">
+                {t('eduLibrary.editor.moreOptions')}
+                <span lang={draft.language} className={cn(NB_STICKER, NB_BLOCK.cream)}>{nativeLanguageName(draft.language)}</span>
+              </span>
+            }
+            closeLabel={t('eduShell.setup.advancedClose')}
+          >
+            <ListMetaFields draft={draft} classrooms={draft.id ? [] : classrooms} onChange={update} />
+            <ShareToDiscoverSwitch checked={draft.isPublic} onChange={(isPublic) => update({ isPublic })} issues={issues} />
+          </NbAdvanced>
+        </NbDialogBody>
 
-        <footer className="flex shrink-0 items-center gap-3 border-t-3 border-neo-cream/50 bg-neo-navy-light px-3 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-5">
-          <p data-testid="list-save-hint" role="status" className="min-w-0 flex-1 text-sm font-bold text-neo-yellow">
+        <NbDialogFooter className="flex-row items-center gap-3 sm:justify-between">
+          <p data-testid="list-save-hint" role="status" className="min-w-0 flex-1 font-neo-body text-sm font-bold text-neo-yellow">
             {hint ?? (saved ? <span className="text-neo-lime">{t('eduLibrary.editor.saved')}</span> : null)}
           </p>
           <button
@@ -323,17 +325,13 @@ export default function ListEditorSheet({ open, onOpenChange, initial, classroom
             data-testid="list-save"
             onClick={() => void handleSave()}
             disabled={saving}
-            className={cn(
-              'inline-flex min-h-12 shrink-0 items-center gap-2 rounded-neo border-3 border-neo-black px-5 font-neo-display text-base font-bold uppercase text-neo-black',
-              'shadow-hard transition hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none disabled:opacity-70',
-              saved ? 'bg-neo-lime' : 'bg-neo-cyan',
-            )}
+            className={cn(NB_PRIMARY, 'shrink-0 sm:min-w-40')}
           >
             {saving ? <Loader2 className="size-5 animate-spin" aria-hidden="true" /> : saved ? <Check className="size-5" strokeWidth={3} aria-hidden="true" /> : null}
             {saving ? t('eduLibrary.editor.saving') : t('eduLibrary.editor.save')}
           </button>
-        </footer>
-      </DialogContent>
+        </NbDialogFooter>
+      </NbDialogContent>
     </Dialog>
   );
 }

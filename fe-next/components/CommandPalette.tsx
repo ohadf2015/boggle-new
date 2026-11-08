@@ -23,7 +23,7 @@ interface CommandItem {
 export const NAV_ITEMS: CommandItem[] = [
   { id: 'home', labelKey: 'nav.home', icon: Home, href: '/', group: 'navigation' },
   { id: 'multiplayer', labelKey: 'nav.play', icon: Swords, href: '/multiplayer', group: 'navigation' },
-  { id: 'singleplayer', labelKey: 'nav.singleplayer', icon: Gamepad2, href: '/singleplayer', group: 'navigation' },
+  { id: 'singleplayer', labelKey: 'nav.singleplayer', icon: Gamepad2, href: '/quick-play', group: 'navigation' },
   { id: 'daily', labelKey: 'nav.daily', icon: Zap, href: '/daily', group: 'navigation' },
   { id: 'adventure', labelKey: 'nav.adventure', icon: Globe, href: '/adventure', group: 'navigation' },
   { id: 'quests', labelKey: 'nav.quests', icon: ScrollText, href: '/quests', group: 'navigation' },

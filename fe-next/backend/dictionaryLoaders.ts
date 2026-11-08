@@ -44,7 +44,7 @@ function mergeApprovedWords(
   normalizer: (w: string) => string = (w) => w.trim().toLowerCase()
 ): void {
   if (!content) return;
-  const approvedWords = content.split('\n').map(normalizer).filter(w => w.length > 0);
+  const approvedWords = content.split('\n').map(normalizer).filter(w => w.length > 0 && !w.startsWith('#'));
   let count = 0;
   for (const word of approvedWords) {
     if (!dictionary.has(word)) {

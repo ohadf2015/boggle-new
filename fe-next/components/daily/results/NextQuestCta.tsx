@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Check } from 'lucide-react';
+import { ArrowRight, Check, Gift } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useDailyPlayedStatus } from '@/hooks/useDailyPlayedStatus';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { cn } from '@/lib/utils';
@@ -17,6 +18,13 @@ import {
 import type { Language } from '@/types';
 import { chainPips, markDailyHandoff, type ChainPip } from '@/components/daily/flow/dailyHandoff';
 import { useDailyReveal, useMountedAfterReveal } from './reveal/DailyRevealContext';
+import { DayPrizeReveal } from '@/components/daily/prize/DayPrizeReveal';
+import { claimPopupSlot, releasePopupSlot } from '@/components/daily/prize/dayPrizeStore';
+import { prizeToPop, finishingClearsDay } from '@/components/daily/prize/prizeEligibility';
+import type { DayPrizeKind } from '@/lib/daily/dayPrize';
+
+/** Let the results land before the prize box steps in. */
+export const PRIZE_POP_DELAY_MS = 700;
 
 export interface NextQuestCtaProps {
   /** The mode whose results screen this is — never offered as the next step. */
@@ -104,6 +112,25 @@ export function NextQuestCta({
     if (pulse) playOn(arrowRef.current, PULSE, { duration: 650, iterations: 3, delay: 150, easing: 'ease-in-out' });
   }, [pulse]);
 
+  // The prize box pops once, on the results screen of the quest that cleared the day.
+  const { user } = useAuth();
+  const signedIn = Boolean(user);
+  const [prizeKind, setPrizeKind] = useState<DayPrizeKind | null>(null);
+  const settled = !reveal.active || reveal.done;
+  const pending = signedIn && !played.loading && settled ? prizeToPop(playStateFromToday(played.today), justFinished) : null;
+  useEffect(() => {
+    if (!pending) return;
+    const timer = setTimeout(() => {
+      if (claimPopupSlot(pending)) setPrizeKind(pending);
+    }, PRIZE_POP_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, [pending]);
+  const closePrize = () => {
+    if (prizeKind) releasePopupSlot(prizeKind);
+    setPrizeKind(null);
+  };
+  const prizeBox = prizeKind ? <DayPrizeReveal kind={prizeKind} source={source} onClose={closePrize} /> : null;
+
   // Don't guess while the server answer is still in flight: rendering an
   // optimistic "play Word Wheel" that flips to "all clear" a moment later is
   // the flash this codebase keeps re-learning to avoid.
@@ -131,6 +158,8 @@ export function NextQuestCta({
     // streak, the weekly chest and the board live, and it is what the old
     // `backToDailyCtaNode` offered at exactly this moment.
     return (
+      <>
+      {prizeBox}
       <Link
         href={`/${currentLanguage}/daily`}
         data-testid="next-quest-all-clear"
@@ -144,6 +173,7 @@ export function NextQuestCta({
         <span className="text-sm font-bold text-white">{t('daily.allClearToday')}</span>
         <ArrowRight className="ms-auto shrink-0 w-4 h-4 text-neo-lime rtl:rotate-180" />
       </Link>
+      </>
     );
   }
 
@@ -159,7 +189,11 @@ export function NextQuestCta({
     return id === 'word-tower' ? state.wordTower : state.connections;
   });
 
+  const oneToGo = signedIn && finishingClearsDay(state, mode.id);
+
   return (
+    <>
+    {prizeBox}
     <Link
       href={href}
       onPointerDown={() => playOn(arrowRef.current, SEND_OFF, { duration: 260, easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)' })}
@@ -208,6 +242,12 @@ export function NextQuestCta({
         <span className="block mt-1 text-2xl @md:text-4xl leading-none font-neo-display font-black uppercase text-neo-black line-clamp-2">
           {t(mode.titleKey)}
         </span>
+        {oneToGo && (
+          <span data-testid="next-quest-one-to-go" className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-neo-black px-2 py-0.5 text-[11px] @md:text-xs font-black text-neo-yellow">
+            <Gift className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+            {t('daily.dayPrize.oneToGo')}
+          </span>
+        )}
       </span>
 
       <span
@@ -222,6 +262,7 @@ export function NextQuestCta({
         <ArrowRight className="w-7 h-7 @md:w-10 @md:h-10 rtl:rotate-180" strokeWidth={3.5} />
       </span>
     </Link>
+    </>
   );
 }
 

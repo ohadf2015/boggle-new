@@ -1,5 +1,7 @@
 'use client';
 
+import { NB_BLOCK, NB_SMALL } from './nb/nbStyles';
+import { cn } from '@/lib/utils';
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -121,7 +123,7 @@ function CheckoutReturnBanner() {
     router.replace(next, { scroll: false });
   };
 
-  const tone = phase === 'failure' ? 'bg-neo-pink' : phase === 'success' ? 'bg-neo-lime' : 'bg-neo-cyan';
+  const tone = phase === 'failure' ? 'bg-neo-pink' : phase === 'success' ? 'bg-neo-lime' : 'bg-neo-yellow';
 
   return (
     <div
@@ -130,19 +132,19 @@ function CheckoutReturnBanner() {
       data-testid="checkout-return-status"
       data-phase={phase}
       dir={language === 'he' ? 'rtl' : 'ltr'}
-      className={`fixed inset-x-0 top-0 z-[120] border-b-[3px] border-black px-4 py-3 text-black ${tone}`}
+      className={`fixed inset-x-3 top-3 z-[120] mx-auto max-w-3xl rounded-neo-lg border-[3px] border-neo-black px-4 py-3 text-neo-black shadow-hard-xl ${tone}`}
     >
-      <div className="mx-auto flex max-w-5xl flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
-          <p className="font-black">{t(copy[0])}</p>
-          <p className="text-sm font-bold">{t(copy[1])}</p>
+          <p className="font-neo-display text-lg font-black leading-snug">{t(copy[0])}</p>
+          <p className="font-neo-body text-sm font-bold">{t(copy[1])}</p>
         </div>
         <div className="flex shrink-0 gap-2">
           {phase === 'failure' ? (
             <button
               type="button"
               data-testid="checkout-return-retry"
-              className="border-2 border-black bg-neo-cream px-3 py-1.5 text-sm font-black"
+              className={cn(NB_SMALL, NB_BLOCK.cream)}
               onClick={() => {
                 setAttempts(0);
                 setPollGen((n) => n + 1);
@@ -155,7 +157,7 @@ function CheckoutReturnBanner() {
           <button
             type="button"
             data-testid="checkout-return-dismiss"
-            className="border-2 border-black bg-white px-3 py-1.5 text-sm font-black"
+            className={cn(NB_SMALL, 'bg-neo-navy text-neo-cream')}
             onClick={dismiss}
           >
             {t('teacher.checkoutReturn.close')}

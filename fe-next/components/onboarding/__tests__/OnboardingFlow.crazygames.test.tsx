@@ -136,11 +136,11 @@ describe('OnboardingFlow on CrazyGames', () => {
     expect(onComplete).toHaveBeenCalled();
   });
 
-  it('Practice CTA routes to singleplayer practice', () => {
+  it('Practice CTA routes to a Quick Play classic round', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
     fireEvent.click(screen.getByTestId('cg-tutorial-continue'));
     fireEvent.click(screen.getByTestId('crazygames-welcome-cta-practice'));
-    expect(mockPush).toHaveBeenCalledWith('/en/singleplayer?autoStart=practice');
+    expect(mockPush).toHaveBeenCalledWith('/en/quick-play?mode=classic');
   });
 
   it('Multiplayer CTA routes to multiplayer hub', () => {

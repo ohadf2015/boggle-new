@@ -7,7 +7,7 @@ export function ZeroRoundNote({ t }: { t: (key: string) => string }) {
   return (
     <div
       data-testid="podium-zero-note"
-      className="absolute start-[25%] end-[4%] bottom-[5%] flex items-center gap-[1.6cqw] rounded-neo-lg border-2 border-neo-cream/60 bg-neo-navy px-[2.4cqw] py-[1.2cqw] text-start shadow-[0.5cqw_0.5cqw_0_rgb(var(--neo-black))]"
+      className="absolute start-[25%] end-[4%] bottom-[5%] flex items-center gap-[1.6cqw] rounded-neo-lg border-[3px] border-neo-cream/50 bg-neo-navy px-[2.4cqw] py-[1.2cqw] text-start shadow-[0.5cqw_0.5cqw_0_rgb(var(--neo-black))]"
     >
       <HourglassGlyph className="shrink-0 text-neo-cream/80" style={{ width: '4cqw', height: '4cqw' }} />
       <span dir="auto" className="min-w-0 font-neo-body font-bold leading-snug text-neo-cream" style={{ fontSize: '2cqw' }}>

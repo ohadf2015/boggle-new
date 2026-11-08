@@ -48,7 +48,7 @@ export function DuelDisconnectOverlay({
   return (
     <div
       data-testid="disconnect-overlay"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-neo-navy/90 backdrop-blur-xs animate-in fade-in-0 duration-300"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-neo-navy/90 animate-in fade-in-0 duration-300"
     >
       <div className="bg-neo-navy border-[3px] border-neo-cream rounded-neo shadow-hard p-8 max-w-md text-center">
         {/* Icon */}

@@ -46,6 +46,8 @@ vi.mock('@/lib/native/webviewRepaint', () => ({ kickWebViewRepaint: vi.fn() }));
 vi.mock('@/contexts/AdMobContext', () => ({
   useAdMobContext: () => ({
     recordGameEnd: vi.fn(),
+    countGameEndAtAdBreak: vi.fn(),
+    recordRewardedShown: vi.fn(),
     shouldShowInterstitial: () => false,
     recordInterstitialShown: vi.fn(),
     hasNoAds: () => false,

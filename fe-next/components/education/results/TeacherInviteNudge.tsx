@@ -18,7 +18,7 @@ function landingUrl(language: string): string {
 }
 
 const ROW_BUTTON =
-  'inline-flex min-h-11 items-center gap-1.5 rounded-neo border-2 border-neo-cream/60 px-3 font-neo-display text-xs font-bold text-neo-cream hover:bg-neo-navy-light';
+  'inline-flex min-h-11 items-center gap-1.5 rounded-neo border-[3px] border-neo-cream/50 bg-neo-navy-light px-3 font-neo-display text-xs font-black text-neo-cream shadow-hard';
 
 /** WhatsApp only on the teacher's own phone: on a projected laptop it would open their chat list in front of the class. */
 export function TeacherInviteNudge({ students, language, whatsapp = false, compact = false, t }: { students: number; language: string; whatsapp?: boolean; compact?: boolean; t: Translate }) {
@@ -35,7 +35,7 @@ export function TeacherInviteNudge({ students, language, whatsapp = false, compa
     <div
       data-testid="teacher-invite"
       data-density={compact ? 'compact' : undefined}
-      className={cn('flex items-center gap-2', compact ? '[&>*]:min-w-0 [&>*]:flex-1 [&>*]:justify-center' : 'flex-wrap rounded-neo border-2 border-dashed border-neo-cream/40 px-3 py-2')}
+      className={cn('flex items-center gap-2', compact ? '[&>*]:min-w-0 [&>*]:flex-1 [&>*]:justify-center' : 'flex-wrap rounded-neo-lg border-[3px] border-dashed border-neo-cream/50 px-3 py-2')}
     >
       {!compact && <p className="min-w-0 flex-1 font-neo-body text-sm font-bold text-neo-cream/85">{t('eduLiveRoom.hostResults.invitePrompt')}</p>}
       <button type="button" data-testid="teacher-invite-share" onClick={() => void share()} className={cn(ROW_BUTTON, PRESS)}>

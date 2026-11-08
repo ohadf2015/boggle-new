@@ -4,12 +4,10 @@
  * Shows the neutral age gate at the moment an interstitial slot came due but
  * the user's tier is still 'unknown' (AdMobContext.ageGatePromptOpportunity).
  *
- * Why here and not onboarding: the app exited the Families program (13+ Play
- * listing, 2026-06-08) but interstitials remain adult-only per adPolicy — so
- * an undeclared user earns ₪0 from the format. The interstitial slot is a
- * natural break already reserved for an interruption; asking there adds zero
- * new friction, keeps the FTUE ad-free, and a declared 13+ flips the tier to
- * 'adult' live (personalized ads + real interstitials from the next slot).
+ * Why here and not onboarding: an undeclared user's ads stay G-rated and
+ * non-personalized (adPolicy). The interstitial slot is a natural break
+ * already reserved for an interruption; asking there keeps the FTUE clean,
+ * and a declared 13+ flips the tier to 'adult' live (Teen-rated, personalized).
  *
  * Marker (`lc_age_prompt_shown_at`) is written at SHOW-time, not dismiss-time
  * — reload without dismissing must not re-prompt (Class-1 rule). Dismissing

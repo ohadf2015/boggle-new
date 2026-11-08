@@ -14,6 +14,7 @@ import { useTeacherStripState } from '@/components/education/controls/useTeacher
 import { useIsVocabQuizRoom, quizOwnsRoundEnd } from '@/components/education/vocabQuiz/useIsVocabQuizRoom';
 import { useQuizBossVerdict } from '@/components/education/boss/useQuizBossVerdict';
 import { resolveClassroomContext, type ClassroomContext } from '@/lib/education/classroomRoomGone';
+import { AD_FREE_ROUTE_CLASS } from '@/lib/admob-routes';
 import { SocketContext } from '@/utils/SocketContext';
 import { clearSessionPreservingUsername } from '@/utils/session';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -42,13 +43,13 @@ import { ENTRY_HIDES_GLOBAL_CHROME } from '@/components/multiplayer/entry/entryC
 import type { Language, ActiveRoom, GameMode } from '@/shared/types/game';
 import type { Socket } from 'socket.io-client';
 import { useMultiplayerJoin } from './useMultiplayerJoin';
-import { useClassroomRoomWait } from './useClassroomRoomWait';
+import { useClassroomRoomWait, rejoinWaitingRoom } from './useClassroomRoomWait';
 import { useClassroomGameMove } from './useClassroomGameMove';
 import { useMpRoomSocket, type MpRoomPlayer, type MpHostLeftState } from './useMpRoomSocket';
 import { useMpPageEffects } from './useMpPageEffects';
 import { applyMpPreselectMode } from './preselectMode';
 import type { MpPhaseRouterProps } from './MpPhaseRouter';
-import { isPracticeSeatPage } from '@/utils/practiceSeatStorage';
+import { isPracticeSeatPage, resolvePracticeSeatName } from '@/utils/practiceSeatStorage';
 
 export function useMpPageState() {
   const searchParams = useSearchParams();
@@ -167,6 +168,15 @@ export function useMpPageState() {
   // flips).
   const classroomContext = resolveClassroomContext({ urlClassroom: isClassroomMode, recordStatus: liveClassroomGameStatus });
 
+  // Ad gates read the URL, which misses a class code typed into the arcade lobby.
+  const adFree = classroomContext !== 'arcade';
+  useEffect(() => {
+    if (!adFree) return;
+    const root = document.documentElement;
+    root.classList.add(AD_FREE_ROUTE_CLASS);
+    return () => root.classList.remove(AD_FREE_ROUTE_CLASS);
+  }, [adFree]);
+
   const {
     showResults, setShowResults, resultsData, setResultsData,
     isSpectator, setIsSpectator, spectators, setSpectators,
@@ -226,8 +236,10 @@ export function useMpPageState() {
     if (isActive) setRoomEndedOffer(null);
   }, [isActive]);
   // Early classroom joiner: the teacher's code is up but her room is not open yet — wait, never bounce.
+  const practiceSeat = isPracticeSeatPage();
+  const practiceSeatName = practiceSeat ? resolvePracticeSeatName(t) : null;
   const roomWait = useClassroomRoomWait({ socketRef, isActive, onGiveUp: exitClassroomStudentToHub,
-    rejoin: (code) => handleJoin(false, null, code, undefined, username, { autoRetry: true }) });
+    rejoin: (code) => rejoinWaitingRoom(handleJoin, { code, username: hostUsername || username, isHost: isClassroomHost, language }) });
 
   // Native-safe exit to the multiplayer lobby: reset MP state IN PLACE (no page
   // reload). Shared by the results "Exit" button and the host-left grace modal.
@@ -413,11 +425,11 @@ export function useMpPageState() {
       handleJoin, refreshRooms, activeRooms, roomsLoading,
       isJoining, isAuthenticated, autoCreate, quickPlay,
       // The teacher's practice seat joins under its own name: the server keeps the teacher's name for the host seat.
-      displayName: isPracticeSeatPage() ? t('eduLiveRoom.practice.seatName') : (isCrazyGames && cgUser?.username) || profile?.display_name || '', profileAvatar: profile?.avatar_config,
+      displayName: practiceSeat ? practiceSeatName ?? '' : (isCrazyGames && cgUser?.username) || profile?.display_name || '', profileAvatar: profile?.avatar_config,
       onCrazyGamesLogin: isCrazyGames && !cgUser ? loginCrazyGames : undefined,
-      prefilledRoom: prefilledRoomCode, defaultLanguage: language as Language,
+      prefilledRoom: practiceSeat && !practiceSeatName ? '' : prefilledRoomCode, defaultLanguage: language as Language,
       host: isClassroomHost,
-      isClassroomMode, waitingForTeacher: !!roomWait.waitingCode,
+      isClassroomMode, waitingForTeacher: !!roomWait.waitingCode && !isClassroomHost,
       roomEndedOffer, onRoomEndedOfferShown: clearRoomEndedOffer, joinRoomGone,
       setGameCode, setUsername, setRoomName, setHostUsername,
     },

@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
@@ -19,6 +18,7 @@ import {
   trackEduTrialReminderCtaClick,
 } from '@/lib/education/proFunnelTelemetry';
 import { teacherProUpgradeCtaLabel } from '@/components/education/TeacherProCheckoutCta';
+import { PRO_BANNER_CTA, ProBanner, ProCountdownTile, ProShine } from '@/components/teacher/pro/ProBanner';
 
 interface TeacherTrialReminderBannerProps {
   trial: TrialStatus | null | undefined;
@@ -91,51 +91,29 @@ export function TeacherTrialReminderBanner({
   const ctaText = teacherProUpgradeCtaLabel(language) || t('teacher.subscription.upgradeNow');
 
   return (
-    <aside
-      data-testid="teacher-trial-reminder-banner"
+    <ProBanner
+      testId="teacher-trial-reminder-banner"
       role="status"
-      className="rounded-neo border-neo bg-neo-pink p-4 text-neo-white shadow-hard"
-    >
-      <div className="flex items-start gap-4">
-        <div className="flex min-w-0 flex-1 items-center gap-4">
-          <div className="shrink-0 rounded-neo border-neo border-neo-cream/40 bg-neo-navy px-3 py-2 text-center text-neo-white shadow-hard-sm">
-            <div data-testid="trial-count" className="text-2xl font-black font-neo-display leading-none">
-              {count}
-            </div>
-            <div data-testid="trial-unit" className="mt-0.5 text-xs font-bold uppercase tracking-wide">
-              {t(unitKey)}
-            </div>
-          </div>
-          <div className="min-w-0 text-start">
-            <h3 data-testid="trial-title" className="text-lg font-black font-neo-display">
-              {t('education.trial.urgent_title')}
-            </h3>
-            <p className="mt-0.5 text-sm font-semibold">
-              {t('education.trial.body', { date: dateStr, days: trial.daysLeft })}
-            </p>
-          </div>
-        </div>
-        <button
-          type="button"
-          data-testid="teacher-trial-reminder-dismiss"
-          onClick={handleDismiss}
-          aria-label={t('common.close')}
-          className="inline-flex size-10 shrink-0 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-pink text-neo-white hover:bg-neo-black hover:text-neo-white focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-white"
-        >
-          <X className="size-5" aria-hidden="true" />
-        </button>
-      </div>
-      <div className="mt-3 flex items-center gap-3">
+      tone="urgent"
+      proLabel={t('eduShell.nav.pro')}
+      lead={<ProCountdownTile count={count} unit={t(unitKey)} tone="urgent" />}
+      title={<span data-testid="trial-title">{t('education.trial.urgent_title')}</span>}
+      body={t('education.trial.body', { date: dateStr, days: trial.daysLeft })}
+      onDismiss={handleDismiss}
+      dismissLabel={t('common.close')}
+      dismissTestId="teacher-trial-reminder-dismiss"
+      action={
         <button
           type="button"
           data-testid="teacher-trial-reminder-cta"
           disabled={pending}
           onClick={() => void handleUpgrade()}
-          className="inline-flex items-center justify-center rounded-neo border-neo border-neo-cream/40 bg-neo-navy px-4 py-2 font-bold text-neo-white shadow-hard-sm transition hover:shadow-hard active:shadow-hard-pressed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
+          className={PRO_BANNER_CTA}
         >
+          <ProShine />
           {pending ? t('common.loading') : ctaText}
         </button>
-      </div>
-    </aside>
+      }
+    />
   );
 }

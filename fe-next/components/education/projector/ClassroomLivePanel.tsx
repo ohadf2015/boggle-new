@@ -144,7 +144,7 @@ export const ClassroomLivePanel = memo<ClassroomLivePanelProps>(function Classro
                   key={i}
                   data-testid="live-word-ghost"
                   style={{ animationDelay: `${i * 140}ms` }}
-                  className="grid size-[clamp(26px,6cqh,76px)] place-items-center rounded-md border-[3px] border-dashed border-neo-cream/40 bg-neo-purple/25 font-neo-display text-[clamp(16px,4cqh,52px)] font-black leading-none text-neo-cream/40 motion-safe:animate-[edu-ghost-wave_2.4s_cubic-bezier(0.45,0,0.55,1)_infinite]"
+                  className="grid size-[clamp(26px,6cqh,76px)] place-items-center rounded-md border-[3px] border-dashed border-neo-cream/60 bg-neo-purple/25 font-neo-display text-[clamp(16px,4cqh,52px)] font-black leading-none text-neo-cream/40 motion-safe:animate-[edu-ghost-wave_2.4s_cubic-bezier(0.45,0,0.55,1)_infinite]"
                 >
                   ?
                 </span>

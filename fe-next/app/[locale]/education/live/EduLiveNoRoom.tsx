@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { EDU_MASCOT } from '@/lib/education/mascotArt';
-import { classroomStudentHomePath } from '@/lib/education/classroomRoomGone';
+import { DeadEndPracticeLink } from '@/components/education/join/DeadEndPracticeLink';
 import { LIVE_KEYFRAMES, PRESS, PRIMARY_BUTTON, type Translate } from '@/components/education/live/eduLiveStyles';
 
 interface EduLiveNoRoomProps {
@@ -12,15 +12,13 @@ interface EduLiveNoRoomProps {
   t: Translate;
 }
 
-/** A stage, not a lone card: the mascot says what happened and the one way forward sits under the thumb. */
-export function EduLiveNoRoom({ isHost, language, t }: EduLiveNoRoomProps) {
-  const primaryHref = isHost ? `/${language}/teacher` : `/${language}/join`;
-  const secondaryHref = isHost ? `/${language}/education/classroom-game` : classroomStudentHomePath(language);
+const SECONDARY_LINK =
+  'inline-flex min-h-11 items-center rounded-neo px-3 font-neo-display text-base font-bold text-neo-cyan underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan tv:text-xl';
 
+export function EduLiveNoRoom({ isHost, language, t }: EduLiveNoRoomProps) {
   return (
     <div data-testid="edu-live-no-room" className="relative flex min-h-[calc(100dvh-1rem)] flex-1 flex-col overflow-hidden bg-neo-navy text-neo-cream">
       <style>{LIVE_KEYFRAMES}</style>
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,var(--neo-navy-light)_0,transparent_62%)]" />
 
       <main className="relative mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col items-center justify-center gap-5 px-4 pt-10 text-center tv:max-w-2xl">
         <div
@@ -45,21 +43,28 @@ export function EduLiveNoRoom({ isHost, language, t }: EduLiveNoRoomProps) {
         </div>
 
         <p className="max-w-xs font-neo-body text-lg font-bold text-neo-cream/85 tv:max-w-lg tv:text-2xl">
-          {t(isHost ? 'eduLiveRoom.entry.noRoomHost' : 'eduLiveRoom.entry.noRoomStudent')}
+          {t(isHost ? 'eduLiveRoom.entry.noRoomHost' : 'education.student.deadEnd.noRoomLine')}
         </p>
       </main>
 
       <footer className="relative mx-auto flex w-full max-w-md flex-col items-center gap-3 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 tv:max-w-xl">
-        <Link href={primaryHref} data-testid="edu-live-no-room-cta" className={cn(PRIMARY_BUTTON, PRESS, 'min-h-14 w-full px-5 text-xl tv:min-h-16 tv:text-2xl')}>
-          {t(isHost ? 'eduLiveRoom.entry.toTeacher' : 'eduLiveRoom.entry.enterCode')}
-        </Link>
-        <Link
-          href={secondaryHref}
-          data-testid="edu-live-no-room-secondary"
-          className="inline-flex min-h-11 items-center rounded-neo px-3 font-neo-display text-base font-bold text-neo-cyan underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
-        >
-          {t(isHost ? 'eduLiveRoom.entry.pickGame' : 'eduLiveRoom.entry.soloPractice')}
-        </Link>
+        {isHost ? (
+          <>
+            <Link href={`/${language}/teacher`} data-testid="edu-live-no-room-cta" className={cn(PRIMARY_BUTTON, PRESS, 'min-h-14 w-full px-5 text-xl tv:min-h-16 tv:text-2xl')}>
+              {t('eduLiveRoom.entry.toTeacher')}
+            </Link>
+            <Link href={`/${language}/education/classroom-game`} data-testid="edu-live-no-room-secondary" className={SECONDARY_LINK}>
+              {t('eduLiveRoom.entry.pickGame')}
+            </Link>
+          </>
+        ) : (
+          <>
+            <DeadEndPracticeLink state="no_room" className="tv:min-h-16" />
+            <Link href={`/${language}/join`} data-testid="edu-live-no-room-secondary" className={SECONDARY_LINK}>
+              {t('eduLiveRoom.entry.enterCode')}
+            </Link>
+          </>
+        )}
       </footer>
     </div>
   );

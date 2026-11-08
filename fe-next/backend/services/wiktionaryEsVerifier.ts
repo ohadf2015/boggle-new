@@ -7,6 +7,7 @@ import ky, { HTTPError } from 'ky';
 import { getRedisClient } from '../redisClient';
 import logger from '../utils/logger';
 import { requireAdminClient } from '@/utils/supabase/admin';
+import { withRealSenses, type WiktionaryEntry } from './wiktionaryPointerDefinitions';
 
 const USER_AGENT = 'LexiClash/1.0 (https://www.lexiclash.live; contact@lexiclash.live)';
 const RATE_LIMIT_MS = 200;
@@ -33,7 +34,6 @@ export interface WiktionaryEsVerificationResult {
   partOfSpeechRaw?: string;
 }
 
-interface WiktionaryEntry { partOfSpeech?: string; language?: string }
 type WiktionaryResponse = Record<string, WiktionaryEntry[]>;
 
 const ACCEPTED_POS: Record<string, WiktionaryEsWordType> = {
@@ -88,7 +88,11 @@ export function parseWiktionaryEsResponse(
     return { verified: false, status: 'rejected_type', error: 'too_short' };
   }
 
-  const entries = body?.es;
+  const senses = withRealSenses(body?.es ?? []);
+  if (senses.pointerOnly) {
+    return { verified: false, status: 'rejected_type', wordType: 'abbreviation', partOfSpeechRaw: 'pointer-only' };
+  }
+  const entries = senses.kept;
   if (!entries || entries.length === 0) {
     return { verified: false, status: 'not_found' };
   }

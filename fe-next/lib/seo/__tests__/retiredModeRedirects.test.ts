@@ -5,6 +5,7 @@ interface RedirectRule {
   source: string;
   destination: string;
   permanent: boolean;
+  missing?: { type: string; key: string; value?: string }[];
 }
 
 const rules = RETIRED_MODE_REDIRECTS as RedirectRule[];
@@ -33,5 +34,20 @@ describe('retired mode redirects', () => {
 
   it('never shadows the Blast route itself', () => {
     for (const rule of rules) expect(rule.source).not.toMatch(/\/blast(\/:path\*)?$/);
+  });
+
+  it('sends /singleplayer (any locale, any subpath) to Quick Play', () => {
+    expect(rules.find((r) => r.source === '/:locale(en|he|sv|ja|es|ru)/singleplayer/:path*')?.destination).toBe('/:locale/quick-play');
+    expect(rules.find((r) => r.source === '/singleplayer/:path*')?.destination).toBe('/en/quick-play');
+  });
+
+  it('keeps the solo deep links Quick Play cannot serve yet (community board, presets, practice lists, MP hand-off, friend challenge)', () => {
+    for (const rule of rules.filter((r) => r.source.includes('/singleplayer'))) {
+      const missing = rule.missing ?? [];
+      for (const key of ['boardCode', 'preset', 'practice', 'mpHandoff', 'mastery']) {
+        expect(missing).toContainEqual({ type: 'query', key });
+      }
+      expect(missing).toContainEqual({ type: 'query', key: 'autoStart', value: 'challenge' });
+    }
   });
 });

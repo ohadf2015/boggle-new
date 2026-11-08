@@ -52,6 +52,8 @@ export interface RunSummary {
   heightM: number;
   /** Emergency braces BOUGHT this run (free ones are not counted); priced by `braceCost`. */
   braces?: number;
+  /** Floating snacks tapped this run. Capped by floors: you see the sky by climbing. */
+  snacks?: number;
   tower?: TowerBlock[];
 }
 
@@ -97,6 +99,10 @@ export type SpendResult =
 
 const MAX_FLOORS = 100;
 const MAX_CRATES = 30;
+/** Snacks paid per run, at most. */
+export const MAX_SNACKS = 20;
+/** Coins one caught snack is worth (a crate is 10). */
+export const SNACK_COINS = 5;
 const MAX_HEIGHT_M = 400;
 const MAX_RUN_COINS = 3000;
 const MAX_COINS = 1_000_000_000;
@@ -169,6 +175,7 @@ export function clampRunSummary(raw: Partial<RunSummary>): RunSummary {
     crates: clampInt(raw.crates, 0, Math.min(MAX_CRATES, floors)),
     heightM: Math.round(heightM * 10) / 10,
     braces: clampInt(raw.braces, 0, MAX_BRACES),
+    ...(raw.snacks ? { snacks: clampInt(raw.snacks, 0, Math.min(MAX_SNACKS, floors)) } : {}),
     ...(raw.tower ? { tower: decodeTower(raw.tower) } : {}),
   };
 }
@@ -176,7 +183,7 @@ export function clampRunSummary(raw: Partial<RunSummary>): RunSummary {
 export function runCoins(raw: RunSummary, opts: { district?: number; coinMult?: number; freeBraces?: number } = {}): number {
   const s = clampRunSummary(raw);
   const district = opts.district ?? 1;
-  const base = 40 + 8 * s.floors + 6 * s.perfects + 5 * s.bestCombo + 10 * s.crates;
+  const base = 40 + 8 * s.floors + 6 * s.perfects + 5 * s.bestCombo + 10 * s.crates + SNACK_COINS * (s.snacks ?? 0);
   const mult = Math.min(2, Math.max(1, opts.coinMult ?? 1));
   const earned = Math.min(Math.round(MAX_RUN_COINS * yieldScale(district)), Math.round(base * mult * yieldScale(district)));
   const paid = Math.max(0, (s.braces ?? 0) - Math.max(0, opts.freeBraces ?? 0));

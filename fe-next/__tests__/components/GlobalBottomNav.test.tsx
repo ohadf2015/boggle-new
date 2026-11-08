@@ -276,7 +276,7 @@ describe('GlobalBottomNav', () => {
             ['/en/settings', /settings/i],
             ['/en/community', /community/i],
             ['/en/referrals', /invite|referral/i],
-            ['/en/singleplayer', /quick play|singleplayer/i],
+            ['/en/quick-play', /quick play|singleplayer/i],
         ];
 
         it.each(dynamicRoutes)('renders and activates a contextual tab on %s', (path, labelRe) => {

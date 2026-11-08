@@ -10,7 +10,7 @@ import { supabase } from '@/lib/supabase';
 import { isNative } from '@/utils/platform';
 import { defaultLocale, locales } from '@/lib/i18n';
 import logger from '@/utils/logger';
-import { nativeOAuthNext, nativeOAuthRedirectUrl } from '@/lib/navigation/authReturnPath';
+import { nativeOAuthNext, nativeOAuthRedirectUrl, rememberAuthOrigin } from '@/lib/navigation/authReturnPath';
 
 export interface MobileOAuthResult {
   success: boolean;
@@ -36,6 +36,7 @@ function getOAuthRedirectUrl(locale: string): string {
   const next = typeof window === 'undefined'
     ? null
     : nativeOAuthNext(window.location.pathname, window.location.search);
+  if (typeof window !== 'undefined') rememberAuthOrigin(window.location.pathname + window.location.search);
   return nativeOAuthRedirectUrl(platform, locale, next);
 }
 

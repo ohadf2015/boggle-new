@@ -86,6 +86,11 @@ vi.mock('@/backend/services/milogWordVerifier', () => ({
   invalidateMilogCache: (...args: unknown[]) => mockInvalidateMilogCache(...args),
 }));
 
+const mockSetCachedWordValidation = vi.fn();
+vi.mock('@/backend/cache/wordCache', () => ({
+  setCachedWordValidation: (...args: unknown[]) => mockSetCachedWordValidation(...args),
+}));
+
 // Mock Sentry
 vi.mock('@/utils/sentry', () => ({
   captureApiError: vi.fn(),
@@ -176,6 +181,12 @@ describe('POST /api/admin/dictionary-revoke', () => {
     await POST(req);
 
     expect(mockInvalidateMilogCache).toHaveBeenCalledWith('מילה');
+  });
+
+  it('marks the word invalid in the 24h validation cache', async () => {
+    await POST(createRequest({ word: 'yuo', language: 'en' }));
+
+    expect(mockSetCachedWordValidation).toHaveBeenCalledWith('en', 'yuo', false);
   });
 
   it('should optionally add to blacklist', async () => {

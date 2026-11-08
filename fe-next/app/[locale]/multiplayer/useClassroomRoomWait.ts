@@ -18,6 +18,7 @@
 
 import { useCallback, useEffect, useRef, useState, type MutableRefObject } from 'react';
 import type { Socket } from 'socket.io-client';
+import type { HandleJoinFn } from './useMultiplayerJoin';
 
 /** Fallback re-ask. The push is the fast path; this only covers a lost push. */
 export const ROOM_WAIT_RETRY_MS = 8_000;
@@ -92,3 +93,15 @@ export function useClassroomRoomWait({ socketRef, isActive, rejoin, onGiveUp }: 
 }
 
 export default useClassroomRoomWait;
+
+/** The host's own replayed `join` can beat its `createGame` to the server; the host then opens the room again, never waits as a student. */
+export function rejoinWaitingRoom(
+  handleJoin: HandleJoinFn,
+  { code, username, isHost, language }: { code: string; username: string; isHost: boolean; language: Parameters<HandleJoinFn>[1] },
+): void {
+  if (isHost) {
+    handleJoin(true, language, code, `${username} Room`, username, { isPrivate: true, isClassroom: true });
+    return;
+  }
+  handleJoin(false, null, code, undefined, username, { autoRetry: true });
+}

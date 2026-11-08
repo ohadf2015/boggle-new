@@ -2,7 +2,6 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { HOME_PREVIEW_COPY as C } from './copy';
 
 interface Game {
   id: string;
@@ -51,6 +50,24 @@ const GAMES: Game[] = [
     tilt: '-rotate-1',
     art: { src: '/mascot/bridge-cheer-nobg.webp' },
   },
+  {
+    id: 'adventure',
+    href: 'adventure',
+    titleKey: 'homeFresh.modes.items.adventure.title',
+    lineKey: 'homeFresh.modes.items.adventure.line',
+    bg: 'bg-neo-orange',
+    tilt: 'rotate-1',
+    art: { src: '/mascot/explorer-nobg.webp' },
+  },
+  {
+    id: 'brain',
+    href: 'brain',
+    titleKey: 'homeFresh.modes.items.brainGym.title',
+    lineKey: 'homeFresh.modes.items.brainGym.line',
+    bg: 'bg-neo-lime',
+    tilt: '-rotate-2',
+    art: { src: '/mascot/powerup-nobg.webp' },
+  },
 ];
 
 const TOWER_OFFSET = ['ms-3', 'ms-0', 'ms-4', 'ms-1', 'ms-2'];
@@ -82,10 +99,10 @@ export function MoreGames({ lang, t }: { lang: string; t: (key: string) => strin
           <h2 id="hp-games-title" className="font-neo-display text-2xl font-bold text-neo-cream lg:text-5xl">
             {t('homeFresh.modes.next')}
           </h2>
-          <p className="mt-1 text-sm text-neo-white/65 lg:text-lg">{C.gamesLine}</p>
+          <p className="mt-1 text-sm text-neo-white/65 lg:text-lg">{t('homePlay.gamesLine')}</p>
         </div>
       </div>
-      <ul className="grid grid-cols-2 gap-x-3 gap-y-4 lg:grid-cols-4 lg:gap-8">
+      <ul className="grid grid-cols-2 gap-x-3 gap-y-4 lg:grid-cols-3 lg:gap-8">
         {GAMES.map((g) => (
           <li key={g.id}>
             <Link

@@ -115,7 +115,7 @@ let usageState = {
 vi.mock('@/hooks/useTeacherUsagePrompt', () => ({
   useTeacherUsagePrompt: () => usageState,
 }));
-vi.mock('lucide-react', () => ({ Shield: () => null, ArrowLeft: () => null, X: () => null }));
+vi.mock('lucide-react', () => ({ Shield: () => null, ArrowLeft: () => null, X: () => null, Crown: () => null }));
 vi.mock('@/components/ui/button', () => ({ Button: ({ children, onClick }: { children: React.ReactNode; onClick?: () => void }) => <button onClick={onClick}>{children}</button> }));
 
 import * as AuthContext from '@/contexts/AuthContext';

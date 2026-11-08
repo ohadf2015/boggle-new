@@ -24,7 +24,7 @@ berg
 bidrag
 bin
 binda
-bjork
+björk
 blad
 blick
 blixt
@@ -51,7 +51,7 @@ brons
 brygga
 bröd
 bubbla
-buffe
+buffé
 bukt
 bulle
 bur
@@ -118,7 +118,6 @@ fjäril
 fladder
 flagga
 flamma
-flask
 flaska
 flingor
 flock
@@ -139,7 +138,7 @@ frö
 fysik
 fält
 fälttåg
-fängsel
+fängelse
 färg
 färja
 fästing
@@ -245,7 +244,7 @@ insekt
 isbjörn
 juice
 jul
-jungel
+djungel
 jägare
 jäst
 kaffe
@@ -426,7 +425,7 @@ orm
 orre
 ost
 ostron
-otter
+utter
 padda
 paj
 panda
@@ -626,7 +625,6 @@ tårta
 uggla
 ugn
 unik
-utter
 valnöt
 valross
 vals
@@ -656,7 +654,7 @@ värme
 väska
 väst
 växt
-våffel
+våffla
 våg
 våning
 yttre

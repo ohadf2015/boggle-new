@@ -116,7 +116,7 @@ const howToJsonLd = JSON.stringify({
   description: 'Start playing free online Boggle in 3 simple steps — no download or account required.',
   totalTime: 'PT1M',
   step: [
-    { '@type': 'HowToStep', name: 'Open LexiClash', text: 'Visit lexiclash.live in any browser — works on phone, tablet, and desktop. No download or signup needed.', url: 'https://www.lexiclash.live/en/singleplayer' },
+    { '@type': 'HowToStep', name: 'Open LexiClash', text: 'Visit lexiclash.live in any browser — works on phone, tablet, and desktop. No download or signup needed.', url: 'https://www.lexiclash.live/en/quick-play' },
     { '@type': 'HowToStep', name: 'Choose Your Mode', text: 'Pick Solo (vs AI bots), Multiplayer (a room of up to 50), Daily Challenge (same puzzle worldwide), or Adventure Mode (boss battles).' },
     { '@type': 'HowToStep', name: 'Find Words & Score', text: 'Swipe or click to connect adjacent letters and form words. Longer words and fast combos score more points. Compete on the global leaderboard!' },
   ],
@@ -240,7 +240,7 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
               <Link
-                href={`/${locale}/singleplayer?autoStart=bots`}
+                href={`/${locale}/quick-play`}
                 className="group rounded-neo border-4 border-neo-black bg-neo-yellow px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
               >
                 <span className="block text-base sm:text-lg">▶ Play Free Now</span>
@@ -668,7 +668,7 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
               </p>
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <Link
-                  href={`/${locale}/singleplayer?autoStart=bots`}
+                  href={`/${locale}/quick-play`}
                   className="rounded-neo border-4 border-neo-black bg-neo-navy px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider text-neo-lime shadow-hard-lg transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl sm:text-lg"
                 >
                   ▶ Play Boggle Now

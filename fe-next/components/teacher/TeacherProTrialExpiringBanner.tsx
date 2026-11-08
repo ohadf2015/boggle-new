@@ -1,7 +1,7 @@
 'use client';
 
+import { PRO_BANNER_CTA, ProBanner, ProShine } from './pro/ProBanner';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { polarTrialDaysLeft, polarTrialDaysTitle, isPolarTrialDay10Expiring } from '@/lib/education/polarTrial';
@@ -93,41 +93,28 @@ export function TeacherProTrialExpiringBanner({
     t('teacher.subscription.trialLifecycleBody');
 
   return (
-    <aside
-      data-testid="teacher-pro-trial-expiring"
-      data-days={String(daysRemaining)}
-      className="border-b-3 border-black bg-neo-pink px-4 py-3"
-    >
-      <div className="mx-auto flex max-w-5xl flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div className="min-w-0 flex-1">
-          <p className="font-neo-display text-sm font-black leading-tight text-black">
-            {title}
-          </p>
-          <p className="mt-0.5 font-neo-body text-xs font-bold text-black/80">
-            {lossDescription}
-          </p>
-        </div>
-        <div className="flex shrink-0 items-center gap-2">
-          <button
-            type="button"
-            data-testid="teacher-pro-trial-expiring-cta"
-            disabled={pending}
-            onClick={() => void handleUpgrade()}
-            className="inline-flex items-center justify-center rounded-neo border-2 border-black bg-neo-black px-4 py-2 font-neo-display text-sm font-black text-white shadow-hard hover:-translate-y-0.5 disabled:opacity-60"
-          >
-            {pending ? t('common.loading') : t('teacher.subscription.trialLifecycleCta')}
-          </button>
-          <button
-            type="button"
-            data-testid="teacher-pro-trial-expiring-dismiss"
-            onClick={handleDismiss}
-            aria-label={t('common.close')}
-            className="inline-flex size-10 items-center justify-center rounded-neo border-2 border-black bg-neo-pink text-black hover:bg-neo-black hover:text-white focus:outline-hidden focus-visible:ring-2 focus-visible:ring-black"
-          >
-            <X className="size-5" aria-hidden="true" />
-          </button>
-        </div>
-      </div>
-    </aside>
+    <ProBanner
+      testId="teacher-pro-trial-expiring"
+      data={{ 'data-days': String(daysRemaining) }}
+      tone="urgent"
+      proLabel={t('eduShell.nav.pro')}
+      title={title}
+      body={lossDescription}
+      onDismiss={handleDismiss}
+      dismissLabel={t('common.close')}
+      dismissTestId="teacher-pro-trial-expiring-dismiss"
+      action={
+        <button
+          type="button"
+          data-testid="teacher-pro-trial-expiring-cta"
+          disabled={pending}
+          onClick={() => void handleUpgrade()}
+          className={PRO_BANNER_CTA}
+        >
+          <ProShine />
+          {pending ? t('common.loading') : t('teacher.subscription.trialLifecycleCta')}
+        </button>
+      }
+    />
   );
 }

@@ -1,5 +1,6 @@
 'use client';
 
+import { PRO_BANNER_CTA, ProShine } from '@/components/teacher/pro/ProBanner';
 import Link from 'next/link';
 import { m, useReducedMotion } from 'framer-motion';
 import { Check, Lock } from 'lucide-react';
@@ -35,7 +36,7 @@ export function MasteryLockedTeaser({ words, hidden }: { words: HardWord[]; hidd
                   style={{ opacity: GHOST_OPACITY[i] }}
                   className="pointer-events-none grid select-none grid-cols-[1.75rem_minmax(0,1fr)_auto] items-center gap-x-2.5 rounded-neo border-2 border-neo-cream/40 bg-neo-navy px-2.5 py-1.5"
                 >
-                  <span className="grid size-7 place-items-center rounded-neo border-2 border-black bg-neo-cream font-neo-display text-sm font-black text-neo-black">
+                  <span className="grid size-7 place-items-center rounded-neo border-2 border-neo-black bg-neo-cream font-neo-display text-sm font-black text-neo-black">
                     {FREE_PREVIEW_WORDS + i + 1}
                   </span>
                   <span className="min-w-0 space-y-1.5 blur-[3px]">
@@ -57,16 +58,16 @@ export function MasteryLockedTeaser({ words, hidden }: { words: HardWord[]; hidd
         initial={reduceMotion ? false : { y: 8 }}
         animate={{ y: 0 }}
         transition={{ type: 'spring', stiffness: 420, damping: 26, delay: 0.2 }}
-        className="relative mt-3 flex flex-col gap-3 rounded-neo border-2 border-neo-lime bg-neo-navy p-4 shadow-hard sm:flex-row sm:items-center sm:justify-between"
+        className="relative mt-3 flex flex-col gap-3 rounded-neo-xl border-[3px] border-neo-cream/50 bg-neo-navy-light p-4 shadow-hard-xl sm:flex-row sm:items-center sm:justify-between sm:p-5"
       >
         <div className="min-w-0">
           <p className="flex items-center gap-2 font-neo-display text-base font-black text-neo-white">
-            <span className="grid size-7 shrink-0 place-items-center rounded-neo border-2 border-black bg-neo-lime text-neo-black">
+            <span className="grid size-7 shrink-0 place-items-center rounded-neo border-2 border-neo-black bg-neo-yellow text-neo-black">
               <Lock className="size-3.5" aria-hidden="true" />
             </span>
             {t('teacher.proGate.mastery.title')}
           </p>
-          {hidden > 0 && <p className="mt-1 text-xs font-black text-neo-lime">{t('eduPro.mastery.hiddenWords', { count: hidden })}</p>}
+          {hidden > 0 && <p className="mt-1 text-xs font-black text-neo-yellow">{t('eduPro.mastery.hiddenWords', { count: hidden })}</p>}
           <ul className="mt-2 space-y-1">
             {UNLOCKS.map((key) => (
               <li key={key} data-testid="mastery-unlock-item" className="flex items-start gap-2 text-sm font-bold text-neo-cream/90">
@@ -79,8 +80,9 @@ export function MasteryLockedTeaser({ words, hidden }: { words: HardWord[]; hidd
         <Link
           href={`/${language}/teacher/upgrade`}
           onClick={() => trackGrowthEvent('landing_cta_clicked', { cta: 'pro_gate_mastery' })}
-          className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-neo border-2 border-black bg-neo-cyan px-4 py-2 text-center text-sm font-black text-neo-navy shadow-hard transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-none motion-reduce:transition-none"
+          className={PRO_BANNER_CTA}
         >
+          <ProShine />
           {t('teacher.proGate.cta', { price: `$${TEACHER_PRO_PRICE_USD}` })}
         </Link>
       </m.div>

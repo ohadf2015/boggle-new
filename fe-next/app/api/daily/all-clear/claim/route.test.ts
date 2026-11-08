@@ -14,8 +14,10 @@ vi.mock('@/backend/services/economy/awardCoins', () => ({
 import { getAuthedUser } from '@/lib/auth/getAuthedUser'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { awardCoinsServer } from '@/backend/services/economy/awardCoins'
-import { ALL_CLEAR_COINS, ALL_CLEAR_XP } from '@/lib/daily/allClearReward'
+import { rollDayPrize } from '@/lib/daily/dayPrize'
 import { POST } from './route'
+
+const PRIZE = rollDayPrize('user-1', '2026-11-03', 'perfect')
 
 beforeAll(() => {
   vi.useFakeTimers()
@@ -78,21 +80,21 @@ describe('POST /api/daily/all-clear/claim', () => {
     expect(awardCoinsServer).not.toHaveBeenCalled()
   })
 
-  it('pays coins + xp once when all four modes are played', async () => {
+  it('pays the rolled perfect-day prize once when all four modes are played', async () => {
     const { insert, rpc } = setup()
     const res = await POST(req())
     expect(res.status).toBe(200)
-    expect(await res.json()).toEqual({ claimed: true, coins: ALL_CLEAR_COINS, xp: ALL_CLEAR_XP })
+    expect(await res.json()).toEqual({ ...PRIZE, claimed: true })
     expect(insert).toHaveBeenCalledWith(expect.objectContaining({ player_id: 'user-1', claim_date: '2026-11-03' }))
-    expect(awardCoinsServer).toHaveBeenCalledWith('user-1', ALL_CLEAR_COINS, 'daily_all_clear', expect.anything())
-    expect(rpc).toHaveBeenCalledWith('increment_player_xp', { p_player_id: 'user-1', p_xp_amount: ALL_CLEAR_XP })
+    expect(awardCoinsServer).toHaveBeenCalledWith('user-1', PRIZE.coins, 'daily_all_clear', expect.anything())
+    expect(rpc).toHaveBeenCalledWith('increment_player_xp', { p_player_id: 'user-1', p_xp_amount: PRIZE.xp })
   })
 
   it('second claim the same day is a 200 with claimed:false and pays nothing', async () => {
     setup({ insertError: { code: '23505', message: 'dup' } })
     const res = await POST(req())
     expect(res.status).toBe(200)
-    expect(await res.json()).toEqual({ claimed: false, coins: ALL_CLEAR_COINS, xp: ALL_CLEAR_XP })
+    expect(await res.json()).toEqual({ ...PRIZE, claimed: false })
     expect(awardCoinsServer).not.toHaveBeenCalled()
   })
 

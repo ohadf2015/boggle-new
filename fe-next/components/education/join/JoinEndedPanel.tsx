@@ -2,11 +2,12 @@
 
 import { useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { Hourglass, Play } from 'lucide-react';
+import { Hourglass } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useStudentClassroom } from '@/hooks/useStudentClassroom';
 import { JoinPrimaryButton } from './JoinPrimaryButton';
-import { joinClassHref, latePracticeHref } from './joinDestinations';
+import { joinClassHref } from './joinDestinations';
+import { DeadEndPracticeLink } from './DeadEndPracticeLink';
 import { reportLateJoinPracticeStarted } from '@/lib/education/reportLateJoinPractice';
 
 interface JoinEndedPanelProps {
@@ -17,11 +18,6 @@ interface JoinEndedPanelProps {
   onNewCode: () => void;
 }
 
-/**
- * A dead code gets an answer and a way on, so the student stops retrying it.
- * The way on is today's practice round (the daily Word Hunt, solo, no account),
- * so a late student still plays instead of staring at a refusal.
- */
 export function JoinEndedPanel({ code, label, classroomId: enrolledIn, onNewCode }: JoinEndedPanelProps) {
   const { t, language } = useLanguage();
   const { classroomId: ownClass, isLoading } = useStudentClassroom();
@@ -53,19 +49,15 @@ export function JoinEndedPanel({ code, label, classroomId: enrolledIn, onNewCode
         </h1>
         {label && <p className="mt-2 font-neo-display text-lg font-black text-neo-lime lg:text-xl">{label}</p>}
         <p data-testid="join-ended-practice-line" className="mt-3 font-neo-body text-base font-bold text-neo-cyan lg:text-lg">
-          {t('education.student.gameEnded.practiceLine')}
+          {t('education.student.deadEnd.endedLine')}
         </p>
       </div>
       <div className="flex flex-col gap-3">
-        <Link
-          href={latePracticeHref(language)}
-          data-testid="join-ended-practice"
+        <DeadEndPracticeLink
+          state="ended"
+          classroomId={enrolledIn}
           onClick={() => reportLateJoinPracticeStarted({ gameCode: code, door: 'join_flow' })}
-          className="flex min-h-14 w-full items-center justify-center gap-2 rounded-neo border-3 border-neo-black bg-neo-lime px-4 py-3 font-neo-display text-xl font-black uppercase text-neo-navy shadow-hard focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-neo-lime"
-        >
-          <Play aria-hidden="true" className="size-5 shrink-0" strokeWidth={3} />
-          {t('education.student.gameEnded.practiceCta')}
-        </Link>
+        />
         <JoinPrimaryButton type="button" onClick={onNewCode} className="min-h-12 bg-neo-cream text-lg lg:min-h-12 lg:text-lg">
           {t('education.student.gameEnded.newCode')}
         </JoinPrimaryButton>

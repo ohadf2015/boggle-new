@@ -71,7 +71,7 @@ export function ClassroomResultsCardSteps({
       <div className="flex shrink-0 justify-center px-4 pt-4" aria-label={t('education.results.steps.progress', { step: index + 1, total: steps.length })} role="img">
         <div className="flex w-full max-w-md gap-2">
           {steps.map((s, i) => (
-            <span key={s} className="relative h-3 flex-1 overflow-hidden rounded-full border-2 border-neo-cream/60 bg-neo-white/15">
+            <span key={s} className="relative h-3 flex-1 overflow-hidden rounded-full border-2 border-neo-cream/60 bg-neo-navy">
               <m.span
                 className="absolute inset-0 block origin-left rounded-full bg-neo-lime rtl:origin-right"
                 initial={false}
@@ -104,7 +104,7 @@ export function ClassroomResultsCardSteps({
 
       <div
         data-testid="results-steps-footer"
-        className="sticky bottom-0 shrink-0 border-t-2 border-neo-cream/40 bg-neo-navy px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-4 sm:p-6"
+        className="sticky bottom-0 shrink-0 border-t-[3px] border-neo-cream/50 bg-neo-navy px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-4 sm:p-6"
       >
         <div className="mx-auto flex w-full max-w-md flex-col gap-2 sm:max-w-[58rem] sm:flex-row-reverse sm:items-center sm:justify-between sm:gap-6">
           <m.button

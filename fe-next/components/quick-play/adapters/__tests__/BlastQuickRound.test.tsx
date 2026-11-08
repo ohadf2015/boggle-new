@@ -102,3 +102,47 @@ describe('BlastQuickRound — ghost rivals', () => {
     expect(mid).toBeLessThan(config.perfectScore);
   });
 });
+
+// The countdown used to be a bare 1s setInterval: a busy or backgrounded tab
+// stretched the "60 seconds". It now runs on the shared wall-clock round timer.
+describe('BlastQuickRound — round clock', () => {
+  beforeEach(() => {
+    lastBlastGameProps.current = null;
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('ends the round exactly once when the 60 seconds run out', async () => {
+    vi.useFakeTimers();
+    const onDone = vi.fn();
+    render(<BlastQuickRound config={config} onDone={onDone} onQuit={vi.fn()} />);
+    await vi.advanceTimersByTimeAsync(59_000);
+    expect(onDone).not.toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(3_000);
+    expect(onDone).toHaveBeenCalledTimes(1);
+    await vi.advanceTimersByTimeAsync(5_000);
+    expect(onDone).toHaveBeenCalledTimes(1);
+  });
+
+  it('rivals race the 60-second par, not the solver perfect', async () => {
+    vi.useFakeTimers();
+    render(
+      <BlastQuickRound
+        config={{
+          ...config,
+          perfectScore: 20000,
+          parScore: 150,
+          parWords: 15,
+          ghosts: [{ userId: 'u2', name: 'Bo', customAvatar: null, scorePct: 100 }],
+        }}
+        onDone={vi.fn()}
+        onQuit={vi.fn()}
+      />
+    );
+    await vi.advanceTimersByTimeAsync(30_000);
+    const bo = lastBlastGameProps.current.leaderboard.find((e: { username: string }) => e.username === 'Bo');
+    expect(bo.score).toBeGreaterThan(0);
+    expect(bo.score).toBeLessThanOrEqual(150);
+  });
+});

@@ -147,7 +147,7 @@ export function ResultsTeacherProTrialCard({
       data-offer={proOffer.offer}
       dir={dir}
       className={cn(
-        'shrink-0 rounded-neo border-2 border-s-4 border-neo-cream/40 border-s-neo-pink bg-neo-navy-light text-neo-white',
+        'shrink-0 rounded-neo-lg border-[3px] border-s-[6px] border-neo-cream/50 border-s-neo-pink bg-neo-navy-light text-neo-white shadow-hard-lg',
         dismissible ? 'p-4' : 'px-3 py-2.5 @[96rem]/results:px-4 @[96rem]/results:py-3.5',
         className,
       )}
@@ -198,7 +198,7 @@ export function ResultsTeacherProTrialCard({
           }
         }}
         className={cn(
-          'inline-flex items-center justify-center rounded-neo border-2 border-neo-pink bg-transparent px-4 text-center font-neo-display text-sm font-bold text-neo-pink-light transition-colors hover:bg-neo-pink/10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan active:translate-y-px',
+          'inline-flex items-center justify-center rounded-neo border-[3px] border-neo-pink bg-neo-navy px-4 text-center font-neo-display text-sm font-black text-neo-pink-light transition-transform hover:-translate-y-px focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan active:translate-y-px',
           dismissible ? 'mt-3 min-h-11 w-full' : 'min-h-10 shrink-0 px-3 text-[0.8125rem] @[96rem]/results:min-h-12 @[96rem]/results:px-4 @[96rem]/results:text-base',
         )}
       >
@@ -208,7 +208,7 @@ export function ResultsTeacherProTrialCard({
         {proOffer.note}
       </p>
       </div>
-      <div className={dismissible ? 'mt-3 border-t border-neo-cream/20 pt-3 text-center' : 'mt-2 flex flex-wrap items-baseline gap-x-2 border-t border-neo-cream/20 pt-1.5'}>
+      <div className={dismissible ? 'mt-3 border-t-2 border-dashed border-neo-cream/50 pt-3 text-center' : 'mt-2 flex flex-wrap items-baseline gap-x-2 border-t-2 border-dashed border-neo-cream/50 pt-1.5'}>
         <Link
           href={`/${language}/education/for-schools?source=${placement}`}
           data-testid="results-school-quote-link"

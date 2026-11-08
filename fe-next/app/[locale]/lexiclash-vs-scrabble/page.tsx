@@ -100,7 +100,7 @@ export default async function LexiClashVsScrabblePage({ params }: PageProps) {
         ]}
         quickCtas={[
           { href: `/${locale}/multiplayer`, label: 'Play Real Multiplayer', variant: 'lime' },
-          { href: `/${locale}/singleplayer`, label: 'Solo vs Labeled Bots', variant: 'cyan' },
+          { href: `/${locale}/quick-play`, label: 'Solo vs Labeled Bots', variant: 'cyan' },
           { href: `/${locale}/daily`, label: 'Daily Challenge', variant: 'pink' },
         ]}
         competitorName="Scrabble GO"

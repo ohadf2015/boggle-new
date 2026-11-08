@@ -7,7 +7,8 @@ import toast from 'react-hot-toast';
 import { cn } from '@/lib/utils';
 import { tvJoinAddress } from '@/lib/education/tvJoinAddress';
 import { PRESS, useShuffledOrder, type Translate } from '@/components/education/live/eduLiveStyles';
-import { HERO_CODE_TEXT, HERO_QR_SIZE, codeCharacters } from './projectorLobbyModel';
+import { HERO_CODE_TEXT, HERO_CODE_TEXT_COMPACT, HERO_QR_SIZE, HERO_QR_SIZE_COMPACT, codeCharacters } from './projectorLobbyModel';
+import { CREAM_STICKER } from './projectorNbStyles';
 
 interface ProjectorJoinPanelProps {
   gameCode: string;
@@ -17,10 +18,12 @@ interface ProjectorJoinPanelProps {
   t: Translate;
   /** Nobody in yet: the QR beckons so the room's eye goes to the way in. */
   waiting?: boolean;
+  /** Lesson words share the wall: code and QR go side by side. */
+  compact?: boolean;
 }
 
 /** The only code and QR on the wall, on the room's one yellow block so every eye finds the way in. Code and address are ASCII, so they stay LTR inside an RTL page. */
-export const ProjectorJoinPanel = memo<ProjectorJoinPanelProps>(function ProjectorJoinPanel({ gameCode, language, baseUrl, t, waiting = false }) {
+export const ProjectorJoinPanel = memo<ProjectorJoinPanelProps>(function ProjectorJoinPanel({ gameCode, language, baseUrl, t, waiting = false, compact = false }) {
   const joinUrl = `${baseUrl}/${language}/join/${gameCode}`;
   const address = `${tvJoinAddress(baseUrl, language, '')}/join`;
   const chars = codeCharacters(gameCode);
@@ -42,6 +45,7 @@ export const ProjectorJoinPanel = memo<ProjectorJoinPanelProps>(function Project
   return (
     <section
       data-testid="projector-join-panel"
+      data-compact={compact ? 'true' : 'false'}
       className="flex h-full flex-col items-center justify-center gap-[clamp(0.5rem,1.6cqh,1.75rem)] rounded-neo-xl border-[3px] border-neo-black bg-neo-yellow p-3 text-neo-black shadow-hard-xl @5xl:p-[clamp(0.75rem,1.4cqw,2rem)]"
     >
       <div className="flex w-full flex-wrap items-center justify-center gap-x-[0.5em] gap-y-1 font-neo-display font-black leading-tight text-[clamp(1.125rem,min(2.4cqw,4.4cqh),3.75rem)]">
@@ -55,18 +59,23 @@ export const ProjectorJoinPanel = memo<ProjectorJoinPanelProps>(function Project
           onClick={copy}
           aria-label={t('eduLiveRoom.lobby.copyLink')}
           title={t('eduLiveRoom.lobby.copyLink')}
-          className={cn('grid size-11 shrink-0 place-items-center rounded-neo border-2 border-neo-black bg-neo-cream text-neo-black shadow-hard-sm hover:bg-neo-white', PRESS)}
+          className={cn('grid size-11 shrink-0 place-items-center rounded-neo border-[3px] border-neo-black bg-neo-cream text-neo-black shadow-hard hover:bg-neo-white', PRESS)}
         >
           {copied ? <Check className="size-5" aria-hidden="true" /> : <Copy className="size-5" aria-hidden="true" />}
         </button>
       </div>
 
+      <div className={cn('flex max-w-full flex-col items-center gap-[clamp(0.5rem,1.6cqh,1.75rem)]', compact && '@5xl:flex-row @5xl:gap-[clamp(1rem,2cqw,3rem)]')}>
+      <div className="flex max-w-full flex-col items-center gap-[clamp(0.5rem,1.4cqh,1.25rem)]">
+      <span data-testid="projector-code-sticker" aria-hidden="true" className={cn(CREAM_STICKER, 'text-[clamp(1rem,min(1.6cqw,3cqh),2.5rem)]')}>
+        {t('education.projectorLobby.gameCode')}
+      </span>
       <div
         data-testid="projector-code"
         dir="ltr"
         role="status"
         aria-label={`${t('education.projectorLobby.gameCode')}: ${chars.join(' ')}`}
-        className={cn('flex max-w-full items-center gap-[0.06em] font-neo-display font-black leading-none tabular-nums [unicode-bidi:isolate]', HERO_CODE_TEXT)}
+        className={cn('flex max-w-full items-center gap-[0.06em] font-neo-display font-black leading-none tabular-nums [unicode-bidi:isolate]', compact ? HERO_CODE_TEXT_COMPACT : HERO_CODE_TEXT)}
       >
         {chars.map((char, index) => (
           <span
@@ -80,17 +89,19 @@ export const ProjectorJoinPanel = memo<ProjectorJoinPanelProps>(function Project
           </span>
         ))}
       </div>
+      </div>
 
       <div
         data-testid="projector-qr"
         data-waiting={waiting ? 'true' : 'false'}
         data-join-url={joinUrl}
-        className="relative shrink-0 rounded-neo-lg border-4 border-neo-black bg-neo-white p-[clamp(0.375rem,0.8cqw,1rem)] shadow-hard-lg"
+        className="relative shrink-0 rounded-neo-lg border-4 border-neo-black bg-neo-white p-[clamp(0.375rem,0.8cqw,1rem)] shadow-hard-xl"
       >
         {waiting && (
           <span aria-hidden="true" className="pointer-events-none absolute -inset-[8px] rounded-neo-lg border-4 border-neo-black/40 motion-safe:animate-[edu-live-beckon_2.2s_ease-in-out_infinite]" />
         )}
-        <QRCodeSVG value={joinUrl} size={512} level="M" title={t('education.projectorLobby.scanToJoin')} className={cn('block', HERO_QR_SIZE)} />
+        <QRCodeSVG value={joinUrl} size={512} level="M" title={t('education.projectorLobby.scanToJoin')} className={cn('block', compact ? HERO_QR_SIZE_COMPACT : HERO_QR_SIZE)} />
+      </div>
       </div>
     </section>
   );

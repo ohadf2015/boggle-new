@@ -10,8 +10,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAnnouncer } from '@/components/GameAnnouncer';
 import posthog from '@/lib/analytics/lazyPosthog';
-import { QuickPlayModePicker } from './QuickPlayModePicker';
 import { QuickModeAdapter } from './adapters/QuickModeAdapter';
+import { preloadQuickMode } from './adapters/preloadQuickMode';
 import { QuickPlayResults, type QuickRival } from './QuickPlayResults';
 import type { CollectedWord } from './QuickWordsCollected';
 import { recordGuestRound, quickCoinsFor, quickXpFor, recentAveragePct } from '@/lib/quickPlay/guestProgress';
@@ -29,11 +29,15 @@ import type { WheelSelection } from './wheelGeometry';
 import { strikeHoldMs } from './lightningPath';
 import { QUICK_MODES, type QuickMode, type QuickRoundConfig, type QuickRoundResult, type QuickSubmitOutcome } from './types';
 
-type HubPhase = 'wheel' | 'loading' | 'playing' | 'results';
+type HubPhase = 'loading' | 'error' | 'playing' | 'results';
 
 function prefersReducedMotion(): boolean {
   if (typeof window === 'undefined' || !window.matchMedia) return false;
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+function isWheelSelection(value: unknown): value is WheelSelection {
+  return value === 'random' || (QUICK_MODES as readonly unknown[]).includes(value);
 }
 
 function sleep(ms: number): Promise<void> {
@@ -51,14 +55,14 @@ interface ChallengeInfo {
 interface QuickPlayHubProps {
   challengeId?: string | null;
   backHref?: string;
+  startMode?: WheelSelection | null;
 }
 
-export function QuickPlayHub({ challengeId, backHref }: QuickPlayHubProps) {
+export function QuickPlayHub({ challengeId, backHref, startMode }: QuickPlayHubProps) {
   const { t, language } = useLanguage();
   const { user } = useAuth();
   const { announce } = useAnnouncer();
-  const [phase, setPhase] = useState<HubPhase>('wheel');
-  const [selection, setSelection] = useState<WheelSelection>('random');
+  const [phase, setPhase] = useState<HubPhase>('loading');
   const [roundIndex, setRoundIndex] = useState(1);
   const [config, setConfig] = useState<QuickRoundConfig | null>(null);
   const [result, setResult] = useState<QuickRoundResult | null>(null);
@@ -70,18 +74,17 @@ export function QuickPlayHub({ challengeId, backHref }: QuickPlayHubProps) {
   const [collected, setCollected] = useState<CollectedWord[]>([]);
   const [collectionTotal, setCollectionTotal] = useState(0);
   const [dayStreak, setDayStreak] = useState(0);
-  const [loadError, setLoadError] = useState(false);
-  /** Resolved mode the lightning bolt is locked onto during loading. */
-  const [strikeMode, setStrikeMode] = useState<QuickMode | null>(null);
+  const [challengeResolved, setChallengeResolved] = useState(!challengeId);
+  const lastSelection = useRef<WheelSelection>(startMode ?? 'random');
   const goBack = useBackOneLevel(backHref);
   const submitting = useRef(false);
   const holdCalmUntilResults = useQuickResultsCalmBridge(phase === 'results');
   const loadingRef = useRef(false);
-  const wheelHeadingRef = useRef<HTMLHeadingElement>(null);
+  const autoStarted = useRef(false);
   // Track current phase for handleNextRound to guard against stale adapter onQuit calls.
   // If an adapter timer fires onQuit after the game has ended (phase !== 'playing'),
   // the call should be ignored so results don't auto-dismiss.
-  const phaseRef = useRef<HubPhase>('wheel');
+  const phaseRef = useRef<HubPhase>('loading');
   useEffect(() => {
     phaseRef.current = phase;
   }, [phase]);
@@ -89,9 +92,9 @@ export function QuickPlayHub({ challengeId, backHref }: QuickPlayHubProps) {
   // Phase changes swap the whole screen with no page navigation, so screen
   // readers get no automatic signal and sighted keyboard focus is stranded
   // on an unmounted control. Announce the change; move focus back to the
-  // wheel heading whenever we return to it (results/playing own their focus).
+  // the load error when a round can't be fetched (results/playing own their focus).
   useEffect(() => {
-    if (phase === 'wheel') wheelHeadingRef.current?.focus();
+    if (phase === 'error') announce(t('quickPlay.solo.loadError'));
     else if (phase === 'loading') announce(t('quickPlay.solo.loading'));
     else if (phase === 'playing') announce(t(`quickPlay.solo.mode.${config?.mode ?? 'classic'}`));
   }, [phase, config?.mode, announce, t]);
@@ -131,9 +134,11 @@ export function QuickPlayHub({ challengeId, backHref }: QuickPlayHubProps) {
           challengerName: d.challengerName,
           challengerScorePct: Number(d.challenger_score_pct),
         });
-        setSelection(d.mode);
       })
-      .catch(() => undefined);
+      .catch(() => undefined)
+      .finally(() => {
+        if (!cancelled) setChallengeResolved(true);
+      });
     return () => {
       cancelled = true;
     };
@@ -162,15 +167,14 @@ export function QuickPlayHub({ challengeId, backHref }: QuickPlayHubProps) {
       (sel === 'random'
         ? QUICK_MODES[Math.floor(Math.random() * QUICK_MODES.length)]
         : sel);
-    // Lock UI to the resolved mode (for Random, show the picked mode on the bolt).
-    setSelection(mode);
-    setStrikeMode(mode);
+    // The board's code downloads during the strike instead of on the clock.
+    preloadQuickMode(mode);
+    lastSelection.current = sel;
     posthog.capture('quick_play_mode_selected', { mode: sel, method, roundIndex });
     if (sel === 'random' && !activeChallenge) {
       posthog.capture('quick_play_mode_selected', { mode, method: 'random', roundIndex });
     }
     setPhase('loading');
-    setLoadError(false);
     const hold = strikeHoldMs(prefersReducedMotion());
     const started = Date.now();
     try {
@@ -187,18 +191,22 @@ export function QuickPlayHub({ challengeId, backHref }: QuickPlayHubProps) {
       const elapsed = Date.now() - started;
       if (elapsed < hold) await sleep(hold - elapsed);
       setConfig(round);
-      setStrikeMode(null);
       setPhase('playing');
     } catch {
       // Silent no-op on error is forbidden — surface it (a dead-looking wheel
       // tap is indistinguishable from a bug).
-      setLoadError(true);
-      setStrikeMode(null);
-      setPhase('wheel');
+      setPhase('error');
     } finally {
       loadingRef.current = false;
     }
   }, [challenge, language, roundIndex]);
+
+  useEffect(() => {
+    // A challenge link waits for its board; if it can't load, play anyway.
+    if (autoStarted.current || !challengeResolved) return;
+    autoStarted.current = true;
+    void handlePlay(startMode ?? 'random', 'tap');
+  }, [startMode, challengeResolved, handlePlay]);
 
   const handleDone = useCallback(
     async (r: QuickRoundResult) => {
@@ -328,17 +336,12 @@ export function QuickPlayHub({ challengeId, backHref }: QuickPlayHubProps) {
   );
 
   /**
-   * Back to the wheel — unless the player already named the mode they want on
-   * the results screen, in which case that choice IS the decision and a trip
-   * through the picker is a tax on it.
-   *
-   * Guard: onQuit calls from adapters should only work during gameplay. If the
-   * adapter's timer fires after results appear (phase !== 'playing'), ignore it
-   * so results don't auto-dismiss while the player is reading their score.
+   * Next round: the mode the player named on the results screen, else a
+   * random one. Anything that isn't a selection (a click event, a board's own
+   * payload) means "random" rather than a board for "[object Object]".
    */
-  const handleNextRound = useCallback((mode?: QuickMode) => {
-    // Ignore stale quit calls after the game ends.
-    if (!mode && phaseRef.current !== 'playing') return;
+  const handleNextRound = useCallback((next?: WheelSelection) => {
+    const mode = isWheelSelection(next) ? next : undefined;
     setRoundIndex((i) => i + 1);
     setConfig(null);
     setResult(null);
@@ -346,13 +349,19 @@ export function QuickPlayHub({ challengeId, backHref }: QuickPlayHubProps) {
     setRival(null);
     setChallenge(null); // challenge is a one-round contract
     setCollected([]);
-    setSelection(mode ?? 'random');
-    setStrikeMode(null);
     // `null`, not the state value: setChallenge above has not applied yet, and
     // the stale one would replay the challenge's board under a new mode.
-    if (mode) void handlePlayRef.current?.(mode, 'tap', null); // it owns the phase from here
-    else setPhase('wheel');
+    void handlePlayRef.current?.(mode ?? 'random', 'tap', null);
   }, []);
+
+  /**
+   * Quitting a round leaves Quick Play (the home screen is the mode picker).
+   * Adapters also fire onQuit from their round timer, which can land after the
+   * results screen is up; only a quit during play counts.
+   */
+  const handleQuit = useCallback(() => {
+    if (phaseRef.current === 'playing') goBack();
+  }, [goBack]);
 
   // handlePlay is declared above but closes over `challenge`, which this
   // callback clears — a direct dependency would rebuild it every round and
@@ -393,7 +402,7 @@ export function QuickPlayHub({ challengeId, backHref }: QuickPlayHubProps) {
           </div>
         }
       >
-        <QuickModeAdapter config={config} onDone={handleDone} onQuit={handleNextRound} />
+        <QuickModeAdapter config={config} onDone={handleDone} onQuit={handleQuit} />
       </BaseErrorBoundary>
     );
   }
@@ -432,8 +441,6 @@ export function QuickPlayHub({ challengeId, backHref }: QuickPlayHubProps) {
         <BackButton onClick={goBack} label={t('common.back')} isDarkMode />
         <div className="text-center">
           <h1
-            ref={wheelHeadingRef}
-            tabIndex={-1}
             className="font-neo-display text-xl font-bold tracking-wide text-neo-cream outline-none! drop-shadow-[0_2px_0_rgba(0,0,0,0.45)] sm:text-2xl"
           >
             {t('quickPlay.solo.title')}
@@ -461,11 +468,6 @@ export function QuickPlayHub({ challengeId, backHref }: QuickPlayHubProps) {
         </div>
       </header>
 
-      {loadError && (
-        <div className="mx-5 mt-4 rounded-2xl border-neo-thick border-black bg-neo-red p-3 text-center font-neo-display text-sm font-semibold text-white shadow-hard" data-testid="quick-load-error">
-          {t('quickPlay.solo.loadError')}
-        </div>
-      )}
 
       {answered && !challenge && (
         <div className="mx-5 mt-4 rounded-2xl border-neo-thick border-black bg-neo-navy-elevated p-3 text-center font-neo-display text-sm font-semibold text-neo-cream shadow-hard" data-testid="quick-answered-banner">
@@ -486,40 +488,36 @@ export function QuickPlayHub({ challengeId, backHref }: QuickPlayHubProps) {
         </div>
       )}
 
-      {/* Board build is a real wait (fetch + a held beat). A dancing mascot is
-          what the rest of the app puts on a loading surface — the static pose +
-          CSS dance, not the heavy animated loop. */}
-      {phase === 'loading' && (
-        <div className="relative z-[2] -mb-2 flex flex-col items-center gap-1" data-testid="quick-loading-mascot">
-          <LoadingDancer styleKey="arcade" className="h-20 w-20 sm:h-24 sm:w-24" />
-          <span className="font-neo-display text-xs tracking-wide text-neo-cream/80">
-            {t('quickPlay.solo.loading')}
-          </span>
-        </div>
-      )}
-
-      <div className="relative z-[1] flex min-h-0 flex-1 flex-col px-3 pb-2 pt-3 sm:px-4 sm:py-5">
-        {/* Mode picker stays mounted during loading so selection state is visible.
-            Loading state dims siblings and disables random while selected card locks. */}
-        {(phase === 'wheel' || phase === 'loading') && (
-          <QuickPlayModePicker
-            selection={selection}
-            pendingMode={phase === 'loading' ? strikeMode : null}
-            onSelect={handlePlay}
-          />
+      <div className="relative z-[1] flex min-h-0 flex-1 flex-col items-center justify-center gap-4 px-5 pb-8">
+        {phase === 'error' ? (
+          <>
+            <div
+              className="w-full max-w-sm rounded-2xl border-neo-thick border-black bg-neo-red p-3 text-center font-neo-display text-sm font-semibold text-white shadow-hard"
+              data-testid="quick-load-error"
+              role="alert"
+            >
+              {t('quickPlay.solo.loadError')}
+            </div>
+            <button
+              type="button"
+              data-testid="quick-load-retry"
+              onClick={() => void handlePlay(lastSelection.current, 'tap')}
+              className="min-h-11 rounded-neo border-neo-thick border-black bg-neo-lime px-6 py-3 font-neo-display text-neo-black shadow-hard active:shadow-hard-pressed"
+            >
+              {t('common.retry', 'Try Again')}
+            </button>
+          </>
+        ) : (
+          /* Board build is a real wait (fetch + a held beat). A dancing mascot is
+             what the rest of the app puts on a loading surface. */
+          <div className="flex flex-col items-center gap-1" data-testid="quick-loading-mascot">
+            <LoadingDancer styleKey="arcade" className="h-20 w-20 sm:h-24 sm:w-24" />
+            <span className="font-neo-display text-xs tracking-wide text-neo-cream/80">
+              {t('quickPlay.solo.loading')}
+            </span>
+          </div>
         )}
       </div>
-
-      {/* Bottom band reservation: the PWA install prompt (fixed bottom-4) and the
-          AdMob anchor both sit over this screen and would cover the Random bar.
-          It belongs OUT here as a flex sibling, not inside the picker — the
-          centring row above is what positions the cards, so a spacer inside it
-          gets centred too and pushes the whole grid upward by half its height. */}
-      <div
-        className="h-[calc(5rem+var(--admob-banner-height,0px))] flex-none"
-        data-testid="quick-picker-bottom-spacer"
-        aria-hidden="true"
-      />
     </div>
   );
 }

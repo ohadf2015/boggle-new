@@ -57,6 +57,22 @@ import { isWordShapeWeird } from '@/shared/utils/wordShapeFilter';
 import { isFirstSessionPlayer } from '@/lib/retention/firstWin';
 import { useExperiment } from '@/hooks/useExperiment';
 import { resolveQuitConfirmDescription } from '@/lib/experiments/quitConfirmDescription';
+import posthog from '@/lib/analytics/lazyPosthog';
+
+/**
+ * Deep-link autoStart entries (coach/challenge/bots) render the 'playing'
+ * phase immediately while `grid` is still null — tapping the board does
+ * nothing until this fires. Targets the autoStart=coach/challenge rage-click
+ * signal: confirms whether the async `/api/themed-words` fetch (skipped for
+ * coach via lessonBoardFor, hit for challenge) is the real gap.
+ */
+function trackGridReady(mode: string, coach: boolean, usedThemedFetch: boolean, ms: number): void {
+  try {
+    posthog.capture('singleplayer_grid_ready', { mode, coach, used_themed_fetch: usedThemedFetch, ms: Math.round(ms) });
+  } catch {
+    /* analytics best-effort */
+  }
+}
 
 interface UseSinglePlayerCoreOptions {
   settings: SinglePlayerGameState;
@@ -74,6 +90,13 @@ interface UseSinglePlayerCoreOptions {
   quitStaysOnPage?: boolean;
   /** Freeze the clock while a full-screen lesson moment is on screen. */
   clockHold?: boolean;
+  /**
+   * The board on top of this engine owns the keyboard (Quick Play classic runs
+   * the MP InGameScreen, which types and submits on its own). Turns off the
+   * engine's typing and its Esc-quits / Space-pauses shortcuts so a key is not
+   * handled twice — and so Space can't freeze a clock that has no pause UI.
+   */
+  externalInput?: boolean;
 }
 
 interface AvailableWords {
@@ -90,6 +113,7 @@ const MIN_TRACKED_WORD_LENGTH = 5;
  */
 export function useSinglePlayerCore({
   settings, targetHighScore, onGameEnd, onQuit, quitStaysOnPage = false, clockHold = false,
+  externalInput = false,
 }: UseSinglePlayerCoreOptions) {
   const { t } = useLanguage();
   // Cozy / Calm Mode (single-player only): calmer bot pacing + no urgency cues.
@@ -276,7 +300,8 @@ export function useSinglePlayerCore({
   const effects = useSinglePlayerEffects({
     grid, isPaused, isGameOver, score, language: settings.language, mode: settings.mode,
     difficulty: settings.difficulty,
-    isLandscape: false, isDesktop, isTv, remainingTime: timer.remainingTime, gameActive,
+    isLandscape: false, isDesktop: isDesktop && !externalInput, isTv: isTv && !externalInput,
+    remainingTime: timer.remainingTime, gameActive,
     foundWords, timerSeconds: settings.timerSeconds,
     trainingCompletedSkillsRef, trainingUpdateProgress, announceTimer, setGameActive,
     onQuit, t, isTypingModeRef, showHintPromptRef, setShowHintPrompt, setShowQuitConfirm, setIsPaused,
@@ -478,7 +503,7 @@ export function useSinglePlayerCore({
 
   const keyboardInput = useKeyboardWordInput({
     grid: grid || ([] as LetterGrid), language: settings.language, gameLanguage: settings.language,
-    enabled: !!grid && !held && !isGameOver, onWordSubmit: handleWordSubmit,
+    enabled: !externalInput && !!grid && !held && !isGameOver, onWordSubmit: handleWordSubmit,
     minWordLength: settings.minWordLength ?? 2,
   });
 
@@ -499,19 +524,24 @@ export function useSinglePlayerCore({
     const baseWordCount = Math.min(35, Math.max(5, Math.floor(totalCells / 3)));
     const wordCount = settings.mode === 'practice' ? Math.min(50, baseWordCount * 2) : baseWordCount;
     const maxWordLen = Math.min(12, Math.max(rows, cols));
+    const gridRequestedAt = performance.now();
     const initGrid = async () => {
       // If settings already has a grid (e.g. community board), use it directly
       if (settings.grid) {
         setGrid(settings.grid);
+        trackGridReady(settings.mode, !!settings.coach, false, performance.now() - gridRequestedAt);
         return;
       }
       const lessonGrid = settings.coach ? lessonBoardFor(settings.language, rows, cols) : null;
       if (lessonGrid) {
         setGrid(lessonGrid);
+        trackGridReady(settings.mode, !!settings.coach, false, performance.now() - gridRequestedAt);
         return;
       }
       let wordsToEmbed: string[] = [];
+      let usedThemedFetch = false;
       if (settings.language !== 'ja') {
+        usedThemedFetch = true;
         try {
           const response = await fetch('/api/themed-words', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ language: settings.language, count: wordCount, minLength: 3, maxLength: maxWordLen }) });
           if (response.ok) { const data = await response.json(); wordsToEmbed = data.words || []; }
@@ -522,6 +552,7 @@ export function useSinglePlayerCore({
         settings.language
       );
       setGrid(settings.coach ? plantStarterWord(dealt, settings.language)?.grid ?? dealt : dealt);
+      trackGridReady(settings.mode, !!settings.coach, usedThemedFetch, performance.now() - gridRequestedAt);
     };
     initGrid(); initializeBotUsedWords(settings.bots); resetBots(); resetSpamDetection();
   // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -509,3 +509,11 @@ describe('AchievementProgressCard', () => {
     });
   });
 });
+
+describe('AchievementProgressCard tier colors', () => {
+  it('uses neo palette tokens only, never raw Tailwind metals', async () => {
+    const { readFileSync } = await import('node:fs');
+    const src = readFileSync(`${__dirname}/AchievementProgressCard.tsx`, 'utf8');
+    expect(src).not.toMatch(/\b(?:bg|border|text)-(?:amber|slate|yellow|cyan)-\d/);
+  });
+});

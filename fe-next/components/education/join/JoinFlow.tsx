@@ -217,11 +217,13 @@ export function JoinFlow({
           )}
         </main>
         <nav className="relative z-10 flex justify-center gap-4 px-4 pb-3 text-xs text-neo-white/60">
-          <Link prefetch={false} href={`/${language}/legal/privacy`} className="underline-offset-2 hover:text-neo-white hover:underline focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black">
+          <Link prefetch={false} href={`/${language}/legal/privacy`} target="_blank" rel="noopener noreferrer" className="underline-offset-2 hover:text-neo-white hover:underline focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black">
             {t('legal.privacyPolicy')}
+            <span className="sr-only"> ({t('common.opensInNewTab')})</span>
           </Link>
-          <Link prefetch={false} href={`/${language}/legal/terms`} className="underline-offset-2 hover:text-neo-white hover:underline focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black">
+          <Link prefetch={false} href={`/${language}/legal/terms`} target="_blank" rel="noopener noreferrer" className="underline-offset-2 hover:text-neo-white hover:underline focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black">
             {t('legal.termsOfService')}
+            <span className="sr-only"> ({t('common.opensInNewTab')})</span>
           </Link>
         </nav>
         </div>

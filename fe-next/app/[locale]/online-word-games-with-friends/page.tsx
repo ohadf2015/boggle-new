@@ -124,7 +124,7 @@ export default async function OnlineWordGamesWithFriendsPage({ params }: PagePro
             Create a Room — Play With Friends
           </Link>
           <Link
-            href={`/${locale}/singleplayer`}
+            href={`/${locale}/quick-play`}
             className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10 sm:px-8 sm:py-4"
           >
             Practice Solo First

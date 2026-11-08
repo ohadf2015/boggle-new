@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { useWheelDragSpell } from '@/hooks/useWheelDragSpell';
 import { subscribeForegroundResume, releaseStuckPointers } from '@/lib/native/foregroundResume';
 import type { PlacementQuality } from '@/lib/wordTower/cranePlacement';
+import posthog from '@/lib/analytics/lazyPosthog';
 
 export interface WordTowerWheelProps {
   /** The ring of letters the player spells from (reused across words). */
@@ -115,6 +116,11 @@ export const WordTowerWheel = memo(function WordTowerWheel({
   // the gesture stays a tap and its click fires on the button.
   const pointerDownRef = useRef<{ x: number; y: number } | null>(null);
 
+  // Rage-click diagnosis (he/word-tower/daily, 27 rage clicks/8 users in 48h):
+  // taps during `placing` hit a locked wheel and do nothing. One event per
+  // placing cycle (not per tap) so a rapid-tap burst reports as one data point.
+  const reportedBlockedTapRef = useRef(false);
+
   const { handlePointerDown, handlePointerMove, handlePointerUp } = useWheelDragSpell({
     draggingRef,
     pointerPosRef,
@@ -145,7 +151,13 @@ export const WordTowerWheel = memo(function WordTowerWheel({
   });
 
   const onDown = (e: React.PointerEvent) => {
-    if (placing) return;
+    if (placing) {
+      if (!reportedBlockedTapRef.current) {
+        reportedBlockedTapRef.current = true;
+        posthog.capture('word_tower_tap_blocked', { reason: 'placing' });
+      }
+      return;
+    }
     addedDuringDragRef.current = false;
     // Remember pointer position at down to gate drag engagement on movement.
     pointerDownRef.current = { x: e.clientX, y: e.clientY };
@@ -177,6 +189,10 @@ export const WordTowerWheel = memo(function WordTowerWheel({
     if (g) { try { g.el.releasePointerCapture(g.id); } catch { /* never claimed */ } }
     handlePointerUp();
   };
+
+  useEffect(() => {
+    if (!placing) reportedBlockedTapRef.current = false;
+  }, [placing]);
 
   useEffect(() => subscribeForegroundResume(() => {
     const g = gestureRef.current;

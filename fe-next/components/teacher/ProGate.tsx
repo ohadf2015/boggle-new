@@ -93,7 +93,7 @@ interface ProGateProps {
   ctaKey?: string;
   /** Offer a never-trialed teacher the Polar trial instead of the paid checkout. */
   polarTrialPlacement?: TrialCtaSource;
-  /** `calm`: neutral lock with one lime CTA and a small PRO badge. `arcade`: the same copy and CTA as a game card with the mascot. */
+  /** Every tone wears the chunky panel, PRO sticker and lime CTA; `calm`/`arcade` pick the trial copy, `arcade` adds the game card and mascot. */
   tone?: 'default' | 'calm' | 'arcade';
 }
 
@@ -149,7 +149,7 @@ export function ProGate({ feature, children, active = true, whileChecking = null
           role="status"
           className={cn(
             'mb-4 flex flex-col gap-2 rounded-neo p-3 sm:flex-row sm:items-center sm:justify-between',
-            calm ? 'border-2 border-neo-cream/40' : 'border-neo border-neo-lime bg-neo-navy-light shadow-hard-sm',
+            'rounded-neo-lg border-[3px] border-neo-cream/50 bg-neo-navy-light shadow-hard-lg',
           )}
         >
           <div className="min-w-0">
@@ -166,7 +166,7 @@ export function ProGate({ feature, children, active = true, whileChecking = null
             }}
             className={cn(
               'shrink-0 rounded-neo px-4 py-2 text-sm font-black disabled:opacity-60',
-              calm ? 'border-2 border-neo-cream text-neo-cream hover:bg-neo-cream/10' : 'border-neo bg-neo-cyan text-neo-navy shadow-hard-sm',
+              'border-2 border-neo-cream text-neo-cream hover:bg-neo-cream/10',
             )}
           >
             {t('teacher.proGate.trialPreviewCta')}
@@ -184,37 +184,29 @@ export function ProGate({ feature, children, active = true, whileChecking = null
       data-testid="pro-gate-lock"
       className={cn(
         arcade ? cn(GAME_CARD, 'p-4 sm:p-6') : 'rounded-neo p-4 sm:p-5',
-        !arcade && (calm ? 'border-2 border-neo-cream/40 bg-neo-navy-light' : 'border-neo border-neo-lime bg-neo-navy-light shadow-hard'),
+        !arcade && 'rounded-neo-xl border-[3px] border-neo-cream/50 bg-neo-navy-light shadow-hard-xl',
       )}
     >
       <div className="grid items-center gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:gap-6">
         {/* Sample data, never the teacher's own rows: a free browser must not receive what the gate sells. */}
         <div data-testid="pro-gate-preview" aria-hidden="true" className={cn('pointer-events-none relative select-none', arcade && 'md:pt-8')}>
-          <ProFeaturePreview feature={feature} calm={calm} arcade={arcade} />
+          <ProFeaturePreview feature={feature} calm arcade={arcade} />
           {arcade ? (
             <EduMascot moment="pro" size={112} className="absolute -top-7 left-1/2 size-20 -translate-x-1/2 animate-edu-bob max-md:hidden" />
           ) : null}
         </div>
-        <div className="text-center md:text-start">
-          {calm ? (
-            <span
-              data-testid="pro-gate-pill"
-              className={cn(
-                'mb-2 inline-flex items-center gap-1 rounded-neo bg-neo-yellow text-neo-black',
-                arcade ? 'px-1.5 py-px text-[11px] font-black sm:-rotate-2 sm:border-[3px] sm:border-neo-black sm:px-2.5 sm:py-0.5 sm:font-neo-display sm:text-sm sm:shadow-hard' : 'px-1.5 py-px text-[11px] font-black',
-              )}
-            >
-              <Crown className="size-3" aria-hidden="true" />
-              {t('eduShell.nav.pro')}
-            </span>
-          ) : (
-            <span
-              data-testid="pro-gate-pill"
-              className="mb-2 inline-block rounded-full border-2 border-neo-black bg-neo-lime px-2.5 py-0.5 text-xs font-black uppercase text-neo-black"
-            >
-              {t('teacher.subscription.proPlanName')}
-            </span>
-          )}
+        {/* Phones: the pitch and its button lead, the sample sits under them instead of pushing the button off screen. */}
+        <div data-testid="pro-gate-pitch" className="text-center max-md:order-first md:text-start">
+          <span
+            data-testid="pro-gate-pill"
+            className={cn(
+              'mb-2 inline-flex items-center gap-1 rounded-neo bg-neo-yellow text-neo-black',
+              arcade ? 'px-1.5 py-px text-[11px] font-black sm:-rotate-2 sm:border-[3px] sm:border-neo-black sm:px-2.5 sm:py-0.5 sm:font-neo-display sm:text-sm sm:shadow-hard' : 'px-1.5 py-px text-[11px] font-black',
+            )}
+          >
+            <Crown className="size-3" aria-hidden="true" />
+            {t('eduShell.nav.pro')}
+          </span>
           <h3 className={cn('mb-2 font-neo-display font-black text-neo-white', arcade ? 'text-xl sm:text-2xl' : 'text-xl')}>
             {t(`teacher.proGate.${feature}.title`)}
           </h3>
@@ -235,8 +227,8 @@ export function ProGate({ feature, children, active = true, whileChecking = null
               startFromHere(lockAction.start);
             }}
             className={cn(
-              'inline-block rounded-neo border-neo px-6 py-3 font-black text-neo-navy shadow-hard transition-shadow hover:shadow-hard-lg disabled:opacity-60',
-              calm ? 'bg-neo-lime' : 'bg-neo-cyan',
+              'inline-block rounded-neo border-neo px-6 py-3 font-black text-neo-navy shadow-hard transition-shadow hover:shadow-hard-lg disabled:opacity-60 max-sm:w-full',
+              'bg-neo-lime',
               arcade && 'animate-edu-shine font-neo-display sm:text-lg hover:-translate-y-0.5 motion-reduce:hover:translate-y-0',
             )}
           >

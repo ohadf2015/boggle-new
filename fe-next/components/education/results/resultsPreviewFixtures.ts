@@ -68,6 +68,8 @@ export function samplePreviewRound(variant: PreviewOutcome, { count = 0, longNam
     const score = Math.max(0, 70 - i * 3);
     players.push({ username, score, wordsFoundCount: wordsFor(score, i)?.length ?? 0, allWords: wordsFor(score, i) });
     summary.masteryByPlayer[username] = { found: score > 30 ? 1 : 0, total };
+    const word = score > 30 ? summary.coverage.find((c) => c.foundBy.length > 0 && !c.foundBy.includes(username)) : undefined;
+    word?.foundBy.push(username);
   }
   if (longNames && players[0]) {
     const old = players[0].username;

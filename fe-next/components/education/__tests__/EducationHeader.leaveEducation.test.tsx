@@ -96,7 +96,7 @@ describe('EducationHeader mobile menu — exit-education placement & styling', (
     const exitLink = screen.getByText('education.header.exitEducation').closest('a')!;
 
     // Primary nav link: bold 3px border + hard-shadow treatment.
-    expect(eduHome.className).toMatch(/border-3/);
+    expect(eduHome.className).toMatch(/border-(3|\[3px\])/);
     expect(eduHome.className).toMatch(/shadow-hard/);
 
     // Exit link: thinner border, no shadow, transparent fill — secondary weight.

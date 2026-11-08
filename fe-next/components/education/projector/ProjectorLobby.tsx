@@ -17,6 +17,7 @@ import { ProjectorWordPanel } from './ProjectorWordPanel';
 import { studentsNotReady } from './projectorLobbyModel';
 import { ProjectorLobbyLock } from './ProjectorLobbyLock';
 import { useProjectorLobbyMode } from './useProjectorLobbyMode';
+import { WALL_SQUARE, WALL_STICKER } from './projectorNbStyles';
 import { markRoomPlayed, roomPlayed } from './roomPlayed';
 import { EduPhoneTestPrompt } from '@/components/education/live/EduPhoneTestPrompt';
 import { EDU_MASCOT } from '@/lib/education/mascotArt';
@@ -52,7 +53,7 @@ export interface ProjectorLobbyProps {
   practiceRoundFailed?: boolean;
 }
 
-const CHIP = 'inline-flex min-w-0 max-w-full items-center gap-[0.4em] rounded-full border-2 border-neo-cream/40 bg-neo-navy-light px-[0.6em] py-[0.2em] @5xl:px-[0.8em] font-neo-display font-bold text-neo-cream';
+const CHIP = cn(WALL_STICKER, '@5xl:px-[0.8em]');
 
 /**
  * The classroom lobby on the wall and on the teacher's own screen. The root is a size container, so every
@@ -122,7 +123,7 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
                 onClick={onExitRoom}
                 aria-label={t('eduLiveRoom.lobby.leave')}
                 title={t('eduLiveRoom.lobby.leave')}
-                className={cn('grid size-11 shrink-0 place-items-center rounded-neo border-2 border-neo-cream/60 bg-neo-navy-light text-neo-cream hover:bg-neo-navy-elevated', PRESS)}
+                className={cn(WALL_SQUARE, PRESS)}
               >
                 <DirectionalIcon icon={ArrowLeft} className="size-5" />
               </button>
@@ -132,12 +133,12 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
             <h1 className="whitespace-nowrap font-neo-display text-[1.6em] font-black leading-none text-neo-cream @max-5xl:text-[1.25em]">
               {t('eduLiveRoom.lobby.joinTitle')}
             </h1>
-            <span className={CHIP}>
+            <span data-testid="projector-session-chip" className={CHIP}>
               <GraduationCap className="size-[1em] shrink-0 @max-5xl:hidden" aria-hidden="true" />
               <span dir="auto" className="truncate">{lobby.className || t('education.classroomGame.classroomSession')}</span>
             </span>
             {lesson && (
-              <span className={CHIP}>
+              <span data-testid="projector-session-chip" className={CHIP}>
                 <BookOpen className="size-[1em] shrink-0 @max-5xl:hidden" aria-hidden="true" />
                 <span dir="auto" className="min-w-0 break-words">{lesson}</span>
                 {wordCount > 0 && <span className="shrink-0 font-neo-body font-bold text-neo-cream/75 @max-5xl:hidden">· {t('education.classroomGame.words', { count: wordCount })}</span>}
@@ -148,7 +149,7 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
           </header>
 
           <div style={delay(1)} className={cn('@5xl:row-start-2 @5xl:min-h-0', RISE)}>
-            <ProjectorJoinPanel gameCode={gameCode} language={language} baseUrl={baseUrl} t={t} waiting={students.length === 0} />
+            <ProjectorJoinPanel gameCode={gameCode} language={language} baseUrl={baseUrl} t={t} waiting={students.length === 0} compact={hasWords} />
           </div>
 
           <div style={delay(2)} className={cn('flex flex-col @5xl:row-start-2 @5xl:min-h-0', RISE)}>

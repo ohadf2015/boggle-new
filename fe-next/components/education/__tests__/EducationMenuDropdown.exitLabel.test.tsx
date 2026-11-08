@@ -12,11 +12,19 @@ import { EducationMenuDropdown } from '../EducationMenuDropdown';
 describe('EducationMenuDropdown — the link to the consumer app says it leaves education', () => {
   it('labels the /{locale} link "Exit Education", not an ambiguous "Back to Home"', () => {
     render(
-      <EducationMenuDropdown isTeacher isOnTeacherSection={false} isOnStudentSection={false} onSignOut={vi.fn()} isAuthenticated />,
+      <EducationMenuDropdown isTeacher isOnTeacherSection={false} isOnStudentSection={false} onSignOut={vi.fn()} isAuthenticated exitHref="/en" />,
     );
     fireEvent.click(screen.getByLabelText('common.menu'));
     const exit = screen.getByText('education.header.exitEducation').closest('a');
     expect(exit).toHaveAttribute('href', '/en');
     expect(screen.queryByText('common.backToHome')).not.toBeInTheDocument();
+  });
+
+  it('with no exit target it stays in education instead of falling back to the game home', () => {
+    render(
+      <EducationMenuDropdown isTeacher isOnTeacherSection={false} isOnStudentSection={false} onSignOut={vi.fn()} isAuthenticated />,
+    );
+    fireEvent.click(screen.getByLabelText('common.menu'));
+    expect(screen.getByText('education.header.exitEducation').closest('a')).toHaveAttribute('href', '/en/education');
   });
 });

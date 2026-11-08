@@ -13,11 +13,10 @@
  *     rewarded keep serving unknown/adult (Families permits G-rated banners and
  *     opt-in rewarded), so the revenue core is intact.
  *
- *  2. shouldSuppressInterstitialForTier — interstitials (and IAP offers) are the
- *     format the rejection cites. They must not reach a user who MIGHT be a
- *     child, so only KNOWN adults see them; undeclared guests ('unknown') are
- *     treated as children here. The age gate flips a guest to 'adult' the moment
- *     they declare 13+, restoring interstitials.
+ *  2. shouldSuppressInterstitialForTier — interstitials (and IAP offers) skip
+ *     only a declared child. Undeclared guests see them since the app left the
+ *     Families program (13+ listing, 2026-06-08); lever 3 keeps their ads
+ *     G-rated and non-personalized until they declare 13+.
  *
  *  3. resolveChildDirectedAdInit — the "Families Self-Certified Ads SDK" half of
  *     the rejection: child-directed treatment + TFUA for anyone not known to be
@@ -42,12 +41,9 @@ export function shouldSuppressAdsForTier(tier: SocialTier): boolean {
   return tier === 'child';
 }
 
-/**
- * True when interstitials (and IAP offers) must NOT be shown. Only a KNOWN adult
- * (declared 13+) may see them; child and undeclared-guest tiers are suppressed.
- */
+/** True when interstitials (and IAP offers) must NOT be shown: a declared child. */
 export function shouldSuppressInterstitialForTier(tier: SocialTier): boolean {
-  return tier !== 'adult';
+  return tier === 'child';
 }
 
 /** Child-directed options for AdMob.initialize(). */

@@ -68,7 +68,7 @@ describe('ChunkErrorBoundary (t_9cc3561f)', () => {
     expect(replaceSpy).not.toHaveBeenCalled();
   });
 
-  it('Home button routes to /{locale}/education for an education pathname', async () => {
+  it('Home button routes to the section hub for an education pathname, never the game home', async () => {
     Object.defineProperty(window, 'location', {
       configurable: true,
       value: {
@@ -85,7 +85,7 @@ describe('ChunkErrorBoundary (t_9cc3561f)', () => {
     );
     const homeBtn = await screen.findByRole('button', { name: /Home/i });
     fireEvent.click(homeBtn);
-    expect(window.location.href).toBe('/en/education');
+    expect(window.location.href).toBe('/en/teacher');
   });
 
   it('Home button routes to bare /{locale} for a non-education pathname', async () => {

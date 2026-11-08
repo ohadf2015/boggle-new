@@ -216,7 +216,7 @@ export default function RulesPageClient(): React.JSX.Element {
                                             size="sm"
                                             className="bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 font-bold w-full text-xs sm:text-sm py-1.5 sm:py-2 min-h-[44px]"
                                         >
-                                            <Link href={`/${language}/singleplayer`}>
+                                            <Link href={`/${language}/quick-play`}>
                                                 <Bot className={`w-3 h-3 sm:w-4 sm:h-4 me-1 sm:me-2`} />
                                                 {t('landing.singlePlayer')}
                                             </Link>

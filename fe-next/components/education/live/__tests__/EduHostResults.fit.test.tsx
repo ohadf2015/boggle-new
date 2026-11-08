@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, act } from '@testing-library/react';
+import { render, screen, act, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import EduHostResults from '@/components/education/live/EduHostResults';
 import { WinnerSpotlight } from '@/components/education/results/WinnerSpotlight';
@@ -9,6 +9,7 @@ import { PodiumStage } from '@/components/education/results/PodiumStage';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 import type { PlayerResult } from '@/types/components';
 
+vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'u1' }, loading: false, isTeacher: true }) }));
 vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ language: 'en', t: (key: string) => key }) }));
 vi.mock('next/image', () => ({ default: () => <span /> }));
 vi.mock('@/components/Avatar', () => ({ default: () => <span /> }));
@@ -56,16 +57,29 @@ describe('EduHostResults: fits the wall with the Teacher Pro card', () => {
     phoneRecap.current = false;
   });
 
-  it('given a free teacher, when results show, then the one Pro preview sits right under the actions, never above them', () => {
+  it('given a free teacher, when results show, then the Pro preview waits closed under "Share and export", after the PDF, never open on the wall the class sees', () => {
     renderZeroRound();
-    const card = screen.getByTestId('class-report-teaser').parentElement!;
-    expect(card.previousElementSibling).toContainElement(screen.getByTestId('edu-results-actions'));
+    expect(screen.queryByTestId('class-report-teaser')).toBeNull();
+    fireEvent.click(screen.getByTestId('edu-results-more-toggle'));
+    const more = screen.getByTestId('edu-results-more');
+    expect(more).toContainElement(screen.getByTestId('class-report-teaser'));
+    expect(more.lastElementChild!.lastElementChild).toContainElement(screen.getByTestId('class-report-teaser'));
   });
 
-  it('given the Pro card shows, when the class missed many words, then the wall prints a short chip list and counts the rest', () => {
+  it('given a free teacher opens More, then room controls come first and the trial is offered once, on the Pro preview', () => {
     renderZeroRound();
-    expect(screen.getByTestId('coverage-words').querySelectorAll('[data-testid^="lesson-word-"]').length).toBeLessThanOrEqual(4);
-    expect(screen.getByTestId('coverage-more')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('edu-results-more-toggle'));
+    const ids = Array.from(screen.getByTestId('edu-results-tertiary').querySelectorAll('[data-testid]')).map((el) => el.getAttribute('data-testid'));
+    expect(ids.indexOf('edu-results-next-mode')).toBeLessThan(ids.indexOf('edu-results-parent-share'));
+    expect(ids.indexOf('edu-results-end')).toBeLessThan(ids.indexOf('report-pdf-locked'));
+    expect(screen.queryByTestId('report-pdf-offer')).toBeNull();
+    expect(screen.getByTestId('class-report-teaser')).toBeInTheDocument();
+  });
+
+  it('given a free teacher, when the class missed many words, then the wall prints the full chip list a Pro wall gets', () => {
+    renderZeroRound();
+    const free = screen.getByTestId('coverage-words').querySelectorAll('[data-testid^="lesson-word-"]').length;
+    expect(free).toBeGreaterThan(4);
   });
 
   it('given a zero round, when the banner shows, then it reads in cream on a navy-light surface, not yellow capitals', () => {
@@ -111,11 +125,11 @@ describe('EduHostResults: fits the wall with the Teacher Pro card', () => {
     expect(screen.queryByTestId('class-word-stone')).toBeNull();
   });
 
-  it('given the Pro state is still loading, when results show, then the wall is already in its compact form so the card never reflows it', () => {
+  it('given the Pro state is still loading, when results show, then the wall is already in its final form', () => {
     pro.loading = true;
     renderZeroRound();
     expect(screen.queryByTestId('class-report-teaser')).toBeNull();
-    expect(screen.getByTestId('coverage-words').querySelectorAll('[data-testid^="lesson-word-"]').length).toBeLessThanOrEqual(4);
+    expect(screen.getByTestId('coverage-words').querySelectorAll('[data-testid^="lesson-word-"]').length).toBeGreaterThan(4);
   });
 
   it('given a small podium, then a student lesson count wraps instead of being cut off', () => {
@@ -124,12 +138,6 @@ describe('EduHostResults: fits the wall with the Teacher Pro card', () => {
       vi.advanceTimersByTime(8000);
     });
     expect(screen.getByTestId('podium-detail-1').className).not.toMatch(/\btruncate\b/);
-  });
-
-  it('given a free teacher on a 1366x768 wall (any round, not only Boss), then the Pro card steps aside so the wall never clips', () => {
-    renderZeroRound();
-    const card = screen.getByTestId('class-report-teaser').parentElement!;
-    expect(card.className).toMatch(/\[@container_results_\(height<56\.25rem\)\]:hidden/);
   });
 
   it('given a Pro teacher on a 1366x768 wall, then the invite nudge steps aside so the wall never clips', () => {

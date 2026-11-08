@@ -2,6 +2,9 @@
 
 import { useEffect } from 'react';
 import { loadSentry } from '@/utils/sentryLazy';
+import { locales } from '@/i18n/config';
+import { isCrawlerUserAgent } from '@/lib/deploy/staleDeployReload';
+import { SW_WARM_SHELLS_MESSAGE_TYPE } from '@/lib/sw/messages';
 
 /**
  * Service Worker Registration Component
@@ -100,11 +103,48 @@ async function registerServiceWorker() {
     }, 5 * 60 * 1000);
     // Cleared when the page unloads; registration lives for the document lifetime.
     window.addEventListener('beforeunload', () => window.clearInterval(updateInterval), { once: true });
+
+    scheduleShellWarm();
   } catch (error) {
     // SW registration can fail for many legitimate reasons (HTTP context, incognito,
     // iframe restrictions, browser settings). Use warn to avoid Sentry noise.
     console.warn('[PWA] Service worker registration failed:', error);
   }
+}
+
+/** The visitor's locale: first path segment, else <html lang>. */
+export function currentLocale(pathname: string, htmlLang: string): string | null {
+  const known = new Set<string>(locales);
+  const seg = pathname.split('/').filter(Boolean)[0] ?? '';
+  if (known.has(seg)) return seg;
+  const lang = (htmlLang || '').slice(0, 2).toLowerCase();
+  return known.has(lang) ? lang : null;
+}
+
+/**
+ * Ask the SW to cache this locale's offline shells, but only after a real
+ * gesture and when the browser is idle. Crawlers never tap, so their renders
+ * no longer fan out into dozens of server-rendered page fetches, and a person's
+ * own first paint never competes with the warm.
+ */
+function scheduleShellWarm() {
+  if (isCrawlerUserAgent(navigator.userAgent)) return;
+  const locale = currentLocale(window.location.pathname, document.documentElement.lang);
+  if (!locale) return;
+  const events = ['pointerdown', 'keydown', 'touchstart'] as const;
+  const onGesture = () => {
+    events.forEach((e) => window.removeEventListener(e, onGesture));
+    const send = () => {
+      navigator.serviceWorker.ready
+        .then((reg) => reg.active?.postMessage({ type: SW_WARM_SHELLS_MESSAGE_TYPE, locale }))
+        .catch(() => undefined);
+    };
+    const ric = (window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number })
+      .requestIdleCallback;
+    if (ric) ric(send, { timeout: 10_000 });
+    else window.setTimeout(send, 3_000);
+  };
+  events.forEach((e) => window.addEventListener(e, onGesture, { once: true, passive: true }));
 }
 
 export default ServiceWorkerRegistration;

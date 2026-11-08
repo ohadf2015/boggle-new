@@ -13,7 +13,6 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { PageStateHandler } from '@/components/layout/PageStateHandler';
-import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
@@ -47,11 +46,9 @@ interface LeaderboardEntry {
 }
 
 export default function LeaderboardPageClient(): React.JSX.Element {
-  const { theme } = useTheme();
   const { t, language } = useLanguage();
   const { user, profile, loading: authLoading, isSupabaseEnabled } = useAuth();
   const router = useRouter();
-  const isDarkMode = theme === 'dark';
   const [activeTab, setActiveTab] = useState<'players' | 'creators'>('players');
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const [seasonScope, setSeasonScope] = useState<SeasonTabKey>(
@@ -63,7 +60,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
 
   // Use real-time hooks for live leaderboard updates
   const {
-    data: leaderboard,
+    data: realtimeLeaderboard,
     loading,
     error,
     refetch,
@@ -72,6 +69,38 @@ export default function LeaderboardPageClient(): React.JSX.Element {
     enabled: isSupabaseEnabled && seasonScope !== 'pastSeasons',
     seasonId: querySeasonId,
   });
+
+  // Static fallback for builds/deploys without the public Supabase env vars:
+  // the server-side /api/leaderboard route (Redis-cached, coalesced) serves
+  // the same top-100 shape without a realtime subscription. Without this the
+  // page dead-ended on a "Coming soon" stub — the nav links here as "Ranks"
+  // from every page.
+  const [staticEntries, setStaticEntries] = useState<LeaderboardEntry[] | null>(null);
+  const [staticError, setStaticError] = useState<string | null>(null);
+
+  const fetchStaticLeaderboard = useCallback(async () => {
+    setStaticError(null);
+    try {
+      const res = await fetch('/api/leaderboard', { cache: 'no-store' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json: { data?: LeaderboardEntry[] } = await res.json();
+      setStaticEntries(json.data ?? []);
+    } catch (err) {
+      setStaticError(err instanceof Error ? err.message : String(err));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isSupabaseEnabled) return;
+    void fetchStaticLeaderboard();
+  }, [isSupabaseEnabled, fetchStaticLeaderboard]);
+
+  const leaderboard = useMemo(
+    () => (isSupabaseEnabled ? realtimeLeaderboard : (staticEntries ?? [])),
+    [isSupabaseEnabled, realtimeLeaderboard, staticEntries],
+  );
+  const listLoading = isSupabaseEnabled ? loading : staticEntries === null && staticError === null;
+  const listError = isSupabaseEnabled ? error : staticError;
 
   const { rank: userRank, loading: rankLoading } = useUserRank<{ total_score?: number; rank_position?: number }>(user?.id, querySeasonId);
 
@@ -109,41 +138,16 @@ export default function LeaderboardPageClient(): React.JSX.Element {
   );
 
   const handleRefresh = async () => {
-    refetch();
+    if (isSupabaseEnabled) {
+      refetch();
+    } else {
+      await fetchStaticLeaderboard();
+    }
     await new Promise((resolve) => setTimeout(resolve, 500));
     toast.success(t('common.refreshed'), {
       duration: 2000,
     });
   };
-
-
-  // Supabase not enabled - show coming soon
-  if (!isSupabaseEnabled) {
-    return (
-      <PageLayout>
-        <div className="text-center py-12">
-          <Trophy className="mx-auto text-6xl text-gray-600 mb-4" />
-          <h2 className={cn('text-2xl font-bold mb-2', isDarkMode ? 'text-white' : 'text-gray-900')}>
-            {t('leaderboard.title')}
-          </h2>
-          <p className={cn('text-lg', (isDarkMode ? 'text-neo-cream/70' : 'text-gray-600'))}>
-            {t('leaderboard.comingSoon')}
-          </p>
-          <Button
-            onClick={() => router.push(`/${language}`)}
-            variant="cyan"
-            className="mt-6"
-            haptic
-            animation="pop"
-          >
-            <ArrowLeft className="me-2 rtl:rotate-180" />
-            {t('common.backToMenu')}
-          </Button>
-        </div>
-      </PageLayout>
-    );
-  }
-
 
   const tabClass = (active: boolean, activeBg: string) => cn(
     'inline-flex min-h-[40px] items-center gap-1.5 rounded-neo border-neo border-neo-black px-3 font-neo-display text-sm font-bold transition-transform active:translate-y-px',
@@ -171,23 +175,27 @@ export default function LeaderboardPageClient(): React.JSX.Element {
           <h1 className="me-auto font-neo-display text-2xl font-black text-neo-white sm:text-3xl">
             {t('leaderboard.title')}
           </h1>
-          <div role="tablist" className="flex gap-1.5">
-            <button type="button" role="tab" aria-selected={activeTab === 'players'} onClick={() => setActiveTab('players')} className={tabClass(activeTab === 'players', 'bg-neo-yellow')}>
-              <Trophy className="h-4 w-4" aria-hidden="true" />
-              {t('leaderboard.players')}
-            </button>
-            <button type="button" role="tab" aria-selected={activeTab === 'creators'} onClick={() => setActiveTab('creators')} className={tabClass(activeTab === 'creators', 'bg-neo-pink')}>
-              <PencilRuler className="h-4 w-4" aria-hidden="true" />
-              {t('ugc.creator.stats')}
-            </button>
-          </div>
+          {/* The creators tab queries Supabase directly; with the static
+              fallback there is only the players ranking. */}
+          {isSupabaseEnabled && (
+            <div role="tablist" className="flex gap-1.5">
+              <button type="button" role="tab" aria-selected={activeTab === 'players'} onClick={() => setActiveTab('players')} className={tabClass(activeTab === 'players', 'bg-neo-yellow')}>
+                <Trophy className="h-4 w-4" aria-hidden="true" />
+                {t('leaderboard.players')}
+              </button>
+              <button type="button" role="tab" aria-selected={activeTab === 'creators'} onClick={() => setActiveTab('creators')} className={tabClass(activeTab === 'creators', 'bg-neo-pink')}>
+                <PencilRuler className="h-4 w-4" aria-hidden="true" />
+                {t('ugc.creator.stats')}
+              </button>
+            </div>
+          )}
         </header>
 
         {activeTab === 'creators' ? (
           <CreatorLeaderboard />
         ) : (
         <>
-        {!isOnCrazyGamesPlatform && (
+        {!isOnCrazyGamesPlatform && isSupabaseEnabled && (
           <div className="mb-5">
             <SeasonLeaderboardTabs active={seasonScope} onChange={setSeasonScope} />
           </div>
@@ -203,7 +211,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
           rank={user ? userRank?.rank_position : undefined}
           score={user ? userRank?.total_score : undefined}
           leaderboard={leaderboard}
-          onPlay={() => router.push(`/${language}/singleplayer`)}
+          onPlay={() => router.push(`/${language}/quick-play`)}
           pending={authLoading || (!!user && rankLoading)}
         >
           {tierPanelEnabled && tierPosition && user?.id && (
@@ -214,10 +222,10 @@ export default function LeaderboardPageClient(): React.JSX.Element {
         </YouCard>
 
         <PageStateHandler
-          isLoading={loading}
-          error={error?.toString()}
-          onRetry={refetch}
-          isEmpty={!loading && !error && leaderboard.length === 0}
+          isLoading={listLoading}
+          error={listError?.toString()}
+          onRetry={isSupabaseEnabled ? refetch : fetchStaticLeaderboard}
+          isEmpty={!listLoading && !listError && leaderboard.length === 0}
           loadingComponent={
             <div className="space-y-2">
               {['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].map((id) => (
@@ -232,7 +240,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
               icon="sparkles"
               action={{
                 label: t('common.playNow'),
-                onClick: () => router.push(`/${language}/singleplayer`),
+                onClick: () => router.push(`/${language}/quick-play`),
                 variant: 'primary',
               }}
             />
@@ -240,8 +248,8 @@ export default function LeaderboardPageClient(): React.JSX.Element {
           errorComponent={
             <ErrorState
               title={t('common.error')}
-              description={error?.toString() || t('common.tryAgainLater')}
-              onRetry={refetch}
+              description={listError?.toString() || t('common.tryAgainLater')}
+              onRetry={isSupabaseEnabled ? refetch : fetchStaticLeaderboard}
             />
           }
         >

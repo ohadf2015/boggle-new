@@ -7,6 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { TeacherProNavLink } from '@/components/teacher/TeacherProNavLink';
 import { ForSchoolsLink } from '@/components/education/ForSchoolsLink';
+import { educationHomeFor } from '@/lib/navigation/educationBackHref';
 
 interface EducationMenuDropdownProps {
   isTeacher: boolean;
@@ -189,7 +190,7 @@ export const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
 
             <div className="p-2">
               <Link
-                href={exitHref ?? `/${language}`}
+                href={exitHref ?? educationHomeFor(language, null)}
                 role="menuitem"
                 onClick={() => setIsOpen(false)}
                 className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',

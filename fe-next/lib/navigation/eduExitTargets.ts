@@ -44,7 +44,38 @@ export function educationViewerRole({ isTeacher, userRole, isAnonymous }: Educat
   return null;
 }
 
+interface EducationAuthState {
+  loading?: boolean;
+  user: { is_anonymous?: boolean | null } | null | undefined;
+  profile: unknown;
+}
+
+/** The role is known once auth settles and a signed-in viewer's profile has arrived; until then the viewer may still be a teacher. */
+export function educationViewerResolved({ loading, user, profile }: EducationAuthState): boolean {
+  if (loading) return false;
+  return !user || !!user.is_anonymous || profile != null;
+}
+
 /** Only a signed-out visitor on a public page may leave for the game home. */
-export function educationExitHref(locale: string, role: EducationRole): string | undefined {
-  return role ? undefined : `/${locale}`;
+export function educationExitHref(locale: string, role: EducationRole, resolved: boolean): string | undefined {
+  return role || !resolved ? undefined : `/${locale}`;
+}
+
+function isStudentJoinPath(pathname: string | null | undefined): boolean {
+  return /^\/[^/]+\/student\/join(?:[/?#]|$)/.test(pathname || '');
+}
+
+/** Students sign out to the class code entry; everyone else to the education landing. */
+export function educationSignOutHref(locale: string, role: EducationRole, pathname: string | null | undefined): string {
+  return role === 'student' || isStudentJoinPath(pathname) ? `/${locale}/join` : `/${locale}/education`;
+}
+
+/** Solo practice inside the classroom product: no player tab bar, no ads. */
+export function studentPracticeHref(locale: string, from?: 'late_join'): string {
+  return `/${locale}/student/quick-play${from ? `?from=${from}` : ''}`;
+}
+
+/** A late joiner has no class hub yet, so back returns to the code entry. */
+export function studentPracticeBackHref(locale: string, from: string | null): string {
+  return from === 'late_join' ? `/${locale}/join` : `/${locale}/student`;
 }

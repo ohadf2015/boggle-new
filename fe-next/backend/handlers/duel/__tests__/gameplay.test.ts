@@ -8,7 +8,7 @@ import type { Namespace } from 'socket.io';
 import type { DuelSocket } from '../types';
 import { registerGameplayHandlers } from '../gameplay';
 import { getSupabase } from '@/backend/modules/supabase/client';
-import { isDictionaryWord } from '@/backend/dictionary';
+import { isValidWordLoaded } from '@/backend/dictionary';
 import { isWordOnBoardAsync } from '@/backend/modules/wordValidatorPool';
 import { calculateWordScore } from '@/backend/modules/scoringEngine.types';
 
@@ -20,7 +20,7 @@ vi.mock('@/backend/modules/scoringEngine.types');
 vi.mock('@/backend/utils/logger');
 
 const mockedGetSupabase = vi.mocked(getSupabase);
-const mockedIsDictionaryWord = vi.mocked(isDictionaryWord);
+const mockedIsValidWordLoaded = vi.mocked(isValidWordLoaded);
 const mockedIsWordOnBoardAsync = vi.mocked(isWordOnBoardAsync);
 const mockedCalculateWordScore = vi.mocked(calculateWordScore);
 
@@ -177,8 +177,8 @@ describe('Duel Gameplay Handlers', () => {
 
       // Mock word validation
 
-      mockedIsDictionaryWord.mockImplementation((word: string) => {
-        return ['test', 'word'].includes(word.toLowerCase());
+      mockedIsValidWordLoaded.mockImplementation((word: string) => {
+        return Promise.resolve(['test', 'word'].includes(word.toLowerCase()));
       });
 
 
@@ -210,9 +210,9 @@ describe('Duel Gameplay Handlers', () => {
       }
 
       // Verify word validation was called
-      expect(isDictionaryWord).toHaveBeenCalledWith('test', 'en');
-      expect(isDictionaryWord).toHaveBeenCalledWith('word', 'en');
-      expect(isDictionaryWord).toHaveBeenCalledWith('invalid', 'en');
+      expect(isValidWordLoaded).toHaveBeenCalledWith('test', 'en');
+      expect(isValidWordLoaded).toHaveBeenCalledWith('word', 'en');
+      expect(isValidWordLoaded).toHaveBeenCalledWith('invalid', 'en');
 
       expect(isWordOnBoardAsync).toHaveBeenCalledWith('test', expect.any(Array));
       expect(isWordOnBoardAsync).toHaveBeenCalledWith('word', expect.any(Array));
@@ -337,7 +337,7 @@ describe('Duel Gameplay Handlers', () => {
         wordsFound: ['test'],
       };
 
-      mockedIsDictionaryWord.mockReturnValue(true);
+      mockedIsValidWordLoaded.mockResolvedValue(true);
       mockedIsWordOnBoardAsync.mockResolvedValue(true);
       mockedCalculateWordScore.mockReturnValue(5);
 
@@ -539,7 +539,7 @@ describe('Duel Gameplay Handlers', () => {
       let duelTurnsCallCount = 0;
 
 
-      mockedIsDictionaryWord.mockReturnValue(true);
+      mockedIsValidWordLoaded.mockResolvedValue(true);
 
 
       mockedIsWordOnBoardAsync.mockResolvedValue(true);

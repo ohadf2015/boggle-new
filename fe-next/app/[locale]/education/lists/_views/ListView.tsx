@@ -12,6 +12,8 @@ import { wordListMetadata } from '@/lib/seo/wordLists/metadata';
 import { CardGrid, ChipLink, LANG_ACCENT, ListsFrame, PageHeader, SectionTitle, Tag } from '../_components/ui';
 import { ListActions } from '../_components/ListActions';
 import { BoardPreview } from '../_components/BoardPreview';
+import { teacherSignupHref } from '../_components/listHandoff';
+import { spellLabels } from '../_components/spellLabels';
 import { baseCrumbs, gradeCrumb, langCrumb } from './shared';
 
 /** Past ~60 characters a results page cuts the title; drop the class-game tail first, and the name's tail only past 65. */
@@ -83,7 +85,8 @@ export function ListView({ list, locale }: { list: WordList; locale: string }) {
     { q: tr(locale, 'detail.faq2q'), a: tr(locale, 'detail.faq2a') },
     { q: tr(locale, 'detail.faq3q'), a: tr(locale, 'detail.faq3a') },
   ];
-  const accessHref = `/${locale}/education/access?from=${encodeURIComponent(`/${locale}${listPath(list)}`)}`;
+  const accessHref = teacherSignupHref(locale, list);
+  const { modeTitle, modeSub, ...spell } = spellLabels(locale);
 
   return (
     <ListsFrame locale={locale} crumbs={crumbs} graph={graph}>
@@ -111,7 +114,7 @@ export function ListView({ list, locale }: { list: WordList; locale: string }) {
 
           <ListActions
             locale={locale}
-            path={listPath(list)}
+            signupHref={accessHref}
             title={c.title}
             lang={list.lang}
             words={list.words}
@@ -123,6 +126,7 @@ export function ListView({ list, locale }: { list: WordList; locale: string }) {
               practiceSoloSub: tr(locale, 'detail.practiceSoloSub'),
               modesTitle: tr(locale, 'detail.modesTitle'),
               modes: {
+                tiles: { title: modeTitle, sub: modeSub },
                 grid: { title: tr(locale, 'detail.modes.grid'), sub: tr(locale, 'detail.modes.gridSub') },
                 spelling: { title: tr(locale, 'detail.modes.spelling'), sub: tr(locale, 'detail.modes.spellingSub') },
                 matching: { title: tr(locale, 'detail.modes.matching'), sub: tr(locale, 'detail.modes.matchingSub') },
@@ -130,6 +134,7 @@ export function ListView({ list, locale }: { list: WordList; locale: string }) {
               close: tr(locale, 'practice.close'),
               pick: tr(locale, 'practice.pick'),
               overlayTitle: tr(locale, 'practice.title', { title: c.title }),
+              spell,
             }}
           />
         </div>

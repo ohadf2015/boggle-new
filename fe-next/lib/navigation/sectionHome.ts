@@ -3,7 +3,7 @@
  *
  * Used by error boundaries and navigation fallbacks to pick a sensible
  * destination when a user can't stay on the current page:
- * - Education users (teacher/student/join/classroom routes) → /{locale}/education
+ * - Education users → their section's hub (teacher, student, join) or /{locale}/education
  * - Everyone else → /{locale} (main app root)
  *
  * This centralizes the definition so all four error boundaries + parentRoute
@@ -14,6 +14,7 @@ import { locales as LOCALES } from '@/lib/i18n';
 import { multiplayerExitDestination } from '@/lib/multiplayer/exitDestination';
 import { isClassroomLivePathname, readClassroomLiveFlags } from '@/lib/education/classroomLivePath';
 import { EDUCATION_SEO_TOP_LEVEL_SEGMENTS } from '@/lib/navigation/educationSeoSegments';
+import { EDU_SECTIONS } from '@/lib/navigation/eduSections';
 
 export interface SectionHomeParams {
   /** The pathname to analyze, e.g. '/en/teacher/classroom/abc' */
@@ -40,7 +41,7 @@ export interface SectionHomeParams {
  * Exported so the registry test pins the exact contents: adding a consumer
  * route whose name collides (e.g. a consumer "join") must fail loudly.
  */
-export const EDUCATION_TOP_LEVEL_SEGMENTS: ReadonlySet<string> = new Set(['teacher', 'student', 'join', 'classroom', 'education']);
+export const EDUCATION_TOP_LEVEL_SEGMENTS: ReadonlySet<string> = new Set(EDU_SECTIONS);
 
 /**
  * Extract locale from pathname, e.g. '/en/teacher' → 'en', '/foo/bar' → undefined
@@ -109,7 +110,7 @@ function isMultiplayerClassroomPath(pathOnly: string, search: string): boolean {
  * Return the "section home" for a given pathname.
  *
  * @param params - pathname, optional explicit locale, optional search string
- * @returns /{locale}/education for edu routes, /{locale} otherwise; defaults to /en if locale is ambiguous
+ * @returns the section hub for edu routes, /{locale} otherwise; defaults to /en if locale is ambiguous
  */
 export function sectionHome({ pathname, locale: explicitLocale, search }: SectionHomeParams): string {
   const locale = explicitLocale || detectLocale(pathname) || 'en';
@@ -135,13 +136,12 @@ export function sectionHome({ pathname, locale: explicitLocale, search }: Sectio
   if (!inEducation) return `/${locale}`;
   // The bare landing must not fall back to itself; a sibling edu page keeps the
   // user inside education.
-  const segs = pathOnly.split('/').filter(Boolean);
-  if (segs.length === 2 && segs[1] === 'education') return `/${locale}/education/for-schools`;
-  // The landing bounces an approved teacher straight back here, so an error on this page can't return to it.
-  if (segs.length === 3 && segs[1] === 'education' && segs[2] === 'classroom-game') return `/${locale}/education/for-schools`;
-  // A deep teacher/student page recovers to that role's hub, which is where its own back button goes.
-  if (segs.length >= 3 && segs[1] === 'teacher') return `/${locale}/teacher`;
-  if (segs.length >= 3 && segs[1] === 'student' && segs[2] !== 'join') return `/${locale}/student`;
+  const [, section, sub] = pathOnly.split('/').filter(Boolean);
+  if (section === 'education' && !sub) return `/${locale}/education/for-schools`;
+  // Each app section recovers to its own hub, the same target its error.tsx uses.
+  if (section === 'teacher' || (section === 'education' && sub === 'classroom-game')) return `/${locale}/teacher`;
+  if (section === 'join' || (section === 'student' && sub === 'join')) return `/${locale}/join`;
+  if ((section === 'student' && sub) || (section === 'education' && sub === 'duels')) return `/${locale}/student`;
   return `/${locale}/education`;
 }
 

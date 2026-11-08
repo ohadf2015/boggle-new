@@ -15,6 +15,14 @@ describe('RoundResultScene', () => {
   it('shows the failed headline when the round was missed', () => {
     render(<RoundResultScene passed={false} round={2} roundScore={40} target={100} onProceed={vi.fn()} />);
     expect(screen.getByText('wordcraft.run.roundResult.failed')).toBeInTheDocument();
+    expect(screen.getByText('wordcraft.run.roundResult.failedSub')).toBeInTheDocument();
+  });
+
+  it('shows near-miss framing instead of a flat fail when the score was close (85%+)', () => {
+    render(<RoundResultScene passed={false} round={2} roundScore={88} target={100} onProceed={vi.fn()} />);
+    expect(screen.getByText('wordcraft.run.roundResult.failed')).toBeInTheDocument();
+    expect(screen.getByText('wordcraft.run.roundResult.closeSub')).toBeInTheDocument();
+    expect(screen.queryByText('wordcraft.run.roundResult.failedSub')).not.toBeInTheDocument();
   });
 
   it('calls onProceed when the CTA is clicked', () => {

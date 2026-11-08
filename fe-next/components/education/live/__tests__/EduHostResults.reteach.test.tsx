@@ -60,10 +60,10 @@ describe('EduHostResults reteach', () => {
     window.sessionStorage.clear();
   });
 
-  it('given words most of the class missed, when the wall shows results, then the teacher sees them and a count of who needs help', () => {
+  it('given words most of the class missed, when the wall shows results, then the teacher sees them, with a count only on words some students found', () => {
     render(<EduHostResults summary={summary} players={players} t={t} onRematch={vi.fn()} />);
-    expect(screen.getAllByTestId('edu-most-missed-word').map((el) => el.textContent)).toEqual(['enzyme0/3 · 0%', 'membrane1/3 · 33%']);
-    expect(screen.getByTestId('edu-needs-help-count')).toHaveTextContent('{"count":2}');
+    expect(screen.getAllByTestId('edu-most-missed-word').map((el) => el.textContent)).toEqual(['enzyme', 'membrane1/3']);
+    expect(screen.queryByTestId('edu-needs-help-count')).toBeNull();
   });
 
   it('given the replay tap, when the server narrows the room, then the next round starts on those words', () => {
@@ -87,6 +87,7 @@ describe('EduHostResults reteach', () => {
     const more = screen.getByTestId('edu-results-more');
     expect(more).not.toContainElement(screen.getByTestId('edu-results-play-again'));
     expect(screen.getByTestId('edu-results-play-again')).not.toHaveAttribute('data-results-primary');
+    fireEvent.click(screen.getByTestId('edu-results-more-toggle'));
     expect(Array.from(screen.getByTestId('edu-results-tertiary').querySelectorAll('button')).map((b) => b.dataset.testid)).toEqual(expect.arrayContaining(['edu-results-next-mode', 'edu-results-end']));
     fireEvent.click(screen.getByTestId('edu-results-play-again'));
     expect(onRematch).toHaveBeenCalledTimes(1);

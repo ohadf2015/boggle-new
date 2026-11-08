@@ -33,8 +33,8 @@ export function BossOutcomeCard({ size, density, className }: { size: 'tv' | 'ph
       data-testid="boss-outcome"
       data-outcome={view.status}
       className={cn(
-        'mx-auto flex w-full rounded-neo-lg border-[3px] border-neo-black shadow-hard-lg',
-        won ? 'bg-neo-lime text-neo-black' : 'bg-neo-navy-light text-neo-white',
+        'mx-auto flex w-full rounded-neo-lg border-[3px] shadow-hard-lg',
+        won ? 'border-neo-black bg-neo-lime text-neo-black' : 'border-neo-cream/50 bg-neo-navy-light text-neo-white',
         tv ? 'max-w-[1800px] flex-row items-center gap-6 px-6 py-4 min-[2200px]:gap-10 min-[2200px]:px-10' : 'max-w-md flex-col gap-2.5 p-3',
         className,
       )}

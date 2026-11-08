@@ -15,6 +15,9 @@ import { reportProOfferClick, reportProOfferImpression } from '@/lib/education/r
 import { useUpsellImpression } from '@/lib/education/useUpsellImpression';
 import { useProOfferSlot } from '@/lib/education/pro/useProOfferSlot';
 import { ProOfferCompactLink } from '@/components/education/results/ProOfferCompactLink';
+import { cn } from '@/lib/utils';
+import { NB_PANEL } from '../nb/nbStyles';
+import { PRO_BANNER_CTA, ProShine } from '../pro/ProBanner';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -33,8 +36,7 @@ export interface HomeProCardProps {
   t: T;
 }
 
-const CTA =
-  'inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-neo border-2 border-neo-cream/40 bg-transparent px-2 text-center font-neo-display text-xs font-bold leading-tight text-neo-cream transition-colors duration-150 hover:border-neo-cream hover:bg-neo-cream/10 active:scale-[0.97] disabled:opacity-60 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy';
+const CTA = cn(PRO_BANNER_CTA, 'w-full whitespace-normal px-3 text-sm leading-tight');
 
 /**
  * The one Pro ask on Home (free teachers only). Same single-trial rules as the
@@ -95,27 +97,28 @@ export function HomeProCard({ kind, onDismiss, trackImpression, language, t }: H
   }
 
   return (
-    <section ref={cardRef} data-testid="home-pro-card" data-kind={kind} data-offer={proOffer.offer} data-variant={variant} aria-labelledby="home-pro-title" className="relative rounded-neo-lg border-2 border-neo-cream/35 bg-neo-navy-light p-2.5 sm:p-3">
+    <section ref={cardRef} data-testid="home-pro-card" data-kind={kind} data-offer={proOffer.offer} data-variant={variant} aria-labelledby="home-pro-title" className={cn(NB_PANEL, 'relative mt-3 p-3 pt-5')}>
+      <span aria-hidden="true" className="edu-stripes pointer-events-none absolute inset-x-0 top-0 h-2 rounded-t-[13px] bg-neo-yellow" />
       <button
         type="button"
         data-testid="home-pro-dismiss"
         onClick={onDismiss}
         aria-label={t('eduShell.pro.dismiss')}
-        className="absolute end-0.5 top-0.5 z-10 grid size-11 place-items-center rounded-neo text-neo-cream/70 transition-colors hover:bg-neo-cream/10 hover:text-neo-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cream"
+        className="absolute end-0.5 top-2 z-10 grid size-11 place-items-center rounded-neo text-neo-cream/70 transition-colors hover:bg-neo-cream/10 hover:text-neo-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cream"
       >
         <X className="size-4" aria-hidden="true" />
       </button>
-      <div className="flex items-center gap-2.5 pe-9">
-        <EduMascot moment="pro" size={36} className="size-9 shrink-0 max-lg:hidden" />
-        <h2 id="home-pro-title" className="min-w-0 font-neo-display text-sm font-black leading-snug text-neo-cream">
-          <span data-testid="home-pro-badge" className="me-1.5 inline-flex translate-y-[-1px] items-center gap-1 rounded-neo bg-neo-yellow px-1.5 py-px align-middle text-[11px] font-black uppercase text-neo-black">
-            <Crown className="size-3" aria-hidden="true" />
-            {t('eduShell.nav.pro')}
-          </span>
+      <span data-testid="home-pro-badge" className="absolute -top-3.5 start-3 inline-flex -rotate-3 items-center gap-1 rounded-neo border-[3px] border-neo-black bg-neo-yellow px-2 py-0.5 font-neo-display text-xs font-black uppercase text-neo-black shadow-hard">
+        <Crown className="size-3.5" aria-hidden="true" />
+        {t('eduShell.nav.pro')}
+      </span>
+      <div className="flex items-center gap-3 pe-9">
+        <EduMascot moment="pro" size={48} className="size-12 shrink-0 animate-edu-bob max-lg:hidden" />
+        <h2 id="home-pro-title" className="min-w-0 font-neo-display text-base font-black leading-snug text-neo-cream">
           {lines.title}
         </h2>
       </div>
-      <div className="mt-1.5 flex flex-col gap-1 sm:mt-2">
+      <div className="mt-3 flex flex-col gap-1.5">
         <button
           type="button"
           data-testid="home-pro-cta"
@@ -132,10 +135,11 @@ export function HomeProCard({ kind, onDismiss, trackImpression, language, t }: H
           }}
           className={CTA}
         >
+          <ProShine />
           {trial.pending ? <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : null}
           {proOffer.label}
         </button>
-        <p data-testid="home-pro-note" className="text-center font-neo-body text-xs text-neo-cream/70">{proOffer.note}</p>
+        <p data-testid="home-pro-note" className="text-center font-neo-body text-xs font-semibold text-neo-cream/70">{proOffer.note}</p>
       </div>
     </section>
   );

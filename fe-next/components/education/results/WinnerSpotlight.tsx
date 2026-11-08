@@ -106,6 +106,7 @@ export function WinnerSpotlight({
   const calm = prefersReducedMotion();
   // The class lost to the boss: the top scorer is a top hitter, never a trophy winner (no win cue, no cup).
   const lostBoss = useClassroomBossStore((s) => (s.view?.status === 'escaped' ? s.view.bossId : null));
+  const lead = quiet && active && earned && !lostBoss;
 
   useEffect(() => {
     if (!active || !winner || !earned || !cue || lostBoss || celebratedRef.current) return;
@@ -136,8 +137,10 @@ export function WinnerSpotlight({
       data-active={String(active)}
       data-outcome={kind}
       className={cn(
-        'relative flex items-center gap-4 rounded-neo text-neo-white',
-        quiet ? 'border-2 border-neo-cream/40 bg-neo-navy-light' : 'border-[2px] border-neo-cream bg-neo-navy-elevated shadow-hard',
+        'relative flex items-center gap-4 text-neo-white',
+        quiet
+          ? cn('rounded-neo-lg border-[3px] shadow-hard-xl', lead ? 'border-neo-black bg-neo-pink' : 'border-neo-cream/50 bg-neo-navy-light')
+          : 'rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated shadow-hard',
         projector
           ? quiet
             ? 'px-4 py-3 gap-4 @[96rem]/results:px-6 @[96rem]/results:py-4 @[137.5rem]/results:px-10 @[137.5rem]/results:py-6'
@@ -167,7 +170,8 @@ export function WinnerSpotlight({
           // Decorative: `aria-hidden` keeps it out of the a11y tree but does
           // nothing about hit-testing, and a capture run lost a lobby click to
           // `covered by <video>`. Nothing here is ever the target of a tap.
-          'pointer-events-none shrink-0 overflow-hidden rounded-neo border-[2px] border-neo-cream bg-neo-navy',
+          'pointer-events-none shrink-0 overflow-hidden rounded-neo',
+          lead ? 'border-[3px] border-neo-black bg-neo-cream' : 'border-[2px] border-neo-cream bg-neo-navy',
           projector
             ? quiet
               ? 'w-20 h-20 @[96rem]/results:w-28 @[96rem]/results:h-28 @[137.5rem]/results:w-40 @[137.5rem]/results:h-40'
@@ -218,7 +222,7 @@ export function WinnerSpotlight({
             quiet ? 'tracking-normal' : 'uppercase tracking-widest',
             // 40% white on navy-elevated measured 3.50:1 — a smudge at the
             // back of a room, which is the only place this line is read from.
-            !active ? 'text-neo-white/75' : quiet ? 'text-neo-cream' : 'text-neo-yellow',
+            !active ? 'text-neo-white/75' : lead ? 'text-neo-white' : quiet ? 'text-neo-cream' : 'text-neo-yellow',
             projector ? (quiet ? 'text-2xl @[96rem]/results:text-3xl @[137.5rem]/results:text-5xl' : 'text-3xl @[137.5rem]/results:text-5xl') : quiet ? 'text-base' : 'text-sm'
           )}
         >

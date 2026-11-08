@@ -178,7 +178,7 @@ describe('fetchGhostRivals', () => {
         calls.push(table);
         const rows = table === 'quick_play_results' ? results : profileRows;
         const chain: Record<string, unknown> = {};
-        for (const m of ['select', 'eq', 'gt', 'order', 'in', 'neq']) {
+        for (const m of ['select', 'eq', 'gt', 'gte', 'order', 'in', 'neq']) {
           chain[m] = () => chain;
         }
         chain.limit = () => Promise.resolve({ data: rows, error: null });

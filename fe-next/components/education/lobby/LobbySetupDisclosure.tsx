@@ -1,10 +1,12 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { SlidersHorizontal, X } from 'lucide-react';
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
+import { SlidersHorizontal } from 'lucide-react';
+import { Dialog, DialogClose } from '@/components/ui/dialog';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { NbDialogBody, NbDialogContent, NbDialogFooter, NbDialogHeader } from '@/components/teacher/nb/NbDialog';
+import { NB_BLOCK, NB_PRIMARY, NB_STICKER } from '@/components/teacher/nb/nbStyles';
 
 export interface LobbySetupDisclosureProps {
   label: string;
@@ -15,7 +17,7 @@ export interface LobbySetupDisclosureProps {
   children: ReactNode;
 }
 
-const focusRing = 'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy';
+const focusRing = 'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy';
 
 export function LobbySetupDisclosure({ label, summary, open, onToggle, children }: LobbySetupDisclosureProps) {
   const { t } = useLanguage();
@@ -27,66 +29,42 @@ export function LobbySetupDisclosure({ label, summary, open, onToggle, children 
         aria-haspopup="dialog"
         aria-expanded={open}
         onClick={onToggle}
-        className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
-          'flex min-h-11 w-full items-center gap-2 rounded-neo border-2 border-neo-cream/35 bg-neo-navy-light px-3 py-2 text-start',
-          'font-neo-body text-sm text-neo-cream/70 transition-colors hover:border-neo-cream/50 hover:text-neo-cream',
+        className={cn(
+          'flex min-h-12 w-full items-center gap-2 rounded-neo-lg border-[3px] border-neo-cream/50 bg-neo-navy-light px-3 py-2 text-start shadow-hard',
+          'font-neo-body text-sm text-neo-cream/80 transition-transform hover:-translate-y-px motion-reduce:transition-none',
           focusRing,
-          'border-s-[6px] border-s-neo-cyan hover:border-s-neo-cyan'
         )}
       >
         <SlidersHorizontal className="size-4 shrink-0" strokeWidth={3} aria-hidden="true" />
         <span className="shrink-0 font-bold text-neo-cream">{label}</span>
         <span data-testid="lobby-setup-line" className="hidden min-w-0 flex-1 leading-snug @lg/lobby:block">{summary}</span>
-        <span className="ms-auto shrink-0 rounded-neo border-2 border-neo-cream/50 px-2.5 py-0.5 font-bold text-neo-cream">
+        <span className={cn(NB_STICKER, NB_BLOCK.cyan, 'ms-auto shrink-0 text-sm')}>
           {t('eduShell.host.gameOptionsChange')}
         </span>
       </button>
       <Dialog open={open} onOpenChange={(next) => next !== open && onToggle()}>
-        <DialogContent
-          hideCloseButton
-          style={{ backgroundImage: 'none' }}
-          className={cn(
-            'flex max-h-[min(92dvh,56rem)] w-[calc(100%-1.5rem)] flex-col overflow-hidden',
-            'sm:max-w-2xl lg:max-w-4xl xl:max-w-5xl',
-            'border-2 border-neo-cream/40 bg-neo-navy text-neo-cream shadow-hard-lg dark:border-neo-cream/40 dark:bg-neo-navy sm:border-2'
-          )}
-        >
-          <header className="flex items-start gap-3 border-b-2 border-neo-cream/20 px-5 py-4">
-            <span className="grid size-10 shrink-0 place-items-center rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light">
-              <SlidersHorizontal className="size-5" strokeWidth={3} aria-hidden="true" />
-            </span>
-            <div className="min-w-0 flex-1">
-              <DialogTitle className="font-neo-display text-xl font-black normal-case leading-tight tracking-normal text-neo-cream">{label}</DialogTitle>
-              <DialogDescription className="mt-0.5 font-neo-body text-sm text-neo-cream/70">
+        <NbDialogContent size="xl" phone="full">
+          <NbDialogHeader
+            icon={<SlidersHorizontal className="size-6" strokeWidth={3} aria-hidden="true" />}
+            title={label}
+            description={
+              <>
                 {summary}
                 <span className="sr-only">. {t('eduShell.host.gameOptionsHint')}</span>
-              </DialogDescription>
-            </div>
-            <DialogClose
-              aria-label={t('common.close')}
-              title={t('common.close')}
-              className={cn('grid size-10 shrink-0 place-items-center rounded-neo border-2 border-neo-cream/40 text-neo-cream hover:bg-neo-navy-light', focusRing)}
-            >
-              <X className="size-5" strokeWidth={3} aria-hidden="true" />
-            </DialogClose>
-          </header>
-          <div data-testid="lobby-setup-body" className="@container/opts min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-5">
+              </>
+            }
+            closeLabel={t('common.close')}
+          />
+          <NbDialogBody data-testid="lobby-setup-body" className="@container/opts py-5">
             {children}
-          </div>
-          <footer className="flex items-center justify-between gap-3 border-t-2 border-neo-cream/20 px-5 py-3">
-            <p className="font-neo-body text-sm text-neo-cream/70">{t('eduShell.host.gameOptionsHint')}</p>
-            <DialogClose
-              data-testid="lobby-setup-done"
-              className={cn(
-                'min-h-11 shrink-0 rounded-neo border-2 border-neo-cream px-6 font-neo-display text-base font-black text-neo-cream',
-                'transition-colors hover:bg-neo-navy-light motion-reduce:transition-none',
-                focusRing
-              )}
-            >
+          </NbDialogBody>
+          <NbDialogFooter className="sm:justify-between">
+            <p className="hidden font-neo-body text-sm text-neo-cream/75 sm:block">{t('eduShell.host.gameOptionsHint')}</p>
+            <DialogClose data-testid="lobby-setup-done" className={cn(NB_PRIMARY, 'w-full sm:w-auto sm:min-w-40')}>
               {t('eduShell.host.listDone')}
             </DialogClose>
-          </footer>
-        </DialogContent>
+          </NbDialogFooter>
+        </NbDialogContent>
       </Dialog>
     </section>
   );

@@ -13,7 +13,7 @@
  *   server markup (hidden by CSS) without hydrating it: its hooks, fetches,
  *   ads and music never mount.
  */
-import { useState, useSyncExternalStore, type ReactNode } from 'react';
+import { useLayoutEffect, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { hasCompletedOnboarding, hasSupabaseSession } from '@/utils/onboardingStorage';
 import { HOME_TREE_SCRIPT, isNativeShell } from '@/utils/returningVisitor';
 
@@ -67,6 +67,10 @@ export function useHomeTree(): HomeTree {
   const [tree] = useState<HomeTree>(() =>
     typeof window === 'undefined' ? 'ssr' : resolveClientHomeTree()
   );
+  // A remounted <html> (locale switch) loses every attribute in the same commit that mounts this.
+  useLayoutEffect(() => {
+    if (tree !== 'ssr') document.documentElement.setAttribute('data-home', tree);
+  }, [tree]);
   return tree;
 }
 

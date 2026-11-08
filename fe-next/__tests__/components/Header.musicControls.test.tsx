@@ -196,8 +196,8 @@ describe('Header - Music Controls Placement', () => {
             expect(triggerButton).toBeInTheDocument();
             expect(triggerButton).toHaveAttribute('aria-expanded', 'false');
 
-            // Trigger keeps the neo-brutalist chrome.
-            expect(triggerButton).toHaveClass('border-3');
+            // Trigger keeps the neo-brutalist chrome (thick border from sm up; 2px on phones).
+            expect(triggerButton).toHaveClass('sm:border-3');
             expect(triggerButton).toHaveClass('rounded-neo');
         });
     });

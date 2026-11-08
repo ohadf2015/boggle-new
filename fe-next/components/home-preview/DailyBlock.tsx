@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, Flame } from 'lucide-react';
-import { HOME_PREVIEW_COPY as C } from './copy';
+import { useTodayLabel } from './useTodayLabel';
 
 interface DailyBlockProps {
   lang: string;
@@ -14,9 +14,8 @@ interface DailyBlockProps {
 
 /** A tear-off ticket: the streak is the stub, today's puzzle is the ticket. */
 export function DailyBlock({ lang, t, streak, streakLoading }: DailyBlockProps) {
-  const today = new Date();
-  const weekday = new Intl.DateTimeFormat(lang, { weekday: 'long' }).format(today);
-  const day = new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'short' }).format(today);
+  const weekday = useTodayLabel(lang, { weekday: 'long' });
+  const day = useTodayLabel(lang, { day: 'numeric', month: 'short' });
 
   return (
     <section aria-labelledby="hp-daily-title" className="relative h-full" data-testid="hp-daily">
@@ -39,7 +38,7 @@ export function DailyBlock({ lang, t, streak, streakLoading }: DailyBlockProps) 
               </span>
             </>
           ) : (
-            <span className="text-center font-neo-display text-sm font-bold leading-tight lg:text-lg">{C.dailyNoStreak}</span>
+            <span className="text-center font-neo-display text-sm font-bold leading-tight lg:text-lg">{t('homePlay.dailyNoStreak')}</span>
           )}
         </div>
 
@@ -49,7 +48,7 @@ export function DailyBlock({ lang, t, streak, streakLoading }: DailyBlockProps) 
               {t('daily.badge')}
             </span>
             <span className="truncate text-xs font-bold lg:text-base">
-              {weekday} · {day}
+              {weekday && `${weekday} · ${day}`}
             </span>
           </div>
           <h2 id="hp-daily-title" className="font-neo-display text-xl font-bold leading-tight lg:text-4xl">

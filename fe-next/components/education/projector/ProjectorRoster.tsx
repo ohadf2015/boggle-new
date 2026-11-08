@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { EDU_MASCOT } from '@/lib/education/mascotArt';
 import { PRESS, tiltOf, type Translate } from '@/components/education/live/eduLiveStyles';
 import { STUDENT_CHIP, arrivalsSince, isArrivalBurst, recordArrivals, rosterTier } from './projectorLobbyModel';
+import { WALL_PANEL } from './projectorNbStyles';
 
 export interface ProjectorStudent {
   username: string;
@@ -86,7 +87,7 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
   return (
     <section
       data-testid="projector-roster"
-      className="@container flex min-h-0 flex-1 flex-col gap-[clamp(0.5rem,1.2cqw,1rem)] rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light p-3 @5xl:p-[clamp(0.75rem,1.4cqw,1.5rem)]"
+      className={cn('@container flex min-h-0 flex-1 flex-col gap-[clamp(0.5rem,1.2cqw,1rem)] p-3 @5xl:p-[clamp(0.75rem,1.4cqw,1.5rem)]', WALL_PANEL)}
     >
       <header className="flex flex-wrap items-center gap-x-[clamp(0.5rem,1.5cqw,1.5rem)] gap-y-2">
         <h2 data-testid="projector-count" className="inline-flex items-center gap-[0.3em] font-neo-display font-black leading-none text-neo-cream text-[clamp(1.25rem,min(3.6cqw,4cqh),3.25rem)]">
@@ -106,9 +107,9 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
             className="flex min-w-[min(100%,12rem)] flex-1 items-center gap-[0.6em] font-neo-body font-bold text-neo-cream/85 text-[clamp(0.875rem,min(1.8cqw,2.2cqh),1.75rem)]"
           >
             <span className="shrink-0 tabular-nums">{t('eduLiveRoom.lobby.readyCount', { ready: readyCount, total: students.length })}</span>
-            <span className="relative h-[0.7em] min-w-0 flex-1 overflow-hidden rounded-full border-2 border-neo-cream/60 bg-neo-navy">
+            <span className="relative h-[0.8em] min-w-0 flex-1 overflow-hidden rounded-neo border-[3px] border-neo-cream/60 bg-neo-navy">
               <span
-                className="absolute inset-y-0 start-0 rounded-full bg-neo-cream transition-[width] duration-500 ease-out motion-reduce:transition-none"
+                className="absolute inset-y-0 start-0 bg-neo-cream transition-[width] duration-500 ease-out motion-reduce:transition-none"
                 style={{ width: `${Math.round((readyCount / students.length) * 100)}%` }}
               />
             </span>
@@ -121,8 +122,8 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
             aria-pressed={editing}
             onClick={() => setEditing((v) => !v)}
             className={cn(
-              'ms-auto inline-flex min-h-11 items-center gap-1.5 rounded-neo border-2 px-3 font-neo-body text-sm font-bold',
-              editing ? 'border-neo-lime bg-neo-navy text-neo-cream ring-2 ring-neo-lime' : 'border-neo-cream/60 bg-neo-navy text-neo-cream',
+              'ms-auto inline-flex min-h-11 items-center gap-1.5 rounded-neo border-[3px] px-3 font-neo-display text-sm font-black shadow-hard',
+              editing ? 'border-neo-black bg-neo-cream text-neo-black' : 'border-neo-cream/50 bg-neo-navy-elevated text-neo-cream',
               PRESS
             )}
           >

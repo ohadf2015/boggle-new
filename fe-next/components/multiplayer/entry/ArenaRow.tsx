@@ -71,7 +71,7 @@ export const ArenaRow = memo(function ArenaRow({ room, joining, locked, onPick }
       data-code={room.gameCode}
       aria-label={t('multiplayerFlow.roomList.joinRoomAction', { roomName: title })}
       aria-busy={joining}
-      disabled={locked}
+      disabled={locked || full}
       onClick={() => onPick(room)}
       onKeyDown={(e) => {
         if (e.key === 'ArrowDown') moveFocus(e, 1);
@@ -134,7 +134,15 @@ export const ArenaRow = memo(function ArenaRow({ room, joining, locked, onPick }
           {room.playerCount || 0}
           {room.maxPlayers ? `/${room.maxPlayers}` : ''}
         </span>
-        <DirectionalIcon icon={ChevronRight} className="h-4 w-4 tv:h-6 tv:w-6 text-neo-white/70 transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5" />
+        {!full && (
+          <span
+            data-testid="arena-row-join"
+            className="inline-flex items-center gap-0.5 rounded-neo border-2 border-neo-black bg-neo-lime px-2 sm:pe-1 py-0.5 font-neo-display text-xs tv:text-lg font-bold uppercase text-neo-black shadow-hard-sm transition-transform group-hover:-translate-y-0.5"
+          >
+            {t('mpUi.entry.joinRow')}
+            <DirectionalIcon icon={ChevronRight} className="hidden sm:block h-3.5 w-3.5 tv:h-5 tv:w-5" />
+          </span>
+        )}
       </span>
     </button>
   );

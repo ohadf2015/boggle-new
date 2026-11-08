@@ -7,6 +7,7 @@ import type { ClassroomSummary } from '@/shared/types/classroom';
 import type { ClassroomBossView } from '@/shared/types/classroomBoss';
 import { useClassroomBossStore } from '@/stores/classroomBossStore';
 
+vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'u1' }, loading: false, isTeacher: true }) }));
 vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ language: 'he', t: (key: string) => key }) }));
 vi.mock('next/image', () => ({ default: () => <span data-testid="boss-art" /> }));
 vi.mock('@/components/Avatar', () => ({ default: () => <span data-testid="avatar" /> }));
@@ -77,6 +78,7 @@ describe('EduHostResults', () => {
     render(<EduHostResults summary={summary} players={players} t={t} onRematch={onRematch} onClose={onClose} onExitRoom={onExitRoom} />);
     expect(screen.getAllByRole('button').filter((b) => b.className.includes('bg-neo-lime'))).toEqual([screen.getByTestId('edu-results-play-again')]);
     fireEvent.click(screen.getByTestId('edu-results-play-again'));
+    fireEvent.click(screen.getByTestId('edu-results-more-toggle'));
     fireEvent.click(screen.getByTestId('edu-results-next-mode'));
     fireEvent.click(screen.getByTestId('edu-results-end'));
     expect(onRematch).toHaveBeenCalledTimes(1);
@@ -93,6 +95,7 @@ describe('EduHostResults', () => {
   it('given a free teacher, when results show, then the labelled Pro preview is the one Pro slot and no trial card or second unlock ask competes', () => {
     render(<EduHostResults summary={lessonSummary} players={players} t={t} onRematch={vi.fn()} />);
     finishReveal();
+    fireEvent.click(screen.getByTestId('edu-results-more-toggle'));
     expect(screen.getByTestId('class-report-teaser')).toBeInTheDocument();
     expect(screen.queryByTestId('results-teacher-pro-trial-card')).toBeNull();
     expect(screen.queryByTestId('unlock-report-upgrade-cta')).toBeNull();
@@ -100,8 +103,26 @@ describe('EduHostResults', () => {
     expect(document.querySelector('a[href="/he/teacher/reports"]')).toBeNull();
   });
 
-  it('given a free teacher, when the Pro preview mounts on the wall, then its server-side rendered impression fires', () => {
+  it('Given a vocab-quiz round, When a free teacher opens the word grid, Then the cells read as quiz answers, not board finds', () => {
+    render(<EduHostResults summary={{ ...lessonSummary, gameMode: 'vocab-quiz' }} players={players} t={t} onRematch={vi.fn()} />);
+    finishReveal();
+    fireEvent.click(screen.getByTestId('edu-results-more-toggle'));
+    fireEvent.click(screen.getByTestId('class-report-open-grid'));
+    expect(screen.getByTestId('round-grid-dialog').innerHTML).toContain('teacher.classReport.state.quizFound');
+  });
+
+  it('Given a vocab-quiz round, When a Pro teacher opens the word grid, Then the cells read as quiz answers too', () => {
+    pro.hasPro = true;
+    render(<EduHostResults summary={{ ...lessonSummary, gameMode: 'vocab-quiz' }} players={players} t={t} onRematch={vi.fn()} />);
+    finishReveal();
+    fireEvent.click(screen.getByTestId('struggle-open-grid'));
+    expect(screen.getByTestId('round-grid-dialog').innerHTML).toContain('teacher.classReport.state.quizFound');
+  });
+
+  it('given a free teacher, when they open "Share and export", then the Pro preview mounts and only then its impression fires', () => {
     render(<EduHostResults summary={lessonSummary} players={players} t={t} onRematch={vi.fn()} />);
+    expect(proOffer.reportProOfferImpression).not.toHaveBeenCalledWith(expect.objectContaining({ placement: 'class_report_button' }), expect.anything());
+    fireEvent.click(screen.getByTestId('edu-results-more-toggle'));
     expect(proOffer.reportProOfferImpression).toHaveBeenCalledWith(expect.objectContaining({ placement: 'class_report_button', format: 'report_teaser', stage: 'rendered' }), expect.anything());
   });
 
@@ -115,7 +136,7 @@ describe('EduHostResults', () => {
 
   it('given lesson words, when results show, then the words still to teach are on the wall', () => {
     render(<EduHostResults summary={lessonSummary} players={players} t={t} />);
-    expect(screen.getAllByTestId('edu-most-missed-word').map((el) => el.textContent)).toEqual(['dog0/2 · 0%']);
+    expect(screen.getAllByTestId('edu-most-missed-word').map((el) => el.textContent)).toEqual(['dog']);
   });
 
   it('given nobody scored, when results show, then the wall says so honestly with the stats and Play again', () => {
@@ -197,6 +218,7 @@ describe('EduHostResults', () => {
   it('given a free teacher, when results show, then the Pro preview says how many struggled, never who, with no tap needed', () => {
     render(<EduHostResults summary={lessonSummary} players={players} t={t} onRematch={vi.fn()} />);
     finishReveal();
+    fireEvent.click(screen.getByTestId('edu-results-more-toggle'));
     const teaser = screen.getByTestId('class-report-teaser');
     expect(teaser).toHaveTextContent(/2 students found under half the words|2 תלמידים/);
     expect(teaser).not.toHaveTextContent(/Noa|Ido/);

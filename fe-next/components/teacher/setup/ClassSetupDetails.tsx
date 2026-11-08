@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Check, ChevronDown, Loader2, Play } from 'lucide-react';
+import { Check, ChevronDown, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Language } from '@/lib/supabase/education/types';
 import type { StarterLessonPack } from '@/lib/education/starterLessonPacks';
@@ -33,7 +33,7 @@ export interface ClassSetupDetailsProps {
   busy: SetupBusy;
   errorKey: string | null;
   onStartLive: () => void;
-  onCreateOnly: () => void;
+  onCreateOnly?: () => void;
   skipHref: string;
   t: T;
 }
@@ -165,27 +165,25 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
         aria-busy={busy === 'live' || undefined}
         className={cn(NB_PRIMARY, 'min-h-[60px] w-full text-2xl')}
       >
-        {busy === 'live' ? (
-          <Loader2 className="size-6 animate-spin motion-reduce:animate-none" aria-hidden="true" />
-        ) : (
-          <Play className="size-6 fill-current" aria-hidden="true" />
-        )}
-        {t(errorKey ? 'eduShell.setup.retry' : 'eduShell.setup.createAndPlay')}
+        {busy === 'live' ? <Loader2 className="size-6 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : null}
+        {t(errorKey ? 'eduShell.setup.retry' : 'eduShell.setup.createClass')}
       </button>
       <p id="setup-start-live-hint" data-testid="setup-start-live-hint" className="-mt-1 text-center font-neo-body text-sm font-semibold text-neo-cream/80">
-        {t('eduShell.setup.createAndPlayHint')}
+        {t('eduShell.setup.words.createHint')}
       </p>
-      <button
-        type="button"
-        data-testid="setup-create"
-        disabled={busy !== null}
-        aria-busy={busy === 'create' || undefined}
-        onClick={props.onCreateOnly}
-        className={cn(NB_SECONDARY, 'w-full')}
-      >
-        {busy === 'create' ? <Loader2 className="size-5 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : null}
-        {t(busy === 'create' ? 'eduShell.setup.creating' : 'eduShell.setup.createOnly')}
-      </button>
+      {props.onCreateOnly ? (
+        <button
+          type="button"
+          data-testid="setup-create"
+          disabled={busy !== null}
+          aria-busy={busy === 'create' || undefined}
+          onClick={props.onCreateOnly}
+          className={cn(NB_SECONDARY, 'w-full')}
+        >
+          {busy === 'create' ? <Loader2 className="size-5 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : null}
+          {t(busy === 'create' ? 'eduShell.setup.creating' : 'eduShell.setup.createOnly')}
+        </button>
+      ) : null}
 
       {cap ? (
         <p data-testid="setup-cap-meter" className="text-center font-neo-body text-xs font-bold text-neo-cream/75">

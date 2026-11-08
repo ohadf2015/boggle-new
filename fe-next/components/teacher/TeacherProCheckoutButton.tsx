@@ -4,9 +4,7 @@ import type { ReactNode } from 'react';
 import { useTeacherProCheckout } from '@/hooks/useTeacherProCheckout';
 import { useCheckoutBlockedInApp } from '@/hooks/useCheckoutBlockedInApp';
 import type { ProUpgradeSource } from '@/lib/education/proFunnelTelemetry';
-
-const CTA_CLASS =
-  'inline-flex shrink-0 items-center justify-center rounded-neo border-2 border-black bg-neo-black px-4 py-2 font-neo-display text-sm font-black text-white shadow-hard hover:-translate-y-0.5 disabled:opacity-60';
+import { PRO_BANNER_CTA, ProShine } from './pro/ProBanner';
 
 export function TeacherProCheckoutButton({
   source,
@@ -29,8 +27,9 @@ export function TeacherProCheckoutButton({
       onClick={() => {
         void start();
       }}
-      className={CTA_CLASS}
+      className={PRO_BANNER_CTA}
     >
+      <ProShine />
       {children}
     </button>
   );

@@ -44,7 +44,7 @@ What this says: an ad that unblocks a stuck player converts once tapped (24 of 3
 
 ## Decisions (made 2026-11-07, owner delegated)
 
-- **Unknown-age guests keep no interstitials.** `shouldSuppressInterstitialForTier` stays as is. The age prompt at an ad break is now reachable from every mode, so it is the lever; read `growth:age_gate` in 28 days before revisiting. Showing interstitials to undeclared guests would also need the child-directed init tags changed, and a Families-format rejection already happened once (v5740).
+- **Unknown-age guests now get interstitials** (owner, 2026-11-07). Only a declared child is blocked. Their ads stay G-rated and non-personalized (child-directed init tags) until they declare 13+; the age prompt still opens at a due slot, at most every 14 days.
 - **No rewarded server-side verification (SSV) yet.** At ~26 native users a month the exploit value is a few coins. Tracked on the board; do it with Double Gold moving onto the capped `award_ad_coins` RPC.
 - **Gates that grant on ad failure stay** (forfeit replay, catch-up, Blast v2 undo), so nobody is stranded by a no-fill.
 - **Word Wheel's interstitial stays before the results**, matching daily Word Hunt; its exits are shared links.

@@ -1,6 +1,6 @@
 /**
- * The projector podium stands the top three ON the pedestals painted in
- * podium-bg — winner on gold in the centre, silver left, bronze right.
+ * The projector podium stands the top three on flat neo blocks — winner on
+ * gold in the centre, silver left, bronze right.
  */
 import React from 'react';
 import { describe, it, expect, vi, afterEach } from 'vitest';
@@ -26,11 +26,17 @@ const entries = [
 describe('PodiumStage', () => {
   afterEach(cleanup);
 
-  it('paints the podium art as a decorative, eager image', () => {
-    render(<PodiumStage entries={entries} stage={FINAL_STAGE} t={t} />);
-    const art = screen.getByTestId('podium-stage-art');
-    expect(art.getAttribute('src')).toContain('/images/education/podium-bg.webp');
-    expect(art).toHaveAttribute('alt', '');
+  it('draws hard-edged blocks: no painting, no gradient sheen, a black 3px outline', () => {
+    const { container } = render(<PodiumStage entries={entries} stage={FINAL_STAGE} t={t} />);
+    expect(screen.queryByTestId('podium-stage-art')).toBeNull();
+    expect(container.querySelector('img')).toBeNull();
+    for (const r of [1, 2, 3]) {
+      const plate = screen.getByTestId(`podium-plate-${r}`);
+      expect(plate.style.backgroundImage).toBe('');
+      expect(plate.className).toMatch(/\bborder-\[3px\]/);
+      expect(plate.className).toMatch(/\bborder-neo-black\b/);
+    }
+    expect(container.innerHTML).not.toMatch(/gradient\(/);
   });
 
   it('keeps the placings in rank order for a screen reader', () => {

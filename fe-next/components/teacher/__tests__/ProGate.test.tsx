@@ -274,7 +274,7 @@ describe('ProGate', () => {
           <div>paid surface</div>
         </ProGate>,
       );
-      expect(screen.getByTestId('pro-gate-pill')).toHaveTextContent('teacher.subscription.proPlanName');
+      expect(screen.getByTestId('pro-gate-pill')).toHaveTextContent('eduShell.nav.pro');
       expect(screen.getByRole('heading', { level: 1, name: 'Reports' })).toBeInTheDocument();
       expect(screen.getByTestId('pro-gate-upgrade-reports')).toHaveTextContent('teacher.proGate.reports.cta');
       expect(screen.getAllByRole('button')).toHaveLength(1);

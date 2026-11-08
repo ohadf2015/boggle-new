@@ -105,8 +105,8 @@ export default function RewardChest({ reveal, wearing, onClose }: RewardChestPro
             </m.h2>
             <RewardChipRow label={t('economy.chest.chip.label')} chips={chips} reduced={reduced} delay={0.1} />
             {reveal.rank !== null && (
-              <p className="inline-flex items-center gap-2 rounded-full border-2 border-neo-white/40 bg-neo-white/10 px-4 py-1.5 text-base font-bold">
-                <Trophy aria-hidden="true" className="h-5 w-5 text-neo-yellow" />
+              <p className="inline-flex items-center gap-2 rounded-full border-2 border-neo-black bg-neo-cream px-4 py-1.5 text-base font-black text-neo-black shadow-hard">
+                <Trophy aria-hidden="true" className="h-5 w-5 fill-neo-yellow text-neo-black" />
                 {t('economy.reward.rank', { rank: reveal.rank, size: reveal.size })}
               </p>
             )}
@@ -118,7 +118,7 @@ export default function RewardChest({ reveal, wearing, onClose }: RewardChestPro
                 e.stopPropagation();
                 onClose();
               }}
-              className="min-h-14 w-full rounded-2xl border-[3px] border-neo-black bg-neo-lime px-8 font-neo-display text-2xl font-black text-neo-navy shadow-hard-lg transition-transform duration-150 ease-out hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white active:scale-[0.97]"
+              className="min-h-14 w-full rounded-neo-lg border-[3px] border-neo-black bg-neo-lime px-8 font-neo-display text-2xl font-black text-neo-navy shadow-hard-lg transition-transform duration-150 ease-out hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white active:scale-[0.97]"
             >
               {t('economy.chest.continue')}
             </button>

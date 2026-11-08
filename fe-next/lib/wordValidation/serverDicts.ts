@@ -4,10 +4,14 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { normalizeHebrewWord, normalizeSpanishWord } from '@/shared/utils/wordNormalization';
+import { normalizeWord } from '@/shared/utils/wordNormalization';
+import type { Language } from '@/shared/types/game';
+import { isRussianWord } from '@/lib/server/russianWordLookup';
+import { checkCommunityWord } from './communityWord';
 import { extractHiraganaWords } from '@/shared/constants/japaneseLetters';
 import {
   getEnglishWordSet,
+  getEnglishApprovedWordSet,
   getHebrewWordSet,
   getSwedishWordSet,
   __resetSharedWordSetsForTest,
@@ -27,7 +31,7 @@ async function loadSpanish(): Promise<Set<string>> {
   // Normalize at load to match validate-time normalization (accent-strip,
   // ñ-preserve). Keeps this path symmetric with backend/dictionary.ts so the
   // same word can't be valid live but rejected on offline-queue replay.
-  spanishDict = new Set(words.map((w) => normalizeSpanishWord(w)));
+  spanishDict = new Set(words.map((w) => normalizeWord(w, 'es')));
   return spanishDict;
 }
 
@@ -45,24 +49,31 @@ function loadJapanese(): Set<string> {
   return japaneseDict;
 }
 
-export async function validateWordOnServer(word: string, language: string): Promise<boolean> {
-  const trimmed = word.trim();
-  if (!trimmed) return false;
-
+async function inBaseDictionary(word: string, language: string): Promise<boolean> {
   switch (language) {
     case 'en':
-      return (await getEnglishWordSet()).has(trimmed.toLowerCase());
+      return (await getEnglishWordSet()).has(word) || getEnglishApprovedWordSet().has(word);
     case 'es':
-      return (await loadSpanish()).has(normalizeSpanishWord(trimmed));
+      return (await loadSpanish()).has(word);
     case 'he':
-      return getHebrewWordSet().has(normalizeHebrewWord(trimmed));
+      return getHebrewWordSet().has(word);
     case 'sv':
-      return getSwedishWordSet().has(trimmed.toLowerCase());
+      return getSwedishWordSet().has(word);
     case 'ja':
-      return loadJapanese().has(trimmed);
+      return loadJapanese().has(word);
+    case 'ru':
+      return isRussianWord(word);
     default:
       return false;
   }
+}
+
+export async function validateWordOnServer(word: string, language: string): Promise<boolean> {
+  const trimmed = word.trim();
+  if (!trimmed) return false;
+  const normalized = normalizeWord(trimmed, language as Language);
+  if (await inBaseDictionary(normalized, language)) return true;
+  return checkCommunityWord(normalized, language);
 }
 
 // Test escape hatch — reset cached dicts between tests.

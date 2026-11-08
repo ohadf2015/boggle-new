@@ -9,7 +9,8 @@
  * TeacherProCheckoutCta. Schools ($49/teacher/year) stay lead-capture
  * (educationPackages.ts). This strip only links /teacher/upgrade.
  */
-import { Check } from 'lucide-react';
+import { Check, Crown } from 'lucide-react';
+import { PRO_BANNER_CTA, ProShine } from '@/components/teacher/pro/ProBanner';
 import { FREE_TIER_LIMITS, TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
 import { PLAN_TABLE_ROWS, type PlanCell } from '@/lib/education/proFeatures';
 import { TeacherProUpgradeLink } from '@/components/education/TeacherProUpgradeLink';
@@ -133,11 +134,15 @@ export function TeacherProCompareCheckoutStrip({
   return (
     <aside
       data-testid="teacher-pro-compare-checkout-strip"
-      className={`mb-12 rounded-neo border-3 border-neo-pink bg-neo-navy/60 p-5 shadow-hard sm:p-6 ${className}`}
+      className={`relative mb-12 mt-3 rounded-neo-xl border-[3px] border-neo-cream/50 bg-neo-navy-light p-5 pt-7 shadow-hard-xl sm:p-6 sm:pt-8 ${className}`}
     >
-      <p className="mb-2 text-xs font-bold uppercase tracking-wide text-neo-pink">{c.eyebrow}</p>
-      <h2 className="mb-2 font-neo-display text-2xl font-bold text-neo-white">{c.heading}</h2>
-      <p className="mb-4 text-sm leading-relaxed text-neo-gray-200 sm:text-base">{c.body}</p>
+      <span aria-hidden="true" className="edu-stripes pointer-events-none absolute inset-x-0 top-0 h-2 rounded-t-[13px] bg-neo-yellow" />
+      <p className="absolute -top-3.5 start-4 inline-flex -rotate-2 items-center gap-1 rounded-neo border-[3px] border-neo-black bg-neo-yellow px-2 py-0.5 font-neo-display text-xs font-black uppercase text-neo-black shadow-hard">
+        <Crown className="size-3.5" aria-hidden="true" />
+        {c.eyebrow}
+      </p>
+      <h2 className="mb-2 font-neo-display text-2xl font-black text-neo-cream">{c.heading}</h2>
+      <p className="mb-4 font-neo-body text-sm font-semibold leading-relaxed text-neo-cream/80 sm:text-base">{c.body}</p>
       <PlanMiniTable locale={locale} />
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
         <TeacherProUpgradeLink
@@ -145,8 +150,9 @@ export function TeacherProCompareCheckoutStrip({
           locale={locale}
           placement="education_compare_strip"
           testId="teacher-pro-compare-checkout-link"
-          className="inline-block rounded-neo border-4 border-neo-pink bg-neo-pink px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition hover:shadow-hard-lg"
+          className={PRO_BANNER_CTA}
         >
+          <ProShine />
           {c.cta}
         </TeacherProUpgradeLink>
         <p className="text-xs font-semibold text-neo-white/70">{c.note}</p>

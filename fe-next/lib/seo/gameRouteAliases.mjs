@@ -1,11 +1,12 @@
 /**
- * Aliases for the two game URLs people type by hand.
+ * Aliases for the URLs people type by hand that were never routes.
  *
- * Neither has ever been a route. `/play` falls into `app/[locale]` as a locale
- * segment and renders the word-validation 404 ("404 — Word Not Found!");
- * `/room` lands on the generic one. For a multiplayer word game those are the
- * two most guessable paths there are, and both are dead ends at the very top of
- * the funnel. Same class of fix as the `/privacy` and `/join?code=` aliases
+ * `/play` and `/room` fall into `app/[locale]` as a locale segment and render
+ * the word-validation 404 ("404 — Word Not Found!"); `/room` lands on the
+ * generic one. `/ranks` is the nav label for the leaderboard, whose route has
+ * always been `/leaderboard`. For a multiplayer word game these are among the
+ * most guessable paths there are, and all are dead ends at the very top of the
+ * funnel. Same class of fix as the `/privacy` and `/join?code=` aliases
  * already in next.config.mjs: nothing in the app emits these shapes, but a
  * person reconstructing a half-remembered link does.
  *
@@ -26,18 +27,15 @@ const LOCALE = ':locale(en|he|sv|ja|es|ru)';
 
 /** @type {RedirectRule[]} */
 export const GAME_ROUTE_ALIASES = [
-  // /play → a solo bot round, which is what "play" with no further intent
-  // means. Explicit ?autoStart=bots, not bare /singleplayer: bare is handled
-  // client-side as bots, and redirectLogic.ts asks entry points to carry the
-  // param so the player skips that client hop.
+  // /play → a random Quick Play round, which is what "play" with no further intent means.
   {
     source: `/${LOCALE}/play`,
-    destination: '/:locale/singleplayer?autoStart=bots',
+    destination: '/:locale/quick-play?mode=random',
     permanent: false,
   },
   {
     source: '/play',
-    destination: '/en/singleplayer?autoStart=bots',
+    destination: '/en/quick-play?mode=random',
     permanent: false,
   },
   // /room → the multiplayer lobby. Next carries the query string through, so a
@@ -64,6 +62,19 @@ export const GAME_ROUTE_ALIASES = [
   {
     source: '/room/:code',
     destination: '/en/join/:code',
+    permanent: false,
+  },
+  // /ranks — the global nav labels the leaderboard "Ranks", but the route has
+  // always been /leaderboard, so /ranks 404s on every locale. Same alias class
+  // as /play and /room: a guessed path, never a real route.
+  {
+    source: `/${LOCALE}/ranks`,
+    destination: '/:locale/leaderboard',
+    permanent: false,
+  },
+  {
+    source: '/ranks',
+    destination: '/en/leaderboard',
     permanent: false,
   },
 ];

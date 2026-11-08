@@ -165,7 +165,7 @@ export default async function BoggleWordShakeFreePage({ params }: PageProps) {
 
         <section className="mb-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
           <Link
-            href={`/${locale}/singleplayer`}
+            href={`/${locale}/quick-play`}
             className="rounded-neo border-4 border-neo-yellow bg-neo-yellow px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4"
           >
             Play Word Shake Solo — Free
@@ -276,7 +276,7 @@ export default async function BoggleWordShakeFreePage({ params }: PageProps) {
           </p>
           <div className="mt-6">
             <Link
-              href={`/${locale}/singleplayer`}
+              href={`/${locale}/quick-play`}
               className="inline-block rounded-neo border-4 border-neo-yellow bg-neo-yellow px-8 py-4 font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg"
             >
               Play Boggle Word Shake Free
