@@ -103,6 +103,8 @@ export type GrowthEvent =
   | 'streak_milestone'
   | 'streak_broken'
   | 'streak_freeze_used'
+  // A missed daily replayed inside the catch-up window restored the streak ({ date, streak }).
+  | 'streak_repaired'
   // Streak Ignition (t_89663cfc) — first-session win-moment redesign on the
   // solo results screen. streak_ignition_shown: StreakIgnitionCard impression,
   //   props { day: number, won: boolean, variant: 'won' | 'lost' }.

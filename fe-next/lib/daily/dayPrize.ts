@@ -9,8 +9,11 @@
  * The roll is a pure hash of (player, date, kind), so the server and a retry
  * always agree on what the box held, and a repeat claim can answer with the
  * same prize without storing a second copy of the roll. Mostly small, sometimes
- * lucky, rarely a jackpot: an unpredictable payout is what makes opening the
- * box worth a tap every day.
+ * lucky, rarely a jackpot, with the odds shown on the box.
+ *
+ * Play inside the education system (teacher accounts, classroom students) gets
+ * a fixed amount instead (`eduDayPrize`): no roll, no tier. The claim route
+ * decides which, server-side.
  */
 
 export type DayPrizeKind = 'clear' | 'perfect';
@@ -21,6 +24,8 @@ export interface DayPrize {
   tier: DayPrizeTier;
   coins: number;
   xp: number;
+  /** True for the education side's fixed prize (no roll, no tier to show). */
+  fixed: boolean;
 }
 
 interface PrizeTable {
@@ -39,6 +44,20 @@ export const DAY_PRIZE_TABLE: Record<DayPrizeKind, PrizeTable> = {
 /** Odds of the two rare tiers; the rest is common. */
 export const JACKPOT_ODDS = 0.06;
 export const LUCKY_ODDS = 0.19;
+
+/** The odds as whole percents, for the one small odds line on the box. */
+export function dayPrizeOddsPct(): Record<DayPrizeTier, number> {
+  const jackpot = Math.round(JACKPOT_ODDS * 100);
+  const lucky = Math.round(LUCKY_ODDS * 100);
+  return { common: 100 - jackpot - lucky, lucky, jackpot };
+}
+
+/** Education side: the same every day, no roll. */
+export const EDU_FIXED_PRIZE_COINS: Record<DayPrizeKind, number> = { clear: 25, perfect: 50 };
+
+export function eduDayPrize(kind: DayPrizeKind): DayPrize {
+  return { kind, tier: 'common', coins: EDU_FIXED_PRIZE_COINS[kind], xp: DAY_PRIZE_TABLE[kind].xp, fixed: true };
+}
 
 /** Highest payout of a kind, for "up to N coins" copy. */
 export function maxPrizeCoins(kind: DayPrizeKind): number {
@@ -63,15 +82,17 @@ function uniforms(seed: string): [number, number] {
 export function rollDayPrize(playerId: string, date: string, kind: DayPrizeKind): DayPrize {
   const table = DAY_PRIZE_TABLE[kind];
   const [tierRoll, amountRoll] = uniforms(`${playerId}|${date}|${kind}`);
-  if (tierRoll < JACKPOT_ODDS) return { kind, tier: 'jackpot', coins: table.jackpot, xp: table.xp };
-  if (tierRoll < JACKPOT_ODDS + LUCKY_ODDS) return { kind, tier: 'lucky', coins: table.lucky, xp: table.xp };
+  if (tierRoll < JACKPOT_ODDS) return { kind, tier: 'jackpot', coins: table.jackpot, xp: table.xp, fixed: false };
+  if (tierRoll < JACKPOT_ODDS + LUCKY_ODDS) return { kind, tier: 'lucky', coins: table.lucky, xp: table.xp, fixed: false };
   const coins = table.common[Math.floor(amountRoll * table.common.length)] ?? table.common[0];
-  return { kind, tier: 'common', coins, xp: table.xp };
+  return { kind, tier: 'common', coins, xp: table.xp, fixed: false };
 }
 
 /** Shape the claim routes answer with. `claimed` is false when the box was already opened. */
-export interface DayPrizeClaimResponse extends DayPrize {
+export interface DayPrizeClaimResponse extends Omit<DayPrize, 'fixed'> {
   claimed: boolean;
+  /** Missing on boxes cached before the education-side split: read as false. */
+  fixed?: boolean;
 }
 
 export function isDayPrizeResponse(body: unknown): body is DayPrizeClaimResponse {
@@ -82,6 +103,7 @@ export function isDayPrizeResponse(body: unknown): body is DayPrizeClaimResponse
     (b.tier === 'common' || b.tier === 'lucky' || b.tier === 'jackpot') &&
     typeof b.coins === 'number' &&
     typeof b.xp === 'number' &&
-    typeof b.claimed === 'boolean'
+    typeof b.claimed === 'boolean' &&
+    (b.fixed === undefined || typeof b.fixed === 'boolean')
   );
 }

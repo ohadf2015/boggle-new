@@ -16,6 +16,7 @@ import { getDailyChallengeDate } from '@/utils/dailyChallenge/dateUtils';
 import { computeCurrentStreak } from '@/lib/daily/weeklyChest';
 import { freezeDateToBridge } from '@/lib/daily/chestFreezeBridge';
 import { computeLongestConsecutiveStreak } from './longestStreakCalculator';
+import { catchUpStreakRepairs } from '@/utils/dailyChallenge/catchUp';
 
 export interface DailyPlayedStatus {
   today: {
@@ -34,6 +35,8 @@ export interface DailyPlayedStatus {
     date: string;
     freezesRemaining: number;
   };
+  /** Missed days replayed inside the catch-up window that now hold the current streak together. */
+  streakRepaired?: { dates: string[] };
   loading: boolean;
   fromServer: boolean;
 }
@@ -76,21 +79,28 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         if (error) throw error;
         return data?.map((r) => r.puzzle_date) ?? [];
       };
+      // Live plays and catch-up replays apart: a catch-up repairs the streak
+      // but never counts as "played today".
+      const split = ({ data, error }: { data: { puzzle_date: string; is_catchup?: boolean | null }[] | null; error: unknown }) => {
+        if (error) throw error;
+        const rows = data ?? [];
+        return {
+          live: rows.filter((r) => r.is_catchup !== true).map((r) => r.puzzle_date),
+          catchUp: rows.filter((r) => r.is_catchup === true).map((r) => r.puzzle_date),
+        };
+      };
 
-      // Fetch all attempts across modes (NO is_catchup)
-      const [huntRows, wheelRows, towerRows, connectionRows, freezeCount] = await Promise.all([
+      const [hunt, wheel, towerRows, connectionRows, freezeCount] = await Promise.all([
         supabase
           .from('daily_word_hunt_attempts')
-          .select('puzzle_date')
+          .select('puzzle_date, is_catchup')
           .eq('player_id', userId)
-          .eq('is_catchup', false)
-          .then(dates),
+          .then(split),
         supabase
           .from('daily_word_wheel_attempts')
-          .select('puzzle_date')
+          .select('puzzle_date, is_catchup')
           .eq('player_id', userId)
-          .eq('is_catchup', false)
-          .then(dates),
+          .then(split),
         supabase
           .from('daily_word_tower_attempts')
           .select('puzzle_date')
@@ -113,7 +123,12 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
           }),
       ]);
 
-      const allDates = Array.from(new Set([...huntRows, ...wheelRows, ...connectionRows])).sort();
+      const huntRows = hunt.live;
+      const wheelRows = wheel.live;
+      const liveDates = [...huntRows, ...wheelRows, ...connectionRows];
+      // Streak repair: a missed day replayed inside the catch-up window counts again.
+      const repairs = catchUpStreakRepairs(liveDates, [...hunt.catchUp, ...wheel.catchUp], today);
+      const allDates = Array.from(new Set([...liveDates, ...repairs])).sort();
 
       // Apply freeze bridge: if today is played and yesterday is missing but day-before is played, bridge yesterday
       const freezeBridgeDate = freezeDateToBridge(allDates, today, freezeCount);
@@ -149,6 +164,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         loading: false,
         fromServer: true,
       };
+
+      if (repairs.length > 0) response.streakRepaired = { dates: repairs };
 
       // Returned on every GET while the bridge holds (nothing here consumes the
       // freeze); the client shows the toast once per bridged date.

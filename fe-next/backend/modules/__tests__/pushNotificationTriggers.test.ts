@@ -167,7 +167,7 @@ describe('pushNotificationTriggers', () => {
 
       expect(mockSendToUser).toHaveBeenCalledWith('target-user-id', expect.objectContaining({
         title: "🎯 Today's challenge is up",
-        body: '60 seconds keeps your streak alive.',
+        body: "Today's board is ready.",
         data: {
           type: 'daily_challenge',
           deepLink: '/daily',

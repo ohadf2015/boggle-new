@@ -2,7 +2,8 @@
  * Daily Challenge Catch-up
  *
  * Players can replay dailies they missed within a short window (the last 3 days).
- * Catch-up plays count toward personal stats + streak history, but deliberately
+ * Catch-up plays count toward personal stats + the daily streak (a replayed
+ * missed day repairs the streak — `catchUpStreakRepairs`), but deliberately
  * do NOT count toward weekly-chest cycle continuity — see docs/specs/
  * daily-catchup-chest-fairness.md. Otherwise a player could grind catch-up to
  * fabricate a 7-day cycle and defeat the gold-tier fairness gate.
@@ -87,4 +88,22 @@ export function getMissedCatchUpDates(
 ): string[] {
   const done = new Set(completedDates);
   return getCatchUpDates(today, windowDays).filter(d => !done.has(d));
+}
+
+/**
+ * Catch-up plays that repair the current daily streak: missed days (no live
+ * play) that were replayed inside the window and now sit inside the current
+ * run. The run is anchored like computeCurrentStreak: today if played, else
+ * yesterday. Empty when no catch-up play changes the streak.
+ */
+export function catchUpStreakRepairs(liveDates: Iterable<string>, catchUpDates: Iterable<string>, today: string): string[] {
+  const live = new Set(liveDates);
+  const all = new Set([...live, ...catchUpDates]);
+  const repairs: string[] = [];
+  let cursor = all.has(today) ? today : previousDate(today);
+  while (all.has(cursor)) {
+    if (!live.has(cursor)) repairs.push(cursor);
+    cursor = previousDate(cursor);
+  }
+  return repairs.sort();
 }

@@ -114,6 +114,22 @@ describe('pushTranslations', () => {
     });
   });
 
+  describe('daily reminder body', () => {
+    it('Given any locale, Then the reminder is the neutral "board is ready" line, never streak-loss framed', () => {
+      const expected: Record<string, string> = {
+        en: "Today's board is ready.",
+        he: 'הלוח של היום מוכן.',
+        sv: 'Dagens bräde är klart.',
+        ja: '今日のボードができました。',
+        es: 'El tablero de hoy está listo.',
+        ru: 'Доска на сегодня готова.',
+      };
+      for (const loc of SUPPORTED_PUSH_LOCALES) {
+        expect(translatePush(loc, 'dailyChallenge.body'), loc).toBe(expected[loc]);
+      }
+    });
+  });
+
   describe('countryToLocale', () => {
     it('maps IL → he', () => {
       expect(countryToLocale('IL')).toBe('he');

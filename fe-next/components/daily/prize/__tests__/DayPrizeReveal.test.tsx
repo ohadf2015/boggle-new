@@ -3,6 +3,7 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 
 const fx = vi.hoisted(() => ({
   postWithAuth: vi.fn(),
+  getWithAuth: vi.fn(),
   emitCoinEarned: vi.fn(),
   fireConfetti: vi.fn(),
   fireVictoryConfetti: vi.fn(),
@@ -13,7 +14,7 @@ const fx = vi.hoisted(() => ({
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string, p?: Record<string, unknown>) => (p ? `${k}|${JSON.stringify(p)}` : k) }),
 }));
-vi.mock('@/utils/authFetch', () => ({ postWithAuth: fx.postWithAuth }));
+vi.mock('@/utils/authFetch', () => ({ postWithAuth: fx.postWithAuth, getWithAuth: fx.getWithAuth }));
 vi.mock('@/utils/coinEarnedFx', () => ({ emitCoinEarned: fx.emitCoinEarned }));
 vi.mock('@/utils/confettiUtils', () => ({
   fireConfetti: fx.fireConfetti,
@@ -40,6 +41,7 @@ describe('DayPrizeReveal', () => {
     vi.useFakeTimers();
     vi.clearAllMocks();
     localStorage.clear();
+    fx.getWithAuth.mockResolvedValue(res(200, { fixed: false }));
   });
   afterEach(() => vi.useRealTimers());
 
@@ -58,7 +60,9 @@ describe('DayPrizeReveal', () => {
     expect(dialog.getAttribute('data-phase')).toBe('open');
     expect(dialog.getAttribute('data-tier')).toBe('jackpot');
     expect(screen.getByTestId('day-prize-stamp').textContent).toBe('daily.dayPrize.tier.jackpot');
-    expect(screen.getByTestId('day-prize-line').textContent).toMatch(/^daily\.dayPrize\.lines\.jackpot\.[01]$/);
+    // A neutral line about today, never a tease about tomorrow.
+    expect(screen.getByTestId('day-prize-line').textContent).toBe('daily.dayPrize.todayLine');
+    expect(screen.getByTestId('day-prize-odds').textContent).toBe('daily.dayPrize.odds|{"common":75,"lucky":19,"jackpot":6}');
     expect(fx.fireFireworks).toHaveBeenCalled();
     expect(fx.emitCoinEarned).toHaveBeenCalledWith(100, undefined, { big: true });
     expect(readOpenedPrize('clear')?.coins).toBe(100);
@@ -92,6 +96,30 @@ describe('DayPrizeReveal', () => {
     );
     render(<DayPrizeReveal kind="clear" source="test" onClose={() => {}} />);
     expect(screen.getByTestId('day-prize-reveal').getAttribute('data-tier')).toBe('lucky');
+  });
+
+  it('Given a random box, When closed, Then the one small odds line shows and day_prize_shown says edu_fixed_prize false', async () => {
+    render(<DayPrizeReveal kind="clear" source="test" onClose={() => {}} />);
+    await act(async () => { await vi.advanceTimersByTimeAsync(0); });
+    expect(screen.getByTestId('day-prize-odds')).toBeTruthy();
+    expect(fx.trackGrowthEvent).toHaveBeenCalledWith('day_prize_shown', { kind: 'clear', source: 'test', edu_fixed_prize: false });
+  });
+
+  it('Given the education side, Then no odds line, no shake wait, no tier stamp, and both events say edu_fixed_prize', async () => {
+    fx.getWithAuth.mockResolvedValue(res(200, { fixed: true }));
+    fx.postWithAuth.mockResolvedValue(res(200, { kind: 'clear', tier: 'common', coins: 25, xp: 50, claimed: true, fixed: true }));
+    render(<DayPrizeReveal kind="clear" source="test" onClose={() => {}} />);
+    await act(async () => { await vi.advanceTimersByTimeAsync(0); });
+    expect(screen.queryByTestId('day-prize-odds')).toBeNull();
+    expect(fx.trackGrowthEvent).toHaveBeenCalledWith('day_prize_shown', { kind: 'clear', source: 'test', edu_fixed_prize: true });
+    fireEvent.click(screen.getByTestId('day-prize-open'));
+    // No anticipation: the box opens as soon as the server answers.
+    await act(async () => { await vi.advanceTimersByTimeAsync(1); });
+    expect(screen.getByTestId('day-prize-reveal').getAttribute('data-phase')).toBe('open');
+    expect(screen.queryByTestId('day-prize-stamp')).toBeNull();
+    expect(screen.queryByTestId('day-prize-odds')).toBeNull();
+    expect(screen.getByTestId('day-prize-coins').textContent).toContain('25');
+    expect(fx.trackGrowthEvent).toHaveBeenCalledWith('day_prize_opened', expect.objectContaining({ edu_fixed_prize: true, coins: 25 }));
   });
 
   it('Later closes without claiming', () => {

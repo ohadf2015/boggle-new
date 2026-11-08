@@ -5,14 +5,15 @@ import { useDailyPlayedStatus } from '@/hooks/useDailyPlayedStatus';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { StreakFreezeToast } from './StreakFreezeToast';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 
 const TOAST_MS = 4000;
 const freezeToastKey = (playerId: string, date: string) => `lc:streak-freeze-toast:${playerId}:${date}`;
+const repairKey = (playerId: string, date: string) => `lc:streak-repaired:${playerId}:${date}`;
 
-/** Marks the bridged date as announced; true only the first time for this player + date. */
-function claimFreezeToast(playerId: string, date: string): boolean {
+/** Marks a date as announced; true only the first time for this key. */
+function claimOnce(key: string): boolean {
   try {
-    const key = freezeToastKey(playerId, date);
     if (localStorage.getItem(key)) return false;
     localStorage.setItem(key, '1');
     return true;
@@ -24,7 +25,7 @@ function claimFreezeToast(playerId: string, date: string): boolean {
 export function PersistentStreakDisplay() {
   const { t } = useLanguage();
   const { user } = useAuth();
-  const { streak, loading, freezeApplied, hasPlayedBefore } = useDailyPlayedStatus();
+  const { streak, loading, freezeApplied, streakRepaired, hasPlayedBefore } = useDailyPlayedStatus();
   const [showFreezeToast, setShowFreezeToast] = useState(false);
   const playerId = user?.id ?? 'guest';
   const freezeDate = freezeApplied?.date;
@@ -32,8 +33,17 @@ export function PersistentStreakDisplay() {
   // The server repeats freezeApplied on every answer while the bridge holds;
   // the marker is written at show-time so a reload or tab return never re-toasts.
   useEffect(() => {
-    if (freezeDate && claimFreezeToast(playerId, freezeDate)) setShowFreezeToast(true);
+    if (freezeDate && claimOnce(freezeToastKey(playerId, freezeDate))) setShowFreezeToast(true);
   }, [playerId, freezeDate]);
+
+  // A missed day replayed inside the catch-up window held the streak together.
+  const repaired = streakRepaired?.dates.join(',') ?? '';
+  const current = streak.current;
+  useEffect(() => {
+    for (const date of repaired ? repaired.split(',') : []) {
+      if (claimOnce(repairKey(playerId, date))) trackGrowthEvent('streak_repaired', { date, streak: current });
+    }
+  }, [playerId, repaired, current]);
 
   useEffect(() => {
     if (!showFreezeToast) return undefined;

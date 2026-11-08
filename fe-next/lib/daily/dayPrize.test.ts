@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { DAY_PRIZE_TABLE, JACKPOT_ODDS, LUCKY_ODDS, isDayPrizeResponse, maxPrizeCoins, rollDayPrize } from './dayPrize';
+import { DAY_PRIZE_TABLE, EDU_FIXED_PRIZE_COINS, JACKPOT_ODDS, LUCKY_ODDS, dayPrizeOddsPct, eduDayPrize, isDayPrizeResponse, maxPrizeCoins, rollDayPrize } from './dayPrize';
 
 describe('rollDayPrize', () => {
   it('is stable for the same player, date and kind', () => {
@@ -66,5 +66,33 @@ describe('isDayPrizeResponse', () => {
     expect(isDayPrizeResponse({ kind: 'clear', tier: 'lucky', coins: 50, xp: 50, claimed: true })).toBe(true);
     expect(isDayPrizeResponse({ claimed: true, coins: 50, xp: 100 })).toBe(false);
     expect(isDayPrizeResponse(null)).toBe(false);
+  });
+});
+
+describe('eduDayPrize (education side: fixed amount, no roll)', () => {
+  it('Given a clear, Then pays a fixed 25 coins with the usual XP', () => {
+    expect(eduDayPrize('clear')).toEqual({ kind: 'clear', tier: 'common', coins: 25, xp: DAY_PRIZE_TABLE.clear.xp, fixed: true });
+  });
+
+  it('Given a perfect day, Then pays a fixed 50 coins with the usual XP', () => {
+    expect(eduDayPrize('perfect')).toEqual({ kind: 'perfect', tier: 'common', coins: 50, xp: DAY_PRIZE_TABLE.perfect.xp, fixed: true });
+    expect(EDU_FIXED_PRIZE_COINS).toEqual({ clear: 25, perfect: 50 });
+  });
+
+  it('Given the random box, Then it is marked not fixed', () => {
+    expect(rollDayPrize('p', '2026-11-07', 'clear').fixed).toBe(false);
+  });
+});
+
+describe('dayPrizeOddsPct', () => {
+  it('states the real odds as whole percents that add up to 100', () => {
+    expect(dayPrizeOddsPct()).toEqual({ common: 75, lucky: 19, jackpot: 6 });
+  });
+});
+
+describe('isDayPrizeResponse with the fixed flag', () => {
+  it('accepts a body with or without `fixed` (older cached boxes)', () => {
+    expect(isDayPrizeResponse({ kind: 'clear', tier: 'common', coins: 25, xp: 50, claimed: true, fixed: true })).toBe(true);
+    expect(isDayPrizeResponse({ kind: 'clear', tier: 'common', coins: 25, xp: 50, claimed: true, fixed: 'yes' })).toBe(false);
   });
 });
