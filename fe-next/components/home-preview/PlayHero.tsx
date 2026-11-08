@@ -17,6 +17,10 @@ import { trackLandingCtaClick } from '@/utils/growthTracking';
 
 const MODES: QuickMode[] = ['classic', 'blast', 'word-hunt', 'wheel-rush'];
 const KEY_TILT = ['-rotate-2', 'rotate-1', '-rotate-1', 'rotate-2'];
+// Classic's shared NODE_COLORS bg is bg-neo-lime — the exact PLAY CTA color
+// above the keycaps — so the same-shape keycap echoes the CTA on mobile.
+// Diverge only here; the wheel/results keep the shared map.
+const keycapBg = (mode: QuickMode) => (mode === 'classic' ? 'bg-neo-lime-light' : NODE_COLORS[mode].bg);
 
 interface PlayHeroProps {
   lang: string;
@@ -168,7 +172,7 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
                 <li key={mode}>
                   <Link
                     href={quickPlayHref(lang, mode)}
-                    className={`flex aspect-square flex-col items-center justify-center gap-1 rounded-2xl border-[3px] border-black text-black shadow-hard transition-transform hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed ${NODE_COLORS[mode].bg} ${KEY_TILT[i]} ${
+                    className={`flex aspect-square flex-col items-center justify-center gap-1 rounded-2xl border-[3px] border-black text-black shadow-hard transition-transform hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed ${keycapBg(mode)} ${KEY_TILT[i]} ${
                       animate ? 'animate-[qp-card-in_0.55s_cubic-bezier(0.3,0.9,0.4,1)_both]' : ''
                     }`}
                     style={animate ? { animationDelay: `${300 + i * 90}ms` } : undefined}

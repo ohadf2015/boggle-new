@@ -106,6 +106,15 @@ describe('PlayHero', () => {
     expect(badge.getAttribute('aria-hidden')).toBe('true');
   });
 
+  it('given the hero, then the classic keycap does not echo the PLAY button lime', () => {
+    renderHero();
+    const playClasses = screen.getByTestId('hp-play').className.split(/\s+/);
+    const classicClasses = (screen.getByTestId('hp-keycaps').querySelector('a')?.className ?? '').split(/\s+/);
+    expect(playClasses).toContain('bg-neo-lime');
+    expect(classicClasses).toContain('bg-neo-lime-light');
+    expect(classicClasses).not.toContain('bg-neo-lime');
+  });
+
   it('given a new user (onPlay set), when PLAY is tapped, then the funnel numerator fires with opens_ftue:true and the handler runs', () => {
     mockTrackCta.mockClear();
     const onPlay = vi.fn();
