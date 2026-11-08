@@ -121,9 +121,9 @@ export function GhostRivalsLayer({
             <div
               data-rival-tag
               data-offscreen={onScreen ? undefined : "true"}
-              // Calm on purpose: one quiet chip, no hard border or shadow, so
+              // Calm on purpose: one quiet chip, no border or shadow, so
               // it marks a height without competing with the tower.
-              className={`absolute end-2 flex max-w-[55%] items-center gap-1 rounded-full border border-neo-cream/30 bg-neo-navy/60 px-2 font-neo-display font-bold text-neo-cream/85 ${
+              className={`absolute end-2 flex max-w-[55%] items-center gap-1 rounded-full bg-neo-navy/70 px-2 font-neo-display font-bold text-neo-cream/85 ${
                 onScreen ? "text-[10px] leading-[18px]" : "text-[10px] leading-[16px] opacity-60"
               }`}
               style={{ top: tagY, height: LABEL_H - 4 }}
