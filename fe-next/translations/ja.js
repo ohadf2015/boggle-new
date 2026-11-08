@@ -12169,7 +12169,56 @@ const ja = {
       "info": "テストメールは件名に[TEST]プレフィックスが付いて送信されます。本番のデイリーチャレンジメールと同じテンプレートを使用します。"
     },
     "todayGames": {
+      "engagement": {
+        "bot": "ボット",
+        "neverPlayed": "未プレイ",
+        "leftAfter": "{time}後に離脱",
+        "finishedEmpty": "終了・0単語"
+      },
+      "show": {
+        "label": "表示",
+        "people": "人",
+        "real": "プレイ済み",
+        "empty": "空",
+        "bots": "ボット",
+        "all": "すべて",
+        "peopleHint": "ボット以外すべて",
+        "realHint": "単語を見つけた、得点した、または階を建てた",
+        "emptyHint": "何も見つけずに離脱または終了した人",
+        "botsHint": "自動化された訪問者",
+        "allHint": "ボットを含むすべて"
+      },
+      "subMode": {
+        "challenge": "タイム制ソロ",
+        "solo-bots": "ボット対戦",
+        "practice": "時間制限なし練習"
+      },
+      "coachStep": {
+        "inline-hint": "最初のヒント",
+        "trace": "なぞりレッスン",
+        "playing": "プレイ中",
+        "skipped": "コーチをスキップ",
+        "complete": "コーチ完了"
+      },
+      "pointsShort": "点",
+      "wordsShort": "単語",
+      "singleplayer": "シングルプレイ",
+      "wordTower": "ワードタワー",
+      "classic": "クラシック",
+      "survival": "サバイバル",
+      "adventure": "アドベンチャー",
+      "connections": "コネクション",
+      "wordCraft": "ワードクラフト",
+      "crossword": "クロスワード",
+      "brainDrill": "脳トレ",
+      "quickPlay": "クイックプレイ",
+      "tutorial": "チュートリアル",
       "detail": {
+        "timeInGame": "プレイ時間",
+        "firstWord": "最初の単語",
+        "floors": "階数",
+        "coachStep": "コーチの段階",
+        "page": "ページ",
         "acquisition": "取得元",
         "botsNa": "ボット未記録",
         "country": "国",

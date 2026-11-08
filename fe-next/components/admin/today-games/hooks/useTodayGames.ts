@@ -10,6 +10,7 @@ import type {
   GamesStats,
   GameLogSource,
 } from '../types';
+import type { ShowFilter, ShowCounts } from '@/lib/admin/gameLog/filterGroups';
 import {
   DEFAULT_PAGE_SIZE,
   AUTO_REFRESH_INTERVAL,
@@ -27,6 +28,8 @@ interface UseTodayGamesReturn {
   filteredGameGroups: import('@/lib/admin/gameLog/groupGames').GameGroup[];
   unbucketedModes: string[];
   truncated: boolean;
+  showCounts: ShowCounts | null;
+  modeCounts: Record<string, number> | null;
   stats: GamesStats;
   lastRefresh: number;
 
@@ -38,6 +41,10 @@ interface UseTodayGamesReturn {
   rankedFilter: string;
   dateRange: DateRange;
   logSource: GameLogSource;
+  showFilter: ShowFilter;
+  modeFilter: string;
+  setShowFilter: (filter: ShowFilter) => void;
+  setModeFilter: (mode: string) => void;
   setLanguageFilter: (filter: string) => void;
   setGameTypeFilter: (filter: GameTypeFilter) => void;
   setRankedFilter: (filter: string) => void;
@@ -66,6 +73,9 @@ export function useTodayGames({ authToken }: UseTodayGamesOptions): UseTodayGame
   const [rankedFilter, setRankedFilter] = useState<string>('all');
   const [dateRange, setDateRangeState] = useState<DateRange>('7d');
   const [logSource, setLogSourceState] = useState<GameLogSource>('analytics');
+  // Bots are hidden by default: a single headless visitor was ~90% of solo rows.
+  const [showFilter, setShowFilterState] = useState<ShowFilter>('people');
+  const [modeFilter, setModeFilterState] = useState<string>('all');
 
   const [sortField, setSortField] = useState<SortField>('created_at');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
@@ -96,6 +106,10 @@ export function useTodayGames({ authToken }: UseTodayGamesOptions): UseTodayGame
         params.set('gameType', gameTypeFilter);
       }
       params.set('source', logSource);
+      params.set('show', showFilter);
+      if (modeFilter !== 'all') {
+        params.set('mode', modeFilter);
+      }
 
       const response = await fetch(`/api/admin/game-logs?${params.toString()}`, {
         headers: {
@@ -116,7 +130,7 @@ export function useTodayGames({ authToken }: UseTodayGamesOptions): UseTodayGame
     } finally {
       setLoading(false);
     }
-  }, [authToken, page, pageSize, sortField, sortOrder, languageFilter, rankedFilter, gameTypeFilter, dateRange, logSource]);
+  }, [authToken, page, pageSize, sortField, sortOrder, languageFilter, rankedFilter, gameTypeFilter, dateRange, logSource, showFilter, modeFilter]);
 
   useEffect(() => {
     setLoading(true);
@@ -167,6 +181,16 @@ export function useTodayGames({ authToken }: UseTodayGamesOptions): UseTodayGame
     setPage(1);
   }, []);
 
+  const handleSetShowFilter = useCallback((filter: ShowFilter) => {
+    setShowFilterState(filter);
+    setPage(1);
+  }, []);
+
+  const handleSetModeFilter = useCallback((mode: string) => {
+    setModeFilterState(mode);
+    setPage(1);
+  }, []);
+
   const handleSetLogSource = useCallback((source: GameLogSource) => {
     setLogSourceState(source);
     setPage(1);
@@ -177,6 +201,8 @@ export function useTodayGames({ authToken }: UseTodayGamesOptions): UseTodayGame
   const filteredGameGroups = useMemo(() => data?.gameGroups ?? [], [data?.gameGroups]);
   const unbucketedModes = useMemo(() => data?.unbucketedModes ?? [], [data?.unbucketedModes]);
   const truncated = useMemo(() => data?.truncated ?? false, [data?.truncated]);
+  const showCounts = data?.showCounts ?? null;
+  const modeCounts = data?.modeCounts ?? null;
 
   const stats = useMemo((): GamesStats => {
     if (!data?.breakdown) {
@@ -213,6 +239,8 @@ export function useTodayGames({ authToken }: UseTodayGamesOptions): UseTodayGame
     filteredGameGroups,
     unbucketedModes,
     truncated,
+    showCounts,
+    modeCounts,
     stats,
     lastRefresh,
 
@@ -224,6 +252,10 @@ export function useTodayGames({ authToken }: UseTodayGamesOptions): UseTodayGame
     rankedFilter,
     dateRange,
     logSource,
+    showFilter,
+    modeFilter,
+    setShowFilter: handleSetShowFilter,
+    setModeFilter: handleSetModeFilter,
     setLanguageFilter: handleSetLanguageFilter,
     setGameTypeFilter: handleSetGameTypeFilter,
     setRankedFilter: handleSetRankedFilter,

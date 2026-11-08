@@ -9,6 +9,8 @@ import { ACQUISITION_TONE } from '../utils/classifyAcquisition';
 import { postHogPersonUrl } from '@/lib/admin/postHogLinks';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { PlayerAvatar } from './PlayerAvatar';
+import { EngagementBadge, modeText } from './GameListRow';
+import { formatSeconds } from '@/lib/admin/gameLog/engagement';
 
 interface Props {
   group: GameGroup;
@@ -23,11 +25,18 @@ export function GameGroupDetailPanel({ group, t }: Props) {
     <div className="bg-neo-navy/60 border-t border-slate-700 px-4 py-4">
       {/* Group-level info */}
       <div className="mb-4 pb-3 border-b border-slate-700/50">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
+          <EngagementBadge group={group} t={t} />
           <div>
-            <span className="text-slate-500">{t('admin.todayGames.detail.gameCode', 'Game Code')}:</span>
-            <span className="ml-2 font-mono text-slate-300">{group.gameCode || '—'}</span>
+            <span className="text-slate-500">{t('admin.todayGames.detail.mode', 'Mode')}:</span>
+            <span className="ms-1.5 text-slate-200">{modeText(group, t)}</span>
           </div>
+          {group.gameCode && (
+            <div>
+              <span className="text-slate-500">{t('admin.todayGames.detail.gameCode', 'Game Code')}:</span>
+              <span className="ms-1.5 font-mono text-slate-300">{group.gameCode}</span>
+            </div>
+          )}
           {group.errorReasons.length > 0 && (
             <div>
               <span className="text-neo-red">{t('admin.todayGames.detail.errors', 'Errors')}:</span>
@@ -130,6 +139,9 @@ function PlayerRow({ player, t }: { player: GamePlayer; t: (key: string, fallbac
             {player.status === 'errored' && (
               <span className="text-[9px] bg-neo-red/20 text-neo-red px-1 rounded">{t('admin.todayGames.status.errored', 'Error')}</span>
             )}
+            {player.isAutomated && (
+              <span className="text-[9px] bg-slate-600 text-slate-200 px-1 rounded">🤖 {t('admin.todayGames.engagement.bot', 'Bot')}</span>
+            )}
             {player.status === 'abandoned' && (
               <span className="text-[9px] bg-neo-orange/20 text-neo-orange px-1 rounded">{t('admin.todayGames.status.left', 'Left mid-game')}</span>
             )}
@@ -152,6 +164,36 @@ function PlayerRow({ player, t }: { player: GamePlayer; t: (key: string, fallbac
           <span className="text-slate-500">{t('admin.todayGames.words', 'Words')}:</span>
           <span className="ml-1 font-mono text-slate-100">{player.wordCount}</span>
         </div>
+        {player.durationSec != null && (
+          <div>
+            <span className="text-slate-500">{t('admin.todayGames.detail.timeInGame', 'Time in game')}:</span>
+            <span className="ml-1 font-mono text-slate-100">{formatSeconds(player.durationSec)}</span>
+          </div>
+        )}
+        {player.firstWordSec != null && (
+          <div>
+            <span className="text-slate-500">{t('admin.todayGames.detail.firstWord', 'First word')}:</span>
+            <span className="ml-1 font-mono text-slate-100">{formatSeconds(player.firstWordSec)}</span>
+          </div>
+        )}
+        {player.floors != null && (
+          <div>
+            <span className="text-slate-500">{t('admin.todayGames.detail.floors', 'Floors')}:</span>
+            <span className="ml-1 font-mono text-slate-100">{player.floors}</span>
+          </div>
+        )}
+        {player.coachStep && (
+          <div>
+            <span className="text-slate-500">{t('admin.todayGames.detail.coachStep', 'Coach step')}:</span>
+            <span className="ml-1 text-slate-300">{t(`admin.todayGames.coachStep.${player.coachStep}`, player.coachStep)}</span>
+          </div>
+        )}
+        {player.landingPath && (
+          <div className="col-span-2 sm:col-span-3 min-w-0 truncate" title={player.landingPath}>
+            <span className="text-slate-500">{t('admin.todayGames.detail.page', 'Page')}:</span>
+            <span className="ml-1 font-mono text-slate-300" dir="ltr">{player.landingPath}</span>
+          </div>
+        )}
         {country && (
           <div>
             <span className="text-slate-500">{t('admin.todayGames.detail.country', 'Country')}:</span>

@@ -19235,7 +19235,56 @@ const en = {
       "title": "Teacher Access"
     },
     "todayGames": {
+      "engagement": {
+        "bot": "Bot",
+        "neverPlayed": "never played",
+        "leftAfter": "Left after {time}",
+        "finishedEmpty": "Finished · 0 words"
+      },
+      "show": {
+        "label": "Show",
+        "people": "People",
+        "real": "Played",
+        "empty": "Empty",
+        "bots": "Bots",
+        "all": "All",
+        "peopleHint": "Everyone except bots",
+        "realHint": "Found a word, scored or built a floor",
+        "emptyHint": "People who left or finished with nothing found",
+        "botsHint": "Headless / automated visitors",
+        "allHint": "Everything, bots included"
+      },
+      "subMode": {
+        "challenge": "Timed solo",
+        "solo-bots": "vs bots",
+        "practice": "Untimed practice"
+      },
+      "coachStep": {
+        "inline-hint": "first hint",
+        "trace": "tracing lesson",
+        "playing": "playing",
+        "skipped": "skipped coach",
+        "complete": "coach done"
+      },
+      "pointsShort": "pts",
+      "wordsShort": "words",
+      "singleplayer": "Single Player",
+      "wordTower": "Word Tower",
+      "classic": "Classic",
+      "survival": "Survival",
+      "adventure": "Adventure",
+      "connections": "Connections",
+      "wordCraft": "Word Craft",
+      "crossword": "Crossword",
+      "brainDrill": "Brain Drill",
+      "quickPlay": "Quick Play",
+      "tutorial": "Tutorial",
       "detail": {
+        "timeInGame": "Time in game",
+        "firstWord": "First word",
+        "floors": "Floors",
+        "coachStep": "Coach step",
+        "page": "Page",
         "acquisition": "Came from",
         "botsNa": "bots not recorded",
         "country": "Country",

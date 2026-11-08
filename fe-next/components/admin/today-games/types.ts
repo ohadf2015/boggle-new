@@ -66,6 +66,18 @@ export interface UnifiedGame {
   // How the player left an abandoned game (hidden | pagehide | spa_navigate |
   // exit | give_up). A normal exit, not an error.
   leave_reason?: string | null;
+  // Headless / automated visitor, tagged at ingest from the user agent.
+  is_automated?: boolean;
+  // Single-player sub-mode (sp_mode: challenge | solo-bots | practice).
+  sub_mode?: string | null;
+  // Last coach step reached in a first-game coach round.
+  coach_step?: string | null;
+  // Page the game was played on.
+  landing_path?: string | null;
+  // Word Tower progress unit (floors standing) — words stay 0 there.
+  floors?: number | null;
+  // Seconds from game start to the first word (forward-only).
+  first_word_sec?: number | null;
 }
 
 export type GameLogSource = 'analytics' | 'tables';
@@ -89,6 +101,10 @@ export interface GamesResponse {
   unbucketedModes?: string[];
   /** True when the analytics fetch hit its row cap — narrow the date range. */
   truncated?: boolean;
+  /** Games per show filter (people/real/empty/bots/all) under the current mode filter. */
+  showCounts?: import('@/lib/admin/gameLog/filterGroups').ShowCounts;
+  /** Games per mode bucket key (plus 'all', 'multiplayer') under the current show filter. */
+  modeCounts?: Record<string, number>;
   /** Legacy per-row feed (still used by source='tables'). */
   games: UnifiedGame[];
   pagination: {

@@ -9961,7 +9961,56 @@ const ru = {
       "title": "Доступ учителей"
     },
     "todayGames": {
+      "engagement": {
+        "bot": "Бот",
+        "neverPlayed": "не играл",
+        "leftAfter": "Вышел через {time}",
+        "finishedEmpty": "Завершил · 0 слов"
+      },
+      "show": {
+        "label": "Показать",
+        "people": "Люди",
+        "real": "Сыграли",
+        "empty": "Пустые",
+        "bots": "Боты",
+        "all": "Все",
+        "peopleHint": "Все, кроме ботов",
+        "realHint": "Нашёл слово, набрал очки или построил этаж",
+        "emptyHint": "Люди, которые вышли или закончили, ничего не найдя",
+        "botsHint": "Автоматические посетители",
+        "allHint": "Всё, включая ботов"
+      },
+      "subMode": {
+        "challenge": "Соло на время",
+        "solo-bots": "против ботов",
+        "practice": "Тренировка без времени"
+      },
+      "coachStep": {
+        "inline-hint": "первая подсказка",
+        "trace": "урок обводки",
+        "playing": "играет",
+        "skipped": "пропустил обучение",
+        "complete": "обучение пройдено"
+      },
+      "pointsShort": "очк.",
+      "wordsShort": "слов",
+      "singleplayer": "Одиночная игра",
+      "wordTower": "Башня слов",
+      "classic": "Классика",
+      "survival": "Выживание",
+      "adventure": "Приключение",
+      "connections": "Связи",
+      "wordCraft": "Word Craft",
+      "crossword": "Кроссворд",
+      "brainDrill": "Тренировка мозга",
+      "quickPlay": "Быстрая игра",
+      "tutorial": "Обучение",
       "detail": {
+        "timeInGame": "Время в игре",
+        "firstWord": "Первое слово",
+        "floors": "Этажи",
+        "coachStep": "Шаг обучения",
+        "page": "Страница",
         "acquisition": "Пришел из",
         "botsNa": "боты не записаны",
         "country": "Страна",

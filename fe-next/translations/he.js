@@ -11978,8 +11978,57 @@ const he = {
       "info": "אימיילי בדיקה נשלחים עם קידומת [TEST] בכותרת. הם משתמשים באותה תבנית כמו אימיילי האתגר היומי."
     },
     "todayGames": {
+      "engagement": {
+        "bot": "בוט",
+        "neverPlayed": "לא שיחק בפועל",
+        "leftAfter": "יצא אחרי {time}",
+        "finishedEmpty": "סיים · 0 מילים"
+      },
+      "show": {
+        "label": "הצג",
+        "people": "אנשים",
+        "real": "שיחקו",
+        "empty": "ריקים",
+        "bots": "בוטים",
+        "all": "הכל",
+        "peopleHint": "כולם חוץ מבוטים",
+        "realHint": "מצאו מילה, צברו ניקוד או בנו קומה",
+        "emptyHint": "אנשים שיצאו או סיימו בלי למצוא כלום",
+        "botsHint": "מבקרים אוטומטיים (דפדפן ללא ממשק)",
+        "allHint": "הכל, כולל בוטים"
+      },
+      "subMode": {
+        "challenge": "סולו עם שעון",
+        "solo-bots": "נגד בוטים",
+        "practice": "תרגול בלי שעון"
+      },
+      "coachStep": {
+        "inline-hint": "רמז ראשון",
+        "trace": "שיעור גרירה",
+        "playing": "משחק",
+        "skipped": "דילג על ההדרכה",
+        "complete": "סיים הדרכה"
+      },
+      "pointsShort": "נק׳",
+      "wordsShort": "מילים",
+      "singleplayer": "שחקן יחיד",
+      "wordTower": "מגדל מילים",
+      "classic": "קלאסי",
+      "survival": "הישרדות",
+      "adventure": "הרפתקה",
+      "connections": "חיבורים",
+      "wordCraft": "יצירת מילים",
+      "crossword": "תשבץ",
+      "brainDrill": "אימון מוח",
+      "quickPlay": "משחק מהיר",
+      "tutorial": "הדרכה",
       "title": "משחקי היום",
       "detail": {
+        "timeInGame": "זמן במשחק",
+        "firstWord": "מילה ראשונה",
+        "floors": "קומות",
+        "coachStep": "שלב בהדרכה",
+        "page": "עמוד",
         "acquisition": "הגיע מהיכן",
         "botsNa": "בוטים לא נרשמו",
         "country": "מדינה",

@@ -30,7 +30,7 @@ import {
   trackRageQuit,
   trackSessionDepth,
 } from '@/utils/posthogEngagement';
-import { markGameActive, markGameInactive, isGameActive, consumeResumedAfterHidden, setAbandonPersistSink } from '@/utils/abandonOnPagehide';
+import { markGameActive, markGameInactive, isGameActive, consumeResumedAfterHidden, setAbandonPersistSink, activeGameTiming } from '@/utils/abandonOnPagehide';
 import { persistEventBeacon } from '@/utils/analyticsBeacon';
 import {
   clearPendingActivation,
@@ -1749,6 +1749,8 @@ export const trackGameEnd = (
   // the same start still collapses (HostView effect + Results without roundId).
   endEmittedModes.add(mode);
 
+  // Read before clearing: seconds to the first word, for the admin game log.
+  const timing = activeGameTiming();
   // Game lifecycle ended (either path) — clear active flag so a later pagehide
   // does not double-emit `game_abandoned`.
   markGameInactive();
@@ -1773,6 +1775,7 @@ export const trackGameEnd = (
   const resumedAfterHidden = completed ? consumeResumedAfterHidden() : false;
 
   trackGrowthEvent(completed ? 'game_completed' : 'game_abandoned', {
+    ...timing,
     ...extras,
     ...(resumedAfterHidden ? { resumed_after_hidden: true } : {}),
     mode,
