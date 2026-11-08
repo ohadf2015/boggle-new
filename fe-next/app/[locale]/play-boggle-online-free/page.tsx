@@ -5,6 +5,7 @@ import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { EducationIntentCta } from '@/components/education/EducationIntentCta';
 import { FRIENDS_ANSWER, PlayBoggleWithFriendsSection } from '@/components/seo/PlayBoggleWithFriendsSection';
 import { ApalabradosSinDescargarLink } from '@/components/seo/ApalabradosSinDescargarLink';
+import { AnagramSolverLink } from '@/components/seo/AnagramSolverLink';
 import { DescargarScrabblePcLink } from '@/components/seo/DescargarScrabblePcLink';
 import { RoundSetupSection, TWO_PLAYER_FAQ } from './RoundSetupSection';
 
@@ -283,6 +284,7 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
         <PlayBoggleWithFriendsSection locale={locale} />
         <ApalabradosSinDescargarLink />
         <DescargarScrabblePcLink lead="En español, para el PC sin instalar nada:" />
+        <AnagramSolverLink lead="Can't find a word on the grid? Run your letters through the free" />
 
         {/* WORDS WITH FRIENDS CROSS-LINK BANNER */}
         <section className="mt-12">

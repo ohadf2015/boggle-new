@@ -84,7 +84,12 @@ const content: Record<Locale, ToolContent> = {
       {
         question: 'What is an anagram solver?',
         answer:
-          'An anagram solver is a tool that takes a set of letters and finds all valid words that can be formed using some or all of those letters. It checks every possible combination against a dictionary to find words you might miss.',
+          'An anagram solver takes a set of letters and lists every valid word you can spell from them. Type your letters above and you get the full list in about a second, grouped by length so the high-scoring plays show first.',
+      },
+      {
+        question: 'How do I find words from letters?',
+        answer:
+          'Type the letters into the box above — the order does not matter — and hit Find Words. The solver checks every combination against the full LexiClash dictionary and returns each valid word, longest first. For a two-word anagram, solve the long word first, then run the leftover letters again.',
       },
       {
         question: 'Can I use this for Scrabble or Words With Friends?',
@@ -94,7 +99,7 @@ const content: Record<Locale, ToolContent> = {
       {
         question: 'Why are some words missing from the results?',
         answer:
-          'Our free tool uses a curated list of 500+ common English words to keep results fast and relevant. For access to a full dictionary with thousands of words, play LexiClash where every valid English word counts!',
+          'The solver checks the full LexiClash tournament dictionary — the same word list that scores multiplayer matches. Proper nouns, abbreviations, and hyphenated words are left out because they are not legal in tournament play, so a word you expected usually falls into one of those groups.',
       },
       {
         question: 'How do I get better at finding words from scrambled letters?',
