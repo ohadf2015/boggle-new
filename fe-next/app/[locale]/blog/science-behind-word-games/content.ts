@@ -31,7 +31,7 @@ export const contentByLocale: Record<string, LocaleContent> = {
 
 My partner looked at me like I needed professional help.
 
-Here's the thing. While I was sitting there looking unhinged, my brain was running one of the most complex cognitive routines it knows how to run. Not in the hand-wavy "brain training makes you smarter" way that got Lumosity hit with a $50 million FTC fine. In a specific, measurable, fMRI-evidence way.
+Here's the thing. While I was sitting there looking unhinged, my brain was running one of the most complex cognitive routines it knows how to run. Not in the hand-wavy "brain training makes you smarter" way that landed Lumosity a $50 million FTC judgment. In a specific, measurable, fMRI-evidence way.
 
 This piece walks through the actual neuroscience of word games. Real studies, real numbers. I'll also flag where the science ends and the marketing begins, because this field has a credibility problem you deserve to know about.`,
       },
@@ -55,7 +55,7 @@ There's a fifth player nobody talks about: the phonological loop. This is your b
 
 I tested this once. I tried playing while counting backwards from 100 by sevens. Brutal. My score dropped about 60%. Counting backwards hijacks the same loop word-finding needs, and the loop can only do one job at a time. That's also why a noisy room kills your score. Other people's words intrude on the loop whether you want them to or not.
 
-A 2019 meta-analysis in Frontiers in Human Neuroscience backs this up: verbal working memory activates the left prefrontal cortex, spatial working memory lights up the right. Two separate systems, both running while you hunt for STRANGE.`,
+A 2019 meta-analysis of 42 fMRI studies in Frontiers in Human Neuroscience adds a twist. Verbal working memory doesn't sit only in the left hemisphere, as people long assumed. It runs on a network across both frontal lobes, the left parietal cortex and the cerebellum, and all of it is busy while you hunt for STRANGE.`,
       },
       {
         title: 'Hard mode, and Hagoort\'s three-engine model',
@@ -75,7 +75,7 @@ All three engines run at once. Retrieve, test, strategize, in parallel. The fact
       },
       {
         title: 'The Lumosity scandal you should know about',
-        content: `In 2016 the Federal Trade Commission fined Lumosity, then the biggest name in brain training, $50 million. Fifty. Million. Dollars.
+        content: `In 2016 the Federal Trade Commission hit Lumosity, then the biggest name in brain training, with a $50 million judgment. Fifty. Million. Dollars. Most of it was suspended because the company couldn't pay, and Lumosity settled by paying $2 million back to its customers.
 
 The reason: Lumosity claimed their games could help users perform better at work and school, delay age-related cognitive decline, and reduce impairment associated with Alzheimer's. The FTC found those claims unsupported by the evidence and stated that Lumosity "preyed on consumers' fears about age-related cognitive decline."
 
@@ -89,13 +89,13 @@ What I am telling you is what neuroscience actually shows about what happens in 
         title: 'What the research actually shows',
         content: `With the caveat in place, here is what we can say with reasonable confidence.
 
-Verghese and colleagues published a landmark study in the New England Journal of Medicine in 2003 that followed 469 adults over a 21-year window. Participants who did crossword puzzles three or four days a week had about a 38% lower risk of developing dementia than non-puzzlers. The result was correlational, not causal, but the effect size was large and the sample was tracked for two decades.
+Verghese and colleagues published a landmark study in the New England Journal of Medicine in 2003 that followed 469 adults over 75 for a median of five years. People who often read, played board games, played music or danced were less likely to develop dementia, and each extra day a week of mentally active hobbies came with about a 7% lower risk. The result was correlational, not causal, and the authors themselves called for controlled trials.
 
-The PROTECT study out of the University of Exeter and King's College London (2019) added another data point. Over 19,000 adults aged 50+ self-reported their word-puzzle habits, then sat for cognitive tests. Regular word-puzzle users scored on attention, reasoning, and memory tasks at levels equivalent to brains roughly ten years younger than their chronological age.
+The PROTECT study out of the University of Exeter and King's College London (2019) added another data point. Over 19,000 adults aged 50 to 93 reported how often they did word puzzles, then sat for cognitive tests. The more often people did puzzles, the better they scored on attention, reasoning and memory. On a grammatical reasoning test, the most regular puzzlers scored like people about ten years younger, and on short-term memory like people about eight years younger.
 
 Both studies are correlational. They cannot prove word puzzles caused the better performance. People who are already sharper might just be more likely to enjoy word puzzles. Chicken-and-egg.
 
-But the effect sizes are big enough to take seriously. A 38% lower dementia risk and a ten-year apparent cognitive age gap are not statistical noise.
+But the pattern is too consistent to wave away. A lower dementia risk in one study and a ten-year gap on reasoning in another are not statistical noise.
 
 My honest read: even if word games do not make you "smarter" in any measurable way, sustained focused linguistic effort is almost certainly better for your brain than passive scrolling. The bar is not "does this cure dementia". The bar is "is this a good use of my mental energy". Yeah. I think it is.`,
       },
@@ -131,13 +131,13 @@ Anyway, I've got a grid waiting.`,
       },
       {
         content: `Sources:
-- Systematic review of fMRI studies on word processing: AIMS Neuroscience (2021)
-- Meta-analysis of verbal vs. spatial working memory: Frontiers in Human Neuroscience (2019)
-- Verghese, J. et al. "Leisure Activities and the Risk of Dementia in the Elderly": New England Journal of Medicine (2003), n=469, 21-year follow-up
-- Brooker, H. et al. PROTECT study, 19,000+ adults aged 50+: University of Exeter and King's College London (2019)
-- Hagoort, P. MUC (Memory, Unification, Control) model: Max Planck Institute
-- Bialystok, E., Craik, F. I. M., and Freedman, M. "Bilingualism as a protection against the onset of symptoms of dementia": Neuropsychologia (2007), n=184
-- FTC v. Lumos Labs (Lumosity): $50M settlement for deceptive advertising (2016)`,
+- [Deldar, Z. et al. "The interaction between language and working memory: a systematic review of fMRI studies in the past two decades": AIMS Neuroscience (2021)](https://doi.org/10.3934/Neuroscience.2021001)
+- [Emch, M. et al. "Neural Correlates of Verbal Working Memory: An fMRI Meta-Analysis": Frontiers in Human Neuroscience (2019)](https://doi.org/10.3389/fnhum.2019.00180)
+- [Verghese, J. et al. "Leisure Activities and the Risk of Dementia in the Elderly": New England Journal of Medicine (2003)](https://doi.org/10.1056/NEJMoa022252), n=469, median follow-up 5.1 years
+- [Brooker, H. et al. PROTECT study of word puzzle use, 19,078 adults aged 50 to 93: International Journal of Geriatric Psychiatry (2019)](https://doi.org/10.1002/gps.5033)
+- [Hagoort, P. "MUC (Memory, Unification, Control) and beyond": Frontiers in Psychology (2013)](https://doi.org/10.3389/fpsyg.2013.00416)
+- [Bialystok, E., Craik, F. I. M., and Freedman, M. "Bilingualism as a protection against the onset of symptoms of dementia": Neuropsychologia (2007)](https://doi.org/10.1016/j.neuropsychologia.2006.10.009), n=184
+- [FTC v. Lumos Labs (Lumosity): $50M judgment, $2M paid, for deceptive advertising (2016)](https://www.ftc.gov/news-events/news/press-releases/2016/01/lumosity-pay-2-million-settle-ftc-deceptive-advertising-charges-its-brain-training-program)`,
       },
     ],
     backToBlog: 'Back to Blog',
@@ -187,7 +187,7 @@ Anyway, I've got a grid waiting.`,
 
 זוהי הלולאה הפונולוגית שלכם בפעולה. זה בעצם RAM של המוח שלכם עבור שפה.
 
-מטא-אנליזה (Frontiers in Human Neuroscience, 2019) מצאה שכשאתם מחזיקים אותיות בתוך הזכרון בעבודה — בזמן שאתם חוצים רשת אותיות — הקורטקס הפרה-פרונטלי השמאלי שלכם פעיל. המוח בעצם מחזק את הצליל בעיניים.
+מטא-אנליזה של 42 מחקרי fMRI (Frontiers in Human Neuroscience, 2019) מצאה שזיכרון העבודה המילולי, זה שמחזיק אותיות בראש בזמן שאתם סורקים את הלוח, לא יושב רק בצד שמאל של המוח כמו שחשבו פעם. הוא מפעיל רשת שלמה: שתי האונות הקדמיות, הקורטקס הקודקודי השמאלי והמוחון.
 
 יש רק אחת מהלולאות הללו. אם אתם מנסים לספור לאחור (תנסו) והלולאה היא תפוסה — הציון שלכם יורד 60% בנוקדם. לא לכן משחקי מילים בחדר רועש זה קשה. קולות אחרים פולשים ללולאה שלכם. המוח לא יכול בכל פשוט לא לעבד אותם.`,
       },
@@ -201,9 +201,7 @@ Anyway, I've got a grid waiting.`,
 
 לכן משחק קשה מרגיש קשה. לא בראש שלכם — המוח באמת מפעיל יותר שטח.
 
-אני רואה את זה בעצמי. כשאני מוצא מילים של שלוש אותיות זה כמעט אוטומטי. אבל מילה בת שבע? אני מרגיש את המאמץ בגוף. המצח מתכווץ. אני נשען קדימה. זו כמו ההפרש בין הליכה נינוחה לספרינט.
-
-מחקר על זיכרון מילות פעולה (PMC, 2022) מוכיח את זה. כשאתם מחזיקים מילה "לקפוץ" בזכרון, הקורטקס המוטורי שלכם זז קלות. המוח לא אחסן מילים כמו תיקיות. הוא אחסן אותם כרשתות. צלילים, משמעויות, תחושות פיזיות כולם מחוברים.`,
+אני רואה את זה בעצמי. כשאני מוצא מילים של שלוש אותיות זה כמעט אוטומטי. אבל מילה בת שבע? אני מרגיש את המאמץ בגוף. המצח מתכווץ. אני נשען קדימה. זו כמו ההפרש בין הליכה נינוחה לספרינט.`,
       },
       {
         title: 'מודל MUC של הגורט — שלושת מנועי השפה',
@@ -221,7 +219,7 @@ Anyway, I've got a grid waiting.`,
       },
       {
         title: 'הפיל בחדר: שערורית Lumosity',
-        content: `2016. Lumosity — החברה הגדולה בתחום "אימון מוח" — קיבלה קנס של 50 מיליון דולר מהנציבות הפדרלית למסחר (FTC).
+        content: `2016. Lumosity, החברה הגדולה בתחום "אימון מוח", חטפה מהנציבות הפדרלית למסחר (FTC) פסק דין של 50 מיליון דולר. רוב הסכום הושעה כי החברה לא יכלה לשלם, ובסוף היא שילמה 2 מיליון דולר שהוחזרו ללקוחות.
 
 למה? כי הם טענו שהמשחקים שלהם מונעים דמנציה ומשפרים ביצועים בעבודה ובלימודים. לא היו להם ראיות.
 
@@ -235,13 +233,13 @@ FTC מצאה שהם טרפו על פחדים של אנשים מדעיכה קוג
         title: 'מה המחקר בעצם מוצא',
         content: `סדר. עם זה מיושב, מה אנחנו יודעים?
 
-אקסטר וקינגס קולג' לונדון עקבו אחרי 19,000 אנשים בני 50 ומעלה שעשו חידות מילים באופן קבוע. התוצאה? הם הראו ביצועים בדיקה קוגניטיבית שווה ערך למוח צעיר ב-10 שנים.
+באוניברסיטת אקסטר ובקינגס קולג' לונדון בדקו יותר מ-19,000 אנשים בני 50 עד 93. ככל שאנשים פתרו חידות מילים לעיתים קרובות יותר, כך הם הצליחו יותר במבחנים הקוגניטיביים. במבחן הסקה דקדוקית, מי שפתרו הכי הרבה קיבלו ציונים של אנשים צעירים מהם בכ-10 שנים, ובזיכרון לטווח קצר בכ-8 שנים.
 
 זוהי מחקר שהשפעה? כן. אבל האם זה הוכיח שחידות מילים גרמו לזה? לא. יכול להיות שאנשים חכמים יותר פשוט אוהבים חידות.
 
-ובכל זאת: 10 שנים של הבדל קוגניטיבי זה בדיוק כן משמעותי.
+ובכל זאת: פער של 10 שנים במבחן הסקה זה לא עניין של מה בכך.
 
-יש גם INHANCE (McGill, 2025) שמצא שתרגילים קוגניטיביים מובנים (כולל משימות מילים) קשורים לעלייה של 2.3% בתרכוז אצטילכולין בנוירוטרנסמיטר שחיוני לזיכרון ולמידה.
+יש גם את ניסוי INHANCE (מקגיל, 2025): מבוגרים שתרגלו במשך עשרה שבועות שני תרגילי מחשב של מהירות וקשב הראו עלייה של 2.3% בפעילות האצטילכולין, נוירוטרנסמיטר שחיוני לזיכרון וללמידה. הקבוצה ששיחקה במשחקי מחשב רגילים לא הראתה עלייה. התרגילים לא היו משחקי מילים, אז על משחקי מילים המחקר הזה עוד לא אומר כלום.
 
 אני מסכים עם זה: משחקי מילים לא יהפכו אתכם לחכמים יותר בצורה מדידה. אבל לשחק משחק קשה וממוקד? בטוח שזה טוב יותר מגלילה בפייסבוק.`,
       },
@@ -285,13 +283,12 @@ FTC מצאה שהם טרפו על פחדים של אנשים מדעיכה קוג
       },
       {
         content: `מקורות:
-- סקירה שיטתית של מחקרי fMRI בעיבוד מילים: AIMS Neuroscience (2021)
-- מטא-אנליזה של זיכרון עבודה מילולי: Frontiers in Human Neuroscience (2019)
-- מתאמים מוחיים של זיכרון מילות פעולה: PMC (2022)
-- Hagoort, P. — מודל MUC (זיכרון-איחוד-בקרה): המסגרת לנוירומדע של שפה
-- אוניברסיטת אקסטר וקינגס קולג' לונדון — מחקר חידות מילים (19,000+ משתתפים, 2019)
-- מחקר INHANCE, אוניברסיטת מקגיל — אצטילכולין ותרגילים קוגניטיביים (2025)
-- FTC נ' Lumos Labs (Lumosity) — פשרה של 50 מיליון דולר (2016)`,
+- [סקירה שיטתית של מחקרי fMRI על שפה וזיכרון עבודה (Deldar ועמיתים): AIMS Neuroscience (2021)](https://doi.org/10.3934/Neuroscience.2021001)
+- [מטא-אנליזה של 42 מחקרי fMRI על זיכרון עבודה מילולי (Emch ועמיתים): Frontiers in Human Neuroscience (2019)](https://doi.org/10.3389/fnhum.2019.00180)
+- [Hagoort, P. — מודל MUC (זיכרון, איחוד, בקרה): Frontiers in Psychology (2013)](https://doi.org/10.3389/fpsyg.2013.00416)
+- [אוניברסיטת אקסטר וקינגס קולג' לונדון, מחקר PROTECT על חידות מילים (19,078 משתתפים): International Journal of Geriatric Psychiatry (2019)](https://doi.org/10.1002/gps.5033)
+- [ניסוי INHANCE, אוניברסיטת מקגיל — אימון מהירות ואצטילכולין: JMIR Serious Games (2025)](https://doi.org/10.2196/75161)
+- [FTC נ' Lumos Labs (Lumosity) — פסק דין של 50 מיליון דולר, מתוכם שולמו 2 מיליון (2016)](https://www.ftc.gov/news-events/news/press-releases/2016/01/lumosity-pay-2-million-settle-ftc-deceptive-advertising-charges-its-brain-training-program)`,
       },
     ],
     backToBlog: 'חזרה לבלוג',
@@ -341,7 +338,7 @@ Här är det som överraskade mig mest: det är inte ett område som gör en sak
 
 Det är ingen tic. Det är din fonologiska loop i arbete.
 
-En metaanalys publicerad i Frontiers in Human Neuroscience (2019) fann att verbalt arbetsminne (den typen du använder när du håller bokstäver i minnet medan du söker efter ord) primärt aktiverar vänster prefrontal cortex. Spatialt arbetsminne (som att minnas var saker är på en karta) lyser upp höger sida istället.
+En metaanalys av 42 fMRI-studier i Frontiers in Human Neuroscience (2019) fann att verbalt arbetsminne (det du använder när du håller bokstäver i huvudet medan du letar efter ord) inte bara sitter i vänster hjärnhalva, som man länge trott. Det använder ett nätverk i båda pannloberna, vänster hjässlob och lillhjärnan.
 
 Den fonologiska loopen är i princip din hjärnas RAM-minne för språk. Det är en repetitionsmekanism som håller information aktiv genom att upprepa den. När du skannar ett bokstavsrutnät, kör du dussintals bokstavskombinationer genom denna loop varje sekund, och testar var och en mot ditt ordförråd.
 
@@ -359,11 +356,7 @@ Svårt ord, långt, ovanligt, kräver att man skannar åt flera håll? Din hjär
 
 Det är därför ett utmanande ordspel genuint känns annorlunda än ett enkelt. Det är inte bara subjektivt. Din hjärna rekryterar bokstavligen mer neuralt utrymme.
 
-Jag märker detta i mitt eget spelande. När jag hittar tre- och fyrbokstavsord känns det nästan automatiskt. Till och med avkopplande. Men när jag jagar det svårfångade sex- eller sjubokstavsordet, finns det en fysisk känsla av ansträngning. Min panna spänns. Jag lutar mig framåt. Det är som skillnaden mellan en avslappnad promenad och en sprint. Samma ben, väldigt olika intensitet.
-
-Forskningen stödjer detta. En studie om handlingsordsminne publicerad i PMC (2022) fann att när människor håller ord i arbetsminnet, särskilt handlingsverb som "springa", "kasta" eller "gripa", aktiverar de även motoriska områden. Hjärnan lagrar inte ord som filer i en mapp. Den lagrar dem som rika, sammankopplade nätverk som länkar ljud, betydelse, fysisk känsla och minne.
-
-Så när du hittar ordet HOPPA i ett bokstavsrutnät, rycks din motoriska cortex till lite, som om den förbereder sig för att faktiskt hoppa. Språk är kroppsligt. Det lever i hela din hjärna, inte bara i "språkdelarna".`,
+Jag märker detta i mitt eget spelande. När jag hittar tre- och fyrbokstavsord känns det nästan automatiskt. Till och med avkopplande. Men när jag jagar det svårfångade sex- eller sjubokstavsordet, finns det en fysisk känsla av ansträngning. Min panna spänns. Jag lutar mig framåt. Det är som skillnaden mellan en avslappnad promenad och en sprint. Samma ben, väldigt olika intensitet.`,
       },
       {
         title: 'Hagoorts MUC-modell: Språkets tre motorer',
@@ -385,7 +378,7 @@ Jag tänker på det varje gång någon avfärdar ordspel som "bara en dum först
         title: 'Elefanten i rummet: Lumosity-skandalen',
         content: `Okej. Dags att prata om det obekväma.
 
-2016 dömdes Lumosity, det största namnet inom "hjärnträning", att betala 50 miljoner dollar i böter av Federal Trade Commission (FTC). Femtio. Miljoner. Dollar.
+2016 fick Lumosity, det största namnet inom "hjärnträning", en dom på 50 miljoner dollar från Federal Trade Commission (FTC). Femtio. Miljoner. Dollar. Det mesta av beloppet sköts upp eftersom företaget inte hade råd att betala, och Lumosity betalade till slut 2 miljoner dollar som gick tillbaka till kunderna.
 
 Varför? Eftersom de hävdade att deras spel kunde hjälpa användare att prestera bättre på jobbet och i skolan, fördröja åldersrelaterad kognitiv nedgång, och till och med minska kognitiv funktionsnedsättning kopplad till tillstånd som Alzheimers. Dessa påståenden stöddes inte av deras bevis.
 
@@ -401,13 +394,13 @@ Vad jag SÄGER är vad neurovetenskapen faktiskt visar om vad som händer i din 
         title: 'Vad forskningen faktiskt visar (ärligt)',
         content: `Okej, med det förbehållet ordentligt på plats, här är vad vi kan säga med rimlig säkerhet.
 
-Den största nyare studien kommer från University of Exeter och King's College London. De följde över 19 000 deltagare i åldern 50 och uppåt som rapporterade att de regelbundet ägnade sig åt ordpussel. Resultaten? Människor som gjorde ordpussel regelbundet presterade betydligt bättre på kognitiva tester, motsvarande att ha en hjärna ungefär 10 år yngre än deras faktiska ålder.
+Den största nyare studien kommer från University of Exeter och King's College London. De testade över 19 000 deltagare mellan 50 och 93 år och frågade hur ofta de löste ordpussel. Ju oftare folk löste ordpussel, desto bättre gick de kognitiva testerna. På ett test i grammatiskt resonerande låg de flitigaste pusslarna i nivå med personer ungefär tio år yngre, och på korttidsminne ungefär åtta år yngre.
 
 Nu, ett massivt förbehåll: detta är en korrelationsstudie. Den bevisar inte att ordpussel orsakade de bättre resultaten. Kanske är personer som redan är kvickare helt enkelt mer benägna att tycka om ordpussel. Hönan eller ägget.
 
-Men effektstorleken var tillräckligt stor för att vara anmärkningsvärd. Vi pratar inte om en marginell förändring. Tio år av kognitiv skillnad är substantiellt.
+Men effekten var tillräckligt stor för att vara anmärkningsvärd. Tio års skillnad i grammatiskt resonerande är ingen marginell förändring.
 
-Sedan finns INHANCE-studien från McGill University (2025), som fann att strukturerade kognitiva övningar, inklusive ordbaserade uppgifter, var associerade med en 2,3% ökning av acetylkolinnivåerna. Acetylkolin är en signalsubstans som är avgörande för minne och inlärning. En 2,3% ökning kanske låter liten, men i signalsubstanstermer är det betydande.
+Sedan finns INHANCE-studien från McGill University (2025). Äldre vuxna som tränade två datorövningar för snabbhet och uppmärksamhet i tio veckor fick 2,3 % högre acetylkolinaktivitet. Acetylkolin är en signalsubstans som är avgörande för minne och inlärning. Gruppen som spelade vanliga datorspel fick ingen ökning. Övningarna var inga ordspel, så om ordspel säger studien ännu ingenting.
 
 Och detta är kritiskt: ingen av dessa studier säger "spela ordspel så förbättras din hjärna." Vad de antyder är att kognitivt krävande språkliga aktiviteter engagerar verkliga neurala system på sätt som korrelerar med bättre kognitiva utfall. Mekanismen är inte helt förstådd ännu.
 
@@ -463,13 +456,12 @@ Hur som helst, jag har ett rutnät som väntar och jag har redan lagt för lång
       },
       {
         content: `Källor:
-- Systematisk genomgång av fMRI-studier om ordbearbetning: AIMS Neuroscience (2021)
-- Metaanalys av verbalt vs. spatialt arbetsminne: Frontiers in Human Neuroscience (2019)
-- Hjärnkorrelat av handlingsordsminne: PMC (2022)
-- Hagoort, P. — MUC-modellen (Memory, Unification, Control): MUC-ramverket för språkneurovetenskap
-- University of Exeter & King's College London — Ordpusselstudie (19 000+ deltagare, 2019)
-- INHANCE-studien, McGill University — Acetylkolin och kognitiva övningar (2025)
-- FTC v. Lumos Labs (Lumosity) — 50 miljoner dollar-förlikning för vilseledande reklam (2016)`,
+- [Systematisk genomgång av fMRI-studier om språk och arbetsminne (Deldar m.fl.): AIMS Neuroscience (2021)](https://doi.org/10.3934/Neuroscience.2021001)
+- [Metaanalys av 42 fMRI-studier om verbalt arbetsminne (Emch m.fl.): Frontiers in Human Neuroscience (2019)](https://doi.org/10.3389/fnhum.2019.00180)
+- [Hagoort, P. — MUC-modellen (Memory, Unification, Control): Frontiers in Psychology (2013)](https://doi.org/10.3389/fpsyg.2013.00416)
+- [University of Exeter & King's College London — PROTECT-studien om ordpussel (19 078 deltagare): International Journal of Geriatric Psychiatry (2019)](https://doi.org/10.1002/gps.5033)
+- [INHANCE-studien, McGill University — Snabbhetsträning och acetylkolin: JMIR Serious Games (2025)](https://doi.org/10.2196/75161)
+- [FTC v. Lumos Labs (Lumosity) — dom på 50 miljoner dollar, varav 2 miljoner betalades, för vilseledande reklam (2016)](https://www.ftc.gov/news-events/news/press-releases/2016/01/lumosity-pay-2-million-settle-ftc-deceptive-advertising-charges-its-brain-training-program)`,
       },
     ],
     backToBlog: 'Tillbaka till Bloggen',
@@ -519,7 +511,7 @@ AIMS Neuroscience（2021年）に発表されたfMRI研究の系統的レビュ�
 
 それは癖じゃありません。音韻ループが働いているんです。
 
-Frontiers in Human Neuroscience（2019年）に発表されたメタ分析によると、言語ワーキングメモリ――単語を探しながら使える文字を頭に保持するときに使うもの――は主に左前頭前皮質を活性化します。空間ワーキングメモリ（地図上の物の場所を覚えるなど）は代わりに右側を活性化します。
+Frontiers in Human Neuroscience（2019年）に掲載された42件のfMRI研究のメタ分析によると、言語ワーキングメモリ――単語を探しながら文字を頭に保持するときに使うもの――は、長く考えられてきたように左脳だけで働くわけではありません。左右両方の前頭葉、左の頭頂葉、そして小脳にまたがるネットワークで動いています。
 
 音韻ループは基本的に言語用の脳のRAMです。情報を繰り返すことでアクティブに保つリハーサルメカニズムです。文字グリッドをスキャンしているとき、毎秒何十もの文字の組み合わせをこのループに通し、それぞれを語彙と照合しています。
 
@@ -537,11 +529,7 @@ Frontiers in Human Neuroscience（2019年）に発表されたメタ分析によ
 
 チャレンジングなワードゲームが簡単なものと本当に違って感じられるのはこのためです。主観的なものだけではありません。脳は文字通り、より多くの神経的な不動産を動員しているのです。
 
-自分のプレイでもこれを感じます。3文字や4文字の単語を見つけているときは、ほぼ自動的に感じます。リラックスさえします。でも、なかなか見つからない6文字や7文字の単語を探しているときは、努力の身体的な感覚があります。額が緊張します。前のめりになります。散歩とスプリントの違いのようなものです。同じ足で、まったく異なる強度です。
-
-研究もこれを裏付けています。PMC（2022年）に発表された動作語記憶の研究は、人がワーキングメモリに単語を保持しているとき、特に「走る」「投げる」「つかむ」のような動作動詞の場合、運動領域も活性化することを発見しました。脳は単語をフォルダ内のファイルのようには保存しません。音、意味、身体感覚、記憶を結ぶ豊かで相互接続されたネットワークとして保存します。
-
-だから文字グリッドで「跳ぶ」という単語を見つけると、運動皮質がわずかに反応します。まるで本当に跳ぶ準備をしているかのように。言語は身体化されているのです。「言語の部分」だけでなく、脳全体に生きています。`,
+自分のプレイでもこれを感じます。3文字や4文字の単語を見つけているときは、ほぼ自動的に感じます。リラックスさえします。でも、なかなか見つからない6文字や7文字の単語を探しているときは、努力の身体的な感覚があります。額が緊張します。前のめりになります。散歩とスプリントの違いのようなものです。同じ足で、まったく異なる強度です。`,
       },
       {
         title: 'ハゴートのMUCモデル：言語の3つのエンジン',
@@ -563,7 +551,7 @@ Frontiers in Human Neuroscience（2019年）に発表されたメタ分析によ
         title: '部屋の中の象：Lumosityスキャンダル',
         content: `さて。不快な話をする時間です。
 
-2016年、Lumosity――「脳トレ」の最大手――は連邦取引委員会（FTC）から5000万ドルの罰金を科されました。5000万ドルです。
+2016年、Lumosity――「脳トレ」の最大手――は連邦取引委員会（FTC）から5000万ドルの支払い命令を受けました。5000万ドルです。ただし会社の財務状況を理由に大半は猶予され、実際に支払ったのは消費者への返金にあてる200万ドルでした。
 
 なぜか？彼らのゲームがユーザーの仕事や学校でのパフォーマンスを向上させ、加齢に伴う認知機能の低下を遅らせ、アルツハイマー病などの状態に関連する認知障害を軽減できると主張したからです。これらの主張は彼らの証拠によって裏付けられていませんでした。
 
@@ -579,13 +567,13 @@ FTCは、Lumosityが「加齢に伴う認知機能低下に対する消費者の
         title: '研究が実際に示していること（正直に）',
         content: `よし、その注意書きをしっかり置いた上で、合理的な確信を持って言えることを述べましょう。
 
-最も大規模な最近の研究は、エクセター大学とキングス・カレッジ・ロンドンから来ています。50歳以上の19,000人以上の参加者を追跡し、定期的にワードパズルに取り組んでいると報告した人々を調査しました。結果は？定期的にワードパズルをしていた人は、認知テストで有意に良い成績を示しました。実年齢より約10歳若い脳に相当します。
+最も大規模な最近の研究は、エクセター大学とキングス・カレッジ・ロンドンによるものです。50〜93歳の19,000人以上に、ワードパズルをどのくらいの頻度で解くかを尋ね、認知テストを受けてもらいました。パズルをよく解く人ほど、テストの成績が良い傾向がありました。文法的推論のテストでは、最も頻繁に解く人たちは約10歳若い人と同じくらいの成績で、短期記憶では約8歳若い人と同じくらいでした。
 
 さて、大きな注意点：これは相関研究です。ワードパズルがより良いパフォーマンスを引き起こしたことは証明していません。すでにシャープな人がワードパズルを楽しむ傾向があるだけかもしれません。鶏が先か卵が先か問題です。
 
-しかし、効果量は注目に値するほど大きかったのです。わずかな変化ではありません。10年分の認知的差異は実質的です。
+しかし、効果量は注目に値するほど大きかったのです。わずかな変化ではありません。文法的推論で10年分の差は実質的です。
 
-次に、マクギル大学のINHANCE試験（2025年）があります。構造化された認知エクササイズ――ワードベースのタスクを含む――がアセチルコリンレベルの2.3%増加と関連していることを発見しました。アセチルコリンは記憶と学習に不可欠な神経伝達物質です。2.3%の上昇は小さく聞こえるかもしれませんが、神経伝達物質の世界では意味のある数字です。
+次に、マクギル大学のINHANCE試験（2025年）があります。高齢者が処理速度と注意力を鍛える2種類のコンピューター課題を10週間続けたところ、記憶と学習に欠かせない神経伝達物質アセチルコリンの働きが2.3%高まりました。普通のコンピューターゲームをしたグループでは変化がありませんでした。ただし使われた課題はワードゲームではないので、ワードゲームについてはまだ何も言えません。
 
 しかし――これが重要ですが――これらの研究のどちらも「ワードゲームをすれば脳が改善する」とは言っていません。認知的に要求の高い言語活動が、より良い認知的結果と相関する方法で実際の神経システムを活性化することを示唆しているのです。メカニズムはまだ完全には理解されていません。
 
@@ -641,13 +629,12 @@ FTCは、Lumosityが「加齢に伴う認知機能低下に対する消費者の
       },
       {
         content: `出典：
-- 単語処理に関するfMRI研究の系統的レビュー：AIMS Neuroscience（2021年）
-- 言語vs.空間ワーキングメモリのメタ分析：Frontiers in Human Neuroscience（2019年）
-- 動作語記憶の脳相関：PMC（2022年）
-- Hagoort, P. — MUC（記憶・統合・制御）モデル：言語神経科学のためのMUCフレームワーク
-- エクセター大学＆キングス・カレッジ・ロンドン — ワードパズル研究（19,000人以上の参加者、2019年）
-- INHANCE試験、マクギル大学 — アセチルコリンと認知エクササイズ（2025年）
-- FTC対Lumos Labs（Lumosity）— 欺瞞的広告に対する5000万ドルの和解（2016年）`,
+- [言語とワーキングメモリに関するfMRI研究の系統的レビュー（Deldarら）：AIMS Neuroscience（2021年）](https://doi.org/10.3934/Neuroscience.2021001)
+- [言語ワーキングメモリに関する42件のfMRI研究のメタ分析（Emchら）：Frontiers in Human Neuroscience（2019年）](https://doi.org/10.3389/fnhum.2019.00180)
+- [Hagoort, P. — MUC（記憶・統合・制御）モデル：Frontiers in Psychology（2013年）](https://doi.org/10.3389/fpsyg.2013.00416)
+- [エクセター大学＆キングス・カレッジ・ロンドン — ワードパズルに関するPROTECT研究（19,078人）：International Journal of Geriatric Psychiatry（2019年）](https://doi.org/10.1002/gps.5033)
+- [INHANCE試験、マクギル大学 — 処理速度トレーニングとアセチルコリン：JMIR Serious Games（2025年）](https://doi.org/10.2196/75161)
+- [FTC対Lumos Labs（Lumosity）— 欺瞞的広告に対する5000万ドルの支払い命令、うち200万ドルを支払い（2016年）](https://www.ftc.gov/news-events/news/press-releases/2016/01/lumosity-pay-2-million-settle-ftc-deceptive-advertising-charges-its-brain-training-program)`,
       },
     ],
     backToBlog: 'ブログに戻る',
@@ -711,7 +698,7 @@ FTCは、Lumosityが「加齢に伴う認知機能低下に対する消費者の
       },
       {
         title: 'Скандал Lumosity, о котором ты должен знать',
-        content: `В 2016 году Lumosity — самое большое имя в индустрии «тренировки мозга» — был оштрафован на 50 миллионов долларов Федеральной торговой комиссией. Пятьдесят. Миллионов. Долларов.
+        content: `В 2016 году Федеральная торговая комиссия вынесла против Lumosity, самого большого имени в индустрии «тренировки мозга», решение на 50 миллионов долларов. Пятьдесят. Миллионов. Долларов. Большую часть суммы отсрочили, потому что компании было нечем платить, и в итоге Lumosity выплатила 2 миллиона долларов, которые вернули покупателям.
 
 Почему? Потому что они заявляли, что их игры могут помочь пользователям лучше работать и учиться, отсрочить возрастное снижение познавательной способности и даже предотвратить нарушения когнитивных функций, связанные с болезнью Альцгеймера. Эти утверждения не поддерживались доказательствами.
 
@@ -727,13 +714,13 @@ FTCは、Lumosityが「加齢に伴う認知機能低下に対する消費者の
         title: 'Что исследования действительно показывают',
         content: `Хорошо, это предупреждение установлено. Вот что мы можем сказать с разумной уверенностью.
 
-Верхезе и его коллеги опубликовали ключевое исследование в New England Journal of Medicine в 2003 году, которое отслеживало 469 взрослых в течение 21 года. Участники, которые разгадывали кроссворды три или четыре раза в неделю, имели примерно на 38% меньший риск развития деменции, чем те, кто не занимался головоломками. Результат был корреляционным, а не причинно-следственным, но размер эффекта был большой, и выборка отслеживалась два десятилетия.
+Верхезе и его коллеги опубликовали ключевое исследование в New England Journal of Medicine в 2003 году: 469 человек старше 75 лет наблюдали в среднем пять лет. Те, кто часто читал, играл в настольные игры, музицировал или танцевал, реже заболевали деменцией, а каждый дополнительный день в неделю умственно активных занятий давал примерно на 7% меньший риск. Результат корреляционный, а не причинно-следственный, и сами авторы призвали проверить его контролируемыми испытаниями.
 
-Исследование PROTECT Университета Экзетера и Королевского колледжа Лондона (2019) добавило ещё одну точку данных. Более 19 000 взрослых в возрасте 50+ сообщили о своих привычках разгадывать головоломки со словами, а затем прошли когнитивные тесты. Регулярные игроки в словесные головоломки показали результаты на уровне примерно на 10 лет моложе их хронологического возраста.
+Исследование PROTECT Университета Экзетера и Королевского колледжа Лондона (2019) добавило ещё одну точку данных. Более 19 000 взрослых от 50 до 93 лет рассказали, как часто решают словесные головоломки, а затем прошли когнитивные тесты. Чем чаще люди решали головоломки, тем лучше были результаты. В тесте на грамматическое рассуждение самые частые любители головоломок показали результат людей примерно на 10 лет моложе, а в тесте на кратковременную память примерно на 8 лет моложе.
 
 Оба исследования — корреляционные. Они не могут доказать, что головоломки со словами вызвали лучший результат. Может быть, люди, которые уже более сообразительны, просто более вероятно любят словесные головоломки. Проблема курицы и яйца.
 
-Но размер эффекта достаточно большой, чтобы его принять всерьёз. 38% меньший риск деменции и десятилетний кажущийся когнитивный возрастной разрыв — это не статистический шум.
+Но эта закономерность слишком устойчива, чтобы от неё отмахнуться. Меньший риск деменции в одном исследовании и разрыв в 10 лет на тесте рассуждения в другом — это не статистический шум.
 
 Моё честное мнение: даже если словесные игры не делают тебя «умнее» каким-либо измеримым способом, занятие сосредоточенной и интеллектуальной деятельностью почти определённо лучше для твоего мозга, чем пассивная прокрутка социальных сетей. Планка — не «вылечит ли это деменцию». Планка — «это хорошее использование моей ментальной энергии». Да, я думаю, что это так.`,
       },
@@ -775,13 +762,13 @@ LexiClash доступен на английском, иврите, шведск
       },
       {
         content: `Источники:
-- Систематический обзор исследований fMRI по обработке слов: AIMS Neuroscience (2021)
-- Мета-анализ вербальной и пространственной рабочей памяти: Frontiers in Human Neuroscience (2019)
-- Verghese, J. et al. «Leisure Activities and the Risk of Dementia in the Elderly»: New England Journal of Medicine (2003), n=469, 21-летнее наблюдение
-- Brooker, H. et al. Исследование PROTECT, 19,000+ взрослых в возрасте 50+: Университет Экзетера и Королевский колледж Лондона (2019)
-- Hagoort, P. Модель MUC (Память, Унификация, Контроль): Институт Макса Планка
-- Bialystok, E., Craik, F. I. M., and Freedman, M. «Bilingualism as a protection against the onset of symptoms of dementia»: Neuropsychologia (2007), n=184
-- FTC v. Lumos Labs (Lumosity): Штраф на 50 млн. долларов за обманчивую рекламу (2016)`,
+- [Deldar, Z. и др. «The interaction between language and working memory: a systematic review of fMRI studies in the past two decades»: AIMS Neuroscience (2021)](https://doi.org/10.3934/Neuroscience.2021001)
+- [Emch, M. и др. «Neural Correlates of Verbal Working Memory: An fMRI Meta-Analysis»: Frontiers in Human Neuroscience (2019)](https://doi.org/10.3389/fnhum.2019.00180)
+- [Verghese, J. et al. «Leisure Activities and the Risk of Dementia in the Elderly»: New England Journal of Medicine (2003)](https://doi.org/10.1056/NEJMoa022252), n=469, медиана наблюдения 5,1 года
+- [Brooker, H. et al. Исследование PROTECT, 19 078 взрослых от 50 до 93 лет: International Journal of Geriatric Psychiatry (2019)](https://doi.org/10.1002/gps.5033)
+- [Hagoort, P. «MUC (Memory, Unification, Control) and beyond»: Frontiers in Psychology (2013)](https://doi.org/10.3389/fpsyg.2013.00416)
+- [Bialystok, E., Craik, F. I. M., and Freedman, M. «Bilingualism as a protection against the onset of symptoms of dementia»: Neuropsychologia (2007)](https://doi.org/10.1016/j.neuropsychologia.2006.10.009), n=184
+- [FTC v. Lumos Labs (Lumosity): решение на 50 млн долларов, выплачено 2 млн, за обманчивую рекламу (2016)](https://www.ftc.gov/news-events/news/press-releases/2016/01/lumosity-pay-2-million-settle-ftc-deceptive-advertising-charges-its-brain-training-program)`,
       },
     ],
     backToBlog: 'Вернуться к блогу',
@@ -831,7 +818,7 @@ Lo que me voló la cabeza: no es un área haciendo una cosa. Es una orquesta neu
 
 Eso no es una manía. Es tu bucle fonológico en acción.
 
-Un metaanálisis publicado en Frontiers in Human Neuroscience (2019) encontró que la memoria de trabajo verbal — el tipo que usas cuando mantienes letras en mente mientras buscas palabras — activa principalmente la corteza prefrontal izquierda. La memoria de trabajo espacial (como recordar dónde están las cosas en un mapa) ilumina más el lado derecho.
+Un metaanálisis de 42 estudios fMRI publicado en Frontiers in Human Neuroscience (2019) encontró que la memoria de trabajo verbal (la que usas cuando mantienes letras en mente mientras buscas palabras) no vive solo en el hemisferio izquierdo, como se pensó durante años. Funciona como una red que abarca ambos lóbulos frontales, la corteza parietal izquierda y el cerebelo.
 
 El bucle fonológico es básicamente la RAM de tu cerebro para el lenguaje. Es un mecanismo de ensayo que mantiene la información activa repitiéndola. Cuando escaneas una cuadrícula de letras, estás pasando docenas de combinaciones de letras por este bucle cada segundo, probando cada una contra tu vocabulario.
 
@@ -849,11 +836,7 @@ Por esto también es más difícil jugar juegos de palabras en un ambiente ruido
 
 Por esto un juego de palabras desafiante genuinamente se siente diferente a uno fácil. No es solo subjetivo. Tu cerebro literalmente está reclutando más bienes raíces neurales.
 
-Lo noto en mi propio juego. Cuando encuentro palabras de tres y cuatro letras, se siente casi automático. Hasta relajante. Pero cuando estoy cazando esa elusiva palabra de seis o siete letras, hay una sensación física de esfuerzo. Mi frente se tensa. Me inclino hacia adelante. Es como la diferencia entre un paseo casual y un sprint — mismas piernas, intensidad muy diferente.
-
-La investigación respalda esto. Un estudio sobre memoria de palabras de acción publicado en PMC (2022) encontró que cuando las personas mantienen palabras en la memoria de trabajo — especialmente verbos de acción como "correr", "lanzar" o "agarrar" — también activan áreas motoras. El cerebro no almacena palabras como archivos en una carpeta. Las almacena como redes ricas e interconectadas que vinculan sonido, significado, sensación física y memoria.
-
-Así que cuando encuentras la palabra SALTAR en una cuadrícula de letras, tu corteza motora se contrae ligeramente, como si se preparara para realmente saltar. El lenguaje es corporal. Vive en todo tu cerebro, no solo en las "partes del lenguaje".`,
+Lo noto en mi propio juego. Cuando encuentro palabras de tres y cuatro letras, se siente casi automático. Hasta relajante. Pero cuando estoy cazando esa elusiva palabra de seis o siete letras, hay una sensación física de esfuerzo. Mi frente se tensa. Me inclino hacia adelante. Es como la diferencia entre un paseo casual y un sprint — mismas piernas, intensidad muy diferente.`,
       },
       {
         title: 'El modelo MUC de Hagoort: Los tres motores del lenguaje',
@@ -875,7 +858,7 @@ Pienso en esto cada vez que alguien descarta los juegos de palabras como "solo u
         title: 'El elefante en la habitación: El escándalo de Lumosity',
         content: `Bien. Es hora de hablar de lo incómodo.
 
-En 2016, Lumosity — el nombre más grande en "entrenamiento cerebral" — fue multada con 50 millones de dólares por la Comisión Federal de Comercio (FTC). Cincuenta. Millones. De dólares.
+En 2016, la Comisión Federal de Comercio (FTC) impuso a Lumosity, el nombre más grande en "entrenamiento cerebral", una sentencia de 50 millones de dólares. Cincuenta. Millones. De dólares. La mayor parte quedó en suspenso porque la empresa no podía pagarla, y Lumosity terminó pagando 2 millones de dólares que se devolvieron a sus clientes.
 
 ¿Por qué? Porque afirmaron que sus juegos podían ayudar a los usuarios a rendir mejor en el trabajo y la escuela, retrasar el deterioro cognitivo relacionado con la edad, e incluso reducir el deterioro cognitivo asociado con condiciones como el Alzheimer. Estas afirmaciones no estaban respaldadas por su evidencia.
 
@@ -891,13 +874,13 @@ Lo que SÍ te estoy diciendo es lo que la neurociencia realmente muestra sobre l
         title: 'Lo que la investigación realmente muestra (honestamente)',
         content: `De acuerdo, con esa advertencia firmemente establecida, aquí está lo que podemos decir con confianza razonable.
 
-El estudio reciente más grande viene de la Universidad de Exeter y King's College London. Siguieron a más de 19,000 participantes de 50 años o más que reportaron participar regularmente en puzzles de palabras. ¿Los resultados? Las personas que hacían puzzles de palabras regularmente rindieron significativamente mejor en pruebas cognitivas — equivalente a tener un cerebro unos 10 años más joven que su edad real.
+El estudio reciente más grande viene de la Universidad de Exeter y King's College London. Evaluaron a más de 19,000 personas de 50 a 93 años y les preguntaron con qué frecuencia hacían puzzles de palabras. Cuanto más a menudo los hacían, mejor les iba en las pruebas cognitivas. En una prueba de razonamiento gramatical, quienes más puzzles hacían puntuaban como personas unos 10 años más jóvenes, y en memoria a corto plazo, como personas unos 8 años más jóvenes.
 
 Ahora, una advertencia masiva: este es un estudio correlacional. No prueba que los puzzles de palabras causaron el mejor rendimiento. Quizás las personas que ya son más agudas simplemente son más propensas a disfrutar los puzzles de palabras. El problema del huevo y la gallina.
 
-Pero el tamaño del efecto fue lo suficientemente grande como para ser notable. No estamos hablando de un cambio marginal. Diez años de diferencia cognitiva es sustancial.
+Pero el tamaño del efecto fue lo suficientemente grande como para ser notable. No estamos hablando de un cambio marginal. Diez años de diferencia en razonamiento gramatical es sustancial.
 
-Luego está el Ensayo INHANCE de la Universidad McGill (2025), que encontró que los ejercicios cognitivos estructurados — incluyendo tareas basadas en palabras — estaban asociados con un aumento del 2.3% en los niveles de acetilcolina. La acetilcolina es un neurotransmisor crucial para la memoria y el aprendizaje. Un aumento del 2.3% puede sonar pequeño, pero en términos de neurotransmisores, es significativo.
+Luego está el Ensayo INHANCE de la Universidad McGill (2025). Adultos mayores que practicaron durante diez semanas dos ejercicios de ordenador de velocidad y atención mostraron un aumento del 2.3% en la actividad de la acetilcolina, un neurotransmisor clave para la memoria y el aprendizaje. El grupo que jugó a juegos de ordenador normales no mostró ningún aumento. Los ejercicios no eran juegos de palabras, así que sobre los juegos de palabras este estudio todavía no dice nada.
 
 Sin embargo — y esto es crítico — ninguno de estos estudios dice "juega juegos de palabras y tu cerebro mejorará." Lo que sugieren es que las actividades lingüísticas cognitivamente exigentes involucran sistemas neurales reales de maneras que se correlacionan con mejores resultados cognitivos. El mecanismo aún no se entiende completamente.
 
@@ -953,13 +936,12 @@ En fin, tengo una cuadrícula esperándome y ya pasé demasiado tiempo escribien
       },
       {
         content: `Fuentes:
-- Revisión sistemática de estudios fMRI sobre procesamiento de palabras: AIMS Neuroscience (2021)
-- Metaanálisis de memoria de trabajo verbal vs. espacial: Frontiers in Human Neuroscience (2019)
-- Correlatos cerebrales de la memoria de palabras de acción: PMC (2022)
-- Hagoort, P. — Modelo MUC (Memoria, Unificación, Control): El marco MUC para la neurociencia del lenguaje
-- Universidad de Exeter y King's College London — Estudio de puzzles de palabras (19,000+ participantes, 2019)
-- Ensayo INHANCE, Universidad McGill — Acetilcolina y ejercicios cognitivos (2025)
-- FTC v. Lumos Labs (Lumosity) — Acuerdo de $50M por publicidad engañosa (2016)`,
+- [Revisión sistemática de estudios fMRI sobre lenguaje y memoria de trabajo (Deldar y otros): AIMS Neuroscience (2021)](https://doi.org/10.3934/Neuroscience.2021001)
+- [Metaanálisis de 42 estudios fMRI sobre memoria de trabajo verbal (Emch y otros): Frontiers in Human Neuroscience (2019)](https://doi.org/10.3389/fnhum.2019.00180)
+- [Hagoort, P. — Modelo MUC (Memoria, Unificación, Control): Frontiers in Psychology (2013)](https://doi.org/10.3389/fpsyg.2013.00416)
+- [Universidad de Exeter y King's College London — Estudio PROTECT sobre puzzles de palabras (19,078 participantes): International Journal of Geriatric Psychiatry (2019)](https://doi.org/10.1002/gps.5033)
+- [Ensayo INHANCE, Universidad McGill — Entrenamiento de velocidad y acetilcolina: JMIR Serious Games (2025)](https://doi.org/10.2196/75161)
+- [FTC v. Lumos Labs (Lumosity) — Sentencia de 50 millones de dólares, de los que se pagaron 2, por publicidad engañosa (2016)](https://www.ftc.gov/news-events/news/press-releases/2016/01/lumosity-pay-2-million-settle-ftc-deceptive-advertising-charges-its-brain-training-program)`,
       },
     ],
     backToBlog: 'Volver al Blog',

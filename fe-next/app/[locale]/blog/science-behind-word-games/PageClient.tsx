@@ -13,6 +13,7 @@ import AutoHideHeader from '@/components/AutoHideHeader';
 import { InlineBannerAd } from '@/components/ads';
 import { RelatedArticles } from '@/components/blog/RelatedArticles';
 import { contentByLocale } from './content';
+import { BlogProse } from '@/components/blog/BlogProse';
 import { AuthorBioCard } from '@/components/blog/AuthorBioCard';
 
 export default function SciencePageClient(): React.ReactElement {
@@ -153,7 +154,7 @@ export default function SciencePageClient(): React.ReactElement {
                     isDarkMode ? 'text-gray-300' : 'text-gray-700'
                   )}
                 >
-                  {paragraph}
+                  <BlogProse text={paragraph} />
                 </p>
               ))}
             </div>
