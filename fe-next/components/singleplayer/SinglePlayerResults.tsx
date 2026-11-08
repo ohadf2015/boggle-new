@@ -80,7 +80,6 @@ import { MissionsCompletedNote, RecordBadges } from './results/components/Record
 import type { DifficultyLevel } from '@/shared/types/game';
 
 const PerformanceChart = dynamic(() => import('@/components/results/PerformanceChart'), { ssr: false });
-const InlineSignupCard = dynamic(() => import('@/components/auth/InlineSignupCard'), { ssr: false });
 const MobileCompactLeaderboard = dynamic(() => import('@/components/results/MobileCompactLeaderboard'), { ssr: false });
 // Streak Ignition (t_89663cfc): the first-session payoff. Both cards read
 // localStorage, so they stay out of SSR and reserve their own min-h (CLS=0).
@@ -403,17 +402,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     <MobileCompactLeaderboard participants={leaderboardParticipants} />
   ) : null;
 
-  // Zero words + no coins = three empty tiles; the hero already says 0.
-  const signupBlock = !isAuthenticated && !authLoading ? (
-    <InlineSignupCard
-      isAuthenticated={isAuthenticated}
-      titleKey="results.saveStreak.title"
-      bodyKey="results.saveStreak.body"
-      onCTAClick={() => trackGrowthEvent('save_streak_clicked', { source: 'solo_results' })}
-      analyticsSource="results_inline"
-    />
-  ) : null;
-
   // Streak Ignition (t_89663cfc): the payoff directly below the celebration
   // hero — the visible streak + the persistent tomorrow hook. Two-column on
   // lg, stacked on mobile.
@@ -552,10 +540,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                 {!showShareImmediate && shareBlock}
                 {achievementsBlock}
                 {globalRank && <GlobalRankBadge rank={globalRank} label={t('leaderboard.globalRank')} />}
-                {/* Signup is demoted below the return CTAs and reframed as
-                    streak insurance (t_89663cfc) — the screen asks for a
-                    RETURN first, an account second. */}
-                {signupBlock}
               </div>
             </div>
             <div className="mt-6">{retentionBlock}</div>
@@ -593,12 +577,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             {globalRank && (
               <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.46 }}>
                 <GlobalRankBadge rank={globalRank} label={t('leaderboard.globalRank')} />
-              </m.div>
-            )}
-            {/* Signup reframed as streak insurance (t_89663cfc): ask for the RETURN first. */}
-            {signupBlock && (
-              <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.48 }}>
-                {signupBlock}
               </m.div>
             )}
             {/* Inline banner ad (web iframe; native shows no inline banner) */}

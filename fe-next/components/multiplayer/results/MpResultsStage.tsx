@@ -16,7 +16,7 @@ import { SERIES_TOTAL_GAMES } from '@/hooks/useSeriesTracker';
 import type { GameModeOption } from '@/components/GameModeSelector';
 import { cn } from '@/lib/utils';
 import { buildMpStandings, podiumTier } from './mpStandings';
-import { nextModeForViewer, pickBestWord, pickVisibleRows, readyTally, seriesLadder, seriesPlacing, showInlineSignup } from './mpResultsView';
+import { nextModeForViewer, pickBestWord, pickVisibleRows, readyTally, seriesLadder, seriesPlacing } from './mpResultsView';
 import { buildRevealTimeline } from './revealTimeline';
 import { useRevealStage } from './useRevealStage';
 import { useMpAutoContinue } from './useMpAutoContinue';
@@ -51,7 +51,6 @@ import { BossOutcomeCard } from '@/components/education/boss/BossOutcomeCard';
 import { useClassroomBossStore } from '@/stores/classroomBossStore';
 
 const MultiplayerSignupSheet = dynamic(() => import('@/components/auth/MultiplayerSignupSheet'), { ssr: false });
-const InlineSignupCard = dynamic(() => import('@/components/auth/InlineSignupCard'), { ssr: false });
 const SignupToast = dynamic(() => import('@/components/auth/SignupToast'), { ssr: false });
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
 const FloatingReaction = dynamic(() => import('@/components/game/QuickReactions').then((m) => m.FloatingReaction), { ssr: false });
@@ -204,8 +203,6 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   // otherwise the round is told as three awards.
   const grid = useMemo(() => seriesGrid({ ladder, standings: seriesStandings, rounds: seriesRoundNumber }), [ladder, seriesStandings, seriesRoundNumber]);
   const awards = useMemo(() => (grid ? null : roundAwards(data.sortedScores)), [grid, data.sortedScores]);
-
-  const signupShown = showInlineSignup({ isGuest: c.isGuest, isClassroom: c.isClassroom, footerShown, branch });
 
   const exitCopy = resultsExitCopy({ isClassroom: c.isClassroom, isHost });
   const bossOutcome = useClassroomBossStore((s) => s.view?.status === 'defeated' || s.view?.status === 'escaped');
@@ -368,9 +365,6 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
         <button type="button" onClick={handleSkip} className="self-center rounded-full px-4 py-2 text-[calc(12px*var(--mp-u,1))] font-bold uppercase tracking-widest text-neo-white/60">
           {t('mpUi.results.skipHint')}
         </button>
-      )}
-      {signupShown && (
-        <InlineSignupCard isAuthenticated={c.isAuthenticated} analyticsSource="results_inline" compact className={cn('shrink-0', fx.cardIn)} />
       )}
     </div>
   );

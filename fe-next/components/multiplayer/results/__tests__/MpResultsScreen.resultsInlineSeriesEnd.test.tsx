@@ -1,6 +1,7 @@
 /**
- * MpResultsScreen: the results_inline guest signup shows on the series-end
- * screen only, never in the auto-advance gap between rounds.
+ * MpResultsScreen: the results_inline guest signup surface was removed
+ * (83% of signup impressions at 0.6% conversion) — it must not render on
+ * the series-end screen nor in the auto-advance gap between rounds.
  */
 import React from 'react';
 import { render, fireEvent, screen, waitFor } from '@testing-library/react';
@@ -120,7 +121,7 @@ function renderScreen(over: Partial<React.ComponentProps<typeof MpResultsScreen>
 
 const skipReveal = () => fireEvent.pointerDown(screen.getByTestId('mp-results-stage'));
 
-describe('MpResultsScreen results_inline signup is series-end only', () => {
+describe('MpResultsScreen results_inline signup removed', () => {
   beforeEach(() => {
     h.flagKeys = [];
     h.guest = true;
@@ -138,10 +139,10 @@ describe('MpResultsScreen results_inline signup is series-end only', () => {
     expect(screen.queryByTestId('inline-signup-card')).toBeNull();
   });
 
-  it('the CTA renders on the series-end / Leave screen', () => {
+  it('the CTA does NOT render on the series-end / Leave screen either', () => {
     renderScreen({ seriesRoundNumber: 5, seriesTotalGames: 5 });
     skipReveal();
-    expect(screen.getByTestId('inline-signup-card')).toBeTruthy();
+    expect(screen.queryByTestId('inline-signup-card')).toBeNull();
   });
 
   it('no longer reads the ri-mp-series-end experiment flag', () => {

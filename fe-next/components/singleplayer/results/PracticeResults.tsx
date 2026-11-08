@@ -2,7 +2,6 @@
 
 import { memo, useEffect, useCallback, useMemo, useState, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import dynamic from 'next/dynamic';
 import { m, useMotionValue, useTransform, animate } from 'framer-motion';
 import { ArrowLeft, Trophy, Crosshair, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -32,11 +31,6 @@ import {
 } from '../results';
 import { CatalystTeaser } from './CatalystTeaser';
 import type { SinglePlayerResultsData } from '../SinglePlayerView';
-
-// SignupPromptHost owns the post-game prompt (t_4833c3cd). PracticeResults
-// only renders a non-blocking inline card so guests see value without a
-// second stacked modal racing the host.
-const InlineSignupCard = dynamic(() => import('@/components/auth/InlineSignupCard'), { ssr: false });
 
 // ─── Encouragement tiers — always positive ───
 
@@ -405,17 +399,6 @@ const PracticeResults = memo(function PracticeResults({
             </m.p>
           </m.div>
 
-
-          {/* Soft signup CTA — Host owns the timed prompt; no duplicate modal. */}
-          {!isAuthenticated && !authLoading && (
-            <InlineSignupCard
-              isAuthenticated={isAuthenticated}
-              titleKey="auth.firstWin.title"
-              bodyKey="auth.firstWin.subtitleValueProp"
-              className="mb-4"
-              analyticsSource="results_inline"
-            />
-          )}
 
           {/* ── Catalyst teaser — surfaces what's coming in arena/adventure ── */}
           <CatalystTeaser t={t} />

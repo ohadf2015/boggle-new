@@ -172,12 +172,3 @@ export function readyTally(players: ReadyPlayer[], readyUsernames: string[]): { 
 export function nextModeForViewer<M extends string>({ isHost, hostPick }: { isHost: boolean; hostPick: M }): M | null {
   return isHost ? hostPick : null;
 }
-
-export function showInlineSignup({ isGuest, isClassroom, footerShown, branch }: {
-  isGuest: boolean;
-  isClassroom: boolean;
-  footerShown: boolean;
-  branch: 'intermission' | 'final' | null;
-}): boolean {
-  return isGuest && !isClassroom && footerShown && branch === 'final';
-}

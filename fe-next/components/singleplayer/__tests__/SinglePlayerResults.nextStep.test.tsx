@@ -19,10 +19,13 @@ vi.mock('@/utils/session', () => ({
   clearSessionPreservingUsername: vi.fn(),
 }));
 
-// Mock dynamic imports
+// Mock dynamic imports — surface a marker for the removed results_inline
+// signup card so its absence can be pinned; all other dynamic children null.
 vi.mock('next/dynamic', () => ({
-  default: () => {
-    const MockComponent = () => null;
+  default: (loader: unknown) => {
+    const isInlineSignup = String(loader).includes('InlineSignupCard');
+    const MockComponent = () =>
+      isInlineSignup ? <div data-testid="inline-signup-card" data-signup-surface="results_inline" /> : null;
     return MockComponent;
   },
 }));
@@ -354,5 +357,34 @@ describe('SinglePlayerResults NextStep navigation bug', () => {
     // Should navigate to singleplayer with bots preset
     expect(mockRouterPush).toHaveBeenCalledWith('/en/singleplayer?preset=bots');
     expect(mockOnQuickRematch).not.toHaveBeenCalled();
+  });
+});
+
+describe('SinglePlayerResults results_inline signup card (removed)', () => {
+  // PostHog 28d: the card took 83% of signup impressions at 0.6% conversion,
+  // so the surface was removed — guests keep the header/menu signup path.
+  it('never renders the inline signup card for guests', () => {
+    const { container } = render(
+      <SinglePlayerResults
+        results={{
+          playerScore: 100,
+          playerWords: ['test'],
+          playerWordData: [{ word: 'test', isValid: true, score: 3, timestamp: Date.now(), timeSinceStart: 5 }],
+          botScores: [],
+          grid: [['T', 'E'], ['S', 'T']],
+          gameDuration: 120,
+          language: 'en' as const,
+          gameSessionId: 'test-session-123',
+          allPossibleWords: ['test'],
+          isNewHighScore: false,
+        }}
+        mode="practice"
+        onPlayAgain={vi.fn()}
+        onBackToLobby={vi.fn()}
+      />,
+    );
+
+    expect(screen.queryByTestId('inline-signup-card')).not.toBeInTheDocument();
+    expect(container.querySelector('[data-signup-surface="results_inline"]')).toBeNull();
   });
 });

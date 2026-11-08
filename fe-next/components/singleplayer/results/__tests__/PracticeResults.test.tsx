@@ -71,11 +71,6 @@ vi.mock('@/contexts/AuthContext', () => ({
   }),
 }));
 
-vi.mock('@/components/auth/InlineSignupCard', () => ({
-  __esModule: true,
-  default: () => <div data-testid="inline-signup-card">InlineSignup</div>,
-}));
-
 vi.mock('@/hooks/useReducedMotion', () => ({
   __esModule: true,
   default: () => true, // Disable animations in tests
@@ -322,6 +317,18 @@ describe('PracticeResults — Celebratory Redesign', () => {
     it('does not render a "Play Again" button (replaced by daily-challenge primary CTA)', () => {
       render(<PracticeResults {...defaultProps} />);
       expect(screen.queryByText('Play Again')).not.toBeInTheDocument();
+    });
+  });
+
+  // ── results_inline signup card removed ──
+
+  describe('results_inline signup card (removed)', () => {
+    // PostHog 28d: the card took 83% of signup impressions but 0.6% converted,
+    // so the surface was removed entirely — guests keep the header/menu path.
+    it('does not render the inline signup card for guests', () => {
+      render(<PracticeResults {...defaultProps} />);
+      expect(document.querySelector('[data-signup-surface="results_inline"]')).toBeNull();
+      expect(screen.queryByTestId('inline-signup-card')).not.toBeInTheDocument();
     });
   });
 
