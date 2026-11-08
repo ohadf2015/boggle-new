@@ -1280,6 +1280,7 @@ const es = {
   // @home-play:start
   "homePlay": {
     "heroLine": "Sesenta segundos, un tablero nuevo y tres rivales que no te esperan.",
+    "intro": "LexiClash es un juego de palabras gratis que se juega en el navegador. Encuentra todas las palabras que puedas en un tablero de letras, contra bots, amigos o toda una clase, en seis idiomas.",
     "playSub": "Modo aleatorio",
     "pickMode": "O elige tú el modo",
     "timerBadge": "60 s",

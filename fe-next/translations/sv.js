@@ -1280,6 +1280,7 @@ const sv = {
   // @home-play:start
   "homePlay": {
     "heroLine": "Sextio sekunder, en ny bricka och tre motståndare som inte väntar på dig.",
+    "intro": "LexiClash är ett gratis ordspel som du spelar direkt i webbläsaren. Hitta så många ord du kan på en bokstavsbräda, mot botar, kompisar eller en hel klass, på sex språk.",
     "playSub": "Slumpat läge",
     "pickMode": "Eller välj läge själv",
     "timerBadge": "60 s",

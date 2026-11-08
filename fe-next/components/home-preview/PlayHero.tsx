@@ -116,6 +116,9 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
             >
               {t('homePlay.heroLine')}
             </h1>
+            <p className="mx-auto mt-2 max-w-sm text-sm leading-snug text-neo-white/75 [@media(max-height:700px)]:text-xs lg:mx-0 lg:mt-4 lg:max-w-xl lg:text-lg">
+              {t('homePlay.intro')}
+            </p>
           </div>
 
           <Link
