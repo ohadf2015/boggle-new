@@ -75,7 +75,7 @@ describe('FreshHero', () => {
     fireEvent(play, evt);
     expect(onPlay).toHaveBeenCalledTimes(1);
     expect(evt.defaultPrevented).toBe(true);
-    expect(track).toHaveBeenCalledWith('fresh_hero_play');
+    expect(track).toHaveBeenCalledWith('fresh_hero_play', { opens_ftue: true });
   });
 
   it('"I have an account" opens sign-in', () => {
