@@ -81,7 +81,9 @@ describe('TabbedDailyLeaderboard — combined Today board', () => {
     serve({ data: [entry(1), entry(2, { isYou: true })], total: 2, countries: [] });
     render(<TabbedDailyLeaderboard puzzleDate="2026-10-30" language="en" t={t} />);
     await screen.findByText('P2');
-    expect(screen.queryByTestId('you-readout')).not.toBeInTheDocument();
+    // The observer reports in an effect after the row paints; on a slow runner
+    // the first frame still shows the pin, so wait for the report to land.
+    await waitFor(() => expect(screen.queryByTestId('you-readout')).not.toBeInTheDocument());
   });
 
   it('says "be the first" when nobody has played yet', async () => {
