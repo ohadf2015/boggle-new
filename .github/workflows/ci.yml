@@ -89,16 +89,26 @@ jobs:
           cache: npm
           cache-dependency-path: fe-next/package-lock.json
       - run: |
-          # @posthog/cli's postinstall downloads a GitHub release asset that has been
-          # intermittently 504ing (GitHub asset-storage issue, hits ~80% of runs).
-          # Retry the install a few times instead of failing the whole job.
+          # @posthog/cli's postinstall downloads a GitHub release asset that is currently
+          # 504ing on most fetches (GitHub asset-storage issue, verified from outside CI).
+          # The binary is only used by `next build` sourcemap upload, which CI never runs.
+          # Retry plain npm ci twice (sometimes an edge node serves the asset), then fall
+          # back to --ignore-scripts + selective rebuild of every install-script package
+          # EXCEPT @posthog/cli.
           ok=0
-          for i in 1 2 3 4; do
+          for i in 1 2; do
             if npm ci --prefer-offline --no-audit; then ok=1; break; fi
-            echo "npm ci attempt $i failed; retrying in 20s"
-            sleep 20
+            echo "npm ci attempt $i failed; retrying in 15s"
+            sleep 15
           done
-          [ "$ok" = 1 ]
+          if [ "$ok" != 1 ]; then
+            echo "::warning::npm ci failing on @posthog/cli asset 504s — falling back to --ignore-scripts + selective rebuild"
+            npm ci --prefer-offline --no-audit --ignore-scripts
+            npm rebuild @firebase/util @parcel/watcher @swc/core core-js esbuild msgpackr-extract msw protobufjs sharp unrs-resolver
+            npm rebuild @sentry/cli || echo "::warning::@sentry/cli binary missing (only used by next build sourcemap upload, not CI)"
+            npx esbuild --version
+            node -e "require('sharp'); console.log('sharp OK')"
+          fi
         working-directory: fe-next
       - name: Lint
         working-directory: fe-next
@@ -122,16 +132,26 @@ jobs:
           cache: npm
           cache-dependency-path: fe-next/package-lock.json
       - run: |
-          # @posthog/cli's postinstall downloads a GitHub release asset that has been
-          # intermittently 504ing (GitHub asset-storage issue, hits ~80% of runs).
-          # Retry the install a few times instead of failing the whole job.
+          # @posthog/cli's postinstall downloads a GitHub release asset that is currently
+          # 504ing on most fetches (GitHub asset-storage issue, verified from outside CI).
+          # The binary is only used by `next build` sourcemap upload, which CI never runs.
+          # Retry plain npm ci twice (sometimes an edge node serves the asset), then fall
+          # back to --ignore-scripts + selective rebuild of every install-script package
+          # EXCEPT @posthog/cli.
           ok=0
-          for i in 1 2 3 4; do
+          for i in 1 2; do
             if npm ci --prefer-offline --no-audit; then ok=1; break; fi
-            echo "npm ci attempt $i failed; retrying in 20s"
-            sleep 20
+            echo "npm ci attempt $i failed; retrying in 15s"
+            sleep 15
           done
-          [ "$ok" = 1 ]
+          if [ "$ok" != 1 ]; then
+            echo "::warning::npm ci failing on @posthog/cli asset 504s — falling back to --ignore-scripts + selective rebuild"
+            npm ci --prefer-offline --no-audit --ignore-scripts
+            npm rebuild @firebase/util @parcel/watcher @swc/core core-js esbuild msgpackr-extract msw protobufjs sharp unrs-resolver
+            npm rebuild @sentry/cli || echo "::warning::@sentry/cli binary missing (only used by next build sourcemap upload, not CI)"
+            npx esbuild --version
+            node -e "require('sharp'); console.log('sharp OK')"
+          fi
         working-directory: fe-next
       - run: npx tsx scripts/build-i18n-assets.ts --skip-brotli && npx tsc --noEmit
         working-directory: fe-next
@@ -158,16 +178,26 @@ jobs:
           cache: npm
           cache-dependency-path: fe-next/package-lock.json
       - run: |
-          # @posthog/cli's postinstall downloads a GitHub release asset that has been
-          # intermittently 504ing (GitHub asset-storage issue, hits ~80% of runs).
-          # Retry the install a few times instead of failing the whole job.
+          # @posthog/cli's postinstall downloads a GitHub release asset that is currently
+          # 504ing on most fetches (GitHub asset-storage issue, verified from outside CI).
+          # The binary is only used by `next build` sourcemap upload, which CI never runs.
+          # Retry plain npm ci twice (sometimes an edge node serves the asset), then fall
+          # back to --ignore-scripts + selective rebuild of every install-script package
+          # EXCEPT @posthog/cli.
           ok=0
-          for i in 1 2 3 4; do
+          for i in 1 2; do
             if npm ci --prefer-offline --no-audit; then ok=1; break; fi
-            echo "npm ci attempt $i failed; retrying in 20s"
-            sleep 20
+            echo "npm ci attempt $i failed; retrying in 15s"
+            sleep 15
           done
-          [ "$ok" = 1 ]
+          if [ "$ok" != 1 ]; then
+            echo "::warning::npm ci failing on @posthog/cli asset 504s — falling back to --ignore-scripts + selective rebuild"
+            npm ci --prefer-offline --no-audit --ignore-scripts
+            npm rebuild @firebase/util @parcel/watcher @swc/core core-js esbuild msgpackr-extract msw protobufjs sharp unrs-resolver
+            npm rebuild @sentry/cli || echo "::warning::@sentry/cli binary missing (only used by next build sourcemap upload, not CI)"
+            npx esbuild --version
+            node -e "require('sharp'); console.log('sharp OK')"
+          fi
         working-directory: fe-next
       - run: npx tsx scripts/build-i18n-assets.ts --skip-brotli && npm run build:schemas
         working-directory: fe-next
@@ -215,16 +245,26 @@ jobs:
           cache: npm
           cache-dependency-path: fe-next/package-lock.json
       - run: |
-          # @posthog/cli's postinstall downloads a GitHub release asset that has been
-          # intermittently 504ing (GitHub asset-storage issue, hits ~80% of runs).
-          # Retry the install a few times instead of failing the whole job.
+          # @posthog/cli's postinstall downloads a GitHub release asset that is currently
+          # 504ing on most fetches (GitHub asset-storage issue, verified from outside CI).
+          # The binary is only used by `next build` sourcemap upload, which CI never runs.
+          # Retry plain npm ci twice (sometimes an edge node serves the asset), then fall
+          # back to --ignore-scripts + selective rebuild of every install-script package
+          # EXCEPT @posthog/cli.
           ok=0
-          for i in 1 2 3 4; do
+          for i in 1 2; do
             if npm ci --prefer-offline --no-audit; then ok=1; break; fi
-            echo "npm ci attempt $i failed; retrying in 20s"
-            sleep 20
+            echo "npm ci attempt $i failed; retrying in 15s"
+            sleep 15
           done
-          [ "$ok" = 1 ]
+          if [ "$ok" != 1 ]; then
+            echo "::warning::npm ci failing on @posthog/cli asset 504s — falling back to --ignore-scripts + selective rebuild"
+            npm ci --prefer-offline --no-audit --ignore-scripts
+            npm rebuild @firebase/util @parcel/watcher @swc/core core-js esbuild msgpackr-extract msw protobufjs sharp unrs-resolver
+            npm rebuild @sentry/cli || echo "::warning::@sentry/cli binary missing (only used by next build sourcemap upload, not CI)"
+            npx esbuild --version
+            node -e "require('sharp'); console.log('sharp OK')"
+          fi
         working-directory: fe-next
       - run: npx tsx scripts/build-i18n-assets.ts --skip-brotli && npm run build:schemas
         working-directory: fe-next
@@ -253,16 +293,26 @@ jobs:
           cache: npm
           cache-dependency-path: fe-next/package-lock.json
       - run: |
-          # @posthog/cli's postinstall downloads a GitHub release asset that has been
-          # intermittently 504ing (GitHub asset-storage issue, hits ~80% of runs).
-          # Retry the install a few times instead of failing the whole job.
+          # @posthog/cli's postinstall downloads a GitHub release asset that is currently
+          # 504ing on most fetches (GitHub asset-storage issue, verified from outside CI).
+          # The binary is only used by `next build` sourcemap upload, which CI never runs.
+          # Retry plain npm ci twice (sometimes an edge node serves the asset), then fall
+          # back to --ignore-scripts + selective rebuild of every install-script package
+          # EXCEPT @posthog/cli.
           ok=0
-          for i in 1 2 3 4; do
+          for i in 1 2; do
             if npm ci --prefer-offline --no-audit; then ok=1; break; fi
-            echo "npm ci attempt $i failed; retrying in 20s"
-            sleep 20
+            echo "npm ci attempt $i failed; retrying in 15s"
+            sleep 15
           done
-          [ "$ok" = 1 ]
+          if [ "$ok" != 1 ]; then
+            echo "::warning::npm ci failing on @posthog/cli asset 504s — falling back to --ignore-scripts + selective rebuild"
+            npm ci --prefer-offline --no-audit --ignore-scripts
+            npm rebuild @firebase/util @parcel/watcher @swc/core core-js esbuild msgpackr-extract msw protobufjs sharp unrs-resolver
+            npm rebuild @sentry/cli || echo "::warning::@sentry/cli binary missing (only used by next build sourcemap upload, not CI)"
+            npx esbuild --version
+            node -e "require('sharp'); console.log('sharp OK')"
+          fi
         working-directory: fe-next
       - run: npx tsx scripts/build-i18n-assets.ts --skip-brotli && npm run build:schemas
         working-directory: fe-next
