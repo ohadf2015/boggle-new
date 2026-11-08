@@ -86,7 +86,9 @@ export function mapAnalyticsEventToGame(
     guest_session_id: row.session_id,
     game_code: str(meta.gameCode) ?? 'solo',
     score: num(meta.score) ?? 0,
-    word_count: num(meta.wordCount) ?? 0,
+    // Abandons carry the running count as `words_found` (abandonOnPagehide), not
+    // `wordCount` — reading only wordCount showed every left game as 0 words.
+    word_count: num(meta.wordCount) ?? num(meta.words_found) ?? 0,
     longest_word: null,
     placement: null,
     is_ranked: false,
@@ -122,6 +124,13 @@ export function mapAnalyticsEventToGame(
     // as an error flagged every normal leave as an error in the admin log.
     error_reason: str(meta.error_reason),
     leave_reason: row.event_type === 'game_abandoned' ? str(meta.reason) : null,
+    // Stamped server-side from the user agent (headless/automation); never client-claimed.
+    is_automated: bool(meta.is_automated) ?? false,
+    sub_mode: str(meta.sp_mode) ?? str(meta.subMode),
+    coach_step: str(meta.coach_step),
+    landing_path: str(meta.landing_path),
+    floors: num(meta.floors),
+    first_word_sec: num(meta.first_word_sec),
     source: 'analytics',
   };
 }

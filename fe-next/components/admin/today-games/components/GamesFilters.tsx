@@ -2,18 +2,21 @@
 
 import React from 'react';
 import { Filter } from 'lucide-react';
-import type { GameTypeFilter, GameLogSource } from '../types';
+import type { GameLogSource } from '../types';
 import { DATE_RANGES, type DateRange } from '../constants';
+import { CANONICAL_MODE_BUCKETS } from '@/lib/admin/gameLog/modeBuckets';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface GamesFiltersProps {
   languageFilter: string;
-  gameTypeFilter: GameTypeFilter;
+  modeFilter: string;
+  /** Games per mode bucket under the current show filter (analytics source). */
+  modeCounts: Record<string, number> | null;
   rankedFilter: string;
   dateRange: DateRange;
   logSource: GameLogSource;
   onLanguageChange: (value: string) => void;
-  onGameTypeChange: (value: GameTypeFilter) => void;
+  onModeChange: (value: string) => void;
   onRankedChange: (value: string) => void;
   onDateRangeChange: (value: DateRange) => void;
   onLogSourceChange: (value: GameLogSource) => void;
@@ -30,19 +33,20 @@ const DATE_RANGE_FALLBACK: Record<DateRange, string> = {
 
 export function GamesFilters({
   languageFilter,
-  gameTypeFilter,
+  modeFilter,
+  modeCounts,
   rankedFilter,
   dateRange,
   logSource,
   onLanguageChange,
-  onGameTypeChange,
+  onModeChange,
   onRankedChange,
   onDateRangeChange,
   onLogSourceChange,
   t,
 }: GamesFiltersProps) {
   return (
-    <div className="flex flex-wrap gap-3 bg-neo-navy-light/50 rounded-neo border-neo border-black p-4">
+    <div className="flex flex-wrap gap-2 sm:gap-3 bg-neo-navy-light/50 rounded-neo border-neo border-black p-3 sm:p-4">
       <div className="flex items-center gap-2">
         <Filter className="w-4 h-4 text-slate-400" />
         <span className="text-sm text-slate-400">
@@ -80,19 +84,26 @@ export function GamesFilters({
         </SelectContent>
       </Select>
 
-      <Select value={gameTypeFilter} onValueChange={(v) => onGameTypeChange(v as GameTypeFilter)}>
-        <SelectTrigger className="h-8 w-auto bg-neo-navy-elevated text-neo-white text-sm border-black px-3 py-1.5">
+      {/* Mode — every canonical bucket, with live counts; empty buckets sink to the end. */}
+      <Select value={modeFilter} onValueChange={onModeChange}>
+        <SelectTrigger
+          className="h-8 w-auto max-w-[60vw] bg-neo-navy-elevated text-neo-white text-sm border-black px-3 py-1.5"
+          aria-label={t('admin.todayGames.detail.mode', 'Mode')}
+          data-testid="mode-filter"
+        >
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">{t('admin.todayGames.allTypes')}</SelectItem>
-          <SelectItem value="multiplayer">{t('admin.todayGames.multiplayer')}</SelectItem>
-          <SelectItem value="word_hunt">{t('admin.todayGames.wordHunt')}</SelectItem>
-          <SelectItem value="daily_challenge">{t('admin.todayGames.daily')}</SelectItem>
-          <SelectItem value="drill">{t('admin.todayGames.drills')}</SelectItem>
-          <SelectItem value="blast">{t('admin.todayGames.blast', 'Blast')}</SelectItem>
-          <SelectItem value="word_wheel">{t('admin.todayGames.wordWheel', 'Word Wheel')}</SelectItem>
-          <SelectItem value="practice">{t('admin.todayGames.practice', 'Practice')}</SelectItem>
+          <SelectItem value="all">
+            {t('admin.todayGames.allTypes', 'All modes')}{modeCounts ? ` (${modeCounts.all ?? 0})` : ''}
+          </SelectItem>
+          {[...CANONICAL_MODE_BUCKETS]
+            .sort((a, b) => (modeCounts?.[b.key] ?? 0) - (modeCounts?.[a.key] ?? 0))
+            .map((b) => (
+              <SelectItem key={b.key} value={b.key}>
+                {t(`admin.todayGames.${b.labelKey}`, b.label)}{modeCounts ? ` (${modeCounts[b.key] ?? 0})` : ''}
+              </SelectItem>
+            ))}
         </SelectContent>
       </Select>
 

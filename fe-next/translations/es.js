@@ -11972,8 +11972,57 @@ const es = {
       "info": "Los emails de prueba se envían con el prefijo [TEST] en el asunto. Usan la misma plantilla que los emails del desafío diario de producción."
     },
     "todayGames": {
+      "engagement": {
+        "bot": "Bot",
+        "neverPlayed": "nunca jugó",
+        "leftAfter": "Salió tras {time}",
+        "finishedEmpty": "Terminó · 0 palabras"
+      },
+      "show": {
+        "label": "Mostrar",
+        "people": "Personas",
+        "real": "Jugadas",
+        "empty": "Vacías",
+        "bots": "Bots",
+        "all": "Todo",
+        "peopleHint": "Todos menos bots",
+        "realHint": "Encontró una palabra, puntuó o construyó un piso",
+        "emptyHint": "Personas que salieron o terminaron sin encontrar nada",
+        "botsHint": "Visitantes automatizados",
+        "allHint": "Todo, bots incluidos"
+      },
+      "subMode": {
+        "challenge": "Solo con tiempo",
+        "solo-bots": "contra bots",
+        "practice": "Práctica sin tiempo"
+      },
+      "coachStep": {
+        "inline-hint": "primera pista",
+        "trace": "lección de trazo",
+        "playing": "jugando",
+        "skipped": "saltó el tutor",
+        "complete": "tutor completo"
+      },
+      "pointsShort": "pts",
+      "wordsShort": "palabras",
+      "singleplayer": "Un jugador",
+      "wordTower": "Torre de palabras",
+      "classic": "Clásico",
+      "survival": "Supervivencia",
+      "adventure": "Aventura",
+      "connections": "Conexiones",
+      "wordCraft": "Word Craft",
+      "crossword": "Crucigrama",
+      "brainDrill": "Entrenamiento mental",
+      "quickPlay": "Partida rápida",
+      "tutorial": "Tutorial",
       "title": "Juegos de Hoy",
       "detail": {
+        "timeInGame": "Tiempo en juego",
+        "firstWord": "Primera palabra",
+        "floors": "Pisos",
+        "coachStep": "Paso del tutor",
+        "page": "Página",
         "acquisition": "Proviene de",
         "botsNa": "bots no registrados",
         "country": "País",

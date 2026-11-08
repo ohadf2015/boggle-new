@@ -11,6 +11,7 @@ import { getSupabaseAdmin } from '@/lib/admin/server';
 import { mapAnalyticsEventToGame, isNudgePhantomRow, type AnalyticsEventRow } from '@/lib/admin/gameLog/analyticsEventMapper';
 import { CANONICAL_MODE_BUCKETS, unbucketedModes } from '@/lib/admin/gameLog/modeBuckets';
 import { groupGames, type GameGroup } from '@/lib/admin/gameLog/groupGames';
+import { filterGameGroups, parseShowFilter, parseModeFilter, type ShowFilter } from '@/lib/admin/gameLog/filterGroups';
 import type { GameProfile } from '@/components/admin/today-games/types';
 
 type ProfileEmbed = unknown;
@@ -229,6 +230,8 @@ export async function GET(request: NextRequest) {
     if (source === 'analytics') {
       return await fetchFromAnalyticsEvents({
         supabase, page, pageSize, offset, ascending, language, gameType, startDate, endDate,
+        show: parseShowFilter(searchParams.get('show')),
+        mode: parseModeFilter(searchParams.get('mode')),
       });
     }
 
@@ -965,9 +968,13 @@ async function fetchFromAnalyticsEvents(opts: {
   gameType: string;
   startDate: string | null;
   endDate: string | null;
+  /** people (default, hides bots) | real | empty | bots | all */
+  show: ShowFilter;
+  /** Mode bucket key, 'multiplayer', or 'all'. */
+  mode: string;
 }): Promise<NextResponse> {
   // `language` is intentionally omitted — analytics_events has no per-game language.
-  const { supabase, page, pageSize, offset, ascending, gameType, startDate, endDate } = opts;
+  const { supabase, page, pageSize, offset, ascending, gameType, startDate, endDate, show, mode } = opts;
 
   const applyCommon = (q: PgFilter): PgFilter => {
     // Lifecycle events that define a play. game_started carries host attribution;
@@ -1034,20 +1041,23 @@ async function fetchFromAnalyticsEvents(opts: {
     });
 
   // Collapse per-player/per-event rows into one group per game.
-  let groups: GameGroup[] = groupGames(games);
-  if (ascending) groups = [...groups].reverse(); // groupGames sorts createdAt desc
+  let allGroups: GameGroup[] = groupGames(games);
+  if (ascending) allGroups = [...allGroups].reverse(); // groupGames sorts createdAt desc
+
+  // Show (people/real/empty/bots) + mode filters, each counted under the other.
+  const { groups, showCounts, modeCounts } = filterGameGroups(allGroups, { show, mode });
 
   const totalCount = groups.length;
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
   const pageGroups = groups.slice(offset, offset + pageSize);
 
-  // Per-type counts at the GROUP level (the "correct" stats the founder wants).
-  const bucketCounts = CANONICAL_MODE_BUCKETS.map((b) => {
-    const count = b.multiplayer
-      ? groups.filter((g) => g.isMultiplayer).length
-      : groups.filter((g) => !g.isMultiplayer && g.typeBucket === b.key).length;
-    return { key: b.key, labelKey: b.labelKey, label: b.label, count };
-  });
+  // Per-type counts at the GROUP level, under the current show filter.
+  const bucketCounts = CANONICAL_MODE_BUCKETS.map((b) => ({
+    key: b.key,
+    labelKey: b.labelKey,
+    label: b.label,
+    count: modeCounts[b.key] ?? 0,
+  }));
   const mpBucket = bucketCounts.find((b) => b.key === 'multiplayer');
 
   // Gap guard: surface raw modes that have no type bucket so new modes can't rot silently.
@@ -1060,6 +1070,8 @@ async function fetchFromAnalyticsEvents(opts: {
     gameGroups: pageGroups,
     unbucketedModes: unbucketed,
     truncated,
+    showCounts,
+    modeCounts,
     pagination: {
       page,
       pageSize,

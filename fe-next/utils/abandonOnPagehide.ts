@@ -20,6 +20,8 @@ export type AbandonReason = 'pagehide' | 'hidden' | 'spa_navigate' | 'exit';
 
 export interface AbandonExtras {
   words_found?: number;
+  /** Running score, so the admin log can tell a scored leave from an empty one. */
+  score?: number;
   /** Standing floors when the mode's unit of progress is not words (Word Tower). */
   floors?: number;
   sp_mode?: string;
@@ -35,6 +37,8 @@ interface ActiveGame {
   mode: string;
   startedAt: number;
   extras: AbandonExtras;
+  /** When words_found first went above 0 (ms epoch). Derived, never caller-set. */
+  firstWordAt: number | null;
 }
 
 let active: ActiveGame | null = null;
@@ -104,9 +108,12 @@ export function markGameActive(mode: string, extras: AbandonExtras = {}): void {
   const queued = pendingExtras;
   pendingExtras = null;
   abandonedWhileHidden = false;
+  const startedAt = Date.now();
   active = {
     mode,
-    startedAt: Date.now(),
+    startedAt,
+    // A word found before the deferred start counts as found at second 0.
+    firstWordAt: (queued?.words_found ?? 0) > 0 ? startedAt : null,
     extras: {
       words_found: extras.words_found ?? 0,
       sp_mode: extras.sp_mode,
@@ -126,7 +133,20 @@ export function updateActiveGameExtras(patch: AbandonExtras): void {
     pendingExtras = { ...(pendingExtras ?? {}), ...patch };
     return;
   }
+  if (active.firstWordAt == null && (patch.words_found ?? 0) > 0) {
+    active.firstWordAt = Date.now();
+  }
   active.extras = { ...active.extras, ...patch };
+}
+
+/**
+ * Timing facts about the running game for the end/abandon payload. Read by
+ * `trackGameEnd` before it clears the active game. `first_word_sec` is absent
+ * until a mode reports words via `updateActiveGameExtras`.
+ */
+export function activeGameTiming(): { first_word_sec?: number } {
+  if (!active || active.firstWordAt == null) return {};
+  return { first_word_sec: Math.round((active.firstWordAt - active.startedAt) / 1000) };
 }
 
 export function markGameInactive(): void {
@@ -170,6 +190,7 @@ function emitAbandonIfActive(reason: 'hidden' | 'pagehide') {
     gameMode: active.mode,
     durationSec: Math.round(durationMs / 1000),
     reason,
+    ...activeGameTiming(),
     ...active.extras,
   };
   try {
@@ -215,6 +236,7 @@ export function installAbandonOnPagehide(): () => void {
 export function emitAbandonOnExit(): void {
   if (!active || alreadyEmitted) return;
   const snapshot = active;
+  const timing = activeGameTiming();
   const durationMs = Date.now() - snapshot.startedAt;
   if (durationMs < MIN_ENGAGED_MS) return;
 
@@ -226,6 +248,7 @@ export function emitAbandonOnExit(): void {
       gameMode: snapshot.mode,
       durationSec: Math.round(durationMs / 1000),
       reason: 'exit',
+      ...timing,
       ...snapshot.extras,
     };
     try {
@@ -246,6 +269,7 @@ export function emitAbandonOnExit(): void {
 export function emitAbandonOnSpaNavigate(): void {
   if (!active || alreadyEmitted) return;
   const snapshot = active;
+  const timing = activeGameTiming();
   const durationMs = Date.now() - snapshot.startedAt;
   if (durationMs < MIN_ENGAGED_MS) return;
 
@@ -266,6 +290,7 @@ export function emitAbandonOnSpaNavigate(): void {
       gameMode: snapshot.mode,
       durationSec: Math.round(durationMs / 1000),
       reason: 'spa_navigate',
+      ...timing,
       ...snapshot.extras,
     };
     try {

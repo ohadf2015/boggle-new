@@ -12324,7 +12324,56 @@ const sv = {
       "info": "Testmail skickas med prefixet [TEST] i ämnesraden. De använder samma mall som produktionens dagliga utmaningsmail."
     },
     "todayGames": {
+      "engagement": {
+        "bot": "Bot",
+        "neverPlayed": "spelade aldrig",
+        "leftAfter": "Lämnade efter {time}",
+        "finishedEmpty": "Klar · 0 ord"
+      },
+      "show": {
+        "label": "Visa",
+        "people": "Personer",
+        "real": "Spelade",
+        "empty": "Tomma",
+        "bots": "Botar",
+        "all": "Alla",
+        "peopleHint": "Alla utom botar",
+        "realHint": "Hittade ett ord, fick poäng eller byggde en våning",
+        "emptyHint": "Personer som lämnade eller slutade utan att hitta något",
+        "botsHint": "Automatiska besökare",
+        "allHint": "Allt, inklusive botar"
+      },
+      "subMode": {
+        "challenge": "Solo på tid",
+        "solo-bots": "mot botar",
+        "practice": "Övning utan tid"
+      },
+      "coachStep": {
+        "inline-hint": "första tipset",
+        "trace": "draglektion",
+        "playing": "spelar",
+        "skipped": "hoppade över coach",
+        "complete": "coach klar"
+      },
+      "pointsShort": "p",
+      "wordsShort": "ord",
+      "singleplayer": "Enspelare",
+      "wordTower": "Ordtorn",
+      "classic": "Klassisk",
+      "survival": "Överlevnad",
+      "adventure": "Äventyr",
+      "connections": "Kopplingar",
+      "wordCraft": "Word Craft",
+      "crossword": "Korsord",
+      "brainDrill": "Hjärnträning",
+      "quickPlay": "Snabbspel",
+      "tutorial": "Guide",
       "detail": {
+        "timeInGame": "Tid i spelet",
+        "firstWord": "Första ordet",
+        "floors": "Våningar",
+        "coachStep": "Coachsteg",
+        "page": "Sida",
         "acquisition": "Kom från",
         "botsNa": "bottar ej registrerade",
         "country": "Land",

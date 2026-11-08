@@ -122,10 +122,10 @@ export function useSinglePlayerEffects({
     return cancelDefer;
   }, []);
 
-  // Keep pagehide abandon payload current (words found mid-round).
+  // Keep pagehide abandon payload current (words found + score mid-round).
   useEffect(() => {
-    updateActiveGameExtras({ words_found: foundWords.length, sp_mode: mode });
-  }, [foundWords.length, mode]);
+    updateActiveGameExtras({ words_found: foundWords.length, sp_mode: mode, score });
+  }, [foundWords.length, mode, score]);
 
   // Set game active for sound context
   useEffect(() => {

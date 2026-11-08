@@ -12,6 +12,9 @@ interface StatsBarProps {
   stats: GamesStats;
   total: number;
   modeBreakdown?: ModeBreakdownEntry[];
+  /** Tap a mode card to filter the list by it (tap again, or Total, to clear). */
+  activeMode?: string;
+  onModeSelect?: (mode: string) => void;
   t: (key: string, fallback?: string) => string;
 }
 
@@ -35,15 +38,21 @@ const BUCKET_ICON: Record<string, React.ReactNode> = {
  * render Total + one card per non-zero mode bucket — accurate counts that match the
  * real gameMode taxonomy. Falls back to the legacy fixed cards otherwise.
  */
-export function StatsBar({ stats, total, modeBreakdown, t }: StatsBarProps) {
+export function StatsBar({ stats, total, modeBreakdown, activeMode, onModeSelect, t }: StatsBarProps) {
   if (modeBreakdown && modeBreakdown.length > 0) {
-    const visible = modeBreakdown.filter((b) => b.count > 0).sort((a, b) => b.count - a.count);
+    const visible = modeBreakdown
+      .filter((b) => b.count > 0 || b.key === activeMode)
+      .sort((a, b) => b.count - a.count);
+    const pick = (key: string) => onModeSelect && (() => onModeSelect(activeMode === key ? 'all' : key));
+    // Phone: one swipeable row instead of a tall card grid above the list.
     return (
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
+      <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 [scrollbar-width:none] sm:grid sm:grid-cols-4 lg:grid-cols-6 sm:gap-3 sm:overflow-visible sm:mx-0 sm:px-0">
         <StatCard
           label={t('admin.todayGames.totalGames', 'Total')}
           value={total}
           icon={<Gamepad2 className="w-5 h-5 text-neo-lime" />}
+          onClick={onModeSelect ? () => onModeSelect('all') : undefined}
+          active={onModeSelect ? !activeMode || activeMode === 'all' : undefined}
         />
         {visible.map((b) => (
           <StatCard
@@ -51,6 +60,8 @@ export function StatsBar({ stats, total, modeBreakdown, t }: StatsBarProps) {
             label={t(`admin.todayGames.${b.labelKey}`, b.label)}
             value={b.count}
             icon={BUCKET_ICON[b.key] ?? <Gamepad2 className="w-5 h-5 text-slate-400" />}
+            onClick={pick(b.key) || undefined}
+            active={onModeSelect ? activeMode === b.key : undefined}
           />
         ))}
       </div>

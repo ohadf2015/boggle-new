@@ -21,6 +21,7 @@
 import type { UnifiedGame, GameProfile } from '@/components/admin/today-games/types';
 import { bucketForMode } from './modeBuckets';
 import { isPlaceholderName } from '@/lib/pushDisplayName';
+import { classifyEngagement, type Engagement } from './engagement';
 import {
   classifyAcquisition,
   type AcquisitionTag,
@@ -61,6 +62,21 @@ export interface GamePlayer {
   /** Number of raw analytics rows merged into this player. */
   eventCount: number;
   firstSeen: string;
+  /** Headless / automated visitor (tagged at ingest). */
+  isAutomated: boolean;
+  /** Single-player sub-mode (sp_mode), when recorded. */
+  subMode: string | null;
+  /** Last coach step reached (first-game coach rounds). */
+  coachStep: string | null;
+  /** Page the game was played on. */
+  landingPath: string | null;
+  /** Seconds in the game, from the terminal event. */
+  durationSec: number | null;
+  /** Seconds to the first word (forward-only). */
+  firstWordSec: number | null;
+  /** Word Tower floors standing. */
+  floors: number | null;
+  engagement: Engagement;
 }
 
 export interface GameGroup {
@@ -82,6 +98,14 @@ export interface GameGroup {
   topScore: number;
   totalWords: number;
   errorReasons: string[];
+  /** Every player in the game is an automated visitor. */
+  isAutomated: boolean;
+  /** Host's single-player sub-mode, when recorded. */
+  subMode: string | null;
+  /** Longest player duration in the game (seconds). */
+  durationSec: number | null;
+  /** How much of the game was actually played (best player wins). */
+  engagement: Engagement;
 }
 
 const TERMINAL = new Set(['game_completed', 'game_abandoned']);
@@ -211,6 +235,14 @@ function buildPlayer(acc: PlayerAccumulator): GamePlayer {
       : 'abandoned';
 
   const identity = resolveIdentity(rows, best);
+  const firstOf = <K extends keyof UnifiedGame>(k: K): UnifiedGame[K] | null =>
+    (best[k] ?? rows.find((r) => r[k] != null)?.[k] ?? null) as UnifiedGame[K] | null;
+  const isAutomated = rows.some((r) => r.is_automated === true);
+  const score = best.score ?? 0;
+  const wordCount = best.word_count ?? 0;
+  const floors = (firstOf('floors') as number | null) ?? null;
+  // time_played is only meaningful on a terminal row (game_started carries none).
+  const durationSec = TERMINAL.has(best.event_type ?? '') && best.time_played > 0 ? best.time_played : null;
 
   return {
     key: acc.key,
@@ -222,8 +254,8 @@ function buildPlayer(acc: PlayerAccumulator): GamePlayer {
     isHost,
     role,
     invitedByName: null, // set in buildGroup once the host is known
-    score: best.score ?? 0,
-    wordCount: best.word_count ?? 0,
+    score,
+    wordCount,
     isWinner: best.is_winner ?? null,
     country: best.country ?? null,
     platform: best.platform ?? null,
@@ -237,7 +269,32 @@ function buildPlayer(acc: PlayerAccumulator): GamePlayer {
     leaveReason: status === 'abandoned' ? leaveReasonOf(rows) : null,
     eventCount: rows.length,
     firstSeen: acc.firstSeen,
+    isAutomated,
+    subMode: (firstOf('sub_mode') as string | null) ?? null,
+    coachStep: (firstOf('coach_step') as string | null) ?? null,
+    landingPath: (firstOf('landing_path') as string | null) ?? null,
+    durationSec,
+    firstWordSec: (firstOf('first_word_sec') as number | null) ?? null,
+    floors,
+    engagement: classifyEngagement({ isAutomated, status, score, wordCount, floors, durationSec }),
   };
+}
+
+/** Best engagement across players: one real player makes the game real. */
+const ENGAGEMENT_RANK: Record<Engagement, number> = {
+  played: 4,
+  finished_empty: 3,
+  left_early: 2,
+  never_played: 1,
+  bot: 0,
+};
+
+function groupEngagement(players: GamePlayer[]): Engagement {
+  let best: Engagement = 'bot';
+  for (const p of players) {
+    if (ENGAGEMENT_RANK[p.engagement] > ENGAGEMENT_RANK[best]) best = p.engagement;
+  }
+  return players.length === 0 ? 'left_early' : best;
 }
 
 /**
@@ -345,6 +402,13 @@ function buildGroup(
     topScore: players.reduce((m, p) => Math.max(m, p.score), 0),
     totalWords: players.reduce((s, p) => s + p.wordCount, 0),
     errorReasons,
+    isAutomated: players.length > 0 && players.every((p) => p.isAutomated),
+    subMode: host?.subMode ?? players.find((p) => p.subMode)?.subMode ?? null,
+    durationSec: players.reduce<number | null>(
+      (m, p) => (p.durationSec != null && (m == null || p.durationSec > m) ? p.durationSec : m),
+      null,
+    ),
+    engagement: groupEngagement(players),
   };
 }
 

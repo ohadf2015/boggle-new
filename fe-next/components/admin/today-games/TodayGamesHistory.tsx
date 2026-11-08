@@ -15,6 +15,7 @@ import { useTodayGames } from './hooks';
 
 // Components
 import { StatsBar, GamesFilters, VirtualGamesList, EmptyState } from './components';
+import { ShowChips } from './components/ShowChips';
 
 export function TodayGamesHistory({ authToken }: TodayGamesHistoryProps) {
   const { t } = useLanguage();
@@ -25,17 +26,21 @@ export function TodayGamesHistory({ authToken }: TodayGamesHistoryProps) {
     filteredGameGroups,
     unbucketedModes,
     truncated,
+    showCounts,
+    modeCounts,
     stats,
     lastRefresh,
     loading,
     error,
     languageFilter,
-    gameTypeFilter,
     rankedFilter,
     dateRange,
     logSource,
+    showFilter,
+    modeFilter,
+    setShowFilter,
+    setModeFilter,
     setLanguageFilter,
-    setGameTypeFilter,
     setRankedFilter,
     setDateRange,
     setLogSource,
@@ -93,22 +98,35 @@ export function TodayGamesHistory({ authToken }: TodayGamesHistoryProps) {
       </div>
 
       {/* Stats Bar */}
-      <StatsBar stats={stats} total={stats.total} modeBreakdown={data?.modeBreakdown} t={t} />
+      <StatsBar
+        stats={stats}
+        total={modeCounts?.all ?? stats.total}
+        modeBreakdown={data?.modeBreakdown}
+        activeMode={modeFilter}
+        onModeSelect={logSource === 'analytics' ? setModeFilter : undefined}
+        t={t}
+      />
 
       {/* Filters */}
       <GamesFilters
         languageFilter={languageFilter}
-        gameTypeFilter={gameTypeFilter}
+        modeFilter={modeFilter}
+        modeCounts={modeCounts}
         rankedFilter={rankedFilter}
         dateRange={dateRange}
         logSource={logSource}
         onLanguageChange={setLanguageFilter}
-        onGameTypeChange={setGameTypeFilter}
+        onModeChange={setModeFilter}
         onRankedChange={setRankedFilter}
         onDateRangeChange={setDateRange}
         onLogSourceChange={setLogSource}
         t={t}
       />
+
+      {/* What kind of games: people / played / empty / bots / all */}
+      {logSource === 'analytics' && (
+        <ShowChips value={showFilter} counts={showCounts} onChange={setShowFilter} t={t} />
+      )}
 
       {/* Unclassified modes warning */}
       {unbucketedModes.length > 0 && (
