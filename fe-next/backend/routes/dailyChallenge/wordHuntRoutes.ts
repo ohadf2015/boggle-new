@@ -91,7 +91,9 @@ async function fetchDailyStreak(
 
   const [puzzleRes, huntRes, wheelRes] = await Promise.all([
     supabase!.from('daily_puzzle_attempts').select('puzzle_date').eq(idColumn, idValue).gt('word_count', 0),
-    supabase!.from('daily_word_hunt_attempts').select('puzzle_date').eq(idColumn, idValue).eq('solved', true).eq('is_catchup', false),
+    // Catch-up replays count: a missed day replayed inside the window repairs
+    // the streak (it only lengthens the current run when it fills a gap).
+    supabase!.from('daily_word_hunt_attempts').select('puzzle_date').eq(idColumn, idValue).eq('solved', true),
     supabase!.from('daily_word_wheel_attempts').select('puzzle_date').eq(idColumn, idValue).gt('word_count', 0),
   ]);
 

@@ -68,6 +68,41 @@ describe('GET /api/daily/status — authed', () => {
     expect(body.streak.longest).toBe(2);
   });
 
+  it('Given a missed day replayed inside the catch-up window, Then the current streak is restored and the repair is reported', async () => {
+    getAuthedUser.mockResolvedValue({ id: USER });
+    tables.daily_word_hunt_attempts = [
+      { puzzle_date: '2026-09-21', is_catchup: false },
+      { puzzle_date: '2026-09-20', is_catchup: true },
+      { puzzle_date: '2026-09-19', is_catchup: false },
+    ];
+    tables.daily_word_wheel_attempts = [{ puzzle_date: '2026-09-18', is_catchup: false }];
+    tables.daily_word_tower_attempts = [];
+    tables.connections_daily_scores = [];
+    tables.profiles = { streak_freeze_count: 0 };
+
+    const { GET } = await import('../route');
+    const body = await (await GET(req(`userId=${USER}`))).json();
+
+    expect(body.streak.current).toBe(4);
+    expect(body.streakRepaired).toEqual({ dates: ['2026-09-20'] });
+    expect(body.allCompletedDates).toContain('2026-09-20');
+  });
+
+  it('Given only live plays, Then nothing is reported as repaired', async () => {
+    getAuthedUser.mockResolvedValue({ id: USER });
+    tables.daily_word_hunt_attempts = [{ puzzle_date: '2026-09-21', is_catchup: false }];
+    tables.daily_word_wheel_attempts = [];
+    tables.daily_word_tower_attempts = [];
+    tables.connections_daily_scores = [];
+    tables.profiles = { streak_freeze_count: 0 };
+
+    const { GET } = await import('../route');
+    const body = await (await GET(req(`userId=${USER}`))).json();
+
+    expect(body.streak.current).toBe(1);
+    expect(body.streakRepaired).toBeUndefined();
+  });
+
   it('ignores a daily_puzzle_streaks row and counts tower dates into longest', async () => {
     getAuthedUser.mockResolvedValue({ id: USER });
     tables.daily_word_hunt_attempts = [{ puzzle_date: '2026-09-21' }, { puzzle_date: '2026-09-19' }];

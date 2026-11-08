@@ -219,6 +219,15 @@ describe('GET /streak', () => {
     expect(huntQuery.eqs).toContainEqual(['guest_fingerprint', 'guest-xyz']);
   });
 
+  it('counts a catch-up replay of a missed day toward the streak (streak repair)', async () => {
+    h.resolvers['daily_word_hunt_attempts'] = () => ({ data: [], error: null });
+    await request(app()).get('/streak').query({ guestFingerprint: 'guest-xyz' });
+    const huntQuery = tableQueries('daily_word_hunt_attempts')[0];
+    // Solved hunts count whether played live or caught up inside the window.
+    expect(huntQuery.eqs).toContainEqual(['solved', true]);
+    expect(huntQuery.eqs).not.toContainEqual(['is_catchup', false]);
+  });
+
   it('reads a streak for an authenticated player by player_id', async () => {
     h.resolvers['daily_puzzle_attempts'] = () => ({ data: [{ puzzle_date: '2026-08-30' }], error: null });
 

@@ -3,7 +3,7 @@ import { getAuthedUser } from '@/lib/auth/getAuthedUser'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { getDailyChallengeDate } from '@/utils/dailyChallenge/dateUtils'
 import { awardCoinsServer, type AwardCoinsReason } from '@/backend/services/economy/awardCoins'
-import { rollDayPrize, type DayPrizeKind } from '@/lib/daily/dayPrize'
+import { eduDayPrize, rollDayPrize, type DayPrizeKind } from '@/lib/daily/dayPrize'
 import logger from '@/utils/logger'
 
 /** Attempt tables per daily mode, the same ones /api/daily/status reads. */
@@ -26,9 +26,42 @@ export const DAY_PRIZE_CONFIG: Record<DayPrizeKind, PrizeConfig> = {
   perfect: { tables: [HUNT, WHEEL, TOWER, CONNECTIONS], claimTable: 'daily_all_clear_claims', reason: 'daily_all_clear' },
 }
 
+type AdminClient = NonNullable<ReturnType<typeof createAdminClient>>
+
+/**
+ * Play inside the education system: a teacher account, or a student in any
+ * classroom. Those players get the fixed prize (no roll). A failed lookup
+ * throws, so the claim answers 500 rather than guessing.
+ */
+async function isEducationAccount(supabase: AdminClient, userId: string): Promise<boolean> {
+  const [profile, membership] = await Promise.all([
+    supabase.from('profiles').select('user_role').eq('id', userId).limit(1),
+    supabase.from('classroom_memberships').select('classroom_id').eq('student_id', userId).limit(1),
+  ])
+  if (profile.error) throw new Error(`profiles: ${profile.error.message}`)
+  if (membership.error) throw new Error(`classroom_memberships: ${membership.error.message}`)
+  const role = (profile.data?.[0] as { user_role?: string } | undefined)?.user_role
+  return role === 'teacher' || (membership.data?.length ?? 0) > 0
+}
+
+/** GET on either claim route: whether this player's box is the fixed one, so the closed box can drop the shake and odds. */
+export async function handleDayPrizeMode(request: NextRequest): Promise<NextResponse> {
+  try {
+    const user = await getAuthedUser(request)
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const supabase = createAdminClient()
+    if (!supabase) return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return NextResponse.json({ fixed: await isEducationAccount(supabase, user.id) })
+  } catch (error) {
+    logger.error('Daily prize mode error:', error instanceof Error ? error.message : String(error))
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+
 /**
  * Shared POST handler for both daily prizes. Re-checks the attempt tables
- * server-side, rolls the prize from (player, date, kind), writes the claim row
+ * server-side, rolls the prize from (player, date, kind) — or, for the
+ * education side, pays the fixed amount — writes the claim row
  * (its primary key stops a double-tap paying twice) and pays coins + XP. A
  * repeat claim answers 200 with `claimed: false` and the same prize, so the
  * client can show what the box held without paying again.
@@ -68,7 +101,7 @@ async function claim(request: NextRequest, kind: DayPrizeKind): Promise<NextResp
     return NextResponse.json({ error: 'Day not cleared' }, { status: 400 })
   }
 
-  const prize = rollDayPrize(user.id, today, kind)
+  const prize = (await isEducationAccount(supabase, user.id)) ? eduDayPrize(kind) : rollDayPrize(user.id, today, kind)
 
   const { error: insertError } = await supabase
     .from(config.claimTable)
@@ -81,7 +114,7 @@ async function claim(request: NextRequest, kind: DayPrizeKind): Promise<NextResp
     return NextResponse.json({ error: 'Failed to save claim' }, { status: 500 })
   }
 
-  const awarded = await awardCoinsServer(user.id, prize.coins, config.reason, { date: today, tier: prize.tier })
+  const awarded = await awardCoinsServer(user.id, prize.coins, config.reason, { date: today, tier: prize.fixed ? 'fixed' : prize.tier })
   if (!awarded.success) {
     // Reopen the day so a retry can pay; otherwise the row blocks it with no coins given.
     const { error: rollbackError } = await supabase

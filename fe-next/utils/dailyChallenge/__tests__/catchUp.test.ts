@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import {
+  catchUpStreakRepairs,
   CATCH_UP_WINDOW_DAYS,
   getCatchUpDates,
   isSubmittableDate,
@@ -93,3 +94,22 @@ describe('shouldGateCatchUpBehindAd', () => {
     expect(shouldGateCatchUpBehindAd({ ...ready, isPlaceholderCooldown: true })).toBe(false)
   })
 })
+
+describe('catchUpStreakRepairs', () => {
+  it('Given a gap filled by a catch-up play, Then that date is a repair of the current run', () => {
+    expect(catchUpStreakRepairs(['2026-09-21', '2026-09-19'], ['2026-09-20'], '2026-09-21')).toEqual(['2026-09-20']);
+  });
+
+  it('Given a catch-up play outside the current run, Then it repairs nothing', () => {
+    // 09-17 is caught up but 09-18 is still missing, so the run 09-19..09-21 never reaches it.
+    expect(catchUpStreakRepairs(['2026-09-21', '2026-09-20', '2026-09-19'], ['2026-09-17'], '2026-09-21')).toEqual([]);
+  });
+
+  it('Given today not yet played, Then the run anchored at yesterday still counts the repair', () => {
+    expect(catchUpStreakRepairs(['2026-09-20', '2026-09-18'], ['2026-09-19'], '2026-09-21')).toEqual(['2026-09-19']);
+  });
+
+  it('Given a catch-up for a day that was also played live, Then it is not a repair', () => {
+    expect(catchUpStreakRepairs(['2026-09-21', '2026-09-20'], ['2026-09-20'], '2026-09-21')).toEqual([]);
+  });
+});

@@ -8,8 +8,11 @@ const status = vi.hoisted(() => ({
     loading: false,
     hasPlayedBefore: false,
     freezeApplied: undefined as { date: string; freezesRemaining: number } | undefined,
+    streakRepaired: undefined as { dates: string[] } | undefined,
   },
+  track: vi.fn(),
 }));
+vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: (...a: unknown[]) => status.track(...a) }));
 vi.mock('@/hooks/useDailyPlayedStatus', () => ({ useDailyPlayedStatus: () => status.value }));
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'u1' } }) }));
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -21,7 +24,17 @@ import { PersistentStreakDisplay } from '../PersistentStreakDisplay';
 describe('PersistentStreakDisplay', () => {
   beforeEach(() => {
     localStorage.clear();
-    status.value = { streak: { current: 0, longest: 0 }, loading: false, hasPlayedBefore: false, freezeApplied: undefined };
+    status.value = { streak: { current: 0, longest: 0 }, loading: false, hasPlayedBefore: false, freezeApplied: undefined, streakRepaired: undefined };
+    status.track.mockClear();
+  });
+
+  it('given a catch-up replay that repaired the streak, then streak_repaired fires once per repaired day', () => {
+    status.value = { ...status.value, hasPlayedBefore: true, streak: { current: 4, longest: 4 }, streakRepaired: { dates: ['2026-10-29'] } };
+    const first = render(<PersistentStreakDisplay />);
+    first.unmount();
+    render(<PersistentStreakDisplay />);
+    expect(status.track).toHaveBeenCalledTimes(1);
+    expect(status.track).toHaveBeenCalledWith('streak_repaired', { date: '2026-10-29', streak: 4 });
   });
 
   it('given a newcomer who has never finished a daily, then no "0" flame is shown', () => {

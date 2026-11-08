@@ -10,9 +10,8 @@ import { fireConfetti, fireFireworks, fireVictoryConfetti } from '@/utils/confet
 import { triggerHaptic } from '@/utils/hapticFeedback';
 import { emitCoinEarned } from '@/utils/coinEarnedFx';
 import { trackGrowthEvent } from '@/utils/growthTracking';
-import type { DayPrizeClaimResponse, DayPrizeKind, DayPrizeTier } from '@/lib/daily/dayPrize';
-import { claimDayPrize, readOpenedPrize } from './dayPrizeStore';
-import { prizeLineKey } from './prizeLines';
+import { dayPrizeOddsPct, type DayPrizeClaimResponse, type DayPrizeKind, type DayPrizeTier } from '@/lib/daily/dayPrize';
+import { claimDayPrize, fetchDayPrizeFixed, readOpenedPrize } from './dayPrizeStore';
 
 /** Closed box shakes at least this long, so the server answer never makes the reveal feel instant. */
 export const ANTICIPATION_MS = 750;
@@ -62,7 +61,9 @@ interface DayPrizeRevealProps {
 /**
  * The daily prize box: a closed chest the player taps to open. It shakes while
  * the server rolls, then lands on one of three tiers, each with its own chest,
- * stamp, line and celebration. Coins fly to the HUD counter when they pay.
+ * stamp and celebration; one small line states the odds. The education side
+ * gets a fixed amount instead: no shake, no stamp, no odds. Coins fly to the
+ * HUD counter when they pay.
  */
 export function DayPrizeReveal({ kind, onClose, source }: DayPrizeRevealProps) {
   const { t } = useLanguage();
@@ -70,12 +71,24 @@ export function DayPrizeReveal({ kind, onClose, source }: DayPrizeRevealProps) {
   const [prize, setPrize] = useState<DayPrizeClaimResponse | null>(() => readOpenedPrize(kind));
   const coinsRef = useRef<HTMLSpanElement>(null);
   const [reduced] = useState(reducedMotion);
+  // Fixed (education side) or random? Unknown until the server says: the odds
+  // line waits for the answer so it never flashes on a fixed box.
+  const [fixedMode, setFixedMode] = useState<boolean | null>(() => readOpenedPrize(kind)?.fixed ?? null);
   const mounted = useRef(true);
 
   useEffect(() => {
     mounted.current = true;
-    trackGrowthEvent('day_prize_shown', { kind, source });
+    const opened = readOpenedPrize(kind);
+    let cancelled = false;
+    const announce = (fixed: boolean) => trackGrowthEvent('day_prize_shown', { kind, source, edu_fixed_prize: fixed });
+    if (opened) announce(!!opened.fixed);
+    else void fetchDayPrizeFixed(kind).then((fixed) => {
+      if (cancelled) return;
+      setFixedMode(fixed);
+      announce(fixed === true);
+    });
     return () => {
+      cancelled = true;
       mounted.current = false;
     };
   }, [kind, source]);
@@ -91,7 +104,8 @@ export function DayPrizeReveal({ kind, onClose, source }: DayPrizeRevealProps) {
   const open = useCallback(async () => {
     setPhase('opening');
     triggerHaptic('light');
-    const wait = new Promise((resolve) => setTimeout(resolve, reduced ? 0 : ANTICIPATION_MS));
+    // The fixed box has nothing to roll, so nothing to build up to.
+    const wait = new Promise((resolve) => setTimeout(resolve, reduced || fixedMode === true ? 0 : ANTICIPATION_MS));
     let [outcome] = await Promise.all([claimDayPrize(kind), wait]);
     // Straight off a results screen the score may still be saving: give it one more beat.
     if (!outcome.ok && outcome.reason === 'not-cleared') {
@@ -105,6 +119,7 @@ export function DayPrizeReveal({ kind, onClose, source }: DayPrizeRevealProps) {
       return;
     }
     setPrize(outcome.prize);
+    setFixedMode(!!outcome.prize.fixed);
     setPhase('open');
     celebrate(outcome.prize.tier);
     trackGrowthEvent('day_prize_opened', {
@@ -113,18 +128,25 @@ export function DayPrizeReveal({ kind, onClose, source }: DayPrizeRevealProps) {
       tier: outcome.prize.tier,
       coins: outcome.prize.coins,
       first_open: outcome.prize.claimed,
+      edu_fixed_prize: !!outcome.prize.fixed,
     });
     if (outcome.prize.claimed) {
       const rect = coinsRef.current?.getBoundingClientRect();
       const origin = rect ? { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 } : undefined;
       emitCoinEarned(outcome.prize.coins, origin, { big: outcome.prize.tier !== 'common' });
     }
-  }, [kind, reduced, source]);
+  }, [kind, reduced, source, fixedMode]);
 
   if (typeof document === 'undefined') return null;
 
   const tier = phase === 'open' && prize ? prize.tier : null;
   const art = CHEST_ART[tier ?? 'closed'];
+  const fixed = prize?.fixed ?? fixedMode === true;
+  const odds = dayPrizeOddsPct();
+  // Random box only, and only once the server said so (never on the education side).
+  const oddsLine = (prize ? !prize.fixed : fixedMode === false) ? (
+    <p data-testid="day-prize-odds" className="text-[11px] font-bold text-neo-white/60">{t('daily.dayPrize.odds', odds)}</p>
+  ) : null;
   const spring = { type: 'spring', stiffness: 420, damping: 18 } as const;
 
   return createPortal(
@@ -165,11 +187,11 @@ export function DayPrizeReveal({ kind, onClose, source }: DayPrizeRevealProps) {
           )}
           initial={reduced || !tier ? false : { scale: 0.4, rotate: -8 }}
           animate={
-            phase === 'opening' && !reduced
+            phase === 'opening' && !reduced && !fixed
               ? { rotate: [0, -7, 7, -9, 9, -5, 0], scale: [1, 1.04, 1, 1.06, 1, 1.08, 1.1] }
               : { scale: 1, rotate: 0 }
           }
-          transition={phase === 'opening' ? { duration: ANTICIPATION_MS / 1000, repeat: Infinity } : spring}
+          transition={phase === 'opening' && !fixed ? { duration: ANTICIPATION_MS / 1000, repeat: Infinity } : spring}
         >
           {/* eslint-disable-next-line @next/next/no-img-element -- 160px decorative chest art */}
           <img src={art} alt="" className="w-full h-full object-cover" draggable={false} />
@@ -182,7 +204,7 @@ export function DayPrizeReveal({ kind, onClose, source }: DayPrizeRevealProps) {
 
         {tier && prize ? (
           <>
-            <m.span
+            {!fixed && <m.span
               data-testid="day-prize-stamp"
               className={cn('px-3 py-1 rounded-md border-3 border-neo-black font-neo-display font-black text-lg uppercase -rotate-3', TIER_STYLE[tier].stamp)}
               initial={reduced ? false : { scale: 2.2, opacity: 0 }}
@@ -190,13 +212,14 @@ export function DayPrizeReveal({ kind, onClose, source }: DayPrizeRevealProps) {
               transition={{ ...spring, delay: 0.1 }}
             >
               {t(`daily.dayPrize.tier.${tier}`)}
-            </m.span>
+            </m.span>}
             <h2 id="day-prize-title" className="flex items-center gap-2 font-neo-display font-black text-3xl text-neo-white">
               <Coins className="w-7 h-7 text-neo-yellow" aria-hidden />
               <span ref={coinsRef} data-testid="day-prize-coins">{t('daily.dayPrize.coins', { coins: prize.coins })}</span>
             </h2>
             <p className="text-xs font-black text-neo-lime">{t('daily.dayPrize.xp', { xp: prize.xp })}</p>
-            <p className="text-sm font-bold text-neo-cream" data-testid="day-prize-line">{t(prizeLineKey(prize))}</p>
+            <p className="text-sm font-bold text-neo-cream" data-testid="day-prize-line">{t('daily.dayPrize.todayLine')}</p>
+            {oddsLine}
             <button
               type="button"
               data-testid="day-prize-collect"
@@ -215,6 +238,7 @@ export function DayPrizeReveal({ kind, onClose, source }: DayPrizeRevealProps) {
                   ? t('daily.dayPrize.failed')
                   : t(kind === 'perfect' ? 'daily.dayPrize.readyPerfect' : 'daily.dayPrize.ready')}
             </h2>
+            {phase === 'closed' && oddsLine}
             {phase === 'closed' || phase === 'opening' ? (
               <button
                 type="button"

@@ -1,6 +1,6 @@
 import { getDailyChallengeDate } from '@/utils/dailyChallenge/dateUtils';
 import { isDayPrizeResponse, type DayPrizeClaimResponse, type DayPrizeKind } from '@/lib/daily/dayPrize';
-import { postWithAuth } from '@/utils/authFetch';
+import { getWithAuth, postWithAuth } from '@/utils/authFetch';
 
 /**
  * Per-device memory for the daily prize box: whether the box already popped up
@@ -70,5 +70,21 @@ export async function claimDayPrize(kind: DayPrizeKind): Promise<ClaimOutcome> {
     return { ok: true, prize: body };
   } catch {
     return { ok: false, reason: 'failed' };
+  }
+}
+
+/**
+ * Whether this player's box is the education side's fixed prize. null when the
+ * server could not say: the box then behaves as the random one until the
+ * claim answers (the claim itself is what the server enforces).
+ */
+export async function fetchDayPrizeFixed(kind: DayPrizeKind): Promise<boolean | null> {
+  try {
+    const res = await getWithAuth(ROUTES[kind]);
+    if (!res.ok) return null;
+    const body = (await res.json()) as { fixed?: unknown };
+    return typeof body?.fixed === 'boolean' ? body.fixed : null;
+  } catch {
+    return null;
   }
 }
