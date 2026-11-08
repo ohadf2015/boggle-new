@@ -14,6 +14,8 @@ import { FriendsBlock } from './FriendsBlock';
 import { MoreGames } from './MoreGames';
 import { ClassroomStrip } from './ClassroomStrip';
 import { FreshAdSlot } from '@/components/landing/fresh/FreshAdSlot';
+import { pickHeroAvatar, type HeroAvatar } from './heroAvatar';
+import { readLastAccountAvatar } from '@/utils/accountAvatarCache';
 
 export function HomePreview({ onPlay }: { onPlay?: () => void } = {}) {
   const { t, language } = useLanguage();
@@ -22,18 +24,19 @@ export function HomePreview({ onPlay }: { onPlay?: () => void } = {}) {
   const { streak, loading: streakLoading } = useAccountStreak();
   const [guestAvatar, setGuestAvatar] = useState<CustomAvatarConfig | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [lastAccount, setLastAccount] = useState<HeroAvatar | null>(null);
 
   useEffect(() => {
     setMounted(true);
     setGuestAvatar(getOrCreateStoredCustomAvatar());
+    const last = readLastAccountAvatar();
+    setLastAccount(last ? { userId: last.userId, customAvatar: last.config } : null);
   }, []);
 
   const ready = mounted && (!authLoading || !hasSupabaseSession());
-  const avatar = ready
-    ? user
-      ? { userId: user.id, customAvatar: profile?.avatar_config ?? null }
-      : { userId: 'guest', customAvatar: guestAvatar }
-    : null;
+  // While a saved session is still being restored, the last account's avatar
+  // (or the placeholder) holds the spot: no guest face, no id-generated face.
+  const avatar = ready ? pickHeroAvatar(user?.id ?? null, profile, guestAvatar) : mounted ? lastAccount : null;
   const name = profile?.display_name || profile?.username;
   const greeting = name ? t('homePlay.greetingUser', { name }) : t('homePlay.greetingGuest');
   const tt = t as (key: string, params?: Record<string, string | number>) => string;

@@ -34,7 +34,7 @@ function AvatarStage({ avatar, animate, t, onAvatarSaved }: Pick<PlayHeroProps, 
   return (
     <div className="relative flex h-[176px] w-full items-center [@media(max-height:700px)]:h-[132px] justify-center lg:h-[440px] 2xl:h-[520px]">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-40 lg:opacity-60">
-        <QuickResultsRays color={NODE_COLORS.classic.hex} spinning={animate} />
+        <QuickResultsRays color={NODE_COLORS.classic.hex} spinning={animate} compact />
       </div>
       <SparkleLoop enabled={animate} />
       <div className="relative z-10">
@@ -53,7 +53,11 @@ function AvatarStage({ avatar, animate, t, onAvatarSaved }: Pick<PlayHeroProps, 
               </div>
             </>
           ) : (
-            <div className="h-[140px] w-[140px] lg:h-[260px] lg:w-[260px] 2xl:h-[300px] 2xl:w-[300px]" />
+            <div
+              data-testid="hp-avatar-skeleton"
+              aria-hidden="true"
+              className={`h-[140px] w-[140px] rounded-full border-[3px] border-black/60 bg-neo-white/10 lg:h-[260px] lg:w-[260px] 2xl:h-[300px] 2xl:w-[300px] ${animate ? 'animate-pulse' : ''}`}
+            />
           )}
         </div>
         <span

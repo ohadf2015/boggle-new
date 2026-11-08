@@ -22,6 +22,13 @@ describe('QuickResultsRays', () => {
     expect(a?.[1]).not.toBe(b?.[1]);
   });
 
+  it('compact rays stay phone-sized below lg (GPU texture cost), full size on desktop', () => {
+    render(<QuickResultsRays color="#ffe135" spinning compact />);
+    const cls = screen.getByTestId('quick-results-rays').className;
+    expect(cls).toContain('h-[640px]');
+    expect(cls).toContain('lg:h-[1200px]');
+  });
+
   it('stays as a still backdrop when motion is off', () => {
     render(<QuickResultsRays color="#ffe135" spinning={false} />);
     expect(screen.getByTestId('quick-results-rays')).toHaveAttribute('data-spinning', 'false');
