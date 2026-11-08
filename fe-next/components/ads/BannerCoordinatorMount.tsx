@@ -7,6 +7,7 @@ import { useAdMob } from '@/hooks/useAdMob';
 import { useAppLifecycle } from '@/hooks/useAppLifecycle';
 import { bannerController, shouldSuppressBanner } from '@/lib/native/bannerController';
 import { AD_FREE_ROUTE_CLASS } from '@/lib/admob-routes';
+import { removeNativeBanner } from '@/lib/native/removeNativeBanner';
 
 /**
  * Lifecycle host for the single banner coordinator. Rendered once (next to
@@ -58,6 +59,10 @@ export default function BannerCoordinatorMount() {
         return showRef.current(BannerAdPosition.BOTTOM_CENTER, margin, { variant });
       },
       hide: () => hideRef.current(),
+      // The native plugin applies `margin` only when it CREATES the AdView, so a
+      // banner can only move (e.g. lift above the tab bar) by being rebuilt.
+      // The controller calls this before re-showing at a new margin.
+      remove: () => removeNativeBanner(),
     });
 
     const removers: Array<() => void> = [];

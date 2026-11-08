@@ -312,6 +312,32 @@ describe('AnchoredNativeBanner', () => {
     }
   });
 
+  it('does not create the banner at 0 when the CSS fallback is the real calc() default (first frame)', async () => {
+    // Real globals.css: `calc(64px + env(...))` → parseFloat NaN. Reading that as
+    // 0 created the native banner on the screen bottom over the tab bar, and the
+    // plugin never moves a banner after creating it (player report 2026-11-08).
+    mockPlatform.current = 'android';
+    mockSafeArea.current = { top: 0, bottom: 24, left: 0, right: 0 };
+    document.documentElement.style.removeProperty('--bottom-nav-height');
+    const style = document.createElement('style');
+    style.textContent = ':root { --bottom-nav-height: calc(64px + env(safe-area-inset-bottom, 0px)); }';
+    document.head.appendChild(style);
+    try {
+      render(<AnchoredNativeBanner />);
+      await Promise.resolve();
+      expect(setRequest).not.toHaveBeenCalled();
+
+      // GlobalBottomNav publishes its measured height → the anchor asks for it.
+      document.documentElement.style.setProperty('--bottom-nav-height', '88px');
+      await new Promise((r) => setTimeout(r, 0));
+      await Promise.resolve();
+      expect(setRequest).toHaveBeenLastCalledWith(...anchorReq(88));
+    } finally {
+      document.documentElement.style.removeProperty('--bottom-nav-height');
+      document.head.removeChild(style);
+    }
+  });
+
   it('inline --bottom-nav-height="0px" wins over CSS fallback (nav explicitly hidden)', async () => {
     mockPlatform.current = 'android';
     mockSafeArea.current = { top: 0, bottom: 24, left: 0, right: 0 };

@@ -31,13 +31,19 @@ function conicRays(rays: Array<[number, number]>, ink: string): string {
   return `conic-gradient(from 0deg, ${stops.join(', ')}, transparent 360deg)`;
 }
 
-export function QuickResultsRays({ color, spinning }: { color: string; spinning: boolean }) {
+// Two spinning layers of this square are GPU textures of side × DPR: 1200px on a
+// 3x phone is ~3600px square per layer. `compact` keeps them phone-sized below lg
+// (the mask fades them out well inside 640px on a narrow hero anyway).
+const RAYS_FULL = 'h-[1200px] w-[1200px]';
+const RAYS_COMPACT = 'h-[640px] w-[640px] lg:h-[1200px] lg:w-[1200px]';
+
+export function QuickResultsRays({ color, spinning, compact = false }: { color: string; spinning: boolean; compact?: boolean }) {
   return (
     <div
       aria-hidden="true"
       data-testid="quick-results-rays"
       data-spinning={spinning ? 'true' : 'false'}
-      className="pointer-events-none absolute left-1/2 top-1/2 h-[1200px] w-[1200px] -translate-x-1/2 -translate-y-1/2 [mask-image:radial-gradient(closest-side,black_6%,transparent_72%)]"
+      className={`pointer-events-none absolute left-1/2 top-1/2 ${compact ? RAYS_COMPACT : RAYS_FULL} -translate-x-1/2 -translate-y-1/2 [mask-image:radial-gradient(closest-side,black_6%,transparent_72%)]`}
     >
       <div
         data-ray-layer

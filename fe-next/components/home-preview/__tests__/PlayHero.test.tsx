@@ -52,6 +52,13 @@ describe('PlayHero', () => {
     expect(screen.queryByRole('button', { name: 'Edit avatar' })).toBeNull();
   });
 
+  it('given no avatar yet (signed-in profile loading), then a neutral placeholder shows instead of a face', () => {
+    renderHero({ avatar: null });
+    expect(screen.getByTestId('hp-avatar-skeleton')).toBeInTheDocument();
+    expect(screen.queryByTestId('avatar')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Edit avatar' })).toBeNull();
+  });
+
   it('given the hero, then the mascot is decorative and hidden from assistive tech', () => {
     renderHero();
     const mascot = screen.getByTestId('hp-mascot');

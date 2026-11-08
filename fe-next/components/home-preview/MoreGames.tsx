@@ -10,7 +10,8 @@ interface Game {
   lineKey: string;
   bg: string;
   tilt: string;
-  art: { src: string } | { tower: string[] };
+  /** `still`: one frame of an animated `src`, shown on phones (see GameArt). */
+  art: { src: string; still?: string } | { tower: string[] };
 }
 
 const GAMES: Game[] = [
@@ -30,7 +31,7 @@ const GAMES: Game[] = [
     lineKey: 'homeFresh.modes.items.blast.line',
     bg: 'bg-neo-pink',
     tilt: 'rotate-1',
-    art: { src: '/mascot/mindblown-nobg.webp' },
+    art: { src: '/mascot/mindblown-nobg.webp', still: '/mascot/stills/mindblown-nobg.webp' },
   },
   {
     id: 'craft',
@@ -39,7 +40,7 @@ const GAMES: Game[] = [
     lineKey: 'homeFresh.modes.items.wordCraft.line',
     bg: 'bg-neo-purple',
     tilt: 'rotate-2',
-    art: { src: '/mascot/knight.webp' },
+    art: { src: '/mascot/knight.webp', still: '/mascot/stills/knight.webp' },
   },
   {
     id: 'bridge',
@@ -57,7 +58,7 @@ const GAMES: Game[] = [
     lineKey: 'homeFresh.modes.items.adventure.line',
     bg: 'bg-neo-orange',
     tilt: 'rotate-1',
-    art: { src: '/mascot/explorer-nobg.webp' },
+    art: { src: '/mascot/explorer-nobg.webp', still: '/mascot/stills/explorer-nobg.webp' },
   },
   {
     id: 'brain',
@@ -66,13 +67,33 @@ const GAMES: Game[] = [
     lineKey: 'homeFresh.modes.items.brainGym.line',
     bg: 'bg-neo-lime',
     tilt: '-rotate-2',
-    art: { src: '/mascot/powerup-nobg.webp' },
+    art: { src: '/mascot/powerup-nobg.webp', still: '/mascot/stills/powerup-nobg.webp' },
   },
 ];
 
 const TOWER_OFFSET = ['ms-3', 'ms-0', 'ms-4', 'ms-1', 'ms-2'];
 
 function GameArt({ art }: { art: Game['art'] }) {
+  if ('src' in art && art.still) {
+    // The animated mascots are 220-540 KB each (100+ frames): 1.6 MB and constant
+    // frame decoding on the home page of a phone. Phones get one still frame
+    // (~5 KB); the <source> means desktop alone downloads the animation.
+    return (
+      <picture>
+        <source media="(min-width: 1024px)" srcSet={art.src} />
+        <img
+          src={art.still}
+          alt=""
+          width={256}
+          height={256}
+          loading="lazy"
+          decoding="async"
+          data-testid="hp-game-art"
+          className="h-20 w-20 lg:h-32 lg:w-32"
+        />
+      </picture>
+    );
+  }
   if ('src' in art) {
     return <Image src={art.src} alt="" width={256} height={256} unoptimized className="h-20 w-20 lg:h-32 lg:w-32" />;
   }

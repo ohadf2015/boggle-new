@@ -25,6 +25,7 @@ import { getRandomAvatar, getAvatarEmojiAndColor } from '@/utils/avatarConfig';
 import { getRandomAvatarConfig } from '@/shared/types/customAvatar';
 import { pickSignupCustomAvatar } from '../signupAvatar';
 import { withAvatarCustomizedFlag } from '@/lib/avatar/avatarNudge';
+import { rememberAccountAvatar } from '@/utils/accountAvatarCache';
 import { captureBackgroundError } from '@/utils/sentry';
 import logger from '@/utils/logger';
 import { fetchGeolocation, fetchRandomPlayerName, extractOAuthDisplayName } from '../authUtils';
@@ -221,6 +222,7 @@ async function createNewProfile(
 
   if (newProfile) {
     logger.info('Created minimal profile for user:', userId);
+    if (newProfile.avatar_config) rememberAccountAvatar(userId, newProfile.avatar_config);
     setProfile(newProfile);
 
     // Submit any pending daily challenge result (from pre-signup)
@@ -291,6 +293,10 @@ export function useProfileManagement({
       }
 
       if (profileData) {
+        // Written here, not only in useAuthState's effect: a fresh sign-in
+        // reloads the page right after this resolves, before effects run, and
+        // the reloaded home should paint this avatar at once.
+        if (profileData.avatar_config) rememberAccountAvatar(userId, profileData.avatar_config);
         // Guard: never overwrite a locally-saved profile that already has
         // has_customized_profile=true with stale DB data that still has false.
         // This prevents the race where a delayed fetchUserData (from duplicate

@@ -4,10 +4,6 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMounted } from '@/hooks/useMounted';
 import {
-  getFriends,
-  getPendingRequests,
-  getOutgoingRequests,
-  getPendingChallenges,
   sendFriendRequest,
   acceptFriendRequest,
   declineFriendRequest,
@@ -17,7 +13,6 @@ import {
   unblockUser,
   getBlockedUsers,
   searchUsers,
-  updateOnlineStatus,
   type Friend,
   type FriendRequest,
   type FriendChallenge,
@@ -26,6 +21,7 @@ import { useSocketOptional } from '@/utils/SocketContext';
 import { friendsSocketRequest, type FriendsSocketResult } from '@/utils/friendsSocketRequest';
 import logger from '@/utils/logger';
 import { trackGrowthEvent } from '@/utils/growthTracking';
+import { loadFriendsSnapshot, pingOnlineStatus } from '@/hooks/friends/friendsSnapshot';
 
 interface UseFriendsState {
   friends: Friend[];
@@ -87,7 +83,9 @@ export function useFriends(): UseFriendsReturn {
   const onlineStatusIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Fetch all friend data
-  const fetchAll = useCallback(async () => {
+  // force: after a friend action or realtime event (always fresh). Routine
+  // fetches share one snapshot across every mounted useFriends (see friendsSnapshot).
+  const fetchAll = useCallback(async (force = false) => {
     if (!isAuthenticated || !user) {
       setState(prev => ({
         ...prev,
@@ -102,12 +100,11 @@ export function useFriends(): UseFriendsReturn {
 
     try {
       // Pass the already-resolved user id so each util skips its own auth.getUser() round-trip (50–200ms each).
-      const [friends, pending, outgoing, challenges] = await Promise.all([
-        getFriends(user.id),
-        getPendingRequests(user.id),
-        getOutgoingRequests(user.id),
-        getPendingChallenges(user.id),
-      ]);
+      const snapshot = await loadFriendsSnapshot(user.id, { force });
+      const friends = [...snapshot.friends];
+      const pending = snapshot.pendingRequests;
+      const outgoing = snapshot.outgoingRequests;
+      const challenges = snapshot.pendingChallenges;
 
       if (isMounted.current) {
         setState({
@@ -139,7 +136,7 @@ export function useFriends(): UseFriendsReturn {
 
   // Refresh friend data
   const refresh = useCallback(async () => {
-    await fetchAll();
+    await fetchAll(true);
   }, [fetchAll]);
 
   /**
@@ -286,9 +283,9 @@ export function useFriends(): UseFriendsReturn {
       fetchAll();
 
       // Update online status periodically (pass user id to skip auth.getUser() round-trips)
-      updateOnlineStatus(user?.id);
+      pingOnlineStatus(user?.id);
       onlineStatusIntervalRef.current = setInterval(() => {
-        updateOnlineStatus(user?.id);
+        pingOnlineStatus(user?.id);
       }, ONLINE_STATUS_INTERVAL);
 
       // Refresh friend list periodically (only when document is visible)
@@ -332,7 +329,7 @@ export function useFriends(): UseFriendsReturn {
   useEffect(() => {
     if (!isAuthenticated || !socket || !isSocketConnected) return;
 
-    const onRefresh = () => { fetchAll(); };
+    const onRefresh = () => { fetchAll(true); };
 
     socket.on('friends:requestReceived', onRefresh);
     socket.on('friends:requestAccepted', onRefresh);

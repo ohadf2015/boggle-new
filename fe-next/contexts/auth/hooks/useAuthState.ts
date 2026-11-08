@@ -10,6 +10,7 @@ import type { User } from '@supabase/supabase-js';
 import type { ProfileData, RankedProgress, AuthState, AuthStateSetters } from '../authTypes';
 import { canAccessInWorkMode } from '@/lib/auth/inWorkModeAccess';
 import { setStoredCustomAvatar } from '@/utils/profileStorage';
+import { rememberAccountAvatar } from '@/utils/accountAvatarCache';
 
 /**
  * Core auth state hook that manages user, profile, and ranked progress state.
@@ -39,9 +40,14 @@ export function useAuthState(): AuthState {
   // host/player lobbies seed from localStorage. Mirror it so a save on the
   // profile page doesn't leave the lobby on the previous avatar.
   const avatarConfig = profile?.avatar_config;
+  const profileId = profile?.id;
   useEffect(() => {
-    if (avatarConfig) setStoredCustomAvatar(avatarConfig);
-  }, [avatarConfig]);
+    if (!avatarConfig) return;
+    setStoredCustomAvatar(avatarConfig);
+    // Account-keyed copy: the next app start paints this avatar before the
+    // profile query answers (no stand-in face for a signed-in player).
+    if (profileId) rememberAccountAvatar(profileId, avatarConfig);
+  }, [avatarConfig, profileId]);
 
   // Initialize lastVisibleTimeRef on mount
   useEffect(() => {

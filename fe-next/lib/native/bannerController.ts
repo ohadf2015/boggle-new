@@ -95,6 +95,12 @@ export function shouldSuppressBanner(input: {
 export interface BannerOps {
   show: (margin: number, variant: BannerVariant) => Promise<void> | void;
   hide: () => Promise<void> | void;
+  /**
+   * Destroy the native AdView outright (AdMob.removeBanner) and resolve once it
+   * is gone. Optional: without it the controller can't move a banner whose
+   * margin changed (see `nativeMargin`) and falls back to a plain re-show.
+   */
+  remove?: () => Promise<void> | void;
 }
 
 interface AppliedState {
@@ -122,6 +128,13 @@ export interface BannerControllerConfig {
    * release-gated; this keeps the web-deployed JS resilient meanwhile.
    */
   opTimeoutMs?: number;
+  /**
+   * Quiet time the wanted margin must hold before the native banner is rebuilt
+   * at a new height, so scroll / layout churn costs one rebuild, not dozens.
+   */
+  recreateSettleMs?: number;
+  /** Clock, injectable for tests. */
+  now?: () => number;
 }
 
 const NO_BANNER: AppliedState = { visible: false, margin: -1, variant: null };
@@ -152,12 +165,28 @@ export class BannerController {
   private readonly setTimeoutFn: (cb: () => void, ms: number) => ReturnType<typeof setTimeout>;
   private readonly clearTimeoutFn: (handle: ReturnType<typeof setTimeout>) => void;
   private readonly opTimeoutMs: number;
+  private readonly recreateSettleMs: number;
+  private readonly now: () => number;
+  private lastRequestChangeAt = 0;
+  /**
+   * The margin the native AdView was CREATED with. The plugin applies `margin`
+   * only in createNewAdView; the re-show path (updateExistingAdView) reloads the
+   * ad in place and ignores it, and its Android 15 insets listener keeps the
+   * first margin too. So a banner first shown at 0 (no tab bar yet, or the CSS
+   * fallback unparsed) stayed on the screen bottom over the tabs all session.
+   *   undefined → unknown (a WebView reload keeps the native view alive)
+   *   null      → no native view exists
+   *   number    → a native view exists at this margin
+   */
+  private nativeMargin: number | null | undefined = undefined;
 
   constructor(config: BannerControllerConfig = {}) {
     this.retryDelays = config.retryDelaysMs ?? [1500, 4000, 10000];
     this.setTimeoutFn = config.setTimeoutFn ?? ((cb, ms) => setTimeout(cb, ms));
     this.clearTimeoutFn = config.clearTimeoutFn ?? ((h) => clearTimeout(h));
     this.opTimeoutMs = config.opTimeoutMs ?? 4000;
+    this.recreateSettleMs = config.recreateSettleMs ?? 300;
+    this.now = config.now ?? (() => Date.now());
   }
 
   /** Inject the plugin ops (native mount) or null (web / teardown). */
@@ -176,6 +205,7 @@ export class BannerController {
 
   /** Owner declares (or, with null, withdraws) its banner intent. */
   setRequest(key: string, req: BannerRequest | null): Promise<void> {
+    this.lastRequestChangeAt = this.now();
     if (req) this.requests[key] = req;
     else delete this.requests[key];
     this.resetRetry(); // fresh intent → fresh recovery budget
@@ -218,6 +248,8 @@ export class BannerController {
    * wants the banner, schedule a bounded backoff re-show.
    */
   notifyFailed(): void {
+    // The plugin destroys the AdView on an initial no-fill — nothing to move.
+    this.nativeMargin = null;
     if (!selectActiveBannerRequest(this.requests)) return; // nobody wants it — nothing to recover
     if (this.retryAttempt >= this.retryDelays.length) return; // budget spent; re-armed by a natural trigger
     const delay = this.retryDelays[this.retryAttempt];
@@ -296,47 +328,96 @@ export class BannerController {
     });
   }
 
+  private activeRequest(): BannerRequest | null {
+    // Suppressed → behave as if no owner wants the banner (hide if shown).
+    return this.suppressed ? null : selectActiveBannerRequest(this.requests);
+  }
+
+  /** True when showing `margin` needs a fresh native view (see nativeMargin). */
+  private needsRebuild(margin: number): boolean {
+    return Boolean(this.ops?.remove) && this.nativeMargin !== null && this.nativeMargin !== margin;
+  }
+
+  private sleep(ms: number): Promise<void> {
+    return new Promise((resolve) => { this.setTimeoutFn(resolve, ms); });
+  }
+
+  /** Wait until no owner has changed its request for recreateSettleMs (bounded). */
+  private async waitForQuietRequests(): Promise<void> {
+    for (let i = 0; i < 20; i++) {
+      const quietFor = this.now() - this.lastRequestChangeAt;
+      if (quietFor >= this.recreateSettleMs) return;
+      await this.sleep(this.recreateSettleMs - quietFor);
+    }
+  }
+
+  private async hideIfShown(gen: number): Promise<void> {
+    // When suppressed (drawer open), always call hide() to be sure the native
+    // banner is gone, even if applied.visible===false (e.g. after a churn).
+    // If applied already claimed nothing shown, hide() is idempotent (plugin
+    // returns benign "no banner" error which useAdMob swallows). This resilience
+    // ensures suppress works even if:
+    // - setOps churn left applied={visible:false} despite native showing
+    // - getConfig() early-return in ops.hide() swallows the call last time
+    // - A prior reconcile's applied state got out of sync with native reality
+    if (this.applied.visible || this.suppressed) {
+      await this.withOpTimeout(() => this.ops!.hide());
+      this.applied = { ...NO_BANNER };
+    }
+    this.appliedGeneration = gen;
+  }
+
   private async reconcile(): Promise<void> {
     if (!this.ops) return;
     const gen = this.generation;
-    // Suppressed → behave as if no owner wants the banner (hide if shown).
-    const active = this.suppressed ? null : selectActiveBannerRequest(this.requests);
+    let active = this.activeRequest();
 
     if (!active) {
-      // When suppressed (drawer open), always call hide() to be sure the native
-      // banner is gone, even if applied.visible===false (e.g. after a churn).
-      // If applied already claimed nothing shown, hide() is idempotent (plugin
-      // returns benign "no banner" error which useAdMob swallows). This resilience
-      // ensures suppress works even if:
-      // - setOps churn left applied={visible:false} despite native showing
-      // - getConfig() early-return in ops.hide() swallows the call last time
-      // - A prior reconcile's applied state got out of sync with native reality
-      if (this.applied.visible || this.suppressed) {
-        await this.withOpTimeout(() => this.ops!.hide());
-        this.applied = { ...NO_BANNER };
-      }
-      this.appliedGeneration = gen;
+      await this.hideIfShown(gen);
       return;
     }
 
     // Coalesce: identical applied state at the current generation → no native
     // churn (scroll/mutation spam). A force (reassert/retry) bumps the
     // generation so this guard fails and the banner is genuinely re-shown.
-    if (
+    const coalesces = (r: BannerRequest) =>
       this.applied.visible &&
-      this.applied.margin === active.margin &&
-      this.applied.variant === active.variant &&
-      this.appliedGeneration === gen
-    ) {
-      return;
+      this.applied.margin === r.margin &&
+      this.applied.variant === r.variant &&
+      this.appliedGeneration === gen;
+    if (coalesces(active)) return;
+
+    if (this.needsRebuild(active.margin)) {
+      // A live native view at another height: let the margin settle first so a
+      // scroll costs one rebuild (unknown state → no view to wait on).
+      if (typeof this.nativeMargin === 'number') {
+        await this.waitForQuietRequests();
+        active = this.activeRequest();
+        if (!active) {
+          await this.hideIfShown(gen);
+          return;
+        }
+        if (coalesces(active)) return;
+      }
+      if (this.needsRebuild(active.margin)) {
+        try {
+          await this.withOpTimeout(() => this.ops!.remove!());
+        } catch {
+          // removeBanner rejected: fall through to a plain re-show.
+        }
+        this.nativeMargin = null;
+        this.applied = { ...NO_BANNER };
+      }
     }
 
     // showBanner() may never resolve on the native re-show path (see
     // opTimeoutMs) — bound the await so a hung show can't freeze the chain and
     // block later suppress/hide/reassert. The banner still paints; we record it
     // as applied either way.
-    await this.withOpTimeout(() => this.ops!.show(active.margin, active.variant));
+    await this.withOpTimeout(() => this.ops!.show(active!.margin, active!.variant));
     this.applied = { visible: true, margin: active.margin, variant: active.variant };
+    // A fresh view is built at this margin; an existing one keeps its own.
+    if (this.nativeMargin === null || this.nativeMargin === undefined) this.nativeMargin = active.margin;
     this.appliedGeneration = gen;
   }
 }

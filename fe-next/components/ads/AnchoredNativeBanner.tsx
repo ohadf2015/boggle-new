@@ -111,7 +111,7 @@ export default function AnchoredNativeBanner() {
       return () => { cancelled = true; };
     }
 
-    const computeMargin = (allowCssFallback: boolean): number => {
+    const computeMargin = (allowCssFallback: boolean): number | null => {
       // Read --bottom-nav-height published by GlobalBottomNav (single source of truth).
       // The var holds the nav's real offsetHeight (h-16 + safe-area paddingBottom), so:
       // Inline value always wins. The CSS-declared default
@@ -128,12 +128,19 @@ export default function AnchoredNativeBanner() {
         (allowCssFallback
           ? getComputedStyle(root).getPropertyValue('--bottom-nav-height').trim()
           : '');
-      const navHeight = Math.round(parseFloat(raw) || 0);
+      const parsed = parseFloat(raw);
+      // The real CSS default is `calc(64px + env(...))`, which parseFloat reads
+      // as NaN. Treating that as 0 created the native banner at the screen
+      // bottom, and the plugin never moves a banner after creating it, so it sat
+      // on the tab bar. Unknown height on the first frame → don't guess; the
+      // rAF re-measure below asks once the nav has published its height.
+      if (!inline && allowCssFallback && raw && !Number.isFinite(parsed)) return null;
+      const navHeight = Math.round(Number.isFinite(parsed) ? parsed : 0);
       return computeBannerMargin({ navHeight, safeBottom, isAndroid });
     };
 
-    const applyBanner = (margin: number) => {
-      if (cancelled) return;
+    const applyBanner = (margin: number | null) => {
+      if (cancelled || margin === null) return;
       // Drawer-suppress (hide behind the open side menu) is owned centrally by
       // bannerController.setSuppressed via BannerCoordinatorMount — it covers
       // both banner owners (anchor + slot), so it's not handled here anymore.

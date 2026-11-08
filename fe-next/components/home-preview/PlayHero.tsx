@@ -52,17 +52,28 @@ function AvatarStage({ avatar, animate, t, onAvatarSaved }: Pick<PlayHeroProps, 
   return (
     <div className="relative flex h-[176px] w-full items-center [@media(max-height:700px)]:h-[132px] justify-center lg:h-[440px] 2xl:h-[520px]">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-40 lg:opacity-60">
-        <QuickResultsRays color={NODE_COLORS.classic.hex} spinning={animate} />
+        <QuickResultsRays color={NODE_COLORS.classic.hex} spinning={animate} compact />
       </div>
       <SparkleLoop enabled={animate} />
       <div className="relative z-10">
       <div className={`relative [@media(max-height:700px)]:scale-[0.7] ${animate ? 'animate-[qp-avatar-pop_0.7s_cubic-bezier(0.3,0.9,0.4,1)_both]' : ''}`}>
         <div className={animate ? 'animate-[qp-avatar-bob_2.8s_ease-in-out_0.9s_infinite]' : ''}>
-          <div
-            ref={avatar ? avatarSlotCallback : undefined}
-            data-testid="hp-avatar-slot"
-            className="h-[140px] w-[140px] lg:h-[260px] lg:w-[260px] 2xl:h-[300px] 2xl:w-[300px]"
-          />
+          <div className="relative">
+            {!avatar && (
+              // Signed-in profile still loading and no avatar from last time:
+              // a neutral disc holds the spot instead of an id-generated face.
+              <div
+                data-testid="hp-avatar-skeleton"
+                aria-hidden="true"
+                className={`absolute inset-0 rounded-full border-[3px] border-black/60 bg-neo-white/10 ${animate ? 'animate-pulse' : ''}`}
+              />
+            )}
+            <div
+              ref={avatar ? avatarSlotCallback : undefined}
+              data-testid="hp-avatar-slot"
+              className="h-[140px] w-[140px] lg:h-[260px] lg:w-[260px] 2xl:h-[300px] 2xl:w-[300px]"
+            />
+          </div>
         </div>
         <span
           aria-hidden="true"
