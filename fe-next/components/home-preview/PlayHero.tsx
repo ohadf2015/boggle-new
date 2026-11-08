@@ -12,7 +12,7 @@ import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { setHeroAvatarProps, setHeroAvatarSlot } from './heroAvatarBridge';
 import { HeroQuickLinks } from './HeroQuickLinks';
 import { quickPlayHref } from '@/lib/quickPlay/startMode';
-import { trackLandingCtaClick } from '@/utils/growthTracking';
+import { trackLandingCtaClick, trackOnboardingOpenRequested } from '@/utils/growthTracking';
 
 const MODES: QuickMode[] = ['classic', 'blast', 'word-hunt', 'wheel-rush'];
 const KEY_TILT = ['-rotate-2', 'rotate-1', '-rotate-1', 'rotate-2'];
@@ -116,9 +116,24 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
   // as gate fall-through); true − onboarding_open_requested = the real
   // mounted-gate loss. Fires on every click, handler or not — same
   // "tracking is not gated on onPlay" semantics as FreshPlayLink.
+  //
+  // `onboarding_open_requested` gets the same every-click accounting: without
+  // it, the returning-user majority of landing_cta_clicked never emits a twin
+  // (their clicks resolve HERE, before any handler exists), so PostHog reads
+  // cta_clicked − open_requested ≈ all clicks as mounted-gate loss — the
+  // 196-vs-0 split that hid the real funnel. allowed:false + `fallthrough`
+  // marks clicks that resolved without requesting an open; allowed:true fires
+  // from PageClient.handleStartOnboarding on the upgrade path, BEFORE
+  // OnboardingFlow mounts (its chunk is lazy-loaded).
   const handlePlayClick = (e: MouseEvent<HTMLAnchorElement>) => {
     trackLandingCtaClick('fresh_hero_play', { opens_ftue: !!onPlay });
-    if (!onPlay || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    if (!onPlay || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) {
+      trackOnboardingOpenRequested({
+        allowed: false,
+        fallthrough: onPlay ? 'modified_click' : 'native_nav',
+      });
+      return;
+    }
     e.preventDefault();
     onPlay();
   };

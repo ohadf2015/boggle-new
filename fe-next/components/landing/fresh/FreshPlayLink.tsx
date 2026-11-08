@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import type { MouseEvent, ReactNode } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { trackLandingCtaClick } from '@/utils/growthTracking';
+import { trackLandingCtaClick, trackOnboardingOpenRequested } from '@/utils/growthTracking';
 
 interface FreshPlayLinkProps {
   /** Opens OnboardingFlow. Absent (server HTML, no JS) → the link just navigates. */
@@ -36,7 +36,20 @@ export function FreshPlayLink({ onPlay, cta, locale, href, className, children }
     // for new users (PageClient gates onStartOnboarding on isNewUser), so
     // false = returning-user native navigation by design, not gate loss.
     trackLandingCtaClick(cta, { opens_ftue: !!onPlay });
-    if (!onPlay || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    // Same every-click accounting as PlayHero: clicks that resolve WITHOUT
+    // requesting an onboarding open (no handler attached = returning user /
+    // route-denied; or a modified click keeping native behaviour) still emit
+    // `onboarding_open_requested` with allowed:false + `fallthrough`, so
+    // cta_clicked − open_requested measures only true tracking loss instead
+    // of the whole returning cohort. allowed:true fires from PageClient's
+    // handleStartOnboarding on the upgrade path.
+    if (!onPlay || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) {
+      trackOnboardingOpenRequested({
+        allowed: false,
+        fallthrough: onPlay ? 'modified_click' : 'native_nav',
+      });
+      return;
+    }
     e.preventDefault();
     onPlay();
   };

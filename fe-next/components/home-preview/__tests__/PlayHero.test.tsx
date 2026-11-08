@@ -2,12 +2,13 @@ import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 
 vi.mock('@/components/quick-play/QuickResultsFx', () => ({ QuickResultsRays: () => null, SparkleLoop: () => null }));
-vi.mock('@/utils/growthTracking', () => ({ trackLandingCtaClick: vi.fn() }));
+vi.mock('@/utils/growthTracking', () => ({ trackLandingCtaClick: vi.fn(), trackOnboardingOpenRequested: vi.fn() }));
 
 import { PlayHero } from '../PlayHero';
-import { trackLandingCtaClick } from '@/utils/growthTracking';
+import { trackLandingCtaClick, trackOnboardingOpenRequested } from '@/utils/growthTracking';
 
 const mockTrackCta = vi.mocked(trackLandingCtaClick);
+const mockTrackOpenRequested = vi.mocked(trackOnboardingOpenRequested);
 
 import { en } from '@/translations/en';
 
@@ -98,19 +99,37 @@ describe('PlayHero', () => {
 
   it('given a new user (onPlay set), when PLAY is tapped, then the funnel numerator fires with opens_ftue:true and the handler runs', () => {
     mockTrackCta.mockClear();
+    mockTrackOpenRequested.mockClear();
     const onPlay = vi.fn();
     renderHero({ onPlay });
     fireEvent.click(screen.getByTestId('hp-play'));
     expect(mockTrackCta).toHaveBeenCalledTimes(1);
     expect(mockTrackCta).toHaveBeenCalledWith('fresh_hero_play', { opens_ftue: true });
     expect(onPlay).toHaveBeenCalledTimes(1);
+    // The allowed:true twin fires from PageClient.handleStartOnboarding (the
+    // upgraded onPlay), BEFORE OnboardingFlow mounts — not from the hero.
+    expect(mockTrackOpenRequested).not.toHaveBeenCalled();
   });
 
-  it('given a returning user (no onPlay), when PLAY is tapped, then the click still counts with opens_ftue:false and nothing is hijacked', () => {
+  it('given a returning user (no onPlay), when PLAY is tapped, then the click still counts with opens_ftue:false, resolves to native nav, and is accounted as allowed:false fallthrough:native_nav', () => {
     mockTrackCta.mockClear();
+    mockTrackOpenRequested.mockClear();
     renderHero();
     fireEvent.click(screen.getByTestId('hp-play'));
     expect(mockTrackCta).toHaveBeenCalledTimes(1);
     expect(mockTrackCta).toHaveBeenCalledWith('fresh_hero_play', { opens_ftue: false });
+    expect(mockTrackOpenRequested).toHaveBeenCalledTimes(1);
+    expect(mockTrackOpenRequested).toHaveBeenCalledWith({ allowed: false, fallthrough: 'native_nav' });
+  });
+
+  it('given a modified click (new tab) with onPlay set, when PLAY is clicked, then native behaviour is kept and accounted as allowed:false fallthrough:modified_click', () => {
+    mockTrackCta.mockClear();
+    mockTrackOpenRequested.mockClear();
+    const onPlay = vi.fn();
+    renderHero({ onPlay });
+    fireEvent.click(screen.getByTestId('hp-play'), { metaKey: true });
+    expect(onPlay).not.toHaveBeenCalled();
+    expect(mockTrackOpenRequested).toHaveBeenCalledTimes(1);
+    expect(mockTrackOpenRequested).toHaveBeenCalledWith({ allowed: false, fallthrough: 'modified_click' });
   });
 });

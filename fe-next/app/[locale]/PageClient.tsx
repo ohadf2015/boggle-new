@@ -239,11 +239,13 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
   }, [quickCover, quickTitle]);
 
   const handleStartOnboarding = useCallback(() => {
-    // Leak discriminator for the PLAY→onboarding funnel: fires the moment a PLAY
-    // click reaches this handler, BEFORE OnboardingFlow mounts. cta_clicked −
-    // open_requested = clicks lost to native <a> navigation (the mounted-gate
-    // fall-through signature); open_requested − onboarding_started = handler ran
-    // but the flow never mounted (lazy-chunk failure / render crash).
+    // Leak discriminator for the PLAY→onboarding funnel: the allowed:true row,
+    // fired the moment a PLAY click reaches this handler, BEFORE OnboardingFlow
+    // mounts. Native-nav fall-throughs (returning users, modified clicks) are
+    // accounted as allowed:false rows by the link components (PlayHero /
+    // FreshPlayLink), so cta_clicked − open_requested ≈ 0 by construction;
+    // open_requested(allowed:true) − onboarding_started = handler ran but the
+    // flow never mounted (lazy-chunk failure / render crash).
     trackOnboardingOpenRequested({ allowed: routeAllowsOnboarding });
     if (!routeAllowsOnboarding) return;
     let isCrazyGames = false;

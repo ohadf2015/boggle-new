@@ -2012,15 +2012,24 @@ export const trackInterstitialLifecycle = (
 };
 
 /**
- * PLAY → onboarding hand-off request. Fires from PageClient.handleStartOnboarding
- * the moment a landing PLAY click reaches the handler — BEFORE OnboardingFlow
- * mounts (its chunk is lazy-loaded, so a gap here means the flow never rendered).
- * Splits the landing_cta_clicked → onboarding_started leak three ways:
- *   cta_clicked − open_requested = clicks that never reached the handler
- *     (native <a href> navigation fall-through — the mounted-gate signature);
- *   open_requested − onboarding_started = handler ran but the flow never
+ * PLAY → onboarding hand-off accounting. Full-accounting twin of
+ * `landing_cta_clicked`: fires on EVERY landing PLAY click decision, split
+ * by whether the click actually requested an onboarding open:
+ *   allowed:true — fired from PageClient.handleStartOnboarding the moment a
+ *     PLAY click reaches the handler, BEFORE OnboardingFlow mounts (its chunk
+ *     is lazy-loaded, so a gap here means the flow never rendered).
+ *     allowed:true − onboarding_started = handler ran but the flow never
  *     mounted (lazy-chunk load failure, render crash, route guard);
- *   started − skipped/completed = the flow opened, then the user bailed.
+ *   allowed:false fallthrough:'native_nav' — no handler was attached
+ *     (returning user or route-denied): the click resolved to native <a href>
+ *     navigation BY DESIGN, not gate loss;
+ *   allowed:false fallthrough:'modified_click' — cmd/ctrl/shift/alt or middle
+ *     click kept the native link behaviour.
+ * With both events covering the same click surface, cta_clicked −
+ * open_requested ≈ 0 by construction (pure tracking loss), and the real
+ * funnel is open_requested(allowed:true) vs onboarding_started; the
+ * returning-user cohort is measured by the allowed:false rows instead of
+ * reading as 100% leak (the 196-vs-0 split this fixes).
  * Auto-open entries (?room= / ?next= / CrazyGames) bypass the PLAY CTA and do
  * NOT fire this — they never emit landing_cta_clicked, so including them would
  * corrupt the subtraction.

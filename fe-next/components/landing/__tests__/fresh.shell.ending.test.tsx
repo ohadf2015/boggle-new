@@ -31,9 +31,11 @@ import { setFreshPlay, getFreshPlay } from '../fresh/freshPlayBridge';
 import LandingView from '../LandingView';
 
 const track = vi.fn();
+const trackOpenRequested = vi.fn();
 vi.mock('@/utils/growthTracking', () => ({
   trackLandingCtaClick: (cta: string) => track(cta),
   trackGrowthEvent: vi.fn(),
+  trackOnboardingOpenRequested: (...a: unknown[]) => trackOpenRequested(...a),
 }));
 // Context says "en" on purpose: the finale must take its locale from the prop
 // HomepageContentSection already receives (server-rendered, no drift).
@@ -76,6 +78,7 @@ const finalePlay = (finale: HTMLElement) =>
 
 beforeEach(() => {
   track.mockClear();
+  trackOpenRequested.mockClear();
   setFreshPlay(undefined);
 });
 afterEach(() => setFreshPlay(undefined));
@@ -167,12 +170,13 @@ describe('the finale is the last thing on the page', () => {
 });
 
 describe('the finale PLAY opens quick play through the bridge', () => {
-  it('without a registered play it is a plain link (server HTML, no JS, returning)', () => {
+  it('without a registered play it is a plain link (server HTML, no JS, returning), accounted as allowed:false fallthrough:native_nav', () => {
     const { finale } = renderEnding();
     const evt = new MouseEvent('click', { bubbles: true, cancelable: true });
     fireEvent(finalePlay(finale), evt);
     expect(evt.defaultPrevented).toBe(false);
     expect(track).toHaveBeenCalledWith('bottom_cta');
+    expect(trackOpenRequested).toHaveBeenCalledWith({ allowed: false, fallthrough: 'native_nav' });
   });
 
   it('with a registered play, a click opens onboarding instead of navigating', () => {
@@ -194,6 +198,7 @@ describe('the finale PLAY opens quick play through the bridge', () => {
     fireEvent(finalePlay(finale), evt);
     expect(play).not.toHaveBeenCalled();
     expect(evt.defaultPrevented).toBe(false);
+    expect(trackOpenRequested).toHaveBeenCalledWith({ allowed: false, fallthrough: 'modified_click' });
   });
 
   it('LandingView fills the bridge from onStartOnboarding and clears it on unmount', () => {
