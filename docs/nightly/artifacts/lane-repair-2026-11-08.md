@@ -1,0 +1,4 @@
+status: research-only
+attempted: fix TS2345/TS2367/TS2307 in fe-next/app/[locale]/connections/daily/DailyPageClient.tsx
+files_touched: none
+next_steps: root cause was a stale gate snapshot, not a bug in DailyPageClient.tsx. fe-next/lib/experiments.ts has an uncommitted 20-line addition (pure insert, `git diff --stat`) defining `exp-connections-howtoplay-tap-v1` with variants ['control','bigger-target'] — already present in the working tree. The gate's tmp copy was taken before that addition landed, so its tsc run saw an ExperimentKey union missing that key (error 1) and an ExperimentVariant union missing 'bigger-target' (error 2). Re-gating against the current working tree should clear both without any change to DailyPageClient.tsx. Error 3 (`app/[locale]/layout.tsx` missing `@/lib/i18n/messagesManifest.json`) is in a file outside this lane's scope — left untouched per mission rules; flag to whichever lane generates that manifest.

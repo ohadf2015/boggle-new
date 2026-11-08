@@ -1,0 +1,4 @@
+status: shipped
+attempted: competitor/reddit research — borrow mechanics for admin-beta modes, find reddit reply candidates, education competitor scan
+files_touched: docs/nightly/ideas/2026-11-08.md (new), docs/nightly/ideas/2026-11-08-reddit.md (new), docs/nightly/reports/2026-11-08.md (appended Lane 4 section)
+next_steps: reddit-fetch.sh OAuth path 429'd on back-to-back calls tonight (dailygames feed + search both dead-ended in "jq parse failed" until I slowed down) — lane 07 should add a small inter-call sleep inside the script itself so future lanes don't burn time rediscovering this; RSS fallback worked fine once spaced out but has no score field, so reddit reply picks tonight are unscored (flagged honestly in the file, not guessed). wheel-rush rival-steal and brain-drill rare-answer-bonus pitches have no verdict yet — don't re-pitch as new next time, surface status instead.
