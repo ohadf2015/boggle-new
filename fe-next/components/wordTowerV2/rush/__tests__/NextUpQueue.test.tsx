@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import type { NextUpSlot } from "@/lib/wordTowerV2/rush/types";
 import { NextUpQueue, detectReveals } from "../NextUpQueue";
 
@@ -14,6 +14,17 @@ const SLOTS: NextUpSlot[] = [
 ];
 
 describe("NextUpQueue", () => {
+  it("given the strip, when tapped, then one line explains the blocks coming up, and a second tap hides it", () => {
+    render(<NextUpQueue t={t} slots={SLOTS} reducedMotion compact />);
+    expect(screen.queryByRole("status")).toBeNull();
+    const strip = screen.getByRole("button", { name: "wordTowerV2.rush.nextUp.hint" });
+    fireEvent.click(strip);
+    expect(screen.getByRole("status").textContent).toBe("wordTowerV2.rush.nextUp.hint");
+    expect(strip.getAttribute("aria-expanded")).toBe("true");
+    fireEvent.click(strip);
+    expect(screen.queryByRole("status")).toBeNull();
+  });
+
   it("given three slots, when rendered, then three chips sit in a labelled list", () => {
     render(<NextUpQueue t={t} slots={SLOTS} reducedMotion />);
     expect(

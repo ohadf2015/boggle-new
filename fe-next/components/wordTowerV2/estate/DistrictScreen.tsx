@@ -234,7 +234,7 @@ export function DistrictScreen({ t, estate: api, onClose }: Props) {
         </div>
       </div>
 
-      <div className="border-t-4 border-black bg-neo-navy px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2">
+      <div className="border-t-4 border-black bg-neo-navy px-3 pb-[max(0.5rem,env(safe-area-inset-bottom),var(--cap-safe-area-bottom,0px))] pt-2">
         <PlotPanel t={t} estate={estate} slot={slot} name={nameOf(slot)} busy={busy} onUpgrade={() => void act('build')} onRepair={() => void act('repair')} />
         {!api.authed ? (
           <p className="mx-auto mt-1.5 max-w-md text-center font-neo-display text-[11px] font-bold text-neo-cream/60">{t('wordTowerV2.estate.guest')}</p>

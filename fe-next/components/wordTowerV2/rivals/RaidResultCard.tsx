@@ -235,7 +235,7 @@ export function RaidResultCard({ t, rival, result, error, floorsKnocked, floorsT
         </div> : null}
 
       {/* Bottom bar: what you banked, and where to next. */}
-      <div className="pointer-events-auto bg-gradient-to-t from-neo-navy via-neo-navy/90 to-transparent px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-10">
+      <div className="pointer-events-auto bg-gradient-to-t from-neo-navy via-neo-navy/90 to-transparent px-4 pb-[max(1rem,env(safe-area-inset-bottom),var(--cap-safe-area-bottom,0px))] pt-10">
         <div className="mx-auto w-full max-w-md md:max-w-lg">
           {subCoins > 0 ? (
             <p className="mx-auto w-fit font-neo-display text-xs font-bold uppercase tracking-wide text-neo-cream/75 md:text-sm">

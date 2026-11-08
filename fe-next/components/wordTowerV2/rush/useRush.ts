@@ -27,6 +27,7 @@ export interface RushApi {
   rank: RankState;
   rankUp: (RushEvent & { tierId: string }) | null;
   clearRankUp(): void;
+  /** The ONE rival marked on the tower: the next above you, or the one you passed once nobody is left above. */
   rivals: GhostRival[];
   overtake: (RushEvent & GhostRival) | null;
   shiftOvertake(): void;
@@ -80,8 +81,11 @@ export function useRush(opts?: { daily?: boolean }): RushApi {
   const repickRivals = useCallback(() => {
     const next = pickRivals(boardRef.current, peakRef.current);
     if (sameRivals(next, rivalsRef.current)) return;
+    // Several stay tracked so every pass is announced; only one is drawn. Four
+    // name tags with dashed lines across the sky read as clutter (player
+    // report, Nov 2026).
     rivalsRef.current = next;
-    setRivals(next);
+    setRivals(pickRivals(boardRef.current, peakRef.current, 1));
   }, []);
 
   const syncRank = useCallback((announce: boolean) => {

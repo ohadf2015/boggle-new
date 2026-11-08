@@ -228,7 +228,7 @@ export function DailyTowerResults(p: Props) {
           </DailyResultsFrame>
         </div>
 
-        <div data-wt2-results-actions className="shrink-0 border-t-3 border-neo-cream bg-neo-navy-light p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+        <div data-wt2-results-actions className="shrink-0 border-t-3 border-neo-cream bg-neo-navy-light p-3 pb-[max(0.75rem,env(safe-area-inset-bottom),var(--cap-safe-area-bottom,0px))]">
           <div className="mx-auto flex max-w-md items-center gap-2">
             <button
               type="button"

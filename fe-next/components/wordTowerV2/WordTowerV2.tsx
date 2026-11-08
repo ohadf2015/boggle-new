@@ -51,6 +51,7 @@ import { useFirstFloorHint } from './guide/useFirstFloorHint';
 import { resolveWt2Screen } from '@/lib/wordTowerV2/exitTracking';
 import { useRush } from './rush/useRush';
 import { useRushUi } from './rush/useRushUi';
+import { PLAY_HEIGHT } from './safeArea';
 
 /**
  * Word Tower v2.
@@ -270,7 +271,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
   const biomeNow = biomeAt(floorsAt(heightM));
 
   return (
-    <div ref={layout.rootRef} className={`relative h-dvh w-full shrink-0 overflow-hidden bg-neo-navy ${layout.railVarsClass}`} dir={dir}>
+    <div ref={layout.rootRef} className={`relative w-full shrink-0 overflow-hidden bg-neo-navy ${layout.railVarsClass}`} style={{ height: PLAY_HEIGHT }} data-wt2-root dir={dir}>
       {/* The smash round covers everything: don't run a second Pixi loop under it. */}
       {!smashing && !raiding ? (
         <TowerCanvas

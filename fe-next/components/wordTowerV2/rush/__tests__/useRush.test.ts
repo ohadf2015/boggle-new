@@ -164,6 +164,31 @@ describe('useRush', () => {
     expect(result.current.overtake?.name).toBe('Ben');
   });
 
+  it('given several rivals, then only the next one above you is shown, and the one you passed once nobody is left above', () => {
+    const { result } = renderHook(() => useRush());
+    act(() => result.current.reset(5));
+    act(() =>
+      result.current.setBoard([
+        { id: 'a', name: 'Ana', bestHeightM: 4 },
+        { id: 'b', name: 'Ben', bestHeightM: 9 },
+        { id: 'c', name: 'Cy', bestHeightM: 14 },
+        { id: 'd', name: 'Dee', bestHeightM: 20 },
+      ]),
+    );
+    expect(result.current.rivals.map((r) => r.name)).toEqual(['Ana']);
+    act(() => result.current.onPeak(10));
+    expect(result.current.rivals.map((r) => r.name)).toEqual(['Cy']);
+    act(() => result.current.shiftOvertake());
+    act(() => result.current.shiftOvertake());
+    expect(result.current.overtake).toBeNull();
+    // Passing two at once still announces each of them.
+    act(() => result.current.onPeak(25));
+    expect(result.current.overtake?.name).toBe('Cy');
+    act(() => result.current.shiftOvertake());
+    expect(result.current.overtake?.name).toBe('Dee');
+    expect(result.current.rivals.map((r) => r.name)).toEqual(['Dee']);
+  });
+
   it('given no safety net, then no free recovery; given one, then exactly one', () => {
     const { result } = renderHook(() => useRush());
     act(() => result.current.reset(1));
