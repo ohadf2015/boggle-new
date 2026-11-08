@@ -40,6 +40,16 @@ function renderHero(overrides: Partial<React.ComponentProps<typeof PlayHero>> = 
 }
 
 describe('PlayHero', () => {
+  it('given the hero, then the first paragraph after the title says what LexiClash is', () => {
+    renderHero();
+    const title = screen.getByRole('heading', { level: 1 });
+    const intro = title.parentElement?.querySelector('h1 + p');
+    expect(intro?.textContent).toBe(en.homePlay.intro);
+    const words = (intro?.textContent ?? '').split(/\s+/).filter(Boolean).length;
+    expect(words).toBeGreaterThanOrEqual(10);
+    expect(words).toBeLessThanOrEqual(60);
+  });
+
   it('given the hero, when tapping the edit-avatar button, then the real avatar builder opens', () => {
     renderHero();
     const edit = screen.getByRole('button', { name: 'Edit avatar' });

@@ -1280,6 +1280,7 @@ const en = {
   // @home-play:start
   "homePlay": {
     "heroLine": "Sixty seconds, a fresh board, and three rivals who don't wait for you.",
+    "intro": "LexiClash is a free word game you play in your browser. Find as many words as you can on a letter board, against bots, friends or a whole class, in six languages.",
     "playSub": "Random mode",
     "pickMode": "Or pick the mode yourself",
     "timerBadge": "60s",
