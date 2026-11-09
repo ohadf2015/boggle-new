@@ -7,7 +7,7 @@ import { m } from "framer-motion";
 import { QRCodeSVG } from "qrcode.react";
 import { X } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { classroomJoinUrl } from "@/lib/education/classroomInvitePayload";
+import { classroomJoinUrl, joinAddressForDisplay } from "@/lib/education/classroomInvitePayload";
 import { useClassRoster } from "./useClassRoster";
 import { RosterSeats } from "./RosterSeats";
 import { useHqJuice } from "./useHqJuice";
@@ -52,7 +52,7 @@ export function HqProjectorSheet({
   }, [arrivals, sfx]);
 
   const joinUrl = classroomJoinUrl(origin || "", language, classroom.join_code);
-  const address = joinUrl.replace(/^https?:\/\//, "");
+  const address = joinAddressForDisplay(joinUrl);
 
   if (typeof document === "undefined") return null;
 

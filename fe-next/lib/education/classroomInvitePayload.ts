@@ -19,6 +19,15 @@ export function classroomJoinUrl(origin: string, language: string, code: string)
   return `${base}/${language}/join/${code}`;
 }
 
+/**
+ * A join address as people read and type it: no scheme, no `www.` (the bare host
+ * redirects), no trailing slash. Every screen and slip that prints an address uses
+ * this, so the projector, the share sheet and the printed slip all say the same thing.
+ */
+export function joinAddressForDisplay(url: string): string {
+  return url.replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/$/, '');
+}
+
 export function classroomInvitePayload(
   origin: string,
   language: string,

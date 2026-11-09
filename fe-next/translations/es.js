@@ -22134,7 +22134,7 @@ const es = {
       "shareWhatsapp": "WhatsApp",
       "shareGoogle": "Google Classroom",
       "shareMore": "Compartir",
-      "copyLink": "Copiar enlace de invitación",
+      "copyLink": "Copiar enlace",
       "copied": "Copiado",
       "copyFailed": "No se pudo copiar. Comparte el código.",
       "noAccount": "Los alumnos entran sin cuenta",
