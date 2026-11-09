@@ -8040,6 +8040,25 @@ const es = {
 "goalLife": "Adivínala antes de quedarte sin vida.",
 "goalClues": "Las palabras que encuentras en el tablero revelan letras pista.",
 "play": "¡A jugar!"
+},
+"lesson": {
+"clueTitle": "Empieza con una palabra corta",
+"clueDoneTitle": "¡Pista gratis!",
+"clueDoneBody": "Las palabras cortas no cuestan nada. Te dan vida y muestran letras de la palabra oculta.",
+"alsoInWord": "También tiene:",
+"lifeLabel": "Vida",
+"colorsNext": "Entendido",
+"guessTitle": "Ahora encuentra la palabra oculta",
+"guessBody": "También está en el tablero. Desliza una palabra de {count} letras para adivinarla.",
+"guessGlow": "Busca el brillo.",
+"guessShort": "Esa es una palabra pista. Para adivinar necesitas {count} letras.",
+"guessWrong": "Esa no es. Usa las pistas y vuelve a intentarlo.",
+"guessWinTitle": "¡La encontraste!",
+"guessWinBody": "Así es el juego. El tablero real es más grande.",
+"readyTitle": "¡Listo!",
+"ruleLife": "Tu vida baja. Encuentra palabras cortas para recargarla.",
+"ruleClues": "Cualquier otra palabra es gratis y revela letras.",
+"ruleGuess": "Una palabra tan larga como la oculta es un intento. Tienes {tries}, y fallar cuesta vida."
 }
 },
     "welcome": {

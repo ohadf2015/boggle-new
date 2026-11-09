@@ -15,6 +15,7 @@ import { useRef, useCallback, useEffect, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { roundTarget, type QuickRoundConfig, type QuickRoundResult } from '../types';
 import { BlastQuickRound } from './BlastQuickRound';
+import { QuickHuntLessonGate } from './QuickHuntLessonGate';
 import { fromWordWheel, fromSurvival } from './normalizeResult';
 import { ghostsToWheelRivals } from '@/lib/quickPlay/ghostRivals';
 import { useHideNavigation } from '@/contexts/NavigationContext';
@@ -120,21 +121,23 @@ export function QuickModeAdapter({ config, onDone, onQuit }: QuickModeAdapterPro
     case 'word-hunt':
       return (
         <div className={STAGE_HUNT} data-testid="quick-stage-word-hunt">
-          <DailyWordHuntSurvival
-            grid={config.grid}
-            puzzleNumber={0}
-            language={config.language as never}
-            targetWord={config.targetWord ?? ''}
-            practice={true}
-            rivals={huntRivals}
-            hideModeCoach={true}
-            onComplete={(r: { wordsDiscovered: Array<{ word: string }> }) =>
-              finish(fromSurvival(r, config))
-            }
-            onQuit={onQuit}
-            quitStaysOnPage={true}
-            timeLimitSec={config.durationSec}
-          />
+          <QuickHuntLessonGate language={config.language as never}>
+            <DailyWordHuntSurvival
+              grid={config.grid}
+              puzzleNumber={0}
+              language={config.language as never}
+              targetWord={config.targetWord ?? ''}
+              practice={true}
+              rivals={huntRivals}
+              hideModeCoach={true}
+              onComplete={(r: { wordsDiscovered: Array<{ word: string }> }) =>
+                finish(fromSurvival(r, config))
+              }
+              onQuit={onQuit}
+              quitStaysOnPage={true}
+              timeLimitSec={config.durationSec}
+            />
+          </QuickHuntLessonGate>
         </div>
       );
     case 'blast':

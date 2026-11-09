@@ -6460,6 +6460,25 @@ const ja = {
 "goalLife": "ライフがなくなる前に当てよう。",
 "goalClues": "盤面で見つけた単語が、ヒントの文字を明かします。",
 "play": "プレイしよう"
+},
+"lesson": {
+"clueTitle": "まずは短い単語から",
+"clueDoneTitle": "無料ヒント！",
+"clueDoneBody": "短い単語はタダ。ライフが回復して、隠れた単語の文字がわかります。",
+"alsoInWord": "ほかに含まれる文字：",
+"lifeLabel": "ライフ",
+"colorsNext": "わかった",
+"guessTitle": "隠れた単語を見つけよう",
+"guessBody": "隠れた単語も盤面にあります。{count}文字の単語をなぞると推理になります。",
+"guessGlow": "光っている文字をたどろう。",
+"guessShort": "それはヒント用の単語です。推理には{count}文字が必要です。",
+"guessWrong": "ちがいます。ヒントを使ってもう一度。",
+"guessWinTitle": "見つけた！",
+"guessWinBody": "これがゲームの流れです。本番の盤面はもっと大きいよ。",
+"readyTitle": "準備OK",
+"ruleLife": "ライフは減っていきます。短い単語で回復しよう。",
+"ruleClues": "それ以外の単語はタダで、文字のヒントがもらえます。",
+"ruleGuess": "隠れた単語と同じ長さの単語は推理です。チャンスは{tries}回、外すとライフが減ります。"
 }
 },
     "welcome": {

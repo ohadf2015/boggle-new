@@ -13,7 +13,7 @@ import AutoHideHeader from '@/components/AutoHideHeader';
 import DailyWordHuntSurvival, { type SurvivalGameResult } from './DailyWordHuntSurvival';
 import DailyWordHuntResults from './DailyWordHuntResults';
 import DailyReadyScreen, { type ChallengeData } from './DailyReadyScreen';
-import { DailyChallengeTutorial } from './DailyChallengeTutorial';
+import { DailyChallengeTutorial, type HuntTutorialSource } from './DailyChallengeTutorial';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
@@ -355,12 +355,14 @@ const DailyChallenge: React.FC = () => {
 
   // First visit: the interactive how-to-play opens once and replaces the in-game coach card.
   const [onboardedThisVisit, setOnboardedThisVisit] = useState(false);
+  const [tutorialSource, setTutorialSource] = useState<HuntTutorialSource>('daily_help');
   useEffect(() => {
     if (phase !== 'ready' || onboardedThisVisit || hasEverPlayedWordHunt(gameLanguage)) return;
     const storage = typeof window !== 'undefined' ? window.localStorage : null;
     if (!storage || hasSeenCoach('wordHunt', COACH_VERSION, storage)) return;
     markCoachSeen('wordHunt', COACH_VERSION, storage);
     setOnboardedThisVisit(true);
+    setTutorialSource('daily_first_visit');
     setShowTutorial(true);
   }, [phase, onboardedThisVisit, gameLanguage]);
 
@@ -369,7 +371,10 @@ const DailyChallenge: React.FC = () => {
     setShowTutorial(false);
     if (onboardedThisVisit && phase === 'ready') handleStartGame();
   }, [onboardedThisVisit, phase, handleStartGame]);
-  const handleShowTutorial = useCallback(() => setShowTutorial(true), []);
+  const handleShowTutorial = useCallback(() => {
+    setTutorialSource('daily_help');
+    setShowTutorial(true);
+  }, []);
   // Client-side nav (no hard reload) — a hard nav while the game-active
   // beforeunload guard is armed can blank a Capacitor WebView (black screen).
   const handleBack = useCallback(() => { router.push(`/${language}/daily`); }, [router, language]);
@@ -469,7 +474,11 @@ const DailyChallenge: React.FC = () => {
       </AnimatePresence>
 
       {showTutorial && (
-        <DailyChallengeTutorial onComplete={closeTutorial} onSkip={closeTutorial} />
+        <DailyChallengeTutorial
+          onComplete={closeTutorial}
+          onSkip={closeTutorial}
+          source={tutorialSource}
+        />
       )}
     </div>
   );

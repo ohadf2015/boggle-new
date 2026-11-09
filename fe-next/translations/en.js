@@ -5997,6 +5997,25 @@ const en = {
 "goalLife": "Guess it before your life runs out.",
 "goalClues": "Words you find on the board reveal clue letters.",
 "play": "Let's play"
+},
+"lesson": {
+"clueTitle": "Start with a short word",
+"clueDoneTitle": "Free clue!",
+"clueDoneBody": "Short words cost nothing. They refill your life and show letters of the hidden word.",
+"alsoInWord": "Also in it:",
+"lifeLabel": "Life",
+"colorsNext": "Got it",
+"guessTitle": "Now find the hidden word",
+"guessBody": "It's on the board too. Swipe a {count}-letter word to guess it.",
+"guessGlow": "Look for the glow.",
+"guessShort": "That's a clue word. A guess needs {count} letters.",
+"guessWrong": "Not this one. Use the clues and try again.",
+"guessWinTitle": "You found it!",
+"guessWinBody": "That's the whole game. The real board is bigger.",
+"readyTitle": "You're ready",
+"ruleLife": "Your life drains. Find short words to refill it.",
+"ruleClues": "Any other word is free and reveals letters.",
+"ruleGuess": "A word as long as the hidden word is a guess. You get {tries}, and a wrong one costs life."
 }
 },
     "welcome": {
