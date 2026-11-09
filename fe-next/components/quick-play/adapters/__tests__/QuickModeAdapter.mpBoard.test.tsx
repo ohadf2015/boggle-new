@@ -9,6 +9,9 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { QuickModeAdapter } from '../QuickModeAdapter';
 import type { QuickRoundConfig } from '../../types';
+// The first-play Word Hunt lesson runs before the round on a fresh device; these tests are about the round itself.
+vi.mock('@/components/daily/survival/howto/huntLessonGate', () => ({ claimHuntLesson: () => false }));
+
 
 vi.mock('@/contexts/NavigationContext', () => ({
   useRegisterHeaderAudioControl: () => undefined,

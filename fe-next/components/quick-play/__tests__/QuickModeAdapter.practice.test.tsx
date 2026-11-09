@@ -16,6 +16,9 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { QuickModeAdapter } from '../adapters/QuickModeAdapter';
 import type { QuickRoundConfig } from '../types';
+// The first-play Word Hunt lesson runs before the round on a fresh device; these tests are about the round itself.
+vi.mock('@/components/daily/survival/howto/huntLessonGate', () => ({ claimHuntLesson: () => false }));
+
 
 // next/dynamic resolves the real game chunks; swap it for a stub that surfaces
 // the props it was handed so we can assert on them.

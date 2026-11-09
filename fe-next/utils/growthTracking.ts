@@ -131,6 +131,11 @@ export type GrowthEvent =
   | 'daily_puzzle_completed'
   | 'daily_word_hunt_complete'
   | 'wordhunt_invalid_submitted'
+  // Word Hunt first-play lesson funnel (source, step, step_index, elapsed_sec)
+  | 'wordhunt_tutorial_shown'
+  | 'wordhunt_tutorial_step'
+  | 'wordhunt_tutorial_skipped'
+  | 'wordhunt_tutorial_completed'
   | 'daily_rival_landed' // Rival challenge link landed (beat-me loop invitation)
   // exp-daily-chase-last-chance-v1: urgency variant of ChaseBanner shown when a
   // chasing player is within the last hours of the daily reset window.

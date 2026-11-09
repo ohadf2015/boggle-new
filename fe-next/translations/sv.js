@@ -6817,6 +6817,25 @@ const sv = {
 "goalLife": "Gissa det innan livet tar slut.",
 "goalClues": "Ord du hittar på brädet avslöjar ledtrådsbokstäver.",
 "play": "Nu kör vi"
+},
+"lesson": {
+"clueTitle": "Börja med ett kort ord",
+"clueDoneTitle": "Gratis ledtråd!",
+"clueDoneBody": "Korta ord kostar ingenting. De fyller på ditt liv och visar bokstäver i det dolda ordet.",
+"alsoInWord": "Finns också:",
+"lifeLabel": "Liv",
+"colorsNext": "Uppfattat",
+"guessTitle": "Hitta nu det dolda ordet",
+"guessBody": "Det finns också på brädet. Dra ett ord med {count} bokstäver för att gissa.",
+"guessGlow": "Leta efter skenet.",
+"guessShort": "Det är ett ledtrådsord. En gissning behöver {count} bokstäver.",
+"guessWrong": "Inte det. Använd ledtrådarna och försök igen.",
+"guessWinTitle": "Du hittade det!",
+"guessWinBody": "Det är hela spelet. Det riktiga brädet är större.",
+"readyTitle": "Du är redo",
+"ruleLife": "Ditt liv sjunker. Hitta korta ord för att fylla på.",
+"ruleClues": "Alla andra ord är gratis och visar bokstäver.",
+"ruleGuess": "Ett ord lika långt som det dolda ordet är en gissning. Du har {tries}, och fel kostar liv."
 }
 },
     "welcome": {
