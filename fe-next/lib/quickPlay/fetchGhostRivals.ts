@@ -7,6 +7,7 @@
 import { getSeededAvatarConfig, hashString, type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { pickGhostRivals, GHOST_COUNT, type QuickGhostRival } from './ghostRivals';
 import { computeScoreBands, padRivalsWithSynthetic } from './syntheticRivals';
+import { shownPlayerName } from '@/lib/friendlyPlayerName';
 
 /**
  * Rounds from this moment on are scored against the 60-second par
@@ -85,25 +86,28 @@ export async function fetchGhostRivals(
 
     const { data: profiles } = await db
       .from('public_profiles')
-      .select('id, username, avatar_config')
+      .select('id, username, display_name, avatar_config')
       .in(
         'id',
         picked.map((g) => g.userId)
       );
 
     const byId = new Map(
-      ((profiles ?? []) as Array<{ id: string; username: string | null; avatar_config: unknown }>).map(
+      ((profiles ?? []) as Array<{ id: string; username: string | null; display_name?: string | null; avatar_config: unknown }>).map(
         (p) => [p.id, p]
       )
     );
 
+    // Most profiles were never named (username is the `Player_<hex>` default),
+    // so the shown name is the chosen one or a readable stand-in, never the id.
+    const taken = new Set<string>();
     const realRivals = picked
       .map((g): QuickGhostRival | null => {
         const p = byId.get(g.userId);
-        if (!p?.username) return null;
+        if (!p) return null;
         return {
           ...g,
-          name: p.username,
+          name: shownPlayerName(p, language, taken),
           // Avatar falls back to a seeded face from `userId` — but the MP
           // leaderboard row passes no userId, so a config-less ghost would
           // render as a permanent skeleton. Resolve the same seeded face here

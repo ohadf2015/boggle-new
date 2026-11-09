@@ -1,4 +1,6 @@
 import type { DailyModeId } from '@/lib/dailyModes';
+import { isPlaceholderName } from '@/lib/displayName';
+import { friendlyPlayerName } from '@/lib/friendlyPlayerName';
 
 /**
  * Merge one day's per-mode results into a single per-player board.
@@ -21,6 +23,8 @@ export interface ModeResultRow {
   avatar_image?: string | null;
   custom_avatar?: unknown;
   country_code?: string | null;
+  /** The puzzle language, used to localize a stand-in name. */
+  language?: string | null;
   completed_at?: string | null;
   /** The mode's own raw metric, already selected by the caller. */
   value?: number | null;
@@ -109,6 +113,7 @@ export interface RankOptions {
 /** Every player with points today, ranked: total, then modes played, then who got there first. */
 export function rankDailyBoard(inputs: MergeInput[], opts: RankOptions = {}): RankedBoardRow[] {
   const byIdentity = new Map<string, Omit<RankedBoardRow, 'rank'>>();
+  const fallbackLang = new Map<string, string>();
 
   for (const { mode, rows } of inputs) {
     for (const row of rows ?? []) {
@@ -124,7 +129,7 @@ export function rankDailyBoard(inputs: MergeInput[], opts: RankOptions = {}): Ra
       if (!entry) {
         entry = {
           identity,
-          name: row.display_name?.trim() || '',
+          name: chosenName(row.display_name),
           avatarEmoji: row.avatar_emoji ?? null,
           avatarColor: row.avatar_color ?? null,
           avatarImage: row.avatar_image ?? null,
@@ -152,13 +157,22 @@ export function rankDailyBoard(inputs: MergeInput[], opts: RankOptions = {}): Ra
       }
 
       // Later rows can fill in display data the first one lacked.
-      if (!entry.name && row.display_name?.trim()) entry.name = row.display_name.trim();
+      if (!entry.name) entry.name = chosenName(row.display_name);
+      if (!fallbackLang.has(identity) && row.language) fallbackLang.set(identity, row.language);
       entry.avatarEmoji ??= row.avatar_emoji ?? null;
       entry.avatarColor ??= row.avatar_color ?? null;
       entry.avatarImage ??= row.avatar_image ?? null;
       entry.customAvatar ??= row.custom_avatar ?? null;
       entry.countryCode ??= row.country_code ?? null;
     }
+  }
+
+  // Unnamed players (the `Player_<hex>` default, or nothing) get a stable,
+  // readable stand-in rather than an id or a blank row.
+  const taken = new Set<string>();
+  for (const e of byIdentity.values()) if (e.name) taken.add(e.name);
+  for (const e of byIdentity.values()) {
+    if (!e.name) e.name = friendlyPlayerName(e.identity, fallbackLang.get(e.identity) ?? 'en', taken);
   }
 
   return Array.from(byIdentity.values())
@@ -169,6 +183,11 @@ export function rankDailyBoard(inputs: MergeInput[], opts: RankOptions = {}): Ra
       || compareReachedAt(a.reachedAt, b.reachedAt)
       || (a.identity < b.identity ? -1 : a.identity > b.identity ? 1 : 0))
     .map((e, i) => ({ ...e, rank: i + 1 }));
+}
+
+/** A name the player chose, or '' for a system placeholder. */
+function chosenName(name: string | null | undefined): string {
+  return isPlaceholderName(name) ? '' : (name as string).trim();
 }
 
 /** Earlier wins; a row with no time sorts after one that has it. */

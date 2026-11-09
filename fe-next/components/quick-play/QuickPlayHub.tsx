@@ -129,7 +129,7 @@ export function QuickPlayHub({ challengeId, backHref, startMode, coach = false, 
   useEffect(() => {
     if (challengeId) return;
     let cancelled = false;
-    fetch('/api/quick-play/challenge?mine=1')
+    fetch(`/api/quick-play/challenge?mine=1&lang=${language}`)
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
         if (cancelled || !d?.answered) return;
@@ -143,13 +143,13 @@ export function QuickPlayHub({ challengeId, backHref, startMode, coach = false, 
     return () => {
       cancelled = true;
     };
-  }, [challengeId]);
+  }, [challengeId, language]);
 
   // Challenge deep link: lock mode+seed to the friend's board
   useEffect(() => {
     if (!challengeId) return;
     let cancelled = false;
-    fetch(`/api/quick-play/challenge?id=${encodeURIComponent(challengeId)}`)
+    fetch(`/api/quick-play/challenge?id=${encodeURIComponent(challengeId)}&lang=${language}`)
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
         if (cancelled || !d?.id) return;
@@ -168,7 +168,7 @@ export function QuickPlayHub({ challengeId, backHref, startMode, coach = false, 
     return () => {
       cancelled = true;
     };
-  }, [challengeId]);
+  }, [challengeId, language]);
 
   // Tapping a mode node or releasing the drag knob fires an electric strike
   // toward that mode, holds a visible loading state on the wheel, then enters

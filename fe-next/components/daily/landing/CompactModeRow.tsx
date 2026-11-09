@@ -26,45 +26,25 @@ export interface CompactModeRowProps {
    literal string appears in source, so `bg-neo-${color}` would silently produce
    nothing. Same rule the hero QuestCard documents. */
 const COLOR_CONFIGS = {
-  orange: {
-    icon: 'text-neo-orange',
-    edge: 'bg-neo-orange',
-    tint: 'bg-neo-orange/10',
-    ring: 'focus-visible:ring-neo-orange',
-  },
-  yellow: {
-    icon: 'text-neo-yellow',
-    edge: 'bg-neo-yellow',
-    tint: 'bg-neo-yellow/10',
-    ring: 'focus-visible:ring-neo-yellow',
-  },
-  cyan: {
-    icon: 'text-neo-cyan',
-    edge: 'bg-neo-cyan',
-    tint: 'bg-neo-cyan/10',
-    ring: 'focus-visible:ring-neo-cyan',
-  },
-  purple: {
-    icon: 'text-neo-purple',
-    edge: 'bg-neo-purple',
-    tint: 'bg-neo-purple/10',
-    ring: 'focus-visible:ring-neo-purple',
-  },
+  orange: { icon: 'text-neo-orange', edge: 'bg-neo-orange', ring: 'focus-visible:ring-neo-orange', tilt: 'rotate-1' },
+  yellow: { icon: 'text-neo-yellow', edge: 'bg-neo-yellow', ring: 'focus-visible:ring-neo-yellow', tilt: '-rotate-1' },
+  cyan: { icon: 'text-neo-cyan', edge: 'bg-neo-cyan', ring: 'focus-visible:ring-neo-cyan', tilt: 'rotate-1' },
+  purple: { icon: 'text-neo-purple', edge: 'bg-neo-purple', ring: 'focus-visible:ring-neo-purple', tilt: '-rotate-1' },
 } as const;
 
 /**
- * CompactModeRow — secondary quest card for the daily hub.
+ * CompactModeRow — a daily mode as a chunky, colour-coded tile.
  *
- * One line: accent edge + mode art + icon + title + small Play button.
- * The rows used to differ only by a 24px icon tint, which made Word Wheel,
- * Word Tower and Connections read as three copies of the same row. Each row now
- * carries its mode's artwork, a solid accent edge and an accent-coloured focus
- * ring, so the hub is scannable without reading the titles.
+ * The hub used to list the other modes as three dark, near-identical rows with
+ * a small lime button; players read it as a settings list, not as games. Each
+ * mode is now its own tile, laid out side by side: the top is the mode's solid
+ * accent with its mascot, the title sits under it, and the tile ends in a big
+ * play button (or a "done" stamp once played). Same family as the home page
+ * mode keycaps, so the two screens read as one game.
  *
- * When played: check-mark badge and dimmed, but still tappable — re-entering a
+ * When played: done stamp, mascot greyed, but still tappable — re-entering a
  * finished quest shows its results (Hunt, Wheel, Connections) or keeps the
- * daily tower climbing. A disabled row was a dead end the journey strip above
- * it never had.
+ * daily tower climbing. A disabled tile would be a dead end.
  */
 export function CompactModeRow({
   icon,
@@ -82,10 +62,10 @@ export function CompactModeRow({
 
   return (
     <m.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay, type: 'spring', stiffness: 300, damping: 25 }}
-      className="w-full"
+      initial={{ opacity: 0, y: 14, scale: 0.9 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ delay, type: 'spring', stiffness: 320, damping: 20 }}
+      className="w-full h-full"
       data-testid={`compact-row-${color}`}
       data-mode={modeId}
       data-state={played ? 'done' : 'todo'}
@@ -94,36 +74,38 @@ export function CompactModeRow({
         type="button"
         onClick={onPlay}
         className={cn(
-          'relative w-full ps-5 pe-4 py-3 rounded-lg border-2 border-neo-black',
-          'shadow-hard-xs overflow-hidden cursor-pointer',
-          'flex items-center gap-3',
+          'relative w-full h-full min-h-[164px] flex flex-col items-center overflow-hidden cursor-pointer',
+          'rounded-2xl border-[3px] border-neo-black bg-neo-navy shadow-hard',
           'focus-visible:outline-hidden focus-visible:ring-4',
           config.ring,
-          'transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] duration-200 group',
-          played
-            ? 'bg-neo-navy hover:bg-neo-navy/90 opacity-75'
-            : 'bg-neo-navy/60 hover:bg-neo-navy/80'
+          config.tilt,
+          'transition-[transform,translate,scale,rotate,box-shadow] duration-150 group',
+          'hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed',
+          played && 'opacity-80'
         )}
       >
-        {/* Accent edge — start-anchored so it flips to the right in Hebrew. */}
+        {/* Accent block — the mode's colour, solid, behind the mascot. */}
         <span
           aria-hidden="true"
           data-testid={`mode-row-edge-${color}`}
-          className={cn('absolute start-0 top-0 bottom-0 w-1.5', config.edge)}
+          className={cn(
+            'absolute inset-x-0 start-0 top-0 h-[58%] border-b-[3px] border-neo-black',
+            config.edge,
+            played && 'saturate-50'
+          )}
+          style={{ backgroundImage: 'radial-gradient(rgba(0,0,0,0.14) 1.2px, transparent 1.3px)', backgroundSize: '8px 8px' }}
         />
 
-        {/* Accent wash: carries the mode's hue across the whole row. */}
-        <span
-          aria-hidden="true"
-          className={cn('absolute inset-0 pointer-events-none', config.tint)}
-        />
+        {badge && !played && (
+          <span className="absolute top-1.5 end-1.5 z-10 rotate-6 rounded-md border-2 border-black bg-neo-cream px-1.5 py-0.5 text-[10px] font-black uppercase leading-none tracking-wide text-neo-navy shadow-hard-xs">
+            {badge}
+          </span>
+        )}
 
-        {/* Mode art — the strongest "which game is this" signal.
-            A CSS background rather than <img>: it is purely decorative (the
-            title beside it names the mode), it is the convention the hero
-            QuestCard already uses for the same mascots, and it keeps the row
-            free of next/image machinery for a 44px thumbnail. */}
-        {artUrl && (
+        {/* Mode art — the strongest "which game is this" signal. A CSS
+            background: purely decorative (the title names the mode), same
+            convention as the hero QuestCard. */}
+        {artUrl ? (
           <span
             aria-hidden="true"
             role="presentation"
@@ -131,55 +113,36 @@ export function CompactModeRow({
             data-art-url={artUrl}
             style={{ backgroundImage: `url(${artUrl})` }}
             className={cn(
-              'relative shrink-0 w-11 h-11 rounded-md bg-cover bg-center',
-              'border-2 border-neo-black/60',
-              played && 'grayscale'
+              'relative mt-3 shrink-0 w-[68px] h-[68px] rounded-xl bg-cover bg-center',
+              'border-[3px] border-neo-black shadow-hard-sm -rotate-3',
+              played ? 'grayscale' : 'motion-safe:group-hover:animate-[qp-avatar-bob_0.9s_ease-in-out_infinite]'
             )}
           />
-        )}
-
-        {!artUrl && (
-          <div className={cn('relative shrink-0 w-6 h-6 flex items-center justify-center', config.icon)}>
+        ) : (
+          <span className={cn('relative mt-3 shrink-0 w-[68px] h-[68px] flex items-center justify-center rounded-xl border-[3px] border-neo-black bg-neo-black shadow-hard-sm -rotate-3', config.icon)}>
             {icon}
-          </div>
+          </span>
         )}
 
-        {/* Title */}
-        <h3 className="relative text-base font-neo-display font-black text-neo-white flex-1 text-start">
+        <h3 className="relative mt-3 px-1.5 text-center font-neo-display text-[15px] font-black leading-tight text-neo-white line-clamp-2">
           {title}
-          {badge && !played && (
-            <span className="ms-2 inline-block rounded-neo border-2 border-black bg-neo-cream px-1.5 py-0.5 align-middle text-[10px] font-black uppercase tracking-wide text-neo-navy">
-              {badge}
-            </span>
-          )}
         </h3>
 
-        {/* Status Badge / Play Button */}
-        {played ? (
-          <m.div
-            initial={{ scale: 0.95, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-            className={cn(
-              'relative shrink-0 py-1.5 px-3 text-xs font-black uppercase rounded-md text-center',
-              'bg-neo-lime text-neo-black border border-neo-black shadow-hard-xs',
-              'flex items-center gap-1'
-            )}
-            data-testid={`${color}-done-badge`}
-          >
-            <CheckCircle2 className="w-3 h-3" aria-hidden="true" />
-            {doneLabel && <span>{doneLabel}</span>}
-          </m.div>
-        ) : (
-          <div className={cn(
-            'relative shrink-0 py-1.5 px-3 text-xs font-black uppercase rounded-md text-center',
-            'bg-neo-lime text-neo-black border border-neo-black shadow-hard-xs',
-            'active:translate-y-0.5 active:shadow-none transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity]',
-            'flex items-center gap-1 group-hover:scale-110'
-          )}>
-            <Play className="w-3 h-3" />
-          </div>
-        )}
+        <span className="relative mt-auto mb-2.5 pt-2">
+          {played ? (
+            <span
+              className="flex items-center gap-1 rounded-full border-2 border-neo-black bg-neo-lime px-2.5 py-1 text-[11px] font-black uppercase text-neo-black shadow-hard-xs -rotate-3"
+              data-testid={`${color}-done-badge`}
+            >
+              <CheckCircle2 className="w-3.5 h-3.5" aria-hidden="true" />
+              {doneLabel && <span>{doneLabel}</span>}
+            </span>
+          ) : (
+            <span className="flex h-10 w-10 items-center justify-center rounded-full border-[3px] border-neo-black bg-neo-lime text-neo-black shadow-hard-sm transition-transform group-hover:scale-110 group-active:scale-95">
+              <Play className="w-4 h-4 fill-current" aria-hidden="true" />
+            </span>
+          )}
+        </span>
       </button>
     </m.div>
   );

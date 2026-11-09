@@ -43,7 +43,7 @@ describe('useRushBoard', () => {
     rerender();
     await waitFor(() => expect(setBoard).toHaveBeenCalledWith([{ id: 'p1', name: 'Ana', bestHeightM: 40, isYou: undefined }]));
     expect(getWithAuth).toHaveBeenCalledTimes(1);
-    expect(getWithAuth.mock.calls[0][0]).toBe('/api/word-tower/leaderboard');
+    expect(getWithAuth.mock.calls[0][0]).toBe('/api/word-tower/leaderboard?lang=en');
   });
 
   it('given free play as a guest, when mounted, then it falls back to the daily board with the guest fingerprint', async () => {
@@ -64,7 +64,7 @@ describe('useRushBoard', () => {
     auth.isAuthenticated = true;
     rerender();
     await waitFor(() => expect(getWithAuth).toHaveBeenCalledTimes(1));
-    expect(getWithAuth.mock.calls[0][0]).toBe('/api/word-tower/leaderboard');
+    expect(getWithAuth.mock.calls[0][0]).toBe('/api/word-tower/leaderboard?lang=en');
   });
 
   it('given the request fails, when mounted, then it stays silent and feeds no rivals', async () => {

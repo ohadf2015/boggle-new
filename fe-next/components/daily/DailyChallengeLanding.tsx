@@ -38,6 +38,7 @@ import { CompactModeRow } from './landing/CompactModeRow';
 import { DailyAllClearCard } from './landing/DailyAllClearCard';
 import { DayPrizeHubCard } from './prize/DayPrizeHubCard';
 import { LeaderboardTeaser } from './landing/LeaderboardTeaser';
+import { DailyBoardSheet } from './landing/DailyBoardSheet';
 import { useUtcDay } from '@/hooks/useUtcDay';
 import { WeeklyChestPlaceholder } from './WeeklyChestPlaceholder';
 import { WeeklyThemeCard } from './WeeklyThemeCard';
@@ -102,6 +103,7 @@ export function DailyChallengeLanding({
   const dailyPlayedStatus = useDailyPlayedStatus();
 
   const [claimedChest, setClaimedChest] = useState<PendingChest | null>(null);
+  const [boardOpen, setBoardOpen] = useState(false);
 
   // This device's played markers (Word Wheel result, Word Tower best, Word
   // Bridge marker). Read in a LAYOUT effect so the first client paint already
@@ -204,6 +206,7 @@ export function DailyChallengeLanding({
   const dayCleared = DAILY_MODES.every((mode) => playedById[mode.id]) && wordHuntStatus !== 'lost';
   const primaryMode = dayCleared ? undefined : DAILY_MODES.find((mode) => mode.id === primaryModeId);
   const showChest = Boolean(user) && statusReady && !isNewcomer;
+  const secondaryCount = DAILY_MODES.filter((mode) => mode.id !== primaryMode?.id).length;
 
   return (
     // No full-page opacity-0 entrance: the hub appears with its content
@@ -257,7 +260,10 @@ export function DailyChallengeLanding({
         )}
 
         {/* Every other mode once, in play order; bonus modes are tagged. */}
-        <div className="w-full flex flex-col gap-2" data-testid="secondary-modes">
+        <div
+          className={`w-full grid gap-3 ${secondaryCount === 3 ? 'grid-cols-3' : 'grid-cols-2'}`}
+          data-testid="secondary-modes"
+        >
           {DAILY_MODES
             .filter((mode) => mode.id !== primaryMode?.id)
             .map((mode, i) => (
@@ -290,8 +296,9 @@ export function DailyChallengeLanding({
 
       <LeaderboardTeaser
         key={day}
-        onViewFull={() => router.push(`/${currentLanguage}/daily/word-hunt?showLeaderboard=true`)}
+        onViewFull={() => setBoardOpen(true)}
       />
+      <DailyBoardSheet open={boardOpen} onOpenChange={setBoardOpen} language={currentLanguage} />
 
       {/* Weekly Chest: 7-day progress + tier reward (authed, after a first daily) */}
       {showChest && (

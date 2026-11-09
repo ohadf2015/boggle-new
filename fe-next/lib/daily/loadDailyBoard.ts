@@ -9,7 +9,7 @@ const CACHE_TTL_MS = 15_000;
 /** A caller missing from the board forces a re-read, at most this often (bounds guests who never played). */
 const MISSING_CALLER_REFRESH_MS = 2_000;
 
-const IDENTITY = 'player_id, guest_fingerprint, display_name, avatar_emoji, avatar_color';
+const IDENTITY = 'player_id, guest_fingerprint, display_name, avatar_emoji, avatar_color, language';
 
 /* Three modes read their LEADERBOARD VIEW (keeps identity and joins custom_avatar
    off the profile). Connections reads its base table: its public view strips

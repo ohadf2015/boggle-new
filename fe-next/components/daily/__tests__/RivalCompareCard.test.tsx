@@ -9,6 +9,8 @@ const mockT = (key: string) => {
     'daily.rival.youLose': '{name} wins this round',
     'daily.rival.tie': "It's a tie! 🤝",
     'daily.rival.score': 'Score',
+    'daily.rival.freshStart': 'Fresh week. First points take the lead!',
+    'daily.rival.gapToPass': '{points} more to pass {name}',
   };
   return translations[key] || key;
 };
@@ -59,8 +61,8 @@ describe('RivalCompareCard', () => {
       />
     );
 
-    // Should show lose message with neo-pink styling
-    const loseMessage = screen.getByText('Bob wins this round');
+    // Losing shows the exact gap to close, in pink
+    const loseMessage = screen.getByText('51 more to pass Bob');
     expect(loseMessage).toBeInTheDocument();
     expect(loseMessage).toHaveClass('text-neo-pink');
   });
@@ -109,10 +111,12 @@ describe('RivalCompareCard', () => {
     );
 
     // Both scores should be rendered
-    const scores = container.querySelectorAll('div.text-sm.font-bold.text-neo-white');
-    expect(scores.length).toBe(2); // One for rival, one for receiver
-    expect(scores[0]).toHaveTextContent('0');
-    expect(scores[1]).toHaveTextContent('0');
+    expect(screen.getByTestId('rival-score-them')).toHaveTextContent('0');
+    expect(screen.getByTestId('rival-score-me')).toHaveTextContent('0');
+    // 0 vs 0 is a fresh race, not a tie: an even bar and a call to take the lead.
+    expect(screen.getByText('Fresh week. First points take the lead!')).toBeInTheDocument();
+    expect(screen.getByTestId('rival-tug')).toHaveAttribute('aria-valuenow', '50');
+    expect(container).toBeTruthy();
   });
 
   it('should handle large scores', () => {
@@ -126,8 +130,13 @@ describe('RivalCompareCard', () => {
       />
     );
 
-    const scores = container.querySelectorAll('div.text-sm.font-bold.text-neo-white');
-    expect(scores[0]).toHaveTextContent('9999');
-    expect(scores[1]).toHaveTextContent('10000');
+    expect(container).toBeTruthy();
+    expect(screen.getByTestId('rival-score-them')).toHaveTextContent('9999');
+    expect(screen.getByTestId('rival-score-me')).toHaveTextContent('10000');
+  });
+
+  it('leans the tug-of-war bar toward whoever is ahead', () => {
+    render(<RivalCompareCard rivalName="Joker" rivalEmoji="🃏" rivalScore={100} myScore={300} t={mockT} />);
+    expect(screen.getByTestId('rival-tug')).toHaveAttribute('aria-valuenow', '75');
   });
 });

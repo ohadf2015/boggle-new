@@ -5,6 +5,7 @@
  * POST /api/ranked/match — Submit match result (called by backend after game)
  */
 
+import { shownPlayerName } from '@/lib/friendlyPlayerName';
 import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
@@ -63,7 +64,7 @@ async function fetchEnrichedLeaderboard(serviceClient: ServiceClient) {
       rank: index + 1,
       userId: entry.user_id,
       username: profile?.username || 'Unknown',
-      displayName: profile?.display_name || profile?.username || 'Unknown',
+      displayName: shownPlayerName({ id: entry.user_id, display_name: profile?.display_name, username: profile?.username }),
       avatarImage: profile?.avatar_image || null,
       avatarEmoji: profile?.avatar_emoji || null,
       avatarColor: profile?.avatar_color || null,

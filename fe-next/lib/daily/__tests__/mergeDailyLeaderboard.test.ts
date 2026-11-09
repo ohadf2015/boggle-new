@@ -65,11 +65,28 @@ describe('mergeDailyLeaderboard', () => {
     const entries = mergeDailyLeaderboard([
       { mode: 'word-hunt', rows: [
         { player_id: 'p1', display_name: 'Signed in', value: 700 },
-        { guest_fingerprint: 'g1', display_name: 'Guest', value: 650 },
+        { guest_fingerprint: 'g1', display_name: 'Zigzag', value: 650 },
       ] },
     ]);
     expect(entries).toHaveLength(2);
-    expect(entries.map((e) => e.name)).toEqual(['Signed in', 'Guest']);
+    expect(entries.map((e) => e.name)).toEqual(['Signed in', 'Zigzag']);
+  });
+
+  it('never shows a Player_<hex> placeholder: unnamed players get a readable, localized stand-in', () => {
+    const entries = mergeDailyLeaderboard([
+      { mode: 'word-hunt', rows: [
+        { player_id: 'p1', display_name: 'Player_9ed33e25', language: 'he', value: 700 },
+        { guest_fingerprint: 'g1', display_name: 'Guest', value: 650 },
+        { player_id: 'p2', display_name: null, value: 600 },
+      ] },
+    ]);
+    const names = entries.map((e) => e.name);
+    for (const n of names) {
+      expect(n).not.toMatch(/^(player[_-]|guest$)/i);
+      expect(n.length).toBeGreaterThan(1);
+    }
+    expect(names[0]).toMatch(/[\u0590-\u05FF]/);
+    expect(new Set(names).size).toBe(3);
   });
 
   it('drops a row with no identity rather than inventing a shared player', () => {

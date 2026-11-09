@@ -1300,6 +1300,8 @@ const sv = {
     "weekly": {
       "kicker": "Veckans bräde",
       "play": "Spela",
+      "endsIn": "Slutar om {days} dagar",
+      "lastDay": "Sista dagen!",
       "chip": "Veckobräde: {theme}",
       "theme": {
         "vowelParty": "Vokalfest",
@@ -1326,8 +1328,8 @@ const sv = {
   // @quick-loop:end
   // @home-play:start
   "homePlay": {
-    "heroLine": "Sextio sekunder, en ny bricka och tre motståndare som inte väntar på dig.",
-    "intro": "LexiClash är ett gratis ordspel som du spelar direkt i webbläsaren. Hitta så många ord du kan på en bokstavsbräda, mot botar, kompisar eller en hel klass, på sex språk.",
+    "heroLine": "60 sekunder. Ny bricka. Tre rivaler.",
+    "intro": "LexiClash är ett gratis ordspel i webbläsaren, på sex språk.",
     "playSub": "Solo · slumpläge",
     "pickMode": "Eller välj ett sololäge",
     "timerBadge": "60 s",
@@ -10104,7 +10106,9 @@ const sv = {
       "you": "Du",
       "youWin": "Du slog {name}! 🏆",
       "youLose": "{name} vinner denna runda",
-      "tie": "Det är oavgjort! 🤝"
+      "tie": "Det är oavgjort! 🤝",
+      "freshStart": "Ny vecka. Första poängen tar ledningen!",
+      "gapToPass": "{points} till för att gå förbi {name}"
     },
     "errorWordTooShort": "Ordet måste ha minst {min} bokstäver",
     "errorWordTooLong": "Ordet får ha max {max} bokstäver",
