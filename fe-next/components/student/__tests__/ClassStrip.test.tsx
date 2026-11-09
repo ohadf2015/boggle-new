@@ -58,4 +58,14 @@ describe('ClassStrip', () => {
     expect(await screen.findByText('student.classStrip.askedToday')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'student.classStrip.askRematch' })).not.toBeInTheDocument();
   });
+
+  it('given the hub read fails, then the optional strip stays out of the way instead of a bare error', async () => {
+    const fetchFn = mockFetch(() => json({ error: 'boom' }, 500));
+    const { container } = render(<ClassStrip classroomId="c1" reducedMotion />);
+    await waitFor(() => expect(fetchFn).toHaveBeenCalled());
+    await new Promise((r) => setTimeout(r, 0));
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.queryByText('common.error')).not.toBeInTheDocument();
+    expect(container).toBeEmptyDOMElement();
+  });
 });
