@@ -3,6 +3,7 @@
  */
 import { renderHook, act } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
+vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
 import { useMatchmaking } from '../useMatchmaking';
 
 // Mock socket
@@ -19,6 +20,11 @@ const mockSocket = {
 vi.mock('@/utils/SocketContext', () => ({
   getSharedSocketIfExists: () => mockSocket,
 }));
+
+vi.mock('@/contexts/SoundEffectsContext', () => ({
+  useSoundEffects: () => ({ playMatchFoundSound: vi.fn() }),
+}));
+
 
 describe('useMatchmaking', () => {
   beforeEach(() => {

@@ -16028,6 +16028,8 @@ const ru = {
   },
   "matchmaking": {
     "rankedMatch": "Рейтинговый матч",
+    "rankedSignIn": "Войдите для рейтинга",
+    "rankedLocked": "Ещё {n} обычных игр до рейтинга",
     "findingOpponent": "Поиск соперника…",
     "eloRange": "{{elo}} ELO (±{{range}})",
     "playersInQueue": "{{count}} в очереди",

@@ -19476,6 +19476,8 @@ const es = {
   },
   "matchmaking": {
     "rankedMatch": "Partida clasificatoria",
+    "rankedSignIn": "Inicia sesión para Ranked",
+    "rankedLocked": "{n} partidas casuales para desbloquear Ranked",
     "findingOpponent": "Buscando oponente…",
     "eloRange": "{{elo}} ELO (±{{range}})",
     "playersInQueue": "{{count}} en cola",

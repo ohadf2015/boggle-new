@@ -222,12 +222,19 @@ export const EXPERIMENTS = {
   }),
 
   /**
-   * Multiplayer desktop chassis kill-switch. When enabled (on), desktop
-   * users see the MultiplayerDesktopShell (responsive layout for wide
-   * screens). When disabled (off), all users see legacy mobile-stacked
-   * layout. Not used for A/B traffic split — flip to off via PostHog if
-   * Sentry warnings spike post-deploy.
+   * Ranked multiplayer QUEUE CTA. Default off until replica-safe matchmaking
+   * and explicit operator opt-in (PostHog + RANKED_MATCHMAKING_ENABLED).
    */
+  'ranked-public-v1': defineExperiment({
+    variants: ['on', 'off'] as const,
+    // Default OFF: in-memory matchmaking is not replica-safe (Redis Socket.IO
+    // adapter). Operators must flip PostHog to on AND set
+    // RANKED_MATCHMAKING_ENABLED=true before public queue use.
+    default: 'off',
+    description:
+      'Ranked multiplayer QUEUE CTA. Default off. on = show Ranked join for eligible signed-in players when remote flag allows. off = hide queue CTA (progress/league/MMR UI stays). Server also requires RANKED_MATCHMAKING_ENABLED=true — clients cannot bypass.',
+  }),
+
   'mp.desktop-shell.v1': defineExperiment({
     variants: ['on', 'off'] as const,
     default: 'on',

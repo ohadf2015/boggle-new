@@ -64,6 +64,7 @@ const MultiplayerSignupSheet = dynamic(() => import('@/components/auth/Multiplay
 const SignupToast = dynamic(() => import('@/components/auth/SignupToast'), { ssr: false });
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
 const FloatingReaction = dynamic(() => import('@/components/game/QuickReactions').then((m) => m.FloatingReaction), { ssr: false });
+const MmrChangeBadge = dynamic(() => import('@/components/results/MmrChangeBadge'), { ssr: false });
 
 /** Max standings rows on one screen (8 seats; in a bigger room I stay visible). */
 const MAX_ROWS = 8;
@@ -385,6 +386,11 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
           hideClassPosition={hideOutcome}
           t={t}
         />
+        {username ? (
+          <div className="shrink-0 empty:hidden" data-testid="mp-mmr-change">
+            <MmrChangeBadge username={username} />
+          </div>
+        ) : null}
         </div>
         {username && seen('card') && !c.isClassroom && (
           <WordShowdownPanel
