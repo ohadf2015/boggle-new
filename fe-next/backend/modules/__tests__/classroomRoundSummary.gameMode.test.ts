@@ -33,3 +33,10 @@ describe('buildClassroomRoundSummary gameMode', () => {
     expect(summary?.gameMode).toBe('vocab-quiz');
   });
 });
+
+describe('buildClassroomRoundSummary classroomId', () => {
+  it('Given a classroom round, When summarized, Then the summary names its class so the host can keep it open as homework', async () => {
+    const summary = await buildClassroomRoundSummary({ gameCode: 'ROUND1', language: 'en', classroomGame: classroomGame(), players, participationBonus: 0 });
+    expect(summary?.classroomId).toBe('class-1');
+  });
+});
