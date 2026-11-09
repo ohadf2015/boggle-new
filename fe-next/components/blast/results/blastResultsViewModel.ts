@@ -3,6 +3,7 @@ import type { BlastCollectionScore } from '@/shared/utils/blastCollectionScore';
 import type { BlastMpRanking, BlastScoreBreakdown } from '../legacy/blastMpRanking';
 import type { BlastResultsData } from '../legacy/types';
 import { getWavePassPct } from '../legacy/utils/blastWaveTheme';
+import type { BlastGemCounts } from '../legacy/utils/blastGems';
 
 export type BlastOutcomeTier = 'low' | 'mid' | 'high' | 'newBest';
 export type BlastStatId = 'coins' | 'diamonds' | 'bombs' | 'combo' | 'words' | 'waves';
@@ -13,6 +14,8 @@ export interface BlastResultsInput {
   score: number;
   coins?: number;
   diamonds?: number;
+  /** Gems by color, when known (SP); MP only knows the total. */
+  gems?: BlastGemCounts;
   bombsPopped?: number;
   maxCombo?: number;
   wordsFound?: readonly string[];
@@ -56,6 +59,8 @@ export interface BlastResultsView {
   isNewBest: boolean;
   pbDelta: number | null;
   stats: BlastStatChip[];
+  /** Gem total and, when known, the count per color. */
+  gems: { total: number; byKind: BlastGemCounts | null };
   bestWord: string | null;
   longestWord: string | null;
   rank: { current: number; total: number | null; delta: number | null } | null;
@@ -149,6 +154,7 @@ export function toBlastResultsView(input: BlastResultsInput): BlastResultsView {
     isNewBest,
     pbDelta: isNewBest ? input.score - best : null,
     stats,
+    gems: { total: diamonds, byKind: input.gems ?? null },
     bestWord,
     longestWord: longestUpper && longestUpper !== bestWord ? longestUpper : null,
     rank: input.rank
@@ -171,6 +177,7 @@ export function fromSpResults(r: BlastResultsData & BlastResultsExtras): BlastRe
     score: r.finalScore,
     coins: r.sessionCoins,
     diamonds: r.diamondsCollected,
+    gems: r.gemsByKind,
     bombsPopped: r.bombsPopped,
     maxCombo: r.maxCombo,
     wordsFound: r.wordsFound?.filter((w) => !isClusterLabel(w)),

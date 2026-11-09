@@ -8,17 +8,40 @@ export interface BlastGemDef {
   clearBonus: number;
   /** Word score multiplier when the gem is in the played word. */
   wordMult: number;
-  /** Played gem also clears its row and column. */
-  cross: boolean;
+  /**
+   * Played gem blasts a plus shape: this many tiles out in each of the 4 directions.
+   * 0 = no blast. Small and fixed so the player can see exactly what a gem will take.
+   */
+  reach: number;
 }
 
-/** Sapphire keeps the numbers diamonds always had; emerald is the small find, ruby the jackpot. */
+/** Full row + column: only the jackpot ruby reaches the board edges. */
+export const GEM_FULL_REACH = 99;
+
+/**
+ * Emerald is the small find, ruby the jackpot. Blasts grow with rarity but stay a
+ * readable plus shape; only a ruby clears its whole row and column.
+ */
 export const GEM_DEFS: Record<BlastGemKind, BlastGemDef> = {
-  emerald: { kind: 'emerald', clearBonus: 15, wordMult: 2, cross: false },
-  sapphire: { kind: 'sapphire', clearBonus: 30, wordMult: 2, cross: true },
-  amethyst: { kind: 'amethyst', clearBonus: 60, wordMult: 3, cross: true },
-  ruby: { kind: 'ruby', clearBonus: 120, wordMult: 4, cross: true },
+  emerald: { kind: 'emerald', clearBonus: 15, wordMult: 2, reach: 0 },
+  sapphire: { kind: 'sapphire', clearBonus: 30, wordMult: 2, reach: 1 },
+  amethyst: { kind: 'amethyst', clearBonus: 60, wordMult: 3, reach: 2 },
+  ruby: { kind: 'ruby', clearBonus: 120, wordMult: 4, reach: GEM_FULL_REACH },
 };
+
+/** Cells a played gem blasts (its own cell excluded), nearest first. */
+export function gemBlastCells(row: number, col: number, gem: BlastGemKind, gridSize: number): Array<{ row: number; col: number }> {
+  const reach = Math.min(GEM_DEFS[gem].reach, gridSize);
+  const cells: Array<{ row: number; col: number }> = [];
+  for (let d = 1; d <= reach; d++) {
+    for (const [dr, dc] of [[-1, 0], [1, 0], [0, -1], [0, 1]] as const) {
+      const r = row + dr * d;
+      const c = col + dc * d;
+      if (r >= 0 && r < gridSize && c >= 0 && c < gridSize) cells.push({ row: r, col: c });
+    }
+  }
+  return cells;
+}
 
 export const DEFAULT_GEM: BlastGemKind = 'sapphire';
 

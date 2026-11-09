@@ -29,7 +29,6 @@ import BlastChainText from './BlastChainText';
 import BlastWaveClearText from './BlastWaveClearText';
 import BlastWordPraise from './BlastWordPraise';
 import { LIFT_OK_HOLD_MS } from '@/components/board/boardLift';
-import { BlastWordRewardPreview } from './BlastWordRewardPreview';
 import { BlastEffectsLayer } from './BlastEffectsLayer';
 import { BlastScoreMilestone } from './BlastScoreMilestone';
 import { ComboMilestoneAnnouncement } from '@/components/game/ComboMilestoneAnnouncement';
@@ -47,6 +46,7 @@ import type { SequencerState } from './hooks/useBlastSequencer';
 import type { ClearedTileEvent } from './BlastEffectsCanvas';
 import type { ComboStreakState } from './hooks/useBlastComboStreak';
 import type { BlastHudProgress } from '@/components/blast/progress/BlastHudProgress';
+import { BlastGemCollectFx } from './effects/BlastGemCollectFx';
 
 interface BlastStageProps {
   // From engine
@@ -466,6 +466,9 @@ export const BlastStage = memo(function BlastStage({
         intensity={sequencerState?.chainLevel ?? 0}
       />
 
+      {/* Collected gems fly from their tiles into the HUD gem counter */}
+      <BlastGemCollectFx boardRef={boardContainerRef} gridSize={gridSize} />
+
       {/* Score milestone announcements */}
       <BlastScoreMilestone score={score} t={t} />
       <ComboMilestoneAnnouncement comboLevel={comboLevel} />
@@ -489,7 +492,6 @@ export const BlastStage = memo(function BlastStage({
           }}
         >
           <WordFormingArea word={liveWord} letterCount={liveWord.length} feedback={currentFeedback} compact morphLayout={false} />
-          <BlastWordRewardPreview wordLength={liveWord.length} />
           {liveWord && (
             <span className="text-[10px] font-bold text-white tabular-nums">
               {liveWord.length}

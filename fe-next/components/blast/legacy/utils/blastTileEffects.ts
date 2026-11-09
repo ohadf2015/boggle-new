@@ -18,12 +18,13 @@ export interface TileEffectContext {
   bombQueue: Array<{ row: number; col: number; depth: number }>;
   processedBombs: Set<string>;
   markCleared: (t: BlastTileState) => void;
-  /**
-   * Optional runaway-chain budget. When present, the bomb chain stops once
-   * `maxDetonations` or `maxCleared` is reached, so one word can't wipe half the board.
-   */
   /** When set, bomb tiles pay by the payout formula instead of the flat bonus. */
   payout?: PayoutCtx;
+  /**
+   * Optional runaway-chain budget. Every blast finishes its own shape, but once
+   * `maxDetonations` or `maxCleared` is reached no caught bomb goes off, so one
+   * word can't set off a board-wide chain.
+   */
   chainBudget?: { detonations: number; cleared: number; suppressed: number; maxDetonations: number; maxCleared: number };
 }
 
@@ -51,8 +52,10 @@ export function processBombBFS(ctx: TileEffectContext): EffectResult {
   const explosions: BlastExplosion[] = [];
 
   while (bombQueue.length > 0) {
-    if (chainAtDetonationCap(ctx) || chainAtClearCap(ctx)) { recordSuppressed(ctx); break; }
     const bomb = bombQueue.shift()!;
+    // Bombs in the played word always go off; only bombs caught by a blast are capped.
+    // A capped bomb is suppressed whole (and paid as surge), never half-detonated.
+    if (bomb.depth > 0 && (chainAtDetonationCap(ctx) || chainAtClearCap(ctx))) { recordSuppressed(ctx); continue; }
     if (ctx.chainBudget) ctx.chainBudget.detonations++;
     const staggeredTime = now + bomb.depth * CHAIN_BOMB_STAGGER;
     explosions.push({
@@ -60,14 +63,12 @@ export function processBombBFS(ctx: TileEffectContext): EffectResult {
       row: bomb.row, col: bomb.col, type: 'bomb', intensity: 3, timestamp: staggeredTime,
     });
 
-    bombRadius: for (let dr = -BOMB_RADIUS; dr <= BOMB_RADIUS; dr++) {
+    for (let dr = -BOMB_RADIUS; dr <= BOMB_RADIUS; dr++) {
       for (let dc = -BOMB_RADIUS; dc <= BOMB_RADIUS; dc++) {
         if (dr === 0 && dc === 0) continue;
         const r = bomb.row + dr;
         const c = bomb.col + dc;
         if (r < 0 || r >= gridSize || c < 0 || c >= gridSize || next[r][c].isCleared) continue;
-        // `break bombRadius` exits both loops so the cap records ONE suppression, not one per row.
-        if (chainAtClearCap(ctx)) { recordSuppressed(ctx); break bombRadius; }
         ctx.markCleared(next[r][c]);
         if (ctx.chainBudget) ctx.chainBudget.cleared++;
         bonusScore += ctx.payout ? bombTilePoints(ctx.payout, r, c, bomb.depth) : BOMB_AREA_CLEAR_BONUS;

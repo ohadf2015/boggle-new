@@ -26,6 +26,7 @@ import type { ClearedTileEvent } from '../BlastEffectsCanvas';
 import type { ScoreFlyEvent } from '../BlastScoreFly';
 import type { UseBlastComboStreakReturn } from './useBlastComboStreak';
 import { emitMascotEvent } from '@/lib/blast/mascotBus';
+import { emitGemsCollected, gemEventsFrom } from '@/lib/blast/gemCollectBus';
 import { detectVerticalWords, detectHorizontalWords } from '../utils/blastVerticalScanner';
 import { detectMatch3Clusters } from '../utils/blastMatch3Detector';
 import { vibrateBlastCascade } from '@/components/grid/hapticFeedback';
@@ -166,6 +167,7 @@ export function useBlastCascade(deps: CascadeDeps) {
           if (popped) return;
           popped = true;
           setClearedTilesForEffects(findInfo.map(c => ({ row: c.row, col: c.col, type: c.type })));
+          emitGemsCollected(gemEventsFrom(findInfo, findTiles));
           sounds.playCascadeChain(chainLevel);
         };
         await sequencer.animateWordClear(findInfo, pop);
@@ -186,6 +188,7 @@ export function useBlastCascade(deps: CascadeDeps) {
           .filter(c => !findKeys.has(`${c.row},${c.col}`));
         if (extraCleared.length > 0) {
           setClearedTilesForEffects(extraCleared.map(c => ({ row: c.row, col: c.col, type: c.type })));
+          emitGemsCollected(gemEventsFrom(extraCleared, preCascade));
         }
 
         // Cascade chain sound + score fly

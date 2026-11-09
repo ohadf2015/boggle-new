@@ -13373,6 +13373,10 @@ const es = {
     "level": "Nivel {n}",
     "results": {
       "loot": "Botín",
+      "gemHaul": "Botín de gemas",
+      "gemTotal": "{n} gemas",
+      "bestFind": "Mejor hallazgo",
+      "gemHaulEmpty": "Sin gemas esta vez. Las palabras raras las ganan.",
       "journey": {
         "title": "Tu partida",
         "stars": "{count} estrellas ganadas",
@@ -13674,11 +13678,11 @@ const es = {
       },
       "diamond": {
         "name": "Gema",
-        "desc": "Se gana con palabras poco comunes o raras, de color según su rareza. En una palabra vale ×2 (esmeralda, zafiro), ×3 (amatista) o ×4 (rubí); todas menos la esmeralda también revientan fila y columna."
+        "desc": "Se gana con palabras poco comunes o raras, de color según su rareza. En una palabra vale ×2 (esmeralda, zafiro), ×3 (amatista) o ×4 (rubí); zafiro y amatista también revientan una pequeña cruz, y el rubí toda su fila y columna."
       },
       "bomb": {
         "name": "Bomba",
-        "desc": "Limpia área 3×3. Encadena con bombas cercanas."
+        "desc": "Limpia un área 3×3. Puede activar una bomba más."
       }
     },
     "title": "Modo Blast",
@@ -14025,11 +14029,11 @@ const es = {
       },
       "diamond": {
         "name": "Gema",
-        "desc": "Se gana con buenas palabras. De ×2 a ×4; las grandes revientan fila y columna"
+        "desc": "Se gana con buenas palabras. De ×2 a ×4; las grandes revientan una cruz, el rubí fila y columna enteras"
       },
       "bomb": {
         "name": "Bomba",
-        "desc": "Limpia área 3×3. Encadena a bombas cercanas."
+        "desc": "Limpia un área 3×3. Puede activar una bomba más."
       }
     },
     "highlight": {

@@ -1,0 +1,36 @@
+@keyframes bestGlow {
+  0%, 100% { box-shadow: 0 0 0 0 var(--gem-glow), 3px 3px 0 rgb(var(--neo-black)); }
+  50% { box-shadow: 0 0 22px 4px var(--gem-glow), 3px 3px 0 rgb(var(--neo-black)); }
+}
+
+@keyframes sweep {
+  0% { transform: translateX(-130%) skewX(-20deg); }
+  100% { transform: translateX(260%) skewX(-20deg); }
+}
+
+.best {
+  animation: bestGlow 1.6s ease-in-out 2.2s infinite;
+}
+
+.sweep {
+  position: relative;
+  overflow: hidden;
+}
+
+.sweep::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 35%;
+  background: rgb(var(--neo-white));
+  opacity: 0.5;
+  pointer-events: none;
+  animation: sweep 0.7s ease-out 2s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .best,
+  .sweep::after {
+    animation: none;
+  }
+}

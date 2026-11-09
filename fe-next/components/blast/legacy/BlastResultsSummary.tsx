@@ -14,6 +14,7 @@ import { BlastResultsHero } from '../results/BlastResultsHero';
 import { BlastResultsBadges } from '../results/BlastResultsBadges';
 import { BlastRunJourney } from '../results/BlastRunJourney';
 import { BlastLootRow } from '../results/BlastLootRow';
+import { BlastGemHaul } from '../results/BlastGemHaul';
 import { BlastBestWordTiles } from '../results/BlastBestWordTiles';
 import { useBlastResultsReveal } from '../results/useBlastResultsReveal';
 import { buildRunJourney } from '../results/runJourneyModel';
@@ -87,6 +88,7 @@ export function BlastResultsSummary({ results, t, onPlayAgain, onQuit, onOpenSto
         </div>
 
         <div className="w-full flex flex-col items-center gap-4 lg:flex-1">
+          <BlastGemHaul gems={view.gems.byKind ?? undefined} total={view.gems.total} t={t} />
           <BlastLootRow view={view} t={t} locale={language} />
           <BlastBestWordTiles word={view.bestWord} longestWord={view.longestWord} t={t} />
           <BlastResultsBadges badges={badges} t={t} />

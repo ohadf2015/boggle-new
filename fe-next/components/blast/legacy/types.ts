@@ -150,6 +150,8 @@ export interface BlastResultsData {
   sessionCoins?: number;
   /** Diamonds collected this run (earned by rare words) */
   diamondsCollected?: number;
+  /** Gems collected this run, by color */
+  gemsByKind?: Partial<Record<BlastGemKind, number>>;
   /** Bombs detonated this run, chains included */
   bombsPopped?: number;
 }
@@ -164,36 +166,38 @@ export const GOLD_BONUS_MOVES = 1;
 export const DIAMOND_CLEAR_BONUS = 30;
 /** A diamond inside the played word multiplies that word */
 export const DIAMOND_WORD_MULTIPLIER = 2;
-/** Points per tile cleared by a played diamond's row + column cross blast */
+/** Points per tile cleared by a played gem's plus-shaped blast */
 export const DIAMOND_CROSS_POINTS = 3;
 /** Number of adjacent cells a bomb clears */
 export const BOMB_RADIUS = 1; // 3x3 area (8 adjacent cells)
 
 /**
- * Runaway-chain guards: cap a single move's bomb chain so it never wipes more
- * than ~half the board. Normal 1–2-bomb chains sit well under both limits.
+ * Runaway-chain guards: one move's blasts stay a calculated hit, never a wipe.
+ * A played bomb may set off at most one more bomb, and blasts off the word's own
+ * path clear at most ~a fifth of the board (7 tiles on 6x6).
  */
-/** Max number of chained bomb detonations per move. */
-export const BLAST_MAX_CHAIN_DETONATIONS = 5;
+/** Max number of chained bomb detonations per move (the played bomb + one it catches). */
+export const BLAST_MAX_CHAIN_DETONATIONS = 2;
 /** Hard ceiling on tiles cleared by chain effects, as a fraction of the board. */
-export const BLAST_MAX_CHAIN_CLEAR_FRACTION = 0.4;
+export const BLAST_MAX_CHAIN_CLEAR_FRACTION = 0.2;
 /** Floor for the chain-clear ceiling on tiny boards. */
-export const BLAST_MIN_CHAIN_CLEAR_CAP = 8;
+export const BLAST_MIN_CHAIN_CLEAR_CAP = 6;
 /** Points paid per chain detonation suppressed by the budget — the cap reads
  * as an "overflow surge" payout, never as a nerf. */
 export const OVERFLOW_SURGE_POINTS_PER_DETONATION = 10;
 /** Stagger delay (ms) between chain bomb explosions for visual ripple */
-export const CHAIN_BOMB_STAGGER = 120;
+export const CHAIN_BOMB_STAGGER = 200;
 /** Bonus per tile cleared by bomb area blast (+1 per tile) */
 export const BOMB_AREA_CLEAR_BONUS = 1;
 
 // ==================== Cascade Chain Constants ====================
 
-/** Maximum number of auto-cascade chain levels before stopping */
-export const MAX_CASCADE_CHAIN = 5;
+/** Maximum number of auto-cascade chain levels before stopping.
+ * Kept at 2: the player's own word should decide the board, not a lucky avalanche. */
+export const MAX_CASCADE_CHAIN = 2;
 /** Chain level at which cascade auto-clears require a "quality" match.
- * Deep chains become rare/earned — variable-ratio reward instead of routine wipes. */
-export const CASCADE_QUALITY_MIN_CHAIN = 3;
+ * The second auto-clear needs a real find (4+ cluster or 5+ word). */
+export const CASCADE_QUALITY_MIN_CHAIN = 2;
 /** Minimum match-3 cluster size that counts as quality at deep chain levels. */
 export const CASCADE_QUALITY_MIN_CLUSTER = 4;
 /** Minimum auto-word length that counts as quality at deep chain levels. */
@@ -217,8 +221,8 @@ export const CASCADE_MOMENTUM_LONG_WORD_BONUS = 1;
 /** Momentum decay per turn when no cascade triggers (cool-down) */
 export const CASCADE_MOMENTUM_DECAY = 1;
 /** Maximum cascade chain allowed at each momentum tier (index = tier).
- * Capped tiers 2-3 at 2 to reduce mid-game avalanche cascades. */
-export const CASCADE_TIER_MAX_CHAIN = [1, 2, 2, 3, 4] as const;
+ * One auto-clear by default; a second only after sustained play. */
+export const CASCADE_TIER_MAX_CHAIN = [1, 1, 1, 2, 2] as const;
 
 // ==================== Cascade Highlight Constants ====================
 

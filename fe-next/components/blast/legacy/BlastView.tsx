@@ -1,6 +1,6 @@
 'use client';
 
-import type { BlastGemCounts } from './utils/blastGems';
+import { mergeGemCounts, type BlastGemCounts } from './utils/blastGems';
 import { useOverlayQuietZoneClaim } from '@/lib/overlayQuietZone';
 import { getWavePassPct } from './utils/blastWaveTheme';
 import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
@@ -183,11 +183,12 @@ export function BlastView() {
   );
 
   /** Wave completed — transition to next wave */
-  const runCollectedRef = useRef({ diamonds: 0, bombs: 0 });
+  const runCollectedRef = useRef<{ diamonds: number; bombs: number; gems: BlastGemCounts }>({ diamonds: 0, bombs: 0, gems: {} });
   const handleWaveComplete = useCallback((waveScore: number, waveWords: string[], clearPct: number, collected?: { diamonds: number; bombs: number; gems?: BlastGemCounts }) => {
     runCollectedRef.current = {
       diamonds: runCollectedRef.current.diamonds + (collected?.diamonds ?? 0),
       bombs: runCollectedRef.current.bombs + (collected?.bombs ?? 0),
+      gems: mergeGemCounts(runCollectedRef.current.gems, collected?.gems),
     };
     const waveResult = buildWaveResult(currentWave, waveScore, waveWords.length, clearPct);
     setTotalScore(prev => prev + waveScore);
@@ -216,6 +217,7 @@ export function BlastView() {
       finalScore: totalScore + resultsData.finalScore,
       diamondsCollected: runCollectedRef.current.diamonds + (resultsData.diamondsCollected ?? 0),
       bombsPopped: runCollectedRef.current.bombs + (resultsData.bombsPopped ?? 0),
+      gemsByKind: mergeGemCounts(runCollectedRef.current.gems, resultsData.gemsByKind),
       wordsFound: [...allWordsFound, ...resultsData.wordsFound],
       bestWord: runBestWord([...allWordsFound, ...resultsData.wordsFound], resultsData.bestWord),
       wavesCompleted: waveHistory.length,
@@ -336,7 +338,7 @@ export function BlastView() {
     setResults(null);
     setCurrentWave(1);
     setTotalScore(0);
-    runCollectedRef.current = { diamonds: 0, bombs: 0 };
+    runCollectedRef.current = { diamonds: 0, bombs: 0, gems: {} };
     setRunDiamonds(0);
     setAllWordsFound([]);
     setWaveHistory([]);
