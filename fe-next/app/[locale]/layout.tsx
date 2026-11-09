@@ -26,6 +26,7 @@ import { headers } from 'next/headers';
 import { getRumBeaconScript } from '@/lib/analytics/rumBeaconScript';
 import { isBotUserAgent } from '@/lib/seo/botUa';
 import { jsonLdGraph } from '@/lib/seo/jsonLdGraph';
+import { LEXICLASH_SAME_AS } from '@/lib/seo/socialProfiles';
 
 // Synchronously primes CSS vars from localStorage before paint to prevent CLS
 // from AdMob SizeChanged async event and GlobalBottomNav ResizeObserver.
@@ -386,12 +387,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 height: 630,
             },
             // Social media and platform presence for SEO authority
-            sameAs: [
-                'https://www.lexiclash.live',
-                'https://www.instagram.com/lexi.clash',
-                'https://play.google.com/store/apps/details?id=live.lexiclash.app',
-                // TODO: Add TikTok and X/Twitter URLs here once accounts are created
-            ],
+            sameAs: ['https://www.lexiclash.live', ...LEXICLASH_SAME_AS],
             contactPoint: {
                 '@type': 'ContactPoint',
                 contactType: 'customer support',

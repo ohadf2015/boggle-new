@@ -1,12 +1,10 @@
+import { LEXICLASH_SAME_AS } from './socialProfiles';
 // Canonical site is www.lexiclash.live (matches metadataBase + lib/seo/educationJsonLd.ts).
 // Using a second domain here previously fragmented the org entity for AI/search.
 const BASE_URL = 'https://www.lexiclash.live';
 
-// Real, existing LexiClash profiles (mirrors educationJsonLd.ts SAME_AS + layout.tsx).
-const SAME_AS = [
-  'https://www.instagram.com/lexi.clash',
-  'https://play.google.com/store/apps/details?id=live.lexiclash.app',
-];
+// Real, existing LexiClash profiles — see lib/seo/socialProfiles.ts.
+const SAME_AS = [...LEXICLASH_SAME_AS];
 
 export function educationOrganizationJsonLd(locale: string) {
   return {
