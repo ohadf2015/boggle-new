@@ -34,6 +34,8 @@ export interface DailyParticipant {
   /** Combined board: the server matched this row to the viewer / a friend. */
   is_you?: boolean;
   is_friend?: boolean;
+  /** Signed-in player on the id-free combined board (row_key resolves on tap). */
+  is_member?: boolean;
 }
 
 export interface AllTimeParticipant {

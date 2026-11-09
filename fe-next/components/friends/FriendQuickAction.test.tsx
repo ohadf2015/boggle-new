@@ -8,6 +8,8 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 vi.mock('react-hot-toast', () => ({ default: { success: vi.fn(), error: vi.fn() } }));
 vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
+const push = vi.hoisted(() => vi.fn());
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push }) }));
 
 const ctx = vi.hoisted(() => ({ value: null as null | Partial<FriendStatusValue> }));
 vi.mock('./FriendStatusContext', () => ({ useFriendStatus: () => ctx.value }));
@@ -69,5 +71,29 @@ describe('FriendQuickAction', () => {
     expect(render(<FriendQuickAction userId="u1" name="Dana" surface="test" />).container).toBeEmptyDOMElement();
     setCtx('friend', { canManage: false, canMessage: false });
     expect(render(<FriendQuickAction userId="u1" name="Dana" surface="test" />).container).toBeEmptyDOMElement();
+  });
+
+  describe('id-free daily board rows', () => {
+    it('resolves the row key on tap, then sends the request', async () => {
+      const resolveBoardKey = vi.fn(async () => 'u9');
+      setCtx('none', { boardDate: '2026-11-09', resolveBoardKey });
+      render(<FriendQuickAction userId={null} boardKey="k3yk3yk3y" name="Dana" surface="daily_leaderboard" />);
+      fireEvent.click(screen.getByTestId('friend-quick-add'));
+      await waitFor(() => expect(ctx.value!.sendTo).toHaveBeenCalledWith('u9', 'daily_leaderboard'));
+      expect(resolveBoardKey).toHaveBeenCalledWith('k3yk3yk3y');
+    });
+
+    it('opens the chat for a friend row', async () => {
+      setCtx('friend', { boardDate: '2026-11-09', resolveBoardKey: vi.fn(async () => 'u9') });
+      render(<FriendQuickAction userId={null} boardKey="k3yk3yk3y" isFriendHint name="Dana" surface="daily_leaderboard" />);
+      fireEvent.click(screen.getByTestId('friend-quick-chat'));
+      await waitFor(() => expect(push).toHaveBeenCalledWith('/he/friends?tab=messages&friendUserId=u9'));
+      expect(ctx.value!.sendTo).not.toHaveBeenCalled();
+    });
+
+    it('shows nothing without a board date', () => {
+      setCtx('none', { boardDate: null });
+      expect(render(<FriendQuickAction userId={null} boardKey="k3yk3yk3y" name="Dana" surface="x" />).container).toBeEmptyDOMElement();
+    });
   });
 });

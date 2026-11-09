@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { ArrowLeft, LogIn, Sparkles, User } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import FriendsList from '@/components/friends/FriendsList';
+import { FriendsTodayCard } from '@/components/friends/FriendsTodayCard';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/utils/ThemeContext';
@@ -204,7 +205,10 @@ export default function FriendsPageClient(): React.JSX.Element {
               </div>
             </div>
           ) : (
-            <FriendsList />
+            <>
+              <FriendsTodayCard className="mb-4" />
+              <FriendsList />
+            </>
           )}
         </div>
       </div>

@@ -2,6 +2,20 @@
 const en = {
   // @friendSocial:start
   "friendSocial": {
+    "today": {
+      "title": "Today's daily with friends",
+      "share": "Share",
+      "shareLead": "I'm #1 of {count} friends on today's LexiClash daily with {score} points. Can you beat me?",
+      "shareRank": "I'm #{rank} of {count} friends on today's LexiClash daily with {score} points. Can you beat me?",
+      "you": "You",
+      "beatTop": "{name} leads with {score}. Play today's daily to beat them.",
+      "beFirst": "None of your friends has played today yet. Set the score to beat.",
+      "leading": "You're ahead of every friend today.",
+      "chase": "{points} points to pass {name}.",
+      "onlyYou": "You're the only one so far. Share it so friends try to beat you.",
+      "notPlayed": "{count} friends haven't played yet",
+      "play": "Play today's daily"
+    },
     "accept": "Accept",
     "acceptFrom": "Accept {name}'s friend request",
     "addFriend": "Add {name} as a friend",

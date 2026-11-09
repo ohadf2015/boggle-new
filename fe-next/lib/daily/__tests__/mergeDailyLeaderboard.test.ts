@@ -126,6 +126,17 @@ describe('mergeDailyLeaderboard', () => {
     expect(serialized).not.toContain('secret-fp');
   });
 
+  it('marks signed-in rows as members without exposing their id', () => {
+    const view = viewDailyBoard(rankDailyBoard([
+      { mode: 'word-hunt', rows: [
+        { player_id: 'secret-uuid', guest_fingerprint: null, display_name: 'A', value: 10 },
+        { player_id: null, guest_fingerprint: 'secret-fp', display_name: 'B', value: 5 },
+      ] },
+    ]));
+    expect(view.data.map((e) => e.member ?? false)).toEqual([true, false]);
+    expect(JSON.stringify(view)).not.toContain('secret-uuid');
+  });
+
   it('honours the limit', () => {
     const rows = Array.from({ length: 20 }, (_, i) => hunt(`p${i}`, i * 10, `P${i}`));
     expect(mergeDailyLeaderboard([{ mode: 'word-hunt', rows }], 3)).toHaveLength(3);
