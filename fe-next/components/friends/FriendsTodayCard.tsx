@@ -16,6 +16,7 @@ import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { buildFriendsToday } from './friendsToday';
 
 const MAX_ROWS = 5;
+const ROW_STAGGER_MS = 70;
 
 /**
  * "Today with friends": the viewer and their friends on today's daily, ranked
@@ -70,7 +71,7 @@ export function FriendsTodayCard({ className }: { className?: string }) {
             type="button"
             onClick={share}
             data-testid="friends-today-share"
-            className="inline-flex h-9 items-center gap-1 rounded-neo border-2 border-neo-black bg-neo-yellow px-3 font-neo-display text-xs font-bold uppercase text-neo-black shadow-hard-sm active:translate-y-0.5 active:shadow-none"
+            className="inline-flex h-9 items-center gap-1 rounded-neo border-2 border-neo-black bg-neo-yellow px-3 font-neo-display text-xs font-bold uppercase text-neo-black shadow-hard-sm transition-transform motion-safe:hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none"
           >
             <Share2 aria-hidden className="h-4 w-4" />
             {t('friendSocial.today.share')}
@@ -80,17 +81,18 @@ export function FriendsTodayCard({ className }: { className?: string }) {
 
       {playedCount > 0 && (
         <ol className="flex flex-col gap-1">
-          {today.rows.slice(0, MAX_ROWS).map((r) => (
+          {today.rows.slice(0, MAX_ROWS).map((r, i) => (
             <li
               key={r.key}
               data-you={r.isYou || undefined}
+              style={{ animationDelay: `${i * ROW_STAGGER_MS}ms` }}
               className={cn(
-                'flex items-center gap-2 rounded-neo border-2 px-2 py-1.5',
+                'flex items-center gap-2 rounded-neo border-2 px-2 py-1.5 motion-safe:animate-pop-in motion-safe:[animation-fill-mode:both]',
                 r.isYou ? 'border-neo-cyan bg-neo-cyan/15' : 'border-neo-black bg-neo-navy',
               )}
             >
               <span className="w-6 text-center font-neo-display text-sm font-bold tabular-nums text-neo-white">
-                {r.rank === 1 ? <Crown aria-label="1" className="mx-auto h-4 w-4 fill-neo-yellow text-neo-yellow" /> : r.rank}
+                {r.rank === 1 ? <Crown aria-label="1" className="mx-auto h-4 w-4 fill-neo-yellow text-neo-yellow motion-safe:animate-neo-wobble" /> : r.rank}
               </span>
               <span className="h-8 w-8 shrink-0 overflow-hidden rounded-full border-2 border-neo-black">
                 <Avatar avatarImage={r.avatarImage ?? undefined} customAvatar={(r.customAvatar as CustomAvatarConfig | null) ?? undefined} userId={r.key} size="sm" className="h-full w-full" />
@@ -104,7 +106,7 @@ export function FriendsTodayCard({ className }: { className?: string }) {
         </ol>
       )}
 
-      <p data-testid="friends-today-line" className="mt-2 text-sm font-bold text-neo-white/80">
+      <p data-testid="friends-today-line" className="mt-2 text-sm font-bold text-neo-white/80 motion-safe:animate-neo-pop motion-safe:[animation-delay:350ms] motion-safe:[animation-fill-mode:both]">
         {!today.youPlayed
           ? today.toBeat
             ? t('friendSocial.today.beatTop').replace('{name}', today.toBeat.name).replace('{score}', String(today.toBeat.total))
@@ -125,7 +127,7 @@ export function FriendsTodayCard({ className }: { className?: string }) {
         <Link
           href={`/${language}/daily`}
           data-testid="friends-today-play"
-          className="mt-2 flex h-11 w-full items-center justify-center rounded-neo border-3 border-neo-black bg-neo-lime font-neo-display text-sm font-bold uppercase text-neo-black shadow-hard active:translate-y-0.5 active:shadow-hard-pressed"
+          className="mt-2 flex h-11 w-full items-center justify-center rounded-neo border-3 border-neo-black bg-neo-lime font-neo-display text-sm font-bold uppercase text-neo-black shadow-hard transition-transform motion-safe:hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed"
         >
           {t('friendSocial.today.play')}
         </Link>

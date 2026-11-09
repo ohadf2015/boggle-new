@@ -64,6 +64,7 @@ describe('FriendQuickAction', () => {
     setCtx('sent');
     render(<FriendQuickAction userId="u1" name="Dana" surface="test" />);
     expect(screen.getByTestId('friend-quick-sent')).toBeInTheDocument();
+    expect(screen.getByTestId('friend-quick-sent').className).toContain('motion-safe:animate-neo-pop');
   });
 
   it('hides add and chat when the Families Policy turns them off', () => {
