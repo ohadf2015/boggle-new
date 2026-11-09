@@ -53,6 +53,13 @@ describe('HomeWeekChallenge', () => {
     expect(screen.getByTestId('home-challenge-results')).toHaveAttribute('href', '/en/teacher/reports?c=c1');
   });
 
+  it('given a class with no students yet, then no 0-of-0 progress line', () => {
+    hook.assignments = [{ ...open, completion_count: 0, student_count: 0 }];
+    view();
+    expect(screen.queryByTestId('home-challenge-finished')).not.toBeInTheDocument();
+    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+  });
+
   it('given nobody finished yet, then there is no results link', () => {
     hook.assignments = [{ ...open, completion_count: 0 }];
     view();

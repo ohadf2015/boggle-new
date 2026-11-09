@@ -114,14 +114,14 @@ export function HomeWeekChallenge({ classroomId, classLanguage, lessons, preferr
         <span className="font-neo-body text-xs font-bold text-neo-cream/80">{status}</span>
       </div>
       <p data-testid="home-challenge-list" className="font-neo-display text-lg font-black leading-tight">{name}</p>
-      <div>
+      {challenge.students > 0 ? (<div>
         <div className="h-3 overflow-hidden rounded-full border-2 border-neo-cream/60 bg-neo-navy" role="progressbar" aria-valuemin={0} aria-valuemax={challenge.students} aria-valuenow={challenge.finished} aria-label={t(`${K}.finished`, { done: challenge.finished, total: challenge.students })}>
           <div className="h-full bg-neo-lime" style={{ width: `${pct}%` }} />
         </div>
         <p data-testid="home-challenge-finished" className="mt-1 font-neo-body text-sm font-bold">
           {t(`${K}.finished`, { done: challenge.finished, total: challenge.students })}
         </p>
-      </div>
+      </div>) : null}
       <div className="flex flex-wrap gap-2">
         {challenge.finished > 0 ? (
           <Link href={resultsHref} data-testid="home-challenge-results" className={cn(PILL, 'bg-neo-cream text-neo-black')}>
