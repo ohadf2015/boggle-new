@@ -18,12 +18,16 @@ const plugin = {
     return { remove: vi.fn() };
   }),
 };
-vi.mock('@capacitor/core', () => ({ registerPlugin: () => plugin }));
+// Capacitor warns "already registered" on a second registration of the same name.
+const registerPlugin = vi.fn((_name: string) => plugin);
+vi.mock('@capacitor/core', () => ({ registerPlugin: (name: string) => registerPlugin(name) }));
 
-import NativeUpdateSnackbar from '../NativeUpdateSnackbar';
+let NativeUpdateSnackbar: typeof import('../NativeUpdateSnackbar').default;
 
 describe('NativeUpdateSnackbar', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
+    vi.resetModules();
+    NativeUpdateSnackbar = (await import('../NativeUpdateSnackbar')).default;
     vi.useFakeTimers();
     vi.clearAllMocks();
     platform.native = true;
@@ -53,5 +57,13 @@ describe('NativeUpdateSnackbar', () => {
     render(<NativeUpdateSnackbar />);
     await act(async () => { await vi.advanceTimersByTimeAsync(9000); });
     expect(screen.queryByRole('status')).toBeNull();
+  });
+
+  it('registers the plugin once across remounts', async () => {
+    render(<NativeUpdateSnackbar />).unmount();
+    render(<NativeUpdateSnackbar />);
+    await act(async () => { await vi.advanceTimersByTimeAsync(9000); });
+    expect(registerPlugin).toHaveBeenCalledTimes(1);
+    expect(plugin.check).toHaveBeenCalledTimes(1);
   });
 });
