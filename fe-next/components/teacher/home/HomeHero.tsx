@@ -70,7 +70,7 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
     <section data-testid="home-hero" aria-labelledby="home-hero-title" className={cn(NB_PANEL, NB_BLOCK.pink, 'relative @container/hero')}>
       <div
         data-testid="home-hero-grid"
-        className="grid gap-3 p-3 sm:gap-4 sm:p-5 @3xl/hero:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] @3xl/hero:grid-rows-[auto_1fr] @3xl/hero:gap-x-6 [@media(max-height:820px)]:gap-2.5 [@media(max-height:820px)]:p-3.5"
+        className="grid grid-cols-[minmax(0,1fr)] gap-3 p-3 sm:gap-4 sm:p-5 @3xl/hero:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] @3xl/hero:grid-rows-[auto_1fr] @3xl/hero:gap-x-6 [@media(max-height:820px)]:gap-2.5 [@media(max-height:820px)]:p-3.5"
       >
         <div className="flex min-w-0 flex-col gap-1 sm:gap-1.5 @3xl/hero:col-start-1 @3xl/hero:row-start-1">
           <div className="flex flex-wrap items-center justify-between gap-x-3">
