@@ -96,7 +96,8 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
   if (!currentHint) return null;
 
   const showMatchWarning = matchesTargetLength && !showFeedbackOverlay;
-  const showGoal = explainRules && !showMatchWarning && !attempts.some((a) => !a.isDiscovery);
+  // Until the first guess, the tries row says what the game is: find the hidden word in ten tries.
+  const showGoal = explainRules && !attempts.some((a) => !a.isDiscovery);
 
   return (
     <AdaptiveMotion.div
@@ -141,16 +142,21 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
             ⚠ {t('wordHunt.survival.matchesTargetWarning')}
           </span>
         )}
-        {showGoal && (
-          <span data-testid="hunt-goal" className="text-center text-sm sm:text-base font-black text-neo-white">
-            {t('wordHunt.survival.goal', { count: targetWord.length })}
-          </span>
-        )}
+
       </div>
       {/* Tries counter - only count non-discovery attempts */}
       {(() => {
         const targetAttempts = attempts.filter(a => !a.isDiscovery).length;
         const triesRemaining = MAX_ATTEMPTS - targetAttempts;
+        if (showGoal) {
+          return (
+            <div className={cn("text-center", compact ? "mb-0.5" : "mb-2 cramped:mb-0.5")}>
+              <span data-testid="hunt-goal" className="font-black text-neo-white text-base sm:text-lg cramped:text-sm">
+                {t('wordHunt.survival.goal', { count: targetWord.length, tries: MAX_ATTEMPTS })}
+              </span>
+            </div>
+          );
+        }
         return (
           <div className={cn("text-center", compact ? "mb-0.5" : "mb-2 cramped:mb-0.5")}>
             <span className={cn(

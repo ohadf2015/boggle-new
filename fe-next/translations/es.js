@@ -10267,7 +10267,7 @@ const es = {
         "decline": "Terminar partida"
       },
       "findWordsToReveal": "Deletrea palabras en la cuadrícula para revelar estas letras",
-      "goal": "Encuentra la palabra oculta de {count} letras",
+      "goal": "Encuentra la palabra oculta de {count} letras en {tries} intentos",
       "cueShortVsGuess": "Las palabras más cortas dan pistas gratis. Las de {count} letras son intentos.",
       "tryWord": "¿Atascado? Traza {word}",
       "readyTagline": "Encuentra la palabra oculta de hoy. Las palabras más cortas que formes en el tablero revelan sus letras.",

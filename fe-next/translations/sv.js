@@ -10701,7 +10701,7 @@ const sv = {
         "decline": "Avsluta rundan"
       },
       "findWordsToReveal": "Stava ord på rutorna för att avslöja dessa bokstäver",
-      "goal": "Hitta det dolda ordet på {count} bokstäver",
+      "goal": "Hitta det dolda ordet på {count} bokstäver på {tries} försök",
       "cueShortVsGuess": "Kortare ord ger gratis ledtrådar. Ord på {count} bokstäver är gissningar.",
       "tryWord": "Fast? Dra över {word}",
       "readyTagline": "Hitta dagens dolda ord. Kortare ord som du stavar på brädet avslöjar dess bokstäver.",

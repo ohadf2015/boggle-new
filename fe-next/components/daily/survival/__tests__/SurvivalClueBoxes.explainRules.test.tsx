@@ -37,9 +37,10 @@ const baseProps = {
 };
 
 describe('SurvivalClueBoxes - explainRules', () => {
-  it('Given a fresh daily run, Then it names the goal with the hidden word length', () => {
+  it('Given a fresh daily run, Then the tries row names the goal, the word length and the tries', () => {
     render(<SurvivalClueBoxes {...baseProps} explainRules />);
-    expect(screen.getByTestId('hunt-goal').textContent).toBe('wordHunt.survival.goal:{"count":5}');
+    expect(screen.getByTestId('hunt-goal').textContent).toBe('wordHunt.survival.goal:{"count":5,"tries":10}');
+    expect(screen.queryByText(/wordHunt.survival.triesLeft/)).toBeNull();
   });
 
   it('Given no clue yet, Then it says short words are free and full-length words are guesses', () => {
@@ -47,16 +48,17 @@ describe('SurvivalClueBoxes - explainRules', () => {
     expect(screen.getByTestId('clue-empty-cue').textContent).toContain('wordHunt.survival.cueShortVsGuess:{"count":5}');
   });
 
-  it('Given a word of the hidden length is being traced, Then the warning takes the goal slot', () => {
+  it('Given a word of the hidden length is being traced, Then the warning shows beside the goal', () => {
     render(<SurvivalClueBoxes {...baseProps} explainRules matchesTargetLength />);
-    expect(screen.queryByTestId('hunt-goal')).toBeNull();
+    expect(screen.getByTestId('hunt-goal')).toBeInTheDocument();
     expect(screen.getByTestId('match-target-warning')).toBeInTheDocument();
   });
 
-  it('Given the first guess is made, Then the goal line steps aside', () => {
+  it('Given the first guess is made, Then the row goes back to counting tries', () => {
     const attempts = [{ word: 'CRANE', feedback: [], timestamp: 1 }] as unknown as TargetAttempt[];
     render(<SurvivalClueBoxes {...baseProps} attempts={attempts} explainRules />);
     expect(screen.queryByTestId('hunt-goal')).toBeNull();
+    expect(screen.getByText(/9\/10/)).toBeInTheDocument();
   });
 
   it('leaves multiplayer copy alone when the rules are not asked for', () => {

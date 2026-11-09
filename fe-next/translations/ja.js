@@ -10393,7 +10393,7 @@ const ja = {
         "decline": "ランを終了"
       },
       "findWordsToReveal": "グリッドで単語を作って、この文字を表示しよう",
-      "goal": "隠れた{count}文字の単語を見つけよう",
+      "goal": "{tries}回以内に隠れた{count}文字の単語を見つけよう",
       "cueShortVsGuess": "短い単語はヒントが無料。{count}文字の単語は1回の推測になります。",
       "tryWord": "迷ったら？{word} をなぞろう",
       "readyTagline": "今日の隠れた単語を見つけよう。ボードで作った短い単語が、その文字を明かします。",
