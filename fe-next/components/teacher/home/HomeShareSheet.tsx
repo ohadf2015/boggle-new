@@ -27,6 +27,7 @@ export function HomeShareSheet({ classroom, open, onOpenChange, uiLanguage, t }:
   useEffect(() => setOrigin(window.location.origin), []);
   const share = useInviteShare(classroom, t);
   const locale = inviteLocale(classroom.language, uiLanguage);
+  const language = uiLanguage;
   const joinUrl = origin ? classroomJoinUrl(origin, locale, classroom.join_code) : '';
   const displayHost = origin ? `${origin.replace(/^https?:\/\//, '')}/${locale}/join` : '';
 
@@ -56,7 +57,7 @@ export function HomeShareSheet({ classroom, open, onOpenChange, uiLanguage, t }:
             {t('academy.hq.openProjector')}
           </NeoButton>
           <Link
-            href={`/${uiLanguage}/teacher/join-sheet?code=${encodeURIComponent(classroom.join_code)}&name=${encodeURIComponent(classroom.name)}`}
+            href={`/${language}/teacher/join-sheet?code=${encodeURIComponent(classroom.join_code)}&name=${encodeURIComponent(classroom.name)}`}
             target="_blank"
             rel="noopener"
             data-testid="home-share-print"
