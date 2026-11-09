@@ -1277,6 +1277,53 @@ const es = {
     }
   },
   // @academy:end
+  // @quick-loop:start
+  "quickLoop": {
+    "nextBoard": "Siguiente tablero",
+    "moreGames": "Más juegos",
+    "pop": {
+      "firstWord": "¡{word}! ¡Primera palabra!",
+      "clockStarts": "El reloj empieza ahora",
+      "golden": "¡Casilla dorada! ×2 +{points}",
+      "rare": "Palabra rara: ¡{word}!",
+      "epic": "Palabra épica: ¡{word}!"
+    },
+    "coach": {
+      "intro": "Encuentra cualquier palabra. El reloj espera a tu primera.",
+      "hint": "Pista: prueba {word}"
+    },
+    "nearMiss": {
+      "toBeatBest": "{points} puntos para superar tu récord",
+      "newBestBy": "¡Nuevo récord por {points} puntos!",
+      "wordsToPar": "{words} palabras más para llegar al objetivo"
+    },
+    "weekly": {
+      "kicker": "Tablero de la semana",
+      "play": "Jugar",
+      "chip": "Tablero semanal: {theme}",
+      "theme": {
+        "vowelParty": "Fiesta de vocales",
+        "goldRush": "Fiebre del oro",
+        "sStorm": "Tormenta de S",
+        "bigLetters": "Letras grandes"
+      },
+      "line": {
+        "vowelParty": "Vocales extra. El mismo tablero para todos, toda la semana.",
+        "goldRush": "Una casilla dorada garantizada. El mismo tablero toda la semana.",
+        "sStorm": "Más eses para plurales. El mismo tablero toda la semana.",
+        "bigLetters": "Letras más raras, palabras más grandes. El mismo tablero toda la semana."
+      }
+    },
+    "daily": {
+      "play": "Jugar"
+    },
+    "freezes": {
+      "title": "Congeladores de racha: cada uno cubre un día perdido",
+      "aria": "{n} congeladores de racha",
+      "count": "Congeladores: {n}"
+    }
+  },
+  // @quick-loop:end
   // @home-play:start
   "homePlay": {
     "heroLine": "Sesenta segundos, un tablero nuevo y tres rivales que no te esperan.",
@@ -9766,7 +9813,7 @@ const es = {
     },
     "weeklyChest": {
       "title": "Cofre semanal",
-      "dayProgress": "Día {day} de 7",
+      "dayProgress": "{day} de 5 días esta semana",
       "daysRemaining": "¡{n} días más para tu cofre {tier}!",
       "claimReady": "¡Tu cofre {tier} está listo!",
       "claimButton": "Abrir cofre",
@@ -9778,8 +9825,8 @@ const es = {
       "freezesGrantedPlural": "+{n} congelaciones de racha",
       "info": {
         "title": "Cómo funciona el cofre semanal",
-        "howItWorks": "Completa un desafío diario cada día. Siete días seguidos llenan tu cofre.",
-        "streakReset": "Si fallas un día, tu racha se reinicia y empiezas los 7 días de nuevo.",
+        "howItWorks": "Completa un reto diario en 5 días cualesquiera de esta semana (de lunes a domingo) para llenar tu cofre.",
+        "streakReset": "Perder un día no reinicia el cofre. Cada lunes empieza una semana nueva.",
         "tiersTitle": "Niveles del cofre",
         "tierBronzeDesc": "Recompensa básica por completar la semana.",
         "tierSilverDesc": "Juega bien toda la semana para alcanzarlo.",

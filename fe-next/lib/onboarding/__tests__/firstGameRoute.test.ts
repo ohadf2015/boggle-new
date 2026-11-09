@@ -19,12 +19,12 @@ import { firstGameRoute } from '../firstGameRoute';
 
 describe('firstGameRoute', () => {
   it('sends a new player into a real auto-started game', () => {
-    expect(firstGameRoute('en')).toBe('/en/quick-play?mode=classic');
+    expect(firstGameRoute('en')).toBe('/en/quick-play?mode=classic&coach=1');
   });
 
   it('keeps the player in their own language', () => {
-    expect(firstGameRoute('he')).toBe('/he/quick-play?mode=classic');
-    expect(firstGameRoute('ja')).toBe('/ja/quick-play?mode=classic');
+    expect(firstGameRoute('he')).toBe('/he/quick-play?mode=classic&coach=1');
+    expect(firstGameRoute('ja')).toBe('/ja/quick-play?mode=classic&coach=1');
   });
 
   it('never routes into practice', () => {

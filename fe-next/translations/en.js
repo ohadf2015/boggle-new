@@ -1277,6 +1277,53 @@ const en = {
     }
   },
   // @academy:end
+  // @quick-loop:start
+  "quickLoop": {
+    "nextBoard": "Next board",
+    "moreGames": "More games",
+    "pop": {
+      "firstWord": "{word}! First word!",
+      "clockStarts": "The clock starts now",
+      "golden": "Golden tile! ×2 +{points}",
+      "rare": "Rare word: {word}!",
+      "epic": "Epic word: {word}!"
+    },
+    "coach": {
+      "intro": "Find any word. The clock waits for your first one.",
+      "hint": "Hint: try {word}"
+    },
+    "nearMiss": {
+      "toBeatBest": "{points} points to beat your best",
+      "newBestBy": "New best by {points} points!",
+      "wordsToPar": "{words} more words to hit par"
+    },
+    "weekly": {
+      "kicker": "This week's board",
+      "play": "Play",
+      "chip": "Weekly board: {theme}",
+      "theme": {
+        "vowelParty": "Vowel Party",
+        "goldRush": "Gold Rush",
+        "sStorm": "S Storm",
+        "bigLetters": "Big Letters"
+      },
+      "line": {
+        "vowelParty": "Extra vowels. Same board for everyone, all week.",
+        "goldRush": "A golden tile on the board, guaranteed. Same board all week.",
+        "sStorm": "Extra S tiles for plurals. Same board all week.",
+        "bigLetters": "Rarer letters, bigger words. Same board all week."
+      }
+    },
+    "daily": {
+      "play": "Play"
+    },
+    "freezes": {
+      "title": "Streak freezes: each one covers a missed day",
+      "aria": "{n} streak freezes",
+      "count": "Freezes: {n}"
+    }
+  },
+  // @quick-loop:end
   // @home-play:start
   "homePlay": {
     "heroLine": "Sixty seconds, a fresh board, and three rivals who don't wait for you.",
@@ -9191,7 +9238,7 @@ const en = {
     },
     "weeklyChest": {
       "title": "Weekly Chest",
-      "dayProgress": "Day {day} of 7",
+      "dayProgress": "{day} of 5 days this week",
       "daysRemaining": "Days to your {tier} Chest: {n}",
       "claimReady": "Your {tier} Chest is ready!",
       "claimButton": "Claim chest",
@@ -9203,8 +9250,8 @@ const en = {
       "freezesGrantedPlural": "+{n} Streak Freezes",
       "info": {
         "title": "How the Weekly Chest works",
-        "howItWorks": "Finish a daily challenge each day. Seven days in a row fills your chest.",
-        "streakReset": "Miss a day and your streak resets. You start the 7-day run over.",
+        "howItWorks": "Finish a daily challenge on any 5 days this week (Monday to Sunday) to fill your chest.",
+        "streakReset": "A missed day doesn't reset the chest. A new week starts every Monday.",
         "tiersTitle": "Chest tiers",
         "tierBronzeDesc": "Base reward for finishing the week.",
         "tierSilverDesc": "Play well all week to reach it.",

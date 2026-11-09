@@ -1277,6 +1277,53 @@ const ja = {
     }
   },
   // @academy:end
+  // @quick-loop:start
+  "quickLoop": {
+    "nextBoard": "次のボード",
+    "moreGames": "その他のゲーム",
+    "pop": {
+      "firstWord": "{word}! 最初の単語!",
+      "clockStarts": "ここから時計スタート",
+      "golden": "ゴールドタイル! ×2 +{points}",
+      "rare": "レア単語: {word}!",
+      "epic": "エピック単語: {word}!"
+    },
+    "coach": {
+      "intro": "どんな単語でもOK。最初の単語まで時計は止まっています。",
+      "hint": "ヒント: {word} を試してみて"
+    },
+    "nearMiss": {
+      "toBeatBest": "自己ベスト更新まであと{points}点",
+      "newBestBy": "自己ベストを{points}点更新!",
+      "wordsToPar": "目標まであと{words}語"
+    },
+    "weekly": {
+      "kicker": "今週のボード",
+      "play": "プレイ",
+      "chip": "週替わりボード: {theme}",
+      "theme": {
+        "vowelParty": "母音パーティー",
+        "goldRush": "ゴールドラッシュ",
+        "sStorm": "Sストーム",
+        "bigLetters": "ビッグレター"
+      },
+      "line": {
+        "vowelParty": "母音が多め。今週はみんな同じボード。",
+        "goldRush": "ゴールドタイル確定。今週はみんな同じボード。",
+        "sStorm": "Sが多め。今週はみんな同じボード。",
+        "bigLetters": "珍しい文字で大きな単語を。今週はみんな同じボード。"
+      }
+    },
+    "daily": {
+      "play": "プレイ"
+    },
+    "freezes": {
+      "title": "ストリークフリーズ: 1つで休んだ日を1日カバー",
+      "aria": "ストリークフリーズ{n}個",
+      "count": "フリーズ: {n}"
+    }
+  },
+  // @quick-loop:end
   // @home-play:start
   "homePlay": {
     "heroLine": "60秒、まっさらな盤面、そして待ってくれないライバルが3人。",
@@ -9806,7 +9853,7 @@ const ja = {
     },
     "weeklyChest": {
       "title": "週間チェスト",
-      "dayProgress": "7日中{day}日目",
+      "dayProgress": "今週 {day}/5日",
       "daysRemaining": "{tier}チェストまであと{n}日！",
       "claimReady": "{tier}チェストの準備ができました！",
       "claimButton": "チェストを開ける",
@@ -9818,8 +9865,8 @@ const ja = {
       "freezesGrantedPlural": "ストリークフリーズ +{n}",
       "info": {
         "title": "週間チェストの仕組み",
-        "howItWorks": "毎日デイリーチャレンジをクリアしましょう。7日連続でチェストが満タンになります。",
-        "streakReset": "1日でも逃すと連続記録がリセットされ、7日間を最初からやり直します。",
+        "howItWorks": "今週(月曜〜日曜)のうち好きな5日でデイリーチャレンジをクリアすると宝箱がいっぱいになります。",
+        "streakReset": "1日休んでも宝箱はリセットされません。毎週月曜に新しい週が始まります。",
         "tiersTitle": "チェストのランク",
         "tierBronzeDesc": "週をやり遂げた基本報酬。",
         "tierSilverDesc": "1週間しっかりプレイすると到達。",

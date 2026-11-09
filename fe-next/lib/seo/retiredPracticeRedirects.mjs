@@ -44,16 +44,17 @@ export const RETIRED_PRACTICE_REDIRECTS = [
     destination: '/:locale/daily/word-wheel',
     permanent: true,
   },
-  // Classic practice was the single-player grid: land straight in a classic round.
+  // Classic practice was the single-player grid: land straight in a classic
+  // round, coached for a first-timer (QuickPlayHub ignores coach=1 otherwise).
   {
     source: `/${LOCALE}/practice/classic`,
-    destination: '/:locale/quick-play?mode=classic',
+    destination: '/:locale/quick-play?mode=classic&coach=1',
     permanent: true,
   },
   // The hub itself — must precede the catch-all; lands where /practice/classic does.
   {
     source: `/${LOCALE}/practice`,
-    destination: '/:locale/quick-play?mode=classic',
+    destination: '/:locale/quick-play?mode=classic&coach=1',
     permanent: true,
   },
   // Anything else under /practice — including `/practice/brain`, which

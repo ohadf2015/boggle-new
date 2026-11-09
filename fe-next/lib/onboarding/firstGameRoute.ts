@@ -6,8 +6,10 @@
  * game — for half its intake the practice hub was where the funnel stopped, not
  * a warm-up. So onboarding now ends inside the actual engine.
  *
- * The first 60 seconds are one Quick Play classic round, started straight from
- * the link (no wheel tap).
+ * The first game is one coached Quick Play classic round, started straight
+ * from the link (no wheel tap): a known word planted on the board, the clock
+ * held until the first word, a hint if they stall. `coach=1` is ignored for a
+ * device that has already finished a quick round (QuickPlayHub).
  *
  * One function, because OnboardingFlow reaches "onboarding done" from three
  * different handlers — style-complete, quick-start, and the Play Now skip. Three
@@ -16,5 +18,5 @@
  */
 
 export function firstGameRoute(language: string): string {
-  return `/${language}/quick-play?mode=classic`;
+  return `/${language}/quick-play?mode=classic&coach=1`;
 }

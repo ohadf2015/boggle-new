@@ -2,18 +2,20 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Flame } from 'lucide-react';
+import { ArrowRight, Flame, Shield } from 'lucide-react';
 import { useTodayLabel } from './useTodayLabel';
 
 interface DailyBlockProps {
   lang: string;
-  t: (key: string) => string;
+  t: (key: string, params?: Record<string, string | number>) => string;
   streak: number;
   streakLoading: boolean;
+  /** Banked streak freezes (signed-in); shown under the streak when > 0. */
+  freezes?: number;
 }
 
 /** A tear-off ticket: the streak is the stub, today's puzzle is the ticket. */
-export function DailyBlock({ lang, t, streak, streakLoading }: DailyBlockProps) {
+export function DailyBlock({ lang, t, streak, streakLoading, freezes = 0 }: DailyBlockProps) {
   const weekday = useTodayLabel(lang, { weekday: 'long' });
   const day = useTodayLabel(lang, { day: 'numeric', month: 'short' });
 
@@ -36,6 +38,16 @@ export function DailyBlock({ lang, t, streak, streakLoading }: DailyBlockProps) 
               <span className="text-center text-[11px] font-bold uppercase tracking-wider lg:text-sm">
                 {t('homeFresh.sections.daily.streak')}
               </span>
+              {freezes > 0 && (
+                <span
+                  className="mt-1 flex items-center gap-1 rounded-full border-2 border-black bg-neo-cyan px-2 py-0.5 text-[11px] font-bold lg:text-sm"
+                  data-testid="hp-daily-freezes"
+                  title={t('quickLoop.freezes.title')}
+                >
+                  <Shield className="h-3 w-3 lg:h-4 lg:w-4" strokeWidth={3} aria-hidden="true" />
+                  {t('quickLoop.freezes.count', { n: freezes })}
+                </span>
+              )}
             </>
           ) : (
             <span className="text-center font-neo-display text-sm font-bold leading-tight lg:text-lg">{t('homePlay.dailyNoStreak')}</span>

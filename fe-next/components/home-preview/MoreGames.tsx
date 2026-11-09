@@ -71,6 +71,12 @@ const GAMES: Game[] = [
   },
 ];
 
+/**
+ * Modes most players leave early (Word Tower ~37% finish, Adventure a handful of
+ * players). Still one tap away under "More", just not in the main shelf.
+ */
+const TUCKED = new Set(['tower', 'adventure']);
+
 const TOWER_OFFSET = ['ms-3', 'ms-0', 'ms-4', 'ms-1', 'ms-2'];
 
 function GameArt({ art }: { art: Game['art'] }) {
@@ -123,8 +129,8 @@ export function MoreGames({ lang, t }: { lang: string; t: (key: string) => strin
           <p className="mt-1 text-sm text-neo-white/65 lg:text-lg">{t('homePlay.gamesLine')}</p>
         </div>
       </div>
-      <ul className="grid grid-cols-2 gap-x-3 gap-y-4 lg:grid-cols-3 lg:gap-8">
-        {GAMES.map((g) => (
+      <ul className="grid grid-cols-2 gap-x-3 gap-y-4 lg:grid-cols-4 lg:gap-8">
+        {GAMES.filter((g) => !TUCKED.has(g.id)).map((g) => (
           <li key={g.id}>
             <Link
               href={`/${lang}/${g.href}`}
@@ -146,6 +152,26 @@ export function MoreGames({ lang, t }: { lang: string; t: (key: string) => strin
           </li>
         ))}
       </ul>
+      <details className="group mt-4 lg:mt-6" data-testid="hp-games-more">
+        <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-xl border-[3px] border-black bg-neo-navy-elevated px-4 font-neo-display text-sm font-bold text-neo-cream shadow-hard-sm [&::-webkit-details-marker]:hidden lg:text-base">
+          {t('quickLoop.moreGames')}
+          <span aria-hidden="true" className="transition-transform group-open:rotate-180">▾</span>
+        </summary>
+        <ul className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
+          {GAMES.filter((g) => TUCKED.has(g.id)).map((g) => (
+            <li key={g.id}>
+              <Link
+                href={`/${lang}/${g.href}`}
+                data-testid={`hp-games-more-${g.id}`}
+                className={`flex h-full flex-col gap-0.5 rounded-2xl border-[3px] border-black p-3 text-black shadow-hard-sm active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed ${g.bg}`}
+              >
+                <span className="font-neo-display text-sm font-bold leading-tight lg:text-lg">{t(g.titleKey)}</span>
+                <span className="text-[12px] leading-snug font-medium lg:text-sm">{t(g.lineKey)}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </details>
     </section>
   );
 }

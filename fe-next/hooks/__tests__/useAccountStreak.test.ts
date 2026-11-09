@@ -3,7 +3,7 @@ import { renderHook } from '@testing-library/react';
 import { useAccountStreak } from '../useAccountStreak';
 
 let mockAuth = { isAuthenticated: false, loading: false };
-let mockChest = { loading: false, currentStreak: 0, cycleStart: '' };
+let mockChest: { loading: boolean; currentStreak: number; cycleStart: string; freezesAvailable?: number } = { loading: false, currentStreak: 0, cycleStart: '' };
 let mockRetention = { streak: 0, best: 0, freezeAvailable: false };
 
 vi.mock('@/contexts/AuthContext', () => ({
@@ -31,7 +31,7 @@ describe('useAccountStreak', () => {
     mockChest = { loading: false, currentStreak: 99, cycleStart: '2026-09-15' };
 
     const { result } = renderHook(() => useAccountStreak());
-    expect(result.current).toEqual({ streak: 3, loading: false });
+    expect(result.current).toEqual({ streak: 3, loading: false, freezes: 0 });
   });
 
   it('shows the server/account streak for a signed-in player, NOT the local device value', () => {
@@ -40,7 +40,15 @@ describe('useAccountStreak', () => {
     mockChest = { loading: false, currentStreak: 1, cycleStart: '2026-09-15' };
 
     const { result } = renderHook(() => useAccountStreak());
-    expect(result.current).toEqual({ streak: 1, loading: false });
+    expect(result.current).toEqual({ streak: 1, loading: false, freezes: 0 });
+  });
+
+  it('surfaces the banked streak freezes for a signed-in player', () => {
+    mockAuth = { isAuthenticated: true, loading: false };
+    mockChest = { loading: false, currentStreak: 4, cycleStart: '2026-11-09', freezesAvailable: 2 };
+
+    const { result } = renderHook(() => useAccountStreak());
+    expect(result.current.freezes).toBe(2);
   });
 
   it('reports loading (not a guessed number) while the account streak is still resolving', () => {

@@ -134,8 +134,9 @@ describe('GET /api/daily/weekly-chest/status', () => {
     const res = await GET(req())
     const body = await res.json()
     expect(body.currentStreak).toBe(4)
-    expect(body.daysCompleted).toBe(4)
-    expect(body.cycleStart).toBe('2026-05-08')
+    // The chest counts this calendar week (Mon 05-11 → today): only 05-11 so far.
+    expect(body.daysCompleted).toBe(1)
+    expect(body.cycleStart).toBe('2026-05-11')
   })
 
   it('returns daysCompleted 1 for single day attempt', async () => {
@@ -148,7 +149,9 @@ describe('GET /api/daily/weekly-chest/status', () => {
     const body = await res.json()
     expect(body.daysCompleted).toBe(1)
     expect(body.cycleNumber).toBe(1)
-    expect(body.cycleStart).toBe(today)
+    // The chest week starts on Monday (05-11), not on the first played day.
+    expect(body.cycleStart).toBe('2026-05-11')
+    expect(body.completedDates).toEqual([today])
   })
 
   it('returns isClaimable true when 7 consecutive days completed', async () => {
@@ -174,15 +177,16 @@ describe('GET /api/daily/weekly-chest/status', () => {
   it('combines attempts from all three daily modes', async () => {
     makeMockSupabase({
         puzzleAttempts: [{ puzzle_date: '2026-05-12' }],
-        huntAttempts: [{ puzzle_date: '2026-05-11' }],
-        wheelAttempts: [{ puzzle_date: '2026-05-10' }],
+        wheelAttempts: [{ puzzle_date: '2026-05-11' }],
+        huntAttempts: [{ puzzle_date: '2026-05-10' }],
       })
     const res = await GET(req())
     expect(res.status).toBe(200)
     const body = await res.json()
-    expect(body.completedDates).toContain('2026-05-12')
-    expect(body.completedDates).toContain('2026-05-11')
-    expect(body.completedDates).toContain('2026-05-10')
+    // This week's chest (Mon 05-11 →) sees the puzzle and wheel days...
+    expect(body.completedDates).toEqual(['2026-05-11', '2026-05-12'])
+    // ...and the streak runs across all three modes, Sunday's hunt included.
+    expect(body.currentStreak).toBe(3)
   })
 
   it('returns pendingChest with tier and coins when claimable and chest exists', async () => {
@@ -254,7 +258,7 @@ describe('GET /api/daily/weekly-chest/status', () => {
     const body = await res.json()
     expect(body.isClaimable).toBe(false)
     expect(body.daysCompleted).toBe(1)
-    expect(body.cycleStart).toBe('2026-05-12')
+    expect(body.cycleStart).toBe('2026-05-11')
   })
 
   it('returns null pendingChest when already claimed (opened_at set)', async () => {

@@ -114,6 +114,7 @@ const InGameScreen = memo<InGameScreenProps & MpRoundOptIns>(function InGameScre
   // Focus mode
   gameplayFocusMode = false,
   clientAuthoritative = false,
+  soloGoldenLetters,
 
   // Achievement dock
   children,
@@ -696,7 +697,7 @@ const InGameScreen = memo<InGameScreenProps & MpRoundOptIns>(function InGameScre
     wordHuntPlayerLives,
     wordHuntEliminatedPlayers,
     onWordHuntGuess,
-    goldenLetters,
+    goldenLetters: soloGoldenLetters ?? goldenLetters,
     roundEvent,
     eventTiles,
     rushTiles,

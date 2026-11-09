@@ -91,6 +91,11 @@ export interface InGameScreenProps {
    * (QuickClassicBoard), never by a real multiplayer room.
    */
   clientAuthoritative?: boolean;
+  /**
+   * Golden tiles for a socketless board (Quick Play classic). MP rooms get them
+   * from the startGame payload instead; when set, this wins.
+   */
+  soloGoldenLetters?: Array<{ row: number; col: number }>;
 
   // Achievement dock (rendered outside this component)
   children?: ReactNode;

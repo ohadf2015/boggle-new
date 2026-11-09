@@ -86,13 +86,13 @@ describe('retired practice routes', () => {
     // both require ?autoStart=coach.
     const rule = match(rules(), '/en/practice');
     expect(rule).toBeDefined();
-    expect(rule?.destination).toBe('/:locale/quick-play?mode=classic');
+    expect(rule?.destination).toBe('/:locale/quick-play?mode=classic&coach=1');
     expect(rule?.permanent).toBe(true);
   });
 
   it('sends each mode to the real game it was wrapping', () => {
     const all = rules();
-    expect(match(all, '/en/practice/classic')?.destination).toBe('/:locale/quick-play?mode=classic');
+    expect(match(all, '/en/practice/classic')?.destination).toBe('/:locale/quick-play?mode=classic&coach=1');
     expect(match(all, '/en/practice/wordHunt')?.destination).toBe('/:locale/daily/word-hunt');
     expect(match(all, '/en/practice/wheelRush')?.destination).toBe('/:locale/daily/word-wheel');
   });
@@ -119,7 +119,7 @@ describe('retired practice routes', () => {
     const all = rules();
     for (const locale of ['he', 'sv', 'ja', 'es', 'ru']) {
       expect(match(all, `/${locale}/practice`)?.destination).toBe(
-        '/:locale/quick-play?mode=classic',
+        '/:locale/quick-play?mode=classic&coach=1',
       );
       expect(match(all, `/${locale}/practice/wheelRush`)?.destination).toBe(
         '/:locale/daily/word-wheel',

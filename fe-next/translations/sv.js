@@ -1277,6 +1277,53 @@ const sv = {
     }
   },
   // @academy:end
+  // @quick-loop:start
+  "quickLoop": {
+    "nextBoard": "Nästa bräde",
+    "moreGames": "Fler spel",
+    "pop": {
+      "firstWord": "{word}! Första ordet!",
+      "clockStarts": "Klockan startar nu",
+      "golden": "Guldruta! ×2 +{points}",
+      "rare": "Sällsynt ord: {word}!",
+      "epic": "Episkt ord: {word}!"
+    },
+    "coach": {
+      "intro": "Hitta vilket ord som helst. Klockan väntar på ditt första.",
+      "hint": "Tips: prova {word}"
+    },
+    "nearMiss": {
+      "toBeatBest": "{points} poäng kvar till nytt rekord",
+      "newBestBy": "Nytt rekord med {points} poäng!",
+      "wordsToPar": "{words} ord till för att nå målet"
+    },
+    "weekly": {
+      "kicker": "Veckans bräde",
+      "play": "Spela",
+      "chip": "Veckobräde: {theme}",
+      "theme": {
+        "vowelParty": "Vokalfest",
+        "goldRush": "Guldrush",
+        "sStorm": "S-storm",
+        "bigLetters": "Stora bokstäver"
+      },
+      "line": {
+        "vowelParty": "Extra vokaler. Samma bräde för alla, hela veckan.",
+        "goldRush": "En guldruta på brädet, garanterat. Samma bräde hela veckan.",
+        "sStorm": "Extra S-rutor. Samma bräde hela veckan.",
+        "bigLetters": "Ovanligare bokstäver, större ord. Samma bräde hela veckan."
+      }
+    },
+    "daily": {
+      "play": "Spela"
+    },
+    "freezes": {
+      "title": "Svitfrysningar: varje täcker en missad dag",
+      "aria": "{n} svitfrysningar",
+      "count": "Frysningar: {n}"
+    }
+  },
+  // @quick-loop:end
   // @home-play:start
   "homePlay": {
     "heroLine": "Sextio sekunder, en ny bricka och tre motståndare som inte väntar på dig.",
@@ -10114,7 +10161,7 @@ const sv = {
     },
     "weeklyChest": {
       "title": "Veckokista",
-      "dayProgress": "Dag {day} av 7",
+      "dayProgress": "{day} av 5 dagar den här veckan",
       "daysRemaining": "{n} dagar kvar för din {tier}-kista!",
       "claimReady": "Din {tier}-kista är klar!",
       "claimButton": "Öppna kista",
@@ -10126,8 +10173,8 @@ const sv = {
       "freezesGrantedPlural": "+{n} svitfrysar",
       "info": {
         "title": "Så funkar veckokistan",
-        "howItWorks": "Slutför en daglig utmaning varje dag. Sju dagar i rad fyller din kista.",
-        "streakReset": "Missar du en dag nollställs din svit – du börjar om på sju dagar.",
+        "howItWorks": "Klara en daglig utmaning fem valfria dagar den här veckan (måndag till söndag) för att fylla kistan.",
+        "streakReset": "En missad dag nollställer inte kistan. En ny vecka börjar varje måndag.",
         "tiersTitle": "Kistnivåer",
         "tierBronzeDesc": "Grundbelöning för att klara veckan.",
         "tierSilverDesc": "Spela bra hela veckan för att nå den.",

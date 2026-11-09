@@ -97,6 +97,14 @@ interface UseSinglePlayerCoreOptions {
    * handled twice — and so Space can't freeze a clock that has no pause UI.
    */
   externalInput?: boolean;
+  /**
+   * Per-word points multiplier applied to an accepted word (Quick Play's golden
+   * tile doubles words traced through it). Default 1. Read through a ref, so a
+   * new function identity each render does not rebuild the submit handler.
+   */
+  wordMultiplier?: (word: string) => number;
+  /** Fires once per accepted word, after scoring (in-round pops, coach beats). */
+  onWordAccepted?: (event: { word: string; points: number; multiplier: number; validCount: number }) => void;
 }
 
 interface AvailableWords {
@@ -113,9 +121,13 @@ const MIN_TRACKED_WORD_LENGTH = 5;
  */
 export function useSinglePlayerCore({
   settings, targetHighScore, onGameEnd, onQuit, quitStaysOnPage = false, clockHold = false,
-  externalInput = false,
+  externalInput = false, wordMultiplier, onWordAccepted,
 }: UseSinglePlayerCoreOptions) {
   const { t } = useLanguage();
+  const wordMultiplierRef = useRef(wordMultiplier);
+  wordMultiplierRef.current = wordMultiplier;
+  const onWordAcceptedRef = useRef(onWordAccepted);
+  onWordAcceptedRef.current = onWordAccepted;
   // Cozy / Calm Mode (single-player only): calmer bot pacing + no urgency cues.
   // Reward-neutral — neither changes how many words the player can find.
   const cosyMode = useCosyMode();
@@ -422,12 +434,18 @@ export function useSinglePlayerCore({
         result: 'ok', word: normalizedWord, basePts: fullScore, elapsedSec: timeSinceStart, nowMs: now,
       });
 
+      // Board bonus (golden tile) multiplies this word's points only — never
+      // the mission bonus. Clamped so a bad multiplier can't zero or explode a word.
+      const rawMult = wordMultiplierRef.current?.(normalizedWord) ?? 1;
+      const wordMult = Number.isFinite(rawMult) ? Math.min(3, Math.max(1, rawMult)) : 1;
+      const wordPts = juice.wordPts * wordMult;
+
       foundWordsRef.current = foundWordsRef.current.map(fw =>
-        fw.word === normalizedWord && fw.timestamp === now ? { ...fw, isValid: true, score: juice.wordPts, comboBonus, fireRoundBonus } : fw
+        fw.word === normalizedWord && fw.timestamp === now ? { ...fw, isValid: true, score: wordPts, comboBonus, fireRoundBonus } : fw
       );
       setFoundWords(foundWordsRef.current);
       wordPace.recordWord();
-      setScore(prev => prev + juice.wordPts + juice.bonusPts);
+      setScore(prev => prev + wordPts + juice.bonusPts);
       playWordAcceptedSound(); hapticForWordScore(normalizedWord.length);
       effects.lastWordFoundTimeRef.current = Date.now(); setShowHintPrompt(false);
       combo.incrementCombo(true);
@@ -436,9 +454,9 @@ export function useSinglePlayerCore({
       if (combo.validWordCount > 1) playComboSound(currentCombo + 1);
       setCurrentFeedback({
         id: `accept-${now}`, type: 'accepted', word: normalizedWord.toUpperCase(),
-        score: juice.wordPts, fireRoundActive, fireRoundBonus, timestamp: now,
+        score: wordPts, fireRoundActive, fireRoundBonus, timestamp: now,
       });
-      announceWordResult(normalizedWord, true, juice.wordPts);
+      announceWordResult(normalizedWord, true, wordPts);
       announceCombo(currentCombo + 1);
       // Activation is "they played", not "the timer hit zero". QuickClassicBoard
       // never mounts SinglePlayerGame's first_word_found effect, so the shared
@@ -447,10 +465,21 @@ export function useSinglePlayerCore({
       if (foundWordsRef.current.filter(fw => fw.isValid === true).length === 1) {
         markFirstGameActivation({
           won: false,
-          score: juice.wordPts,
+          score: wordPts,
           wordCount: 1,
           mode: 'singleplayer',
         });
+      }
+
+      try {
+        onWordAcceptedRef.current?.({
+          word: normalizedWord,
+          points: wordPts,
+          multiplier: wordMult,
+          validCount: foundWordsRef.current.filter(fw => fw.isValid === true).length,
+        });
+      } catch {
+        /* a UI listener must never break scoring */
       }
 
       const validatedWords = foundWordsRef.current

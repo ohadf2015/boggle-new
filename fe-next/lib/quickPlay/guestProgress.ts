@@ -32,6 +32,8 @@ export interface QuickGuestProgress {
   coinsPending: number;
   xpPending: number;
   bestByMode: Record<string, number>;
+  /** Best raw round score per mode (points, not %), for the "N points from your best" line. */
+  bestScoreByMode?: Record<string, number>;
   /** Local date (YYYY-MM-DD) of the last round, for the day streak. */
   lastPlayedDay: string | null;
   dayStreak: number;
@@ -43,6 +45,7 @@ const empty = (): QuickGuestProgress => ({
   coinsPending: 0,
   xpPending: 0,
   bestByMode: {},
+  bestScoreByMode: {},
   lastPlayedDay: null,
   dayStreak: 0,
 });
@@ -77,7 +80,7 @@ function daysBetween(a: string, b: string): number {
  * Idempotency is the caller's job (the hub already guards double-submit).
  */
 export function recordGuestRound(
-  input: { mode: string; scorePct: number },
+  input: { mode: string; scorePct: number; score?: number },
   now: Date = new Date()
 ): QuickGuestProgress {
   const prev = getGuestProgress();
@@ -92,11 +95,25 @@ export function recordGuestRound(
     coinsPending: prev.coinsPending + quickCoinsFor(scorePct),
     xpPending: prev.xpPending + quickXpFor(scorePct),
     bestByMode: { ...prev.bestByMode, [input.mode]: Math.max(prev.bestByMode[input.mode] ?? 0, scorePct) },
+    bestScoreByMode: {
+      ...(prev.bestScoreByMode ?? {}),
+      [input.mode]: Math.max(prev.bestScoreByMode?.[input.mode] ?? 0, Math.max(0, Math.round(input.score ?? 0))),
+    },
     lastPlayedDay: today,
     dayStreak,
   };
   saveJsonToLocalStorage(KEY, next);
   return next;
+}
+
+/** Rounds this device has finished in Quick Play (0 = a first-timer). */
+export function quickRoundsPlayed(): number {
+  return getGuestProgress().history.length;
+}
+
+/** Best raw score this device has posted on `mode`, 0 when none. */
+export function bestScoreFor(mode: string): number {
+  return getGuestProgress().bestScoreByMode?.[mode] ?? 0;
 }
 
 /**
