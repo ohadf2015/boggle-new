@@ -5,6 +5,7 @@
 // BreadcrumbList mirrors the /guides pattern for consistent site navigation.
 
 import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
+import { LEXICLASH_SAME_AS } from './socialProfiles';
 
 const BASE_URL = 'https://www.lexiclash.live';
 const SUPPORTED = new Set(['en', 'he', 'sv', 'ja', 'es', 'ru']);
@@ -28,13 +29,8 @@ const LANGUAGE_COUNT = LOCALES.length;
  */
 const JOIN_CODE_LENGTH = 6;
 
-// Real, existing LexiClash profiles — used as sameAs for entity verification.
-// NEVER add placeholder/non-existent URLs here: an invalid sameAs hurts more
-// than a missing one. Mirrors the canonical set in app/[locale]/layout.tsx.
-const SAME_AS = [
-  'https://www.instagram.com/lexi.clash',
-  'https://play.google.com/store/apps/details?id=live.lexiclash.app',
-];
+// Real, existing LexiClash profiles — see lib/seo/socialProfiles.ts (shared with layout.tsx).
+const SAME_AS = [...LEXICLASH_SAME_AS];
 
 interface FaqItem {
   question: string;

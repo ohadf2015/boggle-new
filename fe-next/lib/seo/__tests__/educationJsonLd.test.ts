@@ -63,6 +63,8 @@ describe('educationJsonLd', () => {
       // Must include the real, existing LexiClash profiles — no placeholders.
       expect(schema.sameAs).toContain('https://www.instagram.com/lexi.clash');
       expect(schema.sameAs).toContain('https://play.google.com/store/apps/details?id=live.lexiclash.app');
+      expect(schema.sameAs).toContain('https://www.threads.com/@lexi.clash');
+      expect(schema.sameAs).toContain('https://www.tiktok.com/@lexiclash');
       // Not the CrazyGames page: that URL 404s, and a sameAs that 404s weakens the entity
       // instead of verifying it. Put it back the day the listing is actually live.
       expect(schema.sameAs).not.toContain('https://www.crazygames.com/game/lexiclash');

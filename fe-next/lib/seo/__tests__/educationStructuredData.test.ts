@@ -24,6 +24,7 @@ describe('educationStructuredData — canonical domain', () => {
   it('educationOrganizationJsonLd sameAs links real profiles, never lexiclash.com', () => {
     const schema = educationOrganizationJsonLd('en');
     expect(schema.sameAs).toContain('https://www.instagram.com/lexi.clash');
+    expect(schema.sameAs).toContain('https://www.tiktok.com/@lexiclash');
     expect(schema.sameAs.every((u: string) => !u.includes('lexiclash.com'))).toBe(true);
   });
 
