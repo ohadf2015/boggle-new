@@ -38,4 +38,31 @@ describe('teacherLifecycleNudge', () => {
     expect(html).not.toContain('<b>Ada</b>');
     expect(html).toContain('&lt;b&gt;Ada&lt;/b&gt;');
   });
+
+  it('Given a share-code email with its class, Then it shows the code and the student link, and the button opens that class tagged for measurement', () => {
+    const { html } = teacherLifecycleNudge({ fullName: 'Ada', locale: 'en', stage: 'share_code', classroom: { id: 'c 1', joinCode: 'KITE43', language: 'he' } });
+    expect(html).toContain('KITE43');
+    expect(html).toContain('https://www.lexiclash.live/he/join/KITE43');
+    expect(html).toContain(en.teacherLifecycleEmail.codeLabel);
+    expect(html).toContain('https://www.lexiclash.live/en/teacher/classroom/new?classroomId=c%201&amp;utm_source=email&amp;utm_medium=lifecycle&amp;utm_campaign=edu_share_code');
+  });
+
+  it('Given a start-live email with its class, Then the button opens that class, and no code box is added', () => {
+    const { html } = teacherLifecycleNudge({ fullName: 'Ada', locale: 'en', stage: 'start_live', classroom: { id: 'c1', joinCode: 'KITE43', language: null } });
+    expect(html).toContain('/en/teacher/classroom/new?classroomId=c1&amp;utm_source=email&amp;utm_medium=lifecycle&amp;utm_campaign=edu_start_live');
+    expect(html).not.toContain(en.teacherLifecycleEmail.codeLabel);
+  });
+
+  it('Given a code with markup, Then it is escaped', () => {
+    const { html } = teacherLifecycleNudge({ fullName: 'Ada', locale: 'en', stage: 'share_code', classroom: { id: 'c1', joinCode: '<x>', language: 'en' } });
+    expect(html).not.toContain('<x>');
+  });
+
+  it.each(Object.keys(LOCALES))('Given locale %s, Then the code and link labels are translated', (loc) => {
+    const dict = (LOCALES as Record<string, Record<string, unknown>>)[loc].teacherLifecycleEmail as Record<string, string>;
+    for (const k of ['codeLabel', 'linkLabel']) {
+      expect(typeof dict[k], `${loc}.${k}`).toBe('string');
+      if (loc !== 'en') expect(dict[k]).not.toBe((en as never as { teacherLifecycleEmail: Record<string, string> }).teacherLifecycleEmail[k]);
+    }
+  });
 });

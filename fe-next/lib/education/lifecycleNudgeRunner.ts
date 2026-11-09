@@ -36,8 +36,8 @@ export async function runLifecycleStageNudges(
   const userIds = [...new Set(teachers.map((t) => t.userId))];
   if (userIds.length === 0) return { due: 0, sent: 0, failed: 0, skipped: { testAccount: 0, cooldown: 0 } };
 
-  const classrooms = must('classrooms', await fetchInChunks<{ id: string; teacher_id: string; created_at: string }>(
-    sb, 'classrooms', 'id, teacher_id, created_at', 'teacher_id', userIds,
+  const classrooms = must('classrooms', await fetchInChunks<{ id: string; teacher_id: string; created_at: string; join_code: string | null; language: string | null }>(
+    sb, 'classrooms', 'id, teacher_id, created_at, join_code, language', 'teacher_id', userIds,
   ));
   const teacherOf = new Map(classrooms.map((c) => [c.id, c.teacher_id]));
   const [members, rounds, tests, ledger, paid] = await Promise.all([
@@ -63,7 +63,7 @@ export async function runLifecycleStageNudges(
   }
 
   const plan = planLifecycleNudges(teachers, {
-    classrooms: classrooms.map((c) => ({ id: c.id, teacherId: c.teacher_id, createdAt: c.created_at })),
+    classrooms: classrooms.map((c) => ({ id: c.id, teacherId: c.teacher_id, createdAt: c.created_at, joinCode: c.join_code, language: c.language })),
     studentCounts,
     liveRounds: must('classroom_rounds', rounds).map((r) => ({
       teacherId: r.teacher_id, completedAt: r.completed_at, playerCount: r.player_count ?? 0,
@@ -88,7 +88,7 @@ export async function runLifecycleStageNudges(
   for (const d of due) {
     const key = { userId: d.userId, kind: stageLedgerKind(d.stage), periodKey: ONCE };
     if (!(await claimSend(sb, key))) continue;
-    const tpl = teacherLifecycleNudge({ fullName: d.fullName, locale: d.locale, stage: d.stage });
+    const tpl = teacherLifecycleNudge({ fullName: d.fullName, locale: d.locale, stage: d.stage, classroom: d.classroom });
     const result = await sendLifecycleEmail({
       to: d.email, subject: tpl.subject, html: tpl.html, replyTo: tpl.replyTo, locale: d.locale, token: d.token,
     });

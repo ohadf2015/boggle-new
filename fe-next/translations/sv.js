@@ -22236,6 +22236,8 @@ const sv = {
     "greeting": "Hej {name},",
     "ask": "Frågor? Svara bara på det här mejlet. Jag läser allt.",
     "signoff": "— Ohad, skaparen av LexiClash",
+    "codeLabel": "Klasskod",
+    "linkLabel": "Elevlänk (inget konto behövs)",
     "share_code": {
       "subject": "Din klass är klar. Eleverna behöver bara koden",
       "lead": "Din klass är skapad, men inga elever har gått med än.",

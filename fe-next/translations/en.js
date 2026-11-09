@@ -21281,6 +21281,8 @@ const en = {
     "greeting": "Hi {name},",
     "ask": "Questions? Just reply to this email. I read everything.",
     "signoff": "— Ohad, the creator of LexiClash",
+    "codeLabel": "Class code",
+    "linkLabel": "Student link (no account needed)",
     "share_code": {
       "subject": "Your class is ready. Your students just need the code",
       "lead": "Your class is set up, but no students have joined yet.",
