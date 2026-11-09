@@ -29,9 +29,9 @@ type T = (key: string, params?: Record<string, string | number>) => string;
 
 const HOUR = 3_600_000;
 const CLASSES = [
-  { id: 'p5b', name: '5B - English', member_count: 28, join_code: 'K7Q2' },
-  { id: 'p4a', name: '4A - Reading', member_count: 26, join_code: 'ZT41' },
-  { id: 'p6c', name: '6C - Spelling', member_count: 24, join_code: 'M3XP' },
+  { id: 'p5b', name: '5B - English', member_count: 28, join_code: 'K7Q2WM' },
+  { id: 'p4a', name: '4A - Reading', member_count: 26, join_code: 'ZT4H9N' },
+  { id: 'p6c', name: '6C - Spelling', member_count: 24, join_code: 'M3XPRA' },
 ];
 const WEEK_ROWS = 4;
 const noopSubscribe = () => () => undefined;

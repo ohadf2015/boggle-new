@@ -65,7 +65,7 @@ export function TeacherHomeView({
         ref={revealRef}
         data-testid="teacher-home"
         className={cn(
-          'mx-auto grid w-full max-w-[1280px] gap-3 px-4 py-3 sm:gap-4 sm:px-6 sm:py-4 lg:gap-5 lg:px-8 lg:py-5 lg:[@media(max-height:820px)]:gap-4 lg:[@media(max-height:820px)]:py-3',
+          'mx-auto grid w-full max-w-[1280px] grid-cols-[minmax(0,1fr)] gap-3 px-4 py-3 sm:gap-4 sm:px-6 sm:py-4 lg:gap-5 lg:px-8 lg:py-5 lg:[@media(max-height:820px)]:gap-4 lg:[@media(max-height:820px)]:py-3',
           hasRail && 'lg:grid-cols-[minmax(0,1fr)_20rem]',
           showSessions && 'lg:min-h-full',
           showSessions && (accountBanner ? 'lg:grid-rows-[auto_1fr_auto]' : 'lg:grid-rows-[auto_1fr]'),

@@ -53,6 +53,13 @@ describe('<HomeHero> layout', () => {
     expect(startRow.contains(screen.getByTestId('rehearse'))).toBe(true);
   });
 
+  it('Given a 360px phone in a long language, Then the single column cannot grow past the card', () => {
+    // An implicit `auto` track sizes to the widest no-wrap child ("Сыграть ещё раз" + the game
+    // name), so on narrow phones the Start button and the code panel spilled past the pink card.
+    renderHero();
+    expect(screen.getByTestId('home-hero-grid').className.split(/\s+/)).toContain('grid-cols-[minmax(0,1fr)]');
+  });
+
   it('Then the desk has one even border, no thick colored edge on one side', () => {
     renderHero();
     expect(screen.getByTestId('home-hero').className).not.toMatch(/border-s-\[/);
