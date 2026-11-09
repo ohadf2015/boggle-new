@@ -116,6 +116,30 @@ describe('buildClassroomGameCompletedEvents', () => {
   });
 });
 
+describe('captureEduServerEvents — test traffic flag', () => {
+  it('Given an event from a test account, When captured, Then the person is flagged for the Internal / Test users cohort', () => {
+    mockCapture.mockClear();
+    captureEduServerEvents([
+      { distinctId: 'qa-1', event: 'edu_pro_checkout_started', properties: { is_test_account: true, $set: { plan: 'x' } } },
+    ]);
+    expect(mockCapture).toHaveBeenCalled();
+    for (const call of mockCapture.mock.calls) {
+      expect(call[0].properties.$set).toEqual({ plan: 'x', $internal_or_test_user: true });
+    }
+  });
+
+  it('Given an event from a real account, When captured, Then no person flag is set', () => {
+    mockCapture.mockClear();
+    captureEduServerEvents([
+      { distinctId: 'stu-1', event: 'edu_classroom_game_completed', properties: { is_test_account: false } },
+      { distinctId: 'stu-2', event: 'edu_classroom_game_completed', properties: {} },
+    ]);
+    for (const call of mockCapture.mock.calls) {
+      expect(call[0].properties.$set?.$internal_or_test_user).toBeUndefined();
+    }
+  });
+});
+
 describe('captureEduServerEvents — $host', () => {
   it('Given any education server event, When captured, Then $host is set so dashboard filters can see it', () => {
     captureEduServerEvents([
