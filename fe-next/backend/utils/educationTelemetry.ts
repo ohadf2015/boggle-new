@@ -208,6 +208,18 @@ const GROWTH_TWIN_EVENTS: ReadonlySet<string> = new Set([
  * every one (see the module header) and swallows transport failures — a dead
  * analytics endpoint must never take a classroom down with it.
  */
+/**
+ * The PostHog "Internal / Test users" cohort (the project's test-account
+ * filter) matches the PERSON property `$internal_or_test_user`. Events carried
+ * `is_test_account` but nothing set the person property, so the cohort held 0
+ * people and "filter out test users" filtered nothing. Flag the person here.
+ */
+function testPersonFlag(props: Record<string, unknown> | undefined): Record<string, unknown> {
+  if (props?.is_test_account !== true) return {};
+  const prior = props.$set && typeof props.$set === 'object' ? (props.$set as Record<string, unknown>) : {};
+  return { $set: { ...prior, $internal_or_test_user: true } };
+}
+
 export function captureEduServerEvents(events: EduServerEvent[]): void {
   if (!events?.length) return;
 
@@ -225,6 +237,7 @@ export function captureEduServerEvents(events: EduServerEvent[]): void {
           event: eventName,
           properties: {
             ...ev.properties,
+            ...testPersonFlag(ev.properties),
             // Last, so a caller's property bag can never clobber the one thing
             // that decides whether this event is visible at all.
             $host: EDU_ANALYTICS_HOST,
