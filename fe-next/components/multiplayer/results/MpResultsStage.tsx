@@ -56,6 +56,7 @@ const MultiplayerSignupSheet = dynamic(() => import('@/components/auth/Multiplay
 const SignupToast = dynamic(() => import('@/components/auth/SignupToast'), { ssr: false });
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
 const FloatingReaction = dynamic(() => import('@/components/game/QuickReactions').then((m) => m.FloatingReaction), { ssr: false });
+const TomorrowCard = dynamic(() => import('@/components/results/TomorrowCard'), { ssr: false });
 
 /** Max standings rows on one screen (8 seats; in a bigger room I stay visible). */
 const MAX_ROWS = 8;
@@ -314,6 +315,11 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
           t={t}
         />
         </div>
+        {c.showDailyInvite && seen('card') && (
+          <div data-testid="mp-tomorrow-card" className={cn('shrink-0', fx.cardIn)}>
+            <TomorrowCard source="mp" />
+          </div>
+        )}
         {classroomStudent && props.gameCode && (
           <div className={cn('shrink-0 empty:hidden', seen('card') ? fx.chestStagger : 'invisible')}>
             <ChestRewardCta gameCode={props.gameCode} roundId={rewardRoundId(props.gameSessionId, props.gameCode)} />

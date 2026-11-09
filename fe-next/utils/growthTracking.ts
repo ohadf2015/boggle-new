@@ -108,12 +108,16 @@ export type GrowthEvent =
   // Streak Ignition (t_89663cfc) — first-session win-moment redesign on the
   // solo results screen. streak_ignition_shown: StreakIgnitionCard impression,
   //   props { day: number, won: boolean, variant: 'won' | 'lost' }.
-  // tomorrow_card_shown: persistent TomorrowCard impression (first-session
-  //   players only), props { seconds_to_midnight: number }.
   // save_streak_clicked: player acted on the streak-insurance signup card,
   //   props { source: 'solo_results' }.
   | 'streak_ignition_shown'
+  // tomorrow_card_shown: post-game daily card on solo/MP results.
+  //   props { seconds_to_midnight, variant: 'finish-today'|'keep-streak',
+  //           streak, daily_done, source: 'solo'|'mp' }.
   | 'tomorrow_card_shown'
+  // postgame_daily_cta_clicked: CTA on TomorrowCard.
+  //   props { variant: 'finish-today'|'keep-streak', source: 'solo'|'mp' }.
+  | 'postgame_daily_cta_clicked'
   | 'save_streak_clicked'
   // NextStepPrompt — the only cross-mode CTA in the product, and until now it
   // emitted nothing, so a 151/14d `daily_puzzle_opened` count could not be told

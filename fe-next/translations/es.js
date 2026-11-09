@@ -5573,7 +5573,13 @@ const es = {
     },
     "tomorrowCard": {
       "title": "MAÑANA: nuevo Desafío Diario",
-      "countdown": "Nuevo puzzle en {time}"
+      "titleFinish": "Termina el diario de hoy",
+      "titleKeep": "Racha a salvo",
+      "countdown": "Nuevo puzzle en {time}",
+      "ctaFinish": "Jugar diario",
+      "ctaKeep": "Ver el diario de mañana",
+      "dismiss": "Cerrar",
+      "streakLabel": "Día {n}"
     },
     "saveStreak": {
       "title": "Guardar mi racha",

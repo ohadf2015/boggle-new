@@ -4,6 +4,8 @@
  * bar competes with it and pulls the player out of the session.
  *
  * So the D1 invite only appears once the rematch loop is actually over.
+ * Classroom results never show it (students stay in the lesson). Guests DO
+ * see it (finish-today / countdown only — no invented streak).
  */
 import { shouldShowDailyInvite } from '../shouldShowDailyInvite';
 
@@ -24,7 +26,21 @@ describe('shouldShowDailyInvite', () => {
     expect(shouldShowDailyInvite({ isGuest: false, gameCode: 'ABCD', isBotsOnlyGame: true, isSeriesComplete: false })).toBe(true);
   });
 
-  it('never shows for guests — their single CTA is the signup card', () => {
-    expect(shouldShowDailyInvite({ isGuest: true, gameCode: undefined, isBotsOnlyGame: true, isSeriesComplete: true })).toBe(false);
+  it('shows for guests on series-end — finish-today / countdown, not a false streak', () => {
+    expect(shouldShowDailyInvite({ isGuest: true, gameCode: 'ABCD', isBotsOnlyGame: false, isSeriesComplete: true })).toBe(true);
+  });
+
+  it('still hides guests mid-series so rematch stays the only ask', () => {
+    expect(shouldShowDailyInvite({ isGuest: true, gameCode: 'ABCD', isBotsOnlyGame: false, isSeriesComplete: false })).toBe(false);
+  });
+
+  it('never shows in classroom results', () => {
+    expect(shouldShowDailyInvite({
+      isGuest: false,
+      gameCode: 'ABCD',
+      isBotsOnlyGame: false,
+      isSeriesComplete: true,
+      isClassroom: true,
+    })).toBe(false);
   });
 });

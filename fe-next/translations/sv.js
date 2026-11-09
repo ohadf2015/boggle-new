@@ -6163,7 +6163,13 @@ const sv = {
     },
     "tomorrowCard": {
       "title": "IMORGON: ny daglig utmaning",
-      "countdown": "Nytt pussel om {time}"
+      "titleFinish": "Klara dagens dagliga",
+      "titleKeep": "Streak säker",
+      "countdown": "Nytt pussel om {time}",
+      "ctaFinish": "Spela daglig",
+      "ctaKeep": "Se morgondagens dagliga",
+      "dismiss": "Stäng",
+      "streakLabel": "Dag {n}"
     },
     "saveStreak": {
       "title": "Spara min svit",

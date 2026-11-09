@@ -5847,7 +5847,13 @@ const he = {
     },
     "tomorrowCard": {
       "title": "מחר: אתגר יומי חדש",
-      "countdown": "פאזל חדש בעוד {time}"
+      "titleFinish": "סיימו את האתגר היומי",
+      "titleKeep": "הרצף בטוח",
+      "countdown": "פאזל חדש בעוד {time}",
+      "ctaFinish": "לשחק אתגר יומי",
+      "ctaKeep": "לראות את אתגר מחר",
+      "dismiss": "סגירה",
+      "streakLabel": "יום {n}"
     },
     "saveStreak": {
       "title": "לשמור את הרצף",

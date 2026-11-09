@@ -422,7 +422,11 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         isLoaded={isStreakLoaded}
       />
       <div className="flex flex-col gap-4">
-        <TomorrowCard />
+        <TomorrowCard
+          source="solo"
+          streak={currentStreak}
+          isStreakLoaded={isStreakLoaded}
+        />
       </div>
     </div>
   );

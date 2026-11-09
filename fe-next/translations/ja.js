@@ -5805,7 +5805,13 @@ const ja = {
     },
     "tomorrowCard": {
       "title": "明日：新しいデイリーチャレンジ",
-      "countdown": "新しいパズルまで {time}"
+      "titleFinish": "今日のデイリーをクリア",
+      "titleKeep": "ストリーク安全",
+      "countdown": "新しいパズルまで {time}",
+      "ctaFinish": "デイリーをプレイ",
+      "ctaKeep": "明日のデイリーを見る",
+      "dismiss": "閉じる",
+      "streakLabel": "{n}日目"
     },
     "saveStreak": {
       "title": "ストリークを保存",

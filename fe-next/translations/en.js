@@ -5346,7 +5346,13 @@ const en = {
     },
     "tomorrowCard": {
       "title": "TOMORROW: new Daily Challenge",
-      "countdown": "New puzzle in {time}"
+      "titleFinish": "Finish today's daily",
+      "titleKeep": "Streak safe",
+      "countdown": "New puzzle in {time}",
+      "ctaFinish": "Play daily",
+      "ctaKeep": "See tomorrow's daily",
+      "dismiss": "Dismiss",
+      "streakLabel": "Day {n}"
     },
     "saveStreak": {
       "title": "Save my streak",
