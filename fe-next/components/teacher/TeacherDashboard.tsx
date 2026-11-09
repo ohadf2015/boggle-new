@@ -63,6 +63,8 @@ export interface TeacherDashboardProps {
   pinBanner?: boolean;
   /** The usage-triggered Pro card (10+ students / 3+ assignments). Same slot. */
   usagePrompt?: ReactNode;
+  /** Billing trouble on a paid plan (declined renewal). Sits right under the greeting, above the desk, with or without classes. */
+  alert?: ReactNode;
 }
 
 type T = (key: string, params?: Record<string, string | number>) => string;
@@ -75,7 +77,7 @@ function greetingKey(hour: number): string {
   return 'eduShell.home.greetEvening';
 }
 
-export default function TeacherDashboard({ banner, proOffer, usagePrompt }: TeacherDashboardProps = {}) {
+export default function TeacherDashboard({ banner, proOffer, usagePrompt, alert }: TeacherDashboardProps = {}) {
   const { t: rawT, language } = useLanguage();
   const t = rawT as T;
   const { profile } = useAuth();
@@ -268,6 +270,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
 
   return (
     <TeacherHomeView
+      alert={alert ?? null}
       t={t}
       isRTL={isRTL}
       revealRef={revealRef}

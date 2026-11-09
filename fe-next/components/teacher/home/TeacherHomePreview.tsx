@@ -125,7 +125,8 @@ export function TeacherHomePreview({ state, banner }: { state: TeacherHomePrevie
           t={t}
         />
       ) : null}
-      accountBanner={previewBanner(banner)}
+      accountBanner={banner === 'pastDue' ? null : previewBanner(banner)}
+      alert={banner === 'pastDue' ? previewBanner(banner) : null}
       hasRail={!ready || hasClasses}
       week={hasClasses ? {
         summary,

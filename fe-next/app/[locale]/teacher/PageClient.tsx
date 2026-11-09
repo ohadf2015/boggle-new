@@ -8,6 +8,7 @@ import { TeacherProTrialExpiringBanner } from '@/components/teacher/TeacherProTr
 import { TeacherProTrialLifecycleBanner } from '@/components/teacher/TeacherProTrialLifecycleBanner';
 import { TeacherTrialReminderBanner } from '@/components/education/TeacherTrialReminderBanner';
 import { PendingCheckoutBanner } from '@/components/teacher/PendingCheckoutBanner';
+import { PaymentFailedBanner } from '@/components/teacher/PaymentFailedBanner';
 import { TeacherProUsagePromptCard } from '@/components/teacher/TeacherProUsagePromptCard';
 import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
@@ -37,7 +38,7 @@ function TeacherDashboardInner() {
   const { language } = useLanguage();
   const { user, isAdmin } = useAuth();
   const { trial } = useTeacherAccess();
-  const { hasPro, loading: proLoading, status, source, trialUsed, trialExpires, periodEnd, pendingCheckout } = useTeacherPro();
+  const { hasPro, loading: proLoading, status, source, trialUsed, trialExpires, periodEnd, pendingCheckout, portalUrl } = useTeacherPro();
   const polarTrial = polarTrialUx({
     hasPro,
     status: status ?? 'active',
@@ -98,6 +99,7 @@ function TeacherDashboardInner() {
     polarOfferTrial: polarTrial.offerTrial,
     offerTrialDismissed: trialOfferDismissed,
     pendingCheckout: pendingCheckout === true,
+    paymentFailed: status === 'past_due' && source === 'polar',
   });
   const banner =
     picked === 'trial' && !hasRecentConfig && !trial?.isExpired ? null : picked;
@@ -108,6 +110,7 @@ function TeacherDashboardInner() {
   const trialNudgeAsk = banner === 'trial' && trialNudgeOpen && !trial?.isExpired;
   const homeAsk = pickHomeAsk({
     account:
+      banner === 'paymentFailed' ||
       banner === 'pendingCheckout' ||
       banner === 'reactivate' ||
       banner === 'trialing' ||
@@ -134,11 +137,13 @@ function TeacherDashboardInner() {
   }, [proLoading, hasPro, status, language, user?.id]);
 
   useEffect(() => {
-    if (banner === 'reactivate' || banner === 'trialing' || banner === 'pendingCheckout') {
+    if (banner === 'reactivate' || banner === 'trialing' || banner === 'pendingCheckout' || banner === 'paymentFailed') {
       trackGrowthEvent('iap_viewed', {
         product: 'teacher_pro',
         source:
-          banner === 'pendingCheckout'
+          banner === 'paymentFailed'
+            ? 'dashboard_payment_failed'
+            : banner === 'pendingCheckout'
             ? 'dashboard_pending_checkout'
             : banner === 'reactivate'
               ? 'dashboard_trial_ended'
@@ -182,6 +187,7 @@ function TeacherDashboardInner() {
         banner === 'trialReminder'
       }
       proOffer={proOffer}
+      alert={banner === 'paymentFailed' ? <PaymentFailedBanner portalUrl={portalUrl} stillPro={hasPro} /> : undefined}
       banner={
         banner === 'pendingCheckout' ? (
           <PendingCheckoutBanner />
