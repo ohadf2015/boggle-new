@@ -96,6 +96,9 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
             {grade ? t(`eduShell.setup.grade.${grade}`) : t('eduShell.setup.anyGrade')}
           </li>
         </ul>
+        <p data-testid="setup-starter-list-hint" className="font-neo-body text-sm font-semibold text-neo-cream/80">
+          {t('eduShell.setup.starterListHint', { name: t(props.pack.nameKey) })}
+        </p>
 
         <button
           type="button"

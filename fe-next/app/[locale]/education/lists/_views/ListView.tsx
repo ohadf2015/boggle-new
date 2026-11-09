@@ -167,7 +167,7 @@ export function ListView({ list, locale }: { list: WordList; locale: string }) {
         <ol className="mt-6 grid gap-4 sm:grid-cols-3">
           {[1, 2, 3].map((n) => (
             <li key={n} className="rounded-neo border-3 border-neo-black bg-neo-cream p-5 text-neo-navy shadow-hard-lg">
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-md border-2 border-neo-black bg-neo-lime font-neo-display font-black shadow-hard-sm">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-lime font-neo-display font-black shadow-hard-sm">
                 {n}
               </span>
               <h3 className="mt-3 font-neo-display text-lg font-black">{tr(locale, `detail.how${n}Title`)}</h3>

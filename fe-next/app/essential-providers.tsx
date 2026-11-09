@@ -33,6 +33,7 @@ import { runWhenScrollSettles } from '@/lib/perf/runWhenScrollSettles';
 import { onFirstEngagement } from '@/lib/perf/onFirstEngagement';
 import { isHeavyGamePath } from '@/lib/perf/heavyGamePath';
 import { usePathname } from 'next/navigation';
+import { surfaceOf } from '@/lib/navigation/eduSections';
 // Season claim/announcement are home-only, interaction-gated popups (never SSR/SEO
 // content) — lazy-load so their ~35KB stays out of the synchronous initial parse on
 // every route. ssr:false: they render nothing visible when there's nothing to claim,
@@ -63,9 +64,9 @@ import { HomeOnlySeasonGate } from '@/components/seasons/HomeOnlySeasonGate';
 // webpack's module registry (see docs/2026-07-25-low-end-device-performance-audit.md).
 // Grouping changes nothing about WHAT loads — only how many round trips it takes.
 //
-// Do NOT add a conditionally-rendered component to this group: sharing the name
-// would force its bytes onto every route. Season* below stay separate for exactly
-// that reason (they are gated behind HomeOnlySeasonGate).
+// Do NOT add a route-gated component to this group: sharing the name would force
+// its bytes onto every route. Season* below stay separate for exactly that reason.
+// The game-only gate on some members (off classroom pages) changes what renders, not what loads.
 const AnchoredNativeBanner = dynamic(() => import(/* webpackChunkName: "app-root-mounts" */ '@/components/ads/AnchoredNativeBanner'), { ssr: false });
 const BannerCoordinatorMount = dynamic(() => import(/* webpackChunkName: "app-root-mounts" */ '@/components/ads/BannerCoordinatorMount'), { ssr: false });
 const SignupPromptHost = dynamic(() => import(/* webpackChunkName: "app-root-mounts" */ '@/components/auth/SignupPromptHost').then(m => m.SignupPromptHost), { ssr: false });
@@ -163,6 +164,8 @@ const initLogRocket = () => {
     if (logRocketInitialized) return;
     if (typeof window === 'undefined' || window.location.hostname === 'localhost') return;
     if (!hasConsent('analytics')) return;
+    // Checked at fire time: the timer, scroll and consent triggers can land after a move into a class.
+    if (surfaceOf(window.location.pathname) === 'edu') return;
 
     logRocketInitialized = true;
     import('logrocket').then(({ default: LogRocket }) => {
@@ -186,6 +189,8 @@ const initLogRocket = () => {
  */
 export function EssentialProviders({ children, lang, initialTranslations }: EssentialProvidersProps) {
     const pathname = usePathname();
+    // Classroom pages get none of the arcade's prompts, coins or easter eggs.
+    const gameSurface = surfaceOf(pathname) === 'game';
     // Initialize session tracking for analytics
     useEffect(() => {
         initSessionTracking();
@@ -201,6 +206,7 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
     // runs until TTI, often 10s+), and the SDK eval was a long task on
     // /singleplayer. No timeout fallback there.
     useEffect(() => {
+        if (!gameSurface) return;
         if (isHeavyGamePath(pathname)) {
             // Engagement opens the gate; consent (which may arrive later) is
             // still required inside initLogRocket. Neither a timer nor scroll
@@ -247,7 +253,7 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
             });
             window.removeEventListener('cookie-consent-change', handleConsent);
         };
-    }, [pathname]);
+    }, [pathname, gameSurface]);
 
     // Memoize children so that when active providers (Music, SoundEffects, Haptics)
     // change state, the children tree reference stays stable and React.memo'd
@@ -299,12 +305,12 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                                                 {/* Cosy / Calm Mode: dignified quiet acknowledgement that replaces confetti when celebrations are suppressed */}
                                                 <QuietCelebrationLayer />
                                                 {/* Global coin-earn VFX: sound + flying coins on every addCoins */}
-                                                <GlobalCoinEarnFx />
+                                                {gameSurface && <GlobalCoinEarnFx />}
                                                 {/* Hidden Konami-code easter egg → fireworks + toast (cosmetic only) */}
                                                 <EasterEggListener />
                                                 {/* Hidden in-app achievements (easter eggs) → localized reveal card + confetti.
                                                     Gameplay only emits on the bus; this listener owns all UI. */}
-                                                <HiddenAchievementListener />
+                                                {gameSurface && <HiddenAchievementListener />}
                                                 {/* Season modals are gated to home route + first interaction + suspense delay
                                                     so they never interrupt gameplay or pop instantly on landing. */}
                                                 <HomeOnlySeasonGate>
@@ -312,7 +318,7 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                                                     <SeasonAnnouncementModal />
                                                 </HomeOnlySeasonGate>
                                                 {/* Global guest signup prompt — fires on first win or 5+ games regardless of mode. MP routes delegate to useMultiplayerSignupNudge. */}
-                                                <SignupPromptHost />
+                                                {gameSurface && <SignupPromptHost />}
                                                 {/* One-time "pick your music/theme style" popup for existing users.
                                                     Gated (shouldShowStylePopup): never double-prompts, defers to
                                                     profile-customization, skips fresh-onboarding visitors. */}
@@ -320,10 +326,10 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                                                 {/* Once-per-install age prompt at the interstitial natural break
                                                     (undeclared tier blocks the format). Declared 13+ → adult tier
                                                     → personalized ads + interstitials from the next slot. */}
-                                                <AgeGatePromptWrapper />
+                                                {gameSurface && <AgeGatePromptWrapper />}
                                                 {/* Cosmetic unlock toast — global so rank-up/streak unlocks surface a
                                                     tap-to-equip deep-link wherever the player is, not just on profile. */}
-                                                <UnlockNotifierMount />
+                                                {gameSurface && <UnlockNotifierMount />}
                                                 {/* Native AdMob banner — single global mount, route-aware.
                                                     BannerCoordinatorMount hosts the single banner coordinator
                                                     (ops + load/fail/foreground signals) the two banner owners

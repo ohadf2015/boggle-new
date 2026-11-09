@@ -45,7 +45,7 @@ function LevelControl({ value, onChange, disabled, label, t }: LevelControlProps
     <div
       role="group"
       aria-label={label}
-      className="flex w-full border-2 border-black rounded-neo overflow-hidden bg-white shadow-hard-sm"
+      className="flex w-full border-2 border-neo-black rounded-neo overflow-hidden bg-neo-white shadow-hard-sm"
     >
       {LEVEL_ORDER.map((level, i) => {
         const selected = level === value;
@@ -59,8 +59,8 @@ function LevelControl({ value, onChange, disabled, label, t }: LevelControlProps
             className={cn(
               'flex-1 min-w-0 min-h-[44px] px-2 truncate text-xs font-neo-display font-black uppercase tracking-wide text-black',
               'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-inset',
-              i > 0 && 'border-s-2 border-black',
-              selected ? LEVEL_SELECTED_BG[level] : 'bg-white hover:bg-neo-cream',
+              i > 0 && 'border-s-2 border-neo-black',
+              selected ? LEVEL_SELECTED_BG[level] : 'bg-neo-white hover:bg-neo-cream',
               disabled && 'opacity-60 cursor-wait'
             )}
           >
@@ -163,12 +163,12 @@ export default function ClassroomStudentList({ classroomId, joinCode }: Classroo
 
   if (error) {
     return (
-      <div className="bg-neo-pink border-3 border-black rounded-neo p-4 text-center shadow-hard-sm">
+      <div className="bg-neo-pink border-3 border-neo-black rounded-neo p-4 text-center shadow-hard-sm">
         <p className="text-black font-neo-body font-bold">{t('teacher.classrooms.students.error')}</p>
         <button
           type="button"
           onClick={() => setAttempt((n) => n + 1)}
-          className="mt-3 min-h-11 rounded-neo border-2 border-black bg-neo-cream px-4 font-neo-body text-sm font-bold text-neo-black shadow-hard-sm active:translate-y-px focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-black"
+          className="mt-3 min-h-11 rounded-neo border-2 border-neo-black bg-neo-cream px-4 font-neo-body text-sm font-bold text-neo-black shadow-hard-sm active:translate-y-px focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-black"
         >
           {t('common.retry')}
         </button>
@@ -217,7 +217,7 @@ export default function ClassroomStudentList({ classroomId, joinCode }: Classroo
           <div
             key={student.id}
             data-student-row
-            className="flex flex-wrap items-center gap-x-3 gap-y-2 p-3 border-2 border-black rounded-neo bg-neo-cream shadow-hard-sm hover:-translate-y-0.5 hover:shadow-hard transition"
+            className="flex flex-wrap items-center gap-x-3 gap-y-2 p-3 border-2 border-neo-black rounded-neo bg-neo-cream shadow-hard-sm hover:-translate-y-0.5 hover:shadow-hard transition"
           >
             {/* Avatar */}
             <div className="shrink-0">

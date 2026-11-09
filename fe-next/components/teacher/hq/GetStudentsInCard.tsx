@@ -27,6 +27,7 @@ import { useRisingCount } from "./useRisingCount";
 import { STUDENT_GOAL } from "./studentGoal";
 import { NB_BLOCK, NB_SMALL } from "../nb/nbStyles";
 import { JoinCodeTile } from "./JoinCodeTile";
+import { NeoButton } from '@/components/ui/button';
 
 export interface HqClassroom {
   id: string;
@@ -188,14 +189,14 @@ export function GetStudentsInCard({
           ))}
         </p>
         <div data-testid="hq-join-actions" className="flex gap-2 @xl:w-auto @xl:flex-col">
-          <button type="button" data-testid="hq-copy-link" onClick={copyLink} aria-label={copyLabel} title={copyLabel} className={cn(NB_SMALL, NB_BLOCK.navy, "min-w-0 flex-1 px-2")}>
+          <NeoButton variant="small" tone="navy" data-testid="hq-copy-link" onClick={copyLink} aria-label={copyLabel} title={copyLabel} className="min-w-0 flex-1 px-2">
             {copied ? <Check className="size-4 shrink-0" strokeWidth={3} aria-hidden="true" /> : <Link2 className="size-4 shrink-0" strokeWidth={3} aria-hidden="true" />}
             <span className="truncate">{copyLabel}</span>
-          </button>
-          <button type="button" data-testid="hq-open-projector" onClick={openProjector} aria-label={projectorLabel} title={projectorLabel} className={cn(NB_SMALL, NB_BLOCK.cream, "min-w-0 flex-1 px-2")}>
+          </NeoButton>
+          <NeoButton variant="small" tone="cream" data-testid="hq-open-projector" onClick={openProjector} aria-label={projectorLabel} title={projectorLabel} className="min-w-0 flex-1 px-2">
             <MonitorUp className="size-4 shrink-0" strokeWidth={3} aria-hidden="true" />
             <span className="truncate">{projectorShort}</span>
-          </button>
+          </NeoButton>
         </div>
       </div>
 

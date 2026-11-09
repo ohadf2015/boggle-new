@@ -14,3 +14,10 @@ export function eduSectionOf(pathname: string | null | undefined): EduSection | 
   const head = segs[0] && LOCALE_RE.test(segs[0]) ? segs[1] : segs[0];
   return head && SECTION_SET.has(head) ? (head as EduSection) : null;
 }
+
+export type ProductSurface = 'edu' | 'game';
+
+/** Which product a page belongs to; analytics, pixels and session replay all split on this. */
+export function surfaceOf(pathname: string | null | undefined): ProductSurface {
+  return eduSectionOf(pathname) ? 'edu' : 'game';
+}

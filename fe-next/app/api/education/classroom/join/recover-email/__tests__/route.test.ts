@@ -1,7 +1,8 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
 
-const { rateLimit, findUser, updateUserById, resend } = vi.hoisted(() => ({
+const { rateLimit, findUser, updateUserById, resend, authedUser } = vi.hoisted(() => ({
+  authedUser: vi.fn(),
   rateLimit: vi.fn(() => ({ success: true })),
   findUser: vi.fn(),
   updateUserById: vi.fn(),
@@ -15,6 +16,7 @@ vi.mock('@/utils/supabase/admin', () => ({
     auth: { admin: { updateUserById }, resend },
   }),
 }));
+vi.mock('@/lib/auth/getAuthedUser', () => ({ getAuthedUser: authedUser }));
 vi.mock('@/utils/logger', () => ({ default: { error: vi.fn(), warn: vi.fn() } }));
 
 import { POST } from '../route';
@@ -31,6 +33,24 @@ describe('POST /api/education/classroom/join/recover-email', () => {
     findUser.mockReset();
     updateUserById.mockReset();
     resend.mockClear();
+    authedUser.mockReset().mockResolvedValue({ id: 'u1' });
+  });
+
+  it('Given no session at all, When someone posts an address, Then nothing is looked up or rewritten', async () => {
+    authedUser.mockResolvedValue(null);
+    const res = await POST(req({ email: 'a@student.mpac.nsw.edu.au', nextEmail: 'a@students.mpac.nsw.edu.au' }));
+    expect(res.status).toBe(401);
+    expect(findUser).not.toHaveBeenCalled();
+    expect(updateUserById).not.toHaveBeenCalled();
+  });
+
+  it('Given a session for a different account, When it names someone else\'s unconfirmed address, Then it is a silent noop', async () => {
+    authedUser.mockResolvedValue({ id: 'attacker' });
+    findUser.mockResolvedValue({ user: { id: 'u1', emailConfirmedAt: null } });
+    const res = await POST(req({ email: 'a@student.mpac.nsw.edu.au', nextEmail: 'a@students.mpac.nsw.edu.au' }));
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ ok: true });
+    expect(updateUserById).not.toHaveBeenCalled();
   });
 
   it('refuses a non-typo before looking anyone up', async () => {

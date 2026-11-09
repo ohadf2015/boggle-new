@@ -52,7 +52,7 @@ function Breadcrumbs({ locale, crumbs }: { locale: string; crumbs: Crumb[] }) {
                 </span>
               ) : (
                 <>
-                  <Link href={`/${locale}${c.path}`} className="underline-offset-4 hover:text-neo-white hover:underline focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan">
+                  <Link href={`/${locale}${c.path}`} className="relative before:absolute before:-inset-x-1 before:-inset-y-3 before:content-[''] underline-offset-4 hover:text-neo-white hover:underline focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan">
                     {c.name}
                   </Link>
                   <span aria-hidden className="text-neo-white/30">
@@ -98,7 +98,7 @@ function WordTiles({ word, lang }: { word: string; lang: ListLang }) {
       {letters.map((ch, i) => (
         <span
           key={`${ch}-${i}`}
-          className={`inline-flex h-8 w-8 items-center justify-center rounded-md border-2 border-neo-black bg-neo-white font-neo-display text-base font-black uppercase text-neo-navy shadow-hard-sm ${
+          className={`inline-flex h-8 w-8 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-white font-neo-display text-base font-black uppercase text-neo-navy shadow-hard-sm ${
             i % 2 ? 'rotate-2' : '-rotate-2'
           }`}
         >

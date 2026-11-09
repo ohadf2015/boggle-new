@@ -6,27 +6,9 @@ import { HomeOnboardingCard } from '../HomeOnboardingCard';
 
 const t = (k: string, p?: Record<string, unknown>) => (p ? `${k}:${JSON.stringify(p)}` : k);
 const HREFS = { createClass: '/en/teacher/classroom/new', shareCode: '/en/teacher/classroom/new?classroomId=c1', tryDemo: '/en/education/classroom-game?classroomId=c1&minutes=2' };
-const TRIAL_HREFS = {
-  create_classroom: '/en/teacher/classroom/new',
-  invite_students: '/en/teacher/classroom/new?classroomId=c1',
-  first_assignment: '/en/teacher?classroomId=c1&assign=1',
-};
 const fresh = homeOnboarding({ classroomCount: 0, inviteCopied: false, liveStarted: false, dismissed: false });
 const shared = homeOnboarding({ classroomCount: 1, inviteCopied: true, liveStarted: false, dismissed: false });
 const allDone = homeOnboarding({ classroomCount: 1, inviteCopied: true, liveStarted: true, dismissed: false });
-
-type Checklist = NonNullable<Parameters<typeof HomeOnboardingCard>[0]['trial']>['checklist'];
-function trialAt(currentIndex: 0 | 1 | 2): Checklist {
-  const ids = ['create_classroom', 'invite_students', 'first_assignment'] as const;
-  return {
-    steps: ids.map((id, i) => ({ id, index: (i + 1) as 1 | 2 | 3, status: i < currentIndex ? 'done' : i === currentIndex ? 'current' : 'todo', done: i < currentIndex })),
-    current: ids[currentIndex],
-    doneCount: currentIndex,
-    allStepsDone: false,
-    complete: false,
-    visible: true,
-  };
-}
 
 afterEach(() => cleanup());
 
@@ -40,30 +22,12 @@ describe('<HomeOnboardingCard>', () => {
     expect(screen.queryByTestId('home-onboarding-dismiss')).toBeNull();
   });
 
-  it('Given a trialing teacher, Then the trial step replaces the first-run step in the same single card', () => {
-    render(
-      <HomeOnboardingCard onboarding={shared} hrefs={HREFS} trial={{ checklist: trialAt(1), hrefs: TRIAL_HREFS, onDismiss: vi.fn() }} variant="compact" t={t} />,
-    );
-    expect(screen.getAllByTestId('home-onboarding')).toHaveLength(1);
-    expect(screen.getByTestId('home-onboarding')).toHaveAttribute('data-source', 'trial');
-    expect(screen.getByTestId('home-onboarding-cta')).toHaveAttribute('href', TRIAL_HREFS.invite_students);
-  });
-
-  it('Given the trial assignment step, When its action is pressed, Then the assignment creator opens in place', () => {
-    const onOpenAssignment = vi.fn();
-    render(
-      <HomeOnboardingCard
-        onboarding={allDone}
-        hrefs={HREFS}
-        trial={{ checklist: trialAt(2), hrefs: TRIAL_HREFS, onOpenAssignment }}
-        variant="compact"
-        t={t}
-      />,
-    );
-    const cta = screen.getByTestId('home-onboarding-cta');
-    expect(cta).toHaveTextContent('eduShell.trialChecklist.steps.first_assignment.cta');
-    fireEvent.click(cta);
-    expect(onOpenAssignment).toHaveBeenCalledTimes(1);
+  it('Given a class with the code shared, Then the one list is create class, share code, play first game', () => {
+    render(<HomeOnboardingCard onboarding={shared} hrefs={HREFS} variant="full" t={t} />);
+    const ids = screen.getAllByTestId(/^home-onboarding-step-/).map((el) => el.getAttribute('data-testid'));
+    expect(ids).toEqual(['home-onboarding-step-createClass', 'home-onboarding-step-shareCode', 'home-onboarding-step-tryDemo']);
+    expect(screen.getByTestId('home-onboarding')).toHaveAttribute('data-source', 'onboarding');
+    expect(screen.getByTestId('home-onboarding-cta')).toHaveAttribute('href', HREFS.tryDemo);
   });
 
   it('Given every step is done, Then the card is gone', () => {

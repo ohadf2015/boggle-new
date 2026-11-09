@@ -11,6 +11,7 @@ import { NB_DIALOG_CLOSE, NB_DIALOG_TITLE } from '@/components/teacher/nb/nbDial
 import { NB_BLOCK, NB_DARK_EDGE, NB_SMALL } from '@/components/teacher/nb/nbStyles';
 import { lastPlayedLabel } from './HomeClassList';
 import type { RosterRow, RosterStatus } from './rosterModel';
+import { NeoButton } from '@/components/ui/button';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -111,14 +112,10 @@ function DetailBody({ row, onClose, onAssign, language, nowMs, t, titleAs }: Det
       </div>
 
       {onAssign && row.status !== 'done' ? (
-        <button
-          type="button"
-          onClick={() => onAssign(row)}
-          className={cn(NB_SMALL, NB_BLOCK.cyan, 'min-h-12 w-full text-base')}
-        >
+        <NeoButton variant="small" tone="cyan" onClick={() => onAssign(row)} className="min-h-12 w-full text-base">
           <ClipboardList className="size-5" aria-hidden="true" />
           {t('eduShell.home.focus.assign')}
-        </button>
+        </NeoButton>
       ) : null}
     </div>
   );

@@ -37,6 +37,7 @@ export interface PlayerScoreResult {
   avatar: Avatar | null;
   isBot: boolean;
   isHost: boolean;
+  isPractice?: true;
   achievements: string[];
 }
 
@@ -235,6 +236,7 @@ export function calculateGameScores(
       avatar: userData?.avatar || null,
       isBot: userData?.isBot || false,
       isHost: username === game.hostUsername,
+      ...(userData?.isPractice ? { isPractice: true as const } : {}),
       achievements: game.playerAchievements?.[username] || []
     });
   }

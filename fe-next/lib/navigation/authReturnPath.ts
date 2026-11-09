@@ -4,15 +4,14 @@
  * homepage (education dashboards are manual entry only).
  */
 import { locales } from '@/i18n/config';
+import { eduSectionOf } from './eduSections';
 
-const EDU_SECTIONS = new Set(['teacher', 'student', 'join', 'education']);
 const LOCALE_PREFIX = new RegExp(`^/(${locales.join('|')})(?=[/?#]|$)`);
 
+// Pricing is the shared Pro page; a sign-in there keeps the arcade's homepage default.
 export function isEduAuthOrigin(path: string | null | undefined): boolean {
-  if (!path) return false;
-  const segments = path.split(/[?#]/)[0].split('/').filter(Boolean);
-  const rest = segments.length > 0 && (locales as readonly string[]).includes(segments[0]) ? segments.slice(1) : segments;
-  return !!rest[0] && EDU_SECTIONS.has(rest[0]);
+  const section = eduSectionOf(path);
+  return section !== null && section !== 'pricing';
 }
 
 /** Native in-app sign-in carries a return path only from edu; Supabase falls back to the Site URL otherwise anyway. */

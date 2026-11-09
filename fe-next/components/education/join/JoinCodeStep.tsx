@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { ChevronDown, HelpCircle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { JoinCodeField } from './JoinCodeField';
@@ -23,6 +23,7 @@ export function JoinCodeStep({ flow, pasteNoteKey, onPaste }: JoinCodeStepProps)
   const formRef = useRef<HTMLFormElement>(null);
   const nextRef = useRef<HTMLButtonElement>(null);
   useKeepInView(formRef, nextRef);
+  const [stripped, setStripped] = useState(false);
   const refused = !!flow.codeErrorKey || flow.codeRejected;
   const wrongCode = flow.codeErrorKey ? flow.codeErrorKey === `${K}.invalidCode` : flow.codeRejected;
 
@@ -52,6 +53,7 @@ export function JoinCodeStep({ flow, pasteNoteKey, onPaste }: JoinCodeStepProps)
           onComplete={(next) => flow.advance(next)}
           onPaste={onPaste}
           onOverflow={flow.refuseTooLong}
+          onStripped={setStripped}
           label={t(`${K}.codeLabel`)}
           describedBy="join-code-note"
           invalid={refused}
@@ -68,12 +70,14 @@ export function JoinCodeStep({ flow, pasteNoteKey, onPaste }: JoinCodeStepProps)
             <p
               role="status"
               className={
-                pasteNoteKey
+                stripped
+                  ? 'font-neo-body text-sm font-bold text-neo-yellow lg:text-base'
+                  : pasteNoteKey
                   ? 'font-neo-body text-sm font-bold text-neo-lime lg:text-base'
                   : 'font-neo-body text-sm text-neo-white/75 lg:text-base'
               }
             >
-              {t(pasteNoteKey ?? `${K}.codeHint`)}
+              {t(stripped ? `${K}.codeStripped` : (pasteNoteKey ?? `${K}.codeHint`))}
             </p>
           )}
         </div>

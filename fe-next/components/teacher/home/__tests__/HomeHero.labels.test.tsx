@@ -10,11 +10,9 @@ const t = (k: string, p?: Record<string, string | number>) => (p ? `${k}:${JSON.
 const CLASS = { id: 'c1', name: 'Period 3', join_code: 'AB12CD', member_count: 4 };
 
 describe('<HomeHero> labels', () => {
-  it('Given the projector button goes icon-only on phones, Then it still names what it does on hover', () => {
+  it('Given the share button, Then it names what it does in words, not only an icon', () => {
     render(<HomeHero classrooms={[CLASS]} selectedId="c1" onSelect={vi.fn()} language="en" t={t} />);
-    const button = screen.getByTestId('home-class-code');
-    expect(button).toHaveAttribute('title', 'academy.hq.openProjector');
-    expect(button).toHaveTextContent('academy.hq.openProjector');
+    expect(screen.getByTestId('home-share-code')).toHaveTextContent('eduShell.home.shareCode');
   });
 
   it('Given the main button only opens the game picker, Then it says so', () => {

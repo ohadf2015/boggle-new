@@ -82,9 +82,9 @@ export function InviteStudentsCta({
   return (
     <div
       data-testid="invite-students-empty-roster"
-      className="border-3 border-black rounded-neo p-6 text-center bg-neo-cream shadow-hard-sm"
+      className="border-3 border-neo-black rounded-neo p-6 text-center bg-neo-cream shadow-hard-sm"
     >
-      <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-neo border-2 border-black bg-neo-cyan shadow-hard-sm">
+      <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-cyan shadow-hard-sm">
         <Users className="h-8 w-8 text-black" aria-hidden="true" />
       </div>
       <p className="mb-1 font-neo-body font-bold text-black">
@@ -93,7 +93,7 @@ export function InviteStudentsCta({
       <p className="mb-4 text-sm font-bold text-black/60">
         {t('teacher.classrooms.students.emptyHint', { code: joinCode })}
       </p>
-      <div className="mx-auto mb-4 flex max-w-xs flex-col items-center rounded-neo border-3 border-black bg-white px-3 py-2 shadow-hard-sm">
+      <div className="mx-auto mb-4 flex max-w-xs flex-col items-center rounded-neo border-3 border-neo-black bg-neo-white px-3 py-2 shadow-hard-sm">
         <span className="font-neo-display text-[0.65rem] font-black uppercase tracking-widest text-black/60">
           {t('teacher.classroom.joinCode')}
         </span>
@@ -114,7 +114,7 @@ export function InviteStudentsCta({
         type="button"
         data-testid={TEACHER_INVITE_STUDENTS_CTA_TESTID}
         onClick={() => void onInvite()}
-        className="inline-flex min-h-11 w-full max-w-xs items-center justify-center gap-2 rounded-neo border-3 border-black bg-neo-lime px-4 font-neo-display text-sm font-black uppercase tracking-wide text-black shadow-hard-sm hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
+        className="inline-flex min-h-11 w-full max-w-xs items-center justify-center gap-2 rounded-neo border-3 border-neo-black bg-neo-lime px-4 font-neo-display text-sm font-black uppercase tracking-wide text-black shadow-hard-sm hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
       >
         {t('teacher.classroom.inviteStudents', 'Invite students')}
       </button>
@@ -132,7 +132,7 @@ export function InviteStudentsCta({
           type="button"
           data-testid="invite-students-share"
           onClick={() => void shareLink()}
-          className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-neo border-2 border-black bg-white px-2 font-neo-display text-xs font-black uppercase tracking-wide text-black shadow-hard-sm hover:-translate-y-0.5 focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
+          className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-neo border-2 border-neo-black bg-neo-white px-2 font-neo-display text-xs font-black uppercase tracking-wide text-black shadow-hard-sm hover:-translate-y-0.5 focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
         >
           <Share2 className="size-4 shrink-0" strokeWidth={3} aria-hidden="true" />
           {t('teacher.classroom.share', 'Share')}

@@ -183,30 +183,32 @@ function MiniCell({ value, copy }: { value: PlanCell; copy: TableCopy }) {
 function PlanMiniTable({ locale }: { locale: string }) {
   const { copy, rows } = teacherProCompareTable(locale);
   return (
-    <table data-testid="teacher-pro-compare-table" className="mb-5 w-full max-w-lg table-fixed border-collapse text-sm text-neo-white">
-      <colgroup>
-        <col />
-        <col className="w-20" />
-        <col className="w-24" />
-      </colgroup>
-      <thead>
-        <tr className="border-b-2 border-neo-cream/40">
-          <th scope="col" className="pb-2" />
-          <th scope="col" className="pb-2 text-center font-neo-display font-black">{copy.free}</th>
-          <th scope="col" className="bg-neo-yellow/10 pb-2 pt-1 text-center">
-            <LandingProPill label={copy.pill} />
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map((row) => (
-          <tr key={row.id} className="border-b border-neo-cream/15 last:border-b-0">
-            <th scope="row" className="py-1.5 pe-2 text-start font-bold leading-snug">{row.label}</th>
-            <td className="py-1.5 text-center"><MiniCell value={row.free} copy={copy} /></td>
-            <td className="bg-neo-yellow/10 py-1.5 text-center"><MiniCell value={row.pro} copy={copy} /></td>
+    <div className="mb-5 w-full max-w-lg overflow-x-auto">
+      <table data-testid="teacher-pro-compare-table" className="w-full min-w-[18rem] table-fixed border-collapse text-sm text-neo-white">
+        <colgroup>
+          <col />
+          <col className="w-20" />
+          <col className="w-24" />
+        </colgroup>
+        <thead>
+          <tr className="border-b-2 border-neo-cream/40">
+            <th scope="col" className="pb-2" />
+            <th scope="col" className="pb-2 text-center font-neo-display font-black">{copy.free}</th>
+            <th scope="col" className="bg-neo-yellow/10 pb-2 pt-1 text-center">
+              <LandingProPill label={copy.pill} />
+            </th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.id} className="border-b border-neo-cream/15 last:border-b-0">
+              <th scope="row" className="py-1.5 pe-2 text-start font-bold leading-snug">{row.label}</th>
+              <td className="py-1.5 text-center"><MiniCell value={row.free} copy={copy} /></td>
+              <td className="bg-neo-yellow/10 py-1.5 text-center"><MiniCell value={row.pro} copy={copy} /></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }

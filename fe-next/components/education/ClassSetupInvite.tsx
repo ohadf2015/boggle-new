@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
@@ -16,11 +16,10 @@ import { createdClassroom } from '@/lib/education/createdClassroomHandoff';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useTeacherActivationProgress } from '@/hooks/useTeacherActivationProgress';
 import { PageLoader } from '@/components/ui/PageLoader';
-import { classroomJoinUrl } from '@/lib/education/classroomInvitePayload';
-import { trackEduFirstStudentJoined, trackEduJoinCodeCopied, trackEduJoinCodeShared, trackEduJoinCodeShown } from '@/lib/education/telemetry';
+import { classroomJoinUrl, inviteLocale } from '@/lib/education/classroomInvitePayload';
+import { trackEduFirstStudentJoined, trackEduJoinCodeShown } from '@/lib/education/telemetry';
 import { trackFirstRoundGuideClicked, trackFirstRoundGuideShown } from '@/lib/education/firstRoundGuideTelemetry';
 import { captureTeacherOnboardingFunnel, TEACHER_ONBOARDING_FUNNEL_EVENTS, teacherFunnelPlan } from '@/lib/education/teacherOnboardingFunnel';
-import { shareWithFallback } from '@/utils/shareWithFallback';
 import { cn } from '@/lib/utils';
 import { useClassRoster } from '@/components/teacher/hq/useClassRoster';
 import { HqProjectorSheet } from '@/components/teacher/hq/HqProjectorSheet';
@@ -32,7 +31,7 @@ import { packsForLanguage, recommendedPack } from '@/components/teacher/setup/st
 import { FirstGameWords, PlayNowButton, type FirstGameError } from '@/components/teacher/setup/FirstGameWords';
 import { firstGameIntent, readPasted, type FirstGameChoice } from '@/components/teacher/setup/firstGameLaunch';
 import { ClassCreatedAsk } from '@/components/education/ClassCreatedAsk';
-import type { InviteChannel } from './ClassSetupInviteCode';
+import { useInviteShare } from './useInviteShare';
 import { ClassSetupInviteView } from './ClassSetupInviteView';
 import { firstStudentSeen } from './lobby/inviteLinks';
 
@@ -151,35 +150,11 @@ function InviteReady({ classroom, packKey, lessonId, t, language }: InviteReadyP
     if (roster.arrivals.length > 0) playPlayerJoinedSound?.();
   }, [roster.arrivals, playPlayerJoinedSound]);
 
-  const share = useCallback(
-    async (channel: InviteChannel, payload: { url: string; text: string }) => {
-      if (channel === 'whatsapp' || channel === 'google_classroom') {
-        trackEduJoinCodeShared({ classroomId: classroom.id, method: channel });
-        return;
-      }
-      if (channel === 'copy') {
-        try {
-          await navigator.clipboard.writeText(payload.url);
-          toast.success(t('eduShell.setup.copied'));
-          trackEduJoinCodeCopied({ classroomId: classroom.id });
-        } catch {
-          toast.error(t('eduShell.setup.copyFailed'));
-        }
-        return;
-      }
-      const result = await shareWithFallback({ title: classroom.name, text: payload.text, url: payload.url, clipboardText: payload.url });
-      if (result === 'shared') trackEduJoinCodeShared({ classroomId: classroom.id, method: 'native' });
-      if (result === 'copied') {
-        trackEduJoinCodeShared({ classroomId: classroom.id, method: 'copy_fallback' });
-        toast.success(t('eduShell.setup.copied'));
-      }
-      if (result === 'failed') toast.error(t('eduShell.setup.copyFailed'));
-    },
-    [classroom.id, classroom.name, t],
-  );
+  const share = useInviteShare(classroom, t);
 
-  const joinUrl = origin ? classroomJoinUrl(origin, language, classroom.join_code) : '';
-  const displayHost = origin ? `${origin.replace(/^https?:\/\//, '')}/${language}/join` : '';
+  const joinLocale = inviteLocale(classroom.language, language);
+  const joinUrl = origin ? classroomJoinUrl(origin, joinLocale, classroom.join_code) : '';
+  const displayHost = origin ? `${origin.replace(/^https?:\/\//, '')}/${joinLocale}/join` : '';
   const startHref = `/${language}/education/classroom-game?flow=${QUICK_LAUNCH_FLOW}`;
   const firstGame = useFirstGame({ classroom, packKey, lessonId, t, language });
 

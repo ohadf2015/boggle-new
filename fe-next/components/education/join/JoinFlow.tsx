@@ -16,6 +16,9 @@ import { JoinNameStep } from './JoinNameStep';
 import { JoinEndedPanel } from './JoinEndedPanel';
 import { BoundedConfettiBurst } from '@/components/motion/BoundedConfettiBurst';
 import { UnconfirmedJoinEmail } from './UnconfirmedJoinEmail';
+import { JoinReturningStep } from './JoinReturningStep';
+import { useReturningStudent } from './useReturningStudent';
+import { QuickLanguageSwitcher } from '@/components/QuickLanguageSwitcher';
 
 /**
  * The student's whole way in: code, nickname, playing.
@@ -54,7 +57,8 @@ export function JoinFlow({
   variant = 'standalone',
 }: JoinFlowProps) {
   const { t, dir, language } = useLanguage();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  const returning = useReturningStudent(user, authLoading);
   const academy = variant === 'academy';
   const [showSuccessCelebration, setShowSuccessCelebration] = useState(false);
 
@@ -67,7 +71,20 @@ export function JoinFlow({
     }
   }, [externalCallback]);
 
-  const flow = useJoinFlow(initialCode, handleSuccessBeforeNavigation);
+  const flow = useJoinFlow(initialCode, handleSuccessBeforeNavigation, returning.holdJoin);
+  const asking = returning.askName !== null && flow.step === 'name' && !flow.joined && !flow.ended;
+
+  const confirmReturning = () => {
+    returning.confirm();
+    if (returning.hasSession) return flow.submit();
+    flow.setName(returning.askName ?? '');
+    flow.submit(returning.askName ?? '');
+  };
+
+  const rejectReturning = () => {
+    flow.setName('');
+    void returning.reject();
+  };
   const nameRef = useRef<HTMLInputElement>(null);
   const goRef = useRef<HTMLButtonElement>(null);
   const [pasteNoteKey, setPasteNoteKey] = useState<string | null>(null);
@@ -92,13 +109,14 @@ export function JoinFlow({
   // code lookup has spoken — a seeded name would look like "they started
   // typing" and block the invalid-code bounce back to the code step.
   useEffect(() => {
+    if (returning.holdJoin) return;
     if (flow.step !== 'name' || !flow.showNameField || flow.name.trim() || nameRef.current?.value.trim()) return;
     if (sanitizeJoinCode(initialCode).length !== JOIN_CODE_LENGTH) return;
     if (flow.isChecking || !flow.target || flow.target.verdict === 'invalid') return;
     const seed = getStoredUsername() || pickFunName(funNames, '');
     if (seed) flow.setName(seed);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [flow.step, flow.showNameField, initialCode, flow.isChecking, flow.target, funNames]);
+  }, [flow.step, flow.showNameField, initialCode, flow.isChecking, flow.target, funNames, returning.holdJoin]);
 
   // Any refusal about the NAME — empty, or taken — puts the cursor back in the
   // field that fixes it, so the two refusals behave the same (class 3).
@@ -168,6 +186,7 @@ export function JoinFlow({
             <span className="inline-block -rotate-2 rounded-neo border-3 border-neo-black bg-neo-lime px-3 py-1 font-neo-display text-lg font-black uppercase tracking-tight text-neo-navy shadow-hard lg:text-2xl">
               LexiClash
             </span>
+            <div className="flex items-center gap-3">
             {!flow.joined && !showSuccessCelebration && !flow.ended && (
               <ol className="flex items-center gap-1.5" aria-label={t(`${K}.flow.steps`)}>
                 {STEPS.map((s) => (
@@ -186,6 +205,8 @@ export function JoinFlow({
                 ))}
               </ol>
             )}
+            <QuickLanguageSwitcher compact />
+            </div>
           </header>
 
           {flow.joined ? (
@@ -204,15 +225,20 @@ export function JoinFlow({
               classroomId={flow.endedClassroomId}
               onNewCode={flow.typeNewCode}
             />
+          ) : asking ? (
+            <JoinReturningStep
+              name={returning.askName ?? ''}
+              leaving={returning.leaving}
+              leaveFailed={returning.leaveFailed}
+              onYes={confirmReturning}
+              onNotMe={rejectReturning}
+            />
           ) : flow.step === 'code' ? (
             <JoinCodeStep flow={flow} pasteNoteKey={pasteNoteKey} onPaste={handlePaste} />
           ) : (
             <>
               <JoinNameStep flow={flow} nameRef={nameRef} goRef={goRef} />
-              <UnconfirmedJoinEmail
-                joinCode={flow.code}
-                signedInEmail={signedInNeedsRecovery(user) ? user?.email : null}
-              />
+              {signedInNeedsRecovery(user) && <UnconfirmedJoinEmail joinCode={flow.code} signedInEmail={user?.email} />}
             </>
           )}
         </main>

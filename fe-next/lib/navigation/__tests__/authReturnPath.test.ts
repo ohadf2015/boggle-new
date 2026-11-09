@@ -16,6 +16,7 @@ describe('isEduAuthOrigin', () => {
     '/ru/student/join',
     '/he/join/ABC123',
     '/en/education/live?room=ABC',
+    '/en/classroom',
   ])('treats %s as edu', (p) => expect(isEduAuthOrigin(p)).toBe(true));
 
   it.each(['/en', '/en/daily', '/en/pricing', '/es/esl-word-games', '/en/multiplayer', '', null])(

@@ -91,7 +91,7 @@ export default function DiscoverPanel({ onOpenMyLists, onShareFirst, onCopied }:
       {lib.status === 'error' && (
         <div className="flex items-center justify-between gap-3 rounded-neo border-2 border-neo-pink p-3 text-sm font-bold text-neo-white">
           {t('eduLibrary.discover.loadError')}
-          <button type="button" onClick={lib.reload} className="inline-flex min-h-9 items-center gap-1 rounded-neo border-2 border-neo-cream px-2">
+          <button type="button" onClick={lib.reload} className="inline-flex min-h-11 items-center gap-1 rounded-neo border-2 border-neo-cream px-2">
             <RefreshCw className="size-4" aria-hidden="true" />
             {t('eduLibrary.discover.retry')}
           </button>
@@ -132,7 +132,7 @@ export default function DiscoverPanel({ onOpenMyLists, onShareFirst, onCopied }:
               type="button"
               data-testid="discover-be-first"
               onClick={onShareFirst}
-              className={cn('group flex w-full items-center gap-3 py-1.5 pe-3 ps-2 text-start text-sm text-neo-cream/85', GAME_CARD, GAME_CARD_HOVER)}
+              className={cn('group flex min-h-11 w-full items-center gap-3 py-1.5 pe-3 ps-2 text-start text-sm text-neo-cream/85', GAME_CARD, GAME_CARD_HOVER)}
             >
               <EduMascot moment="tip" size={48} className="size-12 shrink-0 animate-edu-bob" />
               <span className="min-w-0 flex-1">

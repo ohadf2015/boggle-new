@@ -136,7 +136,7 @@ export function WorkshopVsIntro({
         {/* The Baron's taunt, pointing at him across the pink half. */}
         <m.p
           data-testid="workshop-rival-taunt"
-          className="absolute bottom-[8cqh] start-[4cqw] max-w-[42cqw] rounded-2xl border-[3px] border-neo-black bg-neo-cream px-[2.4cqmin] py-[1.6cqmin] font-neo-display text-[clamp(0.75rem,4.4cqmin,2.25rem)] font-black leading-tight text-neo-black"
+          className="absolute bottom-[8cqh] start-[4cqw] max-w-[42cqw] rounded-neo-lg border-[3px] border-neo-black bg-neo-cream px-[2.4cqmin] py-[1.6cqmin] font-neo-display text-[clamp(0.75rem,4.4cqmin,2.25rem)] font-black leading-tight text-neo-black"
           style={{ boxShadow: '4px 4px 0 rgb(var(--neo-black))' }}
           initial={still ? false : { scale: 0.6, rotate: -12 }}
           animate={{ scale: 1, rotate: -3 }}
@@ -193,7 +193,7 @@ export function WorkshopVsIntro({
                 <li
                   key={w}
                   data-testid="workshop-lesson-word"
-                  className="flex h-[calc(var(--chip-fs)*1.25+10px)] items-center gap-[0.3em] rounded-md border-[3px] border-neo-black pe-[0.55em] ps-[0.3em] font-neo-display text-[length:var(--chip-fs)] font-black leading-[1.25] text-neo-black"
+                  className="flex h-[calc(var(--chip-fs)*1.25+10px)] items-center gap-[0.3em] rounded-neo border-[3px] border-neo-black pe-[0.55em] ps-[0.3em] font-neo-display text-[length:var(--chip-fs)] font-black leading-[1.25] text-neo-black"
                   style={{ background: 'linear-gradient(180deg, color-mix(in srgb, var(--neo-yellow) 30%, rgb(var(--neo-white))) 0%, color-mix(in srgb, var(--neo-red) 10%, var(--neo-yellow)) 60%, color-mix(in srgb, var(--neo-lime) 50%, var(--neo-orange-hover)) 100%)', boxShadow: 'inset 0 2px 0 rgb(var(--neo-white)), inset 0 -3px 0 color-mix(in srgb, var(--neo-lime-dark) 40%, var(--neo-cozy-dark)), 2px 3px 0 rgb(var(--neo-black))' }}
                 >
                   {/* Each word is literally a gold coin: the stakes read on the pill itself, not only in the label. */}

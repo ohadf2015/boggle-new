@@ -74,6 +74,8 @@ export interface PlayerResult {
   wordsFoundCount?: number;
   rank?: number;
   isBot?: boolean;
+  /** The teacher's own practice seat in a classroom room. */
+  isPractice?: boolean;
   title?: {
     icon: string;
     name: string;

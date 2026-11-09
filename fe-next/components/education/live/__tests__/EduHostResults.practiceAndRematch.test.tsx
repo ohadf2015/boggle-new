@@ -76,6 +76,15 @@ describe('EduHostResults practice rounds, rematch and lesson honesty', () => {
     expect(screen.getByTestId('podium-stage')).toBeInTheDocument();
   });
 
+  it("given a practice run with the teacher's own student seat and bots, when results show, then no Pro ask and no parent share", () => {
+    const seat = { username: 'Practice student', score: 30, wordsFoundCount: 1, isPractice: true };
+    const live = [seat, bots[0], { username: TEACHER, score: 0, isHost: true }] as unknown as PlayerResult[];
+    render(<EduHostResults summary={summary()} players={live} t={t} onRematch={vi.fn()} />);
+    expect(screen.queryByTestId('class-report-teaser')).toBeNull();
+    expect(screen.queryByTestId('edu-results-parent-share')).toBeNull();
+    expect(screen.queryByTestId('edu-stat-students')).toBeNull();
+  });
+
   it('given a free teacher after a real class round, when results show, then the labelled Pro preview still shows', () => {
     render(<EduHostResults summary={summary()} players={students} t={t} onRematch={vi.fn()} />);
     fireEvent.click(screen.getByTestId('edu-results-more-toggle'));

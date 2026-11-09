@@ -6,7 +6,7 @@
  * later touches don't overwrite the original source.
  */
 
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { capture, identify, people_set_once, reset, posthogMock } = vi.hoisted(() => {
   const c = vi.fn();
@@ -64,6 +64,24 @@ describe('identifyUserForAnalytics', () => {
       display_name: 'Alice',
       is_admin: false,
       is_teacher: false,
+    });
+  });
+
+  describe('on a classroom page', () => {
+    const studentArgs = { userId: 'kid-1', displayName: 'Dana K', isAdmin: false, isTeacher: false, locale: 'he', email: 'dana@school.org' };
+    beforeEach(() => window.history.replaceState(null, '', '/he/student/quick-play'));
+    afterEach(() => window.history.replaceState(null, '', '/'));
+
+    it('identifies a student by id only', () => {
+      identifyUserForAnalytics(studentArgs);
+      expect(identify).toHaveBeenCalledWith('kid-1', { is_admin: false, is_teacher: false });
+      const identified = capture.mock.calls.find((c) => c[0] === 'user_identified')?.[1];
+      expect(identified).toEqual({ user_id: 'kid-1', is_guest: false, is_admin: false, is_teacher: false });
+    });
+
+    it('keeps a teacher named, as before', () => {
+      identifyUserForAnalytics({ ...studentArgs, isTeacher: true });
+      expect(identify).toHaveBeenCalledWith('kid-1', expect.objectContaining({ display_name: 'Dana K', email: 'dana@school.org' }));
     });
   });
 

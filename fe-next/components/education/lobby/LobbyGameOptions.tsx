@@ -50,7 +50,10 @@ export function LobbyGameOptions({ opts, roundMinutes, gameMode, vocabQuizVarian
             onTeamCountChange={opts.setTeamCount}
             onAccessibilityChange={opts.setAccessibility}
           />
-          <LobbyPressureDials pressure={opts.pressure} onChange={opts.setPressure} />
+          <section data-testid="lobby-options-pro" aria-labelledby="lobby-options-pro-title" className="flex flex-col gap-3">
+            <h3 id="lobby-options-pro-title" className="font-neo-display text-base font-bold text-neo-cream">{t('eduShell.host.proOptions')}</h3>
+            <LobbyPressureDials pressure={opts.pressure} onChange={opts.setPressure} />
+          </section>
         </div>
         <div className="flex flex-col gap-5">
           <LobbyRoundSettings

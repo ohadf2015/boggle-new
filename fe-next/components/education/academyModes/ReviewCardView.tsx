@@ -124,7 +124,7 @@ export default function ReviewCardView({ card, answered, correct, onAnswer, onTi
               key={i}
               style={{ width: slotWidth, fontSize: `calc(${slotWidth} * 0.55)` }}
               className={cn(
-                'grid aspect-square place-items-center rounded-xl border-[3px] font-neo-display font-black',
+                'grid aspect-square place-items-center rounded-neo-lg border-[3px] font-neo-display font-black',
                 filled ? 'border-neo-black text-neo-black shadow-[inset_0_2px_0_rgba(255,255,255,0.7),inset_0_-5px_0_rgba(0,0,0,0.22),0_3px_0_rgb(var(--neo-black))]' : 'border-dashed border-neo-black/40 bg-black/5 text-transparent shadow-[inset_0_3px_4px_rgba(0,0,0,0.15)]',
                 filled && (wrong ? 'bg-neo-pink' : answered && correct === false ? 'bg-neo-cream/70' : 'bg-neo-lime'),
               )}
@@ -155,7 +155,7 @@ export default function ReviewCardView({ card, answered, correct, onAnswer, onTi
                 rotate: used ? undefined : `${TILT[i % TILT.length]}deg`,
               }}
               className={cn(
-                'grid aspect-square place-items-center rounded-xl border-[3px] pb-[0.12em] font-neo-display font-black leading-none',
+                'grid aspect-square place-items-center rounded-neo-lg border-[3px] pb-[0.12em] font-neo-display font-black leading-none',
                 used ? 'border-dashed border-neo-black/50 bg-black/10 text-neo-black/25' : 'border-neo-black bg-neo-cream text-neo-black',
               )}
             >

@@ -59,7 +59,7 @@ export function WordStudentGrid({
             <span
               aria-hidden
               className={cn(
-                'inline-flex h-5 w-5 items-center justify-center rounded-sm border-2 border-black font-black leading-none',
+                'inline-flex h-5 w-5 items-center justify-center rounded-sm border-2 border-neo-black font-black leading-none',
                 CELL_STYLE[state]
               )}
             >
@@ -73,7 +73,7 @@ export function WordStudentGrid({
       <div
         data-testid="report-grid-scroll"
         className={cn(
-          'overflow-x-auto rounded-neo border-3 border-black bg-white',
+          'overflow-x-auto rounded-neo border-3 border-neo-black bg-neo-white',
           // A printed report must show every column, not the first screenful.
           'print:overflow-visible print:border-black print:text-[9px]'
         )}
@@ -126,13 +126,13 @@ export function WordStudentGrid({
                 key={row.key}
                 data-testid="report-row"
                 data-word={row.word}
-                className="border-t-2 border-black/10 even:bg-black/[0.03]"
+                className="border-t-2 border-neo-black/10 even:bg-black/[0.03]"
               >
                 <th
                   scope="row"
                   className={cn(
                     'sticky start-0 z-10 bg-neo-cream px-3 py-2 text-start font-black text-black',
-                    'border-e-2 border-black/20 min-w-[7rem]'
+                    'border-e-2 border-neo-black min-w-[7rem]'
                   )}
                 >
                   {row.word}
@@ -157,7 +157,7 @@ export function WordStudentGrid({
                         title={`${col.name}: ${row.word} — ${stateLabel(state)}`}
                         className={cn(
                           'inline-flex h-7 w-7 items-center justify-center rounded-sm',
-                          'border-2 border-black font-black leading-none',
+                          'border-2 border-neo-black font-black leading-none',
                           CELL_STYLE[state]
                         )}
                       >
@@ -170,7 +170,7 @@ export function WordStudentGrid({
             ))}
           </tbody>
           <tfoot>
-            <tr className="border-t-3 border-black bg-neo-cream">
+            <tr className="border-t-3 border-neo-black bg-neo-cream">
               <th
                 scope="row"
                 className="sticky start-0 z-10 bg-neo-cream px-3 py-2 text-start font-black text-black"

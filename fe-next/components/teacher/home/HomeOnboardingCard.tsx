@@ -11,24 +11,14 @@ import {
   type HomeOnboarding,
   type HomeOnboardingStepId,
 } from '@/lib/education/homeOnboarding';
-import type { TrialChecklistState, TrialChecklistStepId } from '@/lib/education/trialChecklistProgress';
 import { SECONDARY_BUTTON } from './homeStyles';
 import { NB_BLOCK, NB_PANEL, NB_PRIMARY } from '../nb/nbStyles';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
-export interface HomeOnboardingTrial {
-  checklist: TrialChecklistState;
-  hrefs: Record<TrialChecklistStepId, string>;
-  onDismiss?: () => void;
-  onOpenAssignment?: () => void;
-}
-
 export interface HomeOnboardingCardProps {
   onboarding: HomeOnboarding;
   hrefs: Record<HomeOnboardingStepId, string>;
-  /** A trialing teacher's checklist: when visible it takes this card's one slot. */
-  trial?: HomeOnboardingTrial | null;
   shareCardShown?: boolean;
   onStepStart?: (id: HomeOnboardingStepId) => void;
   onDismiss?: () => void;
@@ -50,37 +40,13 @@ interface CardCopy {
   onDismiss?: () => void;
 }
 
-function onboardingKey(step: Extract<HomeNextStep, { source: 'onboarding' }>, field: 'title' | 'body' | 'cta'): string {
+function onboardingKey(step: HomeNextStep, field: 'title' | 'body' | 'cta'): string {
   const suffix = step.id === 'tryDemo' && step.awaitingPlayers ? `${field}AwaitingPlayers` : field;
   return `eduShell.onboarding.steps.${step.id}.${suffix}`;
 }
 
 function cardCopy(step: HomeNextStep, props: HomeOnboardingCardProps): CardCopy {
   const { t } = props;
-  if (step.source === 'trial') {
-    const trial = props.trial as HomeOnboardingTrial;
-    return {
-      steps: trial.checklist.steps.map((s) => ({
-        id: s.id,
-        title: t(`eduShell.trialChecklist.steps.${s.id}.title`),
-        done: s.done,
-        current: s.id === step.id,
-      })),
-      heading: t('eduShell.trialChecklist.title'),
-      title: t(`eduShell.trialChecklist.steps.${step.id}.title`),
-      body: t('eduShell.trialChecklist.subtitle'),
-      cta: t(`eduShell.trialChecklist.steps.${step.id}.cta`),
-      href: trial.hrefs[step.id],
-      onClick:
-        step.id === 'first_assignment' && trial.onOpenAssignment
-          ? (e) => {
-              e.preventDefault();
-              trial.onOpenAssignment?.();
-            }
-          : undefined,
-      onDismiss: trial.onDismiss,
-    };
-  }
   return {
     steps: props.onboarding.steps.map((s) => ({
       id: s.id,
@@ -101,13 +67,13 @@ function cardCopy(step: HomeNextStep, props: HomeOnboardingCardProps): CardCopy 
 const DISMISS =
   'grid size-11 shrink-0 place-items-center rounded-neo text-neo-cream/70 transition-colors hover:bg-neo-cream/10 hover:text-neo-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan';
 
-/** Home's one next-step card: the trial checklist or the first-run steps, never both; gone when done. */
+/** Home's one next-step card: the 3-step first-run list; gone when done. */
 export function HomeOnboardingCard(props: HomeOnboardingCardProps) {
-  const { onboarding, trial, shareCardShown, variant, t, secondary } = props;
-  const step = homeNextStep({ onboarding, trial: trial?.checklist ?? null, shareCardShown });
+  const { onboarding, shareCardShown, variant, t, secondary } = props;
+  const step = homeNextStep({ onboarding, shareCardShown });
   if (!step) return null;
   const copy = cardCopy(step, props);
-  const dismissLabel = t(step.source === 'trial' ? 'eduShell.trialChecklist.dismiss' : 'eduShell.onboarding.dismiss');
+  const dismissLabel = t('eduShell.onboarding.dismiss');
   const progress = t('eduShell.onboarding.progress', { done: step.done, total: step.total });
 
   if (variant === 'compact') {

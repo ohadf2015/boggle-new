@@ -17,7 +17,7 @@ export function LessonWordTile({ word, found, size = 'md' }: { word: string; fou
       data-testid="workshop-lesson-word"
       data-found={found ? 'true' : 'false'}
       className={cn(
-        'flex items-center gap-1 rounded-md border-[3px] border-neo-black font-neo-display font-black text-neo-black shadow-hard',
+        'flex items-center gap-1 rounded-neo border-[3px] border-neo-black font-neo-display font-black text-neo-black shadow-hard',
         size === 'lg' ? 'px-3 py-1.5 text-xl 2xl:text-2xl' : 'px-2 py-0.5 text-sm sm:text-base lg:px-3 lg:py-1 lg:text-2xl',
         found ? 'bg-neo-yellow' : 'bg-neo-cream',
       )}

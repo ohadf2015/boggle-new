@@ -2,10 +2,12 @@
 'use client';
 
 import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
+import { NeoButton } from '@/components/ui/button';
 import { pickHomeAsk } from '@/lib/education/teacherBannerPriority';
 import { useTeacherReveal } from './motion/useTeacherReveal';
 import LessonBuilder from './LessonBuilder';
@@ -22,7 +24,6 @@ import { HomeClassRoster } from './home/HomeClassRoster';
 import { WeeklyProgressDigestCard } from './digest/WeeklyProgressDigestCard';
 import { WeeklyEmailReport } from './digest/WeeklyEmailReport';
 import { HomeProCard, type HomeProOfferKind } from './home/HomeProCard';
-import { HomePracticeCard } from './home/HomePracticeCard';
 import { HomeOnboardingCard } from './home/HomeOnboardingCard';
 import { HomeHowItWorks } from './home/HomeHowItWorks';
 import { NB_BLOCK, NB_SMALL } from './nb/nbStyles';
@@ -37,20 +38,19 @@ import { weekClassRows } from './home/weekClassRows';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useTeacherActivationProgress } from '@/hooks/useTeacherActivationProgress';
-import { useTeacherTrialChecklist } from '@/hooks/useTeacherTrialChecklist';
 import { useTeacherWeekStats } from '@/hooks/useTeacherWeekStats';
 import { useClassStudentPreview } from '@/hooks/useClassStudentPreview';
 import { useLessons } from '@/hooks/useVocabularyLesson';
 import { classLessonProfile, homeCoachCue, homeSessionRail, railLanguages, type RailLesson } from '@/lib/education/homeSessionRail';
 import { isPackLanguage } from '@/lib/education/themedPacks';
-import { teacherAssignHref, useTeacherDashboardDeepLink } from '@/hooks/useTeacherDashboardDeepLink';
+import { useTeacherDashboardDeepLink } from '@/hooks/useTeacherDashboardDeepLink';
 import { polarCheckoutWelcomeKind } from '@/lib/education/polarTrial';
 import { trackEduTeacherDashboardViewed } from '@/lib/education/telemetry';
 import { trackEduProCheckoutReturnLanded } from '@/lib/education/proFunnelTelemetry';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 import { homeNextStep, homeOnboarding, type HomeOnboardingStepId } from '@/lib/education/homeOnboarding';
-import type { TrialChecklistStepId } from '@/lib/education/trialChecklistProgress';
 import { teacherHostHref } from '@/lib/education/teacherHostHref';
+import { teacherResultsHref } from '@/lib/education/teacherResultsHref';
 import { isDigestOverFreeTierCaps } from '@/lib/education/teacherPlanGate';
 import { trackFirstRoundGuideClicked, trackFirstRoundGuideShown } from '@/lib/education/firstRoundGuideTelemetry';
 
@@ -78,8 +78,7 @@ function greetingKey(hour: number): string {
 export default function TeacherDashboard({ banner, proOffer, usagePrompt }: TeacherDashboardProps = {}) {
   const { t: rawT, language } = useLanguage();
   const t = rawT as T;
-  const { user, profile } = useAuth();
-  const teacherId = user?.id ?? (profile as { id?: string } | null)?.id ?? null;
+  const { profile } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const deepLink = useTeacherDashboardDeepLink();
@@ -92,16 +91,6 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
   const pro = useTeacherPro();
   const { hasPro, loading: proLoading } = pro;
   const activation = useTeacherActivationProgress();
-  const trial = useTeacherTrialChecklist({
-    teacherId,
-    locale: language,
-    status: pro.status,
-    known: pro.known,
-    loading: proLoading,
-    classrooms,
-    classroomsReady: !classroomsLoading && !classroomsError,
-    inviteCopied: activation.progress.inviteCopied,
-  });
   const week = useTeacherWeekStats(classrooms, !classroomsLoading && !classroomsError, language);
   const studentPreview = useClassStudentPreview(classrooms, !classroomsLoading && !classroomsError);
   const lessons = useLessons();
@@ -186,13 +175,8 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
     dismissed: activation.progress.dismissed,
   });
   const newClassHref = `/${language}/teacher/classroom/new`;
+  const resultsHref = teacherResultsHref(language, effectiveId);
   const shareCodeHref = effectiveId ? `${newClassHref}?classroomId=${encodeURIComponent(effectiveId)}` : newClassHref;
-  const assignHref = effectiveId ? teacherAssignHref(language, effectiveId) : `/${language}/teacher?assign=1`;
-  const trialHrefs: Record<TrialChecklistStepId, string> = {
-    create_classroom: newClassHref,
-    invite_students: shareCodeHref,
-    first_assignment: assignHref,
-  };
   const onboardingHrefs: Record<HomeOnboardingStepId, string> = {
     createClass: newClassHref,
     shareCode: shareCodeHref,
@@ -226,11 +210,10 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
     studentCounts: classrooms.map((c) => c.member_count ?? 0),
   });
   // First-round guide funnel on Home: which onboarding step was on screen, and which was pressed.
-  const trialCard = { checklist: trial.checklist, hrefs: trialHrefs, onDismiss: trial.dismiss, onOpenAssignment: () => setShowAssignmentCreator(true) };
-  const nextStep = homeNextStep({ onboarding, trial: trial.checklist, shareCardShown });
+  const nextStep = homeNextStep({ onboarding, shareCardShown });
   const nextStepShown = ready && !classroomsError && nextStep !== null && (!hasClasses || week.status !== 'loading');
   // With classes, Home's one Start button replaces the old "next step" strip; the full guide only shows before the first class.
-  const onboardingCardShown = nextStepShown && nextStep?.source === 'onboarding' && !hasClasses;
+  const onboardingCardShown = nextStepShown && !hasClasses;
   // One ask per screen: the rail Pro card waits until onboarding is known, and yields to it and to account state.
   const askSettled = ready && !classroomsError && (!hasClasses || week.status !== 'loading');
   const railAsk = pickHomeAsk({
@@ -301,7 +284,6 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
           <HomeOnboardingCard
             onboarding={onboarding}
             hrefs={onboardingHrefs}
-            trial={trialCard}
             onStepStart={onOnboardingStep}
             variant="full"
             t={t}
@@ -337,7 +319,8 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
               onSelect={setSelectedId}
               language={language}
               t={t}
-              rehearse={<RehearseWithBotsButton classroomId={effectiveId || undefined} source="hq" language={language} t={t} className="lg:hidden" />}
+              rehearse={<RehearseWithBotsButton classroomId={effectiveId || undefined} source="hq" language={language} t={t} withSeat label={t('eduShell.home.practice.cta')} />}
+              resultsHref={resultsHref}
               corner={<HomeNewClass href={newClassHref} count={classrooms.length} limit={null} t={t} />}
               capLabel={!proLoading && !hasPro ? t('eduShell.setup.capMeter', { count: classrooms.length, limit: FREE_TIER_LIMITS.classes }) : undefined}
               meta={selectedClassroom ? (
@@ -358,8 +341,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
                 <HomeWeekLoop
                   ready={loop.ready}
                   missed={loop.missed}
-                  reportsHref={`/${language}/teacher/reports?classroomId=${encodeURIComponent(effectiveId)}`}
-                  locked={!proLoading && !hasPro}
+                  reportsHref={resultsHref}
                   onHomework={() => {
                     setAssignLessonId(loop.listId);
                     setShowAssignmentCreator(true);
@@ -403,7 +385,6 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
       } : null}
       onOpenReports={selectedClassroom ? () => setReportsOpen(true) : null}
       proCard={proCard}
-      practice={<HomePracticeCard t={t} action={<RehearseWithBotsButton classroomId={effectiveId || undefined} source="hq" language={language} t={t} withSeat label={t('eduShell.home.practice.cta')} className="[&_button]:text-neo-black" />} />}
     >
       {selectedClassroom ? (
         <Dialog open={reportsOpen} onOpenChange={setReportsOpen}>
@@ -421,6 +402,9 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
               <WeeklyProgressDigestCard classroomId={selectedClassroom.id} classroomName={selectedClassroom.name} overFreeTierCaps={overFreeTierCaps} />
               <WeeklyEmailReport classroomId={selectedClassroom.id} classroomName={selectedClassroom.name} />
             </div>
+            <NeoButton asChild variant="outline" className="mt-4 self-start">
+              <Link href={resultsHref} data-testid="home-weekly-reports-all">{t('eduShell.home.allResults')}</Link>
+            </NeoButton>
           </DialogContent>
         </Dialog>
       ) : null}
@@ -437,10 +421,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
           initialLessonId={assignLessonId}
           isOpen={showAssignmentCreator}
           onClose={() => setShowAssignmentCreator(false)}
-          onComplete={() => {
-            setShowAssignmentCreator(false);
-            trial.refreshAssignments();
-          }}
+          onComplete={() => setShowAssignmentCreator(false)}
         />
       ) : null}
     </TeacherHomeView>

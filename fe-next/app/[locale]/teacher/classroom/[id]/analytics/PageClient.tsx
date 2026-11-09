@@ -37,6 +37,9 @@ import { teacherAssignHref } from '@/hooks/useTeacherDashboardDeepLink';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
+import { NeoButton } from '@/components/ui/button';
+import { teacherResultsHref } from '@/lib/education/teacherResultsHref';
 import { cn } from '@/lib/utils';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
@@ -147,6 +150,9 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
               <bdi>{classroomName || t('education.analytics.title')}</bdi>
             </h1>
           </div>
+          <NeoButton asChild variant="outline" className="shrink-0">
+            <Link href={teacherResultsHref(locale, classroomId)} data-testid="analytics-results-hub">{t('eduShell.home.allResults')}</Link>
+          </NeoButton>
           {(connectionStatus === 'connected' || connectionStatus === 'connecting') && activeStudentsCount === 0 ? null : (
             <div data-testid="analytics-live" className="rounded-neo border-[3px] border-neo-cream/50 bg-neo-navy-light px-3 py-2 shadow-hard">
               <LiveActivityIndicator

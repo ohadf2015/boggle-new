@@ -130,7 +130,7 @@ export default async function WordListsHubPage({ params }: PageProps) {
                     <Link
                       key={pill.key}
                       href={pill.href}
-                      className="inline-flex min-h-11 items-center rounded-md border-2 border-neo-black bg-neo-white px-3 text-sm font-black text-neo-navy shadow-hard-sm hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+                      className="inline-flex min-h-11 items-center rounded-neo border-2 border-neo-black bg-neo-white px-3 text-sm font-black text-neo-navy shadow-hard-sm hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
                     >
                       {gradeLabel(locale, pill.grade)}
                     </Link>

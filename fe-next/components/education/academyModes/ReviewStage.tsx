@@ -42,7 +42,7 @@ export function ReviewMascot({ mood, className, big }: { mood: ReviewMascotMood;
           exit={reduce ? undefined : { scale: 0.6 }}
           transition={{ type: 'spring', stiffness: 520, damping: 18 }}
           className={cn(
-            'max-w-[9.5rem] rounded-2xl border-[3px] border-neo-black bg-neo-cream px-2 py-1 text-center font-neo-display font-black leading-tight text-neo-black shadow-hard',
+            'max-w-[9.5rem] rounded-neo-lg border-[3px] border-neo-black bg-neo-cream px-2 py-1 text-center font-neo-display font-black leading-tight text-neo-black shadow-hard',
             big ? 'lg:max-w-[min(16rem,14vw)] lg:px-3 lg:py-2 lg:text-[clamp(0.9rem,1.5vw,1.5rem)] min-[2200px]:max-w-[22rem] min-[2200px]:text-3xl' : '',
             'text-xs sm:text-sm',
           )}

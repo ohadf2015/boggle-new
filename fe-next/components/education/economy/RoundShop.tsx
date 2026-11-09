@@ -52,7 +52,7 @@ export default function RoundShop({ gameCode, compact = false }: { gameCode: str
             onClick={() => setOpen(true)}
             disabled={!canBuy}
             className={cn(
-              'min-h-14 w-full rounded-xl border-4 px-3 text-lg font-black transition-transform duration-150 ease-out',
+              'min-h-14 w-full rounded-neo-lg border-4 px-3 text-lg font-black transition-transform duration-150 ease-out',
               canBuy
                 ? 'border-neo-black bg-neo-lime text-neo-navy shadow-hard-lg hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan active:scale-[0.97]'
                 : 'cursor-not-allowed border-dashed border-neo-cream/50 bg-neo-navy text-neo-white/60'
@@ -82,7 +82,7 @@ export default function RoundShop({ gameCode, compact = false }: { gameCode: str
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="min-h-11 rounded-lg border-2 border-neo-black bg-neo-cream px-3 font-bold text-neo-navy focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+              className="min-h-11 rounded-neo border-2 border-neo-black bg-neo-cream px-3 font-bold text-neo-navy focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
             >
               {t('economy.shop.close')}
             </button>

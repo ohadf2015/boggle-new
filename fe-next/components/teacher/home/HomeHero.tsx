@@ -2,7 +2,7 @@
 
 import { useState, type ReactNode } from 'react';
 import Link from 'next/link';
-import { Check, ChevronDown, Loader2, Play, Projector, RotateCcw } from 'lucide-react';
+import { BarChart3, Check, ChevronDown, Loader2, Play, RotateCcw, Share2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   DropdownMenu,
@@ -11,10 +11,11 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { teacherHostHref } from '@/lib/education/teacherHostHref';
-import { HqProjectorSheet } from '@/components/teacher/hq/HqProjectorSheet';
+import { HomeShareSheet } from './HomeShareSheet';
 import { JoinCodeTile } from '@/components/teacher/hq/JoinCodeTile';
-import { NB_BLOCK, NB_PANEL, NB_PRIMARY, NB_SMALL } from '../nb/nbStyles';
+import { NB_BLOCK, NB_PANEL, NB_PRIMARY } from '../nb/nbStyles';
 import { QUIET_LINK } from './homeStyles';
+import { NeoButton } from '@/components/ui/button';
 
 const PRIMARY_SLOT = cn(NB_PRIMARY, 'min-h-[60px] w-full whitespace-nowrap text-2xl sm:w-auto sm:min-w-[16rem] @3xl/hero:w-full');
 
@@ -25,6 +26,7 @@ export interface HomeHeroClass {
   name: string;
   join_code?: string;
   member_count?: number | null;
+  language?: string | null;
 }
 
 export interface HomeHeroProps {
@@ -51,15 +53,17 @@ export interface HomeHeroProps {
   capLabel?: string;
   /** A class that already played: Play again (last mode, this week's list) takes the primary slot. */
   replay?: HomeReplay;
+  /** The one results entry on Home: free summary first, Pro detail behind it. */
+  resultsHref?: string;
 }
 
 export type HomeReplay = { kind: 'pending' } | { kind: 'ready'; href: string; detail: string };
 
-/** The class desk: which class, its join code at a glance, and the one Start button. */
-export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, t, rehearse, nudge, meta, insight, corner, showCode = true, codeSlot, capLabel, replay }: HomeHeroProps) {
+/** The class desk: Start game, Share code and See results, with the join code at a glance. */
+export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, t, rehearse, nudge, meta, insight, corner, showCode = true, codeSlot, capLabel, replay, resultsHref }: HomeHeroProps) {
   const selected = classrooms.find((c) => c.id === selectedId) ?? classrooms[0];
   const [pending, setPending] = useState(false);
-  const [projectorOpen, setProjectorOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   const code = showCode ? (selected?.join_code?.trim() ?? '') : '';
 
   return (
@@ -102,17 +106,16 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
                 />
               ))}
             </p>
-            <button
-              type="button"
-              data-testid="home-class-code"
-              onClick={() => setProjectorOpen(true)}
-              aria-label={t('eduShell.home.showCodeFor', { name: selected?.name ?? '' })}
-              title={t('academy.hq.openProjector')}
-              className={cn(NB_SMALL, NB_BLOCK.navy, 'max-sm:min-w-11 max-sm:px-0')}
+            <NeoButton
+              variant="small"
+              tone="navy"
+              data-testid="home-share-code"
+              aria-haspopup="dialog"
+              onClick={() => setShareOpen(true)}
             >
-              <Projector className="size-5" aria-hidden="true" />
-              <span className="max-sm:hidden">{t('academy.hq.openProjector')}</span>
-            </button>
+              <Share2 className="size-5" aria-hidden="true" />
+              {t('eduShell.home.shareCode')}
+            </NeoButton>
           </div>
         ) : null}
 
@@ -169,8 +172,16 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
               {t('eduShell.home.startLive')}
             </Link>
           )}
-          {rehearse || replay?.kind === 'ready' ? (
-            <div className="flex flex-wrap items-center justify-center gap-x-3 sm:justify-start @3xl/hero:justify-center">
+          {resultsHref || rehearse || replay?.kind === 'ready' ? (
+            <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 sm:justify-start @3xl/hero:justify-center">
+              {resultsHref ? (
+                <NeoButton asChild variant="small" tone="navy">
+                  <Link href={resultsHref} data-testid="home-see-results">
+                    <BarChart3 className="size-4" strokeWidth={2.5} aria-hidden="true" />
+                    {t('eduShell.home.seeResults')}
+                  </Link>
+                </NeoButton>
+              ) : null}
               {replay?.kind === 'ready' ? (
                 <Link href={teacherHostHref(language, { classroomId: selected?.id })} data-testid="home-pick-game" className={cn(QUIET_LINK, 'text-white/90 hover:text-white')}>
                   {t('eduShell.home.loop.pickGame')}
@@ -185,10 +196,13 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
         {nudge ? <div className="min-w-0 @3xl/hero:col-span-2">{nudge}</div> : null}
       </div>
 
-      {projectorOpen && selected && code ? (
-        <HqProjectorSheet
-          classroom={{ id: selected.id, name: selected.name, join_code: code, member_count: selected.member_count ?? undefined }}
-          onClose={() => setProjectorOpen(false)}
+      {selected && code ? (
+        <HomeShareSheet
+          classroom={{ id: selected.id, name: selected.name, join_code: code, member_count: selected.member_count, language: selected.language }}
+          open={shareOpen}
+          onOpenChange={setShareOpen}
+          uiLanguage={language}
+          t={t}
         />
       ) : null}
     </section>

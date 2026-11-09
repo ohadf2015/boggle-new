@@ -215,7 +215,7 @@ export function TeacherLiveControls({
                 data-testid="teacher-idle-chip"
                 aria-label={t('education.liveControls.idleCount', { count: summary.idle })}
                 className={cn(
-                  'inline-flex items-center gap-1 rounded-md border-2 tv:border-3 border-neo-black bg-neo-pink',
+                  'inline-flex items-center gap-1 rounded-neo border-2 tv:border-3 border-neo-black bg-neo-pink',
                   'px-2 lg:px-3 py-1 text-xs sm:text-sm lg:text-lg xl:text-xl tv:text-2xl font-black text-neo-white',
                 )}
               >

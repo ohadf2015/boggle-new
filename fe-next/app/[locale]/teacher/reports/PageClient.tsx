@@ -11,7 +11,7 @@ import { useTeacherReveal } from '@/components/teacher/motion/useTeacherReveal';
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
-import { ArrowLeft, Send } from 'lucide-react';
+import { ArrowLeft, ClipboardList, Send } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { getClassroomStudents } from '@/lib/supabase/education/classrooms';
@@ -45,6 +45,8 @@ import { StudentParentPreview } from '@/components/teacher/reports/StudentParent
 import { ReportsClassEmpty } from './ReportsClassEmpty';
 import { ReportsReteachPanel } from './ReportsReteachPanel';
 import { ReportsLockedTitle } from './ReportsLockedTitle';
+import { ReportsFreeSummary } from './ReportsFreeSummary';
+import { NeoButton } from '@/components/ui/button';
 
 /** Slide distance for the drill-down; the direction follows depth and locale. */
 const SLIDE_PX = 56;
@@ -73,7 +75,11 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
   const selectedClassroomId = pickedClassroomId ?? onlyClassroomId;
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(studentIdFromUrl);
   const [selectedStudentName, setSelectedStudentName] = useState<string | null>(null);
-  const [section, setSection] = useState<string>(() => (searchParams?.get('roundPreview') ? 'games' : 'students'));
+  const [section, setSection] = useState<string>(() => {
+    if (searchParams?.get('roundPreview')) return 'games';
+    const asked = searchParams?.get('section');
+    return asked && (REPORT_TABS as readonly string[]).includes(asked) ? asked : 'students';
+  });
 
   // ...but the URL stays the source of truth: browser Back/Forward change it,
   // and the view used to stay pinned on the old student.
@@ -268,6 +274,12 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
           </div>
           {hasPro ? <TeacherPlanBadge /> : null}
         </div>
+        {classIsEmpty ? null : (
+          <NeoButton variant="small" tone="lime" data-testid="reports-homework-shortcut" onClick={() => setSection('homework')}>
+            <ClipboardList className="size-4" aria-hidden="true" />
+            {t('teacher.reports.homeworkShortcut')}
+          </NeoButton>
+        )}
         {classIsEmpty ? (
           <ReportsClassEmpty classroomId={selectedClassroomId} />
         ) : (
@@ -406,6 +418,7 @@ export default function TeacherReportsPage({ gradePassbackEnabled = false }: { g
   return (
     <ReportsShell>
       <TeacherGate>
+        <ReportsFreeSummary />
         <ReportsProGate>
           <TeacherReportsInner gradePassbackEnabled={gradePassbackEnabled} />
         </ReportsProGate>

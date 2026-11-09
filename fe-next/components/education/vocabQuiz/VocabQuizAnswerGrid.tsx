@@ -152,7 +152,7 @@ export function VocabQuizAnswerGrid({
               aria-hidden
               data-testid="vocab-quiz-choice-badge"
               className={cn(
-                'relative grid size-12 shrink-0 place-items-center rounded-xl border-[3px] border-neo-black text-xl leading-none text-neo-black shadow-hard-sm sm:size-14 sm:text-2xl xl:size-16 xl:text-3xl',
+                'relative grid size-12 shrink-0 place-items-center rounded-neo-lg border-[3px] border-neo-black text-xl leading-none text-neo-black shadow-hard-sm sm:size-14 sm:text-2xl xl:size-16 xl:text-3xl',
                 '[@media(max-height:560px)]:size-8 [@media(max-height:560px)]:text-sm',
                 style.fill
               )}
@@ -167,7 +167,7 @@ export function VocabQuizAnswerGrid({
               <kbd
                 aria-hidden
                 data-testid="vocab-quiz-key-hint"
-                className="ms-auto hidden size-8 shrink-0 place-items-center rounded-md border-2 border-b-4 border-current font-neo-display text-sm font-black leading-none opacity-60 sm:[@media(pointer:fine)]:grid"
+                className="ms-auto hidden size-8 shrink-0 place-items-center rounded-neo border-2 border-b-4 border-current font-neo-display text-sm font-black leading-none opacity-60 sm:[@media(pointer:fine)]:grid"
               >
                 {index + 1}
               </kbd>

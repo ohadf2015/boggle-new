@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-vi.mock('../endedJoinCode', () => ({ isEndedJoinCode: async () => false }));
+vi.mock('../endedJoinCode', () => ({ isEndedJoinCode: async () => false, endedJoinCodeStatus: async () => 'not_ended' }));
 import { renderHook, act } from '@testing-library/react';
 
 const { pushMock, joinMock } = vi.hoisted(() => ({

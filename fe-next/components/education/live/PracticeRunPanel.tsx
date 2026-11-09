@@ -8,10 +8,12 @@
  * The round starts by itself once that seat joins, so the frame is the only thing to act on.
  *
  * Wide screens get the frame beside the board. Phones and portrait tablets get one
- * button that opens the student view in a new tab; a second page squeezed beside
- * the board would be unusable there, and a QR to scan makes no sense on the phone itself.
+ * button that opens the student view in a new tab, and no frame at all: a hidden
+ * frame still loads, joins the seat and starts the round where nobody can see it.
  */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { PRACTICE_SEAT_RETRY_EVENT } from '@/host/hooks/useRehearseAutoStart';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { Check, ExternalLink, MonitorSmartphone, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { practiceSeatPath } from '@/lib/education/classroomLivePath';
@@ -28,6 +30,13 @@ interface PracticeRunPanelProps {
 
 export function PracticeRunPanel({ gameCode, language, joined, t }: PracticeRunPanelProps) {
   const [open, setOpen] = useState(true);
+  const wide = useMediaQuery('(min-width: 1024px)');
+  const [frameKey, setFrameKey] = useState(0);
+  useEffect(() => {
+    const reload = () => setFrameKey((n) => n + 1);
+    window.addEventListener(PRACTICE_SEAT_RETRY_EVENT, reload);
+    return () => window.removeEventListener(PRACTICE_SEAT_RETRY_EVENT, reload);
+  }, []);
   const path = practiceSeatPath(language, gameCode);
 
   const status = (
@@ -71,13 +80,12 @@ export function PracticeRunPanel({ gameCode, language, joined, t }: PracticeRunP
     </button>
   );
 
-  return (
-    <>
-      {/* Wide screens: the student page itself, beside the board. */}
+  if (wide) {
+    return (
       <aside
         data-testid="practice-run-panel"
         aria-labelledby="practice-run-title"
-        className={cn(NB_PANEL, 'm-3 ms-0 hidden w-[min(25rem,32vw)] shrink-0 flex-col gap-3 p-3 lg:flex')}
+        className={cn(NB_PANEL, 'm-3 ms-0 flex w-[min(25rem,32vw)] shrink-0 flex-col gap-3 p-3')}
       >
         <div className="flex flex-col items-start gap-1.5">
           <h2 id="practice-run-title" className="min-w-0 font-neo-display text-xl font-black leading-tight">{t('eduLiveRoom.practice.title')}</h2>
@@ -85,6 +93,7 @@ export function PracticeRunPanel({ gameCode, language, joined, t }: PracticeRunP
         </div>
         <div className="relative min-h-0 flex-1 overflow-hidden rounded-[1.75rem] border-[5px] border-neo-cream bg-neo-navy shadow-hard-lg">
           <iframe
+            key={frameKey}
             data-testid="practice-run-frame"
             src={path}
             title={t('eduLiveRoom.practice.frameTitle')}
@@ -95,20 +104,22 @@ export function PracticeRunPanel({ gameCode, language, joined, t }: PracticeRunP
         {/* The close sits down here: the top corner belongs to the page's sound button. */}
         <div className="flex items-center justify-between gap-2">{openTab}{hide}</div>
       </aside>
+    );
+  }
 
-      <section
-        data-testid="practice-run-card"
-        aria-labelledby="practice-run-card-title"
-        className={cn(NB_PANEL, NB_BLOCK.navy, 'order-last m-3 mt-0 mb-[calc(var(--lc-teacher-bar-h,0px)+0.75rem)] flex shrink-0 flex-wrap items-center gap-3 p-3 lg:hidden')}
-      >
-        <h2 id="practice-run-card-title" className="min-w-0 flex-1 font-neo-display text-lg font-black leading-tight">{t('eduLiveRoom.practice.title')}</h2>
-        {status}
-        <div className="flex w-full items-center gap-2">
-          <div className="flex-1 [&>a]:w-full">{openTab}</div>
-          {hide}
-        </div>
-      </section>
-    </>
+  return (
+    <section
+      data-testid="practice-run-card"
+      aria-labelledby="practice-run-card-title"
+      className={cn(NB_PANEL, NB_BLOCK.navy, 'order-last m-3 mt-0 mb-[calc(var(--lc-teacher-bar-h,0px)+0.75rem)] flex shrink-0 flex-wrap items-center gap-3 p-3')}
+    >
+      <h2 id="practice-run-card-title" className="min-w-0 flex-1 font-neo-display text-lg font-black leading-tight">{t('eduLiveRoom.practice.title')}</h2>
+      {status}
+      <div className="flex w-full items-center gap-2">
+        <div className="flex-1 [&>a]:w-full">{openTab}</div>
+        {hide}
+      </div>
+    </section>
   );
 }
 

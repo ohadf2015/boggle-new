@@ -6,6 +6,13 @@
  * else — and the only page that accepts it, /[locale]/join/[code], is not
  * guessable. The bare domain has no code box at all. Carry the destination.
  */
+const SITE_LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
+
+/** Students land in the class's language; the teacher's UI language is only the fallback. */
+export function inviteLocale(classLanguage: string | null | undefined, uiLanguage: string): string {
+  return classLanguage && SITE_LOCALES.includes(classLanguage) ? classLanguage : uiLanguage;
+}
+
 /** The page a student opens to join this classroom's roster. */
 export function classroomJoinUrl(origin: string, language: string, code: string): string {
   const base = origin.replace(/\/$/, '');

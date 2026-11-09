@@ -5,7 +5,8 @@
 
 import { cookies } from 'next/headers';
 import { NextRequest } from 'next/server';
-import { getAuthedUser } from '@/lib/auth/getAuthedUser';
+import { decodeJwt } from 'jose';
+import { cookieAccessToken, getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { isQaEmail } from '@/backend/utils/educationRoundTelemetry';
 import { isAnyTestAccount } from '@/lib/education/eduTestAccount';
 import { createAdminClient } from '@/utils/supabase/admin';
@@ -25,12 +26,25 @@ async function hasSession(): Promise<boolean> {
   return hasAuthSessionCookie(jar.getAll().map((cookie) => cookie.name));
 }
 
+/** Unverified read is enough: the claim can only make us skip the auto-join, never grant one. */
+export function isAnonymousAccessToken(token: string | null): boolean {
+  if (!token) return false;
+  try {
+    return decodeJwt(token).is_anonymous === true;
+  } catch {
+    return false;
+  }
+}
+
 async function currentUser(): Promise<SignedInJoinUser | null> {
   // Cookie session. getAuthedUser's bearer fast-path does not apply on a
   // document request; the slow path reads the same cookies this page has.
   const user = await getAuthedUser(new Request('https://www.lexiclash.live/join'));
   if (!user) return null;
-  return { id: user.id, email: user.email };
+  const jar = await cookies();
+  const cookie = jar.getAll().map((c) => `${c.name}=${encodeURIComponent(c.value)}`).join('; ');
+  const token = await cookieAccessToken({ headers: new Headers({ cookie }) });
+  return { id: user.id, email: user.email, isAnonymous: isAnonymousAccessToken(token) };
 }
 
 async function joinClassroom(code: string): Promise<SignedInJoinOutcome> {
@@ -94,6 +108,8 @@ export async function autoJoinSignedInStudent(
     if (!(await deps.hasSession())) return null;
     const user = await deps.currentUser();
     if (!user?.id) return null;
+    // The client asks "Continue as …?" first; a silent redirect would enrol the previous student.
+    if (user.isAnonymous) return null;
     return await completeSignedInJoin({
       locale,
       code: rawCode,

@@ -16,7 +16,7 @@ function StudentQuickPlay() {
 
 export default function StudentQuickPlayPageClient() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-neo-navy" />}>
+    <Suspense fallback={<div className="min-h-dvh bg-neo-navy" />}>
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-neo-navy">
         <StudentQuickPlay />
       </div>

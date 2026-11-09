@@ -116,7 +116,7 @@ export function LobbyModeSwitcher({
         {showName && (
           <span
             data-testid="lobby-change-mode-tag"
-            className="rounded-md border-2 border-neo-black bg-neo-lime px-1.5 py-0.5 font-neo-display text-xs font-black uppercase leading-none tracking-wide text-neo-black md:px-[0.4vw] md:text-[clamp(0.75rem,0.72vw,4rem)]"
+            className="rounded-neo border-2 border-neo-black bg-neo-lime px-1.5 py-0.5 font-neo-display text-xs font-black uppercase leading-none tracking-wide text-neo-black md:px-[0.4vw] md:text-[clamp(0.75rem,0.72vw,4rem)]"
           >
             {t('education.modePicker.change')}
           </span>
