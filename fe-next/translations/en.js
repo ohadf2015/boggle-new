@@ -21157,7 +21157,7 @@ const en = {
       "noAccount": "Students join with no account",
       "showProjector": "Show on projector",
       "backHome": "Back to Home",
-      "plan": {"title": "Not with your class right now?", "body": "Put the first game on your calendar. The event has the student join link and a one-tap Start, so it's ready when your class is.", "when": "When's your class?", "google": "Add to Google Calendar", "ics": "Apple or Outlook (.ics)", "added": "On your calendar. See you in class!", "eventTitle": "LexiClash word game with {name}", "eventStudents": "Students join here, no account: {url} (code {code})", "eventStart": "Start the game: {url}"},
+      "plan": {"title": "Not with your class right now?", "body": "Put the first game on your calendar. The event has the student join link and a one-tap Start, so it's ready when your class is.", "when": "When's your class?", "google": "Add to Google Calendar", "ics": "Apple or Outlook (.ics)", "added": "On your calendar. See you in class!", "eventTitle": "LexiClash word game with {name}", "eventStudents": "Students join here, no account: {url} (code {code})", "eventStart": "Start the game: {url}", "homeTitle": "Or send the link now.", "homeBody": "Students who join from home practise this class's word list.", "homeCta": "Send the link"},
       "firstRound": {
         "title": "Run your first round: 2 minutes",
         "step1": "Practice alone against bots (private, no students)",

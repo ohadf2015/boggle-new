@@ -2,8 +2,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
-const tel = vi.hoisted(() => ({ scheduled: vi.fn() }));
-vi.mock('@/lib/education/firstGamePlanTelemetry', () => ({ trackFirstGameScheduled: tel.scheduled }));
+const tel = vi.hoisted(() => ({ scheduled: vi.fn(), homeLink: vi.fn() }));
+vi.mock('@/lib/education/firstGamePlanTelemetry', () => ({ trackFirstGameScheduled: tel.scheduled, trackHomePracticeLinkSent: tel.homeLink }));
 
 import { FirstGamePlanCard } from '../FirstGamePlanCard';
 
@@ -61,5 +61,19 @@ describe('FirstGamePlanCard', () => {
     fireEvent.click(screen.getByTestId('first-game-plan-google'));
     fireEvent.change(screen.getByTestId('first-game-plan-when'), { target: { value: '2030-01-07T10:30' } });
     expect(screen.queryByTestId('first-game-plan-added')).toBeNull();
+  });
+
+  it('Given the class has a word list, Then a second way shows: send the link now so students practise at home', () => {
+    const send = vi.fn();
+    render(<FirstGamePlanCard {...props} onSendHomeLink={send} />);
+    expect(screen.getByTestId('first-game-plan-home')).toHaveTextContent('eduShell.setup.plan.homeTitle');
+    fireEvent.click(screen.getByTestId('first-game-plan-home-send'));
+    expect(send).toHaveBeenCalledTimes(1);
+    expect(tel.homeLink).toHaveBeenCalledWith({ classroomId: 'c1', locale: 'en' });
+  });
+
+  it('Given no word list on the class, Then there is no home-practice row, since students would have nothing to practise', () => {
+    render(<FirstGamePlanCard {...props} />);
+    expect(screen.queryByTestId('first-game-plan-home')).toBeNull();
   });
 });

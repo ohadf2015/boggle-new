@@ -23,3 +23,11 @@ export function trackFirstGameScheduled(args: {
     locale: args.locale,
   });
 }
+
+/**
+ * `edu_home_practice_link_sent` { classroom_id, locale }: the teacher chose "send the link now"
+ * so students practise the class word list at home instead of waiting for a live game.
+ */
+export function trackHomePracticeLinkSent(args: { classroomId: string; locale: string }): void {
+  safeCapture('edu_home_practice_link_sent', { classroom_id: args.classroomId, locale: args.locale });
+}

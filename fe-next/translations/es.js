@@ -22124,7 +22124,7 @@ const es = {
       "noAccount": "Los alumnos entran sin cuenta",
       "showProjector": "Mostrar en el proyector",
       "backHome": "Volver al inicio",
-      "plan": {"title": "¿No estás con tu clase ahora?", "body": "Pon el primer juego en tu calendario. El evento lleva el enlace para que se unan los alumnos y un botón para empezar con un toque, así está listo cuando llegue tu clase.", "when": "¿Cuándo es tu clase?", "google": "Añadir a Google Calendar", "ics": "Apple u Outlook (.ics)", "added": "Ya está en tu calendario. ¡Nos vemos en clase!", "eventTitle": "Juego de palabras de LexiClash con {name}", "eventStudents": "Los alumnos se unen aquí, sin cuenta: {url} (código {code})", "eventStart": "Empezar el juego: {url}"},
+      "plan": {"title": "¿No estás con tu clase ahora?", "body": "Pon el primer juego en tu calendario. El evento lleva el enlace para que se unan los alumnos y un botón para empezar con un toque, así está listo cuando llegue tu clase.", "when": "¿Cuándo es tu clase?", "google": "Añadir a Google Calendar", "ics": "Apple u Outlook (.ics)", "added": "Ya está en tu calendario. ¡Nos vemos en clase!", "eventTitle": "Juego de palabras de LexiClash con {name}", "eventStudents": "Los alumnos se unen aquí, sin cuenta: {url} (código {code})", "eventStart": "Empezar el juego: {url}", "homeTitle": "O envía el enlace ahora.", "homeBody": "Los alumnos que se unen desde casa practican la lista de palabras de la clase.", "homeCta": "Enviar el enlace"},
       "firstRound": {
         "title": "Haz tu primera ronda — 2 minutos",
         "step1": "Practica a solas contra bots (privado, sin alumnos)",
