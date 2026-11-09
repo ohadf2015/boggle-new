@@ -40,6 +40,7 @@ vi.mock('@/hooks/useMasterMute', () => ({ useMasterMute: () => ({ allMuted: fals
 vi.mock('@/contexts/NavigationContext', () => ({ useRegisterHeaderAudioControl: () => {} }));
 vi.mock('@/components/ui/AnimatedCounter', () => ({ __esModule: true, default: ({ value }: { value: number }) => <span>{value}</span> }));
 vi.mock('next/dynamic', () => ({ __esModule: true, default: () => () => null }));
+vi.mock('@/components/auth/InlineSignupCard', () => ({ __esModule: true, default: () => null }));
 vi.mock('@/components/ads/ResultsBannerSlot', () => ({
   __esModule: true,
   default: (props: Record<string, unknown>) => {

@@ -45,6 +45,8 @@ interface InlineSignupCardProps {
   analyticsSource?: string;
   /** Drop the benefits list + stats teaser (tight layouts, e.g. MP results). */
   compact?: boolean;
+  /** Laid out but not on screen yet (skips the completion gate for layout only): no impression is counted and nothing is emitted until released. */
+  held?: boolean;
 }
 
 const benefits: AuthBenefit[] = [
@@ -66,6 +68,7 @@ const InlineSignupCard: React.FC<InlineSignupCardProps> = ({
   onCTAClick,
   analyticsSource,
   compact = false,
+  held = false,
 }) => {
   const { t } = useLanguage();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
@@ -94,11 +97,12 @@ const InlineSignupCard: React.FC<InlineSignupCardProps> = ({
   const isCappedSurface = analyticsSource === 'results_inline';
   const [capped, setCapped] = useState<boolean>(() => isCappedSurface && isResultsInlineCapped());
 
-  const visible = !isAuthenticated && !isOnCrazyGamesPlatform && gameCompleted && !capped;
+  const eligible = !isAuthenticated && !isOnCrazyGamesPlatform && !capped;
+  const visible = eligible && gameCompleted;
 
   const shownRef = useRef(false);
   useEffect(() => {
-    if (!visible || !analyticsSource || shownRef.current) return;
+    if (held || !visible || !analyticsSource || shownRef.current) return;
     if (isCappedSurface) {
       // Race guard: another mount may have burnt the last impression since
       // this one initialized — never emit (or render) past the cap.
@@ -126,7 +130,7 @@ const InlineSignupCard: React.FC<InlineSignupCardProps> = ({
       surface: analyticsSource,
       trigger: analyticsSource,
     });
-  }, [visible, analyticsSource, isCappedSurface]);
+  }, [held, visible, analyticsSource, isCappedSurface]);
 
   const latch = () => {
     if (analyticsSource) latchSignupSource(analyticsSource);
@@ -138,7 +142,7 @@ const InlineSignupCard: React.FC<InlineSignupCardProps> = ({
     signIn(provider);
   };
 
-  if (!visible) return null;
+  if (!visible && !(held && eligible)) return null;
 
   const guestStats = getGuestStatsSummary();
 

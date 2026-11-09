@@ -11,6 +11,9 @@ vi.mock('next/image', () => ({
   default: (p: Record<string, unknown>) => <img {...(p as React.ImgHTMLAttributes<HTMLImageElement>)} />,
 }));
 
+const track = vi.hoisted(() => vi.fn());
+vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: track }));
+
 vi.mock('@/components/ui/AnimatedCounter', () => ({
   default: ({ value }: { value: number }) => <span>{value}</span>,
 }));
@@ -114,5 +117,23 @@ describe('MpMyCard callout (one rivalry line + badge)', () => {
   it('Given hideClassPosition, Then no callout (it reveals the placing)', () => {
     render(<MpMyCard {...base} hideClassPosition callout={{ kind: 'beat', name: 'Leo', points: 30 }} />);
     expect(screen.queryByTestId('mp-my-callout')).toBeNull();
+  });
+});
+
+describe('MpMyCard keeps its height across the reveal (mobile CLS)', () => {
+  it('Given reward and missed-word lines, When the card is not yet revealed, Then both lines are already laid out inside the hidden card', () => {
+    render(<MpMyCard {...base} revealed={false} xp={40} bestMissed={{ word: 'stranger', letters: 8, points: 500 }} />);
+    expect(screen.getByTestId('mp-my-card').className).toMatch(/\binvisible\b/);
+    expect(screen.getByTestId('results-reward-line')).toBeTruthy();
+    expect(screen.getByTestId('best-missed-word')).toBeTruthy();
+  });
+
+  it('Given the hidden card, When it is revealed later, Then the "shown" events fire only on the reveal', () => {
+    track.mockClear();
+    const props = { ...base, xp: 40, bestMissed: { word: 'stranger', letters: 8, points: 500 } };
+    const { rerender } = render(<MpMyCard {...props} revealed={false} />);
+    expect(track).not.toHaveBeenCalled();
+    rerender(<MpMyCard {...props} revealed />);
+    expect(track.mock.calls.map((c) => c[0]).sort()).toEqual(['best_missed_word_shown', 'results_reward_line_shown']);
   });
 });
