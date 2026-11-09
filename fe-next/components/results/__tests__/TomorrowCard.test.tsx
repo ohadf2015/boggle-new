@@ -1,26 +1,35 @@
 /**
- * TomorrowCard — RED phase (t_89663cfc "Streak Ignition")
+ * TomorrowCard — post-game daily streak / tomorrow hook.
  *
- * Replaces the 3s auto-dismissing TomorrowPreview banner for first-session
- * players with a persistent card: tomorrow's Daily Challenge + a live
- * countdown to LOCAL midnight. Fires `growth:tomorrow_card_shown` once per
- * view with the seconds remaining.
+ * Persistent card after every finished game (not first-session only): finish
+ * today's remaining daily, or keep-streak countdown once today's hub is done.
+ * Dismissible for the session; CTA navigates to /{locale}/daily.
  */
 
-import { render, screen, act } from '@testing-library/react';
+import { render, screen, act, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
-const { mockTrackGrowthEvent, mockReadGamesCompletedCount } = vi.hoisted(() => ({
+const { mockTrackGrowthEvent, mockIsDailyHubDoneLocally } = vi.hoisted(() => ({
   mockTrackGrowthEvent: vi.fn(),
-  mockReadGamesCompletedCount: vi.fn(),
+  mockIsDailyHubDoneLocally: vi.fn(),
 }));
 
 vi.mock('@/utils/growthTracking', () => ({
   trackGrowthEvent: (...args: any[]) => mockTrackGrowthEvent(...args),
 }));
 
-vi.mock('@/utils/gamesCompletedCount', () => ({
-  readGamesCompletedCount: () => mockReadGamesCompletedCount(),
+vi.mock('@/lib/results/isDailyHubDoneLocally', () => ({
+  isDailyHubDoneLocally: (...args: any[]) => mockIsDailyHubDoneLocally(...args),
+}));
+
+vi.mock('@/hooks/useWinStreak', () => ({
+  useWinStreak: () => ({ currentStreak: 0, isLoaded: true }),
+}));
+
+vi.mock('next/link', () => ({
+  default: ({ href, children, ...rest }: any) => (
+    <a href={href} {...rest}>{children}</a>
+  ),
 }));
 
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -29,8 +38,16 @@ vi.mock('@/contexts/LanguageContext', () => ({
       if (key === 'results.tomorrowCard.countdown' && params) {
         return `New puzzle in ${params.time}`;
       }
+      if (key === 'results.tomorrowCard.streakLabel' && params) {
+        return `Day ${params.n}`;
+      }
       const translations: Record<string, string> = {
         'results.tomorrowCard.title': 'TOMORROW: new Daily Challenge',
+        'results.tomorrowCard.titleFinish': 'Finish today\'s daily',
+        'results.tomorrowCard.titleKeep': 'Streak safe',
+        'results.tomorrowCard.ctaFinish': 'Play daily',
+        'results.tomorrowCard.ctaKeep': 'See tomorrow\'s daily',
+        'results.tomorrowCard.dismiss': 'Dismiss',
       };
       return translations[key] || key;
     },
@@ -41,46 +58,82 @@ vi.mock('@/contexts/LanguageContext', () => ({
 
 import TomorrowCard, { formatCountdown, getSecondsToMidnight } from '../TomorrowCard';
 
+const DISMISS_KEY = 'lc:tomorrow-card-dismissed';
+
 describe('TomorrowCard', () => {
   beforeEach(() => {
     mockTrackGrowthEvent.mockClear();
-    mockReadGamesCompletedCount.mockReturnValue(1);
+    mockIsDailyHubDoneLocally.mockReturnValue(false);
+    sessionStorage.clear();
   });
 
   afterEach(() => {
     vi.useRealTimers();
   });
 
-  it('renders the title and a live hh:mm:ss countdown for a first-session player', () => {
-    render(<TomorrowCard />);
+  it('renders finish-today variant for returning players when daily is open', () => {
+    render(<TomorrowCard source="solo" streak={3} isStreakLoaded />);
 
-    expect(screen.getByText('TOMORROW: new Daily Challenge')).toBeInTheDocument();
+    expect(screen.getByText("Finish today's daily")).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Play daily' })).toHaveAttribute('href', '/en/daily');
+    expect(screen.getByText('Day 3')).toBeInTheDocument();
+  });
+
+  it('renders keep-streak countdown when daily is already done', () => {
+    render(<TomorrowCard source="solo" dailyDoneToday streak={5} isStreakLoaded />);
+
+    expect(screen.getByText('Streak safe')).toBeInTheDocument();
     expect(screen.getByTestId('tomorrow-countdown').textContent).toMatch(
       /^New puzzle in \d{2}:\d{2}:\d{2}$/,
     );
+    expect(screen.getByRole('link', { name: "See tomorrow's daily" })).toHaveAttribute('href', '/en/daily');
   });
 
-  it('fires growth:tomorrow_card_shown once with seconds_to_midnight', () => {
-    render(<TomorrowCard />);
+  it('fires growth:tomorrow_card_shown once with variant + source props', () => {
+    render(<TomorrowCard source="mp" dailyDoneToday={false} streak={2} isStreakLoaded />);
 
     expect(mockTrackGrowthEvent).toHaveBeenCalledTimes(1);
     const [event, data] = mockTrackGrowthEvent.mock.calls[0];
     expect(event).toBe('tomorrow_card_shown');
+    expect(data.variant).toBe('finish-today');
+    expect(data.source).toBe('mp');
+    expect(data.daily_done).toBe(false);
+    expect(data.streak).toBe(2);
     expect(data.seconds_to_midnight).toBeGreaterThan(0);
-    expect(data.seconds_to_midnight).toBeLessThanOrEqual(86400);
   });
 
-  it('does not render for returning players (second game onwards)', () => {
-    mockReadGamesCompletedCount.mockReturnValue(5);
-    const { container } = render(<TomorrowCard />);
-
-    expect(container).toBeEmptyDOMElement();
-    expect(mockTrackGrowthEvent).not.toHaveBeenCalled();
+  it('fires postgame_daily_cta_clicked on CTA click', () => {
+    render(<TomorrowCard source="solo" dailyDoneToday={false} streak={0} isStreakLoaded />);
+    fireEvent.click(screen.getByRole('link', { name: 'Play daily' }));
+    expect(mockTrackGrowthEvent).toHaveBeenCalledWith('postgame_daily_cta_clicked', {
+      variant: 'finish-today',
+      source: 'solo',
+    });
   });
 
-  it('ticks the countdown down every second', () => {
+  it('hides after dismiss and remembers for the session', () => {
+    const { rerender } = render(<TomorrowCard source="solo" dailyDoneToday={false} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Dismiss' }));
+    expect(sessionStorage.getItem(DISMISS_KEY)).toBe('1');
+    expect(screen.queryByText("Finish today's daily")).not.toBeInTheDocument();
+
+    rerender(<TomorrowCard source="solo" dailyDoneToday={false} />);
+    expect(screen.queryByText("Finish today's daily")).not.toBeInTheDocument();
+  });
+
+  it('does not invent a streak line before load or when streak is 0', () => {
+    const { rerender } = render(
+      <TomorrowCard source="solo" dailyDoneToday={false} streak={0} isStreakLoaded={false} />,
+    );
+    expect(screen.queryByText(/Day /)).not.toBeInTheDocument();
+
+    rerender(<TomorrowCard source="solo" dailyDoneToday={false} streak={0} isStreakLoaded />);
+    expect(screen.queryByText(/Day /)).not.toBeInTheDocument();
+  });
+
+  it('ticks the countdown down every second on keep-streak', () => {
     vi.useFakeTimers();
-    render(<TomorrowCard />);
+    render(<TomorrowCard source="solo" dailyDoneToday streak={1} isStreakLoaded />);
 
     const before = screen.getByTestId('tomorrow-countdown').textContent;
     act(() => {
@@ -92,21 +145,57 @@ describe('TomorrowCard', () => {
   });
 });
 
-describe('getSecondsToMidnight', () => {
-  it('counts seconds to the next LOCAL midnight', () => {
-    const now = new Date(2026, 7, 17, 23, 0, 0); // local 23:00
+describe('getSecondsToMidnight (UTC board identity)', () => {
+  it('counts seconds to the next UTC midnight, not local', () => {
+    // 2026-08-17 23:00 UTC → 1h to UTC midnight (local TZ must not matter)
+    const now = new Date(Date.UTC(2026, 7, 17, 23, 0, 0));
     expect(getSecondsToMidnight(now)).toBe(3600);
   });
 
-  it('is a full day just after midnight', () => {
-    const now = new Date(2026, 7, 17, 0, 0, 1);
-    expect(getSecondsToMidnight(now)).toBe(86399);
+  it('is correct near Asia/Jerusalem evening (UTC+2/+3) when local midnight would be early', () => {
+    // 21:00 UTC = 00:00 Israel summer (+3) local midnight — LOCAL helper would say 0;
+    // UTC board still has 3h left.
+    const now = new Date(Date.UTC(2026, 7, 17, 21, 0, 0));
+    expect(getSecondsToMidnight(now)).toBe(3 * 3600);
+  });
+
+  it('is correct for US Pacific evening vs UTC day boundary', () => {
+    // 2026-08-17 02:00 UTC = previous calendar evening in US — still same UTC day → almost 22h left
+    const now = new Date(Date.UTC(2026, 7, 17, 2, 0, 0));
+    expect(getSecondsToMidnight(now)).toBe(22 * 3600);
+  });
+
+  it('hits zero at the UTC boundary', () => {
+    const now = new Date(Date.UTC(2026, 7, 18, 0, 0, 0));
+    // Exactly midnight UTC → next midnight is 24h away
+    expect(getSecondsToMidnight(now)).toBe(24 * 3600);
+  });
+});
+
+
+describe('TomorrowCard UTC rollover refresh', () => {
+  it('re-reads daily-complete after UTC midnight so copy flips off keep-streak', () => {
+    vi.useFakeTimers();
+    // Start 2s before UTC midnight with hub marked done
+    const justBefore = Date.UTC(2026, 7, 17, 23, 59, 58);
+    vi.setSystemTime(justBefore);
+    mockIsDailyHubDoneLocally.mockReturnValue(true);
+
+    render(<TomorrowCard source="solo" streak={4} isStreakLoaded />);
+    expect(screen.getByText('Streak safe')).toBeInTheDocument();
+
+    // After UTC rollover the hub key is a new day → not done
+    mockIsDailyHubDoneLocally.mockReturnValue(false);
+    act(() => {
+      vi.advanceTimersByTime(3000);
+    });
+    expect(screen.getByText("Finish today's daily")).toBeInTheDocument();
+    expect(screen.queryByTestId('tomorrow-countdown')).not.toBeInTheDocument();
   });
 });
 
 describe('formatCountdown', () => {
-  it('formats hh:mm:ss with padded units', () => {
-    expect(formatCountdown(7 * 3600 + 42 * 60 + 18, 'en')).toBe('07:42:18');
-    expect(formatCountdown(0, 'en')).toBe('00:00:00');
+  it('formats hh:mm:ss with padded digits', () => {
+    expect(formatCountdown(3661, 'en')).toBe('01:01:01');
   });
 });

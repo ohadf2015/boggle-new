@@ -247,7 +247,7 @@ export function useMpResultsController(props: MpResultsProps) {
     handleStartGame();
   }, [onResetSeries, handleStartGame]);
 
-  const showDailyInvite = shouldShowDailyInvite({ isGuest, gameCode, isBotsOnlyGame: data.isBotsOnlyGame, isSeriesComplete });
+  const showDailyInvite = shouldShowDailyInvite({ isGuest, gameCode, isBotsOnlyGame: data.isBotsOnlyGame, isSeriesComplete, isClassroom });
   useGameKeyboardShortcuts({
     onRematch: onReturnToRoom || undefined,
     onEscape: requestExit,

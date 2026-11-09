@@ -8139,7 +8139,13 @@ const ru = {
     },
     "tomorrowCard": {
       "title": "ЗАВТРА: новый ежедневный вызов",
-      "countdown": "Новый пазл через {time}"
+      "titleFinish": "Завершите дневное задание",
+      "titleKeep": "Серия в безопасности",
+      "countdown": "Новая головоломка через {time}",
+      "ctaFinish": "Играть дневное",
+      "ctaKeep": "Смотреть завтрашнее",
+      "dismiss": "Закрыть",
+      "streakLabel": "День {n}"
     },
     "saveStreak": {
       "title": "Сохранить серию",
