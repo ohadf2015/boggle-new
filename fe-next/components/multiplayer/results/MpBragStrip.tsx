@@ -120,7 +120,7 @@ export function MpBragStrip({
     const io = new IntersectionObserver(
       (entries) => {
         if (impressed.current) return;
-        if (entries.some((e) => e.isIntersecting && e.intersectionRatio > 0)) {
+        if (entries.some((e) => e.isIntersecting && e.intersectionRatio >= 0.25)) {
           impressed.current = true;
           trackGrowthEvent('mp_brag_card_viewed', {
             gameMode: gameMode ?? 'unknown',

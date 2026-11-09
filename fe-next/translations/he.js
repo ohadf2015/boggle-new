@@ -20950,15 +20950,11 @@ const he = {
       "leave": "יציאה",
       "share": "שיתוף",
       "challenge": "אתגר",
-      "showdown": {
-        "title": "הצגת מילים",
-        "onlyYou": "רק אתה",
-        "more": "+{count} נוספות"
-      },
-      "h2h": {
-        "record": "אתה {mine}–{theirs} {name}",
-        "firstMeeting": "מפגש ראשון"
-      },
+      "showdownTitle": "הצגת מילים",
+      "showdownOnlyYou": "רק אתה",
+      "showdownMore": "+{count} נוספות",
+      "h2hRecord": "אתה {mine}–{theirs} {name}",
+      "h2hFirstMeeting": "מפגש ראשון",
       "seriesChampion": "אלוף/ת הסדרה",
       "teacherPaced": "המורה יתחיל/תתחיל את המשחק הבא",
       "calloutPhotoWon": "פוטו פיניש! ניצחת את {name} ב-{points}",

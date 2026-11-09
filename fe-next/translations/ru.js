@@ -20720,15 +20720,11 @@ const ru = {
       "leave": "Выйти",
       "share": "Поделиться",
       "challenge": "Вызов",
-      "showdown": {
-        "title": "Дуэль слов",
-        "onlyYou": "Только ты",
-        "more": "+{count} ещё"
-      },
-      "h2h": {
-        "record": "Ты {mine}–{theirs} {name}",
-        "firstMeeting": "Первая встреча"
-      },
+      "showdownTitle": "Дуэль слов",
+      "showdownOnlyYou": "Только ты",
+      "showdownMore": "+{count} ещё",
+      "h2hRecord": "Ты {mine}–{theirs} {name}",
+      "h2hFirstMeeting": "Первая встреча",
       "seriesChampion": "Чемпион серии",
       "teacherPaced": "Учитель запустит следующую игру",
       "calloutPhotoWon": "Фотофиниш! Победа над {name} с разницей {points}",

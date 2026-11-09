@@ -21020,15 +21020,11 @@ const ja = {
       "leave": "退出",
       "share": "シェア",
       "challenge": "チャレンジ",
-      "showdown": {
-        "title": "ワード対決",
-        "onlyYou": "あなただけ",
-        "more": "+{count}"
-      },
-      "h2h": {
-        "record": "あなた {mine}–{theirs} {name}",
-        "firstMeeting": "初対戦"
-      },
+      "showdownTitle": "ワード対決",
+      "showdownOnlyYou": "あなただけ",
+      "showdownMore": "+{count}",
+      "h2hRecord": "あなた {mine}–{theirs} {name}",
+      "h2hFirstMeeting": "初対戦",
       "seriesChampion": "シリーズ王者",
       "teacherPaced": "先生が次のゲームを始めます",
       "calloutPhotoWon": "写真判定！{name}に{points}点差で勝利",

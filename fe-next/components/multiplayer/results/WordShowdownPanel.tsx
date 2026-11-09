@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { Fingerprint } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { selectUniqueWords } from '@/lib/results/selectUniqueWords';
@@ -53,22 +53,28 @@ export function WordShowdownPanel({
     hideOutcome,
   });
 
+  // Scores can re-render as late standings arrive — fire the impression once
+  // per mounted match identity (mode+playerCount+username), not on every chip update.
+  const impressedKeyRef = useRef<string | null>(null);
   useEffect(() => {
     if (!show) return;
+    const key = `${mode}|${playerCount}|${username}`;
+    if (impressedKeyRef.current === key) return;
+    impressedKeyRef.current = key;
     trackGrowthEvent('word_showdown_shown', {
       uniqueCount: chips.length,
       hasBestMissed: !!bestMissed,
       mode,
       playerCount,
     });
-  }, [show, chips.length, bestMissed, mode, playerCount]);
+  }, [show, chips.length, bestMissed, mode, playerCount, username]);
 
   if (!show) return null;
 
   return (
     <section
       data-testid="mp-word-showdown"
-      aria-label={t('mpUi.results.showdown.title')}
+      aria-label={t('mpUi.results.showdownTitle')}
       className={cn(
         'rounded-neo border-[3px] border-neo-cyan/50 bg-neo-navy/70 p-[calc(10px*var(--mp-u,1))] shadow-hard-sm',
         className,
@@ -78,7 +84,7 @@ export function WordShowdownPanel({
         <div className="flex items-center gap-2">
           <Fingerprint aria-hidden="true" className="w-4 h-4 text-neo-cyan shrink-0" />
           <h3 className="text-[calc(12px*var(--mp-u,1))] font-neo-display font-black uppercase tracking-wide text-neo-white">
-            {t('mpUi.results.showdown.onlyYou')}
+            {t('mpUi.results.showdownOnlyYou')}
           </h3>
           <span className="ms-auto text-[calc(11px*var(--mp-u,1))] font-bold text-neo-cyan tabular-nums">
             {uniques.length}
@@ -96,7 +102,7 @@ export function WordShowdownPanel({
           ))}
           {uniques.length > chips.length && (
             <li className="inline-flex items-center px-1 text-[calc(11px*var(--mp-u,1))] font-bold text-neo-cream/70">
-              {t('mpUi.results.showdown.more', { count: uniques.length - chips.length })}
+              {t('mpUi.results.showdownMore', { count: uniques.length - chips.length })}
             </li>
           )}
         </ul>

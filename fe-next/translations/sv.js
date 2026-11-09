@@ -21020,15 +21020,11 @@ const sv = {
       "leave": "Lämna",
       "share": "Dela",
       "challenge": "Utmana",
-      "showdown": {
-        "title": "Orduell",
-        "onlyYou": "Bara du",
-        "more": "+{count} till"
-      },
-      "h2h": {
-        "record": "Du {mine}–{theirs} {name}",
-        "firstMeeting": "Första mötet"
-      },
+      "showdownTitle": "Orduell",
+      "showdownOnlyYou": "Bara du",
+      "showdownMore": "+{count} till",
+      "h2hRecord": "Du {mine}–{theirs} {name}",
+      "h2hFirstMeeting": "Första mötet",
       "seriesChampion": "Seriemästare",
       "teacherPaced": "Din lärare startar nästa spel",
       "calloutPhotoWon": "Fotofinish! Du slog {name} med {points}",

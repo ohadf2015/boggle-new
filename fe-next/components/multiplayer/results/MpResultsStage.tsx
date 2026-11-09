@@ -223,7 +223,13 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   const rival = useMemo(() => calloutRival(boardRows), [boardRows]);
   const h2hLive = useRivalHeadToHead(rival, c.isAuthenticated && !c.isGuest);
   const h2h = useFrozenAfter(h2hLive, seen('card'));
-  const callout = useMemo(() => resultCallout({ rows: boardRows, uniqueCount, h2h }), [boardRows, uniqueCount, h2h]);
+  // One H2H source: footer strip owns the record when meetings >= 2 so MpMyCard
+  // callout does not reprint the same line.
+  const showH2hStrip = !!h2h && h2h.meetings >= 2 && !hideOutcome && !c.isClassroom;
+  const callout = useMemo(
+    () => resultCallout({ rows: boardRows, uniqueCount, h2h: showH2hStrip ? null : h2h }),
+    [boardRows, uniqueCount, h2h, showH2hStrip],
+  );
   const rivalFriend = useMemo(() => {
     if (!rival?.userId) return null;
     return friends.find((f) => f.odUserId === rival.userId) ?? null;
@@ -248,10 +254,12 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
     challengeType: 'new_game' | 'join_room',
     settings?: { language?: string; timerSeconds?: number; mode?: string; message?: string; flow?: 'async' | 'live' },
   ) => {
+    // Results only offers live (allowedFlows=['live']). Async would promise a
+    // score-to-beat path this surface does not implement — reject rather than
+    // fake success via share modal.
     if (settings?.flow === 'async') {
-      setShowShareModal(true);
-      setChallengeFriend(null);
-      return;
+      toast.error(t('friends.errors.sendFailed'));
+      throw new Error('ASYNC_UNSUPPORTED_ON_RESULTS');
     }
     if (!challengeSocket || !challengeConnected) {
       toast.error(t('friends.errors.sendFailed'));
@@ -274,7 +282,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
     }
     toast.success(t('friends.challenges.sent'));
     setChallengeFriend(null);
-  }, [challengeSocket, challengeConnected, t, gameCode, setShowShareModal]);
+  }, [challengeSocket, challengeConnected, t, gameCode]);
   const champions = series?.champions ?? NO_CHAMPIONS;
   // The album (desktop/TV): the series final tells the series round by round;
   // otherwise the round is told as three awards.
@@ -378,7 +386,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
           t={t}
         />
         </div>
-        {username && seen('card') && !classroomStudent && (
+        {username && seen('card') && !c.isClassroom && (
           <WordShowdownPanel
             allPlayerWords={c.allPlayerWords}
             username={username}
@@ -390,10 +398,10 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
             t={t}
           />
         )}
-        {seen('card') && h2h && h2h.meetings > 0 && !hideOutcome && !classroomStudent && (
-          <MpH2HStrip h2h={h2h} onRematch={rematch} className={fx.cardIn} t={t} />
+        {seen('card') && showH2hStrip && (
+          <MpH2HStrip h2h={h2h!} onRematch={rematch} className={fx.cardIn} t={t} />
         )}
-        {branch === 'final' && seen('card') && !classroomStudent && !hideOutcome && me && username && data.sortedScores.length >= 2 && (
+        {branch === 'final' && seen('card') && !c.isClassroom && !hideOutcome && me && username && data.sortedScores.length >= 2 && (
           <MpBragStrip
             visible
             gameCode={gameCode}
@@ -465,7 +473,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
       {footerShown ? (
         <div className={fx.footerUp}>
           {branch === 'final' ? (
-            <MpFinalFooter isHost={isHost} isReady={isReady} onRematch={rematch} onLeave={c.requestExit} onShare={() => setShowShareModal(true)} onChallenge={classroomStudent ? undefined : openChallenge} leaveKey={exitCopy.leaveKey} auto={auto} t={t} />
+            <MpFinalFooter isHost={isHost} isReady={isReady} onRematch={rematch} onLeave={c.requestExit} onShare={() => setShowShareModal(true)} onChallenge={c.isClassroom ? undefined : openChallenge} leaveKey={exitCopy.leaveKey} auto={auto} t={t} />
           ) : (
             <MpIntermissionFooter
               isHost={isHost}
@@ -537,6 +545,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
           friendId={challengeFriend.odUserId}
           onClose={() => setChallengeFriend(null)}
           onSendChallenge={handleSendChallenge}
+          allowedFlows={['live']}
         />
       )}
     </>

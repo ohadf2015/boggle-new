@@ -21032,15 +21032,11 @@ const es = {
       "leave": "Salir",
       "share": "Compartir",
       "challenge": "Desafío",
-      "showdown": {
-        "title": "Duelo de palabras",
-        "onlyYou": "Solo tú",
-        "more": "+{count} más"
-      },
-      "h2h": {
-        "record": "Tú {mine}–{theirs} {name}",
-        "firstMeeting": "Primer enfrentamiento"
-      },
+      "showdownTitle": "Duelo de palabras",
+      "showdownOnlyYou": "Solo tú",
+      "showdownMore": "+{count} más",
+      "h2hRecord": "Tú {mine}–{theirs} {name}",
+      "h2hFirstMeeting": "Primer enfrentamiento",
       "seriesChampion": "Campeón de la serie",
       "teacherPaced": "Tu profe empieza la siguiente partida",
       "calloutPhotoWon": "¡Foto finish! Le ganaste a {name} por {points}",

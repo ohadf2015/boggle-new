@@ -23,6 +23,12 @@ interface ChallengeInviteDialogProps {
     challengeType: 'new_game' | 'join_room',
     settings: GameSettings
   ) => Promise<void>;
+  /**
+   * Flows the caller can actually deliver. Results only supports live
+   * (sendChallengeWithAck); offering async would promise a score-to-beat path
+   * the parent does not implement. Default both for FriendsList.
+   */
+  allowedFlows?: ReadonlyArray<ChallengeFlow>;
   className?: string;
 }
 
@@ -71,11 +77,15 @@ export const ChallengeInviteDialog: React.FC<ChallengeInviteDialogProps> = ({
   friendId,
   onClose,
   onSendChallenge,
+  allowedFlows = ['async', 'live'],
   className,
 }) => {
   const { t, language } = useLanguage();
+  const flows = allowedFlows.length > 0 ? allowedFlows : (['live'] as const);
+  const defaultFlow: ChallengeFlow = flows.includes('async') ? 'async' : 'live';
+  const flowPickerVisible = flows.includes('async') && flows.includes('live');
 
-  const [flow, setFlow] = useState<ChallengeFlow>('async');
+  const [flow, setFlow] = useState<ChallengeFlow>(defaultFlow);
   const [mode, setMode] = useState<ModeId>('classic');
   const [timerSeconds, setTimerSeconds] = useState<number>(120);
   const [message, setMessage] = useState<string>('');
@@ -84,13 +94,13 @@ export const ChallengeInviteDialog: React.FC<ChallengeInviteDialogProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   const reset = useCallback(() => {
-    setFlow('async');
+    setFlow(defaultFlow);
     setMode('classic');
     setTimerSeconds(120);
     setMessage('');
     setShowMessage(false);
     setError(null);
-  }, []);
+  }, [defaultFlow]);
 
   const handleSend = useCallback(async () => {
     setIsLoading(true);
@@ -144,14 +154,15 @@ export const ChallengeInviteDialog: React.FC<ChallengeInviteDialogProps> = ({
             {t('friends.challenges.inviteMessage', { name: friendUsername })}
           </p>
 
-          {/* FLOW — async vs live segmented control */}
+          {/* FLOW — async vs live segmented control (hidden when caller supports only one) */}
+          {flowPickerVisible && (
           <div>
             <div
               role="radiogroup"
               aria-label={t('friends.challenges.flowPicker.label')}
               className="grid grid-cols-2 gap-2"
             >
-              {(['async', 'live'] as const).map((f) => {
+              {flows.map((f) => {
                 const isActive = flow === f;
                 const Icon = f === 'async' ? Trophy : Users;
                 return (
@@ -185,6 +196,12 @@ export const ChallengeInviteDialog: React.FC<ChallengeInviteDialogProps> = ({
               {t(flow === 'async' ? 'friends.challenges.async.subcopy' : 'friends.challenges.live.subcopy')}
             </p>
           </div>
+          )}
+          {!flowPickerVisible && (
+            <p className="text-xs text-center text-current/60 font-bold" data-testid="challenge-flow-hint">
+              {t(flow === 'async' ? 'friends.challenges.async.subcopy' : 'friends.challenges.live.subcopy')}
+            </p>
+          )}
 
           {/* MODE — chip row */}
           <div>

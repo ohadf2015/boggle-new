@@ -26,7 +26,7 @@ export function MpH2HStrip({ h2h, onRematch, className, t }: MpH2HStripProps) {
     >
       <Swords aria-hidden="true" className="w-4 h-4 text-neo-lime shrink-0" />
       <span className="truncate min-w-0" dir="auto">
-        {t('mpUi.results.h2h.record', {
+        {t('mpUi.results.h2hRecord', {
           mine: h2h.myWins,
           theirs: h2h.theirWins,
           name: h2h.name,
