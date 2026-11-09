@@ -35,6 +35,17 @@ export interface SurvivalClueBoxesProps {
 }
 
 /**
+ * Clue-cell colours. Fills take black ink (DESIGN.md contrast rule: white text
+ * on a bright fill is unreadable). Green stays emerald, not neo-lime, because
+ * lime already means "good word" on the Hunt board. An empty cell is a raised,
+ * dashed slot so it reads as a space to fill rather than a black hole on the
+ * navy. text-neo-white flips to charcoal in calm mode (globals.css).
+ */
+const CLUE_GREEN = "bg-emerald-400 border-neo-black text-neo-black";
+const CLUE_YELLOW = "bg-amber-400 border-neo-black text-neo-black";
+const CLUE_UNKNOWN = "bg-neo-navy-elevated border-dashed border-neo-white/45 text-neo-white";
+
+/**
  * Clue-tile size classes, keyed by word length. `compact` returns small fixed
  * sizes (mirroring the `cramped` values) so a tight column on a wide
  * screen gets the same breathing room a short phone already does. The default
@@ -284,10 +295,10 @@ const FeedbackOverlay: React.FC<FeedbackOverlayProps> = ({ feedback, targetWordL
             className={cn(
               "flex items-center justify-center border-2 rounded-neo font-bold transition-colors duration-500",
               sizeClass,
-              letterFb.feedback === 'green' && "bg-emerald-500 border-neo-black text-neo-white",
-              letterFb.feedback === 'yellow' && "bg-amber-400 border-neo-black text-neo-black",
+              letterFb.feedback === 'green' && CLUE_GREEN,
+              letterFb.feedback === 'yellow' && CLUE_YELLOW,
               isGray && showGrayLetter && "bg-slate-500 border-neo-black text-neo-white",
-              isGray && !showGrayLetter && "bg-neo-black border-neo-black text-neo-white"
+              isGray && !showGrayLetter && CLUE_UNKNOWN
             )}
           >
             {isClue ? letterFb.letter : (showGrayLetter ? letterFb.letter : '?')}
@@ -354,25 +365,25 @@ const HintBoxes: React.FC<HintBoxesProps> = ({
           displayChar = accumulatedClue.letter;
           clueType = accumulatedClue.type;
           bgClass = accumulatedClue.type === 'green'
-            ? "bg-emerald-500 border-neo-black text-neo-white"
-            : "bg-amber-400 border-neo-black text-neo-black";
+            ? CLUE_GREEN
+            : CLUE_YELLOW;
         } else if (isShopRevealed) {
           displayChar = targetWord[idx]?.toUpperCase() || '?';
           clueType = 'green';
-          bgClass = "bg-emerald-500 border-neo-black text-neo-white";
+          bgClass = CLUE_GREEN;
         } else if (isHintRevealed) {
           displayChar = char;
           clueType = 'green';
-          bgClass = "bg-emerald-500 border-neo-black text-neo-white";
+          bgClass = CLUE_GREEN;
         } else if (persistedLetter) {
           displayChar = persistedLetter.letter;
           clueType = persistedLetter.type;
           bgClass = persistedLetter.type === 'green'
-            ? "bg-emerald-500 border-neo-black text-neo-white"
-            : "bg-amber-400 border-neo-black text-neo-black";
+            ? CLUE_GREEN
+            : CLUE_YELLOW;
         } else {
           displayChar = '?';
-          bgClass = "bg-neo-black border-neo-cream/25 text-neo-cream/60";
+          bgClass = CLUE_UNKNOWN;
         }
 
         const isRevealed = !!accumulatedClue || isHintRevealed || isShopRevealed || !!persistedLetter;
@@ -415,7 +426,7 @@ const FeedbackLegend: React.FC<FeedbackLegendProps> = ({ t }) => (
     data-testid="clue-legend"
   >
     <span className="flex items-center gap-1">
-      <span className="w-3 h-3 sm:w-4 sm:h-4 bg-emerald-500 rounded border border-neo-black"></span>
+      <span className="w-3 h-3 sm:w-4 sm:h-4 bg-emerald-400 rounded border border-neo-black"></span>
       <span className="text-neo-white">{t('wordHunt.feedback.correct')}</span>
     </span>
     <span className="flex items-center gap-1">

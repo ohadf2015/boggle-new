@@ -186,10 +186,10 @@ describe('SurvivalClueBoxes - Transition Tests', () => {
 
     // Position 0 should show 'A' (green from second attempt)
     const aBox = screen.getByText('A').closest('div');
-    expect(aBox).toHaveClass('bg-emerald-500');
+    expect(aBox).toHaveClass('bg-emerald-400');
 
     // Position 1 should show 'P' (green from second attempt)
     const pBox = screen.getByText('P').closest('div');
-    expect(pBox).toHaveClass('bg-emerald-500');
+    expect(pBox).toHaveClass('bg-emerald-400');
   });
 });

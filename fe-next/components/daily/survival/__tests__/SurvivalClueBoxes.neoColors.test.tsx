@@ -1,6 +1,7 @@
 /**
  * Design-system color contract for SurvivalClueBoxes.
- * Green/yellow feedback cells must use neo-lime/neo-yellow, not generic Tailwind.
+ * Green stays emerald (lime means "good word" on the Hunt board), every coloured
+ * fill takes black ink, and an empty cell is a dashed slot.
  */
 import React from 'react';
 import { render, screen } from '@testing-library/react';
@@ -35,7 +36,7 @@ const BASE_PROPS = {
 };
 
 describe('SurvivalClueBoxes — design system color contract', () => {
-  it('FeedbackOverlay green letter uses bg-emerald-500', () => {
+  it('FeedbackOverlay green letter uses bg-emerald-400', () => {
     const feedback: LetterFeedback[] = [
       { letter: 'A', position: 0, feedback: 'green' },
       { letter: 'P', position: 1, feedback: 'gray' },
@@ -50,7 +51,7 @@ describe('SurvivalClueBoxes — design system color contract', () => {
       attempts={[{ word: 'APPLE', feedback, timestamp: 0 }]}
     />);
     const greenBox = screen.getByText('A').closest('[class]') as HTMLElement;
-    expect(greenBox?.className).toContain('bg-emerald-500');
+    expect(greenBox?.className).toContain('bg-emerald-400');
     expect(greenBox?.className).not.toContain('bg-green-');
   });
 
@@ -73,14 +74,14 @@ describe('SurvivalClueBoxes — design system color contract', () => {
     expect(yellowBox?.className).not.toContain('bg-yellow-');
   });
 
-  it('HintBoxes accumulated green clue uses bg-emerald-500', () => {
+  it('HintBoxes accumulated green clue uses bg-emerald-400', () => {
     const clues = new Map<number, AccumulatedClue>([[0, { letter: 'A', type: 'green' }]]);
     render(<SurvivalClueBoxes
       {...BASE_PROPS}
       accumulatedClues={clues}
     />);
     const greenBox = screen.getByText('A').closest('[class]') as HTMLElement;
-    expect(greenBox?.className).toContain('bg-emerald-500');
+    expect(greenBox?.className).toContain('bg-emerald-400');
     expect(greenBox?.className).not.toContain('bg-green-');
   });
 
@@ -93,5 +94,25 @@ describe('SurvivalClueBoxes — design system color contract', () => {
     const yellowBox = screen.getByText('P').closest('[class]') as HTMLElement;
     expect(yellowBox?.className).toContain('bg-amber-400');
     expect(yellowBox?.className).not.toContain('bg-yellow-');
+  });
+
+  it('green and yellow cells take black ink, never white', () => {
+    const clues = new Map<number, AccumulatedClue>([
+      [0, { letter: 'A', type: 'green' }],
+      [1, { letter: 'P', type: 'yellow' }],
+    ]);
+    render(<SurvivalClueBoxes {...BASE_PROPS} accumulatedClues={clues} />);
+    for (const idx of [0, 1]) {
+      const box = screen.getByTestId(`clue-box-${idx}`);
+      expect(box.className).toContain('text-neo-black');
+      expect(box.className).not.toContain('text-neo-white');
+    }
+  });
+
+  it('empty clue cell is a visible dashed slot', () => {
+    render(<SurvivalClueBoxes {...BASE_PROPS} />);
+    const box = screen.getByTestId('clue-box-0');
+    expect(box.className).toContain('border-dashed');
+    expect(box.className).not.toContain('border-neo-cream/25');
   });
 });

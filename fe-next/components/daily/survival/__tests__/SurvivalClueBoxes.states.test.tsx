@@ -32,9 +32,9 @@ describe('SurvivalClueBoxes clue states', () => {
     expect(g.dataset.state).toBe('green');
     expect(y.dataset.state).toBe('yellow');
     expect(u.dataset.state).toBe('unknown');
-    expect(g.className).toMatch(/bg-emerald-500/);
+    expect(g.className).toMatch(/bg-emerald-400/);
     expect(y.className).toMatch(/bg-amber-400/);
-    expect(u.className).toMatch(/bg-neo-black/);
+    expect(u.className).toMatch(/bg-neo-navy-elevated/);
     expect(screen.getByTestId('clue-legend')).toBeTruthy();
   });
 
