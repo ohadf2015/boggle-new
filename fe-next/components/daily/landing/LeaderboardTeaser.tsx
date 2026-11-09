@@ -12,6 +12,7 @@ import type { Language } from '@/types';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { getGuestFingerprint } from '@/utils/dailyChallenge/guestPlayer';
 import { getWithAuth } from '@/utils/authFetch';
+import { getDailyChallengeDate } from '@/utils/dailyChallenge/dateUtils';
 
 interface LeaderboardTeaserProps {
   /** Unused: the teaser always shows every language. Kept so existing callers compile. */
@@ -50,7 +51,7 @@ export function LeaderboardTeaser({ onViewFull }: LeaderboardTeaserProps) {
     async function fetchLeaderboard() {
       setLoading(true);
       try {
-        const today = new Date().toISOString().split('T')[0];
+        const today = getDailyChallengeDate();
         // Every language: the hub is mounted in the UI locale, so a Hebrew solve
         // was invisible from an English hub. `fp` lets the server find a guest
         // viewer's own row (a signed-in viewer is found by their session).

@@ -5,6 +5,7 @@ import { CheckCircle2, Circle, XCircle } from 'lucide-react'
 import gsap from 'gsap'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { resolveMissedDayAction, type MissedDayAction } from '@/utils/dailyChallenge/missedDayAction'
+import { getDailyChallengeDate } from '@/utils/dailyChallenge/dateUtils'
 
 interface Props {
   completedDates: string[]
@@ -41,7 +42,7 @@ function buildDots(cycleStart: string, completedDates: string[], today: string, 
 }
 
 function todayUtcIso(): string {
-  return new Date().toISOString().slice(0, 10)
+  return getDailyChallengeDate()
 }
 
 const DOT_CLASS = 'flex flex-col items-center gap-1'

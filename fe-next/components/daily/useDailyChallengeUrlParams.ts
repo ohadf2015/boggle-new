@@ -8,6 +8,7 @@ import {
 import { neoSuccessToast, neoErrorToast } from '@/components/NeoToast';
 import type { ChallengeData } from './DailyReadyScreen';
 import type { Language } from '@/types';
+import { getDailyChallengeDate } from '@/utils/dailyChallenge/dateUtils';
 
 interface RetryTokenValidation {
   valid: boolean;
@@ -56,7 +57,7 @@ export function useDailyChallengeUrlParams({
 
       const performReset = async () => {
         try {
-          const today = new Date().toISOString().split('T')[0];
+          const today = getDailyChallengeDate();
           const resetBody: { puzzleDate: string; language: string; playerId?: string; guestFingerprint?: string } = {
             puzzleDate: today,
             language: gameLanguage,

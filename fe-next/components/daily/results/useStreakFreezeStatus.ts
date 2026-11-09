@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { fetchWithAuth } from '@/utils/authFetch';
+import { getDailyChallengeDate } from '@/utils/dailyChallenge/dateUtils';
 
 export interface UseStreakFreezeStatusReturn {
   freezesAvailable: number;
@@ -22,7 +23,7 @@ export function useStreakFreezeStatus(isAuthenticated: boolean): UseStreakFreeze
       .then((data) => {
         if (!data) return;
         setFreezesAvailable(data.freezesAvailable ?? 0);
-        const today = new Date().toISOString().split('T')[0];
+        const today = getDailyChallengeDate();
         const protected_ = data.protectedUntil && new Date(data.protectedUntil) >= new Date(today);
         setIsStreakProtected(Boolean(protected_));
       })

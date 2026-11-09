@@ -8,6 +8,7 @@ import { useMissedDailies, type DailyMode } from '@/hooks/useMissedDailies';
 import { isNative } from '@/utils/platform';
 import { playStoreUrlWithReferrer } from '@/utils/androidApp';
 import GooglePlayMark from '@/components/android-install/GooglePlayMark';
+import { getDailyChallengeDate } from '@/utils/dailyChallenge/dateUtils';
 
 function daysAgo(date: string, today: string): number {
   const a = new Date(date + 'T00:00:00Z').getTime();
@@ -34,7 +35,7 @@ interface CatchUpSuggestionProps {
 export default function CatchUpSuggestion({ excludeDate, mode }: CatchUpSuggestionProps) {
   const { t, language } = useLanguage();
   const { missed } = useMissedDailies(mode || 'word-hunt');
-  const today = new Date().toISOString().split('T')[0];
+  const today = getDailyChallengeDate();
 
   // Platform decides which surface we render (links vs app pitch). Resolved
   // post-mount because isNative() is false during SSR — holding render until

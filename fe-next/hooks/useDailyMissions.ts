@@ -27,6 +27,7 @@ import {
   type QuestConditionType,
   type QuestFamily,
 } from '@/shared/dailyQuestPool';
+import { getDailyChallengeDate } from '@/utils/dailyChallenge/dateUtils';
 
 export interface Mission {
   slot: number;
@@ -167,7 +168,7 @@ export function useDailyMissions(): UseDailyMissionsReturn {
       return;
     }
 
-    const today = new Date().toISOString().split('T')[0];
+    const today = getDailyChallengeDate();
 
     try {
       const { data, error } = await supabase

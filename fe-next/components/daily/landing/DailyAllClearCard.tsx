@@ -6,6 +6,7 @@ import { fireVictoryConfetti } from '@/utils/confettiUtils';
 import { triggerHaptic } from '@/utils/hapticFeedback';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { DayPrizeHubCard } from '../prize/DayPrizeHubCard';
+import { getDailyChallengeDate } from '@/utils/dailyChallenge/dateUtils';
 
 interface DailyAllClearCardProps {
   /** Current daily streak; the streak line is omitted at 0. */
@@ -22,7 +23,7 @@ interface DailyAllClearCardProps {
  * fires a canvas confetti burst + haptic instead.
  */
 function celebrateOncePerDay(): boolean {
-  const key = `lc:daily-all-clear:${new Date().toISOString().slice(0, 10)}`;
+  const key = `lc:daily-all-clear:${getDailyChallengeDate()}`;
   try {
     if (localStorage.getItem(key)) return false;
     localStorage.setItem(key, '1');
