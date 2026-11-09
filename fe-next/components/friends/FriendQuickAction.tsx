@@ -24,7 +24,7 @@ interface FriendQuickActionProps {
 }
 
 const BASE =
-  'shrink-0 inline-flex items-center justify-center gap-1 h-9 min-w-9 px-2 rounded-neo border-2 border-neo-black font-neo-display font-bold text-xs uppercase shadow-hard-sm active:translate-y-0.5 active:shadow-none transition-[transform,box-shadow] disabled:opacity-60';
+  'shrink-0 motion-safe:hover:-translate-y-0.5 inline-flex items-center justify-center gap-1 h-9 min-w-9 px-2 rounded-neo border-2 border-neo-black font-neo-display font-bold text-xs uppercase shadow-hard-sm active:translate-y-0.5 active:shadow-none transition-[transform,box-shadow] disabled:opacity-60';
 
 const stop = (e: React.SyntheticEvent) => e.stopPropagation();
 
@@ -74,7 +74,7 @@ function IdFriendAction({ userId, name, surface, className }: FriendQuickActionP
         aria-label={t('friendSocial.requestSent')}
         title={t('friendSocial.requestSent')}
         data-testid="friend-quick-sent"
-        className={cn(BASE, 'bg-neo-navy-elevated text-neo-lime border-neo-black/60 shadow-none', className)}
+        className={cn(BASE, 'bg-neo-navy-elevated text-neo-lime border-neo-black/60 shadow-none motion-safe:animate-neo-pop motion-safe:hover:translate-y-0', className)}
       >
         <Check aria-hidden className="h-4 w-4" strokeWidth={3} />
       </span>

@@ -42,4 +42,14 @@ describe('FriendsTodayCard', () => {
     await waitFor(() => expect(screen.getByTestId('friends-today-share')).toBeInTheDocument());
     expect(screen.getByTestId('friends-today-line')).toHaveTextContent('friendSocial.today.leading');
   });
+  it('staggers rows in and pops the leading line, only when motion is allowed', async () => {
+    state.friends = [{ odUserId: 'a' }];
+    get.mockResolvedValue({ ok: true, json: async () => ({ data: [entry('Me', 600, { isYou: true }), entry('Dana', 500, { isFriend: true })], total: 9, countries: [] }) });
+    render(<FriendsTodayCard />);
+    const rows = await screen.findAllByRole('listitem');
+    rows.forEach((r) => expect(r.className).toContain('motion-safe:animate-pop-in'));
+    expect(rows[0].style.animationDelay).toBe('0ms');
+    expect(rows[1].style.animationDelay).toBe('70ms');
+    expect(screen.getByTestId('friends-today-line').className).toContain('motion-safe:animate-neo-pop');
+  });
 });
