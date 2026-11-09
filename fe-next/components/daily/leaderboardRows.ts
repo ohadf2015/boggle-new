@@ -42,6 +42,7 @@ export function fromMergedEntries(entries: MergedLeaderboardEntry[]): DailyParti
     tower_height_m: e.towerHeightM,
     is_you: e.isYou || undefined,
     is_friend: e.isFriend || undefined,
+    is_member: e.member || undefined,
   }));
 }
 

@@ -411,7 +411,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
 
 /** Friend add/chat buttons on every row share one friends snapshot. */
 const TabbedDailyLeaderboardWithFriends: React.FC<TabbedDailyLeaderboardProps> = (props) => (
-  <FriendStatusProvider>
+  <FriendStatusProvider boardDate={props.puzzleDate ?? null}>
     <TabbedDailyLeaderboard {...props} />
   </FriendStatusProvider>
 );

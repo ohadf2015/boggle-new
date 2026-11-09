@@ -1,10 +1,11 @@
 'use client';
 
-import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useFriends } from '@/hooks/useFriends';
 import { useSocialCapabilities } from '@/hooks/useSocialCapabilities';
 import { trackGrowthEvent } from '@/utils/growthTracking';
+import { postWithAuth } from '@/utils/authFetch';
 import type { Friend } from '@/utils/friendsTypes';
 
 /**
@@ -32,6 +33,10 @@ export interface FriendStatusValue {
   friends: Friend[];
   outgoingUsernames: Set<string>;
   sendRequest: (userId: string) => Promise<{ success: boolean; error?: string }>;
+  /** Daily board date when rows carry opaque keys instead of ids. */
+  boardDate: string | null;
+  /** Signed-in player behind an opaque daily-board row key (null for guests / not found). */
+  resolveBoardKey: (key: string) => Promise<string | null>;
 }
 
 const FriendStatusContext = createContext<FriendStatusValue | null>(null);
@@ -40,7 +45,7 @@ const FriendStatusContext = createContext<FriendStatusValue | null>(null);
  * One friends snapshot shared by every row on a board. Rows read relations by
  * user id; useFriends (polling, socket) runs once per provider, not per row.
  */
-export function FriendStatusProvider({ children }: { children: React.ReactNode }) {
+export function FriendStatusProvider({ children, boardDate = null }: { children: React.ReactNode; boardDate?: string | null }) {
   const { isAuthenticated, user } = useAuth();
   const { friends = [], outgoingRequests = [], pendingRequests = [], sendRequest, acceptRequest } = useFriends();
   const { caps } = useSocialCapabilities();
@@ -68,6 +73,21 @@ export function FriendStatusProvider({ children }: { children: React.ReactNode }
   }, [myId, friendById, acceptedIds, sentIds, outgoingIds, incomingByUser]);
 
   const friendFor = useCallback((userId: string) => friendById.get(userId), [friendById]);
+
+  const resolved = useRef(new Map<string, string | null>());
+  const resolveBoardKey = useCallback(async (key: string) => {
+    if (!boardDate) return null;
+    const cacheKey = `${boardDate}|${key}`;
+    if (resolved.current.has(cacheKey)) return resolved.current.get(cacheKey) ?? null;
+    try {
+      const res = await postWithAuth('/api/friends/board-player', { date: boardDate, key });
+      const userId = res.ok ? ((await res.json()) as { userId?: string }).userId ?? null : null;
+      if (res.ok || res.status === 404) resolved.current.set(cacheKey, userId);
+      return userId;
+    } catch {
+      return null;
+    }
+  }, [boardDate]);
 
   const sendTo = useCallback(async (userId: string, surface: string) => {
     const res = await sendRequest(userId);
@@ -101,7 +121,9 @@ export function FriendStatusProvider({ children }: { children: React.ReactNode }
     friends,
     outgoingUsernames,
     sendRequest,
-  }), [isAuthenticated, caps.friendManagement, caps.friendMessaging, relationFor, friendFor, onlineFriends, sendTo, acceptFrom, friends, outgoingUsernames, sendRequest]);
+    boardDate,
+    resolveBoardKey,
+  }), [isAuthenticated, caps.friendManagement, caps.friendMessaging, relationFor, friendFor, onlineFriends, sendTo, acceptFrom, friends, outgoingUsernames, sendRequest, boardDate, resolveBoardKey]);
 
   return <FriendStatusContext.Provider value={value}>{children}</FriendStatusContext.Provider>;
 }

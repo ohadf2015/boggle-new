@@ -86,6 +86,8 @@ interface ShellPerson {
   avatar_image?: string | null;
   custom_avatar?: CustomAvatarConfig | null;
   country_code?: string | null;
+  is_friend?: boolean;
+  is_member?: boolean;
 }
 
 /**
@@ -175,7 +177,15 @@ function RowShell({
         {stats && <div className="text-xs sm:text-sm flex items-center gap-2 mt-0.5 flex-wrap">{stats}</div>}
       </div>
 
-      {!isCurrentUser && <FriendQuickAction userId={person.player_id} name={name} surface="daily_leaderboard" />}
+      {!isCurrentUser && (
+        <FriendQuickAction
+          userId={person.player_id}
+          boardKey={!person.player_id && person.is_member ? person.row_key : undefined}
+          isFriendHint={person.is_friend}
+          name={name}
+          surface="daily_leaderboard"
+        />
+      )}
       {trailing}
     </m.div>
   );

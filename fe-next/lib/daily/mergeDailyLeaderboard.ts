@@ -48,10 +48,12 @@ export interface MergedLeaderboardEntry {
   isYou?: boolean;
   /** One of the caller's accepted friends. */
   isFriend?: boolean;
+  /** A signed-in player (not a guest). Carries no id; the friend button resolves the key on tap. */
+  member?: boolean;
 }
 
 /** Server-only ranked row: still carries the group key, so it must never be serialized. */
-export interface RankedBoardRow extends Omit<MergedLeaderboardEntry, 'key' | 'isYou' | 'isFriend'> {
+export interface RankedBoardRow extends Omit<MergedLeaderboardEntry, 'key' | 'isYou' | 'isFriend' | 'member'> {
   identity: string;
   /** When the player's latest counted result landed — the tiebreak. */
   reachedAt: string;
@@ -218,6 +220,7 @@ export function viewDailyBoard(ranked: RankedBoardRow[], opts: ViewOptions = {})
       ...(opts.keyOf ? { key: opts.keyOf(identity) } : {}),
       ...(isYou ? { isYou: true } : {}),
       ...(isFriend ? { isFriend: true } : {}),
+      ...(identity.startsWith('u:') ? { member: true } : {}),
     });
   }
 
