@@ -1,5 +1,6 @@
 'use client';
 
+import { PaymentFailedBanner } from '@/components/teacher/PaymentFailedBanner';
 import { useState, type ReactNode } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { teacherTrialStatus } from '@/lib/education/trial';
@@ -96,6 +97,7 @@ export function TeacherProBannersPreview() {
 /** Dev-only: one banner on fixture dates for the real Home slot (`?banner=`). */
 export function previewBanner(name: string | undefined): ReactNode {
   const iso = (days: number) => new Date(Date.now() + days * DAY).toISOString();
+  if (name === 'pastDue') return <PaymentFailedBanner portalUrl="#" stillPro />;
   if (name === 'reminder') return <TeacherTrialReminderBanner trial={teacherTrialStatus(iso(2), Date.now())} onDismiss={() => undefined} />;
   if (name === 'lifecycle') return <TeacherProTrialLifecycleBanner trialExpires={iso(8)} />;
   if (name === 'expired') return <TrialUrgencyBanner trial={teacherTrialStatus(iso(-1), Date.now())} href="#" />;

@@ -21,6 +21,7 @@
  * the banner stays until checkout completes or the 14-day window expires.
  */
 export type TeacherBanner =
+  | 'paymentFailed'
   | 'pendingCheckout'
   | 'trialReminder'
   | 'trial'
@@ -44,6 +45,7 @@ export function pickTeacherBanner({
   polarOfferTrial = false,
   offerTrialDismissed = false,
   pendingCheckout = false,
+  paymentFailed = false,
 }: {
   hasTrial: boolean;
   /**
@@ -82,6 +84,13 @@ export function pickTeacherBanner({
    * Non-dismissible; outranks reactivate, offerTrial, trial, and pro.
    */
   pendingCheckout?: boolean;
+  /**
+   * A paid Polar subscription whose renewal was declined (`past_due`). The
+   * only banner that shows over a Pro dashboard besides the trial lifecycle:
+   * Pro is still on inside the grace window, and that is exactly when fixing
+   * the card saves the subscription. Outranks everything, admins included.
+   */
+  paymentFailed?: boolean;
 }): TeacherBanner {
   // Pro is checked FIRST, and so is "Pro has not answered yet". A gifted-Pro
   // teacher keeps the trial deadline she was granted Pro to replace; checking
@@ -91,6 +100,7 @@ export function pickTeacherBanner({
   // (days left + Keep Pro CTA). Paid/gifted Pro stays quiet. An expired Polar
   // trial is the single reactivation ask below.
   if (proLoading) return 'none';
+  if (paymentFailed) return 'paymentFailed';
   if (hasPro && polarTrialing) return 'trialing';
   if (hasPro) return 'none';
   if (pendingCheckout && !isAdmin) return 'pendingCheckout';

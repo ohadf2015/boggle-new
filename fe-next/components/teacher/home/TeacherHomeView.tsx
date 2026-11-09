@@ -36,6 +36,8 @@ export interface TeacherHomeViewProps {
   desk: ReactNode;
   sessions: ReactNode | null;
   accountBanner: ReactNode | null;
+  /** Billing trouble (declined renewal): under the greeting, before the desk, never below the fold. */
+  alert?: ReactNode | null;
   hasRail: boolean;
   week: { summary: TeacherWeekSummary | null; status: TeacherWeekStatus; classCount: number; classes?: ReactNode } | null;
   onOpenReports: (() => void) | null;
@@ -48,7 +50,7 @@ export interface TeacherHomeViewProps {
 
 export function TeacherHomeView({
   t, isRTL, revealRef, greeting, cue, hasPro, ready, error, onRetry, hasClasses, onboarding, desk,
-  sessions, accountBanner, hasRail, week, onOpenReports, proCard, practice, welcome, children,
+  sessions, accountBanner, alert = null, hasRail, week, onOpenReports, proCard, practice, welcome, children,
 }: TeacherHomeViewProps) {
   const showSessions = sessions !== null;
   return (
@@ -89,6 +91,8 @@ export function TeacherHomeView({
               {hasPro ? <TeacherPlanBadge quiet className="shrink-0" /> : null}
             </div>
           </header>
+
+          {ready && alert ? <div data-testid="home-alert" className="min-w-0 [&>aside]:mt-1">{alert}</div> : null}
 
           {!ready ? <HomeSkeleton /> : error ? <HqLoadError onRetry={onRetry} /> : hasClasses ? desk : onboarding}
         </div>

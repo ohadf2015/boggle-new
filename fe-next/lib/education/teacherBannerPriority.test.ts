@@ -339,3 +339,31 @@ describe('pickTeacherBanner trialReminder (<=3 days access trial)', () => {
     ).toBe('trial');
   });
 });
+
+describe('pickTeacherBanner: declined renewal (Polar past_due)', () => {
+  it('shows the payment-failed banner over a Pro dashboard inside the grace window', () => {
+    expect(pickTeacherBanner({ hasTrial: false, isAdmin: false, hasPro: true, paymentFailed: true })).toBe('paymentFailed');
+  });
+
+  it('keeps showing it after grace ends and Pro is off', () => {
+    expect(pickTeacherBanner({ hasTrial: false, isAdmin: false, hasPro: false, paymentFailed: true })).toBe('paymentFailed');
+  });
+
+  it('outranks a pending checkout, a reactivation ask and the trial lifecycle', () => {
+    expect(
+      pickTeacherBanner({ hasTrial: true, isAdmin: false, hasPro: true, polarTrialing: true, pendingCheckout: true, polarTrialExpired: true, paymentFailed: true }),
+    ).toBe('paymentFailed');
+  });
+
+  it('shows for an admin too: it is their own card that failed', () => {
+    expect(pickTeacherBanner({ hasTrial: false, isAdmin: true, hasPro: true, paymentFailed: true })).toBe('paymentFailed');
+  });
+
+  it('waits for the entitlement read like every other banner', () => {
+    expect(pickTeacherBanner({ hasTrial: false, isAdmin: false, proLoading: true, paymentFailed: true })).toBe('none');
+  });
+
+  it('a paid Pro teacher with a healthy card still sees nothing', () => {
+    expect(pickTeacherBanner({ hasTrial: false, isAdmin: false, hasPro: true })).toBe('none');
+  });
+});
