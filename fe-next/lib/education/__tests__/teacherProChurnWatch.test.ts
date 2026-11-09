@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   detectChurnTransitions,
+  inactivePayerReasons,
   isAlertingSnapshot,
   parseStoredSnapshots,
   snapshotFingerprint,
@@ -119,5 +120,27 @@ describe('parseStoredSnapshots', () => {
     expect(parseStoredSnapshots('{}')).toBeNull();
     const raw = JSON.stringify([active]);
     expect(parseStoredSnapshots(raw)).toEqual([active]);
+  });
+});
+
+describe('inactivePayerReasons', () => {
+  const now = Date.parse('2026-11-09T09:00:00.000Z');
+  const day = 86_400_000;
+
+  it('flags a paying sub whose teacher has been idle 14+ days', () => {
+    const last = new Map([[active.email!, new Date(now - 20 * day).toISOString()]]);
+    const r = inactivePayerReasons([active], last, now);
+    expect(r).toHaveLength(1);
+    expect(r[0]).toContain('20 days');
+  });
+
+  it('flags a paying teacher with no activity at all', () => {
+    expect(inactivePayerReasons([active], new Map(), now)[0]).toContain('never');
+  });
+
+  it('stays quiet for a recently active teacher and for canceled subs', () => {
+    const recent = new Map([[active.email!, new Date(now - 2 * day).toISOString()]]);
+    expect(inactivePayerReasons([active], recent, now)).toEqual([]);
+    expect(inactivePayerReasons([{ ...active, status: 'canceled' }], new Map(), now)).toEqual([]);
   });
 });
