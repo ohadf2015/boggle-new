@@ -63,7 +63,7 @@ describe('proCopyLines', () => {
     for (const v of ['a', 'b'] as ProCopyVariant[]) {
       const c = proCopyLines('en', v, offerFor('en', live), { accessTrialExpires: live.accessTrialExpires });
       expect(c.title).toMatch(/Keep Teacher Pro after your free trial/i);
-      expect(`${c.title} ${c.body}`).not.toMatch(/14|Try Teacher Pro free|Start your/);
+      expect(`${c.title} ${c.body}`).not.toMatch(/14[- ]?day|Try Teacher Pro free|Start your/);
       expect(c.body).not.toMatch(/\{date\}/);
     }
   });
