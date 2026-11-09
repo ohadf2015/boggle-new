@@ -193,6 +193,11 @@ function InviteReady({ classroom, packKey, lessonId, t, language }: InviteReadyP
               language={language}
               t={t}
               className="lg:col-span-2 lg:mx-auto lg:w-full lg:max-w-xl"
+              onSendHomeLink={
+                lessonId
+                  ? () => void share('native', { url: joinUrl, text: t('teacher.classroom.shareInviteText', { name: classroom.name, code: classroom.join_code }) })
+                  : undefined
+              }
             />
           ) : null
         }

@@ -371,6 +371,16 @@ describe('ClassSetupInvite', () => {
     expect(screen.getByTestId('first-game-plan')).toHaveTextContent('eduShell.setup.plan.title');
   });
 
+  it('Given the class already has its word list, Then the card also offers to send the link for practice at home', () => {
+    render(<ClassSetupInvite classroomId="c1" lessonId="L1" />);
+    expect(screen.getByTestId('first-game-plan-home')).toBeInTheDocument();
+  });
+
+  it('Given no word list saved to the class, Then no home-practice offer shows', () => {
+    render(<ClassSetupInvite classroomId="c1" />);
+    expect(screen.queryByTestId('first-game-plan-home')).toBeNull();
+  });
+
   it('Given a student has joined, Then the calendar card is gone: the class is in the room', () => {
     roster.current = { students: [{ id: 's1', name: 'Noa', avatar: null }], loading: false, arrivals: [] };
     render(<ClassSetupInvite classroomId="c1" />);

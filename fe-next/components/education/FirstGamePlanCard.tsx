@@ -1,7 +1,7 @@
 'use client';
 
 import { useId, useState } from 'react';
-import { CalendarPlus, Check, Download } from 'lucide-react';
+import { CalendarPlus, Check, Download, Send } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { NB_LINK, NB_PANEL, NB_SECONDARY } from '@/components/teacher/nb/nbStyles';
 import {
@@ -11,7 +11,7 @@ import {
   fromDatetimeLocal,
   toDatetimeLocal,
 } from '@/lib/education/firstGamePlan';
-import { trackFirstGameScheduled, type FirstGameCalendarTarget } from '@/lib/education/firstGamePlanTelemetry';
+import { trackFirstGameScheduled, trackHomePracticeLinkSent, type FirstGameCalendarTarget } from '@/lib/education/firstGamePlanTelemetry';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -22,6 +22,8 @@ export interface FirstGamePlanCardProps {
   language: string;
   t: T;
   className?: string;
+  /** Present when the class already has a word list: students who join from home get it as practice. */
+  onSendHomeLink?: () => void;
 }
 
 function downloadIcs(content: string, filename: string): void {
@@ -44,7 +46,7 @@ function downloadIcs(content: string, filename: string): void {
  * For the teacher who sets up a class away from the class: one calendar event at class
  * time with the student join link and a one-tap start link. Shown only while nobody has joined.
  */
-export function FirstGamePlanCard({ classroom, joinUrl, origin, language, t, className }: FirstGamePlanCardProps) {
+export function FirstGamePlanCard({ classroom, joinUrl, origin, language, t, className, onSendHomeLink }: FirstGamePlanCardProps) {
   const inputId = useId();
   const [when, setWhen] = useState(() => toDatetimeLocal(defaultFirstGameStart()));
   const [added, setAdded] = useState(false);
@@ -116,6 +118,26 @@ export function FirstGamePlanCard({ classroom, joinUrl, origin, language, t, cla
           {t('eduShell.setup.plan.ics')}
         </button>
       </div>
+
+      {onSendHomeLink ? (
+        <div data-testid="first-game-plan-home" className="flex flex-col gap-2 border-t-[3px] border-neo-cream/20 pt-3">
+          <p className="font-neo-body text-sm text-neo-cream/85">
+            <span className="font-bold text-neo-cream">{t('eduShell.setup.plan.homeTitle')}</span> {t('eduShell.setup.plan.homeBody')}
+          </p>
+          <button
+            type="button"
+            data-testid="first-game-plan-home-send"
+            onClick={() => {
+              trackHomePracticeLinkSent({ classroomId: classroom.id, locale: language });
+              onSendHomeLink();
+            }}
+            className={cn(NB_SECONDARY, 'w-full sm:w-auto sm:self-start')}
+          >
+            <Send className="size-5" aria-hidden="true" />
+            {t('eduShell.setup.plan.homeCta')}
+          </button>
+        </div>
+      ) : null}
     </section>
   );
 }
