@@ -19,6 +19,7 @@ import { HomeGetStudentsIn } from './home/HomeGetStudentsIn';
 import { EndedCodeTriesNotice } from './hq/EndedCodeTriesNotice';
 import { belowStudentGoal } from './hq/studentGoal';
 import { HomeClassMeta, HomeNewClass } from './home/HomeClassList';
+import { HomeWeekChallenge } from './home/HomeWeekChallenge';
 import { useHomeRoster } from './home/HomeRosterLive';
 import { HomeClassRoster } from './home/HomeClassRoster';
 import { WeeklyProgressDigestCard } from './digest/WeeklyProgressDigestCard';
@@ -355,6 +356,21 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt, alert 
               codeSlot={selectedClassroom && shareCardShown ? <HomeGetStudentsIn classroom={selectedClassroom} /> : undefined}
             />
           </div>
+          {selectedClassroom ? (
+            <div data-tm>
+              <HomeWeekChallenge
+                key={selectedClassroom.id}
+                classroomId={selectedClassroom.id}
+                classLanguage={classLanguage}
+                lessons={lessons.lessons}
+                preferredLessonId={loop.listId ?? null}
+                resultsHref={resultsHref}
+                onPickList={openAssign}
+                language={language}
+                t={t}
+              />
+            </div>
+          ) : null}
           {rosterShown && selectedClassroom ? (
             <div data-tm>
               <HomeClassRoster key={selectedClassroom.id} rows={roster.rows} failed={roster.failed} language={language} nowMs={nowMs} t={t} onAssign={openAssign} onAssignAll={openAssign} />
