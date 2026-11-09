@@ -6,6 +6,8 @@ export interface RosterStudentInput {
   displayName: string;
   avatarConfig?: Record<string, unknown> | null;
   totalXp: number;
+  /** The level the student sees on their own screens; absent on older reads. */
+  currentLevel?: number | null;
   wordsMastered: number;
   wordsAttempted: number;
   overallAccuracy: number;
@@ -18,6 +20,8 @@ export interface RosterRow {
   name: string;
   avatarConfig: Record<string, unknown> | null;
   xp: number;
+  /** null when the read has no level yet, so the UI never shows "Level 0". */
+  level: number | null;
   wordsMastered: number;
   wordsAttempted: number;
   accuracy: number;
@@ -42,6 +46,7 @@ export function rosterRows(students: readonly RosterStudentInput[], nowMs: numbe
       name: s.displayName,
       avatarConfig: s.avatarConfig ?? null,
       xp: s.totalXp,
+      level: typeof s.currentLevel === 'number' && s.currentLevel >= 1 ? Math.floor(s.currentLevel) : null,
       wordsMastered: s.wordsMastered,
       wordsAttempted: s.wordsAttempted,
       accuracy: s.overallAccuracy,

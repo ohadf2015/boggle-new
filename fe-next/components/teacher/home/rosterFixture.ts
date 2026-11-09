@@ -17,6 +17,7 @@ export function rosterFixture(classId: string, size: number, nowMs: number): Ros
       studentId: `${classId}-s${String(i + 1).padStart(2, '0')}`,
       displayName: NAMES[(i + seed) % NAMES.length],
       totalXp: daysAgo === null ? 0 : 120 + ((i * 97 + seed * 3) % 1400),
+      currentLevel: daysAgo === null ? 0 : 1 + Math.floor((120 + ((i * 97 + seed * 3) % 1400)) / 300),
       wordsMastered: Math.round(attempted * 0.6),
       wordsAttempted: attempted,
       overallAccuracy: daysAgo === null ? 0 : 58 + ((i * 11 + seed) % 38),

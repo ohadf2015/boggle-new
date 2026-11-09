@@ -21936,6 +21936,7 @@ const es = {
         },
         "statXp": "XP ganada",
         "statWords": "Palabras dominadas",
+        "statLevel": "Nivel {level}",
         "recent": "Actividad reciente",
         "lastPlayed": "Última partida: {when}",
         "notYet": "todavía no",

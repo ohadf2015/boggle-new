@@ -20969,6 +20969,7 @@ const en = {
         },
         "statXp": "XP earned",
         "statWords": "Words mastered",
+        "statLevel": "Level {level}",
         "recent": "Recent activity",
         "lastPlayed": "Last played: {when}",
         "notYet": "not yet",

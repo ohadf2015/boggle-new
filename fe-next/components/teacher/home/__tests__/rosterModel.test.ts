@@ -36,6 +36,14 @@ describe('rosterStatus', () => {
 });
 
 describe('rosterRows', () => {
+  it('Given a level from the progress read, Then the row carries it, and a missing or zero level reads as none', () => {
+    const [withLevel] = rosterRows([{ ...student('a', 10, null), currentLevel: 3 }], NOW);
+    expect(withLevel.level).toBe(3);
+    expect(rosterRows([student('b', 10, null)], NOW)[0].level).toBeNull();
+    expect(rosterRows([{ ...student('c', 10, null), currentLevel: 0 }], NOW)[0].level).toBeNull();
+  });
+
+
   it('Given students, Then rows are sorted by XP, highest first, each with its status', () => {
     const rows = rosterRows([student('a', 10, null), student('b', 90, iso(1)), student('c', 40, iso(10))], NOW);
     expect(rows.map((r) => [r.id, r.status])).toEqual([
