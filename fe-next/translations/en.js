@@ -20116,6 +20116,7 @@ const en = {
     },
     "practice": {
       "answerIs": "It's spelled",
+      "youWrote": "You wrote",
       "next": "Next word",
       "finish": "See my results"
     },

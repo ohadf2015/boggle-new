@@ -79,6 +79,20 @@ describe('SpellingChallengePractice - every answer gets a verdict before moving 
     expect(screen.queryByTestId('feedback-display')).toBeNull();
   });
 
+  it('Given a wrong answer, Then the student sees their own spelling struck through above the right one', () => {
+    render(<SpellingChallengePractice words={words} onComplete={vi.fn()} onBack={vi.fn()} />);
+    answer('  kat ');
+    const attempt = screen.getByTestId('feedback-attempt');
+    expect(attempt).toHaveTextContent('eduStudent.practice.youWrote');
+    expect(attempt.querySelector('s')).toHaveTextContent(/^kat$/);
+  });
+
+  it('Given a right answer, Then no "you wrote" line repeats it', () => {
+    render(<SpellingChallengePractice words={words} onComplete={vi.fn()} onBack={vi.fn()} />);
+    answer('cat');
+    expect(screen.queryByTestId('feedback-attempt')).toBeNull();
+  });
+
   it('Given a right answer, Then a big verdict covers the answer zone and no Next tap is needed', () => {
     render(<SpellingChallengePractice words={words} onComplete={vi.fn()} onBack={vi.fn()} />);
     answer('cat');

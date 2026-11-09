@@ -21001,6 +21001,7 @@ const he = {
     },
     "practice": {
       "answerIs": "ככה כותבים",
+      "youWrote": "כתבת",
       "next": "למילה הבאה",
       "finish": "לתוצאות שלי"
     },
