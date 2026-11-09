@@ -21031,6 +21031,16 @@ const es = {
       "newSeries": "Nueva serie",
       "leave": "Salir",
       "share": "Compartir",
+      "challenge": "Desafío",
+      "showdown": {
+        "title": "Duelo de palabras",
+        "onlyYou": "Solo tú",
+        "more": "+{count} más"
+      },
+      "h2h": {
+        "record": "Tú {mine}–{theirs} {name}",
+        "firstMeeting": "Primer enfrentamiento"
+      },
       "seriesChampion": "Campeón de la serie",
       "teacherPaced": "Tu profe empieza la siguiente partida",
       "calloutPhotoWon": "¡Foto finish! Le ganaste a {name} por {points}",

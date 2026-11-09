@@ -20064,6 +20064,16 @@ const en = {
       "newSeries": "New series",
       "leave": "Leave",
       "share": "Share",
+      "challenge": "Challenge",
+      "showdown": {
+        "title": "Word showdown",
+        "onlyYou": "Only you",
+        "more": "+{count} more"
+      },
+      "h2h": {
+        "record": "You {mine}–{theirs} {name}",
+        "firstMeeting": "First meeting"
+      },
       "seriesChampion": "Series champion",
       "teacherPaced": "Your teacher starts the next game",
       "calloutPhotoWon": "Photo finish! You beat {name} by {points}",

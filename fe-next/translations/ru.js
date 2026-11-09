@@ -20719,6 +20719,16 @@ const ru = {
       "newSeries": "Новая серия",
       "leave": "Выйти",
       "share": "Поделиться",
+      "challenge": "Вызов",
+      "showdown": {
+        "title": "Дуэль слов",
+        "onlyYou": "Только ты",
+        "more": "+{count} ещё"
+      },
+      "h2h": {
+        "record": "Ты {mine}–{theirs} {name}",
+        "firstMeeting": "Первая встреча"
+      },
       "seriesChampion": "Чемпион серии",
       "teacherPaced": "Учитель запустит следующую игру",
       "calloutPhotoWon": "Фотофиниш! Победа над {name} с разницей {points}",

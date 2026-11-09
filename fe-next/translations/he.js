@@ -20949,6 +20949,16 @@ const he = {
       "newSeries": "סדרה חדשה",
       "leave": "יציאה",
       "share": "שיתוף",
+      "challenge": "אתגר",
+      "showdown": {
+        "title": "הצגת מילים",
+        "onlyYou": "רק אתה",
+        "more": "+{count} נוספות"
+      },
+      "h2h": {
+        "record": "אתה {mine}–{theirs} {name}",
+        "firstMeeting": "מפגש ראשון"
+      },
       "seriesChampion": "אלוף/ת הסדרה",
       "teacherPaced": "המורה יתחיל/תתחיל את המשחק הבא",
       "calloutPhotoWon": "פוטו פיניש! ניצחת את {name} ב-{points}",

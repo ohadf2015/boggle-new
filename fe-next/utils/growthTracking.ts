@@ -482,6 +482,12 @@ export type GrowthEvent =
   //     on the MP results brag card (opens UnifiedShareModal in challenge mode).
   //     Props: { surface: 'mp_results' }.
   | 'mp_results_challenge_cta'
+  // Hero word showdown on MP results (unique chips elevated from Details).
+  //   word_showdown_shown: panel mounted. Props: { uniqueCount, hasBestMissed, mode, playerCount }.
+  | 'word_showdown_shown'
+  // Explicit Challenge CTA on MpFinalFooter (opens dialog or share — never auto-sends).
+  //   results_challenge_cta_tapped: Props: { hasRival, isFriend }.
+  | 'results_challenge_cta_tapped'
   // exp-mp-round-progress-header-v1 instrumentation.
   //   mp_round_gap_nudge_seen: gap-nudge pill rendered in mp results.
   //     Props: { gap: number, language }. Measures nudge exposure rate.
