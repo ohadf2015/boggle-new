@@ -21118,6 +21118,7 @@ const sv = {
     },
     "practice": {
       "answerIs": "Det stavas",
+      "youWrote": "Du skrev",
       "next": "Nästa ord",
       "finish": "Se mitt resultat"
     },

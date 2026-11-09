@@ -92,7 +92,7 @@ export function SpellingChallengePractice({
   );
 
   const [inputValue, setInputValue] = useState('');
-  const [feedback, setFeedback] = useState<{ correct: boolean; correctWord: string } | null>(null);
+  const [feedback, setFeedback] = useState<{ correct: boolean; correctWord: string; attempt?: string } | null>(null);
   const [showResults, setShowResults] = useState(false);
   const [totalHintsUsed, setTotalHintsUsed] = useState(0);
   const [timeSpent, setTimeSpent] = useState(0);
@@ -133,7 +133,8 @@ export function SpellingChallengePractice({
       const result = submitAnswer(inputValue);
       if (result.correct) sfx.correct();
       else sfx.wrong();
-      setFeedback(result);
+      // Keep what they typed: seeing their own spelling next to the right one is the lesson.
+      setFeedback({ ...result, attempt: inputValue.trim() });
       setInputValue('');
 
       if (result.correct) setTimeout(() => setFeedback(null), 1000);
@@ -362,13 +363,13 @@ export function SpellingChallengePractice({
             data-testid="feedback-display"
             role="status"
             className={cn(
-              'absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 rounded-neo border-[3px] border-neo-black p-3 text-center shadow-hard-lg',
+              'absolute inset-0 z-10 flex flex-col items-center justify-center gap-1.5 rounded-neo border-[3px] border-neo-black p-2 text-center shadow-hard-lg sm:gap-2 sm:p-3',
               'motion-safe:animate-[lc-verdict-in_260ms_cubic-bezier(.34,1.56,.64,1)]',
               feedback.correct ? 'bg-neo-lime text-neo-black' : 'bg-neo-pink text-neo-black motion-safe:animate-neo-shake'
             )}
           >
             <style>{'@keyframes lc-verdict-in{0%{transform:scale(.85) rotate(-2deg)}100%{transform:scale(1) rotate(0)}}'}</style>
-            <p className="flex items-center gap-2 font-neo-display text-2xl font-black uppercase">
+            <p className="flex items-center gap-2 font-neo-display text-xl font-black uppercase sm:text-2xl">
               {feedback.correct ? <Check className="size-7" strokeWidth={3.5} /> : <X className="size-7" strokeWidth={3.5} />}
               {feedback.correct ? t('education.practice.correct') : t('education.practice.incorrect')}
             </p>
@@ -376,9 +377,16 @@ export function SpellingChallengePractice({
               <p className="font-neo-display text-xl font-black tracking-wider" dir="auto">{feedback.correctWord}</p>
             ) : (
               <>
+                {/* Their spelling, struck through, on the same row as the right one: the card has no room for another line. */}
                 <p className="flex flex-wrap items-baseline justify-center gap-2 font-neo-body text-sm font-bold">
+                  {feedback.attempt ? (
+                    <span data-testid="feedback-attempt">
+                      <span className="sr-only">{t('eduStudent.practice.youWrote')} </span>
+                      <s dir="auto" className="font-neo-display text-base font-black tracking-[0.1em] decoration-[3px] opacity-80">{feedback.attempt.length > 16 ? `${feedback.attempt.slice(0, 16)}…` : feedback.attempt}</s>
+                    </span>
+                  ) : null}
                   <span>{t('eduStudent.practice.answerIs')}</span>
-                  <span dir="auto" className="rounded-neo border-[3px] border-neo-black bg-neo-cream px-2 py-0.5 font-neo-display text-2xl font-black tracking-[0.15em] text-neo-black shadow-hard-sm">
+                  <span dir="auto" className="rounded-neo border-[3px] border-neo-black bg-neo-cream px-2 py-0.5 font-neo-display text-xl font-black tracking-[0.15em] text-neo-black shadow-hard-sm sm:text-2xl">
                     {feedback.correctWord}
                   </span>
                 </p>
@@ -386,7 +394,7 @@ export function SpellingChallengePractice({
                   type="button"
                   onClick={handleNext}
                   autoFocus
-                  className="mt-1 inline-flex items-center gap-2 rounded-neo border-[3px] border-neo-black bg-neo-navy px-5 py-2 font-neo-display text-lg font-black uppercase text-neo-lime shadow-hard transition-transform active:translate-y-0.5 active:shadow-none"
+                  className="inline-flex items-center gap-2 whitespace-nowrap rounded-neo border-[3px] border-neo-black bg-neo-navy px-4 py-1.5 font-neo-display text-base font-black uppercase text-neo-lime shadow-hard transition-transform active:translate-y-0.5 active:shadow-none sm:mt-1 sm:px-5 sm:py-2 sm:text-lg"
                 >
                   {wordIndex + 1 >= totalWords ? t('eduStudent.practice.finish') : t('eduStudent.practice.next')}
                   <DirectionalIcon icon={ArrowRight} className="size-5" />

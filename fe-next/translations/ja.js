@@ -21118,6 +21118,7 @@ const ja = {
     },
     "practice": {
       "answerIs": "正しいつづりは",
+      "youWrote": "あなたの答え",
       "next": "次の単語",
       "finish": "結果を見る"
     },

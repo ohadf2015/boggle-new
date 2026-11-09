@@ -21130,6 +21130,7 @@ const es = {
     },
     "practice": {
       "answerIs": "Se escribe",
+      "youWrote": "Escribiste",
       "next": "Siguiente palabra",
       "finish": "Ver mis resultados"
     },

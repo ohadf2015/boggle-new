@@ -28,7 +28,7 @@ export function GuestPracticeClient({ locale, pack }: GuestPracticeClientProps) 
       <header className="flex items-center gap-3 border-b-4 border-neo-black bg-neo-navy-light px-4 py-3 tv:px-8 tv:py-5">
         <div className="min-w-0 flex-1">
           <h1 className="font-neo-display text-xl font-black uppercase leading-tight tv:text-3xl">{t('education.student.deadEnd.practiceTitle')}</h1>
-          <p dir="auto" className="truncate font-neo-body text-sm font-bold text-neo-cyan tv:text-lg">
+          <p dir="auto" className="font-neo-body text-sm font-bold leading-snug text-neo-cyan tv:text-lg">
             {t(pack.nameKey)} · {t('education.student.deadEnd.wordCount', { count: String(words.length) })}
           </p>
         </div>
