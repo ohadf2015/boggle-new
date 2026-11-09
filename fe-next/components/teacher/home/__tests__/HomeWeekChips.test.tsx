@@ -13,6 +13,8 @@ describe('HomeWeekChips', () => {
     render(<HomeWeekChips summary={summary} classCount={3} t={t} />);
     const strip = screen.getByTestId('home-week-chips');
     expect(strip).toHaveAccessibleName('eduShell.week.title');
+    // Phones have no hover: the chips carry a visible "This week" caption, not just a tooltip.
+    expect(screen.getByTestId('home-week-chips-caption')).toHaveTextContent('eduShell.week.title');
     await waitFor(() => expect(screen.getByTestId('home-week-chip-games')).toHaveTextContent('6'));
     expect(screen.getByTestId('home-week-chip-games')).toHaveTextContent('eduShell.week.games');
     const meter = screen.getByRole('progressbar', { name: 'eduShell.week.active' });
