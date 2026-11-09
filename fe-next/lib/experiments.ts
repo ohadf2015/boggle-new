@@ -222,16 +222,8 @@ export const EXPERIMENTS = {
   }),
 
   /**
-   * Multiplayer desktop chassis kill-switch. When enabled (on), desktop
-   * users see the MultiplayerDesktopShell (responsive layout for wide
-   * screens). When disabled (off), all users see legacy mobile-stacked
-   * layout. Not used for A/B traffic split — flip to off via PostHog if
-   * Sentry warnings spike post-deploy.
-   */
-  /**
-   * Ranked public CTA kill-switch. on = eligible signed-in players see Ranked
-   * on the multiplayer hub (default). off = hide without deploy if queue/MMR
-   * misbehaves. Not an A/B split.
+   * Ranked multiplayer QUEUE CTA. Default off until replica-safe matchmaking
+   * and explicit operator opt-in (PostHog + RANKED_MATCHMAKING_ENABLED).
    */
   'ranked-public-v1': defineExperiment({
     variants: ['on', 'off'] as const,
