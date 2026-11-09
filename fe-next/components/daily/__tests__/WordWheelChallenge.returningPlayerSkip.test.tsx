@@ -31,6 +31,7 @@ vi.mock('@/hooks/useDailyModePlayed', () => ({ useDailyModePlayed: () => false }
 
 const mockHasEverPlayedWordWheel = vi.fn(() => false);
 
+vi.mock('@/hooks/useUtcDay', () => ({ useUtcDay: () => '2026-04-25', useDailyDate: () => '2026-04-25' }));
 vi.mock('@/utils/dailyChallenge', () => ({
   getDailyChallengeDate: () => '2026-04-25',
   getPuzzleNumber: () => 117,

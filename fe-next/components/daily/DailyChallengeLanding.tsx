@@ -38,7 +38,7 @@ import { CompactModeRow } from './landing/CompactModeRow';
 import { DailyAllClearCard } from './landing/DailyAllClearCard';
 import { DayPrizeHubCard } from './prize/DayPrizeHubCard';
 import { LeaderboardTeaser } from './landing/LeaderboardTeaser';
-import { useUtcDay } from './landing/useUtcDay';
+import { useUtcDay } from '@/hooks/useUtcDay';
 import { WeeklyChestPlaceholder } from './WeeklyChestPlaceholder';
 
 // Below the fold and authed-only: keep gsap + the chest modals out of the hub's first load.

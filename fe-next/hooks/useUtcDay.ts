@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getDailyChallengeDate, getSecondsUntilNextDaily } from '@/utils/dailyChallenge/dateUtils';
 
 /**
@@ -24,6 +24,26 @@ export function useUtcDay(): string {
       window.removeEventListener('focus', check);
     };
   }, [day]);
+
+  return day;
+}
+
+/**
+ * The daily date a game should show: today (UTC), moved to a new day only while
+ * `canRoll` is true, so a run in play or a results screen keeps its own day.
+ * `onRoll` runs when the date moves (clear the old board there).
+ */
+export function useDailyDate(canRoll: boolean, onRoll?: () => void): string {
+  const utcDay = useUtcDay();
+  const [day, setDay] = useState(utcDay);
+  const onRollRef = useRef(onRoll);
+  onRollRef.current = onRoll;
+
+  useEffect(() => {
+    if (utcDay === day || !canRoll) return;
+    setDay(utcDay);
+    onRollRef.current?.();
+  }, [utcDay, day, canRoll]);
 
   return day;
 }

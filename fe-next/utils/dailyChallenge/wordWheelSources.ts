@@ -1,6 +1,7 @@
 // Played dates regenerate from these lists, so LEGACY_WHEEL_SOURCES must never change.
 
 import type { Language } from '@/types';
+import { HEBREW_WHEEL_V3_SOURCES } from './wordWheelSourcesHe';
 
 export const WHEEL_V2_START_DATE = '2026-11-01';
 
@@ -140,4 +141,13 @@ export const HARD_CENTER_LETTERS: Partial<Record<Language, readonly string[]>> =
   es: ['Q', 'J', 'X', 'Z', 'Y', 'K', 'W'],
   ru: ['Ъ', 'Э', 'Ф', 'Ц', 'Щ'],
   ja: ['ぁ', 'ぃ', 'ぅ', 'ぇ', 'ぉ', 'っ', 'ゃ', 'ゅ', 'ょ', 'ゎ', 'ゔ', 'ぢ', 'づ', 'ぴ', 'ぺ', 'ぽ', 'ゑ', 'ゐ'],
+};
+
+// From this date the daily runs off a no-repeat schedule (wordWheelSchedule) and Hebrew gets
+// HEBREW_WHEEL_V3_SOURCES. Earlier dates keep v2/legacy so played puzzles regenerate unchanged.
+export const WHEEL_V3_START_DATE = '2026-11-11';
+
+export const WHEEL_V3_SOURCES: Record<Language, readonly string[]> = {
+  ...WHEEL_V2_SOURCES,
+  he: HEBREW_WHEEL_V3_SOURCES,
 };

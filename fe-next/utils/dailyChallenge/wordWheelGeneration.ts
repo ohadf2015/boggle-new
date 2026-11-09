@@ -10,10 +10,12 @@ import type { Language } from '@/types';
 import { SEED_SALT } from './constants';
 import { mulberry32, hashString } from './prng';
 import { getDailyChallengeDate, getPuzzleNumber } from './dateUtils';
-import { normalizeHebrewLetter } from '@/shared/utils/wordNormalization';
 import {
-  LEGACY_WHEEL_SOURCES, WHEEL_V2_SOURCES, WHEEL_V2_START_DATE, HARD_CENTER_LETTERS,
+  LEGACY_WHEEL_SOURCES, WHEEL_V2_SOURCES, WHEEL_V2_START_DATE, WHEEL_V3_SOURCES, WHEEL_V3_START_DATE,
+  HARD_CENTER_LETTERS,
 } from './wordWheelSources';
+import { getUniqueLetters, shuffleInPlace } from './wordWheelLetters';
+import { scheduledWheel } from './wordWheelSchedule';
 
 // ==========================================
 // Word Wheel Puzzle Types
@@ -28,29 +30,15 @@ export interface WordWheelPuzzle {
   puzzleNumber: number;
 }
 
-/**
- * Extract unique letters from a source word.
- * For languages like Japanese, characters are treated individually.
- */
-function getUniqueLetters(word: string, language?: Language): string[] {
-  const seen = new Set<string>();
-  const unique: string[] = [];
-  for (const char of word) {
-    const upper = char.toUpperCase();
-    if (upper === ' ') continue;
-    // Normalize Hebrew final forms (sofit) so tiles show regular letter forms
-    const normalized = language === 'he' ? normalizeHebrewLetter(upper) : upper;
-    if (seen.has(normalized)) continue;
-    seen.add(normalized);
-    unique.push(normalized);
-  }
-  return unique;
+const isDate = (seed: string) => /^\d{4}-\d{2}-\d{2}$/.test(seed);
+
+/** Played dates keep the old sources and center; practice/quick seeds are not dates and get the newest pool. */
+function isV2Puzzle(date: string): boolean {
+  return !isDate(date) || date >= WHEEL_V2_START_DATE;
 }
 
-/** Played dates keep the old sources and center; practice/quick seeds are not dates and get v2. */
-function isV2Puzzle(date: string): boolean {
-  return !/^\d{4}-\d{2}-\d{2}$/.test(date) || date >= WHEEL_V2_START_DATE;
-}
+const sourcesFor = (table: Record<Language, readonly string[]>, language: Language) =>
+  table[language]?.length ? table[language] : table.en;
 
 function moveFirstPlayableCenterToFront(letters: string[], language: Language): void {
   const hard = HARD_CENTER_LETTERS[language] ?? [];
@@ -69,15 +57,23 @@ export function generateWordWheelPuzzle(
   const date = dateString || getDailyChallengeDate();
   const puzzleNumber = getPuzzleNumber(date);
 
+  // Daily from v3: a no-repeat schedule (fresh source each day, few shared letters with yesterday).
+  if (isDate(date) && date >= WHEEL_V3_START_DATE) {
+    const { center, letters } = scheduledWheel(
+      date, WHEEL_V3_START_DATE, sourcesFor(WHEEL_V3_SOURCES, language), language, HARD_CENTER_LETTERS[language] ?? [],
+    );
+    return { centerLetter: center, outerLetters: letters.slice(1), allLetters: letters, puzzleDate: date, language, puzzleNumber };
+  }
+
   // Seed PRNG — different namespace from Word Hunt
   const seedStr = `word-wheel-${SEED_SALT}-${date}-${language}`;
   const seed = hashString(seedStr);
   const random = mulberry32(seed);
 
   const v2 = isV2Puzzle(date);
-  const sources = v2
-    ? (WHEEL_V2_SOURCES[language]?.length ? WHEEL_V2_SOURCES[language] : WHEEL_V2_SOURCES.en)
-    : (LEGACY_WHEEL_SOURCES[language] || LEGACY_WHEEL_SOURCES.en);
+  const sources = !isDate(date)
+    ? sourcesFor(WHEEL_V3_SOURCES, language)
+    : v2 ? sourcesFor(WHEEL_V2_SOURCES, language) : (LEGACY_WHEEL_SOURCES[language] || LEGACY_WHEEL_SOURCES.en);
   const sourceIndex = Math.floor(random() * sources.length);
   const sourceWord = sources[sourceIndex];
 
@@ -99,11 +95,7 @@ export function generateWordWheelPuzzle(
     }
   }
 
-  // Shuffle letters
-  for (let i = letters.length - 1; i > 0; i--) {
-    const j = Math.floor(random() * (i + 1));
-    [letters[i], letters[j]] = [letters[j], letters[i]];
-  }
+  shuffleInPlace(letters, random);
 
   if (v2) moveFirstPlayableCenterToFront(letters, language);
   const centerLetter = letters[0];

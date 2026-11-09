@@ -15,6 +15,7 @@ import DailyWordHuntResults from './DailyWordHuntResults';
 import DailyReadyScreen, { type ChallengeData } from './DailyReadyScreen';
 import { DailyChallengeTutorial, type HuntTutorialSource } from './DailyChallengeTutorial';
 import { useAuth } from '@/contexts/AuthContext';
+import { useDailyDate } from '@/hooks/useUtcDay';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 
@@ -109,6 +110,11 @@ const DailyChallenge: React.FC = () => {
   // ad-gated on native; on web it degrades to a free replay.
   const [forfeitedToday, setForfeitedToday] = useState(false);
   const [wasReset, setWasReset] = useState(false);
+  // Today's date, moved to the new day for a page left open past midnight UTC, never mid-run.
+  const today = useDailyDate(
+    !isPractice && !isCatchup && phase !== 'playing' && phase !== 'completed',
+    () => { setStoredResult(null); setGrid(null); setPhase('loading'); },
+  );
   const [guestFingerprint, setGuestFingerprint] = useState<string | null>(null);
 
   // Retry challenge hook
@@ -156,7 +162,7 @@ const DailyChallenge: React.FC = () => {
   }, [catchupDate]);
 
   useWordHuntPuzzleInit({
-    gameLanguage, wasReset, isAuthenticated, profileId: profile?.id ?? null, catchupDate, isPractice, online,
+    gameLanguage, today, wasReset, isAuthenticated, profileId: profile?.id ?? null, catchupDate, isPractice, online,
     setPhase, setPuzzleDate, setPuzzleNumber, setForfeitedToday, setStoredResult, setGrid, setTargetWord, setMeaning,
   });
 
