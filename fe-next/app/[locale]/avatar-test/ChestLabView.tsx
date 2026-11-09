@@ -4,10 +4,9 @@ import { useEffect, useMemo, useState } from 'react';
 import UnlockRevealOverlay from '@/components/avatar/reveal/UnlockRevealOverlay';
 import WeeklyChestModal from '@/components/daily/WeeklyChestModal';
 import { DayPrizeReveal } from '@/components/daily/prize/DayPrizeReveal';
-import { CHEST_POOL, type ChestPartDrop, type ChestPartCategory } from '@/lib/avatar/chestDrops';
+import { CHEST_POOL, DUPLICATE_COINS, type ChestPartDrop, type ChestPartCategory } from '@/lib/avatar/chestDrops';
 import { getPartRarity } from '@/lib/avatar/rarity';
 import { chestDropToReveal } from '@/lib/avatar/chestReveal';
-import { DUPLICATE_COINS } from '@/lib/avatar/chestDrops';
 import { fixtureConfigForLevel } from './fixtures';
 
 /**
