@@ -21777,6 +21777,15 @@ const es = {
       "soloPractice": "Practicar por tu cuenta"
     },
     "hostResults": {
+      "keepOpen": {
+        "cta": "Dejarlo abierto como tarea una semana",
+        "hint": "El alumnado puede volver a jugar estas palabras desde el enlace de la clase, cuando quiera, hasta el {date}.",
+        "done": "Abierto como tarea hasta el {date}",
+        "doneNoDate": "Abierto como tarea",
+        "doneHint": "Juegan desde el enlace de la clase, sin partida en directo. Verás quién jugó en el inicio del profesor.",
+        "limit": "El plan gratuito permite 3 tareas por clase. Quita una desde la página de la clase o pásate a Pro para tener ilimitadas.",
+        "failed": "No se pudo guardar la tarea. Inténtalo de nuevo."
+      },
       "more": "Más",
       "missedTitle": "Palabras que tu clase falló",
       "practiceWords": "Practicar estas palabras ({count})",

@@ -85,6 +85,8 @@ export interface ClassroomSummary {
   lessonNames: string[];
   /** Lesson ids, so results can deep-link the player into practice. */
   lessonIds: string[];
+  /** The class this round belongs to; lets the host keep the lesson open as homework. Absent on older summaries. */
+  classroomId?: string;
   /** Distinct lesson words in play. */
   totalWords: number;
   coverage: ClassroomWordCoverage[];

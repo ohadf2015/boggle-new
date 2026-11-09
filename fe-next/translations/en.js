@@ -20810,6 +20810,15 @@ const en = {
       "soloPractice": "Practice on your own"
     },
     "hostResults": {
+      "keepOpen": {
+        "cta": "Keep it open as homework for a week",
+        "hint": "Students can play these words again from the class link, any time, until {date}.",
+        "done": "Open as homework until {date}",
+        "doneNoDate": "Open as homework",
+        "doneHint": "Students play from the class link, no live game needed. You'll see who played on Teacher Home.",
+        "limit": "The free plan holds 3 assignments per class. Remove one from the class page, or go Pro for unlimited.",
+        "failed": "Couldn't save the homework. Try again."
+      },
       "more": "More",
       "missedTitle": "Words your class missed",
       "practiceWords": "Practice these words ({count})",

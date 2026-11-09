@@ -56,6 +56,7 @@ export async function buildClassroomRoundSummary({
     players: players.map((p) => ({ username: p.username, isBot: p.isBot, wordDetails: p.wordDetails })),
   });
   if (!summary) return undefined;
+  if (classroomGame.classroomId) summary.classroomId = classroomGame.classroomId;
   summary.gameMode = gameMode ?? classroomSettings?.gameMode ?? 'classic';
 
   if (classroomSettings?.playStyle === 'teams') {

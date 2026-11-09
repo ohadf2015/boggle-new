@@ -21765,6 +21765,15 @@ const sv = {
       "soloPractice": "Öva på egen hand"
     },
     "hostResults": {
+      "keepOpen": {
+        "cta": "Håll den öppen som läxa i en vecka",
+        "hint": "Eleverna kan spela orden igen från klasslänken, när som helst, till och med {date}.",
+        "done": "Öppen som läxa till och med {date}",
+        "doneNoDate": "Öppen som läxa",
+        "doneHint": "Eleverna spelar från klasslänken, inget livespel behövs. Du ser vem som spelat på lärarens startsida.",
+        "limit": "Gratisplanen rymmer 3 uppgifter per klass. Ta bort en på klassidan, eller välj Pro för obegränsat.",
+        "failed": "Det gick inte att spara läxan. Försök igen."
+      },
       "more": "Mer",
       "missedTitle": "Ord som klassen missade",
       "practiceWords": "Öva på de här orden ({count})",
