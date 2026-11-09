@@ -7,7 +7,7 @@ import { PageLoader } from '@/components/ui/PageLoader';
 import ConnectionsDailyChallenge from '@/components/connections/ConnectionsDailyChallenge';
 import PyramidChallenge from '@/components/connections/pyramid/PyramidChallenge';
 import { dailyConnectionsVariant } from '@/lib/connections/dailyVariant';
-import { todayUTC } from '@/lib/connections/dailyClient';
+import { useDailyDate } from '@/hooks/useUtcDay';
 import { getPyramidsForLocale } from '@/lib/connections/pyramid/puzzles';
 import { loadDailyResult } from '@/lib/connections/dailyResultStore';
 import { DailyFlowChrome } from '@/components/daily/flow/DailyFlowChrome';
@@ -41,15 +41,17 @@ type TutorialState = 'undecided' | 'auto' | 'manual' | 'off';
 export default function DailyPageClient({ locale }: Props): React.JSX.Element {
   useModeBed('CONNECTIONS');
   const { t } = useLanguage();
-  // Frozen for the visit: a run finished after midnight UTC stays on the day (and variant) it started.
-  const [today] = useState(todayUTC);
+  // A run in progress stays on the day (and variant) it started, even past midnight UTC.
+  // Once its result is on screen, a page left open (or an app brought back next
+  // morning) moves on to the new day's quest.
+  const [finished, setFinished] = useState(false);
+  const [playedKind, setPlayedKind] = useState<string | null>(null);
+  const today = useDailyDate(finished, () => { setFinished(false); setPlayedKind(null); });
   const variant = dailyConnectionsVariant(today);
   const hasPyramids = getPyramidsForLocale(locale).length > 0;
   // A result already played today (maybe in another language) decides the flavor, so a
   // language switch can't open the other variant as a fresh run.
-  const [playedKind, setPlayedKind] = useState<string | null>(null);
   const hostPyramid = playedKind ? playedKind === 'pyramid' : variant === 'pyramid' && hasPyramids;
-  const [finished, setFinished] = useState(false);
   const handleTerminal = useCallback(() => setFinished(true), []);
   const [tutorial, setTutorial] = useState<TutorialState>('undecided');
   const closeTutorial = useCallback(() => setTutorial('off'), []);
@@ -63,9 +65,9 @@ export default function DailyPageClient({ locale }: Props): React.JSX.Element {
     } else {
       setTutorial('off');
     }
-    // Once per mount.
+    // Once per day shown.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [today]);
 
   const tutorialOpen = tutorial === 'auto' || tutorial === 'manual';
   // An auto-shown lesson comes before the run starts; one opened mid-run keeps the run mounted underneath.
@@ -99,9 +101,9 @@ export default function DailyPageClient({ locale }: Props): React.JSX.Element {
         <div className={tutorialOpen ? 'hidden' : 'flex-1 flex flex-col min-h-0'}>
           <Suspense fallback={<LoadingFallback />}>
             {hostPyramid ? (
-              <PyramidChallenge sharePath={`${locale}/connections/daily`} today={today} onTerminal={handleTerminal} />
+              <PyramidChallenge key={today} sharePath={`${locale}/connections/daily`} today={today} onTerminal={handleTerminal} />
             ) : (
-              <ConnectionsDailyChallenge today={today} paused={tutorialOpen} onTerminal={handleTerminal} />
+              <ConnectionsDailyChallenge key={today} today={today} paused={tutorialOpen} onTerminal={handleTerminal} />
             )}
           </Suspense>
         </div>
