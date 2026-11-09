@@ -19,6 +19,8 @@ export interface QueueEntry {
   gameMode: GameMode;
   language: string;
   joinedAt: number;
+  /** Safe public label for overlays — never the account UUID. */
+  displayName?: string;
 }
 
 export interface MatchResult {
@@ -54,7 +56,8 @@ export class MatchmakingQueue {
     playerId: string,
     elo: number,
     gameMode: GameMode,
-    language: string
+    language: string,
+    displayName?: string,
   ): void {
     // Prevent duplicate player entries
     const existingSocket = this.playerToSocket.get(playerId);
@@ -69,6 +72,7 @@ export class MatchmakingQueue {
       gameMode,
       language,
       joinedAt: Date.now(),
+      displayName,
     };
 
     this.entries.set(socketId, entry);

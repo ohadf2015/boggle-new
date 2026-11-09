@@ -66,13 +66,47 @@ async function isRankedEligible(playerId: string): Promise<boolean> {
   }
 }
 
-function opponentPayload(entry: { playerId: string; elo: number }) {
+function opponentPayload(entry: { playerId: string; elo: number; displayName?: string }) {
   const tier = getTierFromElo(entry.elo);
+  const label = (entry.displayName || '').trim();
   return {
-    username: entry.playerId,
+    // Never render the account UUID — overlay shows this string.
+    username: label || 'Opponent',
     elo: entry.elo,
     tier: tier?.id ?? 'bronze',
   };
+}
+
+/** Per-socket timer cleanup so a match can clear the peer's interval/timeout. */
+const lifecycleBySocket = new Map<string, { generation: number; clearTimers: () => void }>();
+
+function clearLifecycleTimers(socketId: string): void {
+  const life = lifecycleBySocket.get(socketId);
+  if (!life) return;
+  life.clearTimers();
+  life.clearTimers = () => {};
+}
+
+function bumpLifecycle(socketId: string): number {
+  clearLifecycleTimers(socketId);
+  const prev = lifecycleBySocket.get(socketId);
+  const generation = (prev?.generation ?? 0) + 1;
+  lifecycleBySocket.set(socketId, { generation, clearTimers: () => {} });
+  return generation;
+}
+
+function setLifecycleClear(socketId: string, generation: number, clearTimers: () => void): void {
+  const life = lifecycleBySocket.get(socketId);
+  if (!life || life.generation !== generation) {
+    clearTimers();
+    return;
+  }
+  life.clearTimers = clearTimers;
+}
+
+function dropLifecycle(socketId: string): void {
+  clearLifecycleTimers(socketId);
+  lifecycleBySocket.delete(socketId);
 }
 
 function stampTicket(
@@ -93,7 +127,7 @@ export function registerMatchmakingHandlers(
   let matchInterval: ReturnType<typeof setInterval> | null = null;
   let timeoutTimer: ReturnType<typeof setTimeout> | null = null;
 
-  function cleanup() {
+  function clearLocalTimers() {
     if (matchInterval) {
       clearInterval(matchInterval);
       matchInterval = null;
@@ -102,11 +136,19 @@ export function registerMatchmakingHandlers(
       clearTimeout(timeoutTimer);
       timeoutTimer = null;
     }
+  }
+
+  function cleanup() {
+    clearLocalTimers();
     queue.leaveQueue(socket.id);
+    dropLifecycle(socket.id);
   }
 
   socket.on('joinMatchmaking', async (rawData: unknown) => {
-    cleanup();
+    // Invalidate prior in-flight join + clear prior timers before starting anew.
+    clearLocalTimers();
+    queue.leaveQueue(socket.id);
+    const gen = bumpLifecycle(socket.id);
     (socket.data as SocketData).rankedMatchTicket = null;
 
     if (!isRankedMatchmakingEnabled()) {
@@ -129,7 +171,13 @@ export function registerMatchmakingHandlers(
       return;
     }
 
+    const stillCurrent = () => {
+      const life = lifecycleBySocket.get(socket.id);
+      return !!life && life.generation === gen && socket.connected !== false;
+    };
+
     const eligible = await isRankedEligible(playerId);
+    if (!stillCurrent()) return;
     if (!eligible) {
       socket.emit('matchmakingError', {
         error: 'NOT_ELIGIBLE',
@@ -139,29 +187,41 @@ export function registerMatchmakingHandlers(
     }
 
     let elo = DEFAULT_RATING;
+    let displayName: string | undefined;
     try {
       const client = getSupabase();
       if (client) {
         const { data } = await client
           .from('profiles')
-          .select('ranked_mmr')
+          .select('ranked_mmr, username, display_name')
           .eq('id', playerId)
           .single();
         if (data?.ranked_mmr) elo = data.ranked_mmr;
+        const raw = (data?.display_name || data?.username || '').trim();
+        if (raw && raw !== playerId) displayName = raw;
       }
     } catch (err) {
       logger.warn('MATCHMAKING', `Failed to fetch ELO for ${playerId}, using default: ${err}`);
     }
+    if (!stillCurrent()) return;
 
     const validation = validatePayload(joinMatchmakingSchema, rawData);
     if (!validation.success) {
       socket.emit('matchmakingError', { error: 'INVALID_PAYLOAD', message: validation.error });
       return;
     }
+    if (!stillCurrent()) return;
 
     const { gameMode, language } = validation.data as JoinMatchmakingData;
 
-    queue.joinQueue(socket.id, playerId, elo, gameMode as 'classic' | 'wordHunt', language);
+    queue.joinQueue(
+      socket.id,
+      playerId,
+      elo,
+      gameMode as 'classic' | 'wordHunt',
+      language,
+      displayName,
+    );
 
     logger.info('MATCHMAKING', `Player ${playerId} joined queue (elo=${elo}, mode=${gameMode})`);
 
@@ -173,9 +233,18 @@ export function registerMatchmakingHandlers(
 
     matchInterval = setInterval(() => {
       try {
+        if (!stillCurrent()) {
+          clearLocalTimers();
+          return;
+        }
         const match = queue.tryMatch(socket.id);
         if (match) {
-          cleanup();
+          // Clear BOTH players' intervals/timeouts — peer used to keep ticking.
+          clearLocalTimers();
+          clearLifecycleTimers(match.player1.socketId);
+          clearLifecycleTimers(match.player2.socketId);
+          dropLifecycle(match.player1.socketId);
+          dropLifecycle(match.player2.socketId);
 
           const hostTicket = buildRankedMatchTicket({
             roomId: match.roomId,
@@ -221,19 +290,24 @@ export function registerMatchmakingHandlers(
     }, MATCH_INTERVAL_MS);
 
     timeoutTimer = setTimeout(() => {
+      if (!stillCurrent()) return;
       socket.emit('matchmakingTimeout');
       cleanup();
       (socket.data as SocketData).rankedMatchTicket = null;
       logger.info('MATCHMAKING', `Player ${playerId} timed out`);
     }, TIMEOUT_MS);
+
+    setLifecycleClear(socket.id, gen, clearLocalTimers);
   });
 
   socket.on('leaveMatchmaking', () => {
+    bumpLifecycle(socket.id); // invalidate in-flight async join
     cleanup();
     (socket.data as SocketData).rankedMatchTicket = null;
   });
 
   socket.on('disconnect', () => {
+    bumpLifecycle(socket.id);
     cleanup();
     (socket.data as SocketData).rankedMatchTicket = null;
   });

@@ -40,6 +40,7 @@ function createMockSocket(id = 'socket-1', verified = true) {
   const userId = `user-${id}`;
   return {
     id,
+    connected: true,
     on: vi.fn((event: string, handler: Function) => {
       handlers[event] = handler;
     }),
@@ -160,5 +161,142 @@ describe('matchmakingHandler', () => {
     socket._handlers['leaveMatchmaking']();
     expect(queue.getQueueStats().playersInQueue).toBe(0);
     expect(socket.data.rankedMatchTicket).toBeNull();
+  });
+});
+
+describe('matchmakingHandler lifecycle races', () => {
+  let queue: MatchmakingQueue;
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    mockFrom.mockReset();
+    mockEligible();
+    (isRankedMatchmakingEnabled as unknown as Mock).mockReturnValue(true);
+    queue = new MatchmakingQueue();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    queue.destroy();
+  });
+
+  it('clears BOTH players timers on match so peer does not keep emitting updates/timeout', async () => {
+    const socket1 = createMockSocket('socket-1');
+    const socket2 = createMockSocket('socket-2');
+    const sockets = new Map([[socket1.id, socket1], [socket2.id, socket2]]);
+    const io = createMockIo(sockets);
+    registerMatchmakingHandlers(io as any, socket1 as any, queue);
+    registerMatchmakingHandlers(io as any, socket2 as any, queue);
+
+    await socket1._handlers['joinMatchmaking']({ gameMode: 'classic', language: 'en' });
+    await socket2._handlers['joinMatchmaking']({ gameMode: 'classic', language: 'en' });
+    await vi.advanceTimersByTimeAsync(2000); // match
+
+    const updatesBefore = socket1.emit.mock.calls.filter((c: unknown[]) => c[0] === 'matchmakingUpdate').length
+      + socket2.emit.mock.calls.filter((c: unknown[]) => c[0] === 'matchmakingUpdate').length;
+
+    // Peer used to keep interval alive → dozens of updates then timeout
+    await vi.advanceTimersByTimeAsync(60000);
+
+    const updatesAfter = socket1.emit.mock.calls.filter((c: unknown[]) => c[0] === 'matchmakingUpdate').length
+      + socket2.emit.mock.calls.filter((c: unknown[]) => c[0] === 'matchmakingUpdate').length;
+    expect(updatesAfter).toBe(updatesBefore);
+    expect(socket1.emit).not.toHaveBeenCalledWith('matchmakingTimeout');
+    expect(socket2.emit).not.toHaveBeenCalledWith('matchmakingTimeout');
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('does not enqueue after disconnect during async eligibility', async () => {
+    let resolveEligible!: (v: unknown) => void;
+    mockFrom.mockImplementation((table: string) => {
+      if (table === 'ranked_progress') {
+        return {
+          select: () => ({
+            eq: () => ({
+              maybeSingle: () => new Promise((resolve) => { resolveEligible = resolve; }),
+            }),
+          }),
+        };
+      }
+      return {
+        select: () => ({
+          eq: () => ({
+            single: async () => ({ data: { ranked_mmr: 1200, username: 'Maya' } }),
+          }),
+        }),
+      };
+    });
+
+    const socket = createMockSocket('socket-1');
+    (socket as any).connected = true;
+    const io = createMockIo(new Map([[socket.id, socket]]));
+    registerMatchmakingHandlers(io as any, socket as any, queue);
+
+    const joinPromise = socket._handlers['joinMatchmaking']({ gameMode: 'classic', language: 'en' });
+    (socket as any).connected = false;
+    socket._handlers['disconnect']();
+    resolveEligible({ data: { casual_games_played: 12, unlocked_at: null } });
+    await joinPromise;
+
+    expect(queue.getQueueStats().playersInQueue).toBe(0);
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('re-join after leave leaves zero orphan timers', async () => {
+    const socket = createMockSocket('socket-1');
+    const io = createMockIo(new Map([[socket.id, socket]]));
+    registerMatchmakingHandlers(io as any, socket as any, queue);
+
+    await socket._handlers['joinMatchmaking']({ gameMode: 'classic', language: 'en' });
+    expect(vi.getTimerCount()).toBeGreaterThan(0);
+    socket._handlers['leaveMatchmaking']();
+    expect(vi.getTimerCount()).toBe(0);
+
+    await socket._handlers['joinMatchmaking']({ gameMode: 'classic', language: 'en' });
+    socket._handlers['leaveMatchmaking']();
+    expect(vi.getTimerCount()).toBe(0);
+    expect(queue.getQueueStats().playersInQueue).toBe(0);
+  });
+
+  it('matchFound opponent.username is a display name, never the account UUID', async () => {
+    mockFrom.mockImplementation((table: string) => {
+      if (table === 'ranked_progress') {
+        return {
+          select: () => ({
+            eq: () => ({
+              maybeSingle: async () => ({ data: { casual_games_played: 12, unlocked_at: null } }),
+            }),
+          }),
+        };
+      }
+      return {
+        select: () => ({
+          eq: () => ({
+            single: async () => ({ data: { ranked_mmr: 1200, username: 'Maya', display_name: 'Maya D' } }),
+          }),
+        }),
+      };
+    });
+
+    const socket1 = createMockSocket('socket-1');
+    const socket2 = createMockSocket('socket-2');
+    const sockets = new Map([[socket1.id, socket1], [socket2.id, socket2]]);
+    const io = createMockIo(sockets);
+    registerMatchmakingHandlers(io as any, socket1 as any, queue);
+    registerMatchmakingHandlers(io as any, socket2 as any, queue);
+
+    await socket1._handlers['joinMatchmaking']({ gameMode: 'classic', language: 'en' });
+    await socket2._handlers['joinMatchmaking']({ gameMode: 'classic', language: 'en' });
+    await vi.advanceTimersByTimeAsync(2000);
+
+    const found = io._mockSocket.emit.mock.calls.find((c: unknown[]) => c[0] === 'matchFound');
+    expect(found).toBeTruthy();
+    const opponent = found![1].opponent;
+    expect(opponent.username).not.toMatch(/^user-socket-/);
+    expect(opponent.username).not.toMatch(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+    );
+    expect(typeof opponent.username).toBe('string');
+    expect(opponent.username.length).toBeGreaterThan(0);
   });
 });
