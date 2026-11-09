@@ -56,6 +56,7 @@ export function useBridgeTyping({
     if (next !== input) onInputChange(next);
   };
   const handleBackspace = () => onInputChange(backspace(input));
+  const handleClear = () => { if (input) onInputChange(''); };
 
   // Desktop typing: physical keys feed the same buffer as the on-screen keys.
   useEffect(() => {
@@ -97,5 +98,5 @@ export function useBridgeTyping({
     return () => window.clearTimeout(timer);
   }, [status, wrongAttempts, onInputChange]);
 
-  return { keyboardRows, needsIME, slotCap, handleLetter, handleBackspace };
+  return { keyboardRows, needsIME, slotCap, handleLetter, handleBackspace, handleClear };
 }

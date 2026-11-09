@@ -71,7 +71,7 @@ export default function FinaleCard({
   const isResolved = isCorrect || isGaveUp;
   const isDisabled = isResolved;
 
-  const { keyboardRows, needsIME, slotCap, handleLetter, handleBackspace } = useBridgeTyping({
+  const { keyboardRows, needsIME, slotCap, handleLetter, handleBackspace, handleClear } = useBridgeTyping({
     input,
     answer: pyramid.metaAnswer,
     locale: language,
@@ -259,6 +259,7 @@ export default function FinaleCard({
                   rows={keyboardRows}
                   onLetter={handleLetter}
                   onBackspace={handleBackspace}
+                  onClear={handleClear}
                   onSubmit={onSubmit}
                   backspaceLabel={t('connections.backspace')}
                   submitLabel={t('connections.submit')}

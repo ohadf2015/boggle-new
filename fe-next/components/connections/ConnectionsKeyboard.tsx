@@ -3,6 +3,7 @@
 import type { CSSProperties } from 'react';
 import { m } from 'framer-motion';
 import { Delete, CornerDownLeft } from 'lucide-react';
+import { useHoldToClear } from '@/hooks/useHoldToClear';
 import { ACTION_KEY_WIDTH, backspaceRowIndex, letterColumnCount } from '@/lib/connections/keyboard';
 
 interface ConnectionsKeyboardProps {
@@ -12,6 +13,8 @@ interface ConnectionsKeyboardProps {
   onLetter: (letter: string) => void;
   /** Tap backspace. */
   onBackspace: () => void;
+  /** Hold backspace: clear the whole guess. */
+  onClear?: () => void;
   /** Tap submit / enter. */
   onSubmit: () => void;
   /** Accessible label for the backspace key. */
@@ -83,6 +86,7 @@ export default function ConnectionsKeyboard({
   rows,
   onLetter,
   onBackspace,
+  onClear,
   onSubmit,
   backspaceLabel,
   submitLabel,
@@ -94,6 +98,9 @@ export default function ConnectionsKeyboard({
   const columns = letterColumnCount(rows);
   const keyStyle = letterKeyStyle(columns);
   const actionStyle = actionKeyStyle(columns);
+  // Same as Word Tower: players hammer backspace to undo a whole wrong guess
+  // (PostHog rage clicks, /he/connections/daily). Holding it clears the guess.
+  const backspaceHold = useHoldToClear({ onTap: onBackspace, onHold: onClear });
   return (
     // The key grid is a physical-keyboard artifact, not text: on every physical
     // and mobile Hebrew keyboard (and Hebrew Wordle) ק sits at the TOP-LEFT and
@@ -147,7 +154,7 @@ export default function ConnectionsKeyboard({
           {rowIdx === bsRow && (
             <button
               type="button"
-              onClick={onBackspace}
+              {...backspaceHold}
               disabled={disabled}
               aria-label={backspaceLabel}
               title={backspaceLabel}
