@@ -4,7 +4,7 @@ import type { Ref } from 'react';
 import { ClipboardList, Loader2, Play } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { StarterLessonPack } from '@/lib/education/starterLessonPacks';
-import { NB_BLOCK, NB_INPUT, NB_PANEL, NB_PRIMARY, NB_STICKER } from '../nb/nbStyles';
+import { NB_BLOCK, NB_ICON_TILE, NB_INPUT, NB_PANEL_POP, NB_PRIMARY, NB_STICKER } from '../nb/nbStyles';
 import { StarterPackRow } from './StarterPackRow';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
@@ -29,10 +29,12 @@ export interface FirstGameWordsProps {
 /** The teacher's own words, or a starter pack when the box is empty: whatever is here is what Play now runs. */
 export function FirstGameWords({ text, onTextChange, count, skipped, minWords, error, packs, packKey, savedPackKey, onPackChange, textareaRef, t }: FirstGameWordsProps) {
   return (
-    <section data-testid="first-game-panel" aria-labelledby="first-game-title" className={cn(NB_PANEL, 'flex flex-col gap-2.5 p-3 sm:p-4')}>
+    <section data-testid="first-game-panel" aria-labelledby="first-game-title" className={cn(NB_PANEL_POP.cyan, 'flex flex-col gap-2.5 p-3 sm:p-4')}>
       <div className="flex items-center justify-between gap-2">
         <h2 id="first-game-title" className="inline-flex items-center gap-2 font-neo-display text-lg font-black leading-tight text-neo-cream sm:text-xl">
-          <ClipboardList className="size-5 shrink-0 text-neo-lime" aria-hidden="true" />
+          <span className={cn(NB_ICON_TILE, NB_BLOCK.cyan)} aria-hidden="true">
+            <ClipboardList className="size-5" />
+          </span>
           {t('eduShell.setup.words.title')}
         </h2>
         {count > 0 ? (
