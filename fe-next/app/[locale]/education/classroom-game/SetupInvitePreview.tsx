@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { ClassSetupInviteView } from '@/components/education/ClassSetupInviteView';
-import { classroomJoinUrl } from '@/lib/education/classroomInvitePayload';
+import { classroomJoinUrl, joinAddressForDisplay } from '@/lib/education/classroomInvitePayload';
 import type { RosterStudent } from '@/components/teacher/hq/rosterModel';
 import { cn } from '@/lib/utils';
 
@@ -41,7 +41,7 @@ export function SetupInvitePreview() {
         classroom={CLASSROOM}
         roster={roster}
         joinUrl={origin ? classroomJoinUrl(origin, language, CLASSROOM.join_code) : ''}
-        displayHost={origin ? `${origin.replace(/^https?:\/\//, '')}/${language}/join` : ''}
+        displayHost={origin ? `${joinAddressForDisplay(origin)}/${language}/join` : ''}
         startHref="#"
         homeHref={`/${language}/teacher`}
         reduced={false}

@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import { ClassSetupInviteView } from '@/components/education/ClassSetupInviteView';
-import { classroomJoinUrl } from '@/lib/education/classroomInvitePayload';
+import { classroomJoinUrl, joinAddressForDisplay } from '@/lib/education/classroomInvitePayload';
 import type { RosterStudent } from '@/components/teacher/hq/rosterModel';
 import { MIN_PASTED_WORDS } from '@/components/teacher/dashboard/quickLaunchIntent';
 import { FirstGameWords, PlayNowButton } from '@/components/teacher/setup/FirstGameWords';
@@ -41,7 +41,7 @@ export default function ClassReadyPreview() {
           classroom={CLASSROOM}
           roster={{ students, arrivals: [], loading: false }}
           joinUrl={origin ? classroomJoinUrl(origin, language, CLASSROOM.join_code) : ''}
-          displayHost={origin ? `${origin.replace(/^https?:\/\//, '')}/${language}/join` : ''}
+          displayHost={origin ? `${joinAddressForDisplay(origin)}/${language}/join` : ''}
           startHref="#"
           homeHref={`/${language}/teacher`}
           reduced={false}

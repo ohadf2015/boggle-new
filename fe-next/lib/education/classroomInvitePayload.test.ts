@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { classroomInvitePayload, classroomJoinUrl, inviteLocale } from './classroomInvitePayload';
+import { classroomInvitePayload, classroomJoinUrl, inviteLocale, joinAddressForDisplay } from './classroomInvitePayload';
 
 /**
  * COPY CODE handed students a code with no destination.
@@ -54,5 +54,16 @@ describe('inviteLocale', () => {
     expect(inviteLocale('fr', 'en')).toBe('en');
     expect(inviteLocale(null, 'sv')).toBe('sv');
     expect(inviteLocale(undefined, 'ja')).toBe('ja');
+  });
+});
+
+describe('joinAddressForDisplay', () => {
+  it('Given the production origin, Then the address a student reads has no scheme and no www', () => {
+    expect(joinAddressForDisplay('https://www.lexiclash.live/he/join/AB12CD')).toBe('lexiclash.live/he/join/AB12CD');
+    expect(joinAddressForDisplay('https://www.lexiclash.live/')).toBe('lexiclash.live');
+  });
+
+  it('Given a host without www, Then only the scheme goes', () => {
+    expect(joinAddressForDisplay('http://localhost:3000')).toBe('localhost:3000');
   });
 });

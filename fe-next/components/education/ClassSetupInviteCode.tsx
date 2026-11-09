@@ -1,5 +1,6 @@
 'use client';
 
+import { Fragment } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Copy, GraduationCap, Link2, MessageCircle, Share2, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -73,9 +74,14 @@ export function ClassSetupInviteCode({ code, className, joinUrl, displayHost, on
             {code}
           </span>
           {displayHost ? (
-            <span dir="ltr" className="mt-1 inline-flex min-w-0 items-center gap-1 font-neo-body text-sm font-bold text-neo-black/80">
+            <span dir="ltr" className="mt-1 inline-flex min-w-0 items-center gap-1 font-neo-body text-xs font-bold text-neo-black/80 min-[400px]:text-sm">
               <Link2 className="size-4 shrink-0" aria-hidden="true" />
-              <span className="truncate">{displayHost}</span>
+              {/* Never truncated: a student types this. If it still cannot fit, it breaks after a slash. */}
+              <span data-testid="setup-join-address" className="min-w-0">
+                {displayHost.split('/').map((part, i, all) => (
+                  <Fragment key={i}>{part}{i < all.length - 1 ? <>/<wbr /></> : null}</Fragment>
+                ))}
+              </span>
             </span>
           ) : null}
         </div>

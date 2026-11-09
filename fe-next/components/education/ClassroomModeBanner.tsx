@@ -16,6 +16,7 @@ import { SocketContext } from '@/utils/SocketContext';
 import { useIsVocabQuizRoom } from './vocabQuiz/useIsVocabQuizRoom';
 import { useClassroomSeatCapNotice } from './controls/useClassroomSeatCapNotice';
 import { StudentModeStrip } from './ClassroomModeBannerStudent';
+import { joinAddressForDisplay } from '@/lib/education/classroomInvitePayload';
 
 interface LessonData {
   lessonId: string;
@@ -327,7 +328,7 @@ export function ClassroomModeBanner({
                     className="max-w-full break-all text-center font-neo-body text-xs font-bold text-neo-white/90"
                     dir="ltr"
                   >
-                    {joinUrl.replace(/^https?:\/\/(www\.)?/, '')}
+                    {joinAddressForDisplay(joinUrl)}
                   </p>
                 </div>
               )}

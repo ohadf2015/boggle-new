@@ -22053,7 +22053,7 @@ const he = {
       "shareWhatsapp": "וואטסאפ",
       "shareGoogle": "Google Classroom",
       "shareMore": "שיתוף",
-      "copyLink": "העתקת קישור הזמנה",
+      "copyLink": "העתקת קישור",
       "copied": "הועתק",
       "copyFailed": "ההעתקה לא הצליחה. אפשר לשתף את הקוד במקום.",
       "noAccount": "התלמידים מצטרפים בלי חשבון",
