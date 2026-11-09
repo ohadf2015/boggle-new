@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthedUser } from '@/lib/auth/getAuthedUser'
 import { getSupabaseAdmin } from '@/lib/email'
 import {
-  computeCycleProgress,
+  computeWeekProgress,
   computeChestTierForCycle,
-  findCompletedCycles,
+  findOwedChests,
 } from '@/lib/daily/weeklyChest'
 import { loadChestActivity } from '@/lib/daily/weeklyChestData'
 import { grantStreakFreezes } from '@/lib/daily/chestFreezeGrant'
@@ -53,16 +53,16 @@ async function claim(request: NextRequest) {
     (allChests ?? []).filter((c: any) => !!c.opened_at).map((c: any) => c.cycle_start as string)
   )
 
-  const completedCycles = findCompletedCycles(allDates)
+  const completedCycles = findOwedChests(allDates, today)
   const oldestUnclaimed = completedCycles.find(c => !openedCycleStarts.has(c.cycleStart))
 
-  const liveProgress = computeCycleProgress(allDates, today)
+  const liveProgress = computeWeekProgress(allDates, today)
   const progress = oldestUnclaimed
     ? {
         cycleStart: oldestUnclaimed.cycleStart,
         cycleNumber: oldestUnclaimed.cycleNumber,
         completedDates: oldestUnclaimed.completedDates,
-        daysCompleted: 7,
+        daysCompleted: oldestUnclaimed.completedDates.length,
         isClaimable: true,
       }
     : liveProgress

@@ -14,7 +14,9 @@ import { QuickModeAdapter } from './adapters/QuickModeAdapter';
 import { preloadQuickMode } from './adapters/preloadQuickMode';
 import { QuickPlayResults, type QuickRival } from './QuickPlayResults';
 import type { CollectedWord } from './QuickWordsCollected';
-import { recordGuestRound, quickCoinsFor, quickXpFor, recentAveragePct } from '@/lib/quickPlay/guestProgress';
+import { recordGuestRound, quickCoinsFor, quickXpFor, recentAveragePct, quickRoundsPlayed, bestScoreFor } from '@/lib/quickPlay/guestProgress';
+import { COACH_SEED_PREFIX } from '@/shared/utils/coachBoard';
+import { weeklySeed } from '@/shared/utils/weeklyTheme';
 import { getQuickPlayWordProgress } from '@/lib/quickPlay/wordCollection';
 import { updateGuestStatsAfterGame } from '@/utils/guestManager';
 import { useQuickResultsCalmBridge } from '@/lib/quickPlay/resultsCalm';
@@ -27,9 +29,13 @@ import { captureError } from '@/utils/sentry';
 import { useBackOneLevel } from '@/hooks/useBackOneLevel';
 import type { WheelSelection } from './wheelGeometry';
 import { strikeHoldMs } from './lightningPath';
-import { QUICK_MODES, type QuickMode, type QuickRoundConfig, type QuickRoundResult, type QuickSubmitOutcome } from './types';
+import { QUICK_MODES, roundTarget, type QuickMode, type QuickRoundConfig, type QuickRoundResult, type QuickSubmitOutcome } from './types';
 
 type HubPhase = 'loading' | 'error' | 'playing' | 'results';
+
+function roundTargetWords(config: QuickRoundConfig): number {
+  return roundTarget(config).words;
+}
 
 function prefersReducedMotion(): boolean {
   if (typeof window === 'undefined' || !window.matchMedia) return false;
@@ -56,9 +62,25 @@ interface QuickPlayHubProps {
   challengeId?: string | null;
   backHref?: string;
   startMode?: WheelSelection | null;
+  /**
+   * Coached first game requested (home PLAY for a first-timer, /practice, the
+   * end of onboarding). Honoured only when this device has never finished a
+   * Quick Play round: returning players keep the plain quick round.
+   */
+  coach?: boolean;
+  /** Start on this week's themed board (same seeded classic board for everyone). */
+  weekly?: boolean;
 }
 
-export function QuickPlayHub({ challengeId, backHref, startMode }: QuickPlayHubProps) {
+function randomSeedId(): string {
+  try {
+    return crypto.randomUUID();
+  } catch {
+    return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`;
+  }
+}
+
+export function QuickPlayHub({ challengeId, backHref, startMode, coach = false, weekly = false }: QuickPlayHubProps) {
   const { t, language } = useLanguage();
   const { user } = useAuth();
   const { announce } = useAnnouncer();
@@ -76,6 +98,10 @@ export function QuickPlayHub({ challengeId, backHref, startMode }: QuickPlayHubP
   const [dayStreak, setDayStreak] = useState(0);
   const [challengeResolved, setChallengeResolved] = useState(!challengeId);
   const lastSelection = useRef<WheelSelection>(startMode ?? 'random');
+  // Decided once per mount: the coached board only for a true first-timer.
+  const [coachFirst] = useState(() => coach && !challengeId && quickRoundsPlayed() === 0);
+  // Best raw score on the mode BEFORE the round that just ended (near-miss line).
+  const [prevBest, setPrevBest] = useState(0);
   const goBack = useBackOneLevel(backHref);
   const submitting = useRef(false);
   const holdCalmUntilResults = useQuickResultsCalmBridge(phase === 'results');
@@ -157,16 +183,22 @@ export function QuickPlayHub({ challengeId, backHref, startMode }: QuickPlayHubP
      * so tapping "Blast" after a challenge round replayed the challenge's mode
      * AND seed. `undefined` means "whatever state says"; `null` means none.
      */
-    challengeOverride?: ChallengeInfo | null
+    challengeOverride?: ChallengeInfo | null,
+    /** First auto-started round only: a coached or weekly board seed. */
+    variant?: 'coach' | 'weekly'
   ) => {
     if (loadingRef.current) return;
     loadingRef.current = true;
     const activeChallenge = challengeOverride === undefined ? challenge : challengeOverride;
-    const mode: QuickMode =
-      activeChallenge?.mode ??
-      (sel === 'random'
-        ? QUICK_MODES[Math.floor(Math.random() * QUICK_MODES.length)]
-        : sel);
+    const mode: QuickMode = variant
+      ? 'classic'
+      : activeChallenge?.mode ??
+        (sel === 'random'
+          ? QUICK_MODES[Math.floor(Math.random() * QUICK_MODES.length)]
+          : sel);
+    const seed =
+      activeChallenge?.seed ??
+      (variant === 'coach' ? `${COACH_SEED_PREFIX}${randomSeedId()}`.slice(0, 64) : variant === 'weekly' ? weeklySeed() : undefined);
     // The board's code downloads during the strike instead of on the clock.
     preloadQuickMode(mode);
     lastSelection.current = sel;
@@ -184,10 +216,11 @@ export function QuickPlayHub({ challengeId, backHref, startMode }: QuickPlayHubP
         // recentPct lets the server aim the rival field at THIS player: without
         // it a beginner passes nobody and a strong player passes everyone,
         // every round. Local history, so guests are covered too; 0 = unknown.
-        body: JSON.stringify({ mode, language, seed: activeChallenge?.seed, recentPct: recentAveragePct() }),
+        body: JSON.stringify({ mode, language, seed, recentPct: recentAveragePct() }),
       });
       if (!res.ok) throw new Error(`round fetch ${res.status}`);
       const round = (await res.json()) as QuickRoundConfig;
+      if (variant === 'coach') round.coach = true;
       const elapsed = Date.now() - started;
       if (elapsed < hold) await sleep(hold - elapsed);
       setConfig(round);
@@ -205,8 +238,9 @@ export function QuickPlayHub({ challengeId, backHref, startMode }: QuickPlayHubP
     // A challenge link waits for its board; if it can't load, play anyway.
     if (autoStarted.current || !challengeResolved) return;
     autoStarted.current = true;
-    void handlePlay(startMode ?? 'random', 'tap');
-  }, [startMode, challengeResolved, handlePlay]);
+    const variant = challengeId ? undefined : coachFirst ? 'coach' : weekly ? 'weekly' : undefined;
+    void handlePlay(variant ? 'classic' : startMode ?? 'random', 'tap', undefined, variant);
+  }, [startMode, challengeResolved, handlePlay, coachFirst, weekly, challengeId]);
 
   const handleDone = useCallback(
     async (r: QuickRoundResult) => {
@@ -218,7 +252,8 @@ export function QuickPlayHub({ challengeId, backHref, startMode }: QuickPlayHubP
         // Local first: the day streak has no server home, and a signed-out
         // player's whole progression lives here (submit is auth-gated, so it
         // used to hand guests a row of zeros).
-        const local = recordGuestRound({ mode: r.mode, scorePct: r.scorePct });
+        setPrevBest(bestScoreFor(r.mode));
+        const local = recordGuestRound({ mode: r.mode, scorePct: r.scorePct, score: r.score });
         setDayStreak(local.dayStreak);
         // The signup modal's teaser reads the SHARED guest ledger, not this
         // one — quick rounds bumped its game count but never its score, so it
@@ -418,6 +453,9 @@ export function QuickPlayHub({ challengeId, backHref, startMode }: QuickPlayHubP
         collectionTotal={collectionTotal}
         isGuest={!user?.id}
         dayStreak={dayStreak}
+        prevBestScore={prevBest}
+        parWords={config ? roundTargetWords(config) : result.totalWords}
+        theme={config?.theme}
         onNextRound={handleNextRound}
         onChallenge={handleChallenge}
         onExit={goBack}

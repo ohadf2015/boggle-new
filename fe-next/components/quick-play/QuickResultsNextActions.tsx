@@ -2,6 +2,7 @@
 
 import { RotateCcw, Swords } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import posthog from '@/lib/analytics/lazyPosthog';
 import { ResultsNextBar } from '@/components/results/stage/ResultsNextBar';
 import { ModeGlyph } from './ModeGlyph';
 import { NODE_COLORS } from './modeColors';
@@ -33,7 +34,16 @@ export function QuickResultsCtaBar({
       shine={shine}
       clearAdBand
       top={currentMode ? <QuickResultsModeSwitch currentMode={currentMode} onNextRound={onNextRound} compact /> : undefined}
-      primary={{ label: t('quickPlay.solo.nextRound'), onClick: () => onNextRound('random'), testId: 'quick-results-next' }}
+      primary={{
+        // Straight to a fresh board in the SAME mode: no menu, no spin. The mode
+        // chips above stay for a switch; Random is one of them.
+        label: currentMode ? t('quickLoop.nextBoard') : t('quickPlay.solo.nextRound'),
+        onClick: () => {
+          posthog.capture('next_board_click', { mode: currentMode ?? 'random', source: 'quick_results' });
+          onNextRound(currentMode ?? 'random');
+        },
+        testId: 'quick-results-next',
+      }}
       secondary={{
         label: t('quickPlay.solo.challengeFriend'),
         title: t('quickPlay.solo.challengeHint'),

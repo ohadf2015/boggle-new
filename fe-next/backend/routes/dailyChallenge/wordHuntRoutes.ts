@@ -37,7 +37,7 @@ import { updateDailyProfileStats } from './profileStats';
 import { updateLeaderboardEntry } from '../../modules/supabase/leaderboard';
 import { leaderboardPointsForGame } from '../../modules/leaderboardScoring';
 import {
-  computeCycleProgress,
+  computeWeekProgress,
   computeChestTierForCycle,
   computeCurrentStreak,
   type HuntScoreRow,
@@ -525,7 +525,7 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
           logger.error('API', `[WordHunt] freeze bridge error: ${(fe as Error).message}`)
         }
 
-        const progress = computeCycleProgress([...allDates, ...frozenDates], today)
+        const progress = computeWeekProgress([...allDates, ...frozenDates], today)
         if (progress.isClaimable) {
           const { data: existing } = await supabase
             .from('daily_weekly_chests').select('id').eq('player_id', playerId).eq('cycle_start', progress.cycleStart)

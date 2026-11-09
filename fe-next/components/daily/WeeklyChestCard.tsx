@@ -8,6 +8,8 @@ import { useLanguage } from '@/contexts/LanguageContext'
 import { useWeeklyChest, type PendingChest } from '@/hooks/useWeeklyChest'
 import posthog from '@/lib/analytics/lazyPosthog'
 import ChestProgressDots from './ChestProgressDots'
+import { StreakFreezeIndicator } from './results/StreakFreezeIndicator'
+import { CHEST_DAYS_REQUIRED } from '@/lib/daily/weeklyChest'
 import { WeeklyChestPlaceholder } from './WeeklyChestPlaceholder'
 
 const WeeklyChestInfoModal = dynamic(() => import('./WeeklyChestInfoModal'), { ssr: false })
@@ -41,6 +43,7 @@ export default function WeeklyChestCard({ onChestClaimed }: Props) {
     claiming,
     claimError,
     claim,
+    freezesAvailable,
   } = useWeeklyChest()
   const chestRef = useRef<HTMLButtonElement>(null)
   const cardRef = useRef<HTMLDivElement>(null)
@@ -51,8 +54,9 @@ export default function WeeklyChestCard({ onChestClaimed }: Props) {
   const safeDays = Number.isFinite(daysCompleted)
     ? Math.max(0, Math.min(7, Math.trunc(daysCompleted)))
     : 0
-  const remaining = Math.max(0, 7 - safeDays)
-  const percent = Math.round((safeDays / 7) * 100)
+  // Any 5 days of the calendar week fill the chest (see lib/daily/weeklyChest).
+  const remaining = Math.max(0, CHEST_DAYS_REQUIRED - safeDays)
+  const percent = Math.min(100, Math.round((safeDays / CHEST_DAYS_REQUIRED) * 100))
 
   // Effects run once the real card is mounted (refs are null while loading).
   // gsap is loaded on demand so guests and the hub's first load never pay for it.
@@ -153,9 +157,16 @@ export default function WeeklyChestCard({ onChestClaimed }: Props) {
           className="text-[11px] font-black text-neo-navy bg-neo-yellow rounded-full px-2.5 py-0.5 border-2 border-neo-black shadow-hard-xs"
           data-testid="chest-day-counter"
         >
-          {safeDays}/7
+          {Math.min(safeDays, CHEST_DAYS_REQUIRED)}/{CHEST_DAYS_REQUIRED}
         </span>
       </div>
+
+      {/* Freezes sit with the week: each one covers a missed day. */}
+      {(freezesAvailable ?? 0) > 0 && (
+        <div className="mb-3 relative">
+          <StreakFreezeIndicator freezesAvailable={freezesAvailable ?? 0} isProtected={false} t={t as never} />
+        </div>
+      )}
 
       {/* Main row: chest + progress */}
       <div className="flex items-center gap-4 relative">
@@ -195,8 +206,8 @@ export default function WeeklyChestCard({ onChestClaimed }: Props) {
             className="relative h-3 w-full rounded-full bg-neo-navy border-2 border-neo-black overflow-hidden"
             role="progressbar"
             aria-valuemin={0}
-            aria-valuemax={7}
-            aria-valuenow={safeDays}
+            aria-valuemax={CHEST_DAYS_REQUIRED}
+            aria-valuenow={Math.min(safeDays, CHEST_DAYS_REQUIRED)}
             aria-label={t('daily.weeklyChest.title')}
             data-testid="chest-progress-bar"
           >

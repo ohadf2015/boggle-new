@@ -40,6 +40,7 @@ import { DayPrizeHubCard } from './prize/DayPrizeHubCard';
 import { LeaderboardTeaser } from './landing/LeaderboardTeaser';
 import { useUtcDay } from './landing/useUtcDay';
 import { WeeklyChestPlaceholder } from './WeeklyChestPlaceholder';
+import { WeeklyThemeCard } from './WeeklyThemeCard';
 
 // Below the fold and authed-only: keep gsap + the chest modals out of the hub's first load.
 const WeeklyChestCard = dynamic(() => import('./WeeklyChestCard'), {
@@ -283,6 +284,9 @@ export function DailyChallengeLanding({
           <div className="w-full h-14 rounded-xl skeleton" />
         </div>
       )}
+
+      {/* This week's themed board: same board for everyone, all week. */}
+      <WeeklyThemeCard lang={currentLanguage} t={t as never} source="daily_hub" />
 
       <LeaderboardTeaser
         key={day}

@@ -112,7 +112,14 @@ describe('PlayHero', () => {
     expect(screen.getByTestId('hp-chip-daily').textContent).not.toContain('streak');
   });
 
+  it('given a device that never played, then PLAY opens the coached first round', () => {
+    window.localStorage.removeItem('lexiclash_quick_guest_v1');
+    renderHero({ lang: 'he' });
+    expect(screen.getByTestId('hp-play').getAttribute('href')).toBe('/he/quick-play?mode=classic&coach=1');
+  });
+
   it('given the hero, then PLAY deep-links a random round and each mode key deep-links its mode', () => {
+    window.localStorage.setItem('lexiclash_quick_guest_v1', JSON.stringify({ points: 20, history: [20], coinsPending: 0, xpPending: 0, bestByMode: {}, lastPlayedDay: null, dayStreak: 0 }));
     renderHero({ lang: 'he' });
     expect(screen.getByTestId('hp-play').getAttribute('href')).toBe('/he/quick-play?mode=random');
     const keys = Array.from(screen.getByTestId('hp-keycaps').querySelectorAll('a')).map((a) => a.getAttribute('href'));

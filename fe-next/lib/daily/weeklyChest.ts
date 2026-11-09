@@ -219,3 +219,85 @@ export function computeCycleProgress(
 
   return { cycleStart, cycleNumber, completedDates, daysCompleted: daysInCurrentCycle, isClaimable: daysInCurrentCycle === 7 }
 }
+
+// ── Weekly chest, 5 of 7 ────────────────────────────────────────────────────
+// The chest used to need 7 days IN A ROW: one missed day reset the run, and
+// almost nobody used a freeze to save it. It now fills on any 5 days of the
+// calendar week (Mon–Sun, UTC), so one busy day no longer costs the week.
+// Freeze dates still count as played days (callers merge them into the dates).
+
+/** Days of a calendar week that fill the chest. */
+export const CHEST_DAYS_REQUIRED = 5
+
+/**
+ * First Monday counted under the 5-of-7 rule. Past weeks only become claimable
+ * from here on: without the floor, every old week with 5+ days would mint a
+ * backlog chest the moment this shipped.
+ */
+export const CHEST_WEEKLY_RULE_START = '2026-11-09'
+
+function addDaysIso(iso: string, days: number): string {
+  const d = new Date(iso + 'T00:00:00Z')
+  d.setUTCDate(d.getUTCDate() + days)
+  return d.toISOString().slice(0, 10)
+}
+
+/** Monday (UTC) of the week containing `iso`. */
+export function weekStartOf(iso: string): string {
+  const d = new Date(iso + 'T00:00:00Z')
+  const dow = d.getUTCDay() || 7 // Sunday → 7
+  return addDaysIso(iso, 1 - dow)
+}
+
+function weekNumberFor(weekStart: string): number {
+  const diff = Math.round(
+    (new Date(weekStart + 'T00:00:00Z').getTime() - new Date(weekStartOf(CHEST_WEEKLY_RULE_START) + 'T00:00:00Z').getTime()) / 86_400_000,
+  )
+  return Math.max(1, Math.floor(diff / 7) + 1)
+}
+
+function datesInWeek(allCompletedDates: string[], weekStart: string, upTo?: string): string[] {
+  const end = addDaysIso(weekStart, 6)
+  const last = upTo && upTo < end ? upTo : end
+  return Array.from(new Set(allCompletedDates))
+    .filter(d => typeof d === 'string' && d.length === 10 && d >= weekStart && d <= last)
+    .sort()
+}
+
+/** This calendar week's chest progress: claimable from the 5th played day. */
+export function computeWeekProgress(allCompletedDates: string[], today: string): CycleProgress {
+  const cycleStart = weekStartOf(today)
+  const completedDates = datesInWeek(allCompletedDates, cycleStart, today)
+  return {
+    cycleStart,
+    cycleNumber: weekNumberFor(cycleStart),
+    completedDates,
+    daysCompleted: completedDates.length,
+    isClaimable: completedDates.length >= CHEST_DAYS_REQUIRED,
+  }
+}
+
+/**
+ * Finished past weeks that earned a chest (5+ days), oldest first. Only last
+ * week is still owed — and never a week before CHEST_WEEKLY_RULE_START — so a
+ * chest earned Sunday night can be opened Monday, but old history mints nothing.
+ */
+export function findQualifiedPastWeeks(allCompletedDates: string[], today: string): CompletedCycle[] {
+  const lastWeek = addDaysIso(weekStartOf(today), -7)
+  if (lastWeek < weekStartOf(CHEST_WEEKLY_RULE_START)) return []
+  const completedDates = datesInWeek(allCompletedDates, lastWeek)
+  if (completedDates.length < CHEST_DAYS_REQUIRED) return []
+  return [{ cycleStart: lastWeek, cycleNumber: weekNumberFor(lastWeek), completedDates }]
+}
+
+/**
+ * Every chest still owed, oldest first: 7-in-a-row cycles finished under the
+ * old rule (before CHEST_WEEKLY_RULE_START) — so a chest earned the day before
+ * the switch is never lost — then last week under the 5-of-7 rule.
+ */
+export function findOwedChests(allCompletedDates: string[], today: string): CompletedCycle[] {
+  const legacy = findCompletedCycles(
+    allCompletedDates.filter(d => typeof d === 'string' && d < CHEST_WEEKLY_RULE_START),
+  )
+  return [...legacy, ...findQualifiedPastWeeks(allCompletedDates, today)]
+}

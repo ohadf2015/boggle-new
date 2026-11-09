@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/email'
 import { getAuthedUser } from '@/lib/auth/getAuthedUser'
 import {
-  computeCycleProgress,
+  computeWeekProgress,
   computeCurrentStreak,
   computeChestTierForCycle,
-  findCompletedCycles,
+  findOwedChests,
 } from '@/lib/daily/weeklyChest'
 import { loadChestActivity } from '@/lib/daily/weeklyChestData'
 import logger from '@/utils/logger'
@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
 
     // Find any fully-completed 7-day chunks across the player's history that
     // haven't been claimed yet. Oldest unclaimed wins so backlog clears in order.
-    const completedCycles = findCompletedCycles(allDates)
+    const completedCycles = findOwedChests(allDates, today)
     const unclaimed = completedCycles.find(c => !openedCycleStarts.has(c.cycleStart))
 
     // Backdated path: prior cycle still owed — surface it as the active cycle so
@@ -78,10 +78,10 @@ export async function GET(request: NextRequest) {
           cycleStart: unclaimed.cycleStart,
           cycleNumber: unclaimed.cycleNumber,
           completedDates: unclaimed.completedDates,
-          daysCompleted: 7,
+          daysCompleted: unclaimed.completedDates.length,
           isClaimable: true,
         }
-      : computeCycleProgress(allDates, today)
+      : computeWeekProgress(allDates, today)
 
     // Projected tier — what tier the chest would be if claimed right now, based
     // on the player's performance so far this cycle. Puzzle/Hunt/Wheel all
@@ -107,7 +107,24 @@ export async function GET(request: NextRequest) {
         }
       : null
 
+    // Streak freezes in the bank, shown next to the streak so players know a
+    // missed day is covered. Best effort: a failed read shows none, never 500s.
+    let freezesAvailable = 0
+    try {
+      const { data: engagementRows } = await supabase
+        .from('player_engagement')
+        .select('streak_freezes_available')
+        .eq('player_id', user.id)
+      const raw = Array.isArray(engagementRows)
+        ? (engagementRows[0] as { streak_freezes_available?: number | null } | undefined)?.streak_freezes_available
+        : (engagementRows as { streak_freezes_available?: number | null } | null)?.streak_freezes_available
+      freezesAvailable = Number.isFinite(Number(raw)) ? Math.max(0, Math.trunc(Number(raw))) : 0
+    } catch (e) {
+      logger.warn(`Weekly chest status: freeze read failed: ${(e as Error).message}`)
+    }
+
     return NextResponse.json({
+      freezesAvailable,
       cycleStart: progress.cycleStart,
       cycleNumber: progress.cycleNumber,
       completedDates: progress.completedDates,

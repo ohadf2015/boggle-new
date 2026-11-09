@@ -146,14 +146,14 @@ describe('POST /api/daily/weekly-chest/claim', () => {
     expect(insert).toHaveBeenCalledWith(expect.objectContaining({ cycle_start: '2026-05-01' }))
   })
 
-  it('returns 409 when the chest is already claimed', async () => {
+  it('awards nothing once the only owed chest is opened (this week is still filling)', async () => {
     setup({
       hunt: hunt(CYCLE),
       chests: [{ id: 'c1', cycle_start: '2026-05-06', opened_at: '2026-05-12T10:00:00Z', tier: 'gold', contents: {} }],
     })
     const res = await POST(req())
-    expect(res.status).toBe(409)
-    expect((await res.json()).error).toBe('Already claimed')
+    // Old 7-day cycle already opened; this week (Mon 05-11) has 2 of 5 days.
+    expect(res.status).toBe(400)
     expect(awardCoinsServer).not.toHaveBeenCalled()
   })
 

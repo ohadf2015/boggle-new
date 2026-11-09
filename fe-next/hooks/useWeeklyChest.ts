@@ -31,6 +31,8 @@ export interface WeeklyChestState {
   projectedTier: ChestTier
   /** 0-100 average performance score across this cycle's completed days. */
   weekScore: number
+  /** Streak freezes banked on the account (each covers one missed day). */
+  freezesAvailable: number
   /** True while a claim request is in flight (disable the claim button). */
   claiming: boolean
   /** True when the last claim attempt failed (network / server error). */
@@ -49,6 +51,7 @@ const DEFAULTS = {
   pendingChest: null as PendingChest | null,
   projectedTier: 'bronze' as ChestTier,
   weekScore: 0,
+  freezesAvailable: 0,
 }
 
 // Coerce server payloads (or error responses) into the strict shape the UI expects.
@@ -81,7 +84,10 @@ function normalizeStatus(json: unknown): typeof DEFAULTS {
   const weekScore = Number.isFinite(rawWeekScore)
     ? Math.max(0, Math.min(100, Math.round(rawWeekScore)))
     : 0
+  const rawFreezes = Number(obj.freezesAvailable)
+  const freezesAvailable = Number.isFinite(rawFreezes) ? Math.max(0, Math.trunc(rawFreezes)) : 0
   return {
+    freezesAvailable,
     daysCompleted,
     currentStreak,
     completedDates,

@@ -57,20 +57,20 @@ describe('FreshHero', () => {
     const html = renderToString(<FreshHero />);
     expect(html).toContain('<h1');
     expect(html).toContain('data-hero-grid');
-    expect(html).toMatch(/<a[^>]*href="\/en\/quick-play\?mode=classic"/);
+    expect(html).toMatch(/<a[^>]*href="\/en\/quick-play\?mode=classic&amp;coach=1"/);
     expect(html).toMatch(/<a[^>]*href="\/en\/multiplayer"/);
   });
 
   it('has exactly ONE link to multiplayer (play a friend) and PLAY goes to the coached round', () => {
     const { container } = render(<FreshHero />);
     expect(hero(container).querySelectorAll('a[href="/en/multiplayer"]')).toHaveLength(1);
-    expect(hero(container).querySelectorAll('a[href="/en/quick-play?mode=classic"]')).toHaveLength(1);
+    expect(hero(container).querySelectorAll('a[href="/en/quick-play?mode=classic&coach=1"]')).toHaveLength(1);
   });
 
   it('PLAY with onPlay opens onboarding instead of navigating, and is tracked', () => {
     const onPlay = vi.fn();
     const { container } = render(<FreshHero onPlay={onPlay} />);
-    const play = hero(container).querySelector<HTMLAnchorElement>('a[href="/en/quick-play?mode=classic"]')!;
+    const play = hero(container).querySelector<HTMLAnchorElement>('a[href="/en/quick-play?mode=classic&coach=1"]')!;
     const evt = new MouseEvent('click', { bubbles: true, cancelable: true });
     fireEvent(play, evt);
     expect(onPlay).toHaveBeenCalledTimes(1);

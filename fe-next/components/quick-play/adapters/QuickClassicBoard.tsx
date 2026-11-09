@@ -12,8 +12,12 @@
  * so a solo round reads clean, the same way AdventureHuntGame reuses the MP
  * word-hunt board offline.
  */
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import posthog from '@/lib/analytics/lazyPosthog';
+import { goldenMultiplierFor } from '@/shared/utils/goldenTile';
+import { COACH_IDLE_HINT_SEC, COACH_ROUND_SECONDS, popFor, type RoundPop } from '@/lib/quickPlay/roundPops';
+import { QuickCoachHint, QuickCoachIntro, QuickRoundPop } from './QuickRoundPops';
 import { useSinglePlayerCore } from '@/components/singleplayer/game/hooks/useSinglePlayerCore';
 import InGameScreen from '@/components/game/InGameScreen';
 import type { HintsState } from '@/components/game/in-game/types';
@@ -51,16 +55,55 @@ export function QuickClassicBoard({ config, onDone, onQuit }: QuickClassicBoardP
   // The board's own clock is the only one on a phone; on desktop the rail carries it.
   const inShell = useMediaQuery(SHELL_MEDIA);
 
+  const coach = !!config.coach;
+  const golden = config.goldenTile ?? null;
+  // The engine's grid can change mid-round (earthquake); read the live one.
+  const liveGridRef = useRef<string[][]>(config.grid);
+  const [pop, setPop] = useState<RoundPop | null>(null);
+  const popTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => { if (popTimer.current) clearTimeout(popTimer.current); }, []);
+
+  // Golden tile: a word traced through it scores double. The server picked the
+  // cell from the seed and prices it into the submit ceiling.
+  const wordMultiplier = useCallback(
+    (word: string) => (golden ? goldenMultiplierFor(liveGridRef.current, word, golden) : 1),
+    [golden]
+  );
+
+  const handleWordAccepted = useCallback(
+    (e: { word: string; points: number; multiplier: number; validCount: number }) => {
+      const next = popFor({ ...e, coach });
+      if (e.multiplier > 1) {
+        posthog.capture('golden_tile_hit', { mode: config.mode, points: e.points, word_length: e.word.length });
+      }
+      if (coach && e.validCount === 1) {
+        posthog.capture('coach_first_word', { mode: config.mode, word_length: e.word.length, language: config.language });
+      }
+      if (next?.kind === 'rare') {
+        posthog.capture('rare_word_pop', { mode: config.mode, tier: next.tier, word_length: e.word.length });
+      }
+      if (!next) return;
+      setPop(next);
+      if (popTimer.current) clearTimeout(popTimer.current);
+      popTimer.current = setTimeout(() => setPop(null), next.kind === 'first' ? 2200 : 1600);
+    },
+    [coach, config.mode, config.language]
+  );
+
   const core = useSinglePlayerCore({
     settings: {
       mode: 'challenge',
       difficulty: 'MEDIUM',
       language: config.language as never,
       grid: config.grid as never,
-      timerSeconds: config.durationSec,
+      // Coached first game: shorter, and the clock waits for the first word.
+      timerSeconds: coach ? Math.min(COACH_ROUND_SECONDS, config.durationSec) : config.durationSec,
       bots: [], // quick play is bot-free by design
       minWordLength: 3,
+      coach,
     },
+    wordMultiplier,
+    onWordAccepted: handleWordAccepted,
     // Arcade rounds are "your score this round", not a high-score race.
     targetHighScore: null,
     onGameEnd: (r: SinglePlayerResultsData) =>
@@ -112,6 +155,28 @@ export function QuickClassicBoard({ config, onDone, onQuit }: QuickClassicBoardP
       progress,
     ]
   );
+
+  useEffect(() => {
+    if (core.grid) liveGridRef.current = core.grid as unknown as string[][];
+  }, [core.grid]);
+
+  const validCount = (core.foundWords as Array<{ isValid: boolean | null }>).filter((w) => w.isValid === true).length;
+
+  // Coached round: a gentle hint if no word lands in the first ~10 seconds.
+  // Resets whenever a word is found, and never shows once one has.
+  const [showHint, setShowHint] = useState(false);
+  useEffect(() => {
+    setShowHint(false);
+    if (!coach || !config.hintWord || !core.grid || validCount > 0) return;
+    const id = setTimeout(() => setShowHint(true), COACH_IDLE_HINT_SEC * 1000);
+    return () => clearTimeout(id);
+  }, [coach, config.hintWord, core.grid, validCount]);
+  const hintShownTracked = useRef(false);
+  useEffect(() => {
+    if (!showHint || hintShownTracked.current) return;
+    hintShownTracked.current = true;
+    posthog.capture('coach_hint_shown', { mode: config.mode, language: config.language });
+  }, [showHint, config.mode, config.language]);
 
   const validWords = useMemo(
     () => (core.foundWords as Array<{ word: string; score: number; isValid: boolean | null }>).filter((w) => w.isValid !== false),
@@ -181,8 +246,12 @@ export function QuickClassicBoard({ config, onDone, onQuit }: QuickClassicBoardP
         gameMode="classic"
         onWordSubmit={core.handleWordSubmit}
         onExitRoom={onQuit}
+        soloGoldenLetters={golden ? [golden] : undefined}
       />
       </GameShell>
+      {coach && validCount === 0 && !showHint && <QuickCoachIntro t={t} />}
+      {showHint && config.hintWord && validCount === 0 && <QuickCoachHint word={config.hintWord} t={t} />}
+      <QuickRoundPop pop={pop} t={t} />
     </div>
   );
 }

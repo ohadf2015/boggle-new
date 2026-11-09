@@ -18,6 +18,8 @@ export const LANDING_NAMESPACES = [
   // translations/*.js by the homepage gauntlet merge.
   'homeFresh',
   'homePlay',
+  // Quick-loop copy on the home (freezes, daily Play pill, weekly board, More).
+  'quickLoop',
   'nav',
   'common',
   'footer',

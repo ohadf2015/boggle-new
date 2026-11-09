@@ -1277,6 +1277,53 @@ const he = {
     }
   },
   // @academy:end
+  // @quick-loop:start
+  "quickLoop": {
+    "nextBoard": "הלוח הבא",
+    "moreGames": "עוד משחקים",
+    "pop": {
+      "firstWord": "{word}! מילה ראשונה!",
+      "clockStarts": "השעון מתחיל עכשיו",
+      "golden": "אריח זהב! ×2 +{points}",
+      "rare": "מילה נדירה: {word}!",
+      "epic": "מילה אפית: {word}!"
+    },
+    "coach": {
+      "intro": "מצאו מילה כלשהי. השעון מחכה למילה הראשונה שלכם.",
+      "hint": "רמז: נסו {word}"
+    },
+    "nearMiss": {
+      "toBeatBest": "עוד {points} נקודות כדי לשבור את השיא שלכם",
+      "newBestBy": "שיא חדש ב-{points} נקודות!",
+      "wordsToPar": "עוד {words} מילים כדי להגיע ליעד"
+    },
+    "weekly": {
+      "kicker": "הלוח של השבוע",
+      "play": "שחקו",
+      "chip": "לוח שבועי: {theme}",
+      "theme": {
+        "vowelParty": "מסיבת תנועות",
+        "goldRush": "בהלה לזהב",
+        "sStorm": "סערת S",
+        "bigLetters": "אותיות גדולות"
+      },
+      "line": {
+        "vowelParty": "עוד תנועות. אותו לוח לכולם, כל השבוע.",
+        "goldRush": "אריח זהב מובטח על הלוח. אותו לוח כל השבוע.",
+        "sStorm": "עוד אותיות S. אותו לוח כל השבוע.",
+        "bigLetters": "אותיות נדירות יותר, מילים גדולות יותר. אותו לוח כל השבוע."
+      }
+    },
+    "daily": {
+      "play": "שחקו"
+    },
+    "freezes": {
+      "title": "הקפאות רצף: כל אחת מכסה יום שפספסתם",
+      "aria": "{n} הקפאות רצף",
+      "count": "הקפאות: {n}"
+    }
+  },
+  // @quick-loop:end
   // @home-play:start
   "homePlay": {
     "heroLine": "שישים שניות, לוח חדש ושלושה יריבים שלא מחכים לך.",
@@ -9734,7 +9781,7 @@ const he = {
     },
     "weeklyChest": {
       "title": "תיבה שבועית",
-      "dayProgress": "יום {day} מתוך 7",
+      "dayProgress": "{day} מתוך 5 ימים השבוע",
       "daysRemaining": "עוד {n} ימים לתיבת {tier}!",
       "claimReady": "תיבת ה{tier} שלך מוכנה!",
       "claimButton": "פתחו תיבה",
@@ -9746,8 +9793,8 @@ const he = {
       "freezesGrantedPlural": "+{n} מגני רצף",
       "info": {
         "title": "איך עובדת התיבה השבועית",
-        "howItWorks": "סיימו אתגר יומי בכל יום. שבעה ימים ברצף ממלאים את התיבה.",
-        "streakReset": "פספסתם יום? הרצף מתאפס ומתחילים את שבעת הימים מחדש.",
+        "howItWorks": "סיימו אתגר יומי ב-5 ימים כלשהם השבוע (שני עד ראשון) כדי למלא את התיבה.",
+        "streakReset": "יום שפספסתם לא מאפס את התיבה. שבוע חדש מתחיל בכל יום שני.",
         "tiersTitle": "דרגות התיבה",
         "tierBronzeDesc": "תגמול הבסיס על סיום השבוע.",
         "tierSilverDesc": "שחקו טוב כל השבוע כדי להגיע אליה.",

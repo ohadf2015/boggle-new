@@ -13,6 +13,9 @@ import {
   type WordWheelPuzzle,
 } from '@/utils/dailyChallenge/wordWheelGeneration';
 import { scoreWord as scoreWheelWord } from '@/utils/dailyChallenge/wordWheelScoring';
+import { GOLDEN_TILE_CHANCE, pickGoldenTile, wordUsesCell, GOLDEN_MULTIPLIER, type GoldenCell } from '@/shared/utils/goldenTile';
+import { isCoachSeed, plantCoachWord } from '@/shared/utils/coachBoard';
+import { applyThemeBias, parseWeeklySeed, weeklyThemeFor, type WeeklyThemeId } from '@/shared/utils/weeklyTheme';
 // ESM import — a bare require() here trips the backend vitest CJS transform
 // into a module-init loop (mixed-mode file) and hangs the whole test run.
 import { dictionary, ensureLanguageLoaded } from '../dictionary';
@@ -38,6 +41,12 @@ export interface QuickRoundConfig {
   parScore: number;
   /** How many words make up the par (the denominator players see). */
   parWords: number;
+  /** Classic only, on ~60% of boards: words traced through this cell score double. */
+  goldenTile?: GoldenCell;
+  /** Coached first round (`coach-` seed): the known word planted on the board. */
+  hintWord?: string;
+  /** Weekly themed board (`weekly-` seed): this week's theme. */
+  theme?: WeeklyThemeId;
 }
 
 export const QUICK_ROUND_DURATION_SEC = 60;
@@ -122,7 +131,27 @@ export async function buildQuickRound(
     };
   }
 
-  const grid = generateDailyGridWithWeightedLetters(`quick-${roundSeed}`, language as never);
+  let grid: string[][] = generateDailyGridWithWeightedLetters(`quick-${roundSeed}`, language as never);
+  // Seed-borne board variants (classic only). Both are pure functions of the
+  // seed, so submit's rebuild sees the exact board the player got.
+  let hintWord: string | undefined;
+  let theme: WeeklyThemeId | undefined;
+  let goldenChance = GOLDEN_TILE_CHANCE;
+  if (mode === 'classic') {
+    const weekKey = parseWeeklySeed(roundSeed);
+    if (weekKey) {
+      const weekly = weeklyThemeFor(weekKey, language);
+      grid = applyThemeBias(grid, weekly, roundSeed);
+      theme = weekly.id;
+      goldenChance = weekly.goldenChance;
+    } else if (isCoachSeed(roundSeed)) {
+      const planted = plantCoachWord(grid, language, roundSeed);
+      if (planted) {
+        grid = planted.grid;
+        hintWord = planted.word;
+      }
+    }
+  }
   // A trie is MANDATORY: findAllWords without one falls back to exhaustive
   // depth-15 DFS (no prefix pruning) and effectively never returns.
   const trie = getCachedTrie(language);
@@ -132,6 +161,11 @@ export async function buildQuickRound(
   const targetWord = mode === 'word-hunt'
     ? selectDailyTargetWord(grid, `quick-${roundSeed}`, language as never).word
     : undefined;
+  // Coached board in a language with no starter list (ja): hint the shortest solver word.
+  if (mode === 'classic' && isCoachSeed(roundSeed) && !hintWord && words.length > 0) {
+    hintWord = [...words].sort((a, b) => a.length - b.length || a.localeCompare(b))[0];
+  }
+  const goldenTile = mode === 'classic' ? pickGoldenTile(roundSeed, grid, goldenChance) ?? undefined : undefined;
   return {
     mode,
     seed: roundSeed,
@@ -140,7 +174,28 @@ export async function buildQuickRound(
     grid,
     words,
     targetWord,
-    perfectScore: Math.max(1, scoreWordsForMode(mode, words)),
+    perfectScore: Math.max(1, perfectScoreWithGolden(mode, words, grid, goldenTile)),
     ...parScoreForMode(mode, words),
+    ...(goldenTile ? { goldenTile } : {}),
+    ...(hintWord ? { hintWord } : {}),
+    ...(theme ? { theme } : {}),
   };
+}
+
+/**
+ * The anti-cheat ceiling with the golden tile priced in: every solver word that
+ * can be traced through the golden cell counts double, exactly as the board
+ * scores it. Without this a golden round could trip "implausible score".
+ */
+export function perfectScoreWithGolden(
+  mode: QuickMode,
+  words: string[],
+  grid: string[][],
+  goldenTile: GoldenCell | undefined,
+): number {
+  if (!goldenTile) return scoreWordsForMode(mode, words);
+  return words.reduce((sum, w) => {
+    const base = scoreWordsForMode(mode, [w]);
+    return sum + (wordUsesCell(grid, w, goldenTile) ? base * GOLDEN_MULTIPLIER : base);
+  }, 0);
 }

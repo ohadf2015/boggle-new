@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useCallback, useEffect, type MouseEvent } from 'react';
+import { useCallback, useEffect, useState, type MouseEvent } from 'react';
 import { Users } from 'lucide-react';
 import { ModeGlyph } from '@/components/quick-play/ModeGlyph';
 import { RandomGlyph } from '@/components/quick-play/RandomGlyph';
@@ -14,6 +14,8 @@ import { setHeroAvatarProps, setHeroAvatarSlot } from './heroAvatarBridge';
 import { HeroQuickLinks } from './HeroQuickLinks';
 import { quickPlayHref } from '@/lib/quickPlay/startMode';
 import { trackLandingCtaClick } from '@/utils/growthTracking';
+import { quickRoundsPlayed } from '@/lib/quickPlay/guestProgress';
+import { firstGameRoute } from '@/lib/onboarding/firstGameRoute';
 
 const MODES: QuickMode[] = ['classic', 'blast', 'word-hunt', 'wheel-rush'];
 const KEY_TILT = ['-rotate-2', 'rotate-1', '-rotate-1', 'rotate-2'];
@@ -26,6 +28,8 @@ interface PlayHeroProps {
   greeting: string;
   streak: number;
   streakLoading: boolean;
+  /** Banked streak freezes, shown on the daily chip. */
+  freezes?: number;
   onAvatarSaved: (config: CustomAvatarConfig) => void;
   onPlay?: () => void;
 }
@@ -117,7 +121,7 @@ function AvatarStage({ avatar, animate, t, onAvatarSaved }: Pick<PlayHeroProps, 
   );
 }
 
-export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoading, onAvatarSaved, onPlay }: PlayHeroProps) {
+export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoading, freezes = 0, onAvatarSaved, onPlay }: PlayHeroProps) {
   // Funnel numerator for the landing PLAY→onboarding leak, restored: the
   // play-first redesign (#1706) replaced FreshHero — which fired
   // `fresh_hero_play` on this CTA — with this hero, and the event's main
@@ -128,6 +132,20 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
   // as gate fall-through); true − onboarding_open_requested = the real
   // mounted-gate loss. Fires on every click, handler or not — same
   // "tracking is not gated on onPlay" semantics as FreshPlayLink.
+  // First-timers (no finished Quick Play round on this device) get the coached
+  // first game; everyone else keeps the instant random round. Decided after
+  // mount so server HTML and hydration agree on the default href.
+  const [playHref, setPlayHref] = useState(() => quickPlayHref(lang, 'random'));
+  useEffect(() => {
+    let first = false;
+    try {
+      first = quickRoundsPlayed() === 0;
+    } catch {
+      /* storage blocked: keep the plain round */
+    }
+    setPlayHref(first ? firstGameRoute(lang) : quickPlayHref(lang, 'random'));
+  }, [lang]);
+
   const handlePlayClick = (e: MouseEvent<HTMLAnchorElement>) => {
     trackLandingCtaClick('fresh_hero_play', { opens_ftue: !!onPlay });
     if (!onPlay || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
@@ -161,7 +179,7 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
           </div>
 
           <Link
-            href={quickPlayHref(lang, 'random')}
+            href={playHref}
             data-testid="hp-play"
             onClick={handlePlayClick}
             className="group relative flex h-[58px] items-center justify-center gap-3 [@media(max-height:700px)]:h-[52px] overflow-hidden rounded-2xl border-[3px] border-black bg-neo-lime px-4 text-black shadow-hard active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed lg:h-24 lg:rounded-3xl lg:shadow-hard-lg 2xl:h-28"
@@ -198,6 +216,9 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
             </span>
           </Link>
 
+          {/* Daily puzzle: one tap, right under the two ways to play. */}
+          <HeroQuickLinks lang={lang} t={t} streak={streak} streakLoading={streakLoading} freezes={freezes} />
+
           <div>
             <p className="mb-2 text-center text-xs font-bold text-neo-white/60 lg:text-start lg:text-base">{t('homePlay.pickMode')}</p>
             <ul className="grid grid-cols-4 gap-2.5 lg:gap-4" data-testid="hp-keycaps">
@@ -220,7 +241,6 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
             </ul>
           </div>
 
-          <HeroQuickLinks lang={lang} t={t} streak={streak} streakLoading={streakLoading} />
         </div>
       </div>
     </section>

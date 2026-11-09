@@ -3,6 +3,8 @@
  * backend/modules/quickPlayRound.ts / quickPlaySubmit.ts — keep in sync.
  */
 import type { QuickGhostRival } from '@/lib/quickPlay/ghostRivals';
+import type { GoldenCell } from '@/shared/utils/goldenTile';
+import type { WeeklyThemeId } from '@/shared/utils/weeklyTheme';
 
 export type { QuickGhostRival };
 
@@ -46,6 +48,14 @@ export interface QuickRoundConfig {
    * yet, or when the lookup failed — the round still runs.
    */
   ghosts?: QuickGhostRival[];
+  /** Classic, some boards: words traced through this cell score double (server-picked from the seed). */
+  goldenTile?: GoldenCell;
+  /** Coached first round: a known word planted on the board, for the idle hint. */
+  hintWord?: string;
+  /** Weekly themed board: this week's theme id. */
+  theme?: WeeklyThemeId;
+  /** Client-only: this round is the coached first game (clock waits for the first word). */
+  coach?: boolean;
 }
 
 /**

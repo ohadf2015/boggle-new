@@ -20,6 +20,9 @@ import { getOrCreateStoredCustomAvatar } from '@/utils/profileStorage';
 import { holdQuickResultsCalm } from '@/lib/quickPlay/resultsCalm';
 import { useHeroCheer } from '@/lib/quickPlay/useHeroCheer';
 import { getGuestProgress, percentileFromBoard } from '@/lib/quickPlay/guestProgress';
+import { nearMissFor } from '@/lib/quickPlay/nearMiss';
+import posthog from '@/lib/analytics/lazyPosthog';
+import type { WeeklyThemeId } from '@/shared/utils/weeklyTheme';
 import BlastWalletHud from '@/components/blast/legacy/BlastWalletHud';
 import { CoinArt } from '@/components/ui/CoinArt';
 import { RewardLine } from '@/components/results/ResultsLines';
@@ -75,6 +78,12 @@ interface QuickPlayResultsProps {
   isGuest?: boolean;
   /** Consecutive days played (guests included). 0/1 hides the badge. */
   dayStreak?: number;
+  /** This device's best raw score on the mode before this round (0 = none). */
+  prevBestScore?: number;
+  /** Words in this round's par, for the "N words to par" line on a first round. */
+  parWords?: number;
+  /** Set when this was the weekly themed board. */
+  theme?: WeeklyThemeId;
   /** Start that round now: a mode, or 'random' for a spin. */
   onNextRound: (mode?: WheelSelection) => void;
   onChallenge: () => void;
@@ -103,6 +112,9 @@ export function QuickPlayResults({
   collectionTotal = 0,
   isGuest = false,
   dayStreak = 0,
+  prevBestScore = 0,
+  parWords,
+  theme,
   onNextRound,
   onChallenge,
   onExit,
@@ -162,6 +174,19 @@ export function QuickPlayResults({
   const beatRival = rival !== null && rival.myValue > rival.theirValue;
   // Near-miss tension, suppressed once the bigger badges cover the moment.
   const isNearMiss = result.scorePct >= 85 && result.scorePct < 100 && !isPersonalBest;
+  // One honest "almost" line from real numbers: your best on this mode, else par.
+  const nearMiss = nearMissFor({
+    score: result.score,
+    prevBest: prevBestScore,
+    wordsFound: result.wordsFound,
+    parWords: parWords ?? result.totalWords,
+  });
+  const nearMissTracked = useRef(false);
+  useEffect(() => {
+    if (!nearMiss || nearMissTracked.current) return;
+    nearMissTracked.current = true;
+    posthog.capture('near_miss_shown', { mode: result.mode, kind: nearMiss.kind, ...('points' in nearMiss ? { points: nearMiss.points } : { words: nearMiss.words }) });
+  }, [nearMiss, result.mode]);
   const rankNow = quickRank(outcome.totalPoints);
   const rankBefore = quickRank(Math.max(0, outcome.totalPoints - result.scorePct));
   const rankedUp = rankNow.key !== rankBefore.key && outcome.totalPoints > 0;
@@ -293,6 +318,15 @@ export function QuickPlayResults({
               </div>
             )}
 
+            {theme && (
+              <span
+                className="rounded-xl border-[3px] border-black bg-neo-cyan px-3 py-1 font-neo-display text-xs font-bold text-black shadow-hard"
+                data-testid="quick-weekly-theme"
+              >
+                {t('quickLoop.weekly.chip', { theme: t(`quickLoop.weekly.theme.${theme}`) })}
+              </span>
+            )}
+
             <QuickResultsStats
               score={result.score}
               scorePct={result.scorePct}
@@ -301,6 +335,20 @@ export function QuickPlayResults({
               modeBand={modeColor.bg}
               modeInk={modeColor.text}
             />
+
+            {nearMiss && (
+              <p
+                className="rounded-full border-2 border-neo-yellow px-3 py-1 text-center text-sm font-bold text-neo-yellow"
+                data-testid="quick-near-miss-line"
+                data-kind={nearMiss.kind}
+              >
+                {nearMiss.kind === 'pointsToBeatBest'
+                  ? t('quickLoop.nearMiss.toBeatBest', { points: String(nearMiss.points) })
+                  : nearMiss.kind === 'newBestBy'
+                    ? t('quickLoop.nearMiss.newBestBy', { points: String(nearMiss.points) })
+                    : t('quickLoop.nearMiss.wordsToPar', { words: String(nearMiss.words) })}
+              </p>
+            )}
 
             {showPercentile && (
               <p className="text-center text-xs font-bold text-neo-cream">
