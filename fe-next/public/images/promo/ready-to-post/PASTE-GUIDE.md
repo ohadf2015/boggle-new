@@ -3,59 +3,78 @@
 Open Meta Business Suite: https://business.facebook.com/latest/home
 → Click "Create Post" → Select Instagram account → Upload image → Paste caption → Schedule
 
-Each post below: copy CAPTION, then copy HASHTAGS (paste as first comment).
+Each post below: copy CAPTION, then copy HASHTAGS (paste as first comment). Images are in `public/images/promo/`.
+
+**Copy rule:** this guide mirrors `lib/instagram/postCalendar.ts` (the same calendar the auto-post cron uses). Edit the calendar first, then this file. No statistic, percentage or study claim goes in a caption, or in the artwork, unless it is on `docs/style/citation-sources.md` and the caption names the source.
+
+**Retired, do not post:** these creatives have unsourced stats baked into the image (memory and cognitive-decline percentages, vocabulary counts, made-up brain timings and game averages). They need to be re-made before reuse. That includes the old `ready-to-post/en|he` copies of the brain-science, vocab-chart, fun-fact, 3-minute-brain, game-comparison, English/Hebrew-numbers and history posts.
+
+- lexiclash-insta-brain-science-v6.png
+- lexiclash-insta-brain-science-v7.png
+- lexiclash-insta-brain-science-he.png
+- lexiclash-insta-vocab-chart.png
+- lexiclash-insta-vocab-chart-he.png
+- lexiclash-insta-brain-funfact-he.png
+- lexiclash-insta-brain-funfact-v2.png
+- lexiclash-insta-brain-funfact-v3.png
+- lexiclash-insta-brain-funfact-v4.png
+- lexiclash-insta-brain-funfact-v5.png
+- lexiclash-insta-3min-brain.png
+- lexiclash-insta-3min-brain-he.png
+- lexiclash-insta-3min-brain-he-v2.png
+- lexiclash-insta-3min-brain-he-v3.png
+- lexiclash-insta-english-numbers.png
+- lexiclash-insta-hebrew-numbers.png
+- lexiclash-insta-daily-streak.png
+- lexiclash-insta-word-history.png
+- lexiclash-insta-word-history-he.png
+- lexiclash-insta-2letter-words.png
+- lexiclash-insta-game-comparison.png
+- lexiclash-insta-game-comparison-he.png
 
 ---
 
-## EN ACCOUNT — 7 posts
+## EN ACCOUNT, 6 posts
 
-### 1-sunday-brain-science.png
+### Sunday: ../lexiclash-insta-untranslatable-words.png
 CAPTION:
-Your brain on word games 🧠⚡
+Words that don't exist in English 🌍✨
 
-Science says playing word games just 5 minutes a day:
+🇩🇪 Kummerspeck: weight gained from emotional eating (literally "grief bacon")
+🇯🇵 Tsundoku: buying books and letting them pile up unread
+🇫🇮 Kalsarikännit: drinking at home in your underwear, no plans to go out
+🇮🇩 Jayus: a joke so bad you can't help but laugh
+🇩🇪 Fernweh: longing for places you've never been
 
-🔹 Memory improves 23% after 8 weeks (Univ. of Michigan)
-🔹 Word game players know 12,500 more words on average (Ghent University)
-🔹 Pattern recognition 15% faster in daily players (NEJM 2019)
-🔹 Cognitive decline risk drops 48% (Einstein College of Medicine)
+Which one is you? Tag someone who needs #2 📚
 
-Not just a game. A brain workout.
-
-5 min/day. That's all it takes.
-Free at lexiclash.live — link in bio
-
-Save this for someone who needs an excuse to play more 😏
+Play with words free at lexiclash.live — link in bio
 
 FIRST COMMENT:
-#braintraining #wordgames #neuroscience #cognitivehealth #brainhealth #mentalfitness #vocabulary #wordgame #brainworkout #didyouknow #sciencefacts #lexiclash #boggle #scrabble #wordle #puzzlegame #brainpower #memorytips #smartereveryday #mindgames
+#languages #untranslatable #wordnerd #funfacts #vocabulary #linguistics #lexiclash #german #japanese #finnish #words #languagefacts #bookstagram #wordgames
 
 ---
 
-### 2-monday-vocab-chart.png
+### Monday: ../lexiclash-insta-5-smart-words.png
 CAPTION:
-How many words do you actually know? 📊
+5 words that make you sound smarter 🧠✨
 
-Here's how vocabulary grows through life:
+Ephemeral: lasting a very short time
+Ubiquitous: found everywhere
+Eloquent: fluent and persuasive
+Paradigm: a typical model or pattern
+Serendipity: a happy accident
 
-👶 Age 2 → 300 words
-🧒 Age 6 → 6,000 words
-🎓 Age 12 → 20,000 words
-🧑 Average adult → 30,000 words
-🏆 Word game player → 42,500 words
+Use one today and tell us how it went 👇
 
-That last bar? That's you 💪
-
-Every round you play, you're building neural pathways to new words your brain keeps forever.
-
-Start growing yours at lexiclash.live — link in bio
+Hunt for more words at lexiclash.live — link in bio
 
 FIRST COMMENT:
-#vocabulary #wordpower #didyouknow #languagefacts #wordgames #braintraining #infographic #education #learnenglish #vocabularybuilding #wordnerd #logophile #lexiclash #brainhealth #smartereveryday #languagelearning #funfacts #puzzlegame #dailychallenge
+#vocabulary #wordoftheday #wordnerd #logophile #learnenglish #vocabularybuilding #english #words #lexiclash #wordgames #smartwords #languagelearning
 
 ---
 
-### 3-tuesday-find-words.png
+### Tuesday: ../lexiclash-insta-find-15-words-v3.png
 CAPTION:
 Think you're good with words? Prove it 👇
 
@@ -64,272 +83,118 @@ T  O  N  A
 I   L  D  E
 G  H  A  R
 
-Rules: Connect adjacent letters (horizontal, vertical, diagonal). Each letter used once per word. Minimum 3 letters.
+Rules: Connect adjacent letters. Each letter used once per word. Min 3 letters.
 
 Drop your longest word in the comments 🔥
 
-🔥 = found 10
-🤯 = found 15
-🧠 = found 20+
+🔥 = found 10 | 🤯 = found 15 | 🧠 = found 20+
 
 Hint: there's a 7-letter word hiding in there...
 
 Play unlimited grids free — lexiclash.live (link in bio)
 
 FIRST COMMENT:
-#wordpuzzle #brainteaser #canyousolveit #puzzletime #wordgame #boggle #riddle #challenge #braintraining #puzzle #wordchallenge #thinkfast #lexiclash #gametime #smartgames #mindgames #wordnerd #puzzleoftheday #commentbelow
+#wordpuzzle #brainteaser #canyousolveit #puzzletime #wordgame #boggle #riddle #challenge #puzzle #wordchallenge #thinkfast #lexiclash #gametime #smartgames #mindgames #wordnerd #puzzleoftheday #commentbelow
 
 ---
 
-### 4-wednesday-game-comparison.png
+### Wednesday: ../lexiclash-wordhunt-instagram-en-v4.png
 CAPTION:
-The ultimate word game showdown 🏆⚡
+Same clock. Your words vs theirs. ⚔️
 
-SCRABBLE (1948)
-• 150M+ copies sold
-• 45 min average game
-• 20-30 words per game
+Word Hunt is a live word battle: trace words on your grid, rack up points, and outsmart your friends before time runs out.
 
-WORDLE (2021)
-• 2M+ daily players
-• 4 min average game
-• 1 word per game
+Comment the longest word you've ever found in a word game 👇
 
-LEXICLASH (2024)
-• Real-time battles
-• 3 min average game
-• 15-40 words per game
-• Trains speed + vocabulary
-
-Which one are you? Drop it in the comments 👇
-
-Try the fastest word game at lexiclash.live — link in bio
+Play free — lexiclash.live (link in bio)
 
 FIRST COMMENT:
-#scrabble #wordle #boggle #wordgames #comparison #gamers #puzzlegame #braintraining #versus #gamenight #wordgame #mobilegaming #lexiclash #indiegame #casualgaming #wordnerd #funfacts #gaming #gamecommunity
+#wordgame #wordhunt #multiplayer #wordbattle #friends #gamenight #puzzlegame #lexiclash #wordnerd #mobilegaming #casualgaming
 
 ---
 
-### 5-thursday-3min-brain.png
+### Thursday: ../lexiclash-insta-find-10-words.png
 CAPTION:
-What happens in your brain during ONE round of a word game ⚡🧠
+Can you find 10 words? 👀
 
-0:00 — Your visual cortex processes 16 letters in 200 milliseconds
-0:15 — Your brain checks 3,000 word patterns per SECOND
-0:30 — Your finger starts tracing before you consciously decide
-1:00 — Dopamine fires on every valid word (that's the rush)
-1:30 — Prefrontal cortex enters flow state / hyperfocus
-3:00 — New word pathways are encoded into long-term memory
+B  R  A  I
+T  O  N  E
+S  L  I  P
+D  A  K  E
 
-All of that. In one round. 🤯
+Rules: Connect adjacent letters. Each letter used once per word. Min 3 letters.
 
-Your brain is doing more in 3 minutes of word games than in 30 minutes of scrolling.
+Comment your best word. Drop a 🔥 if you found 10+
 
-Make those minutes count — lexiclash.live (link in bio)
+Play unlimited grids free — lexiclash.live (link in bio)
 
 FIRST COMMENT:
-#neuroscience #brainscience #flowstate #dopamine #braintraining #wordgames #psychology #cognitivescience #brainpower #mindblown #didyouknow #sciencefacts #lexiclash #mentalhealth #focus #productivity #mindgames #smartereveryday
+#wordpuzzle #brainteaser #canyousolveit #puzzletime #wordgame #boggle #challenge #puzzle #wordchallenge #lexiclash #puzzleoftheday #commentbelow #wordnerd
 
 ---
 
-### 6-friday-english-numbers.png
+### Friday: ../lexiclash-wordhunt-instagram-v3.png
 CAPTION:
-The English language is WILD 🤯📊
+Word Hunt ⚔️ Outsmart your friends.
 
-171,476 words currently in use
-47,156 words are now obsolete
-~1,000 new words added every year
+Challenge a friend to a live word battle. Most words when the clock hits zero wins.
 
-The longest word? 45 letters:
-pneumonoultramicroscopicsilicovolcanoconiosis
-(good luck fitting that on a game board 😅)
+Who are you calling out? Tag them 👇
 
-The most common letter: E (13%)
-The most common starting letter: S
-The average person uses only 20,000 out of 171,000+ words
-
-How many do YOU know? Test yourself free at lexiclash.live — link in bio
+Play free — lexiclash.live (link in bio)
 
 FIRST COMMENT:
-#englishlanguage #languagefacts #didyouknow #funfacts #vocabulary #wordnerd #linguistics #learnenglish #wordgames #infographic #education #lexiclash #logophile #languagelearning #trivia #amazingfacts #knowledgeispower
+#wordgame #wordhunt #multiplayer #challenge #friends #gamenight #puzzlegame #lexiclash #wordnerd #mobilegaming #casualgaming #playwithfriends
 
 ---
 
-### 7-next-sunday-history.png
+## HE ACCOUNT, 3 posts
+
+### Sunday (ראשון): ../lexiclash-insta-untranslatable-words-he.png
 CAPTION:
-93 years of word games. Here's the timeline ⚡📜
+מילים שלא קיימות בעברית 🌍✨
 
-1931 — First crossword book becomes a bestseller
-1948 — Scrabble invented by Alfred Mosher Butts
-1972 — Boggle created by Allan Turoff
-1998 — First online word games go viral
-2013 — Words With Friends hits 100M downloads
-2022 — Wordle sells to NYT for $1M+
-2024 — LexiClash launches: real-time word battles ⚡
+🇩🇪 Kummerspeck: המשקל שעולה מאכילה רגשית (מילולית: "בייקון של עצב")
+🇯🇵 Tsundoku: לקנות ספרים ולתת להם להיערם בלי לקרוא
+🇫🇮 Kalsarikännit: לשתות בבית בתחתונים, בלי שום תוכנית לצאת
+🇮🇩 Jayus: בדיחה כל כך גרועה שאי אפשר שלא לצחוק
+🇩🇪 Fernweh: געגוע למקומות שעוד לא הייתם בהם
 
-The next chapter is yours.
-Write it at lexiclash.live — link in bio
+איזו מהן זה אתם? תייגו מישהו שחייב להכיר את #2 📚
+
+משחקי מילים בחינם ב-lexiclash.live — לינק בביו
 
 FIRST COMMENT:
-#wordgamehistory #gamehistory #scrabble #boggle #wordle #timeline #didyouknow #funfacts #gaming #indiegame #wordgames #lexiclash #gamerlife #retrogaming #boardgames #puzzlegame #trivia #historyofgames #evolution #gamedev
+#שפות #מילים #עובדותמעניינות #אוצרמילים #בלשנות #lexiclash #languages #hebrew #israel #wordnerd #bookstagram #משחקימילים
 
 ---
----
 
-## HE ACCOUNT — 7 posts
-
-### 1-sunday-brain-science.png
+### Monday (שני): ../lexiclash-wordhunt-instagram-he-v2.png
 CAPTION:
-המוח שלך על משחקי מילים 🧠⚡
+ציד מילים ⚔️ התחרו בחברים שלכם
 
-מה המדע אומר על 5 דקות משחק ביום:
+קרב מילים בזמן אמת: מי שמוצא יותר מילים עד שהשעון נגמר, מנצח.
 
-🔹 זיכרון משתפר ב-23% אחרי 8 שבועות (אוניברסיטת מישיגן)
-🔹 שחקני משחקי מילים מכירים 12,500 מילים יותר בממוצע (אוניברסיטת גנט)
-🔹 זיהוי דפוסים מהיר ב-15% בשחקנים יומיים (NEJM 2019)
-🔹 סיכון לירידה קוגניטיבית יורד ב-48% (מכללת איינשטיין)
+את מי אתם מאתגרים? תייגו 👇
 
-לא סתם משחק. אימון למוח.
-
-5 דקות ביום. זה כל מה שצריך.
-בחינם ב-lexiclash.live — לינק בביו
-
-שמרו את זה למישהו שצריך תירוץ לשחק עוד 😏
+שחקו בחינם — lexiclash.live (לינק בביו)
 
 FIRST COMMENT:
-#משחקימילים #אימוןמוח #בריאותהמוח #עברית #מדע #עובדותמעניינות #משחקמילים #בוגל #סקראבל #חידה #אוצרמילים #למידה #מוח #זיכרון #lexiclash #braintraining #wordgames #hebrew #israelgaming #freetoplay
+#משחקימילים #ציד_מילים #אתגר #חברים #ערבמשחקים #עברית #ישראל #lexiclash #wordgame #hebrew #multiplayer
 
 ---
 
-### 2-monday-vocab-chart.png
+### Wednesday (רביעי): ../lexiclash-wordhunt-instagram-he.png
 CAPTION:
-כמה מילים אתה באמת מכיר? 📊
+אותו שעון. המילים שלכם מול שלהם. ⚔️
 
-ככה אוצר המילים גדל לאורך החיים:
+ציד מילים הוא קרב מילים בזמן אמת: מעבירים אצבע על הלוח, צוברים נקודות ומנצחים את החברים לפני שהזמן נגמר.
 
-👶 גיל 2 → 300 מילים
-🧒 גיל 6 → 6,000 מילים
-🎓 גיל 12 → 20,000 מילים
-🧑 מבוגר ממוצע → 30,000 מילים
-🏆 שחקן משחקי מילים → 42,500 מילים
+מה המילה הכי ארוכה שמצאתם אי פעם? כתבו בתגובות 👇
 
-העמודה האחרונה? זה אתה 💪
-
-כל סיבוב שאתה משחק, המוח שלך בונה מסלולים חדשים למילים שנשארות לתמיד.
-
-התחל לגדול ב-lexiclash.live — לינק בביו
+שחקו בחינם — lexiclash.live (לינק בביו)
 
 FIRST COMMENT:
-#אוצרמילים #משחקימילים #עברית #למידה #חינוך #עובדותמעניינות #מוח #אימוןמוח #משחקמילים #ישראל #lexiclash #wordgames #hebrew #infographic #education #funfacts
+#משחקימילים #ציד_מילים #קרבמילים #חברים #ערבמשחקים #עברית #ישראל #lexiclash #wordgame #hebrew #multiplayer
 
 ---
-
-### 3-tuesday-funfact.png
-CAPTION:
-הידעת? 🧠
-
-משחק מילים 5 דקות ביום = זיכרון חד ב-23%
-
-זה יותר ממה שרוב האפליקציות "אימון מוח" שגובות 40 שקל בחודש יכולות להציע.
-
-התירוץ שלך לשחק עוד 😏
-בחינם ב-lexiclash.live — לינק בביו
-
-שמרו ושלחו למישהו שצריך לשמוע את זה 💾
-
-FIRST COMMENT:
-#הידעת #אימוןמוח #משחקימילים #זיכרון #מוח #בריאות #עובדותמעניינות #ישראל #lexiclash #braintraining #funfact #hebrew #freetoplay
-
----
-
-### 4-wednesday-comparison.png
-CAPTION:
-הקרב הגדול של משחקי המילים 🏆⚡
-
-סקראבל (1948)
-• 150 מיליון+ עותקים נמכרו
-• משחק ממוצע: 45 דקות
-• 20-30 מילים למשחק
-
-וורדל (2021)
-• 2 מיליון+ שחקנים ביום
-• משחק ממוצע: 4 דקות
-• מילה אחת למשחק
-
-LexiClash (2024)
-• קרבות בזמן אמת
-• משחק ממוצע: 3 דקות
-• 15-40 מילים למשחק
-• מאמן מהירות + אוצר מילים
-
-מה המשחק שלכם? כתבו בתגובות 👇
-
-נסו את משחק המילים הכי מהיר ב-lexiclash.live — לינק בביו
-
-FIRST COMMENT:
-#סקראבל #וורדל #בוגל #משחקימילים #השוואה #גיימרים #משחק #ישראל #lexiclash #wordgames #gaming #versus #hebrew #israelgaming #casualgaming
-
----
-
-### 5-thursday-3min-brain.png
-CAPTION:
-מה המוח שלך עושה בסיבוב אחד? ⚡🧠
-
-0:00 — סריקה: המוח קולט 16 אותיות ברגע
-0:15 — חיפוש: 3,000 צירופי מילים בשנייה
-0:30 — תגובה: האצבע זזה לפני שהבנת
-1:00 — תגמול: דופמין על כל מילה נכונה
-1:30 — ריכוז: המוח נכנס למצב Flow
-3:00 — שמירה: מילים חדשות נחרטות בזיכרון
-
-כל זה בשלוש דקות 🤯
-
-המוח עושה יותר ב-3 דקות משחק מילים מאשר ב-30 דקות גלילה.
-
-lexiclash.live — לינק בביו
-
-FIRST COMMENT:
-#מדעהמוח #דופמין #אימוןמוח #משחקימילים #פסיכולוגיה #מוח #ריכוז #פרודוקטיביות #עובדותמעניינות #lexiclash #neuroscience #braintraining #hebrew #israel
-
----
-
-### 6-friday-hebrew-numbers.png
-CAPTION:
-השפה העברית היא מטורפת 🤯📊
-
-75,000 מילים בשימוש נוכחי
-~500 מילים חדשות נוספות בכל שנה
-שפה בת 3,000 שנה
-
-המילה הארוכה ביותר?
-אלקטרואנצפלוגרפיה
-(בהצלחה למצוא את זה על לוח המשחק 😅)
-
-האות הנפוצה ביותר: י (10%)
-האדם הממוצע משתמש ב-8,000 מילים בלבד
-עברית היא השפה היחידה בהיסטוריה שהוחייתה מחדש
-
-כמה מילים אתה מכיר? בדוק בחינם ב-lexiclash.live — לינק בביו
-
-FIRST COMMENT:
-#עברית #שפהעברית #עובדותמעניינות #ישראל #שפות #למידה #אוצרמילים #חינוך #משחקימילים #lexiclash #hebrew #hebrewlanguage #israelifacts #funfacts #language #education
-
----
-
-### 7-next-sunday-history.png
-CAPTION:
-93 שנה של משחקי מילים. הנה ציר הזמן ⚡📜
-
-1931 — ספר התשבצים הראשון הופך לרב מכר
-1948 — סקראבל הומצא על ידי אלפרד באטס
-1972 — בוגל נוצר על ידי אלן טורוף
-1998 — משחקי מילים מקוונים ראשונים הופכים ויראליים
-2013 — Words With Friends מגיע ל-100 מיליון הורדות
-2022 — וורדל נמכר לניו יורק טיימס ביותר ממיליון דולר
-2024 — LexiClash מושק: קרבות מילים בזמן אמת ⚡
-
-הפרק הבא הוא שלך.
-כתוב אותו ב-lexiclash.live — לינק בביו
-
-FIRST COMMENT:
-#היסטוריה #משחקימילים #סקראבל #בוגל #וורדל #ישראל #עובדותמעניינות #גיימינג #lexiclash #timeline #wordgames #gaming #hebrew #funfacts
