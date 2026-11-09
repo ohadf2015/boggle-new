@@ -177,3 +177,25 @@ export function parseStoredSnapshots(raw: string | null | undefined): TeacherPro
     return null;
   }
 }
+
+export const INACTIVE_PAYER_DAYS = 14;
+
+/** A paying teacher who stopped running live games is churning before the card fails. */
+export function inactivePayerReasons(
+  subs: TeacherProSubSnapshot[],
+  lastActiveByEmail: ReadonlyMap<string, string>,
+  nowMs: number,
+): string[] {
+  const reasons: string[] = [];
+  for (const sub of subs) {
+    if (sub.status !== 'active' && sub.status !== 'trialing' && sub.status !== 'past_due') continue;
+    if (!sub.email) continue;
+    const last = lastActiveByEmail.get(sub.email.trim().toLowerCase());
+    const idleDays = last ? Math.floor((nowMs - Date.parse(last)) / 86_400_000) : null;
+    if (idleDays !== null && idleDays < INACTIVE_PAYER_DAYS) continue;
+    reasons.push(
+      `paying teacher ${sub.email} ${idleDays === null ? 'has never run a live game' : `has not run a live game in ${idleDays} days`} (sub ${sub.id}, ${sub.status}): reach out`,
+    );
+  }
+  return reasons;
+}

@@ -6,6 +6,7 @@ import { SCHOOL_LEAD_NOTIFY_TO } from '@/lib/education/schoolLeadNotify';
 import {
   TEACHER_PRO_CHURN_REDIS_KEY,
   detectChurnTransitions,
+  inactivePayerReasons,
   parseStoredSnapshots,
   snapshotFromPolar,
   type PolarSubscriptionLike,
@@ -16,6 +17,7 @@ import { withCronLock } from '@/backend/redis/locking';
 import { getSharedRedisClient } from '@/backend/redis/connection';
 import { captureApiError } from '@/utils/sentry';
 import logger from '@/utils/logger';
+import { createAdminClient } from '@/utils/supabase/admin';
 
 /**
  * GET/POST /api/cron/teacher-pro-churn-watch
@@ -67,6 +69,31 @@ async function listTeacherProSubs(): Promise<TeacherProSubSnapshot[]> {
   return [...byId.values()];
 }
 
+// Fail open: a lookup error must not mask the billing alerts.
+async function lastLiveGameByEmail(emails: string[]): Promise<Map<string, string> | null> {
+  const out = new Map<string, string>();
+  try {
+    const admin = createAdminClient();
+    if (!admin) return null;
+    if (emails.length === 0) return out;
+    const { data: users } = await admin.from('teacher_access_requests').select('user_id, email').in('email', emails).not('user_id', 'is', null);
+    for (const u of users ?? []) {
+      const { data } = await admin
+        .from('classroom_rounds')
+        .select('completed_at')
+        .eq('teacher_id', u.user_id)
+        .not('completed_at', 'is', null)
+        .order('completed_at', { ascending: false })
+        .limit(1);
+      if (data?.[0]?.completed_at) out.set(String(u.email).toLowerCase(), data[0].completed_at);
+    }
+  } catch (err) {
+    logger.warn('[TeacherPro Churn] activity lookup failed; skipping inactivity check', err);
+    return null;
+  }
+  return out;
+}
+
 function formatTelegram(reasons: string[], curr: TeacherProSubSnapshot[]): string {
   const e = escapeTelegramMarkdownV2;
   const lines = [
@@ -97,6 +124,16 @@ export async function POST(request: NextRequest) {
       const curr = await listTeacherProSubs();
       const prev = await loadLastSnapshots();
       const transition = detectChurnTransitions(prev, curr);
+      // Mondays only: a weekly nudge while a payer idles, no extra Redis state.
+      if (new Date().getUTCDay() === 1) {
+        const emails = curr.map((c) => c.email?.trim().toLowerCase()).filter((e): e is string => !!e);
+        const lastActive = await lastLiveGameByEmail(emails);
+        const idle = lastActive ? inactivePayerReasons(curr, lastActive, Date.now()) : [];
+        if (idle.length > 0) {
+          transition.reasons.push(...idle);
+          transition.shouldNotify = true;
+        }
+      }
 
       logger.log(
         `[TeacherPro Churn] subs=${curr.length} notify=${transition.shouldNotify}` +
