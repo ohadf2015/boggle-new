@@ -34,11 +34,11 @@ vi.mock('@/components/education/results/ResultsTeacherProTrialCard', () => ({ Re
 vi.mock('@/components/education/EduMascot', () => ({ EduMascot: () => null }));
 const single = vi.hoisted(() => ({ getClassroom: vi.fn() }));
 const nav = vi.hoisted(() => ({ push: vi.fn(), replace: vi.fn() }));
-const lessons = vi.hoisted(() => ({ createLesson: vi.fn(), assign: vi.fn(), get: vi.fn() }));
+const lessons = vi.hoisted(() => ({ createLesson: vi.fn(), assign: vi.fn(), get: vi.fn(), countAssigned: vi.fn() }));
 vi.mock('next/navigation', () => ({ useRouter: () => nav }));
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 't1' } }) }));
 vi.mock('@/hooks/useVocabularyLesson', () => ({ useLessons: () => ({ createLesson: lessons.createLesson }) }));
-vi.mock('@/lib/supabase/education/assignments', () => ({ createAssignment: lessons.assign }));
+vi.mock('@/lib/supabase/education/assignments', () => ({ createAssignment: lessons.assign, countClassroomsLessonAssignments: lessons.countAssigned }));
 vi.mock('@/lib/supabase/education/classrooms', () => ({ getClassroom: single.getClassroom }));
 vi.mock('@/lib/supabase/education/lessons', () => ({ getLesson: lessons.get }));
 const toastMock = vi.hoisted(() => ({ success: vi.fn(), error: vi.fn() }));
@@ -63,6 +63,7 @@ describe('ClassSetupInvite', () => {
     single.getClassroom.mockResolvedValue({ data: null, error: null });
     lessons.createLesson.mockResolvedValue({ success: true, data: { id: 'L-new' } });
     lessons.assign.mockResolvedValue({ data: { id: 'a1' }, error: null });
+    lessons.countAssigned.mockResolvedValue(0);
     lessons.get.mockImplementation(async (id: string) => ({ data: { id, words: [{ word: 'cat' }] }, error: null }));
     nav.push.mockReset();
   });
@@ -376,8 +377,28 @@ describe('ClassSetupInvite', () => {
     expect(screen.getByTestId('first-game-plan-home')).toBeInTheDocument();
   });
 
-  it('Given no word list saved to the class, Then no home-practice offer shows', () => {
+  it('Given the class already has its word list, Then it does not ask the database again', () => {
+    render(<ClassSetupInvite classroomId="c1" lessonId="L1" />);
+    expect(lessons.countAssigned).not.toHaveBeenCalled();
+  });
+
+  it('Given the teacher comes back from the calendar or a reminder email (no lessonId) and the class has a word list, Then the home-practice offer shows', async () => {
+    lessons.countAssigned.mockResolvedValue(1);
     render(<ClassSetupInvite classroomId="c1" />);
+    expect(await screen.findByTestId('first-game-plan-home')).toBeInTheDocument();
+    expect(lessons.countAssigned).toHaveBeenCalledWith(['c1']);
+  });
+
+  it('Given no word list saved to the class, Then no home-practice offer shows', async () => {
+    render(<ClassSetupInvite classroomId="c1" />);
+    await waitFor(() => expect(lessons.countAssigned).toHaveBeenCalled());
+    expect(screen.queryByTestId('first-game-plan-home')).toBeNull();
+  });
+
+  it('Given the word-list check fails, Then no home-practice offer shows', async () => {
+    lessons.countAssigned.mockResolvedValue(null);
+    render(<ClassSetupInvite classroomId="c1" />);
+    await waitFor(() => expect(lessons.countAssigned).toHaveBeenCalled());
     expect(screen.queryByTestId('first-game-plan-home')).toBeNull();
   });
 

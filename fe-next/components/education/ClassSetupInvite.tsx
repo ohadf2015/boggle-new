@@ -12,6 +12,7 @@ import { useLessons } from '@/hooks/useVocabularyLesson';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { getClassroom } from '@/lib/supabase/education/classrooms';
 import { getLesson } from '@/lib/supabase/education/lessons';
+import { countClassroomsLessonAssignments } from '@/lib/supabase/education/assignments';
 import { createdClassroom } from '@/lib/education/createdClassroomHandoff';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useTeacherActivationProgress } from '@/hooks/useTeacherActivationProgress';
@@ -158,6 +159,7 @@ function InviteReady({ classroom, packKey, lessonId, t, language }: InviteReadyP
   const displayHost = origin ? `${joinAddressForDisplay(origin)}/${joinLocale}/join` : '';
   const startHref = `/${language}/education/classroom-game?flow=${QUICK_LAUNCH_FLOW}`;
   const firstGame = useFirstGame({ classroom, packKey, lessonId, t, language });
+  const hasWordList = useClassHasWordList(classroom.id, Boolean(lessonId));
 
   return (
     <>
@@ -194,7 +196,7 @@ function InviteReady({ classroom, packKey, lessonId, t, language }: InviteReadyP
               t={t}
               className="lg:col-span-2 lg:mx-auto lg:w-full lg:max-w-xl"
               onSendHomeLink={
-                lessonId
+                hasWordList
                   ? () => void share('native', { url: joinUrl, text: t('teacher.classroom.shareInviteText', { name: classroom.name, code: classroom.join_code }) })
                   : undefined
               }
@@ -214,6 +216,26 @@ function InviteReady({ classroom, packKey, lessonId, t, language }: InviteReadyP
       {projectorOpen ? <HqProjectorSheet classroom={classroom} onClose={() => setProjectorOpen(false)} /> : null}
     </>
   );
+}
+
+/**
+ * True when the class has a word list students can practise. Known at once right after
+ * the class is made (lessonId in the URL); a return visit from the calendar Start link or
+ * a reminder email carries only classroomId, so read it once. Unknown or failed: false.
+ */
+function useClassHasWordList(classroomId: string, known: boolean): boolean {
+  const [found, setFound] = useState(false);
+  useEffect(() => {
+    if (known) return;
+    let live = true;
+    void countClassroomsLessonAssignments([classroomId]).then((count) => {
+      if (live) setFound((count ?? 0) > 0);
+    });
+    return () => {
+      live = false;
+    };
+  }, [classroomId, known]);
+  return known || found;
 }
 
 async function lessonExists(id: string): Promise<boolean> {
