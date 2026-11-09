@@ -4,7 +4,8 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import toast from "react-hot-toast";
 import { AnimatePresence, m } from "framer-motion";
-import { Check, Link2, MonitorUp } from "lucide-react";
+import { Check, Link2, MonitorUp, Printer } from "lucide-react";
+import Link from "next/link";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { cn } from "@/lib/utils";
@@ -146,6 +147,9 @@ export function GetStudentsInCard({
   const projectorLabel = t("academy.hq.openProjector", "Open projector");
   const projectorShort = t("eduShell.home.showCode", "Show code");
 
+  const printLabel = t("teacher.joinSheet.printAria");
+  const printHref = `/${language}/teacher/join-sheet?code=${encodeURIComponent(classroom.join_code ?? "")}&name=${encodeURIComponent(classroom.name ?? "")}`;
+
   const belowGoal = count < STUDENT_GOAL;
   const codeChars = Array.from(classroom.join_code ?? "");
 
@@ -197,6 +201,17 @@ export function GetStudentsInCard({
             <MonitorUp className="size-4 shrink-0" strokeWidth={3} aria-hidden="true" />
             <span className="truncate">{projectorShort}</span>
           </NeoButton>
+          <Link
+            href={printHref}
+            target="_blank"
+            rel="noopener"
+            data-testid="hq-print-join-sheet"
+            aria-label={printLabel}
+            title={printLabel}
+            className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-neo border-[3px] border-neo-black bg-neo-cream text-neo-black shadow-hard-sm hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+          >
+            <Printer className="size-4" strokeWidth={3} aria-hidden="true" />
+          </Link>
         </div>
       </div>
 
