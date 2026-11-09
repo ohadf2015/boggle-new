@@ -24,6 +24,8 @@ import Avatar from '@/components/Avatar';
 import { InlineBannerAd } from '@/components/ads';
 import LeaderboardPodium from '@/components/leaderboard/LeaderboardPodium';
 import { TierBadge } from '@/components/ui/TierBadge';
+import { FriendStatusProvider } from '@/components/friends/FriendStatusContext';
+import { FriendQuickAction } from '@/components/friends/FriendQuickAction';
 import { YouCard } from '@/components/leaderboard/YouCard';
 import { useTierPromotion } from '@/hooks/useTierPromotion';
 import { useTierPosition } from '@/hooks/useTierPosition';
@@ -155,6 +157,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
   );
 
   return (
+    <FriendStatusProvider>
     <PageLayout onRefresh={handleRefresh} padding="md" maxWidth="4xl">
       <div className="py-4">
         <header className="mb-5 flex flex-wrap items-center gap-3">
@@ -278,7 +281,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                     data-testid="leaderboard-row"
                     aria-current={isCurrentUser ? 'true' : undefined}
                     className={cn(
-                      'grid grid-cols-[2.5rem_1fr_auto] items-center gap-3 px-3 py-2.5',
+                      'grid grid-cols-[2.5rem_1fr_auto_auto] items-center gap-2 px-3 py-2.5 sm:gap-3',
                       isCurrentUser ? 'bg-neo-cyan/15 shadow-[inset_4px_0_0_var(--neo-cyan)]' : 'hover:bg-neo-navy-elevated/40',
                     )}
                   >
@@ -302,6 +305,13 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                     <span className="text-end font-neo-display text-sm font-bold tabular-nums text-neo-white">
                       {safeToLocaleString(entry.total_score ?? 0, language)}
                     </span>
+                    <span className="flex w-9 justify-end">
+                      <FriendQuickAction
+                        userId={entry.player_id}
+                        name={entry.display_name || entry.username || ''}
+                        surface="global_leaderboard"
+                      />
+                    </span>
                   </li>
                 );
               })}
@@ -316,5 +326,6 @@ export default function LeaderboardPageClient(): React.JSX.Element {
         <InlineBannerAd webZone="content-page" className="my-8" />
       </div>
     </PageLayout>
+    </FriendStatusProvider>
   );
 }

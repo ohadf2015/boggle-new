@@ -1,5 +1,36 @@
 // Sv translations
 const sv = {
+  // @friendSocial:start
+  "friendSocial": {
+    "accept": "Acceptera",
+    "acceptFrom": "Acceptera vänförfrågan från {name}",
+    "addFriend": "Lägg till {name} som vän",
+    "chatWith": "Chatta med {name}",
+    "findFriendsHint": "Inga vänner än. Tryck på + bredvid spelare på topplistan för att lägga till dem.",
+    "invite": "Bjud in",
+    "inviteFailed": "Kunde inte skicka inbjudan. Försök igen.",
+    "inviteFriends": "Bjud in vänner",
+    "inviteName": "Bjud in {name} till det här spelet",
+    "invited": "Inbjuden",
+    "invitedName": "{name} inbjuden",
+    "nowFriends": "Du och {name} är nu vänner",
+    "offline": "Offline",
+    "online": "Online",
+    "onlineCount": "{count} online",
+    "quickRepliesLabel": "Snabbsvar",
+    "requestFailed": "Kunde inte skicka förfrågan. Försök igen.",
+    "requestSent": "Vänförfrågan skickad",
+    "requestSentTo": "Vänförfrågan skickad till {name}",
+    "quick": {
+      "hi": "Hej! 👋",
+      "gg": "Bra spelat! 🎉",
+      "rematch": "Revansch? ⚔️",
+      "nice": "Snygg poäng! 🔥",
+      "playNow": "Spela nu? 🎮",
+      "beatMe": "Slå min poäng 😏"
+    }
+  },
+  // @friendSocial:end
   // @blastProgress:start
   "blastProgress": {
     "wave": "Våg {wave}",

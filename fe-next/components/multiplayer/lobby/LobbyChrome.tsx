@@ -13,6 +13,7 @@ import RoomChat from '@/components/RoomChat';
 import { LobbyTutorialPanel } from '@/components/lobby/LobbyTutorialPanel';
 import { GameInstructions } from '@/host/components/pre-game/GameInstructions';
 import { InviteCard, type InviteCardProps } from '@/host/components/pre-game/desktop/InviteCard';
+import { FriendInviteList } from '@/components/friends/FriendInviteList';
 import type { GameModeOption } from '@/components/GameModeSelector';
 import type { Language } from '@/shared/types/game';
 import { cn } from '@/lib/utils';
@@ -122,7 +123,10 @@ export function InviteSheet({ open, onClose, gameCode, t }: { open: boolean; onC
   const side = useSheetSide(open);
   return (
     <MpSheet open={open} onClose={onClose} title={t('mpUi.lobby.inviteTitle')} side={side} testId="lobby-invite-sheet">
-      <InviteCard gameCode={gameCode} t={t as InviteCardProps['t']} variant="sheet" />
+      <div className="flex flex-col gap-4">
+        {open && <FriendInviteList gameCode={gameCode} />}
+        <InviteCard gameCode={gameCode} t={t as InviteCardProps['t']} variant="sheet" />
+      </div>
     </MpSheet>
   );
 }

@@ -1,5 +1,36 @@
 // Ja translations
 const ja = {
+  // @friendSocial:start
+  "friendSocial": {
+    "accept": "承認",
+    "acceptFrom": "{name}さんのフレンド申請を承認",
+    "addFriend": "{name}さんをフレンドに追加",
+    "chatWith": "{name}さんとチャット",
+    "findFriendsHint": "まだフレンドがいません。ランキングのプレイヤー横の＋で追加できます。",
+    "invite": "招待",
+    "inviteFailed": "招待を送れませんでした。もう一度お試しください。",
+    "inviteFriends": "フレンドを招待",
+    "inviteName": "{name}さんをこのゲームに招待",
+    "invited": "招待済み",
+    "invitedName": "{name}さんを招待しました",
+    "nowFriends": "{name}さんとフレンドになりました",
+    "offline": "オフライン",
+    "online": "オンライン",
+    "onlineCount": "{count}人がオンライン",
+    "quickRepliesLabel": "クイック返信",
+    "requestFailed": "申請を送れませんでした。もう一度お試しください。",
+    "requestSent": "フレンド申請を送りました",
+    "requestSentTo": "{name}さんにフレンド申請を送りました",
+    "quick": {
+      "hi": "やあ！👋",
+      "gg": "ナイスゲーム！🎉",
+      "rematch": "リベンジする？⚔️",
+      "nice": "すごいスコア！🔥",
+      "playNow": "今から遊ぶ？🎮",
+      "beatMe": "私のスコアを超えてみて😏"
+    }
+  },
+  // @friendSocial:end
   // @blastProgress:start
   "blastProgress": {
     "wave": "ウェーブ {wave}",

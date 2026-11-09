@@ -1,5 +1,36 @@
 // HE translations
 const he = {
+  // @friendSocial:start
+  "friendSocial": {
+    "accept": "אישור",
+    "acceptFrom": "לאשר את בקשת החברות של {name}",
+    "addFriend": "להוסיף את {name} לחברים",
+    "chatWith": "צ'אט עם {name}",
+    "findFriendsHint": "אין עדיין חברים. לוחצים על + ליד שחקנים בטבלה כדי להוסיף.",
+    "invite": "הזמנה",
+    "inviteFailed": "לא הצלחנו לשלוח את ההזמנה. נסו שוב.",
+    "inviteFriends": "הזמנת חברים",
+    "inviteName": "להזמין את {name} למשחק הזה",
+    "invited": "נשלח",
+    "invitedName": "ההזמנה נשלחה ל{name}",
+    "nowFriends": "{name} ברשימת החברים שלך עכשיו",
+    "offline": "לא מחובר",
+    "online": "מחובר",
+    "onlineCount": "{count} מחוברים",
+    "quickRepliesLabel": "תגובות מהירות",
+    "requestFailed": "לא הצלחנו לשלוח את הבקשה. נסו שוב.",
+    "requestSent": "בקשת חברות נשלחה",
+    "requestSentTo": "בקשת חברות נשלחה ל{name}",
+    "quick": {
+      "hi": "היי! 👋",
+      "gg": "משחק טוב! 🎉",
+      "rematch": "עוד סיבוב? ⚔️",
+      "nice": "ניקוד מטורף! 🔥",
+      "playNow": "משחקים עכשיו? 🎮",
+      "beatMe": "מי מנצח אותי? 😏"
+    }
+  },
+  // @friendSocial:end
   // @blastProgress:start
   "blastProgress": {
     "wave": "גל {wave}",

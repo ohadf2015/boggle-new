@@ -5,6 +5,8 @@ import { Send } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/utils/ThemeContext';
 import { cn } from '@/lib/utils';
+import { trackGrowthEvent } from '@/utils/growthTracking';
+import { QuickReplies } from './QuickReplies';
 
 interface MessageComposerProps {
   onSend: (text: string) => void;
@@ -13,6 +15,8 @@ interface MessageComposerProps {
   placeholder?: string;
   maxLength?: number;
   className?: string;
+  /** Show one-tap phrases above the input (default on). */
+  quickReplies?: boolean;
 }
 
 const MESSAGE_MAX_LENGTH = 1000;
@@ -35,6 +39,7 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
   placeholder,
   maxLength = MESSAGE_MAX_LENGTH,
   className,
+  quickReplies = true,
 }) => {
   const { t } = useLanguage();
   const { theme } = useTheme();
@@ -170,8 +175,16 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
   const isValid = text.trim().length > 0 && text.length <= maxLength;
   const isOverLimit = text.length > maxLength;
 
+  const handleQuickReply = useCallback((phrase: string) => {
+    if (disabled) return;
+    onSend(phrase);
+    trackGrowthEvent('friend_quick_reply_sent');
+  }, [disabled, onSend]);
+
   return (
-    <div className={cn('p-3', className)}>
+    <div className={cn(quickReplies ? 'pb-3' : 'p-3', className)}>
+      {quickReplies && <QuickReplies onPick={handleQuickReply} disabled={disabled} />}
+      <div className={cn(quickReplies && 'px-3 pt-1')}>
       <div className={cn(
         'flex gap-2 items-end p-3 rounded-neo border-2 border-neo-black',
         isDark ? 'bg-neo-navy-elevated' : 'bg-white'
@@ -236,6 +249,7 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
             max: maxLength,
           })}
         </span>
+      </div>
       </div>
     </div>
   );

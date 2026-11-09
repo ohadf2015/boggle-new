@@ -1,5 +1,36 @@
 // RU translations
 const ru = {
+  // @friendSocial:start
+  "friendSocial": {
+    "accept": "Принять",
+    "acceptFrom": "Принять заявку в друзья от {name}",
+    "addFriend": "Добавить {name} в друзья",
+    "chatWith": "Чат с {name}",
+    "findFriendsHint": "Друзей пока нет. Нажмите + рядом с игроками в таблице лидеров, чтобы добавить их.",
+    "invite": "Позвать",
+    "inviteFailed": "Не удалось отправить приглашение. Попробуйте ещё раз.",
+    "inviteFriends": "Позвать друзей",
+    "inviteName": "Позвать {name} в эту игру",
+    "invited": "Приглашён",
+    "invitedName": "{name} приглашён",
+    "nowFriends": "Вы с {name} теперь друзья",
+    "offline": "Не в сети",
+    "online": "В сети",
+    "onlineCount": "{count} в сети",
+    "quickRepliesLabel": "Быстрые ответы",
+    "requestFailed": "Не удалось отправить заявку. Попробуйте ещё раз.",
+    "requestSent": "Заявка в друзья отправлена",
+    "requestSentTo": "Заявка в друзья отправлена: {name}",
+    "quick": {
+      "hi": "Привет! 👋",
+      "gg": "Хорошая игра! 🎉",
+      "rematch": "Реванш? ⚔️",
+      "nice": "Отличный счёт! 🔥",
+      "playNow": "Сыграем? 🎮",
+      "beatMe": "Побей мой счёт 😏"
+    }
+  },
+  // @friendSocial:end
   // @blastProgress:start
   "blastProgress": {
     "wave": "Волна {wave}",

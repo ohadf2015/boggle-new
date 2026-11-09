@@ -3,6 +3,7 @@
 import { forwardRef } from 'react';
 import { Bot, ChevronDown, ChevronUp, Crown, Star } from 'lucide-react';
 import Avatar from '@/components/Avatar';
+import { FriendQuickAction } from '@/components/friends/FriendQuickAction';
 import { cn } from '@/lib/utils';
 import { podiumTier, type MpStandingRow } from './mpStandings';
 import fx from './mpResults.module.css';
@@ -150,6 +151,9 @@ export const MpStandingRowItem = forwardRef<HTMLLIElement, MpStandingRowItemProp
           </span>
         )}
       </span>
+      {shown && !r.isMe && !r.isBot && (
+        <FriendQuickAction userId={r.userId} name={r.username} surface="mp_results" />
+      )}
       <span
         data-testid="mp-standing-score"
         className={cn('shrink-0 font-neo-display font-bold tabular-nums', first ? 'text-[calc(32px*var(--mp-u,1))]' : 'text-[calc(24px*var(--mp-u,1))]')}

@@ -10,7 +10,7 @@ import { emitError, ErrorCodes } from '../utils/errorHandler';
 import logger from '../utils/logger';
 import * as friendsManager from '../modules/friendsManager';
 import { getSupabase } from '../modules/supabaseServer';
-import { cleanProfanity } from '../utils/profanityFilter';
+import { cleanChatProfanity } from '../utils/chatProfanity';
 import { sanitizeHtml } from '../utils/sanitize';
 import { getAuthUserId, broadcastToUser, getUserProfile } from '../utils/socialHelpers';
 import { ensureSocialCapability } from '../utils/socialPolicyServer';
@@ -66,7 +66,7 @@ export function registerFriendMessagingHandlers(io: Server, socket: Socket): voi
 
     try {
       // Clean profanity and sanitize HTML
-      const cleanMessage = sanitizeHtml(cleanProfanity(data.message.trim()));
+      const cleanMessage = sanitizeHtml(cleanChatProfanity(data.message.trim()));
 
       // Send message via manager
       const result = await friendsManager.sendMessage(

@@ -1,5 +1,36 @@
 // EN translations
 const en = {
+  // @friendSocial:start
+  "friendSocial": {
+    "accept": "Accept",
+    "acceptFrom": "Accept {name}'s friend request",
+    "addFriend": "Add {name} as a friend",
+    "chatWith": "Chat with {name}",
+    "findFriendsHint": "No friends yet. Tap + next to players on the leaderboard to add them.",
+    "invite": "Invite",
+    "inviteFailed": "Couldn't send the invite. Try again.",
+    "inviteFriends": "Invite friends",
+    "inviteName": "Invite {name} to this game",
+    "invited": "Invited",
+    "invitedName": "Invited {name}",
+    "nowFriends": "You and {name} are now friends",
+    "offline": "Offline",
+    "online": "Online",
+    "onlineCount": "{count} online",
+    "quickRepliesLabel": "Quick replies",
+    "requestFailed": "Couldn't send the request. Try again.",
+    "requestSent": "Friend request sent",
+    "requestSentTo": "Friend request sent to {name}",
+    "quick": {
+      "hi": "Hi! 👋",
+      "gg": "GG! 🎉",
+      "rematch": "Rematch? ⚔️",
+      "nice": "Nice score! 🔥",
+      "playNow": "Play now? 🎮",
+      "beatMe": "Beat my score 😏"
+    }
+  },
+  // @friendSocial:end
   // @blastProgress:start
   "blastProgress": {
     "wave": "Wave {wave}",

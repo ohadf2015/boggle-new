@@ -6,7 +6,7 @@ import { UserPlus, Check, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useFriends } from '@/hooks/useFriends';
+import { FriendStatusProvider, useFriendStatus } from '@/components/friends/FriendStatusContext';
 import { searchUsers } from '@/utils/friends';
 
 type FriendStatus = 'self' | 'friend' | 'pending' | 'sent' | 'none';
@@ -27,8 +27,20 @@ interface ResultsFriendStatusValue {
 const ResultsFriendStatusContext = createContext<ResultsFriendStatusValue | null>(null);
 
 export function ResultsFriendStatusProvider({ children }: { children: React.ReactNode }) {
+  return (
+    <FriendStatusProvider>
+      <LegacyResultsBridge>{children}</LegacyResultsBridge>
+    </FriendStatusProvider>
+  );
+}
+
+/** Username-keyed view over the shared FriendStatusProvider (one useFriends per screen). */
+function LegacyResultsBridge({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, user } = useAuth();
-  const { friends, outgoingRequests, sendRequest } = useFriends();
+  const shared = useFriendStatus();
+  const friends = shared?.friends;
+  const outgoingUsernames = shared?.outgoingUsernames;
+  const sendRequest = shared?.sendRequest;
   const [sentUsernames, setSentUsernames] = useState<Set<string>>(new Set());
 
   const currentUsername = useMemo(() => {
@@ -37,12 +49,8 @@ export function ResultsFriendStatusProvider({ children }: { children: React.Reac
   }, [user]);
 
   const friendSet = useMemo(
-    () => new Set(friends.map(f => f.username.toLowerCase())),
+    () => new Set((friends ?? []).map(f => f.username.toLowerCase())),
     [friends]
-  );
-  const pendingSet = useMemo(
-    () => new Set(outgoingRequests.map(r => r.fromUsername.toLowerCase())),
-    [outgoingRequests]
   );
 
   const statusFor = useCallback((username: string): FriendStatus => {
@@ -50,13 +58,14 @@ export function ResultsFriendStatusProvider({ children }: { children: React.Reac
     if (currentUsername && u === currentUsername) return 'self';
     if (friendSet.has(u)) return 'friend';
     if (sentUsernames.has(u)) return 'sent';
-    if (pendingSet.has(u)) return 'pending';
+    if (outgoingUsernames?.has(u)) return 'pending';
     return 'none';
-  }, [currentUsername, friendSet, pendingSet, sentUsernames]);
+  }, [currentUsername, friendSet, outgoingUsernames, sentUsernames]);
 
   const isSent = useCallback((username: string) => sentUsernames.has(username.toLowerCase()), [sentUsernames]);
 
   const sendByUsername = useCallback(async (username: string) => {
+    if (!sendRequest) return;
     const matches = await searchUsers(username);
     const match = matches.find(m => m.username.toLowerCase() === username.toLowerCase());
     const targetId = match?.odUserId || match?.id;

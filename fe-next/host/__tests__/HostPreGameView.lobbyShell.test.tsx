@@ -9,6 +9,7 @@ const mockSocket = { emit: emitMock, on: vi.fn(), off: vi.fn() } as unknown as {
 
 vi.mock('../../utils/SocketContext', () => ({
   useSocket: () => ({ socket: mockSocket }),
+  useSocketOptional: () => null,
 }));
 
 vi.mock('../../contexts/AuthContext', () => ({
