@@ -42,9 +42,11 @@ describe('avatarLayerRules — premium back-layer wiring', () => {
   });
 
   it('skips cheek blush on premium non-human bases', () => {
-    for (const base of ['starBase', 'moonBase', 'skull', 'robotHead', 'dragonHead', 'slime'] as const) {
+    for (const base of ['shield', 'skull', 'robotHead', 'dragonHead', 'slime'] as const) {
       expect(SKIP_BLUSH_BASES.has(mapLegacyPart('base', base))).toBe(true);
     }
+    // 2026-11: the star and moon heads are drawn as cute faces and keep their blush.
+    expect(SKIP_BLUSH_BASES.has('starBase')).toBe(false);
     expect(SKIP_BLUSH_BASES.has('square')).toBe(false);
   });
 });

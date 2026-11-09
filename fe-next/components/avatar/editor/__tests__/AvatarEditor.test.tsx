@@ -186,7 +186,7 @@ describe('Avatar editor — locked parts are covetable, with a clear unlock path
   it('marks freshly added parts with a NEW ribbon (ported)', () => {
     open(premiumAt(1));
     goTab('accessory');
-    expect(within(cell('crystalCrown')).getByText('avatarBuilder.new')).toBeInTheDocument();
+    expect(within(cell('unicornHorn')).getByText('avatarBuilder.new')).toBeInTheDocument();
   });
 
   it('shows collection progress subtly in the preview', () => {
@@ -291,8 +291,8 @@ describe('Avatar editor — layout never fights itself (critic r1: cropped rows,
     for (const el of screen.getAllByTestId('editor-part')) {
       expect(el.querySelectorAll('[data-cell-badge]').length).toBeLessThanOrEqual(1);
     }
-    // the locked+new crown still says NEW (inside its single price chip)
-    const crown = cell('crystalCrown');
+    // the locked+new unicorn horn still says NEW (inside its single price chip)
+    const crown = cell('unicornHorn');
     expect(crown.querySelectorAll('[data-cell-badge]')).toHaveLength(1);
     expect(within(crown).getByText('avatarBuilder.new')).toBeInTheDocument();
   });

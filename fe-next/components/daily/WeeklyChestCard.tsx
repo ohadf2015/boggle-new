@@ -11,6 +11,8 @@ import ChestProgressDots from './ChestProgressDots'
 import { StreakFreezeIndicator } from './results/StreakFreezeIndicator'
 import { CHEST_DAYS_REQUIRED } from '@/lib/daily/weeklyChest'
 import { WeeklyChestPlaceholder } from './WeeklyChestPlaceholder'
+import { CHEST_DROP_ODDS, weeklyChestSource } from '@/lib/avatar/chestDrops'
+import { RARITY_TOKENS } from '@/lib/avatar/rarity'
 
 const WeeklyChestInfoModal = dynamic(() => import('./WeeklyChestInfoModal'), { ssr: false })
 
@@ -235,6 +237,13 @@ export default function WeeklyChestCard({ onChestClaimed }: Props) {
                 · {t('daily.weeklyChest.claimReady').replace('{tier}', tierLabel)}
               </span>
             )}
+          </p>
+
+          {/* What's inside: an avatar part, luckier on a better week. */}
+          <p data-testid="chest-part-teaser" className="mt-1 text-[11px] font-bold text-neo-white/80">
+            <span style={{ color: RARITY_TOKENS.legendary.hex }}>
+              {t('avatarChest.weeklyTeaser', { legendary: CHEST_DROP_ODDS[weeklyChestSource(tier)].legendary, tier: tierLabel })}
+            </span>
           </p>
 
           {/* Day markers (kept as `chest-dots` testid for existing tests) */}

@@ -14,10 +14,14 @@ import { FACIAL_HAIR } from './facialHair';
 import { ACC_FREE, type AccDef } from './accessories';
 import { ACC_PREMIUM } from './accessoriesPremium';
 import { BODIES } from './bodies';
+import { EYES_CHEST } from './eyesChest';
+import { HAIR_CHEST } from './hairChest';
+import { ACC_CHEST } from './accessoriesChest';
+import { ACC_CHEST_B } from './accessoriesChestB';
 
-export const EYES: Record<string, EyeDef> = { ...EYES_FREE, ...EYES_PREMIUM };
-export const HAIR: Record<string, HairDef> = { ...HAIR_FREE, ...HAIR_PREMIUM };
-export const ACCESSORIES: Record<string, AccDef> = { ...ACC_FREE, ...ACC_PREMIUM };
+export const EYES: Record<string, EyeDef> = { ...EYES_FREE, ...EYES_PREMIUM, ...EYES_CHEST };
+export const HAIR: Record<string, HairDef> = { ...HAIR_FREE, ...HAIR_PREMIUM, ...HAIR_CHEST };
+export const ACCESSORIES: Record<string, AccDef> = { ...ACC_FREE, ...ACC_PREMIUM, ...ACC_CHEST, ...ACC_CHEST_B };
 
 /** Every id the art can draw, per config field — used by tests + catalog. */
 export const DRAWN_IDS: Record<string, readonly string[]> = {

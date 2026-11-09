@@ -32,6 +32,8 @@ export const CANONICAL_PARTS: Record<LegacyCategory, readonly string[]> = {
     'slime', 'diamond',
     'skull', 'robotHead', 'alienHead', 'ghostFace',
     'dragonHead',
+    // 2026-11 chest drop (redrawn + new)
+    'shield', 'starBase', 'moonBase',
   ],
   hair: [
     'none', 'buzz', 'spiky', 'sideSwept', 'mohawk', 'curly', 'afro', 'dreads', 'cornrows',
@@ -40,6 +42,8 @@ export const CANONICAL_PARTS: Record<LegacyCategory, readonly string[]> = {
     'lightning', 'rainbowMohawk', 'flame', 'galaxy',
     // legendary celebrity-lookalike cues (celebrity bots wear these)
     'trumpSwoop', 'recedingHair', 'highAndTight',
+    // 2026-11 chest drop (redrawn + new)
+    'ramen', 'fadeCurly', 'twinTails', 'bobCut', 'pompadour', 'slickBack', 'neon', 'iceSpikes', 'aurora',
   ],
   eyes: [
     'round', 'happy', 'sparkle', 'cool', 'sleepy', 'wink', 'wide', 'curious', 'lashes',
@@ -47,6 +51,8 @@ export const CANONICAL_PARTS: Record<LegacyCategory, readonly string[]> = {
     'kawaii', 'animeEye', 'confident', 'cyclops', 'monocleEye', 'laser', 'hypno',
     'heartEye', 'starEye', 'flame', 'galaxy', 'robot', 'void',
     'infinity', 'thirdEye',
+    // 2026-11 chest drop (redrawn + new)
+    'money', 'alien', 'pixelEyes', 'targetEyes', 'catEye', 'sleepyEye', 'laserEye', 'glitchEyes', 'rainbowEyes', 'diamondEye', 'cyberEye', 'gemEye', 'moonEye', 'supernova',
   ],
   eyebrows: [
     'none', 'natural', 'thin', 'thick', 'flat', 'raised', 'worried', 'angry', 'unibrow',
@@ -59,6 +65,8 @@ export const CANONICAL_PARTS: Record<LegacyCategory, readonly string[]> = {
     'cat', 'braces', 'bubbleGum', 'lipstick',
     'fangs', 'vampire', 'goldTooth', 'zipper', 'blowfish', 'robotMouth',
     'neonSmile', 'dragon', 'glitch', 'grillz',
+    // 2026-11 chest drop (redrawn + new)
+    'rainbowTongue', 'tongueOut', 'grimace', 'zen', 'diamond', 'openLaugh', 'toothyGrind',
   ],
   facialHair: [
     'none', 'stubble', 'mustache', 'goatee', 'shortBeard', 'fullBeard', 'chinStrap',
@@ -74,6 +82,8 @@ export const CANONICAL_PARTS: Record<LegacyCategory, readonly string[]> = {
     'frogHat', 'butterflyWings', 'iceCrown', 'wizardHat', 'astronaut', 'angelWings',
     'demonWings', 'cyberpunkVisor', 'samurai', 'flamingHalo',
     'phoenixCrown', 'crystalCrown', 'microphone', 'earsOut',
+    // 2026-11 chest drop (redrawn + new)
+    'devilHorns', 'monocle', 'mask', 'sombrero', 'gamerHeadset', 'graduationCap', 'tinfoilHat', 'earrings', 'ninjaScarf', 'cape', 'wings', 'unicornHorn', 'dragonWings', 'flameAura',
   ],
   bodyStyle: ['default', 'hoodie', 'suit', 'turtleneck', 'offShoulder', 'cropTop'],
 };
@@ -82,7 +92,6 @@ export const CANONICAL_PARTS: Record<LegacyCategory, readonly string[]> = {
 const RETIRED: Record<LegacyCategory, Record<string, string>> = {
   base: {
     hexagon: 'square', rectangular: 'square', blob: 'round', oblong: 'oval', triangle: 'heart',
-    shield: 'robotHead', starBase: 'alienHead', moonBase: 'ghostFace',
   },
   hair: {
     topknot: 'bun', sideshave: 'pixie', bangs: 'bob',
@@ -92,26 +101,18 @@ const RETIRED: Record<LegacyCategory, Record<string, string>> = {
     curlyBangs: 'curly', quiff: 'sideSwept', heartBuns: 'pigtails', sideBow: 'ponytail',
     milkmaidBraids: 'braids', butterflyClips: 'long', lowPigtailsBow: 'braids',
     princessBraid: 'braids', sideBraidBow: 'braids',
-    ramen: 'cottonCandy', fadeCurly: 'undercut', twinTails: 'twintails', bobCut: 'longFlow',
-    pompadour: 'elvis', slickBack: 'undercut',
-    neon: 'lightning', iceSpikes: 'galaxy',
   },
   eyes: {
     none: 'round', relaxed: 'cool', crossEyed: 'dizzy', squint: 'sleepy', focused: 'cool',
     catPupils: 'round', doe: 'sparkle', crying: 'sad', determined: 'angry', smokyEye: 'lashes',
     wingedLiner: 'lashes',
-    money: 'hypno', alien: 'animeEye', pixelEyes: 'laser', targetEyes: 'hypno', catEye: 'confident',
-    sleepyEye: 'confident', laserEye: 'laser',
-    glitchEyes: 'robot', rainbowEyes: 'galaxy', diamondEye: 'starEye', cyberEye: 'robot',
-    gemEye: 'starEye', moonEye: 'void',
   },
   eyebrows: { short: 'thin', feathered: 'natural' },
   noseStyle: { snub: 'button', roman: 'long', dot: 'round' },
   mouth: {
     none: 'smile', whistle: 'oh', gap: 'teeth', buckTeeth: 'teeth', sideSmile: 'smirk',
     lipGloss: 'lipstick', closedSmile: 'smile', thinLips: 'flat', drool: 'tongue', mustache: 'smile',
-    pipe: 'goldTooth', rainbowTongue: 'fangs', tongueOut: 'fangs', grimace: 'zipper', zen: 'blowfish',
-    diamond: 'grillz', openLaugh: 'neonSmile', toothyGrind: 'grillz',
+    pipe: 'goldTooth',
   },
   facialHair: {
     soulPatch: 'goatee', muttonChops: 'chinStrap', pencilMustache: 'mustache',
@@ -122,11 +123,35 @@ const RETIRED: Record<LegacyCategory, Record<string, string>> = {
     hat: 'cap', pearls: 'earring', antenna: 'propellerHat', clownNose: 'partyHat', bowtie: 'scarf',
     turban: 'bandana', cucumberFace: 'sunglasses', monkeyEars: 'catEars', chefHat: 'beanie',
     noseRing: 'earring', choker: 'earring', plunger: 'partyHat',
+  },
+  bodyStyle: {},
+};
+
+/**
+ * Ids that were retired in the 2026-09 redraw and got their own drawing back in
+ * the 2026-11 chest drop. Owning one used to also unlock the sibling it rendered
+ * as; that stays true (expandOwnedKeys), so nobody loses a part they could equip.
+ */
+const FORMERLY_RETIRED: Partial<Record<LegacyCategory, Record<string, string>>> = {
+  base: { shield: 'robotHead', starBase: 'alienHead', moonBase: 'ghostFace' },
+  hair: {
+    ramen: 'cottonCandy', fadeCurly: 'undercut', twinTails: 'twintails', bobCut: 'longFlow',
+    pompadour: 'elvis', slickBack: 'undercut', neon: 'lightning', iceSpikes: 'galaxy',
+  },
+  eyes: {
+    money: 'hypno', alien: 'animeEye', pixelEyes: 'laser', targetEyes: 'hypno', catEye: 'confident',
+    sleepyEye: 'confident', laserEye: 'laser', glitchEyes: 'robot', rainbowEyes: 'galaxy',
+    diamondEye: 'starEye', cyberEye: 'robot', gemEye: 'starEye', moonEye: 'void',
+  },
+  mouth: {
+    rainbowTongue: 'fangs', tongueOut: 'fangs', grimace: 'zipper', zen: 'blowfish',
+    diamond: 'grillz', openLaugh: 'neonSmile', toothyGrind: 'grillz',
+  },
+  accessory: {
     devilHorns: 'viking', monocle: 'eyepatch', mask: 'eyepatch', sombrero: 'cowboyHat',
     gamerHeadset: 'headphones', graduationCap: 'topHat', tinfoilHat: 'topHat', earrings: 'tiara',
     ninjaScarf: 'samurai', cape: 'demonWings', wings: 'angelWings',
   },
-  bodyStyle: {},
 };
 
 /** Fallback for unknown / missing values. */
@@ -225,6 +250,8 @@ export function expandOwnedKeys(owned: readonly string[]): string[] {
     if (sep < 0) continue;
     const cat = key.slice(0, sep);
     const id = key.slice(sep + 1);
+    const former = FORMERLY_RETIRED[cat as LegacyCategory]?.[id];
+    if (former) out.add(`${cat}:${former}`);
     if (!isRetiredPart(cat, id)) continue;
     out.add(`${cat}:${mapLegacyPart(cat, id)}`);
   }

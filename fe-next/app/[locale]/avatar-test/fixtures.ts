@@ -9,7 +9,7 @@ import type { AvatarPremium } from '@/components/avatar/AvatarBuilderModal';
 import { type CustomAvatarConfig, DEFAULT_AVATAR_CONFIG } from '@/shared/types/customAvatar';
 import { LEVEL_UNLOCK_LADDER, isPartUsable } from '@/lib/avatar/unlocks';
 
-export const AVATAR_LAB_VIEWS = ['editor', 'profile', 'reveal', 'lite', 'grid'] as const;
+export const AVATAR_LAB_VIEWS = ['editor', 'profile', 'reveal', 'lite', 'grid', 'chest'] as const;
 export type AvatarLabView = (typeof AVATAR_LAB_VIEWS)[number];
 
 export const LAB_MIN_LEVEL = 1;

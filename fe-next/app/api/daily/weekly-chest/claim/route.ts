@@ -11,6 +11,8 @@ import { grantStreakFreezes } from '@/lib/daily/chestFreezeGrant'
 import { selectChestPrize } from '@/lib/daily/chestPrizePool'
 import { awardCoinsServer } from '@/backend/services/economy/awardCoins'
 import logger from '@/utils/logger'
+import { grantChestPart } from '@/lib/avatar/grantChestPart.server'
+import { weeklyChestSource } from '@/lib/avatar/chestDrops'
 
 export async function POST(request: NextRequest) {
   try {
@@ -156,8 +158,17 @@ async function claim(request: NextRequest) {
     else logger.error('Weekly chest claim: streak freeze grant failed for', user.id)
   }
 
+  // The weekly chest's headline prize: one avatar part, luckier odds per tier.
+  const granted = await grantChestPart({
+    supabase,
+    playerId: user.id,
+    source: weeklyChestSource(tier),
+    sourceKey: progress.cycleStart,
+  })
+
   return NextResponse.json({
     tier,
+    ...(granted ? { part: granted.drop } : {}),
     coins: prize.coins,
     freezes: freezesGranted,
     badgeId: prize.badgeId,

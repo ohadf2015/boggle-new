@@ -14,6 +14,9 @@ import { Mascot } from '@/components/ui/Mascot'
 import { getStreakHeat } from '@/lib/streakHeat'
 import { getStreakTier } from '@/lib/streakTierRewards'
 import { shareStreak } from '@/utils/streakShare'
+import ChestPartPrize from '@/components/avatar/chest/ChestPartPrize'
+import ChestPartOdds from '@/components/avatar/chest/ChestPartOdds'
+import { isChestPartDrop, weeklyChestSource } from '@/lib/avatar/chestDrops'
 
 const TIER_COLORS: Record<string, string> = {
   bronze: 'text-amber-500',
@@ -182,14 +185,16 @@ export default function WeeklyChestModal({ chest, streak = 0, onClose }: Props) 
       aria-label={t('daily.weeklyChest.title')}
       onClick={handleBackdropClick}
       data-testid="chest-backdrop"
-      className="fixed inset-0 z-[60] flex items-center justify-center backdrop-blur-md"
+      // z-80 + scroll: with the avatar part the reward is taller than a phone,
+      // and it must sit above the bottom tab bar (same layer as the daily box).
+      className="fixed inset-0 z-[80] flex items-center justify-center overflow-y-auto backdrop-blur-md"
       style={{
         // Hardcoded dark base under the tier tint — pitfall Class 5: a
         // lazy-mounted fullscreen overlay must never use a cream/dark pair.
         background: `radial-gradient(circle at 50% 40%, ${heat.from}cc 0%, rgba(26,26,46,0.92) 70%)`,
       }}
     >
-      <div className="relative flex flex-col items-center gap-5 p-8 max-w-sm w-full">
+      <div className="relative m-auto flex flex-col items-center gap-4 px-6 py-8 max-w-sm w-full">
         {/* Persistent tier-colored halo behind the rewards — fades in during burst, stays. */}
         <div
           ref={haloRef}
@@ -211,7 +216,9 @@ export default function WeeklyChestModal({ chest, streak = 0, onClose }: Props) 
 
         {/* The chest that shakes then flies off. Mascot-styled art so the gift
             screen matches the rest of the character work. */}
-        <div ref={chestRef} className="relative z-10">
+        {/* Overlays the reveal hero instead of taking its own row: it flies off
+            anyway, and stacked it pushed the reward below the fold on phones. */}
+        <div ref={chestRef} className="absolute top-8 inset-x-0 z-10 flex justify-center pointer-events-none motion-reduce:hidden">
           <Mascot variant="streakChestClosed" size="lg" animated={false} alt="" />
         </div>
 
@@ -247,6 +254,14 @@ export default function WeeklyChestModal({ chest, streak = 0, onClose }: Props) 
               +{safeToLocaleString(coinCount, language)}
             </span>
           </div>
+
+          {/* The headline prize: an avatar part, rarity first. */}
+          {isChestPartDrop(chest.part) ? (
+            <div className="w-full flex flex-col items-center gap-1.5">
+              <ChestPartPrize drop={chest.part} source={weeklyChestSource(chest.tier)} autoReveal={canClose} />
+              <ChestPartOdds source={weeklyChestSource(chest.tier)} className="text-center" />
+            </div>
+          ) : null}
 
           {/* Freeze chip (only if granted) */}
           {freezes > 0 ? (

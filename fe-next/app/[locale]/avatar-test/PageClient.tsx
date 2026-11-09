@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AVATAR_LAB_VIEWS, type AvatarLabView } from './fixtures';
 import LabGrid from './LabGrid';
+import { ChestView } from './ChestLabView';
 import { EditorView, LiteView, ProfileView, RevealView } from './LabViews';
 
 /**
@@ -34,7 +35,7 @@ export default function AvatarTestPageClient({ level, view }: { level: number; v
                   v === view ? 'bg-neo-lime text-neo-black' : 'bg-neo-navy-light text-neo-white'
                 }`}
               >
-                {t(`avatarLab.views.${v}`)}
+                {t(`avatarLab.views.${v}`, v)}
               </Link>
             ))}
           </nav>
@@ -45,6 +46,7 @@ export default function AvatarTestPageClient({ level, view }: { level: number; v
         {view === 'reveal' && <RevealView level={level} />}
         {view === 'lite' && <LiteView level={level} />}
         {view === 'grid' && <LabGrid />}
+        {view === 'chest' && <ChestView level={level} />}
       </div>
     </div>
   );

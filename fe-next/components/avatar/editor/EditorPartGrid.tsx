@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useEffect, useMemo, useRef } from 'react';
-import { Check } from 'lucide-react';
+import { Check, Gift } from 'lucide-react';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import type { CatalogPart } from '@/lib/avatar/catalog';
 import { RARITY_TOKENS } from '@/lib/avatar/rarity';
@@ -46,6 +46,15 @@ function LockChip({ info, isNew, t, language }: { info: PartLockInfo; isNew: boo
       >
         {isNew && <NewDot t={t} />}
         {t('avatarBuilder.editor.levelChip', { level: info.unlockLevel })}
+      </span>
+    );
+  }
+  if (info.path === 'chest') {
+    return (
+      <span data-cell-badge="chest" title={t('avatarChest.chestOnly')} className="inline-flex items-center gap-0.5 px-1.5 py-px rounded-full border-2 border-black bg-neo-yellow text-neo-black text-[10px] font-black leading-none">
+        {isNew && <NewDot t={t} />}
+        <Gift size={10} strokeWidth={3} aria-hidden="true" />
+        <span className="sr-only">{t('avatarChest.chestOnly')}</span>
       </span>
     );
   }

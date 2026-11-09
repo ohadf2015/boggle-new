@@ -23,6 +23,11 @@ vi.mock('@/utils/confettiUtils', () => ({
 }));
 vi.mock('@/utils/hapticFeedback', () => ({ triggerHaptic: vi.fn() }));
 vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: fx.trackGrowthEvent }));
+vi.mock('@/components/avatar/chest/ChestPartPrize', () => ({
+  default: ({ drop, autoReveal }: { drop: { key: string }; autoReveal?: boolean }) => (
+    <div data-testid="chest-part-prize" data-auto={String(!!autoReveal)}>{drop.key}</div>
+  ),
+}));
 
 import { DayPrizeReveal, ANTICIPATION_MS, RETRY_MS } from '../DayPrizeReveal';
 import { readOpenedPrize } from '../dayPrizeStore';
@@ -66,6 +71,19 @@ describe('DayPrizeReveal', () => {
     expect(fx.fireFireworks).toHaveBeenCalled();
     expect(fx.emitCoinEarned).toHaveBeenCalledWith(100, undefined, { big: true });
     expect(readOpenedPrize('clear')?.coins).toBe(100);
+  });
+
+  it('a random box shows the avatar part it held, with the part odds', async () => {
+    const part = { key: 'eyes:moonEye', category: 'eyes', partId: 'moonEye', rarity: 'epic', duplicate: false, refundCoins: 0 };
+    fx.postWithAuth.mockResolvedValue(res(200, { kind: 'clear', tier: 'common', coins: 20, xp: 50, claimed: true, part }));
+    render(<DayPrizeReveal kind="clear" source="test" onClose={() => {}} />);
+    await act(async () => { await vi.advanceTimersByTimeAsync(0); });
+    expect(screen.getByTestId('chest-part-odds')).toBeTruthy();
+    await openBox();
+    expect(screen.getByTestId('chest-part-prize').textContent).toBe('eyes:moonEye');
+    expect(screen.getByTestId('chest-part-prize').getAttribute('data-auto')).toBe('true');
+    expect(screen.queryByTestId('day-prize-line')).toBeNull();
+    expect(readOpenedPrize('clear')?.part?.key).toBe('eyes:moonEye');
   });
 
   it('a common box gets a small burst; a repeat open pays no coin flight', async () => {

@@ -188,8 +188,9 @@ describe('getCollectionProgress', () => {
     expect(COLLECTIBLE_PART_KEYS).not.toContain('mouth:pipe');
     expect(COLLECTIBLE_PART_KEYS).not.toContain('eyebrows:arched');
     // 2026-09 redraw: galaxy hair is now drawn and in both gender pickers, so it
-    // counts; neon is retired (hidden) AND in neither picker.
-    expect(COLLECTIBLE_PART_KEYS).not.toContain('hair:neon');
+    // counts. 2026-11 chest drop redrew neon too; rainbowBeard is still retired.
+    expect(COLLECTIBLE_PART_KEYS).not.toContain('facialHair:rainbowBeard');
+    expect(COLLECTIBLE_PART_KEYS).toContain('hair:neon');
     expect(COLLECTIBLE_PART_KEYS).toContain('hair:galaxy');
   });
 });
@@ -212,6 +213,8 @@ describe('retired parts a player bought (2026-09 redraw)', () => {
   it('counts the replacement in collection progress', () => {
     const before = getCollectionProgress([], 1).owned;
     const after = getCollectionProgress(OWNED, 1).owned;
-    expect(after).toBe(before + 3);
+    // shield + ninjaScarf were redrawn in the 2026-11 chest drop: they count
+    // themselves AND still grant robotHead + samurai; fuManchu → handlebar.
+    expect(after).toBe(before + 5);
   });
 });

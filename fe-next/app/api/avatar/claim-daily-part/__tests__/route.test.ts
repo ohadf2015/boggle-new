@@ -46,6 +46,7 @@ vi.mock('@/shared/types/customAvatar', () => ({
     return map[category] ?? [];
   }),
   PREMIUM_CATEGORIES: ['eyes', 'accessory'],
+  isChestOnlyPart: vi.fn((category: string, partId: string) => `${category}:${partId}` === 'eyes:supernova'),
 }));
 
 import { NextRequest } from 'next/server';

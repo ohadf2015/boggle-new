@@ -9,7 +9,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
 import { getSupabaseAdmin } from '@/lib/admin/server';
-import { isPremiumPart, getPartPrice } from '@/shared/types/customAvatar';
+import { isChestOnlyPart, isPremiumPart, getPartPrice } from '@/shared/types/customAvatar';
 import { captureApiError } from '@/utils/sentry';
 import { lockOnPartsSnapshot } from '@/lib/avatar/partsSnapshotLock';
 
@@ -46,6 +46,9 @@ export async function POST(request: NextRequest) {
 
     if (typeof category !== 'string' || typeof partId !== 'string' || !isPremiumPart(category, partId)) {
       return NextResponse.json({ error: 'Invalid premium part' }, { status: 400 });
+    }
+    if (isChestOnlyPart(category, partId)) {
+      return NextResponse.json({ error: 'Chest-only part' }, { status: 400 });
     }
 
     const price = getPartPrice(category, partId);

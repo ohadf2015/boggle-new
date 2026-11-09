@@ -18,7 +18,9 @@ export const MAX_SERVER_COIN_AWARD = 2000;
 export type AwardCoinsReason = 'duel_win' | 'wotd_complete' | 'grand_slam' | 'daily_weekly_chest' | 'daily_all_clear' | 'daily_day_clear' | 'daily_wheel_gold' | 'all_quests_complete' | 'bug_report' | 'curator_ratification' | 'quick_play_round'
   // Adventure pays coins at run milestones, and when a run ends its leftover gold
   // banks at a rate (settleRunEnd / purseCoins) — spending gold in-run is a real choice.
-  | 'adventure_elite' | 'adventure_boss' | 'adventure_world' | 'adventure_purse';
+  | 'adventure_elite' | 'adventure_boss' | 'adventure_world' | 'adventure_purse'
+  // A chest rolled an avatar part the player already had: coins instead (lib/avatar/chestDrops).
+  | 'avatar_part_duplicate';
 
 export interface AwardCoinsResult {
   success: boolean;

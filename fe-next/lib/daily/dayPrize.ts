@@ -16,6 +16,8 @@
  * decides which, server-side.
  */
 
+import type { ChestPartDrop } from '@/lib/avatar/chestDrops';
+
 export type DayPrizeKind = 'clear' | 'perfect';
 export type DayPrizeTier = 'common' | 'lucky' | 'jackpot';
 
@@ -91,6 +93,8 @@ export function rollDayPrize(playerId: string, date: string, kind: DayPrizeKind)
 /** Shape the claim routes answer with. `claimed` is false when the box was already opened. */
 export interface DayPrizeClaimResponse extends Omit<DayPrize, 'fixed'> {
   claimed: boolean;
+  /** The avatar part this box held (random boxes only; missing if the part side was down). */
+  part?: ChestPartDrop;
   /** Missing on boxes cached before the education-side split: read as false. */
   fixed?: boolean;
 }

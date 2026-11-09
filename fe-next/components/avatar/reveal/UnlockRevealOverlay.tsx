@@ -8,6 +8,7 @@ import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { RARITY_TOKENS } from '@/lib/avatar/rarity';
 import type { LevelUnlock } from '@/lib/avatar/unlocks';
 import { REVEAL_CATEGORY_KEY, revealPartNameKey, type UnlockReveal } from '@/lib/avatar/revealTrigger';
+import { chestPartNameKey } from '@/lib/avatar/chestReveal';
 import { shareWithFallback } from '@/utils/shareWithFallback';
 import RevealBurst, { BURST_CENTER_X, BURST_CENTER_Y } from './RevealBurst';
 import RevealConfetti from './RevealConfetti';
@@ -87,7 +88,8 @@ export default function UnlockRevealOverlay({
   const attitude = revealAttitude(unlock);
   const wearing = attitudeConfig(config, unlock);
   const categoryLabel = t(REVEAL_CATEGORY_KEY[unlock.category]);
-  const partName = t(revealPartNameKey(unlock), categoryLabel);
+  const fromChest = reveal.source === 'chest';
+  const partName = t(revealPartNameKey(unlock), t(chestPartNameKey(unlock), categoryLabel));
   const rarityLabel = t(token.labelKey);
 
   useEffect(() => { if (portal) setMounted(true); }, [portal]);
@@ -201,7 +203,7 @@ export default function UnlockRevealOverlay({
         <div className="flex flex-col items-center gap-2 shrink-0 lg:col-start-2 lg:row-start-2 lg:items-start" key={`t-${index}`}>
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-neo border-2 border-black bg-black text-neo-white text-[11px] sm:text-xs font-black uppercase tracking-[0.18em] -rotate-2 shadow-hard-sm">
             <Sparkles className="w-3.5 h-3.5" style={{ color: theme.hex }} aria-hidden="true" />
-            {t('revealUnlock.kicker')}
+            {t(fromChest ? 'avatarChest.kicker' : 'revealUnlock.kicker')}
           </span>
           <h2
             id={titleId}
@@ -234,11 +236,11 @@ export default function UnlockRevealOverlay({
               {partName}
             </p>
             <p className="mt-1.5 max-w-[22rem] font-neo-body font-bold text-[15px] sm:text-base leading-snug text-neo-white" style={{ textShadow: '2px 2px 0 #000' }}>
-              {t(revealVoiceKey(unlock))}
+              {t(revealVoiceKey(unlock), t(`avatarChest.voice.${unlock.rarity}`))}
             </p>
             <div className="mt-2 flex flex-wrap items-center justify-center gap-1.5 lg:justify-start">
               <span className="px-1.5 py-0.5 rounded-md border-2 border-black bg-neo-lime text-neo-black text-[11px] font-black uppercase tracking-wider">
-                {t('revealUnlock.unlockedAt', { level: unlock.level })}
+                {fromChest ? t('avatarChest.fromChest') : t('revealUnlock.unlockedAt', { level: unlock.level })}
               </span>
               <span className="px-1.5 py-0.5 rounded-md border-2 border-black bg-black text-neo-white text-[11px] font-black uppercase tracking-wider">
                 {categoryLabel}

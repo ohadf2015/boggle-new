@@ -92,6 +92,10 @@ export const COSTUME_HANDS: Readonly<Record<string, string>> = {
   alienHead: '#9CF26E',
   ghostFace: '#F4F6FF',
   dragonHead: '#E8413C',
+  // 2026-11 chest drop heads (components/avatar/art/headsChest.tsx)
+  shield: '#C3CEDF',
+  starBase: '#FFD23F',
+  moonBase: '#DCE5F6',
 };
 
 export function handColor(config: Pick<CustomAvatarConfig, 'base' | 'skinColor'>): string {
