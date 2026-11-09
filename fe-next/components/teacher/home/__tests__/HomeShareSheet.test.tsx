@@ -31,6 +31,13 @@ describe('<HomeShareSheet>', () => {
     expect(screen.getByTestId('projector-sheet')).toBeInTheDocument();
   });
 
+  it('Given a class, Then the sheet links to printable join slips for it, opened in a new tab', () => {
+    render(<HomeShareSheet classroom={CLASS} open onOpenChange={vi.fn()} uiLanguage="en" t={t} />);
+    const link = screen.getByTestId('home-share-print');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link.getAttribute('href')).toBe('/en/teacher/join-sheet?code=AB12CD&name=Period%203');
+  });
+
   it('Given the sheet is closed, Then nothing renders', () => {
     render(<HomeShareSheet classroom={CLASS} open={false} onOpenChange={vi.fn()} uiLanguage="en" t={t} />);
     expect(screen.queryByTestId('setup-join-code')).toBeNull();

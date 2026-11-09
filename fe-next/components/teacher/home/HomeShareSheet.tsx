@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Projector } from 'lucide-react';
+import Link from 'next/link';
+import { Printer, Projector } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { NeoButton } from '@/components/ui/button';
 import { ClassSetupInviteCode } from '@/components/education/ClassSetupInviteCode';
@@ -26,6 +27,7 @@ export function HomeShareSheet({ classroom, open, onOpenChange, uiLanguage, t }:
   useEffect(() => setOrigin(window.location.origin), []);
   const share = useInviteShare(classroom, t);
   const locale = inviteLocale(classroom.language, uiLanguage);
+  const language = uiLanguage;
   const joinUrl = origin ? classroomJoinUrl(origin, locale, classroom.join_code) : '';
   const displayHost = origin ? `${origin.replace(/^https?:\/\//, '')}/${locale}/join` : '';
 
@@ -54,6 +56,16 @@ export function HomeShareSheet({ classroom, open, onOpenChange, uiLanguage, t }:
             <Projector className="size-5" aria-hidden="true" />
             {t('academy.hq.openProjector')}
           </NeoButton>
+          <Link
+            href={`/${language}/teacher/join-sheet?code=${encodeURIComponent(classroom.join_code)}&name=${encodeURIComponent(classroom.name)}`}
+            target="_blank"
+            rel="noopener"
+            data-testid="home-share-print"
+            className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-neo border-2 border-neo-cream/50 px-4 font-neo-body text-sm font-bold text-neo-cream hover:bg-neo-navy-light focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+          >
+            <Printer className="size-4" aria-hidden="true" />
+            {t('teacher.joinSheet.printAria')}
+          </Link>
         </DialogContent>
       </Dialog>
       {boardOpen ? (

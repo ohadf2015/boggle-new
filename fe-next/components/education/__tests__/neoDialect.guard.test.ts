@@ -19,6 +19,8 @@ const ALLOW: Record<PatternName, Record<string, number>> = {
   bgWhite: {
     // Off-screen PDF renderer: literal paper white on purpose.
     'components/teacher/reports/ClassroomRosterProgress.tsx': 1,
+    // Printable join slips: paper white, and the QR needs a white quiet zone to scan.
+    'components/teacher/joinSheet/JoinSheet.tsx': 3,
   },
   borderBlack: {
     'components/teacher/TeacherPlanBadge.tsx': 1,

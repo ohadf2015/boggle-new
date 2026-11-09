@@ -77,6 +77,16 @@ describe('<GetStudentsInCard>', () => {
     }
   });
 
+  it('Given a class, Then one tap opens printable join slips for it in a new tab', () => {
+    render(<GetStudentsInCard classroom={CLASS} onOpenProjector={vi.fn()} />);
+    const link = screen.getByTestId('hq-print-join-sheet');
+    expect(link).toHaveAttribute('target', '_blank');
+    const href = new URL(link.getAttribute('href') ?? '', 'https://x.test');
+    expect(href.pathname).toMatch(/\/teacher\/join-sheet$/);
+    expect(href.searchParams.get('code')).toBe(CLASS.join_code);
+    expect(href.searchParams.get('name')).toBe(CLASS.name);
+  });
+
   it('Given a phone-width card, Then the code tiles share the full width, one column per character', () => {
     render(<GetStudentsInCard classroom={CLASS} onOpenProjector={vi.fn()} />);
     const code = screen.getByTestId('hq-join-code');

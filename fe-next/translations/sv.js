@@ -16024,6 +16024,19 @@ const sv = {
       },
       "standard": "Standard",
       "lastUpdated": "Senast uppdaterad"
+    },
+    "joinSheet": {
+      "title": "Inloggningslappar: {name}",
+      "subtitle": "Skriv ut, klipp längs de streckade linjerna och ge en till varje elev. Både QR-koden och koden öppnar din klass.",
+      "print": "Skriv ut lappar",
+      "printAria": "Skriv ut lappar så att eleverna kan gå med",
+      "back": "Tillbaka till lärarstart",
+      "slipHeading": "Gå med i min klass",
+      "slipScan": "Skanna med mobilens eller surfplattans kamera",
+      "slipOr": "eller öppna",
+      "slipType": "och skriv koden",
+      "slipNoAccount": "Inget konto eller mejl behövs.",
+      "invalid": "Den här sidan saknar klasskod. Öppna den igen från din lärarstart."
     }
   },
   "education": {

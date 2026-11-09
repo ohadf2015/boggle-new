@@ -15716,6 +15716,19 @@ const ja = {
       },
       "standard": "標準",
       "lastUpdated": "最終更新"
+    },
+    "joinSheet": {
+      "title": "参加カード：{name}",
+      "subtitle": "印刷して点線に沿って切り、生徒に1枚ずつ配ってください。QRコードでもコードでもクラスに参加できます。",
+      "print": "カードを印刷",
+      "printAria": "生徒用の参加カードを印刷",
+      "back": "先生ホームに戻る",
+      "slipHeading": "クラスに参加しよう",
+      "slipScan": "スマホやタブレットのカメラで読み取る",
+      "slipOr": "または",
+      "slipType": "を開いてコードを入力",
+      "slipNoAccount": "アカウントやメールは不要です。",
+      "invalid": "このページにはクラスコードがありません。先生ホームからもう一度開いてください。"
     }
   },
   "education": {

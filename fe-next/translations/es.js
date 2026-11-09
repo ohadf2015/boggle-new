@@ -15664,6 +15664,19 @@ const es = {
       "points": "pts",
       "async": "Asíncrono",
       "realtime": "En vivo"
+    },
+    "joinSheet": {
+      "title": "Tarjetas para unirse: {name}",
+      "subtitle": "Imprime, recorta por las líneas discontinuas y da una a cada estudiante. El código QR y el código abren tu clase.",
+      "print": "Imprimir tarjetas",
+      "printAria": "Imprimir tarjetas para que tus estudiantes se unan",
+      "back": "Volver al inicio del docente",
+      "slipHeading": "Únete a mi clase",
+      "slipScan": "Escanea con la cámara del móvil o la tableta",
+      "slipOr": "o abre",
+      "slipType": "y escribe el código",
+      "slipNoAccount": "No hace falta cuenta ni correo.",
+      "invalid": "A esta página le falta el código de la clase. Ábrela de nuevo desde tu inicio de docente."
     }
   },
   "education": {

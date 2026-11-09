@@ -14003,6 +14003,19 @@ const en = {
         "noAds": "Ad-free for students",
         "analytics": "Analytics & printable reports"
       }
+    },
+    "joinSheet": {
+      "title": "Join slips: {name}",
+      "subtitle": "Print, cut along the dashed lines and hand one to each student. The QR code and the code both open your class.",
+      "print": "Print slips",
+      "printAria": "Print join slips for your students",
+      "back": "Back to teacher home",
+      "slipHeading": "Join my class",
+      "slipScan": "Scan with a phone or tablet camera",
+      "slipOr": "or open",
+      "slipType": "and type the code",
+      "slipNoAccount": "No account or email needed.",
+      "invalid": "This page is missing a class code. Open it again from your teacher home."
     }
   },
   "education": {
