@@ -24,11 +24,19 @@ export interface TomorrowCardProps {
   isStreakLoaded?: boolean;
 }
 
-/** Seconds until the next LOCAL midnight (countdown display — not board identity). */
+/**
+ * Seconds until the next UTC midnight — same boundary as board + completion
+ * identity (`getDailyChallengeDate` / `getSecondsUntilNextDaily`).
+ * Accepts an injectable `now` for timezone-boundary tests.
+ */
 export function getSecondsToMidnight(now: Date = new Date()): number {
-  const midnight = new Date(now);
-  midnight.setHours(24, 0, 0, 0);
-  return Math.max(0, Math.round((midnight.getTime() - now.getTime()) / 1000));
+  const tomorrow = Date.UTC(
+    now.getUTCFullYear(),
+    now.getUTCMonth(),
+    now.getUTCDate() + 1,
+    0, 0, 0, 0,
+  );
+  return Math.max(0, Math.floor((tomorrow - now.getTime()) / 1000));
 }
 
 /** hh:mm:ss with locale digits (Intl.NumberFormat), no grouping separators. */
@@ -58,7 +66,7 @@ function readDismissed(): boolean {
  * After every finished solo/MP (series-end) results visit: CTA into today's
  * remaining daily quests, or a keep-streak countdown once the hub is cleared.
  * Dismissible for the session via sessionStorage. Guests see the card without
- * an invented streak. Countdown uses setInterval(1s), NOT rAF (CWV budget).
+ * an invented streak. Countdown is UTC midnight (board identity) via setInterval(1s), NOT rAF.
  */
 const TomorrowCard: React.FC<TomorrowCardProps> = memo(({
   source = 'solo',
@@ -104,13 +112,24 @@ const TomorrowCard: React.FC<TomorrowCardProps> = memo(({
         source,
       });
     }
-    if (variant !== 'keep-streak') return;
-    const interval = setInterval(() => {
+    // Tick countdown + re-probe hub completion across UTC midnight so keep-streak
+    // copy does not stick after the board identity rolls over. Parent-provided
+    // dailyDoneToday skips the probe (prop remains source of truth).
+    const tick = () => {
       setSecondsLeft(getSecondsToMidnight());
-    }, 1000);
+      if (dailyDoneProp === undefined) {
+        try {
+          setLocalDailyDone(isDailyHubDoneLocally(language as Language));
+        } catch {
+          /* storage off */
+        }
+      }
+    };
+    if (variant !== 'keep-streak' && dailyDoneProp !== undefined) return;
+    const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- track once with mount-time values
-  }, [ready, dismissed, variant]);
+  }, [ready, dismissed, variant, dailyDoneProp, language]);
 
   const dismiss = useCallback(() => {
     setDismissed(true);

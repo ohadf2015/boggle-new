@@ -145,10 +145,52 @@ describe('TomorrowCard', () => {
   });
 });
 
-describe('getSecondsToMidnight', () => {
-  it('counts seconds to the next LOCAL midnight', () => {
-    const now = new Date(2026, 7, 17, 23, 0, 0); // local 23:00
+describe('getSecondsToMidnight (UTC board identity)', () => {
+  it('counts seconds to the next UTC midnight, not local', () => {
+    // 2026-08-17 23:00 UTC → 1h to UTC midnight (local TZ must not matter)
+    const now = new Date(Date.UTC(2026, 7, 17, 23, 0, 0));
     expect(getSecondsToMidnight(now)).toBe(3600);
+  });
+
+  it('is correct near Asia/Jerusalem evening (UTC+2/+3) when local midnight would be early', () => {
+    // 21:00 UTC = 00:00 Israel summer (+3) local midnight — LOCAL helper would say 0;
+    // UTC board still has 3h left.
+    const now = new Date(Date.UTC(2026, 7, 17, 21, 0, 0));
+    expect(getSecondsToMidnight(now)).toBe(3 * 3600);
+  });
+
+  it('is correct for US Pacific evening vs UTC day boundary', () => {
+    // 2026-08-17 02:00 UTC = previous calendar evening in US — still same UTC day → almost 22h left
+    const now = new Date(Date.UTC(2026, 7, 17, 2, 0, 0));
+    expect(getSecondsToMidnight(now)).toBe(22 * 3600);
+  });
+
+  it('hits zero at the UTC boundary', () => {
+    const now = new Date(Date.UTC(2026, 7, 18, 0, 0, 0));
+    // Exactly midnight UTC → next midnight is 24h away
+    expect(getSecondsToMidnight(now)).toBe(24 * 3600);
+  });
+});
+
+
+describe('TomorrowCard UTC rollover refresh', () => {
+  it('re-reads daily-complete after UTC midnight so copy flips off keep-streak', () => {
+    vi.useFakeTimers();
+    // Start 2s before UTC midnight with hub marked done
+    const justBefore = Date.UTC(2026, 7, 17, 23, 59, 58);
+    vi.setSystemTime(justBefore);
+    mockIsDailyHubDoneLocally.mockReturnValue(true);
+
+    render(<TomorrowCard source="solo" streak={4} isStreakLoaded />);
+    expect(screen.getByText('Streak safe')).toBeInTheDocument();
+
+    // After UTC rollover the hub key is a new day → not done
+    mockIsDailyHubDoneLocally.mockReturnValue(false);
+    act(() => {
+      vi.advanceTimersByTime(3000);
+    });
+    expect(screen.getByText("Finish today's daily")).toBeInTheDocument();
+    expect(screen.queryByTestId('tomorrow-countdown')).not.toBeInTheDocument();
   });
 });
 
