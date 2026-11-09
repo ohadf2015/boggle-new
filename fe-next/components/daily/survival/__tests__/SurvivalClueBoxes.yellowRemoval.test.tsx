@@ -96,8 +96,8 @@ describe('SurvivalClueBoxes - Yellow Letter Removal When Found Green', () => {
     // Find all boxes and check position 0 specifically
     const allBoxes = screen.getAllByRole('generic').filter(el =>
       el.classList.contains('bg-amber-400') ||
-      el.classList.contains('bg-emerald-500') ||
-      el.classList.contains('bg-neo-black')
+      el.classList.contains('bg-emerald-400') ||
+      el.classList.contains('bg-neo-navy-elevated')
     );
 
     // Position 1 and 2 should show green P's
@@ -113,7 +113,7 @@ describe('SurvivalClueBoxes - Yellow Letter Removal When Found Green', () => {
     pElements.forEach(pEl => {
       const box = pEl.closest('div');
       // All P's should be green (in correct positions), not yellow
-      expect(box).toHaveClass('bg-emerald-500');
+      expect(box).toHaveClass('bg-emerald-400');
       expect(box).not.toHaveClass('bg-amber-400');
     });
   });
@@ -180,7 +180,7 @@ describe('SurvivalClueBoxes - Yellow Letter Removal When Found Green', () => {
     expect(yellowP).toBeDefined();
 
     // Find the green P (should be at position 1)
-    const greenP = clueBoxes.find(el => el.closest('div')?.classList.contains('bg-emerald-500'));
+    const greenP = clueBoxes.find(el => el.closest('div')?.classList.contains('bg-emerald-400'));
     expect(greenP).toBeDefined();
   });
 
@@ -236,7 +236,7 @@ describe('SurvivalClueBoxes - Yellow Letter Removal When Found Green', () => {
 
     // The A should be green
     const aBox = aElements[0].closest('div');
-    expect(aBox).toHaveClass('bg-emerald-500');
+    expect(aBox).toHaveClass('bg-emerald-400');
     expect(aBox).not.toHaveClass('bg-amber-400');
 
     // Position 1 should show "?" (yellow A removed)

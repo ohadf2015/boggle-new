@@ -373,7 +373,7 @@ describe('SurvivalClueBoxes - Yellow Letter Persistence', () => {
 
       // Position 0 should show 'A' with green styling (green beats yellow)
       const greenBox = screen.getByText('A').closest('div');
-      expect(greenBox).toHaveClass('bg-emerald-500');
+      expect(greenBox).toHaveClass('bg-emerald-400');
     });
   });
 });

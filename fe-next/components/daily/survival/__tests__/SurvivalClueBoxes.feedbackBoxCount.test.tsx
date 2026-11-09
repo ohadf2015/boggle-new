@@ -132,7 +132,7 @@ describe('SurvivalClueBoxes - Feedback Box Count', () => {
 
     // Green letter shown with neo-lime styling
     const wBox = screen.getByText('W').closest('div');
-    expect(wBox).toHaveClass('bg-emerald-500');
+    expect(wBox).toHaveClass('bg-emerald-400');
 
     // Gray letter initially flashes with navy styling (before fade timer)
     const aBox = screen.getByText('A').closest('div');
