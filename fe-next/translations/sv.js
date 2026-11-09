@@ -2,6 +2,20 @@
 const sv = {
   // @friendSocial:start
   "friendSocial": {
+    "today": {
+      "title": "Dagens utmaning med vänner",
+      "share": "Dela",
+      "shareLead": "Jag är etta av {count} vänner på dagens LexiClash-utmaning med {score} poäng. Kan du slå mig?",
+      "shareRank": "Jag är nummer {rank} av {count} vänner på dagens LexiClash-utmaning med {score} poäng. Kan du slå mig?",
+      "you": "Du",
+      "beatTop": "{name} leder med {score}. Spela dagens utmaning för att slå hen.",
+      "beFirst": "Ingen vän har spelat i dag än. Sätt poängen att slå.",
+      "leading": "Du leder före alla vänner i dag.",
+      "chase": "{points} poäng till för att gå om {name}.",
+      "onlyYou": "Bara du har spelat hittills. Dela så att vännerna försöker slå dig.",
+      "notPlayed": "{count} vänner har inte spelat än",
+      "play": "Spela dagens utmaning"
+    },
     "accept": "Acceptera",
     "acceptFrom": "Acceptera vänförfrågan från {name}",
     "addFriend": "Lägg till {name} som vän",

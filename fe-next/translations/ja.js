@@ -2,6 +2,20 @@
 const ja = {
   // @friendSocial:start
   "friendSocial": {
+    "today": {
+      "title": "フレンドと今日のデイリー",
+      "share": "シェア",
+      "shareLead": "今日のLexiClashデイリーでフレンド{count}人中1位、{score}点！超えられる？",
+      "shareRank": "今日のLexiClashデイリーでフレンド{count}人中{rank}位、{score}点！超えられる？",
+      "you": "あなた",
+      "beatTop": "{name}さんが{score}点でトップ。今日のデイリーで追い抜こう。",
+      "beFirst": "今日はまだフレンドが誰も遊んでいません。最初のスコアを作ろう。",
+      "leading": "今日はフレンド全員より上です。",
+      "chase": "{name}さんを抜くまであと{points}点。",
+      "onlyYou": "今のところ遊んだのはあなただけ。シェアしてフレンドに挑戦してもらおう。",
+      "notPlayed": "まだ遊んでいないフレンド：{count}人",
+      "play": "今日のデイリーを遊ぶ"
+    },
     "accept": "承認",
     "acceptFrom": "{name}さんのフレンド申請を承認",
     "addFriend": "{name}さんをフレンドに追加",

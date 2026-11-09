@@ -2,6 +2,20 @@
 const he = {
   // @friendSocial:start
   "friendSocial": {
+    "today": {
+      "title": "היומי של היום עם חברים",
+      "share": "שיתוף",
+      "shareLead": "אני מקום 1 מתוך {count} חברים ביומי של LexiClash היום עם {score} נקודות. מי מנצח אותי?",
+      "shareRank": "אני מקום {rank} מתוך {count} חברים ביומי של LexiClash היום עם {score} נקודות. מי מנצח אותי?",
+      "you": "אני",
+      "beatTop": "{name} מוביל/ה עם {score}. שחקו את היומי כדי לעקוף.",
+      "beFirst": "אף חבר עוד לא שיחק היום. קבעו את הניקוד לניצחון.",
+      "leading": "את/ה לפני כל החברים היום.",
+      "chase": "עוד {points} נקודות כדי לעקוף את {name}.",
+      "onlyYou": "רק את/ה שיחקת עד עכשיו. שתפו כדי שחברים ינסו לנצח.",
+      "notPlayed": "{count} חברים עוד לא שיחקו",
+      "play": "לשחק את היומי"
+    },
     "accept": "אישור",
     "acceptFrom": "לאשר את בקשת החברות של {name}",
     "addFriend": "להוסיף את {name} לחברים",
