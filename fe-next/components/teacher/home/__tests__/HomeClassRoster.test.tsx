@@ -222,7 +222,7 @@ describe('<HomeClassRoster>', () => {
     expect(screen.getByTestId('home-roster-activity')).toHaveTextContent('eduShell.home.roster.noStreak');
   });
 
-  it('Given a student with a level, Then the drawer shows the same level the student sees', () => {
+  it('Given a student with a level, Then the drawer shows the class level the student sees on the leaderboard', () => {
     const rows = rosterRows([{ ...base, currentLevel: 4, studentId: 'l', displayName: 'Lia', totalXp: 640, lastPracticeDate: new Date(NOW - DAY).toISOString() }], NOW);
     renderRoster(rows);
     fireEvent.click(screen.getByTestId('home-roster-row'));
