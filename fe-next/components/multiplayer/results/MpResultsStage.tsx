@@ -9,6 +9,7 @@ import { MpScreen } from '../shell/MpScreen';
 import { ResultsModals } from '@/components/results/ResultsModals';
 import { PostRoundSummary } from '@/components/results/PostRoundSummary';
 import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
+import InlineSignupCard from '@/components/auth/InlineSignupCard';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useShareOpenGuard } from '@/hooks/useShareOpenGuard';
@@ -52,7 +53,6 @@ import { BossOutcomeCard } from '@/components/education/boss/BossOutcomeCard';
 import { useClassroomBossStore } from '@/stores/classroomBossStore';
 
 const MultiplayerSignupSheet = dynamic(() => import('@/components/auth/MultiplayerSignupSheet'), { ssr: false });
-const InlineSignupCard = dynamic(() => import('@/components/auth/InlineSignupCard'), { ssr: false });
 const SignupToast = dynamic(() => import('@/components/auth/SignupToast'), { ssr: false });
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
 const FloatingReaction = dynamic(() => import('@/components/game/QuickReactions').then((m) => m.FloatingReaction), { ssr: false });
@@ -78,7 +78,8 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
     normalizeUsername: data.normalizeUsername,
     series: { roundNumber: seriesRoundNumber, standings: seriesStandings },
   }), [data.sortedScores, username, data.normalizeUsername, seriesRoundNumber, seriesStandings]);
-  const { branch, lock } = useLockedBranch(seriesRoundNumber >= seriesTotalGames);
+  const isFinalLive = seriesRoundNumber >= seriesTotalGames;
+  const { branch, lock } = useLockedBranch(isFinalLive);
   // The teacher's hidden dial means TRUE hidden — the final screen IS the reveal.
   const pressure = useClassroomPressure();
   const hideOutcome = branch !== 'final' && pressure != null && isLeaderboardHidden(pressure);
@@ -122,6 +123,9 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   // show the round order first and flip to the ladder half a second later.
   const seen = (name: Parameters<typeof timeline.stageOf>[0]) => branch !== null && stage >= timeline.stageOf(name);
   const footerShown = seen('footer');
+  // Slots are laid out (invisible) from mount: mounting them on a later beat pushed the screen around (mobile CLS).
+  const expectedBranch = branch ?? (isFinalLive ? 'final' : 'intermission');
+  const nextModeSlot = expectedBranch === 'intermission';
 
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -214,6 +218,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   const awards = useMemo(() => (grid ? null : roundAwards(data.sortedScores)), [grid, data.sortedScores]);
 
   const signupShown = showInlineSignup({ isGuest: c.isGuest, isClassroom: c.isClassroom, footerShown, branch });
+  const signupSlot = showInlineSignup({ isGuest: c.isGuest, isClassroom: c.isClassroom, footerShown: true, branch: expectedBranch });
 
   const exitCopy = resultsExitCopy({ isClassroom: c.isClassroom, isHost });
   const bossOutcome = useClassroomBossStore((s) => s.view?.status === 'defeated' || s.view?.status === 'escaped');
@@ -323,7 +328,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
             onPractice={practiceLessonId && missedWords.length > 0 ? () => openLessonPractice(practiceLessonId) : undefined}
             className={cn('shrink-0', !seen('card') && 'invisible', seen('card') && fx.cardIn)}
           />
-        ) : branch === 'intermission' && (
+        ) : nextModeSlot && (
           <MpNextModeCard
             mode={nextMode}
             onChange={isHost && !c.isClassroom ? c.setSelectedGameMode : undefined}
@@ -379,8 +384,8 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
           {t('mpUi.results.skipHint')}
         </button>
       )}
-      {signupShown && (
-        <InlineSignupCard isAuthenticated={c.isAuthenticated} analyticsSource="results_inline" compact className={cn('shrink-0', fx.cardIn)} />
+      {signupSlot && (
+        <InlineSignupCard isAuthenticated={c.isAuthenticated} analyticsSource="results_inline" compact held={!signupShown} className={cn('shrink-0', signupShown ? fx.cardIn : 'invisible')} />
       )}
     </div>
   );

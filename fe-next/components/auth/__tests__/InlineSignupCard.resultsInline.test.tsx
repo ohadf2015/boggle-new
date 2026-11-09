@@ -75,6 +75,25 @@ describe('InlineSignupCard results_inline', () => {
     ]);
   });
 
+  it('held (laid out ahead of the reveal): renders, but counts no impression and emits nothing until released', () => {
+    markGameCompletedSignal();
+    const { rerender } = render(<InlineSignupCard isAuthenticated={false} analyticsSource="results_inline" held />);
+    expect(screen.getByText('auth.multiGames.title')).toBeInTheDocument();
+    expect(shownCalls()).toHaveLength(0);
+    expect(getResultsInlineImpressionCount()).toBe(0);
+    expect(hasResultsInlineShownThisSession()).toBe(false);
+    rerender(<InlineSignupCard isAuthenticated={false} analyticsSource="results_inline" />);
+    expect(shownCalls()).toEqual([
+      ['signup_prompt_shown', { source: 'results_inline', surface: 'results_inline', trigger: 'results_inline', cap_rank: 1 }],
+    ]);
+  });
+
+  it('held before game_completed: still laid out, so the later completion never changes its height; emits nothing', () => {
+    const { container } = render(<InlineSignupCard isAuthenticated={false} analyticsSource="results_inline" held />);
+    expect(container.firstChild).not.toBeNull();
+    expect(shownCalls()).toHaveLength(0);
+  });
+
   it('appears when game_completed fires after the results screen mounted', () => {
     const { container } = render(<InlineSignupCard isAuthenticated={false} analyticsSource="results_inline" />);
     expect(container.firstChild).toBeNull();

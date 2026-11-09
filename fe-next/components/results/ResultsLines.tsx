@@ -26,11 +26,13 @@ interface BestMissedWordLineProps {
   language: string;
   t: TFn;
   className?: string;
+  /** False while the line is laid out but not yet on screen: holds the "shown" event. */
+  seen?: boolean;
 }
 
 /** "You missed STRANGER (8 letters, 500 points)" — one line, no panel. */
-export function BestMissedWordLine({ best, mode, language, t, className }: BestMissedWordLineProps) {
-  useOnce(!!best, () => {
+export function BestMissedWordLine({ best, mode, language, t, className, seen = true }: BestMissedWordLineProps) {
+  useOnce(seen && !!best, () => {
     if (best) trackGrowthEvent('best_missed_word_shown', { word_length: best.letters, points: best.points, mode });
   });
   if (!best) return null;
@@ -50,13 +52,15 @@ interface RewardLineProps {
   className?: string;
   /** Optional leading glyph (Quick Play flies its coins from here). */
   leading?: React.ReactNode;
+  /** False while the line is laid out but not yet on screen: holds the "shown" event. */
+  seen?: boolean;
 }
 
 /** The one reward line: "+N coins · +N XP" (either part dropped when zero). */
-export function RewardLine({ coins, xp, mode, t, className, leading }: RewardLineProps) {
+export function RewardLine({ coins, xp, mode, t, className, leading, seen = true }: RewardLineProps) {
   const c = coins && coins > 0 ? coins : 0;
   const x = xp && xp > 0 ? xp : 0;
-  useOnce(c > 0 || x > 0, () => trackGrowthEvent('results_reward_line_shown', { coins: c, xp: x, mode }));
+  useOnce(seen && (c > 0 || x > 0), () => trackGrowthEvent('results_reward_line_shown', { coins: c, xp: x, mode }));
   if (c === 0 && x === 0) return null;
   const parts: Array<{ id: string; amount: number; label: string }> = [];
   if (c > 0) parts.push({ id: 'coins', amount: c, label: t('results.rewardLine.coins') });

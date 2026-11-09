@@ -141,8 +141,9 @@ function MpMyCardImpl({ rank, winner, total, score, bestWord, xp, coins, bestMis
             </span>
           )}
         </div>
-        {revealed && <RewardLine coins={coins} xp={xp} mode="multiplayer" t={t} className={cn('text-[calc(13px*var(--mp-u,1))]', fx.rewardPop)} />}
-        {revealed && <BestMissedWordLine best={bestMissed} mode="multiplayer" language={language} t={t} className="text-[calc(12px*var(--mp-u,1))] opacity-80" />}
+        {/* Mounted while the card is still invisible, so the reveal never changes its height. */}
+        <RewardLine coins={coins} xp={xp} mode="multiplayer" seen={revealed} t={t} className={cn('text-[calc(13px*var(--mp-u,1))]', revealed && fx.rewardPop)} />
+        <BestMissedWordLine best={bestMissed} mode="multiplayer" language={language} seen={revealed} t={t} className="text-[calc(12px*var(--mp-u,1))] opacity-80" />
       </div>
     </section>
   );

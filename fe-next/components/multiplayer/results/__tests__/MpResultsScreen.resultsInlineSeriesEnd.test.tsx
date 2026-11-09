@@ -42,13 +42,11 @@ vi.mock('framer-motion', async (orig) => ({ ...(await orig<typeof import('framer
 vi.mock('@/hooks/useMasterMute', () => ({ useMasterMute: () => ({ allMuted: false, toggle: () => {}, label: 'Mute', title: 'Mute' }) }));
 vi.mock('@/contexts/NavigationContext', () => ({ useRegisterHeaderAudioControl: () => {} }));
 vi.mock('@/components/ui/AnimatedCounter', () => ({ __esModule: true, default: ({ value }: { value: number }) => <span>{value}</span> }));
-// InlineSignupCard is the only dynamic() child that takes analyticsSource —
-// surface it as a marker so the flag wiring is what this file pins.
-vi.mock('next/dynamic', () => ({
+vi.mock('next/dynamic', () => ({ __esModule: true, default: () => () => null }));
+vi.mock('@/components/auth/InlineSignupCard', () => ({
   __esModule: true,
-  default: () => (props: Record<string, unknown>) =>
-    props && props.analyticsSource === 'results_inline' ? <div data-testid="inline-signup-card" />
-      : null,
+  default: (props: Record<string, unknown>) =>
+    props.analyticsSource === 'results_inline' ? <div data-testid="inline-signup-card" className={String(props.className)} data-held={String(!!props.held)} /> : null,
 }));
 vi.mock('@/hooks/usePostHogFlag', () => ({
   usePostHogFlag: (key: string, defaultValue: unknown) => {
@@ -142,6 +140,21 @@ describe('MpResultsScreen results_inline signup is series-end only', () => {
     renderScreen({ seriesRoundNumber: 5, seriesTotalGames: 5 });
     skipReveal();
     expect(screen.getByTestId('inline-signup-card')).toBeTruthy();
+  });
+
+  it('series end: the CTA is laid out (hidden, held) from the first frame, so its arrival never squeezes the screen', () => {
+    renderScreen({ seriesRoundNumber: 5, seriesTotalGames: 5 });
+    const card = screen.getByTestId('inline-signup-card');
+    expect(card.className).toMatch(/\binvisible\b/);
+    expect(card.getAttribute('data-held')).toBe('true');
+    skipReveal();
+    expect(screen.getByTestId('inline-signup-card').className).not.toMatch(/\binvisible\b/);
+    expect(screen.getByTestId('inline-signup-card').getAttribute('data-held')).toBe('false');
+  });
+
+  it('between rounds: no CTA is laid out, even during TIME!', () => {
+    renderScreen({ seriesRoundNumber: 1, seriesTotalGames: 5 });
+    expect(screen.queryByTestId('inline-signup-card')).toBeNull();
   });
 
   it('no longer reads the ri-mp-series-end experiment flag', () => {
