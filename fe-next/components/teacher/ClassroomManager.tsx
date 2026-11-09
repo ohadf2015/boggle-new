@@ -17,7 +17,7 @@ import { teacherHostHref } from '@/lib/education/teacherHostHref';
 import { trackEduJoinCodeCopied, trackEduJoinCodeShared } from '@/lib/education/telemetry';
 import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
 import { isEligibleForTeacherProUpgradeCta } from '@/lib/education/trial';
-import { type Language } from '@/lib/supabase/education/types';
+import { type Language, type LeaderboardVisibility } from '@/lib/supabase/education/types';
 import { shareWithFallback } from '@/utils/shareWithFallback';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { ClassroomCardSkeleton, SkeletonGrid } from '@/components/ui/EducationSkeletons';
@@ -78,10 +78,14 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
   const seatFree = classrooms.length > 0 && pageSize > classrooms.length;
   const editing = classrooms.find((c) => c.id === editingId);
 
-  const handleEdit = async (name: string, classroomLanguage: Language) => {
+  const handleEdit = async (name: string, classroomLanguage: Language, leaderboard?: LeaderboardVisibility) => {
     if (!editingId) return;
     setIsSaving(true);
-    const result = await updateClassroom(editingId, { name, language: classroomLanguage });
+    const result = await updateClassroom(editingId, {
+      name,
+      language: classroomLanguage,
+      ...(leaderboard ? { leaderboard_visibility: leaderboard } : {}),
+    });
     setIsSaving(false);
     if (result.success) {
       toast.success(t('teacher.classroom.success.updated'));
@@ -250,6 +254,7 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
         }}
         initialName={editing?.name ?? ''}
         initialLanguage={editing?.language}
+        classroomId={editing?.id}
         isSaving={isSaving}
         onSubmit={handleEdit}
       />

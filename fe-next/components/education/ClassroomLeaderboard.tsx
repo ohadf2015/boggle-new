@@ -23,7 +23,7 @@ import { useClassroomLeaderboard } from '@/hooks/useClassroomLeaderboard';
 import { cn } from '@/lib/utils';
 import { Loader } from '@/components/ui/Loader';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
-import type { LeaderboardEntryWithDelta, LeaderboardTimeScope } from '@/lib/supabase/education/types';
+import type { LeaderboardEntryWithDelta, LeaderboardTimeScope, LeaderboardVisibility } from '@/lib/supabase/education/types';
 import { RankDeltaIndicator, TierBadge, TimeScopeTabs } from './ClassroomLeaderboardParts';
 
 // ============================================
@@ -58,7 +58,7 @@ function useAnimatedValue(target: number, duration = 350): number {
 // TYPE DEFINITIONS
 // ============================================
 
-export type LeaderboardVisibility = 'full' | 'top3' | 'personal_only' | 'hidden';
+export type { LeaderboardVisibility };
 
 export interface ClassroomLeaderboardProps {
   /** Classroom ID to fetch leaderboard for */
@@ -314,6 +314,12 @@ const ClassroomLeaderboard = memo<ClassroomLeaderboardProps>(
 
         {/* Time Scope Tabs */}
         <TimeScopeTabs timeScope={timeScope} onScopeChange={setTimeScope} />
+
+        {visibility !== 'full' && (
+          <p data-testid="leaderboard-scope-note" className="font-neo-body text-sm font-bold text-neo-cream/85">
+            {t(visibility === 'top3' ? 'education.leaderboard.scopeTop3' : 'education.leaderboard.scopePersonal')}
+          </p>
+        )}
 
         {/* Student List (filtered by visibility) */}
         <AdaptiveAnimatePresence mode="wait">

@@ -12,6 +12,7 @@ import {
   type Classroom,
   type Language,
 } from '@/lib/supabase/education';
+import type { LeaderboardVisibility } from '@/lib/supabase/education/types';
 import logger from '@/utils/logger';
 import { trackEduTeacherActionFailed } from '@/lib/education/telemetry';
 
@@ -24,7 +25,7 @@ interface UseClassroomsState {
 interface UseClassroomsActions {
   refresh: () => Promise<void>;
   createClassroom: (name: string, language: Language) => Promise<{ success: boolean; data?: Classroom; error?: string; code?: string; currentCount?: number; limit?: number | null }>;
-  updateClassroom: (id: string, updates: { name?: string; language?: Language }) => Promise<{ success: boolean; error?: string }>;
+  updateClassroom: (id: string, updates: { name?: string; language?: Language; leaderboard_visibility?: LeaderboardVisibility }) => Promise<{ success: boolean; error?: string }>;
   deleteClassroom: (id: string) => Promise<{ success: boolean; error?: string }>;
 }
 
@@ -196,7 +197,7 @@ export function useClassrooms(): UseClassroomsReturn {
   // Update classroom
   const updateClassroom = useCallback(async (
     id: string,
-    updates: { name?: string; language?: Language }
+    updates: { name?: string; language?: Language; leaderboard_visibility?: LeaderboardVisibility }
   ): Promise<{ success: boolean; error?: string }> => {
     try {
       const { error } = await updateClassroomAPI(id, updates);
@@ -337,7 +338,7 @@ interface UseClassroomState {
 
 interface UseClassroomActions {
   refresh: () => Promise<void>;
-  update: (updates: { name?: string; language?: Language }) => Promise<{ success: boolean; error?: string }>;
+  update: (updates: { name?: string; language?: Language; leaderboard_visibility?: LeaderboardVisibility }) => Promise<{ success: boolean; error?: string }>;
   deleteClassroom: () => Promise<{ success: boolean; error?: string }>;
 }
 
@@ -401,7 +402,7 @@ export function useClassroom(classroomId: string | undefined): UseClassroomRetur
 
   // Update classroom
   const update = useCallback(async (
-    updates: { name?: string; language?: Language }
+    updates: { name?: string; language?: Language; leaderboard_visibility?: LeaderboardVisibility }
   ): Promise<{ success: boolean; error?: string }> => {
     if (!classroomId) {
       return { success: false, error: 'No classroom ID' };

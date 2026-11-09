@@ -14536,7 +14536,8 @@ const sv = {
         "unlockedAchievement": "låste upp en prestation",
         "noActivity": "Ingen aktivitet än",
         "errorLoading": "Kunde inte ladda aktivitet"
-      }
+      },
+      "leaderboardOff": "Din lärare har stängt av klassens topplista. Din XP, nivå och dina märken växer ändå varje spel."
     },
     "lessons": {
       "lesson": "Lektion",
@@ -15350,7 +15351,19 @@ const sv = {
         "pressEscape": "Tryck ESC för att avsluta",
         "exit": "Avsluta presentation"
       },
-      "defaultLanguage": "Standardspråk"
+      "defaultLanguage": "Standardspråk",
+      "leaderboard": {
+        "label": "Klassens topplista",
+        "hint": "Det eleverna ser när de öppnar klassens ställning på sin egen enhet.",
+        "top3": "Topp 3 + du",
+        "top3Hint": "Pallplatserna, plus varje elevs egen rad. Rekommenderas.",
+        "full": "Alla",
+        "fullHint": "Hela klassen, rankad efter XP.",
+        "personal": "Bara du",
+        "personalHint": "Varje elev ser bara sin egen XP och placering.",
+        "off": "Av",
+        "offHint": "Ingen topplista. XP, nivåer och märken räknas ändå."
+      }
     },
     "classrooms": {
       "students": {
@@ -17401,7 +17414,9 @@ const sv = {
       "top50": "Topp 50",
       "totalXP": "Totalt XP",
       "weekly": "Denna vecka",
-      "xp": "{{xp}} XP"
+      "xp": "{{xp}} XP",
+      "scopeTop3": "Visar topp 3 och dig.",
+      "scopePersonal": "Visar bara dig. Din lärare håller hela listan privat."
     },
     "milestones": {
       "coinBonus": "+{{coins}} mynt",
