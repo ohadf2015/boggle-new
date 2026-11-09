@@ -99,8 +99,9 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
           canClaimToday: false,
         } : null);
 
-        // Show success toast
-        const rewardText = getRewardText(data.reward);
+        // Show success toast. A mystery box names what the server put in it (and paid).
+        const contents = data.appliedReward?.type === 'mystery_box' ? data.appliedReward.contents : null;
+        const rewardText = getRewardText(contents ? { day: data.reward.day, type: contents.type, amount: contents.amount } : data.reward);
         toast.success(rewardText, {
           icon: '🎁',
           duration: 3000,

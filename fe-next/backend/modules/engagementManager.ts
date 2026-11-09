@@ -3,7 +3,10 @@
  * Handles streaks, calendar rewards, and come-back campaigns
  */
 
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { getSupabase } from './supabaseServer';
+import { CALENDAR_REWARDS } from '../../lib/engagement/calendarRewards';
+import { claimCalendarDay } from '../../lib/engagement/claimCalendarReward.server';
 import logger from '../utils/logger';
 import type {
   StreakBonus, StreakBonusWithDays, CalendarReward, LoginResult,
@@ -125,33 +128,13 @@ export function getStreakXpMultiplier(streak: number): number {
 
 // ==================== CALENDAR REWARDS ====================
 
-export const CALENDAR_REWARDS: CalendarReward[] = [
-  { day: 1, type: 'xp', amount: 50 }, { day: 2, type: 'xp', amount: 75 },
-  { day: 3, type: 'hints', amount: 2 }, { day: 4, type: 'xp', amount: 100 },
-  { day: 5, type: 'xp', amount: 125 }, { day: 6, type: 'hints', amount: 3 },
-  { day: 7, type: 'mystery_box', rarity: 'common', isMilestone: true },
-  { day: 8, type: 'xp', amount: 150 }, { day: 9, type: 'xp', amount: 175 },
-  { day: 10, type: 'streak_freeze', amount: 1 },
-  { day: 11, type: 'xp', amount: 200 }, { day: 12, type: 'xp', amount: 225 },
-  { day: 13, type: 'hints', amount: 4 },
-  { day: 14, type: 'mystery_box', rarity: 'rare', isMilestone: true },
-  { day: 15, type: 'xp', amount: 250 }, { day: 16, type: 'xp', amount: 275 },
-  { day: 17, type: 'hints', amount: 5 }, { day: 18, type: 'xp', amount: 300 },
-  { day: 19, type: 'xp', amount: 325 }, { day: 20, type: 'streak_freeze', amount: 2 },
-  { day: 21, type: 'mystery_box', rarity: 'epic', isMilestone: true },
-  { day: 22, type: 'xp', amount: 350 }, { day: 23, type: 'xp', amount: 375 },
-  { day: 24, type: 'hints', amount: 6 }, { day: 25, type: 'xp', amount: 400 },
-  { day: 26, type: 'xp', amount: 425 }, { day: 27, type: 'hints', amount: 7 },
-  { day: 28, type: 'exclusive_title', titleId: 'DEDICATED_PLAYER', isMilestone: true },
-  { day: 29, type: 'xp', amount: 500 },
-  { day: 30, type: 'mystery_box', rarity: 'legendary', isMilestone: true },
-  { day: 31, type: 'xp', amount: 750 },
-];
+export { CALENDAR_REWARDS };
 
 function getDaysInMonth(month: number, year: number): number {
   return new Date(year, month, 0).getDate();
 }
 
+/** Read-only: a new month reads as an empty calendar; the claim itself starts the month. */
 export async function getCalendarStatus(playerId: string): Promise<CalendarStatus> {
   const supabase = getSupabase()!;
   const now = new Date();
@@ -162,19 +145,10 @@ export async function getCalendarStatus(playerId: string): Promise<CalendarStatu
   const { data: engagement } = await supabase
     .from('player_engagement')
     .select('calendar_month, calendar_year, calendar_days_claimed')
-    .eq('player_id', playerId).single();
+    .eq('player_id', playerId).maybeSingle();
 
-  if (!engagement || engagement.calendar_month !== currentMonth || engagement.calendar_year !== currentYear) {
-    await supabase.from('player_engagement').upsert({
-      player_id: playerId, calendar_month: currentMonth, calendar_year: currentYear, calendar_days_claimed: [],
-    });
-    return {
-      month: currentMonth, year: currentYear, daysClaimed: [], currentDay, canClaimToday: true,
-      rewards: CALENDAR_REWARDS.slice(0, Math.min(31, getDaysInMonth(currentMonth, currentYear))),
-    };
-  }
-
-  const daysClaimed = engagement.calendar_days_claimed || [];
+  const sameMonth = !!engagement && engagement.calendar_month === currentMonth && engagement.calendar_year === currentYear;
+  const daysClaimed: number[] = sameMonth ? engagement.calendar_days_claimed || [] : [];
   return {
     month: currentMonth, year: currentYear, daysClaimed, currentDay,
     canClaimToday: !daysClaimed.includes(currentDay),
@@ -182,51 +156,14 @@ export async function getCalendarStatus(playerId: string): Promise<CalendarStatu
   };
 }
 
+/** Same claim as POST /api/engagement/calendar: one payout per player per calendar day. */
 export async function claimCalendarReward(playerId: string): Promise<{
   success: boolean; error?: string; reward?: CalendarReward; appliedReward?: unknown; nextReward?: CalendarReward | null;
 }> {
-  const supabase = getSupabase()!;
-  const status = await getCalendarStatus(playerId);
-
-  if (!status.canClaimToday) return { success: false, error: 'Already claimed today' };
-
-  const reward = CALENDAR_REWARDS[status.currentDay - 1];
-  if (!reward) return { success: false, error: 'No reward for this day' };
-
-  await supabase.from('player_engagement').update({ calendar_days_claimed: [...status.daysClaimed, status.currentDay] }).eq('player_id', playerId);
-  const rewardResult = await applyReward(playerId, reward);
-
-  return { success: true, reward, appliedReward: rewardResult, nextReward: CALENDAR_REWARDS[status.currentDay] || null };
-}
-
-export async function applyReward(playerId: string, reward: CalendarReward): Promise<unknown> {
-  const supabase = getSupabase()!;
-  switch (reward.type) {
-    case 'xp':
-      await supabase.rpc('increment_player_xp', { p_player_id: playerId, p_xp_amount: reward.amount });
-      return { type: 'xp', amount: reward.amount };
-    case 'hints':
-      await supabase.from('profiles').update({ free_hints_available: supabase.rpc('increment', { x: reward.amount }) }).eq('id', playerId);
-      return { type: 'hints', amount: reward.amount };
-    case 'streak_freeze':
-      await supabase.from('player_engagement').update({ streak_freezes_available: supabase.rpc('increment', { x: reward.amount }) }).eq('player_id', playerId);
-      return { type: 'streak_freeze', amount: reward.amount };
-    case 'mystery_box':
-      return await rollMysteryBox(playerId, reward.rarity || 'common');
-    case 'exclusive_title':
-      return { type: 'title', titleId: reward.titleId };
-    default:
-      return reward;
-  }
-}
-
-export async function rollMysteryBox(playerId: string, rarity: string): Promise<{
-  type: 'mystery_box'; rarity: string; contents: { type: string; amount: number };
-}> {
-  const multiplier = ({ common: 1, rare: 2, epic: 3, legendary: 5 } as Record<string, number>)[rarity] || 1;
-  const rewardTypes = [{ type: 'xp', baseAmount: 100 }, { type: 'hints', baseAmount: 2 }, { type: 'streak_freeze', baseAmount: 1 }];
-  const selected = rewardTypes[Math.floor(Math.random() * rewardTypes.length)];
-  return { type: 'mystery_box', rarity, contents: { type: selected.type, amount: selected.baseAmount * multiplier } };
+  const result = await claimCalendarDay(getSupabase()! as unknown as SupabaseClient, playerId);
+  if (result.status === 'none') return { success: false, error: 'No reward for this day' };
+  if (result.status === 'already') return { success: false, error: 'Already claimed today' };
+  return { success: true, reward: result.reward, appliedReward: result.appliedReward, nextReward: result.nextReward };
 }
 
 export async function getEngagementStatus(playerId: string): Promise<EngagementStatus> {
