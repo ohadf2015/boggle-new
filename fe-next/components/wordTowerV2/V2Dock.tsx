@@ -1,7 +1,8 @@
 'use client';
 
-import { memo, useCallback, useEffect, useMemo, useRef, type ReactNode, type RefObject } from 'react';
+import { memo, useCallback, useMemo, type ReactNode, type RefObject } from 'react';
 import { Delete, Shuffle, Undo2 } from 'lucide-react';
+import { CLEAR_HOLD_MS, useHoldToClear } from '@/hooks/useHoldToClear';
 import { LetterRow, WordBox } from './LetterRow';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
@@ -41,7 +42,7 @@ interface Props {
 }
 
 /** Hold this long on backspace to clear the whole word. */
-export const CLEAR_WORD_HOLD_MS = 450;
+export const CLEAR_WORD_HOLD_MS = CLEAR_HOLD_MS;
 
 /**
  * The controls: the word between shuffle and backspace / put-back, the letters
@@ -57,27 +58,10 @@ export const V2Dock = memo(function V2Dock(p: Props) {
   // (PostHog, Oct 2026): players hammer it to undo a long wrong word. Holding
   // it now clears the word in one go; the click that ends the hold is eaten so
   // it can't also rub out a letter of the NEXT word.
-  const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const holdFired = useRef(false);
-  const cancelHold = () => {
-    if (holdTimer.current) { clearTimeout(holdTimer.current); holdTimer.current = null; }
-  };
-  useEffect(() => cancelHold, []);
-  const onBackspaceDown = () => {
-    holdFired.current = false;
-    cancelHold();
-    if (p.swinging || !p.onClearWord) return;
-    holdTimer.current = setTimeout(() => {
-      holdTimer.current = null;
-      holdFired.current = true;
-      p.onClearWord?.();
-    }, CLEAR_WORD_HOLD_MS);
-  };
-  const onBackspaceClick = () => {
-    cancelHold();
-    if (holdFired.current) { holdFired.current = false; return; }
-    if (p.swinging) p.onPutBack(); else p.onBackspace();
-  };
+  const backspaceHold = useHoldToClear({
+    onTap: () => (p.swinging ? p.onPutBack() : p.onBackspace()),
+    onHold: p.swinging ? undefined : p.onClearWord,
+  });
   const tray = useMemo(() => p.wheel.map((l) => l.toUpperCase()), [p.wheel]);
   const wordLetters = useMemo(() => p.selected.map((i) => tray[i] ?? ''), [p.selected, tray]);
   // Keep letters 0..k: rewinding the path to before letter k+1 drops it and everything after.
@@ -111,11 +95,7 @@ export const V2Dock = memo(function V2Dock(p: Props) {
   const backspace = (
     <button
       type="button"
-      onClick={onBackspaceClick}
-      onPointerDown={onBackspaceDown}
-      onPointerLeave={cancelHold}
-      onPointerCancel={cancelHold}
-      onContextMenu={(e) => e.preventDefault()}
+      {...backspaceHold}
       disabled={p.swinging ? !p.canPutBack : p.selected.length === 0 || !p.composing}
       aria-label={t(p.swinging ? 'wordTowerV2.changeWord' : 'wordTower.hud.backspace')}
       className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-neo border-neo-thick border-black text-neo-navy shadow-hard transition-colors lg:h-14 lg:w-14 active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed disabled:opacity-40 disabled:shadow-none ${

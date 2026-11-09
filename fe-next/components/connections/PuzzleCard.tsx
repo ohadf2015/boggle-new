@@ -109,7 +109,7 @@ export default function PuzzleCard({
     prevStatus.current = state.status;
   }, [state.status, state.wrongAttempts, shakeControls, reducedMotion]);
 
-  const { keyboardRows, needsIME, slotCap, handleLetter, handleBackspace } = useBridgeTyping({
+  const { keyboardRows, needsIME, slotCap, handleLetter, handleBackspace, handleClear } = useBridgeTyping({
     input: state.input,
     answer: puzzle.bridge,
     locale: language,
@@ -323,6 +323,7 @@ export default function PuzzleCard({
                   rows={keyboardRows}
                   onLetter={handleLetter}
                   onBackspace={handleBackspace}
+                  onClear={handleClear}
                   onSubmit={onSubmit}
                   backspaceLabel={t('connections.backspace')}
                   submitLabel={t('connections.submit')}
