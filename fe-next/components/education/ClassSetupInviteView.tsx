@@ -35,6 +35,8 @@ export interface ClassSetupInviteViewProps {
   words?: ReactNode;
   /** When given, this is the hero in the bottom slot whoever has joined, and the projector stays secondary. */
   play?: ReactNode;
+  /** "Not with your class right now?" calendar card; shown only while nobody has joined. */
+  plan?: ReactNode;
   footer?: ReactNode;
   t: T;
 }
@@ -60,7 +62,7 @@ function joinedText(joined: number | null, t: T): string {
 }
 
 /** Code, roster and actions for the invite step; the hero action always lands in the bottom slot so the thumb never hunts for it. */
-export function ClassSetupInviteView({ classroom, roster, joinUrl, displayHost, startHref, homeHref, reduced, onShare, onOpenProjector, onStart, rehearse, words, play, footer, t }: ClassSetupInviteViewProps) {
+export function ClassSetupInviteView({ classroom, roster, joinUrl, displayHost, startHref, homeHref, reduced, onShare, onOpenProjector, onStart, rehearse, words, play, plan, footer, t }: ClassSetupInviteViewProps) {
   const joined = roster.loading ? null : roster.students.length;
   const studentsIn = (joined ?? 0) > 0;
   const projectorLeads = !play && !studentsIn;
@@ -146,6 +148,8 @@ export function ClassSetupInviteView({ classroom, roster, joinUrl, displayHost, 
           <div data-testid="setup-hero-slot">{play ?? (studentsIn ? start : projector)}</div>
         </div>
       </div>
+
+      {studentsIn || joined === null ? null : plan}
 
       <div data-testid="setup-quiet-links" className="flex flex-wrap items-center justify-center gap-2 lg:col-span-2">
         {studentsIn ? null : rehearse}
