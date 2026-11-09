@@ -132,7 +132,7 @@ export function WordStudentGrid({
                   scope="row"
                   className={cn(
                     'sticky start-0 z-10 bg-neo-cream px-3 py-2 text-start font-black text-black',
-                    'border-e-2 border-neo-black/20 min-w-[7rem]'
+                    'border-e-2 border-neo-black min-w-[7rem]'
                   )}
                 >
                   {row.word}
