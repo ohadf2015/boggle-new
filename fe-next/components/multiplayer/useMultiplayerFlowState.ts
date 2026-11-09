@@ -32,15 +32,25 @@ export function useMultiplayerFlowState({
   const { isOnCrazyGamesPlatform, cgUser } = useCrazyGames();
   const matchmaking = useMatchmaking();
 
-  // Auto-join ranked match room when found
+  // Ranked match found: host creates the isRanked room; joiner joins after a beat.
   useEffect(() => {
     if (matchmaking.status !== 'found' || !matchmaking.roomId) return;
+    const code = matchmaking.roomId;
+    const isHost = matchmaking.role !== 'joiner';
+    const delay = isHost ? 800 : 1800; // joiner waits for host create
     const timer = setTimeout(() => {
-      setGameCode(matchmaking.roomId!);
-      handleJoin(false, defaultLanguage, matchmaking.roomId!);
-    }, 1500); // Brief delay so player sees the opponent card
+      setGameCode(code);
+      handleJoin(
+        isHost,
+        defaultLanguage,
+        code,
+        undefined,
+        undefined,
+        { isRanked: true },
+      );
+    }, delay);
     return () => clearTimeout(timer);
-  }, [matchmaking.status, matchmaking.roomId, handleJoin, defaultLanguage, setGameCode]);
+  }, [matchmaking.status, matchmaking.roomId, matchmaking.role, handleJoin, defaultLanguage, setGameCode]);
 
   // Room list with create / join sheets (the entry state machine).
   const [flow, dispatchFlow] = useReducer(

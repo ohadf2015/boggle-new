@@ -63,7 +63,7 @@ export function ClassSetupInviteCode({ code, className, joinUrl, displayHost, on
 
   return (
     <div data-testid="invite-code-card" className="flex flex-col gap-3">
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-neo-lg border-[3px] border-neo-black bg-neo-cream p-3 text-start text-neo-black shadow-hard-xl sm:gap-5 sm:p-5 lg:flex-1 lg:grid-cols-1 lg:content-center lg:justify-items-center lg:gap-6 lg:p-7 lg:text-center">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-neo-lg border-[3px] border-neo-black bg-neo-cream p-3 text-start text-neo-black shadow-hard-lime-xl sm:gap-5 sm:p-5 lg:flex-1 lg:grid-cols-1 lg:content-center lg:justify-items-center lg:gap-6 lg:p-7 lg:text-center">
         <div className="@container flex w-full min-w-0 flex-col gap-1 lg:items-center">
           <span className="font-neo-body text-xs font-black uppercase tracking-wide text-neo-black/70">{t('eduShell.setup.joinCode')}</span>
           <span

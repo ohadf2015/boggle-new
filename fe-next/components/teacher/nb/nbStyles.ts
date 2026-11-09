@@ -12,6 +12,21 @@ export const NB_DARK_EDGE = NEO_DARK_EDGE;
 /** Panel: dark card with a cream outline and a hard shadow. Pass a color block for the lead card. */
 export const NB_PANEL = `rounded-neo-xl border-[3px] ${NB_DARK_EDGE} bg-[#2a2b4a] text-neo-cream shadow-hard-xl`;
 
+/**
+ * Bold panel for a screen that should shout: full cream outline and a big colored offset,
+ * since a black shadow barely shows on the navy page. Pick the color per panel.
+ */
+export const NB_PANEL_POP = {
+  lime: 'rounded-neo-xl border-[3px] border-neo-cream bg-[#2a2b4a] text-neo-cream shadow-hard-lime-xl',
+  cyan: 'rounded-neo-xl border-[3px] border-neo-cream bg-[#2a2b4a] text-neo-cream shadow-hard-cyan-xl',
+  pink: 'rounded-neo-xl border-[3px] border-neo-cream bg-[#2a2b4a] text-neo-cream shadow-hard-pink-xl',
+  yellow: 'rounded-neo-xl border-[3px] border-neo-cream bg-[#2a2b4a] text-neo-cream shadow-hard-yellow-xl',
+} as const;
+
+/** Tilted icon tile for a panel heading. Combine with an NB_BLOCK color. */
+export const NB_ICON_TILE =
+  'inline-flex size-10 shrink-0 -rotate-3 items-center justify-center rounded-neo border-[3px] border-neo-black shadow-hard';
+
 /** Flat color blocks for lead cards. Put the block after the base style in cn() so its outline wins. */
 export const NB_BLOCK = NEO_BLOCK_TONES;
 export type NbColor = keyof typeof NB_BLOCK;

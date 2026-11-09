@@ -42,6 +42,7 @@ import { registerTeacherControlsHandlers } from './teacherControlsHandler.js';
 import { registerVocabQuizHandlers } from './vocabQuizHandler.js';
 import { registerWordcraftClassroomHandlers } from './wordcraftClassroomHandler.js';
 import { registerClassroomEconomyHandlers } from './classroomEconomyHandler.js';
+import { registerMatchmakingHandlers } from './matchmakingHandler.js';
 import { getGame } from '../modules/gameStateManager.js';
 
 /**
@@ -93,6 +94,7 @@ function registerAllHandlers(io: Server, socket: Socket): void {
   registerVocabQuizHandlers(io, socket);
   registerWordcraftClassroomHandlers(io, socket);
   registerClassroomEconomyHandlers(io, socket);
+  registerMatchmakingHandlers(io, socket);
 }
 
 export {

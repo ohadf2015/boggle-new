@@ -11,6 +11,11 @@ import { getStoredUsername } from '@/utils/profileStorage';
 import ClassroomJoinNamePrompt from './ClassroomJoinNamePrompt';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useExperiment } from '@/hooks/useExperiment';
+import { resolveRankedCta } from '@/lib/ranked/resolveRankedCta';
+import { trackGrowthEvent } from '@/utils/growthTracking';
+import dynamic from 'next/dynamic';
+const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
 import { MatchmakingOverlay } from '@/components/multiplayer/MatchmakingOverlay';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { QuickPlaySeekingOverlay } from '@/components/multiplayer/QuickPlaySeekingOverlay';
@@ -26,7 +31,7 @@ export interface MultiplayerFlowProps {
     gameCode?: string,
     roomName?: string,
     overrideUsername?: string,
-    options?: { isPrivate?: boolean; isClassroom?: boolean; quickPlay?: boolean },
+    options?: { isPrivate?: boolean; isClassroom?: boolean; quickPlay?: boolean; isRanked?: boolean },
   ) => void;
   refreshRooms: () => void;
 
@@ -99,7 +104,9 @@ const TEST_ID = 'mp-entry';
  */
 const MultiplayerFlow: React.FC<MultiplayerFlowProps> = (props) => {
   const { t } = useLanguage();
-  const { isAdmin, profile } = useAuth();
+  const { isAuthenticated: authReady, canPlayRanked, gamesUntilRanked, profile } = useAuth();
+  const { variant: rankedFlag } = useExperiment('ranked-public-v1');
+  const [showRankedAuth, setShowRankedAuth] = useState(false);
   const s = useMultiplayerFlowState(props);
   useRoomEndedOffer({ offer: props.roomEndedOffer ?? null, onShown: props.onRoomEndedOfferShown, onPlayNow: s.handleQuickPlay, t });
   const {
@@ -160,16 +167,41 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = (props) => {
 
   const heroOwnsScreen = s.showCgHero && !s.heroExpanded;
 
-  const rankedSlot = isAdmin ? (
+  // Queue CTA only — ProfileRankedProgress / leagues / MMR badge stay mounted elsewhere.
+  const rankedAction = resolveRankedCta({
+    flagOn: rankedFlag === 'on',
+    isAuthenticated: authReady,
+    canPlayRanked,
+  });
+
+  const rankedSlot = rankedAction === 'hidden' ? null : (
     <button
       type="button"
-      onClick={() => s.matchmaking.joinQueue('classic', defaultLanguage)}
-      disabled={s.matchmaking.status !== 'idle'}
+      data-testid="ranked-cta"
+      data-ranked-action={rankedAction}
+      onClick={() => {
+        if (rankedAction === 'auth') {
+          setShowRankedAuth(true);
+          return;
+        }
+        if (rankedAction === 'locked') return;
+        s.matchmaking.joinQueue('classic', defaultLanguage);
+        trackGrowthEvent('ranked_queue_joined', {
+          elo: profile?.ranked_mmr ?? 1000,
+          mode: 'classic',
+          language: defaultLanguage,
+        });
+      }}
+      disabled={rankedAction === 'locked' || s.matchmaking.status !== 'idle'}
       className="w-full rounded-neo border-3 border-neo-black bg-neo-pink px-4 py-2 font-neo-display font-bold uppercase tracking-tight text-neo-black shadow-hard-sm active:translate-y-0.5 active:shadow-hard-pressed disabled:opacity-50"
     >
-      {t('matchmaking.rankedMatch')}
+      {rankedAction === 'locked'
+        ? t('matchmaking.rankedLocked', { n: gamesUntilRanked })
+        : rankedAction === 'auth'
+          ? t('matchmaking.rankedSignIn')
+          : t('matchmaking.rankedMatch')}
     </button>
-  ) : null;
+  );
 
   return (
     <>
@@ -230,6 +262,12 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = (props) => {
         onCancel={s.matchmaking.leaveQueue}
         onCreateRoom={() => { s.matchmaking.leaveQueue(); s.openCreate(); }}
         t={t as (key: string, params?: Record<string, unknown>) => string}
+      />
+
+      <AuthModal
+        isOpen={showRankedAuth}
+        onClose={() => setShowRankedAuth(false)}
+        initialMode="signin"
       />
 
       <JoinRoomModal

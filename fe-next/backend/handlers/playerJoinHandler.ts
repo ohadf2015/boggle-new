@@ -47,6 +47,7 @@ import { startGameTimer, resumeGameTimerIfMissing } from '../services/gameLifecy
 import { generateRandomAvatar } from '../utils/gameUtils.js';
 import { answerMissingRoom } from './classroomMissingRoom.js';
 import logger from '../utils/logger.js';
+import { getAuthUserId } from '../utils/socialHelpers.js';
 import { validatePayload, joinGameSchema } from '../utils/socketValidation.js';
 import { emitClassroomContext } from '../modules/classroomGameContext.js';
 import { broadcastRoomUsers } from './classroomUsersBroadcast.js';
@@ -216,6 +217,18 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
         message: blockMatch.reason || 'You have been blocked from playing.',
       });
       return;
+    }
+
+    // Ranked rooms only admit the two matched auth ids from the ticket.
+    if (game.isRanked && game.rankedAllowedUserIds && game.rankedAllowedUserIds.length > 0) {
+      const verifiedJoinId = getAuthUserId(socket);
+      if (!verifiedJoinId || !game.rankedAllowedUserIds.includes(verifiedJoinId)) {
+        logger.warn('SOCKET', `Rejected ranked join ${gameCode}: user not on match ticket`);
+        emitError(socket, ErrorCodes.AUTH_FORBIDDEN, {
+          message: 'This ranked room is limited to the matched players',
+        });
+        return;
+      }
     }
 
     // Block late joins for ranked games (use state machine helper)

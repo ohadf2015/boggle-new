@@ -31,7 +31,15 @@ import { useClassroomPressure } from '@/hooks/gameState/classroomPressureStore';
 import { isLeaderboardHidden } from '@/shared/utils/classroomPressure';
 import { MpNextModeCard } from './MpNextModeCard';
 import { MpFinalFooter, MpIntermissionFooter } from './MpResultsFooter';
+import { WordShowdownPanel } from './WordShowdownPanel';
+import { MpH2HStrip } from './MpH2HStrip';
+import { MpBragStrip } from './MpBragStrip';
 import MpResultsDetails from './MpResultsDetails';
+import { ChallengeInviteDialog } from '@/components/friends/ChallengeInviteDialog';
+import { sendChallengeWithAck } from '@/lib/friends/sendChallengeWithAck';
+import { useFriends } from '@/hooks/useFriends';
+import { useSocketOptional } from '@/utils/SocketContext';
+import toast from 'react-hot-toast';
 import ChestRewardCta from '@/components/education/economy/ChestRewardCta';
 import { rewardRoundId } from '@/shared/constants/classroomEconomy';
 import RoundShop from '@/components/education/economy/RoundShop';
@@ -57,6 +65,7 @@ const SignupToast = dynamic(() => import('@/components/auth/SignupToast'), { ssr
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
 const FloatingReaction = dynamic(() => import('@/components/game/QuickReactions').then((m) => m.FloatingReaction), { ssr: false });
 const TomorrowCard = dynamic(() => import('@/components/results/TomorrowCard'), { ssr: false });
+const MmrChangeBadge = dynamic(() => import('@/components/results/MmrChangeBadge'), { ssr: false });
 
 /** Max standings rows on one screen (8 seats; in a bigger room I stay visible). */
 const MAX_ROWS = 8;
@@ -72,6 +81,11 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   const { props, t, data, socketEvents } = c;
   const { username, isHost = false, seriesRoundNumber = 0, seriesTotalGames = SERIES_TOTAL_GAMES, seriesStandings, gameCode } = props;
   const reduced = !!useReducedMotion();
+  const { friends } = useFriends();
+  const socketCtx = useSocketOptional();
+  const challengeSocket = socketCtx?.socket ?? null;
+  const challengeConnected = !!socketCtx?.isConnected;
+  const [challengeFriend, setChallengeFriend] = useState<{ odUserId: string; username: string; displayName?: string } | null>(null);
 
   const rows = useMemo(() => buildMpStandings({
     sortedScores: data.sortedScores,
@@ -172,7 +186,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
     isHost,
     isReady,
     armed: footerShown,
-    paused: detailsOpen || pickerOpen || standingsOpen || nudgeSheetOpen || c.showExitConfirm || c.showShareModal || socketEvents.showWordFeedback || c.adGate.anyAdActive,
+    paused: detailsOpen || pickerOpen || standingsOpen || nudgeSheetOpen || c.showExitConfirm || c.showShareModal || !!challengeFriend || socketEvents.showWordFeedback || c.adGate.anyAdActive,
     persistCancel: !isOnCrazyGamesPlatform,
     onStartNext: handleStartGame,
     onNewSeries: handleNewSeries,
@@ -211,7 +225,66 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   const rival = useMemo(() => calloutRival(boardRows), [boardRows]);
   const h2hLive = useRivalHeadToHead(rival, c.isAuthenticated && !c.isGuest);
   const h2h = useFrozenAfter(h2hLive, seen('card'));
-  const callout = useMemo(() => resultCallout({ rows: boardRows, uniqueCount, h2h }), [boardRows, uniqueCount, h2h]);
+  // One H2H source: footer strip owns the record when meetings >= 2 so MpMyCard
+  // callout does not reprint the same line.
+  const showH2hStrip = !!h2h && h2h.meetings >= 2 && !hideOutcome && !c.isClassroom;
+  const callout = useMemo(
+    () => resultCallout({ rows: boardRows, uniqueCount, h2h: showH2hStrip ? null : h2h }),
+    [boardRows, uniqueCount, h2h, showH2hStrip],
+  );
+  const rivalFriend = useMemo(() => {
+    if (!rival?.userId) return null;
+    return friends.find((f) => f.odUserId === rival.userId) ?? null;
+  }, [friends, rival]);
+  const openChallenge = useCallback(() => {
+    auto.cancel();
+    const isFriend = !!rivalFriend;
+    trackGrowthEvent('results_challenge_cta_tapped', { hasRival: !!rival, isFriend });
+    trackGrowthEvent('mp_results_challenge_cta', { surface: 'mp_results' });
+    if (!c.isAuthenticated || c.isGuest || !rivalFriend) {
+      setShowShareModal(true);
+      return;
+    }
+    setChallengeFriend({
+      odUserId: rivalFriend.odUserId,
+      username: rivalFriend.username,
+      displayName: rivalFriend.displayName,
+    });
+  }, [auto, rivalFriend, rival, c.isAuthenticated, c.isGuest, setShowShareModal]);
+  const handleSendChallenge = useCallback(async (
+    friendId: string,
+    challengeType: 'new_game' | 'join_room',
+    settings?: { language?: string; timerSeconds?: number; mode?: string; message?: string; flow?: 'async' | 'live' },
+  ) => {
+    // Results only offers live (allowedFlows=['live']). Async would promise a
+    // score-to-beat path this surface does not implement — reject rather than
+    // fake success via share modal.
+    if (settings?.flow === 'async') {
+      toast.error(t('friends.errors.sendFailed'));
+      throw new Error('ASYNC_UNSUPPORTED_ON_RESULTS');
+    }
+    if (!challengeSocket || !challengeConnected) {
+      toast.error(t('friends.errors.sendFailed'));
+      throw new Error('NOT_CONNECTED');
+    }
+    const result = await sendChallengeWithAck(challengeSocket, {
+      friendUserId: friendId,
+      challengeType,
+      roomCode: gameCode || undefined,
+      gameSettings: settings ? {
+        language: settings.language,
+        timerSeconds: settings.timerSeconds,
+        mode: settings.mode,
+      } : undefined,
+      message: settings?.message,
+    });
+    if (!result.ok) {
+      toast.error(t('friends.errors.sendFailed'));
+      throw new Error(result.code);
+    }
+    toast.success(t('friends.challenges.sent'));
+    setChallengeFriend(null);
+  }, [challengeSocket, challengeConnected, t, gameCode]);
   const champions = series?.champions ?? NO_CHAMPIONS;
   // The album (desktop/TV): the series final tells the series round by round;
   // otherwise the round is told as three awards.
@@ -314,7 +387,51 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
           hideClassPosition={hideOutcome}
           t={t}
         />
+        {username ? (
+          <div className="shrink-0 empty:hidden" data-testid="mp-mmr-change">
+            <MmrChangeBadge username={username} />
+          </div>
+        ) : null}
         </div>
+        {username && seen('card') && !c.isClassroom && (
+          <WordShowdownPanel
+            allPlayerWords={c.allPlayerWords}
+            username={username}
+            bestMissed={bestMissed}
+            hideOutcome={hideOutcome}
+            mode={c.resolvedGameMode}
+            playerCount={data.sortedScores.length}
+            className={fx.cardIn}
+            t={t}
+          />
+        )}
+        {seen('card') && showH2hStrip && (
+          <MpH2HStrip h2h={h2h!} onRematch={rematch} className={fx.cardIn} t={t} />
+        )}
+        {branch === 'final' && seen('card') && !c.isClassroom && !hideOutcome && me && username && data.sortedScores.length >= 2 && (
+          <MpBragStrip
+            visible
+            gameCode={gameCode}
+            gameMode={c.resolvedGameMode}
+            language={c.language}
+            isWinner={iWon}
+            rank={myRank}
+            playerCount={data.sortedScores.length}
+            score={myScore}
+            wordsFound={(me.allWords ?? []).filter((w) => w.validated && !w.isDuplicate).length}
+            longestWord={bestWord?.word}
+            current={{ name: username, avatar: me.avatar, score: myScore }}
+            opponent={rival ? {
+              name: rival.username,
+              score: boardRows.find((r) => r.username === rival.username)?.score ?? 0,
+              avatar: boardRows.find((r) => r.username === rival.username)?.avatar,
+            } : undefined}
+            modeLabel={(c.resolvedGameMode || 'multiplayer').toUpperCase()}
+            onChallenge={openChallenge}
+            className={fx.cardIn}
+            t={t}
+          />
+        )}
         {c.showDailyInvite && seen('card') && (
           <div data-testid="mp-tomorrow-card" className={cn('shrink-0', fx.cardIn)}>
             <TomorrowCard source="mp" />
@@ -368,7 +485,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
       {footerShown ? (
         <div className={fx.footerUp}>
           {branch === 'final' ? (
-            <MpFinalFooter isHost={isHost} isReady={isReady} onRematch={rematch} onLeave={c.requestExit} onShare={() => setShowShareModal(true)} leaveKey={exitCopy.leaveKey} auto={auto} t={t} />
+            <MpFinalFooter isHost={isHost} isReady={isReady} onRematch={rematch} onLeave={c.requestExit} onShare={() => setShowShareModal(true)} onChallenge={c.isClassroom ? undefined : openChallenge} leaveKey={exitCopy.leaveKey} auto={auto} t={t} />
           ) : (
             <MpIntermissionFooter
               isHost={isHost}
@@ -431,6 +548,17 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
         variant="default"
         analyticsId="exit_room_confirm"
       />
+      )}
+
+      {challengeFriend && (
+        <ChallengeInviteDialog
+          isOpen={!!challengeFriend}
+          friendUsername={challengeFriend.displayName || challengeFriend.username}
+          friendId={challengeFriend.odUserId}
+          onClose={() => setChallengeFriend(null)}
+          onSendChallenge={handleSendChallenge}
+          allowedFlows={['live']}
+        />
       )}
     </>
   );

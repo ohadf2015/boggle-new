@@ -103,6 +103,19 @@ describe('experiments registry', () => {
     });
   });
 
+
+  describe('ranked-public-v1 flag', () => {
+    it('is registered', () => {
+      expect(EXPERIMENTS['ranked-public-v1']).toBeDefined();
+    });
+    it('defaults to on', () => {
+      expect(EXPERIMENTS['ranked-public-v1'].default).toBe('off');
+    });
+    it('has on/off variants for kill-switch', () => {
+      expect(EXPERIMENTS['ranked-public-v1'].variants).toEqual(['on', 'off']);
+    });
+  });
+
   describe('mp.desktop-shell.v1 flag', () => {
     it('exists in registry', () => {
       expect(EXPERIMENTS['mp.desktop-shell.v1']).toBeDefined();

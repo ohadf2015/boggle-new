@@ -18,6 +18,7 @@ import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 
 import { usePlayerCollectibles } from '@/hooks/usePlayerCollectibles';
 import dynamic from 'next/dynamic';
+const LeagueRivalsCard = dynamic(() => import('@/components/leagues/LeagueRivalsCard').then(m => m.LeagueRivalsCard), { ssr: false });
 // Sign-in modal opens only on a CTA click — lazy-load to keep its ~40KB out of the
 // profile route's initial parse. ssr:false: renders nothing when closed (no CLS).
 const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
@@ -315,6 +316,7 @@ export default function ProfilePageClient(): React.JSX.Element {
           <>
             <PinnedHighlights counts={profile?.achievement_counts} onSeeAll={() => setActiveSection('achievements')} />
             {user?.id && <SeasonRankCard playerId={user.id} />}
+            {isAuthenticated && <LeagueRivalsCard />}
             <ProfileXpSection profile={profile} isDarkMode={isDarkMode} compact onProfileRefresh={refreshProfile} />
             <WordMasteryCard />
             <ProfileCoinsSection profile={profile} isDarkMode={isDarkMode} compact />
@@ -327,7 +329,7 @@ export default function ProfilePageClient(): React.JSX.Element {
           <>
             <ProfileStatsGrid profile={profile} isDarkMode={isDarkMode} />
             <XpByModeBreakdown xpByMode={xpByMode} delay={0.12} />
-            {isAdmin && <ProfileRankedProgress profile={profile} isDarkMode={isDarkMode} canPlayRanked={canPlayRanked} gamesUntilRanked={gamesUntilRanked} />}
+            {isAuthenticated && <ProfileRankedProgress profile={profile} isDarkMode={isDarkMode} canPlayRanked={canPlayRanked} gamesUntilRanked={gamesUntilRanked} />}
           </>
         )}
 

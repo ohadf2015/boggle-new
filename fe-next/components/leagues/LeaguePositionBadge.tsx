@@ -1,10 +1,11 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLeague, type LeagueTier } from '@/hooks/useLeague';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 
 const TIER_COLORS: Record<LeagueTier, string> = {
   bronze: 'text-amber-600',
@@ -48,6 +49,17 @@ export function LeaguePositionBadge() {
   const { tier, standings, myPosition, myXp, promotionZone, isLoading, error } = useLeague(
     profile?.id ?? null
   );
+
+  const tracked = useRef(false);
+  useEffect(() => {
+    if (tracked.current || isLoading || error || myPosition == null) return;
+    tracked.current = true;
+    trackGrowthEvent('league_panel_shown', {
+      tier,
+      position: myPosition,
+      zone: promotionZone,
+    });
+  }, [isLoading, error, myPosition, tier, promotionZone]);
 
   const xpGap = useMemo(() => {
     if (!myPosition || standings.length === 0) return null;
