@@ -7,12 +7,14 @@
  */
 
 import { m } from 'framer-motion';
-import { X } from 'lucide-react';
+import { EyeOff, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import ClassroomLeaderboard from '@/components/education/ClassroomLeaderboard';
 import { StudentAssignmentPlayCta } from '@/components/student/StudentAssignmentPlayCta';
 import { ClassStrip } from './ClassStrip';
 import { ClassSwitcher } from './ClassSwitcher';
+import { useLeaderboardVisibility } from '@/hooks/useLeaderboardVisibility';
+import { Loader } from '@/components/ui/Loader';
 import type { NextOpenAssignment } from '@/components/student/nextOpenAssignment';
 
 interface Props {
@@ -29,6 +31,7 @@ interface Props {
 
 export function ClassSheet({ classroomId, userId, className, onClose, reducedMotion, nextOpenAssignment = null, classrooms = [], onSelectClassroom }: Props) {
   const { t } = useLanguage();
+  const visibility = useLeaderboardVisibility(classroomId);
   return (
     <div className="fixed inset-0 z-40 flex items-end justify-center sm:items-center" role="dialog" aria-modal="true" aria-label={t('student.dashboard.leaderboard', 'Leaderboard')}>
       <button type="button" aria-label={t('common.close', 'Close')} onClick={onClose} className="absolute inset-0 bg-neo-black/70 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black" />
@@ -58,7 +61,21 @@ export function ClassSheet({ classroomId, userId, className, onClose, reducedMot
         <div className="min-h-0 flex-1 overflow-y-auto p-3">
           <StudentAssignmentPlayCta next={nextOpenAssignment} />
           <ClassStrip classroomId={classroomId} reducedMotion={reducedMotion} />
-          <ClassroomLeaderboard classroomId={classroomId} currentUserId={userId} />
+          {visibility === null ? (
+            <div data-testid="class-sheet-standings-loading" className="flex justify-center py-8">
+              <Loader size="md" />
+            </div>
+          ) : visibility === 'hidden' ? (
+            <p
+              data-testid="class-sheet-standings-off"
+              className="mt-3 flex items-start gap-2 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light p-3 font-neo-body text-sm font-bold text-neo-cream"
+            >
+              <EyeOff className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+              {t('student.dashboard.leaderboardOff')}
+            </p>
+          ) : (
+            <ClassroomLeaderboard classroomId={classroomId} currentUserId={userId} visibility={visibility} />
+          )}
         </div>
       </m.div>
     </div>

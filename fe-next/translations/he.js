@@ -14082,7 +14082,8 @@ const he = {
         "unlockedAchievement": "פתח הישג",
         "noActivity": "אין פעילות עדיין",
         "errorLoading": "שגיאה בטעינת הפעילות"
-      }
+      },
+      "leaderboardOff": "טבלת הדירוג של הכיתה כבויה כרגע. ה-XP, הרמה והתגים שלך ממשיכים לגדול בכל משחק."
     },
     "lessons": {
       "lesson": "שיעור",
@@ -14892,7 +14893,19 @@ const he = {
         "pressEscape": "לחצו ESC כדי לצאת",
         "exit": "יציאה מההצגה"
       },
-      "defaultLanguage": "שפת ברירת מחדל"
+      "defaultLanguage": "שפת ברירת מחדל",
+      "leaderboard": {
+        "label": "טבלת הדירוג של הכיתה",
+        "hint": "מה התלמידים רואים כשהם פותחים את הדירוג במכשיר שלהם.",
+        "top3": "3 הראשונים + את/ה",
+        "top3Hint": "הפודיום, ועוד השורה של כל תלמיד. מומלץ.",
+        "full": "כולם",
+        "fullHint": "כל הכיתה, לפי XP.",
+        "personal": "רק את/ה",
+        "personalHint": "כל תלמיד רואה רק את ה-XP והמקום שלו.",
+        "off": "כבוי",
+        "offHint": "בלי דירוג. XP, רמות ותגים עדיין נספרים."
+      }
     },
     "classrooms": {
       "students": {
@@ -16943,7 +16956,9 @@ const he = {
       "top50": "טופ 50",
       "totalXP": "סה״כ XP",
       "weekly": "שבועי",
-      "xp": "{{xp}} XP"
+      "xp": "{{xp}} XP",
+      "scopeTop3": "מוצגים 3 הראשונים ואת/ה.",
+      "scopePersonal": "מוצג/ת רק את/ה. המורה שומר/ת את הרשימה המלאה פרטית."
     },
     "milestones": {
       "coinBonus": "+{{coins}} מטבעות",

@@ -34,6 +34,16 @@ export function normalizeForStorage(word: string, language?: Language): string {
 export const EDUCATION_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
 export type Language = (typeof EDUCATION_LANGUAGES)[number];
 
+/** How much of the class standings students see (classrooms.leaderboard_visibility). */
+export type LeaderboardVisibility = 'full' | 'top3' | 'personal_only' | 'hidden';
+export const LEADERBOARD_VISIBILITIES: readonly LeaderboardVisibility[] = ['top3', 'full', 'personal_only', 'hidden'];
+/** Column default, and what a pre-migration row (no column) means. */
+export const DEFAULT_LEADERBOARD_VISIBILITY: LeaderboardVisibility = 'top3';
+
+export function coerceLeaderboardVisibility(value: unknown): LeaderboardVisibility {
+  return (LEADERBOARD_VISIBILITIES as readonly unknown[]).includes(value) ? (value as LeaderboardVisibility) : DEFAULT_LEADERBOARD_VISIBILITY;
+}
+
 export interface Classroom {
   id: string;
   teacher_id: string;
@@ -43,6 +53,8 @@ export interface Classroom {
   created_at: string;
   updated_at: string;
   member_count?: number;
+  /** Absent on rows read before the column existed: treat as DEFAULT_LEADERBOARD_VISIBILITY. */
+  leaderboard_visibility?: LeaderboardVisibility;
 }
 
 /**

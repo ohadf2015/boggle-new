@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
-import type { Classroom, ClassroomWithMembers, ClassroomStudent, VocabularyLevel } from './types';
+import { coerceLeaderboardVisibility, DEFAULT_LEADERBOARD_VISIBILITY, type Classroom, type ClassroomWithMembers, type ClassroomStudent, type VocabularyLevel, type LeaderboardVisibility } from './types';
 import { isVocabularyLevel } from '@/lib/education/differentiation';
 
 /**
@@ -105,7 +105,7 @@ export async function getClassroom(classroomId: string): Promise<{ data: Classro
  */
 export async function updateClassroom(
   id: string,
-  updates: Partial<Pick<Classroom, 'name' | 'language'>>
+  updates: Partial<Pick<Classroom, 'name' | 'language' | 'leaderboard_visibility'>>
 ): Promise<{ data: Classroom | null; error: { message: string } | null }> {
   if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
 
@@ -127,6 +127,23 @@ export async function updateClassroom(
     const error = err instanceof Error ? err.message : 'Unknown error';
     logger.error('Exception in updateClassroom:', error);
     return { data: null, error: { message: error } };
+  }
+}
+
+/**
+ * The class standings setting for one class, for its teacher or an enrolled
+ * student (both can read the row under the classrooms SELECT policy).
+ * `*` on purpose: before the column migration lands a named column would fail
+ * the whole read, and a failure or a missing column both mean the default.
+ */
+export async function getClassroomLeaderboardVisibility(id: string): Promise<LeaderboardVisibility> {
+  if (!supabase || !id) return DEFAULT_LEADERBOARD_VISIBILITY;
+  try {
+    const { data, error } = await supabase.from('classrooms').select('*').eq('id', id).maybeSingle();
+    if (error || !data) return DEFAULT_LEADERBOARD_VISIBILITY;
+    return coerceLeaderboardVisibility((data as { leaderboard_visibility?: unknown }).leaderboard_visibility);
+  } catch {
+    return DEFAULT_LEADERBOARD_VISIBILITY;
   }
 }
 

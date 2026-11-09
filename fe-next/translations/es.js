@@ -14160,7 +14160,8 @@ const es = {
         "unlockedAchievement": "desbloqueó un logro",
         "noActivity": "Sin actividad todavía",
         "errorLoading": "No se pudo cargar la actividad"
-      }
+      },
+      "leaderboardOff": "Tu docente desactivó la clasificación de la clase. Tu XP, tu nivel y tus insignias siguen creciendo en cada partida."
     },
     "lessons": {
       "lesson": "Lección",
@@ -14965,7 +14966,19 @@ const es = {
           "body": "Mándales el código. Sin cuentas."
         }
       },
-      "defaultLanguage": "Idioma predeterminado"
+      "defaultLanguage": "Idioma predeterminado",
+      "leaderboard": {
+        "label": "Clasificación de la clase",
+        "hint": "Lo que ven los alumnos al abrir la clasificación en su propio dispositivo.",
+        "top3": "Top 3 + tú",
+        "top3Hint": "El podio, más la fila de cada alumno. Recomendado.",
+        "full": "Todos",
+        "fullHint": "Toda la clase, ordenada por XP.",
+        "personal": "Solo tú",
+        "personalHint": "Cada alumno ve solo su XP y su puesto.",
+        "off": "Desactivada",
+        "offHint": "Sin clasificación. La XP, los niveles y las insignias siguen contando."
+      }
     },
     "classrooms": {
       "students": {
@@ -17037,7 +17050,9 @@ const es = {
       "top50": "Top 50",
       "totalXP": "XP total",
       "weekly": "Semanal",
-      "xp": "{{xp}} XP"
+      "xp": "{{xp}} XP",
+      "scopeTop3": "Se muestran el top 3 y tú.",
+      "scopePersonal": "Solo se te muestra a ti. Tu docente mantiene la lista completa en privado."
     },
     "milestones": {
       "coinBonus": "+{{coins}} monedas",

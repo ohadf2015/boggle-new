@@ -14228,7 +14228,8 @@ const ja = {
         "unlockedAchievement": "実績解除",
         "noActivity": "アクティビティなし",
         "errorLoading": "読み込みエラー"
-      }
+      },
+      "leaderboardOff": "先生がクラスのランキングをオフにしました。XP・レベル・バッジは毎回のゲームでちゃんと増えます。"
     },
     "lessons": {
       "lesson": "レッスン",
@@ -15038,7 +15039,19 @@ const ja = {
         "pressEscape": "ESCを押して終了",
         "exit": "プレゼンテーションを終了"
       },
-      "defaultLanguage": "基本の言語"
+      "defaultLanguage": "基本の言語",
+      "leaderboard": {
+        "label": "クラスのランキング",
+        "hint": "生徒が自分の端末でクラスの順位を開いたときに表示される内容です。",
+        "top3": "上位3人＋自分",
+        "top3Hint": "表彰台と、各生徒自身の行。おすすめ。",
+        "full": "全員",
+        "fullHint": "クラス全員をXP順に表示。",
+        "personal": "自分だけ",
+        "personalHint": "各生徒は自分のXPと順位だけを見られます。",
+        "off": "オフ",
+        "offHint": "ランキングなし。XP・レベル・バッジは引き続きたまります。"
+      }
     },
     "classrooms": {
       "students": {
@@ -17089,7 +17102,9 @@ const ja = {
       "top50": "トップ50",
       "totalXP": "合計XP",
       "weekly": "週間",
-      "xp": "{{xp}} XP"
+      "xp": "{{xp}} XP",
+      "scopeTop3": "上位3人とあなたを表示中。",
+      "scopePersonal": "あなたの分だけを表示中。全体のリストは先生だけが見られます。"
     },
     "milestones": {
       "coinBonus": "+{{coins}}コイン",

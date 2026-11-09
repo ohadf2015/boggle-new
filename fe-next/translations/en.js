@@ -12523,7 +12523,8 @@ const en = {
         "unlockedAchievement": "unlocked an achievement",
         "noActivity": "No activity yet",
         "errorLoading": "Couldn't load activity"
-      }
+      },
+      "leaderboardOff": "Your teacher turned the class leaderboard off. Your XP, level and badges still grow every game."
     },
     "lessons": {
       "lesson": "Lesson",
@@ -13120,7 +13121,19 @@ const en = {
         "pressEscape": "Press ESC to exit",
         "exit": "Exit presentation"
       },
-      "defaultLanguage": "Default language"
+      "defaultLanguage": "Default language",
+      "leaderboard": {
+        "label": "Class leaderboard",
+        "hint": "What students see when they open the class standings on their own device.",
+        "top3": "Top 3 + you",
+        "top3Hint": "The podium, plus each student's own row. Recommended.",
+        "full": "Everyone",
+        "fullHint": "The whole class, ranked by XP.",
+        "personal": "Just you",
+        "personalHint": "Each student sees only their own XP and rank.",
+        "off": "Off",
+        "offHint": "No standings. XP, levels and badges still count."
+      }
     },
     "classrooms": {
       "students": {
@@ -15367,7 +15380,9 @@ const en = {
       "top50": "Top 50",
       "totalXP": "Total XP",
       "weekly": "Weekly",
-      "xp": "{{xp}} XP"
+      "xp": "{{xp}} XP",
+      "scopeTop3": "Showing the top 3 and you.",
+      "scopePersonal": "Showing just you. Your teacher keeps the full list private."
     },
     "milestones": {
       "coinBonus": "+{{coins}} coins",

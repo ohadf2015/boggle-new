@@ -38,7 +38,7 @@ export function ClassStrip({ classroomId, reducedMotion }: Props) {
 
   if (load.status === 'loading') return null;
   if (load.status === 'error') {
-    return <p role="alert" className="font-neo-body text-xs font-bold text-neo-black/70">{t('common.error')}</p>;
+    return <p role="alert" className="font-neo-body text-xs font-bold text-neo-cream/80">{t('common.error')}</p>;
   }
 
   const { hub } = load;
