@@ -17,9 +17,9 @@ describe('PaymentFailedBanner', () => {
     expect(cta).toHaveTextContent('teacher.subscription.paymentFailedCta');
   });
 
-  it('is an alert with no dismiss: it is account state, not an ad', () => {
+  it('is a status region with no dismiss: it is account state, not an ad', () => {
     render(<PaymentFailedBanner portalUrl={null} stillPro />);
-    expect(screen.getByTestId('payment-failed-banner')).toHaveAttribute('role', 'alert');
+    expect(screen.getByTestId('payment-failed-banner')).toHaveAttribute('role', 'status');
     expect(screen.queryByRole('button', { name: /dismiss|close/i })).toBeNull();
   });
 

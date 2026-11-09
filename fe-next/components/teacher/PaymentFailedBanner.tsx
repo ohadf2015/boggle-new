@@ -30,7 +30,7 @@ export function PaymentFailedBanner({ portalUrl, stillPro }: PaymentFailedBanner
     <ProBanner
       testId="payment-failed-banner"
       tone="urgent"
-      role="alert"
+      role="status"
       proLabel={t('eduShell.nav.pro')}
       title={t('teacher.subscription.paymentFailedTitle')}
       body={t(stillPro ? 'teacher.subscription.paymentFailedBody' : 'teacher.subscription.paymentFailedBodyPaused')}
