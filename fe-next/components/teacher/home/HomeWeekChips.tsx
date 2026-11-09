@@ -19,6 +19,10 @@ export function HomeWeekChips({ summary, classCount, t, className }: { summary: 
   if (share.total === 0) return null;
   return (
     <div data-testid="home-week-chips" role="group" aria-label={t('eduShell.week.title')} className={cn('flex shrink-0 items-center gap-1.5', className)}>
+      {/* Visible caption: `title` tooltips never show on a phone, so "6" and "3/3" needed a word. */}
+      <span data-testid="home-week-chips-caption" aria-hidden="true" className="font-neo-body text-xs font-bold text-neo-cream/70">
+        {t('eduShell.week.title')}
+      </span>
       <span data-testid="home-week-chip-games" title={t('eduShell.week.games')} className={cn(CHIP, 'text-neo-cyan')}>
         <Gamepad2 className="size-4 shrink-0" strokeWidth={2.5} aria-hidden="true" />
         <AnimatedNumber to={summary.gamesPlayed} />

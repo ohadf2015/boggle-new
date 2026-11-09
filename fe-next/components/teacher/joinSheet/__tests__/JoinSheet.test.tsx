@@ -25,7 +25,8 @@ describe('JoinSheet', () => {
     const slips = screen.getAllByTestId('join-slip');
     expect(slips).toHaveLength(SLIPS_PER_PAGE);
     expect(screen.getAllByTestId('join-slip-code')[0]).toHaveTextContent('AB12CD');
-    expect(slips[0]).toHaveTextContent('www.lexiclash.live/en/join');
+    expect(slips[0]).toHaveTextContent('lexiclash.live/en/join');
+    expect(slips[0]).not.toHaveTextContent('www.');
     expect(slips[0]).toHaveTextContent('5B English');
     expect(slips[0].querySelector('svg')).not.toBeNull();
   });

@@ -53,7 +53,9 @@ export function JoinSheet({ code, className, origin, language, t }: JoinSheetPro
     );
   }
   const joinUrl = origin ? classroomJoinUrl(origin, language, code) : '';
-  const typedUrl = origin ? `${origin.replace(/^https?:\/\//, '').replace(/\/$/, '')}/${language}/join` : '';
+  // What a student types by hand: no scheme and no `www.` (the bare host redirects), so the
+  // slip reads `lexiclash.live/en/join` instead of a 26-character line a 9-year-old copies wrong.
+  const typedUrl = origin ? `${origin.replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/$/, '')}/${language}/join` : '';
   const name = className.trim() || code;
   const print = () => {
     safeCapture('edu_join_sheet_printed', { slips: SLIPS_PER_PAGE });
