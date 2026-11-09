@@ -9,7 +9,7 @@ import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Link2, Share2, Users } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { classroomJoinUrl } from '@/lib/education/classroomInvitePayload';
+import { classroomJoinUrl, joinAddressForDisplay } from '@/lib/education/classroomInvitePayload';
 import {
   trackEduJoinCodeCopied,
   trackTeacherInviteStudentsCtaClicked,
@@ -106,7 +106,7 @@ export function InviteStudentsCta({
         </code>
         {joinUrl ? (
           <span dir="ltr" className="mt-1 max-w-full truncate font-mono text-xs font-bold text-black/50">
-            {joinUrl.replace(/^https?:\/\//, '')}
+            {joinAddressForDisplay(joinUrl)}
           </span>
         ) : null}
       </div>

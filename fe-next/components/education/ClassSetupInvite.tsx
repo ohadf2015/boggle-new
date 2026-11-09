@@ -16,7 +16,7 @@ import { createdClassroom } from '@/lib/education/createdClassroomHandoff';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useTeacherActivationProgress } from '@/hooks/useTeacherActivationProgress';
 import { PageLoader } from '@/components/ui/PageLoader';
-import { classroomJoinUrl, inviteLocale } from '@/lib/education/classroomInvitePayload';
+import { classroomJoinUrl, inviteLocale, joinAddressForDisplay } from '@/lib/education/classroomInvitePayload';
 import { trackEduFirstStudentJoined, trackEduJoinCodeShown } from '@/lib/education/telemetry';
 import { trackFirstRoundGuideClicked, trackFirstRoundGuideShown } from '@/lib/education/firstRoundGuideTelemetry';
 import { captureTeacherOnboardingFunnel, TEACHER_ONBOARDING_FUNNEL_EVENTS, teacherFunnelPlan } from '@/lib/education/teacherOnboardingFunnel';
@@ -155,7 +155,7 @@ function InviteReady({ classroom, packKey, lessonId, t, language }: InviteReadyP
 
   const joinLocale = inviteLocale(classroom.language, language);
   const joinUrl = origin ? classroomJoinUrl(origin, joinLocale, classroom.join_code) : '';
-  const displayHost = origin ? `${origin.replace(/^https?:\/\//, '')}/${joinLocale}/join` : '';
+  const displayHost = origin ? `${joinAddressForDisplay(origin)}/${joinLocale}/join` : '';
   const startHref = `/${language}/education/classroom-game?flow=${QUICK_LAUNCH_FLOW}`;
   const firstGame = useFirstGame({ classroom, packKey, lessonId, t, language });
 

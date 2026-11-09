@@ -8,7 +8,7 @@ import { NeoButton } from '@/components/ui/button';
 import { ClassSetupInviteCode } from '@/components/education/ClassSetupInviteCode';
 import { useInviteShare } from '@/components/education/useInviteShare';
 import { HqProjectorSheet } from '@/components/teacher/hq/HqProjectorSheet';
-import { classroomJoinUrl, inviteLocale } from '@/lib/education/classroomInvitePayload';
+import { classroomJoinUrl, inviteLocale, joinAddressForDisplay } from '@/lib/education/classroomInvitePayload';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -29,7 +29,7 @@ export function HomeShareSheet({ classroom, open, onOpenChange, uiLanguage, t }:
   const locale = inviteLocale(classroom.language, uiLanguage);
   const language = uiLanguage;
   const joinUrl = origin ? classroomJoinUrl(origin, locale, classroom.join_code) : '';
-  const displayHost = origin ? `${origin.replace(/^https?:\/\//, '')}/${locale}/join` : '';
+  const displayHost = origin ? `${joinAddressForDisplay(origin)}/${locale}/join` : '';
 
   return (
     <>

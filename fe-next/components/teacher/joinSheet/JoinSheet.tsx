@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { QRCodeSVG } from 'qrcode.react';
 import { ArrowLeft, Printer } from 'lucide-react';
-import { classroomJoinUrl } from '@/lib/education/classroomInvitePayload';
+import { classroomJoinUrl, joinAddressForDisplay } from '@/lib/education/classroomInvitePayload';
 import { safeCapture } from '@/lib/education/telemetry';
 
 /** 8 slips fill one A4 / Letter page in two columns. */
@@ -53,9 +53,8 @@ export function JoinSheet({ code, className, origin, language, t }: JoinSheetPro
     );
   }
   const joinUrl = origin ? classroomJoinUrl(origin, language, code) : '';
-  // What a student types by hand: no scheme and no `www.` (the bare host redirects), so the
-  // slip reads `lexiclash.live/en/join` instead of a 26-character line a 9-year-old copies wrong.
-  const typedUrl = origin ? `${origin.replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/$/, '')}/${language}/join` : '';
+  // What a student types by hand: the shared display form (no scheme, no `www.`).
+  const typedUrl = origin ? `${joinAddressForDisplay(origin)}/${language}/join` : '';
   const name = className.trim() || code;
   const print = () => {
     safeCapture('edu_join_sheet_printed', { slips: SLIPS_PER_PAGE });

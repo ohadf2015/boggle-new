@@ -21822,7 +21822,7 @@ const ru = {
       "shareWhatsapp": "WhatsApp",
       "shareGoogle": "Google Classroom",
       "shareMore": "Поделиться",
-      "copyLink": "Скопировать ссылку-приглашение",
+      "copyLink": "Копировать ссылку",
       "copied": "Скопировано",
       "copyFailed": "Не получилось скопировать. Поделитесь кодом.",
       "noAccount": "Ученики входят без аккаунта",
