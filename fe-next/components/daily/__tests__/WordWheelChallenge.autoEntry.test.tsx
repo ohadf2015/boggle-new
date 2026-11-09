@@ -41,6 +41,7 @@ vi.mock('@/hooks/usePracticeFlag', () => ({ usePracticeFlag: () => false }));
 vi.mock('@/hooks/useDailyModePlayed', () => ({ useDailyModePlayed: () => false }));
 
 const mockHasEverPlayed = vi.fn(() => true);
+vi.mock('@/hooks/useUtcDay', () => ({ useUtcDay: () => '2026-10-11' }));
 vi.mock('@/utils/dailyChallenge', () => ({
   getDailyChallengeDate: () => '2026-10-11',
   getPuzzleNumber: () => 200,

@@ -48,6 +48,7 @@ vi.mock('@/contexts/NavigationContext', () => ({
 }));
 
 const saveWordWheelResultMock = vi.fn();
+vi.mock('@/hooks/useUtcDay', () => ({ useUtcDay: () => '2026-04-25' }));
 vi.mock('@/utils/dailyChallenge', () => ({
   getDailyChallengeDate: () => '2026-04-25',
   getPuzzleNumber: () => 117,

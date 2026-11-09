@@ -7,7 +7,6 @@ import {
   type WordWheelPuzzle,
 } from '@/utils/dailyChallenge/wordWheelGeneration';
 import {
-  getDailyChallengeDate,
   getPuzzleNumber,
   hasPlayedWordWheelToday,
   getTodaysWordWheelResult,
@@ -22,6 +21,7 @@ import { needsBonusIntro } from './bonusIntro';
 import { getUnfinishedWordWheelRun, type WordWheelRun } from '@/utils/dailyChallenge/wordWheelRun';
 import type { StoredWordWheelResult } from '@/utils/dailyChallenge/types';
 import { prewarmDictionary } from '@/hooks/useDictionaryCache';
+import { useUtcDay } from '@/hooks/useUtcDay';
 import { wordWheelSkipsReady } from './readySkip';
 import type { Language } from '@/types';
 
@@ -80,7 +80,19 @@ export function useWordWheelLoad({
   const [gameResult, setGameResult] = useState<WordWheelGameResult | null>(null);
   const [puzzleNumber, setPuzzleNumber] = useState(0);
 
-  const loadKey = `${catchupDate || getDailyChallengeDate()}|${language}|${isPractice}`;
+  // Today's daily date, rolled over for a page left open past midnight UTC (or an app
+  // brought back next morning). Never mid-run or on the results: those finish the old day.
+  const utcDay = useUtcDay();
+  const [day, setDay] = useState(utcDay);
+  useEffect(() => {
+    if (utcDay === day || isPractice || isCatchup || phase === 'playing' || phase === 'completed') return;
+    setDay(utcDay);
+    setPuzzle(null);
+    setGameResult(null);
+    setPhase('loading');
+  }, [utcDay, day, phase, isPractice, isCatchup]);
+
+  const loadKey = `${catchupDate || day}|${language}|${isPractice}`;
   // A late profile re-runs init: it may still find a cross-device result, but must never rebuild an entered board.
   const enteredKeyRef = useRef<string | null>(null);
 
@@ -95,7 +107,7 @@ export function useWordWheelLoad({
     // Read live: the player can tap Play while this run awaits the server check.
     const entered = () => enteredKeyRef.current === loadKey;
     let isMounted = true;
-    const date = catchupDate || getDailyChallengeDate();
+    const date = catchupDate || day;
     const number = getPuzzleNumber(date);
     setPuzzleNumber(number);
     catchupAdUnlockedRef.current = false;
@@ -208,7 +220,7 @@ export function useWordWheelLoad({
     // `guestFingerprint` is deliberately NOT a dependency: init resolves it itself,
     // and re-running on the async state landing would double the server sync.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [language, isAuthenticated, authLoading, playerId, isPractice, catchupDate, isCatchup]);
+  }, [language, isAuthenticated, authLoading, playerId, isPractice, catchupDate, isCatchup, day]);
 
   return {
     phase, setPhase, puzzle, setPuzzle, gameResult, setGameResult, puzzleNumber, enterPlaying,
