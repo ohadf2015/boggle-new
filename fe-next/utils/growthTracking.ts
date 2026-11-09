@@ -126,6 +126,11 @@ export type GrowthEvent =
   // next_game_picked: a results CTA chose the next game.
   //   Picker props: { option, from, preset? | href? }.
   | 'next_game_picked'
+  | 'ranked_queue_joined'
+  | 'ranked_match_found'
+  | 'ranked_rating_delta_shown'
+  | 'league_panel_shown'
+  | 'league_rival_cta_clicked'
   | 'daily_challenge_completed'
   | 'daily_puzzle_opened'
   | 'daily_puzzle_completed'

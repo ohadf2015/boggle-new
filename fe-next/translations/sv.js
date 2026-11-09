@@ -19709,6 +19709,8 @@ const sv = {
   },
   "matchmaking": {
     "rankedMatch": "Rankad match",
+    "rankedSignIn": "Logga in för rankad",
+    "rankedLocked": "{n} vanliga matcher kvar till rankad",
     "findingOpponent": "Söker motståndare…",
     "eloRange": "{{elo}} ELO (±{{range}})",
     "playersInQueue": "{{count}} i kö",

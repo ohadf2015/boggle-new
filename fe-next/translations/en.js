@@ -17644,6 +17644,8 @@ const en = {
   },
   "matchmaking": {
     "rankedMatch": "Ranked Match",
+    "rankedSignIn": "Sign in for Ranked",
+    "rankedLocked": "{n} casual games to unlock Ranked",
     "findingOpponent": "Finding opponent…",
     "eloRange": "{{elo}} ELO (±{{range}})",
     "playersInQueue": "{{count}} in queue",

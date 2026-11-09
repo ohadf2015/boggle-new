@@ -19350,6 +19350,8 @@ const ja = {
   },
   "matchmaking": {
     "rankedMatch": "ランクマッチ",
+    "rankedSignIn": "ランクにはログイン",
+    "rankedLocked": "ランク解除までカジュアル{n}試合",
     "findingOpponent": "対戦相手を探しています…",
     "eloRange": "{{elo}} ELO (±{{range}})",
     "playersInQueue": "{{count}}人が待機中",

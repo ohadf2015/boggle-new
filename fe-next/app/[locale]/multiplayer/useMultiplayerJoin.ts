@@ -108,7 +108,7 @@ export type HandleJoinFn = (
   overrideGameCode?: string,
   overrideRoomName?: string,
   overrideUsername?: string,
-  options?: { isPrivate?: boolean; isClassroom?: boolean; quickPlay?: boolean; autoRetry?: boolean },
+  options?: { isPrivate?: boolean; isClassroom?: boolean; quickPlay?: boolean; autoRetry?: boolean; isRanked?: boolean },
 ) => Promise<void>;
 
 export function useMultiplayerJoin({
@@ -149,7 +149,7 @@ export function useMultiplayerJoin({
       overrideGameCode?: string,
       overrideRoomName?: string,
       overrideUsername?: string,
-      options?: { isPrivate?: boolean; isClassroom?: boolean; quickPlay?: boolean; autoRetry?: boolean },
+      options?: { isPrivate?: boolean; isClassroom?: boolean; quickPlay?: boolean; autoRetry?: boolean; isRanked?: boolean },
     ) => {
       if (process.env.NODE_ENV === 'development') {
         console.log(`[JOIN] handleJoin called - mode: ${isHostMode ? 'HOST' : 'PLAYER'}, socket connected: ${socketFromProps?.connected}`);
@@ -427,6 +427,7 @@ export function useMultiplayerJoin({
           ...(options?.isClassroom && { isClassroom: true }),
           // The duo bot only joins rooms Quick Play made, never a friend's room.
           ...(options?.quickPlay && { isQuickPlay: true }),
+          ...(options?.isRanked && { isRanked: true }),
         });
 
         // Remember how to get back into this room after a socket reconnect

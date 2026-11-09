@@ -19365,6 +19365,8 @@ const he = {
   },
   "matchmaking": {
     "rankedMatch": "משחק מדורג",
+    "rankedSignIn": "התחברו למשחק מדורג",
+    "rankedLocked": "עוד {n} משחקים רגילים לפתיחת מדורג",
     "findingOpponent": "מחפשים יריב…",
     "eloRange": "{{elo}} ELO (±{{range}})",
     "playersInQueue": "{{count}} בתור",

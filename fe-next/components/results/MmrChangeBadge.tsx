@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { getMmdChanges, clearMmdChanges } from '@/lib/results/rankedResultStore';
 import { getTierFromElo, type RankedTier } from '@/lib/ranked/tiers';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 
 const TIER_ICONS: Record<string, string> = {
   bronze: '🥉',
@@ -33,8 +34,15 @@ export default function MmrChangeBadge({ username }: MmdChangeBadgeProps) {
   useEffect(() => {
     const changes = getMmdChanges();
     if (changes?.[username]) {
-      setDelta(changes[username].delta);
-      setNewMmr(changes[username].newMmr);
+      const info = changes[username];
+      setDelta(info.delta);
+      setNewMmr(info.newMmr);
+      const tier = getTierFromElo(info.newMmr);
+      trackGrowthEvent('ranked_rating_delta_shown', {
+        delta: info.delta,
+        new_mmr: info.newMmr,
+        tier: tier?.id,
+      });
       // Animate in after a brief delay
       const timer = setTimeout(() => setVisible(true), 600);
       // Clean up so we don't show stale data on the next results page

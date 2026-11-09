@@ -228,6 +228,18 @@ export const EXPERIMENTS = {
    * layout. Not used for A/B traffic split — flip to off via PostHog if
    * Sentry warnings spike post-deploy.
    */
+  /**
+   * Ranked public CTA kill-switch. on = eligible signed-in players see Ranked
+   * on the multiplayer hub (default). off = hide without deploy if queue/MMR
+   * misbehaves. Not an A/B split.
+   */
+  'ranked-public-v1': defineExperiment({
+    variants: ['on', 'off'] as const,
+    default: 'on',
+    description:
+      'Ranked multiplayer CTA kill-switch. on = show Ranked for authenticated eligible players (default). off = hide CTA. Guests still see an auth prompt when on. Eligibility (10 casual / unlocked_at) stays server-enforced.',
+  }),
+
   'mp.desktop-shell.v1': defineExperiment({
     variants: ['on', 'off'] as const,
     default: 'on',
