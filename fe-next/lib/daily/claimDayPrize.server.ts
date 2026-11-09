@@ -5,6 +5,8 @@ import { getDailyChallengeDate } from '@/utils/dailyChallenge/dateUtils'
 import { awardCoinsServer, type AwardCoinsReason } from '@/backend/services/economy/awardCoins'
 import { eduDayPrize, rollDayPrize, type DayPrizeKind } from '@/lib/daily/dayPrize'
 import logger from '@/utils/logger'
+import { grantChestPart } from '@/lib/avatar/grantChestPart.server'
+import type { ChestDropSource } from '@/lib/avatar/chestDrops'
 
 /** Attempt tables per daily mode, the same ones /api/daily/status reads. */
 const HUNT = { table: 'daily_word_hunt_attempts', catchupFlag: true }
@@ -25,6 +27,8 @@ export const DAY_PRIZE_CONFIG: Record<DayPrizeKind, PrizeConfig> = {
   clear: { tables: [WHEEL, HUNT], claimTable: 'daily_day_clear_claims', reason: 'daily_day_clear' },
   perfect: { tables: [HUNT, WHEEL, TOWER, CONNECTIONS], claimTable: 'daily_all_clear_claims', reason: 'daily_all_clear' },
 }
+
+const PART_SOURCE: Record<DayPrizeKind, ChestDropSource> = { clear: 'day_clear', perfect: 'day_perfect' }
 
 type AdminClient = NonNullable<ReturnType<typeof createAdminClient>>
 
@@ -102,13 +106,20 @@ async function claim(request: NextRequest, kind: DayPrizeKind): Promise<NextResp
   }
 
   const prize = (await isEducationAccount(supabase, user.id)) ? eduDayPrize(kind) : rollDayPrize(user.id, today, kind)
+  // Every random box also holds one avatar part (lib/avatar/chestDrops). The
+  // education side keeps its fixed prize: no roll, so no part either.
+  const withPart = async () => {
+    if (prize.fixed) return {}
+    const granted = await grantChestPart({ supabase, playerId: user.id, source: PART_SOURCE[kind], sourceKey: today })
+    return granted ? { part: granted.drop } : {}
+  }
 
   const { error: insertError } = await supabase
     .from(config.claimTable)
     .insert({ player_id: user.id, claim_date: today, coins: prize.coins, xp: prize.xp })
   if (insertError) {
     if ((insertError as { code?: string }).code === '23505') {
-      return NextResponse.json({ ...prize, claimed: false })
+      return NextResponse.json({ ...prize, claimed: false, ...(await withPart()) })
     }
     logger.error(`Daily ${kind} prize claim: insert failed:`, insertError.message)
     return NextResponse.json({ error: 'Failed to save claim' }, { status: 500 })
@@ -132,5 +143,5 @@ async function claim(request: NextRequest, kind: DayPrizeKind): Promise<NextResp
   })
   if (xpError) logger.error(`Daily ${kind} prize claim: xp grant failed:`, xpError.message)
 
-  return NextResponse.json({ ...prize, claimed: true })
+  return NextResponse.json({ ...prize, claimed: true, ...(await withPart()) })
 }

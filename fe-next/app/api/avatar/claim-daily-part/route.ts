@@ -12,7 +12,7 @@ import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
 import { getSupabaseAdmin } from '@/lib/admin/server';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
-import { getPremiumParts, PREMIUM_CATEGORIES } from '@/shared/types/customAvatar';
+import { getPremiumParts, isChestOnlyPart, PREMIUM_CATEGORIES } from '@/shared/types/customAvatar';
 import { captureApiError } from '@/utils/sentry';
 import { adTicketSecret, signAdTicket, verifyAdTicket } from '@/lib/ads/adTicket';
 
@@ -22,6 +22,8 @@ function collectAllPremiumKeys(): string[] {
   const keys: string[] = [];
   for (const category of PREMIUM_CATEGORIES) {
     for (const partId of getPremiumParts(category)) {
+      // Chest-only legendaries come from reward chests, never from the ad claim.
+      if (isChestOnlyPart(category, partId)) continue;
       keys.push(`${category}:${partId}`);
     }
   }

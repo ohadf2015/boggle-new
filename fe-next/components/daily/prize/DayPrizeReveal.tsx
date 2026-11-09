@@ -12,6 +12,11 @@ import { emitCoinEarned } from '@/utils/coinEarnedFx';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { dayPrizeOddsPct, type DayPrizeClaimResponse, type DayPrizeKind, type DayPrizeTier } from '@/lib/daily/dayPrize';
 import { claimDayPrize, fetchDayPrizeFixed, readOpenedPrize } from './dayPrizeStore';
+import ChestPartPrize from '@/components/avatar/chest/ChestPartPrize';
+import ChestPartOdds from '@/components/avatar/chest/ChestPartOdds';
+import { isChestPartDrop, type ChestDropSource } from '@/lib/avatar/chestDrops';
+
+const PART_SOURCE: Record<DayPrizeKind, ChestDropSource> = { clear: 'day_clear', perfect: 'day_perfect' };
 
 /** Closed box shakes at least this long, so the server answer never makes the reveal feel instant. */
 export const ANTICIPATION_MS = 750;
@@ -75,6 +80,8 @@ export function DayPrizeReveal({ kind, onClose, source }: DayPrizeRevealProps) {
   // line waits for the answer so it never flashes on a fixed box.
   const [fixedMode, setFixedMode] = useState<boolean | null>(() => readOpenedPrize(kind)?.fixed ?? null);
   const mounted = useRef(true);
+  // True only for the open that just happened here (not a reopened, cached box).
+  const [freshOpen, setFreshOpen] = useState(false);
 
   useEffect(() => {
     mounted.current = true;
@@ -119,6 +126,7 @@ export function DayPrizeReveal({ kind, onClose, source }: DayPrizeRevealProps) {
       return;
     }
     setPrize(outcome.prize);
+    setFreshOpen(outcome.prize.claimed);
     setFixedMode(!!outcome.prize.fixed);
     setPhase('open');
     celebrate(outcome.prize.tier);
@@ -145,7 +153,10 @@ export function DayPrizeReveal({ kind, onClose, source }: DayPrizeRevealProps) {
   const odds = dayPrizeOddsPct();
   // Random box only, and only once the server said so (never on the education side).
   const oddsLine = (prize ? !prize.fixed : fixedMode === false) ? (
-    <p data-testid="day-prize-odds" className="text-[11px] font-bold text-neo-white/60">{t('daily.dayPrize.odds', odds)}</p>
+    <>
+      <p data-testid="day-prize-odds" className="text-[11px] font-bold text-neo-white/60">{t('daily.dayPrize.odds', odds)}</p>
+      <ChestPartOdds source={PART_SOURCE[kind]} />
+    </>
   ) : null;
   const spring = { type: 'spring', stiffness: 420, damping: 18 } as const;
 
@@ -218,7 +229,11 @@ export function DayPrizeReveal({ kind, onClose, source }: DayPrizeRevealProps) {
               <span ref={coinsRef} data-testid="day-prize-coins">{t('daily.dayPrize.coins', { coins: prize.coins })}</span>
             </h2>
             <p className="text-xs font-black text-neo-lime">{t('daily.dayPrize.xp', { xp: prize.xp })}</p>
-            <p className="text-sm font-bold text-neo-cream" data-testid="day-prize-line">{t('daily.dayPrize.todayLine')}</p>
+            {isChestPartDrop(prize.part) ? (
+              <ChestPartPrize drop={prize.part} source={PART_SOURCE[kind]} autoReveal={freshOpen} />
+            ) : (
+              <p className="text-sm font-bold text-neo-cream" data-testid="day-prize-line">{t('daily.dayPrize.todayLine')}</p>
+            )}
             {oddsLine}
             <button
               type="button"

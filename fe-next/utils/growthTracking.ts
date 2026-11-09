@@ -374,6 +374,9 @@ export type GrowthEvent =
   | 'cross_promo_click'
   | 'day_prize_shown'
   | 'day_prize_opened'
+  // Avatar part out of a reward chest (components/avatar/chest).
+  | 'avatar_chest_part_shown'
+  | 'avatar_chest_part_reveal_open'
   // Cross-promo CTA exposure — fires once when a cross-promo card is rendered, so
   // PostHog can compute click-through rate (clicks / impressions). Props mirror
   // cross_promo_click: { target, source, placement?, language? }.

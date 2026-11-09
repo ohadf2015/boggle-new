@@ -4,6 +4,7 @@
  */
 import type { ReactNode } from 'react';
 import { BRAND, DETAIL, INK, L, O, Sparkle, WHITE, type ArtCtx } from './kit';
+import { MOUTHS_CHEST } from './mouthsChest';
 
 type Part = (ctx: ArtCtx) => ReactNode;
 
@@ -29,7 +30,7 @@ function OpenMouth({ w = 7, h = 6.5, teeth = true, id }: { w?: number; h?: numbe
   );
 }
 
-export const MOUTHS: Record<string, Part> = {
+const MOUTHS_BASE: Record<string, Part> = {
   smile: () => <L d="M44 60 Q50 65.5 56 60" w={2.1} />,
   grin: ctx => <OpenMouth id={`${ctx.uid}-m`} />,
   smirk: () => <L d="M44.5 61.5 Q51 63.5 56.5 58.6" w={2.1} />,
@@ -180,3 +181,5 @@ export const MOUTHS: Record<string, Part> = {
     </g>
   ),
 };
+
+export const MOUTHS: Record<string, Part> = { ...MOUTHS_BASE, ...MOUTHS_CHEST };

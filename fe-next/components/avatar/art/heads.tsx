@@ -5,6 +5,7 @@
  * item should look the same on everyone.
  */
 import type { ReactNode } from 'react';
+import { HEADS_CHEST } from './headsChest';
 import { BRAND, DETAIL, GoldFoil, INK, L, O, Shaded, Sparkle, WHITE, shade, tint, type ArtCtx } from './kit';
 
 export interface HeadDef {
@@ -29,7 +30,7 @@ export interface HeadDef {
 
 const SQUARE = 'M28 37 Q28 22 43 22 L57 22 Q72 22 72 37 L72 57 Q72 71 57 71 L43 71 Q28 71 28 57 Z';
 
-export const HEADS: Record<string, HeadDef> = {
+const HEADS_BASE: Record<string, HeadDef> = {
   square: { d: SQUARE, earX: 28.5 },
   round: { d: 'M24.5 47.5 A25.5 24.5 0 1 0 75.5 47.5 A25.5 24.5 0 1 0 24.5 47.5 Z', earX: 25.5, hairScale: 1.1 },
   oval: { d: 'M30 46.5 A20 26 0 1 0 70 46.5 A20 26 0 1 0 30 46.5 Z', earX: 30.5, hairScale: 0.93 },
@@ -231,6 +232,8 @@ export const HEADS: Record<string, HeadDef> = {
     ),
   },
 };
+
+export const HEADS: Record<string, HeadDef> = { ...HEADS_BASE, ...HEADS_CHEST };
 
 export function headFor(base: string): HeadDef {
   return HEADS[base] ?? HEADS.square;

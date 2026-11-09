@@ -33,6 +33,7 @@ import {
   MALE_HAIR_STYLES,
   PREMIUM_BG_COLORS,
   getPartPrice,
+  isChestOnlyPart,
   isNewPart,
   isPremiumPart,
   type CustomAvatarConfig,
@@ -178,7 +179,7 @@ export interface CatalogPart {
   /** Retired / hidden: still renders for old saves, never offered in pickers. */
   isHidden: boolean;
   isNew: boolean;
-  /** Gold price, or null for free (common) parts. */
+  /** Gold price, or null for free (common) and chest-only parts. */
   price: number | null;
   /** Level that grants it for free, or null if not on the ladder. */
   unlockLevel: number | null;
@@ -233,7 +234,7 @@ function buildPart(category: PartCategoryId, id: string): CatalogPart {
     genders: gendersFor(category, id),
     isHidden: isHiddenPart(category, id),
     isNew: isNewPart(rc, id),
-    price: premium ? getPartPrice(rc, id) : null,
+    price: premium && !isChestOnlyPart(rc, id) ? getPartPrice(rc, id) : null,
     unlockLevel: getUnlockLevel(rc, id),
   };
 }

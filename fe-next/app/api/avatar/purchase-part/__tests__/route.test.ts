@@ -53,6 +53,7 @@ vi.mock('@/shared/types/customAvatar', () => ({
     return premiums[category]?.includes(partId) ?? false;
   }),
   getPartPrice: vi.fn((_category: string, _partId: string) => 75),
+  isChestOnlyPart: vi.fn((category: string, partId: string) => `${category}:${partId}` === 'accessory:halo'),
 }));
 
 import { NextRequest } from 'next/server';
@@ -202,6 +203,13 @@ describe('POST /api/avatar/purchase-part', () => {
     const res = await POST(makeRequest({ category: 'eyes', partId: 'laser' }));
     expect(res.status).toBe(400);
     expect(res.data.error).toBe('Part already purchased');
+  });
+
+  it('refuses to sell a chest-only part (they only come out of chests)', async () => {
+    setupDbMocks({ gold: 9999, premiumParts: [] });
+    const res = await POST(makeRequest({ category: 'accessory', partId: 'halo' }));
+    expect(res.status).toBe(400);
+    expect(res.data.error).toBe('Chest-only part');
   });
 
   // ===== HAPPY PATH =====

@@ -30,6 +30,8 @@ export interface UnlockReveal {
   level: number;
   unlocks: LevelUnlock[];
   rarity: VisualTier;
+  /** 'chest' = found in a reward chest (lib/avatar/chestReveal); default is a level-up. */
+  source?: 'level' | 'chest';
 }
 
 // ── session memory (in-memory only) ──

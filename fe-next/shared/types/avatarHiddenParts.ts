@@ -10,31 +10,27 @@ export const HIDDEN_PARTS = {
   // 2026-09 art redraw: ids without their own drawing. They render as their
   // closest same-rarity sibling via lib/avatar/legacyMap.ts (kept in sync by
   // lib/avatar/__tests__/legacyMap.test.ts).
-  base: ['hexagon', 'rectangular', 'blob', 'oblong', 'triangle', 'shield', 'starBase', 'moonBase'],
+  base: ['hexagon', 'rectangular', 'blob', 'oblong', 'triangle'],
   eyes: [
     'none', 'relaxed', 'crossEyed', 'squint', 'focused', 'catPupils', 'doe', 'crying', 'determined',
-    'smokyEye', 'wingedLiner', 'money', 'alien', 'pixelEyes', 'targetEyes', 'catEye', 'sleepyEye',
-    'laserEye', 'glitchEyes', 'rainbowEyes', 'diamondEye', 'cyberEye', 'gemEye', 'moonEye',
+    'smokyEye', 'wingedLiner',
   ],
   eyebrows: ['short', 'feathered'],
   noseStyle: ['snub', 'roman', 'dot'],
   mouth: [
     'none', 'whistle', 'gap', 'buckTeeth', 'sideSmile', 'lipGloss', 'closedSmile', 'thinLips', 'drool',
-    'mustache', 'pipe', 'rainbowTongue', 'tongueOut', 'grimace', 'zen', 'diamond', 'openLaugh', 'toothyGrind',
+    'mustache', 'pipe',
   ],
   facialHair: ['soulPatch', 'muttonChops', 'pencilMustache', 'fuManchu', 'rainbowBeard'],
   hair: [
     'topknot', 'sideshave', 'bangs', 'mullet', 'combover', 'frizzle', 'durag', 'locsShort', 'fade',
     'wolfCut', 'curtainBangs', 'halfUp', 'himecut', 'frenchBob', 'shag', 'flatTop', 'lob',
     'fingerWaves', 'curlyBangs', 'quiff', 'heartBuns', 'sideBow', 'milkmaidBraids', 'butterflyClips',
-    'lowPigtailsBow', 'princessBraid', 'sideBraidBow', 'ramen', 'fadeCurly', 'twinTails', 'bobCut',
-    'pompadour', 'slickBack', 'neon', 'iceSpikes',
+    'lowPigtailsBow', 'princessBraid', 'sideBraidBow',
   ],
   accessory: [
     'butterflyClip', 'keffiyeh', 'mustacheGlasses', 'fez', 'hat', 'pearls', 'antenna', 'clownNose',
     'bowtie', 'turban', 'cucumberFace', 'monkeyEars', 'chefHat', 'noseRing', 'choker', 'plunger',
-    'devilHorns', 'monocle', 'mask', 'sombrero', 'gamerHeadset', 'graduationCap', 'tinfoilHat',
-    'earrings', 'ninjaScarf', 'cape', 'wings',
   ],
   bodyStyle: [],
 } as const;

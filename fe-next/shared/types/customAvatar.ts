@@ -32,6 +32,8 @@ export const AVATAR_HAIR_STYLES = [
   'lightning', 'rainbowMohawk', 'iceSpikes', 'cottonCandy', 'vaporwave',
   /* Premium overhaul hair */
   'longFlow', 'twinTails', 'bobCut', 'pompadour', 'slickBack',
+  /* 2026-11 chest drop: legendary */
+  'aurora',
 ] as const;
 
 /** Styles that look feminine — shown when gender is female. No overlap with MALE except gender-neutral shared (curly, afro, dreads, cornrows, straight). */
@@ -50,6 +52,8 @@ export const FEMALE_HAIR_STYLES = [
   'lightning', 'rainbowMohawk', 'iceSpikes', 'cottonCandy', 'vaporwave',
   /* 2026-09 redraw: unisex staples + showpieces */
   'ponytail', 'bun', 'elvis', 'flame', 'galaxy', 'trumpSwoop',
+  /* 2026-11 chest drop: revived + new, unisex */
+  'ramen', 'fadeCurly', 'pompadour', 'slickBack', 'neon', 'aurora',
 ] as const;
 
 /** Styles that look masculine — shown when gender is male. */
@@ -67,6 +71,8 @@ export const MALE_HAIR_STYLES = [
   'pompadour', 'slickBack',
   /* 2026-09 redraw: unisex staples + showpieces */
   'wavy', 'flame', 'galaxy',
+  /* 2026-11 chest drop: revived + new, unisex */
+  'twinTails', 'bobCut', 'neon', 'aurora',
 ] as const;
 
 /** Default hair when switching to female */
@@ -103,6 +109,8 @@ export const AVATAR_EYE_STYLES = [
   /* Premium overhaul eyes */
   'catEye', 'starEye', 'heartEye', 'diamondEye', 'sleepyEye', 'laserEye',
   'animeEye', 'cyberEye', 'gemEye', 'moonEye',
+  /* 2026-11 chest drop: legendary */
+  'supernova',
 ] as const;
 
 // ==================== Eyebrows ====================
@@ -156,6 +164,8 @@ export const AVATAR_ACCESSORIES = [
   'microphone', 'earsOut',
   /* Premium overhaul accessories */
   'earrings', 'cape', 'wings',
+  /* 2026-11 chest drop */
+  'unicornHorn', 'dragonWings', 'flameAura',
 ] as const;
 
 export const AVATAR_ACCESSORY_COLORS = [
@@ -278,7 +288,7 @@ export const PREMIUM_BASES = ['diamond', 'slime'] as const;
 // ==================== Epic Part Definitions (Legendary tier) ====================
 // Gradient-filled, multi-layer, jaw-dropping showpieces. 3-5x VIP price.
 
-export const EPIC_EYE_STYLES = ['galaxy', 'flame', 'robot', 'void', 'infinity', 'glitchEyes', 'rainbowEyes', 'thirdEye', 'starEye', 'heartEye', 'diamondEye', 'cyberEye', 'gemEye', 'moonEye'] as const;
+export const EPIC_EYE_STYLES = ['galaxy', 'flame', 'robot', 'void', 'infinity', 'glitchEyes', 'rainbowEyes', 'thirdEye', 'starEye', 'heartEye', 'diamondEye', 'cyberEye', 'gemEye', 'moonEye', 'supernova'] as const;
 export const EPIC_MOUTH_STYLES = ['dragon', 'diamond', 'glitch', 'grillz', 'neonSmile', 'openLaugh', 'toothyGrind'] as const;
 export const EPIC_ACCESSORIES = ['samurai', 'astronaut', 'wizardHat', 'ninjaScarf', 'phoenixCrown', 'cyberpunkVisor',
   // New epic accessories
@@ -286,8 +296,10 @@ export const EPIC_ACCESSORIES = ['samurai', 'astronaut', 'wizardHat', 'ninjaScar
   'microphone', 'earsOut',
   // Premium overhaul (Epic tier)
   'cape', 'wings',
+  // 2026-11 chest drop
+  'unicornHorn', 'dragonWings', 'flameAura',
 ] as const;
-export const EPIC_HAIR_STYLES = ['flame', 'galaxy', 'neon', 'lightning', 'rainbowMohawk', 'iceSpikes', 'trumpSwoop', 'recedingHair', 'highAndTight'] as const;
+export const EPIC_HAIR_STYLES = ['flame', 'galaxy', 'neon', 'lightning', 'rainbowMohawk', 'iceSpikes', 'trumpSwoop', 'recedingHair', 'highAndTight', 'aurora'] as const;
 export const EPIC_BASES = ['skull', 'shield', 'dragonHead', 'robotHead', 'alienHead', 'ghostFace', 'starBase', 'moonBase'] as const;
 
 export const PREMIUM_EYEBROW_STYLES = ['arched', 'bushy', 'scarred'] as const;
@@ -433,6 +445,9 @@ export const EPIC_PART_PRICES: Record<string, number> = {
   'hair:highAndTight': 6000, // celebrity lookalike part — legendary
   'accessory:microphone': 5000, // celebrity lookalike cue — legendary
   'accessory:earsOut': 5000, // celebrity lookalike cue — legendary
+  // 2026-11 chest drop
+  'accessory:unicornHorn': 1800,
+  'eyes:supernova': 6000, 'hair:aurora': 6000, 'accessory:dragonWings': 6000, 'accessory:flameAura': 6000,
 };
 
 /** Get price for a part (epic > vip per-part > category default) */
@@ -452,11 +467,24 @@ export function isEpicPart(category: string, value: string): boolean {
 }
 
 /** The 3 rarest items — shown with special golden LEGENDARY badge */
-export const LEGENDARY_PARTS = ['eyes:infinity', 'accessory:phoenixCrown', 'base:dragonHead', 'accessory:crystalCrown', 'eyes:thirdEye', 'hair:trumpSwoop', 'hair:recedingHair', 'hair:highAndTight', 'accessory:microphone', 'accessory:earsOut'] as const;
+export const LEGENDARY_PARTS = ['eyes:infinity', 'accessory:phoenixCrown', 'base:dragonHead', 'accessory:crystalCrown', 'eyes:thirdEye', 'hair:trumpSwoop', 'hair:recedingHair', 'hair:highAndTight', 'accessory:microphone', 'accessory:earsOut',
+  // 2026-11 chest drop: chest-only legendaries
+  'eyes:supernova', 'hair:aurora', 'accessory:dragonWings', 'accessory:flameAura'] as const;
 
 /** Check if a part is legendary (subset of epic) */
 export function isLegendaryPart(category: string, value: string): boolean {
   return LEGENDARY_PARTS.includes(`${category}:${value}` as typeof LEGENDARY_PARTS[number]);
+}
+
+/**
+ * Chest-only legendaries (2026-11): never sold for gold, only found in reward
+ * chests (lib/avatar/chestDrops.ts). Their EPIC_PART_PRICES entry is the
+ * duplicate/odds bookkeeping value, not a shop price.
+ */
+export const CHEST_ONLY_PARTS = ['eyes:supernova', 'hair:aurora', 'accessory:dragonWings', 'accessory:flameAura'] as const;
+
+export function isChestOnlyPart(category: string, value: string): boolean {
+  return (CHEST_ONLY_PARTS as readonly string[]).includes(`${category}:${value}`);
 }
 
 // Combined: all non-free parts (VIP + Epic)
@@ -487,17 +515,18 @@ export function getPremiumParts(category: string): string[] {
 // Drives the NEW badge in the builder so players discover the latest drops.
 // Keyed by category -> part ids. Bump this list when a new batch ships.
 const NEW_PARTS_MAP: Record<string, readonly string[]> = {
+  // 2026-11 chest drop: redrawn + brand-new parts that now come out of reward chests.
   accessory: [
-    'angelWings', 'demonWings', 'butterflyWings', 'gamerHeadset', 'cowboyHat',
-    'pirateHat', 'topHat', 'graduationCap', 'tinfoilHat', 'duckHat', 'vrHeadset',
-    'frogHat', 'flamingHalo', 'iceCrown', 'crystalCrown',
-    'earrings', 'cape', 'wings',
+    'devilHorns', 'monocle', 'mask', 'sombrero', 'gamerHeadset', 'graduationCap', 'tinfoilHat',
+    'earrings', 'ninjaScarf', 'cape', 'wings', 'unicornHorn', 'dragonWings', 'flameAura',
   ],
-  eyes: ['pixelEyes', 'targetEyes', 'kawaii', 'glitchEyes', 'rainbowEyes', 'thirdEye', 'catEye', 'starEye', 'heartEye', 'diamondEye', 'sleepyEye', 'laserEye', 'animeEye', 'cyberEye', 'gemEye', 'moonEye'],
-  mouth: ['fangs', 'rainbowTongue', 'robotMouth', 'grillz', 'neonSmile', 'openLaugh', 'grimace', 'tongueOut', 'zen', 'toothyGrind'],
-  hair: ['lightning', 'rainbowMohawk', 'iceSpikes', 'cottonCandy', 'vaporwave', 'longFlow', 'twinTails', 'bobCut', 'pompadour', 'slickBack'],
-  base: ['slime', 'robotHead', 'alienHead', 'ghostFace', 'starBase', 'moonBase'],
-  facialHair: ['rainbowBeard', 'flameBeard'],
+  eyes: [
+    'money', 'alien', 'pixelEyes', 'targetEyes', 'catEye', 'sleepyEye', 'laserEye', 'glitchEyes',
+    'rainbowEyes', 'diamondEye', 'cyberEye', 'gemEye', 'moonEye', 'supernova',
+  ],
+  mouth: ['rainbowTongue', 'tongueOut', 'grimace', 'zen', 'diamond', 'openLaugh', 'toothyGrind'],
+  hair: ['ramen', 'fadeCurly', 'twinTails', 'bobCut', 'pompadour', 'slickBack', 'neon', 'iceSpikes', 'aurora'],
+  base: ['shield', 'starBase', 'moonBase'],
 };
 
 /** Whether a part was added in the latest drop (shows a NEW ribbon in the builder). */

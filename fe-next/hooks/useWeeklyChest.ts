@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { getWithAuth, postWithAuth } from '@/utils/authFetch'
 import { useAuth } from '@/contexts/AuthContext'
 import posthog from '@/lib/analytics/lazyPosthog'
+import type { ChestPartDrop } from '@/lib/avatar/chestDrops'
 
 export interface PendingChest {
   tier: 'bronze' | 'silver' | 'gold'
@@ -13,6 +14,8 @@ export interface PendingChest {
   freezes?: number
   variantId?: string
   labelKey?: string
+  /** The avatar part the chest held (missing on legacy chests / if the part side was down). */
+  part?: ChestPartDrop
 }
 
 export type ChestTier = 'bronze' | 'silver' | 'gold'
@@ -220,6 +223,8 @@ export function useWeeklyChest(): WeeklyChestState {
         tier: json.tier,
         coins: json.coins,
         cycleNumber: json.cycleNumber,
+        part_rarity: json.part?.rarity ?? null,
+        part_duplicate: json.part?.duplicate ?? null,
       })
 
       // Claiming changes chest state — invalidate the shared cache and force-refetch.
