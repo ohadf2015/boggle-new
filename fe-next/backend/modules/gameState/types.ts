@@ -108,6 +108,8 @@ export interface GameState {
   hostReconnectionTimeout?: ReturnType<typeof setTimeout> | null;
   validationTimeout?: ReturnType<typeof setTimeout> | null;
   isRanked: boolean;
+  /** Auth user ids allowed into this ranked room (match ticket binding). */
+  rankedAllowedUserIds?: string[];
   isPrivate: boolean;
   /** Classroom-mode rooms skip auto-host-transfer. See audit T4 (2026-05-10). */
   isClassroom: boolean;
@@ -196,6 +198,7 @@ export interface GameCreationData {
   roomName?: string;
   language?: Language;
   isRanked?: boolean;
+  rankedAllowedUserIds?: string[];
   isPrivate?: boolean;
   isClassroom?: boolean;
   /** Quick Play made this room (the duo bot only joins these). */

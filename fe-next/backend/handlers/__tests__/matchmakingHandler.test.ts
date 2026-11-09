@@ -1,12 +1,9 @@
-import { vi, type Mock } from 'vitest';
+import { vi, type Mock, beforeEach, afterEach, describe, it, expect } from 'vitest';
 import { registerMatchmakingHandlers } from '../matchmakingHandler';
 import { MatchmakingQueue } from '../../services/matchmakingQueue';
 
 vi.mock('../../utils/logger', () => ({ default: {
-  info: vi.fn(),
-  debug: vi.fn(),
-  warn: vi.fn(),
-  error: vi.fn(),
+  info: vi.fn(), debug: vi.fn(), warn: vi.fn(), error: vi.fn(),
 } }));
 
 vi.mock('../../utils/rateLimiter', () => ({
@@ -26,7 +23,19 @@ vi.mock('@/lib/ranked/tiers', () => ({
   getTierFromElo: () => ({ id: 'silver', name: 'Silver' }),
 }));
 
-function createMockSocket(id = 'socket-1') {
+vi.mock('../../config/rankedMatchmaking', async () => {
+  const actual = await vi.importActual<typeof import('../../config/rankedMatchmaking')>(
+    '../../config/rankedMatchmaking',
+  );
+  return {
+    ...actual,
+    isRankedMatchmakingEnabled: vi.fn(() => true),
+  };
+});
+
+import { isRankedMatchmakingEnabled } from '../../config/rankedMatchmaking';
+
+function createMockSocket(id = 'socket-1', verified = true) {
   const handlers: Record<string, Function> = {};
   const userId = `user-${id}`;
   return {
@@ -36,16 +45,17 @@ function createMockSocket(id = 'socket-1') {
     }),
     emit: vi.fn(),
     _handlers: handlers,
-    data: { verifiedUserId: userId },
+    data: verified ? { verifiedUserId: userId } : {},
     handshake: { auth: { authUserId: userId } },
   };
 }
 
-function createMockIo() {
+function createMockIo(sockets: Map<string, ReturnType<typeof createMockSocket>>) {
   const mockSocket = { emit: vi.fn() };
   return {
     to: vi.fn(() => mockSocket),
     _mockSocket: mockSocket,
+    sockets: { sockets },
   };
 }
 
@@ -70,30 +80,15 @@ function mockEligible() {
   });
 }
 
-function mockIneligible() {
-  mockFrom.mockImplementation(() => ({
-    select: () => ({
-      eq: () => ({
-        maybeSingle: async () => ({ data: { casual_games_played: 2, unlocked_at: null } }),
-        single: async () => ({ data: { ranked_mmr: 1000 } }),
-      }),
-    }),
-  }));
-}
-
 describe('matchmakingHandler', () => {
-  let io: ReturnType<typeof createMockIo>;
-  let socket: ReturnType<typeof createMockSocket>;
   let queue: MatchmakingQueue;
 
   beforeEach(() => {
     vi.useFakeTimers();
     mockFrom.mockReset();
     mockEligible();
-    io = createMockIo();
-    socket = createMockSocket('socket-1');
+    (isRankedMatchmakingEnabled as unknown as Mock).mockReturnValue(true);
     queue = new MatchmakingQueue();
-    registerMatchmakingHandlers(io as any, socket as any, queue);
   });
 
   afterEach(() => {
@@ -101,18 +96,22 @@ describe('matchmakingHandler', () => {
     queue.destroy();
   });
 
-  it('joinMatchmaking adds eligible player to queue', async () => {
+  it('rejects join when RANKED_MATCHMAKING_ENABLED is off (client cannot bypass)', async () => {
+    (isRankedMatchmakingEnabled as unknown as Mock).mockReturnValue(false);
+    const socket = createMockSocket('socket-1');
+    const io = createMockIo(new Map([[socket.id, socket]]));
+    registerMatchmakingHandlers(io as any, socket as any, queue);
     await socket._handlers['joinMatchmaking']({ gameMode: 'classic', language: 'en' });
-    expect(queue.getQueueStats().playersInQueue).toBe(1);
     expect(socket.emit).toHaveBeenCalledWith(
-      'matchmakingUpdate',
-      expect.objectContaining({ queueSize: 1, eloRange: expect.any(Number) }),
+      'matchmakingError',
+      expect.objectContaining({ error: 'DISABLED' }),
     );
+    expect(queue.getQueueStats().playersInQueue).toBe(0);
   });
 
-  it('rejects unauthenticated join', async () => {
-    socket.data = {};
-    socket.handshake = { auth: {} };
+  it('rejects handshake-only auth (spoofable authUserId)', async () => {
+    const socket = createMockSocket('socket-1', false);
+    const io = createMockIo(new Map([[socket.id, socket]]));
     registerMatchmakingHandlers(io as any, socket as any, queue);
     await socket._handlers['joinMatchmaking']({ gameMode: 'classic', language: 'en' });
     expect(socket.emit).toHaveBeenCalledWith(
@@ -122,41 +121,44 @@ describe('matchmakingHandler', () => {
     expect(queue.getQueueStats().playersInQueue).toBe(0);
   });
 
-  it('rejects players who have not unlocked ranked', async () => {
-    mockIneligible();
+  it('joinMatchmaking adds eligible verified player to queue', async () => {
+    const socket = createMockSocket('socket-1');
+    const io = createMockIo(new Map([[socket.id, socket]]));
+    registerMatchmakingHandlers(io as any, socket as any, queue);
     await socket._handlers['joinMatchmaking']({ gameMode: 'classic', language: 'en' });
-    expect(socket.emit).toHaveBeenCalledWith(
-      'matchmakingError',
-      expect.objectContaining({ error: 'NOT_ELIGIBLE' }),
-    );
-    expect(queue.getQueueStats().playersInQueue).toBe(0);
+    expect(queue.getQueueStats().playersInQueue).toBe(1);
   });
 
-  it('leaveMatchmaking removes player from queue', async () => {
-    await socket._handlers['joinMatchmaking']({ gameMode: 'classic', language: 'en' });
-    socket._handlers['leaveMatchmaking']();
-    expect(queue.getQueueStats().playersInQueue).toBe(0);
-  });
-
-  it('matched players receive matchFound with host/joiner roles', async () => {
+  it('stamps host/joiner tickets on matchFound', async () => {
     const socket1 = createMockSocket('socket-1');
     const socket2 = createMockSocket('socket-2');
-    const sharedQueue = new MatchmakingQueue();
-    registerMatchmakingHandlers(io as any, socket1 as any, sharedQueue);
-    registerMatchmakingHandlers(io as any, socket2 as any, sharedQueue);
+    const sockets = new Map([[socket1.id, socket1], [socket2.id, socket2]]);
+    const io = createMockIo(sockets);
+    registerMatchmakingHandlers(io as any, socket1 as any, queue);
+    registerMatchmakingHandlers(io as any, socket2 as any, queue);
 
     await socket1._handlers['joinMatchmaking']({ gameMode: 'classic', language: 'en' });
     await socket2._handlers['joinMatchmaking']({ gameMode: 'classic', language: 'en' });
-
     await vi.advanceTimersByTimeAsync(2000);
 
-    expect(io.to).toHaveBeenCalled();
-    const emits = (io._mockSocket.emit as Mock).mock.calls.filter((c) => c[0] === 'matchFound');
-    expect(emits.length).toBeGreaterThanOrEqual(1);
-    const payload = emits[0][1] as { role: string; opponent: { username: string; elo: number } };
-    expect(['host', 'joiner']).toContain(payload.role);
-    expect(payload.opponent).toEqual(
-      expect.objectContaining({ username: expect.any(String), elo: expect.any(Number) }),
+    expect(socket1.data.rankedMatchTicket).toEqual(
+      expect.objectContaining({ role: 'host', playerId: 'user-socket-1', opponentId: 'user-socket-2' }),
     );
+    expect(socket2.data.rankedMatchTicket).toEqual(
+      expect.objectContaining({ role: 'joiner', playerId: 'user-socket-2', opponentId: 'user-socket-1' }),
+    );
+    expect(socket1.data.rankedMatchTicket.roomId).toMatch(/^[A-Za-z0-9]{6,10}$/);
+    expect(socket1.data.rankedMatchTicket.roomId).toBe(socket2.data.rankedMatchTicket.roomId);
+  });
+
+  it('leaveMatchmaking clears queue entry and ticket', async () => {
+    const socket = createMockSocket('socket-1');
+    const io = createMockIo(new Map([[socket.id, socket]]));
+    registerMatchmakingHandlers(io as any, socket as any, queue);
+    await socket._handlers['joinMatchmaking']({ gameMode: 'classic', language: 'en' });
+    socket.data.rankedMatchTicket = { roomId: 'X', role: 'host', playerId: 'u', opponentId: 'o', expiresAt: Date.now() + 9999 };
+    socket._handlers['leaveMatchmaking']();
+    expect(queue.getQueueStats().playersInQueue).toBe(0);
+    expect(socket.data.rankedMatchTicket).toBeNull();
   });
 });

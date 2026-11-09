@@ -167,6 +167,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = (props) => {
 
   const heroOwnsScreen = s.showCgHero && !s.heroExpanded;
 
+  // Queue CTA only — ProfileRankedProgress / leagues / MMR badge stay mounted elsewhere.
   const rankedAction = resolveRankedCta({
     flagOn: rankedFlag === 'on',
     isAuthenticated: authReady,

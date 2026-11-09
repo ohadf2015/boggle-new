@@ -1,8 +1,9 @@
 /**
- * Decide what the multiplayer hub Ranked CTA should do.
+ * Decide what the multiplayer hub Ranked *queue* CTA should do.
  *
- * Never a blind isAdmin flip: eligibility (`canPlayRanked`) and the PostHog
- * kill-switch both gate join. Guests get an auth prompt — not a silent hide.
+ * Progress / league / MMR surfaces are independent — they stay visible even
+ * when this returns `hidden`. The PostHog flag defaults to off; the server
+ * also requires RANKED_MATCHMAKING_ENABLED=true before joinMatchmaking works.
  */
 export type RankedCtaAction = 'hidden' | 'auth' | 'locked' | 'join';
 

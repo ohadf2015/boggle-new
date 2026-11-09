@@ -235,9 +235,12 @@ export const EXPERIMENTS = {
    */
   'ranked-public-v1': defineExperiment({
     variants: ['on', 'off'] as const,
-    default: 'on',
+    // Default OFF: in-memory matchmaking is not replica-safe (Redis Socket.IO
+    // adapter). Operators must flip PostHog to on AND set
+    // RANKED_MATCHMAKING_ENABLED=true before public queue use.
+    default: 'off',
     description:
-      'Ranked multiplayer CTA kill-switch. on = show Ranked for authenticated eligible players (default). off = hide CTA. Guests still see an auth prompt when on. Eligibility (10 casual / unlocked_at) stays server-enforced.',
+      'Ranked multiplayer QUEUE CTA. Default off. on = show Ranked join for eligible signed-in players when remote flag allows. off = hide queue CTA (progress/league/MMR UI stays). Server also requires RANKED_MATCHMAKING_ENABLED=true — clients cannot bypass.',
   }),
 
   'mp.desktop-shell.v1': defineExperiment({

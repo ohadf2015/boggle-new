@@ -1,9 +1,14 @@
 /**
- * Matchmaking Handler
- * Wires MatchmakingQueue into Socket.IO events.
+ * Matchmaking Handler — wires MatchmakingQueue into Socket.IO.
  *
- * Server derives playerId + ELO; clients cannot spoof eligibility.
- * Ranked unlock mirrors client canPlayRanked: unlocked_at OR ≥10 casual games.
+ * Hard gates (cannot be bypassed by client payload):
+ *  1. RANKED_MATCHMAKING_ENABLED=true (default OFF — in-memory queue is not
+ *     replica-safe under the Redis Socket.IO adapter).
+ *  2. socket.data.verifiedUserId only (never handshake.auth spoof).
+ *  3. ranked_progress eligibility (unlocked_at OR ≥10 casual games).
+ *
+ * On matchFound, stamps a short-lived RankedMatchTicket on both sockets so
+ * createGame(isRanked) / join cannot be forged with a guessed code.
  */
 
 import type { Server, Socket } from 'socket.io';
@@ -15,12 +20,17 @@ import { validatePayload } from '../utils/socketValidation.js';
 import { getSupabase } from '../modules/supabase/client.js';
 import { DEFAULT_RATING } from '@/shared/utils/eloRating';
 import { getTierFromElo } from '@/lib/ranked/tiers';
+import { getAuthUserId } from '../utils/socialHelpers.js';
+import {
+  buildRankedMatchTicket,
+  isRankedMatchmakingEnabled,
+  type RankedMatchTicket,
+} from '../config/rankedMatchmaking.js';
 
 const MATCH_INTERVAL_MS = 2000;
 const TIMEOUT_MS = 60000;
 const CASUAL_GAMES_TO_UNLOCK = 10;
 
-/** Process-wide queue so players on different sockets can match. */
 export const sharedMatchmakingQueue = new MatchmakingQueue();
 
 const joinMatchmakingSchema = z.object({
@@ -30,11 +40,15 @@ const joinMatchmakingSchema = z.object({
 
 type JoinMatchmakingData = z.infer<typeof joinMatchmakingSchema>;
 
+type SocketData = {
+  verifiedUserId?: string;
+  rankedMatchTicket?: RankedMatchTicket | null;
+};
+
 async function isRankedEligible(playerId: string): Promise<boolean> {
   try {
     const client = getSupabase();
     if (!client) {
-      // Fail closed when we cannot verify progress — do not open ranked to everyone.
       logger.warn('MATCHMAKING', `No Supabase client; denying ranked for ${playerId}`);
       return false;
     }
@@ -61,6 +75,16 @@ function opponentPayload(entry: { playerId: string; elo: number }) {
   };
 }
 
+function stampTicket(
+  io: Server,
+  socketId: string,
+  ticket: RankedMatchTicket,
+): void {
+  const sock = io.sockets.sockets.get(socketId) as Socket | undefined;
+  if (!sock) return;
+  (sock.data as SocketData).rankedMatchTicket = ticket;
+}
+
 export function registerMatchmakingHandlers(
   io: Server,
   socket: Socket,
@@ -83,24 +107,27 @@ export function registerMatchmakingHandlers(
 
   socket.on('joinMatchmaking', async (rawData: unknown) => {
     cleanup();
+    (socket.data as SocketData).rankedMatchTicket = null;
+
+    if (!isRankedMatchmakingEnabled()) {
+      socket.emit('matchmakingError', {
+        error: 'DISABLED',
+        message: 'Ranked matchmaking is not enabled on this server',
+      });
+      return;
+    }
 
     if (!checkRateLimit(socket.id)) {
       socket.emit('matchmakingError', { error: 'RATE_LIMITED', message: 'Too many requests' });
       return;
     }
 
-    const verifiedUserId = (socket.data as Record<string, unknown>)?.verifiedUserId as string | undefined;
-    const fallbackUserId = socket.handshake.auth?.authUserId as string | undefined;
-    if (!verifiedUserId && !fallbackUserId) {
+    // Verified JWT only — handshake.auth.authUserId is client-spoofable.
+    const playerId = getAuthUserId(socket);
+    if (!playerId) {
       socket.emit('matchmakingError', { error: 'UNAUTHORIZED', message: 'Authentication required' });
       return;
     }
-
-    if (!verifiedUserId && fallbackUserId) {
-      logger.warn('MATCHMAKING', `Socket ${socket.id} using unverified fallback authUserId`);
-    }
-
-    const playerId = verifiedUserId ?? fallbackUserId!;
 
     const eligible = await isRankedEligible(playerId);
     if (!eligible) {
@@ -150,6 +177,21 @@ export function registerMatchmakingHandlers(
         if (match) {
           cleanup();
 
+          const hostTicket = buildRankedMatchTicket({
+            roomId: match.roomId,
+            role: 'host',
+            playerId: match.player1.playerId,
+            opponentId: match.player2.playerId,
+          });
+          const joinerTicket = buildRankedMatchTicket({
+            roomId: match.roomId,
+            role: 'joiner',
+            playerId: match.player2.playerId,
+            opponentId: match.player1.playerId,
+          });
+          stampTicket(io, match.player1.socketId, hostTicket);
+          stampTicket(io, match.player2.socketId, joinerTicket);
+
           io.to(match.player1.socketId).emit('matchFound', {
             roomId: match.roomId,
             role: 'host',
@@ -181,15 +223,18 @@ export function registerMatchmakingHandlers(
     timeoutTimer = setTimeout(() => {
       socket.emit('matchmakingTimeout');
       cleanup();
+      (socket.data as SocketData).rankedMatchTicket = null;
       logger.info('MATCHMAKING', `Player ${playerId} timed out`);
     }, TIMEOUT_MS);
   });
 
   socket.on('leaveMatchmaking', () => {
     cleanup();
+    (socket.data as SocketData).rankedMatchTicket = null;
   });
 
   socket.on('disconnect', () => {
     cleanup();
+    (socket.data as SocketData).rankedMatchTicket = null;
   });
 }

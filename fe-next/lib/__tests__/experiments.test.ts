@@ -109,7 +109,7 @@ describe('experiments registry', () => {
       expect(EXPERIMENTS['ranked-public-v1']).toBeDefined();
     });
     it('defaults to on', () => {
-      expect(EXPERIMENTS['ranked-public-v1'].default).toBe('on');
+      expect(EXPERIMENTS['ranked-public-v1'].default).toBe('off');
     });
     it('has on/off variants for kill-switch', () => {
       expect(EXPERIMENTS['ranked-public-v1'].variants).toEqual(['on', 'off']);

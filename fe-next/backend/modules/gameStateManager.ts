@@ -152,6 +152,7 @@ function createGame(gameCode: string, data: GameCreationData): GameState {
     tournamentId: null,
     reconnectionTimeout: null,
     isRanked: data.isRanked || false,
+    rankedAllowedUserIds: data.rankedAllowedUserIds,
     isPrivate: data.isPrivate || false,
     isClassroom: data.isClassroom || false,
     isQuickPlay: data.isQuickPlay || false,

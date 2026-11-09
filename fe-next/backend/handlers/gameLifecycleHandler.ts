@@ -60,6 +60,12 @@ import { generateRandomAvatar } from '../utils/gameUtils.js';
 import { getRandomLongWordsWithTheme, ensureLanguageLoaded } from '../dictionary.js';
 import { classroomRoomLanguage } from '../modules/classroomRoomLanguage.js';
 import logger from '../utils/logger.js';
+import { getAuthUserId } from '../utils/socialHelpers.js';
+import {
+  isRankedMatchmakingEnabled,
+  isRankedMatchTicketValid,
+  type RankedMatchTicket,
+} from '../config/rankedMatchmaking.js';
 import { startGameTimer, endGame } from './shared.js';
 import { resendFinishedResults } from './finishedResultsResend';
 import { tryReclaimClassroomHostSeat } from './classroomGameHostReclaim';
@@ -149,16 +155,34 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
 
       const { gameCode, roomName, language, hostUsername, playerId, avatar, authUserId, guestTokenHash, guestSessionId, isRanked, isPrivate: requestedPrivate, isQuickPlay } = validation.data as CreateGamePayload;
 
-      // Ranked rooms must be hosted by an authenticated user — guests can't
-      // submit results that update the ranked MMR leaderboard, so allowing
-      // them to flag their room as ranked would silently waste matchmaking
-      // intent and pollute lobby filters (audit SRV-CRIT-2).
-      if (isRanked && !authUserId) {
-        logger.warn('SOCKET', `Rejected ranked room ${gameCode}: host not authenticated`);
-        emitError(socket, ErrorCodes.AUTH_FORBIDDEN, {
-          message: 'Ranked rooms require a signed-in host',
-        });
-        return;
+      // Ranked rooms: never trust client isRanked alone. Require explicit
+      // server opt-in + a short-lived match ticket stamped by matchmaking
+      // (verified user id, room code, host role). Spoofed authUserId in the
+      // createGame payload is ignored for this check.
+      let rankedAllowedUserIds: string[] | undefined;
+      if (isRanked) {
+        if (!isRankedMatchmakingEnabled()) {
+          logger.warn('SOCKET', `Rejected ranked room ${gameCode}: matchmaking disabled`);
+          emitError(socket, ErrorCodes.AUTH_FORBIDDEN, {
+            message: 'Ranked matchmaking is not enabled',
+          });
+          return;
+        }
+        const verifiedId = getAuthUserId(socket);
+        const ticket = (socket.data as { rankedMatchTicket?: RankedMatchTicket | null })?.rankedMatchTicket;
+        if (
+          !verifiedId ||
+          !isRankedMatchTicketValid(ticket, { roomId: gameCode, role: 'host', playerId: verifiedId })
+        ) {
+          logger.warn('SOCKET', `Rejected ranked room ${gameCode}: missing/invalid match ticket`);
+          emitError(socket, ErrorCodes.AUTH_FORBIDDEN, {
+            message: 'Ranked rooms require a valid matchmaking ticket',
+          });
+          return;
+        }
+        rankedAllowedUserIds = [ticket!.playerId, ticket!.opponentId];
+        // Consume host ticket so it cannot mint a second ranked room.
+        (socket.data as { rankedMatchTicket?: RankedMatchTicket | null }).rankedMatchTicket = null;
       }
 
       logger.info('SOCKET', `Create game request: ${gameCode} by ${hostUsername}${isRanked ? ' (RANKED)' : ''}`, {
@@ -209,6 +233,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         roomName: roomName || gameCode,
         language: roomLanguage,
         isRanked: isRanked || false,
+        rankedAllowedUserIds,
         isPrivate,
         isClassroom,
         isQuickPlay: isQuickPlay || false,
