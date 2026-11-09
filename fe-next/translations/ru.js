@@ -2057,7 +2057,8 @@ const ru = {
     "lockedInCount": "Ответили: {locked} из {total}",
     "rank": "{position}-е место из {total}",
     "score": {
-      "label": "Ваши очки: {score}"
+      "label": "Ваши очки: {score}",
+      "popLabel": "очков в этом раунде"
     },
     "mascot": {
       "alt": "Лекси реагирует на твой ответ"

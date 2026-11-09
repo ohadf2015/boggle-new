@@ -2055,7 +2055,8 @@ const ja = {
     "lockedInCount": "{total}人中{locked}人が回答",
     "rank": "{total}人中{position}位",
     "score": {
-      "label": "あなたのスコア：{score}"
+      "label": "あなたのスコア：{score}",
+      "popLabel": "このラウンドのポイント"
     },
     "mascot": {
       "alt": "答えに反応するレキシ"

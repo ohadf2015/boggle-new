@@ -18,6 +18,8 @@ const knobs = vi.hoisted(() => ({
   reviewLessonId: '',
   reviewCount: 0,
   streakAtRisk: false,
+  /** Classroom round payout; drives the post-play feedback bubble. */
+  reward: null as null | { userId: string; xpEarned: number; lessonIds: string[]; gameCode: string },
 }));
 
 vi.mock('next/navigation', () => ({
@@ -65,7 +67,7 @@ vi.mock('@/hooks/useActiveClassroomGame', () => ({
   useActiveClassroomGame: () => ({ activeGame: knobs.activeGame, socket: null, isConnected: true }),
 }));
 vi.mock('@/hooks/useClassroomRewardListener', () => ({
-  useClassroomRewardListener: () => ({ reward: null, clearReward: vi.fn() }),
+  useClassroomRewardListener: () => ({ reward: knobs.reward, clearReward: vi.fn() }),
 }));
 
 export function asStudent(extra: Record<string, unknown> = {}) {
@@ -84,6 +86,7 @@ export function resetKnobs() {
   knobs.reviewLessonId = '';
   knobs.reviewCount = 0;
   knobs.streakAtRisk = false;
+  knobs.reward = null;
   knobs.landscape = false;
   knobs.view = null;
   window.matchMedia = ((q: string) => ({

@@ -2,7 +2,7 @@
  * feedbackThrottle — shared anti-annoyance policy for in-game feedback prompts.
  *
  * One small card asks players "how was that?" on various end-of-game surfaces
- * (multiplayer round, single-player, daily). To never nag, all surfaces share
+ * (multiplayer round, single-player, daily, class round). To never nag, all surfaces share
  * ONE budget:
  *   - global cooldown: at most one prompt per COOLDOWN_DAYS across every surface
  *   - min-games gate: never prompt before a player has finished MIN_GAMES games

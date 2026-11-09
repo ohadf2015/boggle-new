@@ -2055,7 +2055,8 @@ const sv = {
     "lockedInCount": "{locked}/{total} har svarat",
     "rank": "Plats {position} av {total}",
     "score": {
-      "label": "Dina poäng: {score}"
+      "label": "Dina poäng: {score}",
+      "popLabel": "poäng den här rundan"
     },
     "mascot": {
       "alt": "Lexi reagerar på ditt svar"
