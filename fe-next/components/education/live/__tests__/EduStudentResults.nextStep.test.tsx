@@ -2,6 +2,7 @@ import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { isAdFreeRoute } from '@/lib/admob-routes';
 
 const controller = vi.hoisted(() => ({ current: null as unknown }));
 const openPractice = vi.hoisted(() => vi.fn());
@@ -109,7 +110,9 @@ describe('EduStudentResults — one next step', () => {
     await waitFor(() => expect(share).toHaveBeenCalledTimes(1));
     const sent = JSON.stringify(share.mock.calls[0][0]);
     expect(share.mock.calls[0][0].text).toBe('eduLiveRoom.studentResults.shareText:{"rank":2,"total":2,"score":20}');
-    expect(share.mock.calls[0][0].url).toBe(`${window.location.origin}/en/daily?utm_source=edu_student_share&utm_medium=referral`);
+    expect(share.mock.calls[0][0].url).toBe(`${window.location.origin}/en/join?utm_source=edu_student_share&utm_medium=referral`);
+    // A minor's share never lands on an ad-carrying consumer page (COPPA).
+    expect(isAdFreeRoute(new URL(share.mock.calls[0][0].url).pathname)).toBe(true);
     for (const secret of ['Maya', 'Noa', 'Ms Cohen', 'AB12CD', 'room=']) expect(sent).not.toContain(secret);
     expect(capture).toHaveBeenCalledWith('edu_student_result_shared', expect.objectContaining({ method: 'native' }));
   });

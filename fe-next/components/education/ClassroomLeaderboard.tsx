@@ -103,8 +103,8 @@ const LeaderboardEntryRow = memo<LeaderboardEntryRowProps>(
           delay: index * 0.04,
         }}
         className={cn(
-          'relative p-4 rounded-neo border-neo shadow-hard-sm',
-          'flex items-center gap-4',
+          'relative p-3 sm:p-4 rounded-neo border-neo shadow-hard-sm',
+          'flex items-center gap-2.5 sm:gap-4',
           isCurrentUser
             ? 'bg-neo-cyan/20 border-neo-cyan'
             : 'bg-neo-navy border-neo-black',
@@ -139,14 +139,14 @@ const LeaderboardEntryRow = memo<LeaderboardEntryRowProps>(
             )}
           </div>
 
-          <div className="flex items-center gap-3">
+          <div data-testid="leaderboard-row-badges" className="flex flex-wrap items-center gap-x-2 gap-y-1">
             {/* XP */}
-            <span className="font-neo-body font-bold text-neo-lime text-sm tabular-nums">
+            <span className="whitespace-nowrap font-neo-body font-bold text-neo-lime text-sm tabular-nums">
               {t('education.leaderboard.xp', { xp: animatedXp })}
             </span>
 
             {/* Level */}
-            <span className="px-2 py-0.5 text-xs font-neo-body bg-neo-cyan text-neo-black rounded">
+            <span className="whitespace-nowrap px-2 py-0.5 text-xs font-neo-body bg-neo-cyan text-neo-black rounded">
               {t('education.leaderboard.level', { level: currentLevel })}
             </span>
 
@@ -154,7 +154,7 @@ const LeaderboardEntryRow = memo<LeaderboardEntryRowProps>(
             {currentStreak >= 3 && (
               <span
                 data-testid="streak-badge"
-                className="px-2 py-0.5 text-xs font-neo-body bg-neo-pink text-neo-black rounded flex items-center gap-1"
+                className="whitespace-nowrap px-2 py-0.5 text-xs font-neo-body bg-neo-pink text-neo-black rounded flex items-center gap-1"
               >
                 <Flame className="w-4 h-4 inline" /> {currentStreak}
               </span>
