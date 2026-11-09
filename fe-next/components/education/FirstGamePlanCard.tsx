@@ -3,7 +3,7 @@
 import { useId, useState } from 'react';
 import { CalendarPlus, Check, Download, Send } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { NB_LINK, NB_PANEL, NB_SECONDARY } from '@/components/teacher/nb/nbStyles';
+import { NB_BLOCK, NB_INPUT, NB_PANEL, NB_SECONDARY, NB_SMALL, NB_STICKER } from '@/components/teacher/nb/nbStyles';
 import {
   buildFirstGameEvent,
   defaultFirstGameStart,
@@ -77,7 +77,9 @@ export function FirstGamePlanCard({ classroom, joinUrl, origin, language, t, cla
   return (
     <section data-testid="first-game-plan" aria-labelledby={`${inputId}-title`} className={cn(NB_PANEL, 'flex flex-col gap-3 p-4', className)}>
       <div className="flex items-start gap-3">
-        <CalendarPlus className="mt-0.5 size-6 shrink-0 text-neo-cyan" aria-hidden="true" />
+        <span className="inline-flex size-11 shrink-0 -rotate-3 items-center justify-center rounded-neo border-[3px] border-neo-black bg-neo-cyan text-neo-black shadow-hard" aria-hidden="true">
+          <CalendarPlus className="size-6" />
+        </span>
         <div className="min-w-0">
           <h2 id={`${inputId}-title`} className="font-neo-display text-lg font-black text-neo-cream">
             {t('eduShell.setup.plan.title')}
@@ -97,23 +99,23 @@ export function FirstGamePlanCard({ classroom, joinUrl, origin, language, t, cla
             setWhen(e.target.value);
             setAdded(false);
           }}
-          className="min-h-[48px] rounded-neo-lg border-[3px] border-neo-cream/60 bg-neo-navy px-3 font-neo-body text-base text-neo-cream [color-scheme:dark] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+          className={cn(NB_INPUT, '[color-scheme:light]')}
         />
       </label>
 
       {added ? (
-        <p data-testid="first-game-plan-added" role="status" className="inline-flex items-center gap-2 font-neo-body text-sm font-bold text-neo-lime">
+        <p data-testid="first-game-plan-added" role="status" className={cn(NB_STICKER, NB_BLOCK.lime, 'self-start text-sm')}>
           <Check className="size-4" aria-hidden="true" />
           {t('eduShell.setup.plan.added')}
         </p>
       ) : null}
 
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-        <button type="button" data-testid="first-game-plan-google" disabled={!start} onClick={() => add('google')} className={cn(NB_SECONDARY, 'w-full sm:w-auto')}>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <button type="button" data-testid="first-game-plan-google" disabled={!start} onClick={() => add('google')} className={cn(NB_SECONDARY, NB_BLOCK.cyan, 'w-full sm:w-auto')}>
           <CalendarPlus className="size-5" aria-hidden="true" />
           {t('eduShell.setup.plan.google')}
         </button>
-        <button type="button" data-testid="first-game-plan-ics" disabled={!start} onClick={() => add('ics')} className={NB_LINK}>
+        <button type="button" data-testid="first-game-plan-ics" disabled={!start} onClick={() => add('ics')} className={cn(NB_SMALL, NB_BLOCK.cream, 'w-full sm:w-auto')}>
           <Download className="size-4" aria-hidden="true" />
           {t('eduShell.setup.plan.ics')}
         </button>
@@ -131,7 +133,7 @@ export function FirstGamePlanCard({ classroom, joinUrl, origin, language, t, cla
               trackHomePracticeLinkSent({ classroomId: classroom.id, locale: language });
               onSendHomeLink();
             }}
-            className={cn(NB_SECONDARY, 'w-full sm:w-auto sm:self-start')}
+            className={cn(NB_SECONDARY, NB_BLOCK.yellow, 'w-full sm:w-auto sm:self-start')}
           >
             <Send className="size-5" aria-hidden="true" />
             {t('eduShell.setup.plan.homeCta')}
