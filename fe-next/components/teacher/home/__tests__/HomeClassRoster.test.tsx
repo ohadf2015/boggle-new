@@ -222,6 +222,19 @@ describe('<HomeClassRoster>', () => {
     expect(screen.getByTestId('home-roster-activity')).toHaveTextContent('eduShell.home.roster.noStreak');
   });
 
+  it('Given a student with a level, Then the drawer shows the same level the student sees', () => {
+    const rows = rosterRows([{ ...base, currentLevel: 4, studentId: 'l', displayName: 'Lia', totalXp: 640, lastPracticeDate: new Date(NOW - DAY).toISOString() }], NOW);
+    renderRoster(rows);
+    fireEvent.click(screen.getByTestId('home-roster-row'));
+    expect(screen.getByTestId('home-roster-level')).toHaveTextContent('eduShell.home.roster.statLevel:{"level":4}');
+  });
+
+  it('Given no level from the read, Then the drawer shows no level chip instead of "Level 0"', () => {
+    renderRoster();
+    fireEvent.click(screen.getAllByTestId('home-roster-row')[0]);
+    expect(screen.queryByTestId('home-roster-level')).not.toBeInTheDocument();
+  });
+
   it('Given no students yet, Then it says how to get them in instead of an empty table', () => {
     renderRoster([]);
     expect(screen.getByTestId('home-roster-empty')).toHaveTextContent('eduShell.home.roster.empty');

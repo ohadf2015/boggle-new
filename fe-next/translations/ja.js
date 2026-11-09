@@ -21924,6 +21924,7 @@ const ja = {
         },
         "statXp": "獲得XP",
         "statWords": "覚えた単語",
+        "statLevel": "レベル{level}",
         "recent": "最近のアクティビティ",
         "lastPlayed": "最後のプレイ：{when}",
         "notYet": "まだ",

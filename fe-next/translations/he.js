@@ -21854,6 +21854,7 @@ const he = {
         },
         "statXp": "XP שנצבר",
         "statWords": "מילים שנלמדו",
+        "statLevel": "רמה {level}",
         "recent": "פעילות אחרונה",
         "lastPlayed": "משחק אחרון: {when}",
         "notYet": "עוד לא",

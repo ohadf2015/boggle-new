@@ -21924,6 +21924,7 @@ const sv = {
         },
         "statXp": "Intjänad XP",
         "statWords": "Inlärda ord",
+        "statLevel": "Nivå {level}",
         "recent": "Senaste aktivitet",
         "lastPlayed": "Senast spelat: {when}",
         "notYet": "inte än",

@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { m } from 'framer-motion';
-import { BookOpenCheck, CalendarDays, ClipboardList, Flame, Target, X, Zap } from 'lucide-react';
+import { BookOpenCheck, CalendarDays, ClipboardList, Flame, Star, Target, X, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import AvatarLite, { type AvatarLiteConfig } from '@/components/AvatarLite';
 import { EDU_MOTION, useReducedMotionSafe } from '@/components/education/motion';
@@ -82,6 +82,15 @@ function DetailBody({ row, onClose, onAssign, language, nowMs, t, titleAs }: Det
           )}
           <p className="mt-1">
             <StatusPill status={row.status} label={t(`eduShell.home.roster.status.${row.status}`)} />
+            {row.level !== null ? (
+              <span
+                data-testid="home-roster-level"
+                className="ms-1.5 inline-flex items-center gap-1 whitespace-nowrap rounded-full border-2 border-neo-cyan/60 bg-neo-cyan/15 px-2 py-px align-middle text-xs font-black text-neo-cyan"
+              >
+                <Star className="size-3" aria-hidden="true" />
+                {t('eduShell.home.roster.statLevel', { level: row.level })}
+              </span>
+            ) : null}
           </p>
         </div>
         <button

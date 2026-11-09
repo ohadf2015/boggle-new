@@ -21624,6 +21624,7 @@ const ru = {
         },
         "statXp": "Заработано XP",
         "statWords": "Выучено слов",
+        "statLevel": "Уровень {level}",
         "recent": "Недавняя активность",
         "lastPlayed": "Последняя игра: {when}",
         "notYet": "ещё нет",
