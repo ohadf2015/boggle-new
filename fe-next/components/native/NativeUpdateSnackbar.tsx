@@ -13,13 +13,20 @@ interface AppUpdatePlugin {
 
 const CHECK_DELAY_MS = 8000;
 
+// Capacitor throws if a plugin name is registered twice, so a remount must reuse the first handle.
+let appUpdatePlugin: AppUpdatePlugin | null | undefined;
+function getAppUpdatePlugin(): AppUpdatePlugin | null {
+  if (appUpdatePlugin === undefined) {
+    appUpdatePlugin = isNative() && isAndroid() ? registerPlugin<AppUpdatePlugin>('AppUpdate') : null;
+  }
+  return appUpdatePlugin;
+}
+
 /** Play flexible update: downloads in the background, then asks the player to restart (native AppUpdatePlugin). */
 export default function NativeUpdateSnackbar() {
   const { t } = useLanguage();
   const [ready, setReady] = useState(false);
-  const [plugin] = useState<AppUpdatePlugin | null>(() =>
-    isNative() && isAndroid() ? registerPlugin<AppUpdatePlugin>('AppUpdate') : null,
-  );
+  const [plugin] = useState(getAppUpdatePlugin);
 
   useEffect(() => {
     if (!plugin) return;
