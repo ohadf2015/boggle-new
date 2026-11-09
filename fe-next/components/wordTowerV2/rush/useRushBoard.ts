@@ -29,7 +29,7 @@ export function toRushRows(rows: ApiRow[], offsetM: number): RushBoardRow[] {
 }
 
 function fetchBoard(authed: boolean, language: string): Promise<ApiRow[] | null> {
-  let url = '/api/word-tower/leaderboard';
+  let url = `/api/word-tower/leaderboard?lang=${encodeURIComponent(language)}`;
   if (!authed) {
     const params = new URLSearchParams({ language });
     const fp = getGuestFingerprint();

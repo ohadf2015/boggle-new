@@ -55,7 +55,7 @@ function AvatarStage({ avatar, animate, t, onAvatarSaved }: Pick<PlayHeroProps, 
   }, [avatar, t, onAvatarSaved]);
 
   return (
-    <div className="relative flex h-[176px] w-full items-center [@media(max-height:700px)]:h-[132px] justify-center lg:h-[440px] 2xl:h-[520px]">
+    <div className="relative flex h-[132px] w-full items-center [@media(max-height:700px)]:h-[112px] justify-center lg:h-[440px] 2xl:h-[520px]">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-40 lg:opacity-60">
         <QuickResultsRays color={NODE_COLORS.classic.hex} spinning={animate} compact />
       </div>
@@ -76,19 +76,19 @@ function AvatarStage({ avatar, animate, t, onAvatarSaved }: Pick<PlayHeroProps, 
             <div
               ref={avatar ? avatarSlotCallback : undefined}
               data-testid="hp-avatar-slot"
-              className="h-[140px] w-[140px] lg:h-[260px] lg:w-[260px] 2xl:h-[300px] 2xl:w-[300px]"
+              className="h-[108px] w-[108px] lg:h-[260px] lg:w-[260px] 2xl:h-[300px] 2xl:w-[300px]"
             />
           </div>
         </div>
         <span
           aria-hidden="true"
-          className={`absolute -bottom-2 left-1/2 -z-10 h-3 w-24 -translate-x-1/2 rounded-[50%] bg-black/45 lg:w-48 ${
+          className={`absolute -bottom-2 left-1/2 -z-10 h-3 w-20 -translate-x-1/2 rounded-[50%] bg-black/45 lg:w-48 ${
             animate ? 'animate-[qp-shadow-bob_2.8s_ease-in-out_0.9s_infinite]' : ''
           }`}
         />
         <span
           aria-hidden="true"
-          className="absolute -start-[50px] bottom-0 -z-10 -rotate-12 lg:-start-[84px] lg:bottom-0 2xl:-start-[96px]"
+          className="absolute -start-[40px] bottom-0 -z-10 -rotate-12 lg:-start-[84px] lg:bottom-0 2xl:-start-[96px]"
         >
           <span className={`block ${animate ? 'animate-[qp-avatar-bob_2.2s_ease-in-out_0.4s_infinite]' : ''}`}>
             <Image
@@ -99,7 +99,7 @@ function AvatarStage({ avatar, animate, t, onAvatarSaved }: Pick<PlayHeroProps, 
               data-testid="hp-mascot"
               loading="eager"
               unoptimized
-              className="h-[80px] w-[80px] drop-shadow-[0_3px_0_black] lg:h-[136px] lg:w-[136px] 2xl:h-[160px] 2xl:w-[160px]"
+              className="h-[64px] w-[64px] drop-shadow-[0_3px_0_black] lg:h-[136px] lg:w-[136px] 2xl:h-[160px] 2xl:w-[160px]"
             />
           </span>
         </span>
@@ -169,11 +169,11 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
             </p>
             <h1
               id="hp-play-title"
-              className="mt-1 font-neo-display text-[21px] font-bold [@media(max-height:700px)]:text-[19px] leading-[1.15] text-neo-cream [text-shadow:0_2px_0_black] lg:text-5xl 2xl:text-6xl"
+              className="mt-0.5 font-neo-display text-[21px] font-bold [@media(max-height:700px)]:text-[19px] leading-[1.15] text-neo-cream [text-shadow:0_2px_0_black] lg:text-5xl 2xl:text-6xl"
             >
               {t('homePlay.heroLine')}
             </h1>
-            <p className="mx-auto mt-2 max-w-sm text-sm leading-snug text-neo-white/75 [@media(max-height:700px)]:text-xs lg:mx-0 lg:mt-4 lg:max-w-xl lg:text-lg">
+            <p className="mx-auto mt-1 max-w-sm text-[13px] leading-snug text-neo-white/70 [@media(max-height:700px)]:text-xs lg:mx-0 lg:mt-4 lg:max-w-xl lg:text-lg">
               {t('homePlay.intro')}
             </p>
           </div>

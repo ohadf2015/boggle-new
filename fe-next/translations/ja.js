@@ -1331,6 +1331,8 @@ const ja = {
     "weekly": {
       "kicker": "今週のボード",
       "play": "プレイ",
+      "endsIn": "終了まであと{days}日",
+      "lastDay": "今日まで！",
       "chip": "週替わりボード: {theme}",
       "theme": {
         "vowelParty": "母音パーティー",
@@ -1357,8 +1359,8 @@ const ja = {
   // @quick-loop:end
   // @home-play:start
   "homePlay": {
-    "heroLine": "60秒、まっさらな盤面、そして待ってくれないライバルが3人。",
-    "intro": "LexiClashはブラウザで遊べる無料の単語ゲームです。文字盤からできるだけ多くの単語を見つけて、ボットや友だち、クラスのみんなと対戦できます。6つの言語で遊べます。",
+    "heroLine": "60秒。新しい盤面。ライバル3人。",
+    "intro": "LexiClashはブラウザで遊べる無料の単語ゲーム。6言語対応。",
     "playSub": "ソロ・ランダムモード",
     "pickMode": "またはソロモードを選ぶ",
     "timerBadge": "60秒",
@@ -9831,7 +9833,9 @@ const ja = {
       "you": "あなた",
       "youWin": "{name}を倒しました！🏆",
       "youLose": "{name}がこのラウンドで勝ちました",
-      "tie": "引き分けです！🤝"
+      "tie": "引き分けです！🤝",
+      "freshStart": "新しい週。先に点を取った方がリード！",
+      "gapToPass": "あと{points}で{name}を抜ける"
     },
     "screenshotProtection": "続けるには戻ってください",
     "errorWordTooShort": "{min}文字以上必要です",

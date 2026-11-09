@@ -8,6 +8,7 @@ import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { createQuickChallenge } from '@/backend/modules/quickPlaySubmit';
 import type { QuickMode } from '@/backend/modules/quickPlayRound';
 import { captureApiError } from '@/utils/sentry';
+import { shownPlayerName } from '@/lib/friendlyPlayerName';
 
 const MODES: QuickMode[] = ['classic', 'blast', 'word-hunt', 'wheel-rush'];
 
@@ -66,6 +67,7 @@ export async function GET(request: NextRequest) {
 
   const id = request.nextUrl.searchParams.get('id');
   const mine = request.nextUrl.searchParams.get('mine') === '1';
+  const lang = request.nextUrl.searchParams.get('lang') || 'en';
   if (!id && !mine) return NextResponse.json({ error: 'Missing id' }, { status: 400 });
 
   try {
@@ -92,11 +94,11 @@ export async function GET(request: NextRequest) {
 
       const { data: accepter } = await supabase
         .from('public_profiles')
-        .select('username')
+        .select('id, username, display_name')
         .eq('id', row.accepted_by)
         .single();
       return NextResponse.json({
-        answered: { ...row, accepterName: accepter?.username || 'Player' },
+        answered: { ...row, accepterName: shownPlayerName(accepter ?? { id: String(row.accepted_by) }, lang) },
       });
     }
     const { data, error } = await supabase
@@ -108,13 +110,13 @@ export async function GET(request: NextRequest) {
 
     const { data: profile } = await supabase
       .from('public_profiles')
-      .select('username')
+      .select('id, username, display_name')
       .eq('id', data.challenger_id)
       .single();
 
     return NextResponse.json({
       ...data,
-      challengerName: profile?.username || 'Player',
+      challengerName: shownPlayerName(profile ?? { id: String(data.challenger_id) }, lang),
     });
   } catch (err) {
     captureApiError(err instanceof Error ? err : new Error(String(err)), 'quick-play-challenge-get');

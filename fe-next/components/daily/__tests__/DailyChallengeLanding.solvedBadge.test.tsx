@@ -210,8 +210,8 @@ describe('DailyChallengeLanding Solved Badge', () => {
       const doneBadge = screen.getByTestId('orange-done-badge');
       // Should have solid background (bg-neo-lime)
       expect(doneBadge).toHaveClass('bg-neo-lime');
-      // Should have border
-      expect(doneBadge).toHaveClass('border');
+      // Should have a solid border
+      expect(doneBadge).toHaveClass('border-2');
       // Should have hard shadow
       expect(doneBadge).toHaveClass('shadow-hard-xs');
     }, { timeout: 2000 });

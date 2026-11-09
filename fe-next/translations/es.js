@@ -1331,6 +1331,8 @@ const es = {
     "weekly": {
       "kicker": "Tablero de la semana",
       "play": "Jugar",
+      "endsIn": "Termina en {days} días",
+      "lastDay": "¡Último día!",
       "chip": "Tablero semanal: {theme}",
       "theme": {
         "vowelParty": "Fiesta de vocales",
@@ -1357,8 +1359,8 @@ const es = {
   // @quick-loop:end
   // @home-play:start
   "homePlay": {
-    "heroLine": "Sesenta segundos, un tablero nuevo y tres rivales que no te esperan.",
-    "intro": "LexiClash es un juego de palabras gratis que se juega en el navegador. Encuentra todas las palabras que puedas en un tablero de letras, contra bots, amigos o toda una clase, en seis idiomas.",
+    "heroLine": "60 segundos. Tablero nuevo. Tres rivales.",
+    "intro": "LexiClash es un juego de palabras gratis en el navegador, en seis idiomas.",
     "playSub": "En solitario · modo aleatorio",
     "pickMode": "O elige un modo en solitario",
     "timerBadge": "60 s",
@@ -9723,7 +9725,9 @@ const es = {
       "you": "Tú",
       "youWin": "¡Venciste a {name}! 🏆",
       "youLose": "{name} gana esta ronda",
-      "tie": "¡Es un empate! 🤝"
+      "tie": "¡Es un empate! 🤝",
+      "freshStart": "Semana nueva. ¡Los primeros puntos toman la delantera!",
+      "gapToPass": "{points} más para pasar a {name}"
     },
     "screenshotProtection": "Regresa para continuar jugando",
     "trainingSuggestion": {

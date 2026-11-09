@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { captureApiError } from '@/utils/sentry';
+import { shownPlayerName } from '@/lib/friendlyPlayerName';
 
 export async function GET(request: NextRequest) {
   const rateLimit = checkApiRateLimit(request, 'quick-play-leaderboard', {
@@ -17,6 +18,7 @@ export async function GET(request: NextRequest) {
   }
 
   const range = request.nextUrl.searchParams.get('range') === 'all' ? 'all' : 'today';
+  const lang = request.nextUrl.searchParams.get('lang') || 'en';
 
   try {
     const supabase = await createClient();
@@ -35,10 +37,15 @@ export async function GET(request: NextRequest) {
     if (rows.length > 0) {
       const { data: profiles } = await supabase
         .from('public_profiles')
-        .select('id, username, avatar_config')
+        .select('id, username, display_name, avatar_config')
         .in('id', rows.map((r) => r.user_id));
+      // Never the `Player_<hex>` default: a chosen name, or a readable stand-in.
+      const taken = new Set<string>();
       names = Object.fromEntries(
-        (profiles ?? []).map((p: { id: string; username: string | null }) => [p.id, p.username ?? ''])
+        (profiles ?? []).map((p: { id: string; username: string | null; display_name?: string | null }) => [
+          p.id,
+          shownPlayerName(p, lang, taken),
+        ])
       );
       avatars = Object.fromEntries(
         (profiles ?? []).map((p: { id: string; avatar_config: unknown }) => [p.id, p.avatar_config ?? null])
@@ -49,7 +56,7 @@ export async function GET(request: NextRequest) {
       range,
       entries: rows.map((r) => ({
         userId: r.user_id,
-        name: names[r.user_id] || 'Player',
+        name: names[r.user_id] || shownPlayerName({ id: r.user_id }, lang),
         customAvatar: avatars[r.user_id] ?? null,
         bestScorePct: Number(r.best_score_pct),
         bestScore: r.best_score,

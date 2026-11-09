@@ -1331,6 +1331,8 @@ const en = {
     "weekly": {
       "kicker": "This week's board",
       "play": "Play",
+      "endsIn": "Ends in {days} days",
+      "lastDay": "Last day!",
       "chip": "Weekly board: {theme}",
       "theme": {
         "vowelParty": "Vowel Party",
@@ -1357,8 +1359,8 @@ const en = {
   // @quick-loop:end
   // @home-play:start
   "homePlay": {
-    "heroLine": "Sixty seconds, a fresh board, and three rivals who don't wait for you.",
-    "intro": "LexiClash is a free word game you play in your browser. Find as many words as you can on a letter board, against bots, friends or a whole class, in six languages.",
+    "heroLine": "60 seconds. Fresh board. Three rivals.",
+    "intro": "LexiClash is a free browser word game in six languages.",
     "playSub": "Solo · random mode",
     "pickMode": "Or pick a solo mode",
     "timerBadge": "60s",
@@ -9203,7 +9205,9 @@ const en = {
       "you": "You",
       "youWin": "You beat {name}!",
       "youLose": "{name} wins this round",
-      "tie": "It's a tie! 🤝"
+      "tie": "It's a tie! 🤝",
+      "freshStart": "Fresh week. First points take the lead!",
+      "gapToPass": "{points} more to pass {name}"
     },
     "errorWordTooShort": "Use at least {min} letters",
     "errorWordTooLong": "Use {max} letters or fewer",

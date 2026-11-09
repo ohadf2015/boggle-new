@@ -3,6 +3,7 @@ import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { getSupabaseAdmin } from '@/lib/email';
 import { captureApiError } from '@/utils/sentry';
+import { shownPlayerName } from '@/lib/friendlyPlayerName';
 
 export const runtime = 'nodejs';
 
@@ -41,13 +42,15 @@ export async function GET(request: NextRequest) {
       for (const p of profiles ?? []) profileMap.set(p.id, p);
     }
 
+    const lang = new URL(request.url).searchParams.get('lang') || 'en';
+    const taken = new Set<string>();
     const leaderboard = (rows ?? []).map((r, i) => {
       const p = profileMap.get(r.player_id);
       return {
         rank: i + 1,
         playerId: r.player_id,
         isYou: r.player_id === user.id,
-        username: p?.display_name || p?.username || 'Player',
+        username: shownPlayerName({ id: r.player_id, display_name: p?.display_name, username: p?.username }, lang, taken),
         avatarImage: p?.avatar_image ?? null,
         avatarConfig: p?.avatar_config ?? null,
         avatarEmoji: p?.avatar_emoji ?? null,

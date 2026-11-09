@@ -119,7 +119,7 @@ export function QuickPlayResults({
   onChallenge,
   onExit,
 }: QuickPlayResultsProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { user, profile } = useAuth();
   const [board, setBoard] = useState<LeaderboardEntry[]>([]);
   const celebrated = useRef(false);
@@ -215,7 +215,7 @@ export function QuickPlayResults({
 
   useEffect(() => {
     let cancelled = false;
-    fetch('/api/quick-play/leaderboard?range=today')
+    fetch(`/api/quick-play/leaderboard?range=today&lang=${language}`)
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
         if (!cancelled && d?.entries) setBoard(d.entries);
@@ -224,7 +224,7 @@ export function QuickPlayResults({
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [language]);
 
   const modeColor = NODE_COLORS[result.mode];
   const wordList: CollectedWord[] =

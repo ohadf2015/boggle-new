@@ -23,7 +23,7 @@ export default function HeroAvatarIsland() {
         ? createPortal(
             <>
               <div className="lg:hidden">
-                <Avatar userId={heroProps.userId} customAvatar={heroProps.customAvatar ?? undefined} pixelSize={140} mood="idle" />
+                <Avatar userId={heroProps.userId} customAvatar={heroProps.customAvatar ?? undefined} pixelSize={108} mood="idle" />
               </div>
               <div className="hidden lg:block 2xl:hidden">
                 <Avatar userId={heroProps.userId} customAvatar={heroProps.customAvatar ?? undefined} pixelSize={260} mood="idle" />
