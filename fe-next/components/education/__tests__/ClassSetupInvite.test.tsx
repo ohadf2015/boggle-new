@@ -366,6 +366,23 @@ describe('ClassSetupInvite', () => {
     });
   });
 
+  it('Given nobody has joined yet, Then a calendar card offers to put the first game on the teacher\'s calendar', () => {
+    render(<ClassSetupInvite classroomId="c1" />);
+    expect(screen.getByTestId('first-game-plan')).toHaveTextContent('eduShell.setup.plan.title');
+  });
+
+  it('Given a student has joined, Then the calendar card is gone: the class is in the room', () => {
+    roster.current = { students: [{ id: 's1', name: 'Noa', avatar: null }], loading: false, arrivals: [] };
+    render(<ClassSetupInvite classroomId="c1" />);
+    expect(screen.queryByTestId('first-game-plan')).toBeNull();
+  });
+
+  it('Given the roster is still loading, Then no calendar card flashes in before the count is known', () => {
+    roster.current = { students: [], loading: true, arrivals: [] };
+    render(<ClassSetupInvite classroomId="c1" />);
+    expect(screen.queryByTestId('first-game-plan')).toBeNull();
+  });
+
   it('Given an unknown class id, Then after the one lookup it says so and links to the class list', async () => {
     render(<ClassSetupInvite classroomId="nope" />);
     expect(await screen.findByRole('alert')).toHaveTextContent('education.classroomGame.classroomNotFound');

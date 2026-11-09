@@ -22089,6 +22089,7 @@ const sv = {
       "noAccount": "Eleverna ansluter utan konto",
       "showProjector": "Visa på projektorn",
       "backHome": "Tillbaka till startsidan",
+      "plan": {"title": "Inte med klassen just nu?", "body": "Lägg in första spelet i kalendern. Händelsen har elevernas länk och en Starta-knapp, så allt är klart när klassen är på plats.", "when": "När har du lektionen?", "google": "Lägg till i Google Kalender", "ics": "Apple eller Outlook (.ics)", "added": "Inlagt i kalendern. Vi ses på lektionen!", "eventTitle": "LexiClash ordspel med {name}", "eventStudents": "Eleverna går med här, inget konto: {url} (kod {code})", "eventStart": "Starta spelet: {url}"},
       "firstRound": {
         "title": "Kör din första runda — 2 minuter",
         "step1": "Öva själv mot bottar (privat, inga elever)",

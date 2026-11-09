@@ -31,6 +31,7 @@ import { packsForLanguage, recommendedPack } from '@/components/teacher/setup/st
 import { FirstGameWords, PlayNowButton, type FirstGameError } from '@/components/teacher/setup/FirstGameWords';
 import { firstGameIntent, readPasted, type FirstGameChoice } from '@/components/teacher/setup/firstGameLaunch';
 import { ClassCreatedAsk } from '@/components/education/ClassCreatedAsk';
+import { FirstGamePlanCard } from '@/components/education/FirstGamePlanCard';
 import { useInviteShare } from './useInviteShare';
 import { ClassSetupInviteView } from './ClassSetupInviteView';
 import { firstStudentSeen } from './lobby/inviteLinks';
@@ -182,6 +183,18 @@ function InviteReady({ classroom, packKey, lessonId, t, language }: InviteReadyP
             label={t('eduShell.home.practice.cta')}
             onStart={() => trackFirstRoundGuideClicked({ surface: 'class_ready', locale: language, step: 'practice_bots' })}
           />
+        }
+        plan={
+          origin && joinUrl ? (
+            <FirstGamePlanCard
+              classroom={classroom}
+              joinUrl={joinUrl}
+              origin={origin}
+              language={language}
+              t={t}
+              className="lg:col-span-2 lg:mx-auto lg:w-full lg:max-w-xl"
+            />
+          ) : null
         }
         footer={
           <ClassCreatedAsk
