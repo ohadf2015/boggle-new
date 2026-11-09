@@ -36,10 +36,10 @@ export function ClassStrip({ classroomId, reducedMotion }: Props) {
     return () => { cancelled = true; };
   }, [classroomId]);
 
-  if (load.status === 'loading') return null;
-  if (load.status === 'error') {
-    return <p role="alert" className="font-neo-body text-xs font-bold text-neo-cream/80">{t('common.error')}</p>;
-  }
+  // The streak and rematch ask are extras above the leaderboard. When the hub read
+  // fails, a bare "Whoops" alert over a working leaderboard reads as "the class is
+  // broken" to a child, so the strip just stays out of the way.
+  if (load.status !== 'ready') return null;
 
   const { hub } = load;
   const asked = hub.rematchRequestedToday || askedNow;
