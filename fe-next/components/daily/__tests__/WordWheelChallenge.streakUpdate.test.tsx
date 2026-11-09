@@ -55,7 +55,7 @@ const updateDailyStreakMock = vi.fn(() => ({
   lastPlayedDate: '2026-04-27',
   totalDailiesCompleted: 5,
 }));
-vi.mock('@/hooks/useUtcDay', () => ({ useUtcDay: () => '2026-04-27' }));
+vi.mock('@/hooks/useUtcDay', () => ({ useUtcDay: () => '2026-04-27', useDailyDate: () => '2026-04-27' }));
 vi.mock('@/utils/dailyChallenge', () => ({
   hasEverPlayedWordWheel: () => false,
   getDailyChallengeDate: () => '2026-04-27',

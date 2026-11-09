@@ -3,7 +3,6 @@
 import { useEffect, useRef, type Dispatch, type SetStateAction } from 'react';
 import {
   generateDailyPuzzle,
-  getDailyChallengeDate,
   getPuzzleNumber,
   getTodaysWordHuntResult,
   getGuestFingerprint,
@@ -23,6 +22,8 @@ type SetFn<T> = Dispatch<SetStateAction<T>>;
 
 export interface WordHuntPuzzleInitDeps {
   gameLanguage: Language;
+  /** Today's daily date (UTC); a change re-runs the load for the new day. */
+  today: string;
   wasReset: boolean;
   isAuthenticated: boolean;
   profileId: string | null;
@@ -41,7 +42,7 @@ export interface WordHuntPuzzleInitDeps {
 
 /** Loads today's (or a catch-up day's) Word Hunt puzzle, or routes to the saved result if already played. */
 export function useWordHuntPuzzleInit({
-  gameLanguage, wasReset, isAuthenticated, profileId, catchupDate, isPractice, online,
+  gameLanguage, today, wasReset, isAuthenticated, profileId, catchupDate, isPractice, online,
   setPhase, setPuzzleDate, setPuzzleNumber, setForfeitedToday, setStoredResult, setGrid, setTargetWord, setMeaning,
 }: WordHuntPuzzleInitDeps) {
   const isCatchup = !!catchupDate;
@@ -61,7 +62,7 @@ export function useWordHuntPuzzleInit({
     if (needsFullReload) setPhase('loading');
 
     const initializePuzzle = async () => {
-      const date = catchupDate || getDailyChallengeDate();
+      const date = catchupDate || today;
       const number = getPuzzleNumber(date);
       if (!isMounted) return;
       setPuzzleDate(date);
@@ -164,5 +165,5 @@ export function useWordHuntPuzzleInit({
     initializePuzzle();
     return () => { isMounted = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gameLanguage, wasReset, isAuthenticated, profileId, catchupDate]);
+  }, [gameLanguage, wasReset, isAuthenticated, profileId, catchupDate, today]);
 }

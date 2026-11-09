@@ -21,7 +21,7 @@ import { needsBonusIntro } from './bonusIntro';
 import { getUnfinishedWordWheelRun, type WordWheelRun } from '@/utils/dailyChallenge/wordWheelRun';
 import type { StoredWordWheelResult } from '@/utils/dailyChallenge/types';
 import { prewarmDictionary } from '@/hooks/useDictionaryCache';
-import { useUtcDay } from '@/hooks/useUtcDay';
+import { useDailyDate } from '@/hooks/useUtcDay';
 import { wordWheelSkipsReady } from './readySkip';
 import type { Language } from '@/types';
 
@@ -82,15 +82,10 @@ export function useWordWheelLoad({
 
   // Today's daily date, rolled over for a page left open past midnight UTC (or an app
   // brought back next morning). Never mid-run or on the results: those finish the old day.
-  const utcDay = useUtcDay();
-  const [day, setDay] = useState(utcDay);
-  useEffect(() => {
-    if (utcDay === day || isPractice || isCatchup || phase === 'playing' || phase === 'completed') return;
-    setDay(utcDay);
-    setPuzzle(null);
-    setGameResult(null);
-    setPhase('loading');
-  }, [utcDay, day, phase, isPractice, isCatchup]);
+  const day = useDailyDate(
+    !isPractice && !isCatchup && phase !== 'playing' && phase !== 'completed',
+    () => { setPuzzle(null); setGameResult(null); setPhase('loading'); },
+  );
 
   const loadKey = `${catchupDate || day}|${language}|${isPractice}`;
   // A late profile re-runs init: it may still find a cross-device result, but must never rebuild an entered board.
