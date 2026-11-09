@@ -116,4 +116,37 @@ describe('planLifecycleNudges', () => {
   it('Given a teacher with no class, Then the stage planner leaves them to the activation nudge', () => {
     expect(stageOf(teacher(), facts())).toBeNull();
   });
+
+  describe('which class the email points at', () => {
+    const classOf = (t: StageTeacher, f: StageFacts) => planLifecycleNudges([t], f, NOW).due[0]?.classroom ?? null;
+
+    it('Given a share-code nudge, Then it carries the class with its code and language so the email can show them', () => {
+      expect(classOf(teacher(), facts({
+        classrooms: [{ id: 'c1', teacherId: 't1', createdAt: daysAgo(2), joinCode: 'KITE43', language: 'he' }],
+      }))).toEqual({ id: 'c1', joinCode: 'KITE43', language: 'he' });
+    });
+
+    it('Given two empty classes, Then the share-code email points at the oldest one', () => {
+      expect(classOf(teacher(), facts({
+        classrooms: [
+          { id: 'new', teacherId: 't1', createdAt: daysAgo(2), joinCode: 'NEW111' },
+          { id: 'old', teacherId: 't1', createdAt: daysAgo(5), joinCode: 'OLD222' },
+        ],
+      }))?.id).toBe('old');
+    });
+
+    it('Given a start-live nudge, Then it points at the class that has students', () => {
+      expect(classOf(teacher(), facts({
+        classrooms: [
+          { id: 'empty', teacherId: 't1', createdAt: daysAgo(9), joinCode: 'EMPTY1' },
+          { id: 'full', teacherId: 't1', createdAt: daysAgo(3), joinCode: 'FULL22' },
+        ],
+        studentCounts: new Map([['full', 4]]),
+      }))).toEqual({ id: 'full', joinCode: 'FULL22', language: null });
+    });
+
+    it('Given a class read without its code, Then no class is attached and the email keeps its generic link', () => {
+      expect(classOf(teacher(), facts({ classrooms: [{ id: 'c1', teacherId: 't1', createdAt: daysAgo(2) }] }))).toBeNull();
+    });
+  });
 });

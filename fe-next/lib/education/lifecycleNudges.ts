@@ -26,8 +26,24 @@ export interface StageTeacher {
   locale: TeacherLocale;
 }
 
+export interface StageClassroom {
+  id: string;
+  teacherId: string;
+  createdAt: string;
+  /** Read with the class so the email can show it; absent in older callers. */
+  joinCode?: string | null;
+  language?: string | null;
+}
+
+/** The class an email points at: its ready screen, and for share_code its code and join link. */
+export interface NudgeClassroom {
+  id: string;
+  joinCode: string;
+  language: string | null;
+}
+
 export interface StageFacts {
-  classrooms: Array<{ id: string; teacherId: string; createdAt: string }>;
+  classrooms: StageClassroom[];
   /** Students per classroom, the teacher's own preview seat excluded. */
   studentCounts: ReadonlyMap<string, number>;
   /**
@@ -43,7 +59,7 @@ export interface StageFacts {
 }
 
 export interface LifecycleNudgePlan {
-  due: Array<StageTeacher & { stage: LifecycleStage }>;
+  due: Array<StageTeacher & { stage: LifecycleStage; classroom: NudgeClassroom | null }>;
   skipped: { testAccount: number; cooldown: number };
 }
 
@@ -75,6 +91,18 @@ function pickStage(t: StageTeacher, f: StageFacts, nowMs: number): LifecycleStag
   return oldest >= shareCodeDueAfterDays(paidDay0) ? owed('share_code') : null;
 }
 
+/** share_code: the oldest class (the one waiting longest). start_live: the oldest class with students. */
+function nudgeClassroom(t: StageTeacher, f: StageFacts, stage: LifecycleStage): NudgeClassroom | null {
+  if (stage === 'second_game') return null;
+  const classes = f.classrooms
+    .filter((c) => c.teacherId === t.userId)
+    .filter((c) => stage !== 'start_live' || (f.studentCounts.get(c.id) ?? 0) > 0)
+    .sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt));
+  const pick = classes[0];
+  if (!pick?.joinCode) return null;
+  return { id: pick.id, joinCode: pick.joinCode, language: pick.language ?? null };
+}
+
 export function planLifecycleNudges(
   teachers: readonly StageTeacher[],
   facts: StageFacts,
@@ -99,7 +127,7 @@ export function planLifecycleNudges(
       plan.skipped.cooldown++;
       continue;
     }
-    plan.due.push({ ...t, stage });
+    plan.due.push({ ...t, stage, classroom: nudgeClassroom(t, facts, stage) });
   }
   return plan;
 }
