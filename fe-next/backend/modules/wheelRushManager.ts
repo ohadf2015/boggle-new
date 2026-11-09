@@ -17,94 +17,23 @@ import {
   WHEEL_RUSH_REPEAT_SCORE_FACTOR,
 } from '@/shared/constants/wheelRushConstants';
 import { calculateWordScoreByLength } from '@/shared/utils/scoring';
-import { normalizeHebrewLetter } from '@/shared/utils/wordNormalization';
+import { normalizeHebrewWord } from '@/shared/utils/wordNormalization';
+import { generateWordWheelPuzzle, isValidWordWheelWord } from '@/utils/dailyChallenge/wordWheelGeneration';
 import { getCachedTrie, getTrieNode } from './boggleSolver';
 import { isWordShapeWeird } from '@/shared/utils/wordShapeFilter';
 
-/** Per-char sofit→regular normalization for Hebrew. Mirrors SP wordWheelGeneration:87. */
-function normalizeWordForLang(word: string, language: Language): string {
-  if (language !== 'he') return word;
-  let out = '';
-  for (const c of word) out += normalizeHebrewLetter(c);
-  return out;
-}
-
-// Nine-letter seed sources (mirror of utils/dailyChallenge/wordWheelGeneration —
-// duplicated here because backend tsconfig rootDir forbids cross-import).
-const NINE_LETTER_SOURCES: Record<string, string[]> = {
-  en: ['BREATHING','COUNTRIES','DANGEROUS','EDUCATION','LANDSCAPE','MACHINERY','NIGHTCLUB','OPERATING','QUESTIONS','REACTIONS','BUILDINGS','CERTAINLY','DESERVING','FURNISHED','GROUNDING','PUBLISHED','RECOGNISE','SHOULDERS','CUSTOMERS','FRAGMENTS','MICROWAVE','PLUNDERED','MARKETING','PROVIDING'],
-  he: ['מחשבונים','התלמידים','משחקיהם','מתכוננים','הרכבתיה','תלבושות'],
-  sv: ['BOKSTAVER','DATORSPEL','FRIHANDIG','GRUNDKURS','HUVUDSIDA','LANDSTING','MUSIKBAND'],
-  // Single hiragana dictionary words with EXACTLY 7 unique kana — so the wheel fills
-  // from the seed alone AND the full word is findable as a pangram (parity with the
-  // English seeds). A wheel is anagram play: phonetic kana only, never kanji.
-  ja: ['りゅうがくせい','ゆうびんきょく','ひゃっかじてん','ちゅうしゃじょう','ていりゅうじょ','にゅうがくする','にゅういんする','めんどうくさい'],
-  es: ['RESPALDOS','CAMINANDO','ENCONTRAR','FABRICADO','GOBIERNO','HORMIGAS','INDOMABLE'],
-  ru: ['АВТОБУСЫ','БИБЛИОТЕК','ВОСТОРГЕ','ГАЗЕТНЫЙ','ДЕРЕВНЯ','ЖЕЛАНИЕ','ЗАВТРАК','ИЗДАНИЕ','КАБИНЕТ','КАРТИНА','КОМАНДА','МАГАЗИН','НАСТРОЕН','ОБЩЕСТВО','ПАМЯТНИК','ПЕРЕМЕНА','ПИСАТЕЛ','ПЛОЩАДЬ','ПОДАРОК','ПОЕЗДКА','ПОМОЩНИК','ПРАЗДНИК','ПРИКЛЮЧЕН','ПРИРОДА','РАССКАЗ','РЕШЕНИЕ','СВОБОДА','СЛОВАРЬ','СОБАКА','СОБЫТИЕ','СОЛНЦЕ','СПАСИБО','СРАВНЕНИ','СТАДИОН','СТОЛИЦА','СТРАНА','СУЩЕСТВО','ТВОРЧЕСТВ','ТЕХНИКА','ТОВАРИЩ','ТРАДИЦИЯ','УЛЫБКА','УЧЕБНИК','ФАМИЛИЯ','ХОРОШИЙ','ЦВЕТОК','ЧЕЛОВЕК','ШКОЛЬНИК','ЭКЗАМЕН','ЯЗЫК'],
-};
-
-function hashString(s: string): number {
-  let h = 2166136261 >>> 0;
-  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
-  return h >>> 0;
-}
-function mulberry32(seed: number): () => number {
-  let a = seed;
-  return () => { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
-}
-function uniqueChars(word: string, language: Language = 'en'): string[] {
-  const seen = new Set<string>(); const out: string[] = [];
-  for (const c of word) {
-    const u = c.toUpperCase();
-    if (u === ' ') continue;
-    // Hebrew: collapse final forms to their regular counterparts so the wheel never
-    // exposes ך/ם/ן/ף/ץ. Parity with SP wordWheelGeneration:87.
-    const norm = language === 'he' ? normalizeHebrewLetter(u) : u;
-    if (seen.has(norm)) continue;
-    seen.add(norm);
-    out.push(norm);
-  }
-  return out;
-}
-
 /**
- * Generate a deterministic wheel puzzle for an MP game.
+ * Generate a deterministic wheel puzzle for an MP game, from the same checked
+ * source pool as the daily and quick wheels (7 real letters, playable centers).
  *
  * Seeded on gameCode + language + `seedSalt`. The salt is the per-round
  * `gameSessionId`, which increments on every "play again" / new round — so a
  * rematch in the same room gets a fresh wheel instead of repeating the same
- * letters every round. Omitting the salt keeps the legacy deterministic
- * behaviour (same gameCode → same puzzle).
+ * letters every round.
  */
 export function generateWheelPuzzle(gameCode: string, language: Language = 'en', seedSalt: string | number = ''): WheelPuzzle {
-  const sources = NINE_LETTER_SOURCES[language] || NINE_LETTER_SOURCES.en;
-  const rng = mulberry32(hashString(`wheel-rush-${gameCode}-${language}-${seedSalt}`));
-  const src = sources[Math.floor(rng() * sources.length)];
-  let letters = uniqueChars(src, language);
-  if (letters.length > 7) letters = letters.slice(0, 7);
-  if (letters.length < 7) {
-    const pool = language === 'he'
-      ? ['א','ב','ג','ד','ה','ו','ח','י','כ','ל','מ','נ','ר','ש','ת']
-      : language === 'ja'
-        ? ['い','う','か','き','し','す','つ','て','と','な','に','の','ん','た','こ']
-        : ['E','T','A','O','I','N','S','H','R','D','L','C','U','M'];
-    const avail = pool.filter(l => !letters.includes(l));
-    while (letters.length < 7 && avail.length) letters.push(avail.splice(Math.floor(rng() * avail.length), 1)[0]);
-  }
-  for (let i = letters.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [letters[i], letters[j]] = [letters[j], letters[i]]; }
-  const centerLetter = letters[0];
-  const outerLetters = letters.slice(1, 7);
-  return { centerLetter, outerLetters, allLetters: [centerLetter, ...outerLetters] };
-}
-
-/** Word uses each available letter at most once and includes center. */
-function isWheelShape(word: string, centerLetter: string, allLetters: string[]): boolean {
-  const upper = word.toUpperCase();
-  if (!upper.includes(centerLetter.toUpperCase())) return false;
-  const avail = new Map<string, number>();
-  for (const l of allLetters) { const u = l.toUpperCase(); avail.set(u, (avail.get(u) || 0) + 1); }
-  for (const c of upper) { const n = avail.get(c); if (!n || n <= 0) return false; avail.set(c, n - 1); }
-  return true;
+  const { centerLetter, outerLetters, allLetters } = generateWordWheelPuzzle(`wheel-rush-${gameCode}-${seedSalt}`, language);
+  return { centerLetter, outerLetters, allLetters };
 }
 
 /** Initialize state for a new wheel-rush game. */
@@ -175,10 +104,10 @@ export function validateWheelSubmission(
   word: string,
   language: Language = 'en',
 ): WheelValidationResult {
-  const upper = normalizeWordForLang(word.toUpperCase(), language);
+  const upper = (language === 'he' ? normalizeHebrewWord(word) : word).toUpperCase();
   if (upper.length < WHEEL_RUSH_MIN_WORD_LEN) return { valid: false, error: 'too-short' };
   if (!upper.includes(state.puzzle.centerLetter.toUpperCase())) return { valid: false, error: 'no-center' };
-  if (!isWheelShape(upper, state.puzzle.centerLetter, state.puzzle.allLetters)) {
+  if (!isValidWordWheelWord(upper, state.puzzle.centerLetter, state.puzzle.allLetters)) {
     return { valid: false, error: 'bad-letters' };
   }
   // Same shape filter the classic live path (wordHandler) AND final scoring

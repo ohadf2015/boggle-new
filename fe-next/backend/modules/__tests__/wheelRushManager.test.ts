@@ -21,6 +21,8 @@ import {
   scoreWheelWord,
   applyWheelWord,
 } from '../wheelRushManager';
+import { HEBREW_WHEEL_V3_SOURCES } from '@/utils/dailyChallenge/wordWheelSourcesHe';
+import { getUniqueLetters } from '@/utils/dailyChallenge/wordWheelLetters';
 import {
   WHEEL_RUSH_FIRST_FINDER_BONUS,
   WHEEL_RUSH_PANGRAM_BONUS,
@@ -76,6 +78,16 @@ describe('wheelRushManager', () => {
         for (const l of p.allLetters) {
           expect(sofits.has(l), `letter ${l} should not be sofit in seed HE-${i}`).toBe(false);
         }
+      }
+    });
+
+    // Same checked pool as the daily wheel: Hebrew rooms used to get 6 sources with
+    // 5-6 real letters padded at random.
+    it('builds Hebrew wheels from a checked source word, never random padding', () => {
+      const sets = new Set(HEBREW_WHEEL_V3_SOURCES.map(w => [...getUniqueLetters(w, 'he').slice(0, 7)].sort().join('')));
+      for (let i = 0; i < 50; i++) {
+        const p = generateWheelPuzzle(`HE-${i}`, 'he', i);
+        expect(sets.has([...p.allLetters].sort().join('')), `seed HE-${i}`).toBe(true);
       }
     });
 
