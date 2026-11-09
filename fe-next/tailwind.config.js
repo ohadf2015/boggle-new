@@ -260,6 +260,11 @@ module.exports = {
         'hard-purple-lg': '3px 3px 0px #581c87',
         'hard-orange': '2px 2px 0px var(--neo-orange)',
         'hard-blue': '2px 2px 0px #3b82f6',
+        // Big colored offsets: the edge that reads on the dark navy page (black on navy is 1.2:1)
+        'hard-lime-xl': '6px 6px 0px var(--neo-lime)',
+        'hard-cyan-xl': '6px 6px 0px var(--neo-cyan)',
+        'hard-pink-xl': '6px 6px 0px var(--neo-pink)',
+        'hard-yellow-xl': '6px 6px 0px var(--neo-yellow)',
         // Remove default shadows
         'none': 'none',
       },
@@ -818,6 +823,10 @@ module.exports = {
         '[dir="rtl"] .shadow-hard-blue': {
           boxShadow: '-4px 4px 0px #3b82f6',
         },
+        '[dir="rtl"] .shadow-hard-lime-xl': { boxShadow: '-6px 6px 0px var(--neo-lime)' },
+        '[dir="rtl"] .shadow-hard-cyan-xl': { boxShadow: '-6px 6px 0px var(--neo-cyan)' },
+        '[dir="rtl"] .shadow-hard-pink-xl': { boxShadow: '-6px 6px 0px var(--neo-pink)' },
+        '[dir="rtl"] .shadow-hard-yellow-xl': { boxShadow: '-6px 6px 0px var(--neo-yellow)' },
         '.badge-token-info': {
           backgroundColor: 'var(--badge-info)',
           color: 'var(--badge-info-text)',

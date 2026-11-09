@@ -3,7 +3,7 @@
 import { useId, useState } from 'react';
 import { CalendarPlus, Check, Download, Send } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { NB_BLOCK, NB_INPUT, NB_PANEL, NB_SECONDARY, NB_SMALL, NB_STICKER } from '@/components/teacher/nb/nbStyles';
+import { NB_BLOCK, NB_ICON_TILE, NB_INPUT, NB_PANEL_POP, NB_SECONDARY, NB_SMALL, NB_STICKER } from '@/components/teacher/nb/nbStyles';
 import {
   buildFirstGameEvent,
   defaultFirstGameStart,
@@ -75,10 +75,10 @@ export function FirstGamePlanCard({ classroom, joinUrl, origin, language, t, cla
   };
 
   return (
-    <section data-testid="first-game-plan" aria-labelledby={`${inputId}-title`} className={cn(NB_PANEL, 'flex flex-col gap-3 p-4', className)}>
+    <section data-testid="first-game-plan" aria-labelledby={`${inputId}-title`} className={cn(NB_PANEL_POP.yellow, 'flex flex-col gap-3 p-4', className)}>
       <div className="flex items-start gap-3">
-        <span className="inline-flex size-11 shrink-0 -rotate-3 items-center justify-center rounded-neo border-[3px] border-neo-black bg-neo-cyan text-neo-black shadow-hard" aria-hidden="true">
-          <CalendarPlus className="size-6" />
+        <span className={cn(NB_ICON_TILE, NB_BLOCK.yellow)} aria-hidden="true">
+          <CalendarPlus className="size-5" />
         </span>
         <div className="min-w-0">
           <h2 id={`${inputId}-title`} className="font-neo-display text-lg font-black text-neo-cream">

@@ -7,7 +7,7 @@ import { EduMascot } from '@/components/education/EduMascot';
 import { cn } from '@/lib/utils';
 import { RosterSeats } from '@/components/teacher/hq/RosterSeats';
 import type { RosterStudent } from '@/components/teacher/hq/rosterModel';
-import { NB_LINK as QUIET_LINK, NB_PANEL as PANEL, NB_PRIMARY as PRIMARY_BUTTON, NB_SECONDARY as SECONDARY_BUTTON } from '@/components/teacher/nb/nbStyles';
+import { NB_BLOCK, NB_LINK as QUIET_LINK, NB_PANEL_POP, NB_PRIMARY as PRIMARY_BUTTON, NB_SECONDARY as SECONDARY_BUTTON, NB_STICKER } from '@/components/teacher/nb/nbStyles';
 import { CelebrationBurst } from '@/components/education/motion';
 import { ClassSetupInviteCode, type InviteChannel } from './ClassSetupInviteCode';
 
@@ -106,7 +106,7 @@ export function ClassSetupInviteView({ classroom, roster, joinUrl, displayHost, 
           <h1 id="setup-ready-title" tabIndex={-1} style={{ outline: 'none' }} className={cn(words ? 'text-2xl' : 'text-3xl', 'font-neo-display font-black leading-tight text-neo-cream sm:text-5xl')}>
             {t('eduShell.setup.readyTitle')}
           </h1>
-          <p dir="auto" className="truncate font-neo-body text-base font-semibold text-neo-cream/80">
+          <p dir="auto" className={cn(NB_STICKER, NB_BLOCK.yellow, 'mt-1.5 max-w-full -rotate-2 truncate px-3 py-1 text-sm sm:text-base')}>
             {classroom.name}
           </p>
         </div>
@@ -116,7 +116,7 @@ export function ClassSetupInviteView({ classroom, roster, joinUrl, displayHost, 
 
       <div className="flex min-w-0 flex-col gap-3">
         {words}
-        <div data-testid="invite-roster" className={cn(PANEL, 'relative flex flex-col gap-2 p-3 sm:gap-3 sm:p-4', !words && 'lg:flex-1 lg:justify-between lg:p-5', play && 'max-sm:hidden')}>
+        <div data-testid="invite-roster" className={cn(NB_PANEL_POP.pink, 'relative flex flex-col gap-2 p-3 sm:gap-3 sm:p-4', !words && 'lg:flex-1 lg:justify-between lg:p-5', play && 'max-sm:hidden')}>
           <p data-testid="setup-joined-count" aria-live="polite" className="inline-flex items-center gap-2 font-neo-display text-lg font-bold text-neo-cream">
             <UsersRound className={cn('size-5 shrink-0', studentsIn ? 'text-neo-lime' : 'text-neo-cream/70')} aria-hidden="true" />
             {joinedText(joined, t)}
