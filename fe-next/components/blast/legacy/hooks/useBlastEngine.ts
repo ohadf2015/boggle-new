@@ -516,6 +516,7 @@ export function useBlastEngine(
       wavesCompleted,
       waveResults,
       diamondsCollected: gs.diamondsCollected,
+      gemsByKind: gs.gemsByKind,
       bombsPopped: gs.tileTypeClears.bomb ?? 0,
     };
   }, []);

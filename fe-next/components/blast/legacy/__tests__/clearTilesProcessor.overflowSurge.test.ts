@@ -27,15 +27,20 @@ function boardOfBombs(): BlastTileState[][] {
 describe('overflow surge', () => {
   it('caps detonations at the new tighter budget and pays surge points for suppressed ones', () => {
     const prev = boardOfBombs();
+    // One bomb in the word (two bombs would be a combo), ringed by bombs it catches.
+    prev[2][3] = tile(2, 3);
+    prev[3][2] = tile(3, 2);
     const path = [{ row: 2, col: 2 }, { row: 2, col: 3 }, { row: 3, col: 2 }];
     const res = processTilesForWord({
       prev, path, word: 'ABC', baseScore: 5, gridSize: GRID, currentWave: 3, rng: () => 0.5,
     });
-    expect(BLAST_MAX_CHAIN_DETONATIONS).toBe(5);
-    // Bombs in center should cause chain reaction that exceeds detonation cap
-    expect(res.newlyClearedCount).toBeGreaterThan(3);
-    // With bomb board, should hit detonation cap and record overflow surge
-    expect(res.overflowSurge).toBeGreaterThanOrEqual(0);
+    expect(BLAST_MAX_CHAIN_DETONATIONS).toBe(2);
+    // The played bombs go off, but caught bombs stop well before the board is gone.
+    // The played bomb clears its full 3x3 and sets off at most one more; the rest stay quiet.
+    expect(res.newlyClearedCount).toBeGreaterThan(9);
+    expect(res.newlyClearedCount).toBeLessThanOrEqual(9 + 8);
+    // With a board of bombs the cap is hit, so the suppressed ones pay as surge.
+    expect(res.overflowSurge).toBeGreaterThan(0);
     // Each suppressed detonation pays 8-20ish points for a 3-letter word, never the old flat 10 each
     if (res.overflowSurge > 0) {
       expect(res.overflowSurge).toBeGreaterThanOrEqual(OVERFLOW_SURGE_POINTS_PER_DETONATION * 0.5);

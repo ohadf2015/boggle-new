@@ -5,7 +5,6 @@
 
 import { detectSpecialCombos, type SpecialCombo } from './blastCombos';
 import { executeComboEffect } from './blastComboEffects';
-import { getWordLengthScaleFactor } from './blastComboScaling';
 import {
   GOLD_MULTIPLIER,
   GOLD_BONUS_MOVES,
@@ -20,7 +19,7 @@ import {
 import { type TileEffectContext, processBombBFS, spawnEarnedDiamonds } from './blastTileEffects';
 import { calculateBonusMoves } from './blastMoveUtils';
 import { getWordRarityTier } from './blastWordRarity';
-import { GEM_DEFS, gemOfTile, rollGemsForWord } from './blastGems';
+import { GEM_DEFS, gemBlastCells, gemOfTile, rollGemsForWord } from './blastGems';
 import { gemClearPoints, crossTilePoints, surgePoints, type PayoutCtx } from './blastPayout';
 import type { BlastGemKind } from '@/shared/types/blast';
 import { getWaveTheme } from './blastWaveTheme';
@@ -103,12 +102,12 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
     },
   };
 
-  // Combos share the chain budget so a combo can never wipe the whole board in one frame.
+  // Combo and gem blasts have small fixed shapes and always finish them; they feed the
+  // chain budget so the bombs they catch stay quiet once the move has done enough.
   const comboMarkCleared = (t: BlastTileState) => {
-    const b = ctx.chainBudget;
-    if (t.isCleared || (b && b.cleared >= b.maxCleared)) return;
+    if (t.isCleared) return;
     markCleared(t);
-    if (b) b.cleared++;
+    if (ctx.chainBudget) ctx.chainBudget.cleared++;
   };
 
   const detectedCombos = preDetectedCombos ?? detectSpecialCombos(path, next);
@@ -117,7 +116,6 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
     comboMultiplier *= combo.scoreMultiplier;
     const effectResult = executeComboEffect({
       combo, next, gridSize, now,
-      wordLengthScale: getWordLengthScaleFactor(path.length),
       markCleared: comboMarkCleared,
     });
     newExplosions.push(...effectResult.explosions);
@@ -150,12 +148,7 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
 
   let gemCrossCount = 0;
   for (const gem of diamondsOnPath) {
-    if (!GEM_DEFS[gem.gem].cross) continue;
-    const cross = [
-      ...Array.from({ length: gridSize }, (_, c) => ({ row: gem.row, col: c })),
-      ...Array.from({ length: gridSize }, (_, r) => ({ row: r, col: gem.col })),
-    ];
-    for (const cell of cross) {
+    for (const cell of gemBlastCells(gem.row, gem.col, gem.gem, gridSize)) {
       const tile = next[cell.row]?.[cell.col];
       if (!tile || tile.isCleared) continue;
       comboMarkCleared(tile);

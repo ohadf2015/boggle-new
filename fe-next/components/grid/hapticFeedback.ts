@@ -193,6 +193,11 @@ export function vibrateBlastPrism(): void {
   vibrate(PATTERNS.blastPrism, N_SUCCESS);
 }
 
+/** A gem landing in the counter: a tick for common gems, a double tap for amethyst and ruby. */
+export function vibrateBlastGem(rarity: 1 | 2 | 3 | 4): void {
+  vibrate(rarity >= 3 ? [14, 50, 22] : 12, rarity >= 3 ? N_SUCCESS : I_MEDIUM);
+}
+
 export function vibrateBlastCascade(): void {
   vibrate(PATTERNS.blastCascade, SEL);
 }

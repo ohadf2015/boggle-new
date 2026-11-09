@@ -28,8 +28,12 @@ describe('selectCascadeFinds', () => {
     expect(selectCascadeFinds([word('TILES')], 4)).toHaveLength(1);
   });
 
-  it('chain level < 3 accepts any find', () => {
-    expect(selectCascadeFinds([cluster(3)], 2)).toHaveLength(1);
+  it('the first chain level accepts any find', () => {
+    expect(selectCascadeFinds([cluster(3)], 1)).toHaveLength(1);
+  });
+
+  it('the second chain level already needs a quality find', () => {
+    expect(selectCascadeFinds([cluster(3)], 2)).toHaveLength(0);
   });
 
   it('empty input returns empty', () => {

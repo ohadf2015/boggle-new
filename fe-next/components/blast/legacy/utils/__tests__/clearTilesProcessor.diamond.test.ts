@@ -71,28 +71,50 @@ describe('processTilesForWord — earned diamonds', () => {
     expect(result.diamondsSpawned).toEqual([]);
   });
 
-  it('a diamond in the word doubles it, pays its bonus and blasts its row and column', () => {
+  it('a sapphire in the word doubles it, pays its bonus and blasts a small plus around itself', () => {
     const prev = makeGrid(6);
     prev[0][1].type = 'diamond';
     const result = run('cat', prev);
     expect(result.diamondsCollected).toBe(1);
-    const crossCells = 5 + 3; // column 1 below the diamond + the rest of row 0 off the path
-    expect(result.gemCrossCount).toBe(crossCells);
-    expect(result.newlyClearedCount).toBe(3 + crossCells);
+    // Reach 1: up is off the board, left/right are the word's own tiles, so only the tile below goes.
+    expect(result.gemCrossCount).toBe(1);
+    expect(result.newlyClearedCount).toBe(4);
+    expect(result.next[1][1].isCleared).toBe(true);
+    expect(result.next[2][1].isCleared).toBe(false);
+    expect(result.next[0][3].isCleared).toBe(false);
     const bonus = result.totalScore - 10 * DIAMOND_WORD_MULTIPLIER;
-    expect(bonus).toBeGreaterThan(crossCells);
-    expect(bonus).toBeLessThan(DIAMOND_CLEAR_BONUS * 2 + crossCells * 12);
+    expect(bonus).toBeGreaterThan(1);
+    expect(bonus).toBeLessThan(DIAMOND_CLEAR_BONUS * 2 + 12);
+  });
+
+  it('an amethyst reaches two tiles out', () => {
+    const prev = makeGrid(6);
+    prev[0][1].type = 'diamond';
+    prev[0][1].gem = 'amethyst';
+    const result = run('cat', prev);
+    expect(result.next[1][1].isCleared).toBe(true);
+    expect(result.next[2][1].isCleared).toBe(true);
+    expect(result.next[3][1].isCleared).toBe(false);
+    expect(result.next[0][3].isCleared).toBe(true);
+    expect(result.next[0][4].isCleared).toBe(false);
+  });
+
+  it('only a ruby blasts its whole row and column', () => {
+    const prev = makeGrid(6);
+    prev[0][1].type = 'diamond';
+    prev[0][1].gem = 'ruby';
+    const result = run('cat', prev);
+    expect(result.gemCrossCount).toBe(5 + 3);
     for (let r = 0; r < 6; r++) expect(result.next[r][1].isCleared).toBe(true);
     for (let c = 0; c < 6; c++) expect(result.next[0][c].isCleared).toBe(true);
   });
 
-  it('a bomb caught in a diamond cross still detonates', () => {
+  it('a bomb caught in a gem blast still detonates in full', () => {
     const prev = makeGrid(6);
     prev[0][1].type = 'diamond';
-    prev[4][1].type = 'bomb';
+    prev[1][1].type = 'bomb';
     const result = run('cat', prev);
-    expect(result.next[5][2].isCleared).toBe(true);
-    expect(result.next[3][0].isCleared).toBe(true);
+    for (const [r, c] of [[2, 0], [2, 1], [2, 2], [1, 0], [1, 2]]) expect(result.next[r][c].isCleared).toBe(true);
   });
 
   it('a diamond swept up by a bomb pays its bonus but does not cross-blast', () => {

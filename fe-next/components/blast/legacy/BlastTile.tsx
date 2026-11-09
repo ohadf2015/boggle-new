@@ -55,6 +55,11 @@ export interface BlastTileProps {
   selectionTotal?: number;
   /** Zone preview type — shows effect radius indicator when tile is selected */
   zonePreview?: 'bomb' | null;
+  /**
+   * Live blast preview while a word is traced: 'hit' = this tile will be blasted,
+   * 'gem' = this gem will be blasted and collected. Lets the player plan the blast.
+   */
+  blastPreview?: 'hit' | 'gem' | null;
   /** Cascade highlight — tile is about to be cleared by a cascade chain reaction */
   isCascadeHighlight?: boolean;
   /** Color tag for color_power objectives (pink/cyan/lime) — applies pulsing glow */
@@ -103,7 +108,7 @@ function getColorTagGlow(colorTag?: 'pink' | 'cyan' | 'lime'): string {
 export const BlastTile = memo(function BlastTile({
   letter, type, gem, phase, isSelected, isCleared,
   fallOffset, clearRotate, spawnOffset, isNearMiss, activationEffect, isComboPreview,
-  selectionIndex, selectionTotal, zonePreview,
+  selectionIndex, selectionTotal, zonePreview, blastPreview,
   isCascadeHighlight, colorTag, hideTooltip, onClick, col,
 }: BlastTileProps) {
   const reducedMotion = usePrefersReducedMotion();
@@ -236,6 +241,18 @@ export const BlastTile = memo(function BlastTile({
           {valueBadge.label}
         </span>
       )}
+      {blastPreview && !isSelected && (
+        <span
+          data-testid="blast-preview"
+          data-preview={blastPreview}
+          className={
+            blastPreview === 'gem'
+              ? 'absolute -inset-0.5 rounded-neo pointer-events-none z-20 border-3 border-neo-yellow shadow-[0_0_14px_rgba(255,230,0,0.85)] motion-safe:animate-pulse'
+              : 'absolute inset-0 rounded-neo pointer-events-none z-20 border-2 border-dashed border-neo-yellow bg-neo-red/25'
+          }
+          aria-hidden="true"
+        />
+      )}
       {zonePreview && isSelected && (
         <span
           data-testid="zone-preview"
@@ -259,6 +276,7 @@ export const BlastTile = memo(function BlastTile({
   prev.isNearMiss === next.isNearMiss &&
   prev.activationEffect === next.activationEffect &&
   prev.isComboPreview === next.isComboPreview &&
+  prev.blastPreview === next.blastPreview &&
   prev.selectionIndex === next.selectionIndex &&
   prev.selectionTotal === next.selectionTotal &&
   prev.zonePreview === next.zonePreview &&

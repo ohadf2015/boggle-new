@@ -264,7 +264,7 @@ describe('BlastResultsSummary', () => {
     expect(screen.getByTestId('blast-results-hero').dataset.cheering).toBe('false');
   });
 
-  it('shows coin, diamond and bomb chips, defaulting diamonds to 0', () => {
+  it('shows coin and bomb chips, and an empty gem haul when the run found no gems', () => {
     render(
       <BlastResultsSummary
         results={{ ...makeResults({ sessionCoins: 14 }), bombsPopped: 3 }}
@@ -274,8 +274,22 @@ describe('BlastResultsSummary', () => {
       />,
     );
     expect(screen.getByTestId('blast-stat-coins').textContent).toContain('14');
-    expect(screen.getByTestId('blast-stat-diamonds').textContent).toContain('0');
     expect(screen.getByTestId('blast-stat-bombs').textContent).toContain('3');
+    expect(screen.queryByTestId('blast-stat-diamonds')).toBeNull();
+    expect(screen.getByTestId('blast-gem-haul').getAttribute('data-empty')).toBe('true');
+  });
+
+  it('lays out the run\'s gems by color in the gem haul', () => {
+    render(
+      <BlastResultsSummary
+        results={{ ...makeResults({ diamondsCollected: 3 }), gemsByKind: { emerald: 2, ruby: 1 } }}
+        t={t}
+        onPlayAgain={noop}
+        onQuit={noop}
+      />,
+    );
+    expect(screen.getByTestId('blast-gem-slot-emerald').textContent).toContain('×2');
+    expect(screen.getByTestId('blast-gem-slot-ruby').textContent).toContain('×1');
   });
 
   it('teases the next goal with a near-miss nudge when close to the best', () => {

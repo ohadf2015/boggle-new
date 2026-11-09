@@ -7,7 +7,8 @@ import { STAT_STYLE } from './blastResultsTheme';
 import type { BlastResultsView, BlastStatId } from './blastResultsViewModel';
 import type { BlastResultsT } from './types';
 
-const LOOT: readonly BlastStatId[] = ['coins', 'diamonds', 'bombs'];
+// Gems get their own shelf (BlastGemHaul), so the loot row is coins and bombs.
+const LOOT: readonly BlastStatId[] = ['coins', 'bombs'];
 const SECONDARY = [
   { id: 'combo', Icon: Flame },
   { id: 'words', Icon: BookOpen },

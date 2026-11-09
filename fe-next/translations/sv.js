@@ -13730,6 +13730,10 @@ const sv = {
     "level": "Nivå {n}",
     "results": {
       "loot": "Byte",
+      "gemHaul": "Ädelstensfynd",
+      "gemTotal": "{n} ädelstenar",
+      "bestFind": "Bästa fyndet",
+      "gemHaulEmpty": "Inga ädelstenar den här gången. Ovanliga ord ger dem.",
       "journey": {
         "title": "Din runda",
         "stars": "{count} stjärnor intjänade",
@@ -14031,11 +14035,11 @@ const sv = {
       },
       "diamond": {
         "name": "Ädelsten",
-        "desc": "Fås av ovanliga och sällsynta ord, färgen visar hur ovanlig. I ett ord ger den ×2 (smaragd, safir), ×3 (ametist) eller ×4 (rubin); alla utom smaragden sprängs också rad och kolumn."
+        "desc": "Fås av ovanliga och sällsynta ord, färgen visar hur ovanlig. I ett ord ger den ×2 (smaragd, safir), ×3 (ametist) eller ×4 (rubin); safir och ametist spränger också ett litet kors, rubinen hela sin rad och kolumn."
       },
       "bomb": {
         "name": "Bomb",
-        "desc": "Rensar 3×3-yta. Kedjar till närliggande bomber."
+        "desc": "Rensar en 3×3-yta. Kan utlösa en bomb till."
       }
     },
     "title": "Blast-läge",
@@ -14381,11 +14385,11 @@ const sv = {
       },
       "diamond": {
         "name": "Ädelsten",
-        "desc": "Fås av bra ord: ×2 till ×4, de stora sprängs rad och kolumn"
+        "desc": "Fås av bra ord: ×2 till ×4, de stora spränger ett kors, rubinen hel rad och kolumn"
       },
       "bomb": {
         "name": "Bomb",
-        "desc": "Rensar 3×3. Kedjar till närliggande bomber"
+        "desc": "Rensar 3×3. Kan utlösa en bomb till"
       }
     },
     "highlight": {

@@ -14,6 +14,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useEquippedCosmetic } from '@/hooks/useEquippedCosmetic';
 import { COMBO_ELIGIBLE_TILES } from './utils/blastCombos';
 import { getTileTooltip } from './utils/blastTileTooltips';
+import { buildBlastPreview } from './utils/blastPreview';
 
 const TILE_TOOLTIP_HOLD_MS = 550;
 
@@ -140,6 +141,12 @@ export const BlastBoard = memo(function BlastBoard({
     return eligibleKeys.length >= 2 ? new Set(eligibleKeys) : null;
   }, [selectedCells, tileStates]);
 
+  // Live blast preview: which tiles this traced word will blast, and which gems it collects.
+  const blastPreviewMap = useMemo(
+    () => (sequencerState?.activeTiles.length ? null : buildBlastPreview(tileStates, selectedCells, gridSize)),
+    [tileStates, selectedCells, gridSize, sequencerState],
+  );
+
   // Build a lookup map from sequencer active tiles
   const animLookup = useMemo(() => {
     if (!sequencerState?.activeTiles.length) return null;
@@ -265,6 +272,7 @@ export const BlastBoard = memo(function BlastBoard({
                 selectionTotal={selectedCells.length}
                 isCascadeHighlight={cascadeHighlightSet.has(key)}
                 zonePreview={isSelected && tile.type === 'bomb' ? 'bomb' : null}
+                blastPreview={blastPreviewMap?.get(key) ?? null}
                 hideTooltip={isMultiplayer}
                 clearRotate={animState?.clearRotate}
                 col={tile.col}

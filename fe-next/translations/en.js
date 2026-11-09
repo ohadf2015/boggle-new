@@ -11768,6 +11768,10 @@ const en = {
     "level": "Level {n}",
     "results": {
       "loot": "Loot",
+      "gemHaul": "Gem haul",
+      "gemTotal": "{n} gems",
+      "bestFind": "Best find",
+      "gemHaulEmpty": "No gems this run. Rare words earn them.",
       "journey": {
         "title": "Your run",
         "stars": "{count} stars earned",
@@ -12015,11 +12019,11 @@ const en = {
       },
       "diamond": {
         "name": "Gem",
-        "desc": "Uncommon and rare words earn it, colored by rarity. In a word it pays ×2 (emerald, sapphire), ×3 (amethyst) or ×4 (ruby); all but emerald also blast a row + column."
+        "desc": "Uncommon and rare words earn it, colored by rarity. In a word it pays ×2 (emerald, sapphire), ×3 (amethyst) or ×4 (ruby); sapphire and amethyst also blast a small plus, ruby its whole row and column."
       },
       "bomb": {
         "name": "Bomb",
-        "desc": "Clears 3×3 area. Chains to nearby bombs."
+        "desc": "Clears a 3×3 area. Can set off one more bomb."
       }
     },
     "title": "Blast Mode",
@@ -12365,11 +12369,11 @@ const en = {
       },
       "diamond": {
         "name": "Gem",
-        "desc": "Earned by good words. ×2 to ×4 word, bigger gems also blast a row + column"
+        "desc": "Earned by good words. ×2 to ×4 word, bigger gems blast a plus, ruby a full row + column"
       },
       "bomb": {
         "name": "Bomb",
-        "desc": "Clears 3×3 area. Chains to nearby bombs"
+        "desc": "Clears a 3×3 area. Can set off one more bomb"
       }
     },
     "highlight": {

@@ -2,6 +2,9 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Gem } from 'lucide-react';
+import type { BlastGemKind } from '@/shared/types/blast';
+import { subscribeGemLanded, subscribeGemsCollected } from '@/lib/blast/gemCollectBus';
+import { BlastGemArt } from '@/components/blast/legacy/BlastGemArt';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { RivalScore } from './rivalTarget';
@@ -38,7 +41,26 @@ function usePulseOnRise(value: number): number {
 export function BlastHudDiamonds({ progress, waveDiamonds }: { progress: BlastHudProgress; waveDiamonds: number }) {
   const { t } = useLanguage();
   const diamonds = progress.baseDiamonds + waveDiamonds;
-  const pulseKey = usePulseOnRise(diamonds);
+  // Gems still flying to this chip are held back, so the count ticks up as each one lands.
+  const [inFlight, setInFlight] = useState(0);
+  const [lastGem, setLastGem] = useState<BlastGemKind | null>(null);
+  useEffect(() => subscribeGemsCollected((events) => setInFlight((n) => n + events.length)), []);
+  useEffect(
+    () =>
+      subscribeGemLanded((gem) => {
+        setInFlight((n) => Math.max(0, n - 1));
+        setLastGem(gem);
+      }),
+    [],
+  );
+  // Safety net: a flight cut short (screen change) must never leave the count low.
+  useEffect(() => {
+    if (inFlight === 0) return undefined;
+    const id = window.setTimeout(() => setInFlight(0), 3000);
+    return () => window.clearTimeout(id);
+  }, [inFlight]);
+  const shown = Math.max(0, diamonds - inFlight);
+  const pulseKey = usePulseOnRise(shown);
 
   return (
     <span
@@ -51,8 +73,12 @@ export function BlastHudDiamonds({ progress, waveDiamonds }: { progress: BlastHu
         pulseKey > 0 && [styles.pulse, styles.shine],
       )}
     >
-      <Gem className="h-3 w-3 text-neo-cyan tv:h-5 tv:w-5" fill="currentColor" strokeWidth={2.5} aria-hidden="true" />
-      {diamonds}
+      {lastGem ? (
+        <BlastGemArt gem={lastGem} className="h-3.5 w-3.5 tv:h-6 tv:w-6" />
+      ) : (
+        <Gem className="h-3 w-3 text-neo-cyan tv:h-5 tv:w-5" fill="currentColor" strokeWidth={2.5} aria-hidden="true" />
+      )}
+      {shown}
     </span>
   );
 }

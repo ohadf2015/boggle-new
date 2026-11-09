@@ -17,6 +17,7 @@ import { vibrateBlastBomb, vibrateBlastPrism } from '@/components/grid/hapticFee
 import { blastCoinDelta } from '../utils/blastCoinCurrency';
 import { emitMascotEvent } from '@/lib/blast/mascotBus';
 import { hasGemLetter } from '@/lib/blast/gemLetters';
+import { emitGemsCollected, gemEventsFrom } from '@/lib/blast/gemCollectBus';
 import { blastLetterBonus } from '@/lib/blast/blastLetterBonus';
 import { rollTreasure, type TreasureTier } from '@/lib/blast/blastTreasureRoll';
 import type { BlastTileType, BlastGameConfig } from '../types';
@@ -157,6 +158,7 @@ export function useBlastWordHandler({
       if (popped) return;
       popped = true;
       effects.setClearedTilesForEffects(animInfo.map(c => ({ row: c.row, col: c.col, type: c.type as BlastTileType })));
+      emitGemsCollected(gemEventsFrom(animInfo, preGrid));
       if (clearedTypes.has('bomb')) vibrateBlastBomb();
       for (const type of clearedTypes) {
         if (type !== 'standard') sounds.playSpecialTileSound(type);
@@ -203,6 +205,7 @@ export function useBlastWordHandler({
     const chainCleared = diffClearedTiles(preGrid, postGrid).filter(c => !animKeys.has(`${c.row},${c.col}`));
     if (chainCleared.length > 0) {
       effects.setClearedTilesForEffects(chainCleared.map(c => ({ row: c.row, col: c.col, type: c.type })));
+      emitGemsCollected(gemEventsFrom(chainCleared, preGrid));
     }
 
     // 3. Score fly effect

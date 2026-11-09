@@ -84,6 +84,22 @@ export function playDiamondPayoff(): void {
   ]);
 }
 
+/**
+ * A gem landing in the counter: a bright two-note pluck. Rarer gems ring higher and
+ * fuller, and each gem in the same haul steps up a note so a run of them climbs.
+ */
+export function playGemCollect(rarity: 1 | 2 | 3 | 4, haulIndex: number): void {
+  const scale = [1046.5, 1174.7, 1318.5, 1568, 1760, 2093, 2349.3, 2637];
+  const f = scale[Math.min(scale.length - 1, rarity - 1 + haulIndex)];
+  const voices: Voice[] = [
+    { freq: f, wave: 'triangle', dur: 0.24, vol: 0.075 },
+    { freq: f * 1.5, wave: 'sine', at: 0.05, dur: 0.22, vol: 0.045 },
+  ];
+  if (rarity >= 3) voices.push({ freq: f * 2, wave: 'sine', at: 0.1, dur: 0.35, vol: 0.03 });
+  if (rarity === 4) voices.push({ freq: f / 2, wave: 'triangle', dur: 0.4, vol: 0.06 }, { freq: f * 3, at: 0.16, dur: 0.4, vol: 0.02 });
+  play(voices);
+}
+
 export function playBombThump(power: number): void {
   play([
     { freq: 120, wave: 'sine', dur: 0.32 + 0.12 * power, vol: 0.14 + 0.06 * power, to: 38 },
