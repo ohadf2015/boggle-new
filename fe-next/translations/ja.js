@@ -14107,6 +14107,9 @@ const ja = {
       "chestHint": "クラスゲームでチェストを獲得",
       "classStreakHint": "今日のクラスゲームでクラスの連続記録が始まります"
     },
+    "classSwitcher": {
+      "label": "あなたのクラス"
+    },
     "classStrip": {
       "title": "クラスの連続記録",
       "streakDays": "{count}日連続",

@@ -163,13 +163,14 @@ export async function deleteClassroom(id: string): Promise<{ error: { message: s
  * If a student is a member of multiple classrooms, returns the most recently joined.
  */
 export async function getStudentClassroom(
-  studentId: string
+  studentId: string,
+  preferredClassroomId?: string | null
 ): Promise<{ data: Classroom | null; level: VocabularyLevel; error: { message: string } | null }> {
   if (!supabase) return { data: null, level: 'core', error: { message: 'Supabase not configured' } };
 
   try {
     // Query membership with joined classroom info, ordered by join date (most recent first)
-    const { data: membership, error: membershipError } = await supabase
+    let query = supabase
       .from('classroom_memberships')
       // Own columns as `*` for the same reason as the roster read above: a named
       // `level` fails the read outright when the column is not there yet.
@@ -185,10 +186,16 @@ export async function getStudentClassroom(
           updated_at
         )
       `)
-      .eq('student_id', studentId)
+      .eq('student_id', studentId);
+    if (preferredClassroomId) query = query.eq('classroom_id', preferredClassroomId);
+    const { data: membership, error: membershipError } = await query
       .order('joined_at', { ascending: false })
       .limit(1)
       .maybeSingle();
+
+    if (preferredClassroomId && !membershipError && !membership) {
+      return getStudentClassroom(studentId);
+    }
 
     if (membershipError) {
       logger.error('Error fetching student classroom:', membershipError);
@@ -212,6 +219,21 @@ export async function getStudentClassroom(
     logger.error('Exception in getStudentClassroom:', error);
     return { data: null, level: 'core', error: { message: error } };
   }
+}
+
+/** Every class the student belongs to, newest join first (feeds the class switcher). */
+export async function getStudentClassrooms(
+  studentId: string
+): Promise<{ data: { id: string; name: string }[]; error: { message: string } | null }> {
+  if (!supabase) return { data: [], error: { message: 'Supabase not configured' } };
+  const { data, error } = await supabase
+    .from('classroom_memberships')
+    .select('classrooms ( id, name )')
+    .eq('student_id', studentId)
+    .order('joined_at', { ascending: false });
+  if (error) return { data: [], error: { message: error.message } };
+  const rows = (data ?? []) as unknown as { classrooms: { id: string; name: string } | null }[];
+  return { data: rows.flatMap((r) => (r.classrooms ? [r.classrooms] : [])), error: null };
 }
 
 /**

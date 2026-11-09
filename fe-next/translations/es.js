@@ -14059,6 +14059,9 @@ const es = {
       "chestHint": "Gana cofres en los juegos de clase",
       "classStreakHint": "El juego de clase de hoy inicia la racha de la clase"
     },
+    "classSwitcher": {
+      "label": "Tus clases"
+    },
     "classStrip": {
       "title": "Racha de la clase",
       "streakDays": "Racha de {count} días",

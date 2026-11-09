@@ -13966,6 +13966,9 @@ const he = {
       "chestHint": "זכו בארגזים במשחקי הכיתה",
       "classStreakHint": "משחק הכיתה של היום מתחיל את הרצף הכיתתי"
     },
+    "classSwitcher": {
+      "label": "הכיתות שלך"
+    },
     "classStrip": {
       "title": "רצף הכיתה",
       "streakDays": "רצף כיתתי של {count} ימים",

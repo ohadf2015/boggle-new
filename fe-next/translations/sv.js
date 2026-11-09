@@ -14415,6 +14415,9 @@ const sv = {
       "chestHint": "Vinn kistor i klassspelen",
       "classStreakHint": "Dagens klassspel startar klassens streak"
     },
+    "classSwitcher": {
+      "label": "Dina klasser"
+    },
     "classStrip": {
       "title": "Klassens svit",
       "streakDays": "{count}-dagars klassvit",
