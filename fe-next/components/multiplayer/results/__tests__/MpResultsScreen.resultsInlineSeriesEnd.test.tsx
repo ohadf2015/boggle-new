@@ -84,6 +84,8 @@ vi.mock('@/lib/native/webViewLayerFlash', () => ({ prefersStaticFullscreenOverla
 vi.mock('@/utils/guestManager', () => ({ getGuestStatsSummary: () => ({ gamesPlayed: 3 }) }));
 vi.mock('@/lib/boardSelection', () => ({ pickRichestBoardClient: () => [['A']] }));
 vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: h.trackGrowthEvent }));
+vi.mock('@/hooks/useFriends', () => ({ useFriends: () => ({ friends: [], pendingRequests: [], outgoingRequests: [], pendingChallenges: [], isLoading: false, error: null, refresh: vi.fn(), sendRequest: vi.fn(), acceptRequest: vi.fn(), declineRequest: vi.fn(), cancelRequest: vi.fn(), removeFriend: vi.fn(), blockUser: vi.fn(), unblockUser: vi.fn(), acceptChallenge: vi.fn() }) }));
+vi.mock('@/utils/SocketContext', () => ({ useSocketOptional: () => null }));
 
 import MpResultsScreen from '../MpResultsScreen';
 import { emitRewardAdActive } from '@/hooks/useRewardAdPause';
@@ -169,14 +171,21 @@ describe('MpResultsScreen results_inline signup is series-end only', () => {
     expect(h.getHeadToHead).not.toHaveBeenCalled();
   });
 
-  it('a signed-in player trailing a signed-in rival with history sees the all-time record', async () => {
+  it('a signed-in player trailing a signed-in rival with history sees the all-time record on the H2H strip only', async () => {
     h.guest = false;
     h.getHeadToHead.mockResolvedValue({ myWins: 2, theirWins: 4, draws: 0, totalGames: 6 });
     renderScreen({ finalScores: [{ ...SCORES[0], score: 400, userId: 'u-maya' }, SCORES[1], SCORES[2]] as never });
     await waitFor(() => expect(h.getHeadToHead).toHaveBeenCalledWith('u-maya'));
     await Promise.resolve();
     skipReveal();
-    await waitFor(() => expect(screen.getByTestId('mp-my-callout').getAttribute('data-kind')).toBe('h2h'));
+    // Single source: strip owns the record (correct rival + W–L), card callout must not reprint h2h.
+    await waitFor(() => {
+      const strip = screen.getByTestId('mp-h2h-strip');
+      expect(strip.textContent).toContain('Maya');
+      expect(strip.textContent).toContain('"mine":2');
+      expect(strip.textContent).toContain('"theirs":4');
+    });
+    expect(screen.getByTestId('mp-my-callout').getAttribute('data-kind')).not.toBe('h2h');
   });
 
   it('a signed-in player whose rival is a guest gets the usual callout and no lookup', () => {
@@ -184,6 +193,40 @@ describe('MpResultsScreen results_inline signup is series-end only', () => {
     renderScreen({ finalScores: [{ ...SCORES[0], score: 400 }, SCORES[1], SCORES[2]] as never });
     skipReveal();
     expect(h.getHeadToHead).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('mp-h2h-strip')).toBeNull();
     expect(screen.getByTestId('mp-my-callout').getAttribute('data-kind')).not.toBe('h2h');
+  });
+
+  it('a signed-in player with a rival but no H2H history does not show the strip', async () => {
+    h.guest = false;
+    h.getHeadToHead.mockResolvedValue(null);
+    renderScreen({ finalScores: [{ ...SCORES[0], score: 400, userId: 'u-maya' }, SCORES[1], SCORES[2]] as never });
+    await waitFor(() => expect(h.getHeadToHead).toHaveBeenCalledWith('u-maya'));
+    skipReveal();
+    await Promise.resolve();
+    expect(screen.queryByTestId('mp-h2h-strip')).toBeNull();
+    expect(screen.getByTestId('mp-my-callout').getAttribute('data-kind')).not.toBe('h2h');
+  });
+
+  it('classroom results never show the public H2H strip even with history', async () => {
+    h.guest = false;
+    h.getHeadToHead.mockResolvedValue({ myWins: 3, theirWins: 1, draws: 0, totalGames: 4 });
+    // Host + classroomSummary ⇒ isClassroom without mounting student chest/socket paths.
+    renderScreen({
+      isHost: true,
+      finalScores: [{ ...SCORES[0], score: 400, userId: 'u-maya' }, SCORES[1], SCORES[2]] as never,
+      classroomSummary: {
+        teacherName: 'Ms. T',
+        lessonNames: ['L1'],
+        lessonIds: ['lesson-1'],
+        totalWords: 0,
+        coverage: [],
+        missedWords: [],
+        classFoundCount: 0,
+        masteryByPlayer: {},
+      } as never,
+    });
+    skipReveal();
+    expect(screen.queryByTestId('mp-h2h-strip')).toBeNull();
   });
 });

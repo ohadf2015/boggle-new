@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, LogOut, Share2, X } from 'lucide-react';
+import { Check, LogOut, Share2, Swords, X } from 'lucide-react';
 import { MpPrimaryCta } from '../shell/MpPrimaryCta';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { cn } from '@/lib/utils';
@@ -131,6 +131,8 @@ export interface MpFinalFooterProps {
   onRematch: () => void;
   onLeave: () => void;
   onShare: () => void;
+  /** One-tap Challenge — opens ChallengeInviteDialog or share/signup. Never auto-sends. */
+  onChallenge?: () => void;
   /** Exit label key; a classroom host's exit goes back to class. */
   leaveKey?: string;
   /** exp-mp-auto-continue-v1: the series final counts down to a new series. */
@@ -138,8 +140,8 @@ export interface MpFinalFooterProps {
   t: TFn;
 }
 
-/** Final results: [REMATCH] [LEAVE] [share]. One primary; the rest are quiet. */
-export function MpFinalFooter({ isHost, isReady, onRematch, onLeave, onShare, leaveKey = 'mpUi.results.leave', auto = null, t }: MpFinalFooterProps) {
+/** Final results: [REMATCH] [Challenge] [LEAVE] [share]. One primary; the rest are quiet. */
+export function MpFinalFooter({ isHost, isReady, onRematch, onLeave, onShare, onChallenge, leaveKey = 'mpUi.results.leave', auto = null, t }: MpFinalFooterProps) {
   const quiet = 'shrink-0 inline-flex flex-col items-center justify-center gap-0.5 rounded-neo border-[3px] border-neo-cream/40 bg-neo-navy-light text-neo-white shadow-hard-sm font-bold uppercase w-[calc(64px*var(--mp-u,1))] h-[calc(64px*var(--mp-u,1))] text-[calc(10px*var(--mp-u,1))] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none';
   return (
     <div className="flex items-center gap-[calc(10px*var(--mp-u,1))]">
@@ -148,6 +150,12 @@ export function MpFinalFooter({ isHost, isReady, onRematch, onLeave, onShare, le
         <MpWaitingHostChip t={t} />
       ) : (
         <MpPrimaryCta tone="lime" label={t('mpUi.results.rematch')} sublabel={isHost ? t('mpUi.results.newSeries') : undefined} onPress={onRematch} className="flex-1 min-w-0" />
+      )}
+      {onChallenge && (
+        <button type="button" data-testid="mp-results-challenge" onClick={onChallenge} className={quiet}>
+          <Swords aria-hidden="true" className="w-5 h-5 text-neo-pink" />
+          {t('mpUi.results.challenge')}
+        </button>
       )}
       <button type="button" data-testid="mp-results-leave" onClick={onLeave} className={cn(quiet, leaveKey !== 'mpUi.results.leave' && 'w-auto px-3')}>
         <DirectionalIcon icon={LogOut} mirror className="w-5 h-5" />
