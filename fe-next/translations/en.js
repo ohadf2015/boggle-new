@@ -12379,6 +12379,9 @@ const en = {
       "chestHint": "Win chests in class games",
       "classStreakHint": "Today's class game starts your class streak"
     },
+    "classSwitcher": {
+      "label": "Your classes"
+    },
     "classStrip": {
       "title": "Class streak",
       "streakDays": "{count}-day class streak",

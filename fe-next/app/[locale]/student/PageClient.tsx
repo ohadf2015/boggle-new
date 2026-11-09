@@ -39,7 +39,7 @@ export default function StudentPageClient() {
   const router = useRouter();
   const [isChecking, setIsChecking] = useState(true);
   const [profileStalled, setProfileStalled] = useState(false);
-  const { classroomId, classroom, level, isLoading: classroomLoading } = useStudentClassroom();
+  const { classroomId, classroom, classrooms, selectClassroom, level, isLoading: classroomLoading } = useStudentClassroom();
 
   useEffect(() => {
     if (loading) return;
@@ -131,6 +131,8 @@ export default function StudentPageClient() {
       studentName={studentName}
       classroomId={classroomId ?? null}
       classroomName={classroom?.name ?? null}
+      classrooms={classrooms}
+      onSelectClassroom={selectClassroom}
       level={level}
       avatarConfig={(profileFields.avatar_config ?? null) as never}
       profileXp={Number(profileFields.total_xp) || 0}

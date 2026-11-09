@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMounted } from '@/hooks/useMounted';
 import type { Classroom } from '@/lib/supabase/education';
@@ -17,10 +17,20 @@ interface UseStudentClassroomState {
   level: VocabularyLevel;
   isLoading: boolean;
   error: string | null;
+  /** Every class the student is in, newest first. Empty when unknown or on a failed read. */
+  classrooms: { id: string; name: string }[];
 }
 
 interface UseStudentClassroomActions {
   refresh: () => Promise<void>;
+  /** Switch the active class; the choice is remembered on this device. */
+  selectClassroom: (id: string) => Promise<void>;
+}
+
+const storageKey = (userId: string) => `lc.student.classroom.${userId}`;
+
+function readPreferred(userId: string): string | null {
+  try { return localStorage.getItem(storageKey(userId)); } catch { return null; }
 }
 
 export type UseStudentClassroomReturn = UseStudentClassroomState & UseStudentClassroomActions;
@@ -31,6 +41,7 @@ const INITIAL_STATE: UseStudentClassroomState = {
   level: 'core',
   isLoading: true,
   error: null,
+  classrooms: [],
 };
 
 const EMPTY_STATE: UseStudentClassroomState = {
@@ -39,6 +50,7 @@ const EMPTY_STATE: UseStudentClassroomState = {
   level: 'core',
   isLoading: false,
   error: null,
+  classrooms: [],
 };
 
 /**
@@ -53,18 +65,28 @@ const EMPTY_STATE: UseStudentClassroomState = {
 export function useStudentClassroom(): UseStudentClassroomReturn {
   const { isAuthenticated, user } = useAuth();
   const isMounted = useMounted();
+  const userId = user?.id ?? null;
 
   const [state, setState] = useState<UseStudentClassroomState>(INITIAL_STATE);
+  const preferredRef = useRef<string | null>(null);
 
   const fetchClassroom = useCallback(async () => {
-    if (!isAuthenticated || !user) {
+    if (!isAuthenticated || !userId) {
       setState(EMPTY_STATE);
       return;
     }
 
     try {
-      const { getStudentClassroom } = await import('@/lib/supabase/education');
-      const { data, level, error } = await getStudentClassroom(user.id);
+      const edu = await import('@/lib/supabase/education');
+      if (preferredRef.current === null) preferredRef.current = readPreferred(userId) ?? '';
+      const [{ data, level, error }, classrooms] = await Promise.all([
+        edu.getStudentClassroom(userId, ...(preferredRef.current ? [preferredRef.current] : [])),
+        // The switcher is optional: a failed list must not break the single-class flow.
+        Promise.resolve()
+          .then(() => edu.getStudentClassrooms(userId))
+          .then((r) => (r.error ? [] : r.data))
+          .catch(() => []),
+      ]);
 
       if (isMounted.current) {
         if (error) {
@@ -76,6 +98,7 @@ export function useStudentClassroom(): UseStudentClassroomReturn {
             level: level ?? 'core',
             isLoading: false,
             error: null,
+            classrooms,
           });
         }
       }
@@ -85,12 +108,21 @@ export function useStudentClassroom(): UseStudentClassroomReturn {
         setState(prev => ({ ...prev, isLoading: false, error: 'Failed to load classroom' }));
       }
     }
-  }, [isAuthenticated, user, isMounted]);
+  }, [isAuthenticated, userId, isMounted]);
 
   const refresh = useCallback(async () => {
     setState(prev => ({ ...prev, isLoading: true }));
     await fetchClassroom();
   }, [fetchClassroom]);
+
+  const selectClassroom = useCallback(async (id: string) => {
+    if (userId) {
+      try { localStorage.setItem(storageKey(userId), id); } catch { /* storage blocked: choice lasts this session */ }
+    }
+    preferredRef.current = id;
+    setState(prev => ({ ...prev, isLoading: true }));
+    await fetchClassroom();
+  }, [userId, fetchClassroom]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -103,5 +135,6 @@ export function useStudentClassroom(): UseStudentClassroomReturn {
   return {
     ...state,
     refresh,
+    selectClassroom,
   };
 }

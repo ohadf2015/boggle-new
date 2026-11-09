@@ -65,6 +65,8 @@ export interface AcademyHubProps {
   studentName: string;
   classroomId: string | null;
   classroomName?: string | null;
+  classrooms?: { id: string; name: string }[];
+  onSelectClassroom?: (id: string) => void;
   level?: VocabularyLevel | null;
   avatarConfig?: CustomAvatarConfig | null;
   profileXp: number;
@@ -94,7 +96,7 @@ type Note = { kind: 'arena' } | { kind: 'boss'; left: number } | null;
 const CHEST_COVER_DELAY_MS = 180;
 
 export function AcademyHub(props: AcademyHubProps) {
-  const { userId, studentName, classroomId, classroomName, level, avatarConfig, profileXp, isGuest, onSignOut, classroomLoading } = props;
+  const { userId, studentName, classroomId, classroomName, classrooms, onSelectClassroom, level, avatarConfig, profileXp, isGuest, onSignOut, classroomLoading } = props;
   const { t, language, dir } = useLanguage();
   const router = useRouter();
   const reducedMotion = useEduReducedMotion();
@@ -460,6 +462,8 @@ export function AcademyHub(props: AcademyHubProps) {
           classroomId={classroomId}
           userId={userId}
           className={classroomName}
+          classrooms={classrooms}
+          onSelectClassroom={onSelectClassroom}
           onClose={() => setClassOpen(false)}
           reducedMotion={reducedMotion}
           nextOpenAssignment={nextAssignment}

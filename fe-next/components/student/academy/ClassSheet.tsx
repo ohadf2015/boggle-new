@@ -12,6 +12,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import ClassroomLeaderboard from '@/components/education/ClassroomLeaderboard';
 import { StudentAssignmentPlayCta } from '@/components/student/StudentAssignmentPlayCta';
 import { ClassStrip } from './ClassStrip';
+import { ClassSwitcher } from './ClassSwitcher';
 import type { NextOpenAssignment } from '@/components/student/nextOpenAssignment';
 
 interface Props {
@@ -22,9 +23,11 @@ interface Props {
   reducedMotion: boolean;
   /** Next unfinished homework; null/omitted hides the Play CTA. */
   nextOpenAssignment?: NextOpenAssignment | null;
+  classrooms?: { id: string; name: string }[];
+  onSelectClassroom?: (id: string) => void;
 }
 
-export function ClassSheet({ classroomId, userId, className, onClose, reducedMotion, nextOpenAssignment = null }: Props) {
+export function ClassSheet({ classroomId, userId, className, onClose, reducedMotion, nextOpenAssignment = null, classrooms = [], onSelectClassroom }: Props) {
   const { t } = useLanguage();
   return (
     <div className="fixed inset-0 z-40 flex items-end justify-center sm:items-center" role="dialog" aria-modal="true" aria-label={t('student.dashboard.leaderboard', 'Leaderboard')}>
@@ -51,6 +54,7 @@ export function ClassSheet({ classroomId, userId, className, onClose, reducedMot
             <X className="h-4 w-4" aria-hidden="true" />
           </button>
         </div>
+        {onSelectClassroom && <ClassSwitcher classrooms={classrooms} activeId={classroomId} onSelect={onSelectClassroom} />}
         <div className="min-h-0 flex-1 overflow-y-auto p-3">
           <StudentAssignmentPlayCta next={nextOpenAssignment} />
           <ClassStrip classroomId={classroomId} reducedMotion={reducedMotion} />

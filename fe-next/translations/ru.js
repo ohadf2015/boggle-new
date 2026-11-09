@@ -2843,6 +2843,9 @@ const ru = {
       "chestHint": "Выигрывай сундуки в играх класса",
       "classStreakHint": "Сегодняшняя игра класса начнёт серию класса"
     },
+    "classSwitcher": {
+      "label": "Твои классы"
+    },
     "classStrip": {
       "title": "Серия класса",
       "streakDays": "Серия класса: {count} дн.",
