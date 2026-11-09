@@ -1,3 +1,5 @@
+import { getDailyChallengeDate } from '@/utils/dailyChallenge/dateUtils';
+
 export const FREE_HINTS_PER_DAY = 1;
 export const FREE_HINTS_KEY = 'connections:freeHints';
 
@@ -6,7 +8,7 @@ function isBrowser(): boolean {
 }
 
 function todayKey(): string {
-  return new Date().toISOString().slice(0, 10);
+  return getDailyChallengeDate();
 }
 
 /** Stored as "<YYYY-MM-DD>:<used>" — a stale or corrupted value reads as 0 used. */

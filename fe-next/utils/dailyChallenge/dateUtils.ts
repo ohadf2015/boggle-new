@@ -76,4 +76,4 @@ export function getPreviousDate(dateString: string): string {
  * Format countdown as HH:MM:SS
  * @deprecated Use formatTimeHHMMSS from '@/shared/utils' directly
  */
-export const formatCountdown = formatTimeHHMMSS;
+export const formatCountdown = (seconds: number): string => formatTimeHHMMSS(seconds);

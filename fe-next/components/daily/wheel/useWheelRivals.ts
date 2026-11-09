@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
+import { getDailyChallengeDate } from '@/utils/dailyChallenge/dateUtils';
 
 export interface RivalScore {
   name: string;
@@ -55,7 +56,7 @@ export function useWheelRivals({ enabled, language, puzzleDate, currentPlayerId,
     const fetchRivals = async () => {
       try {
         // A catch-up replay races that day's board, not today's.
-        const date = puzzleDate || new Date().toISOString().split('T')[0];
+        const date = puzzleDate || getDailyChallengeDate();
         const res = await fetch(`/api/daily-challenge/word-wheel/leaderboard/${date}/${language}?limit=100`);
         if (!res.ok) return;
         const json = await res.json();

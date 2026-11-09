@@ -18,6 +18,7 @@ import { celebrateAdReward } from '@/lib/ads/rewardCelebration';
 import { trackRewardedAdOffered, trackRewardedAdWatched, trackRewardedAdDeclined } from '@/utils/growthTracking';
 import type { RewardedSurface } from '@/lib/admob-config';
 import { isAdFreeRoute } from '@/lib/admob-routes';
+import { getDailyChallengeDate } from '@/utils/dailyChallenge/dateUtils';
 
 export type AdStatus = 'idle' | 'loading' | 'showing' | 'completed' | 'error';
 
@@ -59,7 +60,7 @@ const MAX_DAILY_AD_VIEWS = 10;
 const MAX_DAILY_FEATURE_AD_VIEWS = 40;
 
 function getTodayKey(): string {
-  return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+  return getDailyChallengeDate(); // YYYY-MM-DD
 }
 
 function readDailyCounts(): { count: number; featureCount: number } {

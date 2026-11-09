@@ -8,9 +8,10 @@
  * player's score submit.
  */
 import type { QuestGameResult } from '@/shared/dailyQuestPool';
+import { getDailyChallengeDate } from '@/utils/dailyChallenge/dateUtils';
 
 export function isTodayUTC(dateISO: string): boolean {
-  return dateISO === new Date().toISOString().slice(0, 10);
+  return dateISO === getDailyChallengeDate();
 }
 
 export function creditDailyQuests(

@@ -5,10 +5,11 @@
  */
 import { clientStreakAfterSolve, type ClientStreak } from './streak';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
+import { getDailyChallengeDate } from '@/utils/dailyChallenge/dateUtils';
 
 /** Current UTC calendar day, 'YYYY-MM-DD'. */
 export function todayUTC(): string {
-  return new Date().toISOString().slice(0, 10);
+  return getDailyChallengeDate();
 }
 
 const FP_KEY = 'connections-guest-fp';

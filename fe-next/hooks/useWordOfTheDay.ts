@@ -10,6 +10,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { getDailyChallengeDate } from '@/utils/dailyChallenge/dateUtils';
 
 /** Curated word lists per language — must match backend wordOfTheDayManager.ts pools */
 const WORD_POOLS: Record<string, string[]> = {
@@ -87,7 +88,7 @@ function seededRandom(seed: string): number {
 }
 
 function getTodayDate(): string {
-  return new Date().toISOString().split('T')[0];
+  return getDailyChallengeDate();
 }
 
 export interface WotdData {

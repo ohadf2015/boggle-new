@@ -9,6 +9,7 @@ import { DAILY_MODES, dailyModeHref, pickNextUnplayedMode, playStateFromToday, t
 import { cn } from '@/lib/utils';
 import { consumeDailyHandoff, markDailyHandoff } from './dailyHandoff';
 import { DailyStepBanner } from './DailyStepBanner';
+import { getDailyChallengeDate } from '@/utils/dailyChallenge/dateUtils';
 
 interface DailyFlowChromeProps {
   modeId: DailyModeId;
@@ -29,7 +30,7 @@ interface DailyFlowChromeProps {
 }
 
 const INTRO_MS = 1600;
-const introKey = (id: DailyModeId) => `lc:daily-intro:${id}:${new Date().toISOString().slice(0, 10)}`;
+const introKey = (id: DailyModeId) => `lc:daily-intro:${id}:${getDailyChallengeDate()}`;
 
 /**
  * Shared chrome for every daily challenge page:
