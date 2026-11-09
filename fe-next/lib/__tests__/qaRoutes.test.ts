@@ -32,4 +32,14 @@ describe('isHiddenQaRoute', () => {
     expect(isHiddenQaRoute('/en/avatar-test', { ...PROD, ENABLE_QA_ROUTES: '1' })).toBe(false);
     expect(isHiddenQaRoute('/en/avatar-test', { NODE_ENV: 'development' })).toBe(false);
   });
+
+  it('hides the dev-only design previews in production so they answer a real 404', () => {
+    for (const path of ['/en/teacher/preview', '/he/student/achievements/preview', '/sv/student/play/preview', '/en/teacher/preview/']) {
+      expect(isHiddenQaRoute(path, PROD), path).toBe(true);
+      expect(isHiddenQaRoute(path, { NODE_ENV: 'development' }), path).toBe(false);
+    }
+    for (const path of ['/en/teacher', '/en/teacher/upgrade', '/en/student/play', '/en/student/achievements', '/en/blog/preview']) {
+      expect(isHiddenQaRoute(path, PROD), path).toBe(false);
+    }
+  });
 });

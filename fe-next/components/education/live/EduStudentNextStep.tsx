@@ -31,14 +31,14 @@ export function EduStudentNextStep({ t, placing, onPractice, showTomorrow = true
   );
 }
 
-/** The share carries rank and score only: a child's name, class and room code never leave the phone. */
+/** The share carries rank and score only: a child's name, class and room code never leave the phone. The link lands on the ad-free class join page, never the consumer game. */
 export function EduStudentShareButton({ t, language, placing }: { t: Translate; language: string; placing: Placing }) {
   if (!placing) return null;
   const share = async () => {
     const outcome = await shareOrCopy({
       title: 'LexiClash',
       text: t('eduLiveRoom.studentResults.shareText', { rank: placing.rank, total: placing.total, score: placing.score }),
-      url: `${window.location.origin}/${language}/daily?utm_source=edu_student_share&utm_medium=referral`,
+      url: `${window.location.origin}/${language}/join?utm_source=edu_student_share&utm_medium=referral`,
     });
     if (outcome === 'native' || outcome === 'copy') trackEduStudentResultShared({ method: outcome });
     if (outcome === 'copy') toast.success(t('share.linkCopied'));

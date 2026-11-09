@@ -66,7 +66,7 @@ export const RankDeltaIndicator = memo<RankDeltaProps>(({ rankDelta, isNew }) =>
     return (
       <AdaptiveMotion.span
         data-testid="rank-delta-new"
-        className="px-2 py-0.5 text-xs font-neo-body font-bold bg-neo-cyan text-neo-black rounded"
+        className="whitespace-nowrap px-2 py-0.5 text-xs font-neo-body font-bold bg-neo-cyan text-neo-black rounded"
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ type: 'spring', stiffness: 500, damping: 18 }}
@@ -144,7 +144,7 @@ export const TierBadge = memo<TierBadgeProps>(({ rank, totalStudents }) => {
     <span
       data-testid={`tier-badge-${tier}`}
       className={cn(
-        'px-2 py-0.5 text-xs font-neo-body font-bold rounded',
+        'whitespace-nowrap px-2 py-0.5 text-xs font-neo-body font-bold rounded',
         config.bg,
         config.text
       )}
