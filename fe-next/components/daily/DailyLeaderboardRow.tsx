@@ -11,6 +11,7 @@ import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import Avatar from '@/components/Avatar';
 import PlayerProfileTooltip from '@/components/ui/PlayerProfileTooltip';
 import { TierBadge } from '@/components/ui/TierBadge';
+import { FriendQuickAction } from '@/components/friends/FriendQuickAction';
 import { getDailyLeaderboardTier } from '@/lib/ranked/leaderboardTiers';
 import type { RankMovement } from './leaderboardLive';
 import { MODE_DOT } from './leaderboardRows';
@@ -174,6 +175,7 @@ function RowShell({
         {stats && <div className="text-xs sm:text-sm flex items-center gap-2 mt-0.5 flex-wrap">{stats}</div>}
       </div>
 
+      {!isCurrentUser && <FriendQuickAction userId={person.player_id} name={name} surface="daily_leaderboard" />}
       {trailing}
     </m.div>
   );

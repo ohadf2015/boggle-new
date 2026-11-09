@@ -21,9 +21,9 @@ vi.mock('../../utils/errorHandler', async () => {
 vi.mock('../../modules/friendsManager');
 vi.mock('../../modules/supabaseServer');
 vi.mock('../../utils/socialHelpers');
-vi.mock('../../utils/profanityFilter', () => ({
+vi.mock('../../utils/chatProfanity', () => ({
   __esModule: true,
-  cleanProfanity: vi.fn((s: string) => s),
+  cleanChatProfanity: vi.fn((s: string) => s),
 }));
 vi.mock('../../utils/sanitize', () => ({
   __esModule: true,

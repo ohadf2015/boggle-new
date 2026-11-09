@@ -10,6 +10,7 @@ import { useWindowedList } from '@/hooks/useWindowedList';
 import type { Language } from '@/types';
 import { getCurrentSeasonDynamic, getSeasonIdentity } from '@/lib/seasons';
 import { TodayParticipantRow, AllTimeParticipantRow, SeasonParticipantRow } from './DailyLeaderboardRow';
+import { FriendStatusProvider } from '@/components/friends/FriendStatusContext';
 import { WordWheelWordsModal } from './WordWheelWordsModal';
 import { WordHuntWordsModal } from './WordHuntWordsModal';
 import ChaseBanner from './ChaseBanner';
@@ -408,4 +409,11 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
   );
 };
 
-export default memo(TabbedDailyLeaderboard);
+/** Friend add/chat buttons on every row share one friends snapshot. */
+const TabbedDailyLeaderboardWithFriends: React.FC<TabbedDailyLeaderboardProps> = (props) => (
+  <FriendStatusProvider>
+    <TabbedDailyLeaderboard {...props} />
+  </FriendStatusProvider>
+);
+
+export default memo(TabbedDailyLeaderboardWithFriends);

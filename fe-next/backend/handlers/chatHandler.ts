@@ -7,7 +7,7 @@ import type { Server, Socket } from 'socket.io';
 import type { Game, ChatMessagePayload } from '@/shared/types';
 import { getGame, getGameBySocketId, getUsernameBySocketId } from '../modules/gameStateManager';
 import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers';
-import { cleanProfanity } from '../utils/profanityFilter';
+import { cleanChatProfanity } from '../utils/chatProfanity';
 import { sanitizeHtml } from '../utils/sanitize';
 import { emitError, ErrorCodes } from '../utils/errorHandler';
 import { checkRateLimit } from '../utils/rateLimiter';
@@ -88,7 +88,7 @@ function registerChatHandlers(io: Server, socket: Socket): void {
     const isHostUser = game.hostSocketId === socket.id;
 
     // Filter profanity and sanitize HTML
-    const cleanMessage = sanitizeHtml(cleanProfanity(message.trim().substring(0, 500)));
+    const cleanMessage = sanitizeHtml(cleanChatProfanity(message.trim().substring(0, 500)));
     const timestamp = Date.now();
     const chatMessageData: ChatMessagePayload = {
       username: isHostUser ? 'Host' : sanitizeHtml(username),

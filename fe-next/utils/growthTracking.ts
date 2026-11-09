@@ -177,6 +177,11 @@ export type GrowthEvent =
   // single event regardless of the channel.
   | 'share_completed'
   | 'friend_added'
+  | 'friend_request_sent'
+  | 'friend_request_accepted'
+  | 'friend_chat_opened'
+  | 'friend_quick_reply_sent'
+  | 'friend_invite_sent'
   | 'challenge_sent'
   // Engagement
   | 'achievement_earned'
