@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
       for (const p of profiles ?? []) profileMap.set(p.id, p);
     }
 
-    const lang = request.nextUrl.searchParams.get('lang') || 'en';
+    const lang = new URL(request.url).searchParams.get('lang') || 'en';
     const taken = new Set<string>();
     const leaderboard = (rows ?? []).map((r, i) => {
       const p = profileMap.get(r.player_id);
