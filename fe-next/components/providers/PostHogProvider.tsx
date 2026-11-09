@@ -29,6 +29,7 @@ import { filterEmptyException } from '@/utils/posthogExceptionFilter';
 import { installAbandonOnPagehide } from '@/utils/abandonOnPagehide';
 import { installInpAttributionTracker } from '@/utils/inpAttribution';
 import { isHeavyGamePath } from '@/lib/perf/heavyGamePath';
+import { surfaceOf } from '@/lib/navigation/eduSections';
 
 let posthogInitialized = false;
 
@@ -124,6 +125,8 @@ function PostHogPageView() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
+    // Before the init gate: the lazy proxy queues it, so even the first event carries it.
+    if (pathname) setPostHogSuperProps({ surface: surfaceOf(pathname) });
     if (!pathname || !posthogInitialized) return;
 
     const url = searchParams.toString()

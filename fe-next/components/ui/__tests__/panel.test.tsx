@@ -137,3 +137,20 @@ describe('NeoPanel', () => {
     );
   });
 });
+
+describe('NeoPanel block tones', () => {
+  it('lime → the same classes as the teacher NB_BLOCK lime', () => {
+    const { container } = render(<NeoPanel tone="lime">x</NeoPanel>);
+    expect(container.firstChild as HTMLElement).toHaveClass('bg-neo-lime', 'text-neo-black', 'border-neo-black');
+  });
+  it('navyLight → raised navy with the cream edge', () => {
+    const { container } = render(<NeoPanel tone="navyLight">x</NeoPanel>);
+    const el = container.firstChild as HTMLElement;
+    expect(el).toHaveClass('bg-neo-navy-light', 'text-neo-cream', 'border-neo-cream/50');
+    expect(el.className.split(/\s+/)).not.toContain('border-neo-black');
+  });
+  it('card + neo-xl + xl reproduces NB_PANEL', () => {
+    const { container } = render(<NeoPanel tone="card" radius="neo-xl" shadow="xl">x</NeoPanel>);
+    expect(container.firstChild as HTMLElement).toHaveClass('rounded-neo-xl', 'border-neo-cream/50', 'bg-[#2a2b4a]', 'text-neo-cream', 'shadow-hard-xl');
+  });
+});

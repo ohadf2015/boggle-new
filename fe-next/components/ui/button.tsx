@@ -4,6 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { AdaptiveMotion } from "../motion/AdaptiveMotion";
 
 import { cn } from "../../lib/utils";
+import { NEO_BLOCK_TONES, NEO_BUTTON, type NeoBlockTone, type NeoButtonVariant } from "./neoStyles";
 
 // Neo-Brutalist Button Variants
 // Features: Thick borders, hard shadows, physical press effect, uppercase text
@@ -136,4 +137,26 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 );
 Button.displayName = "Button";
 
-export { Button, buttonVariants };
+export interface NeoButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: NeoButtonVariant;
+  tone?: NeoBlockTone;
+  asChild?: boolean;
+}
+
+/** Chunky neo action built from the same classes as NB_* and the live-game buttons. */
+const NeoButton = React.forwardRef<HTMLButtonElement, NeoButtonProps>(
+  ({ variant = "primary", tone, asChild = false, className, type, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button";
+    return (
+      <Comp
+        ref={ref}
+        type={asChild ? type : (type ?? "button")}
+        className={cn(NEO_BUTTON[variant], tone && NEO_BLOCK_TONES[tone], className)}
+        {...props}
+      />
+    );
+  }
+);
+NeoButton.displayName = "NeoButton";
+
+export { Button, buttonVariants, NeoButton };

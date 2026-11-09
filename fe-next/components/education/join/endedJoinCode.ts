@@ -7,15 +7,22 @@ import { lookupEndedClassroomSession } from '@/app/api/education/classroom/join/
 const CODE_RE = /^[A-Z0-9]{6}$/;
 const LOOKUPS_PER_MINUTE = 20;
 
-export async function isEndedJoinCode(code: string): Promise<boolean> {
+export type EndedJoinCodeStatus = 'ended' | 'not_ended' | 'unverified';
+
+export async function endedJoinCodeStatus(code: string): Promise<EndedJoinCodeStatus> {
   const normalized = code.trim().toUpperCase();
-  if (!CODE_RE.test(normalized)) return false;
+  if (!CODE_RE.test(normalized)) return 'not_ended';
   // Without a cap this is a yes/no oracle for guessing finished session codes.
   const ip = (await headers()).get('x-forwarded-for')?.split(',')[0].trim() || 'unknown';
   const { limited } = await checkRateLimitRedis(RATE_LIMIT_KEYS.api(`ended-code:${ip}`), {
     maxRequests: LOOKUPS_PER_MINUTE,
     windowMs: 60_000,
   });
-  if (limited) return false;
-  return (await lookupEndedClassroomSession(normalized)) !== null;
+  // A class behind one school IP trips this; "could not check" must never read as "wrong code".
+  if (limited) return 'unverified';
+  return (await lookupEndedClassroomSession(normalized)) !== null ? 'ended' : 'not_ended';
+}
+
+export async function isEndedJoinCode(code: string): Promise<boolean> {
+  return (await endedJoinCodeStatus(code)) === 'ended';
 }

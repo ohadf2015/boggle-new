@@ -147,8 +147,8 @@ describe('MetricCard - Severity Styling', () => {
     });
 
     const card = screen.getByTestId('metric-card');
-    // Card has border-black; severity affects the colored header bg
-    expect(card).toHaveClass('border-black');
+    // Card has border-neo-black; severity affects the colored header bg
+    expect(card).toHaveClass('border-neo-black');
     // Header should have bg-neo-cyan
     const header = card.firstElementChild;
     expect(header).toHaveClass('bg-neo-cyan');

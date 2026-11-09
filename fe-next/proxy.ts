@@ -7,6 +7,7 @@ import { decideNextHandle } from './lib/seo/nextHandleGate';
 // Shared with the [locale] layout (RUM beacon suppression for crawlers).
 import { isBotUserAgent } from './lib/seo/botUa';
 import { isNativeAppUserAgent, nativeHandoffRoute } from './lib/native/nativeHandoff';
+import { needsSessionRefresh } from './lib/navigation/sessionRefreshRoutes';
 
 const VALID_LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
 const DEFAULT_LOCALE = 'en';
@@ -86,16 +87,8 @@ export async function proxy(request: NextRequest) {
 
   const isBot = isBotRequest(request);
 
-  // Routes that need Supabase session refresh (game pages, auth)
-  // API routes handle their own auth — skip proxy refresh to avoid 200-500ms overhead.
-  // Public routes (landing, SEO, static pages) skip auth for faster navigation.
-  const AUTH_ROUTES = [
-    '/multiplayer', '/education/live', '/singleplayer', '/adventure', '/daily',
-    '/challenge', '/join', '/brain', '/custom', '/party-screen',
-    '/teacher', '/student', '/auth', '/settings', '/profile',
-  ];
   const pathWithoutLocale = pathname.replace(/^\/(en|he|sv|ja|es|ru)/, '');
-  const needsAuth = AUTH_ROUTES.some(route => pathWithoutLocale.startsWith(route));
+  const needsAuth = needsSessionRefresh(pathname);
 
   // Create Supabase client for session refresh (skip for bots and public pages)
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;

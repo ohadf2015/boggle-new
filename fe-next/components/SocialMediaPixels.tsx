@@ -1,9 +1,21 @@
 'use client';
 
+import { useEffect } from 'react';
 import Script from 'next/script';
+import { usePathname } from 'next/navigation';
+import { surfaceOf } from '@/lib/navigation/eduSections';
 
 const FB_PIXEL_ID = process.env.NEXT_PUBLIC_FB_PIXEL_ID;
 const TIKTOK_PIXEL_ID = process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID;
+
+type FbqWindow = Window & { fbq?: (...args: unknown[]) => void };
+
+// School consent covers educational use only: no ad pixels on any classroom page.
+function onClassroomPage(): boolean {
+  return typeof window !== 'undefined' && surfaceOf(window.location.pathname) === 'edu';
+}
+
+let fbConsentRevoked = false;
 
 /**
  * Social Media Pixels Component
@@ -12,6 +24,23 @@ const TIKTOK_PIXEL_ID = process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID;
  * Add NEXT_PUBLIC_FB_PIXEL_ID and NEXT_PUBLIC_TIKTOK_PIXEL_ID to environment variables.
  */
 export function SocialMediaPixels() {
+  const edu = surfaceOf(usePathname()) === 'edu';
+
+  // A pixel loaded on a game page keeps tracking client-side navigations into a class.
+  useEffect(() => {
+    const fbq = (window as FbqWindow).fbq;
+    if (!fbq) return;
+    if (edu) {
+      fbq('consent', 'revoke');
+      fbConsentRevoked = true;
+    } else if (fbConsentRevoked) {
+      fbq('consent', 'grant');
+      fbConsentRevoked = false;
+    }
+  }, [edu]);
+
+  if (edu) return null;
+
   return (
     <>
       {/* Facebook Pixel */}
@@ -68,8 +97,8 @@ export function trackFBEvent(
   eventName: string,
   eventParams?: Record<string, string | number | boolean>
 ): void {
-  if (typeof window !== 'undefined' && 'fbq' in window && FB_PIXEL_ID) {
-    (window as typeof window & { fbq: (...args: unknown[]) => void }).fbq('track', eventName, eventParams);
+  if (typeof window !== 'undefined' && 'fbq' in window && FB_PIXEL_ID && !onClassroomPage()) {
+    (window as FbqWindow).fbq?.('track', eventName, eventParams);
   }
 }
 
@@ -80,7 +109,7 @@ export function trackTikTokEvent(
   eventName: string,
   eventParams?: Record<string, string | number | boolean>
 ): void {
-  if (typeof window !== 'undefined' && 'ttq' in window && TIKTOK_PIXEL_ID) {
+  if (typeof window !== 'undefined' && 'ttq' in window && TIKTOK_PIXEL_ID && !onClassroomPage()) {
     (window as typeof window & { ttq: { track: (...args: unknown[]) => void } }).ttq.track(eventName, eventParams);
   }
 }

@@ -1,25 +1,22 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { isPracticeRound } from '../isPracticeRound';
 
 describe('isPracticeRound', () => {
-  it('Given every player was a bot, Then the round is a practice round', () => {
-    expect(isPracticeRound([{ isBot: true }, { isBot: true }])).toBe(true);
+  it('is a practice round when only bots played', () => {
+    expect(isPracticeRound([{ isHost: true }, { isBot: true }, { isBot: true }])).toBe(true);
   });
 
-  it('Given one real student played, Then it is a real class round', () => {
-    expect(isPracticeRound([{ isBot: true }, { isBot: false }])).toBe(false);
+  it("counts the teacher's practice seat as practice, not as a student", () => {
+    expect(isPracticeRound([{ isHost: true }, { isPractice: true }, { isBot: true }])).toBe(true);
+    expect(isPracticeRound([{ isPractice: true }])).toBe(true);
   });
 
-  it('Given bots played and the host sat in the scores, as the live payload sends it, Then it is still a practice round', () => {
-    expect(isPracticeRound([{ isBot: true }, { isBot: true }, { isBot: false, isHost: true }])).toBe(true);
+  it('is a real round once one student played', () => {
+    expect(isPracticeRound([{ isPractice: true }, { isBot: true }, {}])).toBe(false);
   });
 
-  it('Given only the host is in the scores, Then it is not treated as practice', () => {
-    expect(isPracticeRound([{ isBot: false, isHost: true }])).toBe(false);
-  });
-
-  it('Given no player list, Then it is not treated as practice', () => {
+  it('is not a practice round with nobody seated', () => {
+    expect(isPracticeRound([{ isHost: true }])).toBe(false);
     expect(isPracticeRound(undefined)).toBe(false);
-    expect(isPracticeRound([])).toBe(false);
   });
 });

@@ -20,6 +20,7 @@ const BY_CODE: Record<JoinClassroomErrorCode | typeof ROOM_LOCKED, JoinFailure> 
   ROOM_LOCKED: { outcome: 'room_locked', effect: 'locked', formErrorKey: ROOM_LOCKED_KEY },
   NAME_TAKEN: { outcome: 'name_taken', effect: 'name_taken' },
   SESSION_ENDED: { outcome: 'invalid_code', effect: 'ended' },
+  TEACHER_OWN_CLASS: { outcome: 'teacher_own_class', effect: 'error', formErrorKey: 'education.student.join.teacherOwnClass' },
 };
 
 export function joinFailure(code: JoinClassroomErrorCode | typeof ROOM_LOCKED | undefined): JoinFailure {

@@ -15105,6 +15105,14 @@ const es = {
     },
     "reports": {
       "valueLine": "Después de cada partida, ves qué palabras falló cada clase, quién necesita ayuda y qué practicar a continuación.",
+      "homeworkShortcut": "Resultados de las tareas",
+      "freeSummary": {
+        "title": "Tus clases hasta ahora",
+        "games": "Partidas en los últimos 30 días",
+        "students": "Estudiantes en tus clases",
+        "classes": "Clases que jugaron esta semana",
+        "hint": "Pro añade los resultados palabra por palabra de cada estudiante y cada partida."
+      },
       "lockedValue": "Las palabras que falló tu clase aparecen gratis en la pantalla de resultados de cada partida. Los informes añaden quién necesita ayuda, alumno por alumno, en todas tus partidas.",
       "emptyClass": {
         "title": "Esta clase aún no ha jugado",
@@ -15734,10 +15742,10 @@ const es = {
       "startBlocked": "Espera a que entre al menos un alumno para empezar.",
       "practiceFirst": "Practica primero con 3 bots",
       "practiceFirstHint": "Mira lo que verá tu clase. Los bots se van cuando entra tu primer alumno.",
-      "rehearseCta": "Practicar con bots",
+      "rehearseCta": "Vista previa con bots",
       "rehearsePrivate": "Solo tú ves esto. Los estudiantes no están en la sala y no cuenta.",
-      "rehearseBotsBlocked": "Los bots no pueden jugar a este juego, así que no puedes practicarlo con ellos.",
-      "rehearseUseClassic": "Practica con bots en Clásico",
+      "rehearseBotsBlocked": "Los bots no pueden jugar a este juego, así que no puedes verlo con ellos antes.",
+      "rehearseUseClassic": "Vista previa con bots en Clásico",
       "startWhenReady": "Empieza cuando estén todos",
       "startAnyway": "Empezar igual",
       "stillLearning": "{count} todavía están aprendiendo las palabras",
@@ -17432,6 +17440,17 @@ const es = {
         "subtitle": "Ingresa el código de tu profe",
         "codeLabel": "Código del aula",
         "codeHint": "Pide el código de 6 caracteres a tu profe",
+        "codeStripped": "Algunos de esos caracteres no existen en los códigos de clase. Cambia el teclado a letras latinas y vuelve a intentarlo.",
+        "teacherOwnClass": "Esta es tu propia clase, así que no puedes unirte como alumno. Ábrela desde tu panel de profe.",
+        "returning": {
+          "title": "¿Sigues como {name}?",
+          "titleNoName": "¿Eres tú?",
+          "sub": "Alguien ya jugó en este dispositivo. Asegúrate de que eres tú antes de entrar.",
+          "yes": "Sí, soy yo",
+          "notMe": "No soy yo",
+          "leaving": "Cerrando su sesión…",
+          "leaveFailed": "No pudimos cerrar la sesión del último jugador. Inténtalo otra vez."
+        },
         "button": "Unirme",
         "joining": "Entrando...",
         "pasteButton": "Pegar código",
@@ -21640,13 +21659,16 @@ const es = {
   "eduLiveRoom": {
     "practice": {
       "seatName": "Estudiante de práctica",
-      "title": "Tu vista de estudiante",
+      "title": "Pruébalo como estudiante",
       "joining": "Entrando como estudiante…",
       "joined": "¡Ya estás dentro! Juega aquí.",
       "openTab": "Abrir en una pestaña nueva",
-      "hide": "Ocultar vista de estudiante",
-      "show": "Mostrar vista de estudiante",
-      "frameTitle": "Vista de estudiante"
+      "hide": "Ocultar",
+      "show": "Pruébalo como estudiante",
+      "frameTitle": "Pruébalo como estudiante",
+      "seatTimeout": "Tu puesto de estudiante no entró. Empieza solo con bots o inténtalo otra vez.",
+      "botsOnly": "Empezar solo con bots",
+      "retry": "Reintentar"
     },
     "round": {
       "boardLabel": "Tablero de la clase",
@@ -21791,14 +21813,18 @@ const es = {
       "railLabel": "Esta semana y tu plan",
       "weeklyReports": "Informes semanales",
       "weeklyReportsHint": "Las cifras de esta semana y un resumen para enviar a las familias.",
+      "shareCode": "Compartir código",
+      "shareTitle": "Comparte el código de tu clase",
+      "seeResults": "Ver resultados",
+      "allResults": "Ver todos los resultados",
       "flow": {
-        "subtitle": "Cada una dirige la clase completa: los alumnos aprenden las palabras en el móvil, juegan una ronda solos y luego toda la clase juega en directo.",
+        "subtitle": "Cada una dirige el juego completo: los alumnos aprenden las palabras en el móvil, juegan una ronda solos y luego toda la clase juega en directo.",
         "learn": "Aprender las palabras",
         "solo": "Ronda individual",
         "live": "Toda la clase: {{mode}}",
-        "start": "Empezar esta clase",
+        "start": "Empezar juego",
         "play": "Empezar el juego",
-        "stepsLabel": "Pasos de la clase",
+        "stepsLabel": "Pasos del juego",
         "thenLive": "Pulsa En directo cuando casi toda la clase haya practicado.",
         "startShort": "Empezar"
       },
@@ -21882,7 +21908,7 @@ const es = {
       "rail": {
         "run": "Usar",
         "seeAll": "Ver todas",
-        "language": "Idioma de la actividad"
+        "language": "Idioma del juego"
       },
       "cue": {
         "first": "¿Primer juego? Un calentamiento de 5 minutos es el comienzo más fácil.",
@@ -22058,6 +22084,7 @@ const es = {
       "startLive": "Empezar en vivo",
       "createOnly": "Crear ahora, jugar después",
       "packSticker": "Lista de palabras: {name}",
+      "starterListHint": "Añadiremos una lista de palabras inicial ({name}) a esta clase. Puedes cambiarla cuando quieras.",
       "packHint": "Tus alumnos también reciben estas palabras como tarea al unirse.",
       "assignFailed": "Tu clase está lista, pero las palabras no se asignaron. Asígnalas desde la página de la clase.",
       "words": {
@@ -22065,12 +22092,12 @@ const es = {
         "label": "Tu lista de palabras",
         "placeholder": "Pega las palabras de esta semana. Una por línea o separadas por comas.",
         "count": "{count} listas",
-        "tooFew": "Añade al menos {min} palabras, o vacía el cuadro para jugar con un paquete inicial.",
-        "phrasesOnly": "Las frases de varias palabras no caben en el tablero. Añade palabras sueltas, o vacía el cuadro para jugar con un paquete inicial.",
+        "tooFew": "Añade al menos {min} palabras, o vacía el cuadro para jugar con una lista de palabras inicial.",
+        "phrasesOnly": "Las frases de varias palabras no caben en el tablero. Añade palabras sueltas, o vacía el cuadro para jugar con una lista de palabras inicial.",
         "skipped": "Frases que se quedan fuera: {count}. En el tablero solo caben palabras sueltas.",
         "playFailed": "El juego no se abrió. Pulsa Jugar ahora otra vez.",
         "yours": "La ronda usará tus palabras, y también se guardan en esta clase.",
-        "packLabel": "¿Aún sin lista? Juega con un paquete inicial",
+        "packLabel": "¿Aún sin lista de palabras? Juega con una inicial",
         "packHint": "Se guarda en esta clase para que tus alumnos lo practiquen después.",
         "listName": "Palabras del {date}",
         "playNow": "Jugar ahora",
@@ -22089,6 +22116,7 @@ const es = {
       "gameOptionsChange": "Cambiar",
       "gameOptionsHint": "Se aplica a la próxima ronda que inicies.",
       "homeworkTitle": "Tarea",
+      "proOptions": "Opciones Pro",
       "homeworkHint": "Envía esta lista para que la practiquen antes del juego.",
       "moreOptions": "Más opciones",
       "proBadge": "Pro",

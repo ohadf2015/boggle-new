@@ -11,6 +11,7 @@ import { getStoredUtmData } from '@/utils/utmCapture';
 import { setPostHogUserPropsOnce } from '@/utils/posthogEngagement';
 import logger from '@/utils/logger';
 import { setEduTestAccountFlag, isTestAccountEmail } from '@/lib/education/telemetry';
+import { surfaceOf } from '@/lib/navigation/eduSections';
 
 export interface IdentifyArgs {
   userId: string;
@@ -45,13 +46,15 @@ function isPostHogLoaded(): boolean {
 export function identifyUserForAnalytics(args: IdentifyArgs): void {
   if (!isPostHogLoaded()) return;
   const { userId, displayName, isAdmin, isTeacher, locale, email, isTestAccount } = args;
+  // Students on classroom pages are minors under school consent: id only, no name or email.
+  const named = isTeacher || typeof window === 'undefined' || surfaceOf(window.location.pathname) === 'game';
 
   safe(() =>
     (posthog.identify as PHFn)(userId, {
-      display_name: displayName,
+      ...(named ? { display_name: displayName } : {}),
       is_admin: isAdmin,
       is_teacher: isTeacher,
-      ...(email ? { email } : {}),
+      ...(named && email ? { email } : {}),
     })
   );
 
@@ -64,7 +67,7 @@ export function identifyUserForAnalytics(args: IdentifyArgs): void {
   safe(() =>
     (posthog.capture as PHFn)('user_identified', {
       user_id: userId,
-      display_name: displayName,
+      ...(named ? { display_name: displayName } : {}),
       is_guest: false,
       is_admin: isAdmin,
       is_teacher: isTeacher,

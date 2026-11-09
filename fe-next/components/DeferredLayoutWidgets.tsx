@@ -6,6 +6,7 @@ import { isStudentJoinPath } from '@/components/education/join/joinRoutes';
 import { isQuietChromeSurface } from '@/components/education/shell/quietChromeRoutes';
 import { useOverlayQuietZone } from '@/lib/overlayQuietZone';
 import { useOverlayQuietZoneGameWatch } from '@/lib/overlayQuietZoneGameWatch';
+import { surfaceOf } from '@/lib/navigation/eduSections';
 
 /**
  * Post-hydration-only chrome mounted by the locale layout: install prompts,
@@ -86,8 +87,8 @@ export default function DeferredLayoutWidgets() {
   // The consent ask is DEFERRED, not skipped: non-essential scripts remain
   // gated on a decision nobody has made, and the sheet mounts on the very next
   // screen (`/multiplayer`), which is this same layout under another path.
-  // The silent widgets (version check, churn telemetry, referral attribution)
-  // keep running — this is about what covers the field, not a blackout.
+  // The silent version check and referral attribution keep running — this is
+  // about what covers the field, not a blackout.
   const pathname = usePathname();
   const quietJoinScreen = isStudentJoinPath(pathname);
   // The teacher's own screens and every projected surface. Each is sized to the
@@ -96,6 +97,8 @@ export default function DeferredLayoutWidgets() {
   // (z-[70]) — i.e. over START GAME, in front of a class. The consent sheet is
   // NOT in this group: it keeps mounting and re-ranks itself instead.
   const quietChrome = quietJoinScreen || isQuietChromeSurface(pathname) || overlayQuietZone;
+  // Arcade retention telemetry; classroom visitors are not arcade players.
+  const gameSurface = surfaceOf(pathname) === 'game';
 
   return (
     <>
@@ -117,7 +120,7 @@ export default function DeferredLayoutWidgets() {
       {/* Chrome routes only. Heavy game paths skip this file; LocaleBodyChrome
           mounts the same component via HeavyPathCookieConsent. Do not mount both. */}
       {!quietJoinScreen && <CookieConsent />}
-      <ChurnSignalTracker />
+      {gameSurface && <ChurnSignalTracker />}
       <ReferralCodeClaimer />
     </>
   );

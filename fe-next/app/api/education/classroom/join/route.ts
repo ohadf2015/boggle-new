@@ -13,6 +13,10 @@ import { lookupEndedClassroomSession, recordEndedCodeTry } from './endedSessionC
 import { guestSignInData, joinMissBudgetSpent, joinRateLimited, recordJoinMiss, sanitizeGuestName } from './joinGuards';
 import { foldJoinCode } from '@/lib/education/joinCodeInput';
 import { honorRehearsalJoin } from '@/lib/education/paidDay0';
+import { joinNameLocale, moderateJoinName } from '@/lib/education/joinNameModeration';
+import { deriveGuestUsername } from '@/lib/education/guestStudent';
+
+const TEACHER_OWN_CLASS = 'TEACHER_OWN_CLASS';
 
 const joinClassroomSchema = z.object({
   joinCode: z.string().min(1).max(10),
@@ -55,7 +59,10 @@ export async function POST(request: NextRequest) {
     let userId: string | undefined = user?.id;
     // Guests are created only after the code resolves and the class has a seat:
     // an anonymous auth user cannot be un-created.
-    const guestName = user ? '' : sanitizeGuestName((body as { guestName?: unknown } | null)?.guestName);
+    const typedName = sanitizeGuestName((body as { guestName?: unknown } | null)?.guestName);
+    const shownName = moderateJoinName(typedName, joinNameLocale(request.headers.get('referer')));
+    const nameReplaced = shownName !== typedName;
+    const guestName = user ? '' : shownName;
     if (!user && !guestName) {
       return NextResponse.json(
         { error: 'Not authenticated' },
@@ -128,7 +135,7 @@ export async function POST(request: NextRequest) {
           return NextResponse.json({ error: 'Room locked', code: ROOM_LOCKED }, { status: 423 });
         }
         if (game) {
-          classroom = { id: game.classroomId };
+          classroom = { id: game.classroomId, teacher_id: game.teacherId };
           liveGameCode = normalizedCode;
         }
       } catch (gameLookupError) {
@@ -216,6 +223,12 @@ export async function POST(request: NextRequest) {
     );
 
     if (user) {
+      // A rehearsal link is the teacher testing the room on their own phone.
+      if (rehearsal !== true && (await teachesClassroom(classroom, userId!))) {
+        // The host may still walk into their own live room; they are never put on their own roster.
+        if (liveGameCode) return NextResponse.json({ classroomId: classroom.id, alreadyMember: true, gameCode: liveGameCode });
+        return NextResponse.json({ error: 'Teachers cannot join their own class as a student', code: TEACHER_OWN_CLASS }, { status: 409 });
+      }
       const { data: existing } = await supabase
         .from('classroom_memberships')
         .select('id')
@@ -233,6 +246,15 @@ export async function POST(request: NextRequest) {
     if (!admin) {
       logger.error('classroom join: service role key not configured');
       return NextResponse.json({ error: 'Failed to join classroom' }, { status: 500 });
+    }
+    // A client-minted guest already carries the typed name; replace it before the roster sees it.
+    if (user && nameReplaced) {
+      const username = deriveGuestUsername(shownName);
+      const [{ error: renameError }, { error: metaError }] = await Promise.all([
+        admin.from('profiles').update({ display_name: shownName, ...(username ? { username } : {}) }).eq('id', userId),
+        admin.auth.admin.updateUserById(userId!, { user_metadata: { full_name: shownName, ...(username ? { username } : {}) } }),
+      ]);
+      if (renameError || metaError) logger.error('classroom join: name moderation rename failed:', renameError ?? metaError);
     }
     const isRehearsal = await rehearsalSeat(admin, classroom.id, rehearsal === true);
     const { error: membershipError } = await admin
@@ -261,6 +283,7 @@ export async function POST(request: NextRequest) {
       {
         message: 'Successfully joined classroom',
         classroomId: classroom.id,
+        ...(nameReplaced ? { displayName: shownName } : {}),
         ...endedVerdict,
         ...(liveGameCode ? { gameCode: liveGameCode } : {}),
       },
@@ -273,6 +296,20 @@ export async function POST(request: NextRequest) {
       { error: 'Internal server error' },
       { status: 500 }
     );
+  }
+}
+
+async function teachesClassroom(classroom: { id: string; teacher_id?: string | null }, userId: string): Promise<boolean> {
+  if (classroom.teacher_id) return classroom.teacher_id === userId;
+  try {
+    const admin = createAdminClient();
+    if (!admin) return false;
+    const { data } = await admin.from('classrooms').select('teacher_id').eq('id', classroom.id).maybeSingle();
+    return (data as { teacher_id?: string } | null)?.teacher_id === userId;
+  } catch (err) {
+    // Fail open: the old behaviour (enrol) beats refusing a real student over our own lookup error.
+    logger.error('classroom join: teacher check failed:', err);
+    return false;
   }
 }
 

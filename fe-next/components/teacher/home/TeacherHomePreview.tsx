@@ -102,7 +102,7 @@ export function TeacherHomePreview({ state, banner }: { state: TeacherHomePrevie
             showCode
             replay={replay ? { kind: 'ready', href: replay.href, detail: replayDetail(replay, t) } : undefined}
             nudge={loop ? (
-              <HomeWeekLoop ready={readyForTest(loop.game)} missed={missedLastGame(loop.game)} reportsHref={`/${language}/teacher/reports`} locked onHomework={() => undefined} t={t} />
+              <HomeWeekLoop ready={readyForTest(loop.game)} missed={missedLastGame(loop.game)} reportsHref={`/${language}/teacher/reports`} onHomework={() => undefined} t={t} />
             ) : undefined}
           />
         </div>

@@ -1,4 +1,5 @@
 import logger from '@/utils/logger';
+import { endedJoinCodeStatus } from '@/components/education/join/endedJoinCode';
 
 /**
  * What a six-character code is worth committing to, BEFORE we commit to it.
@@ -15,7 +16,7 @@ import logger from '@/utils/logger';
  * Supabase hiccup would tell an entire school their classroom code was invalid,
  * and the answer would look exactly like the truthful one.
  */
-export type JoinCodeVerdict = 'classroom' | 'game' | 'invalid' | 'unverified';
+export type JoinCodeVerdict = 'classroom' | 'game' | 'ended' | 'invalid' | 'unverified';
 
 const CODE_RE = /^[A-Z0-9]{6}$/;
 
@@ -38,10 +39,13 @@ export async function resolveJoinCodeVerdict(code: string): Promise<JoinCodeVerd
     if (!res.ok) return 'unverified';
 
     const data = (await res.json()) as { kind?: string; degraded?: boolean } | null;
-    if (data?.kind === 'classroom' || data?.kind === 'game') return data.kind;
-    // Confident unknown — a typo, or a game the teacher has ended. Both are
-    // "we didn't recognize that", which is the whole point of the Kahoot bar.
-    if (data?.kind === 'unknown' && !data.degraded) return 'invalid';
+    if (data?.kind === 'classroom' || data?.kind === 'game' || data?.kind === 'ended') return data.kind;
+    // The join route enrols an ended game's code into its class, so only a true miss may refuse here.
+    if (data?.kind === 'unknown' && !data.degraded) {
+      const status = await endedJoinCodeStatus(normalized).catch(() => 'not_ended' as const);
+      if (status === 'ended') return 'ended';
+      return status === 'unverified' ? 'unverified' : 'invalid';
+    }
     return 'unverified';
   } catch (err) {
     logger.error(

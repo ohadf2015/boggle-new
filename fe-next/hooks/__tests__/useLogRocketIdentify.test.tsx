@@ -279,6 +279,31 @@ describe('useLogRocketIdentify', () => {
     expect(identifyUserMock).not.toHaveBeenCalled();
   });
 
+  it.each(['/he/student/quick-play', '/en/join/ABC123', '/en/teacher'])(
+    'never names anyone to session replay on %s',
+    (p) => {
+      window.history.replaceState(null, '', p);
+      try {
+        mockUseAuth.mockReturnValue(authedAuth());
+        renderHook(() => useLogRocketIdentify());
+        mockUseAuth.mockReturnValue({
+          user: null,
+          profile: { id: 'g1', display_name: 'Dana' },
+          isAuthenticated: false,
+          isGuest: true,
+          isAdmin: false,
+          isTeacher: false,
+        });
+        renderHook(() => useLogRocketIdentify());
+        window.dispatchEvent(new Event('logrocket-ready'));
+        expect(identifyUserMock).not.toHaveBeenCalled();
+        expect(identifyGuestMock).not.toHaveBeenCalled();
+      } finally {
+        window.history.replaceState(null, '', '/');
+      }
+    },
+  );
+
   it('does nothing when there is no user and no profile', () => {
     mockUseAuth.mockReturnValue({
       user: null,

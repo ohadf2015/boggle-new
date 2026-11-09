@@ -24,6 +24,7 @@ import { readLocalGameMode } from '@/components/education/lobby/useClassroomMode
 import { modeAllowsRehearsalBots, type RehearseIntent, type RehearsalSource } from '@/lib/education/rehearsal';
 import { trackEduRehearsalStarted } from '@/lib/education/rehearsalTelemetry';
 import { useRehearseAutoStart } from '../../hooks/useRehearseAutoStart';
+import { PracticeSeatTimeoutNotice } from '@/components/education/live/PracticeSeatTimeoutNotice';
 
 /** How long to wait for auto-filled stand-ins to appear on the roster before giving up. */
 const SOLO_DEMO_FILL_TIMEOUT_MS = 8000;
@@ -224,7 +225,7 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
 
   const hostSeated = playersReady.some((p) => (typeof p === 'string' ? p === username : p.isHost || p.username === username));
   const practiceSeated = playersReady.some((p) => typeof p === 'object' && p.isPractice === true && !p.disconnected);
-  useRehearseAutoStart({
+  const practiceRun = useRehearseAutoStart({
     enabled: isClassroomMode && !!onStartSoloDemoWithBots,
     hostSeated,
     practiceSeated,
@@ -260,6 +261,7 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
           practiceRoundPending={soloDemoInProgress}
           practiceRoundFailed={soloDemoFailed}
         />
+        {practiceRun.seatTimedOut ? <PracticeSeatTimeoutNotice onBotsOnly={practiceRun.startBotsOnly} onRetry={practiceRun.retry} t={t} /> : null}
         {/* Receive-only emoji floats — students fling reactions, the wall shows them. */}
         <LobbyReactions username={username} receiveOnly />
       </>

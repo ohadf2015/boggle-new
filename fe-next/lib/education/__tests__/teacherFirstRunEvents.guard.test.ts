@@ -39,10 +39,12 @@ describe('teacher first-run funnel event names (dashboards query these strings)'
       'TEACHER_ONBOARDING_FUNNEL_EVENTS.studentJoined',
       'trackEduFirstStudentJoined(',
       'trackEduJoinCodeShown(',
-      'trackEduJoinCodeCopied(',
-      'trackEduJoinCodeShared(',
     ]) {
       expect(ready).toContain(call);
+    }
+    const share = src('components/education/useInviteShare.ts');
+    for (const call of ['trackEduJoinCodeCopied(', 'trackEduJoinCodeShared(']) {
+      expect(share).toContain(call);
     }
     expect(ready).toContain('trackFirstRoundGuideShown(');
     expect(ready).toContain("step: 'start_round'");

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { classroomInvitePayload, classroomJoinUrl } from './classroomInvitePayload';
+import { classroomInvitePayload, classroomJoinUrl, inviteLocale } from './classroomInvitePayload';
 
 /**
  * COPY CODE handed students a code with no destination.
@@ -41,5 +41,18 @@ describe('classroomJoinUrl', () => {
     expect(classroomJoinUrl('https://www.lexiclash.live/', 'en', 'ABC123')).toBe(
       'https://www.lexiclash.live/en/join/ABC123',
     );
+  });
+});
+
+describe('inviteLocale', () => {
+  it('sends students to the class language, not the teacher UI language', () => {
+    expect(inviteLocale('he', 'en')).toBe('he');
+    expect(inviteLocale('es', 'he')).toBe('es');
+  });
+
+  it('falls back to the UI language when the class language has no site locale', () => {
+    expect(inviteLocale('fr', 'en')).toBe('en');
+    expect(inviteLocale(null, 'sv')).toBe('sv');
+    expect(inviteLocale(undefined, 'ja')).toBe('ja');
   });
 });

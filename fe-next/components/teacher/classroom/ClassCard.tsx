@@ -29,6 +29,7 @@ import { StudentCapMeter } from '../StudentCapMeter';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { NB_BLOCK, NB_DARK_EDGE, NB_PANEL, NB_PRIMARY, NB_SMALL, NB_STICKER, type NbColor } from '../nb/nbStyles';
 import { slideUp } from '../teacherDashboardTabs';
+import { NeoButton } from '@/components/ui/button';
 
 export interface ClassCardData {
   id: string;
@@ -69,7 +70,7 @@ const ICON_SIZE = 'h-12 min-h-12 flex-1 shrink-0 px-0 @[24rem]:w-12 @[24rem]:fle
 const ICON_ACTION = cn(NB_SMALL, NB_BLOCK.cream, ICON_SIZE);
 
 const MENU_ITEM =
-  'flex min-h-12 w-full items-center gap-3 rounded-neo-lg border-2 border-neo-black bg-white px-3 text-start font-neo-display text-[15px] font-black text-neo-black shadow-hard transition-transform hover:-translate-y-px focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan motion-reduce:transition-none';
+  'flex min-h-12 w-full items-center gap-3 rounded-neo-lg border-2 border-neo-black bg-neo-white px-3 text-start font-neo-display text-[15px] font-black text-neo-black shadow-hard transition-transform hover:-translate-y-px focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan motion-reduce:transition-none';
 const MENU_ICON = 'grid size-8 shrink-0 place-items-center rounded-neo border-2 border-neo-black';
 
 /**
@@ -152,18 +153,19 @@ export function ClassCard({
           {languageKey ? t(languageKey) : classroom.language}
         </span>
         <div ref={menuRef} className="relative shrink-0">
-          <button
-            type="button"
+          <NeoButton
+            variant="small"
+            tone="navy"
             data-testid="classroom-card-menu"
             onClick={() => setMenuOpen((o) => !o)}
             aria-haspopup="menu"
             aria-expanded={menuOpen}
             aria-label={actionsLabel}
             title={actionsLabel}
-            className={cn(NB_SMALL, NB_BLOCK.navy, 'size-11 min-h-11 px-0')}
+            className="size-11 min-h-11 px-0"
           >
             <MoreHorizontal className="size-6" aria-hidden="true" />
-          </button>
+          </NeoButton>
           <AnimatePresence>
             {menuOpen ? (
               <m.div
@@ -217,7 +219,7 @@ export function ClassCard({
                   </a>
                 ) : null}
                 <button type="button" role="menuitem" onClick={pick(onDelete)} className={cn(MENU_ITEM, 'text-neo-pink')}>
-                  <span className={cn(MENU_ICON, 'bg-white')}><Trash2 className="size-4" aria-hidden="true" /></span>
+                  <span className={cn(MENU_ICON, 'bg-neo-white')}><Trash2 className="size-4" aria-hidden="true" /></span>
                   {t('teacher.classroom.delete')}
                 </button>
               </m.div>
@@ -258,16 +260,17 @@ export function ClassCard({
             <Share2 className="size-5" aria-hidden="true" />
           </button>
           {onOpenProjector ? (
-            <button
-              type="button"
+            <NeoButton
+              variant="small"
+              tone="navy"
               data-testid="classroom-card-projector"
               onClick={onOpenProjector}
               aria-label={t('academy.hq.openProjector', 'Show code on board')}
               title={t('academy.hq.openProjector', 'Show code on board')}
-              className={cn(NB_SMALL, NB_BLOCK.navy, NB_DARK_EDGE, ICON_SIZE)}
+              className={ICON_SIZE}
             >
               <MonitorPlay className="size-5" aria-hidden="true" />
-            </button>
+            </NeoButton>
           ) : null}
         </section>
 

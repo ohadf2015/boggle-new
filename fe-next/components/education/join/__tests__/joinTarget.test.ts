@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-vi.mock('../endedJoinCode', () => ({ isEndedJoinCode: async () => false }));
+vi.mock('../endedJoinCode', () => ({ isEndedJoinCode: async () => false, endedJoinCodeStatus: async () => 'not_ended' }));
 
 /**
  * One round trip, one verdict, and a name to show.

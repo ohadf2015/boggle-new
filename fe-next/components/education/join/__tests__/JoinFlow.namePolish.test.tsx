@@ -76,10 +76,11 @@ describe('<JoinFlow> nickname step polish', () => {
     expect(alert.className).not.toContain('text-neo-white');
   });
 
-  it('Given a returning student with a saved nickname, Then the invite link greets them with it, not a new random one', async () => {
+  it('Given a saved nickname on this device, Then the invite link asks "Continue as Maya?" before reusing it, never a random one', async () => {
     mockStoredName.mockReturnValue('Maya');
     render(<JoinFlow initialCode="P45KRT" />);
-    await waitFor(() => expect(nameField().value).toBe('Maya'));
+    expect(await screen.findByText(`education.student.join.returning.title:${JSON.stringify({ name: 'Maya' })}`)).toBeInTheDocument();
+    expect(mockJoin).not.toHaveBeenCalled();
   });
 
   it('Given a first-time student, Then the invite link still seeds a fun name', async () => {

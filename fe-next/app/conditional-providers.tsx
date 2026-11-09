@@ -23,6 +23,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import { isHeavyGamePath } from '@/lib/perf/heavyGamePath';
 import { onFirstEngagement } from '@/lib/perf/onFirstEngagement';
+import { eduSectionOf, type EduSection } from '@/lib/navigation/eduSections';
 
 const CommandPalette = lazy(() => import('@/components/CommandPalette'));
 const LaunchHost = lazy(() => import('@/components/landing/home/LaunchHost').then((m) => ({ default: m.LaunchHost })));
@@ -55,12 +56,9 @@ const GAME_ROUTES = [
   '/adventure',
   '/daily',
   '/challenge',
-  '/join',
   '/brain',
   '/custom',
   '/party-screen',
-  '/teacher',
-  '/student',
   '/auth/callback',  // Auth callback needs full providers
   '/hebrew-multiplayer-word-game',  // SEO page
   // Social routes need Socket.IO for realtime gift/friend-request delivery
@@ -71,8 +69,13 @@ const GAME_ROUTES = [
 /**
  * Determines if the current route needs game-specific providers
  */
+// Edu screens that host live rooms or student play; marketing, reports and the role hub need no sockets.
+const GAME_STACK_EDU_SECTIONS: readonly EduSection[] = ['teacher', 'student', 'join'];
+
 export function needsGameProviders(pathname: string | null): boolean {
   if (!pathname) return false;
+  const section = eduSectionOf(pathname);
+  if (section && GAME_STACK_EDU_SECTIONS.includes(section)) return true;
 
   // Remove locale prefix (e.g., /en/multiplayer -> /multiplayer)
   const path = pathname.replace(/^\/(en|he|sv|ja|es|ru)/, '');

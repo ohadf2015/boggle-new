@@ -1,4 +1,17 @@
 import type { MetadataRoute } from 'next';
+import { locales } from '@/i18n/config';
+import { EDU_SECTIONS, type EduSection } from '@/lib/navigation/eduSections';
+
+// Signed-in classroom app pages: a minor's name, a class roster or a join code, never search content.
+const PRIVATE_EDU_SECTIONS: readonly EduSection[] = EDU_SECTIONS.filter((s) => s !== 'education' && s !== 'pricing');
+// The Teacher Pro page lives under /teacher but is public and in the sitemap.
+const PUBLIC_EDU_PAGES = ['/teacher/upgrade'];
+
+// Spelled per locale: a `/*/teacher` wildcard would also match `/en/blog/teacher/...`.
+const privateEduDisallows = locales.flatMap((l) =>
+  PRIVATE_EDU_SECTIONS.flatMap((s) => [`/${l}/${s}$`, `/${l}/${s}/`]),
+);
+const publicEduAllows = locales.flatMap((l) => PUBLIC_EDU_PAGES.map((p) => `/${l}${p}`));
 
 export default function robots(): MetadataRoute.Robots {
   const baseUrl = 'https://www.lexiclash.live';
@@ -33,7 +46,9 @@ export default function robots(): MetadataRoute.Robots {
     '/*?utm_content=*',
     '/*?fbclid=*',
     '/*?gclid=*',
+    ...privateEduDisallows,
   ];
+  const allowPaths = ['/', ...publicEduAllows];
 
   // AI + search crawlers — explicit Allow signals welcome for citation/training.
   // Same disallow set as default to block share/UTM duplicates.
@@ -84,13 +99,13 @@ export default function robots(): MetadataRoute.Robots {
       // Explicit AI/search crawlers — welcome for citation, subject to duplicate-content guards
       ...aiBots.map((userAgent) => ({
         userAgent,
-        allow: '/',
+        allow: allowPaths,
         disallow: disallowPaths,
       })),
       // Default rule for all other crawlers
       {
         userAgent: '*',
-        allow: '/',
+        allow: allowPaths,
         disallow: disallowPaths,
       },
     ],

@@ -175,7 +175,7 @@ const ROW =
   'flex w-full items-center gap-2.5 rounded-neo border-[2px] border-neo-cream/70 bg-neo-navy-elevated px-3 py-2 ' +
   'min-h-11 text-start font-neo-body text-sm font-bold text-neo-cream transition-colors hover:border-neo-cream hover:bg-neo-navy-light focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan';
 
-const ICON = 'grid size-7 shrink-0 place-items-center rounded-md border-2 border-neo-black text-neo-black [&>svg]:size-4';
+const ICON = 'grid size-7 shrink-0 place-items-center rounded-neo border-2 border-neo-black text-neo-black [&>svg]:size-4';
 
 function RowContent({ icon, tone, label }: { icon: ReactNode; tone: string; label: string }) {
   return (

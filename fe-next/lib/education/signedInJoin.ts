@@ -111,6 +111,8 @@ export type SignedInJoinOutcome = SignedInJoinSuccess | SignedInJoinFailure;
 export interface SignedInJoinUser {
   id: string;
   email?: string | null;
+  /** A guest session may belong to the previous student on a shared device. */
+  isAnonymous?: boolean;
 }
 
 /**

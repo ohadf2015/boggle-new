@@ -90,14 +90,25 @@ describe('Teacher Home', () => {
     expect(screen.getAllByTestId('home-start-live')).toHaveLength(1);
   });
 
-  it('Then the hero shows the class join code as letter tiles, and Open projector opens the big-screen sheet', () => {
+  it('Then the hero shows the class join code as letter tiles, and Share code opens one sheet that also puts it on the board', () => {
     render(<TeacherDashboard />);
     const hero = screen.getByTestId('home-hero');
     const code = within(hero).getByTestId('home-desk-code');
     expect(code).toHaveTextContent('K7Q2');
     expect(within(code).getAllByTestId('home-desk-code-tile')).toHaveLength(4);
-    act(() => within(hero).getByTestId('home-class-code').click());
+    act(() => within(hero).getByTestId('home-share-code').click());
+    expect(screen.getByTestId('setup-share-row')).toBeInTheDocument();
+    act(() => screen.getByTestId('home-share-board').click());
     expect(screen.getByTestId('hq-projector-qr')).toBeInTheDocument();
+  });
+
+  it('Then Home has one See results entry and one Try it as a student link', () => {
+    render(<TeacherDashboard />);
+    const hero = screen.getByTestId('home-hero');
+    expect(within(hero).getByTestId('home-see-results')).toHaveAttribute('href', '/en/teacher/reports?classroomId=c5b');
+    expect(screen.getAllByTestId('rehearse-with-bots')).toHaveLength(1);
+    expect(within(hero).getByTestId('rehearse-with-bots')).toHaveTextContent('eduShell.home.practice.cta');
+    expect(screen.queryByTestId('home-practice-card')).toBeNull();
   });
 
   it('Given a new class still below the student goal, Then the join code shows once: the share card owns it, not the hero', () => {
@@ -289,6 +300,7 @@ describe('Teacher Home', () => {
     expect(entry).not.toContainElement(dialog);
     expect(dialog).toContainElement(screen.getByTestId('weekly-progress-digest'));
     expect(dialog).toContainElement(screen.getByTestId('home-weekly-reports-grid'));
+    expect(screen.getByTestId('home-weekly-reports-all')).toHaveAttribute('href', '/en/teacher/reports?classroomId=c5b');
   });
 
   it('Given a Pro offer, Then the card is words and a button, no blurred fake chart', () => {
@@ -296,13 +308,13 @@ describe('Teacher Home', () => {
     expect(screen.getByTestId('home-pro-card').querySelector('.blur-\\[3px\\]')).toBeNull();
   });
 
-  it('Given setup half done, Then no setup strip stacks on the class: the hero and the practice card carry the next step', () => {
+  it('Given setup half done, Then no setup strip stacks on the class: the hero carries the next step', () => {
     activation = { ...activation, progress: { inviteCopied: false, liveStarted: false, roomOpened: false, dismissed: false } };
     week = { status: 'ready', summary: { gamesPlayed: 0, totalStudents: 0, activeClasses: 0, lastPlayedAt: {} } };
     render(<TeacherDashboard />);
     expect(screen.queryByTestId('home-onboarding')).toBeNull();
     expect(screen.getByTestId('home-start-live')).toBeInTheDocument();
-    expect(screen.getByTestId('home-practice-card')).toBeInTheDocument();
+    expect(within(screen.getByTestId('home-hero')).getByTestId('rehearse-with-bots')).toBeInTheDocument();
   });
 
   it('Given a class that already played but the activation flag never landed, Then no setup nudge shows', () => {

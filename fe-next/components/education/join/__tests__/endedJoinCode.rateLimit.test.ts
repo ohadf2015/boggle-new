@@ -12,7 +12,7 @@ vi.mock('@/backend/redis/rateLimit', () => ({
 }));
 vi.mock('next/headers', () => ({ headers: mockHeaders }));
 
-import { isEndedJoinCode } from '../endedJoinCode';
+import { isEndedJoinCode, endedJoinCodeStatus } from '../endedJoinCode';
 
 describe('isEndedJoinCode rate limit', () => {
   beforeEach(() => {
@@ -26,6 +26,17 @@ describe('isEndedJoinCode rate limit', () => {
     await expect(isEndedJoinCode('ABC123')).resolves.toBe(false);
     expect(mockLookup).not.toHaveBeenCalled();
     expect(mockLimit).toHaveBeenCalledWith('api:ended-code:9.9.9.9', expect.objectContaining({ maxRequests: expect.any(Number) }));
+  });
+
+  it('GIVEN an ip over the limit THEN the status says unverified, so callers never read it as a typo', async () => {
+    mockLimit.mockResolvedValue({ limited: true, remaining: 0, resetTime: 0 });
+    await expect(endedJoinCodeStatus('ABC123')).resolves.toBe('unverified');
+  });
+
+  it('GIVEN no ended session behind the code THEN the status is not_ended', async () => {
+    mockLimit.mockResolvedValue({ limited: false, remaining: 5, resetTime: 0 });
+    mockLookup.mockResolvedValue(null);
+    await expect(endedJoinCodeStatus('ABC123')).resolves.toBe('not_ended');
   });
 
   it('GIVEN an ip under the limit THEN the lookup answers', async () => {

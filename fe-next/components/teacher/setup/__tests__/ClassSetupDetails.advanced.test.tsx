@@ -37,6 +37,12 @@ function renderDetails(overrides: Partial<Parameters<typeof ClassSetupDetails>[0
 }
 
 describe('ClassSetupDetails advanced options', () => {
+  it('Given a new class, Then it says a starter word list comes with it, so the assignment is never silent', () => {
+    renderDetails();
+    const pack = recommendedPack('en', null);
+    expect(screen.getByTestId('setup-starter-list-hint')).toHaveTextContent(`eduShell.setup.starterListHint:${JSON.stringify({ name: pack.nameKey })}`);
+  });
+
   it('Given a new class, Then only the name and the start buttons show, with the defaults summed up in one line', () => {
     renderDetails();
     expect(screen.getByLabelText('eduShell.setup.nameLabel')).toBeInTheDocument();

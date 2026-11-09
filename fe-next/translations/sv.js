@@ -15638,6 +15638,14 @@ const sv = {
     },
     "reports": {
       "valueLine": "Efter varje spel ser du vilka ord varje klass missade, vem som behöver hjälp och vad ni ska öva på härnäst.",
+      "homeworkShortcut": "Läxresultat",
+      "freeSummary": {
+        "title": "Dina klasser hittills",
+        "games": "Spel de senaste 30 dagarna",
+        "students": "Elever i dina klasser",
+        "classes": "Klasser som spelat den här veckan",
+        "hint": "Pro visar resultat ord för ord för varje elev och varje spel."
+      },
       "lockedValue": "Orden som klassen missade visas gratis på resultatskärmen efter varje spel. Rapporterna visar dessutom vem som behöver hjälp, elev för elev, i alla dina spel.",
       "emptyClass": {
         "title": "Inga spel i den här klassen än",
@@ -16094,10 +16102,10 @@ const sv = {
       "startBlocked": "Vänta tills minst en elev har anslutit innan du startar.",
       "practiceFirst": "Öva först med 3 bottar",
       "practiceFirstHint": "Se exakt vad klassen kommer att se. Bottarna går när första eleven ansluter.",
-      "rehearseCta": "Öva med bottar",
+      "rehearseCta": "Förhandsvisa med bottar",
       "rehearsePrivate": "Bara du ser det här. Eleverna är inte i rummet och det räknas inte.",
-      "rehearseBotsBlocked": "Bottar kan inte spela det här spelet, så du kan inte öva på det med dem.",
-      "rehearseUseClassic": "Öva med bottar i Klassiskt i stället",
+      "rehearseBotsBlocked": "Bottar kan inte spela det här spelet, så du kan inte förhandsvisa det med dem.",
+      "rehearseUseClassic": "Förhandsvisa med bottar i Klassiskt i stället",
       "startWhenReady": "Starta när alla är med",
       "startAnyway": "Starta ändå",
       "stillLearning": "{count} lär sig fortfarande orden",
@@ -17809,6 +17817,17 @@ const sv = {
         "button": "Gå med",
         "clipboardError": "Kunde inte läsa urklipp",
         "codeHint": "6 bokstäver från din lärare",
+        "codeStripped": "Några av de tecknen finns inte i klasskoder. Byt tangentbordet till engelska bokstäver och försök igen.",
+        "teacherOwnClass": "Det här är din egen klass, så du kan inte gå med som elev. Öppna den från din lärarpanel i stället.",
+        "returning": {
+          "title": "Fortsätta som {name}?",
+          "titleNoName": "Är det du?",
+          "sub": "Någon har redan spelat på den här enheten. Kolla att det är du innan du går med.",
+          "yes": "Ja, det är jag",
+          "notMe": "Inte jag",
+          "leaving": "Loggar ut förra spelaren…",
+          "leaveFailed": "Vi kunde inte logga ut förra spelaren. Försök igen."
+        },
         "codeLabel": "Klasskod",
         "codeNotRecognised": "Vi kunde inte känna igen den koden",
         "codePasted": "Inklistrad",
@@ -21628,13 +21647,16 @@ const sv = {
   "eduLiveRoom": {
     "practice": {
       "seatName": "Övningselev",
-      "title": "Din elevvy",
+      "title": "Testa som elev",
       "joining": "Går med som elev…",
       "joined": "Du är med! Spela här.",
       "openTab": "Öppna i ny flik",
-      "hide": "Dölj elevvyn",
-      "show": "Visa elevvyn",
-      "frameTitle": "Elevvy"
+      "hide": "Dölj",
+      "show": "Testa som elev",
+      "frameTitle": "Testa som elev",
+      "seatTimeout": "Din elevplats kom inte in. Starta med bara bottar eller försök igen.",
+      "botsOnly": "Starta med bara bottar",
+      "retry": "Försök igen"
     },
     "round": {
       "boardLabel": "Klassens bräde",
@@ -21779,14 +21801,18 @@ const sv = {
       "railLabel": "Den här veckan och din plan",
       "weeklyReports": "Veckorapporter",
       "weeklyReportsHint": "Veckans siffror och en sammanfattning att mejla till vårdnadshavare.",
+      "shareCode": "Dela koden",
+      "shareTitle": "Dela klassens kod",
+      "seeResults": "Se resultat",
+      "allResults": "Öppna alla resultat",
       "flow": {
-        "subtitle": "Varje lektion sköter sig själv: eleverna lär sig orden i mobilen, spelar en runda själva och sedan spelar hela klassen live.",
+        "subtitle": "Varje spel sköter sig självt: eleverna lär sig orden i mobilen, spelar en runda själva och sedan spelar hela klassen live.",
         "learn": "Lär dig orden",
         "solo": "Egen runda",
         "live": "Hela klassen: {{mode}}",
-        "start": "Starta lektionen",
+        "start": "Starta spel",
         "play": "Starta spelet",
-        "stepsLabel": "Lektionens steg",
+        "stepsLabel": "Spelets steg",
         "thenLive": "Tryck på Starta live när de flesta har övat.",
         "startShort": "Starta"
       },
@@ -21870,11 +21896,11 @@ const sv = {
       "rail": {
         "run": "Använd",
         "seeAll": "Visa alla",
-        "language": "Språk för passet"
+        "language": "Spelets språk"
       },
       "cue": {
         "first": "Första spelet? En uppvärmning på 5 minuter är en enkel start.",
-        "closeOut": "Ni har spelat i dag. Avsluta lektionen med en exit ticket på 3 minuter?",
+        "closeOut": "Ni har spelat i dag. Runda av med klassen med en exit ticket på 3 minuter?",
         "season": {
           "school": "Skolstartsorden är redo. Sugen på en uppvärmning på 5 minuter?",
           "autumn": "Höstorden är redo. Sugen på en uppvärmning på 5 minuter?",
@@ -22046,6 +22072,7 @@ const sv = {
       "startLive": "Starta live",
       "createOnly": "Skapa nu, spela senare",
       "packSticker": "Ordlista: {name}",
+      "starterListHint": "Vi lägger till en första ordlista ({name}) i klassen. Du kan byta den när du vill.",
       "packHint": "Eleverna får också orden som läxa när de går med.",
       "assignFailed": "Klassen är klar, men orden tilldelades inte. Tilldela dem från klassens sida.",
       "words": {
@@ -22053,12 +22080,12 @@ const sv = {
         "label": "Din ordlista",
         "placeholder": "Klistra in veckans ord. Ett per rad eller med kommatecken.",
         "count": "{count} klara",
-        "tooFew": "Lägg till minst {min} ord, eller töm rutan och spela ett startpaket.",
-        "phrasesOnly": "Fraser med flera ord får inte plats på brädet. Lägg till enstaka ord, eller töm rutan och spela ett startpaket.",
+        "tooFew": "Lägg till minst {min} ord, eller töm rutan och spela en första ordlista.",
+        "phrasesOnly": "Fraser med flera ord får inte plats på brädet. Lägg till enstaka ord, eller töm rutan och spela en första ordlista.",
         "skipped": "Fraser som utelämnades: {count}. Brädet tar bara enstaka ord.",
         "playFailed": "Spelet öppnades inte. Tryck på Spela nu igen.",
         "yours": "Rundan körs med dina ord, och de sparas i klassen också.",
-        "packLabel": "Ingen lista än? Spela ett startpaket",
+        "packLabel": "Ingen ordlista än? Spela en första",
         "packHint": "Det sparas i klassen så att eleverna kan öva på det senare.",
         "listName": "Ord för {date}",
         "playNow": "Spela nu",
@@ -22077,6 +22104,7 @@ const sv = {
       "gameOptionsChange": "Ändra",
       "gameOptionsHint": "Gäller nästa runda du startar.",
       "homeworkTitle": "Läxa",
+      "proOptions": "Pro-alternativ",
       "homeworkHint": "Skicka listan så att eleverna övar på den före spelet.",
       "moreOptions": "Fler val",
       "proBadge": "Pro",

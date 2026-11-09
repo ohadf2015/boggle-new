@@ -136,6 +136,11 @@ describe('AnalyticsPageClient', () => {
   // RENDERING TESTS
   // ============================================
 
+  it('links to the one results hub for this class', () => {
+    render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
+    expect(screen.getByTestId('analytics-results-hub')).toHaveAttribute('href', '/en/teacher/reports?classroomId=classroom-1');
+  });
+
   it('marks the title for the wipe and the analytics block for the scroll reveal', () => {
     const { container } = render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
     expect(container.querySelector('h1[data-wipe]')).not.toBeNull();

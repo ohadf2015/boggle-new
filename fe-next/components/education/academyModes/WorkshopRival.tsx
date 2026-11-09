@@ -100,7 +100,7 @@ export function WorkshopRival({
             exit={reduce ? undefined : { scale: 0.7 }}
             transition={{ type: 'spring', stiffness: 520, damping: 18 }}
             className={cn(
-              'relative max-w-[13rem] rounded-2xl border-[3px] border-neo-black bg-neo-cream px-3 py-1.5 font-neo-display font-black leading-tight text-neo-black shadow-hard',
+              'relative max-w-[13rem] rounded-neo-lg border-[3px] border-neo-black bg-neo-cream px-3 py-1.5 font-neo-display font-black leading-tight text-neo-black shadow-hard',
               size === 'game' ? 'text-sm 2xl:text-lg' : 'text-base lg:text-lg',
             )}
           >

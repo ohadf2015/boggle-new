@@ -3,6 +3,7 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "../../lib/utils";
+import { NEO_BLOCK_TONES } from "./neoStyles";
 
 /**
  * NeoPanel — lightweight neo-brutalist box shell.
@@ -29,16 +30,27 @@ const panelVariants = cva("border-3", {
       none: "border-neo-black",
       navy: "bg-neo-navy border-neo-cream/40",
       cream: "bg-neo-cream border-neo-black",
+      lime: NEO_BLOCK_TONES.lime,
+      pink: NEO_BLOCK_TONES.pink,
+      cyan: NEO_BLOCK_TONES.cyan,
+      yellow: NEO_BLOCK_TONES.yellow,
+      purple: NEO_BLOCK_TONES.purple,
+      orange: NEO_BLOCK_TONES.orange,
+      navyLight: NEO_BLOCK_TONES.navy,
+      // Teacher card surface; a literal because --neo-navy-elevated turns cream in the light theme.
+      card: "bg-[#2a2b4a] text-neo-cream border-neo-cream/50",
     },
     shadow: {
       none: "",
       sm: "shadow-hard-sm",
       md: "shadow-hard",
       lg: "shadow-hard-lg",
+      xl: "shadow-hard-xl",
     },
     radius: {
       neo: "rounded-neo",
       "neo-lg": "rounded-neo-lg",
+      "neo-xl": "rounded-neo-xl",
     },
   },
   defaultVariants: {

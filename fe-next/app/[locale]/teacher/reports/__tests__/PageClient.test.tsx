@@ -155,6 +155,14 @@ vi.mock('@/hooks/useTeacherPro', () => ({
   useTeacherPro: () => proState,
 }));
 
+const weekStats: { summary: Record<string, unknown> | null; status: string } = {
+  summary: { gamesPlayed: 3, gamesLast30d: 7, totalStudents: 24, activeClasses: 2, lastPlayedAt: {} },
+  status: 'ready',
+};
+vi.mock('@/hooks/useTeacherWeekStats', () => ({
+  useTeacherWeekStats: () => ({ ...weekStats, insights: [] }),
+}));
+
 const trackEduReportsViewed = vi.fn();
 vi.mock('@/lib/education/telemetry', () => ({
   trackEduReportsViewed: (...args: unknown[]) => trackEduReportsViewed(...args),
@@ -204,6 +212,19 @@ describe('ReportsPageClient', () => {
   describe('Class Report View', () => {
     beforeEach(() => {
       mockSearchParams.set('classroomId', 'classroom-1');
+    });
+
+    it('puts Homework results one tap from the top of the class results', async () => {
+      render(<ReportsPageClient />);
+      await userEvent.setup().click(screen.getByTestId('reports-homework-shortcut'));
+      expect(screen.getByRole('tab', { name: 'teacher.reports.tabs.homework' })).toHaveAttribute('data-state', 'active');
+    });
+
+    it('opens straight on homework from a ?section=homework link', () => {
+      mockSearchParams.set('section', 'homework');
+      render(<ReportsPageClient />);
+      expect(screen.getByRole('tab', { name: 'teacher.reports.tabs.homework' })).toHaveAttribute('data-state', 'active');
+      mockSearchParams.delete('section');
     });
 
     it('displays class report when classroom is selected', async () => {
@@ -301,6 +322,23 @@ describe('ReportsPageClient', () => {
       expect(screen.getByTestId('pro-gate-pill')).toBeInTheDocument();
       expect(screen.getByTestId('pro-gate-upgrade-reports')).toHaveTextContent('teacher.proGate.reports.cta');
       expectNoReportData();
+    });
+
+    it('shows a free teacher a free summary of their games before the Pro lock, not a bare wall', () => {
+      proState.hasPro = false;
+      render(<ReportsPageClient />);
+      const summary = screen.getByTestId('reports-free-summary');
+      expect(summary).toHaveTextContent('teacher.reports.freeSummary.games');
+      expect(within(summary).getByTestId('reports-free-games')).toHaveTextContent('7');
+      expect(within(summary).getByTestId('reports-free-students')).toHaveTextContent('24');
+      expect(screen.getByTestId('pro-gate-preview')).toBeInTheDocument();
+      expect(summary.compareDocumentPosition(screen.getByTestId('pro-gate-preview')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    });
+
+    it('shows a Pro teacher no free summary', () => {
+      proState.hasPro = true;
+      render(<ReportsPageClient />);
+      expect(screen.queryByTestId('reports-free-summary')).toBeNull();
     });
 
     it('offers a never-trialed free teacher the Polar trial as the lock\'s one action', () => {

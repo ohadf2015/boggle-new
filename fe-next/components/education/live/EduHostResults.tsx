@@ -49,6 +49,7 @@ import { PRESS, PRIMARY_BUTTON, SECONDARY_BUTTON, type Translate } from './eduLi
 import { ReteachStatusNote } from './ReteachStatusNote';
 import { reteachVerdict, studentsUnderHalf } from './eduReteachModel';
 import { useReteachRound } from './useReteachRound';
+import { NeoButton } from '@/components/ui/button';
 
 /** Play again, Next mode and End game: room controls, drawn as a quiet row so they never compete with the one primary. */
 const TERTIARY = cn(
@@ -88,10 +89,10 @@ function Actions({ t, onRematch, onClose, onExitRoom, practiceLeads, secondary, 
   return (
     <div data-testid="edu-results-actions" className="flex shrink-0 flex-col gap-2 @5xl/results:gap-3">
       {!practiceLeads && playAgain && (
-        <button type="button" data-testid="edu-results-play-again" data-results-primary="" onClick={playAgain} className={PRIMARY_CLASS}>
+        <NeoButton variant="livePrimary" data-testid="edu-results-play-again" data-results-primary="" onClick={playAgain} className={PRIMARY_SIZE}>
           <RotateCcw className="size-[0.9em]" aria-hidden="true" />
           {t('eduLiveRoom.hostResults.playAgain')}
-        </button>
+        </NeoButton>
       )}
       {quietPlayAgain && (
         <button type="button" data-testid="edu-results-play-again" onClick={playAgain} className={cn(TERTIARY, 'basis-auto grow-0')}>
@@ -129,11 +130,11 @@ function Actions({ t, onRematch, onClose, onExitRoom, practiceLeads, secondary, 
 }
 
 
-const PRIMARY_CLASS = cn(
-  PRIMARY_BUTTON,
+const PRIMARY_SIZE = cn(
   PRESS,
   'min-h-14 w-full px-4 py-2.5 normal-case tracking-normal text-xl @lg/results:px-6 @lg/results:text-2xl @5xl/results:text-3xl @[96rem]/results:min-h-20 @[96rem]/results:text-4xl'
 );
+const PRIMARY_CLASS = cn(PRIMARY_BUTTON, PRIMARY_SIZE);
 
 /** Each student's found % this round (no names, host excluded), lowest first: the Pro preview's bars. */
 function reportBars(summary: ClassroomTvResultsScreenProps['summary']): number[] {

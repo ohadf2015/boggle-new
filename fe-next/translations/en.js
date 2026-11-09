@@ -13412,6 +13412,14 @@ const en = {
     },
     "reports": {
       "valueLine": "After every game, see which words each class missed, who needs help, and what to practice next.",
+      "homeworkShortcut": "Homework results",
+      "freeSummary": {
+        "title": "Your classes so far",
+        "games": "Games in the last 30 days",
+        "students": "Students in your classes",
+        "classes": "Classes that played this week",
+        "hint": "Pro adds the word-by-word results for every student and every game."
+      },
       "lockedValue": "The words your class missed are free on every game's results screen. Reports add who needs help, student by student, across all your games.",
       "emptyClass": {
         "title": "No games in this class yet",
@@ -14073,10 +14081,10 @@ const en = {
       "startBlocked": "Waiting for one student to join before you can start.",
       "practiceFirst": "Practice first with 3 bots",
       "practiceFirstHint": "See what your class will see. The bots leave when your first student joins.",
-      "rehearseCta": "Practice with bots",
+      "rehearseCta": "Preview with bots",
       "rehearsePrivate": "Only you see this. Students are not in the room and it is not counted.",
-      "rehearseBotsBlocked": "Bots can't play this game, so you can't practice it with them.",
-      "rehearseUseClassic": "Practice with bots in Classic instead",
+      "rehearseBotsBlocked": "Bots can't play this game, so you can't preview it with them.",
+      "rehearseUseClassic": "Preview with bots in Classic instead",
       "startWhenReady": "Start game when everyone is in",
       "startAnyway": "Start anyway",
       "stillLearning": "{count} still learning the words",
@@ -15780,6 +15788,17 @@ const en = {
         "button": "Join",
         "clipboardError": "Couldn't read clipboard",
         "codeHint": "6 characters from your teacher",
+        "codeStripped": "Some of those characters aren't in class codes. Switch your keyboard to English letters and try again.",
+        "teacherOwnClass": "This is your own class, so you can't join it as a student. Open it from your teacher dashboard instead.",
+        "returning": {
+          "title": "Continue as {name}?",
+          "titleNoName": "Is this you?",
+          "sub": "Someone already played on this device. Make sure it's you before you join.",
+          "yes": "Yes, that's me",
+          "notMe": "Not me",
+          "leaving": "Signing them out…",
+          "leaveFailed": "We couldn't sign the last player out. Try again."
+        },
         "codeLabel": "Class code",
         "codePasted": "Pasted",
         "flow": {
@@ -20673,13 +20692,16 @@ const en = {
   "eduLiveRoom": {
     "practice": {
       "seatName": "Practice student",
-      "title": "Your student view",
+      "title": "Try it as a student",
       "joining": "Joining as a student…",
       "joined": "You're in. Play right here.",
       "openTab": "Open in a new tab",
-      "hide": "Hide student view",
-      "show": "Show student view",
-      "frameTitle": "Student view"
+      "hide": "Hide",
+      "show": "Try it as a student",
+      "frameTitle": "Try it as a student",
+      "seatTimeout": "Your student seat didn't join. Start with bots only, or try again.",
+      "botsOnly": "Start with bots only",
+      "retry": "Try again"
     },
     "round": {
       "boardLabel": "Class board",
@@ -20824,14 +20846,18 @@ const en = {
       "railLabel": "This week and your plan",
       "weeklyReports": "Weekly reports",
       "weeklyReportsHint": "This week's numbers, plus a summary you can email to parents.",
+      "shareCode": "Share code",
+      "shareTitle": "Share your class code",
+      "seeResults": "See results",
+      "allResults": "Open all results",
       "flow": {
-        "subtitle": "Each one runs the whole lesson: students learn the words on their phones, play a solo round, then the whole class plays live.",
+        "subtitle": "Each one runs the whole game: students learn the words on their phones, play a solo round, then the whole class plays live.",
         "learn": "Learn the words",
         "solo": "Solo round",
         "live": "Class plays {{mode}}",
-        "start": "Start this lesson",
+        "start": "Start game",
         "play": "Start the game",
-        "stepsLabel": "Lesson steps",
+        "stepsLabel": "Game steps",
         "thenLive": "Press Go live when most of the class has practiced.",
         "startShort": "Start"
       },
@@ -20915,11 +20941,11 @@ const en = {
       "rail": {
         "run": "Use",
         "seeAll": "See all",
-        "language": "Session language"
+        "language": "Game language"
       },
       "cue": {
         "first": "First game? A 5-minute warm-up is the easy start.",
-        "closeOut": "You played today. Close the lesson with a 3-minute exit ticket?",
+        "closeOut": "You played today. Wrap up the class with a 3-minute exit ticket?",
         "season": {
           "school": "Back-to-school words are ready. Up for a 5-minute warm-up?",
           "autumn": "Autumn words are ready. Up for a 5-minute warm-up?",
@@ -21091,6 +21117,7 @@ const en = {
       "startLive": "Start live",
       "createOnly": "Create now, play later",
       "packSticker": "Word list: {name}",
+      "starterListHint": "We'll add a starter word list ({name}) to this class. You can change it anytime.",
       "packHint": "Students also get these words as homework when they join.",
       "assignFailed": "Your class is ready, but the words weren't assigned. Assign them from the class page.",
       "words": {
@@ -21098,12 +21125,12 @@ const en = {
         "label": "Your word list",
         "placeholder": "Paste this week's words. One per line or with commas.",
         "count": "{count} ready",
-        "tooFew": "Add at least {min} words, or clear the box to play a starter pack.",
-        "phrasesOnly": "Phrases with more than one word can't go on the board. Add single words, or clear the box to play a starter pack.",
+        "tooFew": "Add at least {min} words, or clear the box to play a starter word list.",
+        "phrasesOnly": "Phrases with more than one word can't go on the board. Add single words, or clear the box to play a starter word list.",
         "skipped": "Phrases left out: {count}. The board only takes single words.",
         "playFailed": "The game didn't open. Tap Play now again.",
         "yours": "The round uses your words, and they're saved to this class too.",
-        "packLabel": "No list yet? Play a starter pack",
+        "packLabel": "No word list yet? Play a starter one",
         "packHint": "It's saved to this class, so students can practice it later.",
         "listName": "Words for {date}",
         "playNow": "Play now",
@@ -21122,6 +21149,7 @@ const en = {
       "gameOptionsChange": "Change",
       "gameOptionsHint": "Applies to the next round you start.",
       "homeworkTitle": "Homework",
+      "proOptions": "Pro options",
       "homeworkHint": "Send this list so students practice it before the game.",
       "moreOptions": "More options",
       "proBadge": "Pro",

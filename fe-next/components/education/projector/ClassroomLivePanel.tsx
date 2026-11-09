@@ -123,7 +123,7 @@ export const ClassroomLivePanel = memo<ClassroomLivePanelProps>(function Classro
                   key={i}
                   data-testid="live-word-tile"
                   className={cn(
-                    'grid place-items-center rounded-md border-[3px] border-neo-black font-neo-display font-black leading-none shadow-[3px_3px_0_rgb(var(--neo-black))]',
+                    'grid place-items-center rounded-neo border-[3px] border-neo-black font-neo-display font-black leading-none shadow-[3px_3px_0_rgb(var(--neo-black))]',
                     'size-[clamp(26px,6cqh,76px)] text-[clamp(16px,4cqh,52px)]',
                     letter ? 'bg-neo-cream text-neo-black' : 'bg-neo-purple/80 text-neo-cream'
                   )}
@@ -144,7 +144,7 @@ export const ClassroomLivePanel = memo<ClassroomLivePanelProps>(function Classro
                   key={i}
                   data-testid="live-word-ghost"
                   style={{ animationDelay: `${i * 140}ms` }}
-                  className="grid size-[clamp(26px,6cqh,76px)] place-items-center rounded-md border-[3px] border-dashed border-neo-cream/60 bg-neo-purple/25 font-neo-display text-[clamp(16px,4cqh,52px)] font-black leading-none text-neo-cream/40 motion-safe:animate-[edu-ghost-wave_2.4s_cubic-bezier(0.45,0,0.55,1)_infinite]"
+                  className="grid size-[clamp(26px,6cqh,76px)] place-items-center rounded-neo border-[3px] border-dashed border-neo-cream/60 bg-neo-purple/25 font-neo-display text-[clamp(16px,4cqh,52px)] font-black leading-none text-neo-cream/40 motion-safe:animate-[edu-ghost-wave_2.4s_cubic-bezier(0.45,0,0.55,1)_infinite]"
                 >
                   ?
                 </span>

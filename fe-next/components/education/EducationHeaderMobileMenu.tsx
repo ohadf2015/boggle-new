@@ -58,10 +58,8 @@ export function EducationHeaderMobileMenu({
           'bg-neo-navy border-s-[3px] rounded-s-neo-xl border-neo-cream/50',
           'shadow-hard-xl overflow-y-auto',
           'pb-[max(env(safe-area-inset-bottom),1rem)]',
-          'animate-in duration-300',
-          isRTL
-            ? 'left-0 slide-in-from-left-full'
-            : 'right-0 slide-in-from-right-full'
+          'end-0 animate-in duration-300',
+          isRTL ? 'slide-in-from-left-full' : 'slide-in-from-right-full'
         )}
       >
         {/* Pane Header */}

@@ -20,7 +20,7 @@ export default function StudentLocker() {
         data-testid="student-locker"
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
-        className="inline-flex min-h-11 items-center gap-1 rounded-xl border-2 border-neo-black bg-neo-cyan px-3 font-black text-neo-navy shadow-hard-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+        className="inline-flex min-h-11 items-center gap-1 rounded-neo-lg border-2 border-neo-black bg-neo-cyan px-3 font-black text-neo-navy shadow-hard-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
       >
         <Package aria-hidden="true" className="h-5 w-5" />
         <span>{items.length}</span>

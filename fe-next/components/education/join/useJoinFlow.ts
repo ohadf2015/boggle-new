@@ -102,7 +102,9 @@ export interface JoinFlowState {
 
 export function useJoinFlow(
   initialCode = '',
-  onSuccessBeforeNavigation?: () => Promise<void> | void
+  onSuccessBeforeNavigation?: () => Promise<void> | void,
+  /** The device may belong to the previous student: no join starts on its own until they answer. */
+  holdAutoJoin = false
 ): JoinFlowState {
   const router = useRouter();
   const { t, language } = useLanguage();
@@ -149,12 +151,11 @@ export function useJoinFlow(
   const [endedClassroomId, setEndedClassroomId] = useState<string | null>(null);
   /** Synchronous: two taps in one frame must not send two joins. */
   const inFlight = useRef(false);
+  /** Any real POST is the one automatic attempt: a failed or game-code join must not auto-retry. */
+  const autoJoinStarted = useRef(false);
 
-  // `!user`, deliberately, not `useIsGuest`. That hook answers
-  // `!loading && !isAuthenticated`, which is right for HIDING things from
-  // guests but inverts here: the nickname field is UI *added* for them, so
-  // during the loading frame it would vanish AND the button would go live with
-  // an empty name. Unresolved auth is a third state, handled by the hold below.
+  // `!user`, not `useIsGuest`: the nickname field is UI added for guests, so it
+  // must not vanish during the loading frame. Unresolved auth is the hold below.
   const isGuest = !user;
   const isAuthResolving = authLoading && !holdExpired;
 
@@ -215,20 +216,9 @@ export function useJoinFlow(
         trackJoinCodeStepRefused({ reason: 'too_short', attemptedCode: effective });
         return;
       }
-      // Rule 1 above says nothing WAITS on the lookup. It does not say we throw
-      // away an answer already sitting in `target`. Without this the student
-      // cannot get a still frame in which to fix the code: "change code" puts
-      // them back on the step, the six known-bad characters are still there,
-      // and the next tap throws them at the nickname again with the red alert
-      // scrolling past on the way.
-      //
-      // `effective === code` is load-bearing, not caution. `target` describes
-      // `code`; on the sixth keystroke `codeArg` is a code `target` has never
-      // been about. Gating on that mismatch would block a brand-new code behind
-      // the PREVIOUS one's verdict — and gating on the pending lookup instead
-      // would put the network wait back on the keystroke, which is the failure
-      // rule 1 exists to prevent. An unknown, in-flight or `unverified` verdict
-      // therefore still advances, exactly as before.
+      // Nothing WAITS on the lookup, but an answer already in `target` is used, so a
+      // known-bad code gets a still frame to fix. `effective === code` matters: on the
+      // sixth keystroke `target` still describes the previous code.
       if (effective === code && target?.verdict === 'invalid') {
         setCodeErrorKey('education.student.join.invalidCode');
         setRefusalTick((n) => n + 1);
@@ -307,6 +297,7 @@ export function useJoinFlow(
       setFormErrorKey(null);
       setSuggestedName(null);
       inFlight.current = true;
+      autoJoinStarted.current = true;
       setIsSubmitting(true);
 
       void (async () => {
@@ -339,9 +330,8 @@ export function useJoinFlow(
               setEnded(true);
               return;
             }
-            if (trimmedName) {
-              setStoredUsername(trimmedName);
-            }
+            const keptName = result.displayName || trimmedName;
+            if (keptName) setStoredUsername(keptName);
 
             // A live game code walks straight into the room; a roster join leaves for the class
             // view, with `joined` kept as the fallback panel if the push is skipped.
@@ -420,11 +410,10 @@ export function useJoinFlow(
     ]
   );
 
-  const autoJoinStarted = useRef(false);
   // Invite link + signed-in student: join without a second GO tap.
   useEffect(() => {
     if (autoJoinStarted.current || joined || isSubmitting || inFlight.current) return;
-    if (isAuthResolving) return;
+    if (isAuthResolving || holdAutoJoin) return;
     if (!user) return;
     if (sanitizeJoinCode(initialCode).length !== JOIN_CODE_LENGTH) return;
     if (code.length !== JOIN_CODE_LENGTH) return;
@@ -432,7 +421,12 @@ export function useJoinFlow(
     autoJoinStarted.current = true;
     submit();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthResolving, user, initialCode, code, showNameField, joined, isSubmitting]);
+  }, [isAuthResolving, holdAutoJoin, user, initialCode, code, showNameField, joined, isSubmitting]);
+
+  // A tap held before we knew whose device this is must not replay as the wrong student.
+  useEffect(() => {
+    if (holdAutoJoin) setQueued(false);
+  }, [holdAutoJoin]);
 
   // The nickname question can be WITHDRAWN mid-flow. `showNameField` derives
   // from auth, which resolves LATE (recurring pitfall class 1): a student we
@@ -460,7 +454,7 @@ export function useJoinFlow(
   // AND for whatever that tap was still missing, so the student is never told
   // off for a race they did not cause. Fires once.
   useEffect(() => {
-    if (!queued || isAuthResolving || isSubmitting) return;
+    if (!queued || isAuthResolving || isSubmitting || holdAutoJoin) return;
     if (code.length !== JOIN_CODE_LENGTH) return;
     if (showNameField && !name.trim()) return;
     setQueued(false);
@@ -469,7 +463,7 @@ export function useJoinFlow(
     // `submit` is redefined every render; depending on it would re-fire the
     // queued intent. The guards above are the real trigger.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [queued, isAuthResolving, isSubmitting, code, name, showNameField]);
+  }, [queued, isAuthResolving, isSubmitting, holdAutoJoin, code, name, showNameField]);
 
   return {
     step,

@@ -22,11 +22,15 @@ vi.mock('@/utils/logger', () => ({
   default: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), log: vi.fn() },
 }));
 
+const { mockEndedStatus } = vi.hoisted(() => ({ mockEndedStatus: vi.fn() }));
+vi.mock('@/components/education/join/endedJoinCode', () => ({ endedJoinCodeStatus: mockEndedStatus }));
+
 const jsonRes = (body: unknown, ok = true) => ({ ok, status: ok ? 200 : 500, json: async () => body });
 
 let fetchMock: ReturnType<typeof vi.fn>;
 
 beforeEach(() => {
+  mockEndedStatus.mockReset().mockResolvedValue('not_ended');
   fetchMock = vi.fn();
   vi.stubGlobal('fetch', fetchMock);
 });
@@ -49,9 +53,27 @@ describe('resolveJoinCodeVerdict', () => {
     await expect(resolveJoinCodeVerdict('TZCOQ7')).resolves.toBe('game');
   });
 
-  it('says invalid for a confident unknown — the typo, and the ended game', async () => {
+  it('says invalid for a confident unknown that is not an ended game', async () => {
     fetchMock.mockResolvedValue(jsonRes({ kind: 'unknown' }));
     await expect(resolveJoinCodeVerdict('ZZZZZZ')).resolves.toBe('invalid');
+  });
+
+  it('Given a code the route calls ended, Then the verdict is ended, never invalid', async () => {
+    fetchMock.mockResolvedValue(jsonRes({ kind: 'ended', classroomName: 'Year 9' }));
+    await expect(resolveJoinCodeVerdict('ABC123')).resolves.toBe('ended');
+  });
+
+  it('Given a confident unknown that is yesterday\'s game code, Then the verdict is ended so the server can enrol them', async () => {
+    fetchMock.mockResolvedValue(jsonRes({ kind: 'unknown' }));
+    mockEndedStatus.mockResolvedValue('ended');
+    await expect(resolveJoinCodeVerdict('abc123')).resolves.toBe('ended');
+    expect(mockEndedStatus).toHaveBeenCalledWith('ABC123');
+  });
+
+  it('Given the ended check is rate limited for a class behind one IP, Then the verdict is unverified, not invalid', async () => {
+    fetchMock.mockResolvedValue(jsonRes({ kind: 'unknown' }));
+    mockEndedStatus.mockResolvedValue('unverified');
+    await expect(resolveJoinCodeVerdict('ABC123')).resolves.toBe('unverified');
   });
 
   // ---- Everything below must NOT be allowed to stop a join. ----

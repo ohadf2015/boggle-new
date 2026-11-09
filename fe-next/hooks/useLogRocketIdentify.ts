@@ -15,6 +15,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import posthog from '@/lib/analytics/lazyPosthog';
 import { EXPERIMENTS } from '@/lib/experiments';
 import { identifyGuest, identifyUser } from '@/utils/logrocket';
+import { surfaceOf } from '@/lib/navigation/eduSections';
 
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
 
@@ -57,6 +58,8 @@ export function useLogRocketIdentify(): void {
 
   const identify = useCallback(() => {
     if (!user && !profile) return;
+    // Read at fire time: the ready and flag callbacks can fire after a move into a class.
+    if (surfaceOf(window.location.pathname) === 'edu') return;
 
     const platform = getPlatform();
 

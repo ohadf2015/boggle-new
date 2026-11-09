@@ -17,6 +17,8 @@ import { cn } from '@/lib/utils';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { NB_BLOCK, NB_PANEL, NB_SMALL, NB_STICKER } from '@/components/teacher/nb/nbStyles';
+import { NeoButton } from '@/components/ui/button';
+import { NeoPanel } from '@/components/ui/panel';
 
 export default function DeleteClassPageClient({ classroomId }: { classroomId: string }) {
   const { t } = useLanguage();
@@ -66,7 +68,8 @@ function DeleteClassPanel({ classroomId }: { classroomId: string }) {
         <DirectionalIcon icon={ArrowLeft} className="size-4" />
         {t('education.analytics.backToClassroom')}
       </Link>
-      <section className={cn(NB_PANEL, 'flex flex-col gap-3 p-4 sm:p-5')}>
+      <NeoPanel asChild tone="card" radius="neo-xl" shadow="xl" className="flex flex-col gap-3 p-4 sm:p-5">
+      <section>
         <h1 className="font-neo-display text-2xl font-black text-neo-cream">{t('teacher.classroom.delete')}</h1>
         {name ? (
           <span data-testid="delete-class-name" dir="auto" className={cn(NB_STICKER, NB_BLOCK.cream, 'self-start text-sm')}>
@@ -77,16 +80,17 @@ function DeleteClassPanel({ classroomId }: { classroomId: string }) {
         {error ? (
           <p className="text-sm font-bold text-neo-red" role="alert">{error}</p>
         ) : null}
-        <button
-          type="button"
+        <NeoButton
+          variant="small"
           onClick={() => setOpen(true)}
           data-testid="delete-class-affordance"
-          className={cn(NB_SMALL, 'min-h-12 self-start border-neo-black bg-neo-red px-4 text-base text-white')}
+          className="min-h-12 self-start border-neo-black bg-neo-red px-4 text-base text-white"
         >
           <Trash2 className="size-4" aria-hidden="true" />
           {t('teacher.classroom.delete')}
-        </button>
+        </NeoButton>
       </section>
+      </NeoPanel>
       <ConfirmationDialog
         open={open}
         onOpenChange={setOpen}

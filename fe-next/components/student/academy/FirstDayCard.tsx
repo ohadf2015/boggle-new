@@ -43,7 +43,7 @@ export function FirstDayCard({ goals, hasClass, chestArt = true }: Props) {
               key={g.id}
               data-testid={`academy-first-day-${g.id}`}
               data-done={g.done ? 'true' : 'false'}
-              className={`flex min-w-0 flex-col gap-0.5 rounded-lg border-2 border-neo-black px-1.5 py-1 font-neo-body text-xs font-bold leading-tight ${
+              className={`flex min-w-0 flex-col gap-0.5 rounded-neo border-2 border-neo-black px-1.5 py-1 font-neo-body text-xs font-bold leading-tight ${
                 g.done ? 'bg-neo-lime text-neo-black' : 'bg-neo-white/10 text-neo-white'
               }`}
             >

@@ -26,7 +26,7 @@ describe('robots.txt', () => {
     const yandex = rules.find((r) =>
       (Array.isArray(r.userAgent) ? r.userAgent : [r.userAgent]).includes('YandexBot')
     );
-    expect(yandex?.allow).toBe('/');
+    expect(list(yandex?.allow)).toContain('/');
   });
 
   it('applies the same duplicate-content guards to Yandex as to everyone else', () => {
@@ -36,6 +36,7 @@ describe('robots.txt', () => {
       (Array.isArray(r.userAgent) ? r.userAgent : [r.userAgent]).includes('YandexBot')
     );
     expect(yandex?.disallow).toEqual(wildcard?.disallow);
+    expect(yandex?.allow).toEqual(wildcard?.allow);
   });
 
   /**
@@ -53,6 +54,47 @@ describe('robots.txt', () => {
 
   it('still points at the sitemap', () => {
     expect(robots().sitemap).toBe('https://www.lexiclash.live/sitemap.xml');
+  });
+});
+
+const list = (v: string | string[] | undefined) => (Array.isArray(v) ? v : v ? [v] : []);
+
+const toRegex = (pattern: string) =>
+  new RegExp(`^${pattern.replace(/[.+?^{}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*')}`);
+
+// Google's rule: the longest matching pattern wins, and Allow wins a tie.
+function crawlable(rule: Rule, urlPath: string): boolean {
+  const longest = (patterns: string[]) =>
+    Math.max(-1, ...patterns.filter((p) => toRegex(p).test(urlPath)).map((p) => p.length));
+  return longest(list(rule.allow)) >= longest(list(rule.disallow));
+}
+
+describe('classroom app pages stay out of search', () => {
+  const ruleFor = (agent: string) => rulesOf().find((r) => list(r.userAgent).includes(agent))!;
+
+  it.each(['*', 'Googlebot', 'Bingbot'])('%s may not crawl teacher, student, join, report or classroom pages', (agent) => {
+    const rule = ruleFor(agent);
+    for (const locale of ['en', 'he', 'sv', 'ja', 'es', 'ru']) {
+      for (const p of ['teacher', 'teacher/classroom/abc', 'student', 'student/quick-play', 'join', 'join/ABC123', 'report/tok', 'classroom']) {
+        expect(crawlable(rule, `/${locale}/${p}`), `${agent} /${locale}/${p}`).toBe(false);
+      }
+    }
+  });
+
+  it('still lets crawlers reach education marketing, the Pro page and look-alike paths', () => {
+    const rule = ruleFor('*');
+    for (const p of ['/en/education', '/en/education/classroom-game', '/en/education/live', '/he/teacher/upgrade', '/en/pricing', '/en/word-games-for-the-classroom', '/en/teacher-appreciation', '/en/blog/teacher/tips']) {
+      expect(crawlable(rule, p), p).toBe(true);
+    }
+  });
+
+  it('blocks no URL the sitemap advertises', async () => {
+    const { default: sitemap } = await import('../sitemap');
+    const rule = ruleFor('Googlebot');
+    const blocked = sitemap()
+      .map((e) => new URL(e.url).pathname)
+      .filter((p) => !crawlable(rule, p));
+    expect(blocked).toEqual([]);
   });
 });
 

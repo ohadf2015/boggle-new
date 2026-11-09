@@ -36,31 +36,18 @@ describe('homeNextStep', () => {
     });
   });
 
-  it('Given a trialing teacher, Then the trial step wins and the onboarding step is not shown beside it', () => {
-    expect(homeNextStep({ onboarding: fresh, trial: trial('create_classroom') })).toMatchObject({
-      source: 'trial',
-      id: 'create_classroom',
-      done: 0,
-      total: 3,
-      dismissible: true,
-    });
-  });
-
-  it('Given the trial checklist is hidden, Then the onboarding step is the next step', () => {
-    expect(homeNextStep({ onboarding: needsShare, trial: trial('invite_students', false) })).toMatchObject({
-      source: 'onboarding',
-      id: 'shareCode',
-    });
+  it('Given a trialing teacher, Then Home keeps the one 3-step list, so the step never flips when the plan loads', () => {
+    const withTrial = { onboarding: needsShare, trial: trial('first_assignment') } as Parameters<typeof homeNextStep>[0];
+    expect(homeNextStep(withTrial)).toEqual(homeNextStep({ onboarding: needsShare }));
+    expect(homeNextStep(withTrial)).toMatchObject({ source: 'onboarding', id: 'shareCode' });
   });
 
   it('Given the get-students-in card is already on Home, Then no second share card appears', () => {
     expect(homeNextStep({ onboarding: needsShare, shareCardShown: true })).toBeNull();
-    expect(homeNextStep({ onboarding: fresh, trial: trial('invite_students'), shareCardShown: true })).toBeNull();
   });
 
   it('Given every step is done, Then there is no next-step card', () => {
     expect(homeNextStep({ onboarding: done })).toBeNull();
-    expect(homeNextStep({ onboarding: done, trial: trial(null) })).toBeNull();
   });
 
   it('Given a dismissed onboarding with a class, Then nothing shows', () => {

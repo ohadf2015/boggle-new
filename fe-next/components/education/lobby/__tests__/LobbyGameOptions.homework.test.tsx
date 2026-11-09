@@ -9,7 +9,7 @@ import type { LobbyRoundOptions } from '../useLobbyRoundOptions';
 
 vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ t: (k: string) => k }) }));
 vi.mock('../LobbySetupPanel', () => ({ LobbySetupPanel: () => null }));
-vi.mock('../LobbyPressureDials', () => ({ LobbyPressureDials: () => null }));
+vi.mock('../LobbyPressureDials', () => ({ LobbyPressureDials: () => <div data-testid="pressure-dials" /> }));
 vi.mock('../LobbyRoundSettings', () => ({ LobbyRoundSettings: () => null }));
 vi.mock('../LobbyLateJoinToggle', () => ({ LobbyLateJoinToggle: () => null }));
 vi.mock('../LobbyEconomyToggles', () => ({ LobbyEconomyToggles: () => null }));
@@ -45,5 +45,13 @@ describe('LobbyGameOptions homework section', () => {
     renderOptions();
     fireEvent.click(screen.getByTestId('lobby-setup-summary'));
     expect(screen.queryByTestId('lobby-options-homework')).toBeNull();
+  });
+
+  it('Given the options sheet, Then the Pro dials sit together under one Pro options heading', () => {
+    renderOptions();
+    fireEvent.click(screen.getByTestId('lobby-setup-summary'));
+    const group = within(screen.getByTestId('lobby-setup-body')).getByTestId('lobby-options-pro');
+    expect(within(group).getByRole('heading', { name: 'eduShell.host.proOptions' })).toBeInTheDocument();
+    expect(within(group).getByTestId('pressure-dials')).toBeInTheDocument();
   });
 });

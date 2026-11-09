@@ -14,7 +14,7 @@ import logger from '@/utils/logger';
  * already uses (`CLASS_LIMIT_REACHED` in `ClassroomManager`). `error` stays for logs
  * and for the generic fallback; it is not fit to render on its own.
  */
-export type JoinClassroomErrorCode = 'STUDENT_LIMIT_REACHED' | 'INVALID_CODE' | 'NAME_TAKEN' | 'SESSION_ENDED' | 'ROOM_LOCKED';
+export type JoinClassroomErrorCode = 'STUDENT_LIMIT_REACHED' | 'INVALID_CODE' | 'NAME_TAKEN' | 'SESSION_ENDED' | 'ROOM_LOCKED' | 'TEACHER_OWN_CLASS';
 
 export interface JoinClassroomResult {
   success: boolean;
@@ -28,6 +28,8 @@ export interface JoinClassroomResult {
   alreadyMember?: boolean;
   /** The code was an ended game's: the server enrolled them in that class instead. */
   endedSessionCode?: boolean;
+  /** The server replaced the typed name (moderation); store this one, not what was typed. */
+  displayName?: string;
   error?: string;
 }
 
@@ -95,8 +97,8 @@ export function useJoinClassroom() {
 
       if (!response.ok) {
         const data = await response.json();
-        if (data?.code === 'ROOM_LOCKED') {
-          return { success: false, code: 'ROOM_LOCKED', error: data.error };
+        if (data?.code === 'ROOM_LOCKED' || data?.code === 'TEACHER_OWN_CLASS') {
+          return { success: false, code: data.code, error: data.error };
         }
         if (response.status === 410 || data?.code === 'SESSION_ENDED') {
           return { success: false, code: 'SESSION_ENDED', error: data?.error || 'Game ended' };
@@ -113,7 +115,7 @@ export function useJoinClassroom() {
       // `gameCode` is present only when the student joined by typing the LIVE GAME code
       // (the one on the projector) rather than the permanent roster code. It is the room
       // they should walk straight into — being on the roster is not the thing they came for.
-      const { classroomId, gameCode, alreadyMember, endedSessionCode } = await response.json();
+      const { classroomId, gameCode, alreadyMember, endedSessionCode, displayName } = await response.json();
 
       return {
         success: true,
@@ -121,6 +123,7 @@ export function useJoinClassroom() {
         ...(gameCode ? { gameCode } : {}),
         ...(alreadyMember ? { alreadyMember } : {}),
         ...(endedSessionCode ? { endedSessionCode: true } : {}),
+        ...(typeof displayName === 'string' && displayName ? { displayName } : {}),
       };
     } catch (err) {
       const error = err instanceof Error ? err.message : 'Failed to join classroom';

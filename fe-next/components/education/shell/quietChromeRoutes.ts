@@ -23,18 +23,21 @@
  * pre-start lobby, which is exactly where START GAME is, never sets it.
  */
 
+import { eduSectionOf, type EduSection } from '@/lib/navigation/eduSections';
+
+const QUIET_EDU_SECTIONS: readonly EduSection[] = ['teacher', 'student', 'pricing'];
+
 /** Route heads, matched from the first segment after an optional locale. */
 const QUIET_ROUTES: readonly (readonly string[])[] = [
-  ['teacher'],
-  ['student'],
   ['multiplayer'],
   ['education', 'classroom-game'],
   ['education', 'live'],
-  ['pricing'],
 ];
 
 export function isQuietChromeSurface(pathname: string | null | undefined): boolean {
   if (!pathname) return false;
+  const section = eduSectionOf(pathname);
+  if (section && QUIET_EDU_SECTIONS.includes(section)) return true;
   const segments = pathname.split('/').filter(Boolean);
   if (segments.length === 0) return false;
 

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { BookOpenCheck, ChevronRight, Lock, Send } from 'lucide-react';
+import { BookOpenCheck, ChevronRight, Send } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ReadyForTest } from './weekLoopModel';
 
@@ -14,13 +14,11 @@ export interface HomeWeekLoopProps {
   ready: ReadyForTest | null;
   missed: readonly string[];
   reportsHref: string;
-  /** Free plan: the counts stay free, the per-student word report behind the chip is Pro. */
-  locked: boolean;
   onHomework: () => void;
   t: T;
 }
 
-export function HomeWeekLoop({ ready, missed, reportsHref, locked, onHomework, t }: HomeWeekLoopProps) {
+export function HomeWeekLoop({ ready, missed, reportsHref, onHomework, t }: HomeWeekLoopProps) {
   if (!ready && missed.length === 0) return null;
   return (
     <div data-testid="home-week-loop" className="flex flex-wrap items-center gap-2">
@@ -33,11 +31,7 @@ export function HomeWeekLoop({ ready, missed, reportsHref, locked, onHomework, t
         >
           <BookOpenCheck className="size-4 shrink-0" strokeWidth={2.5} aria-hidden="true" />
           {t('eduShell.home.loop.ready', { ready: ready.ready, total: ready.rated })}
-          {locked ? (
-            <Lock data-testid="home-ready-lock" className="size-3.5 shrink-0" strokeWidth={2.5} aria-hidden="true" />
-          ) : (
-            <ChevronRight className="size-4 shrink-0 rtl:-scale-x-100" aria-hidden="true" />
-          )}
+          <ChevronRight className="size-4 shrink-0 rtl:-scale-x-100" aria-hidden="true" />
         </Link>
       ) : ready?.kind === 'noResults' ? (
         <p data-testid="home-ready-empty" className="font-neo-body text-sm font-bold text-white/85">

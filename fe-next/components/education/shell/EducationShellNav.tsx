@@ -62,7 +62,7 @@ export function EducationShellNav({
     return (
       <div
         data-testid="teacher-topbar"
-        className="flex shrink-0 items-center justify-between gap-3 border-b-[3px] border-neo-cream bg-neo-navy px-4 pb-2 pt-[max(0.5rem,env(safe-area-inset-top))] lg:hidden"
+        className="flex shrink-0 items-center justify-between gap-3 border-b-[3px] border-neo-cream bg-neo-navy px-4 py-2 lg:hidden"
       >
         <TeacherBrand href={home} t={t} compact />
         <div className="flex min-w-0 items-center gap-1">

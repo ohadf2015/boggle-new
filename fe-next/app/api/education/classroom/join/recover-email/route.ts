@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
+import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { findAuthUserByEmail } from '@/lib/education/findAuthUserByEmail';
 import {
@@ -22,16 +23,17 @@ const bodySchema = z.object({
 /**
  * POST /api/education/classroom/join/recover-email
  *
- * A student holding a class code whose signup email was typo'd. Resend is a
- * client call (no session required). This route only corrects the address,
- * and only when the account is still unconfirmed and the new address is one
- * or two edits away. Confirmed accounts are never rewritten.
+ * A signed-in student holding a class code whose signup email was typo'd.
+ * Only the session's own account is corrected, only while unconfirmed, and
+ * only to an address one or two edits away: anyone else's is a silent noop.
  */
 export async function POST(request: NextRequest) {
   const limited = checkApiRateLimit(request, 'join-recover-email', { maxRequests: 8, windowMs: 10 * 60_000 });
   if (!limited.success) {
     return NextResponse.json({ ok: false, code: 'RATE_LIMITED' }, { status: 429 });
   }
+  const session = await getAuthedUser(request, { writes: true });
+  if (!session) return NextResponse.json({ ok: false, code: 'UNAUTHORIZED' }, { status: 401 });
 
   let json: unknown;
   try {
@@ -52,7 +54,7 @@ export async function POST(request: NextRequest) {
     logger.error('join recover-email lookup failed:', looked.error);
     return NextResponse.json({ ok: false, code: 'UNAVAILABLE' }, { status: 503 });
   }
-  if (correctionApply('ok', looked.user) !== 'correct') {
+  if (looked.user?.id !== session.id || correctionApply('ok', looked.user) !== 'correct') {
     return NextResponse.json({ ok: true });
   }
 

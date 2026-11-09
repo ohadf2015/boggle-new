@@ -4,7 +4,7 @@ import React, { useCallback, useRef } from 'react';
 import { ClipboardPaste } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { foldJoinCode } from '@/lib/education/joinCodeInput';
+import { foldJoinCode, joinCodeStripped } from '@/lib/education/joinCodeInput';
 
 export const JOIN_CODE_LENGTH = 6;
 
@@ -30,6 +30,8 @@ interface JoinCodeFieldProps {
   onPaste?: () => void;
   /** A paste longer than a code: `maxLength` would cut it silently. */
   onOverflow?: () => void;
+  /** Whether the last keystroke lost characters no keyboard layout maps. */
+  onStripped?: (stripped: boolean) => void;
 }
 
 /**
@@ -58,6 +60,7 @@ export function JoinCodeField({
   onComplete,
   onPaste,
   onOverflow,
+  onStripped,
 }: JoinCodeFieldProps) {
   const { t } = useLanguage();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -67,12 +70,13 @@ export function JoinCodeField({
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const next = sanitizeJoinCode(e.target.value);
+      onStripped?.(joinCodeStripped(e.target.value));
       onChange(next);
       // Fires on the sixth character AND on a six-character paste, so the two
       // ways in behave identically (recurring pitfall class 3).
       if (next.length === JOIN_CODE_LENGTH) onComplete?.(next);
     },
-    [onChange, onComplete]
+    [onChange, onComplete, onStripped]
   );
 
   // `maxLength` cuts the RAW paste, so "P45 KRT" would land as "P45 KR": sanitize first.

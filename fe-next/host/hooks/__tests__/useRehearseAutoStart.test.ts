@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { act, renderHook } from '@testing-library/react';
 import { writeRehearseIntent, peekRehearseIntent } from '@/lib/education/rehearsal';
-import { useRehearseAutoStart } from '../useRehearseAutoStart';
+import { PRACTICE_SEAT_TIMEOUT_MS, useRehearseAutoStart } from '../useRehearseAutoStart';
 
 describe('useRehearseAutoStart', () => {
   beforeEach(() => sessionStorage.clear());
@@ -64,5 +64,53 @@ describe('useRehearseAutoStart', () => {
     rerender({ practiceSeated: true });
     expect(start).toHaveBeenCalledTimes(1);
     expect(start).toHaveBeenCalledWith({ source: 'hq', classExists: true, withSeat: true });
+  });
+
+  describe('when the practice seat never joins', () => {
+    beforeEach(() => vi.useFakeTimers());
+    afterEach(() => vi.useRealTimers());
+
+    const run = (practiceSeated = false) => {
+      writeRehearseIntent({ source: 'hq', classExists: true, withSeat: true });
+      const start = vi.fn();
+      const hook = renderHook((p: { practiceSeated: boolean }) => useRehearseAutoStart({ enabled: true, hostSeated: true, practiceSeated: p.practiceSeated, botsAllowed: true, start }), {
+        initialProps: { practiceSeated },
+      });
+      return { start, ...hook };
+    };
+
+    it('Given 12 seconds pass with no seat, Then the lobby says so instead of waiting silently', () => {
+      const { result } = run();
+      expect(result.current.seatTimedOut).toBe(false);
+      act(() => vi.advanceTimersByTime(PRACTICE_SEAT_TIMEOUT_MS));
+      expect(PRACTICE_SEAT_TIMEOUT_MS).toBe(12_000);
+      expect(result.current.seatTimedOut).toBe(true);
+    });
+
+    it('Given the timeout, When the teacher picks bots only, Then the round starts without the seat, once', () => {
+      const { result, start } = run();
+      act(() => vi.advanceTimersByTime(PRACTICE_SEAT_TIMEOUT_MS));
+      act(() => result.current.startBotsOnly());
+      expect(start).toHaveBeenCalledTimes(1);
+      expect(start).toHaveBeenCalledWith({ source: 'hq', classExists: true });
+      expect(result.current.seatTimedOut).toBe(false);
+      expect(peekRehearseIntent()).toBeNull();
+    });
+
+    it('Given the timeout, When the teacher tries again, Then the wait restarts and a late seat still starts the round', () => {
+      const { result, start, rerender } = run();
+      act(() => vi.advanceTimersByTime(PRACTICE_SEAT_TIMEOUT_MS));
+      act(() => result.current.retry());
+      expect(result.current.seatTimedOut).toBe(false);
+      rerender({ practiceSeated: true });
+      expect(start).toHaveBeenCalledTimes(1);
+    });
+
+    it('Given the seat joins in time, Then no timeout shows', () => {
+      const { result, rerender } = run();
+      rerender({ practiceSeated: true });
+      act(() => vi.advanceTimersByTime(PRACTICE_SEAT_TIMEOUT_MS * 2));
+      expect(result.current.seatTimedOut).toBe(false);
+    });
   });
 });

@@ -92,13 +92,13 @@ describe('Teacher Home week-two loop', () => {
     expect(getRecent).toHaveBeenCalledWith('c5b', 1, expect.anything());
   });
 
-  it('Then Ready for the test counts students at 80% or more, free, with the report behind a Pro lock', async () => {
+  it('Then Ready for the test counts students at 80% or more, free, and opens the results hub with no lock on Home', async () => {
     render(<TeacherDashboard />);
     await settle();
     const chip = screen.getByTestId('home-ready-chip');
     expect(chip).toHaveTextContent('eduShell.home.loop.ready:{"ready":2,"total":3}');
     expect(chip).toHaveAttribute('href', '/en/teacher/reports?classroomId=c5b');
-    expect(screen.getByTestId('home-ready-lock')).toBeInTheDocument();
+    expect(screen.queryByTestId('home-ready-lock')).toBeNull();
   });
 
   it('Given a Pro teacher, Then the same chip opens the report without a lock', async () => {

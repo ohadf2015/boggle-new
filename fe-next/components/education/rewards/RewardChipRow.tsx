@@ -38,7 +38,7 @@ export default function RewardChipRow({ label, chips, reduced, delay = 0 }: Prop
           initial={reduced ? false : { opacity: 0, y: 18, scale: 0.92 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.25, ease: EASE_OUT, delay: delay + i * 0.08 }}
-          className="relative flex min-h-[8.5rem] flex-col items-center justify-center gap-1 rounded-2xl border-[3px] border-neo-black bg-neo-white px-1.5 pb-2.5 pt-3 text-center text-neo-navy shadow-[4px_4px_0_0_rgb(var(--neo-black))]"
+          className="relative flex min-h-[8.5rem] flex-col items-center justify-center gap-1 rounded-neo-lg border-[3px] border-neo-black bg-neo-white px-1.5 pb-2.5 pt-3 text-center text-neo-navy shadow-[4px_4px_0_0_rgb(var(--neo-black))]"
         >
           {chip.badge && (
             <span

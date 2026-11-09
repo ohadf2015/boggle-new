@@ -32,7 +32,7 @@ export function BoardPreview({ list, title, hiddenLabel }: { list: WordList; tit
       <div
         data-board
         dir={list.lang === 'he' ? 'rtl' : 'ltr'}
-        className="mt-3 grid grid-cols-5 gap-1.5 rounded-lg border-3 border-neo-cream/40 bg-neo-navy p-2"
+        className="mt-3 grid grid-cols-5 gap-1.5 rounded-neo border-3 border-neo-cream/40 bg-neo-navy p-2"
         aria-hidden
       >
         {board.grid.flatMap((row, r) =>
@@ -42,7 +42,7 @@ export function BoardPreview({ list, title, hiddenLabel }: { list: WordList; tit
               <span
                 key={`${r}-${c}`}
                 data-cell
-                className={`relative flex aspect-square items-center justify-center rounded-md border-2 border-neo-black font-neo-display text-xl font-black uppercase shadow-hard-sm sm:text-2xl ${
+                className={`relative flex aspect-square items-center justify-center rounded-neo border-2 border-neo-black font-neo-display text-xl font-black uppercase shadow-hard-sm sm:text-2xl ${
                   step === undefined ? 'bg-neo-white text-neo-navy' : 'bg-neo-lime text-neo-navy'
                 }`}
               >

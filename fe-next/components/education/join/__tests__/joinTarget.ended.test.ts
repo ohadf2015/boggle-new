@@ -1,7 +1,12 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 
 const { mockIsEnded } = vi.hoisted(() => ({ mockIsEnded: vi.fn() }));
-vi.mock('../endedJoinCode', () => ({ isEndedJoinCode: mockIsEnded }));
+vi.mock('../endedJoinCode', () => ({
+  endedJoinCodeStatus: async (code: string) => {
+    const answer = await mockIsEnded(code);
+    return answer === 'limited' ? 'unverified' : answer ? 'ended' : 'not_ended';
+  },
+}));
 
 import { resolveJoinTarget } from '../joinTarget';
 
@@ -36,6 +41,12 @@ describe('resolveJoinTarget — ended games', () => {
     vi.stubGlobal('fetch', answer({ kind: 'unknown' }));
     mockIsEnded.mockRejectedValue(new Error('action failed'));
     await expect(resolveJoinTarget('ABC123')).resolves.toEqual({ verdict: 'invalid' });
+  });
+
+  it('GIVEN the ended check is rate limited THEN a confident unknown is unverified, not invalid', async () => {
+    vi.stubGlobal('fetch', answer({ kind: 'unknown' }));
+    mockIsEnded.mockResolvedValue('limited');
+    await expect(resolveJoinTarget('ABC123')).resolves.toEqual({ verdict: 'unverified' });
   });
 
   it('GIVEN a degraded unknown THEN the ended check is not asked', async () => {
