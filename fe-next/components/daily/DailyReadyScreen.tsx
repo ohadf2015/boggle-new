@@ -258,6 +258,10 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
             <span className="text-neo-white/30">•</span>
             <span className="text-sm">{formattedDate}</span>
           </div>
+          {/* What the game is, in one line: the ready screen never said. */}
+          <p data-testid="hunt-ready-tagline" className="mx-auto max-w-xs text-sm font-bold leading-snug text-neo-white/80">
+            {t('wordHunt.survival.readyTagline')}
+          </p>
         </m.div>
 
         {/* PRIMARY PLAY BUTTON — inline on desktop, sticky on mobile */}

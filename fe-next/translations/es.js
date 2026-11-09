@@ -10240,6 +10240,8 @@ const es = {
       "notOnBoardPenalty": "⚠️ No en el tablero -5 ❤️",
       "notFormablePenalty": "⚠️ No en el tablero -5 ❤️",
       "notInDictionary": "📖 No es una palabra -4 ❤️",
+      "notInDictionaryFree": "📖 No es una palabra. Prueba otra",
+      "notOnBoardFree": "⚠️ No está en el tablero. Las letras deben tocarse",
       "correct": "Correcto",
       "wrongPlace": "Lugar incorrecto",
       "notInWord": "No en palabra"
@@ -10265,6 +10267,10 @@ const es = {
         "decline": "Terminar partida"
       },
       "findWordsToReveal": "Deletrea palabras en la cuadrícula para revelar estas letras",
+      "goal": "Encuentra la palabra oculta de {count} letras",
+      "cueShortVsGuess": "Las palabras más cortas dan pistas gratis. Las de {count} letras son intentos.",
+      "tryWord": "¿Atascado? Traza {word}",
+      "readyTagline": "Encuentra la palabra oculta de hoy. Las palabras más cortas que formes en el tablero revelan sus letras.",
       "shop": "Tienda de Pistas",
       "revealLetter": "Revelar Letra",
       "revealLetterDesc": "Revelar una letra aleatoria de la palabra objetivo",

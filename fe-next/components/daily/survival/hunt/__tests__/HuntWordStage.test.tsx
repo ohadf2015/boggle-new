@@ -22,6 +22,12 @@ describe('HuntWordStage', () => {
     expect(screen.getByText('wordHunt.survival.stage.prompt')).toBeTruthy();
   });
 
+  it('Given a starter hint, When idle, Then it replaces the swipe invite', () => {
+    stage({ prompt: 'Try tracing HEAR' });
+    expect(screen.getByTestId('hunt-stage-prompt').textContent).toBe('Try tracing HEAR');
+    expect(screen.queryByText('wordHunt.survival.stage.prompt')).toBeNull();
+  });
+
   it('spells the live word letter by letter while dragging', () => {
     stage({ phase: 'live', word: 'CAT' });
     const word = screen.getByTestId('hunt-live-word');

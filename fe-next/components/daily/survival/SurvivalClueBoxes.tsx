@@ -21,7 +21,7 @@ export interface SurvivalClueBoxesProps {
   isClueGaining: boolean;
   skipAnimations: boolean;
   gameDir: 'ltr' | 'rtl';
-  t: (key: string) => string;
+  t: (key: string, params?: Record<string, string | number>) => string;
   /** Formed word currently equals target length — submitting will consume a try. */
   matchesTargetLength?: boolean;
   /**
@@ -32,6 +32,11 @@ export interface SurvivalClueBoxesProps {
    * survival never passes it, so its behaviour is unchanged.
    */
   compact?: boolean;
+  /**
+   * Daily Word Hunt: name the goal ("Find the hidden 5-letter word") in the reserved warning slot
+   * until the first guess, and say which words are free and which spend a try. MP keeps its copy.
+   */
+  explainRules?: boolean;
 }
 
 /**
@@ -86,10 +91,12 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
   t,
   matchesTargetLength = false,
   compact = false,
+  explainRules = false,
 }, ref) => {
   if (!currentHint) return null;
 
   const showMatchWarning = matchesTargetLength && !showFeedbackOverlay;
+  const showGoal = explainRules && !showMatchWarning && !attempts.some((a) => !a.isDiscovery);
 
   return (
     <AdaptiveMotion.div
@@ -132,6 +139,11 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
             aria-live="polite"
           >
             ⚠ {t('wordHunt.survival.matchesTargetWarning')}
+          </span>
+        )}
+        {showGoal && (
+          <span data-testid="hunt-goal" className="text-center text-sm sm:text-base font-black text-neo-white">
+            {t('wordHunt.survival.goal', { count: targetWord.length })}
           </span>
         )}
       </div>
@@ -197,6 +209,7 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
                 key="known-letters"
                 knownLetters={knownLetters}
                 noCluesYet={accumulatedClues.size === 0 && knownLetters.size === 0 && revealedLetters.size === 0}
+                cue={explainRules ? t('wordHunt.survival.cueShortVsGuess', { count: targetWord.length }) : t('wordHunt.survival.findWordsToReveal')}
                 t={t}
               />
             )}
@@ -444,10 +457,12 @@ interface KnownLettersDisplayProps {
   knownLetters: Set<string>;
   /** No clues revealed yet → prompt the player to spell board words. */
   noCluesYet?: boolean;
+  /** The empty-state line. */
+  cue: string;
   t: (key: string) => string;
 }
 
-const KnownLettersDisplay: React.FC<KnownLettersDisplayProps> = ({ knownLetters, noCluesYet, t }) => (
+const KnownLettersDisplay: React.FC<KnownLettersDisplayProps> = ({ knownLetters, noCluesYet, cue, t }) => (
   <AdaptiveMotion.div
     key="known-letters"
     initial={{ opacity: 0 }}
@@ -466,7 +481,7 @@ const KnownLettersDisplay: React.FC<KnownLettersDisplayProps> = ({ knownLetters,
         role="status"
         aria-live="polite"
       >
-        🔍 {t('wordHunt.survival.findWordsToReveal')}
+        🔍 {cue}
       </span>
     )}
     {knownLetters.size > 0 && (

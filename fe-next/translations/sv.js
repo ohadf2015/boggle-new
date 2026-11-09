@@ -10632,6 +10632,8 @@ const sv = {
       "notOnBoardPenalty": "⚠️ Inte på brädet -5 ❤️",
       "notFormablePenalty": "⚠️ Inte på brädet -5 ❤️",
       "notInDictionary": "📖 Inte ett ord -4 ❤️",
+      "notInDictionaryFree": "📖 Inte ett ord. Prova ett annat",
+      "notOnBoardFree": "⚠️ Inte på brädet. Bokstäverna måste nudda varandra",
       "correct": "Korrekt",
       "wrongPlace": "Fel plats",
       "notInWord": "Inte i ordet"
@@ -10699,6 +10701,10 @@ const sv = {
         "decline": "Avsluta rundan"
       },
       "findWordsToReveal": "Stava ord på rutorna för att avslöja dessa bokstäver",
+      "goal": "Hitta det dolda ordet på {count} bokstäver",
+      "cueShortVsGuess": "Kortare ord ger gratis ledtrådar. Ord på {count} bokstäver är gissningar.",
+      "tryWord": "Fast? Dra över {word}",
+      "readyTagline": "Hitta dagens dolda ord. Kortare ord som du stavar på brädet avslöjar dess bokstäver.",
       "shop": "Ledtrådsbutik",
       "revealLetter": "Avslöja bokstav",
       "revealLetterDesc": "Avslöja en slumpmässig bokstav i målordet",

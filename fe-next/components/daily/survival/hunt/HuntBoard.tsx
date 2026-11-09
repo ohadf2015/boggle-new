@@ -23,6 +23,8 @@ export interface HuntBoardProps {
   phase: HuntPhase;
   verdict: HuntVerdict | null;
   heldPath: HuntCell[];
+  /** A word to trace, lit while the board is idle (first games, when the player is stuck). */
+  guidePath?: HuntCell[];
   calm: boolean;
   size?: 'phone' | 'desktop';
   t: TFn;
@@ -73,6 +75,7 @@ export function HuntBoard({
   phase,
   verdict,
   heldPath,
+  guidePath,
   calm,
   size = 'phone',
   t,
@@ -126,7 +129,11 @@ export function HuntBoard({
   }, [interactive, selection]);
 
   const holding = (phase === 'pending' || phase === 'verdict') && !hasLive;
-  const shown: HuntCell[] = useMemo(() => (holding ? heldPath : []), [holding, heldPath]);
+  const guiding = !holding && !hasLive && phase === 'idle' && !!guidePath?.length;
+  const shown: HuntCell[] = useMemo(
+    () => (holding ? heldPath : guiding && guidePath ? guidePath : []),
+    [holding, heldPath, guiding, guidePath],
+  );
 
   const cols = grid[0]?.length ?? 0;
   const rows = grid.length;
@@ -216,7 +223,7 @@ export function HuntBoard({
             <svg
               aria-hidden="true"
               data-testid="hunt-trail"
-              data-kind="held"
+              data-kind={guiding ? 'guide' : 'held'}
               className={styles.trail}
               viewBox={`0 0 ${cols * CELL_UNIT} ${rows * CELL_UNIT}`}
             >

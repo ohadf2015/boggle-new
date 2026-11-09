@@ -112,6 +112,8 @@ describe('DailyWordHuntSurvival word feedback', () => {
   });
 
   it('Given a word that is not on the board, When submitted, Then its result stays in the feedback pill', async () => {
+    // A player past their first games pays the penalty, and the pill says so.
+    localStorage.setItem('lexiclash_daily_challenge_progress', JSON.stringify({ challengesCompleted: 5 }));
     renderHunt();
     type('ht');
     fireEvent.keyDown(document, { key: 'Enter' });
@@ -119,6 +121,16 @@ describe('DailyWordHuntSurvival word feedback', () => {
     const pill = screen.getByTestId('hunt-feedback-pill');
     expect(pill.getAttribute('data-type')).toBe('not-on-board');
     expect(pill.textContent).toContain('wordHunt.feedback.notOnBoardPenalty');
+    localStorage.removeItem('lexiclash_daily_challenge_progress');
+  });
+
+  it('Given a first game, When a word is not on the board, Then the pill names it without a life cost', async () => {
+    localStorage.removeItem('lexiclash_daily_challenge_progress');
+    renderHunt();
+    type('ht');
+    fireEvent.keyDown(document, { key: 'Enter' });
+    await waitFor(() => expect(screen.getByTestId('hunt-feedback-pill')).toBeInTheDocument());
+    expect(screen.getByTestId('hunt-feedback-pill').textContent).toContain('wordHunt.feedback.notOnBoardFree');
   });
 
   it('Given no word submitted yet, Then the pill row is reserved but empty so the board never jumps', () => {

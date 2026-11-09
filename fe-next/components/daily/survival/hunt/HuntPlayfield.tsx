@@ -27,6 +27,8 @@ export interface HuntPlayfieldProps {
   calm: boolean;
   size?: 'phone' | 'desktop';
   stageOverlay?: React.ReactNode;
+  /** First games: a word to trace, lit on the board, and the line that names it. */
+  guide?: { path: HuntCell[]; prompt: string } | null;
   t: TFn;
 }
 
@@ -51,6 +53,7 @@ function HuntPlayfieldInner({
   calm,
   size = 'phone',
   stageOverlay,
+  guide = null,
   t,
 }: HuntPlayfieldProps) {
   const typing =
@@ -80,6 +83,7 @@ function HuntPlayfieldInner({
           calm={calm}
           size={size}
           live={typing ? undefined : liveWord}
+          prompt={guide?.prompt}
           t={t as (key: string, params?: Record<string, string | number>) => string}
         />
       </div>
@@ -95,6 +99,7 @@ function HuntPlayfieldInner({
           phase={stage.phase}
           verdict={stage.verdict}
           heldPath={stage.path}
+          guidePath={typing ? undefined : guide?.path}
           calm={calm}
           size={size}
           t={t}

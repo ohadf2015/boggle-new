@@ -24,6 +24,8 @@ export interface SurvivalHeaderProps {
   selfUsername?: string;
   dir?: 'ltr' | 'rtl';
   center?: React.ReactNode;
+  /** First games: the score waits for the first word, so the opening screen has one thing moving. */
+  hideScore?: boolean;
   t: (key: string) => string;
 }
 
@@ -41,6 +43,7 @@ export const SurvivalHeader = memo<SurvivalHeaderProps>(({
   selfUsername = 'You',
   dir = 'ltr',
   center,
+  hideScore = false,
   t,
 }) => {
   // The rank pill reads place from array order (best first), so the board has
@@ -85,7 +88,7 @@ export const SurvivalHeader = memo<SurvivalHeaderProps>(({
         </div>
       )}
 
-      {!practice && (
+      {!practice && !hideScore && (
         <div className={center ? 'flex w-44 shrink-0 justify-end' : 'contents'}>
           <AccumulatedScoreDisplay
             currentScore={liveScore}

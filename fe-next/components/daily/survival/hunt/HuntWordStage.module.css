@@ -45,6 +45,15 @@
   white-space: nowrap;
 }
 
+/* First games: the word to try is a call to action, not a placeholder. */
+.prompt[data-hint='true'] {
+  border: 3px solid var(--ink);
+  background: #ff1493;
+  color: #fff;
+  font-weight: 800;
+  box-shadow: 3px 3px 0 var(--ink);
+}
+
 .pill {
   position: relative;
   display: flex;

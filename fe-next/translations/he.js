@@ -10248,6 +10248,8 @@ const he = {
       "notOnBoardPenalty": "⚠️ לא על הלוח -5 ❤️",
       "notFormablePenalty": "⚠️ לא על הלוח -5 ❤️",
       "notInDictionary": "📖 לא מילה -4 ❤️",
+      "notInDictionaryFree": "📖 לא מילה. נסו אחרת",
+      "notOnBoardFree": "⚠️ לא על הלוח. האותיות צריכות לגעת זו בזו",
       "correct": "נכון",
       "wrongPlace": "מקום לא נכון",
       "notInWord": "לא במילה"
@@ -10315,6 +10317,10 @@ const he = {
         "decline": "סיימו ריצה"
       },
       "findWordsToReveal": "הרכיבו מילים על הלוח כדי לחשוף את האותיות האלה",
+      "goal": "מצאו את המילה הנסתרת בת {count} אותיות",
+      "cueShortVsGuess": "מילים קצרות יותר נותנות רמזים בחינם. מילה בת {count} אותיות היא ניחוש.",
+      "tryWord": "תקועים? העבירו אצבע על {word}",
+      "readyTagline": "מצאו את המילה הנסתרת של היום. מילים קצרות שתרכיבו על הלוח יחשפו את האותיות שלה.",
       "shop": "חנות רמזים",
       "revealLetter": "חשפו אות",
       "revealLetterDesc": "חשפו אות אקראית במילת היעד",

@@ -47,6 +47,12 @@ export interface UseSurvivalGameLogicProps {
    * just no time pressure. Pairs with `?practice=1` URL flag.
    */
   disableLifeDrain?: boolean;
+  /**
+   * First games: the life bar holds until the first word is found, and a swipe that is not a
+   * word (or not on the board) costs no life. The drain and the -4/-5 penalties punished new
+   * players before they had learned the board, and they quit after a few rejected words.
+   */
+  gentleStart?: boolean;
 }
 
 export interface SurvivalGameState {
@@ -128,6 +134,7 @@ export function useSurvivalGameLogic({
   t,
   deferGameOver = false,
   disableLifeDrain = false,
+  gentleStart = false,
 }: UseSurvivalGameLogicProps): [SurvivalGameState, SurvivalGameActions] {
   const { user } = useAuth();
   const { playWordAcceptedSound, playWordRejectedSound, setGameActive } = useSoundEffects();
@@ -250,7 +257,8 @@ export function useSurvivalGameLogic({
   const drainRate = baseDrainRate * getLanguageDrainMultiplier(language);
 
   // Drain by elapsed wall time, paused for practice, the quit dialog and a hidden tab.
-  const drainPaused = state.isGameOver || disableLifeDrain || state.showQuitConfirm;
+  const waitingForFirstWord = gentleStart && state.discoveredWords.length === 0;
+  const drainPaused = state.isGameOver || disableLifeDrain || state.showQuitConfirm || waitingForFirstWord;
   useEffect(() => {
     if (drainPaused) {
       lifeDrainInterval.stop();
@@ -303,6 +311,7 @@ export function useSurvivalGameLogic({
     feedbackTimeout,
     lifeAnimationTimeout,
     handleGameOverRef,
+    forgiveMisses: gentleStart,
   });
 
   const handleGameOver = useCallback(async (won: boolean, finalAttempts?: TargetAttempt[]) => {

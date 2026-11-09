@@ -50,6 +50,9 @@ import { HuntRoundClock } from './survival/hunt/HuntRoundClock';
 import { useGameTimer } from '@/hooks/useGameTimer';
 import { calculateWordScore } from '@/shared/utils/scoring';
 import PracticeCoachTip from '@/components/practice/PracticeCoachTip';
+import { useStarterGuide } from './survival/hunt/useStarterGuide';
+import { isNewDailyPlayer } from '@/utils/trainingProgressStorage';
+import { NEW_PLAYER_THRESHOLD } from './survival/constants';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
 
 export type { WordDiscovery, TargetAttempt, SurvivalGameResult } from './survival/types';
@@ -137,6 +140,11 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     [onComplete, rescueMethodRef],
   );
 
+  const timed = typeof timeLimitSec === 'number' && timeLimitSec > 0;
+  // A player's first daily runs start gently: no drain before the first word, misses cost no
+  // life, a word to trace when stuck. Read once: finishing this run must not flip it mid-game.
+  const [gentle] = useState(() => !timed && isNewDailyPlayer(NEW_PLAYER_THRESHOLD));
+
   // Game logic hook
   const [state, actions] = useSurvivalGameLogic({
     grid,
@@ -147,10 +155,10 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     t,
     deferGameOver: extraLife.offerOpen,
     disableLifeDrain: practice,
+    gentleStart: gentle,
   });
   extraLife.restoreRef.current = actions.restoreLife;
 
-  const timed = typeof timeLimitSec === 'number' && timeLimitSec > 0;
   const { endRound } = actions;
   const roundClock = useGameTimer({
     initialTime: timed ? timeLimitSec : 0,
@@ -284,6 +292,18 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     />
   ) : null;
 
+  const foundWords = useMemo(() => state.discoveredWords.map((d) => d.word), [state.discoveredWords]);
+  const guide = useStarterGuide({
+    enabled: gentle && !state.isGameOver,
+    grid,
+    language,
+    targetLength: targetWord.length,
+    foundWords,
+    feedbackSeq: state.feedbackSeq,
+    feedbackType: state.feedbackType,
+    t,
+  });
+
   const playfieldProps = {
     grid,
     isGameOver: state.isGameOver,
@@ -297,6 +317,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     feedbackMessage: state.feedbackMessage,
     discoveredWords: state.discoveredWords,
     calm,
+    guide,
     t,
   };
 
@@ -430,6 +451,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         isScoreAnimating={state.isScoreAnimating}
         onQuitClick={handleQuitClick}
         practice={practice}
+        hideScore={gentle && state.discoveredWords.length === 0}
         center={inShell ? statusBar : undefined}
         t={t}
       />
@@ -448,6 +470,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           isClueGaining={state.isClueGaining}
           skipAnimations={calm}
           gameDir={actions.gameDir}
+          explainRules={!timed}
           matchesTargetLength={
             !state.isGameOver
             && (keyboardInput.typedWord ? keyboardInput.typedWord.length === targetWord.length : swipeMatchesTarget)

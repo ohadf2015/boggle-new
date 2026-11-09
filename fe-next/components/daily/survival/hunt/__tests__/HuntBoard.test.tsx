@@ -65,6 +65,25 @@ describe('HuntBoard', () => {
     expect(order).toEqual(['H', 'X', 'E']);
   });
 
+  it('Given a starter word to show, When the board is idle, Then its tiles glow as a guide trail', () => {
+    board({ guidePath: [{ row: 0, col: 0 }, { row: 1, col: 1 }, { row: 0, col: 1 }] });
+    const lit = screen.getAllByRole('gridcell').filter((c) => c.dataset.state === 'held');
+    expect(lit.map((c) => c.dataset.letter).sort()).toEqual(['E', 'F', 'S']);
+    expect(screen.getByTestId('hunt-trail').dataset.kind).toBe('guide');
+  });
+
+  it('Given a released word is showing its verdict, Then the guide gives way to it', () => {
+    board({
+      phase: 'verdict',
+      verdict: 'bad',
+      heldPath: [{ row: 3, col: 3 }, { row: 2, col: 3 }],
+      guidePath: [{ row: 0, col: 0 }, { row: 1, col: 1 }],
+    });
+    expect(screen.getByTestId('hunt-trail').dataset.kind).toBe('held');
+    const lit = screen.getAllByRole('gridcell').filter((c) => c.dataset.state === 'held');
+    expect(lit.map((c) => c.dataset.letter).sort()).toEqual(['E', 'M']);
+  });
+
   it('draws no trail when nothing is selected', () => {
     board();
     expect(screen.queryByTestId('hunt-trail')).toBeNull();
