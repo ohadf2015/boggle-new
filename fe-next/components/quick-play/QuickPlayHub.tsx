@@ -84,10 +84,10 @@ export function QuickPlayHub({ challengeId, backHref, startMode }: QuickPlayHubP
   // Track current phase for handleNextRound to guard against stale adapter onQuit calls.
   // If an adapter timer fires onQuit after the game has ended (phase !== 'playing'),
   // the call should be ignored so results don't auto-dismiss.
+  // Set during render, not in an effect: a quit tapped right after the board
+  // mounts can run before passive effects flush, and would read 'loading'.
   const phaseRef = useRef<HubPhase>('loading');
-  useEffect(() => {
-    phaseRef.current = phase;
-  }, [phase]);
+  phaseRef.current = phase;
 
   // Phase changes swap the whole screen with no page navigation, so screen
   // readers get no automatic signal and sighted keyboard focus is stranded
