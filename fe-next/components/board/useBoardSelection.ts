@@ -33,8 +33,10 @@ export interface BoardSelectionOptions {
   onStep?: (length: number) => void;
   canEnter?: (cell: CellRef, pathLength: number) => boolean;
   adjacent?: (a: CellRef, b: CellRef) => boolean;
-  /** Desktop only: a 3+ letter selection left untouched this long submits. */
+  /** A 3+ letter selection left untouched this long submits (touch: tap-built words only). */
   autoSubmitIdleMs?: number;
+  /** Touch too: a tap starts a tap-built word, like a mouse click, instead of being dropped. */
+  tapToSpell?: boolean;
   /** With a live combo, a touch finger resting on 3+ letters chains the word after 500ms. */
   comboLevel?: number;
   fireRoundActive?: boolean;
@@ -124,7 +126,7 @@ function bindBoard(
     clearTimers();
     const { autoSubmitIdleMs, comboLevel = 0 } = o();
     if (path.length < 3) return;
-    if (!isTouch && autoSubmitIdleMs != null) {
+    if (autoSubmitIdleMs != null && (!isTouch || (o().tapToSpell && mode === 'click'))) {
       idleTimer = win.setTimeout(() => submit(mode === 'click' ? 'click' : 'drag'), autoSubmitIdleMs);
     }
     if (isTouch && pressing && comboLevel > 0) {
@@ -271,7 +273,7 @@ function bindBoard(
     last = start;
     pressing = true;
 
-    if (mode === 'click' && path.length && !isTouch) {
+    if (mode === 'click' && path.length && (!isTouch || o().tapToSpell)) {
       if (clickTile(cell)) return;
     }
     clearFx(container);
@@ -313,7 +315,7 @@ function bindBoard(
     if (wasMode === 'drag') {
       submit('drag');
     } else if (wasMode === 'press') {
-      if (isTouch) {
+      if (isTouch && !o().tapToSpell) {
         const cell = path[0];
         if (cell) o().onSingleTap?.(cell);
         clear();

@@ -3857,6 +3857,7 @@ const ja = {
   },
   "game": {
     "doubleClickToSubmit": "最後の文字をダブルクリックで送信",
+    "tapAgainToSubmit": "最後の文字をもう一度タップで送信",
     "boardLocked": "GOを待って — ボードはまだ動けません",
     "foundByOther": "${player}が見つけました",
     "combo": "コンボ",

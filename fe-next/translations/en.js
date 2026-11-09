@@ -3473,6 +3473,7 @@ const en = {
   },
   "game": {
     "doubleClickToSubmit": "Double-click last letter to submit",
+    "tapAgainToSubmit": "Tap the last letter again to submit",
     "boardLocked": "Wait for GO. This board isn't live yet",
     "foundByOther": "Found by ${player}",
     "combo": "Combo",

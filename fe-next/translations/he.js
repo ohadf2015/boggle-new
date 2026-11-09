@@ -3857,6 +3857,7 @@ const he = {
   },
   "game": {
     "doubleClickToSubmit": "לחיצה כפולה על האות האחרונה לשליחה",
+    "tapAgainToSubmit": "הקישו שוב על האות האחרונה לשליחה",
     "boardLocked": "חכו ל-GO — הלוח עדיין לא פעיל",
     "foundByOther": "נמצא על ידי ${player}",
     "combo": "קומבו",

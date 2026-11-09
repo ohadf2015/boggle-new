@@ -8,6 +8,7 @@ import { wordHuntSolveTier } from '@/shared/utils/wordHuntScoring';
 import type { WordHuntEffect } from '../WordHuntEffectsCanvas';
 import type { SurvivalGameState } from './useSurvivalGameLogic';
 import { LIFE_DRAIN_RATE } from './constants';
+import { hapticError, hapticWordAccepted } from '@/utils/haptics';
 
 const LOW_LIFE = 25;
 
@@ -16,7 +17,13 @@ export function isPenaltyDrop(drop: number): boolean {
   return drop > LIFE_DRAIN_RATE;
 }
 
-export function useWordHuntFx(state: SurvivalGameState, skipAnimations: boolean) {
+/**
+ * `skipAnimations` drops the heavy layers (Pixi particles, confetti) on a device
+ * that cannot afford them. `calm` is motion the player asked to stop. A slow phone
+ * keeps the light layer, the screen flash and a buzz per verdict, so a word still
+ * lands like it does on desktop instead of going quiet.
+ */
+export function useWordHuntFx(state: SurvivalGameState, skipAnimations: boolean, calm: boolean = skipAnimations) {
   const { variant: clueShakeVariant, trackExposure: trackClueShakeExposure } =
     useExperiment('exp-wordhunt-clue-shake-v1');
   const [shakingClues, setShakingClues] = useState(false);
@@ -56,21 +63,29 @@ export function useWordHuntFx(state: SurvivalGameState, skipAnimations: boolean)
     const type = state.feedbackType;
     const cx = canvasSize.width / 2;
     const cy = canvasSize.height / 2;
+    const flash = (color: string) => {
+      if (calm) return;
+      setFlashColor(color);
+      setFlashTrigger((n) => n + 1);
+    };
     if (type === 'valid-word') {
+      hapticWordAccepted();
+      flash('bg-neo-lime/15');
       if (skipAnimations) return;
       triggerReward('wordFound');
-      setFlashColor('bg-neo-lime/15');
-      setFlashTrigger((n) => n + 1);
       pushEffect({ type: 'wordValid', x: cx, y: cy, points: state.lastScoreIncrement ?? 1 });
     } else if (type === 'target-found') {
-      if (skipAnimations) return;
+      hapticWordAccepted();
       const tier = wordHuntSolveTier(state.attempts.filter((a) => !a.isDiscovery).length);
+      flash(tier.tier <= 1 ? 'bg-neo-yellow/30' : 'bg-neo-lime/20');
+      if (skipAnimations) return;
       triggerReward('levelUp');
-      setFlashColor(tier.tier <= 1 ? 'bg-neo-yellow/30' : 'bg-neo-lime/20');
-      setFlashTrigger((n) => n + 1);
       pushEffect({ type: 'targetFound', x: cx, y: cy });
     } else if (type === 'invalid-word' || type === 'not-in-dictionary' || type === 'not-on-board') {
-      if (!skipAnimations) pushEffect({ type: 'invalid', x: cx, y: cy });
+      hapticError();
+      // Desktop gets a red flash from the particle layer; without it, flash in CSS.
+      if (skipAnimations) flash('bg-neo-red/15');
+      else pushEffect({ type: 'invalid', x: cx, y: cy });
       trackGrowthEvent('wordhunt_invalid_submitted', { feedbackType: type });
       trackClueShakeExposure();
       if (clueShakeVariant === 'clue-shake') {
@@ -86,6 +101,7 @@ export function useWordHuntFx(state: SurvivalGameState, skipAnimations: boolean)
     state.attempts,
     triggerReward,
     skipAnimations,
+    calm,
     pushEffect,
     canvasSize.width,
     canvasSize.height,

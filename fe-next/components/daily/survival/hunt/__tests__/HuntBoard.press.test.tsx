@@ -1,7 +1,7 @@
 import React, { Profiler } from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { act, render } from '@testing-library/react';
-import { HuntBoard } from '../HuntBoard';
+import { HuntBoard, HUNT_IDLE_SUBMIT_MS } from '../HuntBoard';
 import type { LetterGrid } from '@/types';
 import { drag, press, release, selectedKeys, stubBoardLayout, tileEl } from '@/components/board/__tests__/boardTestUtils';
 
@@ -35,10 +35,22 @@ describe('HuntBoard press feedback', () => {
     expect(tileEl(container, 0, 0).hasAttribute('data-sel')).toBe(false);
   });
 
-  it('Given a pressed tile, When the touch lifts without a drag, Then the light clears', () => {
+  it('Given a pressed tile, When the touch lifts without a drag, Then the letter stays picked like a desktop click', () => {
     const { container } = board();
     act(() => { press(container, 1, 0, 'touch'); release(container, 'touch'); });
-    expect(tileEl(container, 1, 0).hasAttribute('data-sel')).toBe(false);
+    expect(tileEl(container, 1, 0).hasAttribute('data-sel')).toBe(true);
+  });
+
+  it('Given one stray tap, When the idle window passes, Then the lone letter clears itself', () => {
+    vi.useFakeTimers();
+    try {
+      const { container } = board();
+      act(() => { press(container, 1, 0, 'touch'); release(container, 'touch'); });
+      act(() => { vi.advanceTimersByTime(HUNT_IDLE_SUBMIT_MS + 50); });
+      expect(tileEl(container, 1, 0).hasAttribute('data-sel')).toBe(false);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('Given the game is over, When a tile is pressed, Then nothing lights up', () => {
@@ -57,5 +69,59 @@ describe('HuntBoard press feedback', () => {
     expect(tileEl(container, 1, 1).hasAttribute('data-head')).toBe(true);
     expect(onLive).toHaveBeenLastCalledWith('CATRE');
     expect(commits).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('HuntBoard tap to spell on a phone', () => {
+  let restoreLayout: () => void;
+  beforeEach(() => { restoreLayout = stubBoardLayout(); });
+  afterEach(() => { restoreLayout(); vi.useRealTimers(); });
+
+  const tap = (container: HTMLElement, r: number, c: number) => act(() => { press(container, r, c, 'touch'); release(container, 'touch'); });
+
+  function tapBoard() {
+    const onWordSubmit = vi.fn();
+    const onRelease = vi.fn();
+    const utils = render(
+      <HuntBoard
+        grid={grid} interactive eliminatedLetters={new Set()}
+        onWordSubmit={onWordSubmit} onRelease={onRelease} onLive={() => {}}
+        phase="idle" verdict={null} heldPath={[]} calm={false} t={(k: string, f?: unknown) => (typeof f === 'string' ? f : k)}
+      />,
+    );
+    return { ...utils, onWordSubmit, onRelease };
+  }
+
+  it('Given letters tapped one by one, When the last one is tapped again, Then the word submits', () => {
+    const { container, onWordSubmit } = tapBoard();
+    tap(container, 0, 0);
+    tap(container, 0, 1);
+    tap(container, 0, 2);
+    expect(selectedKeys(container)).toEqual(['0-0', '0-1', '0-2']);
+    tap(container, 0, 2);
+    expect(onWordSubmit).toHaveBeenCalledWith('CAT');
+  });
+
+  it('Given two tapped letters, Then a tap hint says how to submit', () => {
+    const { container, getByTestId } = tapBoard();
+    tap(container, 0, 0);
+    tap(container, 0, 1);
+    expect(getByTestId('grid-doubleclick-submit-hint').textContent).toBe('Tap the last letter again to submit');
+  });
+
+  it('Given a tapped word of three letters, When the finger rests, Then it submits on its own like a desktop click', () => {
+    vi.useFakeTimers();
+    const { container, onWordSubmit } = tapBoard();
+    tap(container, 0, 0);
+    tap(container, 0, 1);
+    tap(container, 0, 2);
+    act(() => { vi.advanceTimersByTime(HUNT_IDLE_SUBMIT_MS + 50); });
+    expect(onWordSubmit).toHaveBeenCalledWith('CAT');
+  });
+
+  it('Given a finger swipe, Then it still submits on release', () => {
+    const { container, onWordSubmit } = tapBoard();
+    act(() => { drag(container, [[2, 0], [2, 1], [2, 2]], 'touch'); release(container, 'touch'); });
+    expect(onWordSubmit).toHaveBeenCalledWith('DOG');
   });
 });

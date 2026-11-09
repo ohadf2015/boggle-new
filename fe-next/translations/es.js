@@ -3857,6 +3857,7 @@ const es = {
   },
   "game": {
     "doubleClickToSubmit": "Doble clic en la última letra para enviar",
+    "tapAgainToSubmit": "Toca otra vez la última letra para enviar",
     "boardLocked": "Espera al GO — el tablero aún no está activo",
     "foundByOther": "Encontrada por ${player}",
     "combo": "Combo",

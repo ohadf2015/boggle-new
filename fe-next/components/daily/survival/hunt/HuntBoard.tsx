@@ -89,6 +89,9 @@ export function HuntBoard({
   const selection = useBoardSelection(wrapRef, {
     interactive,
     autoSubmitIdleMs: HUNT_IDLE_SUBMIT_MS,
+    // A phone tap builds a word letter by letter, like a desktop click, instead of
+    // flashing and vanishing: a dropped tap read as a board that ignores you.
+    tapToSpell: true,
     onStep: () => playTileSelectSound?.(),
     onPathChange: (path: CellRef[]) => {
       trayRef.current?.setAttribute('data-live-tier', String(lengthTier(path.length)));
@@ -228,9 +231,11 @@ export function HuntBoard({
           {glyphs}
         </div>
       </div>
-      {interactive && canHover && clickHint && (
+      {interactive && clickHint && (
         <div data-testid="grid-doubleclick-submit-hint" role="status" aria-live="polite" className={styles.submitHint}>
-          {t('game.doubleClickToSubmit', 'Double-click last letter to submit')}
+          {canHover
+            ? t('game.doubleClickToSubmit', 'Double-click last letter to submit')
+            : t('game.tapAgainToSubmit', 'Tap the last letter again to submit')}
         </div>
       )}
     </div>

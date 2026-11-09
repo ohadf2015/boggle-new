@@ -12186,6 +12186,7 @@ const ru = {
   },
   "game": {
     "doubleClickToSubmit": "Дважды нажми на последнюю букву, чтобы отправить",
+    "tapAgainToSubmit": "Нажми на последнюю букву ещё раз, чтобы отправить",
     "boardLocked": "Жди GO — поле ещё не активно",
     "foundByOther": "Найдено игроком ${player}",
     "combo": "Комбо",
