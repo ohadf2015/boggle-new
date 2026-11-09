@@ -119,8 +119,8 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   // drops the heavy layers (particles, flashes, confetti, framer extras). Phones are
   // flagged low-end far more often (Low Power Mode / battery saver caps frames at
   // 30fps and trips the runtime frame watch; Data Saver and 2GB phones trip the
-  // static check), and the tile lift, path pop and pill are cheap transform
-  // animations, so a low-end flag must not freeze them.
+  // static check), and the tile lift, path pop, pill, clue flips, life bar and
+  // screen flash are cheap animations, so a low-end flag must not freeze them.
   const { isLowEnd, enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
   const [effectsReduced] = useReducedEffects();
   const calm = effectsReduced || prefersReducedMotion;
@@ -182,7 +182,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     },
   });
 
-  const fx = useWordHuntFx(state, skipAnimations);
+  const fx = useWordHuntFx(state, skipAnimations, calm);
   const { stage, live: onStageLive, release: onStageRelease, liveWord } = useHuntStage({
     feedbackSeq: state.feedbackSeq,
     feedbackType: state.feedbackType,
@@ -368,7 +368,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       isGameOver={state.isGameOver}
       isLifeGaining={state.isLifeGaining}
       lifeGainAmount={state.lifeGainAmount}
-      skipAnimations={skipAnimations}
+      skipAnimations={calm}
       onLifeGainComplete={handleLifeGainComplete}
     />
   );
@@ -446,7 +446,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           latestAttemptFeedback={state.latestAttemptFeedback}
           showFeedbackOverlay={state.showFeedbackOverlay}
           isClueGaining={state.isClueGaining}
-          skipAnimations={skipAnimations}
+          skipAnimations={calm}
           gameDir={actions.gameDir}
           matchesTargetLength={
             !state.isGameOver

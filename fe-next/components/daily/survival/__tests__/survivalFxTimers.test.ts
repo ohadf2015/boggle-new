@@ -4,7 +4,7 @@ import { useSurvivalClues } from '../useSurvivalClues';
 import { useWordHuntFx } from '../useWordHuntFx';
 import type { SurvivalGameState } from '../useSurvivalGameLogic';
 
-vi.mock('@/utils/haptics', () => ({ hapticClueRevealed: vi.fn() }));
+vi.mock('@/utils/haptics', () => ({ hapticClueRevealed: vi.fn(), hapticError: vi.fn(), hapticWordAccepted: vi.fn() }));
 vi.mock('@/utils/confettiUtils', () => ({ fireConfetti: vi.fn() }));
 vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
 vi.mock('@/hooks/useGameRewards', () => ({ useGameRewards: () => ({ rewardId: 0, triggerReward: vi.fn() }) }));

@@ -4215,6 +4215,7 @@ const sv = {
   },
   "game": {
     "doubleClickToSubmit": "Dubbelklicka på sista bokstaven för att skicka",
+    "tapAgainToSubmit": "Tryck på sista bokstaven igen för att skicka",
     "boardLocked": "Vänta på GO — brädet är inte igång än",
     "foundByOther": "Hittades av ${player}",
     "combo": "Kombo",
