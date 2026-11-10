@@ -10116,6 +10116,7 @@ const ru = {
     "preparingTools": "Подготовка инструментов",
     "sessionError": "Ошибка сессии",
     "sidebar": {
+      "education": "Образование",
       "analytics": "Аналитика",
       "content": "Контент",
       "puzzleReview": "Обзор головоломок",

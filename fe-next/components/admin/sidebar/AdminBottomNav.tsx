@@ -5,10 +5,14 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import {
+  ADMIN_ADVANCED_TABS,
+  ADMIN_MORE_SHEET_ITEMS,
   ADMIN_PRIMARY_TABS,
-  ADMIN_OVERFLOW_ITEMS,
   getActiveAdminTab,
+  isAdvancedAdminTab,
+  type AdminBadgeKey,
 } from '@/lib/admin/adminNav';
+import { AdminBadge } from './AdminBadge';
 import { getAdminNavIcon } from './adminNavIcons';
 
 interface AdminBottomNavProps {
@@ -17,9 +21,9 @@ interface AdminBottomNavProps {
 
 /**
  * Mobile bottom tab bar for admin pages.
- * Consolidated IA: 4 destination tabs (Overview / Content / Moderation /
- * People) + a "More" sheet for lower-frequency routes (Analytics / System /
- * Web Vitals) and the exit-to-site action. Shares its config + active-route
+ * Daily-use IA: Overview / Education / People / Analytics + a "More" sheet
+ * for the advanced buckets (Content / Moderation, with live badge), System,
+ * Web Vitals and the exit-to-site action. Shares its config + active-route
  * logic with AdminSidebar via lib/admin/adminNav (no drift).
  */
 export function AdminBottomNav({ moderationCount = 0 }: AdminBottomNavProps) {
@@ -33,10 +37,11 @@ export function AdminBottomNav({ moderationCount = 0 }: AdminBottomNavProps) {
     ? pathname.slice(basePath.length)
     : pathname;
   const activeKey = getActiveAdminTab(cleanPath);
-
-  function badgeFor(key: string): number {
-    return key === 'moderation' ? moderationCount : 0;
-  }
+  // Advanced buckets live in the sheet, so the More tab owns their highlight and their counts.
+  const advancedActive = isAdvancedAdminTab(activeKey);
+  const counts: Record<AdminBadgeKey, number> = { moderation: moderationCount };
+  const countFor = (key?: AdminBadgeKey) => (key ? counts[key] : 0);
+  const moreCount = ADMIN_ADVANCED_TABS.reduce((n, b) => n + countFor(b.badge), 0);
 
   function go(path: string) {
     router.push(`${basePath}${path}`);
@@ -70,7 +75,7 @@ export function AdminBottomNav({ moderationCount = 0 }: AdminBottomNavProps) {
           <div className="absolute bottom-0 inset-x-0 bg-neo-navy border-t-2 border-neo-lime/30 rounded-t-neo p-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] safe-area-pb">
             <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-slate-600" />
             <div className="grid grid-cols-2 gap-2">
-              {ADMIN_OVERFLOW_ITEMS.map((item) => {
+              {ADMIN_MORE_SHEET_ITEMS.map((item) => {
                 const Icon = getAdminNavIcon(item.iconKey);
                 return (
                   <button
@@ -86,6 +91,7 @@ export function AdminBottomNav({ moderationCount = 0 }: AdminBottomNavProps) {
                   >
                     <Icon className="w-5 h-5 shrink-0" />
                     <span className="truncate">{t(item.labelKey)}</span>
+                    <AdminBadge count={countFor(item.badge)} className="ms-auto min-w-[18px] px-1.5 text-[11px]" />
                   </button>
                 );
               })}
@@ -101,8 +107,8 @@ export function AdminBottomNav({ moderationCount = 0 }: AdminBottomNavProps) {
         <div className="flex justify-around">
           {ADMIN_PRIMARY_TABS.map((tab) => {
             const Icon = getAdminNavIcon(tab.iconKey);
-            const active = activeKey === tab.key;
-            const badge = badgeFor(tab.badge ?? '');
+            const active = activeKey === tab.key || (tab.isOverflow === true && advancedActive);
+            const badge = tab.isOverflow ? moreCount : countFor(tab.badge);
 
             return (
               <button
@@ -120,11 +126,7 @@ export function AdminBottomNav({ moderationCount = 0 }: AdminBottomNavProps) {
               >
                 <div className="relative">
                   <Icon className="w-5 h-5" />
-                  {badge > 0 ? (
-                    <span className="absolute -top-1 -inset-e-1.5 bg-neo-pink text-neo-white text-[10px] font-bold px-1 rounded-full min-w-[14px] text-center leading-tight">
-                      {badge > 99 ? '99+' : badge}
-                    </span>
-                  ) : null}
+                  <AdminBadge count={badge} className="absolute -top-1 -inset-e-1.5 min-w-[14px] px-1 text-[10px] leading-tight" />
                 </div>
                 <span className="truncate max-w-[64px]">{t(tab.labelKey)}</span>
               </button>

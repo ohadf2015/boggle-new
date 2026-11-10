@@ -63,12 +63,12 @@ describe('AdminSidebar', () => {
     expect(overviewButton?.className).toContain('text-neo-lime');
   });
 
-  it('expands the active bucket children inline (People → players/guests/teachers)', () => {
+  it('expands the active bucket children inline (People → players/guests/blocklist)', () => {
     mockPathname = '/en/admin/players';
     render(<AdminSidebar />);
     expect(screen.getByText('admin.sidebar.players')).toBeInTheDocument();
     expect(screen.getByText('admin.nav.guests')).toBeInTheDocument();
-    expect(screen.getByText('admin.nav.teacherAccess')).toBeInTheDocument();
+    expect(screen.getByText('admin.sidebar.blocklist')).toBeInTheDocument();
   });
 
   it('does NOT show another bucket’s children when inactive', () => {
@@ -96,13 +96,13 @@ describe('AdminSidebar', () => {
   });
 });
 
-describe('AdminSidebar — Teacher Pro gifts under People', () => {
+describe('AdminSidebar — Teacher Pro gifts under Education', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockPathname = '/en/admin/teacher-access';
   });
 
-  it('lists the Teacher Pro gifts page as a People child and navigates to it', () => {
+  it('lists the Teacher Pro gifts page as an Education child and navigates to it', () => {
     render(<AdminSidebar />);
     const child = screen.getByText('admin.nav.teacherPro');
     fireEvent.click(child);

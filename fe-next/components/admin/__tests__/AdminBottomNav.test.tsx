@@ -30,20 +30,35 @@ describe('AdminBottomNav', () => {
     mockPathname = '/en/admin';
   });
 
-  it('renders exactly 5 bottom slots: 4 destinations + More', () => {
+  it('renders exactly 5 bottom slots: Overview, Education, People, Analytics + More', () => {
     render(<AdminBottomNav />);
     expect(screen.getByText('admin.sidebar.overview')).toBeInTheDocument();
-    expect(screen.getByText('admin.sidebar.content')).toBeInTheDocument();
-    expect(screen.getByText('admin.sidebar.moderation')).toBeInTheDocument();
+    expect(screen.getByText('admin.sidebar.education')).toBeInTheDocument();
     expect(screen.getByText('admin.sidebar.people')).toBeInTheDocument();
+    expect(screen.getByText('admin.sidebar.analytics')).toBeInTheDocument();
     expect(screen.getByText('admin.sidebar.more')).toBeInTheDocument();
+    expect(screen.queryByText('admin.sidebar.content')).not.toBeInTheDocument();
+    expect(screen.queryByText('admin.sidebar.moderation')).not.toBeInTheDocument();
+  });
+
+  it('lands Education on /education', () => {
+    render(<AdminBottomNav />);
+    fireEvent.click(screen.getByText('admin.sidebar.education'));
+    expect(mockPush).toHaveBeenCalledWith('/en/admin/education');
+  });
+
+  it('puts Content + Moderation inside the More sheet', () => {
+    render(<AdminBottomNav />);
+    fireEvent.click(screen.getByText('admin.sidebar.more'));
+    fireEvent.click(screen.getByText('admin.sidebar.moderation'));
+    expect(mockPush).toHaveBeenCalledWith('/en/admin/moderation');
   });
 
   it('does not render a home/exit-the-zone tab in the bar', () => {
     render(<AdminBottomNav />);
     expect(screen.queryByText('nav.home')).not.toBeInTheDocument();
-    // analytics/system are in the More sheet, not the bar
-    expect(screen.queryByText('admin.sidebar.analytics')).not.toBeInTheDocument();
+    // system is in the More sheet, not the bar
+    expect(screen.queryByText('admin.sidebar.system')).not.toBeInTheDocument();
   });
 
   it('lands People on /players directly (not a launcher)', () => {
@@ -52,18 +67,17 @@ describe('AdminBottomNav', () => {
     expect(mockPush).toHaveBeenCalledWith('/en/admin/players');
   });
 
-  it('lands Content on /content directly', () => {
+  it('lands Content on /content from the More sheet', () => {
     render(<AdminBottomNav />);
+    fireEvent.click(screen.getByText('admin.sidebar.more'));
     fireEvent.click(screen.getByText('admin.sidebar.content'));
     expect(mockPush).toHaveBeenCalledWith('/en/admin/content');
   });
 
   it('opens the More sheet revealing overflow items', () => {
     render(<AdminBottomNav />);
-    // sheet closed initially
-    expect(screen.queryByText('admin.sidebar.analytics')).not.toBeInTheDocument();
+    expect(screen.queryByText('admin.sidebar.system')).not.toBeInTheDocument();
     fireEvent.click(screen.getByText('admin.sidebar.more'));
-    expect(screen.getByText('admin.sidebar.analytics')).toBeInTheDocument();
     expect(screen.getByText('admin.sidebar.system')).toBeInTheDocument();
     expect(screen.getByText('admin.nav.webVitals')).toBeInTheDocument();
     expect(screen.getByText('admin.nav.exitToSite')).toBeInTheDocument();
@@ -72,8 +86,8 @@ describe('AdminBottomNav', () => {
   it('navigates to a route from the More sheet', () => {
     render(<AdminBottomNav />);
     fireEvent.click(screen.getByText('admin.sidebar.more'));
-    fireEvent.click(screen.getByText('admin.sidebar.analytics'));
-    expect(mockPush).toHaveBeenCalledWith('/en/admin/analytics');
+    fireEvent.click(screen.getByText('admin.sidebar.system'));
+    expect(mockPush).toHaveBeenCalledWith('/en/admin/system');
   });
 
   it('exit item leaves the admin zone to the site root', () => {
@@ -90,22 +104,31 @@ describe('AdminBottomNav', () => {
     expect(peopleBtn?.className).toContain('text-neo-lime');
   });
 
-  it('highlights Content when on /curators (non-adjacent route)', () => {
+  it('highlights More when on /curators (Content lives in More)', () => {
     mockPathname = '/en/admin/curators';
-    render(<AdminBottomNav />);
-    const contentBtn = screen.getByText('admin.sidebar.content').closest('button');
-    expect(contentBtn?.className).toContain('text-neo-lime');
-  });
-
-  it('highlights More when on /analytics (overflow route)', () => {
-    mockPathname = '/en/admin/analytics';
     render(<AdminBottomNav />);
     const moreBtn = screen.getByText('admin.sidebar.more').closest('button');
     expect(moreBtn?.className).toContain('text-neo-lime');
   });
 
-  it('shows the moderation badge when count provided', () => {
+  it('highlights Education on a teacher-pro route', () => {
+    mockPathname = '/en/admin/teacher-pro';
+    render(<AdminBottomNav />);
+    const btn = screen.getByText('admin.sidebar.education').closest('button');
+    expect(btn?.className).toContain('text-neo-lime');
+  });
+
+  it('highlights More when on /system (overflow route)', () => {
+    mockPathname = '/en/admin/system';
+    render(<AdminBottomNav />);
+    const moreBtn = screen.getByText('admin.sidebar.more').closest('button');
+    expect(moreBtn?.className).toContain('text-neo-lime');
+  });
+
+  it('surfaces the moderation count on the More tab and on the sheet row', () => {
     render(<AdminBottomNav moderationCount={5} />);
-    expect(screen.getByText('5')).toBeInTheDocument();
+    expect(screen.getAllByText('5')).toHaveLength(1);
+    fireEvent.click(screen.getByText('admin.sidebar.more'));
+    expect(screen.getAllByText('5')).toHaveLength(2);
   });
 });

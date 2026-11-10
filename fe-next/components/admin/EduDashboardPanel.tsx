@@ -11,7 +11,7 @@ const WINDOWS: WindowDays[] = [7, 30, 90];
 
 function isDashboardView(json: unknown): json is EduDashboardView {
   const v = json as Partial<EduDashboardView> | null;
-  return !!v && typeof v.kpis === 'object' && v.kpis !== null && !!v.sparklines && !!v.drill && !!v.attention;
+  return !!v && typeof v.kpis === 'object' && v.kpis !== null && !!v.sparklines && !!v.drill && !!v.attention && !!v.insights && Array.isArray(v.findings);
 }
 
 export function EduDashboardPanel() {

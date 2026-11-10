@@ -3,7 +3,7 @@
  * and counts in, so every number here is testable without a database.
  */
 
-const DAY_MS = 86_400_000;
+export const DAY_MS = 86_400_000;
 
 export type WindowDays = 7 | 30 | 90;
 
@@ -24,7 +24,7 @@ export function windowRange(days: WindowDays, nowMs: number): WindowRange {
   };
 }
 
-function toMs(ts: string | null | undefined): number | null {
+export function toMs(ts: string | null | undefined): number | null {
   if (!ts) return null;
   const ms = Date.parse(ts);
   return Number.isNaN(ms) ? null : ms;

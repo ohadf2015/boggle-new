@@ -34,11 +34,20 @@ const DEFINITION_FALLBACK: Record<SparkKey, string> = {
 
 const NO_PRIOR: ReadonlySet<SparkKey> = new Set(['activeTeachers']);
 
-export function EduKpiGrid({ data, onDrill }: { data: EduDashboardView; onDrill: (drill: ActiveDrill) => void }) {
+export function EduKpiGrid({
+  data,
+  onDrill,
+  only,
+}: {
+  data: EduDashboardView;
+  onDrill: (drill: ActiveDrill) => void;
+  /** Render just these tiles (the Pro tab reuses the trial ones). */
+  only?: SparkKey[];
+}) {
   const { t } = useLanguage();
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-      {KPI_ORDER.map((key) => {
+      {KPI_ORDER.filter((k) => !only || only.includes(k)).map((key) => {
         const delta = data.kpis[key];
         const target = data.drill.kpi[key];
         const label = t(`admin.eduDashboard.kpi.${key}`, LABEL_FALLBACK[key]);

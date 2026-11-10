@@ -25,6 +25,8 @@ const load = async (body: unknown = dashboardPayload()) => {
   await waitFor(() => expect(screen.getByTestId('kpi-activeTeachers')).toBeInTheDocument());
 };
 
+const openTab = (name: RegExp) => fireEvent.mouseDown(screen.getByRole('tab', { name }), { button: 0 });
+
 const teacherNames = () =>
   within(screen.getByTestId('teacher-table'))
     .queryAllByRole('link')
@@ -75,17 +77,20 @@ describe('EduDashboardPanel drill-down', () => {
     const tile = screen.getByTestId('kpi-newTeachers');
     expect(tile.textContent).toContain('Access requests approved in this period');
     expect(screen.getByTestId('kpi-newTeachers-delta').textContent).toBe('+100% vs the previous 7 days (was 1)');
-    expect(screen.getByTestId('kpi-trialsStarted-delta').textContent).toBe('Up from 0 in the previous 7 days');
     expect(screen.queryByTestId('kpi-activeTeachers-delta')).toBeNull();
+    openTab(/pro & trials/i);
+    expect(screen.getByTestId('kpi-trialsStarted-delta').textContent).toBe('Up from 0 in the previous 7 days');
   });
 
   it('shows zero tiles instead of hiding them, so revenue is always on screen', async () => {
     await load();
+    openTab(/pro & trials/i);
     expect(screen.getByTestId('kpi-trialsPaid').textContent).toContain('Trials that paid');
   });
 
   it('keeps dormant teachers out of the default table until asked', async () => {
     await load();
+    openTab(/^teachers/i);
     expect(teacherNames()).not.toContain('Dormant Dee');
     fireEvent.click(screen.getByRole('button', { name: /show dormant/i }));
     expect(teacherNames()).toContain('Dormant Dee');

@@ -54,7 +54,15 @@ describe('AdminSubNav', () => {
     render(<AdminSubNav />);
     expect(screen.getByText('admin.sidebar.players')).toBeInTheDocument();
     expect(screen.getByText('admin.nav.guests')).toBeInTheDocument();
-    expect(screen.getByText('admin.nav.teacherAccess')).toBeInTheDocument();
+    expect(screen.getByText('admin.sidebar.blocklist')).toBeInTheDocument();
+  });
+
+  it('shows Education leaves on an education route', () => {
+    mockPathname = '/en/admin/teacher-access';
+    render(<AdminSubNav />);
+    expect(screen.getByText('admin.nav.education')).toBeInTheDocument();
+    expect(screen.getByText('admin.nav.teacherPro')).toBeInTheDocument();
+    expect(screen.getByText('admin.nav.schoolLeads')).toBeInTheDocument();
   });
 
   it('navigates to a leaf on click', () => {

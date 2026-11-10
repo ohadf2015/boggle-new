@@ -12449,6 +12449,7 @@ const sv = {
       "declineError": "Kunde inte avvisa begäran"
     },
     "sidebar": {
+      "education": "Utbildning",
       "overview": "Översikt",
       "analytics": "Analys",
       "moderation": "Moderering",

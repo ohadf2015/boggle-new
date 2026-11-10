@@ -12294,6 +12294,7 @@ const ja = {
       "declineError": "リクエストを却下できませんでした"
     },
     "sidebar": {
+      "education": "教育",
       "overview": "概要",
       "analytics": "分析",
       "moderation": "モデレーション",

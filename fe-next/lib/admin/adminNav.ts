@@ -3,7 +3,7 @@
  * desktop sidebar and the mobile bottom nav. Pure module (no React/lucide)
  * so the active-route logic is fast and exhaustively testable.
  *
- * IA: 5 primary buckets. Combined buckets own NON-ADJACENT routes
+ * IA: 4 primary buckets + More; Content/Moderation are advanced buckets. Combined buckets own NON-ADJACENT routes
  * (Content owns /curators + /connections-review; People owns /guests +
  * /teacher-access) — so active detection is prefix-set membership, NOT a
  * single startsWith. That mismatch is the classic bug this module prevents.
@@ -36,12 +36,14 @@ export interface AdminNavLeaf {
   labelKey: string;
   iconKey: string;
   defaultPath: string;
+  /** Live badge count shown on this item (More sheet). */
+  badge?: AdminBadgeKey;
 }
 
 /**
- * The 4 destination buckets + the More overflow trigger, in display order.
- * No `home` tab — exiting the admin zone lives inside the More sheet so it
- * can never be mistaken for "admin overview".
+ * Daily-use destinations, in display order: the mobile bottom bar (plus the
+ * More trigger). Education is first-class; Content + Moderation are
+ * lower-frequency and live in ADMIN_ADVANCED_TABS / the More sheet.
  */
 export const ADMIN_PRIMARY_TABS: AdminNavBucket[] = [
   {
@@ -51,6 +53,43 @@ export const ADMIN_PRIMARY_TABS: AdminNavBucket[] = [
     defaultPath: '',
     ownedPrefixes: [''],
   },
+  {
+    key: 'education',
+    labelKey: 'admin.sidebar.education',
+    iconKey: 'GraduationCap',
+    defaultPath: '/education',
+    ownedPrefixes: ['/education', '/teacher-access', '/teacher-pro', '/school-leads'],
+  },
+  {
+    key: 'people',
+    labelKey: 'admin.sidebar.people',
+    iconKey: 'Users',
+    defaultPath: '/players',
+    ownedPrefixes: ['/players', '/guests', '/blocklist'],
+  },
+  {
+    key: 'analytics',
+    labelKey: 'admin.sidebar.analytics',
+    iconKey: 'BarChart3',
+    defaultPath: '/analytics',
+    ownedPrefixes: ['/analytics'],
+  },
+  {
+    key: 'more',
+    labelKey: 'admin.sidebar.more',
+    iconKey: 'Menu',
+    defaultPath: '',
+    ownedPrefixes: [],
+    isOverflow: true,
+  },
+];
+
+/**
+ * Advanced buckets: not in the mobile bar (reached through More), shown as a
+ * secondary group on desktop. They keep full bucket behaviour (sub-nav,
+ * active detection, badge).
+ */
+export const ADMIN_ADVANCED_TABS: AdminNavBucket[] = [
   {
     key: 'content',
     labelKey: 'admin.sidebar.content',
@@ -76,60 +115,35 @@ export const ADMIN_PRIMARY_TABS: AdminNavBucket[] = [
     ownedPrefixes: ['/moderation'],
     badge: 'moderation',
   },
-  {
-    key: 'people',
-    labelKey: 'admin.sidebar.people',
-    iconKey: 'Users',
-    defaultPath: '/players',
-    ownedPrefixes: ['/players', '/guests', '/education', '/teacher-access', '/teacher-pro', '/school-leads', '/blocklist'],
-  },
-  {
-    key: 'more',
-    labelKey: 'admin.sidebar.more',
-    iconKey: 'Menu',
-    defaultPath: '',
-    ownedPrefixes: [],
-    isOverflow: true,
-  },
 ];
 
-/**
- * Items shown inside the More sheet. `analytics`/`system`/`web-vitals` are
- * real admin routes; `exit` leaves the admin zone (handled in the component).
- */
+/** Extra items after the advanced buckets; `exit` leaves the admin zone. */
 export const ADMIN_OVERFLOW_ITEMS: AdminNavLeaf[] = [
-  {
-    key: 'analytics',
-    labelKey: 'admin.sidebar.analytics',
-    iconKey: 'BarChart3',
-    defaultPath: '/analytics',
-  },
-  {
-    key: 'system',
-    labelKey: 'admin.sidebar.system',
-    iconKey: 'Settings',
-    defaultPath: '/system',
-  },
-  {
-    key: 'webVitals',
-    labelKey: 'admin.nav.webVitals',
-    iconKey: 'Activity',
-    defaultPath: '/web-vitals',
-  },
-  {
-    key: 'exit',
-    labelKey: 'admin.nav.exitToSite',
-    iconKey: 'LogOut',
-    defaultPath: '',
-  },
+  { key: 'system', labelKey: 'admin.sidebar.system', iconKey: 'Settings', defaultPath: '/system' },
+  { key: 'webVitals', labelKey: 'admin.nav.webVitals', iconKey: 'Activity', defaultPath: '/web-vitals' },
+  { key: 'exit', labelKey: 'admin.nav.exitToSite', iconKey: 'LogOut', defaultPath: '' },
 ];
 
+/** The More sheet on mobile: the advanced buckets, then the overflow items. */
+export const ADMIN_MORE_SHEET_ITEMS: AdminNavLeaf[] = [...ADMIN_ADVANCED_TABS, ...ADMIN_OVERFLOW_ITEMS];
+
+const ADMIN_ALL_BUCKETS: AdminNavBucket[] = [...ADMIN_PRIMARY_TABS, ...ADMIN_ADVANCED_TABS];
+
+export function isAdvancedAdminTab(key: string | null): boolean {
+  return ADMIN_ADVANCED_TABS.some((b) => b.key === key);
+}
+
 /**
- * Leaf sub-routes per bucket — the single source consumed by both the
- * desktop sidebar (inline expand) and the mobile AdminSubNav. Keyed by the
- * primary bucket key.
+ * Leaf sub-routes per bucket — consumed by the desktop sidebar (inline
+ * expand) and the mobile AdminSubNav. Keyed by bucket key.
  */
 export const ADMIN_BUCKET_CHILDREN: Record<string, AdminNavLeaf[]> = {
+  education: [
+    { key: 'education', labelKey: 'admin.nav.education', iconKey: 'BarChart3', defaultPath: '/education' },
+    { key: 'teacher-access', labelKey: 'admin.nav.teacherAccess', iconKey: 'GraduationCap', defaultPath: '/teacher-access' },
+    { key: 'teacher-pro', labelKey: 'admin.nav.teacherPro', iconKey: 'Gift', defaultPath: '/teacher-pro' },
+    { key: 'school-leads', labelKey: 'admin.nav.schoolLeads', iconKey: 'Building2', defaultPath: '/school-leads' },
+  ],
   content: [
     { key: 'dictionary', labelKey: 'admin.nav.dictionary', iconKey: 'BookOpen', defaultPath: '/dictionary' },
     { key: 'invalid-words', labelKey: 'admin.nav.invalidWords', iconKey: 'AlertTriangle', defaultPath: '/invalid-words' },
@@ -143,10 +157,6 @@ export const ADMIN_BUCKET_CHILDREN: Record<string, AdminNavLeaf[]> = {
   people: [
     { key: 'players', labelKey: 'admin.sidebar.players', iconKey: 'Users', defaultPath: '/players' },
     { key: 'guests', labelKey: 'admin.nav.guests', iconKey: 'UserRound', defaultPath: '/guests' },
-    { key: 'education', labelKey: 'admin.nav.education', iconKey: 'BarChart3', defaultPath: '/education' },
-    { key: 'teacher-access', labelKey: 'admin.nav.teacherAccess', iconKey: 'GraduationCap', defaultPath: '/teacher-access' },
-    { key: 'teacher-pro', labelKey: 'admin.nav.teacherPro', iconKey: 'Gift', defaultPath: '/teacher-pro' },
-    { key: 'school-leads', labelKey: 'admin.nav.schoolLeads', iconKey: 'Building2', defaultPath: '/school-leads' },
     { key: 'blocklist', labelKey: 'admin.sidebar.blocklist', iconKey: 'Ban', defaultPath: '/blocklist' },
   ],
 };
@@ -176,7 +186,7 @@ export function getActiveAdminTab(cleanPath: string): string | null {
   let bestKey: string | null = null;
   let bestLen = -1;
 
-  for (const tab of ADMIN_PRIMARY_TABS) {
+  for (const tab of ADMIN_ALL_BUCKETS) {
     if (tab.isOverflow) continue;
     for (const prefix of tab.ownedPrefixes) {
       if (prefix === '') continue; // overview handled above

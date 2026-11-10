@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { DrillTarget, EduDashboard } from '@/lib/admin/eduDashboard';
 import type { PeriodDelta, TeacherHealth } from '@/lib/admin/eduMetrics';
@@ -58,6 +58,21 @@ export function HealthChip({ health }: { health: TeacherHealth }) {
       {t(`admin.eduDashboard.health.${health}`, healthLabel(health))}
     </span>
   );
+}
+
+const SUNDAY_UTC = Date.UTC(2024, 0, 7);
+
+/** Weekday names, index 0 = Sunday, in UTC to match how rounds are bucketed. One formatter per call. */
+export function weekdayLabels(language: string, width: 'short' | 'long'): string[] {
+  const format = new Intl.DateTimeFormat(language, { weekday: width, timeZone: 'UTC' });
+  return Array.from({ length: 7 }, (_, i) => format.format(SUNDAY_UTC + i * 86_400_000));
+}
+
+export const teacherName = (x: { id: string; name: string | null; email: string | null }) => x.name ?? x.email ?? x.id;
+
+/** id -> teacher row, rebuilt only when the teacher list changes. */
+export function useTeacherIndex(teachers: EduDashboardView['teachers']) {
+  return useMemo(() => new Map(teachers.map((x) => [x.id, x])), [teachers]);
 }
 
 export function shortDate(iso: string | null, language: string): string {

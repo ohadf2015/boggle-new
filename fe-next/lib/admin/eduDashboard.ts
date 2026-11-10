@@ -12,7 +12,11 @@
 
 import { greatestTimestamp } from '@/lib/education/teacherLastActivity';
 import { buildAttention, type AttentionList } from './eduAttention';
+import { buildEduInsights, type EduInsights } from './eduInsights';
+import { buildFindings, type Finding } from './eduFindings';
 import {
+  DAY_MS,
+  toMs,
   countInRange,
   dailyDistinct,
   dailySeries,
@@ -26,7 +30,6 @@ import {
   type WindowDays,
 } from './eduMetrics';
 
-const DAY_MS = 86_400_000;
 const DYING_AFTER_DAYS = 14;
 
 export interface EduDashboardInput {
@@ -155,17 +158,8 @@ export interface EduDashboard {
   verdict: EduVerdict | null;
   drill: EduDrill;
   attention: AttentionList;
-}
-
-function toMs(ts: string | null | undefined): number | null {
-  if (!ts) return null;
-  const ms = Date.parse(ts);
-  return Number.isNaN(ms) ? null : ms;
-}
-
-function distinctStudents(classIds: string[], memberships: EduDashboardInput['memberships']): number {
-  const ids = new Set(classIds);
-  return new Set(memberships.filter((m) => ids.has(m.classroom_id)).map((m) => m.student_id)).size;
+  insights: EduInsights;
+  findings: Finding[];
 }
 
 const uniq = (ids: Array<string | null | undefined>) => [...new Set(ids.filter((id): id is string => !!id))];
@@ -196,6 +190,32 @@ export function buildEduDashboard(input: EduDashboardInput): EduDashboard {
 
   const classesWithRound = (prior: boolean) =>
     uniq((rounds ?? []).filter((r) => inWin(r.completed_at, prior)).map((r) => r.classroom_id));
+  const liveClassIds = classesWithRound(false);
+
+  // Index once: every per-class / per-teacher lookup below is a Map hit, not a rescan.
+  const studentsByClass = new Map<string, Set<string>>();
+  for (const m of input.memberships) {
+    const set = studentsByClass.get(m.classroom_id) ?? new Set<string>();
+    set.add(m.student_id);
+    studentsByClass.set(m.classroom_id, set);
+  }
+  const distinctStudents = (classIds: string[]): number => {
+    if (classIds.length === 1) return studentsByClass.get(classIds[0])?.size ?? 0;
+    const all = new Set<string>();
+    for (const id of classIds) for (const student of studentsByClass.get(id) ?? []) all.add(student);
+    return all.size;
+  };
+  const roundsLastWeek = new Map<string, number>();
+  const classStats = new Map<string, { lastMs: number; inWindow: number }>();
+  for (const r of rounds ?? []) {
+    const ms = toMs(r.completed_at) ?? 0;
+    if (ms > nowMs - 7 * DAY_MS) roundsLastWeek.set(r.teacher_id, (roundsLastWeek.get(r.teacher_id) ?? 0) + 1);
+    if (!r.classroom_id) continue;
+    const stat = classStats.get(r.classroom_id) ?? { lastMs: 0, inWindow: 0 };
+    if (ms > stat.lastMs) stat.lastMs = ms;
+    if (inWin(r.completed_at)) stat.inWindow += 1;
+    classStats.set(r.classroom_id, stat);
+  }
 
   const approvalOf = new Map<string, EduDashboardInput['approvals'][number]>();
   for (const a of input.approvals) if (a.user_id) approvalOf.set(a.user_id, a);
@@ -221,7 +241,7 @@ export function buildEduDashboard(input: EduDashboardInput): EduDashboard {
       countWin(input.approvals.map((a) => a.reviewed_at), true),
     ),
     classesWithLiveGame:
-      rounds === null ? null : periodDelta(classesWithRound(false).length, classesWithRound(true).length),
+      rounds === null ? null : periodDelta(liveClassIds.length, classesWithRound(true).length),
     liveRounds:
       rounds === null
         ? null
@@ -237,7 +257,7 @@ export function buildEduDashboard(input: EduDashboardInput): EduDashboard {
     const classIds = classesByTeacher.get(id) ?? [];
     stageOf.set(
       id,
-      distinctStudents(classIds, input.memberships) > 0
+      distinctStudents(classIds) > 0
         ? 'has_students'
         : classIds.length > 0
           ? 'no_students'
@@ -247,10 +267,7 @@ export function buildEduDashboard(input: EduDashboardInput): EduDashboard {
     );
   }
 
-  const roundsSevenDays = (teacherId: string) =>
-    rounds === null
-      ? null
-      : rounds.filter((r) => r.teacher_id === teacherId && (toMs(r.completed_at) ?? 0) > nowMs - 7 * DAY_MS).length;
+  const roundsSevenDays = (teacherId: string) => (rounds === null ? null : (roundsLastWeek.get(teacherId) ?? 0));
 
   const teacherRow = (id: string, name: string | null, lastActiveAt: string | null): TeacherRow => {
     const classIds = classesByTeacher.get(id) ?? [];
@@ -263,7 +280,7 @@ export function buildEduDashboard(input: EduDashboardInput): EduDashboard {
       lastActiveAt,
       canSignIn: teacherIds.has(id),
       classes: classIds.length,
-      students: distinctStudents(classIds, input.memberships),
+      students: distinctStudents(classIds),
       roundsLast7d,
       health: teacherHealth({ lastActiveMs: toMs(lastActiveAt), roundsLast7d, nowMs }),
       stage: stageOf.get(id) ?? null,
@@ -281,16 +298,15 @@ export function buildEduDashboard(input: EduDashboardInput): EduDashboard {
   const nameOf = new Map(teachers.map((t) => [t.id, t.name ?? t.email]));
 
   const classes: ClassRow[] = input.classrooms.map((c) => {
-    const classRounds = rounds?.filter((r) => r.classroom_id === c.id) ?? null;
-    const lastRoundMs = classRounds ? Math.max(0, ...classRounds.map((r) => toMs(r.completed_at) ?? 0)) : 0;
+    const stat = rounds === null ? undefined : classStats.get(c.id);
     return {
       id: c.id,
       name: c.name,
       teacherId: c.teacher_id,
       teacherName: c.teacher_id ? (nameOf.get(c.teacher_id) ?? null) : null,
-      students: distinctStudents([c.id], input.memberships),
-      lastRoundAt: classRounds && lastRoundMs > 0 ? new Date(lastRoundMs).toISOString() : null,
-      roundsInWindow: classRounds ? classRounds.filter((r) => inWin(r.completed_at)).length : null,
+      students: distinctStudents([c.id]),
+      lastRoundAt: stat && stat.lastMs > 0 ? new Date(stat.lastMs).toISOString() : null,
+      roundsInWindow: rounds === null ? null : (stat?.inWindow ?? 0),
     };
   });
 
@@ -345,10 +361,20 @@ export function buildEduDashboard(input: EduDashboardInput): EduDashboard {
       trialsStarted: teachersOf(trialApprovals.filter((a) => inWin(a.reviewed_at)).map((a) => a.user_id)),
       trialsPaid: teachersOf(paidTrials.filter((s) => inWin(s.created_at)).map((s) => s.user_id)),
       liveRounds: rounds === null ? null : teachersOf(rounds.filter((r) => inWin(r.completed_at)).map((r) => r.teacher_id)),
-      classesWithLiveGame: rounds === null ? null : { kind: 'classes', ids: classesWithRound(false) },
+      classesWithLiveGame: rounds === null ? null : { kind: 'classes', ids: liveClassIds },
     },
     funnel: Object.fromEntries(Object.entries(stuck).map(([k, ids]) => [k, recentFirst(ids)])) as Record<FunnelKey, string[]>,
   };
+
+  const insights = buildEduInsights({
+    nowMs,
+    windowDays,
+    rounds,
+    classes,
+    approvals: input.approvals,
+    subscriptions,
+  });
+  const verdict = buildVerdict(funnel);
 
   return {
     windowDays,
@@ -375,9 +401,20 @@ export function buildEduDashboard(input: EduDashboardInput): EduDashboard {
     dyingClasses,
     modeMix,
     funnel,
-    verdict: buildVerdict(funnel),
+    verdict,
     drill,
     attention: buildAttention({ teachers, dyingClasses, roundsAvailable: rounds !== null, nowMs }),
+    insights,
+    findings: buildFindings({
+      roundsAvailable: rounds !== null,
+      kpis: { liveRounds: kpis.liveRounds, newTeachers: kpis.newTeachers },
+      verdict,
+      funnelStuck: drill.funnel,
+      teachers,
+      classes,
+      dyingClasses,
+      insights,
+    }),
   };
 }
 

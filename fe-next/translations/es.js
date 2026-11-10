@@ -12097,6 +12097,7 @@ const es = {
       "declineError": "No se pudo rechazar la solicitud"
     },
     "sidebar": {
+      "education": "Educación",
       "overview": "Resumen",
       "analytics": "Análisis",
       "moderation": "Moderación",

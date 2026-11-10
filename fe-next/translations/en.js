@@ -19456,6 +19456,7 @@ const en = {
     "preparingTools": "Preparing Tools",
     "sessionError": "Session Error",
     "sidebar": {
+      "education": "Education",
       "analytics": "Analytics",
       "content": "Content",
       "puzzleReview": "Puzzle Review",

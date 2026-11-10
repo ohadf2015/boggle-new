@@ -5,10 +5,12 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import {
   ADMIN_PRIMARY_TABS,
+  ADMIN_ADVANCED_TABS,
   ADMIN_OVERFLOW_ITEMS,
   ADMIN_BUCKET_CHILDREN,
   getActiveAdminTab,
 } from '@/lib/admin/adminNav';
+import { AdminBadge } from './AdminBadge';
 import { getAdminNavIcon } from './adminNavIcons';
 
 interface AdminSidebarProps {
@@ -16,7 +18,7 @@ interface AdminSidebarProps {
 }
 
 /**
- * Desktop admin sidebar. Two-level IA: 4 primary buckets, the active bucket
+ * Desktop admin sidebar. Two-level IA: primary buckets, then the advanced buckets (Content / Moderation) after a divider, the active bucket
  * expands its leaf children inline, plus an overflow group (Analytics /
  * System / Web Vitals / Exit) rendered directly since desktop has the room.
  * Shares config + active-route resolution with AdminBottomNav (no drift).
@@ -55,14 +57,20 @@ export function AdminSidebar({ moderationCount = 0 }: AdminSidebarProps) {
       )}
       aria-label="Admin navigation"
     >
-      {buckets.map((bucket) => {
+      {[...buckets, ...ADMIN_ADVANCED_TABS].map((bucket) => {
         const Icon = getAdminNavIcon(bucket.iconKey);
         const active = activeKey === bucket.key;
         const badge = bucket.badge === 'moderation' ? moderationCount : 0;
         const children = ADMIN_BUCKET_CHILDREN[bucket.key];
 
         return (
-          <div key={bucket.key} className="flex flex-col">
+          <div
+            key={bucket.key}
+            className={cn(
+              'flex flex-col',
+              bucket.key === ADMIN_ADVANCED_TABS[0].key && 'mt-2 pt-2 border-t border-slate-700/50',
+            )}
+          >
             <button
               type="button"
               onClick={() => go(bucket.defaultPath)}
@@ -78,11 +86,7 @@ export function AdminSidebar({ moderationCount = 0 }: AdminSidebarProps) {
             >
               <Icon className="w-5 h-5 shrink-0" />
               <span className="truncate hidden md:inline">{t(bucket.labelKey)}</span>
-              {badge > 0 ? (
-                <span className="ms-auto bg-neo-pink text-neo-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center hidden md:inline">
-                  {badge > 99 ? '99+' : badge}
-                </span>
-              ) : null}
+              <AdminBadge count={badge} className="ms-auto hidden min-w-[20px] px-1.5 py-0.5 text-xs md:inline" />
             </button>
 
             {/* Inline children for the active bucket */}

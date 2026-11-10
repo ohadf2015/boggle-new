@@ -12022,6 +12022,7 @@ const he = {
       "declineError": "נכשל בדחיית הבקשה"
     },
     "sidebar": {
+      "education": "חינוך",
       "overview": "סקירה",
       "analytics": "אנליטיקה",
       "moderation": "מודרציה",
