@@ -3,12 +3,7 @@
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { Database, HardDrive, Clock } from 'lucide-react';
-
-interface HealthData {
-  redis: 'ok' | 'down';
-  database: 'ok' | 'down';
-  process: { heapMB: number; uptimeSeconds: number };
-}
+import type { HealthData } from '@/hooks/useAdminDashboard';
 
 interface SystemHealthProps {
   health: HealthData | null;

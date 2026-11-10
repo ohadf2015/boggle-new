@@ -1,13 +1,11 @@
 'use client';
 
 import { useMemo } from 'react';
-import { AlertTriangle, Radar, Sparkles, TrendingUp, type LucideIcon } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import type { Finding, FindingTone } from '@/lib/admin/eduFindings';
+import type { Finding } from '@/lib/admin/findings';
+import { FindingsPanel } from '../shared/FindingsPanel';
 import {
   FUNNEL_LABEL_FALLBACK,
-  MUTED,
-  PANEL,
   teacherName,
   useTeacherIndex,
   weekdayLabels,
@@ -15,13 +13,6 @@ import {
   type EduDashboardView,
   type Translate,
 } from './eduDashboardShared';
-
-const TONE: Record<FindingTone, { icon: LucideIcon; ring: string; text: string }> = {
-  win: { icon: TrendingUp, ring: 'border-neo-lime', text: 'text-neo-lime' },
-  problem: { icon: AlertTriangle, ring: 'border-neo-red', text: 'text-neo-red' },
-  early: { icon: Radar, ring: 'border-neo-orange', text: 'text-neo-orange' },
-  fact: { icon: Sparkles, ring: 'border-neo-cyan', text: 'text-neo-cyan' },
-};
 
 /** Plain-language sentence per finding id. English fallbacks double as the copy. */
 function sentence(f: Finding, t: Translate, ctx: { weekday: (i: number) => string; nameOf: (id: string) => string; step: (k: string) => string }): string {
@@ -62,57 +53,6 @@ function sentence(f: Finding, t: Translate, ctx: { weekday: (i: number) => strin
   }
 }
 
-function Column({
-  title,
-  empty,
-  items,
-  render,
-  onDrill,
-  testId,
-}: {
-  title: string;
-  empty: string;
-  items: Finding[];
-  render: (f: Finding) => string;
-  onDrill: (d: ActiveDrill) => void;
-  testId: string;
-}) {
-  const { t } = useLanguage();
-  return (
-    <section data-testid={testId} className={`${PANEL} space-y-2`}>
-      <h3 className="text-sm font-semibold text-neo-cream">{title}</h3>
-      {items.length === 0 ? (
-        <p className={`text-sm ${MUTED}`}>{empty}</p>
-      ) : (
-        <ul className="space-y-2">
-          {items.map((f) => {
-            const { icon: Icon, ring, text } = TONE[f.tone];
-            const { drill } = f;
-            const message = render(f);
-            return (
-              <li key={f.id} data-testid={`finding-${f.id}`} className={`flex items-start gap-2 rounded border-s-4 ps-2 ${ring}`}>
-                <Icon className={`mt-0.5 h-4 w-4 shrink-0 ${text}`} aria-hidden="true" />
-                <div className="min-w-0 text-sm text-neo-cream">
-                  <p>{message}</p>
-                  {drill && drill.ids.length > 0 && (
-                    <button
-                      type="button"
-                      onClick={() => onDrill({ ...drill, title: message })}
-                      className="text-xs font-semibold text-neo-cyan underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-neo-cyan"
-                    >
-                      {t('admin.eduDashboard.finding.show', 'Show them ({count})', { count: drill.ids.length })}
-                    </button>
-                  )}
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      )}
-    </section>
-  );
-}
-
 export function EduFindings({ data, onDrill }: { data: EduDashboardView; onDrill: (d: ActiveDrill) => void }) {
   const { t, language } = useLanguage();
   const teachers = useTeacherIndex(data.teachers);
@@ -122,48 +62,5 @@ export function EduFindings({ data, onDrill }: { data: EduDashboardView; onDrill
     nameOf: (id: string) => (teachers.has(id) ? teacherName(teachers.get(id)!) : id),
     step: (key: string) => t(`admin.eduDashboard.funnel.${key}`, FUNNEL_LABEL_FALLBACK[key] ?? key),
   };
-  const render = (f: Finding) => sentence(f, t, ctx);
-  const by = (tone: FindingTone) => data.findings.filter((f) => f.tone === tone);
-  const facts = by('fact');
-
-  return (
-    <div className="space-y-3" data-testid="edu-findings">
-      <Column
-        testId="findings-early"
-        title={t('admin.eduDashboard.finding.earlyTitle', 'Early warnings: likely to become problems')}
-        empty={t('admin.eduDashboard.finding.earlyNone', 'No early warning signs. Nothing is slipping yet.')}
-        items={by('early')}
-        render={render}
-        onDrill={onDrill}
-      />
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Column
-          testId="findings-working"
-          title={t('admin.eduDashboard.finding.workingTitle', 'What is working')}
-          empty={t('admin.eduDashboard.finding.workingNone', 'No clear win yet. Nothing is trending up enough to call.')}
-          items={by('win')}
-          render={render}
-          onDrill={onDrill}
-        />
-        <Column
-          testId="findings-broken"
-          title={t('admin.eduDashboard.finding.brokenTitle', 'What is not working')}
-          empty={t('admin.eduDashboard.finding.brokenNone', 'Nothing is breaking right now.')}
-          items={by('problem')}
-          render={render}
-          onDrill={onDrill}
-        />
-      </div>
-      {facts.length > 0 && (
-        <ul data-testid="findings-facts" className="flex flex-wrap gap-2">
-          {facts.map((f) => (
-            <li key={f.id} className={`flex items-center gap-2 rounded-full border-2 px-3 py-1 text-xs text-neo-cream ${TONE.fact.ring}`}>
-              <Sparkles className={`h-3.5 w-3.5 ${TONE.fact.text}`} aria-hidden="true" />
-              {render(f)}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
+  return <FindingsPanel testId="edu-findings" findings={data.findings} describe={(f) => sentence(f, t, ctx)} onDrill={onDrill} />;
 }

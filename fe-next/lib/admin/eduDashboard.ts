@@ -13,7 +13,8 @@
 import { greatestTimestamp } from '@/lib/education/teacherLastActivity';
 import { buildAttention, type AttentionList } from './eduAttention';
 import { buildEduInsights, type EduInsights } from './eduInsights';
-import { buildFindings, type Finding } from './eduFindings';
+import { buildFindings } from './eduFindings';
+import type { Finding } from './findings';
 import {
   DAY_MS,
   toMs,

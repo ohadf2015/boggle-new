@@ -9,9 +9,9 @@
  */
 
 import { DAY_MS, toMs, windowRange, type WindowDays } from './eduMetrics';
+import { momentum, trailingZeros } from './seriesStats';
 
 const SOON_DAYS = 7;
-const RECENT_DAYS = 3;
 const FADE_MIN_PRIOR_ROUNDS = 3;
 
 interface Round {
@@ -120,20 +120,6 @@ function teacherCounts(hits: Hit[]): Map<string, number> {
   const counts = new Map<string, number>();
   for (const { r } of hits) counts.set(r.teacher_id, (counts.get(r.teacher_id) ?? 0) + 1);
   return counts;
-}
-
-function trailingZeros(xs: number[]): number {
-  let n = 0;
-  while (n < xs.length && xs[xs.length - 1 - n] === 0) n += 1;
-  return n;
-}
-
-function momentum(daily: number[]): number | null {
-  if (daily.length <= RECENT_DAYS) return null;
-  const avg = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / xs.length;
-  const base = avg(daily.slice(0, -RECENT_DAYS));
-  if (base === 0) return null;
-  return Math.round(((avg(daily.slice(-RECENT_DAYS)) - base) / base) * 100);
 }
 
 function modeHealth(cur: Hit[], prior: Hit[]): ModeInsight[] {

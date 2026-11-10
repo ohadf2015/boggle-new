@@ -6,6 +6,8 @@ import { render, screen, waitFor, fireEvent, within } from '@testing-library/rea
 import { dashboardPayload } from './eduDashboardFixture';
 
 const fetchWithAuth = vi.fn();
+// rAF is a no-op under vitest, so skip the count-up animation.
+vi.mock('@/hooks/useCountUp', () => ({ useCountUp: ({ target }: { target: number }) => target }));
 vi.mock('@/utils/authFetch', () => ({
   fetchWithAuth: (...args: unknown[]) => fetchWithAuth(...args),
 }));

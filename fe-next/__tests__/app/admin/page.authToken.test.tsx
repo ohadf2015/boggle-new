@@ -49,15 +49,11 @@ vi.mock('@/components/admin/GamesDiagnostic', () => ({
 vi.mock('@/components/admin/EmailTestPanel', () => ({
   EmailTestPanel: () => <div data-testid="email-panel">EmailTestPanel</div>,
 }));
-vi.mock('@/components/ui/PullToRefreshWrapper', () => ({
-  PullToRefreshWrapper: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-}));
+
 vi.mock('@/utils/mobileAccessibility', () => ({
   isMobileDevice: () => false,
 }));
-vi.mock('@/components/admin/overview/KPICards', () => ({
-  KPICards: () => <div data-testid="kpi-cards">KPICards</div>,
-}));
+
 vi.mock('@/components/admin/overview/SystemHealth', () => ({
   SystemHealth: () => <div data-testid="system-health">SystemHealth</div>,
 }));
@@ -72,6 +68,18 @@ vi.mock('@/components/ui/Loader', () => ({
 }));
 vi.mock('@/components/ui/PageLoader', () => ({
   PageLoader: ({ text }: { text?: string }) => <div>{text}</div>,
+}));
+vi.mock('@/components/admin/overview/PulseSection', () => ({
+  PulseSection: () => <div data-testid="pulse-section">PulseSection</div>,
+}));
+vi.mock('@/components/admin/overview/ModeMixPanel', () => ({
+  ModeMixPanel: () => <div data-testid="mode-mix-panel">ModeMixPanel</div>,
+}));
+vi.mock('@/components/admin/AdminNotificationBell', () => ({
+  AdminNotificationBell: () => <div data-testid="admin-bell">AdminNotificationBell</div>,
+}));
+vi.mock('@/hooks/useOverviewPulse', () => ({
+  useOverviewPulse: () => ({ pulse: null, windowDays: 7, setWindowDays: vi.fn(), failed: false, retry: vi.fn(), revenue: null }),
 }));
 vi.mock('@/hooks/useAdminAuth', () => ({
   useAdminAuth: vi.fn(() => ({

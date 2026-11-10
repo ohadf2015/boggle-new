@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { EduDrill, EduVerdict, FunnelKey } from '@/lib/admin/eduDashboard';
 import { FUNNEL_LABEL_FALLBACK, MUTED, teacherAccessPath, type ActiveDrill } from './eduDashboardShared';
-import { useCountUp } from './useCountUp';
+import { useCountUpTo as useCountUp } from '../shared/useCountUpTo';
 
 const LABEL_FALLBACK: Record<string, string> = {
   approved: 'applicants were never approved',

@@ -7,16 +7,7 @@
 import type { EduVerdict } from './eduDashboard';
 import type { EduInsights } from './eduInsights';
 import type { PeriodDelta } from './eduMetrics';
-
-/** `early` = a leading indicator: not yet a problem in the numbers, but where one starts. */
-export type FindingTone = 'problem' | 'early' | 'win' | 'fact';
-
-export interface Finding {
-  id: string;
-  tone: FindingTone;
-  params: Record<string, string | number>;
-  drill?: { kind: 'teachers' | 'classes'; ids: string[] };
-}
+import { createFindings, type Finding } from './findings';
 
 export interface FindingsInput {
   roundsAvailable: boolean;
@@ -36,7 +27,6 @@ export interface FindingsInput {
   insights: EduInsights;
 }
 
-const ORDER: Record<FindingTone, number> = { problem: 0, early: 1, win: 2, fact: 3 };
 const SURGE_PCT = 20;
 const GOOD_RETENTION = 60;
 const LOW_RETENTION = 40;
@@ -65,21 +55,8 @@ const STUCK_STAGES: Array<[string, string]> = [
 ];
 
 export function buildFindings(d: FindingsInput): Finding[] {
-  const out: Finding[] = [];
+  const { add, addList, done } = createFindings();
   const { usage, retention, pro } = d.insights;
-
-  const add = (id: string, tone: FindingTone, params: Finding['params'] = {}, drill?: Finding['drill']) =>
-    out.push({ id, tone, params, drill });
-  /** A finding about a list of teachers or classes: skipped when the list is empty. */
-  const addList = (
-    id: string,
-    tone: FindingTone,
-    kind: 'teachers' | 'classes',
-    ids: string[],
-    extra: Finding['params'] = {},
-  ) => {
-    if (ids.length > 0) add(id, tone, { count: ids.length, ...extra }, { kind, ids });
-  };
 
   const rounds = d.roundsAvailable ? d.kpis.liveRounds : null;
   if (rounds && rounds.pct !== null) {
@@ -171,5 +148,5 @@ export function buildFindings(d: FindingsInput): Finding[] {
     if (top) add('top_teacher', 'fact', { teacherId: top.teacherId, rounds: top.rounds, players: top.players });
   }
 
-  return out.sort((a, b) => ORDER[a.tone] - ORDER[b.tone]);
+  return done();
 }

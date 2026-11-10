@@ -50,26 +50,12 @@ vi.mock('@/components/admin/TodayGamesHistory', () => {
     },
   };
 });
-vi.mock('@/components/admin/GamesDiagnostic', () => {
-  return {
-    GamesDiagnostic: function MockGamesDiagnostic() {
-      return <div data-testid="mock-games-diagnostic">GamesDiagnostic</div>;
-    },
-  };
-});
-vi.mock('@/components/admin/EmailTestPanel', () => {
-  return {
-    EmailTestPanel: function MockEmailTestPanel() {
-      return <div data-testid="mock-email-test">EmailTestPanel</div>;
-    },
-  };
-});
+
+
 vi.mock('@/utils/mobileAccessibility', () => ({
   isMobileDevice: vi.fn(() => false),
 }));
-vi.mock('@/components/admin/overview/KPICards', () => ({
-  KPICards: () => <div data-testid="kpi-cards">KPICards</div>,
-}));
+
 vi.mock('@/components/admin/overview/SystemHealth', () => ({
   SystemHealth: () => <div data-testid="system-health">SystemHealth</div>,
 }));
@@ -79,15 +65,9 @@ vi.mock('@/components/admin/sidebar/AdminSidebar', () => ({
 vi.mock('@/components/admin/sidebar/AdminBottomNav', () => ({
   AdminBottomNav: () => <div data-testid="admin-bottom-nav">AdminBottomNav</div>,
 }));
-vi.mock('@/components/admin/overview/InsightsPanel', () => ({
-  InsightsPanel: () => <div data-testid="insights-panel">InsightsPanel</div>,
-}));
-vi.mock('@/components/admin/overview/GameModePopularity', () => ({
-  GameModePopularity: () => <div data-testid="game-mode-popularity">GameModePopularity</div>,
-}));
-vi.mock('@/components/admin/overview/MpModeBreakdown', () => ({
-  MpModeBreakdown: () => <div data-testid="mp-mode-breakdown">MpModeBreakdown</div>,
-}));
+
+
+
 vi.mock('@/components/admin/overview/DailyActivityChart', () => ({
   DailyActivityChart: () => <div data-testid="daily-activity-chart">DailyActivityChart</div>,
 }));
@@ -102,6 +82,18 @@ vi.mock('@/components/ui/Loader', () => ({
 }));
 vi.mock('@/components/ui/PageLoader', () => ({
   PageLoader: ({ text }: { text?: string }) => <div>{text}</div>,
+}));
+vi.mock('@/components/admin/overview/PulseSection', () => ({
+  PulseSection: () => <div data-testid="pulse-section">PulseSection</div>,
+}));
+vi.mock('@/components/admin/overview/ModeMixPanel', () => ({
+  ModeMixPanel: () => <div data-testid="mode-mix-panel">ModeMixPanel</div>,
+}));
+vi.mock('@/components/admin/AdminNotificationBell', () => ({
+  AdminNotificationBell: () => <div data-testid="admin-bell">AdminNotificationBell</div>,
+}));
+vi.mock('@/hooks/useOverviewPulse', () => ({
+  useOverviewPulse: () => ({ pulse: null, windowDays: 7, setWindowDays: vi.fn(), failed: false, retry: vi.fn(), revenue: null }),
 }));
 vi.mock('@/hooks/useAdminAuth', () => ({
   useAdminAuth: vi.fn(() => ({
@@ -120,13 +112,6 @@ vi.mock('@/hooks/useAdminDashboard', () => ({
     error: null,
   })),
 }));
-vi.mock('@/components/ui/PullToRefreshWrapper', () => {
-  return {
-    PullToRefreshWrapper: function MockPullToRefreshWrapper({ children }: any) {
-      return <div data-testid="mock-pull-to-refresh">{children}</div>;
-    },
-  };
-});
 
 const mockUseAuth = useAuth as MockedFunction<typeof useAuth>;
 const mockUseLanguage = useLanguage as MockedFunction<typeof useLanguage>;
