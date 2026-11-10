@@ -26,6 +26,7 @@ import { configureMiddleware } from './middleware';
 import { createSocketServer, setupConnectionMonitoring, setupCleanupTimers } from './socketSetup';
 import { configureHealthRoutes } from './healthRoutes';
 import { handleLocaleRedirect } from './localeRedirect';
+import { handleHomeMarkdown } from './markdownHome';
 import { applyOfflineShellCacheHeader } from './offlineShellCache';
 import { errorHandler, notFoundHandler } from './errorMiddleware';
 import { httpRateLimitMiddleware } from '../backend/middleware/rateLimiterRedis';
@@ -188,6 +189,8 @@ async function start(): Promise<void> {
     try {
       const parsedUrl = parseUrl(req.url, true);
       const { pathname } = parsedUrl;
+
+      if (handleHomeMarkdown(req, res, pathname)) return;
 
       // Handle root path locale redirect
       if (pathname === '/') {
