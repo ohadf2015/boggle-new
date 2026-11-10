@@ -30,6 +30,16 @@ describe('claimStreakMilestone', () => {
     expect(tables.daily_streak_milestone_claims).toContainEqual({ player_id: 'u1', milestone: 7, coins: seven.coins })
   })
 
+  it('Given 6 days carried over from guest play and today played, pays the 7-day reward', async () => {
+    vi.mocked(awardCoinsServer).mockResolvedValue({ success: true, newBalance: 60 })
+    const carried = ['06', '07', '08', '09', '10', '11'].map((d) => ({ player_id: 'u1', carried_date: `2026-11-${d}`, guest_id: 'fp1' }))
+    const { db } = makeFakeDb({
+      tables: { daily_word_wheel_attempts: [wheel('2026-11-12')], daily_streak_carryover: carried, daily_streak_milestone_claims: [] },
+    })
+    const res = await claimStreakMilestone(db as never, 'u1', '2026-11-12')
+    expect(res.body).toMatchObject({ claimed: true, days: 7 })
+  })
+
   it('Given the streak does not reach a new milestone, pays nothing', async () => {
     const { db } = makeFakeDb({ tables: { daily_word_wheel_attempts: [wheel('2026-11-12')], daily_streak_milestone_claims: [] } })
     expect((await claimStreakMilestone(db as never, 'u1', '2026-11-12')).status).toBe(400)

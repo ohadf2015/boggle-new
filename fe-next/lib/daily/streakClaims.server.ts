@@ -4,6 +4,7 @@ import { awardCoinsServer } from '@/backend/services/economy/awardCoins'
 import { loadChestActivity } from './weeklyChestData'
 import { computeCurrentStreak } from './weeklyChest'
 import { loadMilestoneClaims } from './streakExtras.server'
+import { loadCarriedDates } from './streakCarryover.server'
 import { claimableMilestone, FREEZE_PRICE, MAX_HELD_FREEZES } from './streakRewards'
 
 export interface ClaimResult {
@@ -17,10 +18,14 @@ export interface ClaimResult {
  * removes the row so a retry can pay.
  */
 export async function claimStreakMilestone(db: SupabaseClient, playerId: string, today: string): Promise<ClaimResult> {
-  const [{ allDates }, claims] = await Promise.all([loadChestActivity(db, playerId), loadMilestoneClaims(db, playerId)])
+  const [{ allDates }, carried, claims] = await Promise.all([
+    loadChestActivity(db, playerId),
+    loadCarriedDates(db, playerId),
+    loadMilestoneClaims(db, playerId),
+  ])
   if (!claims) return { status: 503, body: { error: 'Milestones unavailable' } }
 
-  const milestone = claimableMilestone(computeCurrentStreak(allDates, today), claims)
+  const milestone = claimableMilestone(computeCurrentStreak([...new Set([...allDates, ...carried])], today), claims)
   if (!milestone) return { status: 400, body: { error: 'Nothing to claim' } }
 
   const { error: insertError } = await db

@@ -17,6 +17,7 @@ import { computeCurrentStreak } from '@/lib/daily/weeklyChest';
 import { freezeDateToBridge } from '@/lib/daily/chestFreezeBridge';
 import { computeLongestConsecutiveStreak } from './longestStreakCalculator';
 import { catchUpStreakRepairs } from '@/utils/dailyChallenge/catchUp';
+import { loadCarriedDates } from '@/lib/daily/streakCarryover.server';
 
 export interface DailyPlayedStatus {
   today: {
@@ -90,7 +91,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         };
       };
 
-      const [hunt, wheel, towerRows, connectionRows, freezeCount] = await Promise.all([
+      const [hunt, wheel, towerRows, connectionRows, giftFreezes, earnedFreezes, frozenRows, carriedRows] = await Promise.all([
         supabase
           .from('daily_word_hunt_attempts')
           .select('puzzle_date, is_catchup')
@@ -121,11 +122,32 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
             const count = (data as { streak_freeze_count?: unknown } | null)?.streak_freeze_count;
             return typeof count === 'number' ? count : 0;
           }),
+        supabase
+          .from('player_engagement')
+          .select('streak_freezes_available')
+          .eq('player_id', userId)
+          .maybeSingle()
+          .then(({ data, error }) => {
+            if (error) throw error;
+            const count = (data as { streak_freezes_available?: unknown } | null)?.streak_freezes_available;
+            return typeof count === 'number' ? Math.max(0, count) : 0;
+          }),
+        supabase
+          .from('daily_streak_freezes')
+          .select('frozen_date')
+          .eq('player_id', userId)
+          .then(({ data, error }) => {
+            if (error) throw error;
+            return (data as { frozen_date: string }[] | null)?.map((r) => r.frozen_date) ?? [];
+          }),
+        loadCarriedDates(supabase, userId),
       ]);
+      const freezeCount = giftFreezes + earnedFreezes;
 
       const huntRows = hunt.live;
       const wheelRows = wheel.live;
-      const liveDates = [...huntRows, ...wheelRows, ...connectionRows];
+      // Frozen days and guest days carried over at signup hold the streak like played days.
+      const liveDates = [...huntRows, ...wheelRows, ...connectionRows, ...frozenRows, ...carriedRows];
       // Streak repair: a missed day replayed inside the catch-up window counts again.
       const repairs = catchUpStreakRepairs(liveDates, [...hunt.catchUp, ...wheel.catchUp], today);
       const allDates = Array.from(new Set([...liveDates, ...repairs])).sort();
