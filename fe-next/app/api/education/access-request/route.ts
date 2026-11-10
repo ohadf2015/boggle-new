@@ -34,14 +34,16 @@ export async function POST(req: Request) {
   try { body = await req.json(); } catch { return bad('invalid json'); }
 
   const { locale, school_or_org } = body || {};
-  // Access is granted on submit, so the form asks for nothing: role is an optional tap.
+  // Access is granted on submit; role is an optional tap, the reason is required free text.
   const rolePicked = body?.role !== undefined && body?.role !== null;
   const role = rolePicked ? body.role : 'teacher';
-  const use_case = body?.use_case ?? '';
+  const rawUseCase = body?.use_case;
 
   if (!ROLES.includes(role)) return bad('invalid role');
   if (!LOCALES.includes(locale)) return bad('invalid locale');
-  if (typeof use_case !== 'string' || use_case.length > 800) return bad('use_case must be at most 800 chars');
+  if (typeof rawUseCase !== 'string') return bad('use_case is required');
+  const use_case = rawUseCase.trim();
+  if (use_case.length < 10 || use_case.length > 800) return bad('use_case must be 10-800 chars');
   if (school_or_org && (typeof school_or_org !== 'string' || school_or_org.length > 200)) return bad('invalid school_or_org');
 
   const sb = await createClient();
