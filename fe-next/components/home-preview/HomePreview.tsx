@@ -64,11 +64,13 @@ export function HomePreview({ onPlay }: { onPlay?: () => void } = {}) {
       <div className="mx-auto mt-8 grid w-full max-w-md gap-8 px-4 lg:mt-14 lg:max-w-[1600px] lg:grid-cols-12 lg:gap-10 lg:px-14">
         <div className="flex flex-col gap-4 lg:col-span-7">
           <DailyBlock lang={language} t={tt} streak={streak} streakLoading={streakLoading} freezes={freezes ?? 0} />
-          <HomeAdventureCard />
           <WeeklyThemeCard lang={language} t={tt} source="home" compact />
         </div>
         <div className="lg:col-span-5">
           <FriendsBlock lang={language} t={tt} showAvatars={mounted} />
+        </div>
+        <div className="lg:col-span-12">
+          <HomeAdventureCard />
         </div>
         <div className="lg:col-span-12">
           <MoreGames lang={language} t={tt} hideAdventure />
