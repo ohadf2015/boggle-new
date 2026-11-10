@@ -190,31 +190,39 @@ describe('POST /api/education/access-request', () => {
     expect(res.status).toBe(400);
   });
 
-  describe('nothing to type: role and use case are optional', () => {
-    it('files the request with role teacher and an empty use case when neither is sent', async () => {
-      const res = await POST(mkReq({ locale: 'he' }));
+  describe('use case is required, role is optional', () => {
+    it.each([
+      ['missing', undefined],
+      ['empty', ''],
+      ['whitespace only', '          '],
+      ['under 10 chars', 'vocab'],
+      ['not a string', 42],
+    ])('400 and nothing filed when the reason is %s', async (_n, use_case) => {
+      const res = await POST(mkReq({ locale: 'he', ...(use_case === undefined ? {} : { use_case }) }));
+      expect(res.status).toBe(400);
+      expect(insertMock).not.toHaveBeenCalled();
+      expect(approveMock).not.toHaveBeenCalled();
+    });
+
+    it('files the request with role teacher and the trimmed reason when no role is sent', async () => {
+      const res = await POST(mkReq({ locale: 'he', use_case: '  Friday vocab battles with my class  ' }));
       expect(res.status).toBe(200);
       const row = insertMock.mock.calls[0][0] as any;
       expect(row.role).toBe('teacher');
-      expect(row.use_case).toBe('');
+      expect(row.use_case).toBe('Friday vocab battles with my class');
       expect(approveMock).toHaveBeenCalledTimes(1);
       expect(approveMock.mock.calls[0][0].values.trial_expires_at).toBeTruthy();
     });
 
     it('records whether the teacher picked a role, so the default does not read as a choice', async () => {
-      await POST(mkReq({ locale: 'en' }));
+      await POST(mkReq({ locale: 'en', use_case: validPayload.use_case }));
       const created = captureMock.mock.calls.map((c: any[]) => c[0]).find((e: any) => e.event === 'edu_access_request_created');
       expect(created.properties.role_picked).toBe(false);
       captureMock.mockClear();
-      await POST(mkReq({ locale: 'en', role: 'tutor' }));
+      await POST(mkReq({ locale: 'en', role: 'tutor', use_case: validPayload.use_case }));
       const again = captureMock.mock.calls.map((c: any[]) => c[0]).find((e: any) => e.event === 'edu_access_request_created');
       expect(again.properties.role).toBe('tutor');
       expect(again.properties.role_picked).toBe(true);
-    });
-
-    it('still accepts a short use case (no 10-character minimum)', async () => {
-      const res = await POST(mkReq({ ...validPayload, use_case: 'vocab' }));
-      expect(res.status).toBe(200);
     });
   });
 
@@ -222,7 +230,7 @@ describe('POST /api/education/access-request', () => {
     const completed = () => captureMock.mock.calls.map((c: any[]) => c[0]).filter((e: any) => e.event === 'edu_access_completed_to_class');
 
     it('fires once on a fresh approval, server-side, with where the teacher goes next', async () => {
-      await POST(mkReq({ locale: 'en' }));
+      await POST(mkReq({ locale: 'en', use_case: validPayload.use_case }));
       expect(completed()).toHaveLength(1);
       expect(completed()[0].distinctId).toBe('user-1');
       expect(completed()[0].properties).toMatchObject({ destination: 'class_setup', locale: 'en', $host: EDU_ANALYTICS_HOST });
@@ -230,30 +238,30 @@ describe('POST /api/education/access-request', () => {
 
     it('tags QA accounts so rigs never count as graded completions', async () => {
       mockUser = { ...verifiedUser(), email: 'rig1@lexiclash.test' };
-      await POST(mkReq({ locale: 'en' }));
+      await POST(mkReq({ locale: 'en', use_case: validPayload.use_case }));
       expect(completed()[0].properties.is_test_account).toBe(true);
       captureMock.mockClear();
       mockUser = verifiedUser();
-      await POST(mkReq({ locale: 'en' }));
+      await POST(mkReq({ locale: 'en', use_case: validPayload.use_case }));
       expect(completed()[0].properties.is_test_account).toBe(false);
     });
 
     it('a paid campaign teacher goes to the day-0 class', async () => {
       mockProfile = { ...mockProfile, utm_medium: 'paid' } as any;
-      const res = await POST(mkReq({ locale: 'en' }));
+      const res = await POST(mkReq({ locale: 'en', use_case: validPayload.use_case }));
       expect((await res.json()).paidDay0).toBe(true);
       expect(completed()[0].properties.destination).toBe('paid_class');
     });
 
     it('does not fire for an account that already had access', async () => {
       mockProfile = { display_name: 'Jane', user_role: 'teacher' };
-      await POST(mkReq({ locale: 'en' }));
+      await POST(mkReq({ locale: 'en', use_case: validPayload.use_case }));
       expect(completed()).toHaveLength(0);
     });
 
     it('does not fire when approval is still pending (202)', async () => {
       adminAvailable = false;
-      await POST(mkReq({ locale: 'en' }));
+      await POST(mkReq({ locale: 'en', use_case: validPayload.use_case }));
       expect(completed()).toHaveLength(0);
     });
   });

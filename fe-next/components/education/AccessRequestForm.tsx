@@ -17,6 +17,8 @@ const ROLE_OPTIONS: { value: TeacherAccessRole; emoji: string }[] = [
 ];
 
 const REFRESH_CAP_MS = 4000;
+const USE_CASE_MIN = 10;
+const USE_CASE_MAX = 800;
 
 const PRIMARY_CTA_CLASS =
   'group flex min-h-14 w-full items-center justify-center gap-3 rounded-neo border-neo-thick border-neo-black ' +
@@ -26,8 +28,9 @@ const PRIMARY_CTA_CLASS =
   'disabled:cursor-wait disabled:hover:translate-y-0 disabled:hover:shadow-hard-lg sm:text-xl';
 
 /**
- * The last step before class setup. Access is granted on submit, so nothing here is
- * required: role is an optional tap, and the server fills the rest from the account.
+ * The last step before class setup. Access is granted on submit. The reason is required
+ * free text (no preset answers), role is an optional tap, and the server fills the rest
+ * from the account.
  */
 export function AccessRequestForm({
   knownName,
@@ -37,12 +40,15 @@ export function AccessRequestForm({
   const { refreshProfile } = useAuth();
   const router = useRouter();
   const [role, setRole] = useState<TeacherAccessRole | null>(null);
+  const [useCase, setUseCase] = useState('');
   const [submitting, setSubmitting] = useState(false);
   // `submitting` disables the button only on the next render; two submits in one tick both pass it.
   const inFlight = useRef(false);
   const [error, setError] = useState<string | null>(null);
   const [approvalPending, setApprovalPending] = useState(false);
 
+  const useCaseLen = useCase.trim().length;
+  const useCaseOk = useCaseLen >= USE_CASE_MIN;
   const firstName = (knownName ?? '').trim().split(/\s+/)[0] || '';
 
   const handOff = (paidDay0: boolean, alreadyApproved: boolean) => {
@@ -65,7 +71,7 @@ export function AccessRequestForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (inFlight.current) return;
+    if (inFlight.current || !useCaseOk) return;
     inFlight.current = true;
     setError(null);
     setSubmitting(true);
@@ -74,7 +80,7 @@ export function AccessRequestForm({
       const res = await fetch('/api/education/access-request', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ locale: language as TeacherLocale, ...(role ? { role } : {}) }),
+        body: JSON.stringify({ locale: language as TeacherLocale, use_case: useCase.trim(), ...(role ? { role } : {}) }),
       });
       try {
         trackGrowthEvent('edu_access_request_submitted', { ok: res.ok, status: res.status });
@@ -126,6 +132,29 @@ export function AccessRequestForm({
           : t('education.access.greeting_noname')}
       </h2>
 
+      <div className="mt-5">
+        <label htmlFor="tar-use_case" className="block font-neo-display text-sm font-semibold text-neo-white/80">
+          {t('education.access.use_case_q')}
+        </label>
+        <p className="mt-0.5 text-sm text-neo-white/70">{t('education.access.use_case_hint')}</p>
+        <textarea
+          id="tar-use_case"
+          required
+          minLength={USE_CASE_MIN}
+          maxLength={USE_CASE_MAX}
+          rows={3}
+          value={useCase}
+          onChange={(e) => setUseCase(e.target.value)}
+          placeholder={t('education.access.use_case_placeholder')}
+          className="mt-2 w-full rounded-neo border-neo border-neo-cream/40 bg-neo-navy px-3 py-2 text-neo-white placeholder:text-neo-white/50 focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
+        />
+        <p className={`mt-1 text-xs ${useCaseOk ? 'text-neo-lime' : 'text-neo-white/70'}`}>
+          {useCaseOk
+            ? t('education.access.use_case_ready')
+            : t('education.access.use_case_remaining', { count: USE_CASE_MIN - useCaseLen })}
+        </p>
+      </div>
+
       <fieldset className="mt-5">
         <legend className="font-neo-display text-sm font-semibold text-neo-white/80">
           {t('education.access.role')} <span className="font-normal text-neo-white/60">· {t('common.optional')}</span>
@@ -159,7 +188,7 @@ export function AccessRequestForm({
           {error}
         </p>
       )}
-      <button type="submit" disabled={submitting} className={`mt-6 ${PRIMARY_CTA_CLASS}`}>
+      <button type="submit" disabled={submitting || !useCaseOk} className={`mt-6 ${PRIMARY_CTA_CLASS}`}>
         {submitting
           ? t('education.access.class_ready_creating')
           : t('education.trial.cta')}
