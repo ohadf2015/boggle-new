@@ -13,6 +13,8 @@ import { getPuzzleNumber } from '@/utils/dailyChallenge/dateUtils';
 import { parseRivalFromParams } from '@/utils/dailyChallenge/rivalChallenge';
 import { useDailyChallengeStatus } from '@/hooks/useDailyChallengeStatus';
 import { useDailyPlayedStatus } from '@/hooks/useDailyPlayedStatus';
+import { useStreakView } from '@/hooks/useStreakView';
+import { StreakCardConnected } from '@/components/streak/StreakCardConnected';
 import type { Language } from '@/types';
 import type { PendingChest } from '@/hooks/useWeeklyChest';
 
@@ -101,6 +103,7 @@ export function DailyChallengeLanding({
 
   const dailyStatus = useDailyChallengeStatus(currentLanguage);
   const dailyPlayedStatus = useDailyPlayedStatus();
+  const streakView = useStreakView();
 
   const [claimedChest, setClaimedChest] = useState<PendingChest | null>(null);
   const [boardOpen, setBoardOpen] = useState(false);
@@ -238,7 +241,7 @@ export function DailyChallengeLanding({
           </>
         )}
 
-        {dayCleared && <DailyAllClearCard streak={dailyPlayedStatus.streak.current} />}
+        {dayCleared && <DailyAllClearCard streak={streakView.current} />}
 
         {/* Primary hero card — the one mode to play right now, selected by pickPrimaryMode */}
         {primaryMode && (
@@ -282,6 +285,8 @@ export function DailyChallengeLanding({
               />
             ))}
         </div>
+
+        {!isNewcomer && <StreakCardConnected source="daily_hub" className="w-full" />}
         </>
       ) : (
         <div className="w-full flex flex-col gap-3" aria-hidden="true" data-testid="hub-status-skeleton">
@@ -319,7 +324,7 @@ export function DailyChallengeLanding({
       {claimedChest && (
         <WeeklyChestModal
           chest={claimedChest}
-          streak={dailyPlayedStatus.streak.current}
+          streak={streakView.current}
           onClose={() => setClaimedChest(null)}
         />
       )}

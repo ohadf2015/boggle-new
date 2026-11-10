@@ -8,6 +8,7 @@ import {
   findOwedChests,
 } from '@/lib/daily/weeklyChest'
 import { loadChestActivity } from '@/lib/daily/weeklyChestData'
+import { buildStreakBlock } from '@/lib/daily/streakExtras.server'
 import logger from '@/utils/logger'
 
 /**
@@ -43,7 +44,32 @@ export async function GET(request: NextRequest) {
 
     // One shared loader (also used by /claim) so status and claim can never
     // diverge on which days count.
-    const { huntRows, wheelRows, puzzleRows, allDates } = await loadChestActivity(supabase, user.id)
+    const activity = await loadChestActivity(supabase, user.id)
+    const { huntRows, wheelRows, puzzleRows } = activity
+
+    // Streak freezes in the bank, shown next to the streak so players know a
+    // missed day is covered. Best effort: a failed read shows none, never 500s.
+    let ownedFreezes = 0
+    try {
+      const { data: engagementRows } = await supabase
+        .from('player_engagement')
+        .select('streak_freezes_available')
+        .eq('player_id', user.id)
+      const raw = Array.isArray(engagementRows)
+        ? (engagementRows[0] as { streak_freezes_available?: number | null } | undefined)?.streak_freezes_available
+        : (engagementRows as { streak_freezes_available?: number | null } | null)?.streak_freezes_available
+      ownedFreezes = Number.isFinite(Number(raw)) ? Math.max(0, Math.trunc(Number(raw))) : 0
+    } catch (e) {
+      logger.warn(`Weekly chest status: freeze read failed: ${(e as Error).message}`)
+    }
+
+    const { block: streak, allDates, freezesAvailable } = await buildStreakBlock(
+      supabase,
+      user.id,
+      activity,
+      ownedFreezes,
+      today,
+    )
 
     // Pull every chest row this player owns so we can detect prior unclaimed
     // cycles — chests that became claimable but never got picked up before a
@@ -107,24 +133,9 @@ export async function GET(request: NextRequest) {
         }
       : null
 
-    // Streak freezes in the bank, shown next to the streak so players know a
-    // missed day is covered. Best effort: a failed read shows none, never 500s.
-    let freezesAvailable = 0
-    try {
-      const { data: engagementRows } = await supabase
-        .from('player_engagement')
-        .select('streak_freezes_available')
-        .eq('player_id', user.id)
-      const raw = Array.isArray(engagementRows)
-        ? (engagementRows[0] as { streak_freezes_available?: number | null } | undefined)?.streak_freezes_available
-        : (engagementRows as { streak_freezes_available?: number | null } | null)?.streak_freezes_available
-      freezesAvailable = Number.isFinite(Number(raw)) ? Math.max(0, Math.trunc(Number(raw))) : 0
-    } catch (e) {
-      logger.warn(`Weekly chest status: freeze read failed: ${(e as Error).message}`)
-    }
-
     return NextResponse.json({
       freezesAvailable,
+      streak,
       cycleStart: progress.cycleStart,
       cycleNumber: progress.cycleNumber,
       completedDates: progress.completedDates,

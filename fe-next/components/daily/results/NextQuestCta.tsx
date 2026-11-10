@@ -19,6 +19,7 @@ import type { Language } from '@/types';
 import { chainPips, markDailyHandoff, type ChainPip } from '@/components/daily/flow/dailyHandoff';
 import { useDailyReveal, useMountedAfterReveal } from './reveal/DailyRevealContext';
 import { DayPrizeReveal } from '@/components/daily/prize/DayPrizeReveal';
+import { StreakMilestonePopup } from '@/components/streak/StreakMilestonePopup';
 import { claimPopupSlot, releasePopupSlot } from '@/components/daily/prize/dayPrizeStore';
 import { prizeToPop, finishingClearsDay } from '@/components/daily/prize/prizeEligibility';
 import type { DayPrizeKind } from '@/lib/daily/dayPrize';
@@ -129,7 +130,12 @@ export function NextQuestCta({
     if (prizeKind) releasePopupSlot(prizeKind);
     setPrizeKind(null);
   };
-  const prizeBox = prizeKind ? <DayPrizeReveal kind={prizeKind} source={source} onClose={closePrize} /> : null;
+  const prizeBox = (
+    <>
+      {prizeKind && <DayPrizeReveal kind={prizeKind} source={source} onClose={closePrize} />}
+      <StreakMilestonePopup source={source} blocked={!settled || Boolean(prizeKind)} />
+    </>
+  );
 
   // Don't guess while the server answer is still in flight: rendering an
   // optimistic "play Word Wheel" that flips to "all clear" a moment later is

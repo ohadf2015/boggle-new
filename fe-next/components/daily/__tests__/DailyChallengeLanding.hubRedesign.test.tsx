@@ -37,6 +37,12 @@ vi.mock('@/hooks/useDailyPlayedStatus', () => ({
   }),
 }));
 
+vi.mock('@/hooks/useStreakView', () => ({
+  useStreakView: () => ({
+    loading: false, isGuest: false, current: 7, playedToday: false, atRisk: false, freezes: 0,
+    week: [], milestone: null, freezeSaved: null, refresh: vi.fn(),
+  }),
+}));
 vi.mock('@/utils/dailyChallenge/storage', () => ({
   hasPlayedWordWheelToday: vi.fn(() => false),
 }));

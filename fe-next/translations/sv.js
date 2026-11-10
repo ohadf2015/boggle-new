@@ -18571,7 +18571,52 @@ const sv = {
     "badge": "{count} dagars svit",
     "freezeReady": "Svitskydd redo: en missad dag bryter inte sviten",
     "freezeUsed": "Svitskyddet räddade din svit!",
-    "streak_freeze_toast_message": "Svitskydd använt: {day} räddad · {remaining} kvar"
+    "streak_freeze_toast_message": "Svitskydd använt: {day} räddad · {remaining} kvar",
+    "flame": {
+      "dayStreak": "dagars svit",
+      "tier": {
+        "none": "Inte tänd än",
+        "ember": "Nyss tänd",
+        "flame": "I full fart",
+        "blue": "Blåglödande",
+        "violet": "Supernova",
+        "legendary": "Legendarisk"
+      },
+      "atRisk": "Spela i dag så håller din svit på {n} dagar",
+      "safe": "Sviten är säker för i dag",
+      "start": "Spela en daglig utmaning för att tända din svit",
+      "week": "Den här veckan",
+      "day": {
+        "played": "spelad",
+        "frozen": "räddad av ett svitskydd",
+        "missed": "missad",
+        "today": "i dag",
+        "future": "kommer snart"
+      },
+      "rewardAt": "Belöning vid {days} dagar",
+      "toGo": "{n} kvar",
+      "maxed": "Alla svitbelöningar är dina. Håll elden vid liv!",
+      "freezesLabel": "Svitskydd: {n} av {max}",
+      "claimReady": "Hämta belöningen för {days} dagar: +{coins}",
+      "heroNext": "{n} kvar till belöningen vid {days} dagar: +{coins} mynt",
+      "milestoneEyebrow": "Svitbelöning",
+      "milestoneTitle": "{days} dagar i rad!",
+      "milestoneBody": "Du har kommit tillbaka {days} dagar i rad. Det här är till dig.",
+      "claim": "Hämta +{coins} mynt",
+      "claiming": "Hämtar…",
+      "paid": "+{coins} mynt",
+      "collect": "Snyggt!",
+      "later": "Senare",
+      "claimFailed": "Det gick inte. Försök igen.",
+      "freezeTitle": "Svitskydd",
+      "freezeBody": "Missar du en dag hoppar ett svitskydd in av sig självt och sviten fortsätter.",
+      "needCoins": "Ett svitskydd kostar {price} mynt. Spela lite till och kom tillbaka.",
+      "freezeFull": "Du har redan så många svitskydd du kan ha.",
+      "buyFailed": "Det gick inte att köpa just nu. Försök igen.",
+      "signInForFreezes": "Logga in för att köpa svitskydd",
+      "buying": "Köper…",
+      "buy": "Köp ett för {price}"
+    }
   },
   "notifications": {
     "title": "Aviseringar",

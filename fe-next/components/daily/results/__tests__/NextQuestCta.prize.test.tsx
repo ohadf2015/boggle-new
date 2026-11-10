@@ -15,6 +15,9 @@ const playedStatus = {
   streak: { current: 1, longest: 1 }, loading: false, refresh: vi.fn(),
 };
 vi.mock('@/hooks/useDailyPlayedStatus', () => ({ useDailyPlayedStatus: () => playedStatus }));
+vi.mock('@/components/streak/StreakMilestonePopup', () => ({
+  StreakMilestonePopup: ({ blocked }: { blocked: boolean }) => <span data-testid="milestone-popup" data-blocked={String(blocked)} />,
+}));
 
 import { NextQuestCta, PRIZE_POP_DELAY_MS } from '../NextQuestCta';
 
@@ -33,8 +36,10 @@ describe('NextQuestCta prize box', () => {
   it('pops the day-clear box once after the second required quest, and still offers the next quest', () => {
     const { unmount } = render(<NextQuestCta justFinished="word-hunt" currentLanguage="en" />);
     expect(screen.queryByTestId('day-prize-reveal')).toBeNull();
+    expect(screen.getByTestId('milestone-popup').getAttribute('data-blocked')).toBe('false');
     act(() => { vi.advanceTimersByTime(PRIZE_POP_DELAY_MS + 10); });
     expect(screen.getByTestId('day-prize-reveal').getAttribute('data-phase')).toBe('closed');
+    expect(screen.getByTestId('milestone-popup').getAttribute('data-blocked')).toBe('true');
     expect(screen.getByTestId('next-quest-cta').getAttribute('data-next-mode')).toBe('connections');
     unmount();
 

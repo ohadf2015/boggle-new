@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import StreakBadge from '../StreakBadge';
 
-let mockAccountStreak = { streak: 0, loading: false };
+let mockAccountStreak: { streak: number; loading: boolean; isGuest?: boolean; freezes?: number } = { streak: 0, loading: false };
 let mockRetention = { streak: 0, best: 0, freezeAvailable: false };
 
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -53,12 +53,23 @@ describe('StreakBadge', () => {
     expect(screen.queryByTestId('streak-badge')).toBeNull();
   });
 
-  it('still shows the freeze pip from the device-local retention state', () => {
-    mockAccountStreak = { streak: 4, loading: false };
+  it('for a guest, shows the freeze pip from the device-local weekly freeze', () => {
+    mockAccountStreak = { streak: 4, loading: false, isGuest: true, freezes: 0 };
     mockRetention = { streak: 4, best: 4, freezeAvailable: true };
 
     render(<StreakBadge />);
 
+    expect(screen.getByTestId('streak-freeze-pip')).toBeInTheDocument();
+  });
+
+  it('for a signed-in player, shows the pip only when the account banks a freeze (same count as the freeze shop)', () => {
+    mockAccountStreak = { streak: 4, loading: false, isGuest: false, freezes: 0 };
+    mockRetention = { streak: 4, best: 4, freezeAvailable: true };
+    const { unmount } = render(<StreakBadge />);
+    expect(screen.queryByTestId('streak-freeze-pip')).toBeNull();
+    unmount();
+    mockAccountStreak = { streak: 4, loading: false, isGuest: false, freezes: 1 };
+    render(<StreakBadge />);
     expect(screen.getByTestId('streak-freeze-pip')).toBeInTheDocument();
   });
 });

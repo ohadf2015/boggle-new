@@ -107,6 +107,13 @@ describe('PlayHero', () => {
     expect(screen.getByTestId('hp-chip-daily').textContent).toContain('4-day streak');
   });
 
+  it('given the streak is at risk, then the daily chip says to play today to keep it, with a worried flame', () => {
+    renderHero({ streak: 4, atRisk: true });
+    const chip = screen.getByTestId('hp-chip-daily');
+    expect(chip.textContent).toContain('Play today to keep your 4-day streak');
+    expect(chip.querySelector('[data-testid="streak-flame"]')?.getAttribute('data-mood')).toBe('worried');
+  });
+
   it('given the streak is loading, then the daily chip shows no streak number yet', () => {
     renderHero({ streak: 4, streakLoading: true });
     expect(screen.getByTestId('hp-chip-daily').textContent).not.toContain('streak');

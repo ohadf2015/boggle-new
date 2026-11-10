@@ -16544,7 +16544,52 @@ const en = {
     "badge": "{count}-day streak",
     "freezeReady": "Streak freeze ready. One missed day won't break your streak",
     "freezeUsed": "Streak freeze saved your streak!",
-    "streak_freeze_toast_message": "Streak Freeze used: {day} saved · {remaining} left"
+    "streak_freeze_toast_message": "Streak Freeze used: {day} saved · {remaining} left",
+    "flame": {
+      "dayStreak": "day streak",
+      "tier": {
+        "none": "Not lit yet",
+        "ember": "Just lit",
+        "flame": "On fire",
+        "blue": "Blue-hot",
+        "violet": "Supernova",
+        "legendary": "Legendary"
+      },
+      "atRisk": "Play today to keep your {n}-day streak",
+      "safe": "Streak safe for today",
+      "start": "Play any daily to light your streak",
+      "week": "This week",
+      "day": {
+        "played": "played",
+        "frozen": "saved by a freeze",
+        "missed": "missed",
+        "today": "today",
+        "future": "coming up"
+      },
+      "rewardAt": "{days}-day reward",
+      "toGo": "{n} to go",
+      "maxed": "Every streak reward is yours. Keep it burning!",
+      "freezesLabel": "Streak freezes: {n} of {max}",
+      "claimReady": "Claim your {days}-day reward: +{coins}",
+      "heroNext": "{n} to go until the {days}-day reward: +{coins} coins",
+      "milestoneEyebrow": "Streak reward",
+      "milestoneTitle": "{days}-day streak!",
+      "milestoneBody": "You came back {days} days in a row. Here's something for that.",
+      "claim": "Claim +{coins} coins",
+      "claiming": "Claiming…",
+      "paid": "+{coins} coins",
+      "collect": "Nice!",
+      "later": "Later",
+      "claimFailed": "That didn't go through. Try again.",
+      "freezeTitle": "Streak freeze",
+      "freezeBody": "Miss a day and a freeze steps in on its own, so your streak keeps going.",
+      "needCoins": "A freeze costs {price} coins. Play a few more games and come back.",
+      "freezeFull": "You're holding as many freezes as you can.",
+      "buyFailed": "Couldn't buy that right now. Try again.",
+      "signInForFreezes": "Sign in to buy freezes",
+      "buying": "Buying…",
+      "buy": "Buy one for {price}"
+    }
   },
   "notifications": {
     "title": "Notifications",

@@ -48,6 +48,12 @@ vi.mock('@/hooks/useDailyPlayedStatus', () => ({
   useDailyPlayedStatus: () => played,
 }));
 
+vi.mock('@/hooks/useStreakView', () => ({
+  useStreakView: () => ({
+    loading: false, isGuest: false, current: 6, playedToday: false, atRisk: false, freezes: 0,
+    week: [], milestone: null, freezeSaved: null, refresh: vi.fn(),
+  }),
+}));
 vi.mock('@/hooks/useTiltEffect', () => ({
   useTiltEffect: () => ({
     ref: { current: null },

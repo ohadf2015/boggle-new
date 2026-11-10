@@ -18114,7 +18114,52 @@ const he = {
     "badge": "רצף של {count} ימים",
     "freezeReady": "הקפאת רצף מוכנה: יום אחד שפוספס לא ישבור את הרצף",
     "freezeUsed": "הקפאת הרצף הצילה את הרצף!",
-    "streak_freeze_toast_message": "הקפאת רצף הופעלה, {day} נשמר · נותרו {remaining}"
+    "streak_freeze_toast_message": "הקפאת רצף הופעלה, {day} נשמר · נותרו {remaining}",
+    "flame": {
+      "dayStreak": "ימי רצף",
+      "tier": {
+        "none": "עוד לא נדלק",
+        "ember": "רק נדלק",
+        "flame": "בוער",
+        "blue": "לוהט בכחול",
+        "violet": "סופרנובה",
+        "legendary": "אגדי"
+      },
+      "atRisk": "שחקו היום כדי לשמור על רצף של {n} ימים",
+      "safe": "הרצף בטוח להיום",
+      "start": "שחקו אתגר יומי כדי להדליק את הרצף",
+      "week": "השבוע",
+      "day": {
+        "played": "שוחק",
+        "frozen": "נשמר בהקפאה",
+        "missed": "פוספס",
+        "today": "היום",
+        "future": "בהמשך"
+      },
+      "rewardAt": "פרס {days} ימים",
+      "toGo": "עוד {n}",
+      "maxed": "כל פרסי הרצף כבר אצלכם. תמשיכו לבעור!",
+      "freezesLabel": "הקפאות רצף: {n} מתוך {max}",
+      "claimReady": "לקבל את פרס {days} הימים: {coins}+",
+      "heroNext": "עוד {n} עד פרס {days} הימים: {coins}+ מטבעות",
+      "milestoneEyebrow": "פרס רצף",
+      "milestoneTitle": "רצף של {days} ימים!",
+      "milestoneBody": "חזרתם {days} ימים ברצף. הנה משהו קטן על זה.",
+      "claim": "לקבל {coins}+ מטבעות",
+      "claiming": "רגע…",
+      "paid": "{coins}+ מטבעות",
+      "collect": "יש!",
+      "later": "אחר כך",
+      "claimFailed": "זה לא עבר. נסו שוב.",
+      "freezeTitle": "הקפאת רצף",
+      "freezeBody": "פספסתם יום? ההקפאה נכנסת לבד והרצף ממשיך.",
+      "needCoins": "הקפאה עולה {price} מטבעות. שחקו עוד קצת וחזרו.",
+      "freezeFull": "יש לכם כבר את מספר ההקפאות המקסימלי.",
+      "buyFailed": "לא הצלחנו לקנות כרגע. נסו שוב.",
+      "signInForFreezes": "התחברו כדי לקנות הקפאות",
+      "buying": "קונים…",
+      "buy": "לקנות ב-{price}"
+    }
   },
   "notifications": {
     "title": "התראות",
