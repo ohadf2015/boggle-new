@@ -10191,6 +10191,7 @@ const he = {
     "invalidLetters": "ניתן להשתמש רק באותיות הגלגל",
     "allLettersUsed": "כל האותיות!",
     "almostAllLetters": "כמעט הכל!",
+    "missingLetter": "חסרה: {letter}",
     "streakBadge": "{count} ברצף!",
     "onFireBadge": "{count} על האש!",
     "closeRace": "מרוץ צמוד",

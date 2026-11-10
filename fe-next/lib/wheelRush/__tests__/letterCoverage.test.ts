@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { classifyLetterCoverage } from '../letterCoverage';
+import { classifyLetterCoverage, missingWheelLetter } from '../letterCoverage';
 
 describe('classifyLetterCoverage', () => {
   // 7-letter wheel: center A + C T R S N E
@@ -37,5 +37,30 @@ describe('classifyLetterCoverage', () => {
   it('returns none for empty inputs', () => {
     expect(classifyLetterCoverage('', wheel)).toBe('none');
     expect(classifyLetterCoverage('CRANE', [])).toBe('none');
+  });
+});
+
+describe('missingWheelLetter', () => {
+  const wheel = ['A', 'C', 'T', 'R', 'S', 'N', 'E'];
+
+  it('names the one wheel letter an almost-pangram left out', () => {
+    expect(missingWheelLetter('CANTER', wheel)).toBe('S');
+  });
+
+  it('is case-insensitive and ignores repeated letters', () => {
+    expect(missingWheelLetter('cantere', wheel)).toBe('S');
+  });
+
+  it('is null for a full pangram (nothing missing)', () => {
+    expect(missingWheelLetter('CANTERS', wheel)).toBeNull();
+  });
+
+  it('is null when more than one letter is missing, so no misleading hint is shown', () => {
+    expect(missingWheelLetter('CRANE', wheel)).toBeNull();
+  });
+
+  it('is null for an empty word or an empty wheel', () => {
+    expect(missingWheelLetter('', wheel)).toBeNull();
+    expect(missingWheelLetter('CANTER', [])).toBeNull();
   });
 });

@@ -19,7 +19,7 @@ import { MyWordsChips, type WordEntry } from './WheelRushPieces';
 import WheelPassToasts from '@/components/daily/wheel/WheelPassToasts';
 import { WheelRushHeader } from './WheelRushHeader';
 import { WheelRushCelebration, type WheelCelebration } from './WheelRushCelebration';
-import { classifyLetterCoverage } from '@/lib/wheelRush/letterCoverage';
+import { classifyLetterCoverage, missingWheelLetter } from '@/lib/wheelRush/letterCoverage';
 import { selectClosestRival } from '@/lib/wheelRush/closestRival';
 import { selectWheelRadius } from '@/lib/wordWheel/wheelGeometry';
 import { fireConfetti } from '@/utils/confettiUtils';
@@ -137,7 +137,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   // (WordWheelPixiRing already supports it; daily-challenge wires it, Wheel Rush never did).
   const [comboLevel, setComboLevel] = useState(0);
   // Ref-bridged so the once-bound socket onResult closure can reach the latest trigger.
-  const celebrateRef = useRef<(tier: 'all' | 'almost', word: string) => void>(() => {});
+  const celebrateRef = useRef<(tier: 'all' | 'almost', word: string, missingLetter?: string | null) => void>(() => {});
 
   const { floatingReactions, dismissReaction } = useQuickReactions({ socket, username });
 
@@ -306,9 +306,9 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   // all-but-one) distinct wheel letters, mirroring the daily-challenge pangram
   // beat. Single keyed state so a second pangram replaces (re-animates) rather
   // than queues. fireConfetti self-gates on reduced-motion/low-end devices.
-  const triggerCelebration = useCallback((tier: 'all' | 'almost', word: string) => {
+  const triggerCelebration = useCallback((tier: 'all' | 'almost', word: string, missingLetter?: string | null) => {
     wheelStreakRef.current = tier === 'all' ? wheelStreakRef.current + 1 : 0;
-    setCelebration({ tier, word, key: Date.now(), streak: wheelStreakRef.current });
+    setCelebration({ tier, word, key: Date.now(), streak: wheelStreakRef.current, missingLetter: missingLetter ?? undefined });
     playLegendaryWordSound?.();
     haptic([50, 30, 50, 30, 80]);
     fireConfetti({
@@ -391,7 +391,10 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
         setComboLevel(c => c + 1);
       }
       const coverage = classifyLetterCoverage(data.word, pz?.allLetters ?? []);
-      if (coverage !== 'none') celebrateRef.current(coverage, data.word);
+      if (coverage !== 'none') {
+        const missingLetter = coverage === 'almost' ? missingWheelLetter(data.word, pz?.allLetters ?? []) : null;
+        celebrateRef.current(coverage, data.word, missingLetter);
+      }
       accSfx();
       haptic(20);
       setBuiltLetters([]);

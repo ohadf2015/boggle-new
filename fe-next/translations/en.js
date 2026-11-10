@@ -9664,6 +9664,7 @@ const en = {
     "invalidLetters": "Wheel letters only",
     "allLettersUsed": "ALL LETTERS!",
     "almostAllLetters": "ALMOST ALL!",
+    "missingLetter": "Missing: {letter}",
     "streakBadge": "{count} in a row!",
     "onFireBadge": "{count} on fire!",
     "closeRace": "Close race",

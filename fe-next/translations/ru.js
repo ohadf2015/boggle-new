@@ -17063,6 +17063,7 @@ const ru = {
     "invalidLetters": "Можно использовать только буквы колеса",
     "allLettersUsed": "ВСЕ БУКВЫ!",
     "almostAllLetters": "ПОЧТИ ВСЕ!",
+    "missingLetter": "Не хватает: {letter}",
     "streakBadge": "{count} подряд!",
     "onFireBadge": "{count} подряд, в ударе!",
     "closeRace": "Плотная гонка",

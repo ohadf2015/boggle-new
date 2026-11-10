@@ -10263,6 +10263,7 @@ const ja = {
     "invalidLetters": "ホイールの文字のみ使用できます",
     "allLettersUsed": "全文字使用！",
     "almostAllLetters": "あと一文字！",
+    "missingLetter": "不足: {letter}",
     "streakBadge": "{count}連続！",
     "onFireBadge": "{count}連続、絶好調！",
     "closeRace": "接戦中",

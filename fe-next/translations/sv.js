@@ -10571,6 +10571,7 @@ const sv = {
     "invalidLetters": "Kan bara använda hjulets bokstäver",
     "allLettersUsed": "ALLA BOKSTÄVER!",
     "almostAllLetters": "NÄSTAN ALLA!",
+    "missingLetter": "Saknas: {letter}",
     "streakBadge": "{count} i rad!",
     "onFireBadge": "{count} i rad – glödhett!",
     "closeRace": "Jämn kamp",

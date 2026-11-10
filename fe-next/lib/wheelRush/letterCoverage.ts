@@ -24,3 +24,14 @@ export function classifyLetterCoverage(word: string, allLetters: string[]): Lett
   if (distinctUsed === total - 1 && distinctUsed >= 5) return 'almost';
   return 'none';
 }
+
+/**
+ * The one wheel letter a word left out, for the "almost all" hint. Null unless exactly
+ * one distinct wheel letter is missing, so a hint never names a wrong or vague letter.
+ */
+export function missingWheelLetter(word: string, allLetters: string[]): string | null {
+  if (!word) return null;
+  const used = new Set(word.toUpperCase());
+  const missing = [...new Set(allLetters.map(l => l.toUpperCase()))].filter(l => !used.has(l));
+  return missing.length === 1 ? missing[0] : null;
+}

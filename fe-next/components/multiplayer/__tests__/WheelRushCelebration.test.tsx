@@ -35,6 +35,18 @@ describe('WheelRushCelebration', () => {
     expect(screen.getByTestId('wheel-celebration').textContent).toContain('wordWheel.almostAllLetters');
   });
 
+  it('names the missing letter on an almost-all banner, and only there', () => {
+    const tp = (k: string, p?: Record<string, string | number>) => (p ? `${k}:${p.letter}` : k);
+    const { rerender } = render(
+      <WheelRushCelebration celebration={{ tier: 'almost', word: 'CANTER', key: 3, missingLetter: 'S' }} t={tp} prefersReduced={false} />,
+    );
+    expect(screen.getByTestId('wheel-celebration').textContent).toContain('wordWheel.missingLetter:S');
+    rerender(<WheelRushCelebration celebration={{ tier: 'almost', word: 'CANTER', key: 4 }} t={tp} prefersReduced={false} />);
+    expect(screen.getByTestId('wheel-celebration').textContent).not.toContain('wordWheel.missingLetter');
+    rerender(<WheelRushCelebration celebration={{ tier: 'all', word: 'CANTERS', key: 5, missingLetter: 'S' }} t={tp} prefersReduced={false} />);
+    expect(screen.getByTestId('wheel-celebration').textContent).not.toContain('wordWheel.missingLetter');
+  });
+
   it('shows the base streak badge below the on-fire threshold', () => {
     render(
       <WheelRushCelebration

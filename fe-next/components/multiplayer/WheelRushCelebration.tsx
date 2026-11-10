@@ -15,6 +15,8 @@ export interface WheelCelebration {
   streak?: number;
   /** Points the word scored, shown on the banner when it replaces the praise pill. */
   points?: number;
+  /** The single wheel letter an 'almost' word left out; shown as a hint on that tier only. */
+  missingLetter?: string;
 }
 
 interface Props {
@@ -78,6 +80,11 @@ export const WheelRushCelebration: React.FC<Props> = ({ celebration, t, prefersR
             <span dir="auto" className="font-neo-body font-bold text-sm uppercase tracking-widest opacity-80">
               {celebration.word}
             </span>
+            {celebration.tier === 'almost' && celebration.missingLetter && (
+              <span className="font-neo-display font-black text-xs uppercase tracking-wide bg-neo-black text-neo-yellow px-2 py-0.5 rounded-neo">
+                {t('wordWheel.missingLetter', { letter: celebration.missingLetter })}
+              </span>
+            )}
             {celebration.points !== undefined && (
               <span className="px-2 py-0.5 rounded-full border-2 border-neo-black bg-neo-black text-neo-lime font-neo-display font-black text-sm tabular-nums">
                 +{celebration.points}
