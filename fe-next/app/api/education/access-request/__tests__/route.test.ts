@@ -1,4 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+const notifyAdmins = vi.fn(async (_n: unknown) => true);
+vi.mock('@/lib/admin/adminNotifications', () => ({ notifyAdmins: (n: unknown) => notifyAdmins(n) }));
+
 import { POST } from '../route';
 import { EDU_ANALYTICS_HOST } from '@/backend/utils/educationTelemetry';
 
@@ -118,6 +121,25 @@ describe('POST /api/education/access-request', () => {
     sendEmailMock = vi.fn(async () => ({ ok: true, error: undefined }));
     captureMock = vi.fn();
     posthogThrows = false;
+  });
+
+  it('tells the admin bell about a new teacher whose trial started', async () => {
+    await POST(mkReq(validPayload));
+    expect(notifyAdmins).toHaveBeenCalledTimes(1);
+    expect(notifyAdmins).toHaveBeenCalledWith(expect.objectContaining({ kind: 'teacher_request', body: expect.stringContaining('trial started') }));
+  });
+
+  it('tells the admin bell when a request is left pending, so it is not lost silently', async () => {
+    adminAvailable = false;
+    await POST(mkReq(validPayload));
+    expect(notifyAdmins).toHaveBeenCalledTimes(1);
+    expect(notifyAdmins).toHaveBeenCalledWith(expect.objectContaining({ title: expect.stringContaining('Teacher request waiting') }));
+  });
+
+  it('does not notify for an account that already has access', async () => {
+    mockProfile = { display_name: 'Jane Doe', user_role: 'teacher' };
+    await POST(mkReq(validPayload));
+    expect(notifyAdmins).not.toHaveBeenCalled();
   });
 
   it('200 for a signed-up, email-verified user and fires edu_access_request_created', async () => {

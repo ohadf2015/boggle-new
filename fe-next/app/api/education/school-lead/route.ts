@@ -6,6 +6,8 @@ import { sendEmail } from '@/lib/email/send';
 import { schoolLeadAdminNotify } from '@/lib/email/templates/schoolLeadAdminNotify';
 import { validateSchoolLeadPayload } from '@/lib/education/schoolLead';
 import { SCHOOL_LEAD_NOTIFY_TO } from '@/lib/education/schoolLeadNotify';
+import { notifyAdmins } from '@/lib/admin/adminNotifications';
+import { schoolLeadNotice } from '@/lib/admin/adminEvents';
 
 function bad(msg: string, status = 400) {
   return NextResponse.json({ ok: false, error: msg }, { status });
@@ -43,6 +45,8 @@ export async function POST(req: Request) {
     console.error('[school-lead] insert failed:', ins.error.message);
     return bad('could not submit right now, please try again', 500);
   }
+
+  await notifyAdmins(schoolLeadNotice(lead));
 
   const submittedAt = new Date().toISOString();
   const tpl = schoolLeadAdminNotify({ ...lead, submittedAt });

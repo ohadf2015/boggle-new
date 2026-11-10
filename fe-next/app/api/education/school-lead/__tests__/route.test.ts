@@ -26,6 +26,8 @@ vi.mock('@/utils/supabase/admin', () => ({
 }));
 
 vi.mock('@/lib/email/send', () => ({ sendEmail: h.sendEmailSpy }));
+const notifyAdmins = vi.fn(async (_n: unknown) => true);
+vi.mock('@/lib/admin/adminNotifications', () => ({ notifyAdmins: (n: unknown) => notifyAdmins(n) }));
 
 import { POST } from '../route';
 import { SCHOOL_LEAD_NOTIFY_TO } from '@/lib/education/schoolLeadNotify';
@@ -51,6 +53,18 @@ const valid = {
 };
 
 describe('POST /api/education/school-lead', () => {
+  it('tells the admin bell, high priority for a big school asking about pricing', async () => {
+    const res = await POST(mkReq(valid));
+    expect(res.status).toBe(200);
+    expect(notifyAdmins).toHaveBeenCalledWith(expect.objectContaining({ kind: 'school_lead', severity: 'high', title: 'School lead: Lincoln High School' }));
+  });
+
+  it('does not notify when the lead is rate limited', async () => {
+    h.rateLimited = true;
+    await POST(mkReq(valid));
+    expect(notifyAdmins).not.toHaveBeenCalled();
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
     h.rateLimited = false;

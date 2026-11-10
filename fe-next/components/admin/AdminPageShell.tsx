@@ -15,6 +15,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import Header from '@/components/Header';
+import { AdminNotificationBell } from '@/components/admin/AdminNotificationBell';
 import { AdminSidebar } from '@/components/admin/sidebar/AdminSidebar';
 import { AdminBottomNav } from '@/components/admin/sidebar/AdminBottomNav';
 import { AdminSubNav } from '@/components/admin/sidebar/AdminSubNav';
@@ -49,6 +50,7 @@ export function AdminPageShell({ children }: { children: ReactNode }) {
         </main>
       </div>
       <AdminBottomNav />
+      <AdminNotificationBell />
     </div>
   );
 }

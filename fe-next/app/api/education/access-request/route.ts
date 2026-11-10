@@ -11,6 +11,8 @@ import { isPaidMedium } from '@/lib/education/paidDay0';
 import { testEmailReason } from '@/lib/education/checkoutTrafficTags';
 import { buildEduAccessRequestCreatedEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer';
 import type { TeacherAccessFormPayload } from '@/lib/education/types';
+import { notifyAdmins } from '@/lib/admin/adminNotifications';
+import { teacherRequestNotice } from '@/lib/admin/adminEvents';
 
 const ROLES = ['teacher', 'tutor', 'admin', 'parent', 'researcher', 'other'] as const;
 const LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
@@ -105,6 +107,12 @@ export async function POST(req: Request) {
   // submits, so insert errors are real and should not be silently tolerated.
   if (ins.error) return bad('insert failed: ' + ins.error.message, 500);
 
+  // Every early exit below leaves the request pending; the owner still has to hear about it.
+  const pendingAndTell = async () => {
+    await notifyAdmins(teacherRequestNotice({ full_name, role, school_or_org, country, autoApproved: false }));
+    return pendingApproval();
+  };
+
   // Growth Radar server step: record request creation once durably inserted.
   try {
     captureProFunnelServerEvent(
@@ -126,7 +134,7 @@ export async function POST(req: Request) {
   const admin = createAdminClient();
   if (!admin) {
     console.error('[access-request] service role key not configured — request left pending for', email);
-    return pendingApproval();
+    return pendingAndTell();
   }
 
   const trialExpiresAt = teacherTrialExpiry(Date.now());
@@ -141,7 +149,7 @@ export async function POST(req: Request) {
   // (or the idempotency guard short-circuited), so the approval should match.
   if (approve.error) {
     console.error('[access-request] approval failed for', email, '-', approve.error.message);
-    return pendingApproval();
+    return pendingAndTell();
   }
   if (!approve.data?.length) {
     // The racing twin request approved the row first — a double-submit
@@ -156,7 +164,7 @@ export async function POST(req: Request) {
       .limit(1);
     if (!already?.length) {
       console.error('[access-request] approval matched no pending row and no approved twin for', email);
-      return pendingApproval();
+      return pendingAndTell();
     }
     return NextResponse.json({ ok: true, success: true, paidDay0: isPaidMedium(profile?.utm_medium) });
   }
@@ -164,11 +172,11 @@ export async function POST(req: Request) {
   const promoted = await admin.from('profiles').update({ user_role: 'teacher' }).eq('id', user.id).select('id');
   if (promoted.error) {
     console.error('[access-request] profile promotion failed for', email, '-', promoted.error.message);
-    return pendingApproval();
+    return pendingAndTell();
   }
   if (!promoted.data?.length) {
     console.error('[access-request] profile promotion matched no row for', email);
-    return pendingApproval();
+    return pendingAndTell();
   }
 
   // Admin notify is best-effort like the confirmation below, but never
@@ -178,6 +186,7 @@ export async function POST(req: Request) {
   if (!notified.ok) {
     console.error('[access-request] admin notify email failed -', notified.error);
   }
+  await notifyAdmins(teacherRequestNotice({ full_name, role, school_or_org, country, autoApproved: true }));
 
   // Confirmation email is best-effort — the approval (DB state) is the source
   // of truth and must not be undone by a flaky mail provider, so failures

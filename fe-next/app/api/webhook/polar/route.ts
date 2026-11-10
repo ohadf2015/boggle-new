@@ -19,6 +19,8 @@ import { withPolarMetadataIdentity } from '@/lib/education/checkoutAnalyticsIden
 import type { EduServerEvent } from '@/backend/utils/educationTelemetry'
 import { buildProCheckoutSucceededEvent, buildProTrialSucceededEvent, buildTrialActivatedEvent, buildTrialStartEvent, buildTeacherTrialStartedEvent, buildCheckoutCompleteEvent, buildPaidEvent, buildTeacherTrialConvertedEvent, buildTrialExpiredEvent, buildTrialStartedEvent, buildTeacherProUpgradedEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer'
 import { isPolarTrialLapse } from '@/lib/education/polarTrial'
+import { notifyAdmins } from '@/lib/admin/adminNotifications'
+import { proNotice } from '@/lib/admin/adminEvents'
 
 // Polar payloads are large; we only read a handful of fields.
 type WebhookPayload = any
@@ -369,6 +371,21 @@ function trackCheckoutStatus(eventType: string, payload: WebhookPayload, userId?
   }
 }
 
+/** Tell the owner about a Pro subscription change. Never throws and never blocks the webhook. */
+async function tellAdminsAboutPro(payload: WebhookPayload, event: 'trial' | 'paid' | 'ended') {
+  if (getTierFromProductId(getProductId(payload)) !== 'pro') return
+  const data = payload?.data ?? {}
+  try {
+    await notifyAdmins(proNotice({
+      event,
+      email: data.customer?.email ?? null,
+      subscriptionId: data.id != null ? String(data.id) : null,
+    }))
+  } catch (err) {
+    console.error('[Polar] admin notification threw:', err)
+  }
+}
+
 async function handleSubscriptionActive(payload: WebhookPayload, userId?: string) {
   if (!userId) {
     console.warn('[Polar] subscription active — no user_id in metadata/customer.external_id')
@@ -385,6 +402,7 @@ async function handleSubscriptionActive(payload: WebhookPayload, userId?: string
     cancelAtPeriodEnd: Boolean(data.cancel_at_period_end ?? false),
     eventAt: getEventAt(payload),
   })
+  await tellAdminsAboutPro(payload, mapStatus(data.status) === 'trialing' ? 'trial' : 'paid')
 }
 
 async function handleSubscriptionUpdated(payload: WebhookPayload, userId?: string) {
@@ -433,6 +451,7 @@ async function handleSubscriptionRevoked(payload: WebhookPayload, userId?: strin
     cancelAtPeriodEnd: false,
     eventAt: getEventAt(payload),
   })
+  await tellAdminsAboutPro(payload, 'ended')
 }
 
 /**
