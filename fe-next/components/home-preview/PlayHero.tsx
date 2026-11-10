@@ -212,7 +212,8 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
               <span className="font-neo-display text-[19px] font-bold tracking-[0.04em] lg:text-3xl">
                 {t('homePlay.friendsPlay')}
               </span>
-              <span className="mt-0.5 text-xs font-bold tracking-wide opacity-70 lg:text-base">{t('homePlay.friendsPlaySub')}</span>
+              {/* opacity-80, not 70: black at 70% on the pink fill is 4.2:1, under AA for 12px text. */}
+              <span className="mt-0.5 text-xs font-bold tracking-wide opacity-80 lg:text-base">{t('homePlay.friendsPlaySub')}</span>
             </span>
           </Link>
 

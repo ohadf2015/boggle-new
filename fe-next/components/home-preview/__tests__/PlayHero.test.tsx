@@ -157,4 +157,28 @@ describe('PlayHero', () => {
     expect(mockTrackCta).toHaveBeenCalledTimes(1);
     expect(mockTrackCta).toHaveBeenCalledWith('fresh_hero_play', { opens_ftue: false });
   });
+
+  // Small bold sub-lines are normal text for WCAG, so they need 4.5:1. The text is
+  // black faded by an opacity-NN class over the button's solid fill.
+  it.each([
+    ['hp-play', 'homePlay.playSub', '#bfff00'],
+    ['hp-play-friends', 'homePlay.friendsPlaySub', '#ff1493'],
+  ])('given the %s button, then its sub-line reaches 4.5:1 contrast on the button fill', (testId, key, fill) => {
+    renderHero();
+    const sub = screen.getByTestId(testId).querySelector('span span:last-child') as HTMLElement;
+    expect(sub.textContent).toBe(t(key));
+    const match = sub.className.match(/(?:^|\s)opacity-(\d+)(?:\s|$)/);
+    const alpha = match ? Number(match[1]) / 100 : 1;
+    expect(contrastOfFadedBlack(alpha, fill)).toBeGreaterThanOrEqual(4.5);
+  });
 });
+
+function contrastOfFadedBlack(alpha: number, hex: string): number {
+  const bg = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
+  const fg = bg.map((c) => c * (1 - alpha));
+  const lum = (rgb: number[]) => {
+    const [r, g, b] = rgb.map((c) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  return (lum(bg) + 0.05) / (lum(fg) + 0.05);
+}
