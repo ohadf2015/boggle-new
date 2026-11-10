@@ -17,10 +17,10 @@ export function getAuthUserId(socket: Socket): string | null {
   return typeof verified === 'string' && verified ? verified : null;
 }
 
-export interface ClassroomIdentityRefusal {
+export type ClassroomIdentityRefusal = {
   error: string;
   code: ClassroomIdentityRefusalCode;
-}
+};
 
 /** A token we could not verify is our problem to report, not "you are not the teacher". */
 export function classroomIdentityRefusal(socket: Socket): ClassroomIdentityRefusal {

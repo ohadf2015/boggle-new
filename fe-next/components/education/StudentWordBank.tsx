@@ -24,7 +24,7 @@ import { cn } from '@/lib/utils';
 import { useGameStore } from '@/hooks/gameState';
 import type { VocabularyLevel } from '@/lib/supabase/education/types';
 import { LessonTargetStrip } from '@/components/education/live/LessonTargetStrip';
-import { buildLessonTargets, buildRaceSlots } from '@/components/education/live/lessonTargets';
+import { buildLessonTargets } from '@/components/education/live/lessonTargets';
 import { useLessonClaims } from '@/components/education/live/useLessonClaims';
 
 export interface StudentWordBankProps {
@@ -34,7 +34,7 @@ export interface StudentWordBankProps {
   /** Longer-word target shown to challenge students. */
   challengeMinLength?: number;
   className?: string;
-  /** The local student's seat name; omitted for the watching teacher, who sees the race on the projector. */
+  /** The local student's seat name; omitted for the watching teacher, who keeps their scaffold view. */
   me?: string;
 }
 
@@ -63,13 +63,9 @@ export function StudentWordBank({
   );
 
   const race = useLessonClaims();
-  const raceSlots = useMemo(
-    () => (race && me ? buildRaceSlots(race, me, level === 'support' ? words : []) : null),
-    [race, me, level, words],
-  );
 
-  // The race is shared by the whole class, so it replaces every level's scaffold for the round.
-  if (raceSlots) return <LessonTargetStrip slots={raceSlots} race t={t} dir={isRTL ? 'rtl' : 'ltr'} className={className} />;
+  // The race strip sits in the round dock under the grid; a support student's bank is an accommodation and keeps the bottom.
+  if (race && me && level !== 'support') return null;
   if (targets) return <LessonTargetStrip targets={targets} t={t} dir={isRTL ? 'rtl' : 'ltr'} className={className} />;
 
   if (level === 'challenge') {

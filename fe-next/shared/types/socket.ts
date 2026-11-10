@@ -18,6 +18,7 @@ import type {
 } from './game';
 
 import type { BlastTileType } from './blast';
+import type { RoundBroadcastEvents } from './socketRoundEvents';
 
 import type {
   SpamWarningPayload,
@@ -43,6 +44,7 @@ export interface ClientToServerEvents {
   'lobby:adWatching': (data: { active: boolean }) => void;
   startGame: (data: StartGamePayload) => void;
   startGameAck: (data: { messageId: string }) => void;
+  rivalSync: () => void;
   countdownComplete: (data: { messageId: string }) => void;
   lobbyAutoStartCancel: () => void;
   endGame: () => void;
@@ -128,7 +130,7 @@ export interface HintPayload {
 
 // ==================== Server → Client Events ====================
 
-export interface ServerToClientEvents {
+export interface ServerToClientEvents extends RoundBroadcastEvents {
   // Connection events
   pong: () => void;
   rateLimited: () => void;
@@ -320,27 +322,6 @@ export interface ServerToClientEvents {
   wordSubmit: (data: { word: string; username: string }) => void;
   roomCreate: (data: { gameCode: string; roomName: string }) => void;
   avatarUpdated: (data: { username: string; avatarImage?: unknown; customAvatar?: unknown }) => void;
-
-  // Round events (monotonic breakers)
-  roundEventWarning: (data: { eventType: string; gameSessionId?: number; timestamp: number }) => void;
-  roundEventStart: (data: { eventType: string; gameSessionId?: number; duration: number; data?: Record<string, unknown> }) => void;
-  roundEventEnd: (data: { eventType: string; gameSessionId?: number }) => void;
-
-  // Rush tiles (recurring transient bonus tiles, ~10s each, all players)
-  rushTilesSpawn: (data: { tiles: Array<{ row: number; col: number }>; durationMs: number; gameSessionId?: number }) => void;
-  rushTilesClear: (data: { gameSessionId?: number }) => void;
-
-  // Special word found
-  specialWordFound: (data: { word: string; foundBy: string; bonus: number; gameSessionId?: number }) => void;
-
-  // Lesson Word Race: first student to find a placed lesson word claims it
-  lessonWordClaimed: (data: import('./lessonClaims').LessonWordClaimedEvent) => void;
-
-  // Earthquake / Fire Round events
-  fireRoundStart: (data: { gameSessionId?: string; grid: unknown[][]; duration: number }) => void;
-  fireRoundEnd: (data: { gameSessionId?: string }) => void;
-  earthquakeShake: (data: { gameSessionId?: string }) => void;
-  earthquakeWarning: (data: { gameSessionId?: string; timestamp: number }) => void;
 
   // Engagement — daily missions & grand slam
   'engagement:dailyMissions': (data: { missions: unknown[] }) => void;

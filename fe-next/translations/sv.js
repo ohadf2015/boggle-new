@@ -245,6 +245,7 @@ const sv = {
   // @eduPickers:end
   // @eduBoss:start
   "classroomBoss": {
+    "lessonHit": "LEKTIONSTRÄFF!",
     "chestUpgraded": "Bossen besegrad: din kista har uppgraderats!",
     "topHitter": "Bästa träffen",
     "cardHow": "Hela klassen mot en boss. Varje ord ni hittar är en träff.",
@@ -15430,6 +15431,10 @@ const sv = {
       "scanToJoin": "Skanna för att gå med"
     },
     "classroom": {
+      "rivalry": {
+        "toggle": "Rivaldueller",
+        "hint": "Varje elev får en rival på ungefär samma nivå under rundan."
+      },
       "studentCap": "{{count}} / {{limit}} elever",
       "studentCountPro": "{{count}} elever",
       "cardSeeAllStudents": "Visa alla {{count}} elever",
@@ -16306,6 +16311,35 @@ const sv = {
     }
   },
   "education": {
+    "race": {
+      "claimedCount": "{claimed}/{total} tagna",
+      "takenBy": "{name} hittade {word} först",
+      "youClaimed": "{word} är din! +{bonus}",
+      "claimedBy": "{name} snodde {word}!",
+      "projectorTitle": "Ordrace"
+    },
+    "rivals": {
+      "vs": "vs",
+      "level": "Lika",
+      "aria": {
+        "ahead": "Din rival är {{name}}. Du leder med {{points}}!",
+        "behind": "Din rival är {{name}}. {{points}} poäng kvar att knappa in!",
+        "level": "Din rival är {{name}}. Ni står lika!"
+      },
+      "announce": {
+        "lead": "Du gick om {{name}}!",
+        "passed": "{{name}} gick precis om. Du kan komma ikapp!"
+      },
+      "ticker": {
+        "flip": "{{name}} tog ledningen i sin duell",
+        "label": "Duellögonblick"
+      },
+      "outcome": {
+        "won": "Du slog din rival {{name}} med {{points}}!",
+        "lost": "{{name}} vann er duell med {{points}}. Revansch nästa runda!",
+        "tied": "Du och {{name}} spelade lika!"
+      }
+    },
     "whatsNew": {
       "entries": {
         "sep2026": {

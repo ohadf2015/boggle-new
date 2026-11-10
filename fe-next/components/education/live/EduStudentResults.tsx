@@ -26,6 +26,7 @@ import type { PlayerResult } from '@/types/components';
 import { studentGap, studentPlacing } from './eduResultsModel';
 import { EduMissedRecall, missedDefinitions } from './EduMissedRecall';
 import { EduStudentHero } from './EduStudentHero';
+import { useRival } from './useRival';
 import { EduStudentNextStep, EduStudentShareButton } from './EduStudentNextStep';
 import { EduStudentClassGoal, EduStudentWaitNext, EduStudentXpBar } from './EduStudentProgress';
 import { LIVE_KEYFRAMES, PRESS } from './eduLiveStyles';
@@ -87,6 +88,7 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
   const scores = (c.data.sortedScores as PlayerResult[] | undefined) ?? [];
   const placing = studentPlacing(scores, props.username, teacher);
   const gap = studentGap(scores, props.username, teacher);
+  const { rivalOutcome } = useRival(props.socket as Parameters<typeof useRival>[0]);
   const words = useMemo(
     () => [...(c.data.currentPlayerValidWords ?? [])].sort((a, b) => (b.score ?? 0) - (a.score ?? 0) || b.word.length - a.word.length),
     [c.data.currentPlayerValidWords],
@@ -152,6 +154,7 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
                 xp={xpGained?.xpEarned ?? null}
                 coins={c.sideEffects?.coinReward?.awarded ?? null}
                 gap={gap}
+                rival={rivalOutcome}
                 reduceMotion={reduceMotion}
                 t={t}
                 extra={

@@ -44,6 +44,7 @@ import { registerWordcraftClassroomHandlers } from './wordcraftClassroomHandler.
 import { registerClassroomEconomyHandlers } from './classroomEconomyHandler.js';
 import { registerMatchmakingHandlers } from './matchmakingHandler.js';
 import { getGame } from '../modules/gameStateManager.js';
+import { registerRivalSync } from '../modules/rivalSync.js';
 
 /**
  * Register all socket event handlers for a connection
@@ -82,6 +83,7 @@ function registerAllHandlers(io: Server, socket: Socket): void {
   registerWordCraftHandlers(io, socket);
   registerKickHandler(io, socket);
   registerReactionHandlers(io, socket);
+  registerRivalSync(io, socket);
   registerLobbyEmoteHandlers(io, socket);
   registerLobbyAdGateHandlers(io, socket);
   registerGiftHandlers(io, socket);

@@ -20,7 +20,7 @@ import { getRejoinIntent, planNotSeatedRejoin } from '@/utils/socketRejoin';
 import { setGuestName } from '@/utils/guestManager';
 import { resolveHostLeftMessage } from '@/lib/multiplayer/resolveHostLeftMessage';
 import logger from '@/utils/logger';
-import { isVocabularyLevel } from '@/lib/education/differentiation';
+import { ingestClassroomContext, resetClassroomContext, useClassroomContextStore } from '@/hooks/gameState/classroomContextStore';
 import type { ClassroomLiveContext } from '@/shared/utils/classroomLiveContext';
 import { pressureFromStartPayload } from '@/shared/utils/classroomPressure';
 import { useClassroomPressureStore } from '@/hooks/gameState/classroomPressureStore';
@@ -141,8 +141,8 @@ export function useMultiplayerSocket(
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState<boolean>(false);
   // ---- Classroom differentiation state (see `classroomContext` listener) ----
-  const [classroomLevel, setClassroomLevel] = useState<VocabularyLevel>('core');
-  const [classroomWordBank, setClassroomWordBank] = useState<string[]>([]);
+  const classroomLevel = useClassroomContextStore((s) => s.level);
+  const classroomWordBank = useClassroomContextStore((s) => s.wordBank);
   const [classroomAccessibility, setClassroomAccessibility] = useState<{
     largeText?: boolean;
     audioCues?: boolean;
@@ -278,8 +278,7 @@ export function useMultiplayerSocket(
       // Classroom context is per-room: reset so a previous classroom room's level /
       // word bank never leaks into this one. The server re-sends `classroomContext`
       // right after `joined` for classroom games.
-      setClassroomLevel('core');
-      setClassroomWordBank([]);
+      resetClassroomContext();
       useStudyDeck.getState().clear();
       // Forward-only: persist a GUEST's chosen room name so it reaches analytics
       // (game_completed metadata.guest_name via getGuestName). Without this the
@@ -543,14 +542,7 @@ export function useMultiplayerSocket(
 
     // ---- Classroom differentiation: per-socket, emitted from the server `join`
     // path (first join, late join, reconnect) — never from the `startGame` broadcast.
-    listen('classroomContext', (data: { classroomLevel?: unknown; classroomWordBank?: unknown }) => {
-      setClassroomLevel(isVocabularyLevel(data?.classroomLevel) ? data.classroomLevel : 'core');
-      setClassroomWordBank(
-        Array.isArray(data?.classroomWordBank)
-          ? data.classroomWordBank.filter((w): w is string => typeof w === 'string')
-          : []
-      );
-    });
+    listen('classroomContext', ingestClassroomContext);
 
     listen('classroomStudyCards', (data: { gameCode?: unknown; cards?: unknown }) => {
       if (typeof data?.gameCode === 'string') useStudyDeck.getState().setDeck(data.gameCode, parseStudyCards(data.cards));

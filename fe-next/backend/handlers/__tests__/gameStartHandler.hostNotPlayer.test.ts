@@ -108,7 +108,7 @@ function startHandlers() {
     data: {},
     handshake: { auth: {} },
   };
-  registerStartGameHandler({ to: vi.fn() } as never, socket as never);
+  registerStartGameHandler({ to: vi.fn(() => ({ emit: vi.fn() })) } as never, socket as never);
   return handlers;
 }
 

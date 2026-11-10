@@ -15,7 +15,15 @@ describe('Lesson Word Race mounts', () => {
   });
 
   it('Given a classroom projector, When the round runs, Then the race board sits beside the live panel in every race mode', () => {
-    const tv = read('host/components/TvBroadcastView.tsx');
-    expect(tv).toMatch(/<ProjectorLessonClaims /);
+    expect(read('host/components/TvBroadcastView.tsx')).toMatch(/<TvClassroomStage /);
+    expect(read('host/components/tv-broadcast/TvClassroomStage.tsx')).toMatch(/<ProjectorLessonClaims /);
+  });
+
+  it('Given a board round on a phone, When the tray renders, Then the duel chip and race strip ride the round dock under the grid', () => {
+    expect(read('player/components/PlayerInGameView.tsx')).toMatch(/dock=\{<ClassroomRoundDock /);
+  });
+
+  it('Given a classroom projector, When duels flip, Then the rival ticker is mounted under the battle bar', () => {
+    expect(read('host/components/TvBroadcastView.tsx')).toMatch(/\{isClassroom && <RivalTicker socket=\{socket\}/);
   });
 });

@@ -25,9 +25,9 @@ production numbers and picks what to build.
 
 ## Diagnosis
 
-1. **Setup leaks before anyone plays.** The access form demands a 10 to 800 character
-   use-case text and email verification. The teacher's own words, the thing competitors
-   cannot match, are never asked for: a starter pack is assigned silently.
+1. **Setup leaks before anyone plays.** The teacher's own words, the thing competitors
+   cannot match, are never asked for: a starter pack is assigned silently. More than half
+   of the classes that get made never get a student in.
 2. **Pro gates the proof, not the depth.** The whole analytics page is locked, so a free
    teacher never sees per-student data working. Free caps (3 classes, 50 students) never
    bind. The checkout explainer sells "unlimited students" and "no ads", which free already
@@ -55,7 +55,9 @@ Price, class cap, student cap and assignment cap are unchanged. Those are owner 
 ## What gets built
 
 ### Phase 1: teacher setup
-- Access form: use-case text becomes optional (form and API). Role tap stays.
+- Access form: unchanged. The required reason was restored on purpose on 2026-11-10 after
+  a week of empty reasons, and the "42% never make a class" figure counts teachers who had
+  already passed the form, so the form is not what loses them.
 - First-class screen: optional "Paste your words" field. When filled, the class's first
   list is the teacher's words instead of the starter pack; when empty, behavior is
   unchanged and the screen says a starter list will be added.

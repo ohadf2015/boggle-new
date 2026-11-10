@@ -245,6 +245,7 @@ const es = {
   // @eduPickers:end
   // @eduBoss:start
   "classroomBoss": {
+    "lessonHit": "¡GOLPE DE LECCIÓN!",
     "chestUpgraded": "¡Jefe derrotado: tu cofre subió de nivel!",
     "topHitter": "Más daño",
     "cardHow": "Toda la clase contra un jefe. Cada palabra que encuentras es un golpe.",
@@ -15049,6 +15050,10 @@ const es = {
       "scanToJoin": "Escanea para unirte"
     },
     "classroom": {
+      "rivalry": {
+        "toggle": "Duelos de rivales",
+        "hint": "Cada estudiante tiene un rival de nivel parecido durante la ronda."
+      },
       "studentCap": "{{count}} / {{limit}} alumnos",
       "studentCountPro": "{{count}} alumnos",
       "cardSeeAllStudents": "Ver los {{count}} alumnos",
@@ -15946,6 +15951,35 @@ const es = {
     }
   },
   "education": {
+    "race": {
+      "claimedCount": "{claimed}/{total} atrapadas",
+      "takenBy": "{name} encontró {word} primero",
+      "youClaimed": "¡{word} es tuya! +{bonus}",
+      "claimedBy": "¡{name} se llevó {word}!",
+      "projectorTitle": "Carrera de palabras"
+    },
+    "rivals": {
+      "vs": "vs",
+      "level": "Empate",
+      "aria": {
+        "ahead": "Tu rival es {{name}}. ¡Vas {{points}} por delante!",
+        "behind": "Tu rival es {{name}}. ¡Te faltan {{points}} puntos para remontar!",
+        "level": "Tu rival es {{name}}. ¡Van empatados!"
+      },
+      "announce": {
+        "lead": "¡Ya vas por delante de {{name}}!",
+        "passed": "{{name}} se puso por delante. ¡Todavía puedes remontar!"
+      },
+      "ticker": {
+        "flip": "{{name}} toma la delantera en su duelo",
+        "label": "Momentos del duelo"
+      },
+      "outcome": {
+        "won": "¡Le ganaste el duelo a {{name}} por {{points}}!",
+        "lost": "{{name}} se llevó el duelo por {{points}}. ¡Revancha en la próxima ronda!",
+        "tied": "¡Empate en tu duelo con {{name}}!"
+      }
+    },
     "whatsNew": {
       "entries": {
         "sep2026": {

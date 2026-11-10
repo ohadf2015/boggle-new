@@ -53,6 +53,16 @@ describe('LessonClaimToast', () => {
     expect(socket.emit).toHaveBeenCalledWith('quickReaction', { reactionId: 'fire', username: 'Dana' });
   });
 
+  it('Given a classmate claimed a word, When the toast shows, Then it sits on the HUD at the top and only its emote buttons take touches', () => {
+    render(<LessonClaimToast socket={fakeSocket() as never} me="Dana" t={t} dir="ltr" />);
+    act(() => ingestLessonClaim(claim('Noa')));
+    const wrapper = screen.getByTestId('lesson-claim-toast').parentElement!;
+    expect(wrapper.className).toMatch(/\bfixed\b.*\btop-0\b|\btop-0\b.*\bfixed\b/);
+    expect(wrapper.className).toMatch(/pointer-events-none/);
+    const touchable = [...wrapper.querySelectorAll('*')].filter((el) => /pointer-events-auto/.test(el.className.toString()));
+    expect(touchable).toEqual([screen.getByTestId('lesson-claim-reactions')]);
+  });
+
   it('Given the toast is up, When time passes, Then it leaves on its own', () => {
     render(<LessonClaimToast socket={fakeSocket() as never} me="Dana" t={t} dir="ltr" />);
     act(() => ingestLessonClaim(claim('Noa')));

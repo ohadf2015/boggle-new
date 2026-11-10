@@ -29,6 +29,7 @@ import { cleanupPlayerData } from '../utils/playerCleanup.js';
 import gameStartCoordinator from '../utils/gameStartCoordinator.js';
 import { startGameTimer } from '../services/gameLifecycle/gameTimer.js';
 import logger from '../utils/logger.js';
+import { notifyRivalLeft } from '../modules/rivalSocket.js';
 
 // Auto-kick: players with AFK presence for this long in lobby get kicked
 const AUTO_KICK_AFK_MS = parseInt(process.env.AUTO_KICK_AFK_MS || '180000'); // 3 minutes
@@ -70,6 +71,7 @@ function executeKick(
   }
 
   // Clean up player data and remove
+  notifyRivalLeft(gameCode, game, targetUsername);
   cleanupPlayerData(game, targetUsername);
   removeUserFromGame(gameCode, targetUsername);
 

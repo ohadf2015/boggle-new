@@ -33,7 +33,7 @@ import type { LetterGrid, Language, TournamentStanding } from '@/shared/types/ga
 import type { BoardTheme } from '@/shared/types/socket';
 import { PhoneBossStrip } from '@/components/education/boss/PhoneBossStrip';
 import { LessonClaimToast } from '@/components/education/live/LessonClaimToast';
-import ClassroomStudentDock from '@/components/education/economy/ClassroomStudentDock';
+import { ClassroomRoundDock } from '@/components/education/live/ClassroomRoundDock';
 import { useBossActive } from '@/stores/classroomBossStore';
 import { getMpInGameContainerClass, getMpInGamePlaceholderClass } from '@/lib/multiplayer/inGameContainerClass';
 import { useDesktopShellEnabled } from '@/hooks/useDesktopShellEnabled';
@@ -447,7 +447,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
             canvas={gameCanvas}
             socket={socket}
             bossStrip={bossActive ? <PhoneBossStrip /> : undefined}
-            dock={<ClassroomStudentDock gameCode={gameCode} />}
+            dock={<ClassroomRoundDock gameCode={gameCode} socket={socket} me={username} />}
           />
         )}</RoundClock>
       ) : (

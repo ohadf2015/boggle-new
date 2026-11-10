@@ -57,6 +57,7 @@ import {
 import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import logger from '../utils/logger.js';
+import { notifyRivalScore } from '../modules/rivalSocket.js';
 
 const placementSchema = z.object({
   row: z.number().int().min(0).max(14),
@@ -180,6 +181,7 @@ export function registerWordcraftClassroomHandlers(io: Server, socket: Socket): 
     if (result.bingoBonus > 0) {
       addPlayerEventBonus(game, username, result.bingoBonus);
     }
+    notifyRivalScore(ctx.gameCode, ctx.game as never, username);
 
     socket.emit(WORDCRAFT_LIVE_EVENTS.placeResult, {
       accepted: true,

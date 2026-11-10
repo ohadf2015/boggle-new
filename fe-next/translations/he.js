@@ -245,6 +245,7 @@ const he = {
   // @eduPickers:end
   // @eduBoss:start
   "classroomBoss": {
+    "lessonHit": "פגיעת שיעור!",
     "chestUpgraded": "הבוס הובס: התיבה שלך שודרגה!",
     "topHitter": "הכי פוגע/ת",
     "cardHow": "כל הכיתה נגד בוס אחד. כל מילה שמוצאים היא מכה.",
@@ -14976,6 +14977,10 @@ const he = {
       "scanToJoin": "סרקו להצטרפות"
     },
     "classroom": {
+      "rivalry": {
+        "toggle": "דו־קרבות יריבים",
+        "hint": "לכל תלמיד ותלמידה יריב אחד ברמה דומה לסיבוב."
+      },
       "studentCap": "{{count}} מתוך {{limit}} תלמידים",
       "studentCountPro": "{{count}} תלמידים",
       "cardSeeAllStudents": "לכל {{count}} התלמידים",
@@ -15852,6 +15857,35 @@ const he = {
     }
   },
   "education": {
+    "race": {
+      "claimedCount": "{claimed}/{total} נתפסו",
+      "takenBy": "{word} כבר של {name}",
+      "youClaimed": "{word} שלך! +{bonus}",
+      "claimedBy": "נתפסה! {word} אצל {name}",
+      "projectorTitle": "מרוץ מילים"
+    },
+    "rivals": {
+      "vs": "נגד",
+      "level": "תיקו",
+      "aria": {
+        "ahead": "הדו־קרב שלך: מול {{name}}. יתרון של {{points}} לטובתך!",
+        "behind": "הדו־קרב שלך: מול {{name}}. עוד {{points}} נקודות ומשיגים!",
+        "level": "הדו־קרב שלך: מול {{name}}. תיקו!"
+      },
+      "announce": {
+        "lead": "עקפת את {{name}}!",
+        "passed": "{{name}} עכשיו בהובלה. אפשר עוד להשיג!"
+      },
+      "ticker": {
+        "flip": "{{name}} בהובלה בדו־קרב",
+        "label": "רגעי דו־קרב"
+      },
+      "outcome": {
+        "won": "ניצחת את {{name}} בדו־קרב, בהפרש {{points}}!",
+        "lost": "הפעם הדו־קרב של {{name}}, בהפרש {{points}}. בסיבוב הבא – ריוואנש!",
+        "tied": "תיקו בדו־קרב מול {{name}}!"
+      }
+    },
     "whatsNew": {
       "entries": {
         "sep2026": {

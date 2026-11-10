@@ -17,6 +17,7 @@ import type { GameState } from '../modules/gameState/types';
 import { getLeaderboard } from '../modules/gameStateManager';
 import { quizShellStartFor } from '../services/vocabQuizShell';
 import { lessonClaimsView } from '../modules/lessonClaims';
+import { rivalPayloadField } from '../modules/rivalSocket';
 import { getGameModeModule } from './index';
 
 export type RoundPayloadKind = 'start' | 'retry' | 'reconnect' | 'lateJoin' | 'recovery';
@@ -87,5 +88,6 @@ export function buildRoundPayload(gameCode: string, game: GameState, opts: Round
   if (extras) Object.assign(payload, extras);
   // Live, not the start snapshot: a returning phone must see claims made while it was away.
   if (game.lessonClaims) payload.lessonClaims = lessonClaimsView(game.lessonClaims);
+  if (username) Object.assign(payload, rivalPayloadField(gameCode, game, username));
   return payload;
 }

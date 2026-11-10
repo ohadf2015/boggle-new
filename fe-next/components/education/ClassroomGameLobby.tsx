@@ -238,6 +238,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
           boardSize,
           allowLateJoin,
           economy: opts.economy,
+          rivalry: opts.rivalry,
           bossId: boss,
           targetWord,
           quiz: { focus: opts.vocabQuizFocus, questionCount: opts.vocabQuizQuestionCount, seconds: opts.vocabQuizSeconds, treasureChestsEnabled: opts.treasureChestsEnabled, variant },

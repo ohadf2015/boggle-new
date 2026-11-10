@@ -25,21 +25,15 @@ describe('StudentWordBank in a Lesson Word Race', () => {
     });
   });
 
-  it.each(['core', 'challenge', 'support'] as const)('Given a %s student in a race round, When the round runs, Then they see the shared race strip', (level) => {
-    render(<StudentWordBank level={level} words={['storm', 'cell']} me="Noa" />);
-    const strip = screen.getByTestId('lesson-target-strip');
-    expect(strip).toHaveAttribute('data-race', 'true');
-    expect(strip).toHaveTextContent('education.race.claimedCount:{"claimed":1,"total":2}');
-  });
-
-  it('Given a support student, When a slot is still open, Then their own word bank fills it in', () => {
+  it('Given a support student in a race round, When the round runs, Then they keep their full word bank sheet and the race never covers it', () => {
     render(<StudentWordBank level="support" words={['storm', 'cell']} me="Noa" />);
-    expect(screen.getByTestId('lesson-target-strip')).toHaveTextContent('cell');
+    expect(screen.getByTestId('student-word-bank')).toHaveTextContent('education.wordBank.title:{"count":2}');
+    expect(screen.queryByTestId('lesson-target-strip')).not.toBeInTheDocument();
   });
 
-  it('Given a core student, When a slot is still open, Then it stays masked', () => {
-    render(<StudentWordBank level="core" words={['storm', 'cell']} me="Noa" />);
-    expect(screen.getByTestId('lesson-target-strip')).not.toHaveTextContent('cell');
+  it.each(['core', 'challenge'] as const)('Given a %s student in a race round, When the round runs, Then no bottom sheet shows: the race lives in the round dock under the grid', (level) => {
+    const { container } = render(<StudentWordBank level={level} words={['storm', 'cell']} me="Noa" />);
+    expect(container).toBeEmptyDOMElement();
   });
 
   it('Given the watching teacher (no seat name passed), When the race runs, Then no phone strip shows for them', () => {

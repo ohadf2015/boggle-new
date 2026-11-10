@@ -11,6 +11,8 @@ export type LessonTargetStripProps = {
   t: T;
   dir: 'ltr' | 'rtl';
   className?: string;
+  /** In its row under the grid instead of pinned to the screen bottom; one line, so the row never grows. */
+  inline?: boolean;
 } & (
   | { targets: LessonTarget[]; slots?: never; race?: never }
   | { slots: StripSlot[]; race?: boolean; targets?: never }
@@ -30,7 +32,7 @@ function chipLabel(slot: StripSlot, t: T): string | undefined {
 
 /** Dark-only surface, so colours are fixed against navy rather than a cream/dark pair. */
 export function LessonTargetStrip(props: LessonTargetStripProps) {
-  const { t, dir, className } = props;
+  const { t, dir, className, inline } = props;
   const slots = props.targets ? targetsToSlots(props.targets) : (props.slots ?? []);
   const race = !props.targets && !!props.race;
   const done = slots.filter((s) => s.state !== 'hidden').length;
@@ -44,9 +46,10 @@ export function LessonTargetStrip(props: LessonTargetStripProps) {
       data-race={race ? 'true' : undefined}
       dir={dir}
       className={cn(
-        'pointer-events-none fixed bottom-0 inset-x-0 z-40 mx-auto w-full max-w-lg',
-        'border-3 border-b-0 border-neo-cream rounded-t-neo bg-neo-navy text-white shadow-hard',
-        'px-3 pt-1.5 pb-[calc(0.375rem+env(safe-area-inset-bottom))]',
+        'pointer-events-none bg-neo-navy text-white',
+        inline
+          ? 'min-w-0 overflow-hidden rounded-neo border-2 border-neo-cream/40 px-2 py-1 shadow-hard-sm'
+          : 'fixed bottom-0 inset-x-0 z-40 mx-auto w-full max-w-lg border-3 border-b-0 border-neo-cream rounded-t-neo shadow-hard px-3 pt-1.5 pb-[calc(0.375rem+env(safe-area-inset-bottom))]',
         className,
       )}
     >
@@ -55,7 +58,7 @@ export function LessonTargetStrip(props: LessonTargetStripProps) {
           <Target className="h-3.5 w-3.5" aria-hidden="true" />
           <Pop pulseKey={done}>{title}</Pop>
         </span>
-        <ul className="flex min-w-0 flex-1 flex-wrap items-center gap-1">
+        <ul className={cn('flex min-w-0 flex-1 items-center gap-1', inline ? 'flex-nowrap overflow-hidden' : 'flex-wrap')}>
           {slots.map((slot) => (
             <li
               key={slot.key}
@@ -68,14 +71,10 @@ export function LessonTargetStrip(props: LessonTargetStripProps) {
               )}
             >
               {slot.state === 'hidden' ? (
-                slot.hint ? (
-                  <span dir="auto">{slot.hint}</span>
-                ) : (
-                  <span aria-hidden="true">
-                    {slot.first}
-                    <span className="ms-0.5 tracking-[0.15em] text-neo-black/45">{'·'.repeat(slot.rest)}</span>
-                  </span>
-                )
+                <span aria-hidden="true">
+                  {slot.first}
+                  <span className="ms-0.5 tracking-[0.15em] text-neo-black/45">{'·'.repeat(slot.rest)}</span>
+                </span>
               ) : (
                 <Pop pulseKey={`${slot.key}:${slot.state}`}>
                   <span className="flex items-center gap-1" aria-hidden={slot.state === 'taken' ? 'true' : undefined}>

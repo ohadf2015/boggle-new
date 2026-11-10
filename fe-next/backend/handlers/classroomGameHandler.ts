@@ -82,6 +82,7 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
         playStyle?: 'ffa' | 'teams'; teamCount?: number;
         accessibility?: { largeText?: boolean; audioCues?: boolean; participationPoints?: boolean };
         economy?: { wrongAnswerCost?: boolean; powerUps?: boolean };
+        rivalry?: boolean;
       };
     };
 
@@ -145,6 +146,7 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
           teamCount: payload.settings?.teamCount,
           accessibility: payload.settings?.accessibility,
           economy: payload.settings?.economy,
+          rivalry: payload.settings?.rivalry,
         },
       };
 

@@ -57,8 +57,6 @@ export interface StripSlot {
   word?: string;
   by?: string;
   avatar?: LessonClaimAvatar | null;
-  /** Support students already hold the word bank: an open slot may show its word. */
-  hint?: string;
 }
 
 export function targetsToSlots(targets: readonly LessonTarget[]): StripSlot[] {
@@ -69,7 +67,7 @@ export function targetsToSlots(targets: readonly LessonTarget[]): StripSlot[] {
 }
 
 /** The server's race list as strip slots; claims are matched to me case-insensitively, like seat names. */
-export function buildRaceSlots(view: LessonClaimsView, me: string, bankWords: readonly string[] = []): StripSlot[] {
+export function buildRaceSlots(view: LessonClaimsView, me: string): StripSlot[] {
   const mine = me.toLowerCase();
   return view.slots.map(({ index, first, length, claim }): StripSlot => {
     const base = { key: String(index), first, rest: Math.max(0, length - 1) };
@@ -78,10 +76,6 @@ export function buildRaceSlots(view: LessonClaimsView, me: string, bankWords: re
         ? { ...base, state: 'mine', word: claim.word }
         : { ...base, state: 'taken', word: claim.word, by: claim.username, avatar: claim.avatar };
     }
-    const matches = bankWords.filter((w) => {
-      const m = maskLessonWord(w);
-      return m.first === first && m.rest + 1 === length;
-    });
-    return matches.length === 1 ? { ...base, state: 'hidden', hint: matches[0] } : { ...base, state: 'hidden' };
+    return { ...base, state: 'hidden' };
   });
 }

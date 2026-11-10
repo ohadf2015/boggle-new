@@ -245,6 +245,7 @@ const en = {
   // @eduPickers:end
   // @eduBoss:start
   "classroomBoss": {
+    "lessonHit": "LESSON HIT!",
     "chestUpgraded": "Boss defeated: your chest was upgraded!",
     "topHitter": "Top hitter",
     "cardHow": "The whole class vs one boss. Every word you find is a hit.",
@@ -13199,6 +13200,10 @@ const en = {
       "scanToJoin": "Scan to join"
     },
     "classroom": {
+      "rivalry": {
+        "toggle": "Rival duels",
+        "hint": "Each student gets one rival close to their level for the round."
+      },
       "studentCap": "{{count}} / {{limit}} students",
       "studentCountPro": "{{count}} students",
       "cardSeeAllStudents": "See all {{count}} students",
@@ -14284,6 +14289,35 @@ const en = {
     }
   },
   "education": {
+    "race": {
+      "claimedCount": "{claimed}/{total} claimed",
+      "takenBy": "{name} got {word} first",
+      "youClaimed": "{word} is yours! +{bonus}",
+      "claimedBy": "{name} grabbed {word}!",
+      "projectorTitle": "Word race"
+    },
+    "rivals": {
+      "vs": "vs",
+      "level": "Tied",
+      "aria": {
+        "ahead": "Your rival is {{name}}. You're ahead by {{points}}!",
+        "behind": "Your rival is {{name}}. {{points}} points to catch up!",
+        "level": "Your rival is {{name}}. You're tied!"
+      },
+      "announce": {
+        "lead": "You took the lead over {{name}}!",
+        "passed": "{{name}} just moved ahead. You can catch up!"
+      },
+      "ticker": {
+        "flip": "{{name}} took the lead in their duel",
+        "label": "Duel moments"
+      },
+      "outcome": {
+        "won": "You beat your rival {{name}} by {{points}}!",
+        "lost": "{{name}} won your duel by {{points}}. Rematch next round!",
+        "tied": "You and {{name}} tied your duel!"
+      }
+    },
     "whatsNew": {
       "entries": {
         "sep2026": {

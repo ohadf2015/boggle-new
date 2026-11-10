@@ -6,6 +6,7 @@ import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
+import type { Socket } from 'socket.io-client';
 import { RIVAL_EVENTS, type RivalAvatar, type RivalFlipPayload } from '@/shared/types/rivalry';
 
 export const RIVAL_TICKER_MAX = 3;
@@ -19,10 +20,7 @@ interface TickerItem {
   fading: boolean;
 }
 
-interface TickerSocket {
-  on(event: string, fn: (payload: never) => void): void;
-  off(event: string, fn: (payload: never) => void): void;
-}
+type TickerSocket = Pick<Socket, 'on' | 'off'>;
 
 interface RivalTickerProps {
   socket: TickerSocket | null | undefined;

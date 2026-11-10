@@ -37,6 +37,7 @@ import { advanceServerCombo } from '../modules/comboDecay';
 import { applyWordHuntWordEffects, bumpServerSeq } from './wordCreditEffects';
 import { BOARD_WORD_SCORE_PER_LETTER } from '@/shared/constants/wordHuntMultiplayerConstants';
 import { lessonWordBonus } from '@/shared/constants/lessonScoring';
+import { onLessonWordAccepted } from '../modules/lessonClaims.js';
 
 type Tile = { row: number; col: number };
 
@@ -274,7 +275,8 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
   // bonus + word-hunt board bonus + bonuses
   // Every bonus NOT baked into the stored per-word score also goes into
   // playerEventBonuses, so the end-of-game recompute matches the live leaderboard.
-  const eventBonusDelta = wordHuntBoardBonus + goldenBonus + lightningBonus + meteorBonus + rushBonus + specialBonus + lessonBonus + blastCollectionPoints + catchUpBonus;
+  const lessonClaimBonus = onLessonWordAccepted(io, gameCode, game, { word: normalizedWord, username, fromLesson });
+  const eventBonusDelta = wordHuntBoardBonus + goldenBonus + lightningBonus + meteorBonus + rushBonus + specialBonus + lessonBonus + lessonClaimBonus + blastCollectionPoints + catchUpBonus;
   const totalDelta = scored.total + eventBonusDelta;
   updatePlayerScore(gameCode, username, totalDelta, true);
   if (eventBonusDelta !== 0) {
@@ -308,6 +310,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     ...(catchUp ? { catchUp: { bonus: catchUp.bonus, pct: catchUp.pct } } : {}),
     ...(rushBonus > 0 ? { rushBonus } : {}),
     ...(lessonBonus > 0 ? { lessonBonus } : {}),
+    ...(lessonClaimBonus > 0 ? { lessonClaimBonus } : {}),
     ...(isSpecialWord ? { isSpecialWord: true } : {}),
     ...(boss ? { boss } : {}),
     // Merged blast data (Fix 2): includes tile bonus, moves, combo info in single emit

@@ -53,8 +53,19 @@ describe('LessonTargetStrip in a Lesson Word Race', () => {
     expect(chips[2]).not.toHaveTextContent('cell');
   });
 
-  it('Given a hint for a support student, When the slot is still open, Then the hint word shows', () => {
-    render(<LessonTargetStrip slots={[{ key: '0', first: 'C', rest: 3, state: 'hidden', hint: 'cell' }]} race t={t} dir="ltr" />);
-    expect(screen.getByTestId('lesson-target-strip')).toHaveTextContent('cell');
+});
+
+describe('LessonTargetStrip inline (round dock under the grid)', () => {
+  const slots = [
+    { key: '0', first: 'S', rest: 4, state: 'mine' as const, word: 'storm' },
+    { key: '1', first: 'C', rest: 3, state: 'hidden' as const },
+  ];
+
+  it('Given the inline variant, When rendered, Then it flows in its row instead of pinning to the screen bottom, and keeps to one line', () => {
+    render(<LessonTargetStrip slots={slots} race inline t={t} dir="ltr" />);
+    const strip = screen.getByTestId('lesson-target-strip');
+    expect(strip.className).not.toMatch(/\bfixed\b/);
+    expect(strip.className).toMatch(/pointer-events-none/);
+    expect(within(strip).getByRole('list').className).toMatch(/flex-nowrap/);
   });
 });

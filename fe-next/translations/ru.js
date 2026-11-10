@@ -245,6 +245,7 @@ const ru = {
   // @eduPickers:end
   // @eduBoss:start
   "classroomBoss": {
+    "lessonHit": "СЛОВО УРОКА!",
     "chestUpgraded": "Босс повержен: твой сундук улучшен!",
     "topHitter": "Лучший боец",
     "cardHow": "Весь класс против одного босса. Каждое найденное слово — удар.",
@@ -3835,6 +3836,35 @@ const ru = {
   "forfeitTitle": "Сдаться в поединке?",
   "duelComplete": "Поединок завершён!",
   "education": {
+    "race": {
+      "claimedCount": "{claimed}/{total} занято",
+      "takenBy": "{word} забирает {name}",
+      "youClaimed": "{word} — твоё! +{bonus}",
+      "claimedBy": "{name} хватает {word}!",
+      "projectorTitle": "Гонка слов"
+    },
+    "rivals": {
+      "vs": "vs",
+      "level": "Ничья",
+      "aria": {
+        "ahead": "Твой соперник: {{name}}. Ты впереди на {{points}}!",
+        "behind": "Твой соперник: {{name}}. Отставание {{points}}, можно догнать!",
+        "level": "Твой соперник: {{name}}. У вас ничья!"
+      },
+      "announce": {
+        "lead": "Обгон! Ты впереди, {{name}} позади!",
+        "passed": "{{name}} вырывается вперёд. Ещё можно догнать!"
+      },
+      "ticker": {
+        "flip": "{{name}} вырывается вперёд в своей дуэли",
+        "label": "Моменты дуэлей"
+      },
+      "outcome": {
+        "won": "Победа в дуэли! {{name}} позади на {{points}}!",
+        "lost": "В дуэли побеждает {{name}}, разница {{points}}. Реванш в следующем раунде!",
+        "tied": "Ничья в дуэли! Соперник: {{name}}"
+      }
+    },
     "whatsNew": {
       "entries": {
         "sep2026": {
@@ -14675,6 +14705,10 @@ const ru = {
       "scanToJoin": "Сканируйте, чтобы войти"
     },
     "classroom": {
+      "rivalry": {
+        "toggle": "Дуэли соперников",
+        "hint": "Каждый ученик получает на раунд одного соперника примерно своего уровня."
+      },
       "studentCap": "Учеников: {{count}} из {{limit}}",
       "studentCountPro": "Учеников: {{count}}",
       "cardSeeAllStudents": "Все ученики ({{count}})",

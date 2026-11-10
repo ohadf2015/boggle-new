@@ -92,7 +92,7 @@ const isEligible = (room: RivalRoom, name: string) => {
   return !!seat && !seat.isBot && !seat.isHost && !seat.isPractice;
 };
 
-const scoreOf = (room: RivalRoom, name: string) => room.playerScores[name] ?? 0;
+const scoreOf = (room: RivalRoom, name: string) => room.playerScores?.[name] ?? 0;
 
 const groupOf = (state: RivalryState, name: string) => state.groups.find((g) => g.members.includes(name));
 

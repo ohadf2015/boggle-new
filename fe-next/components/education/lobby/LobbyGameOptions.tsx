@@ -49,6 +49,8 @@ export function LobbyGameOptions({ opts, roundMinutes, gameMode, vocabQuizVarian
             onPlayStyleChange={opts.setPlayStyle}
             onTeamCountChange={opts.setTeamCount}
             onAccessibilityChange={opts.setAccessibility}
+            rivalry={opts.rivalry}
+            onRivalryChange={opts.setRivalry}
           />
           <section data-testid="lobby-options-pro" aria-labelledby="lobby-options-pro-title" className="flex flex-col gap-3">
             <h3 id="lobby-options-pro-title" className="font-neo-display text-base font-bold text-neo-cream">{t('eduShell.host.proOptions')}</h3>

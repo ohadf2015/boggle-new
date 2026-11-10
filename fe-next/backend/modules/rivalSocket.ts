@@ -72,9 +72,12 @@ export function notifyRivalLeft(gameCode: string, game: GameState | undefined | 
   emitRivalEvents(rivalIo, gameCode, game, onPlayerLeft(asRoom(game), username));
 }
 
+const ROUND_OVER: ReadonlySet<string> = new Set(['validating', 'finished', 'waiting']);
+
 export function rivalPayloadFor(gameCode: string, game: GameState, username: string): RivalView | null {
   if (!asRoom(game).rivalry?.enabled) return null;
-  emitRivalEvents(rivalIo, gameCode, game, seatRivalPlayer(asRoom(game), username));
+  // Results read the final duel through rivalSync; seating someone then would hand them a rival for a round that is over.
+  if (!ROUND_OVER.has(game.gameState ?? '')) emitRivalEvents(rivalIo, gameCode, game, seatRivalPlayer(asRoom(game), username));
   return rivalStartExtras(asRoom(game), username);
 }
 

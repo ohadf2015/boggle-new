@@ -63,6 +63,8 @@ export interface ClassroomGameSettings {
   };
   /** In-round economy switches (classroomEconomyStore). Absent = power-ups on, wrong-answer cost off. */
   economy?: { wrongAnswerCost?: boolean; powerUps?: boolean };
+  /** Rival Pairs. Absent (rooms saved before the toggle) = on. */
+  rivalry?: boolean;
 }
 
 export interface ClassroomGame {

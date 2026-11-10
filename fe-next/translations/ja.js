@@ -245,6 +245,7 @@ const ja = {
   // @eduPickers:end
   // @eduBoss:start
   "classroomBoss": {
+    "lessonHit": "レッスンヒット！",
     "chestUpgraded": "ボス撃破! 宝箱がランクアップ!",
     "topHitter": "ダメージ王",
     "cardHow": "クラス全員で1体のボスに挑む。見つけた単語がそのまま攻撃に。",
@@ -15122,6 +15123,10 @@ const ja = {
       "scanToJoin": "スキャンして参加"
     },
     "classroom": {
+      "rivalry": {
+        "toggle": "ライバル対決",
+        "hint": "生徒一人ひとりに、そのラウンドの間、実力の近いライバルが一人つきます。"
+      },
       "studentCap": "生徒 {{count}} / {{limit}} 人",
       "studentCountPro": "生徒 {{count}} 人",
       "cardSeeAllStudents": "生徒 {{count}} 人をすべて見る",
@@ -15998,6 +16003,35 @@ const ja = {
     }
   },
   "education": {
+    "race": {
+      "claimedCount": "{claimed}/{total} ゲット済み",
+      "takenBy": "{word}は{name}が先にゲット",
+      "youClaimed": "{word}ゲット！+{bonus}",
+      "claimedBy": "{name}が{word}をゲット！",
+      "projectorTitle": "ワードレース"
+    },
+    "rivals": {
+      "vs": "vs",
+      "level": "同点",
+      "aria": {
+        "ahead": "ライバルは{{name}}。{{points}}点リード中です！",
+        "behind": "ライバルは{{name}}。あと{{points}}点で追いつけます！",
+        "level": "ライバルは{{name}}。いま同点です！"
+      },
+      "announce": {
+        "lead": "{{name}}を追い抜きました！",
+        "passed": "{{name}}が前に出ました。まだ追いつけます！"
+      },
+      "ticker": {
+        "flip": "{{name}}がライバル対決でリード！",
+        "label": "対決ハイライト"
+      },
+      "outcome": {
+        "won": "ライバルの{{name}}に{{points}}点差で勝ちました！",
+        "lost": "今回は{{name}}が{{points}}点差で勝利。次のラウンドでリベンジ！",
+        "tied": "{{name}}との対決は引き分けでした！"
+      }
+    },
     "whatsNew": {
       "entries": {
         "sep2026": {

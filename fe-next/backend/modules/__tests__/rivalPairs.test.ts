@@ -367,3 +367,12 @@ describe('onPlayerLeft + seatRivalPlayer', () => {
     expect(rivalOf(r, 'teach')).toBeNull();
   });
 });
+
+describe('round start before scores exist', () => {
+  it('Given a fresh room whose score map is not built yet, When duels are dealt, Then everyone starts level at 0 instead of the start failing', () => {
+    const room = { users: { ana: {}, bo: {} }, gameSessionId: 1, rivalry: null } as never;
+    const events = resetRivalsForNewRound(room, { enabled: true, leaderboardHidden: false, mode: 'classic', seed: 's', abilities: {}, teams: [] });
+    expect(events).toHaveLength(2);
+    expect(events[0]).toMatchObject({ payload: { rival: { myScore: 0, rivalScore: 0 } } });
+  });
+});

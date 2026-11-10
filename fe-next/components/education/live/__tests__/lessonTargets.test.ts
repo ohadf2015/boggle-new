@@ -102,16 +102,6 @@ describe('buildRaceSlots', () => {
     expect(slots[2].word).toBeUndefined();
   });
 
-  it('Given a support student with the word bank, When a hidden slot matches exactly one bank word, Then it shows that word as a hint', () => {
-    const slots = buildRaceSlots(view, 'eli', ['storm', 'shad', 'שלום']);
-    expect(slots[2].hint).toBe('שלום');
-  });
-
-  it('Given two bank words share first letter and length, When built, Then no hint guesses between them', () => {
-    const slots = buildRaceSlots({ ...view, slots: [{ index: 0, first: 'C', length: 4, claim: null }] }, 'eli', ['cell', 'cost']);
-    expect(slots[0].hint).toBeUndefined();
-  });
-
   it('Given a target list from the private strip, When converted, Then found words read as mine', () => {
     expect(targetsToSlots([{ word: 'storm', found: true }, { word: 'shad', found: false }]).map((s) => s.state)).toEqual(['mine', 'hidden']);
   });

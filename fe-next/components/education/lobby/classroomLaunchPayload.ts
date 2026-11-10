@@ -19,6 +19,7 @@ export interface ClassroomLaunchPayload {
     allowLateJoin: boolean;
     /** In-round cash economy switches; stored on the room by the create handler. */
     economy?: { wrongAnswerCost: boolean; powerUps: boolean };
+    rivalry?: boolean;
     gameMode: ClassroomGameMode;
     targetWord?: string;
     vocabQuizFocus?: PracticeFocusSetting;
@@ -49,6 +50,7 @@ export interface ClassroomLaunchInput extends Omit<ClassroomLaunchPayload, 'sett
   allowLateJoin: boolean;
   playStyle: PlayStyle;
   economy?: LaunchSettings['economy'];
+  rivalry?: boolean;
   bossId?: ClassroomBossId | null;
   targetWord?: string;
   quiz?: {
@@ -64,7 +66,7 @@ export interface ClassroomLaunchInput extends Omit<ClassroomLaunchPayload, 'sett
 }
 
 export function buildClassroomLaunchPayload(input: ClassroomLaunchInput): ClassroomLaunchPayload {
-  const { mode, timerMinutes, boardSize, allowLateJoin, playStyle, economy, bossId, targetWord, quiz, teamCount, accessibility, pressure, ...room } = input;
+  const { mode, timerMinutes, boardSize, allowLateJoin, playStyle, economy, rivalry, bossId, targetWord, quiz, teamCount, accessibility, pressure, ...room } = input;
   const accessibilityOn = accessibility && (accessibility.largeText || accessibility.audioCues || accessibility.participationPoints);
   return {
     ...room,
@@ -73,6 +75,7 @@ export function buildClassroomLaunchPayload(input: ClassroomLaunchInput): Classr
       boardSize,
       allowLateJoin,
       ...(economy ? { economy } : {}),
+      ...(rivalry === false ? { rivalry: false } : {}),
       gameMode: mode,
       ...(bossId ? { classroomBossId: bossId } : {}),
       ...(targetWord ? { targetWord } : {}),

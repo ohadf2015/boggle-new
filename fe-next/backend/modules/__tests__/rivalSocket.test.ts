@@ -123,4 +123,14 @@ describe('rivalSocket glue', () => {
     expect(rivalPayloadField('ROOM', g as never, 'ana')).toEqual({ rival: { rivalName: 'bo', rivalAvatar: null, myScore: 0, rivalScore: 0 } });
     expect(rivalPayloadField('ROOM', g as never, 'teach')).toEqual({ rival: null });
   });
+
+  it('Given the round has finished, When a student who left syncs from the results screen, Then nobody is re-paired after the duel ended', () => {
+    const g = game(['ana', 'bo']);
+    startRivalRound(io, 'ROOM', g as never, classroom(), {});
+    notifyRivalLeft('ROOM', g as never, 'ana');
+    (g as { gameState?: string }).gameState = 'finished';
+    sent.length = 0;
+    expect(rivalPayloadFor('ROOM', g as never, 'ana')).toBeNull();
+    expect(sent).toEqual([]);
+  });
 });

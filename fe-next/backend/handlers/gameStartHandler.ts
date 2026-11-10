@@ -52,6 +52,9 @@ import { autoAddBotsForSoloPlayer, autoAddBotForDuo } from '../services/gameLife
 import { scheduleRoundEvent } from '../modules/roundEventsManager.js';
 import { startRushTiles } from '../modules/rushTiles/rushTilesManager.js';
 import { buildLessonVocabulary } from '../utils/lessonVocabulary.js';
+import { armLessonClaims } from '../modules/lessonClaims.js';
+import { startRivalRound } from '../modules/rivalSocket.js';
+import { resetRoundSocial } from '../modules/roundSocial.js';
 import { embeddableLessonWords } from '@/shared/utils/classroomGameLanguage';
 import { getGameModeModule, getGameModeRules } from '../modes/index.js';
 import { buildRoundPayload } from '../modes/roundPayload.js';
@@ -210,6 +213,7 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
         return;
       }
       transitioned = true;
+      resetRoundSocial(io, gameCode, game);
 
       // ---- Live Vocab Quiz ----
       // DO NOT MOVE THIS BLOCK: it must stay AFTER the START transition (so
@@ -379,9 +383,9 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       updateGame(gameCode, { goldenLetters });
 
       // Lesson words the FINAL board carries — only now is the grid the one the class sees.
-      if (classroomGame && vocabToEmbed.length > 0) {
-        recordClassroomWordBank(io, gameCode, game, letterGrid, gameLang, vocabToEmbed, classroomGame.teacherId);
-      }
+      const placedLessonWords = classroomGame && vocabToEmbed.length > 0
+        ? recordClassroomWordBank(io, gameCode, game, letterGrid, gameLang, vocabToEmbed, classroomGame.teacherId)
+        : [];
 
       const bossId = resolvedMode === 'classic' ? classroomGame?.settings?.classroomBossId : undefined;
       armRoomBoss(io, gameCode, game, { bossId, students: playerUsernames.length, roundSeconds: validTimer });
@@ -391,8 +395,10 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       const extras = buildClassroomStartExtras(gameCode, classroomGame, humanUsernames);
       if (hasRoomBoss(game)) extras.classroomBossId = bossId;
       game.classroomRoundExtras = classroomGame ? extras : undefined;
+      armLessonClaims(game, { placedWords: placedLessonWords, language: gameLang, gameMode: resolvedMode, users, hostWatches, extras });
       broadcastToRoom(io, getGameRoom(gameCode), 'startGame',
         buildRoundPayload(gameCode, game, { kind: 'start', messageId, extras }));
+      startRivalRound(io, gameCode, game, classroomGame, extras);
       getGameModeModule(resolvedMode).afterStart?.(io, gameCode, game);
 
       if (roundResult.totalBoardWords !== undefined) {
