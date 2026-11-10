@@ -43,6 +43,7 @@ import { AcademySidePanel } from './AcademySidePanel';
 import { AcademyDock } from './AcademyDock';
 import { DailyChest } from './DailyChest';
 import StudentLocker from '@/components/education/economy/StudentLocker';
+import GameFeedback from '@/components/feedback/GameFeedback';
 import { ClassSheet } from './ClassSheet';
 import { HubTopCards } from './HubTopCards';
 import { studentWarmup } from './todayItems';
@@ -155,6 +156,14 @@ export function AcademyHub(props: AcademyHubProps) {
     const timer = setTimeout(() => clearReward(), 5000);
     return () => clearTimeout(timer);
   }, [reward, clearReward]);
+
+  // The class-feedback bubble must outlive the 5-second reward toast it shares
+  // a moment with: remember the first round that paid out this visit. The
+  // shared feedback budget (useGameFeedback) decides whether it renders at all.
+  const [playedGameCode, setPlayedGameCode] = useState<string | null>(null);
+  useEffect(() => {
+    if (reward?.gameCode) setPlayedGameCode((prev) => prev ?? reward.gameCode);
+  }, [reward]);
 
   useEffect(() => {
     if (!note) return;
@@ -382,6 +391,20 @@ export function AcademyHub(props: AcademyHubProps) {
           </m.div>
         )}
       </AnimatePresence>
+
+      {/* After playing a class round: one-tap sentiment that feeds class
+          engagement evidence. Mid-screen, clear of the HUD above and the CTA. */}
+      {playedGameCode && (
+        <div className="absolute left-1/2 top-[42%] z-30 w-full max-w-xs -translate-x-1/2 px-3">
+          <GameFeedback
+            surface="class_round"
+            eligible
+            gameMode="classroom"
+            language={language}
+            throttleKey={playedGameCode}
+          />
+        </div>
+      )}
 
       {/* Bottom. Phone: the ONE hero action over the dock. Phone on its side: hero
           and an icon dock share one row. Desktop: side card (start, when it fits)

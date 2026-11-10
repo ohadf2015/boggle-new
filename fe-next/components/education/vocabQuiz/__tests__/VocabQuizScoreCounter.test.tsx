@@ -48,6 +48,14 @@ describe('VocabQuizScoreCounter', () => {
     expect(screen.getByTestId('vocab-quiz-score-pop')).toHaveAttribute('dir', 'ltr');
   });
 
+  it('labels the flying points so students know what the number means', () => {
+    const { rerender } = render(<VocabQuizScoreCounter score={0} pop={null} t={t} />);
+    rerender(<VocabQuizScoreCounter score={150} pop={{ points: 150, key: 1 }} t={t} />);
+    const pop = screen.getByTestId('vocab-quiz-score-pop');
+    expect(pop).toHaveTextContent('+150');
+    expect(pop).toHaveTextContent('vocabQuiz.score.popLabel');
+  });
+
   it('lands the flying points and clears them, then flies again on the next scored answer', () => {
     const { rerender } = render(<VocabQuizScoreCounter score={0} pop={null} t={t} />);
     rerender(<VocabQuizScoreCounter score={150} pop={{ points: 150, key: 1 }} t={t} />);

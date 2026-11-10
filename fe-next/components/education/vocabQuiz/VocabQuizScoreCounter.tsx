@@ -101,13 +101,18 @@ export function VocabQuizScoreCounter({ score, pop, t, className }: VocabQuizSco
           dir="ltr"
           aria-hidden
           className={cn(
-            'pointer-events-none absolute -top-5 end-0 whitespace-nowrap',
+            'pointer-events-none absolute -top-8 end-0 whitespace-nowrap',
             'rounded-neo border-[2px] border-neo-black bg-neo-lime px-2 py-0.5',
             'font-neo-display font-black text-sm text-neo-black shadow-hard-sm',
             'animate-neo-pop'
           )}
         >
-          +{flying.points}
+          <span className="flex flex-col items-center leading-none">
+            <span>+{flying.points}</span>
+            <span className="pt-0.5 font-neo-body text-[10px] font-bold uppercase tracking-wide">
+              {t('vocabQuiz.score.popLabel')}
+            </span>
+          </span>
         </span>
       )}
     </span>

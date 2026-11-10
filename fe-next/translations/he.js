@@ -2233,7 +2233,8 @@ const he = {
     "lockedInCount": "{locked} מתוך {total} ענו",
     "rank": "מקום {position} מתוך {total}",
     "score": {
-      "label": "הניקוד שלך: {score}"
+      "label": "הניקוד שלך: {score}",
+      "popLabel": "נקודות בסיבוב הזה"
     },
     "mascot": {
       "alt": "לקסי מגיבה לתשובה שלך"

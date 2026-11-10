@@ -2233,7 +2233,8 @@ const en = {
     "lockedInCount": "{locked}/{total} locked in",
     "rank": "#{position} of {total}",
     "score": {
-      "label": "Your score: {score}"
+      "label": "Your score: {score}",
+      "popLabel": "points this round"
     },
     "mascot": {
       "alt": "Lexi reacting to your answer"
