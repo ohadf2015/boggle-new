@@ -17,6 +17,7 @@ import { isDashboardProfileLoading } from '@/lib/landing/dashboardReadiness';
 import { LandingChallengeCards } from './LandingChallengeCards';
 import { HomeTopBar } from './home/HomeTopBar';
 import { HomeDailyHero } from './home/HomeDailyHero';
+import { HomeAdventureCard } from './home/HomeAdventureCard';
 import { LaunchProvider } from './home/HomeLaunch';
 import { HomeEducationCardConnected } from '@/components/education/HomeEducationCardConnected';
 
@@ -111,12 +112,14 @@ export const ReturningHome: React.FC<ReturningHomeProps> = ({ initialData }) => 
         />
 
         <HomeDailyHero preloadedStats={dailyChallengeStats} />
+        <HomeAdventureCard />
         <LandingChallengeCards
           language={language}
           activePlayers={liveRoomStats.activePlayers}
           playerAllTimeBest={playerAllTimeBest}
           t={t}
           cardOrder={initialData?.cardOrder}
+          hideAdventure
         />
         {/* Education entry: teacher dashboard, the student's class, or the
             classroom-mode promo for everyone else. Slim, after the modes. */}

@@ -103,4 +103,14 @@ describe('LandingChallengeCards — adventure survives the ranked order', () => 
     expect(adventureCube).not.toBeNull();
     expect(adventureCube?.getAttribute('href')).toBe('/en/adventure');
   });
+
+  it('Given the host already shows its own Adventure card, when hideAdventure is set, then the grid drops the duplicate tile and keeps the rest', () => {
+    mockIsAdmin.mockReturnValue(false);
+    mockGamesCompleted.mockReturnValue(10);
+    const { container } = render(
+      <LandingChallengeCards {...baseProps} cardOrder={[...RANKED] as never} hideAdventure />,
+    );
+    expect(container.querySelector('[data-cube-key="adventure"]')).toBeNull();
+    expect(container.querySelector('[data-cube-key="wordTowerV2"]')).not.toBeNull();
+  });
 });

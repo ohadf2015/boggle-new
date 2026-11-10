@@ -120,6 +120,7 @@ describe('DesktopGameNav navigation targets', () => {
       ['nav.home', '/en'],
       ['nav.play', '/en/multiplayer'],
       ['nav.daily', '/en/daily'],
+      ['nav.adventure', '/en/adventure'],
       ['nav.leaderboard', '/en/leaderboard'],
       ['nav.friends', '/en/friends'],
       ['education.nav.forTeachers', '/en/education'],
@@ -131,5 +132,11 @@ describe('DesktopGameNav navigation targets', () => {
       expect(mockPush).toHaveBeenCalledWith(expected);
       unmount();
     }
+  });
+
+  it('marks the Adventure tab active on adventure routes', () => {
+    mockPathname = '/en/adventure/world/3';
+    const { getByText } = render(<DesktopGameNav />);
+    expect(getByText('nav.adventure').closest('button')).toHaveAttribute('aria-current', 'page');
   });
 });

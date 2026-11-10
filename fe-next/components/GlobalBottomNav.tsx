@@ -7,7 +7,7 @@ import {
     Home, Swords, ScrollText, Users,
     Brain, CalendarDays, Zap,
     Trophy, User as UserIcon, Settings as SettingsIcon, Users2, Gift, Target,
-    BookOpen,
+    BookOpen, Map as MapIcon,
 } from 'lucide-react';
 import { m, AnimatePresence } from 'framer-motion';
 import { cn } from '../lib/utils';
@@ -85,6 +85,7 @@ const DYNAMIC_ROUTES: ReadonlyArray<readonly [string, DynamicSpec]> = [
     ['/word-of-the-day',    { labelKey: 'nav.daily',        icon: CalendarDays,   color: 'text-neo-cyan',   glowColor: 'bg-neo-cyan/15' }],
     ['/daily',              { labelKey: 'nav.daily',        icon: CalendarDays,   color: 'text-neo-cyan',   glowColor: 'bg-neo-cyan/15' }],
     ['/blast',              { labelKey: 'nav.blast',        icon: Zap,            color: 'text-neo-pink',   glowColor: 'bg-neo-pink/15' }],
+    ['/adventure',          { labelKey: 'nav.adventure',    icon: MapIcon,        color: 'text-neo-lime',   glowColor: 'bg-neo-lime/15' }],
     ['/leaderboard',        { labelKey: 'nav.leaderboard',  icon: Trophy,         color: 'text-neo-lime',   glowColor: 'bg-neo-lime/15' }],
     ['/profile',            { labelKey: 'nav.profile',      icon: UserIcon,       color: 'text-neo-cyan',   glowColor: 'bg-neo-cyan/15' }],
     ['/account',            { labelKey: 'nav.profile',      icon: UserIcon,       color: 'text-neo-cyan',   glowColor: 'bg-neo-cyan/15' }],

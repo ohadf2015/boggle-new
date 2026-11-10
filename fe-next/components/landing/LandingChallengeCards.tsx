@@ -24,6 +24,8 @@ interface LandingChallengeCardsProps {
   t: (key: string) => string;
   /** Pre-computed card order from server — static per ISR/deploy */
   cardOrder?: LandingGameMode[];
+  /** The host renders its own full-width Adventure card, so the grid skips the tile. */
+  hideAdventure?: boolean;
 }
 
 /**
@@ -66,6 +68,7 @@ export function LandingChallengeCards({
   playerAllTimeBest,
   t,
   cardOrder: cardOrderProp,
+  hideAdventure = false,
 }: LandingChallengeCardsProps) {
   // Offline-aware home: when the device is offline, live-multiplayer cards are
   // shown locked so a player on a flight doesn't tap into a dead lobby. Every
@@ -107,7 +110,7 @@ export function LandingChallengeCards({
   // An adventure run still going (sessionStorage, same truth as the world
   // view's RunBanner). Resolves after hydration — the cube paints its resting
   // state first and the resume chrome is absolutely positioned on top.
-  const adventureResume = useAdventureResume(mounted);
+  const adventureResume = useAdventureResume(mounted && !hideAdventure);
   const hasPlayedAnyGame = !!playerAllTimeBest && playerAllTimeBest.score > 0;
   const isVeteran = isVeteranRaw || isOnCrazyGamesPlatform || hasPlayedAnyGame;
   // One "Start Here" pill at a time. Practice wins for non-veterans (it's the
@@ -181,7 +184,8 @@ export function LandingChallengeCards({
   const spCards = (() => {
     const filtered = cardOrder
       .filter((m) => SP_MODES.has(m))
-      .filter((m) => !(featurePractice && m === 'practice'));
+      .filter((m) => !(featurePractice && m === 'practice'))
+      .filter((m) => !(hideAdventure && m === 'adventure'));
     // Feature Adventure and Word Tower V2 prominently (first in the solo section).
     const featured: LandingCardKey[] = [];
     const other: LandingCardKey[] = [];

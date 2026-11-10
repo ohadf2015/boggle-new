@@ -71,11 +71,8 @@ const GAMES: Game[] = [
   },
 ];
 
-/**
- * Modes most players leave early (Word Tower ~37% finish, Adventure a handful of
- * players). Still one tap away under "More", just not in the main shelf.
- */
-const TUCKED = new Set(['tower', 'adventure']);
+/** Word Tower finishes ~37% of the time, so it stays one tap away under "More". */
+const TUCKED = new Set(['tower']);
 
 const TOWER_OFFSET = ['ms-3', 'ms-0', 'ms-4', 'ms-1', 'ms-2'];
 
@@ -118,7 +115,8 @@ function GameArt({ art }: { art: Game['art'] }) {
 }
 
 /** A shelf of game cartridges: each tilted a little, each its own colour. */
-export function MoreGames({ lang, t }: { lang: string; t: (key: string) => string }) {
+export function MoreGames({ lang, t, hideAdventure = false }: { lang: string; t: (key: string) => string; hideAdventure?: boolean }) {
+  const games = hideAdventure ? GAMES.filter((g) => g.id !== 'adventure') : GAMES;
   return (
     <section aria-labelledby="hp-games-title" data-testid="hp-games">
       <div className="mb-4 flex items-end justify-between gap-3 lg:mb-6">
@@ -130,7 +128,7 @@ export function MoreGames({ lang, t }: { lang: string; t: (key: string) => strin
         </div>
       </div>
       <ul className="grid grid-cols-2 gap-x-3 gap-y-4 lg:grid-cols-4 lg:gap-8">
-        {GAMES.filter((g) => !TUCKED.has(g.id)).map((g) => (
+        {games.filter((g) => !TUCKED.has(g.id)).map((g) => (
           <li key={g.id}>
             <Link
               href={`/${lang}/${g.href}`}
@@ -158,7 +156,7 @@ export function MoreGames({ lang, t }: { lang: string; t: (key: string) => strin
           <span aria-hidden="true" className="transition-transform group-open:rotate-180">▾</span>
         </summary>
         <ul className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
-          {GAMES.filter((g) => TUCKED.has(g.id)).map((g) => (
+          {games.filter((g) => TUCKED.has(g.id)).map((g) => (
             <li key={g.id}>
               <Link
                 href={`/${lang}/${g.href}`}

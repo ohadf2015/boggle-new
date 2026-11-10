@@ -49,6 +49,14 @@ const keys: string[] = [
   'adventurePlay.loot.kindRelic',
   'adventurePlay.loot.kindPotion',
   'adventurePlay.loot.kindGold',
+  'landing.home.adventureStartTitle',
+  'landing.home.adventureStartCta',
+  'landing.home.adventureContinueTitle',
+  'landing.home.adventureContinueCta',
+  'landing.home.adventureRunProgress',
+  'landing.adventureModeDesc',
+  'landing.adventureResumeA11y',
+  'nav.adventure',
 ];
 
 describe('Adventure i18n (dynamic keys)', () => {

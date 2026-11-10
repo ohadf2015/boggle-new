@@ -12,6 +12,7 @@ import { PlayHero } from './PlayHero';
 import { DailyBlock } from './DailyBlock';
 import { FriendsBlock } from './FriendsBlock';
 import { MoreGames } from './MoreGames';
+import { HomeAdventureCard } from '@/components/landing/home/HomeAdventureCard';
 import { WeeklyThemeCard } from '@/components/daily/WeeklyThemeCard';
 import { ClassroomStrip } from './ClassroomStrip';
 import { FreshAdSlot } from '@/components/landing/fresh/FreshAdSlot';
@@ -69,7 +70,10 @@ export function HomePreview({ onPlay }: { onPlay?: () => void } = {}) {
           <FriendsBlock lang={language} t={tt} showAvatars={mounted} />
         </div>
         <div className="lg:col-span-12">
-          <MoreGames lang={language} t={tt} />
+          <HomeAdventureCard />
+        </div>
+        <div className="lg:col-span-12">
+          <MoreGames lang={language} t={tt} hideAdventure />
         </div>
       </div>
 
