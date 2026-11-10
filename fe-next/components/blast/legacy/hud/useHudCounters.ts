@@ -21,7 +21,9 @@ export function useAnimatedScore(target: number) {
     const pulseTimer = setTimeout(() => setPulse(false), 200);
 
     function tick(now: number) {
-      const t = Math.min((now - startTime) / duration, 1);
+      // rAF's timestamp is when the frame began, which can be before startTime; unclamped,
+      // t goes negative and the eased value overshoots, flashing scores like "-1,027".
+      const t = Math.max(0, Math.min((now - startTime) / duration, 1));
       const eased = 1 - (1 - t) * (1 - t);
       setDisplay(Math.round(start + delta * eased));
       if (t < 1) rafRef.current = requestAnimationFrame(tick);
