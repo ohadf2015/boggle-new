@@ -54,4 +54,23 @@ describe('WordTowerV2PageClient public access', () => {
     expect(screen.queryByTestId('word-tower-v2')).not.toBeInTheDocument();
     expect(replace).not.toHaveBeenCalled();
   });
+
+  it('given auth still resolving, then it holds the game space so the page below does not jump', () => {
+    useAuth.mockReturnValue({ loading: true, user: null, profile: null });
+
+    render(<WordTowerV2PageClient />);
+
+    expect(screen.getByTestId('word-tower-stage')).toBeInTheDocument();
+  });
+
+  it('given the game is up, when auth briefly re-resolves, then the game stays mounted', async () => {
+    useAuth.mockReturnValue({ loading: false, user: { id: 'player-1' }, profile: { id: 'player-1' } });
+    const { rerender } = render(<WordTowerV2PageClient />);
+    const game = await screen.findByTestId('word-tower-v2');
+
+    useAuth.mockReturnValue({ loading: false, user: { id: 'player-1' }, profile: null });
+    rerender(<WordTowerV2PageClient />);
+
+    expect(screen.getByTestId('word-tower-v2')).toBe(game);
+  });
 });
