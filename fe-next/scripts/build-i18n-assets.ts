@@ -61,7 +61,6 @@ mkdirSync(path.dirname(MANIFEST), { recursive: true });
 // app/[locale]/layout.tsx and bundled by webpack, never through this asset.
 const SOURCE_FILES = [
   ...LOCALES.map((lang) => path.join(ROOT, 'translations', `${lang}.js`)),
-  path.join(ROOT, 'translations', 'he.adminDashboard.js'),
   path.join(ROOT, 'i18n', 'normalizeMessages.ts'),
   path.join(ROOT, 'lib', 'i18n', 'landingNamespaces.ts'),
 ];

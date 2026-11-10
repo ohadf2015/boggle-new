@@ -32,4 +32,13 @@ describe('admin Hebrew catalogue', () => {
     }
     expect([...missing].sort()).toEqual([]);
   });
+
+  it('keeps every locale file self-contained', () => {
+    // Server code and backend tests load these with a synchronous require(); a sibling import
+    // makes that throw and every translation lookup returns undefined.
+    for (const lang of ['en', 'he', 'es', 'sv', 'ja', 'ru']) {
+      const source = readFileSync(path.join(ROOT, 'translations', `${lang}.js`), 'utf8');
+      expect(source.match(/^\s*import\s/m), `${lang}.js must not import`).toBeNull();
+    }
+  });
 });
