@@ -123,7 +123,8 @@ function donut(s: number, phase: number): FoodCritter {
   ring.circle(0, -2 * s, 25 * s).fill(PINK);
   ring.circle(0, 0, 9 * s).fill(INK);
   ring.circle(0, 0, 7 * s).fill(0x3a2a5e);
-  const sprinkles = new Graphics();
+  // A Container, not a Graphics: PixiJS v8 only lets Containers hold children.
+  const sprinkles = new Container();
   const colours = [CYAN, YELLOW, LIME, CREAM, PURPLE];
   for (let i = 0; i < 12; i += 1) {
     const a = (i / 12) * Math.PI * 2 + 0.3;
