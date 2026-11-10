@@ -22754,7 +22754,7 @@ const adminDashboardHe = {
   'eduDashboard.finding.mode_fading': '{modes} איבד לפחות חצי מהמשחקים שלו לעומת התקופה הקודמת.',
   'eduDashboard.finding.top_mode': '{mode} הוא האהוב: {pct}% מכל משחקי הכיתה.',
   'eduDashboard.finding.small_games': 'במשחק ממוצע {avg} תלמידים. ייתכן שמורים מנסים לבד ולא מלמדים.',
-  'eduDashboard.finding.peak_day': 'ההוראה בשיאה ביום {day}. שחררו ושלחו הודעות לפני.',
+  'eduDashboard.finding.peak_day': 'ההוראה בשיאה ב{day}. שחררו ושלחו הודעות לפני.',
   'eduDashboard.finding.top_teacher': '{name} הריץ הכי הרבה משחקים: {rounds} משחקים, {players} מושבי תלמידים.',
 
   'findings.show': 'הצג ({count})',
@@ -22828,7 +22828,9 @@ const adminDashboardHe = {
   'delta.fromZero': 'עלייה מאפס ב-{days} הימים שלפני',
   'delta.vsPrior': '{pct} לעומת {days} הימים שלפני (היו {prior})',
   'delta.dayEarly': 'אתמול: {prior}. מוקדם מדי ביום להשוות.',
-  'delta.dayPace': 'בקצב הזה: {projected} ({pct} לעומת אתמול, {prior})',
+  'delta.dayPace': 'בקצב הזה: {projected} · {pct} לעומת אתמול ({prior})',
+  'delta.dayNone': 'גם אתמול לא היה כלום',
+  'delta.dayFromZero': 'בקצב הזה: {projected} (אתמול: 0)',
 
   'overview.section.live': 'בשידור חי עכשיו',
   'overview.section.liveHint': 'מי מחובר ואילו משחקים רצים',

@@ -78,7 +78,7 @@ describe('EduDashboardPanel drill-down', () => {
     await load();
     const tile = screen.getByTestId('kpi-newTeachers');
     expect(tile.textContent).toContain('Access requests approved in this period');
-    expect(screen.getByTestId('kpi-newTeachers-delta').textContent).toBe('+100% vs the previous 7 days (was 1)');
+    expect(screen.getByTestId('kpi-newTeachers-delta').textContent).toBe('\u2066+100%\u2069 vs the previous 7 days (was 1)');
     expect(screen.queryByTestId('kpi-activeTeachers-delta')).toBeNull();
     openTab(/pro & trials/i);
     expect(screen.getByTestId('kpi-trialsStarted-delta').textContent).toBe('Up from 0 in the previous 7 days');

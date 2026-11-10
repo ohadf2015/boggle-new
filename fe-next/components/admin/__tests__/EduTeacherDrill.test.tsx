@@ -57,7 +57,7 @@ describe('EduTodayStrip', () => {
       <EduTodayStrip today={{ available: true, rounds: { ...tile(6, 4, 12, 200), spark: [1, 2, 3, 4, 5, 4, 6] }, teachers: tile(3, 3, 6, 100), seats: tile(80, 50, 160, 220) }} />,
     );
     expect(within(screen.getByTestId('edu-today-rounds')).getByText('6')).toBeInTheDocument();
-    expect(screen.getByTestId('edu-today-rounds-delta').textContent).toBe('At this pace: 12 (+200% vs yesterday, 4)');
+    expect(screen.getByTestId('edu-today-rounds-delta').textContent).toBe('At this pace: 12 · \u2066+200%\u2069 vs yesterday (4)');
     expect(within(screen.getByTestId('edu-today-seats')).getByText('80')).toBeInTheDocument();
   });
 
