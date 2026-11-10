@@ -48,6 +48,8 @@ export interface UseSurvivalWordSubmissionProps {
   lifeAnimationTimeout: SafeTimeout;
   // Ref for game over callback
   handleGameOverRef: React.MutableRefObject<((won: boolean, finalAttempts?: TargetAttempt[]) => void) | null>;
+  /** First games: a non-word or off-board swipe is named but costs no life. */
+  forgiveMisses?: boolean;
 }
 
 type DiscoveryOutcome = 'accepted' | 'invalid' | 'unavailable' | 'rejected';
@@ -75,6 +77,7 @@ export function useSurvivalWordSubmission({
   feedbackTimeout,
   lifeAnimationTimeout,
   handleGameOverRef,
+  forgiveMisses = false,
 }: UseSurvivalWordSubmissionProps): SurvivalWordSubmissionActions {
   // Callback refs for circular dependencies
   const handleTargetAttemptRef = useRef<((word: string, target: string) => void) | null>(null);
@@ -89,6 +92,17 @@ export function useSurvivalWordSubmission({
   discoveredRef.current = discoveredWords;
   isGameOverRef.current = isGameOver;
   const inFlightRef = useRef<Set<string>>(new Set());
+
+  // A miss costs life, except in a player's first games, where it is only named.
+  const chargeMiss = useCallback((penalty: number) => {
+    if (!forgiveMisses) dispatch({ type: 'ADJUST_LIFE', payload: { delta: -penalty } });
+  }, [forgiveMisses, dispatch]);
+  const notOnBoardMessage = useCallback(
+    () => (forgiveMisses
+      ? t('wordHunt.feedback.notOnBoardFree')
+      : t('wordHunt.feedback.notOnBoardPenalty') || `Not on board -${INVALID_WORD_PENALTY}`),
+    [forgiveMisses, t],
+  );
 
   const validateWordInDictionary = useCallback(async (word: string): Promise<WordVerdict> => {
     if (word.toLowerCase() === targetWord.toLowerCase()) return 'valid';
@@ -201,8 +215,8 @@ export function useSurvivalWordSubmission({
 
     if (!isWordOnBoard(word, grid, language)) {
       playWordRejectedSound?.();
-      dispatch({ type: 'ADJUST_LIFE', payload: { delta: -INVALID_WORD_PENALTY } });
-      showToast('not-on-board', t('wordHunt.feedback.notOnBoardPenalty') || `Not on board -${INVALID_WORD_PENALTY}`, word);
+      chargeMiss(INVALID_WORD_PENALTY);
+      showToast('not-on-board', notOnBoardMessage(), word);
       recordNotOnBoard(word, language, 'daily_word_hunt');
       return 'rejected';
     }
@@ -222,8 +236,14 @@ export function useSurvivalWordSubmission({
     }
     if (verdict === 'invalid') {
       playWordRejectedSound?.();
-      dispatch({ type: 'ADJUST_LIFE', payload: { delta: -NOT_IN_DICTIONARY_PENALTY } });
-      showToast('not-in-dictionary', t('wordHunt.feedback.notInDictionary') || `Not a word -${NOT_IN_DICTIONARY_PENALTY}`, word);
+      chargeMiss(NOT_IN_DICTIONARY_PENALTY);
+      showToast(
+        'not-in-dictionary',
+        forgiveMisses
+          ? t('wordHunt.feedback.notInDictionaryFree')
+          : t('wordHunt.feedback.notInDictionary') || `Not a word -${NOT_IN_DICTIONARY_PENALTY}`,
+        word,
+      );
       recordNotInDictionary(word, language, 'daily_word_hunt');
       return 'invalid';
     }
@@ -260,7 +280,7 @@ export function useSurvivalWordSubmission({
       : rewardMessage;
     showToast('valid-word', bonusMessage, word);
     return 'accepted';
-  }, [grid, language, playWordAcceptedSound, playWordRejectedSound, showToast, t, validateWordInDictionary, clueActions, lifeAnimationTimeout, dispatch]);
+  }, [grid, language, playWordAcceptedSound, playWordRejectedSound, showToast, t, validateWordInDictionary, clueActions, lifeAnimationTimeout, dispatch, chargeMiss, notOnBoardMessage, forgiveMisses]);
 
   // Handle word submission (main entry point)
   const handleWordSubmit = useCallback((word: string) => {
@@ -291,15 +311,21 @@ export function useSurvivalWordSubmission({
           }
         });
       } else {
-        dispatch({ type: 'ADJUST_LIFE', payload: { delta: -INVALID_WORD_PENALTY } });
-        showToast('not-on-board', t('wordHunt.feedback.notFormablePenalty') || `Not on board -${INVALID_WORD_PENALTY}`, displayWord);
+        chargeMiss(INVALID_WORD_PENALTY);
+        showToast(
+          'not-on-board',
+          forgiveMisses
+            ? t('wordHunt.feedback.notOnBoardFree')
+            : t('wordHunt.feedback.notFormablePenalty') || `Not on board -${INVALID_WORD_PENALTY}`,
+          displayWord,
+        );
         recordNotOnBoard(displayWord, language, 'daily_word_hunt');
       }
     } else {
       handleWordDiscoveryRef.current?.(displayWord);
       handleDiscoveryFeedbackRef.current?.(displayWord, targetWord.toUpperCase());
     }
-  }, [isGameOver, targetWord, grid, language, showToast, t, dispatch]);
+  }, [isGameOver, targetWord, grid, language, showToast, t, chargeMiss, forgiveMisses]);
 
   // Keep callback refs in sync
   useEffect(() => {

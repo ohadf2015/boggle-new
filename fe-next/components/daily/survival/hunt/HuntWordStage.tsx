@@ -20,12 +20,14 @@ export interface HuntWordStageProps {
   size?: 'phone' | 'desktop';
   /** While dragging, the pill reads the letters from here instead of `word`. */
   live?: LiveWordStore;
+  /** Replaces the idle swipe invite (first games: the word to try when stuck). */
+  prompt?: string;
   t: TFn;
 }
 
 const same = (w: string) => w;
 
-export function HuntWordStage({ phase, word, verdict, points, coins = null, message, calm, size = 'phone', live, t }: HuntWordStageProps) {
+export function HuntWordStage({ phase, word, verdict, points, coins = null, message, calm, size = 'phone', live, prompt, t }: HuntWordStageProps) {
   const liveWord = useLiveWord(live, same);
   const shownWord = phase === 'live' && live && liveWord ? liveWord : word;
   const letters = phase === 'idle' ? [] : Array.from(shownWord);
@@ -44,7 +46,11 @@ export function HuntWordStage({ phase, word, verdict, points, coins = null, mess
       className={styles.stage}
       aria-live="polite"
     >
-      {phase === 'idle' && <span className={styles.prompt}>{t('wordHunt.survival.stage.prompt')}</span>}
+      {phase === 'idle' && (
+        <span data-testid="hunt-stage-prompt" data-hint={prompt ? 'true' : undefined} className={styles.prompt}>
+          {prompt || t('wordHunt.survival.stage.prompt')}
+        </span>
+      )}
       <div data-testid="hunt-stage-pill" className={styles.pill} data-empty={letters.length === 0 ? 'true' : undefined}>
         <span data-testid="hunt-live-word" className={styles.word} style={{ '--n': letters.length } as React.CSSProperties}>
           {letters.map((ch, i) => (

@@ -9852,6 +9852,8 @@ const en = {
       "notOnBoardPenalty": "⚠️ Not on board -5 ❤️",
       "notFormablePenalty": "⚠️ Not on board -5 ❤️",
       "notInDictionary": "📖 Not a word -4 ❤️",
+      "notInDictionaryFree": "📖 Not a word. Try another",
+      "notOnBoardFree": "⚠️ Not on the board. Letters must touch",
       "correct": "Correct",
       "wrongPlace": "Wrong place",
       "notInWord": "Not in word"
@@ -9919,6 +9921,10 @@ const en = {
         "decline": "End run"
       },
       "findWordsToReveal": "Spell words on the grid to reveal these letters",
+      "goal": "Find the hidden {count}-letter word in {tries} tries",
+      "cueShortVsGuess": "Shorter words give free clues. {count}-letter words are guesses.",
+      "tryWord": "Stuck? Trace {word}",
+      "readyTagline": "Find today's hidden word. Shorter words you spell on the board reveal its letters.",
       "shop": "Clue Shop",
       "revealLetter": "Reveal Letter",
       "revealLetterDesc": "Reveal a random letter in the target word",
