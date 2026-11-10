@@ -157,6 +157,30 @@ describe('resolveProEntitlement', () => {
     expect(resolveProEntitlement({ tier: 'pro', status: 'past_due', source: 'polar', current_period_end: null }, NOW).hasPro).toBe(false);
   });
 
+  describe('past_due grace counts from the past_due onset, not the rolled-forward period end', () => {
+    const advancedEnd = new Date(NOW + 25 * DAY).toISOString();
+    const pastDueSince = (onsetMs: number | null, end: string | null = advancedEnd): SubscriptionRowLike => ({
+      tier: 'pro', status: 'past_due', source: 'polar', current_period_end: end,
+      provider_event_at: onsetMs == null ? null : new Date(onsetMs).toISOString(),
+    });
+
+    it('a past_due onset more than 7 days ago is NOT in grace even though the period end is next month', () => {
+      expect(resolveProEntitlement(pastDueSince(NOW - 8 * DAY), NOW).hasPro).toBe(false);
+    });
+
+    it('a past_due onset inside 7 days IS in grace', () => {
+      expect(resolveProEntitlement(pastDueSince(NOW - 6 * DAY), NOW).hasPro).toBe(true);
+    });
+
+    it('never grants more than the period-end anchor did', () => {
+      expect(resolveProEntitlement(pastDueSince(NOW - DAY, new Date(NOW - 8 * DAY).toISOString()), NOW).hasPro).toBe(false);
+    });
+
+    it('with neither an onset nor a period end there is no grace', () => {
+      expect(resolveProEntitlement(pastDueSince(null, null), NOW).hasPro).toBe(false);
+    });
+  });
+
   it('a canceled or paused Polar row is not Pro', () => {
     expect(resolveProEntitlement({ tier: 'pro', status: 'canceled', source: 'polar', current_period_end: new Date(NOW + DAY).toISOString() }, NOW).hasPro).toBe(false);
     expect(resolveProEntitlement({ tier: 'pro', status: 'paused', source: 'polar', current_period_end: null }, NOW).hasPro).toBe(false);

@@ -65,6 +65,8 @@ export interface SubscriptionRowLike {
   /** Absent on rows written before the column existed — those are provider rows. */
   source?: string | null;
   current_period_end: string | null;
+  /** Provider time of the last webhook on the row; for a past_due row, when it went past_due. */
+  provider_event_at?: string | null;
 }
 
 /**
@@ -93,11 +95,18 @@ export interface ProEntitlement {
 export const TRIAL_END_GRACE_MS = DAY_MS;
 
 /**
- * Grace past `current_period_end` for a past_due row (our choice, not Polar's number). Polar does
- * not say whether that date has already rolled forward on a failed renewal, so the real bound is
- * the provider's own unpaid/revoke event; this cap only stops a lost webhook keeping Pro forever.
+ * Grace after a renewal fails, for a past_due row (our choice, not Polar's number). The real
+ * bound is the provider's own unpaid/revoke event; this cap only stops a lost webhook keeping Pro.
  */
 export const PAST_DUE_GRACE_MS = 7 * DAY_MS;
+
+/** Polar rolls `current_period_end` a period forward on renewal, so the earlier past_due event time wins. */
+function pastDueOnset(row: SubscriptionRowLike): string | null {
+  const times = [row.provider_event_at, row.current_period_end]
+    .map((t) => (t ? Date.parse(t) : NaN))
+    .filter(Number.isFinite);
+  return times.length ? new Date(Math.min(...times)).toISOString() : null;
+}
 
 function withinGrace(periodEnd: string | null, graceMs: number, nowMs: number, whenMissing: boolean): boolean {
   const endMs = periodEnd ? Date.parse(periodEnd) : NaN;
@@ -111,7 +120,7 @@ function withinGrace(periodEnd: string | null, graceMs: number, nowMs: number, w
  * Provider rows (tier pro): `active` is Pro regardless of `current_period_end`,
  * so a late renewal webhook never logs a paying teacher out. `trialing` is Pro
  * until the trial end plus a day. `past_due` is Pro for PAST_DUE_GRACE_MS past
- * the failed renewal. Canceled and paused are not Pro.
+ * the past_due onset. Canceled and paused are not Pro.
  *
  * Grant rows: `status === 'active'` AND `now < current_period_end`. A grant
  * with no deadline is treated as over, never as forever. Grants are not trials.
@@ -126,7 +135,7 @@ export function resolveProEntitlement(row: SubscriptionRowLike | null | undefine
     if (row.tier === 'pro') {
       if (row.status === 'active') providerPro = true;
       else if (row.status === 'trialing') providerPro = withinGrace(end, TRIAL_END_GRACE_MS, nowMs, true);
-      else if (row.status === 'past_due') providerPro = withinGrace(end, PAST_DUE_GRACE_MS, nowMs, false);
+      else if (row.status === 'past_due') providerPro = withinGrace(pastDueOnset(row), PAST_DUE_GRACE_MS, nowMs, false);
     }
     return { hasPro: providerPro, paid: activePro, source, expired: false, periodEnd: end };
   }
