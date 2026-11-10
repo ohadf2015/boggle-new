@@ -1,0 +1,4 @@
+status: shipped
+attempted: ran posthog coverage audit (DEAD/CRATERED), fixed one never-wired P1 social event
+files_touched: fe-next/components/modals/UnifiedShareModal.tsx, fe-next/components/modals/__tests__/UnifiedShareModal.achievementShared.test.tsx
+next_steps: jest run for the new test was still warming up past the finalize cutoff (known slow-start in this repo); eslint on both changed files is clean and the diff is small/low-risk (one new helper + one call per share handler) — tomorrow's lane 12 should run `npx jest components/modals/__tests__/UnifiedShareModal.achievementShared.test.tsx --no-coverage` first thing to confirm GREEN before trusting it further. Backlog: P2 share-attribution events (share_link_copied, share_qr_generated) still show DEAD despite trackShare call sites existing — worth a wired-but-silent investigation next.
