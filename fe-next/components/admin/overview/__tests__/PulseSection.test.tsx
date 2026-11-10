@@ -38,7 +38,7 @@ describe('PulseSection', () => {
   it('shows the headline tiles with the change in words', () => {
     render(<PulseSection {...props} />);
     expect(within(screen.getByTestId('pulse-games')).getByText('420')).toBeInTheDocument();
-    expect(screen.getByTestId('pulse-games-delta').textContent).toBe('+50% vs the previous 7 days (was 280)');
+    expect(screen.getByTestId('pulse-games-delta').textContent).toBe('\u2066+50%\u2069 vs the previous 7 days (was 280)');
     expect(within(screen.getByTestId('pulse-signedin')).getByText('50%')).toBeInTheDocument();
     expect(within(screen.getByTestId('pulse-paying')).getByText('3')).toBeInTheDocument();
     expect(screen.getByTestId('pulse-paying').textContent).toContain('1 in a trial');
@@ -96,7 +96,7 @@ describe('PulseSection', () => {
     });
     render(<PulseSection {...props} pulse={dayPulse} windowDays={1} />);
     expect(within(screen.getByTestId('pulse-games')).getByText('Games today')).toBeInTheDocument();
-    expect(screen.getByTestId('pulse-games-delta').textContent).toBe('At this pace: 40 (0% vs yesterday, 40)');
+    expect(screen.getByTestId('pulse-games-delta').textContent).toBe('At this pace: 40 · \u20660%\u2069 vs yesterday (40)');
     expect(screen.queryByTestId('pulse-stickiness')).not.toBeInTheDocument();
   });
 
