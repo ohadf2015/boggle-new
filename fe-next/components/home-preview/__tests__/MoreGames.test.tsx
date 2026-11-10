@@ -14,22 +14,29 @@ describe('MoreGames', () => {
   it('given a phone, then the cards load one still frame each and only desktop gets the animated mascots', () => {
     const { container } = render(<MoreGames lang="he" t={(k) => k} />);
     const imgs = screen.getAllByTestId('hp-game-art') as HTMLImageElement[];
-    expect(imgs.length).toBe(3);
+    expect(imgs.length).toBe(4);
     for (const img of imgs) expect(img.getAttribute('src')).toMatch(/^\/mascot\/stills\/.+\.webp$/);
     const sources = Array.from(container.querySelectorAll('picture source'));
-    expect(sources).toHaveLength(3);
+    expect(sources).toHaveLength(4);
     for (const s of sources) expect(s.getAttribute('media')).toBe('(min-width: 1024px)');
   });
 
-  it('given the low-finish modes, then Word Tower and Adventure sit under More, not on the main shelf', () => {
+  it('given Adventure, then it sits on the main shelf and only Word Tower stays under More', () => {
     render(<MoreGames lang="en" t={(k) => k} />);
     const more = screen.getByTestId('hp-games-more');
     expect(more.tagName).toBe('DETAILS');
     expect(screen.getByTestId('hp-games-more-tower').getAttribute('href')).toBe('/en/word-tower');
-    expect(screen.getByTestId('hp-games-more-adventure').getAttribute('href')).toBe('/en/adventure');
+    expect(screen.queryByTestId('hp-games-more-adventure')).toBeNull();
     const shelf = screen.getByTestId('hp-games').querySelector('ul')!;
     const shelfHrefs = Array.from(shelf.querySelectorAll('a')).map((a) => a.getAttribute('href'));
-    expect(shelfHrefs).toEqual(['/en/blast', '/en/word-craft', '/en/connections', '/en/brain']);
+    expect(shelfHrefs).toEqual(['/en/blast', '/en/word-craft', '/en/connections', '/en/adventure', '/en/brain']);
+  });
+
+  it('given the page already has its own Adventure card, when hideAdventure is set, then no Adventure link is left on the shelf or under More', () => {
+    render(<MoreGames lang="en" t={(k) => k} hideAdventure />);
+    const hrefs = screen.getAllByRole('link').map((a) => a.getAttribute('href'));
+    expect(hrefs).not.toContain('/en/adventure');
+    expect(hrefs).toEqual(expect.arrayContaining(['/en/blast', '/en/word-tower']));
   });
 
   it('given every still, then the file exists and stays small', async () => {
