@@ -21,6 +21,7 @@ import { buildProCheckoutSucceededEvent, buildProTrialSucceededEvent, buildTrial
 import { isPolarTrialLapse } from '@/lib/education/polarTrial'
 import { notifyAdmins } from '@/lib/admin/adminNotifications'
 import { proNotice } from '@/lib/admin/adminEvents'
+import { captureApiError } from '@/utils/sentry'
 
 // Polar payloads are large; we only read a handful of fields.
 type WebhookPayload = any
@@ -260,6 +261,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ received: true })
   } catch (error) {
     console.error('[Polar] Webhook error:', error)
+    // Payment received but grant failed must page, not vanish — Sentry + PostHog.
+    captureApiError(error instanceof Error ? error : new Error(String(error)), '/api/webhook/polar', { method: 'POST', statusCode: 500 })
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

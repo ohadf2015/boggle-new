@@ -12,6 +12,7 @@ import {
   captureProFunnelServerEvent,
 } from '@/lib/education/proFunnelServer';
 import logger from '@/utils/logger';
+import { captureApiError } from '@/utils/sentry';
 
 const RETURN_RECORD_TIMEOUT_MS = 1500;
 const TEST_FLAG_LOOKUP_TIMEOUT_MS = 800;
@@ -170,6 +171,7 @@ export async function POST(request: NextRequest) {
     captureProFunnelServerEvent(buildEduProCheckoutReturnLandedEvent(user.id, tags));
   } catch (err) {
     logger.warn('Exception in POST /api/subscription/checkout-return:', err);
+    captureApiError(err instanceof Error ? err : new Error(String(err)), '/api/subscription/checkout-return', { method: 'POST' });
   }
   return new NextResponse(null, { status: 204 });
 }

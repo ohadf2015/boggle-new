@@ -37,6 +37,12 @@ vi.mock('@/lib/posthog', () => ({
   getPostHogServer: () => ({ capture: (...a: unknown[]) => capture(...a) }),
 }));
 
+const captureApiError = vi.fn();
+vi.mock('@/utils/sentry', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/utils/sentry')>()),
+  captureApiError: (...args: unknown[]) => captureApiError(...args),
+}));
+
 import { POST } from '../route';
 import { EDU_ANALYTICS_HOST } from '@/backend/utils/educationTelemetry';
 
@@ -50,6 +56,7 @@ describe('POST /api/subscription/checkout-return', () => {
     capture.mockReset();
     getCheckoutStatus.mockReset();
     getCheckoutStatus.mockResolvedValue(null);
+    captureApiError.mockReset();
   });
 
   it('records checkout_return_landed unconditionally (without checking grant/subscription) as both a durable event and server telemetry', async () => {
@@ -215,5 +222,21 @@ describe('POST /api/subscription/checkout-return', () => {
     const res = await POST(req as never);
     expect(res.status).toBe(204);
     expect(capture).toHaveBeenCalledTimes(2);
+  });
+
+  it('a mid-handler exception is captured with route context and still answers 204', async () => {
+    getAuthedUser.mockRejectedValue(new Error('auth blew up'));
+    const req = new Request('http://localhost/api/subscription/checkout-return', {
+      method: 'POST',
+      body: JSON.stringify({ locale: 'en' }),
+    });
+
+    const res = await POST(req as never);
+    expect(res.status).toBe(204);
+    expect(logSubscriptionEvent).not.toHaveBeenCalled();
+    expect(capture).not.toHaveBeenCalled();
+    expect(captureApiError).toHaveBeenCalledWith(expect.any(Error), '/api/subscription/checkout-return', {
+      method: 'POST',
+    });
   });
 });

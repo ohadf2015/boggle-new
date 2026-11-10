@@ -20,6 +20,12 @@ vi.mock('@/lib/education/dunning', () => ({
   maybeSendPaymentFailedEmail: (...args: unknown[]) => maybeSendPaymentFailedEmail(...args),
 }))
 
+const captureApiError = vi.fn()
+vi.mock('@/utils/sentry', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/utils/sentry')>()),
+  captureApiError: (...args: unknown[]) => captureApiError(...args),
+}))
+
 // static import is safe: vitest hoists the vi.mock calls above it
 import { POST } from '../route'
 
@@ -52,6 +58,7 @@ describe('polar webhook', () => {
     grantProFromOrder.mockClear()
     grantProFromCheckout.mockClear()
     logSubscriptionEvent.mockClear()
+    captureApiError.mockClear()
     signatureValid = true
     process.env.POLAR_PRO_PRODUCT_ID = PRO_PRODUCT_ID
     process.env.POLAR_WEBHOOK_SECRET = 'test-webhook-secret'
@@ -364,6 +371,46 @@ describe('polar webhook', () => {
       expect(await res.json()).toMatchObject({ missing: ['POLAR_WEBHOOK_SECRET'] })
       expect(grantProFromCheckout).not.toHaveBeenCalled()
       expect(upsertSubscription).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('mid-handler failure observability', () => {
+    it('a state-write failure returns 500 and is captured to Sentry with route context', async () => {
+      upsertSubscription.mockRejectedValueOnce(new Error('supabase down'))
+      const res = await POST(polarEvent('subscription.active', subscriptionData))
+      expect(res.status).toBe(500)
+      expect(await res.json()).toMatchObject({ error: 'Internal server error' })
+      expect(captureApiError).toHaveBeenCalledWith(expect.any(Error), '/api/webhook/polar', {
+        method: 'POST',
+        statusCode: 500,
+      })
+    })
+
+    it('a grant failure on order.paid returns 500 and is captured — the payment-received case', async () => {
+      grantProFromOrder.mockRejectedValueOnce(new Error('grant write failed'))
+      const res = await POST(polarEvent('order.paid', {
+        id: 'ord_9',
+        product_id: PRO_PRODUCT_ID,
+        total_amount: 900,
+        metadata: { user_id: 'u1' },
+      }))
+      expect(res.status).toBe(500)
+      expect(captureApiError).toHaveBeenCalledTimes(1)
+      expect(captureApiError).toHaveBeenCalledWith(expect.any(Error), '/api/webhook/polar', {
+        method: 'POST',
+        statusCode: 500,
+      })
+    })
+
+    it('non-error throws are wrapped in an Error before capture', async () => {
+      upsertSubscription.mockRejectedValueOnce('string failure')
+      const res = await POST(polarEvent('subscription.active', subscriptionData))
+      expect(res.status).toBe(500)
+      expect(captureApiError).toHaveBeenCalledWith(
+        expect.objectContaining({ message: 'string failure' }),
+        '/api/webhook/polar',
+        { method: 'POST', statusCode: 500 },
+      )
     })
   })
 })
