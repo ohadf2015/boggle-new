@@ -18,6 +18,16 @@ The access token, product id, and webhook secret must all come from the same Pol
 
 `PolarClient.validateWebhookSignature` reads `POLAR_WEBHOOK_SECRET` only. Polar issues `whsec_<base64>`. The HMAC key is the base64 payload decoded to raw bytes (Standard Webhooks). Signed content is `webhook-id.webhook-timestamp.rawBody`. Header is `webhook-signature: v1,<base64>`.
 
+## Health check
+
+`GET /api/webhook/polar` (admin-authed) answers "is Polar delivering?" without SQL access:
+
+- `configured` — env-var presence as booleans only (`polarAccessToken`, `polarProProductId`, `polarWebhookSecret`); secret values are never returned.
+- `lastEvent` — the newest `subscription_events` row the webhook wrote (Polar types are dot-namespaced `subscription./order./checkout.`, so app rows like `checkout_started` never match), or null.
+- `eventsQueryable` — false when the query itself failed, so a null `lastEvent` is never mistaken for "no webhooks ever arrived".
+
+`configured.polarWebhookSecret: true` with `lastEvent: null` means Polar has never delivered — fix the dashboard webhook URL or secret. A recent `lastEvent` proves delivery works; completion telemetry missing after that is user abandonment at Polar's hosted page, not a broken webhook.
+
 ## Events the endpoint must subscribe to
 
 - `checkout.updated` (status `succeeded` is Polar's current completion event) and `checkout.completed` (older name; also granted)

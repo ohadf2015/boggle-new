@@ -8,6 +8,10 @@
  *   Secret → POLAR_WEBHOOK_SECRET (Standard Webhooks; `whsec_` secrets are decoded)
  * Events handled: subscription.* (Teacher Pro product only), order.paid,
  *   checkout.completed, checkout.updated (status succeeded/confirmed/complete).
+ *
+ * GET (admin-authed) is a health check: env-var presence as booleans plus the
+ * last webhook event durably recorded, so "Polar never delivers" is provable
+ * from outside without SQL access.
  */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -21,6 +25,9 @@ import { buildProCheckoutSucceededEvent, buildProTrialSucceededEvent, buildTrial
 import { isPolarTrialLapse } from '@/lib/education/polarTrial'
 import { notifyAdmins } from '@/lib/admin/adminNotifications'
 import { proNotice } from '@/lib/admin/adminEvents'
+import { verifyAdminAuth } from '@/lib/auth/adminAuth'
+import { createAdminClient } from '@/utils/supabase/admin'
+import { withTimeout } from '@/lib/server/routeTimeout'
 
 // Polar payloads are large; we only read a handful of fields.
 type WebhookPayload = any
@@ -262,6 +269,59 @@ export async function POST(request: NextRequest) {
     console.error('[Polar] Webhook error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
+}
+
+const HEALTH_QUERY_TIMEOUT_MS = 2_000
+
+/**
+ * Admin health check for the webhook pipeline — the no-SQL answer to
+ * "is Polar delivering?". `configured` reports env-var presence as booleans
+ * only; secret values never leave this route. `lastEvent` is the newest
+ * subscription_events row the webhook itself wrote: Polar event types are
+ * dot-namespaced (subscription./order./checkout.), so app rows like
+ * checkout_started never match. A configured secret with lastEvent null
+ * means Polar has never delivered — the dashboard URL or secret is wrong;
+ * a recent lastEvent proves delivery works and missing completion telemetry
+ * after it is user abandonment, not a broken webhook.
+ */
+export async function GET(request: NextRequest) {
+  const authResult = await verifyAdminAuth(request)
+  if (!authResult.success) return authResult.response!
+
+  const configured = {
+    polarAccessToken: Boolean(process.env.POLAR_ACCESS_TOKEN),
+    polarProProductId: Boolean(process.env.POLAR_PRO_PRODUCT_ID),
+    polarWebhookSecret: Boolean(process.env.POLAR_WEBHOOK_SECRET),
+  }
+
+  let lastEvent: { eventType: string; receivedAt: string } | null = null
+  let eventsQueryable = true
+  try {
+    const supabase = createAdminClient()
+    if (!supabase) throw new Error('Supabase service role not configured')
+    const { data, error } = await withTimeout(
+      Promise.resolve(
+        supabase
+          .from('subscription_events')
+          .select('event_type, created_at')
+          .or('event_type.like.subscription.%,event_type.like.order.%,event_type.like.checkout.%')
+          .order('created_at', { ascending: false })
+          .limit(1),
+      ),
+      HEALTH_QUERY_TIMEOUT_MS,
+    )
+    if (error) throw error
+    const row = (data ?? [])[0] as { event_type?: unknown; created_at?: unknown } | undefined
+    if (row && typeof row.event_type === 'string' && typeof row.created_at === 'string') {
+      lastEvent = { eventType: row.event_type, receivedAt: row.created_at }
+    }
+  } catch (err) {
+    // A failed query must not read as "no webhooks ever arrived".
+    eventsQueryable = false
+    console.error('[Polar] Health check could not read subscription_events:', err)
+  }
+
+  return NextResponse.json({ ok: true, configured, eventsQueryable, lastEvent })
 }
 
 /**
