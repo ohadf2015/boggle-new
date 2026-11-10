@@ -35,4 +35,15 @@ describe('HomeClassInsightCard', () => {
     render(<HomeClassInsightCard classroomId="c1" className="5B" language="en" t={t} />);
     expect(screen.getByTestId('home-class-insight-sticker')).toBeInTheDocument();
   });
+
+  it('given the narrow Home rail, when rendered, then the button sits under the title and body in one column instead of beside them squeezing the title to a word per line', () => {
+    render(<HomeClassInsightCard classroomId="c1" className="5B" language="en" t={t} />);
+    const title = screen.getByRole('heading');
+    expect(title.parentElement).toContainElement(screen.getByTestId('home-class-insight-cta'));
+  });
+
+  it('given a Latin class name on a Hebrew page, when the title is built, then the name is bidi-isolated so the question mark stays at the end', () => {
+    render(<HomeClassInsightCard classroomId="c1" className="5B - English" language="he" t={t} />);
+    expect(screen.getByRole('heading')).toHaveTextContent('\u20685B - English\u2069');
+  });
 });

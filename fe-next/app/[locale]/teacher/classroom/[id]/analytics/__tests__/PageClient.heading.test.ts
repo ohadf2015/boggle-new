@@ -13,12 +13,6 @@ describe('analytics page says its title once', () => {
     expect(page.match(/education\.analytics\.title/g)).toHaveLength(1);
   });
 
-  it('keeps the dashboard header by default for its other mount (HQ tools sheet)', () => {
-    const dash = read('components/teacher/analytics/AnalyticsDashboard.tsx');
-    expect(dash).toContain('showHeader = true');
-    expect(dash).toMatch(/\{showHeader && \(/);
-  });
-
   it('labels the classroom breadcrumb instead of truncating the raw segment', () => {
     const crumbs = read('components/education/EducationBreadcrumbs.tsx');
     expect(crumbs).toMatch(/case 'classroom':\s*\n\s*label = t\('education\.header\.breadcrumbs\.classrooms'\)/);

@@ -238,6 +238,7 @@ describe('ClassroomGameHandler', () => {
       // THEN
       expect(mockSocket.emit).toHaveBeenCalledWith('classroomGameError', {
         error: 'Failed to create classroom game',
+        code: 'CREATE_FAILED',
       });
     });
   });
@@ -406,6 +407,7 @@ describe('ClassroomGameHandler', () => {
       expect(classroomGameManager.createClassroomGame).not.toHaveBeenCalled();
       expect(mockSocket.emit).toHaveBeenCalledWith('classroomGameError', {
         error: expect.stringMatching(/not the teacher|not authorized|classroom/i),
+        code: 'NOT_TEACHER',
       });
       expect(mockIo.emit).not.toHaveBeenCalledWith('classroomGameCreated', expect.anything());
     });
@@ -532,6 +534,7 @@ describe('ClassroomGameHandler', () => {
       expect(classroomGameManager.getActiveClassroomGames).not.toHaveBeenCalled();
       expect(mockSocket.emit).toHaveBeenCalledWith('classroomGameError', {
         error: expect.stringMatching(/not a member|not authorized|classroom/i),
+        code: 'NOT_A_MEMBER',
       });
     });
   });
@@ -568,6 +571,7 @@ describe('ClassroomGameHandler', () => {
         data.gameCode,
         data.userId
       );
+      expect(mockIo.to).not.toHaveBeenCalled();
     });
   });
 });

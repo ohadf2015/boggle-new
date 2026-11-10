@@ -24,7 +24,7 @@ export interface UseRecentClassroomGamesReturn extends State {
 
 /**
  * Recent live classroom games for the teacher's "Last class game" card.
- * Mirrors useClassroomAnalytics: loading → games | error, plus `refresh`.
+ * Loading → games | error, plus `refresh`.
  */
 export function useRecentClassroomGames({
   classroomId,

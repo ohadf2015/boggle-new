@@ -87,7 +87,7 @@ describe('classroom teacher actions with a forged identity', () => {
     const { socket, send } = socketFor({ verifiedUserId: '00000000-0000-4000-8000-000000000009' });
     await send('startClassroomGame', { gameCode: 'ACT123' });
     expect(classroomGameManager.updateClassroomGameStatus).not.toHaveBeenCalled();
-    expect(socket.emit).toHaveBeenCalledWith('classroomGameError', { error: 'Only the teacher can start this game' });
+    expect(socket.emit).toHaveBeenCalledWith('classroomGameError', { error: 'Only the teacher can start this game', code: 'NOT_TEACHER' });
   });
 
   it('Given any socket that knows a game code, When it asks for the lobby roster, Then it is not subscribed to the room and gets no names', () => {

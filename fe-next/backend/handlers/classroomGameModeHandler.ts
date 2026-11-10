@@ -67,6 +67,7 @@ export function registerClassroomGameModeHandlers(io: Server, socket: Socket): v
     if (!validation.success) {
       socket.emit('classroomGameError', {
         error: 'education.modePicker.switchFailed',
+        code: 'INVALID_PAYLOAD',
         detail: validation.error.issues[0]?.message,
       });
       return;
@@ -84,11 +85,11 @@ export function registerClassroomGameModeHandlers(io: Server, socket: Socket): v
     try {
       const game = await getClassroomGame(payload.gameCode);
       if (!game) {
-        socket.emit('classroomGameError', { error: 'education.modePicker.switchFailed' });
+        socket.emit('classroomGameError', { error: 'education.modePicker.switchFailed' , code: 'GAME_NOT_FOUND' });
         return;
       }
       if (authUserId !== game.teacherId) {
-        socket.emit('classroomGameError', { error: 'education.modePicker.switchFailed' });
+        socket.emit('classroomGameError', { error: 'education.modePicker.switchFailed' , code: 'NOT_TEACHER' });
         return;
       }
       // The one refusal with a reason the teacher can act on. Swapping the
@@ -96,7 +97,7 @@ export function registerClassroomGameModeHandlers(io: Server, socket: Socket): v
       // everyone, so say so rather than doing it or doing nothing.
       const bossId = payload.gameMode === 'classic' ? await resolveBossForTeacher(game.teacherId, payload.classroomBossId) : undefined;
       if (game.status === 'playing') {
-        socket.emit('classroomGameError', { error: 'education.modePicker.switchMidRound' });
+        socket.emit('classroomGameError', { error: 'education.modePicker.switchMidRound' , code: 'MODE_SWITCH_MID_ROUND' });
         return;
       }
 
@@ -106,7 +107,7 @@ export function registerClassroomGameModeHandlers(io: Server, socket: Socket): v
           ? await setClassroomGameMode(payload.gameCode, payload.gameMode, undefined, bossId)
           : await setClassroomGameMode(payload.gameCode, payload.gameMode);
       if (!applied) {
-        socket.emit('classroomGameError', { error: 'education.modePicker.switchFailed' });
+        socket.emit('classroomGameError', { error: 'education.modePicker.switchFailed' , code: 'MODE_SWITCH_FAILED' });
         return;
       }
 
@@ -132,7 +133,7 @@ export function registerClassroomGameModeHandlers(io: Server, socket: Socket): v
       );
     } catch (error) {
       logger.error('CLASSROOM_GAME', `Failed to switch mode: ${error}`);
-      socket.emit('classroomGameError', { error: 'education.modePicker.switchFailed' });
+      socket.emit('classroomGameError', { error: 'education.modePicker.switchFailed' , code: 'MODE_SWITCH_FAILED' });
     }
   });
 }

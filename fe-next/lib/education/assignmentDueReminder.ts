@@ -9,8 +9,7 @@
  *    Academy hub shows a persistent reminder card until it is done or due.
  * 2. OVERDUE — the `due_date` has passed and the assignment is still open: the
  *    hub nudges the student. The nudge is REPEATABLE but at most ONCE PER DAY
- *    per assignment (localStorage throttle, same StorageLike shape as
- *    teacherTrialOfferDismiss.ts), so a daily returner gets re-nudged without
+ *    per assignment (localStorage throttle), so a daily returner gets re-nudged without
  *    being spammed within one day.
  *
  * Everything here is pure + injectable (`now`, `storage`) so the card, the

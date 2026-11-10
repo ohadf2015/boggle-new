@@ -225,7 +225,6 @@ export interface ServerToClientEvents extends RoundBroadcastEvents {
   }) => void;
   /** The teacher opened a new game for the same class: re-join `toCode` (backend/handlers/classroomGameMove.ts). */
   classroomGameMoved: (data: { fromCode: string; toCode: string; reason: 'host_new_game' | 'old_code_rejoin' }) => void;
-  hostReactivated: (data: { success: boolean }) => void;
   // Audit T3 (2026-05-10): typed payload + i18n envelope. Server-side
   // `message` was English-only; clients now prefer `i18nKey`+`i18nParams`
   // via `resolveHostLeftMessage`, falling back to `message` for back-compat.

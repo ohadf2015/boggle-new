@@ -75,10 +75,10 @@ export function LessonClaimToast({ socket, me, t, dir }: LessonClaimToastProps) 
           initial={enter}
           animate={{ y: 0, scale: 1 }}
           transition={reduced ? { duration: 0 } : { type: 'spring', stiffness: 480, damping: 22 }}
-          className="flex max-w-md items-center gap-2 rounded-neo border-3 border-neo-cream/40 bg-neo-navy py-1 ps-3 pe-1 text-neo-cream shadow-hard"
+          className="flex min-w-0 max-w-md items-center gap-2 rounded-neo border-3 border-neo-cream/40 bg-neo-navy py-1 ps-3 pe-1 text-neo-cream shadow-hard"
         >
           {claim.avatar?.emoji && <span aria-hidden="true" className="text-xl">{claim.avatar.emoji}</span>}
-          <span className="min-w-0 flex-1 truncate font-neo-display text-sm font-black">
+          <span data-testid="lesson-claim-text" className="line-clamp-2 min-w-0 flex-1 font-neo-display text-sm font-black leading-tight [overflow-wrap:anywhere]">
             {t('education.race.claimedBy', { name: claim.username, word: claim.word })}
           </span>
           {incoming.length > 0 && (

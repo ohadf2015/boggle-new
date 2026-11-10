@@ -11,7 +11,7 @@ export const PRO_FEATURE_BACKING: Record<string, ProFeatureBacking> = {
   classes: {
     route: 'app/api/education/classroom/create/route.ts',
     guard: 'canCreateClass(',
-    ui: 'components/education/ClassSetupStart.tsx',
+    ui: 'components/teacher/setup/ClassSetupCreate.tsx',
     tapsFromHq: 1,
     refusal: {
       file: 'app/api/education/classroom/create/__tests__/route.classLimit.test.ts',
@@ -33,7 +33,7 @@ export const PRO_FEATURE_BACKING: Record<string, ProFeatureBacking> = {
   analytics: {
     route: 'app/api/education/classroom/[id]/analytics/route.ts',
     guard: 'teacherHasProAccess(',
-    ui: 'components/teacher/analytics/AnalyticsDashboard.tsx',
+    ui: 'components/teacher/analytics/overview/ClassOverview.tsx',
     tapsFromHq: 2,
     refusal: {
       file: 'app/api/education/classroom/[id]/analytics/__tests__/route.test.ts',

@@ -86,10 +86,10 @@ function EduStudentHeroImpl({ rank, total, score, bestWord, lesson, xp, coins, g
     });
   }
   if (xp != null && xp > 0) {
-    chips.push({ id: 'edu-student-xp', fill: 'bg-neo-purple', body: <><Sparkles className="size-4 shrink-0" aria-hidden="true" />{t('mpUi.results.xp', { xp })}</> });
+    chips.push({ id: 'edu-student-xp', fill: 'bg-neo-purple', body: <><Sparkles className="size-4 shrink-0" aria-hidden="true" /><bdi>{t('mpUi.results.xp', { xp })}</bdi></> });
   }
   if (coins != null && coins > 0) {
-    chips.push({ id: 'edu-student-coins', fill: 'bg-neo-orange', body: <><Coins className="size-4 shrink-0" aria-hidden="true" />{t('mpUi.results.coins', { coins })}</> });
+    chips.push({ id: 'edu-student-coins', fill: 'bg-neo-orange', body: <><Coins className="size-4 shrink-0" aria-hidden="true" /><bdi>{t('mpUi.results.coins', { coins })}</bdi></> });
   }
 
   return (
@@ -108,9 +108,12 @@ function EduStudentHeroImpl({ rank, total, score, bestWord, lesson, xp, coins, g
           {/* "#1 of 1" on zero points is not a placing. */}
           <div className="mt-1.5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
             {score > 0 && total > 1 && (
-              <p data-testid="edu-student-rank" className="font-neo-display text-3xl font-black leading-none tabular-nums sm:text-5xl">
-                {t('eduLiveRoom.studentResults.rankOf', { rank, total })}
-              </p>
+              <>
+                <p data-testid="edu-student-rank" className="font-neo-display text-3xl font-black leading-none tabular-nums sm:text-5xl">
+                  {t('eduLiveRoom.studentResults.rankOf', { rank, total })}
+                </p>
+                <span data-testid="edu-student-rank-divider" aria-hidden="true" className="self-center font-neo-display text-2xl font-black leading-none text-neo-black/40">·</span>
+              </>
             )}
             <p className="flex items-baseline gap-1.5 font-neo-body text-lg font-bold">
               <span data-testid="edu-student-score" className="font-neo-display text-3xl font-black tabular-nums">

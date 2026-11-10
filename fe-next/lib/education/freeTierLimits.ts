@@ -42,9 +42,7 @@ import { MAX_PLAYERS_PER_ROOM } from '@/shared/constants/gameConstants';
  * `__tests__/freeTierLimits.test.ts` pins the intent so neither half drifts by accident.
  *
  * 2026-09-21  `assignmentsPerClass: 3` — the usage-triggered paywall's teeth.
- *             The card (components/teacher/TeacherProUsagePromptCard.tsx) asks
- *             at 3+ created assignments; the soft cap in AssignmentCreator is
- *             what makes the ask honest. 3 keeps a real week of assignments
+ *             The soft cap in AssignmentCreator binds at 3+ created assignments. 3 keeps a real week of assignments
  *             free — the same reasoning as the class cap: a paywall that
  *             binds before the teacher has run the loop removes them instead
  *             of converting them. Deleting an old assignment frees a slot, so

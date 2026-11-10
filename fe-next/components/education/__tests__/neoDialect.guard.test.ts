@@ -24,8 +24,6 @@ const ALLOW: Record<PatternName, Record<string, number>> = {
   },
   borderBlack: {
     'components/teacher/TeacherPlanBadge.tsx': 1,
-    'components/teacher/TeacherProUsagePromptCard.tsx': 2,
-    'components/teacher/analytics/AnalyticsDashboard.tsx': 1,
     'components/teacher/assignments/AssignmentCreatorDueDate.tsx': 1,
     'components/teacher/assignments/AssignmentResultsView.tsx': 1,
     'components/teacher/assignments/AssignmentStep.tsx': 1,

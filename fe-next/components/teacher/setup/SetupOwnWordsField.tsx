@@ -33,7 +33,7 @@ export function SetupOwnWordsField({ own, t }: { own: SetupOwnWords; t: T }) {
         spellCheck={false}
         onChange={(e) => own.onTextChange(e.target.value)}
         placeholder={t('eduShell.setup.words.placeholder')}
-        className={cn(NB_INPUT, 'h-16 resize-none py-2 leading-snug')}
+        className={cn(NB_INPUT, 'resize-none py-2 leading-snug', own.text.trim() ? 'h-28' : 'h-16')}
       />
       {short ? (
         <p data-testid="setup-own-words-status" aria-live="polite" className="font-neo-body text-sm font-semibold text-neo-cream/80">

@@ -33,9 +33,12 @@ function chipLabel(slot: StripSlot, t: T): string | undefined {
 /** Dark-only surface, so colours are fixed against navy rather than a cream/dark pair. */
 export function LessonTargetStrip(props: LessonTargetStripProps) {
   const { t, dir, className, inline } = props;
-  const slots = props.targets ? targetsToSlots(props.targets) : (props.slots ?? []);
+  const all = props.targets ? targetsToSlots(props.targets) : (props.slots ?? []);
   const race = !props.targets && !!props.race;
-  const done = slots.filter((s) => s.state !== 'hidden').length;
+  const done = all.filter((s) => s.state !== 'hidden').length;
+  // One line under the grid holds only a few chips: the words still to grab are the clue, so they go first.
+  const compact = inline && race;
+  const slots = compact ? [...all.filter((s) => s.state === 'hidden'), ...all.filter((s) => s.state !== 'hidden')] : all;
   const title = race
     ? t('education.race.claimedCount', { claimed: done, total: slots.length })
     : t('education.wordBank.huntTitle', { found: done, total: slots.length });
@@ -56,9 +59,23 @@ export function LessonTargetStrip(props: LessonTargetStripProps) {
       <div className="flex items-center gap-2">
         <span className="flex shrink-0 items-center gap-1 font-neo-display text-xs font-black uppercase tracking-wide text-neo-cyan">
           <Target className="h-3.5 w-3.5" aria-hidden="true" />
-          <Pop pulseKey={done}>{title}</Pop>
+          {compact ? (
+            <Pop pulseKey={done}>
+              <span data-testid="lesson-target-count" aria-hidden="true" dir="ltr" className="tabular-nums">{`${done}/${slots.length}`}</span>
+              <span className="sr-only">{title}</span>
+            </Pop>
+          ) : (
+            <Pop pulseKey={done}>{title}</Pop>
+          )}
         </span>
-        <ul className={cn('flex min-w-0 flex-1 items-center gap-1', inline ? 'flex-nowrap overflow-hidden' : 'flex-wrap')}>
+        <ul
+          className={cn(
+            'flex min-w-0 flex-1 items-center gap-1',
+            !inline && 'flex-wrap',
+            inline && !compact && 'flex-nowrap overflow-hidden',
+            compact && 'pointer-events-auto flex-nowrap overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
+          )}
+        >
           {slots.map((slot) => (
             <li
               key={slot.key}
@@ -66,14 +83,15 @@ export function LessonTargetStrip(props: LessonTargetStripProps) {
               data-state={slot.state}
               aria-label={chipLabel(slot, t)}
               className={cn(
-                'flex items-center gap-1 rounded-neo border-2 border-neo-black px-1.5 py-0.5 font-neo-display text-sm font-black uppercase leading-none shadow-hard-sm',
+                'flex shrink-0 items-center gap-1 rounded-neo border-2 border-neo-black px-1.5 py-0.5 font-neo-display font-black uppercase leading-none shadow-hard-sm',
+                compact ? 'text-xs' : 'text-sm',
                 CHIP_BY_STATE[slot.state],
               )}
             >
               {slot.state === 'hidden' ? (
                 <span aria-hidden="true">
                   {slot.first}
-                  <span className="ms-0.5 tracking-[0.15em] text-neo-black/45">{'·'.repeat(slot.rest)}</span>
+                  <span className={cn('ms-0.5 text-neo-black/45', compact ? 'tracking-[0.05em]' : 'tracking-[0.15em]')}>{'·'.repeat(slot.rest)}</span>
                 </span>
               ) : (
                 <Pop pulseKey={`${slot.key}:${slot.state}`}>

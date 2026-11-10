@@ -110,11 +110,12 @@ describe('classroomSeatGate — one rule, every seating path', () => {
     expect(mockGetClassroomGame).toHaveBeenCalledTimes(1);
   });
 
-  it("omits the GAME_ENDED log code for a code that never existed", () => {
+  it("tags a code that never existed GAME_NOT_FOUND, not GAME_ENDED", () => {
     const socket = makeSocket();
     refuseSeat(socket, 'NOPE12', 'classroom', 'unknown');
     expect(socket.emit).toHaveBeenCalledWith('classroomGameError', {
       error: 'Game not found',
+      code: 'GAME_NOT_FOUND',
       gameCode: 'NOPE12',
     });
   });

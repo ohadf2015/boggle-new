@@ -45,6 +45,15 @@ describe('RivalTicker', () => {
     ]);
   });
 
+  it('Given three long flips on one line, When they share the row, Then the newest keeps its whole sentence and the older ones give up the room', () => {
+    const s = fakeSocket();
+    render(<RivalTicker socket={s.socket} />);
+    for (const name of ['Maximiliana-Josefina', 'Bartholomew-Alexander', 'Konstantina-Evangelia']) s.fire('rivalFlip', flip(name));
+    const items = screen.getAllByTestId('rival-ticker-item');
+    expect(items[0].className).toMatch(/\bshrink-0\b/);
+    expect(items[1].className).not.toMatch(/\bshrink-0\b/);
+  });
+
   it('Given a flip, When it is shown, Then the text names only the winner and carries no score', () => {
     const s = fakeSocket();
     render(<RivalTicker socket={s.socket} />);

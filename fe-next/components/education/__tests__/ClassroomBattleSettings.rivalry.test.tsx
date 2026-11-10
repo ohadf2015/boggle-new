@@ -36,4 +36,10 @@ describe('ClassroomBattleSettings rivalry toggle', () => {
     render(<ClassroomBattleSettings {...base} />);
     expect(screen.queryByTestId('battle-rivalry')).toBeNull();
   });
+
+  it('Given the settings panel, When rendered, Then the duel toggle sits in the play style group instead of floating as a section with no heading', () => {
+    render(<ClassroomBattleSettings {...base} onRivalryChange={vi.fn()} />);
+    const group = screen.getByTestId('battle-playstyle-group');
+    expect(group).toContainElement(screen.getByTestId('battle-rivalry'));
+  });
 });

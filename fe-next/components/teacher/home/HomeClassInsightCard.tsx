@@ -24,21 +24,20 @@ export function HomeClassInsightCard({ classroomId, className, language, t }: Ho
     <ProBanner
       testId="home-class-insight"
       proLabel={t('eduShell.nav.pro')}
-      title={t('teacher.weekInsight.homeTitle', { name: className })}
+      title={t('teacher.weekInsight.homeTitle', { name: `\u2068${className}\u2069` })}
       body={t('teacher.weekInsight.homeBody')}
-      action={
-        <Link
-          ref={ref}
-          href={`/${language}/teacher/classroom/${classroomId}/analytics`}
-          data-testid="home-class-insight-cta"
-          onClick={onClick}
-          className={cn(PRO_BANNER_CTA, 'w-full whitespace-normal px-3 text-sm leading-tight')}
-        >
-          <ProShine />
-          <span className="relative">{t('teacher.weekInsight.homeCta')}</span>
-          <ChevronRight className="relative size-4 shrink-0 rtl:-scale-x-100" aria-hidden="true" />
-        </Link>
-      }
-    />
+    >
+      <Link
+        ref={ref}
+        href={`/${language}/teacher/classroom/${classroomId}/analytics`}
+        data-testid="home-class-insight-cta"
+        onClick={onClick}
+        className={cn(PRO_BANNER_CTA, 'mt-3 w-full whitespace-normal px-3 text-sm leading-tight')}
+      >
+        <ProShine />
+        <span className="relative">{t('teacher.weekInsight.homeCta')}</span>
+        <ChevronRight className="relative size-4 shrink-0 rtl:-scale-x-100" aria-hidden="true" />
+      </Link>
+    </ProBanner>
   );
 }

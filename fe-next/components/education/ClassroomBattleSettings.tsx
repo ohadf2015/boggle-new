@@ -58,7 +58,7 @@ export function ClassroomBattleSettings({
   return (
     <div className="space-y-6">
       {/* Play style */}
-      <div>
+      <div data-testid="battle-playstyle-group">
         <div id="classroom-playstyle-label" className="mb-3 block font-neo-display text-sm font-bold text-neo-cream">
           <Users className="me-2 inline size-4 text-neo-cream/70" />
           {t('teacher.classroom.playStyle.title')}
@@ -135,27 +135,26 @@ export function ClassroomBattleSettings({
             </p>
           </div>
         )}
+        {onRivalryChange && (
+          <div className="mt-3">
+            <button
+              type="button"
+              aria-pressed={rivalry}
+              data-testid="battle-rivalry"
+              onClick={() => onRivalryChange(!rivalry)}
+              className={cn(
+                'inline-flex min-h-[44px] items-center gap-1.5 rounded-neo border-2 px-4 py-2 font-neo-display text-sm font-bold transition-colors',
+                CALM_FOCUS,
+                rivalry ? CALM_SELECTED : CALM_IDLE
+              )}
+            >
+              {rivalry ? <Check className="size-3.5 shrink-0" strokeWidth={3} aria-hidden="true" /> : <Swords className="size-3.5 shrink-0" aria-hidden="true" />}
+              {t('teacher.classroom.rivalry.toggle')}
+            </button>
+            <p className="mt-2 font-neo-body text-xs text-neo-cream/70">{t('teacher.classroom.rivalry.hint')}</p>
+          </div>
+        )}
       </div>
-
-      {onRivalryChange && (
-        <div>
-          <button
-            type="button"
-            aria-pressed={rivalry}
-            data-testid="battle-rivalry"
-            onClick={() => onRivalryChange(!rivalry)}
-            className={cn(
-              'inline-flex min-h-[44px] items-center gap-1.5 rounded-neo border-2 px-4 py-2 font-neo-display text-sm font-bold transition-colors',
-              CALM_FOCUS,
-              rivalry ? CALM_SELECTED : CALM_IDLE
-            )}
-          >
-            {rivalry ? <Check className="size-3.5 shrink-0" strokeWidth={3} aria-hidden="true" /> : <Swords className="size-3.5 shrink-0" aria-hidden="true" />}
-            {t('teacher.classroom.rivalry.toggle')}
-          </button>
-          <p className="mt-2 font-neo-body text-xs text-neo-cream/70">{t('teacher.classroom.rivalry.hint')}</p>
-        </div>
-      )}
 
       {/* Support (SPED) toggles */}
       <div>

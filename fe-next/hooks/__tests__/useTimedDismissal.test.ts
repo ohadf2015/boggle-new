@@ -3,7 +3,6 @@ import { renderHook, act } from '@testing-library/react';
 import { useTimedDismissal, isDismissedWithin } from '@/hooks/useLocalStorageState';
 import { useTeacherTrialEnded } from '@/hooks/useTeacherTrialEnded';
 import { useTeacherTrialExpiring } from '@/hooks/useTeacherTrialExpiring';
-import { useTeacherTrialOffer } from '@/hooks/useTeacherTrialOffer';
 
 const KEY = 'lexiclash.test_dismissed';
 const DAY = 24 * 60 * 60 * 1000;
@@ -57,9 +56,7 @@ describe('useTimedDismissal', () => {
   it('keeps every trial banner on its existing key, so dismissals already in browsers still count', () => {
     localStorage.setItem('lexiclash.teacher_trial_ended_dismissed', String(NOW));
     localStorage.setItem('lexiclash.teacher_trial_expiring_dismissed', String(NOW));
-    localStorage.setItem('lexiclash.teacher_trial_offer_dismissed', String(NOW));
     expect(renderHook(() => useTeacherTrialEnded()).result.current.dismissed).toBe(true);
     expect(renderHook(() => useTeacherTrialExpiring()).result.current.dismissed).toBe(true);
-    expect(renderHook(() => useTeacherTrialOffer()).result.current.dismissed).toBe(true);
   });
 });

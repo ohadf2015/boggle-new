@@ -63,6 +63,13 @@ describe('LessonClaimToast', () => {
     expect(touchable).toEqual([screen.getByTestId('lesson-claim-reactions')]);
   });
 
+  it('Given a long name and word, When the toast shows on a narrow phone, Then the toast may shrink below its text width so the line truncates instead of spilling off screen', () => {
+    render(<LessonClaimToast socket={fakeSocket() as never} me="Dana" t={t} dir="ltr" />);
+    act(() => ingestLessonClaim(claim('Maximiliana-Josefina')));
+    expect(screen.getByTestId('lesson-claim-toast').className).toMatch(/\bmin-w-0\b/);
+    expect(screen.getByTestId('lesson-claim-text').className).toMatch(/\bline-clamp-2\b/);
+  });
+
   it('Given the toast is up, When time passes, Then it leaves on its own', () => {
     render(<LessonClaimToast socket={fakeSocket() as never} me="Dana" t={t} dir="ltr" />);
     act(() => ingestLessonClaim(claim('Noa')));

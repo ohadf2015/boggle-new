@@ -38,6 +38,12 @@ describe('ChestRewardCta', () => {
     expect(screen.queryByText('classroomBoss.chestUpgraded')).toBeNull();
   });
 
+  it('Given a reward on a Hebrew page, Then the "+N XP" line is isolated so its plus sign stays in front of the number', () => {
+    reward.value = { gameCode: 'ABC', roundId: '7', rarity: 'rare', xp: 25, itemId: 'eyes:starEye', roundCash: 1, rank: 6, size: 6 };
+    render(<ChestRewardCta gameCode="ABC" roundId="7" />);
+    expect(screen.getByText('economy.chest.xp').tagName).toBe('BDI');
+  });
+
   it('Given an underdog finish, Then the chest says it is a comeback chest; a normal chest does not', () => {
     reward.value = { gameCode: 'ABC', roundId: '7', rarity: 'rare', xp: 25, itemId: 'eyes:starEye', roundCash: 1, rank: 6, size: 6, underdog: true };
     render(<ChestRewardCta gameCode="ABC" roundId="7" />);

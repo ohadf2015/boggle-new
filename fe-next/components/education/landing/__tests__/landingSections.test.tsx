@@ -2,7 +2,6 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { LandingHowItWorks } from '../LandingHowItWorks';
 import { LandingFinalCta } from '../LandingFinalCta';
-import { LandingFaq } from '../LandingFaq';
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
@@ -35,20 +34,5 @@ describe('LandingFinalCta', () => {
   it('asks a signed-in non-teacher to finish setup', () => {
     render(<LandingFinalCta setupPending />);
     expect(screen.getByTestId('landing-final-start')).toHaveTextContent('eg2Land.hero.ctaFinishSetup');
-  });
-});
-
-describe('LandingFaq', () => {
-  const items = [
-    { question: 'Q1?', answer: 'A1.' },
-    { question: 'Q2?', answer: 'A2.' },
-  ];
-
-  it('renders every FAQPage item exactly once, answers in the HTML', () => {
-    const { container } = render(<LandingFaq title="FAQ" items={items} />);
-    expect(container.querySelectorAll('details')).toHaveLength(2);
-    expect(container.textContent).toContain('A1.');
-    expect(container.textContent).toContain('A2.');
-    expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('FAQ');
   });
 });

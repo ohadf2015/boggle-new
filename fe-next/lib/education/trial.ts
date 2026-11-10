@@ -14,14 +14,6 @@ export const TEACHER_TRIAL_DAYS = 14;
 /** When daysLeft drops to this or below, surface the high-urgency styling/copy. */
 export const TRIAL_URGENT_DAYS = 3;
 
-/**
- * Dashboard upgrade-nudge window: show the dismissible trial-days banner once
- * the deadline is this close. Distinct from TRIAL_URGENT_DAYS (styling) so a
- * teacher still has a week to convert before the pink "last chance" treatment.
- */
-export const TRIAL_UPGRADE_NUDGE_DAYS = 7;
-
-const TRIAL_UPGRADE_NUDGE_DISMISS_PREFIX = 'lexiclash.teacher_trial_upgrade_nudge_dismissed:';
 const TRIAL_REMINDER_DISMISS_PREFIX = 'lexiclash.teacher_trial_reminder_dismissed:';
 
 /** ISO timestamp for the trial deadline, TEACHER_TRIAL_DAYS after `fromMs`. */
@@ -98,11 +90,6 @@ const HOUR_FORMS = {
   other: 'education.trial.hours_left',
 };
 
-/** Active trial whose deadline is inside the dashboard upgrade-nudge window. */
-export function isTrialUpgradeNudgeWindow(trial: TrialStatus | null | undefined): boolean {
-  return !!trial && !trial.isExpired && trial.daysLeft <= TRIAL_UPGRADE_NUDGE_DAYS;
-}
-
 /** Active trial whose deadline is inside the urgent reminder window (daysLeft <= TRIAL_URGENT_DAYS). */
 export function isTrialReminderWindow(trial: TrialStatus | null | undefined): boolean {
   return !!trial && !trial.isExpired && trial.daysLeft <= TRIAL_URGENT_DAYS;
@@ -125,32 +112,6 @@ export function isEligibleForTeacherProUpgradeCta({
 }): boolean {
   if (proLoading || accessLoading || hasPro) return false;
   return !!trial && !trial.isExpired;
-}
-
-export function trialUpgradeNudgeDismissKey(expiresAt: string): string {
-  return `${TRIAL_UPGRADE_NUDGE_DISMISS_PREFIX}${expiresAt}`;
-}
-
-export function isTrialUpgradeNudgeDismissed(
-  storage: { getItem(key: string): string | null } | null | undefined,
-  expiresAt: string,
-): boolean {
-  try {
-    return storage?.getItem(trialUpgradeNudgeDismissKey(expiresAt)) === '1';
-  } catch {
-    return false;
-  }
-}
-
-export function persistTrialUpgradeNudgeDismissed(
-  storage: { setItem(key: string, value: string): void } | null | undefined,
-  expiresAt: string,
-): void {
-  try {
-    storage?.setItem(trialUpgradeNudgeDismissKey(expiresAt), '1');
-  } catch {
-    // Private mode / quota — the in-session hide still works.
-  }
 }
 
 export function trialReminderDismissKey(expiresAt: string): string {

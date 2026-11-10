@@ -8,7 +8,7 @@ import { JoinAlert } from './JoinAlert';
 import { JoinPrimaryButton } from './JoinPrimaryButton';
 import { useKeepInView } from './useKeepInView';
 import { DeadEndPracticeLink } from './DeadEndPracticeLink';
-import type { JoinFlowState } from './useJoinFlow';
+import type { JoinFlowState } from './joinFlowState';
 
 const K = 'education.student.join';
 

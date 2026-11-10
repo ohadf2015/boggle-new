@@ -359,8 +359,7 @@ export type GrowthEvent =
   // dual-emit would double-count them in PostHog.
   | 'teacher_activation_funnel_step'
   | 'teacher_activation_funnel_completed'
-  // Teacher Pro Day-0 trial activation checklist — mirrored from
-  // lib/education/trialChecklistTelemetry.ts (bare posthog.capture + this mirror).
+  // Teacher Pro Day-0 trial activation checklist.
   // NOT in CANONICAL_DUAL_EMIT: bare names are captured directly, dual-emit would double-count.
   | 'trial_checklist_shown'
   | 'trial_checklist_step_completed'

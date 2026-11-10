@@ -21,8 +21,7 @@ interface Args {
 /**
  * Join the class's live game and navigate ONLY once the server acks it.
  *
- * Extracted from `ClassroomGameBanner` so the Academy Map's big "Join live game"
- * button and the banner run the exact same join (recurring pitfall class 3):
+ * Every student "Join live game" button runs this one join (recurring pitfall class 3):
  *  - navigating in the same tick as the emit rendered the server's rejection
  *    nowhere (class 4), so we wait for `joinedClassroomGame`;
  *  - `classroomGameError` is a shared channel (the 15s poll emits on it too),

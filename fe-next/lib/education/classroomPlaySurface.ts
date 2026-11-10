@@ -2,10 +2,8 @@
  * Is this live multiplayer room actually a class session, seen by a STUDENT?
  *
  * `?classroom=true` is the only signal that separates the two. Every student
- * entry point sets it — `components/education/join/useJoinFlow.ts`,
- * `components/student/ClassroomGameBanner.tsx`,
- * `components/student/PlayWithClassButton.tsx` — and the teacher's own entry
- * adds `&host=true` on top of it.
+ * entry point sets it — `components/education/join/useJoinFlow.ts` — and the
+ * teacher's own entry adds `&host=true` on top of it.
  *
  * Why the URL and not game state: the server never tells a player mid-round
  * that their room belongs to a classroom. `classroomSummary` exists, but it

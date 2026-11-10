@@ -68,4 +68,14 @@ describe('LessonTargetStrip inline (round dock under the grid)', () => {
     expect(strip.className).toMatch(/pointer-events-none/);
     expect(within(strip).getByRole('list').className).toMatch(/flex-nowrap/);
   });
+
+  it('Given an inline race, When rendered, Then the open masks lead the line and the count is a bare number with its full label kept for screen readers', () => {
+    render(<LessonTargetStrip slots={slots} race inline t={t} dir="ltr" />);
+    const strip = screen.getByTestId('lesson-target-strip');
+    const chips = within(strip).getAllByRole('listitem');
+    expect(chips[0]).toHaveAttribute('data-state', 'hidden');
+    expect(chips[1]).toHaveAttribute('data-state', 'mine');
+    expect(within(strip).getByTestId('lesson-target-count')).toHaveTextContent(/^1\/2$/);
+    expect(strip).toHaveTextContent('education.race.claimedCount:{"claimed":1,"total":2}');
+  });
 });

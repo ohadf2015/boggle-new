@@ -95,12 +95,13 @@ export default function RivalTicker({ socket, className }: RivalTickerProps) {
         data-testid="rival-ticker-list"
         className="flex min-h-[2.2em] min-w-0 items-center gap-[1.5cqi] overflow-hidden whitespace-nowrap font-neo-display text-[clamp(0.875rem,1.9cqi,2.25rem)] font-bold text-neo-cream"
       >
-        {items.map((item) => (
+        {items.map((item, index) => (
           <li
             key={item.id}
             data-testid="rival-ticker-item"
             className={cn(
-              'flex min-w-0 shrink items-center gap-[0.6cqi] rounded-neo border-2 border-neo-cream/40 bg-neo-navy px-[1cqi] py-[0.4cqi] shadow-hard-sm transition-opacity duration-700 motion-reduce:transition-none',
+              index === 0 ? 'max-w-full shrink-0' : 'shrink',
+              'flex min-w-0 items-center gap-[0.6cqi] rounded-neo border-2 border-neo-cream/40 bg-neo-navy px-[1cqi] py-[0.4cqi] shadow-hard-sm transition-opacity duration-700 motion-reduce:transition-none',
               item.fading ? 'opacity-0' : 'motion-safe:animate-pop-in'
             )}
           >

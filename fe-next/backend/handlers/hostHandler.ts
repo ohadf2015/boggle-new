@@ -55,8 +55,6 @@ function registerHostHandlers(io: Server, socket: Socket): void {
 
     reactivateHost(gameCode);
     logger.info('HOST', `Host reactivated for game ${gameCode}`);
-
-    socket.emit('hostReactivated', { success: true });
   });
 
   // Handle host changing the room dictionary language pre-game

@@ -47,4 +47,14 @@ describe('ProjectorLessonClaims', () => {
     expect(board.className).toMatch(/\[container-type:size\]/);
     expect(board.outerHTML).not.toMatch(/\b(sm|md|lg|xl):/);
   });
+
+  it('Given a long and a short word, When the tiles size their text, Then each tile is its own size container and the longer word gets the smaller width share, so neither spills out of its tile', () => {
+    const words = [{ index: 0, first: 'T', length: 11, claim: null }, { index: 1, first: 'A', length: 4, claim: null }];
+    act(() => ingestLessonClaimsRound({ lessonClaims: { roundId: 4, total: 2, claimedCount: 0, slots: words } }));
+    render(<ProjectorLessonClaims t={t} />);
+    const faces = screen.getAllByTestId('claim-tile-face');
+    expect(faces.every((f) => /\[container-type:size\]/.test(f.className))).toBe(true);
+    const share = (el: HTMLElement) => Number(/([\d.]+)cqw/.exec(el.querySelector('[data-testid=claim-tile-text]')!.getAttribute('style') ?? '')?.[1]);
+    expect(share(faces[0])).toBeLessThan(share(faces[1]));
+  });
 });

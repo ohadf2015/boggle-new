@@ -219,8 +219,6 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
   const railAsk = pickHomeAsk({
     account: Boolean(accountBanner),
     onboarding: !hasClasses || nextStepShown,
-    trial: false,
-    usage: false,
     pro: freeTeacher && insightClass !== null,
   });
   const proCard = askSettled && railAsk === 'pro' && insightClass ? (

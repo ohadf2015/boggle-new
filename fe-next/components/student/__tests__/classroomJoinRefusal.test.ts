@@ -2,7 +2,9 @@ import { describe, it, expect } from 'vitest';
 import {
   classifyClassroomJoinRefusal,
   CLASSROOM_JOIN_REFUSAL_KEYS,
+  REASON_BY_CODE,
 } from '../classroomJoinRefusal';
+import { CLASSROOM_GAME_ERROR_CODES } from '@/shared/constants/classroomGameErrors';
 
 describe('classifyClassroomJoinRefusal', () => {
   it.each([
@@ -16,12 +18,15 @@ describe('classifyClassroomJoinRefusal', () => {
     [{ code: 'PLAYER_KICKED' }, 'removed', 'student.activeGame.joinRemoved'],
     [{ code: 'PLAYER_BLOCKED' }, 'removed', 'student.activeGame.joinRemoved'],
     [{ code: 'ROOM_LOCKED' }, 'locked', 'education.student.join.roomLocked.hint'],
+    [{ code: 'NOT_TEACHER' }, 'teacherOnly', 'economy.error.not_teacher'],
+    [{ code: 'NO_QUIZ_QUESTIONS' }, 'noQuestions', 'vocabQuiz.errors.noQuestions'],
+    [{ code: 'CREATE_FAILED' }, 'busy', 'student.activeGame.joinBusy'],
   ])('%j is its own reason (%s)', (payload, refusal, messageKey) => {
     expect(classifyClassroomJoinRefusal(payload)).toEqual({ refusal, messageKey });
   });
 
-  it('a room lost to a restart ("Game not found", no code) is retryable, never "the game ended"', () => {
-    expect(classifyClassroomJoinRefusal({ error: 'Game not found' })).toEqual({
+  it('a room lost to a restart (GAME_NOT_FOUND) is retryable, never "the game ended"', () => {
+    expect(classifyClassroomJoinRefusal({ error: 'Game not found', code: 'GAME_NOT_FOUND' })).toEqual({
       refusal: 'retry',
       messageKey: 'student.activeGame.joinRetry',
     });
@@ -37,6 +42,12 @@ describe('classifyClassroomJoinRefusal', () => {
 
   it('Given a sign-in the server could not check, When classified, Then the student is told to try again, not to sign in', () => {
     expect(classifyClassroomJoinRefusal({ code: 'AUTH_UNVERIFIED' }).refusal).toBe('busy');
+  });
+
+  it('maps every code the server can send to a reason of its own choosing', () => {
+    for (const code of CLASSROOM_GAME_ERROR_CODES) {
+      expect(REASON_BY_CODE[code], code).toBeDefined();
+    }
   });
 
   it('an unknown code falls back to retry', () => {

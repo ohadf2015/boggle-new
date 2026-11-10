@@ -52,6 +52,10 @@ export function FreeWeekInsight({ classroomId, locale }: { classroomId: string; 
 
 function WeekCard({ classroomId, locale, insight, t }: { classroomId: string; locale: string; insight: FreeClassInsight; t: T }) {
   const names = useRosterNames(classroomId);
+  return <FreeWeekCard classroomId={classroomId} locale={locale} insight={insight} names={names} t={t} />;
+}
+
+export function FreeWeekCard({ classroomId, locale, insight, names, t }: { classroomId: string; locale: string; insight: FreeClassInsight; names: Map<string, string>; t: T }) {
   const { needsHelp } = insight.pulse;
   const empty = insight.sessionsThisWeek === 0 && insight.hardestWords.length === 0 && needsHelp.length === 0;
 

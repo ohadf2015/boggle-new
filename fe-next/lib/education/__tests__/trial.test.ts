@@ -2,14 +2,9 @@ import { describe, it, expect } from 'vitest';
 import {
   TEACHER_TRIAL_DAYS,
   TRIAL_URGENT_DAYS,
-  TRIAL_UPGRADE_NUDGE_DAYS,
   teacherTrialExpiry,
   teacherTrialStatus,
-  isTrialUpgradeNudgeWindow,
   isEligibleForTeacherProUpgradeCta,
-  isTrialUpgradeNudgeDismissed,
-  persistTrialUpgradeNudgeDismissed,
-  trialUpgradeNudgeDismissKey,
   isTrialReminderWindow,
   trialReminderDismissKey,
   isTrialReminderDismissed,
@@ -78,31 +73,6 @@ function statusInDays(days: number, now = Date.parse('2026-06-26T00:00:00.000Z')
   return teacherTrialStatus(exp, now);
 }
 
-describe('isTrialUpgradeNudgeWindow', () => {
-  it('is false with no trial', () => {
-    expect(isTrialUpgradeNudgeWindow(null)).toBe(false);
-    expect(isTrialUpgradeNudgeWindow(undefined)).toBe(false);
-  });
-
-  it(`is true at the ${TRIAL_UPGRADE_NUDGE_DAYS}-day boundary and inside it`, () => {
-    expect(isTrialUpgradeNudgeWindow(statusInDays(TRIAL_UPGRADE_NUDGE_DAYS))).toBe(true);
-    expect(isTrialUpgradeNudgeWindow(statusInDays(3))).toBe(true);
-    expect(isTrialUpgradeNudgeWindow(statusInDays(1))).toBe(true);
-  });
-
-  it(`is false with more than ${TRIAL_UPGRADE_NUDGE_DAYS} days left`, () => {
-    expect(isTrialUpgradeNudgeWindow(statusInDays(TRIAL_UPGRADE_NUDGE_DAYS + 1))).toBe(false);
-    expect(isTrialUpgradeNudgeWindow(statusInDays(10))).toBe(false);
-  });
-
-  it('is false once the trial has expired — that is a different banner', () => {
-    const now = Date.parse('2026-06-26T00:00:00.000Z');
-    expect(isTrialUpgradeNudgeWindow(teacherTrialStatus(new Date(now - DAY).toISOString(), now))).toBe(
-      false,
-    );
-  });
-});
-
 describe('isEligibleForTeacherProUpgradeCta', () => {
   const active = statusInDays(10);
 
@@ -131,41 +101,6 @@ describe('isEligibleForTeacherProUpgradeCta', () => {
     const expired = teacherTrialStatus(new Date(now - DAY).toISOString(), now);
     expect(isEligibleForTeacherProUpgradeCta({ trial: expired, hasPro: false })).toBe(false);
     expect(isEligibleForTeacherProUpgradeCta({ trial: null, hasPro: false })).toBe(false);
-  });
-});
-
-describe('trial upgrade-nudge dismiss persistence', () => {
-  const expiresAt = '2026-07-01T00:00:00.000Z';
-
-  function memStorage() {
-    const mem = new Map<string, string>();
-    return {
-      mem,
-      storage: {
-        getItem: (k: string) => mem.get(k) ?? null,
-        setItem: (k: string, v: string) => {
-          mem.set(k, v);
-        },
-      },
-    };
-  }
-
-  it('keys dismiss to this trial deadline, not a global flag', () => {
-    expect(trialUpgradeNudgeDismissKey(expiresAt)).toContain(expiresAt);
-  });
-
-  it('reads as not dismissed when storage is missing or empty', () => {
-    expect(isTrialUpgradeNudgeDismissed(null, expiresAt)).toBe(false);
-    const { storage } = memStorage();
-    expect(isTrialUpgradeNudgeDismissed(storage, expiresAt)).toBe(false);
-  });
-
-  it('persists a dismiss so a reload stays quiet for this deadline only', () => {
-    const { mem, storage } = memStorage();
-    persistTrialUpgradeNudgeDismissed(storage, expiresAt);
-    expect(mem.get(trialUpgradeNudgeDismissKey(expiresAt))).toBe('1');
-    expect(isTrialUpgradeNudgeDismissed(storage, expiresAt)).toBe(true);
-    expect(isTrialUpgradeNudgeDismissed(storage, '2026-08-01T00:00:00.000Z')).toBe(false);
   });
 });
 
@@ -216,11 +151,8 @@ describe('trial reminder dismiss persistence', () => {
     };
   }
 
-  it('dismiss key is different from the 7-day nudge key', () => {
-    const reminderKey = trialReminderDismissKey(expiresAt);
-    const nudgeKey = trialUpgradeNudgeDismissKey(expiresAt);
-    expect(reminderKey).not.toBe(nudgeKey);
-    expect(reminderKey).toContain(expiresAt);
+  it('keys dismiss to this trial deadline', () => {
+    expect(trialReminderDismissKey(expiresAt)).toContain(expiresAt);
   });
 
   it('persist and read round-trip; a different expiry is not dismissed', () => {
@@ -229,17 +161,5 @@ describe('trial reminder dismiss persistence', () => {
     persistTrialReminderDismissed(storage, expiresAt);
     expect(isTrialReminderDismissed(storage, expiresAt)).toBe(true);
     expect(isTrialReminderDismissed(storage, '2026-08-01T00:00:00.000Z')).toBe(false);
-  });
-
-  it('dismissing the 7-day card does not dismiss the reminder and vice versa', () => {
-    const { storage } = memStorage();
-    persistTrialUpgradeNudgeDismissed(storage, expiresAt);
-    expect(isTrialUpgradeNudgeDismissed(storage, expiresAt)).toBe(true);
-    expect(isTrialReminderDismissed(storage, expiresAt)).toBe(false);
-
-    const otherExpiry = '2026-09-01T00:00:00.000Z';
-    persistTrialReminderDismissed(storage, otherExpiry);
-    expect(isTrialReminderDismissed(storage, otherExpiry)).toBe(true);
-    expect(isTrialUpgradeNudgeDismissed(storage, otherExpiry)).toBe(false);
   });
 });

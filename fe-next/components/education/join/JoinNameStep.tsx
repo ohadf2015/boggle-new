@@ -11,7 +11,7 @@ import { JoinRoomLocked } from './JoinRoomLocked';
 import { NAME_NOT_ALLOWED_KEY, ROOM_LOCKED_KEY } from './joinFailure';
 import { JoinPrimaryButton } from './JoinPrimaryButton';
 import { useKeepInView } from './useKeepInView';
-import type { JoinFlowState } from './useJoinFlow';
+import type { JoinFlowState } from './joinFlowState';
 
 const K = 'education.student.join';
 
