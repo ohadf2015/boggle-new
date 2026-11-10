@@ -106,6 +106,11 @@ export async function spendFreezeOn(db: SupabaseClient, playerId: string, date: 
   return false
 }
 
+/** Carried guest days never unlock a reward on their own: they count as already paid up to their length. */
+export function withCarriedFloor(claims: readonly number[], carriedDates: readonly string[]): number[] {
+  return carriedDates.length > 0 ? [...claims, new Set(carriedDates).size] : [...claims]
+}
+
 /** Milestone days already paid; null when the read failed (never treat that as "none claimed"). */
 export async function loadMilestoneClaims(db: SupabaseClient, playerId: string): Promise<number[] | null> {
   const { data, error } = await db.from('daily_streak_milestone_claims').select('milestone').eq('player_id', playerId)
@@ -158,6 +163,7 @@ export async function buildStreakBlock(
   const status = streakStatus([...new Set(streakDates)], today)
   const claims = await loadMilestoneClaims(db, playerId).catch(() => null)
   const played = streakDates.filter((d) => !frozen.has(d))
+  const paid = claims ? withCarriedFloor(claims, carriedDates) : null
   return {
     allDates,
     freezesAvailable,
@@ -165,8 +171,8 @@ export async function buildStreakBlock(
       ...status,
       week: weekStrip(played, [...frozen], today),
       freezeSaved,
-      milestone: claims
-        ? { claimable: claimableMilestone(status.current, claims), next: nextMilestone(status.current, claims) }
+      milestone: paid
+        ? { claimable: claimableMilestone(status.current, paid), next: nextMilestone(status.current, paid) }
         : null,
     },
   }

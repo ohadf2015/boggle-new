@@ -6,6 +6,9 @@ export const CARRYOVER_WINDOW_HOURS = 48
 const MAX_GUEST_IDS = 4
 const MAX_GUEST_ID_LENGTH = 128
 
+// Before the migration is applied every status call would warn.
+const MISSING_TABLE_CODES = new Set(['PGRST205', '42P01'])
+
 const DAY_MS = 86_400_000
 const shift = (iso: string, days: number) =>
   new Date(Date.parse(iso + 'T00:00:00Z') + days * DAY_MS).toISOString().slice(0, 10)
@@ -60,8 +63,15 @@ export async function carryOverGuestStreak(
     .select('created_at')
     .eq('id', playerId)
     .maybeSingle()
-  const createdAt = Date.parse((profile as { created_at?: string } | null)?.created_at ?? '')
-  if (profileError || !Number.isFinite(createdAt)) return
+  if (profileError) return
+  let createdAtIso = (profile as { created_at?: string } | null)?.created_at
+  if (!createdAtIso) {
+    // A brand-new signup's first request can beat its profile row.
+    const { data } = await db.auth.admin.getUserById(playerId)
+    createdAtIso = data?.user?.created_at
+  }
+  const createdAt = Date.parse(createdAtIso ?? '')
+  if (!Number.isFinite(createdAt)) return
   if (now.getTime() - createdAt > CARRYOVER_WINDOW_HOURS * 3_600_000) return
 
   const { data: carried, error: carriedError } = await db
@@ -69,6 +79,7 @@ export async function carryOverGuestStreak(
     .select('player_id,guest_id')
     .in('guest_id', guestIds as string[])
   if (carriedError) {
+    if (MISSING_TABLE_CODES.has((carriedError as { code?: string }).code ?? '')) return
     logger.warn(`Streak carry-over: ownership read failed: ${carriedError.message}`)
     return
   }
@@ -111,7 +122,9 @@ export async function carryOverGuestStreak(
 export async function loadCarriedDates(db: SupabaseClient, playerId: string): Promise<string[]> {
   const { data, error } = await db.from('daily_streak_carryover').select('carried_date').eq('player_id', playerId)
   if (error) {
-    logger.warn(`Streak carry-over: read failed: ${error.message}`)
+    if (!MISSING_TABLE_CODES.has((error as { code?: string }).code ?? '')) {
+      logger.warn(`Streak carry-over: read failed: ${error.message}`)
+    }
     return []
   }
   return (data ?? []).map((r: { carried_date: string }) => r.carried_date)

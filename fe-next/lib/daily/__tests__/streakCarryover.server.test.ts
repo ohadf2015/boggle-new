@@ -46,6 +46,15 @@ describe('carryOverGuestStreak', () => {
     expect(tables.daily_streak_carryover.every((r) => r.guest_id === 'fp1')).toBe(true)
   })
 
+  it('Given the first request lands before the profile row exists, dates the account from the auth user', async () => {
+    const { db, tables } = makeFakeDb({ tables: { daily_word_wheel_attempts: sixGuestDays }, unique })
+    const getUserById = vi.fn(async () => ({ data: { user: { created_at: profile(1).created_at } }, error: null }))
+    Object.assign(db, { auth: { admin: { getUserById } } })
+    await carryOverGuestStreak(db as never, 'u1', ['fp1'], TODAY, NOW)
+    expect(getUserById).toHaveBeenCalledWith('u1')
+    expect(tables.daily_streak_carryover).toHaveLength(6)
+  })
+
   it('Given the carry-over replayed, writes the same rows once', async () => {
     const { db, tables } = makeFakeDb({ tables: { profiles: [profile(1)], daily_word_wheel_attempts: sixGuestDays }, unique })
     await carryOverGuestStreak(db as never, 'u1', ['fp1'], TODAY, NOW)
@@ -100,5 +109,13 @@ describe('loadCarriedDates', () => {
   it('Given the table is missing (migration not applied), returns none instead of failing', async () => {
     const { db } = makeFakeDb({ selectErrors: { daily_streak_carryover: { message: 'relation does not exist' } } })
     expect(await loadCarriedDates(db as never, 'u1')).toEqual([])
+  })
+
+  it('Given the table is missing, does not log on every request', async () => {
+    const { default: logger } = await import('@/utils/logger')
+    vi.mocked(logger.warn).mockClear()
+    const { db } = makeFakeDb({ selectErrors: { daily_streak_carryover: { code: 'PGRST205', message: 'Could not find the table' } } })
+    await loadCarriedDates(db as never, 'u1')
+    expect(logger.warn).not.toHaveBeenCalled()
   })
 })

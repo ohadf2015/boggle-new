@@ -40,6 +40,19 @@ describe('claimStreakMilestone', () => {
     expect(res.body).toMatchObject({ claimed: true, days: 7 })
   })
 
+  it('Given a long carried guest run, pays nothing for milestones the carried days alone reach', async () => {
+    const carried = Array.from({ length: 30 }, (_, i) => ({
+      player_id: 'u1',
+      carried_date: new Date(Date.UTC(2026, 10, 11 - i)).toISOString().slice(0, 10),
+      guest_id: 'fp1',
+    }))
+    const { db } = makeFakeDb({
+      tables: { daily_word_wheel_attempts: [wheel('2026-11-12')], daily_streak_carryover: carried, daily_streak_milestone_claims: [] },
+    })
+    expect((await claimStreakMilestone(db as never, 'u1', '2026-11-12')).status).toBe(400)
+    expect(awardCoinsServer).not.toHaveBeenCalled()
+  })
+
   it('Given the streak does not reach a new milestone, pays nothing', async () => {
     const { db } = makeFakeDb({ tables: { daily_word_wheel_attempts: [wheel('2026-11-12')], daily_streak_milestone_claims: [] } })
     expect((await claimStreakMilestone(db as never, 'u1', '2026-11-12')).status).toBe(400)

@@ -141,6 +141,7 @@ describe('GET /api/daily/weekly-chest/status: streak block', () => {
       expect(first.currentStreak).toBe(6)
       expect(first.streak.current).toBe(6)
       expect(first.streak.milestone.next).toMatchObject({ days: 7, remaining: 1 })
+      expect(first.streak.milestone.claimable).toBeNull()
 
       const replay = await get(GUEST)
       expect(replay.currentStreak).toBe(6)
