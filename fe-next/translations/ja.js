@@ -11797,7 +11797,12 @@ const ja = {
       "rankGained": "このラウンドで+{pts}ランクポイント",
       "rank": {"rookie": "ウォームアップ", "bronze": "調子が出てきた", "silver": "キレキレ", "gold": "危険人物", "platinum": "容赦なし", "diamond": "無敵", "legend": "言葉の伝説"},
       "shareTitle": "LexiClash クイックプレイ",
-      "shareText": "このボードでパーフェクトの{pct}%を達成。同じボードで挑戦を:"
+      "shareText": "このボードでパーフェクトの{pct}%を達成。同じボードで挑戦を:",
+      "shareResult": "結果をシェア",
+      "shareResultHint": "スコアを友だちに送って、超えられるか試してもらおう。",
+      "copied": "コピーしました。好きな場所に貼り付けてね",
+      "shareFailed": "シェアできませんでした。もう一度試してみて",
+      "recap": {"header": "LexiClash クイックプレイ：{mode}", "score": "{score}点（パーフェクトの{pct}%）", "words": "{count}語、いちばん長い単語は{longest}文字", "wordsOne": "1語、{longest}文字", "noWords": "今回は単語ゼロ。ボードの勝ち", "longWords": "そのうち7文字以上が{count}語", "targetFound": "隠された単語を見つけた", "targetMissed": "隠された単語は見つからなかった", "streak": "{days}日連続プレイ中", "cta": "60秒で超えられる？"}
     },
     "title": "クイックプレイ",
     "creating": "作成中...",

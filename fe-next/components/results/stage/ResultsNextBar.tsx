@@ -11,7 +11,12 @@ interface BarAction {
 interface ResultsNextBarProps {
   primary: BarAction & { icon?: ReactNode };
   /** Small square button beside the primary one; its label is the accessible name. */
-  secondary?: BarAction & { icon: ReactNode; title?: string };
+  secondary?: BarAction & {
+    icon: ReactNode;
+    title?: string;
+    /** Short feedback after the action (e.g. "Copied"); '' keeps the live region mounted but silent. */
+    note?: string;
+  };
   shine?: boolean;
   /** `fixed` pins to the viewport (pages that scroll the window); `inline` sits as the last flex child. */
   placement?: 'inline' | 'fixed';
@@ -56,7 +61,21 @@ export function ResultsNextBar({
         className="pointer-events-none absolute inset-x-0 bottom-full h-12 bg-linear-to-t from-neo-navy to-transparent"
       />
       {top && <div className="mx-auto mb-2.5 w-full max-w-md">{top}</div>}
-      <div className="mx-auto flex w-full max-w-md items-stretch gap-2.5">
+      <div className="relative mx-auto flex w-full max-w-md items-stretch gap-2.5">
+        {secondary?.note !== undefined && (
+          <span
+            role="status"
+            aria-live="polite"
+            data-testid={secondary.testId ? `${secondary.testId}-note` : undefined}
+            className={
+              secondary.note
+                ? 'pointer-events-none absolute bottom-full start-0 mb-2 whitespace-nowrap rounded-neo border-2 border-black bg-neo-cream px-3 py-1.5 font-neo-display text-sm font-bold text-neo-black shadow-hard'
+                : 'sr-only'
+            }
+          >
+            {secondary.note}
+          </span>
+        )}
         {secondary && (
           <button
             type="button"

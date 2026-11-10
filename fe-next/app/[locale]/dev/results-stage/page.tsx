@@ -48,11 +48,11 @@ function BlastScenario({ failed }: { failed: boolean }) {
 const noop = () => undefined;
 const WORDS = ['quartz', 'stone', 'notes', 'tones', 'rate', 'tear', 'ears', 'seat', 'east', 'tan', 'ant', 'net', 'ten', 'sea'].map((word) => ({ word, score: word.length * 3 }));
 
-function QuickScenario() {
+function QuickScenario({ hunt = false }: { hunt?: boolean }) {
   return (
     <div className="flex h-dvh flex-col">
       <QuickPlayResults
-        result={{ mode: 'classic', seed: 'x', score: 142, perfectScore: 260, scorePct: 55, wordsFound: 14, totalWords: 61, durationMs: 60000, words: WORDS }}
+        result={{ mode: hunt ? 'word-hunt' : 'classic', seed: 'x', score: 142, perfectScore: 260, scorePct: 55, wordsFound: 14, totalWords: 61, durationMs: 60000, words: WORDS, ...(hunt ? { targetWord: 'quartz', targetWordFound: true } : {}) }}
         outcome={{ scorePct: 55, coins: 12, xp: 30, percentileToday: 0, history: [55, 40, 48], totalPoints: 340 }}
         rival={null}
         rivals={[
@@ -63,8 +63,9 @@ function QuickScenario() {
         collected={WORDS.map((w, i) => ({ ...w, isNew: i % 4 === 0 }))}
         collectionTotal={212}
         dayStreak={3}
+        isGuest={hunt}
         onNextRound={noop}
-        onChallenge={noop}
+        onChallenge={hunt ? async () => 'copied' : noop}
         onExit={noop}
       />
     </div>
@@ -107,6 +108,7 @@ export default function ResultsStageGallery() {
           stats={[{ value: 23, label: 'Words' }, { value: 'QUARTZ', label: 'Best' }, { value: '4', label: 'Pangrams' }]} />
       </div>
     );
+  if (s === 'quick-hunt') return <QuickScenario hunt />;
   if (s === 'solo') return <SoloScenario bots={false} />;
   if (s === 'bots') return <SoloScenario bots />;
   if (s === 'zero') return <SoloScenario bots={false} zero />;
