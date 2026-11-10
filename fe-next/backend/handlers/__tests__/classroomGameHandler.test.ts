@@ -63,11 +63,8 @@ describe('ClassroomGameHandler', () => {
       on: vi.fn(),
       emit: vi.fn(),
       join: vi.fn(),
-      handshake: {
-        auth: {
-          authUserId: '00000000-0000-4000-8000-000000000001',
-        },
-      },
+      handshake: { auth: {} },
+      data: { verifiedUserId: '00000000-0000-4000-8000-000000000001' },
     };
 
     mockIo = {
@@ -296,7 +293,7 @@ describe('ClassroomGameHandler', () => {
       };
 
       // Set auth to student for this test
-      mockSocket.handshake.auth.authUserId = studentId;
+      mockSocket.data.verifiedUserId = studentId;
 
       (classroomGameManager.addPlayerToClassroomGame as Mock).mockResolvedValue(undefined);
       (classroomGameManager.getClassroomGame as Mock).mockResolvedValue({
@@ -416,7 +413,7 @@ describe('ClassroomGameHandler', () => {
     it('joinClassroomGame rejects when user is neither teacher nor enrolled student', async () => {
       // GIVEN
       const studentId = '00000000-0000-4000-8000-000000000099';
-      mockSocket.handshake.auth.authUserId = studentId;
+      mockSocket.data.verifiedUserId = studentId;
 
       (classroomGameManager.getClassroomGame as Mock).mockResolvedValue({
         gameCode: 'ABC123',
@@ -454,7 +451,7 @@ describe('ClassroomGameHandler', () => {
     it('joinClassroomGame allows enrolled student', async () => {
       // GIVEN
       const studentId = '00000000-0000-4000-8000-000000000010';
-      mockSocket.handshake.auth.authUserId = studentId;
+      mockSocket.data.verifiedUserId = studentId;
 
       (classroomGameManager.getClassroomGame as Mock).mockResolvedValue({
         gameCode: 'ABC123',
@@ -487,7 +484,7 @@ describe('ClassroomGameHandler', () => {
     it('joinClassroomGame rejects when game code does not exist (no classroom leak)', async () => {
       // GIVEN: attacker probes a random game code
       const attackerId = '00000000-0000-4000-8000-000000000066';
-      mockSocket.handshake.auth.authUserId = attackerId;
+      mockSocket.data.verifiedUserId = attackerId;
       (classroomGameManager.getClassroomGame as Mock).mockResolvedValue(null);
 
       registerClassroomGameHandlers(mockIo, mockSocket);
@@ -517,7 +514,7 @@ describe('ClassroomGameHandler', () => {
     it('getActiveClassroomGames rejects non-members and does not join socket room', async () => {
       // GIVEN: random user tries to subscribe to a classroom they are not in
       const outsiderId = '00000000-0000-4000-8000-000000000077';
-      mockSocket.handshake.auth.authUserId = outsiderId;
+      mockSocket.data.verifiedUserId = outsiderId;
       (classroomMembership.resolveClassroomRole as Mock).mockResolvedValue({ status: 'ok', role: null });
 
       registerClassroomGameHandlers(mockIo, mockSocket);
@@ -549,7 +546,7 @@ describe('ClassroomGameHandler', () => {
       };
 
       // Set auth to student for this test
-      mockSocket.handshake.auth.authUserId = studentId;
+      mockSocket.data.verifiedUserId = studentId;
 
       (classroomGameManager.removePlayerFromClassroomGame as Mock).mockResolvedValue(undefined);
       (classroomGameManager.getClassroomGame as Mock).mockResolvedValue({

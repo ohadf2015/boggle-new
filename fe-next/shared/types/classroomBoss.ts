@@ -39,6 +39,8 @@ export interface ClassroomBossHit {
   crit: boolean;
   /** Landed while the boss was exposed (optional: older servers never send it). */
   exposed?: boolean;
+  /** A lesson word that cracked the exposed boss: always a crit. */
+  lesson?: boolean;
 }
 
 export interface ClassroomBossView {
@@ -77,6 +79,7 @@ export interface ClassroomBossPlayerHit {
   crit: boolean;
   multiplier: number;
   totalDmg: number;
+  lesson?: boolean;
 }
 
 export const CLASSROOM_BOSS_EVENTS = {

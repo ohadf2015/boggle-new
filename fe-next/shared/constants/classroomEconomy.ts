@@ -77,6 +77,8 @@ export interface ClassroomChestReveal {
   size: number;
   /** The class beat the boss this round: the chest rolled one rarity tier up. */
   bossWin?: boolean;
+  /** Finished in the round's bottom quartile (4+ students): the chest rolled one more tier up, capped at epic. */
+  underdog?: boolean;
 }
 
 export interface ClassroomLockerEntry {

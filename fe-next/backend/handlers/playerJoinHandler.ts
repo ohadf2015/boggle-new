@@ -63,7 +63,7 @@ import {
   handleExistingAuthConnectionJoin
 } from './playerReconnectHandler';
 import { ensurePlayerState } from './playerDataInit';
-import { classroomSeatName } from './classroomSeatName';
+import { classroomSeatName, cleanClassroomSeatName } from './classroomSeatName';
 import { practiceSeatToken } from './practiceSeat';
 import { isLockedOut } from '../modules/classroomLobbyLock.js';
 
@@ -195,6 +195,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
       }
     }
     if (seat.game && authUserId) username = classroomSeatName(game.users, username, authUserId);
+    if (seat.game && !practiceSeat && authUserId !== seat.game.teacherId) username = cleanClassroomSeatName(game.users, username, { authUserId, guestTokenHash }, game.language);
 
     // Block kicked players from re-joining
     if (game.kickedPlayers?.has(username)) {

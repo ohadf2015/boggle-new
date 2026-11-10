@@ -86,6 +86,14 @@ describe('ProjectorLobby — room lock', () => {
     expect(toggle()).not.toHaveAttribute('aria-busy', 'true');
   });
 
+  it('GIVEN the server could not confirm who the teacher is THEN the padlock shows its failure instead of spinning', () => {
+    renderLobby();
+    fireEvent.click(toggle());
+    fromServer('classroomGameError', { code: 'AUTH_UNVERIFIED', error: 'education.errors.signInCheckFailed', gameCode: 'LOCK01' });
+    expect(screen.getByRole('alert')).toHaveTextContent(`${K}.failed`);
+    expect(toggle()).not.toHaveAttribute('aria-busy', 'true');
+  });
+
   it('GIVEN a different classroom error (a pressure dial) THEN the padlock does not react', () => {
     renderLobby();
     fireEvent.click(toggle());

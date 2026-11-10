@@ -78,6 +78,8 @@ import { isInProgress } from '../utils/gameStateMachine.js';
 import { registerStartGameHandler } from './gameStartHandler.js';
 import { buildRoundPayload } from '../modes/roundPayload.js';
 import { renamePlayerInGame } from '../modules/playerRename.js';
+import { isProfaneJoinName } from '@/lib/education/joinNameModeration';
+import { suggestPlayerName } from '@/utils/onboardingNameSuggestions';
 
 // Types for payloads
 interface CreateGamePayload {
@@ -760,6 +762,10 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
 
     const trimmedName = data.newName.trim().slice(0, 20);
     if (!trimmedName || !/^[\p{L}\p{N}\p{Emoji} _-]{1,30}$/u.test(trimmedName)) return;
+    if (game.isClassroom && isProfaneJoinName(trimmedName)) {
+      socket.emit('error', { error: 'NAME_NOT_ALLOWED', message: 'Pick a different name', suggestedName: suggestPlayerName(game.language) });
+      return;
+    }
 
     const user = game.users[username];
     if (!user) return;

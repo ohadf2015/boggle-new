@@ -63,10 +63,10 @@ describe('Teacher Pro gating', () => {
     }
   });
 
-  it('advertises unlimited classes and unlimited students on the upgrade page', () => {
+  it('advertises unlimited classes, not unlimited students, on the upgrade page', () => {
     const src = readFileSync(UPGRADE_PAGE, 'utf8');
     expect(src).toContain('unlimitedClasses');
-    expect(src).toContain('unlimitedStudents');
+    expect(src).not.toContain('unlimitedStudents');
   });
 
   it('includes all PRO_FEATURES in the ProGate component', () => {

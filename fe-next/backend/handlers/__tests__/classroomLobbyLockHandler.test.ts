@@ -80,7 +80,7 @@ describe('setClassroomLobbyLocked', () => {
     const { set } = register(socket);
     await set({ gameCode: 'ABC123', locked: true });
     expect(mockSetLocked).not.toHaveBeenCalled();
-    expect(socket.emit).toHaveBeenCalledWith('classroomGameError', expect.objectContaining(failed));
+    expect(socket.emit).toHaveBeenCalledWith('classroomGameError', expect.objectContaining({ code: 'AUTH_REQUIRED', gameCode: 'ABC123' }));
   });
 
   it('GIVEN a malformed payload THEN the lock is refused out loud', async () => {

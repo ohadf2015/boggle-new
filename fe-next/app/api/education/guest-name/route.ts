@@ -7,10 +7,12 @@ import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { canAddStudent } from '@/lib/subscriptions';
 import { foldJoinCode } from '@/lib/education/joinCodeInput';
 import { ROOM_LOCKED } from '@/shared/types/classroomLobbyLock';
+import { isProfaneJoinName, joinNameLocale } from '@/lib/education/joinNameModeration';
+import { suggestPlayerName } from '@/utils/onboardingNameSuggestions';
 
 /**
  * POST /api/education/guest-name  { name, joinCode? }
- *   → 200 { available: true }  |  409 { code: 'NAME_TAKEN', suggestedName }  |  423 { code: 'ROOM_LOCKED' }
+ *   → 200 { available: true }  |  409 { code: 'NAME_TAKEN', suggestedName }  |  422 { code: 'NAME_NOT_ALLOWED', suggestedName }  |  423 { code: 'ROOM_LOCKED' }
  *
  * Answers one question: is this display name already used by someone in THIS
  * classroom?
@@ -54,6 +56,11 @@ export async function POST(request: Request) {
   const name = typeof payload?.name === 'string' ? payload.name.trim() : '';
   if (!name) {
     return NextResponse.json({ error: 'Name is required' }, { status: 400 });
+  }
+
+  if (isProfaneJoinName(name)) {
+    const suggestedName = suggestPlayerName(joinNameLocale(request.headers.get('referer')));
+    return NextResponse.json({ available: false, code: 'NAME_NOT_ALLOWED', suggestedName }, { status: 422 });
   }
 
   const joinCode =

@@ -41,6 +41,7 @@ export interface RoundChestInput {
   userId: string;
   summary: RoundChestSummary;
   bossWin?: boolean;
+  underdog?: boolean;
 }
 
 export async function grantRoundChest(input: RoundChestInput, deps: ChestDeps = defaultChestDeps()): Promise<ChestReveal | null> {
@@ -52,7 +53,7 @@ export async function grantRoundChest(input: RoundChestInput, deps: ChestDeps = 
     return null;
   }
 
-  const chest = rollChest(`${input.gameCode}:${input.roundId}:${input.userId}`, { bossWin: input.bossWin });
+  const chest = rollChest(`${input.gameCode}:${input.roundId}:${input.userId}`, { bossWin: input.bossWin, underdog: input.underdog });
   const { error } = await deps.insert({
     game_code: input.gameCode,
     round_id: input.roundId,
@@ -90,6 +91,7 @@ export async function grantRoundChest(input: RoundChestInput, deps: ChestDeps = 
     itemId: chest.itemId,
     ...input.summary,
     ...(input.bossWin ? { bossWin: true } : {}),
+    ...(input.underdog ? { underdog: true } : {}),
   };
   try {
     await deps.remember(key, reveal);

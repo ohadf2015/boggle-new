@@ -258,6 +258,7 @@ function useFirstGame({ classroom, packKey, lessonId, t, language }: { classroom
   const box = useRef<HTMLTextAreaElement>(null);
   const { words, skipped } = readPasted(text);
   const pack = packs.find((p) => p.nameKey === picked) ?? packs[0];
+  const ownLessonId = lessonId && !packKey ? lessonId : null;
 
   useEffect(() => {
     const onPageShow = (e: PageTransitionEvent) => {
@@ -280,11 +281,18 @@ function useFirstGame({ classroom, packKey, lessonId, t, language }: { classroom
     inFlight.current = true;
     setBusy(true);
     trackFirstRoundGuideClicked({ surface: 'class_ready', locale: language, step: 'start_round' });
-    const choice: FirstGameChoice = words.length > 0 ? { kind: 'paste', words } : { kind: 'pack', pack, lessonId: savedPack && pack.nameKey === savedPack.nameKey ? lessonId : null };
-    const title = choice.kind === 'paste' ? t('eduShell.setup.words.listName', { date: new Date().toLocaleDateString(language, { month: 'short', day: 'numeric' }) }) : t(pack.nameKey);
+    const ownTitle = t('eduShell.setup.words.listName', { date: new Date().toLocaleDateString(language, { month: 'short', day: 'numeric' }) });
+    const choice: FirstGameChoice =
+      words.length > 0
+        ? { kind: 'paste', words }
+        : ownLessonId
+          ? { kind: 'saved', lessonId: ownLessonId, fallback: pack, fallbackTitle: t(pack.nameKey) }
+          : { kind: 'pack', pack, lessonId: savedPack && pack.nameKey === savedPack.nameKey ? lessonId : null };
+    const title = choice.kind === 'pack' ? t(pack.nameKey) : ownTitle;
     try {
       const launch = await firstGameIntent({ choice, classroomId: classroom.id, language: classroom.language, title, teacherId: user?.id ?? '', createLesson, lessonExists });
-      if (launch.assignFailed) toast.error(t('eduShell.setup.assignFailed'));
+      if (launch.listMissing) toast.error(t('eduShell.setup.words.listMissing'));
+      else if (launch.assignFailed) toast.error(t('eduShell.setup.assignFailed'));
       writeQuickLaunchIntent(launch.intent);
       router.push(`/${language}/education/classroom-game?flow=${QUICK_LAUNCH_FLOW}`);
     } catch {
@@ -309,6 +317,7 @@ function useFirstGame({ classroom, packKey, lessonId, t, language }: { classroom
         packs={packs}
         packKey={pack.nameKey}
         savedPackKey={lessonId ? savedPack?.nameKey ?? null : null}
+        ownListSaved={Boolean(ownLessonId)}
         onPackChange={setPicked}
         textareaRef={box}
         t={t}

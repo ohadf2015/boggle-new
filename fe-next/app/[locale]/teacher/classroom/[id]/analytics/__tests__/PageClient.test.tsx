@@ -57,6 +57,10 @@ vi.mock('@/hooks/useTeacherProCheckout', () => ({
   useTeacherProCheckout: () => ({ pending: false, start: vi.fn() }),
 }));
 
+vi.mock('@/components/teacher/analytics/free/FreeWeekInsight', () => ({
+  FreeWeekInsight: ({ classroomId, locale }: any) => <div data-testid="free-week-insight-slot">{`${locale}:${classroomId}`}</div>,
+}));
+
 // Mock all analytics components
 vi.mock('@/components/teacher/analytics/overview/ClassOverview', () => ({
   ClassOverview: ({ classroomId }: any) => (
@@ -203,6 +207,18 @@ describe('AnalyticsPageClient', () => {
       expect(screen.getByTestId('pro-gate-upgrade-analytics').className).not.toMatch(/\bbg-neo-cyan\b/);
       expect(screen.getByTestId('pro-gate-pill')).toHaveTextContent('eduShell.nav.pro');
       expect(screen.getByTestId('pro-gate-pill').className).not.toMatch(/\bbg-neo-lime\b/);
+    });
+
+    it('given a free teacher, when the page renders, then the free weekly insight sits above the depth lock', () => {
+      teacherPro.hasPro = false;
+
+      render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
+
+      const slot = screen.getByTestId('free-week-insight-slot');
+      expect(slot).toHaveTextContent('en:classroom-1');
+      const lock = screen.getByTestId('pro-gate-lock');
+      expect(slot.compareDocumentPosition(lock) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      expect(screen.queryByTestId('free-game-headline')).not.toBeInTheDocument();
     });
 
     it('shows neither the dashboard nor the upsell until Pro state resolves', () => {

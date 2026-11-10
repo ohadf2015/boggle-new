@@ -14,7 +14,7 @@ import logger from '@/utils/logger';
  * already uses (`CLASS_LIMIT_REACHED` in `ClassroomManager`). `error` stays for logs
  * and for the generic fallback; it is not fit to render on its own.
  */
-export type JoinClassroomErrorCode = 'STUDENT_LIMIT_REACHED' | 'INVALID_CODE' | 'NAME_TAKEN' | 'SESSION_ENDED' | 'ROOM_LOCKED' | 'TEACHER_OWN_CLASS';
+export type JoinClassroomErrorCode = 'STUDENT_LIMIT_REACHED' | 'INVALID_CODE' | 'NAME_TAKEN' | 'NAME_NOT_ALLOWED' | 'SESSION_ENDED' | 'ROOM_LOCKED' | 'TEACHER_OWN_CLASS';
 
 export interface JoinClassroomResult {
   success: boolean;

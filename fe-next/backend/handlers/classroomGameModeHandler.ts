@@ -36,7 +36,7 @@ import { CLASSROOM_GAME_MODES, VOCAB_QUIZ_VARIANTS, type ClassroomGameMode, type
 import { CLASSROOM_BOSS_IDS, type ClassroomBossId } from '@/shared/types/classroomBoss';
 import { resolveBossForTeacher } from '../services/classroomBoss/bossEntitlement.js';
 import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
-import { getAuthUserId } from './classroomSocketAuth.js';
+import { getAuthUserId, refuseUnidentified } from './classroomSocketAuth.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { gameCodeSchema } from '../utils/socketValidation.js';
 import logger from '../utils/logger.js';
@@ -77,7 +77,7 @@ export function registerClassroomGameModeHandlers(io: Server, socket: Socket): v
 
     const authUserId = getAuthUserId(socket);
     if (!authUserId) {
-      socket.emit('classroomGameError', { error: 'education.modePicker.switchFailed' });
+      refuseUnidentified(socket, 'updateClassroomGameMode', { gameCode: payload.gameCode });
       return;
     }
 

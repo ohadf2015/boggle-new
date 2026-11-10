@@ -27,6 +27,7 @@ import EduStudentResults from '@/components/education/live/EduStudentResults';
 import { useClassroomBossStore } from '@/stores/classroomBossStore';
 import { FREE_CLASSROOM_BOSS_ID, type ClassroomBossView } from '@/shared/types/classroomBoss';
 import { sessionKeyFor } from '@/lib/education/roundEndHistory';
+import { openMore } from './openStudentMore';
 
 const t = (key: string, params?: Record<string, string | number>) => (params ? `${key}:${JSON.stringify(params)}` : key);
 
@@ -62,28 +63,36 @@ describe('EduStudentResults on a 390x844 phone', () => {
     window.sessionStorage.clear();
   });
 
-  it('given my round, when results show, then the first screen holds placing, practice and the warm-up, and the word lists fold into one row', () => {
+  it('given my round, when results show, then the word lists fold into one closed row that mounts nothing until opened', () => {
     render(<EduStudentResults {...(props as object)} />);
     const more = screen.getByTestId('edu-student-more');
     expect(more.tagName).toBe('DETAILS');
     expect(more).not.toHaveAttribute('open');
+    expect(screen.queryAllByTestId('edu-student-word')).toHaveLength(0);
+    expect(screen.queryByTestId('missed')).toBeNull();
+    openMore();
     expect(more).toContainElement(screen.getAllByTestId('edu-student-word')[0]);
     expect(more).toContainElement(screen.getByTestId('missed'));
-    expect(more).toContainElement(screen.getByTestId('round-shop'));
-    for (const id of ['edu-student-hero', 'edu-student-next-step', 'waiting-warmup']) {
+    for (const id of ['edu-student-hero', 'edu-student-next-step', 'waiting-warmup', 'chest-cta', 'round-shop']) {
       expect(more).not.toContainElement(screen.getByTestId(id));
     }
     expect(screen.getByTestId('edu-student-more-summary')).toHaveTextContent('eduLiveRoom.studentResults.moreFromRound');
   });
 
-  it('given a round reward, when results show, then the chest sits beside Leave instead of taking its own row', () => {
+  it('given a round reward, when results show, then the order is hero, chest, shop, then the next step, and the chest is not in the header', () => {
     render(<EduStudentResults {...(props as object)} />);
-    expect(screen.getByTestId('edu-student-results-leave').closest('header')).toContainElement(screen.getByTestId('chest-cta'));
+    const order = ['edu-student-hero', 'chest-cta', 'round-shop', 'edu-student-next-step'].map((id) => screen.getByTestId(id));
+    for (let i = 1; i < order.length; i++) {
+      expect(order[i - 1].compareDocumentPosition(order[i]) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    }
+    expect(screen.getByTestId('edu-student-results-leave').closest('header')).not.toContainElement(screen.getByTestId('chest-cta'));
   });
 
   it('given a signed-in student, when results show, then the XP bar folds away and the earned XP chip stays on the card', () => {
     controller.current = makeController({ socketEvents: { xpGainedData: { xpEarned: 30, newTotalXp: 400 } } });
     render(<EduStudentResults {...(props as object)} />);
+    expect(screen.queryByTestId('edu-student-xp-bar')).toBeNull();
+    openMore();
     expect(screen.getByTestId('edu-student-more')).toContainElement(screen.getByTestId('edu-student-xp-bar'));
     expect(screen.getByTestId('edu-student-hero')).toContainElement(screen.getByTestId('edu-student-xp'));
   });

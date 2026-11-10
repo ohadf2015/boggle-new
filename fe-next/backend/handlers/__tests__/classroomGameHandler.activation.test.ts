@@ -45,7 +45,7 @@ const payload = {
 };
 
 async function create() {
-  const socket: any = { id: 's1', on: vi.fn(), emit: vi.fn(), join: vi.fn(), handshake: { auth: { authUserId: TEACHER } } };
+  const socket: any = { id: 's1', on: vi.fn(), emit: vi.fn(), join: vi.fn(), handshake: { auth: {} }, data: { verifiedUserId: TEACHER } };
   const io: any = { to: vi.fn().mockReturnThis(), emit: vi.fn() };
   registerClassroomGameHandlers(io, socket);
   const handler = socket.on.mock.calls.find((c: any[]) => c[0] === 'createClassroomGame')[1];

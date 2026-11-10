@@ -24,6 +24,8 @@ import { isVocabularyLevel } from '@/lib/education/differentiation';
 import type { ClassroomLiveContext } from '@/shared/utils/classroomLiveContext';
 import { pressureFromStartPayload } from '@/shared/utils/classroomPressure';
 import { useClassroomPressureStore } from '@/hooks/gameState/classroomPressureStore';
+import { ingestLessonClaim, ingestLessonClaimsRound } from '@/components/education/live/useLessonClaims';
+import { LESSON_WORD_CLAIMED_EVENT } from '@/shared/types/lessonClaims';
 import type { VocabularyLevel } from '@/lib/supabase/education/types';
 import { captureSocketError, addGameBreadcrumb, isExpectedError } from '@/utils/sentry';
 import type { ActiveRoom, Language, Avatar } from '@/shared/types/game';
@@ -503,7 +505,10 @@ export function useMultiplayerSocket(
       // (start/retry/reconnect/late-join/recovery). Absent = not a classroom
       // room — clear, so a casual game after a class session inherits nothing.
       useClassroomPressureStore.getState().setClassroomPressure(pressureFromStartPayload(data));
+      ingestLessonClaimsRound(data);
       optionsRef.current.onGameStart(data);    });
+
+    listen(LESSON_WORD_CLAIMED_EVENT, ingestLessonClaim);
 
     // ---- Teacher live controls (classroom rooms) ----
     listen('gamePaused', () => {

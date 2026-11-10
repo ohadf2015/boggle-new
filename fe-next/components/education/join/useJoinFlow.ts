@@ -366,7 +366,7 @@ export function useJoinFlow(
           if (failure.effect === 'name_taken') {
             // A problem the student can fix in a single tap should cost them a single tap.
             setSuggestedName(result.suggestedName ?? null);
-            setNameError(true);
+            setNameError(true); setFormErrorKey(failure.formErrorKey ?? null);
           } else if (failure.formErrorKey) {
             setFormErrorKey(failure.formErrorKey);
           } else if (failure.effect === 'ended') {

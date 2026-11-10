@@ -4,6 +4,9 @@ export const PRO_OFFER_PLACEMENTS: ReadonlySet<string> = new Set([
   'classroom_results',
   'access_success',
   'dashboard',
+  'analytics_week_insight',
+  'results_hardest_words',
+  'home_class_insight',
   // "See this class's report" on the classroom round-results screen (button + its Pro teaser).
   'class_report_button',
   // "N students tried to join after your game ended" on the teacher's HQ (EndedCodeTriesNotice).

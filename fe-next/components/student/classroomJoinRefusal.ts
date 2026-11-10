@@ -22,6 +22,7 @@ const REASON_BY_CODE: Record<string, ClassroomJoinRefusalReason> = {
   NOT_A_MEMBER: 'notMember',
   AUTH_REQUIRED: 'signIn',
   USER_ID_MISMATCH: 'signIn',
+  AUTH_UNVERIFIED: 'busy',
   LOOKUP_UNAVAILABLE: 'busy',
   JOIN_THREW: 'busy',
   GAME_FULL: 'full',

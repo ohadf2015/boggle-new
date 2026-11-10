@@ -35,6 +35,10 @@ describe('classifyClassroomJoinRefusal', () => {
     expect(classifyClassroomJoinRefusal(undefined).refusal).toBe('retry');
   });
 
+  it('Given a sign-in the server could not check, When classified, Then the student is told to try again, not to sign in', () => {
+    expect(classifyClassroomJoinRefusal({ code: 'AUTH_UNVERIFIED' }).refusal).toBe('busy');
+  });
+
   it('an unknown code falls back to retry', () => {
     expect(classifyClassroomJoinRefusal({ code: 'SOMETHING_NEW' }).refusal).toBe('retry');
   });

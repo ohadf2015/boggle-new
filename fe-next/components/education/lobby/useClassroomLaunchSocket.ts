@@ -16,6 +16,7 @@ import { recordLessonPlays } from '@/lib/education/lessonPlayStat';
 import { trackEduLiveGameStarted } from '@/lib/education/telemetry';
 import type { ClassroomPressure } from '@/shared/types/classroom';
 import { splitLaunchPayload, type ClassroomLaunchPayload } from './classroomLaunchPayload';
+import { isClassroomIdentityRefusal } from '@/shared/constants/classroomIdentityRefusal';
 
 type Translate = (key: string, params?: Record<string, string | number>) => string;
 
@@ -125,6 +126,11 @@ export function useClassroomLaunchSocket(t: Translate) {
       // The server's text is internal English; it is logged, the teacher gets their language.
       socketInstance.on('classroomGameError', (data: { error: string }) => {
         logger.error('Classroom game create rejected:', data?.error);
+        if (isClassroomIdentityRefusal(data)) {
+          setPressurePending(false);
+          fail(data.error);
+          return;
+        }
         // A refused pressure WRITE is not a failed launch: the room exists and is playable.
         if (data?.error === 'education.classroomGame.pressureFailed') {
           if (pressureAckTimerRef.current) clearTimeout(pressureAckTimerRef.current);

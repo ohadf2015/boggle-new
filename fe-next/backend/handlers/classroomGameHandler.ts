@@ -19,7 +19,6 @@ import {
 } from '../modules/classroomGameManager.js';
 import { bindSocketToGame, getGameUsers } from '../modules/gameStateManager.js';
 import { getGameRoom } from '../utils/socketHelpers.js';
-import { getWaitingClassroomStudents } from './classroomMissingRoom.js';
 import {
   resolveClassroomTeacher,
   resolveClassroomRole,
@@ -32,7 +31,8 @@ import { registerClassroomLobbyLockHandlers } from './classroomLobbyLockHandler.
 import { isRecordJoinLockedOut, ROOM_LOCKED } from '../modules/classroomLobbyLock.js';
 import { registerClassroomGameModeHandlers } from './classroomGameModeHandler.js';
 import { registerClassroomReteachHandlers } from './classroomReteachHandler.js';
-import { getAuthUserId } from './classroomSocketAuth.js';
+import { getAuthUserId, classroomIdentityRefusal, refuseUnidentified } from './classroomSocketAuth.js';
+import { cleanClassroomSeatName } from './classroomSeatName.js';
 import { getSupabase } from '../modules/supabase/client.js';
 import { bumpTeacherLastSeen } from './bumpTeacherLastSeen.js';
 import { markTeacherRoomOpened } from '../modules/supabase/teacherActivation.js';
@@ -88,7 +88,7 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
     // Auth check: teacherId MUST match authenticated user (mandatory, not optional)
     const authUserId = getAuthUserId(socket);
     if (!authUserId) {
-      socket.emit('classroomGameError', { error: 'Authentication required to create classroom games' });
+      refuseUnidentified(socket, 'createClassroomGame', { gameCode: payload.gameCode });
       return;
     }
     if (authUserId !== payload.teacherId) {
@@ -210,7 +210,7 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
     // active games or subscribing the socket to classroom broadcasts.
     const gamesAuthUserId = getAuthUserId(socket);
     if (!gamesAuthUserId) {
-      socket.emit('classroomGameError', { error: 'Authentication required' });
+      refuseUnidentified(socket, 'getActiveClassroomGames');
       return;
     }
     const gamesRoleResult = await resolveClassroomRole(gamesAuthUserId, gamesPayload.classroomId);
@@ -282,7 +282,7 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
     // Auth check: authentication required, userId must match authenticated user
     const joinAuthUserId = getAuthUserId(socket);
     if (!joinAuthUserId) {
-      refuseClassroomJoin(socket, joinPayload.gameCode, 'AUTH_REQUIRED', { error: 'Authentication required' }, null);
+      refuseClassroomJoin(socket, joinPayload.gameCode, classroomIdentityRefusal(socket).code, classroomIdentityRefusal(socket), null);
       return;
     }
     if (joinAuthUserId !== joinPayload.userId) {
@@ -314,6 +314,8 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
       return;
     }
 
+    const seated = Object.fromEntries((existingGame.players ?? []).map((p) => [p.username, { authUserId: p.userId }]));
+    joinPayload.username = cleanClassroomSeatName(seated, joinPayload.username, { authUserId: joinAuthUserId }, existingGame.language ?? 'en');
     try {
       await addPlayerToClassroomGame(joinPayload.gameCode, {
         userId: joinPayload.userId,
@@ -372,7 +374,7 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
     // Auth check: authentication required, and userId must match authenticated user
     const leaveAuthUserId = getAuthUserId(socket);
     if (!leaveAuthUserId) {
-      socket.emit('classroomGameError', { error: 'Authentication required' });
+      refuseUnidentified(socket, 'leaveClassroomGame', { gameCode: leavePayload.gameCode });
       return;
     }
     if (leaveAuthUserId !== leavePayload.userId) {
@@ -420,7 +422,7 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
 
     const authUserId = getAuthUserId(socket);
     if (!authUserId) {
-      socket.emit('classroomGameError', { error: 'Authentication required' });
+      refuseUnidentified(socket, 'startClassroomGame', { gameCode: payload.gameCode });
       return;
     }
 
@@ -464,29 +466,6 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
     } catch (error) {
       logger.error('CLASSROOM_GAME', `Failed to start game: ${error}`);
       socket.emit('classroomGameError', { error: 'Failed to start game' });
-    }
-  });
-
-  // Request current live lobby users (waiting students + active game users)
-  socket.on('getLobbyUsers', (data: { gameCode?: string }) => {
-    try {
-      const code = data?.gameCode?.trim()?.toUpperCase();
-      if (!code) return;
-      socket.join(getGameRoom(code));
-      const waiting = getWaitingClassroomStudents(code);
-      const active = getGameUsers(code) || [];
-      const userMap = new Map<string, { username: string; avatar?: unknown }>();
-      for (const u of active) {
-        if (u.username) userMap.set(u.username, u);
-      }
-      for (const w of waiting) {
-        if (w.username && !userMap.has(w.username)) {
-          userMap.set(w.username, w);
-        }
-      }
-      socket.emit('updateUsers', { users: Array.from(userMap.values()) });
-    } catch (err) {
-      logger.warn('CLASSROOM_GAME', `Failed to get lobby users: ${(err as Error)?.message ?? err}`);
     }
   });
 

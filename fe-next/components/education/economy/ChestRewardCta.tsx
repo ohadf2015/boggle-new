@@ -29,9 +29,10 @@ export default function ChestRewardCta({ gameCode, roundId, quiet = false }: Che
     <>
       <button
         type="button"
+        data-testid="chest-reward-cta"
         onClick={() => setOpening(true)}
         className={cn(
-          'flex w-full items-center gap-3 text-start font-bold active:translate-x-0.5 active:translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
+          'flex min-h-14 w-full items-center gap-3 text-start font-bold active:translate-x-0.5 active:translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
           quiet
             ? 'rounded-neo border-[3px] border-neo-lime bg-neo-navy-elevated px-3 py-2 text-neo-cream shadow-hard-sm'
             : 'rounded-neo-lg border-4 border-neo-black bg-neo-lime p-3 text-neo-navy shadow-hard-lg'
@@ -43,6 +44,7 @@ export default function ChestRewardCta({ gameCode, roundId, quiet = false }: Che
           <span className={quiet ? 'text-base' : 'text-lg'}>{collected ? t('economy.reward.collected') : t('economy.reward.ready')}</span>
           <span className="text-sm">{t('economy.chest.xp', { xp: reveal.xp })}</span>
           {reveal.bossWin && <span className="text-sm">{t('classroomBoss.chestUpgraded')}</span>}
+          {reveal.underdog && <span data-testid="chest-comeback" className="text-sm">{t('economy.reward.comeback')}</span>}
         </span>
       </button>
       {opening && (

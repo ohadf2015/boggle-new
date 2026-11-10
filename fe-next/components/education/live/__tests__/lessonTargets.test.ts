@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildLessonTargets, maskLessonWord } from '../lessonTargets';
+import { buildLessonTargets, maskLessonWord, buildRaceSlots, targetsToSlots } from '../lessonTargets';
 
 const GRID = [
   ['S', 'T', 'O', 'R', 'M'],
@@ -79,5 +79,40 @@ describe('maskLessonWord', () => {
   it('keeps the first letter and counts the rest', () => {
     expect(maskLessonWord('storm')).toEqual({ first: 'S', rest: 4 });
     expect(maskLessonWord('שלום')).toEqual({ first: 'ש', rest: 3 });
+  });
+});
+
+describe('buildRaceSlots', () => {
+  const view = {
+    roundId: 4,
+    total: 3,
+    claimedCount: 2,
+    slots: [
+      { index: 0, first: 'S', length: 5, claim: { word: 'storm', username: 'Noa', avatar: { emoji: '🦊' }, teamId: null } },
+      { index: 1, first: 'S', length: 4, claim: { word: 'shad', username: 'Dana', avatar: null, teamId: 1 } },
+      { index: 2, first: 'ש', length: 4, claim: null },
+    ],
+  };
+
+  it('Given a race list, When built for me, Then each slot is hidden, mine or taken by a classmate', () => {
+    const slots = buildRaceSlots(view, 'noa');
+    expect(slots.map((s) => s.state)).toEqual(['mine', 'taken', 'hidden']);
+    expect(slots[1]).toMatchObject({ word: 'shad', by: 'Dana' });
+    expect(slots[2]).toMatchObject({ first: 'ש', rest: 3 });
+    expect(slots[2].word).toBeUndefined();
+  });
+
+  it('Given a support student with the word bank, When a hidden slot matches exactly one bank word, Then it shows that word as a hint', () => {
+    const slots = buildRaceSlots(view, 'eli', ['storm', 'shad', 'שלום']);
+    expect(slots[2].hint).toBe('שלום');
+  });
+
+  it('Given two bank words share first letter and length, When built, Then no hint guesses between them', () => {
+    const slots = buildRaceSlots({ ...view, slots: [{ index: 0, first: 'C', length: 4, claim: null }] }, 'eli', ['cell', 'cost']);
+    expect(slots[0].hint).toBeUndefined();
+  });
+
+  it('Given a target list from the private strip, When converted, Then found words read as mine', () => {
+    expect(targetsToSlots([{ word: 'storm', found: true }, { word: 'shad', found: false }]).map((s) => s.state)).toEqual(['mine', 'hidden']);
   });
 });

@@ -62,11 +62,8 @@ describe('createClassroomGame — boss roster', () => {
       on: vi.fn(),
       emit: vi.fn(),
       join: vi.fn(),
-      handshake: {
-        auth: {
-          authUserId: '00000000-0000-4000-8000-000000000001',
-        },
-      },
+      handshake: { auth: {} },
+      data: { verifiedUserId: '00000000-0000-4000-8000-000000000001' },
     };
 
     mockIo = {

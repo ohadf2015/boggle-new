@@ -123,4 +123,51 @@ describe('ClassSetupCreate', () => {
     expect(api.create).toHaveBeenCalledTimes(1);
     expect(api.assign).toHaveBeenCalledTimes(1);
   });
+  describe('the teacher pastes their own words', () => {
+    const paste = (text: string) => fireEvent.change(screen.getByTestId('setup-own-words'), { target: { value: text } });
+
+    it('Given enough valid words, When "Start live" is tapped, Then those words become the class list instead of the starter pack, and the invite opens on that list with no pack', async () => {
+      render(<ClassSetupCreate />);
+      paste('cat, dog\nsun\nmoon, rely on');
+      fireEvent.click(screen.getByTestId('setup-start-live'));
+      await waitFor(() => expect(nav.replace).toHaveBeenCalled());
+
+      expect(api.createLesson).toHaveBeenCalledTimes(1);
+      const saved = api.createLesson.mock.calls[0][0];
+      expect(saved).toMatchObject({ name: 'eduShell.setup.words.listName', language: 'en', classroomId: 'new1' });
+      expect(saved.words.map((w: { word: string }) => w.word)).toEqual(['cat', 'dog', 'sun', 'moon']);
+      expect(api.assign).toHaveBeenCalledWith(expect.objectContaining({ classroom_id: 'new1', lesson_id: 'lesson-1' }));
+      expect(nav.replace.mock.calls[0][0]).toBe('/en/teacher/classroom/new?classroomId=new1&lessonId=lesson-1');
+      expect(toastMock.success).toHaveBeenCalledWith('teacher.assignment.created');
+    });
+
+    it('Given 3 valid words (the shared minimum), When "Start live" is tapped, Then they become the class list', async () => {
+      render(<ClassSetupCreate />);
+      paste('cat, dog, sun');
+      fireEvent.click(screen.getByTestId('setup-start-live'));
+      await waitFor(() => expect(nav.replace).toHaveBeenCalled());
+      expect(api.createLesson.mock.calls[0][0].words.map((w: { word: string }) => w.word)).toEqual(['cat', 'dog', 'sun']);
+    });
+
+    it('Given fewer than 3 valid words, When "Start live" is tapped, Then the starter pack is assigned exactly as with an empty box', async () => {
+      render(<ClassSetupCreate />);
+      paste('cat, dog');
+      fireEvent.click(screen.getByTestId('setup-start-live'));
+      await waitFor(() => expect(nav.replace).toHaveBeenCalled());
+      expect(api.createLesson).toHaveBeenCalledTimes(1);
+      expect(api.createLesson.mock.calls[0][0].name).toBe(pack.nameKey);
+      expect(nav.replace.mock.calls[0][0]).toBe(`/en/teacher/classroom/new?classroomId=new1&pack=${encodeURIComponent(pack.nameKey)}&lessonId=lesson-1`);
+    });
+
+    it('Given the teacher list cannot be saved, Then no starter pack is slipped in instead and the teacher is told', async () => {
+      api.createLesson.mockResolvedValue({ success: false, error: 'offline' });
+      render(<ClassSetupCreate />);
+      paste('cat, dog, sun, moon');
+      fireEvent.click(screen.getByTestId('setup-start-live'));
+      await waitFor(() => expect(nav.replace).toHaveBeenCalled());
+      expect(api.createLesson).toHaveBeenCalledTimes(1);
+      expect(nav.replace.mock.calls[0][0]).toBe('/en/teacher/classroom/new?classroomId=new1');
+      expect(toastMock.error).toHaveBeenCalledWith('eduShell.setup.assignFailed');
+    });
+  });
 });

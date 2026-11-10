@@ -135,7 +135,7 @@ describe('free tier limits', () => {
     const countBullets = pro.filter((f) => /^Unlimited /.test(f));
     const featureBullets = pro.filter((f) => !countBullets.includes(f) && f !== 'Everything in Free');
 
-    expect(countBullets.length, 'Pro must still sell the count headroom').toBe(2);
+    expect(countBullets, 'Pro must still sell the class headroom, and no unlimited students').toEqual(['Unlimited classes']);
     expect(featureBullets.length, 'Pro must sell at least one real feature').toBeGreaterThan(0);
     for (const bullet of featureBullets) {
       // Each non-count Pro bullet names a `feature` key ProGate knows how to refuse.

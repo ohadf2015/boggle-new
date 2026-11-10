@@ -18,7 +18,7 @@ import type { Server, Socket } from 'socket.io';
 import { getClassroomGame } from '../modules/classroomGameManager.js';
 import { setClassroomPressureSettings } from '../modules/classroomGameSettings.js';
 import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
-import { getAuthUserId } from './classroomSocketAuth.js';
+import { getAuthUserId, refuseUnidentified } from './classroomSocketAuth.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { gameCodeSchema } from '../utils/socketValidation.js';
 import logger from '../utils/logger.js';
@@ -77,7 +77,7 @@ export function registerClassroomPressureHandlers(io: Server, socket: Socket): v
 
     const authUserId = getAuthUserId(socket);
     if (!authUserId) {
-      socket.emit('classroomGameError', { error: 'education.classroomGame.pressureFailed' });
+      refuseUnidentified(socket, 'updateClassroomGamePressure', { gameCode: payload.gameCode });
       return;
     }
 

@@ -333,6 +333,9 @@ export interface ServerToClientEvents {
   // Special word found
   specialWordFound: (data: { word: string; foundBy: string; bonus: number; gameSessionId?: number }) => void;
 
+  // Lesson Word Race: first student to find a placed lesson word claims it
+  lessonWordClaimed: (data: import('./lessonClaims').LessonWordClaimedEvent) => void;
+
   // Earthquake / Fire Round events
   fireRoundStart: (data: { gameSessionId?: string; grid: unknown[][]; duration: number }) => void;
   fireRoundEnd: (data: { gameSessionId?: string }) => void;

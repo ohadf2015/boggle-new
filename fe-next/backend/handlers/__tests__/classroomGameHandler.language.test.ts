@@ -57,7 +57,7 @@ describe('createClassroomGame — round language', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockSocket = { id: 'socket-123', on: vi.fn(), emit: vi.fn(), join: vi.fn(), handshake: { auth: { authUserId: '00000000-0000-4000-8000-000000000001' } } };
+    mockSocket = { id: 'socket-123', on: vi.fn(), emit: vi.fn(), join: vi.fn(), handshake: { auth: {} }, data: { verifiedUserId: '00000000-0000-4000-8000-000000000001' } };
     mockIo = { to: vi.fn().mockReturnThis(), emit: vi.fn() };
     (classroomMembership.resolveClassroomTeacher as Mock).mockResolvedValue('yes');
     (classroomGameManager.createClassroomGame as Mock).mockResolvedValue(undefined);

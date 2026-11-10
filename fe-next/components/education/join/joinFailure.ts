@@ -5,6 +5,7 @@ import { ROOM_LOCKED } from '@/shared/types/classroomLobbyLock';
 export type JoinFailureEffect = 'name_taken' | 'full' | 'locked' | 'invalid_code' | 'ended' | 'error';
 
 export const ROOM_LOCKED_KEY = 'education.student.join.roomLocked.title';
+export const NAME_NOT_ALLOWED_KEY = 'education.student.join.nameNotAllowed';
 
 export interface JoinFailure {
   /** An ended game is still reported as invalid_code until the telemetry union grows a session_ended value. */
@@ -19,6 +20,7 @@ const BY_CODE: Record<JoinClassroomErrorCode | typeof ROOM_LOCKED, JoinFailure> 
   STUDENT_LIMIT_REACHED: { outcome: 'full', effect: 'full', formErrorKey: 'education.student.join.classroomFull' },
   ROOM_LOCKED: { outcome: 'room_locked', effect: 'locked', formErrorKey: ROOM_LOCKED_KEY },
   NAME_TAKEN: { outcome: 'name_taken', effect: 'name_taken' },
+  NAME_NOT_ALLOWED: { outcome: 'name_taken', effect: 'name_taken', formErrorKey: NAME_NOT_ALLOWED_KEY },
   SESSION_ENDED: { outcome: 'invalid_code', effect: 'ended' },
   TEACHER_OWN_CLASS: { outcome: 'teacher_own_class', effect: 'error', formErrorKey: 'education.student.join.teacherOwnClass' },
 };

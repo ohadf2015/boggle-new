@@ -21,6 +21,7 @@ vi.mock('@/components/ui/ConfirmationDialog', () => ({ ConfirmationDialog: () =>
 vi.mock('@/lib/analytics/lazyPosthog', () => ({ default: { capture: vi.fn(), register: vi.fn() } }));
 
 import EduStudentResults from '@/components/education/live/EduStudentResults';
+import { openMore } from './openStudentMore';
 import { useStudyDeck } from '@/lib/education/studyDeckStore';
 
 const t = (key: string, params?: Record<string, string | number>) => (params ? `${key}:${JSON.stringify(params)}` : key);
@@ -71,6 +72,7 @@ describe('EduStudentResults missed-word recall', () => {
   it('given a deck with meanings, when results show, then missed words carry their meaning', () => {
     act(() => useStudyDeck.getState().setDeck('AB12CD', deck));
     render(<EduStudentResults {...(props as never)} />);
+    openMore();
     expect(missedProps.current?.words).toEqual(['apple', 'cloud']);
     expect(missedProps.current?.definitions).toEqual({ apple: 'A red fruit' });
   });
@@ -81,6 +83,7 @@ describe('EduStudentResults missed-word recall', () => {
       useStudyDeck.getState().clear();
     });
     render(<EduStudentResults {...(props as never)} />);
+    openMore();
 
     fireEvent.click(screen.getByTestId('missed-recall-start'));
     expect(screen.getByTestId('recall-definition')).toHaveTextContent('A red fruit');
@@ -95,6 +98,7 @@ describe('EduStudentResults missed-word recall', () => {
   it('given no missed word has a meaning, when results show, then there is no quick recall', () => {
     act(() => useStudyDeck.getState().setDeck('AB12CD', deck.map((c) => ({ word: c.word }))));
     render(<EduStudentResults {...(props as never)} />);
+    openMore();
     expect(screen.queryByTestId('missed-recall-start')).not.toBeInTheDocument();
     expect(missedProps.current?.definitions).toEqual({});
   });
@@ -102,6 +106,7 @@ describe('EduStudentResults missed-word recall', () => {
   it('given the deck belongs to another room, when results show, then there is no quick recall', () => {
     act(() => useStudyDeck.getState().setDeck('ZZ99ZZ', deck));
     render(<EduStudentResults {...(props as never)} />);
+    openMore();
     expect(screen.queryByTestId('missed-recall-start')).not.toBeInTheDocument();
   });
 });

@@ -32,6 +32,7 @@ import { WordcraftLiveView } from '@/components/multiplayer/wordcraft/WordcraftL
 import type { LetterGrid, Language, TournamentStanding } from '@/shared/types/game';
 import type { BoardTheme } from '@/shared/types/socket';
 import { PhoneBossStrip } from '@/components/education/boss/PhoneBossStrip';
+import { LessonClaimToast } from '@/components/education/live/LessonClaimToast';
 import ClassroomStudentDock from '@/components/education/economy/ClassroomStudentDock';
 import { useBossActive } from '@/stores/classroomBossStore';
 import { getMpInGameContainerClass, getMpInGamePlaceholderClass } from '@/lib/multiplayer/inGameContainerClass';
@@ -454,6 +455,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
       )}
 
       <PendingWordChips pendingWords={pendingWords} dismissPending={dismissPending} />
+      {roundFrame && <LessonClaimToast socket={socket} me={username} t={t} dir={dir} />}
 
       {roundDialogs}
     </div>

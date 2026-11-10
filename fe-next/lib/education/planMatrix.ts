@@ -1,4 +1,4 @@
-import { FREE_TIER_LIMITS } from './freeTierLimits';
+import { FREE_TIER_LIMITS, PRO_LIMITS } from './freeTierLimits';
 
 /**
  * The Free-vs-Pro comparison matrix, as data.
@@ -40,9 +40,9 @@ export interface PlanMatrixRow {
  * Advertising non-working/unused features wastes credibility on what is actually free.
  */
 export const PLAN_MATRIX_ROWS: readonly PlanMatrixRow[] = [
-  { key: 'classes', free: FREE_TIER_LIMITS.classes, pro: null },
-  { key: 'studentsPerClass', free: FREE_TIER_LIMITS.studentsPerClass, pro: null },
-  { key: 'assignmentsPerClass', free: FREE_TIER_LIMITS.assignmentsPerClass, pro: null },
+  { key: 'classes', free: FREE_TIER_LIMITS.classes, pro: PRO_LIMITS.classes },
+  { key: 'studentsPerClass', free: FREE_TIER_LIMITS.studentsPerClass, pro: PRO_LIMITS.studentsPerLiveGame },
+  { key: 'assignmentsPerClass', free: FREE_TIER_LIMITS.assignmentsPerClass, pro: PRO_LIMITS.assignmentsPerClass },
   { key: 'customLists', free: true, pro: true },
   { key: 'noAds', free: true, pro: true },
   { key: 'analytics', free: false, pro: true },

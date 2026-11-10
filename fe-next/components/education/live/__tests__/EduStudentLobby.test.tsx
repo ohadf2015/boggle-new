@@ -104,13 +104,25 @@ describe('EduStudentLobby', () => {
     expect(screen.getByTestId('edu-student-ready-sticker')).toHaveTextContent('eduStudent.lobby.readySticker');
   });
 
-  it('given a guest or a still-loading session, then no level or chest shows (nothing a later auth answer could flip)', () => {
+  it('given a still-loading session, then no level or chest shows (nothing a later auth answer could flip)', () => {
     auth.loading = true;
-    const { rerender } = render(<EduStudentLobby {...base} />);
+    render(<EduStudentLobby {...base} />);
     expect(screen.queryByTestId('edu-student-hud')).toBeNull();
-    Object.assign(auth, { loading: false, isAuthenticated: true, user: { id: 'anon', is_anonymous: true } });
-    rerender(<EduStudentLobby {...base} />);
-    expect(screen.queryByTestId('edu-student-hud')).toBeNull();
+  });
+
+  it('given a guest on an anonymous account, then their saved level, day streak and daily chest show', () => {
+    Object.assign(auth, { loading: false, isAuthenticated: true, user: { id: 'anon', is_anonymous: true }, profile: { total_xp: 400 } });
+    render(<EduStudentLobby {...base} />);
+    expect(screen.getByTestId('edu-student-hud-level')).not.toHaveTextContent('academy.student.level:{"level":1}');
+    expect(screen.getByTestId('streak-indicator')).toHaveTextContent('4');
+    expect(screen.getByTestId('daily-chest')).toHaveAttribute('data-user', 'anon');
+  });
+
+  it('given a guest with no account at all, then they see the starting level instead of nothing', () => {
+    Object.assign(auth, { loading: false, isAuthenticated: false, user: null, profile: null });
+    render(<EduStudentLobby {...base} />);
+    expect(screen.getByTestId('edu-student-hud-level')).toHaveTextContent('academy.student.level:{"level":1}');
+    expect(screen.queryByTestId('daily-chest')).toBeNull();
   });
 
   it('given a signed-in student, then my level, day streak and daily chest sit in the lobby', () => {

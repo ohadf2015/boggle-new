@@ -24,7 +24,8 @@ import { cn } from '@/lib/utils';
 import { useGameStore } from '@/hooks/gameState';
 import type { VocabularyLevel } from '@/lib/supabase/education/types';
 import { LessonTargetStrip } from '@/components/education/live/LessonTargetStrip';
-import { buildLessonTargets } from '@/components/education/live/lessonTargets';
+import { buildLessonTargets, buildRaceSlots } from '@/components/education/live/lessonTargets';
+import { useLessonClaims } from '@/components/education/live/useLessonClaims';
 
 export interface StudentWordBankProps {
   level: VocabularyLevel;
@@ -33,6 +34,8 @@ export interface StudentWordBankProps {
   /** Longer-word target shown to challenge students. */
   challengeMinLength?: number;
   className?: string;
+  /** The local student's seat name; omitted for the watching teacher, who sees the race on the projector. */
+  me?: string;
 }
 
 export const DEFAULT_CHALLENGE_MIN_LENGTH = 5;
@@ -42,6 +45,7 @@ export function StudentWordBank({
   words,
   challengeMinLength = DEFAULT_CHALLENGE_MIN_LENGTH,
   className,
+  me,
 }: StudentWordBankProps) {
   const { t, language } = useLanguage();
   const [open, setOpen] = useState(false);
@@ -58,6 +62,14 @@ export function StudentWordBank({
     [level, words, foundWords, grid, gameLanguage, language, gameMode, gameModeConfirmed],
   );
 
+  const race = useLessonClaims();
+  const raceSlots = useMemo(
+    () => (race && me ? buildRaceSlots(race, me, level === 'support' ? words : []) : null),
+    [race, me, level, words],
+  );
+
+  // The race is shared by the whole class, so it replaces every level's scaffold for the round.
+  if (raceSlots) return <LessonTargetStrip slots={raceSlots} race t={t} dir={isRTL ? 'rtl' : 'ltr'} className={className} />;
   if (targets) return <LessonTargetStrip targets={targets} t={t} dir={isRTL ? 'rtl' : 'ltr'} className={className} />;
 
   if (level === 'challenge') {

@@ -13,6 +13,7 @@ import { MascotBubble } from '../nb/MascotBubble';
 import { NB_ADVANCED, NB_BLOCK, NB_INPUT, NB_LINK, NB_PANEL, NB_PRIMARY, NB_SECONDARY, NB_STICKER } from '../nb/nbStyles';
 import { GRADE_BANDS, type GradeBand } from './classSetupDefaults';
 import { StarterPackRow } from './StarterPackRow';
+import { SETUP_FIELD_LABEL, SetupOwnWordsField, type SetupOwnWords } from './SetupOwnWordsField';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -35,10 +36,11 @@ export interface ClassSetupDetailsProps {
   onStartLive: () => void;
   onCreateOnly?: () => void;
   skipHref: string;
+  ownWords?: SetupOwnWords;
   t: T;
 }
 
-const FIELD_LABEL = 'font-neo-body text-sm font-black text-neo-cream';
+const FIELD_LABEL = SETUP_FIELD_LABEL;
 
 /**
  * Name, then "Create and play". Grade, language and the first pack all have defaults, so they
@@ -49,6 +51,8 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
   const { name, onNameChange, grade, onGradeChange, language, onLanguageChange, cap, busy, errorKey, t } = props;
   const placeholder = t(grade ? `eduShell.setup.gradeName.${grade}` : 'eduShell.setup.namePlaceholder');
   const [advancedOpen, setAdvancedOpen] = useState(false);
+  const own = props.ownWords;
+  const ownCount = own && own.count >= own.min ? own.count : null;
   return (
     <form
       data-testid="setup-step-details"
@@ -84,21 +88,31 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
           />
         </div>
 
+        {own ? <SetupOwnWordsField own={own} t={t} /> : null}
+
         <ul data-testid="setup-advanced-summary" aria-label={t('eduShell.setup.advancedOpen')} className="flex flex-wrap gap-1.5">
           <li className={cn(NB_STICKER, NB_BLOCK.cream)}>
             <span aria-hidden="true">{languageFlag(language)}</span>
             {nativeLanguageName(language)}
           </li>
           <li className={cn(NB_STICKER, NB_BLOCK.cyan)}>
-            {t('eduShell.setup.packSticker', { name: t(props.pack.nameKey) })} · {t('eduShell.setup.packWords', { count: props.pack.words.length })}
+            {ownCount !== null
+              ? t('eduShell.setup.ownWords.sticker', { count: ownCount })
+              : `${t('eduShell.setup.packSticker', { name: t(props.pack.nameKey) })} · ${t('eduShell.setup.packWords', { count: props.pack.words.length })}`}
           </li>
           <li className={cn(NB_STICKER, NB_BLOCK.cream)}>
             {grade ? t(`eduShell.setup.grade.${grade}`) : t('eduShell.setup.anyGrade')}
           </li>
         </ul>
-        <p data-testid="setup-starter-list-hint" className="font-neo-body text-sm font-semibold text-neo-cream/80">
-          {t('eduShell.setup.starterListHint', { name: t(props.pack.nameKey) })}
-        </p>
+        {ownCount !== null ? (
+          <p data-testid="setup-own-list-hint" className="font-neo-body text-sm font-semibold text-neo-cream/80">
+            {t('eduShell.setup.ownWords.listHint', { count: ownCount })}
+          </p>
+        ) : (
+          <p data-testid="setup-starter-list-hint" className="font-neo-body text-sm font-semibold text-neo-cream/80">
+            {t('eduShell.setup.starterListHint', { name: t(props.pack.nameKey) })}
+          </p>
+        )}
 
         <button
           type="button"

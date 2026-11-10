@@ -101,7 +101,7 @@ function EduLiveRoom(): React.JSX.Element {
               <EduRoomFullNotice players={s.playersInRoom} watching={s.spectators.length} t={s.t as (key: string, params?: Record<string, string | number>) => string} />
             )}
             {s.isActive && s.gameActive && !s.showResults && s.isPaused && <GamePausedOverlay isHost={s.isHost} />}
-            {s.isActive && s.gameActive && !s.showResults && <StudentWordBank level={s.classroomLevel} words={s.classroomWordBank} />}
+            {s.isActive && s.gameActive && !s.showResults && <StudentWordBank level={s.classroomLevel} words={s.classroomWordBank} me={isTeacher ? undefined : s.username} />}
             {s.teacherStrip.visible && (
               <TeacherLiveControls
                 sidePanelOpen={!!practiceRoom}

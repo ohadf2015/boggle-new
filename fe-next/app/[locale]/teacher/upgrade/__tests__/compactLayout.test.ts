@@ -51,7 +51,7 @@ describe('Upgrade page — compact one-screen layout', () => {
     expect(freeMatch).not.toBeNull();
     if (freeMatch) {
       expect(freeMatch[0]).toContain('teacher.subscription.unlimitedClasses');
-      expect(freeMatch[0]).toContain('teacher.subscription.unlimitedStudents');
+      expect(freeMatch[0]).not.toContain('teacher.subscription.unlimitedStudents');
       expect(freeMatch[0]).toContain('education.landing.pro.analytics');
     }
   });

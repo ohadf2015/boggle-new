@@ -149,7 +149,7 @@ export default function ClassLimitUpsellModal({
               <ProFeaturePreview feature="analytics" />
             </div>
             <ul className="flex flex-wrap gap-2">
-              {['teacher.subscription.unlimitedClasses', 'teacher.subscription.unlimitedStudents'].map((key) => (
+              {['teacher.subscription.unlimitedClasses'].map((key) => (
                 <li key={key} className={cn(NB_STICKER, NB_BLOCK.lime, 'text-sm')}>
                   {t(key)}
                 </li>

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { PLAN_MATRIX_ROWS } from '../planMatrix';
-import { FREE_TIER_LIMITS } from '../freeTierLimits';
+import { FREE_TIER_LIMITS, PRO_LIMITS } from '../freeTierLimits';
 import { getTierConfig } from '../tierConfig';
 // @ts-expect-error — translations are untyped .js bundles
 import { en } from '../../../translations/en';
@@ -77,7 +77,7 @@ describe('plan comparison matrix', () => {
     expect(byKey.studentsPerClass, 'matrix has no "studentsPerClass" row').toBeTruthy();
     expect(byKey.studentsPerClass.free).toBe(FREE_TIER_LIMITS.studentsPerClass);
     expect(byKey.studentsPerClass.free).toBe(free.students_limit_per_class);
-    expect(byKey.studentsPerClass.pro).toBe(pro.students_limit_per_class);
+    expect(byKey.studentsPerClass.pro).toBe(PRO_LIMITS.studentsPerLiveGame);
 
     expect(byKey.assignmentsPerClass, 'matrix has no "assignmentsPerClass" row').toBeTruthy();
     expect(byKey.assignmentsPerClass.free).toBe(FREE_TIER_LIMITS.assignmentsPerClass);

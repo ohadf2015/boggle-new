@@ -38,8 +38,9 @@ describe('PreCheckoutExplainer', () => {
   it('lists what Pro includes', () => {
     setup('trial');
     expect(screen.getByText('teacher.subscription.unlimitedClasses')).toBeInTheDocument();
-    expect(screen.getByText('teacher.subscription.unlimitedStudents')).toBeInTheDocument();
-    expect(screen.getByText('education.landing.pro.noAds')).toBeInTheDocument();
+    expect(screen.getByText('education.landing.pro.analytics')).toBeInTheDocument();
+    expect(screen.queryByText('teacher.subscription.unlimitedStudents')).toBeNull();
+    expect(screen.queryByText('education.landing.pro.noAds')).toBeNull();
   });
 
   it('confirm starts the checkout; back leaves without touching the till', () => {

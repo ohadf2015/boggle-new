@@ -16,6 +16,7 @@
 import type { GameState } from '../modules/gameState/types';
 import { getLeaderboard } from '../modules/gameStateManager';
 import { quizShellStartFor } from '../services/vocabQuizShell';
+import { lessonClaimsView } from '../modules/lessonClaims';
 import { getGameModeModule } from './index';
 
 export type RoundPayloadKind = 'start' | 'retry' | 'reconnect' | 'lateJoin' | 'recovery';
@@ -84,5 +85,7 @@ export function buildRoundPayload(gameCode: string, game: GameState, opts: Round
   // student who rejoins mid-round must get the same room, not a default one.
   if (resume && game.classroomRoundExtras) Object.assign(payload, game.classroomRoundExtras);
   if (extras) Object.assign(payload, extras);
+  // Live, not the start snapshot: a returning phone must see claims made while it was away.
+  if (game.lessonClaims) payload.lessonClaims = lessonClaimsView(game.lessonClaims);
   return payload;
 }

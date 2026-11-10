@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 import { pickFunName } from './funName';
 import { JoinAlert } from './JoinAlert';
 import { JoinRoomLocked } from './JoinRoomLocked';
-import { ROOM_LOCKED_KEY } from './joinFailure';
+import { NAME_NOT_ALLOWED_KEY, ROOM_LOCKED_KEY } from './joinFailure';
 import { JoinPrimaryButton } from './JoinPrimaryButton';
 import { useKeepInView } from './useKeepInView';
 import type { JoinFlowState } from './useJoinFlow';
@@ -147,7 +147,7 @@ export function JoinNameStep({ flow, nameRef, goRef }: JoinNameStepProps) {
         {flow.suggestedName && (
           <div role="alert" className="flex flex-col gap-2 rounded-neo border-3 border-neo-black bg-neo-yellow p-3 shadow-hard">
             <p className="font-neo-body text-sm font-bold text-neo-navy">
-              {t(`${K}.nameTaken`, { suggestedName: flow.suggestedName })}
+              {t(formError === NAME_NOT_ALLOWED_KEY ? NAME_NOT_ALLOWED_KEY : `${K}.nameTaken`, { suggestedName: flow.suggestedName })}
             </p>
             <button
               type="button"

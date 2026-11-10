@@ -73,3 +73,14 @@ export async function verifySocketToken(
     return null;
   }
 }
+
+/** A sent token that failed to verify is kept apart from "no token", so a handler can say "we could not check" instead of "you are not the teacher". */
+export function markSocketIdentity(
+  data: Record<string, unknown>,
+  token: string | undefined,
+  user: VerifiedSocketUser | null,
+): void {
+  data.verifiedUserId = user?.userId ?? null;
+  if (user?.email) data.verifiedEmail = user.email;
+  data.authUnverified = !!token && !user;
+}

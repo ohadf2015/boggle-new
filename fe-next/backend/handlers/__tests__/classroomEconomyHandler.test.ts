@@ -122,6 +122,27 @@ describe('classroomEconomy:requestReward', () => {
     expect(grant).toHaveBeenLastCalledWith(expect.objectContaining({ bossWin: false }));
   });
 
+  it('Given I finished last of 4 students, Then the chest is asked for as an underdog chest; first place is not', async () => {
+    const users = { Ann: { authUserId: 'u1' }, Ben: { authUserId: 'u2' }, Cy: { authUserId: 'u3' }, Dee: { authUserId: 'u4' } };
+    const finish = (annScore: number) => ({
+      gameSessionId: 7,
+      gameState: 'finished',
+      users,
+      cachedResultsPayload: {
+        gameSessionId: 7,
+        scores: [{ username: 'Ben', totalScore: 30 }, { username: 'Cy', totalScore: 20 }, { username: 'Dee', totalScore: 10 }, { username: 'Ann', totalScore: annScore }],
+      },
+    });
+    grant.mockResolvedValue(reveal);
+    handlerSocket();
+    memGame.value = finish(2);
+    await handlers['classroomEconomy:requestReward']({ gameCode: 'ABC', roundId: '7' });
+    expect(grant).toHaveBeenLastCalledWith(expect.objectContaining({ underdog: true }));
+    memGame.value = finish(90);
+    await handlers['classroomEconomy:requestReward']({ gameCode: 'ABC', roundId: '7' });
+    expect(grant).toHaveBeenLastCalledWith(expect.objectContaining({ underdog: false }));
+  });
+
   it('Given a student who joined through the base multiplayer join (not in the class roster), Then the chest is still rolled', async () => {
     classroomGame.value = { classroomId: 'c1', players: [], teacherId: 't' };
     memGame.value = { gameSessionId: 7, gameState: 'finished', cachedResultsPayload: { gameSessionId: 7 }, users: SEATED_USERS };

@@ -3,7 +3,7 @@ import type { Socket } from 'socket.io';
 
 import { getClassroomGame } from '../modules/classroomGameManager.js';
 import { restoreClassroomFullLesson, setClassroomReteachWords } from '../modules/classroomReteach.js';
-import { getAuthUserId } from './classroomSocketAuth.js';
+import { getAuthUserId, refuseUnidentified } from './classroomSocketAuth.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { gameCodeSchema } from '../utils/socketValidation.js';
 import logger from '../utils/logger.js';
@@ -42,8 +42,12 @@ function registerTeacherRoomChange<T extends { gameCode: string }>(socket: Socke
 
     try {
       const authUserId = getAuthUserId(socket);
+      if (!authUserId) {
+        refuseUnidentified(socket, route.event, { gameCode: code }, route.refused);
+        return;
+      }
       const game = await getClassroomGame(code);
-      if (!authUserId || !game || game.teacherId !== authUserId || game.status === 'playing') {
+      if (!game || game.teacherId !== authUserId || game.status === 'playing') {
         refuse();
         return;
       }

@@ -86,7 +86,7 @@ describe('handleValidatedWord rewards', () => {
 
     expect(payload.catchUp).toEqual({ bonus: expect.any(Number), pct: expect.any(Number) });
     expect(payload.catchUp.bonus).toBeGreaterThan(0);
-    expect(payload.catchUp.bonus).toBeLessThanOrEqual(Math.round(base * 0.2));
+    expect(payload.catchUp.bonus).toBeLessThanOrEqual(Math.max(1, Math.round(base * 0.2)));
     expect(lastDelta()).toBe(base + payload.catchUp.bonus);
     expect(addPlayerEventBonus).toHaveBeenCalledWith('RWD1', 'alice', payload.catchUp.bonus);
   });

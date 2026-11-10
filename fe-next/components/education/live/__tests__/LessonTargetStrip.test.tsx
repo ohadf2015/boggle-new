@@ -33,3 +33,28 @@ describe('LessonTargetStrip', () => {
     expect(screen.getByTestId('lesson-target-strip')).toHaveAttribute('dir', 'rtl');
   });
 });
+
+describe('LessonTargetStrip in a Lesson Word Race', () => {
+  const slots = [
+    { key: '0', first: 'S', rest: 4, state: 'mine' as const, word: 'storm' },
+    { key: '1', first: 'S', rest: 3, state: 'taken' as const, word: 'shad', by: 'Dana', avatar: { emoji: '🐼' } },
+    { key: '2', first: 'C', rest: 3, state: 'hidden' as const },
+  ];
+
+  it('Given claimed and open slots, When shown, Then the count says claimed and a classmate\'s slot names them', () => {
+    render(<LessonTargetStrip slots={slots} race t={t} dir="ltr" />);
+    const strip = screen.getByTestId('lesson-target-strip');
+    expect(strip).toHaveTextContent('education.race.claimedCount:{"claimed":2,"total":3}');
+    const chips = within(strip).getAllByRole('listitem');
+    expect(chips.map((c) => c.getAttribute('data-state'))).toEqual(['mine', 'taken', 'hidden']);
+    expect(chips[1]).toHaveTextContent('shad');
+    expect(chips[1]).toHaveTextContent('🐼');
+    expect(chips[1]).toHaveAttribute('aria-label', 'education.race.takenBy:{"word":"shad","name":"Dana"}');
+    expect(chips[2]).not.toHaveTextContent('cell');
+  });
+
+  it('Given a hint for a support student, When the slot is still open, Then the hint word shows', () => {
+    render(<LessonTargetStrip slots={[{ key: '0', first: 'C', rest: 3, state: 'hidden', hint: 'cell' }]} race t={t} dir="ltr" />);
+    expect(screen.getByTestId('lesson-target-strip')).toHaveTextContent('cell');
+  });
+});

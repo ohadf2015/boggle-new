@@ -116,6 +116,7 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
   const levelUp = heroLanded && c.socketEvents?.showLevelUpCelebration ? c.socketEvents.levelUpData : null;
   const classFound = summary?.classFoundCount;
   const classTotal = typeof classFound === 'number' ? (summary?.totalWords ?? 0) : 0;
+  const [moreOpened, setMoreOpened] = useState(false);
   let beat = 0;
 
   if (c.isExiting) return <div data-testid="results-exit-wash" className="fixed inset-0 z-[9999] bg-neo-navy" />;
@@ -124,11 +125,6 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
     <div data-testid="edu-student-results" className="flex min-h-0 flex-1 flex-col overflow-hidden bg-neo-navy text-neo-cream">
       <style>{LIVE_KEYFRAMES}</style>
       <header className="flex shrink-0 items-center justify-end gap-2 pe-16 ps-4 pt-1.5">
-        {props.gameCode && (
-          <div className="min-w-0 flex-1 [&_button]:min-h-11 [&_button]:py-1 [&_img]:!size-7">
-            <ChestRewardCta quiet gameCode={props.gameCode} roundId={rewardRoundId(props.gameSessionId, props.gameCode)} />
-          </div>
-        )}
         <EduStudentShareButton t={t} language={c.language} placing={placing} />
         <button
           type="button"
@@ -170,6 +166,17 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
             </Beat>
           )}
 
+          {props.gameCode && (
+            <>
+              <Beat index={beat++}>
+                <ChestRewardCta gameCode={props.gameCode} roundId={rewardRoundId(props.gameSessionId, props.gameCode)} />
+              </Beat>
+              <Beat index={beat++}>
+                <RoundShop compact gameCode={props.gameCode} />
+              </Beat>
+            </>
+          )}
+
           <BossOutcomeCard size="phone" density="compact" className="w-full max-w-sm rounded-neo-lg border-[3px] border-neo-cream/50 shadow-hard-lg" />
 
           <Beat index={beat++}>
@@ -186,7 +193,10 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
           </Beat>
 
           <Beat index={beat++}>
-            <details data-testid="edu-student-more" className="group rounded-neo-lg border-[3px] border-neo-cream bg-neo-navy-elevated shadow-hard">
+            <details
+              data-testid="edu-student-more"
+              onToggle={(e) => e.currentTarget.open && setMoreOpened(true)}
+              className="group rounded-neo-lg border-[3px] border-neo-cream bg-neo-navy-elevated shadow-hard">
               <summary
                 data-testid="edu-student-more-summary"
                 className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 px-3 py-2 font-neo-display text-lg font-black [&::-webkit-details-marker]:hidden"
@@ -194,7 +204,7 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
                 <span>{t('eduLiveRoom.studentResults.moreFromRound')}</span>
                 <ChevronDown className="size-5 shrink-0 transition-transform duration-200 ease-out group-open:rotate-180 motion-reduce:transition-none" aria-hidden="true" />
               </summary>
-              <div className="flex flex-col gap-3 px-3 pb-3">
+              {moreOpened && <div className="flex flex-col gap-3 px-3 pb-3">
                 {xpGained && xpGained.newTotalXp > 0 && <EduStudentXpBar totalXp={xpGained.newTotalXp} />}
                 <h2 className="flex items-baseline justify-between gap-2 font-neo-display text-base font-black">
                   {t('eduLiveRoom.studentResults.yourWords')}
@@ -222,8 +232,7 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
                 )}
                 <StudentMissedWords words={missed} definitions={definitions} language={props.roomLanguage ?? c.language} t={t} className="w-full" />
                 <EduMissedRecall missed={missed} deck={deck} t={t} />
-                {props.gameCode && <RoundShop compact gameCode={props.gameCode} />}
-              </div>
+              </div>}
             </details>
           </Beat>
         </main>

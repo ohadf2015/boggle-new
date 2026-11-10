@@ -28,6 +28,7 @@ import { TEACHER_CONTROLS_INSET } from '@/components/education/controls/teacherB
 import { ProjectorBossStage } from '@/components/education/boss/ProjectorBossStage';
 import { useBossActive } from '@/stores/classroomBossStore';
 import { ClassroomLivePanel } from '@/components/education/projector/ClassroomLivePanel';
+import { ProjectorLessonClaims } from '@/components/education/projector/ProjectorLessonClaims';
 import { useProjectorWheelPuzzle } from '@/components/education/live/ProjectorWheel';
 import { ProjectorRoundStage } from '@/components/education/live/ProjectorRoundStage';
 import { roundHasScore } from '@/shared/utils/roundCelebration';
@@ -435,10 +436,11 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
           {isClassroom ? (
             <div className="flex h-full min-h-0 gap-2 md:gap-4">
               <ProjectorRoundStage gameMode={gameMode} grid={tableData} wheelPuzzle={wheelPuzzle} t={t} />
-              <div className="min-w-0 flex-1">
-                {gameMode === 'word-hunt' ? activityPanel : (
+              <div className="flex min-w-0 flex-1 flex-col gap-2 md:gap-4">
+                <div className="min-h-0 flex-1">{gameMode === 'word-hunt' ? activityPanel : (
                   <ClassroomLivePanel socket={socket} totalWords={roomWordTotal} lessonWords={lessonWords} language={roomLanguage} hostUsername={username} t={t} />
-                )}
+                )}</div>
+                <ProjectorLessonClaims t={t} className="min-h-[12rem] flex-[1.3]" />
               </div>
             </div>
           ) : activityPanel}

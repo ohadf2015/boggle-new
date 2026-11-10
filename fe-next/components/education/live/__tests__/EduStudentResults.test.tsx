@@ -27,6 +27,7 @@ import EduStudentResults from '@/components/education/live/EduStudentResults';
 import { useClassroomBossStore } from '@/stores/classroomBossStore';
 import type { ClassroomBossView } from '@/shared/types/classroomBoss';
 import { sessionKeyFor } from '@/lib/education/roundEndHistory';
+import { openMore } from './openStudentMore';
 
 const t = (key: string, params?: Record<string, string | number>) => (params ? `${key}:${JSON.stringify(params)}` : key);
 
@@ -68,8 +69,9 @@ describe('EduStudentResults', () => {
     expect(screen.getByTestId('edu-student-score')).toHaveTextContent('20');
   });
 
-  it('given my valid words, when results show, then each is listed', () => {
+  it('given my valid words, when I open the round details, then each is listed', () => {
     render(<EduStudentResults {...(props as object)} />);
+    openMore();
     expect(screen.getAllByTestId('edu-student-word').map((el) => el.textContent)).toEqual(['tame', 'cat']);
   });
 
@@ -160,12 +162,14 @@ describe('EduStudentResults', () => {
   it('given XP came in, when results show, then a level bar fills with my new total', () => {
     controller.current = makeController({ socketEvents: { xpGainedData: { xpEarned: 45, newTotalXp: 345, newLevel: 2 } } });
     render(<EduStudentResults {...(props as object)} />);
+    openMore();
     expect(screen.getByTestId('edu-student-xp-bar')).toBeInTheDocument();
     expect(screen.getByTestId('xp-progress-wrapper')).toBeInTheDocument();
   });
 
   it('given a guest with no XP, when results show, then no empty level bar appears', () => {
     render(<EduStudentResults {...(props as object)} />);
+    openMore();
     expect(screen.queryByTestId('edu-student-xp-bar')).toBeNull();
   });
 

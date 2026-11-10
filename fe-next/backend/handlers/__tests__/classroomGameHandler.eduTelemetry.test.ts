@@ -85,7 +85,8 @@ describe('startClassroomGame — education telemetry', () => {
   it('Given a waiting game, When the teacher starts it, Then edu_live_round_started fires exactly once for the teacher', async () => {
     const socket: any = {
       id: 'socket-1', on: vi.fn(), emit: vi.fn(), join: vi.fn(),
-      handshake: { auth: { authUserId: TEACHER } },
+      handshake: { auth: {} },
+      data: { verifiedUserId: TEACHER },
     };
     const io: any = { to: vi.fn().mockReturnThis(), emit: vi.fn() };
     registerClassroomGameHandlers(io, socket);
@@ -102,7 +103,8 @@ describe('startClassroomGame — education telemetry', () => {
   it('Given a waiting game, When started, Then the legacy edu_classroom_game_started fires exactly once alongside it', async () => {
     const socket: any = {
       id: 'socket-1', on: vi.fn(), emit: vi.fn(), join: vi.fn(),
-      handshake: { auth: { authUserId: TEACHER } },
+      handshake: { auth: {} },
+      data: { verifiedUserId: TEACHER },
     };
     const io: any = { to: vi.fn().mockReturnThis(), emit: vi.fn() };
     registerClassroomGameHandlers(io, socket);
@@ -118,7 +120,8 @@ describe('startClassroomGame — education telemetry', () => {
     flaggedProfiles.add(TEACHER);
     const socket: any = {
       id: 'socket-1', on: vi.fn(), emit: vi.fn(), join: vi.fn(),
-      handshake: { auth: { authUserId: TEACHER } },
+      handshake: { auth: {} },
+      data: { verifiedUserId: TEACHER },
     };
     const io: any = { to: vi.fn().mockReturnThis(), emit: vi.fn() };
     registerClassroomGameHandlers(io, socket);
@@ -133,7 +136,8 @@ describe('startClassroomGame — education telemetry', () => {
   it('Given a real teacher, When started, Then is_test_account is an explicit false', async () => {
     const socket: any = {
       id: 'socket-1', on: vi.fn(), emit: vi.fn(), join: vi.fn(),
-      handshake: { auth: { authUserId: TEACHER } },
+      handshake: { auth: {} },
+      data: { verifiedUserId: TEACHER },
     };
     const io: any = { to: vi.fn().mockReturnThis(), emit: vi.fn() };
     registerClassroomGameHandlers(io, socket);

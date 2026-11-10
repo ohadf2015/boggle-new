@@ -75,7 +75,7 @@ function startHandler(authUserId: string | null) {
     on: vi.fn(),
     emit: vi.fn(),
     join: vi.fn(),
-    handshake: { auth: authUserId ? { authUserId } : {} },
+    handshake: { auth: {} },
     data: authUserId ? { verifiedUserId: authUserId } : {},
   };
   const io: any = { to: vi.fn().mockReturnThis(), emit: vi.fn() };
@@ -104,7 +104,7 @@ describe('startClassroomGame — last_seen_at', () => {
   it('performs no profile read or write when the starter is anonymous', async () => {
     const { socket, handler } = startHandler(null);
     await handler({ gameCode: 'ABC123' });
-    expect(socket.emit).toHaveBeenCalledWith('classroomGameError', { error: 'Authentication required' });
+    expect(socket.emit).toHaveBeenCalledWith('classroomGameError', { error: 'education.errors.signInRequired', code: 'AUTH_REQUIRED', gameCode: 'ABC123' });
     expect(profileReads).toBe(0);
     expect(profileWrites).toEqual([]);
     expect(classroomGameManager.updateClassroomGameStatus).not.toHaveBeenCalled();
