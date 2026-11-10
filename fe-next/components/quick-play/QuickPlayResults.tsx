@@ -86,7 +86,7 @@ interface QuickPlayResultsProps {
   theme?: WeeklyThemeId;
   /** Start that round now: a mode, or 'random' for a spin. */
   onNextRound: (mode?: WheelSelection) => void;
-  onChallenge: () => void;
+  onChallenge: () => Promise<unknown> | void;
   /** Leave the hub from the results screen; omitted = no exit button. */
   onExit?: () => void;
 }
@@ -454,6 +454,7 @@ export function QuickPlayResults({
         onNextRound={onNextRound}
         onChallenge={onChallenge}
         shine={animate}
+        isGuest={isGuest}
       />
     </div>
   );

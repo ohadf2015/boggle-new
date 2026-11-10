@@ -1,6 +1,7 @@
 'use client';
 
-import { RotateCcw, Swords } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Check, RotateCcw, Share2, Swords } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import posthog from '@/lib/analytics/lazyPosthog';
 import { ResultsNextBar } from '@/components/results/stage/ResultsNextBar';
@@ -20,14 +21,34 @@ export function QuickResultsCtaBar({
   onNextRound,
   onChallenge,
   shine,
+  isGuest = false,
 }: {
   /** The mode just played; when given, the next-mode chips pin above the button. */
   currentMode?: QuickMode;
   onNextRound: (mode?: WheelSelection) => void;
-  onChallenge: () => void;
+  /** Resolves with the share outcome so the bar can confirm a copy. */
+  onChallenge: () => Promise<unknown> | void;
   shine: boolean;
+  /** Guests can't create a challenge row, so their button shares the result link. */
+  isGuest?: boolean;
 }) {
   const { t } = useLanguage();
+  const [shareNote, setShareNote] = useState<'copied' | 'failed' | null>(null);
+  const clearTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    if (clearTimer.current) clearTimeout(clearTimer.current);
+  }, []);
+
+  const handleShare = useCallback(async () => {
+    const outcome = await onChallenge();
+    const next = outcome === 'copied' || outcome === 'failed' ? outcome : null;
+    setShareNote(next);
+    if (clearTimer.current) clearTimeout(clearTimer.current);
+    if (next) clearTimer.current = setTimeout(() => setShareNote(null), 2500);
+  }, [onChallenge]);
+
+  const ShareIcon = shareNote === 'copied' ? Check : isGuest ? Share2 : Swords;
+  const note = shareNote === 'copied' ? t('quickPlay.solo.copied') : shareNote === 'failed' ? t('quickPlay.solo.shareFailed') : '';
   return (
     <ResultsNextBar
       testId="quick-results-cta-bar"
@@ -45,11 +66,12 @@ export function QuickResultsCtaBar({
         testId: 'quick-results-next',
       }}
       secondary={{
-        label: t('quickPlay.solo.challengeFriend'),
-        title: t('quickPlay.solo.challengeHint'),
-        onClick: onChallenge,
+        label: isGuest ? t('quickPlay.solo.shareResult') : t('quickPlay.solo.challengeFriend'),
+        title: isGuest ? t('quickPlay.solo.shareResultHint') : t('quickPlay.solo.challengeHint'),
+        onClick: () => void handleShare(),
         testId: 'quick-results-challenge',
-        icon: <Swords className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />,
+        icon: <ShareIcon className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />,
+        note,
       }}
     />
   );
