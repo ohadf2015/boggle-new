@@ -29,7 +29,14 @@ function setup(tables: Record<string, Record<string, unknown>[]>, opts: Paramete
   return fake
 }
 
-const get = async () => (await GET(new NextRequest('http://localhost/api/daily/weekly-chest/status'))).json()
+const get = async (headers: Record<string, string> = {}) =>
+  (await GET(new NextRequest('http://localhost/api/daily/weekly-chest/status', { headers }))).json()
+
+const guestWheel = (puzzle_date: string) => ({ ...wheel(puzzle_date), player_id: null, guest_fingerprint: 'fp1' })
+const guestDays = (n: number) =>
+  Array.from({ length: n }, (_, i) => guestWheel(new Date(Date.UTC(2026, 10, 11 - i)).toISOString().slice(0, 10)))
+const createdHoursAgo = (h: number) => [{ id: 'u1', created_at: new Date(Date.UTC(2026, 10, 12, 12) - h * 3_600_000).toISOString() }]
+const GUEST = { 'x-lc-guest-ids': 'fp1' }
 
 describe('GET /api/daily/weekly-chest/status: streak block', () => {
   beforeEach(() => vi.clearAllMocks())
@@ -71,6 +78,39 @@ describe('GET /api/daily/weekly-chest/status: streak block', () => {
     expect(body.freezesAvailable).toBe(1)
   })
 
+  it('Given only a gifted freeze, counts it as owned and spends it on a missed day exactly once', async () => {
+    const fake = setup({
+      daily_word_wheel_attempts: [wheel('2026-11-09'), wheel('2026-11-10')],
+      player_engagement: [{ player_id: 'u1', streak_freezes_available: 0 }],
+      profiles: [{ id: 'u1', streak_freeze_count: 1 }],
+      daily_streak_freezes: [],
+      daily_streak_milestone_claims: [],
+    })
+    const first = await get()
+    expect(first.streak.freezeSaved).toEqual({ date: '2026-11-11', freezesRemaining: 0 })
+    expect(first.currentStreak).toBe(3)
+
+    const second = await get()
+    expect(second.currentStreak).toBe(3)
+    expect(second.freezesAvailable).toBe(0)
+    expect(fake.tables.daily_streak_freezes).toHaveLength(1)
+    expect(fake.tables.profiles[0].streak_freeze_count).toBe(0)
+  })
+
+  it('Given chest and gifted freezes, shows both as owned and spends the chest one first', async () => {
+    const fake = setup({
+      daily_word_wheel_attempts: [wheel('2026-11-09'), wheel('2026-11-10')],
+      player_engagement: [{ player_id: 'u1', streak_freezes_available: 1 }],
+      profiles: [{ id: 'u1', streak_freeze_count: 2 }],
+      daily_streak_freezes: [],
+      daily_streak_milestone_claims: [],
+    })
+    const body = await get()
+    expect(body.freezesAvailable).toBe(2)
+    expect(fake.tables.player_engagement[0].streak_freezes_available).toBe(0)
+    expect(fake.tables.profiles[0].streak_freeze_count).toBe(2)
+  })
+
   it('Given a 3-day streak and nothing claimed, offers the 3-day reward and points at 7 days', async () => {
     setup({
       daily_word_wheel_attempts: [wheel('2026-11-10'), wheel('2026-11-11'), wheel('2026-11-12')],
@@ -89,5 +129,43 @@ describe('GET /api/daily/weekly-chest/status: streak block', () => {
     const body = await get()
     expect(body.streak.milestone).toBeNull()
     expect(body.currentStreak).toBe(3)
+  })
+
+  describe('guest streak carry-over at signup', () => {
+    it('Given a guest 6 days in who just signed up, keeps 6 and stays one day from the 7-day reward', async () => {
+      setup(
+        { profiles: createdHoursAgo(1), daily_word_wheel_attempts: guestDays(6), daily_streak_milestone_claims: [] },
+        { unique: { daily_streak_carryover: ['player_id', 'carried_date'] } },
+      )
+      const first = await get(GUEST)
+      expect(first.currentStreak).toBe(6)
+      expect(first.streak.current).toBe(6)
+      expect(first.streak.milestone.next).toMatchObject({ days: 7, remaining: 1 })
+      expect(first.streak.milestone.claimable).toBeNull()
+
+      const replay = await get(GUEST)
+      expect(replay.currentStreak).toBe(6)
+    })
+
+    it('Given a long carried run, owes no weekly chests for days the account never played', async () => {
+      setup(
+        { profiles: createdHoursAgo(1), daily_word_wheel_attempts: guestDays(9), daily_streak_milestone_claims: [] },
+        { unique: { daily_streak_carryover: ['player_id', 'carried_date'] } },
+      )
+      const body = await get(GUEST)
+      expect(body.currentStreak).toBe(9)
+      expect(body.isClaimable).toBe(false)
+      expect(body.daysCompleted).toBe(0)
+    })
+
+    it('Given an existing account signing in on a device with guest plays, keeps its own streak', async () => {
+      setup({
+        profiles: createdHoursAgo(24 * 30),
+        daily_word_wheel_attempts: [...guestDays(6), wheel('2026-11-11'), wheel('2026-11-12')],
+        daily_streak_milestone_claims: [],
+      })
+      const body = await get(GUEST)
+      expect(body.currentStreak).toBe(2)
+    })
   })
 })

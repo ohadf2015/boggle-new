@@ -3,12 +3,13 @@ import { getSupabaseAdmin } from '@/lib/email'
 import { getAuthedUser } from '@/lib/auth/getAuthedUser'
 import {
   computeWeekProgress,
-  computeCurrentStreak,
   computeChestTierForCycle,
   findOwedChests,
 } from '@/lib/daily/weeklyChest'
 import { loadChestActivity } from '@/lib/daily/weeklyChestData'
-import { buildStreakBlock } from '@/lib/daily/streakExtras.server'
+import { buildStreakBlock, loadOwnedFreezes } from '@/lib/daily/streakExtras.server'
+import { carryOverGuestStreak, loadCarriedDates, parseGuestIds } from '@/lib/daily/streakCarryover.server'
+import { readGuestId } from '@/lib/auth/guestCookie'
 import logger from '@/utils/logger'
 
 /**
@@ -47,21 +48,19 @@ export async function GET(request: NextRequest) {
     const activity = await loadChestActivity(supabase, user.id)
     const { huntRows, wheelRows, puzzleRows } = activity
 
-    // Streak freezes in the bank, shown next to the streak so players know a
-    // missed day is covered. Best effort: a failed read shows none, never 500s.
-    let ownedFreezes = 0
+    // Before the streak is computed, so the first signed-in answer already holds the guest days.
     try {
-      const { data: engagementRows } = await supabase
-        .from('player_engagement')
-        .select('streak_freezes_available')
-        .eq('player_id', user.id)
-      const raw = Array.isArray(engagementRows)
-        ? (engagementRows[0] as { streak_freezes_available?: number | null } | undefined)?.streak_freezes_available
-        : (engagementRows as { streak_freezes_available?: number | null } | null)?.streak_freezes_available
-      ownedFreezes = Number.isFinite(Number(raw)) ? Math.max(0, Math.trunc(Number(raw))) : 0
+      const guestIds = parseGuestIds([request.headers.get('x-lc-guest-ids'), readGuestId(request)])
+      await carryOverGuestStreak(supabase, user.id, guestIds, today)
     } catch (e) {
-      logger.warn(`Weekly chest status: freeze read failed: ${(e as Error).message}`)
+      logger.warn(`Weekly chest status: guest carry-over failed: ${(e as Error).message}`)
     }
+
+    // Best effort: a failed read shows no freezes, never 500s.
+    const [ownedFreezes, carriedDates] = await Promise.all([
+      loadOwnedFreezes(supabase, user.id),
+      loadCarriedDates(supabase, user.id),
+    ])
 
     const { block: streak, allDates, freezesAvailable } = await buildStreakBlock(
       supabase,
@@ -69,6 +68,7 @@ export async function GET(request: NextRequest) {
       activity,
       ownedFreezes,
       today,
+      carriedDates,
     )
 
     // Pull every chest row this player owns so we can detect prior unclaimed
@@ -86,10 +86,8 @@ export async function GET(request: NextRequest) {
         .map((c: any) => c.cycle_start as string)
     )
 
-    // The live streak (full run, grace-aware) is independent of which cycle we
-    // surface below — it's the same number every homepage "fire" icon shows, so
-    // compute it once from the combined dates and return it on every branch.
-    const currentStreak = computeCurrentStreak(allDates, today)
+    // The same number every homepage "fire" icon shows, on every branch below.
+    const currentStreak = streak.current
 
     // Find any fully-completed 7-day chunks across the player's history that
     // haven't been claimed yet. Oldest unclaimed wins so backlog clears in order.

@@ -14,6 +14,47 @@ import {
 
 const MAX_ATTEMPTS = 4
 
+interface FreezePool {
+  table: string
+  idColumn: string
+  column: string
+}
+
+// Earned/bought freezes go first; gifted ones (profiles) are the fallback.
+const FREEZE_POOLS: readonly FreezePool[] = [
+  { table: 'player_engagement', idColumn: 'player_id', column: 'streak_freezes_available' },
+  { table: 'profiles', idColumn: 'id', column: 'streak_freeze_count' },
+]
+
+async function readPool(db: SupabaseClient, pool: FreezePool, playerId: string): Promise<number | null> {
+  const { data, error } = await db.from(pool.table).select(pool.column).eq(pool.idColumn, playerId).maybeSingle()
+  if (error) return null
+  const n = Number((data as Record<string, unknown> | null)?.[pool.column] ?? 0)
+  return Number.isFinite(n) ? Math.max(0, Math.trunc(n)) : 0
+}
+
+async function spendFromPool(db: SupabaseClient, pool: FreezePool, playerId: string): Promise<boolean> {
+  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+    const owned = await readPool(db, pool, playerId)
+    if (!owned) return false
+    const { data: updated, error } = await db
+      .from(pool.table)
+      .update({ [pool.column]: owned - 1 })
+      .eq(pool.idColumn, playerId)
+      .eq(pool.column, owned)
+      .select(pool.idColumn)
+    if (error) return false
+    if (updated && updated.length > 0) return true
+  }
+  return false
+}
+
+/** Every freeze the player holds, across the earned and gifted pools; a failed read counts as none. */
+export async function loadOwnedFreezes(db: SupabaseClient, playerId: string): Promise<number> {
+  const counts = await Promise.all(FREEZE_POOLS.map((p) => readPool(db, p, playerId).catch(() => null)))
+  return counts.reduce<number>((sum, n) => sum + (n ?? 0), 0)
+}
+
 export interface FreezeSaved {
   date: string
   freezesRemaining: number
@@ -34,32 +75,25 @@ export async function settleStreakFreeze(
 ): Promise<FreezeSaved | null> {
   const date = freezeDateToSettle(dates, today, freezesAvailable)
   if (!date) return null
+  return (await spendFreezeOn(db, playerId, date)) ? { date, freezesRemaining: Math.max(0, freezesAvailable - 1) } : null
+}
 
+/**
+ * The one place a freeze is spent: marks `date` frozen and takes one freeze,
+ * earned pool first, then gifted. UNIQUE(player_id, frozen_date) makes a repeat
+ * spend nothing; true only when this call spent one.
+ */
+export async function spendFreezeOn(db: SupabaseClient, playerId: string, date: string): Promise<boolean> {
   const { error: insertError } = await db.from('daily_streak_freezes').insert({ player_id: playerId, frozen_date: date })
   if (insertError) {
     if ((insertError as { code?: string }).code !== '23505') {
       logger.error('Streak freeze settle: insert failed:', insertError.message)
     }
-    return null
+    return false
   }
 
-  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-    const { data: row, error } = await db
-      .from('player_engagement')
-      .select('streak_freezes_available')
-      .eq('player_id', playerId)
-      .maybeSingle()
-    if (error) break
-    const owned = Number((row as { streak_freezes_available?: number | null } | null)?.streak_freezes_available ?? 0)
-    if (owned <= 0) break
-    const { data: updated, error: updateError } = await db
-      .from('player_engagement')
-      .update({ streak_freezes_available: owned - 1 })
-      .eq('player_id', playerId)
-      .eq('streak_freezes_available', owned)
-      .select('player_id')
-    if (updateError) break
-    if (updated && updated.length > 0) return { date, freezesRemaining: owned - 1 }
+  for (const pool of FREEZE_POOLS) {
+    if (await spendFromPool(db, pool, playerId)) return true
   }
 
   // No freeze could be spent, so the day must not stay frozen for free.
@@ -69,7 +103,12 @@ export async function settleStreakFreeze(
     .eq('player_id', playerId)
     .eq('frozen_date', date)
   if (undoError) logger.error('Streak freeze settle: undo failed:', undoError.message)
-  return null
+  return false
+}
+
+/** Carried guest days never unlock a reward on their own: they count as already paid up to their length. */
+export function withCarriedFloor(claims: readonly number[], carriedDates: readonly string[]): number[] {
+  return carriedDates.length > 0 ? [...claims, new Set(carriedDates).size] : [...claims]
 }
 
 /** Milestone days already paid; null when the read failed (never treat that as "none claimed"). */
@@ -96,17 +135,21 @@ export async function buildStreakBlock(
   activity: { allDates: string[]; frozenDates: string[] },
   freezesAvailable: number,
   today: string,
+  carriedDates: readonly string[] = [],
 ): Promise<{ block: StreakBlock; allDates: string[]; freezesAvailable: number }> {
   let allDates = activity.allDates
+  // Guest days carried over at signup hold the streak, never the weekly chest cycles.
+  let streakDates = [...allDates, ...carriedDates]
   const frozen = new Set(activity.frozenDates)
   let freezeSaved: FreezeSaved | null = null
   try {
-    freezeSaved = await settleStreakFreeze(db, playerId, allDates, freezesAvailable, today)
+    freezeSaved = await settleStreakFreeze(db, playerId, streakDates, freezesAvailable, today)
   } catch (e) {
     logger.error('Streak freeze settle failed:', (e as Error).message)
   }
   if (freezeSaved) {
     allDates = [...allDates, freezeSaved.date]
+    streakDates = [...streakDates, freezeSaved.date]
     frozen.add(freezeSaved.date)
     freezesAvailable = freezeSaved.freezesRemaining
   } else {
@@ -117,9 +160,10 @@ export async function buildStreakBlock(
     if (frozen.has(date)) freezeSaved = { date, freezesRemaining: freezesAvailable }
   }
 
-  const status = streakStatus(allDates, today)
+  const status = streakStatus([...new Set(streakDates)], today)
   const claims = await loadMilestoneClaims(db, playerId).catch(() => null)
-  const played = allDates.filter((d) => !frozen.has(d))
+  const played = streakDates.filter((d) => !frozen.has(d))
+  const paid = claims ? withCarriedFloor(claims, carriedDates) : null
   return {
     allDates,
     freezesAvailable,
@@ -127,8 +171,8 @@ export async function buildStreakBlock(
       ...status,
       week: weekStrip(played, [...frozen], today),
       freezeSaved,
-      milestone: claims
-        ? { claimable: claimableMilestone(status.current, claims), next: nextMilestone(status.current, claims) }
+      milestone: paid
+        ? { claimable: claimableMilestone(status.current, paid), next: nextMilestone(status.current, paid) }
         : null,
     },
   }

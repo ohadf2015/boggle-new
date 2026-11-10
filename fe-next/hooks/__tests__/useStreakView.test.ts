@@ -61,6 +61,14 @@ describe('useStreakView', () => {
     expect(result.current).toMatchObject({ loading: true, current: 0, isGuest: false });
   });
 
+  it('Given the sign-in flip before the first account answer arrives, stays loading instead of showing 0', () => {
+    mockAuth = { isAuthenticated: true, loading: false };
+    mockChest = { ...mockChest, loading: false, awaitingFirstLoad: true };
+    mockRetention = { streak: 6, best: 6, freezeAvailable: true, lastPlayedDate: '2026-11-11' };
+    const { result } = renderHook(() => useStreakView());
+    expect(result.current).toMatchObject({ loading: true, current: 0, isGuest: false });
+  });
+
   it('Given the account answered, shows the server streak, risk, freezes and milestone', () => {
     mockAuth = { isAuthenticated: true, loading: false };
     mockChest = { ...mockChest, currentStreak: 7, freezesAvailable: 1, streak: serverBlock };

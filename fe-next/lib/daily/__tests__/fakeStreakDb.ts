@@ -9,6 +9,8 @@ export interface FakeDbOptions {
   selectErrors?: Record<string, DbError>
   /** Number of compare-and-swap updates on player_engagement that lose the race. */
   casLosses?: number
+  /** Unique keys per table: an insert or upsert that repeats one is a 23505 / skipped. */
+  unique?: Record<string, string[]>
 }
 
 /**
@@ -26,7 +28,16 @@ export function makeFakeDb(opts: FakeDbOptions = {}) {
     let op: 'select' | 'update' | 'delete' = 'select'
     let patch: Row | null = null
     const match = (r: Row) =>
-      filters.every(([kind, c, v]) => (kind === 'eq' ? r[c] === v : kind === 'gt' ? Number(r[c]) > Number(v) : r[c] == null))
+      filters.every(([kind, c, v]) => {
+        if (kind === 'eq') return r[c] === v
+        if (kind === 'neq') return r[c] !== v
+        if (kind === 'in') return (v as unknown[]).includes(r[c])
+        if (kind === 'gt') return Number(r[c]) > Number(v)
+        if (kind === 'gte') return String(r[c]) >= String(v)
+        return r[c] == null
+      })
+    const key = opts.unique?.[table]
+    const clashes = (value: Row) => !!key && rows().some((r) => key.every((c) => r[c] === value[c]))
     const rows = () => (tables[table] ??= [])
 
     const run = () => {
@@ -53,6 +64,9 @@ export function makeFakeDb(opts: FakeDbOptions = {}) {
       select: vi.fn(() => chain),
       eq: vi.fn((c: string, v: unknown) => { filters.push(['eq', c, v]); return chain }),
       gt: vi.fn((c: string, v: unknown) => { filters.push(['gt', c, v]); return chain }),
+      gte: vi.fn((c: string, v: unknown) => { filters.push(['gte', c, v]); return chain }),
+      neq: vi.fn((c: string, v: unknown) => { filters.push(['neq', c, v]); return chain }),
+      in: vi.fn((c: string, v: unknown[]) => { filters.push(['in', c, v]); return chain }),
       is: vi.fn((c: string) => { filters.push(['is', c, null]); return chain }),
       limit: vi.fn(() => chain),
       maybeSingle: vi.fn(async () => {
@@ -65,7 +79,15 @@ export function makeFakeDb(opts: FakeDbOptions = {}) {
         calls.push({ table, op: 'insert', value, filters: [] })
         const err = opts.insertErrors?.[table]
         if (err) return { error: err }
+        if (clashes(value)) return { error: { code: '23505', message: 'duplicate key' } }
         rows().push({ ...value })
+        return { error: null }
+      }),
+      upsert: vi.fn(async (values: Row[]) => {
+        calls.push({ table, op: 'upsert', value: values, filters: [] })
+        const err = opts.insertErrors?.[table]
+        if (err) return { error: err }
+        for (const v of values) if (!clashes(v)) rows().push({ ...v })
         return { error: null }
       }),
       then: (ok: (v: unknown) => unknown, bad?: (e: unknown) => unknown) => Promise.resolve(run()).then(ok, bad),

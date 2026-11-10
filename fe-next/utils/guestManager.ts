@@ -7,6 +7,7 @@ import logger from '@/utils/logger';
 import { getFromStorage, saveToStorage, removeFromStorage, getJsonFromStorage, saveJsonToStorage } from '@/utils/storageHelpers';
 import { getOrCreateStoredUsername, getStoredUsername, setStoredUsername } from '@/utils/profileStorage';
 import { updateGuestDailyPlayer } from '@/utils/dailyChallenge/guestPlayer';
+import { CARRYOVER_GUEST_SESSION_KEY } from '@/utils/dailyChallenge/constants';
 import { markPostGameCompleted } from '@/lib/auth/signupPromptCoordination';
 import { isDefaultPlayerName } from '@/utils/defaultPlayerNames';
 
@@ -220,6 +221,8 @@ export function updateGuestStatsAfterGame(gameResult: GameResult): GuestStats {
 export function clearGuestData(): void {
   if (typeof window === 'undefined') return;
 
+  const sessionId = getFromStorage(GUEST_SESSION_KEY);
+  if (sessionId) saveToStorage(CARRYOVER_GUEST_SESSION_KEY, sessionId);
   removeFromStorage(GUEST_SESSION_KEY);
   removeFromStorage(GUEST_STATS_KEY);
   removeFromStorage(GUEST_NAME_KEY);

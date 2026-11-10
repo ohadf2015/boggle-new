@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { getWithAuth, postWithAuth } from '@/utils/authFetch'
+import { CARRYOVER_GUEST_SESSION_KEY, GUEST_FINGERPRINT_KEY } from '@/utils/dailyChallenge/constants'
 import { useAuth } from '@/contexts/AuthContext'
 import posthog from '@/lib/analytics/lazyPosthog'
 import type { ChestPartDrop } from '@/lib/avatar/chestDrops'
@@ -45,6 +46,8 @@ export interface WeeklyChestState {
   claimError: boolean
   claim: () => Promise<PendingChest | null>
   refresh: (force?: boolean) => void
+  /** Signed in but no account answer yet (first load pending or failed): show a skeleton, never the defaults. */
+  awaitingFirstLoad: boolean
 }
 
 export interface ServerStreakBlock {
@@ -166,6 +169,18 @@ export function _resetWeeklyChestCache() {
   cachedAt = 0
 }
 
+// The ids this device played under as a guest, so a new account keeps its streak (server-validated).
+const GUEST_ID_KEYS = [GUEST_FINGERPRINT_KEY, 'boggle_guest_session_id', CARRYOVER_GUEST_SESSION_KEY]
+
+function guestIdHeaders(): { headers?: Record<string, string> } {
+  try {
+    const ids = [...new Set(GUEST_ID_KEYS.map((k) => localStorage.getItem(k)).filter((v): v is string => !!v))]
+    return ids.length > 0 ? { headers: { 'x-lc-guest-ids': ids.join(',') } } : {}
+  } catch {
+    return {}
+  }
+}
+
 function fetchWeeklyChestStatus(force: boolean): Promise<typeof DEFAULTS | null> {
   if (!force) {
     if (inflightStatus) return inflightStatus
@@ -173,7 +188,7 @@ function fetchWeeklyChestStatus(force: boolean): Promise<typeof DEFAULTS | null>
       return Promise.resolve(cachedStatus)
     }
   }
-  inflightStatus = getWithAuth('/api/daily/weekly-chest/status')
+  inflightStatus = getWithAuth('/api/daily/weekly-chest/status', guestIdHeaders())
     .then(async r => {
       // 429/5xx return error JSON; normalize coerces but we still skip the write
       // entirely so a rate-limited refresh doesn't blank out previously-good data.
@@ -198,6 +213,7 @@ export function useWeeklyChest(): WeeklyChestState {
   const [claimError, setClaimError] = useState(false)
   const mountedRef = useRef(true)
   const hasLoadedRef = useRef(false)
+  const [loadedOnce, setLoadedOnce] = useState(false)
   const claimInFlightRef = useRef(false)
 
   const refresh = useCallback((force = false) => {
@@ -210,6 +226,7 @@ export function useWeeklyChest(): WeeklyChestState {
         if (!mountedRef.current) return
         if (status !== null) {
           hasLoadedRef.current = true
+          setLoadedOnce(true)
           setData(status)
         }
         setLoading(false)
@@ -285,5 +302,6 @@ export function useWeeklyChest(): WeeklyChestState {
     }
   }, [refresh, data.cycleNumber])
 
-  return { loading, ...data, claiming, claimError, claim, refresh }
+  const awaitingFirstLoad = isAuthenticated && !loadedOnce
+  return { loading, ...data, claiming, claimError, claim, refresh, awaitingFirstLoad }
 }

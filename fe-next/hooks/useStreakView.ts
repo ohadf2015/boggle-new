@@ -79,7 +79,7 @@ export function useStreakView(): StreakView {
     };
   }
 
-  if (authLoading || !isAuthenticated || chest.loading) return empty;
+  if (authLoading || !isAuthenticated || chest.loading || chest.awaitingFirstLoad) return empty;
 
   const freezes = chest.freezesAvailable ?? 0;
   const block = chest.streak;
