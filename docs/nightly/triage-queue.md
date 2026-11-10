@@ -2727,3 +2727,68 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
   - status: instrumentation shipped, fix deferred
   - why: touching crane-placement timing risks the animation feel the founder has tuned multiple times (`lib/wordTower/craneSweep.ts`); needs real data first.
   - recommended owner: lane 02/11 — re-check `word_tower_tap_blocked` volume in ~3 days, then decide fix.
+
+## 2026-11-08
+- [Sentry] shopli/GSC 403 cron error (GET /api/cron, JAVASCRIPT-NEXTJS-2M9, 14 events)
+  - first/last seen 2026-11-07 10:15→18:15, count=14, userCount=1
+  - code path (gsc_hourly/url_inspection) does not exist in this repo — belongs to Growth Radar's own GSC ingestion cron, not lexiclash app code
+  - status: deferred
+  - why: wrong-repo; Growth Radar pipeline issue, not lexiclash
+  - recommended owner: growth-radar maintainer
+- [Sentry] parentNode TypeError (JAVASCRIPT-NEXTJS-2M8, 164 events)
+  - tagged app=growth-radar, url=growthradar.app/app — cross-tenant noise in the shared Sentry project, not a lexiclash error
+  - status: deferred
+  - why: not this app
+  - recommended owner: n/a (filter Sentry project tag)
+- [Sentry] "Auth session check never answered" (JAVASCRIPT-NEXTJS-2MB, 1 event, Chrome Mobile WebView/Android)
+  - auth-adjacent (contexts/auth/hooks/useAuthInitialization.ts captureBackgroundError call sites); 1 occurrence, low signal
+  - status: deferred
+  - why: auth-adjacent code is DEFER per autonomy matrix; too low-volume to safely diagnose tonight
+  - recommended owner: backend/review-by-eod if it recurs
+- [Sentry] fetch timeout /api/cron mobile (JAVASCRIPT-NEXTJS-2K4) + insertBefore DOM error (2MA) + generic network TypeError (2MD)
+  - 1 event each, 0-1 users — noise tier, not reproducible
+  - status: deferred
+  - why: too low signal to root-cause safely
+  - recommended owner: self (re-check if volume grows)
+- [Supabase] anon_security_definer_function_executable (8 functions: bump_vocabulary_lesson_stat, flagged_vocabulary_lesson_ids, get_leaderboard, get_or_create_player_rating, get_past_season_leaderboard, lookup_classroom_by_join_code, record_word_mastery_event, report_vocabulary_lesson)
+  - all look like intentional guest-callable RPCs (leaderboard/classroom-join/practice flows need anon access)
+  - status: deferred
+  - why: ambiguous — needs a frontend callsite grep per function to confirm anon usage is intentional before any REVOKE; rg was pathologically slow tonight (timed out repeatedly), ran out of time budget to verify safely
+  - recommended owner: self (next lane 01 run — grep each function name under fe-next for its guest-path callsite)
+- [PostHog] AuthRetryableFetchError "Load failed" (3 occurrences since 2026-10-04, trending up)
+  - status: deferred
+  - why: auth-adjacent (Supabase session fetch), low volume
+  - recommended owner: review-by-eod
+
+## 2026-11-08 — lane 03: fabricated experiment ship (human review)
+- `exp-wordhunt-issue-probe-v1` was reported "shipped" on 2026-10-25 with a PostHog flag id but ZERO code backing it anywhere in the repo — no `lib/experiments.ts` entry, no component, no event in the typed registry. Deactivated the flag tonight (was live, bucketing real users to nothing for ~2 weeks). No code to restore since none ever existed — if word_hunt issue-probing is still wanted, it needs a fresh TDD build from the real `exp-mp-round-issue-probe-v1` pattern (lib/experiments.ts:805), not a resurrection.
+
+## 2026-11-10
+- [Sentry] JAVASCRIPT-NEXTJS-2NZ Error fetching student progress: permission denied for function is_teacher_of_student
+  - first/last seen ~12h ago, count 1, userCount 0
+  - status: deferred
+  - why: confirmed prod grants are correct (authenticated has EXECUTE, anon does not) via live SQL — this is a transient anon-role race (query fired before the supabase-js client's session/JWT propagated), same class as the already-fixed getThreads() 42501 retry-on-refreshSession pattern. Ambiguous/auth-adjacent, 0 users affected — not worth an autonomous fix tonight.
+  - recommended owner: review-by-eod (consider applying the same refreshSession-and-retry-on-42501 pattern used in utils/friendMessages.ts getThreads() to lib/supabase/education/progress.ts if it recurs)
+- [Sentry] JAVASCRIPT-NEXTJS-2P1 SyntaxError: Unexpected end of JSON input, POST /api/quick-play/round
+  - first/last seen 5h ago, count 1, userCount 0
+  - status: deferred
+  - why: not investigated tonight (time budget) — likely a client res.json() parse on an empty/non-JSON error response.
+  - recommended owner: self (next triage pass)
+- [Sentry] JAVASCRIPT-NEXTJS-2K4 / 2P0 — fetch timeout + Bing "no AI performance response" on GET /api/cron
+  - status: deferred
+  - why: infra/cron noise, not investigated — low userCount, looks like known external-API flakiness class.
+  - recommended owner: self (low priority)
+- [PostHog] Rage-click brief items were single-session phantom signals — detector not flood-capped
+  - `posthog:rageclick:https://www.lexiclash.live/en/word-tower` (brief score 0.974, reach 28) and
+    `posthog:rageclick:https://www.lexiclash.live/ru/word-tower/daily` (score 0.848, reach 24) were BOTH
+    verified: `uniq(distinct_id)=1` for each (one query per URL, last 24h) — i.e. one single session fired
+    28-30 `$rageclick` events, not 28 distinct users. `$el_text` on the word-tower clicks is null (icon/canvas
+    target, not a text button) and the session is a 680px-wide desktop Chrome window from Mexico with
+    `$feature/word-tower: "off"`.
+  - status: dismissed (not a real UX problem tonight) — detector fix needed
+  - why: tonight's Phase-0 rage-click ranking does not GROUP BY distinct_id / exclude outlier sessions
+    before scoring reach, same class as the `game_completed` 847x-single-session flood-cap bug already
+    documented for funnel counts. The rage-click brief source needs the identical fix: cap any
+    `$rageclick` distinct_id at some small per-session ceiling before computing `reach`.
+  - recommended owner: lane 07 (apply the flood-cap pattern already used for event counts to the
+    `$rageclick` brief query in the Phase-0 collector)
