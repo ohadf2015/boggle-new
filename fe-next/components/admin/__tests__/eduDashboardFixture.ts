@@ -28,6 +28,7 @@ export const dashboardPayload = (over: Record<string, unknown> = {}) => ({
   windowDays: 7,
   roundsAvailable: true,
   outreachAvailable: true,
+  today: { available: false },
   kpis: {
     activeTeachers: { current: 12, prior: 0, pct: null },
     newTeachers: delta(2, 1),

@@ -24,3 +24,14 @@ export function momentum(daily: number[]): number | null {
   if (base === 0) return null;
   return pctChange(avg(daily.slice(-RECENT_DAYS)), base);
 }
+
+/** Before this share of the day has passed, today's pace says nothing. */
+export const MIN_DAY_ELAPSED = 0.25;
+
+/** Today's expected total at its current pace and its change against a full yesterday; null early in the day. */
+export function dayPace(current: number, prior: number, nowMs: number): { projected: number | null; pct: number | null } {
+  const elapsed = (nowMs % 86_400_000) / 86_400_000;
+  if (elapsed < MIN_DAY_ELAPSED) return { projected: null, pct: null };
+  const projected = Math.round(current / elapsed);
+  return { projected, pct: pctChange(projected, prior) };
+}

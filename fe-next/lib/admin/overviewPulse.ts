@@ -7,9 +7,10 @@
 
 import { DAY_MS } from './eduMetrics';
 import { createFindings, type Finding } from './findings';
-import { momentum, pctChange, sum, trailingZeros } from './seriesStats';
+import { dayPace, momentum, pctChange, sum, trailingZeros } from './seriesStats';
 
-export type PulseWindow = 7 | 30;
+/** 1 = today so far against yesterday. */
+export type PulseWindow = 1 | 7 | 30;
 
 export interface DailyPoint {
   date: string;
@@ -18,6 +19,8 @@ export interface DailyPoint {
   guestGames: number;
   totalGames: number;
   totalUniquePlayers: number;
+  /** New registered users that day (test accounts excluded). */
+  signups?: number;
 }
 
 export interface GrowthWeek {
@@ -45,6 +48,8 @@ export interface PulseTile {
   pct: number | null;
   /** One value per day (or per week for signups), oldest first. */
   spark: number[];
+  /** Window 1 only: today's expected total at its current pace; null in the first hours. */
+  projected?: number | null;
 }
 
 export interface Pulse {
@@ -72,6 +77,7 @@ const THIN_STICKY_PCT = 8;
 const HEAP_WARN_MB = 1200;
 const MIN_CHECKOUTS_TO_JUDGE = 3;
 const SPARK_WEEKS = 8;
+const SPARK_DAYS = 7;
 
 const dayKey = (ms: number) => new Date(ms).toISOString().slice(0, 10);
 
@@ -83,14 +89,23 @@ function series(daily: DailyPoint[], nowMs: number, days: number, pick: (p: Dail
 }
 
 function dayTile(daily: DailyPoint[], nowMs: number, w: number, pick: (p: DailyPoint) => number, mean = false): PulseTile & { dates: string[] } {
-  const { dates, values } = series(daily, nowMs, w * 2, pick);
+  const n = Math.max(w * 2, SPARK_DAYS);
+  const { dates, values } = series(daily, nowMs, n, pick);
   const agg = (xs: number[]) => (mean ? Math.round(sum(xs) / w) : sum(xs));
-  const current = agg(values.slice(w));
-  const prior = agg(values.slice(0, w));
-  return { current, prior, pct: pctChange(current, prior), spark: values.slice(w), dates: dates.slice(w) };
+  const current = agg(values.slice(n - w));
+  const prior = agg(values.slice(n - 2 * w, n - w));
+  const keep = Math.max(w, SPARK_DAYS);
+  const tile = { current, prior, pct: pctChange(current, prior), spark: values.slice(-keep), dates: dates.slice(-keep) };
+  if (w !== 1) return tile;
+  return { ...tile, ...dayPace(current, prior, nowMs) };
 }
 
-function signupTile(growth: GrowthWeek[], nowMs: number, windowDays: PulseWindow): PulseTile | null {
+function signupTile(growth: GrowthWeek[], daily: DailyPoint[], nowMs: number, windowDays: PulseWindow): PulseTile | null {
+  if (windowDays === 1) {
+    if (!daily.some((p) => p.signups !== undefined)) return null;
+    const t = dayTile(daily, nowMs, 1, (p) => p.signups ?? 0);
+    return { current: t.current, prior: t.prior, pct: t.pct, spark: t.spark, projected: t.projected };
+  }
   const weeks = windowDays === 7 ? 1 : 4;
   const sorted = [...growth].sort((a, b) => a.week.localeCompare(b.week));
   const last = sorted[sorted.length - 1];
@@ -106,15 +121,20 @@ export function buildPulse(input: PulseInput): Pulse {
   const { nowMs, windowDays: w, daily, stats, revenue, health } = input;
   const games = dayTile(daily, nowMs, w, (p) => p.totalGames);
   const players = dayTile(daily, nowMs, w, (p) => p.totalUniquePlayers, true);
-  const signups = signupTile(input.growth, nowMs, w);
+  const signups = signupTile(input.growth, daily, nowMs, w);
 
+  const partialDayView = w === 1;
   const signedIn = sum(series(daily, nowMs, w, (p) => p.games).values);
   const signedInShare = games.current > 0 ? Math.round((signedIn / games.current) * 100) : null;
   const monthly = stats?.activity.uniquePlayersMonth ?? 0;
-  const stickinessPct = stats && monthly > 0 ? Math.round((players.current / monthly) * 100) : null;
+  const stickinessPct = !partialDayView && stats && monthly > 0 ? Math.round((players.current / monthly) * 100) : null;
 
   const { add, done } = createFindings();
   const { current: g, prior: gp, pct: gPct } = games;
+  // A partial day cannot be called up or down; the tiles show its pace instead.
+  const partialDay = partialDayView;
+  const periodGames = partialDay ? sum(games.spark) : g;
+  if (!partialDay) {
   if (gPct !== null && gPct >= SURGE_PCT && g >= MIN_GAMES_TO_JUDGE) add('games_up', 'win', { pct: gPct, current: g });
   if (gPct !== null && gPct <= -SURGE_PCT && gp >= MIN_GAMES_TO_JUDGE) add('games_down', 'problem', { pct: Math.abs(gPct), current: g, prior: gp });
   const { pct: pPct, prior: pp } = players;
@@ -124,9 +144,10 @@ export function buildPulse(input: PulseInput): Pulse {
     if (signups.pct >= SIGNUP_SWING_PCT && signups.current >= MIN_SIGNUPS_TO_JUDGE) add('signups_up', 'win', { pct: signups.pct, current: signups.current });
     if (signups.pct <= -SIGNUP_SWING_PCT && signups.prior >= MIN_SIGNUPS_TO_JUDGE) add('signups_down', 'problem', { pct: Math.abs(signups.pct), current: signups.current, prior: signups.prior });
   }
+  }
 
-  if (signedInShare !== null && signedInShare <= GUEST_HEAVY_SHARE && g >= MIN_GAMES_FOR_SHARE) add('guest_heavy', 'early', { pct: signedInShare });
-  const stopped = g >= MIN_GAMES_TO_JUDGE && trailingZeros(games.spark) >= QUIET_DAYS_ALERT;
+  if (signedInShare !== null && signedInShare <= GUEST_HEAVY_SHARE && periodGames >= MIN_GAMES_FOR_SHARE) add('guest_heavy', 'early', { pct: signedInShare });
+  const stopped = periodGames >= MIN_GAMES_TO_JUDGE && trailingZeros(games.spark) >= QUIET_DAYS_ALERT;
   if (stopped) add('activity_stopped', 'early', { days: trailingZeros(games.spark) });
   else {
     const m = momentum(games.spark);

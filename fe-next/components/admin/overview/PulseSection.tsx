@@ -8,10 +8,10 @@ import { cn } from '@/lib/utils';
 import { FindingsPanel } from '../shared/FindingsPanel';
 import { MUTED, PANEL } from '../shared/panelStyles';
 import { TrendTile } from '../shared/TrendTile';
-import { deltaSentence } from '../shared/delta';
+import { dayDeltaSentence, deltaSentence } from '../shared/delta';
 import { describePulseFinding } from './pulseCopy';
 
-const WINDOWS: PulseWindow[] = [7, 30];
+const WINDOWS: PulseWindow[] = [1, 7, 30];
 
 interface Props {
   pulse: Pulse | null;
@@ -19,14 +19,15 @@ interface Props {
   onWindowChange: (w: PulseWindow) => void;
   failed: boolean;
   onRetry: () => void;
+  /** Opens the drill-down section behind a tile and scrolls to it. */
+  onOpenSection: (id: string) => void;
   stats: StatsData | null;
   revenue: { paying: number; trialing: number; paidOrders30d: number } | null;
 }
 
-const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
 const tone = (pct: number | null) => (pct === null || pct === 0 ? 'flat' : pct > 0 ? 'up' : 'down');
 
-export function PulseSection({ pulse, windowDays, onWindowChange, failed, onRetry, stats, revenue }: Props) {
+export function PulseSection({ pulse, windowDays, onWindowChange, failed, onRetry, onOpenSection, stats, revenue }: Props) {
   const { t, language } = useLanguage();
   const formatDate = (iso: string) => new Date(`${iso}T12:00:00Z`).toLocaleDateString(language, { weekday: 'long', month: 'short', day: 'numeric', timeZone: 'UTC' });
 
@@ -34,7 +35,9 @@ export function PulseSection({ pulse, windowDays, onWindowChange, failed, onRetr
     <header className="flex flex-wrap items-center justify-between gap-3">
       <div>
         <h2 className="text-lg font-bold text-neo-cream">{t('admin.pulse.title', 'Pulse')}</h2>
-        <p className={`text-xs ${MUTED}`}>{t('admin.pulse.subtitle', 'Each number compares with the same number of days just before. Tap a number to jump to its chart.')}</p>
+        <p className={`text-xs ${MUTED}`}>{windowDays === 1
+            ? t('admin.pulse.subtitleToday', 'Today so far against all of yesterday, judged by pace. Tap a number to open its details.')
+            : t('admin.pulse.subtitle', 'Each number compares with the same number of days just before. Tap a number to open its details.')}</p>
       </div>
       <div role="group" aria-label={t('admin.pulse.window', 'Window')} className="flex gap-1">
         {WINDOWS.map((w) => (
@@ -45,7 +48,7 @@ export function PulseSection({ pulse, windowDays, onWindowChange, failed, onRetr
             onClick={() => onWindowChange(w)}
             className={cn('rounded border px-3 py-1 text-xs font-semibold tabular-nums', windowDays === w ? 'border-neo-cream bg-neo-cream text-neo-navy' : 'border-neo-cream/40 text-neo-cream')}
           >
-            {t('admin.pulse.windowLast', 'Last {days} days', { days: w })}
+            {w === 1 ? t('admin.pulse.windowToday', 'Today vs yesterday') : t('admin.pulse.windowLast', 'Last {days} days', { days: w })}
           </button>
         ))}
       </div>
@@ -76,7 +79,8 @@ export function PulseSection({ pulse, windowDays, onWindowChange, failed, onRetr
     );
   }
 
-  const delta = (tile: PulseTile, days: number) => deltaSentence(tile, days, t);
+  const day = windowDays === 1;
+  const delta = (tile: PulseTile, days: number) => (day ? dayDeltaSentence(tile, t) : deltaSentence(tile, days, t));
   const noData = t('admin.pulse.notEnough', 'Not enough history yet.');
   const { games, players, signups } = pulse;
 
@@ -87,34 +91,34 @@ export function PulseSection({ pulse, windowDays, onWindowChange, failed, onRetr
         <TrendTile
           testId="pulse-games"
           icon={<Gamepad2 className="h-4 w-4 text-neo-lime" />}
-          label={t('admin.pulse.games', 'Games played')}
+          label={day ? t('admin.pulse.gamesToday', 'Games today') : t('admin.pulse.games', 'Games played')}
           value={games.current}
           deltaText={delta(games, windowDays)}
           deltaTone={tone(games.pct)}
           spark={games.spark}
-          onSelect={() => scrollTo('overview-daily')}
+          onSelect={() => onOpenSection('overview-daily')}
         />
         <TrendTile
           testId="pulse-players"
           icon={<Users className="h-4 w-4 text-neo-cyan" />}
-          label={t('admin.pulse.players', 'Players per day')}
+          label={day ? t('admin.pulse.playersToday', 'Players today') : t('admin.pulse.players', 'Players per day')}
           value={players.current}
           deltaText={delta(players, windowDays)}
           deltaTone={tone(players.pct)}
           spark={players.spark}
-          onSelect={() => scrollTo('overview-daily')}
+          onSelect={() => onOpenSection('overview-daily')}
         />
         <TrendTile
           testId="pulse-signups"
           icon={<UserPlus className="h-4 w-4 text-neo-orange" />}
-          label={t('admin.pulse.signups', 'New signups')}
+          label={day ? t('admin.pulse.signupsToday', 'Signups today') : t('admin.pulse.signups', 'New signups')}
           value={signups ? signups.current : null}
           deltaText={signups ? delta(signups, windowDays === 7 ? 7 : 28) : null}
           deltaTone={tone(signups?.pct ?? null)}
           noData={noData}
           spark={signups?.spark}
-          hint={signups ? t('admin.pulse.signupsHint', 'Complete weeks only') : undefined}
-          onSelect={() => scrollTo('overview-signups')}
+          hint={signups && !day ? t('admin.pulse.signupsHint', 'Complete weeks only') : undefined}
+          onSelect={() => onOpenSection('overview-signups')}
         />
         <TrendTile
           testId="pulse-signedin"
@@ -124,14 +128,16 @@ export function PulseSection({ pulse, windowDays, onWindowChange, failed, onRetr
           noData={noData}
           hint={t('admin.pulse.signedInHint', 'of games are played by logged-in players')}
         />
-        <TrendTile
-          testId="pulse-stickiness"
-          icon={<Repeat className="h-4 w-4 text-neo-purple" />}
-          label={t('admin.pulse.stickiness', 'Stickiness')}
-          value={pulse.stickinessPct === null ? null : `${pulse.stickinessPct}%`}
-          noData={noData}
-          hint={t('admin.pulse.stickinessHint', 'of monthly players show up on an average day')}
-        />
+        {!day && (
+          <TrendTile
+            testId="pulse-stickiness"
+            icon={<Repeat className="h-4 w-4 text-neo-purple" />}
+            label={t('admin.pulse.stickiness', 'Stickiness')}
+            value={pulse.stickinessPct === null ? null : `${pulse.stickinessPct}%`}
+            noData={noData}
+            hint={t('admin.pulse.stickinessHint', 'of monthly players show up on an average day')}
+          />
+        )}
         <TrendTile
           testId="pulse-paying"
           icon={<Crown className="h-4 w-4 text-neo-yellow" />}
@@ -139,7 +145,7 @@ export function PulseSection({ pulse, windowDays, onWindowChange, failed, onRetr
           value={revenue ? revenue.paying : null}
           noData={noData}
           hint={revenue ? t('admin.pulse.payingHint', '{trialing} in a trial · {orders} paid orders in 30 days', { trialing: revenue.trialing, orders: revenue.paidOrders30d }) : undefined}
-          onSelect={() => scrollTo('overview-revenue')}
+          onSelect={() => onOpenSection('overview-revenue')}
         />
       </div>
 

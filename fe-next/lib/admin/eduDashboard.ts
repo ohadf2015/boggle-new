@@ -14,6 +14,7 @@ import { greatestTimestamp } from '@/lib/education/teacherLastActivity';
 import { buildAttention, type AttentionList } from './eduAttention';
 import { buildEduInsights, type EduInsights } from './eduInsights';
 import { buildFindings } from './eduFindings';
+import { buildEduToday, type EduToday } from './eduToday';
 import type { Finding } from './findings';
 import {
   DAY_MS,
@@ -161,6 +162,7 @@ export interface EduDashboard {
   attention: AttentionList;
   insights: EduInsights;
   findings: Finding[];
+  today: EduToday;
 }
 
 const uniq = (ids: Array<string | null | undefined>) => [...new Set(ids.filter((id): id is string => !!id))];
@@ -381,6 +383,7 @@ export function buildEduDashboard(input: EduDashboardInput): EduDashboard {
     windowDays,
     roundsAvailable: rounds !== null,
     outreachAvailable: input.outreach != null,
+    today: buildEduToday(rounds, nowMs),
     kpis,
     sparklines: {
       activeTeachers: null,

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { momentum, pctChange, sum, trailingZeros } from '../seriesStats';
+import { dayPace, momentum, pctChange, sum, trailingZeros } from '../seriesStats';
 
 describe('seriesStats', () => {
   it('sums', () => expect(sum([1, 2, 3])).toBe(6));
@@ -20,5 +20,19 @@ describe('seriesStats', () => {
     expect(momentum([10, 10, 10, 10, 5, 5, 5])).toBe(-50);
     expect(momentum([10, 10, 10])).toBeNull();
     expect(momentum([0, 0, 0, 0, 9, 9, 9])).toBeNull();
+  });
+});
+
+describe('dayPace', () => {
+  const at = (hhmm: string) => Date.parse(`2026-11-10T${hhmm}:00Z`);
+  it('projects today from the share of the day that has passed', () => {
+    expect(dayPace(30, 40, at('18:00'))).toEqual({ projected: 40, pct: 0 });
+    expect(dayPace(10, 40, at('12:00'))).toEqual({ projected: 20, pct: -50 });
+  });
+  it('stays silent in the first hours', () => {
+    expect(dayPace(2, 40, at('03:00'))).toEqual({ projected: null, pct: null });
+  });
+  it('has no percent without a yesterday', () => {
+    expect(dayPace(5, 0, at('12:00'))).toEqual({ projected: 10, pct: null });
   });
 });

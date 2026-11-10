@@ -30,7 +30,7 @@ const pulse = buildPulse({
 });
 const STATS = { overview: { totalPlayers: 1200, totalGuests: 300, totalGames: 9000, totalWords: 1, totalGameTimeHours: 450.4 }, activity: { gamesToday: 1, uniquePlayersToday: 1, uniquePlayersWeek: 1, uniquePlayersMonth: 40, signupsToday: 1, signupsWeek: 1 }, languages: {} };
 
-const props = { pulse, windowDays: 7 as const, onWindowChange: vi.fn(), failed: false, onRetry: vi.fn(), stats: STATS, revenue: { paying: 3, trialing: 1, paidOrders30d: 2 } };
+const props = { pulse, windowDays: 7 as const, onWindowChange: vi.fn(), failed: false, onRetry: vi.fn(), onOpenSection: vi.fn(), stats: STATS, revenue: { paying: 3, trialing: 1, paidOrders30d: 2 } };
 
 describe('PulseSection', () => {
   beforeEach(() => vi.clearAllMocks());
@@ -65,15 +65,39 @@ describe('PulseSection', () => {
     expect(props.onWindowChange).toHaveBeenCalledWith(30);
   });
 
-  it('a tile jumps to the chart behind its number', () => {
-    const el = document.createElement('div');
-    el.id = 'overview-daily';
-    el.scrollIntoView = vi.fn();
-    document.body.appendChild(el);
-    render(<PulseSection {...props} />);
+  it('a tile opens the drill-down behind its number', () => {
+    const onOpenSection = vi.fn();
+    render(<PulseSection {...props} onOpenSection={onOpenSection} />);
     fireEvent.click(within(screen.getByTestId('pulse-games')).getByText('Games played'));
-    expect(el.scrollIntoView).toHaveBeenCalled();
-    el.remove();
+    expect(onOpenSection).toHaveBeenCalledWith('overview-daily');
+    fireEvent.click(within(screen.getByTestId('pulse-paying')).getByText('Paying customers'));
+    expect(onOpenSection).toHaveBeenCalledWith('overview-revenue');
+  });
+
+  it('offers today vs yesterday first and reports the choice', () => {
+    render(<PulseSection {...props} />);
+    const buttons = screen.getAllByRole('button').filter((b) => b.hasAttribute('aria-pressed'));
+    expect(buttons.map((b) => b.textContent)).toEqual(['Today vs yesterday', 'Last 7 days', 'Last 30 days']);
+    fireEvent.click(buttons[0]);
+    expect(props.onWindowChange).toHaveBeenCalledWith(1);
+  });
+
+  it('in the day view shows pace against yesterday and drops stickiness', () => {
+    const evening = Date.parse(new Date(NOW).toISOString().slice(0, 10) + 'T18:00:00Z');
+    const dayPulse = buildPulse({
+      nowMs: evening,
+      windowDays: 1,
+      daily: daily.map((r, i, all) => ({ ...r, totalGames: i === all.length - 1 ? 30 : i === all.length - 2 ? 40 : r.totalGames, signups: 2 })),
+      growth: [],
+      stats: { activity: { uniquePlayersMonth: 40 } },
+      revenue: null,
+      health: null,
+      unreadReports: 0,
+    });
+    render(<PulseSection {...props} pulse={dayPulse} windowDays={1} />);
+    expect(within(screen.getByTestId('pulse-games')).getByText('Games today')).toBeInTheDocument();
+    expect(screen.getByTestId('pulse-games-delta').textContent).toBe('At this pace: 40 (0% vs yesterday, 40)');
+    expect(screen.queryByTestId('pulse-stickiness')).not.toBeInTheDocument();
   });
 
   it('shows lifetime totals under the tiles', () => {

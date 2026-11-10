@@ -36,19 +36,26 @@ describe('useOverviewPulse', () => {
     mockFetch();
     const { result } = renderHook(() => useOverviewPulse('tok', null, null));
     await waitFor(() => expect(result.current.pulse).not.toBeNull());
+    expect(result.current.windowDays).toBe(1);
+    expect(result.current.pulse!.games).toMatchObject({ current: 10, prior: 10 });
+    act(() => result.current.setWindowDays(7));
     expect(result.current.pulse!.games.current).toBe(70);
     expect(result.current.pulse!.findings.find((f) => f.id === 'reports_waiting')?.params.count).toBe(1);
     expect(result.current.pulse!.findings.some((f) => f.id === 'revenue_flowing')).toBe(true);
   });
 
-  it('switching the window recomputes from the same data without refetching', async () => {
+  it('asks for 14 days by default, switching to 7 days refetches nothing, and 30 days fetches 60', async () => {
     mockFetch();
     const { result } = renderHook(() => useOverviewPulse('tok', null, null));
     await waitFor(() => expect(result.current.pulse).not.toBeNull());
-    const calls = (global.fetch as ReturnType<typeof vi.fn>).mock.calls.length;
+    const fetchMock = global.fetch as ReturnType<typeof vi.fn>;
+    const dailyUrls = () => fetchMock.mock.calls.map((c) => String(c[0])).filter((u) => u.includes('/activity/daily'));
+    expect(dailyUrls()).toEqual([expect.stringContaining('days=14')]);
+    act(() => result.current.setWindowDays(7));
+    expect(dailyUrls()).toHaveLength(1);
     act(() => result.current.setWindowDays(30));
-    expect(result.current.pulse!.games.current).toBe(300);
-    expect((global.fetch as ReturnType<typeof vi.fn>).mock.calls.length).toBe(calls);
+    await waitFor(() => expect(result.current.pulse?.games.current).toBe(300));
+    expect(dailyUrls().at(-1)).toContain('days=60');
   });
 
   it('keeps working when one feed fails, and reports failure only when all three data feeds do', async () => {
