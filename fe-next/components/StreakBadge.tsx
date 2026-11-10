@@ -13,14 +13,15 @@ import { useRetentionStreak } from '@/hooks/useRetentionStreak';
  *
  * The day count follows the PLAYER'S ACCOUNT via `useAccountStreak` (the same
  * server number the daily-puzzle card shows), not the device — a signed-in
- * player sees the same streak here as everywhere else. Only the freeze pip
- * (a device-local inventory perk, unrelated to the account streak count)
- * still reads `useRetentionStreak` directly.
+ * player sees the same streak here as everywhere else. A guest's freeze pip is
+ * the device's free weekly freeze (`useRetentionStreak`).
  */
 export default function StreakBadge() {
   const { t } = useLanguage();
-  const { streak, loading } = useAccountStreak();
-  const { freezeAvailable } = useRetentionStreak();
+  const { streak, loading, freezes, isGuest } = useAccountStreak();
+  const { freezeAvailable: guestWeeklyFreeze } = useRetentionStreak();
+  // Signed in: the account's banked freezes, the same count the freeze shop shows.
+  const freezeAvailable = isGuest ? guestWeeklyFreeze : freezes > 0;
 
   if (loading || streak <= 0) return null;
 

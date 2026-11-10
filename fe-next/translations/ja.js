@@ -18263,7 +18263,52 @@ const ja = {
     "badge": "{count}日連続",
     "freezeReady": "ストリークフリーズ準備OK。1日休んでもストリークは続きます",
     "freezeUsed": "ストリークフリーズがストリークを守りました！",
-    "streak_freeze_toast_message": "ストリークフリーズを使用：{day}を守りました · 残り{remaining}回"
+    "streak_freeze_toast_message": "ストリークフリーズを使用：{day}を守りました · 残り{remaining}回",
+    "flame": {
+      "dayStreak": "日連続",
+      "tier": {
+        "none": "まだ火なし",
+        "ember": "点火したて",
+        "flame": "メラメラ",
+        "blue": "青い炎",
+        "violet": "超新星",
+        "legendary": "伝説"
+      },
+      "atRisk": "今日プレイして{n}日連続をキープ",
+      "safe": "今日のストリークは安全",
+      "start": "デイリーを1つ遊んでストリークに火をつけよう",
+      "week": "今週",
+      "day": {
+        "played": "プレイ済み",
+        "frozen": "フリーズで守った日",
+        "missed": "お休み",
+        "today": "今日",
+        "future": "これから"
+      },
+      "rewardAt": "{days}日連続ボーナス",
+      "toGo": "あと{n}日",
+      "maxed": "ストリーク報酬はすべて獲得済み。このまま燃やし続けよう！",
+      "freezesLabel": "ストリークフリーズ：{n}/{max}",
+      "claimReady": "{days}日連続ボーナスを受け取る：+{coins}",
+      "heroNext": "{days}日連続ボーナスまであと{n}日：+{coins}コイン",
+      "milestoneEyebrow": "ストリーク報酬",
+      "milestoneTitle": "{days}日連続！",
+      "milestoneBody": "{days}日続けて戻ってきてくれました。ささやかなお礼です。",
+      "claim": "+{coins}コインを受け取る",
+      "claiming": "受け取り中…",
+      "paid": "+{coins}コイン",
+      "collect": "やった！",
+      "later": "あとで",
+      "claimFailed": "うまくいきませんでした。もう一度お試しください。",
+      "freezeTitle": "ストリークフリーズ",
+      "freezeBody": "1日休んでも、フリーズが自動で入ってストリークは続きます。",
+      "needCoins": "フリーズは{price}コイン。もう少し遊んでからまた来てね。",
+      "freezeFull": "フリーズはもう上限まで持っています。",
+      "buyFailed": "今は購入できませんでした。もう一度お試しください。",
+      "signInForFreezes": "ログインしてフリーズを買う",
+      "buying": "購入中…",
+      "buy": "{price}で1つ買う"
+    }
   },
   "notifications": {
     "title": "通知",

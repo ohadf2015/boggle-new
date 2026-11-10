@@ -18,6 +18,8 @@ vi.mock('@/hooks/useRetentionStreak', () => ({
   useRetentionStreak: () => mockRetention,
 }));
 
+vi.mock('@/utils/onboardingStorage', () => ({ hasSupabaseSession: () => true }));
+
 describe('useAccountStreak', () => {
   beforeEach(() => {
     mockAuth = { isAuthenticated: false, loading: false };
@@ -31,7 +33,7 @@ describe('useAccountStreak', () => {
     mockChest = { loading: false, currentStreak: 99, cycleStart: '2026-09-15' };
 
     const { result } = renderHook(() => useAccountStreak());
-    expect(result.current).toEqual({ streak: 3, loading: false, freezes: 0 });
+    expect(result.current).toEqual({ streak: 3, loading: false, freezes: 0, isGuest: true });
   });
 
   it('shows the server/account streak for a signed-in player, NOT the local device value', () => {
@@ -40,7 +42,7 @@ describe('useAccountStreak', () => {
     mockChest = { loading: false, currentStreak: 1, cycleStart: '2026-09-15' };
 
     const { result } = renderHook(() => useAccountStreak());
-    expect(result.current).toEqual({ streak: 1, loading: false, freezes: 0 });
+    expect(result.current).toEqual({ streak: 1, loading: false, freezes: 0, isGuest: false });
   });
 
   it('surfaces the banked streak freezes for a signed-in player', () => {
@@ -59,7 +61,7 @@ describe('useAccountStreak', () => {
     expect(result.current.loading).toBe(true);
   });
 
-  it('reports loading while auth itself is still resolving', () => {
+  it('reports loading while a saved session is still being restored', () => {
     mockAuth = { isAuthenticated: false, loading: true };
 
     const { result } = renderHook(() => useAccountStreak());

@@ -1,8 +1,6 @@
 'use client';
 
-import { useAuth } from '@/contexts/AuthContext';
-import { useWeeklyChest } from '@/hooks/useWeeklyChest';
-import { useRetentionStreak } from '@/hooks/useRetentionStreak';
+import { useStreakView } from '@/hooks/useStreakView';
 
 export interface AccountStreakState {
   /** Streak to display right now. */
@@ -12,40 +10,17 @@ export interface AccountStreakState {
   loading: boolean;
   /** Streak freezes banked on the account; 0 for guests (they have none). */
   freezes: number;
+  isGuest: boolean;
 }
 
 /**
- * Single source of truth for every home-screen streak pill (`HomeTopBar`'s
- * pill and the header `StreakBadge`).
- *
- * Before this hook, both read `useRetentionStreak()` directly — a purely
- * local, per-device counter (#1087) — so the same signed-in account could
- * show a different number in the header than in the daily-puzzle card on a
- * different device (user report: header "3", profile chip "1", daily card
- * "1"). `useWeeklyChest` is the chest-authoritative, ACCOUNT-wide streak —
- * the same server number `HomeDailyHero` shows — and it already
- * request-dedupes across simultaneous mounts on one page (module-level cache
- * in `useWeeklyChest.ts`), so having both consumers call it directly here
- * does not add extra network calls.
- *
- * - Signed-in player → the server/account streak (`useWeeklyChest`).
- * - Guest (no account) → the only signal that exists for them, the
- *   device-local `useRetentionStreak`.
+ * The streak count for the header badge and home pills: a thin view over
+ * `useStreakView`, so every streak surface shows the same number (account
+ * streak when signed in, device-local retention streak for a guest).
  */
 export function useAccountStreak(): AccountStreakState {
-  const { isAuthenticated, loading: authLoading } = useAuth();
-  const weeklyChest = useWeeklyChest();
-  const { streak: retentionStreak } = useRetentionStreak();
-
-  if (!isAuthenticated) {
-    return { streak: retentionStreak, loading: authLoading, freezes: 0 };
-  }
-
-  return {
-    streak: weeklyChest.currentStreak,
-    loading: authLoading || weeklyChest.loading,
-    freezes: weeklyChest.freezesAvailable ?? 0,
-  };
+  const view = useStreakView();
+  return { streak: view.current, loading: view.loading, freezes: view.freezes, isGuest: view.isGuest };
 }
 
 export default useAccountStreak;

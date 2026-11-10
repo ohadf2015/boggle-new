@@ -374,6 +374,12 @@ export type GrowthEvent =
   | 'cross_promo_click'
   | 'day_prize_shown'
   | 'day_prize_opened'
+  // Daily streak rewards (components/streak): { days, coins, source } / { result }.
+  | 'streak_milestone_shown'
+  | 'streak_milestone_claimed'
+  | 'streak_freeze_sheet_opened'
+  | 'streak_freeze_bought'
+  | 'streak_freeze_saved'
   // Avatar part out of a reward chest (components/avatar/chest).
   | 'avatar_chest_part_shown'
   | 'avatar_chest_part_reveal_open'

@@ -1,57 +1,36 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useDailyPlayedStatus } from '@/hooks/useDailyPlayedStatus';
+import { useStreakView } from '@/hooks/useStreakView';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { StreakFreezeToast } from './StreakFreezeToast';
+import { StreakFlame } from '@/components/streak/StreakFlame';
+import { StreakSavedToast } from '@/components/streak/StreakSavedToast';
 import { trackGrowthEvent } from '@/utils/growthTracking';
+import { claimOnce } from '@/lib/daily/streakToastOnce';
 
-const TOAST_MS = 4000;
-const freezeToastKey = (playerId: string, date: string) => `lc:streak-freeze-toast:${playerId}:${date}`;
 const repairKey = (playerId: string, date: string) => `lc:streak-repaired:${playerId}:${date}`;
-
-/** Marks a date as announced; true only the first time for this key. */
-function claimOnce(key: string): boolean {
-  try {
-    if (localStorage.getItem(key)) return false;
-    localStorage.setItem(key, '1');
-    return true;
-  } catch {
-    return false;
-  }
-}
 
 export function PersistentStreakDisplay() {
   const { t } = useLanguage();
   const { user } = useAuth();
-  const { streak, loading, freezeApplied, streakRepaired, hasPlayedBefore } = useDailyPlayedStatus();
-  const [showFreezeToast, setShowFreezeToast] = useState(false);
+  const { freezeApplied, streakRepaired, hasPlayedBefore } = useDailyPlayedStatus();
+  // The count is the account streak every other surface shows, not /api/daily/status's own tally.
+  const view = useStreakView();
   const playerId = user?.id ?? 'guest';
-  const freezeDate = freezeApplied?.date;
-
-  // The server repeats freezeApplied on every answer while the bridge holds;
-  // the marker is written at show-time so a reload or tab return never re-toasts.
-  useEffect(() => {
-    if (freezeDate && claimOnce(freezeToastKey(playerId, freezeDate))) setShowFreezeToast(true);
-  }, [playerId, freezeDate]);
+  const saved = view.freezeSaved ?? freezeApplied ?? null;
 
   // A missed day replayed inside the catch-up window held the streak together.
   const repaired = streakRepaired?.dates.join(',') ?? '';
-  const current = streak.current;
+  const current = view.current;
   useEffect(() => {
     for (const date of repaired ? repaired.split(',') : []) {
       if (claimOnce(repairKey(playerId, date))) trackGrowthEvent('streak_repaired', { date, streak: current });
     }
   }, [playerId, repaired, current]);
 
-  useEffect(() => {
-    if (!showFreezeToast) return undefined;
-    const timer = setTimeout(() => setShowFreezeToast(false), TOAST_MS);
-    return () => clearTimeout(timer);
-  }, [showFreezeToast]);
-
-  if (loading) {
+  if (view.loading) {
     return (
       <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-neo-navy-light animate-pulse">
         <div className="w-5 h-5 rounded bg-neo-navy-lighter" />
@@ -62,17 +41,18 @@ export function PersistentStreakDisplay() {
 
   return (
     <>
-      {(hasPlayedBefore || streak.current > 0) && (
-        <div data-testid="streak-counter" className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-neo-navy-light">
-          <span className="text-lg" role="img" aria-label={t('auth.dailyChallenge.streak_flame_icon')}>
-            🔥
-          </span>
-          <span className="font-rubik font-semibold text-neo-cream text-sm">
-            {streak.current}
-          </span>
+      {(hasPlayedBefore || current > 0) && (
+        <div
+          data-testid="streak-counter"
+          role="img"
+          aria-label={t('dailyStreak.badge', { count: current })}
+          className="flex items-center gap-1 rounded-neo-pill border-2 border-neo-orange bg-neo-navy-light py-0.5 pe-3 ps-1.5 shadow-hard-sm"
+        >
+          <StreakFlame days={current} size={30} mood={view.atRisk ? 'worried' : 'happy'} />
+          <span className="font-neo-display text-xl font-black tabular-nums text-neo-cream">{current}</span>
         </div>
       )}
-      {showFreezeToast && freezeApplied && <StreakFreezeToast freezeApplied={freezeApplied} />}
+      <StreakSavedToast saved={saved} />
     </>
   );
 }

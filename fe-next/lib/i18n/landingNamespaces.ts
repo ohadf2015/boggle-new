@@ -98,6 +98,9 @@ export const LANDING_EXTRA_KEYS = [
   'wordTowerV2.cardTitle',
   'wordTowerV2.cardDesc',
   'sitemap.wordWheel',
+  // Home streak flame, week strip, at-risk pill and freeze shop (components/streak).
+  'dailyStreak.badge',
+  'dailyStreak.flame',
   // New-modes spotlight loot peek (components/landing/LootPeek.tsx) names real loot.
   'adventurePlay.relic',
   'wordTowerV2.chest.tier',

@@ -16,12 +16,15 @@ export interface UseRetentionStreakReturn {
   best: number;
   /** True while this ISO week's streak freeze is still in inventory. */
   freezeAvailable: boolean;
+  /** Last played day "YYYY-MM-DD" (UTC), or null if never played. */
+  lastPlayedDate?: string | null;
 }
 
 const SERVER_SNAPSHOT: UseRetentionStreakReturn = {
   streak: 0,
   best: 0,
   freezeAvailable: false,
+  lastPlayedDate: null,
 };
 
 function getSnapshot(): UseRetentionStreakReturn {
@@ -32,6 +35,7 @@ function getSnapshot(): UseRetentionStreakReturn {
     streak: displayStreak(state, today),
     best: state.best,
     freezeAvailable: state.freeze.weekKey !== weekKey ? true : state.freeze.available,
+    lastPlayedDate: state.lastPlayedDate,
   };
 }
 

@@ -18206,7 +18206,52 @@ const es = {
     "badge": "Racha de {count} días",
     "freezeReady": "Congelación de racha lista: un día perdido no romperá tu racha",
     "freezeUsed": "¡La congelación salvó tu racha!",
-    "streak_freeze_toast_message": "Congelación de racha usada: {day} a salvo · quedan {remaining}"
+    "streak_freeze_toast_message": "Congelación de racha usada: {day} a salvo · quedan {remaining}",
+    "flame": {
+      "dayStreak": "días de racha",
+      "tier": {
+        "none": "Aún sin encender",
+        "ember": "Recién encendida",
+        "flame": "En llamas",
+        "blue": "Fuego azul",
+        "violet": "Supernova",
+        "legendary": "Legendaria"
+      },
+      "atRisk": "Juega hoy para no perder tu racha de {n} días",
+      "safe": "Tu racha está a salvo hoy",
+      "start": "Juega un reto diario para encender tu racha",
+      "week": "Esta semana",
+      "day": {
+        "played": "jugado",
+        "frozen": "salvado por una congelación",
+        "missed": "perdido",
+        "today": "hoy",
+        "future": "próximamente"
+      },
+      "rewardAt": "Premio de {days} días",
+      "toGo": "faltan {n}",
+      "maxed": "Ya tienes todos los premios de racha. ¡Que siga ardiendo!",
+      "freezesLabel": "Congelaciones de racha: {n} de {max}",
+      "claimReady": "Reclama tu premio de {days} días: +{coins}",
+      "heroNext": "Faltan {n} para el premio de {days} días: +{coins} monedas",
+      "milestoneEyebrow": "Premio de racha",
+      "milestoneTitle": "¡Racha de {days} días!",
+      "milestoneBody": "Volviste {days} días seguidos. Esto es para ti.",
+      "claim": "Reclamar +{coins} monedas",
+      "claiming": "Reclamando…",
+      "paid": "+{coins} monedas",
+      "collect": "¡Genial!",
+      "later": "Luego",
+      "claimFailed": "No salió. Inténtalo otra vez.",
+      "freezeTitle": "Congelación de racha",
+      "freezeBody": "Si te saltas un día, la congelación entra sola y tu racha sigue.",
+      "needCoins": "Una congelación cuesta {price} monedas. Juega un poco más y vuelve.",
+      "freezeFull": "Ya tienes el máximo de congelaciones.",
+      "buyFailed": "No se pudo comprar ahora. Inténtalo otra vez.",
+      "signInForFreezes": "Inicia sesión para comprar congelaciones",
+      "buying": "Comprando…",
+      "buy": "Comprar una por {price}"
+    }
   },
   "notifications": {
     "title": "Notificaciones",

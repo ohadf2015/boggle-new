@@ -4,12 +4,13 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import useReducedMotion from '@/hooks/useReducedMotion';
-import { useAccountStreak } from '@/hooks/useAccountStreak';
+import { useStreakView } from '@/hooks/useStreakView';
 import { getOrCreateStoredCustomAvatar } from '@/utils/profileStorage';
 import { hasSupabaseSession } from '@/utils/onboardingStorage';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { PlayHero } from './PlayHero';
 import { DailyBlock } from './DailyBlock';
+import { StreakSavedToast } from '@/components/streak/StreakSavedToast';
 import { FriendsBlock } from './FriendsBlock';
 import { MoreGames } from './MoreGames';
 import { HomeAdventureCard } from '@/components/landing/home/HomeAdventureCard';
@@ -23,7 +24,8 @@ export function HomePreview({ onPlay }: { onPlay?: () => void } = {}) {
   const { t, language } = useLanguage();
   const { user, profile, loading: authLoading } = useAuth();
   const reduced = useReducedMotion();
-  const { streak, loading: streakLoading, freezes } = useAccountStreak();
+  const streakView = useStreakView();
+  const { current: streak, loading: streakLoading, freezes } = streakView;
   const [guestAvatar, setGuestAvatar] = useState<CustomAvatarConfig | null>(null);
   const [mounted, setMounted] = useState(false);
   const [lastAccount, setLastAccount] = useState<HeroAvatar | null>(null);
@@ -55,7 +57,8 @@ export function HomePreview({ onPlay }: { onPlay?: () => void } = {}) {
           greeting={greeting}
           streak={streak}
           streakLoading={streakLoading}
-          freezes={freezes ?? 0}
+          atRisk={streakView.atRisk}
+          freezes={freezes}
           onAvatarSaved={setGuestAvatar}
           onPlay={onPlay}
         />
@@ -63,7 +66,19 @@ export function HomePreview({ onPlay }: { onPlay?: () => void } = {}) {
 
       <div className="mx-auto mt-8 grid w-full max-w-md gap-8 px-4 lg:mt-14 lg:max-w-[1600px] lg:grid-cols-12 lg:gap-10 lg:px-14">
         <div className="flex flex-col gap-4 lg:col-span-7">
-          <DailyBlock lang={language} t={tt} streak={streak} streakLoading={streakLoading} freezes={freezes ?? 0} />
+          <DailyBlock
+            lang={language}
+            t={tt}
+            streak={streak}
+            streakLoading={streakLoading}
+            freezes={freezes}
+            atRisk={streakView.atRisk}
+            week={mounted ? streakView.week : undefined}
+            next={streakView.milestone?.next ?? null}
+            isGuest={streakView.isGuest}
+            onStreakChanged={() => streakView.refresh(true)}
+          />
+          <StreakSavedToast saved={streakView.loading ? null : streakView.freezeSaved} />
           <WeeklyThemeCard lang={language} t={tt} source="home" compact />
         </div>
         <div className="lg:col-span-5">
