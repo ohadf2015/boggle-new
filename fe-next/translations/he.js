@@ -1,4 +1,6 @@
 // HE translations
+import { mergeAdminDashboardHe } from './he.adminDashboard';
+
 const he = {
   // @avatarChest:start
   "avatarChest": {
@@ -22552,5 +22554,9 @@ const he = {
   }
   // @eduProResults:end
 };
+
+// @adminDashboard:start
+mergeAdminDashboardHe(he.admin);
+// @adminDashboard:end
 
 export { he };

@@ -78,6 +78,11 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
+  const adminInOtherLocale = pathname.match(/^\/(?:en|es|sv|ja|ru)(\/admin(?:\/.*)?)$/);
+  if (adminInOtherLocale) {
+    return NextResponse.redirect(new URL(`/he${adminInOtherLocale[1]}${search}`, request.url), 307);
+  }
+
   const classroomLive = pathnameHasLocale
     ? legacyClassroomLiveRedirect(pathname, request.nextUrl.search) ?? legacyHostLiveRedirect(pathname, request.nextUrl.search)
     : null;

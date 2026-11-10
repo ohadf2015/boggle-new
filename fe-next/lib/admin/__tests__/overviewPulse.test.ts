@@ -153,3 +153,51 @@ describe('buildPulse — findings', () => {
     expect(tones).toEqual([...tones].sort((a, b) => ['problem', 'early', 'win', 'fact'].indexOf(a) - ['problem', 'early', 'win', 'fact'].indexOf(b)));
   });
 });
+
+describe('buildPulse — today against yesterday (window 1)', () => {
+  const dayView = (over: Partial<PulseInput> = {}) => base({ windowDays: 1, ...over });
+  const lateEvening = Date.parse('2026-11-10T18:00:00Z');
+  const earlyMorning = Date.parse('2026-11-10T03:00:00Z');
+  const shaped = (todayGames: number, yesterdayGames: number) => dailyOf(60, (d) => (d === 0 ? todayGames : d === 1 ? yesterdayGames : 40));
+
+  it('takes today as current and yesterday as prior, with a 7-day spark', () => {
+    const p = buildPulse(dayView({ daily: shaped(30, 40) }));
+    expect(p.games).toMatchObject({ current: 30, prior: 40 });
+    expect(p.games.spark).toHaveLength(7);
+  });
+
+  it('judges today by its pace so a half-finished day is not a crash', () => {
+    const p = buildPulse(dayView({ nowMs: lateEvening, daily: shaped(30, 40) }));
+    expect(p.games.projected).toBe(40);
+    expect(p.games.pct).toBe(0);
+  });
+
+  it('gives no verdict in the first hours of the day', () => {
+    const p = buildPulse(dayView({ nowMs: earlyMorning, daily: shaped(2, 40) }));
+    expect(p.games.projected).toBeNull();
+    expect(p.games.pct).toBeNull();
+  });
+
+  it('does not call a drop or a surge on a partial day', () => {
+    const p = buildPulse(dayView({ nowMs: lateEvening, daily: shaped(90, 20) }));
+    expect(ids(p)).not.toContain('games_up');
+    expect(ids(p)).not.toContain('games_down');
+  });
+
+  it('signups are today against yesterday from the daily rows', () => {
+    const daily = dailyOf(60, () => 40).map((r, i, all) => ({ ...r, signups: i === all.length - 1 ? 3 : i === all.length - 2 ? 5 : 1 }));
+    const p = buildPulse(dayView({ daily }));
+    expect(p.signups).toMatchObject({ current: 3, prior: 5 });
+    expect(p.signups!.spark).toHaveLength(7);
+  });
+
+  it('has no stickiness on a partial day', () => {
+    const p = buildPulse(dayView());
+    expect(p.stickinessPct).toBeNull();
+    expect(ids(p)).not.toContain('low_stickiness');
+  });
+
+  it('keeps the week and month windows unprojected', () => {
+    expect(buildPulse(base()).games.projected).toBeUndefined();
+  });
+});

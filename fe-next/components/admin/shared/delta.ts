@@ -21,3 +21,13 @@ export function deltaSentence(delta: PeriodDelta, windowDays: number, t: Transla
     prior: delta.prior,
   });
 }
+
+/** Today so far against a full yesterday: judged by pace, and silent in the first hours of the day. */
+export function dayDeltaSentence(tile: { prior: number; projected?: number | null; pct: number | null }, t: Translate): string {
+  if (tile.projected == null) return t('admin.delta.dayEarly', 'Yesterday: {prior}. Too early in the day to compare.', { prior: tile.prior });
+  return t('admin.delta.dayPace', 'At this pace: {projected} ({pct} vs yesterday, {prior})', {
+    projected: tile.projected,
+    pct: formatDelta({ ...tile, current: tile.projected }) ?? '0%',
+    prior: tile.prior,
+  });
+}

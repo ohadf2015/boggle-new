@@ -297,7 +297,8 @@ export function TeacherFunnelPanel() {
           <p className="font-neo-body text-sm font-bold">
             {t(
               'admin.teacherFunnel.returnedNoClassroom',
-              `${summary.returnedNoClassroom} approved teachers came back to the app and still have no classroom (${summary.returnedNoClassroomTrialActive} with a trial still running).`,
+              '{count} approved teachers came back to the app and still have no classroom ({active} with a trial still running).',
+              { count: summary.returnedNoClassroom, active: summary.returnedNoClassroomTrialActive },
             )}
           </p>
         </div>

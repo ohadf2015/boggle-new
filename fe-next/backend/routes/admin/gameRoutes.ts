@@ -4,8 +4,10 @@
  */
 
 import express, { Response, Router } from 'express';
-import type { AdminRequest, SocketIO, GameInfo, DailyDataEntry, GuestSession, GuestPlayerStat, EventRow } from './types';
+import type { AdminRequest, SocketIO, GameInfo, GuestSession, GuestPlayerStat, EventRow } from './types';
 import logger from '../../utils/logger';
+import { withCache } from './adminCache';
+import { fetchDailyActivity } from '../../../lib/admin/dailyActivity';
 import { getActiveSinglePlayerCount, getActiveSinglePlayerSessions } from '../singlePlayer';
 import { getActivePagePresence } from '../presence';
 import { playersOnOtherPages } from '../../../lib/admin/liveMonitor/playersOnOtherPages';
@@ -70,84 +72,8 @@ router.get('/games/history', async (req: AdminRequest, res: Response): Promise<v
 router.get('/activity/daily', async (req: AdminRequest, res: Response): Promise<void> => {
   try {
     const days = Math.min(parseInt(req.query.days as string) || 30, 90);
-    const supabase = getSupabase();
-
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - days);
-
-    const { data: testRows, error: testError } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('is_test_account', true);
-    if (testError) throw testError;
-    const testIds = new Set((testRows ?? []).map((r: { id: string }) => r.id));
-
-    // Get authenticated user games from game_results
-    const { data: allGamesData, error: gamesError } = await supabase
-      .from('game_results')
-      .select('created_at, player_id')
-      .gte('created_at', startDate.toISOString());
-
-    if (gamesError) throw gamesError;
-    const gamesData = (allGamesData ?? []).filter((g: { player_id: string }) => !testIds.has(g.player_id));
-
-    // Get guest games from game_sessions
-    let guestGamesData: { started_at: string; guest_session_id: string }[] = [];
-    try {
-      const { data: guestData } = await supabase
-        .from('game_sessions')
-        .select('started_at, guest_session_id')
-        .is('user_id', null)
-        .not('guest_session_id', 'is', null)
-        .eq('completed', true)
-        .gte('started_at', startDate.toISOString());
-
-      guestGamesData = guestData || [];
-    } catch {
-      // game_sessions table might not exist or have different structure
-      logger.debug('ADMIN_API', 'Guest game sessions unavailable for daily activity');
-    }
-
-    // Aggregate by day
-    const dailyData: Record<string, DailyDataEntry> = {};
-    for (let i = 0; i < days; i++) {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      const dateStr = date.toISOString().split('T')[0];
-      dailyData[dateStr] = { games: 0, guestGames: 0, uniquePlayers: new Set(), uniqueGuests: new Set() };
-    }
-
-    // Add authenticated games
-    gamesData?.forEach((game: { created_at: string; player_id: string }) => {
-      const dateStr = game.created_at.split('T')[0];
-      if (dailyData[dateStr]) {
-        dailyData[dateStr].games++;
-        dailyData[dateStr].uniquePlayers.add(game.player_id);
-      }
-    });
-
-    // Add guest games
-    guestGamesData.forEach((game: { started_at: string; guest_session_id: string }) => {
-      const dateStr = game.started_at.split('T')[0];
-      if (dailyData[dateStr]) {
-        dailyData[dateStr].guestGames++;
-        dailyData[dateStr].uniqueGuests.add(game.guest_session_id);
-      }
-    });
-
-    const result = Object.entries(dailyData)
-      .map(([date, data]) => ({
-        date,
-        games: data.games,
-        guestGames: data.guestGames,
-        totalGames: data.games + data.guestGames,
-        uniquePlayers: data.uniquePlayers.size,
-        uniqueGuests: data.uniqueGuests.size,
-        totalUniquePlayers: data.uniquePlayers.size + data.uniqueGuests.size,
-      }))
-      .sort((a, b) => a.date.localeCompare(b.date));
-
-    res.json({ daily: result });
+    const daily = await withCache(`admin:activity-daily:${days}`, 60, () => fetchDailyActivity(getSupabase(), days));
+    res.json({ daily });
   } catch (error) {
     const err = error as Error;
     logger.error('ADMIN_API', `Daily activity error: ${err.message}`);

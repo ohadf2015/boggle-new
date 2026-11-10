@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
+import { ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { teacherDetailPath } from '@/components/admin/education/AdminTeacherDetail';
-import type { TeacherRow } from '@/lib/admin/eduDashboard';
+import type { ClassRow, TeacherRow } from '@/lib/admin/eduDashboard';
 import type { TeacherHealth } from '@/lib/admin/eduMetrics';
-import { CHIP_OFF, CHIP_ON, HealthChip, healthLabel, MUTED, PANEL, shortDate, type ActiveDrill } from './eduDashboardShared';
+import { CHIP_OFF, CHIP_ON, classDetailPath, HealthChip, healthLabel, MUTED, PANEL, shortDate, type ActiveDrill } from './eduDashboardShared';
 
 type Filter = 'all' | TeacherHealth;
 
@@ -28,25 +29,63 @@ export function DrillBanner({ drill, onClear }: { drill: ActiveDrill; onClear: (
   );
 }
 
+function TeacherDetail({ row, classes, language, t }: { row: TeacherRow; classes: ClassRow[]; language: string; t: (k: string, fb?: string, p?: Record<string, string | number>) => string }) {
+  return (
+    <div data-testid={`teacher-detail-${row.id}`} className="space-y-2 rounded border border-neo-cream/20 bg-neo-navy/60 p-3 text-start">
+      <p className={`text-xs ${MUTED}`}>
+        {row.email ?? '—'}
+        {row.joinCode && <span className="ms-3">{t('admin.eduDashboard.teachers.joinCode', 'Join code')}: <b className="text-neo-cream">{row.joinCode}</b></span>}
+        <span className="ms-3">{t('admin.eduDashboard.teachers.lastOutreach', 'Last contacted')}: {shortDate(row.lastOutreachAt, language)}</span>
+      </p>
+      {classes.length === 0 ? (
+        <p className={`text-sm ${MUTED}`}>{t('admin.eduDashboard.teachers.noClasses', 'No classes yet.')}</p>
+      ) : (
+        <ul className="divide-y divide-neo-cream/10 text-sm">
+          {classes.map((c) => (
+            <li key={c.id} className="flex flex-wrap items-center justify-between gap-2 py-1.5">
+              <Link href={classDetailPath(language, c.id)} className="font-semibold hover:underline">{c.name ?? '—'}</Link>
+              <span className={`text-xs ${MUTED}`}>
+                {t('admin.eduDashboard.teachers.classLine', '{students} students · {rounds} games · last game {date}', {
+                  students: c.students,
+                  rounds: c.roundsInWindow ?? '—',
+                  date: shortDate(c.lastRoundAt, language),
+                })}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+      <Link href={teacherDetailPath(language, row.id)} className="inline-block text-xs font-semibold text-neo-cyan underline-offset-2 hover:underline">
+        {t('admin.eduDashboard.teachers.fullView', 'Full teacher view')}
+      </Link>
+    </div>
+  );
+}
+
 export function EduTeacherTable({
   rows,
+  classes,
   drill,
   onClearDrill,
 }: {
   rows: TeacherRow[];
+  classes: ClassRow[];
   drill: ActiveDrill | null;
   onClearDrill: () => void;
 }) {
   const { t, language } = useLanguage();
   const [filter, setFilter] = useState<Filter>('all');
   const [showDormant, setShowDormant] = useState(false);
+  const [query, setQuery] = useState('');
+  const [openId, setOpenId] = useState<string | null>(null);
 
   const thriving = rows.filter((r) => r.health === 'thriving');
   const atRisk = rows.filter((r) => r.health === 'at_risk').sort((a, b) => b.students - a.students);
   const dormant = rows.filter((r) => r.health === 'dormant');
   const rowOf = new Map(rows.map((r) => [r.id, r]));
 
-  const visible = drill
+  const matches = (r: TeacherRow) => `${r.name ?? ''} ${r.email ?? ''}`.toLowerCase().includes(query.trim().toLowerCase());
+  const listed = drill
     ? drill.ids.map((id) => rowOf.get(id)).filter((r): r is TeacherRow => !!r)
     : filter === 'thriving'
       ? thriving
@@ -55,6 +94,7 @@ export function EduTeacherTable({
         : filter === 'dormant'
           ? dormant
           : [...thriving, ...atRisk, ...(showDormant ? dormant : [])];
+  const visible = query.trim() && !drill ? rows.filter(matches) : listed;
 
   const chips: Array<{ key: Filter; label: string; count: number }> = [
     { key: 'all', label: t('admin.eduDashboard.teachers.filter.all', 'Not dormant'), count: thriving.length + atRisk.length },
@@ -87,6 +127,16 @@ export function EduTeacherTable({
           ))}
         </div>
       )}
+      {!drill && (
+        <input
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder={t('admin.eduDashboard.teachers.search', 'Search by name or email')}
+          aria-label={t('admin.eduDashboard.teachers.search', 'Search by name or email')}
+          className="w-full rounded border-2 border-neo-cream/40 bg-neo-navy px-3 py-1.5 text-sm text-neo-cream placeholder:text-neo-cream/50 sm:max-w-xs"
+        />
+      )}
       <div className="overflow-x-auto">
         <table className="w-full text-sm tabular-nums text-neo-cream">
           <thead className={`text-start text-xs ${MUTED}`}>
@@ -101,9 +151,22 @@ export function EduTeacherTable({
             </tr>
           </thead>
           <tbody>
-            {visible.map((r) => (
-              <tr key={r.id} className="border-t border-neo-cream/10">
+            {visible.map((r) => {
+              const open = openId === r.id;
+              const label = r.name ?? r.email ?? r.id;
+              return (
+              <Fragment key={r.id}>
+              <tr className="border-t border-neo-cream/10">
                 <td className="p-2">
+                  <button
+                    type="button"
+                    aria-expanded={open}
+                    aria-label={open ? t('admin.eduDashboard.teachers.close', 'Close {name}', { name: label }) : t('admin.eduDashboard.teachers.open', 'Open {name}', { name: label })}
+                    onClick={() => setOpenId(open ? null : r.id)}
+                    className="me-2 align-middle text-neo-cream/70 hover:text-neo-cream"
+                  >
+                    <ChevronDown className={`h-4 w-4 transition-transform motion-reduce:transition-none ${open ? 'rotate-180' : ''}`} aria-hidden="true" />
+                  </button>
                   <Link href={teacherDetailPath(language, r.id)} className="font-semibold hover:underline">
                     {r.name ?? r.email ?? '—'}
                   </Link>
@@ -120,7 +183,16 @@ export function EduTeacherTable({
                   <HealthChip health={r.health} />
                 </td>
               </tr>
-            ))}
+              {open && (
+                <tr>
+                  <td colSpan={7} className="p-2">
+                    <TeacherDetail row={r} classes={classes.filter((c) => c.teacherId === r.id)} language={language} t={t} />
+                  </td>
+                </tr>
+              )}
+              </Fragment>
+              );
+            })}
           </tbody>
         </table>
         {visible.length === 0 && <p className={`p-2 text-sm ${MUTED}`}>{t('admin.eduDashboard.drill.empty', 'Nobody here.')}</p>}

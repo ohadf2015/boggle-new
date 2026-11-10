@@ -16,6 +16,10 @@ import { buildEduDashboard } from '@/lib/admin/eduDashboard';
 import { prepareEduDashboardInput } from '@/lib/admin/eduDashboardInput';
 import { fetchEduRawRows } from '@/lib/admin/eduDashboardRows';
 import type { WindowDays } from '@/lib/admin/eduMetrics';
+import { memoizeFor } from '@/lib/admin/memoizeFor';
+
+const CACHE_MS = 45_000;
+const cache = new Map<string, { at: number; value: Promise<Awaited<ReturnType<typeof fetchEduRawRows>>> }>();
 
 const DAY_MS = 86_400_000;
 
@@ -37,8 +41,10 @@ export async function GET(request: NextRequest) {
   const nowMs = Date.now();
   const sinceIso = new Date(nowMs - 2 * windowDays * DAY_MS).toISOString();
 
-  const fetched = await fetchEduRawRows(supabase, sinceIso);
+  const cacheKey = `window:${windowDays}`;
+  const fetched = await memoizeFor(cache, cacheKey, CACHE_MS, () => fetchEduRawRows(supabase, sinceIso));
   if (!fetched.ok) {
+    cache.delete(cacheKey);
     return NextResponse.json({ error: fetched.error }, { status: 500 });
   }
 
