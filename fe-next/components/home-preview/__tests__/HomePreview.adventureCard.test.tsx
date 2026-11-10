@@ -31,11 +31,11 @@ vi.mock('../MoreGames', () => ({
 }));
 
 describe('HomePreview — Adventure card', () => {
-  it('Given the live home, then the Adventure card sits right before the games shelf, and the shelf drops its own Adventure door', () => {
+  it('Given the live home, then the Adventure card sits right after Daily, above multiplayer, and the shelf drops its own Adventure door', () => {
     render(<HomePreview />);
     const order = Array.from(document.querySelectorAll('[data-testid^="slot-"]')).map((el) => el.getAttribute('data-testid'));
-    expect(order.indexOf('slot-adventure')).toBe(order.indexOf('slot-games') - 1);
-    expect(order.indexOf('slot-adventure')).toBeGreaterThan(order.indexOf('slot-daily'));
+    expect(order.indexOf('slot-adventure')).toBe(order.indexOf('slot-daily') + 1);
+    expect(order.indexOf('slot-adventure')).toBeLessThan(order.indexOf('slot-friends'));
     expect(moreGamesProps).toHaveBeenCalledWith(expect.objectContaining({ hideAdventure: true }));
   });
 });
