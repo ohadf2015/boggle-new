@@ -406,7 +406,10 @@ async function handleSubscriptionActive(payload: WebhookPayload, userId?: string
 }
 
 async function handleSubscriptionUpdated(payload: WebhookPayload, userId?: string) {
-  if (!userId) return
+  if (!userId) {
+    console.warn('[Polar] subscription updated — no user_id in metadata/customer.external_id')
+    return
+  }
   const data = payload?.data ?? {}
   await upsertSubscription({
     userId,
@@ -426,7 +429,10 @@ async function handleSubscriptionUpdated(payload: WebhookPayload, userId?: strin
  * subscription.revoked event performs the actual downgrade.
  */
 async function handleSubscriptionCanceled(payload: WebhookPayload, userId?: string) {
-  if (!userId) return
+  if (!userId) {
+    console.warn('[Polar] subscription canceled — no user_id in metadata/customer.external_id')
+    return
+  }
   const data = payload?.data ?? {}
   await upsertSubscription({
     userId,
@@ -441,7 +447,10 @@ async function handleSubscriptionCanceled(payload: WebhookPayload, userId?: stri
 }
 
 async function handleSubscriptionRevoked(payload: WebhookPayload, userId?: string) {
-  if (!userId) return
+  if (!userId) {
+    console.warn('[Polar] subscription revoked — no user_id in metadata/customer.external_id')
+    return
+  }
   const data = payload?.data ?? {}
   await upsertSubscription({
     userId,
@@ -460,7 +469,10 @@ async function handleSubscriptionRevoked(payload: WebhookPayload, userId?: strin
  * subscription events own trialing.
  */
 async function handleOrderPaid(payload: WebhookPayload, userId?: string) {
-  if (!userId) return
+  if (!userId) {
+    console.warn('[Polar] order paid — no user_id in metadata/customer.external_id')
+    return
+  }
   const data = payload?.data ?? {}
   if (getTierFromProductId(getProductId(payload)) !== 'pro') return
   await grantProFromOrder({ userId, providerOrderId: String(data.id ?? ''), allowGrant: isPaidOrder(payload) })

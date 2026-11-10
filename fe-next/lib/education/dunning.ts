@@ -96,7 +96,8 @@ export async function maybeSendPaymentFailedEmail({
     full_name: fullName,
     locale,
     portalUrl,
-    renewalDate: (data.current_period_end as string | null) ?? null,
+    // current_period_end has already rolled to next month; created_at is the sign-up date.
+    renewalDate: typeof data.modified_at === 'string' && data.modified_at ? data.modified_at : null,
   });
   const result = await sendEmail({ to: email, subject: tpl.subject, html: tpl.html });
   if (!result.ok) {

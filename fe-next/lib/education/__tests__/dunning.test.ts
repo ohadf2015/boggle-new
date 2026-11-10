@@ -69,7 +69,10 @@ const payload = {
   type: 'subscription.past_due',
   data: {
     id: 'sub_123',
-    current_period_end: '2026-10-09T00:00:00.000Z',
+    current_period_start: '2026-10-09T00:00:00.000Z',
+    current_period_end: '2026-11-09T00:00:00.000Z',
+    modified_at: '2026-10-09T00:05:00.000Z',
+    created_at: '2026-09-09T00:00:00.000Z',
     customer: { email: 'teacher@school.org' },
   },
 };
@@ -96,7 +99,7 @@ describe('maybeSendPaymentFailedEmail', () => {
       full_name: 'Dana Cohen',
       locale: 'he',
       portalUrl: 'https://polar.sh/portal/session_123',
-      renewalDate: '2026-10-09T00:00:00.000Z',
+      renewalDate: '2026-10-09T00:05:00.000Z',
     });
     expect(vi.mocked(sendEmail)).toHaveBeenCalledWith({
       to: 'teacher@school.org',
@@ -133,8 +136,15 @@ describe('maybeSendPaymentFailedEmail', () => {
       full_name: 'teacher',
       locale: 'en',
       portalUrl: 'https://www.lexiclash.live/en/teacher',
-      renewalDate: '2026-10-09T00:00:00.000Z',
+      renewalDate: '2026-10-09T00:05:00.000Z',
     });
     expect(vi.mocked(logSubscriptionEvent)).not.toHaveBeenCalled();
+  });
+
+  it('shows no date rather than the sign-up or next-period date when the past_due event time is missing', async () => {
+    const { modified_at: _omit, ...data } = payload.data;
+    await maybeSendPaymentFailedEmail({ payload: { ...payload, data }, userId: 'u1' });
+
+    expect(vi.mocked(teacherPaymentFailed)).toHaveBeenCalledWith(expect.objectContaining({ renewalDate: null }));
   });
 });

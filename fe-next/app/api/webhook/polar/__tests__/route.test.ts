@@ -218,6 +218,27 @@ describe('polar webhook', () => {
     expect(upsertSubscription).not.toHaveBeenCalled()
   })
 
+  describe('a state-changing event with no user id is logged, not dropped silently', () => {
+    const cases: Array<[string, Record<string, unknown>, string]> = [
+      ['subscription.updated', { ...subscriptionData, metadata: {}, customer: {} }, 'subscription updated'],
+      ['subscription.past_due', { ...subscriptionData, status: 'past_due', metadata: {}, customer: {} }, 'subscription updated'],
+      ['subscription.canceled', { ...subscriptionData, metadata: {}, customer: {} }, 'subscription canceled'],
+      ['subscription.revoked', { ...subscriptionData, status: 'canceled', metadata: {}, customer: {} }, 'subscription revoked'],
+      ['order.paid', { id: 'ord_1', product_id: PRO_PRODUCT_ID, total_amount: 900, metadata: {} }, 'order paid'],
+    ]
+    for (const [type, data, label] of cases) {
+      it(`${type} warns and still acks with 200`, async () => {
+        const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+        const res = await POST(polarEvent(type, data))
+        expect(res.status).toBe(200)
+        expect(warn).toHaveBeenCalledWith(expect.stringContaining(`[Polar] ${label} — no user_id`))
+        expect(upsertSubscription).not.toHaveBeenCalled()
+        expect(grantProFromOrder).not.toHaveBeenCalled()
+        warn.mockRestore()
+      })
+    }
+  })
+
   it('falls back to customer.external_id when metadata is absent', async () => {
     await POST(
       polarEvent('subscription.active', {
