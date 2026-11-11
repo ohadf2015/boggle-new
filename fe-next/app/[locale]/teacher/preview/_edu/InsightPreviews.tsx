@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, type ReactNode } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import { ProGate } from '@/components/teacher/ProGate';
@@ -9,7 +9,7 @@ import { ClassroomPicker } from '@/components/teacher/reports/ClassroomPicker';
 import { PreCheckoutExplainer } from '@/components/teacher/pro/PreCheckoutExplainer';
 import UpgradePricingPageClient from '@/app/[locale]/teacher/upgrade/PageClient';
 import { ReportsFreeInsightsView } from '@/app/[locale]/teacher/reports/ReportsFreeInsights';
-import { ReportsShell } from '@/app/[locale]/teacher/reports/PageClient';
+import { TEACHER_TV_SCALE } from '@/components/teacher/hq/tvScale';
 import { buildStudentPulses, type PulseRow } from '@/lib/education/pro/classInsights';
 import { rankWeekHardestWords, toFreeClassPulse, type FreeClassInsight } from '@/lib/education/pro/freeClassInsight';
 import type { ClassAnalytics } from '@/lib/education/pro/classAnalyticsServer';
@@ -139,5 +139,14 @@ export function UpgradePreview({ v }: { v?: string }) {
       <UpgradePricingPageClient />
       {v === 'explainer' ? <PreCheckoutExplainer mode="trial" pending={false} onConfirm={noop} onBack={noop} /> : null}
     </>
+  );
+}
+
+function ReportsShell({ children }: { children: ReactNode }) {
+  const { t } = useLanguage();
+  return (
+    <EducationShell className={TEACHER_TV_SCALE} scrollRegionLabel={t('teacher.reports.title')} contentClassName="relative p-4 sm:p-6 lg:p-8">
+      {children}
+    </EducationShell>
   );
 }
