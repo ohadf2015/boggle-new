@@ -4,6 +4,7 @@ import '@testing-library/jest-dom';
 import { StudentCapMeter, shouldShowStudentCapUpgradeCta } from '../StudentCapMeter';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 import { TEACHER_PRO_MILESTONE_MIN_STUDENTS } from '@/lib/education/teacherProMilestone';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 
 const mockUseTeacherPro = vi.fn();
 vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => mockUseTeacherPro() }));
@@ -17,6 +18,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
+const mockTrackGrowthEvent = vi.mocked(trackGrowthEvent);
 vi.mock('@/components/teacher/ClassLimitUpsellModal', () => ({
   default: ({ isOpen, reason }: { isOpen: boolean; reason?: string }) =>
     isOpen ? <div data-testid="plan-gate-sheet" data-reason={reason ?? ''} /> : null,
@@ -56,6 +58,7 @@ describe('shouldShowStudentCapUpgradeCta', () => {
 
 describe('StudentCapMeter', () => {
   beforeEach(() => {
+    mockTrackGrowthEvent.mockClear();
     mockUseTeacherPro.mockReturnValue({
       hasPro: false,
       loading: false,
@@ -166,5 +169,57 @@ describe('StudentCapMeter', () => {
   it('keeps the Pro line out of the meter when there is no ask', () => {
     render(<StudentCapMeter studentCount={2} />);
     expect(screen.queryByTestId('student-cap-pro-unlocks')).toBeNull();
+  });
+
+  it('fires iap_viewed impression and landing_cta_clicked on dashboard path with source student_cap_dashboard', () => {
+    render(<StudentCapMeter studentCount={3} source="dashboard" />);
+    expect(mockTrackGrowthEvent).toHaveBeenCalledWith('iap_viewed', {
+      product: 'teacher_pro',
+      source: 'student_cap_dashboard',
+      studentCount: 3,
+      limit: FREE_TIER_LIMITS.studentsPerClass,
+      atCap: false,
+    });
+
+    const cta = screen.getByTestId('student-cap-upgrade-cta');
+    fireEvent.click(cta);
+    expect(mockTrackGrowthEvent).toHaveBeenCalledWith('landing_cta_clicked', {
+      cta: 'teacher_pro',
+      source: 'student_cap_dashboard',
+      studentCount: 3,
+      limit: FREE_TIER_LIMITS.studentsPerClass,
+      atCap: false,
+    });
+  });
+
+  it('fires iap_viewed impression and landing_cta_clicked on classroom_card path with source student_cap_classroom_card', () => {
+    render(<StudentCapMeter studentCount={FREE_TIER_LIMITS.studentsPerClass} source="classroom_card" />);
+    expect(mockTrackGrowthEvent).toHaveBeenCalledWith('iap_viewed', {
+      product: 'teacher_pro',
+      source: 'student_cap_classroom_card',
+      studentCount: FREE_TIER_LIMITS.studentsPerClass,
+      limit: FREE_TIER_LIMITS.studentsPerClass,
+      atCap: true,
+    });
+
+    const cta = screen.getByTestId('student-cap-upgrade-cta');
+    fireEvent.click(cta);
+    expect(mockTrackGrowthEvent).toHaveBeenCalledWith('landing_cta_clicked', {
+      cta: 'teacher_pro',
+      source: 'student_cap_classroom_card',
+      studentCount: FREE_TIER_LIMITS.studentsPerClass,
+      limit: FREE_TIER_LIMITS.studentsPerClass,
+      atCap: true,
+    });
+  });
+
+  it('does not fire iap_viewed when CTA is hidden (below milestone or Pro)', () => {
+    render(<StudentCapMeter studentCount={2} source="dashboard" />);
+    expect(mockTrackGrowthEvent).not.toHaveBeenCalledWith('iap_viewed', expect.anything());
+  });
+
+  it('renders classroomName when provided', () => {
+    render(<StudentCapMeter studentCount={5} classroomName="Period 2" />);
+    expect(screen.getByTestId('student-cap-class-name')).toHaveTextContent('Period 2');
   });
 });

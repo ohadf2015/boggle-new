@@ -12,7 +12,7 @@
  */
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
@@ -32,6 +32,7 @@ export function shouldShowStudentCapUpgradeCta(studentCount: number, hasPro: boo
 export interface StudentCapMeterProps {
   studentCount: number;
   className?: string;
+  classroomName?: string;
   /** Distinguishes dashboard vs classroom-card impressions. */
   source?: 'dashboard' | 'classroom_card';
 }
@@ -39,6 +40,7 @@ export interface StudentCapMeterProps {
 export function StudentCapMeter({
   studentCount,
   className,
+  classroomName,
   source = 'dashboard',
 }: StudentCapMeterProps) {
   const { t, language } = useLanguage();
@@ -51,6 +53,17 @@ export function StudentCapMeter({
   const showCta = !pro.loading && shouldShowStudentCapUpgradeCta(count, hasPro);
   const [gateOpen, setGateOpen] = useState(false);
 
+  useEffect(() => {
+    if (!showCta) return;
+    trackGrowthEvent('iap_viewed', {
+      product: 'teacher_pro',
+      source: `student_cap_${source}`,
+      studentCount: count,
+      limit,
+      atCap,
+    });
+  }, [showCta, source, count, limit, atCap]);
+
   const ctaClass = 'inline-flex min-h-10 shrink-0 items-center justify-center rounded-neo border-[3px] border-neo-black bg-neo-yellow px-3 font-neo-display text-xs font-black text-neo-black shadow-hard transition hover:-translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cream';
   const ctaLabel = t('academy.classes.proCta', 'Get Pro: {{price}}/mo', { price: `$${TEACHER_PRO_PRICE_USD}` });
 
@@ -62,6 +75,11 @@ export function StudentCapMeter({
     >
       <div className="flex min-h-10 flex-wrap items-center justify-between gap-x-3 gap-y-1">
         <p data-testid="student-cap-count" className="font-neo-body text-sm font-bold tabular-nums text-neo-cream/85">
+          {classroomName ? (
+            <span data-testid="student-cap-class-name" className="font-neo-display font-black text-neo-cream me-2">
+              {classroomName}
+            </span>
+          ) : null}
           {hasPro
             ? t('teacher.classroom.studentCountPro', '{{count}} students', { count: String(count) })
             : t('teacher.classroom.studentCap', '{{count}} / {{limit}} students', {
